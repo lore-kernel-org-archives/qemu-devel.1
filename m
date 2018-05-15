@@ -1,25 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39683)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39698)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1fIabs-0003tB-TN
-	for qemu-devel@nongnu.org; Tue, 15 May 2018 10:07:30 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1fIabt-0003uW-Tb
+	for qemu-devel@nongnu.org; Tue, 15 May 2018 10:07:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1fIabo-0002zl-Rg
-	for qemu-devel@nongnu.org; Tue, 15 May 2018 10:07:24 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1fIabn-0002y4-VI
+	for qemu-devel@nongnu.org; Tue, 15 May 2018 10:07:25 -0400
 Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:41690)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1fIabo-0002wj-L2
-	for qemu-devel@nongnu.org; Tue, 15 May 2018 10:07:20 -0400
+	id 1fIabn-0002wj-Ow
+	for qemu-devel@nongnu.org; Tue, 15 May 2018 10:07:19 -0400
 Received: from pm215 by orth.archaic.org.uk with local (Exim 4.89)
-	(envelope-from <pm215@archaic.org.uk>) id 1fIabn-0001UC-Jy
-	for qemu-devel@nongnu.org; Tue, 15 May 2018 15:07:19 +0100
+	(envelope-from <pm215@archaic.org.uk>) id 1fIabm-0001Tk-St
+	for qemu-devel@nongnu.org; Tue, 15 May 2018 15:07:18 +0100
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 15 May 2018 15:07:07 +0100
-Message-Id: <20180515140707.15957-17-peter.maydell@linaro.org>
+Date: Tue, 15 May 2018 15:07:06 +0100
+Message-Id: <20180515140707.15957-16-peter.maydell@linaro.org>
 In-Reply-To: <20180515140707.15957-1-peter.maydell@linaro.org>
 References: <20180515140707.15957-1-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PULL 16/16] tcg: Optionally log FPU state in TCG -d
- cpu logging
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PULL 15/16] sdcard: Correct CRC16 offset in
+ sd_function_switch()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,67 +33,41 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-Usually the logging of the CPU state produced by -d cpu is sufficient
-to diagnose problems, but sometimes you want to see the state of
-the floating point registers as well. We don't want to enable that
-by default as it adds a lot of extra data to the log; instead,
-allow it to be optionally enabled via -d fpu.
+From: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
+Per the Physical Layer Simplified Spec. "4.3.10.4 Switch Function Status":
+
+  The block length is predefined to 512 bits
+
+and "4.10.2 SD Status":
+
+  The SD Status contains status bits that are related to the SD Memory Card
+  proprietary features and may be used for future application-specific usage.
+  The size of the SD Status is one data block of 512 bit. The content of this
+  register is transmitted to the Host over the DAT bus along with a 16-bit CRC.
+
+Thus the 16-bit CRC goes at offset 64.
+
+Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Message-id: 20180509060104.4458-3-f4bug@amsat.org
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Message-id: 20180510130024.31678-1-peter.maydell@linaro.org
 ---
- include/qemu/log.h   | 1 +
- accel/tcg/cpu-exec.c | 9 ++++++---
- util/log.c           | 2 ++
- 3 files changed, 9 insertions(+), 3 deletions(-)
+ hw/sd/sd.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/include/qemu/log.h b/include/qemu/log.h
-index ff92a8b86a..b097a6cae1 100644
---- a/include/qemu/log.h
-+++ b/include/qemu/log.h
-@@ -44,6 +44,7 @@ static inline bool qemu_log_separate(void)
- #define CPU_LOG_PAGE       (1 << 14)
- /* LOG_TRACE (1 << 15) is defined in log-for-trace.h */
- #define CPU_LOG_TB_OP_IND  (1 << 16)
-+#define CPU_LOG_TB_FPU     (1 << 17)
- 
- /* Lock output for a series of related logs.  Since this is not needed
-  * for a single qemu_log / qemu_log_mask / qemu_log_mask_and_addr, we
-diff --git a/accel/tcg/cpu-exec.c b/accel/tcg/cpu-exec.c
-index 81153e7a13..0b154cc678 100644
---- a/accel/tcg/cpu-exec.c
-+++ b/accel/tcg/cpu-exec.c
-@@ -156,11 +156,14 @@ static inline tcg_target_ulong cpu_tb_exec(CPUState *cpu, TranslationBlock *itb)
-     if (qemu_loglevel_mask(CPU_LOG_TB_CPU)
-         && qemu_log_in_addr_range(itb->pc)) {
-         qemu_log_lock();
-+        int flags = 0;
-+        if (qemu_loglevel_mask(CPU_LOG_TB_FPU)) {
-+            flags |= CPU_DUMP_FPU;
-+        }
- #if defined(TARGET_I386)
--        log_cpu_state(cpu, CPU_DUMP_CCOP);
--#else
--        log_cpu_state(cpu, 0);
-+        flags |= CPU_DUMP_CCOP;
- #endif
-+        log_cpu_state(cpu, flags);
-         qemu_log_unlock();
+diff --git a/hw/sd/sd.c b/hw/sd/sd.c
+index 235e0518d6..7af19fa06c 100644
+--- a/hw/sd/sd.c
++++ b/hw/sd/sd.c
+@@ -787,7 +787,7 @@ static void sd_function_switch(SDState *sd, uint32_t arg)
+         sd->data[14 + (i >> 1)] = new_func << ((i * 4) & 4);
      }
- #endif /* DEBUG_DISAS */
-diff --git a/util/log.c b/util/log.c
-index 96f30dd21a..c0dbbd4700 100644
---- a/util/log.c
-+++ b/util/log.c
-@@ -256,6 +256,8 @@ const QEMULogItem qemu_log_items[] = {
-       "show trace before each executed TB (lots of logs)" },
-     { CPU_LOG_TB_CPU, "cpu",
-       "show CPU registers before entering a TB (lots of logs)" },
-+    { CPU_LOG_TB_FPU, "fpu",
-+      "include FPU registers in the 'cpu' logging" },
-     { CPU_LOG_MMU, "mmu",
-       "log MMU-related activities" },
-     { CPU_LOG_PCALL, "pcall",
+     memset(&sd->data[17], 0, 47);
+-    stw_be_p(sd->data + 65, sd_crc16(sd->data, 64));
++    stw_be_p(sd->data + 64, sd_crc16(sd->data, 64));
+ }
+ 
+ static inline bool sd_wp_addr(SDState *sd, uint64_t addr)
 -- 
 2.17.0
