@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39511)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39548)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fIiOI-0003JZ-Sw
-	for qemu-devel@nongnu.org; Tue, 15 May 2018 18:25:58 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1fIiOL-0003KW-VB
+	for qemu-devel@nongnu.org; Tue, 15 May 2018 18:26:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fIiOG-00044g-Jt
-	for qemu-devel@nongnu.org; Tue, 15 May 2018 18:25:54 -0400
-Received: from mail-pf0-x241.google.com ([2607:f8b0:400e:c00::241]:40241)
+	(envelope-from <richard.henderson@linaro.org>) id 1fIiOJ-0004PJ-FN
+	for qemu-devel@nongnu.org; Tue, 15 May 2018 18:25:57 -0400
+Received: from mail-pf0-x244.google.com ([2607:f8b0:400e:c00::244]:36933)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1fIiOG-0003yh-Ck
-	for qemu-devel@nongnu.org; Tue, 15 May 2018 18:25:52 -0400
-Received: by mail-pf0-x241.google.com with SMTP id f189-v6so736075pfa.7
-	for <qemu-devel@nongnu.org>; Tue, 15 May 2018 15:25:52 -0700 (PDT)
+	id 1fIiOJ-0004JQ-4g
+	for qemu-devel@nongnu.org; Tue, 15 May 2018 18:25:55 -0400
+Received: by mail-pf0-x244.google.com with SMTP id e9-v6so739347pfi.4
+	for <qemu-devel@nongnu.org>; Tue, 15 May 2018 15:25:55 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Tue, 15 May 2018 15:25:17 -0700
-Message-Id: <20180515222540.9988-6-richard.henderson@linaro.org>
+Date: Tue, 15 May 2018 15:25:19 -0700
+Message-Id: <20180515222540.9988-8-richard.henderson@linaro.org>
 In-Reply-To: <20180515222540.9988-1-richard.henderson@linaro.org>
 References: <20180515222540.9988-1-richard.henderson@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v6 05/28] fpu/softfloat: Canonicalize NaN
- fraction
+Subject: [Qemu-devel] [PATCH v6 07/28] fpu/softfloat: Replace
+ float_class_dnan with parts_default_nan
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,66 +33,227 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: peter.maydell@linaro.org, alex.bennee@linaro.org
 
-Shift the NaN fraction to a canonical position, much like we
-do for the fraction of normal numbers.  This will facilitate
-manipulation of NaNs within the shared code paths.
+With a canonical representation of NaNs, we can return the
+default nan directly rather than delay the expansion until
+the final format is known.
+
+Note one case where we uselessly assigned to a.sign, which was
+overwritten/ignored later when expanding float_class_dnan.
 
 Tested-by: Alex Bennée <alex.bennee@linaro.org>
 Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
 Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- fpu/softfloat.c | 7 ++++++-
- 1 file changed, 6 insertions(+), 1 deletion(-)
+ fpu/softfloat-specialize.h | 37 +++++++++++++++++++++++++++++++++++++
+ fpu/softfloat.c            | 38 +++++++++++---------------------------
+ 2 files changed, 48 insertions(+), 27 deletions(-)
 
+diff --git a/fpu/softfloat-specialize.h b/fpu/softfloat-specialize.h
+index 515cb12cfa..0d3d81a52b 100644
+--- a/fpu/softfloat-specialize.h
++++ b/fpu/softfloat-specialize.h
+@@ -101,6 +101,43 @@ static bool parts_is_snan_frac(uint64_t frac, float_status *status)
+ #endif
+ }
+ 
++/*----------------------------------------------------------------------------
++| The pattern for a default generated deconstructed floating-point NaN.
++*----------------------------------------------------------------------------*/
++
++static FloatParts parts_default_nan(float_status *status)
++{
++    bool sign = 0;
++    uint64_t frac;
++
++#if defined(TARGET_SPARC) || defined(TARGET_M68K)
++    frac = (1ULL << DECOMPOSED_BINARY_POINT) - 1;
++#elif defined(TARGET_PPC) || defined(TARGET_ARM) || defined(TARGET_ALPHA) || \
++      defined(TARGET_S390X) || defined(TARGET_RISCV)
++    frac = 1ULL << (DECOMPOSED_BINARY_POINT - 1);
++#elif defined(TARGET_HPPA)
++    frac = 1ULL << (DECOMPOSED_BINARY_POINT - 2);
++#else
++    if (status->snan_bit_is_one) {
++        frac = (1ULL << (DECOMPOSED_BINARY_POINT - 1)) - 1;
++    } else {
++#if defined(TARGET_MIPS)
++        frac = 1ULL << (DECOMPOSED_BINARY_POINT - 1);
++#else
++        frac = 1ULL << (DECOMPOSED_BINARY_POINT - 1);
++        sign = 1;
++#endif
++    }
++#endif
++
++    return (FloatParts) {
++        .cls = float_class_qnan,
++        .sign = sign,
++        .exp = INT_MAX,
++        .frac = frac
++    };
++}
++
+ /*----------------------------------------------------------------------------
+ | The pattern for a default generated half-precision NaN.
+ *----------------------------------------------------------------------------*/
 diff --git a/fpu/softfloat.c b/fpu/softfloat.c
-index 0d17027379..607c4a78d5 100644
+index 19f40d6932..51780b718f 100644
 --- a/fpu/softfloat.c
 +++ b/fpu/softfloat.c
-@@ -330,10 +330,11 @@ static FloatParts canonicalize(FloatParts part, const FloatFmt *parm,
-         if (part.frac == 0) {
-             part.cls = float_class_inf;
-         } else {
-+            part.frac <<= parm->frac_shift;
- #ifdef NO_SIGNALING_NANS
-             part.cls = float_class_qnan;
- #else
--            int64_t msb = part.frac << (parm->frac_shift + 2);
-+            int64_t msb = part.frac << 2;
-             if ((msb < 0) == status->snan_bit_is_one) {
-                 part.cls = float_class_snan;
-             } else {
-@@ -480,6 +481,7 @@ static FloatParts round_canonical(FloatParts p, float_status *s,
+@@ -188,7 +188,6 @@ typedef enum __attribute__ ((__packed__)) {
+     float_class_inf,
+     float_class_qnan,  /* all NaNs from here */
+     float_class_snan,
+-    float_class_dnan,
+     float_class_msnan, /* maybe silenced */
+ } FloatClass;
+ 
+@@ -494,8 +493,6 @@ static FloatParts float16_unpack_canonical(float16 f, float_status *s)
+ static float16 float16_round_pack_canonical(FloatParts p, float_status *s)
+ {
+     switch (p.cls) {
+-    case float_class_dnan:
+-        return float16_default_nan(s);
+     case float_class_msnan:
+         p.frac >>= float16_params.frac_shift;
+         return float16_maybe_silence_nan(float16_pack_raw(p), s);
+@@ -513,8 +510,6 @@ static FloatParts float32_unpack_canonical(float32 f, float_status *s)
+ static float32 float32_round_pack_canonical(FloatParts p, float_status *s)
+ {
+     switch (p.cls) {
+-    case float_class_dnan:
+-        return float32_default_nan(s);
+     case float_class_msnan:
+         p.frac >>= float32_params.frac_shift;
+         return float32_maybe_silence_nan(float32_pack_raw(p), s);
+@@ -532,8 +527,6 @@ static FloatParts float64_unpack_canonical(float64 f, float_status *s)
+ static float64 float64_round_pack_canonical(FloatParts p, float_status *s)
+ {
+     switch (p.cls) {
+-    case float_class_dnan:
+-        return float64_default_nan(s);
+     case float_class_msnan:
+         p.frac >>= float64_params.frac_shift;
+         return float64_maybe_silence_nan(float64_pack_raw(p), s);
+@@ -566,7 +559,7 @@ static FloatParts return_nan(FloatParts a, float_status *s)
+         /* fall through */
      case float_class_qnan:
-     case float_class_snan:
-         exp = exp_max;
-+        frac >>= parm->frac_shift;
+         if (s->default_nan_mode) {
+-            a.cls = float_class_dnan;
++            return parts_default_nan(s);
+         }
          break;
  
+@@ -583,7 +576,7 @@ static FloatParts pick_nan(FloatParts a, FloatParts b, float_status *s)
+     }
+ 
+     if (s->default_nan_mode) {
+-        a.cls = float_class_dnan;
++        return parts_default_nan(s);
+     } else {
+         if (pickNaN(is_qnan(a.cls), is_snan(a.cls),
+                     is_qnan(b.cls), is_snan(b.cls),
+@@ -614,8 +607,7 @@ static FloatParts pick_nan_muladd(FloatParts a, FloatParts b, FloatParts c,
+         /* Note that this check is after pickNaNMulAdd so that function
+          * has an opportunity to set the Invalid flag.
+          */
+-        a.cls = float_class_dnan;
+-        return a;
++        which = 3;
+     }
+ 
+     switch (which) {
+@@ -628,8 +620,7 @@ static FloatParts pick_nan_muladd(FloatParts a, FloatParts b, FloatParts c,
+         a = c;
+         break;
+     case 3:
+-        a.cls = float_class_dnan;
+-        return a;
++        return parts_default_nan(s);
      default:
-@@ -503,6 +505,7 @@ static float16 float16_round_pack_canonical(FloatParts p, float_status *s)
-     case float_class_dnan:
-         return float16_default_nan(s);
+         g_assert_not_reached();
+     }
+@@ -682,7 +673,7 @@ static FloatParts addsub_floats(FloatParts a, FloatParts b, bool subtract,
+         if (a.cls == float_class_inf) {
+             if (b.cls == float_class_inf) {
+                 float_raise(float_flag_invalid, s);
+-                a.cls = float_class_dnan;
++                return parts_default_nan(s);
+             }
+             return a;
+         }
+@@ -828,9 +819,7 @@ static FloatParts mul_floats(FloatParts a, FloatParts b, float_status *s)
+     if ((a.cls == float_class_inf && b.cls == float_class_zero) ||
+         (a.cls == float_class_zero && b.cls == float_class_inf)) {
+         s->float_exception_flags |= float_flag_invalid;
+-        a.cls = float_class_dnan;
+-        a.sign = sign;
+-        return a;
++        return parts_default_nan(s);
+     }
+     /* Multiply by 0 or Inf */
+     if (a.cls == float_class_inf || a.cls == float_class_zero) {
+@@ -908,8 +897,7 @@ static FloatParts muladd_floats(FloatParts a, FloatParts b, FloatParts c,
+ 
+     if (inf_zero) {
+         s->float_exception_flags |= float_flag_invalid;
+-        a.cls = float_class_dnan;
+-        return a;
++        return parts_default_nan(s);
+     }
+ 
+     if (flags & float_muladd_negate_c) {
+@@ -933,12 +921,12 @@ static FloatParts muladd_floats(FloatParts a, FloatParts b, FloatParts c,
+     if (c.cls == float_class_inf) {
+         if (p_class == float_class_inf && p_sign != c.sign) {
+             s->float_exception_flags |= float_flag_invalid;
+-            a.cls = float_class_dnan;
++            return parts_default_nan(s);
+         } else {
+             a.cls = float_class_inf;
+             a.sign = c.sign ^ sign_flip;
++            return a;
+         }
+-        return a;
+     }
+ 
+     if (p_class == float_class_inf) {
+@@ -1148,8 +1136,7 @@ static FloatParts div_floats(FloatParts a, FloatParts b, float_status *s)
+         &&
+         (a.cls == float_class_inf || a.cls == float_class_zero)) {
+         s->float_exception_flags |= float_flag_invalid;
+-        a.cls = float_class_dnan;
+-        return a;
++        return parts_default_nan(s);
+     }
+     /* Inf / x or 0 / x */
+     if (a.cls == float_class_inf || a.cls == float_class_zero) {
+@@ -1347,7 +1334,6 @@ static int64_t round_to_int_and_pack(FloatParts in, int rmode,
+     switch (p.cls) {
+     case float_class_snan:
+     case float_class_qnan:
+-    case float_class_dnan:
      case float_class_msnan:
-+        p.frac >>= float16_params.frac_shift;
-         return float16_maybe_silence_nan(float16_pack_raw(p), s);
-     default:
-         p = round_canonical(p, s, &float16_params);
-@@ -521,6 +524,7 @@ static float32 float32_round_pack_canonical(FloatParts p, float_status *s)
-     case float_class_dnan:
-         return float32_default_nan(s);
+         s->float_exception_flags = orig_flags | float_flag_invalid;
+         return max;
+@@ -1439,7 +1425,6 @@ static uint64_t round_to_uint_and_pack(FloatParts in, int rmode, uint64_t max,
+     switch (p.cls) {
+     case float_class_snan:
+     case float_class_qnan:
+-    case float_class_dnan:
      case float_class_msnan:
-+        p.frac >>= float32_params.frac_shift;
-         return float32_maybe_silence_nan(float32_pack_raw(p), s);
-     default:
-         p = round_canonical(p, s, &float32_params);
-@@ -539,6 +543,7 @@ static float64 float64_round_pack_canonical(FloatParts p, float_status *s)
-     case float_class_dnan:
-         return float64_default_nan(s);
-     case float_class_msnan:
-+        p.frac >>= float64_params.frac_shift;
-         return float64_maybe_silence_nan(float64_pack_raw(p), s);
-     default:
-         p = round_canonical(p, s, &float64_params);
+         s->float_exception_flags = orig_flags | float_flag_invalid;
+         return max;
+@@ -1940,8 +1925,7 @@ static FloatParts sqrt_float(FloatParts a, float_status *s, const FloatFmt *p)
+     }
+     if (a.sign) {
+         s->float_exception_flags |= float_flag_invalid;
+-        a.cls = float_class_dnan;
+-        return a;
++        return parts_default_nan(s);
+     }
+     if (a.cls == float_class_inf) {
+         return a;  /* sqrt(+inf) = +inf */
 -- 
 2.17.0
