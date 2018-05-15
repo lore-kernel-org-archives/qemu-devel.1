@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59877)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60319)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fIaCS-0006JR-WB
-	for qemu-devel@nongnu.org; Tue, 15 May 2018 09:41:15 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1fIaEG-0007ea-8Y
+	for qemu-devel@nongnu.org; Tue, 15 May 2018 09:43:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fIaCN-0002jL-Tx
-	for qemu-devel@nongnu.org; Tue, 15 May 2018 09:41:08 -0400
-Received: from mail-wr0-x242.google.com ([2a00:1450:400c:c0c::242]:39934)
+	(envelope-from <alex.bennee@linaro.org>) id 1fIaEF-0003WW-CA
+	for qemu-devel@nongnu.org; Tue, 15 May 2018 09:43:00 -0400
+Received: from mail-wr0-x241.google.com ([2a00:1450:400c:c0c::241]:41103)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1fIaCN-0002j6-Jc
-	for qemu-devel@nongnu.org; Tue, 15 May 2018 09:41:03 -0400
-Received: by mail-wr0-x242.google.com with SMTP id q3-v6so192098wrj.6
-	for <qemu-devel@nongnu.org>; Tue, 15 May 2018 06:41:03 -0700 (PDT)
+	id 1fIaEF-0003W1-4r
+	for qemu-devel@nongnu.org; Tue, 15 May 2018 09:42:59 -0400
+Received: by mail-wr0-x241.google.com with SMTP id g21-v6so189742wrb.8
+	for <qemu-devel@nongnu.org>; Tue, 15 May 2018 06:42:58 -0700 (PDT)
 References: <20180514221219.7091-1-richard.henderson@linaro.org>
-	<20180514221219.7091-22-richard.henderson@linaro.org>
+	<20180514221219.7091-28-richard.henderson@linaro.org>
 From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <20180514221219.7091-22-richard.henderson@linaro.org>
-Date: Tue, 15 May 2018 14:41:01 +0100
-Message-ID: <87d0xxf34i.fsf@linaro.org>
+In-reply-to: <20180514221219.7091-28-richard.henderson@linaro.org>
+Date: Tue, 15 May 2018 14:42:56 +0100
+Message-ID: <87bmdhf31b.fsf@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v5 21/28] fpu/softfloat: Remove
- floatX_maybe_silence_nan
+Subject: Re: [Qemu-devel] [PATCH v5 27/28] fpu/softfloat: Clean up
+ parts_default_nan
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,199 +37,59 @@ Cc: qemu-devel@nongnu.org, peter.maydell@linaro.org
 
 Richard Henderson <richard.henderson@linaro.org> writes:
 
-> These functions are now unused.
+> Reduce the number of ifdefs.  Correct the result for OpenRISC
+> and TriCore (although TriCore fixed in target-specific code).
 >
-> Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 > Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 
 Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
 
 > ---
->  fpu/softfloat-specialize.h | 63 --------------------------------------
->  include/fpu/softfloat.h    |  5 ---
->  2 files changed, 68 deletions(-)
+>  fpu/softfloat-specialize.h | 21 ++++++++++++++-------
+>  1 file changed, 14 insertions(+), 7 deletions(-)
 >
 > diff --git a/fpu/softfloat-specialize.h b/fpu/softfloat-specialize.h
-> index 4fa068a5dc..d7033b7757 100644
+> index 9d562ed504..ec4fb6ba8b 100644
 > --- a/fpu/softfloat-specialize.h
 > +++ b/fpu/softfloat-specialize.h
-> @@ -364,19 +364,6 @@ float16 float16_silence_nan(float16 a, float_status =
-*status)
->  #endif
->  }
+> @@ -129,22 +129,29 @@ static FloatParts parts_default_nan(float_status *s=
+tatus)
+>      uint64_t frac;
 >
-> -/*----------------------------------------------------------------------=
-------
-> -| Returns a quiet NaN if the half-precision floating point value `a' is a
-> -| signaling NaN; otherwise returns `a'.
-> -*-----------------------------------------------------------------------=
------*/
-> -
-> -float16 float16_maybe_silence_nan(float16 a, float_status *status)
-> -{
-> -    if (float16_is_signaling_nan(a, status)) {
-> -        return float16_silence_nan(a, status);
-> -    }
-> -    return a;
-> -}
-> -
->  /*----------------------------------------------------------------------=
-------
->  | Returns 1 if the single-precision floating-point value `a' is a quiet
->  | NaN; otherwise returns 0.
-> @@ -438,18 +425,6 @@ float32 float32_silence_nan(float32 a, float_status =
-*status)
+>  #if defined(TARGET_SPARC) || defined(TARGET_M68K)
+> +    /* !snan_bit_is_one, set all bits */
+>      frac =3D (1ULL << DECOMPOSED_BINARY_POINT) - 1;
+> -#elif defined(TARGET_PPC) || defined(TARGET_ARM) || defined(TARGET_ALPHA=
+) || \
+> -      defined(TARGET_S390X) || defined(TARGET_RISCV)
+> +#elif defined(TARGET_I386) || defined(TARGET_X86_64) \
+> +    || defined(TARGET_MICROBLAZE)
+> +    /* !snan_bit_is_one, set sign and msb */
+>      frac =3D 1ULL << (DECOMPOSED_BINARY_POINT - 1);
+> +    sign =3D 1;
+>  #elif defined(TARGET_HPPA)
+> +    /* snan_bit_is_one, set msb-1.  */
+>      frac =3D 1ULL << (DECOMPOSED_BINARY_POINT - 2);
+>  #else
+> +    /* This case is true for Alpha, ARM, MIPS, OpenRISC, PPC, RISC-V,
+> +     * S390, SH4, TriCore, and Xtensa.  I cannot find documentation
+> +     * for Unicore32; the choice from the original commit is unchanged.
+> +     * Our other supported targets, CRIS, LM32, Moxie, Nios2, and Tile,
+> +     * do not have floating-point.
+> +     */
+>      if (snan_bit_is_one(status)) {
+> +        /* set all bits other than msb */
+>          frac =3D (1ULL << (DECOMPOSED_BINARY_POINT - 1)) - 1;
+>      } else {
+> -#if defined(TARGET_MIPS)
+> +        /* set msb */
+>          frac =3D 1ULL << (DECOMPOSED_BINARY_POINT - 1);
+> -#else
+> -        frac =3D 1ULL << (DECOMPOSED_BINARY_POINT - 1);
+> -        sign =3D 1;
+> -#endif
 >      }
 >  #endif
->  }
-> -/*----------------------------------------------------------------------=
-------
-> -| Returns a quiet NaN if the single-precision floating point value `a' i=
-s a
-> -| signaling NaN; otherwise returns `a'.
-> -*-----------------------------------------------------------------------=
------*/
-> -
-> -float32 float32_maybe_silence_nan(float32 a, float_status *status)
-> -{
-> -    if (float32_is_signaling_nan(a, status)) {
-> -        return float32_silence_nan(a, status);
-> -    }
-> -    return a;
-> -}
->
->  /*----------------------------------------------------------------------=
-------
->  | Returns the result of converting the single-precision floating-point N=
-aN
-> @@ -864,18 +839,6 @@ float64 float64_silence_nan(float64 a, float_status =
-*status)
->  #endif
->  }
->
-> -/*----------------------------------------------------------------------=
-------
-> -| Returns a quiet NaN if the double-precision floating point value `a' i=
-s a
-> -| signaling NaN; otherwise returns `a'.
-> -*-----------------------------------------------------------------------=
------*/
-> -
-> -float64 float64_maybe_silence_nan(float64 a, float_status *status)
-> -{
-> -    if (float64_is_signaling_nan(a, status)) {
-> -        return float64_silence_nan(a, status);
-> -    }
-> -    return a;
-> -}
->
->  /*----------------------------------------------------------------------=
-------
->  | Returns the result of converting the double-precision floating-point N=
-aN
-> @@ -1037,19 +1000,6 @@ floatx80 floatx80_silence_nan(floatx80 a, float_st=
-atus *status)
->  #endif
->  }
->
-> -/*----------------------------------------------------------------------=
-------
-> -| Returns a quiet NaN if the extended double-precision floating point va=
-lue
-> -| `a' is a signaling NaN; otherwise returns `a'.
-> -*-----------------------------------------------------------------------=
------*/
-> -
-> -floatx80 floatx80_maybe_silence_nan(floatx80 a, float_status *status)
-> -{
-> -    if (floatx80_is_signaling_nan(a, status)) {
-> -        return floatx80_silence_nan(a, status);
-> -    }
-> -    return a;
-> -}
-> -
->  /*----------------------------------------------------------------------=
-------
->  | Returns the result of converting the extended double-precision floatin=
-g-
->  | point NaN `a' to the canonical NaN format.  If `a' is a signaling NaN,=
- the
-> @@ -1204,19 +1154,6 @@ float128 float128_silence_nan(float128 a, float_st=
-atus *status)
->  #endif
->  }
->
-> -/*----------------------------------------------------------------------=
-------
-> -| Returns a quiet NaN if the quadruple-precision floating point value `a=
-' is
-> -| a signaling NaN; otherwise returns `a'.
-> -*-----------------------------------------------------------------------=
------*/
-> -
-> -float128 float128_maybe_silence_nan(float128 a, float_status *status)
-> -{
-> -    if (float128_is_signaling_nan(a, status)) {
-> -        return float128_silence_nan(a, status);
-> -    }
-> -    return a;
-> -}
-> -
->  /*----------------------------------------------------------------------=
-------
->  | Returns the result of converting the quadruple-precision floating-poin=
-t NaN
->  | `a' to the canonical NaN format.  If `a' is a signaling NaN, the inval=
-id
-> diff --git a/include/fpu/softfloat.h b/include/fpu/softfloat.h
-> index a6860e858d..69f4dbc4db 100644
-> --- a/include/fpu/softfloat.h
-> +++ b/include/fpu/softfloat.h
-> @@ -258,7 +258,6 @@ int float16_compare_quiet(float16, float16, float_sta=
-tus *status);
->  int float16_is_quiet_nan(float16, float_status *status);
->  int float16_is_signaling_nan(float16, float_status *status);
->  float16 float16_silence_nan(float16, float_status *status);
-> -float16 float16_maybe_silence_nan(float16, float_status *status);
->
->  static inline int float16_is_any_nan(float16 a)
->  {
-> @@ -370,7 +369,6 @@ float32 float32_maxnummag(float32, float32, float_sta=
-tus *status);
->  int float32_is_quiet_nan(float32, float_status *status);
->  int float32_is_signaling_nan(float32, float_status *status);
->  float32 float32_silence_nan(float32, float_status *status);
-> -float32 float32_maybe_silence_nan(float32, float_status *status);
->  float32 float32_scalbn(float32, int, float_status *status);
->
->  static inline float32 float32_abs(float32 a)
-> @@ -500,7 +498,6 @@ float64 float64_maxnummag(float64, float64, float_sta=
-tus *status);
->  int float64_is_quiet_nan(float64 a, float_status *status);
->  int float64_is_signaling_nan(float64, float_status *status);
->  float64 float64_silence_nan(float64, float_status *status);
-> -float64 float64_maybe_silence_nan(float64, float_status *status);
->  float64 float64_scalbn(float64, int, float_status *status);
->
->  static inline float64 float64_abs(float64 a)
-> @@ -604,7 +601,6 @@ int floatx80_compare_quiet(floatx80, floatx80, float_=
-status *status);
->  int floatx80_is_quiet_nan(floatx80, float_status *status);
->  int floatx80_is_signaling_nan(floatx80, float_status *status);
->  floatx80 floatx80_silence_nan(floatx80, float_status *status);
-> -floatx80 floatx80_maybe_silence_nan(floatx80, float_status *status);
->  floatx80 floatx80_scalbn(floatx80, int, float_status *status);
->
->  static inline floatx80 floatx80_abs(floatx80 a)
-> @@ -816,7 +812,6 @@ int float128_compare_quiet(float128, float128, float_=
-status *status);
->  int float128_is_quiet_nan(float128, float_status *status);
->  int float128_is_signaling_nan(float128, float_status *status);
->  float128 float128_silence_nan(float128, float_status *status);
-> -float128 float128_maybe_silence_nan(float128, float_status *status);
->  float128 float128_scalbn(float128, int, float_status *status);
->
->  static inline float128 float128_abs(float128 a)
 
 
 --
