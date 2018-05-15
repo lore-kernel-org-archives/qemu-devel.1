@@ -1,25 +1,43 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43471)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43774)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fIapB-000766-VS
-	for qemu-devel@nongnu.org; Tue, 15 May 2018 10:21:14 -0400
+	(envelope-from <danielhb@linux.ibm.com>) id 1fIaqO-000851-OT
+	for qemu-devel@nongnu.org; Tue, 15 May 2018 10:22:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fIap6-0002zW-Ai
-	for qemu-devel@nongnu.org; Tue, 15 May 2018 10:21:09 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:44956)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1fIap6-0002zA-46
-	for qemu-devel@nongnu.org; Tue, 15 May 2018 10:21:04 -0400
-References: <20180514215042.25911-1-danielhb@linux.ibm.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <69f3929f-9af4-f566-b563-2412de292958@redhat.com>
-Date: Tue, 15 May 2018 09:20:55 -0500
+	(envelope-from <danielhb@linux.ibm.com>) id 1fIaqI-0003Og-T6
+	for qemu-devel@nongnu.org; Tue, 15 May 2018 10:22:24 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:59230)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <danielhb@linux.ibm.com>)
+	id 1fIaqI-0003Na-IW
+	for qemu-devel@nongnu.org; Tue, 15 May 2018 10:22:18 -0400
+Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w4FEL4l8028403
+	for <qemu-devel@nongnu.org>; Tue, 15 May 2018 10:22:17 -0400
+Received: from e13.ny.us.ibm.com (e13.ny.us.ibm.com [129.33.205.203])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2j00sa1qr4-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Tue, 15 May 2018 10:22:17 -0400
+Received: from localhost
+	by e13.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <danielhb@linux.ibm.com>;
+	Tue, 15 May 2018 10:22:12 -0400
+References: <20180219141259.26526-1-danielhb@linux.vnet.ibm.com>
+	<eebc1ad7-2191-d9cc-81fd-5fefa9e3b1c8@linux.vnet.ibm.com>
+	<87tvsfxkuq.fsf@dusky.pond.sub.org> <87efie1v65.fsf@dusky.pond.sub.org>
+	<ab7b28df-747b-0294-2c8f-2b7617a8915e@linux.ibm.com>
+	<87vabplc56.fsf@dusky.pond.sub.org>
+From: Daniel Henrique Barboza <danielhb@linux.ibm.com>
+Date: Tue, 15 May 2018 11:22:07 -0300
 MIME-Version: 1.0
-In-Reply-To: <20180514215042.25911-1-danielhb@linux.ibm.com>
+In-Reply-To: <87vabplc56.fsf@dusky.pond.sub.org>
 Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 1/1] qmp.c: system_wakeup: adding
- RUN_STATE_SUSPENDED check before proceeding
+Content-Language: en-US
+Message-Id: <19ea4ab3-43a3-5f21-754e-6ff7e796a1d0@linux.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH v5 0/2] qmp: 'wakeup-suspend-support' in
+ query-target
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,56 +46,16 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Daniel Henrique Barboza <danielhb@linux.ibm.com>, qemu-devel@nongnu.org
-Cc: Markus Armbruster <armbru@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>
+Cc: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>, mdroth@linux.vnet.ibm.com, qemu-devel@nongnu.org, dgilbert@redhat.com
 
-On 05/14/2018 04:50 PM, Daniel Henrique Barboza wrote:
-> The qmp/hmp command 'system_wakeup' is simply a direct call to
-> 'qemu_system_wakeup_request' from vl.c. This function verifies if
-> runstate is SUSPENDED and if the wake up reason is valid before
-> proceeding.
-> 
-> However, no error or warning is thrown if any of those
-> pre-requirements isn't met. There is no way for the caller to
-> differentiate between a successful wakeup or an error state caused
-> when trying to wake up a guest that wasn't suspended.
 
-This would be the ideal place to also mention...
 
-> 
-> This patch changes qmp_system_wakeup to make the runstate verification
-> before proceeding to call qemu_system_wakeup_request, firing up
-> an error message if the user tries to wake up a machine that
-> isn't in SUSPENDED state. The change isn't made inside
-> qemu_system_wakeup_request because it is used in migration,
-> ACPI and others where this usage might be valid.
-> 
-> Signed-off-by: Daniel Henrique Barboza <danielhb@linux.ibm.com>
-> CC: Markus Armbruster <armbru@redhat.com>
-> CC: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> CC: Eric Blake <eblake@redhat.com>
-> ---
-> 
-> This is a v2 of a patch that got buried:
-> 
-> http://lists.gnu.org/archive/html/qemu-devel/2018-01/msg00092.html
-> 
-> The changes in this version was all in the wording of the commit,
-> reflecting the understanding reached in that discusssion:
+On 05/15/2018 02:29 AM, Markus Armbruster wrote:
+> git-am isn't happy on current master.  The conflicts look simple enough
+> for a maintainer to resolve, but that's yet another hurdle.  Best to
+> respin, I think (assuming you still want the patches to go in).
+Just respinned it to v6. Let's see how that goes.
 
-...this text:
 
-> silent
-> failure should be interpreted as a bug and there is no API break
-> in fixing this behavior - applications that didn't check the result
-> will remain broken, the ones that check will have a chance to deal
-> with it.
->
-
-With the commit message further improved,
-Reviewed-by: Eric Blake <eblake@redhat.com>
-
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+Daniel
