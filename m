@@ -1,22 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59158)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59429)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1fIa9N-0003yP-Og
-	for qemu-devel@nongnu.org; Tue, 15 May 2018 09:37:59 -0400
+	(envelope-from <thuth@redhat.com>) id 1fIaAW-0004k0-Ll
+	for qemu-devel@nongnu.org; Tue, 15 May 2018 09:39:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1fIa9J-0001Ct-R9
-	for qemu-devel@nongnu.org; Tue, 15 May 2018 09:37:57 -0400
-Date: Tue, 15 May 2018 15:37:49 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20180515153749.280c2ee7.cohuck@redhat.com>
-In-Reply-To: <d7ad3d7d-ef06-536f-2b59-96358d70a3a4@linux.ibm.com>
-References: <CAFEAcA93DU7H73F-3Xd_4eP6MCZn-JHWMMeqVtyDHoMWYBXHiA@mail.gmail.com>
-	<20180515103229.6684fbe9.cohuck@redhat.com>
-	<d7ad3d7d-ef06-536f-2b59-96358d70a3a4@linux.ibm.com>
+	(envelope-from <thuth@redhat.com>) id 1fIaAQ-0001ir-Dq
+	for qemu-devel@nongnu.org; Tue, 15 May 2018 09:39:08 -0400
+References: <20180515055949.6446-1-olaf@aepfle.de>
+	<87mux1jrf7.fsf@dusky.pond.sub.org>
+	<7c3cb275-1568-ee34-314e-c3400b8148c2@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <27f1e01f-4f06-4cd7-d546-f9654c706be4@redhat.com>
+Date: Tue, 15 May 2018 15:38:53 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <7c3cb275-1568-ee34-314e-c3400b8148c2@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [qemu-s390x] virtio-ccw.c vs larger
- VIRTIO_QUEUE_MAX (coverity warning CID 1390619)
+Subject: Re: [Qemu-devel] [PATCH] replace functions which are only available
+ in glib-2.24
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,106 +26,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Halil Pasic <pasic@linux.ibm.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-s390x@nongnu.org, Jason Wang <jasowang@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
+To: Paolo Bonzini <pbonzini@redhat.com>, Markus Armbruster <armbru@redhat.com>, Olaf Hering <olaf@aepfle.de>
+Cc: qemu-trivial@nongnu.org, Fam Zheng <famz@redhat.com>, "open list:All patches CC here" <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>
 
-On Tue, 15 May 2018 14:00:30 +0200
-Halil Pasic <pasic@linux.ibm.com> wrote:
-
-> On 05/15/2018 10:32 AM, Cornelia Huck wrote:
-> > On Mon, 14 May 2018 19:12:27 +0100
-> > Peter Maydell <peter.maydell@linaro.org> wrote:
-
-> >> (Other odd code in that function:
-> >>      vector = 0;
-> >>      [...]
-> >>      indicators |= 1ULL << vector;
-> >> is that really supposed to ignore the input vector number?)  
+On 15.05.2018 10:41, Paolo Bonzini wrote:
+> On 15/05/2018 09:42, Markus Armbruster wrote:
+>> Olaf Hering <olaf@aepfle.de> writes:
+>>
+>>> Currently the minimal supported version of glib is 2.22.
+>>> Since testing is done with a glib that claims to be 2.22, but in fact
+>>> has APIs from newer version of glib, this bug was not caught during
+>>> submit of the patch referenced below.
+>>>
+>>> Replace g_realloc_n, which is available only since 2.24, with g_renew.
+>>
+>> We're about to bump our required GLib version to 2.34.  See
+>> https://lists.gnu.org/archive/html/qemu-devel/2018-05/msg02562.html
+>> Message-ID: <751a3b4f-55ef-dec0-aec9-6b48922b7843@redhat.com>
+>>
+>> However, the patch may make sense for stable anyway.
 > 
-> This is why the vector >= VIRTIO_QUEUE_MAX + 64 does not make sense. I
-> think this should be simplified. Overwriting the vector with zero and
-> doing the shift is just nonsensical.
+> It's a good idea even for non-stable.  In the end, g_*alloc*_n are
+> rarely needed, and almost always g_*new* is better as it provides better
+> type safety.  I'm queuing the patch, and we should consider adding a
+> checkpatch rule to suggest not using these functions.
 
-Yes, that would only make sense if we did a vector -= VIRTIO_QUEUE_MAX
-instead.
+Please do not queue this version of the patch - Olaf sent a v2 where he
+fixed the obvious bug with "IOVAMapping *" vs. "IOVAMapping".
 
-History time :)
-
-Originally, we defined a single 64 bit area for notifications, matching
-virtqueues bit-for-queue, and simply saved the bit/virtqueue number in
-the vector value. Then, we realized that we were missing configuration
-notifications... solution was to define a second notification area,
-also 64 bit for convenience (and in case we had missed yet another
-notification mechanism). So, we had the following 'vector':
-
-primary (queue) indicators   secondary indicators
-0          ..           63   64       ..      127
-
-with the two parts registered separately, and 65..127 unused. This
-persisted through introduction of adapter interrupts (making the first
-part 64 bit in a bitfield somewhere) and increasing the number of
-virtqueues (making the first part even more bits in a bitfield
-somewhere).
-
-The rationale for the 'max virtqueues + 64' check is that the
-guest always registers the full 64 bit for the second part (and that we
-might want some more bits in there in the future -- which never
-happened). In reality, a notification beyond max virtqueues + 1 means
-that qemu has lost its way somewhere and is doing weird things.
-
+> Paolo
 > 
-> To sum it up, my take on the whole is the diff below. I can convert
-> it to a proper patch if we agree that's the way to go.
+>>> Fixes commit 418026ca43 ("util: Introduce vfio helpers")
+>>>
+>>> Signed-off-by: Olaf Hering <olaf@aepfle.de>
+>>> ---
+>>>
+>>> This must go into stable-2.12.
+>>
+>> Please see docs/devel/stable-process.rst for how to get a patch into a
+>> stable release.
+>>
+>>>  util/vfio-helpers.c | 6 ++----
+>>>  1 file changed, 2 insertions(+), 4 deletions(-)
+>>>
+>>> diff --git a/util/vfio-helpers.c b/util/vfio-helpers.c
+>>> index 006674c916..5fd4f5f212 100644
+>>> --- a/util/vfio-helpers.c
+>>> +++ b/util/vfio-helpers.c
+>>> @@ -522,8 +522,7 @@ static IOVAMapping *qemu_vfio_add_mapping(QEMUVFIOState *s,
+>>>  
+>>>      assert(index >= 0);
+>>>      s->nr_mappings++;
+>>> -    s->mappings = g_realloc_n(s->mappings, sizeof(s->mappings[0]),
+>>> -                              s->nr_mappings);
+>>> +    s->mappings = g_renew(IOVAMapping *, s->mappings, s->nr_mappings);
+>>
+>> I'm afraid this switches from allocating a bunch of IOVAMapping to a
+>> bunch of IOVAMapping *.  My gcc duly warns.
 
-> ----------------------------8<---------------------------------------
-> 
-> From: Halil Pasic <pasic@linux.ibm.com>
-> Date: Tue, 15 May 2018 13:57:44 +0200
-> Subject: [PATCH] WIP: cleanup virtio notify
-> 
-> Signed-off-by: Halil Pasic <pasic@linux.ibm.com>
-> ---
->   hw/s390x/virtio-ccw.c | 9 +++------
->   1 file changed, 3 insertions(+), 6 deletions(-)
-> 
-> diff --git a/hw/s390x/virtio-ccw.c b/hw/s390x/virtio-ccw.c
-> index e51fbefd23..22078605d1 100644
-> --- a/hw/s390x/virtio-ccw.c
-> +++ b/hw/s390x/virtio-ccw.c
-> @@ -1003,10 +1003,8 @@ static void virtio_ccw_notify(DeviceState *d,
-> uint16_t vector) SubchDev *sch = ccw_dev->sch;
->       uint64_t indicators;
-> 
-> -    /* queue indicators + secondary indicators */
-> -    if (vector >= VIRTIO_QUEUE_MAX + 64) {
-> -        return;
-> -    }
-> +    /* vector == VIRTIO_QUEUE_MAX means configuration change */
+See v2 of the patch where Olaf fixed this already.
 
-"vector < VIRTIO_QUEUE_MAX: notification for a virtqueue
-vector == VIRTIO_QUEUE_MAX: configuration change notification
-bits beyond that are unused and should never be notified for"
-
-?
-
-> +    assert(vector <= VIRTIO_QUEUE_MAX);
-> 
->       if (vector < VIRTIO_QUEUE_MAX) {
->           if (!dev->indicators) {
-> @@ -1042,12 +1040,11 @@ static void virtio_ccw_notify(DeviceState *d,
-> uint16_t vector) if (!dev->indicators2) {
->               return;
->           }
-> -        vector = 0;
->           indicators = address_space_ldq(&address_space_memory,
->                                          dev->indicators2->addr,
->                                          MEMTXATTRS_UNSPECIFIED,
->                                          NULL);
-> -        indicators |= 1ULL << vector;
-> +        indicators |= 1ULL;
->           address_space_stq(&address_space_memory,
-> dev->indicators2->addr, indicators, MEMTXATTRS_UNSPECIFIED, NULL);
->           css_conditional_io_interrupt(sch);
-
-I'm ok with that; but as Peter mentioned, you also need to assert on
-vector < 64 in the classic indicator case.
+ Thomas
