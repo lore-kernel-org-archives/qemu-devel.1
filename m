@@ -1,25 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55190)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55754)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fIbUD-0005eW-TV
-	for qemu-devel@nongnu.org; Tue, 15 May 2018 11:03:37 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1fIbVX-0006YZ-5f
+	for qemu-devel@nongnu.org; Tue, 15 May 2018 11:05:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fIbU6-0004bX-Aj
-	for qemu-devel@nongnu.org; Tue, 15 May 2018 11:03:33 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:36166 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1fIbU6-0004b4-6q
-	for qemu-devel@nongnu.org; Tue, 15 May 2018 11:03:26 -0400
-References: <20180512014801.17566-1-richard.henderson@linaro.org>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <cb920ac0-36d2-09c4-e3dc-197f73710868@redhat.com>
-Date: Tue, 15 May 2018 10:03:22 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1fIbVS-0005y6-Hm
+	for qemu-devel@nongnu.org; Tue, 15 May 2018 11:04:55 -0400
+Received: from mail-ot0-x241.google.com ([2607:f8b0:4003:c0f::241]:45633)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1fIbVS-0005xn-Cp
+	for qemu-devel@nongnu.org; Tue, 15 May 2018 11:04:50 -0400
+Received: by mail-ot0-x241.google.com with SMTP id 15-v6so538474otn.12
+	for <qemu-devel@nongnu.org>; Tue, 15 May 2018 08:04:50 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20180512014801.17566-1-richard.henderson@linaro.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 1/2] hw/virtio: Fix brace Werror with clang
- 6.0.0
+In-Reply-To: <e2b0f5a2-18df-79a2-7caa-45afdc09a172@redhat.com>
+References: <20180513085032.27773-1-sw@weilnetz.de>
+	<e2b0f5a2-18df-79a2-7caa-45afdc09a172@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 15 May 2018 16:04:29 +0100
+Message-ID: <CAFEAcA_bbq_ckoUnYs1VvL+389R9KL6HOxxRD2oFMfE05rsg_w@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH] configure: Use strings command from cross
+ development tools
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,39 +30,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
-Cc: "Michael S . Tsirkin" <mst@redhat.com>
+To: Eric Blake <eblake@redhat.com>
+Cc: Stefan Weil <sw@weilnetz.de>, Mike Frysinger <vapier@gentoo.org>, QEMU Developer <qemu-devel@nongnu.org>
 
-On 05/11/2018 08:48 PM, Richard Henderson wrote:
-> The warning is
-> 
-> hw/virtio/vhost-user.c:1319:26: error: suggest braces
->        around initialization of subobject [-Werror,-Wmissing-braces]
->      VhostUserMsg msg = { 0 };
->                           ^
->                           {}
-> 
-> While the original code is correct, and technically exactly correct
-> as per ISO C89, both GCC and Clang support plain empty set of braces
+On 15 May 2018 at 16:00, Eric Blake <eblake@redhat.com> wrote:
+> On 05/13/2018 03:50 AM, Stefan Weil wrote:
+>>
+>> This fixes cross builds for the (rare) case where cross binutils
+>> but no native binutils are installed.
+>>
+>> Signed-off-by: Stefan Weil <sw@weilnetz.de>
+>> ---
+>>   configure | 5 +++--
+>>   1 file changed, 3 insertions(+), 2 deletions(-)
+>>
+>
+>> +strings="${STRINGS-${cross_prefix}strings}"
+>>   strip="${STRIP-${cross_prefix}strip}"
+>
+>
+> Hmm - we have pre-existing problems in our configure file.  More on that
+> below...
+>
+>>   windres="${WINDRES-${cross_prefix}windres}"
+>>   pkg_config_exe="${PKG_CONFIG-${cross_prefix}pkg-config}"
+>> @@ -1956,9 +1957,9 @@ int main(int argc, char *argv[]) {
+>>   EOF
+>>     if compile_object ; then
+>> -    if strings -a $TMPO | grep -q BiGeNdIaN ; then
+>> +    if "$strings" -a $TMPO | grep -q BiGeNdIaN ; then
+>
+>
+> I'd much prefer this to be:
+>
+> if $strings -a $TMPO | grep...
+>
+> That's because if I have something like this in my environment:
+>
+> STRINGS='/path/to/strings -a'
+>
+> it will only work if you allow word splitting on my variable.
 
-s/C89/C99/ (the guarantee of a universal {0} initializer was only added 
-in C99, if I recall correctly)
+Conversely, if I have STRINGS='/path with spaces/to/strings'
+in my environment it will only work if you don't do word
+splitting on it :-)
 
-> as an extension.
-> 
-> Cc: Michael S. Tsirkin <mst@redhat.com>
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-> ---
->   hw/virtio/vhost-user.c | 2 +-
->   1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-
-It's annoying that we have to work around clang's bogus warning by 
-resorting to an extension.  But such is life.
-
-Reviewed-by: Eric Blake <eblake@redhat.com>
-
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+thanks
+-- PMM
