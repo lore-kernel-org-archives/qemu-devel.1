@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45692)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46437)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fIay8-0006aD-Tj
-	for qemu-devel@nongnu.org; Tue, 15 May 2018 10:30:29 -0400
+	(envelope-from <armbru@redhat.com>) id 1fIb1L-0000Sp-H9
+	for qemu-devel@nongnu.org; Tue, 15 May 2018 10:33:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fIay2-00068e-VY
-	for qemu-devel@nongnu.org; Tue, 15 May 2018 10:30:24 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:33968 helo=mx1.redhat.com)
+	(envelope-from <armbru@redhat.com>) id 1fIb1I-0007Re-BV
+	for qemu-devel@nongnu.org; Tue, 15 May 2018 10:33:43 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:43360 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1fIay2-00068H-Jz
-	for qemu-devel@nongnu.org; Tue, 15 May 2018 10:30:18 -0400
-References: <20180313044944.21058-1-aik@ozlabs.ru>
-	<20180313074442.xw5deum6xfw5tvjw@var.youpi.perso.aquilenet.fr>
-	<87d13bdd-4a33-fb05-0c7c-36aabbd3d038@ozlabs.ru>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <ad86c974-120e-4a2d-1db9-03d1b8ace247@redhat.com>
-Date: Tue, 15 May 2018 09:30:17 -0500
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fIb1I-0007RW-6g
+	for qemu-devel@nongnu.org; Tue, 15 May 2018 10:33:40 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <20180514141218.28438-1-pbonzini@redhat.com>
+	<87r2md6sd5.fsf@dusky.pond.sub.org>
+	<38c5dd46-b439-2ac5-22fb-10aca97fb633@redhat.com>
+Date: Tue, 15 May 2018 16:33:38 +0200
+In-Reply-To: <38c5dd46-b439-2ac5-22fb-10aca97fb633@redhat.com> (Paolo
+	Bonzini's message of "Tue, 15 May 2018 14:06:19 +0200")
+Message-ID: <87sh6t56pp.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <87d13bdd-4a33-fb05-0c7c-36aabbd3d038@ozlabs.ru>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH qemu v2] slirp/debug: Print IP addresses in
- human readable form
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH] coverity-model: replay data is considered
+ trusted
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,47 +29,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alexey Kardashevskiy <aik@ozlabs.ru>, Samuel Thibault <samuel.thibault@gnu.org>
-Cc: qemu-devel@nongnu.org
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-devel@nongnu.org, Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
 
-On 05/14/2018 02:00 AM, Alexey Kardashevskiy wrote:
-> On 13/3/18 6:44 pm, Samuel Thibault wrote:
->> Alexey Kardashevskiy, on mar. 13 mars 2018 15:49:44 +1100, wrote:
->>> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
->>
->> Applied to my tree, thanks!
-> 
-> 
-> And what is your tree, is this something to be merged sometime later
-> somewhere? :)
+Paolo Bonzini <pbonzini@redhat.com> writes:
 
-Per MAINTAINERS:
+> On 15/05/2018 14:00, Markus Armbruster wrote:
+>> Paolo Bonzini <pbonzini@redhat.com> writes:
+>> 
+>>> Replay data is not considered a possible attack vector; add a model that
+>>> does not use getc so that "tainted data" warnings are suppressed.
+>>>
+>>> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+>>> ---
+>>>  scripts/coverity-model.c | 13 +++++++++++++
+>>>  1 file changed, 13 insertions(+)
+>>>
+>>> diff --git a/scripts/coverity-model.c b/scripts/coverity-model.c
+>>> index c702804f41..576f48de33 100644
+>>> --- a/scripts/coverity-model.c
+>>> +++ b/scripts/coverity-model.c
+>>> @@ -103,6 +103,19 @@ static int get_keysym(const name2keysym_t *table,
+>>    /* Tainting */
+>> 
+>>    typedef struct {} name2keysym_t;
+>>    static int get_keysym(const name2keysym_t *table,
+>>                          const char *name)
+>>    {
+>>        int result;
+>>        if (result > 0) {
+>>            __coverity_tainted_string_sanitize_content__(name);
+>>            return result;
+>>        } else {
+>>            return 0;
+>>>      }
+>>>  }
+>>>  
+>>> +
+>> 
+>> Does the new model go under /* Tainting */ ?
+>
+> Yes, it does.  Any chance you can do the change yourself?...
 
-SLIRP
-M: Samuel Thibault <samuel.thibault@ens-lyon.org>
-M: Jan Kiszka <jan.kiszka@siemens.com>
-S: Maintained
-F: slirp/
-F: net/slirp.c
-F: include/net/slirp.h
-T: git git://git.kiszka.org/qemu.git queues/slirp
+Gladly :)
 
-which shows Jan's staging tree, but not Samuel's.
-
-It's not a requirement for a maintainer to have a public-facing staging 
-tree, but many of them do, as it gives you a chance to test that what 
-will later be in a pull request matches what you expect.
-
-At any rate, 
-https://wiki.qemu.org/Contribute/SubmitAPatch#Is_my_patch_in.3F mentions 
-that maintainers will batch together various related patches and send a 
-pull request for inclusion in the main repository, thus even when a 
-patch has been reviewed and staged, it may be another week or two before 
-it lands in mainline.  Yes, it can feel slow, but in general it works 
-out for the best (as we have more chances to flag potential problems 
-before they affect everyone by being in mainline).
-
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+Reviewed-by: Markus Armbruster <armbru@redhat.com>
