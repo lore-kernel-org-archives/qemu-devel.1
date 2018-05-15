@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40429)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40686)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fIc7e-0001HT-7U
-	for qemu-devel@nongnu.org; Tue, 15 May 2018 11:44:19 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1fIc8U-000274-Mx
+	for qemu-devel@nongnu.org; Tue, 15 May 2018 11:45:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fIc7Z-0003kf-JM
-	for qemu-devel@nongnu.org; Tue, 15 May 2018 11:44:18 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:40686 helo=mx1.redhat.com)
+	(envelope-from <pbonzini@redhat.com>) id 1fIc8R-0004Xn-Ue
+	for qemu-devel@nongnu.org; Tue, 15 May 2018 11:45:10 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:39682 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1fIc7Z-0003kD-FN
-	for qemu-devel@nongnu.org; Tue, 15 May 2018 11:44:13 -0400
-References: <1526382973-49342-1-git-send-email-imammedo@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <e8b8f182-6515-0036-72ed-21596af9b6ee@redhat.com>
-Date: Tue, 15 May 2018 10:44:12 -0500
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1fIc8R-0004XT-O9
+	for qemu-devel@nongnu.org; Tue, 15 May 2018 11:45:07 -0400
+References: <1526384108-49348-1-git-send-email-jianjay.zhou@huawei.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <b3bdf71d-71c6-b562-43b6-58ecf0865e4b@redhat.com>
+Date: Tue, 15 May 2018 17:45:04 +0200
 MIME-Version: 1.0
-In-Reply-To: <1526382973-49342-1-git-send-email-imammedo@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <1526384108-49348-1-git-send-email-jianjay.zhou@huawei.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] riscv: remove define cpu_init()
+Subject: Re: [Qemu-devel] [PATCH] memory: delete struct AddressSpaceOps
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,22 +27,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>, qemu-devel@nongnu.org
-Cc: mjc@sifive.com, palmer@sifive.com
+To: Jay Zhou <jianjay.zhou@huawei.com>, qemu-devel@nongnu.org
+Cc: wangxinxin.wang@huawei.com, weidong.huang@huawei.com
 
-On 05/15/2018 06:16 AM, Igor Mammedov wrote:
-> cpu_init() was removed since 2.12, so drop define that now isn't used
-> nad point to nowhere.
+On 15/05/2018 13:35, Jay Zhou wrote:
+> Since struct AddressSpaceOps isn't used anywhere else,
+> so just delete it.
+> 
+> Signed-off-by: Jay Zhou <jianjay.zhou@huawei.com>
+> ---
+>  memory.c | 2 --
+>  1 file changed, 2 deletions(-)
+> 
+> diff --git a/memory.c b/memory.c
+> index fc7f9b7..94b91f9 100644
+> --- a/memory.c
+> +++ b/memory.c
+> @@ -220,8 +220,6 @@ struct FlatRange {
+>      bool readonly;
+>  };
+>  
+> -typedef struct AddressSpaceOps AddressSpaceOps;
+> -
+>  #define FOR_EACH_FLAT_RANGE(var, view)          \
+>      for (var = (view)->ranges; var < (view)->ranges + (view)->nr; ++var)
+>  
+> 
 
-Reads better as:
+Queued, thanks.
 
-so drop the define that is now unused
-
-or maybe
-
-so drop the unused define rather than letting it point to nowhere
-
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+Paolo
