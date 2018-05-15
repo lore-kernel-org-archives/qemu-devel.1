@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45643)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47421)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1fIW29-0001mJ-Tl
-	for qemu-devel@nongnu.org; Tue, 15 May 2018 05:14:14 -0400
+	(envelope-from <no-reply@patchew.org>) id 1fIW4q-00036A-8y
+	for qemu-devel@nongnu.org; Tue, 15 May 2018 05:17:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1fIW24-0006hh-Rm
-	for qemu-devel@nongnu.org; Tue, 15 May 2018 05:14:13 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:57830 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1fIW24-0006gJ-NV
-	for qemu-devel@nongnu.org; Tue, 15 May 2018 05:14:08 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.3])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 7D351400BA82
-	for <qemu-devel@nongnu.org>; Tue, 15 May 2018 09:14:02 +0000 (UTC)
-From: Peter Xu <peterx@redhat.com>
-Date: Tue, 15 May 2018 17:13:56 +0800
-Message-Id: <20180515091356.24106-1-peterx@redhat.com>
-Subject: [Qemu-devel] [PATCH RFC] qemu-error: introduce error_report_once
+	(envelope-from <no-reply@patchew.org>) id 1fIW4l-0000Yy-P7
+	for qemu-devel@nongnu.org; Tue, 15 May 2018 05:17:00 -0400
+Resent-Message-Id: <E1fIW4l-0000Yy-P7@eggs.gnu.org>
+Received: from sender-of-o51.zoho.com ([135.84.80.216]:21059)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1fIW4l-0000Tc-F8
+	for qemu-devel@nongnu.org; Tue, 15 May 2018 05:16:55 -0400
+In-Reply-To: <20180515091356.24106-1-peterx@redhat.com>
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <152637577782.159.15011732639919134425@1f70390a8372>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Tue, 15 May 2018 02:16:18 -0700 (PDT)
+Subject: Re: [Qemu-devel] [PATCH RFC] qemu-error: introduce error_report_once
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,48 +28,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: peterx@redhat.com, Markus Armbruster <armbru@redhat.com>
+To: peterx@redhat.com
+Cc: famz@redhat.com, qemu-devel@nongnu.org, armbru@redhat.com
 
-I stole the printk_once() macro.
-
-I always wanted to be able to print some error directly if there is a
-buffer to dump, however we can't use error_report() really quite often
-when there can be any DDOS attack.  To avoid that, we can introduce a
-print-once function for it.
-
-CC: Markus Armbruster <armbru@redhat.com>
-Signed-off-by: Peter Xu <peterx@redhat.com>
----
-We can for sure introduce similar functions for the rest of the
-error_*() functions, it's just an idea to see whether we'd like it
-in general.
----
- include/qemu/error-report.h | 12 ++++++++++++
- 1 file changed, 12 insertions(+)
-
-diff --git a/include/qemu/error-report.h b/include/qemu/error-report.h
-index e1c8ae1a52..efebb80e2c 100644
---- a/include/qemu/error-report.h
-+++ b/include/qemu/error-report.h
-@@ -44,6 +44,18 @@ void error_report(const char *fmt, ...) GCC_FMT_ATTR(1, 2);
- void warn_report(const char *fmt, ...) GCC_FMT_ATTR(1, 2);
- void info_report(const char *fmt, ...) GCC_FMT_ATTR(1, 2);
- 
-+#define error_report_once(fmt, ...)             \
-+    ({                                          \
-+        static bool __print_once;               \
-+        bool __ret_print_once = !__print_once;  \
-+                                                \
-+        if (!__print_once) {					\
-+            __print_once = true;				\
-+            error_report(fmt, ##__VA_ARGS__);   \
-+        }                                       \
-+        unlikely(__ret_print_once);				\
-+    })
-+
- const char *error_get_progname(void);
- extern bool enable_timestamp_msg;
- 
--- 
-2.17.0
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
+c3NhZ2UtaWQ6IDIwMTgwNTE1MDkxMzU2LjI0MTA2LTEtcGV0ZXJ4QHJlZGhhdC5jb20KU3ViamVj
+dDogW1FlbXUtZGV2ZWxdIFtQQVRDSCBSRkNdIHFlbXUtZXJyb3I6IGludHJvZHVjZSBlcnJvcl9y
+ZXBvcnRfb25jZQoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFzaAoKQkFTRT1i
+YXNlCm49MQp0b3RhbD0kKGdpdCBsb2cgLS1vbmVsaW5lICRCQVNFLi4gfCB3YyAtbCkKZmFpbGVk
+PTAKCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxpbWl0IDAKZ2l0IGNvbmZpZyAtLWxv
+Y2FsIGRpZmYucmVuYW1lcyBUcnVlCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLmFsZ29yaXRobSBo
+aXN0b2dyYW0KCmNvbW1pdHM9IiQoZ2l0IGxvZyAtLWZvcm1hdD0lSCAtLXJldmVyc2UgJEJBU0Uu
+LikiCmZvciBjIGluICRjb21taXRzOyBkbwogICAgZWNobyAiQ2hlY2tpbmcgUEFUQ0ggJG4vJHRv
+dGFsOiAkKGdpdCBsb2cgLW4gMSAtLWZvcm1hdD0lcyAkYykuLi4iCiAgICBpZiAhIGdpdCBzaG93
+ICRjIC0tZm9ybWF0PWVtYWlsIHwgLi9zY3JpcHRzL2NoZWNrcGF0Y2gucGwgLS1tYWlsYmFjayAt
+OyB0aGVuCiAgICAgICAgZmFpbGVkPTEKICAgICAgICBlY2hvCiAgICBmaQogICAgbj0kKChuKzEp
+KQpkb25lCgpleGl0ICRmYWlsZWQKPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KClVwZGF0aW5nIDNj
+OGNmNWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMzODQKRnJvbSBodHRwczovL2dpdGh1
+Yi5jb20vcGF0Y2hldy1wcm9qZWN0L3FlbXUKICAgZmJkM2E0ODlkZi4uYzY5MWM4NzYxNiAgbWFz
+dGVyICAgICAtPiBtYXN0ZXIKIHQgW3RhZyB1cGRhdGVdICAgICAgICAgICAgcGF0Y2hldy8yMDE4
+MDUxNTA4MjMxOS4zMDcyMy0xLWtyYXhlbEByZWRoYXQuY29tIC0+IHBhdGNoZXcvMjAxODA1MTUw
+ODIzMTkuMzA3MjMtMS1rcmF4ZWxAcmVkaGF0LmNvbQogKiBbbmV3IHRhZ10gICAgICAgICAgICAg
+ICBwYXRjaGV3LzIwMTgwNTE1MDkxMzU2LjI0MTA2LTEtcGV0ZXJ4QHJlZGhhdC5jb20gLT4gcGF0
+Y2hldy8yMDE4MDUxNTA5MTM1Ni4yNDEwNi0xLXBldGVyeEByZWRoYXQuY29tClN3aXRjaGVkIHRv
+IGEgbmV3IGJyYW5jaCAndGVzdCcKYWQxMTU5YzIzYiBxZW11LWVycm9yOiBpbnRyb2R1Y2UgZXJy
+b3JfcmVwb3J0X29uY2UKCj09PSBPVVRQVVQgQkVHSU4gPT09CkNoZWNraW5nIFBBVENIIDEvMTog
+cWVtdS1lcnJvcjogaW50cm9kdWNlIGVycm9yX3JlcG9ydF9vbmNlLi4uCkVSUk9SOiBjb2RlIGlu
+ZGVudCBzaG91bGQgbmV2ZXIgdXNlIHRhYnMKIzMwOiBGSUxFOiBpbmNsdWRlL3FlbXUvZXJyb3It
+cmVwb3J0Lmg6NTI6CisgICAgICAgIGlmICghX19wcmludF9vbmNlKSB7XkleSV5JXkleSVwkCgpF
+UlJPUjogY29kZSBpbmRlbnQgc2hvdWxkIG5ldmVyIHVzZSB0YWJzCiMzMTogRklMRTogaW5jbHVk
+ZS9xZW11L2Vycm9yLXJlcG9ydC5oOjUzOgorICAgICAgICAgICAgX19wcmludF9vbmNlID0gdHJ1
+ZTteSV5JXkleSVwkCgpFUlJPUjogY29kZSBpbmRlbnQgc2hvdWxkIG5ldmVyIHVzZSB0YWJzCiMz
+NDogRklMRTogaW5jbHVkZS9xZW11L2Vycm9yLXJlcG9ydC5oOjU2OgorICAgICAgICB1bmxpa2Vs
+eShfX3JldF9wcmludF9vbmNlKTteSV5JXkleSVwkCgp0b3RhbDogMyBlcnJvcnMsIDAgd2Fybmlu
+Z3MsIDE4IGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVh
+c2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJl
+cG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVS
+Uy4KCj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEK
+CgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cDovL3Bh
+dGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEBy
+ZWRoYXQuY29t
