@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44407)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44798)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <drjones@redhat.com>) id 1fIasx-00026L-Hm
-	for qemu-devel@nongnu.org; Tue, 15 May 2018 10:25:04 -0400
+	(envelope-from <armbru@redhat.com>) id 1fIau6-0003BG-AU
+	for qemu-devel@nongnu.org; Tue, 15 May 2018 10:26:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <drjones@redhat.com>) id 1fIast-0004L2-GZ
-	for qemu-devel@nongnu.org; Tue, 15 May 2018 10:25:03 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:42954 helo=mx1.redhat.com)
+	(envelope-from <armbru@redhat.com>) id 1fIau2-0004km-69
+	for qemu-devel@nongnu.org; Tue, 15 May 2018 10:26:14 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:33654 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <drjones@redhat.com>) id 1fIast-0004Ja-Bw
-	for qemu-devel@nongnu.org; Tue, 15 May 2018 10:24:59 -0400
-Date: Tue, 15 May 2018 16:24:50 +0200
-From: Andrew Jones <drjones@redhat.com>
-Message-ID: <20180515142450.luz3onyxdfrrqsqb@kamzik.brq.redhat.com>
-References: <1526380858-44651-1-git-send-email-imammedo@redhat.com>
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fIau2-0004kf-16
+	for qemu-devel@nongnu.org; Tue, 15 May 2018 10:26:10 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <1526268228-27951-1-git-send-email-zhangckid@gmail.com>
+	<1526268228-27951-12-git-send-email-zhangckid@gmail.com>
+Date: Tue, 15 May 2018 16:26:08 +0200
+In-Reply-To: <1526268228-27951-12-git-send-email-zhangckid@gmail.com> (Zhang
+	Chen's message of "Mon, 14 May 2018 11:23:42 +0800")
+Message-ID: <877eo56lmn.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1526380858-44651-1-git-send-email-imammedo@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] numa: clarify error message when node
- index is out of range in -numa dist, ...
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH V7 11/17] qapi: Add new command to query
+ colo status
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,58 +28,157 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: qemu-devel@nongnu.org, ehabkost@redhat.com, he.chen@linux.intel.com
+To: Zhang Chen <zhangckid@gmail.com>
+Cc: qemu-devel@nongnu.org, Jason Wang <jasowang@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
+Zhang Chen <zhangckid@gmail.com> writes:
 
-Pretty long patch summary line. Do we not try to limit that?
-
-On Tue, May 15, 2018 at 12:40:58PM +0200, Igor Mammedov wrote:
-> When using following CLI:
->   -numa dist,src=128,dst=1,val=20
-> user getsi a rather confusing error message:
-
-gets
-
->    "Invalid node 128, max possible could be 128"
-> 
-> Where 128 is number of nodes that QEMU supports (MAX_NODES),
-> while src/dst is an index up to that limit, so it should be
-> MAX_NODES - 1 in error message.
-> Make error message to explicitly state valid range for node
-> index to be more clear.
-> 
-> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-> ---
->  numa.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
-> 
-> diff --git a/numa.c b/numa.c
-> index a3637cc..dedc149 100644
-> --- a/numa.c
-> +++ b/numa.c
-> @@ -142,8 +142,8 @@ static void parse_numa_distance(NumaDistOptions *dist, Error **errp)
->  
->      if (src >= MAX_NODES || dst >= MAX_NODES) {
->          error_setg(errp,
-> -                   "Invalid node %d, max possible could be %d",
-> -                   MAX(src, dst), MAX_NODES);
-> +                   "Invalid node %d, should be in range [0 - %d]",
-
-How about "Invalid node %d. The valid node range is [0, %d]." ?
-
-> +                   MAX(src, dst), MAX_NODES - 1);
->          return;
->      }
->  
-> -- 
-> 2.7.4
-> 
+> Libvirt or other high level software can use this command query colo status.
+> You can test this command like that:
+> {'execute':'query-colo-status'}
 >
+> Signed-off-by: Zhang Chen <zhangckid@gmail.com>
+> ---
+>  migration/colo.c    | 34 ++++++++++++++++++++++++++++++++++
+>  qapi/migration.json | 33 +++++++++++++++++++++++++++++++++
+>  2 files changed, 67 insertions(+)
+>
+> diff --git a/migration/colo.c b/migration/colo.c
+> index 8ca6381..314344c 100644
+> --- a/migration/colo.c
+> +++ b/migration/colo.c
+> @@ -29,6 +29,7 @@
+>  #include "net/colo.h"
+>  #include "block/block.h"
+>  #include "qapi/qapi-events-migration.h"
+> +#include "qapi/qmp/qerror.h"
+>  
+>  static bool vmstate_loading;
+>  static Notifier packets_compare_notifier;
+> @@ -237,6 +238,39 @@ void qmp_xen_colo_do_checkpoint(Error **errp)
+>  #endif
+>  }
+>  
+> +COLOStatus *qmp_query_colo_status(Error **errp)
+> +{
+> +    int state;
+> +    COLOStatus *s = g_new0(COLOStatus, 1);
+> +
+> +    if (get_colo_mode() == COLO_MODE_UNKNOWN) {
+> +        error_setg(errp, QERR_FEATURE_DISABLED, "colo");
+> +        s->colo_running = false;
+> +        goto out;
+> +    } else if (get_colo_mode() == COLO_MODE_PRIMARY) {
+> +         state = migrate_get_current()->state;
+> +    } else {
+> +         state = migration_incoming_get_current()->state;
+> +    }
 
-Besides the nits
+Indentation's off, as patchew pointed out.  Perhaps the maintainer could
+fix that for you.
 
-Reviewed-by: Andrew Jones <drjones@redhat.com>
+> +    s->colo_running = state == MIGRATION_STATUS_COLO;
+> +
+> +out:
+> +    s->mode = get_colo_mode();
 
-Thanks,
-drew 
+I'm okay with this.
+
+If you need to respin anyway, consider whether you like this better:
+
+       s->mode = get_colo_mode();
+       switch (s->mode) {
+       case COLO_MODE_UNKNOWN:
+           error_setg(errp, "COLO is disabled");
+           state = MIGRATION_STATUS_NONE;
+           break;
+       case COLO_MODE_PRIMARY:
+           state = migrate_get_current()->state;
+           break;
+       case COLO_MODE_SECONDARY:
+           state = migration_incoming_get_current()->state;
+           break;
+       default:
+           abort();
+       }
+       s->colo_running = state == MIGRATION_STATUS_COLO;
+
+Aside: we should really finish off the QERR_ macros.
+
+> +
+> +    switch (failover_get_state()) {
+> +    case FAILOVER_STATUS_NONE:
+> +        s->reason = COLO_EXIT_REASON_NONE;
+> +        break;
+> +    case FAILOVER_STATUS_REQUIRE:
+> +        s->reason = COLO_EXIT_REASON_REQUEST;
+> +        break;
+> +    default:
+> +        s->reason = COLO_EXIT_REASON_ERROR;
+> +    }
+> +
+> +    return s;
+> +}
+> +
+>  static void colo_send_message(QEMUFile *f, COLOMessage msg,
+>                                Error **errp)
+>  {
+> diff --git a/qapi/migration.json b/qapi/migration.json
+> index 55dae48..13589ba 100644
+> --- a/qapi/migration.json
+> +++ b/qapi/migration.json
+> @@ -1220,3 +1220,36 @@
+>  # Since: 2.9
+>  ##
+>  { 'command': 'xen-colo-do-checkpoint' }
+> +
+> +##
+> +# @COLOStatus:
+> +#
+> +# The result format for 'query-colo-status'.
+> +#
+> +# @mode: which COLO mode the VM was in when it exited.
+
+Pardon my COLO-ignorance...
+
+What does "when it exited" mean?
+
+What's the value of @mode before "it exited"?
+
+> +# @colo-running: true if COLO is running.
+
+If COLO is running, has "it exited", yet?
+
+> +#
+> +# @reason: describes the reason for the COLO exit.
+
+What's the value of @reason before a "COLO exit"?
+
+Remember, while a COLO_EXIT event is tied to an exit, a
+query-colo-status can be executed at any time, in particular before any
+"COLO exit".
+
+> +#
+> +# Since: 2.13
+> +##
+> +{ 'struct': 'COLOStatus',
+> +  'data': { 'mode': 'COLOMode', 'colo-running': 'bool', 'reason': 'COLOExitReason' } }
+> +
+> +##
+> +# @query-colo-status:
+> +#
+> +# Query COLO status while the vm is running.
+> +#
+> +# Returns: A @COLOStatus object showing the status.
+> +#
+> +# Example:
+> +#
+> +# -> { "execute": "query-colo-status" }
+> +# <- { "return": { "mode": "primary", "colo-running": true, "reason": "request" } }
+> +#
+> +# Since: 2.13
+> +##
+> +{ 'command': 'query-colo-status',
+> +  'returns': 'COLOStatus' }
+
+Almost ready :)
