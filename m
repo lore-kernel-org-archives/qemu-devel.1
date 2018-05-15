@@ -1,28 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39679)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39683)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1fIabs-0003t3-Jj
+	(envelope-from <pm215@archaic.org.uk>) id 1fIabs-0003tB-TN
 	for qemu-devel@nongnu.org; Tue, 15 May 2018 10:07:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1fIabm-0002vo-J3
+	(envelope-from <pm215@archaic.org.uk>) id 1fIabo-0002zl-Rg
 	for qemu-devel@nongnu.org; Tue, 15 May 2018 10:07:24 -0400
-Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:41688)
+Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:41690)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1fIabm-0002tn-Cc
-	for qemu-devel@nongnu.org; Tue, 15 May 2018 10:07:18 -0400
+	id 1fIabo-0002wj-L2
+	for qemu-devel@nongnu.org; Tue, 15 May 2018 10:07:20 -0400
 Received: from pm215 by orth.archaic.org.uk with local (Exim 4.89)
-	(envelope-from <pm215@archaic.org.uk>) id 1fIabl-0001So-HV
-	for qemu-devel@nongnu.org; Tue, 15 May 2018 15:07:17 +0100
+	(envelope-from <pm215@archaic.org.uk>) id 1fIabn-0001UC-Jy
+	for qemu-devel@nongnu.org; Tue, 15 May 2018 15:07:19 +0100
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 15 May 2018 15:07:04 +0100
-Message-Id: <20180515140707.15957-14-peter.maydell@linaro.org>
+Date: Tue, 15 May 2018 15:07:07 +0100
+Message-Id: <20180515140707.15957-17-peter.maydell@linaro.org>
 In-Reply-To: <20180515140707.15957-1-peter.maydell@linaro.org>
 References: <20180515140707.15957-1-peter.maydell@linaro.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 13/16] target/arm: Implement FMOV (immediate)
- for fp16
+Subject: [Qemu-devel] [PULL 16/16] tcg: Optionally log FPU state in TCG -d
+ cpu logging
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,64 +30,67 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-From: Alex Bennée <alex.bennee@linaro.org>
+Usually the logging of the CPU state produced by -d cpu is sufficient
+to diagnose problems, but sometimes you want to see the state of
+the floating point registers as well. We don't want to enable that
+by default as it adds a lot of extra data to the log; instead,
+allow it to be optionally enabled via -d fpu.
 
-All the hard work is already done by vfp_expand_imm, we just need to
-make sure we pick up the correct size.
-
-Cc: qemu-stable@nongnu.org
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
-Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-Tested-by: Alex Bennée <alex.bennee@linaro.org>
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-Message-id: 20180512003217.9105-11-richard.henderson@linaro.org
-[rth: Merge unallocated_encoding check with TCGMemOp conversion.]
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Message-id: 20180510130024.31678-1-peter.maydell@linaro.org
 ---
- target/arm/translate-a64.c | 20 +++++++++++++++++---
- 1 file changed, 17 insertions(+), 3 deletions(-)
+ include/qemu/log.h   | 1 +
+ accel/tcg/cpu-exec.c | 9 ++++++---
+ util/log.c           | 2 ++
+ 3 files changed, 9 insertions(+), 3 deletions(-)
 
-diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
-index 9dacb583ae..35997969b4 100644
---- a/target/arm/translate-a64.c
-+++ b/target/arm/translate-a64.c
-@@ -5674,11 +5674,25 @@ static void disas_fp_imm(DisasContext *s, uint32_t insn)
- {
-     int rd = extract32(insn, 0, 5);
-     int imm8 = extract32(insn, 13, 8);
--    int is_double = extract32(insn, 22, 2);
-+    int type = extract32(insn, 22, 2);
-     uint64_t imm;
-     TCGv_i64 tcg_res;
-+    TCGMemOp sz;
+diff --git a/include/qemu/log.h b/include/qemu/log.h
+index ff92a8b86a..b097a6cae1 100644
+--- a/include/qemu/log.h
++++ b/include/qemu/log.h
+@@ -44,6 +44,7 @@ static inline bool qemu_log_separate(void)
+ #define CPU_LOG_PAGE       (1 << 14)
+ /* LOG_TRACE (1 << 15) is defined in log-for-trace.h */
+ #define CPU_LOG_TB_OP_IND  (1 << 16)
++#define CPU_LOG_TB_FPU     (1 << 17)
  
--    if (is_double > 1) {
-+    switch (type) {
-+    case 0:
-+        sz = MO_32;
-+        break;
-+    case 1:
-+        sz = MO_64;
-+        break;
-+    case 3:
-+        sz = MO_16;
-+        if (arm_dc_feature(s, ARM_FEATURE_V8_FP16)) {
-+            break;
+ /* Lock output for a series of related logs.  Since this is not needed
+  * for a single qemu_log / qemu_log_mask / qemu_log_mask_and_addr, we
+diff --git a/accel/tcg/cpu-exec.c b/accel/tcg/cpu-exec.c
+index 81153e7a13..0b154cc678 100644
+--- a/accel/tcg/cpu-exec.c
++++ b/accel/tcg/cpu-exec.c
+@@ -156,11 +156,14 @@ static inline tcg_target_ulong cpu_tb_exec(CPUState *cpu, TranslationBlock *itb)
+     if (qemu_loglevel_mask(CPU_LOG_TB_CPU)
+         && qemu_log_in_addr_range(itb->pc)) {
+         qemu_log_lock();
++        int flags = 0;
++        if (qemu_loglevel_mask(CPU_LOG_TB_FPU)) {
++            flags |= CPU_DUMP_FPU;
 +        }
-+        /* fallthru */
-+    default:
-         unallocated_encoding(s);
-         return;
+ #if defined(TARGET_I386)
+-        log_cpu_state(cpu, CPU_DUMP_CCOP);
+-#else
+-        log_cpu_state(cpu, 0);
++        flags |= CPU_DUMP_CCOP;
+ #endif
++        log_cpu_state(cpu, flags);
+         qemu_log_unlock();
      }
-@@ -5687,7 +5701,7 @@ static void disas_fp_imm(DisasContext *s, uint32_t insn)
-         return;
-     }
- 
--    imm = vfp_expand_imm(MO_32 + is_double, imm8);
-+    imm = vfp_expand_imm(sz, imm8);
- 
-     tcg_res = tcg_const_i64(imm);
-     write_fp_dreg(s, rd, tcg_res);
+ #endif /* DEBUG_DISAS */
+diff --git a/util/log.c b/util/log.c
+index 96f30dd21a..c0dbbd4700 100644
+--- a/util/log.c
++++ b/util/log.c
+@@ -256,6 +256,8 @@ const QEMULogItem qemu_log_items[] = {
+       "show trace before each executed TB (lots of logs)" },
+     { CPU_LOG_TB_CPU, "cpu",
+       "show CPU registers before entering a TB (lots of logs)" },
++    { CPU_LOG_TB_FPU, "fpu",
++      "include FPU registers in the 'cpu' logging" },
+     { CPU_LOG_MMU, "mmu",
+       "log MMU-related activities" },
+     { CPU_LOG_PCALL, "pcall",
 -- 
 2.17.0
