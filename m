@@ -1,28 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39552)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39566)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1fIabl-0003pb-06
-	for qemu-devel@nongnu.org; Tue, 15 May 2018 10:07:26 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1fIabl-0003pd-Cj
+	for qemu-devel@nongnu.org; Tue, 15 May 2018 10:07:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1fIabj-0002rK-T9
-	for qemu-devel@nongnu.org; Tue, 15 May 2018 10:07:16 -0400
-Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:41684)
+	(envelope-from <pm215@archaic.org.uk>) id 1fIabf-0002na-L4
+	for qemu-devel@nongnu.org; Tue, 15 May 2018 10:07:17 -0400
+Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:41676)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1fIabj-0002qc-LX
-	for qemu-devel@nongnu.org; Tue, 15 May 2018 10:07:15 -0400
+	id 1fIabf-0002mA-Dx
+	for qemu-devel@nongnu.org; Tue, 15 May 2018 10:07:11 -0400
 Received: from pm215 by orth.archaic.org.uk with local (Exim 4.89)
-	(envelope-from <pm215@archaic.org.uk>) id 1fIabi-0001R2-Ou
-	for qemu-devel@nongnu.org; Tue, 15 May 2018 15:07:14 +0100
+	(envelope-from <pm215@archaic.org.uk>) id 1fIabe-0001Nh-39
+	for qemu-devel@nongnu.org; Tue, 15 May 2018 15:07:10 +0100
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 15 May 2018 15:07:00 +0100
-Message-Id: <20180515140707.15957-10-peter.maydell@linaro.org>
+Date: Tue, 15 May 2018 15:06:53 +0100
+Message-Id: <20180515140707.15957-3-peter.maydell@linaro.org>
 In-Reply-To: <20180515140707.15957-1-peter.maydell@linaro.org>
 References: <20180515140707.15957-1-peter.maydell@linaro.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 09/16] target/arm: Implement FP data-processing
- (2 source) for fp16
+Subject: [Qemu-devel] [PULL 02/16] fpu/softfloat: Don't set Invalid for
+ float-to-int(MAXINT)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,102 +30,49 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-From: Richard Henderson <richard.henderson@linaro.org>
+In float-to-integer conversion, if the floating point input
+converts exactly to the largest or smallest integer that
+fits in to the result type, this is not an overflow.
+In this situation we were producing the correct result value,
+but were incorrectly setting the Invalid flag.
+For example for Arm A64, "FCVTAS w0, d0" on an input of
+0x41dfffffffc00000 should produce 0x7fffffff and set no flags.
 
-We missed all of the scalar fp16 binary operations.
+Fix the boundary case to take the right half of the if()
+statements.
+
+This fixes a regression from 2.11 introduced by the softfloat
+refactoring.
 
 Cc: qemu-stable@nongnu.org
-Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-Tested-by: Alex Bennée <alex.bennee@linaro.org>
-Message-id: 20180512003217.9105-7-richard.henderson@linaro.org
+Fixes: ab52f973a50
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Message-id: 20180510140141.12120-1-peter.maydell@linaro.org
 ---
- target/arm/translate-a64.c | 65 ++++++++++++++++++++++++++++++++++++++
- 1 file changed, 65 insertions(+)
+ fpu/softfloat.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
-index 78f12daaf6..66607668ce 100644
---- a/target/arm/translate-a64.c
-+++ b/target/arm/translate-a64.c
-@@ -5299,6 +5299,61 @@ static void handle_fp_2src_double(DisasContext *s, int opcode,
-     tcg_temp_free_i64(tcg_res);
- }
- 
-+/* Floating-point data-processing (2 source) - half precision */
-+static void handle_fp_2src_half(DisasContext *s, int opcode,
-+                                int rd, int rn, int rm)
-+{
-+    TCGv_i32 tcg_op1;
-+    TCGv_i32 tcg_op2;
-+    TCGv_i32 tcg_res;
-+    TCGv_ptr fpst;
-+
-+    tcg_res = tcg_temp_new_i32();
-+    fpst = get_fpstatus_ptr(true);
-+    tcg_op1 = read_fp_hreg(s, rn);
-+    tcg_op2 = read_fp_hreg(s, rm);
-+
-+    switch (opcode) {
-+    case 0x0: /* FMUL */
-+        gen_helper_advsimd_mulh(tcg_res, tcg_op1, tcg_op2, fpst);
-+        break;
-+    case 0x1: /* FDIV */
-+        gen_helper_advsimd_divh(tcg_res, tcg_op1, tcg_op2, fpst);
-+        break;
-+    case 0x2: /* FADD */
-+        gen_helper_advsimd_addh(tcg_res, tcg_op1, tcg_op2, fpst);
-+        break;
-+    case 0x3: /* FSUB */
-+        gen_helper_advsimd_subh(tcg_res, tcg_op1, tcg_op2, fpst);
-+        break;
-+    case 0x4: /* FMAX */
-+        gen_helper_advsimd_maxh(tcg_res, tcg_op1, tcg_op2, fpst);
-+        break;
-+    case 0x5: /* FMIN */
-+        gen_helper_advsimd_minh(tcg_res, tcg_op1, tcg_op2, fpst);
-+        break;
-+    case 0x6: /* FMAXNM */
-+        gen_helper_advsimd_maxnumh(tcg_res, tcg_op1, tcg_op2, fpst);
-+        break;
-+    case 0x7: /* FMINNM */
-+        gen_helper_advsimd_minnumh(tcg_res, tcg_op1, tcg_op2, fpst);
-+        break;
-+    case 0x8: /* FNMUL */
-+        gen_helper_advsimd_mulh(tcg_res, tcg_op1, tcg_op2, fpst);
-+        tcg_gen_xori_i32(tcg_res, tcg_res, 0x8000);
-+        break;
-+    default:
-+        g_assert_not_reached();
-+    }
-+
-+    write_fp_sreg(s, rd, tcg_res);
-+
-+    tcg_temp_free_ptr(fpst);
-+    tcg_temp_free_i32(tcg_op1);
-+    tcg_temp_free_i32(tcg_op2);
-+    tcg_temp_free_i32(tcg_res);
-+}
-+
- /* Floating point data-processing (2 source)
-  *   31  30  29 28       24 23  22  21 20  16 15    12 11 10 9    5 4    0
-  * +---+---+---+-----------+------+---+------+--------+-----+------+------+
-@@ -5331,6 +5386,16 @@ static void disas_fp_2src(DisasContext *s, uint32_t insn)
+diff --git a/fpu/softfloat.c b/fpu/softfloat.c
+index b39c0c6fbb..bc0f52fa54 100644
+--- a/fpu/softfloat.c
++++ b/fpu/softfloat.c
+@@ -1368,14 +1368,14 @@ static int64_t round_to_int_and_pack(FloatParts in, int rmode,
+             r = UINT64_MAX;
          }
-         handle_fp_2src_double(s, opcode, rd, rn, rm);
-         break;
-+    case 3:
-+        if (!arm_dc_feature(s, ARM_FEATURE_V8_FP16)) {
-+            unallocated_encoding(s);
-+            return;
-+        }
-+        if (!fp_access_check(s)) {
-+            return;
-+        }
-+        handle_fp_2src_half(s, opcode, rd, rn, rm);
-+        break;
-     default:
-         unallocated_encoding(s);
-     }
+         if (p.sign) {
+-            if (r < -(uint64_t) min) {
++            if (r <= -(uint64_t) min) {
+                 return -r;
+             } else {
+                 s->float_exception_flags = orig_flags | float_flag_invalid;
+                 return min;
+             }
+         } else {
+-            if (r < max) {
++            if (r <= max) {
+                 return r;
+             } else {
+                 s->float_exception_flags = orig_flags | float_flag_invalid;
 -- 
 2.17.0
