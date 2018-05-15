@@ -1,25 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60672)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60900)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1fIWrj-000503-NS
-	for qemu-devel@nongnu.org; Tue, 15 May 2018 06:07:32 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1fIWtQ-00063l-P0
+	for qemu-devel@nongnu.org; Tue, 15 May 2018 06:09:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1fIWrf-0001x6-P0
-	for qemu-devel@nongnu.org; Tue, 15 May 2018 06:07:31 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:48318 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1fIWrf-0001wq-J9
-	for qemu-devel@nongnu.org; Tue, 15 May 2018 06:07:27 -0400
-Date: Tue, 15 May 2018 11:07:25 +0100
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20180515100725.GK14755@stefanha-x1.localdomain>
-References: <1526348758-6643-1-git-send-email-suhang16@mails.ucas.ac.cn>
+	(envelope-from <peter.maydell@linaro.org>) id 1fIWtP-0002MV-Ds
+	for qemu-devel@nongnu.org; Tue, 15 May 2018 06:09:16 -0400
+Received: from mail-oi0-x242.google.com ([2607:f8b0:4003:c06::242]:44982)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1fIWtP-0002ML-8A
+	for qemu-devel@nongnu.org; Tue, 15 May 2018 06:09:15 -0400
+Received: by mail-oi0-x242.google.com with SMTP id e80-v6so13403046oig.11
+	for <qemu-devel@nongnu.org>; Tue, 15 May 2018 03:09:15 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="9a9Vq1BJdYBEXpLG"
-Content-Disposition: inline
-In-Reply-To: <1526348758-6643-1-git-send-email-suhang16@mails.ucas.ac.cn>
-Subject: Re: [Qemu-devel] [PATCH v8 0/2] Implement Hex file loader and add
- test case
+In-Reply-To: <20180514221219.7091-11-richard.henderson@linaro.org>
+References: <20180514221219.7091-1-richard.henderson@linaro.org>
+	<20180514221219.7091-11-richard.henderson@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 15 May 2018 11:08:54 +0100
+Message-ID: <CAFEAcA8kszX4c8WjMabKm6otWFgak8jVJ69o9N2M+uCYfcxFCA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v5 10/28] target/arm: convert conversion
+ helpers to fpst/ahp_flag
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,35 +31,90 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Su Hang <suhang16@mails.ucas.ac.cn>
-Cc: stefanha@gmail.com, jim@groklearning.com, joel@jms.id.au, qemu-devel@nongnu.org
+To: Richard Henderson <richard.henderson@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
 
+On 14 May 2018 at 23:12, Richard Henderson <richard.henderson@linaro.org> w=
+rote:
+> From: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+>
+> Instead of passing env and leaving it up to the helper to get the
+> right fpstatus we pass it explicitly. There was already a get_fpstatus
+> helper for neon for the 32 bit code. We also add an get_ahp_flag() for
+> passing the state of the alternative FP16 format flag. This leaves
+> scope for later tracking the AHP state in translation flags.
+>
+> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+>
+> ---
+> v4
+>   - remove neon_fcvt_*; they are now identical to vfp_fcvt_*.
+>   - add flags to vfp_fcvt_* helper decls.
+>   - add some missing tcg_temp_free_*.
+> v5
+>   - always use get_fpstatus_ptr(false) for FZ, since FZ16 is
+>     supposed to be supressed.
+> ---
 
---9a9Vq1BJdYBEXpLG
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+> @@ -9053,12 +9066,17 @@ static void handle_2misc_narrow(DisasContext *s, =
+bool scalar,
+>              } else {
+>                  TCGv_i32 tcg_lo =3D tcg_temp_new_i32();
+>                  TCGv_i32 tcg_hi =3D tcg_temp_new_i32();
+> +                TCGv_ptr fpst =3D get_fpstatus_ptr(true);
 
-On Tue, May 15, 2018 at 09:45:56AM +0800, Su Hang wrote:
-> These series of patchs implement Intel Hexadecimal File loader and
-> add QTest testcase to verify the correctness of Loader.
+Still the wrong fpstatus here...
 
-Good job, this looks close now.  I left a comment on the test case - it
-needs to work with out-of-tree builds.
+> +                TCGv_i32 ahp =3D get_ahp_flag();
+> +
+>                  tcg_gen_extr_i64_i32(tcg_lo, tcg_hi, tcg_op);
+> -                gen_helper_vfp_fcvt_f32_to_f16(tcg_lo, tcg_lo, cpu_env);
+> -                gen_helper_vfp_fcvt_f32_to_f16(tcg_hi, tcg_hi, cpu_env);
+> +                gen_helper_vfp_fcvt_f32_to_f16(tcg_lo, tcg_lo, fpst, ahp=
+);
+> +                gen_helper_vfp_fcvt_f32_to_f16(tcg_hi, tcg_hi, fpst, ahp=
+);
+>                  tcg_gen_deposit_i32(tcg_res[pass], tcg_lo, tcg_hi, 16, 1=
+6);
+>                  tcg_temp_free_i32(tcg_lo);
+>                  tcg_temp_free_i32(tcg_hi);
+> +                tcg_temp_free_ptr(fpst);
+> +                tcg_temp_free_i32(ahp);
+>              }
+>              break;
+>          case 0x56:  /* FCVTXN, FCVTXN2 */
 
-Stefan
+> @@ -11532,18 +11550,24 @@ static void handle_2misc_widening(DisasContext =
+*s, int opcode, bool is_q,
+>          /* 16 -> 32 bit fp conversion */
+>          int srcelt =3D is_q ? 4 : 0;
+>          TCGv_i32 tcg_res[4];
+> +        TCGv_ptr fpst =3D get_fpstatus_ptr(true);
 
---9a9Vq1BJdYBEXpLG
-Content-Type: application/pgp-signature; name="signature.asc"
+...and here.
 
------BEGIN PGP SIGNATURE-----
+> +        TCGv_i32 ahp =3D get_ahp_flag();
+> +
+>
+>          for (pass =3D 0; pass < 4; pass++) {
+>              tcg_res[pass] =3D tcg_temp_new_i32();
+>
+>              read_vec_element_i32(s, tcg_res[pass], rn, srcelt + pass, MO=
+_16);
+>              gen_helper_vfp_fcvt_f16_to_f32(tcg_res[pass], tcg_res[pass],
+> -                                           cpu_env);
+> +                                           fpst, ahp);
+>          }
+>          for (pass =3D 0; pass < 4; pass++) {
+>              write_vec_element_i32(s, tcg_res[pass], rd, pass, MO_32);
+>              tcg_temp_free_i32(tcg_res[pass]);
+>          }
+> +
+> +        tcg_temp_free_ptr(fpst);
+> +        tcg_temp_free_i32(ahp);
+>      }
+>  }
 
-iQEcBAEBAgAGBQJa+rFdAAoJEJykq7OBq3PIQg4IAJYZrkdXru1HuhNiVriJR7/I
-HoAJx/y8yDF9juz+PFEU4SsPn+oIHxG4WFBx73O2tjHRVKi9Y3WHJQ901ByYJtug
-GApZt+wUvKVLWaPKCePwCzXt5dKcnMi5z7KaXzLuNepp+4NGhS7TNGtJz/94Fxvm
-OvbwHsruizMivLvvWmGiH1Qqa1zmx/qKcvKwUx/d/kq8C7ZmiTsT2FhE++z0py6I
-1XkQDSMY79BeSvJINrr90em8J/VDi24Czlq7Aq2MJFp6x2omevb643mSL76pVRkp
-zrUZgM4THYLtUk0P7J1taxk+Weu+Ibljnd4apOSZGXW5gyRFa4Rbd8Q41B8J8po=
-=IpNE
------END PGP SIGNATURE-----
-
---9a9Vq1BJdYBEXpLG--
+thanks
+-- PMM
