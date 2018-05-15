@@ -1,46 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57502)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57535)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <akrowiak@linux.vnet.ibm.com>) id 1fIbaR-00029i-DC
-	for qemu-devel@nongnu.org; Tue, 15 May 2018 11:10:03 -0400
+	(envelope-from <eblake@redhat.com>) id 1fIbad-0002Ep-Ap
+	for qemu-devel@nongnu.org; Tue, 15 May 2018 11:10:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <akrowiak@linux.vnet.ibm.com>) id 1fIbaN-0008I5-6A
-	for qemu-devel@nongnu.org; Tue, 15 May 2018 11:09:59 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:54112
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <akrowiak@linux.vnet.ibm.com>)
-	id 1fIbaM-0008Hs-Vg
-	for qemu-devel@nongnu.org; Tue, 15 May 2018 11:09:55 -0400
-Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w4FF6tqw064248
-	for <qemu-devel@nongnu.org>; Tue, 15 May 2018 11:09:54 -0400
-Received: from e13.ny.us.ibm.com (e13.ny.us.ibm.com [129.33.205.203])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2j0085x2rs-1
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 15 May 2018 11:09:53 -0400
-Received: from localhost
-	by e13.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <akrowiak@linux.vnet.ibm.com>;
-	Tue, 15 May 2018 11:09:53 -0400
-References: <1525782303-16940-1-git-send-email-akrowiak@linux.vnet.ibm.com>
-	<1525782303-16940-5-git-send-email-akrowiak@linux.vnet.ibm.com>
-	<c36ec83f-8cba-cf7b-3054-35cf4cd65c14@linux.ibm.com>
-	<1806faa3-dc46-f638-5c87-8a7415c9025a@linux.vnet.ibm.com>
-	<369a35de-4313-ee41-bb11-634c6bc45a72@linux.ibm.com>
-	<3531be60-c468-290c-135f-2c1091bc5d80@linux.vnet.ibm.com>
-	<86590293-babe-d474-ecaa-5266acc419e0@linux.ibm.com>
-From: Tony Krowiak <akrowiak@linux.vnet.ibm.com>
-Date: Tue, 15 May 2018 11:09:33 -0400
+	(envelope-from <eblake@redhat.com>) id 1fIbaY-0008MI-RX
+	for qemu-devel@nongnu.org; Tue, 15 May 2018 11:10:10 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:46330 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1fIbaY-0008Lh-Mu
+	for qemu-devel@nongnu.org; Tue, 15 May 2018 11:10:06 -0400
+References: <1526284560-20266-1-git-send-email-jasowang@redhat.com>
+	<1526284560-20266-3-git-send-email-jasowang@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <8e7bd278-eb4b-a142-2f57-7481a165ac3f@redhat.com>
+Date: Tue, 15 May 2018 10:10:05 -0500
 MIME-Version: 1.0
-In-Reply-To: <86590293-babe-d474-ecaa-5266acc419e0@linux.ibm.com>
+In-Reply-To: <1526284560-20266-3-git-send-email-jasowang@redhat.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
 Content-Language: en-US
-Message-Id: <58b3289d-65b2-1ae4-fb92-c9ad3c61d665@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH v5 4/6] s390x/vfio: ap: Introduce VFIO AP
- device
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PULL 2/4] net: Remove the deprecated "vlan"
+ parameter
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -49,136 +29,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: pmorel@linux.ibm.com, Halil Pasic <pasic@linux.ibm.com>, qemu-devel@nongnu.org
-Cc: qemu-s390x@nongnu.org, schwidefsky@de.ibm.com, heiko.carstens@de.ibm.com, borntraeger@de.ibm.com, cohuck@redhat.com, david@redhat.com, bjsdjshi@linux.vnet.ibm.com, pmorel@linux.vnet.ibm.com, alifm@linux.vnet.ibm.com, mjrosato@linux.vnet.ibm.com, jjherne@linux.vnet.ibm.com, pasic@linux.vnet.ibm.com, eskultet@redhat.com, berrange@redhat.com, alex.williamson@redhat.com, eric.auger@redhat.com, pbonzini@redhat.com, peter.maydell@linaro.org, agraf@suse.de, rth@twiddle.net
+To: Jason Wang <jasowang@redhat.com>, qemu-devel@nongnu.org, peter.maydell@linaro.org
+Cc: Thomas Huth <thuth@redhat.com>
 
-On 05/15/2018 03:55 AM, Pierre Morel wrote:
-> On 14/05/2018 21:26, Tony Krowiak wrote:
->> On 05/11/2018 05:02 AM, Pierre Morel wrote:
->>> On 10/05/2018 15:10, Tony Krowiak wrote:
->>>> On 05/09/2018 10:28 AM, Halil Pasic wrote:
->>>>>
->>>>>
->>>>> On 05/08/2018 02:25 PM, Tony Krowiak wrote:
->>>>>> Introduces a VFIO based AP device. The device is defined via
->>>>>> the QEMU command line by specifying:
->>>>>>
->>>>>>      -device vfio-ap,sysfsdev=<path-to-mediated-matrix-device>
->>>>>>
->>>>>> There may be only one vfio-ap device configured for a guest.
->>>>>>
->>>>>> The mediated matrix device is created by the VFIO AP device
->>>>> [..]
->>>>>> + * directory.
->>>>>> + */
->>>>>> +
->>>>>> +#include <linux/vfio.h>
->>>>>> +#include <sys/ioctl.h>
->>>>>> +#include "qemu/osdep.h"
->>>>>> +#include "qapi/error.h"
->>>>>> +#include "hw/sysbus.h"
->>>>>> +#include "hw/vfio/vfio.h"
->>>>>> +#include "hw/vfio/vfio-common.h"
->>>>>> +#include "hw/s390x/ap-device.h"
->>>>>> +#include "qemu/error-report.h"
->>>>>> +#include "qemu/queue.h"
->>>>>> +#include "qemu/option.h"
->>>>>> +#include "qemu/config-file.h"
->>>>>> +#include "cpu.h"
->>>>>> +#include "kvm_s390x.h"
->>>>>> +#include "sysemu/sysemu.h"
->>>>>> +
->>>>>> +#define VFIO_AP_DEVICE_TYPE      "vfio-ap"
->>>>>> +
->>>>>> +typedef struct VFIOAPDevice {
->>>>>> +    APDevice apdev;
->>>>>> +    VFIODevice vdev;
->>>>>> +    QTAILQ_ENTRY(VFIOAPDevice) sibling;
->>>>>> +} VFIOAPDevice;
->>>>>> +
->>>>>> +VFIOAPDevice *vfio_apdev;
->>>>>> +
->>>>>> +static void vfio_ap_compute_needs_reset(VFIODevice *vdev)
->>>>>> +{
->>>>>> +    vdev->needs_reset = false;
->>>>>> +}
->>>>>> +
->>>>>> +/*
->>>>>> + * We don't need vfio_hot_reset_multi and vfio_eoi operations for
->>>>>> + * vfio-ap-matrix device now.
->>>>>> + */
->>>>>> +struct VFIODeviceOps vfio_ap_ops = {
->>>>>> +    .vfio_compute_needs_reset = vfio_ap_compute_needs_reset,
->>>>>> +};
->>>>>> +
->>>>>
->>>>> I'm not familiar with the vfio infrastructure, but AFAIR I
->>>>> haven't seen any substantial reset handling (QEMU or kernel).
->>>>> Did I miss something?
->>>>
->>>> No, you didn't miss anything, there is no reset handling.
->>>>
->>>>>
->>>>> If I did not. I think this is a big problem. We need to at least
->>>>> zeroize the queues (e.g. on system reset)  to avoid leaking
->>>>> sensitive information. Without this, there is no sane way to use
->>>>> ap-passthrough. Or am I wrong?
->>>>
->>>> I do not have a definitive answer, I will have to look into it.
->>>> I'm thinking that since we are using ap-passthrough, the AP bus
->>>> running on the guest would be responsible for handling reset possibly
->>>> by resetting or zeroizing its queues. I'll get back to you on this.
->>>>
->>>>>
->>>>> Regards,
->>>>> Halil
->>>>>
->>>>
->>> On the host, on system reset or subsystem reset, the queues are 
->>> zeroized.
->>
->> Can you point me to where this is done?
->
-> This is firmware. See documentation, it is specified that the queues 
-> are zeroized on system or subsystem reset.
+On 05/14/2018 02:55 AM, Jason Wang wrote:
+> From: Thomas Huth <thuth@redhat.com>
+> 
+> It's been marked as deprecated since QEMU v2.9.0, so that should have
+> been enough time for everybody to either just drop unnecessary "vlan=0"
+> parameters, to switch to the modern -device + -netdev syntax for connecting
+> guest NICs with host network backends, or to switch to the "hubport" netdev
+> in case hubs are really wanted instead.
+> 
+> Buglink: https://bugs.launchpad.net/qemu/+bug/658904
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+> Signed-off-by: Jason Wang <jasowang@redhat.com>
+> ---
 
-The sticking point for me is how does this relate to the guest running 
-under SIE?
+> @@ -499,10 +497,11 @@
+>   # @opts: device type specific properties (legacy)
+>   #
+>   # Since: 1.2
+> +#
+> +# 'vlan' - removed with 2.12
 
->
->
->>
->>>
->>>
->>> It means we must do the same for the guest and implement both cold 
->>> and hot reset.
->>>
->>> One of the patches in the interrupt handling serie I sent last 
->>> wednesday zeroize
->>> the queues on starting and stopping the guest so no data leak occurs 
->>> between
->>> host and guests or between guests.
->>
->> I'm sorry, I was not aware of them and consequently have not yet 
->> reviewed them.
->> I'll take a look at them ASAP.
->>
->>>
->>>
->>> However we should follow the machine specification and zeroize the 
->>> queues between
->>> two guest reset too. i.e. in the "reset" call back. and implement 
->>> the VFIO_DEVICE_RESET
->>> ioctl.
->>
->> Can you point me to the specification to which you are referring? You 
->> can send a personal
->> email if this is restricted information.
->
-> OK.
->
-> regards,
->
-> Pierre
->
->
+Shouldn't this be 2.13?  Also, while the phrase 'removed with XXX' 
+already appears for NetClientDriver::dump, it sounds awkward; better 
+would be matching the way we document things for BlockDeviceInfo:
+
+NetClientDriver
+2.12: dropped 'dump'
+...
+NetLegacy
+2.13: dropped 'vlan'
+
+or the way we do it for QKeyCode:
+
+NetClientDriver
+dump: dropped in 2.12
+...
+NetLegacy
+vlan: dropped in 2.13
+
+As this is already in a pull request, and as NetClientDriver also needs 
+a cleanup, that can be a followup patch.
+
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
