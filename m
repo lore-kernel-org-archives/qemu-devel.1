@@ -1,23 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:32959)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33142)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fIbpF-0002ET-0O
-	for qemu-devel@nongnu.org; Tue, 15 May 2018 11:25:18 -0400
+	(envelope-from <eblake@redhat.com>) id 1fIbpp-0002sp-Mb
+	for qemu-devel@nongnu.org; Tue, 15 May 2018 11:25:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fIbpD-0005px-Eu
-	for qemu-devel@nongnu.org; Tue, 15 May 2018 11:25:16 -0400
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Date: Tue, 15 May 2018 12:25:00 -0300
-Message-Id: <20180515152500.19460-3-f4bug@amsat.org>
-In-Reply-To: <20180515152500.19460-1-f4bug@amsat.org>
-References: <20180515152500.19460-1-f4bug@amsat.org>
+	(envelope-from <eblake@redhat.com>) id 1fIbpm-0006FN-IP
+	for qemu-devel@nongnu.org; Tue, 15 May 2018 11:25:53 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:38412 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1fIbpm-0006FF-Dp
+	for qemu-devel@nongnu.org; Tue, 15 May 2018 11:25:50 -0400
+References: <20180515113348.10516-1-zyimin@linux.ibm.com>
+	<20180515113348.10516-2-zyimin@linux.ibm.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <7bd9074b-04ca-49f6-096b-808d36e4e8b0@redhat.com>
+Date: Tue, 15 May 2018 10:25:46 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v2 2/2] mux: fix ctrl-a b again
+In-Reply-To: <20180515113348.10516-2-zyimin@linux.ibm.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 1/1] sandbox: disable -sandbox if
+ CONFIG_SECCOMP undefined
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,63 +29,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-stable@nongnu.org
+To: Yi Min Zhao <zyimin@linux.ibm.com>, qemu-devel@nongnu.org
+Cc: otubo@redhat.com, fiuczy@linux.ibm.com, jtomko@redhat.com, borntraeger@de.ibm.com, jferlan@redhat.com
 
-From: Marc-André Lureau <marcandre.lureau@redhat.com>
+On 05/15/2018 06:33 AM, Yi Min Zhao wrote:
+> If CONFIG_SECCOMP is undefined, the option 'elevateprivileges' remains
+> compiled. This would make libvirt set the corresponding capability and
+> then trigger the guest startup fails. So this patch excludes the code
 
-Commit fb5e19d2e1472e96d72d5e4d89c20033f8ab345c originally fixed the
-regression, but was inadvertently broken again in merge commit
-2d6752d38d8acda.
+s/trigger the guest startup fails/trigger failure during guest startup/
 
-Fixes:
-https://bugs.launchpad.net/qemu/+bug/1654137
+> regarding seccomp staff if CONFIG_SECCOMP is undefined.
 
-Cc: qemu-stable@nongnu.org
-Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
----
- chardev/char-mux.c | 1 +
- tests/test-char.c  | 8 ++++++++
- 2 files changed, 9 insertions(+)
+s/staff/command line options/
 
-diff --git a/chardev/char-mux.c b/chardev/char-mux.c
-index 1b925c8dec..6055e76293 100644
---- a/chardev/char-mux.c
-+++ b/chardev/char-mux.c
-@@ -304,6 +304,7 @@ void mux_set_focus(Chardev *chr, int focus)
-     }
- 
-     d->focus = focus;
-+    chr->be = d->backends[focus];
-     mux_chr_send_event(d, d->focus, CHR_EVENT_MUX_IN);
- }
- 
-diff --git a/tests/test-char.c b/tests/test-char.c
-index 1880d36783..5905d31441 100644
---- a/tests/test-char.c
-+++ b/tests/test-char.c
-@@ -214,6 +214,10 @@ static void char_mux_test(void)
-     g_assert_cmpint(h2.last_event, ==, -1);
- 
-     /* switch focus */
-+    qemu_chr_be_write(base, (void *)"\1b", 2);
-+    g_assert_cmpint(h1.last_event, ==, 42);
-+    g_assert_cmpint(h2.last_event, ==, CHR_EVENT_BREAK);
-+
-     qemu_chr_be_write(base, (void *)"\1c", 2);
-     g_assert_cmpint(h1.last_event, ==, CHR_EVENT_MUX_IN);
-     g_assert_cmpint(h2.last_event, ==, CHR_EVENT_MUX_OUT);
-@@ -227,6 +231,10 @@ static void char_mux_test(void)
-     g_assert_cmpstr(h1.read_buf, ==, "hello");
-     h1.read_count = 0;
- 
-+    qemu_chr_be_write(base, (void *)"\1b", 2);
-+    g_assert_cmpint(h1.last_event, ==, CHR_EVENT_BREAK);
-+    g_assert_cmpint(h2.last_event, ==, CHR_EVENT_MUX_OUT);
-+
-     /* remove first handler */
-     qemu_chr_fe_set_handlers(&chr_be1, NULL, NULL, NULL, NULL,
-                              NULL, NULL, true);
+> 
+> Signed-off-by: Yi Min Zhao <zyimin@linux.ibm.com>
+> ---
+>   vl.c | 13 ++++++++-----
+>   1 file changed, 8 insertions(+), 5 deletions(-)
+> 
+
+A maintainer can touch up the commit message, so:
+Reviewed-by: Eric Blake <eblake@redhat.com>
+
 -- 
-2.17.0
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
