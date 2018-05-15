@@ -1,16 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48532)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48585)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1fIW6u-0004E0-9b
-	for qemu-devel@nongnu.org; Tue, 15 May 2018 05:19:10 -0400
+	(envelope-from <kraxel@redhat.com>) id 1fIW6v-0004EP-Sf
+	for qemu-devel@nongnu.org; Tue, 15 May 2018 05:19:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1fIW6r-0001UJ-5C
-	for qemu-devel@nongnu.org; Tue, 15 May 2018 05:19:08 -0400
+	(envelope-from <kraxel@redhat.com>) id 1fIW6t-0001Vf-B2
+	for qemu-devel@nongnu.org; Tue, 15 May 2018 05:19:09 -0400
 From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Tue, 15 May 2018 11:18:56 +0200
-Message-Id: <20180515091901.27774-6-kraxel@redhat.com>
+Date: Tue, 15 May 2018 11:18:53 +0200
+Message-Id: <20180515091901.27774-3-kraxel@redhat.com>
 In-Reply-To: <20180515091901.27774-1-kraxel@redhat.com>
 References: <20180515091901.27774-1-kraxel@redhat.com>
-Subject: [Qemu-devel] [PULL 05/10] ui: add qapi parser for -display
+Subject: [Qemu-devel] [PULL 02/10] gtk: make it possible to hide the menu bar
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,76 +20,110 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Laurent Vivier <laurent@vivier.eu>, Paolo Bonzini <pbonzini@redhat.com>, Michael Tokarev <mjt@tls.msk.ru>, qemu-trivial@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>
+Cc: Laurent Vivier <laurent@vivier.eu>, Paolo Bonzini <pbonzini@redhat.com>, Michael Tokarev <mjt@tls.msk.ru>, qemu-trivial@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>, Peter Wu <peter@lekensteyn.nl>
 
-Add parse_display_qapi() function which parses the -display command line
-using a qapi visitor for DisplayOptions.  Wire up as default catch in
-parse_display().
+From: Peter Wu <peter@lekensteyn.nl>
 
-Improves the error message for unknown display types.
+Saves some space and disables the F10 button as side-effect.
 
-Also enables json as -display argument, i.e. -display "{ 'type': 'gtk' }"
-
+Fixes: https://bugs.launchpad.net/qemu/+bug/1726910
+Signed-off-by: Peter Wu <peter@lekensteyn.nl>
+Message-Id: <20180510230739.28459-1-peter@lekensteyn.nl>
 Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
-Message-id: 20180507095539.19584-2-kraxel@redhat.com
 ---
- vl.c | 24 ++++++++++++++++++++++--
- 1 file changed, 22 insertions(+), 2 deletions(-)
+ ui/gtk.c | 46 +++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 45 insertions(+), 1 deletion(-)
 
-diff --git a/vl.c b/vl.c
-index b9f6b42779..c56f7f8046 100644
---- a/vl.c
-+++ b/vl.c
-@@ -120,12 +120,14 @@ int main(int argc, char **argv)
- #include "ui/qemu-spice.h"
- #include "qapi/string-input-visitor.h"
- #include "qapi/opts-visitor.h"
-+#include "qapi/clone-visitor.h"
- #include "qom/object_interfaces.h"
- #include "exec/semihost.h"
- #include "crypto/init.h"
- #include "sysemu/replay.h"
- #include "qapi/qapi-events-run-state.h"
- #include "qapi/qapi-visit-block-core.h"
-+#include "qapi/qapi-visit-ui.h"
- #include "qapi/qapi-commands-block-core.h"
- #include "qapi/qapi-commands-misc.h"
- #include "qapi/qapi-commands-run-state.h"
-@@ -2088,6 +2090,25 @@ static void select_vgahw(const char *p)
+diff --git a/ui/gtk.c b/ui/gtk.c
+index bb3214cffb..9e5390f2c2 100644
+--- a/ui/gtk.c
++++ b/ui/gtk.c
+@@ -145,6 +145,7 @@
+ #define GDK_KEY_2 GDK_2
+ #define GDK_KEY_f GDK_f
+ #define GDK_KEY_g GDK_g
++#define GDK_KEY_m GDK_m
+ #define GDK_KEY_q GDK_q
+ #define GDK_KEY_plus GDK_plus
+ #define GDK_KEY_equal GDK_equal
+@@ -208,6 +209,7 @@ struct GtkDisplayState {
+ 
+     GtkWidget *show_tabs_item;
+     GtkWidget *untabify_item;
++    GtkWidget *show_menubar_item;
+ 
+     GtkWidget *vbox;
+     GtkWidget *notebook;
+@@ -1387,6 +1389,30 @@ static void gd_menu_untabify(GtkMenuItem *item, void *opaque)
      }
  }
  
-+static void parse_display_qapi(const char *optarg)
++static void gd_menu_show_menubar(GtkMenuItem *item, void *opaque)
 +{
-+    Error *err = NULL;
-+    DisplayOptions *opts;
-+    Visitor *v;
++    GtkDisplayState *s = opaque;
++    VirtualConsole *vc = gd_vc_find_current(s);
 +
-+    v = qobject_input_visitor_new_str(optarg, "type", &err);
-+    if (!v) {
-+        error_report_err(err);
-+        exit(1);
++    if (s->full_screen) {
++        return;
 +    }
 +
-+    visit_type_DisplayOptions(v, NULL, &opts, &error_fatal);
-+    QAPI_CLONE_MEMBERS(DisplayOptions, &dpy, opts);
-+
-+    qapi_free_DisplayOptions(opts);
-+    visit_free(v);
++    if (gtk_check_menu_item_get_active(
++                GTK_CHECK_MENU_ITEM(s->show_menubar_item))) {
++        gtk_widget_show(s->menu_bar);
++    } else {
++        gtk_widget_hide(s->menu_bar);
++    }
++    gd_update_windowsize(vc);
 +}
 +
- static void parse_display(const char *p)
++static void gd_accel_show_menubar(void *opaque)
++{
++    GtkDisplayState *s = opaque;
++    gtk_menu_item_activate(GTK_MENU_ITEM(s->show_menubar_item));
++}
++
+ static void gd_menu_full_screen(GtkMenuItem *item, void *opaque)
  {
-     const char *opts;
-@@ -2203,8 +2224,7 @@ static void parse_display(const char *p)
-     } else if (strstart(p, "none", &opts)) {
-         dpy.type = DISPLAY_TYPE_NONE;
+     GtkDisplayState *s = opaque;
+@@ -1403,7 +1429,10 @@ static void gd_menu_full_screen(GtkMenuItem *item, void *opaque)
      } else {
--        error_report("unknown display type");
--        exit(1);
-+        parse_display_qapi(p);
-     }
+         gtk_window_unfullscreen(GTK_WINDOW(s->window));
+         gd_menu_show_tabs(GTK_MENU_ITEM(s->show_tabs_item), s);
+-        gtk_widget_show(s->menu_bar);
++        if (gtk_check_menu_item_get_active(
++                    GTK_CHECK_MENU_ITEM(s->show_menubar_item))) {
++            gtk_widget_show(s->menu_bar);
++        }
+         s->full_screen = FALSE;
+         if (vc->type == GD_VC_GFX) {
+             vc->gfx.scale_x = 1.0;
+@@ -2036,6 +2065,8 @@ static void gd_connect_signals(GtkDisplayState *s)
+                      G_CALLBACK(gd_menu_show_tabs), s);
+     g_signal_connect(s->untabify_item, "activate",
+                      G_CALLBACK(gd_menu_untabify), s);
++    g_signal_connect(s->show_menubar_item, "activate",
++                     G_CALLBACK(gd_menu_show_menubar), s);
+ 
+     g_signal_connect(s->window, "delete-event",
+                      G_CALLBACK(gd_window_close), s);
+@@ -2272,6 +2303,19 @@ static GtkWidget *gd_create_menu_view(GtkDisplayState *s)
+     s->untabify_item = gtk_menu_item_new_with_mnemonic(_("Detach Tab"));
+     gtk_menu_shell_append(GTK_MENU_SHELL(view_menu), s->untabify_item);
+ 
++    s->show_menubar_item = gtk_check_menu_item_new_with_mnemonic(
++            _("Show Menubar"));
++    gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(s->show_menubar_item),
++                                   TRUE);
++    gtk_accel_group_connect(s->accel_group, GDK_KEY_m, HOTKEY_MODIFIERS, 0,
++            g_cclosure_new_swap(G_CALLBACK(gd_accel_show_menubar), s, NULL));
++#if GTK_CHECK_VERSION(3, 8, 0)
++    gtk_accel_label_set_accel(
++            GTK_ACCEL_LABEL(gtk_bin_get_child(GTK_BIN(s->show_menubar_item))),
++            GDK_KEY_m, HOTKEY_MODIFIERS);
++#endif
++    gtk_menu_shell_append(GTK_MENU_SHELL(view_menu), s->show_menubar_item);
++
+     return view_menu;
  }
  
 -- 
