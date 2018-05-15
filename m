@@ -1,20 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45032)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47169)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1fIdja-0007A3-GP
-	for qemu-devel@nongnu.org; Tue, 15 May 2018 13:27:35 -0400
+	(envelope-from <petrutlucian94@gmail.com>) id 1fIdrV-0001dq-55
+	for qemu-devel@nongnu.org; Tue, 15 May 2018 13:35:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1fIdjZ-000487-D8
-	for qemu-devel@nongnu.org; Tue, 15 May 2018 13:27:34 -0400
-Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:41714)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1fIdjZ-00046Q-67
-	for qemu-devel@nongnu.org; Tue, 15 May 2018 13:27:33 -0400
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 15 May 2018 18:27:29 +0100
-Message-Id: <20180515172729.24564-1-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PATCH] memfd: Avoid Coverity warning about integer
- overflow
+	(envelope-from <petrutlucian94@gmail.com>) id 1fIdrR-0006sU-7B
+	for qemu-devel@nongnu.org; Tue, 15 May 2018 13:35:45 -0400
+Received: from mail-wm0-x244.google.com ([2a00:1450:400c:c09::244]:32910)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <petrutlucian94@gmail.com>)
+	id 1fIdrR-0006sF-0B
+	for qemu-devel@nongnu.org; Tue, 15 May 2018 13:35:41 -0400
+Received: by mail-wm0-x244.google.com with SMTP id x12-v6so16717550wmc.0
+	for <qemu-devel@nongnu.org>; Tue, 15 May 2018 10:35:40 -0700 (PDT)
+From: petrutlucian94@gmail.com
+Date: Tue, 15 May 2018 20:35:20 +0300
+Message-Id: <1526405722-10887-1-git-send-email-lpetrut@cloudbasesolutions.com>
+Subject: [Qemu-devel] [PATCH v2 1/3] WHPX Add signature CPUID
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,34 +24,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: patches@linaro.org, Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+Cc: Lucian Petrut <lpetrut@cloudbasesolutions.com>, Alessandro Pilotti <apilotti@cloudbasesolutions.com>, Justin Terry <juterry@microsoft.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, "open list:All patches CC here" <qemu-devel@nongnu.org>
 
-Coverity complains about qemu_memfd_create() (CID 1385858) because
-we calculate a bit position htsize which could be up to 63, but
-then use it in "1 << htsize" which is a 32-bit integer calculation
-and could push the 1 off the top of the value.
+From: Lucian Petrut <lpetrut@cloudbasesolutions.com>
 
-Silence the complaint bu using "1ULL"; this isn't a bug in
-practice since a hugetlbsize of 4GB is not very plausible.
+Adds the CPUID trap for CPUID 0x40000000, sending the WHPX signature
+to the guest upon request. This is consistent with other QEMU
+accelerators (KVM).
 
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+Signed-off-by: Alessandro Pilotti <apilotti@cloudbasesolutions.com>
+Signed-off-by: Justin Terry (VM) <juterry@microsoft.com>
+Signed-off-by: Lucian Petrut <lpetrut@cloudbasesolutions.com>
 ---
- util/memfd.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ target/i386/whpx-all.c | 23 +++++++++++++++++++++++
+ 1 file changed, 23 insertions(+)
 
-diff --git a/util/memfd.c b/util/memfd.c
-index b3ecbac19e..d248a53c3c 100644
---- a/util/memfd.c
-+++ b/util/memfd.c
-@@ -66,7 +66,7 @@ int qemu_memfd_create(const char *name, size_t size, bool hugetlb,
- {
-     int htsize = hugetlbsize ? ctz64(hugetlbsize) : 0;
+diff --git a/target/i386/whpx-all.c b/target/i386/whpx-all.c
+index 5843517..64ef79a 100644
+--- a/target/i386/whpx-all.c
++++ b/target/i386/whpx-all.c
+@@ -29,6 +29,8 @@
+ #include <WinHvPlatform.h>
+ #include <WinHvEmulation.h>
  
--    if (htsize && 1 << htsize != hugetlbsize) {
-+    if (htsize && 1ULL << htsize != hugetlbsize) {
-         error_setg(errp, "Hugepage size must be a power of 2");
-         return -1;
++#define WHPX_CPUID_SIGNATURE 0x40000000
++
+ struct whpx_state {
+     uint64_t mem_quota;
+     WHV_PARTITION_HANDLE partition;
+@@ -1349,6 +1351,27 @@ static int whpx_accel_init(MachineState *ms)
+         goto error;
      }
+ 
++    UINT32 signature[3] = {0};
++    memcpy(signature, "WHPXWHPXWHPX", 12);
++
++    WHV_X64_CPUID_RESULT cpuidResultList[1] = {0};
++    cpuidResultList[0].Function = WHPX_CPUID_SIGNATURE;
++    cpuidResultList[0].Eax = 0;
++    cpuidResultList[0].Ebx = signature[0];
++    cpuidResultList[0].Ecx = signature[1];
++    cpuidResultList[0].Edx = signature[2];
++    hr = WHvSetPartitionProperty(whpx->partition,
++                                 WHvPartitionPropertyCodeCpuidResultList,
++                                 cpuidResultList,
++                                 RTL_NUMBER_OF(cpuidResultList) *
++                                    sizeof(WHV_X64_CPUID_RESULT));
++    if (FAILED(hr)) {
++        error_report("WHPX: Failed to set partition CpuidResultList hr=%08lx",
++                     hr);
++        ret = -EINVAL;
++        goto error;
++    }
++
+     hr = WHvSetupPartition(whpx->partition);
+     if (FAILED(hr)) {
+         error_report("WHPX: Failed to setup partition, hr=%08lx", hr);
 -- 
-2.17.0
+2.7.4
