@@ -1,17 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40989)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42840)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <olaf@aepfle.de>) id 1fITV2-00011D-BD
-	for qemu-devel@nongnu.org; Tue, 15 May 2018 02:31:53 -0400
+	(envelope-from <kraxel@redhat.com>) id 1fITfu-0004dX-BT
+	for qemu-devel@nongnu.org; Tue, 15 May 2018 02:43:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <olaf@aepfle.de>) id 1fITV1-0002Ei-FK
-	for qemu-devel@nongnu.org; Tue, 15 May 2018 02:31:52 -0400
-From: Olaf Hering <olaf@aepfle.de>
-Date: Tue, 15 May 2018 08:31:28 +0200
-Message-Id: <20180515063128.7040-1-olaf@aepfle.de>
+	(envelope-from <kraxel@redhat.com>) id 1fITfp-0006aq-BX
+	for qemu-devel@nongnu.org; Tue, 15 May 2018 02:43:06 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:43836 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1fITfp-0006af-6u
+	for qemu-devel@nongnu.org; Tue, 15 May 2018 02:43:01 -0400
+Date: Tue, 15 May 2018 08:42:59 +0200
+From: Gerd Hoffmann <kraxel@redhat.com>
+Message-ID: <20180515064259.6uh7pngns5in57fn@sirius.home.kraxel.org>
+References: <CA+EEy5tEYtEXPH-vXcdcb1XsAD_5MEaz_JQ+_rwK3RfZn4b+nQ@mail.gmail.com>
+	<20180514131320.GC5182@stefanha-x1.localdomain>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v2] replace functions which are only available
- in glib-2.24
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180514131320.GC5182@stefanha-x1.localdomain>
+Subject: Re: [Qemu-devel] Question about QEMU
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,47 +27,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-trivial@nongnu.org
-Cc: Olaf Hering <olaf@aepfle.de>, Fam Zheng <famz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, "open list:All patches CC here" <qemu-devel@nongnu.org>
+To: Stefan Hajnoczi <stefanha@gmail.com>
+Cc: =?utf-8?B?7Jyg7JuQ7IOB?= <wonsange@gmail.com>, qemu-devel@nongnu.org, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
 
-Currently the minimal supported version of glib is 2.22.
-Since testing is done with a glib that claims to be 2.22, but in fact
-has APIs from newer version of glib, this bug was not caught during
-submit of the patch referenced below.
+  Hi,
 
-Replace g_realloc_n, which is available only since 2.24, with g_renew.
+> > I have a problem about screen resolution.
+> > Recommended resolution of my guest OS is 1920x1080.
+> > If a QEMU window size is 1920x1080, it is clear.
+> > But, if I change smaller of a QEMU window size, it does not display
+> > clearly.(ex: 1280x720)
+> > In this case, QEMU windows size in host is 1280x720, and guest screen
+> > resolution is 1920x1080.
 
-Fixes commit 418026ca43 ("util: Introduce vfio helpers")
+virtio-gpu signals to the guest that the window size has changed, and
+expected guest behavior is that it changes the guest screen resolution
+accordingly.
 
-Signed-off-by: Olaf Hering <olaf@aepfle.de>
----
+> > I want to hold the resolution of the guest OS and scale the QEMU windows in
+> > the host OS.
 
- This must go into stable-2.12.
+Why?
 
- util/vfio-helpers.c | 6 ++----
- 1 file changed, 2 insertions(+), 4 deletions(-)
+Setting GL_TEXTURE_{MIN,MAG}_FILTER to GL_LINEAR for the virtio-gpu
+textures surely is possible.  But using a guest screen resolution
+matching the host window size will still give better results than
+doing any kind of scaling.
 
-diff --git a/util/vfio-helpers.c b/util/vfio-helpers.c
-index 006674c916..1d9272efa4 100644
---- a/util/vfio-helpers.c
-+++ b/util/vfio-helpers.c
-@@ -522,8 +522,7 @@ static IOVAMapping *qemu_vfio_add_mapping(QEMUVFIOState *s,
- 
-     assert(index >= 0);
-     s->nr_mappings++;
--    s->mappings = g_realloc_n(s->mappings, sizeof(s->mappings[0]),
--                              s->nr_mappings);
-+    s->mappings = g_renew(IOVAMapping, s->mappings, s->nr_mappings);
-     insert = &s->mappings[index];
-     shift = s->nr_mappings - index - 1;
-     if (shift) {
-@@ -577,8 +576,7 @@ static void qemu_vfio_undo_mapping(QEMUVFIOState *s, IOVAMapping *mapping,
-     memmove(mapping, &s->mappings[index + 1],
-             sizeof(s->mappings[0]) * (s->nr_mappings - index - 1));
-     s->nr_mappings--;
--    s->mappings = g_realloc_n(s->mappings, sizeof(s->mappings[0]),
--                              s->nr_mappings);
-+    s->mappings = g_renew(IOVAMapping, s->mappings, s->nr_mappings);
- }
- 
- /* Check if the mapping list is (ascending) ordered. */
+cheers,
+  Gerd
