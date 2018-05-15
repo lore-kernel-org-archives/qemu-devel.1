@@ -1,27 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54246)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54837)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1fIeTN-00087r-4z
-	for qemu-devel@nongnu.org; Tue, 15 May 2018 14:14:53 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1fIeYh-0001i7-Mv
+	for qemu-devel@nongnu.org; Tue, 15 May 2018 14:20:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1fIeTM-000663-AL
-	for qemu-devel@nongnu.org; Tue, 15 May 2018 14:14:53 -0400
-Received: from mail-wm0-x243.google.com ([2a00:1450:400c:c09::243]:38930)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
-	id 1fIeTM-00065p-3N
-	for qemu-devel@nongnu.org; Tue, 15 May 2018 14:14:52 -0400
-Received: by mail-wm0-x243.google.com with SMTP id f8-v6so2828344wmc.4
-	for <qemu-devel@nongnu.org>; Tue, 15 May 2018 11:14:51 -0700 (PDT)
-MIME-Version: 1.0
-In-Reply-To: <20180515172729.24564-1-peter.maydell@linaro.org>
-References: <20180515172729.24564-1-peter.maydell@linaro.org>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Tue, 15 May 2018 20:14:49 +0200
-Message-ID: <CAJ+F1C+-K4FgPu3O0gU484z96qM0Lj6U30aJnZX6G1mBa_coUA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] memfd: Avoid Coverity warning about
- integer overflow
+	(envelope-from <pm215@archaic.org.uk>) id 1fIeYg-0007ZN-J2
+	for qemu-devel@nongnu.org; Tue, 15 May 2018 14:20:23 -0400
+Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:41726)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
+	id 1fIeYg-0007St-34
+	for qemu-devel@nongnu.org; Tue, 15 May 2018 14:20:22 -0400
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 15 May 2018 19:19:58 +0100
+Message-Id: <20180515181958.25837-1-peter.maydell@linaro.org>
+Subject: [Qemu-devel] [PATCH] gdbstub: Clarify what gdb_handlesig() is doing
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,49 +22,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, patches@linaro.org
+To: qemu-devel@nongnu.org
+Cc: patches@linaro.org, Laurent Vivier <laurent@vivier.eu>, Riku Voipio <riku.voipio@iki.fi>
 
-On Tue, May 15, 2018 at 7:27 PM, Peter Maydell <peter.maydell@linaro.org> w=
-rote:
-> Coverity complains about qemu_memfd_create() (CID 1385858) because
-> we calculate a bit position htsize which could be up to 63, but
-> then use it in "1 << htsize" which is a 32-bit integer calculation
-> and could push the 1 off the top of the value.
->
-> Silence the complaint bu using "1ULL"; this isn't a bug in
-> practice since a hugetlbsize of 4GB is not very plausible.
->
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+gdb_handlesig()'s behaviour is not entirely obvious at first
+glance. Add a doc comment for it, and also add a comment
+explaining why it's ok for gdb_do_syscallv() to ignore
+gdb_handlesig()'s return value. (Coverity complains about
+this: CID 1390850.)
 
-Thanks Peter for the fix,
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+---
+This took me a little while to figure out, so we might as
+well write it down.
 
-Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Incidentally, a lot of the code in the per-target main
+loops doesn't really use gdb_handlesig() correctly either:
+for instance in the arm main loop we (a) forget to tell
+gdb about SIGSEGV and (b) assume that if we tell gdb about
+a SIGTRAP then the signal we get back on resume is either
+0 or SIGTRAP, when it could really be anything.
 
-> ---
->  util/memfd.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/util/memfd.c b/util/memfd.c
-> index b3ecbac19e..d248a53c3c 100644
-> --- a/util/memfd.c
-> +++ b/util/memfd.c
-> @@ -66,7 +66,7 @@ int qemu_memfd_create(const char *name, size_t size, bo=
-ol hugetlb,
->  {
->      int htsize =3D hugetlbsize ? ctz64(hugetlbsize) : 0;
->
-> -    if (htsize && 1 << htsize !=3D hugetlbsize) {
-> +    if (htsize && 1ULL << htsize !=3D hugetlbsize) {
->          error_setg(errp, "Hugepage size must be a power of 2");
->          return -1;
->      }
-> --
-> 2.17.0
->
->
+Ideally we'd push the gdb_handlesig calls into
+target-independent code, ie queue_signal(). I'm not
+sure what sort of fake siginfo we need to generate
+for the "generate a different signal" codepath, though:
+probably need to look at eg what the gdb gdbstub does.
+---
+ include/exec/gdbstub.h | 15 +++++++++++++++
+ gdbstub.c              |  6 ++++++
+ 2 files changed, 21 insertions(+)
 
-
-
---=20
-Marc-Andr=C3=A9 Lureau
+diff --git a/include/exec/gdbstub.h b/include/exec/gdbstub.h
+index 2e8a4b83b9..08363969c1 100644
+--- a/include/exec/gdbstub.h
++++ b/include/exec/gdbstub.h
+@@ -48,6 +48,21 @@ int use_gdb_syscalls(void);
+ void gdb_set_stop_cpu(CPUState *cpu);
+ void gdb_exit(CPUArchState *, int);
+ #ifdef CONFIG_USER_ONLY
++/**
++ * gdb_handlesig: yield control to gdb
++ * @cpu: CPU
++ * @sig: if non-zero, the signal number which caused us to stop
++ *
++ * This function yields control to gdb, when a user-mode-only target
++ * needs to stop execution. If @sig is non-zero, then we will send a
++ * stop packet to tell gdb that we have stopped because of this signal.
++ *
++ * This function will block (handling protocol requests from gdb)
++ * until gdb tells us to continue target execution. When it does
++ * return, the return value is a signal to deliver to the target,
++ * or 0 if no signal should be delivered, ie the signal that caused
++ * us to stop should be ignored.
++ */
+ int gdb_handlesig(CPUState *, int);
+ void gdb_signalled(CPUArchState *, int);
+ void gdbserver_fork(CPUState *);
+diff --git a/gdbstub.c b/gdbstub.c
+index 3c3807358c..c9a63090ea 100644
+--- a/gdbstub.c
++++ b/gdbstub.c
+@@ -1548,6 +1548,12 @@ void gdb_do_syscallv(gdb_syscall_complete_cb cb, const char *fmt, va_list va)
+     *p = 0;
+ #ifdef CONFIG_USER_ONLY
+     put_packet(s, s->syscall_buf);
++    /* Return control to gdb for it to process the syscall request.
++     * Since the protocol requires that gdb hands control back to us
++     * using a "here are the results" F packet, we don't need to check
++     * gdb_handlesig's return value (which is the signal to deliver if
++     * execution was resumed via a continue packet).
++     */
+     gdb_handlesig(s->c_cpu, 0);
+ #else
+     /* In this case wait to send the syscall packet until notification that
+-- 
+2.17.0
