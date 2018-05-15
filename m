@@ -1,21 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42204)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44212)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fIYye-0004lV-30
-	for qemu-devel@nongnu.org; Tue, 15 May 2018 08:22:49 -0400
+	(envelope-from <marcandre.lureau@redhat.com>) id 1fIZ62-0007xz-8x
+	for qemu-devel@nongnu.org; Tue, 15 May 2018 08:30:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fIYyc-0006v5-Vc
-	for qemu-devel@nongnu.org; Tue, 15 May 2018 08:22:48 -0400
-Date: Tue, 15 May 2018 14:22:35 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20180515122235.GC4442@localhost.localdomain>
-References: <20180509162637.15575-1-kwolf@redhat.com>
-	<20180509162637.15575-18-kwolf@redhat.com>
-	<ff7476fd-5f6d-be11-c65a-296f3b717040@redhat.com>
+	(envelope-from <marcandre.lureau@redhat.com>) id 1fIZ5y-0003Tg-Ay
+	for qemu-devel@nongnu.org; Tue, 15 May 2018 08:30:26 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:55382)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
+	id 1fIZ5y-0003TI-3f
+	for qemu-devel@nongnu.org; Tue, 15 May 2018 08:30:22 -0400
+From: marcandre.lureau@redhat.com
+Date: Tue, 15 May 2018 14:30:03 +0200
+Message-Id: <20180515123007.10164-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ff7476fd-5f6d-be11-c65a-296f3b717040@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 17/42] job: Move defer_to_main_loop to Job
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH 0/4] RFC: ovmf: Add support for TPM Physical
+ Presence interface
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,70 +26,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>
-Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, jcody@redhat.com, armbru@redhat.com, mreitz@redhat.com
+To: edk2-devel@lists.01.org
+Cc: pjones@redhat.com, jiewen.yao@intel.com, stefanb@linux.vnet.ibm.com, lersek@redhat.com, qemu-devel@nongnu.org, javierm@redhat.com, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
-Am 15.05.2018 um 00:33 hat John Snow geschrieben:
-> 
-> 
-> On 05/09/2018 12:26 PM, Kevin Wolf wrote:
-> > Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-> 
-> Hmm, this one is a bit more than just code motion due to the way the
-> aio_context acquisition has changed. I think at a minimum a good commit
-> message is warranted.
+From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
-I know it took a while to convince myself that it's right. I wonder
-where the commit message has gone...
+Hi,
 
-> > @@ -170,3 +171,35 @@ void job_unref(Job *job)
-> >          g_free(job);
-> >      }
-> >  }
-> > +
-> > +typedef struct {
-> > +    Job *job;
-> > +    JobDeferToMainLoopFn *fn;
-> > +    void *opaque;
-> > +} JobDeferToMainLoopData;
-> > +
-> > +static void job_defer_to_main_loop_bh(void *opaque)
-> > +{
-> > +    JobDeferToMainLoopData *data = opaque;
-> > +    Job *job = data->job;
-> > +    AioContext *aio_context = job->aio_context;
-> > +
-> > +    /* Prevent race with job_defer_to_main_loop() */
-> > +    aio_context_acquire(aio_context);
-> > +    data->fn(data->job, data->opaque);
-> > +    aio_context_release(aio_context);
-> > +
-> > +    g_free(data);
-> > +}
-> > +
-> 
-> This function showed up in '14, with dec7d42 from Stefan. His first
-> draft looked like Kevin's, until:
-> 
-> https://lists.gnu.org/archive/html/qemu-devel/2014-10/msg00111.html
-> 
-> Max, from 2014:
-> 
-> "I'm not so sure whether it'd be possible to change the BDS's AIO
-> context (in another thread) after the call to bdrv_get_aio_context() in
-> block_job_defer_to_main_loop() and before
-> block_job_defer_to_main_loop_bh() is run. If so, this might create race
-> conditions."
-> 
-> Err, I dunno either.
+The following series adds basic TPM PPI 1.3 support for OVMF-on-QEMU
+with TPM2 (I haven't tested TPM1, for lack of interest).
 
-This one at least is not a problem in the new code any more because we
-have job->aio_context now, which is updated when the BDS's context
-changes. We read job->aio_context only in the BH, so we always get the
-current one.
+PPI test runs successfully with Windows 10 WHLK, despite the limited
+number of supported funcions (tpm2_ppi_funcs table, in particular, no
+function allows to manipulate Tcg2PhysicalPresenceFlags)
 
-In contrast, the old code put it into BlockJobDeferToMainLoopData at
-the time when the BH was scheduled, so it could be outdated when the BH
-actually ran.
+The way it works is relatively simple: a memory region is allocated by
+QEMU to save PPI related variables. An ACPI interface is exposed by
+QEMU to let the guest manipulate those. At boot, ovmf processes and
+updates the PPI qemu region and request variables.
 
-Kevin
+I build edk2 with:
+
+$ build -DTPM2_ENABLE -DSECURE_BOOT_ENABLE
+
+I test with qemu & swtpm/libtpms (tpm2 branches, swtpm_setup.sh --tpm2 --=
+tpm-state tpmstatedir)
+
+$ swtpm socket --tpmstate tpmstatedir --ctrl type=3Dunixio,path=3Dtpmsock=
+  --tpm2 &
+$ qemu .. -chardev socket,id=3Dchrtpm,path=3Dtpmsock -tpmdev emulator,id=3D=
+tpm0,chardev=3Dchrtpm -device tpm-crb,tpmdev=3Dtpm0
+
+Github trees:
+https://github.com/elmarco/edk2/tree/tpm-ppi
+https://github.com/elmarco/qemu/tree/tpm-ppi
+
+Thanks
+
+Marc-Andr=C3=A9 Lureau (4):
+  ovmf: add and link with Tcg2PhysicalPresenceLibNull when !TPM2_ENABLE
+  ovmf: add QemuTpm.h header
+  ovmf: replace SecurityPkg with OvfmPkg Tcg2PhysicalPresenceLibQemu
+  ovmf: process TPM PPI request in AfterConsole()
+
+ OvmfPkg/Include/IndustryStandard/QemuTpm.h    |  67 ++
+ .../PlatformBootManagerLib/BdsPlatform.c      |   8 +
+ .../PlatformBootManagerLib.inf                |   2 +
+ .../DxeTcg2PhysicalPresenceLib.c              |  26 +
+ .../DxeTcg2PhysicalPresenceLib.inf            |  34 +
+ .../DxeTcg2PhysicalPresenceLib.c              | 881 ++++++++++++++++++
+ .../DxeTcg2PhysicalPresenceLib.inf            |  67 ++
+ .../DxeTcg2PhysicalPresenceLib.uni            |  26 +
+ .../PhysicalPresenceStrings.uni               |  49 +
+ OvmfPkg/OvmfPkgIa32.dsc                       |   4 +-
+ OvmfPkg/OvmfPkgIa32X64.dsc                    |   4 +-
+ OvmfPkg/OvmfPkgX64.dsc                        |   4 +-
+ 12 files changed, 1169 insertions(+), 3 deletions(-)
+ create mode 100644 OvmfPkg/Include/IndustryStandard/QemuTpm.h
+ create mode 100644 OvmfPkg/Library/Tcg2PhysicalPresenceLibNull/DxeTcg2Ph=
+ysicalPresenceLib.c
+ create mode 100644 OvmfPkg/Library/Tcg2PhysicalPresenceLibNull/DxeTcg2Ph=
+ysicalPresenceLib.inf
+ create mode 100644 OvmfPkg/Library/Tcg2PhysicalPresenceLibQemu/DxeTcg2Ph=
+ysicalPresenceLib.c
+ create mode 100644 OvmfPkg/Library/Tcg2PhysicalPresenceLibQemu/DxeTcg2Ph=
+ysicalPresenceLib.inf
+ create mode 100644 OvmfPkg/Library/Tcg2PhysicalPresenceLibQemu/DxeTcg2Ph=
+ysicalPresenceLib.uni
+ create mode 100644 OvmfPkg/Library/Tcg2PhysicalPresenceLibQemu/PhysicalP=
+resenceStrings.uni
+
+--=20
+2.17.0.253.g3dd125b46d
