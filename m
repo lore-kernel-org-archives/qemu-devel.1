@@ -1,27 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40337)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40546)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fIYpo-0006kc-Sq
-	for qemu-devel@nongnu.org; Tue, 15 May 2018 08:13:41 -0400
+	(envelope-from <marcandre.lureau@redhat.com>) id 1fIYqs-0007XY-19
+	for qemu-devel@nongnu.org; Tue, 15 May 2018 08:14:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fIYpk-0007pb-0t
-	for qemu-devel@nongnu.org; Tue, 15 May 2018 08:13:40 -0400
-Received: from mail-ot0-x230.google.com ([2607:f8b0:4003:c0f::230]:44996)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fIYpj-0007p5-S6
-	for qemu-devel@nongnu.org; Tue, 15 May 2018 08:13:35 -0400
-Received: by mail-ot0-x230.google.com with SMTP id g7-v6so18154331otj.11
-	for <qemu-devel@nongnu.org>; Tue, 15 May 2018 05:13:35 -0700 (PDT)
+	(envelope-from <marcandre.lureau@redhat.com>) id 1fIYqn-0000H3-Iq
+	for qemu-devel@nongnu.org; Tue, 15 May 2018 08:14:45 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:35056)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
+	id 1fIYqn-0000GJ-CB
+	for qemu-devel@nongnu.org; Tue, 15 May 2018 08:14:41 -0400
+From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+Date: Tue, 15 May 2018 14:14:29 +0200
+Message-Id: <20180515121433.6112-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <cc3f26a7-a8b7-35a8-9ffa-c5940c9c1927@weilnetz.de>
-References: <20180513090613.27960-1-sw@weilnetz.de>
-	<cc3f26a7-a8b7-35a8-9ffa-c5940c9c1927@weilnetz.de>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 15 May 2018 13:13:14 +0100
-Message-ID: <CAFEAcA9kcKb28uQJOnqCAC4Gf9b7Hnu0wJbG1nHQLF4U1T9sKA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH] disas/libvixl: Fix VIXL_FALLTHROUGH macro
- for QEMU
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v3 0/4] Add support for TPM Physical Presence
+ interface
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,35 +26,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Weil <sw@weilnetz.de>
-Cc: QEMU Developer <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>
+To: qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, stefanb@linux.vnet.ibm.com, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Eduardo Habkost <ehabkost@redhat.com>, Igor Mammedov <imammedo@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Richard Henderson <rth@twiddle.net>, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
-On 13 May 2018 at 10:57, Stefan Weil <sw@weilnetz.de> wrote:
-> Even with the above patch, disas/libvixl raises a compiler warning for a
-> fall through case. The patch below fixes that warning, but I am not sure
-> whether a fall through is correct there.
->
-> Stefan
->
->
-> diff --git a/disas/libvixl/vixl/a64/disasm-a64.cc
-> b/disas/libvixl/vixl/a64/disasm-a64.cc
-> index 7a58a5c087..5481d94209 100644
-> --- a/disas/libvixl/vixl/a64/disasm-a64.cc
-> +++ b/disas/libvixl/vixl/a64/disasm-a64.cc
-> @@ -2986,6 +2986,7 @@ int Disassembler::SubstituteImmediateField(const
-> Instruction* instr,
->            return 3;
->          }
->        }
-> +      VIXL_FALLTHROUGH(); // ???
->      }
->      case 'C': {  // ICondB - Immediate Conditional Branch.
->        int64_t offset = instr->ImmCondBranch() << 2;
+Hi,
 
-This is fixed in upstream vixl, in fact:
+The following patches implement the TPM Physical Presence Interface
+that allows a user to set a command via ACPI (sysfs entry in Linux)
+that, upon the next reboot, the firmware looks for and acts upon by
+sending sequences of commands to the TPM.
 
-https://git.linaro.org/arm/vixl.git/commit/?id=de326f850f736c3a337fda52845ed3d2e620cc02
+A dedicated memory region is added to the TPM CRB & TIS devices, at
+address/size 0xFED45000/0x400. A new "etc/tpm/config" fw_cfg entry
+holds the location for that PPI region and some version details, to
+allow for future flexibility.
 
-thanks
--- PMM
+With the associated edk2/ovmf firmware, the Windows HLK "PPI 1.3" test
+now runs successfully.
+
+It is based on previous work from Stefan Berger ("[PATCH v2 0/4]
+Implement Physical Presence interface for TPM 1.2 and 2")
+
+Git branches:
+https://github.com/elmarco/qemu tpm-ppi
+https://github.com/elmarco/edk2 tpm-ppi
+
+Marc-Andr=C3=A9 Lureau (1):
+  tpm: add a fake ACPI memory clear interface
+
+Stefan Berger (3):
+  tpm: implement virtual memory device for TPM PPI
+  acpi: add fw_cfg file for TPM and PPI virtual memory device
+  acpi: build TPM Physical Presence interface
+
+ hw/tpm/tpm_ppi.h      |  26 ++++
+ include/hw/acpi/tpm.h |  30 ++++
+ hw/i386/acpi-build.c  | 318 ++++++++++++++++++++++++++++++++++++++++++
+ hw/tpm/tpm_crb.c      |   5 +
+ hw/tpm/tpm_ppi.c      |  56 ++++++++
+ hw/tpm/tpm_tis.c      |   5 +
+ docs/specs/tpm.txt    |  20 +++
+ hw/tpm/Makefile.objs  |   2 +-
+ hw/tpm/trace-events   |   4 +
+ 9 files changed, 465 insertions(+), 1 deletion(-)
+ create mode 100644 hw/tpm/tpm_ppi.h
+ create mode 100644 hw/tpm/tpm_ppi.c
+
+--=20
+2.17.0.253.g3dd125b46d
