@@ -1,29 +1,40 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41295)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43876)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Babu.Moger@amd.com>) id 1fINDx-000529-4Z
-	for qemu-devel@nongnu.org; Mon, 14 May 2018 19:49:51 -0400
+	(envelope-from <muriloo@linux.ibm.com>) id 1fINOL-0000Ap-7Z
+	for qemu-devel@nongnu.org; Mon, 14 May 2018 20:00:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <Babu.Moger@amd.com>) id 1fINDt-0001bB-5b
-	for qemu-devel@nongnu.org; Mon, 14 May 2018 19:49:49 -0400
-Received: from mail-bn3nam01on0063.outbound.protection.outlook.com
-	([104.47.33.63]:54400
-	helo=NAM01-BN3-obe.outbound.protection.outlook.com)
+	(envelope-from <muriloo@linux.ibm.com>) id 1fINOH-0002z6-Az
+	for qemu-devel@nongnu.org; Mon, 14 May 2018 20:00:33 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:35222
+	helo=mx0a-001b2d01.pphosted.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <Babu.Moger@amd.com>) id 1fINDs-0001YJ-Qx
-	for qemu-devel@nongnu.org; Mon, 14 May 2018 19:49:45 -0400
-From: "Moger, Babu" <Babu.Moger@amd.com>
-Date: Mon, 14 May 2018 23:49:42 +0000
-Message-ID: <SN1PR12MB2477619C4A8A43C36DC14758959C0@SN1PR12MB2477.namprd12.prod.outlook.com>
-References: <1523402169-113351-1-git-send-email-babu.moger@amd.com>
-	<1523402169-113351-8-git-send-email-babu.moger@amd.com>
-	<20180514211201.GC25013@localhost.localdomain>
-In-Reply-To: <20180514211201.GC25013@localhost.localdomain>
-Content-Language: en-US
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	(Exim 4.71) (envelope-from <muriloo@linux.ibm.com>)
+	id 1fINOH-0002wI-4B
+	for qemu-devel@nongnu.org; Mon, 14 May 2018 20:00:29 -0400
+Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w4ENwnk6123753
+	for <qemu-devel@nongnu.org>; Mon, 14 May 2018 20:00:28 -0400
+Received: from e16.ny.us.ibm.com (e16.ny.us.ibm.com [129.33.205.206])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2hyfnstbhd-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Mon, 14 May 2018 20:00:28 -0400
+Received: from localhost
+	by e16.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <muriloo@linux.ibm.com>;
+	Mon, 14 May 2018 20:00:26 -0400
+Date: Mon, 14 May 2018 21:00:17 -0300
+From: Murilo Opsfelder Araujo <muriloo@linux.ibm.com>
+References: <20180514100023.12542-1-david@redhat.com>
+	<20180514100023.12542-4-david@redhat.com>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v6 7/9] i386: Add support for
- CPUID_8000_001E for AMD
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180514100023.12542-4-david@redhat.com>
+Message-Id: <20180515000017.GB12837@kermit-br-ibm-com>
+Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH v3 03/18] qdev: let machine
+ hotplug handler to override bus hotplug handler
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,150 +43,112 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: "mst@redhat.com" <mst@redhat.com>, "marcel@redhat.com" <marcel@redhat.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "rth@twiddle.net" <rth@twiddle.net>, "mtosatti@redhat.com" <mtosatti@redhat.com>, "geoff@hostfission.com" <geoff@hostfission.com>, "kash@tripleback.net" <kash@tripleback.net>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>
+To: David Hildenbrand <david@redhat.com>
+Cc: qemu-devel@nongnu.org, Pankaj Gupta <pagupta@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Cornelia Huck <cohuck@redhat.com>, Markus Armbruster <armbru@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org, qemu-ppc@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Luiz Capitulino <lcapitulino@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Richard Henderson <rth@twiddle.net>
 
+On Mon, May 14, 2018 at 12:00:08PM +0200, David Hildenbrand wrote:
+> From: Igor Mammedov <imammedo@redhat.com>
+> 
+> it will allow to return another hotplug handler than the default
+> one for a specific bus based device type. Which is needed to handle
+> non trivial plug/unplug sequences that need the access to resources
+> configured outside of bus where device is attached.
+> 
+> That will allow for returned hotplug handler to orchestrate wiring
+> in arbitrary order, by chaining other hotplug handlers when
+> it's needed.
+> 
+> PS:
+> It could be used for hybrid virtio-mem and virtio-pmem devices
+> where it will return machine as hotplug handler which will do
+> necessary wiring at machine level and then pass control down
+> the chain to bus specific hotplug handler.
+> 
+> Example of top level hotplug handler override and custom plug sequence:
+> 
+>   some_machine_get_hotplug_handler(machine){
+>       if (object_dynamic_cast(OBJECT(dev), TYPE_SOME_BUS_DEVICE)) {
+>           return HOTPLUG_HANDLER(machine);
+>       }
+>       return NULL;
+>   }
+> 
+>   some_machine_device_plug(hotplug_dev, dev) {
+>       if (object_dynamic_cast(OBJECT(dev), TYPE_SOME_BUS_DEVICE)) {
+>           /* do machine specific initialization */
+>           some_machine_init_special_device(dev)
+> 
+>           /* pass control to bus specific handler */
+>           hotplug_handler_plug(dev->parent_bus->hotplug_handler, dev)
+>       }
+>   }
 
+Hi, David.
 
-> -----Original Message-----
-> From: Eduardo Habkost [mailto:ehabkost@redhat.com]
-> Sent: Monday, May 14, 2018 4:12 PM
-> To: Moger, Babu <Babu.Moger@amd.com>
-> Cc: mst@redhat.com; marcel@redhat.com; pbonzini@redhat.com;
-> rth@twiddle.net; mtosatti@redhat.com; geoff@hostfission.com;
-> kash@tripleback.net; qemu-devel@nongnu.org; kvm@vger.kernel.org
-> Subject: Re: [Qemu-devel] [PATCH v6 7/9] i386: Add support for
-> CPUID_8000_001E for AMD
->=20
-> On Tue, Apr 10, 2018 at 07:16:07PM -0400, Babu Moger wrote:
-> > Populate threads/core_id/apic_ids/socket_id when CPUID_EXT3_TOPOEXT
-> > feature is supported. This is required to support hyperthreading featur=
-e
-> > on AMD CPUs. This is supported via CPUID_8000_001E extended functions.
-> >
-> > Signed-off-by: Babu Moger <babu.moger@amd.com>
-> > Tested-by: Geoffrey McRae <geoff@hostfission.com>
-> > ---
-> >  target/i386/cpu.c | 14 ++++++++++++++
-> >  1 file changed, 14 insertions(+)
-> >
-> > diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-> > index 63f2d31..24b39c6 100644
-> > --- a/target/i386/cpu.c
-> > +++ b/target/i386/cpu.c
-> > @@ -315,6 +315,12 @@ static uint32_t
-> encode_cache_cpuid80000005(CPUCacheInfo *cache)
-> >                           (((CORES_IN_CMPLX - 1) * 2) + 1)  : \
-> >                           (CORES_IN_CMPLX - 1))
-> >
-> > +/* Definitions used on CPUID Leaf 0x8000001E */
-> > +#define EXTENDED_APIC_ID(threads, socket_id, core_id, thread_id) \
-> > +                        ((threads) ? \
-> > +                         ((socket_id << 6) | (core_id << 1) | thread_i=
-d) : \
-> > +                         ((socket_id << 6) | core_id))
->=20
-> Using the AMD64 Architecture Programmer's Manual Volume 3 as
-> reference below.
->=20
-> The formula above assumes MNC =3D (2 ^ 6).
->=20
-> The current code in QEMU sets ApicIdCoreIdSize
-> (CPUID[0x80000008].ECX[bits 15:12]) to 0, which means MNC is
-> calculated using the legacy method:
->   MNC =3D CPUID Fn8000_0008_ECX[NC] + 1.
->=20
-> The current code sets CPUID Fn8000_0008_ECX[NC] to:
->   (cs->nr_cores * cs->nr_threads) - 1.
->=20
-> This means we cannot hardcode MNC, and must calculate it based on
-> nr_cores and nr_threads.
->=20
-> Probably it's a good idea to fill ApicIdCoreIdSize if TOPOEXT is
-> set, so we will know MNC will always be a power of 2 and the
-> formula here will be compatible with the existing APIC ID
-> calculation logic.
->=20
-> Note that we already have a comment at the top of topology.h:
->=20
->  * This code should be compatible with AMD's "Extended Method" described
-> at:
->  *   AMD CPUID Specification (Publication #25481)
->  *   Section 3: Multiple Core Calcuation
->  * as long as:
->  *  nr_threads is set to 1;
->  *  OFFSET_IDX is assumed to be 0;
->  *  CPUID Fn8000_0008_ECX[ApicIdCoreIdSize[3:0]] is set to
-> apicid_core_width().
->=20
-> So you can already use cpu->apic_id here as long as
-> ApicIdCoreSize is set to apicid_core_width().  Probably
-> compatibility with AMD methods will be kept even if
-> nr_threads > 1, but I didn't confirm that.
->=20
-> Actually, I strongly advise you use cpu->apic_id here.  Otherwise
+I might be misreading, but isn't it more like the following?
 
-Yes. We should be able to use cpu->apic_id here. Thanks for pointing this o=
-ut.
-Will run more tests to confirm. Thanks=20
+    some_machine_device_plug(hotplug_dev, dev) {
+        if (object_dynamic_cast(OBJECT(dev), TYPE_SOME_BUS_DEVICE)) {
+            /* do machine specific initialization */
+            some_machine_init_special_device(dev)
+        } else {
+            /* pass control to bus specific handler */
+            hotplug_handler_plug(dev->parent_bus->hotplug_handler, dev)
+        }
+    }
 
-> the Extended APIC ID seen by the guest here won't match the APIC
-> ID used everywhere else inside QEMU and KVM code.
->=20
->=20
-> > +
-> >  /*
-> >   * Encode cache info for CPUID[0x80000006].ECX and
-> CPUID[0x80000006].EDX
-> >   * @l3 can be NULL.
-> > @@ -4098,6 +4104,14 @@ void cpu_x86_cpuid(CPUX86State *env,
-> uint32_t index, uint32_t count,
-> >              break;
-> >          }
-> >          break;
-> > +    case 0x8000001E:
-> > +        assert(cpu->core_id <=3D 255);
-> > +        *eax =3D EXTENDED_APIC_ID((cs->nr_threads - 1),
-> > +               cpu->socket_id, cpu->core_id, cpu->thread_id);
-> > +        *ebx =3D (cs->nr_threads - 1) << 8 | cpu->core_id;
-> > +        *ecx =3D cpu->socket_id;
->=20
-> Terminology is confusing here, so let's confirm this is really
-> what we want to do:
-> * ThreadsPerComputeUnit is set to nr_threads-1.  Looks correct.
-> * ComputeUnitId is being set to core_id.  Is this really what we
->   want?
-> * NodesPerProcessor is being set to 0 (meaning 1 node per
->   processor)
-> * NodeId is being set to socket_id.  Is this really right,
->   considering that NodesPerProcessor is being set to 0?
+> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+> Signed-off-by: David Hildenbrand <david@redhat.com>
+> ---
+>  hw/core/qdev.c         |  6 ++----
+>  include/hw/qdev-core.h | 11 +++++++++++
+>  2 files changed, 13 insertions(+), 4 deletions(-)
+> 
+> diff --git a/hw/core/qdev.c b/hw/core/qdev.c
+> index f6f92473b8..885286f579 100644
+> --- a/hw/core/qdev.c
+> +++ b/hw/core/qdev.c
+> @@ -261,12 +261,10 @@ HotplugHandler *qdev_get_machine_hotplug_handler(DeviceState *dev)
+>  
+>  HotplugHandler *qdev_get_hotplug_handler(DeviceState *dev)
+>  {
+> -    HotplugHandler *hotplug_ctrl;
+> +    HotplugHandler *hotplug_ctrl = qdev_get_machine_hotplug_handler(dev);
+>  
+> -    if (dev->parent_bus && dev->parent_bus->hotplug_handler) {
+> +    if (hotplug_ctrl == NULL && dev->parent_bus) {
+>          hotplug_ctrl = dev->parent_bus->hotplug_handler;
+> -    } else {
+> -        hotplug_ctrl = qdev_get_machine_hotplug_handler(dev);
+>      }
+>      return hotplug_ctrl;
+>  }
+> diff --git a/include/hw/qdev-core.h b/include/hw/qdev-core.h
+> index 9453588160..e6a8eca558 100644
+> --- a/include/hw/qdev-core.h
+> +++ b/include/hw/qdev-core.h
+> @@ -286,6 +286,17 @@ void qdev_init_nofail(DeviceState *dev);
+>  void qdev_set_legacy_instance_id(DeviceState *dev, int alias_id,
+>                                   int required_for_version);
+>  HotplugHandler *qdev_get_machine_hotplug_handler(DeviceState *dev);
+> +/**
+> + * qdev_get_hotplug_handler: Get handler responsible for device wiring
+> + *
+> + * Find HOTPLUG_HANDLER for @dev that provides [pre|un]plug callbacks for it.
+> + *
+> + * Note: in case @dev has a parent bus, it will be returned as handler unless
+> + * machine handler overrides it.
+> + *
+> + * Returns: pointer to object that implements TYPE_HOTPLUG_HANDLER interface
+> + *          or NULL if there aren't any.
+> + */
+>  HotplugHandler *qdev_get_hotplug_handler(DeviceState *dev);
+>  void qdev_unplug(DeviceState *dev, Error **errp);
+>  void qdev_simple_device_unplug_cb(HotplugHandler *hotplug_dev,
+> -- 
+> 2.14.3
+> 
+> 
 
-Yes. You are right.=20
-ComputeUnitId, NodesPerProcessor and core_id is not set correctly.=20
-Let me study little bit and ask around here.  Will respond again.
-
->=20
-> If this is really what you intend to do, I'd like to see it
-> better documented, to avoid confusion in the future.
->=20
-> We could either add wrapper functions that make the logic more
-> explicit (e.g. x86_cpu_node_id(), x86_cpu_nodes_per_processor(),
-> etc.) or add comments explaining how the QEMU socket/core/thread
-> abstractions are being mapped to the AMD
-> socket/node/compute-unit/thread abstractions (also, how a
-> "Logical CCX L3 complex" is mapped into the QEMU abstractions,
-> here?)
->=20
->=20
-> > +        *edx =3D 0;
-> > +        break;
-> >      case 0xC0000000:
-> >          *eax =3D env->cpuid_xlevel2;
-> >          *ebx =3D 0;
-> > --
-> > 1.8.3.1
-> >
-> >
->=20
-> --
-> Eduardo
+-- 
+Murilo
