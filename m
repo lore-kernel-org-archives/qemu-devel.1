@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39547)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39597)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1fIabk-0003pZ-HS
-	for qemu-devel@nongnu.org; Tue, 15 May 2018 10:07:17 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1fIabm-0003pt-Bl
+	for qemu-devel@nongnu.org; Tue, 15 May 2018 10:07:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1fIabg-0002oI-GR
-	for qemu-devel@nongnu.org; Tue, 15 May 2018 10:07:16 -0400
-Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:41676)
+	(envelope-from <pm215@archaic.org.uk>) id 1fIabi-0002qA-En
+	for qemu-devel@nongnu.org; Tue, 15 May 2018 10:07:18 -0400
+Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:41682)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1fIabg-0002mA-A8
-	for qemu-devel@nongnu.org; Tue, 15 May 2018 10:07:12 -0400
+	id 1fIabi-0002pO-8b
+	for qemu-devel@nongnu.org; Tue, 15 May 2018 10:07:14 -0400
 Received: from pm215 by orth.archaic.org.uk with local (Exim 4.89)
-	(envelope-from <pm215@archaic.org.uk>) id 1fIabf-0001OT-CR
-	for qemu-devel@nongnu.org; Tue, 15 May 2018 15:07:11 +0100
+	(envelope-from <pm215@archaic.org.uk>) id 1fIabh-0001Q9-Bp
+	for qemu-devel@nongnu.org; Tue, 15 May 2018 15:07:13 +0100
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 15 May 2018 15:06:55 +0100
-Message-Id: <20180515140707.15957-5-peter.maydell@linaro.org>
+Date: Tue, 15 May 2018 15:06:58 +0100
+Message-Id: <20180515140707.15957-8-peter.maydell@linaro.org>
 In-Reply-To: <20180515140707.15957-1-peter.maydell@linaro.org>
 References: <20180515140707.15957-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 04/16] target/arm: Implement FMOV (general) for
- fp16
+Subject: [Qemu-devel] [PULL 07/16] target/arm: Implement FCVT (scalar,
+ fixed-point) for fp16
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,63 +35,43 @@ To: qemu-devel@nongnu.org
 
 From: Richard Henderson <richard.henderson@linaro.org>
 
-Adding the fp16 moves to/from general registers.
-
 Cc: qemu-stable@nongnu.org
+Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 Tested-by: Alex Bennée <alex.bennee@linaro.org>
-Message-id: 20180512003217.9105-2-richard.henderson@linaro.org
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+Message-id: 20180512003217.9105-5-richard.henderson@linaro.org
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- target/arm/translate-a64.c | 21 +++++++++++++++++++++
- 1 file changed, 21 insertions(+)
+ target/arm/translate-a64.c | 17 +++++++++++++++--
+ 1 file changed, 15 insertions(+), 2 deletions(-)
 
 diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
-index 4d1b220cc6..5b8cf75e9f 100644
+index 93fb15d185..d0ed125442 100644
 --- a/target/arm/translate-a64.c
 +++ b/target/arm/translate-a64.c
-@@ -5700,6 +5700,15 @@ static void handle_fmov(DisasContext *s, int rd, int rn, int type, bool itof)
-             tcg_gen_st_i64(tcg_rn, cpu_env, fp_reg_hi_offset(s, rd));
-             clear_vec_high(s, true, rd);
-             break;
-+        case 3:
-+            /* 16 bit */
-+            tmp = tcg_temp_new_i64();
-+            tcg_gen_ext16u_i64(tmp, tcg_rn);
-+            write_fp_dreg(s, rd, tmp);
-+            tcg_temp_free_i64(tmp);
+@@ -5697,8 +5697,21 @@ static void disas_fp_fixed_conv(DisasContext *s, uint32_t insn)
+     bool sf = extract32(insn, 31, 1);
+     bool itof;
+ 
+-    if (sbit || (type > 1)
+-        || (!sf && scale < 32)) {
++    if (sbit || (!sf && scale < 32)) {
++        unallocated_encoding(s);
++        return;
++    }
++
++    switch (type) {
++    case 0: /* float32 */
++    case 1: /* float64 */
++        break;
++    case 3: /* float16 */
++        if (arm_dc_feature(s, ARM_FEATURE_V8_FP16)) {
 +            break;
-+        default:
-+            g_assert_not_reached();
-         }
-     } else {
-         TCGv_i64 tcg_rd = cpu_reg(s, rd);
-@@ -5717,6 +5726,12 @@ static void handle_fmov(DisasContext *s, int rd, int rn, int type, bool itof)
-             /* 64 bits from top half */
-             tcg_gen_ld_i64(tcg_rd, cpu_env, fp_reg_hi_offset(s, rn));
-             break;
-+        case 3:
-+            /* 16 bit */
-+            tcg_gen_ld16u_i64(tcg_rd, cpu_env, fp_reg_offset(s, rn, MO_16));
-+            break;
-+        default:
-+            g_assert_not_reached();
-         }
++        }
++        /* fallthru */
++    default:
+         unallocated_encoding(s);
+         return;
      }
- }
-@@ -5756,6 +5771,12 @@ static void disas_fp_int_conv(DisasContext *s, uint32_t insn)
-         case 0xa: /* 64 bit */
-         case 0xd: /* 64 bit to top half of quad */
-             break;
-+        case 0x6: /* 16-bit float, 32-bit int */
-+        case 0xe: /* 16-bit float, 64-bit int */
-+            if (arm_dc_feature(s, ARM_FEATURE_V8_FP16)) {
-+                break;
-+            }
-+            /* fallthru */
-         default:
-             /* all other sf/type/rmode combinations are invalid */
-             unallocated_encoding(s);
 -- 
 2.17.0
