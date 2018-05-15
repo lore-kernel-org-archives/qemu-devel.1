@@ -1,23 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50246)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52862)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fIZYa-00042C-W7
-	for qemu-devel@nongnu.org; Tue, 15 May 2018 08:59:57 -0400
+	(envelope-from <mst@redhat.com>) id 1fIZlP-0007nb-7B
+	for qemu-devel@nongnu.org; Tue, 15 May 2018 09:13:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fIZYa-0005Hb-9x
-	for qemu-devel@nongnu.org; Tue, 15 May 2018 08:59:57 -0400
-Date: Tue, 15 May 2018 14:59:48 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20180515125948.GD4442@localhost.localdomain>
-References: <20180509162637.15575-1-kwolf@redhat.com>
-	<20180509162637.15575-33-kwolf@redhat.com>
-	<43ee7ce4-a57f-0805-070e-e80eca6a8a36@redhat.com>
+	(envelope-from <mst@redhat.com>) id 1fIZlM-0004ND-18
+	for qemu-devel@nongnu.org; Tue, 15 May 2018 09:13:11 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:56362 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1fIZlL-0004My-T6
+	for qemu-devel@nongnu.org; Tue, 15 May 2018 09:13:07 -0400
+Date: Tue, 15 May 2018 16:12:56 +0300
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20180515161223-mutt-send-email-mst@kernel.org>
+References: <1526303228-486609-1-git-send-email-mst@redhat.com>
+	<CAFEAcA_bWJupL7oj=uxNAi3=1RGUZxpEeKx1L=JBZa6J4CuuYA@mail.gmail.com>
+	<20180514212856-mutt-send-email-mst@kernel.org>
+	<CAFEAcA_mLsbULijnaWfVShO0ZHSJx7QQTB32Cs+FU-HZiFbFSw@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="tsOsTdHNUZQcU9Ye"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <43ee7ce4-a57f-0805-070e-e80eca6a8a36@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 32/42] job: Move completion and
- cancellation to Job
+In-Reply-To: <CAFEAcA_mLsbULijnaWfVShO0ZHSJx7QQTB32Cs+FU-HZiFbFSw@mail.gmail.com>
+Subject: Re: [Qemu-devel] [PATCH v6 0/3] linux-headers: arch fixups
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,61 +29,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>
-Cc: qemu-block@nongnu.org, eblake@redhat.com, jsnow@redhat.com, armbru@redhat.com, jcody@redhat.com, qemu-devel@nongnu.org
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, James Hogan <jhogan@kernel.org>
 
+On Mon, May 14, 2018 at 07:37:49PM +0100, Peter Maydell wrote:
+> On 14 May 2018 at 19:29, Michael S. Tsirkin <mst@redhat.com> wrote:
+> > On Mon, May 14, 2018 at 04:10:42PM +0100, Peter Maydell wrote:
+> >> On 14 May 2018 at 14:07, Michael S. Tsirkin <mst@redhat.com> wrote:
+> >> > It turns out that we have unistd.h and kvm headers for some
+> >> > architectures but not others.  We are thus unable to use e.g. usefaultfd
+> >> > on these systems unless system headers have been updated.
+> >> >
+> >> > Fix up update-linux-headers.sh to make sure we auto-updates
+> >> > all architectures which have linux-headers/
+> >> > (unfortunately this still does not mean "all linux systems").
+> >> >
+> >> > Tested on x86 only.
+> >> >
+> >> > Pls consider merging this through the ARM tree.
+> >> >
+> >> > Changes from v5:
+> >> >     rebase to master
+> >>
+> >> Still doesn't apply:
+> >
+> > Against which commit?
+> 
+> bbd87423ea0c436c55bb, but the last change in master
+> to scripts/update-linux-headers.sh is 7afcfd32a65688 a
+> month ago, so this won't apply to anything since then
+> and wouldn't have applied before that either. I think you
+> have based your patchset on some other changes to the script
+> which are not in master (at a guess, your "move kvm_para.h
+> to standard-headers" series).
+> 
+> thanks
+> -- PMM
 
---tsOsTdHNUZQcU9Ye
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+OK I will just do a pull with these + kvm headers since it was
+approved by Paolo.
 
-Am 14.05.2018 um 22:53 hat Max Reitz geschrieben:
-> On 2018-05-09 18:26, Kevin Wolf wrote:
-> > This moves the top-level job completion and cancellation functions from
-> > BlockJob to Job.
-> >=20
-> > Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-
-> > @@ -3362,7 +3362,7 @@ static void bdrv_close(BlockDriverState *bs)
-> > =20
-> >  void bdrv_close_all(void)
-> >  {
-> > -    block_job_cancel_sync_all();
-> > +    job_cancel_sync_all();
->=20
-> Do we really want to cancel jobs that might have nothing to do with the
-> block layer?
-
-Yes, though I admit it's a bit ugly to do it here. Alternatively, I
-could assert here that no jobs are running and pull the
-job_cancel_sync_all() into the callers. For vl.c, this is trivial.
-qemu-nbd.c uses 'atexit(bdrv_close_all);', so I'd have to introduce a
-wrapper function that calls both job_cancel_sync_all() and
-bdrv_close_all().
-
-Would you prefer that?
-
-Kevin
-
---tsOsTdHNUZQcU9Ye
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIcBAEBAgAGBQJa+tnEAAoJEH8JsnLIjy/W+vMQAMBrwUExQHkZsqHOqEqqqN8m
-zbgZzQ/v1ncCN6+5FBZBIu8db93gg/Lr3I1PkPIkLDwBzf+6xKeP+lBUjuW3ixfI
-HfOTYmMbCkfgiRttuTxi8ERYqLnG+HWinACavL3XC8xp3S+bjWrTeirxxUmOwLve
-SahQqae/jpy6eVBCRmJxpZKlMYmKlBUGI1y3WnrZn9ejyBI763sRXM2KS71uQbmI
-pEQ4P8fq/Vn+h8TgHx+p7ALowzwsr0npS/SwMoNcL5lXZVqebUYKAkamXFwwqo6k
-LTO93OHxRa9Knv+frTu5y/rhsRwWJze1NbnfE1yc14fzkZ+2Ls1ChU/cG4HD8gFC
-XCKDHmmB0LXr7l58JVG3yNoQHRpjFbErzPZIl30Ap+oM/vxRtwPat2TcG+zppvCx
-7iT5nVxP74QUqyOlPnzlR2m6YZtbrWf19yqYTd3MAT4YXTEM3Fny8VURASGhrpTz
-UGWVsMUge3G5NpmX/hSk7E9fDdlx6DHNXxdXtiet+DSOrREft+eCa8N39BYqe2tU
-T9cW42hVxpfW83ZTfsRC1vHPii/oak+FCc3C13TfR2pquNVEZCDpttPhIbEfJgTa
-lB8ZGCb3Iot2PXxdHAeZlZFSBDfVEtKR+XLnuMNB+aInPYkxfpOl5Z4CnCglJSbL
-ykvpDrVv70AxexvfDU5p
-=gaNY
------END PGP SIGNATURE-----
-
---tsOsTdHNUZQcU9Ye--
+-- 
+MST
