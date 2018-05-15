@@ -1,41 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53883)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54062)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pasic@linux.ibm.com>) id 1fIZq8-0001im-Id
-	for qemu-devel@nongnu.org; Tue, 15 May 2018 09:18:10 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1fIZrA-0002IM-BK
+	for qemu-devel@nongnu.org; Tue, 15 May 2018 09:19:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pasic@linux.ibm.com>) id 1fIZq3-00079O-Ku
-	for qemu-devel@nongnu.org; Tue, 15 May 2018 09:18:04 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:47244)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pasic@linux.ibm.com>) id 1fIZq3-00078v-Bw
-	for qemu-devel@nongnu.org; Tue, 15 May 2018 09:17:59 -0400
-Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w4FDEEMW055224
-	for <qemu-devel@nongnu.org>; Tue, 15 May 2018 09:17:58 -0400
-Received: from e06smtp14.uk.ibm.com (e06smtp14.uk.ibm.com [195.75.94.110])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2hywq1qp49-1
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 15 May 2018 09:17:57 -0400
-Received: from localhost
-	by e06smtp14.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <pasic@linux.ibm.com>;
-	Tue, 15 May 2018 14:17:55 +0100
-References: <CAFEAcA93DU7H73F-3Xd_4eP6MCZn-JHWMMeqVtyDHoMWYBXHiA@mail.gmail.com>
-	<20180515103229.6684fbe9.cohuck@redhat.com>
-	<d7ad3d7d-ef06-536f-2b59-96358d70a3a4@linux.ibm.com>
-	<CAFEAcA_aH_oVbZnoFWWtJRGOqVDzr1NA9m1A1AVyqhKWQ-Fxpw@mail.gmail.com>
-From: Halil Pasic <pasic@linux.ibm.com>
-Date: Tue, 15 May 2018 15:17:51 +0200
+	(envelope-from <alex.bennee@linaro.org>) id 1fIZr5-0007Zh-CT
+	for qemu-devel@nongnu.org; Tue, 15 May 2018 09:19:08 -0400
+Received: from mail-wr0-x242.google.com ([2a00:1450:400c:c0c::242]:36465)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1fIZr5-0007Yz-2o
+	for qemu-devel@nongnu.org; Tue, 15 May 2018 09:19:03 -0400
+Received: by mail-wr0-x242.google.com with SMTP id p4-v6so124259wrh.3
+	for <qemu-devel@nongnu.org>; Tue, 15 May 2018 06:19:03 -0700 (PDT)
+References: <20180514221219.7091-1-richard.henderson@linaro.org>
+	<20180514221219.7091-10-richard.henderson@linaro.org>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <20180514221219.7091-10-richard.henderson@linaro.org>
+Date: Tue, 15 May 2018 14:19:00 +0100
+Message-ID: <87in7pf457.fsf@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA_aH_oVbZnoFWWtJRGOqVDzr1NA9m1A1AVyqhKWQ-Fxpw@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Message-Id: <91d72a4d-53d8-647d-552d-cfa50bed1551@linux.ibm.com>
-Subject: Re: [Qemu-devel] [qemu-s390x] virtio-ccw.c vs larger
- VIRTIO_QUEUE_MAX (coverity warning CID 1390619)
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v5 09/28] target/arm: Use
+ floatX_silence_nan when we have already checked for SNaN
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -44,110 +31,118 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: qemu-s390x <qemu-s390x@nongnu.org>, Cornelia Huck <cohuck@redhat.com>, Jason Wang <jasowang@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
+To: Richard Henderson <richard.henderson@linaro.org>
+Cc: qemu-devel@nongnu.org, peter.maydell@linaro.org
 
 
+Richard Henderson <richard.henderson@linaro.org> writes:
 
-On 05/15/2018 02:07 PM, Peter Maydell wrote:
-> On 15 May 2018 at 13:00, Halil Pasic <pasic@linux.ibm.com> wrote:
->> To sum it up, my take on the whole is the diff below. I can convert
->> it to a proper patch if we agree that's the way to go.
->>
->> From: Halil Pasic <pasic@linux.ibm.com>
->> Date: Tue, 15 May 2018 13:57:44 +0200
->> Subject: [PATCH] WIP: cleanup virtio notify
->>
->> Signed-off-by: Halil Pasic <pasic@linux.ibm.com>
->> ---
->>   hw/s390x/virtio-ccw.c | 9 +++------
->>   1 file changed, 3 insertions(+), 6 deletions(-)
->>
->> diff --git a/hw/s390x/virtio-ccw.c b/hw/s390x/virtio-ccw.c
->> index e51fbefd23..22078605d1 100644
->> --- a/hw/s390x/virtio-ccw.c
->> +++ b/hw/s390x/virtio-ccw.c
->> @@ -1003,10 +1003,8 @@ static void virtio_ccw_notify(DeviceState *d,
->> uint16_t vector)
->>       SubchDev *sch = ccw_dev->sch;
->>       uint64_t indicators;
->>
->> -    /* queue indicators + secondary indicators */
->> -    if (vector >= VIRTIO_QUEUE_MAX + 64) {
->> -        return;
->> -    }
->> +    /* vector == VIRTIO_QUEUE_MAX means configuration change */
->> +    assert(vector <= VIRTIO_QUEUE_MAX);
->>
->>       if (vector < VIRTIO_QUEUE_MAX) {
->>           if (!dev->indicators) {
-> 
-> This will not be sufficient to satisfy Coverity, because
-> VIRTIO_QUEUE_MAX is 1024, and that is way too big to use as
-> a shift count, and that's the only check that Coverity can see
-> on the code path leading into the "1ULL << vector" code.
-> 
-> If it's not possible to get here with a vector that's 64 or more,
-> you need to
->      assert(vector < NR_CLASSIC_INDICATOR_BITS);
-> somewhere.
+> Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 
-Right. Here is the revised version. It's the second hunk.
+Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
 
-Regards,
-Halil
+> ---
+>  target/arm/helper-a64.c |  6 +++---
+>  target/arm/helper.c     | 12 ++++++------
+>  2 files changed, 9 insertions(+), 9 deletions(-)
+>
+> diff --git a/target/arm/helper-a64.c b/target/arm/helper-a64.c
+> index 4f8034c513..6f0eb83661 100644
+> --- a/target/arm/helper-a64.c
+> +++ b/target/arm/helper-a64.c
+> @@ -376,7 +376,7 @@ float16 HELPER(frecpx_f16)(float16 a, void *fpstp)
+>          float16 nan =3D a;
+>          if (float16_is_signaling_nan(a, fpst)) {
+>              float_raise(float_flag_invalid, fpst);
+> -            nan =3D float16_maybe_silence_nan(a, fpst);
+> +            nan =3D float16_silence_nan(a, fpst);
+>          }
+>          if (fpst->default_nan_mode) {
+>              nan =3D float16_default_nan(fpst);
+> @@ -405,7 +405,7 @@ float32 HELPER(frecpx_f32)(float32 a, void *fpstp)
+>          float32 nan =3D a;
+>          if (float32_is_signaling_nan(a, fpst)) {
+>              float_raise(float_flag_invalid, fpst);
+> -            nan =3D float32_maybe_silence_nan(a, fpst);
+> +            nan =3D float32_silence_nan(a, fpst);
+>          }
+>          if (fpst->default_nan_mode) {
+>              nan =3D float32_default_nan(fpst);
+> @@ -434,7 +434,7 @@ float64 HELPER(frecpx_f64)(float64 a, void *fpstp)
+>          float64 nan =3D a;
+>          if (float64_is_signaling_nan(a, fpst)) {
+>              float_raise(float_flag_invalid, fpst);
+> -            nan =3D float64_maybe_silence_nan(a, fpst);
+> +            nan =3D float64_silence_nan(a, fpst);
+>          }
+>          if (fpst->default_nan_mode) {
+>              nan =3D float64_default_nan(fpst);
+> diff --git a/target/arm/helper.c b/target/arm/helper.c
+> index c6fd7f9479..3df5cf30e4 100644
+> --- a/target/arm/helper.c
+> +++ b/target/arm/helper.c
+> @@ -11739,7 +11739,7 @@ float16 HELPER(recpe_f16)(float16 input, void *fp=
+stp)
+>          float16 nan =3D f16;
+>          if (float16_is_signaling_nan(f16, fpst)) {
+>              float_raise(float_flag_invalid, fpst);
+> -            nan =3D float16_maybe_silence_nan(f16, fpst);
+> +            nan =3D float16_silence_nan(f16, fpst);
+>          }
+>          if (fpst->default_nan_mode) {
+>              nan =3D  float16_default_nan(fpst);
+> @@ -11787,7 +11787,7 @@ float32 HELPER(recpe_f32)(float32 input, void *fp=
+stp)
+>          float32 nan =3D f32;
+>          if (float32_is_signaling_nan(f32, fpst)) {
+>              float_raise(float_flag_invalid, fpst);
+> -            nan =3D float32_maybe_silence_nan(f32, fpst);
+> +            nan =3D float32_silence_nan(f32, fpst);
+>          }
+>          if (fpst->default_nan_mode) {
+>              nan =3D  float32_default_nan(fpst);
+> @@ -11835,7 +11835,7 @@ float64 HELPER(recpe_f64)(float64 input, void *fp=
+stp)
+>          float64 nan =3D f64;
+>          if (float64_is_signaling_nan(f64, fpst)) {
+>              float_raise(float_flag_invalid, fpst);
+> -            nan =3D float64_maybe_silence_nan(f64, fpst);
+> +            nan =3D float64_silence_nan(f64, fpst);
+>          }
+>          if (fpst->default_nan_mode) {
+>              nan =3D  float64_default_nan(fpst);
+> @@ -11934,7 +11934,7 @@ float16 HELPER(rsqrte_f16)(float16 input, void *f=
+pstp)
+>          float16 nan =3D f16;
+>          if (float16_is_signaling_nan(f16, s)) {
+>              float_raise(float_flag_invalid, s);
+> -            nan =3D float16_maybe_silence_nan(f16, s);
+> +            nan =3D float16_silence_nan(f16, s);
+>          }
+>          if (s->default_nan_mode) {
+>              nan =3D  float16_default_nan(s);
+> @@ -11978,7 +11978,7 @@ float32 HELPER(rsqrte_f32)(float32 input, void *f=
+pstp)
+>          float32 nan =3D f32;
+>          if (float32_is_signaling_nan(f32, s)) {
+>              float_raise(float_flag_invalid, s);
+> -            nan =3D float32_maybe_silence_nan(f32, s);
+> +            nan =3D float32_silence_nan(f32, s);
+>          }
+>          if (s->default_nan_mode) {
+>              nan =3D  float32_default_nan(s);
+> @@ -12021,7 +12021,7 @@ float64 HELPER(rsqrte_f64)(float64 input, void *f=
+pstp)
+>          float64 nan =3D f64;
+>          if (float64_is_signaling_nan(f64, s)) {
+>              float_raise(float_flag_invalid, s);
+> -            nan =3D float64_maybe_silence_nan(f64, s);
+> +            nan =3D float64_silence_nan(f64, s);
+>          }
+>          if (s->default_nan_mode) {
+>              nan =3D  float64_default_nan(s);
 
-> 
-> thanks
-> -- PMM
-> 
 
---------------------------------8<------------------------------------------------
-From: Halil Pasic <pasic@linux.ibm.com>
-Date: Tue, 15 May 2018 13:57:44 +0200
-Subject: [PATCH] WIP: cleanup virtio notify
-
-Signed-off-by: Halil Pasic <pasic@linux.ibm.com>
----
-  hw/s390x/virtio-ccw.c | 10 ++++------
-  1 file changed, 4 insertions(+), 6 deletions(-)
-
-diff --git a/hw/s390x/virtio-ccw.c b/hw/s390x/virtio-ccw.c
-index 22df33b509..be433b0336 100644
---- a/hw/s390x/virtio-ccw.c
-+++ b/hw/s390x/virtio-ccw.c
-@@ -1003,10 +1003,8 @@ static void virtio_ccw_notify(DeviceState *d, uint16_t vector)
-      SubchDev *sch = ccw_dev->sch;
-      uint64_t indicators;
-
--    /* queue indicators + secondary indicators */
--    if (vector >= VIRTIO_QUEUE_MAX + 64) {
--        return;
--    }
-+    /* vector == VIRTIO_QUEUE_MAX means configuration change */
-+    assert(vector <= VIRTIO_QUEUE_MAX);
-
-      if (vector < VIRTIO_QUEUE_MAX) {
-          if (!dev->indicators) {
-@@ -1029,6 +1027,7 @@ static void virtio_ccw_notify(DeviceState *d, uint16_t vector)
-                  css_adapter_interrupt(CSS_IO_ADAPTER_VIRTIO, dev->thinint_isc);
-              }
-          } else {
-+            assert(vector < NR_CLASSIC_INDICATOR_BITS);
-              indicators = address_space_ldq(&address_space_memory,
-                                             dev->indicators->addr,
-                                             MEMTXATTRS_UNSPECIFIED,
-@@ -1042,12 +1041,11 @@ static void virtio_ccw_notify(DeviceState *d, uint16_t vector)
-          if (!dev->indicators2) {
-              return;
-          }
--        vector = 0;
-          indicators = address_space_ldq(&address_space_memory,
-                                         dev->indicators2->addr,
-                                         MEMTXATTRS_UNSPECIFIED,
-                                         NULL);
--        indicators |= 1ULL << vector;
-+        indicators |= 1ULL;
-          address_space_stq(&address_space_memory, dev->indicators2->addr,
-                            indicators, MEMTXATTRS_UNSPECIFIED, NULL);
-          css_conditional_io_interrupt(sch);
+--
+Alex Benn=C3=A9e
