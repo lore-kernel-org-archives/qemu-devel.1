@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44798)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45635)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fIau6-0003BG-AU
-	for qemu-devel@nongnu.org; Tue, 15 May 2018 10:26:24 -0400
+	(envelope-from <armbru@redhat.com>) id 1fIaxj-00067V-7Y
+	for qemu-devel@nongnu.org; Tue, 15 May 2018 10:30:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fIau2-0004km-69
-	for qemu-devel@nongnu.org; Tue, 15 May 2018 10:26:14 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:33654 helo=mx1.redhat.com)
+	(envelope-from <armbru@redhat.com>) id 1fIaxf-0005xU-0b
+	for qemu-devel@nongnu.org; Tue, 15 May 2018 10:29:59 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:57862 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fIau2-0004kf-16
-	for qemu-devel@nongnu.org; Tue, 15 May 2018 10:26:10 -0400
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fIaxe-0005x5-RK
+	for qemu-devel@nongnu.org; Tue, 15 May 2018 10:29:54 -0400
 From: Markus Armbruster <armbru@redhat.com>
 References: <1526268228-27951-1-git-send-email-zhangckid@gmail.com>
-	<1526268228-27951-12-git-send-email-zhangckid@gmail.com>
-Date: Tue, 15 May 2018 16:26:08 +0200
-In-Reply-To: <1526268228-27951-12-git-send-email-zhangckid@gmail.com> (Zhang
-	Chen's message of "Mon, 14 May 2018 11:23:42 +0800")
-Message-ID: <877eo56lmn.fsf@dusky.pond.sub.org>
+	<1526268228-27951-11-git-send-email-zhangckid@gmail.com>
+Date: Tue, 15 May 2018 16:29:52 +0200
+In-Reply-To: <1526268228-27951-11-git-send-email-zhangckid@gmail.com> (Zhang
+	Chen's message of "Mon, 14 May 2018 11:23:41 +0800")
+Message-ID: <87603p6lgf.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH V7 11/17] qapi: Add new command to query
- colo status
+Subject: Re: [Qemu-devel] [PATCH V7 10/17] qmp event: Add COLO_EXIT event to
+ notify users while exited COLO
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,156 +29,137 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Zhang Chen <zhangckid@gmail.com>
-Cc: qemu-devel@nongnu.org, Jason Wang <jasowang@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-devel@nongnu.org, zhanghailiang <zhang.zhanghailiang@huawei.com>, Li Zhijian <lizhijian@cn.fujitsu.com>, Jason Wang <jasowang@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
 Zhang Chen <zhangckid@gmail.com> writes:
 
-> Libvirt or other high level software can use this command query colo status.
-> You can test this command like that:
-> {'execute':'query-colo-status'}
+> From: zhanghailiang <zhang.zhanghailiang@huawei.com>
 >
+> If some errors happen during VM's COLO FT stage, it's important to
+> notify the users of this event. Together with 'x-colo-lost-heartbeat',
+> Users can intervene in COLO's failover work immediately.
+> If users don't want to get involved in COLO's failover verdict,
+> it is still necessary to notify users that we exited COLO mode.
+>
+> Signed-off-by: zhanghailiang <zhang.zhanghailiang@huawei.com>
+> Signed-off-by: Li Zhijian <lizhijian@cn.fujitsu.com>
 > Signed-off-by: Zhang Chen <zhangckid@gmail.com>
+> Reviewed-by: Eric Blake <eblake@redhat.com>
 > ---
->  migration/colo.c    | 34 ++++++++++++++++++++++++++++++++++
->  qapi/migration.json | 33 +++++++++++++++++++++++++++++++++
->  2 files changed, 67 insertions(+)
+>  migration/colo.c    | 20 ++++++++++++++++++++
+>  qapi/migration.json | 37 +++++++++++++++++++++++++++++++++++++
+>  2 files changed, 57 insertions(+)
 >
 > diff --git a/migration/colo.c b/migration/colo.c
-> index 8ca6381..314344c 100644
+> index c083d36..8ca6381 100644
 > --- a/migration/colo.c
 > +++ b/migration/colo.c
-> @@ -29,6 +29,7 @@
+> @@ -28,6 +28,7 @@
+>  #include "net/colo-compare.h"
 >  #include "net/colo.h"
 >  #include "block/block.h"
->  #include "qapi/qapi-events-migration.h"
-> +#include "qapi/qmp/qerror.h"
+> +#include "qapi/qapi-events-migration.h"
 >  
 >  static bool vmstate_loading;
 >  static Notifier packets_compare_notifier;
-> @@ -237,6 +238,39 @@ void qmp_xen_colo_do_checkpoint(Error **errp)
->  #endif
->  }
+> @@ -514,6 +515,18 @@ out:
+>          qemu_fclose(fb);
+>      }
 >  
-> +COLOStatus *qmp_query_colo_status(Error **errp)
-> +{
-> +    int state;
-> +    COLOStatus *s = g_new0(COLOStatus, 1);
-> +
-> +    if (get_colo_mode() == COLO_MODE_UNKNOWN) {
-> +        error_setg(errp, QERR_FEATURE_DISABLED, "colo");
-> +        s->colo_running = false;
-> +        goto out;
-> +    } else if (get_colo_mode() == COLO_MODE_PRIMARY) {
-> +         state = migrate_get_current()->state;
+> +    /*
+> +     * There are only two reasons we can go here, some error happened.
+> +     * Or the user triggered failover.
+> +     */
+> +    if (failover_get_state() == FAILOVER_STATUS_NONE) {
+> +        qapi_event_send_colo_exit(COLO_MODE_PRIMARY,
+> +                                  COLO_EXIT_REASON_ERROR, NULL);
 > +    } else {
-> +         state = migration_incoming_get_current()->state;
+> +        qapi_event_send_colo_exit(COLO_MODE_PRIMARY,
+> +                                  COLO_EXIT_REASON_REQUEST, NULL);
 > +    }
 
-Indentation's off, as patchew pointed out.  Perhaps the maintainer could
-fix that for you.
+Your comment makes me suspect failover_get_state() can only be
+FAILOVER_STATUS_NONE or FAILOVER_STATUS_REQUIRE here.  Is that correct?
 
-> +    s->colo_running = state == MIGRATION_STATUS_COLO;
-> +
-> +out:
-> +    s->mode = get_colo_mode();
-
-I'm okay with this.
-
-If you need to respin anyway, consider whether you like this better:
-
-       s->mode = get_colo_mode();
-       switch (s->mode) {
-       case COLO_MODE_UNKNOWN:
-           error_setg(errp, "COLO is disabled");
-           state = MIGRATION_STATUS_NONE;
-           break;
-       case COLO_MODE_PRIMARY:
-           state = migrate_get_current()->state;
-           break;
-       case COLO_MODE_SECONDARY:
-           state = migration_incoming_get_current()->state;
-           break;
-       default:
-           abort();
-       }
-       s->colo_running = state == MIGRATION_STATUS_COLO;
-
-Aside: we should really finish off the QERR_ macros.
+If yes, I recommend to add a suitable assertion.
 
 > +
-> +    switch (failover_get_state()) {
-> +    case FAILOVER_STATUS_NONE:
-> +        s->reason = COLO_EXIT_REASON_NONE;
-> +        break;
-> +    case FAILOVER_STATUS_REQUIRE:
-> +        s->reason = COLO_EXIT_REASON_REQUEST;
-> +        break;
-> +    default:
-> +        s->reason = COLO_EXIT_REASON_ERROR;
+>      /* Hope this not to be too long to wait here */
+>      qemu_sem_wait(&s->colo_exit_sem);
+>      qemu_sem_destroy(&s->colo_exit_sem);
+> @@ -744,6 +757,13 @@ out:
+>      if (local_err) {
+>          error_report_err(local_err);
+>      }
+> +    if (failover_get_state() == FAILOVER_STATUS_NONE) {
+> +        qapi_event_send_colo_exit(COLO_MODE_SECONDARY,
+> +                                  COLO_EXIT_REASON_ERROR, NULL);
+> +    } else {
+> +        qapi_event_send_colo_exit(COLO_MODE_SECONDARY,
+> +                                  COLO_EXIT_REASON_REQUEST, NULL);
 > +    }
-> +
-> +    return s;
-> +}
-> +
->  static void colo_send_message(QEMUFile *f, COLOMessage msg,
->                                Error **errp)
->  {
+
+Same question.
+
+>  
+>      if (fb) {
+>          qemu_fclose(fb);
 > diff --git a/qapi/migration.json b/qapi/migration.json
-> index 55dae48..13589ba 100644
+> index f3974c6..55dae48 100644
 > --- a/qapi/migration.json
 > +++ b/qapi/migration.json
-> @@ -1220,3 +1220,36 @@
->  # Since: 2.9
+> @@ -875,6 +875,43 @@
+>    'data': [ 'none', 'require', 'active', 'completed', 'relaunch' ] }
+>  
 >  ##
->  { 'command': 'xen-colo-do-checkpoint' }
-> +
-> +##
-> +# @COLOStatus:
+> +# @COLO_EXIT:
 > +#
-> +# The result format for 'query-colo-status'.
+> +# Emitted when VM finishes COLO mode due to some errors happening or
+> +# at the request of users.
 > +#
-> +# @mode: which COLO mode the VM was in when it exited.
-
-Pardon my COLO-ignorance...
-
-What does "when it exited" mean?
-
-What's the value of @mode before "it exited"?
-
-> +# @colo-running: true if COLO is running.
-
-If COLO is running, has "it exited", yet?
-
+> +# @mode: report COLO mode when COLO exited.
 > +#
 > +# @reason: describes the reason for the COLO exit.
-
-What's the value of @reason before a "COLO exit"?
-
-Remember, while a COLO_EXIT event is tied to an exit, a
-query-colo-status can be executed at any time, in particular before any
-"COLO exit".
-
 > +#
 > +# Since: 2.13
-> +##
-> +{ 'struct': 'COLOStatus',
-> +  'data': { 'mode': 'COLOMode', 'colo-running': 'bool', 'reason': 'COLOExitReason' } }
-> +
-> +##
-> +# @query-colo-status:
-> +#
-> +# Query COLO status while the vm is running.
-> +#
-> +# Returns: A @COLOStatus object showing the status.
 > +#
 > +# Example:
 > +#
-> +# -> { "execute": "query-colo-status" }
-> +# <- { "return": { "mode": "primary", "colo-running": true, "reason": "request" } }
+> +# <- { "timestamp": {"seconds": 2032141960, "microseconds": 417172},
+> +#      "event": "COLO_EXIT", "data": {"mode": "primary", "reason": "request" } }
+> +#
+> +##
+> +{ 'event': 'COLO_EXIT',
+> +  'data': {'mode': 'COLOMode', 'reason': 'COLOExitReason' } }
+
+'data' duplicates the next patch's ColoStatus, except it lacks
+@colo-running.  Factoring out the common part doesn't seem worth the
+bother.  Okay as is.
+
+> +
+> +##
+> +# @COLOExitReason:
+> +#
+> +# The reason for a COLO exit
+> +#
+> +# @none: no failover has ever happened.
+
+This can't occur in the COLO_EXIT event, only in the result of
+query-colo-status, can it?
+
+Worth spelling that out in the documentation?
+
+> +#
+> +# @request: COLO exit is due to an external request
+> +#
+> +# @error: COLO exit is due to an internal error
 > +#
 > +# Since: 2.13
 > +##
-> +{ 'command': 'query-colo-status',
-> +  'returns': 'COLOStatus' }
-
-Almost ready :)
+> +{ 'enum': 'COLOExitReason',
+> +  'data': [ 'none', 'request', 'error' ] }
+> +
+> +##
+>  # @x-colo-lost-heartbeat:
+>  #
+>  # Tell qemu that heartbeat is lost, request it to do takeover procedures.
