@@ -1,20 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55040)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55041)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1fIWUa-0002wy-TG
-	for qemu-devel@nongnu.org; Tue, 15 May 2018 05:43:37 -0400
+	(envelope-from <kraxel@redhat.com>) id 1fIWUa-0002x1-TK
+	for qemu-devel@nongnu.org; Tue, 15 May 2018 05:43:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1fIWUX-0004ut-QN
+	(envelope-from <kraxel@redhat.com>) id 1fIWUZ-0004wM-HG
 	for qemu-devel@nongnu.org; Tue, 15 May 2018 05:43:36 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:37044 helo=mx1.redhat.com)
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:56474 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1fIWUX-0004tg-MR
-	for qemu-devel@nongnu.org; Tue, 15 May 2018 05:43:33 -0400
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1fIWUZ-0004w7-Bb
+	for qemu-devel@nongnu.org; Tue, 15 May 2018 05:43:35 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.5])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id E323C7D843
+	for <qemu-devel@nongnu.org>; Tue, 15 May 2018 09:43:34 +0000 (UTC)
 From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Tue, 15 May 2018 11:43:31 +0200
-Message-Id: <20180515094332.4907-2-kraxel@redhat.com>
-In-Reply-To: <20180515094332.4907-1-kraxel@redhat.com>
-References: <20180515094332.4907-1-kraxel@redhat.com>
-Subject: [Qemu-devel] [PULL 1/2] ps2: Clear the PS/2 queue and obey disable
+Date: Tue, 15 May 2018 11:43:30 +0200
+Message-Id: <20180515094332.4907-1-kraxel@redhat.com>
+Subject: [Qemu-devel] [PULL 0/2] Input 20180515 patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,61 +28,32 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Geoffrey McRae <geoff@hostfission.com>, Gerd Hoffmann <kraxel@redhat.com>
+Cc: Gerd Hoffmann <kraxel@redhat.com>
 
-From: Geoffrey McRae <geoff@hostfission.com>
+The following changes since commit fbd3a489df9953e2a5d017c922f3c103b2426952:
 
-This allows guest's to correctly reinitialize and identify the mouse
-should the guest decide to re-scan or reset during mouse input events.
+  Merge remote-tracking branch 'remotes/cohuck/tags/s390x-20180514' into staging (2018-05-14 18:53:42 +0100)
 
-When the guest sends the "Identify" command, due to the PC's hardware
-architecutre it is impossible to reliably determine the response from
-the command amongst other streaming data, such as mouse or keyboard
-events. Standard practice is for the guest to disable the device and
-then issue the identify command, so this must be obeyed.
+are available in the git repository at:
 
-Signed-off-by: Geoffrey McRae <geoff@hostfission.com>
-Message-Id: <20180507150303.7486B381924@moya.office.hostfission.com>
-Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
----
- hw/input/ps2.c | 11 +++++++++++
- 1 file changed, 11 insertions(+)
+  git://git.kraxel.org/qemu tags/input-20180515-pull-request
 
-diff --git a/hw/input/ps2.c b/hw/input/ps2.c
-index 06f5d2ac4a..4abc8cecdd 100644
---- a/hw/input/ps2.c
-+++ b/hw/input/ps2.c
-@@ -232,6 +232,11 @@ static void ps2_keyboard_event(DeviceState *dev, QemuConsole *src,
-     uint16_t keycode = 0;
-     int mod;
- 
-+    /* do not process events while disabled to prevent stream corruption */
-+    if (!s->scan_enabled) {
-+        return;
-+    }
-+
-     qemu_system_wakeup_request(QEMU_WAKEUP_REASON_OTHER);
-     assert(evt->type == INPUT_EVENT_KIND_KEY);
-     qcode = qemu_input_key_value_to_qcode(key->key);
-@@ -673,6 +678,11 @@ static void ps2_mouse_sync(DeviceState *dev)
- {
-     PS2MouseState *s = (PS2MouseState *)dev;
- 
-+    /* do not sync while disabled to prevent stream corruption */
-+    if (!(s->mouse_status & MOUSE_STATUS_ENABLED)) {
-+        return;
-+    }
-+
-     if (s->mouse_buttons) {
-         qemu_system_wakeup_request(QEMU_WAKEUP_REASON_OTHER);
-     }
-@@ -776,6 +786,7 @@ void ps2_write_mouse(void *opaque, int val)
-             s->mouse_resolution = 2;
-             s->mouse_status = 0;
-             s->mouse_type = 0;
-+            ps2_reset_queue(&s->common);
-             ps2_queue(&s->common, AUX_ACK);
-             ps2_queue(&s->common, 0xaa);
-             ps2_queue(&s->common, s->mouse_type);
+for you to fetch changes up to 7abe7eb29494b4e4a11ec99ae5623083409a2f1e:
+
+  ps2: Fix mouse stream corruption due to lost data (2018-05-15 11:31:33 +0200)
+
+----------------------------------------------------------------
+input: ps2 fixes.
+
+----------------------------------------------------------------
+
+Geoffrey McRae (2):
+  ps2: Clear the PS/2 queue and obey disable
+  ps2: Fix mouse stream corruption due to lost data
+
+ include/hw/input/ps2.h |   5 ++
+ hw/input/ps2.c         | 135 ++++++++++++++++++++++++++++++++++++++-----------
+ 2 files changed, 111 insertions(+), 29 deletions(-)
+
 -- 
 2.9.3
