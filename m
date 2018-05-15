@@ -1,32 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43628)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45830)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fIcGS-0000M6-Do
-	for qemu-devel@nongnu.org; Tue, 15 May 2018 11:53:25 -0400
+	(envelope-from <armbru@redhat.com>) id 1fIcJg-0003Ql-6w
+	for qemu-devel@nongnu.org; Tue, 15 May 2018 11:56:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fIcGO-0001o3-G4
-	for qemu-devel@nongnu.org; Tue, 15 May 2018 11:53:24 -0400
-Received: from mail-qt0-x241.google.com ([2607:f8b0:400d:c0d::241]:42492)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fIcGO-0001mp-CA
-	for qemu-devel@nongnu.org; Tue, 15 May 2018 11:53:20 -0400
-Received: by mail-qt0-x241.google.com with SMTP id c2-v6so878506qtn.9
-	for <qemu-devel@nongnu.org>; Tue, 15 May 2018 08:53:20 -0700 (PDT)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20180515153039.27514-1-marcandre.lureau@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <ff4985f3-a3c8-4f4d-fd10-c6b7ed4b26c2@amsat.org>
-Date: Tue, 15 May 2018 12:53:16 -0300
+	(envelope-from <armbru@redhat.com>) id 1fIcJc-0004Q8-7Z
+	for qemu-devel@nongnu.org; Tue, 15 May 2018 11:56:44 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:42496 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fIcJc-0004Pp-27
+	for qemu-devel@nongnu.org; Tue, 15 May 2018 11:56:40 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.5])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 500E381FE140
+	for <qemu-devel@nongnu.org>; Tue, 15 May 2018 15:56:39 +0000 (UTC)
+From: Markus Armbruster <armbru@redhat.com>
+References: <20180515091356.24106-1-peterx@redhat.com>
+	<87mux16s9c.fsf@dusky.pond.sub.org> <20180515123827.GB9089@xz-mi>
+Date: Tue, 15 May 2018 17:56:34 +0200
+In-Reply-To: <20180515123827.GB9089@xz-mi> (Peter Xu's message of "Tue, 15 May
+	2018 20:38:27 +0800")
+Message-ID: <87vaboud3h.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <20180515153039.27514-1-marcandre.lureau@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH] ccid-card-passthru: fix regression in
- realize()
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH RFC] qemu-error: introduce error_report_once
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,37 +33,131 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org
-Cc: Gerd Hoffmann <kraxel@redhat.com>
+To: Peter Xu <peterx@redhat.com>
+Cc: qemu-devel@nongnu.org
 
-On 05/15/2018 12:30 PM, Marc-André Lureau wrote:
-> Since cc847bfd16d894fd8c1a2ce25f31772f6cdbbc74, CCID card-passthru
-> fails to intialize, because it changed a debug line to an error,
-> probably by mistake. Change it back to a DPRINTF debug.
+Peter Xu <peterx@redhat.com> writes:
 
-Oops.
+> On Tue, May 15, 2018 at 02:02:55PM +0200, Markus Armbruster wrote:
+>> Peter Xu <peterx@redhat.com> writes:
+>> 
+>> > I stole the printk_once() macro.
+>> >
+>> > I always wanted to be able to print some error directly if there is a
+>> > buffer to dump, however we can't use error_report() really quite often
+>> > when there can be any DDOS attack.
+>> 
+>> Got an example?
+>
+> There aren't much, but there are still some error_report()s that can
+> be used in frequently called functions, especially on IO paths.  For
+> example:
+>
+>
+> *** hw/usb/dev-storage.c:
+> usb_msd_handle_data[422]       error_report("usb-msd: Bad CBW size");
+> usb_msd_handle_data[427]       error_report("usb-msd: Bad signature %08x",
+> usb_msd_handle_data[434]       error_report("usb-msd: Bad LUN %d", cbw.lun);
+>
+> *** hw/usb/dev-uas.c:
+> usb_uas_handle_control[656]    error_report("%s: unhandled control request (req 0x%x, val 0x%x, idx 0x%x",
+> usb_uas_handle_data[823]       error_report("%s: unknown command iu: id 0x%x",
+> usb_uas_handle_data[870]       error_report("%s: no inflight request", __func__);
+> usb_uas_handle_data[888]       error_report("%s: invalid endpoint %d", __func__, p->ep->nr);
+>
+> *** hw/virtio/vhost-user.c:
+> vhost_user_read[208]           error_report("Failed to read msg header. Read %d instead of %d."
+> vhost_user_read[215]           error_report("Failed to read msg header."
+> vhost_user_read[223]           error_report("Failed to read msg header."
+> vhost_user_read[234]           error_report("Failed to read msg payload."
+> process_message_reply[260]     error_report("Received unexpected msg type."
+> vhost_user_write[302]          error_report("Failed to set msg fds.");
+> vhost_user_write[308]          error_report("Failed to write msg."
+> ...
+> slave_read[859]                error_report("Failed to read from slave.");
+> slave_read[864]                error_report("Failed to read msg header."
+> slave_read[873]                error_report("Failed to read payload from slave.");
+> slave_read[885]                error_report("Received unexpected msg type.");
+> slave_read[910]                error_report("Failed to send msg reply to slave.");
+> ...
+>
+> I only picked some of the callers, they might not all suite in this
+> case, but just to show what I mean.
+>
+> Another example is in VT-d emulation code, we have trace_vtd_error()
+> tracer.  AFAIU all those places can be replaced by something like
+> error_report() but trace points are mostly used to avoid DDOS attack,
+> say, an evil guest might trigger this error tons of times to even use
+> up a host's disk space (e.g., in libvirt qemu log, since libvirt might
+> capture that).  However using trace points mean that errors are not
+> dumped if trace not enabled.
+>
+> So this print_once() thing will make sure (1) it's on by deffault, so
+> we can even get something without turning the trace on and
+> reproducing, and (2) it won't be affected by DDOS attack.
+>
+>> 
+>> >                                     To avoid that, we can introduce a
+>> > print-once function for it.
+>> >
+>> > CC: Markus Armbruster <armbru@redhat.com>
+>> > Signed-off-by: Peter Xu <peterx@redhat.com>
+>> > ---
+>> > We can for sure introduce similar functions for the rest of the
+>> > error_*() functions, it's just an idea to see whether we'd like it
+>> > in general.
+>> > ---
+>> >  include/qemu/error-report.h | 12 ++++++++++++
+>> >  1 file changed, 12 insertions(+)
+>> >
+>> > diff --git a/include/qemu/error-report.h b/include/qemu/error-report.h
+>> > index e1c8ae1a52..efebb80e2c 100644
+>> > --- a/include/qemu/error-report.h
+>> > +++ b/include/qemu/error-report.h
+>> > @@ -44,6 +44,18 @@ void error_report(const char *fmt, ...) GCC_FMT_ATTR(1, 2);
+>> >  void warn_report(const char *fmt, ...) GCC_FMT_ATTR(1, 2);
+>> >  void info_report(const char *fmt, ...) GCC_FMT_ATTR(1, 2);
+>> >  
+>> > +#define error_report_once(fmt, ...)             \
+>> > +    ({                                          \
+>> > +        static bool __print_once;               \
+>> > +        bool __ret_print_once = !__print_once;  \
+>> > +                                                \
+>> > +        if (!__print_once) {					\
+>> > +            __print_once = true;				\
+>> > +            error_report(fmt, ##__VA_ARGS__);   \
+>> > +        }                                       \
+>> > +        unlikely(__ret_print_once);				\
+>> > +    })
+>> > +
+>> >  const char *error_get_progname(void);
+>> >  extern bool enable_timestamp_msg;
+>> 
+>> Ignorant question: what's the return value's intended use?
+>
+> For me I don't need it, I just didn't see a reason to remove it - it's
+> quite cheap as a stack variable (comparing to the heap variable
+> __print_once which will really consume some byte in the binaries) and
+> basically it works just like we exported that __print_once when
+> needed, so I kept it in case people might use it.
+>
+> One example I can think of is that we can keep some error environment
+> when the first error happens:
+>
+>   if (something_wrong_happened) {
+>      if (error_report_once("blablabla")) {
+>        /* only cache the first error */
+>        error_cmd = xxx;
+>        error_param = xxx;
+>        ...
+>      }
+>   }
 
-> (solves Boxes creating VM with smartcard passthru failing to start)
-> 
-> Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
+I see.
 
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-
-> ---
->  hw/usb/ccid-card-passthru.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/hw/usb/ccid-card-passthru.c b/hw/usb/ccid-card-passthru.c
-> index 7684db0cb3..25fb19b0d7 100644
-> --- a/hw/usb/ccid-card-passthru.c
-> +++ b/hw/usb/ccid-card-passthru.c
-> @@ -345,7 +345,7 @@ static void passthru_realize(CCIDCardState *base, Error **errp)
->      card->vscard_in_pos = 0;
->      card->vscard_in_hdr = 0;
->      if (qemu_chr_fe_backend_connected(&card->cs)) {
-> -        error_setg(errp, "ccid-card-passthru: initing chardev");
-> +        DPRINTF(card, D_INFO, "ccid-card-passthru: initing chardev");
->          qemu_chr_fe_set_handlers(&card->cs,
->              ccid_card_vscard_can_read,
->              ccid_card_vscard_read,
-> 
+Add a contract comment (suggest to start with the one next to
+error_report()), expand the tabs, replace the reserved identifiers
+(caught by patchew; you can use foo_ instead of __foo), throw in at
+least one use to serve as a showcase (ideally one demonstrating the
+difference to trace points), and consider working some of your
+additional rationale into your commit message.
