@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38743)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38635)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fIc4R-0006gF-4u
-	for qemu-devel@nongnu.org; Tue, 15 May 2018 11:41:00 -0400
+	(envelope-from <kwolf@redhat.com>) id 1fIc4N-0006bm-Q6
+	for qemu-devel@nongnu.org; Tue, 15 May 2018 11:40:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fIc4P-0001Sh-Sz
-	for qemu-devel@nongnu.org; Tue, 15 May 2018 11:40:59 -0400
+	(envelope-from <kwolf@redhat.com>) id 1fIc4H-0001JM-Ly
+	for qemu-devel@nongnu.org; Tue, 15 May 2018 11:40:55 -0400
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Tue, 15 May 2018 17:40:11 +0200
-Message-Id: <20180515154033.19899-16-kwolf@redhat.com>
+Date: Tue, 15 May 2018 17:40:03 +0200
+Message-Id: <20180515154033.19899-8-kwolf@redhat.com>
 In-Reply-To: <20180515154033.19899-1-kwolf@redhat.com>
 References: <20180515154033.19899-1-kwolf@redhat.com>
-Subject: [Qemu-devel] [PULL 15/37] blockjob: Introduce
- block_job_ratelimit_get_delay()
+Subject: [Qemu-devel] [PULL 07/37] block: Drop last of the sector-based aio
+ callbacks
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,139 +23,163 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, qemu-devel@nongnu.org
 
-This gets us rid of more direct accesses to BlockJob fields from the
-job drivers.
+From: Eric Blake <eblake@redhat.com>
 
+We are gradually moving away from sector-based interfaces, towards
+byte-based.  Now that all drivers with aio callbacks are using the
+byte-based interfaces, we can remove the sector-based versions.
+
+Signed-off-by: Eric Blake <eblake@redhat.com>
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
-Reviewed-by: Max Reitz <mreitz@redhat.com>
-Reviewed-by: John Snow <jsnow@redhat.com>
 ---
- include/block/blockjob_int.h |  8 ++++++++
- block/backup.c               | 18 +++++++-----------
- block/commit.c               |  4 ++--
- block/mirror.c               |  5 +----
- block/stream.c               |  4 ++--
- blockjob.c                   |  9 +++++++++
- 6 files changed, 29 insertions(+), 19 deletions(-)
+ include/block/block_int.h |  6 ----
+ block/io.c                | 84 ++++++++++++++++++++---------------------------
+ 2 files changed, 36 insertions(+), 54 deletions(-)
 
-diff --git a/include/block/blockjob_int.h b/include/block/blockjob_int.h
-index ad510d5a0c..62ec964d09 100644
---- a/include/block/blockjob_int.h
-+++ b/include/block/blockjob_int.h
-@@ -166,6 +166,14 @@ void block_job_sleep_ns(BlockJob *job, int64_t ns);
- void block_job_yield(BlockJob *job);
+diff --git a/include/block/block_int.h b/include/block/block_int.h
+index e772e3502b..0bba7ed024 100644
+--- a/include/block/block_int.h
++++ b/include/block/block_int.h
+@@ -141,15 +141,9 @@ struct BlockDriver {
+     void (*bdrv_refresh_filename)(BlockDriverState *bs, QDict *options);
  
- /**
-+ * block_job_ratelimit_get_delay:
-+ *
-+ * Calculate and return delay for the next request in ns. See the documentation
-+ * of ratelimit_calculate_delay() for details.
-+ */
-+int64_t block_job_ratelimit_get_delay(BlockJob *job, uint64_t n);
-+
-+/**
-  * block_job_early_fail:
-  * @bs: The block device.
-  *
-diff --git a/block/backup.c b/block/backup.c
-index 8468fd9f94..cfdb6ecdf5 100644
---- a/block/backup.c
-+++ b/block/backup.c
-@@ -325,21 +325,17 @@ static void backup_complete(BlockJob *job, void *opaque)
- 
- static bool coroutine_fn yield_and_check(BackupBlockJob *job)
- {
-+    uint64_t delay_ns;
-+
-     if (block_job_is_cancelled(&job->common)) {
-         return true;
+     /* aio */
+-    BlockAIOCB *(*bdrv_aio_readv)(BlockDriverState *bs,
+-        int64_t sector_num, QEMUIOVector *qiov, int nb_sectors,
+-        BlockCompletionFunc *cb, void *opaque);
+     BlockAIOCB *(*bdrv_aio_preadv)(BlockDriverState *bs,
+         uint64_t offset, uint64_t bytes, QEMUIOVector *qiov, int flags,
+         BlockCompletionFunc *cb, void *opaque);
+-    BlockAIOCB *(*bdrv_aio_writev)(BlockDriverState *bs,
+-        int64_t sector_num, QEMUIOVector *qiov, int nb_sectors,
+-        BlockCompletionFunc *cb, void *opaque);
+     BlockAIOCB *(*bdrv_aio_pwritev)(BlockDriverState *bs,
+         uint64_t offset, uint64_t bytes, QEMUIOVector *qiov, int flags,
+         BlockCompletionFunc *cb, void *opaque);
+diff --git a/block/io.c b/block/io.c
+index 407bc25df4..6b110b207a 100644
+--- a/block/io.c
++++ b/block/io.c
+@@ -925,31 +925,14 @@ static int coroutine_fn bdrv_driver_preadv(BlockDriverState *bs,
+         return drv->bdrv_co_preadv(bs, offset, bytes, qiov, flags);
      }
  
--    /* we need to yield so that bdrv_drain_all() returns.
--     * (without, VM does not reboot)
--     */
--    if (job->common.speed) {
--        uint64_t delay_ns = ratelimit_calculate_delay(&job->common.limit,
--                                                      job->bytes_read);
--        job->bytes_read = 0;
--        block_job_sleep_ns(&job->common, delay_ns);
--    } else {
--        block_job_sleep_ns(&job->common, 0);
+-    /* FIXME - no need to calculate these if .bdrv_aio_preadv exists */
+-    sector_num = offset >> BDRV_SECTOR_BITS;
+-    nb_sectors = bytes >> BDRV_SECTOR_BITS;
+-
+-    if (!drv->bdrv_aio_preadv) {
+-        assert((offset & (BDRV_SECTOR_SIZE - 1)) == 0);
+-        assert((bytes & (BDRV_SECTOR_SIZE - 1)) == 0);
+-        assert((bytes >> BDRV_SECTOR_BITS) <= BDRV_REQUEST_MAX_SECTORS);
 -    }
-+    /* We need to yield even for delay_ns = 0 so that bdrv_drain_all() can
-+     * return. Without a yield, the VM would not reboot. */
-+    delay_ns = block_job_ratelimit_get_delay(&job->common, job->bytes_read);
-+    job->bytes_read = 0;
-+    block_job_sleep_ns(&job->common, delay_ns);
+-
+-    if (drv->bdrv_co_readv) {
+-        return drv->bdrv_co_readv(bs, sector_num, nb_sectors, qiov);
+-    } else {
++    if (drv->bdrv_aio_preadv) {
+         BlockAIOCB *acb;
+         CoroutineIOCompletion co = {
+             .coroutine = qemu_coroutine_self(),
+         };
  
-     if (block_job_is_cancelled(&job->common)) {
-         return true;
-diff --git a/block/commit.c b/block/commit.c
-index 46cbeaec3e..ba5df6aa0a 100644
---- a/block/commit.c
-+++ b/block/commit.c
-@@ -197,8 +197,8 @@ static void coroutine_fn commit_run(void *opaque)
-         /* Publish progress */
-         block_job_progress_update(&s->common, n);
- 
--        if (copy && s->common.speed) {
--            delay_ns = ratelimit_calculate_delay(&s->common.limit, n);
-+        if (copy) {
-+            delay_ns = block_job_ratelimit_get_delay(&s->common, n);
-         } else {
-             delay_ns = 0;
-         }
-diff --git a/block/mirror.c b/block/mirror.c
-index 6955d68804..6aa38db114 100644
---- a/block/mirror.c
-+++ b/block/mirror.c
-@@ -447,10 +447,7 @@ static uint64_t coroutine_fn mirror_iteration(MirrorBlockJob *s)
-         assert(io_bytes);
-         offset += io_bytes;
-         nb_chunks -= DIV_ROUND_UP(io_bytes, s->granularity);
--        if (s->common.speed) {
--            delay_ns = ratelimit_calculate_delay(&s->common.limit,
--                                                 io_bytes_acct);
+-        if (drv->bdrv_aio_preadv) {
+-            acb = drv->bdrv_aio_preadv(bs, offset, bytes, qiov, flags,
+-                                       bdrv_co_io_em_complete, &co);
+-        } else {
+-            acb = drv->bdrv_aio_readv(bs, sector_num, qiov, nb_sectors,
+-                                      bdrv_co_io_em_complete, &co);
 -        }
-+        delay_ns = block_job_ratelimit_get_delay(&s->common, io_bytes_acct);
-     }
-     return delay_ns;
- }
-diff --git a/block/stream.c b/block/stream.c
-index 797d7c4f21..df9660d2fc 100644
---- a/block/stream.c
-+++ b/block/stream.c
-@@ -185,8 +185,8 @@ static void coroutine_fn stream_run(void *opaque)
- 
-         /* Publish progress */
-         block_job_progress_update(&s->common, n);
--        if (copy && s->common.speed) {
--            delay_ns = ratelimit_calculate_delay(&s->common.limit, n);
-+        if (copy) {
-+            delay_ns = block_job_ratelimit_get_delay(&s->common, n);
++        acb = drv->bdrv_aio_preadv(bs, offset, bytes, qiov, flags,
++                                   bdrv_co_io_em_complete, &co);
+         if (acb == NULL) {
+             return -EIO;
          } else {
-             delay_ns = 0;
+@@ -957,6 +940,16 @@ static int coroutine_fn bdrv_driver_preadv(BlockDriverState *bs,
+             return co.ret;
          }
-diff --git a/blockjob.c b/blockjob.c
-index 2f4b768338..04416f11cd 100644
---- a/blockjob.c
-+++ b/blockjob.c
-@@ -680,6 +680,15 @@ void block_job_set_speed(BlockJob *job, int64_t speed, Error **errp)
-     block_job_enter_cond(job, block_job_timer_pending);
+     }
++
++    sector_num = offset >> BDRV_SECTOR_BITS;
++    nb_sectors = bytes >> BDRV_SECTOR_BITS;
++
++    assert((offset & (BDRV_SECTOR_SIZE - 1)) == 0);
++    assert((bytes & (BDRV_SECTOR_SIZE - 1)) == 0);
++    assert((bytes >> BDRV_SECTOR_BITS) <= BDRV_REQUEST_MAX_SECTORS);
++    assert(drv->bdrv_co_readv);
++
++    return drv->bdrv_co_readv(bs, sector_num, nb_sectors, qiov);
  }
  
-+int64_t block_job_ratelimit_get_delay(BlockJob *job, uint64_t n)
-+{
-+    if (!job->speed) {
-+        return 0;
+ static int coroutine_fn bdrv_driver_pwritev(BlockDriverState *bs,
+@@ -981,45 +974,40 @@ static int coroutine_fn bdrv_driver_pwritev(BlockDriverState *bs,
+         goto emulate_flags;
+     }
+ 
+-    /* FIXME - no need to calculate these if .bdrv_aio_pwritev exists */
+-    sector_num = offset >> BDRV_SECTOR_BITS;
+-    nb_sectors = bytes >> BDRV_SECTOR_BITS;
+-
+-    if (!drv->bdrv_aio_pwritev) {
+-        assert((offset & (BDRV_SECTOR_SIZE - 1)) == 0);
+-        assert((bytes & (BDRV_SECTOR_SIZE - 1)) == 0);
+-        assert((bytes >> BDRV_SECTOR_BITS) <= BDRV_REQUEST_MAX_SECTORS);
+-    }
+-
+-    if (drv->bdrv_co_writev_flags) {
+-        ret = drv->bdrv_co_writev_flags(bs, sector_num, nb_sectors, qiov,
+-                                        flags & bs->supported_write_flags);
+-        flags &= ~bs->supported_write_flags;
+-    } else if (drv->bdrv_co_writev) {
+-        assert(!bs->supported_write_flags);
+-        ret = drv->bdrv_co_writev(bs, sector_num, nb_sectors, qiov);
+-    } else {
++    if (drv->bdrv_aio_pwritev) {
+         BlockAIOCB *acb;
+         CoroutineIOCompletion co = {
+             .coroutine = qemu_coroutine_self(),
+         };
+ 
+-        if (drv->bdrv_aio_pwritev) {
+-            acb = drv->bdrv_aio_pwritev(bs, offset, bytes, qiov,
+-                                        flags & bs->supported_write_flags,
+-                                        bdrv_co_io_em_complete, &co);
+-            flags &= ~bs->supported_write_flags;
+-        } else {
+-            assert(!bs->supported_write_flags);
+-            acb = drv->bdrv_aio_writev(bs, sector_num, qiov, nb_sectors,
+-                                       bdrv_co_io_em_complete, &co);
+-        }
++        acb = drv->bdrv_aio_pwritev(bs, offset, bytes, qiov,
++                                    flags & bs->supported_write_flags,
++                                    bdrv_co_io_em_complete, &co);
++        flags &= ~bs->supported_write_flags;
+         if (acb == NULL) {
+             ret = -EIO;
+         } else {
+             qemu_coroutine_yield();
+             ret = co.ret;
+         }
++        goto emulate_flags;
 +    }
 +
-+    return ratelimit_calculate_delay(&job->limit, n);
-+}
++    sector_num = offset >> BDRV_SECTOR_BITS;
++    nb_sectors = bytes >> BDRV_SECTOR_BITS;
 +
- void block_job_complete(BlockJob *job, Error **errp)
- {
-     /* Should not be reachable via external interface for internal jobs */
++    assert((offset & (BDRV_SECTOR_SIZE - 1)) == 0);
++    assert((bytes & (BDRV_SECTOR_SIZE - 1)) == 0);
++    assert((bytes >> BDRV_SECTOR_BITS) <= BDRV_REQUEST_MAX_SECTORS);
++
++    if (drv->bdrv_co_writev_flags) {
++        ret = drv->bdrv_co_writev_flags(bs, sector_num, nb_sectors, qiov,
++                                        flags & bs->supported_write_flags);
++        flags &= ~bs->supported_write_flags;
++    } else {
++        assert(drv->bdrv_co_writev);
++        assert(!bs->supported_write_flags);
++        ret = drv->bdrv_co_writev(bs, sector_num, nb_sectors, qiov);
+     }
+ 
+ emulate_flags:
 -- 
 2.13.6
