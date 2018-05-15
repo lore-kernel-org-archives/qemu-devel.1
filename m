@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44291)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44353)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1fIZ6K-00087r-FP
-	for qemu-devel@nongnu.org; Tue, 15 May 2018 08:30:45 -0400
+	(envelope-from <marcandre.lureau@redhat.com>) id 1fIZ6T-0008FA-Vf
+	for qemu-devel@nongnu.org; Tue, 15 May 2018 08:31:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1fIZ6J-0003ie-66
-	for qemu-devel@nongnu.org; Tue, 15 May 2018 08:30:44 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:43616)
+	(envelope-from <marcandre.lureau@redhat.com>) id 1fIZ6Q-0003nP-OZ
+	for qemu-devel@nongnu.org; Tue, 15 May 2018 08:30:53 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:51144)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1fIZ6I-0003iD-TW
-	for qemu-devel@nongnu.org; Tue, 15 May 2018 08:30:43 -0400
+	id 1fIZ6Q-0003mW-GM
+	for qemu-devel@nongnu.org; Tue, 15 May 2018 08:30:50 -0400
 From: marcandre.lureau@redhat.com
-Date: Tue, 15 May 2018 14:30:05 +0200
-Message-Id: <20180515123007.10164-3-marcandre.lureau@redhat.com>
+Date: Tue, 15 May 2018 14:30:07 +0200
+Message-Id: <20180515123007.10164-5-marcandre.lureau@redhat.com>
 In-Reply-To: <20180515123007.10164-1-marcandre.lureau@redhat.com>
 References: <20180515123007.10164-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH 2/4] ovmf: add QemuTpm.h header
+Subject: [Qemu-devel] [PATCH 4/4] ovmf: process TPM PPI request in
+ AfterConsole()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,91 +33,80 @@ Cc: pjones@redhat.com, jiewen.yao@intel.com, stefanb@linux.vnet.ibm.com, lersek@
 
 From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
-Add some common macros and type definitions corresponding to the QEMU
-TPM interface.
+Call Tcg2PhysicalPresenceLibProcessRequest() to process pending PPI
+requests from PlatformBootManagerAfterConsole().
+
+Laszlo understanding of edk2 is that the PPI operation processing was
+meant to occur *entirely* before End-Of-Dxe, so that 3rd party UEFI
+drivers couldn't interfere with PPI opcode processing *at all*.
+
+He suggested that we should *not* call
+Tcg2PhysicalPresenceLibProcessRequest() from BeforeConsole(). Because,
+an "auth" console, i.e. one that does not depend on a 3rd party
+driver, is *in general* impossible to guarantee. Instead we could opt
+to trust 3rd party drivers, and use the "normal" console(s) in
+AfterConsole(), in order to let the user confirm the PPI requests. It
+will depend on the user to enable Secure Boot, so that the
+trustworthiness of those 3rd party drivers is ensured. If an attacker
+roots the guest OS from within, queues some TPM2 PPI requests, and
+also modifies drivers on the EFI system partition and/or in GPU option
+ROMs (?), then those drivers will not load after guest reboot, and
+thus the dependent console(s) won't be used for confirming the PPI
+requests.
 
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 ---
- OvmfPkg/Include/IndustryStandard/QemuTpm.h | 67 ++++++++++++++++++++++
- 1 file changed, 67 insertions(+)
- create mode 100644 OvmfPkg/Include/IndustryStandard/QemuTpm.h
+ OvmfPkg/Library/PlatformBootManagerLib/BdsPlatform.c      | 8 ++++++++
+ .../PlatformBootManagerLib/PlatformBootManagerLib.inf     | 2 ++
+ 2 files changed, 10 insertions(+)
 
-diff --git a/OvmfPkg/Include/IndustryStandard/QemuTpm.h b/OvmfPkg/Include=
-/IndustryStandard/QemuTpm.h
-new file mode 100644
-index 000000000000..054cf79374b5
---- /dev/null
-+++ b/OvmfPkg/Include/IndustryStandard/QemuTpm.h
-@@ -0,0 +1,67 @@
-+/** @file
-+  Macro and type definitions corresponding to the QEMU TPM interface.
+diff --git a/OvmfPkg/Library/PlatformBootManagerLib/BdsPlatform.c b/OvmfP=
+kg/Library/PlatformBootManagerLib/BdsPlatform.c
+index 004b753f4d26..8b1beaa3e207 100644
+--- a/OvmfPkg/Library/PlatformBootManagerLib/BdsPlatform.c
++++ b/OvmfPkg/Library/PlatformBootManagerLib/BdsPlatform.c
+@@ -16,6 +16,7 @@
+ #include <Guid/XenInfo.h>
+ #include <Guid/RootBridgesConnectedEventGroup.h>
+ #include <Protocol/FirmwareVolume2.h>
++#include <Library/Tcg2PhysicalPresenceLib.h>
+=20
+=20
+ //
+@@ -1410,6 +1411,13 @@ PlatformBootManagerAfterConsole (
+   //
+   PciAcpiInitialization ();
+=20
 +
-+  Refer to "docs/specs/tpm.txt" in the QEMU source directory.
++  //
++  // Process TPM PPI request
++  //
++  Tcg2PhysicalPresenceLibProcessRequest (NULL);
 +
-+  Copyright (C) 2018, Red Hat, Inc.
-+  Copyright (c) 2018, IBM Corporation. All rights reserved.<BR>
 +
-+  This program and the accompanying materials are licensed and made avai=
-lable
-+  under the terms and conditions of the BSD License which accompanies th=
-is
-+  distribution. The full text of the license may be found at
-+  http://opensource.org/licenses/bsd-license.php
-+
-+  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, =
-WITHOUT
-+  WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
-+**/
-+
-+#ifndef __QEMU_TPM_H__
-+#define __QEMU_TPM_H__
-+
-+#include <Base.h>
-+
-+/* whether function is blocked by BIOS settings; bits 0, 1, 2 */
-+#define QEMU_TPM_PPI_FUNC_NOT_IMPLEMENTED     (0 << 0)
-+#define QEMU_TPM_PPI_FUNC_BIOS_ONLY           (1 << 0)
-+#define QEMU_TPM_PPI_FUNC_BLOCKED             (2 << 0)
-+#define QEMU_TPM_PPI_FUNC_ALLOWED_USR_REQ     (3 << 0)
-+#define QEMU_TPM_PPI_FUNC_ALLOWED_USR_NOT_REQ (4 << 0)
-+#define QEMU_TPM_PPI_FUNC_MASK                (7 << 0)
-+
-+//
-+// The following structure is shared between firmware and ACPI.
-+//
-+#pragma pack (1)
-+typedef struct {
-+  UINT8 Func[256];           /* func */
-+  UINT8 In;                  /* ppin */
-+  UINT32 Ip;                 /* ppip */
-+  UINT32 Response;           /* pprp */
-+  UINT32 Request;            /* pprq */
-+  UINT32 RequestParameter;   /* pprm */
-+  UINT32 LastRequest;        /* lppr */
-+  UINT32 FRet;               /* fret */
-+  UINT8 Res1[0x40];          /* res1 */
-+  UINT8 NextStep;            /* next_step */
-+} QEMU_TPM_PPI;
-+#pragma pack ()
-+
-+//
-+// The following structure is for the fw_cfg etc/tpm/config file.
-+//
-+#pragma pack (1)
-+typedef struct {
-+  UINT32 PpiAddress;
-+  UINT8 TpmVersion;
-+  UINT8 PpiVersion;
-+} QEMU_FWCFG_TPM_CONFIG;
-+#pragma pack ()
-+
-+#define QEMU_TPM_VERSION_UNSPEC    0
-+#define QEMU_TPM_VERSION_1_2       1
-+#define QEMU_TPM_VERSION_2         2
-+
-+#define QEMU_TPM_PPI_VERSION_NONE  0
-+#define QEMU_TPM_PPI_VERSION_1_30  1
-+
-+#endif
+   //
+   // Process QEMU's -kernel command line option
+   //
+diff --git a/OvmfPkg/Library/PlatformBootManagerLib/PlatformBootManagerLi=
+b.inf b/OvmfPkg/Library/PlatformBootManagerLib/PlatformBootManagerLib.inf
+index 27789b7377bc..4b72c44bcf0a 100644
+--- a/OvmfPkg/Library/PlatformBootManagerLib/PlatformBootManagerLib.inf
++++ b/OvmfPkg/Library/PlatformBootManagerLib/PlatformBootManagerLib.inf
+@@ -38,6 +38,7 @@ [Packages]
+   IntelFrameworkModulePkg/IntelFrameworkModulePkg.dec
+   SourceLevelDebugPkg/SourceLevelDebugPkg.dec
+   OvmfPkg/OvmfPkg.dec
++  SecurityPkg/SecurityPkg.dec
+=20
+ [LibraryClasses]
+   BaseLib
+@@ -56,6 +57,7 @@ [LibraryClasses]
+   LoadLinuxLib
+   QemuBootOrderLib
+   UefiLib
++  Tcg2PhysicalPresenceLib
+=20
+ [Pcd]
+   gUefiOvmfPkgTokenSpaceGuid.PcdEmuVariableEvent
 --=20
 2.17.0.253.g3dd125b46d
