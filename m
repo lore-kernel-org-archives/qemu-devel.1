@@ -1,23 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60256)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:32910)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fIbll-00089r-QS
-	for qemu-devel@nongnu.org; Tue, 15 May 2018 11:21:44 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fIbpB-0002C0-7r
+	for qemu-devel@nongnu.org; Tue, 15 May 2018 11:25:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fIbli-0004Gr-Lt
-	for qemu-devel@nongnu.org; Tue, 15 May 2018 11:21:41 -0400
-References: <20180514100023.12542-1-david@redhat.com>
-	<20180514100023.12542-3-david@redhat.com>
-	<20180515002043.GC12837@kermit-br-ibm-com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <3bc66ce9-7535-a75c-8cfc-d47fc5cd2b85@redhat.com>
-Date: Tue, 15 May 2018 10:21:26 -0500
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fIbp8-0005nF-4N
+	for qemu-devel@nongnu.org; Tue, 15 May 2018 11:25:13 -0400
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Date: Tue, 15 May 2018 12:24:58 -0300
+Message-Id: <20180515152500.19460-1-f4bug@amsat.org>
 MIME-Version: 1.0
-In-Reply-To: <20180515002043.GC12837@kermit-br-ibm-com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH v3 02/18] memory-device:
- introduce separate config option
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH v2 0/2] mux: fix ctrl-a b again
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,33 +24,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Murilo Opsfelder Araujo <muriloo@linux.ibm.com>, David Hildenbrand <david@redhat.com>
-Cc: Pankaj Gupta <pagupta@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Richard Henderson <rth@twiddle.net>, Cornelia Huck <cohuck@redhat.com>, qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org, qemu-ppc@nongnu.org, Igor Mammedov <imammedo@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Luiz Capitulino <lcapitulino@redhat.com>, David Gibson <david@gibson.dropbear.id.au>
+To: Peter Maydell <peter.maydell@linaro.org>, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, qemu-stable@nongnu.org
 
-On 05/14/2018 07:20 PM, Murilo Opsfelder Araujo wrote:
-> On Mon, May 14, 2018 at 12:00:07PM +0200, David Hildenbrand wrote:
->> Some architectures might support memory devices, while they don't
->> support DIMM/NVDIMM. So let's
->> - Rename CONFIG_MEM_HOTPLUG to CONFIG_MEM_DEVICE
->> - Intriduce CONFIG_DIMM and use it similarly to CONFIG NVDIMM
-> 
-> Since you're resending it:
-> 
-> s/Intriduce/Introduce
-> 
+Hi, this series contains the rebased patches for the ctrl-a+b fix.
 
->> +++ b/qapi/misc.json
->> @@ -2060,7 +2060,7 @@
->>   #
->>   # @plugged-memory: size of memory that can be hot-unplugged. This field
->>   #                  is omitted if target doesn't support memory hotplug
->> -#                  (i.e. CONFIG_MEM_HOTPLUG not defined on build time).
->> +#                  (i.e. CONFIG_MEM_DEVICE not defined on build time).
->>   #
+Please consider to include in qemu-stable.
 
-Also, it sounds better with: s/on/at/
+Regards,
+
+Phil.
+
+v2:
+- rebase on Peter serial cleanup:
+  "Drop compile time limit on number of serial ports"
+  http://lists.nongnu.org/archive/html/qemu-devel/2018-04/msg03376.html
+- added ctrl-ab test (Marc-André)
+
+v1 was http://lists.nongnu.org/archive/html/qemu-devel/2018-04/msg03168.html
+
+Marc-André Lureau (1):
+  mux: fix ctrl-a b again
+
+Philippe Mathieu-Daudé (1):
+  superio: Fix inconsistent use of Chardev->be
+
+ chardev/char-mux.c   | 1 +
+ hw/isa/isa-superio.c | 4 ++--
+ tests/test-char.c    | 8 ++++++++
+ 3 files changed, 11 insertions(+), 2 deletions(-)
 
 -- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+2.17.0
