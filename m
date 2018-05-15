@@ -1,16 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39280)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39325)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fIc4o-00078j-5C
-	for qemu-devel@nongnu.org; Tue, 15 May 2018 11:41:27 -0400
+	(envelope-from <kwolf@redhat.com>) id 1fIc4q-0007Ay-Al
+	for qemu-devel@nongnu.org; Tue, 15 May 2018 11:41:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fIc4m-0001uz-Fs
-	for qemu-devel@nongnu.org; Tue, 15 May 2018 11:41:22 -0400
+	(envelope-from <kwolf@redhat.com>) id 1fIc4p-0001xZ-De
+	for qemu-devel@nongnu.org; Tue, 15 May 2018 11:41:24 -0400
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Tue, 15 May 2018 17:40:28 +0200
-Message-Id: <20180515154033.19899-33-kwolf@redhat.com>
+Date: Tue, 15 May 2018 17:40:32 +0200
+Message-Id: <20180515154033.19899-37-kwolf@redhat.com>
 In-Reply-To: <20180515154033.19899-1-kwolf@redhat.com>
 References: <20180515154033.19899-1-kwolf@redhat.com>
-Subject: [Qemu-devel] [PULL 32/37] iotests: Add test for COR across nodes
+Subject: [Qemu-devel] [PULL 36/37] qemu-img: Use only string options in
+ img_open_opts
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,199 +25,46 @@ Cc: kwolf@redhat.com, qemu-devel@nongnu.org
 
 From: Max Reitz <mreitz@redhat.com>
 
-COR across nodes (that is, you have some filter node between the
-actually COR target and the node that performs the COR) cannot reliably
-work together with the permission system when there is no explicit COR
-node that can request the WRITE_UNCHANGED permission for its child.
-This is because COR (currently) sneaks its requests by the usual
-permission checks, so it can work without a WRITE* permission; but if
-there is a filter node in between, that will re-issue the request, which
-then passes through the usual check -- and if nobody has requested a
-WRITE_UNCHANGED permission, that check will fail.
+img_open_opts() takes a QemuOpts and converts them to a QDict, so all
+values therein are strings.  Then it may try to call qdict_get_bool(),
+however, which will fail with a segmentation fault every time:
 
-There is no real direct fix apart from hoping that there is someone who
-has requested that permission; in case of just the qemu-io HMP command
-(and no guest device), however, that is not the case.  The real real fix
-is to implement the copy-on-read flag through an implicitly added COR
-node.  Such a node can request the necessary permissions as shown in
-this test.
+$ ./qemu-img info -U --image-opts \
+    driver=file,filename=/dev/null,force-share=off
+[1]    27869 segmentation fault (core dumped)  ./qemu-img info -U
+--image-opts driver=file,filename=/dev/null,force-share=off
 
+Fix this by using qdict_get_str() and comparing the value as a string.
+Also, when adding a force-share value to the QDict, add it as a string
+so it fits the rest of the dict.
+
+Cc: qemu-stable@nongnu.org
 Signed-off-by: Max Reitz <mreitz@redhat.com>
-Message-id: 20180421132929.21610-10-mreitz@redhat.com
-Reviewed-by: Kevin Wolf <kwolf@redhat.com>
+Message-id: 20180502202051.15493-3-mreitz@redhat.com
+Reviewed-by: Eric Blake <eblake@redhat.com>
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 ---
- tests/qemu-iotests/216     | 115 +++++++++++++++++++++++++++++++++++++++++++++
- tests/qemu-iotests/216.out |  28 +++++++++++
- tests/qemu-iotests/group   |   1 +
- 3 files changed, 144 insertions(+)
- create mode 100755 tests/qemu-iotests/216
- create mode 100644 tests/qemu-iotests/216.out
+ qemu-img.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/tests/qemu-iotests/216 b/tests/qemu-iotests/216
-new file mode 100755
-index 0000000000..ca9b47a7fd
---- /dev/null
-+++ b/tests/qemu-iotests/216
-@@ -0,0 +1,115 @@
-+#!/usr/bin/env python
-+#
-+# Copy-on-read tests using a COR filter node
-+#
-+# Copyright (C) 2018 Red Hat, Inc.
-+#
-+# This program is free software; you can redistribute it and/or modify
-+# it under the terms of the GNU General Public License as published by
-+# the Free Software Foundation; either version 2 of the License, or
-+# (at your option) any later version.
-+#
-+# This program is distributed in the hope that it will be useful,
-+# but WITHOUT ANY WARRANTY; without even the implied warranty of
-+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+# GNU General Public License for more details.
-+#
-+# You should have received a copy of the GNU General Public License
-+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
-+#
-+# Creator/Owner: Max Reitz <mreitz@redhat.com>
-+
-+import iotests
-+from iotests import log, qemu_img_pipe, qemu_io, filter_qemu_io
-+
-+# Need backing file support
-+iotests.verify_image_format(supported_fmts=['qcow2', 'qcow', 'qed', 'vmdk'])
-+iotests.verify_platform(['linux'])
-+
-+log('')
-+log('=== Copy-on-read across nodes ===')
-+log('')
-+
-+# The old copy-on-read mechanism without a filter node cannot request
-+# WRITE_UNCHANGED permissions for its child.  Therefore it just tries
-+# to sneak its write by the usual permission system and holds its
-+# fingers crossed.  However, that sneaking does not work so well when
-+# there is a filter node in the way: That will receive the write
-+# request and re-issue a new one to its child, which this time is a
-+# proper write request that will make the permission system cough --
-+# unless there is someone at the top (like a guest device) that has
-+# requested write permissions.
-+#
-+# A COR filter node, however, can request the proper permissions for
-+# its child and therefore is not hit by this issue.
-+
-+with iotests.FilePath('base.img') as base_img_path, \
-+     iotests.FilePath('top.img') as top_img_path, \
-+     iotests.VM() as vm:
-+
-+    log('--- Setting up images ---')
-+    log('')
-+
-+    qemu_img_pipe('create', '-f', iotests.imgfmt, base_img_path, '64M')
-+
-+    log(filter_qemu_io(qemu_io(base_img_path, '-c', 'write -P 1 0M 1M')))
-+
-+    qemu_img_pipe('create', '-f', iotests.imgfmt, '-b', base_img_path,
-+                  top_img_path)
-+
-+    log(filter_qemu_io(qemu_io(top_img_path,  '-c', 'write -P 2 1M 1M')))
-+
-+    log('')
-+    log('--- Doing COR ---')
-+    log('')
-+
-+    # Compare with e.g. the following:
-+    #   vm.add_drive_raw('if=none,node-name=node0,copy-on-read=on,driver=raw,' \
-+    #                    'file.driver=%s,file.file.filename=%s' %
-+    #                       (iotests.imgfmt, top_img_path))
-+    # (Remove the blockdev-add instead.)
-+    # ((Not tested here because it hits an assertion in the permission
-+    #   system.))
-+
-+    vm.launch()
-+
-+    log(vm.qmp('blockdev-add',
-+                    node_name='node0',
-+                    driver='copy-on-read',
-+                    file={
-+                        'driver': 'raw',
-+                        'file': {
-+                            'driver': 'copy-on-read',
-+                            'file': {
-+                                'driver': 'raw',
-+                                'file': {
-+                                    'driver': iotests.imgfmt,
-+                                    'file': {
-+                                        'driver': 'file',
-+                                        'filename': top_img_path
-+                                    },
-+                                    'backing': {
-+                                        'driver': iotests.imgfmt,
-+                                        'file': {
-+                                            'driver': 'file',
-+                                            'filename': base_img_path
-+                                        }
-+                                    }
-+                                }
-+                            }
-+                        }
-+                    }))
-+
-+    # Trigger COR
-+    log(vm.qmp('human-monitor-command',
-+               command_line='qemu-io node0 "read 0 64M"'))
-+
-+    vm.shutdown()
-+
-+    log('')
-+    log('--- Checking COR result ---')
-+    log('')
-+
-+    log(filter_qemu_io(qemu_io(base_img_path, '-c', 'discard 0 64M')))
-+    log(filter_qemu_io(qemu_io(top_img_path,  '-c', 'read -P 1 0M 1M')))
-+    log(filter_qemu_io(qemu_io(top_img_path,  '-c', 'read -P 2 1M 1M')))
-diff --git a/tests/qemu-iotests/216.out b/tests/qemu-iotests/216.out
-new file mode 100644
-index 0000000000..d3fc590d29
---- /dev/null
-+++ b/tests/qemu-iotests/216.out
-@@ -0,0 +1,28 @@
-+
-+=== Copy-on-read across nodes ===
-+
-+--- Setting up images ---
-+
-+wrote 1048576/1048576 bytes at offset 0
-+1 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+
-+wrote 1048576/1048576 bytes at offset 1048576
-+1 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+
-+
-+--- Doing COR ---
-+
-+{u'return': {}}
-+{u'return': u''}
-+
-+--- Checking COR result ---
-+
-+discard 67108864/67108864 bytes at offset 0
-+64 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+
-+read 1048576/1048576 bytes at offset 0
-+1 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+
-+read 1048576/1048576 bytes at offset 1048576
-+1 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-+
-diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
-index b59bcea640..cc8cd8cc8e 100644
---- a/tests/qemu-iotests/group
-+++ b/tests/qemu-iotests/group
-@@ -214,4 +214,5 @@
- 213 rw auto quick
- 214 rw auto
- 215 rw auto quick
-+216 rw auto quick
- 218 rw auto quick
+diff --git a/qemu-img.c b/qemu-img.c
+index 62b29e7feb..60e45ec103 100644
+--- a/qemu-img.c
++++ b/qemu-img.c
+@@ -277,12 +277,12 @@ static BlockBackend *img_open_opts(const char *optstr,
+     options = qemu_opts_to_qdict(opts, NULL);
+     if (force_share) {
+         if (qdict_haskey(options, BDRV_OPT_FORCE_SHARE)
+-            && !qdict_get_bool(options, BDRV_OPT_FORCE_SHARE)) {
++            && strcmp(qdict_get_str(options, BDRV_OPT_FORCE_SHARE), "on")) {
+             error_report("--force-share/-U conflicts with image options");
+             qobject_unref(options);
+             return NULL;
+         }
+-        qdict_put_bool(options, BDRV_OPT_FORCE_SHARE, true);
++        qdict_put_str(options, BDRV_OPT_FORCE_SHARE, "on");
+     }
+     blk = blk_new_open(NULL, NULL, options, flags, &local_err);
+     if (!blk) {
 -- 
 2.13.6
