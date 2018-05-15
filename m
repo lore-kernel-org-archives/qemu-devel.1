@@ -1,16 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48525)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48523)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1fIW6u-0004Dv-8d
+	(envelope-from <kraxel@redhat.com>) id 1fIW6u-0004Dt-7x
 	for qemu-devel@nongnu.org; Tue, 15 May 2018 05:19:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1fIW6s-0001VT-OY
+	(envelope-from <kraxel@redhat.com>) id 1fIW6q-0001Ta-5I
 	for qemu-devel@nongnu.org; Tue, 15 May 2018 05:19:08 -0400
 From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Tue, 15 May 2018 11:18:58 +0200
-Message-Id: <20180515091901.27774-8-kraxel@redhat.com>
+Date: Tue, 15 May 2018 11:18:52 +0200
+Message-Id: <20180515091901.27774-2-kraxel@redhat.com>
 In-Reply-To: <20180515091901.27774-1-kraxel@redhat.com>
 References: <20180515091901.27774-1-kraxel@redhat.com>
-Subject: [Qemu-devel] [PULL 07/10] ui: switch gtk display to qapi parser
+Subject: [Qemu-devel] [PULL 01/10] sdl2: move opts assignment into loop
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,78 +22,33 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Laurent Vivier <laurent@vivier.eu>, Paolo Bonzini <pbonzini@redhat.com>, Michael Tokarev <mjt@tls.msk.ru>, qemu-trivial@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>
 
-Drop the gtk option parser from parse_display(), so parse_display_qapi()
-will handle it instead.
+So the opts pointer is set for all sdl2_consoles.
 
-With this change the parser will accept gl=core and gl=es too, gtk
-must catch the unsupported gles variant now.
-
+Fixes: 844fd50dbbcfc9e401895274bf4fb8da8e8d3f64
 Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
-Message-id: 20180507095539.19584-4-kraxel@redhat.com
 ---
- ui/gtk.c |  6 +++++-
- vl.c     | 32 --------------------------------
- 2 files changed, 5 insertions(+), 33 deletions(-)
+ ui/sdl2.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/ui/gtk.c b/ui/gtk.c
-index 568c9563ce..ef6ca7179e 100644
---- a/ui/gtk.c
-+++ b/ui/gtk.c
-@@ -2478,7 +2478,11 @@ static void early_gtk_display_init(DisplayOptions *opts)
+diff --git a/ui/sdl2.c b/ui/sdl2.c
+index da037248c2..a0f9b16bc1 100644
+--- a/ui/sdl2.c
++++ b/ui/sdl2.c
+@@ -804,7 +804,6 @@ static void sdl2_display_init(DisplayState *ds, DisplayOptions *o)
+         return;
      }
- 
-     assert(opts->type == DISPLAY_TYPE_GTK);
--    if (opts->has_gl && opts->gl) {
-+    if (opts->has_gl && opts->gl != DISPLAYGL_MODE_OFF) {
-+        if (opts->gl == DISPLAYGL_MODE_ES) {
-+            error_report("gtk: opengl es not supported");
-+            return;
-+        }
- #if defined(CONFIG_OPENGL)
- #if defined(CONFIG_GTK_GL) && defined(GDK_WINDOWING_WAYLAND)
-         if (GDK_IS_WAYLAND_DISPLAY(gdk_display_get_default())) {
-diff --git a/vl.c b/vl.c
-index 6b8f946d58..5f1734d851 100644
---- a/vl.c
-+++ b/vl.c
-@@ -2185,38 +2185,6 @@ static void parse_display(const char *p)
-             error_report("VNC requires a display argument vnc=<display>");
-             exit(1);
+     sdl2_console = g_new0(struct sdl2_console, sdl2_num_outputs);
+-    sdl2_console->opts = o;
+     for (i = 0; i < sdl2_num_outputs; i++) {
+         QemuConsole *con = qemu_console_lookup_by_index(i);
+         assert(con != NULL);
+@@ -812,6 +811,7 @@ static void sdl2_display_init(DisplayState *ds, DisplayOptions *o)
+             sdl2_console[i].hidden = true;
          }
--    } else if (strstart(p, "gtk", &opts)) {
--        dpy.type = DISPLAY_TYPE_GTK;
--        while (*opts) {
--            const char *nextopt;
--
--            if (strstart(opts, ",grab_on_hover=", &nextopt)) {
--                opts = nextopt;
--                dpy.u.gtk.has_grab_on_hover = true;
--                if (strstart(opts, "on", &nextopt)) {
--                    dpy.u.gtk.grab_on_hover = true;
--                } else if (strstart(opts, "off", &nextopt)) {
--                    dpy.u.gtk.grab_on_hover = false;
--                } else {
--                    goto invalid_gtk_args;
--                }
--            } else if (strstart(opts, ",gl=", &nextopt)) {
--                opts = nextopt;
--                dpy.has_gl = true;
--                if (strstart(opts, "on", &nextopt)) {
--                    dpy.gl = DISPLAYGL_MODE_ON;
--                } else if (strstart(opts, "off", &nextopt)) {
--                    dpy.gl = DISPLAYGL_MODE_OFF;
--                } else {
--                    goto invalid_gtk_args;
--                }
--            } else {
--            invalid_gtk_args:
--                error_report("invalid GTK option string");
--                exit(1);
--            }
--            opts = nextopt;
--        }
-     } else {
-         parse_display_qapi(p);
-     }
+         sdl2_console[i].idx = i;
++        sdl2_console[i].opts = o;
+ #ifdef CONFIG_OPENGL
+         sdl2_console[i].opengl = display_opengl;
+         sdl2_console[i].dcl.ops = display_opengl ? &dcl_gl_ops : &dcl_2d_ops;
 -- 
 2.9.3
