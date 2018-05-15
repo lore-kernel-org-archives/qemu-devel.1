@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56589)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57342)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1fIh2p-0008Ma-Bm
-	for qemu-devel@nongnu.org; Tue, 15 May 2018 16:59:40 -0400
+	(envelope-from <jsnow@redhat.com>) id 1fIh6K-0001dI-Hn
+	for qemu-devel@nongnu.org; Tue, 15 May 2018 17:03:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1fIh2o-0006E8-Aj
-	for qemu-devel@nongnu.org; Tue, 15 May 2018 16:59:39 -0400
+	(envelope-from <jsnow@redhat.com>) id 1fIh6J-0007vr-Jp
+	for qemu-devel@nongnu.org; Tue, 15 May 2018 17:03:16 -0400
 References: <20180512012537.22478-1-jsnow@redhat.com>
-	<20180512012537.22478-4-jsnow@redhat.com>
-	<b304a857-629f-c9f1-99cf-0ae17d9b9a1c@virtuozzo.com>
+	<20180512012537.22478-8-jsnow@redhat.com>
+	<453c0511-0114-49f9-07e1-3eb63c06cf6c@virtuozzo.com>
 From: John Snow <jsnow@redhat.com>
-Message-ID: <bb409a04-1fbd-e9ea-932b-75718c0a19ff@redhat.com>
-Date: Tue, 15 May 2018 16:59:32 -0400
+Message-ID: <47383ab6-b2a6-c9fb-43d6-814422bcd0c2@redhat.com>
+Date: Tue, 15 May 2018 17:03:09 -0400
 MIME-Version: 1.0
-In-Reply-To: <b304a857-629f-c9f1-99cf-0ae17d9b9a1c@virtuozzo.com>
+In-Reply-To: <453c0511-0114-49f9-07e1-3eb63c06cf6c@virtuozzo.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC PATCH 03/12] block/qcow2-bitmap: avoid
- adjusting bm->flags for RO bitmaps
+Subject: Re: [Qemu-devel] [RFC PATCH 07/12] qcow2-bitmap: add basic bitmaps
+ info
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,148 +31,95 @@ Cc: Kevin Wolf <kwolf@redhat.com>, Markus Armbruster <armbru@redhat.com>, Max Re
 
 
 
-On 05/14/2018 08:44 AM, Vladimir Sementsov-Ogievskiy wrote:
+On 05/14/2018 11:12 AM, Vladimir Sementsov-Ogievskiy wrote:
 > 12.05.2018 04:25, John Snow wrote:
->> Instead of always setting IN_USE, handle whether or not the bitmap
->> is read-only instead of a two-loop pass. This will allow us to show
->> the flags exactly as they appear for bitmaps in `qemu-img info`.
+>> Add functions for querying the basic information inside of bitmaps.
+>> Restructure the bitmaps flags masks to facilitate providing a list of
+>> flags belonging to the bitmap(s) being queried.
 >>
 >> Signed-off-by: John Snow <jsnow@redhat.com>
 >> ---
->> =C2=A0 block/qcow2-bitmap.c | 48
->> ++++++++++++++++++++----------------------------
->> =C2=A0 1 file changed, 20 insertions(+), 28 deletions(-)
+>> =C2=A0 block/qcow2-bitmap.c | 81
+>> ++++++++++++++++++++++++++++++++++++++++++++++++++--
+>> =C2=A0 block/qcow2.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0=
+ 7 +++++
+>> =C2=A0 block/qcow2.h=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0=
+ 1 +
+>> =C2=A0 3 files changed, 87 insertions(+), 2 deletions(-)
 >>
 >> diff --git a/block/qcow2-bitmap.c b/block/qcow2-bitmap.c
->> index d89758f235..fc8d52fc3e 100644
+>> index 60e01abfd7..811b82743a 100644
 >> --- a/block/qcow2-bitmap.c
 >> +++ b/block/qcow2-bitmap.c
->> @@ -942,13 +942,6 @@ fail:
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return ret;
->> =C2=A0 }
->> =C2=A0 -/* for g_slist_foreach for GSList of BdrvDirtyBitmap* elements=
- */
->> -static void release_dirty_bitmap_helper(gpointer bitmap,
->> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0 gpointer bs)
->> -{
->> -=C2=A0=C2=A0=C2=A0 bdrv_release_dirty_bitmap(bs, bitmap);
->> -}
->> -
->> =C2=A0 /* for g_slist_foreach for GSList of BdrvDirtyBitmap* elements =
-*/
->> =C2=A0 static void set_readonly_helper(gpointer bitmap, gpointer value=
-)
->> =C2=A0 {
->> @@ -967,8 +960,8 @@ bool qcow2_load_dirty_bitmaps(BlockDriverState
->> *bs, Error **errp)
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 BDRVQcow2State *s =3D bs->opaque;
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 Qcow2BitmapList *bm_list;
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 Qcow2Bitmap *bm;
->> -=C2=A0=C2=A0=C2=A0 GSList *created_dirty_bitmaps =3D NULL;
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 bool header_updated =3D false;
->> +=C2=A0=C2=A0=C2=A0 bool needs_update =3D false;
->> =C2=A0 =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (s->nb_bitmaps =3D=3D 0) {
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 /* No bitmaps -=
- nothing to do */
->> @@ -992,33 +985,32 @@ bool qcow2_load_dirty_bitmaps(BlockDriverState
->> *bs, Error **errp)
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 bdrv_disable_dirty_bitmap(bitmap);
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0 }
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0 bdrv_dirty_bitmap_set_persistance(bitmap, true);
->> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 bm=
-->flags |=3D BME_FLAG_IN_USE;
->> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 cr=
-eated_dirty_bitmaps =3D
->> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 g_slist_append(created_dirt=
-y_bitmaps, bitmap);
->> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
->> -=C2=A0=C2=A0=C2=A0 }
->> -
->> -=C2=A0=C2=A0=C2=A0 if (created_dirty_bitmaps !=3D NULL) {
->> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (can_write(bs)) {
->> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 /*=
- in_use flags must be updated */
->> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 in=
-t ret =3D update_ext_header_and_dir_in_place(bs, bm_list);
->> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if=
- (ret < 0) {
->> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0 error_setg_errno(errp, -ret, "Can't update bitmap
->> directory");
->> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0 goto fail;
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if=
- (can_write(bs)) {
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0 bm->flags |=3D BME_FLAG_IN_USE;
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0 needs_update =3D true;
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 } =
-else {
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0 bdrv_dirty_bitmap_set_readonly(bitmap, true);
+>> @@ -49,8 +49,28 @@
+>> =C2=A0 =C2=A0 /* Bitmap directory entry flags */
+>> =C2=A0 #define BME_RESERVED_FLAGS 0xfffffffcU
+>> -#define BME_FLAG_IN_USE (1U << 0)
+>> -#define BME_FLAG_AUTO=C2=A0=C2=A0 (1U << 1)
+>> +
+>> +enum BME_FLAG_BITS {
+>> +=C2=A0=C2=A0=C2=A0 BME_FLAG_BIT__BEGIN =3D 0,
+>> +=C2=A0=C2=A0=C2=A0 BME_FLAG_BIT_IN_USE =3D BME_FLAG_BIT__BEGIN,
+>> +=C2=A0=C2=A0=C2=A0 BME_FLAG_BIT_AUTO=C2=A0=C2=A0 =3D 1,
+>> +=C2=A0=C2=A0=C2=A0 BME_FLAG_BIT_EXTRA=C2=A0 =3D 2,
+>> +=C2=A0=C2=A0=C2=A0 BME_FLAG_BIT__MAX,
+>> +};
+>> +
+>> +#define BME_FLAG_IN_USE (1U << BME_FLAG_BIT_IN_USE)
+>> +#define BME_FLAG_AUTO=C2=A0=C2=A0 (1U << BME_FLAG_BIT_AUTO)
+>> +#define BME_FLAG_EXTRA=C2=A0 (1U << BME_FLAG_BIT_EXTRA)
+>> +
+>> +/* Correlate canonical spec values to autogenerated QAPI values */
+>> +struct {
+>> +=C2=A0=C2=A0=C2=A0 uint32_t mask;
 >=20
-> oops. This shows, that patch 01 was incorrect: before this (03) patch,
-> in this case we'll have IN_USE set in cache but not in the image.
+> mask is unused in this patch
 >=20
 
-Ah, I can try to order this patch first so that the cache stays
-semantically correct.
+It sure is! I'll remove it. It's an artifact from an earlier revision.
 
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0 }
->> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 he=
-ader_updated =3D true;
->> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 } else {
->> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 g_=
-slist_foreach(created_dirty_bitmaps, set_readonly_helper,
->> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0 (gpointer)true);
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
+>> +=C2=A0=C2=A0=C2=A0 int qapi_value;
+>> +} BMEFlagMap[BME_FLAG_BIT__MAX] =3D {
+>> +=C2=A0=C2=A0=C2=A0 [BME_FLAG_BIT_IN_USE] =3D { BME_FLAG_IN_USE,
+>> BITMAP_FLAG_ENUM_IN_USE },
+>> +=C2=A0=C2=A0=C2=A0 [BME_FLAG_BIT_AUTO]=C2=A0=C2=A0 =3D { BME_FLAG_AUT=
+O,=C2=A0=C2=A0 BITMAP_FLAG_ENUM_AUTO },
+>> +=C2=A0=C2=A0=C2=A0 [BME_FLAG_BIT_EXTRA]=C2=A0 =3D { BME_FLAG_EXTRA,=C2=
+=A0
+>> BITMAP_FLAG_ENUM_EXTRA_DATA_COMPATIBLE },
+>> +};
+>> =C2=A0 =C2=A0 /* bits [1, 8] U [56, 63] are reserved */
+>> =C2=A0 #define BME_TABLE_ENTRY_RESERVED_MASK 0xff000000000001feULL
+>> @@ -663,6 +683,63 @@ static void del_bitmap_list(BlockDriverState *bs)
 >> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
->> =C2=A0 -=C2=A0=C2=A0=C2=A0 g_slist_free(created_dirty_bitmaps);
->> +=C2=A0=C2=A0=C2=A0 /* in_use flags must be updated */
->> +=C2=A0=C2=A0=C2=A0 if (needs_update) {
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 int ret =3D update_ext_hea=
-der_and_dir_in_place(bs, bm_list);
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (ret < 0) {
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 er=
-ror_setg_errno(errp, -ret, "Can't update bitmap
->> directory");
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 go=
-to fail;
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 header_updated =3D true;
->> +=C2=A0=C2=A0=C2=A0 }
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return header_updated;
+>> =C2=A0 }
+>> =C2=A0 +static BitmapFlagEnumList *get_bitmap_flags(uint32_t flags)
+>> +{
+>> +=C2=A0=C2=A0=C2=A0 int i;
+>> +=C2=A0=C2=A0=C2=A0 BitmapFlagEnumList *flist =3D NULL;
+>> +=C2=A0=C2=A0=C2=A0 BitmapFlagEnumList *ftmp;
+>> +
+>> +=C2=A0=C2=A0=C2=A0 while (flags) {
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 i =3D ctz32(flags);
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ftmp =3D g_new0(BitmapFlag=
+EnumList, 1);
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (i >=3D BME_FLAG_BIT__B=
+EGIN && i < BME_FLAG_BIT__MAX) {
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ft=
+mp->value =3D BMEFlagMap[i].qapi_value;
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 } else {
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ft=
+mp->value =3D BITMAP_FLAG_ENUM_UNKNOWN;
 >=20
-> may be safely changed to return needs_update, as if we failed to update=
-,
-> we'll go to fail.
+> so, there may be several "unknown" entries. It's inconsistent with
+> "@unknown: This bitmap has unknown or reserved properties.".
 >=20
 
-Ugh, yes.
+Based on your feedback from the previous patch I'll probably just call
+this @reserved for any unrecognized flag.
 
->> =C2=A0 =C2=A0 fail:
->> -=C2=A0=C2=A0=C2=A0 g_slist_foreach(created_dirty_bitmaps,
->> release_dirty_bitmap_helper, bs);
->> -=C2=A0=C2=A0=C2=A0 g_slist_free(created_dirty_bitmaps);
->> +=C2=A0=C2=A0=C2=A0 QSIMPLEQ_FOREACH(bm, bm_list, entry) {
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (bm->dirty_bitmap) {
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 bd=
-rv_release_dirty_bitmap(bs, bm->dirty_bitmap);
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
->> +=C2=A0=C2=A0=C2=A0 }
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 del_bitmap_list(bs);
->> =C2=A0 =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return false;
+> Finally, can we export values for unknown flags? It should be more
+> informative.
 >=20
-> overall looks good, may be worth move it before 01.
->
+
+I'll see what I can do -- I hate losing this information too.
