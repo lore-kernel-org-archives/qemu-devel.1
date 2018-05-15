@@ -1,31 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38357)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44970)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fIXPF-00008Y-Sb
-	for qemu-devel@nongnu.org; Tue, 15 May 2018 06:42:10 -0400
+	(envelope-from <imammedo@redhat.com>) id 1fIXx2-0004bs-OY
+	for qemu-devel@nongnu.org; Tue, 15 May 2018 07:17:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fIXPF-0005iZ-4g
-	for qemu-devel@nongnu.org; Tue, 15 May 2018 06:42:09 -0400
-Received: from mail-wr0-x244.google.com ([2a00:1450:400c:c0c::244]:33130)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1fIXPE-0005i4-UU
-	for qemu-devel@nongnu.org; Tue, 15 May 2018 06:42:09 -0400
-Received: by mail-wr0-x244.google.com with SMTP id o4-v6so15486496wrm.0
-	for <qemu-devel@nongnu.org>; Tue, 15 May 2018 03:42:08 -0700 (PDT)
-References: <20180512003217.9105-1-richard.henderson@linaro.org>
-	<20180512003217.9105-4-richard.henderson@linaro.org>
-	<87r2mgowbl.fsf@linaro.org>
-	<9a8d7eff-63ab-bbff-c9cb-4a757fc149d5@linaro.org>
-	<87y3gmfd4z.fsf@linaro.org>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <87y3gmfd4z.fsf@linaro.org>
-Date: Tue, 15 May 2018 11:42:06 +0100
-Message-ID: <87sh6tfbep.fsf@linaro.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v4 03/11] target/arm: Implement FCVT
- (scalar, integer) for fp16
+	(envelope-from <imammedo@redhat.com>) id 1fIXwy-0004WK-Or
+	for qemu-devel@nongnu.org; Tue, 15 May 2018 07:17:04 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:60626 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1fIXwy-0004W5-KF
+	for qemu-devel@nongnu.org; Tue, 15 May 2018 07:17:00 -0400
+From: Igor Mammedov <imammedo@redhat.com>
+Date: Tue, 15 May 2018 13:16:13 +0200
+Message-Id: <1526382973-49342-1-git-send-email-imammedo@redhat.com>
+Subject: [Qemu-devel] [PATCH] riscv: remove define cpu_init()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,36 +21,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>
-Cc: qemu-devel@nongnu.org, peter.maydell@linaro.org, qemu-stable@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: mjc@sifive.com, palmer@sifive.com
 
+cpu_init() was removed since 2.12, so drop define that now isn't used
+nad point to nowhere.
 
-Alex Benn=C3=A9e <alex.bennee@linaro.org> writes:
+Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+---
+ target/riscv/cpu.h | 1 -
+ 1 file changed, 1 deletion(-)
 
-> Richard Henderson <richard.henderson@linaro.org> writes:
->
->> On 05/13/2018 12:21 AM, Alex Benn=C3=A9e wrote:
->>>
->>> Richard Henderson <richard.henderson@linaro.org> writes:
->>>
->>>> Cc: qemu-stable@nongnu.org
->>>> Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
->>>> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
->>>
->>> Hmm oddly this fails to apply:
->>
->> Did try vs master or target-arm.next (as mentioned in the cover)?
->
-> Apologies, I missed that.
-
-Fortunately time heals all things and it now applies cleanly to master
-as the prerequisites have gone in.
-
-Hopefully Peters scripts will pick up the remaining tags?
-
-Anyway now tested on direct master branch as well:
-
-Tested-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-
---
-Alex Benn=C3=A9e
+diff --git a/target/riscv/cpu.h b/target/riscv/cpu.h
+index 34abc38..0562a02 100644
+--- a/target/riscv/cpu.h
++++ b/target/riscv/cpu.h
+@@ -251,7 +251,6 @@ int riscv_cpu_handle_mmu_fault(CPUState *cpu, vaddr address, int size,
+ char *riscv_isa_string(RISCVCPU *cpu);
+ void riscv_cpu_list(FILE *f, fprintf_function cpu_fprintf);
+ 
+-#define cpu_init(cpu_model) cpu_generic_init(TYPE_RISCV_CPU, cpu_model)
+ #define cpu_signal_handler cpu_riscv_signal_handler
+ #define cpu_list riscv_cpu_list
+ #define cpu_mmu_index riscv_cpu_mmu_index
+-- 
+2.7.4
