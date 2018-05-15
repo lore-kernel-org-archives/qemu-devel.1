@@ -1,22 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40237)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40404)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1fIVb4-0006dk-8p
-	for qemu-devel@nongnu.org; Tue, 15 May 2018 04:46:15 -0400
+	(envelope-from <kraxel@redhat.com>) id 1fIVbk-00074F-R0
+	for qemu-devel@nongnu.org; Tue, 15 May 2018 04:47:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1fIVb3-0001FG-87
-	for qemu-devel@nongnu.org; Tue, 15 May 2018 04:46:14 -0400
-References: <20180504072514.8450-1-cohuck@redhat.com>
-	<20180504072514.8450-10-cohuck@redhat.com>
-From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <9cf0b5c3-7e3f-7c2b-8c27-cfb6ce39e55c@redhat.com>
-Date: Tue, 15 May 2018 10:46:09 +0200
+	(envelope-from <kraxel@redhat.com>) id 1fIVbk-0001ds-4C
+	for qemu-devel@nongnu.org; Tue, 15 May 2018 04:46:56 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:38492 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1fIVbj-0001db-Vg
+	for qemu-devel@nongnu.org; Tue, 15 May 2018 04:46:56 -0400
+Date: Tue, 15 May 2018 10:46:54 +0200
+From: Gerd Hoffmann <kraxel@redhat.com>
+Message-ID: <20180515084654.4ldzo2gzqh5bycaz@sirius.home.kraxel.org>
+References: <20180510230739.28459-1-peter@lekensteyn.nl>
+	<20180510230739.28459-2-peter@lekensteyn.nl>
+	<20180515083009.eo6bh6x2flzhmogv@sirius.home.kraxel.org>
+	<20180515083912.GE24129@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20180504072514.8450-10-cohuck@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PULL 09/15] pc-bios/s390-ccw: fix non-sequential
- boot entries (eckd)
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <20180515083912.GE24129@redhat.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 2/2] gtk: disable the F10 menubar key
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,114 +30,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
-Cc: Thomas Huth <thuth@redhat.com>, David Hildenbrand <david@redhat.com>, Alexander Graf <agraf@suse.de>, qemu-devel@nongnu.org, Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org, Collin Walling <walling@linux.ibm.com>, Richard Henderson <rth@twiddle.net>
+To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Cc: Peter Wu <peter@lekensteyn.nl>, qemu-devel@nongnu.org
 
-On 05/04/18 09:25, Cornelia Huck wrote:
-> From: Collin Walling <walling@linux.ibm.com>
-> 
-> zIPL boot menu entries can be non-sequential. Let's account
-> for this issue for the s390 zIPL boot menu. Since this boot
-> menu is actually an imitation and is not completely capable
-> of everything the real zIPL menu can do, let's also print a
-> different banner to the user.
-> 
-> Signed-off-by: Collin Walling <walling@linux.ibm.com>
-> Reported-by: Vasily Gorbik <gor@linux.ibm.com>
-> Reviewed-by: Thomas Huth <thuth@redhat.com>
-> Reviewed-by: Janosch Frank <frankja@linux.ibm.com>
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
-> ---
->  pc-bios/s390-ccw/menu.c | 29 ++++++++++++++++++++---------
->  1 file changed, 20 insertions(+), 9 deletions(-)
-> 
-> diff --git a/pc-bios/s390-ccw/menu.c b/pc-bios/s390-ccw/menu.c
-> index 96eec81e84..aaf5d61ae6 100644
-> --- a/pc-bios/s390-ccw/menu.c
-> +++ b/pc-bios/s390-ccw/menu.c
-> @@ -158,7 +158,7 @@ static void boot_menu_prompt(bool retry)
->      }
->  }
->  
-> -static int get_boot_index(int entries)
-> +static int get_boot_index(bool *valid_entries)
->  {
->      int boot_index;
->      bool retry = false;
-> @@ -168,7 +168,8 @@ static int get_boot_index(int entries)
->          boot_menu_prompt(retry);
->          boot_index = get_index();
->          retry = true;
-> -    } while (boot_index < 0 || boot_index >= entries);
-> +    } while (boot_index < 0 || boot_index >= MAX_BOOT_ENTRIES ||
-> +             !valid_entries[boot_index]);
->  
->      sclp_print("\nBooting entry #");
->      sclp_print(uitoa(boot_index, tmp, sizeof(tmp)));
-> @@ -176,7 +177,8 @@ static int get_boot_index(int entries)
->      return boot_index;
->  }
->  
-> -static void zipl_println(const char *data, size_t len)
-> +/* Returns the entry number that was printed */
-> +static int zipl_print_entry(const char *data, size_t len)
->  {
->      char buf[len + 2];
->  
-> @@ -185,12 +187,15 @@ static void zipl_println(const char *data, size_t len)
->      buf[len + 1] = '\0';
->  
->      sclp_print(buf);
-> +
-> +    return buf[0] == ' ' ? atoui(buf + 1) : atoui(buf);
->  }
+On Tue, May 15, 2018 at 09:39:12AM +0100, Daniel P. Berrang=E9 wrote:
+> On Tue, May 15, 2018 at 10:30:09AM +0200, Gerd Hoffmann wrote:
+> > On Fri, May 11, 2018 at 01:07:39AM +0200, Peter Wu wrote:
+> > > The F10 key is used in various applications, disable it uncondition=
+ally
+> > > (do not limit it to grab mode). Note that this property is deprecat=
+ed
+> > > and might be removed in the future (GTK+ commit b082fb598d).
+> >=20
+> > Any replacement provided by gtk?
+>=20
+> It doesn't look like it
+>=20
+> > I don't feel like adding new code depending on already deprecated
+> > features ...
+> >=20
+> > Also note that there is the "grab-on-hover" option in the view menu,
+> > which will make qemu grab the keyboard if the mouse pointer is inside
+> > the qemu window.  Which is pretty convinient for hotkeys, they go to =
+the
+> > guest if you work in the qemu window and to the host otherwise.
+>=20
+> IMHO the right thing todo long term is to kill the menu bar from the
+> GTK UI entirely, and replace with the GTK HeaderBar. This allows the
+> menu items to be provided via popups directly from the title bar of
+> the windows, which is more vertically space efficient. This would
+> probably have to wait for us to ditch GTK2, so I think this fix is
+> reasonable until that time.
 
-The return type of this function should likely be "unsigned int", judged
-from the function name atoui(). Same for the "entry" variable in
-menu_get_zipl_boot_index() below, consequently.
+Fair enough.  Patch queued.
 
-Thanks
-Laszlo
-
->  
->  int menu_get_zipl_boot_index(const char *menu_data)
->  {
->      size_t len;
-> -    int entries;
-> +    int entry;
-> +    bool valid_entries[MAX_BOOT_ENTRIES] = {false};
->      uint16_t zipl_flag = *(uint16_t *)(menu_data - ZIPL_FLAG_OFFSET);
->      uint16_t zipl_timeout = *(uint16_t *)(menu_data - ZIPL_TIMEOUT_OFFSET);
->  
-> @@ -202,19 +207,25 @@ int menu_get_zipl_boot_index(const char *menu_data)
->          timeout = zipl_timeout * 1000;
->      }
->  
-> -    /* Print and count all menu items, including the banner */
-> -    for (entries = 0; *menu_data; entries++) {
-> +    /* Print banner */
-> +    sclp_print("s390-ccw zIPL Boot Menu\n\n");
-> +    menu_data += strlen(menu_data) + 1;
-> +
-> +    /* Print entries */
-> +    while (*menu_data) {
->          len = strlen(menu_data);
-> -        zipl_println(menu_data, len);
-> +        entry = zipl_print_entry(menu_data, len);
->          menu_data += len + 1;
->  
-> -        if (entries < 2) {
-> +        valid_entries[entry] = true;
-> +
-> +        if (entry == 0) {
->              sclp_print("\n");
->          }
->      }
->  
->      sclp_print("\n");
-> -    return get_boot_index(entries - 1); /* subtract 1 to exclude banner */
-> +    return get_boot_index(valid_entries);
->  }
->  
->  
-> 
+cheers,
+  Gerd
