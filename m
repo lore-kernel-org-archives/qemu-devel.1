@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39526)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39571)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fIiOK-0003KU-1E
-	for qemu-devel@nongnu.org; Tue, 15 May 2018 18:26:00 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1fIiOP-0003Oj-AS
+	for qemu-devel@nongnu.org; Tue, 15 May 2018 18:26:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fIiOH-0004Cv-Qk
-	for qemu-devel@nongnu.org; Tue, 15 May 2018 18:25:55 -0400
-Received: from mail-pl0-x22d.google.com ([2607:f8b0:400e:c01::22d]:32834)
+	(envelope-from <richard.henderson@linaro.org>) id 1fIiON-000556-MW
+	for qemu-devel@nongnu.org; Tue, 15 May 2018 18:26:01 -0400
+Received: from mail-pg0-x22e.google.com ([2607:f8b0:400e:c05::22e]:46878)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1fIiOH-00048Z-Jl
-	for qemu-devel@nongnu.org; Tue, 15 May 2018 18:25:53 -0400
-Received: by mail-pl0-x22d.google.com with SMTP id n10-v6so872861plp.0
-	for <qemu-devel@nongnu.org>; Tue, 15 May 2018 15:25:53 -0700 (PDT)
+	id 1fIiON-0004wT-Gt
+	for qemu-devel@nongnu.org; Tue, 15 May 2018 18:25:59 -0400
+Received: by mail-pg0-x22e.google.com with SMTP id u8-v6so530607pgp.13
+	for <qemu-devel@nongnu.org>; Tue, 15 May 2018 15:25:59 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Tue, 15 May 2018 15:25:18 -0700
-Message-Id: <20180515222540.9988-7-richard.henderson@linaro.org>
+Date: Tue, 15 May 2018 15:25:22 -0700
+Message-Id: <20180515222540.9988-11-richard.henderson@linaro.org>
 In-Reply-To: <20180515222540.9988-1-richard.henderson@linaro.org>
 References: <20180515222540.9988-1-richard.henderson@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v6 06/28] fpu/softfloat: Introduce
- parts_is_snan_frac
+Subject: [Qemu-devel] [PATCH v6 10/28] target/arm: squash FZ16 behaviour for
+ conversions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,63 +33,86 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: peter.maydell@linaro.org, alex.bennee@linaro.org
 
-Tested-by: Alex Bennée <alex.bennee@linaro.org>
-Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
----
- fpu/softfloat-specialize.h | 15 +++++++++++++++
- fpu/softfloat.c            | 12 ++----------
- 2 files changed, 17 insertions(+), 10 deletions(-)
+From: Alex Bennée <alex.bennee@linaro.org>
 
-diff --git a/fpu/softfloat-specialize.h b/fpu/softfloat-specialize.h
-index 4fc9ea4ac0..515cb12cfa 100644
---- a/fpu/softfloat-specialize.h
-+++ b/fpu/softfloat-specialize.h
-@@ -86,6 +86,21 @@ this code that are retained.
- #define NO_SIGNALING_NANS 1
- #endif
+The ARM ARM specifies FZ16 is suppressed for conversions. Rather than
+pushing this logic into the softfloat code we can simply save the FZ
+state and temporarily disable it for the softfloat call.
+
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+
+---
+v4
+  - float16_to_floatX squished the wrong softfloat bit for FZ16;
+    need to adjust input denormals in this case.
+---
+ target/arm/helper.c | 40 ++++++++++++++++++++++++++++++++++++----
+ 1 file changed, 36 insertions(+), 4 deletions(-)
+
+diff --git a/target/arm/helper.c b/target/arm/helper.c
+index 1762042fc7..238a3ceba8 100644
+--- a/target/arm/helper.c
++++ b/target/arm/helper.c
+@@ -11542,22 +11542,54 @@ uint32_t HELPER(set_neon_rmode)(uint32_t rmode, CPUARMState *env)
+ /* Half precision conversions.  */
+ float32 HELPER(vfp_fcvt_f16_to_f32)(float16 a, void *fpstp, uint32_t ahp_mode)
+ {
+-    return float16_to_float32(a, !ahp_mode, fpstp);
++    /* Squash FZ16 to 0 for the duration of conversion.  In this case,
++     * it would affect flushing input denormals.
++     */
++    float_status *fpst = fpstp;
++    flag save = get_flush_inputs_to_zero(fpst);
++    set_flush_inputs_to_zero(false, fpst);
++    float32 r = float16_to_float32(a, !ahp_mode, fpst);
++    set_flush_inputs_to_zero(save, fpst);
++    return r;
+ }
  
-+/*----------------------------------------------------------------------------
-+| For the deconstructed floating-point with fraction FRAC, return true
-+| if the fraction represents a signalling NaN; otherwise false.
-+*----------------------------------------------------------------------------*/
-+
-+static bool parts_is_snan_frac(uint64_t frac, float_status *status)
-+{
-+#ifdef NO_SIGNALING_NANS
-+    return false;
-+#else
-+    flag msb = extract64(frac, DECOMPOSED_BINARY_POINT - 1, 1);
-+    return msb == status->snan_bit_is_one;
-+#endif
-+}
-+
- /*----------------------------------------------------------------------------
- | The pattern for a default generated half-precision NaN.
- *----------------------------------------------------------------------------*/
-diff --git a/fpu/softfloat.c b/fpu/softfloat.c
-index 607c4a78d5..19f40d6932 100644
---- a/fpu/softfloat.c
-+++ b/fpu/softfloat.c
-@@ -331,16 +331,8 @@ static FloatParts canonicalize(FloatParts part, const FloatFmt *parm,
-             part.cls = float_class_inf;
-         } else {
-             part.frac <<= parm->frac_shift;
--#ifdef NO_SIGNALING_NANS
--            part.cls = float_class_qnan;
--#else
--            int64_t msb = part.frac << 2;
--            if ((msb < 0) == status->snan_bit_is_one) {
--                part.cls = float_class_snan;
--            } else {
--                part.cls = float_class_qnan;
--            }
--#endif
-+            part.cls = (parts_is_snan_frac(part.frac, status)
-+                        ? float_class_snan : float_class_qnan);
-         }
-     } else if (part.exp == 0) {
-         if (likely(part.frac == 0)) {
+ float16 HELPER(vfp_fcvt_f32_to_f16)(float32 a, void *fpstp, uint32_t ahp_mode)
+ {
+-    return float32_to_float16(a, !ahp_mode, fpstp);
++    /* Squash FZ16 to 0 for the duration of conversion.  In this case,
++     * it would affect flushing output denormals.
++     */
++    float_status *fpst = fpstp;
++    flag save = get_flush_to_zero(fpst);
++    set_flush_to_zero(false, fpst);
++    float16 r = float32_to_float16(a, !ahp_mode, fpst);
++    set_flush_to_zero(save, fpst);
++    return r;
+ }
+ 
+ float64 HELPER(vfp_fcvt_f16_to_f64)(float16 a, void *fpstp, uint32_t ahp_mode)
+ {
+-    return float16_to_float64(a, !ahp_mode, fpstp);
++    /* Squash FZ16 to 0 for the duration of conversion.  In this case,
++     * it would affect flushing input denormals.
++     */
++    float_status *fpst = fpstp;
++    flag save = get_flush_inputs_to_zero(fpst);
++    set_flush_inputs_to_zero(false, fpst);
++    float64 r = float16_to_float64(a, !ahp_mode, fpst);
++    set_flush_inputs_to_zero(save, fpst);
++    return r;
+ }
+ 
+ float16 HELPER(vfp_fcvt_f64_to_f16)(float64 a, void *fpstp, uint32_t ahp_mode)
+ {
+-    return float64_to_float16(a, !ahp_mode, fpstp);
++    /* Squash FZ16 to 0 for the duration of conversion.  In this case,
++     * it would affect flushing output denormals.
++     */
++    float_status *fpst = fpstp;
++    flag save = get_flush_to_zero(fpst);
++    set_flush_to_zero(false, fpst);
++    float16 r = float64_to_float16(a, !ahp_mode, fpst);
++    set_flush_to_zero(save, fpst);
++    return r;
+ }
+ 
+ #define float32_two make_float32(0x40000000)
 -- 
 2.17.0
