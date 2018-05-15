@@ -1,22 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50594)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52208)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1fIcWn-0006NA-4L
-	for qemu-devel@nongnu.org; Tue, 15 May 2018 12:10:18 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1fIcaj-0001Gh-RG
+	for qemu-devel@nongnu.org; Tue, 15 May 2018 12:14:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1fIcWg-0004Xu-HK
-	for qemu-devel@nongnu.org; Tue, 15 May 2018 12:10:17 -0400
-Date: Tue, 15 May 2018 18:10:06 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20180515181006.0cb1dfc2.cohuck@redhat.com>
-In-Reply-To: <c18f9b9f-da00-1a0b-8ef0-7ac223c73d1a@linux.ibm.com>
-References: <20180509154822.23510-1-cohuck@redhat.com>
-	<20180509154822.23510-3-cohuck@redhat.com>
-	<c18f9b9f-da00-1a0b-8ef0-7ac223c73d1a@linux.ibm.com>
+	(envelope-from <richard.henderson@linaro.org>) id 1fIcag-0006p0-LI
+	for qemu-devel@nongnu.org; Tue, 15 May 2018 12:14:21 -0400
+Received: from mail-pl0-x242.google.com ([2607:f8b0:400e:c01::242]:34900)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1fIcag-0006od-F0
+	for qemu-devel@nongnu.org; Tue, 15 May 2018 12:14:18 -0400
+Received: by mail-pl0-x242.google.com with SMTP id i5-v6so335477plt.2
+	for <qemu-devel@nongnu.org>; Tue, 15 May 2018 09:14:18 -0700 (PDT)
+From: Richard Henderson <richard.henderson@linaro.org>
+References: <20180514221219.7091-1-richard.henderson@linaro.org>
+	<20180514221219.7091-29-richard.henderson@linaro.org>
+	<87a7t1f2x0.fsf@linaro.org>
+	<96c3d0f3-9a8e-5c64-0c7a-a8024f90930a@linaro.org>
+Message-ID: <ab5ec0d3-b26b-949a-02cf-eaa2511f3969@linaro.org>
+Date: Tue, 15 May 2018 09:14:14 -0700
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH RFC 2/2] vfio-ccw: support for halt/clear
- subchannel
+In-Reply-To: <96c3d0f3-9a8e-5c64-0c7a-a8024f90930a@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v5 28/28] fpu/softfloat: Define
+ floatN_silence_nan in terms of parts_silence_nan
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,173 +34,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Pierre Morel <pmorel@linux.ibm.com>
-Cc: Dong Jia Shi <bjsdjshi@linux.ibm.com>, Halil Pasic <pasic@linux.ibm.com>, linux-s390@vger.kernel.org, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, qemu-s390x@nongnu.org, qemu-devel@nongnu.org
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+Cc: qemu-devel@nongnu.org, peter.maydell@linaro.org
 
-On Fri, 11 May 2018 11:33:35 +0200
-Pierre Morel <pmorel@linux.ibm.com> wrote:
+On 05/15/2018 08:41 AM, Richard Henderson wrote:
+> On 05/15/2018 06:45 AM, Alex Bennée wrote:
+>>> +float64 float64_silence_nan(float64 a, float_status *status)
+>>> +{
+>>> +    return float64_pack_raw(parts_silence_nan(float64_unpack_raw(a), status));
+>>> +}
+>>> +
+>>
+>> Not that I'm objecting to the rationalisation but did you look at the
+>> code generated now we unpack NaNs? I guess NaN behaviour isn't the
+>> critical path for performance anyway....
+> 
+> Yes, I looked.  It's about 5 instructions instead of 1.
+> But as you say, it's nowhere near critical path.
+> 
+> Ug.  I've also just realized that the shift isn't correct though...
 
-> On 09/05/2018 17:48, Cornelia Huck wrote:
-> > Currently, vfio-ccw only relays start subchannel requests to the real
-> > hardware, which is enough in many cases but falls short e.g. during
-> > error recovery.
-> >
-> > Fortunately, it is easy to add support for halt and clear subchannel
-> > requests to the existing infrastructure. User space can detect
-> > support for halt/clear subchannel easily, as we always returned
-> > -EOPNOTSUPP before and therefore we do not need any capability to
-> > make this support discoverable.
-> >
-> > Signed-off-by: Cornelia Huck <cohuck@redhat.com>
-> > ---
-> >   drivers/s390/cio/vfio_ccw_drv.c | 10 ++++-
-> >   drivers/s390/cio/vfio_ccw_fsm.c | 94 ++++++++++++++++++++++++++++++++++++-----
-> >   2 files changed, 92 insertions(+), 12 deletions(-)
+Having fixed that and re-checked... the compiler is weird.
 
-> > @@ -65,6 +67,70 @@ static int fsm_io_helper(struct vfio_ccw_private *private)
-> >   	return ret;
-> >   }
-> >   
-> > +static int fsm_halt_helper(struct vfio_ccw_private *private)
-> > +{
-> > +	struct subchannel *sch;
-> > +	int ccode;
-> > +	unsigned long flags;
-> > +	int ret;
-> > +
-> > +	sch = private->sch;
-> > +
-> > +	spin_lock_irqsave(sch->lock, flags);
-> > +	private->state = VFIO_CCW_STATE_BUSY;
-> > +
-> > +	/* Issue "Halt Subchannel" */
-> > +	ccode = hsch(sch->schid);
-> > +
-> > +	switch (ccode) {
-> > +	case 0:
-> > +		/*
-> > +		 * Initialize device status information
-> > +		 */
-> > +		sch->schib.scsw.cmd.actl |= SCSW_ACTL_HALT_PEND;
-> > +		ret = 0;
-> > +		break;
-> > +	case 1:		/* Status pending */  
-> 
-> shouldn't we make a difference between status pending
-> and having halt in progress?
-> 
-> The guest can examine the SCSW, but couldn't it introduce
-> a race condition?
+The float32 version optimizes to 1 insn, as we would hope.  The float16 version
+optimizes to 5 insns, extracting and re-inserting the sign bit.  The float64
+version optimizes to 10 insns, extracting and re-inserting the exponent as well.
 
-Yes, good point. Especially as the guest might want to do different
-things.
+Very odd.
 
-Regarding race conditions: The scsw can already be outdated after the
-operation that stored it finished, which is true even on LPAR. That's
-especially true for tsch which clears some status at the subchannel.
-The guest must already be able to deal with this, the race window is
-just larger.
 
-> 
-> 
-> > +	case 2:		/* Busy */
-> > +		ret = -EBUSY;
-> > +		break;
-> > +	default:	/* Device not operational */
-> > +		ret = -ENODEV;
-> > +	}
-> > +	spin_unlock_irqrestore(sch->lock, flags);
-> > +	return ret;
-> > +}
-> > +
-> > +static int fsm_clear_helper(struct vfio_ccw_private *private)
-> > +{
-> > +	struct subchannel *sch;
-> > +	int ccode;
-> > +	unsigned long flags;
-> > +	int ret;
-> > +
-> > +	sch = private->sch;
-> > +
-> > +	spin_lock_irqsave(sch->lock, flags);
-> > +	private->state = VFIO_CCW_STATE_BUSY;
-> > +
-> > +	/* Issue "Clear Subchannel" */
-> > +	ccode = csch(sch->schid);
-> > +
-> > +	switch (ccode) {
-> > +	case 0:
-> > +		/*
-> > +		 * Initialize device status information
-> > +		 */
-> > +		sch->schib.scsw.cmd.actl |= SCSW_ACTL_CLEAR_PEND;
-> > +		ret = 0;
-> > +		break;
-> > +	default:	/* Device not operational */
-> > +		ret = -ENODEV;
-> > +	}
-> > +	spin_unlock_irqrestore(sch->lock, flags);
-> > +	return ret;
-> > +}
-> > +
-> >   static void fsm_notoper(struct vfio_ccw_private *private,
-> >   			enum vfio_ccw_event event)
-> >   {
-> > @@ -126,7 +192,24 @@ static void fsm_io_request(struct vfio_ccw_private *private,
-> >   
-> >   	memcpy(scsw, io_region->scsw_area, sizeof(*scsw));
-> >   
-> > -	if (scsw->cmd.fctl & SCSW_FCTL_START_FUNC) {
-> > +	/*
-> > +	 * Start processing with the clear function, then halt, then start.
-> > +	 * We may still be start pending when the caller wants to clean
-> > +	 * up things via halt/clear.
-> > +	 */  
-> 
-> hum. The scsw here does not reflect the hardware state but the
-> command passed from the user interface.
-> Can we and should we authorize multiple commands in one call?
-> 
-> If not, the comment is not appropriate and a switch on cmd.fctl
-> would be a clearer.
-
-There may be multiple functions specified, but we need to process them
-in precedence order (and clear wins over the others, so to speak).
-Would adding a sentence like "we always process just one function" help?
-
-> 
-> > +	if (scsw->cmd.fctl & SCSW_FCTL_CLEAR_FUNC) {
-> > +		/* issue clear and wait for interupt */
-> > +		io_region->ret_code = fsm_clear_helper(private);
-> > +		if (io_region->ret_code)
-> > +			goto err_out;
-> > +		return;
-> > +	} else if (scsw->cmd.fctl & SCSW_FCTL_HALT_FUNC) {
-> > +		/* issue halt and wait for interrupt */
-> > +		io_region->ret_code = fsm_halt_helper(private);
-> > +		if (io_region->ret_code)
-> > +			goto err_out;
-> > +		return;
-> > +	} else if (scsw->cmd.fctl & SCSW_FCTL_START_FUNC) {
-> >   		orb = (union orb *)io_region->orb_area;
-> >   
-> >   		/* Don't try to build a cp if transport mode is specified. */
-> > @@ -152,16 +235,7 @@ static void fsm_io_request(struct vfio_ccw_private *private,
-> >   			goto err_out;
-> >   		}
-> >   		return;
-> > -	} else if (scsw->cmd.fctl & SCSW_FCTL_HALT_FUNC) {
-> > -		/* XXX: Handle halt. */
-> > -		io_region->ret_code = -EOPNOTSUPP;
-> > -		goto err_out;
-> > -	} else if (scsw->cmd.fctl & SCSW_FCTL_CLEAR_FUNC) {
-> > -		/* XXX: Handle clear. */
-> > -		io_region->ret_code = -EOPNOTSUPP;
-> > -		goto err_out;
-> >   	}
-> > -
-> >   err_out:
-> >   	private->state = VFIO_CCW_STATE_IDLE;
-> >   }  
-> 
-> 
+r~
