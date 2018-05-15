@@ -1,21 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60640)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35504)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1fIV1z-0007Jo-4K
-	for qemu-devel@nongnu.org; Tue, 15 May 2018 04:10:00 -0400
+	(envelope-from <kraxel@redhat.com>) id 1fIVF1-0003wc-1i
+	for qemu-devel@nongnu.org; Tue, 15 May 2018 04:23:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1fIV1x-0000nt-TJ
-	for qemu-devel@nongnu.org; Tue, 15 May 2018 04:09:59 -0400
-Date: Tue, 15 May 2018 10:09:49 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20180515100949.248bc43b.cohuck@redhat.com>
-In-Reply-To: <d17ae62a-03a5-61fa-934a-4cb917d14222@redhat.com>
-References: <20180515063128.7040-1-olaf@aepfle.de>
-	<d17ae62a-03a5-61fa-934a-4cb917d14222@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2] replace functions which are only
- available in glib-2.24
+	(envelope-from <kraxel@redhat.com>) id 1fIVEw-0000kI-2r
+	for qemu-devel@nongnu.org; Tue, 15 May 2018 04:23:27 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:42542 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1fIVEv-0000j9-Tp
+	for qemu-devel@nongnu.org; Tue, 15 May 2018 04:23:21 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.6])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 8B38B818B13B
+	for <qemu-devel@nongnu.org>; Tue, 15 May 2018 08:23:20 +0000 (UTC)
+From: Gerd Hoffmann <kraxel@redhat.com>
+Date: Tue, 15 May 2018 10:23:19 +0200
+Message-Id: <20180515082319.30723-1-kraxel@redhat.com>
+Subject: [Qemu-devel] [PATCH] sdl2: move opts assignment into loop
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,66 +27,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: Olaf Hering <olaf@aepfle.de>, qemu-trivial@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Fam Zheng <famz@redhat.com>, "open list:All patches
-	CC here" <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>, qemu-stable@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: Gerd Hoffmann <kraxel@redhat.com>
 
-On Tue, 15 May 2018 09:18:52 +0200
-Thomas Huth <thuth@redhat.com> wrote:
+So the opts pointer is set for all sdl2_consoles.
 
-> On 15.05.2018 08:31, Olaf Hering wrote:
-> > Currently the minimal supported version of glib is 2.22.
-> > Since testing is done with a glib that claims to be 2.22, but in fact
-> > has APIs from newer version of glib, this bug was not caught during
-> > submit of the patch referenced below.
-> > 
-> > Replace g_realloc_n, which is available only since 2.24, with g_renew.
-> > 
-> > Fixes commit 418026ca43 ("util: Introduce vfio helpers")
-> > 
-> > Signed-off-by: Olaf Hering <olaf@aepfle.de>
-> > ---
-> >  This must go into stable-2.12.  
-> 
-> In that case please CC: qemu-stable@nongnu.org (done now).
-> 
-> Reviewed-by: Thomas Huth <thuth@redhat.com>
-> 
-> >  util/vfio-helpers.c | 6 ++----
-> >  1 file changed, 2 insertions(+), 4 deletions(-)
-> > 
-> > diff --git a/util/vfio-helpers.c b/util/vfio-helpers.c
-> > index 006674c916..1d9272efa4 100644
-> > --- a/util/vfio-helpers.c
-> > +++ b/util/vfio-helpers.c
-> > @@ -522,8 +522,7 @@ static IOVAMapping *qemu_vfio_add_mapping(QEMUVFIOState *s,
-> >  
-> >      assert(index >= 0);
-> >      s->nr_mappings++;
-> > -    s->mappings = g_realloc_n(s->mappings, sizeof(s->mappings[0]),
-> > -                              s->nr_mappings);
-> > +    s->mappings = g_renew(IOVAMapping, s->mappings, s->nr_mappings);
-> >      insert = &s->mappings[index];
-> >      shift = s->nr_mappings - index - 1;
-> >      if (shift) {
-> > @@ -577,8 +576,7 @@ static void qemu_vfio_undo_mapping(QEMUVFIOState *s, IOVAMapping *mapping,
-> >      memmove(mapping, &s->mappings[index + 1],
-> >              sizeof(s->mappings[0]) * (s->nr_mappings - index - 1));
-> >      s->nr_mappings--;
-> > -    s->mappings = g_realloc_n(s->mappings, sizeof(s->mappings[0]),
-> > -                              s->nr_mappings);
-> > +    s->mappings = g_renew(IOVAMapping, s->mappings, s->nr_mappings);
-> >  }
-> >  
-> >  /* Check if the mapping list is (ascending) ordered. */
-> >   
+Fixes: 844fd50dbbcfc9e401895274bf4fb8da8e8d3f64
+Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+---
+ ui/sdl2.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-This looks fine to me, so
-
-Reviewed-by: Cornelia Huck <cohuck@redhat.com>
-
-But this leads to another question: What do we do if we want a fix only
-in stable? Hypothetical scenario: Same parameters as for this patch
-(glib version bump, newer function sneaked in), but the older function
-that could be used in stable is clearly worse (IOW, we don't want it in
-the new version). Do we have a process to get a change only into stable?
+diff --git a/ui/sdl2.c b/ui/sdl2.c
+index da037248c2..a0f9b16bc1 100644
+--- a/ui/sdl2.c
++++ b/ui/sdl2.c
+@@ -804,7 +804,6 @@ static void sdl2_display_init(DisplayState *ds, DisplayOptions *o)
+         return;
+     }
+     sdl2_console = g_new0(struct sdl2_console, sdl2_num_outputs);
+-    sdl2_console->opts = o;
+     for (i = 0; i < sdl2_num_outputs; i++) {
+         QemuConsole *con = qemu_console_lookup_by_index(i);
+         assert(con != NULL);
+@@ -812,6 +811,7 @@ static void sdl2_display_init(DisplayState *ds, DisplayOptions *o)
+             sdl2_console[i].hidden = true;
+         }
+         sdl2_console[i].idx = i;
++        sdl2_console[i].opts = o;
+ #ifdef CONFIG_OPENGL
+         sdl2_console[i].opengl = display_opengl;
+         sdl2_console[i].dcl.ops = display_opengl ? &dcl_gl_ops : &dcl_2d_ops;
+-- 
+2.9.3
