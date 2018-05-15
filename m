@@ -1,25 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39118)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42664)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fIdIb-0005HE-Ol
-	for qemu-devel@nongnu.org; Tue, 15 May 2018 12:59:42 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1fIdXJ-0002LC-Gr
+	for qemu-devel@nongnu.org; Tue, 15 May 2018 13:14:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fIdIb-0000x8-0b
-	for qemu-devel@nongnu.org; Tue, 15 May 2018 12:59:41 -0400
-Received: from mail-ot0-x243.google.com ([2607:f8b0:4003:c0f::243]:45763)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fIdIa-0000wk-Qp
-	for qemu-devel@nongnu.org; Tue, 15 May 2018 12:59:40 -0400
-Received: by mail-ot0-x243.google.com with SMTP id 15-v6so1000269otn.12
-	for <qemu-devel@nongnu.org>; Tue, 15 May 2018 09:59:40 -0700 (PDT)
-MIME-Version: 1.0
-In-Reply-To: <20180515154033.19899-1-kwolf@redhat.com>
-References: <20180515154033.19899-1-kwolf@redhat.com>
+	(envelope-from <pm215@archaic.org.uk>) id 1fIdXI-0006dd-Fw
+	for qemu-devel@nongnu.org; Tue, 15 May 2018 13:14:53 -0400
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 15 May 2018 17:59:19 +0100
-Message-ID: <CAFEAcA_qieZMT3Z=ZQzkG44z+ovkWde8XF=3T0yGi6b6nu_iJg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL 00/37] Block layer patches
+Date: Tue, 15 May 2018 18:14:46 +0100
+Message-Id: <20180515171446.10834-1-peter.maydell@linaro.org>
+Subject: [Qemu-devel] [PATCH] hw/arm/mps2-tz: Put ethernet controller behind
+ PPC
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,33 +18,100 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: Qemu-block <qemu-block@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
+To: qemu-arm@nongnu.org, qemu-devel@nongnu.org
+Cc: patches@linaro.org
 
-On 15 May 2018 at 16:39, Kevin Wolf <kwolf@redhat.com> wrote:
-> The following changes since commit ad1b4ec39caa5b3f17cbd8160283a03a3dcfe2ae:
->
->   Merge remote-tracking branch 'remotes/kraxel/tags/input-20180515-pull-request' into staging (2018-05-15 12:50:06 +0100)
->
-> are available in the git repository at:
->
->   git://repo.or.cz/qemu/kevin.git tags/for-upstream
->
-> for you to fetch changes up to 1fce860ea5eba1ca00a67911fc0b8a5d80009514:
->
->   Merge remote-tracking branch 'mreitz/tags/pull-block-2018-05-15' into queue-block (2018-05-15 16:19:53 +0200)
->
-> ----------------------------------------------------------------
-> Block layer patches:
->
-> - Switch AIO/callback based block drivers to a byte-based interface
-> - Block jobs: Expose error string via query-block-jobs
-> - Block job cleanups and fixes
-> - hmp: Allow using a qdev id in block_set_io_throttle
-> - Copy-on-read block driver
-> - The qcow2 default refcount cache size has been decreased
-> - Various bug fixes
+The ethernet controller in the AN505 MPC FPGA image is behind
+the same AHB Peripheral Protection Controller that handles
+the graphics and GPIOs. (In the documentation this is clear
+in the block diagram but the ethernet controller was omitted
+from the table listing devices connected to the PPC.)
+The ethernet sits behind AHB PPCEXP0 interface 5. We had
+incorrectly claimed that this was a "gpio4", but there are
+only 4 GPIOs in this image.
 
-Applied, thanks.
+Correct the QEMU model to match the hardware.
 
--- PMM
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+---
+A minor nit that I didn't notice when I was modelling this.
+
+NB: I think the PSRAM is also supposed to be behind this
+interface of the PPC, but we definitely can't model that
+because our PPC implementation won't work for executing
+code from RAM that sits behind it.
+
+ hw/arm/mps2-tz.c | 32 +++++++++++++++++++++++---------
+ 1 file changed, 23 insertions(+), 9 deletions(-)
+
+diff --git a/hw/arm/mps2-tz.c b/hw/arm/mps2-tz.c
+index 8dc8bfd4ab..c5ef95e4cc 100644
+--- a/hw/arm/mps2-tz.c
++++ b/hw/arm/mps2-tz.c
+@@ -74,12 +74,13 @@ typedef struct {
+     UnimplementedDeviceState spi[5];
+     UnimplementedDeviceState i2c[4];
+     UnimplementedDeviceState i2s_audio;
+-    UnimplementedDeviceState gpio[5];
++    UnimplementedDeviceState gpio[4];
+     UnimplementedDeviceState dma[4];
+     UnimplementedDeviceState gfx;
+     CMSDKAPBUART uart[5];
+     SplitIRQ sec_resp_splitter;
+     qemu_or_irq uart_irq_orgate;
++    DeviceState *lan9118;
+ } MPS2TZMachineState;
+ 
+ #define TYPE_MPS2TZ_MACHINE "mps2tz"
+@@ -224,6 +225,26 @@ static MemoryRegion *make_fpgaio(MPS2TZMachineState *mms, void *opaque,
+     return sysbus_mmio_get_region(SYS_BUS_DEVICE(fpgaio), 0);
+ }
+ 
++static MemoryRegion *make_eth_dev(MPS2TZMachineState *mms, void *opaque,
++                                  const char *name, hwaddr size)
++{
++    SysBusDevice *s;
++    DeviceState *iotkitdev = DEVICE(&mms->iotkit);
++    NICInfo *nd = &nd_table[0];
++
++    /* In hardware this is a LAN9220; the LAN9118 is software compatible
++     * except that it doesn't support the checksum-offload feature.
++     */
++    qemu_check_nic_model(nd, "lan9118");
++    mms->lan9118 = qdev_create(NULL, "lan9118");
++    qdev_set_nic_properties(mms->lan9118, nd);
++    qdev_init_nofail(mms->lan9118);
++
++    s = SYS_BUS_DEVICE(mms->lan9118);
++    sysbus_connect_irq(s, 0, qdev_get_gpio_in_named(iotkitdev, "EXP_IRQ", 16));
++    return sysbus_mmio_get_region(s, 0);
++}
++
+ static void mps2tz_common_init(MachineState *machine)
+ {
+     MPS2TZMachineState *mms = MPS2TZ_MACHINE(machine);
+@@ -363,7 +384,7 @@ static void mps2tz_common_init(MachineState *machine)
+                 { "gpio1", make_unimp_dev, &mms->gpio[1], 0x40101000, 0x1000 },
+                 { "gpio2", make_unimp_dev, &mms->gpio[2], 0x40102000, 0x1000 },
+                 { "gpio3", make_unimp_dev, &mms->gpio[3], 0x40103000, 0x1000 },
+-                { "gpio4", make_unimp_dev, &mms->gpio[4], 0x40104000, 0x1000 },
++                { "eth", make_eth_dev, NULL, 0x42000000, 0x100000 },
+             },
+         }, {
+             .name = "ahb_ppcexp1",
+@@ -447,13 +468,6 @@ static void mps2tz_common_init(MachineState *machine)
+                                                      "cfg_sec_resp", 0));
+     }
+ 
+-    /* In hardware this is a LAN9220; the LAN9118 is software compatible
+-     * except that it doesn't support the checksum-offload feature.
+-     * The ethernet controller is not behind a PPC.
+-     */
+-    lan9118_init(&nd_table[0], 0x42000000,
+-                 qdev_get_gpio_in_named(iotkitdev, "EXP_IRQ", 16));
+-
+     create_unimplemented_device("FPGA NS PC", 0x48007000, 0x1000);
+ 
+     armv7m_load_kernel(ARM_CPU(first_cpu), machine->kernel_filename, 0x400000);
+-- 
+2.17.0
