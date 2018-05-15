@@ -1,26 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58465)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58487)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1fIjZ7-0003YE-Vj
-	for qemu-devel@nongnu.org; Tue, 15 May 2018 19:41:10 -0400
+	(envelope-from <quintela@redhat.com>) id 1fIjZA-0003at-Iq
+	for qemu-devel@nongnu.org; Tue, 15 May 2018 19:41:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1fIjZ6-00021K-Rh
-	for qemu-devel@nongnu.org; Tue, 15 May 2018 19:41:09 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:56518 helo=mx1.redhat.com)
+	(envelope-from <quintela@redhat.com>) id 1fIjZ9-00022g-Qw
+	for qemu-devel@nongnu.org; Tue, 15 May 2018 19:41:12 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:56522 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1fIjZ6-000210-J5
-	for qemu-devel@nongnu.org; Tue, 15 May 2018 19:41:08 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.4])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 2752C40201A0
-	for <qemu-devel@nongnu.org>; Tue, 15 May 2018 23:41:08 +0000 (UTC)
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1fIjZ9-00022Q-MC
+	for qemu-devel@nongnu.org; Tue, 15 May 2018 19:41:11 -0400
 From: Juan Quintela <quintela@redhat.com>
-Date: Wed, 16 May 2018 01:40:13 +0200
-Message-Id: <20180515234017.2277-37-quintela@redhat.com>
+Date: Wed, 16 May 2018 01:40:15 +0200
+Message-Id: <20180515234017.2277-39-quintela@redhat.com>
 In-Reply-To: <20180515234017.2277-1-quintela@redhat.com>
 References: <20180515234017.2277-1-quintela@redhat.com>
-Subject: [Qemu-devel] [PULL 36/40] migration/hmp: add migrate_pause command
+Subject: [Qemu-devel] [PULL 38/40] migration: update index field when delete
+ or qsort RDMALocalBlock
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,78 +25,53 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: dgilbert@redhat.com, lvivier@redhat.com, peterx@redhat.com
+Cc: dgilbert@redhat.com, lvivier@redhat.com, peterx@redhat.com, Lidong Chen <jemmy858585@gmail.com>, Lidong Chen <lidongchen@tencent.com>
 
-From: Peter Xu <peterx@redhat.com>
+From: Lidong Chen <jemmy858585@gmail.com>
 
-Wrapper for QMP command "migrate-pause".
+rdma_delete_block function deletes RDMALocalBlock base on index field,
+but not update the index field. So when next time invoke rdma_delete_block,
+it will not work correctly.
 
+If start and cancel migration repeatedly, some RDMALocalBlock not invoke
+ibv_dereg_mr to decrease kernel mm_struct vmpin. When vmpin is large than
+max locked memory limitation, ibv_reg_mr will failed, and migration can not
+start successfully again.
+
+Signed-off-by: Lidong Chen <lidongchen@tencent.com>
 Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-Signed-off-by: Peter Xu <peterx@redhat.com>
-Message-Id: <20180502104740.12123-25-peterx@redhat.com>
+Message-Id: <1525618499-1560-1-git-send-email-lidongchen@tencent.com>
 Signed-off-by: Juan Quintela <quintela@redhat.com>
----
- hmp-commands.hx | 14 ++++++++++++++
- hmp.c           |  9 +++++++++
- hmp.h           |  1 +
- 3 files changed, 24 insertions(+)
 
-diff --git a/hmp-commands.hx b/hmp-commands.hx
-index 2fa387d341..0734fea931 100644
---- a/hmp-commands.hx
-+++ b/hmp-commands.hx
-@@ -971,6 +971,20 @@ STEXI
- @item migrate_recover @var{uri}
- @findex migrate_recover
- Continue a paused incoming postcopy migration using the @var{uri}.
-+ETEXI
+Signed-off-by: Lidong Chen <jemmy858585@gmail.com>
+---
+ migration/rdma.c | 7 +++++++
+ 1 file changed, 7 insertions(+)
+
+diff --git a/migration/rdma.c b/migration/rdma.c
+index da474fc19f..7d233b0820 100644
+--- a/migration/rdma.c
++++ b/migration/rdma.c
+@@ -708,6 +708,9 @@ static int rdma_delete_block(RDMAContext *rdma, RDMALocalBlock *block)
+             memcpy(local->block + block->index, old + (block->index + 1),
+                 sizeof(RDMALocalBlock) *
+                     (local->nb_blocks - (block->index + 1)));
++            for (x = block->index; x < local->nb_blocks - 1; x++) {
++                local->block[x].index--;
++            }
+         }
+     } else {
+         assert(block == local->block);
+@@ -3246,6 +3249,10 @@ static int qemu_rdma_registration_handle(QEMUFile *f, void *opaque)
+             qsort(rdma->local_ram_blocks.block,
+                   rdma->local_ram_blocks.nb_blocks,
+                   sizeof(RDMALocalBlock), dest_ram_sort_func);
++            for (i = 0; i < local->nb_blocks; i++) {
++                local->block[i].index = i;
++            }
 +
-+    {
-+        .name       = "migrate_pause",
-+        .args_type  = "",
-+        .params     = "",
-+        .help       = "Pause an ongoing migration (postcopy-only)",
-+        .cmd        = hmp_migrate_pause,
-+    },
-+
-+STEXI
-+@item migrate_pause
-+@findex migrate_pause
-+Pause an ongoing migration.  Currently it only supports postcopy.
- ETEXI
- 
-     {
-diff --git a/hmp.c b/hmp.c
-index 2a36c1cf8d..ef93f4878b 100644
---- a/hmp.c
-+++ b/hmp.c
-@@ -1527,6 +1527,15 @@ void hmp_migrate_recover(Monitor *mon, const QDict *qdict)
-     hmp_handle_error(mon, &err);
- }
- 
-+void hmp_migrate_pause(Monitor *mon, const QDict *qdict)
-+{
-+    Error *err = NULL;
-+
-+    qmp_migrate_pause(&err);
-+
-+    hmp_handle_error(mon, &err);
-+}
-+
- /* Kept for backwards compatibility */
- void hmp_migrate_set_downtime(Monitor *mon, const QDict *qdict)
- {
-diff --git a/hmp.h b/hmp.h
-index b6b56c8161..20f27439d3 100644
---- a/hmp.h
-+++ b/hmp.h
-@@ -69,6 +69,7 @@ void hmp_migrate_cancel(Monitor *mon, const QDict *qdict);
- void hmp_migrate_continue(Monitor *mon, const QDict *qdict);
- void hmp_migrate_incoming(Monitor *mon, const QDict *qdict);
- void hmp_migrate_recover(Monitor *mon, const QDict *qdict);
-+void hmp_migrate_pause(Monitor *mon, const QDict *qdict);
- void hmp_migrate_set_downtime(Monitor *mon, const QDict *qdict);
- void hmp_migrate_set_speed(Monitor *mon, const QDict *qdict);
- void hmp_migrate_set_capability(Monitor *mon, const QDict *qdict);
+             if (rdma->pin_all) {
+                 ret = qemu_rdma_reg_whole_ram_blocks(rdma);
+                 if (ret) {
 -- 
 2.17.0
