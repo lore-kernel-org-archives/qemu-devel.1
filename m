@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45315)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45350)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <prvs=666685086=Alistair.Francis@wdc.com>)
-	id 1fINVD-0003Bt-30
-	for qemu-devel@nongnu.org; Mon, 14 May 2018 20:07:40 -0400
+	id 1fINVP-0003Ix-1N
+	for qemu-devel@nongnu.org; Mon, 14 May 2018 20:07:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <prvs=666685086=Alistair.Francis@wdc.com>)
-	id 1fINV9-0000fV-Lh
-	for qemu-devel@nongnu.org; Mon, 14 May 2018 20:07:39 -0400
-Received: from esa1.hgst.iphmx.com ([68.232.141.245]:34225)
+	id 1fINVL-0001H0-SP
+	for qemu-devel@nongnu.org; Mon, 14 May 2018 20:07:50 -0400
+Received: from esa6.hgst.iphmx.com ([216.71.154.45]:33431)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
 	(envelope-from <prvs=666685086=Alistair.Francis@wdc.com>)
-	id 1fINV9-0000ZK-6a
-	for qemu-devel@nongnu.org; Mon, 14 May 2018 20:07:35 -0400
+	id 1fINVL-0001Cm-FX
+	for qemu-devel@nongnu.org; Mon, 14 May 2018 20:07:47 -0400
 From: Alistair Francis <alistair.francis@wdc.com>
-Date: Mon, 14 May 2018 17:07:20 -0700
-Message-Id: <d7ab6a82e6381446935acacaffebc53a66206b8f.1526342674.git.alistair.francis@wdc.com>
+Date: Mon, 14 May 2018 17:07:34 -0700
+Message-Id: <17b6d0aba8f00cf598c066de7aac478c32323415.1526342674.git.alistair.francis@wdc.com>
 In-Reply-To: <cover.1526342674.git.alistair.francis@wdc.com>
 References: <cover.1526342674.git.alistair.francis@wdc.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v3 3/7] hw/riscv/sifive_plic: Use gpios instead
- of irqs
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH v3 4/7] hw/riscv/sifive_u: Set the soc device
+ tree node as a simple-bus
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,113 +32,26 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: alistair.francis@wdc.com, alistair23@gmail.com, mjc@sifive.com
 
-Instead of creating the interrupt in lines with qemu_allocate_irq() use
-qdev_init_gpio_in() as this gives us the ability to use the qdev*gpio*()
-helpers later on.
+To allow Linux to ennumerate devices on the /soc/ node set it as a
+"simple-bus".
 
 Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
-Suggested-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Reviewed-by: Michael Clark <mjc@sifive.com>
 ---
- hw/riscv/sifive_e.c            | 5 +++--
- hw/riscv/sifive_plic.c         | 6 +-----
- hw/riscv/sifive_u.c            | 5 +++--
- hw/riscv/virt.c                | 4 ++--
- include/hw/riscv/sifive_plic.h | 1 -
- 5 files changed, 9 insertions(+), 12 deletions(-)
+ hw/riscv/sifive_u.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/hw/riscv/sifive_e.c b/hw/riscv/sifive_e.c
-index 384b456540..006703163b 100644
---- a/hw/riscv/sifive_e.c
-+++ b/hw/riscv/sifive_e.c
-@@ -190,13 +190,14 @@ static void riscv_sifive_e_soc_realize(DeviceState *dev, Error **errp)
-     sifive_mmio_emulate(sys_mem, "riscv.sifive.e.gpio0",
-         memmap[SIFIVE_E_GPIO0].base, memmap[SIFIVE_E_GPIO0].size);
-     sifive_uart_create(sys_mem, memmap[SIFIVE_E_UART0].base,
--        serial_hd(0), SIFIVE_PLIC(s->plic)->irqs[SIFIVE_E_UART0_IRQ]);
-+        serial_hd(0), qdev_get_gpio_in(DEVICE(s->plic), SIFIVE_E_UART0_IRQ));
-     sifive_mmio_emulate(sys_mem, "riscv.sifive.e.qspi0",
-         memmap[SIFIVE_E_QSPI0].base, memmap[SIFIVE_E_QSPI0].size);
-     sifive_mmio_emulate(sys_mem, "riscv.sifive.e.pwm0",
-         memmap[SIFIVE_E_PWM0].base, memmap[SIFIVE_E_PWM0].size);
-     /* sifive_uart_create(sys_mem, memmap[SIFIVE_E_UART1].base,
--        serial_hd(1), SIFIVE_PLIC(s->plic)->irqs[SIFIVE_E_UART1_IRQ]); */
-+        serial_hd(1), qdev_get_gpio_in(DEVICE(s->plic),
-+                                       SIFIVE_E_UART1_IRQ)); */
-     sifive_mmio_emulate(sys_mem, "riscv.sifive.e.qspi1",
-         memmap[SIFIVE_E_QSPI1].base, memmap[SIFIVE_E_QSPI1].size);
-     sifive_mmio_emulate(sys_mem, "riscv.sifive.e.pwm1",
-diff --git a/hw/riscv/sifive_plic.c b/hw/riscv/sifive_plic.c
-index 874de2ebaf..a91aeb97ab 100644
---- a/hw/riscv/sifive_plic.c
-+++ b/hw/riscv/sifive_plic.c
-@@ -435,7 +435,6 @@ static void sifive_plic_irq_request(void *opaque, int irq, int level)
- static void sifive_plic_realize(DeviceState *dev, Error **errp)
- {
-     SiFivePLICState *plic = SIFIVE_PLIC(dev);
--    int i;
- 
-     memory_region_init_io(&plic->mmio, OBJECT(dev), &sifive_plic_ops, plic,
-                           TYPE_SIFIVE_PLIC, plic->aperture_size);
-@@ -448,10 +447,7 @@ static void sifive_plic_realize(DeviceState *dev, Error **errp)
-     plic->claimed = g_new0(uint32_t, plic->bitfield_words);
-     plic->enable = g_new0(uint32_t, plic->bitfield_words * plic->num_addrs);
-     sysbus_init_mmio(SYS_BUS_DEVICE(dev), &plic->mmio);
--    plic->irqs = g_new0(qemu_irq, plic->num_sources + 1);
--    for (i = 0; i <= plic->num_sources; i++) {
--        plic->irqs[i] = qemu_allocate_irq(sifive_plic_irq_request, plic, i);
--    }
-+    qdev_init_gpio_in(dev, sifive_plic_irq_request, plic->num_sources);
- }
- 
- static void sifive_plic_class_init(ObjectClass *klass, void *data)
 diff --git a/hw/riscv/sifive_u.c b/hw/riscv/sifive_u.c
-index 45b6aeb36b..3883d7ff9c 100644
+index 3883d7ff9c..f438a72c27 100644
 --- a/hw/riscv/sifive_u.c
 +++ b/hw/riscv/sifive_u.c
-@@ -320,9 +320,10 @@ static void riscv_sifive_u_soc_realize(DeviceState *dev, Error **errp)
-         SIFIVE_U_PLIC_CONTEXT_STRIDE,
-         memmap[SIFIVE_U_PLIC].size);
-     sifive_uart_create(system_memory, memmap[SIFIVE_U_UART0].base,
--        serial_hd(0), SIFIVE_PLIC(s->plic)->irqs[SIFIVE_U_UART0_IRQ]);
-+        serial_hd(0), qdev_get_gpio_in(DEVICE(s->plic), SIFIVE_U_UART0_IRQ));
-     /* sifive_uart_create(system_memory, memmap[SIFIVE_U_UART1].base,
--        serial_hd(1), SIFIVE_PLIC(s->plic)->irqs[SIFIVE_U_UART1_IRQ]); */
-+        serial_hd(1), qdev_get_gpio_in(DEVICE(s->plic),
-+                                       SIFIVE_U_UART1_IRQ)); */
-     sifive_clint_create(memmap[SIFIVE_U_CLINT].base,
-         memmap[SIFIVE_U_CLINT].size, smp_cpus,
-         SIFIVE_SIP_BASE, SIFIVE_TIMECMP_BASE, SIFIVE_TIME_BASE);
-diff --git a/hw/riscv/virt.c b/hw/riscv/virt.c
-index ad03113e0f..bdd75722eb 100644
---- a/hw/riscv/virt.c
-+++ b/hw/riscv/virt.c
-@@ -379,11 +379,11 @@ static void riscv_virt_board_init(MachineState *machine)
-     for (i = 0; i < VIRTIO_COUNT; i++) {
-         sysbus_create_simple("virtio-mmio",
-             memmap[VIRT_VIRTIO].base + i * memmap[VIRT_VIRTIO].size,
--            SIFIVE_PLIC(s->plic)->irqs[VIRTIO_IRQ + i]);
-+            qdev_get_gpio_in(DEVICE(s->plic), VIRTIO_IRQ + i));
-     }
+@@ -97,7 +97,7 @@ static void create_fdt(SiFiveUState *s, const struct MemmapEntry *memmap,
  
-     serial_mm_init(system_memory, memmap[VIRT_UART0].base,
--        0, SIFIVE_PLIC(s->plic)->irqs[UART0_IRQ], 399193,
-+        0, qdev_get_gpio_in(DEVICE(s->plic), UART0_IRQ), 399193,
-         serial_hd(0), DEVICE_LITTLE_ENDIAN);
- }
+     qemu_fdt_add_subnode(fdt, "/soc");
+     qemu_fdt_setprop(fdt, "/soc", "ranges", NULL, 0);
+-    qemu_fdt_setprop_string(fdt, "/soc", "compatible", "ucbbar,spike-bare-soc");
++    qemu_fdt_setprop_string(fdt, "/soc", "compatible", "simple-bus");
+     qemu_fdt_setprop_cell(fdt, "/soc", "#size-cells", 0x2);
+     qemu_fdt_setprop_cell(fdt, "/soc", "#address-cells", 0x2);
  
-diff --git a/include/hw/riscv/sifive_plic.h b/include/hw/riscv/sifive_plic.h
-index 11a5a98df1..2f2af7e686 100644
---- a/include/hw/riscv/sifive_plic.h
-+++ b/include/hw/riscv/sifive_plic.h
-@@ -56,7 +56,6 @@ typedef struct SiFivePLICState {
-     uint32_t *claimed;
-     uint32_t *enable;
-     QemuMutex lock;
--    qemu_irq *irqs;
- 
-     /* config */
-     char *hart_config;
 -- 
 2.17.0
