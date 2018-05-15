@@ -1,23 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52716)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54823)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1fIgig-0008SD-Kj
-	for qemu-devel@nongnu.org; Tue, 15 May 2018 16:38:52 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fIgvJ-00033b-1U
+	for qemu-devel@nongnu.org; Tue, 15 May 2018 16:51:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1fIgif-0003dH-ET
-	for qemu-devel@nongnu.org; Tue, 15 May 2018 16:38:50 -0400
-References: <20180512012537.22478-1-jsnow@redhat.com>
-	<20180512012537.22478-2-jsnow@redhat.com>
-	<79bed3c8-e80e-5f51-5dfc-0d71b1ea66ca@virtuozzo.com>
-	<1550da5e-d919-3a90-ff0f-1b764a32050c@virtuozzo.com>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <d32d3c25-2713-9b3a-e6b3-01ab2a79d5bc@redhat.com>
-Date: Tue, 15 May 2018 16:38:43 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fIgvF-0001Rm-W5
+	for qemu-devel@nongnu.org; Tue, 15 May 2018 16:51:53 -0400
+Received: from mail-qt0-x241.google.com ([2607:f8b0:400d:c0d::241]:40445)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fIgvF-0001Qx-Rd
+	for qemu-devel@nongnu.org; Tue, 15 May 2018 16:51:49 -0400
+Received: by mail-qt0-x241.google.com with SMTP id h2-v6so2207123qtp.7
+	for <qemu-devel@nongnu.org>; Tue, 15 May 2018 13:51:49 -0700 (PDT)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20180515185814.1374-1-peter.maydell@linaro.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <158facb6-5139-4feb-edab-7bfebd52b122@amsat.org>
+Date: Tue, 15 May 2018 17:51:41 -0300
 MIME-Version: 1.0
-In-Reply-To: <1550da5e-d919-3a90-ff0f-1b764a32050c@virtuozzo.com>
+In-Reply-To: <20180515185814.1374-1-peter.maydell@linaro.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC PATCH 01/12] qcow2-bitmap: cache bm_list
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH] sdl: Move use of surface pointer below
+ check for whether it is NULL
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,138 +35,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, Markus Armbruster <armbru@redhat.com>, Max Reitz <mreitz@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
+Cc: Anatoly Trosinenko <anatoly.trosinenko@gmail.com>, Gerd Hoffmann <kraxel@redhat.com>, patches@linaro.org
 
+On 05/15/2018 03:58 PM, Peter Maydell wrote:
+> In commit 2ab858c6c38ee1 we added a use of the 'surf' variable
+> in sdl2_2d_update() that was unfortunately placed above the
+> early-exit-if-NULL check. Move it to where it ought to be.
+> 
+> Fixes: Coverity CID 1390598
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
-On 05/14/2018 08:15 AM, Vladimir Sementsov-Ogievskiy wrote:
-> 14.05.2018 14:55, Vladimir Sementsov-Ogievskiy wrote:
->> 12.05.2018 04:25, John Snow wrote:
->>> We don't need to re-read this list every time, exactly. We can keep
->>> it cached
->>> and delete our copy when we flush to disk.
->>
->> Why not simply delete cache only on close (unconditionally)? Why do we
->> need to remove it after flush?
->>
->> Actually, I think we need to remove it only in qcow2_inactive, after
->> storing persistent bitmaps.
->>
->>
->>>
->>> Because we don't try to flush bitmaps on close if there's nothing to
->>> flush,
->>> add a new conditional to delete the state anyway for a clean exit.
->>>
->>> Signed-off-by: John Snow <jsnow@redhat.com>
->>> ---
->>> =C2=A0 block/qcow2-bitmap.c | 74
->>> ++++++++++++++++++++++++++++++++--------------------
->>> =C2=A0 block/qcow2.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0=
- 2 ++
->>> =C2=A0 block/qcow2.h=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0=
- 2 ++
->>> =C2=A0 3 files changed, 50 insertions(+), 28 deletions(-)
->>>
->>> diff --git a/block/qcow2-bitmap.c b/block/qcow2-bitmap.c
->>> index 6e93ec43e1..fb0a4f3ec4 100644
->>> --- a/block/qcow2-bitmap.c
->>> +++ b/block/qcow2-bitmap.c
->>> @@ -536,8 +536,7 @@ static uint32_t bitmap_list_count(Qcow2BitmapList
->>> *bm_list)
->>> =C2=A0=C2=A0 * Get bitmap list from qcow2 image. Actually reads bitma=
-p directory,
->>> =C2=A0=C2=A0 * checks it and convert to bitmap list.
->>> =C2=A0=C2=A0 */
->>> -static Qcow2BitmapList *bitmap_list_load(BlockDriverState *bs,
->>> uint64_t offset,
->>> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0 uint64_t size, Error **errp)
->>> +static Qcow2BitmapList *bitmap_list_load(BlockDriverState *bs, Error
->>> **errp)
->>> =C2=A0 {
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 int ret;
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 BDRVQcow2State *s =3D bs->opaque;
->>> @@ -545,6 +544,8 @@ static Qcow2BitmapList
->>> *bitmap_list_load(BlockDriverState *bs, uint64_t offset,
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 Qcow2BitmapDirEntry *e;
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 uint32_t nb_dir_entries =3D 0;
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 Qcow2BitmapList *bm_list =3D NULL;
->>> +=C2=A0=C2=A0=C2=A0 uint64_t offset =3D s->bitmap_directory_offset;
->>> +=C2=A0=C2=A0=C2=A0 uint64_t size =3D s->bitmap_directory_size;
->>
->> Worth split this change as a refactoring patch (just remove extra
->> parameters)?
->>
->>> =C2=A0 =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (size =3D=3D 0) {
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 error_setg(err=
-p, "Requested bitmap directory size is zero");
->>> @@ -636,6 +637,30 @@ fail:
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return NULL;
->>> =C2=A0 }
->>> =C2=A0 +static Qcow2BitmapList *get_bitmap_list(BlockDriverState *bs,
->>> Error **errp)
->>> +{
->>> +=C2=A0=C2=A0=C2=A0 BDRVQcow2State *s =3D bs->opaque;
->>> +=C2=A0=C2=A0=C2=A0 Qcow2BitmapList *bm_list;
->>> +
->>> +=C2=A0=C2=A0=C2=A0 if (s->bitmap_list) {
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return (Qcow2BitmapList *=
-)s->bitmap_list;
->>> +=C2=A0=C2=A0=C2=A0 }
->>> +
->>> +=C2=A0=C2=A0=C2=A0 bm_list =3D bitmap_list_load(bs, errp);
->>> +=C2=A0=C2=A0=C2=A0 s->bitmap_list =3D bm_list;
->>> +=C2=A0=C2=A0=C2=A0 return bm_list;
->>> +}
->>> +
->>> +static void del_bitmap_list(BlockDriverState *bs)
->>> +{
->>> +=C2=A0=C2=A0=C2=A0 BDRVQcow2State *s =3D bs->opaque;
->>> +
->>> +=C2=A0=C2=A0=C2=A0 if (s->bitmap_list) {
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 bitmap_list_free(s->bitma=
-p_list);
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 s->bitmap_list =3D NULL;
->>> +=C2=A0=C2=A0=C2=A0 }
->>> +}
->=20
-> so, with this functions, we see, that list is always safely loaded
-> through the cache. But we need also guarantee, that list is always save=
-d
-> through the cache. There are a lot of functions, which stores an
-> abstract bitmap list, given as a parameter, but we want always store ou=
-r
-> cache..
->=20
-
-Do you have an example?
-
-These functions return a bitmap list:
-
-bitmap_list_new()
-bitmap_list_load(...);
-get_bitmap_list(...);
-
-
-bitmap_list_new creates a new bitmap_list, it's called by
-bitmap_list_load and qcow2_store_persistent_dirty_bitmaps.
-
-qcow2_store_persistent_dirty_bitmaps doesn't matter right now because we
-drop the cache by the end of that function.
-
-bitmap_list_load is only called by get_bitmap_list now, and
-get_bitmap_list caches that bitmap list as s->bitmap_list.
-
-
-I think any other function that takes a bitmap list must be getting it
-from a location where it's cached -- except in store, which trashes it
-anyway.
-
-What I can do here is to make get_bitmap_list create a new bitmap list
-if s->nb_bitmaps is zero, and remove the new call in store -- then we
-can be really very confident that any bitmap list getting passed around
-is definitely the cached one.
+> ---
+>  ui/sdl2-2d.c | 6 +++---
+>  1 file changed, 3 insertions(+), 3 deletions(-)
+> 
+> diff --git a/ui/sdl2-2d.c b/ui/sdl2-2d.c
+> index 1f34817bae..85484407be 100644
+> --- a/ui/sdl2-2d.c
+> +++ b/ui/sdl2-2d.c
+> @@ -36,9 +36,7 @@ void sdl2_2d_update(DisplayChangeListener *dcl,
+>      struct sdl2_console *scon = container_of(dcl, struct sdl2_console, dcl);
+>      DisplaySurface *surf = qemu_console_surface(dcl->con);
+>      SDL_Rect rect;
+> -    size_t surface_data_offset = surface_bytes_per_pixel(surf) * x +
+> -                                 surface_stride(surf) * y;
+> -
+> +    size_t surface_data_offset;
+>      assert(!scon->opengl);
+>  
+>      if (!surf) {
+> @@ -48,6 +46,8 @@ void sdl2_2d_update(DisplayChangeListener *dcl,
+>          return;
+>      }
+>  
+> +    surface_data_offset = surface_bytes_per_pixel(surf) * x +
+> +                          surface_stride(surf) * y;
+>      rect.x = x;
+>      rect.y = y;
+>      rect.w = w;
+> 
