@@ -1,41 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43073)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43121)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1fIani-0005ic-Ja
-	for qemu-devel@nongnu.org; Tue, 15 May 2018 10:19:40 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1fIanq-0005or-6M
+	for qemu-devel@nongnu.org; Tue, 15 May 2018 10:19:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1fIane-0002KJ-H9
-	for qemu-devel@nongnu.org; Tue, 15 May 2018 10:19:38 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:56628
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanb@linux.vnet.ibm.com>)
-	id 1fIane-0002Ii-Bu
-	for qemu-devel@nongnu.org; Tue, 15 May 2018 10:19:34 -0400
-Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w4FEF2lf056024
-	for <qemu-devel@nongnu.org>; Tue, 15 May 2018 10:19:32 -0400
-Received: from e36.co.us.ibm.com (e36.co.us.ibm.com [32.97.110.154])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2j006gbkka-1
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 15 May 2018 10:19:32 -0400
-Received: from localhost
-	by e36.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <stefanb@linux.vnet.ibm.com>;
-	Tue, 15 May 2018 08:19:31 -0600
-References: <20180515121433.6112-1-marcandre.lureau@redhat.com>
-	<20180515121433.6112-2-marcandre.lureau@redhat.com>
-From: Stefan Berger <stefanb@linux.vnet.ibm.com>
-Date: Tue, 15 May 2018 10:19:25 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1fIanm-0002NW-2q
+	for qemu-devel@nongnu.org; Tue, 15 May 2018 10:19:46 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:33000 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1fIanl-0002Kw-SA
+	for qemu-devel@nongnu.org; Tue, 15 May 2018 10:19:42 -0400
+Date: Tue, 15 May 2018 15:19:28 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20180515141927.GA2749@work-vm>
+References: <20180514065700.22202-1-clg@kaod.org>
 MIME-Version: 1.0
-In-Reply-To: <20180515121433.6112-2-marcandre.lureau@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-MW
-Message-Id: <ebcff949-797e-38db-a6d0-d56cc5e234dd@linux.vnet.ibm.com>
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <20180514065700.22202-1-clg@kaod.org>
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v3 1/4] tpm: implement virtual memory
- device for TPM PPI
+Subject: Re: [Qemu-devel] [PATCH v4] migration: discard non-migratable
+ RAMBlocks
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -44,262 +28,418 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Eduardo Habkost <ehabkost@redhat.com>, Igor Mammedov <imammedo@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
+Cc: qemu-devel@nongnu.org, Juan Quintela <quintela@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Alex Williamson <alex.williamson@redhat.com>, Yulei Zhang <yulei.zhang@intel.com>, kevin.tian@intel.com, joonas.lahtinen@linux.intel.com, zhenyuw@linux.intel.com, kwankhede@nvidia.com, zhi.a.wang@intel.com, Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>
 
-On 05/15/2018 08:14 AM, Marc-Andr=C3=A9 Lureau wrote:
-> From: Stefan Berger <stefanb@linux.vnet.ibm.com>
->
-> Implement a virtual memory device for the TPM Physical Presence interfa=
-ce.
-> The memory is located at 0xfffef000 and used by ACPI to send messages t=
-o the
+* C=E9dric Le Goater (clg@kaod.org) wrote:
+> On the POWER9 processor, the XIVE interrupt controller can control
+> interrupt sources using MMIO to trigger events, to EOI or to turn off
+> the sources. Priority management and interrupt acknowledgment is also
+> controlled by MMIO in the presenter sub-engine.
+>=20
+> These MMIO regions are exposed to guests in QEMU with a set of 'ram
+> device' memory mappings, similarly to VFIO, and the VMAs are populated
+> dynamically with the appropriate pages using a fault handler.
+>=20
+> But, these regions are an issue for migration. We need to discard the
+> associated RAMBlocks from the RAM state on the source VM and let the
+> destination VM rebuild the memory mappings on the new host in the
+> post_load() operation just before resuming the system.
+>=20
+> To achieve this goal, the following introduces a new RAMBlock flag
+> RAM_MIGRATABLE which is updated in the vmstate_register_ram() and
+> vmstate_unregister_ram() routines. This flag is then used by the
+> migration to identify RAMBlocks to discard on the source. Some checks
+> are also performed on the destination to make sure nothing invalid was
+> sent.
+>=20
+> This change impacts the boston, malta and jazz mips boards for which
+> migration compatibility is broken.
+>=20
+> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
 
-It's now located at 0xFED45000. I changed that without changing the=20
-commit text... Rest looks good :-)
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 
-
-> firmware (BIOS) and by the firmware to provide parameters for each one =
-of
-> the supported codes.
->
-> This device should be used by all TPM interfaces on x86 and can be adde=
-d
-> by calling tpm_ppi_init_io().
->
-> Signed-off-by: Stefan Berger <stefanb@linux.vnet.ibm.com>
-> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
->
 > ---
->
-> v3 (Marc-Andr=C3=A9):
->   - merge CRB support
->   - use trace events instead of DEBUG printf
->   - headers inclusion simplification
->
-> v2:
->   - moved to byte access since an infrequently used device;
->     this simplifies code
->   - increase size of device to 0x400
->   - move device to 0xfffef000 since SeaBIOS has some code at 0xffff0000=
-:
->     'On the emulators, the bios at 0xf0000 is also at 0xffff0000'
-> ---
->   hw/tpm/tpm_ppi.h      | 26 ++++++++++++++++++++
->   include/hw/acpi/tpm.h |  6 +++++
->   hw/tpm/tpm_crb.c      |  5 ++++
->   hw/tpm/tpm_ppi.c      | 56 ++++++++++++++++++++++++++++++++++++++++++=
-+
->   hw/tpm/tpm_tis.c      |  5 ++++
->   hw/tpm/Makefile.objs  |  2 +-
->   hw/tpm/trace-events   |  4 ++++
->   7 files changed, 103 insertions(+), 1 deletion(-)
->   create mode 100644 hw/tpm/tpm_ppi.h
->   create mode 100644 hw/tpm/tpm_ppi.c
->
-> diff --git a/hw/tpm/tpm_ppi.h b/hw/tpm/tpm_ppi.h
-> new file mode 100644
-> index 0000000000..17030bd989
-> --- /dev/null
-> +++ b/hw/tpm/tpm_ppi.h
-> @@ -0,0 +1,26 @@
-> +/*
-> + * TPM Physical Presence Interface
-> + *
-> + * Copyright (C) 2018 IBM Corporation
-> + *
-> + * Authors:
-> + *  Stefan Berger    <stefanb@us.ibm.com>
-> + *
-> + * This work is licensed under the terms of the GNU GPL, version 2 or =
-later.
-> + * See the COPYING file in the top-level directory.
-> + */
-> +#ifndef TPM_TPM_PPI_H
-> +#define TPM_TPM_PPI_H
+>=20
+>  Changes since v3:
+>=20
+>  - removed a superfluous extra space
+>  - fixed ramblock_recv_map_init() and ram_load_cleanup() to not alloc
+>    (and free) the receivedmap bitmap for non-migratable RAMBlocks
+>  - introduced a qemu_ram_foreach_migratable_block() helper for
+>    postcopy support
+>=20
+>  Changes since v2:
+>=20
+>  - added an error_report() in ram_save_host_page()
+>  - un/set the RAMBlock RAM_MIGRATABLE directly under vmstate_un/registe=
+r_ram()
+>    with some new flag helpers
+>=20
+>  exec.c                    | 38 ++++++++++++++++++++++++++++++++++++++
+>  include/exec/cpu-common.h |  4 ++++
+>  migration/postcopy-ram.c  | 12 ++++++------
+>  migration/ram.c           | 46 ++++++++++++++++++++++++++++++++++-----=
+-------
+>  migration/savevm.c        |  2 ++
+>  5 files changed, 84 insertions(+), 18 deletions(-)
+>=20
+> diff --git a/exec.c b/exec.c
+> index c7fcefa851b2..948747223869 100644
+> --- a/exec.c
+> +++ b/exec.c
+> @@ -104,6 +104,9 @@ static MemoryRegion io_mem_unassigned;
+>   * (Set during postcopy)
+>   */
+>  #define RAM_UF_ZEROPAGE (1 << 3)
 > +
-> +#include "hw/acpi/tpm.h"
-> +#include "exec/address-spaces.h"
-> +
-> +typedef struct TPMPPI {
-> +    MemoryRegion mmio;
-> +
-> +    uint8_t ram[TPM_PPI_ADDR_SIZE];
-> +} TPMPPI;
-> +
-> +void tpm_ppi_init_io(TPMPPI *tpmppi, struct MemoryRegion *m, Object *o=
-bj);
-> +
-> +#endif /* TPM_TPM_PPI_H */
-> diff --git a/include/hw/acpi/tpm.h b/include/hw/acpi/tpm.h
-> index 46ac4dc581..c082df7d1d 100644
-> --- a/include/hw/acpi/tpm.h
-> +++ b/include/hw/acpi/tpm.h
-> @@ -187,4 +187,10 @@ REG32(CRB_DATA_BUFFER, 0x80)
->   #define TPM2_START_METHOD_MMIO      6
->   #define TPM2_START_METHOD_CRB       7
->
-> +/*
-> + * Physical Presence Interface
-> + */
-> +#define TPM_PPI_ADDR_SIZE           0x400
-> +#define TPM_PPI_ADDR_BASE           0xFED45000
-> +
->   #endif /* HW_ACPI_TPM_H */
-> diff --git a/hw/tpm/tpm_crb.c b/hw/tpm/tpm_crb.c
-> index a92dd50437..4f585564d9 100644
-> --- a/hw/tpm/tpm_crb.c
-> +++ b/hw/tpm/tpm_crb.c
-> @@ -29,6 +29,7 @@
->   #include "sysemu/reset.h"
->   #include "tpm_int.h"
->   #include "tpm_util.h"
-> +#include "tpm_ppi.h"
->   #include "trace.h"
->
->   typedef struct CRBState {
-> @@ -41,6 +42,8 @@ typedef struct CRBState {
->       MemoryRegion cmdmem;
->
->       size_t be_buffer_size;
-> +
-> +    TPMPPI ppi;
->   } CRBState;
->
->   #define CRB(obj) OBJECT_CHECK(CRBState, (obj), TYPE_TPM_CRB)
-> @@ -291,6 +294,8 @@ static void tpm_crb_realize(DeviceState *dev, Error=
- **errp)
->       memory_region_add_subregion(get_system_memory(),
->           TPM_CRB_ADDR_BASE + sizeof(s->regs), &s->cmdmem);
->
-> +    tpm_ppi_init_io(&s->ppi, get_system_memory(), OBJECT(s));
-> +
->       qemu_register_reset(tpm_crb_reset, dev);
->   }
->
-> diff --git a/hw/tpm/tpm_ppi.c b/hw/tpm/tpm_ppi.c
-> new file mode 100644
-> index 0000000000..0019c3e6fc
-> --- /dev/null
-> +++ b/hw/tpm/tpm_ppi.c
-> @@ -0,0 +1,56 @@
-> +/*
-> + * tpm_ppi.c - TPM Physical Presence Interface
-> + *
-> + * Copyright (C) 2018 IBM Corporation
-> + *
-> + * Authors:
-> + *  Stefan Berger <stefanb@us.ibm.com>
-> + *
-> + * This work is licensed under the terms of the GNU GPL, version 2 or =
-later.
-> + * See the COPYING file in the top-level directory.
-> + *
-> + */
-> +
-> +#include "qemu/osdep.h"
-> +
-> +#include "tpm_ppi.h"
-> +#include "trace.h"
-> +
-> +static uint64_t tpm_ppi_mmio_read(void *opaque, hwaddr addr,
-> +                                  unsigned size)
+> +/* RAM can be migrated */
+> +#define RAM_MIGRATABLE (1 << 4)
+>  #endif
+> =20
+>  #ifdef TARGET_PAGE_BITS_VARY
+> @@ -1797,6 +1800,21 @@ void qemu_ram_set_uf_zeroable(RAMBlock *rb)
+>      rb->flags |=3D RAM_UF_ZEROPAGE;
+>  }
+> =20
+> +bool qemu_ram_is_migratable(RAMBlock *rb)
 > +{
-> +    TPMPPI *s =3D opaque;
-> +
-> +    trace_tpm_ppi_mmio_read(addr, size, s->ram[addr]);
-> +
-> +    return s->ram[addr];
+> +    return rb->flags & RAM_MIGRATABLE;
 > +}
 > +
-> +static void tpm_ppi_mmio_write(void *opaque, hwaddr addr,
-> +                               uint64_t val, unsigned size)
+> +void qemu_ram_set_migratable(RAMBlock *rb)
 > +{
-> +    TPMPPI *s =3D opaque;
-> +
-> +    trace_tpm_ppi_mmio_write(addr, size, val);
-> +
-> +    s->ram[addr] =3D val;
+> +    rb->flags |=3D RAM_MIGRATABLE;
 > +}
 > +
-> +static const MemoryRegionOps tpm_ppi_memory_ops =3D {
-> +    .read =3D tpm_ppi_mmio_read,
-> +    .write =3D tpm_ppi_mmio_write,
-> +    .endianness =3D DEVICE_NATIVE_ENDIAN,
-> +    .valid =3D {
-> +        .min_access_size =3D 1,
-> +        .max_access_size =3D 1,
-> +    },
-> +};
-> +
-> +void tpm_ppi_init_io(TPMPPI *tpmppi, struct MemoryRegion *m, Object *o=
-bj)
+> +void qemu_ram_unset_migratable(RAMBlock *rb)
 > +{
-> +    memory_region_init_io(&tpmppi->mmio, obj, &tpm_ppi_memory_ops,
-> +                          tpmppi, "tpm-ppi-mmio",
-> +                          TPM_PPI_ADDR_SIZE);
-> +
-> +    memory_region_add_subregion(m, TPM_PPI_ADDR_BASE, &tpmppi->mmio);
+> +    rb->flags &=3D ~RAM_MIGRATABLE;
 > +}
-> diff --git a/hw/tpm/tpm_tis.c b/hw/tpm/tpm_tis.c
-> index 12f5c9a759..9a2fec455a 100644
-> --- a/hw/tpm/tpm_tis.c
-> +++ b/hw/tpm/tpm_tis.c
-> @@ -31,6 +31,7 @@
->   #include "sysemu/tpm_backend.h"
->   #include "tpm_int.h"
->   #include "tpm_util.h"
-> +#include "tpm_ppi.h"
->   #include "trace.h"
->
->   #define TPM_TIS_NUM_LOCALITIES      5     /* per spec */
-> @@ -81,6 +82,8 @@ typedef struct TPMState {
->       TPMVersion be_tpm_version;
->
->       size_t be_buffer_size;
 > +
-> +    TPMPPI ppi;
->   } TPMState;
->
->   #define TPM(obj) OBJECT_CHECK(TPMState, (obj), TYPE_TPM_TIS)
-> @@ -976,6 +979,8 @@ static void tpm_tis_realizefn(DeviceState *dev, Err=
-or **errp)
->
->       memory_region_add_subregion(isa_address_space(ISA_DEVICE(dev)),
->                                   TPM_TIS_ADDR_BASE, &s->mmio);
+>  /* Called with iothread lock held.  */
+>  void qemu_ram_set_idstr(RAMBlock *new_block, const char *name, DeviceS=
+tate *dev)
+>  {
+> @@ -3740,6 +3758,26 @@ int qemu_ram_foreach_block(RAMBlockIterFunc func=
+, void *opaque)
+>      return ret;
+>  }
+> =20
+> +int qemu_ram_foreach_migratable_block(RAMBlockIterFunc func, void *opa=
+que)
+> +{
+> +    RAMBlock *block;
+> +    int ret =3D 0;
 > +
-> +    tpm_ppi_init_io(&s->ppi, isa_address_space(ISA_DEVICE(dev)), OBJEC=
-T(s));
->   }
->
->   static void tpm_tis_initfn(Object *obj)
-> diff --git a/hw/tpm/Makefile.objs b/hw/tpm/Makefile.objs
-> index 1dc9f8bf2c..eedd8b6858 100644
-> --- a/hw/tpm/Makefile.objs
-> +++ b/hw/tpm/Makefile.objs
-> @@ -1,4 +1,4 @@
-> -common-obj-y +=3D tpm_util.o
-> +common-obj-y +=3D tpm_util.o tpm_ppi.o
->   common-obj-$(CONFIG_TPM_TIS) +=3D tpm_tis.o
->   common-obj-$(CONFIG_TPM_CRB) +=3D tpm_crb.o
->   common-obj-$(CONFIG_TPM_PASSTHROUGH) +=3D tpm_passthrough.o
-> diff --git a/hw/tpm/trace-events b/hw/tpm/trace-events
-> index 25bee0cecf..81f9923401 100644
-> --- a/hw/tpm/trace-events
-> +++ b/hw/tpm/trace-events
-> @@ -8,6 +8,10 @@ tpm_crb_mmio_write(uint64_t addr, unsigned size, uint3=
-2_t val) "CRB write 0x" TA
->   tpm_passthrough_handle_request(void *cmd) "processing command %p"
->   tpm_passthrough_reset(void) "reset"
->
-> +# hw/tpm/tpm_ppi.c
-> +tpm_ppi_mmio_read(uint64_t addr, unsigned size, uint32_t val) "PPI rea=
-d 0x" TARGET_FMT_plx " len:%u val: 0x%" PRIx32
-> +tpm_ppi_mmio_write(uint64_t addr, unsigned size, uint32_t val) "PPI wr=
-ite 0x" TARGET_FMT_plx " len:%u val: 0x%" PRIx32
+> +    rcu_read_lock();
+> +    RAMBLOCK_FOREACH(block) {
+> +        if (!qemu_ram_is_migratable(block)) {
+> +            continue;
+> +        }
+> +        ret =3D func(block->idstr, block->host, block->offset,
+> +                   block->used_length, opaque);
+> +        if (ret) {
+> +            break;
+> +        }
+> +    }
+> +    rcu_read_unlock();
+> +    return ret;
+> +}
 > +
->   # hw/tpm/tpm_util.c
->   tpm_util_get_buffer_size_hdr_len(uint32_t len, size_t expected) "tpm_=
-resp->hdr.len =3D %u, expected =3D %zu"
->   tpm_util_get_buffer_size_len(uint32_t len, size_t expected) "tpm_resp=
-->len =3D %u, expected =3D %zu"
+>  /*
+>   * Unmap pages of memory from start to start+length such that
+>   * they a) read as 0, b) Trigger whatever fault mechanism
+> diff --git a/include/exec/cpu-common.h b/include/exec/cpu-common.h
+> index 24d335f95d45..0b58e262f301 100644
+> --- a/include/exec/cpu-common.h
+> +++ b/include/exec/cpu-common.h
+> @@ -75,6 +75,9 @@ const char *qemu_ram_get_idstr(RAMBlock *rb);
+>  bool qemu_ram_is_shared(RAMBlock *rb);
+>  bool qemu_ram_is_uf_zeroable(RAMBlock *rb);
+>  void qemu_ram_set_uf_zeroable(RAMBlock *rb);
+> +bool qemu_ram_is_migratable(RAMBlock *rb);
+> +void qemu_ram_set_migratable(RAMBlock *rb);
+> +void qemu_ram_unset_migratable(RAMBlock *rb);
+> =20
+>  size_t qemu_ram_pagesize(RAMBlock *block);
+>  size_t qemu_ram_pagesize_largest(void);
+> @@ -119,6 +122,7 @@ typedef int (RAMBlockIterFunc)(const char *block_na=
+me, void *host_addr,
+>      ram_addr_t offset, ram_addr_t length, void *opaque);
+> =20
+>  int qemu_ram_foreach_block(RAMBlockIterFunc func, void *opaque);
+> +int qemu_ram_foreach_migratable_block(RAMBlockIterFunc func, void *opa=
+que);
+>  int ram_block_discard_range(RAMBlock *rb, uint64_t start, size_t lengt=
+h);
+> =20
+>  #endif
+> diff --git a/migration/postcopy-ram.c b/migration/postcopy-ram.c
+> index 8ceeaa2a93f6..bec405bc39cc 100644
+> --- a/migration/postcopy-ram.c
+> +++ b/migration/postcopy-ram.c
+> @@ -374,7 +374,7 @@ bool postcopy_ram_supported_by_host(MigrationIncomi=
+ngState *mis)
+>      }
+> =20
+>      /* We don't support postcopy with shared RAM yet */
+> -    if (qemu_ram_foreach_block(test_ramblock_postcopiable, NULL)) {
+> +    if (qemu_ram_foreach_migratable_block(test_ramblock_postcopiable, =
+NULL)) {
+>          goto out;
+>      }
+> =20
+> @@ -502,7 +502,7 @@ static int cleanup_range(const char *block_name, vo=
+id *host_addr,
+>   */
+>  int postcopy_ram_incoming_init(MigrationIncomingState *mis, size_t ram=
+_pages)
+>  {
+> -    if (qemu_ram_foreach_block(init_range, NULL)) {
+> +    if (qemu_ram_foreach_migratable_block(init_range, NULL)) {
+>          return -1;
+>      }
+> =20
+> @@ -524,7 +524,7 @@ int postcopy_ram_incoming_cleanup(MigrationIncoming=
+State *mis)
+>              return -1;
+>          }
+> =20
+> -        if (qemu_ram_foreach_block(cleanup_range, mis)) {
+> +        if (qemu_ram_foreach_migratable_block(cleanup_range, mis)) {
+>              return -1;
+>          }
+>          /* Let the fault thread quit */
+> @@ -593,7 +593,7 @@ static int nhp_range(const char *block_name, void *=
+host_addr,
+>   */
+>  int postcopy_ram_prepare_discard(MigrationIncomingState *mis)
+>  {
+> -    if (qemu_ram_foreach_block(nhp_range, mis)) {
+> +    if (qemu_ram_foreach_migratable_block(nhp_range, mis)) {
+>          return -1;
+>      }
+> =20
+> @@ -604,7 +604,7 @@ int postcopy_ram_prepare_discard(MigrationIncomingS=
+tate *mis)
+> =20
+>  /*
+>   * Mark the given area of RAM as requiring notification to unwritten a=
+reas
+> - * Used as a  callback on qemu_ram_foreach_block.
+> + * Used as a  callback on qemu_ram_foreach_migratable_block.
+>   *   host_addr: Base of area to mark
+>   *   offset: Offset in the whole ram arena
+>   *   length: Length of the section
+> @@ -1053,7 +1053,7 @@ int postcopy_ram_enable_notify(MigrationIncomingS=
+tate *mis)
+>      mis->have_fault_thread =3D true;
+> =20
+>      /* Mark so that we get notified of accesses to unwritten areas */
+> -    if (qemu_ram_foreach_block(ram_block_enable_notify, mis)) {
+> +    if (qemu_ram_foreach_migratable_block(ram_block_enable_notify, mis=
+)) {
+>          return -1;
+>      }
+> =20
+> diff --git a/migration/ram.c b/migration/ram.c
+> index 912810c18e0f..102bfe5c571a 100644
+> --- a/migration/ram.c
+> +++ b/migration/ram.c
+> @@ -153,11 +153,16 @@ out:
+>      return ret;
+>  }
+> =20
+> +/* Should be holding either ram_list.mutex, or the RCU lock. */
+> +#define RAMBLOCK_FOREACH_MIGRATABLE(block)             \
+> +    RAMBLOCK_FOREACH(block)                            \
+> +        if (!qemu_ram_is_migratable(block)) {} else
+> +
+>  static void ramblock_recv_map_init(void)
+>  {
+>      RAMBlock *rb;
+> =20
+> -    RAMBLOCK_FOREACH(rb) {
+> +    RAMBLOCK_FOREACH_MIGRATABLE(rb) {
+>          assert(!rb->receivedmap);
+>          rb->receivedmap =3D bitmap_new(rb->max_length >> qemu_target_p=
+age_bits());
+>      }
+> @@ -813,6 +818,10 @@ unsigned long migration_bitmap_find_dirty(RAMState=
+ *rs, RAMBlock *rb,
+>      unsigned long *bitmap =3D rb->bmap;
+>      unsigned long next;
+> =20
+> +    if (!qemu_ram_is_migratable(rb)) {
+> +        return size;
+> +    }
+> +
+>      if (rs->ram_bulk_stage && start > 0) {
+>          next =3D start + 1;
+>      } else {
+> @@ -858,7 +867,7 @@ uint64_t ram_pagesize_summary(void)
+>      RAMBlock *block;
+>      uint64_t summary =3D 0;
+> =20
+> -    RAMBLOCK_FOREACH(block) {
+> +    RAMBLOCK_FOREACH_MIGRATABLE(block) {
+>          summary |=3D block->page_size;
+>      }
+> =20
+> @@ -882,7 +891,7 @@ static void migration_bitmap_sync(RAMState *rs)
+> =20
+>      qemu_mutex_lock(&rs->bitmap_mutex);
+>      rcu_read_lock();
+> -    RAMBLOCK_FOREACH(block) {
+> +    RAMBLOCK_FOREACH_MIGRATABLE(block) {
+>          migration_bitmap_sync_range(rs, block, 0, block->used_length);
+>      }
+>      rcu_read_unlock();
+> @@ -1521,6 +1530,11 @@ static int ram_save_host_page(RAMState *rs, Page=
+SearchStatus *pss,
+>      size_t pagesize_bits =3D
+>          qemu_ram_pagesize(pss->block) >> TARGET_PAGE_BITS;
+> =20
+> +    if (!qemu_ram_is_migratable(pss->block)) {
+> +        error_report("block %s should not be migrated !", pss->block->=
+idstr);
+> +        return 0;
+> +    }
+> +
+>      do {
+>          /* Check the pages is dirty and if it is send it */
+>          if (!migration_bitmap_clear_dirty(rs, pss->block, pss->page)) =
+{
+> @@ -1619,7 +1633,7 @@ uint64_t ram_bytes_total(void)
+>      uint64_t total =3D 0;
+> =20
+>      rcu_read_lock();
+> -    RAMBLOCK_FOREACH(block) {
+> +    RAMBLOCK_FOREACH_MIGRATABLE(block) {
+>          total +=3D block->used_length;
+>      }
+>      rcu_read_unlock();
+> @@ -1674,7 +1688,7 @@ static void ram_save_cleanup(void *opaque)
+>       */
+>      memory_global_dirty_log_stop();
+> =20
+> -    QLIST_FOREACH_RCU(block, &ram_list.blocks, next) {
+> +    RAMBLOCK_FOREACH_MIGRATABLE(block) {
+>          g_free(block->bmap);
+>          block->bmap =3D NULL;
+>          g_free(block->unsentmap);
+> @@ -1737,7 +1751,7 @@ void ram_postcopy_migrated_memory_release(Migrati=
+onState *ms)
+>  {
+>      struct RAMBlock *block;
+> =20
+> -    RAMBLOCK_FOREACH(block) {
+> +    RAMBLOCK_FOREACH_MIGRATABLE(block) {
+>          unsigned long *bitmap =3D block->bmap;
+>          unsigned long range =3D block->used_length >> TARGET_PAGE_BITS=
+;
+>          unsigned long run_start =3D find_next_zero_bit(bitmap, range, =
+0);
+> @@ -1815,7 +1829,7 @@ static int postcopy_each_ram_send_discard(Migrati=
+onState *ms)
+>      struct RAMBlock *block;
+>      int ret;
+> =20
+> -    RAMBLOCK_FOREACH(block) {
+> +    RAMBLOCK_FOREACH_MIGRATABLE(block) {
+>          PostcopyDiscardState *pds =3D
+>              postcopy_discard_send_init(ms, block->idstr);
+> =20
+> @@ -2023,7 +2037,7 @@ int ram_postcopy_send_discard_bitmap(MigrationSta=
+te *ms)
+>      rs->last_sent_block =3D NULL;
+>      rs->last_page =3D 0;
+> =20
+> -    QLIST_FOREACH_RCU(block, &ram_list.blocks, next) {
+> +    RAMBLOCK_FOREACH_MIGRATABLE(block) {
+>          unsigned long pages =3D block->used_length >> TARGET_PAGE_BITS=
+;
+>          unsigned long *bitmap =3D block->bmap;
+>          unsigned long *unsentmap =3D block->unsentmap;
+> @@ -2182,7 +2196,7 @@ static void ram_list_init_bitmaps(void)
+> =20
+>      /* Skip setting bitmap if there is no RAM */
+>      if (ram_bytes_total()) {
+> -        QLIST_FOREACH_RCU(block, &ram_list.blocks, next) {
+> +        RAMBLOCK_FOREACH_MIGRATABLE(block) {
+>              pages =3D block->max_length >> TARGET_PAGE_BITS;
+>              block->bmap =3D bitmap_new(pages);
+>              bitmap_set(block->bmap, 0, pages);
+> @@ -2263,7 +2277,7 @@ static int ram_save_setup(QEMUFile *f, void *opaq=
+ue)
+> =20
+>      qemu_put_be64(f, ram_bytes_total() | RAM_SAVE_FLAG_MEM_SIZE);
+> =20
+> -    RAMBLOCK_FOREACH(block) {
+> +    RAMBLOCK_FOREACH_MIGRATABLE(block) {
+>          qemu_put_byte(f, strlen(block->idstr));
+>          qemu_put_buffer(f, (uint8_t *)block->idstr, strlen(block->idst=
+r));
+>          qemu_put_be64(f, block->used_length);
+> @@ -2507,6 +2521,11 @@ static inline RAMBlock *ram_block_from_stream(QE=
+MUFile *f, int flags)
+>          return NULL;
+>      }
+> =20
+> +    if (!qemu_ram_is_migratable(block)) {
+> +        error_report("block %s should not be migrated !", id);
+> +        return NULL;
+> +    }
+> +
+>      return block;
+>  }
+> =20
+> @@ -2749,7 +2768,7 @@ static int ram_load_cleanup(void *opaque)
+>      xbzrle_load_cleanup();
+>      compress_threads_load_cleanup();
+> =20
+> -    RAMBLOCK_FOREACH(rb) {
+> +    RAMBLOCK_FOREACH_MIGRATABLE(rb) {
+>          g_free(rb->receivedmap);
+>          rb->receivedmap =3D NULL;
+>      }
+> @@ -3011,7 +3030,10 @@ static int ram_load(QEMUFile *f, void *opaque, i=
+nt version_id)
+>                  length =3D qemu_get_be64(f);
+> =20
+>                  block =3D qemu_ram_block_by_name(id);
+> -                if (block) {
+> +                if (block && !qemu_ram_is_migratable(block)) {
+> +                    error_report("block %s should not be migrated !", =
+id);
+> +                    ret =3D -EINVAL;
+> +                } else if (block) {
+>                      if (length !=3D block->used_length) {
+>                          Error *local_err =3D NULL;
+> =20
+> diff --git a/migration/savevm.c b/migration/savevm.c
+> index e2be02afe42c..9ebfba738ea4 100644
+> --- a/migration/savevm.c
+> +++ b/migration/savevm.c
+> @@ -2501,11 +2501,13 @@ void vmstate_register_ram(MemoryRegion *mr, Dev=
+iceState *dev)
+>  {
+>      qemu_ram_set_idstr(mr->ram_block,
+>                         memory_region_name(mr), dev);
+> +    qemu_ram_set_migratable(mr->ram_block);
+>  }
+> =20
+>  void vmstate_unregister_ram(MemoryRegion *mr, DeviceState *dev)
+>  {
+>      qemu_ram_unset_idstr(mr->ram_block);
+> +    qemu_ram_unset_migratable(mr->ram_block);
+>  }
+> =20
+>  void vmstate_register_ram_global(MemoryRegion *mr)
+> --=20
+> 2.13.6
+>=20
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
