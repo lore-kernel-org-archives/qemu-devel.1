@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56881)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57946)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <petrutlucian94@gmail.com>) id 1fIYHg-0003p2-Mp
-	for qemu-devel@nongnu.org; Tue, 15 May 2018 07:38:50 -0400
+	(envelope-from <jianjay.zhou@huawei.com>) id 1fIYII-0004IH-Ef
+	for qemu-devel@nongnu.org; Tue, 15 May 2018 07:39:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <petrutlucian94@gmail.com>) id 1fIYH3-0007Y0-4m
-	for qemu-devel@nongnu.org; Tue, 15 May 2018 07:38:24 -0400
-Received: from mail-wr0-x243.google.com ([2a00:1450:400c:c0c::243]:41579)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <petrutlucian94@gmail.com>)
-	id 1fIYH2-0007Wm-FG
-	for qemu-devel@nongnu.org; Tue, 15 May 2018 07:37:44 -0400
-Received: by mail-wr0-x243.google.com with SMTP id g21-v6so15627879wrb.8
-	for <qemu-devel@nongnu.org>; Tue, 15 May 2018 04:37:44 -0700 (PDT)
-From: petrutlucian94@gmail.com
-Date: Tue, 15 May 2018 14:37:38 +0300
-Message-Id: <1526384258-3581-1-git-send-email-lpetrut@cloudbasesolutions.com>
-Subject: [Qemu-devel] [PATCH] WHPX Add signature CPUID
+	(envelope-from <jianjay.zhou@huawei.com>) id 1fIYEs-0005Ld-Nc
+	for qemu-devel@nongnu.org; Tue, 15 May 2018 07:39:02 -0400
+Received: from [45.249.212.32] (port=43185 helo=huawei.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jianjay.zhou@huawei.com>)
+	id 1fIYEr-0005CC-Pr
+	for qemu-devel@nongnu.org; Tue, 15 May 2018 07:35:30 -0400
+From: Jay Zhou <jianjay.zhou@huawei.com>
+Date: Tue, 15 May 2018 19:35:08 +0800
+Message-ID: <1526384108-49348-1-git-send-email-jianjay.zhou@huawei.com>
+MIME-Version: 1.0
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH] memory: delete struct AddressSpaceOps
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,65 +24,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Lucian Petrut <lpetrut@cloudbasesolutions.com>, Alessandro Pilotti <apilotti@cloudbasesolutions.com>, Justin Terry <juterry@microsoft.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, "open list:All patches CC here" <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org
+Cc: pbonzini@redhat.com, wangxinxin.wang@huawei.com, weidong.huang@huawei.com, jianjay.zhou@huawei.com
 
-From: Lucian Petrut <lpetrut@cloudbasesolutions.com>
+Since struct AddressSpaceOps isn't used anywhere else,
+so just delete it.
 
-Adds the CPUID trap for CPUID 0x40000000, sending the WHPX signature
-to the guest upon request. This is consistent with other QEMU
-accelerators (KVM).
-
-Signed-off-by: Alessandro Pilotti <apilotti@cloudbasesolutions.com>
-Signed-off-by: Justin Terry (VM) <juterry@microsoft.com>
-Signed-off-by: Lucian Petrut <lpetrut@cloudbasesolutions.com>
+Signed-off-by: Jay Zhou <jianjay.zhou@huawei.com>
 ---
-As opposed to the previous patch, this one will set the result of
-this specific CPUID leaf when initializing the accelerator so that
-we avoid a vcpu exit.
+ memory.c | 2 --
+ 1 file changed, 2 deletions(-)
 
- target/i386/whpx-all.c | 23 +++++++++++++++++++++++
- 1 file changed, 23 insertions(+)
-
-diff --git a/target/i386/whpx-all.c b/target/i386/whpx-all.c
-index 5843517..c8310de 100644
---- a/target/i386/whpx-all.c
-+++ b/target/i386/whpx-all.c
-@@ -29,6 +29,8 @@
- #include <WinHvPlatform.h>
- #include <WinHvEmulation.h>
+diff --git a/memory.c b/memory.c
+index fc7f9b7..94b91f9 100644
+--- a/memory.c
++++ b/memory.c
+@@ -220,8 +220,6 @@ struct FlatRange {
+     bool readonly;
+ };
  
-+#define WHPX_CPUID_SIGNATURE 0x40000000
-+
- struct whpx_state {
-     uint64_t mem_quota;
-     WHV_PARTITION_HANDLE partition;
-@@ -1342,6 +1344,27 @@ static int whpx_accel_init(MachineState *ms)
-                                  cpuidExitList,
-                                  RTL_NUMBER_OF(cpuidExitList) * sizeof(UINT32));
+-typedef struct AddressSpaceOps AddressSpaceOps;
+-
+ #define FOR_EACH_FLAT_RANGE(var, view)          \
+     for (var = (view)->ranges; var < (view)->ranges + (view)->nr; ++var)
  
-+    UINT32 signature[3] = {0};
-+    memcpy(signature, "WHPXWHPXWHPX", 12);
-+
-+    WHV_X64_CPUID_RESULT cpuidResultList[1] = {0};
-+    cpuidResultList[0].Function = WHPX_CPUID_SIGNATURE;
-+    cpuidResultList[0].Eax = 0;
-+    cpuidResultList[0].Ebx = signature[0];
-+    cpuidResultList[0].Ecx = signature[1];
-+    cpuidResultList[0].Edx = signature[2];
-+    hr = WHvSetPartitionProperty(whpx->partition,
-+                                 WHvPartitionPropertyCodeCpuidResultList,
-+                                 cpuidResultList,
-+                                 RTL_NUMBER_OF(cpuidResultList) *
-+                                    sizeof(WHV_X64_CPUID_RESULT));
-+    if (FAILED(hr)) {
-+        error_report("WHPX: Failed to set partition CpuidResultList hr=%08lx",
-+                     hr);
-+        ret = -EINVAL;
-+        goto error;
-+    }
-+
-     if (FAILED(hr)) {
-         error_report("WHPX: Failed to set partition CpuidExitList hr=%08lx",
-                      hr);
 -- 
-2.7.4
+1.8.3.1
