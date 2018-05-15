@@ -1,16 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48585)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48568)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1fIW6v-0004EP-Sf
+	(envelope-from <kraxel@redhat.com>) id 1fIW6v-0004E1-83
 	for qemu-devel@nongnu.org; Tue, 15 May 2018 05:19:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1fIW6t-0001Vf-B2
+	(envelope-from <kraxel@redhat.com>) id 1fIW6t-0001Vo-Go
 	for qemu-devel@nongnu.org; Tue, 15 May 2018 05:19:09 -0400
 From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Tue, 15 May 2018 11:18:53 +0200
-Message-Id: <20180515091901.27774-3-kraxel@redhat.com>
+Date: Tue, 15 May 2018 11:19:01 +0200
+Message-Id: <20180515091901.27774-11-kraxel@redhat.com>
 In-Reply-To: <20180515091901.27774-1-kraxel@redhat.com>
 References: <20180515091901.27774-1-kraxel@redhat.com>
-Subject: [Qemu-devel] [PULL 02/10] gtk: make it possible to hide the menu bar
+Subject: [Qemu-devel] [PULL 10/10] gtk: disable the F10 menubar key
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,107 +24,41 @@ Cc: Laurent Vivier <laurent@vivier.eu>, Paolo Bonzini <pbonzini@redhat.com>, Mic
 
 From: Peter Wu <peter@lekensteyn.nl>
 
-Saves some space and disables the F10 button as side-effect.
+The F10 key is used in various applications, disable it unconditionally
+(do not limit it to grab mode). Note that this property is deprecated
+and might be removed in the future (GTK+ commit b082fb598d).
 
 Fixes: https://bugs.launchpad.net/qemu/+bug/1726910
 Signed-off-by: Peter Wu <peter@lekensteyn.nl>
-Message-Id: <20180510230739.28459-1-peter@lekensteyn.nl>
+Message-id: 20180510230739.28459-2-peter@lekensteyn.nl
 Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
 ---
- ui/gtk.c | 46 +++++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 45 insertions(+), 1 deletion(-)
+ ui/gtk.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
 diff --git a/ui/gtk.c b/ui/gtk.c
-index bb3214cffb..9e5390f2c2 100644
+index ef6ca7179e..dbce970dc4 100644
 --- a/ui/gtk.c
 +++ b/ui/gtk.c
-@@ -145,6 +145,7 @@
- #define GDK_KEY_2 GDK_2
- #define GDK_KEY_f GDK_f
- #define GDK_KEY_g GDK_g
-+#define GDK_KEY_m GDK_m
- #define GDK_KEY_q GDK_q
- #define GDK_KEY_plus GDK_plus
- #define GDK_KEY_equal GDK_equal
-@@ -208,6 +209,7 @@ struct GtkDisplayState {
+@@ -2321,6 +2321,8 @@ static GtkWidget *gd_create_menu_view(GtkDisplayState *s)
  
-     GtkWidget *show_tabs_item;
-     GtkWidget *untabify_item;
-+    GtkWidget *show_menubar_item;
- 
-     GtkWidget *vbox;
-     GtkWidget *notebook;
-@@ -1387,6 +1389,30 @@ static void gd_menu_untabify(GtkMenuItem *item, void *opaque)
-     }
- }
- 
-+static void gd_menu_show_menubar(GtkMenuItem *item, void *opaque)
-+{
-+    GtkDisplayState *s = opaque;
-+    VirtualConsole *vc = gd_vc_find_current(s);
-+
-+    if (s->full_screen) {
-+        return;
-+    }
-+
-+    if (gtk_check_menu_item_get_active(
-+                GTK_CHECK_MENU_ITEM(s->show_menubar_item))) {
-+        gtk_widget_show(s->menu_bar);
-+    } else {
-+        gtk_widget_hide(s->menu_bar);
-+    }
-+    gd_update_windowsize(vc);
-+}
-+
-+static void gd_accel_show_menubar(void *opaque)
-+{
-+    GtkDisplayState *s = opaque;
-+    gtk_menu_item_activate(GTK_MENU_ITEM(s->show_menubar_item));
-+}
-+
- static void gd_menu_full_screen(GtkMenuItem *item, void *opaque)
+ static void gd_create_menus(GtkDisplayState *s)
  {
-     GtkDisplayState *s = opaque;
-@@ -1403,7 +1429,10 @@ static void gd_menu_full_screen(GtkMenuItem *item, void *opaque)
-     } else {
-         gtk_window_unfullscreen(GTK_WINDOW(s->window));
-         gd_menu_show_tabs(GTK_MENU_ITEM(s->show_tabs_item), s);
--        gtk_widget_show(s->menu_bar);
-+        if (gtk_check_menu_item_get_active(
-+                    GTK_CHECK_MENU_ITEM(s->show_menubar_item))) {
-+            gtk_widget_show(s->menu_bar);
-+        }
-         s->full_screen = FALSE;
-         if (vc->type == GD_VC_GFX) {
-             vc->gfx.scale_x = 1.0;
-@@ -2036,6 +2065,8 @@ static void gd_connect_signals(GtkDisplayState *s)
-                      G_CALLBACK(gd_menu_show_tabs), s);
-     g_signal_connect(s->untabify_item, "activate",
-                      G_CALLBACK(gd_menu_untabify), s);
-+    g_signal_connect(s->show_menubar_item, "activate",
-+                     G_CALLBACK(gd_menu_show_menubar), s);
- 
-     g_signal_connect(s->window, "delete-event",
-                      G_CALLBACK(gd_window_close), s);
-@@ -2272,6 +2303,19 @@ static GtkWidget *gd_create_menu_view(GtkDisplayState *s)
-     s->untabify_item = gtk_menu_item_new_with_mnemonic(_("Detach Tab"));
-     gtk_menu_shell_append(GTK_MENU_SHELL(view_menu), s->untabify_item);
- 
-+    s->show_menubar_item = gtk_check_menu_item_new_with_mnemonic(
-+            _("Show Menubar"));
-+    gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(s->show_menubar_item),
-+                                   TRUE);
-+    gtk_accel_group_connect(s->accel_group, GDK_KEY_m, HOTKEY_MODIFIERS, 0,
-+            g_cclosure_new_swap(G_CALLBACK(gd_accel_show_menubar), s, NULL));
-+#if GTK_CHECK_VERSION(3, 8, 0)
-+    gtk_accel_label_set_accel(
-+            GTK_ACCEL_LABEL(gtk_bin_get_child(GTK_BIN(s->show_menubar_item))),
-+            GDK_KEY_m, HOTKEY_MODIFIERS);
-+#endif
-+    gtk_menu_shell_append(GTK_MENU_SHELL(view_menu), s->show_menubar_item);
++    GtkSettings *settings;
 +
-     return view_menu;
+     s->accel_group = gtk_accel_group_new();
+     s->machine_menu = gd_create_menu_machine(s);
+     s->view_menu = gd_create_menu_view(s);
+@@ -2336,6 +2338,10 @@ static void gd_create_menus(GtkDisplayState *s)
+ 
+     g_object_set_data(G_OBJECT(s->window), "accel_group", s->accel_group);
+     gtk_window_add_accel_group(GTK_WINDOW(s->window), s->accel_group);
++
++    /* Disable the default "F10" menu shortcut. */
++    settings = gtk_widget_get_settings(s->window);
++    g_object_set(G_OBJECT(settings), "gtk-menu-bar-accel", "", NULL);
  }
+ 
  
 -- 
 2.9.3
