@@ -1,29 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57797)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57982)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <prvs=66614e27e=anthony.perard@citrix.com>)
-	id 1fIbbW-0002vq-R5
-	for qemu-devel@nongnu.org; Tue, 15 May 2018 11:11:07 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1fIbc4-0003Hm-SG
+	for qemu-devel@nongnu.org; Tue, 15 May 2018 11:11:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <prvs=66614e27e=anthony.perard@citrix.com>)
-	id 1fIbbS-0000MI-LE
-	for qemu-devel@nongnu.org; Tue, 15 May 2018 11:11:06 -0400
-Received: from smtp03.citrix.com ([162.221.156.55]:15047)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71)
-	(envelope-from <prvs=66614e27e=anthony.perard@citrix.com>)
-	id 1fIbbS-0000LF-Bo
-	for qemu-devel@nongnu.org; Tue, 15 May 2018 11:11:02 -0400
-Date: Tue, 15 May 2018 15:40:24 +0100
-From: Anthony PERARD <anthony.perard@citrix.com>
-Message-ID: <20180515144024.GC2057@perard.uk.xensource.com>
-References: <20180510091518.28199-1-paul.durrant@citrix.com>
-	<20180510091518.28199-2-paul.durrant@citrix.com>
+	(envelope-from <alex.bennee@linaro.org>) id 1fIbc0-0000aN-H6
+	for qemu-devel@nongnu.org; Tue, 15 May 2018 11:11:40 -0400
+Received: from mail-wr0-x242.google.com ([2a00:1450:400c:c0c::242]:42640)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1fIbc0-0000Zk-8Y
+	for qemu-devel@nongnu.org; Tue, 15 May 2018 11:11:36 -0400
+Received: by mail-wr0-x242.google.com with SMTP id v5-v6so522557wrf.9
+	for <qemu-devel@nongnu.org>; Tue, 15 May 2018 08:11:35 -0700 (PDT)
+References: <20180515134950.3755-1-muriloo@linux.ibm.com>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <20180515134950.3755-1-muriloo@linux.ibm.com>
+Date: Tue, 15 May 2018 16:11:33 +0100
+Message-ID: <874lj9eyxm.fsf@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20180510091518.28199-2-paul.durrant@citrix.com>
-Subject: Re: [Qemu-devel] [PATCH v2 1/3] xen-hvm: create separate function
- for ioreq server initialization
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] HACKING: document preference for g_new
+ instead of g_malloc
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,17 +30,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paul Durrant <paul.durrant@citrix.com>
-Cc: qemu-devel@nongnu.org, xen-devel@lists.xenproject.org, Stefano Stabellini <sstabellini@kernel.org>
+To: Murilo Opsfelder Araujo <muriloo@linux.ibm.com>
+Cc: qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>, David Hildenbrand <david@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-On Thu, May 10, 2018 at 10:15:16AM +0100, Paul Durrant wrote:
-> The code is sufficiently substantial that it improves code readability
-> to put it in a new function called by xen_hvm_init() rather than having
-> it inline.
-> 
-> Signed-off-by: Paul Durrant <paul.durrant@citrix.com>
 
-Reviewed-by: Anthony PERARD <anthony.perard@citrix.com>
+Murilo Opsfelder Araujo <muriloo@linux.ibm.com> writes:
 
--- 
-Anthony PERARD
+> This patch documents the preference for g_new instead of g_malloc. The
+> reasons were adapted from commit b45c03f585ea9bb1af76c73e82195418c294919d.
+>
+> Discussion in QEMU's mailing list:
+>   http://lists.nongnu.org/archive/html/qemu-devel/2018-05/msg03238.html
+>
+> Cc: qemu-devel@nongnu.org
+> Cc: David Hildenbrand <david@redhat.com>
+> Cc: Eduardo Habkost <ehabkost@redhat.com>
+> Cc: Markus Armbruster <armbru@redhat.com>
+> Cc: Paolo Bonzini <pbonzini@redhat.com>
+> Signed-off-by: Murilo Opsfelder Araujo <muriloo@linux.ibm.com>
+
+Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+
+> ---
+>  HACKING | 9 +++++++++
+>  1 file changed, 9 insertions(+)
+>
+> diff --git a/HACKING b/HACKING
+> index 4125c97d8d..0fc3e0fc04 100644
+> --- a/HACKING
+> +++ b/HACKING
+> @@ -118,6 +118,15 @@ Please note that g_malloc will exit on allocation fa=
+ilure, so there
+>  is no need to test for failure (as you would have to with malloc).
+>  Calling g_malloc with a zero size is valid and will return NULL.
+>
+> +Prefer g_new(T, n) instead of g_malloc(sizeof(T) * n) for the following
+> +reasons:
+> +
+> +  a. It catches multiplication overflowing size_t;
+> +  b. It returns T * instead of void *, letting compiler catch more type
+> +     errors.
+> +
+> +Declarations like T *v =3D g_malloc(sizeof(*v)) are acceptable, though.
+> +
+>  Memory allocated by qemu_memalign or qemu_blockalign must be freed with
+>  qemu_vfree, since breaking this will cause problems on Win32.
+
+
+--
+Alex Benn=C3=A9e
