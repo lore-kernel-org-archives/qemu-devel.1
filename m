@@ -1,40 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43876)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45210)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <muriloo@linux.ibm.com>) id 1fINOL-0000Ap-7Z
-	for qemu-devel@nongnu.org; Mon, 14 May 2018 20:00:34 -0400
+	(envelope-from <prvs=666685086=Alistair.Francis@wdc.com>)
+	id 1fINUa-0002nM-5T
+	for qemu-devel@nongnu.org; Mon, 14 May 2018 20:07:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <muriloo@linux.ibm.com>) id 1fINOH-0002z6-Az
-	for qemu-devel@nongnu.org; Mon, 14 May 2018 20:00:33 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:35222
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <muriloo@linux.ibm.com>)
-	id 1fINOH-0002wI-4B
-	for qemu-devel@nongnu.org; Mon, 14 May 2018 20:00:29 -0400
-Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w4ENwnk6123753
-	for <qemu-devel@nongnu.org>; Mon, 14 May 2018 20:00:28 -0400
-Received: from e16.ny.us.ibm.com (e16.ny.us.ibm.com [129.33.205.206])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2hyfnstbhd-1
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Mon, 14 May 2018 20:00:28 -0400
-Received: from localhost
-	by e16.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <muriloo@linux.ibm.com>;
-	Mon, 14 May 2018 20:00:26 -0400
-Date: Mon, 14 May 2018 21:00:17 -0300
-From: Murilo Opsfelder Araujo <muriloo@linux.ibm.com>
-References: <20180514100023.12542-1-david@redhat.com>
-	<20180514100023.12542-4-david@redhat.com>
+	(envelope-from <prvs=666685086=Alistair.Francis@wdc.com>)
+	id 1fINUX-0006u9-0K
+	for qemu-devel@nongnu.org; Mon, 14 May 2018 20:07:00 -0400
+Received: from esa6.hgst.iphmx.com ([216.71.154.45]:34242)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
+	(envelope-from <prvs=666685086=Alistair.Francis@wdc.com>)
+	id 1fINUW-0006mU-Di
+	for qemu-devel@nongnu.org; Mon, 14 May 2018 20:06:56 -0400
+From: Alistair Francis <alistair.francis@wdc.com>
+Date: Mon, 14 May 2018 17:06:36 -0700
+Message-Id: <cover.1526342674.git.alistair.francis@wdc.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180514100023.12542-4-david@redhat.com>
-Message-Id: <20180515000017.GB12837@kermit-br-ibm-com>
-Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH v3 03/18] qdev: let machine
- hotplug handler to override bus hotplug handler
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH v3 0/7] RISC-V: SoCify SiFive boards and
+ connect GEM
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -43,112 +28,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>
-Cc: qemu-devel@nongnu.org, Pankaj Gupta <pagupta@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Cornelia Huck <cohuck@redhat.com>, Markus Armbruster <armbru@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org, qemu-ppc@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Luiz Capitulino <lcapitulino@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Richard Henderson <rth@twiddle.net>
+To: qemu-devel@nongnu.org
+Cc: alistair.francis@wdc.com, alistair23@gmail.com, mjc@sifive.com
 
-On Mon, May 14, 2018 at 12:00:08PM +0200, David Hildenbrand wrote:
-> From: Igor Mammedov <imammedo@redhat.com>
-> 
-> it will allow to return another hotplug handler than the default
-> one for a specific bus based device type. Which is needed to handle
-> non trivial plug/unplug sequences that need the access to resources
-> configured outside of bus where device is attached.
-> 
-> That will allow for returned hotplug handler to orchestrate wiring
-> in arbitrary order, by chaining other hotplug handlers when
-> it's needed.
-> 
-> PS:
-> It could be used for hybrid virtio-mem and virtio-pmem devices
-> where it will return machine as hotplug handler which will do
-> necessary wiring at machine level and then pass control down
-> the chain to bus specific hotplug handler.
-> 
-> Example of top level hotplug handler override and custom plug sequence:
-> 
->   some_machine_get_hotplug_handler(machine){
->       if (object_dynamic_cast(OBJECT(dev), TYPE_SOME_BUS_DEVICE)) {
->           return HOTPLUG_HANDLER(machine);
->       }
->       return NULL;
->   }
-> 
->   some_machine_device_plug(hotplug_dev, dev) {
->       if (object_dynamic_cast(OBJECT(dev), TYPE_SOME_BUS_DEVICE)) {
->           /* do machine specific initialization */
->           some_machine_init_special_device(dev)
-> 
->           /* pass control to bus specific handler */
->           hotplug_handler_plug(dev->parent_bus->hotplug_handler, dev)
->       }
->   }
 
-Hi, David.
+This series has three tasks:
+ 1. To convert the SiFive U and E machines into SoCs and boards
+ 2. To connect the Cadence GEM device to the SiFive U board
+ 3. Fix some device tree problems with the SiFive U board
 
-I might be misreading, but isn't it more like the following?
+After this series the SiFive E and U boards have their SoCs split into
+seperate QEMU objects, which can be used on future boards if desired.
 
-    some_machine_device_plug(hotplug_dev, dev) {
-        if (object_dynamic_cast(OBJECT(dev), TYPE_SOME_BUS_DEVICE)) {
-            /* do machine specific initialization */
-            some_machine_init_special_device(dev)
-        } else {
-            /* pass control to bus specific handler */
-            hotplug_handler_plug(dev->parent_bus->hotplug_handler, dev)
-        }
-    }
+The RISC-V Virt and Spike boards have not been converted. They haven't
+been converted as they aren't physical boards, so it doesn't make a
+whole lot of sense to split them into an SoC and board. The only
+disadvantage with this is that they now differ to the SiFive boards.
 
-> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-> Signed-off-by: David Hildenbrand <david@redhat.com>
-> ---
->  hw/core/qdev.c         |  6 ++----
->  include/hw/qdev-core.h | 11 +++++++++++
->  2 files changed, 13 insertions(+), 4 deletions(-)
-> 
-> diff --git a/hw/core/qdev.c b/hw/core/qdev.c
-> index f6f92473b8..885286f579 100644
-> --- a/hw/core/qdev.c
-> +++ b/hw/core/qdev.c
-> @@ -261,12 +261,10 @@ HotplugHandler *qdev_get_machine_hotplug_handler(DeviceState *dev)
->  
->  HotplugHandler *qdev_get_hotplug_handler(DeviceState *dev)
->  {
-> -    HotplugHandler *hotplug_ctrl;
-> +    HotplugHandler *hotplug_ctrl = qdev_get_machine_hotplug_handler(dev);
->  
-> -    if (dev->parent_bus && dev->parent_bus->hotplug_handler) {
-> +    if (hotplug_ctrl == NULL && dev->parent_bus) {
->          hotplug_ctrl = dev->parent_bus->hotplug_handler;
-> -    } else {
-> -        hotplug_ctrl = qdev_get_machine_hotplug_handler(dev);
->      }
->      return hotplug_ctrl;
->  }
-> diff --git a/include/hw/qdev-core.h b/include/hw/qdev-core.h
-> index 9453588160..e6a8eca558 100644
-> --- a/include/hw/qdev-core.h
-> +++ b/include/hw/qdev-core.h
-> @@ -286,6 +286,17 @@ void qdev_init_nofail(DeviceState *dev);
->  void qdev_set_legacy_instance_id(DeviceState *dev, int alias_id,
->                                   int required_for_version);
->  HotplugHandler *qdev_get_machine_hotplug_handler(DeviceState *dev);
-> +/**
-> + * qdev_get_hotplug_handler: Get handler responsible for device wiring
-> + *
-> + * Find HOTPLUG_HANDLER for @dev that provides [pre|un]plug callbacks for it.
-> + *
-> + * Note: in case @dev has a parent bus, it will be returned as handler unless
-> + * machine handler overrides it.
-> + *
-> + * Returns: pointer to object that implements TYPE_HOTPLUG_HANDLER interface
-> + *          or NULL if there aren't any.
-> + */
->  HotplugHandler *qdev_get_hotplug_handler(DeviceState *dev);
->  void qdev_unplug(DeviceState *dev, Error **errp);
->  void qdev_simple_device_unplug_cb(HotplugHandler *hotplug_dev,
-> -- 
-> 2.14.3
-> 
-> 
+This series also connect the Cadence GEM device to the SiFive U board.
+There are some interrupt line changes requried before this is possible.
+
+V3:
+ - Generalise the SoC names
+V2:
+ - Use the new GPIOs everywhere in the board
+ - Add the GEM device tree node
+ - Fix some device tree problems identified
+
+
+
+Alistair Francis (7):
+  hw/riscv/sifive_u: Create a SiFive U SoC object
+  hw/riscv/sifive_e: Create a SiFive E SoC object
+  hw/riscv/sifive_plic: Use gpios instead of irqs
+  hw/riscv/sifive_u: Set the soc device tree node as a simple-bus
+  hw/riscv/sifive_u: Set the interrupt controler number of interrupts
+  hw/riscv/sifive_u: Move the uart device tree node under /soc/
+  hw/riscv/sifive_u: Connect the Cadence GEM Ethernet device
+
+ default-configs/riscv32-softmmu.mak |   1 +
+ default-configs/riscv64-softmmu.mak |   1 +
+ hw/riscv/sifive_e.c                 | 102 ++++++++++++++-----
+ hw/riscv/sifive_plic.c              |   6 +-
+ hw/riscv/sifive_u.c                 | 151 +++++++++++++++++++++++-----
+ hw/riscv/virt.c                     |   4 +-
+ include/hw/riscv/sifive_e.h         |  16 ++-
+ include/hw/riscv/sifive_plic.h      |   1 -
+ include/hw/riscv/sifive_u.h         |  25 ++++-
+ 9 files changed, 239 insertions(+), 68 deletions(-)
 
 -- 
-Murilo
+2.17.0
