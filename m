@@ -1,30 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33428)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34188)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <drjones@redhat.com>) id 1fIbqi-0003aW-AJ
-	for qemu-devel@nongnu.org; Tue, 15 May 2018 11:26:52 -0400
+	(envelope-from <mlureau@redhat.com>) id 1fIbsT-00050W-7a
+	for qemu-devel@nongnu.org; Tue, 15 May 2018 11:28:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <drjones@redhat.com>) id 1fIbqf-0006e5-3p
-	for qemu-devel@nongnu.org; Tue, 15 May 2018 11:26:48 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:35106 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <drjones@redhat.com>) id 1fIbqe-0006dg-UY
-	for qemu-devel@nongnu.org; Tue, 15 May 2018 11:26:45 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.5])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 8AF3F4022931
-	for <qemu-devel@nongnu.org>; Tue, 15 May 2018 15:26:44 +0000 (UTC)
-Date: Tue, 15 May 2018 17:26:41 +0200
-From: Andrew Jones <drjones@redhat.com>
-Message-ID: <20180515152641.7oaxop77wgzokr7h@kamzik.brq.redhat.com>
-References: <1526395713-60357-1-git-send-email-imammedo@redhat.com>
+	(envelope-from <mlureau@redhat.com>) id 1fIbsQ-0007cH-2k
+	for qemu-devel@nongnu.org; Tue, 15 May 2018 11:28:37 -0400
+Received: from mail-it0-f68.google.com ([209.85.214.68]:52828)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <mlureau@redhat.com>) id 1fIbsP-0007Zu-UF
+	for qemu-devel@nongnu.org; Tue, 15 May 2018 11:28:34 -0400
+Received: by mail-it0-f68.google.com with SMTP id y189-v6so2490715itb.2
+	for <qemu-devel@nongnu.org>; Tue, 15 May 2018 08:28:32 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1526395713-60357-1-git-send-email-imammedo@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2] numa: clarify error message when node
- index is out of range in -numa dist, ...
+In-Reply-To: <20180515152500.19460-2-f4bug@amsat.org>
+References: <20180515152500.19460-1-f4bug@amsat.org>
+	<20180515152500.19460-2-f4bug@amsat.org>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>
+Date: Tue, 15 May 2018 17:28:31 +0200
+Message-ID: <CAMxuvawA5g7oZ4rF4+69Tko8_bZ1+k1JbPvgYe6mYVUccMYoyA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 1/2] hw/isa/superio: Fix inconsistent
+ use of Chardev->be
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,47 +30,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: qemu-devel@nongnu.org, ehabkost@redhat.com
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, qemu-stable <qemu-stable@nongnu.org>
 
-On Tue, May 15, 2018 at 04:48:33PM +0200, Igor Mammedov wrote:
-> When using following CLI:
->   -numa dist,src=128,dst=1,val=20
-> user gets a rather confusing error message:
->    "Invalid node 128, max possible could be 128"
-> 
-> Where 128 is number of nodes that QEMU supports (MAX_NODES),
-> while src/dst is an index up to that limit, so it should be
-> MAX_NODES - 1 in error message.
-> Make error message to explicitly state valid range for node
-> index to be more clear.
-> 
-> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-> Reviewed-by: Andrew Jones <drjones@redhat.com>
+On Tue, May 15, 2018 at 5:24 PM, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.o=
+rg> wrote:
+> 4c3119a6e3e and cd9526ab7c0 introduced an incorrect and inconsistent
+> use of Chardev->be. Also, this CharBackend member is private and is
+> not supposed to be accessible.
+>
+> Fix it by removing the inconsistent check.
+>
+> Cc: qemu-stable@nongnu.org
+> Reported-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+
+Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+
 > ---
->  numa.c | 4 ++--
+>  hw/isa/isa-superio.c | 4 ++--
 >  1 file changed, 2 insertions(+), 2 deletions(-)
-> 
-> diff --git a/numa.c b/numa.c
-> index a3637cc..9f0c49f 100644
-> --- a/numa.c
-> +++ b/numa.c
-> @@ -142,8 +142,8 @@ static void parse_numa_distance(NumaDistOptions *dist, Error **errp)
->  
->      if (src >= MAX_NODES || dst >= MAX_NODES) {
->          error_setg(errp,
-> -                   "Invalid node %d, max possible could be %d",
-> -                   MAX(src, dst), MAX_NODES);
-> +                   "Invalid node %d, The valid node range is [0 - %d]",
-                                      ^ should be a '.'
-
-And maybe need a '.' at the end of the second sentence too, as it's not
-an error phrase, but a real sentence.
-
-> +                   MAX(src, dst), MAX_NODES - 1);
->          return;
->      }
->  
-> -- 
-> 2.7.4
-> 
+>
+> diff --git a/hw/isa/isa-superio.c b/hw/isa/isa-superio.c
+> index 76286c81a1..bb88251f95 100644
+> --- a/hw/isa/isa-superio.c
+> +++ b/hw/isa/isa-superio.c
+> @@ -43,7 +43,7 @@ static void isa_superio_realize(DeviceState *dev, Error=
+ **errp)
+>          if (!k->parallel.is_enabled || k->parallel.is_enabled(sio, i)) {
+>              /* FIXME use a qdev chardev prop instead of parallel_hds[] *=
+/
+>              chr =3D parallel_hds[i];
+> -            if (chr =3D=3D NULL || chr->be) {
+> +            if (chr =3D=3D NULL) {
+>                  name =3D g_strdup_printf("discarding-parallel%d", i);
+>                  chr =3D qemu_chr_new(name, "null");
+>              } else {
+> @@ -83,7 +83,7 @@ static void isa_superio_realize(DeviceState *dev, Error=
+ **errp)
+>          if (!k->serial.is_enabled || k->serial.is_enabled(sio, i)) {
+>              /* FIXME use a qdev chardev prop instead of serial_hd() */
+>              chr =3D serial_hd(i);
+> -            if (chr =3D=3D NULL || chr->be) {
+> +            if (chr =3D=3D NULL) {
+>                  name =3D g_strdup_printf("discarding-serial%d", i);
+>                  chr =3D qemu_chr_new(name, "null");
+>              } else {
+> --
+> 2.17.0
+>
