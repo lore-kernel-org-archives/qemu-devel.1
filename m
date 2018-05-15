@@ -1,28 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38215)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40337)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fIYjt-00048W-OV
-	for qemu-devel@nongnu.org; Tue, 15 May 2018 08:07:35 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1fIYpo-0006kc-Sq
+	for qemu-devel@nongnu.org; Tue, 15 May 2018 08:13:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fIYjs-0003aT-Oe
-	for qemu-devel@nongnu.org; Tue, 15 May 2018 08:07:33 -0400
-Received: from mail-ot0-x244.google.com ([2607:f8b0:4003:c0f::244]:39075)
+	(envelope-from <peter.maydell@linaro.org>) id 1fIYpk-0007pb-0t
+	for qemu-devel@nongnu.org; Tue, 15 May 2018 08:13:40 -0400
+Received: from mail-ot0-x230.google.com ([2607:f8b0:4003:c0f::230]:44996)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fIYjs-0003aJ-JZ
-	for qemu-devel@nongnu.org; Tue, 15 May 2018 08:07:32 -0400
-Received: by mail-ot0-x244.google.com with SMTP id l12-v6so18139450oth.6
-	for <qemu-devel@nongnu.org>; Tue, 15 May 2018 05:07:32 -0700 (PDT)
+	id 1fIYpj-0007p5-S6
+	for qemu-devel@nongnu.org; Tue, 15 May 2018 08:13:35 -0400
+Received: by mail-ot0-x230.google.com with SMTP id g7-v6so18154331otj.11
+	for <qemu-devel@nongnu.org>; Tue, 15 May 2018 05:13:35 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <d7ad3d7d-ef06-536f-2b59-96358d70a3a4@linux.ibm.com>
-References: <CAFEAcA93DU7H73F-3Xd_4eP6MCZn-JHWMMeqVtyDHoMWYBXHiA@mail.gmail.com>
-	<20180515103229.6684fbe9.cohuck@redhat.com>
-	<d7ad3d7d-ef06-536f-2b59-96358d70a3a4@linux.ibm.com>
+In-Reply-To: <cc3f26a7-a8b7-35a8-9ffa-c5940c9c1927@weilnetz.de>
+References: <20180513090613.27960-1-sw@weilnetz.de>
+	<cc3f26a7-a8b7-35a8-9ffa-c5940c9c1927@weilnetz.de>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 15 May 2018 13:07:11 +0100
-Message-ID: <CAFEAcA_aH_oVbZnoFWWtJRGOqVDzr1NA9m1A1AVyqhKWQ-Fxpw@mail.gmail.com>
+Date: Tue, 15 May 2018 13:13:14 +0100
+Message-ID: <CAFEAcA9kcKb28uQJOnqCAC4Gf9b7Hnu0wJbG1nHQLF4U1T9sKA@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [qemu-s390x] virtio-ccw.c vs larger
- VIRTIO_QUEUE_MAX (coverity warning CID 1390619)
+Subject: Re: [Qemu-devel] [PATCH] disas/libvixl: Fix VIXL_FALLTHROUGH macro
+ for QEMU
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,50 +30,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Halil Pasic <pasic@linux.ibm.com>
-Cc: Cornelia Huck <cohuck@redhat.com>, qemu-s390x <qemu-s390x@nongnu.org>, Jason Wang <jasowang@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
+To: Stefan Weil <sw@weilnetz.de>
+Cc: QEMU Developer <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>
 
-On 15 May 2018 at 13:00, Halil Pasic <pasic@linux.ibm.com> wrote:
-> To sum it up, my take on the whole is the diff below. I can convert
-> it to a proper patch if we agree that's the way to go.
+On 13 May 2018 at 10:57, Stefan Weil <sw@weilnetz.de> wrote:
+> Even with the above patch, disas/libvixl raises a compiler warning for a
+> fall through case. The patch below fixes that warning, but I am not sure
+> whether a fall through is correct there.
 >
-> From: Halil Pasic <pasic@linux.ibm.com>
-> Date: Tue, 15 May 2018 13:57:44 +0200
-> Subject: [PATCH] WIP: cleanup virtio notify
+> Stefan
 >
-> Signed-off-by: Halil Pasic <pasic@linux.ibm.com>
-> ---
->  hw/s390x/virtio-ccw.c | 9 +++------
->  1 file changed, 3 insertions(+), 6 deletions(-)
 >
-> diff --git a/hw/s390x/virtio-ccw.c b/hw/s390x/virtio-ccw.c
-> index e51fbefd23..22078605d1 100644
-> --- a/hw/s390x/virtio-ccw.c
-> +++ b/hw/s390x/virtio-ccw.c
-> @@ -1003,10 +1003,8 @@ static void virtio_ccw_notify(DeviceState *d,
-> uint16_t vector)
->      SubchDev *sch = ccw_dev->sch;
->      uint64_t indicators;
->
-> -    /* queue indicators + secondary indicators */
-> -    if (vector >= VIRTIO_QUEUE_MAX + 64) {
-> -        return;
-> -    }
-> +    /* vector == VIRTIO_QUEUE_MAX means configuration change */
-> +    assert(vector <= VIRTIO_QUEUE_MAX);
->
->      if (vector < VIRTIO_QUEUE_MAX) {
->          if (!dev->indicators) {
+> diff --git a/disas/libvixl/vixl/a64/disasm-a64.cc
+> b/disas/libvixl/vixl/a64/disasm-a64.cc
+> index 7a58a5c087..5481d94209 100644
+> --- a/disas/libvixl/vixl/a64/disasm-a64.cc
+> +++ b/disas/libvixl/vixl/a64/disasm-a64.cc
+> @@ -2986,6 +2986,7 @@ int Disassembler::SubstituteImmediateField(const
+> Instruction* instr,
+>            return 3;
+>          }
+>        }
+> +      VIXL_FALLTHROUGH(); // ???
+>      }
+>      case 'C': {  // ICondB - Immediate Conditional Branch.
+>        int64_t offset = instr->ImmCondBranch() << 2;
 
-This will not be sufficient to satisfy Coverity, because
-VIRTIO_QUEUE_MAX is 1024, and that is way too big to use as
-a shift count, and that's the only check that Coverity can see
-on the code path leading into the "1ULL << vector" code.
+This is fixed in upstream vixl, in fact:
 
-If it's not possible to get here with a vector that's 64 or more,
-you need to
-    assert(vector < NR_CLASSIC_INDICATOR_BITS);
-somewhere.
+https://git.linaro.org/arm/vixl.git/commit/?id=de326f850f736c3a337fda52845ed3d2e620cc02
 
 thanks
 -- PMM
