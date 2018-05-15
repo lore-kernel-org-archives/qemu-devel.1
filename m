@@ -1,30 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58159)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58175)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1fIjYb-00031n-HG
-	for qemu-devel@nongnu.org; Tue, 15 May 2018 19:40:40 -0400
+	(envelope-from <quintela@redhat.com>) id 1fIjYe-00032S-7J
+	for qemu-devel@nongnu.org; Tue, 15 May 2018 19:40:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1fIjYa-0001lT-DM
-	for qemu-devel@nongnu.org; Tue, 15 May 2018 19:40:37 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:56878 helo=mx1.redhat.com)
+	(envelope-from <quintela@redhat.com>) id 1fIjYc-0001ma-KQ
+	for qemu-devel@nongnu.org; Tue, 15 May 2018 19:40:39 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:56492 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1fIjYZ-0001l6-V7
-	for qemu-devel@nongnu.org; Tue, 15 May 2018 19:40:36 -0400
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1fIjYc-0001mN-F2
+	for qemu-devel@nongnu.org; Tue, 15 May 2018 19:40:38 -0400
 Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
 	[10.11.54.4])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 725EB400E9BA
-	for <qemu-devel@nongnu.org>; Tue, 15 May 2018 23:40:35 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 0EC1E40201A0
+	for <qemu-devel@nongnu.org>; Tue, 15 May 2018 23:40:38 +0000 (UTC)
 From: Juan Quintela <quintela@redhat.com>
-Date: Wed, 16 May 2018 01:39:48 +0200
-Message-Id: <20180515234017.2277-12-quintela@redhat.com>
+Date: Wed, 16 May 2018 01:39:50 +0200
+Message-Id: <20180515234017.2277-14-quintela@redhat.com>
 In-Reply-To: <20180515234017.2277-1-quintela@redhat.com>
 References: <20180515234017.2277-1-quintela@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 11/40] migration: Transmit initial package
- through the multifd channels
+Subject: [Qemu-devel] [PULL 13/40] migration: let incoming side use thread
+ context
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,172 +33,85 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: dgilbert@redhat.com, lvivier@redhat.com, peterx@redhat.com
 
+From: Peter Xu <peterx@redhat.com>
+
+The old incoming migration is running in main thread and default
+gcontext.  With the new qio_channel_add_watch_full() we can now let it
+run in the thread's own gcontext (if there is one).
+
+Currently this patch does nothing alone.  But when any of the incoming
+migration is run in another iothread (e.g., the upcoming migrate-recover
+command), this patch will bind the incoming logic to the iothread
+instead of the main thread (which may already get page faulted and
+hanged).
+
+RDMA is not considered for now since it's not even using the QIO watch
+framework at all.
+
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Reviewed-by: Juan Quintela <quintela@redhat.com>
+Signed-off-by: Peter Xu <peterx@redhat.com>
+Message-Id: <20180502104740.12123-2-peterx@redhat.com>
 Signed-off-by: Juan Quintela <quintela@redhat.com>
-Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
-
---
-
-Be network agnostic.
-Add error checking for all values.
 ---
- migration/ram.c | 104 +++++++++++++++++++++++++++++++++++++++++++++---
- 1 file changed, 99 insertions(+), 5 deletions(-)
+ migration/exec.c   | 9 ++++-----
+ migration/fd.c     | 9 ++++-----
+ migration/socket.c | 7 ++++---
+ 3 files changed, 12 insertions(+), 13 deletions(-)
 
-diff --git a/migration/ram.c b/migration/ram.c
-index f7e8615e15..f46a373074 100644
---- a/migration/ram.c
-+++ b/migration/ram.c
-@@ -52,6 +52,8 @@
- #include "qemu/rcu_queue.h"
- #include "migration/colo.h"
- #include "migration/block.h"
-+#include "sysemu/sysemu.h"
-+#include "qemu/uuid.h"
-=20
- /***********************************************************/
- /* ram save/restore */
-@@ -433,6 +435,16 @@ exit:
-=20
- /* Multiple fd's */
-=20
-+#define MULTIFD_MAGIC 0x11223344U
-+#define MULTIFD_VERSION 1
-+
-+typedef struct {
-+    uint32_t magic;
-+    uint32_t version;
-+    unsigned char uuid[16]; /* QemuUUID */
-+    uint8_t id;
-+} __attribute__((packed)) MultiFDInit_t;
-+
- struct MultiFDSendParams {
-     uint8_t id;
-     char *name;
-@@ -445,6 +457,68 @@ struct MultiFDSendParams {
- };
- typedef struct MultiFDSendParams MultiFDSendParams;
-=20
-+static int multifd_send_initial_packet(MultiFDSendParams *p, Error **err=
-p)
-+{
-+    MultiFDInit_t msg;
-+    int ret;
-+
-+    msg.magic =3D cpu_to_be32(MULTIFD_MAGIC);
-+    msg.version =3D cpu_to_be32(MULTIFD_VERSION);
-+    msg.id =3D p->id;
-+    memcpy(msg.uuid, &qemu_uuid.data, sizeof(msg.uuid));
-+
-+    ret =3D qio_channel_write_all(p->c, (char *)&msg, sizeof(msg), errp)=
-;
-+    if (ret !=3D 0) {
-+        return -1;
-+    }
-+    return 0;
-+}
-+
-+static int multifd_recv_initial_packet(QIOChannel *c, Error **errp)
-+{
-+    MultiFDInit_t msg;
-+    int ret;
-+
-+    ret =3D qio_channel_read_all(c, (char *)&msg, sizeof(msg), errp);
-+    if (ret !=3D 0) {
-+        return -1;
-+    }
-+
-+    be32_to_cpus(&msg.magic);
-+    be32_to_cpus(&msg.version);
-+
-+    if (msg.magic !=3D MULTIFD_MAGIC) {
-+        error_setg(errp, "multifd: received packet magic %x "
-+                   "expected %x", msg.magic, MULTIFD_MAGIC);
-+        return -1;
-+    }
-+
-+    if (msg.version !=3D MULTIFD_VERSION) {
-+        error_setg(errp, "multifd: received packet version %d "
-+                   "expected %d", msg.version, MULTIFD_VERSION);
-+        return -1;
-+    }
-+
-+    if (memcmp(msg.uuid, &qemu_uuid, sizeof(qemu_uuid))) {
-+        char *uuid =3D qemu_uuid_unparse_strdup(&qemu_uuid);
-+        char *msg_uuid =3D qemu_uuid_unparse_strdup((const QemuUUID *)ms=
-g.uuid);
-+
-+        error_setg(errp, "multifd: received uuid '%s' and expected "
-+                   "uuid '%s' for channel %hhd", msg_uuid, uuid, msg.id)=
-;
-+        g_free(uuid);
-+        g_free(msg_uuid);
-+        return -1;
-+    }
-+
-+    if (msg.id > migrate_multifd_channels()) {
-+        error_setg(errp, "multifd: received channel version %d "
-+                   "expected %d", msg.version, MULTIFD_VERSION);
-+        return -1;
-+    }
-+
-+    return msg.id;
-+}
-+
- struct {
-     MultiFDSendParams *params;
-     /* number of created threads */
-@@ -509,6 +583,11 @@ int multifd_save_cleanup(Error **errp)
- static void *multifd_send_thread(void *opaque)
- {
-     MultiFDSendParams *p =3D opaque;
-+    Error *local_err =3D NULL;
-+
-+    if (multifd_send_initial_packet(p, &local_err) < 0) {
-+        goto out;
-+    }
-=20
-     while (true) {
-         qemu_mutex_lock(&p->mutex);
-@@ -520,6 +599,11 @@ static void *multifd_send_thread(void *opaque)
-         qemu_sem_wait(&p->sem);
+diff --git a/migration/exec.c b/migration/exec.c
+index 0bc5a427dd..9d0f82f1f0 100644
+--- a/migration/exec.c
++++ b/migration/exec.c
+@@ -65,9 +65,8 @@ void exec_start_incoming_migration(const char *command, Error **errp)
      }
-=20
-+out:
-+    if (local_err) {
-+        multifd_send_terminate_threads(local_err);
-+    }
-+
-     qemu_mutex_lock(&p->mutex);
-     p->running =3D false;
-     qemu_mutex_unlock(&p->mutex);
-@@ -704,12 +788,22 @@ bool multifd_recv_all_channels_created(void)
- void multifd_recv_new_channel(QIOChannel *ioc)
- {
-     MultiFDRecvParams *p;
--    /* we need to invent channels id's until we transmit */
--    /* we will remove this on a later patch */
--    static int i;
-+    Error *local_err =3D NULL;
-+    int id;
-=20
--    p =3D &multifd_recv_state->params[i];
--    i++;
-+    id =3D multifd_recv_initial_packet(ioc, &local_err);
-+    if (id < 0) {
-+        multifd_recv_terminate_threads(local_err);
-+        return;
-+    }
-+
-+    p =3D &multifd_recv_state->params[id];
-+    if (p->c !=3D NULL) {
-+        error_setg(&local_err, "multifd: received id '%d' already setup'=
-",
-+                   id);
-+        multifd_recv_terminate_threads(local_err);
-+        return;
-+    }
-     p->c =3D ioc;
-     object_ref(OBJECT(ioc));
-=20
---=20
+ 
+     qio_channel_set_name(ioc, "migration-exec-incoming");
+-    qio_channel_add_watch(ioc,
+-                          G_IO_IN,
+-                          exec_accept_incoming_migration,
+-                          NULL,
+-                          NULL);
++    qio_channel_add_watch_full(ioc, G_IO_IN,
++                               exec_accept_incoming_migration,
++                               NULL, NULL,
++                               g_main_context_get_thread_default());
+ }
+diff --git a/migration/fd.c b/migration/fd.c
+index cd06182d1e..9a380bbbc4 100644
+--- a/migration/fd.c
++++ b/migration/fd.c
+@@ -66,9 +66,8 @@ void fd_start_incoming_migration(const char *infd, Error **errp)
+     }
+ 
+     qio_channel_set_name(QIO_CHANNEL(ioc), "migration-fd-incoming");
+-    qio_channel_add_watch(ioc,
+-                          G_IO_IN,
+-                          fd_accept_incoming_migration,
+-                          NULL,
+-                          NULL);
++    qio_channel_add_watch_full(ioc, G_IO_IN,
++                               fd_accept_incoming_migration,
++                               NULL, NULL,
++                               g_main_context_get_thread_default());
+ }
+diff --git a/migration/socket.c b/migration/socket.c
+index 7a5eb562b8..3456eb76e9 100644
+--- a/migration/socket.c
++++ b/migration/socket.c
+@@ -190,9 +190,10 @@ static void socket_start_incoming_migration(SocketAddress *saddr,
+         return;
+     }
+ 
+-    qio_net_listener_set_client_func(listener,
+-                                     socket_accept_incoming_migration,
+-                                     NULL, NULL);
++    qio_net_listener_set_client_func_full(listener,
++                                          socket_accept_incoming_migration,
++                                          NULL, NULL,
++                                          g_main_context_get_thread_default());
+ }
+ 
+ void tcp_start_incoming_migration(const char *host_port, Error **errp)
+-- 
 2.17.0
