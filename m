@@ -1,23 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57921)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60202)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <debby83729@gmail.com>) id 1fIOjj-0001zE-QP
-	for qemu-devel@nongnu.org; Mon, 14 May 2018 21:26:45 -0400
+	(envelope-from <suhang16@mails.ucas.ac.cn>) id 1fIP2V-0007Bf-5E
+	for qemu-devel@nongnu.org; Mon, 14 May 2018 21:46:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <debby83729@gmail.com>) id 1fIOji-0005g3-9b
-	for qemu-devel@nongnu.org; Mon, 14 May 2018 21:26:43 -0400
-Received: from mail-wm0-x22c.google.com ([2a00:1450:400c:c09::22c]:33436)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <debby83729@gmail.com>)
-	id 1fIOjh-0005a6-UF
-	for qemu-devel@nongnu.org; Mon, 14 May 2018 21:26:42 -0400
-Received: by mail-wm0-x22c.google.com with SMTP id x12-v6so13863308wmc.0
-	for <qemu-devel@nongnu.org>; Mon, 14 May 2018 18:26:41 -0700 (PDT)
-MIME-Version: 1.0
-From: Eva Chen <debby83729@gmail.com>
-Date: Tue, 15 May 2018 09:26:19 +0800
-Message-ID: <CAG0V3WQCJ-ttZNo3A4tLy3Y=QADhfk8VaDFRRbrLjNBRWYw63w@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: [Qemu-devel] Question about io_writex()
+	(envelope-from <suhang16@mails.ucas.ac.cn>) id 1fIP2S-0007TT-He
+	for qemu-devel@nongnu.org; Mon, 14 May 2018 21:46:07 -0400
+Received: from smtp20.cstnet.cn ([159.226.251.20]:34224 helo=cstnet.cn)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <suhang16@mails.ucas.ac.cn>) id 1fIP2R-0007Gh-SQ
+	for qemu-devel@nongnu.org; Mon, 14 May 2018 21:46:04 -0400
+From: Su Hang <suhang16@mails.ucas.ac.cn>
+Date: Tue, 15 May 2018 09:45:56 +0800
+Message-Id: <1526348758-6643-1-git-send-email-suhang16@mails.ucas.ac.cn>
+Subject: [Qemu-devel] [PATCH v8 0/2] Implement Hex file loader and add test
+ case
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,70 +22,95 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: stefanha@gmail.com, jim@groklearning.com, joel@jms.id.au
+Cc: qemu-devel@nongnu.org
 
-Hello,
+These series of patchs implement Intel Hexadecimal File loader and
+add QTest testcase to verify the correctness of Loader.
 
-I want to know the flow of how devices read/write function be called by
-code_gen_buffer().
-Take pl110_write() for example, I set a breakpoint in  pl110_write(), and
-the backtrace shows bellow.
+v1:
+--  Basic version.
 
-(gdb)
-#0 * pl110_write* (opaque=0x555556e8f3f0, offset=28, val=0, size=4) at
-hw/display/pl110.c:378
-#1  0x00005555557e398b in memory_region_write_accessor (mr=0x555556e8f6f0,
-addr=28, value=<optimized out>, size=4, shift=<optimized out>,
-mask=<optimized out>,
-    attrs=...) at
-/home/jerry/qemu_new-2.10.0-rc4/qemu-2.10.0-rc4/memory.c:529
-#2  0x00005555557e031b in access_with_adjusted_size (addr=addr@entry=28,
-value=value@entry=0x7fffe821b3f8, size=size@entry=4,
-access_size_min=<optimized out>,
-    access_size_max=<optimized out>, access=access@entry=0x5555557e3910
-<memory_region_write_accessor>, mr=mr@entry=0x555556e8f6f0,
-attrs=attrs@entry=...)
-    at /home/jerry/qemu_new-2.10.0-rc4/qemu-2.10.0-rc4/memory.c:595
-#3  0x00005555557e4d0b in memory_region_dispatch_write (mr=<optimized out>,
-addr=28, data=data@entry=0, size=size@entry=4, attrs=...)
-    at /home/jerry/qemu_new-2.10.0-rc4/qemu-2.10.0-rc4/memory.c:1337
-#4  0x0000555555776eae in* io_writex* (env=0x5555568294f0,
-iotlbentry=0x555556839a18, val=0, addr=3498860572, retaddr=<optimized out>,
-size=4)
-    at
-/home/jerry/qemu_new-2.10.0-rc4/qemu-2.10.0-rc4/accel/tcg/cputlb.c:798
-#5  0x00007fffe95609fc in code_gen_buffer ()
-#6  0x00005555557fe0d5 in cpu_tb_exec (itb=<optimized out>, itb=<optimized
-out>, cpu=0x7fffe95608c0 <code_gen_buffer+9767062>)
-    at
-/home/jerry/qemu_new-2.10.0-rc4/qemu-2.10.0-rc4/accel/tcg/cpu-exec.c:166
-#7  cpu_loop_exec_tb (tb_exit=<synthetic pointer>, last_tb=<synthetic
-pointer>, tb=<optimized out>, cpu=0x7fffe95608c0 <code_gen_buffer+9767062>)
-    at
-/home/jerry/qemu_new-2.10.0-rc4/qemu-2.10.0-rc4/accel/tcg/cpu-exec.c:578
-#8  cpu_exec (cpu=cpu@entry=0x555556821260) at
-/home/jerry/qemu_new-2.10.0-rc4/qemu-2.10.0-rc4/accel/tcg/cpu-exec.c:676
-#9  0x00005555557cf527 in tcg_cpu_exec (cpu=0x555556821260) at
-/home/jerry/qemu_new-2.10.0-rc4/qemu-2.10.0-rc4/cpus.c:1270
-#10 qemu_tcg_cpu_thread_fn (arg=0x555556821260) at
-/home/jerry/qemu_new-2.10.0-rc4/qemu-2.10.0-rc4/cpus.c:1473
-#11 0x00007ffff46b0184 in start_thread (arg=0x7fffe821c700) at
-pthread_create.c:312
-#12 0x00007ffff43dcffd in clone () at
-../sysdeps/unix/sysv/linux/x86_64/clone.S:111
+v2:
+--  Replace `do{}while(cond);` block with `for(;;)` block.
 
-This backtrace shows that pl110_write() is called by io_wrtex(), but I
-can't find who call the io_writex().
-code_gen_buffer() is the part that QEMU execute the TB, I think maybe
-io_writex() is called by the helper function but I only find io_writex() in
-softmmu_template.h (*static inline void glue(io_write, SUFFIX)), *which is
-not related to the helper function.
-Could I bother you to explain more about how io_writex() to be called and
-any method that recommended for others that want to trace the flow of
-device read/write()?
+v3:
+--  Add two new files information in MAINTAINERS.
 
-I will be grateful for any advice, thanks.
+v4:
+--  Correct the 'test.hex' path in hexloader-test.c.
+
+v5:
+--  Split huge parse_hex_blob() function into four small function;
+--  Add check for memory bounds;
+--  Check validation for Record type;
+--  Replace function ctoh() with glib function g_ascii_xdigit_value();
+--  Remove check for '.hex' suffix;
+--  Remove unnecessary type cast;
+--  Remove duplicate zero-initialization;
+--  Correct typos;
+
+v6:
+--  Call Intel HEX loader after load_uimage_as();
+--  Remove use of KERNEL_LOAD_ADDR;
+--  Change (hwaddr) type argument to (hwaddr *) type;
+--  Use new struct HexParser to contain all arguments needed by
+        handle_record_type();
+--  Enable discontiguous data records (again);
+--  Remove unnecessary memory clean: bin_buf and HexLine line;
+--  Correct typo;
+--  Remove unnecessary check for hex file size;
+--  Add entry point handle for START_SEG_ADDR_RECORD and
+        START_LINEAR_ADDR_RECORD record type;
+--  Use hwaddr * type to store entry point;
+
+v7:
+--  Remove unnecessary code style changes;
+--  Replace `bool` with `size_t` for function `parse_record` return type;
+--  Replace `int` with `size_t` for struct `HexParser` member field
+        `total_size` type;
+--  Replace `int` with `size_t` for function `handle_record_type` return type;
+--  Return an error when encountered unimplemented data type
+        `START_SEG_ADDR_RECORD`;
+--  Add check for `START_LINEAR_ADDR_RECORD` data type:
+        byte_count == 4 and address == 0;
+--  Rename struct `HexParser` member field `addr` to `start_addr`;
+--  Replace `int` with `size_t` for function `parse_hex_blob` return type;
+--  Stop incrementing `record_index` when encountered whitespace;
+--  Replace
+    `if ((record_index >> 1) - LEN_EXCEPT_DATA != parser.line.byte_count)`
+    with
+    `if ((LEN_EXCEPT_DATA + parser.line.byte_count) * 2 != record_index)`
+--  Remove unused field `max_sz`;
+--  Replace `int` with `size_t` for local variable `total_size`
+        in function `parse_hex_blob`
+--  Rename function `load_image_targphys_hex_as` argument `addr` to `entry`;
+
+v8:
+--  Discard change in code logic: Stop attempting load 32-bit kernel after
+        failed to load 64-bit kernel image;
+--  Rename function name `load_image_targphys_hex_as` to `load_targphys_hex_as`
+        in comment;
+--  Correct grammatical errors in comments;
+--  Drop non-exist argument description in comment;
+--  Drop macro function `rom_add_hex_blob_as`, replace it with
+        `rom_add_blob_fixed_as`, because they are equivalent;
 
 
-Sincerely,
-Eva
+Su Hang (2):
+  Implement .hex file loader
+  Add QTest testcase for the Intel Hexadecimal Object File Loader.
+
+ MAINTAINERS                          |   6 +
+ hw/arm/boot.c                        |   7 +-
+ hw/core/loader.c                     | 246 +++++++++++++++++++++++++++++++++++
+ include/hw/loader.h                  |  12 ++
+ tests/Makefile.include               |   2 +
+ tests/hex-loader-check-data/test.hex |  12 ++
+ tests/hexloader-test.c               |  56 ++++++++
+ 7 files changed, 340 insertions(+), 1 deletion(-)
+ create mode 100644 tests/hex-loader-check-data/test.hex
+ create mode 100644 tests/hexloader-test.c
+
+--
+2.7.4
