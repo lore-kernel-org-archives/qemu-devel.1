@@ -1,32 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50509)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50501)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fIUQZ-00026M-J6
+	(envelope-from <bounces@canonical.com>) id 1fIUQY-00026C-Hu
 	for qemu-devel@nongnu.org; Tue, 15 May 2018 03:31:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fIUQY-0007As-Ic
-	for qemu-devel@nongnu.org; Tue, 15 May 2018 03:31:19 -0400
-Received: from indium.canonical.com ([91.189.90.7]:36232)
+	(envelope-from <bounces@canonical.com>) id 1fIUQV-00077T-Dj
+	for qemu-devel@nongnu.org; Tue, 15 May 2018 03:31:18 -0400
+Received: from indium.canonical.com ([91.189.90.7]:36030)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1fIUQY-00079k-Bz
-	for qemu-devel@nongnu.org; Tue, 15 May 2018 03:31:18 -0400
+	id 1fIUQV-000767-6t
+	for qemu-devel@nongnu.org; Tue, 15 May 2018 03:31:15 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1fIUQW-0001Pu-Ll
-	for <qemu-devel@nongnu.org>; Tue, 15 May 2018 07:31:16 +0000
+	id 1fIUQT-0001KN-Dd
+	for <qemu-devel@nongnu.org>; Tue, 15 May 2018 07:31:13 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id A1F972E8F3E
-	for <qemu-devel@nongnu.org>; Tue, 15 May 2018 07:31:16 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id 4FD7F2E8F42
+	for <qemu-devel@nongnu.org>; Tue, 15 May 2018 07:31:13 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Tue, 15 May 2018 07:19:30 -0000
+Date: Tue, 15 May 2018 07:17:01 -0000
 From: =?utf-8?b?7oO/IENocmlzdGlhbiBFaHJoYXJkdCDug78=?=
 	<1769053@bugs.launchpad.net>
 Reply-To: Bug 1769053 <1769053@bugs.launchpad.net>
 Sender: bounces@canonical.com
 References: <152541524728.557.4600864098110042577.malonedeb@gac.canonical.com>
-Message-Id: <152636877088.28017.11818502889907819278.malone@wampee.canonical.com>
+Message-Id: <152636862197.28061.16069412499623128753.malone@wampee.canonical.com>
 Errors-To: bounces@canonical.com
 Subject: [Qemu-devel] [Bug 1769053] Re: Cannot start a guest with more than
  1TB of RAM
@@ -40,16 +40,24 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-Actually the qemu tasks are "invalid" not "incomplete" as they currently
-are - after our discussions here it seems we agreed that qemu is doing
-what is intended (and the reasons why larger bits are not the default).
-Therefore set the status to that for the qemu tasks.
+Crit prio on Qemu which was explained to work just fine is not correct IMHO.
+After checking with David he meant to want to raise the prio on the suggest=
+ed libvirt extensions instead. I'm re-triaging this bug for that and will p=
+ing David Berrange if work on this is already tracked on a libvirt-BZ or wo=
+rked on in general.
+
+** Also affects: libvirt (Ubuntu)
+   Importance: Undecided
+       Status: New
+
+** Changed in: libvirt (Ubuntu)
+       Status: New =3D> Triaged
+
+** Changed in: libvirt (Ubuntu)
+   Importance: Undecided =3D> High
 
 ** Changed in: qemu (Ubuntu)
-       Status: Incomplete =3D> Invalid
-
-** Changed in: qemu
-       Status: Incomplete =3D> Invalid
+   Importance: Critical =3D> Undecided
 
 -- =
 
