@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40995)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41071)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1fIc95-0002iu-L3
-	for qemu-devel@nongnu.org; Tue, 15 May 2018 11:45:51 -0400
+	(envelope-from <armbru@redhat.com>) id 1fIc9G-0002qx-44
+	for qemu-devel@nongnu.org; Tue, 15 May 2018 11:46:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1fIc90-00054c-Na
-	for qemu-devel@nongnu.org; Tue, 15 May 2018 11:45:47 -0400
-Date: Tue, 15 May 2018 17:45:38 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20180515174538.45357d97.cohuck@redhat.com>
-In-Reply-To: <190e9b8d-0d53-6061-0267-830a6f5b0836@linux.ibm.com>
-References: <CAFEAcA93DU7H73F-3Xd_4eP6MCZn-JHWMMeqVtyDHoMWYBXHiA@mail.gmail.com>
-	<20180515103229.6684fbe9.cohuck@redhat.com>
-	<d7ad3d7d-ef06-536f-2b59-96358d70a3a4@linux.ibm.com>
-	<CAFEAcA_aH_oVbZnoFWWtJRGOqVDzr1NA9m1A1AVyqhKWQ-Fxpw@mail.gmail.com>
-	<91d72a4d-53d8-647d-552d-cfa50bed1551@linux.ibm.com>
-	<20180515160138.53a7852f.cohuck@redhat.com>
-	<190e9b8d-0d53-6061-0267-830a6f5b0836@linux.ibm.com>
+	(envelope-from <armbru@redhat.com>) id 1fIc9E-0005Es-8J
+	for qemu-devel@nongnu.org; Tue, 15 May 2018 11:45:58 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:34802 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fIc9E-0005ES-3E
+	for qemu-devel@nongnu.org; Tue, 15 May 2018 11:45:56 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <20180515140944.15979-1-danielhb@linux.ibm.com>
+	<20180515140944.15979-2-danielhb@linux.ibm.com>
+Date: Tue, 15 May 2018 17:45:54 +0200
+In-Reply-To: <20180515140944.15979-2-danielhb@linux.ibm.com> (Daniel Henrique
+	Barboza's message of "Tue, 15 May 2018 11:09:43 -0300")
+Message-ID: <87zi10udl9.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [qemu-s390x] virtio-ccw.c vs larger
- VIRTIO_QUEUE_MAX (coverity warning CID 1390619)
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v6 1/2] qmp: adding
+ 'wakeup-suspend-support' in query-target
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,116 +28,186 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Halil Pasic <pasic@linux.ibm.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-s390x <qemu-s390x@nongnu.org>, Jason Wang <jasowang@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
+To: Daniel Henrique Barboza <danielhb@linux.ibm.com>
+Cc: qemu-devel@nongnu.org, mdroth@linux.vnet.ibm.com, dgilbert@redhat.com
 
-On Tue, 15 May 2018 17:30:23 +0200
-Halil Pasic <pasic@linux.ibm.com> wrote:
+Daniel Henrique Barboza <danielhb@linux.ibm.com> writes:
 
-> On 05/15/2018 04:01 PM, Cornelia Huck wrote:
-> > On Tue, 15 May 2018 15:17:51 +0200
-> > Halil Pasic <pasic@linux.ibm.com> wrote:
-> > 
-> >   
-> >> --------------------------------8<------------------------------------------------
-> >> From: Halil Pasic <pasic@linux.ibm.com>
-> >> Date: Tue, 15 May 2018 13:57:44 +0200
-> >> Subject: [PATCH] WIP: cleanup virtio notify
-> >>
-> >> Signed-off-by: Halil Pasic <pasic@linux.ibm.com>
-> >> ---
-> >>    hw/s390x/virtio-ccw.c | 10 ++++------
-> >>    1 file changed, 4 insertions(+), 6 deletions(-)
-> >>
-> >> diff --git a/hw/s390x/virtio-ccw.c b/hw/s390x/virtio-ccw.c
-> >> index 22df33b509..be433b0336 100644
-> >> --- a/hw/s390x/virtio-ccw.c
-> >> +++ b/hw/s390x/virtio-ccw.c
-> >> @@ -1003,10 +1003,8 @@ static void virtio_ccw_notify(DeviceState *d, uint16_t vector)
-> >>        SubchDev *sch = ccw_dev->sch;
-> >>        uint64_t indicators;
-> >>
-> >> -    /* queue indicators + secondary indicators */
-> >> -    if (vector >= VIRTIO_QUEUE_MAX + 64) {
-> >> -        return;
-> >> -    }
-> >> +    /* vector == VIRTIO_QUEUE_MAX means configuration change */  
-> 
-> I guess you still prefer the verbose comment, or? (I mean
-> "vector < VIRTIO_QUEUE_MAX: notification for a virtqueue
-> vector == VIRTIO_QUEUE_MAX: configuration change notification
-> bits beyond that are unused and should never be notified for")
+> When issuing the qmp/hmp 'system_wakeup' command, what happens in a
+> nutshell is:
+>
+> - qmp_system_wakeup_request set runstate to RUNNING, sets a wakeup_reason
+> and notify the event
+> - in the main_loop, all vcpus are paused, a system reset is issued, all
+> subscribers of wakeup_notifiers receives a notification, vcpus are then
+> resumed and the wake up QAPI event is fired
+>
+> Note that this procedure alone doesn't ensure that the guest will awake
+> from SUSPENDED state - the subscribers of the wake up event must take
+> action to resume the guest, otherwise the guest will simply reboot.
+>
+> At this moment there are only two subscribers of the wake up event: one
+> in hw/acpi/core.c and another one in hw/i386/xen/xen-hvm.c. This means
+> that system_wakeup does not work as intended with other architectures.
+>
+> However, only the presence of 'system_wakeup' is required for QGA to
+> support 'guest-suspend-ram' and 'guest-suspend-hybrid' at this moment.
+> This means that the user/management will expect to suspend the guest using
+> one of those suspend commands and then resume execution using system_wakeup,
+> regardless of the support offered in system_wakeup in the first place.
+>
+> This patch adds a new flag called 'wakeup-suspend-support' in TargetInfo
+> that allows the caller to query if the guest supports wake up from
+> suspend via system_wakeup. It goes over the subscribers of the wake up
+> event and, if it's empty, it assumes that the guest does not support
+> wake up from suspend (and thus, pm-suspend itself).
+>
+> This is the expected output of query-target when running a x86 guest:
+>
+> {"execute" : "query-target"}
+> {"return": {"arch": "x86_64", "wakeup-suspend-support": true}}
+>
+> This is the output when running a pseries guest:
+>
+> {"execute" : "query-target"}
+> {"return": {"arch": "ppc64", "wakeup-suspend-support": false}}
+>
+> Given that the TargetInfo structure is read-only, adding a new flag to
+> it is backwards compatible. There is no need to deprecate the old
+> TargetInfo format.
+>
+> With this extra tool, management can avoid situations where a guest
+> that does not have proper suspend/wake capabilities ends up in
+> inconsistent state (e.g.
+> https://github.com/open-power-host-os/qemu/issues/31).
+>
+> Reported-by: Balamuruhan S <bala24@linux.vnet.ibm.com>
+> Signed-off-by: Daniel Henrique Barboza <danielhb@linux.ibm.com>
+> ---
+>  arch_init.c             |  1 +
+>  include/sysemu/sysemu.h |  1 +
+>  qapi/misc.json          |  4 +++-
+>  vl.c                    | 21 +++++++++++++++++++++
+>  4 files changed, 26 insertions(+), 1 deletion(-)
+>
+> diff --git a/arch_init.c b/arch_init.c
+> index 9597218ced..67bdf27528 100644
+> --- a/arch_init.c
+> +++ b/arch_init.c
+> @@ -115,6 +115,7 @@ TargetInfo *qmp_query_target(Error **errp)
+>  
+>      info->arch = qapi_enum_parse(&SysEmuTarget_lookup, TARGET_NAME, -1,
+>                                   &error_abort);
+> +    info->wakeup_suspend_support = !qemu_wakeup_notifier_is_empty();
 
-I think it's a good idea to spell it out, before people are confused
-again next year.
+Huh?  Hmm, see "hack" below.
 
-> 
-> I can incorporate it for the proper patch.
-> 
-> >> +    assert(vector <= VIRTIO_QUEUE_MAX);  
-> 
-> I knew changing return to assert was dangerous, and that I forgot
-> something. :/
-> 
-> For this to actually work I need:
-> 
->   
-> -    /* queue indicators + secondary indicators */
-> -    if (vector >= VIRTIO_QUEUE_MAX + 64) {
-> +    if (vector == VIRTIO_NO_VECTOR) {
->           return;
->       }
-> +    /* vector == VIRTIO_QUEUE_MAX means configuration change */
-> +    assert(vector <= VIRTIO_QUEUE_MAX);
-> 
-> Do you prefer keeping the assert, or would you prefer a simple
-> if (vector > VIRTIO_QUEUE_MAX) {
->      return;
-> }
-> 
-> I think I prefer  handling the VIRTIO_NO_VECTOR separately and keeping
-> the assert.
+>  
+>      return info;
+>  }
+> diff --git a/include/sysemu/sysemu.h b/include/sysemu/sysemu.h
+> index 544ab77a2b..fbe2a3373e 100644
+> --- a/include/sysemu/sysemu.h
+> +++ b/include/sysemu/sysemu.h
+> @@ -69,6 +69,7 @@ typedef enum WakeupReason {
+>  void qemu_system_reset_request(ShutdownCause reason);
+>  void qemu_system_suspend_request(void);
+>  void qemu_register_suspend_notifier(Notifier *notifier);
+> +bool qemu_wakeup_notifier_is_empty(void);
+>  void qemu_system_wakeup_request(WakeupReason reason);
+>  void qemu_system_wakeup_enable(WakeupReason reason, bool enabled);
+>  void qemu_register_wakeup_notifier(Notifier *notifier);
+> diff --git a/qapi/misc.json b/qapi/misc.json
+> index f5988cc0b5..a385d897ae 100644
+> --- a/qapi/misc.json
+> +++ b/qapi/misc.json
+> @@ -2484,11 +2484,13 @@
+>  # Information describing the QEMU target.
+>  #
+>  # @arch: the target architecture
+> +# @wakeup-suspend-support: true if the target supports wake up from
+> +#                          suspend (since 2.13)
+>  #
+>  # Since: 1.2.0
+>  ##
+>  { 'struct': 'TargetInfo',
+> -  'data': { 'arch': 'SysEmuTarget' } }
+> +  'data': { 'arch': 'SysEmuTarget', 'wakeup-suspend-support': 'bool' } }
+>  
+>  ##
+>  # @query-target:
 
-Ah, good old NO_VECTOR :( Yes, let's handle it explicitly.
+Does the documentation of system_wakeup need fixing?
 
-> 
-> >>
-> >>        if (vector < VIRTIO_QUEUE_MAX) {
-> >>            if (!dev->indicators) {
-> >> @@ -1029,6 +1027,7 @@ static void virtio_ccw_notify(DeviceState *d, uint16_t vector)
-> >>                    css_adapter_interrupt(CSS_IO_ADAPTER_VIRTIO, dev->thinint_isc);
-> >>                }
-> >>            } else {
-> >> +            assert(vector < NR_CLASSIC_INDICATOR_BITS);  
-> 
-> I think this assert is legit though.
+   ##
+   # @system_wakeup:
+   #
+   # Wakeup guest from suspend.  Does nothing in case the guest isn't suspended.
+   #
+   # Since:  1.1
+   #
+   # Returns:  nothing.
+   #
+   # Example:
+   #
+   # -> { "execute": "system_wakeup" }
+   # <- { "return": {} }
+   #
+   ##
+   { 'command': 'system_wakeup' }
 
-Nod.
+I figure we better explain right here what the command does, both for
+wakeup-suspend-support: false and true.
 
-> 
-> >>                indicators = address_space_ldq(&address_space_memory,
-> >>                                               dev->indicators->addr,
-> >>                                               MEMTXATTRS_UNSPECIFIED,
-> >> @@ -1042,12 +1041,11 @@ static void virtio_ccw_notify(DeviceState *d, uint16_t vector)
-> >>            if (!dev->indicators2) {
-> >>                return;
-> >>            }
-> >> -        vector = 0;
-> >>            indicators = address_space_ldq(&address_space_memory,
-> >>                                           dev->indicators2->addr,
-> >>                                           MEMTXATTRS_UNSPECIFIED,
-> >>                                           NULL);
-> >> -        indicators |= 1ULL << vector;
-> >> +        indicators |= 1ULL;
-> >>            address_space_stq(&address_space_memory, dev->indicators2->addr,
-> >>                              indicators, MEMTXATTRS_UNSPECIFIED, NULL);
-> >>            css_conditional_io_interrupt(sch);
-> >>  
-> > 
-> > Looks sane.
-> >   
-> 
-> Also any tags for the proper patch (e.g. Reported-by: Peter or similar). I
-> guess I should mention the Coverity CID as 'Fixes:' to, or?
+> diff --git a/vl.c b/vl.c
+> index 3b39bbd7a8..ab6bd7e090 100644
+> --- a/vl.c
+> +++ b/vl.c
+> @@ -1832,11 +1832,32 @@ void qemu_system_wakeup_enable(WakeupReason reason, bool enabled)
+>      }
+>  }
+>  
+> +/* The existence of a wake-up notifier is being checked in the function
 
-Yes, that makes sense.
+Please wing both ends of this comment:
+
+   /*
+    * The existence of a wake-up notifier is being checked in the function
+
+> + * qemu_wakeup_notifier_is_empty and it's used in the logic of the
+> + * wakeup-suspend-support flag of QMP 'query-target' command. The idea
+> + * of this flag is to indicate whether the guest supports wake-up from
+> + * suspend (via system_wakeup QMP/HMP call for example), warning the user
+> + * that the guest can't handle both wake-up from suspend and the suspend
+> + * itself via QGA guest-suspend-ram and guest-suspend-hybrid (if it
+> + * can't wake up, it can't be suspended safely).
+> + *
+> + * An assumption is made by the wakeup-suspend-support flag that only the
+> + * guests that can go to RUN_STATE_SUSPENDED and wake up properly would
+> + * be interested in this wakeup_notifier. Adding a wakeup_notifier for
+> + * any other reason will break the logic of the wakeup-suspend-support
+> + * flag and can lead to user/management confusion about the suspend/wake-up
+> + * support of the guest.
+> + */
+
+The assumption is a bit of a hack, but I don't have better ideas.
+Thanks for commenting it clearly.  However, ...
+
+>  void qemu_register_wakeup_notifier(Notifier *notifier)
+>  {
+>      notifier_list_add(&wakeup_notifiers, notifier);
+>  }
+>  
+> +bool qemu_wakeup_notifier_is_empty(void)
+> +{
+> +    return QLIST_EMPTY(&wakeup_notifiers.notifiers);
+> +}
+> +
+>  void qemu_system_killed(int signal, pid_t pid)
+>  {
+>      shutdown_signal = signal;
+
+... I'd recommend to rename qemu_wakeup_notifier_is_empty() to
+qemu_wakeup_suspend_support(), because then the hack is a bit more
+isolated.  With the current name, it spills into qmp_query_target(),
+which doesn't have such a helpful comment.
