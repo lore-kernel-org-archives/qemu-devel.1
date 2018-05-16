@@ -1,23 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53786)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53752)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <edgar.iglesias@gmail.com>) id 1fJ1XH-0003L6-Mt
-	for qemu-devel@nongnu.org; Wed, 16 May 2018 14:52:30 -0400
+	(envelope-from <edgar.iglesias@gmail.com>) id 1fJ1XE-0003JR-DH
+	for qemu-devel@nongnu.org; Wed, 16 May 2018 14:52:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <edgar.iglesias@gmail.com>) id 1fJ1XG-0000qO-Uh
-	for qemu-devel@nongnu.org; Wed, 16 May 2018 14:52:27 -0400
-Received: from mail-wr0-x244.google.com ([2a00:1450:400c:c0c::244]:43184)
+	(envelope-from <edgar.iglesias@gmail.com>) id 1fJ1XD-0000p9-I8
+	for qemu-devel@nongnu.org; Wed, 16 May 2018 14:52:24 -0400
+Received: from mail-wr0-x242.google.com ([2a00:1450:400c:c0c::242]:44227)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <edgar.iglesias@gmail.com>)
-	id 1fJ1XG-0000q8-OA
-	for qemu-devel@nongnu.org; Wed, 16 May 2018 14:52:26 -0400
-Received: by mail-wr0-x244.google.com with SMTP id v15-v6so2758216wrm.10
-	for <qemu-devel@nongnu.org>; Wed, 16 May 2018 11:52:26 -0700 (PDT)
+	id 1fJ1XD-0000ot-Av
+	for qemu-devel@nongnu.org; Wed, 16 May 2018 14:52:23 -0400
+Received: by mail-wr0-x242.google.com with SMTP id y15-v6so2752350wrg.11
+	for <qemu-devel@nongnu.org>; Wed, 16 May 2018 11:52:23 -0700 (PDT)
 From: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
-Date: Wed, 16 May 2018 20:51:31 +0200
-Message-Id: <20180516185146.30708-24-edgar.iglesias@gmail.com>
+Date: Wed, 16 May 2018 20:51:29 +0200
+Message-Id: <20180516185146.30708-22-edgar.iglesias@gmail.com>
 In-Reply-To: <20180516185146.30708-1-edgar.iglesias@gmail.com>
 References: <20180516185146.30708-1-edgar.iglesias@gmail.com>
-Subject: [Qemu-devel] [PATCH v3 23/38] target-microblaze: Implement MFSE EAR
+Subject: [Qemu-devel] [PATCH v3 21/38] target-microblaze: Setup for 64bit
+ addressing
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,47 +32,52 @@ Cc: peter.maydell@linaro.org, richard.henderson@linaro.org, frederic.konrad@adac
 
 From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
 
-Implement MFSE EAR to enable access to the upper part of EAR.
+Setup MicroBlaze builds for 64bit addressing.
+No functional change since the translator does not yet
+emit 64bit addresses.
 
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 Signed-off-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
 ---
- target/microblaze/translate.c | 9 ++++++++-
- 1 file changed, 8 insertions(+), 1 deletion(-)
+ configure               | 1 +
+ target/microblaze/cpu.h | 6 +++---
+ 2 files changed, 4 insertions(+), 3 deletions(-)
 
-diff --git a/target/microblaze/translate.c b/target/microblaze/translate.c
-index 76f09e3f7e..03a0289858 100644
---- a/target/microblaze/translate.c
-+++ b/target/microblaze/translate.c
-@@ -459,7 +459,7 @@ static void dec_msr(DisasContext *dc)
-     CPUState *cs = CPU(dc->cpu);
-     TCGv_i32 t0, t1;
-     unsigned int sr, rn;
--    bool to, clrset;
-+    bool to, clrset, extended;
+diff --git a/configure b/configure
+index 59f91ab3f9..5626499e99 100755
+--- a/configure
++++ b/configure
+@@ -6844,6 +6844,7 @@ case "$target_name" in
+   microblaze|microblazeel)
+     TARGET_ARCH=microblaze
+     bflt="yes"
++    echo "TARGET_ABI32=y" >> $config_target_mak
+   ;;
+   mips|mipsel)
+     TARGET_ARCH=mips
+diff --git a/target/microblaze/cpu.h b/target/microblaze/cpu.h
+index 215f42b384..b631b7dc4c 100644
+--- a/target/microblaze/cpu.h
++++ b/target/microblaze/cpu.h
+@@ -23,7 +23,7 @@
+ #include "qemu-common.h"
+ #include "cpu-qom.h"
  
-     sr = extract32(dc->imm, 0, 14);
-     to = extract32(dc->imm, 14, 1);
-@@ -467,6 +467,9 @@ static void dec_msr(DisasContext *dc)
-     dc->type_b = 1;
-     if (to) {
-         dc->cpustate_changed = 1;
-+        extended = extract32(dc->imm, 24, 1);
-+    } else {
-+        extended = extract32(dc->imm, 19, 1);
-     }
+-#define TARGET_LONG_BITS 32
++#define TARGET_LONG_BITS 64
  
-     /* msrclr and msrset.  */
-@@ -559,6 +562,10 @@ static void dec_msr(DisasContext *dc)
-                 msr_read(dc, cpu_R[dc->rd]);
-                 break;
-             case SR_EAR:
-+                if (extended) {
-+                    tcg_gen_extrh_i64_i32(cpu_R[dc->rd], cpu_SR[sr]);
-+                    break;
-+                }
-             case SR_ESR:
-             case SR_FSR:
-             case SR_BTR:
+ #define CPUArchState struct CPUMBState
+ 
+@@ -340,8 +340,8 @@ int cpu_mb_signal_handler(int host_signum, void *pinfo,
+ /* FIXME: MB uses variable pages down to 1K but linux only uses 4k.  */
+ #define TARGET_PAGE_BITS 12
+ 
+-#define TARGET_PHYS_ADDR_SPACE_BITS 32
+-#define TARGET_VIRT_ADDR_SPACE_BITS 32
++#define TARGET_PHYS_ADDR_SPACE_BITS 64
++#define TARGET_VIRT_ADDR_SPACE_BITS 64
+ 
+ #define CPU_RESOLVING_TYPE TYPE_MICROBLAZE_CPU
+ 
 -- 
 2.14.1
