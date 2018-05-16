@@ -1,21 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44742)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45416)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fJ0tk-0001K4-No
-	for qemu-devel@nongnu.org; Wed, 16 May 2018 14:11:37 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1fJ0uk-0001uu-Q6
+	for qemu-devel@nongnu.org; Wed, 16 May 2018 14:12:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fJ0tj-0003jo-So
-	for qemu-devel@nongnu.org; Wed, 16 May 2018 14:11:36 -0400
-References: <20180509162637.15575-1-kwolf@redhat.com>
-	<20180509162637.15575-14-kwolf@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <ff88f17e-098a-2a73-c73d-bbc38597eb44@redhat.com>
-Date: Wed, 16 May 2018 13:11:28 -0500
+	(envelope-from <ehabkost@redhat.com>) id 1fJ0uh-0004DG-MF
+	for qemu-devel@nongnu.org; Wed, 16 May 2018 14:12:38 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:41580)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1fJ0uh-0004CJ-HT
+	for qemu-devel@nongnu.org; Wed, 16 May 2018 14:12:35 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id DBF6519EE25
+	for <qemu-devel@nongnu.org>; Wed, 16 May 2018 18:12:34 +0000 (UTC)
+Date: Wed, 16 May 2018 15:12:32 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20180516181232.GD4903@localhost.localdomain>
+References: <1525423069-61903-1-git-send-email-imammedo@redhat.com>
+	<1525423069-61903-2-git-send-email-imammedo@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20180509162637.15575-14-kwolf@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 13/42] job: Move state transitions to Job
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <1525423069-61903-2-git-send-email-imammedo@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v7 01/11] numa: postpone options
+ post-processing till machine_run_board_init()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,66 +34,19 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
-Cc: mreitz@redhat.com, jsnow@redhat.com, armbru@redhat.com, jcody@redhat.com, qemu-devel@nongnu.org
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: qemu-devel@nongnu.org, pkrempa@redhat.com, armbru@redhat.com
 
-On 05/09/2018 11:26 AM, Kevin Wolf wrote:
-> This moves BlockJob.status and the closely related functions
-> (block_)job_state_transition() and (block_)job_apply_verb to Job. The
-> two QAPI enums are renamed to JobStatus and JobVerb.
+On Fri, May 04, 2018 at 10:37:39AM +0200, Igor Mammedov wrote:
+> in preparation for numa options to being handled via QMP before
+> machine_run_board_init(), move final numa configuration checks
+> and processing to machine_run_board_init() so it could take into
+> account both CLI (via parse_numa_opts()) and QMP input
 > 
-> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-> ---
->   qapi/block-core.json     |  14 +++----
->   include/block/blockjob.h |   3 --
->   include/qemu/job.h       |  13 ++++++
->   blockjob.c               | 102 +++++++++++------------------------------------
->   job.c                    |  56 ++++++++++++++++++++++++++
->   tests/test-blockjob.c    |  39 +++++++++---------
->   block/trace-events       |   2 -
->   trace-events             |   4 ++
->   8 files changed, 122 insertions(+), 111 deletions(-)
-> 
+> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+> Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
 
-> @@ -90,4 +93,14 @@ Job *job_next(Job *job);
->    */
->   Job *job_get(const char *id);
->   
-> +/**
-> + * Check whether the verb @bv can be applied to @job in its current state.
-> + * Returns 0 if the verb can be applied; otherwise errp is set and -EPERM
-> + * returned.
-> + */
-> +int job_apply_verb(Job *job, JobVerb bv, Error **errp);
-
-Why 'JobVerb bv' rather than 'jv' or 'verb'?
-
-> @@ -968,7 +913,6 @@ void *block_job_create(const char *job_id, const BlockJobDriver *driver,
->       job->refcnt        = 1;
->       job->auto_finalize = !(flags & BLOCK_JOB_MANUAL_FINALIZE);
->       job->auto_dismiss  = !(flags & BLOCK_JOB_MANUAL_DISMISS);
-> -    block_job_state_transition(job, BLOCK_JOB_STATUS_CREATED);
-
-No replacement to the counterpart job_state_transition() here because 
-that should be handled in the parent class now, right? [1]
-
-...
-
-> +
-> +int job_apply_verb(Job *job, JobVerb bv, Error **errp)
-
-Again, the name bv made sense for BlockJobVerb, but less so now.
-
-> @@ -81,6 +135,8 @@ void *job_create(const char *job_id, const JobDriver *driver, Error **errp)
->       job->driver        = driver;
->       job->id            = g_strdup(job_id);
->   
-> +    job_state_transition(job, JOB_STATUS_CREATED);
-> +
-
-[1] Yes, just took me a while to get to it.
+Queued, thanks.
 
 -- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+Eduardo
