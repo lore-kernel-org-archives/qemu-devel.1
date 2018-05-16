@@ -1,23 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51761)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51915)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fJ3QF-00067a-Ca
-	for qemu-devel@nongnu.org; Wed, 16 May 2018 16:53:20 -0400
+	(envelope-from <kwolf@redhat.com>) id 1fJ3Qo-0006Wg-Bz
+	for qemu-devel@nongnu.org; Wed, 16 May 2018 16:53:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fJ3QE-0001i7-MA
-	for qemu-devel@nongnu.org; Wed, 16 May 2018 16:53:19 -0400
+	(envelope-from <kwolf@redhat.com>) id 1fJ3Qn-0001tQ-JR
+	for qemu-devel@nongnu.org; Wed, 16 May 2018 16:53:54 -0400
+Date: Wed, 16 May 2018 22:53:44 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20180516205344.GH4435@localhost.localdomain>
 References: <20180509162637.15575-1-kwolf@redhat.com>
-	<20180509162637.15575-39-kwolf@redhat.com>
-	<8b50aa3d-24eb-53cd-bc0b-14165ae73784@redhat.com>
-	<20180516204649.GG4435@localhost.localdomain>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <4d5039e0-29aa-a859-a186-a468a2ab7a51@redhat.com>
-Date: Wed, 16 May 2018 15:53:09 -0500
+	<20180509162637.15575-23-kwolf@redhat.com>
+	<c6b54143-2dd0-e8f1-eaa7-afb7423628d1@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20180516204649.GG4435@localhost.localdomain>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 38/42] job: Add JOB_STATUS_CHANGE QMP event
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <c6b54143-2dd0-e8f1-eaa7-afb7423628d1@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 22/42] job: Move BlockJobCreateFlags to Job
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,28 +24,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
+To: Eric Blake <eblake@redhat.com>
 Cc: qemu-block@nongnu.org, mreitz@redhat.com, jsnow@redhat.com, armbru@redhat.com, jcody@redhat.com, qemu-devel@nongnu.org
 
-On 05/16/2018 03:46 PM, Kevin Wolf wrote:
-
->>> +{ 'event': 'JOB_STATUS_CHANGE',
->>> +  'data': { 'id': 'str',
->>> +            'status': 'JobStatus' } }
->>
->> Is it worth also trying to list the old state that the transition came from?
->> But that's new compared to what block jobs are currently doing, so if we
->> can't come up with a strong reason to add that, I'm okay.
+Am 16.05.2018 um 21:13 hat Eric Blake geschrieben:
+> On 05/09/2018 11:26 AM, Kevin Wolf wrote:
+> > This renames the BlockJobCreateFlags constants, moves a few JOB_INTERNAL
+> > checks to job_create() and the auto_{finalize,dismiss} fields from
+> > BlockJob to Job.
 > 
-> If a management tool needs this information (I don't see why), it just
-> needs to keep track of the last state it had seen, no?
+> Do we still want to allow auto-finalize on all jobs, or should we keep it
+> just for legacy support on block jobs?  Even more so for auto-dismiss (if
+> you use the legacy interface, that's what you expect to happen; but other
+> than for legacy block jobs, any sane management app is going to request
+> auto-dismiss be false, so why expose it to generic jobs?)
+> 
+> Of course, it may still be easiest to plumb up auto- actions in the internal
+> code (where it has to work to keep legacy block jobs from breaking, but no
+> new callers have to enable it), so my argument may not apply until you
+> actually expose a QMP interface for generic jobs.
 
-And if you miss an event, the previous state is not preserved for any 
-later query-job command.  Exposing something in a (possibly-missed) 
-event that is not available elsewhere doesn't buy us much.  So I agree - 
-there is no strong reason to advertise the previous state.
+This series doesn't expose it anyway. We can later decide whether we
+want to add it or not. A sophisticated management tool like libvirt that
+needs to manage individual nodes and cope with daemon restarts will
+never make use of them, but they might still be useful in hand-crafted
+scripts for defined special cases.
 
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+> > +++ b/block/mirror.c
+> > @@ -1282,7 +1282,7 @@ void mirror_start(const char *job_id, BlockDriverState *bs,
+> >       }
+> >       is_none_mode = mode == MIRROR_SYNC_MODE_NONE;
+> >       base = mode == MIRROR_SYNC_MODE_TOP ? backing_bs(bs) : NULL;
+> > -    mirror_start_job(job_id, bs, BLOCK_JOB_DEFAULT, target, replaces,
+> > +    mirror_start_job(job_id, bs, JOB_DEFAULT, target, replaces,
+> >                        speed, granularity, buf_size, backing_mode,
+> >                        on_source_error, on_target_error, unmap, NULL, NULL,
+> >                        &mirror_job_driver, is_none_mode, base, false,
+> 
+> Just an observation that this is a lot of parameters; would using boxed QAPI
+> types make these calls any more obvious?  But that's a separate cleanup.
+
+I'm not sure if we have a QAPI type that matches this. But maybe it
+could become a QAPI struct and very few extra parameters.
+
+Kevin
