@@ -1,24 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52797)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52808)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1fIuS4-0002CO-O9
-	for qemu-devel@nongnu.org; Wed, 16 May 2018 07:18:38 -0400
+	(envelope-from <wangjie88@huawei.com>) id 1fIuS6-0002D0-6Y
+	for qemu-devel@nongnu.org; Wed, 16 May 2018 07:18:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1fIuS0-0008Sq-OQ
-	for qemu-devel@nongnu.org; Wed, 16 May 2018 07:18:36 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:38458 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1fIuS0-0008Sj-Hu
-	for qemu-devel@nongnu.org; Wed, 16 May 2018 07:18:32 -0400
-Date: Wed, 16 May 2018 12:18:28 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20180516111828.GD2531@work-vm>
-References: <20180514165424.12884-1-zhangckid@gmail.com>
+	(envelope-from <wangjie88@huawei.com>) id 1fIuS5-0008Va-3s
+	for qemu-devel@nongnu.org; Wed, 16 May 2018 07:18:38 -0400
+References: <1526459780-35100-1-git-send-email-wangjie88@huawei.com>
+From: "WangJie (Pluto)" <wangjie88@huawei.com>
+Message-ID: <6e88630e-bc2e-5281-675e-9a07ec6a6a5a@huawei.com>
+Date: Wed, 16 May 2018 19:18:09 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180514165424.12884-1-zhangckid@gmail.com>
-Subject: Re: [Qemu-devel] [PATCH V7 RESEND 00/17] COLO: integrate colo frame
- with block replication and COLO proxy
+In-Reply-To: <1526459780-35100-1-git-send-email-wangjie88@huawei.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v4] iothread: fix epollfd leak in the
+ process of delIOThread
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,96 +24,92 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jason Wang <jasowang@redhat.com>
-Cc: qemu-devel@nongnu.org, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Zhang Chen <zhangckid@gmail.com>
+To: stefanha@redhat.com, peterx@redhat.com, famz@redhat.com, eblake@redhat.com
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, eric.fangyi@huawei.com, wu.wubin@huawei.com
 
-Hi Jason,
-  Patches 1,2,3,14,15 seem mostly networky to me; can you have a look?
+Hi, Peter Xu:
+	If call aio_epoll_disable() in aio_context_destroy, aio_epoll_disable() will return before close(ctx->epollfd),
+    Because the ctx->epoll_enabled is false in the moment.
+	In the process of addIOThread, aio_context_setup created epoll without call aio_epoll_try_enable,
+    so ctx->epoll_enabled have no chance to set true.
 
-Dave
 
-* Zhang Chen (zhangckid@gmail.com) wrote:
-> The RESEND version just fix code style in patch 11/17.
+On 2018/5/16 16:36, Jie Wang wrote:
+> When we call addIOThread, the epollfd created in aio_context_setup,
+> but not close it in the process of delIOThread, so the epollfd will leak.
 > 
-> Hi~ All~
+> Signed-off-by: Jie Wang <wangjie88@huawei.com>
+> ---
+>  include/block/aio.h | 8 ++++++++
+>  util/aio-posix.c    | 9 +++++++++
+>  util/aio-win32.c    | 4 ++++
+>  util/async.c        | 1 +
+>  4 files changed, 22 insertions(+)
 > 
-> COLO Frame, block replication and COLO proxy(colo-compare,filter-mirror,
-> filter-redirector,filter-rewriter) have been exist in qemu
-> for long time, it's time to integrate these three parts to make COLO really works.
+> diff --git a/include/block/aio.h b/include/block/aio.h
+> index a1d6b9e..ae6f354 100644
+> --- a/include/block/aio.h
+> +++ b/include/block/aio.h
+> @@ -555,6 +555,14 @@ static inline bool in_aio_context_home_thread(AioContext *ctx)
+>  void aio_context_setup(AioContext *ctx);
+>  
+>  /**
+> + * aio_context_destroy:
+> + * @ctx: the aio context
+> + *
+> + * Destroy the aio context.
+> + */
+> +void aio_context_destroy(AioContext *ctx);
+> +
+> +/**
+>   * aio_context_set_poll_params:
+>   * @ctx: the aio context
+>   * @max_ns: how long to busy poll for, in nanoseconds
+> diff --git a/util/aio-posix.c b/util/aio-posix.c
+> index d8f0cb4..0ade2c7 100644
+> --- a/util/aio-posix.c
+> +++ b/util/aio-posix.c
+> @@ -713,6 +713,15 @@ void aio_context_setup(AioContext *ctx)
+>  #endif
+>  }
+>  
+> +void aio_context_destroy(AioContext *ctx)
+> +{
+> +#ifdef CONFIG_EPOLL_CREATE1
+> +    if (ctx->epollfd >= 0) {
+> +        close(ctx->epollfd);
+> +    }
+> +#endif
+> +}
+> +
+>  void aio_context_set_poll_params(AioContext *ctx, int64_t max_ns,
+>                                   int64_t grow, int64_t shrink, Error **errp)
+>  {
+> diff --git a/util/aio-win32.c b/util/aio-win32.c
+> index a67b00c..e676a8d 100644
+> --- a/util/aio-win32.c
+> +++ b/util/aio-win32.c
+> @@ -407,6 +407,10 @@ void aio_context_setup(AioContext *ctx)
+>  {
+>  }
+>  
+> +void aio_context_destroy(AioContext *ctx)
+> +{
+> +}
+> +
+>  void aio_context_set_poll_params(AioContext *ctx, int64_t max_ns,
+>                                   int64_t grow, int64_t shrink, Error **errp)
+>  {
+> diff --git a/util/async.c b/util/async.c
+> index 4dd9d95..03f6278 100644
+> --- a/util/async.c
+> +++ b/util/async.c
+> @@ -298,6 +298,7 @@ aio_ctx_finalize(GSource     *source)
+>      qemu_rec_mutex_destroy(&ctx->lock);
+>      qemu_lockcnt_destroy(&ctx->list_lock);
+>      timerlistgroup_deinit(&ctx->tlg);
+> +    aio_context_destroy(ctx);
+>  }
+>  
+>  static GSourceFuncs aio_source_funcs = {
 > 
-> In this series, we have some optimizations for COLO frame, including separating the
-> process of saving ram and device state, using an COLO_EXIT event to notify users that
-> VM exits COLO, for these parts, most of them have been reviewed long time ago in old version,
-> but since this series have just rebased on upstream which had merged a new series of migration,
-> parts of pathes in this series deserve review again.
-> 
-> We use notifier/callback method for COLO compare to notify COLO frame about
-> net packets inconsistent event, and add a handle_event method for NetFilterClass to
-> help COLO frame to notify filters and colo-compare about checkpoint/failover event,
-> it is flexible.
-> 
-> For the neweset version, please refer to:
-> https://github.com/zhangckid/qemu/tree/qemu-colo-18may1-rebase
-> 
-> Please review, thanks.
-> 
-> V7:
->  - Addressed Markus's comments in 11/17.
->  - Rebased on upstream.
-> 
-> V6:
->  - Addressed Eric Blake's comments, use the enum to feedback in patch 11/17.
->  - Fixed QAPI command separator problem in patch 11/17.
-> 
-> 
-> Zhang Chen (12):
->   filter-rewriter: fix memory leak for connection in
->     connection_track_table
->   colo-compare: implement the process of checkpoint
->   colo-compare: use notifier to notify packets comparing result
->   COLO: integrate colo compare with colo frame
->   COLO: Add block replication into colo process
->   COLO: Remove colo_state migration struct
->   COLO: Load dirty pages into SVM's RAM cache firstly
->   ram/COLO: Record the dirty pages that SVM received
->   COLO: Flush memory data from ram cache
->   qapi: Add new command to query colo status
->   filter: Add handle_event method for NetFilterClass
->   filter-rewriter: handle checkpoint and failover event
-> 
-> zhanghailiang (5):
->   qmp event: Add COLO_EXIT event to notify users while exited COLO
->   savevm: split the process of different stages for loadvm/savevm
->   COLO: flush host dirty ram from cache
->   COLO: notify net filters about checkpoint/failover event
->   COLO: quick failover process by kick COLO thread
-> 
->  include/exec/ram_addr.h  |   1 +
->  include/migration/colo.h |  11 +-
->  include/net/filter.h     |   5 +
->  migration/Makefile.objs  |   2 +-
->  migration/colo-comm.c    |  76 --------------
->  migration/colo.c         | 219 +++++++++++++++++++++++++++++++++++++--
->  migration/migration.c    |  38 ++++++-
->  migration/ram.c          | 183 +++++++++++++++++++++++++++++++-
->  migration/ram.h          |   4 +
->  migration/savevm.c       |  55 ++++++++--
->  migration/savevm.h       |   5 +
->  migration/trace-events   |   3 +
->  net/colo-compare.c       | 108 +++++++++++++++++--
->  net/colo-compare.h       |  24 +++++
->  net/colo.h               |   4 +
->  net/filter-rewriter.c    | 109 +++++++++++++++++--
->  net/filter.c             |  17 +++
->  net/net.c                |  28 +++++
->  qapi/migration.json      |  70 +++++++++++++
->  vl.c                     |   2 -
->  20 files changed, 846 insertions(+), 118 deletions(-)
->  delete mode 100644 migration/colo-comm.c
->  create mode 100644 net/colo-compare.h
-> 
-> -- 
-> 2.17.0
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
