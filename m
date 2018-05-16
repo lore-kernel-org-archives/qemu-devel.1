@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34968)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35657)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1fJ4Iw-0001cg-6r
-	for qemu-devel@nongnu.org; Wed, 16 May 2018 17:49:51 -0400
+	(envelope-from <jsnow@redhat.com>) id 1fJ4OD-0003mZ-GK
+	for qemu-devel@nongnu.org; Wed, 16 May 2018 17:55:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1fJ4Iv-00016X-If
-	for qemu-devel@nongnu.org; Wed, 16 May 2018 17:49:50 -0400
+	(envelope-from <jsnow@redhat.com>) id 1fJ4OC-0003fn-LC
+	for qemu-devel@nongnu.org; Wed, 16 May 2018 17:55:17 -0400
 References: <20180512012537.22478-1-jsnow@redhat.com>
-	<20180512012537.22478-9-jsnow@redhat.com>
-	<bdffad4f-8486-4953-69c7-cb9eb4087baa@redhat.com>
+	<20180512012537.22478-10-jsnow@redhat.com>
+	<70d0df96-1d41-4687-4b55-fcfdb42adb0c@redhat.com>
 From: John Snow <jsnow@redhat.com>
-Message-ID: <caaa0be9-212f-1d9d-5c46-6c65badc4751@redhat.com>
-Date: Wed, 16 May 2018 17:49:44 -0400
+Message-ID: <8380a71e-3f5e-1915-9112-037cebd23fc1@redhat.com>
+Date: Wed, 16 May 2018 17:55:09 -0400
 MIME-Version: 1.0
-In-Reply-To: <bdffad4f-8486-4953-69c7-cb9eb4087baa@redhat.com>
+In-Reply-To: <70d0df96-1d41-4687-4b55-fcfdb42adb0c@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC PATCH 08/12] qjson: allow caller to ask for
- arbitrary indent
+Subject: Re: [Qemu-devel] [RFC PATCH 09/12] qapi/block-core: add
+ BitmapMapping and BitmapEntry structs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,36 +31,38 @@ Cc: Kevin Wolf <kwolf@redhat.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virt
 
 
 
-On 05/16/2018 05:34 PM, Eric Blake wrote:
-> On 05/11/2018 08:25 PM, John Snow wrote:
->> The function already exists, just expose it.
->>
->> Signed-off-by: John Snow <jsnow@redhat.com>
->> ---
->> =C2=A0 include/qapi/qmp/qjson.h |=C2=A0 1 +
->> =C2=A0 qobject/qjson.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0 | 21 +++++++++++----------
->> =C2=A0 2 files changed, 12 insertions(+), 10 deletions(-)
->>
->> diff --git a/include/qapi/qmp/qjson.h b/include/qapi/qmp/qjson.h
->> index b274ac3a86..0e8624c1fa 100644
->> --- a/include/qapi/qmp/qjson.h
->> +++ b/include/qapi/qmp/qjson.h
->> @@ -19,6 +19,7 @@ QObject *qobject_from_jsonf(const char *string, ...)
->> GCC_FMT_ATTR(1, 2);
->> =C2=A0 QObject *qobject_from_jsonv(const char *string, va_list *ap, Er=
-ror
->> **errp)
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 GCC_FMT_ATTR(1, 0);
->> =C2=A0 +QString *qobject_to_json_opt(const QObject *obj, int pretty, i=
-nt
->> indent);
+On 05/16/2018 05:37 PM, Eric Blake wrote:
+>> +##
+>> +# @BitmapMapping:
+>> +#
+>> +# List of described regions correlated to a named bitmap.
+>> +#
+>> +# @name: The name of the bitmap whose range is described here
+>> +#
+>> +# @entries: A list of zero or more @BitmapEntry elements representing
+>> +#=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 the ran=
+ge(s) described by the bitmap.
 >=20
-> pretty seems like it is better as a bool.=C2=A0 Even though to_json() i=
-sn't
-> typed correctly, that's no excuse for the public function to copy a bad
-> interface (and maybe it's worth a separate cleanup patch to fix
-> to_json() first).
+> Is it also worth documenting that the list will be in ascending order,
+> with no overlaps (no two entries covering the same offset); and in fact
+> with a gap between all entries (as otherwise those two consecutive
+> entries could have been consolidated to one)?
 >=20
 
-Eh, sure, why not. Done.
+Hm. I didn't necessarily want to guarantee the order, but being more
+specific about the output will assist legibility of the spec.
+
+I'll amend the documentation and make some stronger guarantees.
+
+>> +#
+>> +# Since: 2.13
+>> +#
+>> +##
+>> +{ 'struct': 'BitmapMapping',
+>> +=C2=A0 'data': { 'name': 'str',
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 'e=
+ntries': [ 'BitmapEntry' ] } }
+>> +
+>> =C2=A0 ##
+>> =C2=A0 # @BlockdevCacheInfo:
+>> =C2=A0 #=20
