@@ -1,32 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57885)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58793)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1fIwdL-0004eN-DG
-	for qemu-devel@nongnu.org; Wed, 16 May 2018 09:38:24 -0400
+	(envelope-from <zhangckid@gmail.com>) id 1fIwge-0005sg-Db
+	for qemu-devel@nongnu.org; Wed, 16 May 2018 09:41:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1fIwdI-0004DM-Al
-	for qemu-devel@nongnu.org; Wed, 16 May 2018 09:38:23 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:53566 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eric.auger@redhat.com>)
-	id 1fIwdI-0004Co-5c
-	for qemu-devel@nongnu.org; Wed, 16 May 2018 09:38:20 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.4])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 7315E814FDCF
-	for <qemu-devel@nongnu.org>; Wed, 16 May 2018 13:38:19 +0000 (UTC)
-References: <20180417140802.16711-1-pbonzini@redhat.com>
-	<0a51d026-8b9f-9925-1229-10e3766907bb@redhat.com>
-	<02617670-8b06-e5b9-d763-65453b5f706a@redhat.com>
-From: Auger Eric <eric.auger@redhat.com>
-Message-ID: <222e8530-6bd1-086a-cecf-1a755a38ce99@redhat.com>
-Date: Wed, 16 May 2018 15:38:18 +0200
+	(envelope-from <zhangckid@gmail.com>) id 1fIwgc-000661-Jk
+	for qemu-devel@nongnu.org; Wed, 16 May 2018 09:41:48 -0400
+Received: from mail-wr0-x244.google.com ([2a00:1450:400c:c0c::244]:42535)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <zhangckid@gmail.com>) id 1fIwgc-00065f-8U
+	for qemu-devel@nongnu.org; Wed, 16 May 2018 09:41:46 -0400
+Received: by mail-wr0-x244.google.com with SMTP id v5-v6so1238271wrf.9
+	for <qemu-devel@nongnu.org>; Wed, 16 May 2018 06:41:46 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <02617670-8b06-e5b9-d763-65453b5f706a@redhat.com>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 0/4] exec: reintroduce MemoryRegion caching
+In-Reply-To: <87603p6lgf.fsf@dusky.pond.sub.org>
+References: <1526268228-27951-1-git-send-email-zhangckid@gmail.com>
+	<1526268228-27951-11-git-send-email-zhangckid@gmail.com>
+	<87603p6lgf.fsf@dusky.pond.sub.org>
+From: Zhang Chen <zhangckid@gmail.com>
+Date: Wed, 16 May 2018 21:41:44 +0800
+Message-ID: <CAK3tnvJe-+5uXvFp-83dfCrtyqrJpgkjv8HzEE8NNi0q0NJS6A@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH V7 10/17] qmp event: Add COLO_EXIT event to
+ notify users while exited COLO
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,45 +30,163 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
+To: Markus Armbruster <armbru@redhat.com>
+Cc: qemu-devel@nongnu.org, zhanghailiang <zhang.zhanghailiang@huawei.com>, Li Zhijian <lizhijian@cn.fujitsu.com>, Jason Wang <jasowang@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-Hi Paolo
+On Tue, May 15, 2018 at 10:29 PM, Markus Armbruster <armbru@redhat.com>
+wrote:
 
-On 05/16/2018 12:42 PM, Paolo Bonzini wrote:
-> On 16/05/2018 12:41, Auger Eric wrote:
->> This patch seems to cause a regression with ARM vsmmu +
->> virtio-blk-pci. Reverting it looks to fix the issue. Otherwise I
->> get:
-> 
-> What's the command line for a reproducer?
-> 
-> Thanks,
-> 
-> Paolo
-> 
+> Zhang Chen <zhangckid@gmail.com> writes:
+>
+> > From: zhanghailiang <zhang.zhanghailiang@huawei.com>
+> >
+> > If some errors happen during VM's COLO FT stage, it's important to
+> > notify the users of this event. Together with 'x-colo-lost-heartbeat',
+> > Users can intervene in COLO's failover work immediately.
+> > If users don't want to get involved in COLO's failover verdict,
+> > it is still necessary to notify users that we exited COLO mode.
+> >
+> > Signed-off-by: zhanghailiang <zhang.zhanghailiang@huawei.com>
+> > Signed-off-by: Li Zhijian <lizhijian@cn.fujitsu.com>
+> > Signed-off-by: Zhang Chen <zhangckid@gmail.com>
+> > Reviewed-by: Eric Blake <eblake@redhat.com>
+> > ---
+> >  migration/colo.c    | 20 ++++++++++++++++++++
+> >  qapi/migration.json | 37 +++++++++++++++++++++++++++++++++++++
+> >  2 files changed, 57 insertions(+)
+> >
+> > diff --git a/migration/colo.c b/migration/colo.c
+> > index c083d36..8ca6381 100644
+> > --- a/migration/colo.c
+> > +++ b/migration/colo.c
+> > @@ -28,6 +28,7 @@
+> >  #include "net/colo-compare.h"
+> >  #include "net/colo.h"
+> >  #include "block/block.h"
+> > +#include "qapi/qapi-events-migration.h"
+> >
+> >  static bool vmstate_loading;
+> >  static Notifier packets_compare_notifier;
+> > @@ -514,6 +515,18 @@ out:
+> >          qemu_fclose(fb);
+> >      }
+> >
+> > +    /*
+> > +     * There are only two reasons we can go here, some error happened.
+> > +     * Or the user triggered failover.
+> > +     */
+> > +    if (failover_get_state() == FAILOVER_STATUS_NONE) {
+> > +        qapi_event_send_colo_exit(COLO_MODE_PRIMARY,
+> > +                                  COLO_EXIT_REASON_ERROR, NULL);
+> > +    } else {
+> > +        qapi_event_send_colo_exit(COLO_MODE_PRIMARY,
+> > +                                  COLO_EXIT_REASON_REQUEST, NULL);
+> > +    }
+>
+> Your comment makes me suspect failover_get_state() can only be
+> FAILOVER_STATUS_NONE or FAILOVER_STATUS_REQUIRE here.  Is that correct?
+>
+> If yes, I recommend to add a suitable assertion.
+>
 
-here is my command line:
+Yes, and what kinds of 'suitable assertion'? Just for the
+'failover_get_state()' ?
 
-TCG:
 
-sudo /home/augere/UPSTREAM/qemu/aarch64-softmmu/qemu-system-aarch64 -M virt-2.12,gic-version=3,iommu=smmuv3 \
--cpu cortex-a57 -smp 8 -m 4096 -display none -machine accel=tcg \
--serial tcp:localhost:4444,server -trace events=/home/augere/TEST/QEMU/hw-arm-smmu \
--qmp unix:/home/augere/TEST/QEMU/qmp-sock,server,nowait \
--device virtio-blk-pci,bus=pcie.0,scsi=off,drive=drv0,id=drv0,bootindex=1,iommu_platform,disable-modern=off,disable-legacy=on,werror=stop,rerror=stop \
--drive file=/home/augere/VM/IMAGES/vm0.qcow2,format=qcow2,if=none,id=drv0 \
--device virtio-net-pci,bus=pcie.0,netdev=nic0,mac=6a:f5:10:b1:3d:d2,iommu_platform,disable-modern=off,disable-legacy=on \
--netdev tap,id=nic0,script=/home/augere/TEST/SCRIPTS/qemu-ifup,downscript=/home/augere/TEST/SCRIPTS/qemu-ifdown \
--net none
 
-or with acceleration:
+>
+> > +
+> >      /* Hope this not to be too long to wait here */
+> >      qemu_sem_wait(&s->colo_exit_sem);
+> >      qemu_sem_destroy(&s->colo_exit_sem);
+> > @@ -744,6 +757,13 @@ out:
+> >      if (local_err) {
+> >          error_report_err(local_err);
+> >      }
+> > +    if (failover_get_state() == FAILOVER_STATUS_NONE) {
+> > +        qapi_event_send_colo_exit(COLO_MODE_SECONDARY,
+> > +                                  COLO_EXIT_REASON_ERROR, NULL);
+> > +    } else {
+> > +        qapi_event_send_colo_exit(COLO_MODE_SECONDARY,
+> > +                                  COLO_EXIT_REASON_REQUEST, NULL);
+> > +    }
+>
+> Same question.
+>
+> >
+> >      if (fb) {
+> >          qemu_fclose(fb);
+> > diff --git a/qapi/migration.json b/qapi/migration.json
+> > index f3974c6..55dae48 100644
+> > --- a/qapi/migration.json
+> > +++ b/qapi/migration.json
+> > @@ -875,6 +875,43 @@
+> >    'data': [ 'none', 'require', 'active', 'completed', 'relaunch' ] }
+> >
+> >  ##
+> > +# @COLO_EXIT:
+> > +#
+> > +# Emitted when VM finishes COLO mode due to some errors happening or
+> > +# at the request of users.
+> > +#
+> > +# @mode: report COLO mode when COLO exited.
+> > +#
+> > +# @reason: describes the reason for the COLO exit.
+> > +#
+> > +# Since: 2.13
+> > +#
+> > +# Example:
+> > +#
+> > +# <- { "timestamp": {"seconds": 2032141960, "microseconds": 417172},
+> > +#      "event": "COLO_EXIT", "data": {"mode": "primary", "reason":
+> "request" } }
+> > +#
+> > +##
+> > +{ 'event': 'COLO_EXIT',
+> > +  'data': {'mode': 'COLOMode', 'reason': 'COLOExitReason' } }
+>
+> 'data' duplicates the next patch's ColoStatus, except it lacks
+> @colo-running.  Factoring out the common part doesn't seem worth the
+> bother.  Okay as is.
+>
+> > +
+> > +##
+> > +# @COLOExitReason:
+> > +#
+> > +# The reason for a COLO exit
+> > +#
+> > +# @none: no failover has ever happened.
+>
+> This can't occur in the COLO_EXIT event, only in the result of
+> query-colo-status, can it?
 
-sudo /home/augere/UPSTREAM/qemu/aarch64-softmmu/qemu-system-aarch64 -M virt-2.12,gic-version=3,iommu=smmuv3 -cpu host -smp 8 -m 4096 -display none --enable-kvm ../..
 
-I reproduce with both, 100% of the cases.
+Yes.
 
-Trying to reproduce with intel iommu as well.
+
+> Worth spelling that out in the documentation?
+>
+>
+OK, I will add more comments here in next version.
 
 Thanks
+Zhang Chen
 
-Eric
+
+
+> > +#
+> > +# @request: COLO exit is due to an external request
+> > +#
+> > +# @error: COLO exit is due to an internal error
+> > +#
+> > +# Since: 2.13
+> > +##
+> > +{ 'enum': 'COLOExitReason',
+> > +  'data': [ 'none', 'request', 'error' ] }
+> > +
+> > +##
+> >  # @x-colo-lost-heartbeat:
+> >  #
+> >  # Tell qemu that heartbeat is lost, request it to do takeover
+> procedures.
+>
