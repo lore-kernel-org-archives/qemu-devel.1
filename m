@@ -1,25 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58866)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39599)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fIrSu-0003Hg-Pz
-	for qemu-devel@nongnu.org; Wed, 16 May 2018 04:07:19 -0400
+	(envelope-from <jemmy858585@gmail.com>) id 1fIrqd-0002t3-OR
+	for qemu-devel@nongnu.org; Wed, 16 May 2018 04:31:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fIrSp-00013u-NT
-	for qemu-devel@nongnu.org; Wed, 16 May 2018 04:07:16 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:59546 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fIrSp-00013G-Hi
-	for qemu-devel@nongnu.org; Wed, 16 May 2018 04:07:11 -0400
-From: Markus Armbruster <armbru@redhat.com>
-References: <20180504074207.22634-1-famz@redhat.com>
-	<20180504074207.22634-4-famz@redhat.com>
-Date: Wed, 16 May 2018 10:07:03 +0200
-In-Reply-To: <20180504074207.22634-4-famz@redhat.com> (Fam Zheng's message of
-	"Fri, 4 May 2018 15:42:06 +0800")
-Message-ID: <87sh6sowgo.fsf@dusky.pond.sub.org>
+	(envelope-from <jemmy858585@gmail.com>) id 1fIrqb-0006YB-TX
+	for qemu-devel@nongnu.org; Wed, 16 May 2018 04:31:47 -0400
+Received: from mail-it0-x242.google.com ([2607:f8b0:4001:c0b::242]:40835)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <jemmy858585@gmail.com>)
+	id 1fIrqb-0006Y1-NB
+	for qemu-devel@nongnu.org; Wed, 16 May 2018 04:31:45 -0400
+Received: by mail-it0-x242.google.com with SMTP id j186-v6so9057987ita.5
+	for <qemu-devel@nongnu.org>; Wed, 16 May 2018 01:31:45 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v6 3/4] slirp: Add "query-usernet" QMP
- command
+In-Reply-To: <20180514192723.GH2497@work-vm>
+References: <1525618499-1560-1-git-send-email-lidongchen@tencent.com>
+	<1525618499-1560-2-git-send-email-lidongchen@tencent.com>
+	<20180508184035.GT2500@work-vm>
+	<CAOGPPbdy+198Nxd=ttOtm+mNy7_u4iJxYVhLqYyeK1JJytuZEQ@mail.gmail.com>
+	<20180511180335.GH2720@work-vm>
+	<CAOGPPbdZX9gnp2BcwaizzyLGxN+T3wdSM_6wzVmGAYDgC+zFqQ@mail.gmail.com>
+	<20180514192723.GH2497@work-vm>
+From: 858585 jemmy <jemmy858585@gmail.com>
+Date: Wed, 16 May 2018 16:31:43 +0800
+Message-ID: <CAOGPPbfqiKsfd+qW9ik-NzTox5eQTSpGsKgSi8bULjfesWgQug@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH 2/2] migration: not wait
+ RDMA_CM_EVENT_DISCONNECTED event after rdma_disconnect
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,537 +35,277 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>
-Cc: qemu-devel@nongnu.org, Samuel Thibault <samuel.thibault@ens-lyon.org>, Jason Wang <jasowang@redhat.com>, Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Jan Kiszka <jan.kiszka@siemens.com>, Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: Aviad Yehezkel <aviadye@mellanox.com>, Juan Quintela <quintela@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, Gal Shachaf <galsha@mellanox.com>, adido@mellanox.com, Lidong Chen <lidongchen@tencent.com>
 
-Fam Zheng <famz@redhat.com> writes:
-
-> HMP "info usernet" has been available but it isn't ideal for programmed
-> use cases. This closes the gap in QMP by adding a counterpart
-> "query-usernet" command. It is basically translated from
-> the HMP slirp_connection_info() loop, which now calls the QMP
-> implementation and prints the data, just like other HMP info_* commands.
+On Tue, May 15, 2018 at 3:27 AM, Dr. David Alan Gilbert
+<dgilbert@redhat.com> wrote:
+> * 858585 jemmy (jemmy858585@gmail.com) wrote:
+>> On Sat, May 12, 2018 at 2:03 AM, Dr. David Alan Gilbert
+>> <dgilbert@redhat.com> wrote:
+>> > * 858585 jemmy (jemmy858585@gmail.com) wrote:
+>> >> On Wed, May 9, 2018 at 2:40 AM, Dr. David Alan Gilbert
+>> >> <dgilbert@redhat.com> wrote:
+>> >> > * Lidong Chen (jemmy858585@gmail.com) wrote:
+>> >> >> When cancel migration during RDMA precopy, the source qemu main thread hangs sometime.
+>> >> >>
+>> >> >> The backtrace is:
+>> >> >>     (gdb) bt
+>> >> >>     #0  0x00007f249eabd43d in write () from /lib64/libpthread.so.0
+>> >> >>     #1  0x00007f24a1ce98e4 in rdma_get_cm_event (channel=0x4675d10, event=0x7ffe2f643dd0) at src/cma.c:2189
+>> >> >>     #2  0x00000000007b6166 in qemu_rdma_cleanup (rdma=0x6784000) at migration/rdma.c:2296
+>> >> >>     #3  0x00000000007b7cae in qio_channel_rdma_close (ioc=0x3bfcc30, errp=0x0) at migration/rdma.c:2999
+>> >> >>     #4  0x00000000008db60e in qio_channel_close (ioc=0x3bfcc30, errp=0x0) at io/channel.c:273
+>> >> >>     #5  0x00000000007a8765 in channel_close (opaque=0x3bfcc30) at migration/qemu-file-channel.c:98
+>> >> >>     #6  0x00000000007a71f9 in qemu_fclose (f=0x527c000) at migration/qemu-file.c:334
+>> >> >>     #7  0x0000000000795b96 in migrate_fd_cleanup (opaque=0x3b46280) at migration/migration.c:1162
+>> >> >>     #8  0x000000000093a71b in aio_bh_call (bh=0x3db7a20) at util/async.c:90
+>> >> >>     #9  0x000000000093a7b2 in aio_bh_poll (ctx=0x3b121c0) at util/async.c:118
+>> >> >>     #10 0x000000000093f2ad in aio_dispatch (ctx=0x3b121c0) at util/aio-posix.c:436
+>> >> >>     #11 0x000000000093ab41 in aio_ctx_dispatch (source=0x3b121c0, callback=0x0, user_data=0x0)
+>> >> >>         at util/async.c:261
+>> >> >>     #12 0x00007f249f73c7aa in g_main_context_dispatch () from /lib64/libglib-2.0.so.0
+>> >> >>     #13 0x000000000093dc5e in glib_pollfds_poll () at util/main-loop.c:215
+>> >> >>     #14 0x000000000093dd4e in os_host_main_loop_wait (timeout=28000000) at util/main-loop.c:263
+>> >> >>     #15 0x000000000093de05 in main_loop_wait (nonblocking=0) at util/main-loop.c:522
+>> >> >>     #16 0x00000000005bc6a5 in main_loop () at vl.c:1944
+>> >> >>     #17 0x00000000005c39b5 in main (argc=56, argv=0x7ffe2f6443f8, envp=0x3ad0030) at vl.c:4752
+>> >> >>
+>> >> >> It does not get the RDMA_CM_EVENT_DISCONNECTED event after rdma_disconnect sometime.
+>> >> >> I do not find out the root cause why not get RDMA_CM_EVENT_DISCONNECTED event, but
+>> >> >> it can be reproduced if not invoke ibv_dereg_mr to release all ram blocks which fixed
+>> >> >> in previous patch.
+>> >> >
+>> >> > Does this happen without your other changes?
+>> >>
+>> >> Yes, this issue also happen on v2.12.0. base on
+>> >> commit 4743c23509a51bd4ee85cc272287a41917d1be35
+>> >>
+>> >> > Can you give me instructions to repeat it and also say which
+>> >> > cards you wereusing?
+>> >>
+>> >> This issue can be reproduced by start and cancel migration.
+>> >> less than 10 times, this issue will be reproduced.
+>> >>
+>> >> The command line is:
+>> >> virsh migrate --live --copy-storage-all  --undefinesource --persistent
+>> >> --timeout 10800 \
+>> >>  --verbose 83e0049e-1325-4f31-baf9-25231509ada1  \
+>> >> qemu+ssh://9.16.46.142/system rdma://9.16.46.142
+>> >>
+>> >> The net card i use is :
+>> >> 0000:3b:00.0 Ethernet controller: Mellanox Technologies MT27710 Family
+>> >> [ConnectX-4 Lx]
+>> >> 0000:3b:00.1 Ethernet controller: Mellanox Technologies MT27710 Family
+>> >> [ConnectX-4 Lx]
+>> >>
+>> >> This issue is related to ibv_dereg_mr, if not invoke ibv_dereg_mr for
+>> >> all ram block, this issue can be reproduced.
+>> >> If we fixed the bugs and use ibv_dereg_mr to release all ram block,
+>> >> this issue never happens.
+>> >
+>> > Maybe that is the right fix; I can imagine that the RDMA code doesn't
+>> > like closing down if there are still ramblocks registered that
+>> > potentially could have incoming DMA?
+>> >
+>> >> And for the kernel part, there is a bug also cause not release ram
+>> >> block when canceling live migration.
+>> >> https://patchwork.kernel.org/patch/10385781/
+>> >
+>> > OK, that's a pain; which threads are doing the dereg - is some stuff
+>> > in the migration thread and some stuff in the main thread on cleanup?
+>>
+>> Yes, the migration thread invokes ibv_reg_mr, and the main thread bh
+>> will invoke ibv_dereg_mr.
 >
-> Signed-off-by: Fam Zheng <famz@redhat.com>
-> ---
->  net/slirp.c      |  26 ++++++++
->  qapi/net.json    | 180 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
->  slirp/libslirp.h |   2 +
->  slirp/misc.c     | 158 ++++++++++++++++++++++++++++++++++--------------
->  4 files changed, 321 insertions(+), 45 deletions(-)
+> OK, although my reading of that discussion is that *should* be allowed
+> (with your fix).
 >
-> diff --git a/net/slirp.c b/net/slirp.c
-> index 8991816bbf..9c48a882ec 100644
-> --- a/net/slirp.c
-> +++ b/net/slirp.c
-> @@ -36,6 +36,7 @@
->  #include "monitor/monitor.h"
->  #include "qemu/error-report.h"
->  #include "qemu/sockets.h"
-> +#include "slirp/slirp.h"
->  #include "slirp/libslirp.h"
->  #include "slirp/ip6.h"
->  #include "chardev/char-fe.h"
-> @@ -43,6 +44,7 @@
->  #include "qemu/cutils.h"
->  #include "qapi/error.h"
->  #include "qapi/qmp/qdict.h"
-> +#include "qapi/qapi-commands-net.h"
->  
->  static int get_str_sep(char *buf, int buf_size, const char **pp, int sep)
->  {
-> @@ -864,6 +866,30 @@ static int slirp_guestfwd(SlirpState *s, const char *config_str,
->      return -1;
->  }
->  
-> +UsernetInfoList *qmp_query_usernet(Error **errp)
-> +{
-> +    SlirpState *s;
-> +    UsernetInfoList *list = NULL;
-> +    UsernetInfoList **p = &list;
-> +
-> +    QTAILQ_FOREACH(s, &slirp_stacks, entry) {
-> +        int hub;
-> +        UsernetInfoList *il = g_new0(UsernetInfoList, 1);
-> +        UsernetInfo *info = il->value = g_new0(UsernetInfo, 1);
-> +
-> +        info->id = g_strdup(s->nc.name);
-> +        if (!net_hub_id_for_client(&s->nc, &hub)) {
-> +            info->hub = hub;
-> +        } else {
-> +            info->hub = -1;
-> +        }
-> +        usernet_get_info(s->slirp, info);
-> +        *p = il;
-> +        p = &il->next;
-> +    }
-> +    return list;
-> +}
-> +
->  void hmp_info_usernet(Monitor *mon, const QDict *qdict)
->  {
->      SlirpState *s;
+>> and when the main thread schedule s->cleanup_bh, the migration thread
+>> may have been exited.
+>>
+>> And I find ibv_dereg_mr may take a long time for the big memory size
+>> virtual machine.
+>>
+>> The test result is:
+>>  10GB  326ms
+>>  20GB  699ms
+>>  30GB  1021ms
+>>  40GB  1387ms
+>>  50GB  1712ms
+>>  60GB  2034ms
+>>  70GB  2457ms
+>>  80GB  2807ms
+>>  90GB  3107ms
+>> 100GB 3474ms
+>> 110GB 3735ms
+>> 120GB 4064ms
+>> 130GB 4567ms
+>> 140GB 4886ms
+>>
+>> when canceling migration, the guest os will hang for a while.
+>> so I think we should invoke qemu_fclose(s->to_dst_file)  in
+>> migration_thread, and without hold io thread lock.
+>
+> Be very careful; it's tricky to get it right to handle all the failure
+> cases; that's why it's much easier to clean up right at the end.
+> It might make sense to try and do the deregister in the migration
+> thread but also to just make sure at the end.
 
-       QTAILQ_FOREACH(s, &slirp_stacks, entry) {
-           int id;
-           bool got_hub_id = net_hub_id_for_client(&s->nc, &id) == 0;
-           monitor_printf(mon, "Hub %d (%s):\n",
-                          got_hub_id ? id : -1,
-                          s->nc.name);
-           slirp_connection_info(s->slirp, mon);
-       }
-   }
+Yes, I will make sure at the end of migration thread.
 
-Our policy is to have HMP commands wrap themselves around QMP commands,
-or at least common helpers.  That way, "QMP can do everything HMP can
-do" is trivial.
+>
+> I wonder why dereg_mr takes so long - I could understand if reg_mr
+> took a long time, but why for dereg, that sounds like the easy side.
 
-hmp_info_usernet() uses common helpers net_hub_id_for_client(),
-s->nc.name, usernet_get_info(), the latter via slirp_connection_info().
-I guess that's okay, although wrapping around qmp_query_usernet() would
-be cleaner.
+I use perf collect the information when ibv_dereg_mr is invoked.
 
-> diff --git a/qapi/net.json b/qapi/net.json
-> index fcddce62d6..3cdcda125d 100644
-> --- a/qapi/net.json
-> +++ b/qapi/net.json
-> @@ -723,3 +723,183 @@
->      'time-wait',
->      'none'
->     ] }
-> +
-> +##
-> +# @UsernetTCPConnection:
-> +#
-> +# SLIRP TCP information.
-> +#
-> +# @state: tcp connection state
-> +#
-> +# @hostfwd: whether this connection has host port forwarding
-> +#
-> +# @fd: the file descriptor of the connection
+-   9.95%  client2  [kernel.kallsyms]  [k] put_compound_page
+                                                          `
+   - put_compound_page
+      - 98.45% put_page
+           __ib_umem_release
+           ib_umem_release
+           dereg_mr
+           mlx5_ib_dereg_mr
+           ib_dereg_mr
+           uverbs_free_mr
+           remove_commit_idr_uobject
+           _rdma_remove_commit_uobject
+           rdma_remove_commit_uobject
+           ib_uverbs_dereg_mr
+           ib_uverbs_write
+           vfs_write
+           sys_write
+           system_call_fastpath
+           __GI___libc_write
+           0
+      + 1.55% __ib_umem_release
++   8.31%  client2  [kernel.kallsyms]  [k] compound_unlock_irqrestore
++   7.01%  client2  [kernel.kallsyms]  [k] page_waitqueue
++   7.00%  client2  [kernel.kallsyms]  [k] set_page_dirty
++   6.61%  client2  [kernel.kallsyms]  [k] unlock_page
++   6.33%  client2  [kernel.kallsyms]  [k] put_page_testzero
++   5.68%  client2  [kernel.kallsyms]  [k] set_page_dirty_lock
++   4.30%  client2  [kernel.kallsyms]  [k] __wake_up_bit
++   4.04%  client2  [kernel.kallsyms]  [k] free_pages_prepare
++   3.65%  client2  [kernel.kallsyms]  [k] release_pages
++   3.62%  client2  [kernel.kallsyms]  [k] arch_local_irq_save
++   3.35%  client2  [kernel.kallsyms]  [k] page_mapping
++   3.13%  client2  [kernel.kallsyms]  [k] get_pageblock_flags_group
++   3.09%  client2  [kernel.kallsyms]  [k] put_page
 
-Why is @fd useful?  Hmm, I guess the argument is "info usernet has
-always printed it".  Is it useful there?
+the reason is __ib_umem_release will loop many times for each page.
 
-> +#
-> +# @src-addr: source address of host port forwarding
-> +#
-> +# @src-port: source port of host port forwarding
-> +#
-> +# @dest-addr: destination address of host port forwarding
-> +#
-> +# @dest-port: destination port of host port forwarding
-> +#
-> +# @recv-buffered: number of bytes queued in the receive buffer
-> +#
-> +# @send-buffered: number of bytes queued in the send buffer
-> +#
-> +# Since: 2.13
-> +##
-> +{ 'struct': 'UsernetTCPConnection',
-> +  'data': {
-> +    'state': 'UsernetTcpState',
-> +    'hostfwd': 'bool',
-> +    'fd': 'int',
-> +    'src-addr': 'str',
-> +    'src-port': 'int',
+static void __ib_umem_release(struct ib_device *dev, struct ib_umem
+*umem, int dirty)
+{
+    struct scatterlist *sg;
+    struct page *page;
+    int i;
 
-Shouldn't these two be an InetSocketAddressBase instead?
+    if (umem->nmap > 0)
+         ib_dma_unmap_sg(dev, umem->sg_head.sgl,
+                                        umem->npages,
+                                        DMA_BIDIRECTIONAL);
 
-> +    'dest-addr': 'str',
-> +    'dest-port': 'int',
+         for_each_sg(umem->sg_head.sgl, sg, umem->npages, i) {      <<
+loop a lot of times for each page.here
+              page = sg_page(sg);
+              if (umem->writable && dirty)
+                  set_page_dirty_lock(page);
+              put_page(page);
+         }
 
-Likewise.
+         sg_free_table(&umem->sg_head);
+         return;
+}
 
-> +    'recv-buffered': 'int',
-> +    'send-buffered': 'int'
-
-Make these 'uint32' to match the type of struct sbuf member sb_cc.
-
-> +  } }
-> +
-> +##
-> +# @UsernetUDPConnection:
-> +#
-> +# SLIRP UDP information.
-> +#
-> +# @hostfwd: whether this connection has host port forwarding
-> +#
-> +# @expire-time-ms: time in microseconds after which this connection will expire
-> +#
-> +# @fd: the file descriptor of the connection
-> +#
-> +# @src-addr: source address of host port forwarding
-> +#
-> +# @src-port: source port of host port forwarding
-> +#
-> +# @dest-addr: destination address of host port forwarding
-> +#
-> +# @dest-port: destination port of host port forwarding
-> +#
-> +# @recv-buffered: number of bytes queued in the receive buffer
-> +#
-> +# @send-buffered: number of bytes queued in the send buffer
-> +#
-> +# Since: 2.13
-> +##
-> +{ 'struct': 'UsernetUDPConnection',
-> +  'data': {
-> +    'hostfwd': 'bool',
-> +    'expire-time-ms': 'int',
-
-'uint', to match the type of so->so_expire - curtime.
-
-> +    'fd': 'int',
-> +    'src-addr': 'str',
-> +    'src-port': 'int',
-> +    'dest-addr': 'str',
-> +    'dest-port': 'int',
-> +    'recv-buffered': 'int',
-> +    'send-buffered': 'int'
-> +    } }
-
-Remarks on UsernetTCPConnection apply.
-
-> +
-> +##
-> +# @UsernetICMPConnection:
-> +#
-> +# SLIRP ICMP information.
-> +#
-> +# @expire-time-ms: time in microseconds after which this connection will expire
-> +#
-> +# @fd: the file descriptor of the connection
-> +#
-> +# @src-addr: source address of host port forwarding
-> +#
-> +# @dest-addr: destination address of host port forwarding
-> +#
-> +# @recv-buffered: number of bytes queued in the receive buffer
-> +#
-> +# @send-buffered: number of bytes queued in the send buffer
-> +#
-> +# Since: 2.13
-> +##
-> +{ 'struct': 'UsernetICMPConnection',
-> +  'data': {
-> +    'expire-time-ms': 'int',
-> +    'fd': 'int',
-> +    'src-addr': 'str',
-> +    'dest-addr': 'str',
-> +    'recv-buffered': 'int',
-> +    'send-buffered': 'int'
-> +    } }
-
-Remarks on UsernetTCPConnection and UsernetUDPConnection apply.
-
-> +
-> +##
-> +# @UsernetType:
-> +#
-> +# Available netdev drivers.
-> +#
-> +# Since: 2.13
-> +##
-> +{ 'enum': 'UsernetType',
-> +  'data': [ 'tcp', 'udp', 'icmp' ] }
-> +
-> +##
-> +# @UsernetConnection:
-> +#
-> +# SLIRP usernet connection information.
-> +#
-> +# Since: 2.13
-> +##
-> +{ 'union': 'UsernetConnection',
-> +  'discriminator': 'type',
-> +  'base': { 'type': 'UsernetType' },
-> +  'data': {
-> +    'tcp':     'UsernetTCPConnection',
-> +    'udp':     'UsernetUDPConnection',
-> +    'icmp':    'UsernetICMPConnection'
-> +    } }
-> +
-> +##
-> +# @UsernetInfo:
-> +#
-> +# SLIRP usernet information.
-> +#
-> +# Since: 2.13
-> +##
-> +{ 'struct': 'UsernetInfo',
-> +  'data': {
-> +    'id':              'str',
-> +    'hub':             'int',
-> +    'connections':     ['UsernetConnection']
-> +} }
-> +
-> +##
-> +# @query-usernet:
-> +#
-> +# Return SLIRP network information.
-> +#
-> +# Since: 2.13
-> +#
-> +# Example:
-> +#
-> +# -> { "execute": "query-usernet", "arguments": { } }
-> +# <- { "return": [
-> +#      {
-> +#        "hub": -1,
-> +#        "connections": [
-> +#          {
-> +#            "dest-addr": "10.0.2.15",
-> +#            "recv-buffered": 0,
-> +#            "src-port": 10022,
-> +#            "state": "closed",
-> +#            "fd": 16,
-> +#            "src-addr": "*",
-> +#            "send-buffered": 0,
-> +#            "dest-port": 22,
-> +#            "type": "tcp",
-> +#            "hostfwd": true
-> +#          }
-> +#        ],
-> +#        "id": "vnet"
-> +#      }
-> +#   ]}
-> +#
-> +##
-> +{ 'command': 'query-usernet',
-> +  'returns': ['UsernetInfo'] }
-> diff --git a/slirp/libslirp.h b/slirp/libslirp.h
-> index 540b3e5903..3ba361ea41 100644
-> --- a/slirp/libslirp.h
-> +++ b/slirp/libslirp.h
-> @@ -2,6 +2,7 @@
->  #define LIBSLIRP_H
->  
->  #include "qemu-common.h"
-> +#include "qapi/qapi-commands-net.h"
-
-"qapi/qapi-types-net.h"?
-
->  
->  typedef struct Slirp Slirp;
->  
-> @@ -37,6 +38,7 @@ int slirp_add_exec(Slirp *slirp, int do_pty, const void *args,
->                     struct in_addr *guest_addr, int guest_port);
->  
->  void slirp_connection_info(Slirp *slirp, Monitor *mon);
-> +void usernet_get_info(Slirp *slirp, UsernetInfo *info);
->  
->  void slirp_socket_recv(Slirp *slirp, struct in_addr guest_addr,
->                         int guest_port, const uint8_t *buf, int size);
-
-I'm only skimming the remainder of this patch for now.
-
-> diff --git a/slirp/misc.c b/slirp/misc.c
-> index ee617bc3c4..1d310d7d1f 100644
-> --- a/slirp/misc.c
-> +++ b/slirp/misc.c
-> @@ -206,39 +206,28 @@ fork_exec(struct socket *so, const char *ex, int do_pty)
->  }
->  #endif
->  
-> -void slirp_connection_info(Slirp *slirp, Monitor *mon)
-> +void usernet_get_info(Slirp *slirp, UsernetInfo *info)
->  {
-> -    const char * const tcpstates[] = {
-> -        [USERNET_TCP_STATE_CLOSED]       = "CLOSED",
-> -        [USERNET_TCP_STATE_LISTEN]       = "LISTEN",
-> -        [USERNET_TCP_STATE_SYN_SENT]     = "SYN_SENT",
-> -        [USERNET_TCP_STATE_SYN_RECEIVED] = "SYN_RCVD",
-> -        [USERNET_TCP_STATE_ESTABLISHED]  = "ESTABLISHED",
-> -        [USERNET_TCP_STATE_CLOSE_WAIT]   = "CLOSE_WAIT",
-> -        [USERNET_TCP_STATE_FIN_WAIT_1]   = "FIN_WAIT_1",
-> -        [USERNET_TCP_STATE_CLOSING]      = "CLOSING",
-> -        [USERNET_TCP_STATE_LAST_ACK]     = "LAST_ACK",
-> -        [USERNET_TCP_STATE_FIN_WAIT_2]   = "FIN_WAIT_2",
-> -        [USERNET_TCP_STATE_TIME_WAIT]    = "TIME_WAIT",
-> -    };
->      struct in_addr dst_addr;
->      struct sockaddr_in src;
->      socklen_t src_len;
->      uint16_t dst_port;
->      struct socket *so;
-> -    const char *state;
-> -    char buf[20];
-> -
-> -    monitor_printf(mon, "  Protocol[State]    FD  Source Address  Port   "
-> -                        "Dest. Address  Port RecvQ SendQ\n");
-> +    UsernetConnectionList **p_next = &info->connections;
->  
->      for (so = slirp->tcb.so_next; so != &slirp->tcb; so = so->so_next) {
-> +        UsernetConnection *conn = g_new0(UsernetConnection, 1);
-> +        UsernetTCPConnection *tcp = &conn->u.tcp;
-> +        UsernetConnectionList *list = g_new0(UsernetConnectionList, 1);
-> +
-> +        list->value = conn;
->          if (so->so_state & SS_HOSTFWD) {
-> -            state = "HOST_FORWARD";
-> +            tcp->hostfwd = true;
-> +            tcp->state = so->so_tcpcb->t_state;
->          } else if (so->so_tcpcb) {
-> -            state = tcpstates[so->so_tcpcb->t_state];
-> +            tcp->state = so->so_tcpcb->t_state;
->          } else {
-> -            state = "NONE";
-> +            tcp->state = USERNET_TCP_STATE_NONE;
->          }
->          if (so->so_state & (SS_HOSTFWD | SS_INCOMING)) {
->              src_len = sizeof(src);
-> @@ -251,46 +240,125 @@ void slirp_connection_info(Slirp *slirp, Monitor *mon)
->              dst_addr = so->so_faddr;
->              dst_port = so->so_fport;
->          }
-> -        snprintf(buf, sizeof(buf), "  TCP[%s]", state);
-> -        monitor_printf(mon, "%-19s %3d %15s %5d ", buf, so->s,
-> -                       src.sin_addr.s_addr ? inet_ntoa(src.sin_addr) : "*",
-> -                       ntohs(src.sin_port));
-> -        monitor_printf(mon, "%15s %5d %5d %5d\n",
-> -                       inet_ntoa(dst_addr), ntohs(dst_port),
-> -                       so->so_rcv.sb_cc, so->so_snd.sb_cc);
-> +        tcp->fd = so->s;
-> +        tcp->src_addr =
-> +            g_strdup(src.sin_addr.s_addr ? inet_ntoa(src.sin_addr) : "*");
-> +        tcp->src_port = ntohs(src.sin_port);
-> +        tcp->dest_addr = g_strdup(inet_ntoa(dst_addr));
-> +        tcp->dest_port = ntohs(dst_port);
-> +        tcp->recv_buffered = so->so_rcv.sb_cc;
-> +        tcp->send_buffered = so->so_snd.sb_cc;
-> +        *p_next = list;
-> +        p_next = &list->next;
->      }
-> -
->      for (so = slirp->udb.so_next; so != &slirp->udb; so = so->so_next) {
-> +        UsernetConnection *conn = g_new0(UsernetConnection, 1);
-> +        UsernetUDPConnection *udp = &conn->u.udp;
-> +        UsernetConnectionList *list = g_new0(UsernetConnectionList, 1);
-> +
-> +        list->value = conn;
->          if (so->so_state & SS_HOSTFWD) {
-> -            snprintf(buf, sizeof(buf), "  UDP[HOST_FORWARD]");
-> +            udp->hostfwd = true;
->              src_len = sizeof(src);
->              getsockname(so->s, (struct sockaddr *)&src, &src_len);
->              dst_addr = so->so_laddr;
->              dst_port = so->so_lport;
->          } else {
-> -            snprintf(buf, sizeof(buf), "  UDP[%d sec]",
-> -                         (so->so_expire - curtime) / 1000);
-> +            udp->expire_time_ms = so->so_expire - curtime;
->              src.sin_addr = so->so_laddr;
->              src.sin_port = so->so_lport;
->              dst_addr = so->so_faddr;
->              dst_port = so->so_fport;
->          }
-
-@expire_time_ms appears to be left at zero when @hostfwd is true.
-Should it be optional?
-
-> -        monitor_printf(mon, "%-19s %3d %15s %5d ", buf, so->s,
-> -                       src.sin_addr.s_addr ? inet_ntoa(src.sin_addr) : "*",
-> -                       ntohs(src.sin_port));
-> -        monitor_printf(mon, "%15s %5d %5d %5d\n",
-> -                       inet_ntoa(dst_addr), ntohs(dst_port),
-> -                       so->so_rcv.sb_cc, so->so_snd.sb_cc);
-> +        udp->fd = so->s;
-> +        udp->src_addr =
-> +            g_strdup(src.sin_addr.s_addr ? inet_ntoa(src.sin_addr) : "*");
-> +        udp->src_port = ntohs(src.sin_port);
-> +        udp->dest_addr = g_strdup(inet_ntoa(dst_addr));
-> +        udp->dest_port = ntohs(dst_port);
-> +        udp->recv_buffered = so->so_rcv.sb_cc;
-> +        udp->send_buffered = so->so_snd.sb_cc;
-> +        *p_next = list;
-> +        p_next = &list->next;
->      }
->  
->      for (so = slirp->icmp.so_next; so != &slirp->icmp; so = so->so_next) {
-> -        snprintf(buf, sizeof(buf), "  ICMP[%d sec]",
-> -                     (so->so_expire - curtime) / 1000);
-> +        UsernetConnection *conn = g_new0(UsernetConnection, 1);
-> +        UsernetICMPConnection *icmp = &conn->u.icmp;
-> +        UsernetConnectionList *list = g_new0(UsernetConnectionList, 1);
-> +
-> +        icmp->expire_time_ms = so->so_expire - curtime;
->          src.sin_addr = so->so_laddr;
->          dst_addr = so->so_faddr;
-> -        monitor_printf(mon, "%-19s %3d %15s  -    ", buf, so->s,
-> -                       src.sin_addr.s_addr ? inet_ntoa(src.sin_addr) : "*");
-> -        monitor_printf(mon, "%15s  -    %5d %5d\n", inet_ntoa(dst_addr),
-> -                       so->so_rcv.sb_cc, so->so_snd.sb_cc);
-> +        icmp->fd = so->s;
-> +        icmp->src_addr =
-> +            g_strdup(src.sin_addr.s_addr ? inet_ntoa(src.sin_addr) : "*");
-> +        icmp->dest_addr = g_strdup(inet_ntoa(dst_addr));
-> +        icmp->recv_buffered = so->so_rcv.sb_cc;
-> +        icmp->send_buffered = so->so_snd.sb_cc;
-> +        *p_next = list;
-> +        p_next = &list->next;
->      }
->  }
-> +
-> +
-> +void slirp_connection_info(Slirp *slirp, Monitor *mon)
-> +{
-> +    const char *state;
-> +    char buf[64];
-> +    UsernetInfo *info = g_new0(UsernetInfo, 1);
-> +    UsernetConnectionList *cl;
-> +
-> +    monitor_printf(mon, "  Protocol[State]    FD  Source Address  Port   "
-> +                        "Dest. Address  Port RecvQ SendQ\n");
-> +
-> +    usernet_get_info(slirp, info);
-> +    for (cl = info->connections; cl && cl->value; cl = cl->next) {
-> +        UsernetConnection *conn = cl->value;
-> +
-> +        if (conn->type == USERNET_TYPE_TCP) {
-> +            UsernetTCPConnection *tcp = &conn->u.tcp;
-> +
-> +            if (tcp->hostfwd) {
-> +                state = "HOST_FORWARD";
-> +            } else {
-> +                state = UsernetTcpState_str(tcp->state);
-> +            }
-> +            snprintf(buf, sizeof(buf), "  TCP[%s]", state);
-> +            monitor_printf(mon, "%-19s %3" PRId64 " %15s %5" PRId64 " ",
-> +                           buf, tcp->fd,
-> +                           tcp->src_addr, tcp->src_port);
-> +            monitor_printf(mon, "%15s %5" PRId64 " %5" PRId64 " %5" PRId64 "\n",
-> +                           tcp->dest_addr, tcp->dest_port,
-> +                           tcp->recv_buffered, tcp->send_buffered);
-> +        } else if (conn->type == USERNET_TYPE_UDP) {
-> +            UsernetUDPConnection *udp = &conn->u.udp;
-> +
-> +            if (udp->hostfwd) {
-> +                snprintf(buf, sizeof(buf), "  UDP[HOST_FORWARD]");
-> +            } else {
-> +                snprintf(buf, sizeof(buf), "  UDP[%" PRId64 " sec]",
-> +                         udp->expire_time_ms / 1000);
-> +            }
-> +            monitor_printf(mon, "%-19s %3" PRId64 " %15s %5" PRId64 " ",
-> +                           buf, udp->fd,
-> +                           udp->src_addr, udp->src_port);
-> +            monitor_printf(mon, "%15s %5" PRId64 " %5" PRId64 " %5" PRId64 "\n",
-> +                           udp->dest_addr, udp->dest_port,
-> +                           udp->recv_buffered, udp->send_buffered);
-> +        } else {
-> +            UsernetICMPConnection *icmp = &conn->u.icmp;
-> +
-> +            assert(conn->type == USERNET_TYPE_ICMP);
-> +            snprintf(buf, sizeof(buf), "  ICMP[%" PRId64 " sec]",
-> +                     icmp->expire_time_ms / 1000);
-> +            monitor_printf(mon, "%-19s %3" PRId64 " %15s  -    ", buf, icmp->fd,
-> +                           icmp->src_addr);
-> +            monitor_printf(mon, "%15s  -    %5" PRId64 " %5" PRId64 "\n",
-> +                           icmp->dest_addr,
-> +                           icmp->recv_buffered, icmp->send_buffered);
-> +        }
-> +    }
-> +
-> +    qapi_free_UsernetInfo(info);
-> +}
+>
+> Dave
+>
+>
+>> >
+>> > Dave
+>> >
+>> >> >
+>> >> >> Anyway, it should not invoke rdma_get_cm_event in main thread, and the event channel
+>> >> >> is also destroyed in qemu_rdma_cleanup.
+>> >> >>
+>> >> >> Signed-off-by: Lidong Chen <lidongchen@tencent.com>
+>> >> >> ---
+>> >> >>  migration/rdma.c       | 12 ++----------
+>> >> >>  migration/trace-events |  1 -
+>> >> >>  2 files changed, 2 insertions(+), 11 deletions(-)
+>> >> >>
+>> >> >> diff --git a/migration/rdma.c b/migration/rdma.c
+>> >> >> index 0dd4033..92e4d30 100644
+>> >> >> --- a/migration/rdma.c
+>> >> >> +++ b/migration/rdma.c
+>> >> >> @@ -2275,8 +2275,7 @@ static int qemu_rdma_write(QEMUFile *f, RDMAContext *rdma,
+>> >> >>
+>> >> >>  static void qemu_rdma_cleanup(RDMAContext *rdma)
+>> >> >>  {
+>> >> >> -    struct rdma_cm_event *cm_event;
+>> >> >> -    int ret, idx;
+>> >> >> +    int idx;
+>> >> >>
+>> >> >>      if (rdma->cm_id && rdma->connected) {
+>> >> >>          if ((rdma->error_state ||
+>> >> >> @@ -2290,14 +2289,7 @@ static void qemu_rdma_cleanup(RDMAContext *rdma)
+>> >> >>              qemu_rdma_post_send_control(rdma, NULL, &head);
+>> >> >>          }
+>> >> >>
+>> >> >> -        ret = rdma_disconnect(rdma->cm_id);
+>> >> >> -        if (!ret) {
+>> >> >> -            trace_qemu_rdma_cleanup_waiting_for_disconnect();
+>> >> >> -            ret = rdma_get_cm_event(rdma->channel, &cm_event);
+>> >> >> -            if (!ret) {
+>> >> >> -                rdma_ack_cm_event(cm_event);
+>> >> >> -            }
+>> >> >> -        }
+>> >> >> +        rdma_disconnect(rdma->cm_id);
+>> >> >
+>> >> > I'm worried whether this change could break stuff:
+>> >> > The docs say for rdma_disconnect that it flushes any posted work
+>> >> > requests to the completion queue;  so unless we wait for the event
+>> >> > do we know the stuff has been flushed?   In the normal non-cancel case
+>> >> > I'm worried that means we could lose something.
+>> >> > (But I don't know the rdma/infiniband specs well enough to know if it's
+>> >> > really a problem).
+>> >>
+>> >> In qemu_fclose function, it invoke qemu_fflush(f) before invoke f->ops->close.
+>> >> so I think it's safe for normal migration case.
+>> >>
+>> >> For the root cause why not receive RDMA_CM_EVENT_DISCONNECTED event
+>> >> after rdma_disconnect,
+>> >> I loop in Aviad Yehezkel<aviadye@mellanox.com>, Aviad will help us
+>> >> find the root cause.
+>> >>
+>> >> >
+>> >> > Dave
+>> >> >
+>> >> >>          trace_qemu_rdma_cleanup_disconnect();
+>> >> >>          rdma->connected = false;
+>> >> >>      }
+>> >> >> diff --git a/migration/trace-events b/migration/trace-events
+>> >> >> index d6be74b..64573ff 100644
+>> >> >> --- a/migration/trace-events
+>> >> >> +++ b/migration/trace-events
+>> >> >> @@ -125,7 +125,6 @@ qemu_rdma_accept_pin_state(bool pin) "%d"
+>> >> >>  qemu_rdma_accept_pin_verbsc(void *verbs) "Verbs context after listen: %p"
+>> >> >>  qemu_rdma_block_for_wrid_miss(const char *wcompstr, int wcomp, const char *gcompstr, uint64_t req) "A Wanted wrid %s (%d) but got %s (%" PRIu64 ")"
+>> >> >>  qemu_rdma_cleanup_disconnect(void) ""
+>> >> >> -qemu_rdma_cleanup_waiting_for_disconnect(void) ""
+>> >> >>  qemu_rdma_close(void) ""
+>> >> >>  qemu_rdma_connect_pin_all_requested(void) ""
+>> >> >>  qemu_rdma_connect_pin_all_outcome(bool pin) "%d"
+>> >> >> --
+>> >> >> 1.8.3.1
+>> >> >>
+>> >> > --
+>> >> > Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+>> > --
+>> > Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> --
+> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
