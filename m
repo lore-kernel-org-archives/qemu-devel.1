@@ -1,43 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56633)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57885)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pmorel@linux.ibm.com>) id 1fIwY9-0002tu-3w
-	for qemu-devel@nongnu.org; Wed, 16 May 2018 09:33:05 -0400
+	(envelope-from <eric.auger@redhat.com>) id 1fIwdL-0004eN-DG
+	for qemu-devel@nongnu.org; Wed, 16 May 2018 09:38:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pmorel@linux.ibm.com>) id 1fIwY4-00011Z-OA
-	for qemu-devel@nongnu.org; Wed, 16 May 2018 09:33:00 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:45266)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pmorel@linux.ibm.com>)
-	id 1fIwY4-00011J-GY
-	for qemu-devel@nongnu.org; Wed, 16 May 2018 09:32:56 -0400
-Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w4GDT1MM049757
-	for <qemu-devel@nongnu.org>; Wed, 16 May 2018 09:32:55 -0400
-Received: from e06smtp15.uk.ibm.com (e06smtp15.uk.ibm.com [195.75.94.111])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2j0k3qqj87-1
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Wed, 16 May 2018 09:32:54 -0400
-Received: from localhost
-	by e06smtp15.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <pmorel@linux.ibm.com>;
-	Wed, 16 May 2018 14:32:52 +0100
-Reply-To: pmorel@linux.ibm.com
-References: <20180509154822.23510-1-cohuck@redhat.com>
-	<20180509154822.23510-3-cohuck@redhat.com>
-	<c18f9b9f-da00-1a0b-8ef0-7ac223c73d1a@linux.ibm.com>
-	<20180515181006.0cb1dfc2.cohuck@redhat.com>
-From: Pierre Morel <pmorel@linux.ibm.com>
-Date: Wed, 16 May 2018 15:32:48 +0200
+	(envelope-from <eric.auger@redhat.com>) id 1fIwdI-0004DM-Al
+	for qemu-devel@nongnu.org; Wed, 16 May 2018 09:38:23 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:53566 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eric.auger@redhat.com>)
+	id 1fIwdI-0004Co-5c
+	for qemu-devel@nongnu.org; Wed, 16 May 2018 09:38:20 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.4])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 7315E814FDCF
+	for <qemu-devel@nongnu.org>; Wed, 16 May 2018 13:38:19 +0000 (UTC)
+References: <20180417140802.16711-1-pbonzini@redhat.com>
+	<0a51d026-8b9f-9925-1229-10e3766907bb@redhat.com>
+	<02617670-8b06-e5b9-d763-65453b5f706a@redhat.com>
+From: Auger Eric <eric.auger@redhat.com>
+Message-ID: <222e8530-6bd1-086a-cecf-1a755a38ce99@redhat.com>
+Date: Wed, 16 May 2018 15:38:18 +0200
 MIME-Version: 1.0
-In-Reply-To: <20180515181006.0cb1dfc2.cohuck@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Message-Id: <a5d08fb7-d9c1-b230-fe0c-acebbda2ba65@linux.ibm.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH RFC 2/2] vfio-ccw: support for halt/clear
- subchannel
+In-Reply-To: <02617670-8b06-e5b9-d763-65453b5f706a@redhat.com>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 0/4] exec: reintroduce MemoryRegion caching
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -46,150 +35,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>
-Cc: Dong Jia Shi <bjsdjshi@linux.ibm.com>, Halil Pasic <pasic@linux.ibm.com>, linux-s390@vger.kernel.org, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, qemu-s390x@nongnu.org, qemu-devel@nongnu.org
+To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
 
-On 15/05/2018 18:10, Cornelia Huck wrote:
-> On Fri, 11 May 2018 11:33:35 +0200
-> Pierre Morel <pmorel@linux.ibm.com> wrote:
->
->> On 09/05/2018 17:48, Cornelia Huck wrote:
->>> Currently, vfio-ccw only relays start subchannel requests to the real
->>> hardware, which is enough in many cases but falls short e.g. during
->>> error recovery.
->>>
->>> Fortunately, it is easy to add support for halt and clear subchannel
->>> requests to the existing infrastructure. User space can detect
->>> support for halt/clear subchannel easily, as we always returned
->>> -EOPNOTSUPP before and therefore we do not need any capability to
->>> make this support discoverable.
->>>
->>> Signed-off-by: Cornelia Huck <cohuck@redhat.com>
->>> ---
->>>    drivers/s390/cio/vfio_ccw_drv.c | 10 ++++-
->>>    drivers/s390/cio/vfio_ccw_fsm.c | 94 +++++++++++++++++++++++++++++=
-+++++++-----
->>>    2 files changed, 92 insertions(+), 12 deletions(-)
->>> @@ -65,6 +67,70 @@ static int fsm_io_helper(struct vfio_ccw_private *=
-private)
->>>    	return ret;
->>>    }
->>>   =20
->>> +static int fsm_halt_helper(struct vfio_ccw_private *private)
->>> +{
->>> +	struct subchannel *sch;
->>> +	int ccode;
->>> +	unsigned long flags;
->>> +	int ret;
->>> +
->>> +	sch =3D private->sch;
->>> +
->>> +	spin_lock_irqsave(sch->lock, flags);
->>> +	private->state =3D VFIO_CCW_STATE_BUSY;
->>> +
->>> +	/* Issue "Halt Subchannel" */
->>> +	ccode =3D hsch(sch->schid);
->>> +
->>> +	switch (ccode) {
->>> +	case 0:
->>> +		/*
->>> +		 * Initialize device status information
->>> +		 */
->>> +		sch->schib.scsw.cmd.actl |=3D SCSW_ACTL_HALT_PEND;
->>> +		ret =3D 0;
->>> +		break;
->>> +	case 1:		/* Status pending */
->> shouldn't we make a difference between status pending
->> and having halt in progress?
->>
->> The guest can examine the SCSW, but couldn't it introduce
->> a race condition?
-> Yes, good point. Especially as the guest might want to do different
-> things.
->
-> Regarding race conditions: The scsw can already be outdated after the
-> operation that stored it finished, which is true even on LPAR. That's
-> especially true for tsch which clears some status at the subchannel.
-> The guest must already be able to deal with this, the race window is
-> just larger.
+Hi Paolo
 
-This is the kind of race I try to avoid with the mutex protected
-state changes patch.
+On 05/16/2018 12:42 PM, Paolo Bonzini wrote:
+> On 16/05/2018 12:41, Auger Eric wrote:
+>> This patch seems to cause a regression with ARM vsmmu +
+>> virtio-blk-pci. Reverting it looks to fix the issue. Otherwise I
+>> get:
+> 
+> What's the command line for a reproducer?
+> 
+> Thanks,
+> 
+> Paolo
+> 
 
->
->>
->>> +	case 2:		/* Busy */
->>> +		ret =3D -EBUSY;
->>> +		break;
->>> +	default:	/* Device not operational */
->>> +		ret =3D -ENODEV;
->>> +	}
->>> +	spin_unlock_irqrestore(sch->lock, flags);
->>> +	return ret;
->>> +}
->>> +
->>> +static int fsm_clear_helper(struct vfio_ccw_private *private)
->>> +{
->>> +	struct subchannel *sch;
->>> +	int ccode;
->>> +	unsigned long flags;
->>> +	int ret;
->>> +
->>> +	sch =3D private->sch;
->>> +
->>> +	spin_lock_irqsave(sch->lock, flags);
->>> +	private->state =3D VFIO_CCW_STATE_BUSY;
->>> +
->>> +	/* Issue "Clear Subchannel" */
->>> +	ccode =3D csch(sch->schid);
->>> +
->>> +	switch (ccode) {
->>> +	case 0:
->>> +		/*
->>> +		 * Initialize device status information
->>> +		 */
->>> +		sch->schib.scsw.cmd.actl |=3D SCSW_ACTL_CLEAR_PEND;
->>> +		ret =3D 0;
->>> +		break;
->>> +	default:	/* Device not operational */
->>> +		ret =3D -ENODEV;
->>> +	}
->>> +	spin_unlock_irqrestore(sch->lock, flags);
->>> +	return ret;
->>> +}
->>> +
->>>    static void fsm_notoper(struct vfio_ccw_private *private,
->>>    			enum vfio_ccw_event event)
->>>    {
->>> @@ -126,7 +192,24 @@ static void fsm_io_request(struct vfio_ccw_priva=
-te *private,
->>>   =20
->>>    	memcpy(scsw, io_region->scsw_area, sizeof(*scsw));
->>>   =20
->>> -	if (scsw->cmd.fctl & SCSW_FCTL_START_FUNC) {
->>> +	/*
->>> +	 * Start processing with the clear function, then halt, then start.
->>> +	 * We may still be start pending when the caller wants to clean
->>> +	 * up things via halt/clear.
->>> +	 */
->> hum. The scsw here does not reflect the hardware state but the
->> command passed from the user interface.
->> Can we and should we authorize multiple commands in one call?
->>
->> If not, the comment is not appropriate and a switch on cmd.fctl
->> would be a clearer.
-> There may be multiple functions specified, but we need to process them
-> in precedence order (and clear wins over the others, so to speak).
-> Would adding a sentence like "we always process just one function" help=
-?
+here is my command line:
 
-Why should we allow multiple commands in a single call ?
-It brings no added value.
-Is there a use case?
-Currently QEMU does not do this and since we only have the SCSH there
-is no difference having the bit set alone or not alone.
+TCG:
 
+sudo /home/augere/UPSTREAM/qemu/aarch64-softmmu/qemu-system-aarch64 -M virt-2.12,gic-version=3,iommu=smmuv3 \
+-cpu cortex-a57 -smp 8 -m 4096 -display none -machine accel=tcg \
+-serial tcp:localhost:4444,server -trace events=/home/augere/TEST/QEMU/hw-arm-smmu \
+-qmp unix:/home/augere/TEST/QEMU/qmp-sock,server,nowait \
+-device virtio-blk-pci,bus=pcie.0,scsi=off,drive=drv0,id=drv0,bootindex=1,iommu_platform,disable-modern=off,disable-legacy=on,werror=stop,rerror=stop \
+-drive file=/home/augere/VM/IMAGES/vm0.qcow2,format=qcow2,if=none,id=drv0 \
+-device virtio-net-pci,bus=pcie.0,netdev=nic0,mac=6a:f5:10:b1:3d:d2,iommu_platform,disable-modern=off,disable-legacy=on \
+-netdev tap,id=nic0,script=/home/augere/TEST/SCRIPTS/qemu-ifup,downscript=/home/augere/TEST/SCRIPTS/qemu-ifdown \
+-net none
 
---=20
-Pierre Morel
-Linux/KVM/QEMU in B=C3=B6blingen - Germany
+or with acceleration:
+
+sudo /home/augere/UPSTREAM/qemu/aarch64-softmmu/qemu-system-aarch64 -M virt-2.12,gic-version=3,iommu=smmuv3 -cpu host -smp 8 -m 4096 -display none --enable-kvm ../..
+
+I reproduce with both, 100% of the cases.
+
+Trying to reproduce with intel iommu as well.
+
+Thanks
+
+Eric
