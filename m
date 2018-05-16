@@ -1,24 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35214)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35955)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1fIpxB-0006IN-4C
-	for qemu-devel@nongnu.org; Wed, 16 May 2018 02:30:31 -0400
+	(envelope-from <suhang16@mails.ucas.ac.cn>) id 1fIq1J-0007aO-VQ
+	for qemu-devel@nongnu.org; Wed, 16 May 2018 02:34:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1fIpx6-0004Ut-3C
-	for qemu-devel@nongnu.org; Wed, 16 May 2018 02:30:25 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:38068 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1fIpx5-0004RR-UW
-	for qemu-devel@nongnu.org; Wed, 16 May 2018 02:30:20 -0400
-Date: Wed, 16 May 2018 14:30:09 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20180516063009.GG9089@xz-mi>
-References: <20180504030811.28111-1-peterx@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20180504030811.28111-1-peterx@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2 00/10] intel-iommu: nested vIOMMU,
- cleanups, bug fixes
+	(envelope-from <suhang16@mails.ucas.ac.cn>) id 1fIq1F-00070i-2m
+	for qemu-devel@nongnu.org; Wed, 16 May 2018 02:34:41 -0400
+Received: from smtp23.cstnet.cn ([159.226.251.23]:57907 helo=cstnet.cn)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <suhang16@mails.ucas.ac.cn>) id 1fIq1E-0006xd-D7
+	for qemu-devel@nongnu.org; Wed, 16 May 2018 02:34:36 -0400
+From: Su Hang <suhang16@mails.ucas.ac.cn>
+Date: Wed, 16 May 2018 14:34:25 +0800
+Message-Id: <1526452467-18798-1-git-send-email-suhang16@mails.ucas.ac.cn>
+Subject: [Qemu-devel] [PATCH v9 0/2] Implement Hex file loader and add test
+ case
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,54 +22,99 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Tian Kevin <kevin.tian@intel.com>, "Michael S . Tsirkin" <mst@redhat.com>, Alex Williamson <alex.williamson@redhat.com>, Jintack Lim <jintack@cs.columbia.edu>, Jason Wang <jasowang@redhat.com>
+To: stefanha@gmail.com, qemu.ml@steffen-goertz.de, jusual@mail.ru, jim@groklearning.com, joel@jms.id.au, darcysail@gmail.com
+Cc: qemu-devel@nongnu.org
 
-On Fri, May 04, 2018 at 11:08:01AM +0800, Peter Xu wrote:
-> v2:
-> - fix patchew code style warnings
-> - interval tree: postpone malloc when inserting; simplify node remove
->   a bit where proper [Jason]
-> - fix up comment and commit message for iommu lock patch [Kevin]
-> - protect context cache too using the iommu lock [Kevin, Jason]
-> - add vast comment in patch 8 to explain the modify-PTE problem
->   [Jason, Kevin]
+These series of patchs implement Intel Hexadecimal File loader and
+add QTest testcase to verify the correctness of Loader.
 
-We can hold a bit on reviewing this series.  Jintack reported a scp
-DMAR issue that might happen even with L1 guest with this series, and
-the scp can stall after copied tens or hundreds of MBs randomly.  I'm
-still investigating the problem.  This problem should be related to
-deferred flushing of VT-d kernel driver, since the problem will go
-away if we use "intel_iommu=on,strict".  However I'm still trying to
-figure out what's the thing behind the scene even with that deferred
-flushing feature.
+v1:
+--  Basic version.
 
-Meanwhile, during the investigation I found another "possibly valid"
-use case about the modify-PTE problem that Jason has mentioned when
-with deferred flushing:
+v2:
+--  Replace `do{}while(cond);` block with `for(;;)` block.
 
-         vcpu1                        vcpu2
-      map page A
-  explicitly send PSI for A
-   queue unmap page A [1]
-                                 map the same page A [2]
-                                explcitly send PSI for A [3]
-   flush unmap page A [4]
+v3:
+--  Add two new files information in MAINTAINERS.
 
-Due to deferred flushing, the UNMAP PSI might be postponed (or it can
-be finally a DSI) from step [1] to step [4].  If we allocate the same
-page somewhere else, we might trigger this modify-PTE at [2] since we
-haven't yet received the deferred PSI to unmap A from vcpu1.
+v4:
+--  Correct the 'test.hex' path in hexloader-test.c.
 
-Note that this will not happen with latest upstream Linux, since the
-IOVA allocation algorithm in current Linux kernel made sure that the
-IOVA range won't be freed until [4], so we can't really allocate the
-same page address at [2].  However this let me tend to agree with
-Jason and Kevin's worry on future potential issues if that can be
-triggered easily by common guest kernel bugs.  So now I'm considering
-to drop my mergable interval tree but just use a simpler tree to cache
-everything including translated addresses.  The metadata will possibly
-take 2% of managed memory if with that.
+v5:
+--  Split huge parse_hex_blob() function into four small function;
+--  Add check for memory bounds;
+--  Check validation for Record type;
+--  Replace function ctoh() with glib function g_ascii_xdigit_value();
+--  Remove check for '.hex' suffix;
+--  Remove unnecessary type cast;
+--  Remove duplicate zero-initialization;
+--  Correct typos;
 
--- 
-Peter Xu
+v6:
+--  Call Intel HEX loader after load_uimage_as();
+--  Remove use of KERNEL_LOAD_ADDR;
+--  Change (hwaddr) type argument to (hwaddr *) type;
+--  Use new struct HexParser to contain all arguments needed by
+        handle_record_type();
+--  Enable discontiguous data records (again);
+--  Remove unnecessary memory clean: bin_buf and HexLine line;
+--  Correct typo;
+--  Remove unnecessary check for hex file size;
+--  Add entry point handle for START_SEG_ADDR_RECORD and
+        START_LINEAR_ADDR_RECORD record type;
+--  Use hwaddr * type to store entry point;
+
+v7:
+--  Remove unnecessary code style changes;
+--  Replace `bool` with `size_t` for function `parse_record` return type;
+--  Replace `int` with `size_t` for struct `HexParser` member field
+        `total_size` type;
+--  Replace `int` with `size_t` for function `handle_record_type` return type;
+--  Return an error when encountered unimplemented data type
+        `START_SEG_ADDR_RECORD`;
+--  Add check for `START_LINEAR_ADDR_RECORD` data type:
+        byte_count == 4 and address == 0;
+--  Rename struct `HexParser` member field `addr` to `start_addr`;
+--  Replace `int` with `size_t` for function `parse_hex_blob` return type;
+--  Stop incrementing `record_index` when encountered whitespace;
+--  Replace
+    `if ((record_index >> 1) - LEN_EXCEPT_DATA != parser.line.byte_count)`
+    with
+    `if ((LEN_EXCEPT_DATA + parser.line.byte_count) * 2 != record_index)`
+--  Remove unused field `max_sz`;
+--  Replace `int` with `size_t` for local variable `total_size`
+        in function `parse_hex_blob`
+--  Rename function `load_image_targphys_hex_as` argument `addr` to `entry`;
+
+v8:
+--  Discard change in code logic: Stop attempting load 32-bit kernel after
+        failed to load 64-bit kernel image;
+--  Rename function name `load_image_targphys_hex_as` to `load_targphys_hex_as`
+        in comment;
+--  Correct grammatical errors in comments;
+--  Drop non-exist argument description in comment;
+--  Drop macro function `rom_add_hex_blob_as`, replace it with
+        `rom_add_blob_fixed_as`, because they are equivalent;
+
+v9:
+--  Modify 'configure' file and test data file path in 'hexloader-test.c' to
+        support 'hexloader-test.c' out-of-tree builds and run;
+
+Su Hang (2):
+  Implement .hex file loader
+  Add QTest testcase for the Intel Hexadecimal Object File Loader.
+
+ MAINTAINERS                          |   6 +
+ configure                            |   4 +
+ hw/arm/boot.c                        |   7 +-
+ hw/core/loader.c                     | 246 +++++++++++++++++++++++++++++++++++
+ include/hw/loader.h                  |  12 ++
+ tests/Makefile.include               |   2 +
+ tests/hex-loader-check-data/test.hex |  12 ++
+ tests/hexloader-test.c               |  56 ++++++++
+ 8 files changed, 344 insertions(+), 1 deletion(-)
+ create mode 100644 tests/hex-loader-check-data/test.hex
+ create mode 100644 tests/hexloader-test.c
+
+--
+2.7.4
