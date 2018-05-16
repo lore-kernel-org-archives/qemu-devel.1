@@ -1,42 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60591)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:32866)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <danielhb@linux.ibm.com>) id 1fIwo3-0001PW-MN
-	for qemu-devel@nongnu.org; Wed, 16 May 2018 09:49:29 -0400
+	(envelope-from <prvs=667e0e3bc=anthony.perard@citrix.com>)
+	id 1fIwp2-0002Au-Kb
+	for qemu-devel@nongnu.org; Wed, 16 May 2018 09:50:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <danielhb@linux.ibm.com>) id 1fIwo0-0001Ox-K1
-	for qemu-devel@nongnu.org; Wed, 16 May 2018 09:49:27 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:53352
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <danielhb@linux.ibm.com>)
-	id 1fIwo0-0001OR-Dr
-	for qemu-devel@nongnu.org; Wed, 16 May 2018 09:49:24 -0400
-Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w4GDi71t019537
-	for <qemu-devel@nongnu.org>; Wed, 16 May 2018 09:49:23 -0400
-Received: from e14.ny.us.ibm.com (e14.ny.us.ibm.com [129.33.205.204])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2j0m4f5mpb-1
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Wed, 16 May 2018 09:49:23 -0400
-Received: from localhost
-	by e14.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <danielhb@linux.ibm.com>;
-	Wed, 16 May 2018 09:49:22 -0400
-References: <20180515140944.15979-1-danielhb@linux.ibm.com>
-	<20180515140944.15979-3-danielhb@linux.ibm.com>
-	<8736ytue1w.fsf@dusky.pond.sub.org>
-From: Daniel Henrique Barboza <danielhb@linux.ibm.com>
-Date: Wed, 16 May 2018 10:49:16 -0300
+	(envelope-from <prvs=667e0e3bc=anthony.perard@citrix.com>)
+	id 1fIwoz-0002Sl-IN
+	for qemu-devel@nongnu.org; Wed, 16 May 2018 09:50:28 -0400
+Received: from smtp03.citrix.com ([162.221.156.55]:16139)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71)
+	(envelope-from <prvs=667e0e3bc=anthony.perard@citrix.com>)
+	id 1fIwoz-0002Rk-7p
+	for qemu-devel@nongnu.org; Wed, 16 May 2018 09:50:25 -0400
+Date: Wed, 16 May 2018 14:50:20 +0100
+From: Anthony PERARD <anthony.perard@citrix.com>
+Message-ID: <20180516135020.GF2057@perard.uk.xensource.com>
+References: <1525461967-32174-1-git-send-email-paul.durrant@citrix.com>
+	<1525461967-32174-2-git-send-email-paul.durrant@citrix.com>
 MIME-Version: 1.0
-In-Reply-To: <8736ytue1w.fsf@dusky.pond.sub.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-Message-Id: <6679359f-4a84-4eb1-c32b-997d47a3d4ea@linux.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH v6 2/2] qga: update guest-suspend-ram and
- guest-suspend-hybrid descriptions
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <1525461967-32174-2-git-send-email-paul.durrant@citrix.com>
+Subject: Re: [Qemu-devel] [PATCH v3 1/8] xen_backend: add grant table helpers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -45,83 +31,96 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: qemu-devel@nongnu.org, mdroth@linux.vnet.ibm.com, dgilbert@redhat.com
+To: Paul Durrant <paul.durrant@citrix.com>
+Cc: xen-devel@lists.xenproject.org, qemu-block@nongnu.org, qemu-devel@nongnu.org, Stefano Stabellini <sstabellini@kernel.org>
 
+On Fri, May 04, 2018 at 08:26:00PM +0100, Paul Durrant wrote:
+> This patch adds grant table helper functions to the xen_backend code to
+> localize error reporting and use of xen_domid.
+> 
+> The patch also defers the call to xengnttab_open() until just before the
+> initialise method in XenDevOps is invoked. This method is responsible for
+> mapping the shared ring. No prior method requires access to the grant table.
+> 
+> Signed-off-by: Paul Durrant <paul.durrant@citrix.com>
+> ---
+> Cc: Stefano Stabellini <sstabellini@kernel.org>
+> Cc: Anthony Perard <anthony.perard@citrix.com>
+> 
+> v2:
+>  - New in v2
+> ---
+>  hw/xen/xen_backend.c         | 123 ++++++++++++++++++++++++++++++++++++++-----
+>  include/hw/xen/xen_backend.h |  33 ++++++++++++
+>  2 files changed, 144 insertions(+), 12 deletions(-)
+> 
+> diff --git a/hw/xen/xen_backend.c b/hw/xen/xen_backend.c
+> index 7445b50..50412d6 100644
+> --- a/hw/xen/xen_backend.c
+> +++ b/hw/xen/xen_backend.c
+> @@ -106,6 +106,103 @@ int xen_be_set_state(struct XenDevice *xendev, enum xenbus_state state)
+>      return 0;
+>  }
+>  
+> +void xen_be_set_max_grant_refs(struct XenDevice *xendev,
+> +                               unsigned int nr_refs)
 
+Is it fine to ignore error from set_max_grants and continue ? xen_disk.c
+seems to fail the initialisation if set_max_grants call fails. On the
+other end, xen-usb.c just keep going.
 
-On 05/15/2018 12:35 PM, Markus Armbruster wrote:
-> Daniel Henrique Barboza <danielhb@linux.ibm.com> writes:
->
->> This patch updates the descriptions of 'guest-suspend-ram' and
->> 'guest-suspend-hybrid' to mention that both commands relies now
->> on the existence of 'system_wakeup' and also on the proper support
->> for wake up from suspend, retrieved by the 'wakeup-suspend-support'
->> attribute of the 'query-target' QMP command.
->>
->> Reported-by: Balamuruhan S <bala24@linux.vnet.ibm.com>
->> Signed-off-by: Daniel Henrique Barboza <danielhb@linux.ibm.com>
->> Reviewed-by: Michael Roth <mdroth@linux.vnet.ibm.com>
->> ---
->>   qga/qapi-schema.json | 14 ++++++++++----
->>   1 file changed, 10 insertions(+), 4 deletions(-)
->>
->> diff --git a/qga/qapi-schema.json b/qga/qapi-schema.json
->> index 17884c7c70..e3fb8adfce 100644
->> --- a/qga/qapi-schema.json
->> +++ b/qga/qapi-schema.json
->> @@ -566,8 +566,11 @@
->>   # package installed in the guest.
->>   #
->>   # IMPORTANT: guest-suspend-ram requires QEMU to support the 'system_wakeup'
->> -# command.  Thus, it's *required* to query QEMU for the presence of the
->> -# 'system_wakeup' command before issuing guest-suspend-ram.
->> +# command and the guest to support wake up from suspend. Thus, it's
->> +# *required* to query QEMU for the presence of the 'system_wakeup' command
->> +# and to verify that wake up from suspend is enabled by checking the
->> +# 'wakeup-suspend-support' flag of 'query-target' QMP command, before issuing
->> +# guest-suspend-ram.
-> Isn't checking for presence of system_wakeup redundant?
->
-> When query-target tells us "system_wakeup works" by returning
-> wakeup-suspend-support: true, we surely have system_wakeup (or else
-> query-target would be lying to us).
->
-> When it returns wakeup-suspend-support: false, it doesn't matter whether
-> we have system_wakeup.
->
-> Unless I'm wrong, we can simplify this to something like
->
->     # IMPORTANT: guest-suspend-ram requires working wakeup support in
->     # QEMU.  You *must* check QMP command query-target returns
->     # wakeup-suspend-support: true before issuing this command.
+> +{
+> +    assert(xendev->ops->flags & DEVOPS_FLAG_NEED_GNTDEV);
+> +
+> +    if (xengnttab_set_max_grants(xendev->gnttabdev, nr_refs)) {
+> +        xen_pv_printf(xendev, 0, "xengnttab_set_max_grants failed: %s\n",
+> +                      strerror(errno));
+> +    }
+> +}
+> +
 
-It is worth noticing that this API isn't checking for the existence of
-system_wakeup. It is checking whether there are notifiers added in
-the wakeup_notifiers QLIST.
+> +int xen_be_copy_grant_refs(struct XenDevice *xendev,
+> +                           bool to_domain,
+> +                           XenGrantCopySegment segs[],
+> +                           unsigned int nr_segs)
+> +{
+> +    xengnttab_grant_copy_segment_t *xengnttab_segs;
+> +    unsigned int i;
+> +    int rc;
+> +
+> +    assert(xendev->ops->flags & DEVOPS_FLAG_NEED_GNTDEV);
+> +
+> +    xengnttab_segs = g_new0(xengnttab_grant_copy_segment_t, nr_segs);
+> +
+> +    for (i = 0; i < nr_segs; i++) {
+> +        XenGrantCopySegment *seg = &segs[i];
+> +        xengnttab_grant_copy_segment_t *xengnttab_seg = &xengnttab_segs[i];
+> +
+> +        if (to_domain) {
+> +            xengnttab_seg->flags = GNTCOPY_dest_gref;
+> +            xengnttab_seg->dest.foreign.domid = xen_domid;
+> +            xengnttab_seg->dest.foreign.ref = seg->dest.foreign.ref;
+> +            xengnttab_seg->dest.foreign.offset = seg->dest.foreign.offset;
+> +            xengnttab_seg->source.virt = seg->source.virt;
+> +        } else {
+> +            xengnttab_seg->flags = GNTCOPY_source_gref;
+> +            xengnttab_seg->source.foreign.domid = xen_domid;
+> +            xengnttab_seg->source.foreign.ref = seg->source.foreign.ref;
+> +            xengnttab_seg->source.foreign.offset =
+> +                seg->source.foreign.offset;
+> +            xengnttab_seg->dest.virt = seg->dest.virt;
+> +        }
 
-However, I think we can simplify the text as you suggested because that
-part seems outdated anyway. Is there any relevant scenario where
-system_wakeup will not be present?
+That's not going to work because xengnttab_grant_copy_segment_t doesn't
+exist on Xen 4.7.
 
+> +
+> +        xengnttab_seg->len = seg->len;
+> +    }
+> +
+> +    rc = xengnttab_grant_copy(xendev->gnttabdev, nr_segs, xengnttab_segs);
 
+Thanks,
 
->>   #
->>   # This command does NOT return a response on success. There are two options
->>   # to check for success:
->> @@ -593,8 +596,11 @@
->>   # This command requires the pm-utils package to be installed in the guest.
->>   #
->>   # IMPORTANT: guest-suspend-hybrid requires QEMU to support the 'system_wakeup'
->> -# command.  Thus, it's *required* to query QEMU for the presence of the
->> -# 'system_wakeup' command before issuing guest-suspend-hybrid.
->> +# command and the guest to support wake up from suspend. Thus, it's
->> +# *required* to query QEMU for the presence of the 'system_wakeup' command
->> +# and to verify that wake up from suspend is enabled by checking the
->> +# 'wakeup-suspend-support' flag of 'query-target' QMP command, before issuing
->> +# guest-suspend-hybrid.
->>   #
->>   # This command does NOT return a response on success. There are two options
->>   # to check for success:
-> Likewise.
->
+-- 
+Anthony PERARD
