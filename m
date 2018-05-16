@@ -1,28 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:32866)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:32925)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <prvs=667e0e3bc=anthony.perard@citrix.com>)
-	id 1fIwp2-0002Au-Kb
-	for qemu-devel@nongnu.org; Wed, 16 May 2018 09:50:29 -0400
+	(envelope-from <bounces@canonical.com>) id 1fIwpE-0002Hi-Kq
+	for qemu-devel@nongnu.org; Wed, 16 May 2018 09:50:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <prvs=667e0e3bc=anthony.perard@citrix.com>)
-	id 1fIwoz-0002Sl-IN
-	for qemu-devel@nongnu.org; Wed, 16 May 2018 09:50:28 -0400
-Received: from smtp03.citrix.com ([162.221.156.55]:16139)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71)
-	(envelope-from <prvs=667e0e3bc=anthony.perard@citrix.com>)
-	id 1fIwoz-0002Rk-7p
-	for qemu-devel@nongnu.org; Wed, 16 May 2018 09:50:25 -0400
-Date: Wed, 16 May 2018 14:50:20 +0100
-From: Anthony PERARD <anthony.perard@citrix.com>
-Message-ID: <20180516135020.GF2057@perard.uk.xensource.com>
-References: <1525461967-32174-1-git-send-email-paul.durrant@citrix.com>
-	<1525461967-32174-2-git-send-email-paul.durrant@citrix.com>
+	(envelope-from <bounces@canonical.com>) id 1fIwpA-0002YZ-VE
+	for qemu-devel@nongnu.org; Wed, 16 May 2018 09:50:40 -0400
+Received: from indium.canonical.com ([91.189.90.7]:37082)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1fIwpA-0002Xd-OL
+	for qemu-devel@nongnu.org; Wed, 16 May 2018 09:50:36 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1fIwp9-0006Mh-OY
+	for <qemu-devel@nongnu.org>; Wed, 16 May 2018 13:50:35 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id B7AEE2E8033
+	for <qemu-devel@nongnu.org>; Wed, 16 May 2018 13:50:35 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <1525461967-32174-2-git-send-email-paul.durrant@citrix.com>
-Subject: Re: [Qemu-devel] [PATCH v3 1/8] xen_backend: add grant table helpers
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Wed, 16 May 2018 13:41:19 -0000
+From: Juho Hiltunen <1771570@bugs.launchpad.net>
+Reply-To: Bug 1771570 <1771570@bugs.launchpad.net>
+Sender: bounces@canonical.com
+Message-Id: <152647807950.16381.7444115224433592455.malonedeb@soybean.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1771570] [NEW] qemu-aarch64 $program > $file
+ doesn't pipe output to file in 2.12.0
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,96 +36,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paul Durrant <paul.durrant@citrix.com>
-Cc: xen-devel@lists.xenproject.org, qemu-block@nongnu.org, qemu-devel@nongnu.org, Stefano Stabellini <sstabellini@kernel.org>
+To: qemu-devel@nongnu.org
 
-On Fri, May 04, 2018 at 08:26:00PM +0100, Paul Durrant wrote:
-> This patch adds grant table helper functions to the xen_backend code to
-> localize error reporting and use of xen_domid.
-> 
-> The patch also defers the call to xengnttab_open() until just before the
-> initialise method in XenDevOps is invoked. This method is responsible for
-> mapping the shared ring. No prior method requires access to the grant table.
-> 
-> Signed-off-by: Paul Durrant <paul.durrant@citrix.com>
-> ---
-> Cc: Stefano Stabellini <sstabellini@kernel.org>
-> Cc: Anthony Perard <anthony.perard@citrix.com>
-> 
-> v2:
->  - New in v2
-> ---
->  hw/xen/xen_backend.c         | 123 ++++++++++++++++++++++++++++++++++++++-----
->  include/hw/xen/xen_backend.h |  33 ++++++++++++
->  2 files changed, 144 insertions(+), 12 deletions(-)
-> 
-> diff --git a/hw/xen/xen_backend.c b/hw/xen/xen_backend.c
-> index 7445b50..50412d6 100644
-> --- a/hw/xen/xen_backend.c
-> +++ b/hw/xen/xen_backend.c
-> @@ -106,6 +106,103 @@ int xen_be_set_state(struct XenDevice *xendev, enum xenbus_state state)
->      return 0;
->  }
->  
-> +void xen_be_set_max_grant_refs(struct XenDevice *xendev,
-> +                               unsigned int nr_refs)
+Public bug reported:
 
-Is it fine to ignore error from set_max_grants and continue ? xen_disk.c
-seems to fail the initialisation if set_max_grants call fails. On the
-other end, xen-usb.c just keep going.
+Running qemu-aarch64 $program > $file doesn't pipe anything to $file.
+The file is created but empty.
 
-> +{
-> +    assert(xendev->ops->flags & DEVOPS_FLAG_NEED_GNTDEV);
-> +
-> +    if (xengnttab_set_max_grants(xendev->gnttabdev, nr_refs)) {
-> +        xen_pv_printf(xendev, 0, "xengnttab_set_max_grants failed: %s\n",
-> +                      strerror(errno));
-> +    }
-> +}
-> +
+qemu-aarch64 --help > $file works, so piping output in my system seems to w=
+ork.
+qemu-x86_64 $program > $file works, too.
 
-> +int xen_be_copy_grant_refs(struct XenDevice *xendev,
-> +                           bool to_domain,
-> +                           XenGrantCopySegment segs[],
-> +                           unsigned int nr_segs)
-> +{
-> +    xengnttab_grant_copy_segment_t *xengnttab_segs;
-> +    unsigned int i;
-> +    int rc;
-> +
-> +    assert(xendev->ops->flags & DEVOPS_FLAG_NEED_GNTDEV);
-> +
-> +    xengnttab_segs = g_new0(xengnttab_grant_copy_segment_t, nr_segs);
-> +
-> +    for (i = 0; i < nr_segs; i++) {
-> +        XenGrantCopySegment *seg = &segs[i];
-> +        xengnttab_grant_copy_segment_t *xengnttab_seg = &xengnttab_segs[i];
-> +
-> +        if (to_domain) {
-> +            xengnttab_seg->flags = GNTCOPY_dest_gref;
-> +            xengnttab_seg->dest.foreign.domid = xen_domid;
-> +            xengnttab_seg->dest.foreign.ref = seg->dest.foreign.ref;
-> +            xengnttab_seg->dest.foreign.offset = seg->dest.foreign.offset;
-> +            xengnttab_seg->source.virt = seg->source.virt;
-> +        } else {
-> +            xengnttab_seg->flags = GNTCOPY_source_gref;
-> +            xengnttab_seg->source.foreign.domid = xen_domid;
-> +            xengnttab_seg->source.foreign.ref = seg->source.foreign.ref;
-> +            xengnttab_seg->source.foreign.offset =
-> +                seg->source.foreign.offset;
-> +            xengnttab_seg->dest.virt = seg->dest.virt;
-> +        }
+I'm running version 2.12.0 build from source with ./configure && make
 
-That's not going to work because xengnttab_grant_copy_segment_t doesn't
-exist on Xen 4.7.
+Output of uname -a:
+Linux zhostname>  4.4.0-101-generic #124-Ubuntu SMP Fri Nov 10 18:29:59 UTC=
+ 2017 x86_64 x86_64 x86_64 GNU/Linux
 
-> +
-> +        xengnttab_seg->len = seg->len;
-> +    }
-> +
-> +    rc = xengnttab_grant_copy(xendev->gnttabdev, nr_segs, xengnttab_segs);
+** Affects: qemu
+     Importance: Undecided
+         Status: New
 
-Thanks,
+-- =
 
--- 
-Anthony PERARD
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1771570
+
+Title:
+  qemu-aarch64 $program  > $file doesn't pipe output to file in 2.12.0
+
+Status in QEMU:
+  New
+
+Bug description:
+  Running qemu-aarch64 $program > $file doesn't pipe anything to $file.
+  The file is created but empty.
+
+  qemu-aarch64 --help > $file works, so piping output in my system seems to=
+ work.
+  qemu-x86_64 $program > $file works, too.
+
+  I'm running version 2.12.0 build from source with ./configure && make
+
+  Output of uname -a:
+  Linux zhostname>  4.4.0-101-generic #124-Ubuntu SMP Fri Nov 10 18:29:59 U=
+TC 2017 x86_64 x86_64 x86_64 GNU/Linux
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1771570/+subscriptions
