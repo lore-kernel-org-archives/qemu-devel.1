@@ -1,23 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48872)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51807)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1fIu4k-0004eP-EF
-	for qemu-devel@nongnu.org; Wed, 16 May 2018 06:54:31 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1fIuMR-000058-Tx
+	for qemu-devel@nongnu.org; Wed, 16 May 2018 07:12:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1fIu4j-0007kR-C2
-	for qemu-devel@nongnu.org; Wed, 16 May 2018 06:54:30 -0400
-References: <20180509162637.15575-1-kwolf@redhat.com>
-	<20180509162637.15575-40-kwolf@redhat.com>
-	<1212f284-2af7-e586-ec95-18e77a53d13a@redhat.com>
-	<20180515140850.GE4442@localhost.localdomain>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <fb9ae66c-cf35-144c-0acd-0d27558845f3@redhat.com>
-Date: Wed, 16 May 2018 12:54:17 +0200
+	(envelope-from <dgilbert@redhat.com>) id 1fIuMN-0007CL-Tp
+	for qemu-devel@nongnu.org; Wed, 16 May 2018 07:12:47 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:46194 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1fIuMN-0007C4-Nf
+	for qemu-devel@nongnu.org; Wed, 16 May 2018 07:12:43 -0400
+Date: Wed, 16 May 2018 12:12:39 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20180516111239.GC2531@work-vm>
+References: <20180514165424.12884-1-zhangckid@gmail.com>
+	<20180514165424.12884-5-zhangckid@gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20180515140850.GE4442@localhost.localdomain>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="YrnLOUu4WhZGWJUrewRZfKw4tFO3k23cp"
-Subject: Re: [Qemu-devel] [PATCH 39/42] job: Add lifecycle QMP commands
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180514165424.12884-5-zhangckid@gmail.com>
+Subject: Re: [Qemu-devel] [PATCH V7 RESEND 04/17] COLO: integrate colo
+ compare with colo frame
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,196 +28,157 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: qemu-block@nongnu.org, eblake@redhat.com, jsnow@redhat.com, armbru@redhat.com, jcody@redhat.com, qemu-devel@nongnu.org
+To: Zhang Chen <zhangckid@gmail.com>
+Cc: qemu-devel@nongnu.org, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Jason Wang <jasowang@redhat.com>, zhanghailiang <zhang.zhanghailiang@huawei.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---YrnLOUu4WhZGWJUrewRZfKw4tFO3k23cp
-From: Max Reitz <mreitz@redhat.com>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: qemu-block@nongnu.org, eblake@redhat.com, jsnow@redhat.com,
- armbru@redhat.com, jcody@redhat.com, qemu-devel@nongnu.org
-Message-ID: <fb9ae66c-cf35-144c-0acd-0d27558845f3@redhat.com>
-Subject: Re: [PATCH 39/42] job: Add lifecycle QMP commands
-References: <20180509162637.15575-1-kwolf@redhat.com>
- <20180509162637.15575-40-kwolf@redhat.com>
- <1212f284-2af7-e586-ec95-18e77a53d13a@redhat.com>
- <20180515140850.GE4442@localhost.localdomain>
-In-Reply-To: <20180515140850.GE4442@localhost.localdomain>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: quoted-printable
+* Zhang Chen (zhangckid@gmail.com) wrote:
+> For COLO FT, both the PVM and SVM run at the same time,
+> only sync the state while it needs.
+> 
+> So here, let SVM runs while not doing checkpoint, change
+> DEFAULT_MIGRATE_X_CHECKPOINT_DELAY to 200*100.
+> 
+> Besides, we forgot to release colo_checkpoint_semd and
+> colo_delay_timer, fix them here.
+> 
+> Signed-off-by: zhanghailiang <zhang.zhanghailiang@huawei.com>
+> Signed-off-by: Zhang Chen <zhangckid@gmail.com>
+> Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> ---
+>  migration/colo.c      | 42 ++++++++++++++++++++++++++++++++++++++++--
+>  migration/migration.c |  4 ++--
+>  2 files changed, 42 insertions(+), 4 deletions(-)
+> 
+> diff --git a/migration/colo.c b/migration/colo.c
+> index 4381067ed4..081df1835f 100644
+> --- a/migration/colo.c
+> +++ b/migration/colo.c
+> @@ -25,8 +25,11 @@
+>  #include "qemu/error-report.h"
+>  #include "migration/failover.h"
+>  #include "replication.h"
+> +#include "net/colo-compare.h"
+> +#include "net/colo.h"
+>  
+>  static bool vmstate_loading;
+> +static Notifier packets_compare_notifier;
+>  
+>  #define COLO_BUFFER_BASE_SIZE (4 * 1024 * 1024)
+>  
+> @@ -343,6 +346,11 @@ static int colo_do_checkpoint_transaction(MigrationState *s,
+>          goto out;
+>      }
+>  
+> +    colo_notify_compares_event(NULL, COLO_EVENT_CHECKPOINT, &local_err);
+> +    if (local_err) {
+> +        goto out;
+> +    }
+> +
+>      /* Disable block migration */
+>      migrate_set_block_enabled(false, &local_err);
+>      qemu_savevm_state_header(fb);
+> @@ -400,6 +408,11 @@ out:
+>      return ret;
+>  }
+>  
+> +static void colo_compare_notify_checkpoint(Notifier *notifier, void *data)
+> +{
+> +    colo_checkpoint_notify(data);
+> +}
+> +
+>  static void colo_process_checkpoint(MigrationState *s)
+>  {
+>      QIOChannelBuffer *bioc;
+> @@ -416,6 +429,9 @@ static void colo_process_checkpoint(MigrationState *s)
+>          goto out;
+>      }
+>  
+> +    packets_compare_notifier.notify = colo_compare_notify_checkpoint;
+> +    colo_compare_register_notifier(&packets_compare_notifier);
+> +
+>      /*
+>       * Wait for Secondary finish loading VM states and enter COLO
+>       * restore.
+> @@ -461,11 +477,21 @@ out:
+>          qemu_fclose(fb);
+>      }
+>  
+> -    timer_del(s->colo_delay_timer);
+> -
+>      /* Hope this not to be too long to wait here */
+>      qemu_sem_wait(&s->colo_exit_sem);
+>      qemu_sem_destroy(&s->colo_exit_sem);
+> +
+> +    /*
+> +     * It is safe to unregister notifier after failover finished.
+> +     * Besides, colo_delay_timer and colo_checkpoint_sem can't be
+> +     * released befor unregister notifier, or there will be use-after-free
+> +     * error.
+> +     */
+> +    colo_compare_unregister_notifier(&packets_compare_notifier);
+> +    timer_del(s->colo_delay_timer);
+> +    timer_free(s->colo_delay_timer);
+> +    qemu_sem_destroy(&s->colo_checkpoint_sem);
+> +
+>      /*
+>       * Must be called after failover BH is completed,
+>       * Or the failover BH may shutdown the wrong fd that
+> @@ -558,6 +584,11 @@ void *colo_process_incoming_thread(void *opaque)
+>      fb = qemu_fopen_channel_input(QIO_CHANNEL(bioc));
+>      object_unref(OBJECT(bioc));
+>  
+> +    qemu_mutex_lock_iothread();
+> +    vm_start();
+> +    trace_colo_vm_state_change("stop", "run");
+> +    qemu_mutex_unlock_iothread();
+> +
+>      colo_send_message(mis->to_src_file, COLO_MESSAGE_CHECKPOINT_READY,
+>                        &local_err);
+>      if (local_err) {
+> @@ -577,6 +608,11 @@ void *colo_process_incoming_thread(void *opaque)
+>              goto out;
+>          }
+>  
+> +        qemu_mutex_lock_iothread();
+> +        vm_stop_force_state(RUN_STATE_COLO);
+> +        trace_colo_vm_state_change("run", "stop");
+> +        qemu_mutex_unlock_iothread();
+> +
+>          /* FIXME: This is unnecessary for periodic checkpoint mode */
+>          colo_send_message(mis->to_src_file, COLO_MESSAGE_CHECKPOINT_REPLY,
+>                       &local_err);
+> @@ -630,6 +666,8 @@ void *colo_process_incoming_thread(void *opaque)
+>          }
+>  
+>          vmstate_loading = false;
+> +        vm_start();
+> +        trace_colo_vm_state_change("stop", "run");
+>          qemu_mutex_unlock_iothread();
+>  
+>          if (failover_get_state() == FAILOVER_STATUS_RELAUNCH) {
+> diff --git a/migration/migration.c b/migration/migration.c
+> index 35f2781b03..bca187275a 100644
+> --- a/migration/migration.c
+> +++ b/migration/migration.c
+> @@ -76,9 +76,9 @@
+>  #define DEFAULT_MIGRATE_XBZRLE_CACHE_SIZE (64 * 1024 * 1024)
+>  
+>  /* The delay time (in ms) between two COLO checkpoints
+> - * Note: Please change this default value to 10000 when we support hybrid mode.
+> + * Note: Please change this default value to 20000 when we support hybrid mode.
 
-On 2018-05-15 16:08, Kevin Wolf wrote:
-> Am 15.05.2018 um 00:31 hat Max Reitz geschrieben:
->> On 2018-05-09 18:26, Kevin Wolf wrote:
->>> This adds QMP commands that control the transition between states of =
-the
->>> job lifecycle.
->>>
->>> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
->>> ---
->>>  qapi/job.json | 112 ++++++++++++++++++++++++++++++++++++++++++++++
->>>  job-qmp.c     | 140 ++++++++++++++++++++++++++++++++++++++++++++++++=
-++++++++++
->>>  MAINTAINERS   |   1 +
->>>  Makefile.objs |   2 +-
->>>  trace-events  |   9 ++++
->>>  5 files changed, 263 insertions(+), 1 deletion(-)
->>>  create mode 100644 job-qmp.c
->>>
->>> diff --git a/qapi/job.json b/qapi/job.json
->>> index bd88a358d0..7b84158292 100644
->>> --- a/qapi/job.json
->>> +++ b/qapi/job.json
->>> @@ -63,3 +63,115 @@
->>>  { 'event': 'JOB_STATUS_CHANGE',
->>>    'data': { 'id': 'str',
->>>              'status': 'JobStatus' } }
->>> +
->>> +##
->>> +# @job-pause:
->>> +#
->>> +# Pause an active job.
->>> +#
->>> +# This command returns immediately after marking the active job for =
-pausing.
->>> +# Pausing an already paused job has no cumulative effect; a single j=
-ob-resume
->>> +# command will resume the job.
->>
->> Pausing an already paused job is, in fact, an error.
->>
->> (Which should be noted here instead of making it appear like it'd be
->> idempotent.)
->=20
-> Aye. Interestingly, I managed to fix it below in job-resume, but missed=
+You can remove that comment now?
 
-> it here. I should also stick in a patch somewhere early in the series
-> that fixes the documentation of block-job-pause/resume.
->=20
->>> +##
->>> +# @job-cancel:
->>> +#
->>> +# Instruct an active background job to cancel at the next opportunit=
-y.
->>> +# This command returns immediately after marking the active job for
->>> +# cancellation.
->>> +#
->>> +# The job will cancel as soon as possible and then emit a JOB_STATUS=
-_CHANGE
->>> +# event. Usually, the status will change to ABORTING, but it is poss=
-ible that
->>> +# a job successfully completes (e.g. because it was almost done and =
-there was
->>> +# no opportunity to cancel earlier than completing the job) and tran=
-sitions to
->>> +# PENDING instead.
->>> +#
->>> +# Note that if you issue 'job-cancel' after a mirror block job has i=
-ndicated
->>> +# (via the event BLOCK_JOB_READY, and by transitioning into the READ=
-Y state)
->>> +# that the source and destination are synchronized, then the job alw=
-ays
->>> +# completes successfully and transitions to PENDING as well as trigg=
-ering the
->>> +# event BLOCK_JOB_COMPLETED, to indicate that the mirroring has ende=
-d and the
->>> +# destination now has a point-in-time copy tied to the time of the
->>> +# cancellation.
->>> +#
->>> +# @id: The job identifier.
->>> +#
->>> +# @force: If true, and the job is already in the READY state, abando=
-n the job
->>> +#         immediately (even if it is paused) instead of waiting for =
-the
->>> +#         destination to complete its final synchronization
->>
->> The note on "final synchronization" is extremely mirror-specific.  I s=
-ee
->> three choices here:
->>
->> (1) If mirror stays the only job with this special cancel semantics,
->> then we are free to note that this is a mirror-specific flag here.
->>
->> (2) Even if some other job might come along at some point where use of=
+Dave
 
->> @force may make sense, that doesn't stop us from now noting that only
->> mirror supports this, which helps readers understand what "destination=
-"
->> and "final synchronization" mean.
->>
->> (Yes, so (1) and (2) are basically the same.)
->>
->> (3) We try to find some general description and drop the last part.
->> Like "If a job would normally decide to complete instead of actually
->> aborting, this flag can be used to convince it otherwise."  But that's=
-
->> so handwavy, I'd rather just mark it as a special mirror flag for now.=
-
->=20
-> Or how about this one?
->=20
-> (4) Mirror is really abusing cancel for a second completion mode and we=
-
->     don't want to have this kind of ugliness in job-cancel.
-
-Yeah, well, right, that was implicit and I tried to be more diplomatic
-by calling it "special semantics". :-)
-
->                                                             Remove
->     @force from the schema and internally always use force=3Dtrue. For
->     now, block-job-cancel does the job (no pun intended) for mirror, an=
-d
->     maybe we can later introduce a way to select completion mode with
->     job-complete.
-
-Sounds good to me.
-
-> This would also get us rid of that whole long paragraph above that
-> explains how mirror jobs have an exceptional behaviour.
-
-Yes.
-
-Max
-
->>> diff --git a/Makefile.objs b/Makefile.objs
->>> index 3df8d58e49..253e0356f3 100644
->>> --- a/Makefile.objs
->>> +++ b/Makefile.objs
->>> @@ -66,7 +66,7 @@ chardev-obj-y =3D chardev/
->>>  # block-obj-y is code used by both qemu system emulation and qemu-im=
-g
->>> =20
->>>  block-obj-y +=3D nbd/
->>> -block-obj-y +=3D block.o blockjob.o job.o
->>> +block-obj-y +=3D block.o blockjob.o job.o job-qmp.o
->>
->> Shouldn't this be in common-obj-y like blockdev?
->=20
-> Seems to build with that change, so it can't be wrong...
->=20
-> Kevin
->=20
-
-
-
---YrnLOUu4WhZGWJUrewRZfKw4tFO3k23cp
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlr8DdkACgkQ9AfbAGHV
-z0AM9Af9Hh4AbwcGBt8yNYjoVyl+h90gJDjFilPdjSK2gQEj31FK8lUV0DerCntj
-BoNiB83cQIAE6ZOPKVGD9UhSr/d1x8YQWrpFdNHmdaO7OtpFxPUKVrQxLZR3r6Aq
-5Oqz+Vnd88ZqzWmkVpQvaH6S/PALKJLMsmsL2bzI448DOOtwMM1zSn8jhYU6918Q
-Hp968G+XPmauzvWAIfh0pD+yunma1QzfGxPId0kg7Q58M9neLa+1wsVG8S5k3V9z
-zqe2dzd3SgrU4hX0JUrbwoQrfQekFPAgRCdA1Rq6qGh4kVYRnkeG8al9XhTdTbG+
-MQIThuti0g3nU4Kk2WxNE5XFJ5WeEQ==
-=b1wG
------END PGP SIGNATURE-----
-
---YrnLOUu4WhZGWJUrewRZfKw4tFO3k23cp--
+>   */
+> -#define DEFAULT_MIGRATE_X_CHECKPOINT_DELAY 200
+> +#define DEFAULT_MIGRATE_X_CHECKPOINT_DELAY (200 * 100)
+>  #define DEFAULT_MIGRATE_MULTIFD_CHANNELS 2
+>  #define DEFAULT_MIGRATE_MULTIFD_PAGE_COUNT 16
+>  
+> -- 
+> 2.17.0
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
