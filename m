@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42164)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42145)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fIyk4-0004kl-H9
+	(envelope-from <richard.henderson@linaro.org>) id 1fIyk3-0004iy-4L
 	for qemu-devel@nongnu.org; Wed, 16 May 2018 11:53:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fIyk3-0005CL-En
-	for qemu-devel@nongnu.org; Wed, 16 May 2018 11:53:28 -0400
-Received: from mail-pl0-x244.google.com ([2607:f8b0:400e:c01::244]:33617)
+	(envelope-from <richard.henderson@linaro.org>) id 1fIyk0-0005BO-Nf
+	for qemu-devel@nongnu.org; Wed, 16 May 2018 11:53:27 -0400
+Received: from mail-pl0-x22a.google.com ([2607:f8b0:400e:c01::22a]:34869)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1fIyk3-0005Bu-76
-	for qemu-devel@nongnu.org; Wed, 16 May 2018 11:53:27 -0400
-Received: by mail-pl0-x244.google.com with SMTP id n10-v6so673974plp.0
-	for <qemu-devel@nongnu.org>; Wed, 16 May 2018 08:53:27 -0700 (PDT)
+	id 1fIyk0-0005BB-Fp
+	for qemu-devel@nongnu.org; Wed, 16 May 2018 11:53:24 -0400
+Received: by mail-pl0-x22a.google.com with SMTP id i5-v6so673797plt.2
+	for <qemu-devel@nongnu.org>; Wed, 16 May 2018 08:53:24 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Wed, 16 May 2018 08:52:43 -0700
-Message-Id: <20180516155243.16937-29-richard.henderson@linaro.org>
+Date: Wed, 16 May 2018 08:52:41 -0700
+Message-Id: <20180516155243.16937-27-richard.henderson@linaro.org>
 In-Reply-To: <20180516155243.16937-1-richard.henderson@linaro.org>
 References: <20180516155243.16937-1-richard.henderson@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 28/28] fpu/softfloat: Define floatN_silence_nan
- in terms of parts_silence_nan
+Subject: [Qemu-devel] [PULL 26/28] fpu/softfloat: Define floatN_default_nan
+ in terms of parts_default_nan
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,11 +33,17 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: peter.maydell@linaro.org
 
-Isolate the target-specific choice to 3 functions instead of 6.
+Isolate the target-specific choice to 2 functions instead of 6.
+
+The code in float16_default_nan was only correct for ARM, MIPS, and X86.
+Though float16 support is rare among our targets.
+
+The code in float128_default_nan was arguably wrong for Sparc.  While
+QEMU supports the Sparc 128-bit insns, no real cpu enables it.
 
 The code in floatx80_default_nan tried to be over-general.  There are
 only two targets that support this format: x86 and m68k.  Thus there
-is no point in inventing a mechanism for snan_bit_is_one.
+is no point in inventing a value for snan_bit_is_one.
 
 Move routines that no longer have ifdefs out of softfloat-specialize.h.
 
@@ -45,164 +51,194 @@ Tested-by: Alex Bennée <alex.bennee@linaro.org>
 Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- fpu/softfloat-specialize.h | 81 ++------------------------------------
- fpu/softfloat.c            | 31 +++++++++++++++
- 2 files changed, 35 insertions(+), 77 deletions(-)
+ fpu/softfloat-specialize.h | 105 +++----------------------------------
+ fpu/softfloat.c            |  41 +++++++++++++++
+ 2 files changed, 47 insertions(+), 99 deletions(-)
 
 diff --git a/fpu/softfloat-specialize.h b/fpu/softfloat-specialize.h
-index ec4fb6ba8b..16c0bcb6fa 100644
+index 0399dfe011..9d562ed504 100644
 --- a/fpu/softfloat-specialize.h
 +++ b/fpu/softfloat-specialize.h
-@@ -278,24 +278,6 @@ int float16_is_signaling_nan(float16 a_, float_status *status)
- #endif
+@@ -179,94 +179,22 @@ static FloatParts parts_silence_nan(FloatParts a, float_status *status)
+     return a;
  }
  
 -/*----------------------------------------------------------------------------
--| Returns a quiet NaN from a signalling NaN for the half-precision
--| floating point value `a'.
+-| The pattern for a default generated half-precision NaN.
 -*----------------------------------------------------------------------------*/
--
--float16 float16_silence_nan(float16 a, float_status *status)
+-float16 float16_default_nan(float_status *status)
 -{
--#ifdef NO_SIGNALING_NANS
--    g_assert_not_reached();
+-#if defined(TARGET_ARM)
+-    return const_float16(0x7E00);
 -#else
 -    if (snan_bit_is_one(status)) {
--        return float16_default_nan(status);
+-        return const_float16(0x7DFF);
 -    } else {
--        return a | (1 << 9);
+-#if defined(TARGET_MIPS)
+-        return const_float16(0x7E00);
+-#else
+-        return const_float16(0xFE00);
+-#endif
+-    }
+-#endif
+-}
+-
+-/*----------------------------------------------------------------------------
+-| The pattern for a default generated single-precision NaN.
+-*----------------------------------------------------------------------------*/
+-float32 float32_default_nan(float_status *status)
+-{
+-#if defined(TARGET_SPARC) || defined(TARGET_M68K)
+-    return const_float32(0x7FFFFFFF);
+-#elif defined(TARGET_PPC) || defined(TARGET_ARM) || defined(TARGET_ALPHA) || \
+-      defined(TARGET_XTENSA) || defined(TARGET_S390X) || \
+-      defined(TARGET_TRICORE) || defined(TARGET_RISCV)
+-    return const_float32(0x7FC00000);
+-#elif defined(TARGET_HPPA)
+-    return const_float32(0x7FA00000);
+-#else
+-    if (snan_bit_is_one(status)) {
+-        return const_float32(0x7FBFFFFF);
+-    } else {
+-#if defined(TARGET_MIPS)
+-        return const_float32(0x7FC00000);
+-#else
+-        return const_float32(0xFFC00000);
+-#endif
+-    }
+-#endif
+-}
+-
+-/*----------------------------------------------------------------------------
+-| The pattern for a default generated double-precision NaN.
+-*----------------------------------------------------------------------------*/
+-float64 float64_default_nan(float_status *status)
+-{
+-#if defined(TARGET_SPARC) || defined(TARGET_M68K)
+-    return const_float64(LIT64(0x7FFFFFFFFFFFFFFF));
+-#elif defined(TARGET_PPC) || defined(TARGET_ARM) || defined(TARGET_ALPHA) || \
+-      defined(TARGET_S390X) || defined(TARGET_RISCV)
+-    return const_float64(LIT64(0x7FF8000000000000));
+-#elif defined(TARGET_HPPA)
+-    return const_float64(LIT64(0x7FF4000000000000));
+-#else
+-    if (snan_bit_is_one(status)) {
+-        return const_float64(LIT64(0x7FF7FFFFFFFFFFFF));
+-    } else {
+-#if defined(TARGET_MIPS)
+-        return const_float64(LIT64(0x7FF8000000000000));
+-#else
+-        return const_float64(LIT64(0xFFF8000000000000));
+-#endif
 -    }
 -#endif
 -}
 -
  /*----------------------------------------------------------------------------
- | Returns 1 if the single-precision floating-point value `a' is a quiet
- | NaN; otherwise returns 0.
-@@ -334,30 +316,6 @@ int float32_is_signaling_nan(float32 a_, float_status *status)
- #endif
- }
- 
--/*----------------------------------------------------------------------------
--| Returns a quiet NaN from a signalling NaN for the single-precision
--| floating point value `a'.
--*----------------------------------------------------------------------------*/
--
--float32 float32_silence_nan(float32 a, float_status *status)
--{
--#ifdef NO_SIGNALING_NANS
--    g_assert_not_reached();
--#else
--    if (snan_bit_is_one(status)) {
--# ifdef TARGET_HPPA
--        a &= ~0x00400000;
--        a |=  0x00200000;
--        return a;
--# else
--        return float32_default_nan(status);
--# endif
--    } else {
--        return a | (1 << 22);
--    }
--#endif
--}
--
- /*----------------------------------------------------------------------------
- | Returns the result of converting the single-precision floating-point NaN
- | `a' to the canonical NaN format.  If `a' is a signaling NaN, the invalid
-@@ -706,31 +664,6 @@ int float64_is_signaling_nan(float64 a_, float_status *status)
- #endif
- }
- 
--/*----------------------------------------------------------------------------
--| Returns a quiet NaN from a signalling NaN for the double-precision
--| floating point value `a'.
--*----------------------------------------------------------------------------*/
--
--float64 float64_silence_nan(float64 a, float_status *status)
--{
--#ifdef NO_SIGNALING_NANS
--    g_assert_not_reached();
--#else
--    if (snan_bit_is_one(status)) {
--# ifdef TARGET_HPPA
--        a &= ~0x0008000000000000ULL;
--        a |=  0x0004000000000000ULL;
--        return a;
--# else
--        return float64_default_nan(status);
--# endif
--    } else {
--        return a | LIT64(0x0008000000000000);
--    }
--#endif
--}
--
--
- /*----------------------------------------------------------------------------
- | Returns the result of converting the double-precision floating-point NaN
- | `a' to the canonical NaN format.  If `a' is a signaling NaN, the invalid
-@@ -886,16 +819,10 @@ int floatx80_is_signaling_nan(floatx80 a, float_status *status)
- 
- floatx80 floatx80_silence_nan(floatx80 a, float_status *status)
+ | The pattern for a default generated extended double-precision NaN.
+ *----------------------------------------------------------------------------*/
+ floatx80 floatx80_default_nan(float_status *status)
  {
--#ifdef NO_SIGNALING_NANS
--    g_assert_not_reached();
--#else
--    if (snan_bit_is_one(status)) {
--        return floatx80_default_nan(status);
--    } else {
--        a.low |= LIT64(0xC000000000000000);
--        return a;
--    }
--#endif
+     floatx80 r;
++
 +    /* None of the targets that have snan_bit_is_one use floatx80.  */
 +    assert(!snan_bit_is_one(status));
-+    a.low |= LIT64(0xC000000000000000);
-+    return a;
+ #if defined(TARGET_M68K)
+     r.low = LIT64(0xFFFFFFFFFFFFFFFF);
+     r.high = 0x7FFF;
+ #else
+-    if (snan_bit_is_one(status)) {
+-        r.low = LIT64(0xBFFFFFFFFFFFFFFF);
+-        r.high = 0x7FFF;
+-    } else {
+-        r.low = LIT64(0xC000000000000000);
+-        r.high = 0xFFFF;
+-    }
++    /* X86 */
++    r.low = LIT64(0xC000000000000000);
++    r.high = 0xFFFF;
+ #endif
+     return r;
  }
+@@ -285,27 +213,6 @@ floatx80 floatx80_default_nan(float_status *status)
+ const floatx80 floatx80_infinity
+     = make_floatx80_init(floatx80_infinity_high, floatx80_infinity_low);
  
+-/*----------------------------------------------------------------------------
+-| The pattern for a default generated quadruple-precision NaN.
+-*----------------------------------------------------------------------------*/
+-float128 float128_default_nan(float_status *status)
+-{
+-    float128 r;
+-
+-    if (snan_bit_is_one(status)) {
+-        r.low = LIT64(0xFFFFFFFFFFFFFFFF);
+-        r.high = LIT64(0x7FFF7FFFFFFFFFFF);
+-    } else {
+-        r.low = LIT64(0x0000000000000000);
+-#if defined(TARGET_S390X) || defined(TARGET_PPC) || defined(TARGET_RISCV)
+-        r.high = LIT64(0x7FFF800000000000);
+-#else
+-        r.high = LIT64(0xFFFF800000000000);
+-#endif
+-    }
+-    return r;
+-}
+-
  /*----------------------------------------------------------------------------
+ | Raises the exceptions specified by `flags'.  Floating-point traps can be
+ | defined here if desired.  It is currently not possible for such a trap
 diff --git a/fpu/softfloat.c b/fpu/softfloat.c
-index c8b33e35f4..8cd2400081 100644
+index 8e97602ace..c8b33e35f4 100644
 --- a/fpu/softfloat.c
 +++ b/fpu/softfloat.c
-@@ -2134,6 +2134,37 @@ float128 float128_default_nan(float_status *status)
-     return r;
+@@ -2092,6 +2092,47 @@ float64 __attribute__((flatten)) float64_sqrt(float64 a, float_status *status)
+     return float64_round_pack_canonical(pr, status);
  }
  
 +/*----------------------------------------------------------------------------
-+| Returns a quiet NaN from a signalling NaN for the floating point value `a'.
++| The pattern for a default generated NaN.
 +*----------------------------------------------------------------------------*/
 +
-+float16 float16_silence_nan(float16 a, float_status *status)
++float16 float16_default_nan(float_status *status)
 +{
-+    FloatParts p = float16_unpack_raw(a);
-+    p.frac <<= float16_params.frac_shift;
-+    p = parts_silence_nan(p, status);
++    FloatParts p = parts_default_nan(status);
 +    p.frac >>= float16_params.frac_shift;
 +    return float16_pack_raw(p);
 +}
 +
-+float32 float32_silence_nan(float32 a, float_status *status)
++float32 float32_default_nan(float_status *status)
 +{
-+    FloatParts p = float32_unpack_raw(a);
-+    p.frac <<= float32_params.frac_shift;
-+    p = parts_silence_nan(p, status);
++    FloatParts p = parts_default_nan(status);
 +    p.frac >>= float32_params.frac_shift;
 +    return float32_pack_raw(p);
 +}
 +
-+float64 float64_silence_nan(float64 a, float_status *status)
++float64 float64_default_nan(float_status *status)
 +{
-+    FloatParts p = float64_unpack_raw(a);
-+    p.frac <<= float64_params.frac_shift;
-+    p = parts_silence_nan(p, status);
++    FloatParts p = parts_default_nan(status);
 +    p.frac >>= float64_params.frac_shift;
 +    return float64_pack_raw(p);
 +}
 +
++float128 float128_default_nan(float_status *status)
++{
++    FloatParts p = parts_default_nan(status);
++    float128 r;
++
++    /* Extrapolate from the choices made by parts_default_nan to fill
++     * in the quad-floating format.  If the low bit is set, assume we
++     * want to set all non-snan bits.
++     */
++    r.low = -(p.frac & 1);
++    r.high = p.frac >> (DECOMPOSED_BINARY_POINT - 48);
++    r.high |= LIT64(0x7FFF000000000000);
++    r.high |= (uint64_t)p.sign << 63;
++
++    return r;
++}
+ 
  /*----------------------------------------------------------------------------
  | Takes a 64-bit fixed-point value `absZ' with binary point between bits 6
- | and 7, and returns the properly rounded 32-bit integer corresponding to the
 -- 
 2.17.0
