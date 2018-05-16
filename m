@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53471)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53497)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <edgar.iglesias@gmail.com>) id 1fJ1Wm-0002s5-4i
-	for qemu-devel@nongnu.org; Wed, 16 May 2018 14:51:56 -0400
+	(envelope-from <edgar.iglesias@gmail.com>) id 1fJ1Wn-0002tS-Hw
+	for qemu-devel@nongnu.org; Wed, 16 May 2018 14:51:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <edgar.iglesias@gmail.com>) id 1fJ1Wh-0000f9-NF
-	for qemu-devel@nongnu.org; Wed, 16 May 2018 14:51:56 -0400
-Received: from mail-wm0-x243.google.com ([2a00:1450:400c:c09::243]:38488)
+	(envelope-from <edgar.iglesias@gmail.com>) id 1fJ1Wm-0000h1-Fy
+	for qemu-devel@nongnu.org; Wed, 16 May 2018 14:51:57 -0400
+Received: from mail-wm0-x241.google.com ([2a00:1450:400c:c09::241]:38488)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <edgar.iglesias@gmail.com>)
-	id 1fJ1Wh-0000eu-Gh
-	for qemu-devel@nongnu.org; Wed, 16 May 2018 14:51:51 -0400
-Received: by mail-wm0-x243.google.com with SMTP id m129-v6so4228526wmb.3
-	for <qemu-devel@nongnu.org>; Wed, 16 May 2018 11:51:51 -0700 (PDT)
+	id 1fJ1Wm-0000gh-8v
+	for qemu-devel@nongnu.org; Wed, 16 May 2018 14:51:56 -0400
+Received: by mail-wm0-x241.google.com with SMTP id m129-v6so4229025wmb.3
+	for <qemu-devel@nongnu.org>; Wed, 16 May 2018 11:51:56 -0700 (PDT)
 From: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
-Date: Wed, 16 May 2018 20:51:09 +0200
-Message-Id: <20180516185146.30708-2-edgar.iglesias@gmail.com>
+Date: Wed, 16 May 2018 20:51:12 +0200
+Message-Id: <20180516185146.30708-5-edgar.iglesias@gmail.com>
 In-Reply-To: <20180516185146.30708-1-edgar.iglesias@gmail.com>
 References: <20180516185146.30708-1-edgar.iglesias@gmail.com>
-Subject: [Qemu-devel] [PATCH v3 01/38] target-microblaze: dec_load: Use bool
- instead of unsigned int
+Subject: [Qemu-devel] [PATCH v3 04/38] target-microblaze: Fallback to our
+ latest CPU version
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,38 +32,52 @@ Cc: peter.maydell@linaro.org, richard.henderson@linaro.org, frederic.konrad@adac
 
 From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
 
-Use bool instead of unsigned int to represent flags.
-No functional change.
+Today, when running QEMU in linux-user or with boards that don't
+select a specific CPU version, we treat it as an invalid version
+and log a message.
+
+Instead, if no specific version was selected, fallback to our
+latest CPU version.
 
 Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 Signed-off-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
 ---
- target/microblaze/translate.c | 7 ++++---
- 1 file changed, 4 insertions(+), 3 deletions(-)
+ target/microblaze/cpu.c | 9 +++++++--
+ 1 file changed, 7 insertions(+), 2 deletions(-)
 
-diff --git a/target/microblaze/translate.c b/target/microblaze/translate.c
-index 0872dc9ded..a8a5eaebec 100644
---- a/target/microblaze/translate.c
-+++ b/target/microblaze/translate.c
-@@ -897,14 +897,15 @@ static inline TCGv *compute_ldst_addr(DisasContext *dc, TCGv *t)
- static void dec_load(DisasContext *dc)
- {
-     TCGv t, v, *addr;
--    unsigned int size, rev = 0, ex = 0;
-+    unsigned int size;
-+    bool rev = false, ex = false;
-     TCGMemOp mop;
+diff --git a/target/microblaze/cpu.c b/target/microblaze/cpu.c
+index 4dc1404800..06476f6efc 100644
+--- a/target/microblaze/cpu.c
++++ b/target/microblaze/cpu.c
+@@ -72,6 +72,9 @@ static const struct {
+     {NULL, 0},
+ };
  
-     mop = dc->opcode & 3;
-     size = 1 << mop;
-     if (!dc->type_b) {
--        rev = (dc->ir >> 9) & 1;
--        ex = (dc->ir >> 10) & 1;
-+        rev = extract32(dc->ir, 9, 1);
-+        ex = extract32(dc->ir, 10, 1);
-     }
-     mop |= MO_TE;
-     if (rev) {
++/* If no specific version gets selected, default to the following.  */
++#define DEFAULT_CPU_VERSION "10.0"
++
+ static void mb_cpu_set_pc(CPUState *cs, vaddr value)
+ {
+     MicroBlazeCPU *cpu = MICROBLAZE_CPU(cs);
+@@ -141,6 +144,7 @@ static void mb_cpu_realizefn(DeviceState *dev, Error **errp)
+     MicroBlazeCPU *cpu = MICROBLAZE_CPU(cs);
+     CPUMBState *env = &cpu->env;
+     uint8_t version_code = 0;
++    const char *version;
+     int i = 0;
+     Error *local_err = NULL;
+ 
+@@ -162,8 +166,9 @@ static void mb_cpu_realizefn(DeviceState *dev, Error **errp)
+                         | PVR2_FPU_EXC_MASK \
+                         | 0;
+ 
+-    for (i = 0; mb_cpu_lookup[i].name && cpu->cfg.version; i++) {
+-        if (strcmp(mb_cpu_lookup[i].name, cpu->cfg.version) == 0) {
++    version = cpu->cfg.version ? cpu->cfg.version : DEFAULT_CPU_VERSION;
++    for (i = 0; mb_cpu_lookup[i].name && version; i++) {
++        if (strcmp(mb_cpu_lookup[i].name, version) == 0) {
+             version_code = mb_cpu_lookup[i].version_id;
+             break;
+         }
 -- 
 2.14.1
