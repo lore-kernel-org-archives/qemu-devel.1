@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53497)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53514)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <edgar.iglesias@gmail.com>) id 1fJ1Wn-0002tS-Hw
-	for qemu-devel@nongnu.org; Wed, 16 May 2018 14:51:58 -0400
+	(envelope-from <edgar.iglesias@gmail.com>) id 1fJ1Wo-0002v1-Nk
+	for qemu-devel@nongnu.org; Wed, 16 May 2018 14:51:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <edgar.iglesias@gmail.com>) id 1fJ1Wm-0000h1-Fy
-	for qemu-devel@nongnu.org; Wed, 16 May 2018 14:51:57 -0400
-Received: from mail-wm0-x241.google.com ([2a00:1450:400c:c09::241]:38488)
+	(envelope-from <edgar.iglesias@gmail.com>) id 1fJ1Wo-0000hb-1b
+	for qemu-devel@nongnu.org; Wed, 16 May 2018 14:51:58 -0400
+Received: from mail-wm0-x242.google.com ([2a00:1450:400c:c09::242]:50879)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <edgar.iglesias@gmail.com>)
-	id 1fJ1Wm-0000gh-8v
-	for qemu-devel@nongnu.org; Wed, 16 May 2018 14:51:56 -0400
-Received: by mail-wm0-x241.google.com with SMTP id m129-v6so4229025wmb.3
-	for <qemu-devel@nongnu.org>; Wed, 16 May 2018 11:51:56 -0700 (PDT)
+	id 1fJ1Wn-0000hI-QM
+	for qemu-devel@nongnu.org; Wed, 16 May 2018 14:51:57 -0400
+Received: by mail-wm0-x242.google.com with SMTP id t11-v6so3953185wmt.0
+	for <qemu-devel@nongnu.org>; Wed, 16 May 2018 11:51:57 -0700 (PDT)
 From: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
-Date: Wed, 16 May 2018 20:51:12 +0200
-Message-Id: <20180516185146.30708-5-edgar.iglesias@gmail.com>
+Date: Wed, 16 May 2018 20:51:13 +0200
+Message-Id: <20180516185146.30708-6-edgar.iglesias@gmail.com>
 In-Reply-To: <20180516185146.30708-1-edgar.iglesias@gmail.com>
 References: <20180516185146.30708-1-edgar.iglesias@gmail.com>
-Subject: [Qemu-devel] [PATCH v3 04/38] target-microblaze: Fallback to our
- latest CPU version
+Subject: [Qemu-devel] [PATCH v3 05/38] target-microblaze: Correct special
+ register array sizes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,52 +32,52 @@ Cc: peter.maydell@linaro.org, richard.henderson@linaro.org, frederic.konrad@adac
 
 From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
 
-Today, when running QEMU in linux-user or with boards that don't
-select a specific CPU version, we treat it as an invalid version
-and log a message.
+Correct special register array sizes.
 
-Instead, if no specific version was selected, fallback to our
-latest CPU version.
-
-Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 Signed-off-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
 ---
- target/microblaze/cpu.c | 9 +++++++--
- 1 file changed, 7 insertions(+), 2 deletions(-)
+ target/microblaze/cpu.h       | 4 ++--
+ target/microblaze/translate.c | 5 ++---
+ 2 files changed, 4 insertions(+), 5 deletions(-)
 
-diff --git a/target/microblaze/cpu.c b/target/microblaze/cpu.c
-index 4dc1404800..06476f6efc 100644
---- a/target/microblaze/cpu.c
-+++ b/target/microblaze/cpu.c
-@@ -72,6 +72,9 @@ static const struct {
-     {NULL, 0},
+diff --git a/target/microblaze/cpu.h b/target/microblaze/cpu.h
+index 5be71bc320..994496515f 100644
+--- a/target/microblaze/cpu.h
++++ b/target/microblaze/cpu.h
+@@ -242,8 +242,8 @@ struct CPUMBState {
+     uint32_t bimm;
+ 
+     uint32_t imm;
+-    uint32_t regs[33];
+-    uint32_t sregs[24];
++    uint32_t regs[32];
++    uint32_t sregs[14];
+     float_status fp_status;
+     /* Stack protectors. Yes, it's a hw feature.  */
+     uint32_t slr, shr;
+diff --git a/target/microblaze/translate.c b/target/microblaze/translate.c
+index 46595e6336..9614f15d58 100644
+--- a/target/microblaze/translate.c
++++ b/target/microblaze/translate.c
+@@ -54,7 +54,7 @@
+ 
+ static TCGv env_debug;
+ static TCGv cpu_R[32];
+-static TCGv cpu_SR[18];
++static TCGv cpu_SR[14];
+ static TCGv env_imm;
+ static TCGv env_btaken;
+ static TCGv env_btarget;
+@@ -106,8 +106,7 @@ static const char *regnames[] =
+ static const char *special_regnames[] =
+ {
+     "rpc", "rmsr", "sr2", "sr3", "sr4", "sr5", "sr6", "sr7",
+-    "sr8", "sr9", "sr10", "sr11", "sr12", "sr13", "sr14", "sr15",
+-    "sr16", "sr17", "sr18"
++    "sr8", "sr9", "sr10", "sr11", "sr12", "sr13"
  };
  
-+/* If no specific version gets selected, default to the following.  */
-+#define DEFAULT_CPU_VERSION "10.0"
-+
- static void mb_cpu_set_pc(CPUState *cs, vaddr value)
- {
-     MicroBlazeCPU *cpu = MICROBLAZE_CPU(cs);
-@@ -141,6 +144,7 @@ static void mb_cpu_realizefn(DeviceState *dev, Error **errp)
-     MicroBlazeCPU *cpu = MICROBLAZE_CPU(cs);
-     CPUMBState *env = &cpu->env;
-     uint8_t version_code = 0;
-+    const char *version;
-     int i = 0;
-     Error *local_err = NULL;
- 
-@@ -162,8 +166,9 @@ static void mb_cpu_realizefn(DeviceState *dev, Error **errp)
-                         | PVR2_FPU_EXC_MASK \
-                         | 0;
- 
--    for (i = 0; mb_cpu_lookup[i].name && cpu->cfg.version; i++) {
--        if (strcmp(mb_cpu_lookup[i].name, cpu->cfg.version) == 0) {
-+    version = cpu->cfg.version ? cpu->cfg.version : DEFAULT_CPU_VERSION;
-+    for (i = 0; mb_cpu_lookup[i].name && version; i++) {
-+        if (strcmp(mb_cpu_lookup[i].name, version) == 0) {
-             version_code = mb_cpu_lookup[i].version_id;
-             break;
-         }
+ static inline void t_sync_flags(DisasContext *dc)
 -- 
 2.14.1
