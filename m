@@ -1,26 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55936)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56968)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1fJ3g2-0001Ol-U8
-	for qemu-devel@nongnu.org; Wed, 16 May 2018 17:09:40 -0400
+	(envelope-from <jsnow@redhat.com>) id 1fJ3mA-0003UU-PC
+	for qemu-devel@nongnu.org; Wed, 16 May 2018 17:16:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1fJ3fy-0002qP-Gf
-	for qemu-devel@nongnu.org; Wed, 16 May 2018 17:09:38 -0400
-Resent-Message-Id: <E1fJ3fy-0002qP-Gf@eggs.gnu.org>
-Received: from sender-of-o51.zoho.com ([135.84.80.216]:21035)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1fJ3fy-0002p4-Ap
-	for qemu-devel@nongnu.org; Wed, 16 May 2018 17:09:34 -0400
-In-Reply-To: <20180516205543.29305-1-laurent@vivier.eu>
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <152650491784.252.16631928542427428075@1f70390a8372>
+	(envelope-from <jsnow@redhat.com>) id 1fJ3m9-0007fq-Cr
+	for qemu-devel@nongnu.org; Wed, 16 May 2018 17:15:58 -0400
+References: <20180512012537.22478-1-jsnow@redhat.com>
+	<20180512012537.22478-7-jsnow@redhat.com>
+	<7e72e02f-856b-520e-4499-fb4978dfa22b@virtuozzo.com>
+From: John Snow <jsnow@redhat.com>
+Message-ID: <0cf72eca-78bf-a20c-ad2c-e093f5b7936a@redhat.com>
+Date: Wed, 16 May 2018 17:15:49 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Wed, 16 May 2018 14:08:39 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PATCH v2 0/8] linux-user: move socket.h
- definitions to CPU directories
+In-Reply-To: <7e72e02f-856b-520e-4499-fb4978dfa22b@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [RFC PATCH 06/12] qapi: add bitmap info
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,73 +25,159 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: laurent@vivier.eu
-Cc: famz@redhat.com, qemu-devel@nongnu.org, peter.maydell@linaro.org, riku.voipio@iki.fi, mark.cave-ayland@ilande.co.uk, f4bug@amsat.org, yongbok.kim@mips.com, rth@twiddle.net
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, Markus Armbruster <armbru@redhat.com>, Max Reitz <mreitz@redhat.com>
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
-c3NhZ2UtaWQ6IDIwMTgwNTE2MjA1NTQzLjI5MzA1LTEtbGF1cmVudEB2aXZpZXIuZXUKU3ViamVj
-dDogW1FlbXUtZGV2ZWxdIFtQQVRDSCB2MiAwLzhdIGxpbnV4LXVzZXI6IG1vdmUgc29ja2V0Lmgg
-ZGVmaW5pdGlvbnMgdG8gQ1BVIGRpcmVjdG9yaWVzCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09
-CiMhL2Jpbi9iYXNoCgpCQVNFPWJhc2UKbj0xCnRvdGFsPSQoZ2l0IGxvZyAtLW9uZWxpbmUgJEJB
-U0UuLiB8IHdjIC1sKQpmYWlsZWQ9MAoKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGlt
-aXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKZ2l0IGNvbmZpZyAtLWxv
-Y2FsIGRpZmYuYWxnb3JpdGhtIGhpc3RvZ3JhbQoKY29tbWl0cz0iJChnaXQgbG9nIC0tZm9ybWF0
-PSVIIC0tcmV2ZXJzZSAkQkFTRS4uKSIKZm9yIGMgaW4gJGNvbW1pdHM7IGRvCiAgICBlY2hvICJD
-aGVja2luZyBQQVRDSCAkbi8kdG90YWw6ICQoZ2l0IGxvZyAtbiAxIC0tZm9ybWF0PSVzICRjKS4u
-LiIKICAgIGlmICEgZ2l0IHNob3cgJGMgLS1mb3JtYXQ9ZW1haWwgfCAuL3NjcmlwdHMvY2hlY2tw
-YXRjaC5wbCAtLW1haWxiYWNrIC07IHRoZW4KICAgICAgICBmYWlsZWQ9MQogICAgICAgIGVjaG8K
-ICAgIGZpCiAgICBuPSQoKG4rMSkpCmRvbmUKCmV4aXQgJGZhaWxlZAo9PT0gVEVTVCBTQ1JJUFQg
-RU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4
-NApGcm9tIGh0dHBzOi8vZ2l0aHViLmNvbS9wYXRjaGV3LXByb2plY3QvcWVtdQogKiBbbmV3IHRh
-Z10gICAgICAgICAgICAgICBwYXRjaGV3LzIwMTgwNTE2MjA1NTQzLjI5MzA1LTEtbGF1cmVudEB2
-aXZpZXIuZXUgLT4gcGF0Y2hldy8yMDE4MDUxNjIwNTU0My4yOTMwNS0xLWxhdXJlbnRAdml2aWVy
-LmV1ClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKN2IwOTJlNjA3OCBsaW51eC11c2Vy
-OiBkZWZpbmUgVEFSR0VUX1NPX1JFVVNFUE9SVAo4NjczNWEzMGM5IGxpbnV4LXVzZXI6IGNvcHkg
-c3BhcmMvc29ja2JpdHMuaCBkZWZpbml0aW9ucyBmcm9tIGxpbnV4CmQyNDRmZTYyNjggbGludXgt
-dXNlcjogdXBkYXRlIEFSQ0hfSEFTX1NPQ0tFVF9UWVBFUyB1c2UKOGNjZGU4ZDJjYiBsaW51eC11
-c2VyOiBtb3ZlIHBwYyBzb2NrZXQuaCBkZWZpbml0aW9ucyB0byBwcGMvc29ja2JpdHMuaAoxNWY5
-ODBmZjdiIGxpbnV4LXVzZXI6IG1vdmUgc29ja2V0LmggZ2VuZXJpYyBkZWZpbml0aW9ucyB0byBn
-ZW5lcmljL3NvY2tiaXRzLmgKYmE2YjJhZDljNiBsaW51eC11c2VyOiBtb3ZlIHNwYXJjL3NwYXJj
-NjQgc29ja2V0LmggZGVmaW5pdGlvbnMgdG8gc3BhcmMvc29ja2JpdHMuaAphZjFlN2M2MWIyIGxp
-bnV4LXVzZXI6IG1vdmUgYWxwaGEgc29ja2V0LmggZGVmaW5pdGlvbnMgdG8gYWxwaGEvc29ja2Jp
-dHMuaAoyYTg5ODViOWE5IGxpbnV4LXVzZXI6IG1vdmUgbWlwcyBzb2NrZXQuaCBkZWZpbml0aW9u
-cyB0byBtaXBzL3NvY2tiaXRzLmgKCj09PSBPVVRQVVQgQkVHSU4gPT09CkNoZWNraW5nIFBBVENI
-IDEvODogbGludXgtdXNlcjogbW92ZSBtaXBzIHNvY2tldC5oIGRlZmluaXRpb25zIHRvIG1pcHMv
-c29ja2JpdHMuaC4uLgpXQVJOSU5HOiBhZGRlZCwgbW92ZWQgb3IgZGVsZXRlZCBmaWxlKHMpLCBk
-b2VzIE1BSU5UQUlORVJTIG5lZWQgdXBkYXRpbmc/CiMxNzogCm5ldyBmaWxlIG1vZGUgMTAwNjQ0
-CgpFUlJPUjogaWYgdGhpcyBjb2RlIGlzIHJlZHVuZGFudCBjb25zaWRlciByZW1vdmluZyBpdAoj
-NTI6IEZJTEU6IGxpbnV4LXVzZXIvbWlwcy9zb2NrYml0cy5oOjMxOgorI2lmIDAKCnRvdGFsOiAx
-IGVycm9ycywgMSB3YXJuaW5ncywgMjI3IGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0
-eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUg
-ZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQ
-QVRDSCBpbiBNQUlOVEFJTkVSUy4KCkNoZWNraW5nIFBBVENIIDIvODogbGludXgtdXNlcjogbW92
-ZSBhbHBoYSBzb2NrZXQuaCBkZWZpbml0aW9ucyB0byBhbHBoYS9zb2NrYml0cy5oLi4uCldBUk5J
-Tkc6IGFkZGVkLCBtb3ZlZCBvciBkZWxldGVkIGZpbGUocyksIGRvZXMgTUFJTlRBSU5FUlMgbmVl
-ZCB1cGRhdGluZz8KIzE4OiAKbmV3IGZpbGUgbW9kZSAxMDA2NDQKCnRvdGFsOiAwIGVycm9ycywg
-MSB3YXJuaW5ncywgMjI0IGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2Js
-ZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9z
-aXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBN
-QUlOVEFJTkVSUy4KQ2hlY2tpbmcgUEFUQ0ggMy84OiBsaW51eC11c2VyOiBtb3ZlIHNwYXJjL3Nw
-YXJjNjQgc29ja2V0LmggZGVmaW5pdGlvbnMgdG8gc3BhcmMvc29ja2JpdHMuaC4uLgpXQVJOSU5H
-OiBhZGRlZCwgbW92ZWQgb3IgZGVsZXRlZCBmaWxlKHMpLCBkb2VzIE1BSU5UQUlORVJTIG5lZWQg
-dXBkYXRpbmc/CiM3NDogCm5ldyBmaWxlIG1vZGUgMTAwNjQ0Cgp0b3RhbDogMCBlcnJvcnMsIDEg
-d2FybmluZ3MsIDE0NiBsaW5lcyBjaGVja2VkCgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVt
-cywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0
-aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJ
-TlRBSU5FUlMuCkNoZWNraW5nIFBBVENIIDQvODogbGludXgtdXNlcjogbW92ZSBzb2NrZXQuaCBn
-ZW5lcmljIGRlZmluaXRpb25zIHRvIGdlbmVyaWMvc29ja2JpdHMuaC4uLgpXQVJOSU5HOiBhZGRl
-ZCwgbW92ZWQgb3IgZGVsZXRlZCBmaWxlKHMpLCBkb2VzIE1BSU5UQUlORVJTIG5lZWQgdXBkYXRp
-bmc/CiMxMzogCm5ldyBmaWxlIG1vZGUgMTAwNjQ0Cgp0b3RhbDogMCBlcnJvcnMsIDEgd2Fybmlu
-Z3MsIDE0OCBsaW5lcyBjaGVja2VkCgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxl
-YXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyBy
-ZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5F
-UlMuCkNoZWNraW5nIFBBVENIIDUvODogbGludXgtdXNlcjogbW92ZSBwcGMgc29ja2V0LmggZGVm
-aW5pdGlvbnMgdG8gcHBjL3NvY2tiaXRzLmguLi4KQ2hlY2tpbmcgUEFUQ0ggNi84OiBsaW51eC11
-c2VyOiB1cGRhdGUgQVJDSF9IQVNfU09DS0VUX1RZUEVTIHVzZS4uLgpDaGVja2luZyBQQVRDSCA3
-Lzg6IGxpbnV4LXVzZXI6IGNvcHkgc3BhcmMvc29ja2JpdHMuaCBkZWZpbml0aW9ucyBmcm9tIGxp
-bnV4Li4uCkNoZWNraW5nIFBBVENIIDgvODogbGludXgtdXNlcjogZGVmaW5lIFRBUkdFVF9TT19S
-RVVTRVBPUlQuLi4KPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGgg
-Y29kZTogMQoKCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFto
-dHRwOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3
-LWRldmVsQHJlZGhhdC5jb20=
+
+
+On 05/14/2018 10:30 AM, Vladimir Sementsov-Ogievskiy wrote:
+> 12.05.2018 04:25, John Snow wrote:
+>> Add some of the necessary scaffolding for reporting bitmap information=
+.
+>>
+>> Signed-off-by: John Snow <jsnow@redhat.com>
+>> ---
+>> =C2=A0 qapi/block-core.json | 60
+>> +++++++++++++++++++++++++++++++++++++++++++++++++++-
+>> =C2=A0 1 file changed, 59 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/qapi/block-core.json b/qapi/block-core.json
+>> index c50517bff3..8f33f41ce7 100644
+>> --- a/qapi/block-core.json
+>> +++ b/qapi/block-core.json
+>> @@ -33,6 +33,61 @@
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0 'date-sec': 'int', 'date-nsec': 'int',
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0 'vm-clock-sec': 'int', 'vm-clock-nsec': 'int' } }
+>> =C2=A0 +##
+>> +# @BitmapTypeEnum:
+>> +#
+>> +# An enumeration of possible serialized bitmap types.
+>> +#
+>> +# @dirty-tracking: This bitmap records information on dirty
+>> +#=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 segments within the file.
+>> +#
+>> +# @unknown: This bitmap is of an unknown or reserved type.
+>> +#
+>> +# Since: 2.13
+>> +##
+>> +{ 'enum': 'BitmapTypeEnum', 'data': [ 'dirty-tracking', 'unknown' ] }
+>> +
+>> +##
+>> +# @BitmapFlagEnum:
+>> +#
+>> +# An enumeration of possible flags for serialized bitmaps.
+>> +#
+>> +# @in-use: This bitmap is considered to be in-use, and may now be
+>> inconsistent.
+>> +#
+>> +# @auto: This bitmap must reflect any and all changes to the file it
+>> describes.
+>> +#=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 The type of this bitmap m=
+ust be @DirtyTrackingBitmap.
+>=20
+> logical, but I don't see this restriction in the spec. May be we need t=
+o
+> update the spec
+>=20
+1: auto
+
+"The bitmap must reflect all changes of the virtual disk by any
+application that would write to this qcow2 file (including writes,
+snapshot switching, etc.). The type of this bitmap must be 'dirty
+tracking bitmap'."
+
+Actually, this looks correct now that I'm looking at the spec again.
+I've used a terser phrasing but I think it's correct.
+
+>> +#
+>> +# @extra-data-compatible: This bitmap has extra information
+>> associated with it.
+>=20
+> no, this flag means, that extra data is compatible. So, if you don't
+> know what is this extra data, you can read and modify the bitmap,
+> leaving this data as is. If this flag is unset, and there are some extr=
+a
+> data, bitmap must not be used.
+>=20
+> Finally, this spec should be consistent (or, may be better, duplicate)
+> spec from docs/interop/qcow2.txt..
+
+I might suggest a rewrite of this portion of the spec as it's a little
+unclear to me.
+
+I've given this portion a rewrite.
+
+>> +#
+>> +# @unknown: This bitmap has unknown or reserved properties.
+>=20
+> Better is only "reserved flags" (not unknown and not properties), they
+> are reserved by spec.
+>=20
+>> +#
+>> +# Since: 2.13
+>> +##
+>> +{ 'enum': 'BitmapFlagEnum', 'data': [ 'in-use', 'auto',
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0 'extra-data-compatible',
+>> 'unknown' ] }
+>> +
+>> +##
+>> +# @BitmapInfo:
+>> +#
+>> +# @name: The name of the bitmap.
+>> +#
+>> +# @type: The type of bitmap.
+>> +#
+>> +# @granularity: Bitmap granularity, in bytes.
+>> +#
+>> +# @count: Overall bitmap dirtiness, in bytes.
+>> +#
+>> +# @flags: Bitmap flags, if any.
+>> +#
+>> +# Since: 2.13
+>> +#
+>> +##
+>> +{ 'struct': 'BitmapInfo',
+>> +=C2=A0 'data': { 'name': 'str', 'type': 'BitmapTypeEnum', 'granularit=
+y':
+>> 'int',
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 'c=
+ount': 'int', '*flags': ['BitmapFlagEnum']
+>=20
+> may be worth add 'has-extra-data'
+>=20
+>> +=C2=A0 }
+>> +}
+>> +
+>> =C2=A0 ##
+>> =C2=A0 # @ImageInfoSpecificQCow2EncryptionBase:
+>> =C2=A0 #
+>> @@ -69,6 +124,8 @@
+>> =C2=A0 # @encrypt: details about encryption parameters; only set if im=
+age
+>> =C2=A0 #=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 i=
+s encrypted (since 2.10)
+>> =C2=A0 #
+>> +# @bitmaps: list of image bitmaps (since 2.13)
+>> +#
+>> =C2=A0 # Since: 1.7
+>> =C2=A0 ##
+>> =C2=A0 { 'struct': 'ImageInfoSpecificQCow2',
+>> @@ -77,7 +134,8 @@
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 '*lazy-refcounts': 'bool',
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 '*corrupt': 'bool',
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 'refcount-bits': 'int',
+>> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 '*encrypt': 'ImageInfoSpecificQCow2Enc=
+ryption'
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 '*encrypt': 'ImageInfoSpecificQCow2Enc=
+ryption',
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 '*bitmaps': ['BitmapInfo']
+>> =C2=A0=C2=A0=C2=A0 } }
+>> =C2=A0 =C2=A0 ##
+>=20
+>=20
