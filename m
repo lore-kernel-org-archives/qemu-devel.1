@@ -1,17 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37536)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38507)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wangjie88@huawei.com>) id 1fItM6-0004GY-H1
-	for qemu-devel@nongnu.org; Wed, 16 May 2018 06:08:28 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1fItQq-0005n6-EL
+	for qemu-devel@nongnu.org; Wed, 16 May 2018 06:13:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wangjie88@huawei.com>) id 1fItM5-0002FZ-GH
-	for qemu-devel@nongnu.org; Wed, 16 May 2018 06:08:22 -0400
-From: Jie Wang <wangjie88@huawei.com>
-Date: Wed, 16 May 2018 15:09:04 +0800
-Message-ID: <1526454544-3146-1-git-send-email-wangjie88@huawei.com>
+	(envelope-from <pbonzini@redhat.com>) id 1fItQm-0005EQ-3y
+	for qemu-devel@nongnu.org; Wed, 16 May 2018 06:13:16 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:47964 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1fItQl-0005Dm-Vh
+	for qemu-devel@nongnu.org; Wed, 16 May 2018 06:13:12 -0400
+References: <1526405722-10887-1-git-send-email-lpetrut@cloudbasesolutions.com>
+	<1526405722-10887-3-git-send-email-lpetrut@cloudbasesolutions.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <e2bc8288-d21f-41d4-8a9f-08ff8b18b30d@redhat.com>
+Date: Wed, 16 May 2018 12:13:08 +0200
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v3] iothread: fix epollfd leak in the process
- of delIOThread
+In-Reply-To: <1526405722-10887-3-git-send-email-lpetrut@cloudbasesolutions.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 3/3] WHPX: fix some compiler warnings
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,87 +28,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: stefanha@redhat.com, peterx@redhat.com, famz@redhat.com, eblake@redhat.com
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, eric.fangyi@huawei.com, wu.wubin@huawei.com, wangjie88@huawei.com
+To: petrutlucian94@gmail.com
+Cc: Lucian Petrut <lpetrut@cloudbasesolutions.com>, Alessandro Pilotti <apilotti@cloudbasesolutions.com>, Justin Terry <juterry@microsoft.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, "open list:All patches CC here" <qemu-devel@nongnu.org>
 
-From: w00251574 <wangjie88@huawei.com>
+On 15/05/2018 19:35, petrutlucian94@gmail.com wrote:
+> From: Lucian Petrut <lpetrut@cloudbasesolutions.com>
+> 
+> This patch fixes a few compiler warnings, especially in case of
+> x86 targets, where the number of registers was not properly handled
+> and could cause an overflow.
+> 
+> Signed-off-by: Alessandro Pilotti <apilotti@cloudbasesolutions.com>
+> Signed-off-by: Justin Terry (VM) <juterry@microsoft.com>
+> Signed-off-by: Lucian Petrut <lpetrut@cloudbasesolutions.com>
+> ---
+>  target/i386/whpx-all.c | 49 +++++++++++++++++++++++++++++++++++--------------
+>  1 file changed, 35 insertions(+), 14 deletions(-)
+> 
+> diff --git a/target/i386/whpx-all.c b/target/i386/whpx-all.c
+> index 0a29d56..2fd3397 100644
+> --- a/target/i386/whpx-all.c
+> +++ b/target/i386/whpx-all.c
+> @@ -226,24 +226,31 @@ static void whpx_set_registers(CPUState *cpu)
+>      struct whpx_vcpu *vcpu = get_whpx_vcpu(cpu);
+>      struct CPUX86State *env = (CPUArchState *)(cpu->env_ptr);
+>      X86CPU *x86_cpu = X86_CPU(cpu);
+> -    struct whpx_register_set vcxt = {0};
+> +    struct whpx_register_set vcxt;
+>      HRESULT hr;
+> -    int idx = 0;
+> +    int idx;
+> +    int idx_next;
+>      int i;
+>      int v86, r86;
+>  
+>      assert(cpu_is_stopped(cpu) || qemu_cpu_is_self(cpu));
+>  
+> +    memset(&vcxt, 0, sizeof(struct whpx_register_set));
 
-When we call addIOThread, the epollfd created in aio_context_setup,
-but not close it in the process of delIOThread, so the epollfd will leak.
+This change does not seem like an improvement, can you send a patch with
+the bugfix only?
 
-Signed-off-by: Jie Wang <wangjie88@huawei.com>
----
- include/block/aio.h | 8 ++++++++
- util/aio-posix.c    | 9 +++++++++
- util/aio-win32.c    | 4 ++++
- util/async.c        | 1 +
- 4 files changed, 22 insertions(+)
+Thanks,
 
-diff --git a/include/block/aio.h b/include/block/aio.h
-index a1d6b9e249..ae6f354e6c 100644
---- a/include/block/aio.h
-+++ b/include/block/aio.h
-@@ -554,6 +554,14 @@ static inline bool in_aio_context_home_thread(AioContext *ctx)
-  */
- void aio_context_setup(AioContext *ctx);
- 
-+/**
-+ * aio_context_destroy:
-+ * @ctx: the aio context
-+ *
-+ * Destroy the aio context.
-+ */
-+void aio_context_destroy(AioContext *ctx);
-+
- /**
-  * aio_context_set_poll_params:
-  * @ctx: the aio context
-diff --git a/util/aio-posix.c b/util/aio-posix.c
-index d8f0cb4af8..0ade2c7791 100644
---- a/util/aio-posix.c
-+++ b/util/aio-posix.c
-@@ -713,6 +713,15 @@ void aio_context_setup(AioContext *ctx)
- #endif
- }
- 
-+void aio_context_destroy(AioContext *ctx)
-+{
-+#ifdef CONFIG_EPOLL_CREATE1
-+    if (ctx->epollfd >= 0) {
-+        close(ctx->epollfd);
-+    }
-+#endif
-+}
-+
- void aio_context_set_poll_params(AioContext *ctx, int64_t max_ns,
-                                  int64_t grow, int64_t shrink, Error **errp)
- {
-diff --git a/util/aio-win32.c b/util/aio-win32.c
-index a67b00c6ad..e676a8d9b2 100644
---- a/util/aio-win32.c
-+++ b/util/aio-win32.c
-@@ -407,6 +407,10 @@ void aio_context_setup(AioContext *ctx)
- {
- }
- 
-+void aio_context_destroy(AioContext *ctx)
-+{
-+}
-+
- void aio_context_set_poll_params(AioContext *ctx, int64_t max_ns,
-                                  int64_t grow, int64_t shrink, Error **errp)
- {
-diff --git a/util/async.c b/util/async.c
-index 4dd9d95a9e..03f62787f2 100644
---- a/util/async.c
-+++ b/util/async.c
-@@ -298,6 +298,7 @@ aio_ctx_finalize(GSource     *source)
-     qemu_rec_mutex_destroy(&ctx->lock);
-     qemu_lockcnt_destroy(&ctx->list_lock);
-     timerlistgroup_deinit(&ctx->tlg);
-+    aio_context_destroy(ctx);
- }
- 
- static GSourceFuncs aio_source_funcs = {
--- 
-2.15.0.windows.1
+Paolo
