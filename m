@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53847)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53875)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <edgar.iglesias@gmail.com>) id 1fJ1XM-0003Pz-EL
-	for qemu-devel@nongnu.org; Wed, 16 May 2018 14:52:33 -0400
+	(envelope-from <edgar.iglesias@gmail.com>) id 1fJ1XO-0003Sg-TQ
+	for qemu-devel@nongnu.org; Wed, 16 May 2018 14:52:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <edgar.iglesias@gmail.com>) id 1fJ1XL-0000sx-Cb
-	for qemu-devel@nongnu.org; Wed, 16 May 2018 14:52:32 -0400
-Received: from mail-wr0-x243.google.com ([2a00:1450:400c:c0c::243]:36096)
+	(envelope-from <edgar.iglesias@gmail.com>) id 1fJ1XO-0000uf-0O
+	for qemu-devel@nongnu.org; Wed, 16 May 2018 14:52:34 -0400
+Received: from mail-wr0-x241.google.com ([2a00:1450:400c:c0c::241]:36095)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <edgar.iglesias@gmail.com>)
-	id 1fJ1XL-0000sM-5Y
-	for qemu-devel@nongnu.org; Wed, 16 May 2018 14:52:31 -0400
-Received: by mail-wr0-x243.google.com with SMTP id p4-v6so2785599wrh.3
-	for <qemu-devel@nongnu.org>; Wed, 16 May 2018 11:52:30 -0700 (PDT)
+	id 1fJ1XN-0000tq-Fn
+	for qemu-devel@nongnu.org; Wed, 16 May 2018 14:52:33 -0400
+Received: by mail-wr0-x241.google.com with SMTP id p4-v6so2785765wrh.3
+	for <qemu-devel@nongnu.org>; Wed, 16 May 2018 11:52:33 -0700 (PDT)
 From: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
-Date: Wed, 16 May 2018 20:51:34 +0200
-Message-Id: <20180516185146.30708-27-edgar.iglesias@gmail.com>
+Date: Wed, 16 May 2018 20:51:35 +0200
+Message-Id: <20180516185146.30708-28-edgar.iglesias@gmail.com>
 In-Reply-To: <20180516185146.30708-1-edgar.iglesias@gmail.com>
 References: <20180516185146.30708-1-edgar.iglesias@gmail.com>
-Subject: [Qemu-devel] [PATCH v3 26/38] target-microblaze: mmu: Prepare for
- 64-bit addresses
+Subject: [Qemu-devel] [PATCH v3 27/38] target-microblaze: mmu: Add a
+ configurable output address mask
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,94 +32,53 @@ Cc: peter.maydell@linaro.org, richard.henderson@linaro.org, frederic.konrad@adac
 
 From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
 
-Prepare for 64-bit addresses.
-This makes no functional difference as the upper parts of
-the 64-bit addresses are not yet reachable.
+Add a configurable output address mask, used to mimic the
+configurable physical address bit width.
 
+Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 Signed-off-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
 ---
- target/microblaze/mmu.c | 14 +++++++-------
- target/microblaze/mmu.h |  6 +++---
- 2 files changed, 10 insertions(+), 10 deletions(-)
+ target/microblaze/cpu.c | 1 +
+ target/microblaze/mmu.c | 1 +
+ target/microblaze/mmu.h | 1 +
+ 3 files changed, 3 insertions(+)
 
+diff --git a/target/microblaze/cpu.c b/target/microblaze/cpu.c
+index 2b3f8fa374..d0649fdaaa 100644
+--- a/target/microblaze/cpu.c
++++ b/target/microblaze/cpu.c
+@@ -128,6 +128,7 @@ static void mb_cpu_reset(CPUState *s)
+     env->mmu.c_mmu = 3;
+     env->mmu.c_mmu_tlb_access = 3;
+     env->mmu.c_mmu_zones = 16;
++    env->mmu.c_addr_mask = MAKE_64BIT_MASK(0, cpu->cfg.addr_size);
+ #endif
+ }
+ 
 diff --git a/target/microblaze/mmu.c b/target/microblaze/mmu.c
-index 231803ceea..a379968618 100644
+index a379968618..166c79908c 100644
 --- a/target/microblaze/mmu.c
 +++ b/target/microblaze/mmu.c
-@@ -81,16 +81,16 @@ unsigned int mmu_translate(struct microblaze_mmu *mmu,
- {
-     unsigned int i, hit = 0;
-     unsigned int tlb_ex = 0, tlb_wr = 0, tlb_zsel;
--    unsigned int tlb_size;
--    uint32_t tlb_tag, tlb_rpn, mask, t0;
-+    uint64_t tlb_tag, tlb_rpn, mask;
-+    uint32_t tlb_size, t0;
+@@ -164,6 +164,7 @@ unsigned int mmu_translate(struct microblaze_mmu *mmu,
+             tlb_rpn = d & TLB_RPN_MASK;
  
-     lu->err = ERR_MISS;
-     for (i = 0; i < ARRAY_SIZE(mmu->rams[RAM_TAG]); i++) {
--        uint32_t t, d;
-+        uint64_t t, d;
- 
-         /* Lookup and decode.  */
-         t = mmu->rams[RAM_TAG][i];
--        D(qemu_log("TLB %d valid=%d\n", i, t & TLB_VALID));
-+        D(qemu_log("TLB %d valid=%" PRId64 "\n", i, t & TLB_VALID));
-         if (t & TLB_VALID) {
-             tlb_size = tlb_decode_size((t & TLB_PAGESZ_MASK) >> 7);
-             if (tlb_size < TARGET_PAGE_SIZE) {
-@@ -98,10 +98,10 @@ unsigned int mmu_translate(struct microblaze_mmu *mmu,
-                 abort();
-             }
- 
--            mask = ~(tlb_size - 1);
-+            mask = ~((uint64_t)tlb_size - 1);
-             tlb_tag = t & TLB_EPN_MASK;
-             if ((vaddr & mask) != (tlb_tag & mask)) {
--                D(qemu_log("TLB %d vaddr=%x != tag=%x\n",
-+                D(qemu_log("TLB %d vaddr=%" PRIx64 " != tag=%" PRIx64 "\n",
-                            i, vaddr & mask, tlb_tag & mask));
-                 continue;
-             }
-@@ -173,7 +173,7 @@ unsigned int mmu_translate(struct microblaze_mmu *mmu,
-         }
-     }
- done:
--    D(qemu_log("MMU vaddr=%x rw=%d tlb_wr=%d tlb_ex=%d hit=%d\n",
-+    D(qemu_log("MMU vaddr=%" PRIx64 " rw=%d tlb_wr=%d tlb_ex=%d hit=%d\n",
-               vaddr, rw, tlb_wr, tlb_ex, hit));
-     return hit;
- }
+             lu->vaddr = tlb_tag;
++            lu->paddr = tlb_rpn & mmu->c_addr_mask;
+             lu->paddr = tlb_rpn;
+             lu->size = tlb_size;
+             lu->err = ERR_HIT;
 diff --git a/target/microblaze/mmu.h b/target/microblaze/mmu.h
-index 624becfded..1714caf82e 100644
+index 1714caf82e..9fbdf38f36 100644
 --- a/target/microblaze/mmu.h
 +++ b/target/microblaze/mmu.h
-@@ -28,7 +28,7 @@
- #define RAM_TAG      0
+@@ -72,6 +72,7 @@ struct microblaze_mmu
+     int c_mmu;
+     int c_mmu_tlb_access;
+     int c_mmu_zones;
++    uint64_t c_addr_mask; /* Mask to apply to physical addresses.  */
+ };
  
- /* Tag portion */
--#define TLB_EPN_MASK          0xFFFFFC00 /* Effective Page Number */
-+#define TLB_EPN_MASK          MAKE_64BIT_MASK(10, 64 - 10)
- #define TLB_PAGESZ_MASK       0x00000380
- #define TLB_PAGESZ(x)         (((x) & 0x7) << 7)
- #define PAGESZ_1K             0
-@@ -42,7 +42,7 @@
- #define TLB_VALID             0x00000040 /* Entry is valid */
- 
- /* Data portion */
--#define TLB_RPN_MASK          0xFFFFFC00 /* Real Page Number */
-+#define TLB_RPN_MASK          MAKE_64BIT_MASK(10, 64 - 10)
- #define TLB_PERM_MASK         0x00000300
- #define TLB_EX                0x00000200 /* Instruction execution allowed */
- #define TLB_WR                0x00000100 /* Writes permitted */
-@@ -63,7 +63,7 @@
- struct microblaze_mmu
- {
-     /* Data and tag brams.  */
--    uint32_t rams[2][TLB_ENTRIES];
-+    uint64_t rams[2][TLB_ENTRIES];
-     /* We keep a separate ram for the tids to avoid the 48 bit tag width.  */
-     uint8_t tids[TLB_ENTRIES];
-     /* Control flops.  */
+ struct microblaze_mmu_lookup
 -- 
 2.14.1
