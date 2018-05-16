@@ -1,26 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38567)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42005)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1fIvRN-0003Zj-DK
-	for qemu-devel@nongnu.org; Wed, 16 May 2018 08:21:58 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1fIve2-0006mQ-1K
+	for qemu-devel@nongnu.org; Wed, 16 May 2018 08:35:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1fIvRK-0005xh-Od
-	for qemu-devel@nongnu.org; Wed, 16 May 2018 08:21:57 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:51454 helo=mx1.redhat.com)
+	(envelope-from <ehabkost@redhat.com>) id 1fIvdz-0004eO-DE
+	for qemu-devel@nongnu.org; Wed, 16 May 2018 08:35:02 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:27213)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1fIvRK-0005x9-JF
-	for qemu-devel@nongnu.org; Wed, 16 May 2018 08:21:54 -0400
-References: <20180514165424.12884-1-zhangckid@gmail.com>
-	<20180516111828.GD2531@work-vm>
-From: Jason Wang <jasowang@redhat.com>
-Message-ID: <2ce43efb-9fb3-c091-a444-3b004d888ada@redhat.com>
-Date: Wed, 16 May 2018 20:21:47 +0800
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1fIvdz-0004dv-3n
+	for qemu-devel@nongnu.org; Wed, 16 May 2018 08:34:59 -0400
+Date: Wed, 16 May 2018 09:34:52 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20180516123452.GF25013@localhost.localdomain>
+References: <1523953455-28053-1-git-send-email-wanpengli@tencent.com>
+	<20180417205913.GC29865@localhost.localdomain>
+	<02887fa6-d7c8-bc39-6e65-3c3caec5b903@redhat.com>
+	<20180419195610.GA29865@localhost.localdomain>
+	<98f48c44-e55a-2bd2-0d41-5643f35bce68@redhat.com>
+	<20180419215320.GC29865@localhost.localdomain>
+	<20180512010007-mutt-send-email-mst@kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20180516111828.GD2531@work-vm>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH V7 RESEND 00/17] COLO: integrate colo frame
- with block replication and COLO proxy
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180512010007-mutt-send-email-mst@kernel.org>
+Subject: Re: [Qemu-devel] [PATCH RESEND v2] i386/kvm: add support for
+ KVM_CAP_X86_DISABLE_EXITS
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,117 +33,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Zhang Chen <zhangckid@gmail.com>, qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Wanpeng Li <kernellwp@gmail.com>, qemu-devel@nongnu.org, kvm@vger.kernel.org, Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>
 
+On Sat, May 12, 2018 at 01:12:59AM +0300, Michael S. Tsirkin wrote:
+> On Thu, Apr 19, 2018 at 06:53:20PM -0300, Eduardo Habkost wrote:
+> > On Thu, Apr 19, 2018 at 11:32:16PM +0200, Paolo Bonzini wrote:
+> > > On 19/04/2018 21:56, Eduardo Habkost wrote:
+> > > > On Thu, Apr 19, 2018 at 05:48:57PM +0200, Paolo Bonzini wrote:
+> > > >> On 17/04/2018 22:59, Eduardo Habkost wrote:
+> > > >>>> +        if (disable_exits) {
+> > > >>>> +            disable_exits &= (KVM_X86_DISABLE_EXITS_MWAIT |
+> > > >>>> +                              KVM_X86_DISABLE_EXITS_HLT |
+> > > >>>> +                              KVM_X86_DISABLE_EXITS_PAUSE);
+> > > >>>> +            if (env->user_features[FEAT_KVM] & KVM_PV_UNHALT) {
+> > > >>>> +                disable_exits &= ~KVM_X86_DISABLE_EXITS_HLT;
+> > > >>>> +            }
+> > > >>>
+> > > >>> In the future, if we decide to enable kvm-pv-unhalt by default,
+> > > >>> should "-cpu ...,kvm-hint-dedicated=on" disable kvm-pv-unhalt
+> > > >>> automatically, or should we require an explicit
+> > > >>> "kvm-hint-dedicated=on,kvm-pv-unhalt=off" option?
+> > > >>
+> > > >> It should be automatic.
+> > > >>
+> > > >>> For today's defaults, this patch solves the problem, only one
+> > > >>> thing is missing before I give my R-b: we need to clearly
+> > > >>> document what exactly are the consequences and requirements of
+> > > >>> setting kvm-hint-dedicated=on (I'm not sure if the best place for
+> > > >>> this is qemu-options.hx, x86_cpu_list(), or somewhere else).
+> > > >>
+> > > >> I don't think we have a good place for this kind of documentation,
+> > > >> unfortunately.  Right now it is mentioned in
+> > > >> Documentation/virtual/kvm/cpuid.txt.
+> > > > 
+> > > > With this patch, the QEMU option will do more than just setting
+> > > > the CPUID bit, that's why I miss more detailed documentation on
+> > > > the QEMU side.  But I agree we have no obvious place for that
+> > > > documentation.
+> > > > 
+> > > > In the worst case we can just add a code comment on top of
+> > > > feature_word_info[FEAT_KVM_HINTS].feat_names warning that
+> > > > kvm-hint-dedicated won't just enable the flag on CPUID and has
+> > > > other side-effects.
+> > > 
+> > > Maybe we should use "-realtime dedicated=on" instead of, or in addition
+> > > to kvm-hint-dedicated=on?
+> > 
+> > Maybe it's a better idea than overloading an option that is only
+> > expected to control a CPUID bit.
+> 
+> Well -realtime would be a bit confusing in that it enables mlock by
+> default.
+> 
+> From pure API point of view, hint-dedicated looks good since
+> it seems to say "optimize for a dedicated host CPU" and
+> it's a hint in that guests keep working if you violate this
+> slightly once in a while.
+> 
+> But I agree there's a problem: right now "kvm-" means "KVM PV"
+> as opposed to e.g. HV enlightened gusts.
+> So if you enable hyperv and also want to disable halt existing,
+> what then? What should kvm-hint-dedicated=on do?
+> 
+> So how about a new hint-dedicated=on cpu flag?  We can have that set
+> kvm-hint-dedicated if kvm PV is enabled.
 
+Using a boolean flag that is _not_ considered a CPUID feature
+flag would be better.  Using the CPUID feature flag name risks
+having management software enabling the flag by accident (as it
+will get included in query-cpu-model-* queries).  A separate
+boolean flag would make this clearer.
 
-On 2018=E5=B9=B405=E6=9C=8816=E6=97=A5 19:18, Dr. David Alan Gilbert wrot=
-e:
-> Hi Jason,
->    Patches 1,2,3,14,15 seem mostly networky to me; can you have a look?
->
-> Dave
-
-Sure, will review.
-
-Thanks
-
->
-> * Zhang Chen (zhangckid@gmail.com) wrote:
->> The RESEND version just fix code style in patch 11/17.
->>
->> Hi~ All~
->>
->> COLO Frame, block replication and COLO proxy(colo-compare,filter-mirro=
-r,
->> filter-redirector,filter-rewriter) have been exist in qemu
->> for long time, it's time to integrate these three parts to make COLO r=
-eally works.
->>
->> In this series, we have some optimizations for COLO frame, including s=
-eparating the
->> process of saving ram and device state, using an COLO_EXIT event to no=
-tify users that
->> VM exits COLO, for these parts, most of them have been reviewed long t=
-ime ago in old version,
->> but since this series have just rebased on upstream which had merged a=
- new series of migration,
->> parts of pathes in this series deserve review again.
->>
->> We use notifier/callback method for COLO compare to notify COLO frame =
-about
->> net packets inconsistent event, and add a handle_event method for NetF=
-ilterClass to
->> help COLO frame to notify filters and colo-compare about checkpoint/fa=
-ilover event,
->> it is flexible.
->>
->> For the neweset version, please refer to:
->> https://github.com/zhangckid/qemu/tree/qemu-colo-18may1-rebase
->>
->> Please review, thanks.
->>
->> V7:
->>   - Addressed Markus's comments in 11/17.
->>   - Rebased on upstream.
->>
->> V6:
->>   - Addressed Eric Blake's comments, use the enum to feedback in patch=
- 11/17.
->>   - Fixed QAPI command separator problem in patch 11/17.
->>
->>
->> Zhang Chen (12):
->>    filter-rewriter: fix memory leak for connection in
->>      connection_track_table
->>    colo-compare: implement the process of checkpoint
->>    colo-compare: use notifier to notify packets comparing result
->>    COLO: integrate colo compare with colo frame
->>    COLO: Add block replication into colo process
->>    COLO: Remove colo_state migration struct
->>    COLO: Load dirty pages into SVM's RAM cache firstly
->>    ram/COLO: Record the dirty pages that SVM received
->>    COLO: Flush memory data from ram cache
->>    qapi: Add new command to query colo status
->>    filter: Add handle_event method for NetFilterClass
->>    filter-rewriter: handle checkpoint and failover event
->>
->> zhanghailiang (5):
->>    qmp event: Add COLO_EXIT event to notify users while exited COLO
->>    savevm: split the process of different stages for loadvm/savevm
->>    COLO: flush host dirty ram from cache
->>    COLO: notify net filters about checkpoint/failover event
->>    COLO: quick failover process by kick COLO thread
->>
->>   include/exec/ram_addr.h  |   1 +
->>   include/migration/colo.h |  11 +-
->>   include/net/filter.h     |   5 +
->>   migration/Makefile.objs  |   2 +-
->>   migration/colo-comm.c    |  76 --------------
->>   migration/colo.c         | 219 +++++++++++++++++++++++++++++++++++++=
---
->>   migration/migration.c    |  38 ++++++-
->>   migration/ram.c          | 183 +++++++++++++++++++++++++++++++-
->>   migration/ram.h          |   4 +
->>   migration/savevm.c       |  55 ++++++++--
->>   migration/savevm.h       |   5 +
->>   migration/trace-events   |   3 +
->>   net/colo-compare.c       | 108 +++++++++++++++++--
->>   net/colo-compare.h       |  24 +++++
->>   net/colo.h               |   4 +
->>   net/filter-rewriter.c    | 109 +++++++++++++++++--
->>   net/filter.c             |  17 +++
->>   net/net.c                |  28 +++++
->>   qapi/migration.json      |  70 +++++++++++++
->>   vl.c                     |   2 -
->>   20 files changed, 846 insertions(+), 118 deletions(-)
->>   delete mode 100644 migration/colo-comm.c
->>   create mode 100644 net/colo-compare.h
->>
->> --=20
->> 2.17.0
->>
-> --
-> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
->
+-- 
+Eduardo
