@@ -1,18 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38527)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39999)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1fJ4f1-0001WN-1S
-	for qemu-devel@nongnu.org; Wed, 16 May 2018 18:12:40 -0400
+	(envelope-from <eblake@redhat.com>) id 1fJ4nl-00052o-UC
+	for qemu-devel@nongnu.org; Wed, 16 May 2018 18:21:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1fJ4ex-0003Md-00
-	for qemu-devel@nongnu.org; Wed, 16 May 2018 18:12:38 -0400
-Received: from mout.kundenserver.de ([217.72.192.75]:58971)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1fJ4ew-0003Lk-MP
-	for qemu-devel@nongnu.org; Wed, 16 May 2018 18:12:34 -0400
-From: Laurent Vivier <laurent@vivier.eu>
-Date: Thu, 17 May 2018 00:12:13 +0200
-Message-Id: <20180516221213.11111-1-laurent@vivier.eu>
-Subject: [Qemu-devel] [PATCH] linux-user: update netlink emulation
+	(envelope-from <eblake@redhat.com>) id 1fJ4ni-00049K-Ni
+	for qemu-devel@nongnu.org; Wed, 16 May 2018 18:21:41 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:48040 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1fJ4ni-000473-Hx
+	for qemu-devel@nongnu.org; Wed, 16 May 2018 18:21:38 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.4])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 72787401EF09
+	for <qemu-devel@nongnu.org>; Wed, 16 May 2018 22:21:31 +0000 (UTC)
+References: <1525423069-61903-1-git-send-email-imammedo@redhat.com>
+	<1525423069-61903-9-git-send-email-imammedo@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <7f80806c-3685-f679-c5af-1ca7a9b0052b@redhat.com>
+Date: Wed, 16 May 2018 17:21:30 -0500
+MIME-Version: 1.0
+In-Reply-To: <1525423069-61903-9-git-send-email-imammedo@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v7 08/11] tests: extend qmp test with
+ preconfig checks
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,158 +35,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Laurent Vivier <laurent@vivier.eu>, Riku Voipio <riku.voipio@iki.fi>
+To: Igor Mammedov <imammedo@redhat.com>, qemu-devel@nongnu.org
+Cc: ehabkost@redhat.com, pkrempa@redhat.com, armbru@redhat.com
 
-Update enums with entries from linux 4.17
+On 05/04/2018 03:37 AM, Igor Mammedov wrote:
+> Add permission checks for commands at 'preconfig' stage.
+> 
+> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+> ---
 
-Translate entries that generate logs with iproute2 4.9.0 and
-host kernel 4.15:
+> +++ b/tests/qmp-test.c
+> @@ -392,6 +392,49 @@ static void add_query_tests(QmpSchema *schema)
+>       }
+>   }
+>   
+> +static bool qmp_rsp_is_err(QDict *rsp)
+> +{
+> +    QDict *error = qdict_get_qdict(rsp, "error");
+> +    QDECREF(rsp);
+> +    return !!error;
 
-  # ip address show
-  Unknown host QEMU_IFLA type: 43
-  Unknown host QEMU_IFLA type: 43
-  Unknown host QEMU_IFLA type: 43
-  Unknown QEMU_IFLA_BR type 41
-  Unknown QEMU_IFLA_BR type 42
-  Unknown QEMU_IFLA_BR type 43
-  Unknown QEMU_IFLA_BR type 44
-  Unknown host QEMU_IFLA type: 43
-  Unknown QEMU_IFLA_BR type 41
-  Unknown QEMU_IFLA_BR type 42
-  Unknown QEMU_IFLA_BR type 43
-  Unknown QEMU_IFLA_BR type 44
-  Unknown host QEMU_IFLA type: 43
+At first glance, I was worried that this was a use-after-free; but as 
+you are not actually dereferencing error, but merely checking whether 
+the pointer was non-NULL (which works even if the pointer has gone stale 
+in the meantime due to the QDECREF), you are okay.
 
-Signed-off-by: Laurent Vivier <laurent@vivier.eu>
----
- linux-user/syscall.c | 58 ++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 58 insertions(+)
+> +}
+> +
+> +static void test_qmp_preconfig(void)
+> +{
+> +    QDict *rsp, *ret;
+> +    QTestState *qs = qtest_startf("%s --preconfig", common_args);
+> +
+> +    /* preconfig state */
+> +    /* enabled commands, no error expected  */
+> +    g_assert(!qmp_rsp_is_err(qtest_qmp(qs, "{ 'execute': 'query-commands' }")));
+> +
+> +    /* forbidden commands, expected error */
+> +    g_assert(qmp_rsp_is_err(qtest_qmp(qs, "{ 'execute': 'query-cpus' }")));
+> +
+> +    /* check that query-status returns preconfig state */
+> +    rsp = qtest_qmp(qs, "{ 'execute': 'query-status' }");
+> +    ret = qdict_get_qdict(rsp, "return");
+> +    g_assert(ret);
+> +    g_assert_cmpstr(qdict_get_try_str(ret, "status"), ==, "preconfig");
+> +    QDECREF(rsp);
+> +
+> +    /* exit preconfig state */
+> +    g_assert(!qmp_rsp_is_err(qtest_qmp(qs, "{ 'execute': 'exit-preconfig' }")));
+> +    qtest_qmp_eventwait(qs, "RESUME");
+> +
+> +    /* check that query-status returns running state */
+> +    rsp = qtest_qmp(qs, "{ 'execute': 'query-status' }");
+> +    ret = qdict_get_qdict(rsp, "return");
+> +    g_assert(ret);
+> +    g_assert_cmpstr(qdict_get_try_str(ret, "status"), ==, "running");
+> +    QDECREF(rsp);
+> +
+> +    /* enabled commands, no error expected  */
+> +    g_assert(!qmp_rsp_is_err(qtest_qmp(qs, "{ 'execute': 'query-cpus' }")));
 
-diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-index af8603f1b7..dd77f86ea2 100644
---- a/linux-user/syscall.c
-+++ b/linux-user/syscall.c
-@@ -405,6 +405,8 @@ enum {
-     QEMU_IFLA_BR_PAD,
-     QEMU_IFLA_BR_VLAN_STATS_ENABLED,
-     QEMU_IFLA_BR_MCAST_STATS_ENABLED,
-+    QEMU_IFLA_BR_MCAST_IGMP_VERSION,
-+    QEMU_IFLA_BR_MCAST_MLD_VERSION,
-     QEMU___IFLA_BR_MAX,
- };
- 
-@@ -453,6 +455,12 @@ enum {
-     QEMU_IFLA_GSO_MAX_SIZE,
-     QEMU_IFLA_PAD,
-     QEMU_IFLA_XDP,
-+    QEMU_IFLA_EVENT,
-+    QEMU_IFLA_NEW_NETNSID,
-+    QEMU_IFLA_IF_NETNSID,
-+    QEMU_IFLA_CARRIER_UP_COUNT,
-+    QEMU_IFLA_CARRIER_DOWN_COUNT,
-+    QEMU_IFLA_NEW_IFINDEX,
-     QEMU___IFLA_MAX
- };
- 
-@@ -484,6 +492,12 @@ enum {
-     QEMU_IFLA_BRPORT_FLUSH,
-     QEMU_IFLA_BRPORT_MULTICAST_ROUTER,
-     QEMU_IFLA_BRPORT_PAD,
-+    QEMU_IFLA_BRPORT_MCAST_FLOOD,
-+    QEMU_IFLA_BRPORT_MCAST_TO_UCAST,
-+    QEMU_IFLA_BRPORT_VLAN_TUNNEL,
-+    QEMU_IFLA_BRPORT_BCAST_FLOOD,
-+    QEMU_IFLA_BRPORT_GROUP_FWD_MASK,
-+    QEMU_IFLA_BRPORT_NEIGH_SUPPRESS,
-     QEMU___IFLA_BRPORT_MAX
- };
- 
-@@ -516,6 +530,15 @@ enum {
-     QEMU___IFLA_INET6_MAX
- };
- 
-+enum {
-+    QEMU_IFLA_XDP_UNSPEC,
-+    QEMU_IFLA_XDP_FD,
-+    QEMU_IFLA_XDP_ATTACHED,
-+    QEMU_IFLA_XDP_FLAGS,
-+    QEMU_IFLA_XDP_PROG_ID,
-+    QEMU___IFLA_XDP_MAX,
-+};
-+
- typedef abi_long (*TargetFdDataFunc)(void *, size_t);
- typedef abi_long (*TargetFdAddrFunc)(void *, abi_ulong, socklen_t);
- typedef struct TargetFdTrans {
-@@ -2182,6 +2205,10 @@ static abi_long host_to_target_data_bridge_nlattr(struct nlattr *nlattr,
-     case QEMU_IFLA_BR_NF_CALL_IPTABLES:
-     case QEMU_IFLA_BR_NF_CALL_IP6TABLES:
-     case QEMU_IFLA_BR_NF_CALL_ARPTABLES:
-+    case QEMU_IFLA_BR_VLAN_STATS_ENABLED:
-+    case QEMU_IFLA_BR_MCAST_STATS_ENABLED:
-+    case QEMU_IFLA_BR_MCAST_IGMP_VERSION:
-+    case QEMU_IFLA_BR_MCAST_MLD_VERSION:
-         break;
-     /* uint16_t */
-     case QEMU_IFLA_BR_PRIORITY:
-@@ -2253,6 +2280,11 @@ static abi_long host_to_target_slave_data_bridge_nlattr(struct nlattr *nlattr,
-     case QEMU_IFLA_BRPORT_TOPOLOGY_CHANGE_ACK:
-     case QEMU_IFLA_BRPORT_CONFIG_PENDING:
-     case QEMU_IFLA_BRPORT_MULTICAST_ROUTER:
-+    case QEMU_IFLA_BRPORT_MCAST_FLOOD:
-+    case QEMU_IFLA_BRPORT_MCAST_TO_UCAST:
-+    case QEMU_IFLA_BRPORT_VLAN_TUNNEL:
-+    case QEMU_IFLA_BRPORT_BCAST_FLOOD:
-+    case QEMU_IFLA_BRPORT_NEIGH_SUPPRESS:
-         break;
-     /* uint16_t */
-     case QEMU_IFLA_BRPORT_PRIORITY:
-@@ -2260,6 +2292,7 @@ static abi_long host_to_target_slave_data_bridge_nlattr(struct nlattr *nlattr,
-     case QEMU_IFLA_BRPORT_DESIGNATED_COST:
-     case QEMU_IFLA_BRPORT_ID:
-     case QEMU_IFLA_BRPORT_NO:
-+    case QEMU_IFLA_BRPORT_GROUP_FWD_MASK:
-         u16 = NLA_DATA(nlattr);
-         *u16 = tswap16(*u16);
-         break;
-@@ -2434,6 +2467,27 @@ static abi_long host_to_target_data_spec_nlattr(struct nlattr *nlattr,
-     return 0;
- }
- 
-+static abi_long host_to_target_data_xdp_nlattr(struct nlattr *nlattr,
-+                                               void *context)
-+{
-+    uint32_t *u32;
-+
-+    switch (nlattr->nla_type) {
-+    /* uint8_t */
-+    case QEMU_IFLA_XDP_ATTACHED:
-+        break;
-+    /* uint32_t */
-+    case QEMU_IFLA_XDP_PROG_ID:
-+        u32 = NLA_DATA(nlattr);
-+        *u32 = tswap32(*u32);
-+        break;
-+    default:
-+        gemu_log("Unknown host XDP type: %d\n", nlattr->nla_type);
-+        break;
-+    }
-+    return 0;
-+}
-+
- static abi_long host_to_target_data_link_rtattr(struct rtattr *rtattr)
- {
-     uint32_t *u32;
-@@ -2559,6 +2613,10 @@ static abi_long host_to_target_data_link_rtattr(struct rtattr *rtattr)
-         return host_to_target_for_each_nlattr(RTA_DATA(rtattr), rtattr->rta_len,
-                                               NULL,
-                                              host_to_target_data_spec_nlattr);
-+    case QEMU_IFLA_XDP:
-+        return host_to_target_for_each_nlattr(RTA_DATA(rtattr), rtattr->rta_len,
-+                                              NULL,
-+                                                host_to_target_data_xdp_nlattr);
-     default:
-         gemu_log("Unknown host QEMU_IFLA type: %d\n", rtattr->rta_type);
-         break;
+It would also be worth testing that a second exit-preconfig fails, now 
+that you are no longer in preconfig state.
+
 -- 
-2.14.3
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
