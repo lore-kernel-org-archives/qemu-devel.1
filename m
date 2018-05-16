@@ -1,22 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49186)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49765)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fIzd3-0004lH-2X
-	for qemu-devel@nongnu.org; Wed, 16 May 2018 12:50:17 -0400
+	(envelope-from <thuth@redhat.com>) id 1fIzeL-0005kj-My
+	for qemu-devel@nongnu.org; Wed, 16 May 2018 12:51:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fIzd2-0003Qz-80
-	for qemu-devel@nongnu.org; Wed, 16 May 2018 12:50:17 -0400
-Date: Wed, 16 May 2018 18:50:04 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20180516165004.GF4435@localhost.localdomain>
-References: <20180509162637.15575-1-kwolf@redhat.com>
-	<20180509162637.15575-19-kwolf@redhat.com>
-	<c063b982-58ac-e477-991f-07b847edc48a@redhat.com>
+	(envelope-from <thuth@redhat.com>) id 1fIzeK-0003xj-Qh
+	for qemu-devel@nongnu.org; Wed, 16 May 2018 12:51:37 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:56942 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1fIzeK-0003xB-Mo
+	for qemu-devel@nongnu.org; Wed, 16 May 2018 12:51:36 -0400
+References: <1525453270-23074-1-git-send-email-thuth@redhat.com>
+	<1525453270-23074-3-git-send-email-thuth@redhat.com>
+	<20180516164900.GA32582@perard.uk.xensource.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <b75b0a14-b118-6f29-9050-d291e18ac165@redhat.com>
+Date: Wed, 16 May 2018 18:51:32 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <c063b982-58ac-e477-991f-07b847edc48a@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 18/42] job: Move coroutine and related code
- to Job
+In-Reply-To: <20180516164900.GA32582@perard.uk.xensource.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 2/5] qemu-options: Bail out on
+ unsupported options instead of silently ignoring them
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,49 +30,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>
-Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, jcody@redhat.com, armbru@redhat.com, mreitz@redhat.com
+To: Anthony PERARD <anthony.perard@citrix.com>
+Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Markus Armbruster <armbru@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Michal Privoznik <mprivozn@redhat.com>
 
-Am 15.05.2018 um 01:02 hat John Snow geschrieben:
+On 16.05.2018 18:49, Anthony PERARD wrote:
+> On Fri, May 04, 2018 at 07:01:07PM +0200, Thomas Huth wrote:
+>> diff --git a/vl.c b/vl.c
+>> index 806eec2..457e93b 100644
+>> --- a/vl.c
+>> +++ b/vl.c
+>> @@ -4042,7 +4042,10 @@ int main(int argc, char **argv, char **envp)
+>>                  }
+>>                  break;
+>>              default:
+>> -                os_parse_cmd_args(popt->index, optarg);
+>> +                if (os_parse_cmd_args(popt->index, optarg)) {
+>> +                    error_report("Option not supported in this build");
+>> +                    exit(1);
+>> +                }
 > 
-> 
-> On 05/09/2018 12:26 PM, Kevin Wolf wrote:
-> > This commit moves some core functions for dealing with the job coroutine
-> > from BlockJob to Job. This includes primarily entering the coroutine
-> > (both for the first and reentering) and yielding explicitly and at pause
-> > points.
-> > 
-> > Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-> > ---
-> >  include/block/blockjob.h     |  40 ---------
-> >  include/block/blockjob_int.h |  26 ------
-> >  include/qemu/job.h           |  76 ++++++++++++++++
-> >  block/backup.c               |   2 +-
-> >  block/commit.c               |   4 +-
-> >  block/mirror.c               |  22 ++---
-> >  block/replication.c          |   2 +-
-> >  block/stream.c               |   4 +-
-> >  blockdev.c                   |   8 +-
-> >  blockjob.c                   | 201 +++++++------------------------------------
-> >  job.c                        | 137 +++++++++++++++++++++++++++++
-> >  tests/test-bdrv-drain.c      |  38 ++++----
-> >  tests/test-blockjob-txn.c    |  12 +--
-> >  tests/test-blockjob.c        |  14 +--
-> >  14 files changed, 296 insertions(+), 290 deletions(-)
-> > 
-> 
-> [...]
-> 
-> >  
-> >  /* Assumes the block_job_mutex is held */
-> > -static bool block_job_timer_pending(BlockJob *job)
-> > +static bool job_timer_pending(Job *job)
-> 
-> Is this intentionally left behind in blockjob.c, even once you've
-> changed the name (and moved the state to job.c?)
+> I think that report false errors, I've got:
+> qemu-system-i386: -no-user-config: Option not supported in this build
 
-Yes, it's just a small callback that is structually part of
-block_job_set_speed(). Maybe I shouldn't rename it, but it does get a
-Job rather than a BlockJob now, so I'm not sure.
+Yes, sorry for that. Patch is already on the way:
 
-Kevin
+https://lists.gnu.org/archive/html/qemu-devel/2018-05/msg02972.html
+
+ Thomas
