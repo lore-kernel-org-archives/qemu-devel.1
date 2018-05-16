@@ -1,24 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52649)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52656)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1fJ3TT-0000E7-PE
-	for qemu-devel@nongnu.org; Wed, 16 May 2018 16:56:41 -0400
+	(envelope-from <laurent@vivier.eu>) id 1fJ3TU-0000FF-Py
+	for qemu-devel@nongnu.org; Wed, 16 May 2018 16:56:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1fJ3TQ-00044k-NW
-	for qemu-devel@nongnu.org; Wed, 16 May 2018 16:56:39 -0400
-Received: from mout.kundenserver.de ([217.72.192.75]:54593)
+	(envelope-from <laurent@vivier.eu>) id 1fJ3TR-00045n-Mt
+	for qemu-devel@nongnu.org; Wed, 16 May 2018 16:56:40 -0400
+Received: from mout.kundenserver.de ([217.72.192.73]:57635)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1fJ3TQ-00042r-D6
-	for qemu-devel@nongnu.org; Wed, 16 May 2018 16:56:36 -0400
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1fJ3TR-00044a-DC
+	for qemu-devel@nongnu.org; Wed, 16 May 2018 16:56:37 -0400
 From: Laurent Vivier <laurent@vivier.eu>
-Date: Wed, 16 May 2018 22:55:38 +0200
-Message-Id: <20180516205543.29305-4-laurent@vivier.eu>
+Date: Wed, 16 May 2018 22:55:39 +0200
+Message-Id: <20180516205543.29305-5-laurent@vivier.eu>
 In-Reply-To: <20180516205543.29305-1-laurent@vivier.eu>
 References: <20180516205543.29305-1-laurent@vivier.eu>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v2 3/8] linux-user: move sparc/sparc64 socket.h
- definitions to sparc/sockbits.h
+Subject: [Qemu-devel] [PATCH v2 4/8] linux-user: move socket.h generic
+ definitions to generic/sockbits.h
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,81 +27,72 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Peter Maydell <peter.maydell@linaro.org>, Riku Voipio <riku.voipio@iki.fi>, Laurent Vivier <laurent@vivier.eu>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Richard Henderson <rth@twiddle.net>, Yongbok Kim <yongbok.kim@mips.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 
-No code change.
+and include the file from architectures without specific definitions
 
 Signed-off-by: Laurent Vivier <laurent@vivier.eu>
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- linux-user/socket.h           | 44 +-------------------
- linux-user/sparc/sockbits.h   | 94 +++++++++++++++++++++++++++++++++++++++++++
- linux-user/sparc64/sockbits.h |  1 +
- 3 files changed, 97 insertions(+), 42 deletions(-)
- create mode 100644 linux-user/sparc/sockbits.h
- create mode 100644 linux-user/sparc64/sockbits.h
+ linux-user/aarch64/sockbits.h    |  1 +
+ linux-user/arm/sockbits.h        |  1 +
+ linux-user/cris/sockbits.h       |  1 +
+ linux-user/generic/sockbits.h    | 67 ++++++++++++++++++++++++++++++++++++++++
+ linux-user/i386/sockbits.h       |  1 +
+ linux-user/m68k/sockbits.h       |  1 +
+ linux-user/microblaze/sockbits.h |  1 +
+ linux-user/nios2/sockbits.h      |  1 +
+ linux-user/openrisc/sockbits.h   |  1 +
+ linux-user/ppc/sockbits.h        |  1 +
+ linux-user/riscv/sockbits.h      |  1 +
+ linux-user/s390x/sockbits.h      |  1 +
+ linux-user/sh4/sockbits.h        |  1 +
+ linux-user/socket.h              | 61 ------------------------------------
+ linux-user/tilegx/sockbits.h     |  1 +
+ linux-user/x86_64/sockbits.h     |  1 +
+ linux-user/xtensa/sockbits.h     |  1 +
+ 17 files changed, 82 insertions(+), 61 deletions(-)
+ create mode 100644 linux-user/aarch64/sockbits.h
+ create mode 100644 linux-user/arm/sockbits.h
+ create mode 100644 linux-user/cris/sockbits.h
+ create mode 100644 linux-user/generic/sockbits.h
+ create mode 100644 linux-user/i386/sockbits.h
+ create mode 100644 linux-user/m68k/sockbits.h
+ create mode 100644 linux-user/microblaze/sockbits.h
+ create mode 100644 linux-user/nios2/sockbits.h
+ create mode 100644 linux-user/openrisc/sockbits.h
+ create mode 100644 linux-user/ppc/sockbits.h
+ create mode 100644 linux-user/riscv/sockbits.h
+ create mode 100644 linux-user/s390x/sockbits.h
+ create mode 100644 linux-user/sh4/sockbits.h
+ create mode 100644 linux-user/tilegx/sockbits.h
+ create mode 100644 linux-user/x86_64/sockbits.h
+ create mode 100644 linux-user/xtensa/sockbits.h
 
-diff --git a/linux-user/socket.h b/linux-user/socket.h
-index 1328906205..8eb62ea3f2 100644
---- a/linux-user/socket.h
-+++ b/linux-user/socket.h
-@@ -1,49 +1,9 @@
- 
--#if defined(TARGET_MIPS) || defined(TARGET_HPPA) || defined(TARGET_ALPHA)
-+#if defined(TARGET_MIPS) || defined(TARGET_HPPA) || defined(TARGET_ALPHA) || \
-+    defined(TARGET_SPARC)
- #include "sockbits.h"
--#else
--
--#if defined(TARGET_SPARC)
--    /** sock_type - Socket types
--     *
--     * Please notice that for binary compat reasons SPARC has to
--     * override the enum sock_type in include/linux/net.h, so
--     * we define ARCH_HAS_SOCKET_TYPES here.
--     *
--     * @SOCK_DGRAM - datagram (conn.less) socket
--     * @SOCK_STREAM - stream (connection) socket
--     * @SOCK_RAW - raw socket
--     * @SOCK_RDM - reliably-delivered message
--     * @SOCK_SEQPACKET - sequential packet socket
--     * @SOCK_DCCP - Datagram Congestion Control Protocol socket
--     * @SOCK_PACKET - linux specific way of getting packets at the dev level.
--     *                For writing rarp and other similar things on the user
--     *                level.
--     * @SOCK_CLOEXEC - sets the close-on-exec (FD_CLOEXEC) flag.
--     * @SOCK_NONBLOCK - sets the O_NONBLOCK file status flag.
--     */
--
--    #define ARCH_HAS_SOCKET_TYPES          1
--
--    enum sock_type {
--           TARGET_SOCK_STREAM      = 1,
--           TARGET_SOCK_DGRAM       = 2,
--           TARGET_SOCK_RAW         = 3,
--           TARGET_SOCK_RDM         = 4,
--           TARGET_SOCK_SEQPACKET   = 5,
--           TARGET_SOCK_DCCP        = 6,
--           TARGET_SOCK_PACKET      = 10,
--           TARGET_SOCK_CLOEXEC     = 020000000,
--           TARGET_SOCK_NONBLOCK    = 040000,
--    };
--
--    #define TARGET_SOCK_MAX (TARGET_SOCK_PACKET + 1)
--    #define TARGET_SOCK_TYPE_MASK    0xf  /* Covers up to TARGET_SOCK_MAX-1. */
--
--    #define TARGET_SO_PASSSEC        31
- #else
-     #define TARGET_SO_PASSSEC        34
--#endif
- 
-     /* For setsockopt(2) */
-     #define TARGET_SOL_SOCKET      1
-diff --git a/linux-user/sparc/sockbits.h b/linux-user/sparc/sockbits.h
+diff --git a/linux-user/aarch64/sockbits.h b/linux-user/aarch64/sockbits.h
 new file mode 100644
-index 0000000000..385061c8b0
+index 0000000000..0e4c8f012d
 --- /dev/null
-+++ b/linux-user/sparc/sockbits.h
-@@ -0,0 +1,94 @@
++++ b/linux-user/aarch64/sockbits.h
+@@ -0,0 +1 @@
++#include "../generic/sockbits.h"
+diff --git a/linux-user/arm/sockbits.h b/linux-user/arm/sockbits.h
+new file mode 100644
+index 0000000000..0e4c8f012d
+--- /dev/null
++++ b/linux-user/arm/sockbits.h
+@@ -0,0 +1 @@
++#include "../generic/sockbits.h"
+diff --git a/linux-user/cris/sockbits.h b/linux-user/cris/sockbits.h
+new file mode 100644
+index 0000000000..0e4c8f012d
+--- /dev/null
++++ b/linux-user/cris/sockbits.h
+@@ -0,0 +1 @@
++#include "../generic/sockbits.h"
+diff --git a/linux-user/generic/sockbits.h b/linux-user/generic/sockbits.h
+new file mode 100644
+index 0000000000..093faf0a48
+--- /dev/null
++++ b/linux-user/generic/sockbits.h
+@@ -0,0 +1,67 @@
 +/*
 + * This program is free software; you can redistribute it and/or modify
 + * it under the terms of the GNU General Public License version 2 as
@@ -112,46 +100,10 @@ index 0000000000..385061c8b0
 + * later version. See the COPYING file in the top-level directory.
 + */
 +
-+#ifndef SPARC_SOCKBITS_H
-+#define SPARC_SOCKBITS_H
++#ifndef GENERIC_SOCKBITS_H
++#define GENERIC_SOCKBITS_H
 +
-+/** sock_type - Socket types
-+ *
-+ * Please notice that for binary compat reasons SPARC has to
-+ * override the enum sock_type in include/linux/net.h, so
-+ * we define ARCH_HAS_SOCKET_TYPES here.
-+ *
-+ * @SOCK_DGRAM - datagram (conn.less) socket
-+ * @SOCK_STREAM - stream (connection) socket
-+ * @SOCK_RAW - raw socket
-+ * @SOCK_RDM - reliably-delivered message
-+ * @SOCK_SEQPACKET - sequential packet socket
-+ * @SOCK_DCCP - Datagram Congestion Control Protocol socket
-+ * @SOCK_PACKET - linux specific way of getting packets at the dev level.
-+ *                For writing rarp and other similar things on the user
-+ *                level.
-+ * @SOCK_CLOEXEC - sets the close-on-exec (FD_CLOEXEC) flag.
-+ * @SOCK_NONBLOCK - sets the O_NONBLOCK file status flag.
-+ */
-+
-+#define ARCH_HAS_SOCKET_TYPES          1
-+
-+enum sock_type {
-+       TARGET_SOCK_STREAM      = 1,
-+       TARGET_SOCK_DGRAM       = 2,
-+       TARGET_SOCK_RAW         = 3,
-+       TARGET_SOCK_RDM         = 4,
-+       TARGET_SOCK_SEQPACKET   = 5,
-+       TARGET_SOCK_DCCP        = 6,
-+       TARGET_SOCK_PACKET      = 10,
-+       TARGET_SOCK_CLOEXEC     = 020000000,
-+       TARGET_SOCK_NONBLOCK    = 040000,
-+};
-+
-+#define TARGET_SOCK_MAX (TARGET_SOCK_PACKET + 1)
-+#define TARGET_SOCK_TYPE_MASK    0xf  /* Covers up to TARGET_SOCK_MAX-1. */
-+
-+#define TARGET_SO_PASSSEC        31
++#define TARGET_SO_PASSSEC        34
 +
 +/* For setsockopt(2) */
 +#define TARGET_SOL_SOCKET      1
@@ -173,12 +125,21 @@ index 0000000000..385061c8b0
 +#define TARGET_SO_LINGER       13
 +#define TARGET_SO_BSDCOMPAT    14
 +/* To add :#define TARGET_SO_REUSEPORT 15 */
++#if defined(TARGET_PPC)
++#define TARGET_SO_RCVLOWAT     16
++#define TARGET_SO_SNDLOWAT     17
++#define TARGET_SO_RCVTIMEO     18
++#define TARGET_SO_SNDTIMEO     19
++#define TARGET_SO_PASSCRED     20
++#define TARGET_SO_PEERCRED     21
++#else
 +#define TARGET_SO_PASSCRED     16
 +#define TARGET_SO_PEERCRED     17
 +#define TARGET_SO_RCVLOWAT     18
 +#define TARGET_SO_SNDLOWAT     19
 +#define TARGET_SO_RCVTIMEO     20
 +#define TARGET_SO_SNDTIMEO     21
++#endif
 +
 +/* Security levels - as per NRL IPv6 - don't actually do anything */
 +#define TARGET_SO_SECURITY_AUTHENTICATION              22
@@ -199,12 +160,160 @@ index 0000000000..385061c8b0
 +
 +#define TARGET_SO_PEERSEC              31
 +#endif
-diff --git a/linux-user/sparc64/sockbits.h b/linux-user/sparc64/sockbits.h
+diff --git a/linux-user/i386/sockbits.h b/linux-user/i386/sockbits.h
 new file mode 100644
-index 0000000000..658899e4d3
+index 0000000000..0e4c8f012d
 --- /dev/null
-+++ b/linux-user/sparc64/sockbits.h
++++ b/linux-user/i386/sockbits.h
 @@ -0,0 +1 @@
-+#include "../sparc/sockbits.h"
++#include "../generic/sockbits.h"
+diff --git a/linux-user/m68k/sockbits.h b/linux-user/m68k/sockbits.h
+new file mode 100644
+index 0000000000..0e4c8f012d
+--- /dev/null
++++ b/linux-user/m68k/sockbits.h
+@@ -0,0 +1 @@
++#include "../generic/sockbits.h"
+diff --git a/linux-user/microblaze/sockbits.h b/linux-user/microblaze/sockbits.h
+new file mode 100644
+index 0000000000..0e4c8f012d
+--- /dev/null
++++ b/linux-user/microblaze/sockbits.h
+@@ -0,0 +1 @@
++#include "../generic/sockbits.h"
+diff --git a/linux-user/nios2/sockbits.h b/linux-user/nios2/sockbits.h
+new file mode 100644
+index 0000000000..0e4c8f012d
+--- /dev/null
++++ b/linux-user/nios2/sockbits.h
+@@ -0,0 +1 @@
++#include "../generic/sockbits.h"
+diff --git a/linux-user/openrisc/sockbits.h b/linux-user/openrisc/sockbits.h
+new file mode 100644
+index 0000000000..0e4c8f012d
+--- /dev/null
++++ b/linux-user/openrisc/sockbits.h
+@@ -0,0 +1 @@
++#include "../generic/sockbits.h"
+diff --git a/linux-user/ppc/sockbits.h b/linux-user/ppc/sockbits.h
+new file mode 100644
+index 0000000000..0e4c8f012d
+--- /dev/null
++++ b/linux-user/ppc/sockbits.h
+@@ -0,0 +1 @@
++#include "../generic/sockbits.h"
+diff --git a/linux-user/riscv/sockbits.h b/linux-user/riscv/sockbits.h
+new file mode 100644
+index 0000000000..0e4c8f012d
+--- /dev/null
++++ b/linux-user/riscv/sockbits.h
+@@ -0,0 +1 @@
++#include "../generic/sockbits.h"
+diff --git a/linux-user/s390x/sockbits.h b/linux-user/s390x/sockbits.h
+new file mode 100644
+index 0000000000..0e4c8f012d
+--- /dev/null
++++ b/linux-user/s390x/sockbits.h
+@@ -0,0 +1 @@
++#include "../generic/sockbits.h"
+diff --git a/linux-user/sh4/sockbits.h b/linux-user/sh4/sockbits.h
+new file mode 100644
+index 0000000000..0e4c8f012d
+--- /dev/null
++++ b/linux-user/sh4/sockbits.h
+@@ -0,0 +1 @@
++#include "../generic/sockbits.h"
+diff --git a/linux-user/socket.h b/linux-user/socket.h
+index 8eb62ea3f2..135f438bdf 100644
+--- a/linux-user/socket.h
++++ b/linux-user/socket.h
+@@ -1,66 +1,5 @@
+ 
+-#if defined(TARGET_MIPS) || defined(TARGET_HPPA) || defined(TARGET_ALPHA) || \
+-    defined(TARGET_SPARC)
+ #include "sockbits.h"
+-#else
+-    #define TARGET_SO_PASSSEC        34
+-
+-    /* For setsockopt(2) */
+-    #define TARGET_SOL_SOCKET      1
+-
+-    #define TARGET_SO_DEBUG        1
+-    #define TARGET_SO_REUSEADDR    2
+-    #define TARGET_SO_TYPE         3
+-    #define TARGET_SO_ERROR        4
+-    #define TARGET_SO_DONTROUTE    5
+-    #define TARGET_SO_BROADCAST    6
+-    #define TARGET_SO_SNDBUF       7
+-    #define TARGET_SO_RCVBUF       8
+-    #define TARGET_SO_SNDBUFFORCE  32
+-    #define TARGET_SO_RCVBUFFORCE  33
+-    #define TARGET_SO_KEEPALIVE    9
+-    #define TARGET_SO_OOBINLINE    10
+-    #define TARGET_SO_NO_CHECK     11
+-    #define TARGET_SO_PRIORITY     12
+-    #define TARGET_SO_LINGER       13
+-    #define TARGET_SO_BSDCOMPAT    14
+-    /* To add :#define TARGET_SO_REUSEPORT 15 */
+-#if defined(TARGET_PPC)
+-    #define TARGET_SO_RCVLOWAT     16
+-    #define TARGET_SO_SNDLOWAT     17
+-    #define TARGET_SO_RCVTIMEO     18
+-    #define TARGET_SO_SNDTIMEO     19
+-    #define TARGET_SO_PASSCRED     20
+-    #define TARGET_SO_PEERCRED     21
+-#else
+-    #define TARGET_SO_PASSCRED     16
+-    #define TARGET_SO_PEERCRED     17
+-    #define TARGET_SO_RCVLOWAT     18
+-    #define TARGET_SO_SNDLOWAT     19
+-    #define TARGET_SO_RCVTIMEO     20
+-    #define TARGET_SO_SNDTIMEO     21
+-#endif
+-
+-    /* Security levels - as per NRL IPv6 - don't actually do anything */
+-    #define TARGET_SO_SECURITY_AUTHENTICATION              22
+-    #define TARGET_SO_SECURITY_ENCRYPTION_TRANSPORT        23
+-    #define TARGET_SO_SECURITY_ENCRYPTION_NETWORK          24
+-
+-    #define TARGET_SO_BINDTODEVICE 25
+-
+-    /* Socket filtering */
+-    #define TARGET_SO_ATTACH_FILTER        26
+-    #define TARGET_SO_DETACH_FILTER        27
+-
+-    #define TARGET_SO_PEERNAME             28
+-    #define TARGET_SO_TIMESTAMP            29
+-    #define TARGET_SCM_TIMESTAMP           TARGET_SO_TIMESTAMP
+-
+-    #define TARGET_SO_ACCEPTCONN           30
+-
+-    #define TARGET_SO_PEERSEC              31
+-
+-#endif
+ 
+ #ifndef ARCH_HAS_SOCKET_TYPES
+     /** sock_type - Socket types - default values
+diff --git a/linux-user/tilegx/sockbits.h b/linux-user/tilegx/sockbits.h
+new file mode 100644
+index 0000000000..0e4c8f012d
+--- /dev/null
++++ b/linux-user/tilegx/sockbits.h
+@@ -0,0 +1 @@
++#include "../generic/sockbits.h"
+diff --git a/linux-user/x86_64/sockbits.h b/linux-user/x86_64/sockbits.h
+new file mode 100644
+index 0000000000..0e4c8f012d
+--- /dev/null
++++ b/linux-user/x86_64/sockbits.h
+@@ -0,0 +1 @@
++#include "../generic/sockbits.h"
+diff --git a/linux-user/xtensa/sockbits.h b/linux-user/xtensa/sockbits.h
+new file mode 100644
+index 0000000000..0e4c8f012d
+--- /dev/null
++++ b/linux-user/xtensa/sockbits.h
+@@ -0,0 +1 @@
++#include "../generic/sockbits.h"
 -- 
 2.14.3
