@@ -1,23 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41060)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45433)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lpetrut@cloudbasesolutions.com>) id 1fItYu-00009U-6V
-	for qemu-devel@nongnu.org; Wed, 16 May 2018 06:21:37 -0400
+	(envelope-from <eric.auger@redhat.com>) id 1fItsR-0005Ua-9s
+	for qemu-devel@nongnu.org; Wed, 16 May 2018 06:41:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lpetrut@cloudbasesolutions.com>) id 1fItYq-0000eH-QU
-	for qemu-devel@nongnu.org; Wed, 16 May 2018 06:21:36 -0400
-Received: from mail.cloudbasesolutions.com ([91.232.152.5]:33608)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lpetrut@cloudbasesolutions.com>) id 1fItYq-0000dk-Cy
-	for qemu-devel@nongnu.org; Wed, 16 May 2018 06:21:32 -0400
-From: Lucian Petrut <lpetrut@cloudbasesolutions.com>
-Content-Class: urn:content-classes:message
-Date: Wed, 16 May 2018 10:21:09 +0000
-Message-ID: <64050966FCE0B948BCE2B28DB6E0B7D541340A17@CBSEX1.cloudbase.local>
-Content-Language: en-US
+	(envelope-from <eric.auger@redhat.com>) id 1fItsO-00039v-5H
+	for qemu-devel@nongnu.org; Wed, 16 May 2018 06:41:47 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:44888 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eric.auger@redhat.com>)
+	id 1fItsN-00036c-Vv
+	for qemu-devel@nongnu.org; Wed, 16 May 2018 06:41:44 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.4])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 6381040214E2
+	for <qemu-devel@nongnu.org>; Wed, 16 May 2018 10:41:42 +0000 (UTC)
+References: <20180417140802.16711-1-pbonzini@redhat.com>
+From: Auger Eric <eric.auger@redhat.com>
+Message-ID: <0a51d026-8b9f-9925-1229-10e3766907bb@redhat.com>
+Date: Wed, 16 May 2018 12:41:35 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Subject: Re: [Qemu-devel] [PATCH v2 3/3] WHPX: fix some compiler warnings
+In-Reply-To: <20180417140802.16711-1-pbonzini@redhat.com>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 0/4] exec: reintroduce MemoryRegion caching
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,48 +33,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, "petrutlucian94@gmail.com" <petrutlucian94@gmail.com>
-Cc: Alessandro Pilotti <apilotti@cloudbasesolutions.com>, Justin Terry <juterry@microsoft.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, "open list:All patches CC here" <qemu-devel@nongnu.org>
+To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
 
-SGksDQoNClRoYW5rcyBmb3IgcmV2aWV3aW5nIHRob3NlIGNoYW5nZXMuDQoNCuKAnGNhbiB5b3Ug
-c2VuZCBhIHBhdGNoIHdpdGggdGhlIGJ1Z2ZpeCBvbmx54oCdDQoNCkJ5IOKAnHRoZSBidWdmaXgg
-b25seeKAnSB5b3UgbWVhbiB0aGUgcHJldmlvdXMgY29tbWl0LCB0aGUgb25lIHRoYXQgZHluYW1p
-Y2FsbHkgbG9hZHMgdGhlIERMTHM/DQpGV0lXLCB3aXRob3V0IHRoaXMgcGF0Y2gsIGkzODYgdGFy
-Z2V0cyB3b27igJl0IGNvbXBpbGUsIHNvIEnigJlkIGNvbnNpZGVyIHRoYXQgYW4gaW1wcm92ZW1l
-bnQuIFByb2JhYmx5IEkgc2hvdWxk4oCZdmUgZXhwbGljaXRseSBtZW50aW9uZWQgdGhpcyBpbiB0
-aGUgY29tbWl0IG1lc3NhZ2UuDQoNClJlZ2FyZHMsDQpMdWNpYW4gUGV0cnV0DQoNCkZyb206IFBh
-b2xvIEJvbnppbmk8bWFpbHRvOnBib256aW5pQHJlZGhhdC5jb20+DQpTZW50OiBXZWRuZXNkYXks
-IE1heSAxNiwgMjAxOCAxOjEzIFBNDQpUbzogcGV0cnV0bHVjaWFuOTRAZ21haWwuY29tPG1haWx0
-bzpwZXRydXRsdWNpYW45NEBnbWFpbC5jb20+DQpDYzogTHVjaWFuIFBldHJ1dDxtYWlsdG86bHBl
-dHJ1dEBjbG91ZGJhc2Vzb2x1dGlvbnMuY29tPjsgQWxlc3NhbmRybyBQaWxvdHRpPG1haWx0bzph
-cGlsb3R0aUBjbG91ZGJhc2Vzb2x1dGlvbnMuY29tPjsgSnVzdGluIFRlcnJ5PG1haWx0bzpqdXRl
-cnJ5QG1pY3Jvc29mdC5jb20+OyBSaWNoYXJkIEhlbmRlcnNvbjxtYWlsdG86cnRoQHR3aWRkbGUu
-bmV0PjsgRWR1YXJkbyBIYWJrb3N0PG1haWx0bzplaGFia29zdEByZWRoYXQuY29tPjsgb3BlbiBs
-aXN0OkFsbCBwYXRjaGVzIENDIGhlcmU8bWFpbHRvOnFlbXUtZGV2ZWxAbm9uZ251Lm9yZz4NClN1
-YmplY3Q6IFJlOiBbUEFUQ0ggdjIgMy8zXSBXSFBYOiBmaXggc29tZSBjb21waWxlciB3YXJuaW5n
-cw0KDQpPbiAxNS8wNS8yMDE4IDE5OjM1LCBwZXRydXRsdWNpYW45NEBnbWFpbC5jb20gd3JvdGU6
-DQo+IEZyb206IEx1Y2lhbiBQZXRydXQgPGxwZXRydXRAY2xvdWRiYXNlc29sdXRpb25zLmNvbT4N
-Cj4NCj4gVGhpcyBwYXRjaCBmaXhlcyBhIGZldyBjb21waWxlciB3YXJuaW5ncywgZXNwZWNpYWxs
-eSBpbiBjYXNlIG9mDQo+IHg4NiB0YXJnZXRzLCB3aGVyZSB0aGUgbnVtYmVyIG9mIHJlZ2lzdGVy
-cyB3YXMgbm90IHByb3Blcmx5IGhhbmRsZWQNCj4gYW5kIGNvdWxkIGNhdXNlIGFuIG92ZXJmbG93
-Lg0KPg0KPiBTaWduZWQtb2ZmLWJ5OiBBbGVzc2FuZHJvIFBpbG90dGkgPGFwaWxvdHRpQGNsb3Vk
-YmFzZXNvbHV0aW9ucy5jb20+DQo+IFNpZ25lZC1vZmYtYnk6IEp1c3RpbiBUZXJyeSAoVk0pIDxq
-dXRlcnJ5QG1pY3Jvc29mdC5jb20+DQo+IFNpZ25lZC1vZmYtYnk6IEx1Y2lhbiBQZXRydXQgPGxw
-ZXRydXRAY2xvdWRiYXNlc29sdXRpb25zLmNvbT4NCj4gLS0tDQo+ICB0YXJnZXQvaTM4Ni93aHB4
-LWFsbC5jIHwgNDkgKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKystLS0tLS0tLS0t
-LS0tLQ0KPiAgMSBmaWxlIGNoYW5nZWQsIDM1IGluc2VydGlvbnMoKyksIDE0IGRlbGV0aW9ucygt
-KQ0KPg0KPiBkaWZmIC0tZ2l0IGEvdGFyZ2V0L2kzODYvd2hweC1hbGwuYyBiL3RhcmdldC9pMzg2
-L3docHgtYWxsLmMNCj4gaW5kZXggMGEyOWQ1Ni4uMmZkMzM5NyAxMDA2NDQNCj4gLS0tIGEvdGFy
-Z2V0L2kzODYvd2hweC1hbGwuYw0KPiArKysgYi90YXJnZXQvaTM4Ni93aHB4LWFsbC5jDQo+IEBA
-IC0yMjYsMjQgKzIyNiwzMSBAQCBzdGF0aWMgdm9pZCB3aHB4X3NldF9yZWdpc3RlcnMoQ1BVU3Rh
-dGUgKmNwdSkNCj4gICAgICBzdHJ1Y3Qgd2hweF92Y3B1ICp2Y3B1ID0gZ2V0X3docHhfdmNwdShj
-cHUpOw0KPiAgICAgIHN0cnVjdCBDUFVYODZTdGF0ZSAqZW52ID0gKENQVUFyY2hTdGF0ZSAqKShj
-cHUtPmVudl9wdHIpOw0KPiAgICAgIFg4NkNQVSAqeDg2X2NwdSA9IFg4Nl9DUFUoY3B1KTsNCj4g
-LSAgICBzdHJ1Y3Qgd2hweF9yZWdpc3Rlcl9zZXQgdmN4dCA9IHswfTsNCj4gKyAgICBzdHJ1Y3Qg
-d2hweF9yZWdpc3Rlcl9zZXQgdmN4dDsNCj4gICAgICBIUkVTVUxUIGhyOw0KPiAtICAgIGludCBp
-ZHggPSAwOw0KPiArICAgIGludCBpZHg7DQo+ICsgICAgaW50IGlkeF9uZXh0Ow0KPiAgICAgIGlu
-dCBpOw0KPiAgICAgIGludCB2ODYsIHI4NjsNCj4NCj4gICAgICBhc3NlcnQoY3B1X2lzX3N0b3Bw
-ZWQoY3B1KSB8fCBxZW11X2NwdV9pc19zZWxmKGNwdSkpOw0KPg0KPiArICAgIG1lbXNldCgmdmN4
-dCwgMCwgc2l6ZW9mKHN0cnVjdCB3aHB4X3JlZ2lzdGVyX3NldCkpOw0KDQpUaGlzIGNoYW5nZSBk
-b2VzIG5vdCBzZWVtIGxpa2UgYW4gaW1wcm92ZW1lbnQsIGNhbiB5b3Ugc2VuZCBhIHBhdGNoIHdp
-dGgNCnRoZSBidWdmaXggb25seT8NCg0KVGhhbmtzLA0KDQpQYW9sbw0KDQo=
+Hi Paolo,
+
+On 04/17/2018 04:07 PM, Paolo Bonzini wrote:
+> MemoryRegionCache was reverted to "normal" address_space_* operations
+> for 2.9, due to lack of support for IOMMUs.  This series reinstates
+> optimizations, caching only the IOMMU translation but not the IOMMU
+> lookup and target AddressSpace translation.
+> 
+> Patches 1 to 3 prepare by introducing a new function
+> address_space_translate_iommu (split out of address_space_translate)
+> and new header files for declarations shared by regular and "cached"
+> address_space_* functions.  Patch 4 uses them to introduce both
+> the slow path for IOMMU and MMIO cached regions, and the fast path
+> for RAM cached regions.
+
+This patch seems to cause a regression with ARM vsmmu + virtio-blk-pci. Reverting it looks to fix the issue. Otherwise I get:
+
+Program received signal SIGSEGV, Segmentation fault.
+address_space_lduw_internal_cached_slow (endian=DEVICE_LITTLE_ENDIAN, result=0x0, attrs=..., addr=2, cache=0xffffa81110a0) at /home/augere/UPSTREAM/qemu/memory_ldst.inc.c:242
+242	            val = lduw_le_p(ptr);
+(gdb) where
+#0  address_space_lduw_internal_cached_slow (endian=DEVICE_LITTLE_ENDIAN, result=0x0, attrs=..., addr=2, cache=0xffffa81110a0) at /home/augere/UPSTREAM/qemu/memory_ldst.inc.c:242
+#1  address_space_lduw_le_cached_slow (cache=0xffffa81110a0, addr=addr@entry=2, attrs=..., attrs@entry=..., result=0x0) at /home/augere/UPSTREAM/qemu/memory_ldst.inc.c:273
+#2  0x0000000000511c74 in address_space_lduw_le_cached (result=0x0, attrs=..., addr=2, cache=<optimized out>) at /home/augere/UPSTREAM/qemu/include/exec/memory_ldst_cached.inc.h:56
+#3  lduw_le_phys_cached (addr=2, cache=<optimized out>) at /home/augere/UPSTREAM/qemu/include/exec/memory_ldst_phys.inc.h:91
+#4  virtio_lduw_phys_cached (pa=2, cache=<optimized out>, vdev=<optimized out>) at /home/augere/UPSTREAM/qemu/include/hw/virtio/virtio-access.h:166
+#5  vring_avail_idx (vq=0x1cfe2d0) at /home/augere/UPSTREAM/qemu/hw/virtio/virtio.c:227
+#6  virtio_queue_set_notification (vq=0x1cfe2d0, enable=0) at /home/augere/UPSTREAM/qemu/hw/virtio/virtio.c:324
+#7  0x0000000000511d2c in virtio_queue_set_notification (vq=<optimized out>, enable=<optimized out>) at /home/augere/UPSTREAM/qemu/hw/virtio/virtio.c:318
+#8  0x00000000004aa158 in virtio_blk_handle_vq (s=0x1cf32b0, vq=0x1cfe2d0) at /home/augere/UPSTREAM/qemu/hw/block/virtio-blk.c:605
+#9  0x00000000005113f0 in virtio_queue_notify_aio_vq (vq=0x1cfe2d0) at /home/augere/UPSTREAM/qemu/hw/virtio/virtio.c:1515
+#10 0x000000000087cbf0 in aio_dispatch_handlers (ctx=ctx@entry=0x15300e0) at util/aio-posix.c:406
+#11 0x000000000087d3f8 in aio_dispatch (ctx=0x15300e0) at util/aio-posix.c:437
+#12 0x0000000000879f30 in aio_ctx_dispatch (source=<optimized out>, callback=<optimized out>, user_data=<optimized out>) at util/async.c:261
+#13 0x0000ffffbeee97a0 in g_main_context_dispatch () from /lib64/libglib-2.0.so.0
+#14 0x000000000087c678 in glib_pollfds_poll () at util/main-loop.c:215
+#15 os_host_main_loop_wait (timeout=<optimized out>) at util/main-loop.c:263
+#16 main_loop_wait (nonblocking=nonblocking@entry=0) at util/main-loop.c:522
+#17 0x0000000000423dd8 in main_loop () at vl.c:1943
+#18 main (argc=<optimized out>, argv=<optimized out>, envp=<optimized out>) at vl.c:4675
+
+Investigating further ...
+
+Thanks
+
+Eric
+> 
+> Paolo
+> 
+> Paolo Bonzini (4):
+>   exec: move memory access declarations to a common header, inline
+>     *_phys functions
+>   exec: small changes to flatview_do_translate
+>   exec: extract address_space_translate_iommu, fix page_mask corner case
+>   exec: reintroduce MemoryRegion caching
+> 
+>  exec.c                                | 245 ++++++++++++++++++++------
+>  include/exec/cpu-all.h                |  79 ++++-----
+>  include/exec/memory-internal.h        |   3 +
+>  include/exec/memory.h                 | 209 ++++++++++------------
+>  include/exec/memory_ldst.inc.h        |  71 ++++++++
+>  include/exec/memory_ldst_cached.inc.h | 108 ++++++++++++
+>  include/exec/memory_ldst_phys.inc.h   | 147 ++++++++++++++++
+>  memory.c                              |   4 +-
+>  memory_ldst.inc.c                     | 126 -------------
+>  9 files changed, 651 insertions(+), 341 deletions(-)
+>  create mode 100644 include/exec/memory_ldst.inc.h
+>  create mode 100644 include/exec/memory_ldst_cached.inc.h
+>  create mode 100644 include/exec/memory_ldst_phys.inc.h
+> 
