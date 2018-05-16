@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54042)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54075)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <edgar.iglesias@gmail.com>) id 1fJ1Xc-0003gh-DD
-	for qemu-devel@nongnu.org; Wed, 16 May 2018 14:52:49 -0400
+	(envelope-from <edgar.iglesias@gmail.com>) id 1fJ1Xe-0003hu-G7
+	for qemu-devel@nongnu.org; Wed, 16 May 2018 14:52:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <edgar.iglesias@gmail.com>) id 1fJ1Xa-000133-Lz
-	for qemu-devel@nongnu.org; Wed, 16 May 2018 14:52:48 -0400
-Received: from mail-wr0-x244.google.com ([2a00:1450:400c:c0c::244]:38880)
+	(envelope-from <edgar.iglesias@gmail.com>) id 1fJ1Xd-00014c-Ni
+	for qemu-devel@nongnu.org; Wed, 16 May 2018 14:52:50 -0400
+Received: from mail-wr0-x244.google.com ([2a00:1450:400c:c0c::244]:39782)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <edgar.iglesias@gmail.com>)
-	id 1fJ1Xa-00012g-GP
-	for qemu-devel@nongnu.org; Wed, 16 May 2018 14:52:46 -0400
-Received: by mail-wr0-x244.google.com with SMTP id 94-v6so2767240wrf.5
-	for <qemu-devel@nongnu.org>; Wed, 16 May 2018 11:52:46 -0700 (PDT)
+	id 1fJ1Xd-00014G-Hp
+	for qemu-devel@nongnu.org; Wed, 16 May 2018 14:52:49 -0400
+Received: by mail-wr0-x244.google.com with SMTP id q3-v6so2769277wrj.6
+	for <qemu-devel@nongnu.org>; Wed, 16 May 2018 11:52:49 -0700 (PDT)
 From: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
-Date: Wed, 16 May 2018 20:51:44 +0200
-Message-Id: <20180516185146.30708-37-edgar.iglesias@gmail.com>
+Date: Wed, 16 May 2018 20:51:46 +0200
+Message-Id: <20180516185146.30708-39-edgar.iglesias@gmail.com>
 In-Reply-To: <20180516185146.30708-1-edgar.iglesias@gmail.com>
 References: <20180516185146.30708-1-edgar.iglesias@gmail.com>
-Subject: [Qemu-devel] [PATCH v3 36/38] target-microblaze: Use
- tcg_gen_movcond in eval_cond_jmp
+Subject: [Qemu-devel] [PATCH v3 38/38] target-microblaze: Consolidate MMU
+ enabled checks
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,41 +32,57 @@ Cc: peter.maydell@linaro.org, richard.henderson@linaro.org, frederic.konrad@adac
 
 From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
 
-Cleanup eval_cond_jmp to use tcg_gen_movcond_i64().
-No functional change.
+Consolidate MMU enabled checks to cpu_mmu_index().
+No functional changes.
 
 Suggested-by: Richard Henderson <richard.henderson@linaro.org>
 Signed-off-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
 ---
- target/microblaze/translate.c | 16 ++++++++++------
- 1 file changed, 10 insertions(+), 6 deletions(-)
+ target/microblaze/cpu.h    | 4 +++-
+ target/microblaze/helper.c | 6 +++---
+ 2 files changed, 6 insertions(+), 4 deletions(-)
 
-diff --git a/target/microblaze/translate.c b/target/microblaze/translate.c
-index a846797d9c..78c2855ff0 100644
---- a/target/microblaze/translate.c
-+++ b/target/microblaze/translate.c
-@@ -1171,12 +1171,16 @@ static inline void eval_cc(DisasContext *dc, unsigned int cc,
+diff --git a/target/microblaze/cpu.h b/target/microblaze/cpu.h
+index c77ca2d8f9..3c4e0ba80a 100644
+--- a/target/microblaze/cpu.h
++++ b/target/microblaze/cpu.h
+@@ -360,8 +360,10 @@ int cpu_mb_signal_handler(int host_signum, void *pinfo,
  
- static void eval_cond_jmp(DisasContext *dc, TCGv_i64 pc_true, TCGv_i64 pc_false)
+ static inline int cpu_mmu_index (CPUMBState *env, bool ifetch)
  {
--    TCGLabel *l1 = gen_new_label();
--    /* Conditional jmp.  */
--    tcg_gen_mov_i64(cpu_SR[SR_PC], pc_false);
--    tcg_gen_brcondi_i32(TCG_COND_EQ, env_btaken, 0, l1);
--    tcg_gen_mov_i64(cpu_SR[SR_PC], pc_true);
--    gen_set_label(l1);
-+    TCGv_i64 tmp_btaken = tcg_temp_new_i64();
-+    TCGv_i64 tmp_zero = tcg_const_i64(0);
++    MicroBlazeCPU *cpu = mb_env_get_cpu(env);
 +
-+    tcg_gen_extu_i32_i64(tmp_btaken, env_btaken);
-+    tcg_gen_movcond_i64(TCG_COND_NE, cpu_SR[SR_PC],
-+                        tmp_btaken, tmp_zero,
-+                        pc_true, pc_false);
-+
-+    tcg_temp_free_i64(tmp_btaken);
-+    tcg_temp_free_i64(tmp_zero);
- }
+     /* Are we in nommu mode?.  */
+-    if (!(env->sregs[SR_MSR] & MSR_VM)) {
++    if (!(env->sregs[SR_MSR] & MSR_VM) || !cpu->cfg.use_mmu) {
+         return MMU_NOMMU_IDX;
+     }
  
- static void dec_bcc(DisasContext *dc)
+diff --git a/target/microblaze/helper.c b/target/microblaze/helper.c
+index 985bdae8d1..bc753793ec 100644
+--- a/target/microblaze/helper.c
++++ b/target/microblaze/helper.c
+@@ -58,8 +58,7 @@ int mb_cpu_handle_mmu_fault(CPUState *cs, vaddr address, int size, int rw,
+     int prot;
+ 
+     /* Translate if the MMU is available and enabled.  */
+-    if (cpu->cfg.use_mmu && (env->sregs[SR_MSR] & MSR_VM)
+-        && mmu_idx != MMU_NOMMU_IDX) {
++    if (mmu_idx != MMU_NOMMU_IDX) {
+         uint32_t vaddr, paddr;
+         struct microblaze_mmu_lookup lu;
+ 
+@@ -270,9 +269,10 @@ hwaddr mb_cpu_get_phys_page_debug(CPUState *cs, vaddr addr)
+     CPUMBState *env = &cpu->env;
+     target_ulong vaddr, paddr = 0;
+     struct microblaze_mmu_lookup lu;
++    int mmu_idx = cpu_mmu_index(env, false);
+     unsigned int hit;
+ 
+-    if (env->sregs[SR_MSR] & MSR_VM) {
++    if (mmu_idx != MMU_NOMMU_IDX) {
+         hit = mmu_translate(&env->mmu, &lu, addr, 0, 0);
+         if (hit) {
+             vaddr = addr & TARGET_PAGE_MASK;
 -- 
 2.14.1
