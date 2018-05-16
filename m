@@ -1,27 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51916)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55560)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhangckid@gmail.com>) id 1fIwFx-0005Kq-PK
-	for qemu-devel@nongnu.org; Wed, 16 May 2018 09:14:15 -0400
+	(envelope-from <pasic@linux.ibm.com>) id 1fIwTy-0001bF-62
+	for qemu-devel@nongnu.org; Wed, 16 May 2018 09:28:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zhangckid@gmail.com>) id 1fIwFv-0007yN-PY
-	for qemu-devel@nongnu.org; Wed, 16 May 2018 09:14:13 -0400
-Received: from mail-wr0-x242.google.com ([2a00:1450:400c:c0c::242]:41269)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <zhangckid@gmail.com>) id 1fIwFv-0007xu-Et
-	for qemu-devel@nongnu.org; Wed, 16 May 2018 09:14:11 -0400
-Received: by mail-wr0-x242.google.com with SMTP id g21-v6so1067065wrb.8
-	for <qemu-devel@nongnu.org>; Wed, 16 May 2018 06:14:10 -0700 (PDT)
-MIME-Version: 1.0
-In-Reply-To: <877eo56lmn.fsf@dusky.pond.sub.org>
-References: <1526268228-27951-1-git-send-email-zhangckid@gmail.com>
-	<1526268228-27951-12-git-send-email-zhangckid@gmail.com>
-	<877eo56lmn.fsf@dusky.pond.sub.org>
-From: Zhang Chen <zhangckid@gmail.com>
-Date: Wed, 16 May 2018 21:14:08 +0800
-Message-ID: <CAK3tnvKzxwUGDvHL1u1csJ+gCJS8zxxQzEh6+dVM809z7PwgBQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH V7 11/17] qapi: Add new command to query
- colo status
+	(envelope-from <pasic@linux.ibm.com>) id 1fIwTv-0006lC-2A
+	for qemu-devel@nongnu.org; Wed, 16 May 2018 09:28:42 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:60532)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pasic@linux.ibm.com>) id 1fIwTu-0006kl-QF
+	for qemu-devel@nongnu.org; Wed, 16 May 2018 09:28:38 -0400
+Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w4GDOWFa128095
+	for <qemu-devel@nongnu.org>; Wed, 16 May 2018 09:28:37 -0400
+Received: from e06smtp13.uk.ibm.com (e06smtp13.uk.ibm.com [195.75.94.109])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2j0ketp864-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Wed, 16 May 2018 09:28:37 -0400
+Received: from localhost
+	by e06smtp13.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <pasic@linux.ibm.com>;
+	Wed, 16 May 2018 14:28:34 +0100
+From: Halil Pasic <pasic@linux.ibm.com>
+Date: Wed, 16 May 2018 15:27:57 +0200
+Message-Id: <20180516132757.68558-1-pasic@linux.ibm.com>
+Subject: [Qemu-devel] [PATCH 1/1] virtio-ccw: clean up notify
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,192 +34,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: qemu-devel@nongnu.org, Jason Wang <jasowang@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: Cornelia Huck <cohuck@redhat.com>, Richard Henderson <rth@twiddle.net>, Alexander Graf <agraf@suse.de>, David Hildenbrand <david@redhat.com>
+Cc: Halil Pasic <pasic@linux.ibm.com>, Peter Maydell <peter.maydell@linaro.org>, Dong Jia Shi <bjsdjshi@linux.ibm.com>, qemu-s390x@nongnu.org, qemu-devel@nongnu.org
 
-On Tue, May 15, 2018 at 10:26 PM, Markus Armbruster <armbru@redhat.com>
-wrote:
+Coverity recently started complaining about virtio_ccw_notify().  Turns
+out, there is a couple of things that can be cleaned up.  Let's clean!
 
-> Zhang Chen <zhangckid@gmail.com> writes:
->
-> > Libvirt or other high level software can use this command query colo
-> status.
-> > You can test this command like that:
-> > {'execute':'query-colo-status'}
-> >
-> > Signed-off-by: Zhang Chen <zhangckid@gmail.com>
-> > ---
-> >  migration/colo.c    | 34 ++++++++++++++++++++++++++++++++++
-> >  qapi/migration.json | 33 +++++++++++++++++++++++++++++++++
-> >  2 files changed, 67 insertions(+)
-> >
-> > diff --git a/migration/colo.c b/migration/colo.c
-> > index 8ca6381..314344c 100644
-> > --- a/migration/colo.c
-> > +++ b/migration/colo.c
-> > @@ -29,6 +29,7 @@
-> >  #include "net/colo.h"
-> >  #include "block/block.h"
-> >  #include "qapi/qapi-events-migration.h"
-> > +#include "qapi/qmp/qerror.h"
-> >
-> >  static bool vmstate_loading;
-> >  static Notifier packets_compare_notifier;
-> > @@ -237,6 +238,39 @@ void qmp_xen_colo_do_checkpoint(Error **errp)
-> >  #endif
-> >  }
-> >
-> > +COLOStatus *qmp_query_colo_status(Error **errp)
-> > +{
-> > +    int state;
-> > +    COLOStatus *s = g_new0(COLOStatus, 1);
-> > +
-> > +    if (get_colo_mode() == COLO_MODE_UNKNOWN) {
-> > +        error_setg(errp, QERR_FEATURE_DISABLED, "colo");
-> > +        s->colo_running = false;
-> > +        goto out;
-> > +    } else if (get_colo_mode() == COLO_MODE_PRIMARY) {
-> > +         state = migrate_get_current()->state;
-> > +    } else {
-> > +         state = migration_incoming_get_current()->state;
-> > +    }
->
-> Indentation's off, as patchew pointed out.  Perhaps the maintainer could
-> fix that for you.
->
+Reported-by: Peter Maydell <peter.maydell@linaro.org>
+Fixes: CID 1390619
+Signed-off-by: Halil Pasic <pasic@linux.ibm.com>
+---
+ hw/s390x/virtio-ccw.c | 13 +++++++++----
+ 1 file changed, 9 insertions(+), 4 deletions(-)
 
-I have sent the "RESEND" version fix this problem.
-
-
->
-> > +    s->colo_running = state == MIGRATION_STATUS_COLO;
-> > +
-> > +out:
-> > +    s->mode = get_colo_mode();
->
-> I'm okay with this.
->
-> If you need to respin anyway, consider whether you like this better:
->
->        s->mode = get_colo_mode();
->        switch (s->mode) {
->        case COLO_MODE_UNKNOWN:
->            error_setg(errp, "COLO is disabled");
->            state = MIGRATION_STATUS_NONE;
->            break;
->        case COLO_MODE_PRIMARY:
->            state = migrate_get_current()->state;
->            break;
->        case COLO_MODE_SECONDARY:
->            state = migration_incoming_get_current()->state;
->            break;
->        default:
->            abort();
->        }
->        s->colo_running = state == MIGRATION_STATUS_COLO;
->
-> Aside: we should really finish off the QERR_ macros.
->
-
-OK, I will remove the QERR_macros and change to this style in next version.
-
-
->
-> > +
-> > +    switch (failover_get_state()) {
-> > +    case FAILOVER_STATUS_NONE:
-> > +        s->reason = COLO_EXIT_REASON_NONE;
-> > +        break;
-> > +    case FAILOVER_STATUS_REQUIRE:
-> > +        s->reason = COLO_EXIT_REASON_REQUEST;
-> > +        break;
-> > +    default:
-> > +        s->reason = COLO_EXIT_REASON_ERROR;
-> > +    }
-> > +
-> > +    return s;
-> > +}
-> > +
-> >  static void colo_send_message(QEMUFile *f, COLOMessage msg,
-> >                                Error **errp)
-> >  {
-> > diff --git a/qapi/migration.json b/qapi/migration.json
-> > index 55dae48..13589ba 100644
-> > --- a/qapi/migration.json
-> > +++ b/qapi/migration.json
-> > @@ -1220,3 +1220,36 @@
-> >  # Since: 2.9
-> >  ##
-> >  { 'command': 'xen-colo-do-checkpoint' }
-> > +
-> > +##
-> > +# @COLOStatus:
-> > +#
-> > +# The result format for 'query-colo-status'.
-> > +#
-> > +# @mode: which COLO mode the VM was in when it exited.
->
-> Pardon my COLO-ignorance...
->
-> What does "when it exited" mean?
->
-
-Sorry, this is a typo, change the 'exited' to 'exist'.
-
-
->
-> What's the value of @mode before "it exited"?
->
-> > +# @colo-running: true if COLO is running.
->
-> If COLO is running, has "it exited", yet?
->
-
-If COLO running, this field will return 'primary' or 'secondary' mode.
-
-
->
-> > +#
-> > +# @reason: describes the reason for the COLO exit.
->
-> What's the value of @reason before a "COLO exit"?
->
-> Remember, while a COLO_EXIT event is tied to an exit, a
-> query-colo-status can be executed at any time, in particular before any
-> "COLO exit".
->
-
-Yes, you are right.
-
-Thanks
-Zhang Chen
-
-
->
-> > +#
-> > +# Since: 2.13
-> > +##
-> > +{ 'struct': 'COLOStatus',
-> > +  'data': { 'mode': 'COLOMode', 'colo-running': 'bool', 'reason':
-> 'COLOExitReason' } }
-> > +
-> > +##
-> > +# @query-colo-status:
-> > +#
-> > +# Query COLO status while the vm is running.
-> > +#
-> > +# Returns: A @COLOStatus object showing the status.
-> > +#
-> > +# Example:
-> > +#
-> > +# -> { "execute": "query-colo-status" }
-> > +# <- { "return": { "mode": "primary", "colo-running": true, "reason":
-> "request" } }
-> > +#
-> > +# Since: 2.13
-> > +##
-> > +{ 'command': 'query-colo-status',
-> > +  'returns': 'COLOStatus' }
->
-> Almost ready :)
->
+diff --git a/hw/s390x/virtio-ccw.c b/hw/s390x/virtio-ccw.c
+index 22df33b509..09fa7eed4c 100644
+--- a/hw/s390x/virtio-ccw.c
++++ b/hw/s390x/virtio-ccw.c
+@@ -1003,10 +1003,15 @@ static void virtio_ccw_notify(DeviceState *d, uint16_t vector)
+     SubchDev *sch = ccw_dev->sch;
+     uint64_t indicators;
+ 
+-    /* queue indicators + secondary indicators */
+-    if (vector >= VIRTIO_QUEUE_MAX + 64) {
++    if (vector == VIRTIO_NO_VECTOR) {
+         return;
+     }
++    /*
++     * vector < VIRTIO_QUEUE_MAX: notification for a virtqueue
++     * vector == VIRTIO_QUEUE_MAX: configuration change notification
++     * bits beyond that are unused and should never be notified for
++     */
++    assert(vector <= VIRTIO_QUEUE_MAX);
+ 
+     if (vector < VIRTIO_QUEUE_MAX) {
+         if (!dev->indicators) {
+@@ -1029,6 +1034,7 @@ static void virtio_ccw_notify(DeviceState *d, uint16_t vector)
+                 css_adapter_interrupt(CSS_IO_ADAPTER_VIRTIO, dev->thinint_isc);
+             }
+         } else {
++            assert(vector < NR_CLASSIC_INDICATOR_BITS);
+             indicators = address_space_ldq(&address_space_memory,
+                                            dev->indicators->addr,
+                                            MEMTXATTRS_UNSPECIFIED,
+@@ -1042,12 +1048,11 @@ static void virtio_ccw_notify(DeviceState *d, uint16_t vector)
+         if (!dev->indicators2) {
+             return;
+         }
+-        vector = 0;
+         indicators = address_space_ldq(&address_space_memory,
+                                        dev->indicators2->addr,
+                                        MEMTXATTRS_UNSPECIFIED,
+                                        NULL);
+-        indicators |= 1ULL << vector;
++        indicators |= 1ULL;
+         address_space_stq(&address_space_memory, dev->indicators2->addr,
+                           indicators, MEMTXATTRS_UNSPECIFIED, NULL);
+         css_conditional_io_interrupt(sch);
+-- 
+2.16.3
