@@ -1,21 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50594)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58866)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1fIrAC-0006oi-IS
-	for qemu-devel@nongnu.org; Wed, 16 May 2018 03:47:57 -0400
+	(envelope-from <armbru@redhat.com>) id 1fIrSu-0003Hg-Pz
+	for qemu-devel@nongnu.org; Wed, 16 May 2018 04:07:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1fIrAB-0006ZB-QZ
-	for qemu-devel@nongnu.org; Wed, 16 May 2018 03:47:56 -0400
-References: <42ec7519-653d-09e2-abc6-78f04733ca47@linux.ibm.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <d5093823-76d8-6fd7-86f3-249d9d3518ae@redhat.com>
-Date: Wed, 16 May 2018 09:47:42 +0200
+	(envelope-from <armbru@redhat.com>) id 1fIrSp-00013u-NT
+	for qemu-devel@nongnu.org; Wed, 16 May 2018 04:07:16 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:59546 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fIrSp-00013G-Hi
+	for qemu-devel@nongnu.org; Wed, 16 May 2018 04:07:11 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <20180504074207.22634-1-famz@redhat.com>
+	<20180504074207.22634-4-famz@redhat.com>
+Date: Wed, 16 May 2018 10:07:03 +0200
+In-Reply-To: <20180504074207.22634-4-famz@redhat.com> (Fam Zheng's message of
+	"Fri, 4 May 2018 15:42:06 +0800")
+Message-ID: <87sh6sowgo.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <42ec7519-653d-09e2-abc6-78f04733ca47@linux.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] Problem with data miscompare using scsi-hd,
- cache=none and io=threads
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v6 3/4] slirp: Add "query-usernet" QMP
+ command
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,55 +28,537 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Daniel Henrique Barboza <danielhb@linux.ibm.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, qemu-block@nongnu.org
-Cc: Fam Zheng <famz@redhat.com>, Kevin Wolf <kwolf@redhat.com>
+To: Fam Zheng <famz@redhat.com>
+Cc: qemu-devel@nongnu.org, Samuel Thibault <samuel.thibault@ens-lyon.org>, Jason Wang <jasowang@redhat.com>, Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Jan Kiszka <jan.kiszka@siemens.com>, Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
 
-On 15/05/2018 23:25, Daniel Henrique Barboza wrote:
-> This is the current status of this investigation. I decided to start a
-> discussion here, see if someone can point me something that I overlooke=
-d
-> or got it wrong, before I started changing the POSIX thread pool
-> behavior to see if I can enforce one specific POSIX thread to do a
-> read() if we had a write() done in the same fd. Any suggestions?
+Fam Zheng <famz@redhat.com> writes:
 
-Copying from the bug:
+> HMP "info usernet" has been available but it isn't ideal for programmed
+> use cases. This closes the gap in QMP by adding a counterpart
+> "query-usernet" command. It is basically translated from
+> the HMP slirp_connection_info() loop, which now calls the QMP
+> implementation and prints the data, just like other HMP info_* commands.
+>
+> Signed-off-by: Fam Zheng <famz@redhat.com>
+> ---
+>  net/slirp.c      |  26 ++++++++
+>  qapi/net.json    | 180 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+>  slirp/libslirp.h |   2 +
+>  slirp/misc.c     | 158 ++++++++++++++++++++++++++++++++++--------------
+>  4 files changed, 321 insertions(+), 45 deletions(-)
+>
+> diff --git a/net/slirp.c b/net/slirp.c
+> index 8991816bbf..9c48a882ec 100644
+> --- a/net/slirp.c
+> +++ b/net/slirp.c
+> @@ -36,6 +36,7 @@
+>  #include "monitor/monitor.h"
+>  #include "qemu/error-report.h"
+>  #include "qemu/sockets.h"
+> +#include "slirp/slirp.h"
+>  #include "slirp/libslirp.h"
+>  #include "slirp/ip6.h"
+>  #include "chardev/char-fe.h"
+> @@ -43,6 +44,7 @@
+>  #include "qemu/cutils.h"
+>  #include "qapi/error.h"
+>  #include "qapi/qmp/qdict.h"
+> +#include "qapi/qapi-commands-net.h"
+>  
+>  static int get_str_sep(char *buf, int buf_size, const char **pp, int sep)
+>  {
+> @@ -864,6 +866,30 @@ static int slirp_guestfwd(SlirpState *s, const char *config_str,
+>      return -1;
+>  }
+>  
+> +UsernetInfoList *qmp_query_usernet(Error **errp)
+> +{
+> +    SlirpState *s;
+> +    UsernetInfoList *list = NULL;
+> +    UsernetInfoList **p = &list;
+> +
+> +    QTAILQ_FOREACH(s, &slirp_stacks, entry) {
+> +        int hub;
+> +        UsernetInfoList *il = g_new0(UsernetInfoList, 1);
+> +        UsernetInfo *info = il->value = g_new0(UsernetInfo, 1);
+> +
+> +        info->id = g_strdup(s->nc.name);
+> +        if (!net_hub_id_for_client(&s->nc, &hub)) {
+> +            info->hub = hub;
+> +        } else {
+> +            info->hub = -1;
+> +        }
+> +        usernet_get_info(s->slirp, info);
+> +        *p = il;
+> +        p = &il->next;
+> +    }
+> +    return list;
+> +}
+> +
+>  void hmp_info_usernet(Monitor *mon, const QDict *qdict)
+>  {
+>      SlirpState *s;
 
-> Unless we learn something new, my understanding is that we're dealing
-> with a host side limitation/bug when calling pwritev() in a different
-> thread than a following preadv(), using the same file descriptor
-> opened with O_DIRECT and no WCE in the host side, the kernel can't
-> grant data coherency, e.g:
->=20
-> - thread A executes a pwritev() writing dataA in the disk
->=20
-> - thread B executes a preadv() call to read the data, but this
-> preadv() call isn't aware of the previous pwritev() call done in
-> thread A, thus the guarantee of the preadv() call reading dataA isn't
-> assured (as opposed to what is described in man 3 write)
->=20
-> - the physical disk, due to the heavy load of the stress test, didn't
-> finish writing up dataA. Since the disk itself doesn't have any
-> internal cache to rely on, the preadv() call goes in and read an old
-> data that differs from dataA.
+       QTAILQ_FOREACH(s, &slirp_stacks, entry) {
+           int id;
+           bool got_hub_id = net_hub_id_for_client(&s->nc, &id) == 0;
+           monitor_printf(mon, "Hub %d (%s):\n",
+                          got_hub_id ? id : -1,
+                          s->nc.name);
+           slirp_connection_info(s->slirp, mon);
+       }
+   }
 
-There is a problem in the reasoning of the third point: if the physical
-disk hasn't yet finished writing up dataA, pwritev() shouldn't have
-returned.  This could be a bug in the kernel, or even in the disk.  I
-suspect the kernel because SCSI passthrough doesn't show the bug; SCSI
-passthrough uses ioctl() which completes exactly when the disk tells
-QEMU that the command is done---it cannot report completion too early.
+Our policy is to have HMP commands wrap themselves around QMP commands,
+or at least common helpers.  That way, "QMP can do everything HMP can
+do" is trivial.
 
-(Another small problem in the third point is that the disk actually does
-have a cache.  But the cache should be transparent, if it weren't the
-bug would be in the disk firmware).
+hmp_info_usernet() uses common helpers net_hub_id_for_client(),
+s->nc.name, usernet_get_info(), the latter via slirp_connection_info().
+I guess that's okay, although wrapping around qmp_query_usernet() would
+be cleaner.
 
-It has to be debugged and fixed in the kernel.  The thread pool is
-just... a thread pool, and shouldn't be working around bugs, especially
-as serious as these.
+> diff --git a/qapi/net.json b/qapi/net.json
+> index fcddce62d6..3cdcda125d 100644
+> --- a/qapi/net.json
+> +++ b/qapi/net.json
+> @@ -723,3 +723,183 @@
+>      'time-wait',
+>      'none'
+>     ] }
+> +
+> +##
+> +# @UsernetTCPConnection:
+> +#
+> +# SLIRP TCP information.
+> +#
+> +# @state: tcp connection state
+> +#
+> +# @hostfwd: whether this connection has host port forwarding
+> +#
+> +# @fd: the file descriptor of the connection
 
-A more likely possibility: maybe the disk has 4K sectors and QEMU is
-doing read-modify-write cycles to emulate 512 byte sectors?  In this
-case, mismatches are not expected, since QEMU serializes RMW cycles, but
-at least we would know that the bug would be in QEMU, and where.
+Why is @fd useful?  Hmm, I guess the argument is "info usernet has
+always printed it".  Is it useful there?
 
-Paolo
+> +#
+> +# @src-addr: source address of host port forwarding
+> +#
+> +# @src-port: source port of host port forwarding
+> +#
+> +# @dest-addr: destination address of host port forwarding
+> +#
+> +# @dest-port: destination port of host port forwarding
+> +#
+> +# @recv-buffered: number of bytes queued in the receive buffer
+> +#
+> +# @send-buffered: number of bytes queued in the send buffer
+> +#
+> +# Since: 2.13
+> +##
+> +{ 'struct': 'UsernetTCPConnection',
+> +  'data': {
+> +    'state': 'UsernetTcpState',
+> +    'hostfwd': 'bool',
+> +    'fd': 'int',
+> +    'src-addr': 'str',
+> +    'src-port': 'int',
+
+Shouldn't these two be an InetSocketAddressBase instead?
+
+> +    'dest-addr': 'str',
+> +    'dest-port': 'int',
+
+Likewise.
+
+> +    'recv-buffered': 'int',
+> +    'send-buffered': 'int'
+
+Make these 'uint32' to match the type of struct sbuf member sb_cc.
+
+> +  } }
+> +
+> +##
+> +# @UsernetUDPConnection:
+> +#
+> +# SLIRP UDP information.
+> +#
+> +# @hostfwd: whether this connection has host port forwarding
+> +#
+> +# @expire-time-ms: time in microseconds after which this connection will expire
+> +#
+> +# @fd: the file descriptor of the connection
+> +#
+> +# @src-addr: source address of host port forwarding
+> +#
+> +# @src-port: source port of host port forwarding
+> +#
+> +# @dest-addr: destination address of host port forwarding
+> +#
+> +# @dest-port: destination port of host port forwarding
+> +#
+> +# @recv-buffered: number of bytes queued in the receive buffer
+> +#
+> +# @send-buffered: number of bytes queued in the send buffer
+> +#
+> +# Since: 2.13
+> +##
+> +{ 'struct': 'UsernetUDPConnection',
+> +  'data': {
+> +    'hostfwd': 'bool',
+> +    'expire-time-ms': 'int',
+
+'uint', to match the type of so->so_expire - curtime.
+
+> +    'fd': 'int',
+> +    'src-addr': 'str',
+> +    'src-port': 'int',
+> +    'dest-addr': 'str',
+> +    'dest-port': 'int',
+> +    'recv-buffered': 'int',
+> +    'send-buffered': 'int'
+> +    } }
+
+Remarks on UsernetTCPConnection apply.
+
+> +
+> +##
+> +# @UsernetICMPConnection:
+> +#
+> +# SLIRP ICMP information.
+> +#
+> +# @expire-time-ms: time in microseconds after which this connection will expire
+> +#
+> +# @fd: the file descriptor of the connection
+> +#
+> +# @src-addr: source address of host port forwarding
+> +#
+> +# @dest-addr: destination address of host port forwarding
+> +#
+> +# @recv-buffered: number of bytes queued in the receive buffer
+> +#
+> +# @send-buffered: number of bytes queued in the send buffer
+> +#
+> +# Since: 2.13
+> +##
+> +{ 'struct': 'UsernetICMPConnection',
+> +  'data': {
+> +    'expire-time-ms': 'int',
+> +    'fd': 'int',
+> +    'src-addr': 'str',
+> +    'dest-addr': 'str',
+> +    'recv-buffered': 'int',
+> +    'send-buffered': 'int'
+> +    } }
+
+Remarks on UsernetTCPConnection and UsernetUDPConnection apply.
+
+> +
+> +##
+> +# @UsernetType:
+> +#
+> +# Available netdev drivers.
+> +#
+> +# Since: 2.13
+> +##
+> +{ 'enum': 'UsernetType',
+> +  'data': [ 'tcp', 'udp', 'icmp' ] }
+> +
+> +##
+> +# @UsernetConnection:
+> +#
+> +# SLIRP usernet connection information.
+> +#
+> +# Since: 2.13
+> +##
+> +{ 'union': 'UsernetConnection',
+> +  'discriminator': 'type',
+> +  'base': { 'type': 'UsernetType' },
+> +  'data': {
+> +    'tcp':     'UsernetTCPConnection',
+> +    'udp':     'UsernetUDPConnection',
+> +    'icmp':    'UsernetICMPConnection'
+> +    } }
+> +
+> +##
+> +# @UsernetInfo:
+> +#
+> +# SLIRP usernet information.
+> +#
+> +# Since: 2.13
+> +##
+> +{ 'struct': 'UsernetInfo',
+> +  'data': {
+> +    'id':              'str',
+> +    'hub':             'int',
+> +    'connections':     ['UsernetConnection']
+> +} }
+> +
+> +##
+> +# @query-usernet:
+> +#
+> +# Return SLIRP network information.
+> +#
+> +# Since: 2.13
+> +#
+> +# Example:
+> +#
+> +# -> { "execute": "query-usernet", "arguments": { } }
+> +# <- { "return": [
+> +#      {
+> +#        "hub": -1,
+> +#        "connections": [
+> +#          {
+> +#            "dest-addr": "10.0.2.15",
+> +#            "recv-buffered": 0,
+> +#            "src-port": 10022,
+> +#            "state": "closed",
+> +#            "fd": 16,
+> +#            "src-addr": "*",
+> +#            "send-buffered": 0,
+> +#            "dest-port": 22,
+> +#            "type": "tcp",
+> +#            "hostfwd": true
+> +#          }
+> +#        ],
+> +#        "id": "vnet"
+> +#      }
+> +#   ]}
+> +#
+> +##
+> +{ 'command': 'query-usernet',
+> +  'returns': ['UsernetInfo'] }
+> diff --git a/slirp/libslirp.h b/slirp/libslirp.h
+> index 540b3e5903..3ba361ea41 100644
+> --- a/slirp/libslirp.h
+> +++ b/slirp/libslirp.h
+> @@ -2,6 +2,7 @@
+>  #define LIBSLIRP_H
+>  
+>  #include "qemu-common.h"
+> +#include "qapi/qapi-commands-net.h"
+
+"qapi/qapi-types-net.h"?
+
+>  
+>  typedef struct Slirp Slirp;
+>  
+> @@ -37,6 +38,7 @@ int slirp_add_exec(Slirp *slirp, int do_pty, const void *args,
+>                     struct in_addr *guest_addr, int guest_port);
+>  
+>  void slirp_connection_info(Slirp *slirp, Monitor *mon);
+> +void usernet_get_info(Slirp *slirp, UsernetInfo *info);
+>  
+>  void slirp_socket_recv(Slirp *slirp, struct in_addr guest_addr,
+>                         int guest_port, const uint8_t *buf, int size);
+
+I'm only skimming the remainder of this patch for now.
+
+> diff --git a/slirp/misc.c b/slirp/misc.c
+> index ee617bc3c4..1d310d7d1f 100644
+> --- a/slirp/misc.c
+> +++ b/slirp/misc.c
+> @@ -206,39 +206,28 @@ fork_exec(struct socket *so, const char *ex, int do_pty)
+>  }
+>  #endif
+>  
+> -void slirp_connection_info(Slirp *slirp, Monitor *mon)
+> +void usernet_get_info(Slirp *slirp, UsernetInfo *info)
+>  {
+> -    const char * const tcpstates[] = {
+> -        [USERNET_TCP_STATE_CLOSED]       = "CLOSED",
+> -        [USERNET_TCP_STATE_LISTEN]       = "LISTEN",
+> -        [USERNET_TCP_STATE_SYN_SENT]     = "SYN_SENT",
+> -        [USERNET_TCP_STATE_SYN_RECEIVED] = "SYN_RCVD",
+> -        [USERNET_TCP_STATE_ESTABLISHED]  = "ESTABLISHED",
+> -        [USERNET_TCP_STATE_CLOSE_WAIT]   = "CLOSE_WAIT",
+> -        [USERNET_TCP_STATE_FIN_WAIT_1]   = "FIN_WAIT_1",
+> -        [USERNET_TCP_STATE_CLOSING]      = "CLOSING",
+> -        [USERNET_TCP_STATE_LAST_ACK]     = "LAST_ACK",
+> -        [USERNET_TCP_STATE_FIN_WAIT_2]   = "FIN_WAIT_2",
+> -        [USERNET_TCP_STATE_TIME_WAIT]    = "TIME_WAIT",
+> -    };
+>      struct in_addr dst_addr;
+>      struct sockaddr_in src;
+>      socklen_t src_len;
+>      uint16_t dst_port;
+>      struct socket *so;
+> -    const char *state;
+> -    char buf[20];
+> -
+> -    monitor_printf(mon, "  Protocol[State]    FD  Source Address  Port   "
+> -                        "Dest. Address  Port RecvQ SendQ\n");
+> +    UsernetConnectionList **p_next = &info->connections;
+>  
+>      for (so = slirp->tcb.so_next; so != &slirp->tcb; so = so->so_next) {
+> +        UsernetConnection *conn = g_new0(UsernetConnection, 1);
+> +        UsernetTCPConnection *tcp = &conn->u.tcp;
+> +        UsernetConnectionList *list = g_new0(UsernetConnectionList, 1);
+> +
+> +        list->value = conn;
+>          if (so->so_state & SS_HOSTFWD) {
+> -            state = "HOST_FORWARD";
+> +            tcp->hostfwd = true;
+> +            tcp->state = so->so_tcpcb->t_state;
+>          } else if (so->so_tcpcb) {
+> -            state = tcpstates[so->so_tcpcb->t_state];
+> +            tcp->state = so->so_tcpcb->t_state;
+>          } else {
+> -            state = "NONE";
+> +            tcp->state = USERNET_TCP_STATE_NONE;
+>          }
+>          if (so->so_state & (SS_HOSTFWD | SS_INCOMING)) {
+>              src_len = sizeof(src);
+> @@ -251,46 +240,125 @@ void slirp_connection_info(Slirp *slirp, Monitor *mon)
+>              dst_addr = so->so_faddr;
+>              dst_port = so->so_fport;
+>          }
+> -        snprintf(buf, sizeof(buf), "  TCP[%s]", state);
+> -        monitor_printf(mon, "%-19s %3d %15s %5d ", buf, so->s,
+> -                       src.sin_addr.s_addr ? inet_ntoa(src.sin_addr) : "*",
+> -                       ntohs(src.sin_port));
+> -        monitor_printf(mon, "%15s %5d %5d %5d\n",
+> -                       inet_ntoa(dst_addr), ntohs(dst_port),
+> -                       so->so_rcv.sb_cc, so->so_snd.sb_cc);
+> +        tcp->fd = so->s;
+> +        tcp->src_addr =
+> +            g_strdup(src.sin_addr.s_addr ? inet_ntoa(src.sin_addr) : "*");
+> +        tcp->src_port = ntohs(src.sin_port);
+> +        tcp->dest_addr = g_strdup(inet_ntoa(dst_addr));
+> +        tcp->dest_port = ntohs(dst_port);
+> +        tcp->recv_buffered = so->so_rcv.sb_cc;
+> +        tcp->send_buffered = so->so_snd.sb_cc;
+> +        *p_next = list;
+> +        p_next = &list->next;
+>      }
+> -
+>      for (so = slirp->udb.so_next; so != &slirp->udb; so = so->so_next) {
+> +        UsernetConnection *conn = g_new0(UsernetConnection, 1);
+> +        UsernetUDPConnection *udp = &conn->u.udp;
+> +        UsernetConnectionList *list = g_new0(UsernetConnectionList, 1);
+> +
+> +        list->value = conn;
+>          if (so->so_state & SS_HOSTFWD) {
+> -            snprintf(buf, sizeof(buf), "  UDP[HOST_FORWARD]");
+> +            udp->hostfwd = true;
+>              src_len = sizeof(src);
+>              getsockname(so->s, (struct sockaddr *)&src, &src_len);
+>              dst_addr = so->so_laddr;
+>              dst_port = so->so_lport;
+>          } else {
+> -            snprintf(buf, sizeof(buf), "  UDP[%d sec]",
+> -                         (so->so_expire - curtime) / 1000);
+> +            udp->expire_time_ms = so->so_expire - curtime;
+>              src.sin_addr = so->so_laddr;
+>              src.sin_port = so->so_lport;
+>              dst_addr = so->so_faddr;
+>              dst_port = so->so_fport;
+>          }
+
+@expire_time_ms appears to be left at zero when @hostfwd is true.
+Should it be optional?
+
+> -        monitor_printf(mon, "%-19s %3d %15s %5d ", buf, so->s,
+> -                       src.sin_addr.s_addr ? inet_ntoa(src.sin_addr) : "*",
+> -                       ntohs(src.sin_port));
+> -        monitor_printf(mon, "%15s %5d %5d %5d\n",
+> -                       inet_ntoa(dst_addr), ntohs(dst_port),
+> -                       so->so_rcv.sb_cc, so->so_snd.sb_cc);
+> +        udp->fd = so->s;
+> +        udp->src_addr =
+> +            g_strdup(src.sin_addr.s_addr ? inet_ntoa(src.sin_addr) : "*");
+> +        udp->src_port = ntohs(src.sin_port);
+> +        udp->dest_addr = g_strdup(inet_ntoa(dst_addr));
+> +        udp->dest_port = ntohs(dst_port);
+> +        udp->recv_buffered = so->so_rcv.sb_cc;
+> +        udp->send_buffered = so->so_snd.sb_cc;
+> +        *p_next = list;
+> +        p_next = &list->next;
+>      }
+>  
+>      for (so = slirp->icmp.so_next; so != &slirp->icmp; so = so->so_next) {
+> -        snprintf(buf, sizeof(buf), "  ICMP[%d sec]",
+> -                     (so->so_expire - curtime) / 1000);
+> +        UsernetConnection *conn = g_new0(UsernetConnection, 1);
+> +        UsernetICMPConnection *icmp = &conn->u.icmp;
+> +        UsernetConnectionList *list = g_new0(UsernetConnectionList, 1);
+> +
+> +        icmp->expire_time_ms = so->so_expire - curtime;
+>          src.sin_addr = so->so_laddr;
+>          dst_addr = so->so_faddr;
+> -        monitor_printf(mon, "%-19s %3d %15s  -    ", buf, so->s,
+> -                       src.sin_addr.s_addr ? inet_ntoa(src.sin_addr) : "*");
+> -        monitor_printf(mon, "%15s  -    %5d %5d\n", inet_ntoa(dst_addr),
+> -                       so->so_rcv.sb_cc, so->so_snd.sb_cc);
+> +        icmp->fd = so->s;
+> +        icmp->src_addr =
+> +            g_strdup(src.sin_addr.s_addr ? inet_ntoa(src.sin_addr) : "*");
+> +        icmp->dest_addr = g_strdup(inet_ntoa(dst_addr));
+> +        icmp->recv_buffered = so->so_rcv.sb_cc;
+> +        icmp->send_buffered = so->so_snd.sb_cc;
+> +        *p_next = list;
+> +        p_next = &list->next;
+>      }
+>  }
+> +
+> +
+> +void slirp_connection_info(Slirp *slirp, Monitor *mon)
+> +{
+> +    const char *state;
+> +    char buf[64];
+> +    UsernetInfo *info = g_new0(UsernetInfo, 1);
+> +    UsernetConnectionList *cl;
+> +
+> +    monitor_printf(mon, "  Protocol[State]    FD  Source Address  Port   "
+> +                        "Dest. Address  Port RecvQ SendQ\n");
+> +
+> +    usernet_get_info(slirp, info);
+> +    for (cl = info->connections; cl && cl->value; cl = cl->next) {
+> +        UsernetConnection *conn = cl->value;
+> +
+> +        if (conn->type == USERNET_TYPE_TCP) {
+> +            UsernetTCPConnection *tcp = &conn->u.tcp;
+> +
+> +            if (tcp->hostfwd) {
+> +                state = "HOST_FORWARD";
+> +            } else {
+> +                state = UsernetTcpState_str(tcp->state);
+> +            }
+> +            snprintf(buf, sizeof(buf), "  TCP[%s]", state);
+> +            monitor_printf(mon, "%-19s %3" PRId64 " %15s %5" PRId64 " ",
+> +                           buf, tcp->fd,
+> +                           tcp->src_addr, tcp->src_port);
+> +            monitor_printf(mon, "%15s %5" PRId64 " %5" PRId64 " %5" PRId64 "\n",
+> +                           tcp->dest_addr, tcp->dest_port,
+> +                           tcp->recv_buffered, tcp->send_buffered);
+> +        } else if (conn->type == USERNET_TYPE_UDP) {
+> +            UsernetUDPConnection *udp = &conn->u.udp;
+> +
+> +            if (udp->hostfwd) {
+> +                snprintf(buf, sizeof(buf), "  UDP[HOST_FORWARD]");
+> +            } else {
+> +                snprintf(buf, sizeof(buf), "  UDP[%" PRId64 " sec]",
+> +                         udp->expire_time_ms / 1000);
+> +            }
+> +            monitor_printf(mon, "%-19s %3" PRId64 " %15s %5" PRId64 " ",
+> +                           buf, udp->fd,
+> +                           udp->src_addr, udp->src_port);
+> +            monitor_printf(mon, "%15s %5" PRId64 " %5" PRId64 " %5" PRId64 "\n",
+> +                           udp->dest_addr, udp->dest_port,
+> +                           udp->recv_buffered, udp->send_buffered);
+> +        } else {
+> +            UsernetICMPConnection *icmp = &conn->u.icmp;
+> +
+> +            assert(conn->type == USERNET_TYPE_ICMP);
+> +            snprintf(buf, sizeof(buf), "  ICMP[%" PRId64 " sec]",
+> +                     icmp->expire_time_ms / 1000);
+> +            monitor_printf(mon, "%-19s %3" PRId64 " %15s  -    ", buf, icmp->fd,
+> +                           icmp->src_addr);
+> +            monitor_printf(mon, "%15s  -    %5" PRId64 " %5" PRId64 "\n",
+> +                           icmp->dest_addr,
+> +                           icmp->recv_buffered, icmp->send_buffered);
+> +        }
+> +    }
+> +
+> +    qapi_free_UsernetInfo(info);
+> +}
