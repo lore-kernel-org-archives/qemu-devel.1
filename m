@@ -1,23 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57161)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58103)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1fJ3nM-00049V-5c
-	for qemu-devel@nongnu.org; Wed, 16 May 2018 17:17:13 -0400
+	(envelope-from <eblake@redhat.com>) id 1fJ3tX-0006el-JH
+	for qemu-devel@nongnu.org; Wed, 16 May 2018 17:23:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1fJ3nL-0008Lz-57
-	for qemu-devel@nongnu.org; Wed, 16 May 2018 17:17:12 -0400
-References: <20180512012537.22478-1-jsnow@redhat.com>
-	<20180512012537.22478-8-jsnow@redhat.com>
-	<453c0511-0114-49f9-07e1-3eb63c06cf6c@virtuozzo.com>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <a168ef12-19ae-0eec-a447-11f04d2b7e56@redhat.com>
-Date: Wed, 16 May 2018 17:17:03 -0400
+	(envelope-from <eblake@redhat.com>) id 1fJ3tW-0004N6-MP
+	for qemu-devel@nongnu.org; Wed, 16 May 2018 17:23:35 -0400
+References: <20180509162637.15575-1-kwolf@redhat.com>
+	<20180509162637.15575-38-kwolf@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <a94c9b72-ea9b-11e1-30db-197cd5a4eb63@redhat.com>
+Date: Wed, 16 May 2018 16:23:18 -0500
 MIME-Version: 1.0
-In-Reply-To: <453c0511-0114-49f9-07e1-3eb63c06cf6c@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20180509162637.15575-38-kwolf@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC PATCH 07/12] qcow2-bitmap: add basic bitmaps
- info
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 37/42] job: Move progress fields to Job
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,104 +24,88 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, Markus Armbruster <armbru@redhat.com>, Max Reitz <mreitz@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+Cc: mreitz@redhat.com, jsnow@redhat.com, armbru@redhat.com, jcody@redhat.com, qemu-devel@nongnu.org
 
+On 05/09/2018 11:26 AM, Kevin Wolf wrote:
+> BlockJob has fields .offset and .len, which are actually misnomers today
+> because they are no longer tied to block device sizes, but just progress
+> counters. As such they make a lot of sense in generic Jobs.
+> 
+> This patch moves the fields to Job and renames them to .progress_current
+> and .progress_total to describe their function better.
+> 
+> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+> ---
 
+> +++ b/include/qemu/job.h
+> @@ -114,6 +114,16 @@ typedef struct Job {
+>       /** True if this job should automatically dismiss itself */
+>       bool auto_dismiss;
+>   
+> +    /**
+> +     * Current progress. The unit is arbitrary as long as the ratio between
+> +     * progress_current and progress_total represents the estimated percentage
+> +     * of work already done.
+> +     */
+> +    int64_t progress_current;
+> +
+> +    /** Estimated progress_current value at the completion of the job */
+> +    int64_t progress_total;
+> +
+>       /** ret code passed to block_job_completed. */
+>       int ret;
+>   
+> @@ -304,6 +314,23 @@ void job_ref(Job *job);
+>    */
+>   void job_unref(Job *job);
+>   
+> +/**
+> + * @job: The job that has made progress
+> + * @done: How much progress the job made
+> + *
+> + * Updates the progress counter of the job.
 
-On 05/14/2018 11:12 AM, Vladimir Sementsov-Ogievskiy wrote:
-> 12.05.2018 04:25, John Snow wrote:
->> Add functions for querying the basic information inside of bitmaps.
->> Restructure the bitmaps flags masks to facilitate providing a list of
->> flags belonging to the bitmap(s) being queried.
->>
->> Signed-off-by: John Snow <jsnow@redhat.com>
->> ---
->> =C2=A0 block/qcow2-bitmap.c | 81
->> ++++++++++++++++++++++++++++++++++++++++++++++++++--
->> =C2=A0 block/qcow2.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0=
- 7 +++++
->> =C2=A0 block/qcow2.h=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0=
- 1 +
->> =C2=A0 3 files changed, 87 insertions(+), 2 deletions(-)
->>
->> diff --git a/block/qcow2-bitmap.c b/block/qcow2-bitmap.c
->> index 60e01abfd7..811b82743a 100644
->> --- a/block/qcow2-bitmap.c
->> +++ b/block/qcow2-bitmap.c
->> @@ -49,8 +49,28 @@
->> =C2=A0 =C2=A0 /* Bitmap directory entry flags */
->> =C2=A0 #define BME_RESERVED_FLAGS 0xfffffffcU
->> -#define BME_FLAG_IN_USE (1U << 0)
->> -#define BME_FLAG_AUTO=C2=A0=C2=A0 (1U << 1)
->> +
->> +enum BME_FLAG_BITS {
->> +=C2=A0=C2=A0=C2=A0 BME_FLAG_BIT__BEGIN =3D 0,
->> +=C2=A0=C2=A0=C2=A0 BME_FLAG_BIT_IN_USE =3D BME_FLAG_BIT__BEGIN,
->> +=C2=A0=C2=A0=C2=A0 BME_FLAG_BIT_AUTO=C2=A0=C2=A0 =3D 1,
->> +=C2=A0=C2=A0=C2=A0 BME_FLAG_BIT_EXTRA=C2=A0 =3D 2,
->> +=C2=A0=C2=A0=C2=A0 BME_FLAG_BIT__MAX,
->> +};
->> +
->> +#define BME_FLAG_IN_USE (1U << BME_FLAG_BIT_IN_USE)
->> +#define BME_FLAG_AUTO=C2=A0=C2=A0 (1U << BME_FLAG_BIT_AUTO)
->> +#define BME_FLAG_EXTRA=C2=A0 (1U << BME_FLAG_BIT_EXTRA)
->> +
->> +/* Correlate canonical spec values to autogenerated QAPI values */
->> +struct {
->> +=C2=A0=C2=A0=C2=A0 uint32_t mask;
->=20
-> mask is unused in this patch
->=20
->> +=C2=A0=C2=A0=C2=A0 int qapi_value;
->> +} BMEFlagMap[BME_FLAG_BIT__MAX] =3D {
->> +=C2=A0=C2=A0=C2=A0 [BME_FLAG_BIT_IN_USE] =3D { BME_FLAG_IN_USE,
->> BITMAP_FLAG_ENUM_IN_USE },
->> +=C2=A0=C2=A0=C2=A0 [BME_FLAG_BIT_AUTO]=C2=A0=C2=A0 =3D { BME_FLAG_AUT=
-O,=C2=A0=C2=A0 BITMAP_FLAG_ENUM_AUTO },
->> +=C2=A0=C2=A0=C2=A0 [BME_FLAG_BIT_EXTRA]=C2=A0 =3D { BME_FLAG_EXTRA,=C2=
-=A0
->> BITMAP_FLAG_ENUM_EXTRA_DATA_COMPATIBLE },
->> +};
->> =C2=A0 =C2=A0 /* bits [1, 8] U [56, 63] are reserved */
->> =C2=A0 #define BME_TABLE_ENTRY_RESERVED_MASK 0xff000000000001feULL
->> @@ -663,6 +683,63 @@ static void del_bitmap_list(BlockDriverState *bs)
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
->> =C2=A0 }
->> =C2=A0 +static BitmapFlagEnumList *get_bitmap_flags(uint32_t flags)
->> +{
->> +=C2=A0=C2=A0=C2=A0 int i;
->> +=C2=A0=C2=A0=C2=A0 BitmapFlagEnumList *flist =3D NULL;
->> +=C2=A0=C2=A0=C2=A0 BitmapFlagEnumList *ftmp;
->> +
->> +=C2=A0=C2=A0=C2=A0 while (flags) {
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 i =3D ctz32(flags);
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ftmp =3D g_new0(BitmapFlag=
-EnumList, 1);
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (i >=3D BME_FLAG_BIT__B=
-EGIN && i < BME_FLAG_BIT__MAX) {
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ft=
-mp->value =3D BMEFlagMap[i].qapi_value;
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 } else {
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ft=
-mp->value =3D BITMAP_FLAG_ENUM_UNKNOWN;
->=20
-> so, there may be several "unknown" entries. It's inconsistent with
-> "@unknown: This bitmap has unknown or reserved properties.".
->=20
-> Finally, can we export values for unknown flags? It should be more
-> informative.
->=20
+Which progress counter? It might be worth calling out that this 
+specifically updates the progress_current counter.  Also, it might be 
+worth mentioning that the value is added to the current value of 
+progress_counter, rather than directly assigned.
 
-I changed my mind -- qemu-img is not a debugging tool and shouldn't get
-lost in the weeds trying to enumerate the different kinds of reserved
-values that are set.
+> + */
+> +void job_progress_update(Job *job, uint64_t done);
+> +
+> +/**
+> + * @job: The job whose expected progress end value is set
+> + * @remaining: Expected end value of the progress counter of the job
+> + *
+> + * Sets the expected end value of the progress counter of a job so that a
+> + * completion percentage can be calculated when the progress is updated.
+> + */
+> +void job_progress_set_remaining(Job *job, uint64_t remaining);
 
-It's an error to have them set, or not -- which ones specifically is not
-information that an end-user need know or care about, and I don't want
-to create an extra structure to contain the value.
+The name 'remaining' sounds like this is a delta (that progress_total is 
+computed by summing the current progress_current + remaining) rather 
+than directly the new value of progress_total.  Is that intended?
 
-I'm going to rewrite this loop to just only ever have one unknown value
-at a maximum.
+> +++ b/job.c
+> @@ -364,6 +364,16 @@ void job_unref(Job *job)
+>       }
+>   }
+>   
+> +void job_progress_update(Job *job, uint64_t done)
+> +{
+> +    job->progress_current += done;
+> +}
+> +
+> +void job_progress_set_remaining(Job *job, uint64_t remaining)
+> +{
+> +    job->progress_total = job->progress_current + remaining;
 
---js
+Okay, so implementation-wise, both functions ARE taking a delta, rather 
+than directly assigning the internal field.  The delta can only be 
+positive, but job->progress_total can still shrink over time as needed.
+
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
