@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53752)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53813)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <edgar.iglesias@gmail.com>) id 1fJ1XE-0003JR-DH
-	for qemu-devel@nongnu.org; Wed, 16 May 2018 14:52:25 -0400
+	(envelope-from <edgar.iglesias@gmail.com>) id 1fJ1XK-0003NF-5K
+	for qemu-devel@nongnu.org; Wed, 16 May 2018 14:52:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <edgar.iglesias@gmail.com>) id 1fJ1XD-0000p9-I8
-	for qemu-devel@nongnu.org; Wed, 16 May 2018 14:52:24 -0400
-Received: from mail-wr0-x242.google.com ([2a00:1450:400c:c0c::242]:44227)
+	(envelope-from <edgar.iglesias@gmail.com>) id 1fJ1XI-0000rA-Bc
+	for qemu-devel@nongnu.org; Wed, 16 May 2018 14:52:30 -0400
+Received: from mail-wr0-x244.google.com ([2a00:1450:400c:c0c::244]:32921)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <edgar.iglesias@gmail.com>)
-	id 1fJ1XD-0000ot-Av
-	for qemu-devel@nongnu.org; Wed, 16 May 2018 14:52:23 -0400
-Received: by mail-wr0-x242.google.com with SMTP id y15-v6so2752350wrg.11
-	for <qemu-devel@nongnu.org>; Wed, 16 May 2018 11:52:23 -0700 (PDT)
+	id 1fJ1XI-0000qh-4z
+	for qemu-devel@nongnu.org; Wed, 16 May 2018 14:52:28 -0400
+Received: by mail-wr0-x244.google.com with SMTP id o4-v6so2794778wrm.0
+	for <qemu-devel@nongnu.org>; Wed, 16 May 2018 11:52:27 -0700 (PDT)
 From: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
-Date: Wed, 16 May 2018 20:51:29 +0200
-Message-Id: <20180516185146.30708-22-edgar.iglesias@gmail.com>
+Date: Wed, 16 May 2018 20:51:32 +0200
+Message-Id: <20180516185146.30708-25-edgar.iglesias@gmail.com>
 In-Reply-To: <20180516185146.30708-1-edgar.iglesias@gmail.com>
 References: <20180516185146.30708-1-edgar.iglesias@gmail.com>
-Subject: [Qemu-devel] [PATCH v3 21/38] target-microblaze: Setup for 64bit
- addressing
+Subject: [Qemu-devel] [PATCH v3 24/38] target-microblaze: mmu: Add
+ R_TBLX_MISS macros
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,52 +32,46 @@ Cc: peter.maydell@linaro.org, richard.henderson@linaro.org, frederic.konrad@adac
 
 From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
 
-Setup MicroBlaze builds for 64bit addressing.
-No functional change since the translator does not yet
-emit 64bit addresses.
+Add a R_TBLX_MISS MASK and SHIFT macros.
 
+Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 Signed-off-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
 ---
- configure               | 1 +
- target/microblaze/cpu.h | 6 +++---
- 2 files changed, 4 insertions(+), 3 deletions(-)
+ target/microblaze/mmu.c | 5 +++--
+ target/microblaze/mmu.h | 4 ++++
+ 2 files changed, 7 insertions(+), 2 deletions(-)
 
-diff --git a/configure b/configure
-index 59f91ab3f9..5626499e99 100755
---- a/configure
-+++ b/configure
-@@ -6844,6 +6844,7 @@ case "$target_name" in
-   microblaze|microblazeel)
-     TARGET_ARCH=microblaze
-     bflt="yes"
-+    echo "TARGET_ABI32=y" >> $config_target_mak
-   ;;
-   mips|mipsel)
-     TARGET_ARCH=mips
-diff --git a/target/microblaze/cpu.h b/target/microblaze/cpu.h
-index 215f42b384..b631b7dc4c 100644
---- a/target/microblaze/cpu.h
-+++ b/target/microblaze/cpu.h
-@@ -23,7 +23,7 @@
- #include "qemu-common.h"
- #include "cpu-qom.h"
+diff --git a/target/microblaze/mmu.c b/target/microblaze/mmu.c
+index 0019ebd18f..f4a4c339c9 100644
+--- a/target/microblaze/mmu.c
++++ b/target/microblaze/mmu.c
+@@ -292,8 +292,9 @@ void mmu_write(CPUMBState *env, uint32_t rn, uint32_t v)
+                                 v & TLB_EPN_MASK, 0, cpu_mmu_index(env, false));
+             if (hit) {
+                 env->mmu.regs[MMU_R_TLBX] = lu.idx;
+-            } else
+-                env->mmu.regs[MMU_R_TLBX] |= 0x80000000;
++            } else {
++                env->mmu.regs[MMU_R_TLBX] |= R_TBLX_MISS_MASK;
++            }
+             break;
+         }
+         default:
+diff --git a/target/microblaze/mmu.h b/target/microblaze/mmu.h
+index 3b7a9983d5..113539c6e9 100644
+--- a/target/microblaze/mmu.h
++++ b/target/microblaze/mmu.h
+@@ -54,6 +54,10 @@
+ #define TLB_M                 0x00000002 /* Memory is coherent */
+ #define TLB_G                 0x00000001 /* Memory is guarded from prefetch */
  
--#define TARGET_LONG_BITS 32
-+#define TARGET_LONG_BITS 64
++/* TLBX  */
++#define R_TBLX_MISS_SHIFT 31
++#define R_TBLX_MISS_MASK (1U << R_TBLX_MISS_SHIFT)
++
+ #define TLB_ENTRIES    64
  
- #define CPUArchState struct CPUMBState
- 
-@@ -340,8 +340,8 @@ int cpu_mb_signal_handler(int host_signum, void *pinfo,
- /* FIXME: MB uses variable pages down to 1K but linux only uses 4k.  */
- #define TARGET_PAGE_BITS 12
- 
--#define TARGET_PHYS_ADDR_SPACE_BITS 32
--#define TARGET_VIRT_ADDR_SPACE_BITS 32
-+#define TARGET_PHYS_ADDR_SPACE_BITS 64
-+#define TARGET_VIRT_ADDR_SPACE_BITS 64
- 
- #define CPU_RESOLVING_TYPE TYPE_MICROBLAZE_CPU
- 
+ struct microblaze_mmu
 -- 
 2.14.1
