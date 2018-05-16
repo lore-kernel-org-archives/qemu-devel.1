@@ -1,22 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54919)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57372)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fIz59-00069N-KQ
-	for qemu-devel@nongnu.org; Wed, 16 May 2018 12:15:17 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fIz6w-0007eG-IR
+	for qemu-devel@nongnu.org; Wed, 16 May 2018 12:17:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fIz58-00008d-Or
-	for qemu-devel@nongnu.org; Wed, 16 May 2018 12:15:15 -0400
-Date: Wed, 16 May 2018 18:15:04 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20180516161504.GE4435@localhost.localdomain>
-References: <20180509162637.15575-1-kwolf@redhat.com>
-	<20180509162637.15575-39-kwolf@redhat.com>
-	<3b126693-5a80-9265-acd7-944ef0984a30@redhat.com>
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fIz6t-0001r7-KL
+	for qemu-devel@nongnu.org; Wed, 16 May 2018 12:17:06 -0400
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <1526493784-25328-1-git-send-email-eric.auger@redhat.com>
+	<1526493784-25328-3-git-send-email-eric.auger@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <2c55370d-fa43-12a1-5baf-ec7cf824c0dc@amsat.org>
+Date: Wed, 16 May 2018 13:16:54 -0300
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="Fba/0zbH8Xs+Fj9o"
-Content-Disposition: inline
-In-Reply-To: <3b126693-5a80-9265-acd7-944ef0984a30@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 38/42] job: Add JOB_STATUS_CHANGE QMP event
+In-Reply-To: <1526493784-25328-3-git-send-email-eric.auger@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH 2/2] hw/arm/smmu-common: Fix
+ coverity issue in get_block_pte_address
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,51 +29,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>
-Cc: qemu-block@nongnu.org, eblake@redhat.com, jsnow@redhat.com, armbru@redhat.com, jcody@redhat.com, qemu-devel@nongnu.org
+To: Eric Auger <eric.auger@redhat.com>, eric.auger.pro@gmail.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org, peter.maydell@linaro.org
 
+Hi Eric,
 
---Fba/0zbH8Xs+Fj9o
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+On 05/16/2018 03:03 PM, Eric Auger wrote:
+> Coverity points out that this can overflow if n > 31,
+> because it's only doing 32-bit arithmetic. Let's use 1ULL instead
+> of 1. Also the formulae used to compute n can be replaced by
+> the level_shift() macro.
 
-Am 15.05.2018 um 00:11 hat Max Reitz geschrieben:
-> You forgot to adjust 094, and although I cannot prove it (I don't have
-> an nfs setup handy right now), I have a hunch that this patch breaks 173
-> as well.
+This level_shift() replacement doesn't seems that obvious to me, can you
+split it in another patch?
 
-NFS qemu-iotests look completely broken. And the block driver, too. I've
-sent a fix for the block driver at least...
+> 
+> Reported-by: Peter Maydell <peter.maydell@linaro.org>
+> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+> ---
+>  hw/arm/smmu-common.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+> 
+> diff --git a/hw/arm/smmu-common.c b/hw/arm/smmu-common.c
+> index 01c7be8..3c5f724 100644
+> --- a/hw/arm/smmu-common.c
+> +++ b/hw/arm/smmu-common.c
+> @@ -83,9 +83,9 @@ static inline hwaddr get_table_pte_address(uint64_t pte, int granule_sz)
+>  static inline hwaddr get_block_pte_address(uint64_t pte, int level,
+>                                             int granule_sz, uint64_t *bsz)
+>  {
+> -    int n = (granule_sz - 3) * (4 - level) + 3;
+> +    int n = level_shift(level, granule_sz);
 
-Not sure how the qemu-iotests are supposed to work, but I get messages
-like these:
+Shouldn't this be level_shift(level + 1, granule_sz)?
+Using level_shift() you replaced the trailing 3 by granule_sz. This
+means the previous code was only correct for the granule_sz==3 case.
 
-+mkdir: cannot create directory 'nfs://127.0.0.1//home/kwolf/source/qemu/tests/qemu-iotests/scratch': No such file or directory
-+common.config: Error: $TEST_DIR (nfs://127.0.0.1//home/kwolf/source/qemu/tests/qemu-iotests/scratch) is not a directory
+   level_shift(level + 1, granule_sz)
+== (granule_sz - 3) * (3 - (level + 1)) + granule_sz;
+== (granule_sz - 3) * (4 - level) + granule_sz;
+!= (granule_sz - 3) * (4 - level) + 3;
 
-I guess I'm okay with breaking 173 in this series when the NFS tests are
-in this state...
+>  
+> -    *bsz = 1 << n;
+> +    *bsz = 1ULL << n;
 
-Kevin
+For the coverity fix (patch splitted):
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
---Fba/0zbH8Xs+Fj9o
-Content-Type: application/pgp-signature; name="signature.asc"
+>      return PTE_ADDRESS(pte, n);
+>  }
+>  
 
------BEGIN PGP SIGNATURE-----
+Regards,
 
-iQIcBAEBAgAGBQJa/FkIAAoJEH8JsnLIjy/WOa8QALOrZ/aMIksGnDmVuSvuY9ag
-bhfdwLqAtX5fpNGBTgPcf2AiZChniYfJP8DwqdRObXYzTGbmpwkewdsge06s/vm7
-mpnRZlp6kp+A/khc0RF6/wb7CFECNZ1d720NHWbhM0kyj5j84FljbDW4cdht2+4+
-THmoq2xmpCgyXdUiYRy4DdolmoDnOrJuGepGPbmwLErISBnKwBGMeISSCX/wWewq
-BXxwdgYjv4l9/M72B1ky5rudbRFXX7goXxIAS6fcIr703idO5UkjyZSe+mPrHKZI
-fWxl6XECwYsU1F9Bk8O3ixcgUXdK4xvGDzJAiR6FwXduOK/Rh3wn7WQ6jivhcAcU
-KTMdkb0sFaNqWOrgZRtBscjzt5O6zymxqC4Y3qcbRwEF2MWs9Ah3fpYvFtbKZmA9
-xCJobaD+4v5woFEdQqSG68KVTL416OwOwHJA4eefM7dUx0mct4R/2vlb4kvQWQ2r
-pXSEUtXOcU7+fNAnIhEbH7BL+oThoF7EI5Lrnls1eaivjp4b2ZnAx5XMNozGCq7Z
-OgpGEMG4qb7XYmfjvd6MsaIb9h+QBSmB0IqfXAQwXjRmRjuh64kBAOGIHpHedyVV
-SE6+cEF3C6XGcuxoLVB7LhOE3G1dsL+5/hQDxr/fqVCpGou0Yo+XLUBYBwwAm8kv
-AszN8VSgwpfUWucXIy3A
-=vwIV
------END PGP SIGNATURE-----
-
---Fba/0zbH8Xs+Fj9o--
+Phil.
