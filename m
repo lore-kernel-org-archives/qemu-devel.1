@@ -1,40 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59864)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60601)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <danielhb@linux.ibm.com>) id 1fJ45J-0002Nh-BP
-	for qemu-devel@nongnu.org; Wed, 16 May 2018 17:35:46 -0400
+	(envelope-from <eblake@redhat.com>) id 1fJ47O-0003iJ-Lb
+	for qemu-devel@nongnu.org; Wed, 16 May 2018 17:37:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <danielhb@linux.ibm.com>) id 1fJ45G-0001Kq-5W
-	for qemu-devel@nongnu.org; Wed, 16 May 2018 17:35:45 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:39144)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <danielhb@linux.ibm.com>)
-	id 1fJ45F-0001I6-T6
-	for qemu-devel@nongnu.org; Wed, 16 May 2018 17:35:42 -0400
-Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w4GLZ3Xm058821
-	for <qemu-devel@nongnu.org>; Wed, 16 May 2018 17:35:39 -0400
-Received: from e32.co.us.ibm.com (e32.co.us.ibm.com [32.97.110.150])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2j0vp9g0nk-1
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Wed, 16 May 2018 17:35:39 -0400
-Received: from localhost
-	by e32.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <danielhb@linux.ibm.com>;
-	Wed, 16 May 2018 15:35:38 -0600
-References: <42ec7519-653d-09e2-abc6-78f04733ca47@linux.ibm.com>
-	<d5093823-76d8-6fd7-86f3-249d9d3518ae@redhat.com>
-From: Daniel Henrique Barboza <danielhb@linux.ibm.com>
-Date: Wed, 16 May 2018 18:35:32 -0300
+	(envelope-from <eblake@redhat.com>) id 1fJ47N-0002WZ-QD
+	for qemu-devel@nongnu.org; Wed, 16 May 2018 17:37:54 -0400
+References: <20180512012537.22478-1-jsnow@redhat.com>
+	<20180512012537.22478-10-jsnow@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <70d0df96-1d41-4687-4b55-fcfdb42adb0c@redhat.com>
+Date: Wed, 16 May 2018 16:37:47 -0500
 MIME-Version: 1.0
-In-Reply-To: <d5093823-76d8-6fd7-86f3-249d9d3518ae@redhat.com>
+In-Reply-To: <20180512012537.22478-10-jsnow@redhat.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
 Content-Language: en-US
-Message-Id: <34187a39-5d59-62d4-6dd2-15f013738026@linux.ibm.com>
-Subject: Re: [Qemu-devel] Problem with data miscompare using scsi-hd,
- cache=none and io=threads
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [RFC PATCH 09/12] qapi/block-core: add
+ BitmapMapping and BitmapEntry structs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -43,66 +25,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, qemu-block@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <famz@redhat.com>
+To: John Snow <jsnow@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: Max Reitz <mreitz@redhat.com>, Markus Armbruster <armbru@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 
+On 05/11/2018 08:25 PM, John Snow wrote:
+> Add two new structures for detailing the marked regions of bitmaps as
+> saved in e.g. qcow2 files.
+> 
+> Signed-off-by: John Snow <jsnow@redhat.com>
+> ---
+>   qapi/block-core.json | 32 ++++++++++++++++++++++++++++++++
+>   1 file changed, 32 insertions(+)
+> 
+> diff --git a/qapi/block-core.json b/qapi/block-core.json
+> index 8f33f41ce7..de8ad73a78 100644
+> --- a/qapi/block-core.json
+> +++ b/qapi/block-core.json
+> @@ -298,6 +298,38 @@
+>              'zero': 'bool', 'depth': 'int', '*offset': 'int',
+>              '*filename': 'str' } }
+>   
+> +##
+> +# @BitmapEntry:
+> +#
+> +# Dirty Bitmap region information for a virtual block range
+> +#
+> +# @offset: the start byte of the dirty virtual range
+> +#
+> +# @length: the number of bytes of the dirty virtual range
+> +#
+> +# Since: 2.13
+> +#
+> +##
+> +{ 'struct': 'BitmapEntry',
+> +  'data': { 'offset': 'int', 'length': 'int' } }
+> +
+> +##
+> +# @BitmapMapping:
+> +#
+> +# List of described regions correlated to a named bitmap.
+> +#
+> +# @name: The name of the bitmap whose range is described here
+> +#
+> +# @entries: A list of zero or more @BitmapEntry elements representing
+> +#           the range(s) described by the bitmap.
 
+Is it also worth documenting that the list will be in ascending order, 
+with no overlaps (no two entries covering the same offset); and in fact 
+with a gap between all entries (as otherwise those two consecutive 
+entries could have been consolidated to one)?
 
-On 05/16/2018 04:47 AM, Paolo Bonzini wrote:
-> On 15/05/2018 23:25, Daniel Henrique Barboza wrote:
->> This is the current status of this investigation. I decided to start a
->> discussion here, see if someone can point me something that I overlooked
->> or got it wrong, before I started changing the POSIX thread pool
->> behavior to see if I can enforce one specific POSIX thread to do a
->> read() if we had a write() done in the same fd. Any suggestions?
-> Copying from the bug:
->
->> Unless we learn something new, my understanding is that we're dealing
->> with a host side limitation/bug when calling pwritev() in a different
->> thread than a following preadv(), using the same file descriptor
->> opened with O_DIRECT and no WCE in the host side, the kernel can't
->> grant data coherency, e.g:
->>
->> - thread A executes a pwritev() writing dataA in the disk
->>
->> - thread B executes a preadv() call to read the data, but this
->> preadv() call isn't aware of the previous pwritev() call done in
->> thread A, thus the guarantee of the preadv() call reading dataA isn't
->> assured (as opposed to what is described in man 3 write)
->>
->> - the physical disk, due to the heavy load of the stress test, didn't
->> finish writing up dataA. Since the disk itself doesn't have any
->> internal cache to rely on, the preadv() call goes in and read an old
->> data that differs from dataA.
-> There is a problem in the reasoning of the third point: if the physical
-> disk hasn't yet finished writing up dataA, pwritev() shouldn't have
-> returned.  This could be a bug in the kernel, or even in the disk.  I
-> suspect the kernel because SCSI passthrough doesn't show the bug; SCSI
-> passthrough uses ioctl() which completes exactly when the disk tells
-> QEMU that the command is done---it cannot report completion too early.
->
-> (Another small problem in the third point is that the disk actually does
-> have a cache.  But the cache should be transparent, if it weren't the
-> bug would be in the disk firmware).
->
-> It has to be debugged and fixed in the kernel.  The thread pool is
-> just... a thread pool, and shouldn't be working around bugs, especially
-> as serious as these.
+> +#
+> +# Since: 2.13
+> +#
+> +##
+> +{ 'struct': 'BitmapMapping',
+> +  'data': { 'name': 'str',
+> +            'entries': [ 'BitmapEntry' ] } }
+> +
+>   ##
+>   # @BlockdevCacheInfo:
+>   #
+> 
 
-Fixing in the thread pool would only make sense if we were sure that
-the kernel was working as intended. I think the next step would be to
-look it in the kernel level and see what is not working there.
-
->
-> A more likely possibility: maybe the disk has 4K sectors and QEMU is
-> doing read-modify-write cycles to emulate 512 byte sectors?  In this
-> case, mismatches are not expected, since QEMU serializes RMW cycles, but
-> at least we would know that the bug would be in QEMU, and where.
-
-Haven't considered this possibility. I'll look it up if the disk has 4k
-sectors and whether QEMU is emulating 512 bytes sectors.
-
-
->
-> Paolo
->
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
