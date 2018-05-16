@@ -1,27 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40887)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40985)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fJ4w3-0007Qv-EK
-	for qemu-devel@nongnu.org; Wed, 16 May 2018 18:30:17 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1fJ4w8-0007Vw-9j
+	for qemu-devel@nongnu.org; Wed, 16 May 2018 18:30:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fJ4w1-0007IY-Ac
-	for qemu-devel@nongnu.org; Wed, 16 May 2018 18:30:15 -0400
-Received: from mail-pf0-x242.google.com ([2607:f8b0:400e:c00::242]:40453)
+	(envelope-from <richard.henderson@linaro.org>) id 1fJ4w6-0007Nq-OU
+	for qemu-devel@nongnu.org; Wed, 16 May 2018 18:30:20 -0400
+Received: from mail-pl0-x244.google.com ([2607:f8b0:400e:c01::244]:33995)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1fJ4w1-0007Hh-22
-	for qemu-devel@nongnu.org; Wed, 16 May 2018 18:30:13 -0400
-Received: by mail-pf0-x242.google.com with SMTP id f189-v6so1051763pfa.7
-	for <qemu-devel@nongnu.org>; Wed, 16 May 2018 15:30:12 -0700 (PDT)
+	id 1fJ4w6-0007NQ-Gl
+	for qemu-devel@nongnu.org; Wed, 16 May 2018 18:30:18 -0400
+Received: by mail-pl0-x244.google.com with SMTP id ay10-v6so1254170plb.1
+	for <qemu-devel@nongnu.org>; Wed, 16 May 2018 15:30:18 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Wed, 16 May 2018 15:29:41 -0700
-Message-Id: <20180516223007.10256-2-richard.henderson@linaro.org>
+Date: Wed, 16 May 2018 15:29:45 -0700
+Message-Id: <20180516223007.10256-6-richard.henderson@linaro.org>
 In-Reply-To: <20180516223007.10256-1-richard.henderson@linaro.org>
 References: <20180516223007.10256-1-richard.henderson@linaro.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v3-a 01/27] target/arm: Introduce
- translate-a64.h
+Subject: [Qemu-devel] [PATCH v3-a 05/27] target/arm: Implement SVE predicate
+ test
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,29 +30,29 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: peter.maydell@linaro.org, qemu-arm@nongnu.org
 
-Move some stuff that will be common to both translate-a64.c
-and translate-sve.c.
-
-Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
 Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-
 ---
-v3: Move GVecGen2Fn, GVecGen2iFn, GVecGen3Fn too.
----
- target/arm/translate-a64.h | 118 +++++++++++++++++++++++++++++++++++++
- target/arm/translate-a64.c | 112 +++++------------------------------
- 2 files changed, 133 insertions(+), 97 deletions(-)
- create mode 100644 target/arm/translate-a64.h
+ target/arm/helper-sve.h    | 21 ++++++++++
+ target/arm/helper.h        |  1 +
+ target/arm/sve_helper.c    | 78 ++++++++++++++++++++++++++++++++++++++
+ target/arm/translate-sve.c | 65 +++++++++++++++++++++++++++++++
+ target/arm/Makefile.objs   |  2 +-
+ target/arm/sve.decode      |  5 +++
+ 6 files changed, 171 insertions(+), 1 deletion(-)
+ create mode 100644 target/arm/helper-sve.h
+ create mode 100644 target/arm/sve_helper.c
 
-diff --git a/target/arm/translate-a64.h b/target/arm/translate-a64.h
+diff --git a/target/arm/helper-sve.h b/target/arm/helper-sve.h
 new file mode 100644
-index 0000000000..dd9c09f89b
+index 0000000000..b6e91539ae
 --- /dev/null
-+++ b/target/arm/translate-a64.h
-@@ -0,0 +1,118 @@
++++ b/target/arm/helper-sve.h
+@@ -0,0 +1,21 @@
 +/*
-+ *  AArch64 translation, common definitions.
++ *  AArch64 SVE specific helper definitions
++ *
++ *  Copyright (c) 2018 Linaro, Ltd
 + *
 + * This library is free software; you can redistribute it and/or
 + * modify it under the terms of the GNU Lesser General Public
@@ -71,343 +68,210 @@ index 0000000000..dd9c09f89b
 + * License along with this library; if not, see <http://www.gnu.org/licenses/>.
 + */
 +
-+#ifndef TARGET_ARM_TRANSLATE_A64_H
-+#define TARGET_ARM_TRANSLATE_A64_H
-+
-+void unallocated_encoding(DisasContext *s);
-+
-+#define unsupported_encoding(s, insn)                                    \
-+    do {                                                                 \
-+        qemu_log_mask(LOG_UNIMP,                                         \
-+                      "%s:%d: unsupported instruction encoding 0x%08x "  \
-+                      "at pc=%016" PRIx64 "\n",                          \
-+                      __FILE__, __LINE__, insn, s->pc - 4);              \
-+        unallocated_encoding(s);                                         \
-+    } while (0)
-+
-+TCGv_i64 new_tmp_a64(DisasContext *s);
-+TCGv_i64 new_tmp_a64_zero(DisasContext *s);
-+TCGv_i64 cpu_reg(DisasContext *s, int reg);
-+TCGv_i64 cpu_reg_sp(DisasContext *s, int reg);
-+TCGv_i64 read_cpu_reg(DisasContext *s, int reg, int sf);
-+TCGv_i64 read_cpu_reg_sp(DisasContext *s, int reg, int sf);
-+void write_fp_dreg(DisasContext *s, int reg, TCGv_i64 v);
-+TCGv_ptr get_fpstatus_ptr(bool);
-+bool logic_imm_decode_wmask(uint64_t *result, unsigned int immn,
-+                            unsigned int imms, unsigned int immr);
-+uint64_t vfp_expand_imm(int size, uint8_t imm8);
-+bool sve_access_check(DisasContext *s);
-+
-+/* We should have at some point before trying to access an FP register
-+ * done the necessary access check, so assert that
-+ * (a) we did the check and
-+ * (b) we didn't then just plough ahead anyway if it failed.
-+ * Print the instruction pattern in the abort message so we can figure
-+ * out what we need to fix if a user encounters this problem in the wild.
++DEF_HELPER_FLAGS_2(sve_predtest1, TCG_CALL_NO_WG, i32, i64, i64)
++DEF_HELPER_FLAGS_3(sve_predtest, TCG_CALL_NO_WG, i32, ptr, ptr, i32)
+diff --git a/target/arm/helper.h b/target/arm/helper.h
+index ce89968b2d..dcb5343d7e 100644
+--- a/target/arm/helper.h
++++ b/target/arm/helper.h
+@@ -605,4 +605,5 @@ DEF_HELPER_FLAGS_5(gvec_fcmlad, TCG_CALL_NO_RWG,
+ 
+ #ifdef TARGET_AARCH64
+ #include "helper-a64.h"
++#include "helper-sve.h"
+ #endif
+diff --git a/target/arm/sve_helper.c b/target/arm/sve_helper.c
+new file mode 100644
+index 0000000000..1ebb67e1df
+--- /dev/null
++++ b/target/arm/sve_helper.c
+@@ -0,0 +1,78 @@
++/*
++ * ARM SVE Operations
++ *
++ * Copyright (c) 2018 Linaro, Ltd.
++ *
++ * This library is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU Lesser General Public
++ * License as published by the Free Software Foundation; either
++ * version 2 of the License, or (at your option) any later version.
++ *
++ * This library is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ * Lesser General Public License for more details.
++ *
++ * You should have received a copy of the GNU Lesser General Public
++ * License along with this library; if not, see <http://www.gnu.org/licenses/>.
 + */
-+static inline void assert_fp_access_checked(DisasContext *s)
++
++#include "qemu/osdep.h"
++#include "cpu.h"
++#include "exec/exec-all.h"
++#include "exec/cpu_ldst.h"
++#include "exec/helper-proto.h"
++#include "tcg/tcg-gvec-desc.h"
++
++
++/* Return a value for NZCV as per the ARM PredTest pseudofunction.
++ *
++ * The return value has bit 31 set if N is set, bit 1 set if Z is clear,
++ * and bit 0 set if C is set.  Compare the definitions of these variables
++ * within CPUARMState.
++ */
++
++/* For no G bits set, NZCV = C.  */
++#define PREDTEST_INIT  1
++
++/* This is an iterative function, called for each Pd and Pg word
++ * moving forward.
++ */
++static uint32_t iter_predtest_fwd(uint64_t d, uint64_t g, uint32_t flags)
 +{
-+#ifdef CONFIG_DEBUG_TCG
-+    if (unlikely(!s->fp_access_checked || s->fp_excp_el)) {
-+        fprintf(stderr, "target-arm: FP access check missing for "
-+                "instruction 0x%08x\n", s->insn);
-+        abort();
++    if (likely(g)) {
++        /* Compute N from first D & G.
++           Use bit 2 to signal first G bit seen.  */
++        if (!(flags & 4)) {
++            flags |= ((d & (g & -g)) != 0) << 31;
++            flags |= 4;
++        }
++
++        /* Accumulate Z from each D & G.  */
++        flags |= ((d & g) != 0) << 1;
++
++        /* Compute C from last !(D & G).  Replace previous.  */
++        flags = deposit32(flags, 0, 1, (d & pow2floor(g)) == 0);
 +    }
-+#endif
++    return flags;
 +}
 +
-+/* Return the offset into CPUARMState of an element of specified
-+ * size, 'element' places in from the least significant end of
-+ * the FP/vector register Qn.
-+ */
-+static inline int vec_reg_offset(DisasContext *s, int regno,
-+                                 int element, TCGMemOp size)
++/* The same for a single word predicate.  */
++uint32_t HELPER(sve_predtest1)(uint64_t d, uint64_t g)
 +{
-+    int offs = 0;
-+#ifdef HOST_WORDS_BIGENDIAN
-+    /* This is complicated slightly because vfp.zregs[n].d[0] is
-+     * still the low half and vfp.zregs[n].d[1] the high half
-+     * of the 128 bit vector, even on big endian systems.
-+     * Calculate the offset assuming a fully bigendian 128 bits,
-+     * then XOR to account for the order of the two 64 bit halves.
-+     */
-+    offs += (16 - ((element + 1) * (1 << size)));
-+    offs ^= 8;
-+#else
-+    offs += element * (1 << size);
-+#endif
-+    offs += offsetof(CPUARMState, vfp.zregs[regno]);
-+    assert_fp_access_checked(s);
-+    return offs;
++    return iter_predtest_fwd(d, g, PREDTEST_INIT);
 +}
 +
-+/* Return the offset info CPUARMState of the "whole" vector register Qn.  */
-+static inline int vec_full_reg_offset(DisasContext *s, int regno)
++/* The same for a multi-word predicate.  */
++uint32_t HELPER(sve_predtest)(void *vd, void *vg, uint32_t words)
 +{
-+    assert_fp_access_checked(s);
-+    return offsetof(CPUARMState, vfp.zregs[regno]);
-+}
++    uint32_t flags = PREDTEST_INIT;
++    uint64_t *d = vd, *g = vg;
++    uintptr_t i = 0;
 +
-+/* Return a newly allocated pointer to the vector register.  */
-+static inline TCGv_ptr vec_full_reg_ptr(DisasContext *s, int regno)
++    do {
++        flags = iter_predtest_fwd(d[i], g[i], flags);
++    } while (++i < words);
++
++    return flags;
++}
+diff --git a/target/arm/translate-sve.c b/target/arm/translate-sve.c
+index 5ec18a6aac..c3f1b0bfa6 100644
+--- a/target/arm/translate-sve.c
++++ b/target/arm/translate-sve.c
+@@ -87,6 +87,43 @@ static bool do_mov_z(DisasContext *s, int rd, int rn)
+     return do_vector2_z(s, tcg_gen_gvec_mov, 0, rd, rn);
+ }
+ 
++/* Set the cpu flags as per a return from an SVE helper.  */
++static void do_pred_flags(TCGv_i32 t)
 +{
-+    TCGv_ptr ret = tcg_temp_new_ptr();
-+    tcg_gen_addi_ptr(ret, cpu_env, vec_full_reg_offset(s, regno));
-+    return ret;
++    tcg_gen_mov_i32(cpu_NF, t);
++    tcg_gen_andi_i32(cpu_ZF, t, 2);
++    tcg_gen_andi_i32(cpu_CF, t, 1);
++    tcg_gen_movi_i32(cpu_VF, 0);
 +}
 +
-+/* Return the byte size of the "whole" vector register, VL / 8.  */
-+static inline int vec_full_reg_size(DisasContext *s)
++/* Subroutines computing the ARM PredTest psuedofunction.  */
++static void do_predtest1(TCGv_i64 d, TCGv_i64 g)
 +{
-+    return s->sve_len;
++    TCGv_i32 t = tcg_temp_new_i32();
++
++    gen_helper_sve_predtest1(t, d, g);
++    do_pred_flags(t);
++    tcg_temp_free_i32(t);
 +}
 +
-+bool disas_sve(DisasContext *, uint32_t);
++static void do_predtest(DisasContext *s, int dofs, int gofs, int words)
++{
++    TCGv_ptr dptr = tcg_temp_new_ptr();
++    TCGv_ptr gptr = tcg_temp_new_ptr();
++    TCGv_i32 t;
 +
-+/* Note that the gvec expanders operate on offsets + sizes.  */
-+typedef void GVecGen2Fn(unsigned, uint32_t, uint32_t, uint32_t, uint32_t);
-+typedef void GVecGen2iFn(unsigned, uint32_t, uint32_t, int64_t,
-+                         uint32_t, uint32_t);
-+typedef void GVecGen3Fn(unsigned, uint32_t, uint32_t,
-+                        uint32_t, uint32_t, uint32_t);
++    tcg_gen_addi_ptr(dptr, cpu_env, dofs);
++    tcg_gen_addi_ptr(gptr, cpu_env, gofs);
++    t = tcg_const_i32(words);
 +
-+#endif /* TARGET_ARM_TRANSLATE_A64_H */
-diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
-index a0b0c43d12..ace9d5063e 100644
---- a/target/arm/translate-a64.c
-+++ b/target/arm/translate-a64.c
-@@ -36,13 +36,13 @@
- #include "exec/log.h"
- 
- #include "trace-tcg.h"
-+#include "translate-a64.h"
- 
- static TCGv_i64 cpu_X[32];
- static TCGv_i64 cpu_pc;
- 
- /* Load/store exclusive handling */
- static TCGv_i64 cpu_exclusive_high;
--static TCGv_i64 cpu_reg(DisasContext *s, int reg);
- 
- static const char *regnames[] = {
-     "x0", "x1", "x2", "x3", "x4", "x5", "x6", "x7",
-@@ -86,13 +86,6 @@ typedef void CryptoThreeOpIntFn(TCGv_ptr, TCGv_ptr, TCGv_i32);
- typedef void CryptoThreeOpFn(TCGv_ptr, TCGv_ptr, TCGv_ptr);
- typedef void AtomicThreeOpFn(TCGv_i64, TCGv_i64, TCGv_i64, TCGArg, TCGMemOp);
- 
--/* Note that the gvec expanders operate on offsets + sizes.  */
--typedef void GVecGen2Fn(unsigned, uint32_t, uint32_t, uint32_t, uint32_t);
--typedef void GVecGen2iFn(unsigned, uint32_t, uint32_t, int64_t,
--                         uint32_t, uint32_t);
--typedef void GVecGen3Fn(unsigned, uint32_t, uint32_t,
--                        uint32_t, uint32_t, uint32_t);
--
- /* initialize TCG globals.  */
- void a64_translate_init(void)
- {
-@@ -405,22 +398,13 @@ static inline void gen_goto_tb(DisasContext *s, int n, uint64_t dest)
-     }
- }
- 
--static void unallocated_encoding(DisasContext *s)
-+void unallocated_encoding(DisasContext *s)
- {
-     /* Unallocated and reserved encodings are uncategorized */
-     gen_exception_insn(s, 4, EXCP_UDEF, syn_uncategorized(),
-                        default_exception_el(s));
- }
- 
--#define unsupported_encoding(s, insn)                                    \
--    do {                                                                 \
--        qemu_log_mask(LOG_UNIMP,                                         \
--                      "%s:%d: unsupported instruction encoding 0x%08x "  \
--                      "at pc=%016" PRIx64 "\n",                          \
--                      __FILE__, __LINE__, insn, s->pc - 4);              \
--        unallocated_encoding(s);                                         \
--    } while (0)
--
- static void init_tmp_a64_array(DisasContext *s)
- {
- #ifdef CONFIG_DEBUG_TCG
-@@ -438,13 +422,13 @@ static void free_tmp_a64(DisasContext *s)
-     init_tmp_a64_array(s);
- }
- 
--static TCGv_i64 new_tmp_a64(DisasContext *s)
-+TCGv_i64 new_tmp_a64(DisasContext *s)
- {
-     assert(s->tmp_a64_count < TMP_A64_MAX);
-     return s->tmp_a64[s->tmp_a64_count++] = tcg_temp_new_i64();
- }
- 
--static TCGv_i64 new_tmp_a64_zero(DisasContext *s)
-+TCGv_i64 new_tmp_a64_zero(DisasContext *s)
- {
-     TCGv_i64 t = new_tmp_a64(s);
-     tcg_gen_movi_i64(t, 0);
-@@ -466,7 +450,7 @@ static TCGv_i64 new_tmp_a64_zero(DisasContext *s)
-  * to cpu_X[31] and ZR accesses to a temporary which can be discarded.
-  * This is the point of the _sp forms.
-  */
--static TCGv_i64 cpu_reg(DisasContext *s, int reg)
-+TCGv_i64 cpu_reg(DisasContext *s, int reg)
- {
-     if (reg == 31) {
-         return new_tmp_a64_zero(s);
-@@ -476,7 +460,7 @@ static TCGv_i64 cpu_reg(DisasContext *s, int reg)
- }
- 
- /* register access for when 31 == SP */
--static TCGv_i64 cpu_reg_sp(DisasContext *s, int reg)
-+TCGv_i64 cpu_reg_sp(DisasContext *s, int reg)
- {
-     return cpu_X[reg];
- }
-@@ -485,7 +469,7 @@ static TCGv_i64 cpu_reg_sp(DisasContext *s, int reg)
-  * representing the register contents. This TCGv is an auto-freed
-  * temporary so it need not be explicitly freed, and may be modified.
-  */
--static TCGv_i64 read_cpu_reg(DisasContext *s, int reg, int sf)
-+TCGv_i64 read_cpu_reg(DisasContext *s, int reg, int sf)
- {
-     TCGv_i64 v = new_tmp_a64(s);
-     if (reg != 31) {
-@@ -500,7 +484,7 @@ static TCGv_i64 read_cpu_reg(DisasContext *s, int reg, int sf)
-     return v;
- }
- 
--static TCGv_i64 read_cpu_reg_sp(DisasContext *s, int reg, int sf)
-+TCGv_i64 read_cpu_reg_sp(DisasContext *s, int reg, int sf)
- {
-     TCGv_i64 v = new_tmp_a64(s);
-     if (sf) {
-@@ -511,72 +495,6 @@ static TCGv_i64 read_cpu_reg_sp(DisasContext *s, int reg, int sf)
-     return v;
- }
- 
--/* We should have at some point before trying to access an FP register
-- * done the necessary access check, so assert that
-- * (a) we did the check and
-- * (b) we didn't then just plough ahead anyway if it failed.
-- * Print the instruction pattern in the abort message so we can figure
-- * out what we need to fix if a user encounters this problem in the wild.
-- */
--static inline void assert_fp_access_checked(DisasContext *s)
--{
--#ifdef CONFIG_DEBUG_TCG
--    if (unlikely(!s->fp_access_checked || s->fp_excp_el)) {
--        fprintf(stderr, "target-arm: FP access check missing for "
--                "instruction 0x%08x\n", s->insn);
--        abort();
--    }
--#endif
--}
--
--/* Return the offset into CPUARMState of an element of specified
-- * size, 'element' places in from the least significant end of
-- * the FP/vector register Qn.
-- */
--static inline int vec_reg_offset(DisasContext *s, int regno,
--                                 int element, TCGMemOp size)
--{
--    int offs = 0;
--#ifdef HOST_WORDS_BIGENDIAN
--    /* This is complicated slightly because vfp.zregs[n].d[0] is
--     * still the low half and vfp.zregs[n].d[1] the high half
--     * of the 128 bit vector, even on big endian systems.
--     * Calculate the offset assuming a fully bigendian 128 bits,
--     * then XOR to account for the order of the two 64 bit halves.
--     */
--    offs += (16 - ((element + 1) * (1 << size)));
--    offs ^= 8;
--#else
--    offs += element * (1 << size);
--#endif
--    offs += offsetof(CPUARMState, vfp.zregs[regno]);
--    assert_fp_access_checked(s);
--    return offs;
--}
--
--/* Return the offset info CPUARMState of the "whole" vector register Qn.  */
--static inline int vec_full_reg_offset(DisasContext *s, int regno)
--{
--    assert_fp_access_checked(s);
--    return offsetof(CPUARMState, vfp.zregs[regno]);
--}
--
--/* Return a newly allocated pointer to the vector register.  */
--static TCGv_ptr vec_full_reg_ptr(DisasContext *s, int regno)
--{
--    TCGv_ptr ret = tcg_temp_new_ptr();
--    tcg_gen_addi_ptr(ret, cpu_env, vec_full_reg_offset(s, regno));
--    return ret;
--}
--
--/* Return the byte size of the "whole" vector register, VL / 8.  */
--static inline int vec_full_reg_size(DisasContext *s)
--{
--    /* FIXME SVE: We should put the composite ZCR_EL* value into tb->flags.
--       In the meantime this is just the AdvSIMD length of 128.  */
--    return 128 / 8;
--}
--
- /* Return the offset into CPUARMState of a slice (from
-  * the least significant end) of FP register Qn (ie
-  * Dn, Sn, Hn or Bn).
-@@ -641,7 +559,7 @@ static void clear_vec_high(DisasContext *s, bool is_q, int rd)
-     }
- }
- 
--static void write_fp_dreg(DisasContext *s, int reg, TCGv_i64 v)
-+void write_fp_dreg(DisasContext *s, int reg, TCGv_i64 v)
- {
-     unsigned ofs = fp_reg_offset(s, reg, MO_64);
- 
-@@ -658,7 +576,7 @@ static void write_fp_sreg(DisasContext *s, int reg, TCGv_i32 v)
-     tcg_temp_free_i64(tmp);
- }
- 
--static TCGv_ptr get_fpstatus_ptr(bool is_f16)
-+TCGv_ptr get_fpstatus_ptr(bool is_f16)
- {
-     TCGv_ptr statusptr = tcg_temp_new_ptr();
-     int offset;
-@@ -1246,14 +1164,14 @@ static inline bool fp_access_check(DisasContext *s)
- /* Check that SVE access is enabled.  If it is, return true.
-  * If not, emit code to generate an appropriate exception and return false.
-  */
--static inline bool sve_access_check(DisasContext *s)
-+bool sve_access_check(DisasContext *s)
- {
-     if (s->sve_excp_el) {
-         gen_exception_insn(s, 4, EXCP_UDEF, syn_sve_access_trap(),
-                            s->sve_excp_el);
-         return false;
-     }
--    return true;
-+    return fp_access_check(s);
- }
- 
++    gen_helper_sve_predtest(t, dptr, gptr, t);
++    tcg_temp_free_ptr(dptr);
++    tcg_temp_free_ptr(gptr);
++
++    do_pred_flags(t);
++    tcg_temp_free_i32(t);
++}
++
  /*
-@@ -3419,8 +3337,8 @@ static inline uint64_t bitmask64(unsigned int length)
-  * value (ie should cause a guest UNDEF exception), and true if they are
-  * valid, in which case the decoded bit pattern is written to result.
+  *** SVE Logical - Unpredicated Group
   */
--static bool logic_imm_decode_wmask(uint64_t *result, unsigned int immn,
--                                   unsigned int imms, unsigned int immr)
-+bool logic_imm_decode_wmask(uint64_t *result, unsigned int immn,
-+                            unsigned int imms, unsigned int immr)
- {
-     uint64_t mask;
-     unsigned e, levels, s, r;
-@@ -5637,7 +5555,7 @@ static void disas_fp_3src(DisasContext *s, uint32_t insn)
-  * the range 01....1xx to 10....0xx, and the most significant 4 bits of
-  * the mantissa; see VFPExpandImm() in the v8 ARM ARM.
-  */
--static uint64_t vfp_expand_imm(int size, uint8_t imm8)
-+uint64_t vfp_expand_imm(int size, uint8_t imm8)
- {
-     uint64_t imm;
+@@ -115,6 +152,34 @@ static bool trans_BIC_zzz(DisasContext *s, arg_rrr_esz *a, uint32_t insn)
+     return do_vector3_z(s, tcg_gen_gvec_andc, 0, a->rd, a->rn, a->rm);
+ }
  
++/*
++ *** SVE Predicate Misc Group
++ */
++
++static bool trans_PTEST(DisasContext *s, arg_PTEST *a, uint32_t insn)
++{
++    if (sve_access_check(s)) {
++        int nofs = pred_full_reg_offset(s, a->rn);
++        int gofs = pred_full_reg_offset(s, a->pg);
++        int words = DIV_ROUND_UP(pred_full_reg_size(s), 8);
++
++        if (words == 1) {
++            TCGv_i64 pn = tcg_temp_new_i64();
++            TCGv_i64 pg = tcg_temp_new_i64();
++
++            tcg_gen_ld_i64(pn, cpu_env, nofs);
++            tcg_gen_ld_i64(pg, cpu_env, gofs);
++            do_predtest1(pn, pg);
++
++            tcg_temp_free_i64(pn);
++            tcg_temp_free_i64(pg);
++        } else {
++            do_predtest(s, nofs, gofs, words);
++        }
++    }
++    return true;
++}
++
+ /*
+  *** SVE Memory - 32-bit Gather and Unsized Contiguous Group
+  */
+diff --git a/target/arm/Makefile.objs b/target/arm/Makefile.objs
+index a6f733eaa8..11c7baf8a3 100644
+--- a/target/arm/Makefile.objs
++++ b/target/arm/Makefile.objs
+@@ -19,4 +19,4 @@ target/arm/decode-sve.inc.c: $(SRC_PATH)/target/arm/sve.decode $(DECODETREE)
+ 	  "GEN", $(TARGET_DIR)$@)
+ 
+ target/arm/translate-sve.o: target/arm/decode-sve.inc.c
+-obj-$(TARGET_AARCH64) += translate-sve.o
++obj-$(TARGET_AARCH64) += translate-sve.o sve_helper.o
+diff --git a/target/arm/sve.decode b/target/arm/sve.decode
+index a2c4450e7c..a44ca2f551 100644
+--- a/target/arm/sve.decode
++++ b/target/arm/sve.decode
+@@ -56,6 +56,11 @@ ORR_zzz         00000100 01 1 ..... 001 100 ..... .....         @rd_rn_rm_e0
+ EOR_zzz         00000100 10 1 ..... 001 100 ..... .....         @rd_rn_rm_e0
+ BIC_zzz         00000100 11 1 ..... 001 100 ..... .....         @rd_rn_rm_e0
+ 
++### SVE Predicate Misc Group
++
++# SVE predicate test
++PTEST           00100101 01 010000 11 pg:4 0 rn:4 0 0000
++
+ ### SVE Memory - 32-bit Gather and Unsized Contiguous Group
+ 
+ # SVE load predicate register
 -- 
 2.17.0
