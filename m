@@ -1,28 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37709)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41667)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <SRS0=B6TO=ID=linuxfoundation.org=gregkh@kernel.org>)
-	id 1fIyYY-0001MX-AG
-	for qemu-devel@nongnu.org; Wed, 16 May 2018 11:41:35 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1fIyjJ-00048I-6M
+	for qemu-devel@nongnu.org; Wed, 16 May 2018 11:52:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <SRS0=B6TO=ID=linuxfoundation.org=gregkh@kernel.org>)
-	id 1fIyYU-0007NP-9h
-	for qemu-devel@nongnu.org; Wed, 16 May 2018 11:41:34 -0400
-Received: from mail.kernel.org ([198.145.29.99]:40742)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71)
-	(envelope-from <SRS0=B6TO=ID=linuxfoundation.org=gregkh@kernel.org>)
-	id 1fIyYU-0007N4-1t
-	for qemu-devel@nongnu.org; Wed, 16 May 2018 11:41:30 -0400
-Date: Wed, 16 May 2018 17:41:10 +0200
-From: Greg KH <gregkh@linuxfoundation.org>
-Message-ID: <20180516154110.GE23725@kroah.com>
-References: <152646971421.34839.18198173866060880395.stgit@bahia.lan>
+	(envelope-from <vsementsov@virtuozzo.com>) id 1fIyjI-0004wi-9A
+	for qemu-devel@nongnu.org; Wed, 16 May 2018 11:52:41 -0400
+References: <8739e95e-1900-d4e3-7ac8-77e3aa8b927e@virtuozzo.com>
+	<20180514064139.GB16389@lemon.usersys.redhat.com>
+	<9a59b786-2351-e8ae-f582-5e436ce0383c@virtuozzo.com>
+	<20180516124755.GB4435@localhost.localdomain>
+	<352a3b44-b7ac-7d62-2d4e-8e46a80366d8@virtuozzo.com>
+	<20180516153203.GD4435@localhost.localdomain>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-ID: <25af7923-1eb0-8189-1c14-0f8f33007e6e@virtuozzo.com>
+Date: Wed, 16 May 2018 18:52:28 +0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <152646971421.34839.18198173866060880395.stgit@bahia.lan>
-Subject: Re: [Qemu-devel] [PATCH] block: fix QEMU crash with scsi-hd and
- drive_del
+In-Reply-To: <20180516153203.GD4435@localhost.localdomain>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+Subject: Re: [Qemu-devel] Restoring bitmaps after failed/cancelled migration
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,67 +28,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>
-Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, stable@vger.kernel.org
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: Fam Zheng <famz@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, qemu block <qemu-block@nongnu.org>, Max Reitz <mreitz@redhat.com>, John Snow <jsnow@redhat.com>, "gilbert >> Dr. David Alan Gilbert" <dgilbert@redhat.com>, "Juan Q >> Juan Jose Quintela Carreira" <quintela@redhat.com>
 
-On Wed, May 16, 2018 at 01:21:54PM +0200, Greg Kurz wrote:
-> Removing a drive with drive_del while it is being used to run an I/O
-> intensive workload can cause QEMU to crash.
-> 
-> An AIO flush can yield at some point:
-> 
-> blk_aio_flush_entry()
->  blk_co_flush(blk)
->   bdrv_co_flush(blk->root->bs)
->    ...
->     qemu_coroutine_yield()
-> 
-> and let the HMP command to run, free blk->root and give control
-> back to the AIO flush:
-> 
->     hmp_drive_del()
->      blk_remove_bs()
->       bdrv_root_unref_child(blk->root)
->        child_bs = blk->root->bs
->        bdrv_detach_child(blk->root)
->         bdrv_replace_child(blk->root, NULL)
->          blk->root->bs = NULL
->         g_free(blk->root) <============== blk->root becomes stale
->        bdrv_unref(child_bs)
->         bdrv_delete(child_bs)
->          bdrv_close()
->           bdrv_drained_begin()
->            bdrv_do_drained_begin()
->             bdrv_drain_recurse()
->              aio_poll()
->               ...
->               qemu_coroutine_switch()
-> 
-> and the AIO flush completion ends up dereferencing blk->root:
-> 
->   blk_aio_complete()
->    scsi_aio_complete()
->     blk_get_aio_context(blk)
->      bs = blk_bs(blk)
->  ie, bs = blk->root ? blk->root->bs : NULL
->             ^^^^^
->             stale
-> 
-> The solution to this user-after-free situation is is to clear
-> blk->root before calling bdrv_unref() in bdrv_detach_child(),
-> and let blk_get_aio_context() fall back to the main loop context
-> since the BDS has been removed.
-> 
-> Signed-off-by: Greg Kurz <groug@kaod.org>
-> ---
-> 
+16.05.2018 18:32, Kevin Wolf wrote:
+> Am 16.05.2018 um 17:10 hat Vladimir Sementsov-Ogievskiy geschrieben:
+>> 16.05.2018 15:47, Kevin Wolf wrote:
+>>> Am 14.05.2018 um 12:09 hat Vladimir Sementsov-Ogievskiy geschrieben:
+>>>> 14.05.2018 09:41, Fam Zheng wrote:
+>>>>> On Wed, 04/18 17:00, Vladimir Sementsov-Ogievskiy wrote:
+>>>>>> Is it possible, that target will change the disk, and then we return control
+>>>>>> to the source? In this case bitmaps will be invalid. So, should not we drop
+>>>>>> all the bitmaps on inactivate?
+>>>>> Yes, dropping all live bitmaps upon inactivate sounds reasonable. If the dst
+>>>>> fails to start, and we want to resume VM at src, we could (optionally?) reload
+>>>>> the persistent bitmaps, I guess.
+>>>> Reload from where? We didn't store them.
+>>> Maybe this just means that it turns out that not storing them was a bad
+>>> idea?
+>>>
+>>> What was the motivation for not storing the bitmap? The additional
+>>> downtime? Is it really that bad, though? Bitmaps should be fairly small
+>>> for the usual image sizes and writing them out should be quick.
+>> What are usual ones? A bitmap of standard granularity of 64k for 16Tb disk
+>> is ~30mb. If we have several such bitmaps it may be significant downtime.
+> We could have an in-memory bitmap that tracks which parts of the
+> persistent bitmap are dirty so that you don't have to write out the
+> whole 30 MB during the migration downtime, but can already flush most of
+> the persistent bitmap before the VM is stopped.
+>
+> Kevin
 
+Yes it looks possible. But how to control that downtime? Introduce 
+migration state, with specific _pending function? However, it may be not 
+necessary.
 
-<formletter>
+Anyway, I think we don't need to store it.
 
-This is not the correct way to submit patches for inclusion in the
-stable kernel tree.  Please read:
-    https://www.kernel.org/doc/html/latest/process/stable-kernel-rules.html
-for how to do this properly.
+If we decided to resume source, bitmap is already in memory, why to 
+reload it? If someone already killed source (which was in paused mode), 
+it is inconsistent anyway and loss of dirty bitmap is not the worst 
+possible problem.
 
-</formletter>
+So, finally, it looks safe enough, just to make bitmaps on source 
+persistent again (or better, introduce another way to skip storing (may 
+be with additional flag, so everybody will be happy), not dropping 
+persistent flag). And, after source resume, we have one of the following 
+situations:
+
+1. disk was not changed during migration, so, all is ok and we have bitmaps
+2. disk was changed. bitmaps are inconsistent. But not only bitmaps, the 
+whole vm state is inconsistent with it's disk. This case is a bug in 
+management layer and it should never happen. And possibly, we need some 
+separate way, to catch such cases.
+
+-- 
+Best regards,
+Vladimir
