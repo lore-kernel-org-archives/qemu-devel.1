@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41827)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41902)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fIyjZ-0004GY-Gf
-	for qemu-devel@nongnu.org; Wed, 16 May 2018 11:53:00 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1fIyjg-0004QK-GJ
+	for qemu-devel@nongnu.org; Wed, 16 May 2018 11:53:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fIyjY-00051x-Lt
-	for qemu-devel@nongnu.org; Wed, 16 May 2018 11:52:57 -0400
-Received: from mail-pl0-x22f.google.com ([2607:f8b0:400e:c01::22f]:46633)
+	(envelope-from <richard.henderson@linaro.org>) id 1fIyjf-000543-Fq
+	for qemu-devel@nongnu.org; Wed, 16 May 2018 11:53:04 -0400
+Received: from mail-pl0-x242.google.com ([2607:f8b0:400e:c01::242]:39364)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1fIyjY-00051g-GQ
-	for qemu-devel@nongnu.org; Wed, 16 May 2018 11:52:56 -0400
-Received: by mail-pl0-x22f.google.com with SMTP id 30-v6so658864pld.13
-	for <qemu-devel@nongnu.org>; Wed, 16 May 2018 08:52:56 -0700 (PDT)
+	id 1fIyjf-00053u-9a
+	for qemu-devel@nongnu.org; Wed, 16 May 2018 11:53:03 -0400
+Received: by mail-pl0-x242.google.com with SMTP id c19-v6so668338pls.6
+	for <qemu-devel@nongnu.org>; Wed, 16 May 2018 08:53:03 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Wed, 16 May 2018 08:52:21 -0700
-Message-Id: <20180516155243.16937-7-richard.henderson@linaro.org>
+Date: Wed, 16 May 2018 08:52:26 -0700
+Message-Id: <20180516155243.16937-12-richard.henderson@linaro.org>
 In-Reply-To: <20180516155243.16937-1-richard.henderson@linaro.org>
 References: <20180516155243.16937-1-richard.henderson@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 06/28] fpu/softfloat: Introduce
- parts_is_snan_frac
+Subject: [Qemu-devel] [PULL 11/28] fpu/softfloat: Partial support for ARM
+ Alternative half-precision
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,65 +31,89 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org
+Cc: peter.maydell@linaro.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 
-Tested-by: Alex Bennée <alex.bennee@linaro.org>
-Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
+From: Alex Bennée <alex.bennee@linaro.org>
+
+For float16 ARM supports an alternative half-precision format which
+sacrifices the ability to represent NaN/Inf in return for a higher
+dynamic range.  The new FloatFmt flag, arm_althp, is then used to
+modify the behaviour of canonicalize and round_canonical with respect
+to representation and exception raising.
+
+Usage of this new flag waits until we re-factor float-to-float conversions.
+
 Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- fpu/softfloat-specialize.h | 15 +++++++++++++++
- fpu/softfloat.c            | 12 ++----------
- 2 files changed, 17 insertions(+), 10 deletions(-)
+ fpu/softfloat.c | 19 ++++++++++++++++---
+ 1 file changed, 16 insertions(+), 3 deletions(-)
 
-diff --git a/fpu/softfloat-specialize.h b/fpu/softfloat-specialize.h
-index 4fc9ea4ac0..515cb12cfa 100644
---- a/fpu/softfloat-specialize.h
-+++ b/fpu/softfloat-specialize.h
-@@ -86,6 +86,21 @@ this code that are retained.
- #define NO_SIGNALING_NANS 1
- #endif
- 
-+/*----------------------------------------------------------------------------
-+| For the deconstructed floating-point with fraction FRAC, return true
-+| if the fraction represents a signalling NaN; otherwise false.
-+*----------------------------------------------------------------------------*/
-+
-+static bool parts_is_snan_frac(uint64_t frac, float_status *status)
-+{
-+#ifdef NO_SIGNALING_NANS
-+    return false;
-+#else
-+    flag msb = extract64(frac, DECOMPOSED_BINARY_POINT - 1, 1);
-+    return msb == status->snan_bit_is_one;
-+#endif
-+}
-+
- /*----------------------------------------------------------------------------
- | The pattern for a default generated half-precision NaN.
- *----------------------------------------------------------------------------*/
 diff --git a/fpu/softfloat.c b/fpu/softfloat.c
-index 607c4a78d5..19f40d6932 100644
+index 41253c6749..64e1ad4f98 100644
 --- a/fpu/softfloat.c
 +++ b/fpu/softfloat.c
-@@ -331,16 +331,8 @@ static FloatParts canonicalize(FloatParts part, const FloatFmt *parm,
+@@ -220,8 +220,10 @@ typedef struct {
+  *   frac_shift: shift to normalise the fraction with DECOMPOSED_BINARY_POINT
+  * The following are computed based the size of fraction
+  *   frac_lsb: least significant bit of fraction
+- *   fram_lsbm1: the bit bellow the least significant bit (for rounding)
++ *   frac_lsbm1: the bit below the least significant bit (for rounding)
+  *   round_mask/roundeven_mask: masks used for rounding
++ * The following optional modifiers are available:
++ *   arm_althp: handle ARM Alternative Half Precision
+  */
+ typedef struct {
+     int exp_size;
+@@ -233,6 +235,7 @@ typedef struct {
+     uint64_t frac_lsbm1;
+     uint64_t round_mask;
+     uint64_t roundeven_mask;
++    bool arm_althp;
+ } FloatFmt;
+ 
+ /* Expand fields based on the size of exponent and fraction */
+@@ -324,7 +327,7 @@ static inline float64 float64_pack_raw(FloatParts p)
+ static FloatParts canonicalize(FloatParts part, const FloatFmt *parm,
+                                float_status *status)
+ {
+-    if (part.exp == parm->exp_max) {
++    if (part.exp == parm->exp_max && !parm->arm_althp) {
+         if (part.frac == 0) {
              part.cls = float_class_inf;
          } else {
-             part.frac <<= parm->frac_shift;
--#ifdef NO_SIGNALING_NANS
--            part.cls = float_class_qnan;
--#else
--            int64_t msb = part.frac << 2;
--            if ((msb < 0) == status->snan_bit_is_one) {
--                part.cls = float_class_snan;
--            } else {
--                part.cls = float_class_qnan;
--            }
--#endif
-+            part.cls = (parts_is_snan_frac(part.frac, status)
-+                        ? float_class_snan : float_class_qnan);
-         }
-     } else if (part.exp == 0) {
-         if (likely(part.frac == 0)) {
+@@ -413,7 +416,15 @@ static FloatParts round_canonical(FloatParts p, float_status *s,
+             }
+             frac >>= frac_shift;
+ 
+-            if (unlikely(exp >= exp_max)) {
++            if (parm->arm_althp) {
++                /* ARM Alt HP eschews Inf and NaN for a wider exponent.  */
++                if (unlikely(exp > exp_max)) {
++                    /* Overflow.  Return the maximum normal.  */
++                    flags = float_flag_invalid;
++                    exp = exp_max;
++                    frac = -1;
++                }
++            } else if (unlikely(exp >= exp_max)) {
+                 flags |= float_flag_overflow | float_flag_inexact;
+                 if (overflow_norm) {
+                     exp = exp_max - 1;
+@@ -464,12 +475,14 @@ static FloatParts round_canonical(FloatParts p, float_status *s,
+ 
+     case float_class_inf:
+     do_inf:
++        assert(!parm->arm_althp);
+         exp = exp_max;
+         frac = 0;
+         break;
+ 
+     case float_class_qnan:
+     case float_class_snan:
++        assert(!parm->arm_althp);
+         exp = exp_max;
+         frac >>= parm->frac_shift;
+         break;
 -- 
 2.17.0
