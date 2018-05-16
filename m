@@ -1,24 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60412)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33181)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1fJ0Ne-0004Mu-DQ
-	for qemu-devel@nongnu.org; Wed, 16 May 2018 13:38:27 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1fJ0R0-0006Li-Tp
+	for qemu-devel@nongnu.org; Wed, 16 May 2018 13:41:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1fJ0Nd-0004qi-Bo
-	for qemu-devel@nongnu.org; Wed, 16 May 2018 13:38:26 -0400
-References: <20180509162637.15575-1-kwolf@redhat.com>
-	<20180509162637.15575-19-kwolf@redhat.com>
-	<c063b982-58ac-e477-991f-07b847edc48a@redhat.com>
-	<20180516165004.GF4435@localhost.localdomain>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <ba186290-2cdf-e581-a21b-ff086c1e0e60@redhat.com>
-Date: Wed, 16 May 2018 13:38:18 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1fJ0Qx-0006Yr-Qt
+	for qemu-devel@nongnu.org; Wed, 16 May 2018 13:41:54 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:54238)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1fJ0Qx-0006YS-KZ
+	for qemu-devel@nongnu.org; Wed, 16 May 2018 13:41:51 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id B431719D23E
+	for <qemu-devel@nongnu.org>; Wed, 16 May 2018 17:41:50 +0000 (UTC)
+Date: Wed, 16 May 2018 14:41:46 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20180516174146.GO25013@localhost.localdomain>
+References: <1526483174-169008-1-git-send-email-imammedo@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20180516165004.GF4435@localhost.localdomain>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 18/42] job: Move coroutine and related code
- to Job
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1526483174-169008-1-git-send-email-imammedo@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v4] numa: clarify error message when node
+ index is out of range in -numa dist, ...
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,60 +33,24 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, jcody@redhat.com, armbru@redhat.com, mreitz@redhat.com
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: qemu-devel@nongnu.org, armbru@redhat.com, eblake@redhat.com
 
-
-
-On 05/16/2018 12:50 PM, Kevin Wolf wrote:
-> Am 15.05.2018 um 01:02 hat John Snow geschrieben:
->>
->>
->> On 05/09/2018 12:26 PM, Kevin Wolf wrote:
->>> This commit moves some core functions for dealing with the job coroutine
->>> from BlockJob to Job. This includes primarily entering the coroutine
->>> (both for the first and reentering) and yielding explicitly and at pause
->>> points.
->>>
->>> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
->>> ---
->>>  include/block/blockjob.h     |  40 ---------
->>>  include/block/blockjob_int.h |  26 ------
->>>  include/qemu/job.h           |  76 ++++++++++++++++
->>>  block/backup.c               |   2 +-
->>>  block/commit.c               |   4 +-
->>>  block/mirror.c               |  22 ++---
->>>  block/replication.c          |   2 +-
->>>  block/stream.c               |   4 +-
->>>  blockdev.c                   |   8 +-
->>>  blockjob.c                   | 201 +++++++------------------------------------
->>>  job.c                        | 137 +++++++++++++++++++++++++++++
->>>  tests/test-bdrv-drain.c      |  38 ++++----
->>>  tests/test-blockjob-txn.c    |  12 +--
->>>  tests/test-blockjob.c        |  14 +--
->>>  14 files changed, 296 insertions(+), 290 deletions(-)
->>>
->>
->> [...]
->>
->>>  
->>>  /* Assumes the block_job_mutex is held */
->>> -static bool block_job_timer_pending(BlockJob *job)
->>> +static bool job_timer_pending(Job *job)
->>
->> Is this intentionally left behind in blockjob.c, even once you've
->> changed the name (and moved the state to job.c?)
+On Wed, May 16, 2018 at 05:06:14PM +0200, Igor Mammedov wrote:
+> When using following CLI:
+>   -numa dist,src=128,dst=1,val=20
+> user gets a rather confusing error message:
+>    "Invalid node 128, max possible could be 128"
 > 
-> Yes, it's just a small callback that is structually part of
-> block_job_set_speed(). Maybe I shouldn't rename it, but it does get a
-> Job rather than a BlockJob now, so I'm not sure.
+> Where 128 is number of nodes that QEMU supports (MAX_NODES),
+> while src/dst is an index up to that limit, so it should be
+> MAX_NODES - 1 in error message.
+> Make error message to explicitly state valid range for node
+> index to be more clear.
 > 
-> Kevin
-> 
+> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
 
-Your choice; it's not clear to me yet which things truly belong in which
-file because I haven't had a chance to look at the finished result. I'm
-sure if it looks like it needs to move later that someone will
-eventually move it.
+Queued, thanks.
 
---js
+-- 
+Eduardo
