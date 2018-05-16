@@ -1,28 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57218)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57451)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jemmy858585@gmail.com>) id 1fIsqq-0001gX-R6
-	for qemu-devel@nongnu.org; Wed, 16 May 2018 05:36:05 -0400
+	(envelope-from <david@redhat.com>) id 1fIsrI-00024Y-S2
+	for qemu-devel@nongnu.org; Wed, 16 May 2018 05:36:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jemmy858585@gmail.com>) id 1fIsqp-0004CD-GW
-	for qemu-devel@nongnu.org; Wed, 16 May 2018 05:36:04 -0400
-Received: from mail-it0-x244.google.com ([2607:f8b0:4001:c0b::244]:36599)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <jemmy858585@gmail.com>)
-	id 1fIsqp-0004Bi-CC
-	for qemu-devel@nongnu.org; Wed, 16 May 2018 05:36:03 -0400
-Received: by mail-it0-x244.google.com with SMTP id e20-v6so179127itc.1
-	for <qemu-devel@nongnu.org>; Wed, 16 May 2018 02:36:03 -0700 (PDT)
+	(envelope-from <david@redhat.com>) id 1fIsrF-0004PY-Mh
+	for qemu-devel@nongnu.org; Wed, 16 May 2018 05:36:32 -0400
+References: <1525774672-11913-1-git-send-email-thuth@redhat.com>
+From: David Hildenbrand <david@redhat.com>
+Message-ID: <6884ca18-75ed-d386-c63c-03db269fffd6@redhat.com>
+Date: Wed, 16 May 2018 11:36:27 +0200
 MIME-Version: 1.0
-In-Reply-To: <379b3f13-f53f-966b-ccbf-66517d45aa9d@redhat.com>
-References: <1525530936-21835-1-git-send-email-lidongchen@tencent.com>
-	<1525530936-21835-6-git-send-email-lidongchen@tencent.com>
-	<379b3f13-f53f-966b-ccbf-66517d45aa9d@redhat.com>
-From: 858585 jemmy <jemmy858585@gmail.com>
-Date: Wed, 16 May 2018 17:36:02 +0800
-Message-ID: <CAOGPPbeVvm5OM+oNpYfYiAsNTK7bn7eFDgzyMuvm8YymM2sq_w@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v3 5/6] migration: implement bi-directional
- RDMA QIOChannel
+In-Reply-To: <1525774672-11913-1-git-send-email-thuth@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH] pc-bios/s390-ccw: struct
+ tpi_info must be declared as aligned(4)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,70 +24,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Juan Quintela <quintela@redhat.com>, Dave Gilbert <dgilbert@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>, adido@mellanox.com, Gal Shachaf <galsha@mellanox.com>, Aviad Yehezkel <aviadye@mellanox.com>, qemu-devel <qemu-devel@nongnu.org>, Lidong Chen <lidongchen@tencent.com>
+To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, Cornelia Huck <cohuck@redhat.com>
+Cc: Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org
 
-On Tue, May 15, 2018 at 10:54 PM, Paolo Bonzini <pbonzini@redhat.com> wrote:
-> On 05/05/2018 16:35, Lidong Chen wrote:
->> @@ -2635,12 +2637,20 @@ static ssize_t qio_channel_rdma_writev(QIOChannel *ioc,
->>  {
->>      QIOChannelRDMA *rioc = QIO_CHANNEL_RDMA(ioc);
->>      QEMUFile *f = rioc->file;
->> -    RDMAContext *rdma = rioc->rdma;
->> +    RDMAContext *rdma;
->>      int ret;
->>      ssize_t done = 0;
->>      size_t i;
->>      size_t len = 0;
->>
->> +    rcu_read_lock();
->> +    rdma = atomic_rcu_read(&rioc->rdmaout);
->> +
->> +    if (!rdma) {
->> +        rcu_read_unlock();
->> +        return -EIO;
->> +    }
->> +
->>      CHECK_ERROR_STATE();
->>
->>      /*
->
-> I am not sure I understand this.  It would probably be wrong to use the
-> output side from two threads at the same time, so why not use two mutexes?
+On 08.05.2018 12:17, Thomas Huth wrote:
+> I've run into a compilation error today with the current version of GCC 8:
+> 
+> In file included from s390-ccw.h:49,
+>                  from main.c:12:
+> cio.h:128:1: error: alignment 1 of 'struct tpi_info' is less than 4 [-Werror=packed-not-aligned]
+>  } __attribute__ ((packed));
+>  ^
+> cc1: all warnings being treated as errors
+> 
+> Since the struct tpi_info contains an element ("struct subchannel_id schid")
+> which is marked as aligned(4), we've got to mark the struct tpi_info as
+> aligned(4), too.
+> 
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> ---
+>  pc-bios/s390-ccw/cio.h | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/pc-bios/s390-ccw/cio.h b/pc-bios/s390-ccw/cio.h
+> index 55eaeee..1a0795f 100644
+> --- a/pc-bios/s390-ccw/cio.h
+> +++ b/pc-bios/s390-ccw/cio.h
+> @@ -125,7 +125,7 @@ struct tpi_info {
+>      __u32 reserved3  : 12;
+>      __u32 int_type   : 3;
+>      __u32 reserved4  : 12;
+> -} __attribute__ ((packed));
+> +} __attribute__ ((packed, aligned(4)));
+>  
+>  /* channel command word (type 1) */
+>  struct ccw1 {
+> 
 
-Two thread will not invoke qio_channel_rdma_writev at the same time.
-The source qemu, migration thread only use writev, and the return path
-thread only
-use readv.
-The destination qemu already have a mutex mis->rp_mutex to make sure
-not use writev
-at the same time.
+Late but still
+Reviewed-by: David Hildenbrand <david@redhat.com>
 
-The rcu_read_lock is used to protect not use RDMAContext when another
-thread closes it.
+-- 
 
->
-> Also, who is calling qio_channel_rdma_close in such a way that another
-> thread is still using it?  Would it be possible to synchronize with the
-> other thread *before*, for example with qemu_thread_join?
+Thanks,
 
-The MigrationState structure includes to_dst_file and from_dst_file
-QEMUFile, the two QEMUFile use the same QIOChannel.
-For example, if the return path thread call
-qemu_fclose(ms->rp_state.from_dst_file),
-It will also close the RDMAContext for ms->to_dst_file.
-
-For live migration, the source qemu invokes qemu_fclose in different
-threads include main thread, migration thread, return path thread.
-
-The destination qemu invokes qemu_fclose in main thread, listen thread and
-COLO incoming thread.
-
-I do not find an effective way to synchronize these threads.
-
-Thanks.
-
->
-> Thanks,
->
-> Paolo
+David / dhildenb
