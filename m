@@ -1,29 +1,44 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33934)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47618)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fIzDD-00045g-J5
-	for qemu-devel@nongnu.org; Wed, 16 May 2018 12:23:36 -0400
+	(envelope-from <pasic@linux.ibm.com>) id 1fIzVI-0001qj-Gj
+	for qemu-devel@nongnu.org; Wed, 16 May 2018 12:42:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fIzDC-00056r-Tk
-	for qemu-devel@nongnu.org; Wed, 16 May 2018 12:23:35 -0400
-Received: from mail-oi0-x243.google.com ([2607:f8b0:4003:c06::243]:33405)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fIzDC-00056Z-OI
-	for qemu-devel@nongnu.org; Wed, 16 May 2018 12:23:34 -0400
-Received: by mail-oi0-x243.google.com with SMTP id k5-v6so1275542oiw.0
-	for <qemu-devel@nongnu.org>; Wed, 16 May 2018 09:23:34 -0700 (PDT)
+	(envelope-from <pasic@linux.ibm.com>) id 1fIzVD-0007Yh-TS
+	for qemu-devel@nongnu.org; Wed, 16 May 2018 12:42:16 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:55990)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pasic@linux.ibm.com>) id 1fIzVD-0007YP-LR
+	for qemu-devel@nongnu.org; Wed, 16 May 2018 12:42:11 -0400
+Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w4GGd9Jn089271
+	for <qemu-devel@nongnu.org>; Wed, 16 May 2018 12:42:10 -0400
+Received: from e06smtp13.uk.ibm.com (e06smtp13.uk.ibm.com [195.75.94.109])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2j0pny5d41-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Wed, 16 May 2018 12:42:09 -0400
+Received: from localhost
+	by e06smtp13.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <pasic@linux.ibm.com>;
+	Wed, 16 May 2018 17:42:07 +0100
+References: <20180510000712.6472-1-pasic@linux.ibm.com>
+	<20180510000712.6472-2-pasic@linux.ibm.com>
+	<20180514141808.78efe5c0.cohuck@redhat.com>
+	<ea3c977e-de5c-ed68-fc8d-448efca1d463@linux.ibm.com>
+	<20180514154515.056b605f.cohuck@redhat.com>
+	<2b5d39df-ae97-5fe3-7a1a-658eff5db038@linux.ibm.com>
+	<20180514180409.5eed7d79.cohuck@redhat.com>
+From: Halil Pasic <pasic@linux.ibm.com>
+Date: Wed, 16 May 2018 18:42:01 +0200
 MIME-Version: 1.0
-In-Reply-To: <2c55370d-fa43-12a1-5baf-ec7cf824c0dc@amsat.org>
-References: <1526493784-25328-1-git-send-email-eric.auger@redhat.com>
-	<1526493784-25328-3-git-send-email-eric.auger@redhat.com>
-	<2c55370d-fa43-12a1-5baf-ec7cf824c0dc@amsat.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Wed, 16 May 2018 16:23:13 +0000
-Message-ID: <CAFEAcA-GxScM9StKESYAqJ2sbiSH+hWjJXvF7COjJPojs5J5QQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH 2/2] hw/arm/smmu-common: Fix
- coverity issue in get_block_pte_address
+In-Reply-To: <20180514180409.5eed7d79.cohuck@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Message-Id: <a5e60306-891d-5d9b-5ae2-0b10224aea93@linux.ibm.com>
+Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH 1/2] vfio-ccw: add force
+ unlimited prefetch property
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,52 +47,108 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
-Cc: Eric Auger <eric.auger@redhat.com>, Eric Auger <eric.auger.pro@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>
+To: Cornelia Huck <cohuck@redhat.com>
+Cc: Dong Jia Shi <bjsdjshi@linux.ibm.com>, "Jason J. Herne" <jjherne@linux.ibm.com>, qemu-s390x@nongnu.org, qemu-devel@nongnu.org, Pierre Morel <pmorel@linux.ibm.com>
 
-On 16 May 2018 at 16:16, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> wrot=
-e:
-> Hi Eric,
->
-> On 05/16/2018 03:03 PM, Eric Auger wrote:
->> Coverity points out that this can overflow if n > 31,
->> because it's only doing 32-bit arithmetic. Let's use 1ULL instead
->> of 1. Also the formulae used to compute n can be replaced by
->> the level_shift() macro.
->
-> This level_shift() replacement doesn't seems that obvious to me, can you
-> split it in another patch?
->
+
+
+On 05/14/2018 06:04 PM, Cornelia Huck wrote:
+> On Mon, 14 May 2018 16:22:30 +0200
+> Halil Pasic <pasic@linux.ibm.com> wrote:
+> 
+>> On 05/14/2018 03:45 PM, Cornelia Huck wrote:
+>>> On Mon, 14 May 2018 14:40:13 +0200
+>>> Halil Pasic <pasic@linux.ibm.com> wrote:
+>>>    
+>>>> On 05/14/2018 02:18 PM, Cornelia Huck wrote:
+>>>>> On Thu, 10 May 2018 02:07:11 +0200
+>>>>> Halil Pasic <pasic@linux.ibm.com> wrote:
+
+[..]
+
+>>>>>> +    bool f_upfch;
+>>>>>
+>>>>> force_unlimited_prefetch? You only use it that often :)
+>>>>>       
+>>>>
+>>>> I would have expected complaints for the property name in the
+>>>> first place. I think we should first find a good name for the
+>>>> property and then consider the rest.
+>>>
+>>> What about 'force_pfch' (at least matches the name of the bit in the
+>>> code)?
+>>>    
 >>
->> Reported-by: Peter Maydell <peter.maydell@linaro.org>
->> Signed-off-by: Eric Auger <eric.auger@redhat.com>
->> ---
->>  hw/arm/smmu-common.c | 4 ++--
->>  1 file changed, 2 insertions(+), 2 deletions(-)
+>> I like upfch more as it really not about forcing any prefetch, but
+>> allowing *unlimited* prefetch for the channel program.
+> 
+> 'always_allow_prefetch', then? The problem is that we force a flag to
+> be set, which does not force but allow something. Hard to express in a
+> short property name :(
+> 
+> Any other suggestions?
+> 
+
+How about force-orb-pfch or force-orb-pbit (PoP name) for the property
+and with underscores for the variable. My idea was (starting from your
+force_pfch) to spell out that we are fiddling with that orb bit.
+
+Can I/do I have to document the property somewhere? Telling the whole
+story with the name is going to be difficult.
+
 >>
->> diff --git a/hw/arm/smmu-common.c b/hw/arm/smmu-common.c
->> index 01c7be8..3c5f724 100644
->> --- a/hw/arm/smmu-common.c
->> +++ b/hw/arm/smmu-common.c
->> @@ -83,9 +83,9 @@ static inline hwaddr get_table_pte_address(uint64_t pt=
-e, int granule_sz)
->>  static inline hwaddr get_block_pte_address(uint64_t pte, int level,
->>                                             int granule_sz, uint64_t *bs=
-z)
->>  {
->> -    int n =3D (granule_sz - 3) * (4 - level) + 3;
->> +    int n =3D level_shift(level, granule_sz);
->
-> Shouldn't this be level_shift(level + 1, granule_sz)?
+>>>>   
+>>>>>>     } VFIOCCWDevice;
+> 
+>>>>>> @@ -429,6 +441,7 @@ static void vfio_ccw_unrealize(DeviceState *dev, Error **errp)
+>>>>>>     
+>>>>>>     static Property vfio_ccw_properties[] = {
+>>>>>>         DEFINE_PROP_STRING("sysfsdev", VFIOCCWDevice, vdev.sysfsdev),
+>>>>>> +    DEFINE_PROP_BOOL("f-upfch", VFIOCCWDevice, f_upfch, false),
+>>>>>
 
-No. The two expressions are equivalent, they're
-just arranged differently:
+[..]
 
-   level_shift(lvl, gsz)
-      =3D=3D gsz + (3 - lvl) * (gsz - 3)
-      =3D=3D gsz + (4 - lvl) * (gsz - 3) - (gsz - 3)
-      =3D=3D gsz - gsz + (4 - lvl) * (gsz - 3) + 3
-      =3D=3D (gsz - 3) * (4 - lvl) + 3
+>>>
+>>> Another thought: Should there be a warning logged somewhere if we
+>>> actually force pfch (i.e., not just set the property)?
+>>>    
+>>
+>> I don't think so. With libvirt the cmd line gets logged. So we can
+>> tell if the machine was running with this forced or not. This knob
+>> is really (an opt-in) for expert users only.
+> 
+> But there's a difference between 'we set this one preemptively' and 'we
+> set it, and the guest actually did a request with pfch off'.
+> 
 
-thanks
--- PMM
+I expect the admin to set it *only* after seeing SSCHs fail with
+the 'vfio-ccw requires PFCH flag set' message. So no preemptive usage
+is expected, but...
+
+>>
+>> Furthermore a warning about this may not be very constructive,
+>> as there is not much that can be done to make the warning go away.
+>> IMHO getting used to warnings is not a good thing.
+>>
+>> Or am I missing a reason for issuing a warning?
+> 
+> Just log this once so that the admin sees 'yes, the guest actually did
+> a request with pfch off, so if funny things happened, that might be the
+> reason'. Of course, if this is only an edge use case, that would be
+> overkill.
+> 
+
+... if the admin (actually more likely developer/tester) is mistaken
+about the guest, and it does require the guarantees, but things don't blow
+up right away, this message, together with the timestamp could help
+determine why things turned funny.
+
+So I do see the benefit now. But then I wonder if it should be a
+WARN_ONCE type thing, or if we shall issue a warning each time the override
+happens. (Considering the laid out expected benefit, if the first request
+is OK but some subsequent one is not OK (needs the conservative prefetch
+behavior) we don't gain much).
+
+Regards,
+Halil
