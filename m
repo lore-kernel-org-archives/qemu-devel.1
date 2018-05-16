@@ -1,30 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36656)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37609)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aik@ozlabs.ru>) id 1fImg6-00044Y-T9
-	for qemu-devel@nongnu.org; Tue, 15 May 2018 23:00:38 -0400
+	(envelope-from <peterx@redhat.com>) id 1fImnH-0005yg-9d
+	for qemu-devel@nongnu.org; Tue, 15 May 2018 23:08:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aik@ozlabs.ru>) id 1fImg3-0003g2-QX
-	for qemu-devel@nongnu.org; Tue, 15 May 2018 23:00:34 -0400
-Received: from mail-pf0-x241.google.com ([2607:f8b0:400e:c00::241]:37624)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <aik@ozlabs.ru>) id 1fImg3-0003fT-D4
-	for qemu-devel@nongnu.org; Tue, 15 May 2018 23:00:31 -0400
-Received: by mail-pf0-x241.google.com with SMTP id e9-v6so1036489pfi.4
-	for <qemu-devel@nongnu.org>; Tue, 15 May 2018 20:00:30 -0700 (PDT)
-References: <20180313044944.21058-1-aik@ozlabs.ru>
-	<20180313074442.xw5deum6xfw5tvjw@var.youpi.perso.aquilenet.fr>
-	<87d13bdd-4a33-fb05-0c7c-36aabbd3d038@ozlabs.ru>
-	<ad86c974-120e-4a2d-1db9-03d1b8ace247@redhat.com>
-From: Alexey Kardashevskiy <aik@ozlabs.ru>
-Message-ID: <7ee1ea56-6081-e1f8-7da9-92776060e218@ozlabs.ru>
-Date: Wed, 16 May 2018 13:00:24 +1000
+	(envelope-from <peterx@redhat.com>) id 1fImnE-0007WK-3w
+	for qemu-devel@nongnu.org; Tue, 15 May 2018 23:07:59 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:49080 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1fImnD-0007Vy-Vi
+	for qemu-devel@nongnu.org; Tue, 15 May 2018 23:07:56 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.4])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 67D097C6B1
+	for <qemu-devel@nongnu.org>; Wed, 16 May 2018 03:07:55 +0000 (UTC)
+Date: Wed, 16 May 2018 11:07:50 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20180516030750.GC9089@xz-mi>
+References: <20180515091356.24106-1-peterx@redhat.com>
+	<584bbd99-11dd-8da9-a5b4-de285cebc84d@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <ad86c974-120e-4a2d-1db9-03d1b8ace247@redhat.com>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH qemu v2] slirp/debug: Print IP addresses in
- human readable form
+Content-Disposition: inline
+In-Reply-To: <584bbd99-11dd-8da9-a5b4-de285cebc84d@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH RFC] qemu-error: introduce error_report_once
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,53 +33,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, Samuel Thibault <samuel.thibault@gnu.org>
-Cc: qemu-devel@nongnu.org
+To: Eric Blake <eblake@redhat.com>
+Cc: qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>
 
-On 16/5/18 12:30 am, Eric Blake wrote:
-> On 05/14/2018 02:00 AM, Alexey Kardashevskiy wrote:
->> On 13/3/18 6:44 pm, Samuel Thibault wrote:
->>> Alexey Kardashevskiy, on mar. 13 mars 2018 15:49:44 +1100, wrote:
->>>> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
->>>
->>> Applied to my tree, thanks!
->>
->>
->> And what is your tree, is this something to be merged sometime later
->> somewhere? :)
+On Tue, May 15, 2018 at 10:29:39AM -0500, Eric Blake wrote:
+> On 05/15/2018 04:13 AM, Peter Xu wrote:
+> > I stole the printk_once() macro.
+> > 
+> > I always wanted to be able to print some error directly if there is a
+> > buffer to dump, however we can't use error_report() really quite often
+> > when there can be any DDOS attack.  To avoid that, we can introduce a
+> > print-once function for it.
+> > 
+> > CC: Markus Armbruster <armbru@redhat.com>
+> > Signed-off-by: Peter Xu <peterx@redhat.com>
+> > ---
+> > We can for sure introduce similar functions for the rest of the
+> > error_*() functions, it's just an idea to see whether we'd like it
+> > in general.
+> > ---
+> >   include/qemu/error-report.h | 12 ++++++++++++
+> >   1 file changed, 12 insertions(+)
+> > 
+> > diff --git a/include/qemu/error-report.h b/include/qemu/error-report.h
+> > index e1c8ae1a52..efebb80e2c 100644
+> > --- a/include/qemu/error-report.h
+> > +++ b/include/qemu/error-report.h
+> > @@ -44,6 +44,18 @@ void error_report(const char *fmt, ...) GCC_FMT_ATTR(1, 2);
+> >   void warn_report(const char *fmt, ...) GCC_FMT_ATTR(1, 2);
+> >   void info_report(const char *fmt, ...) GCC_FMT_ATTR(1, 2);
+> > +#define error_report_once(fmt, ...)             \
+> > +    ({                                          \
+> > +        static bool __print_once;               \
 > 
-> Per MAINTAINERS:
+> Double-underscore names are reserved for the compiler's use, not ours.
+> Better would be naming this:
 > 
-> SLIRP
-> M: Samuel Thibault <samuel.thibault@ens-lyon.org>
-> M: Jan Kiszka <jan.kiszka@siemens.com>
-> S: Maintained
-> F: slirp/
-> F: net/slirp.c
-> F: include/net/slirp.h
-> T: git git://git.kiszka.org/qemu.git queues/slirp
+> static bool print_once_;
 > 
-> which shows Jan's staging tree, but not Samuel's.
+> with a trailing underscore, or at most a single leading underscore.
 > 
-> It's not a requirement for a maintainer to have a public-facing staging
-> tree, but many of them do, as it gives you a chance to test that what will
-> later be in a pull request matches what you expect.
+> > +        bool __ret_print_once = !__print_once;  \
 > 
-> At any rate,
-> https://wiki.qemu.org/Contribute/SubmitAPatch#Is_my_patch_in.3F mentions
-> that maintainers will batch together various related patches and send a
-> pull request for inclusion in the main repository, thus even when a patch
-> has been reviewed and staged, it may be another week or two before it lands
-> in mainline.  Yes, it can feel slow, but in general it works out for the
-> best (as we have more chances to flag potential problems before they affect
-> everyone by being in mainline).
+> Same comment for this variable.
 
+Sure!
 
-If it was 2 weeks or even 6 - I would not bother but when it is 2 months,
-chances are it is forgotten/lost somewhere, hence my ping. I am not
-complaining at all, just pinging :)
+(I am wondering why Linux is always using that way to name lots of
+ variables, and I'm surprised that I got 385350 after I run this under
+ the Linux repo: 'git grep "__[a-z][a-z]" | wc -l', even considering
+ some false positives)
 
-
+Thanks,
 
 -- 
-Alexey
+Peter Xu
