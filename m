@@ -1,21 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59934)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33472)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1fIt28-0006WH-UD
-	for qemu-devel@nongnu.org; Wed, 16 May 2018 05:47:46 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1fIt86-0008DX-Bv
+	for qemu-devel@nongnu.org; Wed, 16 May 2018 05:53:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1fIt27-0000wX-BZ
-	for qemu-devel@nongnu.org; Wed, 16 May 2018 05:47:44 -0400
-Date: Wed, 16 May 2018 10:47:31 +0100
+	(envelope-from <dgilbert@redhat.com>) id 1fIt82-0003AR-5w
+	for qemu-devel@nongnu.org; Wed, 16 May 2018 05:53:54 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:49988 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1fIt81-0003AE-Vu
+	for qemu-devel@nongnu.org; Wed, 16 May 2018 05:53:50 -0400
+Date: Wed, 16 May 2018 10:53:45 +0100
 From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20180516094731.GA2741@work-vm>
-References: <42ec7519-653d-09e2-abc6-78f04733ca47@linux.ibm.com>
+Message-ID: <20180516095344.GB2531@work-vm>
+References: <1525618499-1560-1-git-send-email-lidongchen@tencent.com>
+	<1525618499-1560-2-git-send-email-lidongchen@tencent.com>
+	<20180508184035.GT2500@work-vm>
+	<CAOGPPbdy+198Nxd=ttOtm+mNy7_u4iJxYVhLqYyeK1JJytuZEQ@mail.gmail.com>
+	<20180511180335.GH2720@work-vm>
+	<CAOGPPbdZX9gnp2BcwaizzyLGxN+T3wdSM_6wzVmGAYDgC+zFqQ@mail.gmail.com>
+	<20180514192723.GH2497@work-vm>
+	<CAOGPPbfqiKsfd+qW9ik-NzTox5eQTSpGsKgSi8bULjfesWgQug@mail.gmail.com>
+	<20180516093944.GA2531@work-vm>
+	<CAOGPPbemRCtRTmYaWSfQPTXZkGOX2RqAAb_HcdOCncCZ1d9Jqw@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <42ec7519-653d-09e2-abc6-78f04733ca47@linux.ibm.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] Problem with data miscompare using scsi-hd,
- cache=none and io=threads
+In-Reply-To: <CAOGPPbemRCtRTmYaWSfQPTXZkGOX2RqAAb_HcdOCncCZ1d9Jqw@mail.gmail.com>
+Subject: Re: [Qemu-devel] [PATCH 2/2] migration: not wait
+ RDMA_CM_EVENT_DISCONNECTED event after rdma_disconnect
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,168 +36,316 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Daniel Henrique Barboza <danielhb@linux.ibm.com>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Fam Zheng <famz@redhat.com>
+To: 858585 jemmy <jemmy858585@gmail.com>
+Cc: Aviad Yehezkel <aviadye@mellanox.com>, Juan Quintela <quintela@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, Gal Shachaf <galsha@mellanox.com>, adido@mellanox.com, Lidong Chen <lidongchen@tencent.com>
 
-* Daniel Henrique Barboza (danielhb@linux.ibm.com) wrote:
-> Hi,
->=20
-> I've been working in the last two months in a miscompare issue that hap=
-pens
-> when using a raid device and a SATA as scsi-hd (emulated SCSI) with
-> cache=3Dnone and io=3Dthreads during a hardware stress test. I'll summa=
-rize it
-> here as best as I can without creating a great wall of text - Red Hat f=
-olks
-> can check [1] for all the details.
->=20
-> Using the following setup:
->=20
-> - Host is a POWER9 RHEL 7.5-alt: kernel 4.14.0-49.1.1.el7a.ppc64le,
-> qemu-kvm-ma 2.10.0-20.el7 (also reproducible with upstream QEMU)
->=20
-> - Guest is RHEL 7.5-alt using the same kernel as the host, using two st=
-orage
-> disks (a 1.8 Tb raid and a 446Gb SATA drive) as follows:
->=20
-> =A0=A0=A0 <disk type=3D'block' device=3D'disk'>
-> =A0=A0=A0=A0=A0 <driver name=3D'qemu' type=3D'raw' cache=3D'none'/>
-> =A0=A0=A0=A0=A0 <source dev=3D'/dev/disk/by-id/scsi-3600605b000a2c110ff=
-0004053d84a61b'/>
-> =A0=A0=A0=A0=A0 <target dev=3D'sdc' bus=3D'scsi'/>
-> =A0=A0=A0=A0=A0 <alias name=3D'scsi0-0-0-2'/>
-> =A0=A0=A0=A0=A0 <address type=3D'drive' controller=3D'0' bus=3D'0' targ=
-et=3D'0' unit=3D'2'/>
-> =A0=A0=A0 </disk>
->=20
-> Both block devices have WCE off in the host.
->=20
-> With this env, we found problems when running a stress test called HTX =
-[2].
-> At a given time (usually after 24+ hours of test) HTX finds a data
-> miscompare in one of the devices. This is an example:
->=20
-> -------
->=20
-> Device name: /dev/sdb
-> Total blocks: 0x74706daf, Block size: 0x200
-> Rule file name: /usr/lpp/htx/rules/reg/hxestorage/default.hdd
-> Number of Rulefile passes (cycle) completed: 0
-> Stanza running: rule_6, Thread no.: 8
-> Oper performed: wrc, Current seek type: SEQ
-> LBA no. where IO started: 0x94fa
-> Transfer size: 0x8400
->=20
-> Miscompare Summary:
-> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> LBA no. where miscomapre started:=A0=A0=A0=A0 0x94fa
-> LBA no. where miscomapre ended:=A0=A0=A0=A0=A0=A0 0x94ff
-> Miscompare start offset (in bytes):=A0=A0 0x8
-> Miscomapre end offset (in bytes):=A0=A0=A0=A0 0xbff
-> Miscompare size (in bytes):=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 0xbf8
->=20
-> Expected data (at miscomapre offset): 8c9aea5a736462000000000000007275
-> Actual data (at miscomapre offset): 889aea5a736462000000000000007275
+* 858585 jemmy (jemmy858585@gmail.com) wrote:
+> On Wed, May 16, 2018 at 5:39 PM, Dr. David Alan Gilbert
+> <dgilbert@redhat.com> wrote:
+> > * 858585 jemmy (jemmy858585@gmail.com) wrote:
+> >> On Tue, May 15, 2018 at 3:27 AM, Dr. David Alan Gilbert
+> >> <dgilbert@redhat.com> wrote:
+> >> > * 858585 jemmy (jemmy858585@gmail.com) wrote:
+> >> >> On Sat, May 12, 2018 at 2:03 AM, Dr. David Alan Gilbert
+> >> >> <dgilbert@redhat.com> wrote:
+> >> >> > * 858585 jemmy (jemmy858585@gmail.com) wrote:
+> >> >> >> On Wed, May 9, 2018 at 2:40 AM, Dr. David Alan Gilbert
+> >> >> >> <dgilbert@redhat.com> wrote:
+> >> >> >> > * Lidong Chen (jemmy858585@gmail.com) wrote:
+> >> >> >> >> When cancel migration during RDMA precopy, the source qemu main thread hangs sometime.
+> >> >> >> >>
+> >> >> >> >> The backtrace is:
+> >> >> >> >>     (gdb) bt
+> >> >> >> >>     #0  0x00007f249eabd43d in write () from /lib64/libpthread.so.0
+> >> >> >> >>     #1  0x00007f24a1ce98e4 in rdma_get_cm_event (channel=0x4675d10, event=0x7ffe2f643dd0) at src/cma.c:2189
+> >> >> >> >>     #2  0x00000000007b6166 in qemu_rdma_cleanup (rdma=0x6784000) at migration/rdma.c:2296
+> >> >> >> >>     #3  0x00000000007b7cae in qio_channel_rdma_close (ioc=0x3bfcc30, errp=0x0) at migration/rdma.c:2999
+> >> >> >> >>     #4  0x00000000008db60e in qio_channel_close (ioc=0x3bfcc30, errp=0x0) at io/channel.c:273
+> >> >> >> >>     #5  0x00000000007a8765 in channel_close (opaque=0x3bfcc30) at migration/qemu-file-channel.c:98
+> >> >> >> >>     #6  0x00000000007a71f9 in qemu_fclose (f=0x527c000) at migration/qemu-file.c:334
+> >> >> >> >>     #7  0x0000000000795b96 in migrate_fd_cleanup (opaque=0x3b46280) at migration/migration.c:1162
+> >> >> >> >>     #8  0x000000000093a71b in aio_bh_call (bh=0x3db7a20) at util/async.c:90
+> >> >> >> >>     #9  0x000000000093a7b2 in aio_bh_poll (ctx=0x3b121c0) at util/async.c:118
+> >> >> >> >>     #10 0x000000000093f2ad in aio_dispatch (ctx=0x3b121c0) at util/aio-posix.c:436
+> >> >> >> >>     #11 0x000000000093ab41 in aio_ctx_dispatch (source=0x3b121c0, callback=0x0, user_data=0x0)
+> >> >> >> >>         at util/async.c:261
+> >> >> >> >>     #12 0x00007f249f73c7aa in g_main_context_dispatch () from /lib64/libglib-2.0.so.0
+> >> >> >> >>     #13 0x000000000093dc5e in glib_pollfds_poll () at util/main-loop.c:215
+> >> >> >> >>     #14 0x000000000093dd4e in os_host_main_loop_wait (timeout=28000000) at util/main-loop.c:263
+> >> >> >> >>     #15 0x000000000093de05 in main_loop_wait (nonblocking=0) at util/main-loop.c:522
+> >> >> >> >>     #16 0x00000000005bc6a5 in main_loop () at vl.c:1944
+> >> >> >> >>     #17 0x00000000005c39b5 in main (argc=56, argv=0x7ffe2f6443f8, envp=0x3ad0030) at vl.c:4752
+> >> >> >> >>
+> >> >> >> >> It does not get the RDMA_CM_EVENT_DISCONNECTED event after rdma_disconnect sometime.
+> >> >> >> >> I do not find out the root cause why not get RDMA_CM_EVENT_DISCONNECTED event, but
+> >> >> >> >> it can be reproduced if not invoke ibv_dereg_mr to release all ram blocks which fixed
+> >> >> >> >> in previous patch.
+> >> >> >> >
+> >> >> >> > Does this happen without your other changes?
+> >> >> >>
+> >> >> >> Yes, this issue also happen on v2.12.0. base on
+> >> >> >> commit 4743c23509a51bd4ee85cc272287a41917d1be35
+> >> >> >>
+> >> >> >> > Can you give me instructions to repeat it and also say which
+> >> >> >> > cards you wereusing?
+> >> >> >>
+> >> >> >> This issue can be reproduced by start and cancel migration.
+> >> >> >> less than 10 times, this issue will be reproduced.
+> >> >> >>
+> >> >> >> The command line is:
+> >> >> >> virsh migrate --live --copy-storage-all  --undefinesource --persistent
+> >> >> >> --timeout 10800 \
+> >> >> >>  --verbose 83e0049e-1325-4f31-baf9-25231509ada1  \
+> >> >> >> qemu+ssh://9.16.46.142/system rdma://9.16.46.142
+> >> >> >>
+> >> >> >> The net card i use is :
+> >> >> >> 0000:3b:00.0 Ethernet controller: Mellanox Technologies MT27710 Family
+> >> >> >> [ConnectX-4 Lx]
+> >> >> >> 0000:3b:00.1 Ethernet controller: Mellanox Technologies MT27710 Family
+> >> >> >> [ConnectX-4 Lx]
+> >> >> >>
+> >> >> >> This issue is related to ibv_dereg_mr, if not invoke ibv_dereg_mr for
+> >> >> >> all ram block, this issue can be reproduced.
+> >> >> >> If we fixed the bugs and use ibv_dereg_mr to release all ram block,
+> >> >> >> this issue never happens.
+> >> >> >
+> >> >> > Maybe that is the right fix; I can imagine that the RDMA code doesn't
+> >> >> > like closing down if there are still ramblocks registered that
+> >> >> > potentially could have incoming DMA?
+> >> >> >
+> >> >> >> And for the kernel part, there is a bug also cause not release ram
+> >> >> >> block when canceling live migration.
+> >> >> >> https://patchwork.kernel.org/patch/10385781/
+> >> >> >
+> >> >> > OK, that's a pain; which threads are doing the dereg - is some stuff
+> >> >> > in the migration thread and some stuff in the main thread on cleanup?
+> >> >>
+> >> >> Yes, the migration thread invokes ibv_reg_mr, and the main thread bh
+> >> >> will invoke ibv_dereg_mr.
+> >> >
+> >> > OK, although my reading of that discussion is that *should* be allowed
+> >> > (with your fix).
+> >> >
+> >> >> and when the main thread schedule s->cleanup_bh, the migration thread
+> >> >> may have been exited.
+> >> >>
+> >> >> And I find ibv_dereg_mr may take a long time for the big memory size
+> >> >> virtual machine.
+> >> >>
+> >> >> The test result is:
+> >> >>  10GB  326ms
+> >> >>  20GB  699ms
+> >> >>  30GB  1021ms
+> >> >>  40GB  1387ms
+> >> >>  50GB  1712ms
+> >> >>  60GB  2034ms
+> >> >>  70GB  2457ms
+> >> >>  80GB  2807ms
+> >> >>  90GB  3107ms
+> >> >> 100GB 3474ms
+> >> >> 110GB 3735ms
+> >> >> 120GB 4064ms
+> >> >> 130GB 4567ms
+> >> >> 140GB 4886ms
+> >> >>
+> >> >> when canceling migration, the guest os will hang for a while.
+> >> >> so I think we should invoke qemu_fclose(s->to_dst_file)  in
+> >> >> migration_thread, and without hold io thread lock.
+> >> >
+> >> > Be very careful; it's tricky to get it right to handle all the failure
+> >> > cases; that's why it's much easier to clean up right at the end.
+> >> > It might make sense to try and do the deregister in the migration
+> >> > thread but also to just make sure at the end.
+> >>
+> >> Yes, I will make sure at the end of migration thread.
+> >>
+> >> >
+> >> > I wonder why dereg_mr takes so long - I could understand if reg_mr
+> >> > took a long time, but why for dereg, that sounds like the easy side.
+> >>
+> >> I use perf collect the information when ibv_dereg_mr is invoked.
+> >>
+> >> -   9.95%  client2  [kernel.kallsyms]  [k] put_compound_page
+> >>                                                           `
+> >>    - put_compound_page
+> >>       - 98.45% put_page
+> >>            __ib_umem_release
+> >>            ib_umem_release
+> >>            dereg_mr
+> >>            mlx5_ib_dereg_mr
+> >>            ib_dereg_mr
+> >>            uverbs_free_mr
+> >>            remove_commit_idr_uobject
+> >>            _rdma_remove_commit_uobject
+> >>            rdma_remove_commit_uobject
+> >>            ib_uverbs_dereg_mr
+> >>            ib_uverbs_write
+> >>            vfs_write
+> >>            sys_write
+> >>            system_call_fastpath
+> >>            __GI___libc_write
+> >>            0
+> >>       + 1.55% __ib_umem_release
+> >> +   8.31%  client2  [kernel.kallsyms]  [k] compound_unlock_irqrestore
+> >> +   7.01%  client2  [kernel.kallsyms]  [k] page_waitqueue
+> >> +   7.00%  client2  [kernel.kallsyms]  [k] set_page_dirty
+> >> +   6.61%  client2  [kernel.kallsyms]  [k] unlock_page
+> >> +   6.33%  client2  [kernel.kallsyms]  [k] put_page_testzero
+> >> +   5.68%  client2  [kernel.kallsyms]  [k] set_page_dirty_lock
+> >> +   4.30%  client2  [kernel.kallsyms]  [k] __wake_up_bit
+> >> +   4.04%  client2  [kernel.kallsyms]  [k] free_pages_prepare
+> >> +   3.65%  client2  [kernel.kallsyms]  [k] release_pages
+> >> +   3.62%  client2  [kernel.kallsyms]  [k] arch_local_irq_save
+> >> +   3.35%  client2  [kernel.kallsyms]  [k] page_mapping
+> >> +   3.13%  client2  [kernel.kallsyms]  [k] get_pageblock_flags_group
+> >> +   3.09%  client2  [kernel.kallsyms]  [k] put_page
+> >>
+> >> the reason is __ib_umem_release will loop many times for each page.
+> >>
+> >> static void __ib_umem_release(struct ib_device *dev, struct ib_umem
+> >> *umem, int dirty)
+> >> {
+> >>     struct scatterlist *sg;
+> >>     struct page *page;
+> >>     int i;
+> >>
+> >>     if (umem->nmap > 0)
+> >>          ib_dma_unmap_sg(dev, umem->sg_head.sgl,
+> >>                                         umem->npages,
+> >>                                         DMA_BIDIRECTIONAL);
+> >>
+> >>          for_each_sg(umem->sg_head.sgl, sg, umem->npages, i) {      <<
+> >> loop a lot of times for each page.here
+> >
+> > Why 'lot of times for each page'?  I don't know this code at all, but
+> > I'd expected once per page?
+> 
+> sorry, once per page, but a lot of page for a big size virtual machine.
 
-Are all the miscompares single bit errors like that one?
-Is the test doing single bit manipulation or is that coming out of the
-blue?
+Ah OK; so yes it seems best if you can find a way to do the release in
+the migration thread then;  still maybe this is something some
+of the kernel people could look at speeding up?
+
+> >
+> > With your other kernel fix, does the problem of the missing
+> > RDMA_CM_EVENT_DISCONNECTED events go away?
+> 
+> Yes, after kernel and qemu fixed, this issue never happens again.
+
+I'm confused; which qemu fix; my question was whether the kernel fix by
+itself fixed the problem of the missing event.
+
+> Do you think we should remove rdma_get_cm_event after rdma_disconnect?
+
+I don't think so; if 'rdma_disconnect' is supposed to generate the event
+I think we're supposed to wait for it to know that the disconnect is 
+really complete.
 
 Dave
 
-> -----
->=20
->=20
-> This means that the test executed a write at=A0 LBA 0x94fa and, after
-> confirming that the write was completed, issue 2 reads in the same LBA =
-to
-> assert the written contents and found out a mismatch.
->=20
->=20
-> I've tested all sort of configurations between disk vs LUN, cache modes=
- and
-> AIO. My findings are:
->=20
-> - using device=3D'lun' instead of device=3D'disk', I can't reproduce th=
-e issue
-> doesn't matter what other configurations are;
-> - using device=3D'disk' but with cache=3D'writethrough', issue doesn't =
-happen
-> (haven't checked other cache modes);
-> - using device=3D'disk', cache=3D'none' and io=3D'native', issue doesn'=
-t happen.
->=20
->=20
-> The issue seems to be tied with the combination device=3Ddisk + cache=3D=
-none +
-> io=3Dthreads. I've started digging into the SCSI layer all the way down=
- to the
-> block backend. With a shameful amount of logs I've discovered that, in =
-the
-> write that the test finds a miscompare, in block/file-posix.c:
->=20
-> - when doing the write, handle_aiocb_rw_vector() returns success, pwrit=
-ev()
-> reports that all bytes were written
-> - in both reads after the write, handle_aiocb_rw_vector returns success=
-, all
-> bytes read by preadv(). In both reads, the data read is different from =
-the
-> data written by=A0 the pwritev() that happened before
->=20
-> In the discussions at [1], Fam Zheng suggested a test in which we would=
- take
-> down the number of threads created in the POSIX thread pool from 64 to =
-1.
-> The idea is to ensure that we're using the same thread to write and rea=
-d.
-> There was a suspicion that the kernel can't guarantee data coherency be=
-tween
-> different threads, even if using the same fd, when using pwritev() and
-> preadv(). This would explain why the following reads in the same fd wou=
-ld
-> fail to retrieve the same data that was written before. After doing thi=
-s
-> modification, the miscompare didn't reproduce.
->=20
-> After reverting the thread pool number change, I've made a couple of
-> attempts trying to flush before read() and flushing after write(). Both
-> attempts failed - the miscompare appears in both scenarios. This enforc=
-es
-> the suspicion we have above - if data coherency can't be granted betwee=
-n
-> different threads, flushing in different threads wouldn't make a differ=
-ence
-> too. I've also tested a suggestion from Fam where I started the disks w=
-ith
-> "cache.direct=3Don,cache.no-flush=3Doff" - bug still reproduces.
->=20
->=20
-> This is the current status of this investigation. I decided to start a
-> discussion here, see if someone can point me something that I overlooke=
-d or
-> got it wrong, before I started changing the POSIX thread pool behavior =
-to
-> see if I can enforce one specific POSIX thread to do a read() if we had=
- a
-> write() done in the same fd. Any suggestions?
->=20
->=20
->=20
-> ps: it is worth mentioning that I was able to reproduce this same bug i=
-n a
-> POWER8 system running Ubuntu 18.04. Given that the code we're dealing w=
-ith
-> doesn't have any arch-specific behavior I wouldn't be surprised if this=
- bug
-> is also reproducible in other archs like x86.
->=20
->=20
-> Thanks,
->=20
-> Daniel
->=20
-> [1] https://bugzilla.redhat.com/show_bug.cgi?id=3D1561017
-> [2] https://github.com/open-power/HTX
+> 
+> >
+> > Dave
+> >
+> >>               page = sg_page(sg);
+> >>               if (umem->writable && dirty)
+> >>                   set_page_dirty_lock(page);
+> >>               put_page(page);
+> >>          }
+> >>
+> >>          sg_free_table(&umem->sg_head);
+> >>          return;
+> >> }
+> >>
+> >> >
+> >> > Dave
+> >> >
+> >> >
+> >> >> >
+> >> >> > Dave
+> >> >> >
+> >> >> >> >
+> >> >> >> >> Anyway, it should not invoke rdma_get_cm_event in main thread, and the event channel
+> >> >> >> >> is also destroyed in qemu_rdma_cleanup.
+> >> >> >> >>
+> >> >> >> >> Signed-off-by: Lidong Chen <lidongchen@tencent.com>
+> >> >> >> >> ---
+> >> >> >> >>  migration/rdma.c       | 12 ++----------
+> >> >> >> >>  migration/trace-events |  1 -
+> >> >> >> >>  2 files changed, 2 insertions(+), 11 deletions(-)
+> >> >> >> >>
+> >> >> >> >> diff --git a/migration/rdma.c b/migration/rdma.c
+> >> >> >> >> index 0dd4033..92e4d30 100644
+> >> >> >> >> --- a/migration/rdma.c
+> >> >> >> >> +++ b/migration/rdma.c
+> >> >> >> >> @@ -2275,8 +2275,7 @@ static int qemu_rdma_write(QEMUFile *f, RDMAContext *rdma,
+> >> >> >> >>
+> >> >> >> >>  static void qemu_rdma_cleanup(RDMAContext *rdma)
+> >> >> >> >>  {
+> >> >> >> >> -    struct rdma_cm_event *cm_event;
+> >> >> >> >> -    int ret, idx;
+> >> >> >> >> +    int idx;
+> >> >> >> >>
+> >> >> >> >>      if (rdma->cm_id && rdma->connected) {
+> >> >> >> >>          if ((rdma->error_state ||
+> >> >> >> >> @@ -2290,14 +2289,7 @@ static void qemu_rdma_cleanup(RDMAContext *rdma)
+> >> >> >> >>              qemu_rdma_post_send_control(rdma, NULL, &head);
+> >> >> >> >>          }
+> >> >> >> >>
+> >> >> >> >> -        ret = rdma_disconnect(rdma->cm_id);
+> >> >> >> >> -        if (!ret) {
+> >> >> >> >> -            trace_qemu_rdma_cleanup_waiting_for_disconnect();
+> >> >> >> >> -            ret = rdma_get_cm_event(rdma->channel, &cm_event);
+> >> >> >> >> -            if (!ret) {
+> >> >> >> >> -                rdma_ack_cm_event(cm_event);
+> >> >> >> >> -            }
+> >> >> >> >> -        }
+> >> >> >> >> +        rdma_disconnect(rdma->cm_id);
+> >> >> >> >
+> >> >> >> > I'm worried whether this change could break stuff:
+> >> >> >> > The docs say for rdma_disconnect that it flushes any posted work
+> >> >> >> > requests to the completion queue;  so unless we wait for the event
+> >> >> >> > do we know the stuff has been flushed?   In the normal non-cancel case
+> >> >> >> > I'm worried that means we could lose something.
+> >> >> >> > (But I don't know the rdma/infiniband specs well enough to know if it's
+> >> >> >> > really a problem).
+> >> >> >>
+> >> >> >> In qemu_fclose function, it invoke qemu_fflush(f) before invoke f->ops->close.
+> >> >> >> so I think it's safe for normal migration case.
+> >> >> >>
+> >> >> >> For the root cause why not receive RDMA_CM_EVENT_DISCONNECTED event
+> >> >> >> after rdma_disconnect,
+> >> >> >> I loop in Aviad Yehezkel<aviadye@mellanox.com>, Aviad will help us
+> >> >> >> find the root cause.
+> >> >> >>
+> >> >> >> >
+> >> >> >> > Dave
+> >> >> >> >
+> >> >> >> >>          trace_qemu_rdma_cleanup_disconnect();
+> >> >> >> >>          rdma->connected = false;
+> >> >> >> >>      }
+> >> >> >> >> diff --git a/migration/trace-events b/migration/trace-events
+> >> >> >> >> index d6be74b..64573ff 100644
+> >> >> >> >> --- a/migration/trace-events
+> >> >> >> >> +++ b/migration/trace-events
+> >> >> >> >> @@ -125,7 +125,6 @@ qemu_rdma_accept_pin_state(bool pin) "%d"
+> >> >> >> >>  qemu_rdma_accept_pin_verbsc(void *verbs) "Verbs context after listen: %p"
+> >> >> >> >>  qemu_rdma_block_for_wrid_miss(const char *wcompstr, int wcomp, const char *gcompstr, uint64_t req) "A Wanted wrid %s (%d) but got %s (%" PRIu64 ")"
+> >> >> >> >>  qemu_rdma_cleanup_disconnect(void) ""
+> >> >> >> >> -qemu_rdma_cleanup_waiting_for_disconnect(void) ""
+> >> >> >> >>  qemu_rdma_close(void) ""
+> >> >> >> >>  qemu_rdma_connect_pin_all_requested(void) ""
+> >> >> >> >>  qemu_rdma_connect_pin_all_outcome(bool pin) "%d"
+> >> >> >> >> --
+> >> >> >> >> 1.8.3.1
+> >> >> >> >>
+> >> >> >> > --
+> >> >> >> > Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> >> >> > --
+> >> >> > Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> >> > --
+> >> > Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> > --
+> > Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
 --
 Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
