@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41450)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41376)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fJ4wX-0007wB-5J
-	for qemu-devel@nongnu.org; Wed, 16 May 2018 18:30:47 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1fJ4wT-0007so-Kd
+	for qemu-devel@nongnu.org; Wed, 16 May 2018 18:30:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fJ4wU-0007j8-OH
-	for qemu-devel@nongnu.org; Wed, 16 May 2018 18:30:45 -0400
-Received: from mail-pg0-x243.google.com ([2607:f8b0:400e:c05::243]:45740)
+	(envelope-from <richard.henderson@linaro.org>) id 1fJ4wR-0007dk-PP
+	for qemu-devel@nongnu.org; Wed, 16 May 2018 18:30:41 -0400
+Received: from mail-pg0-x22c.google.com ([2607:f8b0:400e:c05::22c]:35982)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1fJ4wU-0007iP-FV
-	for qemu-devel@nongnu.org; Wed, 16 May 2018 18:30:42 -0400
-Received: by mail-pg0-x243.google.com with SMTP id w3-v6so886312pgv.12
-	for <qemu-devel@nongnu.org>; Wed, 16 May 2018 15:30:42 -0700 (PDT)
+	id 1fJ4wR-0007cy-H1
+	for qemu-devel@nongnu.org; Wed, 16 May 2018 18:30:39 -0400
+Received: by mail-pg0-x22c.google.com with SMTP id z70-v6so911585pgz.3
+	for <qemu-devel@nongnu.org>; Wed, 16 May 2018 15:30:39 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Wed, 16 May 2018 15:30:02 -0700
-Message-Id: <20180516223007.10256-23-richard.henderson@linaro.org>
+Date: Wed, 16 May 2018 15:30:00 -0700
+Message-Id: <20180516223007.10256-21-richard.henderson@linaro.org>
 In-Reply-To: <20180516223007.10256-1-richard.henderson@linaro.org>
 References: <20180516223007.10256-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH v3-a 22/27] target/arm: Implement SVE Element
- Count Group
+Subject: [Qemu-devel] [PATCH v3-a 20/27] target/arm: Implement SVE
+ floating-point exponential accelerator
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,546 +33,184 @@ Cc: peter.maydell@linaro.org, qemu-arm@nongnu.org
 Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/arm/helper-sve.h    |  11 ++
- target/arm/sve_helper.c    | 136 ++++++++++++++++++
- target/arm/translate-sve.c | 288 +++++++++++++++++++++++++++++++++++++
- target/arm/sve.decode      |  31 +++-
- 4 files changed, 465 insertions(+), 1 deletion(-)
+ target/arm/helper-sve.h    |  4 ++
+ target/arm/sve_helper.c    | 90 ++++++++++++++++++++++++++++++++++++++
+ target/arm/translate-sve.c | 24 ++++++++++
+ target/arm/sve.decode      |  7 +++
+ 4 files changed, 125 insertions(+)
 
 diff --git a/target/arm/helper-sve.h b/target/arm/helper-sve.h
-index 4f1bd5a62f..2831e1643b 100644
+index 5280d375f9..e2925ff8ec 100644
 --- a/target/arm/helper-sve.h
 +++ b/target/arm/helper-sve.h
-@@ -393,6 +393,17 @@ DEF_HELPER_FLAGS_4(sve_ftssel_h, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
- DEF_HELPER_FLAGS_4(sve_ftssel_s, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
- DEF_HELPER_FLAGS_4(sve_ftssel_d, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
+@@ -385,6 +385,10 @@ DEF_HELPER_FLAGS_4(sve_adr_p64, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
+ DEF_HELPER_FLAGS_4(sve_adr_s32, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
+ DEF_HELPER_FLAGS_4(sve_adr_u32, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
  
-+DEF_HELPER_FLAGS_4(sve_sqaddi_b, TCG_CALL_NO_RWG, void, ptr, ptr, s32, i32)
-+DEF_HELPER_FLAGS_4(sve_sqaddi_h, TCG_CALL_NO_RWG, void, ptr, ptr, s32, i32)
-+DEF_HELPER_FLAGS_4(sve_sqaddi_s, TCG_CALL_NO_RWG, void, ptr, ptr, s64, i32)
-+DEF_HELPER_FLAGS_4(sve_sqaddi_d, TCG_CALL_NO_RWG, void, ptr, ptr, s64, i32)
-+
-+DEF_HELPER_FLAGS_4(sve_uqaddi_b, TCG_CALL_NO_RWG, void, ptr, ptr, s32, i32)
-+DEF_HELPER_FLAGS_4(sve_uqaddi_h, TCG_CALL_NO_RWG, void, ptr, ptr, s32, i32)
-+DEF_HELPER_FLAGS_4(sve_uqaddi_s, TCG_CALL_NO_RWG, void, ptr, ptr, s64, i32)
-+DEF_HELPER_FLAGS_4(sve_uqaddi_d, TCG_CALL_NO_RWG, void, ptr, ptr, i64, i32)
-+DEF_HELPER_FLAGS_4(sve_uqsubi_d, TCG_CALL_NO_RWG, void, ptr, ptr, i64, i32)
++DEF_HELPER_FLAGS_3(sve_fexpa_h, TCG_CALL_NO_RWG, void, ptr, ptr, i32)
++DEF_HELPER_FLAGS_3(sve_fexpa_s, TCG_CALL_NO_RWG, void, ptr, ptr, i32)
++DEF_HELPER_FLAGS_3(sve_fexpa_d, TCG_CALL_NO_RWG, void, ptr, ptr, i32)
 +
  DEF_HELPER_FLAGS_5(sve_and_pppp, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, ptr, i32)
  DEF_HELPER_FLAGS_5(sve_bic_pppp, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, ptr, i32)
  DEF_HELPER_FLAGS_5(sve_eor_pppp, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, ptr, i32)
 diff --git a/target/arm/sve_helper.c b/target/arm/sve_helper.c
-index 85a0639e3a..979aa5c409 100644
+index 7fa8394aec..6ffb126821 100644
 --- a/target/arm/sve_helper.c
 +++ b/target/arm/sve_helper.c
-@@ -1235,3 +1235,139 @@ void HELPER(sve_ftssel_d)(void *vd, void *vn, void *vm, uint32_t desc)
-         d[i] = nn ^ (mm & 2) << 62;
+@@ -1102,3 +1102,93 @@ void HELPER(sve_adr_u32)(void *vd, void *vn, void *vm, uint32_t desc)
+         d[i] = n[i] + ((uint64_t)(uint32_t)m[i] << sh);
      }
  }
 +
-+/*
-+ * Signed saturating addition with scalar operand.
-+ */
-+
-+void HELPER(sve_sqaddi_b)(void *d, void *a, int32_t b, uint32_t desc)
++void HELPER(sve_fexpa_h)(void *vd, void *vn, uint32_t desc)
 +{
-+    intptr_t i, oprsz = simd_oprsz(desc);
++    /* These constants are cut-and-paste directly from the ARM pseudocode.  */
++    static const uint16_t coeff[] = {
++        0x0000, 0x0016, 0x002d, 0x0045, 0x005d, 0x0075, 0x008e, 0x00a8,
++        0x00c2, 0x00dc, 0x00f8, 0x0114, 0x0130, 0x014d, 0x016b, 0x0189,
++        0x01a8, 0x01c8, 0x01e8, 0x0209, 0x022b, 0x024e, 0x0271, 0x0295,
++        0x02ba, 0x02e0, 0x0306, 0x032e, 0x0356, 0x037f, 0x03a9, 0x03d4,
++    };
++    intptr_t i, opr_sz = simd_oprsz(desc) / 2;
++    uint16_t *d = vd, *n = vn;
 +
-+    for (i = 0; i < oprsz; i += sizeof(int8_t)) {
-+        int r = *(int8_t *)(a + i) + b;
-+        if (r > INT8_MAX) {
-+            r = INT8_MAX;
-+        } else if (r < INT8_MIN) {
-+            r = INT8_MIN;
-+        }
-+        *(int8_t *)(d + i) = r;
++    for (i = 0; i < opr_sz; i++) {
++        uint16_t nn = n[i];
++        intptr_t idx = extract32(nn, 0, 5);
++        uint16_t exp = extract32(nn, 5, 5);
++        d[i] = coeff[idx] | (exp << 10);
 +    }
 +}
 +
-+void HELPER(sve_sqaddi_h)(void *d, void *a, int32_t b, uint32_t desc)
++void HELPER(sve_fexpa_s)(void *vd, void *vn, uint32_t desc)
 +{
-+    intptr_t i, oprsz = simd_oprsz(desc);
++    /* These constants are cut-and-paste directly from the ARM pseudocode.  */
++    static const uint32_t coeff[] = {
++        0x000000, 0x0164d2, 0x02cd87, 0x043a29,
++        0x05aac3, 0x071f62, 0x08980f, 0x0a14d5,
++        0x0b95c2, 0x0d1adf, 0x0ea43a, 0x1031dc,
++        0x11c3d3, 0x135a2b, 0x14f4f0, 0x16942d,
++        0x1837f0, 0x19e046, 0x1b8d3a, 0x1d3eda,
++        0x1ef532, 0x20b051, 0x227043, 0x243516,
++        0x25fed7, 0x27cd94, 0x29a15b, 0x2b7a3a,
++        0x2d583f, 0x2f3b79, 0x3123f6, 0x3311c4,
++        0x3504f3, 0x36fd92, 0x38fbaf, 0x3aff5b,
++        0x3d08a4, 0x3f179a, 0x412c4d, 0x4346cd,
++        0x45672a, 0x478d75, 0x49b9be, 0x4bec15,
++        0x4e248c, 0x506334, 0x52a81e, 0x54f35b,
++        0x5744fd, 0x599d16, 0x5bfbb8, 0x5e60f5,
++        0x60ccdf, 0x633f89, 0x65b907, 0x68396a,
++        0x6ac0c7, 0x6d4f30, 0x6fe4ba, 0x728177,
++        0x75257d, 0x77d0df, 0x7a83b3, 0x7d3e0c,
++    };
++    intptr_t i, opr_sz = simd_oprsz(desc) / 4;
++    uint32_t *d = vd, *n = vn;
 +
-+    for (i = 0; i < oprsz; i += sizeof(int16_t)) {
-+        int r = *(int16_t *)(a + i) + b;
-+        if (r > INT16_MAX) {
-+            r = INT16_MAX;
-+        } else if (r < INT16_MIN) {
-+            r = INT16_MIN;
-+        }
-+        *(int16_t *)(d + i) = r;
++    for (i = 0; i < opr_sz; i++) {
++        uint32_t nn = n[i];
++        intptr_t idx = extract32(nn, 0, 6);
++        uint32_t exp = extract32(nn, 6, 8);
++        d[i] = coeff[idx] | (exp << 23);
 +    }
 +}
 +
-+void HELPER(sve_sqaddi_s)(void *d, void *a, int64_t b, uint32_t desc)
++void HELPER(sve_fexpa_d)(void *vd, void *vn, uint32_t desc)
 +{
-+    intptr_t i, oprsz = simd_oprsz(desc);
++    /* These constants are cut-and-paste directly from the ARM pseudocode.  */
++    static const uint64_t coeff[] = {
++        0x0000000000000ull, 0x02C9A3E778061ull, 0x059B0D3158574ull,
++        0x0874518759BC8ull, 0x0B5586CF9890Full, 0x0E3EC32D3D1A2ull,
++        0x11301D0125B51ull, 0x1429AAEA92DE0ull, 0x172B83C7D517Bull,
++        0x1A35BEB6FCB75ull, 0x1D4873168B9AAull, 0x2063B88628CD6ull,
++        0x2387A6E756238ull, 0x26B4565E27CDDull, 0x29E9DF51FDEE1ull,
++        0x2D285A6E4030Bull, 0x306FE0A31B715ull, 0x33C08B26416FFull,
++        0x371A7373AA9CBull, 0x3A7DB34E59FF7ull, 0x3DEA64C123422ull,
++        0x4160A21F72E2Aull, 0x44E086061892Dull, 0x486A2B5C13CD0ull,
++        0x4BFDAD5362A27ull, 0x4F9B2769D2CA7ull, 0x5342B569D4F82ull,
++        0x56F4736B527DAull, 0x5AB07DD485429ull, 0x5E76F15AD2148ull,
++        0x6247EB03A5585ull, 0x6623882552225ull, 0x6A09E667F3BCDull,
++        0x6DFB23C651A2Full, 0x71F75E8EC5F74ull, 0x75FEB564267C9ull,
++        0x7A11473EB0187ull, 0x7E2F336CF4E62ull, 0x82589994CCE13ull,
++        0x868D99B4492EDull, 0x8ACE5422AA0DBull, 0x8F1AE99157736ull,
++        0x93737B0CDC5E5ull, 0x97D829FDE4E50ull, 0x9C49182A3F090ull,
++        0xA0C667B5DE565ull, 0xA5503B23E255Dull, 0xA9E6B5579FDBFull,
++        0xAE89F995AD3ADull, 0xB33A2B84F15FBull, 0xB7F76F2FB5E47ull,
++        0xBCC1E904BC1D2ull, 0xC199BDD85529Cull, 0xC67F12E57D14Bull,
++        0xCB720DCEF9069ull, 0xD072D4A07897Cull, 0xD5818DCFBA487ull,
++        0xDA9E603DB3285ull, 0xDFC97337B9B5Full, 0xE502EE78B3FF6ull,
++        0xEA4AFA2A490DAull, 0xEFA1BEE615A27ull, 0xF50765B6E4540ull,
++        0xFA7C1819E90D8ull,
++    };
++    intptr_t i, opr_sz = simd_oprsz(desc) / 8;
++    uint64_t *d = vd, *n = vn;
 +
-+    for (i = 0; i < oprsz; i += sizeof(int32_t)) {
-+        int64_t r = *(int32_t *)(a + i) + b;
-+        if (r > INT32_MAX) {
-+            r = INT32_MAX;
-+        } else if (r < INT32_MIN) {
-+            r = INT32_MIN;
-+        }
-+        *(int32_t *)(d + i) = r;
-+    }
-+}
-+
-+void HELPER(sve_sqaddi_d)(void *d, void *a, int64_t b, uint32_t desc)
-+{
-+    intptr_t i, oprsz = simd_oprsz(desc);
-+
-+    for (i = 0; i < oprsz; i += sizeof(int64_t)) {
-+        int64_t ai = *(int64_t *)(a + i);
-+        int64_t r = ai + b;
-+        if (((r ^ ai) & ~(ai ^ b)) < 0) {
-+            /* Signed overflow.  */
-+            r = (r < 0 ? INT64_MAX : INT64_MIN);
-+        }
-+        *(int64_t *)(d + i) = r;
-+    }
-+}
-+
-+/*
-+ * Unsigned saturating addition with scalar operand.
-+ */
-+
-+void HELPER(sve_uqaddi_b)(void *d, void *a, int32_t b, uint32_t desc)
-+{
-+    intptr_t i, oprsz = simd_oprsz(desc);
-+
-+    for (i = 0; i < oprsz; i += sizeof(uint8_t)) {
-+        int r = *(uint8_t *)(a + i) + b;
-+        if (r > UINT8_MAX) {
-+            r = UINT8_MAX;
-+        } else if (r < 0) {
-+            r = 0;
-+        }
-+        *(uint8_t *)(d + i) = r;
-+    }
-+}
-+
-+void HELPER(sve_uqaddi_h)(void *d, void *a, int32_t b, uint32_t desc)
-+{
-+    intptr_t i, oprsz = simd_oprsz(desc);
-+
-+    for (i = 0; i < oprsz; i += sizeof(uint16_t)) {
-+        int r = *(uint16_t *)(a + i) + b;
-+        if (r > UINT16_MAX) {
-+            r = UINT16_MAX;
-+        } else if (r < 0) {
-+            r = 0;
-+        }
-+        *(uint16_t *)(d + i) = r;
-+    }
-+}
-+
-+void HELPER(sve_uqaddi_s)(void *d, void *a, int64_t b, uint32_t desc)
-+{
-+    intptr_t i, oprsz = simd_oprsz(desc);
-+
-+    for (i = 0; i < oprsz; i += sizeof(uint32_t)) {
-+        int64_t r = *(uint32_t *)(a + i) + b;
-+        if (r > UINT32_MAX) {
-+            r = UINT32_MAX;
-+        } else if (r < 0) {
-+            r = 0;
-+        }
-+        *(uint32_t *)(d + i) = r;
-+    }
-+}
-+
-+void HELPER(sve_uqaddi_d)(void *d, void *a, uint64_t b, uint32_t desc)
-+{
-+    intptr_t i, oprsz = simd_oprsz(desc);
-+
-+    for (i = 0; i < oprsz; i += sizeof(uint64_t)) {
-+        uint64_t r = *(uint64_t *)(a + i) + b;
-+        if (r < b) {
-+            r = UINT64_MAX;
-+        }
-+        *(uint64_t *)(d + i) = r;
-+    }
-+}
-+
-+void HELPER(sve_uqsubi_d)(void *d, void *a, uint64_t b, uint32_t desc)
-+{
-+    intptr_t i, oprsz = simd_oprsz(desc);
-+
-+    for (i = 0; i < oprsz; i += sizeof(uint64_t)) {
-+        uint64_t ai = *(uint64_t *)(a + i);
-+        *(uint64_t *)(d + i) = (ai < b ? 0 : ai - b);
++    for (i = 0; i < opr_sz; i++) {
++        uint64_t nn = n[i];
++        intptr_t idx = extract32(nn, 0, 6);
++        uint64_t exp = extract32(nn, 6, 11);
++        d[i] = coeff[idx] | (exp << 52);
 +    }
 +}
 diff --git a/target/arm/translate-sve.c b/target/arm/translate-sve.c
-index ea8d2c4112..2a0bf6b47c 100644
+index 8924848463..54d774b5e0 100644
 --- a/target/arm/translate-sve.c
 +++ b/target/arm/translate-sve.c
-@@ -57,6 +57,11 @@ static int tszimm_shl(int x)
-     return x - (8 << tszimm_esz(x));
- }
- 
-+static inline int plus1(int x)
-+{
-+    return x + 1;
-+}
-+
- /*
-  * Include the generated decoder.
-  */
-@@ -1497,6 +1502,289 @@ static bool trans_PNEXT(DisasContext *s, arg_rr_esz *a, uint32_t insn)
-     return do_pfirst_pnext(s, a, gen_helper_sve_pnext);
+@@ -929,6 +929,30 @@ static bool trans_ADR_u32(DisasContext *s, arg_rrri *a, uint32_t insn)
+     return do_adr(s, a, gen_helper_sve_adr_u32);
  }
  
 +/*
-+ *** SVE Element Count Group
++ *** SVE Integer Misc - Unpredicated Group
 + */
 +
-+/* Perform an inline saturating addition of a 32-bit value within
-+ * a 64-bit register.  The second operand is known to be positive,
-+ * which halves the comparisions we must perform to bound the result.
-+ */
-+static void do_sat_addsub_32(TCGv_i64 reg, TCGv_i64 val, bool u, bool d)
++static bool trans_FEXPA(DisasContext *s, arg_rr_esz *a, uint32_t insn)
 +{
-+    int64_t ibound;
-+    TCGv_i64 bound;
-+    TCGCond cond;
-+
-+    /* Use normal 64-bit arithmetic to detect 32-bit overflow.  */
-+    if (u) {
-+        tcg_gen_ext32u_i64(reg, reg);
-+    } else {
-+        tcg_gen_ext32s_i64(reg, reg);
-+    }
-+    if (d) {
-+        tcg_gen_sub_i64(reg, reg, val);
-+        ibound = (u ? 0 : INT32_MIN);
-+        cond = TCG_COND_LT;
-+    } else {
-+        tcg_gen_add_i64(reg, reg, val);
-+        ibound = (u ? UINT32_MAX : INT32_MAX);
-+        cond = TCG_COND_GT;
-+    }
-+    bound = tcg_const_i64(ibound);
-+    tcg_gen_movcond_i64(cond, reg, reg, bound, bound, reg);
-+    tcg_temp_free_i64(bound);
-+}
-+
-+/* Similarly with 64-bit values.  */
-+static void do_sat_addsub_64(TCGv_i64 reg, TCGv_i64 val, bool u, bool d)
-+{
-+    TCGv_i64 t0 = tcg_temp_new_i64();
-+    TCGv_i64 t1 = tcg_temp_new_i64();
-+    TCGv_i64 t2;
-+
-+    if (u) {
-+        if (d) {
-+            tcg_gen_sub_i64(t0, reg, val);
-+            tcg_gen_movi_i64(t1, 0);
-+            tcg_gen_movcond_i64(TCG_COND_LTU, reg, reg, val, t1, t0);
-+        } else {
-+            tcg_gen_add_i64(t0, reg, val);
-+            tcg_gen_movi_i64(t1, -1);
-+            tcg_gen_movcond_i64(TCG_COND_LTU, reg, t0, reg, t1, t0);
-+        }
-+    } else {
-+        if (d) {
-+            /* Detect signed overflow for subtraction.  */
-+            tcg_gen_xor_i64(t0, reg, val);
-+            tcg_gen_sub_i64(t1, reg, val);
-+            tcg_gen_xor_i64(reg, reg, t0);
-+            tcg_gen_and_i64(t0, t0, reg);
-+
-+            /* Bound the result.  */
-+            tcg_gen_movi_i64(reg, INT64_MIN);
-+            t2 = tcg_const_i64(0);
-+            tcg_gen_movcond_i64(TCG_COND_LT, reg, t0, t2, reg, t1);
-+        } else {
-+            /* Detect signed overflow for addition.  */
-+            tcg_gen_xor_i64(t0, reg, val);
-+            tcg_gen_add_i64(reg, reg, val);
-+            tcg_gen_xor_i64(t1, reg, val);
-+            tcg_gen_andc_i64(t0, t1, t0);
-+
-+            /* Bound the result.  */
-+            tcg_gen_movi_i64(t1, INT64_MAX);
-+            t2 = tcg_const_i64(0);
-+            tcg_gen_movcond_i64(TCG_COND_LT, reg, t0, t2, t1, reg);
-+        }
-+        tcg_temp_free_i64(t2);
-+    }
-+    tcg_temp_free_i64(t0);
-+    tcg_temp_free_i64(t1);
-+}
-+
-+/* Similarly with a vector and a scalar operand.  */
-+static void do_sat_addsub_vec(DisasContext *s, int esz, int rd, int rn,
-+                              TCGv_i64 val, bool u, bool d)
-+{
-+    unsigned vsz = vec_full_reg_size(s);
-+    TCGv_ptr dptr, nptr;
-+    TCGv_i32 t32, desc;
-+    TCGv_i64 t64;
-+
-+    dptr = tcg_temp_new_ptr();
-+    nptr = tcg_temp_new_ptr();
-+    tcg_gen_addi_ptr(dptr, cpu_env, vec_full_reg_offset(s, rd));
-+    tcg_gen_addi_ptr(nptr, cpu_env, vec_full_reg_offset(s, rn));
-+    desc = tcg_const_i32(simd_desc(vsz, vsz, 0));
-+
-+    switch (esz) {
-+    case MO_8:
-+        t32 = tcg_temp_new_i32();
-+        tcg_gen_extrl_i64_i32(t32, val);
-+        if (d) {
-+            tcg_gen_neg_i32(t32, t32);
-+        }
-+        if (u) {
-+            gen_helper_sve_uqaddi_b(dptr, nptr, t32, desc);
-+        } else {
-+            gen_helper_sve_sqaddi_b(dptr, nptr, t32, desc);
-+        }
-+        tcg_temp_free_i32(t32);
-+        break;
-+
-+    case MO_16:
-+        t32 = tcg_temp_new_i32();
-+        tcg_gen_extrl_i64_i32(t32, val);
-+        if (d) {
-+            tcg_gen_neg_i32(t32, t32);
-+        }
-+        if (u) {
-+            gen_helper_sve_uqaddi_h(dptr, nptr, t32, desc);
-+        } else {
-+            gen_helper_sve_sqaddi_h(dptr, nptr, t32, desc);
-+        }
-+        tcg_temp_free_i32(t32);
-+        break;
-+
-+    case MO_32:
-+        t64 = tcg_temp_new_i64();
-+        if (d) {
-+            tcg_gen_neg_i64(t64, val);
-+        } else {
-+            tcg_gen_mov_i64(t64, val);
-+        }
-+        if (u) {
-+            gen_helper_sve_uqaddi_s(dptr, nptr, t64, desc);
-+        } else {
-+            gen_helper_sve_sqaddi_s(dptr, nptr, t64, desc);
-+        }
-+        tcg_temp_free_i64(t64);
-+        break;
-+
-+    case MO_64:
-+        if (u) {
-+            if (d) {
-+                gen_helper_sve_uqsubi_d(dptr, nptr, val, desc);
-+            } else {
-+                gen_helper_sve_uqaddi_d(dptr, nptr, val, desc);
-+            }
-+        } else if (d) {
-+            t64 = tcg_temp_new_i64();
-+            tcg_gen_neg_i64(t64, val);
-+            gen_helper_sve_sqaddi_d(dptr, nptr, t64, desc);
-+            tcg_temp_free_i64(t64);
-+        } else {
-+            gen_helper_sve_sqaddi_d(dptr, nptr, val, desc);
-+        }
-+        break;
-+
-+    default:
-+        g_assert_not_reached();
-+    }
-+
-+    tcg_temp_free_ptr(dptr);
-+    tcg_temp_free_ptr(nptr);
-+    tcg_temp_free_i32(desc);
-+}
-+
-+static bool trans_CNT_r(DisasContext *s, arg_CNT_r *a, uint32_t insn)
-+{
-+    if (sve_access_check(s)) {
-+        unsigned fullsz = vec_full_reg_size(s);
-+        unsigned numelem = decode_pred_count(fullsz, a->pat, a->esz);
-+        tcg_gen_movi_i64(cpu_reg(s, a->rd), numelem * a->imm);
-+    }
-+    return true;
-+}
-+
-+static bool trans_INCDEC_r(DisasContext *s, arg_incdec_cnt *a, uint32_t insn)
-+{
-+    if (sve_access_check(s)) {
-+        unsigned fullsz = vec_full_reg_size(s);
-+        unsigned numelem = decode_pred_count(fullsz, a->pat, a->esz);
-+        int inc = numelem * a->imm * (a->d ? -1 : 1);
-+        TCGv_i64 reg = cpu_reg(s, a->rd);
-+
-+        tcg_gen_addi_i64(reg, reg, inc);
-+    }
-+    return true;
-+}
-+
-+static bool trans_SINCDEC_r_32(DisasContext *s, arg_incdec_cnt *a,
-+                               uint32_t insn)
-+{
-+    if (!sve_access_check(s)) {
-+        return true;
-+    }
-+
-+    unsigned fullsz = vec_full_reg_size(s);
-+    unsigned numelem = decode_pred_count(fullsz, a->pat, a->esz);
-+    int inc = numelem * a->imm;
-+    TCGv_i64 reg = cpu_reg(s, a->rd);
-+
-+    /* Use normal 64-bit arithmetic to detect 32-bit overflow.  */
-+    if (inc == 0) {
-+        if (a->u) {
-+            tcg_gen_ext32u_i64(reg, reg);
-+        } else {
-+            tcg_gen_ext32s_i64(reg, reg);
-+        }
-+    } else {
-+        TCGv_i64 t = tcg_const_i64(inc);
-+        do_sat_addsub_32(reg, t, a->u, a->d);
-+        tcg_temp_free_i64(t);
-+    }
-+    return true;
-+}
-+
-+static bool trans_SINCDEC_r_64(DisasContext *s, arg_incdec_cnt *a,
-+                               uint32_t insn)
-+{
-+    if (!sve_access_check(s)) {
-+        return true;
-+    }
-+
-+    unsigned fullsz = vec_full_reg_size(s);
-+    unsigned numelem = decode_pred_count(fullsz, a->pat, a->esz);
-+    int inc = numelem * a->imm;
-+    TCGv_i64 reg = cpu_reg(s, a->rd);
-+
-+    if (inc != 0) {
-+        TCGv_i64 t = tcg_const_i64(inc);
-+        do_sat_addsub_64(reg, t, a->u, a->d);
-+        tcg_temp_free_i64(t);
-+    }
-+    return true;
-+}
-+
-+static bool trans_INCDEC_v(DisasContext *s, arg_incdec2_cnt *a, uint32_t insn)
-+{
++    static gen_helper_gvec_2 * const fns[4] = {
++        NULL,
++        gen_helper_sve_fexpa_h,
++        gen_helper_sve_fexpa_s,
++        gen_helper_sve_fexpa_d,
++    };
 +    if (a->esz == 0) {
 +        return false;
 +    }
-+
-+    unsigned fullsz = vec_full_reg_size(s);
-+    unsigned numelem = decode_pred_count(fullsz, a->pat, a->esz);
-+    int inc = numelem * a->imm;
-+
-+    if (inc != 0) {
-+        if (sve_access_check(s)) {
-+            TCGv_i64 t = tcg_const_i64(a->d ? -inc : inc);
-+            tcg_gen_gvec_adds(a->esz, vec_full_reg_offset(s, a->rd),
-+                              vec_full_reg_offset(s, a->rn),
-+                              t, fullsz, fullsz);
-+            tcg_temp_free_i64(t);
-+        }
-+    } else {
-+        do_mov_z(s, a->rd, a->rn);
-+    }
-+    return true;
-+}
-+
-+static bool trans_SINCDEC_v(DisasContext *s, arg_incdec2_cnt *a,
-+                            uint32_t insn)
-+{
-+    if (a->esz == 0) {
-+        return false;
-+    }
-+
-+    unsigned fullsz = vec_full_reg_size(s);
-+    unsigned numelem = decode_pred_count(fullsz, a->pat, a->esz);
-+    int inc = numelem * a->imm;
-+
-+    if (inc != 0) {
-+        if (sve_access_check(s)) {
-+            TCGv_i64 t = tcg_const_i64(inc);
-+            do_sat_addsub_vec(s, a->esz, a->rd, a->rn, t, a->u, a->d);
-+            tcg_temp_free_i64(t);
-+        }
-+    } else {
-+        do_mov_z(s, a->rd, a->rn);
++    if (sve_access_check(s)) {
++        unsigned vsz = vec_full_reg_size(s);
++        tcg_gen_gvec_2_ool(vec_full_reg_offset(s, a->rd),
++                           vec_full_reg_offset(s, a->rn),
++                           vsz, vsz, 0, fns[a->esz]);
 +    }
 +    return true;
 +}
 +
  /*
-  *** SVE Memory - 32-bit Gather and Unsized Contiguous Group
+  *** SVE Predicate Logical Operations Group
   */
 diff --git a/target/arm/sve.decode b/target/arm/sve.decode
-index 224dfdd1e9..b6890d0410 100644
+index 691876de4e..cd53b95831 100644
 --- a/target/arm/sve.decode
 +++ b/target/arm/sve.decode
-@@ -22,6 +22,7 @@
- ###########################################################################
- # Named fields.  These are primarily for disjoint fields.
+@@ -66,6 +66,7 @@
  
-+%imm4_16_p1             16:4 !function=plus1
- %imm6_22_5      22:1 5:5
- %imm9_16_10     16:s6 10:3
+ # Two operand
+ @pd_pn          ........ esz:2 .. .... ....... rn:4 . rd:4      &rr_esz
++@rd_rn          ........ esz:2 ...... ...... rn:5 rd:5          &rr_esz
  
-@@ -56,6 +57,9 @@
- &rprr_esz       rd pg rn rm esz
- &rprrr_esz      rd pg rn rm ra esz
- &rpri_esz       rd pg rn imm esz
-+&ptrue          rd esz pat s
-+&incdec_cnt     rd pat esz imm d u
-+&incdec2_cnt    rd rn pat esz imm d u
+ # Three operand with unused vector element size
+ @rd_rn_rm_e0    ........ ... rm:5 ... ... rn:5 rd:5             &rrr_esz esz=0
+@@ -288,6 +289,12 @@ ADR_u32         00000100 01 1 ..... 1010 .. ..... .....         @rd_rn_msz_rm
+ ADR_p32         00000100 10 1 ..... 1010 .. ..... .....         @rd_rn_msz_rm
+ ADR_p64         00000100 11 1 ..... 1010 .. ..... .....         @rd_rn_msz_rm
  
- ###########################################################################
- # Named instruction formats.  These are generally used to
-@@ -113,6 +117,13 @@
- @rd_rn_i9       ........ ........ ...... rn:5 rd:5      \
-                 &rri imm=%imm9_16_10
- 
-+# One register, pattern, and uint4+1.
-+# User must fill in U and D.
-+@incdec_cnt     ........ esz:2 .. .... ...... pat:5 rd:5 \
-+                &incdec_cnt imm=%imm4_16_p1
-+@incdec2_cnt    ........ esz:2 .. .... ...... pat:5 rd:5 \
-+                &incdec2_cnt imm=%imm4_16_p1 rn=%reg_movprfx
++### SVE Integer Misc - Unpredicated Group
 +
- ###########################################################################
- # Instruction patterns.  Grouped according to the SVE encodingindex.xhtml.
- 
-@@ -299,7 +310,25 @@ FEXPA           00000100 .. 1 00000 101110 ..... .....          @rd_rn
- # Note esz != 0
- FTSSEL          00000100 .. 1 ..... 101100 ..... .....          @rd_rn_rm
- 
--### SVE Predicate Logical Operations Group
-+### SVE Element Count Group
++# SVE floating-point exponential accelerator
++# Note esz != 0
++FEXPA           00000100 .. 1 00000 101110 ..... .....          @rd_rn
 +
-+# SVE element count
-+CNT_r           00000100 .. 10 .... 1110 0 0 ..... .....    @incdec_cnt d=0 u=1
-+
-+# SVE inc/dec register by element count
-+INCDEC_r        00000100 .. 11 .... 1110 0 d:1 ..... .....      @incdec_cnt u=1
-+
-+# SVE saturating inc/dec register by element count
-+SINCDEC_r_32    00000100 .. 10 .... 1111 d:1 u:1 ..... .....    @incdec_cnt
-+SINCDEC_r_64    00000100 .. 11 .... 1111 d:1 u:1 ..... .....    @incdec_cnt
-+
-+# SVE inc/dec vector by element count
-+# Note this requires esz != 0.
-+INCDEC_v        00000100 .. 1 1 .... 1100 0 d:1 ..... .....    @incdec2_cnt u=1
-+
-+# SVE saturating inc/dec vector by element count
-+# Note these require esz != 0.
-+SINCDEC_v       00000100 .. 1 0 .... 1100 d:1 u:1 ..... .....   @incdec2_cnt
+ ### SVE Predicate Logical Operations Group
  
  # SVE predicate logical operations
- AND_pppp        00100101 0. 00 .... 01 .... 0 .... 0 ....       @pd_pg_pn_pm_s
 -- 
 2.17.0
