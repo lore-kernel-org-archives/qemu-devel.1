@@ -1,24 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41748)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41797)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fIyjU-0004Dt-9p
-	for qemu-devel@nongnu.org; Wed, 16 May 2018 11:52:55 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1fIyjX-0004EQ-IS
+	for qemu-devel@nongnu.org; Wed, 16 May 2018 11:52:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fIyjQ-0004yU-9H
-	for qemu-devel@nongnu.org; Wed, 16 May 2018 11:52:52 -0400
-Received: from mail-pf0-x241.google.com ([2607:f8b0:400e:c00::241]:46290)
+	(envelope-from <richard.henderson@linaro.org>) id 1fIyjW-00051K-MZ
+	for qemu-devel@nongnu.org; Wed, 16 May 2018 11:52:55 -0400
+Received: from mail-pf0-x241.google.com ([2607:f8b0:400e:c00::241]:40989)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1fIyjQ-0004yJ-33
-	for qemu-devel@nongnu.org; Wed, 16 May 2018 11:52:48 -0400
-Received: by mail-pf0-x241.google.com with SMTP id p12-v6so556319pff.13
-	for <qemu-devel@nongnu.org>; Wed, 16 May 2018 08:52:47 -0700 (PDT)
+	id 1fIyjW-00050u-Hu
+	for qemu-devel@nongnu.org; Wed, 16 May 2018 11:52:54 -0400
+Received: by mail-pf0-x241.google.com with SMTP id v63-v6so563115pfk.8
+	for <qemu-devel@nongnu.org>; Wed, 16 May 2018 08:52:54 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Wed, 16 May 2018 08:52:15 -0700
-Message-Id: <20180516155243.16937-1-richard.henderson@linaro.org>
+Date: Wed, 16 May 2018 08:52:20 -0700
+Message-Id: <20180516155243.16937-6-richard.henderson@linaro.org>
+In-Reply-To: <20180516155243.16937-1-richard.henderson@linaro.org>
+References: <20180516155243.16937-1-richard.henderson@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 00/28] softfloat patch roundup
+Subject: [Qemu-devel] [PULL 05/28] fpu/softfloat: Canonicalize NaN fraction
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,74 +32,66 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: peter.maydell@linaro.org
 
-The following changes since commit c416eecea5f3aea863ab8fda5a36a24157b8f704:
+Shift the NaN fraction to a canonical position, much like we
+do for the fraction of normal numbers.  This will facilitate
+manipulation of NaNs within the shared code paths.
 
-  Merge remote-tracking branch 'remotes/kevin/tags/for-upstream' into staging (2018-05-15 17:02:00 +0100)
+Tested-by: Alex Bennée <alex.bennee@linaro.org>
+Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+---
+ fpu/softfloat.c | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
 
-are available in the Git repository at:
-
-  git://github.com/rth7680/qemu.git tags/pull-fpu-20180516
-
-for you to fetch changes up to 47669bac586c191d4cc4f4ec62cf4d07411c8b7b:
-
-  fpu/softfloat: Define floatN_silence_nan in terms of parts_silence_nan (2018-05-16 08:44:01 -0700)
-
-----------------------------------------------------------------
-Roundup of softfloat patches
-
-----------------------------------------------------------------
-Alex Bennée (4):
-      target/arm: convert conversion helpers to fpst/ahp_flag
-      target/arm: squash FZ16 behaviour for conversions
-      fpu/softfloat: Partial support for ARM Alternative half-precision
-      fpu/softfloat: re-factor float to float conversions
-
-Petr Tesarik (1):
-      fpu/softfloat: Fix conversion from uint64 to float128
-
-Richard Henderson (23):
-      fpu/softfloat: Merge NO_SIGNALING_NANS definitions
-      fpu/softfloat: Split floatXX_silence_nan from floatXX_maybe_silence_nan
-      fpu/softfloat: Move softfloat-specialize.h below FloatParts definition
-      fpu/softfloat: Canonicalize NaN fraction
-      fpu/softfloat: Introduce parts_is_snan_frac
-      fpu/softfloat: Replace float_class_dnan with parts_default_nan
-      fpu/softfloat: Replace float_class_msnan with parts_silence_nan
-      target/arm: Use floatX_silence_nan when we have already checked for SNaN
-      target/arm: Remove floatX_maybe_silence_nan from conversions
-      target/hppa: Remove floatX_maybe_silence_nan from conversions
-      target/m68k: Use floatX_silence_nan when we have already checked for SNaN
-      target/mips: Remove floatX_maybe_silence_nan from conversions
-      target/riscv: Remove floatX_maybe_silence_nan from conversions
-      target/s390x: Remove floatX_maybe_silence_nan from conversions
-      fpu/softfloat: Use float*_silence_nan in propagateFloat*NaN
-      fpu/softfloat: Remove floatX_maybe_silence_nan
-      fpu/softfloat: Specialize on snan_bit_is_one
-      fpu/softfloat: Make is_nan et al available to softfloat-specialize.h
-      fpu/softfloat: Pass FloatClass to pickNaN
-      fpu/softfloat: Pass FloatClass to pickNaNMulAdd
-      fpu/softfloat: Define floatN_default_nan in terms of parts_default_nan
-      fpu/softfloat: Clean up parts_default_nan
-      fpu/softfloat: Define floatN_silence_nan in terms of parts_silence_nan
-
- fpu/softfloat-specialize.h    | 691 ++++++++++++++++------------------------
- include/fpu/softfloat-types.h |   1 +
- include/fpu/softfloat.h       |  18 +-
- target/arm/helper.h           |  10 +-
- target/arm/translate.h        |  12 +
- fpu/softfloat.c               | 726 +++++++++++++++---------------------------
- target/arm/helper-a64.c       |   7 +-
- target/arm/helper.c           | 114 +++----
- target/arm/translate-a64.c    |  37 ++-
- target/arm/translate.c        |  74 ++++-
- target/hppa/cpu.c             |   1 -
- target/hppa/op_helper.c       |   2 -
- target/m68k/softfloat.c       |   3 +-
- target/mips/msa_helper.c      |   4 -
- target/mips/op_helper.c       |   2 -
- target/ppc/fpu_helper.c       |   1 -
- target/riscv/fpu_helper.c     |   6 +-
- target/s390x/fpu_helper.c     |  12 +-
- target/sh4/cpu.c              |   1 -
- target/unicore32/cpu.c        |   2 -
- 20 files changed, 718 insertions(+), 1006 deletions(-)
+diff --git a/fpu/softfloat.c b/fpu/softfloat.c
+index 0d17027379..607c4a78d5 100644
+--- a/fpu/softfloat.c
++++ b/fpu/softfloat.c
+@@ -330,10 +330,11 @@ static FloatParts canonicalize(FloatParts part, const FloatFmt *parm,
+         if (part.frac == 0) {
+             part.cls = float_class_inf;
+         } else {
++            part.frac <<= parm->frac_shift;
+ #ifdef NO_SIGNALING_NANS
+             part.cls = float_class_qnan;
+ #else
+-            int64_t msb = part.frac << (parm->frac_shift + 2);
++            int64_t msb = part.frac << 2;
+             if ((msb < 0) == status->snan_bit_is_one) {
+                 part.cls = float_class_snan;
+             } else {
+@@ -480,6 +481,7 @@ static FloatParts round_canonical(FloatParts p, float_status *s,
+     case float_class_qnan:
+     case float_class_snan:
+         exp = exp_max;
++        frac >>= parm->frac_shift;
+         break;
+ 
+     default:
+@@ -503,6 +505,7 @@ static float16 float16_round_pack_canonical(FloatParts p, float_status *s)
+     case float_class_dnan:
+         return float16_default_nan(s);
+     case float_class_msnan:
++        p.frac >>= float16_params.frac_shift;
+         return float16_maybe_silence_nan(float16_pack_raw(p), s);
+     default:
+         p = round_canonical(p, s, &float16_params);
+@@ -521,6 +524,7 @@ static float32 float32_round_pack_canonical(FloatParts p, float_status *s)
+     case float_class_dnan:
+         return float32_default_nan(s);
+     case float_class_msnan:
++        p.frac >>= float32_params.frac_shift;
+         return float32_maybe_silence_nan(float32_pack_raw(p), s);
+     default:
+         p = round_canonical(p, s, &float32_params);
+@@ -539,6 +543,7 @@ static float64 float64_round_pack_canonical(FloatParts p, float_status *s)
+     case float_class_dnan:
+         return float64_default_nan(s);
+     case float_class_msnan:
++        p.frac >>= float64_params.frac_shift;
+         return float64_maybe_silence_nan(float64_pack_raw(p), s);
+     default:
+         p = round_canonical(p, s, &float64_params);
+-- 
+2.17.0
