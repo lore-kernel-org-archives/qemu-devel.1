@@ -1,25 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41979)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42405)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <prvs=66789f4f5=Paul.Durrant@citrix.com>)
-	id 1fIxNI-0001mc-8M
-	for qemu-devel@nongnu.org; Wed, 16 May 2018 10:25:55 -0400
+	(envelope-from <mst@redhat.com>) id 1fIxO9-0002PV-4P
+	for qemu-devel@nongnu.org; Wed, 16 May 2018 10:26:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <prvs=66789f4f5=Paul.Durrant@citrix.com>)
-	id 1fIxNG-00005X-I3
-	for qemu-devel@nongnu.org; Wed, 16 May 2018 10:25:52 -0400
-From: Paul Durrant <Paul.Durrant@citrix.com>
-Date: Wed, 16 May 2018 14:22:59 +0000
-Message-ID: <1bde7e04a484407ca7c4a3f2322e7b99@AMSPEX02CL03.citrite.net>
-References: <1525461967-32174-1-git-send-email-paul.durrant@citrix.com>
-	<1525461967-32174-4-git-send-email-paul.durrant@citrix.com>
-	<20180516141424.GH2057@perard.uk.xensource.com>
-In-Reply-To: <20180516141424.GH2057@perard.uk.xensource.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	(envelope-from <mst@redhat.com>) id 1fIxO5-0000Kx-W8
+	for qemu-devel@nongnu.org; Wed, 16 May 2018 10:26:45 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:51892 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1fIxO5-0000Kr-QL
+	for qemu-devel@nongnu.org; Wed, 16 May 2018 10:26:41 -0400
+Date: Wed, 16 May 2018 17:26:40 +0300
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20180516172539-mutt-send-email-mst@kernel.org>
+References: <1523953455-28053-1-git-send-email-wanpengli@tencent.com>
+	<20180417205913.GC29865@localhost.localdomain>
+	<02887fa6-d7c8-bc39-6e65-3c3caec5b903@redhat.com>
+	<20180419195610.GA29865@localhost.localdomain>
+	<98f48c44-e55a-2bd2-0d41-5643f35bce68@redhat.com>
+	<20180419215320.GC29865@localhost.localdomain>
+	<20180512010007-mutt-send-email-mst@kernel.org>
+	<20180516123452.GF25013@localhost.localdomain>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v3 3/8] xen: remove other open-coded use of
- libxengnttab
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180516123452.GF25013@localhost.localdomain>
+Subject: Re: [Qemu-devel] [PATCH RESEND v2] i386/kvm: add support for
+ KVM_CAP_X86_DISABLE_EXITS
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,87 +34,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Anthony Perard <anthony.perard@citrix.com>
-Cc: "xen-devel@lists.xenproject.org" <xen-devel@lists.xenproject.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Stefano Stabellini <sstabellini@kernel.org>, Greg
-	Kurz <groug@kaod.org>, Paolo Bonzini <pbonzini@redhat.com>, Jason Wang <jasowang@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Wanpeng Li <kernellwp@gmail.com>, qemu-devel@nongnu.org, kvm@vger.kernel.org, Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>
 
-> -----Original Message-----
-> From: Anthony PERARD [mailto:anthony.perard@citrix.com]
-> Sent: 16 May 2018 15:14
-> To: Paul Durrant <Paul.Durrant@citrix.com>
-> Cc: xen-devel@lists.xenproject.org; qemu-block@nongnu.org; qemu-
-> devel@nongnu.org; Stefano Stabellini <sstabellini@kernel.org>; Greg Kurz
-> <groug@kaod.org>; Paolo Bonzini <pbonzini@redhat.com>; Jason Wang
-> <jasowang@redhat.com>; Gerd Hoffmann <kraxel@redhat.com>
-> Subject: Re: [PATCH v3 3/8] xen: remove other open-coded use of
-> libxengnttab
->=20
-> On Fri, May 04, 2018 at 08:26:02PM +0100, Paul Durrant wrote:
-> > Now that helpers are available in xen_backend, use them throughout all
-> > Xen PV backends.
-> >
-> > Signed-off-by: Paul Durrant <paul.durrant@citrix.com>
-> > ---
-> > diff --git a/hw/net/xen_nic.c b/hw/net/xen_nic.c
-> > index 20c43a6..73d6f1b 100644
-> > --- a/hw/net/xen_nic.c
-> > +++ b/hw/net/xen_nic.c
-> > @@ -160,9 +160,8 @@ static void net_tx_packets(struct XenNetDev
-> *netdev)
-> >                            (txreq.flags & NETTXF_more_data)      ? " mo=
-re_data"      : "",
-> >                            (txreq.flags & NETTXF_extra_info)     ? " ex=
-tra_info"     : "");
-> >
-> > -            page =3D xengnttab_map_grant_ref(netdev->xendev.gnttabdev,
-> > -                                           netdev->xendev.dom,
-> > -                                           txreq.gref, PROT_READ);
-> > +            page =3D xen_be_map_grant_refs(&netdev->xendev,
-> > +                                         &txreq.gref, 1, PROT_READ);
->=20
-> xen_be_map_grant_ref instead?
->=20
+On Wed, May 16, 2018 at 09:34:52AM -0300, Eduardo Habkost wrote:
+> On Sat, May 12, 2018 at 01:12:59AM +0300, Michael S. Tsirkin wrote:
+> > On Thu, Apr 19, 2018 at 06:53:20PM -0300, Eduardo Habkost wrote:
+> > > On Thu, Apr 19, 2018 at 11:32:16PM +0200, Paolo Bonzini wrote:
+> > > > On 19/04/2018 21:56, Eduardo Habkost wrote:
+> > > > > On Thu, Apr 19, 2018 at 05:48:57PM +0200, Paolo Bonzini wrote:
+> > > > >> On 17/04/2018 22:59, Eduardo Habkost wrote:
+> > > > >>>> +        if (disable_exits) {
+> > > > >>>> +            disable_exits &= (KVM_X86_DISABLE_EXITS_MWAIT |
+> > > > >>>> +                              KVM_X86_DISABLE_EXITS_HLT |
+> > > > >>>> +                              KVM_X86_DISABLE_EXITS_PAUSE);
+> > > > >>>> +            if (env->user_features[FEAT_KVM] & KVM_PV_UNHALT) {
+> > > > >>>> +                disable_exits &= ~KVM_X86_DISABLE_EXITS_HLT;
+> > > > >>>> +            }
+> > > > >>>
+> > > > >>> In the future, if we decide to enable kvm-pv-unhalt by default,
+> > > > >>> should "-cpu ...,kvm-hint-dedicated=on" disable kvm-pv-unhalt
+> > > > >>> automatically, or should we require an explicit
+> > > > >>> "kvm-hint-dedicated=on,kvm-pv-unhalt=off" option?
+> > > > >>
+> > > > >> It should be automatic.
+> > > > >>
+> > > > >>> For today's defaults, this patch solves the problem, only one
+> > > > >>> thing is missing before I give my R-b: we need to clearly
+> > > > >>> document what exactly are the consequences and requirements of
+> > > > >>> setting kvm-hint-dedicated=on (I'm not sure if the best place for
+> > > > >>> this is qemu-options.hx, x86_cpu_list(), or somewhere else).
+> > > > >>
+> > > > >> I don't think we have a good place for this kind of documentation,
+> > > > >> unfortunately.  Right now it is mentioned in
+> > > > >> Documentation/virtual/kvm/cpuid.txt.
+> > > > > 
+> > > > > With this patch, the QEMU option will do more than just setting
+> > > > > the CPUID bit, that's why I miss more detailed documentation on
+> > > > > the QEMU side.  But I agree we have no obvious place for that
+> > > > > documentation.
+> > > > > 
+> > > > > In the worst case we can just add a code comment on top of
+> > > > > feature_word_info[FEAT_KVM_HINTS].feat_names warning that
+> > > > > kvm-hint-dedicated won't just enable the flag on CPUID and has
+> > > > > other side-effects.
+> > > > 
+> > > > Maybe we should use "-realtime dedicated=on" instead of, or in addition
+> > > > to kvm-hint-dedicated=on?
+> > > 
+> > > Maybe it's a better idea than overloading an option that is only
+> > > expected to control a CPUID bit.
+> > 
+> > Well -realtime would be a bit confusing in that it enables mlock by
+> > default.
+> > 
+> > From pure API point of view, hint-dedicated looks good since
+> > it seems to say "optimize for a dedicated host CPU" and
+> > it's a hint in that guests keep working if you violate this
+> > slightly once in a while.
+> > 
+> > But I agree there's a problem: right now "kvm-" means "KVM PV"
+> > as opposed to e.g. HV enlightened gusts.
+> > So if you enable hyperv and also want to disable halt existing,
+> > what then? What should kvm-hint-dedicated=on do?
+> > 
+> > So how about a new hint-dedicated=on cpu flag?  We can have that set
+> > kvm-hint-dedicated if kvm PV is enabled.
+> 
+> Using a boolean flag that is _not_ considered a CPUID feature
+> flag would be better.  Using the CPUID feature flag name risks
+> having management software enabling the flag by accident (as it
+> will get included in query-cpu-model-* queries).  A separate
+> boolean flag would make this clearer.
 
-Yep.
+Can we remove all hints from query-cpu-model queries?
 
-> >              if (page =3D=3D NULL) {
-> >                  xen_pv_printf(&netdev->xendev, 0,
-> >                                "error: tx gref dereference failed (%d)\=
-n",
-> > @@ -183,7 +182,7 @@ static void net_tx_packets(struct XenNetDev
-> *netdev)
-> >                  qemu_send_packet(qemu_get_queue(netdev->nic),
-> >                                   page + txreq.offset, txreq.size);
-> >              }
-> > -            xengnttab_unmap(netdev->xendev.gnttabdev, page, 1);
-> > +            xen_be_unmap_grant_ref(&netdev->xendev, page);
-> >              net_tx_response(netdev, &txreq, NETIF_RSP_OKAY);
-> >          }
-> >          if (!netdev->tx_work) {
-> > @@ -254,9 +253,8 @@ static ssize_t net_rx_packet(NetClientState *nc,
-> const uint8_t *buf, size_t size
-> >      memcpy(&rxreq, RING_GET_REQUEST(&netdev->rx_ring, rc),
-> sizeof(rxreq));
-> >      netdev->rx_ring.req_cons =3D ++rc;
-> >
-> > -    page =3D xengnttab_map_grant_ref(netdev->xendev.gnttabdev,
-> > -                                   netdev->xendev.dom,
-> > -                                   rxreq.gref, PROT_WRITE);
-> > +    page =3D xen_be_map_grant_refs(&netdev->xendev, &rxreq.gref, 1,
-> > +                                 PROT_WRITE);
->=20
-> xen_be_map_grant_ref instead?
->=20
-
-And yep again.
-
-> With that fix:
-> Acked-by: Anthony PERARD <anthony.perard@citrix.com>
->=20
-
-Thanks :-)
-
-  Paul
-
-> --
-> Anthony PERARD
+> -- 
+> Eduardo
