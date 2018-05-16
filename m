@@ -1,32 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39999)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40868)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fJ4nl-00052o-UC
-	for qemu-devel@nongnu.org; Wed, 16 May 2018 18:21:42 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1fJ4w2-0007Qo-T9
+	for qemu-devel@nongnu.org; Wed, 16 May 2018 18:30:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fJ4ni-00049K-Ni
-	for qemu-devel@nongnu.org; Wed, 16 May 2018 18:21:41 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:48040 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1fJ4ni-000473-Hx
-	for qemu-devel@nongnu.org; Wed, 16 May 2018 18:21:38 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.4])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 72787401EF09
-	for <qemu-devel@nongnu.org>; Wed, 16 May 2018 22:21:31 +0000 (UTC)
-References: <1525423069-61903-1-git-send-email-imammedo@redhat.com>
-	<1525423069-61903-9-git-send-email-imammedo@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <7f80806c-3685-f679-c5af-1ca7a9b0052b@redhat.com>
-Date: Wed, 16 May 2018 17:21:30 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1fJ4vz-0007Gq-IL
+	for qemu-devel@nongnu.org; Wed, 16 May 2018 18:30:14 -0400
+Received: from mail-pl0-x229.google.com ([2607:f8b0:400e:c01::229]:34888)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1fJ4vz-0007GB-DU
+	for qemu-devel@nongnu.org; Wed, 16 May 2018 18:30:11 -0400
+Received: by mail-pl0-x229.google.com with SMTP id i5-v6so1250563plt.2
+	for <qemu-devel@nongnu.org>; Wed, 16 May 2018 15:30:11 -0700 (PDT)
+From: Richard Henderson <richard.henderson@linaro.org>
+Date: Wed, 16 May 2018 15:29:40 -0700
+Message-Id: <20180516223007.10256-1-richard.henderson@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <1525423069-61903-9-git-send-email-imammedo@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v7 08/11] tests: extend qmp test with
- preconfig checks
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH v3-a 00/27] target/arm: Scalable Vector
+ Extension
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,70 +28,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>, qemu-devel@nongnu.org
-Cc: ehabkost@redhat.com, pkrempa@redhat.com, armbru@redhat.com
+To: qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org, qemu-arm@nongnu.org
 
-On 05/04/2018 03:37 AM, Igor Mammedov wrote:
-> Add permission checks for commands at 'preconfig' stage.
-> 
-> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-> ---
+This is the first third, more or less, of my current patch set.
+I'm sending only this portion now, rather than another monster
+set all at once.
 
-> +++ b/tests/qmp-test.c
-> @@ -392,6 +392,49 @@ static void add_query_tests(QmpSchema *schema)
->       }
->   }
->   
-> +static bool qmp_rsp_is_err(QDict *rsp)
-> +{
-> +    QDict *error = qdict_get_qdict(rsp, "error");
-> +    QDECREF(rsp);
-> +    return !!error;
+The major change is to move the call to sve_access_check inside
+any final decode reject that might be required.  There are other
+minor cleanups to patch integrity and comments.
 
-At first glance, I was worried that this was a use-after-free; but as 
-you are not actually dereferencing error, but merely checking whether 
-the pointer was non-NULL (which works even if the pointer has gone stale 
-in the meantime due to the QDECREF), you are okay.
+The changes are mostly trivial from the February v2 patch set,
+so if an R-b was given, I have retained it.
 
-> +}
-> +
-> +static void test_qmp_preconfig(void)
-> +{
-> +    QDict *rsp, *ret;
-> +    QTestState *qs = qtest_startf("%s --preconfig", common_args);
-> +
-> +    /* preconfig state */
-> +    /* enabled commands, no error expected  */
-> +    g_assert(!qmp_rsp_is_err(qtest_qmp(qs, "{ 'execute': 'query-commands' }")));
-> +
-> +    /* forbidden commands, expected error */
-> +    g_assert(qmp_rsp_is_err(qtest_qmp(qs, "{ 'execute': 'query-cpus' }")));
-> +
-> +    /* check that query-status returns preconfig state */
-> +    rsp = qtest_qmp(qs, "{ 'execute': 'query-status' }");
-> +    ret = qdict_get_qdict(rsp, "return");
-> +    g_assert(ret);
-> +    g_assert_cmpstr(qdict_get_try_str(ret, "status"), ==, "preconfig");
-> +    QDECREF(rsp);
-> +
-> +    /* exit preconfig state */
-> +    g_assert(!qmp_rsp_is_err(qtest_qmp(qs, "{ 'execute': 'exit-preconfig' }")));
-> +    qtest_qmp_eventwait(qs, "RESUME");
-> +
-> +    /* check that query-status returns running state */
-> +    rsp = qtest_qmp(qs, "{ 'execute': 'query-status' }");
-> +    ret = qdict_get_qdict(rsp, "return");
-> +    g_assert(ret);
-> +    g_assert_cmpstr(qdict_get_try_str(ret, "status"), ==, "running");
-> +    QDECREF(rsp);
-> +
-> +    /* enabled commands, no error expected  */
-> +    g_assert(!qmp_rsp_is_err(qtest_qmp(qs, "{ 'execute': 'query-cpus' }")));
+That leaves 4, 7, 8, and 26 (new) as unreviewed.
 
-It would also be worth testing that a second exit-preconfig fails, now 
-that you are no longer in preconfig state.
+The patch that enables SVE for aarch64-linux-user is not present.
+
+
+r~
+
+
+Richard Henderson (27):
+  target/arm: Introduce translate-a64.h
+  target/arm: Add SVE decode skeleton
+  target/arm: Implement SVE Bitwise Logical - Unpredicated Group
+  target/arm: Implement SVE load vector/predicate
+  target/arm: Implement SVE predicate test
+  target/arm: Implement SVE Predicate Logical Operations Group
+  target/arm: Implement SVE Predicate Misc Group
+  target/arm: Implement SVE Integer Binary Arithmetic - Predicated Group
+  target/arm: Implement SVE Integer Reduction Group
+  target/arm: Implement SVE bitwise shift by immediate (predicated)
+  target/arm: Implement SVE bitwise shift by vector (predicated)
+  target/arm: Implement SVE bitwise shift by wide elements (predicated)
+  target/arm: Implement SVE Integer Arithmetic - Unary Predicated Group
+  target/arm: Implement SVE Integer Multiply-Add Group
+  target/arm: Implement SVE Integer Arithmetic - Unpredicated Group
+  target/arm: Implement SVE Index Generation Group
+  target/arm: Implement SVE Stack Allocation Group
+  target/arm: Implement SVE Bitwise Shift - Unpredicated Group
+  target/arm: Implement SVE Compute Vector Address Group
+  target/arm: Implement SVE floating-point exponential accelerator
+  target/arm: Implement SVE floating-point trig select coefficient
+  target/arm: Implement SVE Element Count Group
+  target/arm: Implement SVE Bitwise Immediate Group
+  target/arm: Implement SVE Integer Wide Immediate - Predicated Group
+  target/arm: Implement SVE Permute - Extract Group
+  target/arm: Extend vec_reg_offset to larger sizes
+  target/arm: Implement SVE Permute - Unpredicated Group
+
+ target/arm/cpu.h           |    8 +-
+ target/arm/helper-sve.h    |  450 ++++++++
+ target/arm/helper.h        |    1 +
+ target/arm/translate-a64.h |  118 ++
+ target/arm/sve_helper.c    | 1676 +++++++++++++++++++++++++++
+ target/arm/translate-a64.c |  119 +-
+ target/arm/translate-sve.c | 2203 ++++++++++++++++++++++++++++++++++++
+ .gitignore                 |    1 +
+ target/arm/Makefile.objs   |   10 +
+ target/arm/sve.decode      |  446 ++++++++
+ 10 files changed, 4933 insertions(+), 99 deletions(-)
+ create mode 100644 target/arm/helper-sve.h
+ create mode 100644 target/arm/translate-a64.h
+ create mode 100644 target/arm/sve_helper.c
+ create mode 100644 target/arm/translate-sve.c
+ create mode 100644 target/arm/sve.decode
 
 -- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+2.17.0
