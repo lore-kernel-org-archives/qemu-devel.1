@@ -1,27 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34526)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35214)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jingqi.liu@intel.com>) id 1fIpvW-0005Io-A7
-	for qemu-devel@nongnu.org; Wed, 16 May 2018 02:28:43 -0400
+	(envelope-from <peterx@redhat.com>) id 1fIpxB-0006IN-4C
+	for qemu-devel@nongnu.org; Wed, 16 May 2018 02:30:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jingqi.liu@intel.com>) id 1fIpvS-0002Im-52
-	for qemu-devel@nongnu.org; Wed, 16 May 2018 02:28:42 -0400
-Received: from mga04.intel.com ([192.55.52.120]:4802)
+	(envelope-from <peterx@redhat.com>) id 1fIpx6-0004Ut-3C
+	for qemu-devel@nongnu.org; Wed, 16 May 2018 02:30:25 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:38068 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jingqi.liu@intel.com>)
-	id 1fIpvR-0002HS-PV
-	for qemu-devel@nongnu.org; Wed, 16 May 2018 02:28:38 -0400
-From: "Liu, Jingqi" <jingqi.liu@intel.com>
-Date: Wed, 16 May 2018 06:28:32 +0000
-Message-ID: <09D68D4CF52CAF489B702DEBDD12D3D3526A2004@SHSMSX103.ccr.corp.intel.com>
-References: <1525854869-13975-1-git-send-email-jingqi.liu@intel.com>
-	<20180515163549.2389fc70@redhat.com>
-In-Reply-To: <20180515163549.2389fc70@redhat.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1fIpx5-0004RR-UW
+	for qemu-devel@nongnu.org; Wed, 16 May 2018 02:30:20 -0400
+Date: Wed, 16 May 2018 14:30:09 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20180516063009.GG9089@xz-mi>
+References: <20180504030811.28111-1-peterx@redhat.com>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v1 1/7] hmat acpi: Build Memory Subsystem
- Address Range Structre(s) in ACPI HMAT
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20180504030811.28111-1-peterx@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2 00/10] intel-iommu: nested vIOMMU,
+ cleanups, bug fixes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,130 +27,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: "pbonzini@redhat.com" <pbonzini@redhat.com>, "rth@twiddle.net" <rth@twiddle.net>, "ehabkost@redhat.com" <ehabkost@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "mst@redhat.com" <mst@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: Tian Kevin <kevin.tian@intel.com>, "Michael S . Tsirkin" <mst@redhat.com>, Alex Williamson <alex.williamson@redhat.com>, Jintack Lim <jintack@cs.columbia.edu>, Jason Wang <jasowang@redhat.com>
 
-On Tue, May 15, 2018 10:36 PM, Igor Mammedov <imammedo@redhat.com> wrote:
+On Fri, May 04, 2018 at 11:08:01AM +0800, Peter Xu wrote:
+> v2:
+> - fix patchew code style warnings
+> - interval tree: postpone malloc when inserting; simplify node remove
+>   a bit where proper [Jason]
+> - fix up comment and commit message for iommu lock patch [Kevin]
+> - protect context cache too using the iommu lock [Kevin, Jason]
+> - add vast comment in patch 8 to explain the modify-PTE problem
+>   [Jason, Kevin]
 
-> On Wed,  9 May 2018 16:34:29 +0800
-> Liu Jingqi <jingqi.liu@intel.com> wrote:
->=20
-> > HMAT is defined in ACPI 6.2: 5.2.27 Heterogeneous Memory Attribute Tabl=
-e
-> (HMAT).
-> > The specification references below link:
-> > http://www.uefi.org/sites/default/files/resources/ACPI_6_2.pdf
-> >
-> > It describes the memory attributes, such as memory side cache
-> > attributes and bandwidth and latency details, related to the System
-> > Physical Address (SPA) Memory Ranges. The software is expected to use
-> > this information as hint for optimization.
-> >
-> > This structure describes the System Physical Address(SPA) range
-> > occupied by memory subsystem and its associativity with processor
-> > proximity domain as well as hint for memory usage.
-> >
-> > Signed-off-by: Liu Jingqi <jingqi.liu@intel.com>
-> > ---
-> >  default-configs/x86_64-softmmu.mak |   1 +
-> >  hw/acpi/Makefile.objs              |   1 +
-> >  hw/acpi/hmat.c                     | 174
-> +++++++++++++++++++++++++++++++++++++
-> >  hw/acpi/hmat.h                     |  75 ++++++++++++++++
-> >  hw/i386/acpi-build.c               |   3 +
-> >  5 files changed, 254 insertions(+)
-> >  create mode 100644 hw/acpi/hmat.c
-> >  create mode 100644 hw/acpi/hmat.h
-> >
-> > diff --git a/default-configs/x86_64-softmmu.mak
-> > b/default-configs/x86_64-softmmu.mak
-> > index 0390b43..3b4a37d 100644
-> > --- a/default-configs/x86_64-softmmu.mak
-> > +++ b/default-configs/x86_64-softmmu.mak
-> > @@ -66,3 +66,4 @@ CONFIG_I2C=3Dy
-> >  CONFIG_SEV=3D$(CONFIG_KVM)
-> >  CONFIG_VTD=3Dy
-> >  CONFIG_AMD_IOMMU=3Dy
-> > +CONFIG_ACPI_HMAT=3Dy
-> > diff --git a/hw/acpi/Makefile.objs b/hw/acpi/Makefile.objs index
-> > 11c35bc..21889fd 100644
-> > --- a/hw/acpi/Makefile.objs
-> > +++ b/hw/acpi/Makefile.objs
-> > @@ -6,6 +6,7 @@ common-obj-$(CONFIG_ACPI_MEMORY_HOTPLUG) +=3D
-> > memory_hotplug.o
-> >  common-obj-$(CONFIG_ACPI_CPU_HOTPLUG) +=3D cpu.o
-> >  common-obj-$(CONFIG_ACPI_NVDIMM) +=3D nvdimm.o
-> >  common-obj-$(CONFIG_ACPI_VMGENID) +=3D vmgenid.o
-> > +common-obj-$(CONFIG_ACPI_HMAT) +=3D hmat.o
-> >  common-obj-$(call lnot,$(CONFIG_ACPI_X86)) +=3D acpi-stub.o
-> >
-> >  common-obj-y +=3D acpi_interface.o
-> > diff --git a/hw/acpi/hmat.c b/hw/acpi/hmat.c new file mode 100644
-> > index 0000000..bca1fbb
-> > --- /dev/null
-> > +++ b/hw/acpi/hmat.c
-> > @@ -0,0 +1,174 @@
-> > +/*
-> > + * HMAT ACPI Implementation
-> > + *
-> > + * Copyright(C) 2018 Intel Corporation.
-> > + *
-> > + * Author:
-> > + *  Liu jingqi <jingqi.liu@linux.intel.com>
-> > + *
-> > + * HMAT is defined in ACPI 6.2.
-> > + *
-> > + * This library is free software; you can redistribute it and/or
-> > + * modify it under the terms of the GNU Lesser General Public
-> > + * License as published by the Free Software Foundation; either
-> > + * version 2 of the License, or (at your option) any later version.
-> > + *
-> > + * This library is distributed in the hope that it will be useful,
-> > + * but WITHOUT ANY WARRANTY; without even the implied warranty of
-> > + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-> > + * Lesser General Public License for more details.
-> > + *
-> > + * You should have received a copy of the GNU Lesser General Public
-> > + * License along with this library; if not, see
-> > +<http://www.gnu.org/licenses/>  */
-> > +
-> > +#include "unistd.h"
-> > +#include "fcntl.h"
-> > +#include "qemu/osdep.h"
-> > +#include "sysemu/numa.h"
-> > +#include "hw/i386/pc.h"
-> > +#include "hw/acpi/acpi.h"
-> > +#include "hw/acpi/hmat.h"
-> > +#include "hw/acpi/aml-build.h"
-> > +#include "hw/nvram/fw_cfg.h"
-> > +#include "hw/acpi/bios-linker-loader.h"
-> > +
-> > +#define HOLE_640K_START  (640 * 1024)
-> > +#define HOLE_640K_END    (1024 * 1024)
-> > +
-> > +uint32_t initiator_pxm[MAX_NODES], target_pxm[MAX_NODES]; uint32_t
-> > +num_initiator =3D 0, num_target =3D 0;
-> > +
-> > +static void hmat_build_spa_info(AcpiHmatSpaRange *spa,
-> > +                                uint64_t base, uint64_t length, int
-> > +node) {
-> > +    int i;
-> > +
-> > +    spa->type       =3D ACPI_HMAT_SPA;
-> > +    spa->length     =3D sizeof(*spa);
-> > +    spa->spa_base   =3D base;
-> > +    spa->spa_length =3D length;
-> all of above will break on big-endian host, that's one of the reasons we =
-prefer
-> new code/tables to use build_append_foo() API.
->=20
-> Pls rewrite it using preferred build_append_int_noprefix() API,
-> build_amd_iommu() can serve as an example.
->=20
-> As comments above fields use exact field names from spec tables so one co=
-uld
-> easily match spec vs code.
->=20
-Thanks for your reviewing.
-I will use preferred build_append_int_noprefix() API in next version.
-Jingqi Liu
+We can hold a bit on reviewing this series.  Jintack reported a scp
+DMAR issue that might happen even with L1 guest with this series, and
+the scp can stall after copied tens or hundreds of MBs randomly.  I'm
+still investigating the problem.  This problem should be related to
+deferred flushing of VT-d kernel driver, since the problem will go
+away if we use "intel_iommu=on,strict".  However I'm still trying to
+figure out what's the thing behind the scene even with that deferred
+flushing feature.
+
+Meanwhile, during the investigation I found another "possibly valid"
+use case about the modify-PTE problem that Jason has mentioned when
+with deferred flushing:
+
+         vcpu1                        vcpu2
+      map page A
+  explicitly send PSI for A
+   queue unmap page A [1]
+                                 map the same page A [2]
+                                explcitly send PSI for A [3]
+   flush unmap page A [4]
+
+Due to deferred flushing, the UNMAP PSI might be postponed (or it can
+be finally a DSI) from step [1] to step [4].  If we allocate the same
+page somewhere else, we might trigger this modify-PTE at [2] since we
+haven't yet received the deferred PSI to unmap A from vcpu1.
+
+Note that this will not happen with latest upstream Linux, since the
+IOVA allocation algorithm in current Linux kernel made sure that the
+IOVA range won't be freed until [4], so we can't really allocate the
+same page address at [2].  However this let me tend to agree with
+Jason and Kevin's worry on future potential issues if that can be
+triggered easily by common guest kernel bugs.  So now I'm considering
+to drop my mergable interval tree but just use a simpler tree to cache
+everything including translated addresses.  The metadata will possibly
+take 2% of managed memory if with that.
+
+-- 
+Peter Xu
