@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34542)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34945)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhangckid@gmail.com>) id 1fIwuJ-0005j4-2E
-	for qemu-devel@nongnu.org; Wed, 16 May 2018 09:55:56 -0400
+	(envelope-from <jasowang@redhat.com>) id 1fIwwE-0006WN-4d
+	for qemu-devel@nongnu.org; Wed, 16 May 2018 09:57:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zhangckid@gmail.com>) id 1fIwuH-0004xo-8F
-	for qemu-devel@nongnu.org; Wed, 16 May 2018 09:55:55 -0400
-Received: from mail-wm0-x230.google.com ([2a00:1450:400c:c09::230]:40793)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <zhangckid@gmail.com>) id 1fIwuG-0004xb-T7
-	for qemu-devel@nongnu.org; Wed, 16 May 2018 09:55:53 -0400
-Received: by mail-wm0-x230.google.com with SMTP id j5-v6so1928782wme.5
-	for <qemu-devel@nongnu.org>; Wed, 16 May 2018 06:55:52 -0700 (PDT)
+	(envelope-from <jasowang@redhat.com>) id 1fIww9-0005jM-9M
+	for qemu-devel@nongnu.org; Wed, 16 May 2018 09:57:54 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:51150 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1fIww9-0005j2-48
+	for qemu-devel@nongnu.org; Wed, 16 May 2018 09:57:49 -0400
+References: <20180504030811.28111-1-peterx@redhat.com>
+	<20180516063009.GG9089@xz-mi>
+From: Jason Wang <jasowang@redhat.com>
+Message-ID: <ab9ca375-76e3-baa8-9e60-40a73e9a354a@redhat.com>
+Date: Wed, 16 May 2018 21:57:40 +0800
 MIME-Version: 1.0
-In-Reply-To: <20180516111239.GC2531@work-vm>
-References: <20180514165424.12884-1-zhangckid@gmail.com>
-	<20180514165424.12884-5-zhangckid@gmail.com>
-	<20180516111239.GC2531@work-vm>
-From: Zhang Chen <zhangckid@gmail.com>
-Date: Wed, 16 May 2018 21:55:51 +0800
-Message-ID: <CAK3tnvKotft_fzexexPD8WuFqNnNQtrV38jfmCGsaByu4MBTxg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH V7 RESEND 04/17] COLO: integrate colo
- compare with colo frame
+In-Reply-To: <20180516063009.GG9089@xz-mi>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 00/10] intel-iommu: nested vIOMMU,
+ cleanups, bug fixes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,178 +29,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: qemu-devel@nongnu.org, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Jason Wang <jasowang@redhat.com>, zhanghailiang <zhang.zhanghailiang@huawei.com>
+To: Peter Xu <peterx@redhat.com>, qemu-devel@nongnu.org
+Cc: Tian Kevin <kevin.tian@intel.com>, "Michael S . Tsirkin" <mst@redhat.com>, Alex Williamson <alex.williamson@redhat.com>, Jintack Lim <jintack@cs.columbia.edu>
 
-On Wed, May 16, 2018 at 7:12 PM, Dr. David Alan Gilbert <dgilbert@redhat.com
-> wrote:
 
-> * Zhang Chen (zhangckid@gmail.com) wrote:
-> > For COLO FT, both the PVM and SVM run at the same time,
-> > only sync the state while it needs.
-> >
-> > So here, let SVM runs while not doing checkpoint, change
-> > DEFAULT_MIGRATE_X_CHECKPOINT_DELAY to 200*100.
-> >
-> > Besides, we forgot to release colo_checkpoint_semd and
-> > colo_delay_timer, fix them here.
-> >
-> > Signed-off-by: zhanghailiang <zhang.zhanghailiang@huawei.com>
-> > Signed-off-by: Zhang Chen <zhangckid@gmail.com>
-> > Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> > ---
-> >  migration/colo.c      | 42 ++++++++++++++++++++++++++++++++++++++++--
-> >  migration/migration.c |  4 ++--
-> >  2 files changed, 42 insertions(+), 4 deletions(-)
-> >
-> > diff --git a/migration/colo.c b/migration/colo.c
-> > index 4381067ed4..081df1835f 100644
-> > --- a/migration/colo.c
-> > +++ b/migration/colo.c
-> > @@ -25,8 +25,11 @@
-> >  #include "qemu/error-report.h"
-> >  #include "migration/failover.h"
-> >  #include "replication.h"
-> > +#include "net/colo-compare.h"
-> > +#include "net/colo.h"
-> >
-> >  static bool vmstate_loading;
-> > +static Notifier packets_compare_notifier;
-> >
-> >  #define COLO_BUFFER_BASE_SIZE (4 * 1024 * 1024)
-> >
-> > @@ -343,6 +346,11 @@ static int colo_do_checkpoint_transaction(MigrationState
-> *s,
-> >          goto out;
-> >      }
-> >
-> > +    colo_notify_compares_event(NULL, COLO_EVENT_CHECKPOINT,
-> &local_err);
-> > +    if (local_err) {
-> > +        goto out;
-> > +    }
-> > +
-> >      /* Disable block migration */
-> >      migrate_set_block_enabled(false, &local_err);
-> >      qemu_savevm_state_header(fb);
-> > @@ -400,6 +408,11 @@ out:
-> >      return ret;
-> >  }
-> >
-> > +static void colo_compare_notify_checkpoint(Notifier *notifier, void
-> *data)
-> > +{
-> > +    colo_checkpoint_notify(data);
-> > +}
-> > +
-> >  static void colo_process_checkpoint(MigrationState *s)
-> >  {
-> >      QIOChannelBuffer *bioc;
-> > @@ -416,6 +429,9 @@ static void colo_process_checkpoint(MigrationState
-> *s)
-> >          goto out;
-> >      }
-> >
-> > +    packets_compare_notifier.notify = colo_compare_notify_checkpoint;
-> > +    colo_compare_register_notifier(&packets_compare_notifier);
-> > +
-> >      /*
-> >       * Wait for Secondary finish loading VM states and enter COLO
-> >       * restore.
-> > @@ -461,11 +477,21 @@ out:
-> >          qemu_fclose(fb);
-> >      }
-> >
-> > -    timer_del(s->colo_delay_timer);
-> > -
-> >      /* Hope this not to be too long to wait here */
-> >      qemu_sem_wait(&s->colo_exit_sem);
-> >      qemu_sem_destroy(&s->colo_exit_sem);
-> > +
-> > +    /*
-> > +     * It is safe to unregister notifier after failover finished.
-> > +     * Besides, colo_delay_timer and colo_checkpoint_sem can't be
-> > +     * released befor unregister notifier, or there will be
-> use-after-free
-> > +     * error.
-> > +     */
-> > +    colo_compare_unregister_notifier(&packets_compare_notifier);
-> > +    timer_del(s->colo_delay_timer);
-> > +    timer_free(s->colo_delay_timer);
-> > +    qemu_sem_destroy(&s->colo_checkpoint_sem);
-> > +
-> >      /*
-> >       * Must be called after failover BH is completed,
-> >       * Or the failover BH may shutdown the wrong fd that
-> > @@ -558,6 +584,11 @@ void *colo_process_incoming_thread(void *opaque)
-> >      fb = qemu_fopen_channel_input(QIO_CHANNEL(bioc));
-> >      object_unref(OBJECT(bioc));
-> >
-> > +    qemu_mutex_lock_iothread();
-> > +    vm_start();
-> > +    trace_colo_vm_state_change("stop", "run");
-> > +    qemu_mutex_unlock_iothread();
-> > +
-> >      colo_send_message(mis->to_src_file, COLO_MESSAGE_CHECKPOINT_READY,
-> >                        &local_err);
-> >      if (local_err) {
-> > @@ -577,6 +608,11 @@ void *colo_process_incoming_thread(void *opaque)
-> >              goto out;
-> >          }
-> >
-> > +        qemu_mutex_lock_iothread();
-> > +        vm_stop_force_state(RUN_STATE_COLO);
-> > +        trace_colo_vm_state_change("run", "stop");
-> > +        qemu_mutex_unlock_iothread();
-> > +
-> >          /* FIXME: This is unnecessary for periodic checkpoint mode */
-> >          colo_send_message(mis->to_src_file,
-> COLO_MESSAGE_CHECKPOINT_REPLY,
-> >                       &local_err);
-> > @@ -630,6 +666,8 @@ void *colo_process_incoming_thread(void *opaque)
-> >          }
-> >
-> >          vmstate_loading = false;
-> > +        vm_start();
-> > +        trace_colo_vm_state_change("stop", "run");
-> >          qemu_mutex_unlock_iothread();
-> >
-> >          if (failover_get_state() == FAILOVER_STATUS_RELAUNCH) {
-> > diff --git a/migration/migration.c b/migration/migration.c
-> > index 35f2781b03..bca187275a 100644
-> > --- a/migration/migration.c
-> > +++ b/migration/migration.c
-> > @@ -76,9 +76,9 @@
-> >  #define DEFAULT_MIGRATE_XBZRLE_CACHE_SIZE (64 * 1024 * 1024)
-> >
-> >  /* The delay time (in ms) between two COLO checkpoints
-> > - * Note: Please change this default value to 10000 when we support
-> hybrid mode.
-> > + * Note: Please change this default value to 20000 when we support
-> hybrid mode.
+
+On 2018=E5=B9=B405=E6=9C=8816=E6=97=A5 14:30, Peter Xu wrote:
+> On Fri, May 04, 2018 at 11:08:01AM +0800, Peter Xu wrote:
+>> v2:
+>> - fix patchew code style warnings
+>> - interval tree: postpone malloc when inserting; simplify node remove
+>>    a bit where proper [Jason]
+>> - fix up comment and commit message for iommu lock patch [Kevin]
+>> - protect context cache too using the iommu lock [Kevin, Jason]
+>> - add vast comment in patch 8 to explain the modify-PTE problem
+>>    [Jason, Kevin]
+> We can hold a bit on reviewing this series.  Jintack reported a scp
+> DMAR issue that might happen even with L1 guest with this series, and
+> the scp can stall after copied tens or hundreds of MBs randomly.  I'm
+> still investigating the problem.  This problem should be related to
+> deferred flushing of VT-d kernel driver, since the problem will go
+> away if we use "intel_iommu=3Don,strict".  However I'm still trying to
+> figure out what's the thing behind the scene even with that deferred
+> flushing feature.
+
+I vaguely remember recent upstream vfio support delayed flush, maybe=20
+it's related.
+
 >
-> You can remove that comment now?
+> Meanwhile, during the investigation I found another "possibly valid"
+> use case about the modify-PTE problem that Jason has mentioned when
+> with deferred flushing:
+>
+>           vcpu1                        vcpu2
+>        map page A
+>    explicitly send PSI for A
+>     queue unmap page A [1]
+>                                   map the same page A [2]
+>                                  explcitly send PSI for A [3]
+>     flush unmap page A [4]
+>
+> Due to deferred flushing, the UNMAP PSI might be postponed (or it can
+> be finally a DSI) from step [1] to step [4].  If we allocate the same
+> page somewhere else, we might trigger this modify-PTE at [2] since we
+> haven't yet received the deferred PSI to unmap A from vcpu1.
+>
+> Note that this will not happen with latest upstream Linux, since the
+> IOVA allocation algorithm in current Linux kernel made sure that the
+> IOVA range won't be freed until [4], so we can't really allocate the
+> same page address at [2].
+
+Yes, so the vfio + vIOMMU work will probably uncover more bugs in the=20
+IOMMU driver (especially CM mode). I suspect CM mode does not have=20
+sufficient test (since it probably wasn't used in any production=20
+environment before the vfio + vIOMMU work).
+
+>    However this let me tend to agree with
+> Jason and Kevin's worry on future potential issues if that can be
+> triggered easily by common guest kernel bugs.  So now I'm considering
+> to drop my mergable interval tree but just use a simpler tree to cache
+> everything including translated addresses.  The metadata will possibly
+> take 2% of managed memory if with that.
 >
 
-Yes, I will remove it in next version.
+Good to know this, we can start from the way we know correct for sure=20
+then optimizations on top.
 
 Thanks
-Zhang Chen
-
-
-
->
-> Dave
->
-> >   */
-> > -#define DEFAULT_MIGRATE_X_CHECKPOINT_DELAY 200
-> > +#define DEFAULT_MIGRATE_X_CHECKPOINT_DELAY (200 * 100)
-> >  #define DEFAULT_MIGRATE_MULTIFD_CHANNELS 2
-> >  #define DEFAULT_MIGRATE_MULTIFD_PAGE_COUNT 16
-> >
-> > --
-> > 2.17.0
-> >
-> --
-> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
->
