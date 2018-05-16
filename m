@@ -1,16 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33487)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35903)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1fJ0S7-00078O-D2
-	for qemu-devel@nongnu.org; Wed, 16 May 2018 13:43:04 -0400
+	(envelope-from <eblake@redhat.com>) id 1fJ0d8-0004J2-5R
+	for qemu-devel@nongnu.org; Wed, 16 May 2018 13:54:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1fJ0S6-0006sn-EB
-	for qemu-devel@nongnu.org; Wed, 16 May 2018 13:43:03 -0400
-From: Jeff Cody <jcody@redhat.com>
-Date: Wed, 16 May 2018 13:42:34 -0400
-Message-Id: <20180516174234.311-5-jcody@redhat.com>
-In-Reply-To: <20180516174234.311-1-jcody@redhat.com>
-References: <20180516174234.311-1-jcody@redhat.com>
-Subject: [Qemu-devel] [PULL 4/4] nfs: Remove processed options from QDict
+	(envelope-from <eblake@redhat.com>) id 1fJ0d7-0003Bh-Fd
+	for qemu-devel@nongnu.org; Wed, 16 May 2018 13:54:26 -0400
+References: <20180509162637.15575-1-kwolf@redhat.com>
+	<20180509162637.15575-12-kwolf@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <f870bd47-1d1e-4a83-8250-ff68b42607e4@redhat.com>
+Date: Wed, 16 May 2018 12:54:15 -0500
+MIME-Version: 1.0
+In-Reply-To: <20180509162637.15575-12-kwolf@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 11/42] job: Add job_delete()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -19,54 +24,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-block@nongnu.org
-Cc: peter.maydell@linaro.org, jcody@redhat.com, Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>, qemu-stable@nongnu.org
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+Cc: mreitz@redhat.com, jsnow@redhat.com, armbru@redhat.com, jcody@redhat.com, qemu-devel@nongnu.org
 
-From: Kevin Wolf <kwolf@redhat.com>
+On 05/09/2018 11:26 AM, Kevin Wolf wrote:
+> This moves freeing the Job object and its fields from block_job_unref()
+> to job_delete().
+> 
+> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+> ---
+>   include/qemu/job.h | 3 +++
+>   blockjob.c         | 3 +--
+>   job.c              | 6 ++++++
+>   3 files changed, 10 insertions(+), 2 deletions(-)
+> 
 
-Commit c22a03454 QAPIfied option parsing in the NFS block driver, but
-forgot to remove all the options we processed. Therefore, we get an
-error in bdrv_open_inherit(), which thinks the remaining options are
-invalid. Trying to open an NFS image will result in an error like this:
+> +
+> +void job_delete(Job *job)
+> +{
+> +    g_free(job->id);
+> +    g_free(job);
+> +}
 
-    Block protocol 'nfs' doesn't support the option 'server.host'
+Should this be free-like, acting as a no-op when job == NULL on input?
 
-Remove all options from the QDict to make the NFS driver work again.
-
-Cc: qemu-stable@nongnu.org
-Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-Message-id: 20180516160816.26259-1-kwolf@redhat.com
-Reviewed-by: Eric Blake <eblake@redhat.com>
-Reviewed-by: Jeff Cody <jcody@redhat.com>
-Signed-off-by: Jeff Cody <jcody@redhat.com>
----
- block/nfs.c | 7 +++++++
- 1 file changed, 7 insertions(+)
-
-diff --git a/block/nfs.c b/block/nfs.c
-index 4ee2ad59d9..3349b67a76 100644
---- a/block/nfs.c
-+++ b/block/nfs.c
-@@ -557,6 +557,7 @@ static BlockdevOptionsNfs *nfs_options_qdict_to_qapi(QDict *options,
-     BlockdevOptionsNfs *opts = NULL;
-     QObject *crumpled = NULL;
-     Visitor *v;
-+    const QDictEntry *e;
-     Error *local_err = NULL;
- 
-     crumpled = qdict_crumple(options, errp);
-@@ -574,6 +575,12 @@ static BlockdevOptionsNfs *nfs_options_qdict_to_qapi(QDict *options,
-         return NULL;
-     }
- 
-+    /* Remove the processed options from the QDict (the visitor processes
-+     * _all_ options in the QDict) */
-+    while ((e = qdict_first(options))) {
-+        qdict_del(options, e->key);
-+    }
-+
-     return opts;
- }
- 
 -- 
-2.13.6
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
