@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58793)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59139)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhangckid@gmail.com>) id 1fIwge-0005sg-Db
-	for qemu-devel@nongnu.org; Wed, 16 May 2018 09:41:53 -0400
+	(envelope-from <lvivier@redhat.com>) id 1fIwih-0006im-Mv
+	for qemu-devel@nongnu.org; Wed, 16 May 2018 09:43:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zhangckid@gmail.com>) id 1fIwgc-000661-Jk
-	for qemu-devel@nongnu.org; Wed, 16 May 2018 09:41:48 -0400
-Received: from mail-wr0-x244.google.com ([2a00:1450:400c:c0c::244]:42535)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <zhangckid@gmail.com>) id 1fIwgc-00065f-8U
-	for qemu-devel@nongnu.org; Wed, 16 May 2018 09:41:46 -0400
-Received: by mail-wr0-x244.google.com with SMTP id v5-v6so1238271wrf.9
-	for <qemu-devel@nongnu.org>; Wed, 16 May 2018 06:41:46 -0700 (PDT)
+	(envelope-from <lvivier@redhat.com>) id 1fIwie-0007A3-Bw
+	for qemu-devel@nongnu.org; Wed, 16 May 2018 09:43:55 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:50772 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <lvivier@redhat.com>) id 1fIwie-00079f-77
+	for qemu-devel@nongnu.org; Wed, 16 May 2018 09:43:52 -0400
+References: <20180425071040.25542-1-bala24@linux.vnet.ibm.com>
+	<20180425071040.25542-2-bala24@linux.vnet.ibm.com>
+	<20180501143737.GA25113@9.122.211.20>
+From: Laurent Vivier <lvivier@redhat.com>
+Message-ID: <d4e1788d-64c9-4b43-5fd6-4008b616362e@redhat.com>
+Date: Wed, 16 May 2018 15:43:48 +0200
 MIME-Version: 1.0
-In-Reply-To: <87603p6lgf.fsf@dusky.pond.sub.org>
-References: <1526268228-27951-1-git-send-email-zhangckid@gmail.com>
-	<1526268228-27951-11-git-send-email-zhangckid@gmail.com>
-	<87603p6lgf.fsf@dusky.pond.sub.org>
-From: Zhang Chen <zhangckid@gmail.com>
-Date: Wed, 16 May 2018 21:41:44 +0800
-Message-ID: <CAK3tnvJe-+5uXvFp-83dfCrtyqrJpgkjv8HzEE8NNi0q0NJS6A@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH V7 10/17] qmp event: Add COLO_EXIT event to
- notify users while exited COLO
+In-Reply-To: <20180501143737.GA25113@9.122.211.20>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v3 1/1] migration: calculate
+ expected_downtime with ram_bytes_remaining()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,163 +30,107 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: qemu-devel@nongnu.org, zhanghailiang <zhang.zhanghailiang@huawei.com>, Li Zhijian <lizhijian@cn.fujitsu.com>, Jason Wang <jasowang@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: Balamuruhan S <bala24@linux.vnet.ibm.com>, dgilbert@redhat.com, quintela@redhat.com, david@gibson.dropbear.id.au
+Cc: qemu-devel@nongnu.org
 
-On Tue, May 15, 2018 at 10:29 PM, Markus Armbruster <armbru@redhat.com>
-wrote:
+Hi Bala,
 
-> Zhang Chen <zhangckid@gmail.com> writes:
->
-> > From: zhanghailiang <zhang.zhanghailiang@huawei.com>
-> >
-> > If some errors happen during VM's COLO FT stage, it's important to
-> > notify the users of this event. Together with 'x-colo-lost-heartbeat',
-> > Users can intervene in COLO's failover work immediately.
-> > If users don't want to get involved in COLO's failover verdict,
-> > it is still necessary to notify users that we exited COLO mode.
-> >
-> > Signed-off-by: zhanghailiang <zhang.zhanghailiang@huawei.com>
-> > Signed-off-by: Li Zhijian <lizhijian@cn.fujitsu.com>
-> > Signed-off-by: Zhang Chen <zhangckid@gmail.com>
-> > Reviewed-by: Eric Blake <eblake@redhat.com>
-> > ---
-> >  migration/colo.c    | 20 ++++++++++++++++++++
-> >  qapi/migration.json | 37 +++++++++++++++++++++++++++++++++++++
-> >  2 files changed, 57 insertions(+)
-> >
-> > diff --git a/migration/colo.c b/migration/colo.c
-> > index c083d36..8ca6381 100644
-> > --- a/migration/colo.c
-> > +++ b/migration/colo.c
-> > @@ -28,6 +28,7 @@
-> >  #include "net/colo-compare.h"
-> >  #include "net/colo.h"
-> >  #include "block/block.h"
-> > +#include "qapi/qapi-events-migration.h"
-> >
-> >  static bool vmstate_loading;
-> >  static Notifier packets_compare_notifier;
-> > @@ -514,6 +515,18 @@ out:
-> >          qemu_fclose(fb);
-> >      }
-> >
-> > +    /*
-> > +     * There are only two reasons we can go here, some error happened.
-> > +     * Or the user triggered failover.
-> > +     */
-> > +    if (failover_get_state() == FAILOVER_STATUS_NONE) {
-> > +        qapi_event_send_colo_exit(COLO_MODE_PRIMARY,
-> > +                                  COLO_EXIT_REASON_ERROR, NULL);
-> > +    } else {
-> > +        qapi_event_send_colo_exit(COLO_MODE_PRIMARY,
-> > +                                  COLO_EXIT_REASON_REQUEST, NULL);
-> > +    }
->
-> Your comment makes me suspect failover_get_state() can only be
-> FAILOVER_STATUS_NONE or FAILOVER_STATUS_REQUIRE here.  Is that correct?
->
-> If yes, I recommend to add a suitable assertion.
->
+I've tested you patch migrating a pseries between a P9 host and a P8
+host with 1G huge page size on the P9 side and 16MB on P8 side and the
+information are strange now.
 
-Yes, and what kinds of 'suitable assertion'? Just for the
-'failover_get_state()' ?
+"remaining ram" doesn't change, and after a while it can be set to "0"
+and estimated downtime is 0 too, but the migration is not completed and
+"transferred ram" continues to increase.
 
+so think there is a problem somewhere...
 
+thanks,
+Laurent
 
->
-> > +
-> >      /* Hope this not to be too long to wait here */
-> >      qemu_sem_wait(&s->colo_exit_sem);
-> >      qemu_sem_destroy(&s->colo_exit_sem);
-> > @@ -744,6 +757,13 @@ out:
-> >      if (local_err) {
-> >          error_report_err(local_err);
-> >      }
-> > +    if (failover_get_state() == FAILOVER_STATUS_NONE) {
-> > +        qapi_event_send_colo_exit(COLO_MODE_SECONDARY,
-> > +                                  COLO_EXIT_REASON_ERROR, NULL);
-> > +    } else {
-> > +        qapi_event_send_colo_exit(COLO_MODE_SECONDARY,
-> > +                                  COLO_EXIT_REASON_REQUEST, NULL);
-> > +    }
->
-> Same question.
->
-> >
-> >      if (fb) {
-> >          qemu_fclose(fb);
-> > diff --git a/qapi/migration.json b/qapi/migration.json
-> > index f3974c6..55dae48 100644
-> > --- a/qapi/migration.json
-> > +++ b/qapi/migration.json
-> > @@ -875,6 +875,43 @@
-> >    'data': [ 'none', 'require', 'active', 'completed', 'relaunch' ] }
-> >
-> >  ##
-> > +# @COLO_EXIT:
-> > +#
-> > +# Emitted when VM finishes COLO mode due to some errors happening or
-> > +# at the request of users.
-> > +#
-> > +# @mode: report COLO mode when COLO exited.
-> > +#
-> > +# @reason: describes the reason for the COLO exit.
-> > +#
-> > +# Since: 2.13
-> > +#
-> > +# Example:
-> > +#
-> > +# <- { "timestamp": {"seconds": 2032141960, "microseconds": 417172},
-> > +#      "event": "COLO_EXIT", "data": {"mode": "primary", "reason":
-> "request" } }
-> > +#
-> > +##
-> > +{ 'event': 'COLO_EXIT',
-> > +  'data': {'mode': 'COLOMode', 'reason': 'COLOExitReason' } }
->
-> 'data' duplicates the next patch's ColoStatus, except it lacks
-> @colo-running.  Factoring out the common part doesn't seem worth the
-> bother.  Okay as is.
->
-> > +
-> > +##
-> > +# @COLOExitReason:
-> > +#
-> > +# The reason for a COLO exit
-> > +#
-> > +# @none: no failover has ever happened.
->
-> This can't occur in the COLO_EXIT event, only in the result of
-> query-colo-status, can it?
-
-
-Yes.
-
-
-> Worth spelling that out in the documentation?
->
->
-OK, I will add more comments here in next version.
-
-Thanks
-Zhang Chen
-
-
-
-> > +#
-> > +# @request: COLO exit is due to an external request
-> > +#
-> > +# @error: COLO exit is due to an internal error
-> > +#
-> > +# Since: 2.13
-> > +##
-> > +{ 'enum': 'COLOExitReason',
-> > +  'data': [ 'none', 'request', 'error' ] }
-> > +
-> > +##
-> >  # @x-colo-lost-heartbeat:
-> >  #
-> >  # Tell qemu that heartbeat is lost, request it to do takeover
-> procedures.
->
+On 01/05/2018 16:37, Balamuruhan S wrote:
+> Hi,
+> 
+> Dave, David and Juan if you guys are okay with the patch, please
+> help to merge it.
+> 
+> Thanks,
+> Bala
+> 
+> On Wed, Apr 25, 2018 at 12:40:40PM +0530, Balamuruhan S wrote:
+>> expected_downtime value is not accurate with dirty_pages_rate * page_size,
+>> using ram_bytes_remaining would yeild it correct. It will initially be a
+>> gross over-estimate, but for for non-converging migrations it should
+>> approach a reasonable estimate later on.
+>>
+>> currently bandwidth and expected_downtime value are calculated in
+>> migration_update_counters() during each iteration from
+>> migration_thread(), where as remaining ram is calculated in
+>> qmp_query_migrate() when we actually call "info migrate". Due to this
+>> there is some difference in expected_downtime value being calculated.
+>>
+>> with this patch bandwidth, expected_downtime and remaining ram are
+>> calculated in migration_update_counters(), retrieve the same value during
+>> "info migrate". By this approach we get almost close enough value.
+>>
+>> Reported-by: Michael Roth <mdroth@linux.vnet.ibm.com>
+>> Signed-off-by: Balamuruhan S <bala24@linux.vnet.ibm.com>
+>> ---
+>>  migration/migration.c | 11 ++++++++---
+>>  migration/migration.h |  1 +
+>>  2 files changed, 9 insertions(+), 3 deletions(-)
+>>
+>> diff --git a/migration/migration.c b/migration/migration.c
+>> index 52a5092add..5d721ee481 100644
+>> --- a/migration/migration.c
+>> +++ b/migration/migration.c
+>> @@ -614,7 +614,7 @@ static void populate_ram_info(MigrationInfo *info, MigrationState *s)
+>>      }
+>>
+>>      if (s->state != MIGRATION_STATUS_COMPLETED) {
+>> -        info->ram->remaining = ram_bytes_remaining();
+>> +        info->ram->remaining = s->ram_bytes_remaining;
+>>          info->ram->dirty_pages_rate = ram_counters.dirty_pages_rate;
+>>      }
+>>  }
+>> @@ -2227,6 +2227,7 @@ static void migration_update_counters(MigrationState *s,
+>>      transferred = qemu_ftell(s->to_dst_file) - s->iteration_initial_bytes;
+>>      time_spent = current_time - s->iteration_start_time;
+>>      bandwidth = (double)transferred / time_spent;
+>> +    s->ram_bytes_remaining = ram_bytes_remaining();
+>>      s->threshold_size = bandwidth * s->parameters.downtime_limit;
+>>
+>>      s->mbps = (((double) transferred * 8.0) /
+>> @@ -2237,8 +2238,12 @@ static void migration_update_counters(MigrationState *s,
+>>       * recalculate. 10000 is a small enough number for our purposes
+>>       */
+>>      if (ram_counters.dirty_pages_rate && transferred > 10000) {
+>> -        s->expected_downtime = ram_counters.dirty_pages_rate *
+>> -            qemu_target_page_size() / bandwidth;
+>> +        /*
+>> +         * It will initially be a gross over-estimate, but for for
+>> +         * non-converging migrations it should approach a reasonable estimate
+>> +         * later on
+>> +         */
+>> +        s->expected_downtime = s->ram_bytes_remaining / bandwidth;
+>>      }
+>>
+>>      qemu_file_reset_rate_limit(s->to_dst_file);
+>> diff --git a/migration/migration.h b/migration/migration.h
+>> index 8d2f320c48..8584f8e22e 100644
+>> --- a/migration/migration.h
+>> +++ b/migration/migration.h
+>> @@ -128,6 +128,7 @@ struct MigrationState
+>>      int64_t downtime_start;
+>>      int64_t downtime;
+>>      int64_t expected_downtime;
+>> +    int64_t ram_bytes_remaining;
+>>      bool enabled_capabilities[MIGRATION_CAPABILITY__MAX];
+>>      int64_t setup_time;
+>>      /*
+>> -- 
+>> 2.14.3
+>>
+>>
+> 
+> 
