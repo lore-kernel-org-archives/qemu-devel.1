@@ -1,21 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52705)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55936)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1fJ3Td-0000NC-DW
-	for qemu-devel@nongnu.org; Wed, 16 May 2018 16:56:50 -0400
+	(envelope-from <no-reply@patchew.org>) id 1fJ3g2-0001Ol-U8
+	for qemu-devel@nongnu.org; Wed, 16 May 2018 17:09:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1fJ3Ta-00049l-Aw
-	for qemu-devel@nongnu.org; Wed, 16 May 2018 16:56:49 -0400
-Received: from mout.kundenserver.de ([217.72.192.75]:57113)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1fJ3Ta-00049B-1L
-	for qemu-devel@nongnu.org; Wed, 16 May 2018 16:56:46 -0400
-From: Laurent Vivier <laurent@vivier.eu>
-Date: Wed, 16 May 2018 22:55:42 +0200
-Message-Id: <20180516205543.29305-8-laurent@vivier.eu>
+	(envelope-from <no-reply@patchew.org>) id 1fJ3fy-0002qP-Gf
+	for qemu-devel@nongnu.org; Wed, 16 May 2018 17:09:38 -0400
+Resent-Message-Id: <E1fJ3fy-0002qP-Gf@eggs.gnu.org>
+Received: from sender-of-o51.zoho.com ([135.84.80.216]:21035)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1fJ3fy-0002p4-Ap
+	for qemu-devel@nongnu.org; Wed, 16 May 2018 17:09:34 -0400
 In-Reply-To: <20180516205543.29305-1-laurent@vivier.eu>
-References: <20180516205543.29305-1-laurent@vivier.eu>
-Subject: [Qemu-devel] [PATCH v2 7/8] linux-user: copy sparc/sockbits.h
- definitions from linux
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <152650491784.252.16631928542427428075@1f70390a8372>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Wed, 16 May 2018 14:08:39 -0700 (PDT)
+Subject: Re: [Qemu-devel] [PATCH v2 0/8] linux-user: move socket.h
+ definitions to CPU directories
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,165 +29,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Riku Voipio <riku.voipio@iki.fi>, Laurent Vivier <laurent@vivier.eu>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Richard Henderson <rth@twiddle.net>, Yongbok Kim <yongbok.kim@mips.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+To: laurent@vivier.eu
+Cc: famz@redhat.com, qemu-devel@nongnu.org, peter.maydell@linaro.org, riku.voipio@iki.fi, mark.cave-ayland@ilande.co.uk, f4bug@amsat.org, yongbok.kim@mips.com, rth@twiddle.net
 
-Values defined for sparc are not correct.
-Copy the content of "arch/sparc/include/uapi/asm/socket.h"
-to fix them.
-
-Signed-off-by: Laurent Vivier <laurent@vivier.eu>
----
- linux-user/sparc/sockbits.h | 131 +++++++++++++++++++++++++++++++-------------
- 1 file changed, 92 insertions(+), 39 deletions(-)
-
-diff --git a/linux-user/sparc/sockbits.h b/linux-user/sparc/sockbits.h
-index 6434b07033..0a822e3e1f 100644
---- a/linux-user/sparc/sockbits.h
-+++ b/linux-user/sparc/sockbits.h
-@@ -8,51 +8,104 @@
- #ifndef SPARC_SOCKBITS_H
- #define SPARC_SOCKBITS_H
- 
--#define TARGET_SO_PASSSEC        31
--
- /* For setsockopt(2) */
--#define TARGET_SOL_SOCKET      1
--
--#define TARGET_SO_DEBUG        1
--#define TARGET_SO_REUSEADDR    2
--#define TARGET_SO_TYPE         3
--#define TARGET_SO_ERROR        4
--#define TARGET_SO_DONTROUTE    5
--#define TARGET_SO_BROADCAST    6
--#define TARGET_SO_SNDBUF       7
--#define TARGET_SO_RCVBUF       8
--#define TARGET_SO_SNDBUFFORCE  32
--#define TARGET_SO_RCVBUFFORCE  33
--#define TARGET_SO_KEEPALIVE    9
--#define TARGET_SO_OOBINLINE    10
--#define TARGET_SO_NO_CHECK     11
--#define TARGET_SO_PRIORITY     12
--#define TARGET_SO_LINGER       13
--#define TARGET_SO_BSDCOMPAT    14
--/* To add :#define TARGET_SO_REUSEPORT 15 */
--#define TARGET_SO_PASSCRED     16
--#define TARGET_SO_PEERCRED     17
--#define TARGET_SO_RCVLOWAT     18
--#define TARGET_SO_SNDLOWAT     19
--#define TARGET_SO_RCVTIMEO     20
--#define TARGET_SO_SNDTIMEO     21
-+#define TARGET_SOL_SOCKET      0xffff
- 
--/* Security levels - as per NRL IPv6 - don't actually do anything */
--#define TARGET_SO_SECURITY_AUTHENTICATION              22
--#define TARGET_SO_SECURITY_ENCRYPTION_TRANSPORT        23
--#define TARGET_SO_SECURITY_ENCRYPTION_NETWORK          24
-+#define TARGET_SO_DEBUG        0x0001
-+#define TARGET_SO_PASSCRED     0x0002
-+#define TARGET_SO_REUSEADDR    0x0004
-+#define TARGET_SO_KEEPALIVE    0x0008
-+#define TARGET_SO_DONTROUTE    0x0010
-+#define TARGET_SO_BROADCAST    0x0020
-+#define TARGET_SO_PEERCRED     0x0040
-+#define TARGET_SO_LINGER       0x0080
-+#define TARGET_SO_OOBINLINE    0x0100
-+#define TARGET_SO_REUSEPORT    0x0200
-+#define TARGET_SO_BSDCOMPAT    0x0400
-+#define TARGET_SO_RCVLOWAT     0x0800
-+#define TARGET_SO_SNDLOWAT     0x1000
-+#define TARGET_SO_RCVTIMEO     0x2000
-+#define TARGET_SO_SNDTIMEO     0x4000
-+#define TARGET_SO_ACCEPTCONN   0x8000
-+
-+#define TARGET_SO_SNDBUF       0x1001
-+#define TARGET_SO_RCVBUF       0x1002
-+#define TARGET_SO_SNDBUFFORCE  0x100a
-+#define TARGET_SO_RCVBUFFORCE  0x100b
-+#define TARGET_SO_ERROR        0x1007
-+#define TARGET_SO_TYPE         0x1008
-+#define TARGET_SO_PROTOCOL     0x1028
-+#define TARGET_SO_DOMAIN       0x1029
-+
-+/* Linux specific, keep the same. */
-+#define TARGET_SO_NO_CHECK     0x000b
-+#define TARGET_SO_PRIORITY     0x000c
- 
--#define TARGET_SO_BINDTODEVICE 25
-+#define TARGET_SO_BINDTODEVICE 0x000d
- 
--/* Socket filtering */
--#define TARGET_SO_ATTACH_FILTER        26
--#define TARGET_SO_DETACH_FILTER        27
-+#define TARGET_SO_ATTACH_FILTER        0x001a
-+#define TARGET_SO_DETACH_FILTER        0x001b
-+#define TARGET_SO_GET_FILTER           TARGET_SO_ATTACH_FILTER
- 
--#define TARGET_SO_PEERNAME             28
--#define TARGET_SO_TIMESTAMP            29
-+#define TARGET_SO_PEERNAME             0x001c
-+#define TARGET_SO_TIMESTAMP            0x001d
- #define TARGET_SCM_TIMESTAMP           TARGET_SO_TIMESTAMP
- 
--#define TARGET_SO_ACCEPTCONN           30
-+#define TARGET_SO_PEERSEC              0x001e
-+#define TARGET_SO_PASSSEC              0x001f
-+#define TARGET_SO_TIMESTAMPNS          0x0021
-+#define TARGET_SCM_TIMESTAMPNS         TARGET_SO_TIMESTAMPNS
-+
-+#define TARGET_SO_MARK                 0x0022
-+
-+#define TARGET_SO_TIMESTAMPING         0x0023
-+#define TARGET_SCM_TIMESTAMPING        TARGET_SO_TIMESTAMPING
-+
-+#define TARGET_SO_RXQ_OVFL             0x0024
-+
-+#define TARGET_SO_WIFI_STATUS          0x0025
-+#define TARGET_SCM_WIFI_STATUS         TARGET_SO_WIFI_STATUS
-+#define TARGET_SO_PEEK_OFF             0x0026
-+
-+/* Instruct lower device to use last 4-bytes of skb data as FCS */
-+#define TARGET_SO_NOFCS                0x0027
-+
-+#define TARGET_SO_LOCK_FILTER          0x0028
-+
-+#define TARGET_SO_SELECT_ERR_QUEUE     0x0029
-+
-+#define TARGET_SO_BUSY_POLL            0x0030
-+
-+#define TARGET_SO_MAX_PACING_RATE      0x0031
- 
--#define TARGET_SO_PEERSEC              31
-+#define TARGET_SO_BPF_EXTENSIONS       0x0032
-+
-+#define TARGET_SO_INCOMING_CPU         0x0033
-+
-+#define TARGET_SO_ATTACH_BPF           0x0034
-+#define TARGET_SO_DETACH_BPF           TARGET_SO_DETACH_FILTER
-+
-+#define TARGET_SO_ATTACH_REUSEPORT_CBPF        0x0035
-+#define TARGET_SO_ATTACH_REUSEPORT_EBPF        0x0036
-+
-+#define TARGET_SO_CNX_ADVICE           0x0037
-+
-+#define TARGET_SCM_TIMESTAMPING_OPT_STATS      0x0038
-+
-+#define TARGET_SO_MEMINFO              0x0039
-+
-+#define TARGET_SO_INCOMING_NAPI_ID     0x003a
-+
-+#define TARGET_SO_COOKIE               0x003b
-+
-+#define TARGET_SCM_TIMESTAMPING_PKTINFO        0x003c
-+
-+#define TARGET_SO_PEERGROUPS           0x003d
-+
-+#define TARGET_SO_ZEROCOPY             0x003e
-+
-+/* Security levels - as per NRL IPv6 - don't actually do anything */
-+#define TARGET_SO_SECURITY_AUTHENTICATION              0x5001
-+#define TARGET_SO_SECURITY_ENCRYPTION_TRANSPORT        0x5002
-+#define TARGET_SO_SECURITY_ENCRYPTION_NETWORK          0x5004
- #endif
--- 
-2.14.3
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
+c3NhZ2UtaWQ6IDIwMTgwNTE2MjA1NTQzLjI5MzA1LTEtbGF1cmVudEB2aXZpZXIuZXUKU3ViamVj
+dDogW1FlbXUtZGV2ZWxdIFtQQVRDSCB2MiAwLzhdIGxpbnV4LXVzZXI6IG1vdmUgc29ja2V0Lmgg
+ZGVmaW5pdGlvbnMgdG8gQ1BVIGRpcmVjdG9yaWVzCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09
+CiMhL2Jpbi9iYXNoCgpCQVNFPWJhc2UKbj0xCnRvdGFsPSQoZ2l0IGxvZyAtLW9uZWxpbmUgJEJB
+U0UuLiB8IHdjIC1sKQpmYWlsZWQ9MAoKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGlt
+aXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKZ2l0IGNvbmZpZyAtLWxv
+Y2FsIGRpZmYuYWxnb3JpdGhtIGhpc3RvZ3JhbQoKY29tbWl0cz0iJChnaXQgbG9nIC0tZm9ybWF0
+PSVIIC0tcmV2ZXJzZSAkQkFTRS4uKSIKZm9yIGMgaW4gJGNvbW1pdHM7IGRvCiAgICBlY2hvICJD
+aGVja2luZyBQQVRDSCAkbi8kdG90YWw6ICQoZ2l0IGxvZyAtbiAxIC0tZm9ybWF0PSVzICRjKS4u
+LiIKICAgIGlmICEgZ2l0IHNob3cgJGMgLS1mb3JtYXQ9ZW1haWwgfCAuL3NjcmlwdHMvY2hlY2tw
+YXRjaC5wbCAtLW1haWxiYWNrIC07IHRoZW4KICAgICAgICBmYWlsZWQ9MQogICAgICAgIGVjaG8K
+ICAgIGZpCiAgICBuPSQoKG4rMSkpCmRvbmUKCmV4aXQgJGZhaWxlZAo9PT0gVEVTVCBTQ1JJUFQg
+RU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4
+NApGcm9tIGh0dHBzOi8vZ2l0aHViLmNvbS9wYXRjaGV3LXByb2plY3QvcWVtdQogKiBbbmV3IHRh
+Z10gICAgICAgICAgICAgICBwYXRjaGV3LzIwMTgwNTE2MjA1NTQzLjI5MzA1LTEtbGF1cmVudEB2
+aXZpZXIuZXUgLT4gcGF0Y2hldy8yMDE4MDUxNjIwNTU0My4yOTMwNS0xLWxhdXJlbnRAdml2aWVy
+LmV1ClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKN2IwOTJlNjA3OCBsaW51eC11c2Vy
+OiBkZWZpbmUgVEFSR0VUX1NPX1JFVVNFUE9SVAo4NjczNWEzMGM5IGxpbnV4LXVzZXI6IGNvcHkg
+c3BhcmMvc29ja2JpdHMuaCBkZWZpbml0aW9ucyBmcm9tIGxpbnV4CmQyNDRmZTYyNjggbGludXgt
+dXNlcjogdXBkYXRlIEFSQ0hfSEFTX1NPQ0tFVF9UWVBFUyB1c2UKOGNjZGU4ZDJjYiBsaW51eC11
+c2VyOiBtb3ZlIHBwYyBzb2NrZXQuaCBkZWZpbml0aW9ucyB0byBwcGMvc29ja2JpdHMuaAoxNWY5
+ODBmZjdiIGxpbnV4LXVzZXI6IG1vdmUgc29ja2V0LmggZ2VuZXJpYyBkZWZpbml0aW9ucyB0byBn
+ZW5lcmljL3NvY2tiaXRzLmgKYmE2YjJhZDljNiBsaW51eC11c2VyOiBtb3ZlIHNwYXJjL3NwYXJj
+NjQgc29ja2V0LmggZGVmaW5pdGlvbnMgdG8gc3BhcmMvc29ja2JpdHMuaAphZjFlN2M2MWIyIGxp
+bnV4LXVzZXI6IG1vdmUgYWxwaGEgc29ja2V0LmggZGVmaW5pdGlvbnMgdG8gYWxwaGEvc29ja2Jp
+dHMuaAoyYTg5ODViOWE5IGxpbnV4LXVzZXI6IG1vdmUgbWlwcyBzb2NrZXQuaCBkZWZpbml0aW9u
+cyB0byBtaXBzL3NvY2tiaXRzLmgKCj09PSBPVVRQVVQgQkVHSU4gPT09CkNoZWNraW5nIFBBVENI
+IDEvODogbGludXgtdXNlcjogbW92ZSBtaXBzIHNvY2tldC5oIGRlZmluaXRpb25zIHRvIG1pcHMv
+c29ja2JpdHMuaC4uLgpXQVJOSU5HOiBhZGRlZCwgbW92ZWQgb3IgZGVsZXRlZCBmaWxlKHMpLCBk
+b2VzIE1BSU5UQUlORVJTIG5lZWQgdXBkYXRpbmc/CiMxNzogCm5ldyBmaWxlIG1vZGUgMTAwNjQ0
+CgpFUlJPUjogaWYgdGhpcyBjb2RlIGlzIHJlZHVuZGFudCBjb25zaWRlciByZW1vdmluZyBpdAoj
+NTI6IEZJTEU6IGxpbnV4LXVzZXIvbWlwcy9zb2NrYml0cy5oOjMxOgorI2lmIDAKCnRvdGFsOiAx
+IGVycm9ycywgMSB3YXJuaW5ncywgMjI3IGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0
+eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUg
+ZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQ
+QVRDSCBpbiBNQUlOVEFJTkVSUy4KCkNoZWNraW5nIFBBVENIIDIvODogbGludXgtdXNlcjogbW92
+ZSBhbHBoYSBzb2NrZXQuaCBkZWZpbml0aW9ucyB0byBhbHBoYS9zb2NrYml0cy5oLi4uCldBUk5J
+Tkc6IGFkZGVkLCBtb3ZlZCBvciBkZWxldGVkIGZpbGUocyksIGRvZXMgTUFJTlRBSU5FUlMgbmVl
+ZCB1cGRhdGluZz8KIzE4OiAKbmV3IGZpbGUgbW9kZSAxMDA2NDQKCnRvdGFsOiAwIGVycm9ycywg
+MSB3YXJuaW5ncywgMjI0IGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2Js
+ZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9z
+aXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBN
+QUlOVEFJTkVSUy4KQ2hlY2tpbmcgUEFUQ0ggMy84OiBsaW51eC11c2VyOiBtb3ZlIHNwYXJjL3Nw
+YXJjNjQgc29ja2V0LmggZGVmaW5pdGlvbnMgdG8gc3BhcmMvc29ja2JpdHMuaC4uLgpXQVJOSU5H
+OiBhZGRlZCwgbW92ZWQgb3IgZGVsZXRlZCBmaWxlKHMpLCBkb2VzIE1BSU5UQUlORVJTIG5lZWQg
+dXBkYXRpbmc/CiM3NDogCm5ldyBmaWxlIG1vZGUgMTAwNjQ0Cgp0b3RhbDogMCBlcnJvcnMsIDEg
+d2FybmluZ3MsIDE0NiBsaW5lcyBjaGVja2VkCgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVt
+cywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0
+aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJ
+TlRBSU5FUlMuCkNoZWNraW5nIFBBVENIIDQvODogbGludXgtdXNlcjogbW92ZSBzb2NrZXQuaCBn
+ZW5lcmljIGRlZmluaXRpb25zIHRvIGdlbmVyaWMvc29ja2JpdHMuaC4uLgpXQVJOSU5HOiBhZGRl
+ZCwgbW92ZWQgb3IgZGVsZXRlZCBmaWxlKHMpLCBkb2VzIE1BSU5UQUlORVJTIG5lZWQgdXBkYXRp
+bmc/CiMxMzogCm5ldyBmaWxlIG1vZGUgMTAwNjQ0Cgp0b3RhbDogMCBlcnJvcnMsIDEgd2Fybmlu
+Z3MsIDE0OCBsaW5lcyBjaGVja2VkCgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxl
+YXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyBy
+ZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5F
+UlMuCkNoZWNraW5nIFBBVENIIDUvODogbGludXgtdXNlcjogbW92ZSBwcGMgc29ja2V0LmggZGVm
+aW5pdGlvbnMgdG8gcHBjL3NvY2tiaXRzLmguLi4KQ2hlY2tpbmcgUEFUQ0ggNi84OiBsaW51eC11
+c2VyOiB1cGRhdGUgQVJDSF9IQVNfU09DS0VUX1RZUEVTIHVzZS4uLgpDaGVja2luZyBQQVRDSCA3
+Lzg6IGxpbnV4LXVzZXI6IGNvcHkgc3BhcmMvc29ja2JpdHMuaCBkZWZpbml0aW9ucyBmcm9tIGxp
+bnV4Li4uCkNoZWNraW5nIFBBVENIIDgvODogbGludXgtdXNlcjogZGVmaW5lIFRBUkdFVF9TT19S
+RVVTRVBPUlQuLi4KPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGgg
+Y29kZTogMQoKCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFto
+dHRwOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3
+LWRldmVsQHJlZGhhdC5jb20=
