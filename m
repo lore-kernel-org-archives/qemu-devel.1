@@ -1,27 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42145)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42646)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fIyk3-0004iy-4L
-	for qemu-devel@nongnu.org; Wed, 16 May 2018 11:53:29 -0400
+	(envelope-from <smcpolin@smcpolin-M01.vmware.com>)
+	id 1fIyld-0005y3-1R
+	for qemu-devel@nongnu.org; Wed, 16 May 2018 11:55:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fIyk0-0005BO-Nf
-	for qemu-devel@nongnu.org; Wed, 16 May 2018 11:53:27 -0400
-Received: from mail-pl0-x22a.google.com ([2607:f8b0:400e:c01::22a]:34869)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1fIyk0-0005BB-Fp
-	for qemu-devel@nongnu.org; Wed, 16 May 2018 11:53:24 -0400
-Received: by mail-pl0-x22a.google.com with SMTP id i5-v6so673797plt.2
-	for <qemu-devel@nongnu.org>; Wed, 16 May 2018 08:53:24 -0700 (PDT)
-From: Richard Henderson <richard.henderson@linaro.org>
-Date: Wed, 16 May 2018 08:52:41 -0700
-Message-Id: <20180516155243.16937-27-richard.henderson@linaro.org>
-In-Reply-To: <20180516155243.16937-1-richard.henderson@linaro.org>
-References: <20180516155243.16937-1-richard.henderson@linaro.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 26/28] fpu/softfloat: Define floatN_default_nan
- in terms of parts_default_nan
+	(envelope-from <smcpolin@smcpolin-M01.vmware.com>)
+	id 1fIylZ-0005g2-Rv
+	for qemu-devel@nongnu.org; Wed, 16 May 2018 11:55:05 -0400
+Received: from [69.196.150.84] (port=34131 helo=smcpolin-M01.vmware.com)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <smcpolin@smcpolin-M01.vmware.com>)
+	id 1fIylZ-0005fl-Np
+	for qemu-devel@nongnu.org; Wed, 16 May 2018 11:55:01 -0400
+From: Steve Mcpolin <smcpolin@vmware.com>
+Date: Wed, 16 May 2018 10:47:32 -0400
+Message-Id: <20180516152708.9ECB1A5D5F2@smcpolin-M01.vmware.com>
+Subject: [Qemu-devel] [PATCH] linux-user: Remove extra mapping
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,214 +25,65 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org
+Cc: qemu-trivial@nongnu.org, riku.voipio@iki.fi, laurent@vivier.eu, smcpolin@vmware.com
 
-Isolate the target-specific choice to 2 functions instead of 6.
+When a guest mmap()'d a file, a transient MAP_ANONYMOUS mapping was
+created, which required the kernel to reserve this memory, then
+subsequently released by applying a mapping with just the requested
+flags and fd.
+This transient mapping causes spurious failures when the available
+memory is smaller than the mapping.  This patch avoids this transient
+mapping.
 
-The code in float16_default_nan was only correct for ARM, MIPS, and X86.
-Though float16 support is rare among our targets.
-
-The code in float128_default_nan was arguably wrong for Sparc.  While
-QEMU supports the Sparc 128-bit insns, no real cpu enables it.
-
-The code in floatx80_default_nan tried to be over-general.  There are
-only two targets that support this format: x86 and m68k.  Thus there
-is no point in inventing a value for snan_bit_is_one.
-
-Move routines that no longer have ifdefs out of softfloat-specialize.h.
-
-Tested-by: Alex Bennée <alex.bennee@linaro.org>
-Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+Signed-off-by: Steve Mcpolin <smcpolin@vmware.com>
 ---
- fpu/softfloat-specialize.h | 105 +++----------------------------------
- fpu/softfloat.c            |  41 +++++++++++++++
- 2 files changed, 47 insertions(+), 99 deletions(-)
+ linux-user/mmap.c | 31 +++++++++++++++++++------------
+ 1 file changed, 19 insertions(+), 12 deletions(-)
 
-diff --git a/fpu/softfloat-specialize.h b/fpu/softfloat-specialize.h
-index 0399dfe011..9d562ed504 100644
---- a/fpu/softfloat-specialize.h
-+++ b/fpu/softfloat-specialize.h
-@@ -179,94 +179,22 @@ static FloatParts parts_silence_nan(FloatParts a, float_status *status)
-     return a;
- }
- 
--/*----------------------------------------------------------------------------
--| The pattern for a default generated half-precision NaN.
--*----------------------------------------------------------------------------*/
--float16 float16_default_nan(float_status *status)
--{
--#if defined(TARGET_ARM)
--    return const_float16(0x7E00);
--#else
--    if (snan_bit_is_one(status)) {
--        return const_float16(0x7DFF);
--    } else {
--#if defined(TARGET_MIPS)
--        return const_float16(0x7E00);
--#else
--        return const_float16(0xFE00);
--#endif
--    }
--#endif
--}
--
--/*----------------------------------------------------------------------------
--| The pattern for a default generated single-precision NaN.
--*----------------------------------------------------------------------------*/
--float32 float32_default_nan(float_status *status)
--{
--#if defined(TARGET_SPARC) || defined(TARGET_M68K)
--    return const_float32(0x7FFFFFFF);
--#elif defined(TARGET_PPC) || defined(TARGET_ARM) || defined(TARGET_ALPHA) || \
--      defined(TARGET_XTENSA) || defined(TARGET_S390X) || \
--      defined(TARGET_TRICORE) || defined(TARGET_RISCV)
--    return const_float32(0x7FC00000);
--#elif defined(TARGET_HPPA)
--    return const_float32(0x7FA00000);
--#else
--    if (snan_bit_is_one(status)) {
--        return const_float32(0x7FBFFFFF);
--    } else {
--#if defined(TARGET_MIPS)
--        return const_float32(0x7FC00000);
--#else
--        return const_float32(0xFFC00000);
--#endif
--    }
--#endif
--}
--
--/*----------------------------------------------------------------------------
--| The pattern for a default generated double-precision NaN.
--*----------------------------------------------------------------------------*/
--float64 float64_default_nan(float_status *status)
--{
--#if defined(TARGET_SPARC) || defined(TARGET_M68K)
--    return const_float64(LIT64(0x7FFFFFFFFFFFFFFF));
--#elif defined(TARGET_PPC) || defined(TARGET_ARM) || defined(TARGET_ALPHA) || \
--      defined(TARGET_S390X) || defined(TARGET_RISCV)
--    return const_float64(LIT64(0x7FF8000000000000));
--#elif defined(TARGET_HPPA)
--    return const_float64(LIT64(0x7FF4000000000000));
--#else
--    if (snan_bit_is_one(status)) {
--        return const_float64(LIT64(0x7FF7FFFFFFFFFFFF));
--    } else {
--#if defined(TARGET_MIPS)
--        return const_float64(LIT64(0x7FF8000000000000));
--#else
--        return const_float64(LIT64(0xFFF8000000000000));
--#endif
--    }
--#endif
--}
--
- /*----------------------------------------------------------------------------
- | The pattern for a default generated extended double-precision NaN.
- *----------------------------------------------------------------------------*/
- floatx80 floatx80_default_nan(float_status *status)
- {
-     floatx80 r;
-+
-+    /* None of the targets that have snan_bit_is_one use floatx80.  */
-+    assert(!snan_bit_is_one(status));
- #if defined(TARGET_M68K)
-     r.low = LIT64(0xFFFFFFFFFFFFFFFF);
-     r.high = 0x7FFF;
- #else
--    if (snan_bit_is_one(status)) {
--        r.low = LIT64(0xBFFFFFFFFFFFFFFF);
--        r.high = 0x7FFF;
--    } else {
--        r.low = LIT64(0xC000000000000000);
--        r.high = 0xFFFF;
--    }
-+    /* X86 */
-+    r.low = LIT64(0xC000000000000000);
-+    r.high = 0xFFFF;
- #endif
-     return r;
- }
-@@ -285,27 +213,6 @@ floatx80 floatx80_default_nan(float_status *status)
- const floatx80 floatx80_infinity
-     = make_floatx80_init(floatx80_infinity_high, floatx80_infinity_low);
- 
--/*----------------------------------------------------------------------------
--| The pattern for a default generated quadruple-precision NaN.
--*----------------------------------------------------------------------------*/
--float128 float128_default_nan(float_status *status)
--{
--    float128 r;
--
--    if (snan_bit_is_one(status)) {
--        r.low = LIT64(0xFFFFFFFFFFFFFFFF);
--        r.high = LIT64(0x7FFF7FFFFFFFFFFF);
--    } else {
--        r.low = LIT64(0x0000000000000000);
--#if defined(TARGET_S390X) || defined(TARGET_PPC) || defined(TARGET_RISCV)
--        r.high = LIT64(0x7FFF800000000000);
--#else
--        r.high = LIT64(0xFFFF800000000000);
--#endif
--    }
--    return r;
--}
--
- /*----------------------------------------------------------------------------
- | Raises the exceptions specified by `flags'.  Floating-point traps can be
- | defined here if desired.  It is currently not possible for such a trap
-diff --git a/fpu/softfloat.c b/fpu/softfloat.c
-index 8e97602ace..c8b33e35f4 100644
---- a/fpu/softfloat.c
-+++ b/fpu/softfloat.c
-@@ -2092,6 +2092,47 @@ float64 __attribute__((flatten)) float64_sqrt(float64 a, float_status *status)
-     return float64_round_pack_canonical(pr, status);
- }
- 
-+/*----------------------------------------------------------------------------
-+| The pattern for a default generated NaN.
-+*----------------------------------------------------------------------------*/
-+
-+float16 float16_default_nan(float_status *status)
-+{
-+    FloatParts p = parts_default_nan(status);
-+    p.frac >>= float16_params.frac_shift;
-+    return float16_pack_raw(p);
-+}
-+
-+float32 float32_default_nan(float_status *status)
-+{
-+    FloatParts p = parts_default_nan(status);
-+    p.frac >>= float32_params.frac_shift;
-+    return float32_pack_raw(p);
-+}
-+
-+float64 float64_default_nan(float_status *status)
-+{
-+    FloatParts p = parts_default_nan(status);
-+    p.frac >>= float64_params.frac_shift;
-+    return float64_pack_raw(p);
-+}
-+
-+float128 float128_default_nan(float_status *status)
-+{
-+    FloatParts p = parts_default_nan(status);
-+    float128 r;
-+
-+    /* Extrapolate from the choices made by parts_default_nan to fill
-+     * in the quad-floating format.  If the low bit is set, assume we
-+     * want to set all non-snan bits.
-+     */
-+    r.low = -(p.frac & 1);
-+    r.high = p.frac >> (DECOMPOSED_BINARY_POINT - 48);
-+    r.high |= LIT64(0x7FFF000000000000);
-+    r.high |= (uint64_t)p.sign << 63;
-+
-+    return r;
-+}
- 
- /*----------------------------------------------------------------------------
- | Takes a 64-bit fixed-point value `absZ' with binary point between bits 6
+diff --git a/linux-user/mmap.c b/linux-user/mmap.c
+index 9168a20..f91841f 100644
+--- a/linux-user/mmap.c
++++ b/linux-user/mmap.c
+@@ -453,21 +453,28 @@ abi_long target_mmap(abi_ulong start, abi_ulong len, int prot,
+         /* Note: we prefer to control the mapping address. It is
+            especially important if qemu_host_page_size >
+            qemu_real_host_page_size */
+-        p = mmap(g2h(start), host_len, prot,
+-                 flags | MAP_FIXED | MAP_ANONYMOUS, -1, 0);
+-        if (p == MAP_FAILED)
+-            goto fail;
+-        /* update start so that it points to the file position at 'offset' */
+-        host_start = (unsigned long)p;
+-        if (!(flags & MAP_ANONYMOUS)) {
+-            p = mmap(g2h(start), len, prot,
++        if (flags & MAP_ANONYMOUS) {
++            offset = 0;
++            host_offset = 0;
++            fd = -1;
++        }
++        p = mmap(g2h(start), len, prot,
+                      flags | MAP_FIXED, fd, host_offset);
+-            if (p == MAP_FAILED) {
+-                munmap(g2h(start), host_len);
+-                goto fail;
++        host_start = (uintptr_t)p;
++        if (p != MAP_FAILED && host_len > HOST_PAGE_ALIGN(len)) {
++            void *q;
++            q = mmap(g2h(start + len), host_len - HOST_PAGE_ALIGN(len),
++                     prot, MAP_FIXED | MAP_ANONYMOUS, -1, 0);
++            if (q == MAP_FAILED) {
++                p = MAP_FAILED;
+             }
+-            host_start += offset - host_offset;
+         }
++        if (p == MAP_FAILED) {
++            munmap(g2h(start), host_len);
++            goto fail;
++        }
++        host_start += offset - host_offset;
++        /* update start so that it points to the file position at 'offset' */
+         start = h2g(host_start);
+     } else {
+         if (start & ~TARGET_PAGE_MASK) {
 -- 
-2.17.0
+2.7.4
