@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41376)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41495)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fJ4wT-0007so-Kd
-	for qemu-devel@nongnu.org; Wed, 16 May 2018 18:30:43 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1fJ4wZ-0007zc-Jm
+	for qemu-devel@nongnu.org; Wed, 16 May 2018 18:30:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fJ4wR-0007dk-PP
-	for qemu-devel@nongnu.org; Wed, 16 May 2018 18:30:41 -0400
-Received: from mail-pg0-x22c.google.com ([2607:f8b0:400e:c05::22c]:35982)
+	(envelope-from <richard.henderson@linaro.org>) id 1fJ4wX-0007lb-Sf
+	for qemu-devel@nongnu.org; Wed, 16 May 2018 18:30:47 -0400
+Received: from mail-pg0-x244.google.com ([2607:f8b0:400e:c05::244]:45741)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1fJ4wR-0007cy-H1
-	for qemu-devel@nongnu.org; Wed, 16 May 2018 18:30:39 -0400
-Received: by mail-pg0-x22c.google.com with SMTP id z70-v6so911585pgz.3
-	for <qemu-devel@nongnu.org>; Wed, 16 May 2018 15:30:39 -0700 (PDT)
+	id 1fJ4wX-0007kq-HH
+	for qemu-devel@nongnu.org; Wed, 16 May 2018 18:30:45 -0400
+Received: by mail-pg0-x244.google.com with SMTP id w3-v6so886350pgv.12
+	for <qemu-devel@nongnu.org>; Wed, 16 May 2018 15:30:45 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Wed, 16 May 2018 15:30:00 -0700
-Message-Id: <20180516223007.10256-21-richard.henderson@linaro.org>
+Date: Wed, 16 May 2018 15:30:04 -0700
+Message-Id: <20180516223007.10256-25-richard.henderson@linaro.org>
 In-Reply-To: <20180516223007.10256-1-richard.henderson@linaro.org>
 References: <20180516223007.10256-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH v3-a 20/27] target/arm: Implement SVE
- floating-point exponential accelerator
+Subject: [Qemu-devel] [PATCH v3-a 24/27] target/arm: Implement SVE Integer
+ Wide Immediate - Predicated Group
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,181 +33,302 @@ Cc: peter.maydell@linaro.org, qemu-arm@nongnu.org
 Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/arm/helper-sve.h    |  4 ++
- target/arm/sve_helper.c    | 90 ++++++++++++++++++++++++++++++++++++++
- target/arm/translate-sve.c | 24 ++++++++++
- target/arm/sve.decode      |  7 +++
- 4 files changed, 125 insertions(+)
+ target/arm/helper-sve.h    |  10 ++++
+ target/arm/sve_helper.c    | 108 +++++++++++++++++++++++++++++++++++++
+ target/arm/translate-sve.c |  88 ++++++++++++++++++++++++++++++
+ target/arm/sve.decode      |  19 ++++++-
+ 4 files changed, 224 insertions(+), 1 deletion(-)
 
 diff --git a/target/arm/helper-sve.h b/target/arm/helper-sve.h
-index 5280d375f9..e2925ff8ec 100644
+index 2831e1643b..79493ab647 100644
 --- a/target/arm/helper-sve.h
 +++ b/target/arm/helper-sve.h
-@@ -385,6 +385,10 @@ DEF_HELPER_FLAGS_4(sve_adr_p64, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
- DEF_HELPER_FLAGS_4(sve_adr_s32, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
- DEF_HELPER_FLAGS_4(sve_adr_u32, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
+@@ -404,6 +404,16 @@ DEF_HELPER_FLAGS_4(sve_uqaddi_s, TCG_CALL_NO_RWG, void, ptr, ptr, s64, i32)
+ DEF_HELPER_FLAGS_4(sve_uqaddi_d, TCG_CALL_NO_RWG, void, ptr, ptr, i64, i32)
+ DEF_HELPER_FLAGS_4(sve_uqsubi_d, TCG_CALL_NO_RWG, void, ptr, ptr, i64, i32)
  
-+DEF_HELPER_FLAGS_3(sve_fexpa_h, TCG_CALL_NO_RWG, void, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_3(sve_fexpa_s, TCG_CALL_NO_RWG, void, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_3(sve_fexpa_d, TCG_CALL_NO_RWG, void, ptr, ptr, i32)
++DEF_HELPER_FLAGS_5(sve_cpy_m_b, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i64, i32)
++DEF_HELPER_FLAGS_5(sve_cpy_m_h, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i64, i32)
++DEF_HELPER_FLAGS_5(sve_cpy_m_s, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i64, i32)
++DEF_HELPER_FLAGS_5(sve_cpy_m_d, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i64, i32)
++
++DEF_HELPER_FLAGS_4(sve_cpy_z_b, TCG_CALL_NO_RWG, void, ptr, ptr, i64, i32)
++DEF_HELPER_FLAGS_4(sve_cpy_z_h, TCG_CALL_NO_RWG, void, ptr, ptr, i64, i32)
++DEF_HELPER_FLAGS_4(sve_cpy_z_s, TCG_CALL_NO_RWG, void, ptr, ptr, i64, i32)
++DEF_HELPER_FLAGS_4(sve_cpy_z_d, TCG_CALL_NO_RWG, void, ptr, ptr, i64, i32)
 +
  DEF_HELPER_FLAGS_5(sve_and_pppp, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, ptr, i32)
  DEF_HELPER_FLAGS_5(sve_bic_pppp, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, ptr, i32)
  DEF_HELPER_FLAGS_5(sve_eor_pppp, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, ptr, i32)
 diff --git a/target/arm/sve_helper.c b/target/arm/sve_helper.c
-index 7fa8394aec..6ffb126821 100644
+index 979aa5c409..8c7ea989b1 100644
 --- a/target/arm/sve_helper.c
 +++ b/target/arm/sve_helper.c
-@@ -1102,3 +1102,93 @@ void HELPER(sve_adr_u32)(void *vd, void *vn, void *vm, uint32_t desc)
-         d[i] = n[i] + ((uint64_t)(uint32_t)m[i] << sh);
+@@ -1371,3 +1371,111 @@ void HELPER(sve_uqsubi_d)(void *d, void *a, uint64_t b, uint32_t desc)
+         *(uint64_t *)(d + i) = (ai < b ? 0 : ai - b);
      }
  }
 +
-+void HELPER(sve_fexpa_h)(void *vd, void *vn, uint32_t desc)
++/* Two operand predicated copy immediate with merge.  All valid immediates
++ * can fit within 17 signed bits in the simd_data field.
++ */
++void HELPER(sve_cpy_m_b)(void *vd, void *vn, void *vg,
++                         uint64_t mm, uint32_t desc)
 +{
-+    /* These constants are cut-and-paste directly from the ARM pseudocode.  */
-+    static const uint16_t coeff[] = {
-+        0x0000, 0x0016, 0x002d, 0x0045, 0x005d, 0x0075, 0x008e, 0x00a8,
-+        0x00c2, 0x00dc, 0x00f8, 0x0114, 0x0130, 0x014d, 0x016b, 0x0189,
-+        0x01a8, 0x01c8, 0x01e8, 0x0209, 0x022b, 0x024e, 0x0271, 0x0295,
-+        0x02ba, 0x02e0, 0x0306, 0x032e, 0x0356, 0x037f, 0x03a9, 0x03d4,
-+    };
-+    intptr_t i, opr_sz = simd_oprsz(desc) / 2;
-+    uint16_t *d = vd, *n = vn;
-+
-+    for (i = 0; i < opr_sz; i++) {
-+        uint16_t nn = n[i];
-+        intptr_t idx = extract32(nn, 0, 5);
-+        uint16_t exp = extract32(nn, 5, 5);
-+        d[i] = coeff[idx] | (exp << 10);
-+    }
-+}
-+
-+void HELPER(sve_fexpa_s)(void *vd, void *vn, uint32_t desc)
-+{
-+    /* These constants are cut-and-paste directly from the ARM pseudocode.  */
-+    static const uint32_t coeff[] = {
-+        0x000000, 0x0164d2, 0x02cd87, 0x043a29,
-+        0x05aac3, 0x071f62, 0x08980f, 0x0a14d5,
-+        0x0b95c2, 0x0d1adf, 0x0ea43a, 0x1031dc,
-+        0x11c3d3, 0x135a2b, 0x14f4f0, 0x16942d,
-+        0x1837f0, 0x19e046, 0x1b8d3a, 0x1d3eda,
-+        0x1ef532, 0x20b051, 0x227043, 0x243516,
-+        0x25fed7, 0x27cd94, 0x29a15b, 0x2b7a3a,
-+        0x2d583f, 0x2f3b79, 0x3123f6, 0x3311c4,
-+        0x3504f3, 0x36fd92, 0x38fbaf, 0x3aff5b,
-+        0x3d08a4, 0x3f179a, 0x412c4d, 0x4346cd,
-+        0x45672a, 0x478d75, 0x49b9be, 0x4bec15,
-+        0x4e248c, 0x506334, 0x52a81e, 0x54f35b,
-+        0x5744fd, 0x599d16, 0x5bfbb8, 0x5e60f5,
-+        0x60ccdf, 0x633f89, 0x65b907, 0x68396a,
-+        0x6ac0c7, 0x6d4f30, 0x6fe4ba, 0x728177,
-+        0x75257d, 0x77d0df, 0x7a83b3, 0x7d3e0c,
-+    };
-+    intptr_t i, opr_sz = simd_oprsz(desc) / 4;
-+    uint32_t *d = vd, *n = vn;
-+
-+    for (i = 0; i < opr_sz; i++) {
-+        uint32_t nn = n[i];
-+        intptr_t idx = extract32(nn, 0, 6);
-+        uint32_t exp = extract32(nn, 6, 8);
-+        d[i] = coeff[idx] | (exp << 23);
-+    }
-+}
-+
-+void HELPER(sve_fexpa_d)(void *vd, void *vn, uint32_t desc)
-+{
-+    /* These constants are cut-and-paste directly from the ARM pseudocode.  */
-+    static const uint64_t coeff[] = {
-+        0x0000000000000ull, 0x02C9A3E778061ull, 0x059B0D3158574ull,
-+        0x0874518759BC8ull, 0x0B5586CF9890Full, 0x0E3EC32D3D1A2ull,
-+        0x11301D0125B51ull, 0x1429AAEA92DE0ull, 0x172B83C7D517Bull,
-+        0x1A35BEB6FCB75ull, 0x1D4873168B9AAull, 0x2063B88628CD6ull,
-+        0x2387A6E756238ull, 0x26B4565E27CDDull, 0x29E9DF51FDEE1ull,
-+        0x2D285A6E4030Bull, 0x306FE0A31B715ull, 0x33C08B26416FFull,
-+        0x371A7373AA9CBull, 0x3A7DB34E59FF7ull, 0x3DEA64C123422ull,
-+        0x4160A21F72E2Aull, 0x44E086061892Dull, 0x486A2B5C13CD0ull,
-+        0x4BFDAD5362A27ull, 0x4F9B2769D2CA7ull, 0x5342B569D4F82ull,
-+        0x56F4736B527DAull, 0x5AB07DD485429ull, 0x5E76F15AD2148ull,
-+        0x6247EB03A5585ull, 0x6623882552225ull, 0x6A09E667F3BCDull,
-+        0x6DFB23C651A2Full, 0x71F75E8EC5F74ull, 0x75FEB564267C9ull,
-+        0x7A11473EB0187ull, 0x7E2F336CF4E62ull, 0x82589994CCE13ull,
-+        0x868D99B4492EDull, 0x8ACE5422AA0DBull, 0x8F1AE99157736ull,
-+        0x93737B0CDC5E5ull, 0x97D829FDE4E50ull, 0x9C49182A3F090ull,
-+        0xA0C667B5DE565ull, 0xA5503B23E255Dull, 0xA9E6B5579FDBFull,
-+        0xAE89F995AD3ADull, 0xB33A2B84F15FBull, 0xB7F76F2FB5E47ull,
-+        0xBCC1E904BC1D2ull, 0xC199BDD85529Cull, 0xC67F12E57D14Bull,
-+        0xCB720DCEF9069ull, 0xD072D4A07897Cull, 0xD5818DCFBA487ull,
-+        0xDA9E603DB3285ull, 0xDFC97337B9B5Full, 0xE502EE78B3FF6ull,
-+        0xEA4AFA2A490DAull, 0xEFA1BEE615A27ull, 0xF50765B6E4540ull,
-+        0xFA7C1819E90D8ull,
-+    };
 +    intptr_t i, opr_sz = simd_oprsz(desc) / 8;
 +    uint64_t *d = vd, *n = vn;
++    uint8_t *pg = vg;
 +
-+    for (i = 0; i < opr_sz; i++) {
++    mm = dup_const(MO_8, mm);
++    for (i = 0; i < opr_sz; i += 1) {
 +        uint64_t nn = n[i];
-+        intptr_t idx = extract32(nn, 0, 6);
-+        uint64_t exp = extract32(nn, 6, 11);
-+        d[i] = coeff[idx] | (exp << 52);
++        uint64_t pp = expand_pred_b(pg[H1(i)]);
++        d[i] = (mm & pp) | (nn & ~pp);
++    }
++}
++
++void HELPER(sve_cpy_m_h)(void *vd, void *vn, void *vg,
++                         uint64_t mm, uint32_t desc)
++{
++    intptr_t i, opr_sz = simd_oprsz(desc) / 8;
++    uint64_t *d = vd, *n = vn;
++    uint8_t *pg = vg;
++
++    mm = dup_const(MO_16, mm);
++    for (i = 0; i < opr_sz; i += 1) {
++        uint64_t nn = n[i];
++        uint64_t pp = expand_pred_h(pg[H1(i)]);
++        d[i] = (mm & pp) | (nn & ~pp);
++    }
++}
++
++void HELPER(sve_cpy_m_s)(void *vd, void *vn, void *vg,
++                         uint64_t mm, uint32_t desc)
++{
++    intptr_t i, opr_sz = simd_oprsz(desc) / 8;
++    uint64_t *d = vd, *n = vn;
++    uint8_t *pg = vg;
++
++    mm = dup_const(MO_32, mm);
++    for (i = 0; i < opr_sz; i += 1) {
++        uint64_t nn = n[i];
++        uint64_t pp = expand_pred_s(pg[H1(i)]);
++        d[i] = (mm & pp) | (nn & ~pp);
++    }
++}
++
++void HELPER(sve_cpy_m_d)(void *vd, void *vn, void *vg,
++                         uint64_t mm, uint32_t desc)
++{
++    intptr_t i, opr_sz = simd_oprsz(desc) / 8;
++    uint64_t *d = vd, *n = vn;
++    uint8_t *pg = vg;
++
++    for (i = 0; i < opr_sz; i += 1) {
++        uint64_t nn = n[i];
++        d[i] = (pg[H1(i)] & 1 ? mm : nn);
++    }
++}
++
++void HELPER(sve_cpy_z_b)(void *vd, void *vg, uint64_t val, uint32_t desc)
++{
++    intptr_t i, opr_sz = simd_oprsz(desc) / 8;
++    uint64_t *d = vd;
++    uint8_t *pg = vg;
++
++    val = dup_const(MO_8, val);
++    for (i = 0; i < opr_sz; i += 1) {
++        d[i] = val & expand_pred_b(pg[H1(i)]);
++    }
++}
++
++void HELPER(sve_cpy_z_h)(void *vd, void *vg, uint64_t val, uint32_t desc)
++{
++    intptr_t i, opr_sz = simd_oprsz(desc) / 8;
++    uint64_t *d = vd;
++    uint8_t *pg = vg;
++
++    val = dup_const(MO_16, val);
++    for (i = 0; i < opr_sz; i += 1) {
++        d[i] = val & expand_pred_h(pg[H1(i)]);
++    }
++}
++
++void HELPER(sve_cpy_z_s)(void *vd, void *vg, uint64_t val, uint32_t desc)
++{
++    intptr_t i, opr_sz = simd_oprsz(desc) / 8;
++    uint64_t *d = vd;
++    uint8_t *pg = vg;
++
++    val = dup_const(MO_32, val);
++    for (i = 0; i < opr_sz; i += 1) {
++        d[i] = val & expand_pred_s(pg[H1(i)]);
++    }
++}
++
++void HELPER(sve_cpy_z_d)(void *vd, void *vg, uint64_t val, uint32_t desc)
++{
++    intptr_t i, opr_sz = simd_oprsz(desc) / 8;
++    uint64_t *d = vd;
++    uint8_t *pg = vg;
++
++    for (i = 0; i < opr_sz; i += 1) {
++        d[i] = (pg[H1(i)] & 1 ? val : 0);
 +    }
 +}
 diff --git a/target/arm/translate-sve.c b/target/arm/translate-sve.c
-index 8924848463..54d774b5e0 100644
+index 9d7c18c48d..9bdd61ff84 100644
 --- a/target/arm/translate-sve.c
 +++ b/target/arm/translate-sve.c
-@@ -929,6 +929,30 @@ static bool trans_ADR_u32(DisasContext *s, arg_rrri *a, uint32_t insn)
-     return do_adr(s, a, gen_helper_sve_adr_u32);
+@@ -62,6 +62,12 @@ static inline int plus1(int x)
+     return x + 1;
+ }
+ 
++/* The SH bit is in bit 8.  Extract the low 8 and shift.  */
++static inline int expand_imm_sh8s(int x)
++{
++    return (int8_t)x << (x & 0x100 ? 8 : 0);
++}
++
+ /*
+  * Include the generated decoder.
+  */
+@@ -1834,6 +1840,88 @@ static bool trans_DUPM(DisasContext *s, arg_DUPM *a, uint32_t insn)
+     return true;
  }
  
 +/*
-+ *** SVE Integer Misc - Unpredicated Group
++ *** SVE Integer Wide Immediate - Predicated Group
 + */
 +
-+static bool trans_FEXPA(DisasContext *s, arg_rr_esz *a, uint32_t insn)
++/* Implement all merging copies.  This is used for CPY (immediate),
++ * FCPY, CPY (scalar), CPY (SIMD&FP scalar).
++ */
++static void do_cpy_m(DisasContext *s, int esz, int rd, int rn, int pg,
++                     TCGv_i64 val)
 +{
-+    static gen_helper_gvec_2 * const fns[4] = {
-+        NULL,
-+        gen_helper_sve_fexpa_h,
-+        gen_helper_sve_fexpa_s,
-+        gen_helper_sve_fexpa_d,
++    typedef void gen_cpy(TCGv_ptr, TCGv_ptr, TCGv_ptr, TCGv_i64, TCGv_i32);
++    static gen_cpy * const fns[4] = {
++        gen_helper_sve_cpy_m_b, gen_helper_sve_cpy_m_h,
++        gen_helper_sve_cpy_m_s, gen_helper_sve_cpy_m_d,
 +    };
++    unsigned vsz = vec_full_reg_size(s);
++    TCGv_i32 desc = tcg_const_i32(simd_desc(vsz, vsz, 0));
++    TCGv_ptr t_zd = tcg_temp_new_ptr();
++    TCGv_ptr t_zn = tcg_temp_new_ptr();
++    TCGv_ptr t_pg = tcg_temp_new_ptr();
++
++    tcg_gen_addi_ptr(t_zd, cpu_env, vec_full_reg_offset(s, rd));
++    tcg_gen_addi_ptr(t_zn, cpu_env, vec_full_reg_offset(s, rn));
++    tcg_gen_addi_ptr(t_pg, cpu_env, pred_full_reg_offset(s, pg));
++
++    fns[esz](t_zd, t_zn, t_pg, val, desc);
++
++    tcg_temp_free_ptr(t_zd);
++    tcg_temp_free_ptr(t_zn);
++    tcg_temp_free_ptr(t_pg);
++    tcg_temp_free_i32(desc);
++}
++
++static bool trans_FCPY(DisasContext *s, arg_FCPY *a, uint32_t insn)
++{
 +    if (a->esz == 0) {
 +        return false;
 +    }
 +    if (sve_access_check(s)) {
++        /* Decode the VFP immediate.  */
++        uint64_t imm = vfp_expand_imm(a->esz, a->imm);
++        TCGv_i64 t_imm = tcg_const_i64(imm);
++        do_cpy_m(s, a->esz, a->rd, a->rn, a->pg, t_imm);
++        tcg_temp_free_i64(t_imm);
++    }
++    return true;
++}
++
++static bool trans_CPY_m_i(DisasContext *s, arg_rpri_esz *a, uint32_t insn)
++{
++    if (a->esz == 0 && extract32(insn, 13, 1)) {
++        return false;
++    }
++    if (sve_access_check(s)) {
++        TCGv_i64 t_imm = tcg_const_i64(a->imm);
++        do_cpy_m(s, a->esz, a->rd, a->rn, a->pg, t_imm);
++        tcg_temp_free_i64(t_imm);
++    }
++    return true;
++}
++
++static bool trans_CPY_z_i(DisasContext *s, arg_CPY_z_i *a, uint32_t insn)
++{
++    static gen_helper_gvec_2i * const fns[4] = {
++        gen_helper_sve_cpy_z_b, gen_helper_sve_cpy_z_h,
++        gen_helper_sve_cpy_z_s, gen_helper_sve_cpy_z_d,
++    };
++
++    if (a->esz == 0 && extract32(insn, 13, 1)) {
++        return false;
++    }
++    if (sve_access_check(s)) {
 +        unsigned vsz = vec_full_reg_size(s);
-+        tcg_gen_gvec_2_ool(vec_full_reg_offset(s, a->rd),
-+                           vec_full_reg_offset(s, a->rn),
-+                           vsz, vsz, 0, fns[a->esz]);
++        TCGv_i64 t_imm = tcg_const_i64(a->imm);
++        tcg_gen_gvec_2i_ool(vec_full_reg_offset(s, a->rd),
++                            pred_full_reg_offset(s, a->pg),
++                            t_imm, vsz, vsz, 0, fns[a->esz]);
++        tcg_temp_free_i64(t_imm);
 +    }
 +    return true;
 +}
 +
  /*
-  *** SVE Predicate Logical Operations Group
+  *** SVE Memory - 32-bit Gather and Unsized Contiguous Group
   */
 diff --git a/target/arm/sve.decode b/target/arm/sve.decode
-index 691876de4e..cd53b95831 100644
+index a3277a0d21..4ee7c78cda 100644
 --- a/target/arm/sve.decode
 +++ b/target/arm/sve.decode
-@@ -66,6 +66,7 @@
+@@ -22,7 +22,7 @@
+ ###########################################################################
+ # Named fields.  These are primarily for disjoint fields.
  
- # Two operand
- @pd_pn          ........ esz:2 .. .... ....... rn:4 . rd:4      &rr_esz
-+@rd_rn          ........ esz:2 ...... ...... rn:5 rd:5          &rr_esz
+-%imm4_16_p1             16:4 !function=plus1
++%imm4_16_p1     16:4 !function=plus1
+ %imm6_22_5      22:1 5:5
+ %imm9_16_10     16:s6 10:3
  
- # Three operand with unused vector element size
- @rd_rn_rm_e0    ........ ... rm:5 ... ... rn:5 rd:5             &rrr_esz esz=0
-@@ -288,6 +289,12 @@ ADR_u32         00000100 01 1 ..... 1010 .. ..... .....         @rd_rn_msz_rm
- ADR_p32         00000100 10 1 ..... 1010 .. ..... .....         @rd_rn_msz_rm
- ADR_p64         00000100 11 1 ..... 1010 .. ..... .....         @rd_rn_msz_rm
+@@ -38,6 +38,9 @@
+ %tszimm16_shr   22:2 16:5 !function=tszimm_shr
+ %tszimm16_shl   22:2 16:5 !function=tszimm_shl
  
-+### SVE Integer Misc - Unpredicated Group
++# Signed 8-bit immediate, optionally shifted left by 8.
++%sh8_i8s        5:9 !function=expand_imm_sh8s
 +
-+# SVE floating-point exponential accelerator
-+# Note esz != 0
-+FEXPA           00000100 .. 1 00000 101110 ..... .....          @rd_rn
+ # Either a copy of rd (at bit 0), or a different source
+ # as propagated via the MOVPRFX instruction.
+ %reg_movprfx    0:5
+@@ -112,6 +115,11 @@
+ @rd_rn_tszimm   ........ .. ... ... ...... rn:5 rd:5 \
+                 &rri_esz esz=%tszimm16_esz
+ 
++# Two register operand, one immediate operand, with 4-bit predicate.
++# User must fill in imm.
++@rdn_pg4        ........ esz:2 .. pg:4 ... ........ rd:5 \
++                &rpri_esz rn=%reg_movprfx
++
+ # Two register operand, one encoded bitmask.
+ @rdn_dbm        ........ .. .... dbm:13 rd:5 \
+                 &rr_dbm rn=%reg_movprfx
+@@ -345,6 +353,15 @@ AND_zzi         00000101 10 0000 ............. .....            @rdn_dbm
+ # SVE broadcast bitmask immediate
+ DUPM            00000101 11 0000 dbm:13 rd:5
+ 
++### SVE Integer Wide Immediate - Predicated Group
++
++# SVE copy floating-point immediate (predicated)
++FCPY            00000101 .. 01 .... 110 imm:8 .....             @rdn_pg4
++
++# SVE copy integer immediate (predicated)
++CPY_m_i         00000101 .. 01 .... 01 . ........ .....   @rdn_pg4 imm=%sh8_i8s
++CPY_z_i         00000101 .. 01 .... 00 . ........ .....   @rdn_pg4 imm=%sh8_i8s
 +
  ### SVE Predicate Logical Operations Group
  
