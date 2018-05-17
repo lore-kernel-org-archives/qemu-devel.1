@@ -1,19 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47356)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48129)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1fJKnf-00089f-8n
-	for qemu-devel@nongnu.org; Thu, 17 May 2018 11:26:41 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1fJKp1-0000Yo-Kb
+	for qemu-devel@nongnu.org; Thu, 17 May 2018 11:28:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1fJKnZ-0001wt-SI
-	for qemu-devel@nongnu.org; Thu, 17 May 2018 11:26:39 -0400
-Date: Thu, 17 May 2018 17:26:28 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20180517172628.61cf46ba.cohuck@redhat.com>
-In-Reply-To: <20180516132757.68558-1-pasic@linux.ibm.com>
-References: <20180516132757.68558-1-pasic@linux.ibm.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1fJKp0-00032p-Qg
+	for qemu-devel@nongnu.org; Thu, 17 May 2018 11:28:03 -0400
+Received: from mail-ot0-x233.google.com ([2607:f8b0:4003:c0f::233]:36496)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1fJKp0-00032U-LS
+	for qemu-devel@nongnu.org; Thu, 17 May 2018 11:28:02 -0400
+Received: by mail-ot0-x233.google.com with SMTP id m11-v6so5508151otf.3
+	for <qemu-devel@nongnu.org>; Thu, 17 May 2018 08:28:02 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 1/1] virtio-ccw: clean up notify
+In-Reply-To: <20180512092824.13848-6-stefanha@redhat.com>
+References: <20180512092824.13848-1-stefanha@redhat.com>
+	<20180512092824.13848-6-stefanha@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 17 May 2018 16:27:41 +0100
+Message-ID: <CAFEAcA9_zd0FyG8ndOepaWoSXd-D5kFowPft5ANnVmZo_QQHSQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL 5/8] checkpatch: emit a warning on file
+ add/move/delete
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,24 +30,23 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Halil Pasic <pasic@linux.ibm.com>
-Cc: Richard Henderson <rth@twiddle.net>, Alexander Graf <agraf@suse.de>, David Hildenbrand <david@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Dong Jia Shi <bjsdjshi@linux.ibm.com>, qemu-s390x@nongnu.org, qemu-devel@nongnu.org
+To: Stefan Hajnoczi <stefanha@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Qemu-block <qemu-block@nongnu.org>
 
-On Wed, 16 May 2018 15:27:57 +0200
-Halil Pasic <pasic@linux.ibm.com> wrote:
+On 12 May 2018 at 10:28, Stefan Hajnoczi <stefanha@redhat.com> wrote:
+> From: Joe Perches <joe@perches.com>
+>
+> Whenever files are added, moved, or deleted, the MAINTAINERS file
+> patterns can be out of sync or outdated.
+>
+> To try to keep MAINTAINERS more up-to-date, add a one-time warning
+> whenever a patch does any of those.
+>
 
-> Coverity recently started complaining about virtio_ccw_notify().  Turns
-> out, there is a couple of things that can be cleaned up.  Let's clean!
+This seems to generate false positives: it just warned me about
+"xlnx-zdma: Add a model of the Xilinx ZynqMP generic DMA", but
+there are already entries in the MAINTAINERS file that cover
+the new files.
 
-Changes look good to me.
-
-I wanted to come up with a better patch description, but failed (well,
-I did not try much.) So I'm inclined to merge this as-is.
-
-> 
-> Reported-by: Peter Maydell <peter.maydell@linaro.org>
-> Fixes: CID 1390619
-> Signed-off-by: Halil Pasic <pasic@linux.ibm.com>
-> ---
->  hw/s390x/virtio-ccw.c | 13 +++++++++----
->  1 file changed, 9 insertions(+), 4 deletions(-)
+thanks
+-- PMM
