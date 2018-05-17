@@ -1,27 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58006)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59885)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fJLO9-00043q-Ng
-	for qemu-devel@nongnu.org; Thu, 17 May 2018 12:04:22 -0400
+	(envelope-from <rkagan@virtuozzo.com>) id 1fJLV8-00088G-Cb
+	for qemu-devel@nongnu.org; Thu, 17 May 2018 12:11:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fJLO5-000394-SF
-	for qemu-devel@nongnu.org; Thu, 17 May 2018 12:04:21 -0400
-Received: from mail-ot0-x230.google.com ([2607:f8b0:4003:c0f::230]:36745)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fJLO5-00038t-O7
-	for qemu-devel@nongnu.org; Thu, 17 May 2018 12:04:17 -0400
-Received: by mail-ot0-x230.google.com with SMTP id m11-v6so5648907otf.3
-	for <qemu-devel@nongnu.org>; Thu, 17 May 2018 09:04:17 -0700 (PDT)
+	(envelope-from <rkagan@virtuozzo.com>) id 1fJLV7-00084L-9h
+	for qemu-devel@nongnu.org; Thu, 17 May 2018 12:11:34 -0400
+Date: Thu, 17 May 2018 19:11:08 +0300
+From: Roman Kagan <rkagan@virtuozzo.com>
+Message-ID: <20180517161108.GA29931@rkaganb.sw.ru>
+References: <20180426161958.2872-1-rkagan@virtuozzo.com>
 MIME-Version: 1.0
-In-Reply-To: <20180516223007.10256-9-richard.henderson@linaro.org>
-References: <20180516223007.10256-1-richard.henderson@linaro.org>
-	<20180516223007.10256-9-richard.henderson@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 17 May 2018 17:03:56 +0100
-Message-ID: <CAFEAcA8ATbdfprPZRJmPjF_KBnnBsmrW+kH6Cm2_8QqGufQkAg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v3-a 08/27] target/arm: Implement SVE
- Integer Binary Arithmetic - Predicated Group
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180426161958.2872-1-rkagan@virtuozzo.com>
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 00/17] iotests: don't choke on
+ disabled drivers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,19 +23,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>
+To: Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Markus Armbruster <armbru@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
 
-On 16 May 2018 at 23:29, Richard Henderson <richard.henderson@linaro.org> wrote:
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-> ---
->  target/arm/helper-sve.h    | 145 +++++++++++++++++++++++++++
->  target/arm/sve_helper.c    | 194 +++++++++++++++++++++++++++++++++++++
->  target/arm/translate-sve.c |  68 +++++++++++++
->  target/arm/sve.decode      |  42 ++++++++
->  4 files changed, 449 insertions(+)
+On Thu, Apr 26, 2018 at 07:19:41PM +0300, Roman Kagan wrote:
+> Some iotests assume availability of certain block drivers, and fail if
+> the driver is not supported by QEMU because it was disabled at configure
+> time.
+> 
+> This series tries to address that, by making QEMU report the actual list
+> of supported block drivers in response to "-drive format=?", and using
+> this information to skip the parts of the io testsuite that can not be
+> run in this configuration.
+> 
+> Roman Kagan (17):
+>   block: iterate_format with account of whitelisting
+>   iotests: iotests.py: prevent deadlock in subprocess
+>   iotests: ask qemu for supported formats
+>   iotest 030: skip quorum test setup/teardown too
+>   iotest 030: require blkdebug
+>   iotest 055: skip unsupported backup target formats
+>   iotest 055: require blkdebug
+>   iotest 056: skip testcases using blkdebug if disabled
+>   iotest 071: notrun if blkdebug or blkverify is disabled
+>   iotest 081: notrun if quorum is disabled
+>   iotest 087: notrun if null-co is disabled
+>   iotest 093: notrun if null-co or null-aio is disabled
+>   iotest 099: notrun if blkdebug or blkverify is disabled
+>   iotest 124: skip testcases using blkdebug if disabled
+>   iotest 139: skip testcases using disabled drivers
+>   iotest 147: notrun if nbd is disabled
+>   iotest 184: notrun if null-co or throttle is disabled
+> 
+>  include/block/block.h         |  2 +-
+>  block.c                       | 23 ++++++++++++++++++----
+>  blockdev.c                    |  4 +++-
+>  qemu-img.c                    |  2 +-
+>  tests/qemu-iotests/030        |  7 +++++++
+>  tests/qemu-iotests/055        | 13 ++++++++++++
+>  tests/qemu-iotests/056        |  3 +++
+>  tests/qemu-iotests/071        |  1 +
+>  tests/qemu-iotests/081        |  1 +
+>  tests/qemu-iotests/087        |  1 +
+>  tests/qemu-iotests/093        |  1 +
+>  tests/qemu-iotests/099        |  1 +
+>  tests/qemu-iotests/124        |  5 +++++
+>  tests/qemu-iotests/139        |  4 ++++
+>  tests/qemu-iotests/147        |  1 +
+>  tests/qemu-iotests/184        |  1 +
+>  tests/qemu-iotests/common.rc  | 19 ++++++++++++++++++
+>  tests/qemu-iotests/iotests.py | 46 ++++++++++++++++++++++++++++++++-----------
+>  18 files changed, 117 insertions(+), 18 deletions(-)
 
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
-
-thanks
--- PMM
+Ping?
