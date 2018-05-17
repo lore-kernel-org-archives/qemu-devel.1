@@ -1,16 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51732)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55343)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1fJBtq-0000kp-81
-	for qemu-devel@nongnu.org; Thu, 17 May 2018 01:56:27 -0400
+	(envelope-from <peterx@redhat.com>) id 1fJCJo-0007NC-EV
+	for qemu-devel@nongnu.org; Thu, 17 May 2018 02:23:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1fJBtp-0002i5-JD
-	for qemu-devel@nongnu.org; Thu, 17 May 2018 01:56:26 -0400
-Date: Thu, 17 May 2018 13:56:13 +0800
-From: Fam Zheng <famz@redhat.com>
-Message-ID: <20180517055613.GA3017@lemon.usersys.redhat.com>
+	(envelope-from <peterx@redhat.com>) id 1fJCJn-0005sl-JV
+	for qemu-devel@nongnu.org; Thu, 17 May 2018 02:23:16 -0400
+Date: Thu, 17 May 2018 14:22:58 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20180517062258.GP9089@xz-mi>
 References: <1526523977-73930-1-git-send-email-wangjie88@huawei.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 In-Reply-To: <1526523977-73930-1-git-send-email-wangjie88@huawei.com>
 Subject: Re: [Qemu-devel] [PATCH v6 2/2] iothread: let aio_epoll_disable fit
@@ -24,22 +24,12 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Jie Wang <wangjie88@huawei.com>
-Cc: peterx@redhat.com, stefanha@redhat.com, eblake@redhat.com, qemu-devel@nongnu.org, qemu-block@nongnu.org, eric.fangyi@huawei.com, wu.wubin@huawei.com
+Cc: famz@redhat.com, stefanha@redhat.com, eblake@redhat.com, qemu-devel@nongnu.org, qemu-block@nongnu.org, eric.fangyi@huawei.com, wu.wubin@huawei.com
 
-On Thu, 05/17 10:26, Jie Wang wrote:
+On Thu, May 17, 2018 at 10:26:17AM +0800, Jie Wang wrote:
 > epoll_available will only be set if epollfd != -1, os we
-
-s/os/so/
-
 > can swap the two variables in aio_epoll_disable, and
 > aio_context_destroy can call aio_epoll_disable directly.
-
-If you put this as 1/2 in v7, you do not want to mention the
-yet-to-be-introduced aio_context_destroy this way. Maybe you can write as "the
-coming aio_context_destroy can call it directly.".
-
-Fam
-
 > 
 > Signed-off-by: Jie Wang <wangjie88@huawei.com>
 > ---
@@ -73,9 +63,21 @@ Fam
 > -        close(ctx->epollfd);
 > -    }
 > +    aio_epoll_disable(ctx);
+
+Hmm... I think this patch should be the first if to split.
+
+Anyway, IMHO version 5 is already good enough and has got r-bs, no
+need to bother reposting a version 7.  Maintainer could possibly touch
+up the commit message if necessary.
+
+Thanks,
+
 >  #endif
 >  }
 >  
 > -- 
 > 1.8.3.1
 > 
+
+-- 
+Peter Xu
