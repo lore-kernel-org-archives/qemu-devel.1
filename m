@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52603)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52647)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fJN6G-00039s-J0
-	for qemu-devel@nongnu.org; Thu, 17 May 2018 13:54:02 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1fJN6I-0003Bl-CJ
+	for qemu-devel@nongnu.org; Thu, 17 May 2018 13:54:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fJN6F-000763-CQ
-	for qemu-devel@nongnu.org; Thu, 17 May 2018 13:54:00 -0400
-Received: from mail-wm0-x229.google.com ([2a00:1450:400c:c09::229]:32853)
+	(envelope-from <alex.bennee@linaro.org>) id 1fJN6H-00077p-HQ
+	for qemu-devel@nongnu.org; Thu, 17 May 2018 13:54:02 -0400
+Received: from mail-wm0-x22b.google.com ([2a00:1450:400c:c09::22b]:56140)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1fJN6F-00075X-2R
-	for qemu-devel@nongnu.org; Thu, 17 May 2018 13:53:59 -0400
-Received: by mail-wm0-x229.google.com with SMTP id x12-v6so475252wmc.0
-	for <qemu-devel@nongnu.org>; Thu, 17 May 2018 10:53:58 -0700 (PDT)
+	id 1fJN6H-00076v-BJ
+	for qemu-devel@nongnu.org; Thu, 17 May 2018 13:54:01 -0400
+Received: by mail-wm0-x22b.google.com with SMTP id a8-v6so9914344wmg.5
+	for <qemu-devel@nongnu.org>; Thu, 17 May 2018 10:54:01 -0700 (PDT)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Thu, 17 May 2018 18:47:07 +0100
-Message-Id: <20180517174718.10107-39-alex.bennee@linaro.org>
+Date: Thu, 17 May 2018 18:47:13 +0100
+Message-Id: <20180517174718.10107-45-alex.bennee@linaro.org>
 In-Reply-To: <20180517174718.10107-1-alex.bennee@linaro.org>
 References: <20180517174718.10107-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v4 38/49] tests/tcg: enable building for Alpha
+Subject: [Qemu-devel] [PATCH v4 44/49] tests/tcg: enable building for mips64
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,43 +30,35 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: cota@braap.org, famz@redhat.com, berrange@redhat.com, f4bug@amsat.org, richard.henderson@linaro.org, balrogg@gmail.com, aurelien@aurel32.net, agraf@suse.de
-Cc: qemu-devel@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Richard Henderson <rth@twiddle.net>
+Cc: qemu-devel@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Yongbok Kim <yongbok.kim@mips.com>
 
-We can't use our normal Debian based compilers as Alpha isn't an
-officially supported architecture. However it is available as a port
-and fortunately cross compilers for all these targets are included in
-Debian Sid, the perpetual rolling/unstable/testing version of Debian.
+As before, using Debian SID compilers.
 
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 ---
- tests/docker/Makefile.include                 |  1 +
- .../dockerfiles/debian-alpha-cross.docker     | 12 +++++++
- .../dockerfiles/debian-cross-build.docker     | 36 +++++++++++++++++++
- tests/docker/dockerfiles/debian-sid.docker    | 23 ++++++++++++
- tests/tcg/alpha/Makefile.include              |  2 ++
- 5 files changed, 74 insertions(+)
- create mode 100644 tests/docker/dockerfiles/debian-alpha-cross.docker
- create mode 100644 tests/docker/dockerfiles/debian-cross-build.docker
- create mode 100644 tests/docker/dockerfiles/debian-sid.docker
- create mode 100644 tests/tcg/alpha/Makefile.include
+ tests/docker/Makefile.include                       |  1 +
+ tests/docker/dockerfiles/debian-mips64-cross.docker | 12 ++++++++++++
+ tests/tcg/mips/Makefile.include                     |  3 +++
+ 3 files changed, 16 insertions(+)
+ create mode 100644 tests/docker/dockerfiles/debian-mips64-cross.docker
 
 diff --git a/tests/docker/Makefile.include b/tests/docker/Makefile.include
-index 6a5aa9ec71..bcf44e80c4 100644
+index 62d1f4dec0..f58afb8c5d 100644
 --- a/tests/docker/Makefile.include
 +++ b/tests/docker/Makefile.include
-@@ -62,6 +62,7 @@ docker-image-debian-ppc64el-cross: docker-image-debian9
- docker-image-debian-s390x-cross: docker-image-debian9
- docker-image-debian-win32-cross: docker-image-debian8-mxe
- docker-image-debian-win64-cross: docker-image-debian8-mxe
-+docker-image-debian-alpha-cross: docker-image-debian-sid
+@@ -67,6 +67,7 @@ docker-image-debian-hppa-cross: docker-image-debian-sid
+ docker-image-debian-m68k-cross: docker-image-debian-sid
+ docker-image-debian-sh4-cross: docker-image-debian-sid
+ docker-image-debian-sparc64-cross: docker-image-debian-sid
++docker-image-debian-mips64-cross: docker-image-debian-sid
  docker-image-travis: NOUSER=1
  
  # Expand all the pre-requistes for each docker image and test combination
-diff --git a/tests/docker/dockerfiles/debian-alpha-cross.docker b/tests/docker/dockerfiles/debian-alpha-cross.docker
+diff --git a/tests/docker/dockerfiles/debian-mips64-cross.docker b/tests/docker/dockerfiles/debian-mips64-cross.docker
 new file mode 100644
-index 0000000000..e446f7af3f
+index 0000000000..ed1ce0e919
 --- /dev/null
-+++ b/tests/docker/dockerfiles/debian-alpha-cross.docker
++++ b/tests/docker/dockerfiles/debian-mips64-cross.docker
 @@ -0,0 +1,12 @@
 +#
 +# Docker cross-compiler target
@@ -78,86 +70,21 @@ index 0000000000..e446f7af3f
 +
 +RUN DEBIAN_FRONTEND=noninteractive eatmydata \
 +    apt-get install -y --no-install-recommends \
-+        gcc-alpha-linux-gnu \
-+        libc6.1-dev-alpha-cross
-diff --git a/tests/docker/dockerfiles/debian-cross-build.docker b/tests/docker/dockerfiles/debian-cross-build.docker
-new file mode 100644
-index 0000000000..c3611a7d3a
---- /dev/null
-+++ b/tests/docker/dockerfiles/debian-cross-build.docker
-@@ -0,0 +1,36 @@
-+#
-+# Docker multiarch cross-compiler target
-+#
-+# This docker target is builds on Debian cross compiler targets to build distro
-+# with a selection of cross compilers for building test binaries.
-+#
-+# On its own you can't build much but the docker-foo-cross targets
-+# build on top of the base debian image.
-+#
-+FROM debian:stretch
-+
-+# Duplicate deb line as deb-src
-+RUN cat /etc/apt/sources.list | sed "s/^deb\ /deb-src /" >> /etc/apt/sources.list
-+
-+# Install common build utilities
-+RUN apt update
-+RUN DEBIAN_FRONTEND=noninteractive apt install -yy eatmydata
-+RUN DEBIAN_FRONTEND=noninteractive eatmydata \
-+    apt install -y --no-install-recommends \
-+        bison \
-+        build-essential \
-+        ca-certificates \
-+        flex \
-+        gettext \
-+        git \
-+        libgmp-dev \
-+        libmpfr-dev \
-+        libmpc-dev \
-+        pkg-config \
-+        psmisc \
-+        python \
-+        texinfo \
-+        wget \
-+        $(apt-get -s build-dep binutils | egrep ^Inst | cut -d\  -f2) \
-+        $(apt-get -s build-dep gcc | egrep ^Inst | cut -d\  -f2) \
-+        $(apt-get -s build-dep glibc | egrep ^Inst | cut -d\  -f2)
-diff --git a/tests/docker/dockerfiles/debian-sid.docker b/tests/docker/dockerfiles/debian-sid.docker
-new file mode 100644
-index 0000000000..adeb7134ca
---- /dev/null
-+++ b/tests/docker/dockerfiles/debian-sid.docker
-@@ -0,0 +1,23 @@
-+#
-+# A number of our guests exist as ports only. We can either use the ports repo or get everything from SID
-+#
-+
-+FROM debian:sid-slim
-+
-+# Duplicate deb line as deb-src
-+RUN cat /etc/apt/sources.list | sed "s/^deb\ /deb-src /" >> /etc/apt/sources.list
-+
-+# Install common build utilities
-+RUN apt update
-+RUN DEBIAN_FRONTEND=noninteractive apt install -yy eatmydata
-+RUN DEBIAN_FRONTEND=noninteractive eatmydata \
-+    apt install -y --no-install-recommends \
-+        bison \
-+        build-essential \
-+        ca-certificates \
-+        flex \
-+        git \
-+        pkg-config \
-+        psmisc \
-+        python \
-+        texinfo
-diff --git a/tests/tcg/alpha/Makefile.include b/tests/tcg/alpha/Makefile.include
-new file mode 100644
-index 0000000000..c7dc48eadb
---- /dev/null
-+++ b/tests/tcg/alpha/Makefile.include
-@@ -0,0 +1,2 @@
-+DOCKER_IMAGE=debian-alpha-cross
-+DOCKER_CROSS_COMPILER=alpha-linux-gnu-gcc
++        gcc-mips64-linux-gnuabi64 \
++        libc6-dev-mips64-cross
+diff --git a/tests/tcg/mips/Makefile.include b/tests/tcg/mips/Makefile.include
+index a9beceb623..4a14fc078d 100644
+--- a/tests/tcg/mips/Makefile.include
++++ b/tests/tcg/mips/Makefile.include
+@@ -8,6 +8,9 @@
+ ifeq ($(TARGET_NAME),mips64el)
+ DOCKER_IMAGE=debian-mips64el-cross
+ DOCKER_CROSS_COMPILER=mips64el-linux-gnuabi64-gcc
++else ifeq ($(TARGET_NAME),mips64)
++DOCKER_IMAGE=debian-mips64-cross
++DOCKER_CROSS_COMPILER=mips64-linux-gnuabi64-gcc
+ else ifeq ($(TARGET_NAME),mipsel)
+ DOCKER_IMAGE=debian-mipsel-cross
+ DOCKER_CROSS_COMPILER=mipsel-linux-gnu-gcc
 -- 
 2.17.0
