@@ -1,16 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59125)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60341)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1fJ9Bn-0004t0-8q
-	for qemu-devel@nongnu.org; Wed, 16 May 2018 23:02:48 -0400
+	(envelope-from <peterx@redhat.com>) id 1fJ9E1-0006Iu-25
+	for qemu-devel@nongnu.org; Wed, 16 May 2018 23:05:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1fJ9Bm-0007FO-Aj
-	for qemu-devel@nongnu.org; Wed, 16 May 2018 23:02:47 -0400
-Date: Thu, 17 May 2018 11:02:37 +0800
-From: Fam Zheng <famz@redhat.com>
-Message-ID: <20180517030237.GI6731@lemon.usersys.redhat.com>
+	(envelope-from <peterx@redhat.com>) id 1fJ9E0-0000Is-3W
+	for qemu-devel@nongnu.org; Wed, 16 May 2018 23:05:05 -0400
+Date: Thu, 17 May 2018 11:04:53 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20180517030453.GN9089@xz-mi>
 References: <1526517763-11108-1-git-send-email-wangjie88@huawei.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 In-Reply-To: <1526517763-11108-1-git-send-email-wangjie88@huawei.com>
 Subject: Re: [Qemu-devel] [PATCH v5] iothread: fix epollfd leak in the
@@ -24,13 +24,20 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Jie Wang <wangjie88@huawei.com>
-Cc: stefanha@redhat.com, peterx@redhat.com, eblake@redhat.com, qemu-devel@nongnu.org, qemu-block@nongnu.org, eric.fangyi@huawei.com, wu.wubin@huawei.com
+Cc: stefanha@redhat.com, famz@redhat.com, eblake@redhat.com, qemu-devel@nongnu.org, qemu-block@nongnu.org, eric.fangyi@huawei.com, wu.wubin@huawei.com
 
-On Thu, 05/17 08:42, Jie Wang wrote:
+On Thu, May 17, 2018 at 08:42:43AM +0800, Jie Wang wrote:
 > When we call addIOThread, the epollfd created in aio_context_setup,
 > but not close it in the process of delIOThread, so the epollfd will leak.
+
+(maybe also mention about the aio_epoll_disable change, or split into
+ two patches?)
+
 > 
 > Signed-off-by: Jie Wang <wangjie88@huawei.com>
+
+Reviewed-by: Peter Xu <peterx@redhat.com>
+
 > ---
 >  include/block/aio.h |  8 ++++++++
 >  util/aio-posix.c    | 13 ++++++++++---
@@ -121,4 +128,5 @@ On Thu, 05/17 08:42, Jie Wang wrote:
 > 1.8.3.1
 > 
 
-Reviewed-by: Fam Zheng <famz@redhat.com>
+-- 
+Peter Xu
