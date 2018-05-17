@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52751)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52746)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fJN6Q-0003JL-76
+	(envelope-from <alex.bennee@linaro.org>) id 1fJN6Q-0003JH-5X
 	for qemu-devel@nongnu.org; Thu, 17 May 2018 13:54:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fJN6P-0007DE-3e
+	(envelope-from <alex.bennee@linaro.org>) id 1fJN6N-0007Cc-VA
 	for qemu-devel@nongnu.org; Thu, 17 May 2018 13:54:10 -0400
-Received: from mail-wr0-x22a.google.com ([2a00:1450:400c:c0c::22a]:44796)
+Received: from mail-wr0-x232.google.com ([2a00:1450:400c:c0c::232]:46283)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1fJN6O-0007Cr-U7
-	for qemu-devel@nongnu.org; Thu, 17 May 2018 13:54:09 -0400
-Received: by mail-wr0-x22a.google.com with SMTP id y15-v6so6551241wrg.11
-	for <qemu-devel@nongnu.org>; Thu, 17 May 2018 10:54:08 -0700 (PDT)
+	id 1fJN6N-0007Bv-LX
+	for qemu-devel@nongnu.org; Thu, 17 May 2018 13:54:07 -0400
+Received: by mail-wr0-x232.google.com with SMTP id x9-v6so3700103wrl.13
+	for <qemu-devel@nongnu.org>; Thu, 17 May 2018 10:54:07 -0700 (PDT)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Thu, 17 May 2018 18:47:17 +0100
-Message-Id: <20180517174718.10107-49-alex.bennee@linaro.org>
+Date: Thu, 17 May 2018 18:46:44 +0100
+Message-Id: <20180517174718.10107-16-alex.bennee@linaro.org>
 In-Reply-To: <20180517174718.10107-1-alex.bennee@linaro.org>
 References: <20180517174718.10107-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v4 48/49] tests/Makefile.include: add
- [build|clean|check]-tcg targets
+Subject: [Qemu-devel] [PATCH v4 15/49] tests/tcg/multiarch: move most output
+ to stdout
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,72 +33,197 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: cota@braap.org, famz@redhat.com, berrange@redhat.com, f4bug@amsat.org, richard.henderson@linaro.org, balrogg@gmail.com, aurelien@aurel32.net, agraf@suse.de
 Cc: qemu-devel@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 
-This will ensure all linux-user targets build their guest test
-programs and ensure check-tcg will run the respective tests.
+The default test run outputs to stdout so it can be re-directed.
+Errors are still reported to stderr.
 
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 Tested-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
----
-v2
-  - use -include instead of complex macro stuff
-  - also include TARGET_BASE_ARCH/Makefile
-v3
-  - add build-tcg, make check-tcg actually run tests
----
- tests/Makefile.include | 26 +++++++++++++++++++++++++-
- 1 file changed, 25 insertions(+), 1 deletion(-)
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
-diff --git a/tests/Makefile.include b/tests/Makefile.include
-index 3d2f0458ab..310ccefdd9 100644
---- a/tests/Makefile.include
-+++ b/tests/Makefile.include
-@@ -10,6 +10,7 @@ check-help:
- 	@echo " $(MAKE) check-speed          Run qobject speed tests"
- 	@echo " $(MAKE) check-qapi-schema    Run QAPI schema tests"
- 	@echo " $(MAKE) check-block          Run block tests"
-+	@echo " $(MAKE) check-tcg            Run TCG tests"
- 	@echo " $(MAKE) check-report.html    Generates an HTML test report"
- 	@echo " $(MAKE) check-clean          Clean the tests"
- 	@echo
-@@ -916,6 +917,30 @@ check-report.xml: $(patsubst %,check-report-qtest-%.xml, $(QTEST_TARGETS)) check
- check-report.html: check-report.xml
- 	$(call quiet-command,gtester-report $< > $@,"GEN","$@")
+---
+v4
+  - remove space in fprintf () to keep checkpatch happy
+---
+ tests/tcg/multiarch/test-mmap.c | 40 ++++++++++++++++-----------------
+ 1 file changed, 20 insertions(+), 20 deletions(-)
+
+diff --git a/tests/tcg/multiarch/test-mmap.c b/tests/tcg/multiarch/test-mmap.c
+index cdefadfa4c..5c0afe6e49 100644
+--- a/tests/tcg/multiarch/test-mmap.c
++++ b/tests/tcg/multiarch/test-mmap.c
+@@ -36,7 +36,7 @@
+ do                                                             \
+ {                                                              \
+   if (!(x)) {                                                  \
+-    fprintf (stderr, "FAILED at %s:%d\n", __FILE__, __LINE__); \
++    fprintf(stderr, "FAILED at %s:%d\n", __FILE__, __LINE__); \
+     exit (EXIT_FAILURE);                                       \
+   }                                                            \
+ } while (0)
+@@ -57,7 +57,7 @@ void check_aligned_anonymous_unfixed_mmaps(void)
+ 	uintptr_t p;
+ 	int i;
  
-+# Per guest TCG tests
-+
-+LINUX_USER_TARGETS=$(filter %-linux-user,$(TARGET_LIST))
-+BUILD_TCG_TARGET_RULES=$(patsubst %,build-tcg-tests-%, $(LINUX_USER_TARGETS))
-+CLEAN_TCG_TARGET_RULES=$(patsubst %,clean-tcg-tests-%, $(LINUX_USER_TARGETS))
-+RUN_TCG_TARGET_RULES=$(patsubst %,run-tcg-tests-%, $(LINUX_USER_TARGETS))
-+
-+build-tcg-tests-%:
-+	$(call quiet-command,$(MAKE) $(SUBDIR_MAKEFLAGS) -C $* V="$(V)" TARGET_DIR="$*/" guest-tests,)
-+
-+run-tcg-tests-%: build-tcg-tests-%
-+	$(call quiet-command,$(MAKE) $(SUBDIR_MAKEFLAGS) -C $* V="$(V)" TARGET_DIR="$*/" run-guest-tests,)
-+
-+clean-tcg-tests-%:
-+	$(call quiet-command,$(MAKE) $(SUBDIR_MAKEFLAGS) -C $* V="$(V)" TARGET_DIR="$*/" clean-guest-tests,)
-+
-+.PHONY: build-tcg
-+build-tcg: $(BUILD_TCG_TARGET_RULES)
-+
-+.PHONY: check-tcg
-+check-tcg: $(RUN_TCG_TARGET_RULES)
-+
-+.PHONY: clean-tcg
-+clean-tcg: $(CLEAN_TCG_TARGET_RULES)
+-	fprintf (stderr, "%s", __func__);
++	fprintf(stdout, "%s", __func__);
+ 	for (i = 0; i < 0x1fff; i++)
+ 	{
+ 		size_t len;
+@@ -106,7 +106,7 @@ void check_aligned_anonymous_unfixed_mmaps(void)
+ 		munmap (p4, len);
+ 		munmap (p5, len);
+ 	}
+-	fprintf (stderr, " passed\n");
++	fprintf(stdout, " passed\n");
+ }
  
- # Other tests
+ void check_large_anonymous_unfixed_mmap(void)
+@@ -115,7 +115,7 @@ void check_large_anonymous_unfixed_mmap(void)
+ 	uintptr_t p;
+ 	size_t len;
  
-@@ -958,7 +983,6 @@ check-speed: $(patsubst %,check-%, $(check-speed-y))
- check-block: $(patsubst %,check-%, $(check-block-y))
- check: check-qapi-schema check-unit check-qtest check-decodetree
- check-clean:
--	$(MAKE) -C tests/tcg clean
- 	rm -rf $(check-unit-y) tests/*.o $(QEMU_IOTESTS_HELPERS-y)
- 	rm -rf $(sort $(foreach target,$(SYSEMU_TARGET_LIST), $(check-qtest-$(target)-y)) $(check-qtest-generic-y))
- 	rm -f tests/test-qapi-gen-timestamp
+-	fprintf (stderr, "%s", __func__);
++	fprintf(stdout, "%s", __func__);
+ 
+ 	len = 0x02000000;
+ 	p1 = mmap(NULL, len, PROT_READ, 
+@@ -130,7 +130,7 @@ void check_large_anonymous_unfixed_mmap(void)
+ 	/* Make sure we can read from the entire area.  */
+ 	memcpy (dummybuf, p1, pagesize);
+ 	munmap (p1, len);
+-	fprintf (stderr, " passed\n");
++	fprintf(stdout, " passed\n");
+ }
+ 
+ void check_aligned_anonymous_unfixed_colliding_mmaps(void)
+@@ -141,7 +141,7 @@ void check_aligned_anonymous_unfixed_colliding_mmaps(void)
+ 	uintptr_t p;
+ 	int i;
+ 
+-	fprintf (stderr, "%s", __func__);
++	fprintf(stdout, "%s", __func__);
+ 	for (i = 0; i < 0x2fff; i++)
+ 	{
+ 		int nlen;
+@@ -180,7 +180,7 @@ void check_aligned_anonymous_unfixed_colliding_mmaps(void)
+ 		munmap (p2, pagesize);
+ 		munmap (p3, nlen);
+ 	}
+-	fprintf (stderr, " passed\n");
++	fprintf(stdout, " passed\n");
+ }
+ 
+ void check_aligned_anonymous_fixed_mmaps(void)
+@@ -194,7 +194,7 @@ void check_aligned_anonymous_fixed_mmaps(void)
+ 	addr = mmap(NULL, pagesize * 40, PROT_READ | PROT_WRITE, 
+ 		    MAP_PRIVATE | MAP_ANONYMOUS,
+ 		    -1, 0);
+-	fprintf (stderr, "%s addr=%p", __func__, addr);
++	fprintf(stdout, "%s addr=%p", __func__, addr);
+ 	fail_unless (addr != MAP_FAILED);
+ 
+ 	for (i = 0; i < 40; i++)
+@@ -212,7 +212,7 @@ void check_aligned_anonymous_fixed_mmaps(void)
+ 		munmap (p1, pagesize);
+ 		addr += pagesize;
+ 	}
+-	fprintf (stderr, " passed\n");
++	fprintf(stdout, " passed\n");
+ }
+ 
+ void check_aligned_anonymous_fixed_mmaps_collide_with_host(void)
+@@ -225,8 +225,8 @@ void check_aligned_anonymous_fixed_mmaps_collide_with_host(void)
+ 	/* Find a suitable address to start with.  Right were the x86 hosts
+ 	 stack is.  */
+ 	addr = ((void *)0x80000000);
+-	fprintf (stderr, "%s addr=%p", __func__, addr);
+-	fprintf (stderr, "FIXME: QEMU fails to track pages used by the host.");
++	fprintf(stdout, "%s addr=%p", __func__, addr);
++	fprintf(stdout, "FIXME: QEMU fails to track pages used by the host.");
+ 
+ 	for (i = 0; i < 20; i++)
+ 	{
+@@ -243,7 +243,7 @@ void check_aligned_anonymous_fixed_mmaps_collide_with_host(void)
+ 		munmap (p1, pagesize);
+ 		addr += pagesize;
+ 	}
+-	fprintf (stderr, " passed\n");
++	fprintf(stdout, " passed\n");
+ }
+ 
+ void check_file_unfixed_mmaps(void)
+@@ -252,7 +252,7 @@ void check_file_unfixed_mmaps(void)
+ 	uintptr_t p;
+ 	int i;
+ 
+-	fprintf (stderr, "%s", __func__);
++	fprintf(stdout, "%s", __func__);
+ 	for (i = 0; i < 0x10; i++)
+ 	{
+ 		size_t len;
+@@ -294,7 +294,7 @@ void check_file_unfixed_mmaps(void)
+ 		munmap (p2, len);
+ 		munmap (p3, len);
+ 	}
+-	fprintf (stderr, " passed\n");
++	fprintf(stdout, " passed\n");
+ }
+ 
+ void check_file_unfixed_eof_mmaps(void)
+@@ -304,7 +304,7 @@ void check_file_unfixed_eof_mmaps(void)
+ 	uintptr_t p;
+ 	int i;
+ 
+-	fprintf (stderr, "%s", __func__);
++	fprintf(stdout, "%s", __func__);
+ 	for (i = 0; i < 0x10; i++)
+ 	{
+ 		p1 = mmap(NULL, pagesize, PROT_READ, 
+@@ -327,7 +327,7 @@ void check_file_unfixed_eof_mmaps(void)
+ 		fail_unless (cp[pagesize - 4] == 0);
+ 		munmap (p1, pagesize);
+ 	}
+-	fprintf (stderr, " passed\n");
++	fprintf(stdout, " passed\n");
+ }
+ 
+ void check_file_fixed_eof_mmaps(void)
+@@ -343,7 +343,7 @@ void check_file_fixed_eof_mmaps(void)
+ 		    MAP_PRIVATE | MAP_ANONYMOUS,
+ 		    -1, 0);
+ 
+-	fprintf (stderr, "%s addr=%p", __func__, (void *)addr);
++	fprintf(stdout, "%s addr=%p", __func__, (void *)addr);
+ 	fail_unless (addr != MAP_FAILED);
+ 
+ 	for (i = 0; i < 0x10; i++)
+@@ -371,7 +371,7 @@ void check_file_fixed_eof_mmaps(void)
+ 		munmap (p1, pagesize);
+ 		addr += pagesize;
+ 	}
+-	fprintf (stderr, " passed\n");
++	fprintf(stdout, " passed\n");
+ }
+ 
+ void check_file_fixed_mmaps(void)
+@@ -384,7 +384,7 @@ void check_file_fixed_mmaps(void)
+ 	addr = mmap(NULL, pagesize * 40 * 4, PROT_READ, 
+ 		    MAP_PRIVATE | MAP_ANONYMOUS,
+ 		    -1, 0);
+-	fprintf (stderr, "%s addr=%p", __func__, (void *)addr);
++	fprintf(stdout, "%s addr=%p", __func__, (void *)addr);
+ 	fail_unless (addr != MAP_FAILED);
+ 
+ 	for (i = 0; i < 40; i++)
+@@ -426,7 +426,7 @@ void check_file_fixed_mmaps(void)
+ 		munmap (p4, pagesize);
+ 		addr += pagesize * 4;
+ 	}
+-	fprintf (stderr, " passed\n");
++	fprintf(stdout, " passed\n");
+ }
+ 
+ void checked_write(int fd, const void *buf, size_t count)
 -- 
 2.17.0
