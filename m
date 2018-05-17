@@ -1,25 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42774)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43011)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1fJFbd-0004MS-LX
-	for qemu-devel@nongnu.org; Thu, 17 May 2018 05:53:54 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1fJFct-0005NN-S8
+	for qemu-devel@nongnu.org; Thu, 17 May 2018 05:55:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1fJFba-0003qe-L6
-	for qemu-devel@nongnu.org; Thu, 17 May 2018 05:53:53 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:59402 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1fJFba-0003qD-E5
-	for qemu-devel@nongnu.org; Thu, 17 May 2018 05:53:50 -0400
-Date: Thu, 17 May 2018 10:53:46 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20180517095345.GC2500@work-vm>
-References: <20180514165424.12884-1-zhangckid@gmail.com>
-	<20180514165424.12884-18-zhangckid@gmail.com>
+	(envelope-from <vsementsov@virtuozzo.com>) id 1fJFct-0004me-71
+	for qemu-devel@nongnu.org; Thu, 17 May 2018 05:55:11 -0400
+References: <20180507154458.73945-1-vsementsov@virtuozzo.com>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-ID: <0fac4939-20d0-b158-7279-fac31ff7baae@virtuozzo.com>
+Date: Thu, 17 May 2018 12:54:59 +0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180514165424.12884-18-zhangckid@gmail.com>
-Subject: Re: [Qemu-devel] [PATCH V7 RESEND 17/17] COLO: quick failover
- process by kick COLO thread
+In-Reply-To: <20180507154458.73945-1-vsementsov@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+Subject: Re: [Qemu-devel] [PATCH 0/5] NBD reconnect: preliminary refactoring
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,52 +23,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Zhang Chen <zhangckid@gmail.com>
-Cc: qemu-devel@nongnu.org, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Jason Wang <jasowang@redhat.com>, zhanghailiang <zhang.zhanghailiang@huawei.com>
+To: qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: mreitz@redhat.com, kwolf@redhat.com, pbonzini@redhat.com, eblake@redhat.com, den@openvz.org
 
-* Zhang Chen (zhangckid@gmail.com) wrote:
-> From: zhanghailiang <zhang.zhanghailiang@huawei.com>
-> 
-> COLO thread may sleep at qemu_sem_wait(&s->colo_checkpoint_sem),
-> while failover works begin, It's better to wakeup it to quick
-> the process.
-> 
-> Signed-off-by: zhanghailiang <zhang.zhanghailiang@huawei.com>
+What about patches 1-4?
 
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+07.05.2018 18:44, Vladimir Sementsov-Ogievskiy wrote:
+> Hi all!
+>
+> Here are some preliminary refactoring patches, before NBD reconnect
+> series.
+>
+> Vladimir Sementsov-Ogievskiy (5):
+>    block/nbd-client: split channel errors from export errors
+>    block/nbd: move connection code from block/nbd to block/nbd-client
+>    block/nbd-client: split connection from initialization
+>    block/nbd-client: fix nbd_reply_chunk_iter_receive
+>    block/nbd-client: don't check ioc
+>
+>   block/nbd-client.h |   2 +-
+>   block/nbd-client.c | 163 ++++++++++++++++++++++++++++++++++-------------------
+>   block/nbd.c        |  41 +-------------
+>   3 files changed, 107 insertions(+), 99 deletions(-)
+>
 
-> ---
->  migration/colo.c | 8 ++++++++
->  1 file changed, 8 insertions(+)
-> 
-> diff --git a/migration/colo.c b/migration/colo.c
-> index 15463e2823..16def4865c 100644
-> --- a/migration/colo.c
-> +++ b/migration/colo.c
-> @@ -135,6 +135,11 @@ static void primary_vm_do_failover(void)
->  
->      migrate_set_state(&s->state, MIGRATION_STATUS_COLO,
->                        MIGRATION_STATUS_COMPLETED);
-> +    /*
-> +     * kick COLO thread which might wait at
-> +     * qemu_sem_wait(&s->colo_checkpoint_sem).
-> +     */
-> +    colo_checkpoint_notify(migrate_get_current());
->  
->      /*
->       * Wake up COLO thread which may blocked in recv() or send(),
-> @@ -552,6 +557,9 @@ static void colo_process_checkpoint(MigrationState *s)
->  
->          qemu_sem_wait(&s->colo_checkpoint_sem);
->  
-> +        if (s->state != MIGRATION_STATUS_COLO) {
-> +            goto out;
-> +        }
->          ret = colo_do_checkpoint_transaction(s, bioc, fb);
->          if (ret < 0) {
->              goto out;
-> -- 
-> 2.17.0
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+
+-- 
+Best regards,
+Vladimir
