@@ -1,31 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36156)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36276)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fJIIs-0008Lc-Jg
-	for qemu-devel@nongnu.org; Thu, 17 May 2018 08:46:43 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1fJIJ6-0008T3-37
+	for qemu-devel@nongnu.org; Thu, 17 May 2018 08:46:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fJIIo-0008CB-Lb
-	for qemu-devel@nongnu.org; Thu, 17 May 2018 08:46:41 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:39152 helo=mx1.redhat.com)
+	(envelope-from <pbonzini@redhat.com>) id 1fJIJ2-0000FC-Ua
+	for qemu-devel@nongnu.org; Thu, 17 May 2018 08:46:56 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:34956 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fJIIo-0008BC-I5
-	for qemu-devel@nongnu.org; Thu, 17 May 2018 08:46:38 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.4])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 12AB779D36
-	for <qemu-devel@nongnu.org>; Thu, 17 May 2018 12:46:38 +0000 (UTC)
-From: Markus Armbruster <armbru@redhat.com>
-References: <20180509041734.14135-1-peterx@redhat.com>
-	<20180509041734.14135-4-peterx@redhat.com>
-Date: Thu, 17 May 2018 14:46:36 +0200
-In-Reply-To: <20180509041734.14135-4-peterx@redhat.com> (Peter Xu's message of
-	"Wed, 9 May 2018 12:17:33 +0800")
-Message-ID: <87zi0ylaab.fsf@dusky.pond.sub.org>
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1fJIJ2-0000E2-P3
+	for qemu-devel@nongnu.org; Thu, 17 May 2018 08:46:52 -0400
+References: <20180501085939.6201-1-peter.maydell@linaro.org>
+	<c338d0d3-2b02-26e7-f745-fbc5c1893453@redhat.com>
+	<CAFEAcA_Dei48HtKk6GnEgXYcXdY2htCXej4pSfY+q9V6f=abdA@mail.gmail.com>
+	<1738f78f-b310-3cde-ac5e-1a147d3ca5f6@redhat.com>
+	<CAFEAcA-o3M2ruUfU7hk89S=eGgCP=b+hPyKrSdSR79OP_Ug9vg@mail.gmail.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <2d52e9bd-93e7-58fd-af73-8eccda3bcb63@redhat.com>
+Date: Thu, 17 May 2018 14:46:49 +0200
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v5 3/4] monitor: more comments on lock-free
- fleids/funcs
+In-Reply-To: <CAFEAcA-o3M2ruUfU7hk89S=eGgCP=b+hPyKrSdSR79OP_Ug9vg@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [RFC PATCH v2 00/12] iommu: add MemTxAttrs
+ argument to IOMMU translate function
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,63 +32,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: qemu-devel@nongnu.org, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, "patches@linaro.org" <patches@linaro.org>, Eric Auger <eric.auger@redhat.com>, Alex Williamson <alex.williamson@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
 
-Peter Xu <peterx@redhat.com> writes:
+On 17/05/2018 12:48, Peter Maydell wrote:
+> So I had an idea this morning for a slightly different way to approach
+> this, which is that we add a concept of an iommu_idx, analogous to
+> our existing TCG mmu_idx. Basically an iommu_idx represents a
+> page table (kind of like what Arm calls a "translation regime"), so
+> that for any particular iommu index and input address the output
+> address and permissions are always the same. For the memory
+> protection controller there would be two iommu_idxes, one for
+> secure and one for non-secure.
+> 
+> The API changes would be something like:
+>  * new method get_num_indexes() which returns the number of iommu indexes
+>    this IOMMU implements (default implementation: return 1)
+>  * translate method takes an iommu index (and not the txattrs)
+>  * new method index_from_attrs() which takes a MemTxAttrs and
+>    returns the iommu index that should be used (default implementation:
+>    always return 0)
+>  * memory_region_register_iommu_notifier() takes an iommu index
+>  * the default 'replay' method does "for each supported index,
+>    for each address, call @translate"
+>  * vfio and vhost can register their notifiers using the index
+>    returned by index_from_attrs(MEMTXATTRS_UNSPECIFIED)
+>  * maybe they could call get_num_indexes() and bail out if the
+>    IOMMU has support for multiple indexes?
+>  * maybe they could be enhanced to support tracking multiple
+>    page tables if necessary in future
+> 
+> I haven't worked through the details yet, but this seems to me
+> more flexible than working directly with txattrs. It also means
+> it's harder to accidentally write an iommu implementation that
+> looks at more fields in the txattrs than its notifier interface
+> claims are significant to it.
 
-> Add some explicit comment for both Readline and cpu_set/cpu_get helpers
-> that they do not need the mon_lock protection.
+Yes, this also sounds good.  It does have the same issue for VFIO that
+get_num_indexes() would be called too late to fail (and again, in a
+place where it's hard to fail).
 
-Appreciated!
+Maybe the index count and the index-from/to-attrs translation should be
+static (index-to-attrs could use the same pair of MemTxAttrs for "which
+bits matter" and "what value should they have"), so that VFIO can
+inspect it and decide if it's okay to proceed with e.g. the first iommu_idx?
 
-> Signed-off-by: Peter Xu <peterx@redhat.com>
-> ---
->  monitor.c | 5 +++--
->  1 file changed, 3 insertions(+), 2 deletions(-)
->
-> diff --git a/monitor.c b/monitor.c
-> index d6c3c08932..ae5bca9d7c 100644
-> --- a/monitor.c
-> +++ b/monitor.c
-> @@ -207,7 +207,7 @@ struct Monitor {
->      int suspend_cnt;            /* Needs to be accessed atomically */
->      bool skip_flush;
->      bool use_io_thr;
-> -    ReadLineState *rs;
-> +    ReadLineState *rs;   /* Only used in parser, so no lock needed. */
+Thanks,
 
-Pardon the ignorant question: why does "only used in parser" imply "no
-lock needed"?
-
->      MonitorQMP qmp;
->      gchar *mon_cpu_path;
->      BlockCompletionFunc *password_completion_cb;
-> @@ -1313,7 +1313,7 @@ void qmp_qmp_capabilities(bool has_enable, QMPCapabilityList *enable,
->      cur_mon->qmp.commands = &qmp_commands;
->  }
->  
-> -/* set the current CPU defined by the user */
-> +/* set the current CPU defined by the user.  BQL needed. */
-
-It's okay to start a comment containing a phrase with a lower case
-letter, but you're turning this one into two sentences, and sentences
-start in upper case.  Can touch up on commit.
-
-"BQL needed" is okay, just a bit terse; I'd write "Caller must hold
-BQL".  Could change that, too.
-
->  int monitor_set_cpu(int cpu_index)
->  {
->      CPUState *cpu;
-> @@ -1327,6 +1327,7 @@ int monitor_set_cpu(int cpu_index)
->      return 0;
->  }
->  
-> +/* BQL neeeded. */
-
-Likewise.
-
->  static CPUState *mon_get_cpu_sync(bool synchronize)
->  {
->      CPUState *cpu;
+Paolo
