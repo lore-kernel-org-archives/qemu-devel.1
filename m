@@ -1,27 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50784)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50786)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fJMzt-0006Df-9t
-	for qemu-devel@nongnu.org; Thu, 17 May 2018 13:47:26 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1fJMzt-0006Dg-AZ
+	for qemu-devel@nongnu.org; Thu, 17 May 2018 13:47:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fJMzq-0003QN-8e
+	(envelope-from <alex.bennee@linaro.org>) id 1fJMzq-0003QG-3v
 	for qemu-devel@nongnu.org; Thu, 17 May 2018 13:47:25 -0400
-Received: from mail-wr0-x236.google.com ([2a00:1450:400c:c0c::236]:37341)
+Received: from mail-wr0-x243.google.com ([2a00:1450:400c:c0c::243]:41291)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1fJMzq-0003Py-1w
+	id 1fJMzp-0003Pp-P5
 	for qemu-devel@nongnu.org; Thu, 17 May 2018 13:47:22 -0400
-Received: by mail-wr0-x236.google.com with SMTP id h5-v6so6548886wrm.4
+Received: by mail-wr0-x243.google.com with SMTP id g21-v6so6533356wrb.8
 	for <qemu-devel@nongnu.org>; Thu, 17 May 2018 10:47:21 -0700 (PDT)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Thu, 17 May 2018 18:46:30 +0100
-Message-Id: <20180517174718.10107-2-alex.bennee@linaro.org>
-In-Reply-To: <20180517174718.10107-1-alex.bennee@linaro.org>
-References: <20180517174718.10107-1-alex.bennee@linaro.org>
+Date: Thu, 17 May 2018 18:46:29 +0100
+Message-Id: <20180517174718.10107-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=true
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v4 01/49] docker: add "probe" command for
- configure
+Subject: [Qemu-devel] [PATCH v4 00/49] fix building of tests/tcg
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,44 +30,240 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: cota@braap.org, famz@redhat.com, berrange@redhat.com, f4bug@amsat.org, richard.henderson@linaro.org, balrogg@gmail.com, aurelien@aurel32.net, agraf@suse.de
 Cc: qemu-devel@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 
-This is a helper function for the configure script. It replies yes,
-sudo or no to inform the user if non-interactive docker support is
-available. We trap the Exception to fail gracefully.
+Hi,
 
-Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-Reviewed-by: Fam Zheng <famz@redhat.com>
----
- tests/docker/docker.py | 18 ++++++++++++++++++
- 1 file changed, 18 insertions(+)
+Hopefully this is ready for merging. At 48(+1) patches this is quite a
+large series to have hanging around. The main changes are:
 
-diff --git a/tests/docker/docker.py b/tests/docker/docker.py
-index 1246ba9578..f8267586eb 100755
---- a/tests/docker/docker.py
-+++ b/tests/docker/docker.py
-@@ -390,6 +390,24 @@ class ImagesCommand(SubCommand):
-     def run(self, args, argv):
-         return Docker().command("images", argv, args.quiet)
- 
-+
-+class ProbeCommand(SubCommand):
-+    """Probe if we can run docker automatically"""
-+    name = "probe"
-+
-+    def run(self, args, argv):
-+        try:
-+            docker = Docker()
-+            if docker._command[0] == "docker":
-+                print "yes"
-+            elif docker._command[0] == "sudo":
-+                print "sudo"
-+        except Exception:
-+            print "no"
-+
-+        return
-+
-+
- def main():
-     parser = argparse.ArgumentParser(description="A Docker helper",
-             usage="%s <subcommand> ..." % os.path.basename(sys.argv[0]))
+  - Review/Tested-by tags
+  - Help text for new configure options
+  - Support dynamic linking for host/guest targets
+  - Updates to MAINTAINERS
+
+I've also fixed a bunch of checkpatch issues but there still some
+legitimate ones (tabs in old tests) and a whole bunch of false
+positives. I'd prefer to tackle the tabs next time we actually update
+the tests.
+
+I'm not sure what to do with the final patch in the series. We could
+merge it and give maintainers a chance to fix the tests and only
+delete the tests if they are not fixed in the meantime?
+
+I've got some additional tests as well as Travis integration to add
+but I thought I'd get the base set merged first.
+
+As usual detailed notes are bellow the --- in the commit messages.
+
+The following patches still need review:
+
+  patch 0017/docker Add fedora i386 cross image.patch needs review
+  patch 0021/tests tcg i386 add runner for test i386 fprem.patch needs review
+  patch 0022/tests tcg i386 disable i386 version of test i386 .patch needs review
+  patch 0027/tests tcg enable building for ARM.patch needs review
+  patch 0029/tests tcg arm disable p 32768 mmap test.patch needs review
+  patch 0030/tests tcg enable building for AArch64.patch needs review
+  patch 0031/tests tcg aarch64 add Makefile.target.patch needs review
+  patch 0032/tests tcg arm add fcvt test cases for AArch32 64.patch needs review
+  patch 0034/tests tcg enable building for MIPS.patch needs review
+  patch 0035/tests tcg mips include common mips hello mips.patch needs review
+  patch 0038/tests tcg enable building for Alpha.patch needs review
+  patch 0039/tests tcg alpha add Alpha specific tests.patch needs review
+  patch 0043/tests tcg enable building for sparc64.patch needs review
+  patch 0044/tests tcg enable building for mips64.patch needs review
+  patch 0045/tests tcg enable building for RISCV64.patch needs review
+  patch 0046/tests tcg Makefile update to be called from Makef.patch needs review
+  patch 0047/Makefile.target add clean build guest tests targe.patch needs review
+  patch 0049/tests tcg override runners for broken tests UPSTR.patch needs review
+
+Alex Bennée (45):
+  docker: add "probe" command for configure
+  configure: add test for docker availability
+  configure: add support for --cross-cc-FOO
+  configure: move i386_cc to cross_cc_i386
+  configure: allow user to specify --cross-cc-cflags-foo=
+  configure: set cross_cc_FOO for host compiler
+  docker: Add "cc" subcommand
+  docker: extend "cc" command to accept compiler
+  docker: allow "cc" command to run in user context
+  docker: Makefile.include introduce DOCKER_SCRIPT
+  tests/tcg: move architecture independent tests into subdir
+  tests/tcg/multiarch: enable additional linux-test tests
+  tests/tcg/multiarch: move most output to stdout
+  tests/tcg: move i386 specific tests into subdir
+  tests/tcg: enable building for i386
+  tests/tcg/i386: fix test-i386
+  tests/tcg/i386: add runner for test-i386-fprem
+  tests/tcg/i386: disable i386 version of test-i386-ssse
+  tests/tcg/x86_64: add Makefile.target
+  tests/tcg/i386/test-i386: use modern vector_size attributes
+  tests/tcg/i386/test-i386: fix printf format
+  tests/tcg: move ARM specific tests into subdir
+  tests/tcg: enable building for ARM
+  tests/tcg/arm: fix up test-arm-iwmmxt test
+  tests/tcg/arm: disable -p 32768 mmap test
+  tests/tcg: enable building for AArch64
+  tests/tcg/aarch64: add Makefile.target
+  tests/tcg/arm: add fcvt test cases for AArch32/64
+  tests/tcg: move MIPS specific tests into subdir
+  tests/tcg: enable building for MIPS
+  tests/tcg/mips: include common mips hello-mips
+  tests/tcg: enable building for s390x
+  tests/tcg: enable building for ppc64
+  tests/tcg: enable building for Alpha
+  tests/tcg/alpha: add Alpha specific tests
+  tests/tcg: enable building for HPPA
+  tests/tcg: enable building for m68k
+  tests/tcg: enable building for sh4
+  tests/tcg: enable building for sparc64
+  tests/tcg: enable building for mips64
+  tests/tcg: enable building for RISCV64
+  tests/tcg/Makefile: update to be called from Makefile.target
+  Makefile.target: add (clean-/build-)guest-tests targets
+  tests/Makefile.include: add [build|clean|check]-tcg targets
+  tests/tcg: override runners for broken tests (!UPSTREAM)
+
+Fam Zheng (4):
+  Makefile: Rename TARGET_DIRS to TARGET_LIST
+  tests/tcg/multiarch: Build fix for linux-test
+  docker: Add fedora-i386-cross image
+  tests/tcg/i386: Build fix for hello-i386
+
+ MAINTAINERS                                   |   14 +
+ Makefile                                      |   20 +-
+ Makefile.target                               |    5 +
+ configure                                     |  153 +-
+ scripts/create_config                         |    2 +-
+ tests/Makefile.include                        |   28 +-
+ tests/docker/Makefile.include                 |   17 +-
+ tests/docker/docker.py                        |   49 +
+ .../dockerfiles/debian-alpha-cross.docker     |   12 +
+ .../dockerfiles/debian-cross-build.docker     |   36 +
+ .../dockerfiles/debian-hppa-cross.docker      |   12 +
+ .../dockerfiles/debian-m68k-cross.docker      |   12 +
+ .../dockerfiles/debian-mips64-cross.docker    |   12 +
+ .../dockerfiles/debian-riscv64-cross.docker   |   12 +
+ .../dockerfiles/debian-sh4-cross.docker       |   12 +
+ tests/docker/dockerfiles/debian-sid.docker    |   23 +
+ .../dockerfiles/debian-sparc64-cross.docker   |   12 +
+ .../dockerfiles/fedora-i386-cross.docker      |   14 +
+ tests/tcg/Makefile                            |  208 +-
+ tests/tcg/Makefile.include                    |   88 +
+ tests/tcg/README                              |   69 +-
+ tests/tcg/aarch64/Makefile.include            |    8 +
+ tests/tcg/aarch64/Makefile.target             |   19 +
+ tests/tcg/aarch64/fcvt.ref                    | 3268 +++++++++++++++++
+ tests/tcg/alpha/Makefile                      |   35 -
+ tests/tcg/alpha/Makefile.include              |    2 +
+ tests/tcg/alpha/Makefile.target               |   15 +
+ tests/tcg/alpha/crt.s                         |   26 -
+ tests/tcg/alpha/hello-alpha.c                 |    2 +
+ tests/tcg/alpha/test-cond.c                   |    1 +
+ tests/tcg/alpha/test-ovf.c                    |    2 +
+ tests/tcg/arm/Makefile.include                |    8 +
+ tests/tcg/arm/Makefile.target                 |   39 +
+ tests/tcg/arm/README                          |   11 +
+ tests/tcg/arm/fcvt.c                          |  458 +++
+ tests/tcg/arm/fcvt.ref                        | 3268 +++++++++++++++++
+ tests/tcg/{ => arm}/hello-arm.c               |    0
+ .../test-arm-iwmmxt.S}                        |    0
+ tests/tcg/hppa/Makefile.include               |    2 +
+ tests/tcg/hppa/Makefile.target                |    7 +
+ tests/tcg/i386/Makefile.include               |    9 +
+ tests/tcg/i386/Makefile.target                |   58 +
+ tests/tcg/i386/README                         |   38 +
+ tests/tcg/{ => i386}/hello-i386.c             |    1 +
+ tests/tcg/{ => i386}/pi_10.com                |  Bin
+ tests/tcg/{ => i386}/runcom.c                 |    0
+ tests/tcg/{ => i386}/test-i386-code16.S       |    0
+ tests/tcg/{ => i386}/test-i386-fprem.c        |   12 +-
+ tests/tcg/{ => i386}/test-i386-muldiv.h       |    0
+ tests/tcg/{ => i386}/test-i386-shift.h        |    0
+ tests/tcg/{ => i386}/test-i386-ssse3.c        |    0
+ tests/tcg/{ => i386}/test-i386-vm86.S         |    0
+ tests/tcg/{ => i386}/test-i386.c              |    7 +-
+ tests/tcg/{ => i386}/test-i386.h              |    0
+ tests/tcg/m68k/Makefile.include               |    2 +
+ tests/tcg/m68k/Makefile.target                |    9 +
+ tests/tcg/mips/Makefile.include               |   20 +
+ tests/tcg/mips/Makefile.target                |   23 +
+ tests/tcg/mips/README                         |    7 +
+ tests/tcg/{ => mips}/hello-mips.c             |    0
+ tests/tcg/multiarch/Makefile.target           |   29 +
+ tests/tcg/multiarch/README                    |    1 +
+ tests/tcg/{ => multiarch}/linux-test.c        |  113 +-
+ tests/tcg/{ => multiarch}/sha1.c              |    0
+ tests/tcg/{ => multiarch}/test-mmap.c         |   40 +-
+ tests/tcg/{ => multiarch}/testthread.c        |    0
+ tests/tcg/ppc64le/Makefile.include            |    2 +
+ tests/tcg/riscv/Makefile.include              |   10 +
+ tests/tcg/s390x/Makefile.include              |    2 +
+ tests/tcg/sh4/Makefile.include                |    4 +
+ tests/tcg/sparc64/Makefile.include            |    2 +
+ tests/tcg/sparc64/Makefile.target             |    8 +
+ tests/tcg/test_path.c                         |  157 -
+ tests/tcg/x86_64/Makefile.target              |   15 +
+ 74 files changed, 8016 insertions(+), 534 deletions(-)
+ create mode 100644 tests/docker/dockerfiles/debian-alpha-cross.docker
+ create mode 100644 tests/docker/dockerfiles/debian-cross-build.docker
+ create mode 100644 tests/docker/dockerfiles/debian-hppa-cross.docker
+ create mode 100644 tests/docker/dockerfiles/debian-m68k-cross.docker
+ create mode 100644 tests/docker/dockerfiles/debian-mips64-cross.docker
+ create mode 100644 tests/docker/dockerfiles/debian-riscv64-cross.docker
+ create mode 100644 tests/docker/dockerfiles/debian-sh4-cross.docker
+ create mode 100644 tests/docker/dockerfiles/debian-sid.docker
+ create mode 100644 tests/docker/dockerfiles/debian-sparc64-cross.docker
+ create mode 100644 tests/docker/dockerfiles/fedora-i386-cross.docker
+ create mode 100644 tests/tcg/Makefile.include
+ create mode 100644 tests/tcg/aarch64/Makefile.include
+ create mode 100644 tests/tcg/aarch64/Makefile.target
+ create mode 100644 tests/tcg/aarch64/fcvt.ref
+ delete mode 100644 tests/tcg/alpha/Makefile
+ create mode 100644 tests/tcg/alpha/Makefile.include
+ create mode 100644 tests/tcg/alpha/Makefile.target
+ delete mode 100644 tests/tcg/alpha/crt.s
+ create mode 100644 tests/tcg/arm/Makefile.include
+ create mode 100644 tests/tcg/arm/Makefile.target
+ create mode 100644 tests/tcg/arm/README
+ create mode 100644 tests/tcg/arm/fcvt.c
+ create mode 100644 tests/tcg/arm/fcvt.ref
+ rename tests/tcg/{ => arm}/hello-arm.c (100%)
+ rename tests/tcg/{test-arm-iwmmxt.s => arm/test-arm-iwmmxt.S} (100%)
+ create mode 100644 tests/tcg/hppa/Makefile.include
+ create mode 100644 tests/tcg/hppa/Makefile.target
+ create mode 100644 tests/tcg/i386/Makefile.include
+ create mode 100644 tests/tcg/i386/Makefile.target
+ create mode 100644 tests/tcg/i386/README
+ rename tests/tcg/{ => i386}/hello-i386.c (96%)
+ rename tests/tcg/{ => i386}/pi_10.com (100%)
+ rename tests/tcg/{ => i386}/runcom.c (100%)
+ rename tests/tcg/{ => i386}/test-i386-code16.S (100%)
+ rename tests/tcg/{ => i386}/test-i386-fprem.c (97%)
+ rename tests/tcg/{ => i386}/test-i386-muldiv.h (100%)
+ rename tests/tcg/{ => i386}/test-i386-shift.h (100%)
+ rename tests/tcg/{ => i386}/test-i386-ssse3.c (100%)
+ rename tests/tcg/{ => i386}/test-i386-vm86.S (100%)
+ rename tests/tcg/{ => i386}/test-i386.c (99%)
+ rename tests/tcg/{ => i386}/test-i386.h (100%)
+ create mode 100644 tests/tcg/m68k/Makefile.include
+ create mode 100644 tests/tcg/m68k/Makefile.target
+ create mode 100644 tests/tcg/mips/Makefile.include
+ create mode 100644 tests/tcg/mips/Makefile.target
+ create mode 100644 tests/tcg/mips/README
+ rename tests/tcg/{ => mips}/hello-mips.c (100%)
+ create mode 100644 tests/tcg/multiarch/Makefile.target
+ create mode 100644 tests/tcg/multiarch/README
+ rename tests/tcg/{ => multiarch}/linux-test.c (86%)
+ rename tests/tcg/{ => multiarch}/sha1.c (100%)
+ rename tests/tcg/{ => multiarch}/test-mmap.c (93%)
+ rename tests/tcg/{ => multiarch}/testthread.c (100%)
+ create mode 100644 tests/tcg/ppc64le/Makefile.include
+ create mode 100644 tests/tcg/riscv/Makefile.include
+ create mode 100644 tests/tcg/s390x/Makefile.include
+ create mode 100644 tests/tcg/sh4/Makefile.include
+ create mode 100644 tests/tcg/sparc64/Makefile.include
+ create mode 100644 tests/tcg/sparc64/Makefile.target
+ delete mode 100644 tests/tcg/test_path.c
+ create mode 100644 tests/tcg/x86_64/Makefile.target
+
 -- 
 2.17.0
