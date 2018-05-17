@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41398)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41843)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1fJFUa-0000Mt-PZ
-	for qemu-devel@nongnu.org; Thu, 17 May 2018 05:46:37 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1fJFWB-0001B5-BQ
+	for qemu-devel@nongnu.org; Thu, 17 May 2018 05:48:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1fJFUW-0007Sy-R0
-	for qemu-devel@nongnu.org; Thu, 17 May 2018 05:46:36 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:59192 helo=mx1.redhat.com)
+	(envelope-from <dgilbert@redhat.com>) id 1fJFW7-0000NC-6d
+	for qemu-devel@nongnu.org; Thu, 17 May 2018 05:48:15 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:59230 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eric.auger@redhat.com>)
-	id 1fJFUW-0007SU-LO
-	for qemu-devel@nongnu.org; Thu, 17 May 2018 05:46:32 -0400
-References: <20180504030811.28111-1-peterx@redhat.com>
-	<20180504030811.28111-3-peterx@redhat.com>
-From: Auger Eric <eric.auger@redhat.com>
-Message-ID: <17437758-3b51-72c7-81ba-cb0df0a22c1c@redhat.com>
-Date: Thu, 17 May 2018 11:46:22 +0200
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1fJFW7-0000MM-24
+	for qemu-devel@nongnu.org; Thu, 17 May 2018 05:48:11 -0400
+Date: Thu, 17 May 2018 10:48:07 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20180517094806.GB2500@work-vm>
+References: <20180514165424.12884-1-zhangckid@gmail.com>
+	<20180514165424.12884-17-zhangckid@gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20180504030811.28111-3-peterx@redhat.com>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 02/10] intel-iommu: remove
- IntelIOMMUNotifierNode
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180514165424.12884-17-zhangckid@gmail.com>
+Subject: Re: [Qemu-devel] [PATCH V7 RESEND 16/17] COLO: notify net filters
+ about checkpoint/failover event
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,169 +28,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>, qemu-devel@nongnu.org
-Cc: Tian Kevin <kevin.tian@intel.com>, "Michael S . Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, Alex Williamson <alex.williamson@redhat.com>, Jintack Lim <jintack@cs.columbia.edu>
+To: Zhang Chen <zhangckid@gmail.com>
+Cc: qemu-devel@nongnu.org, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Jason Wang <jasowang@redhat.com>, zhanghailiang <zhang.zhanghailiang@huawei.com>
 
-Hi Peter,
-
-On 05/04/2018 05:08 AM, Peter Xu wrote:
-> That is not really necessary.  Removing that node struct and put the
-> list entry directly into VTDAddressSpace.  It simplfies the code a lot.
+* Zhang Chen (zhangckid@gmail.com) wrote:
+> From: zhanghailiang <zhang.zhanghailiang@huawei.com>
 > 
-> Signed-off-by: Peter Xu <peterx@redhat.com>
+> Notify all net filters about the checkpoint and failover event.
+> 
+> Signed-off-by: zhanghailiang <zhang.zhanghailiang@huawei.com>
+
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+
 > ---
->  include/hw/i386/intel_iommu.h |  9 ++------
->  hw/i386/intel_iommu.c         | 41 ++++++++++-------------------------
->  2 files changed, 14 insertions(+), 36 deletions(-)
+>  migration/colo.c | 12 ++++++++++++
+>  1 file changed, 12 insertions(+)
 > 
-> diff --git a/include/hw/i386/intel_iommu.h b/include/hw/i386/intel_iommu.h
-> index 45ec8919b6..220697253f 100644
-> --- a/include/hw/i386/intel_iommu.h
-> +++ b/include/hw/i386/intel_iommu.h
-> @@ -67,7 +67,6 @@ typedef union VTD_IR_TableEntry VTD_IR_TableEntry;
->  typedef union VTD_IR_MSIAddress VTD_IR_MSIAddress;
->  typedef struct VTDIrq VTDIrq;
->  typedef struct VTD_MSIMessage VTD_MSIMessage;
-> -typedef struct IntelIOMMUNotifierNode IntelIOMMUNotifierNode;
->  
->  /* Context-Entry */
->  struct VTDContextEntry {
-> @@ -93,6 +92,7 @@ struct VTDAddressSpace {
->      MemoryRegion iommu_ir;      /* Interrupt region: 0xfeeXXXXX */
->      IntelIOMMUState *iommu_state;
->      VTDContextCacheEntry context_cache_entry;
-> +    QLIST_ENTRY(VTDAddressSpace) next;
->  };
->  
->  struct VTDBus {
-> @@ -253,11 +253,6 @@ struct VTD_MSIMessage {
->  /* When IR is enabled, all MSI/MSI-X data bits should be zero */
->  #define VTD_IR_MSI_DATA          (0)
->  
-> -struct IntelIOMMUNotifierNode {
-> -    VTDAddressSpace *vtd_as;
-> -    QLIST_ENTRY(IntelIOMMUNotifierNode) next;
-> -};
-> -
->  /* The iommu (DMAR) device state struct */
->  struct IntelIOMMUState {
->      X86IOMMUState x86_iommu;
-> @@ -295,7 +290,7 @@ struct IntelIOMMUState {
->      GHashTable *vtd_as_by_busptr;   /* VTDBus objects indexed by PCIBus* reference */
->      VTDBus *vtd_as_by_bus_num[VTD_PCI_BUS_MAX]; /* VTDBus objects indexed by bus number */
->      /* list of registered notifiers */
-> -    QLIST_HEAD(, IntelIOMMUNotifierNode) notifiers_list;
-> +    QLIST_HEAD(, VTDAddressSpace) notifiers_list;
-Wouldn't it make sense to rename notifiers_list into something more
-understandable like address_spaces?
->  
->      /* interrupt remapping */
->      bool intr_enabled;              /* Whether guest enabled IR */
-> diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
-> index b359efd6f9..5987b48d43 100644
-> --- a/hw/i386/intel_iommu.c
-> +++ b/hw/i386/intel_iommu.c
-> @@ -1248,10 +1248,10 @@ static void vtd_interrupt_remap_table_setup(IntelIOMMUState *s)
->  
->  static void vtd_iommu_replay_all(IntelIOMMUState *s)
->  {
-> -    IntelIOMMUNotifierNode *node;
-> +    VTDAddressSpace *vtd_as;
->  
-> -    QLIST_FOREACH(node, &s->notifiers_list, next) {
-> -        memory_region_iommu_replay_all(&node->vtd_as->iommu);
-> +    QLIST_FOREACH(vtd_as, &s->notifiers_list, next) {
-> +        memory_region_iommu_replay_all(&vtd_as->iommu);
+> diff --git a/migration/colo.c b/migration/colo.c
+> index 3dfd84d897..15463e2823 100644
+> --- a/migration/colo.c
+> +++ b/migration/colo.c
+> @@ -88,6 +88,11 @@ static void secondary_vm_do_failover(void)
+>      if (local_err) {
+>          error_report_err(local_err);
 >      }
->  }
+> +    /* Notify all filters of all NIC to do checkpoint */
+> +    colo_notify_filters_event(COLO_EVENT_FAILOVER, &local_err);
+> +    if (local_err) {
+> +        error_report_err(local_err);
+> +    }
 >  
-> @@ -1372,7 +1372,6 @@ static void vtd_iotlb_global_invalidate(IntelIOMMUState *s)
->  
->  static void vtd_iotlb_domain_invalidate(IntelIOMMUState *s, uint16_t domain_id)
->  {
-> -    IntelIOMMUNotifierNode *node;
->      VTDContextEntry ce;
->      VTDAddressSpace *vtd_as;
->  
-> @@ -1381,8 +1380,7 @@ static void vtd_iotlb_domain_invalidate(IntelIOMMUState *s, uint16_t domain_id)
->      g_hash_table_foreach_remove(s->iotlb, vtd_hash_remove_by_domain,
->                                  &domain_id);
->  
-> -    QLIST_FOREACH(node, &s->notifiers_list, next) {
-> -        vtd_as = node->vtd_as;
-> +    QLIST_FOREACH(vtd_as, &s->notifiers_list, next) {
->          if (!vtd_dev_to_context_entry(s, pci_bus_num(vtd_as->bus),
->                                        vtd_as->devfn, &ce) &&
->              domain_id == VTD_CONTEXT_ENTRY_DID(ce.hi)) {
-> @@ -1402,12 +1400,11 @@ static void vtd_iotlb_page_invalidate_notify(IntelIOMMUState *s,
->                                             uint16_t domain_id, hwaddr addr,
->                                             uint8_t am)
->  {
-> -    IntelIOMMUNotifierNode *node;
-> +    VTDAddressSpace *vtd_as;
->      VTDContextEntry ce;
->      int ret;
->  
-> -    QLIST_FOREACH(node, &(s->notifiers_list), next) {
-> -        VTDAddressSpace *vtd_as = node->vtd_as;
-> +    QLIST_FOREACH(vtd_as, &(s->notifiers_list), next) {
->          ret = vtd_dev_to_context_entry(s, pci_bus_num(vtd_as->bus),
->                                         vtd_as->devfn, &ce);
->          if (!ret && domain_id == VTD_CONTEXT_ENTRY_DID(ce.hi)) {
-> @@ -2344,8 +2341,6 @@ static void vtd_iommu_notify_flag_changed(IOMMUMemoryRegion *iommu,
->  {
->      VTDAddressSpace *vtd_as = container_of(iommu, VTDAddressSpace, iommu);
->      IntelIOMMUState *s = vtd_as->iommu_state;
-> -    IntelIOMMUNotifierNode *node = NULL;
-> -    IntelIOMMUNotifierNode *next_node = NULL;
->  
->      if (!s->caching_mode && new & IOMMU_NOTIFIER_MAP) {
->          error_report("We need to set caching-mode=1 for intel-iommu to enable "
-> @@ -2354,21 +2349,11 @@ static void vtd_iommu_notify_flag_changed(IOMMUMemoryRegion *iommu,
->      }
->  
->      if (old == IOMMU_NOTIFIER_NONE) {
-> -        node = g_malloc0(sizeof(*node));
-> -        node->vtd_as = vtd_as;
-> -        QLIST_INSERT_HEAD(&s->notifiers_list, node, next);
-> -        return;
-> -    }
-> -
-> -    /* update notifier node with new flags */
-> -    QLIST_FOREACH_SAFE(node, &s->notifiers_list, next, next_node) {
-> -        if (node->vtd_as == vtd_as) {
-> -            if (new == IOMMU_NOTIFIER_NONE) {
-> -                QLIST_REMOVE(node, next);
-> -                g_free(node);
-> -            }
-> -            return;
-> -        }
-> +        /* Insert new ones */
-s/ones/one
-
-> +        QLIST_INSERT_HEAD(&s->notifiers_list, vtd_as, next);
-> +    } else if (new == IOMMU_NOTIFIER_NONE) {
-> +        /* Remove old ones */
-same. Not sure the comments are worth.
-> +        QLIST_REMOVE(vtd_as, next);
->      }
->  }
->  
-> @@ -2838,12 +2823,10 @@ static void vtd_address_space_unmap(VTDAddressSpace *as, IOMMUNotifier *n)
->  
->  static void vtd_address_space_unmap_all(IntelIOMMUState *s)
->  {
-> -    IntelIOMMUNotifierNode *node;
->      VTDAddressSpace *vtd_as;
->      IOMMUNotifier *n;
->  
-> -    QLIST_FOREACH(node, &s->notifiers_list, next) {
-> -        vtd_as = node->vtd_as;
-> +    QLIST_FOREACH(vtd_as, &s->notifiers_list, next) {
->          IOMMU_NOTIFIER_FOREACH(n, &vtd_as->iommu) {
->              vtd_address_space_unmap(vtd_as, n);
+>      if (!autostart) {
+>          error_report("\"-S\" qemu option will be ignored in secondary side");
+> @@ -799,6 +804,13 @@ void *colo_process_incoming_thread(void *opaque)
+>              goto out;
 >          }
+>  
+> +        /* Notify all filters of all NIC to do checkpoint */
+> +        colo_notify_filters_event(COLO_EVENT_CHECKPOINT, &local_err);
+> +        if (local_err) {
+> +            qemu_mutex_unlock_iothread();
+> +            goto out;
+> +        }
+> +
+>          vmstate_loading = false;
+>          vm_start();
+>          trace_colo_vm_state_change("stop", "run");
+> -- 
+> 2.17.0
 > 
-Thanks
-
-Eric
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
