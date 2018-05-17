@@ -1,28 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55210)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55248)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <edgari@xilinx.com>) id 1fJNFt-0003WV-64
-	for qemu-devel@nongnu.org; Thu, 17 May 2018 14:04:00 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1fJNFw-0003XR-3c
+	for qemu-devel@nongnu.org; Thu, 17 May 2018 14:04:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <edgari@xilinx.com>) id 1fJNFo-0004vd-6g
+	(envelope-from <alex.bennee@linaro.org>) id 1fJNFt-0004zN-Fu
+	for qemu-devel@nongnu.org; Thu, 17 May 2018 14:04:00 -0400
+Received: from mail-wr0-x241.google.com ([2a00:1450:400c:c0c::241]:44332)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1fJNFt-0004yq-AJ
 	for qemu-devel@nongnu.org; Thu, 17 May 2018 14:03:57 -0400
-Received: from mail-sn1nam02on0089.outbound.protection.outlook.com
-	([104.47.36.89]:8768
-	helo=NAM02-SN1-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <edgari@xilinx.com>) id 1fJNFn-0004v4-TH
-	for qemu-devel@nongnu.org; Thu, 17 May 2018 14:03:52 -0400
-Date: Thu, 17 May 2018 20:03:33 +0200
-From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
-Message-ID: <20180517180333.voovwdnnlr5eaapq@toto>
-References: <20180516185146.30708-1-edgar.iglesias@gmail.com>
-	<20180516185146.30708-36-edgar.iglesias@gmail.com>
-	<9e6a126f-4fc8-15a9-1b11-e1d3d6dba691@linaro.org>
+Received: by mail-wr0-x241.google.com with SMTP id y15-v6so6577410wrg.11
+	for <qemu-devel@nongnu.org>; Thu, 17 May 2018 11:03:57 -0700 (PDT)
+From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+Date: Thu, 17 May 2018 18:46:47 +0100
+Message-Id: <20180517174718.10107-19-alex.bennee@linaro.org>
+In-Reply-To: <20180517174718.10107-1-alex.bennee@linaro.org>
+References: <20180517174718.10107-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <9e6a126f-4fc8-15a9-1b11-e1d3d6dba691@linaro.org>
-Subject: Re: [Qemu-devel] [PATCH v3 35/38] target-microblaze: Convert
- env_btarget to i64
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH v4 18/49] tests/tcg: enable building for i386
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,26 +29,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>
-Cc: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, qemu-devel@nongnu.org, peter.maydell@linaro.org, frederic.konrad@adacore.com, alistair@alistair23.me, frasse.iglesias@gmail.com, sstabellini@kernel.org, sai.pavan.boddu@xilinx.com
+To: cota@braap.org, famz@redhat.com, berrange@redhat.com, f4bug@amsat.org, richard.henderson@linaro.org, balrogg@gmail.com, aurelien@aurel32.net, agraf@suse.de
+Cc: qemu-devel@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>
 
-On Thu, May 17, 2018 at 10:34:38AM -0700, Richard Henderson wrote:
-> On 05/16/2018 11:51 AM, Edgar E. Iglesias wrote:
-> > From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
-> > 
-> > Convert env_btarget to i64.
-> > No functional change.
-> > 
-> > Signed-off-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
-> > ---
-> 
-> I thought you were going to drop this one?
+While you can construct a compile command that does work using the
+x86_64 host compiler that most people use this is flakey. Different
+distros handle this is different ways so we default to using a known
+good i386 compiler via docker.
 
+Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Tested-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
-I dropped the conversion of env_btaken as it's not really useful
-since it's a boolean. btarget will eventually need to be 64bit
-allthought strictly necessary in this series so I've kept btarget
-as 64bit.
+---
+v3
+  - add runner for runcom
+---
+ tests/tcg/i386/Makefile.include | 9 +++++++++
+ tests/tcg/i386/Makefile.target  | 9 +++++++++
+ 2 files changed, 18 insertions(+)
+ create mode 100644 tests/tcg/i386/Makefile.include
 
-Cheers,
-Edgar
+diff --git a/tests/tcg/i386/Makefile.include b/tests/tcg/i386/Makefile.include
+new file mode 100644
+index 0000000000..be1c3008dd
+--- /dev/null
++++ b/tests/tcg/i386/Makefile.include
+@@ -0,0 +1,9 @@
++#
++# Makefile.include for all i386
++#
++# There is enough brokeness in x86_64 compilers that we don't default
++# to using the x86_64 system compiler for i386 binaries.
++#
++
++DOCKER_IMAGE=fedora-i386-cross
++DOCKER_CROSS_COMPILER=gcc
+diff --git a/tests/tcg/i386/Makefile.target b/tests/tcg/i386/Makefile.target
+index 2f27b65e2d..39a1627650 100644
+--- a/tests/tcg/i386/Makefile.target
++++ b/tests/tcg/i386/Makefile.target
+@@ -28,3 +28,12 @@ hello-i386: LDFLAGS+=-nostdlib
+ test-i386: test-i386.c test-i386-code16.S test-i386-vm86.S test-i386.h test-i386-shift.h test-i386-muldiv.h
+ 	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ \
+ 	   $(<D)/test-i386.c $(<D)/test-i386-code16.S $(<D)/test-i386-vm86.S -lm
++
++# Specialist test runners
++.PHONY: pi_10.com
++pi_10.com:
++	cp $(I386_SRC)/pi_10.com .
++
++run-runcom: runcom pi_10.com
++	$(call quiet-command, $(QEMU) ./runcom ./pi_10.com > runcom.out, "TEST", "$< on $(TARGET_NAME)")
++
+-- 
+2.17.0
