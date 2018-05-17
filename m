@@ -1,25 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48383)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49143)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1fJE00-0000N1-32
-	for qemu-devel@nongnu.org; Thu, 17 May 2018 04:10:57 -0400
+	(envelope-from <david@redhat.com>) id 1fJE4V-0002RR-Ql
+	for qemu-devel@nongnu.org; Thu, 17 May 2018 04:15:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1fJDzw-0001a6-0t
-	for qemu-devel@nongnu.org; Thu, 17 May 2018 04:10:56 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:40818 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1fJDzv-0001a0-SR
-	for qemu-devel@nongnu.org; Thu, 17 May 2018 04:10:51 -0400
-References: <20180515123007.10164-1-marcandre.lureau@redhat.com>
-	<20180515123007.10164-3-marcandre.lureau@redhat.com>
-From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <48283244-9534-24b8-263f-47d5fa9ff675@redhat.com>
-Date: Thu, 17 May 2018 10:10:48 +0200
-MIME-Version: 1.0
-In-Reply-To: <20180515123007.10164-3-marcandre.lureau@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [edk2] [PATCH 2/4] ovmf: add QemuTpm.h header
+	(envelope-from <david@redhat.com>) id 1fJE4R-0002oO-PK
+	for qemu-devel@nongnu.org; Thu, 17 May 2018 04:15:35 -0400
+From: David Hildenbrand <david@redhat.com>
+Date: Thu, 17 May 2018 10:15:13 +0200
+Message-Id: <20180517081527.14410-1-david@redhat.com>
+Subject: [Qemu-devel] [PATCH v4 00/14] MemoryDevice: use multi stage hotplug
+ handlers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,117 +18,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: marcandre.lureau@redhat.com, edk2-devel@lists.01.org
-Cc: qemu-devel@nongnu.org, javierm@redhat.com, pjones@redhat.com, jiewen.yao@intel.com
+To: qemu-devel@nongnu.org
+Cc: qemu-s390x@nongnu.org, "Michael S . Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Markus Armbruster <armbru@redhat.com>, qemu-ppc@nongnu.org, Pankaj Gupta <pagupta@redhat.com>, Alexander Graf <agraf@suse.de>, Cornelia Huck <cohuck@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Luiz Capitulino <lcapitulino@redhat.com>, David Hildenbrand <david@redhat.com>
 
-On 05/15/18 14:30, marcandre.lureau@redhat.com wrote:
-> From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
->=20
-> Add some common macros and type definitions corresponding to the QEMU
-> TPM interface.
->=20
-> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-> ---
->  OvmfPkg/Include/IndustryStandard/QemuTpm.h | 67 ++++++++++++++++++++++
->  1 file changed, 67 insertions(+)
->  create mode 100644 OvmfPkg/Include/IndustryStandard/QemuTpm.h
->=20
-> diff --git a/OvmfPkg/Include/IndustryStandard/QemuTpm.h b/OvmfPkg/Inclu=
-de/IndustryStandard/QemuTpm.h
-> new file mode 100644
-> index 000000000000..054cf79374b5
-> --- /dev/null
-> +++ b/OvmfPkg/Include/IndustryStandard/QemuTpm.h
-> @@ -0,0 +1,67 @@
-> +/** @file
-> +  Macro and type definitions corresponding to the QEMU TPM interface.
-> +
-> +  Refer to "docs/specs/tpm.txt" in the QEMU source directory.
-> +
-> +  Copyright (C) 2018, Red Hat, Inc.
-> +  Copyright (c) 2018, IBM Corporation. All rights reserved.<BR>
-> +
-> +  This program and the accompanying materials are licensed and made av=
-ailable
-> +  under the terms and conditions of the BSD License which accompanies =
-this
-> +  distribution. The full text of the license may be found at
-> +  http://opensource.org/licenses/bsd-license.php
-> +
-> +  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS=
-, WITHOUT
-> +  WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED=
-.
-> +**/
-> +
-> +#ifndef __QEMU_TPM_H__
-> +#define __QEMU_TPM_H__
-> +
-> +#include <Base.h>
-> +
-> +/* whether function is blocked by BIOS settings; bits 0, 1, 2 */
-> +#define QEMU_TPM_PPI_FUNC_NOT_IMPLEMENTED     (0 << 0)
-> +#define QEMU_TPM_PPI_FUNC_BIOS_ONLY           (1 << 0)
-> +#define QEMU_TPM_PPI_FUNC_BLOCKED             (2 << 0)
-> +#define QEMU_TPM_PPI_FUNC_ALLOWED_USR_REQ     (3 << 0)
-> +#define QEMU_TPM_PPI_FUNC_ALLOWED_USR_NOT_REQ (4 << 0)
-> +#define QEMU_TPM_PPI_FUNC_MASK                (7 << 0)
-> +
-> +//
-> +// The following structure is shared between firmware and ACPI.
-> +//
-> +#pragma pack (1)
-> +typedef struct {
-> +  UINT8 Func[256];           /* func */
-> +  UINT8 In;                  /* ppin */
-> +  UINT32 Ip;                 /* ppip */
-> +  UINT32 Response;           /* pprp */
-> +  UINT32 Request;            /* pprq */
-> +  UINT32 RequestParameter;   /* pprm */
-> +  UINT32 LastRequest;        /* lppr */
-> +  UINT32 FRet;               /* fret */
-> +  UINT8 Res1[0x40];          /* res1 */
-> +  UINT8 NextStep;            /* next_step */
-> +} QEMU_TPM_PPI;
-> +#pragma pack ()
-> +
-> +//
-> +// The following structure is for the fw_cfg etc/tpm/config file.
-> +//
-> +#pragma pack (1)
-> +typedef struct {
-> +  UINT32 PpiAddress;
-> +  UINT8 TpmVersion;
-> +  UINT8 PpiVersion;
-> +} QEMU_FWCFG_TPM_CONFIG;
-> +#pragma pack ()
-> +
-> +#define QEMU_TPM_VERSION_UNSPEC    0
-> +#define QEMU_TPM_VERSION_1_2       1
-> +#define QEMU_TPM_VERSION_2         2
-> +
-> +#define QEMU_TPM_PPI_VERSION_NONE  0
-> +#define QEMU_TPM_PPI_VERSION_1_30  1
-> +
-> +#endif
->=20
+We can have devices that need certain other resources that are e.g.
+system resources managed by the machine. We need a clean way to assign
+these resources (without violating layers as brought up by Igor).
 
-(1) Please update the subject line as discussed earlier; for example:
+One example is virtio-mem/virtio-pmem. Both device types need to be
+assigned some region in guest physical address space. This device memory
+belongs to the machine and is managed by it. However, virito devices are
+hotplugged using the hotplug handler their proxy device implements. So we
+could trigger e.g. a PCI hotplug handler for virtio-pci or a CSS/CCW
+hotplug handler for virtio-ccw. But definetly not the machine.
 
-OvmfPkg/IndustryStandard: add QemuTpm.h header
+Now, we can route other devices through the machine hotplug handler, to
+properly assign/unassign resources - like a portion in guest physical
+address space.
 
-(2) Please convert the file to CRLF.
+v3 -> v4:
+- Removed the s390x bits, will send that out separately (was just a proof
+  that it works just fine with s390x)
+- Fixed a typo and reworded a comment
 
-(3) Please use the "// ..." comment style near the fields of QEMU_TPM_PPI=
-.
+v2 -> v3:
+- Added "memory-device: introduce separate config option"
+- Dropped "parent_bus" check from hotplug handler lookup functions
+- "Handly" -> "Handle" in patch description.
 
-(4) Please align the member identifiers in each of QEMU_TPM_PPI and
-QEMU_FWCFG_TPM_CONFIG -- in practice this means inserting another space
-char after each "UINT8" type name.
+v1 -> v2:
+- Use multi stage hotplug handler instead of resource handler
+- MemoryDevices only compiled if necessary (CONFIG_MEM_HOTPLUG)
+- Prepare PC/SPAPR machines properly for multi stage hotplug handlers
+- Route SPAPR unplug code via the hotunplug handler
+- Directly include s390x support. But there are no usable memory devices
+  yet (well, only my virtio-mem prototype)
+- Included "memory-device: drop assert related to align and start of address
+  space"
 
-With those changes:
+David Hildenbrand (13):
+  memory-device: drop assert related to align and start of address space
+  memory-device: introduce separate config option
+  pc: prepare for multi stage hotplug handlers
+  pc: route all memory devices through the machine hotplug handler
+  spapr: prepare for multi stage hotplug handlers
+  spapr: route all memory devices through the machine hotplug handler
+  spapr: handle pc-dimm unplug via hotplug handler chain
+  spapr: handle cpu core unplug via hotplug handler chain
+  memory-device: new functions to handle plug/unplug
+  pc-dimm: implement new memory device functions
+  memory-device: factor out pre-plug into hotplug handler
+  memory-device: factor out unplug into hotplug handler
+  memory-device: factor out plug into hotplug handler
 
-Acked-by: Laszlo Ersek <lersek@redhat.com>
+Igor Mammedov (1):
+  qdev: let machine hotplug handler to override bus hotplug handler
 
-Thanks!
-Laszlo
+ default-configs/i386-softmmu.mak   |   3 +-
+ default-configs/ppc64-softmmu.mak  |   3 +-
+ default-configs/x86_64-softmmu.mak |   3 +-
+ hw/Makefile.objs                   |   2 +-
+ hw/core/qdev.c                     |   6 +-
+ hw/i386/pc.c                       | 102 ++++++++++++++++++++++-------
+ hw/mem/Makefile.objs               |   4 +-
+ hw/mem/memory-device.c             | 129 +++++++++++++++++++++++--------------
+ hw/mem/pc-dimm.c                   |  48 ++++++--------
+ hw/mem/trace-events                |   4 +-
+ hw/ppc/spapr.c                     | 129 +++++++++++++++++++++++++++++++------
+ include/hw/mem/memory-device.h     |  21 ++++--
+ include/hw/mem/pc-dimm.h           |   3 +-
+ include/hw/qdev-core.h             |  11 ++++
+ qapi/misc.json                     |   2 +-
+ 15 files changed, 330 insertions(+), 140 deletions(-)
+
+-- 
+2.14.3
