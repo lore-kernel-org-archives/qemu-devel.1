@@ -1,20 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59320)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59331)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1fJElh-0001AQ-6q
-	for qemu-devel@nongnu.org; Thu, 17 May 2018 05:00:16 -0400
+	(envelope-from <peterx@redhat.com>) id 1fJElj-0001Cz-8q
+	for qemu-devel@nongnu.org; Thu, 17 May 2018 05:00:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1fJElb-0006yD-3v
-	for qemu-devel@nongnu.org; Thu, 17 May 2018 05:00:13 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:51838 helo=mx1.redhat.com)
+	(envelope-from <peterx@redhat.com>) id 1fJEle-00072D-GI
+	for qemu-devel@nongnu.org; Thu, 17 May 2018 05:00:15 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:51834 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1fJEla-0006xt-PK
-	for qemu-devel@nongnu.org; Thu, 17 May 2018 05:00:07 -0400
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1fJEle-00070R-5z
+	for qemu-devel@nongnu.org; Thu, 17 May 2018 05:00:10 -0400
 From: Peter Xu <peterx@redhat.com>
-Date: Thu, 17 May 2018 16:59:25 +0800
-Message-Id: <20180517085927.24925-11-peterx@redhat.com>
+Date: Thu, 17 May 2018 16:59:26 +0800
+Message-Id: <20180517085927.24925-12-peterx@redhat.com>
 In-Reply-To: <20180517085927.24925-1-peterx@redhat.com>
 References: <20180517085927.24925-1-peterx@redhat.com>
-Subject: [Qemu-devel] [PATCH v3 10/12] intel-iommu: simplify page walk logic
+Subject: [Qemu-devel] [PATCH v3 11/12] intel-iommu: new
+ vtd_sync_shadow_page_table_range
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,116 +27,113 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Tian Kevin <kevin.tian@intel.com>, "Michael S . Tsirkin" <mst@redhat.com>, Alex Williamson <alex.williamson@redhat.com>, Jintack Lim <jintack@cs.columbia.edu>, peterx@redhat.com, Jason Wang <jasowang@redhat.com>
 
-Let's move the notify_unmap check into the new vtd_page_walk_one()
-function so that we can greatly simplify the vtd_page_walk_level()
-logic.
+I pick part of the page walk implementation out into this single
+function.  It was only used now for PSIs, but actually it can be used
+not only for invalidations but for any place that we want to synchronize
+the shadow page table.  No functional change at all.
 
-No functional change at all.
+Here I passed in context entry explicit to avoid fetching it again.
+However I enhanced the helper to even be able to fetch it on its own,
+since in follow up patches we might call without context entries.
 
 Signed-off-by: Peter Xu <peterx@redhat.com>
 ---
- hw/i386/intel_iommu.c | 66 ++++++++++++++++++++-----------------------
- hw/i386/trace-events  |  1 -
- 2 files changed, 30 insertions(+), 37 deletions(-)
+ hw/i386/intel_iommu.c | 65 ++++++++++++++++++++++++++++++++-----------
+ 1 file changed, 48 insertions(+), 17 deletions(-)
 
 diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
-index 5a5175a4ed..272e49ff66 100644
+index 272e49ff66..a1a2a009c1 100644
 --- a/hw/i386/intel_iommu.c
 +++ b/hw/i386/intel_iommu.c
-@@ -779,6 +779,11 @@ static int vtd_page_walk_one(IOMMUTLBEntry *entry, vtd_page_walk_info *info)
-     };
-     DMAMap *mapped = iova_tree_find(as->iova_tree, &target);
+@@ -1018,6 +1018,53 @@ static int vtd_dev_to_context_entry(IntelIOMMUState *s, uint8_t bus_num,
+     return 0;
+ }
  
-+    if (entry->perm == IOMMU_NONE && !info->notify_unmap) {
-+        trace_vtd_page_walk_one_skip_unmap(entry->iova, entry->addr_mask);
-+        return 0;
++static int vtd_sync_shadow_page_hook(IOMMUTLBEntry *entry,
++                                     void *private)
++{
++    memory_region_notify_iommu((IOMMUMemoryRegion *)private, *entry);
++    return 0;
++}
++
++/* If context entry is NULL, we'll try to fetch it on our own. */
++static int vtd_sync_shadow_page_table_range(VTDAddressSpace *vtd_as,
++                                            VTDContextEntry *ce,
++                                            hwaddr addr, hwaddr size)
++{
++    IntelIOMMUState *s = vtd_as->iommu_state;
++    vtd_page_walk_info info = {
++        .hook_fn = vtd_sync_shadow_page_hook,
++        .private = (void *)&vtd_as->iommu,
++        .notify_unmap = true,
++        .aw = s->aw_bits,
++        .as = vtd_as,
++    };
++    VTDContextEntry ce_cache;
++    int ret;
++
++    if (ce) {
++        /* If the caller provided context entry, use it */
++        ce_cache = *ce;
++    } else {
++        /* If the caller didn't provide ce, try to fetch */
++        ret = vtd_dev_to_context_entry(s, pci_bus_num(vtd_as->bus),
++                                       vtd_as->devfn, &ce_cache);
++        if (ret) {
++            /*
++             * This should not really happen, but in case it happens,
++             * we just skip the sync for this time.  After all we even
++             * don't have the root table pointer!
++             */
++            trace_vtd_err("Detected invalid context entry when "
++                          "trying to sync shadow page table");
++            return 0;
++        }
 +    }
 +
-     assert(hook_fn);
- 
-     /* Update local IOVA mapped ranges */
-@@ -894,45 +899,34 @@ static int vtd_page_walk_level(dma_addr_t addr, uint64_t start,
-          */
-         entry_valid = read_cur | write_cur;
- 
--        entry.target_as = &address_space_memory;
--        entry.iova = iova & subpage_mask;
--        entry.perm = IOMMU_ACCESS_FLAG(read_cur, write_cur);
--        entry.addr_mask = ~subpage_mask;
--
--        if (vtd_is_last_slpte(slpte, level)) {
--            /* NOTE: this is only meaningful if entry_valid == true */
--            entry.translated_addr = vtd_get_slpte_addr(slpte, info->aw);
--            if (!entry_valid && !info->notify_unmap) {
--                trace_vtd_page_walk_skip_perm(iova, iova_next);
--                goto next;
--            }
--            ret = vtd_page_walk_one(&entry, info);
--            if (ret < 0) {
--                return ret;
--            }
--        } else {
--            if (!entry_valid) {
--                if (info->notify_unmap) {
--                    /*
--                     * The whole entry is invalid; unmap it all.
--                     * Translated address is meaningless, zero it.
--                     */
--                    entry.translated_addr = 0x0;
--                    ret = vtd_page_walk_one(&entry, info);
--                    if (ret < 0) {
--                        return ret;
--                    }
--                } else {
--                    trace_vtd_page_walk_skip_perm(iova, iova_next);
--                }
--                goto next;
--            }
-+        if (!vtd_is_last_slpte(slpte, level) && entry_valid) {
-+            /*
-+             * This is a valid PDE (or even bigger than PDE).  We need
-+             * to walk one further level.
-+             */
-             ret = vtd_page_walk_level(vtd_get_slpte_addr(slpte, info->aw),
-                                       iova, MIN(iova_next, end), level - 1,
-                                       read_cur, write_cur, info);
--            if (ret < 0) {
--                return ret;
--            }
-+        } else {
-+            /*
-+             * This means we are either:
-+             *
-+             * (1) the real page entry (either 4K page, or huge page)
-+             * (2) the whole range is invalid
-+             *
-+             * In either case, we send an IOTLB notification down.
-+             */
-+            entry.target_as = &address_space_memory;
-+            entry.iova = iova & subpage_mask;
-+            entry.perm = IOMMU_ACCESS_FLAG(read_cur, write_cur);
-+            entry.addr_mask = ~subpage_mask;
-+            /* NOTE: this is only meaningful if entry_valid == true */
-+            entry.translated_addr = vtd_get_slpte_addr(slpte, info->aw);
-+            ret = vtd_page_walk_one(&entry, info);
-+        }
++    info.domain_id = VTD_CONTEXT_ENTRY_DID(ce_cache.hi);
 +
-+        if (ret < 0) {
-+            return ret;
-         }
++    return vtd_page_walk(&ce_cache, addr, addr + size, &info);
++}
++
+ /*
+  * Fetch translation type for specific device. Returns <0 if error
+  * happens, otherwise return the shifted type to check against
+@@ -1493,13 +1540,6 @@ static void vtd_iotlb_domain_invalidate(IntelIOMMUState *s, uint16_t domain_id)
+     }
+ }
  
- next:
-diff --git a/hw/i386/trace-events b/hw/i386/trace-events
-index d8194b80e3..e14d06ec83 100644
---- a/hw/i386/trace-events
-+++ b/hw/i386/trace-events
-@@ -43,7 +43,6 @@ vtd_page_walk_one(uint16_t domain, uint64_t iova, uint64_t gpa, uint64_t mask, i
- vtd_page_walk_one_skip_map(uint64_t iova, uint64_t mask, uint64_t translated) "iova 0x%"PRIx64" mask 0x%"PRIx64" translated 0x%"PRIx64
- vtd_page_walk_one_skip_unmap(uint64_t iova, uint64_t mask) "iova 0x%"PRIx64" mask 0x%"PRIx64
- vtd_page_walk_skip_read(uint64_t iova, uint64_t next) "Page walk skip iova 0x%"PRIx64" - 0x%"PRIx64" due to unable to read"
--vtd_page_walk_skip_perm(uint64_t iova, uint64_t next) "Page walk skip iova 0x%"PRIx64" - 0x%"PRIx64" due to perm empty"
- vtd_page_walk_skip_reserve(uint64_t iova, uint64_t next) "Page walk skip iova 0x%"PRIx64" - 0x%"PRIx64" due to rsrv set"
- vtd_switch_address_space(uint8_t bus, uint8_t slot, uint8_t fn, bool on) "Device %02x:%02x.%x switching address space (iommu enabled=%d)"
- vtd_as_unmap_whole(uint8_t bus, uint8_t slot, uint8_t fn, uint64_t iova, uint64_t size) "Device %02x:%02x.%x start 0x%"PRIx64" size 0x%"PRIx64
+-static int vtd_page_invalidate_notify_hook(IOMMUTLBEntry *entry,
+-                                           void *private)
+-{
+-    memory_region_notify_iommu((IOMMUMemoryRegion *)private, *entry);
+-    return 0;
+-}
+-
+ static void vtd_iotlb_page_invalidate_notify(IntelIOMMUState *s,
+                                            uint16_t domain_id, hwaddr addr,
+                                            uint8_t am)
+@@ -1514,20 +1554,11 @@ static void vtd_iotlb_page_invalidate_notify(IntelIOMMUState *s,
+                                        vtd_as->devfn, &ce);
+         if (!ret && domain_id == VTD_CONTEXT_ENTRY_DID(ce.hi)) {
+             if (vtd_as_notify_mappings(vtd_as)) {
+-                vtd_page_walk_info info = {
+-                    .hook_fn = vtd_page_invalidate_notify_hook,
+-                    .private = (void *)&vtd_as->iommu,
+-                    .notify_unmap = true,
+-                    .aw = s->aw_bits,
+-                    .as = vtd_as,
+-                    .domain_id = domain_id,
+-                };
+-
+                 /*
+                  * For MAP-inclusive notifiers, we need to walk the
+                  * page table to sync the shadow page table.
+                  */
+-                vtd_page_walk(&ce, addr, addr + size, &info);
++                vtd_sync_shadow_page_table_range(vtd_as, &ce, addr, size);
+             } else {
+                 /*
+                  * For UNMAP-only notifiers, we don't need to walk the
 -- 
 2.17.0
