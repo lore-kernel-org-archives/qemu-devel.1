@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41273)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41398)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1fJFUI-0000E0-Dd
-	for qemu-devel@nongnu.org; Thu, 17 May 2018 05:46:19 -0400
+	(envelope-from <eric.auger@redhat.com>) id 1fJFUa-0000Mt-PZ
+	for qemu-devel@nongnu.org; Thu, 17 May 2018 05:46:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1fJFUE-00075o-Ba
-	for qemu-devel@nongnu.org; Thu, 17 May 2018 05:46:18 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:57182 helo=mx1.redhat.com)
+	(envelope-from <eric.auger@redhat.com>) id 1fJFUW-0007Sy-R0
+	for qemu-devel@nongnu.org; Thu, 17 May 2018 05:46:36 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:59192 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1fJFUE-00075a-6U
-	for qemu-devel@nongnu.org; Thu, 17 May 2018 05:46:14 -0400
-Date: Thu, 17 May 2018 17:46:04 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20180517094604.GA26089@xz-mi>
-References: <20180517085927.24925-1-peterx@redhat.com>
-	<20180517085927.24925-10-peterx@redhat.com>
+	(Exim 4.71) (envelope-from <eric.auger@redhat.com>)
+	id 1fJFUW-0007SU-LO
+	for qemu-devel@nongnu.org; Thu, 17 May 2018 05:46:32 -0400
+References: <20180504030811.28111-1-peterx@redhat.com>
+	<20180504030811.28111-3-peterx@redhat.com>
+From: Auger Eric <eric.auger@redhat.com>
+Message-ID: <17437758-3b51-72c7-81ba-cb0df0a22c1c@redhat.com>
+Date: Thu, 17 May 2018 11:46:22 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20180517085927.24925-10-peterx@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v3 09/12] intel-iommu: maintain per-device
- iova ranges
+In-Reply-To: <20180504030811.28111-3-peterx@redhat.com>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 02/10] intel-iommu: remove
+ IntelIOMMUNotifierNode
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,76 +29,169 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Tian Kevin <kevin.tian@intel.com>, "Michael S . Tsirkin" <mst@redhat.com>, Alex Williamson <alex.williamson@redhat.com>, Jintack Lim <jintack@cs.columbia.edu>, Jason Wang <jasowang@redhat.com>
+To: Peter Xu <peterx@redhat.com>, qemu-devel@nongnu.org
+Cc: Tian Kevin <kevin.tian@intel.com>, "Michael S . Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, Alex Williamson <alex.williamson@redhat.com>, Jintack Lim <jintack@cs.columbia.edu>
 
-On Thu, May 17, 2018 at 04:59:24PM +0800, Peter Xu wrote:
+Hi Peter,
 
-[...]
+On 05/04/2018 05:08 AM, Peter Xu wrote:
+> That is not really necessary.  Removing that node struct and put the
+> list entry directly into VTDAddressSpace.  It simplfies the code a lot.
+> 
+> Signed-off-by: Peter Xu <peterx@redhat.com>
+> ---
+>  include/hw/i386/intel_iommu.h |  9 ++------
+>  hw/i386/intel_iommu.c         | 41 ++++++++++-------------------------
+>  2 files changed, 14 insertions(+), 36 deletions(-)
+> 
+> diff --git a/include/hw/i386/intel_iommu.h b/include/hw/i386/intel_iommu.h
+> index 45ec8919b6..220697253f 100644
+> --- a/include/hw/i386/intel_iommu.h
+> +++ b/include/hw/i386/intel_iommu.h
+> @@ -67,7 +67,6 @@ typedef union VTD_IR_TableEntry VTD_IR_TableEntry;
+>  typedef union VTD_IR_MSIAddress VTD_IR_MSIAddress;
+>  typedef struct VTDIrq VTDIrq;
+>  typedef struct VTD_MSIMessage VTD_MSIMessage;
+> -typedef struct IntelIOMMUNotifierNode IntelIOMMUNotifierNode;
+>  
+>  /* Context-Entry */
+>  struct VTDContextEntry {
+> @@ -93,6 +92,7 @@ struct VTDAddressSpace {
+>      MemoryRegion iommu_ir;      /* Interrupt region: 0xfeeXXXXX */
+>      IntelIOMMUState *iommu_state;
+>      VTDContextCacheEntry context_cache_entry;
+> +    QLIST_ENTRY(VTDAddressSpace) next;
+>  };
+>  
+>  struct VTDBus {
+> @@ -253,11 +253,6 @@ struct VTD_MSIMessage {
+>  /* When IR is enabled, all MSI/MSI-X data bits should be zero */
+>  #define VTD_IR_MSI_DATA          (0)
+>  
+> -struct IntelIOMMUNotifierNode {
+> -    VTDAddressSpace *vtd_as;
+> -    QLIST_ENTRY(IntelIOMMUNotifierNode) next;
+> -};
+> -
+>  /* The iommu (DMAR) device state struct */
+>  struct IntelIOMMUState {
+>      X86IOMMUState x86_iommu;
+> @@ -295,7 +290,7 @@ struct IntelIOMMUState {
+>      GHashTable *vtd_as_by_busptr;   /* VTDBus objects indexed by PCIBus* reference */
+>      VTDBus *vtd_as_by_bus_num[VTD_PCI_BUS_MAX]; /* VTDBus objects indexed by bus number */
+>      /* list of registered notifiers */
+> -    QLIST_HEAD(, IntelIOMMUNotifierNode) notifiers_list;
+> +    QLIST_HEAD(, VTDAddressSpace) notifiers_list;
+Wouldn't it make sense to rename notifiers_list into something more
+understandable like address_spaces?
+>  
+>      /* interrupt remapping */
+>      bool intr_enabled;              /* Whether guest enabled IR */
+> diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
+> index b359efd6f9..5987b48d43 100644
+> --- a/hw/i386/intel_iommu.c
+> +++ b/hw/i386/intel_iommu.c
+> @@ -1248,10 +1248,10 @@ static void vtd_interrupt_remap_table_setup(IntelIOMMUState *s)
+>  
+>  static void vtd_iommu_replay_all(IntelIOMMUState *s)
+>  {
+> -    IntelIOMMUNotifierNode *node;
+> +    VTDAddressSpace *vtd_as;
+>  
+> -    QLIST_FOREACH(node, &s->notifiers_list, next) {
+> -        memory_region_iommu_replay_all(&node->vtd_as->iommu);
+> +    QLIST_FOREACH(vtd_as, &s->notifiers_list, next) {
+> +        memory_region_iommu_replay_all(&vtd_as->iommu);
+>      }
+>  }
+>  
+> @@ -1372,7 +1372,6 @@ static void vtd_iotlb_global_invalidate(IntelIOMMUState *s)
+>  
+>  static void vtd_iotlb_domain_invalidate(IntelIOMMUState *s, uint16_t domain_id)
+>  {
+> -    IntelIOMMUNotifierNode *node;
+>      VTDContextEntry ce;
+>      VTDAddressSpace *vtd_as;
+>  
+> @@ -1381,8 +1380,7 @@ static void vtd_iotlb_domain_invalidate(IntelIOMMUState *s, uint16_t domain_id)
+>      g_hash_table_foreach_remove(s->iotlb, vtd_hash_remove_by_domain,
+>                                  &domain_id);
+>  
+> -    QLIST_FOREACH(node, &s->notifiers_list, next) {
+> -        vtd_as = node->vtd_as;
+> +    QLIST_FOREACH(vtd_as, &s->notifiers_list, next) {
+>          if (!vtd_dev_to_context_entry(s, pci_bus_num(vtd_as->bus),
+>                                        vtd_as->devfn, &ce) &&
+>              domain_id == VTD_CONTEXT_ENTRY_DID(ce.hi)) {
+> @@ -1402,12 +1400,11 @@ static void vtd_iotlb_page_invalidate_notify(IntelIOMMUState *s,
+>                                             uint16_t domain_id, hwaddr addr,
+>                                             uint8_t am)
+>  {
+> -    IntelIOMMUNotifierNode *node;
+> +    VTDAddressSpace *vtd_as;
+>      VTDContextEntry ce;
+>      int ret;
+>  
+> -    QLIST_FOREACH(node, &(s->notifiers_list), next) {
+> -        VTDAddressSpace *vtd_as = node->vtd_as;
+> +    QLIST_FOREACH(vtd_as, &(s->notifiers_list), next) {
+>          ret = vtd_dev_to_context_entry(s, pci_bus_num(vtd_as->bus),
+>                                         vtd_as->devfn, &ce);
+>          if (!ret && domain_id == VTD_CONTEXT_ENTRY_DID(ce.hi)) {
+> @@ -2344,8 +2341,6 @@ static void vtd_iommu_notify_flag_changed(IOMMUMemoryRegion *iommu,
+>  {
+>      VTDAddressSpace *vtd_as = container_of(iommu, VTDAddressSpace, iommu);
+>      IntelIOMMUState *s = vtd_as->iommu_state;
+> -    IntelIOMMUNotifierNode *node = NULL;
+> -    IntelIOMMUNotifierNode *next_node = NULL;
+>  
+>      if (!s->caching_mode && new & IOMMU_NOTIFIER_MAP) {
+>          error_report("We need to set caching-mode=1 for intel-iommu to enable "
+> @@ -2354,21 +2349,11 @@ static void vtd_iommu_notify_flag_changed(IOMMUMemoryRegion *iommu,
+>      }
+>  
+>      if (old == IOMMU_NOTIFIER_NONE) {
+> -        node = g_malloc0(sizeof(*node));
+> -        node->vtd_as = vtd_as;
+> -        QLIST_INSERT_HEAD(&s->notifiers_list, node, next);
+> -        return;
+> -    }
+> -
+> -    /* update notifier node with new flags */
+> -    QLIST_FOREACH_SAFE(node, &s->notifiers_list, next, next_node) {
+> -        if (node->vtd_as == vtd_as) {
+> -            if (new == IOMMU_NOTIFIER_NONE) {
+> -                QLIST_REMOVE(node, next);
+> -                g_free(node);
+> -            }
+> -            return;
+> -        }
+> +        /* Insert new ones */
+s/ones/one
 
-> +    /* Update local IOVA mapped ranges */
-> +    if (entry->perm) {
-> +        if (mapped) {
-> +            /* If it's exactly the same translation, skip */
-> +            if (!memcmp(mapped, &target, sizeof(target))) {
-> +                trace_vtd_page_walk_one_skip_map(entry->iova, entry->addr_mask,
-> +                                                 entry->translated_addr);
-> +                return 0;
-> +            } else {
-> +                /*
-> +                 * Translation changed.  This should not happen with
-> +                 * "intel_iommu=on,strict", but it can happen when
-> +                 * delayed flushing is used in guest IOMMU driver
-> +                 * (when without "strict") when page A is reused
-> +                 * before its previous unmap (the unmap can still be
-> +                 * queued in the delayed flushing queue).  Now we do
+> +        QLIST_INSERT_HEAD(&s->notifiers_list, vtd_as, next);
+> +    } else if (new == IOMMU_NOTIFIER_NONE) {
+> +        /* Remove old ones */
+same. Not sure the comments are worth.
+> +        QLIST_REMOVE(vtd_as, next);
+>      }
+>  }
+>  
+> @@ -2838,12 +2823,10 @@ static void vtd_address_space_unmap(VTDAddressSpace *as, IOMMUNotifier *n)
+>  
+>  static void vtd_address_space_unmap_all(IntelIOMMUState *s)
+>  {
+> -    IntelIOMMUNotifierNode *node;
+>      VTDAddressSpace *vtd_as;
+>      IOMMUNotifier *n;
+>  
+> -    QLIST_FOREACH(node, &s->notifiers_list, next) {
+> -        vtd_as = node->vtd_as;
+> +    QLIST_FOREACH(vtd_as, &s->notifiers_list, next) {
+>          IOMMU_NOTIFIER_FOREACH(n, &vtd_as->iommu) {
+>              vtd_address_space_unmap(vtd_as, n);
+>          }
+> 
+Thanks
 
-This comment is wrong.  We can ignore above comments for now since as
-I explained in the other thread Linux IOVA deferred flushing won't
-free IOVA range until the unmap is flushed.  But still, below comment
-is valid.
-
-Regards,
-
-> +                 * our best to remap.  Note that there will be a small
-> +                 * window that we don't have map at all.  But that's
-> +                 * the best effort we can do, and logically
-> +                 * well-behaved guests should not really using this
-> +                 * DMA region yet so we should be very safe.
-> +                 */
-> +                IOMMUAccessFlags cache_perm = entry->perm;
-> +                int ret;
-> +
-> +                /* Emulate an UNMAP */
-> +                entry->perm = IOMMU_NONE;
-> +                trace_vtd_page_walk_one(info->domain_id,
-> +                                        entry->iova,
-> +                                        entry->translated_addr,
-> +                                        entry->addr_mask,
-> +                                        entry->perm);
-> +                ret = hook_fn(entry, private);
-> +                if (ret) {
-> +                    return ret;
-> +                }
-> +                /* Drop any existing mapping */
-> +                iova_tree_remove(as->iova_tree, &target);
-> +                /* Recover the correct permission */
-> +                entry->perm = cache_perm;
-> +            }
-> +        }
-> +        iova_tree_insert(as->iova_tree, &target);
-> +    } else {
-> +        if (!mapped) {
-> +            /* Skip since we didn't map this range at all */
-> +            trace_vtd_page_walk_one_skip_unmap(entry->iova, entry->addr_mask);
-> +            return 0;
-> +        }
-> +        iova_tree_remove(as->iova_tree, &target);
-> +    }
-> +
->      trace_vtd_page_walk_one(info->domain_id, entry->iova,
->                              entry->translated_addr, entry->addr_mask,
->                              entry->perm);
-
--- 
-Peter Xu
+Eric
