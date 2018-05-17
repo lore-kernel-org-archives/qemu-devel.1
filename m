@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52746)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52803)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fJN6Q-0003JH-5X
-	for qemu-devel@nongnu.org; Thu, 17 May 2018 13:54:11 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1fJN6S-0003O7-Uf
+	for qemu-devel@nongnu.org; Thu, 17 May 2018 13:54:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fJN6N-0007Cc-VA
-	for qemu-devel@nongnu.org; Thu, 17 May 2018 13:54:10 -0400
-Received: from mail-wr0-x232.google.com ([2a00:1450:400c:c0c::232]:46283)
+	(envelope-from <alex.bennee@linaro.org>) id 1fJN6R-0007GE-VE
+	for qemu-devel@nongnu.org; Thu, 17 May 2018 13:54:13 -0400
+Received: from mail-wr0-x241.google.com ([2a00:1450:400c:c0c::241]:33010)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1fJN6N-0007Bv-LX
-	for qemu-devel@nongnu.org; Thu, 17 May 2018 13:54:07 -0400
-Received: by mail-wr0-x232.google.com with SMTP id x9-v6so3700103wrl.13
-	for <qemu-devel@nongnu.org>; Thu, 17 May 2018 10:54:07 -0700 (PDT)
+	id 1fJN6R-0007ET-Ps
+	for qemu-devel@nongnu.org; Thu, 17 May 2018 13:54:11 -0400
+Received: by mail-wr0-x241.google.com with SMTP id o4-v6so6590462wrm.0
+	for <qemu-devel@nongnu.org>; Thu, 17 May 2018 10:54:11 -0700 (PDT)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Thu, 17 May 2018 18:46:44 +0100
-Message-Id: <20180517174718.10107-16-alex.bennee@linaro.org>
+Date: Thu, 17 May 2018 18:46:55 +0100
+Message-Id: <20180517174718.10107-27-alex.bennee@linaro.org>
 In-Reply-To: <20180517174718.10107-1-alex.bennee@linaro.org>
 References: <20180517174718.10107-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v4 15/49] tests/tcg/multiarch: move most output
- to stdout
+Subject: [Qemu-devel] [PATCH v4 26/49] tests/tcg: move ARM specific tests
+ into subdir
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,199 +31,110 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: cota@braap.org, famz@redhat.com, berrange@redhat.com, f4bug@amsat.org, richard.henderson@linaro.org, balrogg@gmail.com, aurelien@aurel32.net, agraf@suse.de
-Cc: qemu-devel@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+Cc: qemu-devel@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Peter Maydell <peter.maydell@linaro.org>, "open list:ARM" <qemu-arm@nongnu.org>
 
-The default test run outputs to stdout so it can be re-directed.
-Errors are still reported to stderr.
+These only need to be built for ARM guests.
 
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+Reviewed-by: Thomas Huth <thuth@redhat.com>
 Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 Tested-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
 ---
+v2
+  - do VPATH manipulation in tests/tcg/arm/Makefile.target
+  - merge with fix hello-arm test
 v4
-  - remove space in fprintf () to keep checkpatch happy
+  - update MAINTAINERS
 ---
- tests/tcg/multiarch/test-mmap.c | 40 ++++++++++++++++-----------------
- 1 file changed, 20 insertions(+), 20 deletions(-)
+ MAINTAINERS                           |  1 +
+ tests/tcg/README                      |  9 ---------
+ tests/tcg/arm/Makefile.target         | 13 +++++++++++++
+ tests/tcg/arm/README                  | 11 +++++++++++
+ tests/tcg/{ => arm}/hello-arm.c       |  0
+ tests/tcg/{ => arm}/test-arm-iwmmxt.s |  0
+ 6 files changed, 25 insertions(+), 9 deletions(-)
+ create mode 100644 tests/tcg/arm/Makefile.target
+ create mode 100644 tests/tcg/arm/README
+ rename tests/tcg/{ => arm}/hello-arm.c (100%)
+ rename tests/tcg/{ => arm}/test-arm-iwmmxt.s (100%)
 
-diff --git a/tests/tcg/multiarch/test-mmap.c b/tests/tcg/multiarch/test-mmap.c
-index cdefadfa4c..5c0afe6e49 100644
---- a/tests/tcg/multiarch/test-mmap.c
-+++ b/tests/tcg/multiarch/test-mmap.c
-@@ -36,7 +36,7 @@
- do                                                             \
- {                                                              \
-   if (!(x)) {                                                  \
--    fprintf (stderr, "FAILED at %s:%d\n", __FILE__, __LINE__); \
-+    fprintf(stderr, "FAILED at %s:%d\n", __FILE__, __LINE__); \
-     exit (EXIT_FAILURE);                                       \
-   }                                                            \
- } while (0)
-@@ -57,7 +57,7 @@ void check_aligned_anonymous_unfixed_mmaps(void)
- 	uintptr_t p;
- 	int i;
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 17b9fc0fbe..4e331c4db4 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -135,6 +135,7 @@ M: Peter Maydell <peter.maydell@linaro.org>
+ L: qemu-arm@nongnu.org
+ S: Maintained
+ F: target/arm/
++F: tests/tcg/arm/
+ F: hw/arm/
+ F: hw/cpu/a*mpcore.c
+ F: include/hw/cpu/a*mpcore.h
+diff --git a/tests/tcg/README b/tests/tcg/README
+index 469504c4cb..625f2326e6 100644
+--- a/tests/tcg/README
++++ b/tests/tcg/README
+@@ -5,15 +5,6 @@ or they are architecture specific.
  
--	fprintf (stderr, "%s", __func__);
-+	fprintf(stdout, "%s", __func__);
- 	for (i = 0; i < 0x1fff; i++)
- 	{
- 		size_t len;
-@@ -106,7 +106,7 @@ void check_aligned_anonymous_unfixed_mmaps(void)
- 		munmap (p4, len);
- 		munmap (p5, len);
- 	}
--	fprintf (stderr, " passed\n");
-+	fprintf(stdout, " passed\n");
- }
  
- void check_large_anonymous_unfixed_mmap(void)
-@@ -115,7 +115,7 @@ void check_large_anonymous_unfixed_mmap(void)
- 	uintptr_t p;
- 	size_t len;
  
--	fprintf (stderr, "%s", __func__);
-+	fprintf(stdout, "%s", __func__);
+-ARM
+-===
+-
+-hello-arm
+----------
+-
+-test-arm-iwmmxt
+----------------
+-
+ MIPS
+ ====
  
- 	len = 0x02000000;
- 	p1 = mmap(NULL, len, PROT_READ, 
-@@ -130,7 +130,7 @@ void check_large_anonymous_unfixed_mmap(void)
- 	/* Make sure we can read from the entire area.  */
- 	memcpy (dummybuf, p1, pagesize);
- 	munmap (p1, len);
--	fprintf (stderr, " passed\n");
-+	fprintf(stdout, " passed\n");
- }
- 
- void check_aligned_anonymous_unfixed_colliding_mmaps(void)
-@@ -141,7 +141,7 @@ void check_aligned_anonymous_unfixed_colliding_mmaps(void)
- 	uintptr_t p;
- 	int i;
- 
--	fprintf (stderr, "%s", __func__);
-+	fprintf(stdout, "%s", __func__);
- 	for (i = 0; i < 0x2fff; i++)
- 	{
- 		int nlen;
-@@ -180,7 +180,7 @@ void check_aligned_anonymous_unfixed_colliding_mmaps(void)
- 		munmap (p2, pagesize);
- 		munmap (p3, nlen);
- 	}
--	fprintf (stderr, " passed\n");
-+	fprintf(stdout, " passed\n");
- }
- 
- void check_aligned_anonymous_fixed_mmaps(void)
-@@ -194,7 +194,7 @@ void check_aligned_anonymous_fixed_mmaps(void)
- 	addr = mmap(NULL, pagesize * 40, PROT_READ | PROT_WRITE, 
- 		    MAP_PRIVATE | MAP_ANONYMOUS,
- 		    -1, 0);
--	fprintf (stderr, "%s addr=%p", __func__, addr);
-+	fprintf(stdout, "%s addr=%p", __func__, addr);
- 	fail_unless (addr != MAP_FAILED);
- 
- 	for (i = 0; i < 40; i++)
-@@ -212,7 +212,7 @@ void check_aligned_anonymous_fixed_mmaps(void)
- 		munmap (p1, pagesize);
- 		addr += pagesize;
- 	}
--	fprintf (stderr, " passed\n");
-+	fprintf(stdout, " passed\n");
- }
- 
- void check_aligned_anonymous_fixed_mmaps_collide_with_host(void)
-@@ -225,8 +225,8 @@ void check_aligned_anonymous_fixed_mmaps_collide_with_host(void)
- 	/* Find a suitable address to start with.  Right were the x86 hosts
- 	 stack is.  */
- 	addr = ((void *)0x80000000);
--	fprintf (stderr, "%s addr=%p", __func__, addr);
--	fprintf (stderr, "FIXME: QEMU fails to track pages used by the host.");
-+	fprintf(stdout, "%s addr=%p", __func__, addr);
-+	fprintf(stdout, "FIXME: QEMU fails to track pages used by the host.");
- 
- 	for (i = 0; i < 20; i++)
- 	{
-@@ -243,7 +243,7 @@ void check_aligned_anonymous_fixed_mmaps_collide_with_host(void)
- 		munmap (p1, pagesize);
- 		addr += pagesize;
- 	}
--	fprintf (stderr, " passed\n");
-+	fprintf(stdout, " passed\n");
- }
- 
- void check_file_unfixed_mmaps(void)
-@@ -252,7 +252,7 @@ void check_file_unfixed_mmaps(void)
- 	uintptr_t p;
- 	int i;
- 
--	fprintf (stderr, "%s", __func__);
-+	fprintf(stdout, "%s", __func__);
- 	for (i = 0; i < 0x10; i++)
- 	{
- 		size_t len;
-@@ -294,7 +294,7 @@ void check_file_unfixed_mmaps(void)
- 		munmap (p2, len);
- 		munmap (p3, len);
- 	}
--	fprintf (stderr, " passed\n");
-+	fprintf(stdout, " passed\n");
- }
- 
- void check_file_unfixed_eof_mmaps(void)
-@@ -304,7 +304,7 @@ void check_file_unfixed_eof_mmaps(void)
- 	uintptr_t p;
- 	int i;
- 
--	fprintf (stderr, "%s", __func__);
-+	fprintf(stdout, "%s", __func__);
- 	for (i = 0; i < 0x10; i++)
- 	{
- 		p1 = mmap(NULL, pagesize, PROT_READ, 
-@@ -327,7 +327,7 @@ void check_file_unfixed_eof_mmaps(void)
- 		fail_unless (cp[pagesize - 4] == 0);
- 		munmap (p1, pagesize);
- 	}
--	fprintf (stderr, " passed\n");
-+	fprintf(stdout, " passed\n");
- }
- 
- void check_file_fixed_eof_mmaps(void)
-@@ -343,7 +343,7 @@ void check_file_fixed_eof_mmaps(void)
- 		    MAP_PRIVATE | MAP_ANONYMOUS,
- 		    -1, 0);
- 
--	fprintf (stderr, "%s addr=%p", __func__, (void *)addr);
-+	fprintf(stdout, "%s addr=%p", __func__, (void *)addr);
- 	fail_unless (addr != MAP_FAILED);
- 
- 	for (i = 0; i < 0x10; i++)
-@@ -371,7 +371,7 @@ void check_file_fixed_eof_mmaps(void)
- 		munmap (p1, pagesize);
- 		addr += pagesize;
- 	}
--	fprintf (stderr, " passed\n");
-+	fprintf(stdout, " passed\n");
- }
- 
- void check_file_fixed_mmaps(void)
-@@ -384,7 +384,7 @@ void check_file_fixed_mmaps(void)
- 	addr = mmap(NULL, pagesize * 40 * 4, PROT_READ, 
- 		    MAP_PRIVATE | MAP_ANONYMOUS,
- 		    -1, 0);
--	fprintf (stderr, "%s addr=%p", __func__, (void *)addr);
-+	fprintf(stdout, "%s addr=%p", __func__, (void *)addr);
- 	fail_unless (addr != MAP_FAILED);
- 
- 	for (i = 0; i < 40; i++)
-@@ -426,7 +426,7 @@ void check_file_fixed_mmaps(void)
- 		munmap (p4, pagesize);
- 		addr += pagesize * 4;
- 	}
--	fprintf (stderr, " passed\n");
-+	fprintf(stdout, " passed\n");
- }
- 
- void checked_write(int fd, const void *buf, size_t count)
+diff --git a/tests/tcg/arm/Makefile.target b/tests/tcg/arm/Makefile.target
+new file mode 100644
+index 0000000000..bc6962ecc6
+--- /dev/null
++++ b/tests/tcg/arm/Makefile.target
+@@ -0,0 +1,13 @@
++# -*- Mode: makefile -*-
++#
++# ARM - included from tests/tcg/Makefile.target
++#
++
++ARM_SRC=$(SRC_PATH)/tests/tcg/arm
++
++# Set search path for all sources
++VPATH 		+= $(ARM_SRC)
++
++
++hello-arm: CFLAGS+=-marm -ffreestanding
++hello-arm: LDFLAGS+=-nostdlib
+diff --git a/tests/tcg/arm/README b/tests/tcg/arm/README
+new file mode 100644
+index 0000000000..e6307116e2
+--- /dev/null
++++ b/tests/tcg/arm/README
+@@ -0,0 +1,11 @@
++These are ARM specific guest programs
++
++hello-arm
++---------
++
++A very simple inline assembly, write syscall based hello world
++
++test-arm-iwmmxt
++---------------
++
++A simple test case for older iwmmxt extended ARMs
+diff --git a/tests/tcg/hello-arm.c b/tests/tcg/arm/hello-arm.c
+similarity index 100%
+rename from tests/tcg/hello-arm.c
+rename to tests/tcg/arm/hello-arm.c
+diff --git a/tests/tcg/test-arm-iwmmxt.s b/tests/tcg/arm/test-arm-iwmmxt.s
+similarity index 100%
+rename from tests/tcg/test-arm-iwmmxt.s
+rename to tests/tcg/arm/test-arm-iwmmxt.s
 -- 
 2.17.0
