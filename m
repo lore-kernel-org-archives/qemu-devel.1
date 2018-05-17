@@ -1,22 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59387)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34661)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wangjie88@huawei.com>) id 1fJCjJ-0005Lw-Ud
-	for qemu-devel@nongnu.org; Thu, 17 May 2018 02:49:38 -0400
+	(envelope-from <eric.auger@redhat.com>) id 1fJD0o-0001z8-Lw
+	for qemu-devel@nongnu.org; Thu, 17 May 2018 03:07:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wangjie88@huawei.com>) id 1fJCjJ-0004ON-1n
-	for qemu-devel@nongnu.org; Thu, 17 May 2018 02:49:38 -0400
-References: <1526523977-73930-1-git-send-email-wangjie88@huawei.com>
-	<20180517062258.GP9089@xz-mi>
-From: "WangJie (Pluto)" <wangjie88@huawei.com>
-Message-ID: <2b45d90a-6798-224e-91c5-41b3cc3a5b16@huawei.com>
-Date: Thu, 17 May 2018 14:48:53 +0800
+	(envelope-from <eric.auger@redhat.com>) id 1fJD0n-0007i8-LN
+	for qemu-devel@nongnu.org; Thu, 17 May 2018 03:07:42 -0400
+References: <1526493784-25328-1-git-send-email-eric.auger@redhat.com>
+	<1526493784-25328-3-git-send-email-eric.auger@redhat.com>
+	<2c55370d-fa43-12a1-5baf-ec7cf824c0dc@amsat.org>
+	<CAFEAcA-GxScM9StKESYAqJ2sbiSH+hWjJXvF7COjJPojs5J5QQ@mail.gmail.com>
+	<8324a612-8785-9db9-b0d4-ab943645a16d@amsat.org>
+From: Auger Eric <eric.auger@redhat.com>
+Message-ID: <f7bd0127-a430-3672-17a4-04fd33b41f51@redhat.com>
+Date: Thu, 17 May 2018 09:07:29 +0200
 MIME-Version: 1.0
-In-Reply-To: <20180517062258.GP9089@xz-mi>
-Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v6 2/2] iothread: let aio_epoll_disable fit
- to aio_context_destroy
+In-Reply-To: <8324a612-8785-9db9-b0d4-ab943645a16d@amsat.org>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH 2/2] hw/arm/smmu-common: Fix
+ coverity issue in get_block_pte_address
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,63 +27,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: famz@redhat.com, stefanha@redhat.com, eblake@redhat.com, qemu-devel@nongnu.org, qemu-block@nongnu.org, eric.fangyi@huawei.com, wu.wubin@huawei.com
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, Eric Auger <eric.auger.pro@gmail.com>
 
-I enjoyed the great benefit of your suggestions, and I will improve next time. :)
-This time, I ask maintainers to touch up the commit message base on version 5 and merge it, thanks very much.
+Hi Philippe,
+On 05/16/2018 10:01 PM, Philippe Mathieu-Daud=C3=A9 wrote:
+> On 05/16/2018 01:23 PM, Peter Maydell wrote:
+>> On 16 May 2018 at 16:16, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>=
+ wrote:
+>>> Hi Eric,
+>>>
+>>> On 05/16/2018 03:03 PM, Eric Auger wrote:
+>>>> Coverity points out that this can overflow if n > 31,
+>>>> because it's only doing 32-bit arithmetic. Let's use 1ULL instead
+>>>> of 1. Also the formulae used to compute n can be replaced by
+>>>> the level_shift() macro.
+>>>
+>>> This level_shift() replacement doesn't seems that obvious to me, can =
+you
+>>> split it in another patch?
+>>>
+>>>>
+>>>> Reported-by: Peter Maydell <peter.maydell@linaro.org>
+>>>> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+>>>> ---
+>>>>  hw/arm/smmu-common.c | 4 ++--
+>>>>  1 file changed, 2 insertions(+), 2 deletions(-)
+>>>>
+>>>> diff --git a/hw/arm/smmu-common.c b/hw/arm/smmu-common.c
+>>>> index 01c7be8..3c5f724 100644
+>>>> --- a/hw/arm/smmu-common.c
+>>>> +++ b/hw/arm/smmu-common.c
+>>>> @@ -83,9 +83,9 @@ static inline hwaddr get_table_pte_address(uint64_=
+t pte, int granule_sz)
+>>>>  static inline hwaddr get_block_pte_address(uint64_t pte, int level,
+>>>>                                             int granule_sz, uint64_t=
+ *bsz)
+>>>>  {
+>>>> -    int n =3D (granule_sz - 3) * (4 - level) + 3;
+>>>> +    int n =3D level_shift(level, granule_sz);
+>>>
+>>> Shouldn't this be level_shift(level + 1, granule_sz)?
+>>
+>> No. The two expressions are equivalent, they're
+>> just arranged differently:
+>>
+>>    level_shift(lvl, gsz)
+>>       =3D=3D gsz + (3 - lvl) * (gsz - 3)
+>>       =3D=3D gsz + (4 - lvl) * (gsz - 3) - (gsz - 3)
+>>       =3D=3D gsz - gsz + (4 - lvl) * (gsz - 3) + 3
+>>       =3D=3D (gsz - 3) * (4 - lvl) + 3
+>=20
+> Argh I failed this middle school demonstrations...
+>=20
+> Thanks Peter :)
+>=20
+> So for the much cleaner level_shift() use:
+> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 
-On 2018/5/17 14:22, Peter Xu wrote:
-> On Thu, May 17, 2018 at 10:26:17AM +0800, Jie Wang wrote:
->> epoll_available will only be set if epollfd != -1, os we
->> can swap the two variables in aio_epoll_disable, and
->> aio_context_destroy can call aio_epoll_disable directly.
->>
->> Signed-off-by: Jie Wang <wangjie88@huawei.com>
->> ---
->>  util/aio-posix.c | 10 ++++------
->>  1 file changed, 4 insertions(+), 6 deletions(-)
->>
->> diff --git a/util/aio-posix.c b/util/aio-posix.c
->> index 0ade2c7..118bf57 100644
->> --- a/util/aio-posix.c
->> +++ b/util/aio-posix.c
->> @@ -45,11 +45,11 @@ struct AioHandler
->>  
->>  static void aio_epoll_disable(AioContext *ctx)
->>  {
->> -    ctx->epoll_available = false;
->> -    if (!ctx->epoll_enabled) {
->> +    ctx->epoll_enabled = false;
->> +    if (!ctx->epoll_available) {
->>          return;
->>      }
->> -    ctx->epoll_enabled = false;
->> +    ctx->epoll_available = false;
->>      close(ctx->epollfd);
->>  }
->>  
->> @@ -716,9 +716,7 @@ void aio_context_setup(AioContext *ctx)
->>  void aio_context_destroy(AioContext *ctx)
->>  {
->>  #ifdef CONFIG_EPOLL_CREATE1
->> -    if (ctx->epollfd >= 0) {
->> -        close(ctx->epollfd);
->> -    }
->> +    aio_epoll_disable(ctx);
-> 
-> Hmm... I think this patch should be the first if to split.
-> 
-> Anyway, IMHO version 5 is already good enough and has got r-bs, no
-> need to bother reposting a version 7.  Maintainer could possibly touch
-> up the commit message if necessary.
-> 
-> Thanks,
-> 
->>  #endif
->>  }
->>  
->> -- 
->> 1.8.3.1
->>
-> 
+Thank you for the review!
+
+Eric
+>=20
