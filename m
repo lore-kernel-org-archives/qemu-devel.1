@@ -1,28 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44604)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46571)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1fJIv6-0002sa-Jp
-	for qemu-devel@nongnu.org; Thu, 17 May 2018 09:26:16 -0400
+	(envelope-from <eblake@redhat.com>) id 1fJJ2w-0006OR-0v
+	for qemu-devel@nongnu.org; Thu, 17 May 2018 09:34:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1fJIv1-0003dW-U0
-	for qemu-devel@nongnu.org; Thu, 17 May 2018 09:26:12 -0400
-Received: from mail-wr0-f195.google.com ([209.85.128.195]:46824)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1fJIv1-0003dK-Mr
-	for qemu-devel@nongnu.org; Thu, 17 May 2018 09:26:07 -0400
-Received: by mail-wr0-f195.google.com with SMTP id x9-v6so2826638wrl.13
-	for <qemu-devel@nongnu.org>; Thu, 17 May 2018 06:26:07 -0700 (PDT)
-References: <1526560782-18732-1-git-send-email-pbonzini@redhat.com>
-	<20180517124403.GJ5657@redhat.com>
-	<20180517125110.lhipiezmvifrg3n6@sirius.home.kraxel.org>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <6e0213c3-017e-c794-a222-fde38676d7c8@redhat.com>
-Date: Thu, 17 May 2018 15:26:04 +0200
+	(envelope-from <eblake@redhat.com>) id 1fJJ2v-0006bV-13
+	for qemu-devel@nongnu.org; Thu, 17 May 2018 09:34:18 -0400
+References: <20180413143156.11409-1-vsementsov@virtuozzo.com>
+	<8003bc90-1b11-3d1b-07a3-dca4d49fb79b@virtuozzo.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <dcffbc2b-e0b0-3c90-0c29-aa0c0be64af8@redhat.com>
+Date: Thu, 17 May 2018 08:34:10 -0500
 MIME-Version: 1.0
-In-Reply-To: <20180517125110.lhipiezmvifrg3n6@sirius.home.kraxel.org>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <8003bc90-1b11-3d1b-07a3-dca4d49fb79b@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] ui: add x_keymap.o to modules
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] nbd/server: introduce NBD_CMD_CACHE
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,35 +24,88 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>, "=?UTF-8?Q?Daniel_P._Berrang=c3=a9?=" <berrange@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: mreitz@redhat.com, kwolf@redhat.com, den@openvz.org, pbonzini@redhat.com
 
-On 17/05/2018 14:51, Gerd Hoffmann wrote:
->   Hi,
-> 
->>> +ifeq ($(CONFIG_X11),y)
->>> +sdl.mo-objs += x_keymap.o
->>> +gtk.mo-objs += x_keymap.o
->>
->> Would this cause symbol clash if both sdl & gtk modules are loaded
->> at the same time, or have we used linker scripts to limit what symbols
->> each module exposes ?
-> 
-> Related: can modules depend on modules, so we could make x_keymap a
-> module of its own and have both gtk and sdl depend on it?
-> 
-> That would also be useful when trying to modularize spice.
+On 05/17/2018 04:52 AM, Vladimir Sementsov-Ogievskiy wrote:
+> Finally, what about this?
+>=20
+> 13.04.2018 17:31, Vladimir Sementsov-Ogievskiy wrote:
+>> Handle nbd CACHE command. Just do read, without sending read data back=
+.
+>> Cache mechanism should be done by exported node driver chain.
 
-How hard would it be to modularize the libspice-server side?  The part
-of the library that is used by QXL rendering should have much fewer
-dependencies than the part that is used for keyboard, mouse, audio,
-vmchannel/agent, etc.
+Still waiting on the NBD spec review, which I've pinged on the NBD list.=20
+But as mentioned there, I'll probably go ahead and accept this (possibly=20
+with slight tweaks) on Monday, after giving one more weekend for any=20
+last-minute review comments.
 
-Then you could link libspice-server-core into QEMU and libspice-server
-into the modules.  Unless both have been linked together, functions such
-as spice_server_add_client would fail, and so would adding most of the
-SPICE_INTERFACE_* interface kinds.
+>> @@ -1826,7 +1826,9 @@ static int nbd_co_receive_request(NBDRequestData=
+=20
+>> *req, NBDRequest *request,
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return -EIO;
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
+>> -=C2=A0=C2=A0=C2=A0 if (request->type =3D=3D NBD_CMD_READ || request->=
+type =3D=3D=20
+>> NBD_CMD_WRITE) {
+>> +=C2=A0=C2=A0=C2=A0 if (request->type =3D=3D NBD_CMD_READ || request->=
+type =3D=3D=20
+>> NBD_CMD_WRITE ||
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 request->type =3D=3D NBD_C=
+MD_CACHE)
+>> +=C2=A0=C2=A0=C2=A0 {
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (request->le=
+n > NBD_MAX_BUFFER_SIZE) {
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0 error_setg(errp, "len (%" PRIu32" ) is larger than max=20
+>> len (%u)",
 
-Thanks,
+I'm not sure I agree with this one. Since we aren't passing the cached=20
+data over the wire, we can reject the command with EINVAL instead of=20
+killing the connection entirely.
 
-Paolo
+(As it is, I wonder if we can be nicer about rejecting a read request >=20
+32M. For a write request, we have to disconnect; but for a read request,=20
+we can keep the connection alive by just returning EINVAL for a=20
+too-large read, instead of our current behavior of disconnecting)
+
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 =
+request->len, NBD_MAX_BUFFER_SIZE);
+>> @@ -1911,7 +1913,7 @@ static coroutine_fn int=20
+>> nbd_do_cmd_read(NBDClient *client, NBDRequest *request,
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 int ret;
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 NBDExport *exp =3D client->exp;
+>> -=C2=A0=C2=A0=C2=A0 assert(request->type =3D=3D NBD_CMD_READ);
+>> +=C2=A0=C2=A0=C2=A0 assert(request->type =3D=3D NBD_CMD_READ || reques=
+t->type =3D=3D=20
+>> NBD_CMD_CACHE);
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 /* XXX: NBD Protocol only documents use=
+ of FUA with WRITE */
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (request->flags & NBD_CMD_FLAG_FUA) =
+{
+>> @@ -1930,7 +1932,7 @@ static coroutine_fn int=20
+>> nbd_do_cmd_read(NBDClient *client, NBDRequest *request,
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ret =3D blk_pread(exp->blk, request->fr=
+om + exp->dev_offset, data,
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 request->len);
+>> -=C2=A0=C2=A0=C2=A0 if (ret < 0) {
+>> +=C2=A0=C2=A0=C2=A0 if (ret < 0 || request->type =3D=3D NBD_CMD_CACHE)=
+ {
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return nbd_send=
+_generic_reply(client, request->handle, ret,
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0 "reading from file failed",=20
+>> errp);
+
+As for the implementation on the server side, yes, this looks=20
+reasonable, given the proposed spec wording being considered on the NBD=20
+list.
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
