@@ -1,23 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33057)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38357)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <prvs=6682a862c=anthony.perard@citrix.com>)
-	id 1fJGlM-0002mc-Nk
-	for qemu-devel@nongnu.org; Thu, 17 May 2018 07:08:01 -0400
+	(envelope-from <no-reply@patchew.org>) id 1fJGvZ-00070Z-JV
+	for qemu-devel@nongnu.org; Thu, 17 May 2018 07:18:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <prvs=6682a862c=anthony.perard@citrix.com>)
-	id 1fJGlH-0004l6-SI
-	for qemu-devel@nongnu.org; Thu, 17 May 2018 07:08:00 -0400
-Date: Thu, 17 May 2018 12:07:50 +0100
-From: Anthony PERARD <anthony.perard@citrix.com>
-Message-ID: <20180517110750.GM2057@perard.uk.xensource.com>
-References: <1525461967-32174-1-git-send-email-paul.durrant@citrix.com>
-	<1525461967-32174-9-git-send-email-paul.durrant@citrix.com>
+	(envelope-from <no-reply@patchew.org>) id 1fJGvV-0005Y9-Gm
+	for qemu-devel@nongnu.org; Thu, 17 May 2018 07:18:33 -0400
+Resent-Message-Id: <E1fJGvV-0005Y9-Gm@eggs.gnu.org>
+Received: from sender-of-o51.zoho.com ([135.84.80.216]:21104)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1fJGvV-0005XO-6f
+	for qemu-devel@nongnu.org; Thu, 17 May 2018 07:18:29 -0400
+In-Reply-To: <20180517092513.735-1-kraxel@redhat.com>
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <152654956866.261.7414517447939932710@1f70390a8372>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <1525461967-32174-9-git-send-email-paul.durrant@citrix.com>
-Subject: Re: [Qemu-devel] [PATCH v3 8/8] xen_disk: be consistent with use of
- xendev and blkdev->xendev
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Thu, 17 May 2018 02:32:49 -0700 (PDT)
+Subject: Re: [Qemu-devel] [PATCH 0/4] display: add new bochs-display device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,26 +28,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paul Durrant <paul.durrant@citrix.com>
-Cc: xen-devel@lists.xenproject.org, qemu-block@nongnu.org, qemu-devel@nongnu.org, Stefano Stabellini <sstabellini@kernel.org>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
+To: kraxel@redhat.com
+Cc: famz@redhat.com, qemu-devel@nongnu.org
 
-On Fri, May 04, 2018 at 08:26:07PM +0100, Paul Durrant wrote:
-> Certain functions in xen_disk are called with a pointer to xendev
-> (struct XenDevice *). They then use continer_of() to acces the surrounding
-
-                                      ^ container_of
-
-> blkdev (struct XenBlkDev) but then in various places use &blkdev->xendev
-> when use of the original xendev pointer is shorter to express and clearly
-> equivalent.
-> 
-> This patch is a purely cosmetic patch which makes sure there is a xendev
-> pointer on stack for any function where the pointer is need on multiple
-> occasions modified those functions to use it consistently.
-> 
-> Signed-off-by: Paul Durrant <paul.durrant@citrix.com>
-
-Acked-by: Anthony PERARD <anthony.perard@citrix.com>
-
--- 
-Anthony PERARD
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
+c3NhZ2UtaWQ6IDIwMTgwNTE3MDkyNTEzLjczNS0xLWtyYXhlbEByZWRoYXQuY29tClN1YmplY3Q6
+IFtRZW11LWRldmVsXSBbUEFUQ0ggMC80XSBkaXNwbGF5OiBhZGQgbmV3IGJvY2hzLWRpc3BsYXkg
+ZGV2aWNlCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCgpCQVNFPWJhc2UK
+bj0xCnRvdGFsPSQoZ2l0IGxvZyAtLW9uZWxpbmUgJEJBU0UuLiB8IHdjIC1sKQpmYWlsZWQ9MAoK
+Z2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwg
+ZGlmZi5yZW5hbWVzIFRydWUKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYuYWxnb3JpdGhtIGhpc3Rv
+Z3JhbQoKY29tbWl0cz0iJChnaXQgbG9nIC0tZm9ybWF0PSVIIC0tcmV2ZXJzZSAkQkFTRS4uKSIK
+Zm9yIGMgaW4gJGNvbW1pdHM7IGRvCiAgICBlY2hvICJDaGVja2luZyBQQVRDSCAkbi8kdG90YWw6
+ICQoZ2l0IGxvZyAtbiAxIC0tZm9ybWF0PSVzICRjKS4uLiIKICAgIGlmICEgZ2l0IHNob3cgJGMg
+LS1mb3JtYXQ9ZW1haWwgfCAuL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIC07IHRo
+ZW4KICAgICAgICBmYWlsZWQ9MQogICAgICAgIGVjaG8KICAgIGZpCiAgICBuPSQoKG4rMSkpCmRv
+bmUKCmV4aXQgJGZhaWxlZAo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1
+YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApGcm9tIGh0dHBzOi8vZ2l0aHViLmNv
+bS9wYXRjaGV3LXByb2plY3QvcWVtdQogKiBbbmV3IHRhZ10gICAgICAgICAgICAgICBwYXRjaGV3
+LzIwMTgwNTE3MDkyNTEzLjczNS0xLWtyYXhlbEByZWRoYXQuY29tIC0+IHBhdGNoZXcvMjAxODA1
+MTcwOTI1MTMuNzM1LTEta3JheGVsQHJlZGhhdC5jb20KU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNo
+ICd0ZXN0JwoxMTBiNzc1ODEzIGJvY2hzLWRpc3BsYXk6IGFkZCBwY2llIHN1cHBvcnQKMWU3ZDAy
+NTU5MCBib2Nocy1kaXNwbGF5OiBhZGQgZGlydHkgdHJhY2tpbmcgc3VwcG9ydAphYjVlNDc4ZDA2
+IGRpc3BsYXk6IGFkZCBuZXcgYm9jaHMtZGlzcGxheSBkZXZpY2UKMTQ5YzczOGZiOSB2Z2E6IG1v
+dmUgYm9jaHMgdmJlIGRlZmluZXMgdG8gaGVhZGVyIGZpbGUKCj09PSBPVVRQVVQgQkVHSU4gPT09
+CkNoZWNraW5nIFBBVENIIDEvNDogdmdhOiBtb3ZlIGJvY2hzIHZiZSBkZWZpbmVzIHRvIGhlYWRl
+ciBmaWxlLi4uCldBUk5JTkc6IGFkZGVkLCBtb3ZlZCBvciBkZWxldGVkIGZpbGUocyksIGRvZXMg
+TUFJTlRBSU5FUlMgbmVlZCB1cGRhdGluZz8KIzg2OiAKbmV3IGZpbGUgbW9kZSAxMDA2NDQKCnRv
+dGFsOiAwIGVycm9ycywgMSB3YXJuaW5ncywgMTI3IGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2gg
+aGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9y
+cwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUK
+Q0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KQ2hlY2tpbmcgUEFUQ0ggMi80OiBkaXNwbGF5OiBh
+ZGQgbmV3IGJvY2hzLWRpc3BsYXkgZGV2aWNlLi4uCldBUk5JTkc6IGFkZGVkLCBtb3ZlZCBvciBk
+ZWxldGVkIGZpbGUocyksIGRvZXMgTUFJTlRBSU5FUlMgbmVlZCB1cGRhdGluZz8KIzQzOiAKbmV3
+IGZpbGUgbW9kZSAxMDA2NDQKCkVSUk9SOiBicmFjZXMge30gYXJlIG5lY2Vzc2FyeSBmb3IgYWxs
+IGFybXMgb2YgdGhpcyBzdGF0ZW1lbnQKIzE5OTogRklMRTogaHcvZGlzcGxheS9ib2Nocy1kaXNw
+bGF5LmM6MTUyOgorICAgIGlmICghKHZiZVtWQkVfRElTUElfSU5ERVhfRU5BQkxFXSAmIFZCRV9E
+SVNQSV9FTkFCTEVEKSkKWy4uLl0KCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiMy
+MDk6IEZJTEU6IGh3L2Rpc3BsYXkvYm9jaHMtZGlzcGxheS5jOjE2MjoKKyAgICAgICAgbW9kZS0+
+Zm9ybWF0ID0gcy0+YmlnX2VuZGlhbl9mYiA/IFBJWE1BTl9CRV94OHI4ZzhiOCA6IFBJWE1BTl9M
+RV94OHI4ZzhiODsKCkVSUk9SOiBicmFjZXMge30gYXJlIG5lY2Vzc2FyeSBmb3IgYWxsIGFybXMg
+b2YgdGhpcyBzdGF0ZW1lbnQKIzIxOTogRklMRTogaHcvZGlzcGxheS9ib2Nocy1kaXNwbGF5LmM6
+MTcyOgorICAgIGlmICh2aXJ0X3dpZHRoIDwgbW9kZS0+d2lkdGgpClsuLi5dCgpXQVJOSU5HOiBs
+aW5lIG92ZXIgODAgY2hhcmFjdGVycwojMzA5OiBGSUxFOiBody9kaXNwbGF5L2JvY2hzLWRpc3Bs
+YXkuYzoyNjI6CitzdGF0aWMgdm9pZCBib2Noc19kaXNwbGF5X3NldF9iaWdfZW5kaWFuX2ZiKE9i
+amVjdCAqb2JqLCBib29sIHZhbHVlLCBFcnJvciAqKmVycnApCgp0b3RhbDogMiBlcnJvcnMsIDMg
+d2FybmluZ3MsIDMzMCBsaW5lcyBjaGVja2VkCgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVt
+cywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0
+aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJ
+TlRBSU5FUlMuCgpDaGVja2luZyBQQVRDSCAzLzQ6IGJvY2hzLWRpc3BsYXk6IGFkZCBkaXJ0eSB0
+cmFja2luZyBzdXBwb3J0Li4uCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiM0NDog
+RklMRTogaHcvZGlzcGxheS9ib2Nocy1kaXNwbGF5LmM6MjMxOgorICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBtb2RlLm9mZnNldCArIG1vZGUuc3Ry
+aWRlICogeSwKCnRvdGFsOiAwIGVycm9ycywgMSB3YXJuaW5ncywgNTYgbGluZXMgY2hlY2tlZAoK
+WW91ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2Yg
+dGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50
+YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgpDaGVja2luZyBQQVRDSCA0LzQ6
+IGJvY2hzLWRpc3BsYXk6IGFkZCBwY2llIHN1cHBvcnQuLi4KPT09IE9VVFBVVCBFTkQgPT09CgpU
+ZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0
+b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQg
+eW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
