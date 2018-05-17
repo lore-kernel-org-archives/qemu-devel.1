@@ -1,29 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34867)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35059)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fJQOR-0003mQ-A6
-	for qemu-devel@nongnu.org; Thu, 17 May 2018 17:25:00 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1fJQPF-0004Ga-Vz
+	for qemu-devel@nongnu.org; Thu, 17 May 2018 17:25:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fJQOM-0005Ik-De
-	for qemu-devel@nongnu.org; Thu, 17 May 2018 17:24:59 -0400
-Received: from mail-wr0-x244.google.com ([2a00:1450:400c:c0c::244]:39911)
+	(envelope-from <alex.bennee@linaro.org>) id 1fJQPB-0006JS-3v
+	for qemu-devel@nongnu.org; Thu, 17 May 2018 17:25:50 -0400
+Received: from mail-wr0-x244.google.com ([2a00:1450:400c:c0c::244]:43285)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1fJQOM-0005Gv-6Z
-	for qemu-devel@nongnu.org; Thu, 17 May 2018 17:24:54 -0400
-Received: by mail-wr0-x244.google.com with SMTP id w18-v6so3327363wrn.6
-	for <qemu-devel@nongnu.org>; Thu, 17 May 2018 14:24:53 -0700 (PDT)
+	id 1fJQPA-0006Ia-TE
+	for qemu-devel@nongnu.org; Thu, 17 May 2018 17:25:45 -0400
+Received: by mail-wr0-x244.google.com with SMTP id v15-v6so7067915wrm.10
+	for <qemu-devel@nongnu.org>; Thu, 17 May 2018 14:25:44 -0700 (PDT)
 References: <20180517174718.10107-1-alex.bennee@linaro.org>
-	<20180517174718.10107-30-alex.bennee@linaro.org>
-	<9b8a5a71-2071-ef5c-07b2-3797883ed22e@linaro.org>
+	<20180517174718.10107-32-alex.bennee@linaro.org>
+	<0f3f1135-79fd-ba0e-080d-5366eb99093f@linaro.org>
 From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <9b8a5a71-2071-ef5c-07b2-3797883ed22e@linaro.org>
-Date: Thu, 17 May 2018 22:24:51 +0100
-Message-ID: <87muwydlgc.fsf@linaro.org>
+In-reply-to: <0f3f1135-79fd-ba0e-080d-5366eb99093f@linaro.org>
+Date: Thu, 17 May 2018 22:25:42 +0100
+Message-ID: <87lgcidlex.fsf@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v4 29/49] tests/tcg/arm: disable -p 32768
- mmap test
+Subject: Re: [Qemu-devel] [PATCH v4 31/49] tests/tcg/aarch64: add
+ Makefile.target
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,21 +38,36 @@ Cc: cota@braap.org, famz@redhat.com, berrange@redhat.com, f4bug@amsat.org, balro
 
 Richard Henderson <richard.henderson@linaro.org> writes:
 
-> On 05/17/2018 10:46 AM, Alex Benn=C3=A9e wrote:
->> Broken since I updated to 18.04
+> On 05/17/2018 10:47 AM, Alex Benn=C3=A9e wrote:
+>> Nothing much here yet.
 >>
 >> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
 >> ---
->>  tests/tcg/arm/Makefile.target | 8 ++++++++
->>  1 file changed, 8 insertions(+)
+>>  tests/tcg/aarch64/Makefile.target | 5 +++++
+>>  1 file changed, 5 insertions(+)
+>>  create mode 100644 tests/tcg/aarch64/Makefile.target
+>>
+>> diff --git a/tests/tcg/aarch64/Makefile.target b/tests/tcg/aarch64/Makef=
+ile.target
+>> new file mode 100644
+>> index 0000000000..4ac8fbe73f
+>> --- /dev/null
+>> +++ b/tests/tcg/aarch64/Makefile.target
+>> @@ -0,0 +1,5 @@
+>> +# -*- Mode: makefile -*-
+>> +#
+>> +# AArch64 specific tweaks
+>> +
+>> +fcvt: LDFLAGS+=3D-lm
+>>
 >
-> Meh.  Most of these fail for hosts with 64k pages.
-> So, sure, disable this one, but I don't think that
-> the others are useful either.
+> Merge this with adding fcvt, surely.
 
-I'm not entirely sure what the point of -p is meant to be. Is it just a
-performance hack for linux-user to have bigger pages? We are not using
-softmmu but I guess it affects the PageDesc structures?
+Yeah... too much shuffling around.
+>
+>
+> r~
+
 
 --
 Alex Benn=C3=A9e
