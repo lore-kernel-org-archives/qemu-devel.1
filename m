@@ -1,29 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52522)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53712)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fJPO4-0000Db-NV
-	for qemu-devel@nongnu.org; Thu, 17 May 2018 16:20:33 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1fJPU4-0002If-UN
+	for qemu-devel@nongnu.org; Thu, 17 May 2018 16:26:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fJPO0-0006Ft-O7
-	for qemu-devel@nongnu.org; Thu, 17 May 2018 16:20:32 -0400
-Received: from mail-pf0-x243.google.com ([2607:f8b0:400e:c00::243]:43340)
+	(envelope-from <richard.henderson@linaro.org>) id 1fJPU1-00028m-Q7
+	for qemu-devel@nongnu.org; Thu, 17 May 2018 16:26:44 -0400
+Received: from mail-pl0-x241.google.com ([2607:f8b0:400e:c01::241]:45606)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1fJPO0-0006Fb-H9
-	for qemu-devel@nongnu.org; Thu, 17 May 2018 16:20:28 -0400
-Received: by mail-pf0-x243.google.com with SMTP id j20-v6so2615732pff.10
-	for <qemu-devel@nongnu.org>; Thu, 17 May 2018 13:20:28 -0700 (PDT)
+	id 1fJPU1-00028W-JP
+	for qemu-devel@nongnu.org; Thu, 17 May 2018 16:26:41 -0400
+Received: by mail-pl0-x241.google.com with SMTP id bi12-v6so3190059plb.12
+	for <qemu-devel@nongnu.org>; Thu, 17 May 2018 13:26:41 -0700 (PDT)
 References: <20180517174718.10107-1-alex.bennee@linaro.org>
-	<20180517174718.10107-30-alex.bennee@linaro.org>
+	<20180517174718.10107-31-alex.bennee@linaro.org>
 From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <9b8a5a71-2071-ef5c-07b2-3797883ed22e@linaro.org>
-Date: Thu, 17 May 2018 13:20:24 -0700
+Message-ID: <016c5b98-6c8f-6cdf-3143-3b0dbab9829d@linaro.org>
+Date: Thu, 17 May 2018 13:26:37 -0700
 MIME-Version: 1.0
-In-Reply-To: <20180517174718.10107-30-alex.bennee@linaro.org>
+In-Reply-To: <20180517174718.10107-31-alex.bennee@linaro.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v4 29/49] tests/tcg/arm: disable -p 32768
- mmap test
+Subject: Re: [Qemu-devel] [PATCH v4 30/49] tests/tcg: enable building for
+ AArch64
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,16 +36,20 @@ To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, cota@braap.org, famz@
 Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, "open list:ARM" <qemu-arm@nongnu.org>
 
 On 05/17/2018 10:46 AM, Alex Bennée wrote:
-> Broken since I updated to 18.04
+> We only have compilers for the (default) little endian variants.
 > 
 > Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+> 
 > ---
->  tests/tcg/arm/Makefile.target | 8 ++++++++
->  1 file changed, 8 insertions(+)
+> v4
+>   - update MAINTAINERS
+> ---
+>  MAINTAINERS                        | 1 +
+>  tests/tcg/aarch64/Makefile.include | 8 ++++++++
+>  2 files changed, 9 insertions(+)
+>  create mode 100644 tests/tcg/aarch64/Makefile.include
 
-Meh.  Most of these fail for hosts with 64k pages.
-So, sure, disable this one, but I don't think that
-the others are useful either.
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
 
 r~
