@@ -1,24 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47686)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47710)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fJRii-0001Sr-B5
-	for qemu-devel@nongnu.org; Thu, 17 May 2018 18:50:01 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1fJRij-0001T4-EA
+	for qemu-devel@nongnu.org; Thu, 17 May 2018 18:50:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fJRif-0006Ad-4n
-	for qemu-devel@nongnu.org; Thu, 17 May 2018 18:50:00 -0400
-Received: from mail-pg0-x241.google.com ([2607:f8b0:400e:c05::241]:42899)
+	(envelope-from <richard.henderson@linaro.org>) id 1fJRih-0006Em-6B
+	for qemu-devel@nongnu.org; Thu, 17 May 2018 18:50:01 -0400
+Received: from mail-pl0-x229.google.com ([2607:f8b0:400e:c01::229]:43568)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1fJRie-00069y-T5
-	for qemu-devel@nongnu.org; Thu, 17 May 2018 18:49:57 -0400
-Received: by mail-pg0-x241.google.com with SMTP id p9-v6so2432006pgc.9
-	for <qemu-devel@nongnu.org>; Thu, 17 May 2018 15:49:56 -0700 (PDT)
+	id 1fJRig-0006D3-Ti
+	for qemu-devel@nongnu.org; Thu, 17 May 2018 18:49:59 -0400
+Received: by mail-pl0-x229.google.com with SMTP id c41-v6so3383429plj.10
+	for <qemu-devel@nongnu.org>; Thu, 17 May 2018 15:49:58 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Thu, 17 May 2018 15:49:52 -0700
-Message-Id: <20180517224953.11642-1-richard.henderson@linaro.org>
+Date: Thu, 17 May 2018 15:49:53 -0700
+Message-Id: <20180517224953.11642-2-richard.henderson@linaro.org>
+In-Reply-To: <20180517224953.11642-1-richard.henderson@linaro.org>
+References: <20180517224953.11642-1-richard.henderson@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL v2 00/28] softfloat patch roundup
+Subject: [Qemu-devel] [PULL v2 09/28] target/arm: convert conversion helpers
+ to fpst/ahp_flag
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,86 +31,428 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, qemu-arm@nongnu.org
+Cc: peter.maydell@linaro.org, qemu-arm@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 
-V2 fixing the two erroneous uses of get_fpstatus_ptr
-within the aa32 translator in patch 9.
+From: Alex Bennée <alex.bennee@linaro.org>
 
-Only reposting 9/28 here.
+Instead of passing env and leaving it up to the helper to get the
+right fpstatus we pass it explicitly. There was already a get_fpstatus
+helper for neon for the 32 bit code. We also add an get_ahp_flag() for
+passing the state of the alternative FP16 format flag. This leaves
+scope for later tracking the AHP state in translation flags.
 
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+---
+ target/arm/helper.h        | 10 +++---
+ target/arm/translate.h     | 12 +++++++
+ target/arm/helper.c        | 56 +++++------------------------
+ target/arm/translate-a64.c | 37 +++++++++++++++----
+ target/arm/translate.c     | 74 +++++++++++++++++++++++++++++---------
+ 5 files changed, 112 insertions(+), 77 deletions(-)
 
-r~
-
-
-
-The following changes since commit a4207e3b00e89f934adb231057dcf9a75ac2ae45:
-
-  Merge remote-tracking branch 'remotes/cody/tags/block-pull-request' into staging (2018-05-17 11:59:50 +0100)
-
-are available in the Git repository at:
-
-  git://github.com/rth7680/qemu.git pull-fpu-20180517
-
-for you to fetch changes up to 377ed92679a2a5f838bc0a095112ea5020720fff:
-
-  fpu/softfloat: Define floatN_silence_nan in terms of parts_silence_nan (2018-05-17 15:27:15 -0700)
-
-----------------------------------------------------------------
-Roundup of softfloat patches
-
-----------------------------------------------------------------
-Alex Bennée (4):
-      target/arm: convert conversion helpers to fpst/ahp_flag
-      target/arm: squash FZ16 behaviour for conversions
-      fpu/softfloat: Partial support for ARM Alternative half-precision
-      fpu/softfloat: re-factor float to float conversions
-
-Petr Tesarik (1):
-      fpu/softfloat: Fix conversion from uint64 to float128
-
-Richard Henderson (23):
-      fpu/softfloat: Merge NO_SIGNALING_NANS definitions
-      fpu/softfloat: Split floatXX_silence_nan from floatXX_maybe_silence_nan
-      fpu/softfloat: Move softfloat-specialize.h below FloatParts definition
-      fpu/softfloat: Canonicalize NaN fraction
-      fpu/softfloat: Introduce parts_is_snan_frac
-      fpu/softfloat: Replace float_class_dnan with parts_default_nan
-      fpu/softfloat: Replace float_class_msnan with parts_silence_nan
-      target/arm: Use floatX_silence_nan when we have already checked for SNaN
-      target/arm: Remove floatX_maybe_silence_nan from conversions
-      target/hppa: Remove floatX_maybe_silence_nan from conversions
-      target/m68k: Use floatX_silence_nan when we have already checked for SNaN
-      target/mips: Remove floatX_maybe_silence_nan from conversions
-      target/riscv: Remove floatX_maybe_silence_nan from conversions
-      target/s390x: Remove floatX_maybe_silence_nan from conversions
-      fpu/softfloat: Use float*_silence_nan in propagateFloat*NaN
-      fpu/softfloat: Remove floatX_maybe_silence_nan
-      fpu/softfloat: Specialize on snan_bit_is_one
-      fpu/softfloat: Make is_nan et al available to softfloat-specialize.h
-      fpu/softfloat: Pass FloatClass to pickNaN
-      fpu/softfloat: Pass FloatClass to pickNaNMulAdd
-      fpu/softfloat: Define floatN_default_nan in terms of parts_default_nan
-      fpu/softfloat: Clean up parts_default_nan
-      fpu/softfloat: Define floatN_silence_nan in terms of parts_silence_nan
-
- fpu/softfloat-specialize.h    | 691 ++++++++++++++++------------------------
- include/fpu/softfloat-types.h |   1 +
- include/fpu/softfloat.h       |  18 +-
- target/arm/helper.h           |  10 +-
- target/arm/translate.h        |  12 +
- fpu/softfloat.c               | 726 +++++++++++++++---------------------------
- target/arm/helper-a64.c       |   7 +-
- target/arm/helper.c           | 114 +++----
- target/arm/translate-a64.c    |  37 ++-
- target/arm/translate.c        |  74 ++++-
- target/hppa/cpu.c             |   1 -
- target/hppa/op_helper.c       |   2 -
- target/m68k/softfloat.c       |   3 +-
- target/mips/msa_helper.c      |   4 -
- target/mips/op_helper.c       |   2 -
- target/ppc/fpu_helper.c       |   1 -
- target/riscv/fpu_helper.c     |   6 +-
- target/s390x/fpu_helper.c     |  12 +-
- target/sh4/cpu.c              |   1 -
- target/unicore32/cpu.c        |   2 -
- 20 files changed, 718 insertions(+), 1006 deletions(-)
+diff --git a/target/arm/helper.h b/target/arm/helper.h
+index ce89968b2d..047f3bc1ca 100644
+--- a/target/arm/helper.h
++++ b/target/arm/helper.h
+@@ -187,12 +187,10 @@ DEF_HELPER_3(vfp_uqtoh, f16, i64, i32, ptr)
+ DEF_HELPER_FLAGS_2(set_rmode, TCG_CALL_NO_RWG, i32, i32, ptr)
+ DEF_HELPER_FLAGS_2(set_neon_rmode, TCG_CALL_NO_RWG, i32, i32, env)
+ 
+-DEF_HELPER_2(vfp_fcvt_f16_to_f32, f32, i32, env)
+-DEF_HELPER_2(vfp_fcvt_f32_to_f16, i32, f32, env)
+-DEF_HELPER_2(neon_fcvt_f16_to_f32, f32, i32, env)
+-DEF_HELPER_2(neon_fcvt_f32_to_f16, i32, f32, env)
+-DEF_HELPER_FLAGS_2(vfp_fcvt_f16_to_f64, TCG_CALL_NO_RWG, f64, i32, env)
+-DEF_HELPER_FLAGS_2(vfp_fcvt_f64_to_f16, TCG_CALL_NO_RWG, i32, f64, env)
++DEF_HELPER_FLAGS_3(vfp_fcvt_f16_to_f32, TCG_CALL_NO_RWG, f32, f16, ptr, i32)
++DEF_HELPER_FLAGS_3(vfp_fcvt_f32_to_f16, TCG_CALL_NO_RWG, f16, f32, ptr, i32)
++DEF_HELPER_FLAGS_3(vfp_fcvt_f16_to_f64, TCG_CALL_NO_RWG, f64, f16, ptr, i32)
++DEF_HELPER_FLAGS_3(vfp_fcvt_f64_to_f16, TCG_CALL_NO_RWG, f16, f64, ptr, i32)
+ 
+ DEF_HELPER_4(vfp_muladdd, f64, f64, f64, f64, ptr)
+ DEF_HELPER_4(vfp_muladds, f32, f32, f32, f32, ptr)
+diff --git a/target/arm/translate.h b/target/arm/translate.h
+index 37a1bba056..45f04244be 100644
+--- a/target/arm/translate.h
++++ b/target/arm/translate.h
+@@ -177,4 +177,16 @@ void arm_free_cc(DisasCompare *cmp);
+ void arm_jump_cc(DisasCompare *cmp, TCGLabel *label);
+ void arm_gen_test_cc(int cc, TCGLabel *label);
+ 
++/* Return state of Alternate Half-precision flag, caller frees result */
++static inline TCGv_i32 get_ahp_flag(void)
++{
++    TCGv_i32 ret = tcg_temp_new_i32();
++
++    tcg_gen_ld_i32(ret, cpu_env,
++                   offsetof(CPUARMState, vfp.xregs[ARM_VFP_FPSCR]));
++    tcg_gen_extract_i32(ret, ret, 26, 1);
++
++    return ret;
++}
++
+ #endif /* TARGET_ARM_TRANSLATE_H */
+diff --git a/target/arm/helper.c b/target/arm/helper.c
+index c6fd7f9479..1762042fc7 100644
+--- a/target/arm/helper.c
++++ b/target/arm/helper.c
+@@ -11540,64 +11540,24 @@ uint32_t HELPER(set_neon_rmode)(uint32_t rmode, CPUARMState *env)
+ }
+ 
+ /* Half precision conversions.  */
+-static float32 do_fcvt_f16_to_f32(uint32_t a, CPUARMState *env, float_status *s)
++float32 HELPER(vfp_fcvt_f16_to_f32)(float16 a, void *fpstp, uint32_t ahp_mode)
+ {
+-    int ieee = (env->vfp.xregs[ARM_VFP_FPSCR] & (1 << 26)) == 0;
+-    float32 r = float16_to_float32(make_float16(a), ieee, s);
+-    if (ieee) {
+-        return float32_maybe_silence_nan(r, s);
+-    }
+-    return r;
++    return float16_to_float32(a, !ahp_mode, fpstp);
+ }
+ 
+-static uint32_t do_fcvt_f32_to_f16(float32 a, CPUARMState *env, float_status *s)
++float16 HELPER(vfp_fcvt_f32_to_f16)(float32 a, void *fpstp, uint32_t ahp_mode)
+ {
+-    int ieee = (env->vfp.xregs[ARM_VFP_FPSCR] & (1 << 26)) == 0;
+-    float16 r = float32_to_float16(a, ieee, s);
+-    if (ieee) {
+-        r = float16_maybe_silence_nan(r, s);
+-    }
+-    return float16_val(r);
++    return float32_to_float16(a, !ahp_mode, fpstp);
+ }
+ 
+-float32 HELPER(neon_fcvt_f16_to_f32)(uint32_t a, CPUARMState *env)
++float64 HELPER(vfp_fcvt_f16_to_f64)(float16 a, void *fpstp, uint32_t ahp_mode)
+ {
+-    return do_fcvt_f16_to_f32(a, env, &env->vfp.standard_fp_status);
++    return float16_to_float64(a, !ahp_mode, fpstp);
+ }
+ 
+-uint32_t HELPER(neon_fcvt_f32_to_f16)(float32 a, CPUARMState *env)
++float16 HELPER(vfp_fcvt_f64_to_f16)(float64 a, void *fpstp, uint32_t ahp_mode)
+ {
+-    return do_fcvt_f32_to_f16(a, env, &env->vfp.standard_fp_status);
+-}
+-
+-float32 HELPER(vfp_fcvt_f16_to_f32)(uint32_t a, CPUARMState *env)
+-{
+-    return do_fcvt_f16_to_f32(a, env, &env->vfp.fp_status);
+-}
+-
+-uint32_t HELPER(vfp_fcvt_f32_to_f16)(float32 a, CPUARMState *env)
+-{
+-    return do_fcvt_f32_to_f16(a, env, &env->vfp.fp_status);
+-}
+-
+-float64 HELPER(vfp_fcvt_f16_to_f64)(uint32_t a, CPUARMState *env)
+-{
+-    int ieee = (env->vfp.xregs[ARM_VFP_FPSCR] & (1 << 26)) == 0;
+-    float64 r = float16_to_float64(make_float16(a), ieee, &env->vfp.fp_status);
+-    if (ieee) {
+-        return float64_maybe_silence_nan(r, &env->vfp.fp_status);
+-    }
+-    return r;
+-}
+-
+-uint32_t HELPER(vfp_fcvt_f64_to_f16)(float64 a, CPUARMState *env)
+-{
+-    int ieee = (env->vfp.xregs[ARM_VFP_FPSCR] & (1 << 26)) == 0;
+-    float16 r = float64_to_float16(a, ieee, &env->vfp.fp_status);
+-    if (ieee) {
+-        r = float16_maybe_silence_nan(r, &env->vfp.fp_status);
+-    }
+-    return float16_val(r);
++    return float64_to_float16(a, !ahp_mode, fpstp);
+ }
+ 
+ #define float32_two make_float32(0x40000000)
+diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
+index a0b0c43d12..d8284678f7 100644
+--- a/target/arm/translate-a64.c
++++ b/target/arm/translate-a64.c
+@@ -5147,10 +5147,15 @@ static void handle_fp_fcvt(DisasContext *s, int opcode,
+         } else {
+             /* Single to half */
+             TCGv_i32 tcg_rd = tcg_temp_new_i32();
+-            gen_helper_vfp_fcvt_f32_to_f16(tcg_rd, tcg_rn, cpu_env);
++            TCGv_i32 ahp = get_ahp_flag();
++            TCGv_ptr fpst = get_fpstatus_ptr(false);
++
++            gen_helper_vfp_fcvt_f32_to_f16(tcg_rd, tcg_rn, fpst, ahp);
+             /* write_fp_sreg is OK here because top half of tcg_rd is zero */
+             write_fp_sreg(s, rd, tcg_rd);
+             tcg_temp_free_i32(tcg_rd);
++            tcg_temp_free_i32(ahp);
++            tcg_temp_free_ptr(fpst);
+         }
+         tcg_temp_free_i32(tcg_rn);
+         break;
+@@ -5163,9 +5168,13 @@ static void handle_fp_fcvt(DisasContext *s, int opcode,
+             /* Double to single */
+             gen_helper_vfp_fcvtsd(tcg_rd, tcg_rn, cpu_env);
+         } else {
++            TCGv_ptr fpst = get_fpstatus_ptr(false);
++            TCGv_i32 ahp = get_ahp_flag();
+             /* Double to half */
+-            gen_helper_vfp_fcvt_f64_to_f16(tcg_rd, tcg_rn, cpu_env);
++            gen_helper_vfp_fcvt_f64_to_f16(tcg_rd, tcg_rn, fpst, ahp);
+             /* write_fp_sreg is OK here because top half of tcg_rd is zero */
++            tcg_temp_free_ptr(fpst);
++            tcg_temp_free_i32(ahp);
+         }
+         write_fp_sreg(s, rd, tcg_rd);
+         tcg_temp_free_i32(tcg_rd);
+@@ -5175,17 +5184,21 @@ static void handle_fp_fcvt(DisasContext *s, int opcode,
+     case 0x3:
+     {
+         TCGv_i32 tcg_rn = read_fp_sreg(s, rn);
++        TCGv_ptr tcg_fpst = get_fpstatus_ptr(false);
++        TCGv_i32 tcg_ahp = get_ahp_flag();
+         tcg_gen_ext16u_i32(tcg_rn, tcg_rn);
+         if (dtype == 0) {
+             /* Half to single */
+             TCGv_i32 tcg_rd = tcg_temp_new_i32();
+-            gen_helper_vfp_fcvt_f16_to_f32(tcg_rd, tcg_rn, cpu_env);
++            gen_helper_vfp_fcvt_f16_to_f32(tcg_rd, tcg_rn, tcg_fpst, tcg_ahp);
+             write_fp_sreg(s, rd, tcg_rd);
++            tcg_temp_free_ptr(tcg_fpst);
++            tcg_temp_free_i32(tcg_ahp);
+             tcg_temp_free_i32(tcg_rd);
+         } else {
+             /* Half to double */
+             TCGv_i64 tcg_rd = tcg_temp_new_i64();
+-            gen_helper_vfp_fcvt_f16_to_f64(tcg_rd, tcg_rn, cpu_env);
++            gen_helper_vfp_fcvt_f16_to_f64(tcg_rd, tcg_rn, tcg_fpst, tcg_ahp);
+             write_fp_dreg(s, rd, tcg_rd);
+             tcg_temp_free_i64(tcg_rd);
+         }
+@@ -9053,12 +9066,17 @@ static void handle_2misc_narrow(DisasContext *s, bool scalar,
+             } else {
+                 TCGv_i32 tcg_lo = tcg_temp_new_i32();
+                 TCGv_i32 tcg_hi = tcg_temp_new_i32();
++                TCGv_ptr fpst = get_fpstatus_ptr(false);
++                TCGv_i32 ahp = get_ahp_flag();
++
+                 tcg_gen_extr_i64_i32(tcg_lo, tcg_hi, tcg_op);
+-                gen_helper_vfp_fcvt_f32_to_f16(tcg_lo, tcg_lo, cpu_env);
+-                gen_helper_vfp_fcvt_f32_to_f16(tcg_hi, tcg_hi, cpu_env);
++                gen_helper_vfp_fcvt_f32_to_f16(tcg_lo, tcg_lo, fpst, ahp);
++                gen_helper_vfp_fcvt_f32_to_f16(tcg_hi, tcg_hi, fpst, ahp);
+                 tcg_gen_deposit_i32(tcg_res[pass], tcg_lo, tcg_hi, 16, 16);
+                 tcg_temp_free_i32(tcg_lo);
+                 tcg_temp_free_i32(tcg_hi);
++                tcg_temp_free_ptr(fpst);
++                tcg_temp_free_i32(ahp);
+             }
+             break;
+         case 0x56:  /* FCVTXN, FCVTXN2 */
+@@ -11532,18 +11550,23 @@ static void handle_2misc_widening(DisasContext *s, int opcode, bool is_q,
+         /* 16 -> 32 bit fp conversion */
+         int srcelt = is_q ? 4 : 0;
+         TCGv_i32 tcg_res[4];
++        TCGv_ptr fpst = get_fpstatus_ptr(false);
++        TCGv_i32 ahp = get_ahp_flag();
+ 
+         for (pass = 0; pass < 4; pass++) {
+             tcg_res[pass] = tcg_temp_new_i32();
+ 
+             read_vec_element_i32(s, tcg_res[pass], rn, srcelt + pass, MO_16);
+             gen_helper_vfp_fcvt_f16_to_f32(tcg_res[pass], tcg_res[pass],
+-                                           cpu_env);
++                                           fpst, ahp);
+         }
+         for (pass = 0; pass < 4; pass++) {
+             write_vec_element_i32(s, tcg_res[pass], rd, pass, MO_32);
+             tcg_temp_free_i32(tcg_res[pass]);
+         }
++
++        tcg_temp_free_ptr(fpst);
++        tcg_temp_free_i32(ahp);
+     }
+ }
+ 
+diff --git a/target/arm/translate.c b/target/arm/translate.c
+index 731cf327a1..46a9725bfd 100644
+--- a/target/arm/translate.c
++++ b/target/arm/translate.c
+@@ -3824,38 +3824,56 @@ static int disas_vfp_insn(DisasContext *s, uint32_t insn)
+                         gen_vfp_sqrt(dp);
+                         break;
+                     case 4: /* vcvtb.f32.f16, vcvtb.f64.f16 */
++                    {
++                        TCGv_ptr fpst = get_fpstatus_ptr(false);
++                        TCGv_i32 ahp_mode = get_ahp_flag();
+                         tmp = gen_vfp_mrs();
+                         tcg_gen_ext16u_i32(tmp, tmp);
+                         if (dp) {
+                             gen_helper_vfp_fcvt_f16_to_f64(cpu_F0d, tmp,
+-                                                           cpu_env);
++                                                           fpst, ahp_mode);
+                         } else {
+                             gen_helper_vfp_fcvt_f16_to_f32(cpu_F0s, tmp,
+-                                                           cpu_env);
++                                                           fpst, ahp_mode);
+                         }
++                        tcg_temp_free_i32(ahp_mode);
++                        tcg_temp_free_ptr(fpst);
+                         tcg_temp_free_i32(tmp);
+                         break;
++                    }
+                     case 5: /* vcvtt.f32.f16, vcvtt.f64.f16 */
++                    {
++                        TCGv_ptr fpst = get_fpstatus_ptr(false);
++                        TCGv_i32 ahp = get_ahp_flag();
+                         tmp = gen_vfp_mrs();
+                         tcg_gen_shri_i32(tmp, tmp, 16);
+                         if (dp) {
+                             gen_helper_vfp_fcvt_f16_to_f64(cpu_F0d, tmp,
+-                                                           cpu_env);
++                                                           fpst, ahp);
+                         } else {
+                             gen_helper_vfp_fcvt_f16_to_f32(cpu_F0s, tmp,
+-                                                           cpu_env);
++                                                           fpst, ahp);
+                         }
+                         tcg_temp_free_i32(tmp);
++                        tcg_temp_free_i32(ahp);
++                        tcg_temp_free_ptr(fpst);
+                         break;
++                    }
+                     case 6: /* vcvtb.f16.f32, vcvtb.f16.f64 */
++                    {
++                        TCGv_ptr fpst = get_fpstatus_ptr(false);
++                        TCGv_i32 ahp = get_ahp_flag();
+                         tmp = tcg_temp_new_i32();
++
+                         if (dp) {
+                             gen_helper_vfp_fcvt_f64_to_f16(tmp, cpu_F0d,
+-                                                           cpu_env);
++                                                           fpst, ahp);
+                         } else {
+                             gen_helper_vfp_fcvt_f32_to_f16(tmp, cpu_F0s,
+-                                                           cpu_env);
++                                                           fpst, ahp);
+                         }
++                        tcg_temp_free_i32(ahp);
++                        tcg_temp_free_ptr(fpst);
+                         gen_mov_F0_vreg(0, rd);
+                         tmp2 = gen_vfp_mrs();
+                         tcg_gen_andi_i32(tmp2, tmp2, 0xffff0000);
+@@ -3863,15 +3881,21 @@ static int disas_vfp_insn(DisasContext *s, uint32_t insn)
+                         tcg_temp_free_i32(tmp2);
+                         gen_vfp_msr(tmp);
+                         break;
++                    }
+                     case 7: /* vcvtt.f16.f32, vcvtt.f16.f64 */
++                    {
++                        TCGv_ptr fpst = get_fpstatus_ptr(false);
++                        TCGv_i32 ahp = get_ahp_flag();
+                         tmp = tcg_temp_new_i32();
+                         if (dp) {
+                             gen_helper_vfp_fcvt_f64_to_f16(tmp, cpu_F0d,
+-                                                           cpu_env);
++                                                           fpst, ahp);
+                         } else {
+                             gen_helper_vfp_fcvt_f32_to_f16(tmp, cpu_F0s,
+-                                                           cpu_env);
++                                                           fpst, ahp);
+                         }
++                        tcg_temp_free_i32(ahp);
++                        tcg_temp_free_ptr(fpst);
+                         tcg_gen_shli_i32(tmp, tmp, 16);
+                         gen_mov_F0_vreg(0, rd);
+                         tmp2 = gen_vfp_mrs();
+@@ -3880,6 +3904,7 @@ static int disas_vfp_insn(DisasContext *s, uint32_t insn)
+                         tcg_temp_free_i32(tmp2);
+                         gen_vfp_msr(tmp);
+                         break;
++                    }
+                     case 8: /* cmp */
+                         gen_vfp_cmp(dp);
+                         break;
+@@ -7222,53 +7247,70 @@ static int disas_neon_data_insn(DisasContext *s, uint32_t insn)
+                     }
+                     break;
+                 case NEON_2RM_VCVT_F16_F32:
++                {
++                    TCGv_ptr fpst;
++                    TCGv_i32 ahp;
++
+                     if (!arm_dc_feature(s, ARM_FEATURE_VFP_FP16) ||
+                         q || (rm & 1)) {
+                         return 1;
+                     }
+                     tmp = tcg_temp_new_i32();
+                     tmp2 = tcg_temp_new_i32();
++                    fpst = get_fpstatus_ptr(true);
++                    ahp = get_ahp_flag();
+                     tcg_gen_ld_f32(cpu_F0s, cpu_env, neon_reg_offset(rm, 0));
+-                    gen_helper_neon_fcvt_f32_to_f16(tmp, cpu_F0s, cpu_env);
++                    gen_helper_vfp_fcvt_f32_to_f16(tmp, cpu_F0s, fpst, ahp);
+                     tcg_gen_ld_f32(cpu_F0s, cpu_env, neon_reg_offset(rm, 1));
+-                    gen_helper_neon_fcvt_f32_to_f16(tmp2, cpu_F0s, cpu_env);
++                    gen_helper_vfp_fcvt_f32_to_f16(tmp2, cpu_F0s, fpst, ahp);
+                     tcg_gen_shli_i32(tmp2, tmp2, 16);
+                     tcg_gen_or_i32(tmp2, tmp2, tmp);
+                     tcg_gen_ld_f32(cpu_F0s, cpu_env, neon_reg_offset(rm, 2));
+-                    gen_helper_neon_fcvt_f32_to_f16(tmp, cpu_F0s, cpu_env);
++                    gen_helper_vfp_fcvt_f32_to_f16(tmp, cpu_F0s, fpst, ahp);
+                     tcg_gen_ld_f32(cpu_F0s, cpu_env, neon_reg_offset(rm, 3));
+                     neon_store_reg(rd, 0, tmp2);
+                     tmp2 = tcg_temp_new_i32();
+-                    gen_helper_neon_fcvt_f32_to_f16(tmp2, cpu_F0s, cpu_env);
++                    gen_helper_vfp_fcvt_f32_to_f16(tmp2, cpu_F0s, fpst, ahp);
+                     tcg_gen_shli_i32(tmp2, tmp2, 16);
+                     tcg_gen_or_i32(tmp2, tmp2, tmp);
+                     neon_store_reg(rd, 1, tmp2);
+                     tcg_temp_free_i32(tmp);
++                    tcg_temp_free_i32(ahp);
++                    tcg_temp_free_ptr(fpst);
+                     break;
++                }
+                 case NEON_2RM_VCVT_F32_F16:
++                {
++                    TCGv_ptr fpst;
++                    TCGv_i32 ahp;
+                     if (!arm_dc_feature(s, ARM_FEATURE_VFP_FP16) ||
+                         q || (rd & 1)) {
+                         return 1;
+                     }
++                    fpst = get_fpstatus_ptr(true);
++                    ahp = get_ahp_flag();
+                     tmp3 = tcg_temp_new_i32();
+                     tmp = neon_load_reg(rm, 0);
+                     tmp2 = neon_load_reg(rm, 1);
+                     tcg_gen_ext16u_i32(tmp3, tmp);
+-                    gen_helper_neon_fcvt_f16_to_f32(cpu_F0s, tmp3, cpu_env);
++                    gen_helper_vfp_fcvt_f16_to_f32(cpu_F0s, tmp3, fpst, ahp);
+                     tcg_gen_st_f32(cpu_F0s, cpu_env, neon_reg_offset(rd, 0));
+                     tcg_gen_shri_i32(tmp3, tmp, 16);
+-                    gen_helper_neon_fcvt_f16_to_f32(cpu_F0s, tmp3, cpu_env);
++                    gen_helper_vfp_fcvt_f16_to_f32(cpu_F0s, tmp3, fpst, ahp);
+                     tcg_gen_st_f32(cpu_F0s, cpu_env, neon_reg_offset(rd, 1));
+                     tcg_temp_free_i32(tmp);
+                     tcg_gen_ext16u_i32(tmp3, tmp2);
+-                    gen_helper_neon_fcvt_f16_to_f32(cpu_F0s, tmp3, cpu_env);
++                    gen_helper_vfp_fcvt_f16_to_f32(cpu_F0s, tmp3, fpst, ahp);
+                     tcg_gen_st_f32(cpu_F0s, cpu_env, neon_reg_offset(rd, 2));
+                     tcg_gen_shri_i32(tmp3, tmp2, 16);
+-                    gen_helper_neon_fcvt_f16_to_f32(cpu_F0s, tmp3, cpu_env);
++                    gen_helper_vfp_fcvt_f16_to_f32(cpu_F0s, tmp3, fpst, ahp);
+                     tcg_gen_st_f32(cpu_F0s, cpu_env, neon_reg_offset(rd, 3));
+                     tcg_temp_free_i32(tmp2);
+                     tcg_temp_free_i32(tmp3);
++                    tcg_temp_free_i32(ahp);
++                    tcg_temp_free_ptr(fpst);
+                     break;
++                }
+                 case NEON_2RM_AESE: case NEON_2RM_AESMC:
+                     if (!arm_dc_feature(s, ARM_FEATURE_V8_AES)
+                         || ((rm | rd) & 1)) {
+-- 
+2.17.0
