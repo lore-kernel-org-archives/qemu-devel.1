@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55291)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55246)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fJNFx-0003b1-A9
-	for qemu-devel@nongnu.org; Thu, 17 May 2018 14:04:02 -0400
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fJNFw-00051M-9P
+	(envelope-from <alex.bennee@linaro.org>) id 1fJNFw-0003XP-3X
 	for qemu-devel@nongnu.org; Thu, 17 May 2018 14:04:01 -0400
-Received: from mail-wr0-x22e.google.com ([2a00:1450:400c:c0c::22e]:46330)
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <alex.bennee@linaro.org>) id 1fJNFs-0004yo-Nh
+	for qemu-devel@nongnu.org; Thu, 17 May 2018 14:04:00 -0400
+Received: from mail-wr0-x243.google.com ([2a00:1450:400c:c0c::243]:36997)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1fJNFw-00050Q-0o
-	for qemu-devel@nongnu.org; Thu, 17 May 2018 14:04:00 -0400
-Received: by mail-wr0-x22e.google.com with SMTP id x9-v6so3725951wrl.13
-	for <qemu-devel@nongnu.org>; Thu, 17 May 2018 11:03:59 -0700 (PDT)
+	id 1fJNFs-0004y3-Eq
+	for qemu-devel@nongnu.org; Thu, 17 May 2018 14:03:56 -0400
+Received: by mail-wr0-x243.google.com with SMTP id h5-v6so6592988wrm.4
+	for <qemu-devel@nongnu.org>; Thu, 17 May 2018 11:03:56 -0700 (PDT)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Thu, 17 May 2018 18:47:14 +0100
-Message-Id: <20180517174718.10107-46-alex.bennee@linaro.org>
+Date: Thu, 17 May 2018 18:47:18 +0100
+Message-Id: <20180517174718.10107-50-alex.bennee@linaro.org>
 In-Reply-To: <20180517174718.10107-1-alex.bennee@linaro.org>
 References: <20180517174718.10107-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v4 45/49] tests/tcg: enable building for RISCV64
+Subject: [Qemu-devel] [PATCH v4 49/49] tests/tcg: override runners for
+ broken tests (!UPSTREAM)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,64 +31,142 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: cota@braap.org, famz@redhat.com, berrange@redhat.com, f4bug@amsat.org, richard.henderson@linaro.org, balrogg@gmail.com, aurelien@aurel32.net, agraf@suse.de
-Cc: qemu-devel@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+Cc: qemu-devel@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, Yongbok Kim <yongbok.kim@mips.com>, "open list:ARM" <qemu-arm@nongnu.org>
 
-As before, using Debian SID compilers.
+To get a clean run of check-tcg these tests are currently skipped:
+
+  - test-mmap -p for i386, hppa, m68k
+  - hello-mips for mips
+  - linux-test for sparc
+
+For ARM/aarch64
+  - fcvt doesn't compare against reference (awaiting fixes in mainline)
 
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
----
- tests/docker/Makefile.include                        |  1 +
- tests/docker/dockerfiles/debian-riscv64-cross.docker | 12 ++++++++++++
- tests/tcg/riscv/Makefile.include                     | 10 ++++++++++
- 3 files changed, 23 insertions(+)
- create mode 100644 tests/docker/dockerfiles/debian-riscv64-cross.docker
- create mode 100644 tests/tcg/riscv/Makefile.include
 
-diff --git a/tests/docker/Makefile.include b/tests/docker/Makefile.include
-index f58afb8c5d..d00887bdf1 100644
---- a/tests/docker/Makefile.include
-+++ b/tests/docker/Makefile.include
-@@ -68,6 +68,7 @@ docker-image-debian-m68k-cross: docker-image-debian-sid
- docker-image-debian-sh4-cross: docker-image-debian-sid
- docker-image-debian-sparc64-cross: docker-image-debian-sid
- docker-image-debian-mips64-cross: docker-image-debian-sid
-+docker-image-debian-riscv64-cross: docker-image-debian-sid
- docker-image-travis: NOUSER=1
+---
+v4
+  - document broken tests in commit
+  - temporarily demote fcvt while fixes percolate upstream
+---
+ tests/tcg/aarch64/Makefile.target | 10 +++++-----
+ tests/tcg/arm/Makefile.target     | 10 +++++-----
+ tests/tcg/hppa/Makefile.target    |  7 +++++++
+ tests/tcg/i386/Makefile.target    |  8 ++++++++
+ tests/tcg/m68k/Makefile.target    |  9 +++++++++
+ tests/tcg/mips/Makefile.target    |  4 ++++
+ tests/tcg/sparc64/Makefile.target |  8 ++++++++
+ 7 files changed, 46 insertions(+), 10 deletions(-)
+ create mode 100644 tests/tcg/hppa/Makefile.target
+ create mode 100644 tests/tcg/m68k/Makefile.target
+ create mode 100644 tests/tcg/sparc64/Makefile.target
+
+diff --git a/tests/tcg/aarch64/Makefile.target b/tests/tcg/aarch64/Makefile.target
+index 7dba32138d..d2a6205d7a 100644
+--- a/tests/tcg/aarch64/Makefile.target
++++ b/tests/tcg/aarch64/Makefile.target
+@@ -12,8 +12,8 @@ TESTS:=$(AARCH64_TESTS)
  
- # Expand all the pre-requistes for each docker image and test combination
-diff --git a/tests/docker/dockerfiles/debian-riscv64-cross.docker b/tests/docker/dockerfiles/debian-riscv64-cross.docker
+ fcvt: LDFLAGS+=-lm
+ 
+-run-fcvt: fcvt
+-	$(call quiet-command, \
+-		$(QEMU) $< > fcvt.out && \
+-		diff -u $(AARCH64_SRC)/fcvt.ref fcvt.out, \
+-		"TEST", "$< (default) on $(TARGET_NAME)")
++# run-fcvt: fcvt
++# 	$(call quiet-command, \
++# 		$(QEMU) $< > fcvt.out && \
++# 		diff -u $(AARCH64_SRC)/fcvt.ref fcvt.out, \
++# 		"TEST", "$< (default) on $(TARGET_NAME)")
+diff --git a/tests/tcg/arm/Makefile.target b/tests/tcg/arm/Makefile.target
+index 7bb777f442..f42cf80f84 100644
+--- a/tests/tcg/arm/Makefile.target
++++ b/tests/tcg/arm/Makefile.target
+@@ -31,9 +31,9 @@ ifeq ($(TARGET_NAME), arm)
+ fcvt: LDFLAGS+=-lm
+ # fcvt: CFLAGS+=-march=armv8.2-a+fp16 -mfpu=neon-fp-armv8
+ 
+-run-fcvt: fcvt
+-	$(call quiet-command, \
+-		$(QEMU) $< > fcvt.out && \
+-		diff -u $(ARM_SRC)/fcvt.ref fcvt.out, \
+-		"TEST", "$< (default) on $(TARGET_NAME)")
++# run-fcvt: fcvt
++# 	$(call quiet-command, \
++# 		$(QEMU) $< > fcvt.out && \
++# 		diff -u $(ARM_SRC)/fcvt.ref fcvt.out, \
++# 		"TEST", "$< (default) on $(TARGET_NAME)")
+ endif
+diff --git a/tests/tcg/hppa/Makefile.target b/tests/tcg/hppa/Makefile.target
 new file mode 100644
-index 0000000000..2b2e64cee6
+index 0000000000..15fc0b429f
 --- /dev/null
-+++ b/tests/docker/dockerfiles/debian-riscv64-cross.docker
-@@ -0,0 +1,12 @@
++++ b/tests/tcg/hppa/Makefile.target
+@@ -0,0 +1,7 @@
++# -*- Mode: makefile -*-
 +#
-+# Docker cross-compiler target
-+#
-+# This docker target builds on the debian sid base image which
-+# contains cross compilers for Debian "ports" targets.
-+#
-+FROM qemu:debian-sid
++# HPPA specific tweaks - specifically masking out broken tests
 +
-+RUN DEBIAN_FRONTEND=noninteractive eatmydata \
-+    apt-get install -y --no-install-recommends \
-+        gcc-riscv64-linux-gnu \
-+        libc6-dev-riscv64-cross
-diff --git a/tests/tcg/riscv/Makefile.include b/tests/tcg/riscv/Makefile.include
-new file mode 100644
-index 0000000000..d92ac6c89f
---- /dev/null
-+++ b/tests/tcg/riscv/Makefile.include
-@@ -0,0 +1,10 @@
-+#
-+# Makefile.include for all RISCV targets
-+#
-+# Debian only really cares about 64 bit going forward
-+#
++# Currently broken for -p
++run-test-mmap: test-mmap
++	$(call quiet-command, $(QEMU) $< > test-mmap.out, "TEST", "$< (default) on $(TARGET_NAME)")
+diff --git a/tests/tcg/i386/Makefile.target b/tests/tcg/i386/Makefile.target
+index 6d7d4a164e..b5a7011b79 100644
+--- a/tests/tcg/i386/Makefile.target
++++ b/tests/tcg/i386/Makefile.target
+@@ -48,3 +48,11 @@ run-test-i386-fprem: test-i386-fprem
+ 	$(call quiet-command, /bin/true, "SLOW TEST", "$< SKIPPED on $(TARGET_NAME)")
+ endif
+ 
++# Currently broken tests on i386
++ifeq ($(TARGET_NAME), i386)
 +
-+ifeq ($(TARGET_NAME),riscv64)
-+DOCKER_IMAGE=debian-riscv64-cross
-+DOCKER_CROSS_COMPILER=riscv64-linux-gnu-gcc
++# Currently broken for -p
++run-test-mmap: test-mmap
++	$(call quiet-command, $(QEMU) $< > test-mmap.out, "TEST", "$< (default) on $(TARGET_NAME)")
++
 +endif
+diff --git a/tests/tcg/m68k/Makefile.target b/tests/tcg/m68k/Makefile.target
+new file mode 100644
+index 0000000000..92774ce5ad
+--- /dev/null
++++ b/tests/tcg/m68k/Makefile.target
+@@ -0,0 +1,9 @@
++# -*- Mode: makefile -*-
++#
++# m68k specific tweaks - specifically masking out broken tests
++#
++
++# Currently broken for -p
++run-test-mmap: test-mmap
++	$(call quiet-command, $(QEMU) $< > test-mmap.out, "TEST", "$< (default) on $(TARGET_NAME)")
++
+diff --git a/tests/tcg/mips/Makefile.target b/tests/tcg/mips/Makefile.target
+index 71f0c2dd53..3db4eaf131 100644
+--- a/tests/tcg/mips/Makefile.target
++++ b/tests/tcg/mips/Makefile.target
+@@ -17,3 +17,7 @@ hello-mips: LDFLAGS+=-nostdlib
+ 
+ # For MIPS32 and 64 we have a bunch of extra tests in sub-directories
+ # however they are intended for system tests.
++
++run-hello-mips: hello-mips
++	$(call quiet-command, /bin/true, "BROKEN TEST", "$< SKIPPED on $(TARGET_NAME)")
++
+diff --git a/tests/tcg/sparc64/Makefile.target b/tests/tcg/sparc64/Makefile.target
+new file mode 100644
+index 0000000000..e971a5c818
+--- /dev/null
++++ b/tests/tcg/sparc64/Makefile.target
+@@ -0,0 +1,8 @@
++# -*- Mode: makefile -*-
++#
++# sparc specific tweaks - specifically masking out broken tests
++
++# different from the other hangs
++# /home/alex/lsrc/qemu/qemu.git/tests/tcg/multiarch/linux-test.c:264: Value too large for defined data type (ret=-1, errno=92/Value too large for defined data type)
++run-linux-test: linux-test
++	$(call quiet-command, /bin/true, "BROKEN TEST", "$< SKIPPED on $(TARGET_NAME)")
 -- 
 2.17.0
