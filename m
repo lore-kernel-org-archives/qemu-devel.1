@@ -1,28 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49666)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51876)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fJP2I-000320-7H
-	for qemu-devel@nongnu.org; Thu, 17 May 2018 15:58:03 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1fJPJW-0006jk-S6
+	for qemu-devel@nongnu.org; Thu, 17 May 2018 16:15:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fJP2D-0003Vp-J6
-	for qemu-devel@nongnu.org; Thu, 17 May 2018 15:58:02 -0400
-Received: from mail-wr0-x242.google.com ([2a00:1450:400c:c0c::242]:37544)
+	(envelope-from <richard.henderson@linaro.org>) id 1fJPJS-0004Rg-Ts
+	for qemu-devel@nongnu.org; Thu, 17 May 2018 16:15:50 -0400
+Received: from mail-pl0-x243.google.com ([2607:f8b0:400e:c01::243]:38072)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1fJP2D-0003VY-D1
-	for qemu-devel@nongnu.org; Thu, 17 May 2018 15:57:57 -0400
-Received: by mail-wr0-x242.google.com with SMTP id h5-v6so6883754wrm.4
-	for <qemu-devel@nongnu.org>; Thu, 17 May 2018 12:57:57 -0700 (PDT)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1fJPJS-0004RO-NI
+	for qemu-devel@nongnu.org; Thu, 17 May 2018 16:15:46 -0400
+Received: by mail-pl0-x243.google.com with SMTP id c11-v6so3194500plr.5
+	for <qemu-devel@nongnu.org>; Thu, 17 May 2018 13:15:46 -0700 (PDT)
 References: <20180517174718.10107-1-alex.bennee@linaro.org>
-	<20180517174718.10107-21-alex.bennee@linaro.org>
-	<02e9a6a1-2274-541e-8b88-111a3fc537f5@redhat.com>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <02e9a6a1-2274-541e-8b88-111a3fc537f5@redhat.com>
-Date: Thu, 17 May 2018 20:57:54 +0100
-Message-ID: <87o9hedph9.fsf@linaro.org>
+	<20180517174718.10107-29-alex.bennee@linaro.org>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <d1b655c1-1e22-6ccc-7865-2f830f62ad85@linaro.org>
+Date: Thu, 17 May 2018 13:15:43 -0700
 MIME-Version: 1.0
+In-Reply-To: <20180517174718.10107-29-alex.bennee@linaro.org>
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v4 20/49] tests/tcg/i386: fix test-i386
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v4 28/49] tests/tcg/arm: fix up
+ test-arm-iwmmxt test
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,33 +32,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: cota@braap.org, famz@redhat.com, berrange@redhat.com, f4bug@amsat.org, richard.henderson@linaro.org, balrogg@gmail.com, aurelien@aurel32.net, agraf@suse.de, Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, cota@braap.org, famz@redhat.com, berrange@redhat.com, f4bug@amsat.org, balrogg@gmail.com, aurelien@aurel32.net, agraf@suse.de
+Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, "open list:ARM" <qemu-arm@nongnu.org>
+
+On 05/17/2018 10:46 AM, Alex Bennée wrote:
+> We need to rename the source file to a .S so we can do a single-line
+> assemble and link invocation. We also specify the additional CFLAGS
+> for the compile as it's a non-standard ARM binary.
+> 
+> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+> [rth: force fpu configuration]
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+> Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+> Tested-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+> 
+> ---
+> v4
+>   - include rth's -mfpu=fpv4-sp-d16
+> ---
+
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
 
-Eric Blake <eblake@redhat.com> writes:
-
-> On 05/17/2018 12:46 PM, Alex Benn=C3=A9e wrote:
->> The test-i386 test case is a little special as it includes assembler
->> files. Add the additional compile magic to assemble these bits and
->> link them to the final binary.
->
-> The patch says "add"...
->
->>
->> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
->> Reviewed-by: Thomas Huth <thuth@redhat.com>
->> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
->> Tested-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
->> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
->> ---
->>   tests/tcg/i386/test-i386.c | 1 -
->>   1 file changed, 1 deletion(-)
->
-> ...but consists only of a single deletion.
-
-Oops, yeah it all got merged into the "move to i386 subdir" patch. Maybe
-I should just fold that together?
-
---
-Alex Benn=C3=A9e
+r~
