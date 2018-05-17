@@ -1,30 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46293)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46491)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fJKl2-00067i-GH
-	for qemu-devel@nongnu.org; Thu, 17 May 2018 11:23:57 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fJKlv-0006l5-1s
+	for qemu-devel@nongnu.org; Thu, 17 May 2018 11:24:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fJKl1-0008EA-Ja
-	for qemu-devel@nongnu.org; Thu, 17 May 2018 11:23:56 -0400
-Received: from mail-ot0-x22a.google.com ([2607:f8b0:4003:c0f::22a]:36459)
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fJKlq-0000I9-18
+	for qemu-devel@nongnu.org; Thu, 17 May 2018 11:24:51 -0400
+Received: from mail-qk0-x22c.google.com ([2607:f8b0:400d:c09::22c]:43320)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fJKl1-0008E0-Dt
-	for qemu-devel@nongnu.org; Thu, 17 May 2018 11:23:55 -0400
-Received: by mail-ot0-x22a.google.com with SMTP id m11-v6so5491646otf.3
-	for <qemu-devel@nongnu.org>; Thu, 17 May 2018 08:23:55 -0700 (PDT)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fJKlp-0000Hv-Sj
+	for qemu-devel@nongnu.org; Thu, 17 May 2018 11:24:45 -0400
+Received: by mail-qk0-x22c.google.com with SMTP id h19-v6so3914036qkj.10
+	for <qemu-devel@nongnu.org>; Thu, 17 May 2018 08:24:45 -0700 (PDT)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20180516205543.29305-1-laurent@vivier.eu>
+	<20180516205543.29305-6-laurent@vivier.eu>
+	<4e676844-2918-77b0-521a-16ded3228de9@amsat.org>
+	<62244f16-30e5-3383-249a-a0a932d684d0@vivier.eu>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <a924ff70-8da7-b754-3c90-269fac47b98d@amsat.org>
+Date: Thu, 17 May 2018 12:24:40 -0300
 MIME-Version: 1.0
-In-Reply-To: <87y3gkdlab.fsf@linaro.org>
-References: <1524153386-3550-1-git-send-email-abdallah.bouassida@lauterbach.com>
-	<87lgcrvemu.fsf@linaro.org>
-	<CAFEAcA_3Rg-qhLRmg=TtakVtzOffKrdOKU8z=-=cGts4TTC2+A@mail.gmail.com>
-	<87y3gkdlab.fsf@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 17 May 2018 16:23:34 +0100
-Message-ID: <CAFEAcA8tcspnmGBOOF8zYX22dPRrD_HZ2z+Ot2CSqUo2RdKp1Q@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v6 0/3] target/arm: Add a dynamic
- XML-description of the cp-registers to GDB
+In-Reply-To: <62244f16-30e5-3383-249a-a0a932d684d0@vivier.eu>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v2 5/8] linux-user: move ppc socket.h
+ definitions to ppc/sockbits.h
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,38 +38,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
-Cc: Abdallah Bouassida <abdallah.bouassida@lauterbach.com>, QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Khaled Jmal <khaled.jmal@lauterbach.com>
+To: Laurent Vivier <laurent@vivier.eu>, qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>, Riku Voipio <riku.voipio@iki.fi>, Richard Henderson <rth@twiddle.net>, Yongbok Kim <yongbok.kim@mips.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 
-On 16 May 2018 at 10:03, Alex Benn=C3=A9e <alex.bennee@linaro.org> wrote:
-> Peter Maydell <peter.maydell@linaro.org> writes:
->> CNTVCT_EL0 isn't in the set of registers we expose to gdb (it's
->> marked up as ARM_CP_NO_RAW), so I'm not sure why gdb is
->> giving you any value at all. Does it do that for any
->> random $no_such_thing strings ?
->
-> *sigh* yes....
+On 05/17/2018 04:17 AM, Laurent Vivier wrote:
+> Le 17/05/2018 à 01:17, Philippe Mathieu-Daudé a écrit :
+>> On 05/16/2018 05:55 PM, Laurent Vivier wrote:
+>>> No code change.
+>>>
+>>> Signed-off-by: Laurent Vivier <laurent@vivier.eu>
+>>> ---
+>>>  linux-user/generic/sockbits.h |  9 +--------
+>>>  linux-user/ppc/sockbits.h     | 19 +++++++++++++++++++
+>>>  2 files changed, 20 insertions(+), 8 deletions(-)
+>>>
+>>> diff --git a/linux-user/generic/sockbits.h b/linux-user/generic/sockbits.h
+>>> index 093faf0a48..5ad43eb0c8 100644
+>>> --- a/linux-user/generic/sockbits.h
+>>> +++ b/linux-user/generic/sockbits.h
+>>> @@ -30,14 +30,7 @@
+>>>  #define TARGET_SO_LINGER       13
+>>>  #define TARGET_SO_BSDCOMPAT    14
+>>>  /* To add :#define TARGET_SO_REUSEPORT 15 */
+>>> -#if defined(TARGET_PPC)
+>>> -#define TARGET_SO_RCVLOWAT     16
+>>> -#define TARGET_SO_SNDLOWAT     17
+>>> -#define TARGET_SO_RCVTIMEO     18
+>>> -#define TARGET_SO_SNDTIMEO     19
+>>> -#define TARGET_SO_PASSCRED     20
+>>> -#define TARGET_SO_PEERCRED     21
+>>> -#else
+>>> +#ifndef TARGET_SO_PASSCRED /* powerpc only differs in these */
+>>
+>> #ifndef TARGET_PPC ?
+> 
+> In fact, I have copied the line from linux, I think it's better to not
+> depend on the target but on the value we want to define.
 
-My gdb ("GNU gdb (Ubuntu 7.11.1-0ubuntu1~16.5) 7.11.1") gives
-(gdb) p/x $cntvct_el0
-$3 =3D Value can't be converted to integer.
-or if you don't ask for the hex conversion:
-(gdb) print $cntvct_el0
-$2 =3D void
+I see, but it isn't safer to define each separately?
 
-so this is either something fixed in a newer gdb than you
-have, or alternately it's a regression if you're using a
-newer gdb, which you should probably report upstream...
+/* powerpc only differs in these */
+#ifndef TARGET_SO_PASSCRED
+# define TARGET_SO_PASSCRED     16
+#endif
 
-> So finally:
->
-> Tested-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+#ifndef TARGET_SO_PEERCRED
+# define TARGET_SO_PEERCRED     17
+#endif
 
-Thanks for the testing.
+#ifndef TARGET_SO_RCVLOWAT
+# define TARGET_SO_RCVLOWAT     18
+#endif
 
-Abdallah: I've added this series to my target-arm.next queue,
-so it should reach QEMU master some time next week. Thanks for
-your efforts in working through QEMU's review process, and
-sorry this took us so long to deal with.
+...
 
--- PMM
+> 
+> Thanks,
+> Laurent
+> 
