@@ -1,29 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57038)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57677)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fJGSn-0003C1-Ty
-	for qemu-devel@nongnu.org; Thu, 17 May 2018 06:48:53 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1fJGWY-0004x1-2Y
+	for qemu-devel@nongnu.org; Thu, 17 May 2018 06:52:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fJGSn-00024j-4a
-	for qemu-devel@nongnu.org; Thu, 17 May 2018 06:48:49 -0400
-Received: from mail-oi0-x242.google.com ([2607:f8b0:4003:c06::242]:40290)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fJGSm-00024c-Uf
-	for qemu-devel@nongnu.org; Thu, 17 May 2018 06:48:49 -0400
-Received: by mail-oi0-x242.google.com with SMTP id c203-v6so3547646oib.7
-	for <qemu-devel@nongnu.org>; Thu, 17 May 2018 03:48:48 -0700 (PDT)
+	(envelope-from <pbonzini@redhat.com>) id 1fJGWU-0003Zj-T9
+	for qemu-devel@nongnu.org; Thu, 17 May 2018 06:52:42 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:47370 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1fJGWU-0003ZM-N2
+	for qemu-devel@nongnu.org; Thu, 17 May 2018 06:52:38 -0400
+Reply-To: kvm-forum-2018-pc@redhat.com
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <ab0ead22-c49a-1ace-74bd-6b1a83ea5fda@redhat.com>
+Date: Thu, 17 May 2018 12:52:35 +0200
 MIME-Version: 1.0
-In-Reply-To: <1738f78f-b310-3cde-ac5e-1a147d3ca5f6@redhat.com>
-References: <20180501085939.6201-1-peter.maydell@linaro.org>
-	<c338d0d3-2b02-26e7-f745-fbc5c1893453@redhat.com>
-	<CAFEAcA_Dei48HtKk6GnEgXYcXdY2htCXej4pSfY+q9V6f=abdA@mail.gmail.com>
-	<1738f78f-b310-3cde-ac5e-1a147d3ca5f6@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 17 May 2018 11:48:27 +0100
-Message-ID: <CAFEAcA-o3M2ruUfU7hk89S=eGgCP=b+hPyKrSdSR79OP_Ug9vg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [RFC PATCH v2 00/12] iommu: add MemTxAttrs
- argument to IOMMU translate function
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: [Qemu-devel] KVM Forum 2018: Call For Participation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,62 +26,154 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, "patches@linaro.org" <patches@linaro.org>, Eric Auger <eric.auger@redhat.com>, Alex Williamson <alex.williamson@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
+To: qemu-devel <qemu-devel@nongnu.org>, KVM list <kvm@vger.kernel.org>, "libvir-list@redhat.com" <libvir-list@redhat.com>, "seabios@seabios.org" <seabios@seabios.org>
 
-On 15 May 2018 at 17:50, Paolo Bonzini <pbonzini@redhat.com> wrote:
-> On 15/05/2018 18:28, Peter Maydell wrote:
->>
->> Presumably we also want a way for notifier users like vfio to
->> detect "I'm dealing with an IOMMU that is txattrs aware in a
->> way I can't deal with" so they can usefully bail out rather than
->> not working.
->>
->> Unfortunately I don't really know enough about our two current
->> users of notifiers (vhost and vfio) to know what they actually
->> need the iommu notifications for...
->
-> As you guessed on IRC, they basically establish a shadow IOMMU page
-> table or TLB.  My proposal would be to add two MemTxAttrs arguments to
-> the IOMMUNotify typedef and to memory_region_notify_one, respectively to
-> indicate which attributes matter (0 = indifferent, 1 = matter) and their
-> value.  So far so good.
->
-> Perhaps memory_region_register_iommu_notifier can also get an argument
-> with the supported attributes.  The function would then fail if there
-> are fewer bits set in that argument than what the IOMMU supports...
+================================================================
+KVM Forum 2018: Call For Participation
+October 24-26, 2018 -  Edinburgh International Conference Centre - Edinburgh, UK
 
-So I had an idea this morning for a slightly different way to approach
-this, which is that we add a concept of an iommu_idx, analogous to
-our existing TCG mmu_idx. Basically an iommu_idx represents a
-page table (kind of like what Arm calls a "translation regime"), so
-that for any particular iommu index and input address the output
-address and permissions are always the same. For the memory
-protection controller there would be two iommu_idxes, one for
-secure and one for non-secure.
+(All submissions must be received before midnight June 14, 2018)
+=================================================================
 
-The API changes would be something like:
- * new method get_num_indexes() which returns the number of iommu indexes
-   this IOMMU implements (default implementation: return 1)
- * translate method takes an iommu index (and not the txattrs)
- * new method index_from_attrs() which takes a MemTxAttrs and
-   returns the iommu index that should be used (default implementation:
-   always return 0)
- * memory_region_register_iommu_notifier() takes an iommu index
- * the default 'replay' method does "for each supported index,
-   for each address, call @translate"
- * vfio and vhost can register their notifiers using the index
-   returned by index_from_attrs(MEMTXATTRS_UNSPECIFIED)
- * maybe they could call get_num_indexes() and bail out if the
-   IOMMU has support for multiple indexes?
- * maybe they could be enhanced to support tracking multiple
-   page tables if necessary in future
+KVM Forum is an annual event that presents a rare opportunity
+for developers and users to meet, discuss the state of Linux
+virtualization technology, and plan for the challenges ahead. 
+We invite you to lead part of the discussion by submitting a speaking
+proposal for KVM Forum 2018.
 
-I haven't worked through the details yet, but this seems to me
-more flexible than working directly with txattrs. It also means
-it's harder to accidentally write an iommu implementation that
-looks at more fields in the txattrs than its notifier interface
-claims are significant to it.
+At this highly technical conference, developers driving innovation
+in the KVM virtualization stack (Linux, KVM, QEMU, libvirt) can
+meet users who depend on KVM as part of their offerings, or to
+power their data centers and clouds.
 
-thanks
--- PMM
+KVM Forum will include sessions on the state of the KVM
+virtualization stack, planning for the future, and many
+opportunities for attendees to collaborate. After more than ten
+years of development in the Linux kernel, KVM continues to be a
+critical part of the FOSS cloud infrastructure.
+
+This year, KVM Forum is joining Open Source Summit in Edinburgh, UK. Selected
+talks from KVM Forum will be presented on Wednesday October 24 to the full
+audience of the Open Source Summit.  Also, attendees of KVM Forum will have
+access to all of the talks from Open Source Summit on Wednesday.
+https://events.linuxfoundation.org/events/kvm-forum-2018/program/cfp/
+
+Suggested topics:
+* Scaling, latency optimizations, performance tuning, real-time guests
+* Hardening and security
+* New features
+* Testing
+
+KVM and the Linux kernel:
+* Nested virtualization
+* Resource management (CPU, I/O, memory) and scheduling
+* VFIO: IOMMU, SR-IOV, virtual GPU, etc.
+* Networking: Open vSwitch, XDP, etc.
+* virtio and vhost
+* Architecture ports and new processor features
+
+QEMU:
+* Management interfaces: QOM and QMP
+* New devices, new boards, new architectures
+* Graphics, desktop virtualization and virtual GPU
+* New storage features
+* High availability, live migration and fault tolerance
+* Emulation and TCG
+* Firmware: ACPI, UEFI, coreboot, U-Boot, etc.
+
+Management and infrastructure
+* Managing KVM: Libvirt, OpenStack, oVirt, etc.
+* Storage: Ceph, Gluster, SPDK, etc.r
+* Network Function Virtualization: DPDK, OPNFV, OVN, etc.
+* Provisioning
+
+
+===============
+SUBMITTING YOUR PROPOSAL
+===============
+Abstracts due: June 14, 2018
+
+Please submit a short abstract (~150 words) describing your presentation
+proposal. Slots vary in length up to 45 minutes. Also include the proposal
+type -- one of:
+- technical talk
+- end-user talk
+
+Submit your proposal here:http://events.linuxfoundation.org/cfp
+Please only use the categories "presentation" and "panel discussion"
+
+You will receive a notification whether or not your presentation proposal
+was accepted by August 10, 2018.
+
+Speakers will receive a complimentary pass for the event. In the instance
+that case your submission has multiple presenters, only the primary speaker for a
+proposal will receive a complimentary event pass. For panel discussions, all
+panelists will receive a complimentary event pass.
+
+TECHNICAL TALKS
+
+A good technical talk should not just report on what has happened over
+the last year; it should present a concrete problem and how it impacts
+the user and/or developer community. Whenever applicable, focus on
+work that needs to be done, difficulties that haven't yet been solved,
+and on decisions that other developers should be aware of. Summarizing
+recent developments is okay but it should not be more than a small
+portion of the overall talk.
+
+END-USER TALKS
+
+One of the big challenges as developers is to know what, where and how
+people actually use our software. We will reserve a few slots for end
+users talking about their deployment challenges and achievements.
+
+If you are using KVM in production you are encouraged submit a speaking
+proposal. Simply mark it as an end-user talk. As an end user, this is a
+unique opportunity to get your input to developers.
+
+HANDS-ON / BOF SESSIONS
+
+We will reserve some time for people to get together and discuss
+strategic decisions as well as other topics that are best solved within
+smaller groups.
+
+These sessions will be announced during the event. If you are interested
+in organizing such a session, please add it to the list at
+
+  http://www.linux-kvm.org/page/KVM_Forum_2018_BOF
+
+Let people you think who might be interested know about your BOF, and encourage
+them to add their names to the wiki page as well. Please try to
+add your ideas to the list before KVM Forum starts.
+
+
+PANEL DISCUSSIONS
+
+If you are proposing a panel discussion, please make sure that you list
+all of your potential panelists in your the abstract. We will request full
+biographies if a panel is acceped.
+
+
+===============
+HOTEL / TRAVEL
+===============
+
+This year's event will take place at the Edinburgh International Conference Centre.
+For information about discounted hotel room rate for conference attendees
+at the nearby Sheraton Grand Hotel & Spa, Edinburgh, please visit
+https://events.linuxfoundation.org/events/kvm-forum-2018/attend/venue-travel/
+
+===============
+IMPORTANT DATES
+===============
+Submission deadline: June 14, 2018
+Notification: August 10, 2018
+Schedule announced: August 16, 2018
+Event dates: October 24-26, 2018
+
+Thank you for your interest in KVM. We're looking forward to your
+submissions and seeing you at the KVM Forum 2018 in October!
+
+-your KVM Forum 2018 Program Committee
+
+Please contact us with any questions or comments at
+kvm-forum-2018-pc@redhat.com
