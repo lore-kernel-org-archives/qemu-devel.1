@@ -1,25 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46207)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46274)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fJFrR-0005gP-H5
-	for qemu-devel@nongnu.org; Thu, 17 May 2018 06:10:14 -0400
+	(envelope-from <eric.auger@redhat.com>) id 1fJFs1-0005zE-Px
+	for qemu-devel@nongnu.org; Thu, 17 May 2018 06:10:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fJFrQ-0008Nm-IK
-	for qemu-devel@nongnu.org; Thu, 17 May 2018 06:10:13 -0400
-Received: from mail-ot0-x22d.google.com ([2607:f8b0:4003:c0f::22d]:33211)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fJFrQ-0008M5-E4
-	for qemu-devel@nongnu.org; Thu, 17 May 2018 06:10:12 -0400
-Received: by mail-ot0-x22d.google.com with SMTP id l22-v6so4412892otj.0
-	for <qemu-devel@nongnu.org>; Thu, 17 May 2018 03:10:12 -0700 (PDT)
+	(envelope-from <eric.auger@redhat.com>) id 1fJFrw-0000JV-MS
+	for qemu-devel@nongnu.org; Thu, 17 May 2018 06:10:49 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:54040 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eric.auger@redhat.com>)
+	id 1fJFrw-0000IV-Fv
+	for qemu-devel@nongnu.org; Thu, 17 May 2018 06:10:44 -0400
+References: <20180504030811.28111-1-peterx@redhat.com>
+	<20180504030811.28111-3-peterx@redhat.com>
+	<17437758-3b51-72c7-81ba-cb0df0a22c1c@redhat.com>
+	<20180517100247.GB26089@xz-mi>
+From: Auger Eric <eric.auger@redhat.com>
+Message-ID: <68c29b90-0cec-91c3-f2f3-b0e58fc40d5e@redhat.com>
+Date: Thu, 17 May 2018 12:10:41 +0200
 MIME-Version: 1.0
-In-Reply-To: <20180515215436.6457-1-ehabkost@redhat.com>
-References: <20180515215436.6457-1-ehabkost@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 17 May 2018 11:09:51 +0100
-Message-ID: <CAFEAcA8=+s3eGycOiYPmujwwxrKQr3w5sgFfhgFhM88O5hheBQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL 0/7] x86 queue, 2018-05-15
+In-Reply-To: <20180517100247.GB26089@xz-mi>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 02/10] intel-iommu: remove
+ IntelIOMMUNotifierNode
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,32 +31,97 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>, "Michael S. Tsirkin" <mst@redhat.com>
+To: Peter Xu <peterx@redhat.com>
+Cc: qemu-devel@nongnu.org, Tian Kevin <kevin.tian@intel.com>, "Michael S . Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, Alex Williamson <alex.williamson@redhat.com>, Jintack Lim <jintack@cs.columbia.edu>
 
-On 15 May 2018 at 22:54, Eduardo Habkost <ehabkost@redhat.com> wrote:
-> The following changes since commit ad1b4ec39caa5b3f17cbd8160283a03a3dcfe2ae:
->
->   Merge remote-tracking branch 'remotes/kraxel/tags/input-20180515-pull-request' into staging (2018-05-15 12:50:06 +0100)
->
-> are available in the Git repository at:
->
->   git://github.com/ehabkost/qemu.git tags/x86-next-pull-request
->
-> for you to fetch changes up to ab8f992e3e63e91be257e4e343d386dae7be4bcb:
->
->   i386: Add new property to control cache info (2018-05-15 11:33:33 -0300)
->
-> ----------------------------------------------------------------
-> x86 queue, 2018-05-15
->
-> * KnightsMill CPU model
-> * CLDEMOTE(Demote Cache Line) cpu feature
-> * pc-i440fx-2.13 and pc-q35-2.13 machine-types
-> * Add model-specific cache information to EPYC CPU model
->
-> ----------------------------------------------------------------
+Hi Peter,
 
-Applied, thanks.
+On 05/17/2018 12:02 PM, Peter Xu wrote:
+> On Thu, May 17, 2018 at 11:46:22AM +0200, Auger Eric wrote:
+>> Hi Peter,
+>>
+>> On 05/04/2018 05:08 AM, Peter Xu wrote:
+>>> That is not really necessary.  Removing that node struct and put the
+>>> list entry directly into VTDAddressSpace.  It simplfies the code a lot.
+>>>
+>>> Signed-off-by: Peter Xu <peterx@redhat.com>
+>>> ---
+>>>  include/hw/i386/intel_iommu.h |  9 ++------
+>>>  hw/i386/intel_iommu.c         | 41 ++++++++++-------------------------
+>>>  2 files changed, 14 insertions(+), 36 deletions(-)
+>>>
+>>> diff --git a/include/hw/i386/intel_iommu.h b/include/hw/i386/intel_iommu.h
+>>> index 45ec8919b6..220697253f 100644
+>>> --- a/include/hw/i386/intel_iommu.h
+>>> +++ b/include/hw/i386/intel_iommu.h
+>>> @@ -67,7 +67,6 @@ typedef union VTD_IR_TableEntry VTD_IR_TableEntry;
+>>>  typedef union VTD_IR_MSIAddress VTD_IR_MSIAddress;
+>>>  typedef struct VTDIrq VTDIrq;
+>>>  typedef struct VTD_MSIMessage VTD_MSIMessage;
+>>> -typedef struct IntelIOMMUNotifierNode IntelIOMMUNotifierNode;
+>>>  
+>>>  /* Context-Entry */
+>>>  struct VTDContextEntry {
+>>> @@ -93,6 +92,7 @@ struct VTDAddressSpace {
+>>>      MemoryRegion iommu_ir;      /* Interrupt region: 0xfeeXXXXX */
+>>>      IntelIOMMUState *iommu_state;
+>>>      VTDContextCacheEntry context_cache_entry;
+>>> +    QLIST_ENTRY(VTDAddressSpace) next;
+>>>  };
+>>>  
+>>>  struct VTDBus {
+>>> @@ -253,11 +253,6 @@ struct VTD_MSIMessage {
+>>>  /* When IR is enabled, all MSI/MSI-X data bits should be zero */
+>>>  #define VTD_IR_MSI_DATA          (0)
+>>>  
+>>> -struct IntelIOMMUNotifierNode {
+>>> -    VTDAddressSpace *vtd_as;
+>>> -    QLIST_ENTRY(IntelIOMMUNotifierNode) next;
+>>> -};
+>>> -
+>>>  /* The iommu (DMAR) device state struct */
+>>>  struct IntelIOMMUState {
+>>>      X86IOMMUState x86_iommu;
+>>> @@ -295,7 +290,7 @@ struct IntelIOMMUState {
+>>>      GHashTable *vtd_as_by_busptr;   /* VTDBus objects indexed by PCIBus* reference */
+>>>      VTDBus *vtd_as_by_bus_num[VTD_PCI_BUS_MAX]; /* VTDBus objects indexed by bus number */
+>>>      /* list of registered notifiers */
+>>> -    QLIST_HEAD(, IntelIOMMUNotifierNode) notifiers_list;
+>>> +    QLIST_HEAD(, VTDAddressSpace) notifiers_list;
+>> Wouldn't it make sense to rename notifiers_list into something more
+>> understandable like address_spaces?
+> 
+> But address_spaces might be a bit confusing too on the other side as
+> "a list of all VT-d address spaces".  How about something like:
+> 
+>      address_spaces_with_notifiers
+Hum I missed not all of them belonged to that list. a bit long now?
+vtd_as_with_notifiers?
 
--- PMM
+Thanks
+
+Eric
+> 
+> ?
+> 
+> [...]
+> 
+>>> -    /* update notifier node with new flags */
+>>> -    QLIST_FOREACH_SAFE(node, &s->notifiers_list, next, next_node) {
+>>> -        if (node->vtd_as == vtd_as) {
+>>> -            if (new == IOMMU_NOTIFIER_NONE) {
+>>> -                QLIST_REMOVE(node, next);
+>>> -                g_free(node);
+>>> -            }
+>>> -            return;
+>>> -        }
+>>> +        /* Insert new ones */
+>> s/ones/one
+>>
+>>> +        QLIST_INSERT_HEAD(&s->notifiers_list, vtd_as, next);
+>>> +    } else if (new == IOMMU_NOTIFIER_NONE) {
+>>> +        /* Remove old ones */
+>> same. Not sure the comments are worth.
+> 
+> Will remove two "s"s there.  Thanks,
+> 
