@@ -1,19 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:32977)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33225)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1fJbAI-0003ja-Lx
-	for qemu-devel@nongnu.org; Fri, 18 May 2018 04:55:07 -0400
+	(envelope-from <no-reply@patchew.org>) id 1fJbBI-0004MN-VI
+	for qemu-devel@nongnu.org; Fri, 18 May 2018 04:56:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1fJbAD-0006F1-U2
-	for qemu-devel@nongnu.org; Fri, 18 May 2018 04:55:06 -0400
-Date: Fri, 18 May 2018 10:54:52 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20180518105452.246c77f3.cohuck@redhat.com>
-In-Reply-To: <20180516132757.68558-1-pasic@linux.ibm.com>
-References: <20180516132757.68558-1-pasic@linux.ibm.com>
+	(envelope-from <no-reply@patchew.org>) id 1fJbBE-0007R8-Nz
+	for qemu-devel@nongnu.org; Fri, 18 May 2018 04:56:09 -0400
+Resent-Message-Id: <E1fJbBE-0007R8-Nz@eggs.gnu.org>
+Received: from sender-of-o51.zoho.com ([135.84.80.216]:21049)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1fJbBE-0007Nn-Fw
+	for qemu-devel@nongnu.org; Fri, 18 May 2018 04:56:04 -0400
+In-Reply-To: <20180517050024.20101-1-ross.zwisler@linux.intel.com>
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <152653373366.258.12058788826462830143@1f70390a8372>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 1/1] virtio-ccw: clean up notify
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Wed, 16 May 2018 22:08:54 -0700 (PDT)
+Subject: Re: [Qemu-devel] [qemu PATCH v2 0/4] support NFIT platform
+ capabilities
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,20 +29,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Halil Pasic <pasic@linux.ibm.com>
-Cc: Richard Henderson <rth@twiddle.net>, Alexander Graf <agraf@suse.de>, David Hildenbrand <david@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Dong Jia Shi <bjsdjshi@linux.ibm.com>, qemu-s390x@nongnu.org, qemu-devel@nongnu.org
+To: ross.zwisler@linux.intel.com
+Cc: famz@redhat.com, imammedo@redhat.com, qemu-devel@nongnu.org, haozhong.zhang@intel.com, ehabkost@redhat.com, linux-nvdimm@lists.01.org, mst@redhat.com, stefanha@redhat.com
 
-On Wed, 16 May 2018 15:27:57 +0200
-Halil Pasic <pasic@linux.ibm.com> wrote:
-
-> Coverity recently started complaining about virtio_ccw_notify().  Turns
-> out, there is a couple of things that can be cleaned up.  Let's clean!
-> 
-> Reported-by: Peter Maydell <peter.maydell@linaro.org>
-> Fixes: CID 1390619
-> Signed-off-by: Halil Pasic <pasic@linux.ibm.com>
-> ---
->  hw/s390x/virtio-ccw.c | 13 +++++++++----
->  1 file changed, 9 insertions(+), 4 deletions(-)
-
-Thanks, applied.
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
+c3NhZ2UtaWQ6IDIwMTgwNTE3MDUwMDI0LjIwMTAxLTEtcm9zcy56d2lzbGVyQGxpbnV4LmludGVs
+LmNvbQpTdWJqZWN0OiBbUWVtdS1kZXZlbF0gW3FlbXUgUEFUQ0ggdjIgMC80XSBzdXBwb3J0IE5G
+SVQgcGxhdGZvcm0gY2FwYWJpbGl0aWVzCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jp
+bi9iYXNoCgpCQVNFPWJhc2UKbj0xCnRvdGFsPSQoZ2l0IGxvZyAtLW9uZWxpbmUgJEJBU0UuLiB8
+IHdjIC1sKQpmYWlsZWQ9MAoKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApn
+aXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKZ2l0IGNvbmZpZyAtLWxvY2FsIGRp
+ZmYuYWxnb3JpdGhtIGhpc3RvZ3JhbQoKY29tbWl0cz0iJChnaXQgbG9nIC0tZm9ybWF0PSVIIC0t
+cmV2ZXJzZSAkQkFTRS4uKSIKZm9yIGMgaW4gJGNvbW1pdHM7IGRvCiAgICBlY2hvICJDaGVja2lu
+ZyBQQVRDSCAkbi8kdG90YWw6ICQoZ2l0IGxvZyAtbiAxIC0tZm9ybWF0PSVzICRjKS4uLiIKICAg
+IGlmICEgZ2l0IHNob3cgJGMgLS1mb3JtYXQ9ZW1haWwgfCAuL3NjcmlwdHMvY2hlY2twYXRjaC5w
+bCAtLW1haWxiYWNrIC07IHRoZW4KICAgICAgICBmYWlsZWQ9MQogICAgICAgIGVjaG8KICAgIGZp
+CiAgICBuPSQoKG4rMSkpCmRvbmUKCmV4aXQgJGZhaWxlZAo9PT0gVEVTVCBTQ1JJUFQgRU5EID09
+PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApGcm9t
+IGh0dHBzOi8vZ2l0aHViLmNvbS9wYXRjaGV3LXByb2plY3QvcWVtdQogdCBbdGFnIHVwZGF0ZV0g
+ICAgICAgICAgICBwYXRjaGV3LzE1MjY1MTc3NjMtMTExMDgtMS1naXQtc2VuZC1lbWFpbC13YW5n
+amllODhAaHVhd2VpLmNvbSAtPiBwYXRjaGV3LzE1MjY1MTc3NjMtMTExMDgtMS1naXQtc2VuZC1l
+bWFpbC13YW5namllODhAaHVhd2VpLmNvbQogKiBbbmV3IHRhZ10gICAgICAgICAgICAgICBwYXRj
+aGV3LzIwMTgwNTE3MDUwMDI0LjIwMTAxLTEtcm9zcy56d2lzbGVyQGxpbnV4LmludGVsLmNvbSAt
+PiBwYXRjaGV3LzIwMTgwNTE3MDUwMDI0LjIwMTAxLTEtcm9zcy56d2lzbGVyQGxpbnV4LmludGVs
+LmNvbQpTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCjNhOGIwZTk4ZmEgQUNQSSB0ZXN0
+aW5nOiB0ZXN0IE5GSVQgcGxhdGZvcm0gY2FwYWJpbGl0aWVzCjU3MzJlOGJlOWIgbnZkaW1tLCBh
+Y3BpOiBzdXBwb3J0IE5GSVQgcGxhdGZvcm0gY2FwYWJpbGl0aWVzCjM4MDhiNWYxYmMgdGVzdHMv
+LmdpdGlnbm9yZTogYWRkIGVudHJ5IGZvciBnZW5lcmF0ZWQgZmlsZQpmYTA3YWU3N2M2IG52ZGlt
+bTogZml4IHR5cG8gaW4gbGFiZWwtc2l6ZSBkZWZpbml0aW9uCgo9PT0gT1VUUFVUIEJFR0lOID09
+PQpDaGVja2luZyBQQVRDSCAxLzQ6IG52ZGltbTogZml4IHR5cG8gaW4gbGFiZWwtc2l6ZSBkZWZp
+bml0aW9uLi4uCkNoZWNraW5nIFBBVENIIDIvNDogdGVzdHMvLmdpdGlnbm9yZTogYWRkIGVudHJ5
+IGZvciBnZW5lcmF0ZWQgZmlsZS4uLgpDaGVja2luZyBQQVRDSCAzLzQ6IG52ZGltbSwgYWNwaTog
+c3VwcG9ydCBORklUIHBsYXRmb3JtIGNhcGFiaWxpdGllcy4uLgpFUlJPUjogYnJhY2VzIHt9IGFy
+ZSBuZWNlc3NhcnkgZm9yIGFsbCBhcm1zIG9mIHRoaXMgc3RhdGVtZW50CiM5NDogRklMRTogaHcv
+YWNwaS9udmRpbW0uYzo0MDc6CisgICAgaWYgKHN0YXRlLT5jYXBhYmlsaXRpZXMpClsuLi5dCgp0
+b3RhbDogMSBlcnJvcnMsIDAgd2FybmluZ3MsIDE1NyBsaW5lcyBjaGVja2VkCgpZb3VyIHBhdGNo
+IGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJv
+cnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2Vl
+CkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgpDaGVja2luZyBQQVRDSCA0LzQ6IEFDUEkgdGVz
+dGluZzogdGVzdCBORklUIHBsYXRmb3JtIGNhcGFiaWxpdGllcy4uLgo9PT0gT1VUUFVUIEVORCA9
+PT0KClRlc3QgY29tbWFuZCBleGl0ZWQgd2l0aCBjb2RlOiAxCgoKLS0tCkVtYWlsIGdlbmVyYXRl
+ZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHA6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ug
+c2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAcmVkaGF0LmNvbQ==
