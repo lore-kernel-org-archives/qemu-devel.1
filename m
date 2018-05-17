@@ -1,29 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49126)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50783)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fJMsi-0003Gz-N4
-	for qemu-devel@nongnu.org; Thu, 17 May 2018 13:40:01 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1fJMzt-0006De-9s
+	for qemu-devel@nongnu.org; Thu, 17 May 2018 13:47:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fJMsf-0006pN-Gx
-	for qemu-devel@nongnu.org; Thu, 17 May 2018 13:40:00 -0400
-Received: from mail-pg0-x244.google.com ([2607:f8b0:400e:c05::244]:44583)
+	(envelope-from <alex.bennee@linaro.org>) id 1fJMzr-0003Qv-UV
+	for qemu-devel@nongnu.org; Thu, 17 May 2018 13:47:25 -0400
+Received: from mail-wm0-x22f.google.com ([2a00:1450:400c:c09::22f]:52500)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1fJMsf-0006p9-Bg
-	for qemu-devel@nongnu.org; Thu, 17 May 2018 13:39:57 -0400
-Received: by mail-pg0-x244.google.com with SMTP id c22-v6so1461266pgn.11
-	for <qemu-devel@nongnu.org>; Thu, 17 May 2018 10:39:57 -0700 (PDT)
-References: <20180516185146.30708-1-edgar.iglesias@gmail.com>
-	<20180516185146.30708-39-edgar.iglesias@gmail.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <80e9f8fa-6628-49dd-b07d-2e5f644b792e@linaro.org>
-Date: Thu, 17 May 2018 10:39:53 -0700
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1fJMzr-0003Qg-NN
+	for qemu-devel@nongnu.org; Thu, 17 May 2018 13:47:23 -0400
+Received: by mail-wm0-x22f.google.com with SMTP id w194-v6so9862254wmf.2
+	for <qemu-devel@nongnu.org>; Thu, 17 May 2018 10:47:23 -0700 (PDT)
+From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+Date: Thu, 17 May 2018 18:46:31 +0100
+Message-Id: <20180517174718.10107-3-alex.bennee@linaro.org>
+In-Reply-To: <20180517174718.10107-1-alex.bennee@linaro.org>
+References: <20180517174718.10107-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <20180516185146.30708-39-edgar.iglesias@gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3 38/38] target-microblaze: Consolidate
- MMU enabled checks
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH v4 02/49] configure: add test for docker
+ availability
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,23 +30,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, frederic.konrad@adacore.com, alistair@alistair23.me, frasse.iglesias@gmail.com, sstabellini@kernel.org, sai.pavan.boddu@xilinx.com, edgar.iglesias@xilinx.com
+To: cota@braap.org, famz@redhat.com, berrange@redhat.com, f4bug@amsat.org, richard.henderson@linaro.org, balrogg@gmail.com, aurelien@aurel32.net, agraf@suse.de
+Cc: qemu-devel@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 
-On 05/16/2018 11:51 AM, Edgar E. Iglesias wrote:
-> From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
-> 
-> Consolidate MMU enabled checks to cpu_mmu_index().
-> No functional changes.
-> 
-> Suggested-by: Richard Henderson <richard.henderson@linaro.org>
-> Signed-off-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
-> ---
->  target/microblaze/cpu.h    | 4 +++-
->  target/microblaze/helper.c | 6 +++---
->  2 files changed, 6 insertions(+), 4 deletions(-)
+This tests for a working docker installation without sudo and sets up
+config-host.mak accordingly. This will be useful from cross compiling
+things in the future.
 
+Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+---
+ configure | 17 +++++++++++++++++
+ 1 file changed, 17 insertions(+)
 
-
-r~
+diff --git a/configure b/configure
+index 59f91ab3f9..33681f16dd 100755
+--- a/configure
++++ b/configure
+@@ -456,6 +456,7 @@ jemalloc="no"
+ replication="yes"
+ vxhs=""
+ libxml2=""
++docker="no"
+ 
+ supported_cpu="no"
+ supported_os="no"
+@@ -5444,6 +5445,17 @@ EOF
+   fi
+ fi
+ 
++##########################################
++# Docker and cross-compiler support
++#
++# This is specifically for building test
++# cases for foreign architectures, not
++# cross-compiling QEMU itself.
++
++if has "docker"; then
++    docker=$($python $source_path/tests/docker/docker.py probe)
++fi
++
+ ##########################################
+ # End of CC checks
+ # After here, no more $cc or $ld runs
+@@ -5907,6 +5919,7 @@ echo "avx2 optimization $avx2_opt"
+ echo "replication support $replication"
+ echo "VxHS block device $vxhs"
+ echo "capstone          $capstone"
++echo "docker            $docker"
+ 
+ if test "$sdl_too_old" = "yes"; then
+ echo "-> Your SDL version is too old - please upgrade to have SDL support"
+@@ -6731,6 +6744,10 @@ if test "$gcov" = "yes" ; then
+   echo "GCOV=$gcov_tool" >> $config_host_mak
+ fi
+ 
++if test "$docker" != "no"; then
++    echo "HAVE_USER_DOCKER=y" >> $config_host_mak
++fi
++
+ # use included Linux headers
+ if test "$linux" = "yes" ; then
+   mkdir -p linux-headers
+-- 
+2.17.0
