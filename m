@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50649)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50706)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <prvs=66809d549=Paul.Durrant@citrix.com>)
-	id 1fJKx2-0005Jh-3b
-	for qemu-devel@nongnu.org; Thu, 17 May 2018 11:36:24 -0400
+	id 1fJKx4-0005Kp-Oy
+	for qemu-devel@nongnu.org; Thu, 17 May 2018 11:36:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <prvs=66809d549=Paul.Durrant@citrix.com>)
-	id 1fJKx0-0006Yp-KL
-	for qemu-devel@nongnu.org; Thu, 17 May 2018 11:36:20 -0400
+	id 1fJKx2-0006a3-Mm
+	for qemu-devel@nongnu.org; Thu, 17 May 2018 11:36:22 -0400
 From: Paul Durrant <paul.durrant@citrix.com>
-Date: Thu, 17 May 2018 16:35:57 +0100
-Message-ID: <1526571358-26685-9-git-send-email-paul.durrant@citrix.com>
+Date: Thu, 17 May 2018 16:35:55 +0100
+Message-ID: <1526571358-26685-7-git-send-email-paul.durrant@citrix.com>
 In-Reply-To: <1526571358-26685-1-git-send-email-paul.durrant@citrix.com>
 References: <1526571358-26685-1-git-send-email-paul.durrant@citrix.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v4 8/9] xen_disk: use a single entry iovec
+Subject: [Qemu-devel] [PATCH v4 6/9] xen_disk: remove use of grant map/unmap
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,10 +26,9 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: xen-devel@lists.xenproject.org, qemu-block@nongnu.org, qemu-devel@nongnu.org
 Cc: Paul Durrant <paul.durrant@citrix.com>, Stefano Stabellini <sstabellini@kernel.org>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
 
-Since xen_disk now always copies data to and from a guest there is no need
-to maintain a vector entry corresponding to every page of a request.
-This means there is less per-request state to maintain so the ioreq
-structure can shrink significantly.
+Now that the (native or emulated) xen_be_copy_grant_refs() helper is
+always available, the xen_disk code can be significantly simplified by
+removing direct use of grant map and unmap operations.
 
 Signed-off-by: Paul Durrant <paul.durrant@citrix.com>
 Acked-by: Anthony Perard <anthony.perard@citrix.com>
@@ -38,200 +37,535 @@ Cc: Stefano Stabellini <sstabellini@kernel.org>
 Cc: Kevin Wolf <kwolf@redhat.com>
 Cc: Max Reitz <mreitz@redhat.com>
 
-v3:
- - Un-break by fixing mis-placed qemu_iovec_add()
-
 v2:
+ - Squashed in separate patche removing persistent grant use
  - Re-based
 ---
- hw/block/xen_disk.c | 76 +++++++++++++++--------------------------------------
- 1 file changed, 21 insertions(+), 55 deletions(-)
+ hw/block/xen_disk.c | 352 ++++------------------------------------------------
+ 1 file changed, 25 insertions(+), 327 deletions(-)
 
 diff --git a/hw/block/xen_disk.c b/hw/block/xen_disk.c
-index 28be8b6..28651c5 100644
+index d3be45a..28be8b6 100644
 --- a/hw/block/xen_disk.c
 +++ b/hw/block/xen_disk.c
-@@ -46,13 +46,10 @@ struct ioreq {
-     /* parsed request */
+@@ -36,27 +36,9 @@
+ 
+ /* ------------------------------------------------------------- */
+ 
+-static int batch_maps   = 0;
+-
+-/* ------------------------------------------------------------- */
+-
+ #define BLOCK_SIZE  512
+ #define IOCB_COUNT  (BLKIF_MAX_SEGMENTS_PER_REQUEST + 2)
+ 
+-struct PersistentGrant {
+-    void *page;
+-    struct XenBlkDev *blkdev;
+-};
+-
+-typedef struct PersistentGrant PersistentGrant;
+-
+-struct PersistentRegion {
+-    void *addr;
+-    int num;
+-};
+-
+-typedef struct PersistentRegion PersistentRegion;
+-
+ struct ioreq {
+     blkif_request_t     req;
+     int16_t             status;
+@@ -65,14 +47,11 @@ struct ioreq {
      off_t               start;
      QEMUIOVector        v;
-+    void                *buf;
-+    size_t              size;
      int                 presync;
+-    uint8_t             mapped;
  
--    /* grant mapping */
--    uint32_t            refs[BLKIF_MAX_SEGMENTS_PER_REQUEST];
--    void                *page[BLKIF_MAX_SEGMENTS_PER_REQUEST];
--    void                *pages;
--
+     /* grant mapping */
+     uint32_t            refs[BLKIF_MAX_SEGMENTS_PER_REQUEST];
+-    int                 prot;
+     void                *page[BLKIF_MAX_SEGMENTS_PER_REQUEST];
+     void                *pages;
+-    int                 num_unmap;
+ 
      /* aio status */
      int                 aio_inflight;
-     int                 aio_errors;
-@@ -110,12 +107,10 @@ static void ioreq_reset(struct ioreq *ioreq)
-     memset(&ioreq->req, 0, sizeof(ioreq->req));
+@@ -103,7 +82,6 @@ struct XenBlkDev {
+     int                 protocol;
+     blkif_back_rings_t  rings;
+     int                 more_work;
+-    int                 cnt_map;
+ 
+     /* request lists */
+     QLIST_HEAD(inflight_head, ioreq) inflight;
+@@ -114,13 +92,7 @@ struct XenBlkDev {
+     int                 requests_finished;
+     unsigned int        max_requests;
+ 
+-    /* Persistent grants extension */
+     gboolean            feature_discard;
+-    gboolean            feature_persistent;
+-    GTree               *persistent_gnts;
+-    GSList              *persistent_regions;
+-    unsigned int        persistent_gnt_count;
+-    unsigned int        max_grants;
+ 
+     /* qemu block driver */
+     DriveInfo           *dinfo;
+@@ -139,10 +111,8 @@ static void ioreq_reset(struct ioreq *ioreq)
      ioreq->status = 0;
      ioreq->start = 0;
-+    ioreq->buf = NULL;
-+    ioreq->size = 0;
      ioreq->presync = 0;
+-    ioreq->mapped = 0;
  
--    memset(ioreq->refs, 0, sizeof(ioreq->refs));
--    memset(ioreq->page, 0, sizeof(ioreq->page));
--    ioreq->pages = NULL;
+     memset(ioreq->refs, 0, sizeof(ioreq->refs));
+-    ioreq->prot = 0;
+     memset(ioreq->page, 0, sizeof(ioreq->page));
+     ioreq->pages = NULL;
+ 
+@@ -156,37 +126,6 @@ static void ioreq_reset(struct ioreq *ioreq)
+     qemu_iovec_reset(&ioreq->v);
+ }
+ 
+-static gint int_cmp(gconstpointer a, gconstpointer b, gpointer user_data)
+-{
+-    uint ua = GPOINTER_TO_UINT(a);
+-    uint ub = GPOINTER_TO_UINT(b);
+-    return (ua > ub) - (ua < ub);
+-}
 -
-     ioreq->aio_inflight = 0;
-     ioreq->aio_errors = 0;
- 
-@@ -138,7 +133,7 @@ static struct ioreq *ioreq_start(struct XenBlkDev *blkdev)
-         ioreq = g_malloc0(sizeof(*ioreq));
-         ioreq->blkdev = blkdev;
-         blkdev->requests_total++;
--        qemu_iovec_init(&ioreq->v, BLKIF_MAX_SEGMENTS_PER_REQUEST);
-+        qemu_iovec_init(&ioreq->v, 1);
-     } else {
-         /* get one from freelist */
-         ioreq = QLIST_FIRST(&blkdev->freelist);
-@@ -183,7 +178,6 @@ static void ioreq_release(struct ioreq *ioreq, bool finish)
- static int ioreq_parse(struct ioreq *ioreq)
+-static void destroy_grant(gpointer pgnt)
+-{
+-    PersistentGrant *grant = pgnt;
+-    struct XenBlkDev *blkdev = grant->blkdev;
+-    struct XenDevice *xendev = &blkdev->xendev;
+-
+-    xen_be_unmap_grant_ref(xendev, grant->page);
+-    grant->blkdev->persistent_gnt_count--;
+-    xen_pv_printf(xendev, 3, "unmapped grant %p\n", grant->page);
+-    g_free(grant);
+-}
+-
+-static void remove_persistent_region(gpointer data, gpointer dev)
+-{
+-    PersistentRegion *region = data;
+-    struct XenBlkDev *blkdev = dev;
+-    struct XenDevice *xendev = &blkdev->xendev;
+-
+-    xen_be_unmap_grant_refs(xendev, region->addr, region->num);
+-    xen_pv_printf(xendev, 3, "unmapped grant region %p with %d pages\n",
+-                  region->addr, region->num);
+-    g_free(region);
+-}
+-
+ static struct ioreq *ioreq_start(struct XenBlkDev *blkdev)
  {
-     struct XenBlkDev *blkdev = ioreq->blkdev;
--    uintptr_t mem;
-     size_t len;
-     int i;
- 
-@@ -230,13 +224,10 @@ static int ioreq_parse(struct ioreq *ioreq)
-             goto err;
+     struct ioreq *ioreq = NULL;
+@@ -254,7 +193,6 @@ static int ioreq_parse(struct ioreq *ioreq)
+                   ioreq->req.handle, ioreq->req.id, ioreq->req.sector_number);
+     switch (ioreq->req.operation) {
+     case BLKIF_OP_READ:
+-        ioreq->prot = PROT_WRITE; /* to memory */
+         break;
+     case BLKIF_OP_FLUSH_DISKCACHE:
+         ioreq->presync = 1;
+@@ -263,7 +201,6 @@ static int ioreq_parse(struct ioreq *ioreq)
          }
- 
--        ioreq->refs[i]   = ioreq->req.seg[i].gref;
--
--        mem = ioreq->req.seg[i].first_sect * blkdev->file_blk;
-         len = (ioreq->req.seg[i].last_sect - ioreq->req.seg[i].first_sect + 1) * blkdev->file_blk;
--        qemu_iovec_add(&ioreq->v, (void*)mem, len);
-+        ioreq->size += len;
-     }
--    if (ioreq->start + ioreq->v.size > blkdev->file_size) {
-+    if (ioreq->start + ioreq->size > blkdev->file_size) {
-         xen_pv_printf(&blkdev->xendev, 0, "error: access beyond end of file\n");
-         goto err;
-     }
-@@ -247,35 +238,6 @@ err:
+         /* fall through */
+     case BLKIF_OP_WRITE:
+-        ioreq->prot = PROT_READ; /* from memory */
+         break;
+     case BLKIF_OP_DISCARD:
+         return 0;
+@@ -310,171 +247,6 @@ err:
      return -1;
  }
  
--static void ioreq_free_copy_buffers(struct ioreq *ioreq)
+-static void ioreq_unmap(struct ioreq *ioreq)
 -{
+-    struct XenBlkDev *blkdev = ioreq->blkdev;
+-    struct XenDevice *xendev = &blkdev->xendev;
 -    int i;
 -
--    for (i = 0; i < ioreq->v.niov; i++) {
--        ioreq->page[i] = NULL;
+-    if (ioreq->num_unmap == 0 || ioreq->mapped == 0) {
+-        return;
 -    }
--
--    qemu_vfree(ioreq->pages);
+-    if (batch_maps) {
+-        if (!ioreq->pages) {
+-            return;
+-        }
+-        xen_be_unmap_grant_refs(xendev, ioreq->pages, ioreq->num_unmap);
+-        ioreq->blkdev->cnt_map -= ioreq->num_unmap;
+-        ioreq->pages = NULL;
+-    } else {
+-        for (i = 0; i < ioreq->num_unmap; i++) {
+-            if (!ioreq->page[i]) {
+-                continue;
+-            }
+-            xen_be_unmap_grant_ref(xendev, ioreq->page[i]);
+-            ioreq->blkdev->cnt_map--;
+-            ioreq->page[i] = NULL;
+-        }
+-    }
+-    ioreq->mapped = 0;
 -}
 -
--static int ioreq_init_copy_buffers(struct ioreq *ioreq)
+-static int ioreq_map(struct ioreq *ioreq)
 -{
--    int i;
+-    struct XenBlkDev *blkdev = ioreq->blkdev;
+-    struct XenDevice *xendev = &blkdev->xendev;
+-    uint32_t refs[BLKIF_MAX_SEGMENTS_PER_REQUEST];
+-    void *page[BLKIF_MAX_SEGMENTS_PER_REQUEST];
+-    int i, j, new_maps = 0;
+-    PersistentGrant *grant;
+-    PersistentRegion *region;
+-    /* refs variable will contain the information necessary
+-     * to map the grants that are needed to fulfill this request.
+-     *
+-     * After mapping the needed grants, the page array will contain the
+-     * memory address of each granted page in the order specified in ioreq
+-     * (disregarding if it's a persistent grant or not).
+-     */
 -
--    if (ioreq->v.niov == 0) {
+-    if (ioreq->v.niov == 0 || ioreq->mapped == 1) {
 -        return 0;
 -    }
+-    if (ioreq->blkdev->feature_persistent) {
+-        for (i = 0; i < ioreq->v.niov; i++) {
+-            grant = g_tree_lookup(ioreq->blkdev->persistent_gnts,
+-                                    GUINT_TO_POINTER(ioreq->refs[i]));
 -
--    ioreq->pages = qemu_memalign(XC_PAGE_SIZE, ioreq->v.niov * XC_PAGE_SIZE);
--
--    for (i = 0; i < ioreq->v.niov; i++) {
--        ioreq->page[i] = ioreq->pages + i * XC_PAGE_SIZE;
--        ioreq->v.iov[i].iov_base = ioreq->page[i];
+-            if (grant != NULL) {
+-                page[i] = grant->page;
+-                xen_pv_printf(&ioreq->blkdev->xendev, 3,
+-                              "using persistent-grant %" PRIu32 "\n",
+-                              ioreq->refs[i]);
+-            } else {
+-                    /* Add the grant to the list of grants that
+-                     * should be mapped
+-                     */
+-                    refs[new_maps] = ioreq->refs[i];
+-                    page[i] = NULL;
+-                    new_maps++;
+-            }
+-        }
+-        /* Set the protection to RW, since grants may be reused later
+-         * with a different protection than the one needed for this request
+-         */
+-        ioreq->prot = PROT_WRITE | PROT_READ;
+-    } else {
+-        /* All grants in the request should be mapped */
+-        memcpy(refs, ioreq->refs, sizeof(refs));
+-        memset(page, 0, sizeof(page));
+-        new_maps = ioreq->v.niov;
 -    }
 -
+-    if (batch_maps && new_maps) {
+-        ioreq->pages = xen_be_map_grant_refs(xendev, refs, new_maps,
+-                                             ioreq->prot);
+-        if (ioreq->pages == NULL) {
+-            xen_pv_printf(&ioreq->blkdev->xendev, 0,
+-                          "can't map %d grant refs (%s, %d maps)\n",
+-                          new_maps, strerror(errno), ioreq->blkdev->cnt_map);
+-            return -1;
+-        }
+-        for (i = 0, j = 0; i < ioreq->v.niov; i++) {
+-            if (page[i] == NULL) {
+-                page[i] = ioreq->pages + (j++) * XC_PAGE_SIZE;
+-            }
+-        }
+-        ioreq->blkdev->cnt_map += new_maps;
+-    } else if (new_maps)  {
+-        for (i = 0; i < new_maps; i++) {
+-            ioreq->page[i] = xen_be_map_grant_ref(xendev, refs[i],
+-                                                  ioreq->prot);
+-            if (ioreq->page[i] == NULL) {
+-                xen_pv_printf(&ioreq->blkdev->xendev, 0,
+-                              "can't map grant ref %d (%s, %d maps)\n",
+-                              refs[i], strerror(errno), ioreq->blkdev->cnt_map);
+-                ioreq->mapped = 1;
+-                ioreq_unmap(ioreq);
+-                return -1;
+-            }
+-            ioreq->blkdev->cnt_map++;
+-        }
+-        for (i = 0, j = 0; i < ioreq->v.niov; i++) {
+-            if (page[i] == NULL) {
+-                page[i] = ioreq->page[j++];
+-            }
+-        }
+-    }
+-    if (ioreq->blkdev->feature_persistent && new_maps != 0 &&
+-        (!batch_maps || (ioreq->blkdev->persistent_gnt_count + new_maps <=
+-        ioreq->blkdev->max_grants))) {
+-        /*
+-         * If we are using persistent grants and batch mappings only
+-         * add the new maps to the list of persistent grants if the whole
+-         * area can be persistently mapped.
+-         */
+-        if (batch_maps) {
+-            region = g_malloc0(sizeof(*region));
+-            region->addr = ioreq->pages;
+-            region->num = new_maps;
+-            ioreq->blkdev->persistent_regions = g_slist_append(
+-                                            ioreq->blkdev->persistent_regions,
+-                                            region);
+-        }
+-        while ((ioreq->blkdev->persistent_gnt_count < ioreq->blkdev->max_grants)
+-              && new_maps) {
+-            /* Go through the list of newly mapped grants and add as many
+-             * as possible to the list of persistently mapped grants.
+-             *
+-             * Since we start at the end of ioreq->page(s), we only need
+-             * to decrease new_maps to prevent this granted pages from
+-             * being unmapped in ioreq_unmap.
+-             */
+-            grant = g_malloc0(sizeof(*grant));
+-            new_maps--;
+-            if (batch_maps) {
+-                grant->page = ioreq->pages + (new_maps) * XC_PAGE_SIZE;
+-            } else {
+-                grant->page = ioreq->page[new_maps];
+-            }
+-            grant->blkdev = ioreq->blkdev;
+-            xen_pv_printf(&ioreq->blkdev->xendev, 3,
+-                          "adding grant %" PRIu32 " page: %p\n",
+-                          refs[new_maps], grant->page);
+-            g_tree_insert(ioreq->blkdev->persistent_gnts,
+-                          GUINT_TO_POINTER(refs[new_maps]),
+-                          grant);
+-            ioreq->blkdev->persistent_gnt_count++;
+-        }
+-        assert(!batch_maps || new_maps == 0);
+-    }
+-    for (i = 0; i < ioreq->v.niov; i++) {
+-        ioreq->v.iov[i].iov_base += (uintptr_t)page[i];
+-    }
+-    ioreq->mapped = 1;
+-    ioreq->num_unmap = new_maps;
 -    return 0;
 -}
 -
- static int ioreq_grant_copy(struct ioreq *ioreq)
+ static void ioreq_free_copy_buffers(struct ioreq *ioreq)
  {
-     struct XenBlkDev *blkdev = ioreq->blkdev;
-@@ -284,25 +246,27 @@ static int ioreq_grant_copy(struct ioreq *ioreq)
-     int i, count, rc;
-     int64_t file_blk = ioreq->blkdev->file_blk;
-     bool to_domain = (ioreq->req.operation == BLKIF_OP_READ);
-+    void *virt = ioreq->buf;
- 
--    if (ioreq->v.niov == 0) {
-+    if (ioreq->req.nr_segments == 0) {
-         return 0;
+     int i;
+@@ -570,32 +342,28 @@ static void qemu_aio_complete(void *opaque, int ret)
+         goto done;
      }
  
--    count = ioreq->v.niov;
-+    count = ioreq->req.nr_segments;
- 
-     for (i = 0; i < count; i++) {
-         if (to_domain) {
--            segs[i].dest.foreign.ref = ioreq->refs[i];
-+            segs[i].dest.foreign.ref = ioreq->req.seg[i].gref;
-             segs[i].dest.foreign.offset = ioreq->req.seg[i].first_sect * file_blk;
--            segs[i].source.virt = ioreq->v.iov[i].iov_base;
-+            segs[i].source.virt = virt;
-         } else {
--            segs[i].source.foreign.ref = ioreq->refs[i];
-+            segs[i].source.foreign.ref = ioreq->req.seg[i].gref;
-             segs[i].source.foreign.offset = ioreq->req.seg[i].first_sect * file_blk;
--            segs[i].dest.virt = ioreq->v.iov[i].iov_base;
-+            segs[i].dest.virt = virt;
-         }
-         segs[i].len = (ioreq->req.seg[i].last_sect
-                        - ioreq->req.seg[i].first_sect + 1) * file_blk;
-+        virt += segs[i].len;
-     }
- 
-     rc = xen_be_copy_grant_refs(xendev, to_domain, segs, count);
-@@ -348,14 +312,14 @@ static void qemu_aio_complete(void *opaque, int ret)
-         if (ret == 0) {
-             ioreq_grant_copy(ioreq);
-         }
--        ioreq_free_copy_buffers(ioreq);
-+        qemu_vfree(ioreq->buf);
-         break;
-     case BLKIF_OP_WRITE:
-     case BLKIF_OP_FLUSH_DISKCACHE:
-         if (!ioreq->req.nr_segments) {
+-    if (xen_feature_grant_copy) {
+-        switch (ioreq->req.operation) {
+-        case BLKIF_OP_READ:
+-            /* in case of failure ioreq->aio_errors is increased */
+-            if (ret == 0) {
+-                ioreq_grant_copy(ioreq);
+-            }
+-            ioreq_free_copy_buffers(ioreq);
+-            break;
+-        case BLKIF_OP_WRITE:
+-        case BLKIF_OP_FLUSH_DISKCACHE:
+-            if (!ioreq->req.nr_segments) {
+-                break;
+-            }
+-            ioreq_free_copy_buffers(ioreq);
+-            break;
+-        default:
++    switch (ioreq->req.operation) {
++    case BLKIF_OP_READ:
++        /* in case of failure ioreq->aio_errors is increased */
++        if (ret == 0) {
++            ioreq_grant_copy(ioreq);
++        }
++        ioreq_free_copy_buffers(ioreq);
++        break;
++    case BLKIF_OP_WRITE:
++    case BLKIF_OP_FLUSH_DISKCACHE:
++        if (!ioreq->req.nr_segments) {
              break;
          }
--        ioreq_free_copy_buffers(ioreq);
-+        qemu_vfree(ioreq->buf);
-         break;
-     default:
-         break;
-@@ -423,12 +387,12 @@ static int ioreq_runio_qemu_aio(struct ioreq *ioreq)
++        ioreq_free_copy_buffers(ioreq);
++        break;
++    default:
++        break;
+     }
+ 
+     ioreq->status = ioreq->aio_errors ? BLKIF_RSP_ERROR : BLKIF_RSP_OKAY;
+-    if (!xen_feature_grant_copy) {
+-        ioreq_unmap(ioreq);
+-    }
+     ioreq_finish(ioreq);
++
+     switch (ioreq->req.operation) {
+     case BLKIF_OP_WRITE:
+     case BLKIF_OP_FLUSH_DISKCACHE:
+@@ -655,18 +423,13 @@ static int ioreq_runio_qemu_aio(struct ioreq *ioreq)
  {
      struct XenBlkDev *blkdev = ioreq->blkdev;
  
--    ioreq_init_copy_buffers(ioreq);
-+    ioreq->buf = qemu_memalign(XC_PAGE_SIZE, ioreq->size);
-     if (ioreq->req.nr_segments &&
-         (ioreq->req.operation == BLKIF_OP_WRITE ||
-          ioreq->req.operation == BLKIF_OP_FLUSH_DISKCACHE) &&
-         ioreq_grant_copy(ioreq)) {
--        ioreq_free_copy_buffers(ioreq);
-+        qemu_vfree(ioreq->buf);
+-    if (xen_feature_grant_copy) {
+-        ioreq_init_copy_buffers(ioreq);
+-        if (ioreq->req.nr_segments && (ioreq->req.operation == BLKIF_OP_WRITE ||
+-            ioreq->req.operation == BLKIF_OP_FLUSH_DISKCACHE) &&
+-            ioreq_grant_copy(ioreq)) {
+-                ioreq_free_copy_buffers(ioreq);
+-                goto err;
+-        }
+-    } else {
+-        if (ioreq->req.nr_segments && ioreq_map(ioreq)) {
+-            goto err;
+-        }
++    ioreq_init_copy_buffers(ioreq);
++    if (ioreq->req.nr_segments &&
++        (ioreq->req.operation == BLKIF_OP_WRITE ||
++         ioreq->req.operation == BLKIF_OP_FLUSH_DISKCACHE) &&
++        ioreq_grant_copy(ioreq)) {
++        ioreq_free_copy_buffers(ioreq);
++        goto err;
+     }
+ 
+     ioreq->aio_inflight++;
+@@ -707,9 +470,6 @@ static int ioreq_runio_qemu_aio(struct ioreq *ioreq)
+     }
+     default:
+         /* unknown operation (shouldn't happen -- parse catches this) */
+-        if (!xen_feature_grant_copy) {
+-            ioreq_unmap(ioreq);
+-        }
          goto err;
      }
  
-@@ -440,6 +404,7 @@ static int ioreq_runio_qemu_aio(struct ioreq *ioreq)
+@@ -895,10 +655,6 @@ static void blk_alloc(struct XenDevice *xendev)
  
-     switch (ioreq->req.operation) {
-     case BLKIF_OP_READ:
-+        qemu_iovec_add(&ioreq->v, ioreq->buf, ioreq->size);
-         block_acct_start(blk_get_stats(blkdev->blk), &ioreq->acct,
-                          ioreq->v.size, BLOCK_ACCT_READ);
-         ioreq->aio_inflight++;
-@@ -452,6 +417,7 @@ static int ioreq_runio_qemu_aio(struct ioreq *ioreq)
-             break;
-         }
+     blkdev->ctx = iothread_get_aio_context(blkdev->iothread);
+     blkdev->bh = aio_bh_new(blkdev->ctx, blk_bh, blkdev);
+-
+-    if (xen_mode != XEN_EMULATE) {
+-        batch_maps = 1;
+-    }
+ }
  
-+        qemu_iovec_add(&ioreq->v, ioreq->buf, ioreq->size);
-         block_acct_start(blk_get_stats(blkdev->blk), &ioreq->acct,
-                          ioreq->v.size,
-                          ioreq->req.operation == BLKIF_OP_WRITE ?
+ static void blk_parse_discard(struct XenBlkDev *blkdev)
+@@ -981,15 +737,10 @@ static int blk_init(struct XenDevice *xendev)
+ 
+     blkdev->file_blk  = BLOCK_SIZE;
+ 
+-    xen_pv_printf(&blkdev->xendev, 3, "grant copy operation %s\n",
+-                  xen_feature_grant_copy ? "enabled" : "disabled");
+-
+     /* fill info
+      * blk_connect supplies sector-size and sectors
+      */
+     xenstore_write_be_int(&blkdev->xendev, "feature-flush-cache", 1);
+-    xenstore_write_be_int(&blkdev->xendev, "feature-persistent",
+-                          !xen_feature_grant_copy);
+     xenstore_write_be_int(&blkdev->xendev, "info", info);
+ 
+     xenstore_write_be_int(&blkdev->xendev, "max-ring-page-order",
+@@ -1016,19 +767,10 @@ out_error:
+     return -1;
+ }
+ 
+-/*
+- * We need to account for the grant allocations requiring contiguous
+- * chunks; the worst case number would be
+- *     max_req * max_seg + (max_req - 1) * (max_seg - 1) + 1,
+- * but in order to keep things simple just use
+- *     2 * max_req * max_seg.
+- */
+-#define MAX_GRANTS(max_req, max_seg) (2 * (max_req) * (max_seg))
+-
+ static int blk_connect(struct XenDevice *xendev)
+ {
+     struct XenBlkDev *blkdev = container_of(xendev, struct XenBlkDev, xendev);
+-    int pers, index, qflags;
++    int index, qflags;
+     bool readonly = true;
+     bool writethrough = true;
+     int order, ring_ref;
+@@ -1150,11 +892,6 @@ static int blk_connect(struct XenDevice *xendev)
+                              &blkdev->xendev.remote_port) == -1) {
+         return -1;
+     }
+-    if (xenstore_read_fe_int(&blkdev->xendev, "feature-persistent", &pers)) {
+-        blkdev->feature_persistent = FALSE;
+-    } else {
+-        blkdev->feature_persistent = !!pers;
+-    }
+ 
+     if (!blkdev->xendev.protocol) {
+         blkdev->protocol = BLKIF_PROTOCOL_NATIVE;
+@@ -1189,11 +926,8 @@ static int blk_connect(struct XenDevice *xendev)
+         return -1;
+     }
+ 
+-    /* Calculate the maximum number of grants needed by ioreqs */
+-    max_grants = MAX_GRANTS(blkdev->max_requests,
+-                            BLKIF_MAX_SEGMENTS_PER_REQUEST);
+     /* Add on the number needed for the ring pages */
+-    max_grants += blkdev->nr_ring_ref;
++    max_grants = blkdev->nr_ring_ref;
+ 
+     xen_be_set_max_grant_refs(xendev, max_grants);
+ 
+@@ -1204,8 +938,6 @@ static int blk_connect(struct XenDevice *xendev)
+         return -1;
+     }
+ 
+-    blkdev->cnt_map++;
+-
+     switch (blkdev->protocol) {
+     case BLKIF_PROTOCOL_NATIVE:
+     {
+@@ -1229,19 +961,6 @@ static int blk_connect(struct XenDevice *xendev)
+     }
+     }
+ 
+-    if (blkdev->feature_persistent) {
+-        /* Init persistent grants */
+-        blkdev->max_grants = blkdev->max_requests *
+-            BLKIF_MAX_SEGMENTS_PER_REQUEST;
+-        blkdev->persistent_gnts = g_tree_new_full((GCompareDataFunc)int_cmp,
+-                                             NULL, NULL,
+-                                             batch_maps ?
+-                                             (GDestroyNotify)g_free :
+-                                             (GDestroyNotify)destroy_grant);
+-        blkdev->persistent_regions = NULL;
+-        blkdev->persistent_gnt_count = 0;
+-    }
+-
+     blk_set_aio_context(blkdev->blk, blkdev->ctx);
+ 
+     xen_be_bind_evtchn(&blkdev->xendev);
+@@ -1274,29 +993,8 @@ static void blk_disconnect(struct XenDevice *xendev)
+     if (blkdev->sring) {
+         xen_be_unmap_grant_refs(xendev, blkdev->sring,
+                                 blkdev->nr_ring_ref);
+-        blkdev->cnt_map--;
+         blkdev->sring = NULL;
+     }
+-
+-    /*
+-     * Unmap persistent grants before switching to the closed state
+-     * so the frontend can free them.
+-     *
+-     * In the !batch_maps case g_tree_destroy will take care of unmapping
+-     * the grant, but in the batch_maps case we need to iterate over every
+-     * region in persistent_regions and unmap it.
+-     */
+-    if (blkdev->feature_persistent) {
+-        g_tree_destroy(blkdev->persistent_gnts);
+-        assert(batch_maps || blkdev->persistent_gnt_count == 0);
+-        if (batch_maps) {
+-            blkdev->persistent_gnt_count = 0;
+-            g_slist_foreach(blkdev->persistent_regions,
+-                            (GFunc)remove_persistent_region, blkdev);
+-            g_slist_free(blkdev->persistent_regions);
+-        }
+-        blkdev->feature_persistent = false;
+-    }
+ }
+ 
+ static int blk_free(struct XenDevice *xendev)
 -- 
 2.1.4
