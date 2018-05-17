@@ -1,25 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56857)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60472)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fJHrw-00049Y-UH
-	for qemu-devel@nongnu.org; Thu, 17 May 2018 08:18:53 -0400
+	(envelope-from <armbru@redhat.com>) id 1fJI5Q-0000wP-7P
+	for qemu-devel@nongnu.org; Thu, 17 May 2018 08:32:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fJHrv-0006nb-RM
-	for qemu-devel@nongnu.org; Thu, 17 May 2018 08:18:52 -0400
-Received: from mail-ot0-x229.google.com ([2607:f8b0:4003:c0f::229]:40724)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fJHrv-0006nE-Lr
-	for qemu-devel@nongnu.org; Thu, 17 May 2018 08:18:51 -0400
-Received: by mail-ot0-x229.google.com with SMTP id n1-v6so4770014otf.7
-	for <qemu-devel@nongnu.org>; Thu, 17 May 2018 05:18:51 -0700 (PDT)
+	(envelope-from <armbru@redhat.com>) id 1fJI5M-0007Bg-9a
+	for qemu-devel@nongnu.org; Thu, 17 May 2018 08:32:48 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:38460 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fJI5M-0007Aj-4S
+	for qemu-devel@nongnu.org; Thu, 17 May 2018 08:32:44 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.5])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 7ED45195476
+	for <qemu-devel@nongnu.org>; Thu, 17 May 2018 12:32:43 +0000 (UTC)
+From: Markus Armbruster <armbru@redhat.com>
+References: <20180509041734.14135-1-peterx@redhat.com>
+	<20180509041734.14135-2-peterx@redhat.com>
+Date: Thu, 17 May 2018 14:32:34 +0200
+In-Reply-To: <20180509041734.14135-2-peterx@redhat.com> (Peter Xu's message of
+	"Wed, 9 May 2018 12:17:31 +0800")
+Message-ID: <877eo2mpi5.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <20180516174234.311-1-jcody@redhat.com>
-References: <20180516174234.311-1-jcody@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 17 May 2018 13:18:30 +0100
-Message-ID: <CAFEAcA99=W0XFy+JGv-s8sJyab8HX7gL41H0J45Q5oqVfhuEWQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL 0/4] Block patches
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v5 1/4] monitor: rename out_lock to mon_lock
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,34 +33,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jeff Cody <jcody@redhat.com>
-Cc: Qemu-block <qemu-block@nongnu.org>, Kevin Wolf <kwolf@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>
+To: Peter Xu <peterx@redhat.com>
+Cc: qemu-devel@nongnu.org, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
 
-On 16 May 2018 at 18:42, Jeff Cody <jcody@redhat.com> wrote:
-> The following changes since commit c416eecea5f3aea863ab8fda5a36a24157b8f704:
->
->   Merge remote-tracking branch 'remotes/kevin/tags/for-upstream' into staging (2018-05-15 17:02:00 +0100)
->
-> are available in the git repository at:
->
->   git://github.com/codyprime/qemu-kvm-jtc.git tags/block-pull-request
->
-> for you to fetch changes up to c82be42cc803b36fd7aed5dceec68312c7056fd5:
->
->   nfs: Remove processed options from QDict (2018-05-16 13:37:47 -0400)
->
-> ----------------------------------------------------------------
-> Block patches
-> ----------------------------------------------------------------
->
-> Kevin Wolf (2):
->   nfs: Fix error path in nfs_options_qdict_to_qapi()
->   nfs: Remove processed options from QDict
->
-> Stefan Hajnoczi (2):
->   qemu-iotests: reduce chance of races in 185
->   blockjob: do not cancel timer in resume
+Peter Xu <peterx@redhat.com> writes:
 
-Applied, thanks.
+> The out_lock was only protecting a few Monitor fields.  In the future
 
--- PMM
+"was protecting"?  When?  Or do you mean "is protecting"?
+
+> the monitor code will start to run in multiple threads.  We turn it into
+> a bigger lock to protect not only the out buffer but also all the rest.
+
+"We turn it into a bigger lock"?  If this patch does what its title
+claims, it can't "turn" anything.  Do you perhaps mean "We're going to
+turn it into a bigger lock"?
+
+> For now we share the lock.  We can split the lock when needed.
+
+What exactly do you mean by "we share the lock"?
+
+> Since at it, arrange the Monitor struct a bit.
+
+"Since we're at it, rearrange".  Can touch up on commit.
+
+>
+> Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+> Signed-off-by: Peter Xu <peterx@redhat.com>
+> ---
+>  monitor.c | 53 +++++++++++++++++++++++++++++------------------------
+>  1 file changed, 29 insertions(+), 24 deletions(-)
+>
+> diff --git a/monitor.c b/monitor.c
+> index 46814af533..14c681dc8a 100644
+> --- a/monitor.c
+> +++ b/monitor.c
+> @@ -207,15 +207,6 @@ struct Monitor {
+>      int suspend_cnt;            /* Needs to be accessed atomically */
+>      bool skip_flush;
+>      bool use_io_thr;
+> -
+> -    /* We can't access guest memory when holding the lock */
+> -    QemuMutex out_lock;
+> -    QString *outbuf;
+> -    guint out_watch;
+> -
+> -    /* Read under either BQL or out_lock, written with BQL+out_lock.  */
+> -    int mux_out;
+> -
+>      ReadLineState *rs;
+>      MonitorQMP qmp;
+>      gchar *mon_cpu_path;
+> @@ -224,6 +215,20 @@ struct Monitor {
+>      mon_cmd_t *cmd_table;
+>      QLIST_HEAD(,mon_fd_t) fds;
+>      QTAILQ_ENTRY(Monitor) entry;
+> +
+> +    /*
+> +     * The per-monitor lock. We can't access guest memory when holding
+> +     * the lock.
+> +     */
+> +    QemuMutex mon_lock;
+> +
+> +    /*
+> +     * Fields that are protected by the per-monitor lock.
+> +     */
+> +    QString *outbuf;
+> +    guint out_watch;
+> +    /* Read under either BQL or mon_lock, written with BQL+mon_lock.  */
+> +    int mux_out;
+
+This is an improvement.
+
+>  };
+>  
+>  /* Let's add monitor global variables to this struct. */
+[Remainder of patch snipped; it looks completely mechanical]
