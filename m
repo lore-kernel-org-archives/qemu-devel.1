@@ -1,21 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59143)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59163)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1fJElA-0000k7-Vc
-	for qemu-devel@nongnu.org; Thu, 17 May 2018 04:59:42 -0400
+	(envelope-from <peterx@redhat.com>) id 1fJElF-0000o5-Vh
+	for qemu-devel@nongnu.org; Thu, 17 May 2018 04:59:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1fJEl9-0006dg-T8
-	for qemu-devel@nongnu.org; Thu, 17 May 2018 04:59:41 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:34688 helo=mx1.redhat.com)
+	(envelope-from <peterx@redhat.com>) id 1fJElC-0006hO-Sk
+	for qemu-devel@nongnu.org; Thu, 17 May 2018 04:59:46 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:51802 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1fJEl9-0006d4-Kj
-	for qemu-devel@nongnu.org; Thu, 17 May 2018 04:59:39 -0400
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1fJElC-0006gR-NI
+	for qemu-devel@nongnu.org; Thu, 17 May 2018 04:59:42 -0400
 From: Peter Xu <peterx@redhat.com>
-Date: Thu, 17 May 2018 16:59:17 +0800
-Message-Id: <20180517085927.24925-3-peterx@redhat.com>
+Date: Thu, 17 May 2018 16:59:18 +0800
+Message-Id: <20180517085927.24925-4-peterx@redhat.com>
 In-Reply-To: <20180517085927.24925-1-peterx@redhat.com>
 References: <20180517085927.24925-1-peterx@redhat.com>
-Subject: [Qemu-devel] [PATCH v3 02/12] intel-iommu: remove
- IntelIOMMUNotifierNode
+Subject: [Qemu-devel] [PATCH v3 03/12] intel-iommu: add iommu lock
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,156 +26,203 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Tian Kevin <kevin.tian@intel.com>, "Michael S . Tsirkin" <mst@redhat.com>, Alex Williamson <alex.williamson@redhat.com>, Jintack Lim <jintack@cs.columbia.edu>, peterx@redhat.com, Jason Wang <jasowang@redhat.com>
 
-That is not really necessary.  Removing that node struct and put the
-list entry directly into VTDAddressSpace.  It simplfies the code a lot.
+Add a per-iommu big lock to protect IOMMU status.  Currently the only
+thing to be protected is the IOTLB/context cache, since that can be
+accessed even without BQL, e.g., in IO dataplane.
 
+Note that we don't need to protect device page tables since that's fully
+controlled by the guest kernel.  However there is still possibility that
+malicious drivers will program the device to not obey the rule.  In that
+case QEMU can't really do anything useful, instead the guest itself will
+be responsible for all uncertainties.
+
+Reported-by: Fam Zheng <famz@redhat.com>
 Signed-off-by: Peter Xu <peterx@redhat.com>
 ---
- include/hw/i386/intel_iommu.h |  9 ++------
- hw/i386/intel_iommu.c         | 41 ++++++++++-------------------------
- 2 files changed, 14 insertions(+), 36 deletions(-)
+ include/hw/i386/intel_iommu.h |  6 +++++
+ hw/i386/intel_iommu.c         | 43 +++++++++++++++++++++++++++++++----
+ 2 files changed, 44 insertions(+), 5 deletions(-)
 
 diff --git a/include/hw/i386/intel_iommu.h b/include/hw/i386/intel_iommu.h
-index 45ec8919b6..220697253f 100644
+index 220697253f..ee517704e7 100644
 --- a/include/hw/i386/intel_iommu.h
 +++ b/include/hw/i386/intel_iommu.h
-@@ -67,7 +67,6 @@ typedef union VTD_IR_TableEntry VTD_IR_TableEntry;
- typedef union VTD_IR_MSIAddress VTD_IR_MSIAddress;
- typedef struct VTDIrq VTDIrq;
- typedef struct VTD_MSIMessage VTD_MSIMessage;
--typedef struct IntelIOMMUNotifierNode IntelIOMMUNotifierNode;
- 
- /* Context-Entry */
- struct VTDContextEntry {
-@@ -93,6 +92,7 @@ struct VTDAddressSpace {
-     MemoryRegion iommu_ir;      /* Interrupt region: 0xfeeXXXXX */
-     IntelIOMMUState *iommu_state;
-     VTDContextCacheEntry context_cache_entry;
-+    QLIST_ENTRY(VTDAddressSpace) next;
+@@ -300,6 +300,12 @@ struct IntelIOMMUState {
+     OnOffAuto intr_eim;             /* Toggle for EIM cabability */
+     bool buggy_eim;                 /* Force buggy EIM unless eim=off */
+     uint8_t aw_bits;                /* Host/IOVA address width (in bits) */
++
++    /*
++     * Protects IOMMU states in general.  Currently it protects the
++     * per-IOMMU IOTLB cache, and context entry cache in VTDAddressSpace.
++     */
++    QemuMutex iommu_lock;
  };
  
- struct VTDBus {
-@@ -253,11 +253,6 @@ struct VTD_MSIMessage {
- /* When IR is enabled, all MSI/MSI-X data bits should be zero */
- #define VTD_IR_MSI_DATA          (0)
- 
--struct IntelIOMMUNotifierNode {
--    VTDAddressSpace *vtd_as;
--    QLIST_ENTRY(IntelIOMMUNotifierNode) next;
--};
--
- /* The iommu (DMAR) device state struct */
- struct IntelIOMMUState {
-     X86IOMMUState x86_iommu;
-@@ -295,7 +290,7 @@ struct IntelIOMMUState {
-     GHashTable *vtd_as_by_busptr;   /* VTDBus objects indexed by PCIBus* reference */
-     VTDBus *vtd_as_by_bus_num[VTD_PCI_BUS_MAX]; /* VTDBus objects indexed by bus number */
-     /* list of registered notifiers */
--    QLIST_HEAD(, IntelIOMMUNotifierNode) notifiers_list;
-+    QLIST_HEAD(, VTDAddressSpace) notifiers_list;
- 
-     /* interrupt remapping */
-     bool intr_enabled;              /* Whether guest enabled IR */
+ /* Find the VTD Address space associated with the given bus pointer,
 diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
-index b359efd6f9..5987b48d43 100644
+index 5987b48d43..112971638d 100644
 --- a/hw/i386/intel_iommu.c
 +++ b/hw/i386/intel_iommu.c
-@@ -1248,10 +1248,10 @@ static void vtd_interrupt_remap_table_setup(IntelIOMMUState *s)
- 
- static void vtd_iommu_replay_all(IntelIOMMUState *s)
- {
--    IntelIOMMUNotifierNode *node;
-+    VTDAddressSpace *vtd_as;
- 
--    QLIST_FOREACH(node, &s->notifiers_list, next) {
--        memory_region_iommu_replay_all(&node->vtd_as->iommu);
-+    QLIST_FOREACH(vtd_as, &s->notifiers_list, next) {
-+        memory_region_iommu_replay_all(&vtd_as->iommu);
-     }
+@@ -128,6 +128,16 @@ static uint64_t vtd_set_clear_mask_quad(IntelIOMMUState *s, hwaddr addr,
+     return new_val;
  }
  
-@@ -1372,7 +1372,6 @@ static void vtd_iotlb_global_invalidate(IntelIOMMUState *s)
- 
- static void vtd_iotlb_domain_invalidate(IntelIOMMUState *s, uint16_t domain_id)
++static inline void vtd_iommu_lock(IntelIOMMUState *s)
++{
++    qemu_mutex_lock(&s->iommu_lock);
++}
++
++static inline void vtd_iommu_unlock(IntelIOMMUState *s)
++{
++    qemu_mutex_unlock(&s->iommu_lock);
++}
++
+ /* GHashTable functions */
+ static gboolean vtd_uint64_equal(gconstpointer v1, gconstpointer v2)
  {
--    IntelIOMMUNotifierNode *node;
-     VTDContextEntry ce;
-     VTDAddressSpace *vtd_as;
+@@ -172,7 +182,7 @@ static gboolean vtd_hash_remove_by_page(gpointer key, gpointer value,
+ }
  
-@@ -1381,8 +1380,7 @@ static void vtd_iotlb_domain_invalidate(IntelIOMMUState *s, uint16_t domain_id)
+ /* Reset all the gen of VTDAddressSpace to zero and set the gen of
+- * IntelIOMMUState to 1.
++ * IntelIOMMUState to 1.  Must be with IOMMU lock held.
+  */
+ static void vtd_reset_context_cache(IntelIOMMUState *s)
+ {
+@@ -197,12 +207,19 @@ static void vtd_reset_context_cache(IntelIOMMUState *s)
+     s->context_cache_gen = 1;
+ }
+ 
+-static void vtd_reset_iotlb(IntelIOMMUState *s)
++static void vtd_reset_iotlb_locked(IntelIOMMUState *s)
+ {
+     assert(s->iotlb);
+     g_hash_table_remove_all(s->iotlb);
+ }
+ 
++static void vtd_reset_iotlb(IntelIOMMUState *s)
++{
++    vtd_iommu_lock(s);
++    vtd_reset_iotlb_locked(s);
++    vtd_iommu_unlock(s);
++}
++
+ static uint64_t vtd_get_iotlb_key(uint64_t gfn, uint16_t source_id,
+                                   uint32_t level)
+ {
+@@ -215,6 +232,7 @@ static uint64_t vtd_get_iotlb_gfn(hwaddr addr, uint32_t level)
+     return (addr & vtd_slpt_level_page_mask(level)) >> VTD_PAGE_SHIFT_4K;
+ }
+ 
++/* Must be with IOMMU lock held */
+ static VTDIOTLBEntry *vtd_lookup_iotlb(IntelIOMMUState *s, uint16_t source_id,
+                                        hwaddr addr)
+ {
+@@ -235,6 +253,7 @@ out:
+     return entry;
+ }
+ 
++/* Must be with IOMMU lock held */
+ static void vtd_update_iotlb(IntelIOMMUState *s, uint16_t source_id,
+                              uint16_t domain_id, hwaddr addr, uint64_t slpte,
+                              uint8_t access_flags, uint32_t level)
+@@ -246,7 +265,7 @@ static void vtd_update_iotlb(IntelIOMMUState *s, uint16_t source_id,
+     trace_vtd_iotlb_page_update(source_id, addr, slpte, domain_id);
+     if (g_hash_table_size(s->iotlb) >= VTD_IOTLB_MAX_SIZE) {
+         trace_vtd_iotlb_reset("iotlb exceeds size limit");
+-        vtd_reset_iotlb(s);
++        vtd_reset_iotlb_locked(s);
+     }
+ 
+     entry->gfn = gfn;
+@@ -1106,7 +1125,7 @@ static bool vtd_do_iommu_translate(VTDAddressSpace *vtd_as, PCIBus *bus,
+     IntelIOMMUState *s = vtd_as->iommu_state;
+     VTDContextEntry ce;
+     uint8_t bus_num = pci_bus_num(bus);
+-    VTDContextCacheEntry *cc_entry = &vtd_as->context_cache_entry;
++    VTDContextCacheEntry *cc_entry;
+     uint64_t slpte, page_mask;
+     uint32_t level;
+     uint16_t source_id = vtd_make_source_id(bus_num, devfn);
+@@ -1123,6 +1142,10 @@ static bool vtd_do_iommu_translate(VTDAddressSpace *vtd_as, PCIBus *bus,
+      */
+     assert(!vtd_is_interrupt_addr(addr));
+ 
++    vtd_iommu_lock(s);
++
++    cc_entry = &vtd_as->context_cache_entry;
++
+     /* Try to fetch slpte form IOTLB */
+     iotlb_entry = vtd_lookup_iotlb(s, source_id, addr);
+     if (iotlb_entry) {
+@@ -1182,7 +1205,7 @@ static bool vtd_do_iommu_translate(VTDAddressSpace *vtd_as, PCIBus *bus,
+          * IOMMU region can be swapped back.
+          */
+         vtd_pt_enable_fast_path(s, source_id);
+-
++        vtd_iommu_unlock(s);
+         return true;
+     }
+ 
+@@ -1203,6 +1226,7 @@ static bool vtd_do_iommu_translate(VTDAddressSpace *vtd_as, PCIBus *bus,
+     vtd_update_iotlb(s, source_id, VTD_CONTEXT_ENTRY_DID(ce.hi), addr, slpte,
+                      access_flags, level);
+ out:
++    vtd_iommu_unlock(s);
+     entry->iova = addr & page_mask;
+     entry->translated_addr = vtd_get_slpte_addr(slpte, s->aw_bits) & page_mask;
+     entry->addr_mask = ~page_mask;
+@@ -1210,6 +1234,7 @@ out:
+     return true;
+ 
+ error:
++    vtd_iommu_unlock(s);
+     entry->iova = 0;
+     entry->translated_addr = 0;
+     entry->addr_mask = 0;
+@@ -1258,10 +1283,13 @@ static void vtd_iommu_replay_all(IntelIOMMUState *s)
+ static void vtd_context_global_invalidate(IntelIOMMUState *s)
+ {
+     trace_vtd_inv_desc_cc_global();
++    /* Protects context cache */
++    vtd_iommu_lock(s);
+     s->context_cache_gen++;
+     if (s->context_cache_gen == VTD_CONTEXT_CACHE_GEN_MAX) {
+         vtd_reset_context_cache(s);
+     }
++    vtd_iommu_unlock(s);
+     vtd_switch_address_space_all(s);
+     /*
+      * From VT-d spec 6.5.2.1, a global context entry invalidation
+@@ -1377,8 +1405,10 @@ static void vtd_iotlb_domain_invalidate(IntelIOMMUState *s, uint16_t domain_id)
+ 
+     trace_vtd_inv_desc_iotlb_domain(domain_id);
+ 
++    vtd_iommu_lock(s);
      g_hash_table_foreach_remove(s->iotlb, vtd_hash_remove_by_domain,
                                  &domain_id);
++    vtd_iommu_unlock(s);
  
--    QLIST_FOREACH(node, &s->notifiers_list, next) {
--        vtd_as = node->vtd_as;
-+    QLIST_FOREACH(vtd_as, &s->notifiers_list, next) {
+     QLIST_FOREACH(vtd_as, &s->notifiers_list, next) {
          if (!vtd_dev_to_context_entry(s, pci_bus_num(vtd_as->bus),
-                                       vtd_as->devfn, &ce) &&
-             domain_id == VTD_CONTEXT_ENTRY_DID(ce.hi)) {
-@@ -1402,12 +1400,11 @@ static void vtd_iotlb_page_invalidate_notify(IntelIOMMUState *s,
-                                            uint16_t domain_id, hwaddr addr,
-                                            uint8_t am)
- {
--    IntelIOMMUNotifierNode *node;
-+    VTDAddressSpace *vtd_as;
-     VTDContextEntry ce;
-     int ret;
- 
--    QLIST_FOREACH(node, &(s->notifiers_list), next) {
--        VTDAddressSpace *vtd_as = node->vtd_as;
-+    QLIST_FOREACH(vtd_as, &(s->notifiers_list), next) {
-         ret = vtd_dev_to_context_entry(s, pci_bus_num(vtd_as->bus),
-                                        vtd_as->devfn, &ce);
-         if (!ret && domain_id == VTD_CONTEXT_ENTRY_DID(ce.hi)) {
-@@ -2344,8 +2341,6 @@ static void vtd_iommu_notify_flag_changed(IOMMUMemoryRegion *iommu,
- {
-     VTDAddressSpace *vtd_as = container_of(iommu, VTDAddressSpace, iommu);
-     IntelIOMMUState *s = vtd_as->iommu_state;
--    IntelIOMMUNotifierNode *node = NULL;
--    IntelIOMMUNotifierNode *next_node = NULL;
- 
-     if (!s->caching_mode && new & IOMMU_NOTIFIER_MAP) {
-         error_report("We need to set caching-mode=1 for intel-iommu to enable "
-@@ -2354,21 +2349,11 @@ static void vtd_iommu_notify_flag_changed(IOMMUMemoryRegion *iommu,
-     }
- 
-     if (old == IOMMU_NOTIFIER_NONE) {
--        node = g_malloc0(sizeof(*node));
--        node->vtd_as = vtd_as;
--        QLIST_INSERT_HEAD(&s->notifiers_list, node, next);
--        return;
--    }
--
--    /* update notifier node with new flags */
--    QLIST_FOREACH_SAFE(node, &s->notifiers_list, next, next_node) {
--        if (node->vtd_as == vtd_as) {
--            if (new == IOMMU_NOTIFIER_NONE) {
--                QLIST_REMOVE(node, next);
--                g_free(node);
--            }
--            return;
--        }
-+        /* Insert new ones */
-+        QLIST_INSERT_HEAD(&s->notifiers_list, vtd_as, next);
-+    } else if (new == IOMMU_NOTIFIER_NONE) {
-+        /* Remove old ones */
-+        QLIST_REMOVE(vtd_as, next);
-     }
+@@ -1426,7 +1456,9 @@ static void vtd_iotlb_page_invalidate(IntelIOMMUState *s, uint16_t domain_id,
+     info.domain_id = domain_id;
+     info.addr = addr;
+     info.mask = ~((1 << am) - 1);
++    vtd_iommu_lock(s);
+     g_hash_table_foreach_remove(s->iotlb, vtd_hash_remove_by_page, &info);
++    vtd_iommu_unlock(s);
+     vtd_iotlb_page_invalidate_notify(s, domain_id, addr, am);
  }
  
-@@ -2838,12 +2823,10 @@ static void vtd_address_space_unmap(VTDAddressSpace *as, IOMMUNotifier *n)
+@@ -3072,6 +3104,7 @@ static void vtd_realize(DeviceState *dev, Error **errp)
+     }
  
- static void vtd_address_space_unmap_all(IntelIOMMUState *s)
- {
--    IntelIOMMUNotifierNode *node;
-     VTDAddressSpace *vtd_as;
-     IOMMUNotifier *n;
- 
--    QLIST_FOREACH(node, &s->notifiers_list, next) {
--        vtd_as = node->vtd_as;
-+    QLIST_FOREACH(vtd_as, &s->notifiers_list, next) {
-         IOMMU_NOTIFIER_FOREACH(n, &vtd_as->iommu) {
-             vtd_address_space_unmap(vtd_as, n);
-         }
+     QLIST_INIT(&s->notifiers_list);
++    qemu_mutex_init(&s->iommu_lock);
+     memset(s->vtd_as_by_bus_num, 0, sizeof(s->vtd_as_by_bus_num));
+     memory_region_init_io(&s->csrmem, OBJECT(s), &vtd_mem_ops, s,
+                           "intel_iommu", DMAR_REG_SIZE);
 -- 
 2.17.0
