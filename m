@@ -1,41 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41374)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48904)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zyimin@linux.ibm.com>) id 1fJHA1-0004z3-7v
-	for qemu-devel@nongnu.org; Thu, 17 May 2018 07:33:30 -0400
+	(envelope-from <imammedo@redhat.com>) id 1fJHS2-0003kP-He
+	for qemu-devel@nongnu.org; Thu, 17 May 2018 07:52:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zyimin@linux.ibm.com>) id 1fJH9x-0004or-Vg
-	for qemu-devel@nongnu.org; Thu, 17 May 2018 07:33:29 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:50008
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <zyimin@linux.ibm.com>)
-	id 1fJH9x-0004o6-QM
-	for qemu-devel@nongnu.org; Thu, 17 May 2018 07:33:25 -0400
-Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w4HBU8od130003
-	for <qemu-devel@nongnu.org>; Thu, 17 May 2018 07:33:24 -0400
-Received: from e19.ny.us.ibm.com (e19.ny.us.ibm.com [129.33.205.209])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2j17a14vej-1
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Thu, 17 May 2018 07:33:24 -0400
-Received: from localhost
-	by e19.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <zyimin@linux.ibm.com>;
-	Thu, 17 May 2018 07:33:23 -0400
-References: <20180515113348.10516-1-zyimin@linux.ibm.com>
-	<20180515113348.10516-2-zyimin@linux.ibm.com>
-	<7bd9074b-04ca-49f6-096b-808d36e4e8b0@redhat.com>
-From: Yi Min Zhao <zyimin@linux.ibm.com>
-Date: Thu, 17 May 2018 19:33:16 +0800
-MIME-Version: 1.0
-In-Reply-To: <7bd9074b-04ca-49f6-096b-808d36e4e8b0@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Message-Id: <6a0fb781-f569-dbc7-dd6d-caec0d9eb43d@linux.ibm.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 1/1] sandbox: disable -sandbox if
- CONFIG_SECCOMP undefined
+	(envelope-from <imammedo@redhat.com>) id 1fJHRz-0008DE-Vd
+	for qemu-devel@nongnu.org; Thu, 17 May 2018 07:52:06 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:36516 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1fJHRz-0008Cu-Mp
+	for qemu-devel@nongnu.org; Thu, 17 May 2018 07:52:03 -0400
+From: Igor Mammedov <imammedo@redhat.com>
+Date: Thu, 17 May 2018 13:51:17 +0200
+Message-Id: <1526557877-293151-1-git-send-email-imammedo@redhat.com>
+Subject: [Qemu-devel] [PATCH v2] linux-user: update comments to point to
+ tcg_exec_init()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -44,32 +22,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
-Cc: otubo@redhat.com, borntraeger@de.ibm.com, fiuczy@linux.ibm.com, jtomko@redhat.com, jferlan@redhat.com, pbonzini@redhat.com
+To: qemu-devel@nongnu.org
+Cc: riku.voipio@iki.fi, laurent@vivier.eu
 
-Add Paolo to CC list. @Paolo, expect your comment. Thanks very much!
+cpu_init() was replaced by cpu_create() since 2.12 but comments
+weren't updated. So update stale comments to point that page
+sizes arei actually initialized by tcg_exec_init(). Also move
+another qemu_host_page_size related comment before tcg_exec_init()
+where it belongs.
 
+Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+---
+---
+ bsd-user/main.c   | 7 ++++---
+ linux-user/main.c | 5 ++---
+ 2 files changed, 6 insertions(+), 6 deletions(-)
 
-=E5=9C=A8 2018/5/15 =E4=B8=8B=E5=8D=8811:25, Eric Blake =E5=86=99=E9=81=93=
-:
-> On 05/15/2018 06:33 AM, Yi Min Zhao wrote:
->> If CONFIG_SECCOMP is undefined, the option 'elevateprivileges' remains
->> compiled. This would make libvirt set the corresponding capability and
->> then trigger the guest startup fails. So this patch excludes the code
->
-> s/trigger the guest startup fails/trigger failure during guest startup/
->
->> regarding seccomp staff if CONFIG_SECCOMP is undefined.
->
-> s/staff/command line options/
->
->>
->> Signed-off-by: Yi Min Zhao <zyimin@linux.ibm.com>
->> ---
->> =C2=A0 vl.c | 13 ++++++++-----
->> =C2=A0 1 file changed, 8 insertions(+), 5 deletions(-)
->>
->
-> A maintainer can touch up the commit message, so:
-> Reviewed-by: Eric Blake <eblake@redhat.com>
->
+diff --git a/bsd-user/main.c b/bsd-user/main.c
+index 283dc6f..da3b833 100644
+--- a/bsd-user/main.c
++++ b/bsd-user/main.c
+@@ -898,9 +898,10 @@ int main(int argc, char **argv)
+         cpu_model = "any";
+ #endif
+     }
++
++    /* init tcg before creating CPUs and to get qemu_host_page_size */
+     tcg_exec_init(0);
+-    /* NOTE: we need to init the CPU at this stage to get
+-       qemu_host_page_size */
++
+     cpu_type = parse_cpu_model(cpu_model);
+     cpu = cpu_create(cpu_type);
+     env = cpu->env_ptr;
+@@ -917,7 +918,7 @@ int main(int argc, char **argv)
+     envlist_free(envlist);
+ 
+     /*
+-     * Now that page sizes are configured in cpu_init() we can do
++     * Now that page sizes are configured in tcg_exec_init() we can do
+      * proper page alignment for guest_base.
+      */
+     guest_base = HOST_PAGE_ALIGN(guest_base);
+diff --git a/linux-user/main.c b/linux-user/main.c
+index 3234754..78d6d3e 100644
+--- a/linux-user/main.c
++++ b/linux-user/main.c
+@@ -671,9 +671,8 @@ int main(int argc, char **argv, char **envp)
+     }
+     cpu_type = parse_cpu_model(cpu_model);
+ 
++    /* init tcg before creating CPUs and to get qemu_host_page_size */
+     tcg_exec_init(0);
+-    /* NOTE: we need to init the CPU at this stage to get
+-       qemu_host_page_size */
+ 
+     cpu = cpu_create(cpu_type);
+     env = cpu->env_ptr;
+@@ -693,7 +692,7 @@ int main(int argc, char **argv, char **envp)
+     envlist_free(envlist);
+ 
+     /*
+-     * Now that page sizes are configured in cpu_init() we can do
++     * Now that page sizes are configured in tcg_exec_init() we can do
+      * proper page alignment for guest_base.
+      */
+     guest_base = HOST_PAGE_ALIGN(guest_base);
+-- 
+2.7.4
