@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52910)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52907)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fJN6b-0003dj-BJ
+	(envelope-from <alex.bennee@linaro.org>) id 1fJN6b-0003dM-82
 	for qemu-devel@nongnu.org; Thu, 17 May 2018 13:54:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fJN6X-0007Jg-Pa
+	(envelope-from <alex.bennee@linaro.org>) id 1fJN6W-0007JJ-V1
 	for qemu-devel@nongnu.org; Thu, 17 May 2018 13:54:21 -0400
-Received: from mail-wm0-x235.google.com ([2a00:1450:400c:c09::235]:40024)
+Received: from mail-wm0-x230.google.com ([2a00:1450:400c:c09::230]:40019)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1fJN6X-0007JH-Im
-	for qemu-devel@nongnu.org; Thu, 17 May 2018 13:54:17 -0400
-Received: by mail-wm0-x235.google.com with SMTP id j5-v6so10610808wme.5
-	for <qemu-devel@nongnu.org>; Thu, 17 May 2018 10:54:17 -0700 (PDT)
+	id 1fJN6W-0007J3-Nx
+	for qemu-devel@nongnu.org; Thu, 17 May 2018 13:54:16 -0400
+Received: by mail-wm0-x230.google.com with SMTP id j5-v6so10610739wme.5
+	for <qemu-devel@nongnu.org>; Thu, 17 May 2018 10:54:16 -0700 (PDT)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Thu, 17 May 2018 18:47:12 +0100
-Message-Id: <20180517174718.10107-44-alex.bennee@linaro.org>
+Date: Thu, 17 May 2018 18:46:49 +0100
+Message-Id: <20180517174718.10107-21-alex.bennee@linaro.org>
 In-Reply-To: <20180517174718.10107-1-alex.bennee@linaro.org>
 References: <20180517174718.10107-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v4 43/49] tests/tcg: enable building for sparc64
+Subject: [Qemu-devel] [PATCH v4 20/49] tests/tcg/i386: fix test-i386
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,56 +30,32 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: cota@braap.org, famz@redhat.com, berrange@redhat.com, f4bug@amsat.org, richard.henderson@linaro.org, balrogg@gmail.com, aurelien@aurel32.net, agraf@suse.de
-Cc: qemu-devel@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+Cc: qemu-devel@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>
 
-As before, using Debian SID compilers.
+The test-i386 test case is a little special as it includes assembler
+files. Add the additional compile magic to assemble these bits and
+link them to the final binary.
 
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+Reviewed-by: Thomas Huth <thuth@redhat.com>
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Tested-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- tests/docker/Makefile.include                        |  1 +
- tests/docker/dockerfiles/debian-sparc64-cross.docker | 12 ++++++++++++
- tests/tcg/sparc64/Makefile.include                   |  2 ++
- 3 files changed, 15 insertions(+)
- create mode 100644 tests/docker/dockerfiles/debian-sparc64-cross.docker
- create mode 100644 tests/tcg/sparc64/Makefile.include
+ tests/tcg/i386/test-i386.c | 1 -
+ 1 file changed, 1 deletion(-)
 
-diff --git a/tests/docker/Makefile.include b/tests/docker/Makefile.include
-index c08f32ca58..62d1f4dec0 100644
---- a/tests/docker/Makefile.include
-+++ b/tests/docker/Makefile.include
-@@ -66,6 +66,7 @@ docker-image-debian-alpha-cross: docker-image-debian-sid
- docker-image-debian-hppa-cross: docker-image-debian-sid
- docker-image-debian-m68k-cross: docker-image-debian-sid
- docker-image-debian-sh4-cross: docker-image-debian-sid
-+docker-image-debian-sparc64-cross: docker-image-debian-sid
- docker-image-travis: NOUSER=1
- 
- # Expand all the pre-requistes for each docker image and test combination
-diff --git a/tests/docker/dockerfiles/debian-sparc64-cross.docker b/tests/docker/dockerfiles/debian-sparc64-cross.docker
-new file mode 100644
-index 0000000000..1e2c809274
---- /dev/null
-+++ b/tests/docker/dockerfiles/debian-sparc64-cross.docker
-@@ -0,0 +1,12 @@
-+#
-+# Docker cross-compiler target
-+#
-+# This docker target builds on the debian sid base image which
-+# contains cross compilers for Debian "ports" targets.
-+#
-+FROM qemu:debian-sid
-+
-+RUN DEBIAN_FRONTEND=noninteractive eatmydata \
-+    apt-get install -y --no-install-recommends \
-+        gcc-sparc64-linux-gnu \
-+        libc6-dev-sparc64-cross
-diff --git a/tests/tcg/sparc64/Makefile.include b/tests/tcg/sparc64/Makefile.include
-new file mode 100644
-index 0000000000..95fc8dee9f
---- /dev/null
-+++ b/tests/tcg/sparc64/Makefile.include
-@@ -0,0 +1,2 @@
-+DOCKER_IMAGE=debian-sparc64-cross
-+DOCKER_CROSS_COMPILER=sparc64-linux-gnu-gcc
+diff --git a/tests/tcg/i386/test-i386.c b/tests/tcg/i386/test-i386.c
+index 9599204895..cae6a7773a 100644
+--- a/tests/tcg/i386/test-i386.c
++++ b/tests/tcg/i386/test-i386.c
+@@ -17,7 +17,6 @@
+  *  along with this program; if not, see <http://www.gnu.org/licenses/>.
+  */
+ #define _GNU_SOURCE
+-#include "qemu/compiler.h"
+ #include <stdlib.h>
+ #include <stdio.h>
+ #include <string.h>
 -- 
 2.17.0
