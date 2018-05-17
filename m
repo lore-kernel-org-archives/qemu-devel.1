@@ -1,26 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42339)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44177)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1fJKWf-0007Nd-OA
-	for qemu-devel@nongnu.org; Thu, 17 May 2018 11:09:09 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fJKcd-00023Y-52
+	for qemu-devel@nongnu.org; Thu, 17 May 2018 11:15:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1fJKWb-0000ZJ-Jf
-	for qemu-devel@nongnu.org; Thu, 17 May 2018 11:09:05 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:35170 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1fJKWb-0000Z9-Fk
-	for qemu-devel@nongnu.org; Thu, 17 May 2018 11:09:01 -0400
-Date: Thu, 17 May 2018 18:08:58 +0300
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20180517180833-mutt-send-email-mst@kernel.org>
-References: <20180406185125.12536-1-brijesh.singh@amd.com>
-	<20180408065347-mutt-send-email-mst@kernel.org>
-	<e5a2ff57-a049-42ab-de44-522ec4195406@amd.com>
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fJKcZ-0003EW-Q7
+	for qemu-devel@nongnu.org; Thu, 17 May 2018 11:15:15 -0400
+Received: from mail-qt0-x243.google.com ([2607:f8b0:400d:c0d::243]:33239)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fJKcZ-0003DX-Mu
+	for qemu-devel@nongnu.org; Thu, 17 May 2018 11:15:11 -0400
+Received: by mail-qt0-x243.google.com with SMTP id e8-v6so6229269qth.0
+	for <qemu-devel@nongnu.org>; Thu, 17 May 2018 08:15:11 -0700 (PDT)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20180516185146.30708-1-edgar.iglesias@gmail.com>
+	<20180516185146.30708-26-edgar.iglesias@gmail.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <8f75bf77-e36e-9958-35c9-094aab2d4a10@amsat.org>
+Date: Thu, 17 May 2018 12:15:06 -0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <e5a2ff57-a049-42ab-de44-522ec4195406@amd.com>
-Subject: Re: [Qemu-devel] [PATCH v2 for-2.12] tap: set vhostfd passed from
- qemu cli to non-blocking
+In-Reply-To: <20180516185146.30708-26-edgar.iglesias@gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v3 25/38] target-microblaze: mmu: Remove
+ unused register state
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,72 +36,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Brijesh Singh <brijesh.singh@amd.com>
-Cc: qemu-devel@nongnu.org, Thomas.Lendacky@amd.com, Jason Wang <jasowang@redhat.com>
+To: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, qemu-devel@nongnu.org
+Cc: edgar.iglesias@xilinx.com, peter.maydell@linaro.org, sstabellini@kernel.org, sai.pavan.boddu@xilinx.com, frasse.iglesias@gmail.com, alistair@alistair23.me, richard.henderson@linaro.org, frederic.konrad@adacore.com
 
-On Thu, May 17, 2018 at 09:54:40AM -0500, Brijesh Singh wrote:
-> Hi Michael and Jason,
+On 05/16/2018 03:51 PM, Edgar E. Iglesias wrote:
+> From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
 > 
-> Looks like this patch was not included in any of your pull request hence it
-> didn't made into 2.12. Can you please include this patch in your next pull
-> request?
+> Add explicit handling for MMU_R_TLBX and log accesses to
+> invalid MMU registers. We can now remove the state for
+> all regs but PID, ZPR and TLBX (0 - 2).
 > 
-> ~ Brijesh
+> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+> Signed-off-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
+> ---
+>  target/microblaze/mmu.c | 7 +++++--
+>  target/microblaze/mmu.h | 2 +-
+>  2 files changed, 6 insertions(+), 3 deletions(-)
+> 
+> diff --git a/target/microblaze/mmu.c b/target/microblaze/mmu.c
+> index f4a4c339c9..231803ceea 100644
+> --- a/target/microblaze/mmu.c
+> +++ b/target/microblaze/mmu.c
+> @@ -211,11 +211,14 @@ uint32_t mmu_read(CPUMBState *env, uint32_t rn)
+>              }
+>              r = env->mmu.regs[rn];
+>              break;
+> +        case MMU_R_TLBX:
+> +            r = env->mmu.regs[rn];
+> +            break;
+>          case MMU_R_TLBSX:
+>              qemu_log_mask(LOG_GUEST_ERROR, "TLBSX is write-only.\n");
+>              break;
+>          default:
+> -            r = env->mmu.regs[rn];
+> +            qemu_log_mask(LOG_GUEST_ERROR, "Invalid MMU register %d.\n", rn);
+>              break;
+>      }
+>      D(qemu_log("%s rn=%d=%x\n", __func__, rn, r));
+> @@ -298,7 +301,7 @@ void mmu_write(CPUMBState *env, uint32_t rn, uint32_t v)
+>              break;
+>          }
+>          default:
+> -            env->mmu.regs[rn] = v;
 
+I was afraid of an overflow but the only way to reach this function is
+via dec_msr() which calls with rn &= 7, whew. Lot of magic numbers...
 
-I reviewed.
-Jason?
-Cc stable I guess ...
+> +            qemu_log_mask(LOG_GUEST_ERROR, "Invalid MMU register %d.\n", rn);
+>              break;
+>     }
+>  }
+> diff --git a/target/microblaze/mmu.h b/target/microblaze/mmu.h
+> index 113539c6e9..624becfded 100644
+> --- a/target/microblaze/mmu.h
+> +++ b/target/microblaze/mmu.h
+> @@ -67,7 +67,7 @@ struct microblaze_mmu
+>      /* We keep a separate ram for the tids to avoid the 48 bit tag width.  */
+>      uint8_t tids[TLB_ENTRIES];
+>      /* Control flops.  */
+> -    uint32_t regs[8];
+> +    uint32_t regs[3];
+>  
+>      int c_mmu;
+>      int c_mmu_tlb_access;
+> 
 
-> On 04/07/2018 10:53 PM, Michael S. Tsirkin wrote:
-> > On Fri, Apr 06, 2018 at 01:51:25PM -0500, Brijesh Singh wrote:
-> > > A guest boot hangs while probing the network interface when
-> > > iommu_platform=on is used.
-> > > 
-> > > The following qemu cli hangs without this patch:
-> > > 
-> > > # $QEMU \
-> > >    -netdev tap,fd=3,id=hostnet0,vhost=on,vhostfd=4 3<>/dev/tap67 4<>/dev/host-net \
-> > >    -device virtio-net-pci,netdev=hostnet0,id=net0,iommu_platform=on,disable-legacy=on \
-> > >    ...
-> > > 
-> > > Commit: c471ad0e9bd46 (vhost_net: device IOTLB support) took care of
-> > > setting vhostfd to non-blocking when QEMU opens /dev/host-net but if
-> > > the fd is passed from qemu cli then we need to ensure that fd is set
-> > > to non-blocking.
-> > > 
-> > > Fixes: c471ad0e9bd46 "vhost_net: device IOTLB support"
-> > > Cc: Michael S. Tsirkin <mst@redhat.com>
-> > > Cc: Jason Wang <jasowang@redhat.com>
-> > > Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
-> > 
-> > Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
-> > 
-> > > ---
-> > > 
-> > > Changes since v1:
-> > >   - use qemu_set_nonblock() instead of fcntl(..)
-> > > 
-> > >   net/tap.c | 2 ++
-> > >   1 file changed, 2 insertions(+)
-> > > 
-> > > diff --git a/net/tap.c b/net/tap.c
-> > > index 2b3a36f9b50d..89c4e19162a2 100644
-> > > --- a/net/tap.c
-> > > +++ b/net/tap.c
-> > > @@ -40,6 +40,7 @@
-> > >   #include "qemu-common.h"
-> > >   #include "qemu/cutils.h"
-> > >   #include "qemu/error-report.h"
-> > > +#include "qemu/sockets.h"
-> > >   #include "net/tap.h"
-> > > @@ -693,6 +694,7 @@ static void net_init_tap_one(const NetdevTapOptions *tap, NetClientState *peer,
-> > >                   }
-> > >                   return;
-> > >               }
-> > > +            qemu_set_nonblock(vhostfd);
-> > >           } else {
-> > >               vhostfd = open("/dev/vhost-net", O_RDWR);
-> > >               if (vhostfd < 0) {
-> > > -- 
-> > > 2.14.3
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
