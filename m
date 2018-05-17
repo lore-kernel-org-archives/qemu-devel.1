@@ -1,33 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43581)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44604)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fJIr4-0000uY-9V
-	for qemu-devel@nongnu.org; Thu, 17 May 2018 09:22:03 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1fJIv6-0002sa-Jp
+	for qemu-devel@nongnu.org; Thu, 17 May 2018 09:26:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fJIqz-0001uq-H3
-	for qemu-devel@nongnu.org; Thu, 17 May 2018 09:22:02 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:40534 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1fJIqz-0001ue-C0
-	for qemu-devel@nongnu.org; Thu, 17 May 2018 09:21:57 -0400
-References: <1526029534-35771-1-git-send-email-anton.nefedov@virtuozzo.com>
-	<1526029534-35771-2-git-send-email-anton.nefedov@virtuozzo.com>
-	<877eo6nm99.fsf@dusky.pond.sub.org>
-	<1839ed60-ffd9-42c1-bf52-6d6121abb224@redhat.com>
-	<87h8n9l7wq.fsf@dusky.pond.sub.org>
-	<95ab24a5-d600-67b5-9c7e-e5290f42f520@redhat.com>
-	<87a7t0u8az.fsf@dusky.pond.sub.org>
-	<419b57a2-157e-b18c-944e-96ecdb391711@virtuozzo.com>
-	<87fu2qogew.fsf@dusky.pond.sub.org>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <e5230c5b-0675-2611-d10f-51a05f730869@redhat.com>
-Date: Thu, 17 May 2018 08:21:55 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1fJIv1-0003dW-U0
+	for qemu-devel@nongnu.org; Thu, 17 May 2018 09:26:12 -0400
+Received: from mail-wr0-f195.google.com ([209.85.128.195]:46824)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1fJIv1-0003dK-Mr
+	for qemu-devel@nongnu.org; Thu, 17 May 2018 09:26:07 -0400
+Received: by mail-wr0-f195.google.com with SMTP id x9-v6so2826638wrl.13
+	for <qemu-devel@nongnu.org>; Thu, 17 May 2018 06:26:07 -0700 (PDT)
+References: <1526560782-18732-1-git-send-email-pbonzini@redhat.com>
+	<20180517124403.GJ5657@redhat.com>
+	<20180517125110.lhipiezmvifrg3n6@sirius.home.kraxel.org>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <6e0213c3-017e-c794-a222-fde38676d7c8@redhat.com>
+Date: Thu, 17 May 2018 15:26:04 +0200
 MIME-Version: 1.0
-In-Reply-To: <87fu2qogew.fsf@dusky.pond.sub.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <20180517125110.lhipiezmvifrg3n6@sirius.home.kraxel.org>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 1/2] qapi: allow flat unions with empty
- branches
+Subject: Re: [Qemu-devel] [PATCH] ui: add x_keymap.o to modules
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,41 +31,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>, Anton Nefedov <anton.nefedov@virtuozzo.com>
-Cc: qemu-devel@nongnu.org, mdroth@linux.vnet.ibm.com
+To: Gerd Hoffmann <kraxel@redhat.com>, "=?UTF-8?Q?Daniel_P._Berrang=c3=a9?=" <berrange@redhat.com>
+Cc: qemu-devel@nongnu.org
 
-On 05/17/2018 03:05 AM, Markus Armbruster wrote:
->>>>>>> QAPI language design alternatives:
->>>>>>>
->>>>>>> 1. Having unions cover all discriminator values explicitly is useful.
->>>>
->>>>>>> 2. Having unions repeat all the discriminator values explicitly is not
->>>>>>> useful.  All we need is replacing the code enforcing that by code
->>>>>>> defaulting missing ones to the empty type.
->>>>>>>
-
->> I think I'd vote for 2 (never enforce all-branches coverage) as well.
+On 17/05/2018 14:51, Gerd Hoffmann wrote:
+>   Hi,
 > 
-> Eric, what do you think?
-
-I'm sold. Let's go ahead and make the change that for any flat union, a 
-branch not listed defaults to the empty type (no added fields) rather 
-than being an error, then simplify a couple of the existing flat unions 
-that benefit from that.
-
+>>> +ifeq ($(CONFIG_X11),y)
+>>> +sdl.mo-objs += x_keymap.o
+>>> +gtk.mo-objs += x_keymap.o
+>>
+>> Would this cause symbol clash if both sdl & gtk modules are loaded
+>> at the same time, or have we used linker scripts to limit what symbols
+>> each module exposes ?
 > 
-> One more thought: if we ever get around to provide more convenient flat
-> union syntax so users don't have to enumerate the variant names twice,
-> we'll need a way to say "empty branch".  Let's worry about that problem
-> when we have it.
+> Related: can modules depend on modules, so we could make x_keymap a
+> module of its own and have both gtk and sdl depend on it?
+> 
+> That would also be useful when trying to modularize spice.
 
-In other words, our current "simple" unions act in a manner that 
-declares an implicit enum type - if we ever add an implicit enum to a 
-flat union (where you don't have to declare a pre-existing enum type), 
-then you need some syntax to declare additional acceptable enum values 
-that form an empty branch.  Indeed, not a problem to be solved right now.
+How hard would it be to modularize the libspice-server side?  The part
+of the library that is used by QXL rendering should have much fewer
+dependencies than the part that is used for keyboard, mouse, audio,
+vmchannel/agent, etc.
 
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+Then you could link libspice-server-core into QEMU and libspice-server
+into the modules.  Unless both have been linked together, functions such
+as spice_server_add_client would fail, and so would adding most of the
+SPICE_INTERFACE_* interface kinds.
+
+Thanks,
+
+Paolo
