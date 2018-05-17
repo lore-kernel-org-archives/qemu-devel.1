@@ -1,26 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56793)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57038)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1fJGRt-0002eX-S1
-	for qemu-devel@nongnu.org; Thu, 17 May 2018 06:47:55 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1fJGSn-0003C1-Ty
+	for qemu-devel@nongnu.org; Thu, 17 May 2018 06:48:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1fJGRq-0001iZ-Gs
-	for qemu-devel@nongnu.org; Thu, 17 May 2018 06:47:53 -0400
-Resent-Message-Id: <E1fJGRq-0001iZ-Gs@eggs.gnu.org>
-Received: from sender-of-o51.zoho.com ([135.84.80.216]:21087)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1fJGRq-0001iJ-8F
-	for qemu-devel@nongnu.org; Thu, 17 May 2018 06:47:50 -0400
-In-Reply-To: <20180516223007.10256-1-richard.henderson@linaro.org>
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <152651170062.258.10553300984590992969@1f70390a8372>
+	(envelope-from <peter.maydell@linaro.org>) id 1fJGSn-00024j-4a
+	for qemu-devel@nongnu.org; Thu, 17 May 2018 06:48:49 -0400
+Received: from mail-oi0-x242.google.com ([2607:f8b0:4003:c06::242]:40290)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1fJGSm-00024c-Uf
+	for qemu-devel@nongnu.org; Thu, 17 May 2018 06:48:49 -0400
+Received: by mail-oi0-x242.google.com with SMTP id c203-v6so3547646oib.7
+	for <qemu-devel@nongnu.org>; Thu, 17 May 2018 03:48:48 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Wed, 16 May 2018 16:01:41 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PATCH v3-a 00/27] target/arm: Scalable Vector
- Extension
+In-Reply-To: <1738f78f-b310-3cde-ac5e-1a147d3ca5f6@redhat.com>
+References: <20180501085939.6201-1-peter.maydell@linaro.org>
+	<c338d0d3-2b02-26e7-f745-fbc5c1893453@redhat.com>
+	<CAFEAcA_Dei48HtKk6GnEgXYcXdY2htCXej4pSfY+q9V6f=abdA@mail.gmail.com>
+	<1738f78f-b310-3cde-ac5e-1a147d3ca5f6@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 17 May 2018 11:48:27 +0100
+Message-ID: <CAFEAcA-o3M2ruUfU7hk89S=eGgCP=b+hPyKrSdSR79OP_Ug9vg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [RFC PATCH v2 00/12] iommu: add MemTxAttrs
+ argument to IOMMU translate function
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,141 +32,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: richard.henderson@linaro.org
-Cc: famz@redhat.com, qemu-devel@nongnu.org, peter.maydell@linaro.org, qemu-arm@nongnu.org
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, "patches@linaro.org" <patches@linaro.org>, Eric Auger <eric.auger@redhat.com>, Alex Williamson <alex.williamson@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
-c3NhZ2UtaWQ6IDIwMTgwNTE2MjIzMDA3LjEwMjU2LTEtcmljaGFyZC5oZW5kZXJzb25AbGluYXJv
-Lm9yZwpTdWJqZWN0OiBbUWVtdS1kZXZlbF0gW1BBVENIIHYzLWEgMDAvMjddIHRhcmdldC9hcm06
-IFNjYWxhYmxlIFZlY3RvciBFeHRlbnNpb24KCj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEv
-YmluL2Jhc2gKCkJBU0U9YmFzZQpuPTEKdG90YWw9JChnaXQgbG9nIC0tb25lbGluZSAkQkFTRS4u
-IHwgd2MgLWwpCmZhaWxlZD0wCgpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAw
-CmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQpnaXQgY29uZmlnIC0tbG9jYWwg
-ZGlmZi5hbGdvcml0aG0gaGlzdG9ncmFtCgpjb21taXRzPSIkKGdpdCBsb2cgLS1mb3JtYXQ9JUgg
-LS1yZXZlcnNlICRCQVNFLi4pIgpmb3IgYyBpbiAkY29tbWl0czsgZG8KICAgIGVjaG8gIkNoZWNr
-aW5nIFBBVENIICRuLyR0b3RhbDogJChnaXQgbG9nIC1uIDEgLS1mb3JtYXQ9JXMgJGMpLi4uIgog
-ICAgaWYgISBnaXQgc2hvdyAkYyAtLWZvcm1hdD1lbWFpbCB8IC4vc2NyaXB0cy9jaGVja3BhdGNo
-LnBsIC0tbWFpbGJhY2sgLTsgdGhlbgogICAgICAgIGZhaWxlZD0xCiAgICAgICAgZWNobwogICAg
-ZmkKICAgIG49JCgobisxKSkKZG9uZQoKZXhpdCAkZmFpbGVkCj09PSBURVNUIFNDUklQVCBFTkQg
-PT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQxZGVmN2Y0NGJkODg4NzEzMzg0CkZy
-b20gaHR0cHM6Ly9naXRodWIuY29tL3BhdGNoZXctcHJvamVjdC9xZW11CiAqIFtuZXcgdGFnXSAg
-ICAgICAgICAgICAgIHBhdGNoZXcvMjAxODA1MTYyMjMwMDcuMTAyNTYtMS1yaWNoYXJkLmhlbmRl
-cnNvbkBsaW5hcm8ub3JnIC0+IHBhdGNoZXcvMjAxODA1MTYyMjMwMDcuMTAyNTYtMS1yaWNoYXJk
-LmhlbmRlcnNvbkBsaW5hcm8ub3JnClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKZDVk
-NmM4ZjFjMSB0YXJnZXQvYXJtOiBJbXBsZW1lbnQgU1ZFIFBlcm11dGUgLSBVbnByZWRpY2F0ZWQg
-R3JvdXAKM2U4MWQ1ODVlYSB0YXJnZXQvYXJtOiBFeHRlbmQgdmVjX3JlZ19vZmZzZXQgdG8gbGFy
-Z2VyIHNpemVzCmIxZmQwYjM1ZWQgdGFyZ2V0L2FybTogSW1wbGVtZW50IFNWRSBQZXJtdXRlIC0g
-RXh0cmFjdCBHcm91cAo3NDQwZDQxOGI0IHRhcmdldC9hcm06IEltcGxlbWVudCBTVkUgSW50ZWdl
-ciBXaWRlIEltbWVkaWF0ZSAtIFByZWRpY2F0ZWQgR3JvdXAKYzM1MjMwNTM4YyB0YXJnZXQvYXJt
-OiBJbXBsZW1lbnQgU1ZFIEJpdHdpc2UgSW1tZWRpYXRlIEdyb3VwCmI3NDQ5MjQxNWUgdGFyZ2V0
-L2FybTogSW1wbGVtZW50IFNWRSBFbGVtZW50IENvdW50IEdyb3VwCjRjNGQ1NmFiNjAgdGFyZ2V0
-L2FybTogSW1wbGVtZW50IFNWRSBmbG9hdGluZy1wb2ludCB0cmlnIHNlbGVjdCBjb2VmZmljaWVu
-dAo5MDM3ZDdkYjg5IHRhcmdldC9hcm06IEltcGxlbWVudCBTVkUgZmxvYXRpbmctcG9pbnQgZXhw
-b25lbnRpYWwgYWNjZWxlcmF0b3IKNGRjYjBlMWUwZCB0YXJnZXQvYXJtOiBJbXBsZW1lbnQgU1ZF
-IENvbXB1dGUgVmVjdG9yIEFkZHJlc3MgR3JvdXAKNmViZDAzOGIzZiB0YXJnZXQvYXJtOiBJbXBs
-ZW1lbnQgU1ZFIEJpdHdpc2UgU2hpZnQgLSBVbnByZWRpY2F0ZWQgR3JvdXAKNmYzMTMxNzBkNyB0
-YXJnZXQvYXJtOiBJbXBsZW1lbnQgU1ZFIFN0YWNrIEFsbG9jYXRpb24gR3JvdXAKM2FjNDQxNzY5
-ZSB0YXJnZXQvYXJtOiBJbXBsZW1lbnQgU1ZFIEluZGV4IEdlbmVyYXRpb24gR3JvdXAKNTViYjNm
-NmUwZiB0YXJnZXQvYXJtOiBJbXBsZW1lbnQgU1ZFIEludGVnZXIgQXJpdGhtZXRpYyAtIFVucHJl
-ZGljYXRlZCBHcm91cAphOTAzOTQ3YzZlIHRhcmdldC9hcm06IEltcGxlbWVudCBTVkUgSW50ZWdl
-ciBNdWx0aXBseS1BZGQgR3JvdXAKNjFjYTE5NThlYiB0YXJnZXQvYXJtOiBJbXBsZW1lbnQgU1ZF
-IEludGVnZXIgQXJpdGhtZXRpYyAtIFVuYXJ5IFByZWRpY2F0ZWQgR3JvdXAKMTBlYmQwZmRiNiB0
-YXJnZXQvYXJtOiBJbXBsZW1lbnQgU1ZFIGJpdHdpc2Ugc2hpZnQgYnkgd2lkZSBlbGVtZW50cyAo
-cHJlZGljYXRlZCkKMmJjNzBjMTkyYSB0YXJnZXQvYXJtOiBJbXBsZW1lbnQgU1ZFIGJpdHdpc2Ug
-c2hpZnQgYnkgdmVjdG9yIChwcmVkaWNhdGVkKQpkZjY4YzQ5MTg4IHRhcmdldC9hcm06IEltcGxl
-bWVudCBTVkUgYml0d2lzZSBzaGlmdCBieSBpbW1lZGlhdGUgKHByZWRpY2F0ZWQpCmY3ZmY5NDE2
-M2QgdGFyZ2V0L2FybTogSW1wbGVtZW50IFNWRSBJbnRlZ2VyIFJlZHVjdGlvbiBHcm91cApiMTQ5
-NmRlYjAwIHRhcmdldC9hcm06IEltcGxlbWVudCBTVkUgSW50ZWdlciBCaW5hcnkgQXJpdGhtZXRp
-YyAtIFByZWRpY2F0ZWQgR3JvdXAKYzVmMjIzYjVmYiB0YXJnZXQvYXJtOiBJbXBsZW1lbnQgU1ZF
-IFByZWRpY2F0ZSBNaXNjIEdyb3VwCmE0MzdiYThjMjEgdGFyZ2V0L2FybTogSW1wbGVtZW50IFNW
-RSBQcmVkaWNhdGUgTG9naWNhbCBPcGVyYXRpb25zIEdyb3VwCmMyZWI5NmRkMmYgdGFyZ2V0L2Fy
-bTogSW1wbGVtZW50IFNWRSBwcmVkaWNhdGUgdGVzdApkOGM2NmQ2NTY4IHRhcmdldC9hcm06IElt
-cGxlbWVudCBTVkUgbG9hZCB2ZWN0b3IvcHJlZGljYXRlCjM1NmM5Yzg4M2MgdGFyZ2V0L2FybTog
-SW1wbGVtZW50IFNWRSBCaXR3aXNlIExvZ2ljYWwgLSBVbnByZWRpY2F0ZWQgR3JvdXAKOTMyYTQx
-NzNhYSB0YXJnZXQvYXJtOiBBZGQgU1ZFIGRlY29kZSBza2VsZXRvbgozMTMyOTRjNzhjIHRhcmdl
-dC9hcm06IEludHJvZHVjZSB0cmFuc2xhdGUtYTY0LmgKCj09PSBPVVRQVVQgQkVHSU4gPT09CkNo
-ZWNraW5nIFBBVENIIDEvMjc6IHRhcmdldC9hcm06IEludHJvZHVjZSB0cmFuc2xhdGUtYTY0Lmgu
-Li4KV0FSTklORzogYWRkZWQsIG1vdmVkIG9yIGRlbGV0ZWQgZmlsZShzKSwgZG9lcyBNQUlOVEFJ
-TkVSUyBuZWVkIHVwZGF0aW5nPwojMjU2OiAKbmV3IGZpbGUgbW9kZSAxMDA2NDQKCnRvdGFsOiAw
-IGVycm9ycywgMSB3YXJuaW5ncywgMzM3IGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0
-eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUg
-ZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQ
-QVRDSCBpbiBNQUlOVEFJTkVSUy4KQ2hlY2tpbmcgUEFUQ0ggMi8yNzogdGFyZ2V0L2FybTogQWRk
-IFNWRSBkZWNvZGUgc2tlbGV0b24uLi4KV0FSTklORzogYWRkZWQsIG1vdmVkIG9yIGRlbGV0ZWQg
-ZmlsZShzKSwgZG9lcyBNQUlOVEFJTkVSUyBuZWVkIHVwZGF0aW5nPwojNDE6IApuZXcgZmlsZSBt
-b2RlIDEwMDY0NAoKdG90YWw6IDAgZXJyb3JzLCAxIHdhcm5pbmdzLCAxNDAgbGluZXMgY2hlY2tl
-ZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkg
-b2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1h
-aW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgpDaGVja2luZyBQQVRDSCAz
-LzI3OiB0YXJnZXQvYXJtOiBJbXBsZW1lbnQgU1ZFIEJpdHdpc2UgTG9naWNhbCAtIFVucHJlZGlj
-YXRlZCBHcm91cC4uLgpDaGVja2luZyBQQVRDSCA0LzI3OiB0YXJnZXQvYXJtOiBJbXBsZW1lbnQg
-U1ZFIGxvYWQgdmVjdG9yL3ByZWRpY2F0ZS4uLgpDaGVja2luZyBQQVRDSCA1LzI3OiB0YXJnZXQv
-YXJtOiBJbXBsZW1lbnQgU1ZFIHByZWRpY2F0ZSB0ZXN0Li4uCldBUk5JTkc6IGFkZGVkLCBtb3Zl
-ZCBvciBkZWxldGVkIGZpbGUocyksIGRvZXMgTUFJTlRBSU5FUlMgbmVlZCB1cGRhdGluZz8KIzIx
-OiAKbmV3IGZpbGUgbW9kZSAxMDA2NDQKCnRvdGFsOiAwIGVycm9ycywgMSB3YXJuaW5ncywgMTk3
-IGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2
-aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0
-aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KQ2hl
-Y2tpbmcgUEFUQ0ggNi8yNzogdGFyZ2V0L2FybTogSW1wbGVtZW50IFNWRSBQcmVkaWNhdGUgTG9n
-aWNhbCBPcGVyYXRpb25zIEdyb3VwLi4uCkNoZWNraW5nIFBBVENIIDcvMjc6IHRhcmdldC9hcm06
-IEltcGxlbWVudCBTVkUgUHJlZGljYXRlIE1pc2MgR3JvdXAuLi4KQ2hlY2tpbmcgUEFUQ0ggOC8y
-NzogdGFyZ2V0L2FybTogSW1wbGVtZW50IFNWRSBJbnRlZ2VyIEJpbmFyeSBBcml0aG1ldGljIC0g
-UHJlZGljYXRlZCBHcm91cC4uLgpDaGVja2luZyBQQVRDSCA5LzI3OiB0YXJnZXQvYXJtOiBJbXBs
-ZW1lbnQgU1ZFIEludGVnZXIgUmVkdWN0aW9uIEdyb3VwLi4uCkNoZWNraW5nIFBBVENIIDEwLzI3
-OiB0YXJnZXQvYXJtOiBJbXBsZW1lbnQgU1ZFIGJpdHdpc2Ugc2hpZnQgYnkgaW1tZWRpYXRlIChw
-cmVkaWNhdGVkKS4uLgpDaGVja2luZyBQQVRDSCAxMS8yNzogdGFyZ2V0L2FybTogSW1wbGVtZW50
-IFNWRSBiaXR3aXNlIHNoaWZ0IGJ5IHZlY3RvciAocHJlZGljYXRlZCkuLi4KQ2hlY2tpbmcgUEFU
-Q0ggMTIvMjc6IHRhcmdldC9hcm06IEltcGxlbWVudCBTVkUgYml0d2lzZSBzaGlmdCBieSB3aWRl
-IGVsZW1lbnRzIChwcmVkaWNhdGVkKS4uLgpFUlJPUjogc3BhY2VzIHJlcXVpcmVkIGFyb3VuZCB0
-aGF0ICcqJyAoY3R4Old4VikKIzExODogRklMRTogdGFyZ2V0L2FybS90cmFuc2xhdGUtc3ZlLmM6
-NTA1Ogorc3RhdGljIGJvb2wgdHJhbnNfIyNOQU1FIyNfenB6dyhEaXNhc0NvbnRleHQgKnMsIGFy
-Z19ycHJyX2VzeiAqYSwgICAgICAgICBcCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIF4KCnRvdGFsOiAxIGVycm9ycywgMCB3YXJu
-aW5ncywgMTEwIGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBw
-bGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVz
-IHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJ
-TkVSUy4KCkNoZWNraW5nIFBBVENIIDEzLzI3OiB0YXJnZXQvYXJtOiBJbXBsZW1lbnQgU1ZFIElu
-dGVnZXIgQXJpdGhtZXRpYyAtIFVuYXJ5IFByZWRpY2F0ZWQgR3JvdXAuLi4KRVJST1I6IHNwYWNl
-cyByZXF1aXJlZCBhcm91bmQgdGhhdCAnLScgKGN0eDpWeFYpCiMxODU6IEZJTEU6IHRhcmdldC9h
-cm0vc3ZlX2hlbHBlci5jOjU2NDoKKyNkZWZpbmUgRE9fRkFCUyhOKSAgICAoTiAmICgoX190eXBl
-b2YoTikpLTEgPj4gMSkpCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-IF4KCkVSUk9SOiBzcGFjZXMgcmVxdWlyZWQgYXJvdW5kIHRoYXQgJy0nIChjdHg6VnhWKQojMTkx
-OiBGSUxFOiB0YXJnZXQvYXJtL3N2ZV9oZWxwZXIuYzo1NzA6CisjZGVmaW5lIERPX0ZORUcoTikg
-ICAgKE4gXiB+KChfX3R5cGVvZihOKSktMSA+PiAxKSkKICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgIF4KCnRvdGFsOiAyIGVycm9ycywgMCB3YXJuaW5ncywgMzQ3IGxp
-bmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3
-LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVt
-IHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCkNoZWNr
-aW5nIFBBVENIIDE0LzI3OiB0YXJnZXQvYXJtOiBJbXBsZW1lbnQgU1ZFIEludGVnZXIgTXVsdGlw
-bHktQWRkIEdyb3VwLi4uCkNoZWNraW5nIFBBVENIIDE1LzI3OiB0YXJnZXQvYXJtOiBJbXBsZW1l
-bnQgU1ZFIEludGVnZXIgQXJpdGhtZXRpYyAtIFVucHJlZGljYXRlZCBHcm91cC4uLgpDaGVja2lu
-ZyBQQVRDSCAxNi8yNzogdGFyZ2V0L2FybTogSW1wbGVtZW50IFNWRSBJbmRleCBHZW5lcmF0aW9u
-IEdyb3VwLi4uCkNoZWNraW5nIFBBVENIIDE3LzI3OiB0YXJnZXQvYXJtOiBJbXBsZW1lbnQgU1ZF
-IFN0YWNrIEFsbG9jYXRpb24gR3JvdXAuLi4KQ2hlY2tpbmcgUEFUQ0ggMTgvMjc6IHRhcmdldC9h
-cm06IEltcGxlbWVudCBTVkUgQml0d2lzZSBTaGlmdCAtIFVucHJlZGljYXRlZCBHcm91cC4uLgpD
-aGVja2luZyBQQVRDSCAxOS8yNzogdGFyZ2V0L2FybTogSW1wbGVtZW50IFNWRSBDb21wdXRlIFZl
-Y3RvciBBZGRyZXNzIEdyb3VwLi4uCkNoZWNraW5nIFBBVENIIDIwLzI3OiB0YXJnZXQvYXJtOiBJ
-bXBsZW1lbnQgU1ZFIGZsb2F0aW5nLXBvaW50IGV4cG9uZW50aWFsIGFjY2VsZXJhdG9yLi4uCkNo
-ZWNraW5nIFBBVENIIDIxLzI3OiB0YXJnZXQvYXJtOiBJbXBsZW1lbnQgU1ZFIGZsb2F0aW5nLXBv
-aW50IHRyaWcgc2VsZWN0IGNvZWZmaWNpZW50Li4uCkNoZWNraW5nIFBBVENIIDIyLzI3OiB0YXJn
-ZXQvYXJtOiBJbXBsZW1lbnQgU1ZFIEVsZW1lbnQgQ291bnQgR3JvdXAuLi4KQ2hlY2tpbmcgUEFU
-Q0ggMjMvMjc6IHRhcmdldC9hcm06IEltcGxlbWVudCBTVkUgQml0d2lzZSBJbW1lZGlhdGUgR3Jv
-dXAuLi4KQ2hlY2tpbmcgUEFUQ0ggMjQvMjc6IHRhcmdldC9hcm06IEltcGxlbWVudCBTVkUgSW50
-ZWdlciBXaWRlIEltbWVkaWF0ZSAtIFByZWRpY2F0ZWQgR3JvdXAuLi4KQ2hlY2tpbmcgUEFUQ0gg
-MjUvMjc6IHRhcmdldC9hcm06IEltcGxlbWVudCBTVkUgUGVybXV0ZSAtIEV4dHJhY3QgR3JvdXAu
-Li4KQ2hlY2tpbmcgUEFUQ0ggMjYvMjc6IHRhcmdldC9hcm06IEV4dGVuZCB2ZWNfcmVnX29mZnNl
-dCB0byBsYXJnZXIgc2l6ZXMuLi4KQ2hlY2tpbmcgUEFUQ0ggMjcvMjc6IHRhcmdldC9hcm06IElt
-cGxlbWVudCBTVkUgUGVybXV0ZSAtIFVucHJlZGljYXRlZCBHcm91cC4uLgpFUlJPUjogc3BhY2Ug
-cHJvaGliaXRlZCBiZWZvcmUgdGhhdCBjbG9zZSBwYXJlbnRoZXNpcyAnKScKIzExNjogRklMRTog
-dGFyZ2V0L2FybS9zdmVfaGVscGVyLmM6MTU3NToKK0RPX0lOU1Ioc3ZlX2luc3JfZCwgdWludDY0
-X3QsICkKCkVSUk9SOiBzcGFjZSBwcm9oaWJpdGVkIGJlZm9yZSB0aGF0IGNsb3NlIHBhcmVudGhl
-c2lzICcpJwojMTkwOiBGSUxFOiB0YXJnZXQvYXJtL3N2ZV9oZWxwZXIuYzoxNjQ5OgorRE9fVEJM
-KHN2ZV90YmxfZCwgdWludDY0X3QsICkKCnRvdGFsOiAyIGVycm9ycywgMCB3YXJuaW5ncywgMzMw
-IGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2
-aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0
-aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCj09
-PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgotLS0K
-RW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cDovL3BhdGNoZXcu
-b3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEByZWRoYXQu
-Y29t
+On 15 May 2018 at 17:50, Paolo Bonzini <pbonzini@redhat.com> wrote:
+> On 15/05/2018 18:28, Peter Maydell wrote:
+>>
+>> Presumably we also want a way for notifier users like vfio to
+>> detect "I'm dealing with an IOMMU that is txattrs aware in a
+>> way I can't deal with" so they can usefully bail out rather than
+>> not working.
+>>
+>> Unfortunately I don't really know enough about our two current
+>> users of notifiers (vhost and vfio) to know what they actually
+>> need the iommu notifications for...
+>
+> As you guessed on IRC, they basically establish a shadow IOMMU page
+> table or TLB.  My proposal would be to add two MemTxAttrs arguments to
+> the IOMMUNotify typedef and to memory_region_notify_one, respectively to
+> indicate which attributes matter (0 = indifferent, 1 = matter) and their
+> value.  So far so good.
+>
+> Perhaps memory_region_register_iommu_notifier can also get an argument
+> with the supported attributes.  The function would then fail if there
+> are fewer bits set in that argument than what the IOMMU supports...
+
+So I had an idea this morning for a slightly different way to approach
+this, which is that we add a concept of an iommu_idx, analogous to
+our existing TCG mmu_idx. Basically an iommu_idx represents a
+page table (kind of like what Arm calls a "translation regime"), so
+that for any particular iommu index and input address the output
+address and permissions are always the same. For the memory
+protection controller there would be two iommu_idxes, one for
+secure and one for non-secure.
+
+The API changes would be something like:
+ * new method get_num_indexes() which returns the number of iommu indexes
+   this IOMMU implements (default implementation: return 1)
+ * translate method takes an iommu index (and not the txattrs)
+ * new method index_from_attrs() which takes a MemTxAttrs and
+   returns the iommu index that should be used (default implementation:
+   always return 0)
+ * memory_region_register_iommu_notifier() takes an iommu index
+ * the default 'replay' method does "for each supported index,
+   for each address, call @translate"
+ * vfio and vhost can register their notifiers using the index
+   returned by index_from_attrs(MEMTXATTRS_UNSPECIFIED)
+ * maybe they could call get_num_indexes() and bail out if the
+   IOMMU has support for multiple indexes?
+ * maybe they could be enhanced to support tracking multiple
+   page tables if necessary in future
+
+I haven't worked through the details yet, but this seems to me
+more flexible than working directly with txattrs. It also means
+it's harder to accidentally write an iommu implementation that
+looks at more fields in the txattrs than its notifier interface
+claims are significant to it.
+
+thanks
+-- PMM
