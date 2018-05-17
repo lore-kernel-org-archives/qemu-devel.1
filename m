@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55251)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55250)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fJNFw-0003XU-47
-	for qemu-devel@nongnu.org; Thu, 17 May 2018 14:04:00 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1fJNFw-0003XT-46
+	for qemu-devel@nongnu.org; Thu, 17 May 2018 14:04:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fJNFr-0004xP-20
+	(envelope-from <alex.bennee@linaro.org>) id 1fJNFr-0004y8-SS
 	for qemu-devel@nongnu.org; Thu, 17 May 2018 14:04:00 -0400
-Received: from mail-wr0-x244.google.com ([2a00:1450:400c:c0c::244]:43379)
+Received: from mail-wm0-x242.google.com ([2a00:1450:400c:c09::242]:55683)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1fJNFq-0004wm-Rx
-	for qemu-devel@nongnu.org; Thu, 17 May 2018 14:03:54 -0400
-Received: by mail-wr0-x244.google.com with SMTP id v15-v6so6574633wrm.10
-	for <qemu-devel@nongnu.org>; Thu, 17 May 2018 11:03:54 -0700 (PDT)
+	id 1fJNFr-0004xV-Lw
+	for qemu-devel@nongnu.org; Thu, 17 May 2018 14:03:55 -0400
+Received: by mail-wm0-x242.google.com with SMTP id a8-v6so9960572wmg.5
+	for <qemu-devel@nongnu.org>; Thu, 17 May 2018 11:03:55 -0700 (PDT)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Thu, 17 May 2018 18:46:56 +0100
-Message-Id: <20180517174718.10107-28-alex.bennee@linaro.org>
+Date: Thu, 17 May 2018 18:47:02 +0100
+Message-Id: <20180517174718.10107-34-alex.bennee@linaro.org>
 In-Reply-To: <20180517174718.10107-1-alex.bennee@linaro.org>
 References: <20180517174718.10107-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v4 27/49] tests/tcg: enable building for ARM
+Subject: [Qemu-devel] [PATCH v4 33/49] tests/tcg: move MIPS specific tests
+ into subdir
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,30 +31,59 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: cota@braap.org, famz@redhat.com, berrange@redhat.com, f4bug@amsat.org, richard.henderson@linaro.org, balrogg@gmail.com, aurelien@aurel32.net, agraf@suse.de
-Cc: qemu-devel@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Peter Maydell <peter.maydell@linaro.org>, "open list:ARM" <qemu-arm@nongnu.org>
+Cc: qemu-devel@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Yongbok Kim <yongbok.kim@mips.com>
 
-This allows us to use the docker cross compiler image to build these
-tests.
+These only need to be built for MIPS guests.
 
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Tested-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- tests/tcg/arm/Makefile.include | 8 ++++++++
- 1 file changed, 8 insertions(+)
- create mode 100644 tests/tcg/arm/Makefile.include
+ tests/tcg/README                  | 11 -----------
+ tests/tcg/mips/README             |  7 +++++++
+ tests/tcg/{ => mips}/hello-mips.c |  0
+ 3 files changed, 7 insertions(+), 11 deletions(-)
+ create mode 100644 tests/tcg/mips/README
+ rename tests/tcg/{ => mips}/hello-mips.c (100%)
 
-diff --git a/tests/tcg/arm/Makefile.include b/tests/tcg/arm/Makefile.include
+diff --git a/tests/tcg/README b/tests/tcg/README
+index 625f2326e6..a5643d33e7 100644
+--- a/tests/tcg/README
++++ b/tests/tcg/README
+@@ -3,17 +3,6 @@ regression testing. Tests are either multi-arch, meaning they can be
+ built for all guest architectures that support linux-user executable,
+ or they are architecture specific.
+ 
+-
+-
+-MIPS
+-====
+-
+-hello-mips
+-----------
+-
+-hello-mipsel
+-------------
+-
+ CRIS
+ ====
+ The testsuite for CRIS is in tests/tcg/cris.  You can run it
+diff --git a/tests/tcg/mips/README b/tests/tcg/mips/README
 new file mode 100644
-index 0000000000..8e7eac008f
+index 0000000000..e5bbc58ec5
 --- /dev/null
-+++ b/tests/tcg/arm/Makefile.include
-@@ -0,0 +1,8 @@
-+# Makefile.include for all ARM targets
-+#
-+# We don't have any bigendian build tools so we only use this for armhf
++++ b/tests/tcg/mips/README
+@@ -0,0 +1,7 @@
++MIPS
++====
 +
-+ifeq ($(TARGET_NAME),arm)
-+DOCKER_IMAGE=debian-armhf-cross
-+DOCKER_CROSS_COMPILER=arm-linux-gnueabihf-gcc
-+endif
++hello-mips
++----------
++
++A very simple inline assembly, write syscall based hello world
+diff --git a/tests/tcg/hello-mips.c b/tests/tcg/mips/hello-mips.c
+similarity index 100%
+rename from tests/tcg/hello-mips.c
+rename to tests/tcg/mips/hello-mips.c
 -- 
 2.17.0
