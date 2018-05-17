@@ -1,32 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54585)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55329)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1fJ90h-0007uo-Cw
-	for qemu-devel@nongnu.org; Wed, 16 May 2018 22:51:20 -0400
+	(envelope-from <wangjie88@huawei.com>) id 1fJ96V-00014Q-2I
+	for qemu-devel@nongnu.org; Wed, 16 May 2018 22:57:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1fJ90e-0000u8-BI
-	for qemu-devel@nongnu.org; Wed, 16 May 2018 22:51:19 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:43200 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1fJ90e-0000tu-65
-	for qemu-devel@nongnu.org; Wed, 16 May 2018 22:51:16 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.6])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 72C1640201AC
-	for <qemu-devel@nongnu.org>; Thu, 17 May 2018 02:51:15 +0000 (UTC)
-Date: Thu, 17 May 2018 10:51:10 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20180517025110.GL9089@xz-mi>
-References: <20180515091356.24106-1-peterx@redhat.com>
-	<584bbd99-11dd-8da9-a5b4-de285cebc84d@redhat.com>
-	<20180516030750.GC9089@xz-mi>
-	<b5eeb9d8-b5d5-ea06-ae09-3bfacb6036e0@redhat.com>
+	(envelope-from <wangjie88@huawei.com>) id 1fJ96U-00039x-5e
+	for qemu-devel@nongnu.org; Wed, 16 May 2018 22:57:19 -0400
+From: Jie Wang <wangjie88@huawei.com>
+Date: Thu, 17 May 2018 08:42:43 +0800
+Message-ID: <1526517763-11108-1-git-send-email-wangjie88@huawei.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <b5eeb9d8-b5d5-ea06-ae09-3bfacb6036e0@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH RFC] qemu-error: introduce error_report_once
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH v5] iothread: fix epollfd leak in the process
+ of delIOThread
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,53 +20,98 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>
+To: stefanha@redhat.com, peterx@redhat.com, famz@redhat.com, eblake@redhat.com
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, eric.fangyi@huawei.com, wu.wubin@huawei.com, wangjie88@huawei.com
 
-On Wed, May 16, 2018 at 09:02:42AM -0500, Eric Blake wrote:
-> On 05/15/2018 10:07 PM, Peter Xu wrote:
-> 
-> > > > +        static bool __print_once;               \
-> > > 
-> > > Double-underscore names are reserved for the compiler's use, not ours.
-> > > Better would be naming this:
-> > > 
-> > > static bool print_once_;
-> > > 
-> > > with a trailing underscore, or at most a single leading underscore.
-> > > 
-> > > > +        bool __ret_print_once = !__print_once;  \
-> > > 
-> > > Same comment for this variable.
-> > 
-> > Sure!
-> > 
-> > (I am wondering why Linux is always using that way to name lots of
-> >   variables, and I'm surprised that I got 385350 after I run this under
-> >   the Linux repo: 'git grep "__[a-z][a-z]" | wc -l', even considering
-> >   some false positives)
-> 
-> git grep "\b_[_A-Z]" might be a more precise grep for use of reserved
-> identifiers.  The Linux kernel can get away with some uses that qemu does
-> not, because it is a monolithic low-level project that is closely tied to
-> rather specific compiler behaviors and does not have to port to other
-> systems; rather than a user-space application that aims to be portable to
-> multiple operating systems, compilers, and libc implementations.  Also,
-> grepping for leading double-underscore will have hits even in qemu, where we
-> ARE taking advantage of a compiler feature (an obvious example: anywhere we
-> #define a macro wrapper around an __attribute__ tag - __attribute__ belongs
-> to the namespace reserved for the compiler, so it makes sense that turning
-> on that compiler feature requires using the compiler's namespace).  Or put
-> another way, grepping for the use of reserved identifiers is easy, but
-> grepping for where we are inappropriately declaring something that may
-> collide (rather than using something that already exists) is a bit harder.
+When we call addIOThread, the epollfd created in aio_context_setup,
+but not close it in the process of delIOThread, so the epollfd will leak.
 
-Ah yes, I suppose it'll at least need a whitelist of existing symbols
-that are used in compiler's namespace (like, __attribute__) to make
-the number more accurate, which does not really suite for a oneliner
-any more.
+Signed-off-by: Jie Wang <wangjie88@huawei.com>
+---
+ include/block/aio.h |  8 ++++++++
+ util/aio-posix.c    | 13 ++++++++++---
+ util/aio-win32.c    |  4 ++++
+ util/async.c        |  1 +
+ 4 files changed, 23 insertions(+), 3 deletions(-)
 
-Good to know the reason finally.  Thanks Eric!
-
+diff --git a/include/block/aio.h b/include/block/aio.h
+index a1d6b9e..ae6f354 100644
+--- a/include/block/aio.h
++++ b/include/block/aio.h
+@@ -555,6 +555,14 @@ static inline bool in_aio_context_home_thread(AioContext *ctx)
+ void aio_context_setup(AioContext *ctx);
+ 
+ /**
++ * aio_context_destroy:
++ * @ctx: the aio context
++ *
++ * Destroy the aio context.
++ */
++void aio_context_destroy(AioContext *ctx);
++
++/**
+  * aio_context_set_poll_params:
+  * @ctx: the aio context
+  * @max_ns: how long to busy poll for, in nanoseconds
+diff --git a/util/aio-posix.c b/util/aio-posix.c
+index d8f0cb4..118bf57 100644
+--- a/util/aio-posix.c
++++ b/util/aio-posix.c
+@@ -45,11 +45,11 @@ struct AioHandler
+ 
+ static void aio_epoll_disable(AioContext *ctx)
+ {
+-    ctx->epoll_available = false;
+-    if (!ctx->epoll_enabled) {
++    ctx->epoll_enabled = false;
++    if (!ctx->epoll_available) {
+         return;
+     }
+-    ctx->epoll_enabled = false;
++    ctx->epoll_available = false;
+     close(ctx->epollfd);
+ }
+ 
+@@ -713,6 +713,13 @@ void aio_context_setup(AioContext *ctx)
+ #endif
+ }
+ 
++void aio_context_destroy(AioContext *ctx)
++{
++#ifdef CONFIG_EPOLL_CREATE1
++    aio_epoll_disable(ctx);
++#endif
++}
++
+ void aio_context_set_poll_params(AioContext *ctx, int64_t max_ns,
+                                  int64_t grow, int64_t shrink, Error **errp)
+ {
+diff --git a/util/aio-win32.c b/util/aio-win32.c
+index a67b00c..e676a8d 100644
+--- a/util/aio-win32.c
++++ b/util/aio-win32.c
+@@ -407,6 +407,10 @@ void aio_context_setup(AioContext *ctx)
+ {
+ }
+ 
++void aio_context_destroy(AioContext *ctx)
++{
++}
++
+ void aio_context_set_poll_params(AioContext *ctx, int64_t max_ns,
+                                  int64_t grow, int64_t shrink, Error **errp)
+ {
+diff --git a/util/async.c b/util/async.c
+index 4dd9d95..03f6278 100644
+--- a/util/async.c
++++ b/util/async.c
+@@ -298,6 +298,7 @@ aio_ctx_finalize(GSource     *source)
+     qemu_rec_mutex_destroy(&ctx->lock);
+     qemu_lockcnt_destroy(&ctx->list_lock);
+     timerlistgroup_deinit(&ctx->tlg);
++    aio_context_destroy(ctx);
+ }
+ 
+ static GSourceFuncs aio_source_funcs = {
 -- 
-Peter Xu
+1.8.3.1
