@@ -1,25 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34455)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34456)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <viktor.prutyanov@virtuozzo.com>) id 1fJLhX-0006aX-Is
-	for qemu-devel@nongnu.org; Thu, 17 May 2018 12:24:25 -0400
+	(envelope-from <viktor.prutyanov@virtuozzo.com>) id 1fJLhX-0006aY-Iy
+	for qemu-devel@nongnu.org; Thu, 17 May 2018 12:24:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <viktor.prutyanov@virtuozzo.com>) id 1fJLhU-0007KR-VV
+	(envelope-from <viktor.prutyanov@virtuozzo.com>) id 1fJLhT-0007Ip-TT
 	for qemu-devel@nongnu.org; Thu, 17 May 2018 12:24:23 -0400
 Received: from mail-eopbgr50097.outbound.protection.outlook.com
 	([40.107.5.97]:20608
 	helo=EUR03-VE1-obe.outbound.protection.outlook.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <viktor.prutyanov@virtuozzo.com>)
-	id 1fJLhU-0007FD-Og
-	for qemu-devel@nongnu.org; Thu, 17 May 2018 12:24:20 -0400
+	id 1fJLhT-0007FD-Hd
+	for qemu-devel@nongnu.org; Thu, 17 May 2018 12:24:19 -0400
 From: Viktor Prutyanov <viktor.prutyanov@virtuozzo.com>
-Date: Thu, 17 May 2018 19:23:42 +0300
-Message-Id: <20180517162342.4330-5-viktor.prutyanov@virtuozzo.com>
+Date: Thu, 17 May 2018 19:23:39 +0300
+Message-ID: <20180517162342.4330-2-viktor.prutyanov@virtuozzo.com>
 In-Reply-To: <20180517162342.4330-1-viktor.prutyanov@virtuozzo.com>
 References: <20180517162342.4330-1-viktor.prutyanov@virtuozzo.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH 4/4] dump: add Windows live system dump
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH 1/4] dump: add Windows dump format to
+ dump-guest-memory
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,321 +33,525 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: rkagan@virtuozzo.com, marcandre.lureau@redhat.com, dgilbert@redhat.com, armbru@redhat.com, Viktor Prutyanov <viktor.prutyanov@virtuozzo.com>
 
-Unlike dying Windows, live system memory doesn't contain
-correct register contexts. But they can be populated with QEMU register
-values.
-After this patch, QEMU will be able to produce guest Windows live system
-dump.
+This patch adds Windows crashdumping feature. Now QEMU can produce ELF-dump
+containing Windows crashdump header, which can help to convert to a valid
+WinDbg-understandable crashdump file, or immediately create such file.
+The crashdump will be obtained by joining physical memory dump and 8K heade=
+r
+exposed through vmcoreinfo/fw_cfg device by guest driver at BSOD time. Opti=
+on
+'-w' was added to dump-guest-memory command. At the moment, only x64
+configuration is supported.
+Suitable driver can be found at
+https://github.com/virtio-win/kvm-guest-drivers-windows/tree/master/fwcfg64
 
 Signed-off-by: Viktor Prutyanov <viktor.prutyanov@virtuozzo.com>
+Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 ---
- win_dump.c | 156 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++-
- win_dump.h |  95 +++++++++++++++++++++++++++++++++++--
- 2 files changed, 246 insertions(+), 5 deletions(-)
+This patch is unchanged from the one posted separately on 2018-05-01
+with message-id: <20180501132031.13270-1-viktor.prutyanov@virtuozzo.com>
 
-diff --git a/win_dump.c b/win_dump.c
-index 2d9afb514e..b15c191ad7 100644
---- a/win_dump.c
-+++ b/win_dump.c
-@@ -97,6 +97,14 @@ static void patch_bugcheck_data(WinDumpHeader64 *h, Error **errp)
-         error_setg(errp, "win-dump: failed to read bugcheck data");
+ Makefile.target |   1 +
+ dump.c          |  24 ++++++-
+ hmp-commands.hx |  13 ++--
+ hmp.c           |   9 ++-
+ qapi/misc.json  |   5 +-
+ win_dump.c      | 209 ++++++++++++++++++++++++++++++++++++++++++++++++++++=
+++++
+ win_dump.h      |  87 +++++++++++++++++++++++
+ 7 files changed, 339 insertions(+), 9 deletions(-)
+ create mode 100644 win_dump.c
+ create mode 100644 win_dump.h
+
+diff --git a/Makefile.target b/Makefile.target
+index d0ec77a307..6ae2609597 100644
+--- a/Makefile.target
++++ b/Makefile.target
+@@ -138,6 +138,7 @@ obj-y +=3D hw/
+ obj-y +=3D memory.o
+ obj-y +=3D memory_mapping.o
+ obj-y +=3D dump.o
++obj-y +=3D win_dump.o
+ obj-y +=3D migration/ram.o
+ LIBS :=3D $(libs_softmmu) $(LIBS)
+=20
+diff --git a/dump.c b/dump.c
+index b54cd42b21..04467b353e 100644
+--- a/dump.c
++++ b/dump.c
+@@ -29,6 +29,10 @@
+ #include "qemu/error-report.h"
+ #include "hw/misc/vmcoreinfo.h"
+=20
++#ifdef TARGET_X86_64
++#include "win_dump.h"
++#endif
++
+ #include <zlib.h>
+ #ifdef CONFIG_LZO
+ #include <lzo/lzo1x.h>
+@@ -1866,7 +1870,11 @@ static void dump_process(DumpState *s, Error **errp)
+     Error *local_err =3D NULL;
+     DumpQueryResult *result =3D NULL;
+=20
+-    if (s->has_format && s->format !=3D DUMP_GUEST_MEMORY_FORMAT_ELF) {
++    if (s->has_format && s->format =3D=3D DUMP_GUEST_MEMORY_FORMAT_WIN_DMP=
+) {
++#ifdef TARGET_X86_64
++        create_win_dump(s, &local_err);
++#endif
++    } else if (s->has_format && s->format !=3D DUMP_GUEST_MEMORY_FORMAT_EL=
+F) {
+         create_kdump_vmcore(s, &local_err);
+     } else {
+         create_vmcore(s, &local_err);
+@@ -1970,6 +1978,13 @@ void qmp_dump_guest_memory(bool paging, const char *=
+file,
+     }
+ #endif
+=20
++#ifndef TARGET_X86_64
++    if (has_format && format =3D=3D DUMP_GUEST_MEMORY_FORMAT_WIN_DMP) {
++        error_setg(errp, "Windows dump is only available for x86-64");
++        return;
++    }
++#endif
++
+ #if !defined(WIN32)
+     if (strstart(file, "fd:", &p)) {
+         fd =3D monitor_get_fd(cur_mon, p, errp);
+@@ -2044,5 +2059,12 @@ DumpGuestMemoryCapability *qmp_query_dump_guest_memo=
+ry_capability(Error **errp)
+     item->value =3D DUMP_GUEST_MEMORY_FORMAT_KDUMP_SNAPPY;
+ #endif
+=20
++    /* Windows dump is available only if target is x86_64 */
++#ifdef TARGET_X86_64
++    item->next =3D g_malloc0(sizeof(DumpGuestMemoryFormatList));
++    item =3D item->next;
++    item->value =3D DUMP_GUEST_MEMORY_FORMAT_WIN_DMP;
++#endif
++
+     return cap;
+ }
+diff --git a/hmp-commands.hx b/hmp-commands.hx
+index 227f7eee88..fc1f7401f7 100644
+--- a/hmp-commands.hx
++++ b/hmp-commands.hx
+@@ -1088,30 +1088,33 @@ ETEXI
+=20
+     {
+         .name       =3D "dump-guest-memory",
+-        .args_type  =3D "paging:-p,detach:-d,zlib:-z,lzo:-l,snappy:-s,file=
+name:F,begin:i?,length:i?",
+-        .params     =3D "[-p] [-d] [-z|-l|-s] filename [begin length]",
++        .args_type  =3D "paging:-p,detach:-d,windmp:-w,zlib:-z,lzo:-l,snap=
+py:-s,filename:F,begin:i?,length:i?",
++        .params     =3D "[-p] [-d] [-z|-l|-s|-w] filename [begin length]",
+         .help       =3D "dump guest memory into file 'filename'.\n\t\t\t"
+                       "-p: do paging to get guest's memory mapping.\n\t\t\=
+t"
+                       "-d: return immediately (do not wait for completion)=
+.\n\t\t\t"
+                       "-z: dump in kdump-compressed format, with zlib comp=
+ression.\n\t\t\t"
+                       "-l: dump in kdump-compressed format, with lzo compr=
+ession.\n\t\t\t"
+                       "-s: dump in kdump-compressed format, with snappy co=
+mpression.\n\t\t\t"
++                      "-w: dump in Windows crashdump format (can be used i=
+nstead of ELF-dump converting),\n\t\t\t"
++                      "    for Windows x64 guests with vmcoreinfo driver o=
+nly.\n\t\t\t"
+                       "begin: the starting physical address.\n\t\t\t"
+                       "length: the memory size, in bytes.",
+         .cmd        =3D hmp_dump_guest_memory,
+     },
+=20
+-
+ STEXI
+ @item dump-guest-memory [-p] @var{filename} @var{begin} @var{length}
+-@item dump-guest-memory [-z|-l|-s] @var{filename}
++@item dump-guest-memory [-z|-l|-s|-w] @var{filename}
+ @findex dump-guest-memory
+ Dump guest memory to @var{protocol}. The file can be processed with crash =
+or
+-gdb. Without -z|-l|-s, the dump format is ELF.
++gdb. Without -z|-l|-s|-w, the dump format is ELF.
+         -p: do paging to get guest's memory mapping.
+         -z: dump in kdump-compressed format, with zlib compression.
+         -l: dump in kdump-compressed format, with lzo compression.
+         -s: dump in kdump-compressed format, with snappy compression.
++        -w: dump in Windows crashdump format (can be used instead of ELF-d=
+ump converting),
++            for Windows x64 guests with vmcoreinfo driver only
+   filename: dump file name.
+      begin: the starting physical address. It's optional, and should be
+             specified together with length.
+diff --git a/hmp.c b/hmp.c
+index bdb340605c..c0c7ff0982 100644
+--- a/hmp.c
++++ b/hmp.c
+@@ -1976,6 +1976,7 @@ void hmp_device_del(Monitor *mon, const QDict *qdict)
+ void hmp_dump_guest_memory(Monitor *mon, const QDict *qdict)
+ {
+     Error *err =3D NULL;
++    bool win_dmp =3D qdict_get_try_bool(qdict, "windmp", false);
+     bool paging =3D qdict_get_try_bool(qdict, "paging", false);
+     bool zlib =3D qdict_get_try_bool(qdict, "zlib", false);
+     bool lzo =3D qdict_get_try_bool(qdict, "lzo", false);
+@@ -1990,12 +1991,16 @@ void hmp_dump_guest_memory(Monitor *mon, const QDic=
+t *qdict)
+     enum DumpGuestMemoryFormat dump_format =3D DUMP_GUEST_MEMORY_FORMAT_EL=
+F;
+     char *prot;
+=20
+-    if (zlib + lzo + snappy > 1) {
+-        error_setg(&err, "only one of '-z|-l|-s' can be set");
++    if (zlib + lzo + snappy + win_dmp > 1) {
++        error_setg(&err, "only one of '-z|-l|-s|-w' can be set");
+         hmp_handle_error(mon, &err);
          return;
      }
-+
-+    /*
-+     * If BugcheckCode wasn't saved, we consider guest OS as alive.
-+     */
-+
-+    if (!h->BugcheckCode) {
-+        h->BugcheckCode = LIVE_SYSTEM_DUMP;
+=20
++    if (win_dmp) {
++        dump_format =3D DUMP_GUEST_MEMORY_FORMAT_WIN_DMP;
 +    }
- }
- 
- /*
-@@ -177,12 +185,139 @@ try_again:
-     h->KdDebuggerDataBlock = KdDebuggerDataBlock;
- }
- 
-+struct saved_context {
-+    WinContext ctx;
-+    uint64_t addr;
-+};
 +
-+static void patch_and_save_context(WinDumpHeader64 *h,
-+                                   struct saved_context *saved_ctx,
-+                                   Error **errp)
+     if (zlib) {
+         dump_format =3D DUMP_GUEST_MEMORY_FORMAT_KDUMP_ZLIB;
+     }
+diff --git a/qapi/misc.json b/qapi/misc.json
+index f5988cc0b5..5d02d07298 100644
+--- a/qapi/misc.json
++++ b/qapi/misc.json
+@@ -1679,10 +1679,13 @@
+ #
+ # @kdump-snappy: kdump-compressed format with snappy-compressed
+ #
++# @win-dmp: Windows full crashdump format,
++#           can be used instead of ELF converting (since 2.13)
++#
+ # Since: 2.0
+ ##
+ { 'enum': 'DumpGuestMemoryFormat',
+-  'data': [ 'elf', 'kdump-zlib', 'kdump-lzo', 'kdump-snappy' ] }
++  'data': [ 'elf', 'kdump-zlib', 'kdump-lzo', 'kdump-snappy', 'win-dmp' ] =
+}
+=20
+ ##
+ # @dump-guest-memory:
+diff --git a/win_dump.c b/win_dump.c
+new file mode 100644
+index 0000000000..58255c12ee
+--- /dev/null
++++ b/win_dump.c
+@@ -0,0 +1,209 @@
++/*
++ * Windows crashdump
++ *
++ * Copyright (c) 2018 Virtuozzo International GmbH
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or late=
+r.
++ * See the COPYING file in the top-level directory.
++ *
++ */
++
++#include "qemu/osdep.h"
++#include "qemu/cutils.h"
++#include "elf.h"
++#include "cpu.h"
++#include "exec/hwaddr.h"
++#include "monitor/monitor.h"
++#include "sysemu/kvm.h"
++#include "sysemu/dump.h"
++#include "sysemu/sysemu.h"
++#include "sysemu/memory_mapping.h"
++#include "sysemu/cpus.h"
++#include "qapi/error.h"
++#include "qapi/qmp/qerror.h"
++#include "qemu/error-report.h"
++#include "hw/misc/vmcoreinfo.h"
++#include "win_dump.h"
++
++static size_t write_run(WinDumpPhyMemRun64 *run, int fd, Error **errp)
 +{
-+    uint64_t KiProcessorBlock;
-+    uint16_t OffsetPrcbContext;
-+    CPUState *cpu;
-+    int i = 0;
++    void *buf;
++    uint64_t addr =3D run->BasePage << TARGET_PAGE_BITS;
++    uint64_t size =3D run->PageCount << TARGET_PAGE_BITS;
++    uint64_t len =3D size;
 +
-+    if (cpu_memory_rw_debug(first_cpu,
-+            h->KdDebuggerDataBlock + KDBG_KI_PROCESSOR_BLOCK_OFFSET64,
-+            (uint8_t *)&KiProcessorBlock, sizeof(KiProcessorBlock), 0)) {
-+        error_setg(errp, "win-dump: failed to read KiProcessorBlock");
-+        return;
++    buf =3D cpu_physical_memory_map(addr, &len, false);
++    if (!buf) {
++        error_setg(errp, "win-dump: failed to map run");
++        return 0;
++    }
++    if (len !=3D size) {
++        error_setg(errp, "win-dump: failed to map entire run");
++        len =3D 0;
++        goto out_unmap;
 +    }
 +
-+    if (cpu_memory_rw_debug(first_cpu,
-+            h->KdDebuggerDataBlock + KDBG_OFFSET_PRCB_CONTEXT_OFFSET64,
-+            (uint8_t *)&OffsetPrcbContext, sizeof(OffsetPrcbContext), 0)) {
-+        error_setg(errp, "win-dump: failed to read OffsetPrcbContext");
-+        return;
++    len =3D qemu_write_full(fd, buf, len);
++    if (len !=3D size) {
++        error_setg(errp, QERR_IO_ERROR);
 +    }
 +
-+    CPU_FOREACH(cpu) {
-+        X86CPU *x86_cpu = X86_CPU(cpu);
-+        CPUX86State *env = &x86_cpu->env;
-+        uint64_t Prcb;
-+        uint64_t Context;
-+        WinContext ctx;
++out_unmap:
++    cpu_physical_memory_unmap(buf, addr, false, len);
 +
-+        if (cpu_memory_rw_debug(first_cpu,
-+                KiProcessorBlock + i * sizeof(uint64_t),
-+                (uint8_t *)&Prcb, sizeof(Prcb), 0)) {
-+            error_setg(errp, "win-dump: failed to read"
-+                             " CPU #%d PRCB location", i);
-+            return;
-+        }
-+
-+        if (cpu_memory_rw_debug(first_cpu,
-+                Prcb + OffsetPrcbContext,
-+                (uint8_t *)&Context, sizeof(Context), 0)) {
-+            error_setg(errp, "win-dump: failed to read"
-+                             " CPU #%d ContextFrame location", i);
-+            return;
-+        }
-+
-+        saved_ctx[i].addr = Context;
-+
-+        ctx = (WinContext){
-+            .ContextFlags = WIN_CTX_ALL,
-+            .MxCsr = env->mxcsr,
-+
-+            .SegEs = env->segs[0].selector,
-+            .SegCs = env->segs[1].selector,
-+            .SegSs = env->segs[2].selector,
-+            .SegDs = env->segs[3].selector,
-+            .SegFs = env->segs[4].selector,
-+            .SegGs = env->segs[5].selector,
-+            .EFlags = cpu_compute_eflags(env),
-+
-+            .Dr0 = env->dr[0],
-+            .Dr1 = env->dr[1],
-+            .Dr2 = env->dr[2],
-+            .Dr3 = env->dr[3],
-+            .Dr6 = env->dr[6],
-+            .Dr7 = env->dr[7],
-+
-+            .Rax = env->regs[R_EAX],
-+            .Rbx = env->regs[R_EBX],
-+            .Rcx = env->regs[R_ECX],
-+            .Rdx = env->regs[R_EDX],
-+            .Rsp = env->regs[R_ESP],
-+            .Rbp = env->regs[R_EBP],
-+            .Rsi = env->regs[R_ESI],
-+            .Rdi = env->regs[R_EDI],
-+            .R8  = env->regs[8],
-+            .R9  = env->regs[9],
-+            .R10 = env->regs[10],
-+            .R11 = env->regs[11],
-+            .R12 = env->regs[12],
-+            .R13 = env->regs[13],
-+            .R14 = env->regs[14],
-+            .R15 = env->regs[15],
-+
-+            .Rip = env->eip,
-+            .FltSave = {
-+                .MxCsr = env->mxcsr,
-+            },
-+        };
-+
-+        if (cpu_memory_rw_debug(first_cpu, Context,
-+                (uint8_t *)&saved_ctx[i].ctx, sizeof(WinContext), 0)) {
-+            error_setg(errp, "win-dump: failed to save CPU #%d context", i);
-+            return;
-+        }
-+
-+        if (cpu_memory_rw_debug(first_cpu, Context,
-+                (uint8_t *)&ctx, sizeof(WinContext), 1)) {
-+            error_setg(errp, "win-dump: failed to write CPU #%d context", i);
-+            return;
-+        }
-+
-+        i++;
-+    }
++    return len;
 +}
 +
-+static void restore_context(WinDumpHeader64 *h,
-+                            struct saved_context *saved_ctx)
++static void write_runs(DumpState *s, WinDumpHeader64 *h, Error **errp)
 +{
++    WinDumpPhyMemDesc64 *desc =3D &h->PhysicalMemoryBlock;
++    WinDumpPhyMemRun64 *run =3D desc->Run;
++    Error *local_err =3D NULL;
 +    int i;
-+    Error *err = NULL;
 +
-+    for (i = 0; i < h->NumberProcessors; i++) {
-+        if (cpu_memory_rw_debug(first_cpu, saved_ctx[i].addr,
-+                (uint8_t *)&saved_ctx[i].ctx, sizeof(WinContext), 1)) {
-+            error_setg(&err, "win-dump: failed to restore CPU #%d context", i);
-+            warn_report_err(err);
++    for (i =3D 0; i < desc->NumberOfRuns; i++) {
++        s->written_size +=3D write_run(run + i, s->fd, &local_err);
++        if (local_err) {
++            error_propagate(errp, local_err);
++            return;
 +        }
 +    }
 +}
 +
- void create_win_dump(DumpState *s, Error **errp)
- {
-     WinDumpHeader64 *h = (WinDumpHeader64 *)(s->guest_note +
-             VMCOREINFO_ELF_NOTE_HDR_SIZE);
-     X86CPU *first_x86_cpu = X86_CPU(first_cpu);
-     uint64_t saved_cr3 = first_x86_cpu->env.cr[3];
-+    struct saved_context *saved_ctx = NULL;
-     Error *local_err = NULL;
- 
-     if (s->guest_note_size != sizeof(WinDumpHeader64) +
-@@ -212,20 +347,37 @@ void create_win_dump(DumpState *s, Error **errp)
- 
-     patch_header(h);
- 
-+    saved_ctx = g_new(struct saved_context, h->NumberProcessors);
++static void patch_mm_pfn_database(WinDumpHeader64 *h, Error **errp)
++{
++    if (cpu_memory_rw_debug(first_cpu,
++            h->KdDebuggerDataBlock + KDBG_MM_PFN_DATABASE_OFFSET64,
++            (uint8_t *)&h->PfnDatabase, sizeof(h->PfnDatabase), 0)) {
++        error_setg(errp, "win-dump: failed to read MmPfnDatabase");
++        return;
++    }
++}
++
++static void patch_bugcheck_data(WinDumpHeader64 *h, Error **errp)
++{
++    uint64_t KiBugcheckData;
++
++    if (cpu_memory_rw_debug(first_cpu,
++            h->KdDebuggerDataBlock + KDBG_KI_BUGCHECK_DATA_OFFSET64,
++            (uint8_t *)&KiBugcheckData, sizeof(KiBugcheckData), 0)) {
++        error_setg(errp, "win-dump: failed to read KiBugcheckData");
++        return;
++    }
++
++    if (cpu_memory_rw_debug(first_cpu,
++            KiBugcheckData,
++            h->BugcheckData, sizeof(h->BugcheckData), 0)) {
++        error_setg(errp, "win-dump: failed to read bugcheck data");
++        return;
++    }
++}
++
++/*
++ * This routine tries to correct mistakes in crashdump header.
++ */
++static void patch_header(WinDumpHeader64 *h)
++{
++    Error *local_err =3D NULL;
++
++    h->RequiredDumpSpace =3D sizeof(WinDumpHeader64) +
++            (h->PhysicalMemoryBlock.NumberOfPages << TARGET_PAGE_BITS);
++    h->PhysicalMemoryBlock.unused =3D 0;
++    h->unused1 =3D 0;
 +
 +    /*
-+     * Always patch context because there is no way
-+     * to determine if the system-saved context is valid
++     * We assume h->DirectoryBase and current CR3 are the same when we acc=
+ess
++     * memory by virtual address. In other words, we suppose current conte=
+xt
++     * is system context. It is definetely true in case of BSOD.
 +     */
 +
-+    patch_and_save_context(h, saved_ctx, &local_err);
++    patch_mm_pfn_database(h, &local_err);
++    if (local_err) {
++        warn_report_err(local_err);
++        local_err =3D NULL;
++    }
++    patch_bugcheck_data(h, &local_err);
++    if (local_err) {
++        warn_report_err(local_err);
++    }
++}
++
++static void check_header(WinDumpHeader64 *h, Error **errp)
++{
++    const char Signature[] =3D "PAGE";
++    const char ValidDump[] =3D "DU64";
++
++    if (memcmp(h->Signature, Signature, sizeof(h->Signature))) {
++        error_setg(errp, "win-dump: invalid header, expected '%.4s',"
++                         " got '%.4s'", Signature, h->Signature);
++        return;
++    }
++
++    if (memcmp(h->ValidDump, ValidDump, sizeof(h->ValidDump))) {
++        error_setg(errp, "win-dump: invalid header, expected '%.4s',"
++                         " got '%.4s'", ValidDump, h->ValidDump);
++        return;
++    }
++}
++
++static void check_kdbg(WinDumpHeader64 *h, Error **errp)
++{
++    const char OwnerTag[] =3D "KDBG";
++    char read_OwnerTag[4];
++
++    if (cpu_memory_rw_debug(first_cpu,
++            h->KdDebuggerDataBlock + KDBG_OWNER_TAG_OFFSET64,
++            (uint8_t *)&read_OwnerTag, sizeof(read_OwnerTag), 0)) {
++        error_setg(errp, "win-dump: failed to read OwnerTag");
++        return;
++    }
++
++    if (memcmp(read_OwnerTag, OwnerTag, sizeof(read_OwnerTag))) {
++        error_setg(errp, "win-dump: invalid KDBG OwnerTag,"
++                         " expected '%.4s', got '%.4s',"
++                         " KdDebuggerDataBlock seems to be encrypted",
++                         OwnerTag, read_OwnerTag);
++        return;
++    }
++}
++
++void create_win_dump(DumpState *s, Error **errp)
++{
++    WinDumpHeader64 *h =3D (WinDumpHeader64 *)(s->guest_note +
++            VMCOREINFO_ELF_NOTE_HDR_SIZE);
++    Error *local_err =3D NULL;
++
++    if (s->guest_note_size !=3D sizeof(WinDumpHeader64) +
++            VMCOREINFO_ELF_NOTE_HDR_SIZE) {
++        error_setg(errp, "win-dump: invalid vmcoreinfo note size");
++        return;
++    }
++
++    check_header(h, &local_err);
 +    if (local_err) {
 +        error_propagate(errp, local_err);
-+        goto out_free;
++        return;
 +    }
 +
-     s->total_size = h->RequiredDumpSpace;
- 
-     s->written_size = qemu_write_full(s->fd, h, sizeof(*h));
-     if (s->written_size != sizeof(*h)) {
-         error_setg(errp, QERR_IO_ERROR);
--        goto out_cr3;
-+        goto out_restore;
-     }
- 
-     write_runs(s, h, &local_err);
-     if (local_err) {
-         error_propagate(errp, local_err);
--        goto out_cr3;
-+        goto out_restore;
-     }
- 
-+out_restore:
-+    restore_context(h, saved_ctx);
-+out_free:
-+    g_free(saved_ctx);
- out_cr3:
-     first_x86_cpu->env.cr[3] = saved_cr3;
- 
++    check_kdbg(h, &local_err);
++    if (local_err) {
++        error_propagate(errp, local_err);
++        return;
++    }
++
++    patch_header(h);
++
++    s->total_size =3D h->RequiredDumpSpace;
++
++    s->written_size =3D qemu_write_full(s->fd, h, sizeof(*h));
++    if (s->written_size !=3D sizeof(*h)) {
++        error_setg(errp, QERR_IO_ERROR);
++        return;
++    }
++
++    write_runs(s, h, &local_err);
++    if (local_err) {
++        error_propagate(errp, local_err);
++        return;
++    }
++}
 diff --git a/win_dump.h b/win_dump.h
-index 281241881e..f9e1faf8eb 100644
---- a/win_dump.h
+new file mode 100644
+index 0000000000..281241881e
+--- /dev/null
 +++ b/win_dump.h
-@@ -80,8 +80,97 @@ typedef struct WinDumpHeader64 {
- 
- void create_win_dump(DumpState *s, Error **errp);
- 
--#define KDBG_OWNER_TAG_OFFSET64         0x10
--#define KDBG_KI_BUGCHECK_DATA_OFFSET64  0x88
--#define KDBG_MM_PFN_DATABASE_OFFSET64   0xC0
-+#define KDBG_OWNER_TAG_OFFSET64             0x10
-+#define KDBG_MM_PFN_DATABASE_OFFSET64       0xC0
-+#define KDBG_KI_BUGCHECK_DATA_OFFSET64      0x88
-+#define KDBG_KI_PROCESSOR_BLOCK_OFFSET64    0x218
-+#define KDBG_OFFSET_PRCB_CONTEXT_OFFSET64   0x338
- 
- #define VMCOREINFO_ELF_NOTE_HDR_SIZE    24
+@@ -0,0 +1,87 @@
++/*
++ * Windows crashdump
++ *
++ * Copyright (c) 2018 Virtuozzo International GmbH
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or late=
+r.
++ * See the COPYING file in the top-level directory.
++ *
++ */
 +
-+#define WIN_CTX_X64 0x00100000L
++typedef struct WinDumpPhyMemRun64 {
++    uint64_t BasePage;
++    uint64_t PageCount;
++} QEMU_PACKED WinDumpPhyMemRun64;
 +
-+#define WIN_CTX_CTL 0x00000001L
-+#define WIN_CTX_INT 0x00000002L
-+#define WIN_CTX_SEG 0x00000004L
-+#define WIN_CTX_FP  0x00000008L
-+#define WIN_CTX_DBG 0x00000010L
++typedef struct WinDumpPhyMemDesc64 {
++    uint32_t NumberOfRuns;
++    uint32_t unused;
++    uint64_t NumberOfPages;
++    WinDumpPhyMemRun64 Run[43];
++} QEMU_PACKED WinDumpPhyMemDesc64;
 +
-+#define WIN_CTX_FULL    (WIN_CTX_X64 | WIN_CTX_CTL | WIN_CTX_INT | WIN_CTX_FP)
-+#define WIN_CTX_ALL     (WIN_CTX_FULL | WIN_CTX_SEG | WIN_CTX_DBG)
++typedef struct WinDumpExceptionRecord {
++    uint32_t ExceptionCode;
++    uint32_t ExceptionFlags;
++    uint64_t ExceptionRecord;
++    uint64_t ExceptionAddress;
++    uint32_t NumberParameters;
++    uint32_t unused;
++    uint64_t ExceptionInformation[15];
++} QEMU_PACKED WinDumpExceptionRecord;
 +
-+#define LIVE_SYSTEM_DUMP    0x00000161
++typedef struct WinDumpHeader64 {
++    char Signature[4];
++    char ValidDump[4];
++    uint32_t MajorVersion;
++    uint32_t MinorVersion;
++    uint64_t DirectoryTableBase;
++    uint64_t PfnDatabase;
++    uint64_t PsLoadedModuleList;
++    uint64_t PsActiveProcessHead;
++    uint32_t MachineImageType;
++    uint32_t NumberProcessors;
++    union {
++        struct {
++            uint32_t BugcheckCode;
++            uint32_t unused0;
++            uint64_t BugcheckParameter1;
++            uint64_t BugcheckParameter2;
++            uint64_t BugcheckParameter3;
++            uint64_t BugcheckParameter4;
++        };
++        uint8_t BugcheckData[40];
++    };
++    uint8_t VersionUser[32];
++    uint64_t KdDebuggerDataBlock;
++    union {
++        WinDumpPhyMemDesc64 PhysicalMemoryBlock;
++        uint8_t PhysicalMemoryBlockBuffer[704];
++    };
++    union {
++        uint8_t ContextBuffer[3000];
++    };
++    WinDumpExceptionRecord Exception;
++    uint32_t DumpType;
++    uint32_t unused1;
++    uint64_t RequiredDumpSpace;
++    uint64_t SystemTime;
++    char Comment[128];
++    uint64_t SystemUpTime;
++    uint32_t MiniDumpFields;
++    uint32_t SecondaryDataState;
++    uint32_t ProductType;
++    uint32_t SuiteMask;
++    uint32_t WriterStatus;
++    uint8_t unused2;
++    uint8_t KdSecondaryVersion;
++    uint8_t reserved[4018];
++} QEMU_PACKED WinDumpHeader64;
 +
-+typedef struct WinM128A {
-+    uint64_t low;
-+    int64_t high;
-+} QEMU_ALIGNED(16) WinM128A;
++void create_win_dump(DumpState *s, Error **errp);
 +
-+typedef struct WinContext {
-+    uint64_t PHome[6];
++#define KDBG_OWNER_TAG_OFFSET64         0x10
++#define KDBG_KI_BUGCHECK_DATA_OFFSET64  0x88
++#define KDBG_MM_PFN_DATABASE_OFFSET64   0xC0
 +
-+    uint32_t ContextFlags;
-+    uint32_t MxCsr;
-+
-+    uint16_t SegCs;
-+    uint16_t SegDs;
-+    uint16_t SegEs;
-+    uint16_t SegFs;
-+    uint16_t SegGs;
-+    uint16_t SegSs;
-+    uint32_t EFlags;
-+
-+    uint64_t Dr0;
-+    uint64_t Dr1;
-+    uint64_t Dr2;
-+    uint64_t Dr3;
-+    uint64_t Dr6;
-+    uint64_t Dr7;
-+
-+    uint64_t Rax;
-+    uint64_t Rcx;
-+    uint64_t Rdx;
-+    uint64_t Rbx;
-+    uint64_t Rsp;
-+    uint64_t Rbp;
-+    uint64_t Rsi;
-+    uint64_t Rdi;
-+    uint64_t R8;
-+    uint64_t R9;
-+    uint64_t R10;
-+    uint64_t R11;
-+    uint64_t R12;
-+    uint64_t R13;
-+    uint64_t R14;
-+    uint64_t R15;
-+
-+    uint64_t Rip;
-+
-+    struct {
-+        uint16_t ControlWord;
-+        uint16_t StatusWord;
-+        uint8_t TagWord;
-+        uint8_t Reserved1;
-+        uint16_t ErrorOpcode;
-+        uint32_t ErrorOffset;
-+        uint16_t ErrorSelector;
-+        uint16_t Reserved2;
-+        uint32_t DataOffset;
-+        uint16_t DataSelector;
-+        uint16_t Reserved3;
-+        uint32_t MxCsr;
-+        uint32_t MxCsr_Mask;
-+        WinM128A FloatRegisters[8];
-+        WinM128A XmmRegisters[16];
-+        uint8_t Reserved4[96];
-+    } FltSave;
-+
-+    WinM128A VectorRegister[26];
-+    uint64_t VectorControl;
-+
-+    uint64_t DebugControl;
-+    uint64_t LastBranchToRip;
-+    uint64_t LastBranchFromRip;
-+    uint64_t LastExceptionToRip;
-+    uint64_t LastExceptionFromRip;
-+} QEMU_ALIGNED(16) WinContext;
--- 
++#define VMCOREINFO_ELF_NOTE_HDR_SIZE    24
+--=20
 2.14.3
