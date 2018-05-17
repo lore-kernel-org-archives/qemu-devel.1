@@ -1,21 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50513)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50649)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <prvs=66809d549=Paul.Durrant@citrix.com>)
-	id 1fJKwy-0005Fv-1F
-	for qemu-devel@nongnu.org; Thu, 17 May 2018 11:36:16 -0400
+	id 1fJKx2-0005Jh-3b
+	for qemu-devel@nongnu.org; Thu, 17 May 2018 11:36:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <prvs=66809d549=Paul.Durrant@citrix.com>)
-	id 1fJKwt-0006TE-6I
-	for qemu-devel@nongnu.org; Thu, 17 May 2018 11:36:15 -0400
+	id 1fJKx0-0006Yp-KL
+	for qemu-devel@nongnu.org; Thu, 17 May 2018 11:36:20 -0400
 From: Paul Durrant <paul.durrant@citrix.com>
-Date: Thu, 17 May 2018 16:35:56 +0100
-Message-ID: <1526571358-26685-8-git-send-email-paul.durrant@citrix.com>
+Date: Thu, 17 May 2018 16:35:57 +0100
+Message-ID: <1526571358-26685-9-git-send-email-paul.durrant@citrix.com>
 In-Reply-To: <1526571358-26685-1-git-send-email-paul.durrant@citrix.com>
 References: <1526571358-26685-1-git-send-email-paul.durrant@citrix.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v4 7/9] xen_backend: make the
- xen_feature_grant_copy flag private
+Subject: [Qemu-devel] [PATCH v4 8/9] xen_disk: use a single entry iovec
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,48 +24,214 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: xen-devel@lists.xenproject.org, qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: Paul Durrant <paul.durrant@citrix.com>, Stefano Stabellini <sstabellini@kernel.org>
+Cc: Paul Durrant <paul.durrant@citrix.com>, Stefano Stabellini <sstabellini@kernel.org>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
 
-There is no longer any use of this flag outside of the xen_backend code.
+Since xen_disk now always copies data to and from a guest there is no need
+to maintain a vector entry corresponding to every page of a request.
+This means there is less per-request state to maintain so the ioreq
+structure can shrink significantly.
 
 Signed-off-by: Paul Durrant <paul.durrant@citrix.com>
 Acked-by: Anthony Perard <anthony.perard@citrix.com>
 ---
 Cc: Stefano Stabellini <sstabellini@kernel.org>
+Cc: Kevin Wolf <kwolf@redhat.com>
+Cc: Max Reitz <mreitz@redhat.com>
+
+v3:
+ - Un-break by fixing mis-placed qemu_iovec_add()
 
 v2:
- - New in v2
+ - Re-based
 ---
- hw/xen/xen_backend.c         | 2 +-
- include/hw/xen/xen_backend.h | 1 -
- 2 files changed, 1 insertion(+), 2 deletions(-)
+ hw/block/xen_disk.c | 76 +++++++++++++++--------------------------------------
+ 1 file changed, 21 insertions(+), 55 deletions(-)
 
-diff --git a/hw/xen/xen_backend.c b/hw/xen/xen_backend.c
-index 3c3fc2c..9a8e877 100644
---- a/hw/xen/xen_backend.c
-+++ b/hw/xen/xen_backend.c
-@@ -44,9 +44,9 @@ BusState *xen_sysbus;
- /* public */
- struct xs_handle *xenstore = NULL;
- const char *xen_protocol;
--bool xen_feature_grant_copy;
+diff --git a/hw/block/xen_disk.c b/hw/block/xen_disk.c
+index 28be8b6..28651c5 100644
+--- a/hw/block/xen_disk.c
++++ b/hw/block/xen_disk.c
+@@ -46,13 +46,10 @@ struct ioreq {
+     /* parsed request */
+     off_t               start;
+     QEMUIOVector        v;
++    void                *buf;
++    size_t              size;
+     int                 presync;
  
- /* private */
-+static bool xen_feature_grant_copy;
- static int debug;
+-    /* grant mapping */
+-    uint32_t            refs[BLKIF_MAX_SEGMENTS_PER_REQUEST];
+-    void                *page[BLKIF_MAX_SEGMENTS_PER_REQUEST];
+-    void                *pages;
+-
+     /* aio status */
+     int                 aio_inflight;
+     int                 aio_errors;
+@@ -110,12 +107,10 @@ static void ioreq_reset(struct ioreq *ioreq)
+     memset(&ioreq->req, 0, sizeof(ioreq->req));
+     ioreq->status = 0;
+     ioreq->start = 0;
++    ioreq->buf = NULL;
++    ioreq->size = 0;
+     ioreq->presync = 0;
  
- int xenstore_write_be_str(struct XenDevice *xendev, const char *node, const char *val)
-diff --git a/include/hw/xen/xen_backend.h b/include/hw/xen/xen_backend.h
-index 29bf1c3..9c17fdd 100644
---- a/include/hw/xen/xen_backend.h
-+++ b/include/hw/xen/xen_backend.h
-@@ -16,7 +16,6 @@
- /* variables */
- extern struct xs_handle *xenstore;
- extern const char *xen_protocol;
--extern bool xen_feature_grant_copy;
- extern DeviceState *xen_sysdev;
- extern BusState *xen_sysbus;
+-    memset(ioreq->refs, 0, sizeof(ioreq->refs));
+-    memset(ioreq->page, 0, sizeof(ioreq->page));
+-    ioreq->pages = NULL;
+-
+     ioreq->aio_inflight = 0;
+     ioreq->aio_errors = 0;
  
+@@ -138,7 +133,7 @@ static struct ioreq *ioreq_start(struct XenBlkDev *blkdev)
+         ioreq = g_malloc0(sizeof(*ioreq));
+         ioreq->blkdev = blkdev;
+         blkdev->requests_total++;
+-        qemu_iovec_init(&ioreq->v, BLKIF_MAX_SEGMENTS_PER_REQUEST);
++        qemu_iovec_init(&ioreq->v, 1);
+     } else {
+         /* get one from freelist */
+         ioreq = QLIST_FIRST(&blkdev->freelist);
+@@ -183,7 +178,6 @@ static void ioreq_release(struct ioreq *ioreq, bool finish)
+ static int ioreq_parse(struct ioreq *ioreq)
+ {
+     struct XenBlkDev *blkdev = ioreq->blkdev;
+-    uintptr_t mem;
+     size_t len;
+     int i;
+ 
+@@ -230,13 +224,10 @@ static int ioreq_parse(struct ioreq *ioreq)
+             goto err;
+         }
+ 
+-        ioreq->refs[i]   = ioreq->req.seg[i].gref;
+-
+-        mem = ioreq->req.seg[i].first_sect * blkdev->file_blk;
+         len = (ioreq->req.seg[i].last_sect - ioreq->req.seg[i].first_sect + 1) * blkdev->file_blk;
+-        qemu_iovec_add(&ioreq->v, (void*)mem, len);
++        ioreq->size += len;
+     }
+-    if (ioreq->start + ioreq->v.size > blkdev->file_size) {
++    if (ioreq->start + ioreq->size > blkdev->file_size) {
+         xen_pv_printf(&blkdev->xendev, 0, "error: access beyond end of file\n");
+         goto err;
+     }
+@@ -247,35 +238,6 @@ err:
+     return -1;
+ }
+ 
+-static void ioreq_free_copy_buffers(struct ioreq *ioreq)
+-{
+-    int i;
+-
+-    for (i = 0; i < ioreq->v.niov; i++) {
+-        ioreq->page[i] = NULL;
+-    }
+-
+-    qemu_vfree(ioreq->pages);
+-}
+-
+-static int ioreq_init_copy_buffers(struct ioreq *ioreq)
+-{
+-    int i;
+-
+-    if (ioreq->v.niov == 0) {
+-        return 0;
+-    }
+-
+-    ioreq->pages = qemu_memalign(XC_PAGE_SIZE, ioreq->v.niov * XC_PAGE_SIZE);
+-
+-    for (i = 0; i < ioreq->v.niov; i++) {
+-        ioreq->page[i] = ioreq->pages + i * XC_PAGE_SIZE;
+-        ioreq->v.iov[i].iov_base = ioreq->page[i];
+-    }
+-
+-    return 0;
+-}
+-
+ static int ioreq_grant_copy(struct ioreq *ioreq)
+ {
+     struct XenBlkDev *blkdev = ioreq->blkdev;
+@@ -284,25 +246,27 @@ static int ioreq_grant_copy(struct ioreq *ioreq)
+     int i, count, rc;
+     int64_t file_blk = ioreq->blkdev->file_blk;
+     bool to_domain = (ioreq->req.operation == BLKIF_OP_READ);
++    void *virt = ioreq->buf;
+ 
+-    if (ioreq->v.niov == 0) {
++    if (ioreq->req.nr_segments == 0) {
+         return 0;
+     }
+ 
+-    count = ioreq->v.niov;
++    count = ioreq->req.nr_segments;
+ 
+     for (i = 0; i < count; i++) {
+         if (to_domain) {
+-            segs[i].dest.foreign.ref = ioreq->refs[i];
++            segs[i].dest.foreign.ref = ioreq->req.seg[i].gref;
+             segs[i].dest.foreign.offset = ioreq->req.seg[i].first_sect * file_blk;
+-            segs[i].source.virt = ioreq->v.iov[i].iov_base;
++            segs[i].source.virt = virt;
+         } else {
+-            segs[i].source.foreign.ref = ioreq->refs[i];
++            segs[i].source.foreign.ref = ioreq->req.seg[i].gref;
+             segs[i].source.foreign.offset = ioreq->req.seg[i].first_sect * file_blk;
+-            segs[i].dest.virt = ioreq->v.iov[i].iov_base;
++            segs[i].dest.virt = virt;
+         }
+         segs[i].len = (ioreq->req.seg[i].last_sect
+                        - ioreq->req.seg[i].first_sect + 1) * file_blk;
++        virt += segs[i].len;
+     }
+ 
+     rc = xen_be_copy_grant_refs(xendev, to_domain, segs, count);
+@@ -348,14 +312,14 @@ static void qemu_aio_complete(void *opaque, int ret)
+         if (ret == 0) {
+             ioreq_grant_copy(ioreq);
+         }
+-        ioreq_free_copy_buffers(ioreq);
++        qemu_vfree(ioreq->buf);
+         break;
+     case BLKIF_OP_WRITE:
+     case BLKIF_OP_FLUSH_DISKCACHE:
+         if (!ioreq->req.nr_segments) {
+             break;
+         }
+-        ioreq_free_copy_buffers(ioreq);
++        qemu_vfree(ioreq->buf);
+         break;
+     default:
+         break;
+@@ -423,12 +387,12 @@ static int ioreq_runio_qemu_aio(struct ioreq *ioreq)
+ {
+     struct XenBlkDev *blkdev = ioreq->blkdev;
+ 
+-    ioreq_init_copy_buffers(ioreq);
++    ioreq->buf = qemu_memalign(XC_PAGE_SIZE, ioreq->size);
+     if (ioreq->req.nr_segments &&
+         (ioreq->req.operation == BLKIF_OP_WRITE ||
+          ioreq->req.operation == BLKIF_OP_FLUSH_DISKCACHE) &&
+         ioreq_grant_copy(ioreq)) {
+-        ioreq_free_copy_buffers(ioreq);
++        qemu_vfree(ioreq->buf);
+         goto err;
+     }
+ 
+@@ -440,6 +404,7 @@ static int ioreq_runio_qemu_aio(struct ioreq *ioreq)
+ 
+     switch (ioreq->req.operation) {
+     case BLKIF_OP_READ:
++        qemu_iovec_add(&ioreq->v, ioreq->buf, ioreq->size);
+         block_acct_start(blk_get_stats(blkdev->blk), &ioreq->acct,
+                          ioreq->v.size, BLOCK_ACCT_READ);
+         ioreq->aio_inflight++;
+@@ -452,6 +417,7 @@ static int ioreq_runio_qemu_aio(struct ioreq *ioreq)
+             break;
+         }
+ 
++        qemu_iovec_add(&ioreq->v, ioreq->buf, ioreq->size);
+         block_acct_start(blk_get_stats(blkdev->blk), &ioreq->acct,
+                          ioreq->v.size,
+                          ioreq->req.operation == BLKIF_OP_WRITE ?
 -- 
 2.1.4
