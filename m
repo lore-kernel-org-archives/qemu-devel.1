@@ -1,33 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34715)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34940)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fJK5T-0005H2-0w
-	for qemu-devel@nongnu.org; Thu, 17 May 2018 10:41:00 -0400
+	(envelope-from <eric.auger@redhat.com>) id 1fJK7T-0006F1-0t
+	for qemu-devel@nongnu.org; Thu, 17 May 2018 10:43:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fJK5N-0004pF-LW
-	for qemu-devel@nongnu.org; Thu, 17 May 2018 10:40:59 -0400
-Received: from mail-qt0-x243.google.com ([2607:f8b0:400d:c0d::243]:36722)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fJK5N-0004pA-FT
-	for qemu-devel@nongnu.org; Thu, 17 May 2018 10:40:53 -0400
-Received: by mail-qt0-x243.google.com with SMTP id q6-v6so6046072qtn.3
-	for <qemu-devel@nongnu.org>; Thu, 17 May 2018 07:40:53 -0700 (PDT)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20180516185146.30708-1-edgar.iglesias@gmail.com>
-	<20180516185146.30708-12-edgar.iglesias@gmail.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <53bfff10-2b12-e1db-d195-e4160e0aa9ff@amsat.org>
-Date: Thu, 17 May 2018 11:39:41 -0300
+	(envelope-from <eric.auger@redhat.com>) id 1fJK7N-0005SR-Qj
+	for qemu-devel@nongnu.org; Thu, 17 May 2018 10:43:02 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:39020 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eric.auger@redhat.com>)
+	id 1fJK7N-0005SH-Kn
+	for qemu-devel@nongnu.org; Thu, 17 May 2018 10:42:57 -0400
+References: <20180504030811.28111-1-peterx@redhat.com>
+	<20180504030811.28111-2-peterx@redhat.com>
+From: Auger Eric <eric.auger@redhat.com>
+Message-ID: <010f281a-ba20-3ad9-5842-ae93bfd4b987@redhat.com>
+Date: Thu, 17 May 2018 16:42:54 +0200
 MIME-Version: 1.0
-In-Reply-To: <20180516185146.30708-12-edgar.iglesias@gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v3 11/38] target-microblaze: Make
- compute_ldst_addr always use a temp
+In-Reply-To: <20180504030811.28111-2-peterx@redhat.com>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 01/10] intel-iommu: send PSI always even
+ if across PDEs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,307 +29,121 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, qemu-devel@nongnu.org
-Cc: edgar.iglesias@xilinx.com, peter.maydell@linaro.org, sstabellini@kernel.org, sai.pavan.boddu@xilinx.com, frasse.iglesias@gmail.com, alistair@alistair23.me, richard.henderson@linaro.org, frederic.konrad@adacore.com
+To: Peter Xu <peterx@redhat.com>, qemu-devel@nongnu.org
+Cc: Tian Kevin <kevin.tian@intel.com>, "Michael S . Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, Alex Williamson <alex.williamson@redhat.com>, Jintack Lim <jintack@cs.columbia.edu>
 
-On 05/16/2018 03:51 PM, Edgar E. Iglesias wrote:
-> From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
+Hi Peter,
+
+On 05/04/2018 05:08 AM, Peter Xu wrote:
+> During IOVA page table walking, there is a special case when the PSI
+> covers one whole PDE (Page Directory Entry, which contains 512 Page
+> Table Entries) or more.  In the past, we skip that entry and we don't
+> notify the IOMMU notifiers.  This is not correct.  We should send UNMAP
+> notification to registered UNMAP notifiers in this case.
 > 
-> Make compute_ldst_addr always use a temp. This simplifies
-> the code a bit in preparation for adding support for
-> 64bit addresses.
+> For UNMAP only notifiers, this might cause IOTLBs cached in the devices
+> even if they were already invalid.  For MAP/UNMAP notifiers like
+> vfio-pci, this will cause stale page mappings.
 > 
-> No functional change.
+> This special case doesn't trigger often, but it is very easy to be
+> triggered by nested device assignments, since in that case we'll
+> possibly map the whole L2 guest RAM region into the device's IOVA
+> address space (several GBs at least), which is far bigger than normal
+> kernel driver usages of the device (tens of MBs normally).
 > 
-> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-> Signed-off-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
+> Without this patch applied to L1 QEMU, nested device assignment to L2
+> guests will dump some errors like:
+> 
+> qemu-system-x86_64: VFIO_MAP_DMA: -17
+> qemu-system-x86_64: vfio_dma_map(0x557305420c30, 0xad000, 0x1000,
+>                     0x7f89a920d000) = -17 (File exists)
+> 
+> Acked-by: Jason Wang <jasowang@redhat.com>
+> [peterx: rewrite the commit message]
+> Signed-off-by: Peter Xu <peterx@redhat.com>
 > ---
->  target/microblaze/translate.c | 111 ++++++++++++++----------------------------
->  1 file changed, 37 insertions(+), 74 deletions(-)
+>  hw/i386/intel_iommu.c | 42 ++++++++++++++++++++++++++++++------------
+>  1 file changed, 30 insertions(+), 12 deletions(-)
 > 
-> diff --git a/target/microblaze/translate.c b/target/microblaze/translate.c
-> index 2e9a286af6..3431a07b99 100644
-> --- a/target/microblaze/translate.c
-> +++ b/target/microblaze/translate.c
-> @@ -848,7 +848,7 @@ static void dec_imm(DisasContext *dc)
->      dc->clear_imm = 0;
->  }
+> diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
+> index fb31de9416..b359efd6f9 100644
+> --- a/hw/i386/intel_iommu.c
+> +++ b/hw/i386/intel_iommu.c
+> @@ -722,6 +722,15 @@ static int vtd_iova_to_slpte(VTDContextEntry *ce, uint64_t iova, bool is_write,
 >  
-> -static inline TCGv_i32 *compute_ldst_addr(DisasContext *dc, TCGv_i32 *t)
-> +static inline void compute_ldst_addr(DisasContext *dc, TCGv_i32 *t)
->  {
->      bool extimm = dc->tb_flags & IMM_FLAG;
->      /* Should be set to true if r1 is used by loadstores.  */
-> @@ -861,47 +861,47 @@ static inline TCGv_i32 *compute_ldst_addr(DisasContext *dc, TCGv_i32 *t)
-
-I never noticed that git diff show line/prototype of the previous patchset.
-
+>  typedef int (*vtd_page_walk_hook)(IOMMUTLBEntry *entry, void *private);
 >  
->      /* Treat the common cases first.  */
->      if (!dc->type_b) {
-> -        /* If any of the regs is r0, return a ptr to the other.  */
-> +        /* If any of the regs is r0, return the value of the other reg.  */
-
-Single nit here, this comment isn't true anymore since this function
-doesn't return.
-
-No need to respin for this, but can you/Richard drop this comment when
-pulling?
-
->          if (dc->ra == 0) {
-> -            return &cpu_R[dc->rb];
-> +            tcg_gen_mov_i32(*t, cpu_R[dc->rb]);
-> +            return;
->          } else if (dc->rb == 0) {
-> -            return &cpu_R[dc->ra];
-> +            tcg_gen_mov_i32(*t, cpu_R[dc->ra]);
-> +            return;
->          }
->  
->          if (dc->rb == 1 && dc->cpu->cfg.stackprot) {
->              stackprot = true;
->          }
->  
-> -        *t = tcg_temp_new_i32();
->          tcg_gen_add_i32(*t, cpu_R[dc->ra], cpu_R[dc->rb]);
->  
->          if (stackprot) {
->              gen_helper_stackprot(cpu_env, *t);
->          }
-> -        return t;
-> +        return;
->      }
->      /* Immediate.  */
->      if (!extimm) {
->          if (dc->imm == 0) {
-> -            return &cpu_R[dc->ra];
-> +            tcg_gen_mov_i32(*t, cpu_R[dc->ra]);
-> +            return;
->          }
-> -        *t = tcg_temp_new_i32();
->          tcg_gen_movi_i32(*t, (int32_t)((int16_t)dc->imm));
->          tcg_gen_add_i32(*t, cpu_R[dc->ra], *t);
->      } else {
-> -        *t = tcg_temp_new_i32();
->          tcg_gen_add_i32(*t, cpu_R[dc->ra], *(dec_alu_op_b(dc)));
->      }
->  
->      if (stackprot) {
->          gen_helper_stackprot(cpu_env, *t);
->      }
-> -    return t;
-> +    return;
->  }
->  
->  static void dec_load(DisasContext *dc)
->  {
-> -    TCGv_i32 t, v, *addr;
-> +    TCGv_i32 v, addr;
->      unsigned int size;
->      bool rev = false, ex = false;
->      TCGMemOp mop;
-> @@ -928,7 +928,8 @@ static void dec_load(DisasContext *dc)
->                                                          ex ? "x" : "");
->  
->      t_sync_flags(dc);
-> -    addr = compute_ldst_addr(dc, &t);
-> +    addr = tcg_temp_new_i32();
-> +    compute_ldst_addr(dc, &addr);
->  
->      /*
->       * When doing reverse accesses we need to do two things.
-> @@ -947,17 +948,10 @@ static void dec_load(DisasContext *dc)
->                     11 -> 00 */
->                  TCGv_i32 low = tcg_temp_new_i32();
->  
-> -                /* Force addr into the temp.  */
-> -                if (addr != &t) {
-> -                    t = tcg_temp_new_i32();
-> -                    tcg_gen_mov_i32(t, *addr);
-> -                    addr = &t;
-> -                }
-> -
-> -                tcg_gen_andi_i32(low, t, 3);
-> +                tcg_gen_andi_i32(low, addr, 3);
->                  tcg_gen_sub_i32(low, tcg_const_i32(3), low);
-> -                tcg_gen_andi_i32(t, t, ~3);
-> -                tcg_gen_or_i32(t, t, low);
-> +                tcg_gen_andi_i32(addr, addr, ~3);
-> +                tcg_gen_or_i32(addr, addr, low);
->                  tcg_temp_free_i32(low);
->                  break;
->              }
-> @@ -965,14 +959,7 @@ static void dec_load(DisasContext *dc)
->              case 2:
->                  /* 00 -> 10
->                     10 -> 00.  */
-> -                /* Force addr into the temp.  */
-> -                if (addr != &t) {
-> -                    t = tcg_temp_new_i32();
-> -                    tcg_gen_xori_i32(t, *addr, 2);
-> -                    addr = &t;
-> -                } else {
-> -                    tcg_gen_xori_i32(t, t, 2);
-> -                }
-> +                tcg_gen_xori_i32(addr, addr, 2);
->                  break;
->              default:
->                  cpu_abort(CPU(dc->cpu), "Invalid reverse size\n");
-> @@ -982,13 +969,7 @@ static void dec_load(DisasContext *dc)
->  
->      /* lwx does not throw unaligned access errors, so force alignment */
->      if (ex) {
-> -        /* Force addr into the temp.  */
-> -        if (addr != &t) {
-> -            t = tcg_temp_new_i32();
-> -            tcg_gen_mov_i32(t, *addr);
-> -            addr = &t;
-> -        }
-> -        tcg_gen_andi_i32(t, t, ~3);
-> +        tcg_gen_andi_i32(addr, addr, ~3);
->      }
->  
->      /* If we get a fault on a dslot, the jmpstate better be in sync.  */
-> @@ -1002,16 +983,16 @@ static void dec_load(DisasContext *dc)
->       * address and if that succeeds we write into the destination reg.
->       */
->      v = tcg_temp_new_i32();
-> -    tcg_gen_qemu_ld_i32(v, *addr, cpu_mmu_index(&dc->cpu->env, false), mop);
-> +    tcg_gen_qemu_ld_i32(v, addr, cpu_mmu_index(&dc->cpu->env, false), mop);
->  
->      if ((dc->cpu->env.pvr.regs[2] & PVR2_UNALIGNED_EXC_MASK) && size > 1) {
->          tcg_gen_movi_i32(cpu_SR[SR_PC], dc->pc);
-> -        gen_helper_memalign(cpu_env, *addr, tcg_const_i32(dc->rd),
-> +        gen_helper_memalign(cpu_env, addr, tcg_const_i32(dc->rd),
->                              tcg_const_i32(0), tcg_const_i32(size - 1));
->      }
->  
->      if (ex) {
-> -        tcg_gen_mov_i32(env_res_addr, *addr);
-> +        tcg_gen_mov_i32(env_res_addr, addr);
->          tcg_gen_mov_i32(env_res_val, v);
->      }
->      if (dc->rd) {
-> @@ -1024,13 +1005,12 @@ static void dec_load(DisasContext *dc)
->          write_carryi(dc, 0);
->      }
->  
-> -    if (addr == &t)
-> -        tcg_temp_free_i32(t);
-> +    tcg_temp_free_i32(addr);
->  }
->  
->  static void dec_store(DisasContext *dc)
->  {
-> -    TCGv_i32 t, *addr, swx_addr;
-> +    TCGv_i32 addr;
->      TCGLabel *swx_skip = NULL;
->      unsigned int size;
->      bool rev = false, ex = false;
-> @@ -1059,21 +1039,19 @@ static void dec_store(DisasContext *dc)
->      t_sync_flags(dc);
->      /* If we get a fault on a dslot, the jmpstate better be in sync.  */
->      sync_jmpstate(dc);
-> -    addr = compute_ldst_addr(dc, &t);
-> +    /* SWX needs a temp_local.  */
-> +    addr = ex ? tcg_temp_local_new_i32() : tcg_temp_new_i32();
-> +    compute_ldst_addr(dc, &addr);
->  
-> -    swx_addr = tcg_temp_local_new_i32();
->      if (ex) { /* swx */
->          TCGv_i32 tval;
->  
-> -        /* Force addr into the swx_addr. */
-> -        tcg_gen_mov_i32(swx_addr, *addr);
-> -        addr = &swx_addr;
->          /* swx does not throw unaligned access errors, so force alignment */
-> -        tcg_gen_andi_i32(swx_addr, swx_addr, ~3);
-> +        tcg_gen_andi_i32(addr, addr, ~3);
->  
->          write_carryi(dc, 1);
->          swx_skip = gen_new_label();
-> -        tcg_gen_brcond_i32(TCG_COND_NE, env_res_addr, swx_addr, swx_skip);
-> +        tcg_gen_brcond_i32(TCG_COND_NE, env_res_addr, addr, swx_skip);
->  
->          /* Compare the value loaded at lwx with current contents of
->             the reserved location.
-> @@ -1081,8 +1059,8 @@ static void dec_store(DisasContext *dc)
->             this compare and the following write to be atomic. For user
->             emulation we need to add atomicity between threads.  */
->          tval = tcg_temp_new_i32();
-> -        tcg_gen_qemu_ld_i32(tval, swx_addr, cpu_mmu_index(&dc->cpu->env, false),
-> -                           MO_TEUL);
-> +        tcg_gen_qemu_ld_i32(tval, addr, cpu_mmu_index(&dc->cpu->env, false),
-> +                            MO_TEUL);
->          tcg_gen_brcond_i32(TCG_COND_NE, env_res_val, tval, swx_skip);
->          write_carryi(dc, 0);
->          tcg_temp_free_i32(tval);
-> @@ -1099,17 +1077,10 @@ static void dec_store(DisasContext *dc)
->                     11 -> 00 */
->                  TCGv_i32 low = tcg_temp_new_i32();
->  
-> -                /* Force addr into the temp.  */
-> -                if (addr != &t) {
-> -                    t = tcg_temp_new_i32();
-> -                    tcg_gen_mov_i32(t, *addr);
-> -                    addr = &t;
-> -                }
-> -
-> -                tcg_gen_andi_i32(low, t, 3);
-> +                tcg_gen_andi_i32(low, addr, 3);
->                  tcg_gen_sub_i32(low, tcg_const_i32(3), low);
-> -                tcg_gen_andi_i32(t, t, ~3);
-> -                tcg_gen_or_i32(t, t, low);
-> +                tcg_gen_andi_i32(addr, addr, ~3);
-> +                tcg_gen_or_i32(addr, addr, low);
->                  tcg_temp_free_i32(low);
->                  break;
->              }
-> @@ -1118,20 +1089,14 @@ static void dec_store(DisasContext *dc)
->                  /* 00 -> 10
->                     10 -> 00.  */
->                  /* Force addr into the temp.  */
-> -                if (addr != &t) {
-> -                    t = tcg_temp_new_i32();
-> -                    tcg_gen_xori_i32(t, *addr, 2);
-> -                    addr = &t;
-> -                } else {
-> -                    tcg_gen_xori_i32(t, t, 2);
-> -                }
-> +                tcg_gen_xori_i32(addr, addr, 2);
->                  break;
->              default:
->                  cpu_abort(CPU(dc->cpu), "Invalid reverse size\n");
->                  break;
->          }
->      }
-> -    tcg_gen_qemu_st_i32(cpu_R[dc->rd], *addr,
-> +    tcg_gen_qemu_st_i32(cpu_R[dc->rd], addr,
->                          cpu_mmu_index(&dc->cpu->env, false), mop);
->  
->      /* Verify alignment if needed.  */
-> @@ -1143,17 +1108,15 @@ static void dec_store(DisasContext *dc)
->           *        the alignment checks in between the probe and the mem
->           *        access.
+> +static int vtd_page_walk_one(IOMMUTLBEntry *entry, int level,
+> +                             vtd_page_walk_hook hook_fn, void *private)
+I find the function  name a bit weird as it does not does a ptw but
+rather call a callback on an entry. vtd_callback_wrapper?
+> +{
+> +    assert(hook_fn);
+> +    trace_vtd_page_walk_one(level, entry->iova, entry->translated_addr,
+> +                            entry->addr_mask, entry->perm);
+> +    return hook_fn(entry, private);
+> +}
+> +
+>  /**
+>   * vtd_page_walk_level - walk over specific level for IOVA range
+>   *
+> @@ -781,28 +790,37 @@ static int vtd_page_walk_level(dma_addr_t addr, uint64_t start,
 >           */
-> -        gen_helper_memalign(cpu_env, *addr, tcg_const_i32(dc->rd),
-> +        gen_helper_memalign(cpu_env, addr, tcg_const_i32(dc->rd),
->                              tcg_const_i32(1), tcg_const_i32(size - 1));
->      }
+>          entry_valid = read_cur | write_cur;
 >  
->      if (ex) {
->          gen_set_label(swx_skip);
->      }
-> -    tcg_temp_free_i32(swx_addr);
->  
-> -    if (addr == &t)
-> -        tcg_temp_free_i32(t);
-> +    tcg_temp_free_i32(addr);
->  }
->  
->  static inline void eval_cc(DisasContext *dc, unsigned int cc,
+> +        entry.target_as = &address_space_memory;
+> +        entry.iova = iova & subpage_mask;
+> +        entry.perm = IOMMU_ACCESS_FLAG(read_cur, write_cur);
+> +        entry.addr_mask = ~subpage_mask;
+> +
+>          if (vtd_is_last_slpte(slpte, level)) {
+> -            entry.target_as = &address_space_memory;
+> -            entry.iova = iova & subpage_mask;
+>              /* NOTE: this is only meaningful if entry_valid == true */
+>              entry.translated_addr = vtd_get_slpte_addr(slpte, aw);
+> -            entry.addr_mask = ~subpage_mask;
+> -            entry.perm = IOMMU_ACCESS_FLAG(read_cur, write_cur);
+>              if (!entry_valid && !notify_unmap) {
+>                  trace_vtd_page_walk_skip_perm(iova, iova_next);
+>                  goto next;
+>              }
+> -            trace_vtd_page_walk_one(level, entry.iova, entry.translated_addr,
+> -                                    entry.addr_mask, entry.perm);
+> -            if (hook_fn) {
+> -                ret = hook_fn(&entry, private);
+> -                if (ret < 0) {
+> -                    return ret;
+> -                }
+> +            ret = vtd_page_walk_one(&entry, level, hook_fn, private);
+> +            if (ret < 0) {
+> +                return ret;
+>              }
+>          } else {
+>              if (!entry_valid) {
+> -                trace_vtd_page_walk_skip_perm(iova, iova_next);
+> +                if (notify_unmap) {
+> +                    /*
+> +                     * The whole entry is invalid; unmap it all.
+> +                     * Translated address is meaningless, zero it.
+> +                     */
+> +                    entry.translated_addr = 0x0;
+do you really need to zero the translated_addr and the related comment.
+As soon as perm is NONE this should not be used?
+> +                    ret = vtd_page_walk_one(&entry, level, hook_fn, private);
+> +                    if (ret < 0) {
+> +                        return ret;
+> +                    }
+> +                } else {
+> +                    trace_vtd_page_walk_skip_perm(iova, iova_next);
+> +                }
+>                  goto next;
+>              }
+>              ret = vtd_page_walk_level(vtd_get_slpte_addr(slpte, aw), iova,
 > 
 
-Nice cleanup!
+Besides
+Reviewed-by: Eric Auger <eric.auger@redhat.com>
 
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Thanks
+
+Eric
