@@ -1,31 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47440)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47529)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fJDvL-0005rS-28
-	for qemu-devel@nongnu.org; Thu, 17 May 2018 04:06:11 -0400
+	(envelope-from <antonynpavlov@gmail.com>) id 1fJDvl-00064R-6i
+	for qemu-devel@nongnu.org; Thu, 17 May 2018 04:06:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fJDvF-0007wC-TB
-	for qemu-devel@nongnu.org; Thu, 17 May 2018 04:06:07 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:40696 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fJDvF-0007w2-NZ
-	for qemu-devel@nongnu.org; Thu, 17 May 2018 04:06:01 -0400
-From: Markus Armbruster <armbru@redhat.com>
-References: <1526029534-35771-1-git-send-email-anton.nefedov@virtuozzo.com>
-	<1526029534-35771-2-git-send-email-anton.nefedov@virtuozzo.com>
-	<877eo6nm99.fsf@dusky.pond.sub.org>
-	<1839ed60-ffd9-42c1-bf52-6d6121abb224@redhat.com>
-	<87h8n9l7wq.fsf@dusky.pond.sub.org>
-	<95ab24a5-d600-67b5-9c7e-e5290f42f520@redhat.com>
-	<87a7t0u8az.fsf@dusky.pond.sub.org>
-	<419b57a2-157e-b18c-944e-96ecdb391711@virtuozzo.com>
-Date: Thu, 17 May 2018 10:05:59 +0200
-In-Reply-To: <419b57a2-157e-b18c-944e-96ecdb391711@virtuozzo.com> (Anton
-	Nefedov's message of "Wed, 16 May 2018 18:05:13 +0300")
-Message-ID: <87fu2qogew.fsf@dusky.pond.sub.org>
-MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH 1/2] qapi: allow flat unions with empty
- branches
+	(envelope-from <antonynpavlov@gmail.com>) id 1fJDvg-00084W-FE
+	for qemu-devel@nongnu.org; Thu, 17 May 2018 04:06:33 -0400
+Received: from mail-lf0-x242.google.com ([2a00:1450:4010:c07::242]:43196)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <antonynpavlov@gmail.com>)
+	id 1fJDvg-000843-1B
+	for qemu-devel@nongnu.org; Thu, 17 May 2018 04:06:28 -0400
+Received: by mail-lf0-x242.google.com with SMTP id n18-v6so7356199lfh.10
+	for <qemu-devel@nongnu.org>; Thu, 17 May 2018 01:06:27 -0700 (PDT)
+Date: Thu, 17 May 2018 11:23:12 +0300
+From: Antony Pavlov <antonynpavlov@gmail.com>
+Message-Id: <20180517112312.ec27e97d19c82aaee8178bcf@gmail.com>
+In-Reply-To: <20180507210838.16451-1-antonynpavlov@gmail.com>
+References: <20180507210838.16451-1-antonynpavlov@gmail.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] RISC-V: make it possible to alter default
+ reset vector
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,104 +30,199 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Anton Nefedov <anton.nefedov@virtuozzo.com>
-Cc: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org, mdroth@linux.vnet.ibm.com
+To: qemu-devel@nongnu.org, Michael Clark <mjc@sifive.com>, Palmer Dabbelt <palmer@sifive.com>, Sagar Karandikar <sagark@eecs.berkeley.edu>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Peter Maydell <peter.maydell@linaro.org>
 
-Anton Nefedov <anton.nefedov@virtuozzo.com> writes:
+On Tue,  8 May 2018 00:08:38 +0300
+Antony Pavlov <antonynpavlov@gmail.com> wrote:
 
-> On 15/5/2018 8:40 PM, Markus Armbruster wrote:
->> Eric Blake <eblake@redhat.com> writes:
->>
->>> On 05/15/2018 02:01 AM, Markus Armbruster wrote:
->>>
->>>>>> QAPI language design alternatives:
->>>>>>
->>>>>> 1. Having unions cover all discriminator values explicitly is useful.
->>>
->>>>>> 2. Having unions repeat all the discriminator values explicitly is not
->>>>>> useful.  All we need is replacing the code enforcing that by code
->>>>>> defaulting missing ones to the empty type.
->>>>>>
->>>>>> 3. We can't decide, so we do both (this patch).
->>>>>>
->>>
->>>> I'd prefer a more opinionated design here.
->>>>
->>>> Either we opine making people repeat the tag values is an overall win.
->>>> Then make them repeat them always, don't give them the option to not
->>>> repeat them.  Drop this patch.  To reduce verbosity, we can add a
->>>> suitable way to denote a predefined empty type.
->>>>
->>>> Or we opine it's not.  Then let them not repeat them, don't give them
->>>> the option to make themselves repeat them.  Evolve this patch into one
->>>> that makes flat union variants optional and default to empty.  If we
->>>> later find we still want a way to denote a predefined empty type, we can
->>>> add it then.
->>>>
->>>> My personal opinion is it's not.
->>>
->>> I followed the arguments up to the last sentence, but then I got lost
->>> on whether you meant:
->>>
->>> This patch is not an overall win, so let's drop it and keep status quo
->>> and/or implement a way to write 'branch':{} (option 1 above)
->>>
->>> or
->>>
->>> Forcing repetition is not an overall win, so let's drop that
->>> requirement by using something similar to this patch (option 2 above)
->>> but without adding a 'partial-data' key.
->>
->> Sorry about that.  I meant the latter.
->>
->>> But you've convinced me that option 3 (supporting a compact branch
->>> representation AND supporting missing branches as defaulting to an
->>> empty type) is more of a maintenance burden (any time there is more
->>> than one way to write something, it requires more testing that both
->>> ways continue to work) and thus not worth doing without strong
->>> evidence that we need both ways (which we do not currently have).
->
-> I agree that neither option 3 nor this patch are the best way to handle
-> this, so it's 1 or 2.
->
-> (2) sure brings some prettiness into jsons; I wonder when it might harm;
-> e.g. a person adds another block driver: it would be difficult to get
-> round BlockdevOptionsFoo, and what can be missed is something
-> optional like BlockdevStatsFoo, which is harmless if left empty and
-> probably would be made an empty branch anyway. The difference is that
-> an empty branch is something one might notice during a review and
-> object.
+Please comment this patch!
 
-Yes, forcing reviewer attention is the one real advantage of 1. I can
-see.  I agree with you that reviewers missing the "main" union (such as
-BlockdevOptions) is unlikely.  Missing "secondary" unions is more
-plausible.  Let's see how many of unions sharing a tag enumeration type
-we have.  A quick hack to introspect.py coughs up:
+> The RISC-V Instruction Set Manual, Volume II:
+> Privileged Architecture, Version 1.10 states
+> that upon reset the pc is set to
+> an implementation-defined reset vector
+> (see chapter 3.3 Reset).
+>=20
+> This patch makes it possible to alter default
+> reset vector by setting "rstvec" property
+> for TYPE_RISCV_HART_ARRAY.
+>=20
+> Signed-off-by: Antony Pavlov <antonynpavlov@gmail.com>
+> Cc: Michael Clark <mjc@sifive.com>
+> Cc: Palmer Dabbelt <palmer@sifive.com>
+> Cc: Sagar Karandikar <sagark@eecs.berkeley.edu>
+> Cc: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
+> Cc: Peter Crosthwaite <crosthwaite.peter@gmail.com>
+> Cc: Peter Maydell <peter.maydell@linaro.org>
+> ---
+>  hw/riscv/riscv_hart.c         |  3 +++
+>  include/hw/riscv/riscv_hart.h |  1 +
+>  target/riscv/cpu.c            | 17 ++++++++++-------
+>  target/riscv/cpu.h            |  2 ++
+>  4 files changed, 16 insertions(+), 7 deletions(-)
+>=20
+> diff --git a/hw/riscv/riscv_hart.c b/hw/riscv/riscv_hart.c
+> index 14e3c186fe..98e5e50f33 100644
+> --- a/hw/riscv/riscv_hart.c
+> +++ b/hw/riscv/riscv_hart.c
+> @@ -27,6 +27,7 @@
+>  static Property riscv_harts_props[] =3D {
+>      DEFINE_PROP_UINT32("num-harts", RISCVHartArrayState, num_harts, 1),
+>      DEFINE_PROP_STRING("cpu-type", RISCVHartArrayState, cpu_type),
+> +    DEFINE_PROP_UINT64("rstvec", RISCVHartArrayState, rstvec, DEFAULT_RS=
+TVEC),
+>      DEFINE_PROP_END_OF_LIST(),
+>  };
+> =20
+> @@ -50,6 +51,8 @@ static void riscv_harts_realize(DeviceState *dev, Error=
+ **errp)
+>          s->harts[n].env.mhartid =3D n;
+>          object_property_add_child(OBJECT(s), "harts[*]", OBJECT(&s->hart=
+s[n]),
+>                                    &error_abort);
+> +        object_property_set_uint(OBJECT(&s->harts[n]), s->rstvec,
+> +                                 "rstvec", &err);
+>          qemu_register_reset(riscv_harts_cpu_reset, &s->harts[n]);
+>          object_property_set_bool(OBJECT(&s->harts[n]), true,
+>                                   "realized", &err);
+> diff --git a/include/hw/riscv/riscv_hart.h b/include/hw/riscv/riscv_hart.h
+> index 0671d88a44..3cc19e2b60 100644
+> --- a/include/hw/riscv/riscv_hart.h
+> +++ b/include/hw/riscv/riscv_hart.h
+> @@ -34,6 +34,7 @@ typedef struct RISCVHartArrayState {
+>      uint32_t num_harts;
+>      char *cpu_type;
+>      RISCVCPU *harts;
+> +    uint64_t rstvec;
+>  } RISCVHartArrayState;
+> =20
+>  #endif
+> diff --git a/target/riscv/cpu.c b/target/riscv/cpu.c
+> index 5a527fbba0..061aa5cc6b 100644
+> --- a/target/riscv/cpu.c
+> +++ b/target/riscv/cpu.c
+> @@ -23,6 +23,7 @@
+>  #include "exec/exec-all.h"
+>  #include "qapi/error.h"
+>  #include "migration/vmstate.h"
+> +#include "hw/qdev-properties.h"
+> =20
+>  /* RISC-V CPU definitions */
+> =20
+> @@ -112,7 +113,6 @@ static void riscv_any_cpu_init(Object *obj)
+>      CPURISCVState *env =3D &RISCV_CPU(obj)->env;
+>      set_misa(env, RVXLEN | RVI | RVM | RVA | RVF | RVD | RVC | RVU);
+>      set_versions(env, USER_VERSION_2_02_0, PRIV_VERSION_1_10_0);
+> -    set_resetvec(env, DEFAULT_RSTVEC);
+>  }
+> =20
+>  #if defined(TARGET_RISCV32)
+> @@ -122,7 +122,6 @@ static void rv32gcsu_priv1_09_1_cpu_init(Object *obj)
+>      CPURISCVState *env =3D &RISCV_CPU(obj)->env;
+>      set_misa(env, RV32 | RVI | RVM | RVA | RVF | RVD | RVC | RVS | RVU);
+>      set_versions(env, USER_VERSION_2_02_0, PRIV_VERSION_1_09_1);
+> -    set_resetvec(env, DEFAULT_RSTVEC);
+>      set_feature(env, RISCV_FEATURE_MMU);
+>  }
+> =20
+> @@ -131,7 +130,6 @@ static void rv32gcsu_priv1_10_0_cpu_init(Object *obj)
+>      CPURISCVState *env =3D &RISCV_CPU(obj)->env;
+>      set_misa(env, RV32 | RVI | RVM | RVA | RVF | RVD | RVC | RVS | RVU);
+>      set_versions(env, USER_VERSION_2_02_0, PRIV_VERSION_1_10_0);
+> -    set_resetvec(env, DEFAULT_RSTVEC);
+>      set_feature(env, RISCV_FEATURE_MMU);
+>  }
+> =20
+> @@ -140,7 +138,6 @@ static void rv32imacu_nommu_cpu_init(Object *obj)
+>      CPURISCVState *env =3D &RISCV_CPU(obj)->env;
+>      set_misa(env, RV32 | RVI | RVM | RVA | RVC | RVU);
+>      set_versions(env, USER_VERSION_2_02_0, PRIV_VERSION_1_10_0);
+> -    set_resetvec(env, DEFAULT_RSTVEC);
+>  }
+> =20
+>  #elif defined(TARGET_RISCV64)
+> @@ -150,7 +147,6 @@ static void rv64gcsu_priv1_09_1_cpu_init(Object *obj)
+>      CPURISCVState *env =3D &RISCV_CPU(obj)->env;
+>      set_misa(env, RV64 | RVI | RVM | RVA | RVF | RVD | RVC | RVS | RVU);
+>      set_versions(env, USER_VERSION_2_02_0, PRIV_VERSION_1_09_1);
+> -    set_resetvec(env, DEFAULT_RSTVEC);
+>      set_feature(env, RISCV_FEATURE_MMU);
+>  }
+> =20
+> @@ -159,7 +155,6 @@ static void rv64gcsu_priv1_10_0_cpu_init(Object *obj)
+>      CPURISCVState *env =3D &RISCV_CPU(obj)->env;
+>      set_misa(env, RV64 | RVI | RVM | RVA | RVF | RVD | RVC | RVS | RVU);
+>      set_versions(env, USER_VERSION_2_02_0, PRIV_VERSION_1_10_0);
+> -    set_resetvec(env, DEFAULT_RSTVEC);
+>      set_feature(env, RISCV_FEATURE_MMU);
+>  }
+> =20
+> @@ -168,7 +163,6 @@ static void rv64imacu_nommu_cpu_init(Object *obj)
+>      CPURISCVState *env =3D &RISCV_CPU(obj)->env;
+>      set_misa(env, RV64 | RVI | RVM | RVA | RVC | RVU);
+>      set_versions(env, USER_VERSION_2_02_0, PRIV_VERSION_1_10_0);
+> -    set_resetvec(env, DEFAULT_RSTVEC);
+>  }
+> =20
+>  #endif
+> @@ -292,6 +286,7 @@ static void riscv_cpu_disas_set_info(CPUState *s, dis=
+assemble_info *info)
+>  static void riscv_cpu_realize(DeviceState *dev, Error **errp)
+>  {
+>      CPUState *cs =3D CPU(dev);
+> +    RISCVCPU *cpu =3D RISCV_CPU(dev);
+>      RISCVCPUClass *mcc =3D RISCV_CPU_GET_CLASS(dev);
+>      Error *local_err =3D NULL;
+> =20
+> @@ -302,6 +297,7 @@ static void riscv_cpu_realize(DeviceState *dev, Error=
+ **errp)
+>      }
+> =20
+>      qemu_init_vcpu(cs);
+> +    set_resetvec(&cpu->env, cpu->rstvec);
+>      cpu_reset(cs);
+> =20
+>      mcc->parent_realize(dev, errp);
+> @@ -315,6 +311,11 @@ static void riscv_cpu_init(Object *obj)
+>      cs->env_ptr =3D &cpu->env;
+>  }
+> =20
+> +static Property riscv_cpu_properties[] =3D {
+> +    DEFINE_PROP_UINT64("rstvec", RISCVCPU, rstvec, DEFAULT_RSTVEC),
+> +    DEFINE_PROP_END_OF_LIST()
+> +};
+> +
+>  static const VMStateDescription vmstate_riscv_cpu =3D {
+>      .name =3D "cpu",
+>      .unmigratable =3D 1,
+> @@ -329,6 +330,8 @@ static void riscv_cpu_class_init(ObjectClass *c, void=
+ *data)
+>      mcc->parent_realize =3D dc->realize;
+>      dc->realize =3D riscv_cpu_realize;
+> =20
+> +    dc->props =3D riscv_cpu_properties;
+> +
+>      mcc->parent_reset =3D cc->reset;
+>      cc->reset =3D riscv_cpu_reset;
+> =20
+> diff --git a/target/riscv/cpu.h b/target/riscv/cpu.h
+> index 41e06ac0f9..80f7772b04 100644
+> --- a/target/riscv/cpu.h
+> +++ b/target/riscv/cpu.h
+> @@ -210,6 +210,8 @@ typedef struct RISCVCPU {
+>      CPUState parent_obj;
+>      /*< public >*/
+>      CPURISCVState env;
+> +
+> +    uint64_t rstvec;
+>  } RISCVCPU;
+> =20
+>  static inline RISCVCPU *riscv_env_get_cpu(CPURISCVState *env)
+> --=20
+> 2.17.0
+>=20
 
-    Flat union type                  Tag enum type
-    --------------------------------------------------------------
-    BlockdevCreateOptions            BlockdevDriver
-    BlockdevOptions                  BlockdevDriver
-    BlockdevQcow2Encryption          BlockdevQcow2EncryptionFormat
-    ImageInfoSpecificQCow2Encryption BlockdevQcow2EncryptionFormat
-    BlockdevQcowEncryption           BlockdevQcowEncryptionFormat
-    CpuInfo                          CpuInfoArch
-    GuestPanicInformation            GuestPanicInformationType
-    QCryptoBlockCreateOptions        QCryptoBlockFormat
-    SchemaInfo                       SchemaMetaType
-    SheepdogRedundancy               SheepdogRedundancyType
-    SocketAddress                    SocketAddressType
-    SshHostKeyCheck                  SshHostKeyCheckMode
-    CpuInfoFast                      SysEmuTarget
-    UsernetConnection                UsernetType
 
-Two pairs.  We'll live.
-
-> I think I'd vote for 2 (never enforce all-branches coverage) as well.
-
-Eric, what do you think?
-
-One more thought: if we ever get around to provide more convenient flat
-union syntax so users don't have to enumerate the variant names twice,
-we'll need a way to say "empty branch".  Let's worry about that problem
-when we have it.
+--=20
+Best regards,
+=A0 Antony Pavlov
