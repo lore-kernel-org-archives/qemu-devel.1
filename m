@@ -1,25 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38357)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40148)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1fJGvZ-00070Z-JV
-	for qemu-devel@nongnu.org; Thu, 17 May 2018 07:18:37 -0400
+	(envelope-from <imammedo@redhat.com>) id 1fJH46-0001ya-Hw
+	for qemu-devel@nongnu.org; Thu, 17 May 2018 07:27:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1fJGvV-0005Y9-Gm
-	for qemu-devel@nongnu.org; Thu, 17 May 2018 07:18:33 -0400
-Resent-Message-Id: <E1fJGvV-0005Y9-Gm@eggs.gnu.org>
-Received: from sender-of-o51.zoho.com ([135.84.80.216]:21104)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1fJGvV-0005XO-6f
-	for qemu-devel@nongnu.org; Thu, 17 May 2018 07:18:29 -0400
-In-Reply-To: <20180517092513.735-1-kraxel@redhat.com>
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <152654956866.261.7414517447939932710@1f70390a8372>
+	(envelope-from <imammedo@redhat.com>) id 1fJH43-0002Dk-8q
+	for qemu-devel@nongnu.org; Thu, 17 May 2018 07:27:22 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:56492 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1fJH43-0002DY-3m
+	for qemu-devel@nongnu.org; Thu, 17 May 2018 07:27:19 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.4])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 3FDBE4201AEE
+	for <qemu-devel@nongnu.org>; Thu, 17 May 2018 11:27:18 +0000 (UTC)
+Date: Thu, 17 May 2018 13:27:16 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20180517132716.55c886be@redhat.com>
+In-Reply-To: <20180517100134.4e84c21a@redhat.com>
+References: <1525423069-61903-1-git-send-email-imammedo@redhat.com>
+	<1525423069-61903-12-git-send-email-imammedo@redhat.com>
+	<20180516221230.GB1989@localhost.localdomain>
+	<20180517100134.4e84c21a@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Thu, 17 May 2018 02:32:49 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PATCH 0/4] display: add new bochs-display device
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v7 11/11] tests: functional tests for QMP
+ command set-numa-node
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,64 +36,90 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: kraxel@redhat.com
-Cc: famz@redhat.com, qemu-devel@nongnu.org
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: pkrempa@redhat.com, qemu-devel@nongnu.org, armbru@redhat.com
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
-c3NhZ2UtaWQ6IDIwMTgwNTE3MDkyNTEzLjczNS0xLWtyYXhlbEByZWRoYXQuY29tClN1YmplY3Q6
-IFtRZW11LWRldmVsXSBbUEFUQ0ggMC80XSBkaXNwbGF5OiBhZGQgbmV3IGJvY2hzLWRpc3BsYXkg
-ZGV2aWNlCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCgpCQVNFPWJhc2UK
-bj0xCnRvdGFsPSQoZ2l0IGxvZyAtLW9uZWxpbmUgJEJBU0UuLiB8IHdjIC1sKQpmYWlsZWQ9MAoK
-Z2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwg
-ZGlmZi5yZW5hbWVzIFRydWUKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYuYWxnb3JpdGhtIGhpc3Rv
-Z3JhbQoKY29tbWl0cz0iJChnaXQgbG9nIC0tZm9ybWF0PSVIIC0tcmV2ZXJzZSAkQkFTRS4uKSIK
-Zm9yIGMgaW4gJGNvbW1pdHM7IGRvCiAgICBlY2hvICJDaGVja2luZyBQQVRDSCAkbi8kdG90YWw6
-ICQoZ2l0IGxvZyAtbiAxIC0tZm9ybWF0PSVzICRjKS4uLiIKICAgIGlmICEgZ2l0IHNob3cgJGMg
-LS1mb3JtYXQ9ZW1haWwgfCAuL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIC07IHRo
-ZW4KICAgICAgICBmYWlsZWQ9MQogICAgICAgIGVjaG8KICAgIGZpCiAgICBuPSQoKG4rMSkpCmRv
-bmUKCmV4aXQgJGZhaWxlZAo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1
-YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApGcm9tIGh0dHBzOi8vZ2l0aHViLmNv
-bS9wYXRjaGV3LXByb2plY3QvcWVtdQogKiBbbmV3IHRhZ10gICAgICAgICAgICAgICBwYXRjaGV3
-LzIwMTgwNTE3MDkyNTEzLjczNS0xLWtyYXhlbEByZWRoYXQuY29tIC0+IHBhdGNoZXcvMjAxODA1
-MTcwOTI1MTMuNzM1LTEta3JheGVsQHJlZGhhdC5jb20KU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNo
-ICd0ZXN0JwoxMTBiNzc1ODEzIGJvY2hzLWRpc3BsYXk6IGFkZCBwY2llIHN1cHBvcnQKMWU3ZDAy
-NTU5MCBib2Nocy1kaXNwbGF5OiBhZGQgZGlydHkgdHJhY2tpbmcgc3VwcG9ydAphYjVlNDc4ZDA2
-IGRpc3BsYXk6IGFkZCBuZXcgYm9jaHMtZGlzcGxheSBkZXZpY2UKMTQ5YzczOGZiOSB2Z2E6IG1v
-dmUgYm9jaHMgdmJlIGRlZmluZXMgdG8gaGVhZGVyIGZpbGUKCj09PSBPVVRQVVQgQkVHSU4gPT09
-CkNoZWNraW5nIFBBVENIIDEvNDogdmdhOiBtb3ZlIGJvY2hzIHZiZSBkZWZpbmVzIHRvIGhlYWRl
-ciBmaWxlLi4uCldBUk5JTkc6IGFkZGVkLCBtb3ZlZCBvciBkZWxldGVkIGZpbGUocyksIGRvZXMg
-TUFJTlRBSU5FUlMgbmVlZCB1cGRhdGluZz8KIzg2OiAKbmV3IGZpbGUgbW9kZSAxMDA2NDQKCnRv
-dGFsOiAwIGVycm9ycywgMSB3YXJuaW5ncywgMTI3IGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2gg
-aGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9y
-cwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUK
-Q0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KQ2hlY2tpbmcgUEFUQ0ggMi80OiBkaXNwbGF5OiBh
-ZGQgbmV3IGJvY2hzLWRpc3BsYXkgZGV2aWNlLi4uCldBUk5JTkc6IGFkZGVkLCBtb3ZlZCBvciBk
-ZWxldGVkIGZpbGUocyksIGRvZXMgTUFJTlRBSU5FUlMgbmVlZCB1cGRhdGluZz8KIzQzOiAKbmV3
-IGZpbGUgbW9kZSAxMDA2NDQKCkVSUk9SOiBicmFjZXMge30gYXJlIG5lY2Vzc2FyeSBmb3IgYWxs
-IGFybXMgb2YgdGhpcyBzdGF0ZW1lbnQKIzE5OTogRklMRTogaHcvZGlzcGxheS9ib2Nocy1kaXNw
-bGF5LmM6MTUyOgorICAgIGlmICghKHZiZVtWQkVfRElTUElfSU5ERVhfRU5BQkxFXSAmIFZCRV9E
-SVNQSV9FTkFCTEVEKSkKWy4uLl0KCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiMy
-MDk6IEZJTEU6IGh3L2Rpc3BsYXkvYm9jaHMtZGlzcGxheS5jOjE2MjoKKyAgICAgICAgbW9kZS0+
-Zm9ybWF0ID0gcy0+YmlnX2VuZGlhbl9mYiA/IFBJWE1BTl9CRV94OHI4ZzhiOCA6IFBJWE1BTl9M
-RV94OHI4ZzhiODsKCkVSUk9SOiBicmFjZXMge30gYXJlIG5lY2Vzc2FyeSBmb3IgYWxsIGFybXMg
-b2YgdGhpcyBzdGF0ZW1lbnQKIzIxOTogRklMRTogaHcvZGlzcGxheS9ib2Nocy1kaXNwbGF5LmM6
-MTcyOgorICAgIGlmICh2aXJ0X3dpZHRoIDwgbW9kZS0+d2lkdGgpClsuLi5dCgpXQVJOSU5HOiBs
-aW5lIG92ZXIgODAgY2hhcmFjdGVycwojMzA5OiBGSUxFOiBody9kaXNwbGF5L2JvY2hzLWRpc3Bs
-YXkuYzoyNjI6CitzdGF0aWMgdm9pZCBib2Noc19kaXNwbGF5X3NldF9iaWdfZW5kaWFuX2ZiKE9i
-amVjdCAqb2JqLCBib29sIHZhbHVlLCBFcnJvciAqKmVycnApCgp0b3RhbDogMiBlcnJvcnMsIDMg
-d2FybmluZ3MsIDMzMCBsaW5lcyBjaGVja2VkCgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVt
-cywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0
-aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJ
-TlRBSU5FUlMuCgpDaGVja2luZyBQQVRDSCAzLzQ6IGJvY2hzLWRpc3BsYXk6IGFkZCBkaXJ0eSB0
-cmFja2luZyBzdXBwb3J0Li4uCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiM0NDog
-RklMRTogaHcvZGlzcGxheS9ib2Nocy1kaXNwbGF5LmM6MjMxOgorICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBtb2RlLm9mZnNldCArIG1vZGUuc3Ry
-aWRlICogeSwKCnRvdGFsOiAwIGVycm9ycywgMSB3YXJuaW5ncywgNTYgbGluZXMgY2hlY2tlZAoK
-WW91ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2Yg
-dGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50
-YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgpDaGVja2luZyBQQVRDSCA0LzQ6
-IGJvY2hzLWRpc3BsYXk6IGFkZCBwY2llIHN1cHBvcnQuLi4KPT09IE9VVFBVVCBFTkQgPT09CgpU
-ZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0
-b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQg
-eW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
+On Thu, 17 May 2018 10:01:34 +0200
+Igor Mammedov <imammedo@redhat.com> wrote:
+
+> On Wed, 16 May 2018 19:12:30 -0300
+> Eduardo Habkost <ehabkost@redhat.com> wrote:
+>=20
+> > On Fri, May 04, 2018 at 10:37:49AM +0200, Igor Mammedov wrote: =20
+> > >  * start QEMU with 2 unmapped cpus,
+> > >  * while in preconfig state
+> > >     * add 2 numa nodes
+> > >     * assign cpus to them
+> > >  * exit preconfig and in running state check that cpus
+> > >    are mapped correctly.
+> > >=20
+> > > Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+> > > ---
+> > > v6:
+> > >   * replace 'cont' with 'exit-preconfig' command
+> > > v5:
+> > >   * s/qobject_to_qdict(/qobject_to(QDict,/
+> > >   * s/-preconfig/--preconfig/
+> > > v4:
+> > >   * drop duplicate is_err() and reuse qmp_rsp_is_err() wich is moved
+> > >     to generic file libqtest.c. (Eric Blake <eblake@redhat.com>)
+> > >=20
+> > > FIXUP! tests: functional tests for QMP command  set-numa-node
+> > > ---
+> > >  tests/libqtest.h  |  9 ++++++++
+> > >  tests/libqtest.c  |  7 +++++++
+> > >  tests/numa-test.c | 61 +++++++++++++++++++++++++++++++++++++++++++++=
+++++++++++
+> > >  tests/qmp-test.c  |  7 -------
+> > >  4 files changed, 77 insertions(+), 7 deletions(-)
+> > >=20
+> > > diff --git a/tests/libqtest.h b/tests/libqtest.h
+> > > index cbe8df4..ac52872 100644
+> > > --- a/tests/libqtest.h
+> > > +++ b/tests/libqtest.h
+> > > @@ -972,4 +972,13 @@ void qtest_qmp_device_add(const char *driver, co=
+nst char *id, const char *fmt,
+> > >   */
+> > >  void qtest_qmp_device_del(const char *id);
+> > > =20
+> > > +/**
+> > > + * qmp_rsp_is_err:
+> > > + * @rsp: QMP response to check for error
+> > > + *
+> > > + * Test @rsp for error and discard @rsp.
+> > > + * Returns 'true' if there is error in @rsp and 'false' otherwise.
+> > > + */
+> > > +bool qmp_rsp_is_err(QDict *rsp);
+> > > +
+> > >  #endif
+> > > diff --git a/tests/libqtest.c b/tests/libqtest.c
+> > > index 6f33a37..33426d5 100644
+> > > --- a/tests/libqtest.c
+> > > +++ b/tests/libqtest.c
+> > > @@ -1098,3 +1098,10 @@ void qtest_qmp_device_del(const char *id)
+> > >      QDECREF(response1);
+> > >      QDECREF(response2);
+> > >  }
+> > > +
+> > > +bool qmp_rsp_is_err(QDict *rsp)
+> > > +{
+> > > +    QDict *error =3D qdict_get_qdict(rsp, "error");
+> > > +    QDECREF(rsp);   =20
+> >=20
+> >=20
+> > Oops:
+> >=20
+> >   tests/libqtest.c: In function =E2=80=98qmp_rsp_is_err=E2=80=99:
+> >   tests/libqtest.c:1105:5: error: implicit declaration of function =E2=
+=80=98QDECREF=E2=80=99 [-Werror=3Dimplicit-function-declaration]
+> >        QDECREF(rsp);
+> >        ^
+> >   tests/libqtest.c:1105:5: error: nested extern declaration of =E2=80=
+=98QDECREF=E2=80=99 [-Werror=3Dnested-externs]
+> >=20
+> > I've fixed this on numa-next, replaced QDECREF with object_unref. =20
+> I guess QDECREF was removed while patch were sitting on the list.
+change affected 8th and 11th patches make the last depended on 8th.
+I'll post rebased v8 8,11th patches here so it would still bisectable
+and include into 8th Eric's request for negative exit-preconfig testcase (+=
+3LOC)
