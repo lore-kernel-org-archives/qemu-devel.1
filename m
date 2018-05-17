@@ -1,36 +1,36 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43039)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43057)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <danielhb@linux.ibm.com>) id 1fJOV8-0008QI-Pf
-	for qemu-devel@nongnu.org; Thu, 17 May 2018 15:23:48 -0400
+	(envelope-from <danielhb@linux.ibm.com>) id 1fJOVC-0008S7-Ib
+	for qemu-devel@nongnu.org; Thu, 17 May 2018 15:23:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <danielhb@linux.ibm.com>) id 1fJOV4-0001J3-QP
-	for qemu-devel@nongnu.org; Thu, 17 May 2018 15:23:46 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:43864
+	(envelope-from <danielhb@linux.ibm.com>) id 1fJOV7-0001Kc-KX
+	for qemu-devel@nongnu.org; Thu, 17 May 2018 15:23:50 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:54642
 	helo=mx0a-001b2d01.pphosted.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <danielhb@linux.ibm.com>)
-	id 1fJOV4-0001Iu-JV
-	for qemu-devel@nongnu.org; Thu, 17 May 2018 15:23:42 -0400
-Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
+	id 1fJOV7-0001KR-EF
+	for qemu-devel@nongnu.org; Thu, 17 May 2018 15:23:45 -0400
+Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
 	by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w4HJIwqJ112756
-	for <qemu-devel@nongnu.org>; Thu, 17 May 2018 15:23:42 -0400
-Received: from e32.co.us.ibm.com (e32.co.us.ibm.com [32.97.110.150])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2j1cc2sfcy-1
+	w4HJIs0u003415
+	for <qemu-devel@nongnu.org>; Thu, 17 May 2018 15:23:44 -0400
+Received: from e36.co.us.ibm.com (e36.co.us.ibm.com [32.97.110.154])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2j1fr6g90d-1
 	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Thu, 17 May 2018 15:23:41 -0400
+	for <qemu-devel@nongnu.org>; Thu, 17 May 2018 15:23:44 -0400
 Received: from localhost
-	by e32.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	by e36.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
 	Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <danielhb@linux.ibm.com>;
-	Thu, 17 May 2018 13:23:41 -0600
+	Thu, 17 May 2018 13:23:43 -0600
 From: Daniel Henrique Barboza <danielhb@linux.ibm.com>
-Date: Thu, 17 May 2018 16:23:23 -0300
+Date: Thu, 17 May 2018 16:23:24 -0300
 In-Reply-To: <20180517192325.8335-1-danielhb@linux.ibm.com>
 References: <20180517192325.8335-1-danielhb@linux.ibm.com>
-Message-Id: <20180517192325.8335-2-danielhb@linux.ibm.com>
-Subject: [Qemu-devel] [PATCH v7 1/3] qmp: adding 'wakeup-suspend-support' in
- query-target
+Message-Id: <20180517192325.8335-3-danielhb@linux.ibm.com>
+Subject: [Qemu-devel] [PATCH v7 2/3] qga: update guest-suspend-ram and
+ guest-suspend-hybrid descriptions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -42,154 +42,48 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: armbru@redhat.com, mdroth@linux.vnet.ibm.com, eblake@redhat.com, dgilbert@redhat.com, Daniel Henrique Barboza <danielhb@linux.ibm.com>
 
-When issuing the qmp/hmp 'system_wakeup' command, what happens in a
-nutshell is:
-
-- qmp_system_wakeup_request set runstate to RUNNING, sets a wakeup_reason
-and notify the event
-- in the main_loop, all vcpus are paused, a system reset is issued, all
-subscribers of wakeup_notifiers receives a notification, vcpus are then
-resumed and the wake up QAPI event is fired
-
-Note that this procedure alone doesn't ensure that the guest will awake
-from SUSPENDED state - the subscribers of the wake up event must take
-action to resume the guest, otherwise the guest will simply reboot.
-
-At this moment there are only two subscribers of the wake up event: one
-in hw/acpi/core.c and another one in hw/i386/xen/xen-hvm.c. This means
-that system_wakeup does not work as intended with other architectures.
-
-However, only the presence of 'system_wakeup' is required for QGA to
-support 'guest-suspend-ram' and 'guest-suspend-hybrid' at this moment.
-This means that the user/management will expect to suspend the guest using
-one of those suspend commands and then resume execution using system_wakeup,
-regardless of the support offered in system_wakeup in the first place.
-
-This patch adds a new flag called 'wakeup-suspend-support' in TargetInfo
-that allows the caller to query if the guest supports wake up from
-suspend via system_wakeup. It goes over the subscribers of the wake up
-event and, if it's empty, it assumes that the guest does not support
-wake up from suspend (and thus, pm-suspend itself).
-
-This is the expected output of query-target when running a x86 guest:
-
-{"execute" : "query-target"}
-{"return": {"arch": "x86_64", "wakeup-suspend-support": true}}
-
-This is the output when running a pseries guest:
-
-{"execute" : "query-target"}
-{"return": {"arch": "ppc64", "wakeup-suspend-support": false}}
-
-Given that the TargetInfo structure is read-only, adding a new flag to
-it is backwards compatible. There is no need to deprecate the old
-TargetInfo format.
-
-With this extra tool, management can avoid situations where a guest
-that does not have proper suspend/wake capabilities ends up in
-inconsistent state (e.g.
-https://github.com/open-power-host-os/qemu/issues/31).
+This patch updates the descriptions of 'guest-suspend-ram' and
+'guest-suspend-hybrid' to mention that both commands relies now
+on the proper support for wake up from suspend, retrieved by the
+'wakeup-suspend-support' attribute of the 'query-target' QMP
+command.
 
 Reported-by: Balamuruhan S <bala24@linux.vnet.ibm.com>
 Signed-off-by: Daniel Henrique Barboza <danielhb@linux.ibm.com>
+Reviewed-by: Michael Roth <mdroth@linux.vnet.ibm.com>
 ---
- arch_init.c             |  1 +
- include/sysemu/sysemu.h |  1 +
- qapi/misc.json          |  8 ++++++--
- vl.c                    | 22 ++++++++++++++++++++++
- 4 files changed, 30 insertions(+), 2 deletions(-)
+ qga/qapi-schema.json | 12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
 
-diff --git a/arch_init.c b/arch_init.c
-index 9597218ced..fa5407e2de 100644
---- a/arch_init.c
-+++ b/arch_init.c
-@@ -115,6 +115,7 @@ TargetInfo *qmp_query_target(Error **errp)
- 
-     info->arch = qapi_enum_parse(&SysEmuTarget_lookup, TARGET_NAME, -1,
-                                  &error_abort);
-+    info->wakeup_suspend_support = qemu_wakeup_suspend_support();
- 
-     return info;
- }
-diff --git a/include/sysemu/sysemu.h b/include/sysemu/sysemu.h
-index 544ab77a2b..b987e61d76 100644
---- a/include/sysemu/sysemu.h
-+++ b/include/sysemu/sysemu.h
-@@ -79,6 +79,7 @@ void qemu_system_debug_request(void);
- void qemu_system_vmstop_request(RunState reason);
- void qemu_system_vmstop_request_prepare(void);
- bool qemu_vmstop_requested(RunState *r);
-+bool qemu_wakeup_suspend_support(void);
- ShutdownCause qemu_shutdown_requested_get(void);
- ShutdownCause qemu_reset_requested_get(void);
- void qemu_system_killed(int signal, pid_t pid);
-diff --git a/qapi/misc.json b/qapi/misc.json
-index f5988cc0b5..efba0449a6 100644
---- a/qapi/misc.json
-+++ b/qapi/misc.json
-@@ -1245,7 +1245,9 @@
- ##
- # @system_wakeup:
+diff --git a/qga/qapi-schema.json b/qga/qapi-schema.json
+index 17884c7c70..bc46c2d0f0 100644
+--- a/qga/qapi-schema.json
++++ b/qga/qapi-schema.json
+@@ -565,9 +565,9 @@
+ # For the best results it's strongly recommended to have the pm-utils
+ # package installed in the guest.
  #
--# Wakeup guest from suspend.  Does nothing in case the guest isn't suspended.
-+# If the guest has wake-up from suspend support enabled
-+# (wakeup-suspend-support flag from query-target), wakeup guest from
-+# suspend. Does nothing otherwise.
+-# IMPORTANT: guest-suspend-ram requires QEMU to support the 'system_wakeup'
+-# command.  Thus, it's *required* to query QEMU for the presence of the
+-# 'system_wakeup' command before issuing guest-suspend-ram.
++# IMPORTANT: guest-suspend-ram requires working wakeup support in
++# QEMU. You *must* check QMP command query-target returns
++# wakeup-suspend-support: true before issuing this command.
  #
- # Since:  1.1
+ # This command does NOT return a response on success. There are two options
+ # to check for success:
+@@ -592,9 +592,9 @@
  #
-@@ -2484,11 +2486,13 @@
- # Information describing the QEMU target.
+ # This command requires the pm-utils package to be installed in the guest.
  #
- # @arch: the target architecture
-+# @wakeup-suspend-support: true if the target supports wake up from
-+#                          suspend (since 2.13)
+-# IMPORTANT: guest-suspend-hybrid requires QEMU to support the 'system_wakeup'
+-# command.  Thus, it's *required* to query QEMU for the presence of the
+-# 'system_wakeup' command before issuing guest-suspend-hybrid.
++# IMPORTANT: guest-suspend-hybrid requires working wakeup support in
++# QEMU. You *must* check QMP command query-target returns
++# wakeup-suspend-support: true before issuing this command.
  #
- # Since: 1.2.0
- ##
- { 'struct': 'TargetInfo',
--  'data': { 'arch': 'SysEmuTarget' } }
-+  'data': { 'arch': 'SysEmuTarget', 'wakeup-suspend-support': 'bool' } }
- 
- ##
- # @query-target:
-diff --git a/vl.c b/vl.c
-index 3b39bbd7a8..b8fe41860a 100644
---- a/vl.c
-+++ b/vl.c
-@@ -1832,11 +1832,33 @@ void qemu_system_wakeup_enable(WakeupReason reason, bool enabled)
-     }
- }
- 
-+/*
-+ * The existence of a wake-up notifier is being checked in the function
-+ * qemu_wakeup_suspend_support and it's used in the logic of the
-+ * wakeup-suspend-support flag of QMP 'query-target' command. The idea
-+ * of this flag is to indicate whether the guest supports wake-up from
-+ * suspend (via system_wakeup QMP/HMP call for example), warning the user
-+ * that the guest can't handle both wake-up from suspend and the suspend
-+ * itself via QGA guest-suspend-ram and guest-suspend-hybrid (if it
-+ * can't wake up, it can't be suspended safely).
-+ *
-+ * An assumption is made by the wakeup-suspend-support flag that only the
-+ * guests that can go to RUN_STATE_SUSPENDED and wake up properly would
-+ * be interested in this wakeup_notifier. Adding a wakeup_notifier for
-+ * any other reason will break the logic of the wakeup-suspend-support
-+ * flag and can lead to user/management confusion about the suspend/wake-up
-+ * support of the guest.
-+ */
- void qemu_register_wakeup_notifier(Notifier *notifier)
- {
-     notifier_list_add(&wakeup_notifiers, notifier);
- }
- 
-+bool qemu_wakeup_suspend_support(void)
-+{
-+    return !QLIST_EMPTY(&wakeup_notifiers.notifiers);
-+}
-+
- void qemu_system_killed(int signal, pid_t pid)
- {
-     shutdown_signal = signal;
+ # This command does NOT return a response on success. There are two options
+ # to check for success:
 -- 
 2.14.3
