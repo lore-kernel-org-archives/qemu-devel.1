@@ -1,26 +1,41 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33184)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33938)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1fJJy1-0000QF-AM
-	for qemu-devel@nongnu.org; Thu, 17 May 2018 10:33:20 -0400
+	(envelope-from <zyimin@linux.ibm.com>) id 1fJK1m-0003CD-AA
+	for qemu-devel@nongnu.org; Thu, 17 May 2018 10:37:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1fJJxr-0000F8-FN
-	for qemu-devel@nongnu.org; Thu, 17 May 2018 10:33:17 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:44914 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eric.auger@redhat.com>)
-	id 1fJJxr-0000Et-A0
-	for qemu-devel@nongnu.org; Thu, 17 May 2018 10:33:07 -0400
-References: <20180504030811.28111-1-peterx@redhat.com>
-	<20180504030811.28111-6-peterx@redhat.com>
-From: Auger Eric <eric.auger@redhat.com>
-Message-ID: <99897d3c-ee46-977d-c886-5d23996c7f04@redhat.com>
-Date: Thu, 17 May 2018 16:32:58 +0200
+	(envelope-from <zyimin@linux.ibm.com>) id 1fJK1i-0002To-T7
+	for qemu-devel@nongnu.org; Thu, 17 May 2018 10:37:10 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:33365
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <zyimin@linux.ibm.com>)
+	id 1fJK1i-0002Tg-Mm
+	for qemu-devel@nongnu.org; Thu, 17 May 2018 10:37:06 -0400
+Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w4HEVsjF003003
+	for <qemu-devel@nongnu.org>; Thu, 17 May 2018 10:37:05 -0400
+Received: from e34.co.us.ibm.com (e34.co.us.ibm.com [32.97.110.152])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2j1baph717-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Thu, 17 May 2018 10:37:05 -0400
+Received: from localhost
+	by e34.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <zyimin@linux.ibm.com>;
+	Thu, 17 May 2018 08:37:04 -0600
+References: <20180515113348.10516-1-zyimin@linux.ibm.com>
+	<20180515113348.10516-2-zyimin@linux.ibm.com>
+	<20180517124109.GJ17734@vader>
+From: Yi Min Zhao <zyimin@linux.ibm.com>
+Date: Thu, 17 May 2018 22:36:57 +0800
 MIME-Version: 1.0
-In-Reply-To: <20180504030811.28111-6-peterx@redhat.com>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 05/10] intel-iommu: introduce
- vtd_page_walk_info
+In-Reply-To: <20180517124109.GJ17734@vader>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Message-Id: <a3595950-e669-a6ca-d8a6-8426aee1b790@linux.ibm.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 1/1] sandbox: disable -sandbox if
+ CONFIG_SECCOMP undefined
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,146 +44,116 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>, qemu-devel@nongnu.org
-Cc: Tian Kevin <kevin.tian@intel.com>, "Michael S . Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, Alex Williamson <alex.williamson@redhat.com>, Jintack Lim <jintack@cs.columbia.edu>
+To: Eduardo Otubo <otubo@redhat.com>
+Cc: qemu-devel@nongnu.org, jtomko@redhat.com, jferlan@redhat.com, berrange@redhat.com, borntraeger@de.ibm.com, fiuczy@linux.ibm.com
 
-Hi Peter,
 
-On 05/04/2018 05:08 AM, Peter Xu wrote:
-> During the recursive page walking of IOVA page tables, some stack
-> variables are constant variables and never changed during the whole page
-> walking procedure.  Isolate them into a struct so that we don't need to
-> pass those contants down the stack every time and multiple times.
-> 
-> Signed-off-by: Peter Xu <peterx@redhat.com>
-Reviewed-by: Eric Auger <eric.auger@redhat.com>
 
-Thanks
-
-Eric
-> ---
->  hw/i386/intel_iommu.c | 56 ++++++++++++++++++++++++++++---------------
->  1 file changed, 37 insertions(+), 19 deletions(-)
-> 
-> diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
-> index 9a418abfb6..b2b2a0a441 100644
-> --- a/hw/i386/intel_iommu.c
-> +++ b/hw/i386/intel_iommu.c
-> @@ -747,9 +747,27 @@ static int vtd_iova_to_slpte(VTDContextEntry *ce, uint64_t iova, bool is_write,
->  
->  typedef int (*vtd_page_walk_hook)(IOMMUTLBEntry *entry, void *private);
->  
-> +/**
-> + * Constant information used during page walking
-> + *
-> + * @hook_fn: hook func to be called when detected page
-> + * @private: private data to be passed into hook func
-> + * @notify_unmap: whether we should notify invalid entries
-> + * @aw: maximum address width
-> + */
-> +typedef struct {
-> +    vtd_page_walk_hook hook_fn;
-> +    void *private;
-> +    bool notify_unmap;
-> +    uint8_t aw;
-> +} vtd_page_walk_info;
-> +
->  static int vtd_page_walk_one(IOMMUTLBEntry *entry, int level,
-> -                             vtd_page_walk_hook hook_fn, void *private)
-> +                             vtd_page_walk_info *info)
->  {
-> +    vtd_page_walk_hook hook_fn = info->hook_fn;
-> +    void *private = info->private;
-> +
->      assert(hook_fn);
->      trace_vtd_page_walk_one(level, entry->iova, entry->translated_addr,
->                              entry->addr_mask, entry->perm);
-> @@ -762,17 +780,13 @@ static int vtd_page_walk_one(IOMMUTLBEntry *entry, int level,
->   * @addr: base GPA addr to start the walk
->   * @start: IOVA range start address
->   * @end: IOVA range end address (start <= addr < end)
-> - * @hook_fn: hook func to be called when detected page
-> - * @private: private data to be passed into hook func
->   * @read: whether parent level has read permission
->   * @write: whether parent level has write permission
-> - * @notify_unmap: whether we should notify invalid entries
-> - * @aw: maximum address width
-> + * @info: constant information for the page walk
->   */
->  static int vtd_page_walk_level(dma_addr_t addr, uint64_t start,
-> -                               uint64_t end, vtd_page_walk_hook hook_fn,
-> -                               void *private, uint32_t level, bool read,
-> -                               bool write, bool notify_unmap, uint8_t aw)
-> +                               uint64_t end, uint32_t level, bool read,
-> +                               bool write, vtd_page_walk_info *info)
->  {
->      bool read_cur, write_cur, entry_valid;
->      uint32_t offset;
-> @@ -822,24 +836,24 @@ static int vtd_page_walk_level(dma_addr_t addr, uint64_t start,
->  
->          if (vtd_is_last_slpte(slpte, level)) {
->              /* NOTE: this is only meaningful if entry_valid == true */
-> -            entry.translated_addr = vtd_get_slpte_addr(slpte, aw);
-> -            if (!entry_valid && !notify_unmap) {
-> +            entry.translated_addr = vtd_get_slpte_addr(slpte, info->aw);
-> +            if (!entry_valid && !info->notify_unmap) {
->                  trace_vtd_page_walk_skip_perm(iova, iova_next);
->                  goto next;
->              }
-> -            ret = vtd_page_walk_one(&entry, level, hook_fn, private);
-> +            ret = vtd_page_walk_one(&entry, level, info);
->              if (ret < 0) {
->                  return ret;
->              }
->          } else {
->              if (!entry_valid) {
-> -                if (notify_unmap) {
-> +                if (info->notify_unmap) {
->                      /*
->                       * The whole entry is invalid; unmap it all.
->                       * Translated address is meaningless, zero it.
->                       */
->                      entry.translated_addr = 0x0;
-> -                    ret = vtd_page_walk_one(&entry, level, hook_fn, private);
-> +                    ret = vtd_page_walk_one(&entry, level, info);
->                      if (ret < 0) {
->                          return ret;
->                      }
-> @@ -848,10 +862,9 @@ static int vtd_page_walk_level(dma_addr_t addr, uint64_t start,
->                  }
->                  goto next;
->              }
-> -            ret = vtd_page_walk_level(vtd_get_slpte_addr(slpte, aw), iova,
-> -                                      MIN(iova_next, end), hook_fn, private,
-> -                                      level - 1, read_cur, write_cur,
-> -                                      notify_unmap, aw);
-> +            ret = vtd_page_walk_level(vtd_get_slpte_addr(slpte, info->aw),
-> +                                      iova, MIN(iova_next, end), level - 1,
-> +                                      read_cur, write_cur, info);
->              if (ret < 0) {
->                  return ret;
->              }
-> @@ -880,6 +893,12 @@ static int vtd_page_walk(VTDContextEntry *ce, uint64_t start, uint64_t end,
->  {
->      dma_addr_t addr = vtd_ce_get_slpt_base(ce);
->      uint32_t level = vtd_ce_get_level(ce);
-> +    vtd_page_walk_info info = {
-> +        .hook_fn = hook_fn,
-> +        .private = private,
-> +        .notify_unmap = notify_unmap,
-> +        .aw = aw,
-> +    };
->  
->      if (!vtd_iova_range_check(start, ce, aw)) {
->          return -VTD_FR_ADDR_BEYOND_MGAW;
-> @@ -890,8 +909,7 @@ static int vtd_page_walk(VTDContextEntry *ce, uint64_t start, uint64_t end,
->          end = vtd_iova_limit(ce, aw);
->      }
->  
-> -    return vtd_page_walk_level(addr, start, end, hook_fn, private,
-> -                               level, true, true, notify_unmap, aw);
-> +    return vtd_page_walk_level(addr, start, end, level, true, true, &info);
->  }
->  
->  /* Map a device to its corresponding domain (context-entry) */
-> 
+=E5=9C=A8 2018/5/17 =E4=B8=8B=E5=8D=888:41, Eduardo Otubo =E5=86=99=E9=81=
+=93:
+> On 15/05/2018 - 19:33:48, Yi Min Zhao wrote:
+>> If CONFIG_SECCOMP is undefined, the option 'elevateprivileges' remains
+>> compiled. This would make libvirt set the corresponding capability and
+>> then trigger the guest startup fails. So this patch excludes the code
+>> regarding seccomp staff if CONFIG_SECCOMP is undefined.
+> Just a sugestion for the next patch you send: If it's a single patch, y=
+ou don't
+> need to format it with a cover-letter. Just put all the description in =
+the body,
+> or if you need to add a text that shouldn't be included in the commit m=
+essage,
+> just add it after the "---" after Signed-off-by.
+OK. Thanks for your suggestion.
+>
+>> Signed-off-by: Yi Min Zhao <zyimin@linux.ibm.com>
+>> ---
+>>   vl.c | 13 ++++++++-----
+>>   1 file changed, 8 insertions(+), 5 deletions(-)
+>>
+>> diff --git a/vl.c b/vl.c
+>> index 806eec2ef6..b22d158f5f 100644
+>> --- a/vl.c
+>> +++ b/vl.c
+>> @@ -257,6 +257,7 @@ static QemuOptsList qemu_rtc_opts =3D {
+>>       },
+>>   };
+>>  =20
+>> +#ifdef CONFIG_SECCOMP
+>>   static QemuOptsList qemu_sandbox_opts =3D {
+>>       .name =3D "sandbox",
+>>       .implied_opt_name =3D "enable",
+>> @@ -285,6 +286,7 @@ static QemuOptsList qemu_sandbox_opts =3D {
+>>           { /* end of list */ }
+>>       },
+>>   };
+>> +#endif
+>>  =20
+>>   static QemuOptsList qemu_option_rom_opts =3D {
+>>       .name =3D "option-rom",
+>> @@ -1041,10 +1043,10 @@ static int bt_parse(const char *opt)
+>>       return 1;
+>>   }
+>>  =20
+>> +#ifdef CONFIG_SECCOMP
+>>   static int parse_sandbox(void *opaque, QemuOpts *opts, Error **errp)
+>>   {
+>>       if (qemu_opt_get_bool(opts, "enable", false)) {
+>> -#ifdef CONFIG_SECCOMP
+>>           uint32_t seccomp_opts =3D QEMU_SECCOMP_SET_DEFAULT
+>>                   | QEMU_SECCOMP_SET_OBSOLETE;
+>>           const char *value =3D NULL;
+>> @@ -1114,14 +1116,11 @@ static int parse_sandbox(void *opaque, QemuOpt=
+s *opts, Error **errp)
+>>                            "in the kernel");
+>>               return -1;
+>>           }
+>> -#else
+>> -        error_report("seccomp support is disabled");
+>> -        return -1;
+>> -#endif
+> Any reason not to keep the error message on the new #endif location?
+If error report is originally wrapped in CONFIG_SECCOMP undefined.
+This patch excludes the entire function if CONFIG_SECCOMP is undefined.
+So the error report is not needed.
+>
+>>       }
+>>  =20
+>>       return 0;
+>>   }
+>> +#endif
+>>  =20
+>>   static int parse_name(void *opaque, QemuOpts *opts, Error **errp)
+>>   {
+>> @@ -3074,7 +3073,9 @@ int main(int argc, char **argv, char **envp)
+>>       qemu_add_opts(&qemu_mem_opts);
+>>       qemu_add_opts(&qemu_smp_opts);
+>>       qemu_add_opts(&qemu_boot_opts);
+>> +#ifdef CONFIG_SECCOMP
+>>       qemu_add_opts(&qemu_sandbox_opts);
+>> +#endif
+>>       qemu_add_opts(&qemu_add_fd_opts);
+>>       qemu_add_opts(&qemu_object_opts);
+>>       qemu_add_opts(&qemu_tpmdev_opts);
+>> @@ -4071,10 +4072,12 @@ int main(int argc, char **argv, char **envp)
+>>           exit(1);
+>>       }
+>>  =20
+>> +#ifdef CONFIG_SECCOMP
+>>       if (qemu_opts_foreach(qemu_find_opts("sandbox"),
+>>                             parse_sandbox, NULL, NULL)) {
+>>           exit(1);
+>>       }
+>> +#endif
+>>  =20
+>>       if (qemu_opts_foreach(qemu_find_opts("name"),
+>>                             parse_name, NULL, NULL)) {
+>> --=20
+>> Yi Min
+>>
+> I just wanted a review from J=C3=A1n, since he is the author of the ori=
+ginal libvirt
+> patch. Does this breaks libvirt logic in any way? If not, ACK on this p=
+atch.
+>
+>
+OK.
