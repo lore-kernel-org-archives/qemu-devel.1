@@ -1,34 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51517)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51592)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1fJJIw-0006PK-1A
-	for qemu-devel@nongnu.org; Thu, 17 May 2018 09:50:50 -0400
+	(envelope-from <kwolf@redhat.com>) id 1fJJJG-0006aN-82
+	for qemu-devel@nongnu.org; Thu, 17 May 2018 09:51:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1fJJIt-0000RP-00
-	for qemu-devel@nongnu.org; Thu, 17 May 2018 09:50:50 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:43730 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1fJJIs-0000R3-PV
-	for qemu-devel@nongnu.org; Thu, 17 May 2018 09:50:46 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.6])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id F23CA401EF08
-	for <qemu-devel@nongnu.org>; Thu, 17 May 2018 13:50:45 +0000 (UTC)
-References: <1526560782-18732-1-git-send-email-pbonzini@redhat.com>
-	<20180517124403.GJ5657@redhat.com>
-	<20180517125110.lhipiezmvifrg3n6@sirius.home.kraxel.org>
-	<6e0213c3-017e-c794-a222-fde38676d7c8@redhat.com>
-	<20180517134559.uwne63xmqh2lucwq@sirius.home.kraxel.org>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <e54a1bf7-b154-844e-875c-87690754b7c0@redhat.com>
-Date: Thu, 17 May 2018 15:50:44 +0200
+	(envelope-from <kwolf@redhat.com>) id 1fJJJF-0000WV-6i
+	for qemu-devel@nongnu.org; Thu, 17 May 2018 09:51:10 -0400
+Date: Thu, 17 May 2018 15:50:49 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20180517135049.GC4080@localhost.localdomain>
+References: <20180509162637.15575-1-kwolf@redhat.com>
+	<20180509162637.15575-43-kwolf@redhat.com>
+	<49ee7d19-779d-cc1b-12a4-e4be14dc0a0f@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20180517134559.uwne63xmqh2lucwq@sirius.home.kraxel.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] ui: add x_keymap.o to modules
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="ReaqsoxgOBHFXBhH"
+Content-Disposition: inline
+In-Reply-To: <49ee7d19-779d-cc1b-12a4-e4be14dc0a0f@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 42/42] qemu-iotests: Test job-* with block
+ jobs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,31 +26,129 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>
-Cc: "=?UTF-8?Q?Daniel_P._Berrang=c3=a9?=" <berrange@redhat.com>, qemu-devel@nongnu.org
+To: Max Reitz <mreitz@redhat.com>
+Cc: qemu-block@nongnu.org, eblake@redhat.com, jsnow@redhat.com, armbru@redhat.com, jcody@redhat.com, qemu-devel@nongnu.org
 
-On 17/05/2018 15:45, Gerd Hoffmann wrote:
->   Hi,
-> 
->>> Related: can modules depend on modules, so we could make x_keymap a
->>> module of its own and have both gtk and sdl depend on it?
->>>
->>> That would also be useful when trying to modularize spice.
->>
->> How hard would it be to modularize the libspice-server side?  The part
->> of the library that is used by QXL rendering should have much fewer
->> dependencies than the part that is used for keyboard, mouse, audio,
->> vmchannel/agent, etc.
-> 
-> kbd, mouse, audio is needed on the client side and is not part of
-> libspice-server anyway.
 
-Yes, I'm talking about separating the client side from the QXL rendering
-part.
+--ReaqsoxgOBHFXBhH
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
->  So spice is much less of a burden compared
-> to sdl/gtk which bring alot of ui toolkit deps.
+Am 15.05.2018 um 01:44 hat Max Reitz geschrieben:
+> On 2018-05-09 18:26, Kevin Wolf wrote:
+> > This adds a test case that tests the new job-* QMP commands with
+> > mirror and backup block jobs.
+> >=20
+> > Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+> > ---
+> >  tests/qemu-iotests/219     | 201 ++++++++++++++++++++++++++++
+> >  tests/qemu-iotests/219.out | 327 +++++++++++++++++++++++++++++++++++++=
+++++++++
+> >  tests/qemu-iotests/group   |   1 +
+> >  3 files changed, 529 insertions(+)
+> >  create mode 100755 tests/qemu-iotests/219
+> >  create mode 100644 tests/qemu-iotests/219.out
 
-But SPICE does bring in 16 libraries, including both of NSS and OpenSSL...
+> > +Pause/resume in READY
+> > +=3D=3D=3D Testing block-job-pause/block-job-resume =3D=3D=3D
+> > +{u'return': {}}
+> > +{u'timestamp': {u'seconds': 'SECS', u'microseconds': 'USECS'}, u'data'=
+: {u'status': u'standby', u'id': u'job0'}, u'event': u'JOB_STATUS_CHANGE'}
+> > +{u'return': [{u'status': u'standby', u'current-progress': 4194304, u't=
+otal-progress': 4194304, u'id': u'job0', u'type': u'mirror'}]}
+> > +{u'return': {}}
+> > +{u'timestamp': {u'seconds': 'SECS', u'microseconds': 'USECS'}, u'data'=
+: {u'status': u'ready', u'id': u'job0'}, u'event': u'JOB_STATUS_CHANGE'}
+> > +{u'return': [{u'status': u'ready', u'current-progress': 4194304, u'tot=
+al-progress': 4194304, u'id': u'job0', u'type': u'mirror'}]}
+> > +=3D=3D=3D Testing block-job-pause/job-resume =3D=3D=3D
+> > +{u'return': {}}
+> > +{u'timestamp': {u'seconds': 'SECS', u'microseconds': 'USECS'}, u'data'=
+: {u'status': u'standby', u'id': u'job0'}, u'event': u'JOB_STATUS_CHANGE'}
+> > +{u'return': [{u'status': u'standby', u'current-progress': 4194304, u't=
+otal-progress': 4194304, u'id': u'job0', u'type': u'mirror'}]}
+> > +{u'return': {}}
+> > +{u'timestamp': {u'seconds': 'SECS', u'microseconds': 'USECS'}, u'data'=
+: {u'status': u'ready', u'id': u'job0'}, u'event': u'JOB_STATUS_CHANGE'}
+> > +{u'return': [{u'status': u'ready', u'current-progress': 4194304, u'tot=
+al-progress': 4194304, u'id': u'job0', u'type': u'mirror'}]}
+> > +=3D=3D=3D Testing job-pause/block-job-resume =3D=3D=3D
+> > +{u'return': {}}
+> > +{u'timestamp': {u'seconds': 'SECS', u'microseconds': 'USECS'}, u'data'=
+: {u'status': u'standby', u'id': u'job0'}, u'event': u'JOB_STATUS_CHANGE'}
+> > +{u'return': [{u'status': u'standby', u'current-progress': 4194304, u't=
+otal-progress': 4194304, u'id': u'job0', u'type': u'mirror'}]}
+> > +{u'return': {}}
+> > +{u'timestamp': {u'seconds': 'SECS', u'microseconds': 'USECS'}, u'data'=
+: {u'status': u'ready', u'id': u'job0'}, u'event': u'JOB_STATUS_CHANGE'}
+> > +{u'return': [{u'status': u'ready', u'current-progress': 4194304, u'tot=
+al-progress': 4194304, u'id': u'job0', u'type': u'mirror'}]}
+> > +=3D=3D=3D Testing job-pause/job-resume =3D=3D=3D
+> > +{u'return': {}}
+> > +{u'timestamp': {u'seconds': 'SECS', u'microseconds': 'USECS'}, u'data'=
+: {u'status': u'standby', u'id': u'job0'}, u'event': u'JOB_STATUS_CHANGE'}
+> > +{u'return': [{u'status': u'standby', u'current-progress': 4194304, u't=
+otal-progress': 4194304, u'id': u'job0', u'type': u'mirror'}]}
+> > +{u'return': {}}
+> > +{u'timestamp': {u'seconds': 'SECS', u'microseconds': 'USECS'}, u'data'=
+: {u'status': u'ready', u'id': u'job0'}, u'event': u'JOB_STATUS_CHANGE'}
+> > +{u'return': [{u'status': u'ready', u'current-progress': 4194304, u'tot=
+al-progress': 4194304, u'id': u'job0', u'type': u'mirror'}]}
+>=20
+> This is really, really mean.  Don't you have any compassion with the
+> poor little job that just wants to have Feierabend?
+>=20
+> It worked so hard and it's always on standby and instantly ready when
+> you need it.  Yet, you keep it hanging.  That's not nice.
 
-Paolo
+If you just mean that I do some testing with the poor job before I
+complete it, then I'm afraid the job will have to suffer this.
+
+But if you have a more serious concern, I don't see it. Isn't the job
+properly completed in the end, as the following lines show?
+
+> > +{u'error': {u'class': u'GenericError', u'desc': u"Job 'job0' in state =
+'ready' cannot accept command verb 'finalize'"}}
+> > +{u'error': {u'class': u'GenericError', u'desc': u"Job 'job0' in state =
+'ready' cannot accept command verb 'dismiss'"}}
+> > +{u'error': {u'class': u'GenericError', u'desc': u"Job 'job0' in state =
+'ready' cannot accept command verb 'finalize'"}}
+> > +{u'error': {u'class': u'GenericError', u'desc': u"Job 'job0' in state =
+'ready' cannot accept command verb 'dismiss'"}}
+> > +{u'return': {}}
+> > +
+> > +Waiting for PENDING state...
+> > +{u'timestamp': {u'seconds': 'SECS', u'microseconds': 'USECS'}, u'data'=
+: {u'status': u'waiting', u'id': u'job0'}, u'event': u'JOB_STATUS_CHANGE'}
+> > +{u'timestamp': {u'seconds': 'SECS', u'microseconds': 'USECS'}, u'data'=
+: {u'status': u'pending', u'id': u'job0'}, u'event': u'JOB_STATUS_CHANGE'}
+> > +{u'timestamp': {u'seconds': 'SECS', u'microseconds': 'USECS'}, u'data'=
+: {u'status': u'concluded', u'id': u'job0'}, u'event': u'JOB_STATUS_CHANGE'}
+> > +{u'timestamp': {u'seconds': 'SECS', u'microseconds': 'USECS'}, u'data'=
+: {u'status': u'null', u'id': u'job0'}, u'event': u'JOB_STATUS_CHANGE'}
+> > +{u'return': []}
+
+Kevin
+
+--ReaqsoxgOBHFXBhH
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIcBAEBAgAGBQJa/Yi5AAoJEH8JsnLIjy/WAfgQAKLrkaPBOrMnIqOiIQcMDBeC
+q88pqBYD+ieZQp0hQIGCA1nGCXXelifNMIfhtV+NqFJtfUaFxVJKD9mwJuSL0jLp
+N1bij/3cICWtNExqB9FZimAfsMeO5YvPH3AkIE78mR3Nzy7iBNVzULymflm5UuLi
++iBZHyoZgPVAaY4gLrmVm/oRcWJqh4xfIuakStTG4zWWNT465rbwOsbQfHBzDwLS
+5IYQBVpCqSLYRy1VsfwVxJYLmwucSaXLdJD2bObZdSRFEEE0hIVsEoOHD+7/iiJx
+TjQ3XBGxPvBTrCpsBo0IBhGC6+408mv618a/v3C8+EDqAQL9viGuWC4aqFt7XwCD
+ziajQD8T1juuympdfBOJy1upcLIf6GquZLWBINhawh0EMdpwm+5juuiXnvkL7S2Z
+oAV4qageo5/qubzh4OyIrkyMKdCmsBkQZ6Sx1SCWFcbhyP5NlTOTWt45oiLiirnM
+XumugJyAGB4jTRap8ATTWq0iyp4NX9Tg71KJHeTqzFF3HyEGqYV6uoogmtuKJQsy
+KkHjcE6F+7tF8loB2awHiOtCyyh0drsp1EieS+FxJACC4tdlerVecjKvzvm121m4
+8QTBwnM5YGfj8IqqdUh1IT67UGdzzX+L7PVq84HwxKYdc+6/XsTa+KZfZxucENJc
+zwCc1+ylkirz1VugQWk/
+=P/gU
+-----END PGP SIGNATURE-----
+
+--ReaqsoxgOBHFXBhH--
