@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50922)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50967)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fJN04-0006IS-FL
-	for qemu-devel@nongnu.org; Thu, 17 May 2018 13:47:37 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1fJN06-0006KN-M2
+	for qemu-devel@nongnu.org; Thu, 17 May 2018 13:47:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fJN02-0003Yp-Eb
-	for qemu-devel@nongnu.org; Thu, 17 May 2018 13:47:35 -0400
-Received: from mail-wm0-x244.google.com ([2a00:1450:400c:c09::244]:55531)
+	(envelope-from <alex.bennee@linaro.org>) id 1fJN05-0003aC-CL
+	for qemu-devel@nongnu.org; Thu, 17 May 2018 13:47:38 -0400
+Received: from mail-wr0-x22a.google.com ([2a00:1450:400c:c0c::22a]:38319)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1fJN02-0003Yc-6W
-	for qemu-devel@nongnu.org; Thu, 17 May 2018 13:47:34 -0400
-Received: by mail-wm0-x244.google.com with SMTP id a8-v6so9885718wmg.5
-	for <qemu-devel@nongnu.org>; Thu, 17 May 2018 10:47:34 -0700 (PDT)
+	id 1fJN05-0003Zm-2b
+	for qemu-devel@nongnu.org; Thu, 17 May 2018 13:47:37 -0400
+Received: by mail-wr0-x22a.google.com with SMTP id 94-v6so6546618wrf.5
+	for <qemu-devel@nongnu.org>; Thu, 17 May 2018 10:47:36 -0700 (PDT)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Thu, 17 May 2018 18:46:38 +0100
-Message-Id: <20180517174718.10107-10-alex.bennee@linaro.org>
+Date: Thu, 17 May 2018 18:46:43 +0100
+Message-Id: <20180517174718.10107-15-alex.bennee@linaro.org>
 In-Reply-To: <20180517174718.10107-1-alex.bennee@linaro.org>
 References: <20180517174718.10107-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v4 09/49] docker: extend "cc" command to accept
- compiler
+Subject: [Qemu-devel] [PATCH v4 14/49] tests/tcg/multiarch: enable
+ additional linux-test tests
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,40 +33,166 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: cota@braap.org, famz@redhat.com, berrange@redhat.com, f4bug@amsat.org, richard.henderson@linaro.org, balrogg@gmail.com, aurelien@aurel32.net, agraf@suse.de
 Cc: qemu-devel@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 
-When calling our cross-compilation images we want to call something
-other than the default cc.
+Un-comment the remaining tests.
+
+I removed the itimer value tests because I'm fairly sure a re-arming
+timer will always have a different value in it when you grab it.
+
+I've also fixed up the clone thread flags as QEMU will only allow a
+clone to use flags which match glibc. However the test is still racey
+so it remains disabled by default - it can be run by passing any
+additional parameters on the command line.
 
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Reviewed-by: Fam Zheng <famz@redhat.com>
+Tested-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 ---
-v2
-  - use arg.cc default to simplify logic
+v3
+  - make clone flags match CLONE_THREAD_FLAGS
+v4
+  - disable test_clone for default case
 ---
- tests/docker/docker.py | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+ tests/tcg/multiarch/linux-test.c | 51 +++++++++++++++++++++-----------
+ 1 file changed, 33 insertions(+), 18 deletions(-)
 
-diff --git a/tests/docker/docker.py b/tests/docker/docker.py
-index bcc3ee2dee..59bce9f19a 100755
---- a/tests/docker/docker.py
-+++ b/tests/docker/docker.py
-@@ -415,6 +415,8 @@ class CcCommand(SubCommand):
-     def args(self, parser):
-         parser.add_argument("--image", "-i", required=True,
-                             help="The docker image in which to run cc")
-+        parser.add_argument("--cc", default="cc",
-+                            help="The compiler executable to call")
-         parser.add_argument("--source-path", "-s", nargs="*", dest="paths",
-                             help="""Extra paths to (ro) mount into container for
-                             reading sources""")
-@@ -428,7 +430,7 @@ class CcCommand(SubCommand):
-         if args.paths:
-             for p in args.paths:
-                 cmd += ["-v", "%s:%s:ro,z" % (p, p)]
--        cmd += [args.image, "cc"]
-+        cmd += [args.image, args.cc]
-         cmd += argv
-         return Docker().command("run", cmd, args.quiet)
+diff --git a/tests/tcg/multiarch/linux-test.c b/tests/tcg/multiarch/linux-test.c
+index 4457bd04ba..6f2c531474 100644
+--- a/tests/tcg/multiarch/linux-test.c
++++ b/tests/tcg/multiarch/linux-test.c
+@@ -16,6 +16,7 @@
+  *  You should have received a copy of the GNU General Public License
+  *  along with this program; if not, see <http://www.gnu.org/licenses/>.
+  */
++#define _GNU_SOURCE
+ #include <stdarg.h>
+ #include <stdlib.h>
+ #include <stdio.h>
+@@ -58,8 +59,8 @@ static void error1(const char *filename, int line, const char *fmt, ...)
+ static int __chk_error(const char *filename, int line, int ret)
+ {
+     if (ret < 0) {
+-        error1(filename, line, "%m (ret=%d, errno=%d)",
+-               ret, errno);
++        error1(filename, line, "%m (ret=%d, errno=%d/%s)",
++               ret, errno, strerror(errno));
+     }
+     return ret;
+ }
+@@ -216,6 +217,7 @@ static void test_fork(void)
+     pid = chk_error(fork());
+     if (pid == 0) {
+         /* child */
++        sleep(2);
+         exit(2);
+     }
+     chk_error(waitpid(pid, &status, 0));
+@@ -320,7 +322,6 @@ static void test_socket(void)
+     chk_error(close(server_fd));
+ }
  
+-#if 0
+ #define WCOUNT_MAX 512
+ 
+ static void test_pipe(void)
+@@ -355,7 +356,7 @@ static void test_pipe(void)
+             }
+             if (FD_ISSET(fds[1], &wfds)) {
+                 ch = 'a';
+-                chk_error(write(fds[0], &ch, 1));
++                chk_error(write(fds[1], &ch, 1));
+                 wcount++;
+             }
+         }
+@@ -387,28 +388,41 @@ static int thread2_func(void *arg)
+     return 0;
+ }
+ 
+-void test_clone(void)
++static void wait_for_child(pid_t pid)
++{
++    int status;
++    chk_error(waitpid(pid, &status, 0));
++}
++
++/* For test_clone we must match the clone flags used by glibc, see
++ * CLONE_THREAD_FLAGS in the QEMU source code.
++ */
++static void test_clone(void)
+ {
+     uint8_t *stack1, *stack2;
+-    int pid1, pid2, status1, status2;
++    pid_t pid1, pid2;
+ 
+     stack1 = malloc(STACK_SIZE);
+     pid1 = chk_error(clone(thread1_func, stack1 + STACK_SIZE,
+-                           CLONE_VM | CLONE_FS | CLONE_FILES | SIGCHLD, "hello1"));
++                           CLONE_VM | CLONE_FS | CLONE_FILES |
++                           CLONE_SIGHAND | CLONE_THREAD | CLONE_SYSVSEM,
++                            "hello1"));
+ 
+     stack2 = malloc(STACK_SIZE);
+     pid2 = chk_error(clone(thread2_func, stack2 + STACK_SIZE,
+-                           CLONE_VM | CLONE_FS | CLONE_FILES | SIGCHLD, "hello2"));
++                           CLONE_VM | CLONE_FS | CLONE_FILES |
++                           CLONE_SIGHAND | CLONE_THREAD | CLONE_SYSVSEM,
++                           "hello2"));
+ 
+-    while (waitpid(pid1, &status1, 0) != pid1);
++    wait_for_child(pid1);
+     free(stack1);
+-    while (waitpid(pid2, &status2, 0) != pid2);
++    wait_for_child(pid2);
+     free(stack2);
++
+     if (thread1_res != 5 ||
+         thread2_res != 6)
+         error("clone");
+ }
+-#endif
+ 
+ /***********************************/
+ 
+@@ -449,12 +463,10 @@ static void test_signal(void)
+     it.it_value.tv_usec = 10 * 1000;
+     chk_error(setitimer(ITIMER_REAL, &it, NULL));
+     chk_error(getitimer(ITIMER_REAL, &oit));
+-    if (oit.it_value.tv_sec != it.it_value.tv_sec ||
+-        oit.it_value.tv_usec != it.it_value.tv_usec)
+-        error("itimer");
+ 
+     while (alarm_count < 5) {
+         usleep(10 * 1000);
++        getitimer(ITIMER_REAL, &oit);
+     }
+ 
+     it.it_interval.tv_sec = 0;
+@@ -463,9 +475,6 @@ static void test_signal(void)
+     it.it_value.tv_usec = 0;
+     memset(&oit, 0xff, sizeof(oit));
+     chk_error(setitimer(ITIMER_REAL, &it, &oit));
+-    if (oit.it_value.tv_sec != 0 ||
+-        oit.it_value.tv_usec != 10 * 1000)
+-        error("setitimer");
+ 
+     /* SIGSEGV test */
+     act.sa_sigaction = sig_segv;
+@@ -503,10 +512,16 @@ static void test_shm(void)
+ int main(int argc, char **argv)
+ {
+     test_file();
++    test_pipe();
+     test_fork();
+     test_time();
+     test_socket();
+-    //    test_clone();
++
++    if (argc > 1) {
++        printf("test_clone still considered buggy\n");
++        test_clone();
++    }
++
+     test_signal();
+     test_shm();
+     return 0;
 -- 
 2.17.0
