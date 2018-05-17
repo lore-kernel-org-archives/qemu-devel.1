@@ -1,26 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44910)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44958)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1fJFkO-0000Md-Gv
-	for qemu-devel@nongnu.org; Thu, 17 May 2018 06:02:59 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1fJFkj-0000dK-GP
+	for qemu-devel@nongnu.org; Thu, 17 May 2018 06:03:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1fJFkL-0008To-Ss
-	for qemu-devel@nongnu.org; Thu, 17 May 2018 06:02:56 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:57878 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1fJFkL-0008TQ-FH
-	for qemu-devel@nongnu.org; Thu, 17 May 2018 06:02:53 -0400
-Date: Thu, 17 May 2018 18:02:47 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20180517100247.GB26089@xz-mi>
-References: <20180504030811.28111-1-peterx@redhat.com>
-	<20180504030811.28111-3-peterx@redhat.com>
-	<17437758-3b51-72c7-81ba-cb0df0a22c1c@redhat.com>
+	(envelope-from <vsementsov@virtuozzo.com>) id 1fJFkd-00008b-Ox
+	for qemu-devel@nongnu.org; Thu, 17 May 2018 06:03:17 -0400
+References: <20180512012537.22478-1-jsnow@redhat.com>
+	<20180512012537.22478-8-jsnow@redhat.com>
+	<453c0511-0114-49f9-07e1-3eb63c06cf6c@virtuozzo.com>
+	<a168ef12-19ae-0eec-a447-11f04d2b7e56@redhat.com>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-ID: <3545c85c-e4fc-bfce-d732-02ed9359c7d0@virtuozzo.com>
+Date: Thu, 17 May 2018 13:03:05 +0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <17437758-3b51-72c7-81ba-cb0df0a22c1c@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2 02/10] intel-iommu: remove
- IntelIOMMUNotifierNode
+In-Reply-To: <a168ef12-19ae-0eec-a447-11f04d2b7e56@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
+Content-Language: en-US
+Subject: Re: [Qemu-devel] [RFC PATCH 07/12] qcow2-bitmap: add basic bitmaps
+ info
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,90 +27,107 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Auger Eric <eric.auger@redhat.com>
-Cc: qemu-devel@nongnu.org, Tian Kevin <kevin.tian@intel.com>, "Michael S . Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, Alex Williamson <alex.williamson@redhat.com>, Jintack Lim <jintack@cs.columbia.edu>
+To: John Snow <jsnow@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, Markus Armbruster <armbru@redhat.com>, Max Reitz <mreitz@redhat.com>
 
-On Thu, May 17, 2018 at 11:46:22AM +0200, Auger Eric wrote:
-> Hi Peter,
-> 
-> On 05/04/2018 05:08 AM, Peter Xu wrote:
-> > That is not really necessary.  Removing that node struct and put the
-> > list entry directly into VTDAddressSpace.  It simplfies the code a lot.
-> > 
-> > Signed-off-by: Peter Xu <peterx@redhat.com>
-> > ---
-> >  include/hw/i386/intel_iommu.h |  9 ++------
-> >  hw/i386/intel_iommu.c         | 41 ++++++++++-------------------------
-> >  2 files changed, 14 insertions(+), 36 deletions(-)
-> > 
-> > diff --git a/include/hw/i386/intel_iommu.h b/include/hw/i386/intel_iommu.h
-> > index 45ec8919b6..220697253f 100644
-> > --- a/include/hw/i386/intel_iommu.h
-> > +++ b/include/hw/i386/intel_iommu.h
-> > @@ -67,7 +67,6 @@ typedef union VTD_IR_TableEntry VTD_IR_TableEntry;
-> >  typedef union VTD_IR_MSIAddress VTD_IR_MSIAddress;
-> >  typedef struct VTDIrq VTDIrq;
-> >  typedef struct VTD_MSIMessage VTD_MSIMessage;
-> > -typedef struct IntelIOMMUNotifierNode IntelIOMMUNotifierNode;
-> >  
-> >  /* Context-Entry */
-> >  struct VTDContextEntry {
-> > @@ -93,6 +92,7 @@ struct VTDAddressSpace {
-> >      MemoryRegion iommu_ir;      /* Interrupt region: 0xfeeXXXXX */
-> >      IntelIOMMUState *iommu_state;
-> >      VTDContextCacheEntry context_cache_entry;
-> > +    QLIST_ENTRY(VTDAddressSpace) next;
-> >  };
-> >  
-> >  struct VTDBus {
-> > @@ -253,11 +253,6 @@ struct VTD_MSIMessage {
-> >  /* When IR is enabled, all MSI/MSI-X data bits should be zero */
-> >  #define VTD_IR_MSI_DATA          (0)
-> >  
-> > -struct IntelIOMMUNotifierNode {
-> > -    VTDAddressSpace *vtd_as;
-> > -    QLIST_ENTRY(IntelIOMMUNotifierNode) next;
-> > -};
-> > -
-> >  /* The iommu (DMAR) device state struct */
-> >  struct IntelIOMMUState {
-> >      X86IOMMUState x86_iommu;
-> > @@ -295,7 +290,7 @@ struct IntelIOMMUState {
-> >      GHashTable *vtd_as_by_busptr;   /* VTDBus objects indexed by PCIBus* reference */
-> >      VTDBus *vtd_as_by_bus_num[VTD_PCI_BUS_MAX]; /* VTDBus objects indexed by bus number */
-> >      /* list of registered notifiers */
-> > -    QLIST_HEAD(, IntelIOMMUNotifierNode) notifiers_list;
-> > +    QLIST_HEAD(, VTDAddressSpace) notifiers_list;
-> Wouldn't it make sense to rename notifiers_list into something more
-> understandable like address_spaces?
+17.05.2018 00:17, John Snow wrote:
+>
+> On 05/14/2018 11:12 AM, Vladimir Sementsov-Ogievskiy wrote:
+>> 12.05.2018 04:25, John Snow wrote:
+>>> Add functions for querying the basic information inside of bitmaps.
+>>> Restructure the bitmaps flags masks to facilitate providing a list of
+>>> flags belonging to the bitmap(s) being queried.
+>>>
+>>> Signed-off-by: John Snow <jsnow@redhat.com>
+>>> ---
+>>>  =C2=A0 block/qcow2-bitmap.c | 81
+>>> ++++++++++++++++++++++++++++++++++++++++++++++++++--
+>>>  =C2=A0 block/qcow2.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0=
+ 7 +++++
+>>>  =C2=A0 block/qcow2.h=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0=
+ 1 +
+>>>  =C2=A0 3 files changed, 87 insertions(+), 2 deletions(-)
+>>>
+>>> diff --git a/block/qcow2-bitmap.c b/block/qcow2-bitmap.c
+>>> index 60e01abfd7..811b82743a 100644
+>>> --- a/block/qcow2-bitmap.c
+>>> +++ b/block/qcow2-bitmap.c
+>>> @@ -49,8 +49,28 @@
+>>>  =C2=A0 =C2=A0 /* Bitmap directory entry flags */
+>>>  =C2=A0 #define BME_RESERVED_FLAGS 0xfffffffcU
+>>> -#define BME_FLAG_IN_USE (1U << 0)
+>>> -#define BME_FLAG_AUTO=C2=A0=C2=A0 (1U << 1)
+>>> +
+>>> +enum BME_FLAG_BITS {
+>>> +=C2=A0=C2=A0=C2=A0 BME_FLAG_BIT__BEGIN =3D 0,
+>>> +=C2=A0=C2=A0=C2=A0 BME_FLAG_BIT_IN_USE =3D BME_FLAG_BIT__BEGIN,
+>>> +=C2=A0=C2=A0=C2=A0 BME_FLAG_BIT_AUTO=C2=A0=C2=A0 =3D 1,
+>>> +=C2=A0=C2=A0=C2=A0 BME_FLAG_BIT_EXTRA=C2=A0 =3D 2,
+>>> +=C2=A0=C2=A0=C2=A0 BME_FLAG_BIT__MAX,
+>>> +};
+>>> +
+>>> +#define BME_FLAG_IN_USE (1U << BME_FLAG_BIT_IN_USE)
+>>> +#define BME_FLAG_AUTO=C2=A0=C2=A0 (1U << BME_FLAG_BIT_AUTO)
+>>> +#define BME_FLAG_EXTRA=C2=A0 (1U << BME_FLAG_BIT_EXTRA)
+>>> +
+>>> +/* Correlate canonical spec values to autogenerated QAPI values */
+>>> +struct {
+>>> +=C2=A0=C2=A0=C2=A0 uint32_t mask;
+>> mask is unused in this patch
+>>
+>>> +=C2=A0=C2=A0=C2=A0 int qapi_value;
+>>> +} BMEFlagMap[BME_FLAG_BIT__MAX] =3D {
+>>> +=C2=A0=C2=A0=C2=A0 [BME_FLAG_BIT_IN_USE] =3D { BME_FLAG_IN_USE,
+>>> BITMAP_FLAG_ENUM_IN_USE },
+>>> +=C2=A0=C2=A0=C2=A0 [BME_FLAG_BIT_AUTO]=C2=A0=C2=A0 =3D { BME_FLAG_AUTO=
+,=C2=A0=C2=A0 BITMAP_FLAG_ENUM_AUTO },
+>>> +=C2=A0=C2=A0=C2=A0 [BME_FLAG_BIT_EXTRA]=C2=A0 =3D { BME_FLAG_EXTRA,
+>>> BITMAP_FLAG_ENUM_EXTRA_DATA_COMPATIBLE },
+>>> +};
+>>>  =C2=A0 =C2=A0 /* bits [1, 8] U [56, 63] are reserved */
+>>>  =C2=A0 #define BME_TABLE_ENTRY_RESERVED_MASK 0xff000000000001feULL
+>>> @@ -663,6 +683,63 @@ static void del_bitmap_list(BlockDriverState *bs)
+>>>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
+>>>  =C2=A0 }
+>>>  =C2=A0 +static BitmapFlagEnumList *get_bitmap_flags(uint32_t flags)
+>>> +{
+>>> +=C2=A0=C2=A0=C2=A0 int i;
+>>> +=C2=A0=C2=A0=C2=A0 BitmapFlagEnumList *flist =3D NULL;
+>>> +=C2=A0=C2=A0=C2=A0 BitmapFlagEnumList *ftmp;
+>>> +
+>>> +=C2=A0=C2=A0=C2=A0 while (flags) {
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 i =3D ctz32(flags);
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ftmp =3D g_new0(BitmapFlagE=
+numList, 1);
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (i >=3D BME_FLAG_BIT__BE=
+GIN && i < BME_FLAG_BIT__MAX) {
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ftm=
+p->value =3D BMEFlagMap[i].qapi_value;
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 } else {
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ftm=
+p->value =3D BITMAP_FLAG_ENUM_UNKNOWN;
+>> so, there may be several "unknown" entries. It's inconsistent with
+>> "@unknown: This bitmap has unknown or reserved properties.".
+>>
+>> Finally, can we export values for unknown flags? It should be more
+>> informative.
+>>
+> I changed my mind -- qemu-img is not a debugging tool and shouldn't get
+> lost in the weeds trying to enumerate the different kinds of reserved
+> values that are set.
+>
+> It's an error to have them set, or not -- which ones specifically is not
+> information that an end-user need know or care about, and I don't want
+> to create an extra structure to contain the value.
+>
+> I'm going to rewrite this loop to just only ever have one unknown value
+> at a maximum.
+>
+> --js
+>
 
-But address_spaces might be a bit confusing too on the other side as
-"a list of all VT-d address spaces".  How about something like:
+Ok, I agree.
 
-     address_spaces_with_notifiers
-
-?
-
-[...]
-
-> > -    /* update notifier node with new flags */
-> > -    QLIST_FOREACH_SAFE(node, &s->notifiers_list, next, next_node) {
-> > -        if (node->vtd_as == vtd_as) {
-> > -            if (new == IOMMU_NOTIFIER_NONE) {
-> > -                QLIST_REMOVE(node, next);
-> > -                g_free(node);
-> > -            }
-> > -            return;
-> > -        }
-> > +        /* Insert new ones */
-> s/ones/one
-> 
-> > +        QLIST_INSERT_HEAD(&s->notifiers_list, vtd_as, next);
-> > +    } else if (new == IOMMU_NOTIFIER_NONE) {
-> > +        /* Remove old ones */
-> same. Not sure the comments are worth.
-
-Will remove two "s"s there.  Thanks,
-
--- 
-Peter Xu
+--=20
+Best regards,
+Vladimir
