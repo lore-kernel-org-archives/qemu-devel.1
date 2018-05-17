@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50830)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50901)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fJMzw-0006Eh-Am
-	for qemu-devel@nongnu.org; Thu, 17 May 2018 13:47:29 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1fJN02-0006Hw-DP
+	for qemu-devel@nongnu.org; Thu, 17 May 2018 13:47:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fJMzv-0003SZ-Fp
-	for qemu-devel@nongnu.org; Thu, 17 May 2018 13:47:28 -0400
-Received: from mail-wr0-x22d.google.com ([2a00:1450:400c:c0c::22d]:33176)
+	(envelope-from <alex.bennee@linaro.org>) id 1fJN01-0003YY-Ft
+	for qemu-devel@nongnu.org; Thu, 17 May 2018 13:47:34 -0400
+Received: from mail-wr0-x234.google.com ([2a00:1450:400c:c0c::234]:42860)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1fJMzv-0003S9-92
-	for qemu-devel@nongnu.org; Thu, 17 May 2018 13:47:27 -0400
-Received: by mail-wr0-x22d.google.com with SMTP id o4-v6so6573336wrm.0
-	for <qemu-devel@nongnu.org>; Thu, 17 May 2018 10:47:27 -0700 (PDT)
+	id 1fJN01-0003YH-8m
+	for qemu-devel@nongnu.org; Thu, 17 May 2018 13:47:33 -0400
+Received: by mail-wr0-x234.google.com with SMTP id t16-v6so3367974wrm.9
+	for <qemu-devel@nongnu.org>; Thu, 17 May 2018 10:47:33 -0700 (PDT)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Thu, 17 May 2018 18:46:35 +0100
-Message-Id: <20180517174718.10107-7-alex.bennee@linaro.org>
+Date: Thu, 17 May 2018 18:46:39 +0100
+Message-Id: <20180517174718.10107-11-alex.bennee@linaro.org>
 In-Reply-To: <20180517174718.10107-1-alex.bennee@linaro.org>
 References: <20180517174718.10107-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v4 06/49] configure: set cross_cc_FOO for host
- compiler
+Subject: [Qemu-devel] [PATCH v4 10/49] docker: allow "cc" command to run in
+ user context
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,66 +33,35 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: cota@braap.org, famz@redhat.com, berrange@redhat.com, f4bug@amsat.org, richard.henderson@linaro.org, balrogg@gmail.com, aurelien@aurel32.net, agraf@suse.de
 Cc: qemu-devel@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 
-We can build tests for the host system with the compiler that we have
-selected.
-
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Reviewed-by: Fam Zheng <famz@redhat.com>
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Tested-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- configure | 14 +++++++++++++-
- 1 file changed, 13 insertions(+), 1 deletion(-)
+ tests/docker/docker.py | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-diff --git a/configure b/configure
-index 2c2f27b755..01b20355ca 100755
---- a/configure
-+++ b/configure
-@@ -1431,26 +1431,38 @@ case "$cpu" in
-     ppc)
-            CPU_CFLAGS="-m32"
-            LDFLAGS="-m32 $LDFLAGS"
-+           cross_cc_powerpc=$cc
-+           cross_cc_cflags_powerpc=$CPU_CFLAGS
-            ;;
-     ppc64)
-            CPU_CFLAGS="-m64"
-            LDFLAGS="-m64 $LDFLAGS"
-+           cross_cc_ppc64=$cc
-+           cross_cc_cflags_ppc64=$CPU_CFLAGS
-            ;;
-     sparc)
-            CPU_CFLAGS="-m32 -mv8plus -mcpu=ultrasparc"
-            LDFLAGS="-m32 -mv8plus $LDFLAGS"
-+           cross_cc_sparc=$cc
-+           cross_cc_cflags_sparc=$CPU_CFLAGS
-            ;;
-     sparc64)
-            CPU_CFLAGS="-m64 -mcpu=ultrasparc"
-            LDFLAGS="-m64 $LDFLAGS"
-+           cross_cc_sparc64=$cc
-+           cross_cc_cflags_sparc64=$CPU_CFLAGS
-            ;;
-     s390)
-            CPU_CFLAGS="-m31"
-            LDFLAGS="-m31 $LDFLAGS"
-+           cross_cc_s390=$cc
-+           cross_cc_cflags_s390=$CPU_CFLAGS
-            ;;
-     s390x)
-            CPU_CFLAGS="-m64"
-            LDFLAGS="-m64 $LDFLAGS"
-+           cross_cc_s390x=$cc
-+           cross_cc_cflags_s390x=$CPU_CFLAGS
-            ;;
-     i386)
-            CPU_CFLAGS="-m32"
-@@ -1471,7 +1483,7 @@ case "$cpu" in
-            CPU_CFLAGS="-mx32"
-            LDFLAGS="-mx32 $LDFLAGS"
-            cross_cc_i386=$cc
--           cross_cc_cflags_i386="-m32"
-+           cross_cc_cflags_i386=$CPU_CFLAGS
-            ;;
-     # No special flags required for other host CPUs
- esac
+diff --git a/tests/docker/docker.py b/tests/docker/docker.py
+index 59bce9f19a..37bfa98005 100755
+--- a/tests/docker/docker.py
++++ b/tests/docker/docker.py
+@@ -417,6 +417,8 @@ class CcCommand(SubCommand):
+                             help="The docker image in which to run cc")
+         parser.add_argument("--cc", default="cc",
+                             help="The compiler executable to call")
++        parser.add_argument("--user",
++                            help="The user-id to run under")
+         parser.add_argument("--source-path", "-s", nargs="*", dest="paths",
+                             help="""Extra paths to (ro) mount into container for
+                             reading sources""")
+@@ -430,6 +432,8 @@ class CcCommand(SubCommand):
+         if args.paths:
+             for p in args.paths:
+                 cmd += ["-v", "%s:%s:ro,z" % (p, p)]
++        if args.user:
++            cmd += ["-u", args.user]
+         cmd += [args.image, args.cc]
+         cmd += argv
+         return Docker().command("run", cmd, args.quiet)
 -- 
 2.17.0
