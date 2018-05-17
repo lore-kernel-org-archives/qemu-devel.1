@@ -1,26 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52355)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55678)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1fJEFH-0002tk-Ko
-	for qemu-devel@nongnu.org; Thu, 17 May 2018 04:26:44 -0400
+	(envelope-from <armbru@redhat.com>) id 1fJEWS-0004YM-Di
+	for qemu-devel@nongnu.org; Thu, 17 May 2018 04:44:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1fJEFE-0000ST-Dk
-	for qemu-devel@nongnu.org; Thu, 17 May 2018 04:26:43 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:54678 helo=mx1.redhat.com)
+	(envelope-from <armbru@redhat.com>) id 1fJEWP-0000nF-93
+	for qemu-devel@nongnu.org; Thu, 17 May 2018 04:44:28 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:55326 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1fJEFE-0000SL-9r
-	for qemu-devel@nongnu.org; Thu, 17 May 2018 04:26:40 -0400
-From: Laszlo Ersek <lersek@redhat.com>
-References: <20180515123007.10164-1-marcandre.lureau@redhat.com>
-	<fa1fac3a-6662-6516-5d65-827b9d36d6b0@redhat.com>
-Message-ID: <af7d9bbf-1a5b-1937-4b19-02442c95a6a1@redhat.com>
-Date: Thu, 17 May 2018 10:26:33 +0200
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fJEWO-0000mp-Vk
+	for qemu-devel@nongnu.org; Thu, 17 May 2018 04:44:25 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <20180515140944.15979-1-danielhb@linux.ibm.com>
+	<20180515140944.15979-2-danielhb@linux.ibm.com>
+	<87zi10udl9.fsf@dusky.pond.sub.org>
+	<061a0f45-857c-3210-9fb2-af2469eb7956@linux.ibm.com>
+Date: Thu, 17 May 2018 10:44:22 +0200
+In-Reply-To: <061a0f45-857c-3210-9fb2-af2469eb7956@linux.ibm.com> (Daniel
+	Henrique Barboza's message of "Wed, 16 May 2018 10:13:28 -0300")
+Message-ID: <871seaoemx.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <fa1fac3a-6662-6516-5d65-827b9d36d6b0@redhat.com>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [edk2] [PATCH 0/4] RFC: ovmf: Add support for TPM
- Physical Presence interface
+Subject: Re: [Qemu-devel] [PATCH v6 1/2] qmp: adding
+ 'wakeup-suspend-support' in query-target
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,48 +31,180 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: marcandre.lureau@redhat.com, edk2-devel@lists.01.org
-Cc: qemu-devel@nongnu.org, javierm@redhat.com, pjones@redhat.com, jiewen.yao@intel.com
+To: Daniel Henrique Barboza <danielhb@linux.ibm.com>
+Cc: qemu-devel@nongnu.org, dgilbert@redhat.com, mdroth@linux.vnet.ibm.com
 
-On 05/17/18 09:54, Laszlo Ersek wrote:
-> On 05/15/18 14:30, marcandre.lureau@redhat.com wrote:
->> From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
->>
->> Hi,
->>
->> The following series adds basic TPM PPI 1.3 support for OVMF-on-QEMU
->> with TPM2 (I haven't tested TPM1, for lack of interest).
->>
->> PPI test runs successfully with Windows 10 WHLK, despite the limited
->> number of supported funcions (tpm2_ppi_funcs table, in particular, no
->> function allows to manipulate Tcg2PhysicalPresenceFlags)
->>
->> The way it works is relatively simple: a memory region is allocated by
->> QEMU to save PPI related variables. An ACPI interface is exposed by
->> QEMU to let the guest manipulate those. At boot, ovmf processes and
->> updates the PPI qemu region and request variables.
->>
->> I build edk2 with:
->>
->> $ build -DTPM2_ENABLE -DSECURE_BOOT_ENABLE
->=20
-> Is -DSECURE_BOOT_ENABLE necessary for *building* with -DTPM2_ENABLE? If
-> that's the case, we should update the DSC files; users building OVMF
-> from source shouldn't have to care about "-D" inter-dependencies, if we
-> can manage that somehow.
->=20
-> If -DSECURE_BOOT_ENABLE is only there because otherwise a guest OS
-> doesn't really make use of -DTPM2_ENABLE either, that's different. In
-> that case, it's fine to allow building OVMF with TPM2 support but
-> without SB support.
+Daniel Henrique Barboza <danielhb@linux.ibm.com> writes:
 
-Oops, almost missed another important omission: in every commit message,
-please insert the following line just above your S-o-b:
+> On 05/15/2018 12:45 PM, Markus Armbruster wrote:
+>> Daniel Henrique Barboza <danielhb@linux.ibm.com> writes:
+>>
+>>> When issuing the qmp/hmp 'system_wakeup' command, what happens in a
+>>> nutshell is:
+>>>
+>>> - qmp_system_wakeup_request set runstate to RUNNING, sets a wakeup_reas=
+on
+>>> and notify the event
+>>> - in the main_loop, all vcpus are paused, a system reset is issued, all
+>>> subscribers of wakeup_notifiers receives a notification, vcpus are then
+>>> resumed and the wake up QAPI event is fired
+>>>
+>>> Note that this procedure alone doesn't ensure that the guest will awake
+>>> from SUSPENDED state - the subscribers of the wake up event must take
+>>> action to resume the guest, otherwise the guest will simply reboot.
+>>>
+>>> At this moment there are only two subscribers of the wake up event: one
+>>> in hw/acpi/core.c and another one in hw/i386/xen/xen-hvm.c. This means
+>>> that system_wakeup does not work as intended with other architectures.
+>>>
+>>> However, only the presence of 'system_wakeup' is required for QGA to
+>>> support 'guest-suspend-ram' and 'guest-suspend-hybrid' at this moment.
+>>> This means that the user/management will expect to suspend the guest us=
+ing
+>>> one of those suspend commands and then resume execution using system_wa=
+keup,
+>>> regardless of the support offered in system_wakeup in the first place.
+>>>
+>>> This patch adds a new flag called 'wakeup-suspend-support' in TargetInfo
+>>> that allows the caller to query if the guest supports wake up from
+>>> suspend via system_wakeup. It goes over the subscribers of the wake up
+>>> event and, if it's empty, it assumes that the guest does not support
+>>> wake up from suspend (and thus, pm-suspend itself).
+>>>
+>>> This is the expected output of query-target when running a x86 guest:
+>>>
+>>> {"execute" : "query-target"}
+>>> {"return": {"arch": "x86_64", "wakeup-suspend-support": true}}
+>>>
+>>> This is the output when running a pseries guest:
+>>>
+>>> {"execute" : "query-target"}
+>>> {"return": {"arch": "ppc64", "wakeup-suspend-support": false}}
+>>>
+>>> Given that the TargetInfo structure is read-only, adding a new flag to
+>>> it is backwards compatible. There is no need to deprecate the old
+>>> TargetInfo format.
+>>>
+>>> With this extra tool, management can avoid situations where a guest
+>>> that does not have proper suspend/wake capabilities ends up in
+>>> inconsistent state (e.g.
+>>> https://github.com/open-power-host-os/qemu/issues/31).
+>>>
+>>> Reported-by: Balamuruhan S <bala24@linux.vnet.ibm.com>
+>>> Signed-off-by: Daniel Henrique Barboza <danielhb@linux.ibm.com>
+>>> ---
+>>>   arch_init.c             |  1 +
+>>>   include/sysemu/sysemu.h |  1 +
+>>>   qapi/misc.json          |  4 +++-
+>>>   vl.c                    | 21 +++++++++++++++++++++
+>>>   4 files changed, 26 insertions(+), 1 deletion(-)
+>>>
+>>> diff --git a/arch_init.c b/arch_init.c
+>>> index 9597218ced..67bdf27528 100644
+>>> --- a/arch_init.c
+>>> +++ b/arch_init.c
+>>> @@ -115,6 +115,7 @@ TargetInfo *qmp_query_target(Error **errp)
+>>>         info->arch =3D qapi_enum_parse(&SysEmuTarget_lookup,
+>>> TARGET_NAME, -1,
+>>>                                    &error_abort);
+>>> +    info->wakeup_suspend_support =3D !qemu_wakeup_notifier_is_empty();
+>> Huh?  Hmm, see "hack" below.
+>>
+>>>         return info;
+>>>   }
+>>> diff --git a/include/sysemu/sysemu.h b/include/sysemu/sysemu.h
+>>> index 544ab77a2b..fbe2a3373e 100644
+>>> --- a/include/sysemu/sysemu.h
+>>> +++ b/include/sysemu/sysemu.h
+>>> @@ -69,6 +69,7 @@ typedef enum WakeupReason {
+>>>   void qemu_system_reset_request(ShutdownCause reason);
+>>>   void qemu_system_suspend_request(void);
+>>>   void qemu_register_suspend_notifier(Notifier *notifier);
+>>> +bool qemu_wakeup_notifier_is_empty(void);
+>>>   void qemu_system_wakeup_request(WakeupReason reason);
+>>>   void qemu_system_wakeup_enable(WakeupReason reason, bool enabled);
+>>>   void qemu_register_wakeup_notifier(Notifier *notifier);
+>>> diff --git a/qapi/misc.json b/qapi/misc.json
+>>> index f5988cc0b5..a385d897ae 100644
+>>> --- a/qapi/misc.json
+>>> +++ b/qapi/misc.json
+>>> @@ -2484,11 +2484,13 @@
+>>>   # Information describing the QEMU target.
+>>>   #
+>>>   # @arch: the target architecture
+>>> +# @wakeup-suspend-support: true if the target supports wake up from
+>>> +#                          suspend (since 2.13)
+>>>   #
+>>>   # Since: 1.2.0
+>>>   ##
+>>>   { 'struct': 'TargetInfo',
+>>> -  'data': { 'arch': 'SysEmuTarget' } }
+>>> +  'data': { 'arch': 'SysEmuTarget', 'wakeup-suspend-support': 'bool' }=
+ }
+>>>     ##
+>>>   # @query-target:
+>> Does the documentation of system_wakeup need fixing?
+>>
+>>     ##
+>>     # @system_wakeup:
+>>     #
+>>     # Wakeup guest from suspend.  Does nothing in case the guest isn't s=
+uspended.
+>>     #
+>>     # Since:  1.1
+>>     #
+>>     # Returns:  nothing.
+>>     #
+>>     # Example:
+>>     #
+>>     # -> { "execute": "system_wakeup" }
+>>     # <- { "return": {} }
+>>     #
+>>     ##
+>>     { 'command': 'system_wakeup' }
+>>
+>> I figure we better explain right here what the command does, both for
+>> wakeup-suspend-support: false and true.
+>
+> Hmm, I've re-sent a patch that changes a bit the behavior of system_wakeup
+> yesterday. The command should now fail with an error if the VM isn't in
+> SUSPENDED state. However, I failed to update this documentation
+> in that patch.
+>
+> What if I resend that system_wakeup patch with the updated
+> documentation such
+> as:
+>
+>
+>    ##
+>    # @system_wakeup:
+>    #
+>    # Wakeup guest from suspend.  Throws an error in case the guest isn't =
+suspended.
+>    #
+>    # Since:  1.1
+>    #
+>    # Returns:  nothing if succeed
+>    #
+>
+>
+> And then I believe we don't need to update this doc again - if the
+> guest isn't suspended,
+> =C2=A0system_wakeup will still fire up an error.
 
-Contributed-under: TianoCore Contribution Agreement 1.1
+What about a guest that is suspended under a QEMU that isn't capable of
+waking it?
 
-We cannot take patches without that line. You can read about it in the
-"Contributions.txt" file, in the project root directory.
+Shouldn't system_wakeup's documentation point to query-target's
+wakeup-suspend-support?
 
-Thanks!
-Laszlo
+> In fact, I could have added that patch in this series too since it
+> kind of relates with these
+> changes as well. Let me know if you think it helps and I'll respin it
+> together with this
+> series.
+
+Respinning in a single series is the simplest way to ensure the patches
+get committed in a sane order.  I'd appreciate that.
+
+[...]
