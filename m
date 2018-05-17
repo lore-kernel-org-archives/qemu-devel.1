@@ -1,27 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39710)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40213)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1fJKMS-0001wF-5x
-	for qemu-devel@nongnu.org; Thu, 17 May 2018 10:58:33 -0400
+	(envelope-from <mprivozn@redhat.com>) id 1fJKOn-0003o8-FX
+	for qemu-devel@nongnu.org; Thu, 17 May 2018 11:01:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1fJKMO-0004D1-Bx
-	for qemu-devel@nongnu.org; Thu, 17 May 2018 10:58:32 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:44720 helo=mx1.redhat.com)
+	(envelope-from <mprivozn@redhat.com>) id 1fJKOh-0005iR-UM
+	for qemu-devel@nongnu.org; Thu, 17 May 2018 11:00:57 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:35518 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1fJKMO-0004Ci-7p
-	for qemu-devel@nongnu.org; Thu, 17 May 2018 10:58:28 -0400
-References: <20180515123007.10164-1-marcandre.lureau@redhat.com>
-	<229d0059-2ab4-bf2d-cbf5-9dca4ff978bd@redhat.com>
-	<CAMxuvazHGsPv9KWQTp7p6JxaPaLPBdw-NgrPN83ne0=SsodVRw@mail.gmail.com>
-From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <ad78160c-a5d8-18cc-e2ac-9bb97a0c76eb@redhat.com>
-Date: Thu, 17 May 2018 16:58:25 +0200
-MIME-Version: 1.0
-In-Reply-To: <CAMxuvazHGsPv9KWQTp7p6JxaPaLPBdw-NgrPN83ne0=SsodVRw@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [edk2] [PATCH 0/4] RFC: ovmf: Add support for TPM
- Physical Presence interface
+	(Exim 4.71) (envelope-from <mprivozn@redhat.com>) id 1fJKOh-0005hy-Ps
+	for qemu-devel@nongnu.org; Thu, 17 May 2018 11:00:51 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.6])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id B43644201B08
+	for <qemu-devel@nongnu.org>; Thu, 17 May 2018 15:00:50 +0000 (UTC)
+From: Michal Privoznik <mprivozn@redhat.com>
+Date: Thu, 17 May 2018 17:00:11 +0200
+Message-Id: <cb05bb1909daa6ba62145c0194aafa05a14ed3d1.1526569138.git.mprivozn@redhat.com>
+Subject: [Qemu-devel] [PATCH] console: Avoid segfault in screendump
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,38 +27,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>
-Cc: edk2-devel@lists.01.org, qemu-devel <qemu-devel@nongnu.org>, javierm@redhat.com, pjones@redhat.com, jiewen.yao@intel.com
+To: qemu-devel@nongnu.org
+Cc: thuth@redhat.com, kraxel@redhat.com
 
-On 05/17/18 16:43, Marc-Andr=C3=A9 Lureau wrote:
-> On Wed, May 16, 2018 at 11:29 AM, Laszlo Ersek <lersek@redhat.com> wrot=
-e:
+After f771c5440e04626f1 it is possible to select device and
+head which to take screendump from. And even though we check if
+provided head number falls within range, it may still happen that
+the console has no surface yet leading to SIGSEGV:
 
->>   - the "xfuncname"-related settings, so that git diff hunk headers @@
->>     are useful for DSC and INF files too,
->>
->=20
-> This is already in my .git/config, I hope it takes it by default in
-> format-patch?
+  qemu.git $ ./x86_64-softmmu/qemu-system-x86_64 \
+    -qmp stdio \
+    -device virtio-vga,id=video0,max_outputs=4
 
-You also need to classify files appropriately so that the xfuncname
-setting apply to them:
+  {"execute":"qmp_capabilities"}
+  {"execute":"screendump", "arguments":{"filename":"/tmp/screen.ppm", "device":"video0", "head":1}}
+  Segmentation fault
 
-https://github.com/tianocore/tianocore.github.io/wiki/Laszlo's-unkempt-gi=
-t-guide-for-edk2-contributors-and-maintainers#contrib-09
+ #0  0x00005628249dda88 in ppm_save (filename=0x56282826cbc0 "/tmp/screen.ppm", ds=0x0, errp=0x7fff52a6fae0) at ui/console.c:304
+ #1  0x00005628249ddd9b in qmp_screendump (filename=0x56282826cbc0 "/tmp/screen.ppm", has_device=true, device=0x5628276902d0 "video0", has_head=true, head=1, errp=0x7fff52a6fae0) at ui/console.c:375
+ #2  0x00005628247740df in qmp_marshal_screendump (args=0x562828265e00, ret=0x7fff52a6fb68, errp=0x7fff52a6fb60) at qapi/qapi-commands-ui.c:110
 
->> Not much of a review, I know; this is all I can offer right now. If yo=
-u
->> have the time to respin just with these superficial changes, that migh=
-t
->> make my life easier. If you prefer to delay them, that's 100% fine too=
-.
->>
->=20
-> I am going to resend with the style fixes.
+Here, @ds from frame #0 (or @surface from frame #1) is
+dereferenced at the very beginning of ppm_save(). And because
+it's NULL crash happens.
 
-I managed to review your v1 in full earlier today, so I'd prefer to
-review your v3, with my more in-depth comments addressed as well.
+Signed-off-by: Michal Privoznik <mprivozn@redhat.com>
+---
 
-Thanks!
-Laszlo
+I'm not entirely sure if this is the right approach, but crasher is bad
+for sure.
+
+ ui/console.c | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/ui/console.c b/ui/console.c
+index 945f05d728..ef1247f872 100644
+--- a/ui/console.c
++++ b/ui/console.c
+@@ -372,6 +372,11 @@ void qmp_screendump(const char *filename, bool has_device, const char *device,
+ 
+     graphic_hw_update(con);
+     surface = qemu_console_surface(con);
++    if (!surface) {
++        error_setg(errp, "no surface");
++        return;
++    }
++
+     ppm_save(filename, surface, errp);
+ }
+ 
+-- 
+2.16.1
