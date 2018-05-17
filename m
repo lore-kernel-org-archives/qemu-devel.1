@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34965)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35227)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mlureau@redhat.com>) id 1fJK7f-0006Ko-Bp
-	for qemu-devel@nongnu.org; Thu, 17 May 2018 10:43:16 -0400
+	(envelope-from <mlureau@redhat.com>) id 1fJK9J-0007g6-Tj
+	for qemu-devel@nongnu.org; Thu, 17 May 2018 10:44:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mlureau@redhat.com>) id 1fJK7a-0005UZ-Ul
-	for qemu-devel@nongnu.org; Thu, 17 May 2018 10:43:15 -0400
-Received: from mail-it0-f67.google.com ([209.85.214.67]:52918)
+	(envelope-from <mlureau@redhat.com>) id 1fJK9F-00064H-2l
+	for qemu-devel@nongnu.org; Thu, 17 May 2018 10:44:57 -0400
+Received: from mail-it0-f68.google.com ([209.85.214.68]:55975)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <mlureau@redhat.com>) id 1fJK7a-0005UP-Pt
-	for qemu-devel@nongnu.org; Thu, 17 May 2018 10:43:10 -0400
-Received: by mail-it0-f67.google.com with SMTP id y189-v6so9110107itb.2
-	for <qemu-devel@nongnu.org>; Thu, 17 May 2018 07:43:09 -0700 (PDT)
+	(Exim 4.71) (envelope-from <mlureau@redhat.com>) id 1fJK9E-000647-Tc
+	for qemu-devel@nongnu.org; Thu, 17 May 2018 10:44:52 -0400
+Received: by mail-it0-f68.google.com with SMTP id 144-v6so9063461iti.5
+	for <qemu-devel@nongnu.org>; Thu, 17 May 2018 07:44:52 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <229d0059-2ab4-bf2d-cbf5-9dca4ff978bd@redhat.com>
+In-Reply-To: <fa1fac3a-6662-6516-5d65-827b9d36d6b0@redhat.com>
 References: <20180515123007.10164-1-marcandre.lureau@redhat.com>
-	<229d0059-2ab4-bf2d-cbf5-9dca4ff978bd@redhat.com>
+	<fa1fac3a-6662-6516-5d65-827b9d36d6b0@redhat.com>
 From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>
-Date: Thu, 17 May 2018 16:43:08 +0200
-Message-ID: <CAMxuvazHGsPv9KWQTp7p6JxaPaLPBdw-NgrPN83ne0=SsodVRw@mail.gmail.com>
+Date: Thu, 17 May 2018 16:44:51 +0200
+Message-ID: <CAMxuvax6O55+mcJFb83B6iEzCyxHU0GhEz=dC_HWtFmEMAC0pQ@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 Subject: Re: [Qemu-devel] [edk2] [PATCH 0/4] RFC: ovmf: Add support for TPM
@@ -35,9 +35,7 @@ Cc: edk2-devel@lists.01.org, qemu-devel <qemu-devel@nongnu.org>, javierm@redhat.
 
 Hi
 
-On Wed, May 16, 2018 at 11:29 AM, Laszlo Ersek <lersek@redhat.com> wrote:
-> Hi Marc-Andr=C3=A9,
->
+On Thu, May 17, 2018 at 9:54 AM, Laszlo Ersek <lersek@redhat.com> wrote:
 > On 05/15/18 14:30, marcandre.lureau@redhat.com wrote:
 >> From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 >>
@@ -45,73 +43,33 @@ On Wed, May 16, 2018 at 11:29 AM, Laszlo Ersek <lersek@redhat.com> wrote:
 >>
 >> The following series adds basic TPM PPI 1.3 support for OVMF-on-QEMU
 >> with TPM2 (I haven't tested TPM1, for lack of interest).
+>>
+>> PPI test runs successfully with Windows 10 WHLK, despite the limited
+>> number of supported funcions (tpm2_ppi_funcs table, in particular, no
+>> function allows to manipulate Tcg2PhysicalPresenceFlags)
+>>
+>> The way it works is relatively simple: a memory region is allocated by
+>> QEMU to save PPI related variables. An ACPI interface is exposed by
+>> QEMU to let the guest manipulate those. At boot, ovmf processes and
+>> updates the PPI qemu region and request variables.
+>>
+>> I build edk2 with:
+>>
+>> $ build -DTPM2_ENABLE -DSECURE_BOOT_ENABLE
 >
-> I got the review of this patch series added to my TODO list, but I'll
-> have to ask for your patience. :(
->
-> From an extremely superficial skim:
->
-> * please use the
->
->     TopDirPkg/ModuleName: blah blah blah
->
->   subject format, or more generally, if a module cannot be identified,
->
->     TopDirPkg: blah blah blah
->
+> Is -DSECURE_BOOT_ENABLE necessary for *building* with -DTPM2_ENABLE? If
+> that's the case, we should update the DSC files; users building OVMF
+> from source shouldn't have to care about "-D" inter-dependencies, if we
+> can manage that somehow.
 
-done
-
-> * the subject line and the commit message shouldn't be wider than 74
->   chars;
->
-
-that should be ok
-
-> * edk2 uses two spaces for general indentation, and I'm noticing some
->   inconsistency there (4 spaces like in QEMU).
-
-yes, I tried to respect that, but sometime fail (emacs c-basic-offset
-2 isn't great with comments)
+No, that's only my build setup, because it is likely both will be used
+together. TPM usage/tests seem to be fine without it.
 
 >
-> * Please consider formatting the patches with "--find-copies-harder"
->   (although I can look at them with the same option after fetching the
->   series from your repo). This option is usually helpful for reviewers
->   when cloning and modifying modules cross-package.
-
-Hmm, I didn't know that option, ok
-
+> If -DSECURE_BOOT_ENABLE is only there because otherwise a guest OS
+> doesn't really make use of -DTPM2_ENABLE either, that's different. In
+> that case, it's fine to allow building OVMF with TPM2 support but
+> without SB support.
 >
-> * Please consider adopting the git settings at
->   <https://github.com/tianocore/tianocore.github.io/wiki/Laszlo's-unkempt=
--git-guide-for-edk2-contributors-and-maintainers>,
->   in particular:
->
->   - "--stat=3D1000 --stat-graph-width=3D20", so that pathnames are not
->     truncated in the diffstats,
->
-
-I use git-publish very often. I had to modify it to pass those options
-(https://github.com/stefanha/git-publish/pull/48)
-
->   - the "xfuncname"-related settings, so that git diff hunk headers @@
->     are useful for DSC and INF files too,
->
-
-This is already in my .git/config, I hope it takes it by default in
-format-patch?
-
->   - the diff order file, so that files are listed in patches in logical
->     order, going from abstract / descriptive (.inf, .h) to concrete /
->     imperative (.c).
->
-
-ok
-
-> Not much of a review, I know; this is all I can offer right now. If you
-> have the time to respin just with these superficial changes, that might
-> make my life easier. If you prefer to delay them, that's 100% fine too.
->
-
-I am going to resend with the style fixes.
+> Thanks!
+> Laszlo
