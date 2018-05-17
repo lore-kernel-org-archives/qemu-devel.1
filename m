@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50900)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50929)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fJN02-0006Hv-DH
-	for qemu-devel@nongnu.org; Thu, 17 May 2018 13:47:36 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1fJN04-0006IT-FM
+	for qemu-devel@nongnu.org; Thu, 17 May 2018 13:47:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fJN00-0003Y1-6o
-	for qemu-devel@nongnu.org; Thu, 17 May 2018 13:47:34 -0400
-Received: from mail-wm0-x232.google.com ([2a00:1450:400c:c09::232]:39641)
+	(envelope-from <alex.bennee@linaro.org>) id 1fJN03-0003ZH-CQ
+	for qemu-devel@nongnu.org; Thu, 17 May 2018 13:47:36 -0400
+Received: from mail-wr0-x22c.google.com ([2a00:1450:400c:c0c::22c]:37333)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1fJMzz-0003Xe-Tu
-	for qemu-devel@nongnu.org; Thu, 17 May 2018 13:47:32 -0400
-Received: by mail-wm0-x232.google.com with SMTP id f8-v6so10621961wmc.4
-	for <qemu-devel@nongnu.org>; Thu, 17 May 2018 10:47:31 -0700 (PDT)
+	id 1fJN03-0003Z0-5a
+	for qemu-devel@nongnu.org; Thu, 17 May 2018 13:47:35 -0400
+Received: by mail-wr0-x22c.google.com with SMTP id h5-v6so6549476wrm.4
+	for <qemu-devel@nongnu.org>; Thu, 17 May 2018 10:47:35 -0700 (PDT)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Thu, 17 May 2018 18:46:36 +0100
-Message-Id: <20180517174718.10107-8-alex.bennee@linaro.org>
+Date: Thu, 17 May 2018 18:46:40 +0100
+Message-Id: <20180517174718.10107-12-alex.bennee@linaro.org>
 In-Reply-To: <20180517174718.10107-1-alex.bennee@linaro.org>
 References: <20180517174718.10107-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v4 07/49] Makefile: Rename TARGET_DIRS to
- TARGET_LIST
+Subject: [Qemu-devel] [PATCH v4 11/49] docker: Makefile.include introduce
+ DOCKER_SCRIPT
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,136 +31,57 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: cota@braap.org, famz@redhat.com, berrange@redhat.com, f4bug@amsat.org, richard.henderson@linaro.org, balrogg@gmail.com, aurelien@aurel32.net, agraf@suse.de
-Cc: qemu-devel@nongnu.org
+Cc: qemu-devel@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 
-From: Fam Zheng <famz@redhat.com>
+Define this in one place to make it easy to re-use.
 
-To be more accurate on its purpose and make code that looks for a certain
-target out of this variable more readable.
-
-Signed-off-by: Fam Zheng <famz@redhat.com>
+Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Tested-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- Makefile               | 20 ++++++++++----------
- configure              |  2 +-
- scripts/create_config  |  2 +-
- tests/Makefile.include |  2 +-
- 4 files changed, 13 insertions(+), 13 deletions(-)
+ tests/docker/Makefile.include | 10 ++++++----
+ 1 file changed, 6 insertions(+), 4 deletions(-)
 
-diff --git a/Makefile b/Makefile
-index 35554b5bef..52cd83f7fd 100644
---- a/Makefile
-+++ b/Makefile
-@@ -62,8 +62,8 @@ seems to have been used for an in-tree build. You can fix this by running \
- endif
- endif
+diff --git a/tests/docker/Makefile.include b/tests/docker/Makefile.include
+index de87341528..6a5aa9ec71 100644
+--- a/tests/docker/Makefile.include
++++ b/tests/docker/Makefile.include
+@@ -14,6 +14,8 @@ DOCKER_TESTS := $(notdir $(shell \
  
--CONFIG_SOFTMMU := $(if $(filter %-softmmu,$(TARGET_DIRS)),y)
--CONFIG_USER_ONLY := $(if $(filter %-user,$(TARGET_DIRS)),y)
-+CONFIG_SOFTMMU := $(if $(filter %-softmmu,$(TARGET_LIST)),y)
-+CONFIG_USER_ONLY := $(if $(filter %-user,$(TARGET_LIST)),y)
- CONFIG_XEN := $(CONFIG_XEN_BACKEND)
- CONFIG_ALL=y
- -include config-all-devices.mak
-@@ -362,8 +362,8 @@ DOCS=
- endif
+ DOCKER_TOOLS := travis
  
- SUBDIR_MAKEFLAGS=$(if $(V),,--no-print-directory --quiet) BUILD_DIR=$(BUILD_DIR)
--SUBDIR_DEVICES_MAK=$(patsubst %, %/config-devices.mak, $(TARGET_DIRS))
--SUBDIR_DEVICES_MAK_DEP=$(patsubst %, %-config-devices.mak.d, $(TARGET_DIRS))
-+SUBDIR_DEVICES_MAK=$(patsubst %, %/config-devices.mak, $(TARGET_LIST))
-+SUBDIR_DEVICES_MAK_DEP=$(patsubst %, %-config-devices.mak.d, $(TARGET_LIST))
++DOCKER_SCRIPT=$(SRC_PATH)/tests/docker/docker.py
++
+ TESTS ?= %
+ IMAGES ?= %
  
- ifeq ($(SUBDIR_DEVICES_MAK),)
- config-all-devices.mak:
-@@ -466,7 +466,7 @@ config-host.h-timestamp: config-host.mak
- qemu-options.def: $(SRC_PATH)/qemu-options.hx $(SRC_PATH)/scripts/hxtool
- 	$(call quiet-command,sh $(SRC_PATH)/scripts/hxtool -h < $< > $@,"GEN","$@")
+@@ -37,7 +39,7 @@ docker-image-%: $(DOCKER_FILES_DIR)/%.docker
+ 		echo WARNING: EXECUTABLE is not set, debootstrap may fail. 2>&1 ; \
+ 	fi
+ 	$(call quiet-command,\
+-		$(SRC_PATH)/tests/docker/docker.py build qemu:$* $< \
++		$(DOCKER_SCRIPT) build qemu:$* $< \
+ 		$(if $V,,--quiet) $(if $(NOCACHE),--no-cache) \
+ 		$(if $(NOUSER),,--add-current-user) \
+ 		$(if $(EXTRA_FILES),--extra-files $(EXTRA_FILES))\
+@@ -129,11 +131,11 @@ docker-run: docker-qemu-src
+ 	fi
+ 	$(if $(EXECUTABLE),						\
+ 		$(call quiet-command,					\
+-			$(SRC_PATH)/tests/docker/docker.py update 	\
++			$(DOCKER_SCRIPT) update 			\
+ 			$(IMAGE) $(EXECUTABLE),				\
+ 			"  COPYING $(EXECUTABLE) to $(IMAGE)"))
+ 	$(call quiet-command,						\
+-		$(SRC_PATH)/tests/docker/docker.py run 			\
++		$(DOCKER_SCRIPT) run 					\
+ 			$(if $(NOUSER),,-u $(shell id -u)) 		\
+ 			--security-opt seccomp=unconfined		\
+ 			$(if $V,,--rm) 					\
+@@ -163,4 +165,4 @@ docker-run-%:
+ 	@$(MAKE) docker-run TEST=$(CMD) IMAGE=qemu:$(IMAGE)
  
--SUBDIR_RULES=$(patsubst %,subdir-%, $(TARGET_DIRS))
-+SUBDIR_RULES=$(patsubst %,subdir-%, $(TARGET_LIST))
- SOFTMMU_SUBDIR_RULES=$(filter %-softmmu,$(SUBDIR_RULES))
- 
- $(SOFTMMU_SUBDIR_RULES): $(block-obj-y)
-@@ -510,7 +510,7 @@ ROMSUBDIR_RULES=$(patsubst %,romsubdir-%, $(ROMS))
- romsubdir-%:
- 	$(call quiet-command,$(MAKE) $(SUBDIR_MAKEFLAGS) -C pc-bios/$* V="$(V)" TARGET_DIR="$*/" CFLAGS="$(filter -O% -g%,$(CFLAGS))",)
- 
--ALL_SUBDIRS=$(TARGET_DIRS) $(patsubst %,pc-bios/%, $(ROMS))
-+ALL_SUBDIRS=$(TARGET_LIST) $(patsubst %,pc-bios/%, $(ROMS))
- 
- recurse-all: $(SUBDIR_RULES) $(ROMSUBDIR_RULES)
- 
-@@ -763,7 +763,7 @@ distclean: clean
- 	rm -f docs/interop/qemu-qmp-ref.pdf docs/interop/qemu-ga-ref.pdf
- 	rm -f docs/interop/qemu-qmp-ref.html docs/interop/qemu-ga-ref.html
- 	rm -f docs/qemu-block-drivers.7
--	for d in $(TARGET_DIRS); do \
-+	for d in $(TARGET_LIST); do \
- 	rm -rf $$d || exit 1 ; \
-         done
- 	rm -Rf .sdk
-@@ -864,7 +864,7 @@ endif
- 		$(INSTALL_DATA) $(SRC_PATH)/pc-bios/keymaps/$$x "$(DESTDIR)$(qemu_datadir)/keymaps"; \
- 	done
- 	$(INSTALL_DATA) $(BUILD_DIR)/trace-events-all "$(DESTDIR)$(qemu_datadir)/trace-events-all"
--	for d in $(TARGET_DIRS); do \
-+	for d in $(TARGET_LIST); do \
- 	$(MAKE) $(SUBDIR_MAKEFLAGS) TARGET_DIR=$$d/ -C $$d $@ || exit 1 ; \
-         done
- 
-@@ -1062,9 +1062,9 @@ endif
- 	@echo  '  ctags/TAGS      - Generate tags file for editors'
- 	@echo  '  cscope          - Generate cscope index'
- 	@echo  ''
--	@$(if $(TARGET_DIRS), \
-+	@$(if $(TARGET_LIST), \
- 		echo 'Architecture specific targets:'; \
--		$(foreach t, $(TARGET_DIRS), \
-+		$(foreach t, $(TARGET_LIST), \
- 		printf "  %-30s - Build for %s\\n" $(patsubst %,subdir-%,$(t)) $(t);) \
- 		echo '')
- 	@echo  'Cleaning targets:'
-diff --git a/configure b/configure
-index 01b20355ca..8a73dbab1d 100755
---- a/configure
-+++ b/configure
-@@ -6168,7 +6168,7 @@ qemu_version=$(head $source_path/VERSION)
- echo "VERSION=$qemu_version" >>$config_host_mak
- echo "PKGVERSION=$pkgversion" >>$config_host_mak
- echo "SRC_PATH=$source_path" >> $config_host_mak
--echo "TARGET_DIRS=$target_list" >> $config_host_mak
-+echo "TARGET_LIST=$target_list" >> $config_host_mak
- if [ "$docs" = "yes" ] ; then
-   echo "BUILD_DOCS=yes" >> $config_host_mak
- fi
-diff --git a/scripts/create_config b/scripts/create_config
-index d727e5e36e..58948a67a4 100755
---- a/scripts/create_config
-+++ b/scripts/create_config
-@@ -107,7 +107,7 @@ case $line in
-     target_name=${line#*=}
-     echo "#define TARGET_NAME \"$target_name\""
-     ;;
-- TARGET_DIRS=*)
-+ TARGET_LIST=*)
-     # do nothing
-     ;;
-  TARGET_*=y) # configuration
-diff --git a/tests/Makefile.include b/tests/Makefile.include
-index 3b9a5e31a2..3d2f0458ab 100644
---- a/tests/Makefile.include
-+++ b/tests/Makefile.include
-@@ -854,7 +854,7 @@ endif
- 
- # QTest rules
- 
--TARGETS=$(patsubst %-softmmu,%, $(filter %-softmmu,$(TARGET_DIRS)))
-+TARGETS=$(patsubst %-softmmu,%, $(filter %-softmmu,$(TARGET_LIST)))
- ifeq ($(CONFIG_POSIX),y)
- QTEST_TARGETS = $(TARGETS)
- check-qtest-y=$(foreach TARGET,$(TARGETS), $(check-qtest-$(TARGET)-y))
+ docker-clean:
+-	$(call quiet-command, $(SRC_PATH)/tests/docker/docker.py clean)
++	$(call quiet-command, $(DOCKER_SCRIPT) clean)
 -- 
 2.17.0
