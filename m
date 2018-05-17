@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52748)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52751)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fJN6Q-0003JK-6G
+	(envelope-from <alex.bennee@linaro.org>) id 1fJN6Q-0003JL-76
 	for qemu-devel@nongnu.org; Thu, 17 May 2018 13:54:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fJN6N-0007Bc-0D
+	(envelope-from <alex.bennee@linaro.org>) id 1fJN6P-0007DE-3e
 	for qemu-devel@nongnu.org; Thu, 17 May 2018 13:54:10 -0400
-Received: from mail-wr0-x242.google.com ([2a00:1450:400c:c0c::242]:43330)
+Received: from mail-wr0-x22a.google.com ([2a00:1450:400c:c0c::22a]:44796)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1fJN6M-0007Ai-Ph
-	for qemu-devel@nongnu.org; Thu, 17 May 2018 13:54:06 -0400
-Received: by mail-wr0-x242.google.com with SMTP id v15-v6so6548294wrm.10
-	for <qemu-devel@nongnu.org>; Thu, 17 May 2018 10:54:06 -0700 (PDT)
+	id 1fJN6O-0007Cr-U7
+	for qemu-devel@nongnu.org; Thu, 17 May 2018 13:54:09 -0400
+Received: by mail-wr0-x22a.google.com with SMTP id y15-v6so6551241wrg.11
+	for <qemu-devel@nongnu.org>; Thu, 17 May 2018 10:54:08 -0700 (PDT)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Thu, 17 May 2018 18:47:08 +0100
-Message-Id: <20180517174718.10107-40-alex.bennee@linaro.org>
+Date: Thu, 17 May 2018 18:47:17 +0100
+Message-Id: <20180517174718.10107-49-alex.bennee@linaro.org>
 In-Reply-To: <20180517174718.10107-1-alex.bennee@linaro.org>
 References: <20180517174718.10107-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v4 39/49] tests/tcg/alpha: add Alpha specific
- tests
+Subject: [Qemu-devel] [PATCH v4 48/49] tests/Makefile.include: add
+ [build|clean|check]-tcg targets
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,153 +31,74 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: cota@braap.org, famz@redhat.com, berrange@redhat.com, f4bug@amsat.org, richard.henderson@linaro.org, balrogg@gmail.com, aurelien@aurel32.net, agraf@suse.de
-Cc: qemu-devel@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Richard Henderson <rth@twiddle.net>
+Cc: qemu-devel@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 
-These tests did use their own crt.o stub however that is a little
-stone age so we drop crt.S and just statically link to the cross
-compilers libraries.
+This will ensure all linux-user targets build their guest test
+programs and ensure check-tcg will run the respective tests.
 
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Tested-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
-v4
-  - drop crt.s
-  - drop skipping of threadtest
-  - drop write() hack, include unistd.h
+v2
+  - use -include instead of complex macro stuff
+  - also include TARGET_BASE_ARCH/Makefile
+v3
+  - add build-tcg, make check-tcg actually run tests
 ---
- tests/tcg/alpha/Makefile        | 35 ---------------------------------
- tests/tcg/alpha/Makefile.target | 15 ++++++++++++++
- tests/tcg/alpha/crt.s           | 26 ------------------------
- tests/tcg/alpha/hello-alpha.c   |  2 ++
- tests/tcg/alpha/test-cond.c     |  1 +
- tests/tcg/alpha/test-ovf.c      |  2 ++
- 6 files changed, 20 insertions(+), 61 deletions(-)
- delete mode 100644 tests/tcg/alpha/Makefile
- create mode 100644 tests/tcg/alpha/Makefile.target
- delete mode 100644 tests/tcg/alpha/crt.s
+ tests/Makefile.include | 26 +++++++++++++++++++++++++-
+ 1 file changed, 25 insertions(+), 1 deletion(-)
 
-diff --git a/tests/tcg/alpha/Makefile b/tests/tcg/alpha/Makefile
-deleted file mode 100644
-index 2b1f03d048..0000000000
---- a/tests/tcg/alpha/Makefile
-+++ /dev/null
-@@ -1,35 +0,0 @@
--CROSS=alpha-linux-gnu-
--CC=$(CROSS)gcc
--AS=$(CROSS)as
--
--SIM=../../alpha-linux-user/qemu-alpha
--
--CFLAGS=-O
--LINK=$(CC) -o $@ crt.o $< -nostdlib
--
--TESTS=test-cond test-cmov
--
--all: hello-alpha $(TESTS)
--
--hello-alpha: hello-alpha.o crt.o
--	$(LINK)
--
--test-cond: test-cond.o crt.o
--	$(LINK)
--
--test-cmov.o: test-cond.c
--	$(CC) -c $(CFLAGS) -DTEST_CMOV -o $@ $<
--
--test-cmov: test-cmov.o crt.o
--	$(LINK)
--
--test-ovf: test-ovf.o crt.o
--	$(LINK)
--
--check: $(TESTS)
--	for f in $(TESTS); do $(SIM) $$f || exit 1; done
--
--clean:
--	$(RM) *.o *~ hello-alpha $(TESTS)
--
--.PHONY: clean all check
-diff --git a/tests/tcg/alpha/Makefile.target b/tests/tcg/alpha/Makefile.target
-new file mode 100644
-index 0000000000..b253cee1fc
---- /dev/null
-+++ b/tests/tcg/alpha/Makefile.target
-@@ -0,0 +1,15 @@
-+# -*- Mode: makefile -*-
-+#
-+# Alpha specific tweaks
-+
-+ALPHA_SRC=$(SRC_PATH)/tests/tcg/alpha
-+VPATH+=$(ALPHA_SRC)
-+
-+ALPHA_TESTS=hello-alpha test-cond test-cmov test-ovf
-+TESTS+=$(ALPHA_TESTS)
-+
-+test-cmov: EXTRA_CFLAGS=-DTEST_CMOV
-+test-cmov: test-cond.c
-+	$(CC) $(CFLAGS) $(EXTRA_CFLAGS) $< -o $@ $(LDFLAGS)
-+
-+run-test-cmov: test-cmov
-diff --git a/tests/tcg/alpha/crt.s b/tests/tcg/alpha/crt.s
-deleted file mode 100644
-index 31af8825bc..0000000000
---- a/tests/tcg/alpha/crt.s
-+++ /dev/null
-@@ -1,26 +0,0 @@
--	.text
--
--	.globl _start
--	.ent _start,0
--_start:
--	.frame $15,0,$15
--	br $29,1f
--1:	ldgp $29, 0($29)
--	.prologue 0
--	ldq $27,main($29) !literal!1
--	jsr $26,($27)
--	or $0,$0,$16
--	.end _start
--
--	.globl _exit
--_exit:
--	lda $0,1
--	callsys
--
--	call_pal 0
--
--	.globl write
--write:
--	lda $0,4
--	callsys
--	ret
-diff --git a/tests/tcg/alpha/hello-alpha.c b/tests/tcg/alpha/hello-alpha.c
-index 79892e6522..84e43b2fc4 100644
---- a/tests/tcg/alpha/hello-alpha.c
-+++ b/tests/tcg/alpha/hello-alpha.c
-@@ -1,3 +1,5 @@
-+#include <unistd.h>
-+
- int main (void)
- {
-   write (1, "hello\n", 6);
-diff --git a/tests/tcg/alpha/test-cond.c b/tests/tcg/alpha/test-cond.c
-index 74adffaa69..e625313b3e 100644
---- a/tests/tcg/alpha/test-cond.c
-+++ b/tests/tcg/alpha/test-cond.c
-@@ -1,3 +1,4 @@
-+#include <unistd.h>
+diff --git a/tests/Makefile.include b/tests/Makefile.include
+index 3d2f0458ab..310ccefdd9 100644
+--- a/tests/Makefile.include
++++ b/tests/Makefile.include
+@@ -10,6 +10,7 @@ check-help:
+ 	@echo " $(MAKE) check-speed          Run qobject speed tests"
+ 	@echo " $(MAKE) check-qapi-schema    Run QAPI schema tests"
+ 	@echo " $(MAKE) check-block          Run block tests"
++	@echo " $(MAKE) check-tcg            Run TCG tests"
+ 	@echo " $(MAKE) check-report.html    Generates an HTML test report"
+ 	@echo " $(MAKE) check-clean          Clean the tests"
+ 	@echo
+@@ -916,6 +917,30 @@ check-report.xml: $(patsubst %,check-report-qtest-%.xml, $(QTEST_TARGETS)) check
+ check-report.html: check-report.xml
+ 	$(call quiet-command,gtester-report $< > $@,"GEN","$@")
  
- #ifdef TEST_CMOV
- 
-diff --git a/tests/tcg/alpha/test-ovf.c b/tests/tcg/alpha/test-ovf.c
-index 01c80e7525..17892f1e89 100644
---- a/tests/tcg/alpha/test-ovf.c
-+++ b/tests/tcg/alpha/test-ovf.c
-@@ -1,3 +1,5 @@
-+#include <unistd.h>
++# Per guest TCG tests
 +
- static long test_subqv (long a, long b)
- {
-   long res;
++LINUX_USER_TARGETS=$(filter %-linux-user,$(TARGET_LIST))
++BUILD_TCG_TARGET_RULES=$(patsubst %,build-tcg-tests-%, $(LINUX_USER_TARGETS))
++CLEAN_TCG_TARGET_RULES=$(patsubst %,clean-tcg-tests-%, $(LINUX_USER_TARGETS))
++RUN_TCG_TARGET_RULES=$(patsubst %,run-tcg-tests-%, $(LINUX_USER_TARGETS))
++
++build-tcg-tests-%:
++	$(call quiet-command,$(MAKE) $(SUBDIR_MAKEFLAGS) -C $* V="$(V)" TARGET_DIR="$*/" guest-tests,)
++
++run-tcg-tests-%: build-tcg-tests-%
++	$(call quiet-command,$(MAKE) $(SUBDIR_MAKEFLAGS) -C $* V="$(V)" TARGET_DIR="$*/" run-guest-tests,)
++
++clean-tcg-tests-%:
++	$(call quiet-command,$(MAKE) $(SUBDIR_MAKEFLAGS) -C $* V="$(V)" TARGET_DIR="$*/" clean-guest-tests,)
++
++.PHONY: build-tcg
++build-tcg: $(BUILD_TCG_TARGET_RULES)
++
++.PHONY: check-tcg
++check-tcg: $(RUN_TCG_TARGET_RULES)
++
++.PHONY: clean-tcg
++clean-tcg: $(CLEAN_TCG_TARGET_RULES)
+ 
+ # Other tests
+ 
+@@ -958,7 +983,6 @@ check-speed: $(patsubst %,check-%, $(check-speed-y))
+ check-block: $(patsubst %,check-%, $(check-block-y))
+ check: check-qapi-schema check-unit check-qtest check-decodetree
+ check-clean:
+-	$(MAKE) -C tests/tcg clean
+ 	rm -rf $(check-unit-y) tests/*.o $(QEMU_IOTESTS_HELPERS-y)
+ 	rm -rf $(sort $(foreach target,$(SYSEMU_TARGET_LIST), $(check-qtest-$(target)-y)) $(check-qtest-generic-y))
+ 	rm -f tests/test-qapi-gen-timestamp
 -- 
 2.17.0
