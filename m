@@ -1,26 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52909)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53459)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fJN6b-0003df-At
-	for qemu-devel@nongnu.org; Thu, 17 May 2018 13:54:22 -0400
+	(envelope-from <mst@redhat.com>) id 1fJN9L-0006FP-2M
+	for qemu-devel@nongnu.org; Thu, 17 May 2018 13:57:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fJN6Y-0007KY-Sj
-	for qemu-devel@nongnu.org; Thu, 17 May 2018 13:54:21 -0400
-Received: from mail-wr0-x230.google.com ([2a00:1450:400c:c0c::230]:40233)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1fJN6Y-0007Jp-Md
-	for qemu-devel@nongnu.org; Thu, 17 May 2018 13:54:18 -0400
-Received: by mail-wr0-x230.google.com with SMTP id v60-v6so6560474wrc.7
-	for <qemu-devel@nongnu.org>; Thu, 17 May 2018 10:54:18 -0700 (PDT)
-From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Thu, 17 May 2018 18:46:52 +0100
-Message-Id: <20180517174718.10107-24-alex.bennee@linaro.org>
-In-Reply-To: <20180517174718.10107-1-alex.bennee@linaro.org>
-References: <20180517174718.10107-1-alex.bennee@linaro.org>
+	(envelope-from <mst@redhat.com>) id 1fJN9G-0000tq-3J
+	for qemu-devel@nongnu.org; Thu, 17 May 2018 13:57:11 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:36092 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1fJN9F-0000tg-Th
+	for qemu-devel@nongnu.org; Thu, 17 May 2018 13:57:06 -0400
+Date: Thu, 17 May 2018 20:57:04 +0300
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20180517203910-mutt-send-email-mst@kernel.org>
+References: <1523953455-28053-1-git-send-email-wanpengli@tencent.com>
+	<20180417205913.GC29865@localhost.localdomain>
+	<02887fa6-d7c8-bc39-6e65-3c3caec5b903@redhat.com>
+	<20180419195610.GA29865@localhost.localdomain>
+	<98f48c44-e55a-2bd2-0d41-5643f35bce68@redhat.com>
+	<20180419215320.GC29865@localhost.localdomain>
+	<20180512010007-mutt-send-email-mst@kernel.org>
+	<20180516123452.GF25013@localhost.localdomain>
+	<20180516172539-mutt-send-email-mst@kernel.org>
+	<20180517173428.GT25013@localhost.localdomain>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v4 23/49] tests/tcg/x86_64: add Makefile.target
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180517173428.GT25013@localhost.localdomain>
+Subject: Re: [Qemu-devel] [PATCH RESEND v2] i386/kvm: add support for
+ KVM_CAP_X86_DISABLE_EXITS
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,72 +36,89 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: cota@braap.org, famz@redhat.com, berrange@redhat.com, f4bug@amsat.org, richard.henderson@linaro.org, balrogg@gmail.com, aurelien@aurel32.net, agraf@suse.de
-Cc: qemu-devel@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Wanpeng Li <kernellwp@gmail.com>, qemu-devel@nongnu.org, kvm@vger.kernel.org, Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>
 
-The sources for x86_64 are shared in the i386 directory which will be
-included thanks to TARGET_BASE_ARCH. However not all sources build so
-we need to filter out the ones we can't build in the 64 bit world.
+On Thu, May 17, 2018 at 02:34:28PM -0300, Eduardo Habkost wrote:
+> On Wed, May 16, 2018 at 05:26:40PM +0300, Michael S. Tsirkin wrote:
+> > On Wed, May 16, 2018 at 09:34:52AM -0300, Eduardo Habkost wrote:
+> > > On Sat, May 12, 2018 at 01:12:59AM +0300, Michael S. Tsirkin wrote:
+> > > > On Thu, Apr 19, 2018 at 06:53:20PM -0300, Eduardo Habkost wrote:
+> > > > > On Thu, Apr 19, 2018 at 11:32:16PM +0200, Paolo Bonzini wrote:
+> > > > > > On 19/04/2018 21:56, Eduardo Habkost wrote:
+> > > > > > > On Thu, Apr 19, 2018 at 05:48:57PM +0200, Paolo Bonzini wrote:
+> > > > > > >> On 17/04/2018 22:59, Eduardo Habkost wrote:
+> > > > > > >>>> +        if (disable_exits) {
+> > > > > > >>>> +            disable_exits &= (KVM_X86_DISABLE_EXITS_MWAIT |
+> > > > > > >>>> +                              KVM_X86_DISABLE_EXITS_HLT |
+> > > > > > >>>> +                              KVM_X86_DISABLE_EXITS_PAUSE);
+> > > > > > >>>> +            if (env->user_features[FEAT_KVM] & KVM_PV_UNHALT) {
+> > > > > > >>>> +                disable_exits &= ~KVM_X86_DISABLE_EXITS_HLT;
+> > > > > > >>>> +            }
+> > > > > > >>>
+> > > > > > >>> In the future, if we decide to enable kvm-pv-unhalt by default,
+> > > > > > >>> should "-cpu ...,kvm-hint-dedicated=on" disable kvm-pv-unhalt
+> > > > > > >>> automatically, or should we require an explicit
+> > > > > > >>> "kvm-hint-dedicated=on,kvm-pv-unhalt=off" option?
+> > > > > > >>
+> > > > > > >> It should be automatic.
+> > > > > > >>
+> > > > > > >>> For today's defaults, this patch solves the problem, only one
+> > > > > > >>> thing is missing before I give my R-b: we need to clearly
+> > > > > > >>> document what exactly are the consequences and requirements of
+> > > > > > >>> setting kvm-hint-dedicated=on (I'm not sure if the best place for
+> > > > > > >>> this is qemu-options.hx, x86_cpu_list(), or somewhere else).
+> > > > > > >>
+> > > > > > >> I don't think we have a good place for this kind of documentation,
+> > > > > > >> unfortunately.  Right now it is mentioned in
+> > > > > > >> Documentation/virtual/kvm/cpuid.txt.
+> > > > > > > 
+> > > > > > > With this patch, the QEMU option will do more than just setting
+> > > > > > > the CPUID bit, that's why I miss more detailed documentation on
+> > > > > > > the QEMU side.  But I agree we have no obvious place for that
+> > > > > > > documentation.
+> > > > > > > 
+> > > > > > > In the worst case we can just add a code comment on top of
+> > > > > > > feature_word_info[FEAT_KVM_HINTS].feat_names warning that
+> > > > > > > kvm-hint-dedicated won't just enable the flag on CPUID and has
+> > > > > > > other side-effects.
+> > > > > > 
+> > > > > > Maybe we should use "-realtime dedicated=on" instead of, or in addition
+> > > > > > to kvm-hint-dedicated=on?
+> > > > > 
+> > > > > Maybe it's a better idea than overloading an option that is only
+> > > > > expected to control a CPUID bit.
+> > > > 
+> > > > Well -realtime would be a bit confusing in that it enables mlock by
+> > > > default.
+> > > > 
+> > > > From pure API point of view, hint-dedicated looks good since
+> > > > it seems to say "optimize for a dedicated host CPU" and
+> > > > it's a hint in that guests keep working if you violate this
+> > > > slightly once in a while.
+> > > > 
+> > > > But I agree there's a problem: right now "kvm-" means "KVM PV"
+> > > > as opposed to e.g. HV enlightened gusts.
+> > > > So if you enable hyperv and also want to disable halt existing,
+> > > > what then? What should kvm-hint-dedicated=on do?
+> > > > 
+> > > > So how about a new hint-dedicated=on cpu flag?  We can have that set
+> > > > kvm-hint-dedicated if kvm PV is enabled.
+> > > 
+> > > Using a boolean flag that is _not_ considered a CPUID feature
+> > > flag would be better.  Using the CPUID feature flag name risks
+> > > having management software enabling the flag by accident (as it
+> > > will get included in query-cpu-model-* queries).  A separate
+> > > boolean flag would make this clearer.
+> > 
+> > Can we remove all hints from query-cpu-model queries?
+> 
+> We already do (see usage of EatureWordInfo::no_autoenable_flags).
+> This is just a matter of making the configuration option
+> decoupled from the CPUID code, to avoid surprises elsewhere.
 
-Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Tested-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+It it too late to drop the hint flag and rename to a -realtime option?
 
----
-v4
-  - update MAINTAINERS
----
- MAINTAINERS                      |  1 +
- tests/tcg/i386/Makefile.target   |  2 +-
- tests/tcg/x86_64/Makefile.target | 15 +++++++++++++++
- 3 files changed, 17 insertions(+), 1 deletion(-)
- create mode 100644 tests/tcg/x86_64/Makefile.target
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 688f166d39..17b9fc0fbe 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -284,6 +284,7 @@ M: Eduardo Habkost <ehabkost@redhat.com>
- S: Maintained
- F: target/i386/
- F: tests/tcg/i386/
-+F: tests/tcg/x86_64/
- F: hw/i386/
- F: disas/i386.c
- T: git git://github.com/ehabkost/qemu.git x86-next
-diff --git a/tests/tcg/i386/Makefile.target b/tests/tcg/i386/Makefile.target
-index 290073a882..6d7d4a164e 100644
---- a/tests/tcg/i386/Makefile.target
-+++ b/tests/tcg/i386/Makefile.target
-@@ -7,7 +7,7 @@ VPATH 		+= $(I386_SRC)
- 
- I386_SRCS=$(notdir $(wildcard $(I386_SRC)/*.c))
- I386_TESTS=$(I386_SRCS:.c=)
--
-+I386_ONLY_TESTS=$(filter-out test-i386-ssse3, $(I386_TESTS))
- # Update TESTS
- TESTS+=$(I386_ONLY_TESTS)
- 
-diff --git a/tests/tcg/x86_64/Makefile.target b/tests/tcg/x86_64/Makefile.target
-new file mode 100644
-index 0000000000..74f170b9ed
---- /dev/null
-+++ b/tests/tcg/x86_64/Makefile.target
-@@ -0,0 +1,15 @@
-+# -*- Mode: makefile -*-
-+#
-+# x86_64 tests - included from tests/tcg/Makefile.target
-+#
-+# Currently we only build test-x86_64 and test-i386-ssse3 from
-+# $(SRC)/tests/tcg/i386/
-+#
-+
-+X86_64_TESTS=$(filter-out $(I386_ONLY_TESTS), $(TESTS))
-+X86_64_TESTS+=test-x86_64
-+TESTS:=$(X86_64_TESTS)
-+
-+test-x86_64: LDFLAGS+=-lm -lc
-+test-x86_64: test-i386.c test-i386.h test-i386-shift.h test-i386-muldiv.h
-+	$(CC) $(CFLAGS) $< -o $@ $(LDFLAGS)
--- 
-2.17.0
+> -- 
+> Eduardo
