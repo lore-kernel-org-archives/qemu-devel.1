@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52324)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52355)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fJEF4-0002nY-Is
-	for qemu-devel@nongnu.org; Thu, 17 May 2018 04:26:31 -0400
+	(envelope-from <lersek@redhat.com>) id 1fJEFH-0002tk-Ko
+	for qemu-devel@nongnu.org; Thu, 17 May 2018 04:26:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fJEF1-0000On-CE
-	for qemu-devel@nongnu.org; Thu, 17 May 2018 04:26:30 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:36102)
+	(envelope-from <lersek@redhat.com>) id 1fJEFE-0000ST-Dk
+	for qemu-devel@nongnu.org; Thu, 17 May 2018 04:26:43 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:54678 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fJEF1-0000OR-4C
-	for qemu-devel@nongnu.org; Thu, 17 May 2018 04:26:27 -0400
-From: Markus Armbruster <armbru@redhat.com>
-References: <20180515140944.15979-1-danielhb@linux.ibm.com>
-	<20180515140944.15979-3-danielhb@linux.ibm.com>
-	<8736ytue1w.fsf@dusky.pond.sub.org>
-	<6679359f-4a84-4eb1-c32b-997d47a3d4ea@linux.ibm.com>
-Date: Thu, 17 May 2018 10:26:22 +0200
-In-Reply-To: <6679359f-4a84-4eb1-c32b-997d47a3d4ea@linux.ibm.com> (Daniel
-	Henrique Barboza's message of "Wed, 16 May 2018 10:49:16 -0300")
-Message-ID: <877eo2ofgx.fsf@dusky.pond.sub.org>
+	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1fJEFE-0000SL-9r
+	for qemu-devel@nongnu.org; Thu, 17 May 2018 04:26:40 -0400
+From: Laszlo Ersek <lersek@redhat.com>
+References: <20180515123007.10164-1-marcandre.lureau@redhat.com>
+	<fa1fac3a-6662-6516-5d65-827b9d36d6b0@redhat.com>
+Message-ID: <af7d9bbf-1a5b-1937-4b19-02442c95a6a1@redhat.com>
+Date: Thu, 17 May 2018 10:26:33 +0200
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v6 2/2] qga: update guest-suspend-ram and
- guest-suspend-hybrid descriptions
+In-Reply-To: <fa1fac3a-6662-6516-5d65-827b9d36d6b0@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [edk2] [PATCH 0/4] RFC: ovmf: Add support for TPM
+ Physical Presence interface
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,70 +29,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Daniel Henrique Barboza <danielhb@linux.ibm.com>
-Cc: qemu-devel@nongnu.org, dgilbert@redhat.com, mdroth@linux.vnet.ibm.com
+To: marcandre.lureau@redhat.com, edk2-devel@lists.01.org
+Cc: qemu-devel@nongnu.org, javierm@redhat.com, pjones@redhat.com, jiewen.yao@intel.com
 
-Daniel Henrique Barboza <danielhb@linux.ibm.com> writes:
+On 05/17/18 09:54, Laszlo Ersek wrote:
+> On 05/15/18 14:30, marcandre.lureau@redhat.com wrote:
+>> From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+>>
+>> Hi,
+>>
+>> The following series adds basic TPM PPI 1.3 support for OVMF-on-QEMU
+>> with TPM2 (I haven't tested TPM1, for lack of interest).
+>>
+>> PPI test runs successfully with Windows 10 WHLK, despite the limited
+>> number of supported funcions (tpm2_ppi_funcs table, in particular, no
+>> function allows to manipulate Tcg2PhysicalPresenceFlags)
+>>
+>> The way it works is relatively simple: a memory region is allocated by
+>> QEMU to save PPI related variables. An ACPI interface is exposed by
+>> QEMU to let the guest manipulate those. At boot, ovmf processes and
+>> updates the PPI qemu region and request variables.
+>>
+>> I build edk2 with:
+>>
+>> $ build -DTPM2_ENABLE -DSECURE_BOOT_ENABLE
+>=20
+> Is -DSECURE_BOOT_ENABLE necessary for *building* with -DTPM2_ENABLE? If
+> that's the case, we should update the DSC files; users building OVMF
+> from source shouldn't have to care about "-D" inter-dependencies, if we
+> can manage that somehow.
+>=20
+> If -DSECURE_BOOT_ENABLE is only there because otherwise a guest OS
+> doesn't really make use of -DTPM2_ENABLE either, that's different. In
+> that case, it's fine to allow building OVMF with TPM2 support but
+> without SB support.
 
-> On 05/15/2018 12:35 PM, Markus Armbruster wrote:
->> Daniel Henrique Barboza <danielhb@linux.ibm.com> writes:
->>
->>> This patch updates the descriptions of 'guest-suspend-ram' and
->>> 'guest-suspend-hybrid' to mention that both commands relies now
->>> on the existence of 'system_wakeup' and also on the proper support
->>> for wake up from suspend, retrieved by the 'wakeup-suspend-support'
->>> attribute of the 'query-target' QMP command.
->>>
->>> Reported-by: Balamuruhan S <bala24@linux.vnet.ibm.com>
->>> Signed-off-by: Daniel Henrique Barboza <danielhb@linux.ibm.com>
->>> Reviewed-by: Michael Roth <mdroth@linux.vnet.ibm.com>
->>> ---
->>>   qga/qapi-schema.json | 14 ++++++++++----
->>>   1 file changed, 10 insertions(+), 4 deletions(-)
->>>
->>> diff --git a/qga/qapi-schema.json b/qga/qapi-schema.json
->>> index 17884c7c70..e3fb8adfce 100644
->>> --- a/qga/qapi-schema.json
->>> +++ b/qga/qapi-schema.json
->>> @@ -566,8 +566,11 @@
->>>   # package installed in the guest.
->>>   #
->>>   # IMPORTANT: guest-suspend-ram requires QEMU to support the 'system_wakeup'
->>> -# command.  Thus, it's *required* to query QEMU for the presence of the
->>> -# 'system_wakeup' command before issuing guest-suspend-ram.
->>> +# command and the guest to support wake up from suspend. Thus, it's
->>> +# *required* to query QEMU for the presence of the 'system_wakeup' command
->>> +# and to verify that wake up from suspend is enabled by checking the
->>> +# 'wakeup-suspend-support' flag of 'query-target' QMP command, before issuing
->>> +# guest-suspend-ram.
->> Isn't checking for presence of system_wakeup redundant?
->>
->> When query-target tells us "system_wakeup works" by returning
->> wakeup-suspend-support: true, we surely have system_wakeup (or else
->> query-target would be lying to us).
->>
->> When it returns wakeup-suspend-support: false, it doesn't matter whether
->> we have system_wakeup.
->>
->> Unless I'm wrong, we can simplify this to something like
->>
->>     # IMPORTANT: guest-suspend-ram requires working wakeup support in
->>     # QEMU.  You *must* check QMP command query-target returns
->>     # wakeup-suspend-support: true before issuing this command.
->
-> It is worth noticing that this API isn't checking for the existence of
-> system_wakeup. It is checking whether there are notifiers added in
-> the wakeup_notifiers QLIST.
->
-> However, I think we can simplify the text as you suggested because that
-> part seems outdated anyway. Is there any relevant scenario where
-> system_wakeup will not be present?
+Oops, almost missed another important omission: in every commit message,
+please insert the following line just above your S-o-b:
 
-I doubt it: we have system_wakeup since 1.1, and we've even backported
-it to RHEL-6.
+Contributed-under: TianoCore Contribution Agreement 1.1
 
-But even if there *was* a relevant scenario involving a QEMU that
-doesn't provide system_wakeup, that QEMU will also not provide member
-wakeup-suspend-support, let alone tell us wakeup-suspend-support: true,
-unless somebody set out to break things on purpose.  That somebody would
-get to keep the pieces then.
+We cannot take patches without that line. You can read about it in the
+"Contributions.txt" file, in the project root directory.
+
+Thanks!
+Laszlo
