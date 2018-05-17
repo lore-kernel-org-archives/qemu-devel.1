@@ -1,21 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49845)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50369)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ross.zwisler@linux.intel.com>) id 1fJKuC-0003Nd-H5
-	for qemu-devel@nongnu.org; Thu, 17 May 2018 11:33:25 -0400
+	(envelope-from <laurent@vivier.eu>) id 1fJKwU-0004w8-LC
+	for qemu-devel@nongnu.org; Thu, 17 May 2018 11:35:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ross.zwisler@linux.intel.com>) id 1fJKu7-0005MQ-MY
-	for qemu-devel@nongnu.org; Thu, 17 May 2018 11:33:24 -0400
-Received: from mga12.intel.com ([192.55.52.136]:64532)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ross.zwisler@linux.intel.com>)
-	id 1fJKu7-0005Ly-Cm
-	for qemu-devel@nongnu.org; Thu, 17 May 2018 11:33:19 -0400
-From: Ross Zwisler <ross.zwisler@linux.intel.com>
-Date: Thu, 17 May 2018 09:32:54 -0600
-Message-Id: <20180517153254.5760-1-ross.zwisler@linux.intel.com>
-in-reply-to: <152653373366.258.12058788826462830143@1f70390a8372>
-Subject: [Qemu-devel] [qemu PATCH v3 3/4] nvdimm,
- acpi: support NFIT platform capabilities
+	(envelope-from <laurent@vivier.eu>) id 1fJKwP-0006JI-LV
+	for qemu-devel@nongnu.org; Thu, 17 May 2018 11:35:46 -0400
+Received: from mout.kundenserver.de ([212.227.126.133]:34501)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1fJKwP-0006J9-BI
+	for qemu-devel@nongnu.org; Thu, 17 May 2018 11:35:41 -0400
+References: <20180516205543.29305-1-laurent@vivier.eu>
+	<20180516205543.29305-6-laurent@vivier.eu>
+	<4e676844-2918-77b0-521a-16ded3228de9@amsat.org>
+	<62244f16-30e5-3383-249a-a0a932d684d0@vivier.eu>
+	<a924ff70-8da7-b754-3c90-269fac47b98d@amsat.org>
+From: Laurent Vivier <laurent@vivier.eu>
+Message-ID: <32444c3b-e845-5350-8730-f5cc81cd3296@vivier.eu>
+Date: Thu, 17 May 2018 17:35:06 +0200
+MIME-Version: 1.0
+In-Reply-To: <a924ff70-8da7-b754-3c90-269fac47b98d@amsat.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v2 5/8] linux-user: move ppc socket.h
+ definitions to ppc/sockbits.h
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,213 +32,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>, qemu-devel@nongnu.org
-Cc: Ross Zwisler <ross.zwisler@linux.intel.com>, Haozhong Zhang <haozhong.zhang@intel.com>, "Michael S . Tsirkin" <mst@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, linux-nvdimm <linux-nvdimm@lists.01.org>
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>, Riku Voipio <riku.voipio@iki.fi>, Richard Henderson <rth@twiddle.net>, Yongbok Kim <yongbok.kim@mips.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 
-Add a machine command line option to allow the user to control the Platform
-Capabilities Structure in the virtualized NFIT.  This Platform Capabilities
-Structure was added in ACPI 6.2 Errata A.
+Le 17/05/2018 à 17:24, Philippe Mathieu-Daudé a écrit :
+> On 05/17/2018 04:17 AM, Laurent Vivier wrote:
+>> Le 17/05/2018 à 01:17, Philippe Mathieu-Daudé a écrit :
+>>> On 05/16/2018 05:55 PM, Laurent Vivier wrote:
+>>>> No code change.
+>>>>
+>>>> Signed-off-by: Laurent Vivier <laurent@vivier.eu>
+>>>> ---
+>>>>  linux-user/generic/sockbits.h |  9 +--------
+>>>>  linux-user/ppc/sockbits.h     | 19 +++++++++++++++++++
+>>>>  2 files changed, 20 insertions(+), 8 deletions(-)
+>>>>
+>>>> diff --git a/linux-user/generic/sockbits.h b/linux-user/generic/sockbits.h
+>>>> index 093faf0a48..5ad43eb0c8 100644
+>>>> --- a/linux-user/generic/sockbits.h
+>>>> +++ b/linux-user/generic/sockbits.h
+>>>> @@ -30,14 +30,7 @@
+>>>>  #define TARGET_SO_LINGER       13
+>>>>  #define TARGET_SO_BSDCOMPAT    14
+>>>>  /* To add :#define TARGET_SO_REUSEPORT 15 */
+>>>> -#if defined(TARGET_PPC)
+>>>> -#define TARGET_SO_RCVLOWAT     16
+>>>> -#define TARGET_SO_SNDLOWAT     17
+>>>> -#define TARGET_SO_RCVTIMEO     18
+>>>> -#define TARGET_SO_SNDTIMEO     19
+>>>> -#define TARGET_SO_PASSCRED     20
+>>>> -#define TARGET_SO_PEERCRED     21
+>>>> -#else
+>>>> +#ifndef TARGET_SO_PASSCRED /* powerpc only differs in these */
+>>>
+>>> #ifndef TARGET_PPC ?
+>>
+>> In fact, I have copied the line from linux, I think it's better to not
+>> depend on the target but on the value we want to define.
+> 
+> I see, but it isn't safer to define each separately?
+> 
+> /* powerpc only differs in these */
+> #ifndef TARGET_SO_PASSCRED
+> # define TARGET_SO_PASSCRED     16
+> #endif
+> 
+> #ifndef TARGET_SO_PEERCRED
+> # define TARGET_SO_PEERCRED     17
+> #endif
+> 
+> #ifndef TARGET_SO_RCVLOWAT
+> # define TARGET_SO_RCVLOWAT     18
+> #endif
 
-Signed-off-by: Ross Zwisler <ross.zwisler@linux.intel.com>
----
+The other way should be to remove the "#if" from generic/sockbits.h, to
+include it in the top of ppc/sockbits.h and to #undef values before
+redefining them.
 
-v3: Added brackets around single statement "if" conditional to comply
-    with qemu coding style.
+It's cleaner, I think, but I like to stay as close as possible to the
+kernel headers.
 
----
- docs/nvdimm.txt         | 18 ++++++++++++++++++
- hw/acpi/nvdimm.c        | 45 +++++++++++++++++++++++++++++++++++++++++----
- hw/i386/pc.c            | 31 +++++++++++++++++++++++++++++++
- include/hw/i386/pc.h    |  1 +
- include/hw/mem/nvdimm.h |  5 +++++
- 5 files changed, 96 insertions(+), 4 deletions(-)
-
-diff --git a/docs/nvdimm.txt b/docs/nvdimm.txt
-index e903d8bb09..3f18013880 100644
---- a/docs/nvdimm.txt
-+++ b/docs/nvdimm.txt
-@@ -153,3 +153,21 @@ guest NVDIMM region mapping structure.  This unarmed flag indicates
- guest software that this vNVDIMM device contains a region that cannot
- accept persistent writes. In result, for example, the guest Linux
- NVDIMM driver, marks such vNVDIMM device as read-only.
-+
-+Platform Capabilities
-+---------------------
-+
-+ACPI 6.2 Errata A added support for a new Platform Capabilities Structure
-+which allows the platform to communicate what features it supports related to
-+NVDIMM data durability.  Users can provide a capabilities value to a guest via
-+the optional "nvdimm-cap" machine command line option:
-+
-+    -machine pc,accel=kvm,nvdimm,nvdimm-cap=2
-+
-+As of ACPI 6.2 Errata A, the following values are valid for the bottom two
-+bits:
-+
-+2 - Memory Controller Flush to NVDIMM Durability on Power Loss Capable.
-+3 - CPU Cache Flush to NVDIMM Durability on Power Loss Capable.
-+
-+For a complete list of the flags available please consult the ACPI spec.
-diff --git a/hw/acpi/nvdimm.c b/hw/acpi/nvdimm.c
-index 59d6e4254c..946937f3ca 100644
---- a/hw/acpi/nvdimm.c
-+++ b/hw/acpi/nvdimm.c
-@@ -169,6 +169,21 @@ struct NvdimmNfitControlRegion {
- } QEMU_PACKED;
- typedef struct NvdimmNfitControlRegion NvdimmNfitControlRegion;
- 
-+/*
-+ * NVDIMM Platform Capabilities Structure
-+ *
-+ * Defined in section 5.2.25.9 of ACPI 6.2 Errata A, September 2017
-+ */
-+struct NvdimmNfitPlatformCaps {
-+    uint16_t type;
-+    uint16_t length;
-+    uint8_t highest_cap;
-+    uint8_t reserved[3];
-+    uint32_t capabilities;
-+    uint8_t reserved2[4];
-+} QEMU_PACKED;
-+typedef struct NvdimmNfitPlatformCaps NvdimmNfitPlatformCaps;
-+
- /*
-  * Module serial number is a unique number for each device. We use the
-  * slot id of NVDIMM device to generate this number so that each device
-@@ -351,7 +366,23 @@ static void nvdimm_build_structure_dcr(GArray *structures, DeviceState *dev)
-                                          JEDEC Annex L Release 3. */);
- }
- 
--static GArray *nvdimm_build_device_structure(void)
-+/*
-+ * ACPI 6.2 Errata A: 5.2.25.9 NVDIMM Platform Capabilities Structure
-+ */
-+static void
-+nvdimm_build_structure_caps(GArray *structures, uint32_t capabilities)
-+{
-+    NvdimmNfitPlatformCaps *nfit_caps;
-+
-+    nfit_caps = acpi_data_push(structures, sizeof(*nfit_caps));
-+
-+    nfit_caps->type = cpu_to_le16(7 /* NVDIMM Platform Capabilities */);
-+    nfit_caps->length = cpu_to_le16(sizeof(*nfit_caps));
-+    nfit_caps->highest_cap = 2;
-+    nfit_caps->capabilities = cpu_to_le32(capabilities);
-+}
-+
-+static GArray *nvdimm_build_device_structure(AcpiNVDIMMState *state)
- {
-     GSList *device_list = nvdimm_get_device_list();
-     GArray *structures = g_array_new(false, true /* clear */, 1);
-@@ -373,6 +404,10 @@ static GArray *nvdimm_build_device_structure(void)
-     }
-     g_slist_free(device_list);
- 
-+    if (state->capabilities) {
-+        nvdimm_build_structure_caps(structures, state->capabilities);
-+    }
-+
-     return structures;
- }
- 
-@@ -381,16 +416,18 @@ static void nvdimm_init_fit_buffer(NvdimmFitBuffer *fit_buf)
-     fit_buf->fit = g_array_new(false, true /* clear */, 1);
- }
- 
--static void nvdimm_build_fit_buffer(NvdimmFitBuffer *fit_buf)
-+static void nvdimm_build_fit_buffer(AcpiNVDIMMState *state)
- {
-+    NvdimmFitBuffer *fit_buf = &state->fit_buf;
-+
-     g_array_free(fit_buf->fit, true);
--    fit_buf->fit = nvdimm_build_device_structure();
-+    fit_buf->fit = nvdimm_build_device_structure(state);
-     fit_buf->dirty = true;
- }
- 
- void nvdimm_plug(AcpiNVDIMMState *state)
- {
--    nvdimm_build_fit_buffer(&state->fit_buf);
-+    nvdimm_build_fit_buffer(state);
- }
- 
- static void nvdimm_build_nfit(AcpiNVDIMMState *state, GArray *table_offsets,
-diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-index d768930d02..1b2684c549 100644
---- a/hw/i386/pc.c
-+++ b/hw/i386/pc.c
-@@ -2182,6 +2182,33 @@ static void pc_machine_set_nvdimm(Object *obj, bool value, Error **errp)
-     pcms->acpi_nvdimm_state.is_enabled = value;
- }
- 
-+static void pc_machine_get_nvdimm_capabilities(Object *obj, Visitor *v,
-+                                               const char *name, void *opaque,
-+                                               Error **errp)
-+{
-+    PCMachineState *pcms = PC_MACHINE(obj);
-+    uint32_t value = pcms->acpi_nvdimm_state.capabilities;
-+
-+    visit_type_uint32(v, name, &value, errp);
-+}
-+
-+static void pc_machine_set_nvdimm_capabilities(Object *obj, Visitor *v,
-+                                               const char *name, void *opaque,
-+                                               Error **errp)
-+{
-+    PCMachineState *pcms = PC_MACHINE(obj);
-+    Error *error = NULL;
-+    uint32_t value;
-+
-+    visit_type_uint32(v, name, &value, &error);
-+    if (error) {
-+        error_propagate(errp, error);
-+        return;
-+    }
-+
-+    pcms->acpi_nvdimm_state.capabilities = value;
-+}
-+
- static bool pc_machine_get_smbus(Object *obj, Error **errp)
- {
-     PCMachineState *pcms = PC_MACHINE(obj);
-@@ -2395,6 +2422,10 @@ static void pc_machine_class_init(ObjectClass *oc, void *data)
-     object_class_property_add_bool(oc, PC_MACHINE_NVDIMM,
-         pc_machine_get_nvdimm, pc_machine_set_nvdimm, &error_abort);
- 
-+    object_class_property_add(oc, PC_MACHINE_NVDIMM_CAP, "uint32",
-+        pc_machine_get_nvdimm_capabilities,
-+        pc_machine_set_nvdimm_capabilities, NULL, NULL, &error_abort);
-+
-     object_class_property_add_bool(oc, PC_MACHINE_SMBUS,
-         pc_machine_get_smbus, pc_machine_set_smbus, &error_abort);
- 
-diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
-index 2a98e3ad68..e9b22f929c 100644
---- a/include/hw/i386/pc.h
-+++ b/include/hw/i386/pc.h
-@@ -76,6 +76,7 @@ struct PCMachineState {
- #define PC_MACHINE_VMPORT           "vmport"
- #define PC_MACHINE_SMM              "smm"
- #define PC_MACHINE_NVDIMM           "nvdimm"
-+#define PC_MACHINE_NVDIMM_CAP       "nvdimm-cap"
- #define PC_MACHINE_SMBUS            "smbus"
- #define PC_MACHINE_SATA             "sata"
- #define PC_MACHINE_PIT              "pit"
-diff --git a/include/hw/mem/nvdimm.h b/include/hw/mem/nvdimm.h
-index 74c60332e1..3c82751bab 100644
---- a/include/hw/mem/nvdimm.h
-+++ b/include/hw/mem/nvdimm.h
-@@ -134,6 +134,11 @@ struct AcpiNVDIMMState {
- 
-     /* the IO region used by OSPM to transfer control to QEMU. */
-     MemoryRegion io_mr;
-+
-+    /*
-+     * Platform capabilities, section 5.2.25.9 of ACPI 6.2 Errata A
-+     */
-+    int32_t capabilities;
- };
- typedef struct AcpiNVDIMMState AcpiNVDIMMState;
- 
--- 
-2.14.3
+Thanks,
+Laurent
