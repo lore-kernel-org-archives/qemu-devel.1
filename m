@@ -1,28 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43465)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43502)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1fJZl3-0006GF-BB
-	for qemu-devel@nongnu.org; Fri, 18 May 2018 03:24:58 -0400
+	(envelope-from <peterx@redhat.com>) id 1fJZlY-0006lt-Pt
+	for qemu-devel@nongnu.org; Fri, 18 May 2018 03:25:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1fJZl0-0005LC-Nb
-	for qemu-devel@nongnu.org; Fri, 18 May 2018 03:24:57 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:59998 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eric.auger@redhat.com>)
-	id 1fJZl0-0005Jq-I0
-	for qemu-devel@nongnu.org; Fri, 18 May 2018 03:24:54 -0400
-References: <20180504030811.28111-1-peterx@redhat.com>
-	<20180504030811.28111-6-peterx@redhat.com>
-	<99897d3c-ee46-977d-c886-5d23996c7f04@redhat.com>
-	<20180518055939.GE2569@xz-mi>
-From: Auger Eric <eric.auger@redhat.com>
-Message-ID: <601036e5-a1b8-9afe-714e-e5d76e06a6d5@redhat.com>
-Date: Fri, 18 May 2018 09:24:51 +0200
-MIME-Version: 1.0
-In-Reply-To: <20180518055939.GE2569@xz-mi>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 05/10] intel-iommu: introduce
- vtd_page_walk_info
+	(envelope-from <peterx@redhat.com>) id 1fJZlT-0005bp-3U
+	for qemu-devel@nongnu.org; Fri, 18 May 2018 03:25:25 -0400
+From: Peter Xu <peterx@redhat.com>
+Date: Fri, 18 May 2018 15:25:08 +0800
+Message-Id: <20180518072517.20901-1-peterx@redhat.com>
+Subject: [Qemu-devel] [PATCH v4 0/9] intel-iommu: nested vIOMMU, cleanups,
+ bug fixes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,34 +18,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: qemu-devel@nongnu.org, Tian Kevin <kevin.tian@intel.com>, "Michael S . Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, Alex Williamson <alex.williamson@redhat.com>, Jintack Lim <jintack@cs.columbia.edu>
+To: qemu-devel@nongnu.org
+Cc: Tian Kevin <kevin.tian@intel.com>, QEMU Stable <qemu-stable@nongnu.org>, Jintack Lim <jintack@cs.columbia.edu>, peterx@redhat.com, Jason Wang <jasowang@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Alex Williamson <alex.williamson@redhat.com>
 
-Hi Peter,
-On 05/18/2018 07:59 AM, Peter Xu wrote:
-> On Thu, May 17, 2018 at 04:32:58PM +0200, Auger Eric wrote:
->> Hi Peter,
->>
->> On 05/04/2018 05:08 AM, Peter Xu wrote:
->>> During the recursive page walking of IOVA page tables, some stack
->>> variables are constant variables and never changed during the whole page
->>> walking procedure.  Isolate them into a struct so that we don't need to
->>> pass those contants down the stack every time and multiple times.
->>>
->>> Signed-off-by: Peter Xu <peterx@redhat.com>
->> Reviewed-by: Eric Auger <eric.auger@redhat.com>
-> 
-> Thanks for the r-b, but this patch is changed in version 3.  Please
-> feel free to have a look at that version.
+Upstream repo: https://github.com/xzpeter/qemu/tree/fix-vtd-dma
 
-Sure. Please apologize, I missed your v3. Looking at it now.
+This version contains little functional changes, mostly comment-wise
+and patch squashings.  I squashed the last 4 patches since they are
+solving the same problem, meanwhile the old patch 9 itself might
+brought some problem if without patch 12 so I just squashed them all.
+I re-wrote the commit message for that patch (and it simplifies me to
+write the SECURITY part since all those four patches are solving the
+single problem).  Reviewers can go to previous version 3 and have a
+look at patches 9-12 since the contents are totally the same (and I
+suppose that one might be easier for reviewers).
 
-Thanks
+V3: http://lists.gnu.org/archive/html/qemu-devel/2018-05/msg04009.html
 
-Eric
-> 
-> (For all the review comments previously to version 2, I adopted them
->  when the contents are still there in version 3)
-> 
-> Regards,
-> 
+I made bold to have Jintack's Reported-by and Tested-by for the last
+big patch already, after I did some smoke test for this new version.
+
+v4:
+- rename: notifiers_list to vtd_as_with_notifiers,
+  vtd_as_notify_mappings to vtd_as_has_map_notifier [Eric]
+- tune the comments in misc patches [Eric]
+- add missing places to take iommu lock [Eric]
+- for each patch: cc stable, add "SECURITY IMPLICATION" at the
+  beginning of commit where necessary
+- merge patch 9-12
+
+Please review.  Thanks.
+
+Peter Xu (9):
+  intel-iommu: send PSI always even if across PDEs
+  intel-iommu: remove IntelIOMMUNotifierNode
+  intel-iommu: add iommu lock
+  intel-iommu: only do page walk for MAP notifiers
+  intel-iommu: introduce vtd_page_walk_info
+  intel-iommu: pass in address space when page walk
+  intel-iommu: trace domain id during page walk
+  util: implement simple iova tree
+  intel-iommu: rework the page walk logic
+
+ include/hw/i386/intel_iommu.h |  19 +-
+ include/qemu/iova-tree.h      | 134 ++++++++++++
+ hw/i386/intel_iommu.c         | 396 +++++++++++++++++++++++++---------
+ util/iova-tree.c              | 114 ++++++++++
+ MAINTAINERS                   |   6 +
+ hw/i386/trace-events          |   5 +-
+ util/Makefile.objs            |   1 +
+ 7 files changed, 566 insertions(+), 109 deletions(-)
+ create mode 100644 include/qemu/iova-tree.h
+ create mode 100644 util/iova-tree.c
+
+-- 
+2.17.0
