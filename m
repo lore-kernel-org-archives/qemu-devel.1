@@ -1,16 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60155)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60141)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fJfL2-0000bx-Sx
+	(envelope-from <kwolf@redhat.com>) id 1fJfL1-0000Xl-P0
 	for qemu-devel@nongnu.org; Fri, 18 May 2018 09:22:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fJfKw-0006Rw-6p
-	for qemu-devel@nongnu.org; Fri, 18 May 2018 09:22:28 -0400
+	(envelope-from <kwolf@redhat.com>) id 1fJfL0-0006VZ-JI
+	for qemu-devel@nongnu.org; Fri, 18 May 2018 09:22:27 -0400
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Fri, 18 May 2018 15:21:07 +0200
-Message-Id: <20180518132114.4070-34-kwolf@redhat.com>
+Date: Fri, 18 May 2018 15:21:13 +0200
+Message-Id: <20180518132114.4070-40-kwolf@redhat.com>
 In-Reply-To: <20180518132114.4070-1-kwolf@redhat.com>
 References: <20180518132114.4070-1-kwolf@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 33/40] job: Move progress fields to Job
+Subject: [Qemu-devel] [PATCH v2 39/40] iotests: Move qmp_to_opts() to VM
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,322 +22,117 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, mreitz@redhat.com, jsnow@redhat.com, eblake@redhat.com, jcody@redhat.com, armbru@redhat.com, qemu-devel@nongnu.org
 
-BlockJob has fields .offset and .len, which are actually misnomers today
-because they are no longer tied to block device sizes, but just progress
-counters. As such they make a lot of sense in generic Jobs.
-
-This patch moves the fields to Job and renames them to .progress_current
-and .progress_total to describe their function better.
+qmp_to_opts() used to be a method of QMPTestCase, but recently we
+started to add more Python test cases that don't make use of
+QMPTestCase. In order to make the method usable there, move it to VM.
 
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 Reviewed-by: Max Reitz <mreitz@redhat.com>
 ---
- include/block/blockjob.h | 25 -------------------------
- include/qemu/job.h       | 28 ++++++++++++++++++++++++++++
- block/backup.c           |  8 ++++----
- block/commit.c           |  4 ++--
- block/mirror.c           |  4 ++--
- block/stream.c           |  4 ++--
- blockjob.c               | 26 ++++++++------------------
- job.c                    | 10 ++++++++++
- qemu-img.c               |  8 ++++++--
- 9 files changed, 62 insertions(+), 55 deletions(-)
+ tests/qemu-iotests/041        |  6 +++---
+ tests/qemu-iotests/155        |  2 +-
+ tests/qemu-iotests/iotests.py | 45 ++++++++++++++++++++++---------------------
+ 3 files changed, 27 insertions(+), 26 deletions(-)
 
-diff --git a/include/block/blockjob.h b/include/block/blockjob.h
-index 4fca45f6a1..3021d11126 100644
---- a/include/block/blockjob.h
-+++ b/include/block/blockjob.h
-@@ -52,12 +52,6 @@ typedef struct BlockJob {
-     /** Status that is published by the query-block-jobs QMP API */
-     BlockDeviceIoStatus iostatus;
+diff --git a/tests/qemu-iotests/041 b/tests/qemu-iotests/041
+index e94587950c..c20ac7da87 100755
+--- a/tests/qemu-iotests/041
++++ b/tests/qemu-iotests/041
+@@ -1030,9 +1030,9 @@ class TestOrphanedSource(iotests.QMPTestCase):
+                  'read-only': 'on' }
  
--    /** Offset that is published by the query-block-jobs QMP API */
--    int64_t offset;
--
--    /** Length that is published by the query-block-jobs QMP API */
--    int64_t len;
--
-     /** Speed that was set with @block_job_set_speed.  */
-     int64_t speed;
+         self.vm = iotests.VM()
+-        self.vm.add_blockdev(self.qmp_to_opts(blk0))
+-        self.vm.add_blockdev(self.qmp_to_opts(blk1))
+-        self.vm.add_blockdev(self.qmp_to_opts(blk2))
++        self.vm.add_blockdev(self.vm.qmp_to_opts(blk0))
++        self.vm.add_blockdev(self.vm.qmp_to_opts(blk1))
++        self.vm.add_blockdev(self.vm.qmp_to_opts(blk2))
+         self.vm.launch()
  
-@@ -139,25 +133,6 @@ void block_job_remove_all_bdrv(BlockJob *job);
- void block_job_set_speed(BlockJob *job, int64_t speed, Error **errp);
+     def tearDown(self):
+diff --git a/tests/qemu-iotests/155 b/tests/qemu-iotests/155
+index 42dae04c83..63a5b5e2c0 100755
+--- a/tests/qemu-iotests/155
++++ b/tests/qemu-iotests/155
+@@ -63,7 +63,7 @@ class BaseClass(iotests.QMPTestCase):
+                     'driver': iotests.imgfmt,
+                     'file': {'driver': 'file',
+                              'filename': source_img}}
+-        self.vm.add_blockdev(self.qmp_to_opts(blockdev))
++        self.vm.add_blockdev(self.vm.qmp_to_opts(blockdev))
+         self.vm.add_device('virtio-blk,id=qdev0,drive=source')
+         self.vm.launch()
  
- /**
-- * block_job_progress_update:
-- * @job: The job that has made progress
-- * @done: How much progress the job made
-- *
-- * Updates the progress counter of the job.
-- */
--void block_job_progress_update(BlockJob *job, uint64_t done);
--
--/**
-- * block_job_progress_set_remaining:
-- * @job: The job whose expected progress end value is set
-- * @remaining: Expected end value of the progress counter of the job
-- *
-- * Sets the expected end value of the progress counter of a job so that a
-- * completion percentage can be calculated when the progress is updated.
-- */
--void block_job_progress_set_remaining(BlockJob *job, uint64_t remaining);
--
--/**
-  * block_job_query:
-  * @job: The job to get information about.
-  *
-diff --git a/include/qemu/job.h b/include/qemu/job.h
-index bfc2bc5611..92d1d249fe 100644
---- a/include/qemu/job.h
-+++ b/include/qemu/job.h
-@@ -114,6 +114,16 @@ typedef struct Job {
-     /** True if this job should automatically dismiss itself */
-     bool auto_dismiss;
+diff --git a/tests/qemu-iotests/iotests.py b/tests/qemu-iotests/iotests.py
+index ed08e06e1f..28159d837a 100644
+--- a/tests/qemu-iotests/iotests.py
++++ b/tests/qemu-iotests/iotests.py
+@@ -363,6 +363,27 @@ class VM(qtest.QEMUQtestMachine):
+         return self.qmp('human-monitor-command',
+                         command_line='qemu-io %s "%s"' % (drive, cmd))
  
-+    /**
-+     * Current progress. The unit is arbitrary as long as the ratio between
-+     * progress_current and progress_total represents the estimated percentage
-+     * of work already done.
-+     */
-+    int64_t progress_current;
++    def flatten_qmp_object(self, obj, output=None, basestr=''):
++        if output is None:
++            output = dict()
++        if isinstance(obj, list):
++            for i in range(len(obj)):
++                self.flatten_qmp_object(obj[i], output, basestr + str(i) + '.')
++        elif isinstance(obj, dict):
++            for key in obj:
++                self.flatten_qmp_object(obj[key], output, basestr + key + '.')
++        else:
++            output[basestr[:-1]] = obj # Strip trailing '.'
++        return output
 +
-+    /** Estimated progress_current value at the completion of the job */
-+    int64_t progress_total;
++    def qmp_to_opts(self, obj):
++        obj = self.flatten_qmp_object(obj)
++        output_list = list()
++        for key in obj:
++            output_list += [key + '=' + obj[key]]
++        return ','.join(output_list)
 +
-     /** ret code passed to job_completed. */
-     int ret;
- 
-@@ -304,6 +314,24 @@ void job_ref(Job *job);
-  */
- void job_unref(Job *job);
- 
-+/**
-+ * @job: The job that has made progress
-+ * @done: How much progress the job made since the last call
-+ *
-+ * Updates the progress counter of the job.
-+ */
-+void job_progress_update(Job *job, uint64_t done);
 +
-+/**
-+ * @job: The job whose expected progress end value is set
-+ * @remaining: Missing progress (on top of the current progress counter value)
-+ *             until the new expected end value is reached
-+ *
-+ * Sets the expected end value of the progress counter of a job so that a
-+ * completion percentage can be calculated when the progress is updated.
-+ */
-+void job_progress_set_remaining(Job *job, uint64_t remaining);
-+
- /** To be called when a cancelled job is finalised. */
- void job_event_cancelled(Job *job);
  
-diff --git a/block/backup.c b/block/backup.c
-index 6f4f3df229..4e228e959b 100644
---- a/block/backup.c
-+++ b/block/backup.c
-@@ -160,7 +160,7 @@ static int coroutine_fn backup_do_cow(BackupBlockJob *job,
-          * offset field is an opaque progress value, it is not a disk offset.
-          */
-         job->bytes_read += n;
--        block_job_progress_update(&job->common, n);
-+        job_progress_update(&job->common.job, n);
-     }
+ index_re = re.compile(r'([^\[]+)\[([^\]]+)\]')
  
- out:
-@@ -406,8 +406,8 @@ static void backup_incremental_init_copy_bitmap(BackupBlockJob *job)
-         bdrv_set_dirty_iter(dbi, next_cluster * job->cluster_size);
-     }
+@@ -390,26 +411,6 @@ class QMPTestCase(unittest.TestCase):
+                     self.fail('invalid index "%s" in path "%s" in "%s"' % (idx, path, str(d)))
+         return d
  
--    /* TODO block_job_progress_set_remaining() would make more sense */
--    block_job_progress_update(&job->common,
-+    /* TODO job_progress_set_remaining() would make more sense */
-+    job_progress_update(&job->common.job,
-         job->len - hbitmap_count(job->copy_bitmap) * job->cluster_size);
- 
-     bdrv_dirty_iter_free(dbi);
-@@ -425,7 +425,7 @@ static void coroutine_fn backup_run(void *opaque)
-     qemu_co_rwlock_init(&job->flush_rwlock);
- 
-     nb_clusters = DIV_ROUND_UP(job->len, job->cluster_size);
--    block_job_progress_set_remaining(&job->common, job->len);
-+    job_progress_set_remaining(&job->common.job, job->len);
- 
-     job->copy_bitmap = hbitmap_alloc(nb_clusters, 0);
-     if (job->sync_mode == MIRROR_SYNC_MODE_INCREMENTAL) {
-diff --git a/block/commit.c b/block/commit.c
-index b0a847e678..620666161b 100644
---- a/block/commit.c
-+++ b/block/commit.c
-@@ -150,7 +150,7 @@ static void coroutine_fn commit_run(void *opaque)
-     if (len < 0) {
-         goto out;
-     }
--    block_job_progress_set_remaining(&s->common, len);
-+    job_progress_set_remaining(&s->common.job, len);
- 
-     ret = base_len = blk_getlength(s->base);
-     if (base_len < 0) {
-@@ -196,7 +196,7 @@ static void coroutine_fn commit_run(void *opaque)
-             }
-         }
-         /* Publish progress */
--        block_job_progress_update(&s->common, n);
-+        job_progress_update(&s->common.job, n);
- 
-         if (copy) {
-             delay_ns = block_job_ratelimit_get_delay(&s->common, n);
-diff --git a/block/mirror.c b/block/mirror.c
-index bdc1b5b7b9..dcb66ec3be 100644
---- a/block/mirror.c
-+++ b/block/mirror.c
-@@ -119,7 +119,7 @@ static void mirror_iteration_done(MirrorOp *op, int ret)
-             bitmap_set(s->cow_bitmap, chunk_num, nb_chunks);
-         }
-         if (!s->initial_zeroing_ongoing) {
--            block_job_progress_update(&s->common, op->bytes);
-+            job_progress_update(&s->common.job, op->bytes);
-         }
-     }
-     qemu_iovec_destroy(&op->qiov);
-@@ -792,7 +792,7 @@ static void coroutine_fn mirror_run(void *opaque)
-         /* cnt is the number of dirty bytes remaining and s->bytes_in_flight is
-          * the number of bytes currently being processed; together those are
-          * the current remaining operation length */
--        block_job_progress_set_remaining(&s->common, s->bytes_in_flight + cnt);
-+        job_progress_set_remaining(&s->common.job, s->bytes_in_flight + cnt);
- 
-         /* Note that even when no rate limit is applied we need to yield
-          * periodically with no pending I/O so that bdrv_drain_all() returns.
-diff --git a/block/stream.c b/block/stream.c
-index 8546c412cd..a5d6e0cf8a 100644
---- a/block/stream.c
-+++ b/block/stream.c
-@@ -121,7 +121,7 @@ static void coroutine_fn stream_run(void *opaque)
-         ret = len;
-         goto out;
-     }
--    block_job_progress_set_remaining(&s->common, len);
-+    job_progress_set_remaining(&s->common.job, len);
- 
-     buf = qemu_blockalign(bs, STREAM_BUFFER_SIZE);
- 
-@@ -184,7 +184,7 @@ static void coroutine_fn stream_run(void *opaque)
-         ret = 0;
- 
-         /* Publish progress */
--        block_job_progress_update(&s->common, n);
-+        job_progress_update(&s->common.job, n);
-         if (copy) {
-             delay_ns = block_job_ratelimit_get_delay(&s->common, n);
-         } else {
-diff --git a/blockjob.c b/blockjob.c
-index da11b3b763..5c8ff6f846 100644
---- a/blockjob.c
-+++ b/blockjob.c
-@@ -242,16 +242,6 @@ int64_t block_job_ratelimit_get_delay(BlockJob *job, uint64_t n)
-     return ratelimit_calculate_delay(&job->limit, n);
- }
- 
--void block_job_progress_update(BlockJob *job, uint64_t done)
--{
--    job->offset += done;
--}
+-    def flatten_qmp_object(self, obj, output=None, basestr=''):
+-        if output is None:
+-            output = dict()
+-        if isinstance(obj, list):
+-            for i in range(len(obj)):
+-                self.flatten_qmp_object(obj[i], output, basestr + str(i) + '.')
+-        elif isinstance(obj, dict):
+-            for key in obj:
+-                self.flatten_qmp_object(obj[key], output, basestr + key + '.')
+-        else:
+-            output[basestr[:-1]] = obj # Strip trailing '.'
+-        return output
 -
--void block_job_progress_set_remaining(BlockJob *job, uint64_t remaining)
--{
--    job->len = job->offset + remaining;
--}
+-    def qmp_to_opts(self, obj):
+-        obj = self.flatten_qmp_object(obj)
+-        output_list = list()
+-        for key in obj:
+-            output_list += [key + '=' + obj[key]]
+-        return ','.join(output_list)
 -
- BlockJobInfo *block_job_query(BlockJob *job, Error **errp)
- {
-     BlockJobInfo *info;
-@@ -263,10 +253,10 @@ BlockJobInfo *block_job_query(BlockJob *job, Error **errp)
-     info = g_new0(BlockJobInfo, 1);
-     info->type      = g_strdup(job_type_str(&job->job));
-     info->device    = g_strdup(job->job.id);
--    info->len       = job->len;
-     info->busy      = atomic_read(&job->job.busy);
-     info->paused    = job->job.pause_count > 0;
--    info->offset    = job->offset;
-+    info->offset    = job->job.progress_current;
-+    info->len       = job->job.progress_total;
-     info->speed     = job->speed;
-     info->io_status = job->iostatus;
-     info->ready     = job_is_ready(&job->job),
-@@ -296,8 +286,8 @@ static void block_job_event_cancelled(Notifier *n, void *opaque)
+     def assert_qmp_absent(self, d, path):
+         try:
+             result = self.dictpath(d, path)
+@@ -444,8 +445,8 @@ class QMPTestCase(unittest.TestCase):
+         '''Asserts that the given filename is a json: filename and that its
+            content is equal to the given reference object'''
+         self.assertEqual(json_filename[:5], 'json:')
+-        self.assertEqual(self.flatten_qmp_object(json.loads(json_filename[5:])),
+-                         self.flatten_qmp_object(reference))
++        self.assertEqual(self.vm.flatten_qmp_object(json.loads(json_filename[5:])),
++                         self.vm.flatten_qmp_object(reference))
  
-     qapi_event_send_block_job_cancelled(job_type(&job->job),
-                                         job->job.id,
--                                        job->len,
--                                        job->offset,
-+                                        job->job.progress_total,
-+                                        job->job.progress_current,
-                                         job->speed,
-                                         &error_abort);
- }
-@@ -317,8 +307,8 @@ static void block_job_event_completed(Notifier *n, void *opaque)
- 
-     qapi_event_send_block_job_completed(job_type(&job->job),
-                                         job->job.id,
--                                        job->len,
--                                        job->offset,
-+                                        job->job.progress_total,
-+                                        job->job.progress_current,
-                                         job->speed,
-                                         !!msg,
-                                         msg,
-@@ -348,8 +338,8 @@ static void block_job_event_ready(Notifier *n, void *opaque)
- 
-     qapi_event_send_block_job_ready(job_type(&job->job),
-                                     job->job.id,
--                                    job->len,
--                                    job->offset,
-+                                    job->job.progress_total,
-+                                    job->job.progress_current,
-                                     job->speed, &error_abort);
- }
- 
-diff --git a/job.c b/job.c
-index 34304f2883..f7ab94352a 100644
---- a/job.c
-+++ b/job.c
-@@ -364,6 +364,16 @@ void job_unref(Job *job)
-     }
- }
- 
-+void job_progress_update(Job *job, uint64_t done)
-+{
-+    job->progress_current += done;
-+}
-+
-+void job_progress_set_remaining(Job *job, uint64_t remaining)
-+{
-+    job->progress_total = job->progress_current + remaining;
-+}
-+
- void job_event_cancelled(Job *job)
- {
-     notifier_list_notify(&job->on_finalize_cancelled, job);
-diff --git a/qemu-img.c b/qemu-img.c
-index eecb7d3228..e67b7a5844 100644
---- a/qemu-img.c
-+++ b/qemu-img.c
-@@ -864,9 +864,13 @@ static void run_block_job(BlockJob *job, Error **errp)
-     aio_context_acquire(aio_context);
-     job_ref(&job->job);
-     do {
-+        float progress = 0.0f;
-         aio_poll(aio_context, true);
--        qemu_progress_print(job->len ?
--                            ((float)job->offset / job->len * 100.f) : 0.0f, 0);
-+        if (job->job.progress_total) {
-+            progress = (float)job->job.progress_current /
-+                       job->job.progress_total * 100.f;
-+        }
-+        qemu_progress_print(progress, 0);
-     } while (!job_is_ready(&job->job) && !job_is_completed(&job->job));
- 
-     if (!job_is_completed(&job->job)) {
+     def cancel_and_wait(self, drive='drive0', force=False, resume=False):
+         '''Cancel a block job and wait for it to finish, returning the event'''
 -- 
 2.13.6
