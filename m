@@ -1,16 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60090)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60143)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fJfKz-0000Rn-1q
-	for qemu-devel@nongnu.org; Fri, 18 May 2018 09:22:27 -0400
+	(envelope-from <kwolf@redhat.com>) id 1fJfL1-0000Y3-RP
+	for qemu-devel@nongnu.org; Fri, 18 May 2018 09:22:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fJfKu-0006Qz-Vf
-	for qemu-devel@nongnu.org; Fri, 18 May 2018 09:22:25 -0400
+	(envelope-from <kwolf@redhat.com>) id 1fJfL0-0006V3-8t
+	for qemu-devel@nongnu.org; Fri, 18 May 2018 09:22:27 -0400
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Fri, 18 May 2018 15:21:08 +0200
-Message-Id: <20180518132114.4070-35-kwolf@redhat.com>
+Date: Fri, 18 May 2018 15:21:10 +0200
+Message-Id: <20180518132114.4070-37-kwolf@redhat.com>
 In-Reply-To: <20180518132114.4070-1-kwolf@redhat.com>
 References: <20180518132114.4070-1-kwolf@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 34/40] job: Introduce qapi/job.json
+Subject: [Qemu-devel] [PATCH v2 36/40] job: Add lifecycle QMP commands
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,352 +22,309 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, mreitz@redhat.com, jsnow@redhat.com, eblake@redhat.com, jcody@redhat.com, armbru@redhat.com, qemu-devel@nongnu.org
 
-This adds a separate schema file for all job-related definitions that
-aren't tied to the block layer.
-
-For a start, move the enums JobType, JobStatus and JobVerb.
+This adds QMP commands that control the transition between states of the
+job lifecycle.
 
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 ---
- qapi/block-core.json  | 90 +-----------------------------------------------
- qapi/job.json         | 94 +++++++++++++++++++++++++++++++++++++++++++++++++++
- qapi/qapi-schema.json |  1 +
- Makefile              |  9 +++++
- Makefile.objs         |  4 +++
- 5 files changed, 109 insertions(+), 89 deletions(-)
- create mode 100644 qapi/job.json
+ qapi/job.json |  99 +++++++++++++++++++++++++++++++++++++++++++
+ job-qmp.c     | 134 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ MAINTAINERS   |   1 +
+ Makefile.objs |   1 +
+ trace-events  |   9 ++++
+ 5 files changed, 244 insertions(+)
+ create mode 100644 job-qmp.c
 
-diff --git a/qapi/block-core.json b/qapi/block-core.json
-index bb964b4319..7dfa77a05c 100644
---- a/qapi/block-core.json
-+++ b/qapi/block-core.json
-@@ -6,6 +6,7 @@
- 
- { 'include': 'common.json' }
- { 'include': 'crypto.json' }
-+{ 'include': 'job.json' }
- { 'include': 'sockets.json' }
- 
- ##
-@@ -1050,95 +1051,6 @@
-   'data': ['top', 'full', 'none', 'incremental'] }
- 
- ##
--# @JobType:
--#
--# Type of a background job.
--#
--# @commit: block commit job type, see "block-commit"
--#
--# @stream: block stream job type, see "block-stream"
--#
--# @mirror: drive mirror job type, see "drive-mirror"
--#
--# @backup: drive backup job type, see "drive-backup"
--#
--# Since: 1.7
--##
--{ 'enum': 'JobType',
--  'data': ['commit', 'stream', 'mirror', 'backup'] }
--
--##
--# @JobVerb:
--#
--# Represents command verbs that can be applied to a job.
--#
--# @cancel: see @block-job-cancel
--#
--# @pause: see @block-job-pause
--#
--# @resume: see @block-job-resume
--#
--# @set-speed: see @block-job-set-speed
--#
--# @complete: see @block-job-complete
--#
--# @dismiss: see @block-job-dismiss
--#
--# @finalize: see @block-job-finalize
--#
--# Since: 2.12
--##
--{ 'enum': 'JobVerb',
--  'data': ['cancel', 'pause', 'resume', 'set-speed', 'complete', 'dismiss',
--           'finalize' ] }
--
--##
--# @JobStatus:
--#
--# Indicates the present state of a given job in its lifetime.
--#
--# @undefined: Erroneous, default state. Should not ever be visible.
--#
--# @created: The job has been created, but not yet started.
--#
--# @running: The job is currently running.
--#
--# @paused: The job is running, but paused. The pause may be requested by
--#          either the QMP user or by internal processes.
--#
--# @ready: The job is running, but is ready for the user to signal completion.
--#         This is used for long-running jobs like mirror that are designed to
--#         run indefinitely.
--#
--# @standby: The job is ready, but paused. This is nearly identical to @paused.
--#           The job may return to @ready or otherwise be canceled.
--#
--# @waiting: The job is waiting for other jobs in the transaction to converge
--#           to the waiting state. This status will likely not be visible for
--#           the last job in a transaction.
--#
--# @pending: The job has finished its work, but has finalization steps that it
--#           needs to make prior to completing. These changes may require
--#           manual intervention by the management process if manual was set
--#           to true. These changes may still fail.
--#
--# @aborting: The job is in the process of being aborted, and will finish with
--#            an error. The job will afterwards report that it is @concluded.
--#            This status may not be visible to the management process.
--#
--# @concluded: The job has finished all work. If manual was set to true, the job
--#             will remain in the query list until it is dismissed.
--#
--# @null: The job is in the process of being dismantled. This state should not
--#        ever be visible externally.
--#
--# Since: 2.12
--##
--{ 'enum': 'JobStatus',
--  'data': ['undefined', 'created', 'running', 'paused', 'ready', 'standby',
--           'waiting', 'pending', 'aborting', 'concluded', 'null' ] }
--
--##
- # @BlockJobInfo:
- #
- # Information about a long-running block device operation.
 diff --git a/qapi/job.json b/qapi/job.json
-new file mode 100644
-index 0000000000..a472c0cb29
---- /dev/null
+index 9fbdd0ccd9..b84dc6c820 100644
+--- a/qapi/job.json
 +++ b/qapi/job.json
-@@ -0,0 +1,94 @@
-+# -*- Mode: Python -*-
+@@ -106,3 +106,102 @@
+ { 'event': 'JOB_STATUS_CHANGE',
+   'data': { 'id': 'str',
+             'status': 'JobStatus' } }
 +
 +##
-+# == Background jobs
++# @job-pause:
++#
++# Pause an active job.
++#
++# This command returns immediately after marking the active job for pausing.
++# Pausing an already paused job is an error.
++#
++# The job will pause as soon as possible, which means transitioning into the
++# PAUSED state if it was RUNNING, or into STANDBY if it was READY. The
++# corresponding JOB_STATUS_CHANGE event will be emitted.
++#
++# Cancelling a paused job automatically resumes it.
++#
++# @id: The job identifier.
++#
++# Since: 2.13
 +##
++{ 'command': 'job-pause', 'data': { 'id': 'str' } }
 +
 +##
-+# @JobType:
++# @job-resume:
 +#
-+# Type of a background job.
++# Resume a paused job.
 +#
-+# @commit: block commit job type, see "block-commit"
++# This command returns immediately after resuming a paused job. Resuming an
++# already running job is an error.
 +#
-+# @stream: block stream job type, see "block-stream"
++# @id : The job identifier.
 +#
-+# @mirror: drive mirror job type, see "drive-mirror"
-+#
-+# @backup: drive backup job type, see "drive-backup"
-+#
-+# Since: 1.7
++# Since: 2.13
 +##
-+{ 'enum': 'JobType',
-+  'data': ['commit', 'stream', 'mirror', 'backup'] }
++{ 'command': 'job-resume', 'data': { 'id': 'str' } }
 +
 +##
-+# @JobStatus:
++# @job-cancel:
 +#
-+# Indicates the present state of a given job in its lifetime.
++# Instruct an active background job to cancel at the next opportunity.
++# This command returns immediately after marking the active job for
++# cancellation.
 +#
-+# @undefined: Erroneous, default state. Should not ever be visible.
++# The job will cancel as soon as possible and then emit a JOB_STATUS_CHANGE
++# event. Usually, the status will change to ABORTING, but it is possible that
++# a job successfully completes (e.g. because it was almost done and there was
++# no opportunity to cancel earlier than completing the job) and transitions to
++# PENDING instead.
 +#
-+# @created: The job has been created, but not yet started.
++# @id: The job identifier.
 +#
-+# @running: The job is currently running.
-+#
-+# @paused: The job is running, but paused. The pause may be requested by
-+#          either the QMP user or by internal processes.
-+#
-+# @ready: The job is running, but is ready for the user to signal completion.
-+#         This is used for long-running jobs like mirror that are designed to
-+#         run indefinitely.
-+#
-+# @standby: The job is ready, but paused. This is nearly identical to @paused.
-+#           The job may return to @ready or otherwise be canceled.
-+#
-+# @waiting: The job is waiting for other jobs in the transaction to converge
-+#           to the waiting state. This status will likely not be visible for
-+#           the last job in a transaction.
-+#
-+# @pending: The job has finished its work, but has finalization steps that it
-+#           needs to make prior to completing. These changes may require
-+#           manual intervention by the management process if manual was set
-+#           to true. These changes may still fail.
-+#
-+# @aborting: The job is in the process of being aborted, and will finish with
-+#            an error. The job will afterwards report that it is @concluded.
-+#            This status may not be visible to the management process.
-+#
-+# @concluded: The job has finished all work. If manual was set to true, the job
-+#             will remain in the query list until it is dismissed.
-+#
-+# @null: The job is in the process of being dismantled. This state should not
-+#        ever be visible externally.
-+#
-+# Since: 2.12
++# Since: 2.13
 +##
-+{ 'enum': 'JobStatus',
-+  'data': ['undefined', 'created', 'running', 'paused', 'ready', 'standby',
-+           'waiting', 'pending', 'aborting', 'concluded', 'null' ] }
++{ 'command': 'job-cancel', 'data': { 'id': 'str' } }
++
 +
 +##
-+# @JobVerb:
++# @job-complete:
 +#
-+# Represents command verbs that can be applied to a job.
++# Manually trigger completion of an active job in the READY state.
 +#
-+# @cancel: see @block-job-cancel
++# @id: The job identifier.
 +#
-+# @pause: see @block-job-pause
-+#
-+# @resume: see @block-job-resume
-+#
-+# @set-speed: see @block-job-set-speed
-+#
-+# @complete: see @block-job-complete
-+#
-+# @dismiss: see @block-job-dismiss
-+#
-+# @finalize: see @block-job-finalize
-+#
-+# Since: 2.12
++# Since: 2.13
 +##
-+{ 'enum': 'JobVerb',
-+  'data': ['cancel', 'pause', 'resume', 'set-speed', 'complete', 'dismiss',
-+           'finalize' ] }
-diff --git a/qapi/qapi-schema.json b/qapi/qapi-schema.json
-index 25bce78352..65b6dc2f6f 100644
---- a/qapi/qapi-schema.json
-+++ b/qapi/qapi-schema.json
-@@ -84,6 +84,7 @@
- { 'include': 'crypto.json' }
- { 'include': 'block.json' }
- { 'include': 'char.json' }
-+{ 'include': 'job.json' }
- { 'include': 'net.json' }
- { 'include': 'rocker.json' }
- { 'include': 'tpm.json' }
-diff --git a/Makefile b/Makefile
-index 35554b5bef..6d588d1f71 100644
---- a/Makefile
-+++ b/Makefile
-@@ -98,6 +98,7 @@ GENERATED_FILES += qapi/qapi-types-char.h qapi/qapi-types-char.c
- GENERATED_FILES += qapi/qapi-types-common.h qapi/qapi-types-common.c
- GENERATED_FILES += qapi/qapi-types-crypto.h qapi/qapi-types-crypto.c
- GENERATED_FILES += qapi/qapi-types-introspect.h qapi/qapi-types-introspect.c
-+GENERATED_FILES += qapi/qapi-types-job.h qapi/qapi-types-job.c
- GENERATED_FILES += qapi/qapi-types-migration.h qapi/qapi-types-migration.c
- GENERATED_FILES += qapi/qapi-types-misc.h qapi/qapi-types-misc.c
- GENERATED_FILES += qapi/qapi-types-net.h qapi/qapi-types-net.c
-@@ -116,6 +117,7 @@ GENERATED_FILES += qapi/qapi-visit-char.h qapi/qapi-visit-char.c
- GENERATED_FILES += qapi/qapi-visit-common.h qapi/qapi-visit-common.c
- GENERATED_FILES += qapi/qapi-visit-crypto.h qapi/qapi-visit-crypto.c
- GENERATED_FILES += qapi/qapi-visit-introspect.h qapi/qapi-visit-introspect.c
-+GENERATED_FILES += qapi/qapi-visit-job.h qapi/qapi-visit-job.c
- GENERATED_FILES += qapi/qapi-visit-migration.h qapi/qapi-visit-migration.c
- GENERATED_FILES += qapi/qapi-visit-misc.h qapi/qapi-visit-misc.c
- GENERATED_FILES += qapi/qapi-visit-net.h qapi/qapi-visit-net.c
-@@ -133,6 +135,7 @@ GENERATED_FILES += qapi/qapi-commands-char.h qapi/qapi-commands-char.c
- GENERATED_FILES += qapi/qapi-commands-common.h qapi/qapi-commands-common.c
- GENERATED_FILES += qapi/qapi-commands-crypto.h qapi/qapi-commands-crypto.c
- GENERATED_FILES += qapi/qapi-commands-introspect.h qapi/qapi-commands-introspect.c
-+GENERATED_FILES += qapi/qapi-commands-job.h qapi/qapi-commands-job.c
- GENERATED_FILES += qapi/qapi-commands-migration.h qapi/qapi-commands-migration.c
- GENERATED_FILES += qapi/qapi-commands-misc.h qapi/qapi-commands-misc.c
- GENERATED_FILES += qapi/qapi-commands-net.h qapi/qapi-commands-net.c
-@@ -150,6 +153,7 @@ GENERATED_FILES += qapi/qapi-events-char.h qapi/qapi-events-char.c
- GENERATED_FILES += qapi/qapi-events-common.h qapi/qapi-events-common.c
- GENERATED_FILES += qapi/qapi-events-crypto.h qapi/qapi-events-crypto.c
- GENERATED_FILES += qapi/qapi-events-introspect.h qapi/qapi-events-introspect.c
-+GENERATED_FILES += qapi/qapi-events-job.h qapi/qapi-events-job.c
- GENERATED_FILES += qapi/qapi-events-migration.h qapi/qapi-events-migration.c
- GENERATED_FILES += qapi/qapi-events-misc.h qapi/qapi-events-misc.c
- GENERATED_FILES += qapi/qapi-events-net.h qapi/qapi-events-net.c
-@@ -582,6 +586,7 @@ qapi-modules = $(SRC_PATH)/qapi/qapi-schema.json $(SRC_PATH)/qapi/common.json \
-                $(SRC_PATH)/qapi/char.json \
-                $(SRC_PATH)/qapi/crypto.json \
-                $(SRC_PATH)/qapi/introspect.json \
-+               $(SRC_PATH)/qapi/job.json \
-                $(SRC_PATH)/qapi/migration.json \
-                $(SRC_PATH)/qapi/misc.json \
-                $(SRC_PATH)/qapi/net.json \
-@@ -601,6 +606,7 @@ qapi/qapi-types-char.c qapi/qapi-types-char.h \
- qapi/qapi-types-common.c qapi/qapi-types-common.h \
- qapi/qapi-types-crypto.c qapi/qapi-types-crypto.h \
- qapi/qapi-types-introspect.c qapi/qapi-types-introspect.h \
-+qapi/qapi-types-job.c qapi/qapi-types-job.h \
- qapi/qapi-types-migration.c qapi/qapi-types-migration.h \
- qapi/qapi-types-misc.c qapi/qapi-types-misc.h \
- qapi/qapi-types-net.c qapi/qapi-types-net.h \
-@@ -619,6 +625,7 @@ qapi/qapi-visit-char.c qapi/qapi-visit-char.h \
- qapi/qapi-visit-common.c qapi/qapi-visit-common.h \
- qapi/qapi-visit-crypto.c qapi/qapi-visit-crypto.h \
- qapi/qapi-visit-introspect.c qapi/qapi-visit-introspect.h \
-+qapi/qapi-visit-job.c qapi/qapi-visit-job.h \
- qapi/qapi-visit-migration.c qapi/qapi-visit-migration.h \
- qapi/qapi-visit-misc.c qapi/qapi-visit-misc.h \
- qapi/qapi-visit-net.c qapi/qapi-visit-net.h \
-@@ -636,6 +643,7 @@ qapi/qapi-commands-char.c qapi/qapi-commands-char.h \
- qapi/qapi-commands-common.c qapi/qapi-commands-common.h \
- qapi/qapi-commands-crypto.c qapi/qapi-commands-crypto.h \
- qapi/qapi-commands-introspect.c qapi/qapi-commands-introspect.h \
-+qapi/qapi-commands-job.c qapi/qapi-commands-job.h \
- qapi/qapi-commands-migration.c qapi/qapi-commands-migration.h \
- qapi/qapi-commands-misc.c qapi/qapi-commands-misc.h \
- qapi/qapi-commands-net.c qapi/qapi-commands-net.h \
-@@ -653,6 +661,7 @@ qapi/qapi-events-char.c qapi/qapi-events-char.h \
- qapi/qapi-events-common.c qapi/qapi-events-common.h \
- qapi/qapi-events-crypto.c qapi/qapi-events-crypto.h \
- qapi/qapi-events-introspect.c qapi/qapi-events-introspect.h \
-+qapi/qapi-events-job.c qapi/qapi-events-job.h \
- qapi/qapi-events-migration.c qapi/qapi-events-migration.h \
- qapi/qapi-events-misc.c qapi/qapi-events-misc.h \
- qapi/qapi-events-net.c qapi/qapi-events-net.h \
++{ 'command': 'job-complete', 'data': { 'id': 'str' } }
++
++##
++# @job-dismiss:
++#
++# Deletes a job that is in the CONCLUDED state. This command only needs to be
++# run explicitly for jobs that don't have automatic dismiss enabled.
++#
++# This command will refuse to operate on any job that has not yet reached its
++# terminal state, JOB_STATUS_CONCLUDED. For jobs that make use of JOB_READY
++# event, job-cancel or job-complete will still need to be used as appropriate.
++#
++# @id: The job identifier.
++#
++# Since: 2.13
++##
++{ 'command': 'job-dismiss', 'data': { 'id': 'str' } }
++
++##
++# @job-finalize:
++#
++# Instructs all jobs in a transaction (or a single job if it is not part of any
++# transaction) to finalize any graph changes and do any necessary cleanup. This
++# command requires that all involved jobs are in the PENDING state.
++#
++# For jobs in a transaction, instructing one job to finalize will force
++# ALL jobs in the transaction to finalize, so it is only necessary to instruct
++# a single member job to finalize.
++#
++# @id: The identifier of any job in the transaction, or of a job that is not
++#      part of any transaction.
++#
++# Since: 2.13
++##
++{ 'command': 'job-finalize', 'data': { 'id': 'str' } }
+diff --git a/job-qmp.c b/job-qmp.c
+new file mode 100644
+index 0000000000..b2e18cfd9c
+--- /dev/null
++++ b/job-qmp.c
+@@ -0,0 +1,134 @@
++/*
++ * QMP interface for background jobs
++ *
++ * Copyright (c) 2011 IBM Corp.
++ * Copyright (c) 2012, 2018 Red Hat, Inc.
++ *
++ * Permission is hereby granted, free of charge, to any person obtaining a copy
++ * of this software and associated documentation files (the "Software"), to deal
++ * in the Software without restriction, including without limitation the rights
++ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
++ * copies of the Software, and to permit persons to whom the Software is
++ * furnished to do so, subject to the following conditions:
++ *
++ * The above copyright notice and this permission notice shall be included in
++ * all copies or substantial portions of the Software.
++ *
++ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
++ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
++ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
++ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
++ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
++ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
++ * THE SOFTWARE.
++ */
++
++#include "qemu/osdep.h"
++#include "qemu-common.h"
++#include "qemu/job.h"
++#include "qapi/qapi-commands-job.h"
++#include "qapi/error.h"
++#include "trace-root.h"
++
++/* Get a job using its ID and acquire its AioContext */
++static Job *find_job(const char *id, AioContext **aio_context, Error **errp)
++{
++    Job *job;
++
++    *aio_context = NULL;
++
++    job = job_get(id);
++    if (!job) {
++        error_setg(errp, "Job not found");
++        return NULL;
++    }
++
++    *aio_context = job->aio_context;
++    aio_context_acquire(*aio_context);
++
++    return job;
++}
++
++void qmp_job_cancel(const char *id, Error **errp)
++{
++    AioContext *aio_context;
++    Job *job = find_job(id, &aio_context, errp);
++
++    if (!job) {
++        return;
++    }
++
++    trace_qmp_job_cancel(job);
++    job_user_cancel(job, true, errp);
++    aio_context_release(aio_context);
++}
++
++void qmp_job_pause(const char *id, Error **errp)
++{
++    AioContext *aio_context;
++    Job *job = find_job(id, &aio_context, errp);
++
++    if (!job) {
++        return;
++    }
++
++    trace_qmp_job_pause(job);
++    job_user_pause(job, errp);
++    aio_context_release(aio_context);
++}
++
++void qmp_job_resume(const char *id, Error **errp)
++{
++    AioContext *aio_context;
++    Job *job = find_job(id, &aio_context, errp);
++
++    if (!job) {
++        return;
++    }
++
++    trace_qmp_job_resume(job);
++    job_user_resume(job, errp);
++    aio_context_release(aio_context);
++}
++
++void qmp_job_complete(const char *id, Error **errp)
++{
++    AioContext *aio_context;
++    Job *job = find_job(id, &aio_context, errp);
++
++    if (!job) {
++        return;
++    }
++
++    trace_qmp_job_complete(job);
++    job_complete(job, errp);
++    aio_context_release(aio_context);
++}
++
++void qmp_job_finalize(const char *id, Error **errp)
++{
++    AioContext *aio_context;
++    Job *job = find_job(id, &aio_context, errp);
++
++    if (!job) {
++        return;
++    }
++
++    trace_qmp_job_finalize(job);
++    job_finalize(job, errp);
++    aio_context_release(aio_context);
++}
++
++void qmp_job_dismiss(const char *id, Error **errp)
++{
++    AioContext *aio_context;
++    Job *job = find_job(id, &aio_context, errp);
++
++    if (!job) {
++        return;
++    }
++
++    trace_qmp_job_dismiss(job);
++    job_dismiss(&job, errp);
++    aio_context_release(aio_context);
++}
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 9fba3307d9..4215295f05 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -1370,6 +1370,7 @@ S: Supported
+ F: blockjob.c
+ F: include/block/blockjob.h
+ F: job.c
++F: job-qmp.c
+ F: include/block/job.h
+ F: block/backup.c
+ F: block/commit.c
 diff --git a/Makefile.objs b/Makefile.objs
-index 92b73fc272..3df8d58e49 100644
+index 3df8d58e49..c6c3554203 100644
 --- a/Makefile.objs
 +++ b/Makefile.objs
-@@ -10,6 +10,7 @@ util-obj-y += qapi/qapi-types-char.o
- util-obj-y += qapi/qapi-types-common.o
- util-obj-y += qapi/qapi-types-crypto.o
- util-obj-y += qapi/qapi-types-introspect.o
-+util-obj-y += qapi/qapi-types-job.o
- util-obj-y += qapi/qapi-types-migration.o
- util-obj-y += qapi/qapi-types-misc.o
- util-obj-y += qapi/qapi-types-net.o
-@@ -28,6 +29,7 @@ util-obj-y += qapi/qapi-visit-char.o
- util-obj-y += qapi/qapi-visit-common.o
- util-obj-y += qapi/qapi-visit-crypto.o
- util-obj-y += qapi/qapi-visit-introspect.o
-+util-obj-y += qapi/qapi-visit-job.o
- util-obj-y += qapi/qapi-visit-migration.o
- util-obj-y += qapi/qapi-visit-misc.o
- util-obj-y += qapi/qapi-visit-net.o
-@@ -45,6 +47,7 @@ util-obj-y += qapi/qapi-events-char.o
- util-obj-y += qapi/qapi-events-common.o
- util-obj-y += qapi/qapi-events-crypto.o
- util-obj-y += qapi/qapi-events-introspect.o
-+util-obj-y += qapi/qapi-events-job.o
- util-obj-y += qapi/qapi-events-migration.o
- util-obj-y += qapi/qapi-events-misc.o
- util-obj-y += qapi/qapi-events-net.o
-@@ -140,6 +143,7 @@ common-obj-y += qapi/qapi-commands-char.o
- common-obj-y += qapi/qapi-commands-common.o
- common-obj-y += qapi/qapi-commands-crypto.o
- common-obj-y += qapi/qapi-commands-introspect.o
-+common-obj-y += qapi/qapi-commands-job.o
- common-obj-y += qapi/qapi-commands-migration.o
- common-obj-y += qapi/qapi-commands-misc.o
- common-obj-y += qapi/qapi-commands-net.o
+@@ -97,6 +97,7 @@ io-obj-y = io/
+ ifeq ($(CONFIG_SOFTMMU),y)
+ common-obj-y = blockdev.o blockdev-nbd.o block/
+ common-obj-y += bootdevice.o iothread.o
++common-obj-y += job-qmp.o
+ common-obj-y += net/
+ common-obj-y += qdev-monitor.o device-hotplug.o
+ common-obj-$(CONFIG_WIN32) += os-win32.o
+diff --git a/trace-events b/trace-events
+index ef7579a285..c445f54773 100644
+--- a/trace-events
++++ b/trace-events
+@@ -109,6 +109,15 @@ job_state_transition(void *job,  int ret, const char *legal, const char *s0, con
+ job_apply_verb(void *job, const char *state, const char *verb, const char *legal) "job %p in state %s; applying verb %s (%s)"
+ job_completed(void *job, int ret, int jret) "job %p ret %d corrected ret %d"
+ 
++# job-qmp.c
++qmp_job_cancel(void *job) "job %p"
++qmp_job_pause(void *job) "job %p"
++qmp_job_resume(void *job) "job %p"
++qmp_job_complete(void *job) "job %p"
++qmp_job_finalize(void *job) "job %p"
++qmp_job_dismiss(void *job) "job %p"
++
++
+ ### Guest events, keep at bottom
+ 
+ 
 -- 
 2.13.6
