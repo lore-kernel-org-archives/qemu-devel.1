@@ -1,33 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52131)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52221)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fJkJc-0002Kd-Ok
-	for qemu-devel@nongnu.org; Fri, 18 May 2018 14:41:21 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1fJkKI-0002db-H9
+	for qemu-devel@nongnu.org; Fri, 18 May 2018 14:42:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fJkJX-0004AP-S3
-	for qemu-devel@nongnu.org; Fri, 18 May 2018 14:41:20 -0400
-Received: from indium.canonical.com ([91.189.90.7]:39992)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1fJkJX-000486-LF
-	for qemu-devel@nongnu.org; Fri, 18 May 2018 14:41:15 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1fJkJV-000346-KE
-	for <qemu-devel@nongnu.org>; Fri, 18 May 2018 18:41:13 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 423362E8F43
-	for <qemu-devel@nongnu.org>; Fri, 18 May 2018 18:41:13 +0000 (UTC)
+	(envelope-from <dgilbert@redhat.com>) id 1fJkKH-0004Vm-PB
+	for qemu-devel@nongnu.org; Fri, 18 May 2018 14:42:02 -0400
+Date: Fri, 18 May 2018 19:41:51 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20180518184151.GA2479@work-vm>
+References: <20180518132114.4070-1-kwolf@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <20180518132114.4070-1-kwolf@redhat.com>
 Content-Transfer-Encoding: quoted-printable
-Date: Fri, 18 May 2018 18:26:10 -0000
-From: Patto <1772086@bugs.launchpad.net>
-Reply-To: Bug 1772086 <1772086@bugs.launchpad.net>
-Sender: bounces@canonical.com
-Message-Id: <152666797097.2555.6897470014572103765.malonedeb@gac.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1772086] [NEW] malformed serial data being sent
- from guest
+Subject: Re: [Qemu-devel] [PATCH v2 00/40] Generic background jobs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,37 +23,19 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Kevin Wolf <kwolf@redhat.com>, marcandre.lureau@redhat.com
+Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, jsnow@redhat.com, jcody@redhat.com, armbru@redhat.com, mreitz@redhat.com
 
-Public bug reported:
+* Kevin Wolf (kwolf@redhat.com) wrote:
+> Before we can make x-blockdev-create a background job, we need to
+> generalise the job infrastructure so that it can be used without any
+> associated block node.
 
-When sending data through serial from guest each time 0x0A byte is sent
-0x0D is sent before it. For example, when sending {0x29, 0x0A} on the
-other end I receive {0x29, 0x0D, 0x0A}.
+Is there any relationship between what this does, and what
+Marc-Andr=E9's 'monitor: add asynchronous command type' tries to do?
+(See 20180326150916.9602-1-marcandre.lureau@redhat.com 26th March)
 
-** Affects: qemu
-     Importance: Undecided
-         Status: New
+Dave
 
-
-** Tags: com serial
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1772086
-
-Title:
-  malformed serial data being sent from guest
-
-Status in QEMU:
-  New
-
-Bug description:
-  When sending data through serial from guest each time 0x0A byte is
-  sent 0x0D is sent before it. For example, when sending {0x29, 0x0A} on
-  the other end I receive {0x29, 0x0D, 0x0A}.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1772086/+subscriptions
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
