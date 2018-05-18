@@ -1,33 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46867)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47449)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fJgIi-0007WX-1r
-	for qemu-devel@nongnu.org; Fri, 18 May 2018 10:24:09 -0400
+	(envelope-from <eblake@redhat.com>) id 1fJgKP-00011X-NJ
+	for qemu-devel@nongnu.org; Fri, 18 May 2018 10:25:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fJgIg-0000rz-Tv
-	for qemu-devel@nongnu.org; Fri, 18 May 2018 10:24:08 -0400
-Received: from mail-qt0-x234.google.com ([2607:f8b0:400d:c0d::234]:43037)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fJgIg-0000rS-Oy
-	for qemu-devel@nongnu.org; Fri, 18 May 2018 10:24:06 -0400
-Received: by mail-qt0-x234.google.com with SMTP id f13-v6so10450068qtp.10
-	for <qemu-devel@nongnu.org>; Fri, 18 May 2018 07:24:06 -0700 (PDT)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20180517174718.10107-1-alex.bennee@linaro.org>
-	<20180517174718.10107-46-alex.bennee@linaro.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <45d110eb-8014-f1d2-fbe4-d1d62d7c5882@amsat.org>
-Date: Fri, 18 May 2018 11:24:00 -0300
+	(envelope-from <eblake@redhat.com>) id 1fJgKL-00031M-Ht
+	for qemu-devel@nongnu.org; Fri, 18 May 2018 10:25:53 -0400
+References: <20180518132114.4070-1-kwolf@redhat.com>
+	<20180518132114.4070-3-kwolf@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <c0590f28-6394-36ba-2c32-9fdefafca875@redhat.com>
+Date: Fri, 18 May 2018 09:25:43 -0500
 MIME-Version: 1.0
-In-Reply-To: <20180517174718.10107-46-alex.bennee@linaro.org>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20180518132114.4070-3-kwolf@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v4 45/49] tests/tcg: enable building for
- RISCV64
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 02/40] blockjob: Improve
+ BlockJobInfo.offset/len documentation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,85 +25,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, cota@braap.org, famz@redhat.com, berrange@redhat.com, richard.henderson@linaro.org, balrogg@gmail.com, aurelien@aurel32.net, agraf@suse.de
-Cc: qemu-devel@nongnu.org
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+Cc: mreitz@redhat.com, jsnow@redhat.com, jcody@redhat.com, armbru@redhat.com, qemu-devel@nongnu.org
 
-On 05/17/2018 02:47 PM, Alex Bennée wrote:
-> As before, using Debian SID compilers.
+On 05/18/2018 08:20 AM, Kevin Wolf wrote:
+> Clarify that len is just an estimation of the end value of offset, and
+> that offset increases monotonically while len can change arbitrarily.
+
+That's tighter than what libvirt promises (and in fact, there are cases 
+where libvirt synthesizes an offset/len of 1/1 to indicate completion 
+when the information is no longer available from qemu, which means the 
+offset has gone backwards to libvirt clients).
+
+But it matches the qemu implementation, and I'm okay if we want to stick 
+to those semantics of monotonically increasing offset (the more 
+important semantics of being an estimate of time remaining is possible 
+whether or not you have a guarantee of a monotonic increase on one of 
+the two numbers).
+
 > 
-> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 > ---
->  tests/docker/Makefile.include                        |  1 +
->  tests/docker/dockerfiles/debian-riscv64-cross.docker | 12 ++++++++++++
->  tests/tcg/riscv/Makefile.include                     | 10 ++++++++++
->  3 files changed, 23 insertions(+)
->  create mode 100644 tests/docker/dockerfiles/debian-riscv64-cross.docker
->  create mode 100644 tests/tcg/riscv/Makefile.include
+>   qapi/block-core.json | 9 ++++++---
+>   1 file changed, 6 insertions(+), 3 deletions(-)
 > 
-> diff --git a/tests/docker/Makefile.include b/tests/docker/Makefile.include
-> index f58afb8c5d..d00887bdf1 100644
-> --- a/tests/docker/Makefile.include
-> +++ b/tests/docker/Makefile.include
-> @@ -68,6 +68,7 @@ docker-image-debian-m68k-cross: docker-image-debian-sid
->  docker-image-debian-sh4-cross: docker-image-debian-sid
->  docker-image-debian-sparc64-cross: docker-image-debian-sid
->  docker-image-debian-mips64-cross: docker-image-debian-sid
-> +docker-image-debian-riscv64-cross: docker-image-debian-sid
->  docker-image-travis: NOUSER=1
->  
->  # Expand all the pre-requistes for each docker image and test combination
-> diff --git a/tests/docker/dockerfiles/debian-riscv64-cross.docker b/tests/docker/dockerfiles/debian-riscv64-cross.docker
-> new file mode 100644
-> index 0000000000..2b2e64cee6
-> --- /dev/null
-> +++ b/tests/docker/dockerfiles/debian-riscv64-cross.docker
-> @@ -0,0 +1,12 @@
+> diff --git a/qapi/block-core.json b/qapi/block-core.json
+> index d32ec95666..0e29abf099 100644
+> --- a/qapi/block-core.json
+> +++ b/qapi/block-core.json
+> @@ -1148,7 +1148,12 @@
+>   # @device: The job identifier. Originally the device name but other
+>   #          values are allowed since QEMU 2.7
+>   #
+> -# @len: the maximum progress value
+> +# @len: Estimated @offset value at the completion of the job. This value can
+> +#       arbitrarily change while the job is running, in both directions.
 > +#
-> +# Docker cross-compiler target
-> +#
-> +# This docker target builds on the debian sid base image which
-> +# contains cross compilers for Debian "ports" targets.
-> +#
-> +FROM qemu:debian-sid
-> +
-> +RUN DEBIAN_FRONTEND=noninteractive eatmydata \
-> +    apt-get install -y --no-install-recommends \
-> +        gcc-riscv64-linux-gnu \
-> +        libc6-dev-riscv64-cross
-> diff --git a/tests/tcg/riscv/Makefile.include b/tests/tcg/riscv/Makefile.include
-> new file mode 100644
-> index 0000000000..d92ac6c89f
-> --- /dev/null
-> +++ b/tests/tcg/riscv/Makefile.include
-> @@ -0,0 +1,10 @@
-> +#
-> +# Makefile.include for all RISCV targets
-> +#
-> +# Debian only really cares about 64 bit going forward
-> +#
-> +
-> +ifeq ($(TARGET_NAME),riscv64)
-> +DOCKER_IMAGE=debian-riscv64-cross
-> +DOCKER_CROSS_COMPILER=riscv64-linux-gnu-gcc
-> +endif
-> 
+> +# @offset: Progress made until now. The unit is arbitrary and the value can
+> +#          only meaningfully be used for the ratio of @offset to @len. The
+> +#          value is monotonically increasing.
 
-Using a snapshot:
+So I'm okay whether or not you drop that last sentence.
 
--- >8 --
-diff --git a/tests/docker/dockerfiles/debian-sid.docker
-b/tests/docker/dockerfiles/debian-sid.docker
--# Duplicate deb line as deb-src
--RUN cat /etc/apt/sources.list | sed "s/^deb\ /deb-src /" >>
-/etc/apt/sources.list
-+# random 'working' snapshot
-+RUN echo "deb
-http://snapshot.debian.org/archive/debian/20180512T101008Z/ sid main" >
-/etc/apt/sources.list && \
-+    echo "deb-src
-http://snapshot.debian.org/archive/debian/20180512T101008Z/ sid main" >>
-/etc/apt/sources.list
---
+You're also rearranging the docs to occur in the order that the struct 
+declares things (good change, and trivial; not sure if you want to call 
+it out in the commit message).
 
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Tested-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Reviewed-by: Eric Blake <eblake@redhat.com>
+
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
