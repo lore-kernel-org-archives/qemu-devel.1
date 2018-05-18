@@ -1,36 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56482)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57553)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1fJagE-0006R3-8x
-	for qemu-devel@nongnu.org; Fri, 18 May 2018 04:24:04 -0400
+	(envelope-from <wangjie88@huawei.com>) id 1fJamd-0001SC-I3
+	for qemu-devel@nongnu.org; Fri, 18 May 2018 04:30:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1fJagC-0005Rr-L7
-	for qemu-devel@nongnu.org; Fri, 18 May 2018 04:24:02 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:32802 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eric.auger@redhat.com>)
-	id 1fJagC-0005RO-Et
-	for qemu-devel@nongnu.org; Fri, 18 May 2018 04:24:00 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.4])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 10670402385D
-	for <qemu-devel@nongnu.org>; Fri, 18 May 2018 08:24:00 +0000 (UTC)
-Received: from localhost.localdomain (ovpn-117-111.ams2.redhat.com
-	[10.36.117.111])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id A0FF82023582
-	for <qemu-devel@nongnu.org>; Fri, 18 May 2018 08:23:59 +0000 (UTC)
-References: <20180517085927.24925-1-peterx@redhat.com>
-	<20180517085927.24925-6-peterx@redhat.com>
-From: Auger Eric <eric.auger@redhat.com>
-Message-ID: <faaefaac-799d-1e32-8a49-de8338cbaca6@redhat.com>
-Date: Fri, 18 May 2018 10:23:58 +0200
+	(envelope-from <wangjie88@huawei.com>) id 1fJamc-0001bl-GK
+	for qemu-devel@nongnu.org; Fri, 18 May 2018 04:30:39 -0400
+From: "WangJie (Pluto)" <wangjie88@huawei.com>
+References: <1526523977-73930-1-git-send-email-wangjie88@huawei.com>
+	<20180517062258.GP9089@xz-mi>
+	<2b45d90a-6798-224e-91c5-41b3cc3a5b16@huawei.com>
+Message-ID: <7cb9a938-7bd3-fd44-2914-fbd98eecd50d@huawei.com>
+Date: Fri, 18 May 2018 16:24:44 +0800
 MIME-Version: 1.0
-In-Reply-To: <20180517085927.24925-6-peterx@redhat.com>
-Content-Type: text/plain; charset=windows-1252
+In-Reply-To: <2b45d90a-6798-224e-91c5-41b3cc3a5b16@huawei.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3 05/12] intel-iommu: introduce
- vtd_page_walk_info
+Subject: [Qemu-devel] Ping? Re: [PATCH v6 2/2] iothread: let
+ aio_epoll_disable fit to aio_context_destroy
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,201 +26,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Peter Xu <peterx@redhat.com>
+Cc: famz@redhat.com, stefanha@redhat.com, eblake@redhat.com, qemu-devel@nongnu.org, qemu-block@nongnu.org, eric.fangyi@huawei.com, wangjie88@huawei.com
 
+Ping
 
-
-On 05/17/2018 10:59 AM, Peter Xu wrote:
-> During the recursive page walking of IOVA page tables, some stack
-> variables are constant variables and never changed during the whole page
-> walking procedure.  Isolate them into a struct so that we don't need to
-> pass those contants down the stack every time and multiple times.
-s/contants/constants
+On 2018/5/17 14:48, WangJie (Pluto) wrote:
+> I enjoyed the great benefit of your suggestions, and I will improve next time. :)
+> This time, I ask maintainers to touch up the commit message base on version 5 and merge it, thanks very much.
 > 
-> Signed-off-by: Peter Xu <peterx@redhat.com>
-> ---
->  hw/i386/intel_iommu.c | 84 ++++++++++++++++++++++++++-----------------
->  1 file changed, 52 insertions(+), 32 deletions(-)
-> 
-> diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
-> index 9a418abfb6..4953d02ed0 100644
-> --- a/hw/i386/intel_iommu.c
-> +++ b/hw/i386/intel_iommu.c
-> @@ -747,9 +747,27 @@ static int vtd_iova_to_slpte(VTDContextEntry *ce, uint64_t iova, bool is_write,
->  
->  typedef int (*vtd_page_walk_hook)(IOMMUTLBEntry *entry, void *private);
->  
-> +/**
-> + * Constant information used during page walking
-page table walk?
-> + *
-> + * @hook_fn: hook func to be called when detected page
-nit: when detected page? Not necessarily as it may be called on invalid
-entries. on leaf ptw entries?
-> + * @private: private data to be passed into hook func
-> + * @notify_unmap: whether we should notify invalid entries
-> + * @aw: maximum address width
-> + */
-> +typedef struct {
-> +    vtd_page_walk_hook hook_fn;
-> +    void *private;
-> +    bool notify_unmap;
-> +    uint8_t aw;
-> +} vtd_page_walk_info;
-> +
->  static int vtd_page_walk_one(IOMMUTLBEntry *entry, int level,
-> -                             vtd_page_walk_hook hook_fn, void *private)
-> +                             vtd_page_walk_info *info)
->  {
-> +    vtd_page_walk_hook hook_fn = info->hook_fn;
-> +    void *private = info->private;
-> +
->      assert(hook_fn);
->      trace_vtd_page_walk_one(level, entry->iova, entry->translated_addr,
->                              entry->addr_mask, entry->perm);
-> @@ -762,17 +780,13 @@ static int vtd_page_walk_one(IOMMUTLBEntry *entry, int level,
->   * @addr: base GPA addr to start the walk
->   * @start: IOVA range start address
->   * @end: IOVA range end address (start <= addr < end)
-> - * @hook_fn: hook func to be called when detected page
-> - * @private: private data to be passed into hook func
->   * @read: whether parent level has read permission
->   * @write: whether parent level has write permission
-> - * @notify_unmap: whether we should notify invalid entries
-> - * @aw: maximum address width
-> + * @info: constant information for the page walk
->   */
->  static int vtd_page_walk_level(dma_addr_t addr, uint64_t start,
-> -                               uint64_t end, vtd_page_walk_hook hook_fn,
-> -                               void *private, uint32_t level, bool read,
-> -                               bool write, bool notify_unmap, uint8_t aw)
-> +                               uint64_t end, uint32_t level, bool read,
-> +                               bool write, vtd_page_walk_info *info)
->  {
->      bool read_cur, write_cur, entry_valid;
->      uint32_t offset;
-> @@ -822,24 +836,24 @@ static int vtd_page_walk_level(dma_addr_t addr, uint64_t start,
->  
->          if (vtd_is_last_slpte(slpte, level)) {
->              /* NOTE: this is only meaningful if entry_valid == true */
-> -            entry.translated_addr = vtd_get_slpte_addr(slpte, aw);
-> -            if (!entry_valid && !notify_unmap) {
-> +            entry.translated_addr = vtd_get_slpte_addr(slpte, info->aw);
-> +            if (!entry_valid && !info->notify_unmap) {
->                  trace_vtd_page_walk_skip_perm(iova, iova_next);
->                  goto next;
->              }
-> -            ret = vtd_page_walk_one(&entry, level, hook_fn, private);
-> +            ret = vtd_page_walk_one(&entry, level, info);
->              if (ret < 0) {
->                  return ret;
->              }
->          } else {
->              if (!entry_valid) {
-> -                if (notify_unmap) {
-> +                if (info->notify_unmap) {
->                      /*
->                       * The whole entry is invalid; unmap it all.
->                       * Translated address is meaningless, zero it.
->                       */
->                      entry.translated_addr = 0x0;
-> -                    ret = vtd_page_walk_one(&entry, level, hook_fn, private);
-> +                    ret = vtd_page_walk_one(&entry, level, info);
->                      if (ret < 0) {
->                          return ret;
->                      }
-> @@ -848,10 +862,9 @@ static int vtd_page_walk_level(dma_addr_t addr, uint64_t start,
->                  }
->                  goto next;
->              }
-> -            ret = vtd_page_walk_level(vtd_get_slpte_addr(slpte, aw), iova,
-> -                                      MIN(iova_next, end), hook_fn, private,
-> -                                      level - 1, read_cur, write_cur,
-> -                                      notify_unmap, aw);
-> +            ret = vtd_page_walk_level(vtd_get_slpte_addr(slpte, info->aw),
-> +                                      iova, MIN(iova_next, end), level - 1,
-> +                                      read_cur, write_cur, info);
->              if (ret < 0) {
->                  return ret;
->              }
-> @@ -870,28 +883,24 @@ next:
->   * @ce: context entry to walk upon
->   * @start: IOVA address to start the walk
->   * @end: IOVA range end address (start <= addr < end)
-> - * @hook_fn: the hook that to be called for each detected area
-> - * @private: private data for the hook function
-> - * @aw: maximum address width
-> + * @info: page walking information struct
->   */
->  static int vtd_page_walk(VTDContextEntry *ce, uint64_t start, uint64_t end,
-> -                         vtd_page_walk_hook hook_fn, void *private,
-> -                         bool notify_unmap, uint8_t aw)
-> +                         vtd_page_walk_info *info)
->  {
->      dma_addr_t addr = vtd_ce_get_slpt_base(ce);
->      uint32_t level = vtd_ce_get_level(ce);
->  
-> -    if (!vtd_iova_range_check(start, ce, aw)) {
-> +    if (!vtd_iova_range_check(start, ce, info->aw)) {
->          return -VTD_FR_ADDR_BEYOND_MGAW;
->      }
->  
-> -    if (!vtd_iova_range_check(end, ce, aw)) {
-> +    if (!vtd_iova_range_check(end, ce, info->aw)) {
->          /* Fix end so that it reaches the maximum */
-> -        end = vtd_iova_limit(ce, aw);
-> +        end = vtd_iova_limit(ce, info->aw);
->      }
->  
-> -    return vtd_page_walk_level(addr, start, end, hook_fn, private,
-> -                               level, true, true, notify_unmap, aw);
-> +    return vtd_page_walk_level(addr, start, end, level, true, true, info);
->  }
->  
->  /* Map a device to its corresponding domain (context-entry) */
-> @@ -1446,13 +1455,18 @@ static void vtd_iotlb_page_invalidate_notify(IntelIOMMUState *s,
->                                         vtd_as->devfn, &ce);
->          if (!ret && domain_id == VTD_CONTEXT_ENTRY_DID(ce.hi)) {
->              if (vtd_as_notify_mappings(vtd_as)) {
-> +                vtd_page_walk_info info = {
-> +                    .hook_fn = vtd_page_invalidate_notify_hook,
-> +                    .private = (void *)&vtd_as->iommu,
-> +                    .notify_unmap = true,
-> +                    .aw = s->aw_bits,
-> +                };
-> +
->                  /*
->                   * For MAP-inclusive notifiers, we need to walk the
->                   * page table to sync the shadow page table.
->                   */
-> -                vtd_page_walk(&ce, addr, addr + size,
-> -                              vtd_page_invalidate_notify_hook,
-> -                              (void *)&vtd_as->iommu, true, s->aw_bits);
-> +                vtd_page_walk(&ce, addr, addr + size, &info);
->              } else {
->                  /*
->                   * For UNMAP-only notifiers, we don't need to walk the
-> @@ -2922,8 +2936,14 @@ static void vtd_iommu_replay(IOMMUMemoryRegion *iommu_mr, IOMMUNotifier *n)
->                                    ce.hi, ce.lo);
->          if (vtd_as_notify_mappings(vtd_as)) {
->              /* This is required only for MAP typed notifiers */
-> -            vtd_page_walk(&ce, 0, ~0ULL, vtd_replay_hook, (void *)n, false,
-> -                          s->aw_bits);
-> +            vtd_page_walk_info info = {
-> +                .hook_fn = vtd_replay_hook,
-> +                .private = (void *)n,
-> +                .notify_unmap = false,
-> +                .aw = s->aw_bits,
-> +            };
-> +
-> +            vtd_page_walk(&ce, 0, ~0ULL, &info);
->          }
->      } else {
->          trace_vtd_replay_ce_invalid(bus_n, PCI_SLOT(vtd_as->devfn),
-> 
-Besides the nit
-Reviewed-by: Eric Auger <eric.auger@redhat.com>
-
-Thanks
-
-Eric
+> On 2018/5/17 14:22, Peter Xu wrote:
+>> On Thu, May 17, 2018 at 10:26:17AM +0800, Jie Wang wrote:
+>>> epoll_available will only be set if epollfd != -1, os we
+>>> can swap the two variables in aio_epoll_disable, and
+>>> aio_context_destroy can call aio_epoll_disable directly.
+>>>
+>>> Signed-off-by: Jie Wang <wangjie88@huawei.com>
+>>> ---
+>>>  util/aio-posix.c | 10 ++++------
+>>>  1 file changed, 4 insertions(+), 6 deletions(-)
+>>>
+>>> diff --git a/util/aio-posix.c b/util/aio-posix.c
+>>> index 0ade2c7..118bf57 100644
+>>> --- a/util/aio-posix.c
+>>> +++ b/util/aio-posix.c
+>>> @@ -45,11 +45,11 @@ struct AioHandler
+>>>  
+>>>  static void aio_epoll_disable(AioContext *ctx)
+>>>  {
+>>> -    ctx->epoll_available = false;
+>>> -    if (!ctx->epoll_enabled) {
+>>> +    ctx->epoll_enabled = false;
+>>> +    if (!ctx->epoll_available) {
+>>>          return;
+>>>      }
+>>> -    ctx->epoll_enabled = false;
+>>> +    ctx->epoll_available = false;
+>>>      close(ctx->epollfd);
+>>>  }
+>>>  
+>>> @@ -716,9 +716,7 @@ void aio_context_setup(AioContext *ctx)
+>>>  void aio_context_destroy(AioContext *ctx)
+>>>  {
+>>>  #ifdef CONFIG_EPOLL_CREATE1
+>>> -    if (ctx->epollfd >= 0) {
+>>> -        close(ctx->epollfd);
+>>> -    }
+>>> +    aio_epoll_disable(ctx);
+>>
+>> Hmm... I think this patch should be the first if to split.
+>>
+>> Anyway, IMHO version 5 is already good enough and has got r-bs, no
+>> need to bother reposting a version 7.  Maintainer could possibly touch
+>> up the commit message if necessary.
+>>
+>> Thanks,
+>>
+>>>  #endif
+>>>  }
+>>>  
+>>> -- 
+>>> 1.8.3.1
+>>>
+>>
