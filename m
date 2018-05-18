@@ -1,20 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58004)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40223)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <changpeng.liu@intel.com>) id 1fJnb4-00013W-Ih
-	for qemu-devel@nongnu.org; Fri, 18 May 2018 18:11:35 -0400
+	(envelope-from <bounces@canonical.com>) id 1fJjN7-0002L1-CR
+	for qemu-devel@nongnu.org; Fri, 18 May 2018 13:40:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <changpeng.liu@intel.com>) id 1fJnb0-0000Hj-IA
-	for qemu-devel@nongnu.org; Fri, 18 May 2018 18:11:34 -0400
-Received: from mga02.intel.com ([134.134.136.20]:8331)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <changpeng.liu@intel.com>)
-	id 1fJnb0-0000HT-AD
-	for qemu-devel@nongnu.org; Fri, 18 May 2018 18:11:30 -0400
-From: Changpeng Liu <changpeng.liu@intel.com>
-Date: Sat, 19 May 2018 06:20:46 +0800
-Message-Id: <1526682046-17414-1-git-send-email-changpeng.liu@intel.com>
-Subject: [Qemu-devel] [PATCH] contrib/vhost-user-blk: enable protocol
- feature for vhost-user-blk
+	(envelope-from <bounces@canonical.com>) id 1fJjN4-0000p2-AK
+	for qemu-devel@nongnu.org; Fri, 18 May 2018 13:40:53 -0400
+Received: from indium.canonical.com ([91.189.90.7]:45234)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1fJjN3-0000oW-H2
+	for qemu-devel@nongnu.org; Fri, 18 May 2018 13:40:49 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1fJjN2-0008Vt-Dw
+	for <qemu-devel@nongnu.org>; Fri, 18 May 2018 17:40:48 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 656642E8A3E
+	for <qemu-devel@nongnu.org>; Fri, 18 May 2018 17:40:48 +0000 (UTC)
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Fri, 18 May 2018 17:35:30 -0000
+From: M0Rf30 <morfeo89@hotmail.it>
+Reply-To: Bug 1772075 <1772075@bugs.launchpad.net>
+Sender: bounces@canonical.com
+Message-Id: <152666493053.16686.5820944431341933507.malonedeb@wampee.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1772075] [NEW] Segmentation fault on aarch64 vm
+ at powerdown
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,40 +37,70 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: mst@redhat.com, stefanha@redhat.com, changpeng.liu@intel.com
 
-This patch reports the protocol feature that is only advertised by
-QEMU if the device implements the config ops.
+Public bug reported:
 
-Signed-off-by: Changpeng Liu <changpeng.liu@intel.com>
----
- contrib/vhost-user-blk/vhost-user-blk.c | 7 +++++++
- 1 file changed, 7 insertions(+)
+OS Arch Linux
+x86_64
+qemu version: 2.12
 
-diff --git a/contrib/vhost-user-blk/vhost-user-blk.c b/contrib/vhost-user-blk/vhost-user-blk.c
-index 67dac81..a6a132a 100644
---- a/contrib/vhost-user-blk/vhost-user-blk.c
-+++ b/contrib/vhost-user-blk/vhost-user-blk.c
-@@ -311,6 +311,12 @@ vub_get_features(VuDev *dev)
-            1ull << VHOST_USER_F_PROTOCOL_FEATURES;
- }
- 
-+static uint64_t
-+vub_get_protocol_features(VuDev *dev)
-+{
-+    return 1ull << VHOST_USER_PROTOCOL_F_CONFIG;
-+}
-+
- static int
- vub_get_config(VuDev *vu_dev, uint8_t *config, uint32_t len)
- {
-@@ -373,6 +379,7 @@ vub_set_config(VuDev *vu_dev, const uint8_t *data,
- static const VuDevIface vub_iface = {
-     .get_features = vub_get_features,
-     .queue_set_started = vub_queue_set_started,
-+    .get_protocol_features = vub_get_protocol_features,
-     .get_config = vub_get_config,
-     .set_config = vub_set_config,
- };
--- 
-1.9.3
+cmdline:
+qemu-system-aarch64 -nographic -cpu cortex-a57 -m 2048 -M virt,gic_version=
+=3D3 -machine virtualization=3Dtrue -bios /usr/share/ovmf/AARCH64/QEMU_EFI.=
+fd -drive file=3Dfat:rw:/opt/simonpiemu/kernels/rpi-3,if=3Dnone,format=3Dra=
+w,cache=3Dnone,id=3Dhd0 -device virtio-blk-device,drive=3Dhd0 -drive file=
+=3D/home/morfeo/.simonpi/sd-arch-rpi-3-qemu.img,if=3Dnone,format=3Draw,cach=
+e=3Dnone,id=3Dhd1 -device virtio-blk-device,drive=3Dhd1 -kernel /opt/simonp=
+iemu/kernels/rpi-3/Image -append "root=3D/dev/vda2 fstab=3Dno rootfstype=3D=
+ext4 rw console=3DttyAMA0" -initrd /home/morfeo/.simonpi/rpi-3/boot/initram=
+fs-linux.img -device virtio-net-device,mac=3D52:54:26:11:72:9b,netdev=3Dnet=
+0 -netdev tap,id=3Dnet0,ifname=3Drasp-tap0,script=3Dno,downscript=3Dno
+
+error:
+
+qemu-system-aarch64: /build/qemu/src/qemu-2.12.0/block.c:3375:
+bdrv_close_all: Assertion `QTAILQ_EMPTY(&all_bdrv_states)' failed.
+
+** Affects: qemu
+     Importance: Undecided
+         Status: New
+
+** Attachment added: "log"
+   https://bugs.launchpad.net/bugs/1772075/+attachment/5141371/+files/log
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1772075
+
+Title:
+  Segmentation fault on aarch64 vm at powerdown
+
+Status in QEMU:
+  New
+
+Bug description:
+  OS Arch Linux
+  x86_64
+  qemu version: 2.12
+
+  cmdline:
+  qemu-system-aarch64 -nographic -cpu cortex-a57 -m 2048 -M virt,gic_versio=
+n=3D3 -machine virtualization=3Dtrue -bios /usr/share/ovmf/AARCH64/QEMU_EFI=
+.fd -drive file=3Dfat:rw:/opt/simonpiemu/kernels/rpi-3,if=3Dnone,format=3Dr=
+aw,cache=3Dnone,id=3Dhd0 -device virtio-blk-device,drive=3Dhd0 -drive file=
+=3D/home/morfeo/.simonpi/sd-arch-rpi-3-qemu.img,if=3Dnone,format=3Draw,cach=
+e=3Dnone,id=3Dhd1 -device virtio-blk-device,drive=3Dhd1 -kernel /opt/simonp=
+iemu/kernels/rpi-3/Image -append "root=3D/dev/vda2 fstab=3Dno rootfstype=3D=
+ext4 rw console=3DttyAMA0" -initrd /home/morfeo/.simonpi/rpi-3/boot/initram=
+fs-linux.img -device virtio-net-device,mac=3D52:54:26:11:72:9b,netdev=3Dnet=
+0 -netdev tap,id=3Dnet0,ifname=3Drasp-tap0,script=3Dno,downscript=3Dno
+
+  error:
+
+  qemu-system-aarch64: /build/qemu/src/qemu-2.12.0/block.c:3375:
+  bdrv_close_all: Assertion `QTAILQ_EMPTY(&all_bdrv_states)' failed.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1772075/+subscriptions
