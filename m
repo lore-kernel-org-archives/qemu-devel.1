@@ -1,26 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43271)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43841)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1fJe5t-0007Ga-Ah
-	for qemu-devel@nongnu.org; Fri, 18 May 2018 08:02:47 -0400
+	(envelope-from <david@redhat.com>) id 1fJe7e-0008Sl-Sw
+	for qemu-devel@nongnu.org; Fri, 18 May 2018 08:04:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1fJe5q-000514-PR
-	for qemu-devel@nongnu.org; Fri, 18 May 2018 08:02:45 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:38762 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1fJe5q-000505-K2
-	for qemu-devel@nongnu.org; Fri, 18 May 2018 08:02:42 -0400
-Date: Fri, 18 May 2018 13:02:39 +0100
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20180518120239.GA31915@stefanha-x1.localdomain>
-References: <20180518091440.1559-1-alex.bennee@linaro.org>
-	<20180518091440.1559-3-alex.bennee@linaro.org>
+	(envelope-from <david@redhat.com>) id 1fJe7c-0006RN-8H
+	for qemu-devel@nongnu.org; Fri, 18 May 2018 08:04:34 -0400
+References: <20180517174718.10107-1-alex.bennee@linaro.org>
+	<20180517174718.10107-37-alex.bennee@linaro.org>
+From: David Hildenbrand <david@redhat.com>
+Message-ID: <b7dda2b4-e871-2ece-d350-9f8cb971cc44@redhat.com>
+Date: Fri, 18 May 2018 14:04:26 +0200
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="opJtzjQTFsWo+cga"
-Content-Disposition: inline
-In-Reply-To: <20180518091440.1559-3-alex.bennee@linaro.org>
-Subject: Re: [Qemu-devel] [RFC PATCH 2/2] tests/Makefile: comment out flakey
- tests
+In-Reply-To: <20180517174718.10107-37-alex.bennee@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH v4 36/49] tests/tcg: enable
+ building for s390x
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,34 +25,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>
-Cc: famz@redhat.com, pbonzini@redhat.com, stefanb@linux.vnet.ibm.com, marcandre.lureau@redhat.com, qemu-devel@nongnu.org
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, cota@braap.org, famz@redhat.com, berrange@redhat.com, f4bug@amsat.org, richard.henderson@linaro.org, balrogg@gmail.com, aurelien@aurel32.net, agraf@suse.de
+Cc: "open list:S390" <qemu-s390x@nongnu.org>, Cornelia Huck <cohuck@redhat.com>, qemu-devel@nongnu.org
 
-
---opJtzjQTFsWo+cga
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Fri, May 18, 2018 at 10:14:40AM +0100, Alex Benn=E9e wrote:
-> The following tests keep showing up in failed Travis runs:
+On 17.05.2018 19:47, Alex Benn=C3=A9e wrote:
+> This doesn't add any additional tests but enables building the
+> multiarch tests for s390x.
 >=20
->   - test-aio
+> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+> Acked-by: Cornelia Huck <cohuck@redhat.com>
+> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+> Tested-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+> ---
+>  tests/tcg/s390x/Makefile.include | 2 ++
+>  1 file changed, 2 insertions(+)
+>  create mode 100644 tests/tcg/s390x/Makefile.include
+>=20
+> diff --git a/tests/tcg/s390x/Makefile.include b/tests/tcg/s390x/Makefil=
+e.include
+> new file mode 100644
+> index 0000000000..1f58115d96
+> --- /dev/null
+> +++ b/tests/tcg/s390x/Makefile.include
+> @@ -0,0 +1,2 @@
+> +DOCKER_IMAGE=3Ddebian-s390x-cross
+> +DOCKER_CROSS_COMPILER=3Ds390x-linux-gnu-gcc
+>=20
 
-What is the issue?
+Reviewed-by: David Hildenbrand <david@redhat.com>
 
---opJtzjQTFsWo+cga
-Content-Type: application/pgp-signature; name="signature.asc"
+--=20
 
------BEGIN PGP SIGNATURE-----
+Thanks,
 
-iQEcBAEBAgAGBQJa/sDfAAoJEJykq7OBq3PIawoH/jnySYYGr07gwjaaqDE+KVsl
-5HB383WXAx5UtHvemzJ8oSiLSJlPuCqapEfSMK1/snQjDZ0uat1Ilbmhh3WqXQFb
-wArSFa+aGzaSuHswpJxbJqIzsoQk0roUlP2Q61qbxgBu9utduhjrtmMG7NA45aui
-dNb38jz0Gk7ZTvRYXj+790rcdsWdoOPtF6/CoHd7GgPoNMuHZ1bDk9vqzARS8d2x
-5wquMZPNOGDkxDestmeSPKUfmVmuAipIHtoSIydVa17JGvwucl7q4yhi+m7Fe7GZ
-Kb9ED0lXG9+bIh1KdYYU5YaIiedLvkWl4YtrJHCNO/BnfUlZoCQWROCbHaEwWFg=
-=rt9L
------END PGP SIGNATURE-----
-
---opJtzjQTFsWo+cga--
+David / dhildenb
