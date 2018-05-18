@@ -1,22 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47449)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47466)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fJgKP-00011X-NJ
-	for qemu-devel@nongnu.org; Fri, 18 May 2018 10:25:54 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fJgKU-00012u-BR
+	for qemu-devel@nongnu.org; Fri, 18 May 2018 10:25:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fJgKL-00031M-Ht
-	for qemu-devel@nongnu.org; Fri, 18 May 2018 10:25:53 -0400
-References: <20180518132114.4070-1-kwolf@redhat.com>
-	<20180518132114.4070-3-kwolf@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <c0590f28-6394-36ba-2c32-9fdefafca875@redhat.com>
-Date: Fri, 18 May 2018 09:25:43 -0500
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fJgKQ-00037S-D6
+	for qemu-devel@nongnu.org; Fri, 18 May 2018 10:25:57 -0400
+Received: from mail-qt0-x244.google.com ([2607:f8b0:400d:c0d::244]:46793)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fJgKQ-000374-7M
+	for qemu-devel@nongnu.org; Fri, 18 May 2018 10:25:54 -0400
+Received: by mail-qt0-x244.google.com with SMTP id m16-v6so10453428qtg.13
+	for <qemu-devel@nongnu.org>; Fri, 18 May 2018 07:25:54 -0700 (PDT)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20180517174718.10107-1-alex.bennee@linaro.org>
+	<20180517174718.10107-40-alex.bennee@linaro.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <c04618e6-8612-7c8d-1226-2a96507b18be@amsat.org>
+Date: Fri, 18 May 2018 11:25:44 -0300
 MIME-Version: 1.0
-In-Reply-To: <20180518132114.4070-3-kwolf@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <20180517174718.10107-40-alex.bennee@linaro.org>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 02/40] blockjob: Improve
- BlockJobInfo.offset/len documentation
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v4 39/49] tests/tcg/alpha: add Alpha
+ specific tests
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,55 +36,157 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
-Cc: mreitz@redhat.com, jsnow@redhat.com, jcody@redhat.com, armbru@redhat.com, qemu-devel@nongnu.org
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, cota@braap.org, famz@redhat.com, berrange@redhat.com, richard.henderson@linaro.org, balrogg@gmail.com, aurelien@aurel32.net, agraf@suse.de
+Cc: qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>
 
-On 05/18/2018 08:20 AM, Kevin Wolf wrote:
-> Clarify that len is just an estimation of the end value of offset, and
-> that offset increases monotonically while len can change arbitrarily.
-
-That's tighter than what libvirt promises (and in fact, there are cases 
-where libvirt synthesizes an offset/len of 1/1 to indicate completion 
-when the information is no longer available from qemu, which means the 
-offset has gone backwards to libvirt clients).
-
-But it matches the qemu implementation, and I'm okay if we want to stick 
-to those semantics of monotonically increasing offset (the more 
-important semantics of being an estimate of time remaining is possible 
-whether or not you have a guarantee of a monotonic increase on one of 
-the two numbers).
-
+On 05/17/2018 02:47 PM, Alex Bennée wrote:
+> These tests did use their own crt.o stub however that is a little
+> stone age so we drop crt.S and just statically link to the cross
+> compilers libraries.
 > 
-> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+> 
 > ---
->   qapi/block-core.json | 9 ++++++---
->   1 file changed, 6 insertions(+), 3 deletions(-)
+> v4
+>   - drop crt.s
+>   - drop skipping of threadtest
+>   - drop write() hack, include unistd.h
+> ---
+>  tests/tcg/alpha/Makefile        | 35 ---------------------------------
+>  tests/tcg/alpha/Makefile.target | 15 ++++++++++++++
+>  tests/tcg/alpha/crt.s           | 26 ------------------------
+>  tests/tcg/alpha/hello-alpha.c   |  2 ++
+>  tests/tcg/alpha/test-cond.c     |  1 +
+>  tests/tcg/alpha/test-ovf.c      |  2 ++
+>  6 files changed, 20 insertions(+), 61 deletions(-)
+>  delete mode 100644 tests/tcg/alpha/Makefile
+>  create mode 100644 tests/tcg/alpha/Makefile.target
+>  delete mode 100644 tests/tcg/alpha/crt.s
 > 
-> diff --git a/qapi/block-core.json b/qapi/block-core.json
-> index d32ec95666..0e29abf099 100644
-> --- a/qapi/block-core.json
-> +++ b/qapi/block-core.json
-> @@ -1148,7 +1148,12 @@
->   # @device: The job identifier. Originally the device name but other
->   #          values are allowed since QEMU 2.7
->   #
-> -# @len: the maximum progress value
-> +# @len: Estimated @offset value at the completion of the job. This value can
-> +#       arbitrarily change while the job is running, in both directions.
+> diff --git a/tests/tcg/alpha/Makefile b/tests/tcg/alpha/Makefile
+> deleted file mode 100644
+> index 2b1f03d048..0000000000
+> --- a/tests/tcg/alpha/Makefile
+> +++ /dev/null
+> @@ -1,35 +0,0 @@
+> -CROSS=alpha-linux-gnu-
+> -CC=$(CROSS)gcc
+> -AS=$(CROSS)as
+> -
+> -SIM=../../alpha-linux-user/qemu-alpha
+> -
+> -CFLAGS=-O
+> -LINK=$(CC) -o $@ crt.o $< -nostdlib
+> -
+> -TESTS=test-cond test-cmov
+> -
+> -all: hello-alpha $(TESTS)
+> -
+> -hello-alpha: hello-alpha.o crt.o
+> -	$(LINK)
+> -
+> -test-cond: test-cond.o crt.o
+> -	$(LINK)
+> -
+> -test-cmov.o: test-cond.c
+> -	$(CC) -c $(CFLAGS) -DTEST_CMOV -o $@ $<
+> -
+> -test-cmov: test-cmov.o crt.o
+> -	$(LINK)
+> -
+> -test-ovf: test-ovf.o crt.o
+> -	$(LINK)
+> -
+> -check: $(TESTS)
+> -	for f in $(TESTS); do $(SIM) $$f || exit 1; done
+> -
+> -clean:
+> -	$(RM) *.o *~ hello-alpha $(TESTS)
+> -
+> -.PHONY: clean all check
+> diff --git a/tests/tcg/alpha/Makefile.target b/tests/tcg/alpha/Makefile.target
+> new file mode 100644
+> index 0000000000..b253cee1fc
+> --- /dev/null
+> +++ b/tests/tcg/alpha/Makefile.target
+> @@ -0,0 +1,15 @@
+> +# -*- Mode: makefile -*-
 > +#
-> +# @offset: Progress made until now. The unit is arbitrary and the value can
-> +#          only meaningfully be used for the ratio of @offset to @len. The
-> +#          value is monotonically increasing.
+> +# Alpha specific tweaks
+> +
+> +ALPHA_SRC=$(SRC_PATH)/tests/tcg/alpha
+> +VPATH+=$(ALPHA_SRC)
+> +
+> +ALPHA_TESTS=hello-alpha test-cond test-cmov test-ovf
+> +TESTS+=$(ALPHA_TESTS)
+> +
+> +test-cmov: EXTRA_CFLAGS=-DTEST_CMOV
+> +test-cmov: test-cond.c
+> +	$(CC) $(CFLAGS) $(EXTRA_CFLAGS) $< -o $@ $(LDFLAGS)
+> +
+> +run-test-cmov: test-cmov
+> diff --git a/tests/tcg/alpha/crt.s b/tests/tcg/alpha/crt.s
+> deleted file mode 100644
+> index 31af8825bc..0000000000
+> --- a/tests/tcg/alpha/crt.s
+> +++ /dev/null
+> @@ -1,26 +0,0 @@
+> -	.text
+> -
+> -	.globl _start
+> -	.ent _start,0
+> -_start:
+> -	.frame $15,0,$15
+> -	br $29,1f
+> -1:	ldgp $29, 0($29)
+> -	.prologue 0
+> -	ldq $27,main($29) !literal!1
+> -	jsr $26,($27)
+> -	or $0,$0,$16
+> -	.end _start
+> -
+> -	.globl _exit
+> -_exit:
+> -	lda $0,1
+> -	callsys
+> -
+> -	call_pal 0
+> -
+> -	.globl write
+> -write:
+> -	lda $0,4
+> -	callsys
+> -	ret
+> diff --git a/tests/tcg/alpha/hello-alpha.c b/tests/tcg/alpha/hello-alpha.c
+> index 79892e6522..84e43b2fc4 100644
+> --- a/tests/tcg/alpha/hello-alpha.c
+> +++ b/tests/tcg/alpha/hello-alpha.c
+> @@ -1,3 +1,5 @@
+> +#include <unistd.h>
+> +
+>  int main (void)
+>  {
+>    write (1, "hello\n", 6);
+> diff --git a/tests/tcg/alpha/test-cond.c b/tests/tcg/alpha/test-cond.c
+> index 74adffaa69..e625313b3e 100644
+> --- a/tests/tcg/alpha/test-cond.c
+> +++ b/tests/tcg/alpha/test-cond.c
+> @@ -1,3 +1,4 @@
+> +#include <unistd.h>
+>  
+>  #ifdef TEST_CMOV
+>  
+> diff --git a/tests/tcg/alpha/test-ovf.c b/tests/tcg/alpha/test-ovf.c
+> index 01c80e7525..17892f1e89 100644
+> --- a/tests/tcg/alpha/test-ovf.c
+> +++ b/tests/tcg/alpha/test-ovf.c
+> @@ -1,3 +1,5 @@
+> +#include <unistd.h>
+> +
+>  static long test_subqv (long a, long b)
+>  {
+>    long res;
+> 
 
-So I'm okay whether or not you drop that last sentence.
-
-You're also rearranging the docs to occur in the order that the struct 
-declares things (good change, and trivial; not sure if you want to call 
-it out in the commit message).
-
-Reviewed-by: Eric Blake <eblake@redhat.com>
-
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Tested-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
