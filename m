@@ -1,34 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59634)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52007)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fK88n-0002KH-Mh
-	for qemu-devel@nongnu.org; Sat, 19 May 2018 16:07:46 -0400
+	(envelope-from <no-reply@patchew.org>) id 1fKADR-0005qn-TH
+	for qemu-devel@nongnu.org; Sat, 19 May 2018 18:20:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fK88k-0003tN-HI
-	for qemu-devel@nongnu.org; Sat, 19 May 2018 16:07:45 -0400
-Received: from indium.canonical.com ([91.189.90.7]:60942)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1fK88k-0003su-AV
-	for qemu-devel@nongnu.org; Sat, 19 May 2018 16:07:42 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1fK88j-0000XE-5h
-	for <qemu-devel@nongnu.org>; Sat, 19 May 2018 20:07:41 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 1D70A2E8007
-	for <qemu-devel@nongnu.org>; Sat, 19 May 2018 20:07:41 +0000 (UTC)
+	(envelope-from <no-reply@patchew.org>) id 1fKADO-0005uF-IY
+	for qemu-devel@nongnu.org; Sat, 19 May 2018 18:20:41 -0400
+Resent-Message-Id: <E1fKADO-0005uF-IY@eggs.gnu.org>
+Received: from sender-of-o51.zoho.com ([135.84.80.216]:21035)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1fKADO-0005tr-9E
+	for qemu-devel@nongnu.org; Sat, 19 May 2018 18:20:38 -0400
+In-Reply-To: <cover.1526671191.git.julian@codesourcery.com>
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <152668281384.273.18277960283840475122@1f70390a8372>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Sat, 19 May 2018 19:58:21 -0000
-From: George <1772165@bugs.launchpad.net>
-Reply-To: Bug 1772165 <1772165@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <152673688616.9061.7617411809661975686.malonedeb@chaenomeles.canonical.com>
-Message-Id: <152675990141.16193.12705919312183622679.malone@soybean.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1772165] Re: qemu-system-arm: -device usb-host,
- bus=001, vendorid=0x04f2, productid=0x0111: Bus '001' not found
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Fri, 18 May 2018 15:33:35 -0700 (PDT)
+Subject: Re: [Qemu-devel] [PATCH v3 0/2] Nios II generic board config and
+ semihosting support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,53 +29,93 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: julian@codesourcery.com
+Cc: famz@redhat.com, qemu-devel@nongnu.org, marex@denx.de, sandra@codesourcery.com, crwulff@gmail.com, Andrew_Jenner@mentor.com
 
-Whenever I append `console=3DttyAMA0` I get kernel panic `Division by zero
-in kernel` and -serial stdio doen't seem to work.
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1772165
-
-Title:
-  qemu-system-arm: -device usb-
-  host,bus=3D001,vendorid=3D0x04f2,productid=3D0x0111: Bus '001' not found
-
-Status in QEMU:
-  New
-
-Bug description:
-  Using Qemu 2.12.0 on ArchLinux.
-
-  Trying to emulate arm device with `qemu-system-arm` and attach usb
-  device for unput using
-
-  ` -usb -device usb-host,bus=3D001,vendorid=3D0x1d6b,productid=3D0x0002 `
-
-  # lsusb returns
-
-  Bus 002 Device 001: ID 1d6b:0003 Linux Foundation 3.0 root hub
-  Bus 001 Device 014: ID 13d3:3487 IMC Networks =
-
-  Bus 001 Device 004: ID 0457:11af Silicon Integrated Systems Corp. =
-
-  Bus 001 Device 003: ID 0bda:57e6 Realtek Semiconductor Corp. =
-
-  Bus 001 Device 002: ID 0bda:0129 Realtek Semiconductor Corp. RTS5129 Card=
- Reader Controller
-  Bus 001 Device 001: ID 1d6b:0002 Linux Foundation 2.0 root hub
-
-  # qemu returns
-  qemu-system-arm: -device usb-host,bus=3D001,vendorid=3D0x1d6b,productid=
-=3D0x0002: Bus '001' not found
-
-  =
-
-  Tried with connecting external usb keyboard but that didn't seem to work =
-either.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1772165/+subscriptions
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
+c3NhZ2UtaWQ6IGNvdmVyLjE1MjY2NzExOTEuZ2l0Lmp1bGlhbkBjb2Rlc291cmNlcnkuY29tClN1
+YmplY3Q6IFtRZW11LWRldmVsXSBbUEFUQ0ggdjMgMC8yXSBOaW9zIElJIGdlbmVyaWMgYm9hcmQg
+Y29uZmlnIGFuZCBzZW1paG9zdGluZyBzdXBwb3J0Cgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09
+CiMhL2Jpbi9iYXNoCgpCQVNFPWJhc2UKbj0xCnRvdGFsPSQoZ2l0IGxvZyAtLW9uZWxpbmUgJEJB
+U0UuLiB8IHdjIC1sKQpmYWlsZWQ9MAoKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGlt
+aXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKZ2l0IGNvbmZpZyAtLWxv
+Y2FsIGRpZmYuYWxnb3JpdGhtIGhpc3RvZ3JhbQoKY29tbWl0cz0iJChnaXQgbG9nIC0tZm9ybWF0
+PSVIIC0tcmV2ZXJzZSAkQkFTRS4uKSIKZm9yIGMgaW4gJGNvbW1pdHM7IGRvCiAgICBlY2hvICJD
+aGVja2luZyBQQVRDSCAkbi8kdG90YWw6ICQoZ2l0IGxvZyAtbiAxIC0tZm9ybWF0PSVzICRjKS4u
+LiIKICAgIGlmICEgZ2l0IHNob3cgJGMgLS1mb3JtYXQ9ZW1haWwgfCAuL3NjcmlwdHMvY2hlY2tw
+YXRjaC5wbCAtLW1haWxiYWNrIC07IHRoZW4KICAgICAgICBmYWlsZWQ9MQogICAgICAgIGVjaG8K
+ICAgIGZpCiAgICBuPSQoKG4rMSkpCmRvbmUKCmV4aXQgJGZhaWxlZAo9PT0gVEVTVCBTQ1JJUFQg
+RU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4
+NApTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCjY1OWM1YTk3ZjYgQWRkIE5pb3MgSUkg
+c2VtaWhvc3Rpbmcgc3VwcG9ydC4KYzkxN2VhMzkwOCBBZGQgZ2VuZXJpYyBOaW9zIElJIGJvYXJk
+LgoKPT09IE9VVFBVVCBCRUdJTiA9PT0KQ2hlY2tpbmcgUEFUQ0ggMS8yOiBBZGQgZ2VuZXJpYyBO
+aW9zIElJIGJvYXJkLi4uLgpFUlJPUjogY29kZSBpbmRlbnQgc2hvdWxkIG5ldmVyIHVzZSB0YWJz
+CiMzODogRklMRTogaHcvbmlvczIvYm9vdC5jOjE0MzoKK15JaW50IGtlcm5lbF9zcGFjZSA9IDA7
+JAoKRVJST1I6IGNvZGUgaW5kZW50IHNob3VsZCBuZXZlciB1c2UgdGFicwojNDY6IEZJTEU6IGh3
+L25pb3MyL2Jvb3QuYzoxNTg6CiteSSAgICBrZXJuZWxfc3BhY2UgPSAxOyQKCkVSUk9SOiBjb2Rl
+IGluZGVudCBzaG91bGQgbmV2ZXIgdXNlIHRhYnMKIzUyOiBGSUxFOiBody9uaW9zMi9ib290LmM6
+MTYzOgorXkkgICAgKyAoZW50cnkgJiAweDA3ZmZmZmZmKTskCgpXQVJOSU5HOiBhZGRlZCwgbW92
+ZWQgb3IgZGVsZXRlZCBmaWxlKHMpLCBkb2VzIE1BSU5UQUlORVJTIG5lZWQgdXBkYXRpbmc/CiM1
+NzogCm5ldyBmaWxlIG1vZGUgMTAwNjQ0CgpFUlJPUjogZG8gbm90IHVzZSBDOTkgLy8gY29tbWVu
+dHMKIzE3NTogRklMRTogaHcvbmlvczIvZ2VuZXJpY19ub21tdS5jOjExNDoKKyAgICBjcHUtPnJl
+c2V0X2FkZHIgPSAweGQwMDAwMDAwOyAvLzB4ZDQwMDAwMDA7CgpFUlJPUjogZG8gbm90IHVzZSBD
+OTkgLy8gY29tbWVudHMKIzE3NzogRklMRTogaHcvbmlvczIvZ2VuZXJpY19ub21tdS5jOjExNjoK
+KyAgICBjcHUtPmZhc3RfdGxiX21pc3NfYWRkciA9IDB4N2ZmZjQwMDsgLy8weGMwMDAwMTAwOwoK
+dG90YWw6IDUgZXJyb3JzLCAxIHdhcm5pbmdzLCAxNTAgbGluZXMgY2hlY2tlZAoKWW91ciBwYXRj
+aCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJy
+b3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNl
+ZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKQ2hlY2tpbmcgUEFUQ0ggMi8yOiBBZGQgTmlv
+cyBJSSBzZW1paG9zdGluZyBzdXBwb3J0Li4uLgpXQVJOSU5HOiBhZGRlZCwgbW92ZWQgb3IgZGVs
+ZXRlZCBmaWxlKHMpLCBkb2VzIE1BSU5UQUlORVJTIG5lZWQgdXBkYXRpbmc/CiMxMDU6IApuZXcg
+ZmlsZSBtb2RlIDEwMDY0NAoKRVJST1I6IGJyYWNlcyB7fSBhcmUgbmVjZXNzYXJ5IGZvciBhbGwg
+YXJtcyBvZiB0aGlzIHN0YXRlbWVudAojMTk0OiBGSUxFOiB0YXJnZXQvbmlvczIvbmlvczItc2Vt
+aS5jOjg1OgorICAgIGlmIChmbGFncyAmIEdEQl9PX1dST05MWSkKWy4uLl0KKyAgICBlbHNlIGlm
+IChmbGFncyAmIEdEQl9PX1JEV1IpClsuLi5dCisgICAgZWxzZQpbLi4uXQoKRVJST1I6IGJyYWNl
+cyB7fSBhcmUgbmVjZXNzYXJ5IGZvciBhbGwgYXJtcyBvZiB0aGlzIHN0YXRlbWVudAojMTk2OiBG
+SUxFOiB0YXJnZXQvbmlvczIvbmlvczItc2VtaS5jOjg3OgorICAgIGVsc2UgaWYgKGZsYWdzICYg
+R0RCX09fUkRXUikKWy4uLl0KKyAgICBlbHNlClsuLi5dCgpFUlJPUjogdHJhaWxpbmcgc3RhdGVt
+ZW50cyBzaG91bGQgYmUgb24gbmV4dCBsaW5lCiMyMDE6IEZJTEU6IHRhcmdldC9uaW9zMi9uaW9z
+Mi1zZW1pLmM6OTI6CisgICAgaWYgKGZsYWdzICYgR0RCX09fQVBQRU5EKSBoZiB8PSBPX0FQUEVO
+RDsKCkVSUk9SOiBicmFjZXMge30gYXJlIG5lY2Vzc2FyeSBmb3IgYWxsIGFybXMgb2YgdGhpcyBz
+dGF0ZW1lbnQKIzIwMTogRklMRTogdGFyZ2V0L25pb3MyL25pb3MyLXNlbWkuYzo5MjoKKyAgICBp
+ZiAoZmxhZ3MgJiBHREJfT19BUFBFTkQpIGhmIHw9IE9fQVBQRU5EOwpbLi4uXQoKRVJST1I6IHRy
+YWlsaW5nIHN0YXRlbWVudHMgc2hvdWxkIGJlIG9uIG5leHQgbGluZQojMjAyOiBGSUxFOiB0YXJn
+ZXQvbmlvczIvbmlvczItc2VtaS5jOjkzOgorICAgIGlmIChmbGFncyAmIEdEQl9PX0NSRUFUKSBo
+ZiB8PSBPX0NSRUFUOwoKRVJST1I6IGJyYWNlcyB7fSBhcmUgbmVjZXNzYXJ5IGZvciBhbGwgYXJt
+cyBvZiB0aGlzIHN0YXRlbWVudAojMjAyOiBGSUxFOiB0YXJnZXQvbmlvczIvbmlvczItc2VtaS5j
+OjkzOgorICAgIGlmIChmbGFncyAmIEdEQl9PX0NSRUFUKSBoZiB8PSBPX0NSRUFUOwpbLi4uXQoK
+RVJST1I6IHRyYWlsaW5nIHN0YXRlbWVudHMgc2hvdWxkIGJlIG9uIG5leHQgbGluZQojMjAzOiBG
+SUxFOiB0YXJnZXQvbmlvczIvbmlvczItc2VtaS5jOjk0OgorICAgIGlmIChmbGFncyAmIEdEQl9P
+X1RSVU5DKSBoZiB8PSBPX1RSVU5DOwoKRVJST1I6IGJyYWNlcyB7fSBhcmUgbmVjZXNzYXJ5IGZv
+ciBhbGwgYXJtcyBvZiB0aGlzIHN0YXRlbWVudAojMjAzOiBGSUxFOiB0YXJnZXQvbmlvczIvbmlv
+czItc2VtaS5jOjk0OgorICAgIGlmIChmbGFncyAmIEdEQl9PX1RSVU5DKSBoZiB8PSBPX1RSVU5D
+OwpbLi4uXQoKRVJST1I6IHRyYWlsaW5nIHN0YXRlbWVudHMgc2hvdWxkIGJlIG9uIG5leHQgbGlu
+ZQojMjA0OiBGSUxFOiB0YXJnZXQvbmlvczIvbmlvczItc2VtaS5jOjk1OgorICAgIGlmIChmbGFn
+cyAmIEdEQl9PX0VYQ0wpIGhmIHw9IE9fRVhDTDsKCkVSUk9SOiBicmFjZXMge30gYXJlIG5lY2Vz
+c2FyeSBmb3IgYWxsIGFybXMgb2YgdGhpcyBzdGF0ZW1lbnQKIzIwNDogRklMRTogdGFyZ2V0L25p
+b3MyL25pb3MyLXNlbWkuYzo5NToKKyAgICBpZiAoZmxhZ3MgJiBHREJfT19FWENMKSBoZiB8PSBP
+X0VYQ0w7ClsuLi5dCgpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwojMjA5OiBGSUxF
+OiB0YXJnZXQvbmlvczIvbmlvczItc2VtaS5jOjEwMDoKK3N0YXRpYyB2b2lkIHRyYW5zbGF0ZV9z
+dGF0KENQVU5pb3MyU3RhdGUgKmVudiwgdGFyZ2V0X3Vsb25nIGFkZHIsIHN0cnVjdCBzdGF0ICpz
+KQoKRVJST1I6IGRvIG5vdCB1c2UgYXNzaWdubWVudCBpbiBpZiBjb25kaXRpb24KIzIxMzogRklM
+RTogdGFyZ2V0L25pb3MyL25pb3MyLXNlbWkuYzoxMDQ6CisgICAgaWYgKCEocCA9IGxvY2tfdXNl
+cihWRVJJRllfV1JJVEUsIGFkZHIsIHNpemVvZihzdHJ1Y3QgbmlvczJfZ2RiX3N0YXQpLCAwKSkp
+CgpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwojMjM4OiBGSUxFOiB0YXJnZXQvbmlv
+czIvbmlvczItc2VtaS5jOjEyOToKK3N0YXRpYyB2b2lkIG5pb3MyX3NlbWlfcmV0dXJuX3UzMihD
+UFVOaW9zMlN0YXRlICplbnYsIHVpbnQzMl90IHJldCwgdWludDMyX3QgZXJyKQoKV0FSTklORzog
+bGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzI1MjogRklMRTogdGFyZ2V0L25pb3MyL25pb3MyLXNl
+bWkuYzoxNDM6CitzdGF0aWMgdm9pZCBuaW9zMl9zZW1pX3JldHVybl91NjQoQ1BVTmlvczJTdGF0
+ZSAqZW52LCB1aW50NjRfdCByZXQsIHVpbnQzMl90IGVycikKCkVSUk9SOiBkbyBub3QgdXNlIGFz
+c2lnbm1lbnQgaW4gaWYgY29uZGl0aW9uCiM0OTM6IEZJTEU6IHRhcmdldC9uaW9zMi9uaW9zMi1z
+ZW1pLmM6Mzg0OgorICAgICAgICAgICAgICAgIGlmICghKHAgPSBsb2NrX3VzZXIoVkVSSUZZX1dS
+SVRFLAoKRVJST1I6IGxpbmUgb3ZlciA5MCBjaGFyYWN0ZXJzCiM1MzM6IEZJTEU6IHRhcmdldC9u
+aW9zMi9uaW9zMi1zZW1pLmM6NDI0OgorICAgICAgICBjcHVfYWJvcnQoQ1BVKG5pb3MyX2Vudl9n
+ZXRfY3B1KGVudikpLCAiVW5zdXBwb3J0ZWQgc2VtaWhvc3Rpbmcgc3lzY2FsbCAlZFxuIiwgbnIp
+OwoKdG90YWw6IDEzIGVycm9ycywgNCB3YXJuaW5ncywgNDk4IGxpbmVzIGNoZWNrZWQKCllvdXIg
+cGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNl
+IGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVy
+LCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCj09PSBPVVRQVVQgRU5EID09PQoKVGVz
+dCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9t
+YXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cDovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlv
+dXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEByZWRoYXQuY29t
