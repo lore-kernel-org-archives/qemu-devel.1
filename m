@@ -1,16 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59421)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59385)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fJfKM-0008EZ-Db
+	(envelope-from <kwolf@redhat.com>) id 1fJfKJ-0008A3-MM
 	for qemu-devel@nongnu.org; Fri, 18 May 2018 09:21:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fJfKI-0005sX-CU
-	for qemu-devel@nongnu.org; Fri, 18 May 2018 09:21:46 -0400
+	(envelope-from <kwolf@redhat.com>) id 1fJfKH-0005rw-J0
+	for qemu-devel@nongnu.org; Fri, 18 May 2018 09:21:43 -0400
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Fri, 18 May 2018 15:20:45 +0200
-Message-Id: <20180518132114.4070-12-kwolf@redhat.com>
+Date: Fri, 18 May 2018 15:20:43 +0200
+Message-Id: <20180518132114.4070-10-kwolf@redhat.com>
 In-Reply-To: <20180518132114.4070-1-kwolf@redhat.com>
 References: <20180518132114.4070-1-kwolf@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 11/40] job: Add Job.aio_context
+Subject: [Qemu-devel] [PATCH v2 09/40] job: Add reference counting
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,97 +22,431 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, mreitz@redhat.com, jsnow@redhat.com, eblake@redhat.com, jcody@redhat.com, armbru@redhat.com, qemu-devel@nongnu.org
 
-When block jobs need an AioContext, they just take it from their main
-block node. Generic jobs don't have a main block node, so we need to
-assign them an AioContext explicitly.
+This moves reference counting from BlockJob to Job.
+
+In order to keep calling the BlockJob cleanup code when the job is
+deleted via job_unref(), introduce a new JobDriver.free callback. Every
+block job must use block_job_free() for this callback, this is asserted
+in block_job_create().
 
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 Reviewed-by: Max Reitz <mreitz@redhat.com>
 Reviewed-by: John Snow <jsnow@redhat.com>
 ---
- include/qemu/job.h | 7 ++++++-
- blockjob.c         | 5 ++++-
- job.c              | 4 +++-
- 3 files changed, 13 insertions(+), 3 deletions(-)
+ include/block/blockjob.h     | 21 -------------------
+ include/block/blockjob_int.h |  7 +++++++
+ include/qemu/job.h           | 19 ++++++++++++++++--
+ block/backup.c               |  1 +
+ block/commit.c               |  1 +
+ block/mirror.c               |  2 ++
+ block/stream.c               |  1 +
+ blockjob.c                   | 48 +++++++++++++++++++-------------------------
+ job.c                        | 22 ++++++++++++++++----
+ qemu-img.c                   |  4 ++--
+ tests/test-bdrv-drain.c      |  1 +
+ tests/test-blockjob-txn.c    |  1 +
+ tests/test-blockjob.c        |  6 ++++--
+ 13 files changed, 76 insertions(+), 58 deletions(-)
 
+diff --git a/include/block/blockjob.h b/include/block/blockjob.h
+index 01cdee6d15..087e7820f5 100644
+--- a/include/block/blockjob.h
++++ b/include/block/blockjob.h
+@@ -132,9 +132,6 @@ typedef struct BlockJob {
+     /** The opaque value that is passed to the completion function.  */
+     void *opaque;
+ 
+-    /** Reference count of the block job */
+-    int refcnt;
+-
+     /** True when job has reported completion by calling block_job_completed. */
+     bool completed;
+ 
+@@ -400,24 +397,6 @@ void block_job_iostatus_reset(BlockJob *job);
+ BlockJobTxn *block_job_txn_new(void);
+ 
+ /**
+- * block_job_ref:
+- *
+- * Add a reference to BlockJob refcnt, it will be decreased with
+- * block_job_unref, and then be freed if it comes to be the last
+- * reference.
+- */
+-void block_job_ref(BlockJob *job);
+-
+-/**
+- * block_job_unref:
+- *
+- * Release a reference that was previously acquired with block_job_ref
+- * or block_job_create. If it's the last reference to the object, it will be
+- * freed.
+- */
+-void block_job_unref(BlockJob *job);
+-
+-/**
+  * block_job_txn_unref:
+  *
+  * Release a reference that was previously acquired with block_job_txn_add_job
+diff --git a/include/block/blockjob_int.h b/include/block/blockjob_int.h
+index 1e62d6dd30..6f0fe3c48d 100644
+--- a/include/block/blockjob_int.h
++++ b/include/block/blockjob_int.h
+@@ -144,6 +144,13 @@ void *block_job_create(const char *job_id, const BlockJobDriver *driver,
+                        BlockCompletionFunc *cb, void *opaque, Error **errp);
+ 
+ /**
++ * block_job_free:
++ * Callback to be used for JobDriver.free in all block jobs. Frees block job
++ * specific resources in @job.
++ */
++void block_job_free(Job *job);
++
++/**
+  * block_job_sleep_ns:
+  * @job: The job that calls the function.
+  * @ns: How many nanoseconds to stop for.
 diff --git a/include/qemu/job.h b/include/qemu/job.h
-index 5dfbec5d69..01e083f97a 100644
+index 0b78778b9e..0751e2afab 100644
 --- a/include/qemu/job.h
 +++ b/include/qemu/job.h
-@@ -47,6 +47,9 @@ typedef struct Job {
+@@ -41,6 +41,9 @@ typedef struct Job {
+     /** The type of this job. */
+     const JobDriver *driver;
+ 
++    /** Reference count of the block job */
++    int refcnt;
++
      /** Current state; See @JobStatus for details. */
      JobStatus status;
  
-+    /** AioContext to run the job coroutine in */
-+    AioContext *aio_context;
-+
-     /**
-      * Set to true if the job should cancel itself.  The flag must
-      * always be tested just before toggling the busy flag from false
-@@ -79,9 +82,11 @@ struct JobDriver {
-  *
-  * @job_id: The id of the newly-created job, or %NULL for internal jobs
-  * @driver: The class object for the newly-created job.
-+ * @ctx: The AioContext to run the job coroutine in.
-  * @errp: Error object.
-  */
--void *job_create(const char *job_id, const JobDriver *driver, Error **errp);
-+void *job_create(const char *job_id, const JobDriver *driver, AioContext *ctx,
-+                 Error **errp);
+@@ -57,6 +60,9 @@ struct JobDriver {
  
- /**
-  * Add a reference to Job refcnt, it will be decreased with job_unref, and then
+     /** Enum describing the operation */
+     JobType job_type;
++
++    /** Called when the job is freed */
++    void (*free)(Job *job);
+ };
+ 
+ 
+@@ -69,8 +75,17 @@ struct JobDriver {
+  */
+ void *job_create(const char *job_id, const JobDriver *driver, Error **errp);
+ 
+-/** Frees the @job object. */
+-void job_delete(Job *job);
++/**
++ * Add a reference to Job refcnt, it will be decreased with job_unref, and then
++ * be freed if it comes to be the last reference.
++ */
++void job_ref(Job *job);
++
++/**
++ * Release a reference that was previously acquired with job_ref() or
++ * job_create(). If it's the last reference to the object, it will be freed.
++ */
++void job_unref(Job *job);
+ 
+ /** Returns the JobType of a given Job. */
+ JobType job_type(const Job *job);
+diff --git a/block/backup.c b/block/backup.c
+index baf8d432da..cfdb89d977 100644
+--- a/block/backup.c
++++ b/block/backup.c
+@@ -526,6 +526,7 @@ static const BlockJobDriver backup_job_driver = {
+     .job_driver = {
+         .instance_size          = sizeof(BackupBlockJob),
+         .job_type               = JOB_TYPE_BACKUP,
++        .free                   = block_job_free,
+     },
+     .start                  = backup_run,
+     .commit                 = backup_commit,
+diff --git a/block/commit.c b/block/commit.c
+index 32d29c890e..925c96abe7 100644
+--- a/block/commit.c
++++ b/block/commit.c
+@@ -218,6 +218,7 @@ static const BlockJobDriver commit_job_driver = {
+     .job_driver = {
+         .instance_size = sizeof(CommitBlockJob),
+         .job_type      = JOB_TYPE_COMMIT,
++        .free          = block_job_free,
+     },
+     .start         = commit_run,
+ };
+diff --git a/block/mirror.c b/block/mirror.c
+index 35fcc1f0b7..0df4f709fd 100644
+--- a/block/mirror.c
++++ b/block/mirror.c
+@@ -989,6 +989,7 @@ static const BlockJobDriver mirror_job_driver = {
+     .job_driver = {
+         .instance_size          = sizeof(MirrorBlockJob),
+         .job_type               = JOB_TYPE_MIRROR,
++        .free                   = block_job_free,
+     },
+     .start                  = mirror_run,
+     .complete               = mirror_complete,
+@@ -1001,6 +1002,7 @@ static const BlockJobDriver commit_active_job_driver = {
+     .job_driver = {
+         .instance_size          = sizeof(MirrorBlockJob),
+         .job_type               = JOB_TYPE_COMMIT,
++        .free                   = block_job_free,
+     },
+     .start                  = mirror_run,
+     .complete               = mirror_complete,
+diff --git a/block/stream.c b/block/stream.c
+index cb723f190a..7273d2213c 100644
+--- a/block/stream.c
++++ b/block/stream.c
+@@ -212,6 +212,7 @@ static const BlockJobDriver stream_job_driver = {
+     .job_driver = {
+         .instance_size = sizeof(StreamBlockJob),
+         .job_type      = JOB_TYPE_STREAM,
++        .free          = block_job_free,
+     },
+     .start         = stream_run,
+ };
 diff --git a/blockjob.c b/blockjob.c
-index f4f9956678..0a0b1c41dd 100644
+index 0fba01edd4..0bf0a26af0 100644
 --- a/blockjob.c
 +++ b/blockjob.c
-@@ -216,6 +216,7 @@ static void block_job_attached_aio_context(AioContext *new_context,
+@@ -190,31 +190,25 @@ static void block_job_resume(BlockJob *job)
+     block_job_enter_cond(job, block_job_timer_not_pending);
+ }
+ 
+-void block_job_ref(BlockJob *job)
+-{
+-    ++job->refcnt;
+-}
+-
+ static void block_job_attached_aio_context(AioContext *new_context,
+                                            void *opaque);
+ static void block_job_detach_aio_context(void *opaque);
+ 
+-void block_job_unref(BlockJob *job)
++void block_job_free(Job *job)
  {
+-    if (--job->refcnt == 0) {
+-        assert(job->job.status == JOB_STATUS_NULL);
+-        assert(!job->txn);
+-        BlockDriverState *bs = blk_bs(job->blk);
+-        bs->job = NULL;
+-        block_job_remove_all_bdrv(job);
+-        blk_remove_aio_context_notifier(job->blk,
+-                                        block_job_attached_aio_context,
+-                                        block_job_detach_aio_context, job);
+-        blk_unref(job->blk);
+-        error_free(job->blocker);
+-        assert(!timer_pending(&job->sleep_timer));
+-        job_delete(&job->job);
+-    }
++    BlockJob *bjob = container_of(job, BlockJob, job);
++    BlockDriverState *bs = blk_bs(bjob->blk);
++
++    assert(!bjob->txn);
++
++    bs->job = NULL;
++    block_job_remove_all_bdrv(bjob);
++    blk_remove_aio_context_notifier(bjob->blk,
++                                    block_job_attached_aio_context,
++                                    block_job_detach_aio_context, bjob);
++    blk_unref(bjob->blk);
++    error_free(bjob->blocker);
++    assert(!timer_pending(&bjob->sleep_timer));
+ }
+ 
+ static void block_job_attached_aio_context(AioContext *new_context,
+@@ -245,7 +239,7 @@ static void block_job_detach_aio_context(void *opaque)
      BlockJob *job = opaque;
  
-+    job->job.aio_context = new_context;
-     if (job->driver->attached_aio_context) {
-         job->driver->attached_aio_context(job, new_context);
-     }
-@@ -247,6 +248,7 @@ static void block_job_detach_aio_context(void *opaque)
+     /* In case the job terminates during aio_poll()... */
+-    block_job_ref(job);
++    job_ref(&job->job);
+ 
+     block_job_pause(job);
+ 
+@@ -253,7 +247,7 @@ static void block_job_detach_aio_context(void *opaque)
          block_job_drain(job);
      }
  
-+    job->job.aio_context = NULL;
-     job_unref(&job->job);
+-    block_job_unref(job);
++    job_unref(&job->job);
  }
  
-@@ -899,7 +901,8 @@ void *block_job_create(const char *job_id, const BlockJobDriver *driver,
-         return NULL;
+ static char *child_job_get_parent_desc(BdrvChild *c)
+@@ -367,7 +361,7 @@ static void block_job_decommission(BlockJob *job)
+     job->deferred_to_main_loop = true;
+     block_job_txn_del_job(job);
+     job_state_transition(&job->job, JOB_STATUS_NULL);
+-    block_job_unref(job);
++    job_unref(&job->job);
+ }
+ 
+ static void block_job_do_dismiss(BlockJob *job)
+@@ -506,14 +500,14 @@ static int block_job_finish_sync(BlockJob *job,
+ 
+     assert(blk_bs(job->blk)->job == job);
+ 
+-    block_job_ref(job);
++    job_ref(&job->job);
+ 
+     if (finish) {
+         finish(job, &local_err);
+     }
+     if (local_err) {
+         error_propagate(errp, local_err);
+-        block_job_unref(job);
++        job_unref(&job->job);
+         return -EBUSY;
+     }
+     /* block_job_drain calls block_job_enter, and it should be enough to
+@@ -526,7 +520,7 @@ static int block_job_finish_sync(BlockJob *job,
+         aio_poll(qemu_get_aio_context(), true);
+     }
+     ret = (job->cancelled && job->ret == 0) ? -ECANCELED : job->ret;
+-    block_job_unref(job);
++    job_unref(&job->job);
+     return ret;
+ }
+ 
+@@ -909,6 +903,7 @@ void *block_job_create(const char *job_id, const BlockJobDriver *driver,
      }
  
--    job = job_create(job_id, &driver->job_driver, errp);
-+    job = job_create(job_id, &driver->job_driver, blk_get_aio_context(blk),
-+                     errp);
-     if (job == NULL) {
-         blk_unref(blk);
-         return NULL;
+     assert(is_block_job(&job->job));
++    assert(job->job.driver->free == &block_job_free);
+ 
+     job->driver        = driver;
+     job->blk           = blk;
+@@ -917,7 +912,6 @@ void *block_job_create(const char *job_id, const BlockJobDriver *driver,
+     job->busy          = false;
+     job->paused        = true;
+     job->pause_count   = 1;
+-    job->refcnt        = 1;
+     job->auto_finalize = !(flags & BLOCK_JOB_MANUAL_FINALIZE);
+     job->auto_dismiss  = !(flags & BLOCK_JOB_MANUAL_DISMISS);
+     aio_timer_init(qemu_get_aio_context(), &job->sleep_timer,
 diff --git a/job.c b/job.c
-index 92729cffa4..7ff1f66273 100644
+index 4960b30838..e588fbe53d 100644
 --- a/job.c
 +++ b/job.c
-@@ -121,7 +121,8 @@ Job *job_get(const char *id)
-     return NULL;
- }
- 
--void *job_create(const char *job_id, const JobDriver *driver, Error **errp)
-+void *job_create(const char *job_id, const JobDriver *driver, AioContext *ctx,
-+                 Error **errp)
- {
-     Job *job;
- 
-@@ -140,6 +141,7 @@ void *job_create(const char *job_id, const JobDriver *driver, Error **errp)
+@@ -134,6 +134,7 @@ void *job_create(const char *job_id, const JobDriver *driver, Error **errp)
+     job = g_malloc0(driver->instance_size);
      job->driver        = driver;
      job->id            = g_strdup(job_id);
-     job->refcnt        = 1;
-+    job->aio_context   = ctx;
++    job->refcnt        = 1;
  
      job_state_transition(job, JOB_STATUS_CREATED);
+ 
+@@ -142,10 +143,23 @@ void *job_create(const char *job_id, const JobDriver *driver, Error **errp)
+     return job;
+ }
+ 
+-void job_delete(Job *job)
++void job_ref(Job *job)
+ {
+-    QLIST_REMOVE(job, job_list);
++    ++job->refcnt;
++}
++
++void job_unref(Job *job)
++{
++    if (--job->refcnt == 0) {
++        assert(job->status == JOB_STATUS_NULL);
+ 
+-    g_free(job->id);
+-    g_free(job);
++        if (job->driver->free) {
++            job->driver->free(job);
++        }
++
++        QLIST_REMOVE(job, job_list);
++
++        g_free(job->id);
++        g_free(job);
++    }
+ }
+diff --git a/qemu-img.c b/qemu-img.c
+index 60e45ec103..27bbcc5100 100644
+--- a/qemu-img.c
++++ b/qemu-img.c
+@@ -862,7 +862,7 @@ static void run_block_job(BlockJob *job, Error **errp)
+     int ret = 0;
+ 
+     aio_context_acquire(aio_context);
+-    block_job_ref(job);
++    job_ref(&job->job);
+     do {
+         aio_poll(aio_context, true);
+         qemu_progress_print(job->len ?
+@@ -874,7 +874,7 @@ static void run_block_job(BlockJob *job, Error **errp)
+     } else {
+         ret = job->ret;
+     }
+-    block_job_unref(job);
++    job_unref(&job->job);
+     aio_context_release(aio_context);
+ 
+     /* publish completion progress only when success */
+diff --git a/tests/test-bdrv-drain.c b/tests/test-bdrv-drain.c
+index fe9f412b39..f9e37d479c 100644
+--- a/tests/test-bdrv-drain.c
++++ b/tests/test-bdrv-drain.c
+@@ -522,6 +522,7 @@ static void test_job_complete(BlockJob *job, Error **errp)
+ BlockJobDriver test_job_driver = {
+     .job_driver = {
+         .instance_size  = sizeof(TestBlockJob),
++        .free           = block_job_free,
+     },
+     .start          = test_job_start,
+     .complete       = test_job_complete,
+diff --git a/tests/test-blockjob-txn.c b/tests/test-blockjob-txn.c
+index 48b12d1744..b49b28ca27 100644
+--- a/tests/test-blockjob-txn.c
++++ b/tests/test-blockjob-txn.c
+@@ -76,6 +76,7 @@ static void test_block_job_cb(void *opaque, int ret)
+ static const BlockJobDriver test_block_job_driver = {
+     .job_driver = {
+         .instance_size = sizeof(TestBlockJob),
++        .free          = block_job_free,
+     },
+     .start = test_block_job_run,
+ };
+diff --git a/tests/test-blockjob.c b/tests/test-blockjob.c
+index 6ccd585dee..e24fc3f140 100644
+--- a/tests/test-blockjob.c
++++ b/tests/test-blockjob.c
+@@ -19,6 +19,7 @@
+ static const BlockJobDriver test_block_job_driver = {
+     .job_driver = {
+         .instance_size = sizeof(BlockJob),
++        .free          = block_job_free,
+     },
+ };
+ 
+@@ -196,6 +197,7 @@ static void coroutine_fn cancel_job_start(void *opaque)
+ static const BlockJobDriver test_cancel_driver = {
+     .job_driver = {
+         .instance_size = sizeof(CancelJob),
++        .free          = block_job_free,
+     },
+     .start         = cancel_job_start,
+     .complete      = cancel_job_complete,
+@@ -210,7 +212,7 @@ static CancelJob *create_common(BlockJob **pjob)
+     blk = create_blk(NULL);
+     job = mk_job(blk, "Steve", &test_cancel_driver, true,
+                  BLOCK_JOB_MANUAL_FINALIZE | BLOCK_JOB_MANUAL_DISMISS);
+-    block_job_ref(job);
++    job_ref(&job->job);
+     assert(job->job.status == JOB_STATUS_CREATED);
+     s = container_of(job, CancelJob, common);
+     s->blk = blk;
+@@ -231,7 +233,7 @@ static void cancel_common(CancelJob *s)
+         block_job_dismiss(&dummy, &error_abort);
+     }
+     assert(job->job.status == JOB_STATUS_NULL);
+-    block_job_unref(job);
++    job_unref(&job->job);
+     destroy_blk(blk);
+ }
  
 -- 
 2.13.6
