@@ -1,16 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60042)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60090)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fJfKv-0000Q2-SY
-	for qemu-devel@nongnu.org; Fri, 18 May 2018 09:22:26 -0400
+	(envelope-from <kwolf@redhat.com>) id 1fJfKz-0000Rn-1q
+	for qemu-devel@nongnu.org; Fri, 18 May 2018 09:22:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fJfKq-0006Ng-Rk
-	for qemu-devel@nongnu.org; Fri, 18 May 2018 09:22:21 -0400
+	(envelope-from <kwolf@redhat.com>) id 1fJfKu-0006Qz-Vf
+	for qemu-devel@nongnu.org; Fri, 18 May 2018 09:22:25 -0400
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Fri, 18 May 2018 15:21:05 +0200
-Message-Id: <20180518132114.4070-32-kwolf@redhat.com>
+Date: Fri, 18 May 2018 15:21:08 +0200
+Message-Id: <20180518132114.4070-35-kwolf@redhat.com>
 In-Reply-To: <20180518132114.4070-1-kwolf@redhat.com>
 References: <20180518132114.4070-1-kwolf@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 31/40] job: Add job_is_ready()
+Subject: [Qemu-devel] [PATCH v2 34/40] job: Introduce qapi/job.json
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,140 +22,352 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, mreitz@redhat.com, jsnow@redhat.com, eblake@redhat.com, jcody@redhat.com, armbru@redhat.com, qemu-devel@nongnu.org
 
-Instead of having a 'bool ready' in BlockJob, add a function that
-derives its value from the job status.
+This adds a separate schema file for all job-related definitions that
+aren't tied to the block layer.
 
-At the same time, this fixes the behaviour to match what the QAPI
-documentation promises for query-block-job: 'true if the job may be
-completed'. When the ready flag was introduced in commit ef6dbf1e46e,
-the flag never had to be reset to match the description because after
-being ready, the jobs would immediately complete and disappear.
-
-Job transactions and manual job finalisation were introduced only later.
-With these changes, jobs may stay around even after having completed
-(and they are not ready to be completed a second time), however their
-patches forgot to reset the ready flag.
+For a start, move the enums JobType, JobStatus and JobVerb.
 
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-Reviewed-by: Max Reitz <mreitz@redhat.com>
 ---
- include/block/blockjob.h |  5 -----
- include/qemu/job.h       |  3 +++
- blockjob.c               |  3 +--
- job.c                    | 22 ++++++++++++++++++++++
- qemu-img.c               |  2 +-
- tests/test-blockjob.c    |  2 +-
- 6 files changed, 28 insertions(+), 9 deletions(-)
+ qapi/block-core.json  | 90 +-----------------------------------------------
+ qapi/job.json         | 94 +++++++++++++++++++++++++++++++++++++++++++++++++++
+ qapi/qapi-schema.json |  1 +
+ Makefile              |  9 +++++
+ Makefile.objs         |  4 +++
+ 5 files changed, 109 insertions(+), 89 deletions(-)
+ create mode 100644 qapi/job.json
 
-diff --git a/include/block/blockjob.h b/include/block/blockjob.h
-index 5a81afc6c3..8e1e1ee0de 100644
---- a/include/block/blockjob.h
-+++ b/include/block/blockjob.h
-@@ -49,11 +49,6 @@ typedef struct BlockJob {
-     /** The block device on which the job is operating.  */
-     BlockBackend *blk;
+diff --git a/qapi/block-core.json b/qapi/block-core.json
+index bb964b4319..7dfa77a05c 100644
+--- a/qapi/block-core.json
++++ b/qapi/block-core.json
+@@ -6,6 +6,7 @@
  
--    /**
--     * Set to true when the job is ready to be completed.
--     */
--    bool ready;
+ { 'include': 'common.json' }
+ { 'include': 'crypto.json' }
++{ 'include': 'job.json' }
+ { 'include': 'sockets.json' }
+ 
+ ##
+@@ -1050,95 +1051,6 @@
+   'data': ['top', 'full', 'none', 'incremental'] }
+ 
+ ##
+-# @JobType:
+-#
+-# Type of a background job.
+-#
+-# @commit: block commit job type, see "block-commit"
+-#
+-# @stream: block stream job type, see "block-stream"
+-#
+-# @mirror: drive mirror job type, see "drive-mirror"
+-#
+-# @backup: drive backup job type, see "drive-backup"
+-#
+-# Since: 1.7
+-##
+-{ 'enum': 'JobType',
+-  'data': ['commit', 'stream', 'mirror', 'backup'] }
 -
-     /** Status that is published by the query-block-jobs QMP API */
-     BlockDeviceIoStatus iostatus;
- 
-diff --git a/include/qemu/job.h b/include/qemu/job.h
-index 1e8050c6fb..487f9d9a32 100644
---- a/include/qemu/job.h
-+++ b/include/qemu/job.h
-@@ -367,6 +367,9 @@ bool job_is_cancelled(Job *job);
- /** Returns whether the job is in a completed state. */
- bool job_is_completed(Job *job);
- 
-+/** Returns whether the job is ready to be completed. */
-+bool job_is_ready(Job *job);
+-##
+-# @JobVerb:
+-#
+-# Represents command verbs that can be applied to a job.
+-#
+-# @cancel: see @block-job-cancel
+-#
+-# @pause: see @block-job-pause
+-#
+-# @resume: see @block-job-resume
+-#
+-# @set-speed: see @block-job-set-speed
+-#
+-# @complete: see @block-job-complete
+-#
+-# @dismiss: see @block-job-dismiss
+-#
+-# @finalize: see @block-job-finalize
+-#
+-# Since: 2.12
+-##
+-{ 'enum': 'JobVerb',
+-  'data': ['cancel', 'pause', 'resume', 'set-speed', 'complete', 'dismiss',
+-           'finalize' ] }
+-
+-##
+-# @JobStatus:
+-#
+-# Indicates the present state of a given job in its lifetime.
+-#
+-# @undefined: Erroneous, default state. Should not ever be visible.
+-#
+-# @created: The job has been created, but not yet started.
+-#
+-# @running: The job is currently running.
+-#
+-# @paused: The job is running, but paused. The pause may be requested by
+-#          either the QMP user or by internal processes.
+-#
+-# @ready: The job is running, but is ready for the user to signal completion.
+-#         This is used for long-running jobs like mirror that are designed to
+-#         run indefinitely.
+-#
+-# @standby: The job is ready, but paused. This is nearly identical to @paused.
+-#           The job may return to @ready or otherwise be canceled.
+-#
+-# @waiting: The job is waiting for other jobs in the transaction to converge
+-#           to the waiting state. This status will likely not be visible for
+-#           the last job in a transaction.
+-#
+-# @pending: The job has finished its work, but has finalization steps that it
+-#           needs to make prior to completing. These changes may require
+-#           manual intervention by the management process if manual was set
+-#           to true. These changes may still fail.
+-#
+-# @aborting: The job is in the process of being aborted, and will finish with
+-#            an error. The job will afterwards report that it is @concluded.
+-#            This status may not be visible to the management process.
+-#
+-# @concluded: The job has finished all work. If manual was set to true, the job
+-#             will remain in the query list until it is dismissed.
+-#
+-# @null: The job is in the process of being dismantled. This state should not
+-#        ever be visible externally.
+-#
+-# Since: 2.12
+-##
+-{ 'enum': 'JobStatus',
+-  'data': ['undefined', 'created', 'running', 'paused', 'ready', 'standby',
+-           'waiting', 'pending', 'aborting', 'concluded', 'null' ] }
+-
+-##
+ # @BlockJobInfo:
+ #
+ # Information about a long-running block device operation.
+diff --git a/qapi/job.json b/qapi/job.json
+new file mode 100644
+index 0000000000..a472c0cb29
+--- /dev/null
++++ b/qapi/job.json
+@@ -0,0 +1,94 @@
++# -*- Mode: Python -*-
 +
- /**
-  * Request @job to pause at the next pause point. Must be paired with
-  * job_resume(). If the job is supposed to be resumed by user action, call
-diff --git a/blockjob.c b/blockjob.c
-index 3ca009bea5..38f18e9ba3 100644
---- a/blockjob.c
-+++ b/blockjob.c
-@@ -269,7 +269,7 @@ BlockJobInfo *block_job_query(BlockJob *job, Error **errp)
-     info->offset    = job->offset;
-     info->speed     = job->speed;
-     info->io_status = job->iostatus;
--    info->ready     = job->ready;
-+    info->ready     = job_is_ready(&job->job),
-     info->status    = job->job.status;
-     info->auto_finalize = job->job.auto_finalize;
-     info->auto_dismiss  = job->job.auto_dismiss;
-@@ -436,7 +436,6 @@ void block_job_user_resume(Job *job)
- void block_job_event_ready(BlockJob *job)
- {
-     job_state_transition(&job->job, JOB_STATUS_READY);
--    job->ready = true;
- 
-     if (block_job_is_internal(job)) {
-         return;
-diff --git a/job.c b/job.c
-index af31de4669..66ee26f2a0 100644
---- a/job.c
-+++ b/job.c
-@@ -199,6 +199,28 @@ bool job_is_cancelled(Job *job)
-     return job->cancelled;
- }
- 
-+bool job_is_ready(Job *job)
-+{
-+    switch (job->status) {
-+    case JOB_STATUS_UNDEFINED:
-+    case JOB_STATUS_CREATED:
-+    case JOB_STATUS_RUNNING:
-+    case JOB_STATUS_PAUSED:
-+    case JOB_STATUS_WAITING:
-+    case JOB_STATUS_PENDING:
-+    case JOB_STATUS_ABORTING:
-+    case JOB_STATUS_CONCLUDED:
-+    case JOB_STATUS_NULL:
-+        return false;
-+    case JOB_STATUS_READY:
-+    case JOB_STATUS_STANDBY:
-+        return true;
-+    default:
-+        g_assert_not_reached();
-+    }
-+    return false;
-+}
++##
++# == Background jobs
++##
 +
- bool job_is_completed(Job *job)
- {
-     switch (job->status) {
-diff --git a/qemu-img.c b/qemu-img.c
-index b2bcfc3df1..eecb7d3228 100644
---- a/qemu-img.c
-+++ b/qemu-img.c
-@@ -867,7 +867,7 @@ static void run_block_job(BlockJob *job, Error **errp)
-         aio_poll(aio_context, true);
-         qemu_progress_print(job->len ?
-                             ((float)job->offset / job->len * 100.f) : 0.0f, 0);
--    } while (!job->ready && !job_is_completed(&job->job));
-+    } while (!job_is_ready(&job->job) && !job_is_completed(&job->job));
- 
-     if (!job_is_completed(&job->job)) {
-         ret = job_complete_sync(&job->job, errp);
-diff --git a/tests/test-blockjob.c b/tests/test-blockjob.c
-index 7131cabb16..8180d03a5f 100644
---- a/tests/test-blockjob.c
-+++ b/tests/test-blockjob.c
-@@ -185,7 +185,7 @@ static void coroutine_fn cancel_job_start(void *opaque)
-             goto defer;
-         }
- 
--        if (!s->common.ready && s->should_converge) {
-+        if (!job_is_ready(&s->common.job) && s->should_converge) {
-             block_job_event_ready(&s->common);
-         }
- 
++##
++# @JobType:
++#
++# Type of a background job.
++#
++# @commit: block commit job type, see "block-commit"
++#
++# @stream: block stream job type, see "block-stream"
++#
++# @mirror: drive mirror job type, see "drive-mirror"
++#
++# @backup: drive backup job type, see "drive-backup"
++#
++# Since: 1.7
++##
++{ 'enum': 'JobType',
++  'data': ['commit', 'stream', 'mirror', 'backup'] }
++
++##
++# @JobStatus:
++#
++# Indicates the present state of a given job in its lifetime.
++#
++# @undefined: Erroneous, default state. Should not ever be visible.
++#
++# @created: The job has been created, but not yet started.
++#
++# @running: The job is currently running.
++#
++# @paused: The job is running, but paused. The pause may be requested by
++#          either the QMP user or by internal processes.
++#
++# @ready: The job is running, but is ready for the user to signal completion.
++#         This is used for long-running jobs like mirror that are designed to
++#         run indefinitely.
++#
++# @standby: The job is ready, but paused. This is nearly identical to @paused.
++#           The job may return to @ready or otherwise be canceled.
++#
++# @waiting: The job is waiting for other jobs in the transaction to converge
++#           to the waiting state. This status will likely not be visible for
++#           the last job in a transaction.
++#
++# @pending: The job has finished its work, but has finalization steps that it
++#           needs to make prior to completing. These changes may require
++#           manual intervention by the management process if manual was set
++#           to true. These changes may still fail.
++#
++# @aborting: The job is in the process of being aborted, and will finish with
++#            an error. The job will afterwards report that it is @concluded.
++#            This status may not be visible to the management process.
++#
++# @concluded: The job has finished all work. If manual was set to true, the job
++#             will remain in the query list until it is dismissed.
++#
++# @null: The job is in the process of being dismantled. This state should not
++#        ever be visible externally.
++#
++# Since: 2.12
++##
++{ 'enum': 'JobStatus',
++  'data': ['undefined', 'created', 'running', 'paused', 'ready', 'standby',
++           'waiting', 'pending', 'aborting', 'concluded', 'null' ] }
++
++##
++# @JobVerb:
++#
++# Represents command verbs that can be applied to a job.
++#
++# @cancel: see @block-job-cancel
++#
++# @pause: see @block-job-pause
++#
++# @resume: see @block-job-resume
++#
++# @set-speed: see @block-job-set-speed
++#
++# @complete: see @block-job-complete
++#
++# @dismiss: see @block-job-dismiss
++#
++# @finalize: see @block-job-finalize
++#
++# Since: 2.12
++##
++{ 'enum': 'JobVerb',
++  'data': ['cancel', 'pause', 'resume', 'set-speed', 'complete', 'dismiss',
++           'finalize' ] }
+diff --git a/qapi/qapi-schema.json b/qapi/qapi-schema.json
+index 25bce78352..65b6dc2f6f 100644
+--- a/qapi/qapi-schema.json
++++ b/qapi/qapi-schema.json
+@@ -84,6 +84,7 @@
+ { 'include': 'crypto.json' }
+ { 'include': 'block.json' }
+ { 'include': 'char.json' }
++{ 'include': 'job.json' }
+ { 'include': 'net.json' }
+ { 'include': 'rocker.json' }
+ { 'include': 'tpm.json' }
+diff --git a/Makefile b/Makefile
+index 35554b5bef..6d588d1f71 100644
+--- a/Makefile
++++ b/Makefile
+@@ -98,6 +98,7 @@ GENERATED_FILES += qapi/qapi-types-char.h qapi/qapi-types-char.c
+ GENERATED_FILES += qapi/qapi-types-common.h qapi/qapi-types-common.c
+ GENERATED_FILES += qapi/qapi-types-crypto.h qapi/qapi-types-crypto.c
+ GENERATED_FILES += qapi/qapi-types-introspect.h qapi/qapi-types-introspect.c
++GENERATED_FILES += qapi/qapi-types-job.h qapi/qapi-types-job.c
+ GENERATED_FILES += qapi/qapi-types-migration.h qapi/qapi-types-migration.c
+ GENERATED_FILES += qapi/qapi-types-misc.h qapi/qapi-types-misc.c
+ GENERATED_FILES += qapi/qapi-types-net.h qapi/qapi-types-net.c
+@@ -116,6 +117,7 @@ GENERATED_FILES += qapi/qapi-visit-char.h qapi/qapi-visit-char.c
+ GENERATED_FILES += qapi/qapi-visit-common.h qapi/qapi-visit-common.c
+ GENERATED_FILES += qapi/qapi-visit-crypto.h qapi/qapi-visit-crypto.c
+ GENERATED_FILES += qapi/qapi-visit-introspect.h qapi/qapi-visit-introspect.c
++GENERATED_FILES += qapi/qapi-visit-job.h qapi/qapi-visit-job.c
+ GENERATED_FILES += qapi/qapi-visit-migration.h qapi/qapi-visit-migration.c
+ GENERATED_FILES += qapi/qapi-visit-misc.h qapi/qapi-visit-misc.c
+ GENERATED_FILES += qapi/qapi-visit-net.h qapi/qapi-visit-net.c
+@@ -133,6 +135,7 @@ GENERATED_FILES += qapi/qapi-commands-char.h qapi/qapi-commands-char.c
+ GENERATED_FILES += qapi/qapi-commands-common.h qapi/qapi-commands-common.c
+ GENERATED_FILES += qapi/qapi-commands-crypto.h qapi/qapi-commands-crypto.c
+ GENERATED_FILES += qapi/qapi-commands-introspect.h qapi/qapi-commands-introspect.c
++GENERATED_FILES += qapi/qapi-commands-job.h qapi/qapi-commands-job.c
+ GENERATED_FILES += qapi/qapi-commands-migration.h qapi/qapi-commands-migration.c
+ GENERATED_FILES += qapi/qapi-commands-misc.h qapi/qapi-commands-misc.c
+ GENERATED_FILES += qapi/qapi-commands-net.h qapi/qapi-commands-net.c
+@@ -150,6 +153,7 @@ GENERATED_FILES += qapi/qapi-events-char.h qapi/qapi-events-char.c
+ GENERATED_FILES += qapi/qapi-events-common.h qapi/qapi-events-common.c
+ GENERATED_FILES += qapi/qapi-events-crypto.h qapi/qapi-events-crypto.c
+ GENERATED_FILES += qapi/qapi-events-introspect.h qapi/qapi-events-introspect.c
++GENERATED_FILES += qapi/qapi-events-job.h qapi/qapi-events-job.c
+ GENERATED_FILES += qapi/qapi-events-migration.h qapi/qapi-events-migration.c
+ GENERATED_FILES += qapi/qapi-events-misc.h qapi/qapi-events-misc.c
+ GENERATED_FILES += qapi/qapi-events-net.h qapi/qapi-events-net.c
+@@ -582,6 +586,7 @@ qapi-modules = $(SRC_PATH)/qapi/qapi-schema.json $(SRC_PATH)/qapi/common.json \
+                $(SRC_PATH)/qapi/char.json \
+                $(SRC_PATH)/qapi/crypto.json \
+                $(SRC_PATH)/qapi/introspect.json \
++               $(SRC_PATH)/qapi/job.json \
+                $(SRC_PATH)/qapi/migration.json \
+                $(SRC_PATH)/qapi/misc.json \
+                $(SRC_PATH)/qapi/net.json \
+@@ -601,6 +606,7 @@ qapi/qapi-types-char.c qapi/qapi-types-char.h \
+ qapi/qapi-types-common.c qapi/qapi-types-common.h \
+ qapi/qapi-types-crypto.c qapi/qapi-types-crypto.h \
+ qapi/qapi-types-introspect.c qapi/qapi-types-introspect.h \
++qapi/qapi-types-job.c qapi/qapi-types-job.h \
+ qapi/qapi-types-migration.c qapi/qapi-types-migration.h \
+ qapi/qapi-types-misc.c qapi/qapi-types-misc.h \
+ qapi/qapi-types-net.c qapi/qapi-types-net.h \
+@@ -619,6 +625,7 @@ qapi/qapi-visit-char.c qapi/qapi-visit-char.h \
+ qapi/qapi-visit-common.c qapi/qapi-visit-common.h \
+ qapi/qapi-visit-crypto.c qapi/qapi-visit-crypto.h \
+ qapi/qapi-visit-introspect.c qapi/qapi-visit-introspect.h \
++qapi/qapi-visit-job.c qapi/qapi-visit-job.h \
+ qapi/qapi-visit-migration.c qapi/qapi-visit-migration.h \
+ qapi/qapi-visit-misc.c qapi/qapi-visit-misc.h \
+ qapi/qapi-visit-net.c qapi/qapi-visit-net.h \
+@@ -636,6 +643,7 @@ qapi/qapi-commands-char.c qapi/qapi-commands-char.h \
+ qapi/qapi-commands-common.c qapi/qapi-commands-common.h \
+ qapi/qapi-commands-crypto.c qapi/qapi-commands-crypto.h \
+ qapi/qapi-commands-introspect.c qapi/qapi-commands-introspect.h \
++qapi/qapi-commands-job.c qapi/qapi-commands-job.h \
+ qapi/qapi-commands-migration.c qapi/qapi-commands-migration.h \
+ qapi/qapi-commands-misc.c qapi/qapi-commands-misc.h \
+ qapi/qapi-commands-net.c qapi/qapi-commands-net.h \
+@@ -653,6 +661,7 @@ qapi/qapi-events-char.c qapi/qapi-events-char.h \
+ qapi/qapi-events-common.c qapi/qapi-events-common.h \
+ qapi/qapi-events-crypto.c qapi/qapi-events-crypto.h \
+ qapi/qapi-events-introspect.c qapi/qapi-events-introspect.h \
++qapi/qapi-events-job.c qapi/qapi-events-job.h \
+ qapi/qapi-events-migration.c qapi/qapi-events-migration.h \
+ qapi/qapi-events-misc.c qapi/qapi-events-misc.h \
+ qapi/qapi-events-net.c qapi/qapi-events-net.h \
+diff --git a/Makefile.objs b/Makefile.objs
+index 92b73fc272..3df8d58e49 100644
+--- a/Makefile.objs
++++ b/Makefile.objs
+@@ -10,6 +10,7 @@ util-obj-y += qapi/qapi-types-char.o
+ util-obj-y += qapi/qapi-types-common.o
+ util-obj-y += qapi/qapi-types-crypto.o
+ util-obj-y += qapi/qapi-types-introspect.o
++util-obj-y += qapi/qapi-types-job.o
+ util-obj-y += qapi/qapi-types-migration.o
+ util-obj-y += qapi/qapi-types-misc.o
+ util-obj-y += qapi/qapi-types-net.o
+@@ -28,6 +29,7 @@ util-obj-y += qapi/qapi-visit-char.o
+ util-obj-y += qapi/qapi-visit-common.o
+ util-obj-y += qapi/qapi-visit-crypto.o
+ util-obj-y += qapi/qapi-visit-introspect.o
++util-obj-y += qapi/qapi-visit-job.o
+ util-obj-y += qapi/qapi-visit-migration.o
+ util-obj-y += qapi/qapi-visit-misc.o
+ util-obj-y += qapi/qapi-visit-net.o
+@@ -45,6 +47,7 @@ util-obj-y += qapi/qapi-events-char.o
+ util-obj-y += qapi/qapi-events-common.o
+ util-obj-y += qapi/qapi-events-crypto.o
+ util-obj-y += qapi/qapi-events-introspect.o
++util-obj-y += qapi/qapi-events-job.o
+ util-obj-y += qapi/qapi-events-migration.o
+ util-obj-y += qapi/qapi-events-misc.o
+ util-obj-y += qapi/qapi-events-net.o
+@@ -140,6 +143,7 @@ common-obj-y += qapi/qapi-commands-char.o
+ common-obj-y += qapi/qapi-commands-common.o
+ common-obj-y += qapi/qapi-commands-crypto.o
+ common-obj-y += qapi/qapi-commands-introspect.o
++common-obj-y += qapi/qapi-commands-job.o
+ common-obj-y += qapi/qapi-commands-migration.o
+ common-obj-y += qapi/qapi-commands-misc.o
+ common-obj-y += qapi/qapi-commands-net.o
 -- 
 2.13.6
