@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51927)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54621)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fJn2R-0000Rr-BM
-	for qemu-devel@nongnu.org; Fri, 18 May 2018 17:35:48 -0400
+	(envelope-from <bounces@canonical.com>) id 1fJnH3-0005xx-Ne
+	for qemu-devel@nongnu.org; Fri, 18 May 2018 17:50:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fJn2M-0003gE-8p
-	for qemu-devel@nongnu.org; Fri, 18 May 2018 17:35:45 -0400
-Received: from indium.canonical.com ([91.189.90.7]:38766)
+	(envelope-from <bounces@canonical.com>) id 1fJnGy-0001B0-Sd
+	for qemu-devel@nongnu.org; Fri, 18 May 2018 17:50:53 -0400
+Received: from indium.canonical.com ([91.189.90.7]:47202)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1fJn2M-0003fo-2R
-	for qemu-devel@nongnu.org; Fri, 18 May 2018 17:35:42 -0400
+	id 1fJnGy-0001Av-Ju
+	for qemu-devel@nongnu.org; Fri, 18 May 2018 17:50:48 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1fJn2J-0006c0-Qn
-	for <qemu-devel@nongnu.org>; Fri, 18 May 2018 21:35:39 +0000
+	id 1fJnGv-0001Jb-SG
+	for <qemu-devel@nongnu.org>; Fri, 18 May 2018 21:50:46 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id C86AA2E8F3A
-	for <qemu-devel@nongnu.org>; Fri, 18 May 2018 21:35:39 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id B81A42E8FD2
+	for <qemu-devel@nongnu.org>; Fri, 18 May 2018 21:45:44 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Fri, 18 May 2018 21:27:18 -0000
+Date: Fri, 18 May 2018 21:32:20 -0000
 From: Patto <1772086@bugs.launchpad.net>
 Reply-To: Bug 1772086 <1772086@bugs.launchpad.net>
 Sender: bounces@canonical.com
 References: <152666797097.2555.6897470014572103765.malonedeb@gac.canonical.com>
-Message-Id: <152667883851.16020.12107650861550981725.malone@wampee.canonical.com>
+Message-Id: <152667914040.2593.6145602740791383780.malone@gac.canonical.com>
 Errors-To: bounces@canonical.com
 Subject: [Qemu-devel] [Bug 1772086] Re: malformed serial data being sent
  from guest
@@ -39,15 +39,9 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-After doing a bit of research I think line 142 in file chardev/char-
-serial.c is problematic.
-https://github.com/qemu/qemu/blob/master/chardev/char-serial.c#L142
-
-It enables output processing, which is something unwanted here. With a
-simple test program I found out that by default, besides OPOST, ONLCR
-flag is set in c_oflag. I guess fix would be removing OPOST flag, which
-would disable any output processing, or setting c_oflag to 0 just to be
-sure.
+Seems like the problems isn't really new and might be at least 6 years
+old if not more. https://robert.penz.name/550/mapping-a-serial-device-
+to-a-kvm-guest-may-lead-to-communication-problems/
 
 -- =
 
