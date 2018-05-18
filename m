@@ -1,24 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54552)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57009)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <prvs=669710df0=Paul.Durrant@citrix.com>)
-	id 1fJezZ-00070M-Sb
-	for qemu-devel@nongnu.org; Fri, 18 May 2018 09:00:19 -0400
+	(envelope-from <jtomko@redhat.com>) id 1fJf6i-00039B-6I
+	for qemu-devel@nongnu.org; Fri, 18 May 2018 09:07:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <prvs=669710df0=Paul.Durrant@citrix.com>)
-	id 1fJezV-0004TX-B8
-	for qemu-devel@nongnu.org; Fri, 18 May 2018 09:00:17 -0400
-Received: from smtp03.citrix.com ([162.221.156.55]:19149)
+	(envelope-from <jtomko@redhat.com>) id 1fJf6d-0001xP-8F
+	for qemu-devel@nongnu.org; Fri, 18 May 2018 09:07:40 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:35696 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <prvs=669710df0=Paul.Durrant@citrix.com>)
-	id 1fJezV-0004Pv-0X
-	for qemu-devel@nongnu.org; Fri, 18 May 2018 09:00:13 -0400
-From: Paul Durrant <paul.durrant@citrix.com>
-Date: Fri, 18 May 2018 14:00:06 +0100
-Message-ID: <1526648406-1746-1-git-send-email-paul.durrant@citrix.com>
+	(Exim 4.71) (envelope-from <jtomko@redhat.com>) id 1fJf6d-0001x3-2u
+	for qemu-devel@nongnu.org; Fri, 18 May 2018 09:07:35 -0400
+Date: Fri, 18 May 2018 15:07:29 +0200
+From: =?iso-8859-1?B?SuFu?= Tomko <jtomko@redhat.com>
+Message-ID: <20180518130729.GF3416@dnr>
+References: <20180515113348.10516-1-zyimin@linux.ibm.com>
+	<20180515113348.10516-2-zyimin@linux.ibm.com>
+	<20180517124109.GJ17734@vader> <20180518075212.GE3416@dnr>
+	<20180518091916.GA22292@vader>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v2] xen-hvm: stop faking I/O to access PCI
- config space
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="8JPrznbw0YAQ/KXy"
+Content-Disposition: inline
+In-Reply-To: <20180518091916.GA22292@vader>
+Subject: Re: [Qemu-devel] [PATCH v2 1/1] sandbox: disable -sandbox if
+ CONFIG_SECCOMP undefined
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,236 +31,94 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, xen-devel@lists.xenproject.org
-Cc: Paul Durrant <paul.durrant@citrix.com>, Stefano Stabellini <sstabellini@kernel.org>, Anthony Perard <anthony.perard@citrix.com>, "Michael S. Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, Roger Pau Monne <roger.pau@citrix.com>
+To: Eduardo Otubo <otubo@redhat.com>
+Cc: Yi Min Zhao <zyimin@linux.ibm.com>, fiuczy@linux.ibm.com, borntraeger@de.ibm.com, qemu-devel@nongnu.org
 
-This patch removes the current hackery where IOREQ_TYPE_PCI_CONFIG
-requests are handled by faking PIO to 0xcf8 and 0xcfc and replaces it
-with direct calls to pci_host_config_read/write_common().
-Doing so necessitates mapping BDFs to PCIDevices but maintaining a simple
-QLIST in xen_device_realize/unrealize() will suffice.
 
-NOTE: whilst config space accesses are currently limited to
-      PCI_CONFIG_SPACE_SIZE, this patch paves the way to increasing the
-      limit to PCIE_CONFIG_SPACE_SIZE when Xen gains the ability to
-      emulate MCFG table accesses.
+--8JPrznbw0YAQ/KXy
+Content-Type: text/plain; charset=iso-8859-1; format=flowed
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Signed-off-by: Paul Durrant <paul.durrant@citrix.com>
---
-Cc: Stefano Stabellini <sstabellini@kernel.org>
-Cc: Anthony Perard <anthony.perard@citrix.com>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Marcel Apfelbaum <marcel@redhat.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Richard Henderson <rth@twiddle.net>
-Cc: Eduardo Habkost <ehabkost@redhat.com>
-Cc: Roger Pau Monne <roger.pau@citrix.com>
+On Fri, May 18, 2018 at 11:19:16AM +0200, Eduardo Otubo wrote:
+>On 18/05/2018 - 09:52:12, J=E1n Tomko wrote:
+>> On Thu, May 17, 2018 at 02:41:09PM +0200, Eduardo Otubo wrote:
+>> > On 15/05/2018 - 19:33:48, Yi Min Zhao wrote:
+>> > > If CONFIG_SECCOMP is undefined, the option 'elevateprivileges' remai=
+ns
+>> > > compiled. This would make libvirt set the corresponding capability a=
+nd
+>> > > then trigger the guest startup fails. So this patch excludes the code
+>> > > regarding seccomp staff if CONFIG_SECCOMP is undefined.
+>> >
+>> > Just a sugestion for the next patch you send: If it's a single patch, =
+you don't
+>> > need to format it with a cover-letter. Just put all the description in=
+ the body,
+>> > or if you need to add a text that shouldn't be included in the commit =
+message,
+>> > just add it after the "---" after Signed-off-by.
+>> >
+>> > >
+>> > > Signed-off-by: Yi Min Zhao <zyimin@linux.ibm.com>
+>> > > ---
+>> > >  vl.c | 13 ++++++++-----
+>> > >  1 file changed, 8 insertions(+), 5 deletions(-)
+>> > >
+>>
 
-v2:
- - Introduce a helper function rw_config_req_item() to handle config
-   register offset calculation
- - Handle req->count > 1 more like MMIO rather than PIO
- - Added Roger to cc list (not taking R-b because of significant change)
----
- hw/i386/xen/trace-events |   2 +
- hw/i386/xen/xen-hvm.c    | 120 +++++++++++++++++++++++++++++++++++++++--------
- 2 files changed, 102 insertions(+), 20 deletions(-)
+[...]
 
-diff --git a/hw/i386/xen/trace-events b/hw/i386/xen/trace-events
-index 8dab7bc..f576f1b 100644
---- a/hw/i386/xen/trace-events
-+++ b/hw/i386/xen/trace-events
-@@ -15,6 +15,8 @@ cpu_ioreq_pio(void *req, uint32_t dir, uint32_t df, uint32_t data_is_ptr, uint64
- cpu_ioreq_pio_read_reg(void *req, uint64_t data, uint64_t addr, uint32_t size) "I/O=%p pio read reg data=0x%"PRIx64" port=0x%"PRIx64" size=%d"
- cpu_ioreq_pio_write_reg(void *req, uint64_t data, uint64_t addr, uint32_t size) "I/O=%p pio write reg data=0x%"PRIx64" port=0x%"PRIx64" size=%d"
- cpu_ioreq_move(void *req, uint32_t dir, uint32_t df, uint32_t data_is_ptr, uint64_t addr, uint64_t data, uint32_t count, uint32_t size) "I/O=%p copy dir=%d df=%d ptr=%d port=0x%"PRIx64" data=0x%"PRIx64" count=%d size=%d"
-+cpu_ioreq_config_read(void *req, uint32_t sbdf, uint32_t reg, uint32_t size, uint32_t data) "I/O=%p sbdf=0x%x reg=%u size=%u data=0x%x"
-+cpu_ioreq_config_write(void *req, uint32_t sbdf, uint32_t reg, uint32_t size, uint32_t data) "I/O=%p sbdf=0x%x reg=%u size=%u data=0x%x"
- 
- # xen-mapcache.c
- xen_map_cache(uint64_t phys_addr) "want 0x%"PRIx64
-diff --git a/hw/i386/xen/xen-hvm.c b/hw/i386/xen/xen-hvm.c
-index caa563b..d79b1d6 100644
---- a/hw/i386/xen/xen-hvm.c
-+++ b/hw/i386/xen/xen-hvm.c
-@@ -12,6 +12,7 @@
- 
- #include "cpu.h"
- #include "hw/pci/pci.h"
-+#include "hw/pci/pci_host.h"
- #include "hw/i386/pc.h"
- #include "hw/i386/apic-msidef.h"
- #include "hw/xen/xen_common.h"
-@@ -86,6 +87,12 @@ typedef struct XenPhysmap {
-     QLIST_ENTRY(XenPhysmap) list;
- } XenPhysmap;
- 
-+typedef struct XenPciDevice {
-+    PCIDevice *pci_dev;
-+    uint32_t sbdf;
-+    QLIST_ENTRY(XenPciDevice) entry;
-+} XenPciDevice;
-+
- typedef struct XenIOState {
-     ioservid_t ioservid;
-     shared_iopage_t *shared_page;
-@@ -105,6 +112,7 @@ typedef struct XenIOState {
-     struct xs_handle *xenstore;
-     MemoryListener memory_listener;
-     MemoryListener io_listener;
-+    QLIST_HEAD(, XenPciDevice) dev_list;
-     DeviceListener device_listener;
-     QLIST_HEAD(, XenPhysmap) physmap;
-     hwaddr free_phys_offset;
-@@ -569,6 +577,12 @@ static void xen_device_realize(DeviceListener *listener,
- 
-     if (object_dynamic_cast(OBJECT(dev), TYPE_PCI_DEVICE)) {
-         PCIDevice *pci_dev = PCI_DEVICE(dev);
-+        XenPciDevice *xendev = g_new(XenPciDevice, 1);
-+
-+        xendev->pci_dev = pci_dev;
-+        xendev->sbdf = PCI_BUILD_BDF(pci_dev_bus_num(pci_dev),
-+                                     pci_dev->devfn);
-+        QLIST_INSERT_HEAD(&state->dev_list, xendev, entry);
- 
-         xen_map_pcidev(xen_domid, state->ioservid, pci_dev);
-     }
-@@ -581,8 +595,17 @@ static void xen_device_unrealize(DeviceListener *listener,
- 
-     if (object_dynamic_cast(OBJECT(dev), TYPE_PCI_DEVICE)) {
-         PCIDevice *pci_dev = PCI_DEVICE(dev);
-+        XenPciDevice *xendev, *next;
- 
-         xen_unmap_pcidev(xen_domid, state->ioservid, pci_dev);
-+
-+        QLIST_FOREACH_SAFE(xendev, &state->dev_list, entry, next) {
-+            if (xendev->pci_dev == pci_dev) {
-+                QLIST_REMOVE(xendev, entry);
-+                g_free(xendev);
-+                break;
-+            }
-+        }
-     }
- }
- 
-@@ -903,6 +926,80 @@ static void cpu_ioreq_move(ioreq_t *req)
-     }
- }
- 
-+static void rw_config_req_item(XenPciDevice *xendev, ioreq_t *req,
-+                               uint32_t i, uint32_t *val)
-+{
-+    int32_t reg = req->addr;
-+    uint32_t offset = req->size * i;
-+
-+    reg += (req->df ? -1 : 1) * offset;
-+    if (reg < 0 || reg > PCI_CONFIG_SPACE_SIZE) {
-+        if (req->dir == IOREQ_READ) {
-+            *val = ~0u;
-+        }
-+        return;
-+    }
-+
-+    if (req->dir == IOREQ_READ) {
-+        *val = pci_host_config_read_common(xendev->pci_dev, reg,
-+                                           PCI_CONFIG_SPACE_SIZE,
-+                                           req->size);
-+        trace_cpu_ioreq_config_read(req, xendev->sbdf, reg,
-+                                    req->size, *val);
-+    } else {
-+        trace_cpu_ioreq_config_write(req, xendev->sbdf, reg, req->size,
-+                                     *val);
-+        pci_host_config_write_common(xendev->pci_dev, reg,
-+                                     PCI_CONFIG_SPACE_SIZE, *val,
-+                                     req->size);
-+    }
-+}
-+
-+static void cpu_ioreq_config(XenIOState *state, ioreq_t *req)
-+{
-+    uint32_t sbdf = req->addr >> 32;
-+    XenPciDevice *xendev;
-+
-+    if (req->size > sizeof(uint32_t)) {
-+        hw_error("PCI config access: bad size (%u)", req->size);
-+    }
-+
-+    QLIST_FOREACH(xendev, &state->dev_list, entry) {
-+        unsigned int i;
-+        uint32_t tmp;
-+
-+        if (xendev->sbdf != sbdf) {
-+            continue;
-+        }
-+
-+        if (!req->data_is_ptr) {
-+            if (req->dir == IOREQ_READ) {
-+                for (i = 0; i < req->count; i++) {
-+                    rw_config_req_item(xendev, req, i, &tmp);
-+                    req->data = tmp;
-+                }
-+            } else if (req->dir == IOREQ_WRITE) {
-+                for (i = 0; i < req->count; i++) {
-+                    tmp = req->data;
-+                    rw_config_req_item(xendev, req, i, &tmp);
-+                }
-+            }
-+        } else {
-+            if (req->dir == IOREQ_READ) {
-+                for (i = 0; i < req->count; i++) {
-+                    rw_config_req_item(xendev, req, i, &tmp);
-+                    write_phys_req_item(req->data, req, i, &tmp);
-+                }
-+            } else if (req->dir == IOREQ_WRITE) {
-+                for (i = 0; i < req->count; i++) {
-+                    read_phys_req_item(req->data, req, i, &tmp);
-+                    rw_config_req_item(xendev, req, i, &tmp);
-+                }
-+            }
-+        }
-+    }
-+}
-+
- static void regs_to_cpu(vmware_regs_t *vmport_regs, ioreq_t *req)
- {
-     X86CPU *cpu;
-@@ -975,27 +1072,9 @@ static void handle_ioreq(XenIOState *state, ioreq_t *req)
-         case IOREQ_TYPE_INVALIDATE:
-             xen_invalidate_map_cache();
-             break;
--        case IOREQ_TYPE_PCI_CONFIG: {
--            uint32_t sbdf = req->addr >> 32;
--            uint32_t val;
--
--            /* Fake a write to port 0xCF8 so that
--             * the config space access will target the
--             * correct device model.
--             */
--            val = (1u << 31) |
--                  ((req->addr & 0x0f00) << 16) |
--                  ((sbdf & 0xffff) << 8) |
--                  (req->addr & 0xfc);
--            do_outp(0xcf8, 4, val);
--
--            /* Now issue the config space access via
--             * port 0xCFC
--             */
--            req->addr = 0xcfc | (req->addr & 0x03);
--            cpu_ioreq_pio(req);
-+        case IOREQ_TYPE_PCI_CONFIG:
-+            cpu_ioreq_config(state, req);
-             break;
--        }
-         default:
-             hw_error("Invalid ioreq type 0x%x\n", req->type);
-     }
-@@ -1366,6 +1445,7 @@ void xen_hvm_init(PCMachineState *pcms, MemoryRegion **ram_memory)
-     memory_listener_register(&state->io_listener, &address_space_io);
- 
-     state->device_listener = xen_device_listener;
-+    QLIST_INIT(&state->dev_list);
-     device_listener_register(&state->device_listener);
- 
-     /* Initialize backend core & drivers */
--- 
-2.1.4
+>> Current libvirt logic assumes the -sandbox option is always present.
+>> (IIRC it was introduced in QEMU 1.1 and when we switched from help
+>> scraping to capability probing via QMP for QEMU 1.2, there was no
+>> way to detect it)
+>>
+>> This patch fixes the usage of QEMU new enough for seccomp blacklist
+>> (where libvirt enables the sandbox by default),
+>> but breaks the usage of QEMU with compiled out sandbox and
+>> setting
+>>  seccomp_sandbox =3D 0
+>> in libvirt's qemu.conf:
+>>
+>> error: internal error: process exited while connecting to monitor:
+>> qemu-git: -sandbox off: There is no option group 'sandbox'
+>>
+>>
+>> But now libvirt requires QEMU >=3D 1.5.0 which already supports
+>> query-command-line-options, so if you want the option gone completely
+>> --without-seccomp, I can add the code that probes for it and
+>> make seccomp_sandbox =3D 0 a no-op if it's compiled out.
+>
+>This looks like a good solution for the libvirt side. Can you add this sup=
+port
+>so we can merge this fix?
+>
+
+Patches proposed:
+https://www.redhat.com/archives/libvir-list/2018-May/msg01430.html
+
+Jano
+
+--8JPrznbw0YAQ/KXy
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: Digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEyAry0cRMFDoj9m/ZyvpdPXT/AmkFAlr+0AoACgkQyvpdPXT/
+AmlolBAAmvaW7cboBwbQB08IKJ4EsjIX7CXdkXqiihsHqnDCRfpwyMaPHateoff0
+zVyn6sUazghXh/QM1qNLAAJtmW6cj9xoAqSiaujOrHATpncxZBERxDBp9jOMCmjF
+WRVjoRAmW8JEUm1Sb6tEj+UEPmAhl6zSjuct/fsPFBYp1xT4a7P++OIEmM0v1+cw
+6NfhZ8soGBlFagbdZcHIf98mTiX/QJ1y//OT62NnzAh+lpxFLcJdHK1+yU7QUbLH
+ofomowruz7LjZCzJnXX44iw0o3F5RM+w3QiBALYV3M9GWy7zS3J/tnXfbY/MGSxz
+Y6K9PLFZcfEZiRLO2ztCf2RdDCrkGXJyvColzuEsR/K0tqkz/Tut4HT2W7JBolFM
+sYpBh2zxGniwNe3lpwp5l2ldzstygmm5DVOG5SNYiWXkJG2oGBonP3VS6Yl6jl6c
+sBrmCWVhfbHIDogdkHPO1bjxle5PgKbxHfEh0miSFqKDgKrcqsde7H4zJm06llq2
+rOrku5cqohpzuIHVZRCoEQAXOARrEsSXqelsTpM3MSPzDVQl37n7aP4qzihDnKre
+PyGswKra3njnnAgvfpI2+Ckj5yWdOPcFprh35NMGkh7zQHed7xtlaablzuY8ayjf
+BnqxnMYPKV0zEpWjkNeQc6PedXwIIAAAurK8C8gg/koLOsjPttA=
+=mkhG
+-----END PGP SIGNATURE-----
+
+--8JPrznbw0YAQ/KXy--
