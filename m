@@ -1,36 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56480)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56481)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1fJagE-0006R1-8k
+	(envelope-from <eric.auger@redhat.com>) id 1fJagE-0006R2-8q
 	for qemu-devel@nongnu.org; Fri, 18 May 2018 04:24:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1fJagB-0005Qt-4b
+	(envelope-from <eric.auger@redhat.com>) id 1fJagB-0005R1-8i
 	for qemu-devel@nongnu.org; Fri, 18 May 2018 04:24:02 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:33234 helo=mx1.redhat.com)
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:54092 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <eric.auger@redhat.com>)
-	id 1fJagA-0005QZ-VY
+	id 1fJagB-0005Qi-3X
 	for qemu-devel@nongnu.org; Fri, 18 May 2018 04:23:59 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.4])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 694234067F19
-	for <qemu-devel@nongnu.org>; Fri, 18 May 2018 08:23:58 +0000 (UTC)
-Received: from localhost.localdomain (ovpn-117-111.ams2.redhat.com
-	[10.36.117.111])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 249B92023582
-	for <qemu-devel@nongnu.org>; Fri, 18 May 2018 08:23:57 +0000 (UTC)
 References: <20180517085927.24925-1-peterx@redhat.com>
-	<20180517085927.24925-7-peterx@redhat.com>
+	<20180517085927.24925-2-peterx@redhat.com>
 From: Auger Eric <eric.auger@redhat.com>
-Message-ID: <48a97e95-23d3-afa0-8513-beb822149eca@redhat.com>
-Date: Fri, 18 May 2018 10:23:57 +0200
+Message-ID: <005c2086-7384-90e1-9128-448448aab946@redhat.com>
+Date: Fri, 18 May 2018 10:23:56 +0200
 MIME-Version: 1.0
-In-Reply-To: <20180517085927.24925-7-peterx@redhat.com>
+In-Reply-To: <20180517085927.24925-2-peterx@redhat.com>
 Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3 06/12] intel-iommu: pass in address
- space when page walk
+Subject: Re: [Qemu-devel] [PATCH v3 01/12] intel-iommu: send PSI always even
+ if across PDEs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,56 +29,117 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Peter Xu <peterx@redhat.com>, qemu-devel@nongnu.org
+Cc: Tian Kevin <kevin.tian@intel.com>, "Michael S . Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, Alex Williamson <alex.williamson@redhat.com>, Jintack Lim <jintack@cs.columbia.edu>
 
 Hi Peter,
 
 On 05/17/2018 10:59 AM, Peter Xu wrote:
-> We pass in the VTDAddressSpace too.  It'll be used in the follow up
-> patches.
-So you evetually preferred to keep .aw. I don't have a strong opinion
-but maybe a small preference to v2 version.
-
-Nevertheless
-Reviewed-by: Eric Auger <eric.auger@redhat.com>
-
-Eric
+> During IOVA page table walking, there is a special case when the PSI
+> covers one whole PDE (Page Directory Entry, which contains 512 Page
+> Table Entries) or more.  In the past, we skip that entry and we don't
+> notify the IOMMU notifiers.  This is not correct.  We should send UNMAP
+> notification to registered UNMAP notifiers in this case.
 > 
+> For UNMAP only notifiers, this might cause IOTLBs cached in the devices
+> even if they were already invalid.  For MAP/UNMAP notifiers like
+> vfio-pci, this will cause stale page mappings.
+> 
+> This special case doesn't trigger often, but it is very easy to be
+> triggered by nested device assignments, since in that case we'll
+> possibly map the whole L2 guest RAM region into the device's IOVA
+> address space (several GBs at least), which is far bigger than normal
+> kernel driver usages of the device (tens of MBs normally).
+> 
+> Without this patch applied to L1 QEMU, nested device assignment to L2
+> guests will dump some errors like:
+> 
+> qemu-system-x86_64: VFIO_MAP_DMA: -17
+> qemu-system-x86_64: vfio_dma_map(0x557305420c30, 0xad000, 0x1000,
+>                     0x7f89a920d000) = -17 (File exists)
+> 
+> Acked-by: Jason Wang <jasowang@redhat.com>
+> [peterx: rewrite the commit message]
 > Signed-off-by: Peter Xu <peterx@redhat.com>
 > ---
->  hw/i386/intel_iommu.c | 4 ++++
->  1 file changed, 4 insertions(+)
+>  hw/i386/intel_iommu.c | 42 ++++++++++++++++++++++++++++++------------
+>  1 file changed, 30 insertions(+), 12 deletions(-)
 > 
 > diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
-> index 4953d02ed0..fe5ee77d46 100644
+> index fb31de9416..b359efd6f9 100644
 > --- a/hw/i386/intel_iommu.c
 > +++ b/hw/i386/intel_iommu.c
-> @@ -753,9 +753,11 @@ typedef int (*vtd_page_walk_hook)(IOMMUTLBEntry *entry, void *private);
->   * @hook_fn: hook func to be called when detected page
->   * @private: private data to be passed into hook func
->   * @notify_unmap: whether we should notify invalid entries
-> + * @as: VT-d address space of the device
->   * @aw: maximum address width
->   */
->  typedef struct {
-> +    VTDAddressSpace *as;
->      vtd_page_walk_hook hook_fn;
->      void *private;
->      bool notify_unmap;
-> @@ -1460,6 +1462,7 @@ static void vtd_iotlb_page_invalidate_notify(IntelIOMMUState *s,
->                      .private = (void *)&vtd_as->iommu,
->                      .notify_unmap = true,
->                      .aw = s->aw_bits,
-> +                    .as = vtd_as,
->                  };
+> @@ -722,6 +722,15 @@ static int vtd_iova_to_slpte(VTDContextEntry *ce, uint64_t iova, bool is_write,
 >  
->                  /*
-> @@ -2941,6 +2944,7 @@ static void vtd_iommu_replay(IOMMUMemoryRegion *iommu_mr, IOMMUNotifier *n)
->                  .private = (void *)n,
->                  .notify_unmap = false,
->                  .aw = s->aw_bits,
-> +                .as = vtd_as,
->              };
+>  typedef int (*vtd_page_walk_hook)(IOMMUTLBEntry *entry, void *private);
 >  
->              vtd_page_walk(&ce, 0, ~0ULL, &info);
+> +static int vtd_page_walk_one(IOMMUTLBEntry *entry, int level,
+> +                             vtd_page_walk_hook hook_fn, void *private)
+Besides the name of this function (nit)
+Reviewed-by: Eric Auger <eric.auger@redhat.com>
+
+Thanks
+
+Eric
+
+> +{
+> +    assert(hook_fn);
+> +    trace_vtd_page_walk_one(level, entry->iova, entry->translated_addr,
+> +                            entry->addr_mask, entry->perm);
+> +    return hook_fn(entry, private);
+> +}
+> +
+>  /**
+>   * vtd_page_walk_level - walk over specific level for IOVA range
+>   *
+> @@ -781,28 +790,37 @@ static int vtd_page_walk_level(dma_addr_t addr, uint64_t start,
+>           */
+>          entry_valid = read_cur | write_cur;
+>  
+> +        entry.target_as = &address_space_memory;
+> +        entry.iova = iova & subpage_mask;
+> +        entry.perm = IOMMU_ACCESS_FLAG(read_cur, write_cur);
+> +        entry.addr_mask = ~subpage_mask;
+> +
+>          if (vtd_is_last_slpte(slpte, level)) {
+> -            entry.target_as = &address_space_memory;
+> -            entry.iova = iova & subpage_mask;
+>              /* NOTE: this is only meaningful if entry_valid == true */
+>              entry.translated_addr = vtd_get_slpte_addr(slpte, aw);
+> -            entry.addr_mask = ~subpage_mask;
+> -            entry.perm = IOMMU_ACCESS_FLAG(read_cur, write_cur);
+>              if (!entry_valid && !notify_unmap) {
+>                  trace_vtd_page_walk_skip_perm(iova, iova_next);
+>                  goto next;
+>              }
+> -            trace_vtd_page_walk_one(level, entry.iova, entry.translated_addr,
+> -                                    entry.addr_mask, entry.perm);
+> -            if (hook_fn) {
+> -                ret = hook_fn(&entry, private);
+> -                if (ret < 0) {
+> -                    return ret;
+> -                }
+> +            ret = vtd_page_walk_one(&entry, level, hook_fn, private);
+> +            if (ret < 0) {
+> +                return ret;
+>              }
+>          } else {
+>              if (!entry_valid) {
+> -                trace_vtd_page_walk_skip_perm(iova, iova_next);
+> +                if (notify_unmap) {
+> +                    /*
+> +                     * The whole entry is invalid; unmap it all.
+> +                     * Translated address is meaningless, zero it.
+> +                     */
+> +                    entry.translated_addr = 0x0;
+> +                    ret = vtd_page_walk_one(&entry, level, hook_fn, private);
+> +                    if (ret < 0) {
+> +                        return ret;
+> +                    }
+> +                } else {
+> +                    trace_vtd_page_walk_skip_perm(iova, iova_next);
+> +                }
+>                  goto next;
+>              }
+>              ret = vtd_page_walk_level(vtd_get_slpte_addr(slpte, aw), iova,
 > 
