@@ -1,26 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48446)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44571)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fJhzM-0000kU-3f
-	for qemu-devel@nongnu.org; Fri, 18 May 2018 12:12:16 -0400
+	(envelope-from <bastien.orivel@diateam.net>) id 1fJg9Q-0002Ax-HO
+	for qemu-devel@nongnu.org; Fri, 18 May 2018 10:14:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fJhzJ-0007gQ-Ft
-	for qemu-devel@nongnu.org; Fri, 18 May 2018 12:12:16 -0400
-Received: from mail-wm0-x241.google.com ([2a00:1450:400c:c09::241]:39675)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1fJhzJ-0007gB-97
-	for qemu-devel@nongnu.org; Fri, 18 May 2018 12:12:13 -0400
-Received: by mail-wm0-x241.google.com with SMTP id f8-v6so16201489wmc.4
-	for <qemu-devel@nongnu.org>; Fri, 18 May 2018 09:12:13 -0700 (PDT)
-References: <20180316142223.28745-1-marcandre.lureau@redhat.com>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <20180316142223.28745-1-marcandre.lureau@redhat.com>
-Date: Fri, 18 May 2018 17:12:10 +0100
-Message-ID: <87d0xtdjtx.fsf@linaro.org>
+	(envelope-from <bastien.orivel@diateam.net>) id 1fJg9M-0000QD-26
+	for qemu-devel@nongnu.org; Fri, 18 May 2018 10:14:32 -0400
+Received: from mail.virtualys.com ([178.33.44.80]:36851)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <bastien.orivel@diateam.net>) id 1fJg9L-0000MS-Nr
+	for qemu-devel@nongnu.org; Fri, 18 May 2018 10:14:27 -0400
+From: Bastien Orivel <bastien.orivel@diateam.net>
+Message-ID: <7ccfbaf3-d2bf-3527-24b0-cfeb9927afc2@diateam.net>
+Date: Fri, 18 May 2018 16:14:16 +0200
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] tests: fix tpm-crb tpm-tis tests race
+Content-Language: en-US
+Subject: [Qemu-devel] QEMU's SPICE server not getting leds callback when
+ sending capslock
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,41 +26,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
-Cc: qemu-devel@nongnu.org, peter.maydell@linaro.org, stefanb@linux.vnet.ibm.com
+To: qemu-devel@nongnu.org
+Cc: kraxel@redhat.com
 
+Hey,
 
-Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
+I'm having troubles using the QEMU's SPICE server for remote views. When
+trying to sync leds from my SPICE client to QEMU, I can see that the
+caps lock keycodes are sent but the server state never gets updated
+(which leads in funny behaviours like caps lock "blinking" in the guest
+if the clients resyncs its state often).
 
-> No need to close the TPM data socket on the emulator end, qemu will
-> close it after a SHUTDOWN. This avoids a race between close() and
-> read() in the TPM data thread.
+That behaviour doesn't happen at all with the numlock led which does the
+same thing but with different keycodes.
+
+Here is an example of what's happening when the client tries to resync
+with a capslock difference:
+
+> Spice received: 58
+> ps2_put_keycode: 88
 >
-> Reported-by: Peter Maydell <peter.maydell@linaro.org>
-> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> Spice received: 186
+> ps2_put_keycode: 240
+> ps2_put_keycode: 88
+> ps2_queue: 186
 
-Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-Tested-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+And with numlock:
 
-> ---
->  tests/tpm-emu.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/tests/tpm-emu.c b/tests/tpm-emu.c
-> index 4dada76834..8c2bd53cad 100644
-> --- a/tests/tpm-emu.c
-> +++ b/tests/tpm-emu.c
-> @@ -125,7 +125,7 @@ void *tpm_emu_ctrl_thread(void *data)
->          case CMD_SHUTDOWN: {
->              ptm_res res =3D 0;
->              qio_channel_write(ioc, (char *)&res, sizeof(res), &error_abo=
-rt);
-> -            qio_channel_close(s->tpm_ioc, &error_abort);
-> +            /* the tpm data thread is expected to finish now */
->              g_thread_join(s->emu_tpm_thread);
->              break;
->          }
+> Spice received: 69
+> ps2_put_keycode: 119
+
+> Spice received: 197
+> ps2_put_keycode: 240
+> ps2_put_keycode: 119
+> ps2_queue: 197
+> ps2_set_ledstate: 0
+> Spice new ledstate: 0
 
 
---
-Alex Benn=C3=A9e
+Spice registers a callback for leds via qemu_add_led_event_handler but
+it's never called for capslock. Is that a normal behaviour ? Is there
+any reasons for the capslock led not to be updated ?
+
+Regards,
+Bastien
