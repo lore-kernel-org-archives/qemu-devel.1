@@ -1,29 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50016)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50436)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <prvs=669710df0=Paul.Durrant@citrix.com>)
-	id 1fJgTV-0001P7-Ed
-	for qemu-devel@nongnu.org; Fri, 18 May 2018 10:35:19 -0400
+	(envelope-from <eblake@redhat.com>) id 1fJgVO-0002gs-8H
+	for qemu-devel@nongnu.org; Fri, 18 May 2018 10:37:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <prvs=669710df0=Paul.Durrant@citrix.com>)
-	id 1fJgTP-0002pw-0y
-	for qemu-devel@nongnu.org; Fri, 18 May 2018 10:35:17 -0400
-Received: from smtp.ctxuk.citrix.com ([185.25.65.24]:16808
-	helo=SMTP.EU.CITRIX.COM)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <prvs=669710df0=Paul.Durrant@citrix.com>)
-	id 1fJgTO-0002lQ-L6
-	for qemu-devel@nongnu.org; Fri, 18 May 2018 10:35:10 -0400
-From: Paul Durrant <Paul.Durrant@citrix.com>
-Date: Fri, 18 May 2018 14:35:08 +0000
-Message-ID: <b6be9fdddee04630ba38b2fb91cd202d@AMSPEX02CL03.citrite.net>
-References: <1526653662-9237-1-git-send-email-paul.durrant@citrix.com>
-In-Reply-To: <1526653662-9237-1-git-send-email-paul.durrant@citrix.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	(envelope-from <eblake@redhat.com>) id 1fJgVH-0004VX-RW
+	for qemu-devel@nongnu.org; Fri, 18 May 2018 10:37:14 -0400
+References: <20180518132114.4070-1-kwolf@redhat.com>
+	<20180518132114.4070-9-kwolf@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <658b36c1-f533-a1a3-12ab-bff15d864f62@redhat.com>
+Date: Fri, 18 May 2018 09:36:57 -0500
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v3] xen-hvm: stop faking I/O to access PCI
- config space
+In-Reply-To: <20180518132114.4070-9-kwolf@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 08/40] job: Move state transitions to Job
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,271 +24,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paul Durrant <Paul.Durrant@citrix.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "xen-devel@lists.xenproject.org" <xen-devel@lists.xenproject.org>
-Cc: Stefano Stabellini <sstabellini@kernel.org>, Anthony Perard <anthony.perard@citrix.com>, "Michael S. Tsirkin" <mst@redhat.com>, Marcel
-	Apfelbaum <marcel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard
-	Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, Roger
-	Pau Monne <roger.pau@citrix.com>, Jan Beulich <JBeulich@suse.com>
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+Cc: mreitz@redhat.com, jsnow@redhat.com, jcody@redhat.com, armbru@redhat.com, qemu-devel@nongnu.org
 
-> -----Original Message-----
-> From: Paul Durrant [mailto:paul.durrant@citrix.com]
-> Sent: 18 May 2018 15:28
-> To: qemu-devel@nongnu.org; xen-devel@lists.xenproject.org
-> Cc: Paul Durrant <Paul.Durrant@citrix.com>; Stefano Stabellini
-> <sstabellini@kernel.org>; Anthony Perard <anthony.perard@citrix.com>;
-> Michael S. Tsirkin <mst@redhat.com>; Marcel Apfelbaum
-> <marcel@redhat.com>; Paolo Bonzini <pbonzini@redhat.com>; Richard
-> Henderson <rth@twiddle.net>; Eduardo Habkost <ehabkost@redhat.com>;
-> Roger Pau Monne <roger.pau@citrix.com>; Jan Beulich
-> <JBeulich@suse.com>
-> Subject: [PATCH v3] xen-hvm: stop faking I/O to access PCI config space
->=20
-> This patch removes the current hackery where IOREQ_TYPE_PCI_CONFIG
-> requests are handled by faking PIO to 0xcf8 and 0xcfc and replaces it
-> with direct calls to pci_host_config_read/write_common().
-> Doing so necessitates mapping BDFs to PCIDevices but maintaining a simple
-> QLIST in xen_device_realize/unrealize() will suffice.
->=20
-> NOTE: whilst config space accesses are currently limited to
->       PCI_CONFIG_SPACE_SIZE, this patch paves the way to increasing the
->       limit to PCIE_CONFIG_SPACE_SIZE when Xen gains the ability to
->       emulate MCFG table accesses.
->=20
-> Signed-off-by: Paul Durrant <paul.durrant@citrix.com>
-
-Apologies. Due to a missing 'git add', this patch has an error...
-
-> --
-> Cc: Stefano Stabellini <sstabellini@kernel.org>
-> Cc: Anthony Perard <anthony.perard@citrix.com>
-> Cc: "Michael S. Tsirkin" <mst@redhat.com>
-> Cc: Marcel Apfelbaum <marcel@redhat.com>
-> Cc: Paolo Bonzini <pbonzini@redhat.com>
-> Cc: Richard Henderson <rth@twiddle.net>
-> Cc: Eduardo Habkost <ehabkost@redhat.com>
-> Cc: Roger Pau Monne <roger.pau@citrix.com>
-> Cc: Jan Beulich <JBeulich@suse.com>
->=20
-> v3:
->  - Drop helper function and treat count > 1 as an error
->  - Add Jan to cc list
->=20
-> v2:
->  - Introduce a helper function rw_config_req_item() to handle config
->    register offset calculation
->  - Handle req->count > 1 more like MMIO rather than PIO
->  - Add Roger to cc list (not taking R-b because of significant change)
+On 05/18/2018 08:20 AM, Kevin Wolf wrote:
+> This moves BlockJob.status and the closely related functions
+> (block_)job_state_transition() and (block_)job_apply_verb to Job. The
+> two QAPI enums are renamed to JobStatus and JobVerb.
+> 
+> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+> Reviewed-by: Max Reitz <mreitz@redhat.com>
+> Reviewed-by: John Snow <jsnow@redhat.com>
 > ---
->  hw/i386/xen/trace-events |   2 +
->  hw/i386/xen/xen-hvm.c    | 102
-> +++++++++++++++++++++++++++++++++++++----------
->  2 files changed, 84 insertions(+), 20 deletions(-)
->=20
-> diff --git a/hw/i386/xen/trace-events b/hw/i386/xen/trace-events
-> index 8dab7bc..f576f1b 100644
-> --- a/hw/i386/xen/trace-events
-> +++ b/hw/i386/xen/trace-events
-> @@ -15,6 +15,8 @@ cpu_ioreq_pio(void *req, uint32_t dir, uint32_t df,
-> uint32_t data_is_ptr, uint64
->  cpu_ioreq_pio_read_reg(void *req, uint64_t data, uint64_t addr, uint32_t
-> size) "I/O=3D%p pio read reg data=3D0x%"PRIx64" port=3D0x%"PRIx64" size=
-=3D%d"
->  cpu_ioreq_pio_write_reg(void *req, uint64_t data, uint64_t addr, uint32_=
-t
-> size) "I/O=3D%p pio write reg data=3D0x%"PRIx64" port=3D0x%"PRIx64" size=
-=3D%d"
->  cpu_ioreq_move(void *req, uint32_t dir, uint32_t df, uint32_t data_is_pt=
-r,
-> uint64_t addr, uint64_t data, uint32_t count, uint32_t size) "I/O=3D%p co=
-py
-> dir=3D%d df=3D%d ptr=3D%d port=3D0x%"PRIx64" data=3D0x%"PRIx64" count=3D%=
-d
-> size=3D%d"
-> +cpu_ioreq_config_read(void *req, uint32_t sbdf, uint32_t reg, uint32_t
-> size, uint32_t data) "I/O=3D%p sbdf=3D0x%x reg=3D%u size=3D%u data=3D0x%x=
-"
-> +cpu_ioreq_config_write(void *req, uint32_t sbdf, uint32_t reg, uint32_t
-> size, uint32_t data) "I/O=3D%p sbdf=3D0x%x reg=3D%u size=3D%u data=3D0x%x=
-"
->=20
->  # xen-mapcache.c
->  xen_map_cache(uint64_t phys_addr) "want 0x%"PRIx64
-> diff --git a/hw/i386/xen/xen-hvm.c b/hw/i386/xen/xen-hvm.c
-> index caa563b..3a6c42b 100644
-> --- a/hw/i386/xen/xen-hvm.c
-> +++ b/hw/i386/xen/xen-hvm.c
-> @@ -12,6 +12,7 @@
->=20
->  #include "cpu.h"
->  #include "hw/pci/pci.h"
-> +#include "hw/pci/pci_host.h"
->  #include "hw/i386/pc.h"
->  #include "hw/i386/apic-msidef.h"
->  #include "hw/xen/xen_common.h"
-> @@ -86,6 +87,12 @@ typedef struct XenPhysmap {
->      QLIST_ENTRY(XenPhysmap) list;
->  } XenPhysmap;
->=20
-> +typedef struct XenPciDevice {
-> +    PCIDevice *pci_dev;
-> +    uint32_t sbdf;
-> +    QLIST_ENTRY(XenPciDevice) entry;
-> +} XenPciDevice;
-> +
->  typedef struct XenIOState {
->      ioservid_t ioservid;
->      shared_iopage_t *shared_page;
-> @@ -105,6 +112,7 @@ typedef struct XenIOState {
->      struct xs_handle *xenstore;
->      MemoryListener memory_listener;
->      MemoryListener io_listener;
-> +    QLIST_HEAD(, XenPciDevice) dev_list;
->      DeviceListener device_listener;
->      QLIST_HEAD(, XenPhysmap) physmap;
->      hwaddr free_phys_offset;
-> @@ -569,6 +577,12 @@ static void xen_device_realize(DeviceListener
-> *listener,
->=20
->      if (object_dynamic_cast(OBJECT(dev), TYPE_PCI_DEVICE)) {
->          PCIDevice *pci_dev =3D PCI_DEVICE(dev);
-> +        XenPciDevice *xendev =3D g_new(XenPciDevice, 1);
-> +
-> +        xendev->pci_dev =3D pci_dev;
-> +        xendev->sbdf =3D PCI_BUILD_BDF(pci_dev_bus_num(pci_dev),
-> +                                     pci_dev->devfn);
-> +        QLIST_INSERT_HEAD(&state->dev_list, xendev, entry);
->=20
->          xen_map_pcidev(xen_domid, state->ioservid, pci_dev);
->      }
-> @@ -581,8 +595,17 @@ static void xen_device_unrealize(DeviceListener
-> *listener,
->=20
->      if (object_dynamic_cast(OBJECT(dev), TYPE_PCI_DEVICE)) {
->          PCIDevice *pci_dev =3D PCI_DEVICE(dev);
-> +        XenPciDevice *xendev, *next;
->=20
->          xen_unmap_pcidev(xen_domid, state->ioservid, pci_dev);
-> +
-> +        QLIST_FOREACH_SAFE(xendev, &state->dev_list, entry, next) {
-> +            if (xendev->pci_dev =3D=3D pci_dev) {
-> +                QLIST_REMOVE(xendev, entry);
-> +                g_free(xendev);
-> +                break;
-> +            }
-> +        }
->      }
->  }
->=20
-> @@ -903,6 +926,62 @@ static void cpu_ioreq_move(ioreq_t *req)
->      }
->  }
->=20
-> +static void cpu_ioreq_config(XenIOState *state, ioreq_t *req)
+
+> @@ -1077,14 +1021,14 @@ void coroutine_fn block_job_pause_point(BlockJob *job)
+>       }
+>   
+>       if (block_job_should_pause(job) && !block_job_is_cancelled(job)) {
+> -        BlockJobStatus status = job->status;
+> -        block_job_state_transition(job, status == BLOCK_JOB_STATUS_READY ? \
+> -                                   BLOCK_JOB_STATUS_STANDBY :           \
+> -                                   BLOCK_JOB_STATUS_PAUSED);
+> +        JobStatus status = job->job.status;
+> +        job_state_transition(&job->job, status == JOB_STATUS_READY
+> +                                        ? JOB_STATUS_STANDBY
+> +                                        : JOB_STATUS_PAUSED);
+
+Nice that you are getting rid of the pointless \.  Here, you split the 
+?: operator by wrapping the ? onto the start of the next line...
+
+> +++ b/job.c
+
+> +int job_apply_verb(Job *job, JobVerb verb, Error **errp)
 > +{
-> +    uint32_t sbdf =3D req->addr >> 32;
-> +    uint32_t reg =3D req->addr;
-> +    XenPciDevice *xendev;
-> +
-> +    if (req->size !=3D sizeof(uint8_t) && req->size !=3D sizeof(uint16_t=
-) &&
-> +        req->size !=3D sizeof(uint32_t)) {
-> +        hw_error("PCI config access: bad size (%u)", req->size);
-> +    }
-> +
-> +    if (req->count !=3D 1) {
-> +        hw_error("PCI config access: bad count (%u)", req->count);
-> +    }
-> +
-> +    QLIST_FOREACH(xendev, &state->dev_list, entry) {
-> +        if (xendev->sbdf !=3D sbdf) {
-> +            continue;
-> +        }
-> +
-> +        if (!req->data_is_ptr) {
-> +            if (req->dir =3D=3D IOREQ_READ) {
-> +                req->data =3D pci_host_config_read_common(
-> +                    xendev->pci_dev, reg, PCI_CONFIG_SPACE_SIZE,
-> +                    req->size);
-> +                trace_cpu_ioreq_config_read(req, xendev->sbdf, reg,
-> +                                            req->size, req->data);
-> +            } else if (req->dir =3D=3D IOREQ_WRITE) {
-> +                trace_cpu_ioreq_config_write(req, xendev->sbdf, reg,
-> +                                             req->size, req->data);
-> +                pci_host_config_write_common(
-> +                    xendev->pci_dev, reg, PCI_CONFIG_SPACE_SIZE,
-> +                    req->data, req->size);
-> +            }
-> +        } else {
-> +            uint32_t tmp;
-> +
-> +            if (req->dir =3D=3D IOREQ_READ) {
-> +                tmp =3D pci_host_config_read_common(
-> +                    xendev->pci_dev, reg, PCI_CONFIG_SPACE_SIZE,
-> +                    req->size);
-> +                trace_cpu_ioreq_config_read(req, xendev->sbdf, reg,
-> +                                            req->size, tmp);
-> +                write_phys_req_item(req->data, req, 0, &tmp);
-> +            } else if (req->dir =3D=3D IOREQ_WRITE) {
-> +                read_phys_req_item(req->data, req, i, &tmp);
+> +    assert(verb >= 0 && verb <= JOB_VERB__MAX);
+> +    trace_job_apply_verb(job, JobStatus_str(job->status), JobVerb_str(verb),
+> +                         JobVerbTable[verb][job->status] ?
+> +                         "allowed" : "prohibited");
 
-...here.=20
+while here, you put it at the end of the previous line.  We have a 
+slight preference for one style over the other (there are also false 
+positives in both of these greps):
 
-I'll send v4 shortly.
+$ git grep '?$' | wc -c
+27251
+$ git grep '^ *?' | wc -c
+9619
 
-  Paul
+But I don't care which style you use, other than pointing out that a 
+consistent style within the patch doesn't hurt. :)
 
-> +                trace_cpu_ioreq_config_write(req, xendev->sbdf, reg,
-> +                                             req->size, tmp);
-> +                pci_host_config_write_common(
-> +                    xendev->pci_dev, reg, PCI_CONFIG_SPACE_SIZE,
-> +                    tmp, req->size);
-> +            }
-> +        }
-> +    }
-> +}
-> +
->  static void regs_to_cpu(vmware_regs_t *vmport_regs, ioreq_t *req)
->  {
->      X86CPU *cpu;
-> @@ -975,27 +1054,9 @@ static void handle_ioreq(XenIOState *state, ioreq_t
-> *req)
->          case IOREQ_TYPE_INVALIDATE:
->              xen_invalidate_map_cache();
->              break;
-> -        case IOREQ_TYPE_PCI_CONFIG: {
-> -            uint32_t sbdf =3D req->addr >> 32;
-> -            uint32_t val;
-> -
-> -            /* Fake a write to port 0xCF8 so that
-> -             * the config space access will target the
-> -             * correct device model.
-> -             */
-> -            val =3D (1u << 31) |
-> -                  ((req->addr & 0x0f00) << 16) |
-> -                  ((sbdf & 0xffff) << 8) |
-> -                  (req->addr & 0xfc);
-> -            do_outp(0xcf8, 4, val);
-> -
-> -            /* Now issue the config space access via
-> -             * port 0xCFC
-> -             */
-> -            req->addr =3D 0xcfc | (req->addr & 0x03);
-> -            cpu_ioreq_pio(req);
-> +        case IOREQ_TYPE_PCI_CONFIG:
-> +            cpu_ioreq_config(state, req);
->              break;
-> -        }
->          default:
->              hw_error("Invalid ioreq type 0x%x\n", req->type);
->      }
-> @@ -1366,6 +1427,7 @@ void xen_hvm_init(PCMachineState *pcms,
-> MemoryRegion **ram_memory)
->      memory_listener_register(&state->io_listener, &address_space_io);
->=20
->      state->device_listener =3D xen_device_listener;
-> +    QLIST_INIT(&state->dev_list);
->      device_listener_register(&state->device_listener);
->=20
->      /* Initialize backend core & drivers */
-> --
-> 2.1.4
+So, whether or not you make a whitespace-only tweak to one of those two 
+spots,
+
+Reviewed-by: Eric Blake <eblake@redhat.com>
+
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
