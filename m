@@ -1,33 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47466)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47603)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fJgKU-00012u-BR
-	for qemu-devel@nongnu.org; Fri, 18 May 2018 10:25:59 -0400
+	(envelope-from <kwolf@redhat.com>) id 1fJgKo-0001XD-Pd
+	for qemu-devel@nongnu.org; Fri, 18 May 2018 10:26:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fJgKQ-00037S-D6
-	for qemu-devel@nongnu.org; Fri, 18 May 2018 10:25:57 -0400
-Received: from mail-qt0-x244.google.com ([2607:f8b0:400d:c0d::244]:46793)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fJgKQ-000374-7M
-	for qemu-devel@nongnu.org; Fri, 18 May 2018 10:25:54 -0400
-Received: by mail-qt0-x244.google.com with SMTP id m16-v6so10453428qtg.13
-	for <qemu-devel@nongnu.org>; Fri, 18 May 2018 07:25:54 -0700 (PDT)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20180517174718.10107-1-alex.bennee@linaro.org>
-	<20180517174718.10107-40-alex.bennee@linaro.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <c04618e6-8612-7c8d-1226-2a96507b18be@amsat.org>
-Date: Fri, 18 May 2018 11:25:44 -0300
-MIME-Version: 1.0
-In-Reply-To: <20180517174718.10107-40-alex.bennee@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v4 39/49] tests/tcg/alpha: add Alpha
- specific tests
+	(envelope-from <kwolf@redhat.com>) id 1fJgKn-0003WL-PJ
+	for qemu-devel@nongnu.org; Fri, 18 May 2018 10:26:18 -0400
+From: Kevin Wolf <kwolf@redhat.com>
+Date: Fri, 18 May 2018 16:26:02 +0200
+Message-Id: <20180518142605.19846-1-kwolf@redhat.com>
+Subject: [Qemu-devel] [PATCH v2 0/3] qemu-iotests: Fix NFS + raw
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,157 +17,25 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, cota@braap.org, famz@redhat.com, berrange@redhat.com, richard.henderson@linaro.org, balrogg@gmail.com, aurelien@aurel32.net, agraf@suse.de
-Cc: qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>
+To: qemu-block@nongnu.org
+Cc: kwolf@redhat.com, qemu-devel@nongnu.org
 
-On 05/17/2018 02:47 PM, Alex Bennée wrote:
-> These tests did use their own crt.o stub however that is a little
-> stone age so we drop crt.S and just statically link to the cross
-> compilers libraries.
-> 
-> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-> 
-> ---
-> v4
->   - drop crt.s
->   - drop skipping of threadtest
->   - drop write() hack, include unistd.h
-> ---
->  tests/tcg/alpha/Makefile        | 35 ---------------------------------
->  tests/tcg/alpha/Makefile.target | 15 ++++++++++++++
->  tests/tcg/alpha/crt.s           | 26 ------------------------
->  tests/tcg/alpha/hello-alpha.c   |  2 ++
->  tests/tcg/alpha/test-cond.c     |  1 +
->  tests/tcg/alpha/test-ovf.c      |  2 ++
->  6 files changed, 20 insertions(+), 61 deletions(-)
->  delete mode 100644 tests/tcg/alpha/Makefile
->  create mode 100644 tests/tcg/alpha/Makefile.target
->  delete mode 100644 tests/tcg/alpha/crt.s
-> 
-> diff --git a/tests/tcg/alpha/Makefile b/tests/tcg/alpha/Makefile
-> deleted file mode 100644
-> index 2b1f03d048..0000000000
-> --- a/tests/tcg/alpha/Makefile
-> +++ /dev/null
-> @@ -1,35 +0,0 @@
-> -CROSS=alpha-linux-gnu-
-> -CC=$(CROSS)gcc
-> -AS=$(CROSS)as
-> -
-> -SIM=../../alpha-linux-user/qemu-alpha
-> -
-> -CFLAGS=-O
-> -LINK=$(CC) -o $@ crt.o $< -nostdlib
-> -
-> -TESTS=test-cond test-cmov
-> -
-> -all: hello-alpha $(TESTS)
-> -
-> -hello-alpha: hello-alpha.o crt.o
-> -	$(LINK)
-> -
-> -test-cond: test-cond.o crt.o
-> -	$(LINK)
-> -
-> -test-cmov.o: test-cond.c
-> -	$(CC) -c $(CFLAGS) -DTEST_CMOV -o $@ $<
-> -
-> -test-cmov: test-cmov.o crt.o
-> -	$(LINK)
-> -
-> -test-ovf: test-ovf.o crt.o
-> -	$(LINK)
-> -
-> -check: $(TESTS)
-> -	for f in $(TESTS); do $(SIM) $$f || exit 1; done
-> -
-> -clean:
-> -	$(RM) *.o *~ hello-alpha $(TESTS)
-> -
-> -.PHONY: clean all check
-> diff --git a/tests/tcg/alpha/Makefile.target b/tests/tcg/alpha/Makefile.target
-> new file mode 100644
-> index 0000000000..b253cee1fc
-> --- /dev/null
-> +++ b/tests/tcg/alpha/Makefile.target
-> @@ -0,0 +1,15 @@
-> +# -*- Mode: makefile -*-
-> +#
-> +# Alpha specific tweaks
-> +
-> +ALPHA_SRC=$(SRC_PATH)/tests/tcg/alpha
-> +VPATH+=$(ALPHA_SRC)
-> +
-> +ALPHA_TESTS=hello-alpha test-cond test-cmov test-ovf
-> +TESTS+=$(ALPHA_TESTS)
-> +
-> +test-cmov: EXTRA_CFLAGS=-DTEST_CMOV
-> +test-cmov: test-cond.c
-> +	$(CC) $(CFLAGS) $(EXTRA_CFLAGS) $< -o $@ $(LDFLAGS)
-> +
-> +run-test-cmov: test-cmov
-> diff --git a/tests/tcg/alpha/crt.s b/tests/tcg/alpha/crt.s
-> deleted file mode 100644
-> index 31af8825bc..0000000000
-> --- a/tests/tcg/alpha/crt.s
-> +++ /dev/null
-> @@ -1,26 +0,0 @@
-> -	.text
-> -
-> -	.globl _start
-> -	.ent _start,0
-> -_start:
-> -	.frame $15,0,$15
-> -	br $29,1f
-> -1:	ldgp $29, 0($29)
-> -	.prologue 0
-> -	ldq $27,main($29) !literal!1
-> -	jsr $26,($27)
-> -	or $0,$0,$16
-> -	.end _start
-> -
-> -	.globl _exit
-> -_exit:
-> -	lda $0,1
-> -	callsys
-> -
-> -	call_pal 0
-> -
-> -	.globl write
-> -write:
-> -	lda $0,4
-> -	callsys
-> -	ret
-> diff --git a/tests/tcg/alpha/hello-alpha.c b/tests/tcg/alpha/hello-alpha.c
-> index 79892e6522..84e43b2fc4 100644
-> --- a/tests/tcg/alpha/hello-alpha.c
-> +++ b/tests/tcg/alpha/hello-alpha.c
-> @@ -1,3 +1,5 @@
-> +#include <unistd.h>
-> +
->  int main (void)
->  {
->    write (1, "hello\n", 6);
-> diff --git a/tests/tcg/alpha/test-cond.c b/tests/tcg/alpha/test-cond.c
-> index 74adffaa69..e625313b3e 100644
-> --- a/tests/tcg/alpha/test-cond.c
-> +++ b/tests/tcg/alpha/test-cond.c
-> @@ -1,3 +1,4 @@
-> +#include <unistd.h>
->  
->  #ifdef TEST_CMOV
->  
-> diff --git a/tests/tcg/alpha/test-ovf.c b/tests/tcg/alpha/test-ovf.c
-> index 01c80e7525..17892f1e89 100644
-> --- a/tests/tcg/alpha/test-ovf.c
-> +++ b/tests/tcg/alpha/test-ovf.c
-> @@ -1,3 +1,5 @@
-> +#include <unistd.h>
-> +
->  static long test_subqv (long a, long b)
->  {
->    long res;
-> 
+This series fixes the NFS support in qemu-iotests, at least as far as
+raw is concerned. More fixes would be needed for NFS with qcow2.
 
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Tested-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+v2:
+- Introduce $REMOTE_TEST_DIR to avoid breaking non-NFS cases (and to
+  support additional files in the same directory besides $TEST_IMG)
+
+Kevin Wolf (3):
+  qemu-iotests: Fix paths for NFS
+  qemu-iotests: Filter NFS paths
+  qemu-iotests: 086 doesn't work with NFS
+
+ tests/qemu-iotests/086           |  2 +-
+ tests/qemu-iotests/common.filter |  6 ++++--
+ tests/qemu-iotests/common.rc     | 12 +++++++++---
+ 3 files changed, 14 insertions(+), 6 deletions(-)
+
+-- 
+2.13.6
