@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40477)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58644)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <elliott@hpe.com>) id 1fJR2s-0006VF-6a
-	for qemu-devel@nongnu.org; Thu, 17 May 2018 18:06:47 -0400
+	(envelope-from <mjc@sifive.com>) id 1fJUqi-00087a-4N
+	for qemu-devel@nongnu.org; Thu, 17 May 2018 22:10:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <elliott@hpe.com>) id 1fJR2o-0000Ta-Vi
-	for qemu-devel@nongnu.org; Thu, 17 May 2018 18:06:46 -0400
-Received: from g9t5008.houston.hpe.com ([15.241.48.72]:48812)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <elliott@hpe.com>) id 1fJR2o-0000Sz-OM
-	for qemu-devel@nongnu.org; Thu, 17 May 2018 18:06:42 -0400
-From: "Elliott, Robert (Persistent Memory)" <elliott@hpe.com>
-Date: Thu, 17 May 2018 22:06:37 +0000
-Message-ID: <AT5PR8401MB11697DD6A19AA3F499ACDDBAAB910@AT5PR8401MB1169.NAMPRD84.PROD.OUTLOOK.COM>
-References: <20180517050024.20101-1-ross.zwisler@linux.intel.com>
-	<20180517050024.20101-4-ross.zwisler@linux.intel.com>
-In-Reply-To: <20180517050024.20101-4-ross.zwisler@linux.intel.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	(envelope-from <mjc@sifive.com>) id 1fJUqg-0006dU-LO
+	for qemu-devel@nongnu.org; Thu, 17 May 2018 22:10:27 -0400
+Received: from mail-ot0-x230.google.com ([2607:f8b0:4003:c0f::230]:37010)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <mjc@sifive.com>) id 1fJUqg-0006cn-FL
+	for qemu-devel@nongnu.org; Thu, 17 May 2018 22:10:26 -0400
+Received: by mail-ot0-x230.google.com with SMTP id 77-v6so7375217otd.4
+	for <qemu-devel@nongnu.org>; Thu, 17 May 2018 19:10:25 -0700 (PDT)
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [qemu PATCH v2 3/4] nvdimm,
- acpi: support NFIT platform capabilities
+In-Reply-To: <1526400000-66561-1-git-send-email-imammedo@redhat.com>
+References: <1526382973-49342-1-git-send-email-imammedo@redhat.com>
+	<1526400000-66561-1-git-send-email-imammedo@redhat.com>
+From: Michael Clark <mjc@sifive.com>
+Date: Fri, 18 May 2018 14:10:24 +1200
+Message-ID: <CAHNT7NtoqQDpQCMF9C92KHvn6jLAy0K1fOJaT6nTTAAJ0s+utQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2] riscv: remove define cpu_init()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,79 +29,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: 'Ross Zwisler' <ross.zwisler@linux.intel.com>, Igor Mammedov <imammedo@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: Eduardo Habkost <ehabkost@redhat.com>, linux-nvdimm <linux-nvdimm@lists.01.org>, "Michael S . Tsirkin" <mst@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Eric Blake <eblake@redhat.com>, Palmer Dabbelt <palmer@sifive.com>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
 
+On Wed, May 16, 2018 at 4:00 AM, Igor Mammedov <imammedo@redhat.com> wrote:
 
+> cpu_init() was removed since 2.12, so drop the define that is now unused.
+>
+> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+>
 
-> -----Original Message-----
-> From: Linux-nvdimm [mailto:linux-nvdimm-bounces@lists.01.org] On Behalf O=
-f
-> Ross Zwisler
-> Sent: Thursday, May 17, 2018 12:00 AM
-> Subject: [qemu PATCH v2 3/4] nvdimm, acpi: support NFIT platform
-> capabilities
->=20
-> Add a machine command line option to allow the user to control the
-> Platform
-> Capabilities Structure in the virtualized NFIT.  This Platform
-> Capabilities
-> Structure was added in ACPI 6.2 Errata A.
->=20
-...
-> +Platform Capabilities
-> +---------------------
-> +
-> +ACPI 6.2 Errata A added support for a new Platform Capabilities Structur=
-e
-> +which allows the platform to communicate what features it supports
-> related to
-> +NVDIMM data durability.  Users can provide a capabilities value to a
-> guest via
-> +the optional "nvdimm-cap" machine command line option:
-> +
-> +    -machine pc,accel=3Dkvm,nvdimm,nvdimm-cap=3D2
-> +
-> +As of ACPI 6.2 Errata A, the following values are valid for the bottom
-> two
-> +bits:
-> +
-> +2 - Memory Controller Flush to NVDIMM Durability on Power Loss Capable.
-> +3 - CPU Cache Flush to NVDIMM Durability on Power Loss Capable.
-
-It's a bit unclear that those are decimal values for the field, not=20
-bit numbers.
-
-...
-> -static GArray *nvdimm_build_device_structure(void)
-> +/*
-> + * ACPI 6.2 Errata A: 5.2.25.9 NVDIMM Platform Capabilities Structure
-> + */
-> +static void
-> +nvdimm_build_structure_caps(GArray *structures, uint32_t capabilities)
-> +{
-> +    NvdimmNfitPlatformCaps *nfit_caps;
-> +
-> +    nfit_caps =3D acpi_data_push(structures, sizeof(*nfit_caps));
-> +
-> +    nfit_caps->type =3D cpu_to_le16(7 /* NVDIMM Platform Capabilities */=
-);
-> +    nfit_caps->length =3D cpu_to_le16(sizeof(*nfit_caps));
-> +    nfit_caps->highest_cap =3D 2;
-> +    nfit_caps->capabilities =3D cpu_to_le32(capabilities);
-
-highest_cap needs to be set to a value that at least covers the highest=20
-bit set to 1 used in capabilities.
-
-As capabilities bits are added, there are three different meanings:
-* 1: bit within highest_cap range, platform is claiming the 1 meaning
-* 0: bit within highest_cap range, platform is claiming the 0 meaning
-* not reported: bit not within highest_cap range, so the platform's
-  implementation of this feature is unknown. Not necessarily the same=20
-  as the 0 meaning.
-
-So, there should be a way to specify a highest_cap value to convey that
-some of the upper capabilities bits are valid and contain 0.
+Reviewed-by: Michael Clark <mjc@sifive.com>
 
 ---
-Robert Elliott, HPE Persistent Memory
+> v2:
+>   * refine commit message (Eric Blake <eblake@redhat.com>)
+> ---
+>  target/riscv/cpu.h | 1 -
+>  1 file changed, 1 deletion(-)
+>
+> diff --git a/target/riscv/cpu.h b/target/riscv/cpu.h
+> index 34abc38..0562a02 100644
+> --- a/target/riscv/cpu.h
+> +++ b/target/riscv/cpu.h
+> @@ -251,7 +251,6 @@ int riscv_cpu_handle_mmu_fault(CPUState *cpu, vaddr
+> address, int size,
+>  char *riscv_isa_string(RISCVCPU *cpu);
+>  void riscv_cpu_list(FILE *f, fprintf_function cpu_fprintf);
+>
+> -#define cpu_init(cpu_model) cpu_generic_init(TYPE_RISCV_CPU, cpu_model)
+>  #define cpu_signal_handler cpu_riscv_signal_handler
+>  #define cpu_list riscv_cpu_list
+>  #define cpu_mmu_index riscv_cpu_mmu_index
+> --
+> 2.7.4
+>
+>
