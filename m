@@ -1,25 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35936)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35954)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1fJj3B-0000aA-W7
+	(envelope-from <pm215@archaic.org.uk>) id 1fJj3D-0000c4-Oy
 	for qemu-devel@nongnu.org; Fri, 18 May 2018 13:20:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1fJj38-0007PH-LD
-	for qemu-devel@nongnu.org; Fri, 18 May 2018 13:20:17 -0400
-Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:41780)
+	(envelope-from <pm215@archaic.org.uk>) id 1fJj3B-0007SO-Ad
+	for qemu-devel@nongnu.org; Fri, 18 May 2018 13:20:19 -0400
+Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:41784)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1fJj38-0007Oi-1Z
-	for qemu-devel@nongnu.org; Fri, 18 May 2018 13:20:14 -0400
+	id 1fJj3A-0007Rj-Ua
+	for qemu-devel@nongnu.org; Fri, 18 May 2018 13:20:17 -0400
 Received: from pm215 by orth.archaic.org.uk with local (Exim 4.89)
-	(envelope-from <pm215@archaic.org.uk>) id 1fJj37-0004lG-2H
-	for qemu-devel@nongnu.org; Fri, 18 May 2018 18:20:13 +0100
+	(envelope-from <pm215@archaic.org.uk>) id 1fJj3A-0004nE-1J
+	for qemu-devel@nongnu.org; Fri, 18 May 2018 18:20:16 +0100
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 18 May 2018 18:19:41 +0100
-Message-Id: <20180518172009.14416-5-peter.maydell@linaro.org>
+Date: Fri, 18 May 2018 18:19:45 +0100
+Message-Id: <20180518172009.14416-9-peter.maydell@linaro.org>
 In-Reply-To: <20180518172009.14416-1-peter.maydell@linaro.org>
 References: <20180518172009.14416-1-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PULL 04/32] xlnx-zdma: Add a model of the Xilinx
- ZynqMP generic DMA
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PULL 08/32] target/arm: Introduce translate-a64.h
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,962 +32,382 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-From: Francisco Iglesias <frasse.iglesias@gmail.com>
+From: Richard Henderson <richard.henderson@linaro.org>
 
-Add a model of the generic DMA found on Xilinx ZynqMP.
+Move some stuff that will be common to both translate-a64.c
+and translate-sve.c.
 
-Signed-off-by: Francisco Iglesias <frasse.iglesias@gmail.com>
-Signed-off-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
-Reviewed-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
-Message-id: 20180503214201.29082-2-frasse.iglesias@gmail.com
+Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+Message-id: 20180516223007.10256-2-richard.henderson@linaro.org
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- hw/dma/Makefile.objs       |   1 +
- include/hw/dma/xlnx-zdma.h |  84 ++++
- hw/dma/xlnx-zdma.c         | 832 +++++++++++++++++++++++++++++++++++++
- 3 files changed, 917 insertions(+)
- create mode 100644 include/hw/dma/xlnx-zdma.h
- create mode 100644 hw/dma/xlnx-zdma.c
+ target/arm/translate-a64.h | 118 +++++++++++++++++++++++++++++++++++++
+ target/arm/translate-a64.c | 112 +++++------------------------------
+ 2 files changed, 133 insertions(+), 97 deletions(-)
+ create mode 100644 target/arm/translate-a64.h
 
-diff --git a/hw/dma/Makefile.objs b/hw/dma/Makefile.objs
-index c2afecbf73..79affecc39 100644
---- a/hw/dma/Makefile.objs
-+++ b/hw/dma/Makefile.objs
-@@ -10,6 +10,7 @@ common-obj-$(CONFIG_ETRAXFS) += etraxfs_dma.o
- common-obj-$(CONFIG_STP2000) += sparc32_dma.o
- obj-$(CONFIG_XLNX_ZYNQMP) += xlnx_dpdma.o
- obj-$(CONFIG_XLNX_ZYNQMP_ARM) += xlnx_dpdma.o
-+common-obj-$(CONFIG_XLNX_ZYNQMP_ARM) += xlnx-zdma.o
- 
- obj-$(CONFIG_OMAP) += omap_dma.o soc_dma.o
- obj-$(CONFIG_PXA2XX) += pxa2xx_dma.o
-diff --git a/include/hw/dma/xlnx-zdma.h b/include/hw/dma/xlnx-zdma.h
+diff --git a/target/arm/translate-a64.h b/target/arm/translate-a64.h
 new file mode 100644
-index 0000000000..0b240b4c3c
+index 0000000000..dd9c09f89b
 --- /dev/null
-+++ b/include/hw/dma/xlnx-zdma.h
-@@ -0,0 +1,84 @@
++++ b/target/arm/translate-a64.h
+@@ -0,0 +1,118 @@
 +/*
-+ * QEMU model of the ZynqMP generic DMA
++ *  AArch64 translation, common definitions.
 + *
-+ * Copyright (c) 2014 Xilinx Inc.
-+ * Copyright (c) 2018 FEIMTECH AB
++ * This library is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU Lesser General Public
++ * License as published by the Free Software Foundation; either
++ * version 2 of the License, or (at your option) any later version.
 + *
-+ * Written by Edgar E. Iglesias <edgar.iglesias@xilinx.com>,
-+ *            Francisco Iglesias <francisco.iglesias@feimtech.se>
++ * This library is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ * Lesser General Public License for more details.
 + *
-+ * Permission is hereby granted, free of charge, to any person obtaining a copy
-+ * of this software and associated documentation files (the "Software"), to deal
-+ * in the Software without restriction, including without limitation the rights
-+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-+ * copies of the Software, and to permit persons to whom the Software is
-+ * furnished to do so, subject to the following conditions:
-+ *
-+ * The above copyright notice and this permission notice shall be included in
-+ * all copies or substantial portions of the Software.
-+ *
-+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
-+ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-+ * THE SOFTWARE.
++ * You should have received a copy of the GNU Lesser General Public
++ * License along with this library; if not, see <http://www.gnu.org/licenses/>.
 + */
 +
-+#ifndef XLNX_ZDMA_H
-+#define XLNX_ZDMA_H
++#ifndef TARGET_ARM_TRANSLATE_A64_H
++#define TARGET_ARM_TRANSLATE_A64_H
 +
-+#include "hw/sysbus.h"
-+#include "hw/register.h"
-+#include "sysemu/dma.h"
++void unallocated_encoding(DisasContext *s);
 +
-+#define ZDMA_R_MAX (0x204 / 4)
++#define unsupported_encoding(s, insn)                                    \
++    do {                                                                 \
++        qemu_log_mask(LOG_UNIMP,                                         \
++                      "%s:%d: unsupported instruction encoding 0x%08x "  \
++                      "at pc=%016" PRIx64 "\n",                          \
++                      __FILE__, __LINE__, insn, s->pc - 4);              \
++        unallocated_encoding(s);                                         \
++    } while (0)
 +
-+typedef enum {
-+    DISABLED = 0,
-+    ENABLED = 1,
-+    PAUSED = 2,
-+} XlnxZDMAState;
++TCGv_i64 new_tmp_a64(DisasContext *s);
++TCGv_i64 new_tmp_a64_zero(DisasContext *s);
++TCGv_i64 cpu_reg(DisasContext *s, int reg);
++TCGv_i64 cpu_reg_sp(DisasContext *s, int reg);
++TCGv_i64 read_cpu_reg(DisasContext *s, int reg, int sf);
++TCGv_i64 read_cpu_reg_sp(DisasContext *s, int reg, int sf);
++void write_fp_dreg(DisasContext *s, int reg, TCGv_i64 v);
++TCGv_ptr get_fpstatus_ptr(bool);
++bool logic_imm_decode_wmask(uint64_t *result, unsigned int immn,
++                            unsigned int imms, unsigned int immr);
++uint64_t vfp_expand_imm(int size, uint8_t imm8);
++bool sve_access_check(DisasContext *s);
 +
-+typedef union {
-+    struct {
-+        uint64_t addr;
-+        uint32_t size;
-+        uint32_t attr;
-+    };
-+    uint32_t words[4];
-+} XlnxZDMADescr;
-+
-+typedef struct XlnxZDMA {
-+    SysBusDevice parent_obj;
-+    MemoryRegion iomem;
-+    MemTxAttrs attr;
-+    MemoryRegion *dma_mr;
-+    AddressSpace *dma_as;
-+    qemu_irq irq_zdma_ch_imr;
-+
-+    struct {
-+        uint32_t bus_width;
-+    } cfg;
-+
-+    XlnxZDMAState state;
-+    bool error;
-+
-+    XlnxZDMADescr dsc_src;
-+    XlnxZDMADescr dsc_dst;
-+
-+    uint32_t regs[ZDMA_R_MAX];
-+    RegisterInfo regs_info[ZDMA_R_MAX];
-+
-+    /* We don't model the common bufs. Must be at least 16 bytes
-+       to model write only mode.  */
-+    uint8_t buf[2048];
-+} XlnxZDMA;
-+
-+#define TYPE_XLNX_ZDMA "xlnx.zdma"
-+
-+#define XLNX_ZDMA(obj) \
-+     OBJECT_CHECK(XlnxZDMA, (obj), TYPE_XLNX_ZDMA)
-+
-+#endif /* XLNX_ZDMA_H */
-diff --git a/hw/dma/xlnx-zdma.c b/hw/dma/xlnx-zdma.c
-new file mode 100644
-index 0000000000..14d86c254b
---- /dev/null
-+++ b/hw/dma/xlnx-zdma.c
-@@ -0,0 +1,832 @@
-+/*
-+ * QEMU model of the ZynqMP generic DMA
-+ *
-+ * Copyright (c) 2014 Xilinx Inc.
-+ * Copyright (c) 2018 FEIMTECH AB
-+ *
-+ * Written by Edgar E. Iglesias <edgar.iglesias@xilinx.com>,
-+ *            Francisco Iglesias <francisco.iglesias@feimtech.se>
-+ *
-+ * Permission is hereby granted, free of charge, to any person obtaining a copy
-+ * of this software and associated documentation files (the "Software"), to deal
-+ * in the Software without restriction, including without limitation the rights
-+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-+ * copies of the Software, and to permit persons to whom the Software is
-+ * furnished to do so, subject to the following conditions:
-+ *
-+ * The above copyright notice and this permission notice shall be included in
-+ * all copies or substantial portions of the Software.
-+ *
-+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
-+ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-+ * THE SOFTWARE.
++/* We should have at some point before trying to access an FP register
++ * done the necessary access check, so assert that
++ * (a) we did the check and
++ * (b) we didn't then just plough ahead anyway if it failed.
++ * Print the instruction pattern in the abort message so we can figure
++ * out what we need to fix if a user encounters this problem in the wild.
 + */
-+
-+#include "qemu/osdep.h"
-+#include "hw/dma/xlnx-zdma.h"
-+#include "qemu/bitops.h"
-+#include "qemu/log.h"
-+#include "qapi/error.h"
-+
-+#ifndef XLNX_ZDMA_ERR_DEBUG
-+#define XLNX_ZDMA_ERR_DEBUG 0
++static inline void assert_fp_access_checked(DisasContext *s)
++{
++#ifdef CONFIG_DEBUG_TCG
++    if (unlikely(!s->fp_access_checked || s->fp_excp_el)) {
++        fprintf(stderr, "target-arm: FP access check missing for "
++                "instruction 0x%08x\n", s->insn);
++        abort();
++    }
 +#endif
-+
-+REG32(ZDMA_ERR_CTRL, 0x0)
-+    FIELD(ZDMA_ERR_CTRL, APB_ERR_RES, 0, 1)
-+REG32(ZDMA_CH_ISR, 0x100)
-+    FIELD(ZDMA_CH_ISR, DMA_PAUSE, 11, 1)
-+    FIELD(ZDMA_CH_ISR, DMA_DONE, 10, 1)
-+    FIELD(ZDMA_CH_ISR, AXI_WR_DATA, 9, 1)
-+    FIELD(ZDMA_CH_ISR, AXI_RD_DATA, 8, 1)
-+    FIELD(ZDMA_CH_ISR, AXI_RD_DST_DSCR, 7, 1)
-+    FIELD(ZDMA_CH_ISR, AXI_RD_SRC_DSCR, 6, 1)
-+    FIELD(ZDMA_CH_ISR, IRQ_DST_ACCT_ERR, 5, 1)
-+    FIELD(ZDMA_CH_ISR, IRQ_SRC_ACCT_ERR, 4, 1)
-+    FIELD(ZDMA_CH_ISR, BYTE_CNT_OVRFL, 3, 1)
-+    FIELD(ZDMA_CH_ISR, DST_DSCR_DONE, 2, 1)
-+    FIELD(ZDMA_CH_ISR, SRC_DSCR_DONE, 1, 1)
-+    FIELD(ZDMA_CH_ISR, INV_APB, 0, 1)
-+REG32(ZDMA_CH_IMR, 0x104)
-+    FIELD(ZDMA_CH_IMR, DMA_PAUSE, 11, 1)
-+    FIELD(ZDMA_CH_IMR, DMA_DONE, 10, 1)
-+    FIELD(ZDMA_CH_IMR, AXI_WR_DATA, 9, 1)
-+    FIELD(ZDMA_CH_IMR, AXI_RD_DATA, 8, 1)
-+    FIELD(ZDMA_CH_IMR, AXI_RD_DST_DSCR, 7, 1)
-+    FIELD(ZDMA_CH_IMR, AXI_RD_SRC_DSCR, 6, 1)
-+    FIELD(ZDMA_CH_IMR, IRQ_DST_ACCT_ERR, 5, 1)
-+    FIELD(ZDMA_CH_IMR, IRQ_SRC_ACCT_ERR, 4, 1)
-+    FIELD(ZDMA_CH_IMR, BYTE_CNT_OVRFL, 3, 1)
-+    FIELD(ZDMA_CH_IMR, DST_DSCR_DONE, 2, 1)
-+    FIELD(ZDMA_CH_IMR, SRC_DSCR_DONE, 1, 1)
-+    FIELD(ZDMA_CH_IMR, INV_APB, 0, 1)
-+REG32(ZDMA_CH_IEN, 0x108)
-+    FIELD(ZDMA_CH_IEN, DMA_PAUSE, 11, 1)
-+    FIELD(ZDMA_CH_IEN, DMA_DONE, 10, 1)
-+    FIELD(ZDMA_CH_IEN, AXI_WR_DATA, 9, 1)
-+    FIELD(ZDMA_CH_IEN, AXI_RD_DATA, 8, 1)
-+    FIELD(ZDMA_CH_IEN, AXI_RD_DST_DSCR, 7, 1)
-+    FIELD(ZDMA_CH_IEN, AXI_RD_SRC_DSCR, 6, 1)
-+    FIELD(ZDMA_CH_IEN, IRQ_DST_ACCT_ERR, 5, 1)
-+    FIELD(ZDMA_CH_IEN, IRQ_SRC_ACCT_ERR, 4, 1)
-+    FIELD(ZDMA_CH_IEN, BYTE_CNT_OVRFL, 3, 1)
-+    FIELD(ZDMA_CH_IEN, DST_DSCR_DONE, 2, 1)
-+    FIELD(ZDMA_CH_IEN, SRC_DSCR_DONE, 1, 1)
-+    FIELD(ZDMA_CH_IEN, INV_APB, 0, 1)
-+REG32(ZDMA_CH_IDS, 0x10c)
-+    FIELD(ZDMA_CH_IDS, DMA_PAUSE, 11, 1)
-+    FIELD(ZDMA_CH_IDS, DMA_DONE, 10, 1)
-+    FIELD(ZDMA_CH_IDS, AXI_WR_DATA, 9, 1)
-+    FIELD(ZDMA_CH_IDS, AXI_RD_DATA, 8, 1)
-+    FIELD(ZDMA_CH_IDS, AXI_RD_DST_DSCR, 7, 1)
-+    FIELD(ZDMA_CH_IDS, AXI_RD_SRC_DSCR, 6, 1)
-+    FIELD(ZDMA_CH_IDS, IRQ_DST_ACCT_ERR, 5, 1)
-+    FIELD(ZDMA_CH_IDS, IRQ_SRC_ACCT_ERR, 4, 1)
-+    FIELD(ZDMA_CH_IDS, BYTE_CNT_OVRFL, 3, 1)
-+    FIELD(ZDMA_CH_IDS, DST_DSCR_DONE, 2, 1)
-+    FIELD(ZDMA_CH_IDS, SRC_DSCR_DONE, 1, 1)
-+    FIELD(ZDMA_CH_IDS, INV_APB, 0, 1)
-+REG32(ZDMA_CH_CTRL0, 0x110)
-+    FIELD(ZDMA_CH_CTRL0, OVR_FETCH, 7, 1)
-+    FIELD(ZDMA_CH_CTRL0, POINT_TYPE, 6, 1)
-+    FIELD(ZDMA_CH_CTRL0, MODE, 4, 2)
-+    FIELD(ZDMA_CH_CTRL0, RATE_CTRL, 3, 1)
-+    FIELD(ZDMA_CH_CTRL0, CONT_ADDR, 2, 1)
-+    FIELD(ZDMA_CH_CTRL0, CONT, 1, 1)
-+REG32(ZDMA_CH_CTRL1, 0x114)
-+    FIELD(ZDMA_CH_CTRL1, DST_ISSUE, 5, 5)
-+    FIELD(ZDMA_CH_CTRL1, SRC_ISSUE, 0, 5)
-+REG32(ZDMA_CH_FCI, 0x118)
-+    FIELD(ZDMA_CH_FCI, PROG_CELL_CNT, 2, 2)
-+    FIELD(ZDMA_CH_FCI, SIDE, 1, 1)
-+    FIELD(ZDMA_CH_FCI, EN, 0, 1)
-+REG32(ZDMA_CH_STATUS, 0x11c)
-+    FIELD(ZDMA_CH_STATUS, STATE, 0, 2)
-+REG32(ZDMA_CH_DATA_ATTR, 0x120)
-+    FIELD(ZDMA_CH_DATA_ATTR, ARBURST, 26, 2)
-+    FIELD(ZDMA_CH_DATA_ATTR, ARCACHE, 22, 4)
-+    FIELD(ZDMA_CH_DATA_ATTR, ARQOS, 18, 4)
-+    FIELD(ZDMA_CH_DATA_ATTR, ARLEN, 14, 4)
-+    FIELD(ZDMA_CH_DATA_ATTR, AWBURST, 12, 2)
-+    FIELD(ZDMA_CH_DATA_ATTR, AWCACHE, 8, 4)
-+    FIELD(ZDMA_CH_DATA_ATTR, AWQOS, 4, 4)
-+    FIELD(ZDMA_CH_DATA_ATTR, AWLEN, 0, 4)
-+REG32(ZDMA_CH_DSCR_ATTR, 0x124)
-+    FIELD(ZDMA_CH_DSCR_ATTR, AXCOHRNT, 8, 1)
-+    FIELD(ZDMA_CH_DSCR_ATTR, AXCACHE, 4, 4)
-+    FIELD(ZDMA_CH_DSCR_ATTR, AXQOS, 0, 4)
-+REG32(ZDMA_CH_SRC_DSCR_WORD0, 0x128)
-+REG32(ZDMA_CH_SRC_DSCR_WORD1, 0x12c)
-+    FIELD(ZDMA_CH_SRC_DSCR_WORD1, MSB, 0, 17)
-+REG32(ZDMA_CH_SRC_DSCR_WORD2, 0x130)
-+    FIELD(ZDMA_CH_SRC_DSCR_WORD2, SIZE, 0, 30)
-+REG32(ZDMA_CH_SRC_DSCR_WORD3, 0x134)
-+    FIELD(ZDMA_CH_SRC_DSCR_WORD3, CMD, 3, 2)
-+    FIELD(ZDMA_CH_SRC_DSCR_WORD3, INTR, 2, 1)
-+    FIELD(ZDMA_CH_SRC_DSCR_WORD3, TYPE, 1, 1)
-+    FIELD(ZDMA_CH_SRC_DSCR_WORD3, COHRNT, 0, 1)
-+REG32(ZDMA_CH_DST_DSCR_WORD0, 0x138)
-+REG32(ZDMA_CH_DST_DSCR_WORD1, 0x13c)
-+    FIELD(ZDMA_CH_DST_DSCR_WORD1, MSB, 0, 17)
-+REG32(ZDMA_CH_DST_DSCR_WORD2, 0x140)
-+    FIELD(ZDMA_CH_DST_DSCR_WORD2, SIZE, 0, 30)
-+REG32(ZDMA_CH_DST_DSCR_WORD3, 0x144)
-+    FIELD(ZDMA_CH_DST_DSCR_WORD3, INTR, 2, 1)
-+    FIELD(ZDMA_CH_DST_DSCR_WORD3, TYPE, 1, 1)
-+    FIELD(ZDMA_CH_DST_DSCR_WORD3, COHRNT, 0, 1)
-+REG32(ZDMA_CH_WR_ONLY_WORD0, 0x148)
-+REG32(ZDMA_CH_WR_ONLY_WORD1, 0x14c)
-+REG32(ZDMA_CH_WR_ONLY_WORD2, 0x150)
-+REG32(ZDMA_CH_WR_ONLY_WORD3, 0x154)
-+REG32(ZDMA_CH_SRC_START_LSB, 0x158)
-+REG32(ZDMA_CH_SRC_START_MSB, 0x15c)
-+    FIELD(ZDMA_CH_SRC_START_MSB, ADDR, 0, 17)
-+REG32(ZDMA_CH_DST_START_LSB, 0x160)
-+REG32(ZDMA_CH_DST_START_MSB, 0x164)
-+    FIELD(ZDMA_CH_DST_START_MSB, ADDR, 0, 17)
-+REG32(ZDMA_CH_RATE_CTRL, 0x18c)
-+    FIELD(ZDMA_CH_RATE_CTRL, CNT, 0, 12)
-+REG32(ZDMA_CH_SRC_CUR_PYLD_LSB, 0x168)
-+REG32(ZDMA_CH_SRC_CUR_PYLD_MSB, 0x16c)
-+    FIELD(ZDMA_CH_SRC_CUR_PYLD_MSB, ADDR, 0, 17)
-+REG32(ZDMA_CH_DST_CUR_PYLD_LSB, 0x170)
-+REG32(ZDMA_CH_DST_CUR_PYLD_MSB, 0x174)
-+    FIELD(ZDMA_CH_DST_CUR_PYLD_MSB, ADDR, 0, 17)
-+REG32(ZDMA_CH_SRC_CUR_DSCR_LSB, 0x178)
-+REG32(ZDMA_CH_SRC_CUR_DSCR_MSB, 0x17c)
-+    FIELD(ZDMA_CH_SRC_CUR_DSCR_MSB, ADDR, 0, 17)
-+REG32(ZDMA_CH_DST_CUR_DSCR_LSB, 0x180)
-+REG32(ZDMA_CH_DST_CUR_DSCR_MSB, 0x184)
-+    FIELD(ZDMA_CH_DST_CUR_DSCR_MSB, ADDR, 0, 17)
-+REG32(ZDMA_CH_TOTAL_BYTE, 0x188)
-+REG32(ZDMA_CH_RATE_CNTL, 0x18c)
-+    FIELD(ZDMA_CH_RATE_CNTL, CNT, 0, 12)
-+REG32(ZDMA_CH_IRQ_SRC_ACCT, 0x190)
-+    FIELD(ZDMA_CH_IRQ_SRC_ACCT, CNT, 0, 8)
-+REG32(ZDMA_CH_IRQ_DST_ACCT, 0x194)
-+    FIELD(ZDMA_CH_IRQ_DST_ACCT, CNT, 0, 8)
-+REG32(ZDMA_CH_DBG0, 0x198)
-+    FIELD(ZDMA_CH_DBG0, CMN_BUF_FREE, 0, 9)
-+REG32(ZDMA_CH_DBG1, 0x19c)
-+    FIELD(ZDMA_CH_DBG1, CMN_BUF_OCC, 0, 9)
-+REG32(ZDMA_CH_CTRL2, 0x200)
-+    FIELD(ZDMA_CH_CTRL2, EN, 0, 1)
-+
-+enum {
-+    PT_REG = 0,
-+    PT_MEM = 1,
-+};
-+
-+enum {
-+    CMD_HALT = 1,
-+    CMD_STOP = 2,
-+};
-+
-+enum {
-+    RW_MODE_RW = 0,
-+    RW_MODE_WO = 1,
-+    RW_MODE_RO = 2,
-+};
-+
-+enum {
-+    DTYPE_LINEAR = 0,
-+    DTYPE_LINKED = 1,
-+};
-+
-+enum {
-+    AXI_BURST_FIXED = 0,
-+    AXI_BURST_INCR  = 1,
-+};
-+
-+static void zdma_ch_imr_update_irq(XlnxZDMA *s)
-+{
-+    bool pending;
-+
-+    pending = s->regs[R_ZDMA_CH_ISR] & ~s->regs[R_ZDMA_CH_IMR];
-+
-+    qemu_set_irq(s->irq_zdma_ch_imr, pending);
 +}
 +
-+static void zdma_ch_isr_postw(RegisterInfo *reg, uint64_t val64)
++/* Return the offset into CPUARMState of an element of specified
++ * size, 'element' places in from the least significant end of
++ * the FP/vector register Qn.
++ */
++static inline int vec_reg_offset(DisasContext *s, int regno,
++                                 int element, TCGMemOp size)
 +{
-+    XlnxZDMA *s = XLNX_ZDMA(reg->opaque);
-+    zdma_ch_imr_update_irq(s);
-+}
-+
-+static uint64_t zdma_ch_ien_prew(RegisterInfo *reg, uint64_t val64)
-+{
-+    XlnxZDMA *s = XLNX_ZDMA(reg->opaque);
-+    uint32_t val = val64;
-+
-+    s->regs[R_ZDMA_CH_IMR] &= ~val;
-+    zdma_ch_imr_update_irq(s);
-+    return 0;
-+}
-+
-+static uint64_t zdma_ch_ids_prew(RegisterInfo *reg, uint64_t val64)
-+{
-+    XlnxZDMA *s = XLNX_ZDMA(reg->opaque);
-+    uint32_t val = val64;
-+
-+    s->regs[R_ZDMA_CH_IMR] |= val;
-+    zdma_ch_imr_update_irq(s);
-+    return 0;
-+}
-+
-+static void zdma_set_state(XlnxZDMA *s, XlnxZDMAState state)
-+{
-+    s->state = state;
-+    ARRAY_FIELD_DP32(s->regs, ZDMA_CH_STATUS, STATE, state);
-+
-+    /* Signal error if we have an error condition.  */
-+    if (s->error) {
-+        ARRAY_FIELD_DP32(s->regs, ZDMA_CH_STATUS, STATE, 3);
-+    }
-+}
-+
-+static void zdma_src_done(XlnxZDMA *s)
-+{
-+    unsigned int cnt;
-+    cnt = ARRAY_FIELD_EX32(s->regs, ZDMA_CH_IRQ_SRC_ACCT, CNT);
-+    cnt++;
-+    ARRAY_FIELD_DP32(s->regs, ZDMA_CH_IRQ_SRC_ACCT, CNT, cnt);
-+    ARRAY_FIELD_DP32(s->regs, ZDMA_CH_ISR, SRC_DSCR_DONE, true);
-+
-+    /* Did we overflow?  */
-+    if (cnt != ARRAY_FIELD_EX32(s->regs, ZDMA_CH_IRQ_SRC_ACCT, CNT)) {
-+        ARRAY_FIELD_DP32(s->regs, ZDMA_CH_ISR, IRQ_SRC_ACCT_ERR, true);
-+    }
-+    zdma_ch_imr_update_irq(s);
-+}
-+
-+static void zdma_dst_done(XlnxZDMA *s)
-+{
-+    unsigned int cnt;
-+    cnt = ARRAY_FIELD_EX32(s->regs, ZDMA_CH_IRQ_DST_ACCT, CNT);
-+    cnt++;
-+    ARRAY_FIELD_DP32(s->regs, ZDMA_CH_IRQ_DST_ACCT, CNT, cnt);
-+    ARRAY_FIELD_DP32(s->regs, ZDMA_CH_ISR, DST_DSCR_DONE, true);
-+
-+    /* Did we overflow?  */
-+    if (cnt != ARRAY_FIELD_EX32(s->regs, ZDMA_CH_IRQ_DST_ACCT, CNT)) {
-+        ARRAY_FIELD_DP32(s->regs, ZDMA_CH_ISR, IRQ_DST_ACCT_ERR, true);
-+    }
-+    zdma_ch_imr_update_irq(s);
-+}
-+
-+static uint64_t zdma_get_regaddr64(XlnxZDMA *s, unsigned int basereg)
-+{
-+    uint64_t addr;
-+
-+    addr = s->regs[basereg + 1];
-+    addr <<= 32;
-+    addr |= s->regs[basereg];
-+
-+    return addr;
-+}
-+
-+static void zdma_put_regaddr64(XlnxZDMA *s, unsigned int basereg, uint64_t addr)
-+{
-+    s->regs[basereg] = addr;
-+    s->regs[basereg + 1] = addr >> 32;
-+}
-+
-+static bool zdma_load_descriptor(XlnxZDMA *s, uint64_t addr, void *buf)
-+{
-+    /* ZDMA descriptors must be aligned to their own size.  */
-+    if (addr % sizeof(XlnxZDMADescr)) {
-+        qemu_log_mask(LOG_GUEST_ERROR,
-+                      "zdma: unaligned descriptor at %" PRIx64,
-+                      addr);
-+        memset(buf, 0xdeadbeef, sizeof(XlnxZDMADescr));
-+        s->error = true;
-+        return false;
-+    }
-+
-+    address_space_rw(s->dma_as, addr, s->attr,
-+                     buf, sizeof(XlnxZDMADescr), false);
-+    return true;
-+}
-+
-+static void zdma_load_src_descriptor(XlnxZDMA *s)
-+{
-+    uint64_t src_addr;
-+    unsigned int ptype = ARRAY_FIELD_EX32(s->regs, ZDMA_CH_CTRL0, POINT_TYPE);
-+
-+    if (ptype == PT_REG) {
-+        memcpy(&s->dsc_src, &s->regs[R_ZDMA_CH_SRC_DSCR_WORD0],
-+               sizeof(s->dsc_src));
-+        return;
-+    }
-+
-+    src_addr = zdma_get_regaddr64(s, R_ZDMA_CH_SRC_CUR_DSCR_LSB);
-+
-+    if (!zdma_load_descriptor(s, src_addr, &s->dsc_src)) {
-+        ARRAY_FIELD_DP32(s->regs, ZDMA_CH_ISR, AXI_RD_SRC_DSCR, true);
-+    }
-+}
-+
-+static void zdma_load_dst_descriptor(XlnxZDMA *s)
-+{
-+    uint64_t dst_addr;
-+    unsigned int ptype = ARRAY_FIELD_EX32(s->regs, ZDMA_CH_CTRL0, POINT_TYPE);
-+
-+    if (ptype == PT_REG) {
-+        memcpy(&s->dsc_dst, &s->regs[R_ZDMA_CH_DST_DSCR_WORD0],
-+               sizeof(s->dsc_dst));
-+        return;
-+    }
-+
-+    dst_addr = zdma_get_regaddr64(s, R_ZDMA_CH_DST_CUR_DSCR_LSB);
-+
-+    if (!zdma_load_descriptor(s, dst_addr, &s->dsc_dst)) {
-+        ARRAY_FIELD_DP32(s->regs, ZDMA_CH_ISR, AXI_RD_DST_DSCR, true);
-+    }
-+}
-+
-+static uint64_t zdma_update_descr_addr(XlnxZDMA *s, bool type,
-+                                       unsigned int basereg)
-+{
-+    uint64_t addr, next;
-+
-+    if (type == DTYPE_LINEAR) {
-+        next = zdma_get_regaddr64(s, basereg);
-+        next += sizeof(s->dsc_dst);
-+        zdma_put_regaddr64(s, basereg, next);
-+    } else {
-+        addr = zdma_get_regaddr64(s, basereg);
-+        addr += sizeof(s->dsc_dst);
-+        address_space_rw(s->dma_as, addr, s->attr, (void *) &next, 8, false);
-+        zdma_put_regaddr64(s, basereg, next);
-+    }
-+    return next;
-+}
-+
-+static void zdma_write_dst(XlnxZDMA *s, uint8_t *buf, uint32_t len)
-+{
-+    uint32_t dst_size, dlen;
-+    bool dst_intr, dst_type;
-+    unsigned int ptype = ARRAY_FIELD_EX32(s->regs, ZDMA_CH_CTRL0, POINT_TYPE);
-+    unsigned int rw_mode = ARRAY_FIELD_EX32(s->regs, ZDMA_CH_CTRL0, MODE);
-+    unsigned int burst_type = ARRAY_FIELD_EX32(s->regs, ZDMA_CH_DATA_ATTR,
-+                                               AWBURST);
-+
-+    /* FIXED burst types are only supported in simple dma mode.  */
-+    if (ptype != PT_REG) {
-+        burst_type = AXI_BURST_INCR;
-+    }
-+
-+    while (len) {
-+        dst_size = FIELD_EX32(s->dsc_dst.words[2], ZDMA_CH_DST_DSCR_WORD2,
-+                              SIZE);
-+        dst_type = FIELD_EX32(s->dsc_dst.words[3], ZDMA_CH_DST_DSCR_WORD3,
-+                              TYPE);
-+        if (dst_size == 0 && ptype == PT_MEM) {
-+            uint64_t next;
-+            next = zdma_update_descr_addr(s, dst_type,
-+                                          R_ZDMA_CH_DST_CUR_DSCR_LSB);
-+            zdma_load_descriptor(s, next, &s->dsc_dst);
-+            dst_size = FIELD_EX32(s->dsc_dst.words[2], ZDMA_CH_DST_DSCR_WORD2,
-+                                  SIZE);
-+            dst_type = FIELD_EX32(s->dsc_dst.words[3], ZDMA_CH_DST_DSCR_WORD3,
-+                                  TYPE);
-+        }
-+
-+        /* Match what hardware does by ignoring the dst_size and only using
-+         * the src size for Simple register mode.  */
-+        if (ptype == PT_REG && rw_mode != RW_MODE_WO) {
-+            dst_size = len;
-+        }
-+
-+        dst_intr = FIELD_EX32(s->dsc_dst.words[3], ZDMA_CH_DST_DSCR_WORD3,
-+                              INTR);
-+
-+        dlen = len > dst_size ? dst_size : len;
-+        if (burst_type == AXI_BURST_FIXED) {
-+            if (dlen > (s->cfg.bus_width / 8)) {
-+                dlen = s->cfg.bus_width / 8;
-+            }
-+        }
-+
-+        address_space_rw(s->dma_as, s->dsc_dst.addr, s->attr, buf, dlen,
-+                         true);
-+        if (burst_type == AXI_BURST_INCR) {
-+            s->dsc_dst.addr += dlen;
-+        }
-+        dst_size -= dlen;
-+        buf += dlen;
-+        len -= dlen;
-+
-+        if (dst_size == 0 && dst_intr) {
-+            zdma_dst_done(s);
-+        }
-+
-+        /* Write back to buffered descriptor.  */
-+        s->dsc_dst.words[2] = FIELD_DP32(s->dsc_dst.words[2],
-+                                         ZDMA_CH_DST_DSCR_WORD2,
-+                                         SIZE,
-+                                         dst_size);
-+    }
-+}
-+
-+static void zdma_process_descr(XlnxZDMA *s)
-+{
-+    uint64_t src_addr;
-+    uint32_t src_size, len;
-+    unsigned int src_cmd;
-+    bool src_intr, src_type;
-+    unsigned int ptype = ARRAY_FIELD_EX32(s->regs, ZDMA_CH_CTRL0, POINT_TYPE);
-+    unsigned int rw_mode = ARRAY_FIELD_EX32(s->regs, ZDMA_CH_CTRL0, MODE);
-+    unsigned int burst_type = ARRAY_FIELD_EX32(s->regs, ZDMA_CH_DATA_ATTR,
-+                                               ARBURST);
-+
-+    src_addr = s->dsc_src.addr;
-+    src_size = FIELD_EX32(s->dsc_src.words[2], ZDMA_CH_SRC_DSCR_WORD2, SIZE);
-+    src_cmd = FIELD_EX32(s->dsc_src.words[3], ZDMA_CH_SRC_DSCR_WORD3, CMD);
-+    src_type = FIELD_EX32(s->dsc_src.words[3], ZDMA_CH_SRC_DSCR_WORD3, TYPE);
-+    src_intr = FIELD_EX32(s->dsc_src.words[3], ZDMA_CH_SRC_DSCR_WORD3, INTR);
-+
-+    /* FIXED burst types and non-rw modes are only supported in
-+     * simple dma mode.
++    int offs = 0;
++#ifdef HOST_WORDS_BIGENDIAN
++    /* This is complicated slightly because vfp.zregs[n].d[0] is
++     * still the low half and vfp.zregs[n].d[1] the high half
++     * of the 128 bit vector, even on big endian systems.
++     * Calculate the offset assuming a fully bigendian 128 bits,
++     * then XOR to account for the order of the two 64 bit halves.
 +     */
-+    if (ptype != PT_REG) {
-+        if (rw_mode != RW_MODE_RW) {
-+            qemu_log_mask(LOG_GUEST_ERROR,
-+                          "zDMA: rw-mode=%d but not simple DMA mode.\n",
-+                          rw_mode);
-+        }
-+        if (burst_type != AXI_BURST_INCR) {
-+            qemu_log_mask(LOG_GUEST_ERROR,
-+                          "zDMA: burst_type=%d but not simple DMA mode.\n",
-+                          burst_type);
-+        }
-+        burst_type = AXI_BURST_INCR;
-+        rw_mode = RW_MODE_RW;
-+    }
-+
-+    if (rw_mode == RW_MODE_WO) {
-+        /* In Simple DMA Write-Only, we need to push DST size bytes
-+         * regardless of what SRC size is set to.  */
-+        src_size = FIELD_EX32(s->dsc_dst.words[2], ZDMA_CH_DST_DSCR_WORD2,
-+                              SIZE);
-+        memcpy(s->buf, &s->regs[R_ZDMA_CH_WR_ONLY_WORD0], s->cfg.bus_width / 8);
-+    }
-+
-+    while (src_size) {
-+        len = src_size > ARRAY_SIZE(s->buf) ? ARRAY_SIZE(s->buf) : src_size;
-+        if (burst_type == AXI_BURST_FIXED) {
-+            if (len > (s->cfg.bus_width / 8)) {
-+                len = s->cfg.bus_width / 8;
-+            }
-+        }
-+
-+        if (rw_mode == RW_MODE_WO) {
-+            if (len > s->cfg.bus_width / 8) {
-+                len = s->cfg.bus_width / 8;
-+            }
-+        } else {
-+            address_space_rw(s->dma_as, src_addr, s->attr, s->buf, len,
-+                             false);
-+            if (burst_type == AXI_BURST_INCR) {
-+                src_addr += len;
-+            }
-+        }
-+
-+        if (rw_mode != RW_MODE_RO) {
-+            zdma_write_dst(s, s->buf, len);
-+        }
-+
-+        s->regs[R_ZDMA_CH_TOTAL_BYTE] += len;
-+        src_size -= len;
-+    }
-+
-+    ARRAY_FIELD_DP32(s->regs, ZDMA_CH_ISR, DMA_DONE, true);
-+
-+    if (src_intr) {
-+        zdma_src_done(s);
-+    }
-+
-+    /* Load next descriptor.  */
-+    if (ptype == PT_REG || src_cmd == CMD_STOP) {
-+        ARRAY_FIELD_DP32(s->regs, ZDMA_CH_CTRL2, EN, 0);
-+        zdma_set_state(s, DISABLED);
-+        return;
-+    }
-+
-+    if (src_cmd == CMD_HALT) {
-+        zdma_set_state(s, PAUSED);
-+        ARRAY_FIELD_DP32(s->regs, ZDMA_CH_ISR, DMA_PAUSE, 1);
-+        zdma_ch_imr_update_irq(s);
-+        return;
-+    }
-+
-+    zdma_update_descr_addr(s, src_type, R_ZDMA_CH_SRC_CUR_DSCR_LSB);
++    offs += (16 - ((element + 1) * (1 << size)));
++    offs ^= 8;
++#else
++    offs += element * (1 << size);
++#endif
++    offs += offsetof(CPUARMState, vfp.zregs[regno]);
++    assert_fp_access_checked(s);
++    return offs;
 +}
 +
-+static void zdma_run(XlnxZDMA *s)
++/* Return the offset info CPUARMState of the "whole" vector register Qn.  */
++static inline int vec_full_reg_offset(DisasContext *s, int regno)
 +{
-+    while (s->state == ENABLED && !s->error) {
-+        zdma_load_src_descriptor(s);
-+
-+        if (s->error) {
-+            zdma_set_state(s, DISABLED);
-+        } else {
-+            zdma_process_descr(s);
-+        }
-+    }
-+
-+    zdma_ch_imr_update_irq(s);
++    assert_fp_access_checked(s);
++    return offsetof(CPUARMState, vfp.zregs[regno]);
 +}
 +
-+static void zdma_update_descr_addr_from_start(XlnxZDMA *s)
++/* Return a newly allocated pointer to the vector register.  */
++static inline TCGv_ptr vec_full_reg_ptr(DisasContext *s, int regno)
 +{
-+    uint64_t src_addr, dst_addr;
-+
-+    src_addr = zdma_get_regaddr64(s, R_ZDMA_CH_SRC_START_LSB);
-+    zdma_put_regaddr64(s, R_ZDMA_CH_SRC_CUR_DSCR_LSB, src_addr);
-+    dst_addr = zdma_get_regaddr64(s, R_ZDMA_CH_DST_START_LSB);
-+    zdma_put_regaddr64(s, R_ZDMA_CH_DST_CUR_DSCR_LSB, dst_addr);
-+    zdma_load_dst_descriptor(s);
++    TCGv_ptr ret = tcg_temp_new_ptr();
++    tcg_gen_addi_ptr(ret, cpu_env, vec_full_reg_offset(s, regno));
++    return ret;
 +}
 +
-+static void zdma_ch_ctrlx_postw(RegisterInfo *reg, uint64_t val64)
++/* Return the byte size of the "whole" vector register, VL / 8.  */
++static inline int vec_full_reg_size(DisasContext *s)
 +{
-+    XlnxZDMA *s = XLNX_ZDMA(reg->opaque);
-+
-+    if (ARRAY_FIELD_EX32(s->regs, ZDMA_CH_CTRL2, EN)) {
-+        s->error = false;
-+
-+        if (s->state == PAUSED &&
-+            ARRAY_FIELD_EX32(s->regs, ZDMA_CH_CTRL0, CONT)) {
-+            if (ARRAY_FIELD_EX32(s->regs, ZDMA_CH_CTRL0, CONT_ADDR) == 1) {
-+                zdma_update_descr_addr_from_start(s);
-+            } else {
-+                bool src_type = FIELD_EX32(s->dsc_src.words[3],
-+                                       ZDMA_CH_SRC_DSCR_WORD3, TYPE);
-+                zdma_update_descr_addr(s, src_type,
-+                                          R_ZDMA_CH_SRC_CUR_DSCR_LSB);
-+            }
-+            ARRAY_FIELD_DP32(s->regs, ZDMA_CH_CTRL0, CONT, false);
-+            zdma_set_state(s, ENABLED);
-+        } else if (s->state == DISABLED) {
-+            zdma_update_descr_addr_from_start(s);
-+            zdma_set_state(s, ENABLED);
-+        }
-+    } else {
-+        /* Leave Paused state?  */
-+        if (s->state == PAUSED &&
-+            ARRAY_FIELD_EX32(s->regs, ZDMA_CH_CTRL0, CONT)) {
-+            zdma_set_state(s, DISABLED);
-+        }
-+    }
-+
-+    zdma_run(s);
++    return s->sve_len;
 +}
 +
-+static RegisterAccessInfo zdma_regs_info[] = {
-+    {   .name = "ZDMA_ERR_CTRL",  .addr = A_ZDMA_ERR_CTRL,
-+        .rsvd = 0xfffffffe,
-+    },{ .name = "ZDMA_CH_ISR",  .addr = A_ZDMA_CH_ISR,
-+        .rsvd = 0xfffff000,
-+        .w1c = 0xfff,
-+        .post_write = zdma_ch_isr_postw,
-+    },{ .name = "ZDMA_CH_IMR",  .addr = A_ZDMA_CH_IMR,
-+        .reset = 0xfff,
-+        .rsvd = 0xfffff000,
-+        .ro = 0xfff,
-+    },{ .name = "ZDMA_CH_IEN",  .addr = A_ZDMA_CH_IEN,
-+        .rsvd = 0xfffff000,
-+        .pre_write = zdma_ch_ien_prew,
-+    },{ .name = "ZDMA_CH_IDS",  .addr = A_ZDMA_CH_IDS,
-+        .rsvd = 0xfffff000,
-+        .pre_write = zdma_ch_ids_prew,
-+    },{ .name = "ZDMA_CH_CTRL0",  .addr = A_ZDMA_CH_CTRL0,
-+        .reset = 0x80,
-+        .rsvd = 0xffffff01,
-+        .post_write = zdma_ch_ctrlx_postw,
-+    },{ .name = "ZDMA_CH_CTRL1",  .addr = A_ZDMA_CH_CTRL1,
-+        .reset = 0x3ff,
-+        .rsvd = 0xfffffc00,
-+    },{ .name = "ZDMA_CH_FCI",  .addr = A_ZDMA_CH_FCI,
-+        .rsvd = 0xffffffc0,
-+    },{ .name = "ZDMA_CH_STATUS",  .addr = A_ZDMA_CH_STATUS,
-+        .rsvd = 0xfffffffc,
-+        .ro = 0x3,
-+    },{ .name = "ZDMA_CH_DATA_ATTR",  .addr = A_ZDMA_CH_DATA_ATTR,
-+        .reset = 0x483d20f,
-+        .rsvd = 0xf0000000,
-+    },{ .name = "ZDMA_CH_DSCR_ATTR",  .addr = A_ZDMA_CH_DSCR_ATTR,
-+        .rsvd = 0xfffffe00,
-+    },{ .name = "ZDMA_CH_SRC_DSCR_WORD0",  .addr = A_ZDMA_CH_SRC_DSCR_WORD0,
-+    },{ .name = "ZDMA_CH_SRC_DSCR_WORD1",  .addr = A_ZDMA_CH_SRC_DSCR_WORD1,
-+        .rsvd = 0xfffe0000,
-+    },{ .name = "ZDMA_CH_SRC_DSCR_WORD2",  .addr = A_ZDMA_CH_SRC_DSCR_WORD2,
-+        .rsvd = 0xc0000000,
-+    },{ .name = "ZDMA_CH_SRC_DSCR_WORD3",  .addr = A_ZDMA_CH_SRC_DSCR_WORD3,
-+        .rsvd = 0xffffffe0,
-+    },{ .name = "ZDMA_CH_DST_DSCR_WORD0",  .addr = A_ZDMA_CH_DST_DSCR_WORD0,
-+    },{ .name = "ZDMA_CH_DST_DSCR_WORD1",  .addr = A_ZDMA_CH_DST_DSCR_WORD1,
-+        .rsvd = 0xfffe0000,
-+    },{ .name = "ZDMA_CH_DST_DSCR_WORD2",  .addr = A_ZDMA_CH_DST_DSCR_WORD2,
-+        .rsvd = 0xc0000000,
-+    },{ .name = "ZDMA_CH_DST_DSCR_WORD3",  .addr = A_ZDMA_CH_DST_DSCR_WORD3,
-+        .rsvd = 0xfffffffa,
-+    },{ .name = "ZDMA_CH_WR_ONLY_WORD0",  .addr = A_ZDMA_CH_WR_ONLY_WORD0,
-+    },{ .name = "ZDMA_CH_WR_ONLY_WORD1",  .addr = A_ZDMA_CH_WR_ONLY_WORD1,
-+    },{ .name = "ZDMA_CH_WR_ONLY_WORD2",  .addr = A_ZDMA_CH_WR_ONLY_WORD2,
-+    },{ .name = "ZDMA_CH_WR_ONLY_WORD3",  .addr = A_ZDMA_CH_WR_ONLY_WORD3,
-+    },{ .name = "ZDMA_CH_SRC_START_LSB",  .addr = A_ZDMA_CH_SRC_START_LSB,
-+    },{ .name = "ZDMA_CH_SRC_START_MSB",  .addr = A_ZDMA_CH_SRC_START_MSB,
-+        .rsvd = 0xfffe0000,
-+    },{ .name = "ZDMA_CH_DST_START_LSB",  .addr = A_ZDMA_CH_DST_START_LSB,
-+    },{ .name = "ZDMA_CH_DST_START_MSB",  .addr = A_ZDMA_CH_DST_START_MSB,
-+        .rsvd = 0xfffe0000,
-+    },{ .name = "ZDMA_CH_SRC_CUR_PYLD_LSB",  .addr = A_ZDMA_CH_SRC_CUR_PYLD_LSB,
-+        .ro = 0xffffffff,
-+    },{ .name = "ZDMA_CH_SRC_CUR_PYLD_MSB",  .addr = A_ZDMA_CH_SRC_CUR_PYLD_MSB,
-+        .rsvd = 0xfffe0000,
-+        .ro = 0x1ffff,
-+    },{ .name = "ZDMA_CH_DST_CUR_PYLD_LSB",  .addr = A_ZDMA_CH_DST_CUR_PYLD_LSB,
-+        .ro = 0xffffffff,
-+    },{ .name = "ZDMA_CH_DST_CUR_PYLD_MSB",  .addr = A_ZDMA_CH_DST_CUR_PYLD_MSB,
-+        .rsvd = 0xfffe0000,
-+        .ro = 0x1ffff,
-+    },{ .name = "ZDMA_CH_SRC_CUR_DSCR_LSB",  .addr = A_ZDMA_CH_SRC_CUR_DSCR_LSB,
-+        .ro = 0xffffffff,
-+    },{ .name = "ZDMA_CH_SRC_CUR_DSCR_MSB",  .addr = A_ZDMA_CH_SRC_CUR_DSCR_MSB,
-+        .rsvd = 0xfffe0000,
-+        .ro = 0x1ffff,
-+    },{ .name = "ZDMA_CH_DST_CUR_DSCR_LSB",  .addr = A_ZDMA_CH_DST_CUR_DSCR_LSB,
-+        .ro = 0xffffffff,
-+    },{ .name = "ZDMA_CH_DST_CUR_DSCR_MSB",  .addr = A_ZDMA_CH_DST_CUR_DSCR_MSB,
-+        .rsvd = 0xfffe0000,
-+        .ro = 0x1ffff,
-+    },{ .name = "ZDMA_CH_TOTAL_BYTE",  .addr = A_ZDMA_CH_TOTAL_BYTE,
-+        .w1c = 0xffffffff,
-+    },{ .name = "ZDMA_CH_RATE_CNTL",  .addr = A_ZDMA_CH_RATE_CNTL,
-+        .rsvd = 0xfffff000,
-+    },{ .name = "ZDMA_CH_IRQ_SRC_ACCT",  .addr = A_ZDMA_CH_IRQ_SRC_ACCT,
-+        .rsvd = 0xffffff00,
-+        .ro = 0xff,
-+        .cor = 0xff,
-+    },{ .name = "ZDMA_CH_IRQ_DST_ACCT",  .addr = A_ZDMA_CH_IRQ_DST_ACCT,
-+        .rsvd = 0xffffff00,
-+        .ro = 0xff,
-+        .cor = 0xff,
-+    },{ .name = "ZDMA_CH_DBG0",  .addr = A_ZDMA_CH_DBG0,
-+        .rsvd = 0xfffffe00,
-+        .ro = 0x1ff,
-+    },{ .name = "ZDMA_CH_DBG1",  .addr = A_ZDMA_CH_DBG1,
-+        .rsvd = 0xfffffe00,
-+        .ro = 0x1ff,
-+    },{ .name = "ZDMA_CH_CTRL2",  .addr = A_ZDMA_CH_CTRL2,
-+        .rsvd = 0xfffffffe,
-+        .post_write = zdma_ch_ctrlx_postw,
-+    }
-+};
++bool disas_sve(DisasContext *, uint32_t);
 +
-+static void zdma_reset(DeviceState *dev)
-+{
-+    XlnxZDMA *s = XLNX_ZDMA(dev);
-+    unsigned int i;
++/* Note that the gvec expanders operate on offsets + sizes.  */
++typedef void GVecGen2Fn(unsigned, uint32_t, uint32_t, uint32_t, uint32_t);
++typedef void GVecGen2iFn(unsigned, uint32_t, uint32_t, int64_t,
++                         uint32_t, uint32_t);
++typedef void GVecGen3Fn(unsigned, uint32_t, uint32_t,
++                        uint32_t, uint32_t, uint32_t);
 +
-+    for (i = 0; i < ARRAY_SIZE(s->regs_info); ++i) {
-+        register_reset(&s->regs_info[i]);
-+    }
-+
-+    zdma_ch_imr_update_irq(s);
-+}
-+
-+static uint64_t zdma_read(void *opaque, hwaddr addr, unsigned size)
-+{
-+    XlnxZDMA *s = XLNX_ZDMA(opaque);
-+    RegisterInfo *r = &s->regs_info[addr / 4];
-+
-+    if (!r->data) {
-+        qemu_log("%s: Decode error: read from %" HWADDR_PRIx "\n",
-+                 object_get_canonical_path(OBJECT(s)),
-+                 addr);
-+        ARRAY_FIELD_DP32(s->regs, ZDMA_CH_ISR, INV_APB, true);
-+        zdma_ch_imr_update_irq(s);
-+        return 0;
-+    }
-+    return register_read(r, ~0, NULL, false);
-+}
-+
-+static void zdma_write(void *opaque, hwaddr addr, uint64_t value,
-+                      unsigned size)
-+{
-+    XlnxZDMA *s = XLNX_ZDMA(opaque);
-+    RegisterInfo *r = &s->regs_info[addr / 4];
-+
-+    if (!r->data) {
-+        qemu_log("%s: Decode error: write to %" HWADDR_PRIx "=%" PRIx64 "\n",
-+                 object_get_canonical_path(OBJECT(s)),
-+                 addr, value);
-+        ARRAY_FIELD_DP32(s->regs, ZDMA_CH_ISR, INV_APB, true);
-+        zdma_ch_imr_update_irq(s);
-+        return;
-+    }
-+    register_write(r, value, ~0, NULL, false);
-+}
-+
-+static const MemoryRegionOps zdma_ops = {
-+    .read = zdma_read,
-+    .write = zdma_write,
-+    .endianness = DEVICE_LITTLE_ENDIAN,
-+    .valid = {
-+        .min_access_size = 4,
-+        .max_access_size = 4,
-+    },
-+};
-+
-+static void zdma_realize(DeviceState *dev, Error **errp)
-+{
-+    XlnxZDMA *s = XLNX_ZDMA(dev);
-+    unsigned int i;
-+
-+    for (i = 0; i < ARRAY_SIZE(zdma_regs_info); ++i) {
-+        RegisterInfo *r = &s->regs_info[zdma_regs_info[i].addr / 4];
-+
-+        *r = (RegisterInfo) {
-+            .data = (uint8_t *)&s->regs[
-+                    zdma_regs_info[i].addr / 4],
-+            .data_size = sizeof(uint32_t),
-+            .access = &zdma_regs_info[i],
-+            .opaque = s,
-+        };
-+    }
-+
-+    if (s->dma_mr) {
-+        s->dma_as = g_malloc0(sizeof(AddressSpace));
-+        address_space_init(s->dma_as, s->dma_mr, NULL);
-+    } else {
-+        s->dma_as = &address_space_memory;
-+    }
-+    s->attr = MEMTXATTRS_UNSPECIFIED;
-+}
-+
-+static void zdma_init(Object *obj)
-+{
-+    XlnxZDMA *s = XLNX_ZDMA(obj);
-+    SysBusDevice *sbd = SYS_BUS_DEVICE(obj);
-+
-+    memory_region_init_io(&s->iomem, obj, &zdma_ops, s,
-+                          TYPE_XLNX_ZDMA, ZDMA_R_MAX * 4);
-+    sysbus_init_mmio(sbd, &s->iomem);
-+    sysbus_init_irq(sbd, &s->irq_zdma_ch_imr);
-+
-+    object_property_add_link(obj, "dma", TYPE_MEMORY_REGION,
-+                             (Object **)&s->dma_mr,
-+                             qdev_prop_allow_set_link_before_realize,
-+                             OBJ_PROP_LINK_UNREF_ON_RELEASE,
-+                             &error_abort);
-+}
-+
-+static const VMStateDescription vmstate_zdma = {
-+    .name = TYPE_XLNX_ZDMA,
-+    .version_id = 1,
-+    .minimum_version_id = 1,
-+    .minimum_version_id_old = 1,
-+    .fields = (VMStateField[]) {
-+        VMSTATE_UINT32_ARRAY(regs, XlnxZDMA, ZDMA_R_MAX),
-+        VMSTATE_UINT32(state, XlnxZDMA),
-+        VMSTATE_UINT32_ARRAY(dsc_src.words, XlnxZDMA, 4),
-+        VMSTATE_UINT32_ARRAY(dsc_dst.words, XlnxZDMA, 4),
-+        VMSTATE_END_OF_LIST(),
-+    }
-+};
-+
-+static Property zdma_props[] = {
-+    DEFINE_PROP_UINT32("bus-width", XlnxZDMA, cfg.bus_width, 64),
-+    DEFINE_PROP_END_OF_LIST(),
-+};
-+
-+static void zdma_class_init(ObjectClass *klass, void *data)
-+{
-+    DeviceClass *dc = DEVICE_CLASS(klass);
-+
-+    dc->reset = zdma_reset;
-+    dc->realize = zdma_realize;
-+    dc->props = zdma_props;
-+    dc->vmsd = &vmstate_zdma;
-+}
-+
-+static const TypeInfo zdma_info = {
-+    .name          = TYPE_XLNX_ZDMA,
-+    .parent        = TYPE_SYS_BUS_DEVICE,
-+    .instance_size = sizeof(XlnxZDMA),
-+    .class_init    = zdma_class_init,
-+    .instance_init = zdma_init,
-+};
-+
-+static void zdma_register_types(void)
-+{
-+    type_register_static(&zdma_info);
-+}
-+
-+type_init(zdma_register_types)
++#endif /* TARGET_ARM_TRANSLATE_A64_H */
+diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
+index d8284678f7..74ef756ad5 100644
+--- a/target/arm/translate-a64.c
++++ b/target/arm/translate-a64.c
+@@ -36,13 +36,13 @@
+ #include "exec/log.h"
+ 
+ #include "trace-tcg.h"
++#include "translate-a64.h"
+ 
+ static TCGv_i64 cpu_X[32];
+ static TCGv_i64 cpu_pc;
+ 
+ /* Load/store exclusive handling */
+ static TCGv_i64 cpu_exclusive_high;
+-static TCGv_i64 cpu_reg(DisasContext *s, int reg);
+ 
+ static const char *regnames[] = {
+     "x0", "x1", "x2", "x3", "x4", "x5", "x6", "x7",
+@@ -86,13 +86,6 @@ typedef void CryptoThreeOpIntFn(TCGv_ptr, TCGv_ptr, TCGv_i32);
+ typedef void CryptoThreeOpFn(TCGv_ptr, TCGv_ptr, TCGv_ptr);
+ typedef void AtomicThreeOpFn(TCGv_i64, TCGv_i64, TCGv_i64, TCGArg, TCGMemOp);
+ 
+-/* Note that the gvec expanders operate on offsets + sizes.  */
+-typedef void GVecGen2Fn(unsigned, uint32_t, uint32_t, uint32_t, uint32_t);
+-typedef void GVecGen2iFn(unsigned, uint32_t, uint32_t, int64_t,
+-                         uint32_t, uint32_t);
+-typedef void GVecGen3Fn(unsigned, uint32_t, uint32_t,
+-                        uint32_t, uint32_t, uint32_t);
+-
+ /* initialize TCG globals.  */
+ void a64_translate_init(void)
+ {
+@@ -405,22 +398,13 @@ static inline void gen_goto_tb(DisasContext *s, int n, uint64_t dest)
+     }
+ }
+ 
+-static void unallocated_encoding(DisasContext *s)
++void unallocated_encoding(DisasContext *s)
+ {
+     /* Unallocated and reserved encodings are uncategorized */
+     gen_exception_insn(s, 4, EXCP_UDEF, syn_uncategorized(),
+                        default_exception_el(s));
+ }
+ 
+-#define unsupported_encoding(s, insn)                                    \
+-    do {                                                                 \
+-        qemu_log_mask(LOG_UNIMP,                                         \
+-                      "%s:%d: unsupported instruction encoding 0x%08x "  \
+-                      "at pc=%016" PRIx64 "\n",                          \
+-                      __FILE__, __LINE__, insn, s->pc - 4);              \
+-        unallocated_encoding(s);                                         \
+-    } while (0)
+-
+ static void init_tmp_a64_array(DisasContext *s)
+ {
+ #ifdef CONFIG_DEBUG_TCG
+@@ -438,13 +422,13 @@ static void free_tmp_a64(DisasContext *s)
+     init_tmp_a64_array(s);
+ }
+ 
+-static TCGv_i64 new_tmp_a64(DisasContext *s)
++TCGv_i64 new_tmp_a64(DisasContext *s)
+ {
+     assert(s->tmp_a64_count < TMP_A64_MAX);
+     return s->tmp_a64[s->tmp_a64_count++] = tcg_temp_new_i64();
+ }
+ 
+-static TCGv_i64 new_tmp_a64_zero(DisasContext *s)
++TCGv_i64 new_tmp_a64_zero(DisasContext *s)
+ {
+     TCGv_i64 t = new_tmp_a64(s);
+     tcg_gen_movi_i64(t, 0);
+@@ -466,7 +450,7 @@ static TCGv_i64 new_tmp_a64_zero(DisasContext *s)
+  * to cpu_X[31] and ZR accesses to a temporary which can be discarded.
+  * This is the point of the _sp forms.
+  */
+-static TCGv_i64 cpu_reg(DisasContext *s, int reg)
++TCGv_i64 cpu_reg(DisasContext *s, int reg)
+ {
+     if (reg == 31) {
+         return new_tmp_a64_zero(s);
+@@ -476,7 +460,7 @@ static TCGv_i64 cpu_reg(DisasContext *s, int reg)
+ }
+ 
+ /* register access for when 31 == SP */
+-static TCGv_i64 cpu_reg_sp(DisasContext *s, int reg)
++TCGv_i64 cpu_reg_sp(DisasContext *s, int reg)
+ {
+     return cpu_X[reg];
+ }
+@@ -485,7 +469,7 @@ static TCGv_i64 cpu_reg_sp(DisasContext *s, int reg)
+  * representing the register contents. This TCGv is an auto-freed
+  * temporary so it need not be explicitly freed, and may be modified.
+  */
+-static TCGv_i64 read_cpu_reg(DisasContext *s, int reg, int sf)
++TCGv_i64 read_cpu_reg(DisasContext *s, int reg, int sf)
+ {
+     TCGv_i64 v = new_tmp_a64(s);
+     if (reg != 31) {
+@@ -500,7 +484,7 @@ static TCGv_i64 read_cpu_reg(DisasContext *s, int reg, int sf)
+     return v;
+ }
+ 
+-static TCGv_i64 read_cpu_reg_sp(DisasContext *s, int reg, int sf)
++TCGv_i64 read_cpu_reg_sp(DisasContext *s, int reg, int sf)
+ {
+     TCGv_i64 v = new_tmp_a64(s);
+     if (sf) {
+@@ -511,72 +495,6 @@ static TCGv_i64 read_cpu_reg_sp(DisasContext *s, int reg, int sf)
+     return v;
+ }
+ 
+-/* We should have at some point before trying to access an FP register
+- * done the necessary access check, so assert that
+- * (a) we did the check and
+- * (b) we didn't then just plough ahead anyway if it failed.
+- * Print the instruction pattern in the abort message so we can figure
+- * out what we need to fix if a user encounters this problem in the wild.
+- */
+-static inline void assert_fp_access_checked(DisasContext *s)
+-{
+-#ifdef CONFIG_DEBUG_TCG
+-    if (unlikely(!s->fp_access_checked || s->fp_excp_el)) {
+-        fprintf(stderr, "target-arm: FP access check missing for "
+-                "instruction 0x%08x\n", s->insn);
+-        abort();
+-    }
+-#endif
+-}
+-
+-/* Return the offset into CPUARMState of an element of specified
+- * size, 'element' places in from the least significant end of
+- * the FP/vector register Qn.
+- */
+-static inline int vec_reg_offset(DisasContext *s, int regno,
+-                                 int element, TCGMemOp size)
+-{
+-    int offs = 0;
+-#ifdef HOST_WORDS_BIGENDIAN
+-    /* This is complicated slightly because vfp.zregs[n].d[0] is
+-     * still the low half and vfp.zregs[n].d[1] the high half
+-     * of the 128 bit vector, even on big endian systems.
+-     * Calculate the offset assuming a fully bigendian 128 bits,
+-     * then XOR to account for the order of the two 64 bit halves.
+-     */
+-    offs += (16 - ((element + 1) * (1 << size)));
+-    offs ^= 8;
+-#else
+-    offs += element * (1 << size);
+-#endif
+-    offs += offsetof(CPUARMState, vfp.zregs[regno]);
+-    assert_fp_access_checked(s);
+-    return offs;
+-}
+-
+-/* Return the offset info CPUARMState of the "whole" vector register Qn.  */
+-static inline int vec_full_reg_offset(DisasContext *s, int regno)
+-{
+-    assert_fp_access_checked(s);
+-    return offsetof(CPUARMState, vfp.zregs[regno]);
+-}
+-
+-/* Return a newly allocated pointer to the vector register.  */
+-static TCGv_ptr vec_full_reg_ptr(DisasContext *s, int regno)
+-{
+-    TCGv_ptr ret = tcg_temp_new_ptr();
+-    tcg_gen_addi_ptr(ret, cpu_env, vec_full_reg_offset(s, regno));
+-    return ret;
+-}
+-
+-/* Return the byte size of the "whole" vector register, VL / 8.  */
+-static inline int vec_full_reg_size(DisasContext *s)
+-{
+-    /* FIXME SVE: We should put the composite ZCR_EL* value into tb->flags.
+-       In the meantime this is just the AdvSIMD length of 128.  */
+-    return 128 / 8;
+-}
+-
+ /* Return the offset into CPUARMState of a slice (from
+  * the least significant end) of FP register Qn (ie
+  * Dn, Sn, Hn or Bn).
+@@ -641,7 +559,7 @@ static void clear_vec_high(DisasContext *s, bool is_q, int rd)
+     }
+ }
+ 
+-static void write_fp_dreg(DisasContext *s, int reg, TCGv_i64 v)
++void write_fp_dreg(DisasContext *s, int reg, TCGv_i64 v)
+ {
+     unsigned ofs = fp_reg_offset(s, reg, MO_64);
+ 
+@@ -658,7 +576,7 @@ static void write_fp_sreg(DisasContext *s, int reg, TCGv_i32 v)
+     tcg_temp_free_i64(tmp);
+ }
+ 
+-static TCGv_ptr get_fpstatus_ptr(bool is_f16)
++TCGv_ptr get_fpstatus_ptr(bool is_f16)
+ {
+     TCGv_ptr statusptr = tcg_temp_new_ptr();
+     int offset;
+@@ -1246,14 +1164,14 @@ static inline bool fp_access_check(DisasContext *s)
+ /* Check that SVE access is enabled.  If it is, return true.
+  * If not, emit code to generate an appropriate exception and return false.
+  */
+-static inline bool sve_access_check(DisasContext *s)
++bool sve_access_check(DisasContext *s)
+ {
+     if (s->sve_excp_el) {
+         gen_exception_insn(s, 4, EXCP_UDEF, syn_sve_access_trap(),
+                            s->sve_excp_el);
+         return false;
+     }
+-    return true;
++    return fp_access_check(s);
+ }
+ 
+ /*
+@@ -3419,8 +3337,8 @@ static inline uint64_t bitmask64(unsigned int length)
+  * value (ie should cause a guest UNDEF exception), and true if they are
+  * valid, in which case the decoded bit pattern is written to result.
+  */
+-static bool logic_imm_decode_wmask(uint64_t *result, unsigned int immn,
+-                                   unsigned int imms, unsigned int immr)
++bool logic_imm_decode_wmask(uint64_t *result, unsigned int immn,
++                            unsigned int imms, unsigned int immr)
+ {
+     uint64_t mask;
+     unsigned e, levels, s, r;
+@@ -5650,7 +5568,7 @@ static void disas_fp_3src(DisasContext *s, uint32_t insn)
+  * the range 01....1xx to 10....0xx, and the most significant 4 bits of
+  * the mantissa; see VFPExpandImm() in the v8 ARM ARM.
+  */
+-static uint64_t vfp_expand_imm(int size, uint8_t imm8)
++uint64_t vfp_expand_imm(int size, uint8_t imm8)
+ {
+     uint64_t imm;
+ 
 -- 
 2.17.0
