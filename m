@@ -1,25 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60310)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:32825)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fJb47-0008P8-SR
-	for qemu-devel@nongnu.org; Fri, 18 May 2018 04:48:45 -0400
+	(envelope-from <th.huth@gmail.com>) id 1fJb9T-0002io-BD
+	for qemu-devel@nongnu.org; Fri, 18 May 2018 04:54:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fJb46-0003Kk-Ok
-	for qemu-devel@nongnu.org; Fri, 18 May 2018 04:48:43 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:39538 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fJb46-0003KY-K4
-	for qemu-devel@nongnu.org; Fri, 18 May 2018 04:48:42 -0400
-From: Markus Armbruster <armbru@redhat.com>
-References: <20180517192325.8335-1-danielhb@linux.ibm.com>
-	<20180517192325.8335-4-danielhb@linux.ibm.com>
-Date: Fri, 18 May 2018 10:48:40 +0200
-In-Reply-To: <20180517192325.8335-4-danielhb@linux.ibm.com> (Daniel Henrique
-	Barboza's message of "Thu, 17 May 2018 16:23:25 -0300")
-Message-ID: <87vablgxhz.fsf@dusky.pond.sub.org>
+	(envelope-from <th.huth@gmail.com>) id 1fJb9O-0005My-Fv
+	for qemu-devel@nongnu.org; Fri, 18 May 2018 04:54:15 -0400
+Received: from mail-wm0-f67.google.com ([74.125.82.67]:34300)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <th.huth@gmail.com>) id 1fJb9O-0005Mj-9z
+	for qemu-devel@nongnu.org; Fri, 18 May 2018 04:54:10 -0400
+Received: by mail-wm0-f67.google.com with SMTP id a137-v6so2614925wme.1
+	for <qemu-devel@nongnu.org>; Fri, 18 May 2018 01:54:09 -0700 (PDT)
+References: <4521b265-855f-7f06-ffff-3fa394380922@xenosoft.de>
+From: Thomas Huth <huth@tuxfamily.org>
+Message-ID: <b3243bab-58b6-0b43-67b5-94a2f90d9199@tuxfamily.org>
+Date: Fri, 18 May 2018 10:54:06 +0200
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v7 3/3] qmp.c: system_wakeup: runstate and
- wake-up support check
+In-Reply-To: <4521b265-855f-7f06-ffff-3fa394380922@xenosoft.de>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PPC64] P5020DS: Booting from img possible
+ (-drive)?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,124 +30,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Daniel Henrique Barboza <danielhb@linux.ibm.com>
-Cc: qemu-devel@nongnu.org, dgilbert@redhat.com, mdroth@linux.vnet.ibm.com
+To: Christian Zigotzky <chzigotzky@xenosoft.de>, "kvm-ppc@vger.kernel.org" <kvm-ppc@vger.kernel.org>, qemu-devel@nongnu.org, Alexander Graf <agraf@suse.de>
 
-This affects both QMP and HMP.  Let's rephrase the title to
+On 18.05.2018 08:01, Christian Zigotzky wrote:
+> |Hello,
+> 
+> I was able to boot a Linux kernel (uImage) with an initrd in a virtual
+> P5020DS PPC64 machine with an e5500 core (QEMU 2.12.0) with the
+> following command.
+> 
+> qemu-system-ppc64 -M ppce500 -cpu e5500 -m 2048 -initrd
+> /home/christian/Downloads/slitaz25.gz -nographic -kernel
+> /home/christian/Downloads/vmlinux-4.17-rc5-AmigaOne_X1000_X5000/X5000/uImage-4.17
+> -net nic,vlan=0,model=e1000 -net user,vlan=0 -machine
+> dt_compatible=fsl,,P5020DS -append "root=/dev/ramdisk"
+> 
+> It also works with the machine 'MPC8544DS':
+> 
+> qemu-system-ppc64 -M mpc8544ds -cpu e5500 -m 2048 -initrd
+> /home/christian/Downloads/slitaz25.gz -nographic -kernel
+> /home/christian/Downloads/vmlinux-4.17-rc5-AmigaOne_X1000_X5000/X5000/uImage-4.17
+> -net nic,vlan=0,model=e1000 -net user,vlan=0 -machine
+> dt_compatible=fsl,,P5020DS -append "root=/dev/ramdisk"
 
-    qmp hmp: Make system_wakeup check wake-up support and run state
+These two machines ppce500 and mpc8544ds are "embedded" PowerPC machines...
 
-Can do that in my tree.
+> I tried to boot ubuntu MATE 16.04 LTS PowerPC from an img with the
+> option '-drive' but without any success. Is it possible to boot from a
+> hard disk img with a virtual P5020DS PPC64 machine? Can I use a virtual
+> graphics card with this machine?
 
-Daniel Henrique Barboza <danielhb@linux.ibm.com> writes:
+... but according to http://cdimage.ubuntu.com/releases/16.04/release/
+Ubuntu 16.04 is for Apple and IBM machines only, so I don't think that
+you'll be able to run this on an embedded PPC machine?
 
-> The qmp/hmp command 'system_wakeup' is simply a direct call to
-> 'qemu_system_wakeup_request' from vl.c. This function verifies if
-> runstate is SUSPENDED and if the wake up reason is valid before
-> proceeding. However, no error or warning is thrown if any of those
-> pre-requirements isn't met. There is no way for the caller to
-> differentiate between a successful wakeup or an error state caused
-> when trying to wake up a guest that wasn't suspended.
->
-> This means that system_wakeup is silently failing, which can be
-> considered a bug. Adding error handling isn't an API break in this
-> case - applications that didn't check the result will remain broken,
-> the ones that check it will have a chance to deal with it.
->
-> Adding to that, recent changes in query-target added a new flag called
-
-"... the commit before previous extended query-target with a new flag..."
-
-> wakeup-suspend-support that indicates if the guest has the capability
-> of waking up from suspended state. Although such guest will never
-> reach SUSPENDED state and erroring it out in this scenario would
-> suffice, it is more informative for the user to differentiate between a
-> failure because the guest isn't suspended versus a failure because the
-> guest does not have support for wake up at all.
->
-> All this considered, this patch changes qmp_system_wakeup to:
->
-> - check if the guest has the capability to wake-up from suspend. If
-> not, error out informing about the lack of support;
->
-> - make the runstate verification before proceeding to call
-> qemu_system_wakeup_request, firing up an error message if the user tries
-> to wake up a machine that isn't in SUSPENDED state.
->
-> After this patch, this is the output of system_wakeup in a guest that
-> does not have wake-up from suspend support (ppc64):
->
-> (qemu) system_wakeup
-> wake-up from suspend is not supported by this guest
-> (qemu)
->
-> And this is the output of system_wakeup in a x86 guest that has the
-> support but isn't suspended:
->
-> (qemu) system_wakeup
-> Unable to wake up: guest is not in suspended state
-> (qemu)
-
-The examples are a nice touch.
-
-> Reported-by: Balamuruhan S <bala24@linux.vnet.ibm.com>
-> Signed-off-by: Daniel Henrique Barboza <danielhb@linux.ibm.com>
-> ---
->  hmp.c          |  4 +++-
->  qapi/misc.json |  3 ++-
->  qmp.c          | 10 ++++++++++
->  3 files changed, 15 insertions(+), 2 deletions(-)
->
-> diff --git a/hmp.c b/hmp.c
-> index ef93f4878b..d177d14cc9 100644
-> --- a/hmp.c
-> +++ b/hmp.c
-> @@ -1156,7 +1156,9 @@ void hmp_cont(Monitor *mon, const QDict *qdict)
->  
->  void hmp_system_wakeup(Monitor *mon, const QDict *qdict)
->  {
-> -    qmp_system_wakeup(NULL);
-> +    Error *err = NULL;
-
-Blank line between declaration and statement, please.  Happy to touch
-this up in my tree.
-
-> +    qmp_system_wakeup(&err);
-> +    hmp_handle_error(mon, &err);
->  }
->  
->  void hmp_nmi(Monitor *mon, const QDict *qdict)
-> diff --git a/qapi/misc.json b/qapi/misc.json
-> index efba0449a6..73bfc3e436 100644
-> --- a/qapi/misc.json
-> +++ b/qapi/misc.json
-> @@ -1247,7 +1247,8 @@
->  #
->  # If the guest has wake-up from suspend support enabled
->  # (wakeup-suspend-support flag from query-target), wakeup guest from
-> -# suspend. Does nothing otherwise.
-> +# suspend if the guest is in SUSPENDED state. Returns an error
-> +# otherwise.
->  #
->  # Since:  1.1
->  #
-> diff --git a/qmp.c b/qmp.c
-> index 25fdc9a5b2..5366e963ad 100644
-> --- a/qmp.c
-> +++ b/qmp.c
-> @@ -205,6 +205,16 @@ void qmp_cont(Error **errp)
->  
->  void qmp_system_wakeup(Error **errp)
->  {
-> +    if (!qemu_wakeup_suspend_support()) {
-> +        error_setg(errp,
-> +                   "wake-up from suspend is not supported by this guest");
-> +        return;
-> +    }
-> +    if (!runstate_check(RUN_STATE_SUSPENDED)) {
-> +        error_setg(errp,
-> +                   "Unable to wake up: guest is not in suspended state");
-> +        return;
-> +    }
->      qemu_system_wakeup_request(QEMU_WAKEUP_REASON_OTHER);
->  }
+ Thomas
