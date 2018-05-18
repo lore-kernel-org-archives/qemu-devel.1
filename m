@@ -1,16 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60008)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60042)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fJfKs-0000MR-PU
-	for qemu-devel@nongnu.org; Fri, 18 May 2018 09:22:20 -0400
+	(envelope-from <kwolf@redhat.com>) id 1fJfKv-0000Q2-SY
+	for qemu-devel@nongnu.org; Fri, 18 May 2018 09:22:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fJfKr-0006OH-Cc
-	for qemu-devel@nongnu.org; Fri, 18 May 2018 09:22:18 -0400
+	(envelope-from <kwolf@redhat.com>) id 1fJfKq-0006Ng-Rk
+	for qemu-devel@nongnu.org; Fri, 18 May 2018 09:22:21 -0400
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Fri, 18 May 2018 15:21:06 +0200
-Message-Id: <20180518132114.4070-33-kwolf@redhat.com>
+Date: Fri, 18 May 2018 15:21:05 +0200
+Message-Id: <20180518132114.4070-32-kwolf@redhat.com>
 In-Reply-To: <20180518132114.4070-1-kwolf@redhat.com>
 References: <20180518132114.4070-1-kwolf@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 32/40] job: Add job_transition_to_ready()
+Subject: [Qemu-devel] [PATCH v2 31/40] job: Add job_is_ready()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,252 +22,140 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, mreitz@redhat.com, jsnow@redhat.com, eblake@redhat.com, jcody@redhat.com, armbru@redhat.com, qemu-devel@nongnu.org
 
-The transition to the READY state was still performed in the BlockJob
-layer, in the same function that sent the BLOCK_JOB_READY QMP event.
+Instead of having a 'bool ready' in BlockJob, add a function that
+derives its value from the job status.
 
-This patch brings the state transition to the Job layer and implements
-the QMP event using a notifier called from the Job layer, like we
-already do for other events related to state transitions.
+At the same time, this fixes the behaviour to match what the QAPI
+documentation promises for query-block-job: 'true if the job may be
+completed'. When the ready flag was introduced in commit ef6dbf1e46e,
+the flag never had to be reset to match the description because after
+being ready, the jobs would immediately complete and disappear.
+
+Job transactions and manual job finalisation were introduced only later.
+With these changes, jobs may stay around even after having completed
+(and they are not ready to be completed a second time), however their
+patches forgot to reset the ready flag.
 
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 Reviewed-by: Max Reitz <mreitz@redhat.com>
 ---
- include/block/blockjob.h     |  3 +++
- include/block/blockjob_int.h |  8 --------
- include/qemu/job.h           |  9 ++++++---
- block/mirror.c               |  6 +++---
- blockjob.c                   | 33 ++++++++++++++++++---------------
- job.c                        | 16 +++++++++++++---
- tests/test-bdrv-drain.c      |  2 +-
- tests/test-blockjob.c        |  2 +-
- 8 files changed, 45 insertions(+), 34 deletions(-)
+ include/block/blockjob.h |  5 -----
+ include/qemu/job.h       |  3 +++
+ blockjob.c               |  3 +--
+ job.c                    | 22 ++++++++++++++++++++++
+ qemu-img.c               |  2 +-
+ tests/test-blockjob.c    |  2 +-
+ 6 files changed, 28 insertions(+), 9 deletions(-)
 
 diff --git a/include/block/blockjob.h b/include/block/blockjob.h
-index 8e1e1ee0de..4fca45f6a1 100644
+index 5a81afc6c3..8e1e1ee0de 100644
 --- a/include/block/blockjob.h
 +++ b/include/block/blockjob.h
-@@ -76,6 +76,9 @@ typedef struct BlockJob {
-     /** Called when the job transitions to PENDING */
-     Notifier pending_notifier;
+@@ -49,11 +49,6 @@ typedef struct BlockJob {
+     /** The block device on which the job is operating.  */
+     BlockBackend *blk;
  
-+    /** Called when the job transitions to READY */
-+    Notifier ready_notifier;
-+
-     /** BlockDriverStates that are involved in this block job */
-     GSList *nodes;
- } BlockJob;
-diff --git a/include/block/blockjob_int.h b/include/block/blockjob_int.h
-index 806ac64d87..5cd50c6639 100644
---- a/include/block/blockjob_int.h
-+++ b/include/block/blockjob_int.h
-@@ -116,14 +116,6 @@ void block_job_drain(Job *job);
- int64_t block_job_ratelimit_get_delay(BlockJob *job, uint64_t n);
- 
- /**
-- * block_job_event_ready:
-- * @job: The job which is now ready to be completed.
-- *
-- * Send a BLOCK_JOB_READY event for the specified job.
-- */
--void block_job_event_ready(BlockJob *job);
+-    /**
+-     * Set to true when the job is ready to be completed.
+-     */
+-    bool ready;
 -
--/**
-  * block_job_error_action:
-  * @job: The job to signal an error for.
-  * @on_err: The error action setting.
+     /** Status that is published by the query-block-jobs QMP API */
+     BlockDeviceIoStatus iostatus;
+ 
 diff --git a/include/qemu/job.h b/include/qemu/job.h
-index 487f9d9a32..bfc2bc5611 100644
+index 1e8050c6fb..487f9d9a32 100644
 --- a/include/qemu/job.h
 +++ b/include/qemu/job.h
-@@ -132,6 +132,9 @@ typedef struct Job {
-     /** Notifiers called when the job transitions to PENDING */
-     NotifierList on_pending;
+@@ -367,6 +367,9 @@ bool job_is_cancelled(Job *job);
+ /** Returns whether the job is in a completed state. */
+ bool job_is_completed(Job *job);
  
-+    /** Notifiers called when the job transitions to READY */
-+    NotifierList on_ready;
-+
-     /** Element of the list of jobs */
-     QLIST_ENTRY(Job) job_list;
- 
-@@ -426,6 +429,9 @@ int job_apply_verb(Job *job, JobVerb verb, Error **errp);
- /** The @job could not be started, free it. */
- void job_early_fail(Job *job);
- 
-+/** Moves the @job from RUNNING to READY */
-+void job_transition_to_ready(Job *job);
++/** Returns whether the job is ready to be completed. */
++bool job_is_ready(Job *job);
 +
  /**
-  * @job: The job being completed.
-  * @ret: The status code.
-@@ -522,7 +528,4 @@ void job_defer_to_main_loop(Job *job, JobDeferToMainLoopFn *fn, void *opaque);
-  */
- int job_finish_sync(Job *job, void (*finish)(Job *, Error **errp), Error **errp);
- 
--/* TODO To be removed from the public interface */
--void job_state_transition(Job *job, JobStatus s1);
--
- #endif
-diff --git a/block/mirror.c b/block/mirror.c
-index 687f955c22..bdc1b5b7b9 100644
---- a/block/mirror.c
-+++ b/block/mirror.c
-@@ -727,8 +727,8 @@ static void coroutine_fn mirror_run(void *opaque)
-     }
- 
-     if (s->bdev_length == 0) {
--        /* Report BLOCK_JOB_READY and wait for complete. */
--        block_job_event_ready(&s->common);
-+        /* Transition to the READY state and wait for complete. */
-+        job_transition_to_ready(&s->common.job);
-         s->synced = true;
-         while (!job_is_cancelled(&s->common.job) && !s->should_complete) {
-             job_yield(&s->common.job);
-@@ -824,7 +824,7 @@ static void coroutine_fn mirror_run(void *opaque)
-                  * report completion.  This way, block-job-cancel will leave
-                  * the target in a consistent state.
-                  */
--                block_job_event_ready(&s->common);
-+                job_transition_to_ready(&s->common.job);
-                 s->synced = true;
-             }
- 
+  * Request @job to pause at the next pause point. Must be paired with
+  * job_resume(). If the job is supposed to be resumed by user action, call
 diff --git a/blockjob.c b/blockjob.c
-index 38f18e9ba3..da11b3b763 100644
+index 3ca009bea5..38f18e9ba3 100644
 --- a/blockjob.c
 +++ b/blockjob.c
-@@ -338,6 +338,22 @@ static void block_job_event_pending(Notifier *n, void *opaque)
-                                       &error_abort);
- }
- 
-+static void block_job_event_ready(Notifier *n, void *opaque)
-+{
-+    BlockJob *job = opaque;
-+
-+    if (block_job_is_internal(job)) {
-+        return;
-+    }
-+
-+    qapi_event_send_block_job_ready(job_type(&job->job),
-+                                    job->job.id,
-+                                    job->len,
-+                                    job->offset,
-+                                    job->speed, &error_abort);
-+}
-+
-+
- /*
-  * API for block job drivers and the block layer.  These functions are
-  * declared in blockjob_int.h.
-@@ -386,12 +402,14 @@ void *block_job_create(const char *job_id, const BlockJobDriver *driver,
-     job->finalize_cancelled_notifier.notify = block_job_event_cancelled;
-     job->finalize_completed_notifier.notify = block_job_event_completed;
-     job->pending_notifier.notify = block_job_event_pending;
-+    job->ready_notifier.notify = block_job_event_ready;
- 
-     notifier_list_add(&job->job.on_finalize_cancelled,
-                       &job->finalize_cancelled_notifier);
-     notifier_list_add(&job->job.on_finalize_completed,
-                       &job->finalize_completed_notifier);
-     notifier_list_add(&job->job.on_pending, &job->pending_notifier);
-+    notifier_list_add(&job->job.on_ready, &job->ready_notifier);
- 
-     error_setg(&job->blocker, "block device is in use by block job: %s",
-                job_type_str(&job->job));
-@@ -433,21 +451,6 @@ void block_job_user_resume(Job *job)
-     block_job_iostatus_reset(bjob);
- }
- 
--void block_job_event_ready(BlockJob *job)
--{
--    job_state_transition(&job->job, JOB_STATUS_READY);
--
--    if (block_job_is_internal(job)) {
--        return;
--    }
--
--    qapi_event_send_block_job_ready(job_type(&job->job),
--                                    job->job.id,
--                                    job->len,
--                                    job->offset,
--                                    job->speed, &error_abort);
--}
--
- BlockErrorAction block_job_error_action(BlockJob *job, BlockdevOnError on_err,
-                                         int is_read, int error)
+@@ -269,7 +269,7 @@ BlockJobInfo *block_job_query(BlockJob *job, Error **errp)
+     info->offset    = job->offset;
+     info->speed     = job->speed;
+     info->io_status = job->iostatus;
+-    info->ready     = job->ready;
++    info->ready     = job_is_ready(&job->job),
+     info->status    = job->job.status;
+     info->auto_finalize = job->job.auto_finalize;
+     info->auto_dismiss  = job->job.auto_dismiss;
+@@ -436,7 +436,6 @@ void block_job_user_resume(Job *job)
+ void block_job_event_ready(BlockJob *job)
  {
+     job_state_transition(&job->job, JOB_STATUS_READY);
+-    job->ready = true;
+ 
+     if (block_job_is_internal(job)) {
+         return;
 diff --git a/job.c b/job.c
-index 66ee26f2a0..34304f2883 100644
+index af31de4669..66ee26f2a0 100644
 --- a/job.c
 +++ b/job.c
-@@ -157,9 +157,7 @@ static int job_txn_apply(JobTxn *txn, int fn(Job *), bool lock)
-     return rc;
+@@ -199,6 +199,28 @@ bool job_is_cancelled(Job *job)
+     return job->cancelled;
  }
  
--
--/* TODO Make static once the whole state machine is in job.c */
--void job_state_transition(Job *job, JobStatus s1)
-+static void job_state_transition(Job *job, JobStatus s1)
- {
-     JobStatus s0 = job->status;
-     assert(s1 >= 0 && s1 <= JOB_STATUS__MAX);
-@@ -321,6 +319,7 @@ void *job_create(const char *job_id, const JobDriver *driver, JobTxn *txn,
-     notifier_list_init(&job->on_finalize_cancelled);
-     notifier_list_init(&job->on_finalize_completed);
-     notifier_list_init(&job->on_pending);
-+    notifier_list_init(&job->on_ready);
- 
-     job_state_transition(job, JOB_STATUS_CREATED);
-     aio_timer_init(qemu_get_aio_context(), &job->sleep_timer,
-@@ -380,6 +379,11 @@ static void job_event_pending(Job *job)
-     notifier_list_notify(&job->on_pending, job);
- }
- 
-+static void job_event_ready(Job *job)
++bool job_is_ready(Job *job)
 +{
-+    notifier_list_notify(&job->on_ready, job);
++    switch (job->status) {
++    case JOB_STATUS_UNDEFINED:
++    case JOB_STATUS_CREATED:
++    case JOB_STATUS_RUNNING:
++    case JOB_STATUS_PAUSED:
++    case JOB_STATUS_WAITING:
++    case JOB_STATUS_PENDING:
++    case JOB_STATUS_ABORTING:
++    case JOB_STATUS_CONCLUDED:
++    case JOB_STATUS_NULL:
++        return false;
++    case JOB_STATUS_READY:
++    case JOB_STATUS_STANDBY:
++        return true;
++    default:
++        g_assert_not_reached();
++    }
++    return false;
 +}
 +
- void job_enter_cond(Job *job, bool(*fn)(Job *job))
+ bool job_is_completed(Job *job)
  {
-     if (!job_started(job)) {
-@@ -799,6 +803,12 @@ static int job_transition_to_pending(Job *job)
-     return 0;
- }
+     switch (job->status) {
+diff --git a/qemu-img.c b/qemu-img.c
+index b2bcfc3df1..eecb7d3228 100644
+--- a/qemu-img.c
++++ b/qemu-img.c
+@@ -867,7 +867,7 @@ static void run_block_job(BlockJob *job, Error **errp)
+         aio_poll(aio_context, true);
+         qemu_progress_print(job->len ?
+                             ((float)job->offset / job->len * 100.f) : 0.0f, 0);
+-    } while (!job->ready && !job_is_completed(&job->job));
++    } while (!job_is_ready(&job->job) && !job_is_completed(&job->job));
  
-+void job_transition_to_ready(Job *job)
-+{
-+    job_state_transition(job, JOB_STATUS_READY);
-+    job_event_ready(job);
-+}
-+
- static void job_completed_txn_success(Job *job)
- {
-     JobTxn *txn = job->txn;
-diff --git a/tests/test-bdrv-drain.c b/tests/test-bdrv-drain.c
-index 3600ffd3fb..2cba63b881 100644
---- a/tests/test-bdrv-drain.c
-+++ b/tests/test-bdrv-drain.c
-@@ -505,7 +505,7 @@ static void coroutine_fn test_job_start(void *opaque)
- {
-     TestBlockJob *s = opaque;
- 
--    block_job_event_ready(&s->common);
-+    job_transition_to_ready(&s->common.job);
-     while (!s->should_complete) {
-         job_sleep_ns(&s->common.job, 100000);
-     }
+     if (!job_is_completed(&job->job)) {
+         ret = job_complete_sync(&job->job, errp);
 diff --git a/tests/test-blockjob.c b/tests/test-blockjob.c
-index 8180d03a5f..e408d52351 100644
+index 7131cabb16..8180d03a5f 100644
 --- a/tests/test-blockjob.c
 +++ b/tests/test-blockjob.c
-@@ -186,7 +186,7 @@ static void coroutine_fn cancel_job_start(void *opaque)
+@@ -185,7 +185,7 @@ static void coroutine_fn cancel_job_start(void *opaque)
+             goto defer;
          }
  
-         if (!job_is_ready(&s->common.job) && s->should_converge) {
--            block_job_event_ready(&s->common);
-+            job_transition_to_ready(&s->common.job);
+-        if (!s->common.ready && s->should_converge) {
++        if (!job_is_ready(&s->common.job) && s->should_converge) {
+             block_job_event_ready(&s->common);
          }
  
-         job_sleep_ns(&s->common.job, 100000);
 -- 
 2.13.6
