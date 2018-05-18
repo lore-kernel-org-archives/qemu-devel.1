@@ -1,18 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58529)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58541)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marex@denx.de>) id 1fJkkD-0000sY-NX
-	for qemu-devel@nongnu.org; Fri, 18 May 2018 15:08:50 -0400
+	(envelope-from <marex@denx.de>) id 1fJkkG-0000tD-Ck
+	for qemu-devel@nongnu.org; Fri, 18 May 2018 15:08:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marex@denx.de>) id 1fJkkA-00035s-Gc
-	for qemu-devel@nongnu.org; Fri, 18 May 2018 15:08:49 -0400
-Received: from mail-out.m-online.net ([2001:a60:0:28:0:1:25:1]:40143)
+	(envelope-from <marex@denx.de>) id 1fJkkD-00036z-5U
+	for qemu-devel@nongnu.org; Fri, 18 May 2018 15:08:52 -0400
+Received: from mail-out.m-online.net ([212.18.0.9]:53267)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <marex@denx.de>) id 1fJkkA-000345-9N
-	for qemu-devel@nongnu.org; Fri, 18 May 2018 15:08:46 -0400
+	(Exim 4.71) (envelope-from <marex@denx.de>) id 1fJkkC-00036U-UR
+	for qemu-devel@nongnu.org; Fri, 18 May 2018 15:08:49 -0400
 References: <cover.1526669368.git.julian@codesourcery.com>
 From: Marek Vasut <marex@denx.de>
-Message-ID: <8bf856db-c6ba-eaa9-8240-3d48ce640cb9@denx.de>
-Date: Fri, 18 May 2018 21:08:39 +0200
+Message-ID: <384960e4-8648-2b79-21cd-05c76d8c6158@denx.de>
+Date: Fri, 18 May 2018 21:08:46 +0200
 MIME-Version: 1.0
 In-Reply-To: <cover.1526669368.git.julian@codesourcery.com>
 Content-Type: text/plain; charset=utf-8
@@ -42,7 +42,7 @@ On 05/18/2018 08:57 PM, Julian Brown wrote:
 > 
 > OK, or any comments?
 
-Same problem as with v2, git format-patch + git send-email please.
+Same problem as with v1, git format-patch + git send-email please.
 
 -- 
 Best regards,
