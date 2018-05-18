@@ -1,22 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44299)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44402)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fJjg8-000859-2F
-	for qemu-devel@nongnu.org; Fri, 18 May 2018 14:00:32 -0400
+	(envelope-from <bounces@canonical.com>) id 1fJjgq-0000EM-W0
+	for qemu-devel@nongnu.org; Fri, 18 May 2018 14:01:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fJjg7-0001WR-CE
-	for qemu-devel@nongnu.org; Fri, 18 May 2018 14:00:32 -0400
-References: <20180518132114.4070-1-kwolf@redhat.com>
-	<20180518132114.4070-21-kwolf@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <dd921788-cb74-c646-1edb-123b0359082f@redhat.com>
-Date: Fri, 18 May 2018 13:00:23 -0500
+	(envelope-from <bounces@canonical.com>) id 1fJjgn-0001kJ-3M
+	for qemu-devel@nongnu.org; Fri, 18 May 2018 14:01:17 -0400
+Received: from indium.canonical.com ([91.189.90.7]:54630)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1fJjgm-0001ja-TG
+	for qemu-devel@nongnu.org; Fri, 18 May 2018 14:01:13 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1fJjgl-000489-Ip
+	for <qemu-devel@nongnu.org>; Fri, 18 May 2018 18:01:11 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 8D8A82E804E
+	for <qemu-devel@nongnu.org>; Fri, 18 May 2018 18:01:11 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20180518132114.4070-21-kwolf@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 20/40] job: Move single job finalisation
- to Job
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Fri, 18 May 2018 17:47:36 -0000
+From: Juho Hiltunen <1771570@bugs.launchpad.net>
+Reply-To: Bug 1771570 <1771570@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <152647807950.16381.7444115224433592455.malonedeb@soybean.canonical.com>
+Message-Id: <152666565666.2744.2828126064980578338.malone@gac.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1771570] Re: qemu-aarch64 $program > $file
+ doesn't pipe output to file in 2.12.0
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,42 +37,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
-Cc: mreitz@redhat.com, jsnow@redhat.com, jcody@redhat.com, armbru@redhat.com, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
 
-On 05/18/2018 08:20 AM, Kevin Wolf wrote:
-> This moves the finalisation of a single job from BlockJob to Job.
-> 
-> Some part of this code depends on job transactions, and job transactions
-> call this code, we introduce some temporary calls from Job functions to
-> BlockJob ones. This will be fixed once transactions move to Job, too.
-> 
-> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-> Reviewed-by: Max Reitz <mreitz@redhat.com>
-> ---
+Running "unbuffer qemu-aarch64 $program > $file" allows to pipe the
+output.
 
-> +++ b/job.c
+Is it intentional that I need to disable buffering to allow piping to
+other processes? If yes, this issue can be closed.
 
-> @@ -449,6 +451,100 @@ void job_user_resume(Job *job, Error **errp)
->       job_resume(job);
->   }
->   
-> +void job_do_dismiss(Job *job)
-> +{
-> +    assert(job);
-> +    job->busy = false;
-> +    job->paused = false;
-> +    job->deferred_to_main_loop = true;
-> +
-> +    /* TODO Don't assume it's a BlockJob */
-> +    block_job_txn_del_job((BlockJob*) job);
+further reading about unbuffer:
+https://unix.stackexchange.com/questions/25372/turn-off-buffering-in-
+pipe#25378
 
-checkpatch flagged this for style, but it goes away later in the series. 
-But more than just style, this hard-codes the assumption that BlockJob 
-has a Job member at offset 0.  So would it be better to use 
-container_of() instead of a bare cast, even though it is transient?
+-- =
 
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1771570
+
+Title:
+  qemu-aarch64 $program  > $file doesn't pipe output to file in 2.12.0
+
+Status in QEMU:
+  New
+
+Bug description:
+  Running qemu-aarch64 $program > $file doesn't pipe anything to $file.
+  The file is created but empty.
+
+  qemu-aarch64 --help > $file works, so piping output in my system seems to=
+ work.
+  qemu-x86_64 $program > $file works, too.
+
+  I'm running version 2.12.0 build from source with ./configure && make
+
+  Output of uname -a:
+  Linux zhostname>  4.4.0-101-generic #124-Ubuntu SMP Fri Nov 10 18:29:59 U=
+TC 2017 x86_64 x86_64 x86_64 GNU/Linux
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1771570/+subscriptions
