@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46659)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47075)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1fJZxu-0008KM-Gx
-	for qemu-devel@nongnu.org; Fri, 18 May 2018 03:38:15 -0400
+	(envelope-from <eric.auger@redhat.com>) id 1fJZzQ-0001E0-Js
+	for qemu-devel@nongnu.org; Fri, 18 May 2018 03:39:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1fJZxr-0003kN-EK
-	for qemu-devel@nongnu.org; Fri, 18 May 2018 03:38:14 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:42758 helo=mx1.redhat.com)
+	(envelope-from <eric.auger@redhat.com>) id 1fJZzN-0004Z5-Fy
+	for qemu-devel@nongnu.org; Fri, 18 May 2018 03:39:48 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:52676 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <eric.auger@redhat.com>)
-	id 1fJZxr-0003k6-7X
-	for qemu-devel@nongnu.org; Fri, 18 May 2018 03:38:11 -0400
+	id 1fJZzN-0004Yo-9E
+	for qemu-devel@nongnu.org; Fri, 18 May 2018 03:39:45 -0400
 References: <20180504030811.28111-1-peterx@redhat.com>
-	<20180504030811.28111-5-peterx@redhat.com>
-	<5f5b6f33-12fc-1bd1-a60f-035196270b23@redhat.com>
-	<20180518055307.GD2569@xz-mi>
+	<20180504030811.28111-2-peterx@redhat.com>
+	<010f281a-ba20-3ad9-5842-ae93bfd4b987@redhat.com>
+	<20180518034153.GB2569@xz-mi>
 From: Auger Eric <eric.auger@redhat.com>
-Message-ID: <bebaaf95-ffa0-b2c6-658a-ba7d9f8db7fd@redhat.com>
-Date: Fri, 18 May 2018 09:38:07 +0200
+Message-ID: <941044eb-2f85-3d1d-a9d9-2c257648680e@redhat.com>
+Date: Fri, 18 May 2018 09:39:42 +0200
 MIME-Version: 1.0
-In-Reply-To: <20180518055307.GD2569@xz-mi>
+In-Reply-To: <20180518034153.GB2569@xz-mi>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 04/10] intel-iommu: only do page walk
- for MAP notifiers
+Subject: Re: [Qemu-devel] [PATCH v2 01/10] intel-iommu: send PSI always even
+ if across PDEs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,165 +34,146 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Peter Xu <peterx@redhat.com>
 Cc: qemu-devel@nongnu.org, Tian Kevin <kevin.tian@intel.com>, "Michael S . Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, Alex Williamson <alex.williamson@redhat.com>, Jintack Lim <jintack@cs.columbia.edu>
 
-Hi Peter,
+Hi,
 
-On 05/18/2018 07:53 AM, Peter Xu wrote:
-> On Thu, May 17, 2018 at 03:39:50PM +0200, Auger Eric wrote:
+On 05/18/2018 05:41 AM, Peter Xu wrote:
+> On Thu, May 17, 2018 at 04:42:54PM +0200, Auger Eric wrote:
 >> Hi Peter,
 >>
 >> On 05/04/2018 05:08 AM, Peter Xu wrote:
->>> For UNMAP-only IOMMU notifiers, we don't really need to walk the page
->> s/really// ;-)
-> 
-> Ok.
-> 
->>> tables.  Fasten that procedure by skipping the page table walk.  That
->>> should boost performance for UNMAP-only notifiers like vhost.
+>>> During IOVA page table walking, there is a special case when the PSI
+>>> covers one whole PDE (Page Directory Entry, which contains 512 Page
+>>> Table Entries) or more.  In the past, we skip that entry and we don't
+>>> notify the IOMMU notifiers.  This is not correct.  We should send UNMAP
+>>> notification to registered UNMAP notifiers in this case.
 >>>
+>>> For UNMAP only notifiers, this might cause IOTLBs cached in the devices
+>>> even if they were already invalid.  For MAP/UNMAP notifiers like
+>>> vfio-pci, this will cause stale page mappings.
+>>>
+>>> This special case doesn't trigger often, but it is very easy to be
+>>> triggered by nested device assignments, since in that case we'll
+>>> possibly map the whole L2 guest RAM region into the device's IOVA
+>>> address space (several GBs at least), which is far bigger than normal
+>>> kernel driver usages of the device (tens of MBs normally).
+>>>
+>>> Without this patch applied to L1 QEMU, nested device assignment to L2
+>>> guests will dump some errors like:
+>>>
+>>> qemu-system-x86_64: VFIO_MAP_DMA: -17
+>>> qemu-system-x86_64: vfio_dma_map(0x557305420c30, 0xad000, 0x1000,
+>>>                     0x7f89a920d000) = -17 (File exists)
+>>>
+>>> Acked-by: Jason Wang <jasowang@redhat.com>
+>>> [peterx: rewrite the commit message]
 >>> Signed-off-by: Peter Xu <peterx@redhat.com>
 >>> ---
->>>  include/hw/i386/intel_iommu.h |  2 ++
->>>  hw/i386/intel_iommu.c         | 43 +++++++++++++++++++++++++++++++----
->>>  2 files changed, 40 insertions(+), 5 deletions(-)
+>>>  hw/i386/intel_iommu.c | 42 ++++++++++++++++++++++++++++++------------
+>>>  1 file changed, 30 insertions(+), 12 deletions(-)
 >>>
->>> diff --git a/include/hw/i386/intel_iommu.h b/include/hw/i386/intel_iommu.h
->>> index ee517704e7..9e0a6c1c6a 100644
->>> --- a/include/hw/i386/intel_iommu.h
->>> +++ b/include/hw/i386/intel_iommu.h
->>> @@ -93,6 +93,8 @@ struct VTDAddressSpace {
->>>      IntelIOMMUState *iommu_state;
->>>      VTDContextCacheEntry context_cache_entry;
->>>      QLIST_ENTRY(VTDAddressSpace) next;
->>> +    /* Superset of notifier flags that this address space has */
->>> +    IOMMUNotifierFlag notifier_flags;
->>>  };
->>>  
->>>  struct VTDBus {
 >>> diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
->>> index 112971638d..9a418abfb6 100644
+>>> index fb31de9416..b359efd6f9 100644
 >>> --- a/hw/i386/intel_iommu.c
 >>> +++ b/hw/i386/intel_iommu.c
->>> @@ -138,6 +138,12 @@ static inline void vtd_iommu_unlock(IntelIOMMUState *s)
->>>      qemu_mutex_unlock(&s->iommu_lock);
->>>  }
+>>> @@ -722,6 +722,15 @@ static int vtd_iova_to_slpte(VTDContextEntry *ce, uint64_t iova, bool is_write,
 >>>  
->>> +/* Whether the address space needs to notify new mappings */
->>> +static inline gboolean vtd_as_notify_mappings(VTDAddressSpace *as)
->> would suggest vtd_as_has_map_notifier()? But tastes & colours ;-)
-> 
-> Yeah it is.  But okay, I can switch to that especially it's only used
-> in this patch and it's new.
-> 
->>> +{
->>> +    return as->notifier_flags & IOMMU_NOTIFIER_MAP;
->>> +}
->>> +
->>>  /* GHashTable functions */
->>>  static gboolean vtd_uint64_equal(gconstpointer v1, gconstpointer v2)
->>>  {
->>> @@ -1433,14 +1439,35 @@ static void vtd_iotlb_page_invalidate_notify(IntelIOMMUState *s,
->>>      VTDAddressSpace *vtd_as;
->>>      VTDContextEntry ce;
->>>      int ret;
->>> +    hwaddr size = (1 << am) * VTD_PAGE_SIZE;
+>>>  typedef int (*vtd_page_walk_hook)(IOMMUTLBEntry *entry, void *private);
 >>>  
->>>      QLIST_FOREACH(vtd_as, &(s->notifiers_list), next) {
->>>          ret = vtd_dev_to_context_entry(s, pci_bus_num(vtd_as->bus),
->>>                                         vtd_as->devfn, &ce);
->>>          if (!ret && domain_id == VTD_CONTEXT_ENTRY_DID(ce.hi)) {
->>> -            vtd_page_walk(&ce, addr, addr + (1 << am) * VTD_PAGE_SIZE,
->>> -                          vtd_page_invalidate_notify_hook,
->>> -                          (void *)&vtd_as->iommu, true, s->aw_bits);
->>> +            if (vtd_as_notify_mappings(vtd_as)) {
->>> +                /*
->>> +                 * For MAP-inclusive notifiers, we need to walk the
->>> +                 * page table to sync the shadow page table.
->>> +                 */
->> Potentially we may have several notifiers attached to the IOMMU MR ~
->> vtd_as, each of them having different flags. Those flags are OR'ed in
->> memory_region_update_iommu_notify_flags and this is the one you now
->> store in the vtd_as. So maybe your comment may rather state:
->> as soon as we have at least one MAP notifier, we need to do the PTW?
+>>> +static int vtd_page_walk_one(IOMMUTLBEntry *entry, int level,
+>>> +                             vtd_page_walk_hook hook_fn, void *private)
+>> I find the function  name a bit weird as it does not does a ptw but
+>> rather call a callback on an entry. vtd_callback_wrapper?
 > 
-> Actually this is not 100% clear too, since all the "MAP notifiers" are
-> actually both MAP+UNMAP notifiers...  Maybe:
-
-Can't IOMMU_NOTIFIER_MAP flag value be used without
-IOMMU_NOTIFIER_UNMAP? I don't see such restriction in the
-memory_region_register_iommu_notifier API.
+> It's a hook for the page walk process, and IMHO vtd_callback_wrapper
+> does not really provide any hint for the page walking.  So even if you
+> prefer the "callback_wrapper" naming I would still more prefer:
 > 
->   As long as we have MAP notifications registered in any of our IOMMU
->   notifiers, we need to sync the shadow page table.
+>   vtd_page_walk_callback[_wrapper]
 > 
->>
->> nit: not related to this patch: vtd_page_walk kerneldoc comments misses
->> @notify_unmap param comment
->> side note: the name of the hook is a bit misleading as it suggests we
->> invalidate the entry, whereas we update any valid entry and invalidate
->> stale ones (if notify_unmap=true)?
->>> +                vtd_page_walk(&ce, addr, addr + size,
->>> +                              vtd_page_invalidate_notify_hook,
->>> +                              (void *)&vtd_as->iommu, true, s->aw_bits);
->>> +            } else {
->>> +                /*
->>> +                 * For UNMAP-only notifiers, we don't need to walk the
->>> +                 * page tables.  We just deliver the PSI down to
->>> +                 * invalidate caches.
->>
->> We just unmap the range?
-> 
-> Isn't it the same thing? :)
-> 
-> If to be explicit, here we know we only registered UNMAP
-> notifications, it's not really "unmap", it's really cache
-> invalidations only.
-yes you're right I meant We just invalidate the range in cache. The
-sentence "We just deliver the PSI down to invalidate caches." was not
-crystal clear to me at first reading.
+> though if so I'd say I don't see much benefit comparing to use the old
+> vtd_page_walk_hook, which seems fine to me too...
+I preferred vtd_page_walk_hook too.
 
 Thanks
 
 Eric
 > 
->>> +                 */
->>> +                IOMMUTLBEntry entry = {
->>> +                    .target_as = &address_space_memory,
->>> +                    .iova = addr,
->>> +                    .translated_addr = 0,
->>> +                    .addr_mask = size - 1,
->>> +                    .perm = IOMMU_NONE,
->>> +                };
->>> +                memory_region_notify_iommu(&vtd_as->iommu, entry);
->>> +            }
->>>          }
->>>      }
->>>  }
->>> @@ -2380,6 +2407,9 @@ static void vtd_iommu_notify_flag_changed(IOMMUMemoryRegion *iommu,
->>>          exit(1);
->>>      }
->>>  
->>> +    /* Update per-address-space notifier flags */
->>> +    vtd_as->notifier_flags = new;
+>>> +{
+>>> +    assert(hook_fn);
+>>> +    trace_vtd_page_walk_one(level, entry->iova, entry->translated_addr,
+>>> +                            entry->addr_mask, entry->perm);
+>>> +    return hook_fn(entry, private);
+>>> +}
 >>> +
->>>      if (old == IOMMU_NOTIFIER_NONE) {
->>>          /* Insert new ones */
->>>          QLIST_INSERT_HEAD(&s->notifiers_list, vtd_as, next);
->>> @@ -2890,8 +2920,11 @@ static void vtd_iommu_replay(IOMMUMemoryRegion *iommu_mr, IOMMUNotifier *n)
->>>                                    PCI_FUNC(vtd_as->devfn),
->>>                                    VTD_CONTEXT_ENTRY_DID(ce.hi),
->>>                                    ce.hi, ce.lo);
->>> -        vtd_page_walk(&ce, 0, ~0ULL, vtd_replay_hook, (void *)n, false,
->>> -                      s->aw_bits);
->>> +        if (vtd_as_notify_mappings(vtd_as)) {
->>> +            /* This is required only for MAP typed notifiers */
->>> +            vtd_page_walk(&ce, 0, ~0ULL, vtd_replay_hook, (void *)n, false,
->>> +                          s->aw_bits);
->>> +        }
->>>      } else {
->>>          trace_vtd_replay_ce_invalid(bus_n, PCI_SLOT(vtd_as->devfn),
->>>                                      PCI_FUNC(vtd_as->devfn));
->>>
->> A worthwhile improvement indeed!
+>>>  /**
+>>>   * vtd_page_walk_level - walk over specific level for IOVA range
+>>>   *
+>>> @@ -781,28 +790,37 @@ static int vtd_page_walk_level(dma_addr_t addr, uint64_t start,
+>>>           */
+>>>          entry_valid = read_cur | write_cur;
+>>>  
+>>> +        entry.target_as = &address_space_memory;
+>>> +        entry.iova = iova & subpage_mask;
+>>> +        entry.perm = IOMMU_ACCESS_FLAG(read_cur, write_cur);
+>>> +        entry.addr_mask = ~subpage_mask;
+>>> +
+>>>          if (vtd_is_last_slpte(slpte, level)) {
+>>> -            entry.target_as = &address_space_memory;
+>>> -            entry.iova = iova & subpage_mask;
+>>>              /* NOTE: this is only meaningful if entry_valid == true */
+>>>              entry.translated_addr = vtd_get_slpte_addr(slpte, aw);
+>>> -            entry.addr_mask = ~subpage_mask;
+>>> -            entry.perm = IOMMU_ACCESS_FLAG(read_cur, write_cur);
+>>>              if (!entry_valid && !notify_unmap) {
+>>>                  trace_vtd_page_walk_skip_perm(iova, iova_next);
+>>>                  goto next;
+>>>              }
+>>> -            trace_vtd_page_walk_one(level, entry.iova, entry.translated_addr,
+>>> -                                    entry.addr_mask, entry.perm);
+>>> -            if (hook_fn) {
+>>> -                ret = hook_fn(&entry, private);
+>>> -                if (ret < 0) {
+>>> -                    return ret;
+>>> -                }
+>>> +            ret = vtd_page_walk_one(&entry, level, hook_fn, private);
+>>> +            if (ret < 0) {
+>>> +                return ret;
+>>>              }
+>>>          } else {
+>>>              if (!entry_valid) {
+>>> -                trace_vtd_page_walk_skip_perm(iova, iova_next);
+>>> +                if (notify_unmap) {
+>>> +                    /*
+>>> +                     * The whole entry is invalid; unmap it all.
+>>> +                     * Translated address is meaningless, zero it.
+>>> +                     */
+>>> +                    entry.translated_addr = 0x0;
+>> do you really need to zero the translated_addr and the related comment.
+>> As soon as perm is NONE this should not be used?
 > 
-> I hope so. :) Thanks,
+> Yes here we can avoid setting it.  However that'll make sure we don't
+> leak strange numbers to the below notifiers, so I would still slightly
+> prefer to zero it here.
+> 
+>>> +                    ret = vtd_page_walk_one(&entry, level, hook_fn, private);
+>>> +                    if (ret < 0) {
+>>> +                        return ret;
+>>> +                    }
+>>> +                } else {
+>>> +                    trace_vtd_page_walk_skip_perm(iova, iova_next);
+>>> +                }
+>>>                  goto next;
+>>>              }
+>>>              ret = vtd_page_walk_level(vtd_get_slpte_addr(slpte, aw), iova,
+>>>
+>>
+>> Besides
+>> Reviewed-by: Eric Auger <eric.auger@redhat.com>
+> 
+> Thanks for reviewing the series.
+> 
+> Note that this v2 is obsolete, please feel free to read version 3 of
+> this series, which contains quite a lot of functional changes.
+> 
+> Regards,
 > 
