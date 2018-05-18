@@ -1,26 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45501)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45612)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fJeJA-0004IW-CW
-	for qemu-devel@nongnu.org; Fri, 18 May 2018 08:16:29 -0400
+	(envelope-from <groug@kaod.org>) id 1fJeJa-0004TR-LY
+	for qemu-devel@nongnu.org; Fri, 18 May 2018 08:16:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fJeJ9-0006uA-GB
-	for qemu-devel@nongnu.org; Fri, 18 May 2018 08:16:28 -0400
-Received: from mail-oi0-x231.google.com ([2607:f8b0:4003:c06::231]:35361)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fJeJ9-0006tl-9w
-	for qemu-devel@nongnu.org; Fri, 18 May 2018 08:16:27 -0400
-Received: by mail-oi0-x231.google.com with SMTP id a6-v6so6904667oia.2
-	for <qemu-devel@nongnu.org>; Fri, 18 May 2018 05:16:27 -0700 (PDT)
+	(envelope-from <groug@kaod.org>) id 1fJeJX-00079L-HM
+	for qemu-devel@nongnu.org; Fri, 18 May 2018 08:16:54 -0400
+Received: from 4.mo2.mail-out.ovh.net ([87.98.172.75]:59638)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1fJeJX-00078Y-AC
+	for qemu-devel@nongnu.org; Fri, 18 May 2018 08:16:51 -0400
+Received: from player158.ha.ovh.net (unknown [10.109.122.80])
+	by mo2.mail-out.ovh.net (Postfix) with ESMTP id B806C134F52
+	for <qemu-devel@nongnu.org>; Fri, 18 May 2018 14:16:49 +0200 (CEST)
+Date: Fri, 18 May 2018 14:16:42 +0200
+From: Greg Kurz <groug@kaod.org>
+Message-ID: <20180518141642.6ad639ac@bahia.lan>
+In-Reply-To: <e9333edf-fa2a-6ad8-412b-459b0b8002e9@xenosoft.de>
+References: <4521b265-855f-7f06-ffff-3fa394380922@xenosoft.de>
+	<b3243bab-58b6-0b43-67b5-94a2f90d9199@tuxfamily.org>
+	<5BD35D0B-E490-4693-8858-E11B7401709F@xenosoft.de>
+	<1821476d-7724-ad71-eb3f-69c731633582@tuxfamily.org>
+	<886dc490-c96a-ad5a-e1f7-8e41a686a53e@xenosoft.de>
+	<20180518131303.6f0778eb@bahia.lan>
+	<e9333edf-fa2a-6ad8-412b-459b0b8002e9@xenosoft.de>
 MIME-Version: 1.0
-In-Reply-To: <20180516223007.10256-1-richard.henderson@linaro.org>
-References: <20180516223007.10256-1-richard.henderson@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 18 May 2018 13:16:06 +0100
-Message-ID: <CAFEAcA9p2WAsb7xiC9Y65EZYWzOrG11P_hKTx5BBPQAnd1xgcQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v3-a 00/27] target/arm: Scalable Vector
- Extension
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PPC64] P5020DS: Booting from img possible
+ (-drive)?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,26 +36,18 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>
+To: Christian Zigotzky <chzigotzky@xenosoft.de>
+Cc: Thomas Huth <huth@tuxfamily.org>, qemu-devel@nongnu.org, "kvm-ppc@vger.kernel.org" <kvm-ppc@vger.kernel.org>, Alexander Graf <agraf@suse.de>, qemu-ppc@nongnu.org
 
-On 16 May 2018 at 23:29, Richard Henderson <richard.henderson@linaro.org> wrote:
-> This is the first third, more or less, of my current patch set.
-> I'm sending only this portion now, rather than another monster
-> set all at once.
->
-> The major change is to move the call to sve_access_check inside
-> any final decode reject that might be required.  There are other
-> minor cleanups to patch integrity and comments.
->
-> The changes are mostly trivial from the February v2 patch set,
-> so if an R-b was given, I have retained it.
->
-> That leaves 4, 7, 8, and 26 (new) as unreviewed.
->
-> The patch that enables SVE for aarch64-linux-user is not present.
+On Fri, 18 May 2018 13:50:42 +0200
+Christian Zigotzky <chzigotzky@xenosoft.de> wrote:
 
-I've applied 1-25 to target-arm.next.
+> On 18 May 2018 at 1:13PM, Greg Kurz wrote:
+> > And of course your kernel should be built with virtio support.
+> I think I have enabled virtio support. Please find attached my kernel 
+> config.
+> 
 
-thanks
--- PMM
+Indeed, what about passing root=/dev/vda3 to the kernel ?
+
+> -- Christian
