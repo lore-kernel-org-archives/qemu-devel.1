@@ -1,28 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35912)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35958)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1fJj3B-0000ZZ-98
-	for qemu-devel@nongnu.org; Fri, 18 May 2018 13:20:18 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1fJj3D-0000c7-QF
+	for qemu-devel@nongnu.org; Fri, 18 May 2018 13:20:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1fJj3A-0007Rr-GI
-	for qemu-devel@nongnu.org; Fri, 18 May 2018 13:20:17 -0400
-Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:41780)
+	(envelope-from <pm215@archaic.org.uk>) id 1fJj3C-0007T0-BE
+	for qemu-devel@nongnu.org; Fri, 18 May 2018 13:20:19 -0400
+Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:41784)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1fJj3A-0007Oi-AJ
-	for qemu-devel@nongnu.org; Fri, 18 May 2018 13:20:16 -0400
+	id 1fJj3C-0007Rj-1Q
+	for qemu-devel@nongnu.org; Fri, 18 May 2018 13:20:18 -0400
 Received: from pm215 by orth.archaic.org.uk with local (Exim 4.89)
-	(envelope-from <pm215@archaic.org.uk>) id 1fJj39-0004mI-BC
-	for qemu-devel@nongnu.org; Fri, 18 May 2018 18:20:15 +0100
+	(envelope-from <pm215@archaic.org.uk>) id 1fJj3A-0004ne-Lr
+	for qemu-devel@nongnu.org; Fri, 18 May 2018 18:20:16 +0100
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 18 May 2018 18:19:44 +0100
-Message-Id: <20180518172009.14416-8-peter.maydell@linaro.org>
+Date: Fri, 18 May 2018 18:19:46 +0100
+Message-Id: <20180518172009.14416-10-peter.maydell@linaro.org>
 In-Reply-To: <20180518172009.14416-1-peter.maydell@linaro.org>
 References: <20180518172009.14416-1-peter.maydell@linaro.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 07/32] hw/arm/smmu-common: Fix coverity issue in
- get_block_pte_address
+Subject: [Qemu-devel] [PULL 09/32] target/arm: Add SVE decode skeleton
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,38 +29,191 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-From: Eric Auger <eric.auger@redhat.com>
+From: Richard Henderson <richard.henderson@linaro.org>
 
-Coverity points out that this can overflow if n > 31,
-because it's only doing 32-bit arithmetic. Let's use 1ULL instead
-of 1. Also the formulae used to compute n can be replaced by
-the level_shift() macro.
+Including only 4, as-yet unimplemented, instruction patterns
+so that the whole thing compiles.
 
-Reported-by: Peter Maydell <peter.maydell@linaro.org>
-Signed-off-by: Eric Auger <eric.auger@redhat.com>
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Message-id: 1526493784-25328-3-git-send-email-eric.auger@redhat.com
 Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+Message-id: 20180516223007.10256-3-richard.henderson@linaro.org
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- hw/arm/smmu-common.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ target/arm/Makefile.objs   | 10 ++++++
+ target/arm/translate-a64.c |  7 ++++-
+ target/arm/translate-sve.c | 63 ++++++++++++++++++++++++++++++++++++++
+ .gitignore                 |  1 +
+ target/arm/sve.decode      | 45 +++++++++++++++++++++++++++
+ 5 files changed, 125 insertions(+), 1 deletion(-)
+ create mode 100644 target/arm/translate-sve.c
+ create mode 100644 target/arm/sve.decode
 
-diff --git a/hw/arm/smmu-common.c b/hw/arm/smmu-common.c
-index 01c7be82b6..3c5f7245b5 100644
---- a/hw/arm/smmu-common.c
-+++ b/hw/arm/smmu-common.c
-@@ -83,9 +83,9 @@ static inline hwaddr get_table_pte_address(uint64_t pte, int granule_sz)
- static inline hwaddr get_block_pte_address(uint64_t pte, int level,
-                                            int granule_sz, uint64_t *bsz)
- {
--    int n = (granule_sz - 3) * (4 - level) + 3;
-+    int n = level_shift(level, granule_sz);
+diff --git a/target/arm/Makefile.objs b/target/arm/Makefile.objs
+index 1297bead5f..a6f733eaa8 100644
+--- a/target/arm/Makefile.objs
++++ b/target/arm/Makefile.objs
+@@ -10,3 +10,13 @@ obj-y += gdbstub.o
+ obj-$(TARGET_AARCH64) += cpu64.o translate-a64.o helper-a64.o gdbstub64.o
+ obj-y += crypto_helper.o
+ obj-$(CONFIG_SOFTMMU) += arm-powerctl.o
++
++DECODETREE = $(SRC_PATH)/scripts/decodetree.py
++
++target/arm/decode-sve.inc.c: $(SRC_PATH)/target/arm/sve.decode $(DECODETREE)
++	$(call quiet-command,\
++	  $(PYTHON) $(DECODETREE) --decode disas_sve -o $@ $<,\
++	  "GEN", $(TARGET_DIR)$@)
++
++target/arm/translate-sve.o: target/arm/decode-sve.inc.c
++obj-$(TARGET_AARCH64) += translate-sve.o
+diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
+index 74ef756ad5..b32332ce2c 100644
+--- a/target/arm/translate-a64.c
++++ b/target/arm/translate-a64.c
+@@ -13676,9 +13676,14 @@ static void disas_a64_insn(CPUARMState *env, DisasContext *s)
+     s->fp_access_checked = false;
  
--    *bsz = 1 << n;
-+    *bsz = 1ULL << n;
-     return PTE_ADDRESS(pte, n);
- }
- 
+     switch (extract32(insn, 25, 4)) {
+-    case 0x0: case 0x1: case 0x2: case 0x3: /* UNALLOCATED */
++    case 0x0: case 0x1: case 0x3: /* UNALLOCATED */
+         unallocated_encoding(s);
+         break;
++    case 0x2:
++        if (!arm_dc_feature(s, ARM_FEATURE_SVE) || !disas_sve(s, insn)) {
++            unallocated_encoding(s);
++        }
++        break;
+     case 0x8: case 0x9: /* Data processing - immediate */
+         disas_data_proc_imm(s, insn);
+         break;
+diff --git a/target/arm/translate-sve.c b/target/arm/translate-sve.c
+new file mode 100644
+index 0000000000..d323bd0b67
+--- /dev/null
++++ b/target/arm/translate-sve.c
+@@ -0,0 +1,63 @@
++/*
++ * AArch64 SVE translation
++ *
++ * Copyright (c) 2018 Linaro, Ltd
++ *
++ * This library is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU Lesser General Public
++ * License as published by the Free Software Foundation; either
++ * version 2 of the License, or (at your option) any later version.
++ *
++ * This library is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ * Lesser General Public License for more details.
++ *
++ * You should have received a copy of the GNU Lesser General Public
++ * License along with this library; if not, see <http://www.gnu.org/licenses/>.
++ */
++
++#include "qemu/osdep.h"
++#include "cpu.h"
++#include "exec/exec-all.h"
++#include "tcg-op.h"
++#include "tcg-op-gvec.h"
++#include "qemu/log.h"
++#include "arm_ldst.h"
++#include "translate.h"
++#include "internals.h"
++#include "exec/helper-proto.h"
++#include "exec/helper-gen.h"
++#include "exec/log.h"
++#include "trace-tcg.h"
++#include "translate-a64.h"
++
++/*
++ * Include the generated decoder.
++ */
++
++#include "decode-sve.inc.c"
++
++/*
++ * Implement all of the translator functions referenced by the decoder.
++ */
++
++static bool trans_AND_zzz(DisasContext *s, arg_AND_zzz *a, uint32_t insn)
++{
++    return false;
++}
++
++static bool trans_ORR_zzz(DisasContext *s, arg_ORR_zzz *a, uint32_t insn)
++{
++    return false;
++}
++
++static bool trans_EOR_zzz(DisasContext *s, arg_EOR_zzz *a, uint32_t insn)
++{
++    return false;
++}
++
++static bool trans_BIC_zzz(DisasContext *s, arg_BIC_zzz *a, uint32_t insn)
++{
++    return false;
++}
+diff --git a/.gitignore b/.gitignore
+index 4055e12ee8..81e1f2fb0f 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -206,3 +206,4 @@ trace-dtrace-root.h
+ trace-dtrace-root.dtrace
+ trace-ust-all.h
+ trace-ust-all.c
++/target/arm/decode-sve.inc.c
+diff --git a/target/arm/sve.decode b/target/arm/sve.decode
+new file mode 100644
+index 0000000000..48dac9f71f
+--- /dev/null
++++ b/target/arm/sve.decode
+@@ -0,0 +1,45 @@
++# AArch64 SVE instruction descriptions
++#
++#  Copyright (c) 2017 Linaro, Ltd
++#
++# This library is free software; you can redistribute it and/or
++# modify it under the terms of the GNU Lesser General Public
++# License as published by the Free Software Foundation; either
++# version 2 of the License, or (at your option) any later version.
++#
++# This library is distributed in the hope that it will be useful,
++# but WITHOUT ANY WARRANTY; without even the implied warranty of
++# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++# Lesser General Public License for more details.
++#
++# You should have received a copy of the GNU Lesser General Public
++# License along with this library; if not, see <http://www.gnu.org/licenses/>.
++
++#
++# This file is processed by scripts/decodetree.py
++#
++
++###########################################################################
++# Named attribute sets.  These are used to make nice(er) names
++# when creating helpers common to those for the individual
++# instruction patterns.
++
++&rrr_esz        rd rn rm esz
++
++###########################################################################
++# Named instruction formats.  These are generally used to
++# reduce the amount of duplication between instruction patterns.
++
++# Three operand with unused vector element size
++@rd_rn_rm_e0    ........ ... rm:5 ... ... rn:5 rd:5             &rrr_esz esz=0
++
++###########################################################################
++# Instruction patterns.  Grouped according to the SVE encodingindex.xhtml.
++
++### SVE Logical - Unpredicated Group
++
++# SVE bitwise logical operations (unpredicated)
++AND_zzz         00000100 00 1 ..... 001 100 ..... .....         @rd_rn_rm_e0
++ORR_zzz         00000100 01 1 ..... 001 100 ..... .....         @rd_rn_rm_e0
++EOR_zzz         00000100 10 1 ..... 001 100 ..... .....         @rd_rn_rm_e0
++BIC_zzz         00000100 11 1 ..... 001 100 ..... .....         @rd_rn_rm_e0
 -- 
 2.17.0
