@@ -1,17 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59274)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59330)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fJfKC-0007tA-R3
-	for qemu-devel@nongnu.org; Fri, 18 May 2018 09:21:39 -0400
+	(envelope-from <kwolf@redhat.com>) id 1fJfKF-0007yp-Ly
+	for qemu-devel@nongnu.org; Fri, 18 May 2018 09:21:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fJfK8-0005l6-Ru
-	for qemu-devel@nongnu.org; Fri, 18 May 2018 09:21:36 -0400
+	(envelope-from <kwolf@redhat.com>) id 1fJfKE-0005pY-Bt
+	for qemu-devel@nongnu.org; Fri, 18 May 2018 09:21:39 -0400
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Fri, 18 May 2018 15:20:37 +0200
-Message-Id: <20180518132114.4070-4-kwolf@redhat.com>
+Date: Fri, 18 May 2018 15:20:41 +0200
+Message-Id: <20180518132114.4070-8-kwolf@redhat.com>
 In-Reply-To: <20180518132114.4070-1-kwolf@redhat.com>
 References: <20180518132114.4070-1-kwolf@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 03/40] job: Create Job,
- JobDriver and job_create()
+Subject: [Qemu-devel] [PATCH v2 07/40] job: Maintain a list of all jobs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,556 +22,247 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, mreitz@redhat.com, jsnow@redhat.com, eblake@redhat.com, jcody@redhat.com, armbru@redhat.com, qemu-devel@nongnu.org
 
-This is the first step towards creating an infrastructure for generic
-background jobs that aren't tied to a block device. For now, Job only
-stores its ID and JobDriver, the rest stays in BlockJob.
-
-The following patches will move over more parts of BlockJob to Job if
-they are meaningful outside the context of a block job.
-
-BlockJob.driver is now redundant, but this patch leaves it around to
-avoid unnecessary churn. The next patches will get rid of almost all of
-its uses anyway so that it can be removed later with much less churn.
+This moves the job list from BlockJob to Job. Now we can check for
+duplicate IDs in job_create().
 
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 Reviewed-by: Max Reitz <mreitz@redhat.com>
 Reviewed-by: John Snow <jsnow@redhat.com>
 ---
- include/block/blockjob.h     |  9 +++----
- include/block/blockjob_int.h |  4 +--
- include/qemu/job.h           | 60 ++++++++++++++++++++++++++++++++++++++++++++
- block/backup.c               |  4 ++-
- block/commit.c               |  4 ++-
- block/mirror.c               | 10 +++++---
- block/stream.c               |  4 ++-
- blockjob.c                   | 46 ++++++++++++++++-----------------
- job.c                        | 48 +++++++++++++++++++++++++++++++++++
- tests/test-bdrv-drain.c      |  4 ++-
- tests/test-blockjob-txn.c    |  4 ++-
- tests/test-blockjob.c        | 12 ++++++---
- MAINTAINERS                  |  2 ++
- Makefile.objs                |  2 +-
- 14 files changed, 169 insertions(+), 44 deletions(-)
- create mode 100644 include/qemu/job.h
- create mode 100644 job.c
+ include/block/blockjob.h |  3 ---
+ include/qemu/job.h       | 19 +++++++++++++++++++
+ blockjob.c               | 46 ++++++++++++++++++++++++----------------------
+ job.c                    | 31 +++++++++++++++++++++++++++++++
+ 4 files changed, 74 insertions(+), 25 deletions(-)
 
 diff --git a/include/block/blockjob.h b/include/block/blockjob.h
-index 0f56f723de..640e649034 100644
+index 640e649034..10bd9f7059 100644
 --- a/include/block/blockjob.h
 +++ b/include/block/blockjob.h
-@@ -26,6 +26,7 @@
- #ifndef BLOCKJOB_H
- #define BLOCKJOB_H
- 
-+#include "qemu/job.h"
- #include "block/block.h"
- #include "qemu/ratelimit.h"
- 
-@@ -40,6 +41,9 @@ typedef struct BlockJobTxn BlockJobTxn;
-  * Long-running operation on a BlockDriverState.
-  */
- typedef struct BlockJob {
-+    /** Data belonging to the generic Job infrastructure */
-+    Job job;
-+
-     /** The job type, including the job vtable.  */
-     const BlockJobDriver *driver;
- 
-@@ -47,11 +51,6 @@ typedef struct BlockJob {
-     BlockBackend *blk;
- 
-     /**
--     * The ID of the block job. May be NULL for internal jobs.
--     */
--    char *id;
--
--    /**
-      * The coroutine that executes the job.  If not NULL, it is
-      * reentered when busy is false and the job is cancelled.
+@@ -105,9 +105,6 @@ typedef struct BlockJob {
       */
-diff --git a/include/block/blockjob_int.h b/include/block/blockjob_int.h
-index 62ec964d09..e8eca44747 100644
---- a/include/block/blockjob_int.h
-+++ b/include/block/blockjob_int.h
-@@ -35,8 +35,8 @@
-  * A class type for block job driver.
-  */
- struct BlockJobDriver {
--    /** Derived BlockJob struct size */
--    size_t instance_size;
-+    /** Generic JobDriver callbacks and settings */
-+    JobDriver job_driver;
+     bool deferred_to_main_loop;
  
-     /** String describing the operation, part of query-block-jobs QMP API */
-     BlockJobType job_type;
+-    /** Element of the list of block jobs */
+-    QLIST_ENTRY(BlockJob) job_list;
+-
+     /** Status that is published by the query-block-jobs QMP API */
+     BlockDeviceIoStatus iostatus;
+ 
 diff --git a/include/qemu/job.h b/include/qemu/job.h
-new file mode 100644
-index 0000000000..b4b49f19e1
---- /dev/null
+index 43dc2e4a7d..bae2b0920c 100644
+--- a/include/qemu/job.h
 +++ b/include/qemu/job.h
-@@ -0,0 +1,60 @@
-+/*
-+ * Declarations for background jobs
+@@ -27,6 +27,7 @@
+ #define JOB_H
+ 
+ #include "qapi/qapi-types-block-core.h"
++#include "qemu/queue.h"
+ 
+ typedef struct JobDriver JobDriver;
+ 
+@@ -39,6 +40,9 @@ typedef struct Job {
+ 
+     /** The type of this job. */
+     const JobDriver *driver;
++
++    /** Element of the list of jobs */
++    QLIST_ENTRY(Job) job_list;
+ } Job;
+ 
+ /**
+@@ -71,4 +75,19 @@ JobType job_type(const Job *job);
+ /** Returns the enum string for the JobType of a given Job. */
+ const char *job_type_str(const Job *job);
+ 
++/**
++ * Get the next element from the list of block jobs after @job, or the
++ * first one if @job is %NULL.
 + *
-+ * Copyright (c) 2011 IBM Corp.
-+ * Copyright (c) 2012, 2018 Red Hat, Inc.
-+ *
-+ * Permission is hereby granted, free of charge, to any person obtaining a copy
-+ * of this software and associated documentation files (the "Software"), to deal
-+ * in the Software without restriction, including without limitation the rights
-+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-+ * copies of the Software, and to permit persons to whom the Software is
-+ * furnished to do so, subject to the following conditions:
-+ *
-+ * The above copyright notice and this permission notice shall be included in
-+ * all copies or substantial portions of the Software.
-+ *
-+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
-+ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-+ * THE SOFTWARE.
++ * Returns the requested job, or %NULL if there are no more jobs left.
 + */
-+
-+#ifndef JOB_H
-+#define JOB_H
-+
-+typedef struct JobDriver JobDriver;
++Job *job_next(Job *job);
 +
 +/**
-+ * Long-running operation.
-+ */
-+typedef struct Job {
-+    /** The ID of the job. May be NULL for internal jobs. */
-+    char *id;
-+
-+    /** The type of this job. */
-+    const JobDriver *driver;
-+} Job;
-+
-+/**
-+ * Callbacks and other information about a Job driver.
-+ */
-+struct JobDriver {
-+    /** Derived Job struct size */
-+    size_t instance_size;
-+};
-+
-+
-+/**
-+ * Create a new long-running job and return it.
++ * Get the job identified by @id (which must not be %NULL).
 + *
-+ * @job_id: The id of the newly-created job, or %NULL for internal jobs
-+ * @driver: The class object for the newly-created job.
-+ * @errp: Error object.
++ * Returns the requested job, or %NULL if it doesn't exist.
 + */
-+void *job_create(const char *job_id, const JobDriver *driver, Error **errp);
++Job *job_get(const char *id);
 +
-+#endif
-diff --git a/block/backup.c b/block/backup.c
-index e14d99560d..9e672bbd5e 100644
---- a/block/backup.c
-+++ b/block/backup.c
-@@ -523,7 +523,9 @@ static void coroutine_fn backup_run(void *opaque)
- }
- 
- static const BlockJobDriver backup_job_driver = {
--    .instance_size          = sizeof(BackupBlockJob),
-+    .job_driver = {
-+        .instance_size          = sizeof(BackupBlockJob),
-+    },
-     .job_type               = BLOCK_JOB_TYPE_BACKUP,
-     .start                  = backup_run,
-     .commit                 = backup_commit,
-diff --git a/block/commit.c b/block/commit.c
-index ba5df6aa0a..18cbb2f9c4 100644
---- a/block/commit.c
-+++ b/block/commit.c
-@@ -215,7 +215,9 @@ out:
- }
- 
- static const BlockJobDriver commit_job_driver = {
--    .instance_size = sizeof(CommitBlockJob),
-+    .job_driver = {
-+        .instance_size = sizeof(CommitBlockJob),
-+    },
-     .job_type      = BLOCK_JOB_TYPE_COMMIT,
-     .start         = commit_run,
- };
-diff --git a/block/mirror.c b/block/mirror.c
-index a4197bb975..aa1d6b742e 100644
---- a/block/mirror.c
-+++ b/block/mirror.c
-@@ -913,7 +913,7 @@ static void mirror_complete(BlockJob *job, Error **errp)
- 
-     if (!s->synced) {
-         error_setg(errp, "The active block job '%s' cannot be completed",
--                   job->id);
-+                   job->job.id);
-         return;
-     }
- 
-@@ -986,7 +986,9 @@ static void mirror_drain(BlockJob *job)
- }
- 
- static const BlockJobDriver mirror_job_driver = {
--    .instance_size          = sizeof(MirrorBlockJob),
-+    .job_driver = {
-+        .instance_size          = sizeof(MirrorBlockJob),
-+    },
-     .job_type               = BLOCK_JOB_TYPE_MIRROR,
-     .start                  = mirror_run,
-     .complete               = mirror_complete,
-@@ -996,7 +998,9 @@ static const BlockJobDriver mirror_job_driver = {
- };
- 
- static const BlockJobDriver commit_active_job_driver = {
--    .instance_size          = sizeof(MirrorBlockJob),
-+    .job_driver = {
-+        .instance_size          = sizeof(MirrorBlockJob),
-+    },
-     .job_type               = BLOCK_JOB_TYPE_COMMIT,
-     .start                  = mirror_run,
-     .complete               = mirror_complete,
-diff --git a/block/stream.c b/block/stream.c
-index df9660d2fc..f88fc75141 100644
---- a/block/stream.c
-+++ b/block/stream.c
-@@ -209,7 +209,9 @@ out:
- }
- 
- static const BlockJobDriver stream_job_driver = {
--    .instance_size = sizeof(StreamBlockJob),
-+    .job_driver = {
-+        .instance_size = sizeof(StreamBlockJob),
-+    },
-     .job_type      = BLOCK_JOB_TYPE_STREAM,
-     .start         = stream_run,
- };
+ #endif
 diff --git a/blockjob.c b/blockjob.c
-index 112672a68b..1464856eb5 100644
+index 430a67ba63..c69b2e7cf5 100644
 --- a/blockjob.c
 +++ b/blockjob.c
-@@ -34,7 +34,6 @@
- #include "qapi/qapi-events-block-core.h"
- #include "qapi/qmp/qerror.h"
- #include "qemu/coroutine.h"
--#include "qemu/id.h"
- #include "qemu/timer.h"
+@@ -129,8 +129,6 @@ struct BlockJobTxn {
+     int refcnt;
+ };
  
- /* Right now, this mutex is only needed to synchronize accesses to job->busy
-@@ -92,7 +91,8 @@ static int block_job_apply_verb(BlockJob *job, BlockJobVerb bv, Error **errp)
-         return 0;
-     }
-     error_setg(errp, "Job '%s' in state '%s' cannot accept command verb '%s'",
--               job->id, BlockJobStatus_str(job->status), BlockJobVerb_str(bv));
-+               job->job.id, BlockJobStatus_str(job->status),
-+               BlockJobVerb_str(bv));
-     return -EPERM;
+-static QLIST_HEAD(, BlockJob) block_jobs = QLIST_HEAD_INITIALIZER(block_jobs);
+-
+ /*
+  * The block job API is composed of two categories of functions.
+  *
+@@ -146,25 +144,34 @@ static QLIST_HEAD(, BlockJob) block_jobs = QLIST_HEAD_INITIALIZER(block_jobs);
+  * blockjob_int.h.
+  */
+ 
+-BlockJob *block_job_next(BlockJob *job)
++static bool is_block_job(Job *job)
+ {
+-    if (!job) {
+-        return QLIST_FIRST(&block_jobs);
+-    }
+-    return QLIST_NEXT(job, job_list);
++    return job_type(job) == JOB_TYPE_BACKUP ||
++           job_type(job) == JOB_TYPE_COMMIT ||
++           job_type(job) == JOB_TYPE_MIRROR ||
++           job_type(job) == JOB_TYPE_STREAM;
++}
++
++BlockJob *block_job_next(BlockJob *bjob)
++{
++    Job *job = bjob ? &bjob->job : NULL;
++
++    do {
++        job = job_next(job);
++    } while (job && !is_block_job(job));
++
++    return job ? container_of(job, BlockJob, job) : NULL;
  }
  
-@@ -159,7 +159,7 @@ BlockJob *block_job_get(const char *id)
+ BlockJob *block_job_get(const char *id)
+ {
+-    BlockJob *job;
++    Job *job = job_get(id);
+ 
+-    QLIST_FOREACH(job, &block_jobs, job_list) {
+-        if (job->job.id && !strcmp(id, job->job.id)) {
+-            return job;
+-        }
++    if (job && is_block_job(job)) {
++        return container_of(job, BlockJob, job);
++    } else {
++        return NULL;
+     }
+-
+-    return NULL;
+ }
+ 
+ BlockJobTxn *block_job_txn_new(void)
+@@ -253,7 +260,6 @@ void block_job_unref(BlockJob *job)
+         assert(job->status == BLOCK_JOB_STATUS_NULL);
+         assert(!job->txn);
+         BlockDriverState *bs = blk_bs(job->blk);
+-        QLIST_REMOVE(job, job_list);
+         bs->job = NULL;
+         block_job_remove_all_bdrv(job);
+         blk_remove_aio_context_notifier(job->blk,
+@@ -812,7 +818,7 @@ void block_job_cancel_sync_all(void)
      BlockJob *job;
+     AioContext *aio_context;
  
-     QLIST_FOREACH(job, &block_jobs, job_list) {
--        if (job->id && !strcmp(id, job->id)) {
-+        if (job->job.id && !strcmp(id, job->job.id)) {
-             return job;
-         }
-     }
-@@ -261,7 +261,7 @@ void block_job_unref(BlockJob *job)
-                                         block_job_detach_aio_context, job);
-         blk_unref(job->blk);
-         error_free(job->blocker);
--        g_free(job->id);
-+        g_free(job->job.id);
-         assert(!timer_pending(&job->sleep_timer));
-         g_free(job);
-     }
-@@ -311,7 +311,7 @@ static char *child_job_get_parent_desc(BdrvChild *c)
-     BlockJob *job = c->opaque;
-     return g_strdup_printf("%s job '%s'",
-                            BlockJobType_str(job->driver->job_type),
--                           job->id);
-+                           job->job.id);
- }
- 
- static void child_job_drained_begin(BdrvChild *c)
-@@ -365,7 +365,7 @@ int block_job_add_bdrv(BlockJob *job, const char *name, BlockDriverState *bs,
- 
- bool block_job_is_internal(BlockJob *job)
- {
--    return (job->id == NULL);
-+    return (job->job.id == NULL);
- }
- 
- static bool block_job_started(BlockJob *job)
-@@ -705,13 +705,13 @@ int64_t block_job_ratelimit_get_delay(BlockJob *job, uint64_t n)
- void block_job_complete(BlockJob *job, Error **errp)
- {
-     /* Should not be reachable via external interface for internal jobs */
--    assert(job->id);
-+    assert(job->job.id);
-     if (block_job_apply_verb(job, BLOCK_JOB_VERB_COMPLETE, errp)) {
-         return;
-     }
-     if (job->pause_count || job->cancelled || !job->driver->complete) {
-         error_setg(errp, "The active block job '%s' cannot be completed",
--                   job->id);
-+                   job->job.id);
-         return;
-     }
- 
-@@ -720,7 +720,7 @@ void block_job_complete(BlockJob *job, Error **errp)
- 
- void block_job_finalize(BlockJob *job, Error **errp)
- {
--    assert(job && job->id);
-+    assert(job && job->job.id);
-     if (block_job_apply_verb(job, BLOCK_JOB_VERB_FINALIZE, errp)) {
-         return;
-     }
-@@ -731,7 +731,7 @@ void block_job_dismiss(BlockJob **jobptr, Error **errp)
- {
-     BlockJob *job = *jobptr;
-     /* similarly to _complete, this is QMP-interface only. */
--    assert(job->id);
-+    assert(job->job.id);
-     if (block_job_apply_verb(job, BLOCK_JOB_VERB_DISMISS, errp)) {
-         return;
-     }
-@@ -848,7 +848,7 @@ BlockJobInfo *block_job_query(BlockJob *job, Error **errp)
-     }
-     info = g_new0(BlockJobInfo, 1);
-     info->type      = g_strdup(BlockJobType_str(job->driver->job_type));
--    info->device    = g_strdup(job->id);
-+    info->device    = g_strdup(job->job.id);
-     info->len       = job->len;
-     info->busy      = atomic_read(&job->busy);
-     info->paused    = job->pause_count > 0;
-@@ -879,7 +879,7 @@ static void block_job_event_cancelled(BlockJob *job)
-     }
- 
-     qapi_event_send_block_job_cancelled(job->driver->job_type,
--                                        job->id,
-+                                        job->job.id,
-                                         job->len,
-                                         job->offset,
-                                         job->speed,
-@@ -893,7 +893,7 @@ static void block_job_event_completed(BlockJob *job, const char *msg)
-     }
- 
-     qapi_event_send_block_job_completed(job->driver->job_type,
--                                        job->id,
-+                                        job->job.id,
-                                         job->len,
-                                         job->offset,
-                                         job->speed,
-@@ -907,7 +907,7 @@ static int block_job_event_pending(BlockJob *job)
-     block_job_state_transition(job, BLOCK_JOB_STATUS_PENDING);
-     if (!job->auto_finalize && !block_job_is_internal(job)) {
-         qapi_event_send_block_job_pending(job->driver->job_type,
--                                          job->id,
-+                                          job->job.id,
-                                           &error_abort);
-     }
-     return 0;
-@@ -945,12 +945,6 @@ void *block_job_create(const char *job_id, const BlockJobDriver *driver,
+-    while ((job = QLIST_FIRST(&block_jobs))) {
++    while ((job = block_job_next(NULL))) {
+         aio_context = blk_get_aio_context(job->blk);
+         aio_context_acquire(aio_context);
+         block_job_cancel_sync(job);
+@@ -942,10 +948,6 @@ void *block_job_create(const char *job_id, const BlockJobDriver *driver,
              error_setg(errp, "Cannot specify job ID for internal block job");
              return NULL;
          }
--
--        if (!id_wellformed(job_id)) {
--            error_setg(errp, "Invalid job ID '%s'", job_id);
+-        if (block_job_get(job_id)) {
+-            error_setg(errp, "Job ID '%s' already in use", job_id);
 -            return NULL;
 -        }
--
-         if (block_job_get(job_id)) {
-             error_setg(errp, "Job ID '%s' already in use", job_id);
-             return NULL;
-@@ -964,9 +958,13 @@ void *block_job_create(const char *job_id, const BlockJobDriver *driver,
+     }
+ 
+     blk = blk_new(perm, shared_perm);
+@@ -961,6 +963,8 @@ void *block_job_create(const char *job_id, const BlockJobDriver *driver,
          return NULL;
      }
  
--    job = g_malloc0(driver->instance_size);
-+    job = job_create(job_id, &driver->job_driver, errp);
-+    if (job == NULL) {
-+        blk_unref(blk);
-+        return NULL;
-+    }
++    assert(is_block_job(&job->job));
 +
      job->driver        = driver;
--    job->id            = g_strdup(job_id);
      job->blk           = blk;
      job->cb            = cb;
-     job->opaque        = opaque;
-@@ -1187,7 +1185,7 @@ void block_job_event_ready(BlockJob *job)
-     }
+@@ -983,8 +987,6 @@ void *block_job_create(const char *job_id, const BlockJobDriver *driver,
  
-     qapi_event_send_block_job_ready(job->driver->job_type,
--                                    job->id,
-+                                    job->job.id,
-                                     job->len,
-                                     job->offset,
-                                     job->speed, &error_abort);
-@@ -1217,7 +1215,7 @@ BlockErrorAction block_job_error_action(BlockJob *job, BlockdevOnError on_err,
-         abort();
-     }
-     if (!block_job_is_internal(job)) {
--        qapi_event_send_block_job_error(job->id,
-+        qapi_event_send_block_job_error(job->job.id,
-                                         is_read ? IO_OPERATION_TYPE_READ :
-                                         IO_OPERATION_TYPE_WRITE,
-                                         action, &error_abort);
+     bdrv_op_unblock(bs, BLOCK_OP_TYPE_DATAPLANE, job->blocker);
+ 
+-    QLIST_INSERT_HEAD(&block_jobs, job, job_list);
+-
+     blk_add_aio_context_notifier(blk, block_job_attached_aio_context,
+                                  block_job_detach_aio_context, job);
+ 
 diff --git a/job.c b/job.c
-new file mode 100644
-index 0000000000..87fd48468c
---- /dev/null
+index cfdd008c52..e57303c6bb 100644
+--- a/job.c
 +++ b/job.c
-@@ -0,0 +1,48 @@
-+/*
-+ * Background jobs (long-running operations)
-+ *
-+ * Copyright (c) 2011 IBM Corp.
-+ * Copyright (c) 2012, 2018 Red Hat, Inc.
-+ *
-+ * Permission is hereby granted, free of charge, to any person obtaining a copy
-+ * of this software and associated documentation files (the "Software"), to deal
-+ * in the Software without restriction, including without limitation the rights
-+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-+ * copies of the Software, and to permit persons to whom the Software is
-+ * furnished to do so, subject to the following conditions:
-+ *
-+ * The above copyright notice and this permission notice shall be included in
-+ * all copies or substantial portions of the Software.
-+ *
-+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
-+ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-+ * THE SOFTWARE.
-+ */
+@@ -29,6 +29,8 @@
+ #include "qemu/job.h"
+ #include "qemu/id.h"
+ 
++static QLIST_HEAD(, Job) jobs = QLIST_HEAD_INITIALIZER(jobs);
 +
-+#include "qemu/osdep.h"
-+#include "qemu-common.h"
-+#include "qapi/error.h"
-+#include "qemu/job.h"
-+#include "qemu/id.h"
+ JobType job_type(const Job *job)
+ {
+     return job->driver->job_type;
+@@ -39,6 +41,27 @@ const char *job_type_str(const Job *job)
+     return JobType_str(job_type(job));
+ }
+ 
++Job *job_next(Job *job)
++{
++    if (!job) {
++        return QLIST_FIRST(&jobs);
++    }
++    return QLIST_NEXT(job, job_list);
++}
 +
-+void *job_create(const char *job_id, const JobDriver *driver, Error **errp)
++Job *job_get(const char *id)
 +{
 +    Job *job;
 +
-+    if (job_id) {
-+        if (!id_wellformed(job_id)) {
-+            error_setg(errp, "Invalid job ID '%s'", job_id);
-+            return NULL;
++    QLIST_FOREACH(job, &jobs, job_list) {
++        if (job->id && !strcmp(id, job->id)) {
++            return job;
 +        }
 +    }
 +
-+    job = g_malloc0(driver->instance_size);
-+    job->driver        = driver;
-+    job->id            = g_strdup(job_id);
-+
-+    return job;
++    return NULL;
 +}
-diff --git a/tests/test-bdrv-drain.c b/tests/test-bdrv-drain.c
-index 7673de1062..fe9f412b39 100644
---- a/tests/test-bdrv-drain.c
-+++ b/tests/test-bdrv-drain.c
-@@ -520,7 +520,9 @@ static void test_job_complete(BlockJob *job, Error **errp)
- }
- 
- BlockJobDriver test_job_driver = {
--    .instance_size  = sizeof(TestBlockJob),
-+    .job_driver = {
-+        .instance_size  = sizeof(TestBlockJob),
-+    },
-     .start          = test_job_start,
-     .complete       = test_job_complete,
- };
-diff --git a/tests/test-blockjob-txn.c b/tests/test-blockjob-txn.c
-index 5789893dda..48b12d1744 100644
---- a/tests/test-blockjob-txn.c
-+++ b/tests/test-blockjob-txn.c
-@@ -74,7 +74,9 @@ static void test_block_job_cb(void *opaque, int ret)
- }
- 
- static const BlockJobDriver test_block_job_driver = {
--    .instance_size = sizeof(TestBlockJob),
-+    .job_driver = {
-+        .instance_size = sizeof(TestBlockJob),
-+    },
-     .start = test_block_job_run,
- };
- 
-diff --git a/tests/test-blockjob.c b/tests/test-blockjob.c
-index 8946bfd37b..b82026180a 100644
---- a/tests/test-blockjob.c
-+++ b/tests/test-blockjob.c
-@@ -17,7 +17,9 @@
- #include "sysemu/block-backend.h"
- 
- static const BlockJobDriver test_block_job_driver = {
--    .instance_size = sizeof(BlockJob),
-+    .job_driver = {
-+        .instance_size = sizeof(BlockJob),
-+    },
- };
- 
- static void block_job_cb(void *opaque, int ret)
-@@ -38,9 +40,9 @@ static BlockJob *mk_job(BlockBackend *blk, const char *id,
-         g_assert_null(errp);
-         g_assert_nonnull(job);
-         if (id) {
--            g_assert_cmpstr(job->id, ==, id);
-+            g_assert_cmpstr(job->job.id, ==, id);
-         } else {
--            g_assert_cmpstr(job->id, ==, blk_name(blk));
-+            g_assert_cmpstr(job->job.id, ==, blk_name(blk));
++
+ void *job_create(const char *job_id, const JobDriver *driver, Error **errp)
+ {
+     Job *job;
+@@ -48,17 +71,25 @@ void *job_create(const char *job_id, const JobDriver *driver, Error **errp)
+             error_setg(errp, "Invalid job ID '%s'", job_id);
+             return NULL;
          }
-     } else {
-         g_assert_nonnull(errp);
-@@ -192,7 +194,9 @@ static void coroutine_fn cancel_job_start(void *opaque)
++        if (job_get(job_id)) {
++            error_setg(errp, "Job ID '%s' already in use", job_id);
++            return NULL;
++        }
+     }
+ 
+     job = g_malloc0(driver->instance_size);
+     job->driver        = driver;
+     job->id            = g_strdup(job_id);
+ 
++    QLIST_INSERT_HEAD(&jobs, job, job_list);
++
+     return job;
  }
  
- static const BlockJobDriver test_cancel_driver = {
--    .instance_size = sizeof(CancelJob),
-+    .job_driver = {
-+        .instance_size = sizeof(CancelJob),
-+    },
-     .start         = cancel_job_start,
-     .complete      = cancel_job_complete,
- };
-diff --git a/MAINTAINERS b/MAINTAINERS
-index e187b1f18f..9fba3307d9 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -1369,6 +1369,8 @@ L: qemu-block@nongnu.org
- S: Supported
- F: blockjob.c
- F: include/block/blockjob.h
-+F: job.c
-+F: include/block/job.h
- F: block/backup.c
- F: block/commit.c
- F: block/stream.c
-diff --git a/Makefile.objs b/Makefile.objs
-index c6c9b8fc21..92b73fc272 100644
---- a/Makefile.objs
-+++ b/Makefile.objs
-@@ -63,7 +63,7 @@ chardev-obj-y = chardev/
- # block-obj-y is code used by both qemu system emulation and qemu-img
- 
- block-obj-y += nbd/
--block-obj-y += block.o blockjob.o
-+block-obj-y += block.o blockjob.o job.o
- block-obj-y += block/ scsi/
- block-obj-y += qemu-io-cmds.o
- block-obj-$(CONFIG_REPLICATION) += replication.o
+ void job_delete(Job *job)
+ {
++    QLIST_REMOVE(job, job_list);
++
+     g_free(job->id);
+     g_free(job);
+ }
 -- 
 2.13.6
