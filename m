@@ -1,31 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46506)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46867)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <prvs=669710df0=Paul.Durrant@citrix.com>)
-	id 1fJgH1-0006IX-Cu
-	for qemu-devel@nongnu.org; Fri, 18 May 2018 10:22:24 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fJgIi-0007WX-1r
+	for qemu-devel@nongnu.org; Fri, 18 May 2018 10:24:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <prvs=669710df0=Paul.Durrant@citrix.com>)
-	id 1fJgGy-0007lC-8v
-	for qemu-devel@nongnu.org; Fri, 18 May 2018 10:22:23 -0400
-Received: from smtp.eu.citrix.com ([185.25.65.24]:16185)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <prvs=669710df0=Paul.Durrant@citrix.com>)
-	id 1fJgGx-0007k1-UU
-	for qemu-devel@nongnu.org; Fri, 18 May 2018 10:22:20 -0400
-From: Paul Durrant <Paul.Durrant@citrix.com>
-Date: Fri, 18 May 2018 14:22:18 +0000
-Message-ID: <c2a28c7b574d405787d7e63ec82a67b1@AMSPEX02CL03.citrite.net>
-References: <1526648406-1746-1-git-send-email-paul.durrant@citrix.com>
-	<5AFED64102000078001C4069@prv1-mh.provo.novell.com>
-	<f4620ef5cd6d45b58bb4ef29259c6ee9@AMSPEX02CL03.citrite.net>
-	<5AFEE01F02000078001C4100@prv1-mh.provo.novell.com>
-In-Reply-To: <5AFEE01F02000078001C4100@prv1-mh.provo.novell.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fJgIg-0000rz-Tv
+	for qemu-devel@nongnu.org; Fri, 18 May 2018 10:24:08 -0400
+Received: from mail-qt0-x234.google.com ([2607:f8b0:400d:c0d::234]:43037)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fJgIg-0000rS-Oy
+	for qemu-devel@nongnu.org; Fri, 18 May 2018 10:24:06 -0400
+Received: by mail-qt0-x234.google.com with SMTP id f13-v6so10450068qtp.10
+	for <qemu-devel@nongnu.org>; Fri, 18 May 2018 07:24:06 -0700 (PDT)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20180517174718.10107-1-alex.bennee@linaro.org>
+	<20180517174718.10107-46-alex.bennee@linaro.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <45d110eb-8014-f1d2-fbe4-d1d62d7c5882@amsat.org>
+Date: Fri, 18 May 2018 11:24:00 -0300
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [Xen-devel] [PATCH v2] xen-hvm: stop faking I/O to
- access PCI config space
+In-Reply-To: <20180517174718.10107-46-alex.bennee@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v4 45/49] tests/tcg: enable building for
+ RISCV64
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,66 +36,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: 'Jan Beulich' <JBeulich@suse.com>
-Cc: Anthony Perard <anthony.perard@citrix.com>, Roger Pau Monne <roger.pau@citrix.com>, Stefano Stabellini <sstabellini@kernel.org>, xen-devel <xen-devel@lists.xenproject.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "ehabkost@redhat.com" <ehabkost@redhat.com>, "marcel@redhat.com" <marcel@redhat.com>, "mst@redhat.com" <mst@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, cota@braap.org, famz@redhat.com, berrange@redhat.com, richard.henderson@linaro.org, balrogg@gmail.com, aurelien@aurel32.net, agraf@suse.de
+Cc: qemu-devel@nongnu.org
 
-> -----Original Message-----
-> From: Jan Beulich [mailto:JBeulich@suse.com]
-> Sent: 18 May 2018 15:16
-> To: Paul Durrant <Paul.Durrant@citrix.com>
-> Cc: Anthony Perard <anthony.perard@citrix.com>; Roger Pau Monne
-> <roger.pau@citrix.com>; Stefano Stabellini <sstabellini@kernel.org>; xen-
-> devel <xen-devel@lists.xenproject.org>; qemu-devel@nongnu.org;
-> ehabkost@redhat.com; marcel@redhat.com; mst@redhat.com; Paolo
-> Bonzini <pbonzini@redhat.com>; Richard Henderson <rth@twiddle.net>
-> Subject: RE: [Xen-devel] [PATCH v2] xen-hvm: stop faking I/O to access PC=
-I
-> config space
->=20
-> >>> On 18.05.18 at 15:51, <Paul.Durrant@citrix.com> wrote:
-> >> Sent: 18 May 2018 14:34
-> >> To: Paul Durrant <Paul.Durrant@citrix.com>
-> >> >>> On 18.05.18 at 15:00, <paul.durrant@citrix.com> wrote:
-> >> > +    QLIST_FOREACH(xendev, &state->dev_list, entry) {
-> >> > +        unsigned int i;
-> >> > +        uint32_t tmp;
-> >> > +
-> >> > +        if (xendev->sbdf !=3D sbdf) {
-> >> > +            continue;
-> >> > +        }
-> >> > +
-> >> > +        if (!req->data_is_ptr) {
-> >> > +            if (req->dir =3D=3D IOREQ_READ) {
-> >> > +                for (i =3D 0; i < req->count; i++) {
-> >> > +                    rw_config_req_item(xendev, req, i, &tmp);
-> >> > +                    req->data =3D tmp;
-> >> > +                }
-> >> > +            } else if (req->dir =3D=3D IOREQ_WRITE) {
-> >> > +                for (i =3D 0; i < req->count; i++) {
-> >> > +                    tmp =3D req->data;
-> >> > +                    rw_config_req_item(xendev, req, i, &tmp);
-> >> > +                }
-> >> > +            }
-> >>
-> >> Wouldn't it be more sensible to fail req->count !=3D 1 requests here?
-> >>
-> >
-> > I'm wondering whether we'd want to handle count > 1 once we allow
-> MMCONFIG
-> > accesses though. I guess it would be easier just to defer that.
->=20
-> For the data_is_ptr case - sure. But here? Or wait - are you thinking abo=
-ut
-> REP STOS (and the relatively useless REP LODS)?
->=20
+On 05/17/2018 02:47 PM, Alex Bennée wrote:
+> As before, using Debian SID compilers.
+> 
+> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+> ---
+>  tests/docker/Makefile.include                        |  1 +
+>  tests/docker/dockerfiles/debian-riscv64-cross.docker | 12 ++++++++++++
+>  tests/tcg/riscv/Makefile.include                     | 10 ++++++++++
+>  3 files changed, 23 insertions(+)
+>  create mode 100644 tests/docker/dockerfiles/debian-riscv64-cross.docker
+>  create mode 100644 tests/tcg/riscv/Makefile.include
+> 
+> diff --git a/tests/docker/Makefile.include b/tests/docker/Makefile.include
+> index f58afb8c5d..d00887bdf1 100644
+> --- a/tests/docker/Makefile.include
+> +++ b/tests/docker/Makefile.include
+> @@ -68,6 +68,7 @@ docker-image-debian-m68k-cross: docker-image-debian-sid
+>  docker-image-debian-sh4-cross: docker-image-debian-sid
+>  docker-image-debian-sparc64-cross: docker-image-debian-sid
+>  docker-image-debian-mips64-cross: docker-image-debian-sid
+> +docker-image-debian-riscv64-cross: docker-image-debian-sid
+>  docker-image-travis: NOUSER=1
+>  
+>  # Expand all the pre-requistes for each docker image and test combination
+> diff --git a/tests/docker/dockerfiles/debian-riscv64-cross.docker b/tests/docker/dockerfiles/debian-riscv64-cross.docker
+> new file mode 100644
+> index 0000000000..2b2e64cee6
+> --- /dev/null
+> +++ b/tests/docker/dockerfiles/debian-riscv64-cross.docker
+> @@ -0,0 +1,12 @@
+> +#
+> +# Docker cross-compiler target
+> +#
+> +# This docker target builds on the debian sid base image which
+> +# contains cross compilers for Debian "ports" targets.
+> +#
+> +FROM qemu:debian-sid
+> +
+> +RUN DEBIAN_FRONTEND=noninteractive eatmydata \
+> +    apt-get install -y --no-install-recommends \
+> +        gcc-riscv64-linux-gnu \
+> +        libc6-dev-riscv64-cross
+> diff --git a/tests/tcg/riscv/Makefile.include b/tests/tcg/riscv/Makefile.include
+> new file mode 100644
+> index 0000000000..d92ac6c89f
+> --- /dev/null
+> +++ b/tests/tcg/riscv/Makefile.include
+> @@ -0,0 +1,10 @@
+> +#
+> +# Makefile.include for all RISCV targets
+> +#
+> +# Debian only really cares about 64 bit going forward
+> +#
+> +
+> +ifeq ($(TARGET_NAME),riscv64)
+> +DOCKER_IMAGE=debian-riscv64-cross
+> +DOCKER_CROSS_COMPILER=riscv64-linux-gnu-gcc
+> +endif
+> 
 
-Yes. We'd need to cope with a rep stos if we had memory mapped access, but =
-we don't need to worry about it until then I think.
+Using a snapshot:
 
-In the meantime I doubt any well behaved OS is going to do rep ins or rep o=
-uts to cfc so just aborting on count > 1 is probably fine.
+-- >8 --
+diff --git a/tests/docker/dockerfiles/debian-sid.docker
+b/tests/docker/dockerfiles/debian-sid.docker
+-# Duplicate deb line as deb-src
+-RUN cat /etc/apt/sources.list | sed "s/^deb\ /deb-src /" >>
+/etc/apt/sources.list
++# random 'working' snapshot
++RUN echo "deb
+http://snapshot.debian.org/archive/debian/20180512T101008Z/ sid main" >
+/etc/apt/sources.list && \
++    echo "deb-src
+http://snapshot.debian.org/archive/debian/20180512T101008Z/ sid main" >>
+/etc/apt/sources.list
+--
 
-  Paul
-
-> Jan
->=20
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Tested-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
