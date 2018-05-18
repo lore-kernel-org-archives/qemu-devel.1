@@ -1,16 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60141)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60186)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fJfL1-0000Xl-P0
-	for qemu-devel@nongnu.org; Fri, 18 May 2018 09:22:31 -0400
+	(envelope-from <kwolf@redhat.com>) id 1fJfL6-0000eR-6E
+	for qemu-devel@nongnu.org; Fri, 18 May 2018 09:22:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fJfL0-0006VZ-JI
-	for qemu-devel@nongnu.org; Fri, 18 May 2018 09:22:27 -0400
+	(envelope-from <kwolf@redhat.com>) id 1fJfL0-0006VF-Bb
+	for qemu-devel@nongnu.org; Fri, 18 May 2018 09:22:32 -0400
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Fri, 18 May 2018 15:21:13 +0200
-Message-Id: <20180518132114.4070-40-kwolf@redhat.com>
+Date: Fri, 18 May 2018 15:21:12 +0200
+Message-Id: <20180518132114.4070-39-kwolf@redhat.com>
 In-Reply-To: <20180518132114.4070-1-kwolf@redhat.com>
 References: <20180518132114.4070-1-kwolf@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 39/40] iotests: Move qmp_to_opts() to VM
+Subject: [Qemu-devel] [PATCH v2 38/40] blockjob: Remove BlockJob.driver
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,117 +22,81 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, mreitz@redhat.com, jsnow@redhat.com, eblake@redhat.com, jcody@redhat.com, armbru@redhat.com, qemu-devel@nongnu.org
 
-qmp_to_opts() used to be a method of QMPTestCase, but recently we
-started to add more Python test cases that don't make use of
-QMPTestCase. In order to make the method usable there, move it to VM.
+BlockJob.driver is redundant with Job.driver and only used in very few
+places any more. Remove it.
 
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-Reviewed-by: Max Reitz <mreitz@redhat.com>
 ---
- tests/qemu-iotests/041        |  6 +++---
- tests/qemu-iotests/155        |  2 +-
- tests/qemu-iotests/iotests.py | 45 ++++++++++++++++++++++---------------------
- 3 files changed, 27 insertions(+), 26 deletions(-)
+ include/block/blockjob.h |  3 ---
+ blockjob.c               | 17 ++++++++++-------
+ 2 files changed, 10 insertions(+), 10 deletions(-)
 
-diff --git a/tests/qemu-iotests/041 b/tests/qemu-iotests/041
-index e94587950c..c20ac7da87 100755
---- a/tests/qemu-iotests/041
-+++ b/tests/qemu-iotests/041
-@@ -1030,9 +1030,9 @@ class TestOrphanedSource(iotests.QMPTestCase):
-                  'read-only': 'on' }
+diff --git a/include/block/blockjob.h b/include/block/blockjob.h
+index 3021d11126..32c00b7dc0 100644
+--- a/include/block/blockjob.h
++++ b/include/block/blockjob.h
+@@ -43,9 +43,6 @@ typedef struct BlockJob {
+     /** Data belonging to the generic Job infrastructure */
+     Job job;
  
-         self.vm = iotests.VM()
--        self.vm.add_blockdev(self.qmp_to_opts(blk0))
--        self.vm.add_blockdev(self.qmp_to_opts(blk1))
--        self.vm.add_blockdev(self.qmp_to_opts(blk2))
-+        self.vm.add_blockdev(self.vm.qmp_to_opts(blk0))
-+        self.vm.add_blockdev(self.vm.qmp_to_opts(blk1))
-+        self.vm.add_blockdev(self.vm.qmp_to_opts(blk2))
-         self.vm.launch()
- 
-     def tearDown(self):
-diff --git a/tests/qemu-iotests/155 b/tests/qemu-iotests/155
-index 42dae04c83..63a5b5e2c0 100755
---- a/tests/qemu-iotests/155
-+++ b/tests/qemu-iotests/155
-@@ -63,7 +63,7 @@ class BaseClass(iotests.QMPTestCase):
-                     'driver': iotests.imgfmt,
-                     'file': {'driver': 'file',
-                              'filename': source_img}}
--        self.vm.add_blockdev(self.qmp_to_opts(blockdev))
-+        self.vm.add_blockdev(self.vm.qmp_to_opts(blockdev))
-         self.vm.add_device('virtio-blk,id=qdev0,drive=source')
-         self.vm.launch()
- 
-diff --git a/tests/qemu-iotests/iotests.py b/tests/qemu-iotests/iotests.py
-index ed08e06e1f..28159d837a 100644
---- a/tests/qemu-iotests/iotests.py
-+++ b/tests/qemu-iotests/iotests.py
-@@ -363,6 +363,27 @@ class VM(qtest.QEMUQtestMachine):
-         return self.qmp('human-monitor-command',
-                         command_line='qemu-io %s "%s"' % (drive, cmd))
- 
-+    def flatten_qmp_object(self, obj, output=None, basestr=''):
-+        if output is None:
-+            output = dict()
-+        if isinstance(obj, list):
-+            for i in range(len(obj)):
-+                self.flatten_qmp_object(obj[i], output, basestr + str(i) + '.')
-+        elif isinstance(obj, dict):
-+            for key in obj:
-+                self.flatten_qmp_object(obj[key], output, basestr + key + '.')
-+        else:
-+            output[basestr[:-1]] = obj # Strip trailing '.'
-+        return output
-+
-+    def qmp_to_opts(self, obj):
-+        obj = self.flatten_qmp_object(obj)
-+        output_list = list()
-+        for key in obj:
-+            output_list += [key + '=' + obj[key]]
-+        return ','.join(output_list)
-+
-+
- 
- index_re = re.compile(r'([^\[]+)\[([^\]]+)\]')
- 
-@@ -390,26 +411,6 @@ class QMPTestCase(unittest.TestCase):
-                     self.fail('invalid index "%s" in path "%s" in "%s"' % (idx, path, str(d)))
-         return d
- 
--    def flatten_qmp_object(self, obj, output=None, basestr=''):
--        if output is None:
--            output = dict()
--        if isinstance(obj, list):
--            for i in range(len(obj)):
--                self.flatten_qmp_object(obj[i], output, basestr + str(i) + '.')
--        elif isinstance(obj, dict):
--            for key in obj:
--                self.flatten_qmp_object(obj[key], output, basestr + key + '.')
--        else:
--            output[basestr[:-1]] = obj # Strip trailing '.'
--        return output
+-    /** The job type, including the job vtable.  */
+-    const BlockJobDriver *driver;
 -
--    def qmp_to_opts(self, obj):
--        obj = self.flatten_qmp_object(obj)
--        output_list = list()
--        for key in obj:
--            output_list += [key + '=' + obj[key]]
--        return ','.join(output_list)
--
-     def assert_qmp_absent(self, d, path):
-         try:
-             result = self.dictpath(d, path)
-@@ -444,8 +445,8 @@ class QMPTestCase(unittest.TestCase):
-         '''Asserts that the given filename is a json: filename and that its
-            content is equal to the given reference object'''
-         self.assertEqual(json_filename[:5], 'json:')
--        self.assertEqual(self.flatten_qmp_object(json.loads(json_filename[5:])),
--                         self.flatten_qmp_object(reference))
-+        self.assertEqual(self.vm.flatten_qmp_object(json.loads(json_filename[5:])),
-+                         self.vm.flatten_qmp_object(reference))
+     /** The block device on which the job is operating.  */
+     BlockBackend *blk;
  
-     def cancel_and_wait(self, drive='drive0', force=False, resume=False):
-         '''Cancel a block job and wait for it to finish, returning the event'''
+diff --git a/blockjob.c b/blockjob.c
+index 5c8ff6f846..0306533a2e 100644
+--- a/blockjob.c
++++ b/blockjob.c
+@@ -103,10 +103,12 @@ static void block_job_attached_aio_context(AioContext *new_context,
+                                            void *opaque)
+ {
+     BlockJob *job = opaque;
++    const JobDriver *drv = job->job.driver;
++    BlockJobDriver *bjdrv = container_of(drv, BlockJobDriver, job_driver);
+ 
+     job->job.aio_context = new_context;
+-    if (job->driver->attached_aio_context) {
+-        job->driver->attached_aio_context(job, new_context);
++    if (bjdrv->attached_aio_context) {
++        bjdrv->attached_aio_context(job, new_context);
+     }
+ 
+     job_resume(&job->job);
+@@ -115,10 +117,12 @@ static void block_job_attached_aio_context(AioContext *new_context,
+ void block_job_drain(Job *job)
+ {
+     BlockJob *bjob = container_of(job, BlockJob, job);
++    const JobDriver *drv = job->driver;
++    BlockJobDriver *bjdrv = container_of(drv, BlockJobDriver, job_driver);
+ 
+     blk_drain(bjob->blk);
+-    if (bjob->driver->drain) {
+-        bjob->driver->drain(bjob);
++    if (bjdrv->drain) {
++        bjdrv->drain(bjob);
+     }
+ }
+ 
+@@ -201,7 +205,7 @@ bool block_job_is_internal(BlockJob *job)
+ 
+ const BlockJobDriver *block_job_driver(BlockJob *job)
+ {
+-    return job->driver;
++    return container_of(job->job.driver, BlockJobDriver, job_driver);
+ }
+ 
+ /* Assumes the job_mutex is held */
+@@ -386,8 +390,7 @@ void *block_job_create(const char *job_id, const BlockJobDriver *driver,
+     assert(job->job.driver->user_resume == &block_job_user_resume);
+     assert(job->job.driver->drain == &block_job_drain);
+ 
+-    job->driver        = driver;
+-    job->blk           = blk;
++    job->blk = blk;
+ 
+     job->finalize_cancelled_notifier.notify = block_job_event_cancelled;
+     job->finalize_completed_notifier.notify = block_job_event_completed;
 -- 
 2.13.6
