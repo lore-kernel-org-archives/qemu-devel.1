@@ -1,39 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47307)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47409)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1fJeSu-0001QI-C4
-	for qemu-devel@nongnu.org; Fri, 18 May 2018 08:26:33 -0400
+	(envelope-from <armbru@redhat.com>) id 1fJeTW-0001nC-Od
+	for qemu-devel@nongnu.org; Fri, 18 May 2018 08:27:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1fJeSr-0005Wo-7V
-	for qemu-devel@nongnu.org; Fri, 18 May 2018 08:26:32 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:51856)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanb@linux.vnet.ibm.com>)
-	id 1fJeSq-0005Uy-Vd
-	for qemu-devel@nongnu.org; Fri, 18 May 2018 08:26:29 -0400
-Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w4ICPSvh146685
-	for <qemu-devel@nongnu.org>; Fri, 18 May 2018 08:26:26 -0400
-Received: from e34.co.us.ibm.com (e34.co.us.ibm.com [32.97.110.152])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2j1vhw69sw-1
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Fri, 18 May 2018 08:26:26 -0400
-Received: from localhost
-	by e34.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <stefanb@linux.vnet.ibm.com>;
-	Fri, 18 May 2018 06:26:25 -0600
-References: <20180518122304.31020-1-marcandre.lureau@redhat.com>
-From: Stefan Berger <stefanb@linux.vnet.ibm.com>
-Date: Fri, 18 May 2018 08:26:21 -0400
+	(envelope-from <armbru@redhat.com>) id 1fJeTV-0005zG-Gq
+	for qemu-devel@nongnu.org; Fri, 18 May 2018 08:27:10 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:49978 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fJeTV-0005yz-BE
+	for qemu-devel@nongnu.org; Fri, 18 May 2018 08:27:09 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.3])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 01592401EF14
+	for <qemu-devel@nongnu.org>; Fri, 18 May 2018 12:27:09 +0000 (UTC)
+From: Markus Armbruster <armbru@redhat.com>
+References: <20180509041734.14135-1-peterx@redhat.com>
+	<20180509041734.14135-5-peterx@redhat.com>
+	<87tvr6l9ix.fsf@dusky.pond.sub.org> <20180518105311.GP2569@xz-mi>
+Date: Fri, 18 May 2018 14:27:00 +0200
+In-Reply-To: <20180518105311.GP2569@xz-mi> (Peter Xu's message of "Fri, 18 May
+	2018 18:53:11 +0800")
+Message-ID: <877eo1f8tn.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <20180518122304.31020-1-marcandre.lureau@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-MW
-Message-Id: <7ae4578a-e3e6-ee61-fca7-9d60a0030cf6@linux.vnet.ibm.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v3 0/4] RFC: ovmf: Add support for TPM
- Physical Presence interface
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v5 4/4] monitor: add lock to protect
+ mon_fdsets
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -42,103 +35,168 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: marcandre.lureau@redhat.com, edk2-devel@lists.01.org
-Cc: pjones@redhat.com, jiewen.yao@intel.com, lersek@redhat.com, qemu-devel@nongnu.org, javierm@redhat.com
+To: Peter Xu <peterx@redhat.com>
+Cc: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>, "Dr .
+	David Alan Gilbert" <dgilbert@redhat.com>
 
-On 05/18/2018 08:23 AM, marcandre.lureau@redhat.com wrote:
-> From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
->
-> Hi,
->
-> The following series adds basic TPM PPI 1.3 support for OVMF-on-QEMU
-> with TPM2 (I haven't looked at TPM1, for lack of interest).
->
-> PPI test runs successfully with Windows 10 WHLK, despite the limited
-> number of supported funcions (tpm2_ppi_funcs table, in particular, no
-> function allows to manipulate Tcg2PhysicalPresenceFlags)
->
-> The way it works is relatively simple: a memory region is allocated by
-> QEMU to save PPI related variables. An ACPI interface is exposed by
-> QEMU to let the guest manipulate those. At boot, ovmf processes and
-> updates the PPI qemu region and request variables.
->
-> I build edk2 with:
->
-> $ build -DTPM2_ENABLE
->
-> I test with qemu & swtpm/libtpms (tpm2 branches, swtpm_setup.sh --tpm2
->   --tpm-state tpmstatedir)
->
-> $ swtpm socket --tpmstate tpmstatedir --ctrl type=3Dunixio,path=3Dtpmso=
-ck
->    --tpm2 &
+Peter Xu <peterx@redhat.com> writes:
 
-Make this:
+> On Thu, May 17, 2018 at 03:03:02PM +0200, Markus Armbruster wrote:
+>
+> [...]
+>
+>> > @@ -2502,7 +2525,9 @@ int monitor_fdset_get_fd(int64_t fdset_id, int flags)
+>> >      MonFdset *mon_fdset;
+>> >      MonFdsetFd *mon_fdset_fd;
+>> >      int mon_fd_flags;
+>> > +    int ret = -1;
+>> 
+>> Suggest not to initialize ret, and instead ret = -1 on both failure
+>> paths.
+>
+> [1]
+>
+> But there is a third hidden failure path that we failed to find the fd
+> specified?  In that case we still need that initial value.
 
-swtpm socket --tpmstate dir=3Dtpmstatedir --ctrl type=3Dunixio,path=3Dtpm=
-sock=20
---tpm2
+You're right.  However, that failure path could be made explicit easily:
 
+        QLIST_FOREACH(mon_fdset, &mon_fdsets, next) {
+            [got out on error and on finding the right one...]
+        }
+        ret = -1;
+        errno = ENOENT;
+
+    out:
+        qemu_mutex_unlock(&mon_fdsets_lock);
+        return ret;
+
+I find this clearer.  Your choice.
+
+> But I didn't really notice that this function is returning error with
+> -1 paired with errno.  So instead of set -1 here I may need to
+> initialize it to -ENOENT, and I can convert it back to errno when
+> return.  Please see below.
 >
-> $ qemu .. -chardev socket,id=3Dchrtpm,path=3Dtpmsock -tpmdev
->    emulator,id=3Dtpm0,chardev=3Dchrtpm -device tpm-crb,tpmdev=3Dtpm0
+>> 
+>> >  
+>> > +    qemu_mutex_lock(&mon_fdsets_lock);
+>> >      QLIST_FOREACH(mon_fdset, &mon_fdsets, next) {
+>> >          if (mon_fdset->id != fdset_id) {
+>> >              continue;
+>> > @@ -2510,49 +2535,62 @@ int monitor_fdset_get_fd(int64_t fdset_id, int flags)
+>> >          QLIST_FOREACH(mon_fdset_fd, &mon_fdset->fds, next) {
+>> >              mon_fd_flags = fcntl(mon_fdset_fd->fd, F_GETFL);
+>> >              if (mon_fd_flags == -1) {
+>> > -                return -1;
+>> > +                goto out;
+>> 
+>> Preexisting: we fail without setting errno.  Smells buggy.
 >
-> Github trees:
-> https://github.com/elmarco/edk2/tree/tpm-ppi
-> https://github.com/elmarco/qemu/tree/tpm-ppi
+> Indeed.  Here I possibly need to set "ret = -errno" since at [2] below
+> the errno might be polluted by the mutex unlocking operation.
+
+Good point.
+
+>> Can we avoid setting errno and return a negative errno code instead?
 >
-> Thanks
+> Yes that'll be nice, but it's getting out of the scope of this
+> patchset.  So I'll try to avoid touching that.  I mean qemu_open() and
+> its callers.
+
+I'd change just monitor_fdset_get_fd(), and have its only caller
+qemu_open() do
+
+        fd = monitor_fdset_get_fd(fdset_id, flags);
+        if (fd < 0) {
+            errno = -fd;
+            return -1;
+        }
+
+>> >              }
+>> >  
+>> >              if ((flags & O_ACCMODE) == (mon_fd_flags & O_ACCMODE)) {
+>> > -                return mon_fdset_fd->fd;
+>> > +                ret = mon_fdset_fd->fd;
+>> > +                goto out;
+>> >              }
+>> >          }
+>> >          errno = EACCES;
+>> > -        return -1;
+>> > +        break;
+>> >      }
+>> > -#endif
+>> > -
+>> > +out:
+>> > +    qemu_mutex_unlock(&mon_fdsets_lock);
 >
-> v3: after Laszlo review
->   - dropped DxeTcg2PhysicalPresenceLib.uni
->   - removed mTpm2PPIFuncs static initialization, use hard-coded assignm=
-ents
->   - declared STATIC the functions that should be
->   - fixed an OUT/IN decorator
->   - use EFI_PROTOCOL_ERROR instead of EFI_INVALID_PARAMETER when PPI
->     initialization fails
->   - replaced EFI_D_INFO with DEBUG_INFO
->   - added a check for mPpi address that it doesn't cross a page boundar=
-y
->   - added a GetMemorySpaceDescriptor() check for memory type
->   - declared *mPpi as volatile, to correct mmio access
->   - a few more style changes
->   - comments updated
->   - some minor dead code/inclusion/defines removal
->   - added a few r-b tags
+> [2]
 >
-> v2:
->   - style and commit message fixes
+>> > +    return ret;
 >
-> Marc-Andr=C3=A9 Lureau (4):
->    OvmfPkg: add Tcg2PhysicalPresenceLibNull when !TPM2_ENABLE
->    OvmfPkg/IndustryStandard: add QemuTpm.h header
->    OvmfPkg: add Tcg2PhysicalPresenceLibQemu
->    OvmfPkg/PlatformBootManagerLib: process TPM PPI request
+> So in my next post I'll make sure I return -1 when error happens, and
+> errno should contain the correct (positive) error.
 >
->   OvmfPkg/OvmfPkgIa32.dsc                       |   4 +-
->   OvmfPkg/OvmfPkgIa32X64.dsc                    |   4 +-
->   OvmfPkg/OvmfPkgX64.dsc                        |   4 +-
->   .../PlatformBootManagerLib.inf                |   2 +
->   .../DxeTcg2PhysicalPresenceLib.inf            |  33 +
->   .../DxeTcg2PhysicalPresenceLib.inf            |  46 +-
->   OvmfPkg/Include/IndustryStandard/QemuTpm.h    |  69 ++
->   .../PlatformBootManagerLib/BdsPlatform.c      |   6 +
->   .../DxeTcg2PhysicalPresenceLib.c              |  20 +-
->   .../DxeTcg2PhysicalPresenceLib.c              | 919 +++++++++++++++++=
-+
->   .../PhysicalPresenceStrings.uni               |  33 +-
->   11 files changed, 1081 insertions(+), 59 deletions(-)
->   create mode 100644 OvmfPkg/Library/Tcg2PhysicalPresenceLibNull/DxeTcg=
-2PhysicalPresenceLib.inf
->   copy {SecurityPkg/Library/DxeTcg2PhysicalPresenceLib =3D> OvmfPkg/Lib=
-rary/Tcg2PhysicalPresenceLibQemu}/DxeTcg2PhysicalPresenceLib.inf (66%)
->   create mode 100644 OvmfPkg/Include/IndustryStandard/QemuTpm.h
->   copy EdkCompatibilityPkg/Foundation/Library/EdkIIGlueLib/Library/Base=
-Lib/Ia32/CpuSleep.c =3D> OvmfPkg/Library/Tcg2PhysicalPresenceLibNull/DxeT=
-cg2PhysicalPresenceLib.c (55%)
->   create mode 100644 OvmfPkg/Library/Tcg2PhysicalPresenceLibQemu/DxeTcg=
-2PhysicalPresenceLib.c
->   copy {SecurityPkg/Library/DxeTcg2PhysicalPresenceLib =3D> OvmfPkg/Lib=
-rary/Tcg2PhysicalPresenceLibQemu}/PhysicalPresenceStrings.uni (56%)
+>> > +#else
+>> 
+>> #ifndef _WIN32 ... #endif becomes #ifndef _WIN32 ... #else ... #endif.
+>> I hate negative conditionals with else.  Mind to swap?
 >
+> Sure I can.
+>
+>> 
+>> >      errno = ENOENT;
+>> >      return -1;
+>> > +#endif
+>> >  }
+>> >  
+>> >  int monitor_fdset_dup_fd_add(int64_t fdset_id, int dup_fd)
+>> >  {
+>> >      MonFdset *mon_fdset;
+>> >      MonFdsetFd *mon_fdset_fd_dup;
+>> > +    int ret = -1;
+>> 
+>> Dead initializer, please remove.
+>
+> IMHO it's the same as above [1], so we still need that, right?
+
+You're right.
+
+>> >  
+>> > +    qemu_mutex_lock(&mon_fdsets_lock);
+>> >      QLIST_FOREACH(mon_fdset, &mon_fdsets, next) {
+>> >          if (mon_fdset->id != fdset_id) {
+>> >              continue;
+>> >          }
+>> >          QLIST_FOREACH(mon_fdset_fd_dup, &mon_fdset->dup_fds, next) {
+>> >              if (mon_fdset_fd_dup->fd == dup_fd) {
+>> > -                return -1;
+>> > +                ret = -1;
+>> > +                goto out;
+>> >              }
+>> >          }
+>> >          mon_fdset_fd_dup = g_malloc0(sizeof(*mon_fdset_fd_dup));
+>> >          mon_fdset_fd_dup->fd = dup_fd;
+>> >          QLIST_INSERT_HEAD(&mon_fdset->dup_fds, mon_fdset_fd_dup, next);
+>> > -        return 0;
+>> > +        ret = 0;
+>> > +        break;
+>> >      }
+>> > -    return -1;
+>> > +
+>> > +out:
+>> > +    qemu_mutex_unlock(&mon_fdsets_lock);
+>> > +    return ret;
+>> >  }
+>> >  
+>> >  static int monitor_fdset_dup_fd_find_remove(int dup_fd, bool remove)
+>> >  {
+>> >      MonFdset *mon_fdset;
+>> >      MonFdsetFd *mon_fdset_fd_dup;
+>> > +    int ret = -1;
+>> 
+>> Likewise.
+>
+> Same as [1]?
+
+Right again.
