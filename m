@@ -1,21 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48415)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48621)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fJk17-0001K4-OK
-	for qemu-devel@nongnu.org; Fri, 18 May 2018 14:22:14 -0400
+	(envelope-from <bsd@redhat.com>) id 1fJk1v-00023L-Pi
+	for qemu-devel@nongnu.org; Fri, 18 May 2018 14:23:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fJk16-0002zf-TM
-	for qemu-devel@nongnu.org; Fri, 18 May 2018 14:22:13 -0400
-References: <20180518132114.4070-1-kwolf@redhat.com>
-	<20180518132114.4070-38-kwolf@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <34f3b470-614b-d836-c8ca-c6d4b81ecc1d@redhat.com>
-Date: Fri, 18 May 2018 13:22:04 -0500
+	(envelope-from <bsd@redhat.com>) id 1fJk1s-0003Ho-LK
+	for qemu-devel@nongnu.org; Fri, 18 May 2018 14:23:03 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:58924 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bsd@redhat.com>) id 1fJk1s-0003Hc-Hp
+	for qemu-devel@nongnu.org; Fri, 18 May 2018 14:23:00 -0400
+From: Bandan Das <bsd@redhat.com>
+References: <20180507094448.32386-1-kraxel@redhat.com>
+	<20180507094448.32386-2-kraxel@redhat.com>
+	<CAFEAcA9Edg2pk0x05mvfDwa8F4OjKmG-WTcnt9v17o3YVPQiWg@mail.gmail.com>
+	<jpgr2maq7rs.fsf@linux.bootlegged.copy>
+Date: Fri, 18 May 2018 14:22:59 -0400
+In-Reply-To: <jpgr2maq7rs.fsf@linux.bootlegged.copy> (Bandan Das's message of
+	"Thu, 17 May 2018 17:41:59 -0400")
+Message-ID: <jpga7swygak.fsf_-_@linux.bootlegged.copy>
 MIME-Version: 1.0
-In-Reply-To: <20180518132114.4070-38-kwolf@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 37/40] job: Add query-jobs QMP command
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH] usb-mtp: Assert on suspicious TYPE_DATA packet
+ from initiator
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,43 +30,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
-Cc: mreitz@redhat.com, jsnow@redhat.com, jcody@redhat.com, armbru@redhat.com, qemu-devel@nongnu.org
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Gerd Hoffmann <kraxel@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
 
-On 05/18/2018 08:21 AM, Kevin Wolf wrote:
-> This adds a minimal query-jobs implementation that shouldn't pose many
-> design questions. It can later be extended to expose more information,
-> and especially job-specific information.
-> 
-> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-> ---
->   qapi/job.json      | 45 +++++++++++++++++++++++++++++++++++++++++++++
->   include/qemu/job.h |  3 +++
->   job-qmp.c          | 54 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
->   job.c              |  2 +-
->   4 files changed, 103 insertions(+), 1 deletion(-)
-> 
 
-> +##
-> +# @JobInfo:
-> +#
-> +# Information about a job.
-> +#
-> +# @id:                  The job identifier
+CID 1390604
+If the initiator sends a packet with TYPE_DATA set without
+initiating a CMD_GET_OBJECT_INFO first, then usb_mtp_get_data
+can trip on a null s->data_out.
 
-> +##
-> +{ 'struct': 'JobInfo',
-> +  'data': { 'id': 'str', 'type': 'JobType', 'status': 'JobStatus',
-> +            'current-progress': 'int', 'total-progress': 'int',
-> +            '*error': 'str' } }
+Signed-off-by: Bandan Das <bsd@redhat.com>
+---
+ hw/usb/dev-mtp.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-Is it worth exposing whether a job is auto-finalize and auto-complete? 
-Goes back to the issue of whether clients of the new job API would ever 
-want/need to rely on the auto- features; while clients of the old 
-blockjob API that get the auto- features by default will never be 
-calling the new query-jobs command.
-
+diff --git a/hw/usb/dev-mtp.c b/hw/usb/dev-mtp.c
+index 3d59fe4944..905e025d7f 100644
+--- a/hw/usb/dev-mtp.c
++++ b/hw/usb/dev-mtp.c
+@@ -1696,6 +1696,7 @@ static void usb_mtp_get_data(MTPState *s, mtp_container *container,
+     uint64_t dlen;
+     uint32_t data_len = p->iov.size;
+ 
++    assert(d != NULL);
+     if (d->first) {
+         /* Total length of incoming data */
+         d->length = cpu_to_le32(container->length) - sizeof(mtp_container);
 -- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+2.14.3
