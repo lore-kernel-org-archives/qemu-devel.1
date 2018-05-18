@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55327)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55343)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fJnNg-0000FW-9y
-	for qemu-devel@nongnu.org; Fri, 18 May 2018 17:57:45 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1fJnNh-0000Fl-84
+	for qemu-devel@nongnu.org; Fri, 18 May 2018 17:57:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fJnNf-0003XY-4Q
-	for qemu-devel@nongnu.org; Fri, 18 May 2018 17:57:44 -0400
-Received: from mail-pl0-x22e.google.com ([2607:f8b0:400e:c01::22e]:37278)
+	(envelope-from <richard.henderson@linaro.org>) id 1fJnNg-0003Xv-7g
+	for qemu-devel@nongnu.org; Fri, 18 May 2018 17:57:45 -0400
+Received: from mail-pl0-x22d.google.com ([2607:f8b0:400e:c01::22d]:39664)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1fJnNe-0003XS-UU
-	for qemu-devel@nongnu.org; Fri, 18 May 2018 17:57:43 -0400
-Received: by mail-pl0-x22e.google.com with SMTP id w19-v6so5311674plq.4
-	for <qemu-devel@nongnu.org>; Fri, 18 May 2018 14:57:42 -0700 (PDT)
+	id 1fJnNg-0003Xi-2C
+	for qemu-devel@nongnu.org; Fri, 18 May 2018 17:57:44 -0400
+Received: by mail-pl0-x22d.google.com with SMTP id c19-v6so5311903pls.6
+	for <qemu-devel@nongnu.org>; Fri, 18 May 2018 14:57:43 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Fri, 18 May 2018 14:57:29 -0700
-Message-Id: <20180518215734.18833-4-richard.henderson@linaro.org>
+Date: Fri, 18 May 2018 14:57:30 -0700
+Message-Id: <20180518215734.18833-5-richard.henderson@linaro.org>
 In-Reply-To: <20180518215734.18833-1-richard.henderson@linaro.org>
 References: <20180518215734.18833-1-richard.henderson@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 3/8] target/ppc: Honor CPU_DUMP_FPU
+Subject: [Qemu-devel] [PULL 4/8] target/riscv: Honor CPU_DUMP_FPU
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,47 +30,40 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, Alexander Graf <agraf@suse.de>, David Gibson <david@gibson.dropbear.id.au>
+Cc: peter.maydell@linaro.org, Palmer Dabbelt <palmer@sifive.com>, Sagar Karandikar <sagark@eecs.berkeley.edu>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
 
-Cc: Alexander Graf <agraf@suse.de>
-Cc: David Gibson <david@gibson.dropbear.id.au>
+Cc: Palmer Dabbelt <palmer@sifive.com>
+Cc: Sagar Karandikar <sagark@eecs.berkeley.edu>
+Cc: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
+Reviewed-by: Michael Clark <mjc@sifive.com>
 Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/ppc/translate.c | 20 +++++++++++++-------
- 1 file changed, 13 insertions(+), 7 deletions(-)
+ target/riscv/cpu.c | 12 +++++++-----
+ 1 file changed, 7 insertions(+), 5 deletions(-)
 
-diff --git a/target/ppc/translate.c b/target/ppc/translate.c
-index d5e5f953da..e30d99fcbc 100644
---- a/target/ppc/translate.c
-+++ b/target/ppc/translate.c
-@@ -7048,14 +7048,20 @@ void ppc_cpu_dump_state(CPUState *cs, FILE *f, fprintf_function cpu_fprintf,
+diff --git a/target/riscv/cpu.c b/target/riscv/cpu.c
+index 4e5a56d4e3..d630e8fd6c 100644
+--- a/target/riscv/cpu.c
++++ b/target/riscv/cpu.c
+@@ -219,11 +219,13 @@ static void riscv_cpu_dump_state(CPUState *cs, FILE *f,
+             cpu_fprintf(f, "\n");
+         }
      }
-     cpu_fprintf(f, " ]             RES " TARGET_FMT_lx "\n",
-                 env->reserve_addr);
 -    for (i = 0; i < 32; i++) {
--        if ((i & (RFPL - 1)) == 0)
--            cpu_fprintf(f, "FPR%02d", i);
--        cpu_fprintf(f, " %016" PRIx64, *((uint64_t *)&env->fpr[i]));
--        if ((i & (RFPL - 1)) == (RFPL - 1))
+-        cpu_fprintf(f, " %s %016" PRIx64,
+-            riscv_fpr_regnames[i], env->fpr[i]);
+-        if ((i & 3) == 3) {
 -            cpu_fprintf(f, "\n");
-+
 +    if (flags & CPU_DUMP_FPU) {
 +        for (i = 0; i < 32; i++) {
-+            if ((i & (RFPL - 1)) == 0) {
-+                cpu_fprintf(f, "FPR%02d", i);
-+            }
-+            cpu_fprintf(f, " %016" PRIx64, *((uint64_t *)&env->fpr[i]));
-+            if ((i & (RFPL - 1)) == (RFPL - 1)) {
++            cpu_fprintf(f, " %s %016" PRIx64,
++                riscv_fpr_regnames[i], env->fpr[i]);
++            if ((i & 3) == 3) {
 +                cpu_fprintf(f, "\n");
 +            }
-+        }
-+        cpu_fprintf(f, "FPSCR " TARGET_FMT_lx "\n", env->fpscr);
+         }
      }
--    cpu_fprintf(f, "FPSCR " TARGET_FMT_lx "\n", env->fpscr);
-+
- #if !defined(CONFIG_USER_ONLY)
-     cpu_fprintf(f, " SRR0 " TARGET_FMT_lx "  SRR1 " TARGET_FMT_lx
-                    "    PVR " TARGET_FMT_lx " VRSAVE " TARGET_FMT_lx "\n",
+ }
 -- 
 2.17.0
