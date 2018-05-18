@@ -1,33 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45612)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46772)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1fJeJa-0004TR-LY
-	for qemu-devel@nongnu.org; Fri, 18 May 2018 08:16:55 -0400
+	(envelope-from <marcandre.lureau@redhat.com>) id 1fJePi-0007D7-0G
+	for qemu-devel@nongnu.org; Fri, 18 May 2018 08:23:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1fJeJX-00079L-HM
-	for qemu-devel@nongnu.org; Fri, 18 May 2018 08:16:54 -0400
-Received: from 4.mo2.mail-out.ovh.net ([87.98.172.75]:59638)
+	(envelope-from <marcandre.lureau@redhat.com>) id 1fJePe-0003Pg-Rl
+	for qemu-devel@nongnu.org; Fri, 18 May 2018 08:23:14 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:44932 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1fJeJX-00078Y-AC
-	for qemu-devel@nongnu.org; Fri, 18 May 2018 08:16:51 -0400
-Received: from player158.ha.ovh.net (unknown [10.109.122.80])
-	by mo2.mail-out.ovh.net (Postfix) with ESMTP id B806C134F52
-	for <qemu-devel@nongnu.org>; Fri, 18 May 2018 14:16:49 +0200 (CEST)
-Date: Fri, 18 May 2018 14:16:42 +0200
-From: Greg Kurz <groug@kaod.org>
-Message-ID: <20180518141642.6ad639ac@bahia.lan>
-In-Reply-To: <e9333edf-fa2a-6ad8-412b-459b0b8002e9@xenosoft.de>
-References: <4521b265-855f-7f06-ffff-3fa394380922@xenosoft.de>
-	<b3243bab-58b6-0b43-67b5-94a2f90d9199@tuxfamily.org>
-	<5BD35D0B-E490-4693-8858-E11B7401709F@xenosoft.de>
-	<1821476d-7724-ad71-eb3f-69c731633582@tuxfamily.org>
-	<886dc490-c96a-ad5a-e1f7-8e41a686a53e@xenosoft.de>
-	<20180518131303.6f0778eb@bahia.lan>
-	<e9333edf-fa2a-6ad8-412b-459b0b8002e9@xenosoft.de>
+	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
+	id 1fJePe-0003PK-MH
+	for qemu-devel@nongnu.org; Fri, 18 May 2018 08:23:10 -0400
+From: marcandre.lureau@redhat.com
+Date: Fri, 18 May 2018 14:23:00 +0200
+Message-Id: <20180518122304.31020-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PPC64] P5020DS: Booting from img possible
- (-drive)?
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v3 0/4] RFC: ovmf: Add support for TPM Physical
+ Presence interface
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,18 +26,94 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Christian Zigotzky <chzigotzky@xenosoft.de>
-Cc: Thomas Huth <huth@tuxfamily.org>, qemu-devel@nongnu.org, "kvm-ppc@vger.kernel.org" <kvm-ppc@vger.kernel.org>, Alexander Graf <agraf@suse.de>, qemu-ppc@nongnu.org
+To: edk2-devel@lists.01.org
+Cc: pjones@redhat.com, jiewen.yao@intel.com, stefanb@linux.vnet.ibm.com, lersek@redhat.com, qemu-devel@nongnu.org, javierm@redhat.com, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
-On Fri, 18 May 2018 13:50:42 +0200
-Christian Zigotzky <chzigotzky@xenosoft.de> wrote:
+From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
-> On 18 May 2018 at 1:13PM, Greg Kurz wrote:
-> > And of course your kernel should be built with virtio support.
-> I think I have enabled virtio support. Please find attached my kernel 
-> config.
-> 
+Hi,
 
-Indeed, what about passing root=/dev/vda3 to the kernel ?
+The following series adds basic TPM PPI 1.3 support for OVMF-on-QEMU
+with TPM2 (I haven't looked at TPM1, for lack of interest).
 
-> -- Christian
+PPI test runs successfully with Windows 10 WHLK, despite the limited
+number of supported funcions (tpm2_ppi_funcs table, in particular, no
+function allows to manipulate Tcg2PhysicalPresenceFlags)
+
+The way it works is relatively simple: a memory region is allocated by
+QEMU to save PPI related variables. An ACPI interface is exposed by
+QEMU to let the guest manipulate those. At boot, ovmf processes and
+updates the PPI qemu region and request variables.
+
+I build edk2 with:
+
+$ build -DTPM2_ENABLE
+
+I test with qemu & swtpm/libtpms (tpm2 branches, swtpm_setup.sh --tpm2
+ --tpm-state tpmstatedir)
+
+$ swtpm socket --tpmstate tpmstatedir --ctrl type=3Dunixio,path=3Dtpmsock
+  --tpm2 &
+
+$ qemu .. -chardev socket,id=3Dchrtpm,path=3Dtpmsock -tpmdev
+  emulator,id=3Dtpm0,chardev=3Dchrtpm -device tpm-crb,tpmdev=3Dtpm0
+
+Github trees:
+https://github.com/elmarco/edk2/tree/tpm-ppi
+https://github.com/elmarco/qemu/tree/tpm-ppi
+
+Thanks
+
+v3: after Laszlo review
+ - dropped DxeTcg2PhysicalPresenceLib.uni
+ - removed mTpm2PPIFuncs static initialization, use hard-coded assignment=
+s
+ - declared STATIC the functions that should be
+ - fixed an OUT/IN decorator
+ - use EFI_PROTOCOL_ERROR instead of EFI_INVALID_PARAMETER when PPI
+   initialization fails
+ - replaced EFI_D_INFO with DEBUG_INFO
+ - added a check for mPpi address that it doesn't cross a page boundary
+ - added a GetMemorySpaceDescriptor() check for memory type
+ - declared *mPpi as volatile, to correct mmio access
+ - a few more style changes
+ - comments updated
+ - some minor dead code/inclusion/defines removal
+ - added a few r-b tags
+
+v2:
+ - style and commit message fixes
+
+Marc-Andr=C3=A9 Lureau (4):
+  OvmfPkg: add Tcg2PhysicalPresenceLibNull when !TPM2_ENABLE
+  OvmfPkg/IndustryStandard: add QemuTpm.h header
+  OvmfPkg: add Tcg2PhysicalPresenceLibQemu
+  OvmfPkg/PlatformBootManagerLib: process TPM PPI request
+
+ OvmfPkg/OvmfPkgIa32.dsc                       |   4 +-
+ OvmfPkg/OvmfPkgIa32X64.dsc                    |   4 +-
+ OvmfPkg/OvmfPkgX64.dsc                        |   4 +-
+ .../PlatformBootManagerLib.inf                |   2 +
+ .../DxeTcg2PhysicalPresenceLib.inf            |  33 +
+ .../DxeTcg2PhysicalPresenceLib.inf            |  46 +-
+ OvmfPkg/Include/IndustryStandard/QemuTpm.h    |  69 ++
+ .../PlatformBootManagerLib/BdsPlatform.c      |   6 +
+ .../DxeTcg2PhysicalPresenceLib.c              |  20 +-
+ .../DxeTcg2PhysicalPresenceLib.c              | 919 ++++++++++++++++++
+ .../PhysicalPresenceStrings.uni               |  33 +-
+ 11 files changed, 1081 insertions(+), 59 deletions(-)
+ create mode 100644 OvmfPkg/Library/Tcg2PhysicalPresenceLibNull/DxeTcg2Ph=
+ysicalPresenceLib.inf
+ copy {SecurityPkg/Library/DxeTcg2PhysicalPresenceLib =3D> OvmfPkg/Librar=
+y/Tcg2PhysicalPresenceLibQemu}/DxeTcg2PhysicalPresenceLib.inf (66%)
+ create mode 100644 OvmfPkg/Include/IndustryStandard/QemuTpm.h
+ copy EdkCompatibilityPkg/Foundation/Library/EdkIIGlueLib/Library/BaseLib=
+/Ia32/CpuSleep.c =3D> OvmfPkg/Library/Tcg2PhysicalPresenceLibNull/DxeTcg2=
+PhysicalPresenceLib.c (55%)
+ create mode 100644 OvmfPkg/Library/Tcg2PhysicalPresenceLibQemu/DxeTcg2Ph=
+ysicalPresenceLib.c
+ copy {SecurityPkg/Library/DxeTcg2PhysicalPresenceLib =3D> OvmfPkg/Librar=
+y/Tcg2PhysicalPresenceLibQemu}/PhysicalPresenceStrings.uni (56%)
+
+--=20
+2.17.0.253.g3dd125b46d
