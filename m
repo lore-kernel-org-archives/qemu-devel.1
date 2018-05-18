@@ -1,27 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47297)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58913)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1fJa0X-0001ti-3V
-	for qemu-devel@nongnu.org; Fri, 18 May 2018 03:40:58 -0400
+	(envelope-from <chzigotzky@xenosoft.de>) id 1fJYSm-0003Mc-Ah
+	for qemu-devel@nongnu.org; Fri, 18 May 2018 02:02:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1fJa0W-00053n-6D
-	for qemu-devel@nongnu.org; Fri, 18 May 2018 03:40:57 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:37856 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1fJa0W-00053e-0z
-	for qemu-devel@nongnu.org; Fri, 18 May 2018 03:40:56 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.3])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 964AB81FE147
-	for <qemu-devel@nongnu.org>; Fri, 18 May 2018 07:40:55 +0000 (UTC)
-From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Fri, 18 May 2018 09:40:49 +0200
-Message-Id: <20180518074052.31724-1-kraxel@redhat.com>
+	(envelope-from <chzigotzky@xenosoft.de>) id 1fJYSl-0005Ve-Dl
+	for qemu-devel@nongnu.org; Fri, 18 May 2018 02:02:00 -0400
+Received: from mo6-p00-ob.smtp.rzone.de ([2a01:238:20a:202:5300::12]:32364)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <chzigotzky@xenosoft.de>)
+	id 1fJYSk-0005Ua-Sr
+	for qemu-devel@nongnu.org; Fri, 18 May 2018 02:01:59 -0400
+From: Christian Zigotzky <chzigotzky@xenosoft.de>
+Message-ID: <4521b265-855f-7f06-ffff-3fa394380922@xenosoft.de>
+Date: Fri, 18 May 2018 08:01:49 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 0/3] Ui 20180518 patches
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: de-DE
+Subject: [Qemu-devel] [PPC64] P5020DS: Booting from img possible (-drive)?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,43 +26,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Gerd Hoffmann <kraxel@redhat.com>
+To: "kvm-ppc@vger.kernel.org" <kvm-ppc@vger.kernel.org>, qemu-devel@nongnu.org, Alexander Graf <agraf@suse.de>
 
-The following changes since commit a4207e3b00e89f934adb231057dcf9a75ac2ae=
-45:
+|Hello,
 
-  Merge remote-tracking branch 'remotes/cody/tags/block-pull-request' int=
-o staging (2018-05-17 11:59:50 +0100)
+I was able to boot a Linux kernel (uImage) with an initrd in a virtual 
+P5020DS PPC64 machine with an e5500 core (QEMU 2.12.0) with the 
+following command.
 
-are available in the git repository at:
+qemu-system-ppc64 -M ppce500 -cpu e5500 -m 2048 -initrd 
+/home/christian/Downloads/slitaz25.gz -nographic -kernel 
+/home/christian/Downloads/vmlinux-4.17-rc5-AmigaOne_X1000_X5000/X5000/uImage-4.17 
+-net nic,vlan=0,model=e1000 -net user,vlan=0 -machine 
+dt_compatible=fsl,,P5020DS -append "root=/dev/ramdisk"
 
-  git://git.kraxel.org/qemu tags/ui-20180518-pull-request
+It also works with the machine 'MPC8544DS':
 
-for you to fetch changes up to e8dcb8ae5121965ac8c89e6b277ac127e9d08452:
+qemu-system-ppc64 -M mpc8544ds -cpu e5500 -m 2048 -initrd 
+/home/christian/Downloads/slitaz25.gz -nographic -kernel 
+/home/christian/Downloads/vmlinux-4.17-rc5-AmigaOne_X1000_X5000/X5000/uImage-4.17 
+-net nic,vlan=0,model=e1000 -net user,vlan=0 -machine 
+dt_compatible=fsl,,P5020DS -append "root=/dev/ramdisk"
 
-  sdl: Move use of surface pointer below check for whether it is NULL (20=
-18-05-18 09:14:24 +0200)
+I tried to boot ubuntu MATE 16.04 LTS PowerPC from an img with the 
+option '-drive' but without any success. Is it possible to boot from a 
+hard disk img with a virtual P5020DS PPC64 machine? Can I use a virtual 
+graphics card with this machine?
 
-----------------------------------------------------------------
-ui: bugfixes, move x11 dependency to modules.
+Have a nice weekend! :-)
 
-----------------------------------------------------------------
-
-Michal Privoznik (1):
-  console: Avoid segfault in screendump
-
-Paolo Bonzini (1):
-  ui: add x_keymap.o to modules
-
-Peter Maydell (1):
-  sdl: Move use of surface pointer below check for whether it is NULL
-
- ui/console.c             |  5 +++++
- ui/sdl2-2d.c             |  6 +++---
- hw/display/Makefile.objs |  2 ++
- ui/Makefile.objs         | 11 +++++++----
- 4 files changed, 17 insertions(+), 7 deletions(-)
-
---=20
-2.9.3
+Thanks,
+Christian
+|
