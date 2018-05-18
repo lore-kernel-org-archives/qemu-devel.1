@@ -1,24 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47296)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47297)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1fJa0X-0001tg-3C
+	(envelope-from <kraxel@redhat.com>) id 1fJa0X-0001ti-3V
 	for qemu-devel@nongnu.org; Fri, 18 May 2018 03:40:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1fJa0U-00052v-0h
+	(envelope-from <kraxel@redhat.com>) id 1fJa0W-00053n-6D
 	for qemu-devel@nongnu.org; Fri, 18 May 2018 03:40:57 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:60610 helo=mx1.redhat.com)
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:37856 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1fJa0T-00052l-SC
-	for qemu-devel@nongnu.org; Fri, 18 May 2018 03:40:53 -0400
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1fJa0W-00053e-0z
+	for qemu-devel@nongnu.org; Fri, 18 May 2018 03:40:56 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.3])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 964AB81FE147
+	for <qemu-devel@nongnu.org>; Fri, 18 May 2018 07:40:55 +0000 (UTC)
 From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Fri, 18 May 2018 09:40:52 +0200
-Message-Id: <20180518074052.31724-4-kraxel@redhat.com>
-In-Reply-To: <20180518074052.31724-1-kraxel@redhat.com>
-References: <20180518074052.31724-1-kraxel@redhat.com>
+Date: Fri, 18 May 2018 09:40:49 +0200
+Message-Id: <20180518074052.31724-1-kraxel@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 3/3] sdl: Move use of surface pointer below
- check for whether it is NULL
+Subject: [Qemu-devel] [PULL 0/3] Ui 20180518 patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,47 +31,42 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Gerd Hoffmann <kraxel@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
+Cc: Gerd Hoffmann <kraxel@redhat.com>
 
-From: Peter Maydell <peter.maydell@linaro.org>
+The following changes since commit a4207e3b00e89f934adb231057dcf9a75ac2ae=
+45:
 
-In commit 2ab858c6c38ee1 we added a use of the 'surf' variable
-in sdl2_2d_update() that was unfortunately placed above the
-early-exit-if-NULL check. Move it to where it ought to be.
+  Merge remote-tracking branch 'remotes/cody/tags/block-pull-request' int=
+o staging (2018-05-17 11:59:50 +0100)
 
-Fixes: Coverity CID 1390598
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-Message-id: 20180515185814.1374-1-peter.maydell@linaro.org
-Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
----
- ui/sdl2-2d.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+are available in the git repository at:
 
-diff --git a/ui/sdl2-2d.c b/ui/sdl2-2d.c
-index 1f34817bae..85484407be 100644
---- a/ui/sdl2-2d.c
-+++ b/ui/sdl2-2d.c
-@@ -36,9 +36,7 @@ void sdl2_2d_update(DisplayChangeListener *dcl,
-     struct sdl2_console *scon =3D container_of(dcl, struct sdl2_console,=
- dcl);
-     DisplaySurface *surf =3D qemu_console_surface(dcl->con);
-     SDL_Rect rect;
--    size_t surface_data_offset =3D surface_bytes_per_pixel(surf) * x +
--                                 surface_stride(surf) * y;
--
-+    size_t surface_data_offset;
-     assert(!scon->opengl);
-=20
-     if (!surf) {
-@@ -48,6 +46,8 @@ void sdl2_2d_update(DisplayChangeListener *dcl,
-         return;
-     }
-=20
-+    surface_data_offset =3D surface_bytes_per_pixel(surf) * x +
-+                          surface_stride(surf) * y;
-     rect.x =3D x;
-     rect.y =3D y;
-     rect.w =3D w;
+  git://git.kraxel.org/qemu tags/ui-20180518-pull-request
+
+for you to fetch changes up to e8dcb8ae5121965ac8c89e6b277ac127e9d08452:
+
+  sdl: Move use of surface pointer below check for whether it is NULL (20=
+18-05-18 09:14:24 +0200)
+
+----------------------------------------------------------------
+ui: bugfixes, move x11 dependency to modules.
+
+----------------------------------------------------------------
+
+Michal Privoznik (1):
+  console: Avoid segfault in screendump
+
+Paolo Bonzini (1):
+  ui: add x_keymap.o to modules
+
+Peter Maydell (1):
+  sdl: Move use of surface pointer below check for whether it is NULL
+
+ ui/console.c             |  5 +++++
+ ui/sdl2-2d.c             |  6 +++---
+ hw/display/Makefile.objs |  2 ++
+ ui/Makefile.objs         | 11 +++++++----
+ 4 files changed, 17 insertions(+), 7 deletions(-)
+
 --=20
 2.9.3
