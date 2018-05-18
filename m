@@ -1,32 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50946)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51341)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1fJcWK-00063c-7y
-	for qemu-devel@nongnu.org; Fri, 18 May 2018 06:21:57 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1fJcXJ-0006e2-3k
+	for qemu-devel@nongnu.org; Fri, 18 May 2018 06:22:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1fJcWH-0006I1-2b
-	for qemu-devel@nongnu.org; Fri, 18 May 2018 06:21:56 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:41550 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1fJcWG-0006Hr-Ul
-	for qemu-devel@nongnu.org; Fri, 18 May 2018 06:21:53 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.5])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 7E780BB41A
-	for <qemu-devel@nongnu.org>; Fri, 18 May 2018 10:21:52 +0000 (UTC)
-Date: Fri, 18 May 2018 18:21:43 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20180518102143.GO2569@xz-mi>
-References: <20180509041734.14135-1-peterx@redhat.com>
-	<20180509041734.14135-4-peterx@redhat.com>
-	<87zi0ylaab.fsf@dusky.pond.sub.org>
+	(envelope-from <peter.maydell@linaro.org>) id 1fJcXI-0006m4-2S
+	for qemu-devel@nongnu.org; Fri, 18 May 2018 06:22:57 -0400
+Received: from mail-ot0-x22b.google.com ([2607:f8b0:4003:c0f::22b]:36821)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1fJcXH-0006lp-TR
+	for qemu-devel@nongnu.org; Fri, 18 May 2018 06:22:56 -0400
+Received: by mail-ot0-x22b.google.com with SMTP id m11-v6so8518932otf.3
+	for <qemu-devel@nongnu.org>; Fri, 18 May 2018 03:22:55 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <87zi0ylaab.fsf@dusky.pond.sub.org>
-Subject: Re: [Qemu-devel] [PATCH v5 3/4] monitor: more comments on lock-free
- fleids/funcs
+In-Reply-To: <CAFEAcA-7ebtCy+-YzpDhxY9eiZBU+7qcs98CmHKwiu60-ro2Og@mail.gmail.com>
+References: <20180509112406.6183-1-quintela@redhat.com>
+	<CAFEAcA9+qqcVO1gq7PiLqCdKiHkrE81KroEdz7+iPanQ50zJRQ@mail.gmail.com>
+	<CAFEAcA-7ebtCy+-YzpDhxY9eiZBU+7qcs98CmHKwiu60-ro2Og@mail.gmail.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 18 May 2018 11:22:34 +0100
+Message-ID: <CAFEAcA_rRJKCEzWbfY9WQXcq2OhAxmdfobWMOVpAOkxB=ZNiTg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL 00/41] Migration queue
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,78 +30,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: qemu-devel@nongnu.org, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
+To: Juan Quintela <quintela@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Laurent Vivier <lvivier@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Peter Xu <peterx@redhat.com>
 
-On Thu, May 17, 2018 at 02:46:36PM +0200, Markus Armbruster wrote:
-> Peter Xu <peterx@redhat.com> writes:
-> 
-> > Add some explicit comment for both Readline and cpu_set/cpu_get helpers
-> > that they do not need the mon_lock protection.
-> 
-> Appreciated!
-> 
-> > Signed-off-by: Peter Xu <peterx@redhat.com>
-> > ---
-> >  monitor.c | 5 +++--
-> >  1 file changed, 3 insertions(+), 2 deletions(-)
-> >
-> > diff --git a/monitor.c b/monitor.c
-> > index d6c3c08932..ae5bca9d7c 100644
-> > --- a/monitor.c
-> > +++ b/monitor.c
-> > @@ -207,7 +207,7 @@ struct Monitor {
-> >      int suspend_cnt;            /* Needs to be accessed atomically */
-> >      bool skip_flush;
-> >      bool use_io_thr;
-> > -    ReadLineState *rs;
-> > +    ReadLineState *rs;   /* Only used in parser, so no lock needed. */
-> 
-> Pardon the ignorant question: why does "only used in parser" imply "no
-> lock needed"?
+On 18 May 2018 at 11:19, Peter Maydell <peter.maydell@linaro.org> wrote:
+> On 11 May 2018 at 14:41, Peter Maydell <peter.maydell@linaro.org> wrote:
+>> Hi. I get some test failures here:
+>>
+>> S390x host:
+>> TEST: tests/migration-test... (pid=57456)
+>>   /ppc64/migration/deprecated:                                         OK
+>>   /ppc64/migration/bad_dest:                                           OK
+>>   /ppc64/migration/postcopy/unix:                                      OK
+>>   /ppc64/migration/precopy/unix:                                       OK
+>>   /ppc64/migration/xbzrle/unix:
+>> Unexpected 32 on dest_serial serial
+>> **
+>> ERROR:/home/linux1/qemu/tests/migration-test.c:144:wait_for_serial:
+>> code should not be reached
+>> FAIL
+>
+> It turns out that this one is an intermittent that we've seen
+> before (I just hit it again this morning on an unrelated test run
+> on an x86-64 host, and last time it was on a ppc host).
+> In this mail Laurent tracked it down to an overly optimistic
+> setting for downtime-limit in migration-test.c:
+> https://lists.gnu.org/archive/html/qemu-devel/2018-02/msg00107.html
+>
+> Can we push that up to something that we won't hit even if the
+> test is being run on a machine that's under CPU load, please?
 
-Since even if the monitors can be run in multiple threads now, the
-monitor parser of a specific Monitor will still only be run in either
-the main thread or the monitor iothread.  My fault to be unclear on
-the comment.  Maybe this one is better:
+Also, it would be nice if the test reported failure to converge
+with an error including the phrase "failed to converge" rather
+than obscure stuff about serial :-)
 
-  It is only used in parser, and the parser of a monitor will only be
-  run either in main thread or monitor IOThread but never both, so no
-  lock is needed when accessing ReadLineState.
-
-> 
-> >      MonitorQMP qmp;
-> >      gchar *mon_cpu_path;
-> >      BlockCompletionFunc *password_completion_cb;
-> > @@ -1313,7 +1313,7 @@ void qmp_qmp_capabilities(bool has_enable, QMPCapabilityList *enable,
-> >      cur_mon->qmp.commands = &qmp_commands;
-> >  }
-> >  
-> > -/* set the current CPU defined by the user */
-> > +/* set the current CPU defined by the user.  BQL needed. */
-> 
-> It's okay to start a comment containing a phrase with a lower case
-> letter, but you're turning this one into two sentences, and sentences
-> start in upper case.  Can touch up on commit.
-> 
-> "BQL needed" is okay, just a bit terse; I'd write "Caller must hold
-> BQL".  Could change that, too.
-
-I'll do that.
-
-> 
-> >  int monitor_set_cpu(int cpu_index)
-> >  {
-> >      CPUState *cpu;
-> > @@ -1327,6 +1327,7 @@ int monitor_set_cpu(int cpu_index)
-> >      return 0;
-> >  }
-> >  
-> > +/* BQL neeeded. */
-> 
-> Likewise.
-
-Will do.  Thanks,
-
--- 
-Peter Xu
+thanks
+-- PMM
