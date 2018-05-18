@@ -1,23 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57553)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59117)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wangjie88@huawei.com>) id 1fJamd-0001SC-I3
-	for qemu-devel@nongnu.org; Fri, 18 May 2018 04:30:40 -0400
+	(envelope-from <kwolf@redhat.com>) id 1fJay6-0005uA-Hs
+	for qemu-devel@nongnu.org; Fri, 18 May 2018 04:42:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wangjie88@huawei.com>) id 1fJamc-0001bl-GK
-	for qemu-devel@nongnu.org; Fri, 18 May 2018 04:30:39 -0400
-From: "WangJie (Pluto)" <wangjie88@huawei.com>
-References: <1526523977-73930-1-git-send-email-wangjie88@huawei.com>
-	<20180517062258.GP9089@xz-mi>
-	<2b45d90a-6798-224e-91c5-41b3cc3a5b16@huawei.com>
-Message-ID: <7cb9a938-7bd3-fd44-2914-fbd98eecd50d@huawei.com>
-Date: Fri, 18 May 2018 16:24:44 +0800
+	(envelope-from <kwolf@redhat.com>) id 1fJay5-0008Kr-NM
+	for qemu-devel@nongnu.org; Fri, 18 May 2018 04:42:30 -0400
+Date: Fri, 18 May 2018 10:42:21 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20180518084221.GA4833@localhost.localdomain>
+References: <20180517165253.19958-1-kwolf@redhat.com>
+	<20180517165253.19958-3-kwolf@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <2b45d90a-6798-224e-91c5-41b3cc3a5b16@huawei.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] Ping? Re: [PATCH v6 2/2] iothread: let
- aio_epoll_disable fit to aio_context_destroy
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180517165253.19958-3-kwolf@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 2/3] qemu-iotests: Filter NFS paths
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,66 +23,22 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: famz@redhat.com, stefanha@redhat.com, eblake@redhat.com, qemu-devel@nongnu.org, qemu-block@nongnu.org, eric.fangyi@huawei.com, wangjie88@huawei.com
+To: qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org
 
-Ping
-
-On 2018/5/17 14:48, WangJie (Pluto) wrote:
-> I enjoyed the great benefit of your suggestions, and I will improve next time. :)
-> This time, I ask maintainers to touch up the commit message base on version 5 and merge it, thanks very much.
+Am 17.05.2018 um 18:52 hat Kevin Wolf geschrieben:
+> NFS paths were only partially filtered in _filter_img_create, _img_info
+> and _filter_img_info, resulting in "nfs://127.0.0.1TEST_DIR/t.IMGFMT".
+> This adds another replacement to the sed calls that matches $TEST_IMG as
+> a whole.
 > 
-> On 2018/5/17 14:22, Peter Xu wrote:
->> On Thu, May 17, 2018 at 10:26:17AM +0800, Jie Wang wrote:
->>> epoll_available will only be set if epollfd != -1, os we
->>> can swap the two variables in aio_epoll_disable, and
->>> aio_context_destroy can call aio_epoll_disable directly.
->>>
->>> Signed-off-by: Jie Wang <wangjie88@huawei.com>
->>> ---
->>>  util/aio-posix.c | 10 ++++------
->>>  1 file changed, 4 insertions(+), 6 deletions(-)
->>>
->>> diff --git a/util/aio-posix.c b/util/aio-posix.c
->>> index 0ade2c7..118bf57 100644
->>> --- a/util/aio-posix.c
->>> +++ b/util/aio-posix.c
->>> @@ -45,11 +45,11 @@ struct AioHandler
->>>  
->>>  static void aio_epoll_disable(AioContext *ctx)
->>>  {
->>> -    ctx->epoll_available = false;
->>> -    if (!ctx->epoll_enabled) {
->>> +    ctx->epoll_enabled = false;
->>> +    if (!ctx->epoll_available) {
->>>          return;
->>>      }
->>> -    ctx->epoll_enabled = false;
->>> +    ctx->epoll_available = false;
->>>      close(ctx->epollfd);
->>>  }
->>>  
->>> @@ -716,9 +716,7 @@ void aio_context_setup(AioContext *ctx)
->>>  void aio_context_destroy(AioContext *ctx)
->>>  {
->>>  #ifdef CONFIG_EPOLL_CREATE1
->>> -    if (ctx->epollfd >= 0) {
->>> -        close(ctx->epollfd);
->>> -    }
->>> +    aio_epoll_disable(ctx);
->>
->> Hmm... I think this patch should be the first if to split.
->>
->> Anyway, IMHO version 5 is already good enough and has got r-bs, no
->> need to bother reposting a version 7.  Maintainer could possibly touch
->> up the commit message if necessary.
->>
->> Thanks,
->>
->>>  #endif
->>>  }
->>>  
->>> -- 
->>> 1.8.3.1
->>>
->>
+> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+
+Self-NACK, this replaces a bit too much... (Some places in the test
+scripts override $TEST_IMG, but not $TEST_IMG_FILE).
+
+Maybe we need to introduce some $TEST_DIR_REMOTE (any suggestions for
+a better name?) that would contain "nfs://127.0.0.1$TEST_DIR" and can be
+used in the filter function.
+
+Kevin
