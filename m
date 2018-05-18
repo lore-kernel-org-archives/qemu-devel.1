@@ -1,28 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43235)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43299)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fJjaw-0003jC-Pp
-	for qemu-devel@nongnu.org; Fri, 18 May 2018 13:55:11 -0400
+	(envelope-from <eblake@redhat.com>) id 1fJjb9-0003zy-NE
+	for qemu-devel@nongnu.org; Fri, 18 May 2018 13:55:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fJjav-0007Pg-Rl
-	for qemu-devel@nongnu.org; Fri, 18 May 2018 13:55:10 -0400
-Received: from mail-ot0-x234.google.com ([2607:f8b0:4003:c0f::234]:43751)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fJjav-0007PU-MN
-	for qemu-devel@nongnu.org; Fri, 18 May 2018 13:55:09 -0400
-Received: by mail-ot0-x234.google.com with SMTP id y10-v6so10069408otg.10
-	for <qemu-devel@nongnu.org>; Fri, 18 May 2018 10:55:09 -0700 (PDT)
+	(envelope-from <eblake@redhat.com>) id 1fJjb8-0007Vw-M2
+	for qemu-devel@nongnu.org; Fri, 18 May 2018 13:55:23 -0400
+References: <20180518132114.4070-1-kwolf@redhat.com>
+	<20180518132114.4070-36-kwolf@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <c2263684-d5fa-4eb5-6bc9-2b7c816e9321@redhat.com>
+Date: Fri, 18 May 2018 12:55:12 -0500
 MIME-Version: 1.0
-In-Reply-To: <20180514171913.17664-2-berrange@redhat.com>
-References: <20180514171913.17664-1-berrange@redhat.com>
-	<20180514171913.17664-2-berrange@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 18 May 2018 18:54:48 +0100
-Message-ID: <CAFEAcA_Md+65UePz-_WWUWJi35EGVaOEnPHMUGuA=ZJPqGcp2Q@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 1/3] i386: fix regression parsing multiboot
- initrd modules
+In-Reply-To: <20180518132114.4070-36-kwolf@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 35/40] job: Add JOB_STATUS_CHANGE QMP
+ event
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,62 +25,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+Cc: mreitz@redhat.com, jsnow@redhat.com, jcody@redhat.com, armbru@redhat.com, qemu-devel@nongnu.org
 
-On 14 May 2018 at 18:19, Daniel P. Berrang=C3=A9 <berrange@redhat.com> wrot=
-e:
-> The logic for parsing the multiboot initrd modules was messed up in
->
->   commit 950c4e6c94b15cd0d8b63891dddd7a8dbf458e6a
->   Author: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
->   Date:   Mon Apr 16 12:17:43 2018 +0100
->
->     opts: don't silently truncate long option values
->
-> Causing the length to be undercounter, and the number of modules over
-> counted. It also passes NULL to get_opt_value() which was not robust
-> at accepting a NULL value.
->
-> Signed-off-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+On 05/18/2018 08:21 AM, Kevin Wolf wrote:
+> This adds a QMP event that is emitted whenever a job transitions from
+> one status to another.
+> 
+> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 > ---
->  hw/i386/multiboot.c | 3 +--
->  util/qemu-option.c  | 4 +++-
->  2 files changed, 4 insertions(+), 3 deletions(-)
->
-> diff --git a/hw/i386/multiboot.c b/hw/i386/multiboot.c
-> index 7a2953e26f..8e26545814 100644
-> --- a/hw/i386/multiboot.c
-> +++ b/hw/i386/multiboot.c
-> @@ -292,8 +292,7 @@ int load_multiboot(FWCfgState *fw_cfg,
->      cmdline_len +=3D strlen(kernel_cmdline) + 1;
->      if (initrd_filename) {
->          const char *r =3D get_opt_value(initrd_filename, NULL);
-> -        cmdline_len +=3D strlen(r) + 1;
-> -        mbs.mb_mods_avail =3D 1;
-> +        cmdline_len +=3D strlen(initrd_filename) + 1;
->          while (1) {
->              mbs.mb_mods_avail++;
->              r =3D get_opt_value(r, NULL);
-> diff --git a/util/qemu-option.c b/util/qemu-option.c
-> index 58d1c23893..8a68bc2314 100644
-> --- a/util/qemu-option.c
-> +++ b/util/qemu-option.c
-> @@ -75,7 +75,9 @@ const char *get_opt_value(const char *p, char **value)
->      size_t capacity =3D 0, length;
->      const char *offset;
->
-> -    *value =3D NULL;
-> +    if (value) {
-> +        *value =3D NULL;
-> +    }
->      while (1) {
->          offset =3D strchr(p, ',');
->          if (!offset) {
+>   qapi/job.json                 |  14 ++++
+>   job.c                         |  10 +++
 
-Don't we delete this check again in patch 3? If we're
-going to fix this by making multiboot.c not pass in NULL pointers,
-is there a reason not to simply do that?
+> @@ -157,6 +158,11 @@ static int job_txn_apply(JobTxn *txn, int fn(Job *), bool lock)
+>       return rc;
+>   }
+>   
+> +static bool job_is_internal(Job *job)
+> +{
+> +    return (job->id == NULL);
 
-thanks
--- PMM
+The () are not necessary.  In fact, you could use !!job->id for less 
+typing, or even rely on the compiler to auto-convert a pointer into bool 
+by just 'return job->id' (although the latter feels a bit too terse to me).
+
+Style is minor, so
+Reviewed-by: Eric Blake <eblake@redhat.com>
+
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
