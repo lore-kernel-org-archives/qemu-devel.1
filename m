@@ -1,25 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35898)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35912)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1fJj3A-0000Z7-OK
+	(envelope-from <pm215@archaic.org.uk>) id 1fJj3B-0000ZZ-98
 	for qemu-devel@nongnu.org; Fri, 18 May 2018 13:20:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1fJj39-0007Qp-Jv
-	for qemu-devel@nongnu.org; Fri, 18 May 2018 13:20:16 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1fJj3A-0007Rr-GI
+	for qemu-devel@nongnu.org; Fri, 18 May 2018 13:20:17 -0400
 Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:41780)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1fJj39-0007Oi-Bs
-	for qemu-devel@nongnu.org; Fri, 18 May 2018 13:20:15 -0400
+	id 1fJj3A-0007Oi-AJ
+	for qemu-devel@nongnu.org; Fri, 18 May 2018 13:20:16 -0400
 Received: from pm215 by orth.archaic.org.uk with local (Exim 4.89)
-	(envelope-from <pm215@archaic.org.uk>) id 1fJj37-0004lU-Oh
-	for qemu-devel@nongnu.org; Fri, 18 May 2018 18:20:13 +0100
+	(envelope-from <pm215@archaic.org.uk>) id 1fJj39-0004mI-BC
+	for qemu-devel@nongnu.org; Fri, 18 May 2018 18:20:15 +0100
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 18 May 2018 18:19:42 +0100
-Message-Id: <20180518172009.14416-6-peter.maydell@linaro.org>
+Date: Fri, 18 May 2018 18:19:44 +0100
+Message-Id: <20180518172009.14416-8-peter.maydell@linaro.org>
 In-Reply-To: <20180518172009.14416-1-peter.maydell@linaro.org>
 References: <20180518172009.14416-1-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PULL 05/32] xlnx-zynqmp: Connect the ZynqMP GDMA and
- ADMA
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PULL 07/32] hw/arm/smmu-common: Fix coverity issue in
+ get_block_pte_address
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,129 +33,38 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-From: Francisco Iglesias <frasse.iglesias@gmail.com>
+From: Eric Auger <eric.auger@redhat.com>
 
-The ZynqMP contains two instances of a generic DMA, the GDMA, located in the
-FPD (full power domain), and the ADMA, located in LPD (low power domain).  This
-patch adds these two DMAs to the ZynqMP board.
+Coverity points out that this can overflow if n > 31,
+because it's only doing 32-bit arithmetic. Let's use 1ULL instead
+of 1. Also the formulae used to compute n can be replaced by
+the level_shift() macro.
 
-Signed-off-by: Francisco Iglesias <frasse.iglesias@gmail.com>
-Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
-Reviewed-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
-Message-id: 20180503214201.29082-3-frasse.iglesias@gmail.com
+Reported-by: Peter Maydell <peter.maydell@linaro.org>
+Signed-off-by: Eric Auger <eric.auger@redhat.com>
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Message-id: 1526493784-25328-3-git-send-email-eric.auger@redhat.com
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- include/hw/arm/xlnx-zynqmp.h |  5 ++++
- hw/arm/xlnx-zynqmp.c         | 53 ++++++++++++++++++++++++++++++++++++
- 2 files changed, 58 insertions(+)
+ hw/arm/smmu-common.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/include/hw/arm/xlnx-zynqmp.h b/include/hw/arm/xlnx-zynqmp.h
-index 3b613e364d..82b6ec2486 100644
---- a/include/hw/arm/xlnx-zynqmp.h
-+++ b/include/hw/arm/xlnx-zynqmp.h
-@@ -27,6 +27,7 @@
- #include "hw/sd/sdhci.h"
- #include "hw/ssi/xilinx_spips.h"
- #include "hw/dma/xlnx_dpdma.h"
-+#include "hw/dma/xlnx-zdma.h"
- #include "hw/display/xlnx_dp.h"
- #include "hw/intc/xlnx-zynqmp-ipi.h"
- #include "hw/timer/xlnx-zynqmp-rtc.h"
-@@ -41,6 +42,8 @@
- #define XLNX_ZYNQMP_NUM_UARTS 2
- #define XLNX_ZYNQMP_NUM_SDHCI 2
- #define XLNX_ZYNQMP_NUM_SPIS 2
-+#define XLNX_ZYNQMP_NUM_GDMA_CH 8
-+#define XLNX_ZYNQMP_NUM_ADMA_CH 8
+diff --git a/hw/arm/smmu-common.c b/hw/arm/smmu-common.c
+index 01c7be82b6..3c5f7245b5 100644
+--- a/hw/arm/smmu-common.c
++++ b/hw/arm/smmu-common.c
+@@ -83,9 +83,9 @@ static inline hwaddr get_table_pte_address(uint64_t pte, int granule_sz)
+ static inline hwaddr get_block_pte_address(uint64_t pte, int level,
+                                            int granule_sz, uint64_t *bsz)
+ {
+-    int n = (granule_sz - 3) * (4 - level) + 3;
++    int n = level_shift(level, granule_sz);
  
- #define XLNX_ZYNQMP_NUM_QSPI_BUS 2
- #define XLNX_ZYNQMP_NUM_QSPI_BUS_CS 2
-@@ -94,6 +97,8 @@ typedef struct XlnxZynqMPState {
-     XlnxDPDMAState dpdma;
-     XlnxZynqMPIPI ipi;
-     XlnxZynqMPRTC rtc;
-+    XlnxZDMA gdma[XLNX_ZYNQMP_NUM_GDMA_CH];
-+    XlnxZDMA adma[XLNX_ZYNQMP_NUM_ADMA_CH];
- 
-     char *boot_cpu;
-     ARMCPU *boot_cpu_ptr;
-diff --git a/hw/arm/xlnx-zynqmp.c b/hw/arm/xlnx-zynqmp.c
-index 505253e0d2..2045b9d71e 100644
---- a/hw/arm/xlnx-zynqmp.c
-+++ b/hw/arm/xlnx-zynqmp.c
-@@ -90,6 +90,24 @@ static const int spi_intr[XLNX_ZYNQMP_NUM_SPIS] = {
-     19, 20,
- };
- 
-+static const uint64_t gdma_ch_addr[XLNX_ZYNQMP_NUM_GDMA_CH] = {
-+    0xFD500000, 0xFD510000, 0xFD520000, 0xFD530000,
-+    0xFD540000, 0xFD550000, 0xFD560000, 0xFD570000
-+};
-+
-+static const int gdma_ch_intr[XLNX_ZYNQMP_NUM_GDMA_CH] = {
-+    124, 125, 126, 127, 128, 129, 130, 131
-+};
-+
-+static const uint64_t adma_ch_addr[XLNX_ZYNQMP_NUM_ADMA_CH] = {
-+    0xFFA80000, 0xFFA90000, 0xFFAA0000, 0xFFAB0000,
-+    0xFFAC0000, 0xFFAD0000, 0xFFAE0000, 0xFFAF0000
-+};
-+
-+static const int adma_ch_intr[XLNX_ZYNQMP_NUM_ADMA_CH] = {
-+    77, 78, 79, 80, 81, 82, 83, 84
-+};
-+
- typedef struct XlnxZynqMPGICRegion {
-     int region_index;
-     uint32_t address;
-@@ -197,6 +215,16 @@ static void xlnx_zynqmp_init(Object *obj)
- 
-     object_initialize(&s->rtc, sizeof(s->rtc), TYPE_XLNX_ZYNQMP_RTC);
-     qdev_set_parent_bus(DEVICE(&s->rtc), sysbus_get_default());
-+
-+    for (i = 0; i < XLNX_ZYNQMP_NUM_GDMA_CH; i++) {
-+        object_initialize(&s->gdma[i], sizeof(s->gdma[i]), TYPE_XLNX_ZDMA);
-+        qdev_set_parent_bus(DEVICE(&s->gdma[i]), sysbus_get_default());
-+    }
-+
-+    for (i = 0; i < XLNX_ZYNQMP_NUM_ADMA_CH; i++) {
-+        object_initialize(&s->adma[i], sizeof(s->adma[i]), TYPE_XLNX_ZDMA);
-+        qdev_set_parent_bus(DEVICE(&s->adma[i]), sysbus_get_default());
-+    }
+-    *bsz = 1 << n;
++    *bsz = 1ULL << n;
+     return PTE_ADDRESS(pte, n);
  }
  
- static void xlnx_zynqmp_realize(DeviceState *dev, Error **errp)
-@@ -492,6 +520,31 @@ static void xlnx_zynqmp_realize(DeviceState *dev, Error **errp)
-     }
-     sysbus_mmio_map(SYS_BUS_DEVICE(&s->rtc), 0, RTC_ADDR);
-     sysbus_connect_irq(SYS_BUS_DEVICE(&s->rtc), 0, gic_spi[RTC_IRQ]);
-+
-+    for (i = 0; i < XLNX_ZYNQMP_NUM_GDMA_CH; i++) {
-+        object_property_set_uint(OBJECT(&s->gdma[i]), 128, "bus-width", &err);
-+        object_property_set_bool(OBJECT(&s->gdma[i]), true, "realized", &err);
-+        if (err) {
-+            error_propagate(errp, err);
-+            return;
-+        }
-+
-+        sysbus_mmio_map(SYS_BUS_DEVICE(&s->gdma[i]), 0, gdma_ch_addr[i]);
-+        sysbus_connect_irq(SYS_BUS_DEVICE(&s->gdma[i]), 0,
-+                           gic_spi[gdma_ch_intr[i]]);
-+    }
-+
-+    for (i = 0; i < XLNX_ZYNQMP_NUM_ADMA_CH; i++) {
-+        object_property_set_bool(OBJECT(&s->adma[i]), true, "realized", &err);
-+        if (err) {
-+            error_propagate(errp, err);
-+            return;
-+        }
-+
-+        sysbus_mmio_map(SYS_BUS_DEVICE(&s->adma[i]), 0, adma_ch_addr[i]);
-+        sysbus_connect_irq(SYS_BUS_DEVICE(&s->adma[i]), 0,
-+                           gic_spi[adma_ch_intr[i]]);
-+    }
- }
- 
- static Property xlnx_zynqmp_props[] = {
 -- 
 2.17.0
