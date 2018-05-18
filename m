@@ -1,25 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35977)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36578)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fJhJY-0001XB-Pw
-	for qemu-devel@nongnu.org; Fri, 18 May 2018 11:29:05 -0400
+	(envelope-from <mst@redhat.com>) id 1fJhLF-0003A1-VM
+	for qemu-devel@nongnu.org; Fri, 18 May 2018 11:30:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fJhJX-00033h-To
-	for qemu-devel@nongnu.org; Fri, 18 May 2018 11:29:04 -0400
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20180517174718.10107-1-alex.bennee@linaro.org>
-	<20180517174718.10107-28-alex.bennee@linaro.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <13cbc8f7-ed4b-e302-3a6c-b8791a21047b@amsat.org>
-Date: Fri, 18 May 2018 12:28:49 -0300
+	(envelope-from <mst@redhat.com>) id 1fJhLF-0004tL-0x
+	for qemu-devel@nongnu.org; Fri, 18 May 2018 11:30:49 -0400
+Date: Fri, 18 May 2018 18:30:38 +0300
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20180518180440-mutt-send-email-mst@kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20180517174718.10107-28-alex.bennee@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v4 27/49] tests/tcg: enable building for ARM
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Subject: [Qemu-devel] storing machine data in qcow images?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,40 +20,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, cota@braap.org, famz@redhat.com, berrange@redhat.com, richard.henderson@linaro.org, balrogg@gmail.com, aurelien@aurel32.net, agraf@suse.de, Peter Maydell <peter.maydell@linaro.org>
-Cc: qemu-devel@nongnu.org, "open list:ARM" <qemu-arm@nongnu.org>
+To: ehabkost@redhat.com, stefanha@redhat.com, kwolf@redhat.com, mreitz@redhat.com, qemu-devel@nongnu.org, qemu-block@nongnu.org
 
-On 05/17/2018 02:46 PM, Alex Bennée wrote:
-> This allows us to use the docker cross compiler image to build these
-> tests.
-> 
-> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-> ---
->  tests/tcg/arm/Makefile.include | 8 ++++++++
->  1 file changed, 8 insertions(+)
->  create mode 100644 tests/tcg/arm/Makefile.include
-> 
-> diff --git a/tests/tcg/arm/Makefile.include b/tests/tcg/arm/Makefile.include
-> new file mode 100644
-> index 0000000000..8e7eac008f
-> --- /dev/null
-> +++ b/tests/tcg/arm/Makefile.include
-> @@ -0,0 +1,8 @@
-> +# Makefile.include for all ARM targets
-> +#
-> +# We don't have any bigendian build tools so we only use this for armhf
-> +
-> +ifeq ($(TARGET_NAME),arm)
-> +DOCKER_IMAGE=debian-armhf-cross
+Hi!
+Right now, QEMU supports multiple machine types within
+a given architecture. This was the case for many architectures
+(like ARM) for a while, somewhat more recently this is the case
+for x86 with I440FX and Q35 options.
 
-[Note for a later series:]
-Since this image comes with ARMv7 libraries, I find clearer to rename as
-arm32v7, following new Docker scheme. This will ease to add arm32v6 (and
-arm32v5 if possible...)
+Unfortunately this means that it's no longer possible
+to more or less reliably boot a VM just given a disk image,
+even if you select the correct QEMU binary:
+you must supply the correct machine type.
 
-> +DOCKER_CROSS_COMPILER=arm-linux-gnueabihf-gcc
-> +endif
-> 
+Some guests go even further and require specific devices to be present.
 
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Tested-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Would it be reasonable to support storing this information in the qcow
+image itself?  For example, I can see it following immediately the
+backing file path within the image.
+
+As Eduardo pointed out off-list, the format could be a set of key-value
+pairs. Initially qemu-img could gain ability to retrieve and manipulate
+these. Down the road we could teach qemu to use them automatically.
+We could also thinkably warn the user, or drop the image from the boot
+order.
+
+Reasonable (IMO) things we could store in such a section:
+- qemu architecture to use with the image
+- machine type
+
+more possibilities:
+- required cpu flags
+- expected frontend devices
+- kernel flags for device tree based guests
+
+Security considerations
+- If there is a machine type specific security issue,
+  this makes it easier to trick user to hitting it.
+  Not sure how common this is.
+- We most likely shouldn't get backend parameters from the image
+
+Thoughts?
+
+-- 
+MST
