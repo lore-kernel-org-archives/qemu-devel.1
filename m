@@ -1,16 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60186)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60208)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fJfL6-0000eR-6E
-	for qemu-devel@nongnu.org; Fri, 18 May 2018 09:22:34 -0400
+	(envelope-from <kwolf@redhat.com>) id 1fJfLD-0000o4-8J
+	for qemu-devel@nongnu.org; Fri, 18 May 2018 09:22:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fJfL0-0006VF-Bb
-	for qemu-devel@nongnu.org; Fri, 18 May 2018 09:22:32 -0400
+	(envelope-from <kwolf@redhat.com>) id 1fJfL8-0006au-RY
+	for qemu-devel@nongnu.org; Fri, 18 May 2018 09:22:39 -0400
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Fri, 18 May 2018 15:21:12 +0200
-Message-Id: <20180518132114.4070-39-kwolf@redhat.com>
+Date: Fri, 18 May 2018 15:21:14 +0200
+Message-Id: <20180518132114.4070-41-kwolf@redhat.com>
 In-Reply-To: <20180518132114.4070-1-kwolf@redhat.com>
 References: <20180518132114.4070-1-kwolf@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 38/40] blockjob: Remove BlockJob.driver
+Subject: [Qemu-devel] [PATCH v2 40/40] qemu-iotests: Test job-* with block
+ jobs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,81 +23,574 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, mreitz@redhat.com, jsnow@redhat.com, eblake@redhat.com, jcody@redhat.com, armbru@redhat.com, qemu-devel@nongnu.org
 
-BlockJob.driver is redundant with Job.driver and only used in very few
-places any more. Remove it.
+This adds a test case that tests the new job-* QMP commands with
+mirror and backup block jobs.
 
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 ---
- include/block/blockjob.h |  3 ---
- blockjob.c               | 17 ++++++++++-------
- 2 files changed, 10 insertions(+), 10 deletions(-)
+ tests/qemu-iotests/219     | 209 +++++++++++++++++++++++++++++
+ tests/qemu-iotests/219.out | 327 +++++++++++++++++++++++++++++++++++++++++++++
+ tests/qemu-iotests/group   |   1 +
+ 3 files changed, 537 insertions(+)
+ create mode 100755 tests/qemu-iotests/219
+ create mode 100644 tests/qemu-iotests/219.out
 
-diff --git a/include/block/blockjob.h b/include/block/blockjob.h
-index 3021d11126..32c00b7dc0 100644
---- a/include/block/blockjob.h
-+++ b/include/block/blockjob.h
-@@ -43,9 +43,6 @@ typedef struct BlockJob {
-     /** Data belonging to the generic Job infrastructure */
-     Job job;
- 
--    /** The job type, including the job vtable.  */
--    const BlockJobDriver *driver;
--
-     /** The block device on which the job is operating.  */
-     BlockBackend *blk;
- 
-diff --git a/blockjob.c b/blockjob.c
-index 5c8ff6f846..0306533a2e 100644
---- a/blockjob.c
-+++ b/blockjob.c
-@@ -103,10 +103,12 @@ static void block_job_attached_aio_context(AioContext *new_context,
-                                            void *opaque)
- {
-     BlockJob *job = opaque;
-+    const JobDriver *drv = job->job.driver;
-+    BlockJobDriver *bjdrv = container_of(drv, BlockJobDriver, job_driver);
- 
-     job->job.aio_context = new_context;
--    if (job->driver->attached_aio_context) {
--        job->driver->attached_aio_context(job, new_context);
-+    if (bjdrv->attached_aio_context) {
-+        bjdrv->attached_aio_context(job, new_context);
-     }
- 
-     job_resume(&job->job);
-@@ -115,10 +117,12 @@ static void block_job_attached_aio_context(AioContext *new_context,
- void block_job_drain(Job *job)
- {
-     BlockJob *bjob = container_of(job, BlockJob, job);
-+    const JobDriver *drv = job->driver;
-+    BlockJobDriver *bjdrv = container_of(drv, BlockJobDriver, job_driver);
- 
-     blk_drain(bjob->blk);
--    if (bjob->driver->drain) {
--        bjob->driver->drain(bjob);
-+    if (bjdrv->drain) {
-+        bjdrv->drain(bjob);
-     }
- }
- 
-@@ -201,7 +205,7 @@ bool block_job_is_internal(BlockJob *job)
- 
- const BlockJobDriver *block_job_driver(BlockJob *job)
- {
--    return job->driver;
-+    return container_of(job->job.driver, BlockJobDriver, job_driver);
- }
- 
- /* Assumes the job_mutex is held */
-@@ -386,8 +390,7 @@ void *block_job_create(const char *job_id, const BlockJobDriver *driver,
-     assert(job->job.driver->user_resume == &block_job_user_resume);
-     assert(job->job.driver->drain == &block_job_drain);
- 
--    job->driver        = driver;
--    job->blk           = blk;
-+    job->blk = blk;
- 
-     job->finalize_cancelled_notifier.notify = block_job_event_cancelled;
-     job->finalize_completed_notifier.notify = block_job_event_completed;
+diff --git a/tests/qemu-iotests/219 b/tests/qemu-iotests/219
+new file mode 100755
+index 0000000000..898a26eef0
+--- /dev/null
++++ b/tests/qemu-iotests/219
+@@ -0,0 +1,209 @@
++#!/usr/bin/env python
++#
++# Copyright (C) 2018 Red Hat, Inc.
++#
++# This program is free software; you can redistribute it and/or modify
++# it under the terms of the GNU General Public License as published by
++# the Free Software Foundation; either version 2 of the License, or
++# (at your option) any later version.
++#
++# This program is distributed in the hope that it will be useful,
++# but WITHOUT ANY WARRANTY; without even the implied warranty of
++# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++# GNU General Public License for more details.
++#
++# You should have received a copy of the GNU General Public License
++# along with this program.  If not, see <http://www.gnu.org/licenses/>.
++#
++# Creator/Owner: Kevin Wolf <kwolf@redhat.com>
++#
++# Check using the job-* QMP commands with block jobs
++
++import iotests
++
++iotests.verify_image_format(supported_fmts=['qcow2'])
++
++def pause_wait(vm, job_id):
++    with iotests.Timeout(3, "Timeout waiting for job to pause"):
++        while True:
++            result = vm.qmp('query-jobs')
++            for job in result['return']:
++                if job['id'] == job_id and job['status'] in ['paused', 'standby']:
++                    return job
++
++# Test that block-job-pause/resume and job-pause/resume can be mixed
++def test_pause_resume(vm):
++    for pause_cmd, pause_arg in [('block-job-pause', 'device'),
++                                 ('job-pause', 'id')]:
++        for resume_cmd, resume_arg in [('block-job-resume', 'device'),
++                                       ('job-resume', 'id')]:
++            iotests.log('=== Testing %s/%s ===' % (pause_cmd, resume_cmd))
++
++            iotests.log(vm.qmp(pause_cmd, **{pause_arg: 'job0'}))
++            pause_wait(vm, 'job0')
++            iotests.log(iotests.filter_qmp_event(vm.event_wait('JOB_STATUS_CHANGE')))
++            iotests.log(vm.qmp('query-jobs'))
++
++            iotests.log(vm.qmp(resume_cmd, **{resume_arg: 'job0'}))
++            iotests.log(iotests.filter_qmp_event(vm.event_wait('JOB_STATUS_CHANGE')))
++            iotests.log(vm.qmp('query-jobs'))
++
++def test_job_lifecycle(vm, job, job_args, has_ready=False):
++    iotests.log('')
++    iotests.log('')
++    iotests.log('Starting block job: %s (auto-finalize: %s; auto-dismiss: %s)' %
++                (job,
++                 job_args.get('auto-finalize', True),
++                 job_args.get('auto-dismiss', True)))
++    iotests.log(vm.qmp(job, job_id='job0', **job_args))
++
++    # Depending on the storage, the first request may or may not have completed
++    # yet, so filter out the progress. Later query-job calls don't need the
++    # filtering because the progress is made deterministic by the block job
++    # speed
++    result = vm.qmp('query-jobs')
++    for j in result['return']:
++        del j['current-progress']
++    iotests.log(result)
++
++    # undefined -> created -> running
++    iotests.log(iotests.filter_qmp_event(vm.event_wait('JOB_STATUS_CHANGE')))
++    iotests.log(iotests.filter_qmp_event(vm.event_wait('JOB_STATUS_CHANGE')))
++
++    # RUNNING state:
++    # pause/resume should work, complete/finalize/dismiss should error out
++    iotests.log('')
++    iotests.log('Pause/resume in RUNNING')
++    test_pause_resume(vm)
++
++    iotests.log(vm.qmp('job-complete', id='job0'))
++    iotests.log(vm.qmp('job-finalize', id='job0'))
++    iotests.log(vm.qmp('job-dismiss', id='job0'))
++
++    iotests.log(vm.qmp('block-job-complete', device='job0'))
++    iotests.log(vm.qmp('block-job-finalize', id='job0'))
++    iotests.log(vm.qmp('block-job-dismiss', id='job0'))
++
++    # Let the job complete (or transition to READY if it supports that)
++    iotests.log(vm.qmp('block-job-set-speed', device='job0', speed=0))
++    if has_ready:
++        iotests.log('')
++        iotests.log('Waiting for READY state...')
++        vm.event_wait('BLOCK_JOB_READY')
++        iotests.log(iotests.filter_qmp_event(vm.event_wait('JOB_STATUS_CHANGE')))
++        iotests.log(vm.qmp('query-jobs'))
++
++        # READY state:
++        # pause/resume/complete should work, finalize/dismiss should error out
++        iotests.log('')
++        iotests.log('Pause/resume in READY')
++        test_pause_resume(vm)
++
++        iotests.log(vm.qmp('job-finalize', id='job0'))
++        iotests.log(vm.qmp('job-dismiss', id='job0'))
++
++        iotests.log(vm.qmp('block-job-finalize', id='job0'))
++        iotests.log(vm.qmp('block-job-dismiss', id='job0'))
++
++        # Transition to WAITING
++        iotests.log(vm.qmp('job-complete', id='job0'))
++
++    # Move to WAITING and PENDING state
++    iotests.log('')
++    iotests.log('Waiting for PENDING state...')
++    iotests.log(iotests.filter_qmp_event(vm.event_wait('JOB_STATUS_CHANGE')))
++    iotests.log(iotests.filter_qmp_event(vm.event_wait('JOB_STATUS_CHANGE')))
++
++    if not job_args.get('auto-finalize', True):
++        # PENDING state:
++        # finalize should work, pause/complete/dismiss should error out
++        iotests.log(vm.qmp('query-jobs'))
++
++        iotests.log(vm.qmp('job-pause', id='job0'))
++        iotests.log(vm.qmp('job-complete', id='job0'))
++        iotests.log(vm.qmp('job-dismiss', id='job0'))
++
++        iotests.log(vm.qmp('block-job-pause', device='job0'))
++        iotests.log(vm.qmp('block-job-complete', device='job0'))
++        iotests.log(vm.qmp('block-job-dismiss', id='job0'))
++
++        # Transition to CONCLUDED
++        iotests.log(vm.qmp('job-finalize', id='job0'))
++
++
++    # Move to CONCLUDED state
++    iotests.log(iotests.filter_qmp_event(vm.event_wait('JOB_STATUS_CHANGE')))
++
++    if not job_args.get('auto-dismiss', True):
++        # CONCLUDED state:
++        # dismiss should work, pause/complete/finalize should error out
++        iotests.log(vm.qmp('query-jobs'))
++
++        iotests.log(vm.qmp('job-pause', id='job0'))
++        iotests.log(vm.qmp('job-complete', id='job0'))
++        iotests.log(vm.qmp('job-finalize', id='job0'))
++
++        iotests.log(vm.qmp('block-job-pause', device='job0'))
++        iotests.log(vm.qmp('block-job-complete', device='job0'))
++        iotests.log(vm.qmp('block-job-finalize', id='job0'))
++
++        # Transition to NULL
++        iotests.log(vm.qmp('job-dismiss', id='job0'))
++
++    # Move to NULL state
++    iotests.log(iotests.filter_qmp_event(vm.event_wait('JOB_STATUS_CHANGE')))
++    iotests.log(vm.qmp('query-jobs'))
++
++
++with iotests.FilePath('disk.img') as disk_path, \
++     iotests.FilePath('copy.img') as copy_path, \
++     iotests.VM() as vm:
++
++    img_size = '4M'
++    iotests.qemu_img_create('-f', iotests.imgfmt, disk_path, img_size)
++    iotests.qemu_io('-c', 'write 0 %s' % (img_size),
++                    '-f', iotests.imgfmt, disk_path)
++
++    iotests.log('Launching VM...')
++    vm.add_blockdev(vm.qmp_to_opts({
++        'driver': iotests.imgfmt,
++        'node-name': 'drive0-node',
++        'file': {
++            'driver': 'file',
++            'filename': disk_path,
++        },
++    }))
++    vm.launch()
++
++    # In order to keep things deterministic (especially progress in query-job,
++    # but related to this also automatic state transitions like job
++    # completion), but still get pause points often enough to avoid making this
++    # test very slow, it's important to have the right ratio between speed and
++    # buf_size.
++    #
++    # For backup, buf_size is hard-coded to the source image cluster size (64k),
++    # so we'll pick the same for mirror. The slice time, i.e. the granularity
++    # of the rate limiting is 100ms. With a speed of 256k per second, we can
++    # get four pause points per second. This gives us 250ms per iteration,
++    # which should be enough to stay deterministic.
++
++    test_job_lifecycle(vm, 'drive-mirror', has_ready=True, job_args={
++        'device': 'drive0-node',
++        'target': copy_path,
++        'sync': 'full',
++        'speed': 262144,
++        'buf_size': 65536,
++    })
++
++    for auto_finalize in [True, False]:
++        for auto_dismiss in [True, False]:
++            test_job_lifecycle(vm, 'drive-backup', job_args={
++                'device': 'drive0-node',
++                'target': copy_path,
++                'sync': 'full',
++                'speed': 262144,
++                'auto-finalize': auto_finalize,
++                'auto-dismiss': auto_dismiss,
++            })
++
++    vm.shutdown()
+diff --git a/tests/qemu-iotests/219.out b/tests/qemu-iotests/219.out
+new file mode 100644
+index 0000000000..346801b655
+--- /dev/null
++++ b/tests/qemu-iotests/219.out
+@@ -0,0 +1,327 @@
++Launching VM...
++
++
++Starting block job: drive-mirror (auto-finalize: True; auto-dismiss: True)
++{u'return': {}}
++{u'return': [{u'status': u'running', u'total-progress': 4194304, u'id': u'job0', u'type': u'mirror'}]}
++{u'timestamp': {u'seconds': 'SECS', u'microseconds': 'USECS'}, u'data': {u'status': u'created', u'id': u'job0'}, u'event': u'JOB_STATUS_CHANGE'}
++{u'timestamp': {u'seconds': 'SECS', u'microseconds': 'USECS'}, u'data': {u'status': u'running', u'id': u'job0'}, u'event': u'JOB_STATUS_CHANGE'}
++
++Pause/resume in RUNNING
++=== Testing block-job-pause/block-job-resume ===
++{u'return': {}}
++{u'timestamp': {u'seconds': 'SECS', u'microseconds': 'USECS'}, u'data': {u'status': u'paused', u'id': u'job0'}, u'event': u'JOB_STATUS_CHANGE'}
++{u'return': [{u'status': u'paused', u'current-progress': 65536, u'total-progress': 4194304, u'id': u'job0', u'type': u'mirror'}]}
++{u'return': {}}
++{u'timestamp': {u'seconds': 'SECS', u'microseconds': 'USECS'}, u'data': {u'status': u'running', u'id': u'job0'}, u'event': u'JOB_STATUS_CHANGE'}
++{u'return': [{u'status': u'running', u'current-progress': 131072, u'total-progress': 4194304, u'id': u'job0', u'type': u'mirror'}]}
++=== Testing block-job-pause/job-resume ===
++{u'return': {}}
++{u'timestamp': {u'seconds': 'SECS', u'microseconds': 'USECS'}, u'data': {u'status': u'paused', u'id': u'job0'}, u'event': u'JOB_STATUS_CHANGE'}
++{u'return': [{u'status': u'paused', u'current-progress': 131072, u'total-progress': 4194304, u'id': u'job0', u'type': u'mirror'}]}
++{u'return': {}}
++{u'timestamp': {u'seconds': 'SECS', u'microseconds': 'USECS'}, u'data': {u'status': u'running', u'id': u'job0'}, u'event': u'JOB_STATUS_CHANGE'}
++{u'return': [{u'status': u'running', u'current-progress': 196608, u'total-progress': 4194304, u'id': u'job0', u'type': u'mirror'}]}
++=== Testing job-pause/block-job-resume ===
++{u'return': {}}
++{u'timestamp': {u'seconds': 'SECS', u'microseconds': 'USECS'}, u'data': {u'status': u'paused', u'id': u'job0'}, u'event': u'JOB_STATUS_CHANGE'}
++{u'return': [{u'status': u'paused', u'current-progress': 196608, u'total-progress': 4194304, u'id': u'job0', u'type': u'mirror'}]}
++{u'return': {}}
++{u'timestamp': {u'seconds': 'SECS', u'microseconds': 'USECS'}, u'data': {u'status': u'running', u'id': u'job0'}, u'event': u'JOB_STATUS_CHANGE'}
++{u'return': [{u'status': u'running', u'current-progress': 262144, u'total-progress': 4194304, u'id': u'job0', u'type': u'mirror'}]}
++=== Testing job-pause/job-resume ===
++{u'return': {}}
++{u'timestamp': {u'seconds': 'SECS', u'microseconds': 'USECS'}, u'data': {u'status': u'paused', u'id': u'job0'}, u'event': u'JOB_STATUS_CHANGE'}
++{u'return': [{u'status': u'paused', u'current-progress': 262144, u'total-progress': 4194304, u'id': u'job0', u'type': u'mirror'}]}
++{u'return': {}}
++{u'timestamp': {u'seconds': 'SECS', u'microseconds': 'USECS'}, u'data': {u'status': u'running', u'id': u'job0'}, u'event': u'JOB_STATUS_CHANGE'}
++{u'return': [{u'status': u'running', u'current-progress': 327680, u'total-progress': 4194304, u'id': u'job0', u'type': u'mirror'}]}
++{u'error': {u'class': u'GenericError', u'desc': u"Job 'job0' in state 'running' cannot accept command verb 'complete'"}}
++{u'error': {u'class': u'GenericError', u'desc': u"Job 'job0' in state 'running' cannot accept command verb 'finalize'"}}
++{u'error': {u'class': u'GenericError', u'desc': u"Job 'job0' in state 'running' cannot accept command verb 'dismiss'"}}
++{u'error': {u'class': u'GenericError', u'desc': u"Job 'job0' in state 'running' cannot accept command verb 'complete'"}}
++{u'error': {u'class': u'GenericError', u'desc': u"Job 'job0' in state 'running' cannot accept command verb 'finalize'"}}
++{u'error': {u'class': u'GenericError', u'desc': u"Job 'job0' in state 'running' cannot accept command verb 'dismiss'"}}
++{u'return': {}}
++
++Waiting for READY state...
++{u'timestamp': {u'seconds': 'SECS', u'microseconds': 'USECS'}, u'data': {u'status': u'ready', u'id': u'job0'}, u'event': u'JOB_STATUS_CHANGE'}
++{u'return': [{u'status': u'ready', u'current-progress': 4194304, u'total-progress': 4194304, u'id': u'job0', u'type': u'mirror'}]}
++
++Pause/resume in READY
++=== Testing block-job-pause/block-job-resume ===
++{u'return': {}}
++{u'timestamp': {u'seconds': 'SECS', u'microseconds': 'USECS'}, u'data': {u'status': u'standby', u'id': u'job0'}, u'event': u'JOB_STATUS_CHANGE'}
++{u'return': [{u'status': u'standby', u'current-progress': 4194304, u'total-progress': 4194304, u'id': u'job0', u'type': u'mirror'}]}
++{u'return': {}}
++{u'timestamp': {u'seconds': 'SECS', u'microseconds': 'USECS'}, u'data': {u'status': u'ready', u'id': u'job0'}, u'event': u'JOB_STATUS_CHANGE'}
++{u'return': [{u'status': u'ready', u'current-progress': 4194304, u'total-progress': 4194304, u'id': u'job0', u'type': u'mirror'}]}
++=== Testing block-job-pause/job-resume ===
++{u'return': {}}
++{u'timestamp': {u'seconds': 'SECS', u'microseconds': 'USECS'}, u'data': {u'status': u'standby', u'id': u'job0'}, u'event': u'JOB_STATUS_CHANGE'}
++{u'return': [{u'status': u'standby', u'current-progress': 4194304, u'total-progress': 4194304, u'id': u'job0', u'type': u'mirror'}]}
++{u'return': {}}
++{u'timestamp': {u'seconds': 'SECS', u'microseconds': 'USECS'}, u'data': {u'status': u'ready', u'id': u'job0'}, u'event': u'JOB_STATUS_CHANGE'}
++{u'return': [{u'status': u'ready', u'current-progress': 4194304, u'total-progress': 4194304, u'id': u'job0', u'type': u'mirror'}]}
++=== Testing job-pause/block-job-resume ===
++{u'return': {}}
++{u'timestamp': {u'seconds': 'SECS', u'microseconds': 'USECS'}, u'data': {u'status': u'standby', u'id': u'job0'}, u'event': u'JOB_STATUS_CHANGE'}
++{u'return': [{u'status': u'standby', u'current-progress': 4194304, u'total-progress': 4194304, u'id': u'job0', u'type': u'mirror'}]}
++{u'return': {}}
++{u'timestamp': {u'seconds': 'SECS', u'microseconds': 'USECS'}, u'data': {u'status': u'ready', u'id': u'job0'}, u'event': u'JOB_STATUS_CHANGE'}
++{u'return': [{u'status': u'ready', u'current-progress': 4194304, u'total-progress': 4194304, u'id': u'job0', u'type': u'mirror'}]}
++=== Testing job-pause/job-resume ===
++{u'return': {}}
++{u'timestamp': {u'seconds': 'SECS', u'microseconds': 'USECS'}, u'data': {u'status': u'standby', u'id': u'job0'}, u'event': u'JOB_STATUS_CHANGE'}
++{u'return': [{u'status': u'standby', u'current-progress': 4194304, u'total-progress': 4194304, u'id': u'job0', u'type': u'mirror'}]}
++{u'return': {}}
++{u'timestamp': {u'seconds': 'SECS', u'microseconds': 'USECS'}, u'data': {u'status': u'ready', u'id': u'job0'}, u'event': u'JOB_STATUS_CHANGE'}
++{u'return': [{u'status': u'ready', u'current-progress': 4194304, u'total-progress': 4194304, u'id': u'job0', u'type': u'mirror'}]}
++{u'error': {u'class': u'GenericError', u'desc': u"Job 'job0' in state 'ready' cannot accept command verb 'finalize'"}}
++{u'error': {u'class': u'GenericError', u'desc': u"Job 'job0' in state 'ready' cannot accept command verb 'dismiss'"}}
++{u'error': {u'class': u'GenericError', u'desc': u"Job 'job0' in state 'ready' cannot accept command verb 'finalize'"}}
++{u'error': {u'class': u'GenericError', u'desc': u"Job 'job0' in state 'ready' cannot accept command verb 'dismiss'"}}
++{u'return': {}}
++
++Waiting for PENDING state...
++{u'timestamp': {u'seconds': 'SECS', u'microseconds': 'USECS'}, u'data': {u'status': u'waiting', u'id': u'job0'}, u'event': u'JOB_STATUS_CHANGE'}
++{u'timestamp': {u'seconds': 'SECS', u'microseconds': 'USECS'}, u'data': {u'status': u'pending', u'id': u'job0'}, u'event': u'JOB_STATUS_CHANGE'}
++{u'timestamp': {u'seconds': 'SECS', u'microseconds': 'USECS'}, u'data': {u'status': u'concluded', u'id': u'job0'}, u'event': u'JOB_STATUS_CHANGE'}
++{u'timestamp': {u'seconds': 'SECS', u'microseconds': 'USECS'}, u'data': {u'status': u'null', u'id': u'job0'}, u'event': u'JOB_STATUS_CHANGE'}
++{u'return': []}
++
++
++Starting block job: drive-backup (auto-finalize: True; auto-dismiss: True)
++{u'return': {}}
++{u'return': [{u'status': u'running', u'total-progress': 4194304, u'id': u'job0', u'type': u'backup'}]}
++{u'timestamp': {u'seconds': 'SECS', u'microseconds': 'USECS'}, u'data': {u'status': u'created', u'id': u'job0'}, u'event': u'JOB_STATUS_CHANGE'}
++{u'timestamp': {u'seconds': 'SECS', u'microseconds': 'USECS'}, u'data': {u'status': u'running', u'id': u'job0'}, u'event': u'JOB_STATUS_CHANGE'}
++
++Pause/resume in RUNNING
++=== Testing block-job-pause/block-job-resume ===
++{u'return': {}}
++{u'timestamp': {u'seconds': 'SECS', u'microseconds': 'USECS'}, u'data': {u'status': u'paused', u'id': u'job0'}, u'event': u'JOB_STATUS_CHANGE'}
++{u'return': [{u'status': u'paused', u'current-progress': 65536, u'total-progress': 4194304, u'id': u'job0', u'type': u'backup'}]}
++{u'return': {}}
++{u'timestamp': {u'seconds': 'SECS', u'microseconds': 'USECS'}, u'data': {u'status': u'running', u'id': u'job0'}, u'event': u'JOB_STATUS_CHANGE'}
++{u'return': [{u'status': u'running', u'current-progress': 131072, u'total-progress': 4194304, u'id': u'job0', u'type': u'backup'}]}
++=== Testing block-job-pause/job-resume ===
++{u'return': {}}
++{u'timestamp': {u'seconds': 'SECS', u'microseconds': 'USECS'}, u'data': {u'status': u'paused', u'id': u'job0'}, u'event': u'JOB_STATUS_CHANGE'}
++{u'return': [{u'status': u'paused', u'current-progress': 131072, u'total-progress': 4194304, u'id': u'job0', u'type': u'backup'}]}
++{u'return': {}}
++{u'timestamp': {u'seconds': 'SECS', u'microseconds': 'USECS'}, u'data': {u'status': u'running', u'id': u'job0'}, u'event': u'JOB_STATUS_CHANGE'}
++{u'return': [{u'status': u'running', u'current-progress': 196608, u'total-progress': 4194304, u'id': u'job0', u'type': u'backup'}]}
++=== Testing job-pause/block-job-resume ===
++{u'return': {}}
++{u'timestamp': {u'seconds': 'SECS', u'microseconds': 'USECS'}, u'data': {u'status': u'paused', u'id': u'job0'}, u'event': u'JOB_STATUS_CHANGE'}
++{u'return': [{u'status': u'paused', u'current-progress': 196608, u'total-progress': 4194304, u'id': u'job0', u'type': u'backup'}]}
++{u'return': {}}
++{u'timestamp': {u'seconds': 'SECS', u'microseconds': 'USECS'}, u'data': {u'status': u'running', u'id': u'job0'}, u'event': u'JOB_STATUS_CHANGE'}
++{u'return': [{u'status': u'running', u'current-progress': 262144, u'total-progress': 4194304, u'id': u'job0', u'type': u'backup'}]}
++=== Testing job-pause/job-resume ===
++{u'return': {}}
++{u'timestamp': {u'seconds': 'SECS', u'microseconds': 'USECS'}, u'data': {u'status': u'paused', u'id': u'job0'}, u'event': u'JOB_STATUS_CHANGE'}
++{u'return': [{u'status': u'paused', u'current-progress': 262144, u'total-progress': 4194304, u'id': u'job0', u'type': u'backup'}]}
++{u'return': {}}
++{u'timestamp': {u'seconds': 'SECS', u'microseconds': 'USECS'}, u'data': {u'status': u'running', u'id': u'job0'}, u'event': u'JOB_STATUS_CHANGE'}
++{u'return': [{u'status': u'running', u'current-progress': 327680, u'total-progress': 4194304, u'id': u'job0', u'type': u'backup'}]}
++{u'error': {u'class': u'GenericError', u'desc': u"Job 'job0' in state 'running' cannot accept command verb 'complete'"}}
++{u'error': {u'class': u'GenericError', u'desc': u"Job 'job0' in state 'running' cannot accept command verb 'finalize'"}}
++{u'error': {u'class': u'GenericError', u'desc': u"Job 'job0' in state 'running' cannot accept command verb 'dismiss'"}}
++{u'error': {u'class': u'GenericError', u'desc': u"Job 'job0' in state 'running' cannot accept command verb 'complete'"}}
++{u'error': {u'class': u'GenericError', u'desc': u"Job 'job0' in state 'running' cannot accept command verb 'finalize'"}}
++{u'error': {u'class': u'GenericError', u'desc': u"Job 'job0' in state 'running' cannot accept command verb 'dismiss'"}}
++{u'return': {}}
++
++Waiting for PENDING state...
++{u'timestamp': {u'seconds': 'SECS', u'microseconds': 'USECS'}, u'data': {u'status': u'waiting', u'id': u'job0'}, u'event': u'JOB_STATUS_CHANGE'}
++{u'timestamp': {u'seconds': 'SECS', u'microseconds': 'USECS'}, u'data': {u'status': u'pending', u'id': u'job0'}, u'event': u'JOB_STATUS_CHANGE'}
++{u'timestamp': {u'seconds': 'SECS', u'microseconds': 'USECS'}, u'data': {u'status': u'concluded', u'id': u'job0'}, u'event': u'JOB_STATUS_CHANGE'}
++{u'timestamp': {u'seconds': 'SECS', u'microseconds': 'USECS'}, u'data': {u'status': u'null', u'id': u'job0'}, u'event': u'JOB_STATUS_CHANGE'}
++{u'return': []}
++
++
++Starting block job: drive-backup (auto-finalize: True; auto-dismiss: False)
++{u'return': {}}
++{u'return': [{u'status': u'running', u'total-progress': 4194304, u'id': u'job0', u'type': u'backup'}]}
++{u'timestamp': {u'seconds': 'SECS', u'microseconds': 'USECS'}, u'data': {u'status': u'created', u'id': u'job0'}, u'event': u'JOB_STATUS_CHANGE'}
++{u'timestamp': {u'seconds': 'SECS', u'microseconds': 'USECS'}, u'data': {u'status': u'running', u'id': u'job0'}, u'event': u'JOB_STATUS_CHANGE'}
++
++Pause/resume in RUNNING
++=== Testing block-job-pause/block-job-resume ===
++{u'return': {}}
++{u'timestamp': {u'seconds': 'SECS', u'microseconds': 'USECS'}, u'data': {u'status': u'paused', u'id': u'job0'}, u'event': u'JOB_STATUS_CHANGE'}
++{u'return': [{u'status': u'paused', u'current-progress': 65536, u'total-progress': 4194304, u'id': u'job0', u'type': u'backup'}]}
++{u'return': {}}
++{u'timestamp': {u'seconds': 'SECS', u'microseconds': 'USECS'}, u'data': {u'status': u'running', u'id': u'job0'}, u'event': u'JOB_STATUS_CHANGE'}
++{u'return': [{u'status': u'running', u'current-progress': 131072, u'total-progress': 4194304, u'id': u'job0', u'type': u'backup'}]}
++=== Testing block-job-pause/job-resume ===
++{u'return': {}}
++{u'timestamp': {u'seconds': 'SECS', u'microseconds': 'USECS'}, u'data': {u'status': u'paused', u'id': u'job0'}, u'event': u'JOB_STATUS_CHANGE'}
++{u'return': [{u'status': u'paused', u'current-progress': 131072, u'total-progress': 4194304, u'id': u'job0', u'type': u'backup'}]}
++{u'return': {}}
++{u'timestamp': {u'seconds': 'SECS', u'microseconds': 'USECS'}, u'data': {u'status': u'running', u'id': u'job0'}, u'event': u'JOB_STATUS_CHANGE'}
++{u'return': [{u'status': u'running', u'current-progress': 196608, u'total-progress': 4194304, u'id': u'job0', u'type': u'backup'}]}
++=== Testing job-pause/block-job-resume ===
++{u'return': {}}
++{u'timestamp': {u'seconds': 'SECS', u'microseconds': 'USECS'}, u'data': {u'status': u'paused', u'id': u'job0'}, u'event': u'JOB_STATUS_CHANGE'}
++{u'return': [{u'status': u'paused', u'current-progress': 196608, u'total-progress': 4194304, u'id': u'job0', u'type': u'backup'}]}
++{u'return': {}}
++{u'timestamp': {u'seconds': 'SECS', u'microseconds': 'USECS'}, u'data': {u'status': u'running', u'id': u'job0'}, u'event': u'JOB_STATUS_CHANGE'}
++{u'return': [{u'status': u'running', u'current-progress': 262144, u'total-progress': 4194304, u'id': u'job0', u'type': u'backup'}]}
++=== Testing job-pause/job-resume ===
++{u'return': {}}
++{u'timestamp': {u'seconds': 'SECS', u'microseconds': 'USECS'}, u'data': {u'status': u'paused', u'id': u'job0'}, u'event': u'JOB_STATUS_CHANGE'}
++{u'return': [{u'status': u'paused', u'current-progress': 262144, u'total-progress': 4194304, u'id': u'job0', u'type': u'backup'}]}
++{u'return': {}}
++{u'timestamp': {u'seconds': 'SECS', u'microseconds': 'USECS'}, u'data': {u'status': u'running', u'id': u'job0'}, u'event': u'JOB_STATUS_CHANGE'}
++{u'return': [{u'status': u'running', u'current-progress': 327680, u'total-progress': 4194304, u'id': u'job0', u'type': u'backup'}]}
++{u'error': {u'class': u'GenericError', u'desc': u"Job 'job0' in state 'running' cannot accept command verb 'complete'"}}
++{u'error': {u'class': u'GenericError', u'desc': u"Job 'job0' in state 'running' cannot accept command verb 'finalize'"}}
++{u'error': {u'class': u'GenericError', u'desc': u"Job 'job0' in state 'running' cannot accept command verb 'dismiss'"}}
++{u'error': {u'class': u'GenericError', u'desc': u"Job 'job0' in state 'running' cannot accept command verb 'complete'"}}
++{u'error': {u'class': u'GenericError', u'desc': u"Job 'job0' in state 'running' cannot accept command verb 'finalize'"}}
++{u'error': {u'class': u'GenericError', u'desc': u"Job 'job0' in state 'running' cannot accept command verb 'dismiss'"}}
++{u'return': {}}
++
++Waiting for PENDING state...
++{u'timestamp': {u'seconds': 'SECS', u'microseconds': 'USECS'}, u'data': {u'status': u'waiting', u'id': u'job0'}, u'event': u'JOB_STATUS_CHANGE'}
++{u'timestamp': {u'seconds': 'SECS', u'microseconds': 'USECS'}, u'data': {u'status': u'pending', u'id': u'job0'}, u'event': u'JOB_STATUS_CHANGE'}
++{u'timestamp': {u'seconds': 'SECS', u'microseconds': 'USECS'}, u'data': {u'status': u'concluded', u'id': u'job0'}, u'event': u'JOB_STATUS_CHANGE'}
++{u'return': [{u'status': u'concluded', u'current-progress': 4194304, u'total-progress': 4194304, u'id': u'job0', u'type': u'backup'}]}
++{u'error': {u'class': u'GenericError', u'desc': u"Job 'job0' in state 'concluded' cannot accept command verb 'pause'"}}
++{u'error': {u'class': u'GenericError', u'desc': u"Job 'job0' in state 'concluded' cannot accept command verb 'complete'"}}
++{u'error': {u'class': u'GenericError', u'desc': u"Job 'job0' in state 'concluded' cannot accept command verb 'finalize'"}}
++{u'error': {u'class': u'GenericError', u'desc': u"Job 'job0' in state 'concluded' cannot accept command verb 'pause'"}}
++{u'error': {u'class': u'GenericError', u'desc': u"Job 'job0' in state 'concluded' cannot accept command verb 'complete'"}}
++{u'error': {u'class': u'GenericError', u'desc': u"Job 'job0' in state 'concluded' cannot accept command verb 'finalize'"}}
++{u'return': {}}
++{u'timestamp': {u'seconds': 'SECS', u'microseconds': 'USECS'}, u'data': {u'status': u'null', u'id': u'job0'}, u'event': u'JOB_STATUS_CHANGE'}
++{u'return': []}
++
++
++Starting block job: drive-backup (auto-finalize: False; auto-dismiss: True)
++{u'return': {}}
++{u'return': [{u'status': u'running', u'total-progress': 4194304, u'id': u'job0', u'type': u'backup'}]}
++{u'timestamp': {u'seconds': 'SECS', u'microseconds': 'USECS'}, u'data': {u'status': u'created', u'id': u'job0'}, u'event': u'JOB_STATUS_CHANGE'}
++{u'timestamp': {u'seconds': 'SECS', u'microseconds': 'USECS'}, u'data': {u'status': u'running', u'id': u'job0'}, u'event': u'JOB_STATUS_CHANGE'}
++
++Pause/resume in RUNNING
++=== Testing block-job-pause/block-job-resume ===
++{u'return': {}}
++{u'timestamp': {u'seconds': 'SECS', u'microseconds': 'USECS'}, u'data': {u'status': u'paused', u'id': u'job0'}, u'event': u'JOB_STATUS_CHANGE'}
++{u'return': [{u'status': u'paused', u'current-progress': 65536, u'total-progress': 4194304, u'id': u'job0', u'type': u'backup'}]}
++{u'return': {}}
++{u'timestamp': {u'seconds': 'SECS', u'microseconds': 'USECS'}, u'data': {u'status': u'running', u'id': u'job0'}, u'event': u'JOB_STATUS_CHANGE'}
++{u'return': [{u'status': u'running', u'current-progress': 131072, u'total-progress': 4194304, u'id': u'job0', u'type': u'backup'}]}
++=== Testing block-job-pause/job-resume ===
++{u'return': {}}
++{u'timestamp': {u'seconds': 'SECS', u'microseconds': 'USECS'}, u'data': {u'status': u'paused', u'id': u'job0'}, u'event': u'JOB_STATUS_CHANGE'}
++{u'return': [{u'status': u'paused', u'current-progress': 131072, u'total-progress': 4194304, u'id': u'job0', u'type': u'backup'}]}
++{u'return': {}}
++{u'timestamp': {u'seconds': 'SECS', u'microseconds': 'USECS'}, u'data': {u'status': u'running', u'id': u'job0'}, u'event': u'JOB_STATUS_CHANGE'}
++{u'return': [{u'status': u'running', u'current-progress': 196608, u'total-progress': 4194304, u'id': u'job0', u'type': u'backup'}]}
++=== Testing job-pause/block-job-resume ===
++{u'return': {}}
++{u'timestamp': {u'seconds': 'SECS', u'microseconds': 'USECS'}, u'data': {u'status': u'paused', u'id': u'job0'}, u'event': u'JOB_STATUS_CHANGE'}
++{u'return': [{u'status': u'paused', u'current-progress': 196608, u'total-progress': 4194304, u'id': u'job0', u'type': u'backup'}]}
++{u'return': {}}
++{u'timestamp': {u'seconds': 'SECS', u'microseconds': 'USECS'}, u'data': {u'status': u'running', u'id': u'job0'}, u'event': u'JOB_STATUS_CHANGE'}
++{u'return': [{u'status': u'running', u'current-progress': 262144, u'total-progress': 4194304, u'id': u'job0', u'type': u'backup'}]}
++=== Testing job-pause/job-resume ===
++{u'return': {}}
++{u'timestamp': {u'seconds': 'SECS', u'microseconds': 'USECS'}, u'data': {u'status': u'paused', u'id': u'job0'}, u'event': u'JOB_STATUS_CHANGE'}
++{u'return': [{u'status': u'paused', u'current-progress': 262144, u'total-progress': 4194304, u'id': u'job0', u'type': u'backup'}]}
++{u'return': {}}
++{u'timestamp': {u'seconds': 'SECS', u'microseconds': 'USECS'}, u'data': {u'status': u'running', u'id': u'job0'}, u'event': u'JOB_STATUS_CHANGE'}
++{u'return': [{u'status': u'running', u'current-progress': 327680, u'total-progress': 4194304, u'id': u'job0', u'type': u'backup'}]}
++{u'error': {u'class': u'GenericError', u'desc': u"Job 'job0' in state 'running' cannot accept command verb 'complete'"}}
++{u'error': {u'class': u'GenericError', u'desc': u"Job 'job0' in state 'running' cannot accept command verb 'finalize'"}}
++{u'error': {u'class': u'GenericError', u'desc': u"Job 'job0' in state 'running' cannot accept command verb 'dismiss'"}}
++{u'error': {u'class': u'GenericError', u'desc': u"Job 'job0' in state 'running' cannot accept command verb 'complete'"}}
++{u'error': {u'class': u'GenericError', u'desc': u"Job 'job0' in state 'running' cannot accept command verb 'finalize'"}}
++{u'error': {u'class': u'GenericError', u'desc': u"Job 'job0' in state 'running' cannot accept command verb 'dismiss'"}}
++{u'return': {}}
++
++Waiting for PENDING state...
++{u'timestamp': {u'seconds': 'SECS', u'microseconds': 'USECS'}, u'data': {u'status': u'waiting', u'id': u'job0'}, u'event': u'JOB_STATUS_CHANGE'}
++{u'timestamp': {u'seconds': 'SECS', u'microseconds': 'USECS'}, u'data': {u'status': u'pending', u'id': u'job0'}, u'event': u'JOB_STATUS_CHANGE'}
++{u'return': [{u'status': u'pending', u'current-progress': 4194304, u'total-progress': 4194304, u'id': u'job0', u'type': u'backup'}]}
++{u'error': {u'class': u'GenericError', u'desc': u"Job 'job0' in state 'pending' cannot accept command verb 'pause'"}}
++{u'error': {u'class': u'GenericError', u'desc': u"Job 'job0' in state 'pending' cannot accept command verb 'complete'"}}
++{u'error': {u'class': u'GenericError', u'desc': u"Job 'job0' in state 'pending' cannot accept command verb 'dismiss'"}}
++{u'error': {u'class': u'GenericError', u'desc': u"Job 'job0' in state 'pending' cannot accept command verb 'pause'"}}
++{u'error': {u'class': u'GenericError', u'desc': u"Job 'job0' in state 'pending' cannot accept command verb 'complete'"}}
++{u'error': {u'class': u'GenericError', u'desc': u"Job 'job0' in state 'pending' cannot accept command verb 'dismiss'"}}
++{u'return': {}}
++{u'timestamp': {u'seconds': 'SECS', u'microseconds': 'USECS'}, u'data': {u'status': u'concluded', u'id': u'job0'}, u'event': u'JOB_STATUS_CHANGE'}
++{u'timestamp': {u'seconds': 'SECS', u'microseconds': 'USECS'}, u'data': {u'status': u'null', u'id': u'job0'}, u'event': u'JOB_STATUS_CHANGE'}
++{u'return': []}
++
++
++Starting block job: drive-backup (auto-finalize: False; auto-dismiss: False)
++{u'return': {}}
++{u'return': [{u'status': u'running', u'total-progress': 4194304, u'id': u'job0', u'type': u'backup'}]}
++{u'timestamp': {u'seconds': 'SECS', u'microseconds': 'USECS'}, u'data': {u'status': u'created', u'id': u'job0'}, u'event': u'JOB_STATUS_CHANGE'}
++{u'timestamp': {u'seconds': 'SECS', u'microseconds': 'USECS'}, u'data': {u'status': u'running', u'id': u'job0'}, u'event': u'JOB_STATUS_CHANGE'}
++
++Pause/resume in RUNNING
++=== Testing block-job-pause/block-job-resume ===
++{u'return': {}}
++{u'timestamp': {u'seconds': 'SECS', u'microseconds': 'USECS'}, u'data': {u'status': u'paused', u'id': u'job0'}, u'event': u'JOB_STATUS_CHANGE'}
++{u'return': [{u'status': u'paused', u'current-progress': 65536, u'total-progress': 4194304, u'id': u'job0', u'type': u'backup'}]}
++{u'return': {}}
++{u'timestamp': {u'seconds': 'SECS', u'microseconds': 'USECS'}, u'data': {u'status': u'running', u'id': u'job0'}, u'event': u'JOB_STATUS_CHANGE'}
++{u'return': [{u'status': u'running', u'current-progress': 131072, u'total-progress': 4194304, u'id': u'job0', u'type': u'backup'}]}
++=== Testing block-job-pause/job-resume ===
++{u'return': {}}
++{u'timestamp': {u'seconds': 'SECS', u'microseconds': 'USECS'}, u'data': {u'status': u'paused', u'id': u'job0'}, u'event': u'JOB_STATUS_CHANGE'}
++{u'return': [{u'status': u'paused', u'current-progress': 131072, u'total-progress': 4194304, u'id': u'job0', u'type': u'backup'}]}
++{u'return': {}}
++{u'timestamp': {u'seconds': 'SECS', u'microseconds': 'USECS'}, u'data': {u'status': u'running', u'id': u'job0'}, u'event': u'JOB_STATUS_CHANGE'}
++{u'return': [{u'status': u'running', u'current-progress': 196608, u'total-progress': 4194304, u'id': u'job0', u'type': u'backup'}]}
++=== Testing job-pause/block-job-resume ===
++{u'return': {}}
++{u'timestamp': {u'seconds': 'SECS', u'microseconds': 'USECS'}, u'data': {u'status': u'paused', u'id': u'job0'}, u'event': u'JOB_STATUS_CHANGE'}
++{u'return': [{u'status': u'paused', u'current-progress': 196608, u'total-progress': 4194304, u'id': u'job0', u'type': u'backup'}]}
++{u'return': {}}
++{u'timestamp': {u'seconds': 'SECS', u'microseconds': 'USECS'}, u'data': {u'status': u'running', u'id': u'job0'}, u'event': u'JOB_STATUS_CHANGE'}
++{u'return': [{u'status': u'running', u'current-progress': 262144, u'total-progress': 4194304, u'id': u'job0', u'type': u'backup'}]}
++=== Testing job-pause/job-resume ===
++{u'return': {}}
++{u'timestamp': {u'seconds': 'SECS', u'microseconds': 'USECS'}, u'data': {u'status': u'paused', u'id': u'job0'}, u'event': u'JOB_STATUS_CHANGE'}
++{u'return': [{u'status': u'paused', u'current-progress': 262144, u'total-progress': 4194304, u'id': u'job0', u'type': u'backup'}]}
++{u'return': {}}
++{u'timestamp': {u'seconds': 'SECS', u'microseconds': 'USECS'}, u'data': {u'status': u'running', u'id': u'job0'}, u'event': u'JOB_STATUS_CHANGE'}
++{u'return': [{u'status': u'running', u'current-progress': 327680, u'total-progress': 4194304, u'id': u'job0', u'type': u'backup'}]}
++{u'error': {u'class': u'GenericError', u'desc': u"Job 'job0' in state 'running' cannot accept command verb 'complete'"}}
++{u'error': {u'class': u'GenericError', u'desc': u"Job 'job0' in state 'running' cannot accept command verb 'finalize'"}}
++{u'error': {u'class': u'GenericError', u'desc': u"Job 'job0' in state 'running' cannot accept command verb 'dismiss'"}}
++{u'error': {u'class': u'GenericError', u'desc': u"Job 'job0' in state 'running' cannot accept command verb 'complete'"}}
++{u'error': {u'class': u'GenericError', u'desc': u"Job 'job0' in state 'running' cannot accept command verb 'finalize'"}}
++{u'error': {u'class': u'GenericError', u'desc': u"Job 'job0' in state 'running' cannot accept command verb 'dismiss'"}}
++{u'return': {}}
++
++Waiting for PENDING state...
++{u'timestamp': {u'seconds': 'SECS', u'microseconds': 'USECS'}, u'data': {u'status': u'waiting', u'id': u'job0'}, u'event': u'JOB_STATUS_CHANGE'}
++{u'timestamp': {u'seconds': 'SECS', u'microseconds': 'USECS'}, u'data': {u'status': u'pending', u'id': u'job0'}, u'event': u'JOB_STATUS_CHANGE'}
++{u'return': [{u'status': u'pending', u'current-progress': 4194304, u'total-progress': 4194304, u'id': u'job0', u'type': u'backup'}]}
++{u'error': {u'class': u'GenericError', u'desc': u"Job 'job0' in state 'pending' cannot accept command verb 'pause'"}}
++{u'error': {u'class': u'GenericError', u'desc': u"Job 'job0' in state 'pending' cannot accept command verb 'complete'"}}
++{u'error': {u'class': u'GenericError', u'desc': u"Job 'job0' in state 'pending' cannot accept command verb 'dismiss'"}}
++{u'error': {u'class': u'GenericError', u'desc': u"Job 'job0' in state 'pending' cannot accept command verb 'pause'"}}
++{u'error': {u'class': u'GenericError', u'desc': u"Job 'job0' in state 'pending' cannot accept command verb 'complete'"}}
++{u'error': {u'class': u'GenericError', u'desc': u"Job 'job0' in state 'pending' cannot accept command verb 'dismiss'"}}
++{u'return': {}}
++{u'timestamp': {u'seconds': 'SECS', u'microseconds': 'USECS'}, u'data': {u'status': u'concluded', u'id': u'job0'}, u'event': u'JOB_STATUS_CHANGE'}
++{u'return': [{u'status': u'concluded', u'current-progress': 4194304, u'total-progress': 4194304, u'id': u'job0', u'type': u'backup'}]}
++{u'error': {u'class': u'GenericError', u'desc': u"Job 'job0' in state 'concluded' cannot accept command verb 'pause'"}}
++{u'error': {u'class': u'GenericError', u'desc': u"Job 'job0' in state 'concluded' cannot accept command verb 'complete'"}}
++{u'error': {u'class': u'GenericError', u'desc': u"Job 'job0' in state 'concluded' cannot accept command verb 'finalize'"}}
++{u'error': {u'class': u'GenericError', u'desc': u"Job 'job0' in state 'concluded' cannot accept command verb 'pause'"}}
++{u'error': {u'class': u'GenericError', u'desc': u"Job 'job0' in state 'concluded' cannot accept command verb 'complete'"}}
++{u'error': {u'class': u'GenericError', u'desc': u"Job 'job0' in state 'concluded' cannot accept command verb 'finalize'"}}
++{u'return': {}}
++{u'timestamp': {u'seconds': 'SECS', u'microseconds': 'USECS'}, u'data': {u'status': u'null', u'id': u'job0'}, u'event': u'JOB_STATUS_CHANGE'}
++{u'return': []}
+diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
+index cc8cd8cc8e..6f1e07dc6e 100644
+--- a/tests/qemu-iotests/group
++++ b/tests/qemu-iotests/group
+@@ -216,3 +216,4 @@
+ 215 rw auto quick
+ 216 rw auto quick
+ 218 rw auto quick
++219 rw auto
 -- 
 2.13.6
