@@ -1,25 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45998)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46211)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1fJgFP-00056D-QP
-	for qemu-devel@nongnu.org; Fri, 18 May 2018 10:20:46 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fJgGK-0005m4-E9
+	for qemu-devel@nongnu.org; Fri, 18 May 2018 10:21:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1fJgFM-000606-Gt
-	for qemu-devel@nongnu.org; Fri, 18 May 2018 10:20:43 -0400
-Resent-Message-Id: <E1fJgFM-000606-Gt@eggs.gnu.org>
-Received: from sender-of-o51.zoho.com ([135.84.80.216]:21128)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1fJgFM-0005zF-94
-	for qemu-devel@nongnu.org; Fri, 18 May 2018 10:20:40 -0400
-In-Reply-To: <20180518132114.4070-1-kwolf@redhat.com>
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <152665231224.270.9636589903452802482@1f70390a8372>
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fJgGD-0006oq-TZ
+	for qemu-devel@nongnu.org; Fri, 18 May 2018 10:21:40 -0400
+Received: from mail-vk0-x22a.google.com ([2607:f8b0:400c:c05::22a]:44884)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fJgGD-0006oR-NX
+	for qemu-devel@nongnu.org; Fri, 18 May 2018 10:21:33 -0400
+Received: by mail-vk0-x22a.google.com with SMTP id x66-v6so4904095vka.11
+	for <qemu-devel@nongnu.org>; Fri, 18 May 2018 07:21:33 -0700 (PDT)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20180517174718.10107-1-alex.bennee@linaro.org>
+	<20180517174718.10107-39-alex.bennee@linaro.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <e33b816a-7bdf-f807-b6db-6f4077441b5c@amsat.org>
+Date: Fri, 18 May 2018 11:21:21 -0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Fri, 18 May 2018 07:05:13 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PATCH v2 00/40] Generic background jobs
+In-Reply-To: <20180517174718.10107-39-alex.bennee@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v4 38/49] tests/tcg: enable building for
+ Alpha
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,191 +36,173 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: kwolf@redhat.com
-Cc: famz@redhat.com, qemu-block@nongnu.org, qemu-devel@nongnu.org, jsnow@redhat.com, jcody@redhat.com, armbru@redhat.com, mreitz@redhat.com
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, cota@braap.org, famz@redhat.com, berrange@redhat.com, richard.henderson@linaro.org, balrogg@gmail.com, aurelien@aurel32.net, agraf@suse.de
+Cc: qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
-c3NhZ2UtaWQ6IDIwMTgwNTE4MTMyMTE0LjQwNzAtMS1rd29sZkByZWRoYXQuY29tClN1YmplY3Q6
-IFtRZW11LWRldmVsXSBbUEFUQ0ggdjIgMDAvNDBdIEdlbmVyaWMgYmFja2dyb3VuZCBqb2JzCgo9
-PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCgpCQVNFPWJhc2UKbj0xCnRvdGFs
-PSQoZ2l0IGxvZyAtLW9uZWxpbmUgJEJBU0UuLiB8IHdjIC1sKQpmYWlsZWQ9MAoKZ2l0IGNvbmZp
-ZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5h
-bWVzIFRydWUKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYuYWxnb3JpdGhtIGhpc3RvZ3JhbQoKY29t
-bWl0cz0iJChnaXQgbG9nIC0tZm9ybWF0PSVIIC0tcmV2ZXJzZSAkQkFTRS4uKSIKZm9yIGMgaW4g
-JGNvbW1pdHM7IGRvCiAgICBlY2hvICJDaGVja2luZyBQQVRDSCAkbi8kdG90YWw6ICQoZ2l0IGxv
-ZyAtbiAxIC0tZm9ybWF0PSVzICRjKS4uLiIKICAgIGlmICEgZ2l0IHNob3cgJGMgLS1mb3JtYXQ9
-ZW1haWwgfCAuL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIC07IHRoZW4KICAgICAg
-ICBmYWlsZWQ9MQogICAgICAgIGVjaG8KICAgIGZpCiAgICBuPSQoKG4rMSkpCmRvbmUKCmV4aXQg
-JGZhaWxlZAo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3
-ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApGcm9tIGh0dHBzOi8vZ2l0aHViLmNvbS9wYXRjaGV3
-LXByb2plY3QvcWVtdQogdCBbdGFnIHVwZGF0ZV0gICAgICAgICAgICBwYXRjaGV3LzIwMTgwNTE3
-MDkyNTEzLjczNS0xLWtyYXhlbEByZWRoYXQuY29tIC0+IHBhdGNoZXcvMjAxODA1MTcwOTI1MTMu
-NzM1LTEta3JheGVsQHJlZGhhdC5jb20KICogW25ldyB0YWddICAgICAgICAgICAgICAgcGF0Y2hl
-dy8yMDE4MDUxODEzMjExNC40MDcwLTEta3dvbGZAcmVkaGF0LmNvbSAtPiBwYXRjaGV3LzIwMTgw
-NTE4MTMyMTE0LjQwNzAtMS1rd29sZkByZWRoYXQuY29tClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5j
-aCAndGVzdCcKYmUwMWFhMTk4YSBxZW11LWlvdGVzdHM6IFRlc3Qgam9iLSogd2l0aCBibG9jayBq
-b2JzCjYyMjMzYjc1OGMgaW90ZXN0czogTW92ZSBxbXBfdG9fb3B0cygpIHRvIFZNCjNmOTQ2YmM0
-NDIgYmxvY2tqb2I6IFJlbW92ZSBCbG9ja0pvYi5kcml2ZXIKY2FlNjM3M2NiZCBqb2I6IEFkZCBx
-dWVyeS1qb2JzIFFNUCBjb21tYW5kCjliZjA1NjVlMGMgam9iOiBBZGQgbGlmZWN5Y2xlIFFNUCBj
-b21tYW5kcwpmNzM2M2E2OWI0IGpvYjogQWRkIEpPQl9TVEFUVVNfQ0hBTkdFIFFNUCBldmVudAo1
-YTYzZWZlNGU0IGpvYjogSW50cm9kdWNlIHFhcGkvam9iLmpzb24KMmE1ZTczNzVmYSBqb2I6IE1v
-dmUgcHJvZ3Jlc3MgZmllbGRzIHRvIEpvYgoyYWUwOGMxZDA2IGpvYjogQWRkIGpvYl90cmFuc2l0
-aW9uX3RvX3JlYWR5KCkKOWQ3NmJlMTFiZCBqb2I6IEFkZCBqb2JfaXNfcmVhZHkoKQo5YjUxY2My
-YTdlIGpvYjogQWRkIGpvYl9kaXNtaXNzKCkKNTU1YTYxYTY5ZiBqb2I6IEFkZCBqb2JfeWllbGQo
-KQo3OTg5NzhiY2IxIGJsb2NrOiBDYW5jZWwgam9iIGluIGJkcnZfY2xvc2VfYWxsKCkgY2FsbGVy
-cwo0ZGNiNzFlNGU1IGpvYjogTW92ZSBjb21wbGV0aW9uIGFuZCBjYW5jZWxsYXRpb24gdG8gSm9i
-CmZmYWQ4ZmFkNGIgam9iOiBNb3ZlIHRyYW5zYWN0aW9ucyB0byBKb2IKMGVkYzQxY2E0OCBqb2I6
-IFN3aXRjaCB0cmFuc2FjdGlvbnMgdG8gSm9iVHhuCmExMDczMDIzZjIgam9iOiBNb3ZlIGpvYl9m
-aW5pc2hfc3luYygpIHRvIEpvYgo2ZWM1MjFkYmRiIGpvYjogTW92ZSAuY29tcGxldGUgY2FsbGJh
-Y2sgdG8gSm9iCjk2NjBhNzMxYWIgam9iOiBBZGQgam9iX2RyYWluKCkKMTk1OGQwYWMzOCBqb2I6
-IENvbnZlcnQgYmxvY2tfam9iX2NhbmNlbF9hc3luYygpIHRvIEpvYgpkYzFhOGQ3MGI4IGpvYjog
-TW92ZSBzaW5nbGUgam9iIGZpbmFsaXNhdGlvbiB0byBKb2IKNGU3YTEyMDA4ZiBqb2I6IEFkZCBq
-b2JfZXZlbnRfKigpCmQ5NzNlYjY1NDYgYmxvY2tqb2I6IFNwbGl0IGJsb2NrX2pvYl9ldmVudF9w
-ZW5kaW5nKCkKN2Q0NDdmOGFiMyBqb2I6IE1vdmUgQmxvY2tKb2JDcmVhdGVGbGFncyB0byBKb2IK
-ZmZhMWM5YWQzMCBqb2I6IFJlcGxhY2UgQmxvY2tKb2IuY29tcGxldGVkIHdpdGggam9iX2lzX2Nv
-bXBsZXRlZCgpCjEzZTQyNjg1NWMgam9iOiBNb3ZlIHBhdXNlL3Jlc3VtZSBmdW5jdGlvbnMgdG8g
-Sm9iCjBjNTJmZjFiMjQgam9iOiBBZGQgam9iX3NsZWVwX25zKCkKNWViZjNiYTY2YSBqb2I6IE1v
-dmUgY29yb3V0aW5lIGFuZCByZWxhdGVkIGNvZGUgdG8gSm9iCjRlN2I0Njk3MTggam9iOiBNb3Zl
-IGRlZmVyX3RvX21haW5fbG9vcCB0byBKb2IKODk2ZmUwNTEyOCBqb2I6IEFkZCBKb2IuYWlvX2Nv
-bnRleHQKZDczYTk0ZmRlOSBqb2I6IE1vdmUgY2FuY2VsbGVkIHRvIEpvYgplMzg2YWU4M2Y5IGpv
-YjogQWRkIHJlZmVyZW5jZSBjb3VudGluZwozOTE1ZGEwYWRhIGpvYjogTW92ZSBzdGF0ZSB0cmFu
-c2l0aW9ucyB0byBKb2IKZTJlYTU4YzdiMCBqb2I6IE1haW50YWluIGEgbGlzdCBvZiBhbGwgam9i
-cwo3MTdmMmU2MGJmIGpvYjogQWRkIGpvYl9kZWxldGUoKQpmMzFmMzM2YmNhIGpvYjogQWRkIEpv
-YkRyaXZlci5qb2JfdHlwZQowNDhiYjg3ZDBhIGpvYjogUmVuYW1lIEJsb2NrSm9iVHlwZSBpbnRv
-IEpvYlR5cGUKYjI3MDdhYmMyMiBqb2I6IENyZWF0ZSBKb2IsIEpvYkRyaXZlciBhbmQgam9iX2Ny
-ZWF0ZSgpCmY3Yzc4NjcyMjkgYmxvY2tqb2I6IEltcHJvdmUgQmxvY2tKb2JJbmZvLm9mZnNldC9s
-ZW4gZG9jdW1lbnRhdGlvbgo3NjExZDBjNzVmIGJsb2Nram9iOiBVcGRhdGUgYmxvY2stam9iLXBh
-dXNlL3Jlc3VtZSBkb2N1bWVudGF0aW9uCgo9PT0gT1VUUFVUIEJFR0lOID09PQpDaGVja2luZyBQ
-QVRDSCAxLzQwOiBibG9ja2pvYjogVXBkYXRlIGJsb2NrLWpvYi1wYXVzZS9yZXN1bWUgZG9jdW1l
-bnRhdGlvbi4uLgpDaGVja2luZyBQQVRDSCAyLzQwOiBibG9ja2pvYjogSW1wcm92ZSBCbG9ja0pv
-YkluZm8ub2Zmc2V0L2xlbiBkb2N1bWVudGF0aW9uLi4uCkNoZWNraW5nIFBBVENIIDMvNDA6IGpv
-YjogQ3JlYXRlIEpvYiwgSm9iRHJpdmVyIGFuZCBqb2JfY3JlYXRlKCkuLi4KV0FSTklORzogYWRk
-ZWQsIG1vdmVkIG9yIGRlbGV0ZWQgZmlsZShzKSwgZG9lcyBNQUlOVEFJTkVSUyBuZWVkIHVwZGF0
-aW5nPwojMzUzOiAKbmV3IGZpbGUgbW9kZSAxMDA2NDQKCnRvdGFsOiAwIGVycm9ycywgMSB3YXJu
-aW5ncywgNDI0IGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBw
-bGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVz
-IHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJ
-TkVSUy4KQ2hlY2tpbmcgUEFUQ0ggNC80MDogam9iOiBSZW5hbWUgQmxvY2tKb2JUeXBlIGludG8g
-Sm9iVHlwZS4uLgpDaGVja2luZyBQQVRDSCA1LzQwOiBqb2I6IEFkZCBKb2JEcml2ZXIuam9iX3R5
-cGUuLi4KQ2hlY2tpbmcgUEFUQ0ggNi80MDogam9iOiBBZGQgam9iX2RlbGV0ZSgpLi4uCkNoZWNr
-aW5nIFBBVENIIDcvNDA6IGpvYjogTWFpbnRhaW4gYSBsaXN0IG9mIGFsbCBqb2JzLi4uCkNoZWNr
-aW5nIFBBVENIIDgvNDA6IGpvYjogTW92ZSBzdGF0ZSB0cmFuc2l0aW9ucyB0byBKb2IuLi4KRVJS
-T1I6IHNwYWNlIHByb2hpYml0ZWQgYmVmb3JlIG9wZW4gc3F1YXJlIGJyYWNrZXQgJ1snCiMzNDI6
-IEZJTEU6IGpvYi5jOjM4OgorICAgIC8qIFU6ICovIFtKT0JfU1RBVFVTX1VOREVGSU5FRF0gPSB7
-MCwgMSwgMCwgMCwgMCwgMCwgMCwgMCwgMCwgMCwgMH0sCgpFUlJPUjogc3BhY2UgcHJvaGliaXRl
-ZCBiZWZvcmUgb3BlbiBzcXVhcmUgYnJhY2tldCAnWycKIzM0MzogRklMRTogam9iLmM6Mzk6Cisg
-ICAgLyogQzogKi8gW0pPQl9TVEFUVVNfQ1JFQVRFRF0gICA9IHswLCAwLCAxLCAwLCAwLCAwLCAw
-LCAwLCAxLCAwLCAxfSwKCkVSUk9SOiBzcGFjZSBwcm9oaWJpdGVkIGJlZm9yZSBvcGVuIHNxdWFy
-ZSBicmFja2V0ICdbJwojMzQ0OiBGSUxFOiBqb2IuYzo0MDoKKyAgICAvKiBSOiAqLyBbSk9CX1NU
-QVRVU19SVU5OSU5HXSAgID0gezAsIDAsIDAsIDEsIDEsIDAsIDEsIDAsIDEsIDAsIDB9LAoKRVJS
-T1I6IHNwYWNlIHByb2hpYml0ZWQgYmVmb3JlIG9wZW4gc3F1YXJlIGJyYWNrZXQgJ1snCiMzNDU6
-IEZJTEU6IGpvYi5jOjQxOgorICAgIC8qIFA6ICovIFtKT0JfU1RBVFVTX1BBVVNFRF0gICAgPSB7
-MCwgMCwgMSwgMCwgMCwgMCwgMCwgMCwgMCwgMCwgMH0sCgpFUlJPUjogc3BhY2UgcHJvaGliaXRl
-ZCBiZWZvcmUgb3BlbiBzcXVhcmUgYnJhY2tldCAnWycKIzM0NjogRklMRTogam9iLmM6NDI6Cisg
-ICAgLyogWTogKi8gW0pPQl9TVEFUVVNfUkVBRFldICAgICA9IHswLCAwLCAwLCAwLCAwLCAxLCAx
-LCAwLCAxLCAwLCAwfSwKCkVSUk9SOiBzcGFjZSBwcm9oaWJpdGVkIGJlZm9yZSBvcGVuIHNxdWFy
-ZSBicmFja2V0ICdbJwojMzQ3OiBGSUxFOiBqb2IuYzo0MzoKKyAgICAvKiBTOiAqLyBbSk9CX1NU
-QVRVU19TVEFOREJZXSAgID0gezAsIDAsIDAsIDAsIDEsIDAsIDAsIDAsIDAsIDAsIDB9LAoKRVJS
-T1I6IHNwYWNlIHByb2hpYml0ZWQgYmVmb3JlIG9wZW4gc3F1YXJlIGJyYWNrZXQgJ1snCiMzNDg6
-IEZJTEU6IGpvYi5jOjQ0OgorICAgIC8qIFc6ICovIFtKT0JfU1RBVFVTX1dBSVRJTkddICAgPSB7
-MCwgMCwgMCwgMCwgMCwgMCwgMCwgMSwgMSwgMCwgMH0sCgpFUlJPUjogc3BhY2UgcHJvaGliaXRl
-ZCBiZWZvcmUgb3BlbiBzcXVhcmUgYnJhY2tldCAnWycKIzM0OTogRklMRTogam9iLmM6NDU6Cisg
-ICAgLyogRDogKi8gW0pPQl9TVEFUVVNfUEVORElOR10gICA9IHswLCAwLCAwLCAwLCAwLCAwLCAw
-LCAwLCAxLCAxLCAwfSwKCkVSUk9SOiBzcGFjZSBwcm9oaWJpdGVkIGJlZm9yZSBvcGVuIHNxdWFy
-ZSBicmFja2V0ICdbJwojMzUwOiBGSUxFOiBqb2IuYzo0NjoKKyAgICAvKiBYOiAqLyBbSk9CX1NU
-QVRVU19BQk9SVElOR10gID0gezAsIDAsIDAsIDAsIDAsIDAsIDAsIDAsIDEsIDEsIDB9LAoKRVJS
-T1I6IHNwYWNlIHByb2hpYml0ZWQgYmVmb3JlIG9wZW4gc3F1YXJlIGJyYWNrZXQgJ1snCiMzNTE6
-IEZJTEU6IGpvYi5jOjQ3OgorICAgIC8qIEU6ICovIFtKT0JfU1RBVFVTX0NPTkNMVURFRF0gPSB7
-MCwgMCwgMCwgMCwgMCwgMCwgMCwgMCwgMCwgMCwgMX0sCgpFUlJPUjogc3BhY2UgcHJvaGliaXRl
-ZCBiZWZvcmUgb3BlbiBzcXVhcmUgYnJhY2tldCAnWycKIzM1MjogRklMRTogam9iLmM6NDg6Cisg
-ICAgLyogTjogKi8gW0pPQl9TVEFUVVNfTlVMTF0gICAgICA9IHswLCAwLCAwLCAwLCAwLCAwLCAw
-LCAwLCAwLCAwLCAwfSwKCnRvdGFsOiAxMSBlcnJvcnMsIDAgd2FybmluZ3MsIDUyOCBsaW5lcyBj
-aGVja2VkCgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElm
-IGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0
-aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgpDaGVja2luZyBQ
-QVRDSCA5LzQwOiBqb2I6IEFkZCByZWZlcmVuY2UgY291bnRpbmcuLi4KQ2hlY2tpbmcgUEFUQ0gg
-MTAvNDA6IGpvYjogTW92ZSBjYW5jZWxsZWQgdG8gSm9iLi4uCkNoZWNraW5nIFBBVENIIDExLzQw
-OiBqb2I6IEFkZCBKb2IuYWlvX2NvbnRleHQuLi4KQ2hlY2tpbmcgUEFUQ0ggMTIvNDA6IGpvYjog
-TW92ZSBkZWZlcl90b19tYWluX2xvb3AgdG8gSm9iLi4uCkNoZWNraW5nIFBBVENIIDEzLzQwOiBq
-b2I6IE1vdmUgY29yb3V0aW5lIGFuZCByZWxhdGVkIGNvZGUgdG8gSm9iLi4uCkNoZWNraW5nIFBB
-VENIIDE0LzQwOiBqb2I6IEFkZCBqb2Jfc2xlZXBfbnMoKS4uLgpDaGVja2luZyBQQVRDSCAxNS80
-MDogam9iOiBNb3ZlIHBhdXNlL3Jlc3VtZSBmdW5jdGlvbnMgdG8gSm9iLi4uCkNoZWNraW5nIFBB
-VENIIDE2LzQwOiBqb2I6IFJlcGxhY2UgQmxvY2tKb2IuY29tcGxldGVkIHdpdGggam9iX2lzX2Nv
-bXBsZXRlZCgpLi4uCkNoZWNraW5nIFBBVENIIDE3LzQwOiBqb2I6IE1vdmUgQmxvY2tKb2JDcmVh
-dGVGbGFncyB0byBKb2IuLi4KQ2hlY2tpbmcgUEFUQ0ggMTgvNDA6IGJsb2Nram9iOiBTcGxpdCBi
-bG9ja19qb2JfZXZlbnRfcGVuZGluZygpLi4uCkNoZWNraW5nIFBBVENIIDE5LzQwOiBqb2I6IEFk
-ZCBqb2JfZXZlbnRfKigpLi4uCkNoZWNraW5nIFBBVENIIDIwLzQwOiBqb2I6IE1vdmUgc2luZ2xl
-IGpvYiBmaW5hbGlzYXRpb24gdG8gSm9iLi4uCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0
-ZXJzCiM1MDg6IEZJTEU6IGluY2x1ZGUvcWVtdS9qb2IuaDoyMjE6CisgICAgICAgICAgICAgICAg
-IGludCBmbGFncywgQmxvY2tDb21wbGV0aW9uRnVuYyAqY2IsIHZvaWQgKm9wYXF1ZSwgRXJyb3Ig
-KiplcnJwKTsKCkVSUk9SOiAiKGZvbyopIiBzaG91bGQgYmUgIihmb28gKikiCiM1Nzg6IEZJTEU6
-IGpvYi5jOjQ2MjoKKyAgICBibG9ja19qb2JfdHhuX2RlbF9qb2IoKEJsb2NrSm9iKikgam9iKTsK
-CkVSUk9SOiAiKGZvbyopIiBzaG91bGQgYmUgIihmb28gKikiCiM2NTk6IEZJTEU6IGpvYi5jOjU0
-MzoKKyAgICBibG9ja19qb2JfdHhuX2RlbF9qb2IoKEJsb2NrSm9iKikgam9iKTsKCnRvdGFsOiAy
-IGVycm9ycywgMSB3YXJuaW5ncywgNjIwIGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0
-eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUg
-ZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQ
-QVRDSCBpbiBNQUlOVEFJTkVSUy4KCkNoZWNraW5nIFBBVENIIDIxLzQwOiBqb2I6IENvbnZlcnQg
-YmxvY2tfam9iX2NhbmNlbF9hc3luYygpIHRvIEpvYi4uLgpDaGVja2luZyBQQVRDSCAyMi80MDog
-am9iOiBBZGQgam9iX2RyYWluKCkuLi4KQ2hlY2tpbmcgUEFUQ0ggMjMvNDA6IGpvYjogTW92ZSAu
-Y29tcGxldGUgY2FsbGJhY2sgdG8gSm9iLi4uCkNoZWNraW5nIFBBVENIIDI0LzQwOiBqb2I6IE1v
-dmUgam9iX2ZpbmlzaF9zeW5jKCkgdG8gSm9iLi4uCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFy
-YWN0ZXJzCiMxMzk6IEZJTEU6IGluY2x1ZGUvcWVtdS9qb2IuaDozOTk6CitpbnQgam9iX2Zpbmlz
-aF9zeW5jKEpvYiAqam9iLCB2b2lkICgqZmluaXNoKShKb2IgKiwgRXJyb3IgKiplcnJwKSwgRXJy
-b3IgKiplcnJwKTsKCnRvdGFsOiAwIGVycm9ycywgMSB3YXJuaW5ncywgMTQ0IGxpbmVzIGNoZWNr
-ZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55
-IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBt
-YWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KQ2hlY2tpbmcgUEFUQ0gg
-MjUvNDA6IGpvYjogU3dpdGNoIHRyYW5zYWN0aW9ucyB0byBKb2JUeG4uLi4KQ2hlY2tpbmcgUEFU
-Q0ggMjYvNDA6IGpvYjogTW92ZSB0cmFuc2FjdGlvbnMgdG8gSm9iLi4uCkNoZWNraW5nIFBBVENI
-IDI3LzQwOiBqb2I6IE1vdmUgY29tcGxldGlvbiBhbmQgY2FuY2VsbGF0aW9uIHRvIEpvYi4uLgpD
-aGVja2luZyBQQVRDSCAyOC80MDogYmxvY2s6IENhbmNlbCBqb2IgaW4gYmRydl9jbG9zZV9hbGwo
-KSBjYWxsZXJzLi4uCkNoZWNraW5nIFBBVENIIDI5LzQwOiBqb2I6IEFkZCBqb2JfeWllbGQoKS4u
-LgpDaGVja2luZyBQQVRDSCAzMC80MDogam9iOiBBZGQgam9iX2Rpc21pc3MoKS4uLgpDaGVja2lu
-ZyBQQVRDSCAzMS80MDogam9iOiBBZGQgam9iX2lzX3JlYWR5KCkuLi4KQ2hlY2tpbmcgUEFUQ0gg
-MzIvNDA6IGpvYjogQWRkIGpvYl90cmFuc2l0aW9uX3RvX3JlYWR5KCkuLi4KQ2hlY2tpbmcgUEFU
-Q0ggMzMvNDA6IGpvYjogTW92ZSBwcm9ncmVzcyBmaWVsZHMgdG8gSm9iLi4uCkNoZWNraW5nIFBB
-VENIIDM0LzQwOiBqb2I6IEludHJvZHVjZSBxYXBpL2pvYi5qc29uLi4uCldBUk5JTkc6IGFkZGVk
-LCBtb3ZlZCBvciBkZWxldGVkIGZpbGUocyksIGRvZXMgTUFJTlRBSU5FUlMgbmVlZCB1cGRhdGlu
-Zz8KIzIzNTogCm5ldyBmaWxlIG1vZGUgMTAwNjQ0Cgp0b3RhbDogMCBlcnJvcnMsIDEgd2Fybmlu
-Z3MsIDI5NCBsaW5lcyBjaGVja2VkCgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxl
-YXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyBy
-ZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5F
-UlMuCkNoZWNraW5nIFBBVENIIDM1LzQwOiBqb2I6IEFkZCBKT0JfU1RBVFVTX0NIQU5HRSBRTVAg
-ZXZlbnQuLi4KQ2hlY2tpbmcgUEFUQ0ggMzYvNDA6IGpvYjogQWRkIGxpZmVjeWNsZSBRTVAgY29t
-bWFuZHMuLi4KV0FSTklORzogYWRkZWQsIG1vdmVkIG9yIGRlbGV0ZWQgZmlsZShzKSwgZG9lcyBN
-QUlOVEFJTkVSUyBuZWVkIHVwZGF0aW5nPwojMzc6IApuZXcgZmlsZSBtb2RlIDEwMDY0NAoKdG90
-YWw6IDAgZXJyb3JzLCAxIHdhcm5pbmdzLCAyNjUgbGluZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBo
-YXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3Jz
-CmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpD
-SEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgpDaGVja2luZyBQQVRDSCAzNy80MDogam9iOiBBZGQg
-cXVlcnktam9icyBRTVAgY29tbWFuZC4uLgpDaGVja2luZyBQQVRDSCAzOC80MDogYmxvY2tqb2I6
-IFJlbW92ZSBCbG9ja0pvYi5kcml2ZXIuLi4KRVJST1I6IGluaXRpYWxpemVyIGZvciBzdHJ1Y3Qg
-QmxvY2tKb2JEcml2ZXIgc2hvdWxkIG5vcm1hbGx5IGJlIGNvbnN0CiMyMTogRklMRTogYmxvY2tq
-b2IuYzoxMDc6CisgICAgQmxvY2tKb2JEcml2ZXIgKmJqZHJ2ID0gY29udGFpbmVyX29mKGRydiwg
-QmxvY2tKb2JEcml2ZXIsIGpvYl9kcml2ZXIpOwoKRVJST1I6IGluaXRpYWxpemVyIGZvciBzdHJ1
-Y3QgQmxvY2tKb2JEcml2ZXIgc2hvdWxkIG5vcm1hbGx5IGJlIGNvbnN0CiMzNjogRklMRTogYmxv
-Y2tqb2IuYzoxMjE6CisgICAgQmxvY2tKb2JEcml2ZXIgKmJqZHJ2ID0gY29udGFpbmVyX29mKGRy
-diwgQmxvY2tKb2JEcml2ZXIsIGpvYl9kcml2ZXIpOwoKdG90YWw6IDIgZXJyb3JzLCAwIHdhcm5p
-bmdzLCA1NCBsaW5lcyBjaGVja2VkCgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxl
-YXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyBy
-ZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5F
-UlMuCgpDaGVja2luZyBQQVRDSCAzOS80MDogaW90ZXN0czogTW92ZSBxbXBfdG9fb3B0cygpIHRv
-IFZNLi4uCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiMxMDk6IEZJTEU6IHRlc3Rz
-L3FlbXUtaW90ZXN0cy9pb3Rlc3RzLnB5OjQ0ODoKKyAgICAgICAgc2VsZi5hc3NlcnRFcXVhbChz
-ZWxmLnZtLmZsYXR0ZW5fcW1wX29iamVjdChqc29uLmxvYWRzKGpzb25fZmlsZW5hbWVbNTpdKSks
-Cgp0b3RhbDogMCBlcnJvcnMsIDEgd2FybmluZ3MsIDgzIGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0
-Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVy
-cm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBz
-ZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KQ2hlY2tpbmcgUEFUQ0ggNDAvNDA6IHFlbXUt
-aW90ZXN0czogVGVzdCBqb2ItKiB3aXRoIGJsb2NrIGpvYnMuLi4KV0FSTklORzogYWRkZWQsIG1v
-dmVkIG9yIGRlbGV0ZWQgZmlsZShzKSwgZG9lcyBNQUlOVEFJTkVSUyBuZWVkIHVwZGF0aW5nPwoj
-MTM6IApuZXcgZmlsZSBtb2RlIDEwMDc1NQoKdG90YWw6IDAgZXJyb3JzLCAxIHdhcm5pbmdzLCA1
-NDAgbGluZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSBy
-ZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0
-IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgo9
-PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29tbWFuZCBleGl0ZWQgd2l0aCBjb2RlOiAxCgoKLS0t
-CkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHA6Ly9wYXRjaGV3
-Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAcmVkaGF0
-LmNvbQ==
+Hi Alex,
+
+On 05/17/2018 02:47 PM, Alex Bennée wrote:
+> We can't use our normal Debian based compilers as Alpha isn't an
+> officially supported architecture. However it is available as a port
+> and fortunately cross compilers for all these targets are included in
+> Debian Sid, the perpetual rolling/unstable/testing version of Debian.
+
+I see 2/3 commits at once here.
+
+> 
+> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+> ---
+>  tests/docker/Makefile.include                 |  1 +
+>  .../dockerfiles/debian-alpha-cross.docker     | 12 +++++++
+>  .../dockerfiles/debian-cross-build.docker     | 36 +++++++++++++++++++
+>  tests/docker/dockerfiles/debian-sid.docker    | 23 ++++++++++++
+>  tests/tcg/alpha/Makefile.include              |  2 ++
+>  5 files changed, 74 insertions(+)
+>  create mode 100644 tests/docker/dockerfiles/debian-alpha-cross.docker
+
+^ Alpha
+
+>  create mode 100644 tests/docker/dockerfiles/debian-cross-build.docker
+
+^ for guest-tests I presume.
+
+>  create mode 100644 tests/docker/dockerfiles/debian-sid.docker
+
+^ cross base
+
+I'd like to review the debian-sid.docker separately than the Alpha part.
+
+>  create mode 100644 tests/tcg/alpha/Makefile.include
+> 
+> diff --git a/tests/docker/Makefile.include b/tests/docker/Makefile.include
+> index 6a5aa9ec71..bcf44e80c4 100644
+> --- a/tests/docker/Makefile.include
+> +++ b/tests/docker/Makefile.include
+> @@ -62,6 +62,7 @@ docker-image-debian-ppc64el-cross: docker-image-debian9
+>  docker-image-debian-s390x-cross: docker-image-debian9
+>  docker-image-debian-win32-cross: docker-image-debian8-mxe
+>  docker-image-debian-win64-cross: docker-image-debian8-mxe
+> +docker-image-debian-alpha-cross: docker-image-debian-sid
+>  docker-image-travis: NOUSER=1
+>  
+>  # Expand all the pre-requistes for each docker image and test combination
+> diff --git a/tests/docker/dockerfiles/debian-alpha-cross.docker b/tests/docker/dockerfiles/debian-alpha-cross.docker
+> new file mode 100644
+> index 0000000000..e446f7af3f
+> --- /dev/null
+> +++ b/tests/docker/dockerfiles/debian-alpha-cross.docker
+> @@ -0,0 +1,12 @@
+> +#
+> +# Docker cross-compiler target
+> +#
+> +# This docker target builds on the debian sid base image which
+> +# contains cross compilers for Debian "ports" targets.
+> +#
+> +FROM qemu:debian-sid
+> +
+> +RUN DEBIAN_FRONTEND=noninteractive eatmydata \
+> +    apt-get install -y --no-install-recommends \
+> +        gcc-alpha-linux-gnu \
+> +        libc6.1-dev-alpha-cross
+> diff --git a/tests/docker/dockerfiles/debian-cross-build.docker b/tests/docker/dockerfiles/debian-cross-build.docker
+> new file mode 100644
+> index 0000000000..c3611a7d3a
+> --- /dev/null
+> +++ b/tests/docker/dockerfiles/debian-cross-build.docker
+> @@ -0,0 +1,36 @@
+> +#
+> +# Docker multiarch cross-compiler target
+> +#
+> +# This docker target is builds on Debian cross compiler targets to build distro
+> +# with a selection of cross compilers for building test binaries.
+> +#
+> +# On its own you can't build much but the docker-foo-cross targets
+> +# build on top of the base debian image.
+> +#
+> +FROM debian:stretch
+> +
+> +# Duplicate deb line as deb-src
+> +RUN cat /etc/apt/sources.list | sed "s/^deb\ /deb-src /" >> /etc/apt/sources.list
+> +
+> +# Install common build utilities
+> +RUN apt update
+> +RUN DEBIAN_FRONTEND=noninteractive apt install -yy eatmydata
+> +RUN DEBIAN_FRONTEND=noninteractive eatmydata \
+> +    apt install -y --no-install-recommends \
+> +        bison \
+> +        build-essential \
+> +        ca-certificates \
+> +        flex \
+> +        gettext \
+> +        git \
+> +        libgmp-dev \
+> +        libmpfr-dev \
+> +        libmpc-dev \
+> +        pkg-config \
+> +        psmisc \
+> +        python \
+> +        texinfo \
+> +        wget \
+> +        $(apt-get -s build-dep binutils | egrep ^Inst | cut -d\  -f2) \
+> +        $(apt-get -s build-dep gcc | egrep ^Inst | cut -d\  -f2) \
+> +        $(apt-get -s build-dep glibc | egrep ^Inst | cut -d\  -f2)
+> diff --git a/tests/docker/dockerfiles/debian-sid.docker b/tests/docker/dockerfiles/debian-sid.docker
+> new file mode 100644
+> index 0000000000..adeb7134ca
+> --- /dev/null
+> +++ b/tests/docker/dockerfiles/debian-sid.docker
+> @@ -0,0 +1,23 @@
+> +#
+> +# A number of our guests exist as ports only. We can either use the ports repo or get everything from SID
+> +#
+> +
+> +FROM debian:sid-slim
+> +
+> +# Duplicate deb line as deb-src
+> +RUN cat /etc/apt/sources.list | sed "s/^deb\ /deb-src /" >> /etc/apt/sources.list
+> +
+> +# Install common build utilities
+> +RUN apt update
+> +RUN DEBIAN_FRONTEND=noninteractive apt install -yy eatmydata
+> +RUN DEBIAN_FRONTEND=noninteractive eatmydata \
+> +    apt install -y --no-install-recommends \
+> +        bison \
+> +        build-essential \
+> +        ca-certificates \
+> +        flex \
+> +        git \
+> +        pkg-config \
+> +        psmisc \
+> +        python \
+> +        texinfo
+> diff --git a/tests/tcg/alpha/Makefile.include b/tests/tcg/alpha/Makefile.include
+> new file mode 100644
+> index 0000000000..c7dc48eadb
+> --- /dev/null
+> +++ b/tests/tcg/alpha/Makefile.include
+> @@ -0,0 +1,2 @@
+> +DOCKER_IMAGE=debian-alpha-cross
+> +DOCKER_CROSS_COMPILER=alpha-linux-gnu-gcc
+> 
+
+Ignoring the Debian "Sid/unstable" problems (I'll develop this replying
+to the cover), and using a snapshot:
+
+-- >8 --
+diff --git a/tests/docker/dockerfiles/debian-sid.docker
+b/tests/docker/dockerfiles/debian-sid.docker
+-# Duplicate deb line as deb-src
+-RUN cat /etc/apt/sources.list | sed "s/^deb\ /deb-src /" >>
+/etc/apt/sources.list
++# random 'working' snapshot
++RUN echo "deb
+http://snapshot.debian.org/archive/debian/20180512T101008Z/ sid main" >
+/etc/apt/sources.list && \
++    echo "deb-src
+http://snapshot.debian.org/archive/debian/20180512T101008Z/ sid main" >>
+/etc/apt/sources.list
+--
+
+For the Alpha part:
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Tested-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
