@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44427)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44855)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1fJWHM-0002Nn-3E
-	for qemu-devel@nongnu.org; Thu, 17 May 2018 23:42:05 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fJWL7-0003rm-CK
+	for qemu-devel@nongnu.org; Thu, 17 May 2018 23:45:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1fJWHJ-0005zd-0I
-	for qemu-devel@nongnu.org; Thu, 17 May 2018 23:42:04 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:56554 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1fJWHI-0005yx-PX
-	for qemu-devel@nongnu.org; Thu, 17 May 2018 23:42:00 -0400
-Date: Fri, 18 May 2018 11:41:53 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20180518034153.GB2569@xz-mi>
-References: <20180504030811.28111-1-peterx@redhat.com>
-	<20180504030811.28111-2-peterx@redhat.com>
-	<010f281a-ba20-3ad9-5842-ae93bfd4b987@redhat.com>
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fJWL6-0008J2-JN
+	for qemu-devel@nongnu.org; Thu, 17 May 2018 23:45:57 -0400
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20180517174718.10107-1-alex.bennee@linaro.org>
+	<20180517174718.10107-33-alex.bennee@linaro.org>
+	<9ef2bc85-cead-080c-8313-bf0113d5019e@linaro.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <927cd32b-6de1-3702-5125-e682fb2ffcd4@amsat.org>
+Date: Fri, 18 May 2018 00:45:39 -0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <010f281a-ba20-3ad9-5842-ae93bfd4b987@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2 01/10] intel-iommu: send PSI always even
- if across PDEs
+In-Reply-To: <9ef2bc85-cead-080c-8313-bf0113d5019e@linaro.org>
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature";
+	boundary="hFC4m1Pc39Av3iyTIbFBdDm2YVwE7IOtY"
+Subject: Re: [Qemu-devel] [PATCH v4 32/49] tests/tcg/arm: add fcvt test
+ cases for AArch32/64
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,143 +30,140 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Auger Eric <eric.auger@redhat.com>
-Cc: qemu-devel@nongnu.org, Tian Kevin <kevin.tian@intel.com>, "Michael S . Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, Alex Williamson <alex.williamson@redhat.com>, Jintack Lim <jintack@cs.columbia.edu>
+To: Richard Henderson <richard.henderson@linaro.org>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, cota@braap.org, famz@redhat.com, berrange@redhat.com, balrogg@gmail.com, aurelien@aurel32.net, agraf@suse.de
+Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, "open list:ARM" <qemu-arm@nongnu.org>
 
-On Thu, May 17, 2018 at 04:42:54PM +0200, Auger Eric wrote:
-> Hi Peter,
-> 
-> On 05/04/2018 05:08 AM, Peter Xu wrote:
-> > During IOVA page table walking, there is a special case when the PSI
-> > covers one whole PDE (Page Directory Entry, which contains 512 Page
-> > Table Entries) or more.  In the past, we skip that entry and we don't
-> > notify the IOMMU notifiers.  This is not correct.  We should send UNMAP
-> > notification to registered UNMAP notifiers in this case.
-> > 
-> > For UNMAP only notifiers, this might cause IOTLBs cached in the devices
-> > even if they were already invalid.  For MAP/UNMAP notifiers like
-> > vfio-pci, this will cause stale page mappings.
-> > 
-> > This special case doesn't trigger often, but it is very easy to be
-> > triggered by nested device assignments, since in that case we'll
-> > possibly map the whole L2 guest RAM region into the device's IOVA
-> > address space (several GBs at least), which is far bigger than normal
-> > kernel driver usages of the device (tens of MBs normally).
-> > 
-> > Without this patch applied to L1 QEMU, nested device assignment to L2
-> > guests will dump some errors like:
-> > 
-> > qemu-system-x86_64: VFIO_MAP_DMA: -17
-> > qemu-system-x86_64: vfio_dma_map(0x557305420c30, 0xad000, 0x1000,
-> >                     0x7f89a920d000) = -17 (File exists)
-> > 
-> > Acked-by: Jason Wang <jasowang@redhat.com>
-> > [peterx: rewrite the commit message]
-> > Signed-off-by: Peter Xu <peterx@redhat.com>
-> > ---
-> >  hw/i386/intel_iommu.c | 42 ++++++++++++++++++++++++++++++------------
-> >  1 file changed, 30 insertions(+), 12 deletions(-)
-> > 
-> > diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
-> > index fb31de9416..b359efd6f9 100644
-> > --- a/hw/i386/intel_iommu.c
-> > +++ b/hw/i386/intel_iommu.c
-> > @@ -722,6 +722,15 @@ static int vtd_iova_to_slpte(VTDContextEntry *ce, uint64_t iova, bool is_write,
-> >  
-> >  typedef int (*vtd_page_walk_hook)(IOMMUTLBEntry *entry, void *private);
-> >  
-> > +static int vtd_page_walk_one(IOMMUTLBEntry *entry, int level,
-> > +                             vtd_page_walk_hook hook_fn, void *private)
-> I find the function  name a bit weird as it does not does a ptw but
-> rather call a callback on an entry. vtd_callback_wrapper?
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--hFC4m1Pc39Av3iyTIbFBdDm2YVwE7IOtY
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+To: Richard Henderson <richard.henderson@linaro.org>,
+ =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, cota@braap.org,
+ famz@redhat.com, berrange@redhat.com, balrogg@gmail.com,
+ aurelien@aurel32.net, agraf@suse.de
+Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>,
+ "open list:ARM" <qemu-arm@nongnu.org>
+Message-ID: <927cd32b-6de1-3702-5125-e682fb2ffcd4@amsat.org>
+Subject: Re: [PATCH v4 32/49] tests/tcg/arm: add fcvt test cases for
+ AArch32/64
+References: <20180517174718.10107-1-alex.bennee@linaro.org>
+ <20180517174718.10107-33-alex.bennee@linaro.org>
+ <9ef2bc85-cead-080c-8313-bf0113d5019e@linaro.org>
+In-Reply-To: <9ef2bc85-cead-080c-8313-bf0113d5019e@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-It's a hook for the page walk process, and IMHO vtd_callback_wrapper
-does not really provide any hint for the page walking.  So even if you
-prefer the "callback_wrapper" naming I would still more prefer:
+On 05/17/2018 05:30 PM, Richard Henderson wrote:
+> On 05/17/2018 10:47 AM, Alex Benn=C3=A9e wrote:
+>> This runs through the usual float to float conversions and crucially
+>> also runs with ARM Alternative Half Precision Format.
+>>
+>> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+>> [rth: tweak vcvtb.f16.f32/vctb.f32.f16 code and regen]
+>> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+>>
+>> ---
+>> v4
+>>   - add fcvt.ref and check results against it
+>>   - fix single_to_half, single_to_double conversions
+>>   - properly toggle AHP mode (fpsr->fpcr)
+>>   - more values around the AHP margins
+>>   - add INF/NAN/SNAN inputs
+>>   - build for ARM and AArch64
+>>   - fix bug for hex literals
+>>   - add float-to-int
+>>   - checkpatch fix
+>> ---
+>=20
+> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
-  vtd_page_walk_callback[_wrapper]
+Thanks Richard, I was not very motivated to review each line of the
+fcvt.ref files =3D)
 
-though if so I'd say I don't see much benefit comparing to use the old
-vtd_page_walk_hook, which seems fine to me too...
+> diff --git a/tests/tcg/arm/Makefile.target b/tests/tcg/arm/Makefile.tar=
+get
+> index 9d2b551732..7bb777f442 100644
+> --- a/tests/tcg/arm/Makefile.target
+> +++ b/tests/tcg/arm/Makefile.target
+> @@ -8,7 +8,9 @@ ARM_SRC=3D$(SRC_PATH)/tests/tcg/arm
+>  # Set search path for all sources
+>  VPATH 		+=3D $(ARM_SRC)
+>
+> -TESTS +=3D hello-arm test-arm-iwmmxt
+> +ARM_TESTS=3Dhello-arm test-arm-iwmmxt
+> +
+> +TESTS +=3D $(ARM_TESTS) fcvt
+>
+>  hello-arm: CFLAGS+=3D-marm -ffreestanding
+>  hello-arm: LDFLAGS+=3D-nostdlib
+> @@ -24,3 +26,14 @@ run-test-mmap: test-mmap
+>  	$(call quiet-command, $(QEMU) -p 8192 $< 8192 > test-mmap-8192.out,
+"TEST", "$< (8k pages) on $(TARGET_NAME)")
+>  	$(call quiet-command, $(QEMU) -p 16384 $< 16384 >
+test-mmap-16384.out, "TEST", "$< (16k pages) on $(TARGET_NAME)")
+>  endif
+> +
+> +ifeq ($(TARGET_NAME), arm)
+> +fcvt: LDFLAGS+=3D-lm
+> +# fcvt: CFLAGS+=3D-march=3Darmv8.2-a+fp16 -mfpu=3Dneon-fp-armv8
 
-> > +{
-> > +    assert(hook_fn);
-> > +    trace_vtd_page_walk_one(level, entry->iova, entry->translated_addr,
-> > +                            entry->addr_mask, entry->perm);
-> > +    return hook_fn(entry, private);
-> > +}
-> > +
-> >  /**
-> >   * vtd_page_walk_level - walk over specific level for IOVA range
-> >   *
-> > @@ -781,28 +790,37 @@ static int vtd_page_walk_level(dma_addr_t addr, uint64_t start,
-> >           */
-> >          entry_valid = read_cur | write_cur;
-> >  
-> > +        entry.target_as = &address_space_memory;
-> > +        entry.iova = iova & subpage_mask;
-> > +        entry.perm = IOMMU_ACCESS_FLAG(read_cur, write_cur);
-> > +        entry.addr_mask = ~subpage_mask;
-> > +
-> >          if (vtd_is_last_slpte(slpte, level)) {
-> > -            entry.target_as = &address_space_memory;
-> > -            entry.iova = iova & subpage_mask;
-> >              /* NOTE: this is only meaningful if entry_valid == true */
-> >              entry.translated_addr = vtd_get_slpte_addr(slpte, aw);
-> > -            entry.addr_mask = ~subpage_mask;
-> > -            entry.perm = IOMMU_ACCESS_FLAG(read_cur, write_cur);
-> >              if (!entry_valid && !notify_unmap) {
-> >                  trace_vtd_page_walk_skip_perm(iova, iova_next);
-> >                  goto next;
-> >              }
-> > -            trace_vtd_page_walk_one(level, entry.iova, entry.translated_addr,
-> > -                                    entry.addr_mask, entry.perm);
-> > -            if (hook_fn) {
-> > -                ret = hook_fn(&entry, private);
-> > -                if (ret < 0) {
-> > -                    return ret;
-> > -                }
-> > +            ret = vtd_page_walk_one(&entry, level, hook_fn, private);
-> > +            if (ret < 0) {
-> > +                return ret;
-> >              }
-> >          } else {
-> >              if (!entry_valid) {
-> > -                trace_vtd_page_walk_skip_perm(iova, iova_next);
-> > +                if (notify_unmap) {
-> > +                    /*
-> > +                     * The whole entry is invalid; unmap it all.
-> > +                     * Translated address is meaningless, zero it.
-> > +                     */
-> > +                    entry.translated_addr = 0x0;
-> do you really need to zero the translated_addr and the related comment.
-> As soon as perm is NONE this should not be used?
+Alex, What is your idea here, enable this later?
+Maybe add some TODO comment around..
 
-Yes here we can avoid setting it.  However that'll make sure we don't
-leak strange numbers to the below notifiers, so I would still slightly
-prefer to zero it here.
+Except this nit, for both Makefile.target:
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 
-> > +                    ret = vtd_page_walk_one(&entry, level, hook_fn, private);
-> > +                    if (ret < 0) {
-> > +                        return ret;
-> > +                    }
-> > +                } else {
-> > +                    trace_vtd_page_walk_skip_perm(iova, iova_next);
-> > +                }
-> >                  goto next;
-> >              }
-> >              ret = vtd_page_walk_level(vtd_get_slpte_addr(slpte, aw), iova,
-> > 
-> 
-> Besides
-> Reviewed-by: Eric Auger <eric.auger@redhat.com>
+> +
+> +run-fcvt: fcvt
+> +	$(call quiet-command, \
+> +		$(QEMU) $< > fcvt.out && \
+> +		diff -u $(ARM_SRC)/fcvt.ref fcvt.out, \
+> +		"TEST", "$< (default) on $(TARGET_NAME)")
+> +endif
 
-Thanks for reviewing the series.
+$ make -j1 run-tcg-tests-aarch64-linux-user
+  BUILD   debian9
+  BUILD   debian-arm64-cross
+  CROSS-BUILD aarch64 guest-tests with docker qemu:debian-arm64-cross
+  BUILD   debian9
+  BUILD   debian-arm64-cross
+  CROSS-BUILD aarch64 guest-tests with docker qemu:debian-arm64-cross
+  RUN-TESTS for aarch64
+  TEST    test-mmap (default) on aarch64
+  TEST    test-mmap (8k pages) on aarch64
+  TEST    test-mmap (16k pages) on aarch64
+  TEST    test-mmap (32k pages) on aarch64
+  TEST    sha1 on aarch64
+  TEST    linux-test on aarch64
+  TEST    testthread on aarch64
+  TEST    fcvt (default) on aarch64
+  TEST    sysregs on aarch64
 
-Note that this v2 is obsolete, please feel free to read version 3 of
-this series, which contains quite a lot of functional changes.
+\o/
 
-Regards,
+Tested-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 
--- 
-Peter Xu
+
+
+--hFC4m1Pc39Av3iyTIbFBdDm2YVwE7IOtY
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCgAdFiEE+qvnXhKRciHc/Wuy4+MsLN6twN4FAlr+TGUACgkQ4+MsLN6t
+wN40vhAAuXXucMeHEkaCJYEG1YeZXhusu43LTVLxsOE1eVnfBX3P2VAYb/oyDFkw
+kQy5sDk5xDAZWtnvwuODOPepUpSwES8clbZ81KB+PXBk0LNKbO2/LeNFZ3ik7q8b
+l1z89iTo7fN7oxd5BZmwM2aLqh6rn1QnEubFkuAiR/ZKCw2WaEJIVSDprB2B9rQQ
+8D1juhobOHPobTWm/Swwepbv7qaLTBA1JSfMRAIf+ALEqpQJlS4yHQKp3c5c9Czt
+5oLQFfkrMDlOUbc0swITZYQ+bQ/EcD7+OkZiozFr46aGd7hzYhIf83pOtFW/SAh+
+aE8JHpZIEKy4KadL+Qjlpw8c0mm4MyuCbUoBOn2zuxvXoK5gWEvTx8L7rz6a0EcD
+d0d/U9sYTrbUzGq91LQDrxZ3ehl3rVkF5tRTf34IN2P2MQsRDxCBfsd4O3hYbtdb
+haRTeLmDVCoVXFHAxIoJ7eXbXOgZaBTDGtPiP0Xruy2aVwEwtMgiU2g3OTMTYR4F
+jK7EF/fPIq7PXhCy+BxMyrOs5DLNEQdNqQgyyuyEM+97bGE09lVJcPTd9qwfyuT0
+S+wTqRGq1fnX9gzagTQR4cCjJQgdQA0W1lj0Ub6Z/RBqzFqY3mbke/a2HhRWJZon
+HNcs/efRfySEW8dvIhMZmflQHXVtIUfX00DS4SBYMnrtxPS6xvc=
+=2Ywr
+-----END PGP SIGNATURE-----
+
+--hFC4m1Pc39Av3iyTIbFBdDm2YVwE7IOtY--
