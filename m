@@ -1,24 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48096)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48204)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <prvs=669710df0=Paul.Durrant@citrix.com>)
-	id 1fJgMK-0002xD-OR
-	for qemu-devel@nongnu.org; Fri, 18 May 2018 10:27:54 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fJgNA-0003hk-Dt
+	for qemu-devel@nongnu.org; Fri, 18 May 2018 10:28:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <prvs=669710df0=Paul.Durrant@citrix.com>)
-	id 1fJgMG-0004gl-1E
-	for qemu-devel@nongnu.org; Fri, 18 May 2018 10:27:52 -0400
-Received: from smtp03.citrix.com ([162.221.156.55]:27182)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <prvs=669710df0=Paul.Durrant@citrix.com>)
-	id 1fJgMF-0004et-Lf
-	for qemu-devel@nongnu.org; Fri, 18 May 2018 10:27:47 -0400
-From: Paul Durrant <paul.durrant@citrix.com>
-Date: Fri, 18 May 2018 15:27:42 +0100
-Message-ID: <1526653662-9237-1-git-send-email-paul.durrant@citrix.com>
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fJgN5-0005Jh-Ni
+	for qemu-devel@nongnu.org; Fri, 18 May 2018 10:28:44 -0400
+Received: from mail-qt0-x243.google.com ([2607:f8b0:400d:c0d::243]:40456)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fJgN5-0005JR-Ic
+	for qemu-devel@nongnu.org; Fri, 18 May 2018 10:28:39 -0400
+Received: by mail-qt0-x243.google.com with SMTP id h2-v6so10485546qtp.7
+	for <qemu-devel@nongnu.org>; Fri, 18 May 2018 07:28:39 -0700 (PDT)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20180517174718.10107-1-alex.bennee@linaro.org>
+	<20180517174718.10107-44-alex.bennee@linaro.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <97fd88b9-c0c1-2d69-724f-f26144e36a2e@amsat.org>
+Date: Fri, 18 May 2018 11:28:34 -0300
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v3] xen-hvm: stop faking I/O to access PCI
- config space
+In-Reply-To: <20180517174718.10107-44-alex.bennee@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v4 43/49] tests/tcg: enable building for
+ sparc64
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,223 +36,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, xen-devel@lists.xenproject.org
-Cc: Paul Durrant <paul.durrant@citrix.com>, Stefano Stabellini <sstabellini@kernel.org>, Anthony Perard <anthony.perard@citrix.com>, "Michael S. Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, Roger Pau Monne <roger.pau@citrix.com>, Jan Beulich <JBeulich@suse.com>
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, cota@braap.org, famz@redhat.com, berrange@redhat.com, richard.henderson@linaro.org, balrogg@gmail.com, aurelien@aurel32.net, agraf@suse.de
+Cc: qemu-devel@nongnu.org
 
-This patch removes the current hackery where IOREQ_TYPE_PCI_CONFIG
-requests are handled by faking PIO to 0xcf8 and 0xcfc and replaces it
-with direct calls to pci_host_config_read/write_common().
-Doing so necessitates mapping BDFs to PCIDevices but maintaining a simple
-QLIST in xen_device_realize/unrealize() will suffice.
+On 05/17/2018 02:47 PM, Alex Bennée wrote:
+> As before, using Debian SID compilers.
+> 
+> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+> ---
+>  tests/docker/Makefile.include                        |  1 +
+>  tests/docker/dockerfiles/debian-sparc64-cross.docker | 12 ++++++++++++
+>  tests/tcg/sparc64/Makefile.include                   |  2 ++
+>  3 files changed, 15 insertions(+)
+>  create mode 100644 tests/docker/dockerfiles/debian-sparc64-cross.docker
+>  create mode 100644 tests/tcg/sparc64/Makefile.include
+> 
+> diff --git a/tests/docker/Makefile.include b/tests/docker/Makefile.include
+> index c08f32ca58..62d1f4dec0 100644
+> --- a/tests/docker/Makefile.include
+> +++ b/tests/docker/Makefile.include
+> @@ -66,6 +66,7 @@ docker-image-debian-alpha-cross: docker-image-debian-sid
+>  docker-image-debian-hppa-cross: docker-image-debian-sid
+>  docker-image-debian-m68k-cross: docker-image-debian-sid
+>  docker-image-debian-sh4-cross: docker-image-debian-sid
+> +docker-image-debian-sparc64-cross: docker-image-debian-sid
+>  docker-image-travis: NOUSER=1
+>  
+>  # Expand all the pre-requistes for each docker image and test combination
+> diff --git a/tests/docker/dockerfiles/debian-sparc64-cross.docker b/tests/docker/dockerfiles/debian-sparc64-cross.docker
+> new file mode 100644
+> index 0000000000..1e2c809274
+> --- /dev/null
+> +++ b/tests/docker/dockerfiles/debian-sparc64-cross.docker
+> @@ -0,0 +1,12 @@
+> +#
+> +# Docker cross-compiler target
+> +#
+> +# This docker target builds on the debian sid base image which
+> +# contains cross compilers for Debian "ports" targets.
+> +#
+> +FROM qemu:debian-sid
+> +
+> +RUN DEBIAN_FRONTEND=noninteractive eatmydata \
+> +    apt-get install -y --no-install-recommends \
+> +        gcc-sparc64-linux-gnu \
+> +        libc6-dev-sparc64-cross
+> diff --git a/tests/tcg/sparc64/Makefile.include b/tests/tcg/sparc64/Makefile.include
+> new file mode 100644
+> index 0000000000..95fc8dee9f
+> --- /dev/null
+> +++ b/tests/tcg/sparc64/Makefile.include
+> @@ -0,0 +1,2 @@
+> +DOCKER_IMAGE=debian-sparc64-cross
+> +DOCKER_CROSS_COMPILER=sparc64-linux-gnu-gcc
+> 
 
-NOTE: whilst config space accesses are currently limited to
-      PCI_CONFIG_SPACE_SIZE, this patch paves the way to increasing the
-      limit to PCIE_CONFIG_SPACE_SIZE when Xen gains the ability to
-      emulate MCFG table accesses.
+Using a snapshot:
 
-Signed-off-by: Paul Durrant <paul.durrant@citrix.com>
+-- >8 --
+diff --git a/tests/docker/dockerfiles/debian-sid.docker
+b/tests/docker/dockerfiles/debian-sid.docker
+-# Duplicate deb line as deb-src
+-RUN cat /etc/apt/sources.list | sed "s/^deb\ /deb-src /" >>
+/etc/apt/sources.list
++# random 'working' snapshot
++RUN echo "deb
+http://snapshot.debian.org/archive/debian/20180512T101008Z/ sid main" >
+/etc/apt/sources.list && \
++    echo "deb-src
+http://snapshot.debian.org/archive/debian/20180512T101008Z/ sid main" >>
+/etc/apt/sources.list
 --
-Cc: Stefano Stabellini <sstabellini@kernel.org>
-Cc: Anthony Perard <anthony.perard@citrix.com>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Marcel Apfelbaum <marcel@redhat.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Richard Henderson <rth@twiddle.net>
-Cc: Eduardo Habkost <ehabkost@redhat.com>
-Cc: Roger Pau Monne <roger.pau@citrix.com>
-Cc: Jan Beulich <JBeulich@suse.com>
 
-v3:
- - Drop helper function and treat count > 1 as an error
- - Add Jan to cc list
-
-v2:
- - Introduce a helper function rw_config_req_item() to handle config
-   register offset calculation
- - Handle req->count > 1 more like MMIO rather than PIO
- - Add Roger to cc list (not taking R-b because of significant change)
----
- hw/i386/xen/trace-events |   2 +
- hw/i386/xen/xen-hvm.c    | 102 +++++++++++++++++++++++++++++++++++++----------
- 2 files changed, 84 insertions(+), 20 deletions(-)
-
-diff --git a/hw/i386/xen/trace-events b/hw/i386/xen/trace-events
-index 8dab7bc..f576f1b 100644
---- a/hw/i386/xen/trace-events
-+++ b/hw/i386/xen/trace-events
-@@ -15,6 +15,8 @@ cpu_ioreq_pio(void *req, uint32_t dir, uint32_t df, uint32_t data_is_ptr, uint64
- cpu_ioreq_pio_read_reg(void *req, uint64_t data, uint64_t addr, uint32_t size) "I/O=%p pio read reg data=0x%"PRIx64" port=0x%"PRIx64" size=%d"
- cpu_ioreq_pio_write_reg(void *req, uint64_t data, uint64_t addr, uint32_t size) "I/O=%p pio write reg data=0x%"PRIx64" port=0x%"PRIx64" size=%d"
- cpu_ioreq_move(void *req, uint32_t dir, uint32_t df, uint32_t data_is_ptr, uint64_t addr, uint64_t data, uint32_t count, uint32_t size) "I/O=%p copy dir=%d df=%d ptr=%d port=0x%"PRIx64" data=0x%"PRIx64" count=%d size=%d"
-+cpu_ioreq_config_read(void *req, uint32_t sbdf, uint32_t reg, uint32_t size, uint32_t data) "I/O=%p sbdf=0x%x reg=%u size=%u data=0x%x"
-+cpu_ioreq_config_write(void *req, uint32_t sbdf, uint32_t reg, uint32_t size, uint32_t data) "I/O=%p sbdf=0x%x reg=%u size=%u data=0x%x"
- 
- # xen-mapcache.c
- xen_map_cache(uint64_t phys_addr) "want 0x%"PRIx64
-diff --git a/hw/i386/xen/xen-hvm.c b/hw/i386/xen/xen-hvm.c
-index caa563b..3a6c42b 100644
---- a/hw/i386/xen/xen-hvm.c
-+++ b/hw/i386/xen/xen-hvm.c
-@@ -12,6 +12,7 @@
- 
- #include "cpu.h"
- #include "hw/pci/pci.h"
-+#include "hw/pci/pci_host.h"
- #include "hw/i386/pc.h"
- #include "hw/i386/apic-msidef.h"
- #include "hw/xen/xen_common.h"
-@@ -86,6 +87,12 @@ typedef struct XenPhysmap {
-     QLIST_ENTRY(XenPhysmap) list;
- } XenPhysmap;
- 
-+typedef struct XenPciDevice {
-+    PCIDevice *pci_dev;
-+    uint32_t sbdf;
-+    QLIST_ENTRY(XenPciDevice) entry;
-+} XenPciDevice;
-+
- typedef struct XenIOState {
-     ioservid_t ioservid;
-     shared_iopage_t *shared_page;
-@@ -105,6 +112,7 @@ typedef struct XenIOState {
-     struct xs_handle *xenstore;
-     MemoryListener memory_listener;
-     MemoryListener io_listener;
-+    QLIST_HEAD(, XenPciDevice) dev_list;
-     DeviceListener device_listener;
-     QLIST_HEAD(, XenPhysmap) physmap;
-     hwaddr free_phys_offset;
-@@ -569,6 +577,12 @@ static void xen_device_realize(DeviceListener *listener,
- 
-     if (object_dynamic_cast(OBJECT(dev), TYPE_PCI_DEVICE)) {
-         PCIDevice *pci_dev = PCI_DEVICE(dev);
-+        XenPciDevice *xendev = g_new(XenPciDevice, 1);
-+
-+        xendev->pci_dev = pci_dev;
-+        xendev->sbdf = PCI_BUILD_BDF(pci_dev_bus_num(pci_dev),
-+                                     pci_dev->devfn);
-+        QLIST_INSERT_HEAD(&state->dev_list, xendev, entry);
- 
-         xen_map_pcidev(xen_domid, state->ioservid, pci_dev);
-     }
-@@ -581,8 +595,17 @@ static void xen_device_unrealize(DeviceListener *listener,
- 
-     if (object_dynamic_cast(OBJECT(dev), TYPE_PCI_DEVICE)) {
-         PCIDevice *pci_dev = PCI_DEVICE(dev);
-+        XenPciDevice *xendev, *next;
- 
-         xen_unmap_pcidev(xen_domid, state->ioservid, pci_dev);
-+
-+        QLIST_FOREACH_SAFE(xendev, &state->dev_list, entry, next) {
-+            if (xendev->pci_dev == pci_dev) {
-+                QLIST_REMOVE(xendev, entry);
-+                g_free(xendev);
-+                break;
-+            }
-+        }
-     }
- }
- 
-@@ -903,6 +926,62 @@ static void cpu_ioreq_move(ioreq_t *req)
-     }
- }
- 
-+static void cpu_ioreq_config(XenIOState *state, ioreq_t *req)
-+{
-+    uint32_t sbdf = req->addr >> 32;
-+    uint32_t reg = req->addr;
-+    XenPciDevice *xendev;
-+
-+    if (req->size != sizeof(uint8_t) && req->size != sizeof(uint16_t) &&
-+        req->size != sizeof(uint32_t)) {
-+        hw_error("PCI config access: bad size (%u)", req->size);
-+    }
-+
-+    if (req->count != 1) {
-+        hw_error("PCI config access: bad count (%u)", req->count);
-+    }
-+
-+    QLIST_FOREACH(xendev, &state->dev_list, entry) {
-+        if (xendev->sbdf != sbdf) {
-+            continue;
-+        }
-+
-+        if (!req->data_is_ptr) {
-+            if (req->dir == IOREQ_READ) {
-+                req->data = pci_host_config_read_common(
-+                    xendev->pci_dev, reg, PCI_CONFIG_SPACE_SIZE,
-+                    req->size);
-+                trace_cpu_ioreq_config_read(req, xendev->sbdf, reg,
-+                                            req->size, req->data);
-+            } else if (req->dir == IOREQ_WRITE) {
-+                trace_cpu_ioreq_config_write(req, xendev->sbdf, reg,
-+                                             req->size, req->data);
-+                pci_host_config_write_common(
-+                    xendev->pci_dev, reg, PCI_CONFIG_SPACE_SIZE,
-+                    req->data, req->size);
-+            }
-+        } else {
-+            uint32_t tmp;
-+
-+            if (req->dir == IOREQ_READ) {
-+                tmp = pci_host_config_read_common(
-+                    xendev->pci_dev, reg, PCI_CONFIG_SPACE_SIZE,
-+                    req->size);
-+                trace_cpu_ioreq_config_read(req, xendev->sbdf, reg,
-+                                            req->size, tmp);
-+                write_phys_req_item(req->data, req, 0, &tmp);
-+            } else if (req->dir == IOREQ_WRITE) {
-+                read_phys_req_item(req->data, req, i, &tmp);
-+                trace_cpu_ioreq_config_write(req, xendev->sbdf, reg,
-+                                             req->size, tmp);
-+                pci_host_config_write_common(
-+                    xendev->pci_dev, reg, PCI_CONFIG_SPACE_SIZE,
-+                    tmp, req->size);
-+            }
-+        }
-+    }
-+}
-+
- static void regs_to_cpu(vmware_regs_t *vmport_regs, ioreq_t *req)
- {
-     X86CPU *cpu;
-@@ -975,27 +1054,9 @@ static void handle_ioreq(XenIOState *state, ioreq_t *req)
-         case IOREQ_TYPE_INVALIDATE:
-             xen_invalidate_map_cache();
-             break;
--        case IOREQ_TYPE_PCI_CONFIG: {
--            uint32_t sbdf = req->addr >> 32;
--            uint32_t val;
--
--            /* Fake a write to port 0xCF8 so that
--             * the config space access will target the
--             * correct device model.
--             */
--            val = (1u << 31) |
--                  ((req->addr & 0x0f00) << 16) |
--                  ((sbdf & 0xffff) << 8) |
--                  (req->addr & 0xfc);
--            do_outp(0xcf8, 4, val);
--
--            /* Now issue the config space access via
--             * port 0xCFC
--             */
--            req->addr = 0xcfc | (req->addr & 0x03);
--            cpu_ioreq_pio(req);
-+        case IOREQ_TYPE_PCI_CONFIG:
-+            cpu_ioreq_config(state, req);
-             break;
--        }
-         default:
-             hw_error("Invalid ioreq type 0x%x\n", req->type);
-     }
-@@ -1366,6 +1427,7 @@ void xen_hvm_init(PCMachineState *pcms, MemoryRegion **ram_memory)
-     memory_listener_register(&state->io_listener, &address_space_io);
- 
-     state->device_listener = xen_device_listener;
-+    QLIST_INIT(&state->dev_list);
-     device_listener_register(&state->device_listener);
- 
-     /* Initialize backend core & drivers */
--- 
-2.1.4
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Tested-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
