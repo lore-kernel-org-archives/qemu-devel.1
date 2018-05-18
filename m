@@ -1,27 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36658)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37262)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fJbTK-0004ab-Bm
-	for qemu-devel@nongnu.org; Fri, 18 May 2018 05:14:47 -0400
+	(envelope-from <famz@redhat.com>) id 1fJbX9-0006pY-9L
+	for qemu-devel@nongnu.org; Fri, 18 May 2018 05:18:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fJbTH-0001gJ-RO
-	for qemu-devel@nongnu.org; Fri, 18 May 2018 05:14:46 -0400
-Received: from mail-wr0-x236.google.com ([2a00:1450:400c:c0c::236]:35983)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1fJbTH-0001ea-L7
-	for qemu-devel@nongnu.org; Fri, 18 May 2018 05:14:43 -0400
-Received: by mail-wr0-x236.google.com with SMTP id p4-v6so8434206wrh.3
-	for <qemu-devel@nongnu.org>; Fri, 18 May 2018 02:14:43 -0700 (PDT)
-From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Fri, 18 May 2018 10:14:39 +0100
-Message-Id: <20180518091440.1559-2-alex.bennee@linaro.org>
-In-Reply-To: <20180518091440.1559-1-alex.bennee@linaro.org>
-References: <20180518091440.1559-1-alex.bennee@linaro.org>
+	(envelope-from <famz@redhat.com>) id 1fJbX6-0003zH-3o
+	for qemu-devel@nongnu.org; Fri, 18 May 2018 05:18:43 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:40264 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1fJbX5-0003z5-W6
+	for qemu-devel@nongnu.org; Fri, 18 May 2018 05:18:40 -0400
+From: Fam Zheng <famz@redhat.com>
+Date: Fri, 18 May 2018 17:18:26 +0800
+Message-Id: <20180518091828.12814-1-famz@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [RFC PATCH 1/2] .travis.yml: disable linux-user build
- for gcov
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL 0/2] Docker and block patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,31 +24,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: famz@redhat.com, pbonzini@redhat.com, stefanha@redhat.com, stefanb@linux.vnet.ibm.com, marcandre.lureau@redhat.com
-Cc: qemu-devel@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+To: qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>
 
-Currently the default testing doesn't exercise the linux-user builds
-so there is no point spending time building them. We may want to
-enable a separate gcov build once linux-user testing is re-enabled
-although it's likely to report very low coverage.
+The following changes since commit a4207e3b00e89f934adb231057dcf9a75ac2ae=
+45:
 
-Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
----
- .travis.yml | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+  Merge remote-tracking branch 'remotes/cody/tags/block-pull-request' int=
+o staging (2018-05-17 11:59:50 +0100)
 
-diff --git a/.travis.yml b/.travis.yml
-index c1e99237b2..aa83e9aed7 100644
---- a/.travis.yml
-+++ b/.travis.yml
-@@ -74,7 +74,7 @@ matrix:
-     - env: CONFIG=""
-       compiler: clang
-     # gprof/gcov are GCC features
--    - env: CONFIG="--enable-gprof --enable-gcov --disable-pie"
-+    - env: CONFIG="--enable-gprof --enable-gcov --disable-pie --disable-linux-user"
-       compiler: gcc
-     # We manually include builds which we disable "make check" for
-     - env: CONFIG="--enable-debug --enable-tcg-interpreter"
--- 
-2.17.0
+are available in the Git repository at:
+
+  git://github.com/famz/qemu.git tags/docker-and-block-pull-request
+
+for you to fetch changes up to cd0a6d2b2c3d5cbf82a868d8c6c80961bcda6db5:
+
+  iothread: fix epollfd leak in the process of delIOThread (2018-05-18 17=
+:09:54 +0800)
+
+----------------------------------------------------------------
+Docker and block patches
+
+Two fairly small fixes.
+
+----------------------------------------------------------------
+
+Jie Wang (1):
+  iothread: fix epollfd leak in the process of delIOThread
+
+Philippe Mathieu-Daud=C3=A9 (1):
+  docker: Fix trivial typo
+
+ include/block/aio.h           |  8 ++++++++
+ tests/docker/Makefile.include |  2 +-
+ util/aio-posix.c              | 13 ++++++++++---
+ util/aio-win32.c              |  4 ++++
+ util/async.c                  |  1 +
+ 5 files changed, 24 insertions(+), 4 deletions(-)
+
+--=20
+2.14.3
