@@ -1,24 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41132)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43465)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1fJZR2-0008Tn-Rs
-	for qemu-devel@nongnu.org; Fri, 18 May 2018 03:04:17 -0400
+	(envelope-from <eric.auger@redhat.com>) id 1fJZl3-0006GF-BB
+	for qemu-devel@nongnu.org; Fri, 18 May 2018 03:24:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1fJZQz-0001iN-Kr
-	for qemu-devel@nongnu.org; Fri, 18 May 2018 03:04:16 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:34876 helo=mx1.redhat.com)
+	(envelope-from <eric.auger@redhat.com>) id 1fJZl0-0005LC-Nb
+	for qemu-devel@nongnu.org; Fri, 18 May 2018 03:24:57 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:59998 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1fJZQz-0001iD-H9
-	for qemu-devel@nongnu.org; Fri, 18 May 2018 03:04:13 -0400
-Date: Fri, 18 May 2018 09:04:12 +0200
-From: Gerd Hoffmann <kraxel@redhat.com>
-Message-ID: <20180518070412.4zlrltobjqc54g6b@sirius.home.kraxel.org>
-References: <20180515185814.1374-1-peter.maydell@linaro.org>
+	(Exim 4.71) (envelope-from <eric.auger@redhat.com>)
+	id 1fJZl0-0005Jq-I0
+	for qemu-devel@nongnu.org; Fri, 18 May 2018 03:24:54 -0400
+References: <20180504030811.28111-1-peterx@redhat.com>
+	<20180504030811.28111-6-peterx@redhat.com>
+	<99897d3c-ee46-977d-c886-5d23996c7f04@redhat.com>
+	<20180518055939.GE2569@xz-mi>
+From: Auger Eric <eric.auger@redhat.com>
+Message-ID: <601036e5-a1b8-9afe-714e-e5d76e06a6d5@redhat.com>
+Date: Fri, 18 May 2018 09:24:51 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180515185814.1374-1-peter.maydell@linaro.org>
-Subject: Re: [Qemu-devel] [PATCH] sdl: Move use of surface pointer below
- check for whether it is NULL
+In-Reply-To: <20180518055939.GE2569@xz-mi>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 05/10] intel-iommu: introduce
+ vtd_page_walk_info
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,15 +31,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: qemu-devel@nongnu.org, patches@linaro.org, Anatoly Trosinenko <anatoly.trosinenko@gmail.com>
+To: Peter Xu <peterx@redhat.com>
+Cc: qemu-devel@nongnu.org, Tian Kevin <kevin.tian@intel.com>, "Michael S . Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, Alex Williamson <alex.williamson@redhat.com>, Jintack Lim <jintack@cs.columbia.edu>
 
-On Tue, May 15, 2018 at 07:58:14PM +0100, Peter Maydell wrote:
-> In commit 2ab858c6c38ee1 we added a use of the 'surf' variable
-> in sdl2_2d_update() that was unfortunately placed above the
-> early-exit-if-NULL check. Move it to where it ought to be.
+Hi Peter,
+On 05/18/2018 07:59 AM, Peter Xu wrote:
+> On Thu, May 17, 2018 at 04:32:58PM +0200, Auger Eric wrote:
+>> Hi Peter,
+>>
+>> On 05/04/2018 05:08 AM, Peter Xu wrote:
+>>> During the recursive page walking of IOVA page tables, some stack
+>>> variables are constant variables and never changed during the whole page
+>>> walking procedure.  Isolate them into a struct so that we don't need to
+>>> pass those contants down the stack every time and multiple times.
+>>>
+>>> Signed-off-by: Peter Xu <peterx@redhat.com>
+>> Reviewed-by: Eric Auger <eric.auger@redhat.com>
+> 
+> Thanks for the r-b, but this patch is changed in version 3.  Please
+> feel free to have a look at that version.
 
-Added to ui patch queue.
+Sure. Please apologize, I missed your v3. Looking at it now.
 
-thanks,
-  Gerd
+Thanks
+
+Eric
+> 
+> (For all the review comments previously to version 2, I adopted them
+>  when the contents are still there in version 3)
+> 
+> Regards,
+> 
