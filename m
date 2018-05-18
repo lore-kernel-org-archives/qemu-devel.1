@@ -1,16 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59400)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59421)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fJfKK-0008CE-8Y
+	(envelope-from <kwolf@redhat.com>) id 1fJfKM-0008EZ-Db
 	for qemu-devel@nongnu.org; Fri, 18 May 2018 09:21:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fJfKH-0005rk-Dw
-	for qemu-devel@nongnu.org; Fri, 18 May 2018 09:21:44 -0400
+	(envelope-from <kwolf@redhat.com>) id 1fJfKI-0005sX-CU
+	for qemu-devel@nongnu.org; Fri, 18 May 2018 09:21:46 -0400
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Fri, 18 May 2018 15:20:42 +0200
-Message-Id: <20180518132114.4070-9-kwolf@redhat.com>
+Date: Fri, 18 May 2018 15:20:45 +0200
+Message-Id: <20180518132114.4070-12-kwolf@redhat.com>
 In-Reply-To: <20180518132114.4070-1-kwolf@redhat.com>
 References: <20180518132114.4070-1-kwolf@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 08/40] job: Move state transitions to Job
+Subject: [Qemu-devel] [PATCH v2 11/40] job: Add Job.aio_context
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,624 +22,97 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, mreitz@redhat.com, jsnow@redhat.com, eblake@redhat.com, jcody@redhat.com, armbru@redhat.com, qemu-devel@nongnu.org
 
-This moves BlockJob.status and the closely related functions
-(block_)job_state_transition() and (block_)job_apply_verb to Job. The
-two QAPI enums are renamed to JobStatus and JobVerb.
+When block jobs need an AioContext, they just take it from their main
+block node. Generic jobs don't have a main block node, so we need to
+assign them an AioContext explicitly.
 
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 Reviewed-by: Max Reitz <mreitz@redhat.com>
 Reviewed-by: John Snow <jsnow@redhat.com>
 ---
- qapi/block-core.json     |  16 ++++----
- include/block/blockjob.h |   3 --
- include/qemu/job.h       |  13 ++++++
- blockjob.c               | 102 +++++++++++------------------------------------
- job.c                    |  56 ++++++++++++++++++++++++++
- tests/test-blockjob.c    |  39 +++++++++---------
- block/trace-events       |   2 -
- trace-events             |   4 ++
- 8 files changed, 123 insertions(+), 112 deletions(-)
+ include/qemu/job.h | 7 ++++++-
+ blockjob.c         | 5 ++++-
+ job.c              | 4 +++-
+ 3 files changed, 13 insertions(+), 3 deletions(-)
 
-diff --git a/qapi/block-core.json b/qapi/block-core.json
-index 63c6011411..bb964b4319 100644
---- a/qapi/block-core.json
-+++ b/qapi/block-core.json
-@@ -1068,9 +1068,9 @@
-   'data': ['commit', 'stream', 'mirror', 'backup'] }
- 
- ##
--# @BlockJobVerb:
-+# @JobVerb:
- #
--# Represents command verbs that can be applied to a blockjob.
-+# Represents command verbs that can be applied to a job.
- #
- # @cancel: see @block-job-cancel
- #
-@@ -1088,14 +1088,14 @@
- #
- # Since: 2.12
- ##
--{ 'enum': 'BlockJobVerb',
-+{ 'enum': 'JobVerb',
-   'data': ['cancel', 'pause', 'resume', 'set-speed', 'complete', 'dismiss',
-            'finalize' ] }
- 
- ##
--# @BlockJobStatus:
-+# @JobStatus:
- #
--# Indicates the present state of a given blockjob in its lifetime.
-+# Indicates the present state of a given job in its lifetime.
- #
- # @undefined: Erroneous, default state. Should not ever be visible.
- #
-@@ -1134,7 +1134,7 @@
- #
- # Since: 2.12
- ##
--{ 'enum': 'BlockJobStatus',
-+{ 'enum': 'JobStatus',
-   'data': ['undefined', 'created', 'running', 'paused', 'ready', 'standby',
-            'waiting', 'pending', 'aborting', 'concluded', 'null' ] }
- 
-@@ -1184,7 +1184,7 @@
-   'data': {'type': 'str', 'device': 'str', 'len': 'int',
-            'offset': 'int', 'busy': 'bool', 'paused': 'bool', 'speed': 'int',
-            'io-status': 'BlockDeviceIoStatus', 'ready': 'bool',
--           'status': 'BlockJobStatus',
-+           'status': 'JobStatus',
-            'auto-finalize': 'bool', 'auto-dismiss': 'bool',
-            '*error': 'str' } }
- 
-@@ -2416,7 +2416,7 @@
- # QEMU 2.12+ job lifetime management semantics.
- #
- # This command will refuse to operate on any job that has not yet reached
--# its terminal state, BLOCK_JOB_STATUS_CONCLUDED. For jobs that make use of
-+# its terminal state, JOB_STATUS_CONCLUDED. For jobs that make use of the
- # BLOCK_JOB_READY event, block-job-cancel or block-job-complete will still need
- # to be used as appropriate.
- #
-diff --git a/include/block/blockjob.h b/include/block/blockjob.h
-index 10bd9f7059..01cdee6d15 100644
---- a/include/block/blockjob.h
-+++ b/include/block/blockjob.h
-@@ -147,9 +147,6 @@ typedef struct BlockJob {
-      */
-     QEMUTimer sleep_timer;
- 
--    /** Current state; See @BlockJobStatus for details. */
--    BlockJobStatus status;
--
-     /** True if this job should automatically finalize itself */
-     bool auto_finalize;
- 
 diff --git a/include/qemu/job.h b/include/qemu/job.h
-index bae2b0920c..0b78778b9e 100644
+index 5dfbec5d69..01e083f97a 100644
 --- a/include/qemu/job.h
 +++ b/include/qemu/job.h
-@@ -41,6 +41,9 @@ typedef struct Job {
-     /** The type of this job. */
-     const JobDriver *driver;
+@@ -47,6 +47,9 @@ typedef struct Job {
+     /** Current state; See @JobStatus for details. */
+     JobStatus status;
  
-+    /** Current state; See @JobStatus for details. */
-+    JobStatus status;
++    /** AioContext to run the job coroutine in */
++    AioContext *aio_context;
 +
-     /** Element of the list of jobs */
-     QLIST_ENTRY(Job) job_list;
- } Job;
-@@ -90,4 +93,14 @@ Job *job_next(Job *job);
+     /**
+      * Set to true if the job should cancel itself.  The flag must
+      * always be tested just before toggling the busy flag from false
+@@ -79,9 +82,11 @@ struct JobDriver {
+  *
+  * @job_id: The id of the newly-created job, or %NULL for internal jobs
+  * @driver: The class object for the newly-created job.
++ * @ctx: The AioContext to run the job coroutine in.
+  * @errp: Error object.
   */
- Job *job_get(const char *id);
+-void *job_create(const char *job_id, const JobDriver *driver, Error **errp);
++void *job_create(const char *job_id, const JobDriver *driver, AioContext *ctx,
++                 Error **errp);
  
-+/**
-+ * Check whether the verb @verb can be applied to @job in its current state.
-+ * Returns 0 if the verb can be applied; otherwise errp is set and -EPERM
-+ * returned.
-+ */
-+int job_apply_verb(Job *job, JobVerb verb, Error **errp);
-+
-+/* TODO To be removed from the public interface */
-+void job_state_transition(Job *job, JobStatus s1);
-+
- #endif
+ /**
+  * Add a reference to Job refcnt, it will be decreased with job_unref, and then
 diff --git a/blockjob.c b/blockjob.c
-index c69b2e7cf5..0fba01edd4 100644
+index f4f9956678..0a0b1c41dd 100644
 --- a/blockjob.c
 +++ b/blockjob.c
-@@ -41,61 +41,6 @@
-  * block_job_enter. */
- static QemuMutex block_job_mutex;
+@@ -216,6 +216,7 @@ static void block_job_attached_aio_context(AioContext *new_context,
+ {
+     BlockJob *job = opaque;
  
--/* BlockJob State Transition Table */
--bool BlockJobSTT[BLOCK_JOB_STATUS__MAX][BLOCK_JOB_STATUS__MAX] = {
--                                          /* U, C, R, P, Y, S, W, D, X, E, N */
--    /* U: */ [BLOCK_JOB_STATUS_UNDEFINED] = {0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0},
--    /* C: */ [BLOCK_JOB_STATUS_CREATED]   = {0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 1},
--    /* R: */ [BLOCK_JOB_STATUS_RUNNING]   = {0, 0, 0, 1, 1, 0, 1, 0, 1, 0, 0},
--    /* P: */ [BLOCK_JOB_STATUS_PAUSED]    = {0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0},
--    /* Y: */ [BLOCK_JOB_STATUS_READY]     = {0, 0, 0, 0, 0, 1, 1, 0, 1, 0, 0},
--    /* S: */ [BLOCK_JOB_STATUS_STANDBY]   = {0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0},
--    /* W: */ [BLOCK_JOB_STATUS_WAITING]   = {0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0},
--    /* D: */ [BLOCK_JOB_STATUS_PENDING]   = {0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0},
--    /* X: */ [BLOCK_JOB_STATUS_ABORTING]  = {0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0},
--    /* E: */ [BLOCK_JOB_STATUS_CONCLUDED] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
--    /* N: */ [BLOCK_JOB_STATUS_NULL]      = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
--};
--
--bool BlockJobVerbTable[BLOCK_JOB_VERB__MAX][BLOCK_JOB_STATUS__MAX] = {
--                                          /* U, C, R, P, Y, S, W, D, X, E, N */
--    [BLOCK_JOB_VERB_CANCEL]               = {0, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0},
--    [BLOCK_JOB_VERB_PAUSE]                = {0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0},
--    [BLOCK_JOB_VERB_RESUME]               = {0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0},
--    [BLOCK_JOB_VERB_SET_SPEED]            = {0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0},
--    [BLOCK_JOB_VERB_COMPLETE]             = {0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0},
--    [BLOCK_JOB_VERB_FINALIZE]             = {0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0},
--    [BLOCK_JOB_VERB_DISMISS]              = {0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0},
--};
--
--static void block_job_state_transition(BlockJob *job, BlockJobStatus s1)
--{
--    BlockJobStatus s0 = job->status;
--    assert(s1 >= 0 && s1 <= BLOCK_JOB_STATUS__MAX);
--    trace_block_job_state_transition(job, job->ret, BlockJobSTT[s0][s1] ?
--                                     "allowed" : "disallowed",
--                                     BlockJobStatus_str(s0),
--                                     BlockJobStatus_str(s1));
--    assert(BlockJobSTT[s0][s1]);
--    job->status = s1;
--}
--
--static int block_job_apply_verb(BlockJob *job, BlockJobVerb bv, Error **errp)
--{
--    assert(bv >= 0 && bv <= BLOCK_JOB_VERB__MAX);
--    trace_block_job_apply_verb(job, BlockJobStatus_str(job->status),
--                               BlockJobVerb_str(bv),
--                               BlockJobVerbTable[bv][job->status] ?
--                               "allowed" : "prohibited");
--    if (BlockJobVerbTable[bv][job->status]) {
--        return 0;
--    }
--    error_setg(errp, "Job '%s' in state '%s' cannot accept command verb '%s'",
--               job->job.id, BlockJobStatus_str(job->status),
--               BlockJobVerb_str(bv));
--    return -EPERM;
--}
--
- static void block_job_lock(void)
- {
-     qemu_mutex_lock(&block_job_mutex);
-@@ -257,7 +202,7 @@ static void block_job_detach_aio_context(void *opaque);
- void block_job_unref(BlockJob *job)
- {
-     if (--job->refcnt == 0) {
--        assert(job->status == BLOCK_JOB_STATUS_NULL);
-+        assert(job->job.status == JOB_STATUS_NULL);
-         assert(!job->txn);
-         BlockDriverState *bs = blk_bs(job->blk);
-         bs->job = NULL;
-@@ -409,7 +354,7 @@ void block_job_start(BlockJob *job)
-     job->pause_count--;
-     job->busy = true;
-     job->paused = false;
--    block_job_state_transition(job, BLOCK_JOB_STATUS_RUNNING);
-+    job_state_transition(&job->job, JOB_STATUS_RUNNING);
-     bdrv_coroutine_enter(blk_bs(job->blk), job->co);
++    job->job.aio_context = new_context;
+     if (job->driver->attached_aio_context) {
+         job->driver->attached_aio_context(job, new_context);
+     }
+@@ -247,6 +248,7 @@ static void block_job_detach_aio_context(void *opaque)
+         block_job_drain(job);
+     }
+ 
++    job->job.aio_context = NULL;
+     job_unref(&job->job);
  }
  
-@@ -421,7 +366,7 @@ static void block_job_decommission(BlockJob *job)
-     job->paused = false;
-     job->deferred_to_main_loop = true;
-     block_job_txn_del_job(job);
--    block_job_state_transition(job, BLOCK_JOB_STATUS_NULL);
-+    job_state_transition(&job->job, JOB_STATUS_NULL);
-     block_job_unref(job);
- }
- 
-@@ -432,7 +377,7 @@ static void block_job_do_dismiss(BlockJob *job)
- 
- static void block_job_conclude(BlockJob *job)
- {
--    block_job_state_transition(job, BLOCK_JOB_STATUS_CONCLUDED);
-+    job_state_transition(&job->job, JOB_STATUS_CONCLUDED);
-     if (job->auto_dismiss || !block_job_started(job)) {
-         block_job_do_dismiss(job);
-     }
-@@ -444,7 +389,7 @@ static void block_job_update_rc(BlockJob *job)
-         job->ret = -ECANCELED;
-     }
-     if (job->ret) {
--        block_job_state_transition(job, BLOCK_JOB_STATUS_ABORTING);
-+        job_state_transition(&job->job, JOB_STATUS_ABORTING);
-     }
- }
- 
-@@ -652,7 +597,7 @@ static void block_job_completed_txn_success(BlockJob *job)
-     BlockJobTxn *txn = job->txn;
-     BlockJob *other_job;
- 
--    block_job_state_transition(job, BLOCK_JOB_STATUS_WAITING);
-+    job_state_transition(&job->job, JOB_STATUS_WAITING);
- 
-     /*
-      * Successful completion, see if there are other running jobs in this
-@@ -677,7 +622,7 @@ void block_job_set_speed(BlockJob *job, int64_t speed, Error **errp)
- {
-     int64_t old_speed = job->speed;
- 
--    if (block_job_apply_verb(job, BLOCK_JOB_VERB_SET_SPEED, errp)) {
-+    if (job_apply_verb(&job->job, JOB_VERB_SET_SPEED, errp)) {
-         return;
-     }
-     if (speed < 0) {
-@@ -709,7 +654,7 @@ void block_job_complete(BlockJob *job, Error **errp)
- {
-     /* Should not be reachable via external interface for internal jobs */
-     assert(job->job.id);
--    if (block_job_apply_verb(job, BLOCK_JOB_VERB_COMPLETE, errp)) {
-+    if (job_apply_verb(&job->job, JOB_VERB_COMPLETE, errp)) {
-         return;
-     }
-     if (job->pause_count || job->cancelled || !job->driver->complete) {
-@@ -724,7 +669,7 @@ void block_job_complete(BlockJob *job, Error **errp)
- void block_job_finalize(BlockJob *job, Error **errp)
- {
-     assert(job && job->job.id);
--    if (block_job_apply_verb(job, BLOCK_JOB_VERB_FINALIZE, errp)) {
-+    if (job_apply_verb(&job->job, JOB_VERB_FINALIZE, errp)) {
-         return;
-     }
-     block_job_do_finalize(job);
-@@ -735,7 +680,7 @@ void block_job_dismiss(BlockJob **jobptr, Error **errp)
-     BlockJob *job = *jobptr;
-     /* similarly to _complete, this is QMP-interface only. */
-     assert(job->job.id);
--    if (block_job_apply_verb(job, BLOCK_JOB_VERB_DISMISS, errp)) {
-+    if (job_apply_verb(&job->job, JOB_VERB_DISMISS, errp)) {
-         return;
+@@ -899,7 +901,8 @@ void *block_job_create(const char *job_id, const BlockJobDriver *driver,
+         return NULL;
      }
  
-@@ -745,7 +690,7 @@ void block_job_dismiss(BlockJob **jobptr, Error **errp)
- 
- void block_job_user_pause(BlockJob *job, Error **errp)
- {
--    if (block_job_apply_verb(job, BLOCK_JOB_VERB_PAUSE, errp)) {
-+    if (job_apply_verb(&job->job, JOB_VERB_PAUSE, errp)) {
-         return;
-     }
-     if (job->user_paused) {
-@@ -768,7 +713,7 @@ void block_job_user_resume(BlockJob *job, Error **errp)
-         error_setg(errp, "Can't resume a job that was not paused");
-         return;
-     }
--    if (block_job_apply_verb(job, BLOCK_JOB_VERB_RESUME, errp)) {
-+    if (job_apply_verb(&job->job, JOB_VERB_RESUME, errp)) {
-         return;
-     }
-     block_job_iostatus_reset(job);
-@@ -778,7 +723,7 @@ void block_job_user_resume(BlockJob *job, Error **errp)
- 
- void block_job_cancel(BlockJob *job, bool force)
- {
--    if (job->status == BLOCK_JOB_STATUS_CONCLUDED) {
-+    if (job->job.status == JOB_STATUS_CONCLUDED) {
-         block_job_do_dismiss(job);
-         return;
-     }
-@@ -794,7 +739,7 @@ void block_job_cancel(BlockJob *job, bool force)
- 
- void block_job_user_cancel(BlockJob *job, bool force, Error **errp)
- {
--    if (block_job_apply_verb(job, BLOCK_JOB_VERB_CANCEL, errp)) {
-+    if (job_apply_verb(&job->job, JOB_VERB_CANCEL, errp)) {
-         return;
-     }
-     block_job_cancel(job, force);
-@@ -859,7 +804,7 @@ BlockJobInfo *block_job_query(BlockJob *job, Error **errp)
-     info->speed     = job->speed;
-     info->io_status = job->iostatus;
-     info->ready     = job->ready;
--    info->status    = job->status;
-+    info->status    = job->job.status;
-     info->auto_finalize = job->auto_finalize;
-     info->auto_dismiss  = job->auto_dismiss;
-     info->has_error = job->ret != 0;
-@@ -907,7 +852,7 @@ static void block_job_event_completed(BlockJob *job, const char *msg)
- 
- static int block_job_event_pending(BlockJob *job)
- {
--    block_job_state_transition(job, BLOCK_JOB_STATUS_PENDING);
-+    job_state_transition(&job->job, JOB_STATUS_PENDING);
-     if (!job->auto_finalize && !block_job_is_internal(job)) {
-         qapi_event_send_block_job_pending(job_type(&job->job),
-                                           job->job.id,
-@@ -975,7 +920,6 @@ void *block_job_create(const char *job_id, const BlockJobDriver *driver,
-     job->refcnt        = 1;
-     job->auto_finalize = !(flags & BLOCK_JOB_MANUAL_FINALIZE);
-     job->auto_dismiss  = !(flags & BLOCK_JOB_MANUAL_DISMISS);
--    block_job_state_transition(job, BLOCK_JOB_STATUS_CREATED);
-     aio_timer_init(qemu_get_aio_context(), &job->sleep_timer,
-                    QEMU_CLOCK_REALTIME, SCALE_NS,
-                    block_job_sleep_timer_cb, job);
-@@ -1017,7 +961,7 @@ void *block_job_create(const char *job_id, const BlockJobDriver *driver,
- 
- void block_job_early_fail(BlockJob *job)
- {
--    assert(job->status == BLOCK_JOB_STATUS_CREATED);
-+    assert(job->job.status == JOB_STATUS_CREATED);
-     block_job_decommission(job);
- }
- 
-@@ -1077,14 +1021,14 @@ void coroutine_fn block_job_pause_point(BlockJob *job)
-     }
- 
-     if (block_job_should_pause(job) && !block_job_is_cancelled(job)) {
--        BlockJobStatus status = job->status;
--        block_job_state_transition(job, status == BLOCK_JOB_STATUS_READY ? \
--                                   BLOCK_JOB_STATUS_STANDBY :           \
--                                   BLOCK_JOB_STATUS_PAUSED);
-+        JobStatus status = job->job.status;
-+        job_state_transition(&job->job, status == JOB_STATUS_READY
-+                                        ? JOB_STATUS_STANDBY
-+                                        : JOB_STATUS_PAUSED);
-         job->paused = true;
-         block_job_do_yield(job, -1);
-         job->paused = false;
--        block_job_state_transition(job, status);
-+        job_state_transition(&job->job, status);
-     }
- 
-     if (job->driver->resume) {
-@@ -1176,7 +1120,7 @@ void block_job_iostatus_reset(BlockJob *job)
- 
- void block_job_event_ready(BlockJob *job)
- {
--    block_job_state_transition(job, BLOCK_JOB_STATUS_READY);
-+    job_state_transition(&job->job, JOB_STATUS_READY);
-     job->ready = true;
- 
-     if (block_job_is_internal(job)) {
+-    job = job_create(job_id, &driver->job_driver, errp);
++    job = job_create(job_id, &driver->job_driver, blk_get_aio_context(blk),
++                     errp);
+     if (job == NULL) {
+         blk_unref(blk);
+         return NULL;
 diff --git a/job.c b/job.c
-index e57303c6bb..4960b30838 100644
+index 92729cffa4..7ff1f66273 100644
 --- a/job.c
 +++ b/job.c
-@@ -28,9 +28,63 @@
- #include "qapi/error.h"
- #include "qemu/job.h"
- #include "qemu/id.h"
-+#include "trace-root.h"
+@@ -121,7 +121,8 @@ Job *job_get(const char *id)
+     return NULL;
+ }
  
- static QLIST_HEAD(, Job) jobs = QLIST_HEAD_INITIALIZER(jobs);
- 
-+/* Job State Transition Table */
-+bool JobSTT[JOB_STATUS__MAX][JOB_STATUS__MAX] = {
-+                                    /* U, C, R, P, Y, S, W, D, X, E, N */
-+    /* U: */ [JOB_STATUS_UNDEFINED] = {0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-+    /* C: */ [JOB_STATUS_CREATED]   = {0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 1},
-+    /* R: */ [JOB_STATUS_RUNNING]   = {0, 0, 0, 1, 1, 0, 1, 0, 1, 0, 0},
-+    /* P: */ [JOB_STATUS_PAUSED]    = {0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0},
-+    /* Y: */ [JOB_STATUS_READY]     = {0, 0, 0, 0, 0, 1, 1, 0, 1, 0, 0},
-+    /* S: */ [JOB_STATUS_STANDBY]   = {0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0},
-+    /* W: */ [JOB_STATUS_WAITING]   = {0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0},
-+    /* D: */ [JOB_STATUS_PENDING]   = {0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0},
-+    /* X: */ [JOB_STATUS_ABORTING]  = {0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0},
-+    /* E: */ [JOB_STATUS_CONCLUDED] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-+    /* N: */ [JOB_STATUS_NULL]      = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-+};
-+
-+bool JobVerbTable[JOB_VERB__MAX][JOB_STATUS__MAX] = {
-+                                    /* U, C, R, P, Y, S, W, D, X, E, N */
-+    [JOB_VERB_CANCEL]               = {0, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0},
-+    [JOB_VERB_PAUSE]                = {0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0},
-+    [JOB_VERB_RESUME]               = {0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0},
-+    [JOB_VERB_SET_SPEED]            = {0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0},
-+    [JOB_VERB_COMPLETE]             = {0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0},
-+    [JOB_VERB_FINALIZE]             = {0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0},
-+    [JOB_VERB_DISMISS]              = {0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0},
-+};
-+
-+/* TODO Make static once the whole state machine is in job.c */
-+void job_state_transition(Job *job, JobStatus s1)
-+{
-+    JobStatus s0 = job->status;
-+    assert(s1 >= 0 && s1 <= JOB_STATUS__MAX);
-+    trace_job_state_transition(job, /* TODO re-enable: job->ret */ 0,
-+                               JobSTT[s0][s1] ? "allowed" : "disallowed",
-+                               JobStatus_str(s0), JobStatus_str(s1));
-+    assert(JobSTT[s0][s1]);
-+    job->status = s1;
-+}
-+
-+int job_apply_verb(Job *job, JobVerb verb, Error **errp)
-+{
-+    assert(verb >= 0 && verb <= JOB_VERB__MAX);
-+    trace_job_apply_verb(job, JobStatus_str(job->status), JobVerb_str(verb),
-+                         JobVerbTable[verb][job->status] ?
-+                         "allowed" : "prohibited");
-+    if (JobVerbTable[verb][job->status]) {
-+        return 0;
-+    }
-+    error_setg(errp, "Job '%s' in state '%s' cannot accept command verb '%s'",
-+               job->id, JobStatus_str(job->status), JobVerb_str(verb));
-+    return -EPERM;
-+}
-+
- JobType job_type(const Job *job)
+-void *job_create(const char *job_id, const JobDriver *driver, Error **errp)
++void *job_create(const char *job_id, const JobDriver *driver, AioContext *ctx,
++                 Error **errp)
  {
-     return job->driver->job_type;
-@@ -81,6 +135,8 @@ void *job_create(const char *job_id, const JobDriver *driver, Error **errp)
+     Job *job;
+ 
+@@ -140,6 +141,7 @@ void *job_create(const char *job_id, const JobDriver *driver, Error **errp)
      job->driver        = driver;
      job->id            = g_strdup(job_id);
+     job->refcnt        = 1;
++    job->aio_context   = ctx;
  
-+    job_state_transition(job, JOB_STATUS_CREATED);
-+
-     QLIST_INSERT_HEAD(&jobs, job, job_list);
- 
-     return job;
-diff --git a/tests/test-blockjob.c b/tests/test-blockjob.c
-index b82026180a..6ccd585dee 100644
---- a/tests/test-blockjob.c
-+++ b/tests/test-blockjob.c
-@@ -211,7 +211,7 @@ static CancelJob *create_common(BlockJob **pjob)
-     job = mk_job(blk, "Steve", &test_cancel_driver, true,
-                  BLOCK_JOB_MANUAL_FINALIZE | BLOCK_JOB_MANUAL_DISMISS);
-     block_job_ref(job);
--    assert(job->status == BLOCK_JOB_STATUS_CREATED);
-+    assert(job->job.status == JOB_STATUS_CREATED);
-     s = container_of(job, CancelJob, common);
-     s->blk = blk;
- 
-@@ -223,15 +223,14 @@ static void cancel_common(CancelJob *s)
- {
-     BlockJob *job = &s->common;
-     BlockBackend *blk = s->blk;
--    BlockJobStatus sts = job->status;
-+    JobStatus sts = job->job.status;
- 
-     block_job_cancel_sync(job);
--    if ((sts != BLOCK_JOB_STATUS_CREATED) &&
--        (sts != BLOCK_JOB_STATUS_CONCLUDED)) {
-+    if (sts != JOB_STATUS_CREATED && sts != JOB_STATUS_CONCLUDED) {
-         BlockJob *dummy = job;
-         block_job_dismiss(&dummy, &error_abort);
-     }
--    assert(job->status == BLOCK_JOB_STATUS_NULL);
-+    assert(job->job.status == JOB_STATUS_NULL);
-     block_job_unref(job);
-     destroy_blk(blk);
- }
-@@ -253,7 +252,7 @@ static void test_cancel_running(void)
-     s = create_common(&job);
- 
-     block_job_start(job);
--    assert(job->status == BLOCK_JOB_STATUS_RUNNING);
-+    assert(job->job.status == JOB_STATUS_RUNNING);
- 
-     cancel_common(s);
- }
-@@ -266,11 +265,11 @@ static void test_cancel_paused(void)
-     s = create_common(&job);
- 
-     block_job_start(job);
--    assert(job->status == BLOCK_JOB_STATUS_RUNNING);
-+    assert(job->job.status == JOB_STATUS_RUNNING);
- 
-     block_job_user_pause(job, &error_abort);
-     block_job_enter(job);
--    assert(job->status == BLOCK_JOB_STATUS_PAUSED);
-+    assert(job->job.status == JOB_STATUS_PAUSED);
- 
-     cancel_common(s);
- }
-@@ -283,11 +282,11 @@ static void test_cancel_ready(void)
-     s = create_common(&job);
- 
-     block_job_start(job);
--    assert(job->status == BLOCK_JOB_STATUS_RUNNING);
-+    assert(job->job.status == JOB_STATUS_RUNNING);
- 
-     s->should_converge = true;
-     block_job_enter(job);
--    assert(job->status == BLOCK_JOB_STATUS_READY);
-+    assert(job->job.status == JOB_STATUS_READY);
- 
-     cancel_common(s);
- }
-@@ -300,15 +299,15 @@ static void test_cancel_standby(void)
-     s = create_common(&job);
- 
-     block_job_start(job);
--    assert(job->status == BLOCK_JOB_STATUS_RUNNING);
-+    assert(job->job.status == JOB_STATUS_RUNNING);
- 
-     s->should_converge = true;
-     block_job_enter(job);
--    assert(job->status == BLOCK_JOB_STATUS_READY);
-+    assert(job->job.status == JOB_STATUS_READY);
- 
-     block_job_user_pause(job, &error_abort);
-     block_job_enter(job);
--    assert(job->status == BLOCK_JOB_STATUS_STANDBY);
-+    assert(job->job.status == JOB_STATUS_STANDBY);
- 
-     cancel_common(s);
- }
-@@ -321,18 +320,18 @@ static void test_cancel_pending(void)
-     s = create_common(&job);
- 
-     block_job_start(job);
--    assert(job->status == BLOCK_JOB_STATUS_RUNNING);
-+    assert(job->job.status == JOB_STATUS_RUNNING);
- 
-     s->should_converge = true;
-     block_job_enter(job);
--    assert(job->status == BLOCK_JOB_STATUS_READY);
-+    assert(job->job.status == JOB_STATUS_READY);
- 
-     block_job_complete(job, &error_abort);
-     block_job_enter(job);
-     while (!s->completed) {
-         aio_poll(qemu_get_aio_context(), true);
-     }
--    assert(job->status == BLOCK_JOB_STATUS_PENDING);
-+    assert(job->job.status == JOB_STATUS_PENDING);
- 
-     cancel_common(s);
- }
-@@ -345,21 +344,21 @@ static void test_cancel_concluded(void)
-     s = create_common(&job);
- 
-     block_job_start(job);
--    assert(job->status == BLOCK_JOB_STATUS_RUNNING);
-+    assert(job->job.status == JOB_STATUS_RUNNING);
- 
-     s->should_converge = true;
-     block_job_enter(job);
--    assert(job->status == BLOCK_JOB_STATUS_READY);
-+    assert(job->job.status == JOB_STATUS_READY);
- 
-     block_job_complete(job, &error_abort);
-     block_job_enter(job);
-     while (!s->completed) {
-         aio_poll(qemu_get_aio_context(), true);
-     }
--    assert(job->status == BLOCK_JOB_STATUS_PENDING);
-+    assert(job->job.status == JOB_STATUS_PENDING);
- 
-     block_job_finalize(job, &error_abort);
--    assert(job->status == BLOCK_JOB_STATUS_CONCLUDED);
-+    assert(job->job.status == JOB_STATUS_CONCLUDED);
- 
-     cancel_common(s);
- }
-diff --git a/block/trace-events b/block/trace-events
-index f8c50b4063..93b927908a 100644
---- a/block/trace-events
-+++ b/block/trace-events
-@@ -6,8 +6,6 @@ bdrv_lock_medium(void *bs, bool locked) "bs %p locked %d"
- 
- # blockjob.c
- block_job_completed(void *job, int ret, int jret) "job %p ret %d corrected ret %d"
--block_job_state_transition(void *job,  int ret, const char *legal, const char *s0, const char *s1) "job %p (ret: %d) attempting %s transition (%s-->%s)"
--block_job_apply_verb(void *job, const char *state, const char *verb, const char *legal) "job %p in state %s; applying verb %s (%s)"
- 
- # block/block-backend.c
- blk_co_preadv(void *blk, void *bs, int64_t offset, unsigned int bytes, int flags) "blk %p bs %p offset %"PRId64" bytes %u flags 0x%x"
-diff --git a/trace-events b/trace-events
-index ed71f44649..2507e1327d 100644
---- a/trace-events
-+++ b/trace-events
-@@ -104,6 +104,10 @@ gdbstub_err_invalid_rle(void) "got invalid RLE sequence"
- gdbstub_err_checksum_invalid(uint8_t ch) "got invalid command checksum digit: 0x%02x"
- gdbstub_err_checksum_incorrect(uint8_t expected, uint8_t got) "got command packet with incorrect checksum, expected=0x%02x, received=0x%02x"
- 
-+# job.c
-+job_state_transition(void *job,  int ret, const char *legal, const char *s0, const char *s1) "job %p (ret: %d) attempting %s transition (%s-->%s)"
-+job_apply_verb(void *job, const char *state, const char *verb, const char *legal) "job %p in state %s; applying verb %s (%s)"
-+
- ### Guest events, keep at bottom
- 
+     job_state_transition(job, JOB_STATUS_CREATED);
  
 -- 
 2.13.6
