@@ -1,25 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36088)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36003)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1fJj3L-0000mM-Is
-	for qemu-devel@nongnu.org; Fri, 18 May 2018 13:20:28 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1fJj3G-0000fe-OA
+	for qemu-devel@nongnu.org; Fri, 18 May 2018 13:20:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1fJj3J-0007Yd-EZ
-	for qemu-devel@nongnu.org; Fri, 18 May 2018 13:20:27 -0400
-Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:41784)
+	(envelope-from <pm215@archaic.org.uk>) id 1fJj3E-0007U9-2l
+	for qemu-devel@nongnu.org; Fri, 18 May 2018 13:20:21 -0400
+Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:41788)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1fJj3J-0007Rj-0q
-	for qemu-devel@nongnu.org; Fri, 18 May 2018 13:20:25 -0400
+	id 1fJj3D-0007TX-OM
+	for qemu-devel@nongnu.org; Fri, 18 May 2018 13:20:20 -0400
 Received: from pm215 by orth.archaic.org.uk with local (Exim 4.89)
-	(envelope-from <pm215@archaic.org.uk>) id 1fJj3I-0004rv-3W
-	for qemu-devel@nongnu.org; Fri, 18 May 2018 18:20:24 +0100
+	(envelope-from <pm215@archaic.org.uk>) id 1fJj3C-0004p1-P0
+	for qemu-devel@nongnu.org; Fri, 18 May 2018 18:20:18 +0100
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 18 May 2018 18:19:56 +0100
-Message-Id: <20180518172009.14416-20-peter.maydell@linaro.org>
+Date: Fri, 18 May 2018 18:19:49 +0100
+Message-Id: <20180518172009.14416-13-peter.maydell@linaro.org>
 In-Reply-To: <20180518172009.14416-1-peter.maydell@linaro.org>
 References: <20180518172009.14416-1-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PULL 19/32] target/arm: Implement SVE bitwise shift
- by wide elements (predicated)
+Subject: [Qemu-devel] [PULL 12/32] target/arm: Implement SVE predicate test
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,144 +33,248 @@ From: Richard Henderson <richard.henderson@linaro.org>
 
 Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-Message-id: 20180516223007.10256-13-richard.henderson@linaro.org
+Message-id: 20180516223007.10256-6-richard.henderson@linaro.org
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- target/arm/helper-sve.h    | 21 +++++++++++++++++++++
- target/arm/sve_helper.c    | 35 +++++++++++++++++++++++++++++++++++
- target/arm/translate-sve.c | 24 ++++++++++++++++++++++++
- target/arm/sve.decode      |  6 ++++++
- 4 files changed, 86 insertions(+)
+ target/arm/Makefile.objs   |  2 +-
+ target/arm/helper-sve.h    | 21 ++++++++++
+ target/arm/helper.h        |  1 +
+ target/arm/sve_helper.c    | 78 ++++++++++++++++++++++++++++++++++++++
+ target/arm/translate-sve.c | 65 +++++++++++++++++++++++++++++++
+ target/arm/sve.decode      |  5 +++
+ 6 files changed, 171 insertions(+), 1 deletion(-)
+ create mode 100644 target/arm/helper-sve.h
+ create mode 100644 target/arm/sve_helper.c
 
+diff --git a/target/arm/Makefile.objs b/target/arm/Makefile.objs
+index a6f733eaa8..11c7baf8a3 100644
+--- a/target/arm/Makefile.objs
++++ b/target/arm/Makefile.objs
+@@ -19,4 +19,4 @@ target/arm/decode-sve.inc.c: $(SRC_PATH)/target/arm/sve.decode $(DECODETREE)
+ 	  "GEN", $(TARGET_DIR)$@)
+ 
+ target/arm/translate-sve.o: target/arm/decode-sve.inc.c
+-obj-$(TARGET_AARCH64) += translate-sve.o
++obj-$(TARGET_AARCH64) += translate-sve.o sve_helper.o
 diff --git a/target/arm/helper-sve.h b/target/arm/helper-sve.h
-index 0cc02ee59e..d516580134 100644
---- a/target/arm/helper-sve.h
+new file mode 100644
+index 0000000000..b6e91539ae
+--- /dev/null
 +++ b/target/arm/helper-sve.h
-@@ -195,6 +195,27 @@ DEF_HELPER_FLAGS_5(sve_lsl_zpzz_s, TCG_CALL_NO_RWG,
- DEF_HELPER_FLAGS_5(sve_lsl_zpzz_d, TCG_CALL_NO_RWG,
-                    void, ptr, ptr, ptr, ptr, i32)
- 
-+DEF_HELPER_FLAGS_5(sve_asr_zpzw_b, TCG_CALL_NO_RWG,
-+                   void, ptr, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_5(sve_asr_zpzw_h, TCG_CALL_NO_RWG,
-+                   void, ptr, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_5(sve_asr_zpzw_s, TCG_CALL_NO_RWG,
-+                   void, ptr, ptr, ptr, ptr, i32)
-+
-+DEF_HELPER_FLAGS_5(sve_lsr_zpzw_b, TCG_CALL_NO_RWG,
-+                   void, ptr, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_5(sve_lsr_zpzw_h, TCG_CALL_NO_RWG,
-+                   void, ptr, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_5(sve_lsr_zpzw_s, TCG_CALL_NO_RWG,
-+                   void, ptr, ptr, ptr, ptr, i32)
-+
-+DEF_HELPER_FLAGS_5(sve_lsl_zpzw_b, TCG_CALL_NO_RWG,
-+                   void, ptr, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_5(sve_lsl_zpzw_h, TCG_CALL_NO_RWG,
-+                   void, ptr, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_5(sve_lsl_zpzw_s, TCG_CALL_NO_RWG,
-+                   void, ptr, ptr, ptr, ptr, i32)
-+
- DEF_HELPER_FLAGS_3(sve_orv_b, TCG_CALL_NO_RWG, i64, ptr, ptr, i32)
- DEF_HELPER_FLAGS_3(sve_orv_h, TCG_CALL_NO_RWG, i64, ptr, ptr, i32)
- DEF_HELPER_FLAGS_3(sve_orv_s, TCG_CALL_NO_RWG, i64, ptr, ptr, i32)
-diff --git a/target/arm/sve_helper.c b/target/arm/sve_helper.c
-index ece3a81ad3..a5d12603e5 100644
---- a/target/arm/sve_helper.c
-+++ b/target/arm/sve_helper.c
-@@ -465,6 +465,41 @@ DO_ZPZZ_D(sve_lsl_zpzz_d, uint64_t, DO_LSL)
- #undef DO_ZPZZ
- #undef DO_ZPZZ_D
- 
-+/* Three-operand expander, controlled by a predicate, in which the
-+ * third operand is "wide".  That is, for D = N op M, the same 64-bit
-+ * value of M is used with all of the narrower values of N.
+@@ -0,0 +1,21 @@
++/*
++ *  AArch64 SVE specific helper definitions
++ *
++ *  Copyright (c) 2018 Linaro, Ltd
++ *
++ * This library is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU Lesser General Public
++ * License as published by the Free Software Foundation; either
++ * version 2 of the License, or (at your option) any later version.
++ *
++ * This library is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ * Lesser General Public License for more details.
++ *
++ * You should have received a copy of the GNU Lesser General Public
++ * License along with this library; if not, see <http://www.gnu.org/licenses/>.
 + */
-+#define DO_ZPZW(NAME, TYPE, TYPEW, H, OP)                               \
-+void HELPER(NAME)(void *vd, void *vn, void *vm, void *vg, uint32_t desc) \
-+{                                                                       \
-+    intptr_t i, opr_sz = simd_oprsz(desc);                              \
-+    for (i = 0; i < opr_sz; ) {                                         \
-+        uint8_t pg = *(uint8_t *)(vg + H1(i >> 3));                     \
-+        TYPEW mm = *(TYPEW *)(vm + i);                                  \
-+        do {                                                            \
-+            if (pg & 1) {                                               \
-+                TYPE nn = *(TYPE *)(vn + H(i));                         \
-+                *(TYPE *)(vd + H(i)) = OP(nn, mm);                      \
-+            }                                                           \
-+            i += sizeof(TYPE), pg >>= sizeof(TYPE);                     \
-+        } while (i & 7);                                                \
-+    }                                                                   \
++
++DEF_HELPER_FLAGS_2(sve_predtest1, TCG_CALL_NO_WG, i32, i64, i64)
++DEF_HELPER_FLAGS_3(sve_predtest, TCG_CALL_NO_WG, i32, ptr, ptr, i32)
+diff --git a/target/arm/helper.h b/target/arm/helper.h
+index 047f3bc1ca..0c6a144458 100644
+--- a/target/arm/helper.h
++++ b/target/arm/helper.h
+@@ -603,4 +603,5 @@ DEF_HELPER_FLAGS_5(gvec_fcmlad, TCG_CALL_NO_RWG,
+ 
+ #ifdef TARGET_AARCH64
+ #include "helper-a64.h"
++#include "helper-sve.h"
+ #endif
+diff --git a/target/arm/sve_helper.c b/target/arm/sve_helper.c
+new file mode 100644
+index 0000000000..1ebb67e1df
+--- /dev/null
++++ b/target/arm/sve_helper.c
+@@ -0,0 +1,78 @@
++/*
++ * ARM SVE Operations
++ *
++ * Copyright (c) 2018 Linaro, Ltd.
++ *
++ * This library is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU Lesser General Public
++ * License as published by the Free Software Foundation; either
++ * version 2 of the License, or (at your option) any later version.
++ *
++ * This library is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ * Lesser General Public License for more details.
++ *
++ * You should have received a copy of the GNU Lesser General Public
++ * License along with this library; if not, see <http://www.gnu.org/licenses/>.
++ */
++
++#include "qemu/osdep.h"
++#include "cpu.h"
++#include "exec/exec-all.h"
++#include "exec/cpu_ldst.h"
++#include "exec/helper-proto.h"
++#include "tcg/tcg-gvec-desc.h"
++
++
++/* Return a value for NZCV as per the ARM PredTest pseudofunction.
++ *
++ * The return value has bit 31 set if N is set, bit 1 set if Z is clear,
++ * and bit 0 set if C is set.  Compare the definitions of these variables
++ * within CPUARMState.
++ */
++
++/* For no G bits set, NZCV = C.  */
++#define PREDTEST_INIT  1
++
++/* This is an iterative function, called for each Pd and Pg word
++ * moving forward.
++ */
++static uint32_t iter_predtest_fwd(uint64_t d, uint64_t g, uint32_t flags)
++{
++    if (likely(g)) {
++        /* Compute N from first D & G.
++           Use bit 2 to signal first G bit seen.  */
++        if (!(flags & 4)) {
++            flags |= ((d & (g & -g)) != 0) << 31;
++            flags |= 4;
++        }
++
++        /* Accumulate Z from each D & G.  */
++        flags |= ((d & g) != 0) << 1;
++
++        /* Compute C from last !(D & G).  Replace previous.  */
++        flags = deposit32(flags, 0, 1, (d & pow2floor(g)) == 0);
++    }
++    return flags;
 +}
 +
-+DO_ZPZW(sve_asr_zpzw_b, int8_t, uint64_t, H1, DO_ASR)
-+DO_ZPZW(sve_lsr_zpzw_b, uint8_t, uint64_t, H1, DO_LSR)
-+DO_ZPZW(sve_lsl_zpzw_b, uint8_t, uint64_t, H1, DO_LSL)
++/* The same for a single word predicate.  */
++uint32_t HELPER(sve_predtest1)(uint64_t d, uint64_t g)
++{
++    return iter_predtest_fwd(d, g, PREDTEST_INIT);
++}
 +
-+DO_ZPZW(sve_asr_zpzw_h, int16_t, uint64_t, H1_2, DO_ASR)
-+DO_ZPZW(sve_lsr_zpzw_h, uint16_t, uint64_t, H1_2, DO_LSR)
-+DO_ZPZW(sve_lsl_zpzw_h, uint16_t, uint64_t, H1_2, DO_LSL)
++/* The same for a multi-word predicate.  */
++uint32_t HELPER(sve_predtest)(void *vd, void *vg, uint32_t words)
++{
++    uint32_t flags = PREDTEST_INIT;
++    uint64_t *d = vd, *g = vg;
++    uintptr_t i = 0;
 +
-+DO_ZPZW(sve_asr_zpzw_s, int32_t, uint64_t, H1_4, DO_ASR)
-+DO_ZPZW(sve_lsr_zpzw_s, uint32_t, uint64_t, H1_4, DO_LSR)
-+DO_ZPZW(sve_lsl_zpzw_s, uint32_t, uint64_t, H1_4, DO_LSL)
++    do {
++        flags = iter_predtest_fwd(d[i], g[i], flags);
++    } while (++i < words);
 +
-+#undef DO_ZPZW
-+
- /* Two-operand reduction expander, controlled by a predicate.
-  * The difference between TYPERED and TYPERET has to do with
-  * sign-extension.  E.g. for SMAX, TYPERED must be signed,
++    return flags;
++}
 diff --git a/target/arm/translate-sve.c b/target/arm/translate-sve.c
-index f0400e35d9..438df6359e 100644
+index 5ec18a6aac..c3f1b0bfa6 100644
 --- a/target/arm/translate-sve.c
 +++ b/target/arm/translate-sve.c
-@@ -497,6 +497,30 @@ static bool trans_ASRD(DisasContext *s, arg_rpri_esz *a, uint32_t insn)
-     }
+@@ -87,6 +87,43 @@ static bool do_mov_z(DisasContext *s, int rd, int rn)
+     return do_vector2_z(s, tcg_gen_gvec_mov, 0, rd, rn);
+ }
+ 
++/* Set the cpu flags as per a return from an SVE helper.  */
++static void do_pred_flags(TCGv_i32 t)
++{
++    tcg_gen_mov_i32(cpu_NF, t);
++    tcg_gen_andi_i32(cpu_ZF, t, 2);
++    tcg_gen_andi_i32(cpu_CF, t, 1);
++    tcg_gen_movi_i32(cpu_VF, 0);
++}
++
++/* Subroutines computing the ARM PredTest psuedofunction.  */
++static void do_predtest1(TCGv_i64 d, TCGv_i64 g)
++{
++    TCGv_i32 t = tcg_temp_new_i32();
++
++    gen_helper_sve_predtest1(t, d, g);
++    do_pred_flags(t);
++    tcg_temp_free_i32(t);
++}
++
++static void do_predtest(DisasContext *s, int dofs, int gofs, int words)
++{
++    TCGv_ptr dptr = tcg_temp_new_ptr();
++    TCGv_ptr gptr = tcg_temp_new_ptr();
++    TCGv_i32 t;
++
++    tcg_gen_addi_ptr(dptr, cpu_env, dofs);
++    tcg_gen_addi_ptr(gptr, cpu_env, gofs);
++    t = tcg_const_i32(words);
++
++    gen_helper_sve_predtest(t, dptr, gptr, t);
++    tcg_temp_free_ptr(dptr);
++    tcg_temp_free_ptr(gptr);
++
++    do_pred_flags(t);
++    tcg_temp_free_i32(t);
++}
++
+ /*
+  *** SVE Logical - Unpredicated Group
+  */
+@@ -115,6 +152,34 @@ static bool trans_BIC_zzz(DisasContext *s, arg_rrr_esz *a, uint32_t insn)
+     return do_vector3_z(s, tcg_gen_gvec_andc, 0, a->rd, a->rn, a->rm);
  }
  
 +/*
-+ *** SVE Bitwise Shift - Predicated Group
++ *** SVE Predicate Misc Group
 + */
 +
-+#define DO_ZPZW(NAME, name) \
-+static bool trans_##NAME##_zpzw(DisasContext *s, arg_rprr_esz *a,         \
-+                                uint32_t insn)                            \
-+{                                                                         \
-+    static gen_helper_gvec_4 * const fns[3] = {                           \
-+        gen_helper_sve_##name##_zpzw_b, gen_helper_sve_##name##_zpzw_h,   \
-+        gen_helper_sve_##name##_zpzw_s,                                   \
-+    };                                                                    \
-+    if (a->esz < 0 || a->esz >= 3) {                                      \
-+        return false;                                                     \
-+    }                                                                     \
-+    return do_zpzz_ool(s, a, fns[a->esz]);                                \
++static bool trans_PTEST(DisasContext *s, arg_PTEST *a, uint32_t insn)
++{
++    if (sve_access_check(s)) {
++        int nofs = pred_full_reg_offset(s, a->rn);
++        int gofs = pred_full_reg_offset(s, a->pg);
++        int words = DIV_ROUND_UP(pred_full_reg_size(s), 8);
++
++        if (words == 1) {
++            TCGv_i64 pn = tcg_temp_new_i64();
++            TCGv_i64 pg = tcg_temp_new_i64();
++
++            tcg_gen_ld_i64(pn, cpu_env, nofs);
++            tcg_gen_ld_i64(pg, cpu_env, gofs);
++            do_predtest1(pn, pg);
++
++            tcg_temp_free_i64(pn);
++            tcg_temp_free_i64(pg);
++        } else {
++            do_predtest(s, nofs, gofs, words);
++        }
++    }
++    return true;
 +}
 +
-+DO_ZPZW(ASR, asr)
-+DO_ZPZW(LSR, lsr)
-+DO_ZPZW(LSL, lsl)
-+
-+#undef DO_ZPZW
-+
  /*
-  *** SVE Predicate Logical Operations Group
+  *** SVE Memory - 32-bit Gather and Unsized Contiguous Group
   */
 diff --git a/target/arm/sve.decode b/target/arm/sve.decode
-index 8267963b6b..1de289e55d 100644
+index a2c4450e7c..a44ca2f551 100644
 --- a/target/arm/sve.decode
 +++ b/target/arm/sve.decode
-@@ -157,6 +157,12 @@ ASR_zpzz        00000100 .. 010 100 100 ... ..... .....   @rdm_pg_rn # ASRR
- LSR_zpzz        00000100 .. 010 101 100 ... ..... .....   @rdm_pg_rn # LSRR
- LSL_zpzz        00000100 .. 010 111 100 ... ..... .....   @rdm_pg_rn # LSLR
+@@ -56,6 +56,11 @@ ORR_zzz         00000100 01 1 ..... 001 100 ..... .....         @rd_rn_rm_e0
+ EOR_zzz         00000100 10 1 ..... 001 100 ..... .....         @rd_rn_rm_e0
+ BIC_zzz         00000100 11 1 ..... 001 100 ..... .....         @rd_rn_rm_e0
  
-+# SVE bitwise shift by wide elements (predicated)
-+# Note these require size != 3.
-+ASR_zpzw        00000100 .. 011 000 100 ... ..... .....         @rdn_pg_rm
-+LSR_zpzw        00000100 .. 011 001 100 ... ..... .....         @rdn_pg_rm
-+LSL_zpzw        00000100 .. 011 011 100 ... ..... .....         @rdn_pg_rm
++### SVE Predicate Misc Group
 +
- ### SVE Logical - Unpredicated Group
++# SVE predicate test
++PTEST           00100101 01 010000 11 pg:4 0 rn:4 0 0000
++
+ ### SVE Memory - 32-bit Gather and Unsized Contiguous Group
  
- # SVE bitwise logical operations (unpredicated)
+ # SVE load predicate register
 -- 
 2.17.0
