@@ -1,25 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54102)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54156)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fJkQh-0005zf-0G
-	for qemu-devel@nongnu.org; Fri, 18 May 2018 14:48:39 -0400
+	(envelope-from <bsd@redhat.com>) id 1fJkRD-0006Fr-1c
+	for qemu-devel@nongnu.org; Fri, 18 May 2018 14:49:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fJkQg-00080m-9b
-	for qemu-devel@nongnu.org; Fri, 18 May 2018 14:48:39 -0400
-Received: from mail-ot0-x236.google.com ([2607:f8b0:4003:c0f::236]:44504)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fJkQg-00080h-3z
-	for qemu-devel@nongnu.org; Fri, 18 May 2018 14:48:38 -0400
-Received: by mail-ot0-x236.google.com with SMTP id g7-v6so10239561otj.11
-	for <qemu-devel@nongnu.org>; Fri, 18 May 2018 11:48:37 -0700 (PDT)
+	(envelope-from <bsd@redhat.com>) id 1fJkR9-0008Bt-63
+	for qemu-devel@nongnu.org; Fri, 18 May 2018 14:49:11 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:49114 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bsd@redhat.com>) id 1fJkR9-0008BY-07
+	for qemu-devel@nongnu.org; Fri, 18 May 2018 14:49:07 -0400
+From: Bandan Das <bsd@redhat.com>
+References: <20180507094448.32386-1-kraxel@redhat.com>
+	<20180507094448.32386-2-kraxel@redhat.com>
+	<CAFEAcA9Edg2pk0x05mvfDwa8F4OjKmG-WTcnt9v17o3YVPQiWg@mail.gmail.com>
+	<jpgr2maq7rs.fsf@linux.bootlegged.copy>
+	<jpga7swygak.fsf_-_@linux.bootlegged.copy>
+Date: Fri, 18 May 2018 14:49:03 -0400
+In-Reply-To: <jpga7swygak.fsf_-_@linux.bootlegged.copy> (Bandan Das's message
+	of "Fri, 18 May 2018 14:22:59 -0400")
+Message-ID: <jpgr2m8ajfk.fsf_-_@linux.bootlegged.copy>
 MIME-Version: 1.0
-In-Reply-To: <20180518172009.14416-1-peter.maydell@linaro.org>
-References: <20180518172009.14416-1-peter.maydell@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 18 May 2018 19:48:16 +0100
-Message-ID: <CAFEAcA_+0gfKh_A_6JDT1tF3F3axvD675hp27Z_rRL+5g8z97A@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL 00/32] target-arm queue
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH v2] usb-mtp: Return error on suspicious
+ TYPE_DATA packet from initiator
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,37 +31,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: QEMU Developers <qemu-devel@nongnu.org>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Gerd Hoffmann <kraxel@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
 
-On 18 May 2018 at 18:19, Peter Maydell <peter.maydell@linaro.org> wrote:
-> Another target-arm queue, since we're over 30 patches
-> already. Most of this is RTH's SVE-patches-part-1.
->
-> thanks
-> -- PMM
->
->
-> The following changes since commit d32e41a1188e929cc0fb16829ce3736046951e39:
->
->   Merge remote-tracking branch 'remotes/famz/tags/docker-and-block-pull-request' into staging (2018-05-18 14:11:52 +0100)
->
-> are available in the Git repository at:
->
->   git://git.linaro.org/people/pmaydell/qemu-arm.git tags/pull-target-arm-20180518
->
-> for you to fetch changes up to b94f8f60bd841c5b737185cd38263e26822f77ab:
->
->   target/arm: Implement SVE Permute - Extract Group (2018-05-18 17:48:09 +0100)
->
-> ----------------------------------------------------------------
-> target-arm queue:
->  * Initial part of SVE implementation (currently disabled)
->  * smmuv3: fix some minor Coverity issues
->  * add model of Xilinx ZynqMP generic DMA controller
->  * expose (most) Arm coprocessor/system registers to
->    gdb via QEMU's gdbstub, for reads only
->
 
-Applied, thanks.
+CID 1390604
+If the initiator sends a packet with TYPE_DATA set without
+initiating a CMD_GET_OBJECT_INFO first, then usb_mtp_get_data
+can trip on a null s->data_out.
 
--- PMM
+Signed-off-by: Bandan Das <bsd@redhat.com>
+---
+ hw/usb/dev-mtp.c | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/hw/usb/dev-mtp.c b/hw/usb/dev-mtp.c
+index 3d59fe4944..28384ea3b0 100644
+--- a/hw/usb/dev-mtp.c
++++ b/hw/usb/dev-mtp.c
+@@ -1696,6 +1696,11 @@ static void usb_mtp_get_data(MTPState *s, mtp_container *container,
+     uint64_t dlen;
+     uint32_t data_len = p->iov.size;
+ 
++    if (!d) {
++            usb_mtp_queue_result(s, RES_INVALID_OBJECTINFO, 0,
++                                 0, 0, 0, 0);
++            return;
++    }
+     if (d->first) {
+         /* Total length of incoming data */
+         d->length = cpu_to_le32(container->length) - sizeof(mtp_container);
+-- 
+2.14.3
