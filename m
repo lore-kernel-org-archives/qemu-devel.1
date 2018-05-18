@@ -1,24 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55310)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55320)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fJnNf-0000FS-6t
+	(envelope-from <richard.henderson@linaro.org>) id 1fJnNf-0000FV-Tr
 	for qemu-devel@nongnu.org; Fri, 18 May 2018 17:57:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fJnNb-0003Wm-1C
+	(envelope-from <richard.henderson@linaro.org>) id 1fJnNd-0003XJ-PW
 	for qemu-devel@nongnu.org; Fri, 18 May 2018 17:57:43 -0400
-Received: from mail-pg0-x242.google.com ([2607:f8b0:400e:c05::242]:40855)
+Received: from mail-pl0-x236.google.com ([2607:f8b0:400e:c01::236]:34848)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1fJnNa-0003We-RF
-	for qemu-devel@nongnu.org; Fri, 18 May 2018 17:57:38 -0400
-Received: by mail-pg0-x242.google.com with SMTP id l2-v6so3847294pgc.7
-	for <qemu-devel@nongnu.org>; Fri, 18 May 2018 14:57:38 -0700 (PDT)
+	id 1fJnNd-0003XA-JX
+	for qemu-devel@nongnu.org; Fri, 18 May 2018 17:57:41 -0400
+Received: by mail-pl0-x236.google.com with SMTP id i5-v6so5318997plt.2
+	for <qemu-devel@nongnu.org>; Fri, 18 May 2018 14:57:41 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Fri, 18 May 2018 14:57:26 -0700
-Message-Id: <20180518215734.18833-1-richard.henderson@linaro.org>
+Date: Fri, 18 May 2018 14:57:28 -0700
+Message-Id: <20180518215734.18833-3-richard.henderson@linaro.org>
+In-Reply-To: <20180518215734.18833-1-richard.henderson@linaro.org>
+References: <20180518215734.18833-1-richard.henderson@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 0/8] Honor CPU_DUMP_FPU
+Subject: [Qemu-devel] [PULL 2/8] target/mips: Honor CPU_DUMP_FPU
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,47 +30,30 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org
+Cc: peter.maydell@linaro.org, Aurelien Jarno <aurelien@aurel32.net>, Yongbok Kim <yongbok.kim@mips.com>
 
-With Peter's new patch for "-d fpu", it makes sense to honor
-this setting in as many targets as currently dump the fpu.
+Cc: Aurelien Jarno <aurelien@aurel32.net>
+Cc: Yongbok Kim <yongbok.kim@mips.com>
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+---
+ target/mips/translate.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-
-r~
-
-
-The following changes since commit 5bcf917ee37a5efbef99f091a96db54a5276becb:
-
-  Merge remote-tracking branch 'remotes/pmaydell/tags/pull-target-arm-20180518' into staging (2018-05-18 18:25:29 +0100)
-
-are available in the Git repository at:
-
-  https://github.com/rth7680/qemu.git tags/pull-fpu-20180518
-
-for you to fetch changes up to f29c0b170fa9e0568f2d02e764e18b00cad3a27f:
-
-  target/xtensa: Honor CPU_DUMP_FPU (2018-05-18 14:52:38 -0700)
-
-----------------------------------------------------------------
-Honor CPU_DUMP_FPU
-
-----------------------------------------------------------------
-Richard Henderson (8):
-      target/alpha: Honor CPU_DUMP_FPU
-      target/mips: Honor CPU_DUMP_FPU
-      target/ppc: Honor CPU_DUMP_FPU
-      target/riscv: Honor CPU_DUMP_FPU
-      target/s390x: Honor CPU_DUMP_FPU
-      target/sparc: Honor CPU_DUMP_FPU
-      target/unicore32: Honor CPU_DUMP_FPU
-      target/xtensa: Honor CPU_DUMP_FPU
-
- target/alpha/helper.c        | 17 ++++++++---------
- target/mips/translate.c      |  3 ++-
- target/ppc/translate.c       | 20 +++++++++++++-------
- target/riscv/cpu.c           | 12 +++++++-----
- target/s390x/helper.c        | 23 ++++++++++++-----------
- target/sparc/cpu.c           | 17 ++++++++++-------
- target/unicore32/translate.c |  4 +++-
- target/xtensa/translate.c    |  3 ++-
- 8 files changed, 57 insertions(+), 42 deletions(-)
+diff --git a/target/mips/translate.c b/target/mips/translate.c
+index f1c1fdd35c..e88f983ae7 100644
+--- a/target/mips/translate.c
++++ b/target/mips/translate.c
+@@ -20446,8 +20446,9 @@ void mips_cpu_dump_state(CPUState *cs, FILE *f, fprintf_function cpu_fprintf,
+                 env->CP0_Config2, env->CP0_Config3);
+     cpu_fprintf(f, "    Config4 0x%08x Config5 0x%08x\n",
+                 env->CP0_Config4, env->CP0_Config5);
+-    if (env->hflags & MIPS_HFLAG_FPU)
++    if ((flags & CPU_DUMP_FPU) && (env->hflags & MIPS_HFLAG_FPU)) {
+         fpu_dump_state(env, f, cpu_fprintf, flags);
++    }
+ }
+ 
+ void mips_tcg_init(void)
+-- 
+2.17.0
