@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35228)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35990)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1fJYuA-0005TY-Vv
-	for qemu-devel@nongnu.org; Fri, 18 May 2018 02:30:23 -0400
+	(envelope-from <peterx@redhat.com>) id 1fJYyH-0007NN-A3
+	for qemu-devel@nongnu.org; Fri, 18 May 2018 02:34:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1fJYu6-0005wY-Gp
-	for qemu-devel@nongnu.org; Fri, 18 May 2018 02:30:18 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:36036 helo=mx1.redhat.com)
+	(envelope-from <peterx@redhat.com>) id 1fJYyC-0007wJ-Q9
+	for qemu-devel@nongnu.org; Fri, 18 May 2018 02:34:33 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:41376 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1fJYu6-0005vV-Bx
-	for qemu-devel@nongnu.org; Fri, 18 May 2018 02:30:14 -0400
-Date: Fri, 18 May 2018 14:30:04 +0800
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1fJYyC-0007w1-KV
+	for qemu-devel@nongnu.org; Fri, 18 May 2018 02:34:28 -0400
+Date: Fri, 18 May 2018 14:34:17 +0800
 From: Peter Xu <peterx@redhat.com>
-Message-ID: <20180518063004.GK2569@xz-mi>
+Message-ID: <20180518063417.GL2569@xz-mi>
 References: <20180517085927.24925-1-peterx@redhat.com>
-	<20180518000635-mutt-send-email-mst@kernel.org>
+	<20180518000204-mutt-send-email-mst@kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20180518000635-mutt-send-email-mst@kernel.org>
+In-Reply-To: <20180518000204-mutt-send-email-mst@kernel.org>
 Subject: Re: [Qemu-devel] [PATCH v3 00/12] intel-iommu: nested vIOMMU,
  cleanups, bug fixes
 List-Id: <qemu-devel.nongnu.org>
@@ -31,7 +31,7 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: "Michael S. Tsirkin" <mst@redhat.com>
 Cc: qemu-devel@nongnu.org, Tian Kevin <kevin.tian@intel.com>, Alex Williamson <alex.williamson@redhat.com>, Jintack Lim <jintack@cs.columbia.edu>, Jason Wang <jasowang@redhat.com>
 
-On Fri, May 18, 2018 at 12:08:01AM +0300, Michael S. Tsirkin wrote:
+On Fri, May 18, 2018 at 12:04:04AM +0300, Michael S. Tsirkin wrote:
 > On Thu, May 17, 2018 at 04:59:15PM +0800, Peter Xu wrote:
 > > (Hello, Jintack, Feel free to test this branch again against your scp
 > >  error case when you got free time)
@@ -92,14 +92,20 @@ On Fri, May 18, 2018 at 12:08:01AM +0300, Michael S. Tsirkin wrote:
 > > - Issue 1: when getting very big PSI UNMAP invalidations, the current
 > >   code is buggy in that we might skip the notification while actually
 > >   we should always send that notification.
-> > 
+> 
+> security issue
+> 
 > > - Issue 2: IOTLB is not thread safe, while block dataplane can be
 > >   accessing and updating it in parallel.
-> > 
+> 
+> security issue
+> 
 > > - Issue 3: For devices that only registered with UNMAP-only notifiers,
 > >   we don't really need to do page walking for PSIs, we can directly
 > >   deliver the notification down.  For example, vhost.
-> > 
+> 
+> optimization
+> 
 > > - Issue 4: unsafe window for MAP notified devices like vfio-pci (and
 > >   in the future, vDPA as well).  The problem is that, now for domain
 > >   invalidations we do this to make sure the shadow page tables are
@@ -113,7 +119,9 @@ On Fri, May 18, 2018 at 12:08:01AM +0300, Michael S. Tsirkin wrote:
 > >   incomplete (since we're rebuilding it up).  That's fatal error since
 > >   devices never know that happending and it's still possible to DMA to
 > >   memories.
-> > 
+> 
+> correctness but not a security issue
+> 
 > > Patch 1 fixes issue 1.  I put it at the first since it's picked from
 > > an old post.
 > > 
@@ -133,19 +141,17 @@ On Fri, May 18, 2018 at 12:08:01AM +0300, Michael S. Tsirkin wrote:
 > > 
 > > Patch 10 is another big cleanup only can work after patch 9.
 > 
-> I think patch numbers are wrong somehow.
-
-Yes, this is the old cover letter, so the numbers do not match.
-
 > 
-> Given you also want to tweak one comment, could
-> you please repost with this fix, and also
-> in commit log for each patch
-> - Cc stable
-> - for security patches mention as much, if possible
->   add data about the issue and its severity
+> So 1-2 are needed on stable. 1-9 would be nice to have
+> there too, even though they are big and it looks risky.
 
-The rest I can try to do.  Thanks,
+Yes, although issue 4 is not a security issue, but it might cause DMA
+errors and unusability of devices to happen.  I don't know very much
+on the details of how stable tree should treat patches like this, but
+considering that this whole series only touches VT-d code, and as you
+mentioned merely all the patches would be nice to have even for
+stable, I'll just CC stable for all the patches, refine messages and
+repost.  Thanks,
 
 -- 
 Peter Xu
