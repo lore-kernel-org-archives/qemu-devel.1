@@ -1,32 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33918)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42779)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <th.huth@gmail.com>) id 1fK3eM-0004Cs-4x
-	for qemu-devel@nongnu.org; Sat, 19 May 2018 11:20:03 -0400
+	(envelope-from <bounces@canonical.com>) id 1fK4b4-00047j-63
+	for qemu-devel@nongnu.org; Sat, 19 May 2018 12:20:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <th.huth@gmail.com>) id 1fK3eL-0002Zs-0r
-	for qemu-devel@nongnu.org; Sat, 19 May 2018 11:20:02 -0400
-Date: Sat, 19 May 2018 17:19:49 +0200
-From: Thomas Huth <huth@tuxfamily.org>
-Message-ID: <20180519171949.0031d971@thl530.multi.box>
-In-Reply-To: <7d552162-5165-c022-ce6d-4903da7d2262@xenosoft.de>
-References: <4521b265-855f-7f06-ffff-3fa394380922@xenosoft.de>
-	<b3243bab-58b6-0b43-67b5-94a2f90d9199@tuxfamily.org>
-	<5BD35D0B-E490-4693-8858-E11B7401709F@xenosoft.de>
-	<1821476d-7724-ad71-eb3f-69c731633582@tuxfamily.org>
-	<886dc490-c96a-ad5a-e1f7-8e41a686a53e@xenosoft.de>
-	<20180518131303.6f0778eb@bahia.lan>
-	<e9333edf-fa2a-6ad8-412b-459b0b8002e9@xenosoft.de>
-	<20180518141642.6ad639ac@bahia.lan>
-	<8bde9b6f-b80f-e87e-e4d3-ace15454cf3d@xenosoft.de>
-	<3db651e3-a237-fbaa-6ffe-ecc5db43ad0f@tuxfamily.org>
-	<E9FA9AA6-FDA6-467F-9B72-B331756464A7@xenosoft.de>
-	<ccaa7d46-79d4-c223-3828-ae22a59392db@tuxfamily.org>
-	<7d552162-5165-c022-ce6d-4903da7d2262@xenosoft.de>
+	(envelope-from <bounces@canonical.com>) id 1fK4b1-0008NE-0g
+	for qemu-devel@nongnu.org; Sat, 19 May 2018 12:20:42 -0400
+Received: from indium.canonical.com ([91.189.90.7]:49502)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1fK4b0-0008Mv-QP
+	for qemu-devel@nongnu.org; Sat, 19 May 2018 12:20:38 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1fK4az-0008DH-Me
+	for <qemu-devel@nongnu.org>; Sat, 19 May 2018 16:20:37 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id A7AE82E8056
+	for <qemu-devel@nongnu.org>; Sat, 19 May 2018 16:20:37 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [Qemu-ppc] [PPC64] P5020DS: Booting from img
- possible (-drive)?
+Date: Sat, 19 May 2018 16:14:07 -0000
+From: Peter Maydell <peter.maydell@linaro.org>
+Reply-To: Bug 1772166 <1772166@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <152673788962.15828.1293088141981880409.malonedeb@wampee.canonical.com>
+Message-Id: <152674644775.15756.13233907384807102411.malone@wampee.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] =?utf-8?b?W0J1ZyAxNzcyMTY2XSBSZTogcWVtdSAyLjQuMTog?=
+ =?utf-8?q?dereferencing_pointer_to_incomplete_type_=E2=80=98struct_uconte?=
+ =?utf-8?b?eHTigJk=?=
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,60 +38,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Christian Zigotzky <chzigotzky@xenosoft.de>
-Cc: qemu-ppc@nongnu.org, Greg Kurz <groug@kaod.org>, "kvm-ppc@vger.kernel.org" <kvm-ppc@vger.kernel.org>, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
 
-Am Sat, 19 May 2018 16:03:02 +0200
-schrieb Christian Zigotzky <chzigotzky@xenosoft.de>:
+2.4.1 is a very old release of QEMU. I would recommend moving to a more
+recent release.
 
-> On 19 May 2018 at 08:15AM, Thomas Huth wrote:
-> > On 19.05.2018 06:58, Christian Zigotzky wrote: =20
-> >> Thomas wrote:
-> >> =20
-> >>> No clue, so just a blind guess: Is "CoreNet Generic" the right
-> >>> machine? What happens if you set "CONFIG_CORENET_GENERIC=3Dn" in
-> >>> your kernel config? =20
-> >> I think it=E2=80=98s the right machine. =20
-> > It's likely the right selection for the real hardware, but it's
-> > maybe the wrong machine type for the QEMU ppce500 machine.
-> >
-> >   Thomas
-> > =20
-> Hello Thomas,
->=20
-> Thanks for your reply. I compiled the RC5 of kernel 4.17 without
-> corenet generic support today. ubuntu MATE 16.04 LTS PowerPC
-> boots!!!!!!!!!
+-- =
 
-Cool! :-)
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1772166
 
-> With the following command I can boot it with a VirtIO graphics cards.
->=20
-> qemu-system-ppc64 -M ppce500 -cpu e5500 -m 2048 -kernel=20
-> /home/christian/Downloads/uImage-4.17-without_corenet -drive=20
-> file=3D/home/christian/Dokumente/ubuntu_MATE_16.04.3_LTS_PowerPC_QEMU/ubu=
-ntu_MATE_16.04_PowerPC.img,index=3D0,if=3Dvirtio=20
-> -net nic,vlan=3D0,model=3De1000 -net user,vlan=3D0 -append "rw
-> root=3D/dev/vda3" -device virtio-vga
+Title:
+  qemu 2.4.1: dereferencing pointer to incomplete type =E2=80=98struct ucon=
+text=E2=80=99
 
-Note that "vlan=3D0" won't work with the next version (2.13) of QEMU
-anymore. But since that's the default, you can simply omit that
-"vlan=3D0" in both -net options. Or if you are using the latest and
-greatest QEMU v2.12 already, you can also use "-nic user,model=3De1000"
-instead.
+Status in QEMU:
+  New
 
-> Unfortunately mouse and keyboard doesn't work in the virtual machine.
+Bug description:
+  Trying to compile qemu release 2.4.1
 
-I guess with the ppce500 machine, you've also got to specify them
-manually, too. You've got two options, virtio and USB. For virtio, try:
+  Getting compile error
 
- -device virtio-mouse-pci -device virtio-keyboard-pci
+  user-exec.c: In function =E2=80=98cpu_resume_from_signal=E2=80=99:
+  user-exec.c:72:37: error: dereferencing pointer to incomplete type =E2=80=
+=98struct ucontext=E2=80=99
+           sigprocmask(SIG_SETMASK, &uc->uc_sigmask, NULL);
+                                       ^~
+  user-exec.c: In function =E2=80=98cpu_arm_signal_handler=E2=80=99:
+  user-exec.c:214:41: error: dereferencing pointer to incomplete type =E2=
+=80=98struct ucontext=E2=80=99
 
-And for USB, try something like:
-
- -device qemu-xhci -device usb-mouse -device usb-kbd
-
-If "qemu-xhci" does not work, you could also try "pci-ohci" instead.
-
- HTH,
-  Thomas
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1772166/+subscriptions
