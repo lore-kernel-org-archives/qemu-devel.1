@@ -1,35 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45678)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56635)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fK6Eg-0007dp-1f
-	for qemu-devel@nongnu.org; Sat, 19 May 2018 14:05:42 -0400
+	(envelope-from <bounces@canonical.com>) id 1fK6ON-00037f-DZ
+	for qemu-devel@nongnu.org; Sat, 19 May 2018 14:15:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fK6Eb-0004XJ-26
-	for qemu-devel@nongnu.org; Sat, 19 May 2018 14:05:42 -0400
-Received: from indium.canonical.com ([91.189.90.7]:50086)
+	(envelope-from <bounces@canonical.com>) id 1fK6OI-0001a8-Fv
+	for qemu-devel@nongnu.org; Sat, 19 May 2018 14:15:43 -0400
+Received: from indium.canonical.com ([91.189.90.7]:51392)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1fK6Ea-0004Wz-J5
-	for qemu-devel@nongnu.org; Sat, 19 May 2018 14:05:36 -0400
+	id 1fK6OI-0001Zv-9G
+	for qemu-devel@nongnu.org; Sat, 19 May 2018 14:15:38 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1fK6EZ-0008A3-BO
-	for <qemu-devel@nongnu.org>; Sat, 19 May 2018 18:05:35 +0000
+	id 1fK6OH-0000do-2r
+	for <qemu-devel@nongnu.org>; Sat, 19 May 2018 18:15:37 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 52B092E8071
-	for <qemu-devel@nongnu.org>; Sat, 19 May 2018 18:05:35 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id 01B4E2E8F36
+	for <qemu-devel@nongnu.org>; Sat, 19 May 2018 18:15:37 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Sat, 19 May 2018 17:50:54 -0000
-From: Peter Maydell <peter.maydell@linaro.org>
-Reply-To: Bug 1772166 <1772166@bugs.launchpad.net>
+Date: Sat, 19 May 2018 18:03:00 -0000
+From: M0Rf30 <morfeo89@hotmail.it>
+Reply-To: Bug 1772075 <1772075@bugs.launchpad.net>
 Sender: bounces@canonical.com
-References: <152673788962.15828.1293088141981880409.malonedeb@wampee.canonical.com>
-Message-Id: <152675225417.15942.9524022443191417673.malone@wampee.canonical.com>
+References: <152666493053.16686.5820944431341933507.malonedeb@wampee.canonical.com>
+Message-Id: <152675298053.2479.9453593561554833493.malone@gac.canonical.com>
 Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] =?utf-8?b?W0J1ZyAxNzcyMTY2XSBSZTogcWVtdSAyLjQuMTog?=
- =?utf-8?q?dereferencing_pointer_to_incomplete_type_=E2=80=98struct_uconte?=
- =?utf-8?b?eHTigJk=?=
+Subject: [Qemu-devel] [Bug 1772075] Re: Segmentation fault on aarch64 vm at
+ powerdown
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -40,37 +39,41 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-QEMU 2.4 is from 2015, and we didn't add raspi2 support until 2016.
-We've never supported the USB controller for the raspi boards. Perhaps
-you're using some other fork of QEMU? If so, better to talk to whoever's
-responsible for it.
+This bug is present also on AARCH32, ARMv7 architectures
 
 -- =
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1772166
+https://bugs.launchpad.net/bugs/1772075
 
 Title:
-  qemu 2.4.1: dereferencing pointer to incomplete type =E2=80=98struct ucon=
-text=E2=80=99
+  Segmentation fault on aarch64 vm at powerdown
 
 Status in QEMU:
   New
 
 Bug description:
-  Trying to compile qemu release 2.4.1
+  OS Arch Linux
+  x86_64
+  qemu version: 2.12
 
-  Getting compile error
+  cmdline:
+  qemu-system-aarch64 -nographic -cpu cortex-a57 -m 2048 -M virt,gic_versio=
+n=3D3 -machine virtualization=3Dtrue -bios /usr/share/ovmf/AARCH64/QEMU_EFI=
+.fd -drive file=3Dfat:rw:/opt/simonpiemu/kernels/rpi-3,if=3Dnone,format=3Dr=
+aw,cache=3Dnone,id=3Dhd0 -device virtio-blk-device,drive=3Dhd0 -drive file=
+=3D/home/morfeo/.simonpi/sd-arch-rpi-3-qemu.img,if=3Dnone,format=3Draw,cach=
+e=3Dnone,id=3Dhd1 -device virtio-blk-device,drive=3Dhd1 -kernel /opt/simonp=
+iemu/kernels/rpi-3/Image -append "root=3D/dev/vda2 fstab=3Dno rootfstype=3D=
+ext4 rw console=3DttyAMA0" -initrd /home/morfeo/.simonpi/rpi-3/boot/initram=
+fs-linux.img -device virtio-net-device,mac=3D52:54:26:11:72:9b,netdev=3Dnet=
+0 -netdev tap,id=3Dnet0,ifname=3Drasp-tap0,script=3Dno,downscript=3Dno
 
-  user-exec.c: In function =E2=80=98cpu_resume_from_signal=E2=80=99:
-  user-exec.c:72:37: error: dereferencing pointer to incomplete type =E2=80=
-=98struct ucontext=E2=80=99
-           sigprocmask(SIG_SETMASK, &uc->uc_sigmask, NULL);
-                                       ^~
-  user-exec.c: In function =E2=80=98cpu_arm_signal_handler=E2=80=99:
-  user-exec.c:214:41: error: dereferencing pointer to incomplete type =E2=
-=80=98struct ucontext=E2=80=99
+  error:
+
+  qemu-system-aarch64: /build/qemu/src/qemu-2.12.0/block.c:3375:
+  bdrv_close_all: Assertion `QTAILQ_EMPTY(&all_bdrv_states)' failed.
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1772166/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/1772075/+subscriptions
