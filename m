@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41544)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54369)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fK7PJ-0001os-2U
-	for qemu-devel@nongnu.org; Sat, 19 May 2018 15:20:45 -0400
+	(envelope-from <bounces@canonical.com>) id 1fK7ii-0000pI-Gb
+	for qemu-devel@nongnu.org; Sat, 19 May 2018 15:40:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fK7PE-0004RK-5q
-	for qemu-devel@nongnu.org; Sat, 19 May 2018 15:20:45 -0400
-Received: from indium.canonical.com ([91.189.90.7]:57064)
+	(envelope-from <bounces@canonical.com>) id 1fK7if-0002T4-Du
+	for qemu-devel@nongnu.org; Sat, 19 May 2018 15:40:48 -0400
+Received: from indium.canonical.com ([91.189.90.7]:58604)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1fK7PD-0004QO-VA
-	for qemu-devel@nongnu.org; Sat, 19 May 2018 15:20:40 -0400
+	id 1fK7if-0002Sh-6y
+	for qemu-devel@nongnu.org; Sat, 19 May 2018 15:40:45 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1fK7PC-0005Qs-Hm
-	for <qemu-devel@nongnu.org>; Sat, 19 May 2018 19:20:38 +0000
+	id 1fK7ie-0006tI-2s
+	for <qemu-devel@nongnu.org>; Sat, 19 May 2018 19:40:44 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 82DBA2E8F35
-	for <qemu-devel@nongnu.org>; Sat, 19 May 2018 19:20:38 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id 1497B2E8F36
+	for <qemu-devel@nongnu.org>; Sat, 19 May 2018 19:40:44 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Sat, 19 May 2018 19:07:29 -0000
-From: George <1772165@bugs.launchpad.net>
+Date: Sat, 19 May 2018 19:33:20 -0000
+From: Peter Maydell <peter.maydell@linaro.org>
 Reply-To: Bug 1772165 <1772165@bugs.launchpad.net>
 Sender: bounces@canonical.com
 References: <152673688616.9061.7617411809661975686.malonedeb@chaenomeles.canonical.com>
-Message-Id: <152675684906.8293.2733083751017005685.malone@chaenomeles.canonical.com>
+Message-Id: <152675840028.2438.12561271562034953162.malone@gac.canonical.com>
 Errors-To: bounces@canonical.com
 Subject: [Qemu-devel] [Bug 1772165] Re: qemu-system-arm: -device usb-host,
  bus=001, vendorid=0x04f2, productid=0x0111: Bus '001' not found
@@ -39,9 +39,17 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-Serial terminal doesn't work with this options. Would you provide
-options with which i'll be able to access and login into the terminal.
-SSH is also a good solution.
+This is for raspi3 but may be a useful reference:
+https://translatedcode.wordpress.com/2018/04/25/debian-on-qemus-raspberry-p=
+i-3-model/
+
+Probably what you're hitting is that the kernel/dtb default to the
+second serial terminal, so you can try adding 'console=3DttyAMA0' to the
+-append options, or alternatively maybe using -serial null -serial stdio
+to drop the 1st serial output and send the second to the terminal.
+
+Since the raspi networking sits behind USB, QEMU doesn't support that,
+so no ssh option, I'm afraid.
 
 -- =
 
