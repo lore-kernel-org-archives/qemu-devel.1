@@ -1,34 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51827)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52097)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fK2Pl-0002D9-3A
-	for qemu-devel@nongnu.org; Sat, 19 May 2018 10:00:54 -0400
+	(envelope-from <chzigotzky@xenosoft.de>) id 1fK2SB-0003SE-KV
+	for qemu-devel@nongnu.org; Sat, 19 May 2018 10:03:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fK2Pg-0006pN-Ny
-	for qemu-devel@nongnu.org; Sat, 19 May 2018 10:00:53 -0400
-Received: from indium.canonical.com ([91.189.90.7]:53194)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1fK2Pg-0006nz-HI
-	for qemu-devel@nongnu.org; Sat, 19 May 2018 10:00:48 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1fK2Pf-0001L8-IO
-	for <qemu-devel@nongnu.org>; Sat, 19 May 2018 14:00:47 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 86EEE2E8F39
-	for <qemu-devel@nongnu.org>; Sat, 19 May 2018 14:00:47 +0000 (UTC)
+	(envelope-from <chzigotzky@xenosoft.de>) id 1fK2SA-0008L5-Dl
+	for qemu-devel@nongnu.org; Sat, 19 May 2018 10:03:23 -0400
+References: <4521b265-855f-7f06-ffff-3fa394380922@xenosoft.de>
+	<b3243bab-58b6-0b43-67b5-94a2f90d9199@tuxfamily.org>
+	<5BD35D0B-E490-4693-8858-E11B7401709F@xenosoft.de>
+	<1821476d-7724-ad71-eb3f-69c731633582@tuxfamily.org>
+	<886dc490-c96a-ad5a-e1f7-8e41a686a53e@xenosoft.de>
+	<20180518131303.6f0778eb@bahia.lan>
+	<e9333edf-fa2a-6ad8-412b-459b0b8002e9@xenosoft.de>
+	<20180518141642.6ad639ac@bahia.lan>
+	<8bde9b6f-b80f-e87e-e4d3-ace15454cf3d@xenosoft.de>
+	<3db651e3-a237-fbaa-6ffe-ecc5db43ad0f@tuxfamily.org>
+	<E9FA9AA6-FDA6-467F-9B72-B331756464A7@xenosoft.de>
+	<ccaa7d46-79d4-c223-3828-ae22a59392db@tuxfamily.org>
+From: Christian Zigotzky <chzigotzky@xenosoft.de>
+Message-ID: <7d552162-5165-c022-ce6d-4903da7d2262@xenosoft.de>
+Date: Sat, 19 May 2018 16:03:02 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Sat, 19 May 2018 13:53:22 -0000
-From: George <1772165@bugs.launchpad.net>
-Reply-To: Bug 1772165 <1772165@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <152673688616.9061.7617411809661975686.malonedeb@chaenomeles.canonical.com>
-Message-Id: <152673800218.16466.8644557176492240444.malone@wampee.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1772165] Re: qemu-system-arm: -device usb-host,
- bus=001, vendorid=0x04f2, productid=0x0111: Bus '001' not found
+In-Reply-To: <ccaa7d46-79d4-c223-3828-ae22a59392db@tuxfamily.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: de-DE
+Subject: Re: [Qemu-devel] [Qemu-ppc] [PPC64] P5020DS: Booting from img
+ possible (-drive)?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,58 +35,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Thomas Huth <huth@tuxfamily.org>
+Cc: qemu-ppc@nongnu.org, Greg Kurz <groug@kaod.org>, "kvm-ppc@vger.kernel.org" <kvm-ppc@vger.kernel.org>, qemu-devel@nongnu.org
 
-qemu-system-arm -M raspi2 -append "rw earlyprintk loglevel=3D8
-dwc_otg.lpm_enable=3D0 root=3D/dev/mmcblk0p2" -cpu arm1176 -dtb
-bcm2709-rpi-2-b.dtb -hda DietPi_v6.8_RPi-ARMv6-Stretch.img -kernel
-kernel7.img -m 1G -smp 4 -serial stdio -usb -device usb-
-host,bus=3D001,vendorid=3D0x1d6b,productid=3D0x0002
+On 19 May 2018 at 08:15AM, Thomas Huth wrote:
+> On 19.05.2018 06:58, Christian Zigotzky wrote:
+>> Thomas wrote:
+>>
+>>> No clue, so just a blind guess: Is "CoreNet Generic" the right machine?
+>>> What happens if you set "CONFIG_CORENET_GENERIC=n" in your kernel config?
+>> I think it‘s the right machine.
+> It's likely the right selection for the real hardware, but it's maybe
+> the wrong machine type for the QEMU ppce500 machine.
+>
+>   Thomas
+>
+Hello Thomas,
 
-** Tags added: usb
+Thanks for your reply. I compiled the RC5 of kernel 4.17 without corenet 
+generic support today. ubuntu MATE 16.04 LTS PowerPC boots!!!!!!!!!
 
--- =
+qemu-system-ppc64 -M ppce500 -cpu e5500 -m 2048 -nographic -kernel 
+/home/christian/Downloads/uImage-4.17-without_corenet -drive 
+file=/home/christian/Dokumente/ubuntu_MATE_16.04.3_LTS_PowerPC_QEMU/ubuntu_MATE_16.04_PowerPC.img,index=0,if=virtio 
+-net nic,vlan=0,model=e1000 -net user,vlan=0 -append "rw root=/dev/vda3"
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1772165
+With the following command I can boot it with a VirtIO graphics cards.
 
-Title:
-  qemu-system-arm: -device usb-
-  host,bus=3D001,vendorid=3D0x04f2,productid=3D0x0111: Bus '001' not found
+qemu-system-ppc64 -M ppce500 -cpu e5500 -m 2048 -kernel 
+/home/christian/Downloads/uImage-4.17-without_corenet -drive 
+file=/home/christian/Dokumente/ubuntu_MATE_16.04.3_LTS_PowerPC_QEMU/ubuntu_MATE_16.04_PowerPC.img,index=0,if=virtio 
+-net nic,vlan=0,model=e1000 -net user,vlan=0 -append "rw root=/dev/vda3" 
+-device virtio-vga
 
-Status in QEMU:
-  New
+Unfortunately mouse and keyboard doesn't work in the virtual machine.
 
-Bug description:
-  Using Qemu 2.12.0 on ArchLinux.
+Many thanks for your help! :-)
 
-  Trying to emulate arm device with `qemu-system-arm` and attach usb
-  device for unput using
+Have a nice weekend! :-)
 
-  ` -usb -device usb-host,bus=3D001,vendorid=3D0x1d6b,productid=3D0x0002 `
-
-  # lsusb returns
-
-  Bus 002 Device 001: ID 1d6b:0003 Linux Foundation 3.0 root hub
-  Bus 001 Device 014: ID 13d3:3487 IMC Networks =
-
-  Bus 001 Device 004: ID 0457:11af Silicon Integrated Systems Corp. =
-
-  Bus 001 Device 003: ID 0bda:57e6 Realtek Semiconductor Corp. =
-
-  Bus 001 Device 002: ID 0bda:0129 Realtek Semiconductor Corp. RTS5129 Card=
- Reader Controller
-  Bus 001 Device 001: ID 1d6b:0002 Linux Foundation 2.0 root hub
-
-  # qemu returns
-  qemu-system-arm: -device usb-host,bus=3D001,vendorid=3D0x1d6b,productid=
-=3D0x0002: Bus '001' not found
-
-  =
-
-  Tried with connecting external usb keyboard but that didn't seem to work =
-either.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1772165/+subscriptions
+Cheers,
+Christian
