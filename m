@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48541)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40642)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fK5NY-0003zW-I3
-	for qemu-devel@nongnu.org; Sat, 19 May 2018 13:10:49 -0400
+	(envelope-from <bounces@canonical.com>) id 1fK64u-0003Cb-A2
+	for qemu-devel@nongnu.org; Sat, 19 May 2018 13:55:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fK5NV-000680-35
-	for qemu-devel@nongnu.org; Sat, 19 May 2018 13:10:48 -0400
-Received: from indium.canonical.com ([91.189.90.7]:54738)
+	(envelope-from <bounces@canonical.com>) id 1fK64r-0000jj-96
+	for qemu-devel@nongnu.org; Sat, 19 May 2018 13:55:36 -0400
+Received: from indium.canonical.com ([91.189.90.7]:48454)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1fK5NU-000671-T5
-	for qemu-devel@nongnu.org; Sat, 19 May 2018 13:10:45 -0400
+	id 1fK64r-0000jX-2p
+	for qemu-devel@nongnu.org; Sat, 19 May 2018 13:55:33 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1fK5NU-0003lt-6L
-	for <qemu-devel@nongnu.org>; Sat, 19 May 2018 17:10:44 +0000
+	id 1fK64p-0006tL-Ta
+	for <qemu-devel@nongnu.org>; Sat, 19 May 2018 17:55:31 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 2EE3E2E8F35
-	for <qemu-devel@nongnu.org>; Sat, 19 May 2018 17:10:44 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id DE1A42E8F36
+	for <qemu-devel@nongnu.org>; Sat, 19 May 2018 17:55:31 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Sat, 19 May 2018 17:04:37 -0000
-From: George <1772165@bugs.launchpad.net>
+Date: Sat, 19 May 2018 17:49:02 -0000
+From: Peter Maydell <peter.maydell@linaro.org>
 Reply-To: Bug 1772165 <1772165@bugs.launchpad.net>
 Sender: bounces@canonical.com
 References: <152673688616.9061.7617411809661975686.malonedeb@chaenomeles.canonical.com>
-Message-Id: <152674947726.2706.1833675276200208860.malone@gac.canonical.com>
+Message-Id: <152675214248.2631.3828473778334333303.malone@gac.canonical.com>
 Errors-To: bounces@canonical.com
 Subject: [Qemu-devel] [Bug 1772165] Re: qemu-system-arm: -device usb-host,
  bus=001, vendorid=0x04f2, productid=0x0111: Bus '001' not found
@@ -39,7 +39,7 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-How then should I be able to actually use the vm when there is no input?
+Serial terminal is how I've used the raspi3 board before.
 
 -- =
 
