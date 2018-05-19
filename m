@@ -1,29 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58753)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47920)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fK0AY-0003fU-Q9
-	for qemu-devel@nongnu.org; Sat, 19 May 2018 07:37:03 -0400
+	(envelope-from <bounces@canonical.com>) id 1fK26L-0002iE-Cr
+	for qemu-devel@nongnu.org; Sat, 19 May 2018 09:40:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fK0AX-0002ST-Va
-	for qemu-devel@nongnu.org; Sat, 19 May 2018 07:37:02 -0400
-Received: from mail-oi0-x22e.google.com ([2607:f8b0:4003:c06::22e]:40857)
+	(envelope-from <bounces@canonical.com>) id 1fK26I-00005I-9a
+	for qemu-devel@nongnu.org; Sat, 19 May 2018 09:40:49 -0400
+Received: from indium.canonical.com ([91.189.90.7]:49854)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fK0AX-0002SG-Qf
-	for qemu-devel@nongnu.org; Sat, 19 May 2018 07:37:01 -0400
-Received: by mail-oi0-x22e.google.com with SMTP id c203-v6so9359378oib.7
-	for <qemu-devel@nongnu.org>; Sat, 19 May 2018 04:37:01 -0700 (PDT)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1fK26I-0008Vr-2L
+	for qemu-devel@nongnu.org; Sat, 19 May 2018 09:40:46 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1fK26H-0007ai-5i
+	for <qemu-devel@nongnu.org>; Sat, 19 May 2018 13:40:45 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 24BF72E806E
+	for <qemu-devel@nongnu.org>; Sat, 19 May 2018 13:40:45 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <dd2d19de-eba5-90be-5f01-ff9fd268685f@redhat.com>
-References: <20180518091440.1559-1-alex.bennee@linaro.org>
-	<20180518091440.1559-3-alex.bennee@linaro.org>
-	<CAFEAcA968HDBJiBRCBEu+hV=fUx5HzHbnn6GDGKYzusEtjHGUQ@mail.gmail.com>
-	<dd2d19de-eba5-90be-5f01-ff9fd268685f@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Sat, 19 May 2018 12:36:40 +0100
-Message-ID: <CAFEAcA-9miwQ_JK4VFcFMgWc=XCb_Qf3W4ZFk59csXUGdnAMDA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [RFC PATCH 2/2] tests/Makefile: comment out flakey
- tests
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Sat, 19 May 2018 13:34:46 -0000
+From: George <1772165@bugs.launchpad.net>
+Reply-To: Bug 1772165 <1772165@bugs.launchpad.net>
+Sender: bounces@canonical.com
+Message-Id: <152673688616.9061.7617411809661975686.malonedeb@chaenomeles.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1772165] [NEW] qemu-system-arm: -device usb-host,
+ bus=001, vendorid=0x04f2, productid=0x0111: Bus '001' not found
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,34 +36,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>, Fam Zheng <famz@redhat.com>, Stefan Berger <stefanb@linux.vnet.ibm.com>, QEMU Developers <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>, =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: qemu-devel@nongnu.org
 
-On 19 May 2018 at 07:10, Thomas Huth <thuth@redhat.com> wrote:
-> On 18.05.2018 20:31, Peter Maydell wrote:
->> Another flaky test for the collection:
->>
->> TEST: tests/boot-serial-test... (pid=25144)
->>   /sparc64/boot-serial/sun4u:                                          **
->> ERROR:/home/petmay01/linaro/qemu-for-merges/tests/boot-serial-test.c:140:check_guest_output:
->> assertion failed: (output_ok)
->> FAIL
->>
->> Probably another "overly optimistic timeout" setting. (Failed
->> for me on x86-64 host just now.)
->
-> That test normally finishes within 3 seconds on my machine. The test
-> timeout is 60 seconds. How much load did you have on that machine to go
-> from 3s to 60s ?
+Public bug reported:
 
-The machine is my desktop box; I didn't notice anything too
-terrible while I was using it interactively at the same time
-the test build was running. The test build will run at -j8;
-it might also have been during a different -j8 build/test
-on the same machine for a different source tree.
+Using Qemu 2.12.0 on ArchLinux.
 
-60s is quite a long time, so maybe there's an intermittent
-deadlock in there instead...
+Trying to emulate arm device with `qemu-system-arm` and attach usb
+device for unput using
 
-thanks
--- PMM
+` -usb -device usb-host,bus=3D001,vendorid=3D0x1d6b,productid=3D0x0002 `
+
+# lsusb returns
+
+Bus 002 Device 001: ID 1d6b:0003 Linux Foundation 3.0 root hub
+Bus 001 Device 014: ID 13d3:3487 IMC Networks =
+
+Bus 001 Device 004: ID 0457:11af Silicon Integrated Systems Corp. =
+
+Bus 001 Device 003: ID 0bda:57e6 Realtek Semiconductor Corp. =
+
+Bus 001 Device 002: ID 0bda:0129 Realtek Semiconductor Corp. RTS5129 Card R=
+eader Controller
+Bus 001 Device 001: ID 1d6b:0002 Linux Foundation 2.0 root hub
+
+# qemu returns
+qemu-system-arm: -device usb-host,bus=3D001,vendorid=3D0x1d6b,productid=3D0=
+x0002: Bus '001' not found
+
+
+Tried with connecting external usb keyboard but that didn't seem to work ei=
+ther.
+
+** Affects: qemu
+     Importance: Undecided
+         Status: New
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1772165
+
+Title:
+  qemu-system-arm: -device usb-
+  host,bus=3D001,vendorid=3D0x04f2,productid=3D0x0111: Bus '001' not found
+
+Status in QEMU:
+  New
+
+Bug description:
+  Using Qemu 2.12.0 on ArchLinux.
+
+  Trying to emulate arm device with `qemu-system-arm` and attach usb
+  device for unput using
+
+  ` -usb -device usb-host,bus=3D001,vendorid=3D0x1d6b,productid=3D0x0002 `
+
+  # lsusb returns
+
+  Bus 002 Device 001: ID 1d6b:0003 Linux Foundation 3.0 root hub
+  Bus 001 Device 014: ID 13d3:3487 IMC Networks =
+
+  Bus 001 Device 004: ID 0457:11af Silicon Integrated Systems Corp. =
+
+  Bus 001 Device 003: ID 0bda:57e6 Realtek Semiconductor Corp. =
+
+  Bus 001 Device 002: ID 0bda:0129 Realtek Semiconductor Corp. RTS5129 Card=
+ Reader Controller
+  Bus 001 Device 001: ID 1d6b:0002 Linux Foundation 2.0 root hub
+
+  # qemu returns
+  qemu-system-arm: -device usb-host,bus=3D001,vendorid=3D0x1d6b,productid=
+=3D0x0002: Bus '001' not found
+
+  =
+
+  Tried with connecting external usb keyboard but that didn't seem to work =
+either.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1772165/+subscriptions
