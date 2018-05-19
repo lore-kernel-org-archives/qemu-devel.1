@@ -1,32 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47920)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49114)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fK26L-0002iE-Cr
-	for qemu-devel@nongnu.org; Sat, 19 May 2018 09:40:50 -0400
+	(envelope-from <bounces@canonical.com>) id 1fK2Fq-0006YS-Rt
+	for qemu-devel@nongnu.org; Sat, 19 May 2018 09:50:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fK26I-00005I-9a
-	for qemu-devel@nongnu.org; Sat, 19 May 2018 09:40:49 -0400
-Received: from indium.canonical.com ([91.189.90.7]:49854)
+	(envelope-from <bounces@canonical.com>) id 1fK2Fm-0003Be-C0
+	for qemu-devel@nongnu.org; Sat, 19 May 2018 09:50:38 -0400
+Received: from indium.canonical.com ([91.189.90.7]:50458)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1fK26I-0008Vr-2L
-	for qemu-devel@nongnu.org; Sat, 19 May 2018 09:40:46 -0400
+	id 1fK2Fm-0003BK-43
+	for qemu-devel@nongnu.org; Sat, 19 May 2018 09:50:34 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1fK26H-0007ai-5i
-	for <qemu-devel@nongnu.org>; Sat, 19 May 2018 13:40:45 +0000
+	id 1fK2Fl-00088L-2p
+	for <qemu-devel@nongnu.org>; Sat, 19 May 2018 13:50:33 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 24BF72E806E
-	for <qemu-devel@nongnu.org>; Sat, 19 May 2018 13:40:45 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id E30E22E8056
+	for <qemu-devel@nongnu.org>; Sat, 19 May 2018 13:50:32 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Sat, 19 May 2018 13:34:46 -0000
-From: George <1772165@bugs.launchpad.net>
+Date: Sat, 19 May 2018 13:43:54 -0000
+From: Peter Maydell <peter.maydell@linaro.org>
 Reply-To: Bug 1772165 <1772165@bugs.launchpad.net>
 Sender: bounces@canonical.com
-Message-Id: <152673688616.9061.7617411809661975686.malonedeb@chaenomeles.canonical.com>
+References: <152673688616.9061.7617411809661975686.malonedeb@chaenomeles.canonical.com>
+Message-Id: <152673743435.2782.6957650882816671971.malone@gac.canonical.com>
 Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1772165] [NEW] qemu-system-arm: -device usb-host,
+Subject: [Qemu-devel] [Bug 1772165] Re: qemu-system-arm: -device usb-host,
  bus=001, vendorid=0x04f2, productid=0x0111: Bus '001' not found
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -38,39 +39,9 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-Public bug reported:
-
-Using Qemu 2.12.0 on ArchLinux.
-
-Trying to emulate arm device with `qemu-system-arm` and attach usb
-device for unput using
-
-` -usb -device usb-host,bus=3D001,vendorid=3D0x1d6b,productid=3D0x0002 `
-
-# lsusb returns
-
-Bus 002 Device 001: ID 1d6b:0003 Linux Foundation 3.0 root hub
-Bus 001 Device 014: ID 13d3:3487 IMC Networks =
-
-Bus 001 Device 004: ID 0457:11af Silicon Integrated Systems Corp. =
-
-Bus 001 Device 003: ID 0bda:57e6 Realtek Semiconductor Corp. =
-
-Bus 001 Device 002: ID 0bda:0129 Realtek Semiconductor Corp. RTS5129 Card R=
-eader Controller
-Bus 001 Device 001: ID 1d6b:0002 Linux Foundation 2.0 root hub
-
-# qemu returns
-qemu-system-arm: -device usb-host,bus=3D001,vendorid=3D0x1d6b,productid=3D0=
-x0002: Bus '001' not found
-
-
-Tried with connecting external usb keyboard but that didn't seem to work ei=
-ther.
-
-** Affects: qemu
-     Importance: Undecided
-         Status: New
+Can you give the full QEMU command line you're using? (I suspect the
+reason for this error is that the board model you're using does not have
+a USB controller.)
 
 -- =
 
