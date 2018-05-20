@@ -1,13 +1,13 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47617)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47620)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mjt@tls.msk.ru>) id 1fKIEY-0007pE-KF
+	(envelope-from <mjt@tls.msk.ru>) id 1fKIEY-0007pI-KG
 	for qemu-devel@nongnu.org; Sun, 20 May 2018 02:54:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mjt@tls.msk.ru>) id 1fKIEV-0002K4-IZ
+	(envelope-from <mjt@tls.msk.ru>) id 1fKIEV-0002Jx-HY
 	for qemu-devel@nongnu.org; Sun, 20 May 2018 02:54:22 -0400
 From: Michael Tokarev <mjt@tls.msk.ru>
-Date: Sun, 20 May 2018 09:14:57 +0300
-Message-Id: <6b1875476313ce320a6a1d1827e85511365a469c.1526796813.git.mjt@msgid.tls.msk.ru>
+Date: Sun, 20 May 2018 09:14:58 +0300
+Message-Id: <7647d5c6b5e3b3f36a6e0441c81ae3fe797eb233.1526796813.git.mjt@msgid.tls.msk.ru>
 In-Reply-To: <cover.1526796813.git.mjt@msgid.tls.msk.ru>
 References: <cover.1526796813.git.mjt@msgid.tls.msk.ru>
 In-Reply-To: <cover.1526796813.git.mjt@msgid.tls.msk.ru>
@@ -15,8 +15,7 @@ References: <cover.1526796813.git.mjt@msgid.tls.msk.ru>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 11/22] hw/ide/ahci: Keep ALLWINNER_AHCI() macro
- internal
+Subject: [Qemu-devel] [PULL 12/22] tests: fix tpm-crb tpm-tis tests race
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,46 +25,36 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-trivial@nongnu.org, Michael Tokarev <mjt@tls.msk.ru>
+Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, qemu-trivial@nongnu.org, Stefan Berger <stefanb@linux.vnet.ibm.com>, Michael Tokarev <mjt@tls.msk.ru>
 
-From: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
-The ALLWINNER_AHCI() macro is only used in ahci-allwinner.c.
+No need to close the TPM data socket on the emulator end, qemu will
+close it after a SHUTDOWN. This avoids a race between close() and
+read() in the TPM data thread.
 
-Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-Reviewed-by: John Snow <jsnow@redhat.com>
+Reported-by: Peter Maydell <peter.maydell@linaro.org>
+Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Signed-off-by: Stefan Berger <stefanb@linux.vnet.ibm.com>
+Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
 Signed-off-by: Michael Tokarev <mjt@tls.msk.ru>
 ---
- hw/ide/ahci-allwinner.c | 3 +++
- hw/ide/ahci_internal.h  | 3 ---
- 2 files changed, 3 insertions(+), 3 deletions(-)
+ tests/tpm-emu.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/hw/ide/ahci-allwinner.c b/hw/ide/ahci-allwinner.c
-index 5397483fd8..2fd95078ba 100644
---- a/hw/ide/ahci-allwinner.c
-+++ b/hw/ide/ahci-allwinner.c
-@@ -24,6 +24,9 @@
-=20
- #include "trace.h"
-=20
-+#define ALLWINNER_AHCI(obj) \
-+        OBJECT_CHECK(AllwinnerAHCIState, (obj), TYPE_ALLWINNER_AHCI)
-+
- #define ALLWINNER_AHCI_BISTAFR    ((0xa0 - ALLWINNER_AHCI_MMIO_OFF) / 4)
- #define ALLWINNER_AHCI_BISTCR     ((0xa4 - ALLWINNER_AHCI_MMIO_OFF) / 4)
- #define ALLWINNER_AHCI_BISTFCTR   ((0xa8 - ALLWINNER_AHCI_MMIO_OFF) / 4)
-diff --git a/hw/ide/ahci_internal.h b/hw/ide/ahci_internal.h
-index 8c755d4ca1..1a25d6c039 100644
---- a/hw/ide/ahci_internal.h
-+++ b/hw/ide/ahci_internal.h
-@@ -375,7 +375,4 @@ void ahci_reset(AHCIState *s);
-=20
- #define SYSBUS_AHCI(obj) OBJECT_CHECK(SysbusAHCIState, (obj), TYPE_SYSBU=
-S_AHCI)
-=20
--#define ALLWINNER_AHCI(obj) OBJECT_CHECK(AllwinnerAHCIState, (obj), \
--                       TYPE_ALLWINNER_AHCI)
--
- #endif /* HW_IDE_AHCI_H */
+diff --git a/tests/tpm-emu.c b/tests/tpm-emu.c
+index 4dada76834..8c2bd53cad 100644
+--- a/tests/tpm-emu.c
++++ b/tests/tpm-emu.c
+@@ -125,7 +125,7 @@ void *tpm_emu_ctrl_thread(void *data)
+         case CMD_SHUTDOWN: {
+             ptm_res res =3D 0;
+             qio_channel_write(ioc, (char *)&res, sizeof(res), &error_abo=
+rt);
+-            qio_channel_close(s->tpm_ioc, &error_abort);
++            /* the tpm data thread is expected to finish now */
+             g_thread_join(s->emu_tpm_thread);
+             break;
+         }
 --=20
 2.11.0
