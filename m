@@ -1,27 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42306)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45162)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhangckid@gmail.com>) id 1fKT6W-0001UB-57
-	for qemu-devel@nongnu.org; Sun, 20 May 2018 14:30:50 -0400
+	(envelope-from <chzigotzky@xenosoft.de>) id 1fKTQm-00027h-4b
+	for qemu-devel@nongnu.org; Sun, 20 May 2018 14:51:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zhangckid@gmail.com>) id 1fKT6T-0002Cp-Dj
-	for qemu-devel@nongnu.org; Sun, 20 May 2018 14:30:48 -0400
-Received: from mail-wr0-x241.google.com ([2a00:1450:400c:c0c::241]:38502)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <zhangckid@gmail.com>) id 1fKT6T-0002CK-1K
-	for qemu-devel@nongnu.org; Sun, 20 May 2018 14:30:45 -0400
-Received: by mail-wr0-x241.google.com with SMTP id 94-v6so13851720wrf.5
-	for <qemu-devel@nongnu.org>; Sun, 20 May 2018 11:30:44 -0700 (PDT)
+	(envelope-from <chzigotzky@xenosoft.de>) id 1fKTQl-0002QF-6c
+	for qemu-devel@nongnu.org; Sun, 20 May 2018 14:51:44 -0400
+References: <4521b265-855f-7f06-ffff-3fa394380922@xenosoft.de>
+	<b3243bab-58b6-0b43-67b5-94a2f90d9199@tuxfamily.org>
+	<5BD35D0B-E490-4693-8858-E11B7401709F@xenosoft.de>
+	<1821476d-7724-ad71-eb3f-69c731633582@tuxfamily.org>
+	<886dc490-c96a-ad5a-e1f7-8e41a686a53e@xenosoft.de>
+	<20180518131303.6f0778eb@bahia.lan>
+	<e9333edf-fa2a-6ad8-412b-459b0b8002e9@xenosoft.de>
+	<20180518141642.6ad639ac@bahia.lan>
+	<8bde9b6f-b80f-e87e-e4d3-ace15454cf3d@xenosoft.de>
+	<3db651e3-a237-fbaa-6ffe-ecc5db43ad0f@tuxfamily.org>
+	<E9FA9AA6-FDA6-467F-9B72-B331756464A7@xenosoft.de>
+	<ccaa7d46-79d4-c223-3828-ae22a59392db@tuxfamily.org>
+	<7d552162-5165-c022-ce6d-4903da7d2262@xenosoft.de>
+	<20180519171949.0031d971@thl530.multi.box>
+From: Christian Zigotzky <chzigotzky@xenosoft.de>
+Message-ID: <62700eb1-e13e-6262-ed2d-31feb6b38dd0@xenosoft.de>
+Date: Sun, 20 May 2018 20:51:24 +0200
 MIME-Version: 1.0
-In-Reply-To: <20180515165517.GE2749@work-vm>
-References: <20180514165424.12884-1-zhangckid@gmail.com>
-	<20180514165424.12884-8-zhangckid@gmail.com>
-	<20180515165517.GE2749@work-vm>
-From: Zhang Chen <zhangckid@gmail.com>
-Date: Mon, 21 May 2018 02:30:43 +0800
-Message-ID: <CAK3tnvLofaRAT3SwmYCBgYy6SuP4GkGt9J4KDEWEZkJYF-61Mw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH V7 RESEND 07/17] COLO: Load dirty pages
- into SVM's RAM cache firstly
+In-Reply-To: <20180519171949.0031d971@thl530.multi.box>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: de-DE
+Subject: Re: [Qemu-devel] [Qemu-ppc] [PPC64] P5020DS: Booting from img
+ possible (-drive)?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,297 +37,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: qemu-devel@nongnu.org, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Jason Wang <jasowang@redhat.com>, zhanghailiang <zhang.zhanghailiang@huawei.com>, Li Zhijian <lizhijian@cn.fujitsu.com>
+To: Thomas Huth <huth@tuxfamily.org>
+Cc: qemu-ppc@nongnu.org, Greg Kurz <groug@kaod.org>, "kvm-ppc@vger.kernel.org" <kvm-ppc@vger.kernel.org>, qemu-devel@nongnu.org
 
-On Wed, May 16, 2018 at 12:55 AM, Dr. David Alan Gilbert <
-dgilbert@redhat.com> wrote:
-
-> * Zhang Chen (zhangckid@gmail.com) wrote:
-> > We should not load PVM's state directly into SVM, because there maybe
-> some
-> > errors happen when SVM is receving data, which will break SVM.
-> >
-> > We need to ensure receving all data before load the state into SVM. We
-> use
-> > an extra memory to cache these data (PVM's ram). The ram cache in
-> secondary side
-> > is initially the same as SVM/PVM's memory. And in the process of
-> checkpoint,
-> > we cache the dirty pages of PVM into this ram cache firstly, so this ram
-> cache
-> > always the same as PVM's memory at every checkpoint, then we flush this
-> cached ram
-> > to SVM after we receive all PVM's state.
-> >
-> > Signed-off-by: zhanghailiang <zhang.zhanghailiang@huawei.com>
-> > Signed-off-by: Li Zhijian <lizhijian@cn.fujitsu.com>
-> > Signed-off-by: Zhang Chen <zhangckid@gmail.com>
-> > ---
-> >  include/exec/ram_addr.h |  1 +
-> >  migration/migration.c   |  2 +
-> >  migration/ram.c         | 99 +++++++++++++++++++++++++++++++++++++++--
-> >  migration/ram.h         |  4 ++
-> >  migration/savevm.c      |  2 +-
-> >  5 files changed, 104 insertions(+), 4 deletions(-)
-> >
-> > diff --git a/include/exec/ram_addr.h b/include/exec/ram_addr.h
-> > index cf2446a176..51ec153a57 100644
-> > --- a/include/exec/ram_addr.h
-> > +++ b/include/exec/ram_addr.h
-> > @@ -27,6 +27,7 @@ struct RAMBlock {
-> >      struct rcu_head rcu;
-> >      struct MemoryRegion *mr;
-> >      uint8_t *host;
-> > +    uint8_t *colo_cache; /* For colo, VM's ram cache */
-> >      ram_addr_t offset;
-> >      ram_addr_t used_length;
-> >      ram_addr_t max_length;
-> > diff --git a/migration/migration.c b/migration/migration.c
-> > index 8dee7dd309..cfc1b958b9 100644
-> > --- a/migration/migration.c
-> > +++ b/migration/migration.c
-> > @@ -421,6 +421,8 @@ static void process_incoming_migration_co(void
-> *opaque)
-> >
-> >          /* Wait checkpoint incoming thread exit before free resource */
-> >          qemu_thread_join(&mis->colo_incoming_thread);
-> > +        /* We hold the global iothread lock, so it is safe here */
-> > +        colo_release_ram_cache();
-> >      }
-> >
-> >      if (ret < 0) {
-> > diff --git a/migration/ram.c b/migration/ram.c
-> > index 912810c18e..7ca845f8a9 100644
-> > --- a/migration/ram.c
-> > +++ b/migration/ram.c
-> > @@ -2520,6 +2520,20 @@ static inline void *host_from_ram_block_offset(RAMBlock
-> *block,
-> >      return block->host + offset;
-> >  }
-> >
-> > +static inline void *colo_cache_from_block_offset(RAMBlock *block,
-> > +                                                 ram_addr_t offset)
-> > +{
-> > +    if (!offset_in_ramblock(block, offset)) {
-> > +        return NULL;
-> > +    }
-> > +    if (!block->colo_cache) {
-> > +        error_report("%s: colo_cache is NULL in block :%s",
-> > +                     __func__, block->idstr);
-> > +        return NULL;
-> > +    }
-> > +    return block->colo_cache + offset;
-> > +}
-> > +
-> >  /**
-> >   * ram_handle_compressed: handle the zero page case
-> >   *
-> > @@ -2724,6 +2738,57 @@ static void decompress_data_with_multi_threads(QEMUFile
-> *f,
-> >      qemu_mutex_unlock(&decomp_done_lock);
-> >  }
-> >
-> > +/*
-> > + * colo cache: this is for secondary VM, we cache the whole
-> > + * memory of the secondary VM, it is need to hold the global lock
-> > + * to call this helper.
-> > + */
-> > +int colo_init_ram_cache(void)
-> > +{
-> > +    RAMBlock *block;
-> > +
-> > +    rcu_read_lock();
-> > +    QLIST_FOREACH_RCU(block, &ram_list.blocks, next) {
-> > +        block->colo_cache = qemu_anon_ram_alloc(block->used_length,
-> > +                                                NULL,
-> > +                                                false);
-> > +        if (!block->colo_cache) {
-> > +            error_report("%s: Can't alloc memory for COLO cache of
-> block %s,"
-> > +                         "size 0x" RAM_ADDR_FMT, __func__, block->idstr,
-> > +                         block->used_length);
-> > +            goto out_locked;
-> > +        }
-> > +    }
-> > +    rcu_read_unlock();
-> > +    return 0;
-> > +
-> > +out_locked:
-> > +    QLIST_FOREACH_RCU(block, &ram_list.blocks, next) {
-> > +        if (block->colo_cache) {
-> > +            qemu_anon_ram_free(block->colo_cache, block->used_length);
-> > +            block->colo_cache = NULL;
-> > +        }
-> > +    }
-> > +
-> > +    rcu_read_unlock();
-> > +    return -errno;
-> > +}
-> > +
-> > +/* It is need to hold the global lock to call this helper */
-> > +void colo_release_ram_cache(void)
-> > +{
-> > +    RAMBlock *block;
-> > +
-> > +    rcu_read_lock();
-> > +    QLIST_FOREACH_RCU(block, &ram_list.blocks, next) {
-> > +        if (block->colo_cache) {
-> > +            qemu_anon_ram_free(block->colo_cache, block->used_length);
-> > +            block->colo_cache = NULL;
-> > +        }
-> > +    }
-> > +    rcu_read_unlock();
-> > +}
-> > +
-> >  /**
-> >   * ram_load_setup: Setup RAM for migration incoming side
-> >   *
-> > @@ -2740,6 +2805,7 @@ static int ram_load_setup(QEMUFile *f, void
-> *opaque)
-> >
-> >      xbzrle_load_setup();
-> >      ramblock_recv_map_init();
-> > +
-> >      return 0;
-> >  }
-> >
-> > @@ -2753,6 +2819,7 @@ static int ram_load_cleanup(void *opaque)
-> >          g_free(rb->receivedmap);
-> >          rb->receivedmap = NULL;
-> >      }
-> > +
-> >      return 0;
-> >  }
-> >
-> > @@ -2966,7 +3033,7 @@ static int ram_load(QEMUFile *f, void *opaque, int
-> version_id)
-> >
-> >      while (!postcopy_running && !ret && !(flags & RAM_SAVE_FLAG_EOS)) {
-> >          ram_addr_t addr, total_ram_bytes;
-> > -        void *host = NULL;
-> > +        void *host = NULL, *host_bak = NULL;
-> >          uint8_t ch;
-> >
-> >          addr = qemu_get_be64(f);
-> > @@ -2986,13 +3053,36 @@ static int ram_load(QEMUFile *f, void *opaque,
-> int version_id)
-> >                       RAM_SAVE_FLAG_COMPRESS_PAGE |
-> RAM_SAVE_FLAG_XBZRLE)) {
-> >              RAMBlock *block = ram_block_from_stream(f, flags);
-> >
-> > -            host = host_from_ram_block_offset(block, addr);
-> > +             /*
-> > +             * After going into COLO, we should load the Page into
-> colo_cache
-> > +             * NOTE: We need to keep a copy of SVM's ram in colo_cache.
-> > +             * Privously, we copied all these memory in preparing stage
-> of COLO
-> > +             * while we need to stop VM, which is a time-consuming
-> process.
-> > +             * Here we optimize it by a trick, back-up every page while
-> in
-> > +             * migration process while COLO is enabled, though it
-> affects the
-> > +             * speed of the migration, but it obviously reduce the
-> downtime of
-> > +             * back-up all SVM'S memory in COLO preparing stage.
-> > +             */
-> > +            if (migration_incoming_in_colo_state()) {
-> > +                host = colo_cache_from_block_offset(block, addr);
-> > +                /* After goes into COLO state, don't backup it any more
-> */
-> > +                if (!migration_incoming_in_colo_state()) {
+On 19 May 2018 at 5:19PM, Thomas Huth wrote:
+> On Sat, 19 May 2018 16:03:02 +0200
+> Christian Zigotzky <chzigotzky@xenosoft.de> wrote:
 >
-> I don't understand how we can reach this nested 'if';
-> colo_cache_from_block_offset is short and simple; so how can
-> migration_incoming_in_colo_state() be both true and false?
 >
-> I think this is trying to do it for when COLO is enabled but when
-> receiving the first checkpoint you want to take a copy; but I don't
-> think that's what the 'if' is doing.
+>> Unfortunately mouse and keyboard doesn't work in the virtual machine.
+> I guess with the ppce500 machine, you've also got to specify them
+> manually, too. You've got two options, virtio and USB. For virtio, try:
 >
-
-I'm also confused about this part.
-I checked old version codes for this part, but it looks same .
-How do you think this should be done?
-
-Or maybe the original author know some detail?
-CC Lizhijian and Zhanghailiang
-
-Thanks
-Zhang Chen
-
-
-
-
+>   -device virtio-mouse-pci -device virtio-keyboard-pci
 >
-> Dave
+> And for USB, try something like:
 >
-> > +                    host_bak = host;
-> > +                }
-> > +            }
-> > +            if (!migration_incoming_in_colo_state()) {
-> > +                host = host_from_ram_block_offset(block, addr);
-> > +            }
-> >              if (!host) {
-> >                  error_report("Illegal RAM offset " RAM_ADDR_FMT, addr);
-> >                  ret = -EINVAL;
-> >                  break;
-> >              }
-> > -            ramblock_recv_bitmap_set(block, host);
-> > +
-> > +            if (!migration_incoming_in_colo_state()) {
-> > +                ramblock_recv_bitmap_set(block, host);
-> > +            }
-> > +
-> >              trace_ram_load_loop(block->idstr, (uint64_t)addr, flags,
-> host);
-> >          }
-> >
-> > @@ -3087,6 +3177,9 @@ static int ram_load(QEMUFile *f, void *opaque, int
-> version_id)
-> >          if (!ret) {
-> >              ret = qemu_file_get_error(f);
-> >          }
-> > +        if (!ret && host_bak && host) {
-> > +            memcpy(host_bak, host, TARGET_PAGE_SIZE);
-> > +        }
-> >      }
-> >
-> >      ret |= wait_for_decompress_done();
-> > diff --git a/migration/ram.h b/migration/ram.h
-> > index 5030be110a..66e9b86ff0 100644
-> > --- a/migration/ram.h
-> > +++ b/migration/ram.h
-> > @@ -64,4 +64,8 @@ bool ramblock_recv_bitmap_test_byte_offset(RAMBlock
-> *rb, uint64_t byte_offset);
-> >  void ramblock_recv_bitmap_set(RAMBlock *rb, void *host_addr);
-> >  void ramblock_recv_bitmap_set_range(RAMBlock *rb, void *host_addr,
-> size_t nr);
-> >
-> > +/* ram cache */
-> > +int colo_init_ram_cache(void);
-> > +void colo_release_ram_cache(void);
-> > +
-> >  #endif
-> > diff --git a/migration/savevm.c b/migration/savevm.c
-> > index c43d220220..ec0bff09ce 100644
-> > --- a/migration/savevm.c
-> > +++ b/migration/savevm.c
-> > @@ -1807,7 +1807,7 @@ static int loadvm_handle_cmd_packaged(MigrationIncomingState
-> *mis)
-> >  static int loadvm_process_enable_colo(MigrationIncomingState *mis)
-> >  {
-> >      migration_incoming_enable_colo();
-> > -    return 0;
-> > +    return colo_init_ram_cache();
-> >  }
-> >
-> >  /*
-> > --
-> > 2.17.0
-> >
-> --
-> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+>   -device qemu-xhci -device usb-mouse -device usb-kbd
 >
+> If "qemu-xhci" does not work, you could also try "pci-ohci" instead.
+>
+>   HTH,
+>    Thomas
+>
+Yes, you're right. Mouse and keyboard work!
+
+Screenshot: 
+https://plus.google.com/u/0/photos/photo/115515624056477014971/6557728521525034386
+
+Many thanks for your help! :-)
