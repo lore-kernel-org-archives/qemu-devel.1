@@ -1,34 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45162)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40024)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <chzigotzky@xenosoft.de>) id 1fKTQm-00027h-4b
-	for qemu-devel@nongnu.org; Sun, 20 May 2018 14:51:45 -0400
+	(envelope-from <randrianasulu@gmail.com>) id 1fKSn2-0003yj-Rc
+	for qemu-devel@nongnu.org; Sun, 20 May 2018 14:10:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <chzigotzky@xenosoft.de>) id 1fKTQl-0002QF-6c
-	for qemu-devel@nongnu.org; Sun, 20 May 2018 14:51:44 -0400
-References: <4521b265-855f-7f06-ffff-3fa394380922@xenosoft.de>
-	<b3243bab-58b6-0b43-67b5-94a2f90d9199@tuxfamily.org>
-	<5BD35D0B-E490-4693-8858-E11B7401709F@xenosoft.de>
-	<1821476d-7724-ad71-eb3f-69c731633582@tuxfamily.org>
-	<886dc490-c96a-ad5a-e1f7-8e41a686a53e@xenosoft.de>
-	<20180518131303.6f0778eb@bahia.lan>
-	<e9333edf-fa2a-6ad8-412b-459b0b8002e9@xenosoft.de>
-	<20180518141642.6ad639ac@bahia.lan>
-	<8bde9b6f-b80f-e87e-e4d3-ace15454cf3d@xenosoft.de>
-	<3db651e3-a237-fbaa-6ffe-ecc5db43ad0f@tuxfamily.org>
-	<E9FA9AA6-FDA6-467F-9B72-B331756464A7@xenosoft.de>
-	<ccaa7d46-79d4-c223-3828-ae22a59392db@tuxfamily.org>
-	<7d552162-5165-c022-ce6d-4903da7d2262@xenosoft.de>
-	<20180519171949.0031d971@thl530.multi.box>
-From: Christian Zigotzky <chzigotzky@xenosoft.de>
-Message-ID: <62700eb1-e13e-6262-ed2d-31feb6b38dd0@xenosoft.de>
-Date: Sun, 20 May 2018 20:51:24 +0200
+	(envelope-from <randrianasulu@gmail.com>) id 1fKSmy-0001GX-Ny
+	for qemu-devel@nongnu.org; Sun, 20 May 2018 14:10:40 -0400
+Received: from mail-lf0-x22f.google.com ([2a00:1450:4010:c07::22f]:42884)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <randrianasulu@gmail.com>)
+	id 1fKSmy-0001G8-Cj
+	for qemu-devel@nongnu.org; Sun, 20 May 2018 14:10:36 -0400
+Received: by mail-lf0-x22f.google.com with SMTP id b18-v6so20714851lfa.9
+	for <qemu-devel@nongnu.org>; Sun, 20 May 2018 11:10:35 -0700 (PDT)
+Received: from [192.168.1.102] ([176.116.252.109])
+	by smtp.gmail.com with ESMTPSA id
+	y23-v6sm2174907ljh.88.2018.05.20.11.10.32 for <qemu-devel@nongnu.org>
+	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+	Sun, 20 May 2018 11:10:33 -0700 (PDT)
+From: Andrew Randrianasulu <randrianasulu@gmail.com>
+Date: Sun, 20 May 2018 20:54:50 +0300
 MIME-Version: 1.0
-In-Reply-To: <20180519171949.0031d971@thl530.multi.box>
-Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Type: text/plain;
+  charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Content-Language: de-DE
-Subject: Re: [Qemu-devel] [Qemu-ppc] [PPC64] P5020DS: Booting from img
- possible (-drive)?
+Content-Disposition: inline
+Message-Id: <201805202054.50525.randrianasulu@gmail.com>
+Subject: [Qemu-devel] [Bug 1769189] Re: Issue with qemu 2.12.0 + SATA
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,32 +34,94 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <huth@tuxfamily.org>
-Cc: qemu-ppc@nongnu.org, Greg Kurz <groug@kaod.org>, "kvm-ppc@vger.kernel.org" <kvm-ppc@vger.kernel.org>, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
 
-On 19 May 2018 at 5:19PM, Thomas Huth wrote:
-> On Sat, 19 May 2018 16:03:02 +0200
-> Christian Zigotzky <chzigotzky@xenosoft.de> wrote:
->
->
->> Unfortunately mouse and keyboard doesn't work in the virtual machine.
-> I guess with the ppce500 machine, you've also got to specify them
-> manually, too. You've got two options, virtio and USB. For virtio, try:
->
->   -device virtio-mouse-pci -device virtio-keyboard-pci
->
-> And for USB, try something like:
->
->   -device qemu-xhci -device usb-mouse -device usb-kbd
->
-> If "qemu-xhci" does not work, you could also try "pci-ohci" instead.
->
->   HTH,
->    Thomas
->
-Yes, you're right. Mouse and keyboard work!
+I think I was hit with very same bug.
 
-Screenshot: 
-https://plus.google.com/u/0/photos/photo/115515624056477014971/6557728521525034386
+I did bisect with 2.11.0 as good point and 2.12.0 as bad point.
 
-Many thanks for your help! :-)
+configure was 
+
+setarch 
+i486 ./configure --prefix=/usr --disable-gtk --enable-virglrenderer --enable-sdl --with-sdlabi=2.0 --audio-drv-list=alsa,oss --host-cc=/opt/gcc49/bin/gcc --enable-opengl --extra-cflags="-I/usr/X11R7/include -O3 -march=i686 -mtune=native -m32 -Wno-maybe-uninitialized -Wno-nested-externs -Wno-implicit-function-declaration" --disable-werror --target-list="x86_64-softmmu"
+
+and launch command
+
+x86_64-softmmu/qemu-system-x86_64 -cdrom 
+~/Downloads/ISO/slax-English-US-7.0.8-x86_64.iso -enable-kvm -m 1G -M q35
+
+
+
+------------
+git bisect bad
+66eb7825d0bd84a870a054fb208fe765317109fa is the first bad commit
+commit 66eb7825d0bd84a870a054fb208fe765317109fa
+Author: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
+Date:   Tue Feb 27 12:53:05 2018 +0300
+
+    replay: avoid recursive call of checkpoints
+
+    This patch adds a flag which denies recursive call of replay_checkpoint
+    function. Checkpoints may be accompanied by the hardware events. When event
+    is processed, virtual device may invoke timer modification functions that
+    also invoke the checkpoint function. This leads to infinite loop.
+
+    Signed-off-by: Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>
+    Message-Id: <20180227095305.1060.56463.stgit@pasha-VirtualBox>
+    Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+    Signed-off-by: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
+
+:040000 040000 f8d1eb18d3a8fcd0df0329e6b899a515e4b0e16e 
+a286be2d590b42b15f9facf033348ee37c460d25 M      replay
+
+-------------
+
+git bisect log
+git bisect start
+# good: [0a0dc59d27527b78a195c2d838d28b7b49e5a639] Update version for v2.11.0 
+release
+git bisect good 0a0dc59d27527b78a195c2d838d28b7b49e5a639
+# bad: [4743c23509a51bd4ee85cc272287a41917d1be35] Update version for v2.12.0 
+release
+git bisect bad 4743c23509a51bd4ee85cc272287a41917d1be35
+# skip: [db57d7a3c284db2315d92f55962597cc7276579a] wdt_ib700-test: Drop 
+dependence on global_qtest
+git bisect skip db57d7a3c284db2315d92f55962597cc7276579a
+# good: [539022dd6089cdef36589d608ed63cbdaacfd71f] chardev: Clean up previous 
+patch indentation
+git bisect good 539022dd6089cdef36589d608ed63cbdaacfd71f
+# good: [9db0855e8501365334e859370800c240d25322a2] Merge remote-tracking 
+branch 'remotes/pmaydell/tags/pull-target-arm-20180301' into staging
+git bisect good 9db0855e8501365334e859370800c240d25322a2
+# good: [a57946ff2acb9c0d95c9f127914540586b0b8c21] Merge remote-tracking 
+branch 'remotes/awilliam/tags/vfio-update-20180313.0' into staging
+git bisect good a57946ff2acb9c0d95c9f127914540586b0b8c21
+# bad: [211d6260208d079429fd0d447b86ff480d0524ca] Merge remote-tracking 
+branch 'remotes/kevin/tags/for-upstream' into staging
+git bisect bad 211d6260208d079429fd0d447b86ff480d0524ca
+# bad: [09b68dab5a11e8657119bc1d2ab18e98a70530ed] vhdx: Support .bdrv_co_create
+git bisect bad 09b68dab5a11e8657119bc1d2ab18e98a70530ed
+# bad: [3788c7b6e56fa34ee2a73e41706eb2a2447ba75a] Merge remote-tracking 
+branch 'remotes/bonzini/tags/for-upstream' into staging
+git bisect bad 3788c7b6e56fa34ee2a73e41706eb2a2447ba75a
+# good: [63f01a74aeeb9c4fb39e2b4100beb084f5c10c95] hw/isa/pc87312: Inherit from 
+the abstract TYPE_ISA_SUPERIO
+git bisect good 63f01a74aeeb9c4fb39e2b4100beb084f5c10c95
+# good: [1a96e3c1e7dbb466a8c93743b8f5ae37cc023766] replay: fix processing async 
+events
+git bisect good 1a96e3c1e7dbb466a8c93743b8f5ae37cc023766
+# good: [1a423896fa4fc2ea49c64e7a493d88a8b251950d] replay: don't destroy mutex 
+at exit
+git bisect good 1a423896fa4fc2ea49c64e7a493d88a8b251950d
+# bad: [821c113033075d4f1b50966d92022a1064085422] scripts/replay-dump.py: replay 
+log dumper
+git bisect bad 821c113033075d4f1b50966d92022a1064085422
+# good: [6dc0f5296359ff59c248215a965c8658dea9544b] replay: check return values 
+of fwrite
+git bisect good 6dc0f5296359ff59c248215a965c8658dea9544b
+# bad: [66eb7825d0bd84a870a054fb208fe765317109fa] replay: avoid recursive call 
+of checkpoints
+git bisect bad 66eb7825d0bd84a870a054fb208fe765317109fa
+# first bad commit: [66eb7825d0bd84a870a054fb208fe765317109fa] replay: avoid 
+recursive call of checkpoints
+------------------------
