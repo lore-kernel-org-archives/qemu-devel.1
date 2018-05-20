@@ -1,23 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52345)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52363)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <whois.zihan.yang@gmail.com>) id 1fKImU-00014m-Gc
-	for qemu-devel@nongnu.org; Sun, 20 May 2018 03:29:27 -0400
+	(envelope-from <whois.zihan.yang@gmail.com>) id 1fKImZ-0001K0-65
+	for qemu-devel@nongnu.org; Sun, 20 May 2018 03:29:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <whois.zihan.yang@gmail.com>) id 1fKImR-0006xO-DR
-	for qemu-devel@nongnu.org; Sun, 20 May 2018 03:29:26 -0400
-Received: from mail-pl0-x242.google.com ([2607:f8b0:400e:c01::242]:36599)
+	(envelope-from <whois.zihan.yang@gmail.com>) id 1fKImY-0006yf-3c
+	for qemu-devel@nongnu.org; Sun, 20 May 2018 03:29:31 -0400
+Received: from mail-pl0-x244.google.com ([2607:f8b0:400e:c01::244]:46372)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <whois.zihan.yang@gmail.com>)
-	id 1fKImR-0006xD-6Z
-	for qemu-devel@nongnu.org; Sun, 20 May 2018 03:29:23 -0400
-Received: by mail-pl0-x242.google.com with SMTP id v24-v6so6961097plo.3
-	for <qemu-devel@nongnu.org>; Sun, 20 May 2018 00:29:23 -0700 (PDT)
+	id 1fKImX-0006yO-Rl
+	for qemu-devel@nongnu.org; Sun, 20 May 2018 03:29:30 -0400
+Received: by mail-pl0-x244.google.com with SMTP id 30-v6so6937671pld.13
+	for <qemu-devel@nongnu.org>; Sun, 20 May 2018 00:29:29 -0700 (PDT)
 From: Zihan Yang <whois.zihan.yang@gmail.com>
-Date: Sun, 20 May 2018 15:28:52 +0800
-Message-Id: <1526801333-30613-3-git-send-email-whois.zihan.yang@gmail.com>
+Date: Sun, 20 May 2018 15:28:53 +0800
+Message-Id: <1526801333-30613-4-git-send-email-whois.zihan.yang@gmail.com>
 In-Reply-To: <1526801333-30613-1-git-send-email-whois.zihan.yang@gmail.com>
 References: <1526801333-30613-1-git-send-email-whois.zihan.yang@gmail.com>
-Subject: [Qemu-devel] [RFC 2/3] pci: Link pci_host_bridges with QTAILQ
+Subject: [Qemu-devel] [RFC 3/3] acpi-build: allocate mcfg for multiple host
+ bridges
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,71 +28,157 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Zihan Yang <whois.zihan.yang@gmail.com>, "Michael S. Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+Cc: Zihan Yang <whois.zihan.yang@gmail.com>, "Michael S. Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>
 
-QLIST will place the original q35 host bridge at the end of list because it is
-added first. Replace it with QTAILQ to make q35 at the first of queue, which
-makes it convinient and compatible when there are pxb hosts other than q35 hosts
+Currently only q35 host bridge us allocated space in MCFG table. To put pxb host
+into sepratate pci domain, each of them should have its own configuration space
+int MCFG table
 
 Signed-off-by: Zihan Yang <whois.zihan.yang@gmail.com>
 ---
- hw/pci/pci.c              | 9 +++++----
- include/hw/pci/pci_host.h | 2 +-
- 2 files changed, 6 insertions(+), 5 deletions(-)
+ hw/i386/acpi-build.c | 83 +++++++++++++++++++++++++++++++++++++++-------------
+ 1 file changed, 62 insertions(+), 21 deletions(-)
 
-diff --git a/hw/pci/pci.c b/hw/pci/pci.c
-index 80bc459..ddc27ba 100644
---- a/hw/pci/pci.c
-+++ b/hw/pci/pci.c
-@@ -196,7 +196,8 @@ static void pci_del_option_rom(PCIDevice *pdev);
- static uint16_t pci_default_sub_vendor_id = PCI_SUBVENDOR_ID_REDHAT_QUMRANET;
- static uint16_t pci_default_sub_device_id = PCI_SUBDEVICE_ID_QEMU;
+diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
+index 9bc6d97..808d815 100644
+--- a/hw/i386/acpi-build.c
++++ b/hw/i386/acpi-build.c
+@@ -89,6 +89,7 @@
+ typedef struct AcpiMcfgInfo {
+     uint64_t mcfg_base;
+     uint32_t mcfg_size;
++    struct AcpiMcfgInfo *next;
+ } AcpiMcfgInfo;
  
--static QLIST_HEAD(, PCIHostState) pci_host_bridges;
-+static QTAILQ_HEAD(, PCIHostState) pci_host_bridges =
-+    QTAILQ_HEAD_INITIALIZER(pci_host_bridges);
- 
- int pci_bar(PCIDevice *d, int reg)
+ typedef struct AcpiPmInfo {
+@@ -2427,14 +2428,15 @@ build_mcfg_q35(GArray *table_data, BIOSLinker *linker, AcpiMcfgInfo *info)
  {
-@@ -330,7 +331,7 @@ static void pci_host_bus_register(DeviceState *host)
- {
-     PCIHostState *host_bridge = PCI_HOST_BRIDGE(host);
+     AcpiTableMcfg *mcfg;
+     const char *sig;
+-    int len = sizeof(*mcfg) + 1 * sizeof(mcfg->allocation[0]);
++    int len, count = 0;
++    AcpiMcfgInfo *cfg = info;
  
--    QLIST_INSERT_HEAD(&pci_host_bridges, host_bridge, next);
-+    QTAILQ_INSERT_TAIL(&pci_host_bridges, host_bridge, next);
++    while (cfg) {
++        ++count;
++        cfg = cfg->next;
++    }
++    len = sizeof(*mcfg) + count * sizeof(mcfg->allocation[0]);
+     mcfg = acpi_data_push(table_data, len);
+-    mcfg->allocation[0].address = cpu_to_le64(info->mcfg_base);
+-    /* Only a single allocation so no need to play with segments */
+-    mcfg->allocation[0].pci_segment = cpu_to_le16(0);
+-    mcfg->allocation[0].start_bus_number = 0;
+-    mcfg->allocation[0].end_bus_number = PCIE_MMCFG_BUS(info->mcfg_size - 1);
+ 
+     /* MCFG is used for ECAM which can be enabled or disabled by guest.
+      * To avoid table size changes (which create migration issues),
+@@ -2448,6 +2450,17 @@ build_mcfg_q35(GArray *table_data, BIOSLinker *linker, AcpiMcfgInfo *info)
+     } else {
+         sig = "MCFG";
+     }
++
++    count = 0;
++    while (info) {
++        mcfg[count].allocation[0].address = cpu_to_le64(info->mcfg_base);
++        /* Only a single allocation so no need to play with segments */
++        mcfg[count].allocation[0].pci_segment = cpu_to_le16(count);
++        mcfg[count].allocation[0].start_bus_number = 0;
++        mcfg[count++].allocation[0].end_bus_number = PCIE_MMCFG_BUS(info->mcfg_size - 1);
++        info = info->next;
++    }
++
+     build_header(linker, table_data, (void *)mcfg, sig, len, 1, NULL, NULL);
  }
  
- PCIBus *pci_device_root_bus(const PCIDevice *d)
-@@ -1798,7 +1799,7 @@ PciInfoList *qmp_query_pci(Error **errp)
-     PciInfoList *info, *head = NULL, *cur_item = NULL;
-     PCIHostState *host_bridge;
+@@ -2602,26 +2615,52 @@ struct AcpiBuildState {
+     MemoryRegion *linker_mr;
+ } AcpiBuildState;
  
--    QLIST_FOREACH(host_bridge, &pci_host_bridges, next) {
-+    QTAILQ_FOREACH(host_bridge, &pci_host_bridges, next) {
-         info = g_malloc0(sizeof(*info));
-         info->value = qmp_query_pci_bus(host_bridge->bus,
-                                         pci_bus_num(host_bridge->bus));
-@@ -2493,7 +2494,7 @@ int pci_qdev_find_device(const char *id, PCIDevice **pdev)
-     PCIHostState *host_bridge;
-     int rc = -ENODEV;
+-static bool acpi_get_mcfg(AcpiMcfgInfo *mcfg)
++static inline void cleanup_mcfg(AcpiMcfgInfo *mcfg)
++{
++    AcpiMcfgInfo *tmp;
++    while (mcfg) {
++        tmp = mcfg->next;
++        g_free(mcfg);
++        mcfg = tmp;
++    }
++}
++
++static AcpiMcfgInfo *acpi_get_mcfg(void)
+ {
+     Object *pci_host;
+     QObject *o;
++    AcpiMcfgInfo *head = NULL, *tail, *mcfg;
  
--    QLIST_FOREACH(host_bridge, &pci_host_bridges, next) {
-+    QTAILQ_FOREACH(host_bridge, &pci_host_bridges, next) {
-         int tmp = pci_qdev_find_recursive(host_bridge->bus, id, pdev);
-         if (!tmp) {
-             rc = 0;
-diff --git a/include/hw/pci/pci_host.h b/include/hw/pci/pci_host.h
-index ba31595..a5617cf 100644
---- a/include/hw/pci/pci_host.h
-+++ b/include/hw/pci/pci_host.h
-@@ -47,7 +47,7 @@ struct PCIHostState {
-     uint32_t config_reg;
-     PCIBus *bus;
+     pci_host = acpi_get_i386_pci_host();
+     g_assert(pci_host);
  
--    QLIST_ENTRY(PCIHostState) next;
-+    QTAILQ_ENTRY(PCIHostState) next;
- };
+-    o = object_property_get_qobject(pci_host, PCIE_HOST_MCFG_BASE, NULL);
+-    if (!o) {
+-        return false;
++    while (pci_host) {
++        mcfg = g_new0(AcpiMcfgInfo, 1);
++        mcfg->next = NULL;
++        if (!head) {
++            tail = head = mcfg;
++        } else {
++            tail->next = mcfg;
++            tail = mcfg;
++        }
++
++        o = object_property_get_qobject(pci_host, PCIE_HOST_MCFG_BASE, NULL);
++        if (!o) {
++            cleanup_mcfg(head);
++            g_free(mcfg);
++            return NULL;
++        }
++        mcfg->mcfg_base = qnum_get_uint(qobject_to(QNum, o));
++        qobject_unref(o);
++
++        o = object_property_get_qobject(pci_host, PCIE_HOST_MCFG_SIZE, NULL);
++        assert(o);
++        mcfg->mcfg_size = qnum_get_uint(qobject_to(QNum, o));
++        qobject_unref(o);
++
++        pci_host = OBJECT(QTAILQ_NEXT(PCI_HOST_BRIDGE(pci_host), next));
+     }
+-    mcfg->mcfg_base = qnum_get_uint(qobject_to(QNum, o));
+-    qobject_unref(o);
+-
+-    o = object_property_get_qobject(pci_host, PCIE_HOST_MCFG_SIZE, NULL);
+-    assert(o);
+-    mcfg->mcfg_size = qnum_get_uint(qobject_to(QNum, o));
+-    qobject_unref(o);
+-    return true;
++    return head;
+ }
  
- typedef struct PCIHostBridgeClass {
+ static
+@@ -2633,7 +2672,7 @@ void acpi_build(AcpiBuildTables *tables, MachineState *machine)
+     unsigned facs, dsdt, rsdt, fadt;
+     AcpiPmInfo pm;
+     AcpiMiscInfo misc;
+-    AcpiMcfgInfo mcfg;
++    AcpiMcfgInfo *mcfg;
+     Range pci_hole, pci_hole64;
+     uint8_t *u;
+     size_t aml_len = 0;
+@@ -2714,10 +2753,12 @@ void acpi_build(AcpiBuildTables *tables, MachineState *machine)
+             build_slit(tables_blob, tables->linker);
+         }
+     }
+-    if (acpi_get_mcfg(&mcfg)) {
++    if ((mcfg = acpi_get_mcfg()) != NULL) {
+         acpi_add_table(table_offsets, tables_blob);
+-        build_mcfg_q35(tables_blob, tables->linker, &mcfg);
++        build_mcfg_q35(tables_blob, tables->linker, mcfg);
+     }
++    cleanup_mcfg(mcfg);
++
+     if (x86_iommu_get_default()) {
+         IommuType IOMMUType = x86_iommu_get_type();
+         if (IOMMUType == TYPE_AMD) {
 -- 
 2.7.4
