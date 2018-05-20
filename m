@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53417)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42306)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhangckid@gmail.com>) id 1fKQtb-0007Bp-Lx
-	for qemu-devel@nongnu.org; Sun, 20 May 2018 12:09:21 -0400
+	(envelope-from <zhangckid@gmail.com>) id 1fKT6W-0001UB-57
+	for qemu-devel@nongnu.org; Sun, 20 May 2018 14:30:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zhangckid@gmail.com>) id 1fKQtZ-00077p-TA
-	for qemu-devel@nongnu.org; Sun, 20 May 2018 12:09:19 -0400
-Received: from mail-wm0-x236.google.com ([2a00:1450:400c:c09::236]:36825)
+	(envelope-from <zhangckid@gmail.com>) id 1fKT6T-0002Cp-Dj
+	for qemu-devel@nongnu.org; Sun, 20 May 2018 14:30:48 -0400
+Received: from mail-wr0-x241.google.com ([2a00:1450:400c:c0c::241]:38502)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <zhangckid@gmail.com>) id 1fKQtZ-00076H-In
-	for qemu-devel@nongnu.org; Sun, 20 May 2018 12:09:17 -0400
-Received: by mail-wm0-x236.google.com with SMTP id n10-v6so22613285wmc.1
-	for <qemu-devel@nongnu.org>; Sun, 20 May 2018 09:09:17 -0700 (PDT)
+	(Exim 4.71) (envelope-from <zhangckid@gmail.com>) id 1fKT6T-0002CK-1K
+	for qemu-devel@nongnu.org; Sun, 20 May 2018 14:30:45 -0400
+Received: by mail-wr0-x241.google.com with SMTP id 94-v6so13851720wrf.5
+	for <qemu-devel@nongnu.org>; Sun, 20 May 2018 11:30:44 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20180515144402.GB2749@work-vm>
+In-Reply-To: <20180515165517.GE2749@work-vm>
 References: <20180514165424.12884-1-zhangckid@gmail.com>
-	<20180514165424.12884-10-zhangckid@gmail.com>
-	<20180515144402.GB2749@work-vm>
+	<20180514165424.12884-8-zhangckid@gmail.com>
+	<20180515165517.GE2749@work-vm>
 From: Zhang Chen <zhangckid@gmail.com>
-Date: Mon, 21 May 2018 00:09:15 +0800
-Message-ID: <CAK3tnvJco07CtchA=G8Dhp7eABVdkGW54JBX-2u=jwSYTB2-jw@mail.gmail.com>
+Date: Mon, 21 May 2018 02:30:43 +0800
+Message-ID: <CAK3tnvLofaRAT3SwmYCBgYy6SuP4GkGt9J4KDEWEZkJYF-61Mw@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH V7 RESEND 09/17] COLO: Flush memory data
- from ram cache
+Subject: Re: [Qemu-devel] [PATCH V7 RESEND 07/17] COLO: Load dirty pages
+ into SVM's RAM cache firstly
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,133 +33,291 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 Cc: qemu-devel@nongnu.org, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Jason Wang <jasowang@redhat.com>, zhanghailiang <zhang.zhanghailiang@huawei.com>, Li Zhijian <lizhijian@cn.fujitsu.com>
 
-On Tue, May 15, 2018 at 10:44 PM, Dr. David Alan Gilbert <
+On Wed, May 16, 2018 at 12:55 AM, Dr. David Alan Gilbert <
 dgilbert@redhat.com> wrote:
 
 > * Zhang Chen (zhangckid@gmail.com) wrote:
-> > During the time of VM's running, PVM may dirty some pages, we will
-> transfer
-> > PVM's dirty pages to SVM and store them into SVM's RAM cache at next
-> checkpoint
-> > time. So, the content of SVM's RAM cache will always be same with PVM's
-> memory
-> > after checkpoint.
+> > We should not load PVM's state directly into SVM, because there maybe
+> some
+> > errors happen when SVM is receving data, which will break SVM.
 > >
-> > Instead of flushing all content of PVM's RAM cache into SVM's MEMORY,
-> > we do this in a more efficient way:
-> > Only flush any page that dirtied by PVM since last checkpoint.
-> > In this way, we can ensure SVM's memory same with PVM's.
-> >
-> > Besides, we must ensure flush RAM cache before load device state.
+> > We need to ensure receving all data before load the state into SVM. We
+> use
+> > an extra memory to cache these data (PVM's ram). The ram cache in
+> secondary side
+> > is initially the same as SVM/PVM's memory. And in the process of
+> checkpoint,
+> > we cache the dirty pages of PVM into this ram cache firstly, so this ram
+> cache
+> > always the same as PVM's memory at every checkpoint, then we flush this
+> cached ram
+> > to SVM after we receive all PVM's state.
 > >
 > > Signed-off-by: zhanghailiang <zhang.zhanghailiang@huawei.com>
 > > Signed-off-by: Li Zhijian <lizhijian@cn.fujitsu.com>
-> > Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> > Signed-off-by: Zhang Chen <zhangckid@gmail.com>
 > > ---
-> >  migration/ram.c        | 39 +++++++++++++++++++++++++++++++++++++++
-> >  migration/trace-events |  2 ++
-> >  2 files changed, 41 insertions(+)
+> >  include/exec/ram_addr.h |  1 +
+> >  migration/migration.c   |  2 +
+> >  migration/ram.c         | 99 +++++++++++++++++++++++++++++++++++++++--
+> >  migration/ram.h         |  4 ++
+> >  migration/savevm.c      |  2 +-
+> >  5 files changed, 104 insertions(+), 4 deletions(-)
 > >
+> > diff --git a/include/exec/ram_addr.h b/include/exec/ram_addr.h
+> > index cf2446a176..51ec153a57 100644
+> > --- a/include/exec/ram_addr.h
+> > +++ b/include/exec/ram_addr.h
+> > @@ -27,6 +27,7 @@ struct RAMBlock {
+> >      struct rcu_head rcu;
+> >      struct MemoryRegion *mr;
+> >      uint8_t *host;
+> > +    uint8_t *colo_cache; /* For colo, VM's ram cache */
+> >      ram_addr_t offset;
+> >      ram_addr_t used_length;
+> >      ram_addr_t max_length;
+> > diff --git a/migration/migration.c b/migration/migration.c
+> > index 8dee7dd309..cfc1b958b9 100644
+> > --- a/migration/migration.c
+> > +++ b/migration/migration.c
+> > @@ -421,6 +421,8 @@ static void process_incoming_migration_co(void
+> *opaque)
+> >
+> >          /* Wait checkpoint incoming thread exit before free resource */
+> >          qemu_thread_join(&mis->colo_incoming_thread);
+> > +        /* We hold the global iothread lock, so it is safe here */
+> > +        colo_release_ram_cache();
+> >      }
+> >
+> >      if (ret < 0) {
 > > diff --git a/migration/ram.c b/migration/ram.c
-> > index e35dfee06e..4235a8f24d 100644
+> > index 912810c18e..7ca845f8a9 100644
 > > --- a/migration/ram.c
 > > +++ b/migration/ram.c
-> > @@ -3031,6 +3031,40 @@ static bool postcopy_is_running(void)
-> >      return ps >= POSTCOPY_INCOMING_LISTENING && ps <
-> POSTCOPY_INCOMING_END;
+> > @@ -2520,6 +2520,20 @@ static inline void *host_from_ram_block_offset(RAMBlock
+> *block,
+> >      return block->host + offset;
+> >  }
+> >
+> > +static inline void *colo_cache_from_block_offset(RAMBlock *block,
+> > +                                                 ram_addr_t offset)
+> > +{
+> > +    if (!offset_in_ramblock(block, offset)) {
+> > +        return NULL;
+> > +    }
+> > +    if (!block->colo_cache) {
+> > +        error_report("%s: colo_cache is NULL in block :%s",
+> > +                     __func__, block->idstr);
+> > +        return NULL;
+> > +    }
+> > +    return block->colo_cache + offset;
+> > +}
+> > +
+> >  /**
+> >   * ram_handle_compressed: handle the zero page case
+> >   *
+> > @@ -2724,6 +2738,57 @@ static void decompress_data_with_multi_threads(QEMUFile
+> *f,
+> >      qemu_mutex_unlock(&decomp_done_lock);
 > >  }
 > >
 > > +/*
-> > + * Flush content of RAM cache into SVM's memory.
-> > + * Only flush the pages that be dirtied by PVM or SVM or both.
+> > + * colo cache: this is for secondary VM, we cache the whole
+> > + * memory of the secondary VM, it is need to hold the global lock
+> > + * to call this helper.
 > > + */
-> > +static void colo_flush_ram_cache(void)
+> > +int colo_init_ram_cache(void)
 > > +{
-> > +    RAMBlock *block = NULL;
-> > +    void *dst_host;
-> > +    void *src_host;
-> > +    unsigned long offset = 0;
+> > +    RAMBlock *block;
 > > +
-> > +    trace_colo_flush_ram_cache_begin(ram_state->migration_dirty_pages);
 > > +    rcu_read_lock();
-> > +    block = QLIST_FIRST_RCU(&ram_list.blocks);
+> > +    QLIST_FOREACH_RCU(block, &ram_list.blocks, next) {
+> > +        block->colo_cache = qemu_anon_ram_alloc(block->used_length,
+> > +                                                NULL,
+> > +                                                false);
+> > +        if (!block->colo_cache) {
+> > +            error_report("%s: Can't alloc memory for COLO cache of
+> block %s,"
+> > +                         "size 0x" RAM_ADDR_FMT, __func__, block->idstr,
+> > +                         block->used_length);
+> > +            goto out_locked;
+> > +        }
+> > +    }
+> > +    rcu_read_unlock();
+> > +    return 0;
 > > +
-> > +    while (block) {
-> > +        offset = migration_bitmap_find_dirty(ram_state, block, offset);
-> > +        migration_bitmap_clear_dirty(ram_state, block, offset);
+> > +out_locked:
+> > +    QLIST_FOREACH_RCU(block, &ram_list.blocks, next) {
+> > +        if (block->colo_cache) {
+> > +            qemu_anon_ram_free(block->colo_cache, block->used_length);
+> > +            block->colo_cache = NULL;
+> > +        }
+> > +    }
+> > +
+> > +    rcu_read_unlock();
+> > +    return -errno;
+> > +}
+> > +
+> > +/* It is need to hold the global lock to call this helper */
+> > +void colo_release_ram_cache(void)
+> > +{
+> > +    RAMBlock *block;
+> > +
+> > +    rcu_read_lock();
+> > +    QLIST_FOREACH_RCU(block, &ram_list.blocks, next) {
+> > +        if (block->colo_cache) {
+> > +            qemu_anon_ram_free(block->colo_cache, block->used_length);
+> > +            block->colo_cache = NULL;
+> > +        }
+> > +    }
+> > +    rcu_read_unlock();
+> > +}
+> > +
+> >  /**
+> >   * ram_load_setup: Setup RAM for migration incoming side
+> >   *
+> > @@ -2740,6 +2805,7 @@ static int ram_load_setup(QEMUFile *f, void
+> *opaque)
+> >
+> >      xbzrle_load_setup();
+> >      ramblock_recv_map_init();
+> > +
+> >      return 0;
+> >  }
+> >
+> > @@ -2753,6 +2819,7 @@ static int ram_load_cleanup(void *opaque)
+> >          g_free(rb->receivedmap);
+> >          rb->receivedmap = NULL;
+> >      }
+> > +
+> >      return 0;
+> >  }
+> >
+> > @@ -2966,7 +3033,7 @@ static int ram_load(QEMUFile *f, void *opaque, int
+> version_id)
+> >
+> >      while (!postcopy_running && !ret && !(flags & RAM_SAVE_FLAG_EOS)) {
+> >          ram_addr_t addr, total_ram_bytes;
+> > -        void *host = NULL;
+> > +        void *host = NULL, *host_bak = NULL;
+> >          uint8_t ch;
+> >
+> >          addr = qemu_get_be64(f);
+> > @@ -2986,13 +3053,36 @@ static int ram_load(QEMUFile *f, void *opaque,
+> int version_id)
+> >                       RAM_SAVE_FLAG_COMPRESS_PAGE |
+> RAM_SAVE_FLAG_XBZRLE)) {
+> >              RAMBlock *block = ram_block_from_stream(f, flags);
+> >
+> > -            host = host_from_ram_block_offset(block, addr);
+> > +             /*
+> > +             * After going into COLO, we should load the Page into
+> colo_cache
+> > +             * NOTE: We need to keep a copy of SVM's ram in colo_cache.
+> > +             * Privously, we copied all these memory in preparing stage
+> of COLO
+> > +             * while we need to stop VM, which is a time-consuming
+> process.
+> > +             * Here we optimize it by a trick, back-up every page while
+> in
+> > +             * migration process while COLO is enabled, though it
+> affects the
+> > +             * speed of the migration, but it obviously reduce the
+> downtime of
+> > +             * back-up all SVM'S memory in COLO preparing stage.
+> > +             */
+> > +            if (migration_incoming_in_colo_state()) {
+> > +                host = colo_cache_from_block_offset(block, addr);
+> > +                /* After goes into COLO state, don't backup it any more
+> */
+> > +                if (!migration_incoming_in_colo_state()) {
 >
-> That looks suspicious to me; shouldn't that be inside the else block
-> below?   If the find_dirty returns a bit after or equal to used_length
-> (i.e. there's nothing dirty in this block), then you don't want to clear
-> that bit yet because it really means there's a dirty page at the start
-> of the next block?
+> I don't understand how we can reach this nested 'if';
+> colo_cache_from_block_offset is short and simple; so how can
+> migration_incoming_in_colo_state() be both true and false?
 >
+> I think this is trying to do it for when COLO is enabled but when
+> receiving the first checkpoint you want to take a copy; but I don't
+> think that's what the 'if' is doing.
 >
-Make sense. I will move it to the 'else block below'.
+
+I'm also confused about this part.
+I checked old version codes for this part, but it looks same .
+How do you think this should be done?
+
+Or maybe the original author know some detail?
+CC Lizhijian and Zhanghailiang
 
 Thanks
 Zhang Chen
 
 
 
+
+>
 > Dave
 >
-> > +        if (offset << TARGET_PAGE_BITS >= block->used_length) {
-> > +            offset = 0;
-> > +            block = QLIST_NEXT_RCU(block, next);
-> > +        } else {
-> > +            dst_host = block->host + (offset << TARGET_PAGE_BITS);
-> > +            src_host = block->colo_cache + (offset << TARGET_PAGE_BITS);
-> > +            memcpy(dst_host, src_host, TARGET_PAGE_SIZE);
-> > +        }
-> > +    }
+> > +                    host_bak = host;
+> > +                }
+> > +            }
+> > +            if (!migration_incoming_in_colo_state()) {
+> > +                host = host_from_ram_block_offset(block, addr);
+> > +            }
+> >              if (!host) {
+> >                  error_report("Illegal RAM offset " RAM_ADDR_FMT, addr);
+> >                  ret = -EINVAL;
+> >                  break;
+> >              }
+> > -            ramblock_recv_bitmap_set(block, host);
 > > +
-> > +    rcu_read_unlock();
-> > +    trace_colo_flush_ram_cache_end();
-> > +    assert(ram_state->migration_dirty_pages == 0);
-> > +}
+> > +            if (!migration_incoming_in_colo_state()) {
+> > +                ramblock_recv_bitmap_set(block, host);
+> > +            }
 > > +
-> >  static int ram_load(QEMUFile *f, void *opaque, int version_id)
-> >  {
-> >      int flags = 0, ret = 0, invalid_flags = 0;
-> > @@ -3043,6 +3077,7 @@ static int ram_load(QEMUFile *f, void *opaque, int
+> >              trace_ram_load_loop(block->idstr, (uint64_t)addr, flags,
+> host);
+> >          }
+> >
+> > @@ -3087,6 +3177,9 @@ static int ram_load(QEMUFile *f, void *opaque, int
 > version_id)
-> >      bool postcopy_running = postcopy_is_running();
-> >      /* ADVISE is earlier, it shows the source has the postcopy
-> capability on */
-> >      bool postcopy_advised = postcopy_is_advised();
-> > +    bool need_flush = false;
+> >          if (!ret) {
+> >              ret = qemu_file_get_error(f);
+> >          }
+> > +        if (!ret && host_bak && host) {
+> > +            memcpy(host_bak, host, TARGET_PAGE_SIZE);
+> > +        }
+> >      }
 > >
-> >      seq_iter++;
-> >
-> > @@ -3218,6 +3253,10 @@ static int ram_load(QEMUFile *f, void *opaque,
-> int version_id)
 > >      ret |= wait_for_decompress_done();
-> >      rcu_read_unlock();
-> >      trace_ram_load_complete(ret, seq_iter);
+> > diff --git a/migration/ram.h b/migration/ram.h
+> > index 5030be110a..66e9b86ff0 100644
+> > --- a/migration/ram.h
+> > +++ b/migration/ram.h
+> > @@ -64,4 +64,8 @@ bool ramblock_recv_bitmap_test_byte_offset(RAMBlock
+> *rb, uint64_t byte_offset);
+> >  void ramblock_recv_bitmap_set(RAMBlock *rb, void *host_addr);
+> >  void ramblock_recv_bitmap_set_range(RAMBlock *rb, void *host_addr,
+> size_t nr);
+> >
+> > +/* ram cache */
+> > +int colo_init_ram_cache(void);
+> > +void colo_release_ram_cache(void);
 > > +
-> > +    if (!ret  && migration_incoming_in_colo_state() && need_flush) {
-> > +        colo_flush_ram_cache();
-> > +    }
-> >      return ret;
+> >  #endif
+> > diff --git a/migration/savevm.c b/migration/savevm.c
+> > index c43d220220..ec0bff09ce 100644
+> > --- a/migration/savevm.c
+> > +++ b/migration/savevm.c
+> > @@ -1807,7 +1807,7 @@ static int loadvm_handle_cmd_packaged(MigrationIncomingState
+> *mis)
+> >  static int loadvm_process_enable_colo(MigrationIncomingState *mis)
+> >  {
+> >      migration_incoming_enable_colo();
+> > -    return 0;
+> > +    return colo_init_ram_cache();
 > >  }
 > >
-> > diff --git a/migration/trace-events b/migration/trace-events
-> > index 9295b4cf40..8e2f9749e0 100644
-> > --- a/migration/trace-events
-> > +++ b/migration/trace-events
-> > @@ -78,6 +78,8 @@ ram_load_postcopy_loop(uint64_t addr, int flags) "@%"
-> PRIx64 " %x"
-> >  ram_postcopy_send_discard_bitmap(void) ""
-> >  ram_save_page(const char *rbname, uint64_t offset, void *host) "%s:
-> offset: 0x%" PRIx64 " host: %p"
-> >  ram_save_queue_pages(const char *rbname, size_t start, size_t len) "%s:
-> start: 0x%zx len: 0x%zx"
-> > +colo_flush_ram_cache_begin(uint64_t dirty_pages) "dirty_pages %" PRIu64
-> > +colo_flush_ram_cache_end(void) ""
-> >
-> >  # migration/migration.c
-> >  await_return_path_close_on_source_close(void) ""
+> >  /*
 > > --
 > > 2.17.0
 > >
