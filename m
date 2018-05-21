@@ -1,26 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58165)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46351)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <michael@walle.cc>) id 1fKkPi-0000d0-G4
-	for qemu-devel@nongnu.org; Mon, 21 May 2018 08:59:47 -0400
+	(envelope-from <Andrew_Jenner@mentor.com>) id 1fKhOd-0007Hf-67
+	for qemu-devel@nongnu.org; Mon, 21 May 2018 05:46:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <michael@walle.cc>) id 1fKkPh-0003O1-Lu
-	for qemu-devel@nongnu.org; Mon, 21 May 2018 08:59:46 -0400
-Received: from ssl.serverraum.org ([2a01:4f8:222:d45::1:2]:47203)
+	(envelope-from <Andrew_Jenner@mentor.com>) id 1fKhOY-0004V7-64
+	for qemu-devel@nongnu.org; Mon, 21 May 2018 05:46:27 -0400
+Received: from relay1.mentorg.com ([192.94.38.131]:50147)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <michael@walle.cc>) id 1fKkPh-0003LX-El
-	for qemu-devel@nongnu.org; Mon, 21 May 2018 08:59:45 -0400
+	(Exim 4.71) (envelope-from <Andrew_Jenner@mentor.com>)
+	id 1fKhOX-0004TJ-VW
+	for qemu-devel@nongnu.org; Mon, 21 May 2018 05:46:22 -0400
+References: <cover.1526671191.git.julian@codesourcery.com>
+	<8f1a519f9faa6ea16df5040c45bb2d5d7dfb8d50.1526671191.git.julian@codesourcery.com>
+	<49dbe9f7-0558-12d4-363a-fe13099f86bd@denx.de>
+	<20180518211648.5d849941@octopus>
+From: Andrew Jenner <andrew@codesourcery.com>
+Message-ID: <f3d139d3-d1d2-88c9-6390-37ea809e1fff@codesourcery.com>
+Date: Mon, 21 May 2018 10:46:15 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8;
- format=flowed
-Date: Mon, 21 May 2018 14:59:42 +0200
-From: Michael Walle <michael@walle.cc>
-In-Reply-To: <20180509034658.26455-14-f4bug@amsat.org>
-References: <20180509034658.26455-1-f4bug@amsat.org>
-	<20180509034658.26455-14-f4bug@amsat.org>
-Message-ID: <4ffdadd450170974d33c44022b5dc310@walle.cc>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 13/14] sdcard: Add a "validate-crc"
- property
+In-Reply-To: <20180518211648.5d849941@octopus>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v3 1/2] Add generic Nios II board.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,27 +31,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Cc: Peter Maydell <peter.maydell@linaro.org>, "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Alistair Francis <alistair@alistair23.me>, =?UTF-8?Q?Philippe_Mathieu-Daud?= =?UTF-8?Q?=C3=A9?= <philippe.mathieu.daude@gmail.com>
+To: Julian Brown <julian@codesourcery.com>, Marek Vasut <marex@denx.de>
+Cc: qemu-devel@nongnu.org, Sandra Loosemore <sandra@codesourcery.com>, Chris Wulff <crwulff@gmail.com>
 
-Am 2018-05-09 05:46, schrieb Philippe Mathieu-Daud=C3=A9:
-> Since not all modelled controllers use the CRC verification (which is
-> somehow expensive), let the controller have a configurable property
-> to enable verification.
->=20
-> So far only the Milkymist controller uses it.
->=20
-> This silent the Coverity warning:
->=20
->   "Code block is unreachable because of the syntactic structure of the
-> code (CWE-561)"
->=20
-> and fixes the following issue:
->=20
-> - CID1005332 (hw/sd/sd.c::sd_req_crc_validate) Structurally dead code
->=20
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+On 18/05/2018 21:16, Julian Brown wrote:
+> On Fri, 18 May 2018 21:50:55 +0200
+> Marek Vasut <marex@denx.de> wrote:
+> 
+>> On 05/18/2018 09:23 PM, Julian Brown wrote:
+>>> This patch adds support for a generic MMU-less Nios II board that
+>>> can be used e.g. for bare-metal compiler testing.  Nios II booting
+>>> is also tweaked so that bare-metal binaries start executing in RAM
+>>> starting at 0x00000000, rather than an alias at 0xc0000000, which
+>>> allows features such as unwinding to work when binaries are linked
+>>> to start at the beginning of the address space.
+>>>    
+>> So why dont you just use the 10m50 GHRD for this , why do you need
+>> custom board ?
+> 
+> I think because we wanted a board with no MMU, since our startup code
+> doesn't support that. Maybe Andrew can confirm/deny?
 
-Tested-by: Michael Walle <michael@walle.cc>
+Yes, that's correct.
 
--michael
+Thanks,
+
+Andrew
