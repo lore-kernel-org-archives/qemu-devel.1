@@ -1,26 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52325)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55350)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1fKpKe-0006r0-8C
-	for qemu-devel@nongnu.org; Mon, 21 May 2018 14:14:53 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1fKpZ2-0006XK-Eb
+	for qemu-devel@nongnu.org; Mon, 21 May 2018 14:29:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1fKpKa-00084M-97
-	for qemu-devel@nongnu.org; Mon, 21 May 2018 14:14:52 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:48572)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1fKpKZ-00082t-Oy
-	for qemu-devel@nongnu.org; Mon, 21 May 2018 14:14:47 -0400
-Date: Mon, 21 May 2018 15:14:35 -0300
+	(envelope-from <ehabkost@redhat.com>) id 1fKpZ1-00063X-EH
+	for qemu-devel@nongnu.org; Mon, 21 May 2018 14:29:44 -0400
+Date: Mon, 21 May 2018 15:29:28 -0300
 From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20180521181435.GN25013@localhost.localdomain>
-References: <20180517192325.8335-1-danielhb@linux.ibm.com>
-	<20180517192325.8335-2-danielhb@linux.ibm.com>
-	<87wow1gxi8.fsf@dusky.pond.sub.org>
+Message-ID: <20180521182928.GO25013@localhost.localdomain>
+References: <20180518180440-mutt-send-email-mst@kernel.org>
+	<20180518170956.GI8615@redhat.com>
+	<20180518174133.GC25013@localhost.localdomain>
+	<87bmdc18q5.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <87wow1gxi8.fsf@dusky.pond.sub.org>
-Subject: Re: [Qemu-devel] [PATCH v7 1/3] qmp: adding
- 'wakeup-suspend-support' in query-target
+In-Reply-To: <87bmdc18q5.fsf@dusky.pond.sub.org>
+Subject: Re: [Qemu-devel] storing machine data in qcow images?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,84 +26,65 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Markus Armbruster <armbru@redhat.com>
-Cc: Daniel Henrique Barboza <danielhb@linux.ibm.com>, qemu-devel@nongnu.org, dgilbert@redhat.com, mdroth@linux.vnet.ibm.com, Stefano Stabellini <sstabellini@kernel.org>, Anthony Perard <anthony.perard@citrix.com>, libvir-list@redhat.com, "Michael S. Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>
+Cc: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>, kwolf@redhat.com, qemu-block@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org, mreitz@redhat.com, stefanha@redhat.com
 
-On Fri, May 18, 2018 at 10:48:31AM +0200, Markus Armbruster wrote:
-> Cc'ing a few more people.
+On Sat, May 19, 2018 at 08:05:06AM +0200, Markus Armbruster wrote:
+> Eduardo Habkost <ehabkost@redhat.com> writes:
 > 
-> Daniel Henrique Barboza <danielhb@linux.ibm.com> writes:
+> [...]
+> > About being more expressive than just a single list of key,value
+> > pairs, I don't see any evidence of that being necessary for the
+> > problems we're trying to address.
 > 
-> > When issuing the qmp/hmp 'system_wakeup' command, what happens in a
-> > nutshell is:
-> >
-> > - qmp_system_wakeup_request set runstate to RUNNING, sets a wakeup_reason
-> > and notify the event
-> > - in the main_loop, all vcpus are paused, a system reset is issued, all
-> > subscribers of wakeup_notifiers receives a notification, vcpus are then
-> > resumed and the wake up QAPI event is fired
-> >
-> > Note that this procedure alone doesn't ensure that the guest will awake
-> > from SUSPENDED state - the subscribers of the wake up event must take
-> > action to resume the guest, otherwise the guest will simply reboot.
-> >
-> > At this moment there are only two subscribers of the wake up event: one
-> > in hw/acpi/core.c and another one in hw/i386/xen/xen-hvm.c. This means
-> > that system_wakeup does not work as intended with other architectures.
-> >
-> > However, only the presence of 'system_wakeup' is required for QGA to
-> > support 'guest-suspend-ram' and 'guest-suspend-hybrid' at this moment.
-> > This means that the user/management will expect to suspend the guest using
-> > one of those suspend commands and then resume execution using system_wakeup,
-> > regardless of the support offered in system_wakeup in the first place.
-> >
-> > This patch adds a new flag called 'wakeup-suspend-support' in TargetInfo
-> > that allows the caller to query if the guest supports wake up from
-> > suspend via system_wakeup. It goes over the subscribers of the wake up
-> > event and, if it's empty, it assumes that the guest does not support
-> > wake up from suspend (and thus, pm-suspend itself).
-> >
-> > This is the expected output of query-target when running a x86 guest:
-> >
-> > {"execute" : "query-target"}
-> > {"return": {"arch": "x86_64", "wakeup-suspend-support": true}}
-> >
-> > This is the output when running a pseries guest:
-> >
-> > {"execute" : "query-target"}
-> > {"return": {"arch": "ppc64", "wakeup-suspend-support": false}}
-> >
-> > Given that the TargetInfo structure is read-only, adding a new flag to
-> > it is backwards compatible. There is no need to deprecate the old
-> > TargetInfo format.
-> >
-> > With this extra tool, management can avoid situations where a guest
-> > that does not have proper suspend/wake capabilities ends up in
-> > inconsistent state (e.g.
-> > https://github.com/open-power-host-os/qemu/issues/31).
-> >
-> > Reported-by: Balamuruhan S <bala24@linux.vnet.ibm.com>
-> > Signed-off-by: Daniel Henrique Barboza <danielhb@linux.ibm.com>
+> Short history of a configuration format you might have encountered:
 > 
-> Is query-target is the right place to carry this flag?  v7 is rather
-> late for this kind of question; my sincere apologies.
-[...]
+> 1. A couple of (key, value) is all we ne need for the problems we're
+> trying to address.  (v0.4, 2003)
 > 
-> Issue#2: the flag isn't a property of the target.  Due to -no-acpi, it's
-> not even a property of the machine type.  If it was, query-machines
-> would be the natural owner of the flag.
+> 2.1. I got this one special snowflake problem where I actually need a few
+> related values.  Fortunately, this little ad hoc parser can take apart
+> the key's single value easily.  (ca. v0.8, 2005)
 > 
-> Perhaps query-machines is still the proper owner.  The value of
-> wakeup-suspend-support would have to depend on -no-acpi for the machine
-> types that honor it.  Not ideal; I'd prefer MachineInfo to be static.
-> Tolerable?  I guess that's also a libvirt question.
+> ...
+> 
+> 2.n. Snowflakes are surprisingly common, but fortunately one more little
+> ad hoc parser can't hurt.
+> 
+> 3. Umm, this is getting messy.  Let's have proper infrastructure for
+> two-level keys.  Surely two levels are all we ne need for the problems
+> we're trying to address.  Fortunately, we can bolt them on without too
+> much trouble.  (v0.12, 2009)
+> 
+> 4. Err, trees, I'm afraid we actually need trees.  Fortunately, we can
+> hack them into the existing two-level infrastructure without too much
+> trouble.  (v1.3, 2013)
+> 
+> 5. You are in a maze of twisting little passages, all different.
+> (today)
+> 
+> 
+> How confident are we a single list of (key, value) is really all we're
+> going to need?
+> 
+> Even if we think it is, would it be possible to provide for a future
+> extension to trees at next to no cost?
 
-It depends when libvirt is going to query it.  Is it OK to only
-query it after the VM is already up and running?  If it is, then
-we can simply expose it as a read-only property of the machine
-object.
+I'm confident that a list of key,values is all we need for the
+current problem.
 
-Or, if we don't want to rely on qom-get as a stable API, we can
-add a new query command (query-machine? query-power-management?)
+I also agree that being possible to represent trees is a good
+idea, and it would probably have next to no cost.
+
+But I disagree if the point here is "we will eventually need much
+more complex data in the future, so let's require users to move
+to OVF instead".
+
+The point here is to allow users to simply copy an existing disk
+image, and it will contain enough hints for a cloud stack to
+choose reasonable defaults for machine-type and disk type
+automatically.  Requiring the user to perform a separate step to
+encapsulate the disk image in another file format defeats the
+whole purpose of the proposal.
 
 -- 
 Eduardo
