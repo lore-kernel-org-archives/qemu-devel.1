@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50436)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50761)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cyrus296@gmail.com>) id 1fKnrl-0005Dp-TJ
-	for qemu-devel@nongnu.org; Mon, 21 May 2018 12:40:58 -0400
+	(envelope-from <eblake@redhat.com>) id 1fKnsY-0005n6-D1
+	for qemu-devel@nongnu.org; Mon, 21 May 2018 12:41:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cyrus296@gmail.com>) id 1fKnrk-0005m6-T1
-	for qemu-devel@nongnu.org; Mon, 21 May 2018 12:40:57 -0400
-Received: from mail-qt0-x229.google.com ([2607:f8b0:400d:c0d::229]:45075)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <cyrus296@gmail.com>) id 1fKnrk-0005lP-O2
-	for qemu-devel@nongnu.org; Mon, 21 May 2018 12:40:56 -0400
-Received: by mail-qt0-x229.google.com with SMTP id j42-v6so19652528qtj.12
-	for <qemu-devel@nongnu.org>; Mon, 21 May 2018 09:40:55 -0700 (PDT)
+	(envelope-from <eblake@redhat.com>) id 1fKnsX-0006G9-G9
+	for qemu-devel@nongnu.org; Mon, 21 May 2018 12:41:46 -0400
+References: <20180521163203.26590-1-ross.zwisler@linux.intel.com>
+	<20180521163203.26590-3-ross.zwisler@linux.intel.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <6332df7d-3588-9ecc-6220-2f40c1581fe6@redhat.com>
+Date: Mon, 21 May 2018 11:41:33 -0500
 MIME-Version: 1.0
-From: Calvin Lee <cyrus296@gmail.com>
-Date: Mon, 21 May 2018 10:40:33 -0600
-Message-ID: <CAG7gSg0DJHjZiPZr6+itsmSOGJ372HRipEUsh2x8dj8EWUjkhg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: [Qemu-devel] Ping [PATCH RFC v2 0/2] Fix UART serial implementation
+In-Reply-To: <20180521163203.26590-3-ross.zwisler@linux.intel.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [qemu PATCH v4 2/4] tests/.gitignore: add entry
+ for generated file
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,20 +25,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: mst@redhat.com, pbonzini@redhat.com, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Calvin Lee <cyrus296@gmail.com>
+To: Ross Zwisler <ross.zwisler@linux.intel.com>, Igor Mammedov <imammedo@redhat.com>, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, Haozhong Zhang <haozhong.zhang@intel.com>, Eduardo Habkost <ehabkost@redhat.com>, linux-nvdimm <linux-nvdimm@lists.01.org>, "Michael S . Tsirkin" <mst@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, "Elliott, Robert (Persistent Memory)" <elliott@hpe.com>, qemu block <qemu-block@nongnu.org>
 
-Hello,
+On 05/21/2018 11:32 AM, Ross Zwisler wrote:
+> After a "make check" we end up with the following:
+> 
+> $ git status
+> On branch master
+> Your branch is up-to-date with 'origin/master'.
+> 
+> Untracked files:
+>    (use "git add <file>..." to include in what will be committed)
+> 
+> 	tests/test-block-backend
+> 
+> nothing added to commit but untracked files present (use "git add" to track)
+> 
+> Signed-off-by: Ross Zwisler <ross.zwisler@linux.intel.com>
+> Fixes: commit ad0df3e0fdac ("block: test blk_aio_flush() with blk->root == NULL")
+> Cc: Kevin Wolf <kwolf@redhat.com>
+> ---
+>   tests/.gitignore | 1 +
+>   1 file changed, 1 insertion(+)
 
-It's been about a week since the last email to my patches, in case anyone would
-like to review but missed them.
+Reviewed-by: Eric Blake <eblake@redhat.com>
 
-Patches are the following on patchwork:
-http://patchwork.ozlabs.org/patch/912281/
-http://patchwork.ozlabs.org/patch/912282/
+> 
+> diff --git a/tests/.gitignore b/tests/.gitignore
+> index fb62d2299b..2bc61a9a58 100644
+> --- a/tests/.gitignore
+> +++ b/tests/.gitignore
+> @@ -21,6 +21,7 @@ test-base64
+>   test-bdrv-drain
+>   test-bitops
+>   test-bitcnt
+> +test-block-backend
+>   test-blockjob
+>   test-blockjob-txn
+>   test-bufferiszero
+> 
 
-And the following on patchew:
-http://patchew.org/QEMU/20180512000545.966-1-cyrus296@gmail.com/
-
-Thank you,
-Calvin Lee
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
