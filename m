@@ -1,22 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37441)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38003)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <michael@walle.cc>) id 1fKn43-0002Ac-8s
-	for qemu-devel@nongnu.org; Mon, 21 May 2018 11:49:36 -0400
+	(envelope-from <michael@walle.cc>) id 1fKn5s-00049S-Gs
+	for qemu-devel@nongnu.org; Mon, 21 May 2018 11:51:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <michael@walle.cc>) id 1fKn42-00038Z-8K
-	for qemu-devel@nongnu.org; Mon, 21 May 2018 11:49:35 -0400
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
-Content-Transfer-Encoding: 7bit
-Date: Mon, 21 May 2018 17:49:31 +0200
+	(envelope-from <michael@walle.cc>) id 1fKn5o-00047K-LX
+	for qemu-devel@nongnu.org; Mon, 21 May 2018 11:51:28 -0400
 From: Michael Walle <michael@walle.cc>
-In-Reply-To: <CAFEAcA-Q6c7Z49uxup1HdyaEvWt+er_B8eYcJn0UYDiXShz1eQ@mail.gmail.com>
-References: <20180521122100.22602-1-michael@walle.cc>
-	<20180521122100.22602-3-michael@walle.cc>
-	<CAFEAcA-Q6c7Z49uxup1HdyaEvWt+er_B8eYcJn0UYDiXShz1eQ@mail.gmail.com>
-Message-ID: <7bf9b59e7e457efc1a117597ab8d4aae@walle.cc>
-Subject: Re: [Qemu-devel] [PATCH v2 2/2] target/lm32: hold BQL in gdbstub
+Date: Mon, 21 May 2018 17:49:52 +0200
+Message-Id: <20180521154952.15421-2-michael@walle.cc>
+In-Reply-To: <20180521154952.15421-1-michael@walle.cc>
+References: <20180521154952.15421-1-michael@walle.cc>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL 1/1] lm32: take BQL before writing IP/IM register
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,54 +22,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?Q?Alex_Benn=C3=A9e?= <alex.bennee@linaro.org>, qemu-stable <qemu-stable@nongnu.org>
+To: qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>, Michael Walle <michael@walle.cc>, qemu-stable@nongnu.org
 
-Am 2018-05-21 14:25, schrieb Peter Maydell:
-> On 21 May 2018 at 13:21, Michael Walle <michael@walle.cc> wrote:
->> Changing the IP/IM registers may cause interrupts, so hold the BQL.
->> 
->> Cc: qemu-stable@nongnu.org
->> Signed-off-by: Michael Walle <michael@walle.cc>
->> ---
->>  target/lm32/gdbstub.c | 5 +++++
->>  1 file changed, 5 insertions(+)
->> 
->> diff --git a/target/lm32/gdbstub.c b/target/lm32/gdbstub.c
->> index cf929dd392..dac9418a2b 100644
->> --- a/target/lm32/gdbstub.c
->> +++ b/target/lm32/gdbstub.c
->> @@ -18,6 +18,7 @@
->>   * License along with this library; if not, see 
->> <http://www.gnu.org/licenses/>.
->>   */
->>  #include "qemu/osdep.h"
->> +#include "qemu/main-loop.h"
->>  #include "qemu-common.h"
->>  #include "cpu.h"
->>  #include "exec/gdbstub.h"
->> @@ -82,10 +83,14 @@ int lm32_cpu_gdb_write_register(CPUState *cs, 
->> uint8_t *mem_buf, int n)
->>              env->ie = tmp;
->>              break;
->>          case 37:
->> +            qemu_mutex_lock_iothread();
->>              lm32_pic_set_im(env->pic_state, tmp);
->> +            qemu_mutex_unlock_iothread();
->>              break;
->>          case 38:
->> +            qemu_mutex_lock_iothread();
->>              lm32_pic_set_ip(env->pic_state, tmp);
->> +            qemu_mutex_unlock_iothread();
->>              break;
->>          }
->>      }
-> 
-> Are you sure this is necessary? I would have expected the gdbstub to
-> be operating under the qemu lock anyway.
+Writing to these registers may raise an interrupt request. Actually,
+this prevents the milkymist board from starting.
 
+Cc: qemu-stable@nongnu.org
+Signed-off-by: Michael Walle <michael@walle.cc>
+Tested-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+---
+ target/lm32/op_helper.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-You're right. The gdbstub is already holding the lock. So i'll drop this 
-and send the pull request right now.
-
--michael
+diff --git a/target/lm32/op_helper.c b/target/lm32/op_helper.c
+index 577f8306e3..234d55e056 100644
+--- a/target/lm32/op_helper.c
++++ b/target/lm32/op_helper.c
+@@ -102,12 +102,16 @@ void HELPER(wcsr_dc)(CPULM32State *env, uint32_t dc=
+)
+=20
+ void HELPER(wcsr_im)(CPULM32State *env, uint32_t im)
+ {
++    qemu_mutex_lock_iothread();
+     lm32_pic_set_im(env->pic_state, im);
++    qemu_mutex_unlock_iothread();
+ }
+=20
+ void HELPER(wcsr_ip)(CPULM32State *env, uint32_t im)
+ {
++    qemu_mutex_lock_iothread();
+     lm32_pic_set_ip(env->pic_state, im);
++    qemu_mutex_unlock_iothread();
+ }
+=20
+ void HELPER(wcsr_jtx)(CPULM32State *env, uint32_t jtx)
+--=20
+2.11.0
