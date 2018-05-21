@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42811)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42629)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1fKlQK-0002qa-VT
-	for qemu-devel@nongnu.org; Mon, 21 May 2018 10:04:33 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1fKlQF-0002nO-7H
+	for qemu-devel@nongnu.org; Mon, 21 May 2018 10:04:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1fKlQE-0000xR-DU
-	for qemu-devel@nongnu.org; Mon, 21 May 2018 10:04:28 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1fKlQ8-0000qo-RI
+	for qemu-devel@nongnu.org; Mon, 21 May 2018 10:04:23 -0400
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 21 May 2018 15:03:40 +0100
-Message-Id: <20180521140402.23318-6-peter.maydell@linaro.org>
+Date: Mon, 21 May 2018 15:03:36 +0100
+Message-Id: <20180521140402.23318-2-peter.maydell@linaro.org>
 In-Reply-To: <20180521140402.23318-1-peter.maydell@linaro.org>
 References: <20180521140402.23318-1-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PATCH 05/27] Make address_space_access_valid() take a
- MemTxAttrs argument
+Subject: [Qemu-devel] [PATCH 01/27] memory.h: Improve IOMMU related
+ documentation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,131 +23,183 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-arm@nongnu.org, qemu-devel@nongnu.org
 Cc: patches@linaro.org, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 
-As part of plumbing MemTxAttrs down to the IOMMU translate method,
-add MemTxAttrs as an argument to address_space_access_valid().
-Its callers either have an attrs value to hand, or don't care
-and can use MEMTXATTRS_UNSPECIFIED.
+Add more detail to the documentation for memory_region_init_iommu()
+and other IOMMU-related functions and data structures.
 
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- include/exec/memory.h      | 4 +++-
- include/sysemu/dma.h       | 3 ++-
- exec.c                     | 3 ++-
- target/s390x/diag.c        | 6 ++++--
- target/s390x/excp_helper.c | 3 ++-
- target/s390x/mmu_helper.c  | 3 ++-
- target/s390x/sigp.c        | 3 ++-
- 7 files changed, 17 insertions(+), 8 deletions(-)
+v2->v3 changes:
+ * minor wording tweaks per Eric's review
+ * moved the bit about requirements to notify out from the translate
+   method docs to the top level class doc comment
+ * added description of flags argument and in particular that it's
+   just an optimization and callers can pass IOMMU_NONE to get the
+   full permissions
+v1 -> v2 changes:
+ * documented replay method
+ * added note about wanting RCU or big qemu lock while calling
+   translate
+---
+ include/exec/memory.h | 105 ++++++++++++++++++++++++++++++++++++++----
+ 1 file changed, 95 insertions(+), 10 deletions(-)
 
 diff --git a/include/exec/memory.h b/include/exec/memory.h
-index b1bdb376d4..54263bd23b 100644
+index 4fa1227f13..cce355d2d8 100644
 --- a/include/exec/memory.h
 +++ b/include/exec/memory.h
-@@ -1937,8 +1937,10 @@ static inline MemoryRegion *address_space_translate(AddressSpace *as,
-  * @addr: address within that address space
-  * @len: length of the area to be checked
-  * @is_write: indicates the transfer direction
-+ * @attrs: memory attributes
-  */
--bool address_space_access_valid(AddressSpace *as, hwaddr addr, int len, bool is_write);
-+bool address_space_access_valid(AddressSpace *as, hwaddr addr, int len,
-+                                bool is_write, MemTxAttrs attrs);
+@@ -194,29 +194,100 @@ enum IOMMUMemoryRegionAttr {
+     IOMMU_ATTR_SPAPR_TCE_FD
+ };
  
- /* address_space_map: map a physical memory region into a host virtual address
++/**
++ * IOMMUMemoryRegionClass:
++ *
++ * All IOMMU implementations need to subclass TYPE_IOMMU_MEMORY_REGION
++ * and provide an implementation of at least the @translate method here
++ * to handle requests to the memory region. Other methods are optional.
++ *
++ * The IOMMU implementation must use the IOMMU notifier infrastructure
++ * to report whenever mappings are changed, by calling
++ * memory_region_notify_iommu() (or, if necessary, by calling
++ * memory_region_notify_one() for each registered notifier).
++ */
+ typedef struct IOMMUMemoryRegionClass {
+     /* private */
+     struct DeviceClass parent_class;
+ 
+     /*
+-     * Return a TLB entry that contains a given address. Flag should
+-     * be the access permission of this translation operation. We can
+-     * set flag to IOMMU_NONE to mean that we don't need any
+-     * read/write permission checks, like, when for region replay.
++     * Return a TLB entry that contains a given address.
++     *
++     * The IOMMUAccessFlags indicated via @flag are optional and may
++     * be specified as IOMMU_NONE to indicate that the caller needs
++     * the full translation information for both reads and writes. If
++     * the access flags are specified then the IOMMU implementation
++     * may use this as an optimization, to stop doing a page table
++     * walk as soon as it knows that the requested permissions are not
++     * allowed. If IOMMU_NONE is passed then the IOMMU must do the
++     * full page table walk and report the permissions in the returned
++     * IOMMUTLBEntry. (Note that this implies that an IOMMU may not
++     * return different mappings for reads and writes.)
++     *
++     * The returned information remains valid while the caller is
++     * holding the big QEMU lock or is inside an RCU critical section;
++     * if the caller wishes to cache the mapping beyond that it must
++     * register an IOMMU notifier so it can invalidate its cached
++     * information when the IOMMU mapping changes.
++     *
++     * @iommu: the IOMMUMemoryRegion
++     * @hwaddr: address to be translated within the memory region
++     * @flag: requested access permissions
+      */
+     IOMMUTLBEntry (*translate)(IOMMUMemoryRegion *iommu, hwaddr addr,
+                                IOMMUAccessFlags flag);
+-    /* Returns minimum supported page size */
++    /* Returns minimum supported page size in bytes.
++     * If this method is not provided then the minimum is assumed to
++     * be TARGET_PAGE_SIZE.
++     *
++     * @iommu: the IOMMUMemoryRegion
++     */
+     uint64_t (*get_min_page_size)(IOMMUMemoryRegion *iommu);
+-    /* Called when IOMMU Notifier flag changed */
++    /* Called when IOMMU Notifier flag changes (ie when the set of
++     * events which IOMMU users are requesting notification for changes).
++     * Optional method -- need not be provided if the IOMMU does not
++     * need to know exactly which events must be notified.
++     *
++     * @iommu: the IOMMUMemoryRegion
++     * @old_flags: events which previously needed to be notified
++     * @new_flags: events which now need to be notified
++     */
+     void (*notify_flag_changed)(IOMMUMemoryRegion *iommu,
+                                 IOMMUNotifierFlag old_flags,
+                                 IOMMUNotifierFlag new_flags);
+-    /* Set this up to provide customized IOMMU replay function */
++    /* Called to handle memory_region_iommu_replay().
++     *
++     * The default implementation of memory_region_iommu_replay() is to
++     * call the IOMMU translate method for every page in the address space
++     * with flag == IOMMU_NONE and then call the notifier if translate
++     * returns a valid mapping. If this method is implemented then it
++     * overrides the default behaviour, and must provide the full semantics
++     * of memory_region_iommu_replay(), by calling @notifier for every
++     * translation present in the IOMMU.
++     *
++     * Optional method -- an IOMMU only needs to provide this method
++     * if the default is inefficient or produces undesirable side effects.
++     *
++     * Note: this is not related to record-and-replay functionality.
++     */
+     void (*replay)(IOMMUMemoryRegion *iommu, IOMMUNotifier *notifier);
+ 
+-    /* Get IOMMU misc attributes */
+-    int (*get_attr)(IOMMUMemoryRegion *iommu, enum IOMMUMemoryRegionAttr,
++    /* Get IOMMU misc attributes. This is an optional method that
++     * can be used to allow users of the IOMMU to get implementation-specific
++     * information. The IOMMU implements this method to handle calls
++     * by IOMMU users to memory_region_iommu_get_attr() by filling in
++     * the arbitrary data pointer for any IOMMUMemoryRegionAttr values that
++     * the IOMMU supports. If the method is unimplemented then
++     * memory_region_iommu_get_attr() will always return -EINVAL.
++     *
++     * @iommu: the IOMMUMemoryRegion
++     * @attr: attribute being queried
++     * @data: memory to fill in with the attribute data
++     *
++     * Returns 0 on success, or a negative errno; in particular
++     * returns -EINVAL for unrecognized or unimplemented attribute types.
++     */
++    int (*get_attr)(IOMMUMemoryRegion *iommu, enum IOMMUMemoryRegionAttr attr,
+                     void *data);
+ } IOMMUMemoryRegionClass;
+ 
+@@ -705,6 +776,14 @@ static inline void memory_region_init_reservation(MemoryRegion *mr,
+  * An IOMMU region translates addresses and forwards accesses to a target
+  * memory region.
   *
-diff --git a/include/sysemu/dma.h b/include/sysemu/dma.h
-index 0d73902634..5da3c4e3c5 100644
---- a/include/sysemu/dma.h
-+++ b/include/sysemu/dma.h
-@@ -77,7 +77,8 @@ static inline bool dma_memory_valid(AddressSpace *as,
-                                     DMADirection dir)
- {
-     return address_space_access_valid(as, addr, len,
--                                      dir == DMA_DIRECTION_FROM_DEVICE);
-+                                      dir == DMA_DIRECTION_FROM_DEVICE,
-+                                      MEMTXATTRS_UNSPECIFIED);
- }
- 
- static inline int dma_memory_rw_relaxed(AddressSpace *as, dma_addr_t addr,
-diff --git a/exec.c b/exec.c
-index 1dc81cfe4a..22af4e8cb9 100644
---- a/exec.c
-+++ b/exec.c
-@@ -3480,7 +3480,8 @@ static bool flatview_access_valid(FlatView *fv, hwaddr addr, int len,
- }
- 
- bool address_space_access_valid(AddressSpace *as, hwaddr addr,
--                                int len, bool is_write)
-+                                int len, bool is_write,
-+                                MemTxAttrs attrs)
- {
-     FlatView *fv;
-     bool result;
-diff --git a/target/s390x/diag.c b/target/s390x/diag.c
-index ac2c40f363..d1d3433aa7 100644
---- a/target/s390x/diag.c
-+++ b/target/s390x/diag.c
-@@ -87,7 +87,8 @@ void handle_diag_308(CPUS390XState *env, uint64_t r1, uint64_t r3, uintptr_t ra)
-             return;
-         }
-         if (!address_space_access_valid(&address_space_memory, addr,
--                                        sizeof(IplParameterBlock), false)) {
-+                                        sizeof(IplParameterBlock), false,
-+                                        MEMTXATTRS_UNSPECIFIED)) {
-             s390_program_interrupt(env, PGM_ADDRESSING, ILEN_AUTO, ra);
-             return;
-         }
-@@ -116,7 +117,8 @@ out:
-             return;
-         }
-         if (!address_space_access_valid(&address_space_memory, addr,
--                                        sizeof(IplParameterBlock), true)) {
-+                                        sizeof(IplParameterBlock), true,
-+                                        MEMTXATTRS_UNSPECIFIED)) {
-             s390_program_interrupt(env, PGM_ADDRESSING, ILEN_AUTO, ra);
-             return;
-         }
-diff --git a/target/s390x/excp_helper.c b/target/s390x/excp_helper.c
-index dfee221111..f0ce60cff2 100644
---- a/target/s390x/excp_helper.c
-+++ b/target/s390x/excp_helper.c
-@@ -120,7 +120,8 @@ int s390_cpu_handle_mmu_fault(CPUState *cs, vaddr orig_vaddr, int size,
- 
-     /* check out of RAM access */
-     if (!address_space_access_valid(&address_space_memory, raddr,
--                                    TARGET_PAGE_SIZE, rw)) {
-+                                    TARGET_PAGE_SIZE, rw,
-+                                    MEMTXATTRS_UNSPECIFIED)) {
-         DPRINTF("%s: raddr %" PRIx64 " > ram_size %" PRIx64 "\n", __func__,
-                 (uint64_t)raddr, (uint64_t)ram_size);
-         trigger_pgm_exception(env, PGM_ADDRESSING, ILEN_AUTO);
-diff --git a/target/s390x/mmu_helper.c b/target/s390x/mmu_helper.c
-index a25deef5dd..145b62a7ef 100644
---- a/target/s390x/mmu_helper.c
-+++ b/target/s390x/mmu_helper.c
-@@ -461,7 +461,8 @@ static int translate_pages(S390CPU *cpu, vaddr addr, int nr_pages,
-             return ret;
-         }
-         if (!address_space_access_valid(&address_space_memory, pages[i],
--                                        TARGET_PAGE_SIZE, is_write)) {
-+                                        TARGET_PAGE_SIZE, is_write,
-+                                        MEMTXATTRS_UNSPECIFIED)) {
-             trigger_access_exception(env, PGM_ADDRESSING, ILEN_AUTO, 0);
-             return -EFAULT;
-         }
-diff --git a/target/s390x/sigp.c b/target/s390x/sigp.c
-index aff1530c82..c1f9245797 100644
---- a/target/s390x/sigp.c
-+++ b/target/s390x/sigp.c
-@@ -280,7 +280,8 @@ static void sigp_set_prefix(CPUState *cs, run_on_cpu_data arg)
-     cpu_synchronize_state(cs);
- 
-     if (!address_space_access_valid(&address_space_memory, addr,
--                                    sizeof(struct LowCore), false)) {
-+                                    sizeof(struct LowCore), false,
-+                                    MEMTXATTRS_UNSPECIFIED)) {
-         set_sigp_status(si, SIGP_STAT_INVALID_PARAMETER);
-         return;
-     }
++ * The IOMMU implementation must define a subclass of TYPE_IOMMU_MEMORY_REGION.
++ * @_iommu_mr should be a pointer to enough memory for an instance of
++ * that subclass, @instance_size is the size of that subclass, and
++ * @mrtypename is its name. This function will initialize @_iommu_mr as an
++ * instance of the subclass, and its methods will then be called to handle
++ * accesses to the memory region. See the documentation of
++ * #IOMMUMemoryRegionClass for further details.
++ *
+  * @_iommu_mr: the #IOMMUMemoryRegion to be initialized
+  * @instance_size: the IOMMUMemoryRegion subclass instance size
+  * @mrtypename: the type name of the #IOMMUMemoryRegion
+@@ -953,6 +1032,8 @@ void memory_region_register_iommu_notifier(MemoryRegion *mr,
+  * a notifier with the minimum page granularity returned by
+  * mr->iommu_ops->get_page_size().
+  *
++ * Note: this is not related to record-and-replay functionality.
++ *
+  * @iommu_mr: the memory region to observe
+  * @n: the notifier to which to replay iommu mappings
+  */
+@@ -962,6 +1043,8 @@ void memory_region_iommu_replay(IOMMUMemoryRegion *iommu_mr, IOMMUNotifier *n);
+  * memory_region_iommu_replay_all: replay existing IOMMU translations
+  * to all the notifiers registered.
+  *
++ * Note: this is not related to record-and-replay functionality.
++ *
+  * @iommu_mr: the memory region to observe
+  */
+ void memory_region_iommu_replay_all(IOMMUMemoryRegion *iommu_mr);
+@@ -981,7 +1064,9 @@ void memory_region_unregister_iommu_notifier(MemoryRegion *mr,
+  * memory_region_iommu_get_attr: return an IOMMU attr if get_attr() is
+  * defined on the IOMMU.
+  *
+- * Returns 0 if succeded, error code otherwise.
++ * Returns 0 on success, or a negative errno otherwise. In particular,
++ * -EINVAL indicates that the IOMMU does not support the requested
++ * attribute.
+  *
+  * @iommu_mr: the memory region
+  * @attr: the requested attribute
 -- 
 2.17.0
