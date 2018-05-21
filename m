@@ -1,25 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34865)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41532)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1fKq3k-00088G-VM
-	for qemu-devel@nongnu.org; Mon, 21 May 2018 15:01:29 -0400
+	(envelope-from <sstabellini@kernel.org>) id 1fKqZt-0008U5-SJ
+	for qemu-devel@nongnu.org; Mon, 21 May 2018 15:34:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1fKq3k-0004oW-1p
-	for qemu-devel@nongnu.org; Mon, 21 May 2018 15:01:29 -0400
-Date: Mon, 21 May 2018 16:01:12 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20180521190112.GP25013@localhost.localdomain>
-References: <20180518180440-mutt-send-email-mst@kernel.org>
-	<20180518170956.GI8615@redhat.com>
-	<20180518174133.GC25013@localhost.localdomain>
-	<87bmdc18q5.fsf@dusky.pond.sub.org>
-	<20180521182928.GO25013@localhost.localdomain>
-	<20180521184440.GB8214@redhat.com>
+	(envelope-from <sstabellini@kernel.org>) id 1fKqZp-0002lF-Oy
+	for qemu-devel@nongnu.org; Mon, 21 May 2018 15:34:41 -0400
+Received: from mail.kernel.org ([198.145.29.99]:59938)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <sstabellini@kernel.org>)
+	id 1fKqZp-0002kf-IB
+	for qemu-devel@nongnu.org; Mon, 21 May 2018 15:34:37 -0400
+Date: Mon, 21 May 2018 12:34:32 -0700 (PDT)
+From: Stefano Stabellini <sstabellini@kernel.org>
+Message-ID: <alpine.DEB.2.10.1805211229070.4520@sstabellini-ThinkPad-X260>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <20180521184440.GB8214@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] storing machine data in qcow images?
+Content-Type: TEXT/PLAIN; charset=US-ASCII
+Subject: [Qemu-devel] [PULL 00/15] xen-20180521-tag
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,68 +24,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>
-Cc: Markus Armbruster <armbru@redhat.com>, kwolf@redhat.com, qemu-block@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org, mreitz@redhat.com, stefanha@redhat.com
+To: peter.maydell@linaro.org, stefanha@gmail.com
+Cc: sstabellini@kernel.org, stefanha@redhat.com, anthony.perard@citrix.com, xen-devel@lists.xenproject.org, qemu-devel@nongnu.org
 
-On Mon, May 21, 2018 at 07:44:40PM +0100, Daniel P. Berrang=E9 wrote:
-> On Mon, May 21, 2018 at 03:29:28PM -0300, Eduardo Habkost wrote:
-> > On Sat, May 19, 2018 at 08:05:06AM +0200, Markus Armbruster wrote:
-> > > Eduardo Habkost <ehabkost@redhat.com> writes:
-> > >=20
-> > > [...]
-> > > > About being more expressive than just a single list of key,value
-> > > > pairs, I don't see any evidence of that being necessary for the
-> > > > problems we're trying to address.
-> > >=20
-> > > Short history of a configuration format you might have encountered:
->=20
-> [snip]
->=20
-> > > How confident are we a single list of (key, value) is really all we=
-'re
-> > > going to need?
-> > >=20
-> > > Even if we think it is, would it be possible to provide for a futur=
-e
-> > > extension to trees at next to no cost?
-> >=20
-> > I'm confident that a list of key,values is all we need for the
-> > current problem.
->=20
-> I'm not convinced. A disk image may work with Q35 or i440fx,  or
-> work with any of virtio, ide or sata disk. So that already means
-> values have to be arrays, not scalars. You could do that with a
-> simple key,value list, but only by defining a mapping of arrays
-> into a flattened form. eg do we allow repeated keys, or do we
-> allow array indexes on keys.=20
+The following changes since commit d32e41a1188e929cc0fb16829ce3736046951e39:
 
-No problem, we can support trees if it's necessary.
+  Merge remote-tracking branch 'remotes/famz/tags/docker-and-block-pull-request' into staging (2018-05-18 14:11:52 +0100)
+
+are available in the git repository at:
 
 
-> > The point here is to allow users to simply copy an existing disk
-> > image, and it will contain enough hints for a cloud stack to
-> > choose reasonable defaults for machine-type and disk type
-> > automatically.  Requiring the user to perform a separate step to
-> > encapsulate the disk image in another file format defeats the
-> > whole purpose of the proposal.
->=20
-> It doesn't have to mean more work for the user - the application
-> that is used to create the image can do that on their behalf.
-> oVirt for example can import/export OVA files, containing OVF
-> metadata. I could imagine virt-manager, and other tools adding
-> export ability without much trouble if this was deemed a desirable
-> thing. Bundling gives ability to have multiple disk images in one
-> archive, which is something OVF does.
+  http://xenbits.xenproject.org/git-http/people/sstabellini/qemu-dm.git tags/xen-20180521-tag
 
-I have the impression that "the application that is used to
-create the image" is a very large set.  It can be virt-manager,
-virt-install, virt-manager, or even QEMU itself.
+for you to fetch changes up to f03df99f09ee0ca27ea2298a1b77438e7999044d:
 
-Today people can simply create a VM on virt-manager, or run QEMU
-manually, and upload the qcow2 image directly from its original
-location (they don't need to copy/export it).  Don't we want the
-same procedure to keep working instead of requiring users to use
-another tool?
+  xen_disk: be consistent with use of xendev and blkdev->xendev (2018-05-18 11:13:01 -0700)
 
---=20
-Eduardo
+----------------------------------------------------------------
+Xen 2018/05/21
+
+----------------------------------------------------------------
+Anthony PERARD (1):
+      configure: Add explanation for --enable-xen-pci-passthrough
+
+Igor Druzhinin (2):
+      xen-pvdevice: Introduce a simplistic xen-pvdevice save state
+      xen/pt: use address_space_memory object for memory region hooks
+
+Paul Durrant (11):
+      xen-hvm: create separate function for ioreq server initialization
+      All the xen stable APIs define handle types of the form:
+      xen: add a meaningful declaration of grant_copy_segment into xen_common.h
+      xen_backend: add grant table helpers
+      xen_disk: remove open-coded use of libxengnttab
+      xen: remove other open-coded use of libxengnttab
+      xen_backend: add an emulation of grant copy
+      xen_disk: remove use of grant map/unmap
+      xen_backend: make the xen_feature_grant_copy flag private
+      xen_disk: use a single entry iovec
+      xen_disk: be consistent with use of xendev and blkdev->xendev
+
+Ross Lagerwall (1):
+      xen_pt: Present the size of 64 bit BARs correctly
+
+ configure                    |   2 +-
+ dtc                          |   2 +-
+ hw/9pfs/xen-9p-backend.c     |  32 ++-
+ hw/block/xen_disk.c          | 614 +++++++------------------------------------
+ hw/char/xen_console.c        |   9 +-
+ hw/i386/xen/xen-hvm.c        |  76 +++---
+ hw/i386/xen/xen_pvdevice.c   |  11 +
+ hw/net/xen_nic.c             |  33 +--
+ hw/usb/xen-usb.c             |  37 ++-
+ hw/xen/xen_backend.c         | 178 ++++++++++++-
+ hw/xen/xen_pt.c              |   2 +-
+ hw/xen/xen_pt_config_init.c  |   2 +
+ include/hw/xen/xen_backend.h |  34 ++-
+ include/hw/xen/xen_common.h  |  17 +-
+ scripts/checkpatch.pl        |   2 +-
+ ui/keycodemapdb              |   2 +-
+ 16 files changed, 429 insertions(+), 624 deletions(-)
