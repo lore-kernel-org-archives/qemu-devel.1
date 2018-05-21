@@ -1,28 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52744)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54315)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1fKrO2-0003Zp-29
-	for qemu-devel@nongnu.org; Mon, 21 May 2018 16:26:31 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1fKrUx-0004rv-Hd
+	for qemu-devel@nongnu.org; Mon, 21 May 2018 16:33:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1fKrNx-00020B-33
-	for qemu-devel@nongnu.org; Mon, 21 May 2018 16:26:30 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:44380)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1fKrNw-0001zn-RG
-	for qemu-devel@nongnu.org; Mon, 21 May 2018 16:26:25 -0400
-Date: Mon, 21 May 2018 17:26:16 -0300
+	(envelope-from <ehabkost@redhat.com>) id 1fKrUw-0004lW-8r
+	for qemu-devel@nongnu.org; Mon, 21 May 2018 16:33:39 -0400
+Date: Mon, 21 May 2018 17:33:22 -0300
 From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20180521202616.GT25013@localhost.localdomain>
-References: <20180517192325.8335-1-danielhb@linux.ibm.com>
-	<20180517192325.8335-2-danielhb@linux.ibm.com>
-	<87wow1gxi8.fsf@dusky.pond.sub.org>
-	<20180521181435.GN25013@localhost.localdomain>
-	<ab91cf9f-95c3-59dc-36cb-641a3db1171b@linux.ibm.com>
+Message-ID: <20180521203322.GU25013@localhost.localdomain>
+References: <20180518180440-mutt-send-email-mst@kernel.org>
+	<20180518170956.GI8615@redhat.com>
+	<20180518174133.GC25013@localhost.localdomain>
+	<20180521201817.GA10382@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <ab91cf9f-95c3-59dc-36cb-641a3db1171b@linux.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH v7 1/3] qmp: adding
- 'wakeup-suspend-support' in query-target
+In-Reply-To: <20180521201817.GA10382@redhat.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] storing machine data in qcow images?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,84 +26,160 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Daniel Henrique Barboza <danielhb@linux.ibm.com>
-Cc: Markus Armbruster <armbru@redhat.com>, Stefano Stabellini <sstabellini@kernel.org>, "Michael S. Tsirkin" <mst@redhat.com>, libvir-list@redhat.com, mdroth@linux.vnet.ibm.com, qemu-devel@nongnu.org, Anthony Perard <anthony.perard@citrix.com>, Igor Mammedov <imammedo@redhat.com>, dgilbert@redhat.com, Eric Blake <eblake@redhat.com>
+To: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, stefanha@redhat.com, kwolf@redhat.com, mreitz@redhat.com, qemu-devel@nongnu.org, qemu-block@nongnu.org
 
-On Mon, May 21, 2018 at 04:46:36PM -0300, Daniel Henrique Barboza wrote:
-> 
-> 
-> On 05/21/2018 03:14 PM, Eduardo Habkost wrote:
-> > > Issue#2: the flag isn't a property of the target.  Due to -no-acpi, it's
-> > > not even a property of the machine type.  If it was, query-machines
-> > > would be the natural owner of the flag.
-> > > 
-> > > Perhaps query-machines is still the proper owner.  The value of
-> > > wakeup-suspend-support would have to depend on -no-acpi for the machine
-> > > types that honor it.  Not ideal; I'd prefer MachineInfo to be static.
-> > > Tolerable?  I guess that's also a libvirt question.
-> > It depends when libvirt is going to query it.  Is it OK to only
-> > query it after the VM is already up and running?  If it is, then
-> > we can simply expose it as a read-only property of the machine
-> > object.
-> > 
-> > Or, if we don't want to rely on qom-get as a stable API, we can
-> > add a new query command (query-machine? query-power-management?)
-> > 
-> In the first version this logic was included in a new query command called
-> "query-wakeup-from-suspend-support":
-> 
-> https://lists.gnu.org/archive/html/qemu-devel/2017-12/msg00889.html
-> 
-> In that review it was suggested that this logic could be a flag in either
-> query-target
-> or query-machines API. Before sending the v2 I sent the following comment:
-> 
-> "After investigating, I think that it's simpler to hook the wakeup support
-> info into
-> TargetInfo than MachineInfo, given that the detection I'm using for this new
-> property
-> is based on the current runtime state. Hooking into MachineInfo would
-> require to
-> change the MachineClass to add a new property, then setting it up for the
-> machines
-> that have the wakeup support (only x86 so far). Definitely doable, but if we
-> don't
-> have any favorites between MachineInfo and TargetInfo I'd rather pick the
-> simpler
-> route.
-> 
-> So, if no one objects, I'll rework this series by putting the logic inside
-> query-target
-> instead of a new API."
+On Mon, May 21, 2018 at 09:18:17PM +0100, Daniel P. Berrang=E9 wrote:
+> On Fri, May 18, 2018 at 02:41:33PM -0300, Eduardo Habkost wrote:
+> > On Fri, May 18, 2018 at 06:09:56PM +0100, Daniel P. Berrang=E9 wrote:
+> > > On Fri, May 18, 2018 at 06:30:38PM +0300, Michael S. Tsirkin wrote:
+> > > > Hi!
+> > > > Right now, QEMU supports multiple machine types within
+> > > > a given architecture. This was the case for many architectures
+> > > > (like ARM) for a while, somewhat more recently this is the case
+> > > > for x86 with I440FX and Q35 options.
+> > > >=20
+> > > > Unfortunately this means that it's no longer possible
+> > > > to more or less reliably boot a VM just given a disk image,
+> > > > even if you select the correct QEMU binary:
+> > > > you must supply the correct machine type.
+> > >=20
+> > > You must /sometimes/ supply the correct machine type.
+> > >=20
+> > > It is quite dependent on the guest OS you have installed, and even
+> > > just how the guest OS is configured.  In general Linux is very
+> > > flexible and can adapt to a wide range of hardware, automatically
+> > > detecting things as needed. It is possible for a sysadmin to build
+> > > a Linux image in a way that would only work with I440FX, but I
+> > > don't think it would be common to see that. Many distros build
+> > > and distribute disk images that can work across VMWare, KVM,
+> > > and VirtualBox which all have very quite different hardware.
+> > > Non-x86 archs may be more fussy but I don't have personal
+> > > experiance with them
+> > >=20
+> > > Windows is probably where things get more tricky, as it is not
+> > > happy with disks moving between different controller types
+> > > for example, and you might trigger license activation again.
+> >=20
+> > All I'm suggesting here is just adding extra hints that OpenStack
+> > can use.
+> >=20
+> > I have very specific goal here: the goal is to make it less
+> > painful to users when OpenStack+libvirt+QEMU switch to using a
+> > different machine-type by default (q35), and/or when guest OSes
+> > stop supporting pc-i440fx.  I assume this is a goal for OpenStack
+> > as well.
+> >=20
+> > We can make the solution to be more extensible and solve other
+> > problems as well, but my original goal is the one above.
+>=20
+> Configuring the machine type is just one thing that users
+> would do with OpenStack though.  A simple example might be
+>=20
+>     openstack image set \
+>          --property hw_disk_bus=3Dscsi \
+> 	 --property hw_vif_model=3De1000e
+>=20
+> Or if they're using libosinfo to set preferred devices=20
+>=20
+>     openstack image set \
+>          --property os_distro=3Dfedora26
+>=20
+> which will identify virtio-blk & virtio-net as disk+nic
+> respectively. Using libosinfo is more flexible than setting
+> the hw_disk_bus & hw_vif_model  explicitly, because libosinfo
+> will report multiple devices that can be used, and the virt
+> driver can then pick one which best suits the particular
+> host or hypervisor.
+>=20
+> Setting a non-default machine type is one extra prop
+>=20
+>     openstack image set \
+>          --property hw_machine_type=3Dq35
+>          --property os_distro=3Dfedora26
 
-Apologies for not noticing this series months ago.  :(
+Nice.  Are these just hypothetical examples, or something that
+already works?
 
 
-> 
-> Since no objection was made back then, this logic was put into query-target
-> starting
-> in v2. Still, I don't have any favorites though: query-target looks ok,
-> query-machine
-> looks ok and a new API looks ok too. It's all about what makes (more) sense
-> in the
-> management level, I think.
+>=20
+> So while your immediate motivation is only considering the
+> machine type, from the Openstack POV thats only one property
+> out of many that users might be setting.
 
-I understand the original objection from Eric: having to add a
-new command for every runtime flag we want to expose to the user
-looks wrong to me.
+Agreed.
 
-However, extending query-machines and query-target looks wrong
-too, however.  query-target looks wrong because this not a
-property of the target.  query-machines is wrong because this is
-not a static property of the machine-type, but of the running
-machine instance.
 
-Can we have a new query command that could be an obvious
-container for simple machine capabilities that are not static?  A
-name like "query-machine" would be generic enough for that, I
-guess.
+> > > That said I'm not really convinced that using the qcow2 headers is
+> > > a good plan. We have many disk image formats in common use, qcow2
+> > > is just one. Even if the user provides the image in qcow2 format,
+> > > that doesn't mean that mgmt apps actually store the qcow2 file.
+> > >=20
+> >=20
+> > Why this OpenStack implementation detail matters?  Once the hints
+> > are included in the input, it's up to OpenStack to choose how to
+> > deal with it.
+>=20
+> Well openstack aims to support multiple hypervisors - if there's a
+> choice between implementing something that is a cross-vendor standard
+> like OVF, or implementing something that only works with qcow2, the
+> latter is not very appealing to support.
 
-Markus, Eric, what do you think?
+I still don't understand why you claim this would only work with
+qcow2.  If somebody wants to implement the same functionality in
+OVF, it's also possible.
 
--- 
+
+> > > The closest to a cross-hypervisor standard is OVF which can store
+> > > metadata about required hardware for a VM. I'm pretty sure it does
+> > > not have the concept of machine types, but maybe it has a way for
+> > > people to define metadata extensions. Since it is just XML at the
+> > > end of the day, even if there was nothing official in OVF, it would
+> > > be possible to just define a custom XML namespace and declare a
+> > > schema for that to follow.
+> >=20
+> > There's nothing preventing OVF from supporting the same kind of
+> > hints.
+> >=20
+> > I just don't think we should require people to migrate to OVF if
+> > all they need is to tell OpenStack what's the recommended
+> > machine-type for a guest image.
+> >=20
+> > Requiring a different image format seems very likely to not
+> > fulfill the goal I stated above: it will require using different
+> > tools to create the guest images, and we can't force everybody
+> > publishing guest images to stop using qcow2.
+>=20
+> It doesn't have to require different tools - existing tools could
+> create a OVF/OVA file for the disk image as part of an "export"
+> process.
+
+Requiring a new "export" step that wasn't required before is
+requiring a different tool, isn't it?
+
+
+> > > > - We most likely shouldn't get backend parameters from the image
+> > > >=20
+> > > > Thoughts?
+> > >=20
+> > > I tend to think we'd be better looking at what we can do in the con=
+text
+> > > of an existing standard like OVF rather than inventing something th=
+at
+> > > only works with qcow2. I think it would need to be more expressive =
+than
+> > > just a single list of key,value pairs for each item.
+> >=20
+> > Why you claim we are inventing something that only works with
+> > qcow2?
+>=20
+> It works with a disk image format that has ability to record extra
+> metadata. With raw files you would have to have a separate file to
+> record it, likewise for any other vendor disk formats that are
+> not extended.=20
+
+So this could work with both qcow2 and OVF (and maybe other
+formats if others want to extend them), wouldn't it?
+
+--=20
 Eduardo
