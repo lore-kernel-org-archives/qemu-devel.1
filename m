@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57897)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57948)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1fKuOv-0002f7-I1
-	for qemu-devel@nongnu.org; Mon, 21 May 2018 19:39:39 -0400
+	(envelope-from <cota@braap.org>) id 1fKuOx-0002h0-HC
+	for qemu-devel@nongnu.org; Mon, 21 May 2018 19:39:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1fKuOr-0005Z2-BT
-	for qemu-devel@nongnu.org; Mon, 21 May 2018 19:39:37 -0400
-Received: from out1-smtp.messagingengine.com ([66.111.4.25]:45731)
+	(envelope-from <cota@braap.org>) id 1fKuOr-0005Yl-AB
+	for qemu-devel@nongnu.org; Mon, 21 May 2018 19:39:39 -0400
+Received: from out1-smtp.messagingengine.com ([66.111.4.25]:45485)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cota@braap.org>) id 1fKuOq-0005Xa-Fd
+	(Exim 4.71) (envelope-from <cota@braap.org>) id 1fKuOq-0005Xd-E9
 	for qemu-devel@nongnu.org; Mon, 21 May 2018 19:39:32 -0400
 From: "Emilio G. Cota" <cota@braap.org>
-Date: Mon, 21 May 2018 19:39:21 -0400
-Message-Id: <1526945967-9687-12-git-send-email-cota@braap.org>
+Date: Mon, 21 May 2018 19:39:24 -0400
+Message-Id: <1526945967-9687-15-git-send-email-cota@braap.org>
 In-Reply-To: <1526945967-9687-1-git-send-email-cota@braap.org>
 References: <1526945967-9687-1-git-send-email-cota@braap.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v3 11/17] translate-all: add page_locked
- assertions
+Subject: [Qemu-devel] [PATCH v3 14/17] translate-all: protect TB jumps with
+ a per-destination-TB lock
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,189 +30,398 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Richard Henderson <richard.henderson@linaro.org>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>
 
-This is only compiled under CONFIG_DEBUG_TCG to avoid
-bloating the binary.
+This applies to both user-mode and !user-mode emulation.
 
-In user-mode, assert_page_locked is equivalent to assert_mmap_lock.
+Instead of relying on a global lock, protect the list of incoming
+jumps with tb->jmp_lock. This lock also protects tb->cflags,
+so update all tb->cflags readers outside tb->jmp_lock to use
+atomic reads via tb_cflags().
 
-Note: There are some tb_lock assertions left that will be
-removed by later patches.
+In order to find the destination TB (and therefore its jmp_lock)
+from the origin TB, we introduce tb->jmp_dest[].
 
-Suggested-by: Alex Bennée <alex.bennee@linaro.org>
+I considered not using a linked list of jumps, which simplifies
+code and makes the struct smaller. However, it unnecessarily increases
+memory usage, which results in a performance decrease. See for
+instance these numbers booting+shutting down debian-arm:
+                      Time (s)  Rel. err (%)  Abs. err (s)  Rel. slowdown (%)
+------------------------------------------------------------------------------
+ before                  20.88          0.74      0.154512                 0.
+ after                   20.81          0.38      0.079078        -0.33524904
+ GTree                   21.02          0.28      0.058856         0.67049808
+ GHashTable + xxhash     21.63          1.08      0.233604          3.5919540
+
+Using a hash table or a binary tree to keep track of the jumps
+doesn't really pay off, not only due to the increased memory usage,
+but also because most TBs have only 0 or 1 jumps to them. The maximum
+number of jumps when booting debian-arm that I measured is 35, but
+as we can see in the histogram below a TB with that many incoming jumps
+is extremely rare; the average TB has 0.80 incoming jumps.
+
+n_jumps: 379208; avg jumps/tb: 0.801099
+dist: [0.0,1.0)|▄█▁▁▁▁▁▁▁▁▁▁▁ ▁▁▁▁▁▁ ▁▁▁  ▁▁▁     ▁|[34.0,35.0]
+
 Signed-off-by: Emilio G. Cota <cota@braap.org>
 ---
- accel/tcg/translate-all.c | 81 +++++++++++++++++++++++++++++++++++++++++++++--
- 1 file changed, 78 insertions(+), 3 deletions(-)
+ docs/devel/multi-thread-tcg.txt |   6 +-
+ include/exec/exec-all.h         |  35 +++++++-----
+ accel/tcg/cpu-exec.c            |  41 +++++++++-----
+ accel/tcg/translate-all.c       | 118 ++++++++++++++++++++++++----------------
+ 4 files changed, 124 insertions(+), 76 deletions(-)
 
+diff --git a/docs/devel/multi-thread-tcg.txt b/docs/devel/multi-thread-tcg.txt
+index faf09c6..df83445 100644
+--- a/docs/devel/multi-thread-tcg.txt
++++ b/docs/devel/multi-thread-tcg.txt
+@@ -131,8 +131,10 @@ DESIGN REQUIREMENT: Safely handle invalidation of TBs
+ 
+ The direct jump themselves are updated atomically by the TCG
+ tb_set_jmp_target() code. Modification to the linked lists that allow
+-searching for linked pages are done under the protect of the
+-tb_lock().
++searching for linked pages are done under the protection of tb->jmp_lock,
++where tb is the destination block of a jump. Each origin block keeps a
++pointer to its destinations so that the appropriate lock can be acquired before
++iterating over a jump list.
+ 
+ The global page table is a lockless radix tree; cmpxchg is used
+ to atomically insert new elements.
+diff --git a/include/exec/exec-all.h b/include/exec/exec-all.h
+index 66902f7..daac968 100644
+--- a/include/exec/exec-all.h
++++ b/include/exec/exec-all.h
+@@ -344,7 +344,7 @@ struct TranslationBlock {
+ #define CF_LAST_IO     0x00008000 /* Last insn may be an IO access.  */
+ #define CF_NOCACHE     0x00010000 /* To be freed after execution */
+ #define CF_USE_ICOUNT  0x00020000
+-#define CF_INVALID     0x00040000 /* TB is stale. Setters need tb_lock */
++#define CF_INVALID     0x00040000 /* TB is stale. Set with @jmp_lock held */
+ #define CF_PARALLEL    0x00080000 /* Generate code for a parallel context */
+ /* cflags' mask for hashing/comparison */
+ #define CF_HASH_MASK   \
+@@ -363,6 +363,9 @@ struct TranslationBlock {
+     uintptr_t page_next[2];
+     tb_page_addr_t page_addr[2];
+ 
++    /* jmp_lock placed here to fill a 4-byte hole. Its documentation is below */
++    QemuSpin jmp_lock;
++
+     /* The following data are used to directly call another TB from
+      * the code of this one. This can be done either by emitting direct or
+      * indirect native jump instructions. These jumps are reset so that the TB
+@@ -374,20 +377,26 @@ struct TranslationBlock {
+ #define TB_JMP_RESET_OFFSET_INVALID 0xffff /* indicates no jump generated */
+     uintptr_t jmp_target_arg[2];  /* target address or offset */
+ 
+-    /* Each TB has an associated circular list of TBs jumping to this one.
+-     * jmp_list_first points to the first TB jumping to this one.
+-     * jmp_list_next is used to point to the next TB in a list.
+-     * Since each TB can have two jumps, it can participate in two lists.
+-     * jmp_list_first and jmp_list_next are 4-byte aligned pointers to a
+-     * TranslationBlock structure, but the two least significant bits of
+-     * them are used to encode which data field of the pointed TB should
+-     * be used to traverse the list further from that TB:
+-     * 0 => jmp_list_next[0], 1 => jmp_list_next[1], 2 => jmp_list_first.
+-     * In other words, 0/1 tells which jump is used in the pointed TB,
+-     * and 2 means that this is a pointer back to the target TB of this list.
++    /*
++     * Each TB has a NULL-terminated list (jmp_list_head) of incoming jumps.
++     * Each TB can have two outgoing jumps, and therefore can participate
++     * in two lists. The list entries are kept in jmp_list_next[2]. The least
++     * significant bit (LSB) of the pointers in these lists is used to encode
++     * which of the two list entries is to be used in the pointed TB.
++     *
++     * List traversals are protected by jmp_lock. The destination TB of each
++     * outgoing jump is kept in jmp_dest[] so that the appropriate jmp_lock
++     * can be acquired from any origin TB.
++     *
++     * jmp_dest[] are tagged pointers as well. The LSB is set when the TB is
++     * being invalidated, so that no further outgoing jumps from it can be set.
++     *
++     * jmp_lock also protects the CF_INVALID cflag; a jump must not be chained
++     * to a destination TB that has CF_INVALID set.
+      */
++    uintptr_t jmp_list_head;
+     uintptr_t jmp_list_next[2];
+-    uintptr_t jmp_list_first;
++    uintptr_t jmp_dest[2];
+ };
+ 
+ extern bool parallel_cpus;
+diff --git a/accel/tcg/cpu-exec.c b/accel/tcg/cpu-exec.c
+index b45d10f..c9db99d 100644
+--- a/accel/tcg/cpu-exec.c
++++ b/accel/tcg/cpu-exec.c
+@@ -353,28 +353,43 @@ void tb_set_jmp_target(TranslationBlock *tb, int n, uintptr_t addr)
+     }
+ }
+ 
+-/* Called with tb_lock held.  */
+ static inline void tb_add_jump(TranslationBlock *tb, int n,
+                                TranslationBlock *tb_next)
+ {
++    uintptr_t old;
++
+     assert(n < ARRAY_SIZE(tb->jmp_list_next));
+-    if (tb->jmp_list_next[n]) {
+-        /* Another thread has already done this while we were
+-         * outside of the lock; nothing to do in this case */
+-        return;
++    qemu_spin_lock(&tb_next->jmp_lock);
++
++    /* make sure the destination TB is valid */
++    if (tb_next->cflags & CF_INVALID) {
++        goto out_unlock_next;
++    }
++    /* Atomically claim the jump destination slot only if it was NULL */
++    old = atomic_cmpxchg(&tb->jmp_dest[n], (uintptr_t)NULL, (uintptr_t)tb_next);
++    if (old) {
++        goto out_unlock_next;
+     }
++
++    /* patch the native jump address */
++    tb_set_jmp_target(tb, n, (uintptr_t)tb_next->tc.ptr);
++
++    /* add in TB jmp list */
++    tb->jmp_list_next[n] = tb_next->jmp_list_head;
++    tb_next->jmp_list_head = (uintptr_t)tb | n;
++
++    qemu_spin_unlock(&tb_next->jmp_lock);
++
+     qemu_log_mask_and_addr(CPU_LOG_EXEC, tb->pc,
+                            "Linking TBs %p [" TARGET_FMT_lx
+                            "] index %d -> %p [" TARGET_FMT_lx "]\n",
+                            tb->tc.ptr, tb->pc, n,
+                            tb_next->tc.ptr, tb_next->pc);
++    return;
+ 
+-    /* patch the native jump address */
+-    tb_set_jmp_target(tb, n, (uintptr_t)tb_next->tc.ptr);
+-
+-    /* add in TB jmp circular list */
+-    tb->jmp_list_next[n] = tb_next->jmp_list_first;
+-    tb_next->jmp_list_first = (uintptr_t)tb | n;
++ out_unlock_next:
++    qemu_spin_unlock(&tb_next->jmp_lock);
++    return;
+ }
+ 
+ static inline TranslationBlock *tb_find(CPUState *cpu,
+@@ -417,9 +432,7 @@ static inline TranslationBlock *tb_find(CPUState *cpu,
+             tb_lock();
+             acquired_tb_lock = true;
+         }
+-        if (!(tb->cflags & CF_INVALID)) {
+-            tb_add_jump(last_tb, tb_exit, tb);
+-        }
++        tb_add_jump(last_tb, tb_exit, tb);
+     }
+     if (acquired_tb_lock) {
+         tb_unlock();
 diff --git a/accel/tcg/translate-all.c b/accel/tcg/translate-all.c
-index 14c2c23..8286203 100644
+index f24dcb8..031060f 100644
 --- a/accel/tcg/translate-all.c
 +++ b/accel/tcg/translate-all.c
-@@ -583,6 +583,9 @@ static void page_lock_pair(PageDesc **ret_p1, tb_page_addr_t phys1,
+@@ -170,6 +170,9 @@ struct page_collection {
+ #define PAGE_FOR_EACH_TB(pagedesc, tb, n)                       \
+     TB_FOR_EACH_TAGGED((pagedesc)->first_tb, tb, n, page_next)
  
- /* In user-mode page locks aren't used; mmap_lock is enough */
- #ifdef CONFIG_USER_ONLY
++#define TB_FOR_EACH_JMP(head_tb, tb, n)                                 \
++    TB_FOR_EACH_TAGGED((head_tb)->jmp_list_head, tb, n, jmp_list_next)
 +
-+#define assert_page_locked(pd) tcg_debug_assert(have_mmap_lock())
-+
- static inline void page_lock(PageDesc *pd)
- { }
+ /* In system mode we want L1_MAP to be based on ram offsets,
+    while in user mode we want it to be based on virtual addresses.  */
+ #if !defined(CONFIG_USER_ONLY)
+@@ -389,7 +392,7 @@ static int cpu_restore_state_from_tb(CPUState *cpu, TranslationBlock *tb,
+     return -1;
  
-@@ -605,14 +608,80 @@ void page_collection_unlock(struct page_collection *set)
- { }
- #else /* !CONFIG_USER_ONLY */
+  found:
+-    if (reset_icount && (tb->cflags & CF_USE_ICOUNT)) {
++    if (reset_icount && (tb_cflags(tb) & CF_USE_ICOUNT)) {
+         assert(use_icount);
+         /* Reset the cycle counter to the start of the block
+            and shift if to the number of actually executed instructions */
+@@ -432,7 +435,7 @@ bool cpu_restore_state(CPUState *cpu, uintptr_t host_pc, bool will_exit)
+         tb = tcg_tb_lookup(host_pc);
+         if (tb) {
+             cpu_restore_state_from_tb(cpu, tb, host_pc, will_exit);
+-            if (tb->cflags & CF_NOCACHE) {
++            if (tb_cflags(tb) & CF_NOCACHE) {
+                 /* one-shot translation, invalidate it immediately */
+                 tb_phys_invalidate(tb, -1);
+                 tcg_tb_remove(tb);
+@@ -1359,34 +1362,53 @@ static inline void tb_page_remove(PageDesc *pd, TranslationBlock *tb)
+     g_assert_not_reached();
+ }
  
-+#ifdef CONFIG_DEBUG_TCG
-+
-+static __thread GHashTable *ht_pages_locked_debug;
-+
-+static void ht_pages_locked_debug_init(void)
-+{
-+    if (ht_pages_locked_debug) {
+-/* remove the TB from a list of TBs jumping to the n-th jump target of the TB */
+-static inline void tb_remove_from_jmp_list(TranslationBlock *tb, int n)
++/* remove @orig from its @n_orig-th jump list */
++static inline void tb_remove_from_jmp_list(TranslationBlock *orig, int n_orig)
+ {
+-    TranslationBlock *tb1;
+-    uintptr_t *ptb, ntb;
+-    unsigned int n1;
++    uintptr_t ptr, ptr_locked;
++    TranslationBlock *dest;
++    TranslationBlock *tb;
++    uintptr_t *pprev;
++    int n;
+ 
+-    ptb = &tb->jmp_list_next[n];
+-    if (*ptb) {
+-        /* find tb(n) in circular list */
+-        for (;;) {
+-            ntb = *ptb;
+-            n1 = ntb & 3;
+-            tb1 = (TranslationBlock *)(ntb & ~3);
+-            if (n1 == n && tb1 == tb) {
+-                break;
+-            }
+-            if (n1 == 2) {
+-                ptb = &tb1->jmp_list_first;
+-            } else {
+-                ptb = &tb1->jmp_list_next[n1];
+-            }
+-        }
+-        /* now we can suppress tb(n) from the list */
+-        *ptb = tb->jmp_list_next[n];
++    /* mark the LSB of jmp_dest[] so that no further jumps can be inserted */
++    ptr = atomic_or_fetch(&orig->jmp_dest[n_orig], 1);
++    dest = (TranslationBlock *)(ptr & ~1);
++    if (dest == NULL) {
 +        return;
 +    }
-+    ht_pages_locked_debug = g_hash_table_new(NULL, NULL);
-+}
-+
-+static bool page_is_locked(const PageDesc *pd)
-+{
-+    PageDesc *found;
-+
-+    ht_pages_locked_debug_init();
-+    found = g_hash_table_lookup(ht_pages_locked_debug, pd);
-+    return !!found;
-+}
-+
-+static void page_lock__debug(PageDesc *pd)
-+{
-+    ht_pages_locked_debug_init();
-+    g_assert(!page_is_locked(pd));
-+    g_hash_table_insert(ht_pages_locked_debug, pd, pd);
-+}
-+
-+static void page_unlock__debug(const PageDesc *pd)
-+{
-+    bool removed;
-+
-+    ht_pages_locked_debug_init();
-+    g_assert(page_is_locked(pd));
-+    removed = g_hash_table_remove(ht_pages_locked_debug, pd);
-+    g_assert(removed);
-+}
-+
-+static void
-+do_assert_page_locked(const PageDesc *pd, const char *file, int line)
-+{
-+    if (unlikely(!page_is_locked(pd))) {
-+        error_report("assert_page_lock: PageDesc %p not locked @ %s:%d",
-+                     pd, file, line);
-+        abort();
+ 
+-        tb->jmp_list_next[n] = (uintptr_t)NULL;
++    qemu_spin_lock(&dest->jmp_lock);
++    /*
++     * While acquiring the lock, the jump might have been removed if the
++     * destination TB was invalidated; check again.
++     */
++    ptr_locked = atomic_read(&orig->jmp_dest[n_orig]);
++    if (ptr_locked != ptr) {
++        qemu_spin_unlock(&dest->jmp_lock);
++        /*
++         * The only possibility is that the jump was unlinked via
++         * tb_jump_unlink(dest). Seeing here another destination would be a bug,
++         * because we set the LSB above.
++         */
++        g_assert(ptr_locked == 1 && dest->cflags & CF_INVALID);
++        return;
+     }
++    /*
++     * We first acquired the lock, and since the destination pointer matches,
++     * we know for sure that @orig is in the jmp list.
++     */
++    pprev = &dest->jmp_list_head;
++    TB_FOR_EACH_JMP(dest, tb, n) {
++        if (tb == orig && n == n_orig) {
++            *pprev = tb->jmp_list_next[n];
++            /* no need to set orig->jmp_dest[n]; setting the LSB was enough */
++            qemu_spin_unlock(&dest->jmp_lock);
++            return;
++        }
++        pprev = &tb->jmp_list_next[n];
 +    }
-+}
-+
-+#define assert_page_locked(pd) do_assert_page_locked(pd, __FILE__, __LINE__)
-+
-+#else /* !CONFIG_DEBUG_TCG */
-+
-+#define assert_page_locked(pd)
-+
-+static inline void page_lock__debug(const PageDesc *pd)
-+{
-+}
-+
-+static inline void page_unlock__debug(const PageDesc *pd)
-+{
-+}
-+
-+#endif /* CONFIG_DEBUG_TCG */
-+
- static inline void page_lock(PageDesc *pd)
- {
-+    page_lock__debug(pd);
-     qemu_spin_lock(&pd->lock);
++    g_assert_not_reached();
  }
  
- static inline void page_unlock(PageDesc *pd)
- {
-     qemu_spin_unlock(&pd->lock);
-+    page_unlock__debug(pd);
+ /* reset the jump entry 'n' of a TB so that it is not chained to
+@@ -1398,24 +1420,21 @@ static inline void tb_reset_jump(TranslationBlock *tb, int n)
  }
  
- /* lock the page(s) of a TB in the correct acquisition order */
-@@ -775,6 +844,7 @@ page_collection_lock(tb_page_addr_t start, tb_page_addr_t end)
-             g_tree_foreach(set->tree, page_entry_unlock, NULL);
-             goto retry;
-         }
-+        assert_page_locked(pd);
-         PAGE_FOR_EACH_TB(pd, tb, n) {
-             if (page_trylock_add(set, tb->page_addr[0]) ||
-                 (tb->page_addr[1] != -1 &&
-@@ -1113,6 +1183,7 @@ static TranslationBlock *tb_alloc(target_ulong pc)
- /* call with @p->lock held */
- static inline void invalidate_page_bitmap(PageDesc *p)
+ /* remove any jumps to the TB */
+-static inline void tb_jmp_unlink(TranslationBlock *tb)
++static inline void tb_jmp_unlink(TranslationBlock *dest)
  {
-+    assert_page_locked(p);
- #ifdef CONFIG_SOFTMMU
-     g_free(p->code_bitmap);
-     p->code_bitmap = NULL;
-@@ -1269,6 +1340,7 @@ static inline void tb_page_remove(PageDesc *pd, TranslationBlock *tb)
-     uintptr_t *pprev;
-     unsigned int n1;
+-    TranslationBlock *tb1;
+-    uintptr_t *ptb, ntb;
+-    unsigned int n1;
++    TranslationBlock *tb;
++    int n;
  
-+    assert_page_locked(pd);
-     pprev = &pd->first_tb;
-     PAGE_FOR_EACH_TB(pd, tb1, n1) {
-         if (tb1 == tb) {
-@@ -1417,6 +1489,7 @@ static void build_page_bitmap(PageDesc *p)
-     int n, tb_start, tb_end;
-     TranslationBlock *tb;
- 
-+    assert_page_locked(p);
-     p->code_bitmap = bitmap_new(TARGET_PAGE_SIZE);
- 
-     PAGE_FOR_EACH_TB(p, tb, n) {
-@@ -1450,7 +1523,7 @@ static inline void tb_page_add(PageDesc *p, TranslationBlock *tb,
-     bool page_already_protected;
- #endif
- 
--    assert_memory_lock();
-+    assert_page_locked(p);
- 
-     tb->page_addr[n] = page_addr;
-     tb->page_next[n] = p->first_tb;
-@@ -1721,8 +1794,7 @@ tb_invalidate_phys_page_range__locked(struct page_collection *pages,
-     uint32_t current_flags = 0;
- #endif /* TARGET_HAS_PRECISE_SMC */
- 
--    assert_memory_lock();
--    assert_tb_locked();
-+    assert_page_locked(p);
- 
- #if defined(TARGET_HAS_PRECISE_SMC)
-     if (cpu != NULL) {
-@@ -1734,6 +1806,7 @@ tb_invalidate_phys_page_range__locked(struct page_collection *pages,
-     /* XXX: see if in some cases it could be faster to invalidate all
-        the code */
-     PAGE_FOR_EACH_TB(p, tb, n) {
-+        assert_page_locked(p);
-         /* NOTE: this is subtle as a TB may span two physical pages */
-         if (n == 0) {
-             /* NOTE: tb_end may be after the end of the page, but
-@@ -1891,6 +1964,7 @@ void tb_invalidate_phys_page_fast(tb_page_addr_t start, int len)
+-    ptb = &tb->jmp_list_first;
+-    for (;;) {
+-        ntb = *ptb;
+-        n1 = ntb & 3;
+-        tb1 = (TranslationBlock *)(ntb & ~3);
+-        if (n1 == 2) {
+-            break;
+-        }
+-        tb_reset_jump(tb1, n1);
+-        *ptb = tb1->jmp_list_next[n1];
+-        tb1->jmp_list_next[n1] = (uintptr_t)NULL;
++    qemu_spin_lock(&dest->jmp_lock);
++
++    TB_FOR_EACH_JMP(dest, tb, n) {
++        tb_reset_jump(tb, n);
++        atomic_and(&tb->jmp_dest[n], (uintptr_t)NULL | 1);
++        /* No need to clear the list entry; setting the dest ptr is enough */
      }
++    dest->jmp_list_head = (uintptr_t)NULL;
++
++    qemu_spin_unlock(&dest->jmp_lock);
+ }
  
-     pages = page_collection_lock(start, start + len);
-+    assert_page_locked(p);
-     if (!p->code_bitmap &&
-         ++p->code_write_count >= SMC_BITMAP_USE_THRESHOLD) {
-         build_page_bitmap(p);
-@@ -1949,6 +2023,7 @@ static bool tb_invalidate_phys_page(tb_page_addr_t addr, uintptr_t pc)
-         env = cpu->env_ptr;
-     }
- #endif
-+    assert_page_locked(p);
+ /* If @rm_from_page_list is set, call with the TB's pages' locks held */
+@@ -1428,11 +1447,14 @@ static void do_tb_phys_invalidate(TranslationBlock *tb, bool rm_from_page_list)
+ 
+     assert_tb_locked();
+ 
++    /* make sure no further incoming jumps will be chained to this TB */
++    qemu_spin_lock(&tb->jmp_lock);
+     atomic_set(&tb->cflags, tb->cflags | CF_INVALID);
++    qemu_spin_unlock(&tb->jmp_lock);
+ 
+     /* remove the TB from the hash list */
+     phys_pc = tb->page_addr[0] + (tb->pc & ~TARGET_PAGE_MASK);
+-    h = tb_hash_func(phys_pc, tb->pc, tb->flags, tb->cflags & CF_HASH_MASK,
++    h = tb_hash_func(phys_pc, tb->pc, tb->flags, tb_cflags(tb) & CF_HASH_MASK,
+                      tb->trace_vcpu_dstate);
+     if (!qht_remove(&tb_ctx.htable, tb, h)) {
+         return;
+@@ -1772,10 +1794,12 @@ TranslationBlock *tb_gen_code(CPUState *cpu,
+                  CODE_GEN_ALIGN));
+ 
+     /* init jump list */
+-    assert(((uintptr_t)tb & 3) == 0);
+-    tb->jmp_list_first = (uintptr_t)tb | 2;
++    qemu_spin_init(&tb->jmp_lock);
++    tb->jmp_list_head = (uintptr_t)NULL;
+     tb->jmp_list_next[0] = (uintptr_t)NULL;
+     tb->jmp_list_next[1] = (uintptr_t)NULL;
++    tb->jmp_dest[0] = (uintptr_t)NULL;
++    tb->jmp_dest[1] = (uintptr_t)NULL;
+ 
+     /* init original jump addresses wich has been set during tcg_gen_code() */
+     if (tb->jmp_reset_offset[0] != TB_JMP_RESET_OFFSET_INVALID) {
+@@ -1867,7 +1891,7 @@ tb_invalidate_phys_page_range__locked(struct page_collection *pages,
+                 }
+             }
+             if (current_tb == tb &&
+-                (current_tb->cflags & CF_COUNT_MASK) != 1) {
++                (tb_cflags(current_tb) & CF_COUNT_MASK) != 1) {
+                 /* If we are modifying the current TB, we must stop
+                 its execution. We could be more precise by checking
+                 that the modification is after the current PC, but it
+@@ -2066,7 +2090,7 @@ static bool tb_invalidate_phys_page(tb_page_addr_t addr, uintptr_t pc)
      PAGE_FOR_EACH_TB(p, tb, n) {
  #ifdef TARGET_HAS_PRECISE_SMC
          if (current_tb == tb &&
+-            (current_tb->cflags & CF_COUNT_MASK) != 1) {
++            (tb_cflags(current_tb) & CF_COUNT_MASK) != 1) {
+                 /* If we are modifying the current TB, we must stop
+                    its execution. We could be more precise by checking
+                    that the modification is after the current PC, but it
+@@ -2191,7 +2215,7 @@ void cpu_io_recompile(CPUState *cpu, uintptr_t retaddr)
+     /* Generate a new TB executing the I/O insn.  */
+     cpu->cflags_next_tb = curr_cflags() | CF_LAST_IO | n;
+ 
+-    if (tb->cflags & CF_NOCACHE) {
++    if (tb_cflags(tb) & CF_NOCACHE) {
+         if (tb->orig_tb) {
+             /* Invalidate original TB if this TB was generated in
+              * cpu_exec_nocache() */
 -- 
 2.7.4
