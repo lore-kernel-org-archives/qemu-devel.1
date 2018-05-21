@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41971)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44034)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fKogE-00072R-6c
-	for qemu-devel@nongnu.org; Mon, 21 May 2018 13:33:07 -0400
+	(envelope-from <no-reply@patchew.org>) id 1fKonG-0001MU-8Z
+	for qemu-devel@nongnu.org; Mon, 21 May 2018 13:40:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fKogD-0003dY-Ad
-	for qemu-devel@nongnu.org; Mon, 21 May 2018 13:33:06 -0400
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20180521163203.26590-1-ross.zwisler@linux.intel.com>
-	<20180521163203.26590-3-ross.zwisler@linux.intel.com>
-	<6332df7d-3588-9ecc-6220-2f40c1581fe6@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <be62d517-9b3e-6fe2-7333-b8315e830b4b@amsat.org>
-Date: Mon, 21 May 2018 14:32:16 -0300
+	(envelope-from <no-reply@patchew.org>) id 1fKonD-0007xc-0o
+	for qemu-devel@nongnu.org; Mon, 21 May 2018 13:40:22 -0400
+Resent-Message-Id: <E1fKonD-0007xc-0o@eggs.gnu.org>
+Received: from sender-of-o51.zoho.com ([135.84.80.216]:21047)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1fKonC-0007vj-Dw
+	for qemu-devel@nongnu.org; Mon, 21 May 2018 13:40:18 -0400
+In-Reply-To: <20180519092956.15134-1-laurent@vivier.eu>
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <152689637465.66.3504538063631747170@d39dc562802a>
 MIME-Version: 1.0
-In-Reply-To: <6332df7d-3588-9ecc-6220-2f40c1581fe6@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [qemu PATCH v4 2/4] tests/.gitignore: add entry
- for generated file
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Mon, 21 May 2018 02:52:55 -0700 (PDT)
+Subject: Re: [Qemu-devel] [PATCH v3 0/8] linux-user: move socket.h
+ definitions to CPU directories
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,47 +29,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, Ross Zwisler <ross.zwisler@linux.intel.com>, Igor Mammedov <imammedo@redhat.com>, qemu-devel@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, Haozhong Zhang <haozhong.zhang@intel.com>, Eduardo Habkost <ehabkost@redhat.com>, qemu block <qemu-block@nongnu.org>, "Michael S . Tsirkin" <mst@redhat.com>, linux-nvdimm <linux-nvdimm@lists.01.org>, Stefan Hajnoczi <stefanha@redhat.com>, "Elliott, Robert (Persistent Memory)" <elliott@hpe.com>
+To: laurent@vivier.eu
+Cc: famz@redhat.com, qemu-devel@nongnu.org, peter.maydell@linaro.org, riku.voipio@iki.fi, mark.cave-ayland@ilande.co.uk, f4bug@amsat.org, yongbok.kim@mips.com, rth@twiddle.net
 
-On 05/21/2018 01:41 PM, Eric Blake wrote:
-> On 05/21/2018 11:32 AM, Ross Zwisler wrote:
->> After a "make check" we end up with the following:
->>
->> $ git status
->> On branch master
->> Your branch is up-to-date with 'origin/master'.
->>
->> Untracked files:
->>    (use "git add <file>..." to include in what will be committed)
->>
->>     tests/test-block-backend
->>
->> nothing added to commit but untracked files present (use "git add" to
->> track)
->>
->> Signed-off-by: Ross Zwisler <ross.zwisler@linux.intel.com>
->> Fixes: commit ad0df3e0fdac ("block: test blk_aio_flush() with
->> blk->root == NULL")
->> Cc: Kevin Wolf <kwolf@redhat.com>
->> ---
->>   tests/.gitignore | 1 +
->>   1 file changed, 1 insertion(+)
-> 
-> Reviewed-by: Eric Blake <eblake@redhat.com>
-> 
->>
->> diff --git a/tests/.gitignore b/tests/.gitignore
->> index fb62d2299b..2bc61a9a58 100644
->> --- a/tests/.gitignore
->> +++ b/tests/.gitignore
->> @@ -21,6 +21,7 @@ test-base64
->>   test-bdrv-drain
->>   test-bitops
->>   test-bitcnt
->> +test-block-backend
->>   test-blockjob
->>   test-blockjob-txn
->>   test-bufferiszero
-
-What about using gitignore negated pattern in tests/?
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
+c3NhZ2UtaWQ6IDIwMTgwNTE5MDkyOTU2LjE1MTM0LTEtbGF1cmVudEB2aXZpZXIuZXUKU3ViamVj
+dDogW1FlbXUtZGV2ZWxdIFtQQVRDSCB2MyAwLzhdIGxpbnV4LXVzZXI6IG1vdmUgc29ja2V0Lmgg
+ZGVmaW5pdGlvbnMgdG8gQ1BVIGRpcmVjdG9yaWVzCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09
+CiMhL2Jpbi9iYXNoCgpCQVNFPWJhc2UKbj0xCnRvdGFsPSQoZ2l0IGxvZyAtLW9uZWxpbmUgJEJB
+U0UuLiB8IHdjIC1sKQpmYWlsZWQ9MAoKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGlt
+aXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKZ2l0IGNvbmZpZyAtLWxv
+Y2FsIGRpZmYuYWxnb3JpdGhtIGhpc3RvZ3JhbQoKY29tbWl0cz0iJChnaXQgbG9nIC0tZm9ybWF0
+PSVIIC0tcmV2ZXJzZSAkQkFTRS4uKSIKZm9yIGMgaW4gJGNvbW1pdHM7IGRvCiAgICBlY2hvICJD
+aGVja2luZyBQQVRDSCAkbi8kdG90YWw6ICQoZ2l0IGxvZyAtbiAxIC0tZm9ybWF0PSVzICRjKS4u
+LiIKICAgIGlmICEgZ2l0IHNob3cgJGMgLS1mb3JtYXQ9ZW1haWwgfCAuL3NjcmlwdHMvY2hlY2tw
+YXRjaC5wbCAtLW1haWxiYWNrIC07IHRoZW4KICAgICAgICBmYWlsZWQ9MQogICAgICAgIGVjaG8K
+ICAgIGZpCiAgICBuPSQoKG4rMSkpCmRvbmUKCmV4aXQgJGZhaWxlZAo9PT0gVEVTVCBTQ1JJUFQg
+RU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4
+NApGcm9tIGh0dHBzOi8vZ2l0aHViLmNvbS9wYXRjaGV3LXByb2plY3QvcWVtdQogKiBbbmV3IHRh
+Z10gICAgICAgICAgICAgICBwYXRjaGV3LzIwMTgwNTE5MDkyOTU2LjE1MTM0LTEtbGF1cmVudEB2
+aXZpZXIuZXUgLT4gcGF0Y2hldy8yMDE4MDUxOTA5Mjk1Ni4xNTEzNC0xLWxhdXJlbnRAdml2aWVy
+LmV1ClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKNDMwMmUxNWIzYyBsaW51eC11c2Vy
+OiBkZWZpbmUgVEFSR0VUX1NPX1JFVVNFUE9SVAo3OWY5ZDQ2MmUwIGxpbnV4LXVzZXI6IGNvcHkg
+c3BhcmMvc29ja2JpdHMuaCBkZWZpbml0aW9ucyBmcm9tIGxpbnV4CjRkNGQ4MGY2ZGQgbGludXgt
+dXNlcjogdXBkYXRlIEFSQ0hfSEFTX1NPQ0tFVF9UWVBFUyB1c2UKZjkwZWIxOTIyNSBsaW51eC11
+c2VyOiBtb3ZlIHBwYyBzb2NrZXQuaCBkZWZpbml0aW9ucyB0byBwcGMvc29ja2JpdHMuaAphMTU5
+MjMzNzgyIGxpbnV4LXVzZXI6IG1vdmUgc29ja2V0LmggZ2VuZXJpYyBkZWZpbml0aW9ucyB0byBn
+ZW5lcmljL3NvY2tiaXRzLmgKN2JkYTUwYzJiOSBsaW51eC11c2VyOiBtb3ZlIHNwYXJjL3NwYXJj
+NjQgc29ja2V0LmggZGVmaW5pdGlvbnMgdG8gc3BhcmMvc29ja2JpdHMuaAoxZTVlN2QxMDdlIGxp
+bnV4LXVzZXI6IG1vdmUgYWxwaGEgc29ja2V0LmggZGVmaW5pdGlvbnMgdG8gYWxwaGEvc29ja2Jp
+dHMuaAo5Njc1YmRjMGM1IGxpbnV4LXVzZXI6IG1vdmUgbWlwcyBzb2NrZXQuaCBkZWZpbml0aW9u
+cyB0byBtaXBzL3NvY2tiaXRzLmgKCj09PSBPVVRQVVQgQkVHSU4gPT09CkNoZWNraW5nIFBBVENI
+IDEvODogbGludXgtdXNlcjogbW92ZSBtaXBzIHNvY2tldC5oIGRlZmluaXRpb25zIHRvIG1pcHMv
+c29ja2JpdHMuaC4uLgpXQVJOSU5HOiBhZGRlZCwgbW92ZWQgb3IgZGVsZXRlZCBmaWxlKHMpLCBk
+b2VzIE1BSU5UQUlORVJTIG5lZWQgdXBkYXRpbmc/CiMxNzogCm5ldyBmaWxlIG1vZGUgMTAwNjQ0
+CgpFUlJPUjogaWYgdGhpcyBjb2RlIGlzIHJlZHVuZGFudCBjb25zaWRlciByZW1vdmluZyBpdAoj
+NTI6IEZJTEU6IGxpbnV4LXVzZXIvbWlwcy9zb2NrYml0cy5oOjMxOgorI2lmIDAKCnRvdGFsOiAx
+IGVycm9ycywgMSB3YXJuaW5ncywgMjI3IGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0
+eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUg
+ZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQ
+QVRDSCBpbiBNQUlOVEFJTkVSUy4KCkNoZWNraW5nIFBBVENIIDIvODogbGludXgtdXNlcjogbW92
+ZSBhbHBoYSBzb2NrZXQuaCBkZWZpbml0aW9ucyB0byBhbHBoYS9zb2NrYml0cy5oLi4uCldBUk5J
+Tkc6IGFkZGVkLCBtb3ZlZCBvciBkZWxldGVkIGZpbGUocyksIGRvZXMgTUFJTlRBSU5FUlMgbmVl
+ZCB1cGRhdGluZz8KIzE4OiAKbmV3IGZpbGUgbW9kZSAxMDA2NDQKCnRvdGFsOiAwIGVycm9ycywg
+MSB3YXJuaW5ncywgMjI0IGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2Js
+ZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9z
+aXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBN
+QUlOVEFJTkVSUy4KQ2hlY2tpbmcgUEFUQ0ggMy84OiBsaW51eC11c2VyOiBtb3ZlIHNwYXJjL3Nw
+YXJjNjQgc29ja2V0LmggZGVmaW5pdGlvbnMgdG8gc3BhcmMvc29ja2JpdHMuaC4uLgpXQVJOSU5H
+OiBhZGRlZCwgbW92ZWQgb3IgZGVsZXRlZCBmaWxlKHMpLCBkb2VzIE1BSU5UQUlORVJTIG5lZWQg
+dXBkYXRpbmc/CiM3NDogCm5ldyBmaWxlIG1vZGUgMTAwNjQ0Cgp0b3RhbDogMCBlcnJvcnMsIDEg
+d2FybmluZ3MsIDE0NiBsaW5lcyBjaGVja2VkCgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVt
+cywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0
+aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJ
+TlRBSU5FUlMuCkNoZWNraW5nIFBBVENIIDQvODogbGludXgtdXNlcjogbW92ZSBzb2NrZXQuaCBn
+ZW5lcmljIGRlZmluaXRpb25zIHRvIGdlbmVyaWMvc29ja2JpdHMuaC4uLgpXQVJOSU5HOiBhZGRl
+ZCwgbW92ZWQgb3IgZGVsZXRlZCBmaWxlKHMpLCBkb2VzIE1BSU5UQUlORVJTIG5lZWQgdXBkYXRp
+bmc/CiMxNDogCm5ldyBmaWxlIG1vZGUgMTAwNjQ0Cgp0b3RhbDogMCBlcnJvcnMsIDEgd2Fybmlu
+Z3MsIDE0OCBsaW5lcyBjaGVja2VkCgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxl
+YXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyBy
+ZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5F
+UlMuCkNoZWNraW5nIFBBVENIIDUvODogbGludXgtdXNlcjogbW92ZSBwcGMgc29ja2V0LmggZGVm
+aW5pdGlvbnMgdG8gcHBjL3NvY2tiaXRzLmguLi4KQ2hlY2tpbmcgUEFUQ0ggNi84OiBsaW51eC11
+c2VyOiB1cGRhdGUgQVJDSF9IQVNfU09DS0VUX1RZUEVTIHVzZS4uLgpDaGVja2luZyBQQVRDSCA3
+Lzg6IGxpbnV4LXVzZXI6IGNvcHkgc3BhcmMvc29ja2JpdHMuaCBkZWZpbml0aW9ucyBmcm9tIGxp
+bnV4Li4uCkNoZWNraW5nIFBBVENIIDgvODogbGludXgtdXNlcjogZGVmaW5lIFRBUkdFVF9TT19S
+RVVTRVBPUlQuLi4KPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGgg
+Y29kZTogMQoKCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFto
+dHRwOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3
+LWRldmVsQHJlZGhhdC5jb20=
