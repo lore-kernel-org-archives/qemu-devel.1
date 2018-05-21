@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55453)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60216)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fKmLA-0002Wd-6X
-	for qemu-devel@nongnu.org; Mon, 21 May 2018 11:03:13 -0400
+	(envelope-from <marcel.apfelbaum@gmail.com>) id 1fKmet-0005Mq-KN
+	for qemu-devel@nongnu.org; Mon, 21 May 2018 11:23:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fKmL9-0005ah-Bo
-	for qemu-devel@nongnu.org; Mon, 21 May 2018 11:03:12 -0400
-Received: from mail-oi0-x244.google.com ([2607:f8b0:4003:c06::244]:37910)
+	(envelope-from <marcel.apfelbaum@gmail.com>) id 1fKmeo-0006qR-IW
+	for qemu-devel@nongnu.org; Mon, 21 May 2018 11:23:35 -0400
+Received: from mail-wr0-x242.google.com ([2a00:1450:400c:c0c::242]:33875)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fKmL9-0005aI-7E
-	for qemu-devel@nongnu.org; Mon, 21 May 2018 11:03:11 -0400
-Received: by mail-oi0-x244.google.com with SMTP id k17-v6so13263679oih.5
-	for <qemu-devel@nongnu.org>; Mon, 21 May 2018 08:03:10 -0700 (PDT)
+	(Exim 4.71) (envelope-from <marcel.apfelbaum@gmail.com>)
+	id 1fKmeo-0006qJ-BY
+	for qemu-devel@nongnu.org; Mon, 21 May 2018 11:23:30 -0400
+Received: by mail-wr0-x242.google.com with SMTP id j1-v6so5454549wrm.1
+	for <qemu-devel@nongnu.org>; Mon, 21 May 2018 08:23:30 -0700 (PDT)
+References: <1526801333-30613-1-git-send-email-whois.zihan.yang@gmail.com>
+From: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+Message-ID: <287ca613-aaeb-b2b6-77ac-df3b9ceaf7cd@gmail.com>
+Date: Mon, 21 May 2018 18:23:26 +0300
 MIME-Version: 1.0
-In-Reply-To: <c049f864-304d-f8ee-4b2f-1476a602be30@redhat.com>
-References: <20180521140402.23318-1-peter.maydell@linaro.org>
-	<20180521140402.23318-24-peter.maydell@linaro.org>
-	<c049f864-304d-f8ee-4b2f-1476a602be30@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 21 May 2018 16:02:49 +0100
-Message-ID: <CAFEAcA_ErfYKnVrp=Dv9mNg55Y+=fFmg4eEMddGdMxUGVb9ztA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH 23/27] hw/core/or-irq: Support more than 16
- inputs to an OR gate
+In-Reply-To: <1526801333-30613-1-git-send-email-whois.zihan.yang@gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+Subject: Re: [Qemu-devel] [RFC 0/3] pci_expander_brdige: Put pxb host bridge
+ into separate pci domain
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,27 +31,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, "patches@linaro.org" <patches@linaro.org>, Richard Henderson <rth@twiddle.net>, =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
+To: Zihan Yang <whois.zihan.yang@gmail.com>, qemu-devel@nongnu.org
 
-On 21 May 2018 at 15:34, Paolo Bonzini <pbonzini@redhat.com> wrote:
-> Why do the levels have to be migrated at all?  It should be enough if
-> the IRQ level is either migrated manually, or restored (e.g. in
-> post_save callbacks) through other data that is migrated.
+Hi Zihan
 
-This is standard behaviour for devices: they track their
-inbound irq/gpio lines, and then that becomes internal state for
-them that must be migrated.
+On 05/20/2018 10:28 AM, Zihan Yang wrote:
 
-If we didn't migrate the input line state, then after a migration
-the levels[] array would be all zeroes, and the next time a
-connected device signalled a high-to-low transition we'd take
-the output line low even if it should not be (because we'd have
-forgotten that some other input lines were high).
+You do have patch 0, sorry for not seeing it, please disregard my prev 
+comment.
 
-In a different world, the state would be in the qemu_irq line itself
-(in the same way that in hardware signal lines are their own state),
-but we can't get there from here.
+> Currently only q35 host bridge is allocated an item in MCFG table, all pxb
+> host bridges stay within pci domain 0. This series of patches put each pxb
+> host bridge in separate pci domain, allocating a new MCFG table item for it.
 
-thanks
--- PMM
+Maybe we should add a parameter to the pxb-pci device specifying the PCI 
+domain
+instead of adding it on the fly. It will help ensuring the PCI domain 
+will not change over
+time due to code changes.In this case "bus sharing" should be off. For 
+the moment
+the pxb devices get the bus range from the same PCI domain.
+> The pxb host does not have an mch in it, as q35 host already has one. All
+> pxb host bridges just serve as expander bridges in QEMU, which makes them
+> a lit
+> tle simpler than q35 host bridge.
+Agreed
+
+> NOTE: These patches are just initial proof of concept, asking for suggestions.
+>        The aml part and seabios part are not finished at all. This means it
+>        still behaves like before, that all pci expander bridges stay in the
+>        same pci domain as a35 host.
+
+Looks promising!
+
+Thanks,
+Marcel
+
+> Zihan Yang (3):
+>    pci_expander_bridge: reserve enough mcfg space for pxb host
+>    pci: Link pci_host_bridges with QTAILQ
+>    acpi-build: allocate mcfg for multiple host bridges
+>
+>   hw/i386/acpi-build.c                        | 83 ++++++++++++++++++-------
+>   hw/i386/pc.c                                |  5 ++
+>   hw/pci-bridge/pci_expander_bridge.c         | 96 ++++++++++++++++++++++++++++-
+>   hw/pci/pci.c                                |  9 +--
+>   include/hw/pci-bridge/pci_expander_bridge.h |  7 +++
+>   include/hw/pci/pci_host.h                   |  2 +-
+>   6 files changed, 175 insertions(+), 27 deletions(-)
+>   create mode 100644 include/hw/pci-bridge/pci_expander_bridge.h
+>
