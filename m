@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55361)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60201)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fKpZ3-0006Zl-9e
-	for qemu-devel@nongnu.org; Mon, 21 May 2018 14:29:46 -0400
+	(envelope-from <berrange@redhat.com>) id 1fKpnl-00064N-El
+	for qemu-devel@nongnu.org; Mon, 21 May 2018 14:44:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fKpZ2-00063t-FU
-	for qemu-devel@nongnu.org; Mon, 21 May 2018 14:29:45 -0400
-References: <20180521163203.26590-1-ross.zwisler@linux.intel.com>
-	<20180521163203.26590-3-ross.zwisler@linux.intel.com>
-	<6332df7d-3588-9ecc-6220-2f40c1581fe6@redhat.com>
-	<be62d517-9b3e-6fe2-7333-b8315e830b4b@amsat.org>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <cf2f3544-fe8f-4649-6056-f37246009307@redhat.com>
-Date: Mon, 21 May 2018 13:29:31 -0500
+	(envelope-from <berrange@redhat.com>) id 1fKpnj-00054V-Fe
+	for qemu-devel@nongnu.org; Mon, 21 May 2018 14:44:57 -0400
+Date: Mon, 21 May 2018 19:44:40 +0100
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Message-ID: <20180521184440.GB8214@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <20180518180440-mutt-send-email-mst@kernel.org>
+	<20180518170956.GI8615@redhat.com>
+	<20180518174133.GC25013@localhost.localdomain>
+	<87bmdc18q5.fsf@dusky.pond.sub.org>
+	<20180521182928.GO25013@localhost.localdomain>
 MIME-Version: 1.0
-In-Reply-To: <be62d517-9b3e-6fe2-7333-b8315e830b4b@amsat.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [qemu PATCH v4 2/4] tests/.gitignore: add entry
- for generated file
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20180521182928.GO25013@localhost.localdomain>
+Subject: Re: [Qemu-devel] storing machine data in qcow images?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,31 +27,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Ross Zwisler <ross.zwisler@linux.intel.com>, Igor Mammedov <imammedo@redhat.com>, qemu-devel@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, Haozhong Zhang <haozhong.zhang@intel.com>, Eduardo Habkost <ehabkost@redhat.com>, qemu block <qemu-block@nongnu.org>, "Michael S . Tsirkin" <mst@redhat.com>, linux-nvdimm <linux-nvdimm@lists.01.org>, Stefan Hajnoczi <stefanha@redhat.com>, "Elliott, Robert (Persistent Memory)" <elliott@hpe.com>
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: Markus Armbruster <armbru@redhat.com>, kwolf@redhat.com, qemu-block@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org, mreitz@redhat.com, stefanha@redhat.com
 
-On 05/21/2018 12:32 PM, Philippe Mathieu-Daud=C3=A9 wrote:
+On Mon, May 21, 2018 at 03:29:28PM -0300, Eduardo Habkost wrote:
+> On Sat, May 19, 2018 at 08:05:06AM +0200, Markus Armbruster wrote:
+> > Eduardo Habkost <ehabkost@redhat.com> writes:
+> > 
+> > [...]
+> > > About being more expressive than just a single list of key,value
+> > > pairs, I don't see any evidence of that being necessary for the
+> > > problems we're trying to address.
+> > 
+> > Short history of a configuration format you might have encountered:
 
->>>
->>>  =C2=A0=C2=A0=C2=A0=C2=A0tests/test-block-backend
->>>
+[snip]
 
->>> +test-block-backend
->>>  =C2=A0 test-blockjob
->>>  =C2=A0 test-blockjob-txn
->>>  =C2=A0 test-bufferiszero
->=20
-> What about using gitignore negated pattern in tests/?
+> > How confident are we a single list of (key, value) is really all we're
+> > going to need?
+> > 
+> > Even if we think it is, would it be possible to provide for a future
+> > extension to trees at next to no cost?
+> 
+> I'm confident that a list of key,values is all we need for the
+> current problem.
 
-Or, what we've threatened to do in the past: rename all unit tests to=20
-the pattern *-test instead of test-*, as a suffix is a lot easier to=20
-exclude via glob than a prefix.  And while we're renaming things, sort=20
-tests into separate subdirectories according to whether they are run as=20
-part of 'make check-unit' or 'make check-qtest'.  But until someone does=20
-that work, tweaking the .gitignore for individual tests as they keep=20
-getting added is no worse than what we've been doing.
+I'm not convinced. A disk image may work with Q35 or i440fx,  or
+work with any of virtio, ide or sata disk. So that already means
+values have to be arrays, not scalars. You could do that with a
+simple key,value list, but only by defining a mapping of arrays
+into a flattened form. eg do we allow repeated keys, or do we
+allow array indexes on keys. 
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+> The point here is to allow users to simply copy an existing disk
+> image, and it will contain enough hints for a cloud stack to
+> choose reasonable defaults for machine-type and disk type
+> automatically.  Requiring the user to perform a separate step to
+> encapsulate the disk image in another file format defeats the
+> whole purpose of the proposal.
+
+It doesn't have to mean more work for the user - the application
+that is used to create the image can do that on their behalf.
+oVirt for example can import/export OVA files, containing OVF
+metadata. I could imagine virt-manager, and other tools adding
+export ability without much trouble if this was deemed a desirable
+thing. Bundling gives ability to have multiple disk images in one
+archive, which is something OVF does.
+
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
