@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42766)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42880)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1fKlQJ-0002qU-LY
-	for qemu-devel@nongnu.org; Mon, 21 May 2018 10:04:30 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1fKlQN-0002un-Sy
+	for qemu-devel@nongnu.org; Mon, 21 May 2018 10:04:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1fKlQH-00011e-K0
-	for qemu-devel@nongnu.org; Mon, 21 May 2018 10:04:27 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1fKlQM-00015u-IK
+	for qemu-devel@nongnu.org; Mon, 21 May 2018 10:04:31 -0400
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 21 May 2018 15:03:51 +0100
-Message-Id: <20180521140402.23318-17-peter.maydell@linaro.org>
+Date: Mon, 21 May 2018 15:03:56 +0100
+Message-Id: <20180521140402.23318-22-peter.maydell@linaro.org>
 In-Reply-To: <20180521140402.23318-1-peter.maydell@linaro.org>
 References: <20180521140402.23318-1-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PATCH 16/27] iommu: Add IOMMU index argument to
- translate method
+Subject: [Qemu-devel] [PATCH 21/27] hw/misc/tz_mpc.c: Honour the BLK_LUT
+ settings in translate
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,197 +23,107 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-arm@nongnu.org, qemu-devel@nongnu.org
 Cc: patches@linaro.org, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 
-Add an IOMMU index argument to the translate method of
-IOMMUs. Since all of our current IOMMU implementations
-support only a single IOMMU index, this has no effect
-on the behaviour.
+The final part of the Memory Protection Controller we need to
+implement is actually using the BLK_LUT data programmed by the
+guest to determine whether to block the transaction or not.
+
+Since this means we now change transaction mappings when
+the guest writes to BLK_LUT, we must also call the IOMMU
+notifiers at that point.
 
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- include/exec/memory.h    |  3 ++-
- exec.c                   | 11 +++++++++--
- hw/alpha/typhoon.c       |  3 ++-
- hw/arm/smmuv3.c          |  2 +-
- hw/dma/rc4030.c          |  2 +-
- hw/i386/amd_iommu.c      |  2 +-
- hw/i386/intel_iommu.c    |  2 +-
- hw/ppc/spapr_iommu.c     |  3 ++-
- hw/s390x/s390-pci-bus.c  |  2 +-
- hw/sparc/sun4m_iommu.c   |  3 ++-
- hw/sparc64/sun4u_iommu.c |  2 +-
- memory.c                 |  2 +-
- 12 files changed, 24 insertions(+), 13 deletions(-)
+ hw/misc/tz-mpc.c     | 50 ++++++++++++++++++++++++++++++++++++++++++--
+ hw/misc/trace-events |  1 +
+ 2 files changed, 49 insertions(+), 2 deletions(-)
 
-diff --git a/include/exec/memory.h b/include/exec/memory.h
-index 4e6b125add..b25cf527bb 100644
---- a/include/exec/memory.h
-+++ b/include/exec/memory.h
-@@ -252,9 +252,10 @@ typedef struct IOMMUMemoryRegionClass {
-      * @iommu: the IOMMUMemoryRegion
-      * @hwaddr: address to be translated within the memory region
-      * @flag: requested access permissions
-+     * @iommu_idx: IOMMU index for the translation
-      */
-     IOMMUTLBEntry (*translate)(IOMMUMemoryRegion *iommu, hwaddr addr,
--                               IOMMUAccessFlags flag);
-+                               IOMMUAccessFlags flag, int iommu_idx);
-     /* Returns minimum supported page size in bytes.
-      * If this method is not provided then the minimum is assumed to
-      * be TARGET_PAGE_SIZE.
-diff --git a/exec.c b/exec.c
-index c3baadc349..c9285c9c39 100644
---- a/exec.c
-+++ b/exec.c
-@@ -498,8 +498,15 @@ static MemoryRegionSection address_space_translate_iommu(IOMMUMemoryRegion *iomm
-     do {
-         hwaddr addr = *xlat;
-         IOMMUMemoryRegionClass *imrc = memory_region_get_iommu_class_nocheck(iommu_mr);
--        IOMMUTLBEntry iotlb = imrc->translate(iommu_mr, addr, is_write ?
--                                              IOMMU_WO : IOMMU_RO);
-+        int iommu_idx = 0;
-+        IOMMUTLBEntry iotlb;
+diff --git a/hw/misc/tz-mpc.c b/hw/misc/tz-mpc.c
+index 39a72563b7..439f6b9496 100644
+--- a/hw/misc/tz-mpc.c
++++ b/hw/misc/tz-mpc.c
+@@ -72,6 +72,50 @@ static void tz_mpc_irq_update(TZMPC *s)
+     qemu_set_irq(s->irq, s->int_stat && s->int_en);
+ }
+ 
++static void tz_mpc_iommu_notify(TZMPC *s, uint32_t lutidx,
++                                uint32_t oldlut, uint32_t newlut)
++{
++    /* Called when the LUT word at lutidx has changed from oldlut to newlut;
++     * must call the IOMMU notifiers for the changed blocks.
++     */
++    IOMMUTLBEntry entry = {
++        .addr_mask = s->blocksize - 1,
++    };
++    hwaddr addr = lutidx * s->blocksize * 32;
++    int i;
 +
-+        if (imrc->attrs_to_index) {
-+            iommu_idx = imrc->attrs_to_index(iommu_mr, attrs);
++    for (i = 0; i < 32; i++, addr += s->blocksize) {
++        if (!((oldlut ^ newlut) & (1 << i))) {
++            continue;
 +        }
++        /* This changes the mappings for both the S and the NS space,
++         * so we need to do four notifies: an UNMAP then a MAP for each.
++         */
 +
-+        iotlb = imrc->translate(iommu_mr, addr, is_write ?
-+                                IOMMU_WO : IOMMU_RO, iommu_idx);
++        trace_tz_mpc_iommu_notify(addr);
++        entry.iova = addr;
++        entry.translated_addr = addr;
++
++        entry.perm = IOMMU_NONE;
++        memory_region_notify_iommu(&s->upstream, IOMMU_IDX_S, entry);
++        memory_region_notify_iommu(&s->upstream, IOMMU_IDX_NS, entry);
++
++        entry.perm = IOMMU_RW;
++        if (newlut & (1 << i)) {
++            entry.target_as = &s->blocked_io_as;
++        } else {
++            entry.target_as = &s->downstream_as;
++        }
++        memory_region_notify_iommu(&s->upstream, IOMMU_IDX_S, entry);
++        if (newlut & (1 << i)) {
++            entry.target_as = &s->downstream_as;
++        } else {
++            entry.target_as = &s->blocked_io_as;
++        }
++        memory_region_notify_iommu(&s->upstream, IOMMU_IDX_NS, entry);
++    }
++}
++
+ static MemTxResult tz_mpc_reg_read(void *opaque, hwaddr addr,
+                                    uint64_t *pdata,
+                                    unsigned size, MemTxAttrs attrs)
+@@ -213,6 +257,7 @@ static MemTxResult tz_mpc_reg_write(void *opaque, hwaddr addr,
+         s->blk_idx = value % s->blk_max;
+         break;
+     case A_BLK_LUT:
++        tz_mpc_iommu_notify(s, s->blk_idx, s->blk_lut[s->blk_idx], value);
+         s->blk_lut[s->blk_idx] = value;
+         if (size == 4) {
+             s->blk_idx++;
+@@ -362,9 +407,10 @@ static IOMMUTLBEntry tz_mpc_translate(IOMMUMemoryRegion *iommu,
+     /* Look at the per-block configuration for this address, and
+      * return a TLB entry directing the transaction at either
+      * downstream_as or blocked_io_as, as appropriate.
+-     * For the moment, always permit accesses.
++     * If the LUT cfg_ns bit is 1, only non-secure transactions
++     * may pass. If the bit is 0, only secure transactions may pass.
+      */
+-    ok = true;
++    ok = tz_mpc_cfg_ns(s, addr) == (iommu_idx == IOMMU_IDX_NS);
  
-         if (!(iotlb.perm & (1 << is_write))) {
-             goto unassigned;
-diff --git a/hw/alpha/typhoon.c b/hw/alpha/typhoon.c
-index 6a40869488..d3ed7cdbe8 100644
---- a/hw/alpha/typhoon.c
-+++ b/hw/alpha/typhoon.c
-@@ -666,7 +666,8 @@ static bool window_translate(TyphoonWindow *win, hwaddr addr,
-    Pchip and generate a machine check interrupt.  */
- static IOMMUTLBEntry typhoon_translate_iommu(IOMMUMemoryRegion *iommu,
-                                              hwaddr addr,
--                                             IOMMUAccessFlags flag)
-+                                             IOMMUAccessFlags flag,
-+                                             int iommu_idx)
- {
-     TyphoonPchip *pchip = container_of(iommu, TyphoonPchip, iommu);
-     IOMMUTLBEntry ret;
-diff --git a/hw/arm/smmuv3.c b/hw/arm/smmuv3.c
-index 42dc521c13..978330900d 100644
---- a/hw/arm/smmuv3.c
-+++ b/hw/arm/smmuv3.c
-@@ -538,7 +538,7 @@ static int smmuv3_decode_config(IOMMUMemoryRegion *mr, SMMUTransCfg *cfg,
- }
+     trace_tz_mpc_translate(addr, flags,
+                            iommu_idx == IOMMU_IDX_S ? "S" : "NS",
+diff --git a/hw/misc/trace-events b/hw/misc/trace-events
+index d4835c8970..be3ee1707b 100644
+--- a/hw/misc/trace-events
++++ b/hw/misc/trace-events
+@@ -90,6 +90,7 @@ tz_mpc_reg_write(uint32_t offset, uint64_t data, unsigned size) "TZ MPC regs wri
+ tz_mpc_mem_blocked_read(uint64_t addr, unsigned size, bool secure) "TZ MPC blocked read: offset 0x%" PRIx64 " size %u secure %d"
+ tz_mpc_mem_blocked_write(uint64_t addr, uint64_t data, unsigned size, bool secure) "TZ MPC blocked write: offset 0x%" PRIx64 " data 0x%" PRIx64 " size %u secure %d"
+ tz_mpc_translate(uint64_t addr, int flags, const char *idx, const char *res) "TZ MPC translate: addr 0x%" PRIx64 " flags 0x%x iommu_idx %s: %s"
++tz_mpc_iommu_notify(uint64_t addr) "TZ MPC iommu: notifying UNMAP/MAP for 0x%" PRIx64
  
- static IOMMUTLBEntry smmuv3_translate(IOMMUMemoryRegion *mr, hwaddr addr,
--                                      IOMMUAccessFlags flag)
-+                                      IOMMUAccessFlags flag, int iommu_idx)
- {
-     SMMUDevice *sdev = container_of(mr, SMMUDevice, iommu);
-     SMMUv3State *s = sdev->smmu;
-diff --git a/hw/dma/rc4030.c b/hw/dma/rc4030.c
-index 5d4833eeca..ccd8612888 100644
---- a/hw/dma/rc4030.c
-+++ b/hw/dma/rc4030.c
-@@ -491,7 +491,7 @@ static const MemoryRegionOps jazzio_ops = {
- };
- 
- static IOMMUTLBEntry rc4030_dma_translate(IOMMUMemoryRegion *iommu, hwaddr addr,
--                                          IOMMUAccessFlags flag)
-+                                          IOMMUAccessFlags flag, int iommu_idx)
- {
-     rc4030State *s = container_of(iommu, rc4030State, dma_mr);
-     IOMMUTLBEntry ret = {
-diff --git a/hw/i386/amd_iommu.c b/hw/i386/amd_iommu.c
-index 63d46ff6ee..1fd669fef8 100644
---- a/hw/i386/amd_iommu.c
-+++ b/hw/i386/amd_iommu.c
-@@ -991,7 +991,7 @@ static inline bool amdvi_is_interrupt_addr(hwaddr addr)
- }
- 
- static IOMMUTLBEntry amdvi_translate(IOMMUMemoryRegion *iommu, hwaddr addr,
--                                     IOMMUAccessFlags flag)
-+                                     IOMMUAccessFlags flag, int iommu_idx)
- {
-     AMDVIAddressSpace *as = container_of(iommu, AMDVIAddressSpace, iommu);
-     AMDVIState *s = as->iommu_state;
-diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
-index b8c9354b0b..a4b9a254bd 100644
---- a/hw/i386/intel_iommu.c
-+++ b/hw/i386/intel_iommu.c
-@@ -2282,7 +2282,7 @@ static void vtd_mem_write(void *opaque, hwaddr addr,
- }
- 
- static IOMMUTLBEntry vtd_iommu_translate(IOMMUMemoryRegion *iommu, hwaddr addr,
--                                         IOMMUAccessFlags flag)
-+                                         IOMMUAccessFlags flag, int iommu_idx)
- {
-     VTDAddressSpace *vtd_as = container_of(iommu, VTDAddressSpace, iommu);
-     IntelIOMMUState *s = vtd_as->iommu_state;
-diff --git a/hw/ppc/spapr_iommu.c b/hw/ppc/spapr_iommu.c
-index 301708e45e..1b0880ac9e 100644
---- a/hw/ppc/spapr_iommu.c
-+++ b/hw/ppc/spapr_iommu.c
-@@ -112,7 +112,8 @@ static void spapr_tce_free_table(uint64_t *table, int fd, uint32_t nb_table)
- /* Called from RCU critical section */
- static IOMMUTLBEntry spapr_tce_translate_iommu(IOMMUMemoryRegion *iommu,
-                                                hwaddr addr,
--                                               IOMMUAccessFlags flag)
-+                                               IOMMUAccessFlags flag,
-+                                               int iommu_idx)
- {
-     sPAPRTCETable *tcet = container_of(iommu, sPAPRTCETable, iommu);
-     uint64_t tce;
-diff --git a/hw/s390x/s390-pci-bus.c b/hw/s390x/s390-pci-bus.c
-index 10da87458e..e3e0ebb7f6 100644
---- a/hw/s390x/s390-pci-bus.c
-+++ b/hw/s390x/s390-pci-bus.c
-@@ -484,7 +484,7 @@ uint16_t s390_guest_io_table_walk(uint64_t g_iota, hwaddr addr,
- }
- 
- static IOMMUTLBEntry s390_translate_iommu(IOMMUMemoryRegion *mr, hwaddr addr,
--                                          IOMMUAccessFlags flag)
-+                                          IOMMUAccessFlags flag, int iommu_idx)
- {
-     S390PCIIOMMU *iommu = container_of(mr, S390PCIIOMMU, iommu_mr);
-     S390IOTLBEntry *entry;
-diff --git a/hw/sparc/sun4m_iommu.c b/hw/sparc/sun4m_iommu.c
-index b677601fc6..7ca1e3fce4 100644
---- a/hw/sparc/sun4m_iommu.c
-+++ b/hw/sparc/sun4m_iommu.c
-@@ -282,7 +282,8 @@ static void iommu_bad_addr(IOMMUState *s, hwaddr addr,
- /* Called from RCU critical section */
- static IOMMUTLBEntry sun4m_translate_iommu(IOMMUMemoryRegion *iommu,
-                                            hwaddr addr,
--                                           IOMMUAccessFlags flags)
-+                                           IOMMUAccessFlags flags,
-+                                           int iommu_idx)
- {
-     IOMMUState *is = container_of(iommu, IOMMUState, iommu);
-     hwaddr page, pa;
-diff --git a/hw/sparc64/sun4u_iommu.c b/hw/sparc64/sun4u_iommu.c
-index eb3aaa87e6..1ef7645ba5 100644
---- a/hw/sparc64/sun4u_iommu.c
-+++ b/hw/sparc64/sun4u_iommu.c
-@@ -73,7 +73,7 @@
- /* Called from RCU critical section */
- static IOMMUTLBEntry sun4u_translate_iommu(IOMMUMemoryRegion *iommu,
-                                            hwaddr addr,
--                                           IOMMUAccessFlags flag)
-+                                           IOMMUAccessFlags flag, int iommu_idx)
- {
-     IOMMUState *is = container_of(iommu, IOMMUState, iommu);
-     hwaddr baseaddr, offset;
-diff --git a/memory.c b/memory.c
-index accb28d694..ff6cbf5831 100644
---- a/memory.c
-+++ b/memory.c
-@@ -1835,7 +1835,7 @@ void memory_region_iommu_replay(IOMMUMemoryRegion *iommu_mr, IOMMUNotifier *n)
-     granularity = memory_region_iommu_get_min_page_size(iommu_mr);
- 
-     for (addr = 0; addr < memory_region_size(mr); addr += granularity) {
--        iotlb = imrc->translate(iommu_mr, addr, IOMMU_NONE);
-+        iotlb = imrc->translate(iommu_mr, addr, IOMMU_NONE, n->iommu_idx);
-         if (iotlb.perm != IOMMU_NONE) {
-             n->notify(n, &iotlb);
-         }
+ # hw/misc/tz-ppc.c
+ tz_ppc_reset(void) "TZ PPC: reset"
 -- 
 2.17.0
