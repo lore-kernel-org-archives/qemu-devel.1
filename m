@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42880)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42716)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1fKlQN-0002un-Sy
-	for qemu-devel@nongnu.org; Mon, 21 May 2018 10:04:36 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1fKlQI-0002pw-CM
+	for qemu-devel@nongnu.org; Mon, 21 May 2018 10:04:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1fKlQM-00015u-IK
-	for qemu-devel@nongnu.org; Mon, 21 May 2018 10:04:31 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1fKlQH-00010w-9j
+	for qemu-devel@nongnu.org; Mon, 21 May 2018 10:04:26 -0400
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 21 May 2018 15:03:56 +0100
-Message-Id: <20180521140402.23318-22-peter.maydell@linaro.org>
+Date: Mon, 21 May 2018 15:03:44 +0100
+Message-Id: <20180521140402.23318-10-peter.maydell@linaro.org>
 In-Reply-To: <20180521140402.23318-1-peter.maydell@linaro.org>
 References: <20180521140402.23318-1-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PATCH 21/27] hw/misc/tz_mpc.c: Honour the BLK_LUT
- settings in translate
+Subject: [Qemu-devel] [PATCH 09/27] Make flatview_access_valid() take a
+ MemTxAttrs argument
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,107 +23,65 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-arm@nongnu.org, qemu-devel@nongnu.org
 Cc: patches@linaro.org, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 
-The final part of the Memory Protection Controller we need to
-implement is actually using the BLK_LUT data programmed by the
-guest to determine whether to block the transaction or not.
-
-Since this means we now change transaction mappings when
-the guest writes to BLK_LUT, we must also call the IOMMU
-notifiers at that point.
+As part of plumbing MemTxAttrs down to the IOMMU translate method,
+add MemTxAttrs as an argument to flatview_access_valid().
+Its callers now all have an attrs value to hand, so we can
+correct our earlier temporary use of MEMTXATTRS_UNSPECIFIED.
 
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- hw/misc/tz-mpc.c     | 50 ++++++++++++++++++++++++++++++++++++++++++--
- hw/misc/trace-events |  1 +
- 2 files changed, 49 insertions(+), 2 deletions(-)
+ exec.c | 11 +++++------
+ 1 file changed, 5 insertions(+), 6 deletions(-)
 
-diff --git a/hw/misc/tz-mpc.c b/hw/misc/tz-mpc.c
-index 39a72563b7..439f6b9496 100644
---- a/hw/misc/tz-mpc.c
-+++ b/hw/misc/tz-mpc.c
-@@ -72,6 +72,50 @@ static void tz_mpc_irq_update(TZMPC *s)
-     qemu_set_irq(s->irq, s->int_stat && s->int_en);
+diff --git a/exec.c b/exec.c
+index b58eb0fedd..9229fb4058 100644
+--- a/exec.c
++++ b/exec.c
+@@ -2697,7 +2697,7 @@ static MemTxResult flatview_read(FlatView *fv, hwaddr addr,
+ static MemTxResult flatview_write(FlatView *fv, hwaddr addr, MemTxAttrs attrs,
+                                   const uint8_t *buf, int len);
+ static bool flatview_access_valid(FlatView *fv, hwaddr addr, int len,
+-                                  bool is_write);
++                                  bool is_write, MemTxAttrs attrs);
+ 
+ static MemTxResult subpage_read(void *opaque, hwaddr addr, uint64_t *data,
+                                 unsigned len, MemTxAttrs attrs)
+@@ -2773,7 +2773,7 @@ static bool subpage_accepts(void *opaque, hwaddr addr,
+ #endif
+ 
+     return flatview_access_valid(subpage->fv, addr + subpage->base,
+-                                 len, is_write);
++                                 len, is_write, attrs);
  }
  
-+static void tz_mpc_iommu_notify(TZMPC *s, uint32_t lutidx,
-+                                uint32_t oldlut, uint32_t newlut)
-+{
-+    /* Called when the LUT word at lutidx has changed from oldlut to newlut;
-+     * must call the IOMMU notifiers for the changed blocks.
-+     */
-+    IOMMUTLBEntry entry = {
-+        .addr_mask = s->blocksize - 1,
-+    };
-+    hwaddr addr = lutidx * s->blocksize * 32;
-+    int i;
-+
-+    for (i = 0; i < 32; i++, addr += s->blocksize) {
-+        if (!((oldlut ^ newlut) & (1 << i))) {
-+            continue;
-+        }
-+        /* This changes the mappings for both the S and the NS space,
-+         * so we need to do four notifies: an UNMAP then a MAP for each.
-+         */
-+
-+        trace_tz_mpc_iommu_notify(addr);
-+        entry.iova = addr;
-+        entry.translated_addr = addr;
-+
-+        entry.perm = IOMMU_NONE;
-+        memory_region_notify_iommu(&s->upstream, IOMMU_IDX_S, entry);
-+        memory_region_notify_iommu(&s->upstream, IOMMU_IDX_NS, entry);
-+
-+        entry.perm = IOMMU_RW;
-+        if (newlut & (1 << i)) {
-+            entry.target_as = &s->blocked_io_as;
-+        } else {
-+            entry.target_as = &s->downstream_as;
-+        }
-+        memory_region_notify_iommu(&s->upstream, IOMMU_IDX_S, entry);
-+        if (newlut & (1 << i)) {
-+            entry.target_as = &s->downstream_as;
-+        } else {
-+            entry.target_as = &s->blocked_io_as;
-+        }
-+        memory_region_notify_iommu(&s->upstream, IOMMU_IDX_NS, entry);
-+    }
-+}
-+
- static MemTxResult tz_mpc_reg_read(void *opaque, hwaddr addr,
-                                    uint64_t *pdata,
-                                    unsigned size, MemTxAttrs attrs)
-@@ -213,6 +257,7 @@ static MemTxResult tz_mpc_reg_write(void *opaque, hwaddr addr,
-         s->blk_idx = value % s->blk_max;
-         break;
-     case A_BLK_LUT:
-+        tz_mpc_iommu_notify(s, s->blk_idx, s->blk_lut[s->blk_idx], value);
-         s->blk_lut[s->blk_idx] = value;
-         if (size == 4) {
-             s->blk_idx++;
-@@ -362,9 +407,10 @@ static IOMMUTLBEntry tz_mpc_translate(IOMMUMemoryRegion *iommu,
-     /* Look at the per-block configuration for this address, and
-      * return a TLB entry directing the transaction at either
-      * downstream_as or blocked_io_as, as appropriate.
--     * For the moment, always permit accesses.
-+     * If the LUT cfg_ns bit is 1, only non-secure transactions
-+     * may pass. If the bit is 0, only secure transactions may pass.
-      */
--    ok = true;
-+    ok = tz_mpc_cfg_ns(s, addr) == (iommu_idx == IOMMU_IDX_NS);
+ static const MemoryRegionOps subpage_ops = {
+@@ -3461,7 +3461,7 @@ static void cpu_notify_map_clients(void)
+ }
  
-     trace_tz_mpc_translate(addr, flags,
-                            iommu_idx == IOMMU_IDX_S ? "S" : "NS",
-diff --git a/hw/misc/trace-events b/hw/misc/trace-events
-index d4835c8970..be3ee1707b 100644
---- a/hw/misc/trace-events
-+++ b/hw/misc/trace-events
-@@ -90,6 +90,7 @@ tz_mpc_reg_write(uint32_t offset, uint64_t data, unsigned size) "TZ MPC regs wri
- tz_mpc_mem_blocked_read(uint64_t addr, unsigned size, bool secure) "TZ MPC blocked read: offset 0x%" PRIx64 " size %u secure %d"
- tz_mpc_mem_blocked_write(uint64_t addr, uint64_t data, unsigned size, bool secure) "TZ MPC blocked write: offset 0x%" PRIx64 " data 0x%" PRIx64 " size %u secure %d"
- tz_mpc_translate(uint64_t addr, int flags, const char *idx, const char *res) "TZ MPC translate: addr 0x%" PRIx64 " flags 0x%x iommu_idx %s: %s"
-+tz_mpc_iommu_notify(uint64_t addr) "TZ MPC iommu: notifying UNMAP/MAP for 0x%" PRIx64
+ static bool flatview_access_valid(FlatView *fv, hwaddr addr, int len,
+-                                  bool is_write)
++                                  bool is_write, MemTxAttrs attrs)
+ {
+     MemoryRegion *mr;
+     hwaddr l, xlat;
+@@ -3472,8 +3472,7 @@ static bool flatview_access_valid(FlatView *fv, hwaddr addr, int len,
+         if (!memory_access_is_direct(mr, is_write)) {
+             l = memory_access_size(mr, l, addr);
+             /* When our callers all have attrs we'll pass them through here */
+-            if (!memory_region_access_valid(mr, xlat, l, is_write,
+-                                            MEMTXATTRS_UNSPECIFIED)) {
++            if (!memory_region_access_valid(mr, xlat, l, is_write, attrs)) {
+                 return false;
+             }
+         }
+@@ -3493,7 +3492,7 @@ bool address_space_access_valid(AddressSpace *as, hwaddr addr,
  
- # hw/misc/tz-ppc.c
- tz_ppc_reset(void) "TZ PPC: reset"
+     rcu_read_lock();
+     fv = address_space_to_flatview(as);
+-    result = flatview_access_valid(fv, addr, len, is_write);
++    result = flatview_access_valid(fv, addr, len, is_write, attrs);
+     rcu_read_unlock();
+     return result;
+ }
 -- 
 2.17.0
