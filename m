@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47730)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56264)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fKhSi-0001q1-0F
-	for qemu-devel@nongnu.org; Mon, 21 May 2018 05:50:42 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1fKi9s-0001QH-R9
+	for qemu-devel@nongnu.org; Mon, 21 May 2018 06:35:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fKhSg-0007QQ-47
-	for qemu-devel@nongnu.org; Mon, 21 May 2018 05:50:39 -0400
-Received: from mail-oi0-x22f.google.com ([2607:f8b0:4003:c06::22f]:38057)
+	(envelope-from <alex.bennee@linaro.org>) id 1fKi9o-0004cT-Th
+	for qemu-devel@nongnu.org; Mon, 21 May 2018 06:35:16 -0400
+Received: from mail-wr0-x22c.google.com ([2a00:1450:400c:c0c::22c]:46782)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fKhSf-0007Py-V8
-	for qemu-devel@nongnu.org; Mon, 21 May 2018 05:50:38 -0400
-Received: by mail-oi0-x22f.google.com with SMTP id k17-v6so12478663oih.5
-	for <qemu-devel@nongnu.org>; Mon, 21 May 2018 02:50:37 -0700 (PDT)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1fKi9o-0004bJ-MQ
+	for qemu-devel@nongnu.org; Mon, 21 May 2018 06:35:12 -0400
+Received: by mail-wr0-x22c.google.com with SMTP id x9-v6so12623712wrl.13
+	for <qemu-devel@nongnu.org>; Mon, 21 May 2018 03:35:12 -0700 (PDT)
+From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+Date: Mon, 21 May 2018 11:35:04 +0100
+Message-Id: <20180521103504.26432-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <20180518215734.18833-1-richard.henderson@linaro.org>
-References: <20180518215734.18833-1-richard.henderson@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 21 May 2018 10:50:16 +0100
-Message-ID: <CAFEAcA_vNgR36OKur2Fu2dCFVm+uNX2bLVx3bxoqygRkV=BFZA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL 0/8] Honor CPU_DUMP_FPU
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH v2] tests/docker/Makefile.include: handle empty
+ TARGET_LIST
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,32 +28,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: famz@redhat.com
+Cc: qemu-devel@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 
-On 18 May 2018 at 22:57, Richard Henderson <richard.henderson@linaro.org> wrote:
-> With Peter's new patch for "-d fpu", it makes sense to honor
-> this setting in as many targets as currently dump the fpu.
->
->
-> r~
->
->
-> The following changes since commit 5bcf917ee37a5efbef99f091a96db54a5276becb:
->
->   Merge remote-tracking branch 'remotes/pmaydell/tags/pull-target-arm-20180518' into staging (2018-05-18 18:25:29 +0100)
->
-> are available in the Git repository at:
->
->   https://github.com/rth7680/qemu.git tags/pull-fpu-20180518
->
-> for you to fetch changes up to f29c0b170fa9e0568f2d02e764e18b00cad3a27f:
->
->   target/xtensa: Honor CPU_DUMP_FPU (2018-05-18 14:52:38 -0700)
->
-> ----------------------------------------------------------------
-> Honor CPU_DUMP_FPU
+If the user doesn't specify a TARGET_LIST they get the current
+configuration but with spaces and hilarity ensues. This adds some make
+magic to turn the TARGET_LIST back into a comma separated list.
 
-Applied, thanks.
+Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 
--- PMM
+---
+v2
+  - use common $(SPACE) and $(COMMA) in rules.mak
+---
+ rules.mak                     | 3 +++
+ tests/docker/Makefile.include | 2 +-
+ 2 files changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/rules.mak b/rules.mak
+index 04c7f74d07..bbb2667928 100644
+--- a/rules.mak
++++ b/rules.mak
+@@ -1,4 +1,7 @@
+ 
++# These are used when we want to do substitutions without confusing Make
++NULL  :=
++SPACE := $(NULL) #
+ COMMA := ,
+ 
+ # Don't use implicit rules or variables
+diff --git a/tests/docker/Makefile.include b/tests/docker/Makefile.include
+index d00887bdf1..e911d44d9f 100644
+--- a/tests/docker/Makefile.include
++++ b/tests/docker/Makefile.include
+@@ -148,7 +148,7 @@ docker-run: docker-qemu-src
+ 			$(if $V,,--rm) 					\
+ 			$(if $(DEBUG),-ti,)				\
+ 			$(if $(NETWORK),$(if $(subst $(NETWORK),,1),--net=$(NETWORK)),--net=none) \
+-			-e TARGET_LIST=$(TARGET_LIST) 			\
++			-e TARGET_LIST=$(subst $(SPACE),$(COMMA),$(TARGET_LIST))	\
+ 			-e EXTRA_CONFIGURE_OPTS="$(EXTRA_CONFIGURE_OPTS)" \
+ 			-e V=$V -e J=$J -e DEBUG=$(DEBUG)		\
+ 			-e SHOW_ENV=$(SHOW_ENV) 			\
+-- 
+2.17.0
