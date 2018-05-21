@@ -1,21 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43428)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43442)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1fKssA-0005lq-5b
+	(envelope-from <ehabkost@redhat.com>) id 1fKssA-0005lt-Se
 	for qemu-devel@nongnu.org; Mon, 21 May 2018 18:01:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1fKss6-0000fO-BU
+	(envelope-from <ehabkost@redhat.com>) id 1fKssA-0000gW-3A
 	for qemu-devel@nongnu.org; Mon, 21 May 2018 18:01:42 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:34354)
+Received: from mx1.redhat.com ([209.132.183.28]:49590)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1fKss6-0000ez-6E
-	for qemu-devel@nongnu.org; Mon, 21 May 2018 18:01:38 -0400
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1fKss9-0000gF-Up
+	for qemu-devel@nongnu.org; Mon, 21 May 2018 18:01:42 -0400
 From: Eduardo Habkost <ehabkost@redhat.com>
-Date: Mon, 21 May 2018 19:01:30 -0300
-Message-Id: <20180521220133.17445-1-ehabkost@redhat.com>
+Date: Mon, 21 May 2018 19:01:31 -0300
+Message-Id: <20180521220133.17445-2-ehabkost@redhat.com>
+In-Reply-To: <20180521220133.17445-1-ehabkost@redhat.com>
+References: <20180521220133.17445-1-ehabkost@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 0/3] Speculative store buffer bypass mitigation
+Subject: [Qemu-devel] [PULL 1/3] i386: define the 'ssbd' CPUID feature bit
  (CVE-2018-3639)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -26,50 +28,52 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, Eduardo Habkost <ehabkost@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, qemu-devel@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>, Richard Henderson <rth@twiddle.net>, Marcelo Tosatti <mtosatti@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, Eduardo Habkost <ehabkost@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, qemu-devel@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>, Richard Henderson <rth@twiddle.net>, Marcelo Tosatti <mtosatti@redhat.com>, =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
 
-This provides the QEMU part of the mitigations for the speculative
-store buffer bypass vulnerabilities on the x86 platform[1], and is
-the companion of the kernel patches merged in:
+From: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
 
-  https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/comm=
-it/?id=3D3b78ce4a34b761c7fe13520de822984019ff1a8f
+New microcode introduces the "Speculative Store Bypass Disable"
+CPUID feature bit. This needs to be exposed to guest OS to allow
+them to protect against CVE-2018-3639.
 
-[1] https://bugs.chromium.org/p/project-zero/issues/detail?id=3D1528
-    https://access.redhat.com/security/vulnerabilities/ssbd
+Signed-off-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+Reviewed-by: Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>
+Signed-off-by: Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>
+Message-Id: <20180521215424.13520-2-berrange@redhat.com>
+Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+---
+ target/i386/cpu.h | 1 +
+ target/i386/cpu.c | 2 +-
+ 2 files changed, 2 insertions(+), 1 deletion(-)
 
-The following changes since commit 9802316ed6c19fd45b4c498523df02ca370d05=
-86:
-
-  Merge remote-tracking branch 'remotes/mjt/tags/trivial-patches-fetch' i=
-nto staging (2018-05-21 10:50:32 +0100)
-
-are available in the Git repository at:
-
-  git://github.com/ehabkost/qemu.git tags/x86-next-pull-request
-
-for you to fetch changes up to 403503b162ffc33fb64cfefdf7b880acf41772cd:
-
-  i386: define the AMD 'virt-ssbd' CPUID feature bit (CVE-2018-3639) (201=
-8-05-21 18:59:08 -0300)
-
-----------------------------------------------------------------
-Speculative store buffer bypass mitigation (CVE-2018-3639)
-
-----------------------------------------------------------------
-
-Daniel P. Berrang=C3=A9 (1):
-  i386: define the 'ssbd' CPUID feature bit (CVE-2018-3639)
-
-Konrad Rzeszutek Wilk (2):
-  i386: Define the Virt SSBD MSR and handling of it (CVE-2018-3639)
-  i386: define the AMD 'virt-ssbd' CPUID feature bit (CVE-2018-3639)
-
- target/i386/cpu.h     |  3 +++
- target/i386/cpu.c     |  4 ++--
- target/i386/kvm.c     | 16 ++++++++++++++--
- target/i386/machine.c | 20 ++++++++++++++++++++
- 4 files changed, 39 insertions(+), 4 deletions(-)
-
+diff --git a/target/i386/cpu.h b/target/i386/cpu.h
+index 8bc54d70bf..f0b68905de 100644
+--- a/target/i386/cpu.h
++++ b/target/i386/cpu.h
+@@ -685,6 +685,7 @@ typedef uint32_t FeatureWordArray[FEATURE_WORDS];
+ #define CPUID_7_0_EDX_AVX512_4VNNIW (1U << 2) /* AVX512 Neural Network I=
+nstructions */
+ #define CPUID_7_0_EDX_AVX512_4FMAPS (1U << 3) /* AVX512 Multiply Accumul=
+ation Single Precision */
+ #define CPUID_7_0_EDX_SPEC_CTRL     (1U << 26) /* Speculation Control */
++#define CPUID_7_0_EDX_SPEC_CTRL_SSBD  (1U << 31) /* Speculative Store By=
+pass Disable */
+=20
+ #define KVM_HINTS_DEDICATED (1U << 0)
+=20
+diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+index e5e66a75d4..a1185b17d1 100644
+--- a/target/i386/cpu.c
++++ b/target/i386/cpu.c
+@@ -805,7 +805,7 @@ static FeatureWordInfo feature_word_info[FEATURE_WORD=
+S] =3D {
+             NULL, NULL, NULL, NULL,
+             NULL, NULL, NULL, NULL,
+             NULL, NULL, "spec-ctrl", NULL,
+-            NULL, NULL, NULL, NULL,
++            NULL, NULL, NULL, "ssbd",
+         },
+         .cpuid_eax =3D 7,
+         .cpuid_needs_ecx =3D true, .cpuid_ecx =3D 0,
 --=20
 2.14.3
