@@ -1,17 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42769)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42978)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1fKlQJ-0002qW-P4
-	for qemu-devel@nongnu.org; Mon, 21 May 2018 10:04:30 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1fKlQQ-00033D-AR
+	for qemu-devel@nongnu.org; Mon, 21 May 2018 10:04:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1fKlQD-0000vq-GW
-	for qemu-devel@nongnu.org; Mon, 21 May 2018 10:04:27 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1fKlQO-00017F-GD
+	for qemu-devel@nongnu.org; Mon, 21 May 2018 10:04:34 -0400
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 21 May 2018 15:03:42 +0100
-Message-Id: <20180521140402.23318-8-peter.maydell@linaro.org>
+Date: Mon, 21 May 2018 15:04:02 +0100
+Message-Id: <20180521140402.23318-28-peter.maydell@linaro.org>
 In-Reply-To: <20180521140402.23318-1-peter.maydell@linaro.org>
 References: <20180521140402.23318-1-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PATCH 07/27] Make memory_region_access_valid() take a
- MemTxAttrs argument
+Subject: [Qemu-devel] [PATCH 27/27] hw/arm/mps2-tz.c: Instantiate MPCs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,100 +22,134 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-arm@nongnu.org, qemu-devel@nongnu.org
 Cc: patches@linaro.org, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 
-As part of plumbing MemTxAttrs down to the IOMMU translate method,
-add MemTxAttrs as an argument to memory_region_access_valid().
-Its callers either have an attrs value to hand, or don't care
-and can use MEMTXATTRS_UNSPECIFIED.
-
-The callsite in flatview_access_valid() is part of a recursive
-loop flatview_access_valid() -> memory_region_access_valid() ->
- subpage_accepts() -> flatview_access_valid(); we make it pass
-MEMTXATTRS_UNSPECIFIED for now, until the next several commits
-have plumbed an attrs parameter through the rest of the loop
-and we can add an attrs parameter to flatview_access_valid().
+Instantiate and wire up the Memory Protection Controllers
+in the MPS2 board itself.
 
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- include/exec/memory-internal.h | 3 ++-
- exec.c                         | 4 +++-
- hw/s390x/s390-pci-inst.c       | 3 ++-
- memory.c                       | 7 ++++---
- 4 files changed, 11 insertions(+), 6 deletions(-)
+ hw/arm/mps2-tz.c | 71 ++++++++++++++++++++++++++++++------------------
+ 1 file changed, 44 insertions(+), 27 deletions(-)
 
-diff --git a/include/exec/memory-internal.h b/include/exec/memory-internal.h
-index 58399b9318..56c25c0ef7 100644
---- a/include/exec/memory-internal.h
-+++ b/include/exec/memory-internal.h
-@@ -37,7 +37,8 @@ void flatview_unref(FlatView *view);
- extern const MemoryRegionOps unassigned_mem_ops;
+diff --git a/hw/arm/mps2-tz.c b/hw/arm/mps2-tz.c
+index 8dc8bfd4ab..a58b5dea79 100644
+--- a/hw/arm/mps2-tz.c
++++ b/hw/arm/mps2-tz.c
+@@ -44,6 +44,7 @@
+ #include "hw/timer/cmsdk-apb-timer.h"
+ #include "hw/misc/mps2-scc.h"
+ #include "hw/misc/mps2-fpgaio.h"
++#include "hw/misc/tz-mpc.h"
+ #include "hw/arm/iotkit.h"
+ #include "hw/devices.h"
+ #include "net/net.h"
+@@ -64,13 +65,12 @@ typedef struct {
  
- bool memory_region_access_valid(MemoryRegion *mr, hwaddr addr,
--                                unsigned size, bool is_write);
-+                                unsigned size, bool is_write,
-+                                MemTxAttrs attrs);
+     IoTKit iotkit;
+     MemoryRegion psram;
+-    MemoryRegion ssram1;
++    MemoryRegion ssram[3];
+     MemoryRegion ssram1_m;
+-    MemoryRegion ssram23;
+     MPS2SCC scc;
+     MPS2FPGAIO fpgaio;
+     TZPPC ppc[5];
+-    UnimplementedDeviceState ssram_mpc[3];
++    TZMPC ssram_mpc[3];
+     UnimplementedDeviceState spi[5];
+     UnimplementedDeviceState i2c[4];
+     UnimplementedDeviceState i2s_audio;
+@@ -95,16 +95,6 @@ typedef struct {
+ /* Main SYSCLK frequency in Hz */
+ #define SYSCLK_FRQ 20000000
  
- void flatview_add_to_dispatch(FlatView *fv, MemoryRegionSection *section);
- AddressSpaceDispatch *address_space_dispatch_new(FlatView *fv);
-diff --git a/exec.c b/exec.c
-index 718b33921b..6cf97b5d28 100644
---- a/exec.c
-+++ b/exec.c
-@@ -3468,7 +3468,9 @@ static bool flatview_access_valid(FlatView *fv, hwaddr addr, int len,
-         mr = flatview_translate(fv, addr, &xlat, &l, is_write);
-         if (!memory_access_is_direct(mr, is_write)) {
-             l = memory_access_size(mr, l, addr);
--            if (!memory_region_access_valid(mr, xlat, l, is_write)) {
-+            /* When our callers all have attrs we'll pass them through here */
-+            if (!memory_region_access_valid(mr, xlat, l, is_write,
-+                                            MEMTXATTRS_UNSPECIFIED)) {
-                 return false;
-             }
-         }
-diff --git a/hw/s390x/s390-pci-inst.c b/hw/s390x/s390-pci-inst.c
-index 02a815fd31..d1a5f79678 100644
---- a/hw/s390x/s390-pci-inst.c
-+++ b/hw/s390x/s390-pci-inst.c
-@@ -762,7 +762,8 @@ int pcistb_service_call(S390CPU *cpu, uint8_t r1, uint8_t r3, uint64_t gaddr,
-     mr = s390_get_subregion(mr, offset, len);
-     offset -= mr->addr;
+-/* Initialize the auxiliary RAM region @mr and map it into
+- * the memory map at @base.
+- */
+-static void make_ram(MemoryRegion *mr, const char *name,
+-                     hwaddr base, hwaddr size)
+-{
+-    memory_region_init_ram(mr, NULL, name, size, &error_fatal);
+-    memory_region_add_subregion(get_system_memory(), base, mr);
+-}
+-
+ /* Create an alias of an entire original MemoryRegion @orig
+  * located at @base in the memory map.
+  */
+@@ -224,6 +214,44 @@ static MemoryRegion *make_fpgaio(MPS2TZMachineState *mms, void *opaque,
+     return sysbus_mmio_get_region(SYS_BUS_DEVICE(fpgaio), 0);
+ }
  
--    if (!memory_region_access_valid(mr, offset, len, true)) {
-+    if (!memory_region_access_valid(mr, offset, len, true,
-+                                    MEMTXATTRS_UNSPECIFIED)) {
-         s390_program_interrupt(env, PGM_OPERAND, 6, ra);
-         return 0;
-     }
-diff --git a/memory.c b/memory.c
-index fc7f9b782b..279f7c9b4a 100644
---- a/memory.c
-+++ b/memory.c
-@@ -1347,7 +1347,8 @@ static const MemoryRegionOps ram_device_mem_ops = {
- bool memory_region_access_valid(MemoryRegion *mr,
-                                 hwaddr addr,
-                                 unsigned size,
--                                bool is_write)
-+                                bool is_write,
-+                                MemTxAttrs attrs)
++static MemoryRegion *make_mpc(MPS2TZMachineState *mms, void *opaque,
++                              const char *name, hwaddr size)
++{
++    TZMPC *mpc = opaque;
++    int i = mpc - &mms->ssram_mpc[0];
++    MemoryRegion *ssram = &mms->ssram[i];
++    MemoryRegion *upstream;
++    char *mpcname = g_strdup_printf("%s-mpc", name);
++    static uint32_t ramsize[] = { 0x00400000, 0x00200000, 0x00200000 };
++    static uint32_t rambase[] = { 0x00000000, 0x28000000, 0x28200000 };
++
++    memory_region_init_ram(ssram, NULL, name, ramsize[i], &error_fatal);
++
++    init_sysbus_child(OBJECT(mms), mpcname, mpc,
++                      sizeof(mms->ssram_mpc[0]), TYPE_TZ_MPC);
++    object_property_set_link(OBJECT(mpc), OBJECT(ssram),
++                             "downstream", &error_fatal);
++    object_property_set_bool(OBJECT(mpc), true, "realized", &error_fatal);
++    /* Map the upstream end of the MPC into system memory */
++    upstream = sysbus_mmio_get_region(SYS_BUS_DEVICE(mpc), 1);
++    memory_region_add_subregion(get_system_memory(), rambase[i], upstream);
++    /* and connect its interrupt to the IoTKit */
++    qdev_connect_gpio_out_named(DEVICE(mpc), "irq", 0,
++                                qdev_get_gpio_in_named(DEVICE(&mms->iotkit),
++                                                       "mpcexp_status", i));
++
++    /* The first SSRAM is a special case as it has an alias; accesses to
++     * the alias region at 0x00400000 must also go to the MPC upstream.
++     */
++    if (i == 0) {
++        make_ram_alias(&mms->ssram1_m, "mps.ssram1_m", upstream, 0x00400000);
++    }
++
++    g_free(mpcname);
++    /* Return the register interface MR for our caller to map behind the PPC */
++    return sysbus_mmio_get_region(SYS_BUS_DEVICE(mpc), 0);
++}
++
+ static void mps2tz_common_init(MachineState *machine)
  {
-     int access_size_min, access_size_max;
-     int access_size, i;
-@@ -1416,7 +1417,7 @@ MemTxResult memory_region_dispatch_read(MemoryRegion *mr,
- {
-     MemTxResult r;
+     MPS2TZMachineState *mms = MPS2TZ_MACHINE(machine);
+@@ -285,14 +313,6 @@ static void mps2tz_common_init(MachineState *machine)
+                                          NULL, "mps.ram", 0x01000000);
+     memory_region_add_subregion(system_memory, 0x80000000, &mms->psram);
  
--    if (!memory_region_access_valid(mr, addr, size, false)) {
-+    if (!memory_region_access_valid(mr, addr, size, false, attrs)) {
-         *pval = unassigned_mem_read(mr, addr, size);
-         return MEMTX_DECODE_ERROR;
-     }
-@@ -1458,7 +1459,7 @@ MemTxResult memory_region_dispatch_write(MemoryRegion *mr,
-                                          unsigned size,
-                                          MemTxAttrs attrs)
- {
--    if (!memory_region_access_valid(mr, addr, size, true)) {
-+    if (!memory_region_access_valid(mr, addr, size, true, attrs)) {
-         unassigned_mem_write(mr, addr, data, size);
-         return MEMTX_DECODE_ERROR;
-     }
+-    /* The SSRAM memories should all be behind Memory Protection Controllers,
+-     * but we don't implement that yet.
+-     */
+-    make_ram(&mms->ssram1, "mps.ssram1", 0x00000000, 0x00400000);
+-    make_ram_alias(&mms->ssram1_m, "mps.ssram1_m", &mms->ssram1, 0x00400000);
+-
+-    make_ram(&mms->ssram23, "mps.ssram23", 0x28000000, 0x00400000);
+-
+     /* The overflow IRQs for all UARTs are ORed together.
+      * Tx, Rx and "combined" IRQs are sent to the NVIC separately.
+      * Create the OR gate for this.
+@@ -322,12 +342,9 @@ static void mps2tz_common_init(MachineState *machine)
+     const PPCInfo ppcs[] = { {
+             .name = "apb_ppcexp0",
+             .ports = {
+-                { "ssram-mpc0", make_unimp_dev, &mms->ssram_mpc[0],
+-                  0x58007000, 0x1000 },
+-                { "ssram-mpc1", make_unimp_dev, &mms->ssram_mpc[1],
+-                  0x58008000, 0x1000 },
+-                { "ssram-mpc2", make_unimp_dev, &mms->ssram_mpc[2],
+-                  0x58009000, 0x1000 },
++                { "ssram-0", make_mpc, &mms->ssram_mpc[0], 0x58007000, 0x1000 },
++                { "ssram-1", make_mpc, &mms->ssram_mpc[1], 0x58008000, 0x1000 },
++                { "ssram-2", make_mpc, &mms->ssram_mpc[2], 0x58009000, 0x1000 },
+             },
+         }, {
+             .name = "apb_ppcexp1",
 -- 
 2.17.0
