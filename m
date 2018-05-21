@@ -1,16 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42633)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42797)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1fKlQF-0002nP-BZ
-	for qemu-devel@nongnu.org; Mon, 21 May 2018 10:04:24 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1fKlQK-0002qY-No
+	for qemu-devel@nongnu.org; Mon, 21 May 2018 10:04:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1fKlQD-0000wP-Rp
-	for qemu-devel@nongnu.org; Mon, 21 May 2018 10:04:23 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1fKlQI-00013F-Lf
+	for qemu-devel@nongnu.org; Mon, 21 May 2018 10:04:28 -0400
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 21 May 2018 15:03:54 +0100
-Message-Id: <20180521140402.23318-20-peter.maydell@linaro.org>
+Date: Mon, 21 May 2018 15:03:39 +0100
+Message-Id: <20180521140402.23318-5-peter.maydell@linaro.org>
 In-Reply-To: <20180521140402.23318-1-peter.maydell@linaro.org>
 References: <20180521140402.23318-1-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PATCH 19/27] hw/misc/tz-mpc.c: Implement registers
+Subject: [Qemu-devel] [PATCH 04/27] Make address_space_map() take a
+ MemTxAttrs argument
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,250 +23,86 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-arm@nongnu.org, qemu-devel@nongnu.org
 Cc: patches@linaro.org, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 
-Implement the missing registers for the TZ MPC.
+As part of plumbing MemTxAttrs down to the IOMMU translate method,
+add MemTxAttrs as an argument to address_space_map().
+Its callers either have an attrs value to hand, or don't care
+and can use MEMTXATTRS_UNSPECIFIED.
 
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- include/hw/misc/tz-mpc.h |  10 +++
- hw/misc/tz-mpc.c         | 137 ++++++++++++++++++++++++++++++++++++++-
- 2 files changed, 144 insertions(+), 3 deletions(-)
+ include/exec/memory.h   | 3 ++-
+ include/sysemu/dma.h    | 3 ++-
+ exec.c                  | 6 ++++--
+ target/ppc/mmu-hash64.c | 3 ++-
+ 4 files changed, 10 insertions(+), 5 deletions(-)
 
-diff --git a/include/hw/misc/tz-mpc.h b/include/hw/misc/tz-mpc.h
-index b5eaf1699e..1fff4d6029 100644
---- a/include/hw/misc/tz-mpc.h
-+++ b/include/hw/misc/tz-mpc.h
-@@ -48,6 +48,16 @@ struct TZMPC {
+diff --git a/include/exec/memory.h b/include/exec/memory.h
+index 9a30a1bb9e..b1bdb376d4 100644
+--- a/include/exec/memory.h
++++ b/include/exec/memory.h
+@@ -1952,9 +1952,10 @@ bool address_space_access_valid(AddressSpace *as, hwaddr addr, int len, bool is_
+  * @addr: address within that address space
+  * @plen: pointer to length of buffer; updated on return
+  * @is_write: indicates the transfer direction
++ * @attrs: memory attributes
+  */
+ void *address_space_map(AddressSpace *as, hwaddr addr,
+-                        hwaddr *plen, bool is_write);
++                        hwaddr *plen, bool is_write, MemTxAttrs attrs);
  
-     /*< public >*/
+ /* address_space_unmap: Unmaps a memory region previously mapped by address_space_map()
+  *
+diff --git a/include/sysemu/dma.h b/include/sysemu/dma.h
+index c228c66513..0d73902634 100644
+--- a/include/sysemu/dma.h
++++ b/include/sysemu/dma.h
+@@ -132,7 +132,8 @@ static inline void *dma_memory_map(AddressSpace *as,
+     hwaddr xlen = *len;
+     void *p;
  
-+    /* State */
-+    uint32_t ctrl;
-+    uint32_t blk_idx;
-+    uint32_t int_stat;
-+    uint32_t int_en;
-+    uint32_t int_info1;
-+    uint32_t int_info2;
-+
-+    uint32_t *blk_lut;
-+
-     qemu_irq irq;
- 
-     /* Properties */
-diff --git a/hw/misc/tz-mpc.c b/hw/misc/tz-mpc.c
-index d4467ccc3b..93453cbef2 100644
---- a/hw/misc/tz-mpc.c
-+++ b/hw/misc/tz-mpc.c
-@@ -28,16 +28,23 @@ enum {
- 
- /* Config registers */
- REG32(CTRL, 0x00)
-+    FIELD(CTRL, SEC_RESP, 4, 1)
-+    FIELD(CTRL, AUTOINC, 8, 1)
-+    FIELD(CTRL, LOCKDOWN, 31, 1)
- REG32(BLK_MAX, 0x10)
- REG32(BLK_CFG, 0x14)
- REG32(BLK_IDX, 0x18)
- REG32(BLK_LUT, 0x1c)
- REG32(INT_STAT, 0x20)
-+    FIELD(INT_STAT, IRQ, 0, 1)
- REG32(INT_CLEAR, 0x24)
-+    FIELD(INT_CLEAR, IRQ, 0, 1)
- REG32(INT_EN, 0x28)
-+    FIELD(INT_EN, IRQ, 0, 1)
- REG32(INT_INFO1, 0x2c)
- REG32(INT_INFO2, 0x30)
- REG32(INT_SET, 0x34)
-+    FIELD(INT_SET, IRQ, 0, 1)
- REG32(PIDR4, 0xfd0)
- REG32(PIDR5, 0xfd4)
- REG32(PIDR6, 0xfd8)
-@@ -57,14 +64,55 @@ static const uint8_t tz_mpc_idregs[] = {
-     0x0d, 0xf0, 0x05, 0xb1,
- };
- 
-+static void tz_mpc_irq_update(TZMPC *s)
-+{
-+    qemu_set_irq(s->irq, s->int_stat && s->int_en);
-+}
-+
- static MemTxResult tz_mpc_reg_read(void *opaque, hwaddr addr,
-                                    uint64_t *pdata,
-                                    unsigned size, MemTxAttrs attrs)
+-    p = address_space_map(as, addr, &xlen, dir == DMA_DIRECTION_FROM_DEVICE);
++    p = address_space_map(as, addr, &xlen, dir == DMA_DIRECTION_FROM_DEVICE,
++                          MEMTXATTRS_UNSPECIFIED);
+     *len = xlen;
+     return p;
+ }
+diff --git a/exec.c b/exec.c
+index d314c7cc39..1dc81cfe4a 100644
+--- a/exec.c
++++ b/exec.c
+@@ -3529,7 +3529,8 @@ flatview_extend_translation(FlatView *fv, hwaddr addr,
+ void *address_space_map(AddressSpace *as,
+                         hwaddr addr,
+                         hwaddr *plen,
+-                        bool is_write)
++                        bool is_write,
++                        MemTxAttrs attrs)
  {
-+    TZMPC *s = TZ_MPC(opaque);
-     uint64_t r;
-     uint32_t offset = addr & ~0x3;
- 
-     switch (offset) {
-+    case A_CTRL:
-+        r = s->ctrl;
-+        break;
-+    case A_BLK_MAX:
-+        r = s->blk_max;
-+        break;
-+    case A_BLK_CFG:
-+        /* We are never in "init in progress state", so this just indicates
-+         * the block size. s->blocksize == (1 << BLK_CFG + 5), so
-+         * BLK_CFG == ctz32(s->blocksize) - 5
-+         */
-+        r = ctz32(s->blocksize) - 5;
-+        break;
-+    case A_BLK_IDX:
-+        r = s->blk_idx;
-+        break;
-+    case A_BLK_LUT:
-+        r = s->blk_lut[s->blk_idx];
-+        if (size == 4) {
-+            s->blk_idx++;
-+            s->blk_idx %= s->blk_max;
-+        }
-+        break;
-+    case A_INT_STAT:
-+        r = s->int_stat;
-+        break;
-+    case A_INT_EN:
-+        r = s->int_en;
-+        break;
-+    case A_INT_INFO1:
-+        r = s->int_info1;
-+        break;
-+    case A_INT_INFO2:
-+        r = s->int_info2;
-+        break;
-     case A_PIDR4:
-     case A_PIDR5:
-     case A_PIDR6:
-@@ -110,6 +158,7 @@ static MemTxResult tz_mpc_reg_write(void *opaque, hwaddr addr,
-                                     uint64_t value,
-                                     unsigned size, MemTxAttrs attrs)
+     hwaddr len = *plen;
+     hwaddr l, xlat;
+@@ -3616,7 +3617,8 @@ void *cpu_physical_memory_map(hwaddr addr,
+                               hwaddr *plen,
+                               int is_write)
  {
-+    TZMPC *s = TZ_MPC(opaque);
-     uint32_t offset = addr & ~0x3;
- 
-     trace_tz_mpc_reg_write(addr, value, size);
-@@ -122,9 +171,15 @@ static MemTxResult tz_mpc_reg_write(void *opaque, hwaddr addr,
-         uint32_t oldval;
- 
-         switch (offset) {
--            /* As we add support for registers which need expansions
--             * other than zeroes we'll fill in cases here.
--             */
-+        case A_CTRL:
-+            oldval = s->ctrl;
-+            break;
-+        case A_BLK_IDX:
-+            oldval = s->blk_idx;
-+            break;
-+        case A_BLK_LUT:
-+            oldval = s->blk_lut[s->blk_idx];
-+            break;
-         default:
-             oldval = 0;
-             break;
-@@ -132,7 +187,51 @@ static MemTxResult tz_mpc_reg_write(void *opaque, hwaddr addr,
-         value = deposit32(oldval, (addr & 3) * 8, size * 8, value);
-     }
- 
-+    if ((s->ctrl & R_CTRL_LOCKDOWN_MASK) &&
-+        (offset == A_CTRL || offset == A_BLK_LUT || offset == A_INT_EN)) {
-+        /* Lockdown mode makes these three registers read-only, and
-+         * the only way out of it is to reset the device.
-+         */
-+        qemu_log_mask(LOG_GUEST_ERROR, "TZ MPC register write to offset 0x%x "
-+                      "while MPC is in lockdown mode\n", offset);
-+        return MEMTX_OK;
-+    }
-+
-     switch (offset) {
-+    case A_CTRL:
-+        /* We don't implement the 'data gating' feature so all other bits
-+         * are reserved and we make them RAZ/WI.
-+         */
-+        s->ctrl = value & (R_CTRL_SEC_RESP_MASK |
-+                           R_CTRL_AUTOINC_MASK |
-+                           R_CTRL_LOCKDOWN_MASK);
-+        break;
-+    case A_BLK_IDX:
-+        s->blk_idx = value % s->blk_max;
-+        break;
-+    case A_BLK_LUT:
-+        s->blk_lut[s->blk_idx] = value;
-+        if (size == 4) {
-+            s->blk_idx++;
-+            s->blk_idx %= s->blk_max;
-+        }
-+        break;
-+    case A_INT_CLEAR:
-+        if (value & R_INT_CLEAR_IRQ_MASK) {
-+            s->int_stat = 0;
-+            tz_mpc_irq_update(s);
-+        }
-+        break;
-+    case A_INT_EN:
-+        s->int_en = value & R_INT_EN_IRQ_MASK;
-+        tz_mpc_irq_update(s);
-+        break;
-+    case A_INT_SET:
-+        if (value & R_INT_SET_IRQ_MASK) {
-+            s->int_stat = R_INT_STAT_IRQ_MASK;
-+            tz_mpc_irq_update(s);
-+        }
-+        break;
-     case A_PIDR4:
-     case A_PIDR5:
-     case A_PIDR6:
-@@ -248,6 +347,16 @@ static int tz_mpc_num_indexes(IOMMUMemoryRegion *iommu)
- 
- static void tz_mpc_reset(DeviceState *dev)
- {
-+    TZMPC *s = TZ_MPC(dev);
-+
-+    s->ctrl = 0;
-+    s->blk_idx = 0;
-+    s->int_stat = 0;
-+    s->int_en = 0;
-+    s->int_info1 = 0;
-+    s->int_info2 = 0;
-+
-+    memset(s->blk_lut, 0, s->blk_max * sizeof(uint32_t));
+-    return address_space_map(&address_space_memory, addr, plen, is_write);
++    return address_space_map(&address_space_memory, addr, plen, is_write,
++                             MEMTXATTRS_UNSPECIFIED);
  }
  
- static void tz_mpc_init(Object *obj)
-@@ -321,13 +430,35 @@ static void tz_mpc_realize(DeviceState *dev, Error **errp)
-                        "tz-mpc-downstream");
-     address_space_init(&s->blocked_io_as, &s->blocked_io,
-                        "tz-mpc-blocked-io");
-+
-+    s->blk_lut = g_new(uint32_t, s->blk_max);
-+}
-+
-+static int tz_mpc_post_load(void *opaque, int version_id)
-+{
-+    TZMPC *s = TZ_MPC(opaque);
-+
-+    /* Check the incoming data doesn't point blk_idx off the end of blk_lut. */
-+    if (s->blk_idx >= s->blk_max) {
-+        return -1;
-+    }
-+    return 0;
- }
- 
- static const VMStateDescription tz_mpc_vmstate = {
-     .name = "tz-mpc",
-     .version_id = 1,
-     .minimum_version_id = 1,
-+    .post_load = tz_mpc_post_load,
-     .fields = (VMStateField[]) {
-+        VMSTATE_UINT32(ctrl, TZMPC),
-+        VMSTATE_UINT32(blk_idx, TZMPC),
-+        VMSTATE_UINT32(int_stat, TZMPC),
-+        VMSTATE_UINT32(int_en, TZMPC),
-+        VMSTATE_UINT32(int_info1, TZMPC),
-+        VMSTATE_UINT32(int_info2, TZMPC),
-+        VMSTATE_VARRAY_UINT32(blk_lut, TZMPC, blk_max,
-+                              0, vmstate_info_uint32, uint32_t),
-         VMSTATE_END_OF_LIST()
+ void cpu_physical_memory_unmap(void *buffer, hwaddr len,
+diff --git a/target/ppc/mmu-hash64.c b/target/ppc/mmu-hash64.c
+index a1db20e3a8..aa200cba4c 100644
+--- a/target/ppc/mmu-hash64.c
++++ b/target/ppc/mmu-hash64.c
+@@ -431,7 +431,8 @@ const ppc_hash_pte64_t *ppc_hash64_map_hptes(PowerPCCPU *cpu,
+         return NULL;
      }
- };
+ 
+-    hptes = address_space_map(CPU(cpu)->as, base + pte_offset, &plen, false);
++    hptes = address_space_map(CPU(cpu)->as, base + pte_offset, &plen, false,
++                              MEMTXATTRS_UNSPECIFIED);
+     if (plen < (n * HASH_PTE_SIZE_64)) {
+         hw_error("%s: Unable to map all requested HPTEs\n", __func__);
+     }
 -- 
 2.17.0
