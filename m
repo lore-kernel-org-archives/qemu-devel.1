@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42603)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42708)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1fKlQE-0002nJ-J7
+	(envelope-from <pm215@archaic.org.uk>) id 1fKlQI-0002pm-6R
 	for qemu-devel@nongnu.org; Mon, 21 May 2018 10:04:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1fKlQD-0000va-3Y
-	for qemu-devel@nongnu.org; Mon, 21 May 2018 10:04:22 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1fKlQG-0000zZ-O7
+	for qemu-devel@nongnu.org; Mon, 21 May 2018 10:04:26 -0400
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 21 May 2018 15:03:43 +0100
-Message-Id: <20180521140402.23318-9-peter.maydell@linaro.org>
+Date: Mon, 21 May 2018 15:03:37 +0100
+Message-Id: <20180521140402.23318-3-peter.maydell@linaro.org>
 In-Reply-To: <20180521140402.23318-1-peter.maydell@linaro.org>
 References: <20180521140402.23318-1-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PATCH 08/27] Make MemoryRegion valid.accepts callback
- take a MemTxAttrs argument
+Subject: [Qemu-devel] [PATCH 02/27] Make tb_invalidate_phys_addr() take a
+ MemTxAttrs argument
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,180 +24,80 @@ To: qemu-arm@nongnu.org, qemu-devel@nongnu.org
 Cc: patches@linaro.org, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 
 As part of plumbing MemTxAttrs down to the IOMMU translate method,
-add MemTxAttrs as an argument to the MemoryRegion valid.accepts
-callback. We'll need this for subpage_accepts().
-
-We could take the approach we used with the read and write
-callbacks and add new a new _with_attrs version, but since there
-are so few implementations of the accepts hook we just change
-them all.
+add MemTxAttrs as an argument to tb_invalidate_phys_addr().
+Its callers either have an attrs value to hand, or don't care
+and can use MEMTXATTRS_UNSPECIFIED.
 
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- include/exec/memory.h |  3 ++-
- exec.c                |  9 ++++++---
- hw/hppa/dino.c        |  3 ++-
- hw/nvram/fw_cfg.c     | 12 ++++++++----
- hw/scsi/esp.c         |  3 ++-
- hw/xen/xen_pt_msi.c   |  3 ++-
- memory.c              |  5 +++--
- 7 files changed, 25 insertions(+), 13 deletions(-)
+ include/exec/exec-all.h   | 5 +++--
+ accel/tcg/translate-all.c | 2 +-
+ exec.c                    | 2 +-
+ target/xtensa/op_helper.c | 3 ++-
+ 4 files changed, 7 insertions(+), 5 deletions(-)
 
-diff --git a/include/exec/memory.h b/include/exec/memory.h
-index 54263bd23b..444fceac55 100644
---- a/include/exec/memory.h
-+++ b/include/exec/memory.h
-@@ -166,7 +166,8 @@ struct MemoryRegionOps {
-          * as a machine check exception).
-          */
-         bool (*accepts)(void *opaque, hwaddr addr,
--                        unsigned size, bool is_write);
-+                        unsigned size, bool is_write,
-+                        MemTxAttrs attrs);
-     } valid;
-     /* Internal implementation constraints: */
-     struct {
+diff --git a/include/exec/exec-all.h b/include/exec/exec-all.h
+index bd68328ed9..4d09eaba72 100644
+--- a/include/exec/exec-all.h
++++ b/include/exec/exec-all.h
+@@ -255,7 +255,7 @@ void tlb_set_page_with_attrs(CPUState *cpu, target_ulong vaddr,
+ void tlb_set_page(CPUState *cpu, target_ulong vaddr,
+                   hwaddr paddr, int prot,
+                   int mmu_idx, target_ulong size);
+-void tb_invalidate_phys_addr(AddressSpace *as, hwaddr addr);
++void tb_invalidate_phys_addr(AddressSpace *as, hwaddr addr, MemTxAttrs attrs);
+ void probe_write(CPUArchState *env, target_ulong addr, int size, int mmu_idx,
+                  uintptr_t retaddr);
+ #else
+@@ -303,7 +303,8 @@ static inline void tlb_flush_by_mmuidx_all_cpus_synced(CPUState *cpu,
+                                                        uint16_t idxmap)
+ {
+ }
+-static inline void tb_invalidate_phys_addr(AddressSpace *as, hwaddr addr)
++static inline void tb_invalidate_phys_addr(AddressSpace *as, hwaddr addr,
++                                           MemTxAttrs attrs)
+ {
+ }
+ #endif
+diff --git a/accel/tcg/translate-all.c b/accel/tcg/translate-all.c
+index f409d42d54..f04a922ef7 100644
+--- a/accel/tcg/translate-all.c
++++ b/accel/tcg/translate-all.c
+@@ -1672,7 +1672,7 @@ static TranslationBlock *tb_find_pc(uintptr_t tc_ptr)
+ }
+ 
+ #if !defined(CONFIG_USER_ONLY)
+-void tb_invalidate_phys_addr(AddressSpace *as, hwaddr addr)
++void tb_invalidate_phys_addr(AddressSpace *as, hwaddr addr, MemTxAttrs attrs)
+ {
+     ram_addr_t ram_addr;
+     MemoryRegion *mr;
 diff --git a/exec.c b/exec.c
-index 6cf97b5d28..b58eb0fedd 100644
+index ffa1099547..c3a197e67b 100644
 --- a/exec.c
 +++ b/exec.c
-@@ -2539,7 +2539,8 @@ static void notdirty_mem_write(void *opaque, hwaddr ram_addr,
- }
- 
- static bool notdirty_mem_accepts(void *opaque, hwaddr addr,
--                                 unsigned size, bool is_write)
-+                                 unsigned size, bool is_write,
-+                                 MemTxAttrs attrs)
- {
-     return is_write;
- }
-@@ -2762,7 +2763,8 @@ static MemTxResult subpage_write(void *opaque, hwaddr addr,
- }
- 
- static bool subpage_accepts(void *opaque, hwaddr addr,
--                            unsigned len, bool is_write)
-+                            unsigned len, bool is_write,
-+                            MemTxAttrs attrs)
- {
-     subpage_t *subpage = opaque;
- #if defined(DEBUG_SUBPAGE)
-@@ -2845,7 +2847,8 @@ static void readonly_mem_write(void *opaque, hwaddr addr,
- }
- 
- static bool readonly_mem_accepts(void *opaque, hwaddr addr,
--                                 unsigned size, bool is_write)
-+                                 unsigned size, bool is_write,
-+                                 MemTxAttrs attrs)
- {
-     return is_write;
- }
-diff --git a/hw/hppa/dino.c b/hw/hppa/dino.c
-index 15aefde09c..77463672a3 100644
---- a/hw/hppa/dino.c
-+++ b/hw/hppa/dino.c
-@@ -137,7 +137,8 @@ static void gsc_to_pci_forwarding(DinoState *s)
- }
- 
- static bool dino_chip_mem_valid(void *opaque, hwaddr addr,
--                                unsigned size, bool is_write)
-+                                unsigned size, bool is_write,
-+                                MemTxAttrs attrs)
- {
-     switch (addr) {
-     case DINO_IAR0:
-diff --git a/hw/nvram/fw_cfg.c b/hw/nvram/fw_cfg.c
-index 2a0739d0e9..b23e7f64a8 100644
---- a/hw/nvram/fw_cfg.c
-+++ b/hw/nvram/fw_cfg.c
-@@ -420,14 +420,16 @@ static void fw_cfg_dma_mem_write(void *opaque, hwaddr addr,
- }
- 
- static bool fw_cfg_dma_mem_valid(void *opaque, hwaddr addr,
--                                  unsigned size, bool is_write)
-+                                 unsigned size, bool is_write,
-+                                 MemTxAttrs attrs)
- {
-     return !is_write || ((size == 4 && (addr == 0 || addr == 4)) ||
-                          (size == 8 && addr == 0));
- }
- 
- static bool fw_cfg_data_mem_valid(void *opaque, hwaddr addr,
--                                  unsigned size, bool is_write)
-+                                  unsigned size, bool is_write,
-+                                  MemTxAttrs attrs)
- {
-     return addr == 0;
- }
-@@ -439,7 +441,8 @@ static void fw_cfg_ctl_mem_write(void *opaque, hwaddr addr,
- }
- 
- static bool fw_cfg_ctl_mem_valid(void *opaque, hwaddr addr,
--                                 unsigned size, bool is_write)
-+                                 unsigned size, bool is_write,
-+                                 MemTxAttrs attrs)
- {
-     return is_write && size == 2;
- }
-@@ -458,7 +461,8 @@ static void fw_cfg_comb_write(void *opaque, hwaddr addr,
- }
- 
- static bool fw_cfg_comb_valid(void *opaque, hwaddr addr,
--                                  unsigned size, bool is_write)
-+                              unsigned size, bool is_write,
-+                              MemTxAttrs attrs)
- {
-     return (size == 1) || (is_write && size == 2);
- }
-diff --git a/hw/scsi/esp.c b/hw/scsi/esp.c
-index 64ec285826..9ed9727744 100644
---- a/hw/scsi/esp.c
-+++ b/hw/scsi/esp.c
-@@ -564,7 +564,8 @@ void esp_reg_write(ESPState *s, uint32_t saddr, uint64_t val)
- }
- 
- static bool esp_mem_accepts(void *opaque, hwaddr addr,
--                            unsigned size, bool is_write)
-+                            unsigned size, bool is_write,
-+                            MemTxAttrs attrs)
- {
-     return (size == 1) || (is_write && size == 4);
- }
-diff --git a/hw/xen/xen_pt_msi.c b/hw/xen/xen_pt_msi.c
-index 6d1e3bdeb4..cc514f9157 100644
---- a/hw/xen/xen_pt_msi.c
-+++ b/hw/xen/xen_pt_msi.c
-@@ -498,7 +498,8 @@ static uint64_t pci_msix_read(void *opaque, hwaddr addr,
- }
- 
- static bool pci_msix_accepts(void *opaque, hwaddr addr,
--                             unsigned size, bool is_write)
-+                             unsigned size, bool is_write,
-+                             MemTxAttrs attrs)
- {
-     return !(addr & (size - 1));
- }
-diff --git a/memory.c b/memory.c
-index 279f7c9b4a..10fa2ddd31 100644
---- a/memory.c
-+++ b/memory.c
-@@ -1269,7 +1269,8 @@ static void unassigned_mem_write(void *opaque, hwaddr addr,
- }
- 
- static bool unassigned_mem_accepts(void *opaque, hwaddr addr,
--                                   unsigned size, bool is_write)
-+                                   unsigned size, bool is_write,
-+                                   MemTxAttrs attrs)
- {
-     return false;
- }
-@@ -1374,7 +1375,7 @@ bool memory_region_access_valid(MemoryRegion *mr,
-     access_size = MAX(MIN(size, access_size_max), access_size_min);
-     for (i = 0; i < size; i += access_size) {
-         if (!mr->ops->valid.accepts(mr->opaque, addr + i, access_size,
--                                    is_write)) {
-+                                    is_write, attrs)) {
-             return false;
-         }
+@@ -898,7 +898,7 @@ static void breakpoint_invalidate(CPUState *cpu, target_ulong pc)
+     if (phys != -1) {
+         /* Locks grabbed by tb_invalidate_phys_addr */
+         tb_invalidate_phys_addr(cpu->cpu_ases[asidx].as,
+-                                phys | (pc & ~TARGET_PAGE_MASK));
++                                phys | (pc & ~TARGET_PAGE_MASK), attrs);
      }
+ }
+ #endif
+diff --git a/target/xtensa/op_helper.c b/target/xtensa/op_helper.c
+index e3bcbe10d6..8a8c763c63 100644
+--- a/target/xtensa/op_helper.c
++++ b/target/xtensa/op_helper.c
+@@ -105,7 +105,8 @@ static void tb_invalidate_virtual_addr(CPUXtensaState *env, uint32_t vaddr)
+     int ret = xtensa_get_physical_addr(env, false, vaddr, 2, 0,
+             &paddr, &page_size, &access);
+     if (ret == 0) {
+-        tb_invalidate_phys_addr(&address_space_memory, paddr);
++        tb_invalidate_phys_addr(&address_space_memory, paddr,
++                                MEMTXATTRS_UNSPECIFIED);
+     }
+ }
+ 
 -- 
 2.17.0
