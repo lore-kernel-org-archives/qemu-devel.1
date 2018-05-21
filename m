@@ -1,25 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34047)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43534)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mail@void.so>) id 1fKiiH-0006q1-9s
-	for qemu-devel@nongnu.org; Mon, 21 May 2018 07:10:50 -0400
+	(envelope-from <jemmy858585@gmail.com>) id 1fKjJS-00045f-Tz
+	for qemu-devel@nongnu.org; Mon, 21 May 2018 07:49:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mail@void.so>) id 1fKiiE-0001CC-3S
-	for qemu-devel@nongnu.org; Mon, 21 May 2018 07:10:49 -0400
-Received: from forward106j.mail.yandex.net ([5.45.198.249]:49040)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mail@void.so>) id 1fKiiD-0001AB-H3
-	for qemu-devel@nongnu.org; Mon, 21 May 2018 07:10:46 -0400
-Received: from mxback3j.mail.yandex.net (mxback3j.mail.yandex.net
-	[IPv6:2a02:6b8:0:1619::10c])
-	by forward106j.mail.yandex.net (Yandex) with ESMTP id 1C7821802FD9
-	for <qemu-devel@nongnu.org>; Mon, 21 May 2018 14:10:41 +0300 (MSK)
-Date: Mon, 21 May 2018 14:10:18 +0300
-From: Pavel Balaev <mail@void.so>
-Message-ID: <20180521111015.GA26731@rnd>
+	(envelope-from <jemmy858585@gmail.com>) id 1fKjJS-00049j-7P
+	for qemu-devel@nongnu.org; Mon, 21 May 2018 07:49:15 -0400
+Received: from mail-it0-x243.google.com ([2607:f8b0:4001:c0b::243]:39757)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <jemmy858585@gmail.com>)
+	id 1fKjJS-00049a-1X
+	for qemu-devel@nongnu.org; Mon, 21 May 2018 07:49:14 -0400
+Received: by mail-it0-x243.google.com with SMTP id c3-v6so20736981itj.4
+	for <qemu-devel@nongnu.org>; Mon, 21 May 2018 04:49:13 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Subject: [Qemu-devel] [PATCH] Delete AF_UNIX socket after close
+In-Reply-To: <CAOGPPbeVvm5OM+oNpYfYiAsNTK7bn7eFDgzyMuvm8YymM2sq_w@mail.gmail.com>
+References: <1525530936-21835-1-git-send-email-lidongchen@tencent.com>
+	<1525530936-21835-6-git-send-email-lidongchen@tencent.com>
+	<379b3f13-f53f-966b-ccbf-66517d45aa9d@redhat.com>
+	<CAOGPPbeVvm5OM+oNpYfYiAsNTK7bn7eFDgzyMuvm8YymM2sq_w@mail.gmail.com>
+From: 858585 jemmy <jemmy858585@gmail.com>
+Date: Mon, 21 May 2018 19:49:12 +0800
+Message-ID: <CAOGPPbdx1EPXFUibshPG+ZfgJ38ALpX4xBi2fk2LqkaLjbA6Yw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v3 5/6] migration: implement bi-directional
+ RDMA QIOChannel
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,139 +32,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Paolo Bonzini <pbonzini@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>
+Cc: Juan Quintela <quintela@redhat.com>, Dave Gilbert <dgilbert@redhat.com>, Adi Dotan <adido@mellanox.com>, Gal Shachaf <galsha@mellanox.com>, Aviad Yehezkel <aviadye@mellanox.com>, qemu-devel <qemu-devel@nongnu.org>, Lidong Chen <lidongchen@tencent.com>
 
-Hello,
+On Wed, May 16, 2018 at 5:36 PM, 858585 jemmy <jemmy858585@gmail.com> wrote:
+> On Tue, May 15, 2018 at 10:54 PM, Paolo Bonzini <pbonzini@redhat.com> wrote:
+>> On 05/05/2018 16:35, Lidong Chen wrote:
+>>> @@ -2635,12 +2637,20 @@ static ssize_t qio_channel_rdma_writev(QIOChannel *ioc,
+>>>  {
+>>>      QIOChannelRDMA *rioc = QIO_CHANNEL_RDMA(ioc);
+>>>      QEMUFile *f = rioc->file;
+>>> -    RDMAContext *rdma = rioc->rdma;
+>>> +    RDMAContext *rdma;
+>>>      int ret;
+>>>      ssize_t done = 0;
+>>>      size_t i;
+>>>      size_t len = 0;
+>>>
+>>> +    rcu_read_lock();
+>>> +    rdma = atomic_rcu_read(&rioc->rdmaout);
+>>> +
+>>> +    if (!rdma) {
+>>> +        rcu_read_unlock();
+>>> +        return -EIO;
+>>> +    }
+>>> +
+>>>      CHECK_ERROR_STATE();
+>>>
+>>>      /*
+>>
+>> I am not sure I understand this.  It would probably be wrong to use the
+>> output side from two threads at the same time, so why not use two mutexes?
+>
+> Two thread will not invoke qio_channel_rdma_writev at the same time.
+> The source qemu, migration thread only use writev, and the return path
+> thread only
+> use readv.
+> The destination qemu already have a mutex mis->rp_mutex to make sure
+> not use writev
+> at the same time.
+>
+> The rcu_read_lock is used to protect not use RDMAContext when another
+> thread closes it.
 
-Since version 2.12.0 AF_UNIX socket created for QMP exchange is not
-deleted on instance shutdown.
+Any suggestion?
 
-This is due to the fact that function qio_channel_socket_finalize() is
-called after qio_channel_socket_close().
-
-
-Signed-off-by: Pavel Balaev <mail@void.so>
----
- include/qemu/sockets.h |  1 -
- io/channel-socket.c    | 40 +++++++++++++++-------------------------
- util/qemu-sockets.c    | 21 ---------------------
- 3 files changed, 15 insertions(+), 47 deletions(-)
-
-diff --git a/include/qemu/sockets.h b/include/qemu/sockets.h
-index 8140fea685..a786bd76d7 100644
---- a/include/qemu/sockets.h
-+++ b/include/qemu/sockets.h
-@@ -42,7 +42,6 @@ int unix_connect(const char *path, Error **errp);
- SocketAddress *socket_parse(const char *str, Error **errp);
- int socket_connect(SocketAddress *addr, Error **errp);
- int socket_listen(SocketAddress *addr, Error **errp);
--void socket_listen_cleanup(int fd, Error **errp);
- int socket_dgram(SocketAddress *remote, SocketAddress *local, Error **errp);
- 
- /* Old, ipv4 only bits.  Don't use for new code. */
-diff --git a/io/channel-socket.c b/io/channel-socket.c
-index 57cfb4d3a6..3c88ca4130 100644
---- a/io/channel-socket.c
-+++ b/io/channel-socket.c
-@@ -383,30 +383,6 @@ static void qio_channel_socket_init(Object *obj)
-     ioc->fd = -1;
- }
- 
--static void qio_channel_socket_finalize(Object *obj)
--{
--    QIOChannelSocket *ioc = QIO_CHANNEL_SOCKET(obj);
--
--    if (ioc->fd != -1) {
--        QIOChannel *ioc_local = QIO_CHANNEL(ioc);
--        if (qio_channel_has_feature(ioc_local, QIO_CHANNEL_FEATURE_LISTEN)) {
--            Error *err = NULL;
--
--            socket_listen_cleanup(ioc->fd, &err);
--            if (err) {
--                error_report_err(err);
--                err = NULL;
--            }
--        }
--#ifdef WIN32
--        WSAEventSelect(ioc->fd, NULL, 0);
--#endif
--        closesocket(ioc->fd);
--        ioc->fd = -1;
--    }
--}
--
--
- #ifndef WIN32
- static void qio_channel_socket_copy_fds(struct msghdr *msg,
-                                         int **fds, size_t *nfds)
-@@ -687,6 +663,8 @@ qio_channel_socket_close(QIOChannel *ioc,
-     QIOChannelSocket *sioc = QIO_CHANNEL_SOCKET(ioc);
- 
-     if (sioc->fd != -1) {
-+        SocketAddress *addr = socket_local_address(sioc->fd, errp);
-+
- #ifdef WIN32
-         WSAEventSelect(sioc->fd, NULL, 0);
- #endif
-@@ -697,6 +675,19 @@ qio_channel_socket_close(QIOChannel *ioc,
-             return -1;
-         }
-         sioc->fd = -1;
-+
-+        if (addr && addr->type == SOCKET_ADDRESS_TYPE_UNIX
-+            && addr->u.q_unix.path) {
-+            if (unlink(addr->u.q_unix.path) < 0 && errno != ENOENT) {
-+                error_setg_errno(errp, errno,
-+                                 "Failed to unlink socket %s",
-+                                 addr->u.q_unix.path);
-+            }
-+        }
-+
-+        if (addr) {
-+            qapi_free_SocketAddress(addr);
-+        }
-     }
-     return 0;
- }
-@@ -770,7 +761,6 @@ static const TypeInfo qio_channel_socket_info = {
-     .name = TYPE_QIO_CHANNEL_SOCKET,
-     .instance_size = sizeof(QIOChannelSocket),
-     .instance_init = qio_channel_socket_init,
--    .instance_finalize = qio_channel_socket_finalize,
-     .class_init = qio_channel_socket_class_init,
- };
- 
-diff --git a/util/qemu-sockets.c b/util/qemu-sockets.c
-index 8bd8bb64eb..aedcb5b9c0 100644
---- a/util/qemu-sockets.c
-+++ b/util/qemu-sockets.c
-@@ -1120,27 +1120,6 @@ int socket_listen(SocketAddress *addr, Error **errp)
-     return fd;
- }
- 
--void socket_listen_cleanup(int fd, Error **errp)
--{
--    SocketAddress *addr;
--
--    addr = socket_local_address(fd, errp);
--    if (!addr) {
--        return;
--    }
--
--    if (addr->type == SOCKET_ADDRESS_TYPE_UNIX
--        && addr->u.q_unix.path) {
--        if (unlink(addr->u.q_unix.path) < 0 && errno != ENOENT) {
--            error_setg_errno(errp, errno,
--                             "Failed to unlink socket %s",
--                             addr->u.q_unix.path);
--        }
--    }
--
--    qapi_free_SocketAddress(addr);
--}
--
- int socket_dgram(SocketAddress *remote, SocketAddress *local, Error **errp)
- {
-     int fd;
--- 
-2.16.1
+>
+>>
+>> Also, who is calling qio_channel_rdma_close in such a way that another
+>> thread is still using it?  Would it be possible to synchronize with the
+>> other thread *before*, for example with qemu_thread_join?
+>
+> The MigrationState structure includes to_dst_file and from_dst_file
+> QEMUFile, the two QEMUFile use the same QIOChannel.
+> For example, if the return path thread call
+> qemu_fclose(ms->rp_state.from_dst_file),
+> It will also close the RDMAContext for ms->to_dst_file.
+>
+> For live migration, the source qemu invokes qemu_fclose in different
+> threads include main thread, migration thread, return path thread.
+>
+> The destination qemu invokes qemu_fclose in main thread, listen thread and
+> COLO incoming thread.
+>
+> I do not find an effective way to synchronize these threads.
+>
+> Thanks.
+>
+>>
+>> Thanks,
+>>
+>> Paolo
