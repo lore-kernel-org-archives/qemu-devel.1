@@ -1,17 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42921)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45088)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1fKlQO-0002yN-RY
-	for qemu-devel@nongnu.org; Mon, 21 May 2018 10:04:34 -0400
+	(envelope-from <eblake@redhat.com>) id 1fKlYm-0004lL-77
+	for qemu-devel@nongnu.org; Mon, 21 May 2018 10:13:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1fKlQM-00016B-OK
-	for qemu-devel@nongnu.org; Mon, 21 May 2018 10:04:32 -0400
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 21 May 2018 15:03:38 +0100
-Message-Id: <20180521140402.23318-4-peter.maydell@linaro.org>
-In-Reply-To: <20180521140402.23318-1-peter.maydell@linaro.org>
-References: <20180521140402.23318-1-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PATCH 03/27] Make address_space_translate{,
- _cached}() take a MemTxAttrs argument
+	(envelope-from <eblake@redhat.com>) id 1fKlYi-0004SE-VN
+	for qemu-devel@nongnu.org; Mon, 21 May 2018 10:13:12 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:57792 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1fKlYi-0004Ro-Q1
+	for qemu-devel@nongnu.org; Mon, 21 May 2018 10:13:08 -0400
+References: <20180521084249.10640-1-peterx@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <8ef2c984-7817-a54f-ebae-a1f14e453b6a@redhat.com>
+Date: Mon, 21 May 2018 09:13:06 -0500
+MIME-Version: 1.0
+In-Reply-To: <20180521084249.10640-1-peterx@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [RFC] monitor: turn on Out-Of-Band by default again
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,223 +27,130 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-arm@nongnu.org, qemu-devel@nongnu.org
-Cc: patches@linaro.org, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Peter Xu <peterx@redhat.com>, qemu-devel@nongnu.org
+Cc: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Fam Zheng <famz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Eric Auger <eric.auger@redhat.com>, John Snow <jsnow@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Markus Armbruster <armbru@redhat.com>
 
-As part of plumbing MemTxAttrs down to the IOMMU translate method,
-add MemTxAttrs as an argument to address_space_translate()
-and address_space_translate_cached(). Callers either have an
-attrs value to hand, or don't care and can use MEMTXATTRS_UNSPECIFIED.
+On 05/21/2018 03:42 AM, Peter Xu wrote:
+> We turned Out-Of-Band feature of monitors off for 2.12 release.  Now we
+> try to turn that on again.
 
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
----
- include/exec/memory.h     |  4 +++-
- accel/tcg/translate-all.c |  2 +-
- exec.c                    | 14 +++++++++-----
- hw/vfio/common.c          |  3 ++-
- memory_ldst.inc.c         | 18 +++++++++---------
- target/riscv/helper.c     |  2 +-
- 6 files changed, 25 insertions(+), 18 deletions(-)
+"try to turn" sounds weak, like you aren't sure of this patch.  If you 
+aren't sure, then why should we feel safe in applying it?  This text is 
+going in the permanent git history, so sound bold, rather than hesitant!
 
-diff --git a/include/exec/memory.h b/include/exec/memory.h
-index cce355d2d8..9a30a1bb9e 100644
---- a/include/exec/memory.h
-+++ b/include/exec/memory.h
-@@ -1908,6 +1908,7 @@ IOMMUTLBEntry address_space_get_iotlb_entry(AddressSpace *as, hwaddr addr,
-  * #MemoryRegion.
-  * @len: pointer to length
-  * @is_write: indicates the transfer direction
-+ * @attrs: memory attributes
-  */
- MemoryRegion *flatview_translate(FlatView *fv,
-                                  hwaddr addr, hwaddr *xlat,
-@@ -1915,7 +1916,8 @@ MemoryRegion *flatview_translate(FlatView *fv,
- 
- static inline MemoryRegion *address_space_translate(AddressSpace *as,
-                                                     hwaddr addr, hwaddr *xlat,
--                                                    hwaddr *len, bool is_write)
-+                                                    hwaddr *len, bool is_write,
-+                                                    MemTxAttrs attrs)
- {
-     return flatview_translate(address_space_to_flatview(as),
-                               addr, xlat, len, is_write);
-diff --git a/accel/tcg/translate-all.c b/accel/tcg/translate-all.c
-index f04a922ef7..52f7bd59a9 100644
---- a/accel/tcg/translate-all.c
-+++ b/accel/tcg/translate-all.c
-@@ -1679,7 +1679,7 @@ void tb_invalidate_phys_addr(AddressSpace *as, hwaddr addr, MemTxAttrs attrs)
-     hwaddr l = 1;
- 
-     rcu_read_lock();
--    mr = address_space_translate(as, addr, &addr, &l, false);
-+    mr = address_space_translate(as, addr, &addr, &l, false, attrs);
-     if (!(memory_region_is_ram(mr)
-           || memory_region_is_romd(mr))) {
-         rcu_read_unlock();
-diff --git a/exec.c b/exec.c
-index c3a197e67b..d314c7cc39 100644
---- a/exec.c
-+++ b/exec.c
-@@ -3322,7 +3322,8 @@ static inline void cpu_physical_memory_write_rom_internal(AddressSpace *as,
-     rcu_read_lock();
-     while (len > 0) {
-         l = len;
--        mr = address_space_translate(as, addr, &addr1, &l, true);
-+        mr = address_space_translate(as, addr, &addr1, &l, true,
-+                                     MEMTXATTRS_UNSPECIFIED);
- 
-         if (!(memory_region_is_ram(mr) ||
-               memory_region_is_romd(mr))) {
-@@ -3699,7 +3700,7 @@ void address_space_cache_destroy(MemoryRegionCache *cache)
-  */
- static inline MemoryRegion *address_space_translate_cached(
-     MemoryRegionCache *cache, hwaddr addr, hwaddr *xlat,
--    hwaddr *plen, bool is_write)
-+    hwaddr *plen, bool is_write, MemTxAttrs attrs)
- {
-     MemoryRegionSection section;
-     MemoryRegion *mr;
-@@ -3733,7 +3734,8 @@ address_space_read_cached_slow(MemoryRegionCache *cache, hwaddr addr,
-     MemoryRegion *mr;
- 
-     l = len;
--    mr = address_space_translate_cached(cache, addr, &addr1, &l, false);
-+    mr = address_space_translate_cached(cache, addr, &addr1, &l, false,
-+                                        MEMTXATTRS_UNSPECIFIED);
-     flatview_read_continue(cache->fv,
-                            addr, MEMTXATTRS_UNSPECIFIED, buf, len,
-                            addr1, l, mr);
-@@ -3750,7 +3752,8 @@ address_space_write_cached_slow(MemoryRegionCache *cache, hwaddr addr,
-     MemoryRegion *mr;
- 
-     l = len;
--    mr = address_space_translate_cached(cache, addr, &addr1, &l, true);
-+    mr = address_space_translate_cached(cache, addr, &addr1, &l, true,
-+                                        MEMTXATTRS_UNSPECIFIED);
-     flatview_write_continue(cache->fv,
-                             addr, MEMTXATTRS_UNSPECIFIED, buf, len,
-                             addr1, l, mr);
-@@ -3848,7 +3851,8 @@ bool cpu_physical_memory_is_io(hwaddr phys_addr)
- 
-     rcu_read_lock();
-     mr = address_space_translate(&address_space_memory,
--                                 phys_addr, &phys_addr, &l, false);
-+                                 phys_addr, &phys_addr, &l, false,
-+                                 MEMTXATTRS_UNSPECIFIED);
- 
-     res = !(memory_region_is_ram(mr) || memory_region_is_romd(mr));
-     rcu_read_unlock();
-diff --git a/hw/vfio/common.c b/hw/vfio/common.c
-index 07ffa0ba10..8e57265edf 100644
---- a/hw/vfio/common.c
-+++ b/hw/vfio/common.c
-@@ -324,7 +324,8 @@ static bool vfio_get_vaddr(IOMMUTLBEntry *iotlb, void **vaddr,
-      */
-     mr = address_space_translate(&address_space_memory,
-                                  iotlb->translated_addr,
--                                 &xlat, &len, writable);
-+                                 &xlat, &len, writable,
-+                                 MEMTXATTRS_UNSPECIFIED);
-     if (!memory_region_is_ram(mr)) {
-         error_report("iommu map to non memory area %"HWADDR_PRIx"",
-                      xlat);
-diff --git a/memory_ldst.inc.c b/memory_ldst.inc.c
-index 25d6125747..15483987fe 100644
---- a/memory_ldst.inc.c
-+++ b/memory_ldst.inc.c
-@@ -33,7 +33,7 @@ static inline uint32_t glue(address_space_ldl_internal, SUFFIX)(ARG1_DECL,
-     bool release_lock = false;
- 
-     RCU_READ_LOCK();
--    mr = TRANSLATE(addr, &addr1, &l, false);
-+    mr = TRANSLATE(addr, &addr1, &l, false, attrs);
-     if (l < 4 || !IS_DIRECT(mr, false)) {
-         release_lock |= prepare_mmio_access(mr);
- 
-@@ -109,7 +109,7 @@ static inline uint64_t glue(address_space_ldq_internal, SUFFIX)(ARG1_DECL,
-     bool release_lock = false;
- 
-     RCU_READ_LOCK();
--    mr = TRANSLATE(addr, &addr1, &l, false);
-+    mr = TRANSLATE(addr, &addr1, &l, false, attrs);
-     if (l < 8 || !IS_DIRECT(mr, false)) {
-         release_lock |= prepare_mmio_access(mr);
- 
-@@ -183,7 +183,7 @@ uint32_t glue(address_space_ldub, SUFFIX)(ARG1_DECL,
-     bool release_lock = false;
- 
-     RCU_READ_LOCK();
--    mr = TRANSLATE(addr, &addr1, &l, false);
-+    mr = TRANSLATE(addr, &addr1, &l, false, attrs);
-     if (!IS_DIRECT(mr, false)) {
-         release_lock |= prepare_mmio_access(mr);
- 
-@@ -219,7 +219,7 @@ static inline uint32_t glue(address_space_lduw_internal, SUFFIX)(ARG1_DECL,
-     bool release_lock = false;
- 
-     RCU_READ_LOCK();
--    mr = TRANSLATE(addr, &addr1, &l, false);
-+    mr = TRANSLATE(addr, &addr1, &l, false, attrs);
-     if (l < 2 || !IS_DIRECT(mr, false)) {
-         release_lock |= prepare_mmio_access(mr);
- 
-@@ -296,7 +296,7 @@ void glue(address_space_stl_notdirty, SUFFIX)(ARG1_DECL,
-     bool release_lock = false;
- 
-     RCU_READ_LOCK();
--    mr = TRANSLATE(addr, &addr1, &l, true);
-+    mr = TRANSLATE(addr, &addr1, &l, true, attrs);
-     if (l < 4 || !IS_DIRECT(mr, true)) {
-         release_lock |= prepare_mmio_access(mr);
- 
-@@ -333,7 +333,7 @@ static inline void glue(address_space_stl_internal, SUFFIX)(ARG1_DECL,
-     bool release_lock = false;
- 
-     RCU_READ_LOCK();
--    mr = TRANSLATE(addr, &addr1, &l, true);
-+    mr = TRANSLATE(addr, &addr1, &l, true, attrs);
-     if (l < 4 || !IS_DIRECT(mr, true)) {
-         release_lock |= prepare_mmio_access(mr);
- 
-@@ -405,7 +405,7 @@ void glue(address_space_stb, SUFFIX)(ARG1_DECL,
-     bool release_lock = false;
- 
-     RCU_READ_LOCK();
--    mr = TRANSLATE(addr, &addr1, &l, true);
-+    mr = TRANSLATE(addr, &addr1, &l, true, attrs);
-     if (!IS_DIRECT(mr, true)) {
-         release_lock |= prepare_mmio_access(mr);
-         r = memory_region_dispatch_write(mr, addr1, val, 1, attrs);
-@@ -438,7 +438,7 @@ static inline void glue(address_space_stw_internal, SUFFIX)(ARG1_DECL,
-     bool release_lock = false;
- 
-     RCU_READ_LOCK();
--    mr = TRANSLATE(addr, &addr1, &l, true);
-+    mr = TRANSLATE(addr, &addr1, &l, true, attrs);
-     if (l < 2 || !IS_DIRECT(mr, true)) {
-         release_lock |= prepare_mmio_access(mr);
- 
-@@ -511,7 +511,7 @@ static void glue(address_space_stq_internal, SUFFIX)(ARG1_DECL,
-     bool release_lock = false;
- 
-     RCU_READ_LOCK();
--    mr = TRANSLATE(addr, &addr1, &l, true);
-+    mr = TRANSLATE(addr, &addr1, &l, true, attrs);
-     if (l < 8 || !IS_DIRECT(mr, true)) {
-         release_lock |= prepare_mmio_access(mr);
- 
-diff --git a/target/riscv/helper.c b/target/riscv/helper.c
-index 95889f23b9..29e1a603dc 100644
---- a/target/riscv/helper.c
-+++ b/target/riscv/helper.c
-@@ -210,7 +210,7 @@ restart:
-                 MemoryRegion *mr;
-                 hwaddr l = sizeof(target_ulong), addr1;
-                 mr = address_space_translate(cs->as, pte_addr,
--                    &addr1, &l, false);
-+                    &addr1, &l, false, MEMTXATTRS_UNSPECIFIED);
-                 if (memory_access_is_direct(mr, true)) {
-                     target_ulong *pte_pa =
-                         qemu_map_ram_ptr(mr->ram_block, addr1);
+"We have resolved the issues from last time (commit 3fd2457d reverted by 
+commit a4f90923):
+- issue 1 ...
+- issue 2 ...
+So now we are ready to enable advertisement of the feature by default"
+
+with better descriptions of the issues that you fixed (I can think of at 
+least the fixes adding thread-safety to the current monitor, and fixing 
+early use of the monitor before qmp_capabilities completes; there may 
+also be other issues that you want to call out).
+
+> 
+> Signed-off-by: Peter Xu <peterx@redhat.com>
+> --
+> Now OOB should be okay with all known tests (except iotest qcow2, since
+> it is still broken on master),
+
+Which tests are still failing for you?  Ideally, you can still 
+demonstrate that the tests not failing without this patch continue to 
+pass with this patch, even if you call out the tests that have known 
+issues to still be resolved.
+
+> and AFAIK now we should also be okay with
+> ARM+Libvirt (not testsed, but Eric Auger helped to verify that before
+> the release).  So I think it's now safe to turn OOB on again.  Please
+> feel free to test this against any of existing testsuites to see whether
+> it'll still break any stuff.  Thanks,
+> 
+> Signed-off-by: Peter Xu <peterx@redhat.com>
+> ---
+>   monitor.c        | 13 +++----------
+>   tests/qmp-test.c |  2 +-
+>   vl.c             |  9 ++++-----
+>   3 files changed, 8 insertions(+), 16 deletions(-)
+> 
+> diff --git a/monitor.c b/monitor.c
+> index 46814af533..ce5cc5e34e 100644
+> --- a/monitor.c
+> +++ b/monitor.c
+> @@ -4560,16 +4560,9 @@ void monitor_init(Chardev *chr, int flags)
+>       bool use_readline = flags & MONITOR_USE_READLINE;
+>       bool use_oob = flags & MONITOR_USE_OOB;
+>   
+> -    if (use_oob) {
+> -        if (CHARDEV_IS_MUX(chr)) {
+> -            error_report("Monitor Out-Of-Band is not supported with "
+> -                         "MUX typed chardev backend");
+> -            exit(1);
+> -        }
+> -        if (use_readline) {
+> -            error_report("Monitor Out-Of-band is only supported by QMP");
+> -            exit(1);
+> -        }
+> +    if (CHARDEV_IS_MUX(chr)) {
+> +        /* MUX is still not supported for Out-Of-Band */
+> +        use_oob = false;
+
+This isn't a mere reinstatement of 3fd2457d, but is now advertising OOB 
+when using readline (which presumably is a synonym for using HMP).  Is 
+that intentional?  If so, the commit message should mention it.
+
+>       }
+>   
+>       monitor_data_init(mon, false, use_oob);
+> diff --git a/tests/qmp-test.c b/tests/qmp-test.c
+> index 88f867f8c0..c85a3964d9 100644
+> --- a/tests/qmp-test.c
+> +++ b/tests/qmp-test.c
+> @@ -89,7 +89,7 @@ static void test_qmp_protocol(void)
+>       g_assert(q);
+>       test_version(qdict_get(q, "version"));
+>       capabilities = qdict_get_qlist(q, "capabilities");
+> -    g_assert(capabilities && qlist_empty(capabilities));
+> +    g_assert(capabilities);
+>       qobject_unref(resp);
+>   
+>       /* Test valid command before handshake */
+> diff --git a/vl.c b/vl.c
+> index 3b39bbd7a8..b71fb8eb25 100644
+> --- a/vl.c
+> +++ b/vl.c
+> @@ -2394,6 +2394,10 @@ static int mon_init_func(void *opaque, QemuOpts *opts, Error **errp)
+>           flags = MONITOR_USE_READLINE;
+>       } else if (strcmp(mode, "control") == 0) {
+>           flags = MONITOR_USE_CONTROL;
+> +        /* Out-Of-Band is on by default */
+> +        if (qemu_opt_get_bool(opts, "x-oob", 1)) {
+> +            flags |= MONITOR_USE_OOB;
+> +        }
+
+Do we really still need the x-oob property, vs. outright deletion of 
+this bandaid?  Then again, I guess keeping it for one more release makes 
+it easier to forcefully turn things off for temporary testing when 
+isolating whether OOB is a culprit in something breaking.
+
+>       } else {
+>           error_report("unknown monitor mode \"%s\"", mode);
+>           exit(1);
+> @@ -2402,11 +2406,6 @@ static int mon_init_func(void *opaque, QemuOpts *opts, Error **errp)
+>       if (qemu_opt_get_bool(opts, "pretty", 0))
+>           flags |= MONITOR_USE_PRETTY;
+>   
+> -    /* OOB is off by default */
+> -    if (qemu_opt_get_bool(opts, "x-oob", 0)) {
+> -        flags |= MONITOR_USE_OOB;
+> -    }
+> -
+>       chardev = qemu_opt_get(opts, "chardev");
+>       chr = qemu_chr_find(chardev);
+>       if (chr == NULL) {
+> 
+
 -- 
-2.17.0
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
