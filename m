@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44034)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52325)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1fKonG-0001MU-8Z
-	for qemu-devel@nongnu.org; Mon, 21 May 2018 13:40:23 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1fKpKe-0006r0-8C
+	for qemu-devel@nongnu.org; Mon, 21 May 2018 14:14:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1fKonD-0007xc-0o
-	for qemu-devel@nongnu.org; Mon, 21 May 2018 13:40:22 -0400
-Resent-Message-Id: <E1fKonD-0007xc-0o@eggs.gnu.org>
-Received: from sender-of-o51.zoho.com ([135.84.80.216]:21047)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1fKonC-0007vj-Dw
-	for qemu-devel@nongnu.org; Mon, 21 May 2018 13:40:18 -0400
-In-Reply-To: <20180519092956.15134-1-laurent@vivier.eu>
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <152689637465.66.3504538063631747170@d39dc562802a>
+	(envelope-from <ehabkost@redhat.com>) id 1fKpKa-00084M-97
+	for qemu-devel@nongnu.org; Mon, 21 May 2018 14:14:52 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:48572)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1fKpKZ-00082t-Oy
+	for qemu-devel@nongnu.org; Mon, 21 May 2018 14:14:47 -0400
+Date: Mon, 21 May 2018 15:14:35 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20180521181435.GN25013@localhost.localdomain>
+References: <20180517192325.8335-1-danielhb@linux.ibm.com>
+	<20180517192325.8335-2-danielhb@linux.ibm.com>
+	<87wow1gxi8.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Mon, 21 May 2018 02:52:55 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PATCH v3 0/8] linux-user: move socket.h
- definitions to CPU directories
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <87wow1gxi8.fsf@dusky.pond.sub.org>
+Subject: Re: [Qemu-devel] [PATCH v7 1/3] qmp: adding
+ 'wakeup-suspend-support' in query-target
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,73 +29,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: laurent@vivier.eu
-Cc: famz@redhat.com, qemu-devel@nongnu.org, peter.maydell@linaro.org, riku.voipio@iki.fi, mark.cave-ayland@ilande.co.uk, f4bug@amsat.org, yongbok.kim@mips.com, rth@twiddle.net
+To: Markus Armbruster <armbru@redhat.com>
+Cc: Daniel Henrique Barboza <danielhb@linux.ibm.com>, qemu-devel@nongnu.org, dgilbert@redhat.com, mdroth@linux.vnet.ibm.com, Stefano Stabellini <sstabellini@kernel.org>, Anthony Perard <anthony.perard@citrix.com>, libvir-list@redhat.com, "Michael S. Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
-c3NhZ2UtaWQ6IDIwMTgwNTE5MDkyOTU2LjE1MTM0LTEtbGF1cmVudEB2aXZpZXIuZXUKU3ViamVj
-dDogW1FlbXUtZGV2ZWxdIFtQQVRDSCB2MyAwLzhdIGxpbnV4LXVzZXI6IG1vdmUgc29ja2V0Lmgg
-ZGVmaW5pdGlvbnMgdG8gQ1BVIGRpcmVjdG9yaWVzCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09
-CiMhL2Jpbi9iYXNoCgpCQVNFPWJhc2UKbj0xCnRvdGFsPSQoZ2l0IGxvZyAtLW9uZWxpbmUgJEJB
-U0UuLiB8IHdjIC1sKQpmYWlsZWQ9MAoKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGlt
-aXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKZ2l0IGNvbmZpZyAtLWxv
-Y2FsIGRpZmYuYWxnb3JpdGhtIGhpc3RvZ3JhbQoKY29tbWl0cz0iJChnaXQgbG9nIC0tZm9ybWF0
-PSVIIC0tcmV2ZXJzZSAkQkFTRS4uKSIKZm9yIGMgaW4gJGNvbW1pdHM7IGRvCiAgICBlY2hvICJD
-aGVja2luZyBQQVRDSCAkbi8kdG90YWw6ICQoZ2l0IGxvZyAtbiAxIC0tZm9ybWF0PSVzICRjKS4u
-LiIKICAgIGlmICEgZ2l0IHNob3cgJGMgLS1mb3JtYXQ9ZW1haWwgfCAuL3NjcmlwdHMvY2hlY2tw
-YXRjaC5wbCAtLW1haWxiYWNrIC07IHRoZW4KICAgICAgICBmYWlsZWQ9MQogICAgICAgIGVjaG8K
-ICAgIGZpCiAgICBuPSQoKG4rMSkpCmRvbmUKCmV4aXQgJGZhaWxlZAo9PT0gVEVTVCBTQ1JJUFQg
-RU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4
-NApGcm9tIGh0dHBzOi8vZ2l0aHViLmNvbS9wYXRjaGV3LXByb2plY3QvcWVtdQogKiBbbmV3IHRh
-Z10gICAgICAgICAgICAgICBwYXRjaGV3LzIwMTgwNTE5MDkyOTU2LjE1MTM0LTEtbGF1cmVudEB2
-aXZpZXIuZXUgLT4gcGF0Y2hldy8yMDE4MDUxOTA5Mjk1Ni4xNTEzNC0xLWxhdXJlbnRAdml2aWVy
-LmV1ClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKNDMwMmUxNWIzYyBsaW51eC11c2Vy
-OiBkZWZpbmUgVEFSR0VUX1NPX1JFVVNFUE9SVAo3OWY5ZDQ2MmUwIGxpbnV4LXVzZXI6IGNvcHkg
-c3BhcmMvc29ja2JpdHMuaCBkZWZpbml0aW9ucyBmcm9tIGxpbnV4CjRkNGQ4MGY2ZGQgbGludXgt
-dXNlcjogdXBkYXRlIEFSQ0hfSEFTX1NPQ0tFVF9UWVBFUyB1c2UKZjkwZWIxOTIyNSBsaW51eC11
-c2VyOiBtb3ZlIHBwYyBzb2NrZXQuaCBkZWZpbml0aW9ucyB0byBwcGMvc29ja2JpdHMuaAphMTU5
-MjMzNzgyIGxpbnV4LXVzZXI6IG1vdmUgc29ja2V0LmggZ2VuZXJpYyBkZWZpbml0aW9ucyB0byBn
-ZW5lcmljL3NvY2tiaXRzLmgKN2JkYTUwYzJiOSBsaW51eC11c2VyOiBtb3ZlIHNwYXJjL3NwYXJj
-NjQgc29ja2V0LmggZGVmaW5pdGlvbnMgdG8gc3BhcmMvc29ja2JpdHMuaAoxZTVlN2QxMDdlIGxp
-bnV4LXVzZXI6IG1vdmUgYWxwaGEgc29ja2V0LmggZGVmaW5pdGlvbnMgdG8gYWxwaGEvc29ja2Jp
-dHMuaAo5Njc1YmRjMGM1IGxpbnV4LXVzZXI6IG1vdmUgbWlwcyBzb2NrZXQuaCBkZWZpbml0aW9u
-cyB0byBtaXBzL3NvY2tiaXRzLmgKCj09PSBPVVRQVVQgQkVHSU4gPT09CkNoZWNraW5nIFBBVENI
-IDEvODogbGludXgtdXNlcjogbW92ZSBtaXBzIHNvY2tldC5oIGRlZmluaXRpb25zIHRvIG1pcHMv
-c29ja2JpdHMuaC4uLgpXQVJOSU5HOiBhZGRlZCwgbW92ZWQgb3IgZGVsZXRlZCBmaWxlKHMpLCBk
-b2VzIE1BSU5UQUlORVJTIG5lZWQgdXBkYXRpbmc/CiMxNzogCm5ldyBmaWxlIG1vZGUgMTAwNjQ0
-CgpFUlJPUjogaWYgdGhpcyBjb2RlIGlzIHJlZHVuZGFudCBjb25zaWRlciByZW1vdmluZyBpdAoj
-NTI6IEZJTEU6IGxpbnV4LXVzZXIvbWlwcy9zb2NrYml0cy5oOjMxOgorI2lmIDAKCnRvdGFsOiAx
-IGVycm9ycywgMSB3YXJuaW5ncywgMjI3IGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0
-eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUg
-ZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQ
-QVRDSCBpbiBNQUlOVEFJTkVSUy4KCkNoZWNraW5nIFBBVENIIDIvODogbGludXgtdXNlcjogbW92
-ZSBhbHBoYSBzb2NrZXQuaCBkZWZpbml0aW9ucyB0byBhbHBoYS9zb2NrYml0cy5oLi4uCldBUk5J
-Tkc6IGFkZGVkLCBtb3ZlZCBvciBkZWxldGVkIGZpbGUocyksIGRvZXMgTUFJTlRBSU5FUlMgbmVl
-ZCB1cGRhdGluZz8KIzE4OiAKbmV3IGZpbGUgbW9kZSAxMDA2NDQKCnRvdGFsOiAwIGVycm9ycywg
-MSB3YXJuaW5ncywgMjI0IGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2Js
-ZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9z
-aXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBN
-QUlOVEFJTkVSUy4KQ2hlY2tpbmcgUEFUQ0ggMy84OiBsaW51eC11c2VyOiBtb3ZlIHNwYXJjL3Nw
-YXJjNjQgc29ja2V0LmggZGVmaW5pdGlvbnMgdG8gc3BhcmMvc29ja2JpdHMuaC4uLgpXQVJOSU5H
-OiBhZGRlZCwgbW92ZWQgb3IgZGVsZXRlZCBmaWxlKHMpLCBkb2VzIE1BSU5UQUlORVJTIG5lZWQg
-dXBkYXRpbmc/CiM3NDogCm5ldyBmaWxlIG1vZGUgMTAwNjQ0Cgp0b3RhbDogMCBlcnJvcnMsIDEg
-d2FybmluZ3MsIDE0NiBsaW5lcyBjaGVja2VkCgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVt
-cywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0
-aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJ
-TlRBSU5FUlMuCkNoZWNraW5nIFBBVENIIDQvODogbGludXgtdXNlcjogbW92ZSBzb2NrZXQuaCBn
-ZW5lcmljIGRlZmluaXRpb25zIHRvIGdlbmVyaWMvc29ja2JpdHMuaC4uLgpXQVJOSU5HOiBhZGRl
-ZCwgbW92ZWQgb3IgZGVsZXRlZCBmaWxlKHMpLCBkb2VzIE1BSU5UQUlORVJTIG5lZWQgdXBkYXRp
-bmc/CiMxNDogCm5ldyBmaWxlIG1vZGUgMTAwNjQ0Cgp0b3RhbDogMCBlcnJvcnMsIDEgd2Fybmlu
-Z3MsIDE0OCBsaW5lcyBjaGVja2VkCgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxl
-YXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyBy
-ZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5F
-UlMuCkNoZWNraW5nIFBBVENIIDUvODogbGludXgtdXNlcjogbW92ZSBwcGMgc29ja2V0LmggZGVm
-aW5pdGlvbnMgdG8gcHBjL3NvY2tiaXRzLmguLi4KQ2hlY2tpbmcgUEFUQ0ggNi84OiBsaW51eC11
-c2VyOiB1cGRhdGUgQVJDSF9IQVNfU09DS0VUX1RZUEVTIHVzZS4uLgpDaGVja2luZyBQQVRDSCA3
-Lzg6IGxpbnV4LXVzZXI6IGNvcHkgc3BhcmMvc29ja2JpdHMuaCBkZWZpbml0aW9ucyBmcm9tIGxp
-bnV4Li4uCkNoZWNraW5nIFBBVENIIDgvODogbGludXgtdXNlcjogZGVmaW5lIFRBUkdFVF9TT19S
-RVVTRVBPUlQuLi4KPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGgg
-Y29kZTogMQoKCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFto
-dHRwOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3
-LWRldmVsQHJlZGhhdC5jb20=
+On Fri, May 18, 2018 at 10:48:31AM +0200, Markus Armbruster wrote:
+> Cc'ing a few more people.
+> 
+> Daniel Henrique Barboza <danielhb@linux.ibm.com> writes:
+> 
+> > When issuing the qmp/hmp 'system_wakeup' command, what happens in a
+> > nutshell is:
+> >
+> > - qmp_system_wakeup_request set runstate to RUNNING, sets a wakeup_reason
+> > and notify the event
+> > - in the main_loop, all vcpus are paused, a system reset is issued, all
+> > subscribers of wakeup_notifiers receives a notification, vcpus are then
+> > resumed and the wake up QAPI event is fired
+> >
+> > Note that this procedure alone doesn't ensure that the guest will awake
+> > from SUSPENDED state - the subscribers of the wake up event must take
+> > action to resume the guest, otherwise the guest will simply reboot.
+> >
+> > At this moment there are only two subscribers of the wake up event: one
+> > in hw/acpi/core.c and another one in hw/i386/xen/xen-hvm.c. This means
+> > that system_wakeup does not work as intended with other architectures.
+> >
+> > However, only the presence of 'system_wakeup' is required for QGA to
+> > support 'guest-suspend-ram' and 'guest-suspend-hybrid' at this moment.
+> > This means that the user/management will expect to suspend the guest using
+> > one of those suspend commands and then resume execution using system_wakeup,
+> > regardless of the support offered in system_wakeup in the first place.
+> >
+> > This patch adds a new flag called 'wakeup-suspend-support' in TargetInfo
+> > that allows the caller to query if the guest supports wake up from
+> > suspend via system_wakeup. It goes over the subscribers of the wake up
+> > event and, if it's empty, it assumes that the guest does not support
+> > wake up from suspend (and thus, pm-suspend itself).
+> >
+> > This is the expected output of query-target when running a x86 guest:
+> >
+> > {"execute" : "query-target"}
+> > {"return": {"arch": "x86_64", "wakeup-suspend-support": true}}
+> >
+> > This is the output when running a pseries guest:
+> >
+> > {"execute" : "query-target"}
+> > {"return": {"arch": "ppc64", "wakeup-suspend-support": false}}
+> >
+> > Given that the TargetInfo structure is read-only, adding a new flag to
+> > it is backwards compatible. There is no need to deprecate the old
+> > TargetInfo format.
+> >
+> > With this extra tool, management can avoid situations where a guest
+> > that does not have proper suspend/wake capabilities ends up in
+> > inconsistent state (e.g.
+> > https://github.com/open-power-host-os/qemu/issues/31).
+> >
+> > Reported-by: Balamuruhan S <bala24@linux.vnet.ibm.com>
+> > Signed-off-by: Daniel Henrique Barboza <danielhb@linux.ibm.com>
+> 
+> Is query-target is the right place to carry this flag?  v7 is rather
+> late for this kind of question; my sincere apologies.
+[...]
+> 
+> Issue#2: the flag isn't a property of the target.  Due to -no-acpi, it's
+> not even a property of the machine type.  If it was, query-machines
+> would be the natural owner of the flag.
+> 
+> Perhaps query-machines is still the proper owner.  The value of
+> wakeup-suspend-support would have to depend on -no-acpi for the machine
+> types that honor it.  Not ideal; I'd prefer MachineInfo to be static.
+> Tolerable?  I guess that's also a libvirt question.
+
+It depends when libvirt is going to query it.  Is it OK to only
+query it after the VM is already up and running?  If it is, then
+we can simply expose it as a read-only property of the machine
+object.
+
+Or, if we don't want to rely on qom-get as a stable API, we can
+add a new query command (query-machine? query-power-management?)
+
+-- 
+Eduardo
