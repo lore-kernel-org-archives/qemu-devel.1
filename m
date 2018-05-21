@@ -1,22 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55350)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55361)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1fKpZ2-0006XK-Eb
-	for qemu-devel@nongnu.org; Mon, 21 May 2018 14:29:45 -0400
+	(envelope-from <eblake@redhat.com>) id 1fKpZ3-0006Zl-9e
+	for qemu-devel@nongnu.org; Mon, 21 May 2018 14:29:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1fKpZ1-00063X-EH
-	for qemu-devel@nongnu.org; Mon, 21 May 2018 14:29:44 -0400
-Date: Mon, 21 May 2018 15:29:28 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20180521182928.GO25013@localhost.localdomain>
-References: <20180518180440-mutt-send-email-mst@kernel.org>
-	<20180518170956.GI8615@redhat.com>
-	<20180518174133.GC25013@localhost.localdomain>
-	<87bmdc18q5.fsf@dusky.pond.sub.org>
+	(envelope-from <eblake@redhat.com>) id 1fKpZ2-00063t-FU
+	for qemu-devel@nongnu.org; Mon, 21 May 2018 14:29:45 -0400
+References: <20180521163203.26590-1-ross.zwisler@linux.intel.com>
+	<20180521163203.26590-3-ross.zwisler@linux.intel.com>
+	<6332df7d-3588-9ecc-6220-2f40c1581fe6@redhat.com>
+	<be62d517-9b3e-6fe2-7333-b8315e830b4b@amsat.org>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <cf2f3544-fe8f-4649-6056-f37246009307@redhat.com>
+Date: Mon, 21 May 2018 13:29:31 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <87bmdc18q5.fsf@dusky.pond.sub.org>
-Subject: Re: [Qemu-devel] storing machine data in qcow images?
+In-Reply-To: <be62d517-9b3e-6fe2-7333-b8315e830b4b@amsat.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [qemu PATCH v4 2/4] tests/.gitignore: add entry
+ for generated file
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,66 +27,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>, kwolf@redhat.com, qemu-block@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org, mreitz@redhat.com, stefanha@redhat.com
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Ross Zwisler <ross.zwisler@linux.intel.com>, Igor Mammedov <imammedo@redhat.com>, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, Haozhong Zhang <haozhong.zhang@intel.com>, Eduardo Habkost <ehabkost@redhat.com>, qemu block <qemu-block@nongnu.org>, "Michael S . Tsirkin" <mst@redhat.com>, linux-nvdimm <linux-nvdimm@lists.01.org>, Stefan Hajnoczi <stefanha@redhat.com>, "Elliott, Robert (Persistent Memory)" <elliott@hpe.com>
 
-On Sat, May 19, 2018 at 08:05:06AM +0200, Markus Armbruster wrote:
-> Eduardo Habkost <ehabkost@redhat.com> writes:
-> 
-> [...]
-> > About being more expressive than just a single list of key,value
-> > pairs, I don't see any evidence of that being necessary for the
-> > problems we're trying to address.
-> 
-> Short history of a configuration format you might have encountered:
-> 
-> 1. A couple of (key, value) is all we ne need for the problems we're
-> trying to address.  (v0.4, 2003)
-> 
-> 2.1. I got this one special snowflake problem where I actually need a few
-> related values.  Fortunately, this little ad hoc parser can take apart
-> the key's single value easily.  (ca. v0.8, 2005)
-> 
-> ...
-> 
-> 2.n. Snowflakes are surprisingly common, but fortunately one more little
-> ad hoc parser can't hurt.
-> 
-> 3. Umm, this is getting messy.  Let's have proper infrastructure for
-> two-level keys.  Surely two levels are all we ne need for the problems
-> we're trying to address.  Fortunately, we can bolt them on without too
-> much trouble.  (v0.12, 2009)
-> 
-> 4. Err, trees, I'm afraid we actually need trees.  Fortunately, we can
-> hack them into the existing two-level infrastructure without too much
-> trouble.  (v1.3, 2013)
-> 
-> 5. You are in a maze of twisting little passages, all different.
-> (today)
-> 
-> 
-> How confident are we a single list of (key, value) is really all we're
-> going to need?
-> 
-> Even if we think it is, would it be possible to provide for a future
-> extension to trees at next to no cost?
+On 05/21/2018 12:32 PM, Philippe Mathieu-Daud=C3=A9 wrote:
 
-I'm confident that a list of key,values is all we need for the
-current problem.
+>>>
+>>>  =C2=A0=C2=A0=C2=A0=C2=A0tests/test-block-backend
+>>>
 
-I also agree that being possible to represent trees is a good
-idea, and it would probably have next to no cost.
+>>> +test-block-backend
+>>>  =C2=A0 test-blockjob
+>>>  =C2=A0 test-blockjob-txn
+>>>  =C2=A0 test-bufferiszero
+>=20
+> What about using gitignore negated pattern in tests/?
 
-But I disagree if the point here is "we will eventually need much
-more complex data in the future, so let's require users to move
-to OVF instead".
+Or, what we've threatened to do in the past: rename all unit tests to=20
+the pattern *-test instead of test-*, as a suffix is a lot easier to=20
+exclude via glob than a prefix.  And while we're renaming things, sort=20
+tests into separate subdirectories according to whether they are run as=20
+part of 'make check-unit' or 'make check-qtest'.  But until someone does=20
+that work, tweaking the .gitignore for individual tests as they keep=20
+getting added is no worse than what we've been doing.
 
-The point here is to allow users to simply copy an existing disk
-image, and it will contain enough hints for a cloud stack to
-choose reasonable defaults for machine-type and disk type
-automatically.  Requiring the user to perform a separate step to
-encapsulate the disk image in another file format defeats the
-whole purpose of the proposal.
-
--- 
-Eduardo
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
