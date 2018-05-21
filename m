@@ -1,28 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46351)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42462)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Andrew_Jenner@mentor.com>) id 1fKhOd-0007Hf-67
-	for qemu-devel@nongnu.org; Mon, 21 May 2018 05:46:28 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1fKlQA-0002dX-I4
+	for qemu-devel@nongnu.org; Mon, 21 May 2018 10:04:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <Andrew_Jenner@mentor.com>) id 1fKhOY-0004V7-64
-	for qemu-devel@nongnu.org; Mon, 21 May 2018 05:46:27 -0400
-Received: from relay1.mentorg.com ([192.94.38.131]:50147)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <Andrew_Jenner@mentor.com>)
-	id 1fKhOX-0004TJ-VW
-	for qemu-devel@nongnu.org; Mon, 21 May 2018 05:46:22 -0400
-References: <cover.1526671191.git.julian@codesourcery.com>
-	<8f1a519f9faa6ea16df5040c45bb2d5d7dfb8d50.1526671191.git.julian@codesourcery.com>
-	<49dbe9f7-0558-12d4-363a-fe13099f86bd@denx.de>
-	<20180518211648.5d849941@octopus>
-From: Andrew Jenner <andrew@codesourcery.com>
-Message-ID: <f3d139d3-d1d2-88c9-6390-37ea809e1fff@codesourcery.com>
-Date: Mon, 21 May 2018 10:46:15 +0100
-MIME-Version: 1.0
-In-Reply-To: <20180518211648.5d849941@octopus>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3 1/2] Add generic Nios II board.
+	(envelope-from <pm215@archaic.org.uk>) id 1fKlQ9-0000rJ-LW
+	for qemu-devel@nongnu.org; Mon, 21 May 2018 10:04:18 -0400
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 21 May 2018 15:03:48 +0100
+Message-Id: <20180521140402.23318-14-peter.maydell@linaro.org>
+In-Reply-To: <20180521140402.23318-1-peter.maydell@linaro.org>
+References: <20180521140402.23318-1-peter.maydell@linaro.org>
+Subject: [Qemu-devel] [PATCH 13/27] Make address_space_translate_iommu take
+ a MemTxAttrs argument
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,29 +20,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Julian Brown <julian@codesourcery.com>, Marek Vasut <marex@denx.de>
-Cc: qemu-devel@nongnu.org, Sandra Loosemore <sandra@codesourcery.com>, Chris Wulff <crwulff@gmail.com>
+To: qemu-arm@nongnu.org, qemu-devel@nongnu.org
+Cc: patches@linaro.org, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 
-On 18/05/2018 21:16, Julian Brown wrote:
-> On Fri, 18 May 2018 21:50:55 +0200
-> Marek Vasut <marex@denx.de> wrote:
-> 
->> On 05/18/2018 09:23 PM, Julian Brown wrote:
->>> This patch adds support for a generic MMU-less Nios II board that
->>> can be used e.g. for bare-metal compiler testing.  Nios II booting
->>> is also tweaked so that bare-metal binaries start executing in RAM
->>> starting at 0x00000000, rather than an alias at 0xc0000000, which
->>> allows features such as unwinding to work when binaries are linked
->>> to start at the beginning of the address space.
->>>    
->> So why dont you just use the 10m50 GHRD for this , why do you need
->> custom board ?
-> 
-> I think because we wanted a board with no MMU, since our startup code
-> doesn't support that. Maybe Andrew can confirm/deny?
+As part of plumbing MemTxAttrs down to the IOMMU translate method,
+add MemTxAttrs as an argument to address_space_translate_iommu().
 
-Yes, that's correct.
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+---
+ exec.c | 8 +++++---
+ 1 file changed, 5 insertions(+), 3 deletions(-)
 
-Thanks,
-
-Andrew
+diff --git a/exec.c b/exec.c
+index af2b82d154..c3baadc349 100644
+--- a/exec.c
++++ b/exec.c
+@@ -478,6 +478,7 @@ address_space_translate_internal(AddressSpaceDispatch *d, hwaddr addr, hwaddr *x
+  * @is_write: whether the translation operation is for write
+  * @is_mmio: whether this can be MMIO, set true if it can
+  * @target_as: the address space targeted by the IOMMU
++ * @attrs: transaction attributes
+  *
+  * This function is called from RCU critical section.  It is the common
+  * part of flatview_do_translate and address_space_translate_cached.
+@@ -488,7 +489,8 @@ static MemoryRegionSection address_space_translate_iommu(IOMMUMemoryRegion *iomm
+                                                          hwaddr *page_mask_out,
+                                                          bool is_write,
+                                                          bool is_mmio,
+-                                                         AddressSpace **target_as)
++                                                         AddressSpace **target_as,
++                                                         MemTxAttrs attrs)
+ {
+     MemoryRegionSection *section;
+     hwaddr page_mask = (hwaddr)-1;
+@@ -572,7 +574,7 @@ static MemoryRegionSection flatview_do_translate(FlatView *fv,
+         return address_space_translate_iommu(iommu_mr, xlat,
+                                              plen_out, page_mask_out,
+                                              is_write, is_mmio,
+-                                             target_as);
++                                             target_as, attrs);
+     }
+     if (page_mask_out) {
+         /* Not behind an IOMMU, use default page size. */
+@@ -3735,7 +3737,7 @@ static inline MemoryRegion *address_space_translate_cached(
+ 
+     section = address_space_translate_iommu(iommu_mr, xlat, plen,
+                                             NULL, is_write, true,
+-                                            &target_as);
++                                            &target_as, attrs);
+     return section.mr;
+ }
+ 
+-- 
+2.17.0
