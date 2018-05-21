@@ -1,28 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:32956)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34047)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcel.apfelbaum@gmail.com>) id 1fKidU-0005dX-Nx
-	for qemu-devel@nongnu.org; Mon, 21 May 2018 07:05:53 -0400
+	(envelope-from <mail@void.so>) id 1fKiiH-0006q1-9s
+	for qemu-devel@nongnu.org; Mon, 21 May 2018 07:10:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcel.apfelbaum@gmail.com>) id 1fKidQ-00064g-PZ
-	for qemu-devel@nongnu.org; Mon, 21 May 2018 07:05:52 -0400
-Received: from mail-wr0-x22b.google.com ([2a00:1450:400c:c0c::22b]:45531)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <marcel.apfelbaum@gmail.com>)
-	id 1fKidQ-00064E-GH
-	for qemu-devel@nongnu.org; Mon, 21 May 2018 07:05:48 -0400
-Received: by mail-wr0-x22b.google.com with SMTP id w3-v6so7866894wrl.12
-	for <qemu-devel@nongnu.org>; Mon, 21 May 2018 04:05:48 -0700 (PDT)
-References: <1526801333-30613-1-git-send-email-whois.zihan.yang@gmail.com>
-	<1526801333-30613-3-git-send-email-whois.zihan.yang@gmail.com>
-From: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
-Message-ID: <5f5a0e11-7048-ff5a-ec0c-8d05d50c2887@gmail.com>
-Date: Mon, 21 May 2018 14:05:45 +0300
+	(envelope-from <mail@void.so>) id 1fKiiE-0001CC-3S
+	for qemu-devel@nongnu.org; Mon, 21 May 2018 07:10:49 -0400
+Received: from forward106j.mail.yandex.net ([5.45.198.249]:49040)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mail@void.so>) id 1fKiiD-0001AB-H3
+	for qemu-devel@nongnu.org; Mon, 21 May 2018 07:10:46 -0400
+Received: from mxback3j.mail.yandex.net (mxback3j.mail.yandex.net
+	[IPv6:2a02:6b8:0:1619::10c])
+	by forward106j.mail.yandex.net (Yandex) with ESMTP id 1C7821802FD9
+	for <qemu-devel@nongnu.org>; Mon, 21 May 2018 14:10:41 +0300 (MSK)
+Date: Mon, 21 May 2018 14:10:18 +0300
+From: Pavel Balaev <mail@void.so>
+Message-ID: <20180521111015.GA26731@rnd>
 MIME-Version: 1.0
-In-Reply-To: <1526801333-30613-3-git-send-email-whois.zihan.yang@gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-Subject: Re: [Qemu-devel] [RFC 2/3] pci: Link pci_host_bridges with QTAILQ
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Subject: [Qemu-devel] [PATCH] Delete AF_UNIX socket after close
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,78 +28,139 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Zihan Yang <whois.zihan.yang@gmail.com>, qemu-devel@nongnu.org
-Cc: "Michael S. Tsirkin" <mst@redhat.com>
+To: qemu-devel@nongnu.org
+
+Hello,
+
+Since version 2.12.0 AF_UNIX socket created for QMP exchange is not
+deleted on instance shutdown.
+
+This is due to the fact that function qio_channel_socket_finalize() is
+called after qio_channel_socket_close().
 
 
+Signed-off-by: Pavel Balaev <mail@void.so>
+---
+ include/qemu/sockets.h |  1 -
+ io/channel-socket.c    | 40 +++++++++++++++-------------------------
+ util/qemu-sockets.c    | 21 ---------------------
+ 3 files changed, 15 insertions(+), 47 deletions(-)
 
-On 05/20/2018 10:28 AM, Zihan Yang wrote:
-> QLIST will place the original q35 host bridge at the end of list because it is
-> added first. Replace it with QTAILQ to make q35 at the first of queue, which
-> makes it convinient and compatible when there are pxb hosts other than q35 hosts
-
-I have no objection here, we'll see later how the modification helps.
-
-Thanks,
-Marcek
-
-> Signed-off-by: Zihan Yang <whois.zihan.yang@gmail.com>
-> ---
->   hw/pci/pci.c              | 9 +++++----
->   include/hw/pci/pci_host.h | 2 +-
->   2 files changed, 6 insertions(+), 5 deletions(-)
->
-> diff --git a/hw/pci/pci.c b/hw/pci/pci.c
-> index 80bc459..ddc27ba 100644
-> --- a/hw/pci/pci.c
-> +++ b/hw/pci/pci.c
-> @@ -196,7 +196,8 @@ static void pci_del_option_rom(PCIDevice *pdev);
->   static uint16_t pci_default_sub_vendor_id = PCI_SUBVENDOR_ID_REDHAT_QUMRANET;
->   static uint16_t pci_default_sub_device_id = PCI_SUBDEVICE_ID_QEMU;
->   
-> -static QLIST_HEAD(, PCIHostState) pci_host_bridges;
-> +static QTAILQ_HEAD(, PCIHostState) pci_host_bridges =
-> +    QTAILQ_HEAD_INITIALIZER(pci_host_bridges);
->   
->   int pci_bar(PCIDevice *d, int reg)
->   {
-> @@ -330,7 +331,7 @@ static void pci_host_bus_register(DeviceState *host)
->   {
->       PCIHostState *host_bridge = PCI_HOST_BRIDGE(host);
->   
-> -    QLIST_INSERT_HEAD(&pci_host_bridges, host_bridge, next);
-> +    QTAILQ_INSERT_TAIL(&pci_host_bridges, host_bridge, next);
->   }
->   
->   PCIBus *pci_device_root_bus(const PCIDevice *d)
-> @@ -1798,7 +1799,7 @@ PciInfoList *qmp_query_pci(Error **errp)
->       PciInfoList *info, *head = NULL, *cur_item = NULL;
->       PCIHostState *host_bridge;
->   
-> -    QLIST_FOREACH(host_bridge, &pci_host_bridges, next) {
-> +    QTAILQ_FOREACH(host_bridge, &pci_host_bridges, next) {
->           info = g_malloc0(sizeof(*info));
->           info->value = qmp_query_pci_bus(host_bridge->bus,
->                                           pci_bus_num(host_bridge->bus));
-> @@ -2493,7 +2494,7 @@ int pci_qdev_find_device(const char *id, PCIDevice **pdev)
->       PCIHostState *host_bridge;
->       int rc = -ENODEV;
->   
-> -    QLIST_FOREACH(host_bridge, &pci_host_bridges, next) {
-> +    QTAILQ_FOREACH(host_bridge, &pci_host_bridges, next) {
->           int tmp = pci_qdev_find_recursive(host_bridge->bus, id, pdev);
->           if (!tmp) {
->               rc = 0;
-> diff --git a/include/hw/pci/pci_host.h b/include/hw/pci/pci_host.h
-> index ba31595..a5617cf 100644
-> --- a/include/hw/pci/pci_host.h
-> +++ b/include/hw/pci/pci_host.h
-> @@ -47,7 +47,7 @@ struct PCIHostState {
->       uint32_t config_reg;
->       PCIBus *bus;
->   
-> -    QLIST_ENTRY(PCIHostState) next;
-> +    QTAILQ_ENTRY(PCIHostState) next;
->   };
->   
->   typedef struct PCIHostBridgeClass {
+diff --git a/include/qemu/sockets.h b/include/qemu/sockets.h
+index 8140fea685..a786bd76d7 100644
+--- a/include/qemu/sockets.h
++++ b/include/qemu/sockets.h
+@@ -42,7 +42,6 @@ int unix_connect(const char *path, Error **errp);
+ SocketAddress *socket_parse(const char *str, Error **errp);
+ int socket_connect(SocketAddress *addr, Error **errp);
+ int socket_listen(SocketAddress *addr, Error **errp);
+-void socket_listen_cleanup(int fd, Error **errp);
+ int socket_dgram(SocketAddress *remote, SocketAddress *local, Error **errp);
+ 
+ /* Old, ipv4 only bits.  Don't use for new code. */
+diff --git a/io/channel-socket.c b/io/channel-socket.c
+index 57cfb4d3a6..3c88ca4130 100644
+--- a/io/channel-socket.c
++++ b/io/channel-socket.c
+@@ -383,30 +383,6 @@ static void qio_channel_socket_init(Object *obj)
+     ioc->fd = -1;
+ }
+ 
+-static void qio_channel_socket_finalize(Object *obj)
+-{
+-    QIOChannelSocket *ioc = QIO_CHANNEL_SOCKET(obj);
+-
+-    if (ioc->fd != -1) {
+-        QIOChannel *ioc_local = QIO_CHANNEL(ioc);
+-        if (qio_channel_has_feature(ioc_local, QIO_CHANNEL_FEATURE_LISTEN)) {
+-            Error *err = NULL;
+-
+-            socket_listen_cleanup(ioc->fd, &err);
+-            if (err) {
+-                error_report_err(err);
+-                err = NULL;
+-            }
+-        }
+-#ifdef WIN32
+-        WSAEventSelect(ioc->fd, NULL, 0);
+-#endif
+-        closesocket(ioc->fd);
+-        ioc->fd = -1;
+-    }
+-}
+-
+-
+ #ifndef WIN32
+ static void qio_channel_socket_copy_fds(struct msghdr *msg,
+                                         int **fds, size_t *nfds)
+@@ -687,6 +663,8 @@ qio_channel_socket_close(QIOChannel *ioc,
+     QIOChannelSocket *sioc = QIO_CHANNEL_SOCKET(ioc);
+ 
+     if (sioc->fd != -1) {
++        SocketAddress *addr = socket_local_address(sioc->fd, errp);
++
+ #ifdef WIN32
+         WSAEventSelect(sioc->fd, NULL, 0);
+ #endif
+@@ -697,6 +675,19 @@ qio_channel_socket_close(QIOChannel *ioc,
+             return -1;
+         }
+         sioc->fd = -1;
++
++        if (addr && addr->type == SOCKET_ADDRESS_TYPE_UNIX
++            && addr->u.q_unix.path) {
++            if (unlink(addr->u.q_unix.path) < 0 && errno != ENOENT) {
++                error_setg_errno(errp, errno,
++                                 "Failed to unlink socket %s",
++                                 addr->u.q_unix.path);
++            }
++        }
++
++        if (addr) {
++            qapi_free_SocketAddress(addr);
++        }
+     }
+     return 0;
+ }
+@@ -770,7 +761,6 @@ static const TypeInfo qio_channel_socket_info = {
+     .name = TYPE_QIO_CHANNEL_SOCKET,
+     .instance_size = sizeof(QIOChannelSocket),
+     .instance_init = qio_channel_socket_init,
+-    .instance_finalize = qio_channel_socket_finalize,
+     .class_init = qio_channel_socket_class_init,
+ };
+ 
+diff --git a/util/qemu-sockets.c b/util/qemu-sockets.c
+index 8bd8bb64eb..aedcb5b9c0 100644
+--- a/util/qemu-sockets.c
++++ b/util/qemu-sockets.c
+@@ -1120,27 +1120,6 @@ int socket_listen(SocketAddress *addr, Error **errp)
+     return fd;
+ }
+ 
+-void socket_listen_cleanup(int fd, Error **errp)
+-{
+-    SocketAddress *addr;
+-
+-    addr = socket_local_address(fd, errp);
+-    if (!addr) {
+-        return;
+-    }
+-
+-    if (addr->type == SOCKET_ADDRESS_TYPE_UNIX
+-        && addr->u.q_unix.path) {
+-        if (unlink(addr->u.q_unix.path) < 0 && errno != ENOENT) {
+-            error_setg_errno(errp, errno,
+-                             "Failed to unlink socket %s",
+-                             addr->u.q_unix.path);
+-        }
+-    }
+-
+-    qapi_free_SocketAddress(addr);
+-}
+-
+ int socket_dgram(SocketAddress *remote, SocketAddress *local, Error **errp)
+ {
+     int fd;
+-- 
+2.16.1
