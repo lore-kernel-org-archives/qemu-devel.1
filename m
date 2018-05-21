@@ -1,23 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57826)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57833)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1fKuOt-0002eG-5s
+	(envelope-from <cota@braap.org>) id 1fKuOt-0002eL-6j
 	for qemu-devel@nongnu.org; Mon, 21 May 2018 19:39:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1fKuOq-0005YC-I5
+	(envelope-from <cota@braap.org>) id 1fKuOr-0005YZ-9f
 	for qemu-devel@nongnu.org; Mon, 21 May 2018 19:39:35 -0400
-Received: from out1-smtp.messagingengine.com ([66.111.4.25]:45545)
+Received: from out1-smtp.messagingengine.com ([66.111.4.25]:40953)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cota@braap.org>) id 1fKuOq-0005Wf-9d
+	(Exim 4.71) (envelope-from <cota@braap.org>) id 1fKuOq-0005XX-FP
 	for qemu-devel@nongnu.org; Mon, 21 May 2018 19:39:32 -0400
 From: "Emilio G. Cota" <cota@braap.org>
-Date: Mon, 21 May 2018 19:39:17 -0400
-Message-Id: <1526945967-9687-8-git-send-email-cota@braap.org>
+Date: Mon, 21 May 2018 19:39:22 -0400
+Message-Id: <1526945967-9687-13-git-send-email-cota@braap.org>
 In-Reply-To: <1526945967-9687-1-git-send-email-cota@braap.org>
 References: <1526945967-9687-1-git-send-email-cota@braap.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v3 07/17] translate-all: remove hole in PageDesc
+Subject: [Qemu-devel] [PATCH v3 12/17] translate-all: introduce
+ assert_no_pages_locked
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,31 +27,72 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Richard Henderson <richard.henderson@linaro.org>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>
 
-Groundwork for supporting parallel TCG generation.
+The appended adds assertions to make sure we do not longjmp with page
+locks held. Note that user-mode has nothing to check, since page_locks
+are !user-mode only.
 
-Move the hole to the end of the struct, so that a u32
-field can be added there without bloating the struct.
-
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
 Signed-off-by: Emilio G. Cota <cota@braap.org>
 ---
- accel/tcg/translate-all.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ include/exec/exec-all.h   | 8 ++++++++
+ accel/tcg/cpu-exec.c      | 1 +
+ accel/tcg/translate-all.c | 7 +++++++
+ 3 files changed, 16 insertions(+)
 
+diff --git a/include/exec/exec-all.h b/include/exec/exec-all.h
+index 3fad93b..66902f7 100644
+--- a/include/exec/exec-all.h
++++ b/include/exec/exec-all.h
+@@ -434,6 +434,14 @@ void tb_lock(void);
+ void tb_unlock(void);
+ void tb_lock_reset(void);
+ 
++#if !defined(CONFIG_USER_ONLY) && defined(CONFIG_DEBUG_TCG)
++void assert_no_pages_locked(void);
++#else
++static inline void assert_no_pages_locked(void)
++{
++}
++#endif
++
+ #if !defined(CONFIG_USER_ONLY)
+ 
+ struct MemoryRegion *iotlb_to_region(CPUState *cpu,
+diff --git a/accel/tcg/cpu-exec.c b/accel/tcg/cpu-exec.c
+index 7b934a6..ad1f0c4 100644
+--- a/accel/tcg/cpu-exec.c
++++ b/accel/tcg/cpu-exec.c
+@@ -274,6 +274,7 @@ void cpu_exec_step_atomic(CPUState *cpu)
+         tcg_debug_assert(!have_mmap_lock());
+ #endif
+         tb_lock_reset();
++        assert_no_pages_locked();
+     }
+ 
+     if (in_exclusive_region) {
 diff --git a/accel/tcg/translate-all.c b/accel/tcg/translate-all.c
-index 38e712d..07674e4 100644
+index 8286203..f3a0ecb 100644
 --- a/accel/tcg/translate-all.c
 +++ b/accel/tcg/translate-all.c
-@@ -107,8 +107,8 @@ typedef struct PageDesc {
- #ifdef CONFIG_SOFTMMU
-     /* in order to optimize self modifying code, we count the number
-        of lookups we do to a given page to use a bitmap */
--    unsigned int code_write_count;
-     unsigned long *code_bitmap;
-+    unsigned int code_write_count;
- #else
-     unsigned long flags;
- #endif
+@@ -658,6 +658,12 @@ do_assert_page_locked(const PageDesc *pd, const char *file, int line)
+ 
+ #define assert_page_locked(pd) do_assert_page_locked(pd, __FILE__, __LINE__)
+ 
++void assert_no_pages_locked(void)
++{
++    ht_pages_locked_debug_init();
++    g_assert(g_hash_table_size(ht_pages_locked_debug) == 0);
++}
++
+ #else /* !CONFIG_DEBUG_TCG */
+ 
+ #define assert_page_locked(pd)
+@@ -828,6 +834,7 @@ page_collection_lock(tb_page_addr_t start, tb_page_addr_t end)
+     set->tree = g_tree_new_full(tb_page_addr_cmp, NULL, NULL,
+                                 page_entry_destroy);
+     set->max = NULL;
++    assert_no_pages_locked();
+ 
+  retry:
+     g_tree_foreach(set->tree, page_entry_lock, NULL);
 -- 
 2.7.4
