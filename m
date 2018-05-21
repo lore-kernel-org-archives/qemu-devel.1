@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42882)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42905)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1fKlQN-0002ur-T1
-	for qemu-devel@nongnu.org; Mon, 21 May 2018 10:04:33 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1fKlQO-0002wx-FQ
+	for qemu-devel@nongnu.org; Mon, 21 May 2018 10:04:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1fKlQM-00015j-FE
-	for qemu-devel@nongnu.org; Mon, 21 May 2018 10:04:31 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1fKlQM-000163-Kv
+	for qemu-devel@nongnu.org; Mon, 21 May 2018 10:04:32 -0400
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 21 May 2018 15:03:58 +0100
-Message-Id: <20180521140402.23318-24-peter.maydell@linaro.org>
+Date: Mon, 21 May 2018 15:04:01 +0100
+Message-Id: <20180521140402.23318-27-peter.maydell@linaro.org>
 In-Reply-To: <20180521140402.23318-1-peter.maydell@linaro.org>
 References: <20180521140402.23318-1-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PATCH 23/27] hw/core/or-irq: Support more than 16
- inputs to an OR gate
+Subject: [Qemu-devel] [PATCH 26/27] hw/arm/iotkit: Wire up MPC interrupt
+ lines
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,95 +23,152 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-arm@nongnu.org, qemu-devel@nongnu.org
 Cc: patches@linaro.org, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 
-For the IoTKit MPC support, we need to wire together the
-interrupt outputs of 17 MPCs; this exceeds the current
-value of MAX_OR_LINES. Increase MAX_OR_LINES to 32 (which
-should be enough for anyone).
-
-The tricky part is retaining the migration compatibility for
-existing OR gates; we add a subsection which is only used
-for larger OR gates, and define it such that we can freely
-increase MAX_OR_LINES in future (or even move to a dynamically
-allocated levels[] array without an upper size limit) without
-breaking compatibility.
+The interrupt outputs from the MPC in the IoTKit and the expansion
+MPCs in the board must be wired up to the security controller, and
+also all ORed together to produce a single line to the NVIC.
 
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- include/hw/or-irq.h |  5 ++++-
- hw/core/or-irq.c    | 39 +++++++++++++++++++++++++++++++++++++--
- 2 files changed, 41 insertions(+), 3 deletions(-)
+ include/hw/arm/iotkit.h |  6 ++++
+ hw/arm/iotkit.c         | 74 +++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 80 insertions(+)
 
-diff --git a/include/hw/or-irq.h b/include/hw/or-irq.h
-index 3f6fc1b58a..5a31e5a188 100644
---- a/include/hw/or-irq.h
-+++ b/include/hw/or-irq.h
-@@ -31,7 +31,10 @@
+diff --git a/include/hw/arm/iotkit.h b/include/hw/arm/iotkit.h
+index b21cf1ab9d..2cddde55dd 100644
+--- a/include/hw/arm/iotkit.h
++++ b/include/hw/arm/iotkit.h
+@@ -42,6 +42,9 @@
+  *  + named GPIO outputs ahb_ppcexp{0,1,2,3}_irq_enable
+  *  + named GPIO outputs ahb_ppcexp{0,1,2,3}_irq_clear
+  *  + named GPIO inputs ahb_ppcexp{0,1,2,3}_irq_status
++ * Controlling each of the 16 expansion MPCs which a system using the IoTKit
++ * might provide:
++ *  + named GPIO inputs mpcexp_status[0..15]
+  */
  
- #define TYPE_OR_IRQ "or-irq"
+ #ifndef IOTKIT_H
+@@ -81,6 +84,8 @@ typedef struct IoTKit {
+     qemu_or_irq ppc_irq_orgate;
+     SplitIRQ sec_resp_splitter;
+     SplitIRQ ppc_irq_splitter[NUM_PPCS];
++    SplitIRQ mpc_irq_splitter[IOTS_NUM_EXP_MPC + IOTS_NUM_MPC];
++    qemu_or_irq mpc_irq_orgate;
  
--#define MAX_OR_LINES      16
-+/* This can safely be increased if necessary without breaking
-+ * migration compatibility (as long as it remains greater than 15).
-+ */
-+#define MAX_OR_LINES      32
+     UnimplementedDeviceState dualtimer;
+     UnimplementedDeviceState s32ktimer;
+@@ -99,6 +104,7 @@ typedef struct IoTKit {
+     qemu_irq nsc_cfg_in;
  
- typedef struct OrIRQState qemu_or_irq;
+     qemu_irq irq_status_in[NUM_EXTERNAL_PPCS];
++    qemu_irq mpcexp_status_in[IOTS_NUM_EXP_MPC];
  
-diff --git a/hw/core/or-irq.c b/hw/core/or-irq.c
-index f9d76c4641..a86901b673 100644
---- a/hw/core/or-irq.c
-+++ b/hw/core/or-irq.c
-@@ -66,14 +66,49 @@ static void or_irq_init(Object *obj)
-     qdev_init_gpio_out(DEVICE(obj), &s->out_irq, 1);
+     uint32_t nsccfg;
+ 
+diff --git a/hw/arm/iotkit.c b/hw/arm/iotkit.c
+index 160e40c744..133d5bb34f 100644
+--- a/hw/arm/iotkit.c
++++ b/hw/arm/iotkit.c
+@@ -131,6 +131,18 @@ static void iotkit_init(Object *obj)
+     init_sysbus_child(obj, "apb-ppc1", &s->apb_ppc1, sizeof(s->apb_ppc1),
+                       TYPE_TZ_PPC);
+     init_sysbus_child(obj, "mpc", &s->mpc, sizeof(s->mpc), TYPE_TZ_MPC);
++    object_initialize(&s->mpc_irq_orgate, sizeof(s->mpc_irq_orgate),
++                      TYPE_OR_IRQ);
++    object_property_add_child(obj, "mpc-irq-orgate",
++                              OBJECT(&s->mpc_irq_orgate), &error_abort);
++    for (i = 0; i < ARRAY_SIZE(s->mpc_irq_splitter); i++) {
++        char *name = g_strdup_printf("mpc-irq-splitter-%d", i);
++        SplitIRQ *splitter = &s->mpc_irq_splitter[i];
++
++        object_initialize(splitter, sizeof(*splitter), TYPE_SPLIT_IRQ);
++        object_property_add_child(obj, name, OBJECT(splitter), &error_abort);
++        g_free(name);
++    }
+     init_sysbus_child(obj, "timer0", &s->timer0, sizeof(s->timer0),
+                       TYPE_CMSDK_APB_TIMER);
+     init_sysbus_child(obj, "timer1", &s->timer1, sizeof(s->timer1),
+@@ -163,6 +175,12 @@ static void iotkit_exp_irq(void *opaque, int n, int level)
+     qemu_set_irq(s->exp_irqs[n], level);
  }
  
-+/* The original version of this device had a fixed 16 entries in its
-+ * VMState array; devices with more inputs than this need to
-+ * migrate the extra lines via a subsection.
-+ * The subsection migrates as much of the levels[] array as is needed
-+ * (including repeating the first 16 elements), to avoid the awkwardness
-+ * of splitting it in two to meet the requirements of VMSTATE_VARRAY_UINT16.
-+ */
-+#define OLD_MAX_OR_LINES 16
-+#if MAX_OR_LINES < OLD_MAX_OR_LINES
-+#error MAX_OR_LINES must be at least 16 for migration compatibility
-+#endif
-+
-+static bool vmstate_extras_needed(void *opaque)
++static void iotkit_mpcexp_status(void *opaque, int n, int level)
 +{
-+    qemu_or_irq *s = OR_IRQ(opaque);
-+
-+    return s->num_lines >= OLD_MAX_OR_LINES;
++    IoTKit *s = IOTKIT(opaque);
++    qemu_set_irq(s->mpcexp_status_in[n], level);
 +}
 +
-+static const VMStateDescription vmstate_or_irq_extras = {
-+    .name = "or-irq-extras",
-+    .version_id = 1,
-+    .minimum_version_id = 1,
-+    .needed = vmstate_extras_needed,
-+    .fields = (VMStateField[]) {
-+        VMSTATE_VARRAY_UINT16_UNSAFE(levels, qemu_or_irq, num_lines, 0,
-+                                     vmstate_info_bool, bool),
-+        VMSTATE_END_OF_LIST(),
-+    },
-+};
-+
- static const VMStateDescription vmstate_or_irq = {
-     .name = TYPE_OR_IRQ,
-     .version_id = 1,
-     .minimum_version_id = 1,
-     .fields = (VMStateField[]) {
--        VMSTATE_BOOL_ARRAY(levels, qemu_or_irq, MAX_OR_LINES),
-+        VMSTATE_BOOL_SUB_ARRAY(levels, qemu_or_irq, 0, OLD_MAX_OR_LINES),
-         VMSTATE_END_OF_LIST(),
--    }
-+    },
-+    .subsections = (const VMStateDescription*[]) {
-+        &vmstate_or_irq_extras,
-+        NULL
-+    },
- };
+ static void iotkit_realize(DeviceState *dev, Error **errp)
+ {
+     IoTKit *s = IOTKIT(dev);
+@@ -328,6 +346,22 @@ static void iotkit_realize(DeviceState *dev, Error **errp)
+                                 sysbus_mmio_get_region(SYS_BUS_DEVICE(&s->mpc),
+                                                        0));
  
- static Property or_irq_properties[] = {
++    /* We must OR together lines from the MPC splitters to go to the NVIC */
++    object_property_set_int(OBJECT(&s->mpc_irq_orgate),
++                            IOTS_NUM_EXP_MPC + IOTS_NUM_MPC, "num-lines", &err);
++    if (err) {
++        error_propagate(errp, err);
++        return;
++    }
++    object_property_set_bool(OBJECT(&s->mpc_irq_orgate), true,
++                             "realized", &err);
++    if (err) {
++        error_propagate(errp, err);
++        return;
++    }
++    qdev_connect_gpio_out(DEVICE(&s->mpc_irq_orgate), 0,
++                          qdev_get_gpio_in(DEVICE(&s->armv7m), 9));
++
+     /* Devices behind APB PPC0:
+      *   0x40000000: timer0
+      *   0x40001000: timer1
+@@ -536,6 +570,46 @@ static void iotkit_realize(DeviceState *dev, Error **errp)
+         g_free(gpioname);
+     }
+ 
++    /* Wire up the splitters for the MPC IRQs */
++    for (i = 0; i < IOTS_NUM_EXP_MPC + IOTS_NUM_MPC; i++) {
++        SplitIRQ *splitter = &s->mpc_irq_splitter[i];
++        DeviceState *dev_splitter = DEVICE(splitter);
++
++        object_property_set_int(OBJECT(splitter), 2, "num-lines", &err);
++        if (err) {
++            error_propagate(errp, err);
++            return;
++        }
++        object_property_set_bool(OBJECT(splitter), true, "realized", &err);
++        if (err) {
++            error_propagate(errp, err);
++            return;
++        }
++
++        if (i < IOTS_NUM_EXP_MPC) {
++            /* Splitter input is from GPIO input line */
++            s->mpcexp_status_in[i] = qdev_get_gpio_in(dev_splitter, 0);
++            qdev_connect_gpio_out(dev_splitter, 0,
++                                  qdev_get_gpio_in_named(dev_secctl,
++                                                         "mpcexp_status", i));
++        } else {
++            /* Splitter input is from our own MPC */
++            qdev_connect_gpio_out_named(DEVICE(&s->mpc), "irq", 0,
++                                        qdev_get_gpio_in(dev_splitter, 0));
++            qdev_connect_gpio_out(dev_splitter, 0,
++                                  qdev_get_gpio_in_named(dev_secctl,
++                                                         "mpc_status", 0));
++        }
++
++        qdev_connect_gpio_out(dev_splitter, 1,
++                              qdev_get_gpio_in(DEVICE(&s->mpc_irq_orgate), i));
++    }
++    /* Create GPIO inputs which will pass the line state for our
++     * mpcexp_irq inputs to the correct splitter devices.
++     */
++    qdev_init_gpio_in_named(dev, iotkit_mpcexp_status, "mpcexp_status",
++                            IOTS_NUM_EXP_MPC);
++
+     iotkit_forward_sec_resp_cfg(s);
+ 
+     system_clock_scale = NANOSECONDS_PER_SECOND / s->mainclk_frq;
 -- 
 2.17.0
