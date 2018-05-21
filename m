@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41708)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41671)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sstabellini@kernel.org>) id 1fKqaQ-0000fy-1w
+	(envelope-from <sstabellini@kernel.org>) id 1fKqaO-0000fF-Ti
 	for qemu-devel@nongnu.org; Mon, 21 May 2018 15:35:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sstabellini@kernel.org>) id 1fKqaO-0003Hn-F6
-	for qemu-devel@nongnu.org; Mon, 21 May 2018 15:35:14 -0400
-Received: from mail.kernel.org ([198.145.29.99]:60354)
+	(envelope-from <sstabellini@kernel.org>) id 1fKqaM-0003DV-A0
+	for qemu-devel@nongnu.org; Mon, 21 May 2018 15:35:12 -0400
+Received: from mail.kernel.org ([198.145.29.99]:60260)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <sstabellini@kernel.org>)
-	id 1fKqaO-0003Gb-7L
-	for qemu-devel@nongnu.org; Mon, 21 May 2018 15:35:12 -0400
+	id 1fKqaM-0003Bx-2K
+	for qemu-devel@nongnu.org; Mon, 21 May 2018 15:35:10 -0400
 From: Stefano Stabellini <sstabellini@kernel.org>
-Date: Mon, 21 May 2018 12:35:00 -0700
-Message-Id: <1526931304-7289-11-git-send-email-sstabellini@kernel.org>
+Date: Mon, 21 May 2018 12:34:54 -0700
+Message-Id: <1526931304-7289-5-git-send-email-sstabellini@kernel.org>
 In-Reply-To: <alpine.DEB.2.10.1805211229070.4520@sstabellini-ThinkPad-X260>
 References: <alpine.DEB.2.10.1805211229070.4520@sstabellini-ThinkPad-X260>
-Subject: [Qemu-devel] [PULL 11/15] xen_backend: add an emulation of grant
- copy
+Subject: [Qemu-devel] [PULL 05/15] xen-hvm: create separate function for
+ ioreq server initialization
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,89 +30,136 @@ Cc: sstabellini@kernel.org, stefanha@redhat.com, anthony.perard@citrix.com, xen-
 
 From: Paul Durrant <paul.durrant@citrix.com>
 
-Not all Xen environments support the xengnttab_grant_copy() operation.
-E.g. where the OS is FreeBSD or Xen is older than 4.8.0.
-
-This patch introduces an emulation of that operation using
-xengnttab_map_domain_grant_refs() and memcpy() for those environments.
+The code is sufficiently substantial that it improves code readability
+to put it in a new function called by xen_hvm_init() rather than having
+it inline.
 
 Signed-off-by: Paul Durrant <paul.durrant@citrix.com>
-Acked-by: Anthony PERARD <anthony.perard@citrix.com>
+Reviewed-by: Anthony Perard <anthony.perard@citrix.com>
 Signed-off-by: Stefano Stabellini <sstabellini@kernel.org>
 ---
- hw/xen/xen_backend.c | 53 ++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 53 insertions(+)
+ hw/i386/xen/xen-hvm.c | 76 +++++++++++++++++++++++++++++++--------------------
+ 1 file changed, 46 insertions(+), 30 deletions(-)
 
-diff --git a/hw/xen/xen_backend.c b/hw/xen/xen_backend.c
-index 50412d6..3c3fc2c 100644
---- a/hw/xen/xen_backend.c
-+++ b/hw/xen/xen_backend.c
-@@ -146,6 +146,55 @@ void xen_be_unmap_grant_refs(struct XenDevice *xendev, void *ptr,
-     }
+diff --git a/hw/i386/xen/xen-hvm.c b/hw/i386/xen/xen-hvm.c
+index caa563b..6ffa3c2 100644
+--- a/hw/i386/xen/xen-hvm.c
++++ b/hw/i386/xen/xen-hvm.c
+@@ -95,7 +95,8 @@ typedef struct XenIOState {
+     CPUState **cpu_by_vcpu_id;
+     /* the evtchn port for polling the notification, */
+     evtchn_port_t *ioreq_local_port;
+-    /* evtchn local port for buffered io */
++    /* evtchn remote and local ports for buffered io */
++    evtchn_port_t bufioreq_remote_port;
+     evtchn_port_t bufioreq_local_port;
+     /* the evtchn fd for polling */
+     xenevtchn_handle *xce_handle;
+@@ -1236,12 +1237,52 @@ static void xen_wakeup_notifier(Notifier *notifier, void *data)
+     xc_set_hvm_param(xen_xc, xen_domid, HVM_PARAM_ACPI_S_STATE, 0);
  }
  
-+static int compat_copy_grant_refs(struct XenDevice *xendev,
-+                                  bool to_domain,
-+                                  XenGrantCopySegment segs[],
-+                                  unsigned int nr_segs)
-+{
-+    uint32_t *refs = g_new(uint32_t, nr_segs);
-+    int prot = to_domain ? PROT_WRITE : PROT_READ;
-+    void *pages;
-+    unsigned int i;
+-void xen_hvm_init(PCMachineState *pcms, MemoryRegion **ram_memory)
++static int xen_map_ioreq_server(XenIOState *state)
+ {
+-    int i, rc;
+     xen_pfn_t ioreq_pfn;
+     xen_pfn_t bufioreq_pfn;
+     evtchn_port_t bufioreq_evtchn;
++    int rc;
 +
-+    for (i = 0; i < nr_segs; i++) {
-+        XenGrantCopySegment *seg = &segs[i];
-+
-+        refs[i] = to_domain ?
-+            seg->dest.foreign.ref : seg->source.foreign.ref;
++    rc = xen_get_ioreq_server_info(xen_domid, state->ioservid,
++                                   &ioreq_pfn, &bufioreq_pfn,
++                                   &bufioreq_evtchn);
++    if (rc < 0) {
++        error_report("failed to get ioreq server info: error %d handle=%p",
++                     errno, xen_xc);
++        return rc;
 +    }
 +
-+    pages = xengnttab_map_domain_grant_refs(xendev->gnttabdev, nr_segs,
-+                                            xen_domid, refs, prot);
-+    if (!pages) {
-+        xen_pv_printf(xendev, 0,
-+                      "xengnttab_map_domain_grant_refs failed: %s\n",
-+                      strerror(errno));
-+        g_free(refs);
++    DPRINTF("shared page at pfn %lx\n", ioreq_pfn);
++    DPRINTF("buffered io page at pfn %lx\n", bufioreq_pfn);
++    DPRINTF("buffered io evtchn is %x\n", bufioreq_evtchn);
++
++    state->shared_page = xenforeignmemory_map(xen_fmem, xen_domid,
++                                              PROT_READ | PROT_WRITE,
++                                              1, &ioreq_pfn, NULL);
++    if (state->shared_page == NULL) {
++        error_report("map shared IO page returned error %d handle=%p",
++                     errno, xen_xc);
 +        return -1;
 +    }
 +
-+    for (i = 0; i < nr_segs; i++) {
-+        XenGrantCopySegment *seg = &segs[i];
-+        void *page = pages + (i * XC_PAGE_SIZE);
-+
-+        if (to_domain) {
-+            memcpy(page + seg->dest.foreign.offset, seg->source.virt,
-+                   seg->len);
-+        } else {
-+            memcpy(seg->dest.virt, page + seg->source.foreign.offset,
-+                   seg->len);
-+        }
++    state->buffered_io_page = xenforeignmemory_map(xen_fmem, xen_domid,
++                                                   PROT_READ | PROT_WRITE,
++                                                   1, &bufioreq_pfn, NULL);
++    if (state->buffered_io_page == NULL) {
++        error_report("map buffered IO page returned error %d", errno);
++        return -1;
 +    }
 +
-+    if (xengnttab_unmap(xendev->gnttabdev, pages, nr_segs)) {
-+        xen_pv_printf(xendev, 0, "xengnttab_unmap failed: %s\n",
-+                      strerror(errno));
-+    }
++    state->bufioreq_remote_port = bufioreq_evtchn;
 +
-+    g_free(refs);
 +    return 0;
 +}
 +
- int xen_be_copy_grant_refs(struct XenDevice *xendev,
-                            bool to_domain,
-                            XenGrantCopySegment segs[],
-@@ -157,6 +206,10 @@ int xen_be_copy_grant_refs(struct XenDevice *xendev,
++void xen_hvm_init(PCMachineState *pcms, MemoryRegion **ram_memory)
++{
++    int i, rc;
++    xen_pfn_t ioreq_pfn;
+     XenIOState *state;
  
-     assert(xendev->ops->flags & DEVOPS_FLAG_NEED_GNTDEV);
+     state = g_malloc0(sizeof (XenIOState));
+@@ -1269,25 +1310,8 @@ void xen_hvm_init(PCMachineState *pcms, MemoryRegion **ram_memory)
+     state->wakeup.notify = xen_wakeup_notifier;
+     qemu_register_wakeup_notifier(&state->wakeup);
  
-+    if (!xen_feature_grant_copy) {
-+        return compat_copy_grant_refs(xendev, to_domain, segs, nr_segs);
-+    }
-+
-     xengnttab_segs = g_new0(xengnttab_grant_copy_segment_t, nr_segs);
+-    rc = xen_get_ioreq_server_info(xen_domid, state->ioservid,
+-                                   &ioreq_pfn, &bufioreq_pfn,
+-                                   &bufioreq_evtchn);
++    rc = xen_map_ioreq_server(state);
+     if (rc < 0) {
+-        error_report("failed to get ioreq server info: error %d handle=%p",
+-                     errno, xen_xc);
+-        goto err;
+-    }
+-
+-    DPRINTF("shared page at pfn %lx\n", ioreq_pfn);
+-    DPRINTF("buffered io page at pfn %lx\n", bufioreq_pfn);
+-    DPRINTF("buffered io evtchn is %x\n", bufioreq_evtchn);
+-
+-    state->shared_page = xenforeignmemory_map(xen_fmem, xen_domid,
+-                                              PROT_READ|PROT_WRITE,
+-                                              1, &ioreq_pfn, NULL);
+-    if (state->shared_page == NULL) {
+-        error_report("map shared IO page returned error %d handle=%p",
+-                     errno, xen_xc);
+         goto err;
+     }
  
-     for (i = 0; i < nr_segs; i++) {
+@@ -1308,14 +1332,6 @@ void xen_hvm_init(PCMachineState *pcms, MemoryRegion **ram_memory)
+         goto err;
+     }
+ 
+-    state->buffered_io_page = xenforeignmemory_map(xen_fmem, xen_domid,
+-                                                   PROT_READ|PROT_WRITE,
+-                                                   1, &bufioreq_pfn, NULL);
+-    if (state->buffered_io_page == NULL) {
+-        error_report("map buffered IO page returned error %d", errno);
+-        goto err;
+-    }
+-
+     /* Note: cpus is empty at this point in init */
+     state->cpu_by_vcpu_id = g_malloc0(max_cpus * sizeof(CPUState *));
+ 
+@@ -1340,7 +1356,7 @@ void xen_hvm_init(PCMachineState *pcms, MemoryRegion **ram_memory)
+     }
+ 
+     rc = xenevtchn_bind_interdomain(state->xce_handle, xen_domid,
+-                                    bufioreq_evtchn);
++                                    state->bufioreq_remote_port);
+     if (rc == -1) {
+         error_report("buffered evtchn bind error %d", errno);
+         goto err;
 -- 
 1.9.1
