@@ -1,28 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37753)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38003)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1fL7tK-0003iq-DM
-	for qemu-devel@nongnu.org; Tue, 22 May 2018 10:03:57 -0400
+	(envelope-from <bounces@canonical.com>) id 1fL7uD-0004BC-5B
+	for qemu-devel@nongnu.org; Tue, 22 May 2018 10:04:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1fL7tA-0004so-Qr
-	for qemu-devel@nongnu.org; Tue, 22 May 2018 10:03:54 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:40686)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1fL7tA-0004sW-Lj
-	for qemu-devel@nongnu.org; Tue, 22 May 2018 10:03:44 -0400
-Date: Tue, 22 May 2018 11:03:39 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20180522140339.GC25013@localhost.localdomain>
-References: <1526949675-106737-1-git-send-email-babu.moger@amd.com>
-	<1526949675-106737-3-git-send-email-babu.moger@amd.com>
-	<CY4PR12MB181551D174221BF3CC5F209AF9940@CY4PR12MB1815.namprd12.prod.outlook.com>
-	<DM5PR12MB24713F0E6095C786E0AA8ED795940@DM5PR12MB2471.namprd12.prod.outlook.com>
+	(envelope-from <bounces@canonical.com>) id 1fL7uA-0005LR-57
+	for qemu-devel@nongnu.org; Tue, 22 May 2018 10:04:49 -0400
+Received: from indium.canonical.com ([91.189.90.7]:46782)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1fL7uA-0005Ky-0M
+	for qemu-devel@nongnu.org; Tue, 22 May 2018 10:04:46 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1fL7u8-00079V-C7
+	for <qemu-devel@nongnu.org>; Tue, 22 May 2018 14:04:44 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 2DA322E8F52
+	for <qemu-devel@nongnu.org>; Tue, 22 May 2018 13:55:19 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <DM5PR12MB24713F0E6095C786E0AA8ED795940@DM5PR12MB2471.namprd12.prod.outlook.com>
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v10 2/5] i386: Populate AMD Processor Cache
- Information for cpuid 0x8000001D
+Date: Tue, 22 May 2018 13:44:52 -0000
+From: Thomas Huth <1101210@bugs.launchpad.net>
+Reply-To: Bug 1101210 <1101210@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20130118141238.13697.51258.malonedeb@chaenomeles.canonical.com>
+Message-Id: <152699669274.8113.12849501114281782768.malone@chaenomeles.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1101210] Re: qemu 1.4.2: usb keyboard not fully
+ working
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,45 +37,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Moger, Babu" <Babu.Moger@amd.com>
-Cc: "Duran, Leo" <leo.duran@amd.com>, "mst@redhat.com" <mst@redhat.com>, "marcel.apfelbaum@gmail.com" <marcel.apfelbaum@gmail.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "rth@twiddle.net" <rth@twiddle.net>, "mtosatti@redhat.com" <mtosatti@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "kash@tripleback.net" <kash@tripleback.net>, "geoff@hostfission.com" <geoff@hostfission.com>
+To: qemu-devel@nongnu.org
 
-On Tue, May 22, 2018 at 01:32:52PM +0000, Moger, Babu wrote:
->=20
-> > -----Original Message-----
-> > From: Duran, Leo
-> > Sent: Monday, May 21, 2018 8:32 PM
-> > To: Moger, Babu <Babu.Moger@amd.com>; mst@redhat.com;
-> > marcel.apfelbaum@gmail.com; pbonzini@redhat.com; rth@twiddle.net;
-> > ehabkost@redhat.com; mtosatti@redhat.com
-> > Cc: qemu-devel@nongnu.org; kvm@vger.kernel.org; kash@tripleback.net;
-> > geoff@hostfission.com
-> > Subject: RE: [PATCH v10 2/5] i386: Populate AMD Processor Cache
-> > Information for cpuid 0x8000001D
-> >=20
-> > Babu,
-> >=20
-> > If num_sharing_l3_cache() uses MAX_NODES_EPYC, then that function It=E2=
-=80=99s
-> > EPYC specific.
-> >=20
-> > An alternative would be to use a data member (e.g.,
-> > max_nodes_per_socket)) that get initialized (via another helper funct=
-ion) to
-> > MAX_NODES_EPYC.
->=20
-> Thanks Leo.  Let me see how we can handle this. This requires changes i=
-n generic
-> Data structure which I tried to avoid here.  I will wait for all the co=
-mments for whole
-> series before making this change.  Note that right now, this feature is=
- only enabled
-> for EPYC. Yes. I know this could this in future.
+Looking through old bug tickets... can you still reproduce this issue
+with the latest version of QEMU? Or could we close this ticket nowadays?
 
-We just need a reasonable default, by now, and it can even be the
-same value used on EPYC.  This default just need to generate
-reasonable results for other cases that don't match real hardware
-(like cores=3D32 or cores=3D12).
+** Changed in: qemu
+       Status: Confirmed =3D> Incomplete
 
---=20
-Eduardo
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1101210
+
+Title:
+  qemu 1.4.2: usb keyboard not fully working
+
+Status in QEMU:
+  Incomplete
+
+Bug description:
+  When using the usb keyboard, I can't type the | character. I'm using
+  german keyboard layout (de) on the host and inside the guest. As a
+  guest OS, I use Linux (e.g. a recent KNOPPIX cd). To obtain the |
+  character on a german keyboard, I need to press AltGr + the < or >
+  key, i.e. the key right to the left shift.
+
+  The qemu command line is something like this:
+  ./qemu-system-i386 -device pci-ohci -device usb-kbd
+  I also tried
+  ./qemu-system-i386 -usb -usbdevice keyboard
+  with the same effect.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1101210/+subscriptions
