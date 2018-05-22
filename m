@@ -1,28 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40630)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41792)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1fLFRp-0005v7-Um
-	for qemu-devel@nongnu.org; Tue, 22 May 2018 18:08:04 -0400
+	(envelope-from <pasic@linux.ibm.com>) id 1fLFbQ-0007nx-Ji
+	for qemu-devel@nongnu.org; Tue, 22 May 2018 18:17:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1fLFRm-0005ze-OP
-	for qemu-devel@nongnu.org; Tue, 22 May 2018 18:08:01 -0400
-Received: from mail-pl0-f68.google.com ([209.85.160.68]:44501)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1fLFRm-0005zK-IL
-	for qemu-devel@nongnu.org; Tue, 22 May 2018 18:07:58 -0400
-Received: by mail-pl0-f68.google.com with SMTP id m24-v6so328086pls.11
-	for <qemu-devel@nongnu.org>; Tue, 22 May 2018 15:07:58 -0700 (PDT)
-References: <20180522192034.13318-1-pbonzini@redhat.com>
-	<CAFEAcA_mU6wvzGCvhv_OvX37QqyNkMdwfM8Kc6swNQK=tCZMYA@mail.gmail.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <91829340-f17a-1c24-715c-fe0fd6953ebc@redhat.com>
-Date: Wed, 23 May 2018 00:07:56 +0200
-MIME-Version: 1.0
-In-Reply-To: <CAFEAcA_mU6wvzGCvhv_OvX37QqyNkMdwfM8Kc6swNQK=tCZMYA@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] tcg: remove softfloat from --disable-tcg
- builds
+	(envelope-from <pasic@linux.ibm.com>) id 1fLFbH-0002sz-Cq
+	for qemu-devel@nongnu.org; Tue, 22 May 2018 18:17:56 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:50910
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pasic@linux.ibm.com>) id 1fLFbH-0002sE-7a
+	for qemu-devel@nongnu.org; Tue, 22 May 2018 18:17:47 -0400
+Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w4MMF1a1008886
+	for <qemu-devel@nongnu.org>; Tue, 22 May 2018 18:17:45 -0400
+Received: from e06smtp11.uk.ibm.com (e06smtp11.uk.ibm.com [195.75.94.107])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2j4ueurwpb-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Tue, 22 May 2018 18:17:45 -0400
+Received: from localhost
+	by e06smtp11.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <pasic@linux.ibm.com>;
+	Tue, 22 May 2018 23:17:43 +0100
+From: Halil Pasic <pasic@linux.ibm.com>
+Date: Wed, 23 May 2018 00:16:53 +0200
+Message-Id: <20180522221655.78979-1-pasic@linux.ibm.com>
+Subject: [Qemu-devel] [PATCH v2 0/2] vfio-ccw: loosen orb flags checks
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,24 +35,18 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Trivial <qemu-trivial@nongnu.org>, Thomas Huth <thuth@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, David Hildenbrand <david@redhat.com>
+To: Cornelia Huck <cohuck@redhat.com>
+Cc: Halil Pasic <pasic@linux.ibm.com>, Dong Jia Shi <bjsdjshi@linux.ibm.com>, "Jason J. Herne" <jjherne@linux.ibm.com>, qemu-s390x@nongnu.org, qemu-devel@nongnu.org
 
-On 22/05/2018 21:27, Peter Maydell wrote:
-> On 22 May 2018 at 20:20, Paolo Bonzini <pbonzini@redhat.com> wrote:
->> Even though the presence of softfloat does not cause --disable-tcg builds to fail,
->> it is the single largest .o file in them.  Remove it, since TCG is the only client.
->>
->> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
->> ---
->>  Makefile.target          |   2 +-
->>  hw/i386/x86-iommu-stub.c | 132 +++++++++++++++++++++++++++++++++++++++
->>  2 files changed, 133 insertions(+), 1 deletion(-)
->>  create mode 100644 hw/i386/x86-iommu-stub.c
-> 
-> Is this new x86-iommu-stub.c file intended to be in this patch?
+See the individual patches (inclusive change log).
 
-No, of course not.  I probably fat fingered a "r" into "f" in git rebase
--i...
+Halil Pasic (2):
+  vfio-ccw: add force unlimited prefetch property
+  vfio-ccw: remove orb.c64 (64 bit data addresses) check
 
-Paolo
+ hw/s390x/css.c | 12 ------------
+ hw/vfio/ccw.c  | 25 +++++++++++++++++++++++++
+ 2 files changed, 25 insertions(+), 12 deletions(-)
+
+-- 
+2.16.3
