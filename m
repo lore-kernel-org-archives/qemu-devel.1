@@ -1,34 +1,36 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44177)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48306)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <hahn@univention.de>) id 1fL30C-0002nO-9c
-	for qemu-devel@nongnu.org; Tue, 22 May 2018 04:50:41 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1fL3Me-0005zE-Ps
+	for qemu-devel@nongnu.org; Tue, 22 May 2018 05:13:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <hahn@univention.de>) id 1fL309-0003je-ON
-	for qemu-devel@nongnu.org; Tue, 22 May 2018 04:50:40 -0400
-Received: from mail.univention.de ([82.198.197.8]:24870)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <hahn@univention.de>) id 1fL309-0003jH-H0
-	for qemu-devel@nongnu.org; Tue, 22 May 2018 04:50:37 -0400
-Received: from localhost (localhost [127.0.0.1])
-	by solig.knut.univention.de (Postfix) with ESMTP id E289F1F19F76
-	for <qemu-devel@nongnu.org>; Tue, 22 May 2018 10:50:34 +0200 (CEST)
-Received: from mail.univention.de ([127.0.0.1])
-	by localhost (solig.knut.univention.de [127.0.0.1]) (amavisd-new,
-	port 10024) with ESMTP id 99kGqK7AJibk for <qemu-devel@nongnu.org>;
-	Tue, 22 May 2018 10:50:30 +0200 (CEST)
-Received: from [192.168.0.82] (mail.univention.de [82.198.197.8])
-	by solig.knut.univention.de (Postfix) with ESMTPSA id 8793F1F19F63
-	for <qemu-devel@nongnu.org>; Tue, 22 May 2018 10:50:30 +0200 (CEST)
-References: <20180518180440-mutt-send-email-mst@kernel.org>
-From: Philipp Hahn <hahn@univention.de>
-Message-ID: <3b5cc5b2-a25c-bf84-0501-0d3a00b867c2@univention.de>
-Date: Tue, 22 May 2018 10:50:30 +0200
+	(envelope-from <peter.maydell@linaro.org>) id 1fL3Md-00041g-P8
+	for qemu-devel@nongnu.org; Tue, 22 May 2018 05:13:52 -0400
+Received: from mail-oi0-x241.google.com ([2607:f8b0:4003:c06::241]:41735)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1fL3Md-00041K-Ji
+	for qemu-devel@nongnu.org; Tue, 22 May 2018 05:13:51 -0400
+Received: by mail-oi0-x241.google.com with SMTP id 11-v6so15541962ois.8
+	for <qemu-devel@nongnu.org>; Tue, 22 May 2018 02:13:51 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20180518180440-mutt-send-email-mst@kernel.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] storing machine data in qcow images?
+In-Reply-To: <5AC97568.2040502@huawei.com>
+References: <1521530809-11780-1-git-send-email-zhaoshenglong@huawei.com>
+	<1521530809-11780-3-git-send-email-zhaoshenglong@huawei.com>
+	<CAFEAcA96qV_f7i_36Yzb-QV7W9SRHKfJpg=rvv3tia2X-Xi7QQ@mail.gmail.com>
+	<5AB0F254.3050503@huawei.com>
+	<CAFEAcA-Ct3qa0OFZ4U+9RH68SQJgmkxJKKS5e+if_MuL2pSu3A@mail.gmail.com>
+	<5AB21130.2020309@huawei.com>
+	<CAFEAcA8yr+KJFwBSksMP-VjNbsSd190VCzB4wGwOCoaX2ScDiA@mail.gmail.com>
+	<CAFEAcA_r=S=YWAuZue1zZnFdtFYK2wU7NnaCcGThZU_u33qD4g@mail.gmail.com>
+	<CAFEAcA_JYyHj6NGJahGPQ9p9XQz6rkmhWMfheW96DzkciModDA@mail.gmail.com>
+	<CAFEAcA_GwG-80oNHHb1wcJxkzS5YcbH335JHBo48_ksFmgRB7A@mail.gmail.com>
+	<5AC97568.2040502@huawei.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 22 May 2018 10:13:30 +0100
+Message-ID: <CAFEAcA8M4-2sAr84kA-1m-0ydw_Xy27A6qK4BEwEzRTdCNahgg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH v2 2/2] arm_gicv3_kvm:
+ kvm_dist_get/put: skip the registers banked by GICR
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,28 +39,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Shannon Zhao <zhaoshenglong@huawei.com>
+Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, Eric Auger <eric.auger@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Juan Quintela <quintela@redhat.com>, Shannon Zhao <shannon.zhaosl@gmail.com>
 
-Hi,
+On 8 April 2018 at 02:50, Shannon Zhao <zhaoshenglong@huawei.com> wrote:
+> On 2018/4/6 17:36, Peter Maydell wrote:
+>> On reflection, I think I'd aim for 2.13 for this, since:
+>>  * it's not a regression
+>>  * it doesn't actually affect any of our boards, because
+>>    none of them define enough interrupt lines that they
+>>    would actually be using the top 32 that we fail to migrate
+>>  * getting the migration compat right is a bit tricky and
+>>    will benefit from having the time for careful review and testing
+>>
+>> Let me know if I'm wrong with any of those assumptions.
+>
+> Yes, it's no need to merge this for 2.12. I'll respin this patch later.
 
-Am 18.05.2018 um 17:30 schrieb Michael S. Tsirkin:
-> Unfortunately this means that it's no longer possible
-> to more or less reliably boot a VM just given a disk image,
-> even if you select the correct QEMU binary:
-...
-> Would it be reasonable to support storing this information in the qcow
-> image itself?  For example, I can see it following immediately the
-> backing file path within the image.
+Looking at another GIC related patch this morning reminded me
+about this one. Shannon, are you planning to respin this now we've
+reopened for 2.13 development?
 
-- This looks like a layering violation
-- what happens when you have multiple (conflicting) images like a VM
-with 2 image files?
-
-Philipp
-
-PS: this is even more an issue for restoring snapshots as you the must
-launch a new QEMU process with the exact layout of the saving QEMU
-process - otherwise LoadVM will just fail.
-PPS: I'm afraid of someone suggesting such an abomination as those self
-extracting archives using shell scripts at the beginning and an
-compressed archive BLOB at the end of the same file.
+thanks
+-- PMM
