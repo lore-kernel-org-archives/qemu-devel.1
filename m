@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50371)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50634)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fLAI9-00016g-LM
-	for qemu-devel@nongnu.org; Tue, 22 May 2018 12:37:42 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1fLAJ8-0001jj-FE
+	for qemu-devel@nongnu.org; Tue, 22 May 2018 12:38:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fLAI8-0002QD-QQ
-	for qemu-devel@nongnu.org; Tue, 22 May 2018 12:37:41 -0400
-Received: from mail-oi0-x242.google.com ([2607:f8b0:4003:c06::242]:44725)
+	(envelope-from <peter.maydell@linaro.org>) id 1fLAJ7-0002i5-NN
+	for qemu-devel@nongnu.org; Tue, 22 May 2018 12:38:42 -0400
+Received: from mail-oi0-x243.google.com ([2607:f8b0:4003:c06::243]:45893)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fLAI8-0002Px-Ka
-	for qemu-devel@nongnu.org; Tue, 22 May 2018 12:37:40 -0400
-Received: by mail-oi0-x242.google.com with SMTP id e80-v6so16784992oig.11
-	for <qemu-devel@nongnu.org>; Tue, 22 May 2018 09:37:40 -0700 (PDT)
+	id 1fLAJ7-0002hl-JN
+	for qemu-devel@nongnu.org; Tue, 22 May 2018 12:38:41 -0400
+Received: by mail-oi0-x243.google.com with SMTP id b130-v6so16797624oif.12
+	for <qemu-devel@nongnu.org>; Tue, 22 May 2018 09:38:41 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <d022028c-624d-ed88-9ba6-d0fe88d8adcf@twiddle.net>
-References: <20180521140402.23318-1-peter.maydell@linaro.org>
-	<20180521140402.23318-10-peter.maydell@linaro.org>
-	<d022028c-624d-ed88-9ba6-d0fe88d8adcf@twiddle.net>
+In-Reply-To: <CANCZdfq0_-t+HZhYmGOt0uCLd2p1VNUythUKrCMJffTtrWhz9Q@mail.gmail.com>
+References: <CAFEAcA9a-xrtibHYb4+-xu3QVmW3tJ1v9X0s_X_PMhQGFSJgdg@mail.gmail.com>
+	<CANCZdfpNMR_buj3L4xvqhh_T4QZOvV5JsXHK2Rzk-zs5iHvGrg@mail.gmail.com>
+	<CAFEAcA-xqG+9SZ2_K5XFooJuKYyuRoL51K1JuwQ-SWGcCYcX=A@mail.gmail.com>
+	<CANCZdfq0_-t+HZhYmGOt0uCLd2p1VNUythUKrCMJffTtrWhz9Q@mail.gmail.com>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 22 May 2018 17:37:19 +0100
-Message-ID: <CAFEAcA8V_8xOpGuVKSQQYUZ=GZ+a21Mom5=dq+Nj=t5nyrYJWA@mail.gmail.com>
+Date: Tue, 22 May 2018 17:38:20 +0100
+Message-ID: <CAFEAcA8TPL8hJtdWtf1fAFSb1T2iXLxX23vcbVYkLW4rT7oWkw@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH 09/27] Make flatview_access_valid() take a
- MemTxAttrs argument
+Subject: Re: [Qemu-devel] QEMU 3.0 proposed release schedule
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,29 +31,22 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <rth@twiddle.net>
-Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, "patches@linaro.org" <patches@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
+To: Warner Losh <imp@bsdimp.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Michael Roth <mdroth@linux.vnet.ibm.com>
 
-On 22 May 2018 at 17:33, Richard Henderson <rth@twiddle.net> wrote:
-> On 05/21/2018 07:03 AM, Peter Maydell wrote:
->> As part of plumbing MemTxAttrs down to the IOMMU translate method,
->> add MemTxAttrs as an argument to flatview_access_valid().
->> Its callers now all have an attrs value to hand, so we can
->> correct our earlier temporary use of MEMTXATTRS_UNSPECIFIED.
->>
->> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
->> ---
+On 22 May 2018 at 17:34, Warner Losh <imp@bsdimp.com> wrote:
+> On Tue, May 22, 2018 at 9:50 AM, Peter Maydell <peter.maydell@linaro.org>
+> wrote:
+>> The usual recommendation is to submit early and often.
 >
-> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 >
->>              /* When our callers all have attrs we'll pass them through here */
->> -            if (!memory_region_access_valid(mr, xlat, l, is_write,
->> -                                            MEMTXATTRS_UNSPECIFIED)) {
->> +            if (!memory_region_access_valid(mr, xlat, l, is_write, attrs)) {
->
-> Kill the temporary comment too.
+> Should I do a RFC or preview submission then of the first dozen patches
+> maybe as I work out integrating back the bug/compile fixes into the early
+> series? I'd love to get feedback, but don't want to waste people's time on
+> something that I've not compile tested every change on (just the final
+> results, which stands today at ~125 changes, but last week was at 200).
 
-Oops, yes.
+I would suggest a preview submission, yes, though if it did
+at least compile that would be nice...
 
-thanks
 -- PMM
