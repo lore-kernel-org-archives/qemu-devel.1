@@ -1,34 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39170)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40181)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1fLFKL-0003O6-9f
-	for qemu-devel@nongnu.org; Tue, 22 May 2018 18:00:18 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1fLFPY-0004dn-Nc
+	for qemu-devel@nongnu.org; Tue, 22 May 2018 18:05:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1fLFKI-0001A8-9Y
-	for qemu-devel@nongnu.org; Tue, 22 May 2018 18:00:17 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:37624 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1fLFKI-00019t-5t
-	for qemu-devel@nongnu.org; Tue, 22 May 2018 18:00:14 -0400
-References: <1526801333-30613-1-git-send-email-whois.zihan.yang@gmail.com>
-	<1526801333-30613-4-git-send-email-whois.zihan.yang@gmail.com>
-	<ef3fc85d-7726-c888-e8ca-9dfae1b908d3@gmail.com>
-	<17a3765f-b835-2d45-e8b9-ffd4aff909f9@redhat.com>
-	<cbdfe0d6-f071-3560-009d-3bbdde12b33c@gmail.com>
-	<f71a8c61-a0d7-6ebc-62ad-3dab8b9f8e5a@redhat.com>
-	<20180522234410-mutt-send-email-mst@kernel.org>
-	<20180522153659.2e33fbe0@w520.home>
-	<20180523004236-mutt-send-email-mst@kernel.org>
-	<20180522154741.3939d1e0@w520.home>
-From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <fc603491-7c41-e862-a583-2bae6f165b5a@redhat.com>
-Date: Wed, 23 May 2018 00:00:04 +0200
+	(envelope-from <pbonzini@redhat.com>) id 1fLFPV-0004V4-Id
+	for qemu-devel@nongnu.org; Tue, 22 May 2018 18:05:40 -0400
+Received: from mail-pl0-f68.google.com ([209.85.160.68]:45341)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1fLFPV-0004Ub-CC
+	for qemu-devel@nongnu.org; Tue, 22 May 2018 18:05:37 -0400
+Received: by mail-pl0-f68.google.com with SMTP id bi12-v6so11684737plb.12
+	for <qemu-devel@nongnu.org>; Tue, 22 May 2018 15:05:37 -0700 (PDT)
+References: <20180522194943.24871-1-pbonzini@redhat.com>
+	<f8ad161c-f411-1b60-d81f-7d65cf4ec69f@amsat.org>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <f2184144-2032-3070-0b51-93cc3f64854c@redhat.com>
+Date: Wed, 23 May 2018 00:05:31 +0200
 MIME-Version: 1.0
-In-Reply-To: <20180522154741.3939d1e0@w520.home>
+In-Reply-To: <f8ad161c-f411-1b60-d81f-7d65cf4ec69f@amsat.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC 3/3] acpi-build: allocate mcfg for multiple
- host bridges
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH] hw: allow compiling out SCSI
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,38 +30,130 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alex Williamson <alex.williamson@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Zihan Yang <whois.zihan.yang@gmail.com>, qemu-devel@nongnu.org, Igor Mammedov <imammedo@redhat.com>, Eric Auger <eauger@redhat.com>, Drew Jones <drjones@redhat.com>, Wei Huang <wei@redhat.com>
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, qemu-devel@nongnu.org
 
-On 05/22/18 23:47, Alex Williamson wrote:
-> On Wed, 23 May 2018 00:44:22 +0300
-> "Michael S. Tsirkin" <mst@redhat.com> wrote:
+On 22/05/2018 22:37, Philippe Mathieu-Daudé wrote:
+> Hi Paolo,
 > 
->> On Tue, May 22, 2018 at 03:36:59PM -0600, Alex Williamson wrote:
->>> On Tue, 22 May 2018 23:58:30 +0300
->>> "Michael S. Tsirkin" <mst@redhat.com> wrote:   
->>>>
->>>> It's not hard to think of a use-case where >256 devices
->>>> are helpful, for example a nested virt scenario where
->>>> each device is passed on to a different nested guest.
->>>>
->>>> But I think the main feature this is needed for is numa modeling.
->>>> Guests seem to assume a numa node per PCI root, ergo we need more PCI
->>>> roots.  
->>>
->>> But even if we have NUMA affinity per PCI host bridge, a PCI host
->>> bridge does not necessarily imply a new PCIe domain.  
+> On 05/22/2018 04:49 PM, Paolo Bonzini wrote:
+>> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+>> ---
+>>  default-configs/mips-softmmu-common.mak | 1 +
+>>  default-configs/pci.mak                 | 1 +
+>>  default-configs/riscv32-softmmu.mak     | 1 +
+>>  default-configs/riscv64-softmmu.mak     | 1 +
+>>  default-configs/s390x-softmmu.mak       | 1 +
+>>  default-configs/sparc-softmmu.mak       | 1 +
+>>  default-configs/usb.mak                 | 1 +
+>>  hw/Makefile.objs                        | 2 +-
+>>  8 files changed, 8 insertions(+), 1 deletion(-)
 >>
->> What are you calling a PCIe domain?
+>> diff --git a/default-configs/mips-softmmu-common.mak b/default-configs/mips-softmmu-common.mak
+>> index e31f046b3b..fae2347ee7 100644
+>> --- a/default-configs/mips-softmmu-common.mak
+>> +++ b/default-configs/mips-softmmu-common.mak
+>> @@ -4,6 +4,7 @@ include pci.mak
+>>  include sound.mak
+>>  include usb.mak
+>>  CONFIG_ESP=y
+>> +CONFIG_SCSI=y
+>>  CONFIG_VGA_ISA=y
+>>  CONFIG_VGA_ISA_MM=y
+>>  CONFIG_VGA_CIRRUS=y
+>> diff --git a/default-configs/pci.mak b/default-configs/pci.mak
+>> index 35e7596949..163dd814c7 100644
+>> --- a/default-configs/pci.mak
+>> +++ b/default-configs/pci.mak
+>> @@ -15,6 +15,7 @@ CONFIG_PCNET_COMMON=y
+>>  CONFIG_AC97=y
+>>  CONFIG_HDA=y
+>>  CONFIG_ES1370=y
+>> +CONFIG_SCSI=y
+>>  CONFIG_LSI_SCSI_PCI=y
+>>  CONFIG_VMW_PVSCSI_SCSI_PCI=y
+>>  CONFIG_MEGASAS_SCSI_PCI=y
+>> diff --git a/default-configs/riscv32-softmmu.mak b/default-configs/riscv32-softmmu.mak
+>> index f9e742120c..9159a4a8af 100644
+>> --- a/default-configs/riscv32-softmmu.mak
+>> +++ b/default-configs/riscv32-softmmu.mak
+>> @@ -2,3 +2,4 @@
+>>  
+>>  CONFIG_SERIAL=y
+>>  CONFIG_VIRTIO=y
+>> +CONFIG_SCSI=y
+>> diff --git a/default-configs/riscv64-softmmu.mak b/default-configs/riscv64-softmmu.mak
+>> index f9e742120c..9159a4a8af 100644
+>> --- a/default-configs/riscv64-softmmu.mak
+>> +++ b/default-configs/riscv64-softmmu.mak
+>> @@ -2,3 +2,4 @@
+>>  
+>>  CONFIG_SERIAL=y
+>>  CONFIG_VIRTIO=y
+>> +CONFIG_SCSI=y
+>> diff --git a/default-configs/s390x-softmmu.mak b/default-configs/s390x-softmmu.mak
+>> index 2f4bfe73b4..729033b25a 100644
+>> --- a/default-configs/s390x-softmmu.mak
+>> +++ b/default-configs/s390x-softmmu.mak
+>> @@ -2,6 +2,7 @@ CONFIG_PCI=y
+>>  CONFIG_VIRTIO_PCI=$(CONFIG_PCI)
+>>  CONFIG_VHOST_USER_SCSI=$(call land,$(CONFIG_VHOST_USER),$(CONFIG_LINUX))
+>>  CONFIG_VHOST_USER_BLK=$(call land,$(CONFIG_VHOST_USER),$(CONFIG_LINUX))
+>> +CONFIG_SCSI=y
+>>  CONFIG_VIRTIO=y
+>>  CONFIG_SCLPCONSOLE=y
+>>  CONFIG_TERMINAL3270=y
+>> diff --git a/default-configs/sparc-softmmu.mak b/default-configs/sparc-softmmu.mak
+>> index 004b0f4e77..12f97eeb20 100644
+>> --- a/default-configs/sparc-softmmu.mak
+>> +++ b/default-configs/sparc-softmmu.mak
+>> @@ -2,6 +2,7 @@
+>>  
+>>  CONFIG_ISA_BUS=y
+>>  CONFIG_ECC=y
+>> +CONFIG_SCSI=y
+>>  CONFIG_ESP=y
+>>  CONFIG_ESCC=y
+>>  CONFIG_M48T59=y
+>> diff --git a/default-configs/usb.mak b/default-configs/usb.mak
+>> index f4b85684f0..e42cfeabbe 100644
+>> --- a/default-configs/usb.mak
+>> +++ b/default-configs/usb.mak
+>> @@ -3,6 +3,7 @@ CONFIG_USB_TABLET_WACOM=y
+>>  CONFIG_USB_STORAGE_BOT=y
+>>  CONFIG_USB_STORAGE_UAS=y
+>>  CONFIG_USB_STORAGE_MTP=y
+>> +CONFIG_SCSI=y
 > 
-> Domain/segment
+> What about:
 > 
-> 0000:00:00.0
-> ^^^^ This
-> 
-> Isn't that the only reason we'd need a new MCFG section and the reason
-> we're limited to 256 buses?  Thanks,
+> ifeq ($(CONFIG_SCSI),y)
+> CONFIG_USB_STORAGE_BOT=y
+> CONFIG_USB_STORAGE_UAS=y
+> CONFIG_USB_STORAGE_MTP=y
+> endif
 
-(Just to confirm: this matches my understanding of the thread as well.)
+The question is where the dependency goes: is it USB storage (BOT and
+UAS; MTP is different) that should bring in SCSI support, or the other
+way round?  Or, in Kconfig terms, whether it is a "depends on SCSI" or a
+"select SCSI"...
 
-Laszlo
+Paolo
+
+>>  CONFIG_USB_SMARTCARD=y
+>>  CONFIG_USB_AUDIO=y
+>>  CONFIG_USB_SERIAL=y
+>> diff --git a/hw/Makefile.objs b/hw/Makefile.objs
+>> index 6a0ffe0afd..a19c1417ed 100644
+>> --- a/hw/Makefile.objs
+>> +++ b/hw/Makefile.objs
+>> @@ -23,7 +23,7 @@ devices-dirs-$(CONFIG_SOFTMMU) += nvram/
+>>  devices-dirs-$(CONFIG_SOFTMMU) += pci/
+>>  devices-dirs-$(CONFIG_PCI) += pci-bridge/ pci-host/
+>>  devices-dirs-$(CONFIG_SOFTMMU) += pcmcia/
+>> -devices-dirs-$(CONFIG_SOFTMMU) += scsi/
+>> +devices-dirs-$(CONFIG_SCSI) += scsi/
+>>  devices-dirs-$(CONFIG_SOFTMMU) += sd/
+>>  devices-dirs-$(CONFIG_SOFTMMU) += ssi/
+>>  devices-dirs-$(CONFIG_SOFTMMU) += timer/
+>>
+> 
