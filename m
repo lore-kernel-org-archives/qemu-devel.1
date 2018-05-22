@@ -1,23 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35169)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37446)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wlosh@bsdimp.com>) id 1fL9OE-0005VJ-Dn
-	for qemu-devel@nongnu.org; Tue, 22 May 2018 11:39:55 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1fL9YX-0007pc-9S
+	for qemu-devel@nongnu.org; Tue, 22 May 2018 11:50:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wlosh@bsdimp.com>) id 1fL9OD-0001ff-Cc
-	for qemu-devel@nongnu.org; Tue, 22 May 2018 11:39:54 -0400
-Received: from mail-it0-x236.google.com ([2607:f8b0:4001:c0b::236]:55721)
+	(envelope-from <peter.maydell@linaro.org>) id 1fL9YW-0005Ru-4L
+	for qemu-devel@nongnu.org; Tue, 22 May 2018 11:50:33 -0400
+Received: from mail-oi0-x230.google.com ([2607:f8b0:4003:c06::230]:44578)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <wlosh@bsdimp.com>) id 1fL9OD-0001fE-74
-	for qemu-devel@nongnu.org; Tue, 22 May 2018 11:39:53 -0400
-Received: by mail-it0-x236.google.com with SMTP id 144-v6so442264iti.5
-	for <qemu-devel@nongnu.org>; Tue, 22 May 2018 08:39:52 -0700 (PDT)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1fL9YV-0005Ri-VB
+	for qemu-devel@nongnu.org; Tue, 22 May 2018 11:50:32 -0400
+Received: by mail-oi0-x230.google.com with SMTP id e80-v6so16636335oig.11
+	for <qemu-devel@nongnu.org>; Tue, 22 May 2018 08:50:31 -0700 (PDT)
 MIME-Version: 1.0
-Sender: wlosh@bsdimp.com
-In-Reply-To: <CAFEAcA9a-xrtibHYb4+-xu3QVmW3tJ1v9X0s_X_PMhQGFSJgdg@mail.gmail.com>
+In-Reply-To: <CANCZdfpNMR_buj3L4xvqhh_T4QZOvV5JsXHK2Rzk-zs5iHvGrg@mail.gmail.com>
 References: <CAFEAcA9a-xrtibHYb4+-xu3QVmW3tJ1v9X0s_X_PMhQGFSJgdg@mail.gmail.com>
-From: Warner Losh <imp@bsdimp.com>
-Date: Tue, 22 May 2018 09:39:51 -0600
-Message-ID: <CANCZdfpNMR_buj3L4xvqhh_T4QZOvV5JsXHK2Rzk-zs5iHvGrg@mail.gmail.com>
+	<CANCZdfpNMR_buj3L4xvqhh_T4QZOvV5JsXHK2Rzk-zs5iHvGrg@mail.gmail.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 22 May 2018 16:50:10 +0100
+Message-ID: <CAFEAcA-xqG+9SZ2_K5XFooJuKYyuRoL51K1JuwQ-SWGcCYcX=A@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 Subject: Re: [Qemu-devel] QEMU 3.0 proposed release schedule
 List-Id: <qemu-devel.nongnu.org>
@@ -28,33 +29,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
+To: Warner Losh <imp@bsdimp.com>
 Cc: QEMU Developers <qemu-devel@nongnu.org>, Michael Roth <mdroth@linux.vnet.ibm.com>
 
-On Tue, May 22, 2018 at 9:24 AM, Peter Maydell <peter.maydell@linaro.org>
-wrote:
+On 22 May 2018 at 16:39, Warner Losh <imp@bsdimp.com> wrote:
+> On Tue, May 22, 2018 at 9:24 AM, Peter Maydell <peter.maydell@linaro.org>
+> wrote:
+>>
+>> I've put up a draft release schedule at:
+>> https://wiki.qemu.org/Planning/3.0
+>>
+>> 2018-04-24      Beginning of development phase
+>> 2018-07-03      Soft feature freeze.
+>> 2018-07-10      Hard feature freeze. Tag rc0
+>> 2018-07-17      Tag rc1
+>> 2018-07-24      Tag rc2
+>> 2018-07-31      Tag rc3
+>> 2018-08-07      Release, or if necessary, tag rc4
+>> 2018-08-14      Release, if we needed rc4
 
-> I've put up a draft release schedule at:
-> https://wiki.qemu.org/Planning/3.0
->
-> 2018-04-24      Beginning of development phase
-> 2018-07-03      Soft feature freeze.
-> 2018-07-10      Hard feature freeze. Tag rc0
-> 2018-07-17      Tag rc1
-> 2018-07-24      Tag rc2
-> 2018-07-31      Tag rc3
-> 2018-08-07      Release, or if necessary, tag rc4
-> 2018-08-14      Release, if we needed rc4
->
-> It's a touch earlier than last year, so we're definitely
-> finished before the end of August.
->
-> Does this work for people?
->
+> I'd love to get bsd-user into 3.0. At the moment, all the changes are in
+> bsd-user, and my cleanup is trending to about 50 patches. Given traditional
+> timelines, when should I submit patches to the mailing list for that?
 
-I'd love to get bsd-user into 3.0. At the moment, all the changes are in
-bsd-user, and my cleanup is trending to about 50 patches. Given traditional
-timelines, when should I submit patches to the mailing list for that?
-Alternatively, when would a future 3.1 be expected?
+The usual recommendation is to submit early and often.
+"softfreeze" means "any new feature to go in must already
+be in a pull request on the list by this date", but big
+features hitting the list late in the cycle are not fun to
+deal with and best avoided. Also, don't feel you need to hold
+on to the thing until all 50-odd patches are ready to submit;
+if you can break it up into smaller patchsets that's easier
+to deal with.
 
-Warner
+> Alternatively, when would a future 3.1 be expected?
+
+We do 3 releases a year, generally in approximately April, August
+and December. So 3.1 will be early December.
+
+thanks
+-- PMM
