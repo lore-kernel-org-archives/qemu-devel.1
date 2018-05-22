@@ -1,26 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:32839)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39051)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fLCwu-0005bk-5Z
-	for qemu-devel@nongnu.org; Tue, 22 May 2018 15:27:57 -0400
+	(envelope-from <paolo.bonzini@gmail.com>) id 1fLDIA-0002tL-8D
+	for qemu-devel@nongnu.org; Tue, 22 May 2018 15:49:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fLCwt-00073p-Gi
-	for qemu-devel@nongnu.org; Tue, 22 May 2018 15:27:56 -0400
-Received: from mail-oi0-x241.google.com ([2607:f8b0:4003:c06::241]:43110)
+	(envelope-from <paolo.bonzini@gmail.com>) id 1fLDI6-00014d-Ao
+	for qemu-devel@nongnu.org; Tue, 22 May 2018 15:49:54 -0400
+Received: from mail-pl0-x242.google.com ([2607:f8b0:400e:c01::242]:42858)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fLCwt-00073P-C8
-	for qemu-devel@nongnu.org; Tue, 22 May 2018 15:27:55 -0400
-Received: by mail-oi0-x241.google.com with SMTP id p62-v6so17282011oie.10
-	for <qemu-devel@nongnu.org>; Tue, 22 May 2018 12:27:55 -0700 (PDT)
-MIME-Version: 1.0
-In-Reply-To: <20180522192034.13318-1-pbonzini@redhat.com>
-References: <20180522192034.13318-1-pbonzini@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 22 May 2018 20:27:34 +0100
-Message-ID: <CAFEAcA_mU6wvzGCvhv_OvX37QqyNkMdwfM8Kc6swNQK=tCZMYA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH] tcg: remove softfloat from --disable-tcg
- builds
+	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
+	id 1fLDI6-00014R-5S
+	for qemu-devel@nongnu.org; Tue, 22 May 2018 15:49:50 -0400
+Received: by mail-pl0-x242.google.com with SMTP id u6-v6so11509619pls.9
+	for <qemu-devel@nongnu.org>; Tue, 22 May 2018 12:49:50 -0700 (PDT)
+Received: from donizetti.event.priv ([72.28.93.232])
+	by smtp.gmail.com with ESMTPSA id
+	d19-v6sm45704656pfk.59.2018.05.22.12.49.46
+	for <qemu-devel@nongnu.org>
+	(version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+	Tue, 22 May 2018 12:49:47 -0700 (PDT)
+Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Date: Tue, 22 May 2018 21:49:43 +0200
+Message-Id: <20180522194943.24871-1-pbonzini@redhat.com>
+Subject: [Qemu-devel] [PATCH] hw: allow compiling out SCSI
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,21 +31,110 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, QEMU Trivial <qemu-trivial@nongnu.org>, Thomas Huth <thuth@redhat.com>, David Hildenbrand <david@redhat.com>
+To: qemu-devel@nongnu.org
 
-On 22 May 2018 at 20:20, Paolo Bonzini <pbonzini@redhat.com> wrote:
-> Even though the presence of softfloat does not cause --disable-tcg builds to fail,
-> it is the single largest .o file in them.  Remove it, since TCG is the only client.
->
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> ---
->  Makefile.target          |   2 +-
->  hw/i386/x86-iommu-stub.c | 132 +++++++++++++++++++++++++++++++++++++++
->  2 files changed, 133 insertions(+), 1 deletion(-)
->  create mode 100644 hw/i386/x86-iommu-stub.c
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+---
+ default-configs/mips-softmmu-common.mak | 1 +
+ default-configs/pci.mak                 | 1 +
+ default-configs/riscv32-softmmu.mak     | 1 +
+ default-configs/riscv64-softmmu.mak     | 1 +
+ default-configs/s390x-softmmu.mak       | 1 +
+ default-configs/sparc-softmmu.mak       | 1 +
+ default-configs/usb.mak                 | 1 +
+ hw/Makefile.objs                        | 2 +-
+ 8 files changed, 8 insertions(+), 1 deletion(-)
 
-Is this new x86-iommu-stub.c file intended to be in this patch?
-
-thanks
--- PMM
+diff --git a/default-configs/mips-softmmu-common.mak b/default-configs/mips-softmmu-common.mak
+index e31f046b3b..fae2347ee7 100644
+--- a/default-configs/mips-softmmu-common.mak
++++ b/default-configs/mips-softmmu-common.mak
+@@ -4,6 +4,7 @@ include pci.mak
+ include sound.mak
+ include usb.mak
+ CONFIG_ESP=y
++CONFIG_SCSI=y
+ CONFIG_VGA_ISA=y
+ CONFIG_VGA_ISA_MM=y
+ CONFIG_VGA_CIRRUS=y
+diff --git a/default-configs/pci.mak b/default-configs/pci.mak
+index 35e7596949..163dd814c7 100644
+--- a/default-configs/pci.mak
++++ b/default-configs/pci.mak
+@@ -15,6 +15,7 @@ CONFIG_PCNET_COMMON=y
+ CONFIG_AC97=y
+ CONFIG_HDA=y
+ CONFIG_ES1370=y
++CONFIG_SCSI=y
+ CONFIG_LSI_SCSI_PCI=y
+ CONFIG_VMW_PVSCSI_SCSI_PCI=y
+ CONFIG_MEGASAS_SCSI_PCI=y
+diff --git a/default-configs/riscv32-softmmu.mak b/default-configs/riscv32-softmmu.mak
+index f9e742120c..9159a4a8af 100644
+--- a/default-configs/riscv32-softmmu.mak
++++ b/default-configs/riscv32-softmmu.mak
+@@ -2,3 +2,4 @@
+ 
+ CONFIG_SERIAL=y
+ CONFIG_VIRTIO=y
++CONFIG_SCSI=y
+diff --git a/default-configs/riscv64-softmmu.mak b/default-configs/riscv64-softmmu.mak
+index f9e742120c..9159a4a8af 100644
+--- a/default-configs/riscv64-softmmu.mak
++++ b/default-configs/riscv64-softmmu.mak
+@@ -2,3 +2,4 @@
+ 
+ CONFIG_SERIAL=y
+ CONFIG_VIRTIO=y
++CONFIG_SCSI=y
+diff --git a/default-configs/s390x-softmmu.mak b/default-configs/s390x-softmmu.mak
+index 2f4bfe73b4..729033b25a 100644
+--- a/default-configs/s390x-softmmu.mak
++++ b/default-configs/s390x-softmmu.mak
+@@ -2,6 +2,7 @@ CONFIG_PCI=y
+ CONFIG_VIRTIO_PCI=$(CONFIG_PCI)
+ CONFIG_VHOST_USER_SCSI=$(call land,$(CONFIG_VHOST_USER),$(CONFIG_LINUX))
+ CONFIG_VHOST_USER_BLK=$(call land,$(CONFIG_VHOST_USER),$(CONFIG_LINUX))
++CONFIG_SCSI=y
+ CONFIG_VIRTIO=y
+ CONFIG_SCLPCONSOLE=y
+ CONFIG_TERMINAL3270=y
+diff --git a/default-configs/sparc-softmmu.mak b/default-configs/sparc-softmmu.mak
+index 004b0f4e77..12f97eeb20 100644
+--- a/default-configs/sparc-softmmu.mak
++++ b/default-configs/sparc-softmmu.mak
+@@ -2,6 +2,7 @@
+ 
+ CONFIG_ISA_BUS=y
+ CONFIG_ECC=y
++CONFIG_SCSI=y
+ CONFIG_ESP=y
+ CONFIG_ESCC=y
+ CONFIG_M48T59=y
+diff --git a/default-configs/usb.mak b/default-configs/usb.mak
+index f4b85684f0..e42cfeabbe 100644
+--- a/default-configs/usb.mak
++++ b/default-configs/usb.mak
+@@ -3,6 +3,7 @@ CONFIG_USB_TABLET_WACOM=y
+ CONFIG_USB_STORAGE_BOT=y
+ CONFIG_USB_STORAGE_UAS=y
+ CONFIG_USB_STORAGE_MTP=y
++CONFIG_SCSI=y
+ CONFIG_USB_SMARTCARD=y
+ CONFIG_USB_AUDIO=y
+ CONFIG_USB_SERIAL=y
+diff --git a/hw/Makefile.objs b/hw/Makefile.objs
+index 6a0ffe0afd..a19c1417ed 100644
+--- a/hw/Makefile.objs
++++ b/hw/Makefile.objs
+@@ -23,7 +23,7 @@ devices-dirs-$(CONFIG_SOFTMMU) += nvram/
+ devices-dirs-$(CONFIG_SOFTMMU) += pci/
+ devices-dirs-$(CONFIG_PCI) += pci-bridge/ pci-host/
+ devices-dirs-$(CONFIG_SOFTMMU) += pcmcia/
+-devices-dirs-$(CONFIG_SOFTMMU) += scsi/
++devices-dirs-$(CONFIG_SCSI) += scsi/
+ devices-dirs-$(CONFIG_SOFTMMU) += sd/
+ devices-dirs-$(CONFIG_SOFTMMU) += ssi/
+ devices-dirs-$(CONFIG_SOFTMMU) += timer/
+-- 
+2.17.0
