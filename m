@@ -1,28 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55493)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55696)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fLEIB-0001io-VL
-	for qemu-devel@nongnu.org; Tue, 22 May 2018 16:54:00 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fLEIo-0002Hh-2P
+	for qemu-devel@nongnu.org; Tue, 22 May 2018 16:54:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fLEI8-0001e8-T4
-	for qemu-devel@nongnu.org; Tue, 22 May 2018 16:54:00 -0400
-Received: from mail-pg0-x244.google.com ([2607:f8b0:400e:c05::244]:33051)
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fLEIk-0001si-V7
+	for qemu-devel@nongnu.org; Tue, 22 May 2018 16:54:38 -0400
+Received: from mail-qt0-x235.google.com ([2607:f8b0:400d:c0d::235]:40963)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1fLEI8-0001dT-M7
-	for qemu-devel@nongnu.org; Tue, 22 May 2018 16:53:56 -0400
-Received: by mail-pg0-x244.google.com with SMTP id e21-v6so3481513pgv.0
-	for <qemu-devel@nongnu.org>; Tue, 22 May 2018 13:53:56 -0700 (PDT)
-References: <20180522192034.13318-1-pbonzini@redhat.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <724510e7-e739-5f88-b20b-9e27376a3438@linaro.org>
-Date: Tue, 22 May 2018 13:53:45 -0700
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fLEIk-0001sL-RY
+	for qemu-devel@nongnu.org; Tue, 22 May 2018 16:54:34 -0400
+Received: by mail-qt0-x235.google.com with SMTP id g13-v6so25324390qth.8
+	for <qemu-devel@nongnu.org>; Tue, 22 May 2018 13:54:34 -0700 (PDT)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20180522165058.15404-1-kraxel@redhat.com>
+	<20180522165058.15404-7-kraxel@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <7a07853d-601b-f49d-2543-d176e781f297@amsat.org>
+Date: Tue, 22 May 2018 17:54:29 -0300
 MIME-Version: 1.0
-In-Reply-To: <20180522192034.13318-1-pbonzini@redhat.com>
+In-Reply-To: <20180522165058.15404-7-kraxel@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] tcg: remove softfloat from --disable-tcg
- builds
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v2 6/6] MAINTAINERS: add vga entries
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,35 +35,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-trivial@nongnu.org, thuth@redhat.com, david@redhat.com
+To: Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org
+Cc: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>
 
-On 05/22/2018 12:20 PM, Paolo Bonzini wrote:
-> Even though the presence of softfloat does not cause --disable-tcg builds to fail,
-> it is the single largest .o file in them.  Remove it, since TCG is the only client.
-> 
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+On 05/22/2018 01:50 PM, Gerd Hoffmann wrote:
+> Add entries for standard vga, virtio-gpu and cirrus.
+
+Thanks :)
+
+> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+
 > ---
->  Makefile.target          |   2 +-
->  hw/i386/x86-iommu-stub.c | 132 +++++++++++++++++++++++++++++++++++++++
-
-Assuming this wasn't supposed to be here.
-
->  2 files changed, 133 insertions(+), 1 deletion(-)
->  create mode 100644 hw/i386/x86-iommu-stub.c
+>  MAINTAINERS | 21 +++++++++++++++++++++
+>  1 file changed, 21 insertions(+)
 > 
-> diff --git a/Makefile.target b/Makefile.target
-> index d0ec77a307..dad2cf8778 100644
-> --- a/Makefile.target
-> +++ b/Makefile.target
-> @@ -97,7 +97,7 @@ obj-$(CONFIG_TCG) += tcg/tcg.o tcg/tcg-op.o tcg/tcg-op-vec.o tcg/tcg-op-gvec.o
->  obj-$(CONFIG_TCG) += tcg/tcg-common.o tcg/optimize.o
->  obj-$(CONFIG_TCG_INTERPRETER) += tcg/tci.o
->  obj-$(CONFIG_TCG_INTERPRETER) += disas/tci.o
-> -obj-y += fpu/softfloat.o
-> +obj-$(CONFIG_TCG) += fpu/softfloat.o
-
-But for this change alone,
-Acked-by: Richard Henderson <richard.henderson@linaro.org>
-
-r~
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index e187b1f18f..2af3ad5172 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -1314,6 +1314,27 @@ S: Maintained
+>  F: include/hw/misc/unimp.h
+>  F: hw/misc/unimp.c
+>  
+> +Standard VGA
+> +M: Gerd Hoffmann <kraxel@redhat.com>
+> +S: Maintained
+> +F: hw/display/vga*
+> +F: hw/display/bochs-display.c
+> +F: include/hw/display/vga.h
+> +F: include/hw/display/bochs-vbe.h
+> +
+> +virtio-gpu
+> +M: Gerd Hoffmann <kraxel@redhat.com>
+> +S: Maintained
+> +F: hw/display/virtio-gpu*
+> +F: hw/display/virtio-vga.c
+> +F: include/hw/virtio/virtio-gpu.h
+> +
+> +Cirrus VGA
+> +M: Gerd Hoffmann <kraxel@redhat.com>
+> +S: Odd Fixes
+> +W: https://www.kraxel.org/blog/2014/10/qemu-using-cirrus-considered-harmful/
+> +F: hw/display/cirrus*
+> +
+>  Subsystems
+>  ----------
+>  Audio
+> 
