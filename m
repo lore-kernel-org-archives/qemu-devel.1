@@ -1,25 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57429)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58303)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fL47S-0001pt-6Q
-	for qemu-devel@nongnu.org; Tue, 22 May 2018 06:02:15 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1fL4CU-0003ZP-3R
+	for qemu-devel@nongnu.org; Tue, 22 May 2018 06:07:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fL47R-0005sY-7I
-	for qemu-devel@nongnu.org; Tue, 22 May 2018 06:02:14 -0400
-Received: from mail-oi0-x233.google.com ([2607:f8b0:4003:c06::233]:32781)
+	(envelope-from <peter.maydell@linaro.org>) id 1fL4CT-00084L-9j
+	for qemu-devel@nongnu.org; Tue, 22 May 2018 06:07:26 -0400
+Received: from mail-oi0-x234.google.com ([2607:f8b0:4003:c06::234]:39437)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fL47R-0005sD-2t
-	for qemu-devel@nongnu.org; Tue, 22 May 2018 06:02:13 -0400
-Received: by mail-oi0-x233.google.com with SMTP id k5-v6so15661196oiw.0
-	for <qemu-devel@nongnu.org>; Tue, 22 May 2018 03:02:12 -0700 (PDT)
+	id 1fL4CT-00083z-5Y
+	for qemu-devel@nongnu.org; Tue, 22 May 2018 06:07:25 -0400
+Received: by mail-oi0-x234.google.com with SMTP id n65-v6so15674296oig.6
+	for <qemu-devel@nongnu.org>; Tue, 22 May 2018 03:07:25 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20180521154952.15421-1-michael@walle.cc>
-References: <20180521154952.15421-1-michael@walle.cc>
+In-Reply-To: <20180430103312.GH3249@redhat.com>
+References: <CAFEAcA-hha7jMSfPTdNEVKhuJr4nwAx4wKmEk5E9+j-JS4U14w@mail.gmail.com>
+	<20180430103312.GH3249@redhat.com>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 22 May 2018 11:01:51 +0100
-Message-ID: <CAFEAcA_9Cj0smiup_-gCf_QFbyt-kJDEykFMYJ-KMeand9dyWg@mail.gmail.com>
+Date: Tue, 22 May 2018 11:07:04 +0100
+Message-ID: <CAFEAcA9gt50-7UR5XuR5DVrxLbsFx1hP=BDR2mjUOwjxDPwkdw@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL 0/1] target/lm32 BQL patch
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] release retrospective, next release timing,
+ numbering
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,19 +31,21 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Michael Walle <michael@walle.cc>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>
 
-On 21 May 2018 at 16:49, Michael Walle <michael@walle.cc> wrote:
-> The following changes since commit 81e9cbd0ca1131012b058df6804b1f626a6b730c:
->
->   lm32: take BQL before writing IP/IM register (2018-05-21 13:37:12 +0200)
->
-> are available in the git repository at:
->
->   git://github.com/mwalle/qemu.git tags/lm32-queue/20180521
+On 30 April 2018 at 11:33, Daniel P. Berrang=C3=A9 <berrange@redhat.com> wr=
+ote:
+>  a) Bump major version once a year, so we'll have 3.0, 3.1, 3.3,
+>     4.0, 4.1, 4.2, 5.0, ...etc  We missed the first release this
+>     year, so we would only have 3.0 and 3.1 this year.
 
-Hi -- this doesn't appear to be a GPG signed tag?
+I realised we didn't really come to a conclusion in this discussion.
+I've reread the thread, and my proposal is to arbitrarily pick
+something which accords with my aesthetic preferences, which is
+this one that Dan suggests.
+
+That will make the next release be 3.0.0.
 
 thanks
 -- PMM
