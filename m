@@ -1,33 +1,42 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38541)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39779)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fL7vU-0005GC-Rk
-	for qemu-devel@nongnu.org; Tue, 22 May 2018 10:06:14 -0400
+	(envelope-from <walling@linux.ibm.com>) id 1fL7yw-000833-3E
+	for qemu-devel@nongnu.org; Tue, 22 May 2018 10:09:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fL7vQ-0006L6-1e
-	for qemu-devel@nongnu.org; Tue, 22 May 2018 10:06:08 -0400
-Received: from indium.canonical.com ([91.189.90.7]:47104)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1fL7vP-0006KY-SY
-	for qemu-devel@nongnu.org; Tue, 22 May 2018 10:06:03 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1fL7vP-0007FL-1V
-	for <qemu-devel@nongnu.org>; Tue, 22 May 2018 14:06:03 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 0545C2E8F34
-	for <qemu-devel@nongnu.org>; Tue, 22 May 2018 14:06:03 +0000 (UTC)
+	(envelope-from <walling@linux.ibm.com>) id 1fL7ys-0008KT-Qt
+	for qemu-devel@nongnu.org; Tue, 22 May 2018 10:09:42 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:43314)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <walling@linux.ibm.com>)
+	id 1fL7ys-0008IV-Ho
+	for qemu-devel@nongnu.org; Tue, 22 May 2018 10:09:38 -0400
+Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w4ME5x5f061298
+	for <qemu-devel@nongnu.org>; Tue, 22 May 2018 10:09:36 -0400
+Received: from e38.co.us.ibm.com (e38.co.us.ibm.com [32.97.110.159])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2j4mcc1a3w-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Tue, 22 May 2018 10:09:36 -0400
+Received: from localhost
+	by e38.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <walling@linux.ibm.com>;
+	Tue, 22 May 2018 08:09:35 -0600
+References: <20180504072514.8450-1-cohuck@redhat.com>
+	<20180504072514.8450-9-cohuck@redhat.com>
+	<b1a5eb12-4f1d-2f66-f59f-eb1baa87746d@redhat.com>
+	<20180522144426.0e683b60.cohuck@redhat.com>
+From: Collin Walling <walling@linux.ibm.com>
+Date: Tue, 22 May 2018 10:09:29 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 22 May 2018 13:53:47 -0000
-From: Thomas Huth <1242963@bugs.launchpad.net>
-Reply-To: Bug 1242963 <1242963@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20131022003829.24859.20433.malonedeb@wampee.canonical.com>
-Message-Id: <152699722748.8704.6250709738086440546.malone@chaenomeles.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1242963] Re: QEMU loadvm causes guest OS freeze
+In-Reply-To: <20180522144426.0e683b60.cohuck@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Message-Id: <26c59585-89ca-ecaf-9252-ba23955e42a3@linux.ibm.com>
+Subject: Re: [Qemu-devel] [PULL 08/15] pc-bios/s390-ccw: fix loadparm
+ initialization and int conversion
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,57 +45,125 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Cornelia Huck <cohuck@redhat.com>, Laszlo Ersek <lersek@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>, David Hildenbrand <david@redhat.com>, Alexander Graf <agraf@suse.de>, qemu-devel@nongnu.org, Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org, Richard Henderson <rth@twiddle.net>
 
-Looking through old bug tickets... can you still reproduce this issue
-with the latest version of QEMU? Or could we close this ticket nowadays?
+On 05/22/2018 08:44 AM, Cornelia Huck wrote:
+> On Tue, 15 May 2018 10:45:02 +0200
+> Laszlo Ersek <lersek@redhat.com> wrote:
+> 
+>> I've come across this patch in downstream review (although I really have
+>> zero background in s390x), and Cornelia suggested I might want to repeat
+>> my comments on the upstream list too:
+>>
+>> On 05/04/18 09:25, Cornelia Huck wrote:
+>>> From: Collin Walling <walling@linux.ibm.com>
+>>>
+>>> Rename the loadparm char array in main.c to loadparm_str and
+>>> increased the size by one byte to account for a null termination
+>>> when converting the loadparm string to an int  via atoui. We
+>>> also allow the boot menu to be enabled when loadparm is set to
+>>> an empty string or a series of spaces.
+>>>
+>>> Signed-off-by: Collin Walling <walling@linux.ibm.com>
+>>> Reported-by: Vasily Gorbik <gor@linux.ibm.com>
+>>> Reviewed-by: Thomas Huth <thuth@redhat.com>
+>>> Reviewed-by: Janosch Frank <frankja@linux.ibm.com>
+>>> Signed-off-by: Thomas Huth <thuth@redhat.com>
+>>> ---
+>>>  hw/s390x/ipl.c          |  4 ++++
+>>>  pc-bios/s390-ccw/main.c | 14 +++++++-------
+>>>  2 files changed, 11 insertions(+), 7 deletions(-)
+>>>
+>>> diff --git a/hw/s390x/ipl.c b/hw/s390x/ipl.c
+>>> index fb554ab156..150f6c0582 100644
+>>> --- a/hw/s390x/ipl.c
+>>> +++ b/hw/s390x/ipl.c
+>>> @@ -373,6 +373,10 @@ int s390_ipl_set_loadparm(uint8_t *loadparm)
+>>>              loadparm[i] = ascii2ebcdic[(uint8_t) lp[i]];
+>>>          }
+>>>  
+>>> +        if (i < 8) {
+>>> +            memset(loadparm + i, 0x40, 8 - i); /* fill with EBCDIC spaces */
+>>> +        }
+>>> +
+>>>          g_free(lp);
+>>>          return 0;
+>>>      }
+>>> diff --git a/pc-bios/s390-ccw/main.c b/pc-bios/s390-ccw/main.c
+>>> index 9d9f8cf4d3..26f9adf84a 100644
+>>> --- a/pc-bios/s390-ccw/main.c
+>>> +++ b/pc-bios/s390-ccw/main.c
+>>> @@ -15,11 +15,11 @@
+>>>  char stack[PAGE_SIZE * 8] __attribute__((__aligned__(PAGE_SIZE)));
+>>>  static SubChannelId blk_schid = { .one = 1 };
+>>>  IplParameterBlock iplb __attribute__((__aligned__(PAGE_SIZE)));
+>>> -static char loadparm[8] = { 0, 0, 0, 0, 0, 0, 0, 0 };
+>>> +static char loadparm_str[9] = { 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+>>>  QemuIplParameters qipl;
+>>>  
+>>>  #define LOADPARM_PROMPT "PROMPT  "
+>>> -#define LOADPARM_EMPTY  "........"
+>>> +#define LOADPARM_EMPTY  "        "
+>>>  #define BOOT_MENU_FLAG_MASK (QIPL_FLAG_BM_OPTS_CMD | QIPL_FLAG_BM_OPTS_ZIPL)
+>>>  
+>>>  /*
+>>> @@ -45,7 +45,7 @@ void panic(const char *string)
+>>>  
+>>>  unsigned int get_loadparm_index(void)
+>>>  {
+>>> -    return atoui(loadparm);
+>>> +    return atoui(loadparm_str);
+>>>  }
+>>>  
+>>>  static bool find_dev(Schib *schib, int dev_no)
+>>> @@ -80,13 +80,13 @@ static bool find_dev(Schib *schib, int dev_no)
+>>>  
+>>>  static void menu_setup(void)
+>>>  {
+>>> -    if (memcmp(loadparm, LOADPARM_PROMPT, 8) == 0) {
+>>> +    if (memcmp(loadparm_str, LOADPARM_PROMPT, 8) == 0) {
+>>>          menu_set_parms(QIPL_FLAG_BM_OPTS_CMD, 0);
+>>>          return;
+>>>      }
+>>>  
+>>>      /* If loadparm was set to any other value, then do not enable menu */
+>>> -    if (memcmp(loadparm, LOADPARM_EMPTY, 8) != 0) {
+>>> +    if (memcmp(loadparm_str, LOADPARM_EMPTY, 8) != 0) {
+>>>          return;
+>>>      }
+>>>  
+>>> @@ -116,8 +116,8 @@ static void virtio_setup(void)
+>>>       */
+>>>      enable_mss_facility();
+>>>  
+>>> -    sclp_get_loadparm_ascii(loadparm);
+>>> -    memcpy(ldp + 10, loadparm, 8);
+>>> +    sclp_get_loadparm_ascii(loadparm_str);
+>>> +    memcpy(ldp + 10, loadparm_str, 8);
+>>>      sclp_print(ldp);
+>>>  
+>>>      memcpy(&qipl, early_qipl, sizeof(QemuIplParameters));
+>>>   
+>>
+>> So here I said, "There are a bunch of naked 8 constants; those should
+>> all be (sizeof loadparm_str - 1), I think. Should be a separate patch,
+>> of course."
+> 
+> Alternatively, as loadparm size is architectured IIRC and unlikely to
+> change, do
+> 
 
-** Changed in: qemu
-       Status: New =3D> Incomplete
+Correct.
 
--- =
+> #define LOADPARM_LEN 8
+> char loadparm_str[LOADPARM_LEN + 1];
+> 
+> and compare against LOADPARM_LEN... opinions?
+> 
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1242963
+I have another (unrelated) QEMU patch to throw on the list, so I can get to this today.
 
-Title:
-  QEMU loadvm causes guest OS freeze
-
-Status in QEMU:
-  Incomplete
-
-Bug description:
-  HOST: ubuntu 13.10 x64
-  GUEST: winxp sp 3 x86
-
-  AFFECT QEMU(tested): v1.5.2, v1.5.3,  v1.6.0, v1.6.1
-
-  I compile QEMU by myself with "./configure --target-list=3Di386-softmmu &=
-& make && make install".
-  After installing a winxp sp3 into the qemu-system-i386 with command line:
-  > qemu-system-i386 -m 512 -hda xp.img -net user -net nic,model=3Drtl8139 =
--rtc base=3Dlocaltime,clock=3Dvm
-
-  I use monitor to create a live snapshot: =
-
-  > stop
-  > savevm xxx
-  > cont
-
-  And then I load this snapshot (I also try it in commad line: -loadvm xxx):
-  > loadvm xxx
-  > cont
-
-  After that, the windows system is freeze (don't accept any keyboard or
-  mouse input, although I knew vcpu is still working).
-
-  If I compile with -enable-kvm and launch qemu-system-i386 with -enable-kv=
-m, it looks like everything works well.
-  I think it is a bug for qemu system.
-
-  BTW: freeze is not appearing 100%, but in my test, 95% cases would
-  cause system freeze.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1242963/+subscriptions
+-- 
+Respectfully,
+- Collin Walling
