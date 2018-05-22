@@ -1,20 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57653)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39526)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1fLIog-0003py-1J
-	for qemu-devel@nongnu.org; Tue, 22 May 2018 21:43:50 -0400
+	(envelope-from <naravamudan@digitalocean.com>) id 1fLFLo-00047b-O1
+	for qemu-devel@nongnu.org; Tue, 22 May 2018 18:01:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1fLIof-00034F-3I
-	for qemu-devel@nongnu.org; Tue, 22 May 2018 21:43:50 -0400
-Date: Wed, 23 May 2018 09:43:39 +0800
-From: Fam Zheng <famz@redhat.com>
-Message-ID: <20180523014339.GD28114@lemon.usersys.redhat.com>
-References: <20180522201056.1442-1-pbonzini@redhat.com>
-	<20180522201056.1442-3-pbonzini@redhat.com>
+	(envelope-from <naravamudan@digitalocean.com>) id 1fLFLn-00027t-Qv
+	for qemu-devel@nongnu.org; Tue, 22 May 2018 18:01:48 -0400
+Received: from mail-io0-x236.google.com ([2607:f8b0:4001:c06::236]:42573)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <naravamudan@digitalocean.com>)
+	id 1fLFLn-00027R-Lg
+	for qemu-devel@nongnu.org; Tue, 22 May 2018 18:01:47 -0400
+Received: by mail-io0-x236.google.com with SMTP id a10-v6so20371408ioc.9
+	for <qemu-devel@nongnu.org>; Tue, 22 May 2018 15:01:47 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180522201056.1442-3-pbonzini@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 2/2] sheepdog: remove huge BSS object
+From: Nishanth Aravamudan <naravamudan@digitalocean.com>
+Date: Tue, 22 May 2018 15:01:46 -0700
+Message-ID: <CAGtobs_PEYmSyPwbYG-6oNp9PxwQ52xHaFuXh59ELWcrAm6LSA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: [Qemu-devel] AIO error case
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,81 +26,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: qemu-devel@nongnu.org, jcody@redhat.com, qemu-block@nongnu.org
+To: qemu-devel@nongnu.org
 
-On Tue, 05/22 22:10, Paolo Bonzini wrote:
-> block/sheepdog.o has a 4M static variable that is 90% of QEMU's whole .bss
-> section.  Replace it with a heap-allocated block, and make it smaller too
-> since only the inode header is actually being used.
-> 
-> bss size goes down from 4464280 to 269976.
-> 
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> ---
->  block/sheepdog.c | 21 +++++++++++----------
->  1 file changed, 11 insertions(+), 10 deletions(-)
-> 
-> diff --git a/block/sheepdog.c b/block/sheepdog.c
-> index 23cf5a8430..2068166e3e 100644
-> --- a/block/sheepdog.c
-> +++ b/block/sheepdog.c
-> @@ -2940,13 +2940,14 @@ static int sd_snapshot_list(BlockDriverState *bs, QEMUSnapshotInfo **psn_tab)
->      QEMUSnapshotInfo *sn_tab = NULL;
->      unsigned wlen, rlen;
->      int found = 0;
-> -    static SheepdogInode inode;
-> +    SheepdogInode *inode;
->      unsigned long *vdi_inuse;
->      unsigned int start_nr;
->      uint64_t hval;
->      uint32_t vid;
->  
->      vdi_inuse = g_malloc(max);
-> +    inode = g_malloc(SD_INODE_HEADER_SIZE);
+Hi!
 
-Should you g_free() it before returning?
+I'm tracking an error case in the native AIO path, and was wondering if
+there was a latent (albeit possibly hard to hit) bug. Specifically
+util/async.c::aio_get_linux_aio:
 
+#ifdef CONFIG_LINUX_AIO
+LinuxAioState *aio_get_linux_aio(AioContext *ctx)
+{
+    if (!ctx->linux_aio) {
+        ctx->linux_aio = laio_init();
+        laio_attach_aio_context(ctx->linux_aio, ctx);
+    }
+    return ctx->linux_aio;
+}
+#endif
 
->  
->      fd = connect_to_sdog(s, &local_err);
->      if (fd < 0) {
-> @@ -2989,7 +2990,7 @@ static int sd_snapshot_list(BlockDriverState *bs, QEMUSnapshotInfo **psn_tab)
->          }
->  
->          /* we don't need to read entire object */
-> -        ret = read_object(fd, s->bs, (char *)&inode,
-> +        ret = read_object(fd, s->bs, (char *)inode,
->                            vid_to_vdi_oid(vid),
->                            0, SD_INODE_HEADER_SIZE, 0,
->                            s->cache_flags);
-> @@ -2998,17 +2999,17 @@ static int sd_snapshot_list(BlockDriverState *bs, QEMUSnapshotInfo **psn_tab)
->              continue;
->          }
->  
-> -        if (!strcmp(inode.name, s->name) && is_snapshot(&inode)) {
-> -            sn_tab[found].date_sec = inode.snap_ctime >> 32;
-> -            sn_tab[found].date_nsec = inode.snap_ctime & 0xffffffff;
-> -            sn_tab[found].vm_state_size = inode.vm_state_size;
-> -            sn_tab[found].vm_clock_nsec = inode.vm_clock_nsec;
-> +        if (!strcmp(inode->name, s->name) && is_snapshot(inode)) {
-> +            sn_tab[found].date_sec = inode->snap_ctime >> 32;
-> +            sn_tab[found].date_nsec = inode->snap_ctime & 0xffffffff;
-> +            sn_tab[found].vm_state_size = inode->vm_state_size;
-> +            sn_tab[found].vm_clock_nsec = inode->vm_clock_nsec;
->  
->              snprintf(sn_tab[found].id_str, sizeof(sn_tab[found].id_str),
-> -                     "%" PRIu32, inode.snap_id);
-> +                     "%" PRIu32, inode->snap_id);
->              pstrcpy(sn_tab[found].name,
-> -                    MIN(sizeof(sn_tab[found].name), sizeof(inode.tag)),
-> -                    inode.tag);
-> +                    MIN(sizeof(sn_tab[found].name), sizeof(inode->tag)),
-> +                    inode->tag);
->              found++;
->          }
->      }
-> -- 
-> 2.17.0
-> 
-> 
+laio_init() can in certain conditions return NULL, but that's not checked
+here and then the NULL result is passed directly into
+laio_attach_aio_context, which dereferences it without checking that the
+pointer is valid.
+
+I'm not sure what is appropriate if laio_init() returns NULL, returning
+NULL back to the caller of aio_get_linux_aio() has its own issues, because
+those callers don't seem to check its return value either.
+
+Thanks in advance!
+-Nish
