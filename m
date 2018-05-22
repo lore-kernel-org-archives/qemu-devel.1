@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43259)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44763)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jan.kiszka@siemens.com>) id 1fL1A6-0006Wu-AK
-	for qemu-devel@nongnu.org; Tue, 22 May 2018 02:52:47 -0400
+	(envelope-from <mail@void.so>) id 1fL1H6-000876-45
+	for qemu-devel@nongnu.org; Tue, 22 May 2018 03:00:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jan.kiszka@siemens.com>) id 1fL1A2-0005dg-Bs
-	for qemu-devel@nongnu.org; Tue, 22 May 2018 02:52:46 -0400
-Received: from david.siemens.de ([192.35.17.14]:58427)
+	(envelope-from <mail@void.so>) id 1fL1H2-0008JT-4w
+	for qemu-devel@nongnu.org; Tue, 22 May 2018 03:00:00 -0400
+Received: from forward105p.mail.yandex.net ([77.88.28.108]:36747)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jan.kiszka@siemens.com>)
-	id 1fL1A2-0005d1-13
-	for qemu-devel@nongnu.org; Tue, 22 May 2018 02:52:42 -0400
-From: Jan Kiszka <jan.kiszka@siemens.com>
-Message-ID: <28b927d3-da58-bce4-cc13-bfec7f9b1cb9@siemens.com>
-Date: Tue, 22 May 2018 08:52:37 +0200
+	(Exim 4.71) (envelope-from <mail@void.so>) id 1fL1H1-0008Fx-Kw
+	for qemu-devel@nongnu.org; Tue, 22 May 2018 02:59:56 -0400
+Received: from mxback13j.mail.yandex.net (mxback13j.mail.yandex.net
+	[IPv6:2a02:6b8:0:1619::88])
+	by forward105p.mail.yandex.net (Yandex) with ESMTP id CF8DB408214A
+	for <qemu-devel@nongnu.org>; Tue, 22 May 2018 09:59:51 +0300 (MSK)
+Date: Tue, 22 May 2018 09:59:24 +0300
+From: Pavel Balaev <mail@void.so>
+Message-ID: <20180522065922.GA3462@rnd>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] [PATCH] hw/intc/arm_gicv3: Fix APxR<n> register
- dispatching
+Content-Disposition: inline
+Subject: [Qemu-devel] [PATCH] Add save/load/del[vm] QMP api
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,74 +28,173 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org
 
-There was a nasty flip in identifying which register group an access is
-targeting. The issue caused spuriously raised priorities of the guest
-when handing CPUs over in the Jailhouse hypervisor.
+Hello,
 
-Signed-off-by: Jan Kiszka <jan.kiszka@siemens.com>
+Now savevm, loadvm and delvm commands only allowed from hmp monitor.
+This patch adds ability to send them via QMP api. 
+
+Signed-off-by: Pavel Balaev <mail@void.so>
 ---
- hw/intc/arm_gicv3_cpuif.c | 12 ++++++------
- 1 file changed, 6 insertions(+), 6 deletions(-)
+ hmp.c              | 22 +++++++++-------------
+ migration/savevm.c | 27 +++++++++++++++++++++++++++
+ qapi/misc.json     | 54 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 90 insertions(+), 13 deletions(-)
 
-diff --git a/hw/intc/arm_gicv3_cpuif.c b/hw/intc/arm_gicv3_cpuif.c
-index cb9a3a542d..5c89be1af0 100644
---- a/hw/intc/arm_gicv3_cpuif.c
-+++ b/hw/intc/arm_gicv3_cpuif.c
-@@ -427,7 +427,7 @@ static uint64_t icv_ap_read(CPUARMState *env, const ARMCPRegInfo *ri)
+diff --git a/hmp.c b/hmp.c
+index ef93f4878b..7ae5852c77 100644
+--- a/hmp.c
++++ b/hmp.c
+@@ -1313,37 +1313,33 @@ void hmp_snapshot_delete_blkdev_internal(Monitor *mon, const QDict *qdict)
+ 
+ void hmp_loadvm(Monitor *mon, const QDict *qdict)
  {
-     GICv3CPUState *cs = icc_cs_from_env(env);
-     int regno = ri->opc2 & 3;
--    int grp = ri->crm & 1 ? GICV3_G0 : GICV3_G1NS;
-+    int grp = (ri->crm & 1) ? GICV3_G1NS : GICV3_G0;
-     uint64_t value = cs->ich_apr[grp][regno];
+-    int saved_vm_running  = runstate_is_running();
+     const char *name = qdict_get_str(qdict, "name");
+     Error *err = NULL;
  
-     trace_gicv3_icv_ap_read(ri->crm & 1, regno, gicv3_redist_affid(cs), value);
-@@ -439,7 +439,7 @@ static void icv_ap_write(CPUARMState *env, const ARMCPRegInfo *ri,
+-    vm_stop(RUN_STATE_RESTORE_VM);
+-
+-    if (load_snapshot(name, &err) == 0 && saved_vm_running) {
+-        vm_start();
+-    }
++    qmp_loadvm(name, &err);
+     hmp_handle_error(mon, &err);
+ }
+ 
+ void hmp_savevm(Monitor *mon, const QDict *qdict)
  {
-     GICv3CPUState *cs = icc_cs_from_env(env);
-     int regno = ri->opc2 & 3;
--    int grp = ri->crm & 1 ? GICV3_G0 : GICV3_G1NS;
-+    int grp = (ri->crm & 1) ? GICV3_G1NS : GICV3_G0;
+     Error *err = NULL;
++    bool has_name = TRUE;
++    const char *name = qdict_get_try_str(qdict, "name");
  
-     trace_gicv3_icv_ap_write(ri->crm & 1, regno, gicv3_redist_affid(cs), value);
+-    save_snapshot(qdict_get_try_str(qdict, "name"), &err);
++    if (name == NULL) {
++        has_name = FALSE;
++    }
++
++    qmp_savevm(has_name, name, &err);
+     hmp_handle_error(mon, &err);
+ }
  
-@@ -1461,7 +1461,7 @@ static uint64_t icc_ap_read(CPUARMState *env, const ARMCPRegInfo *ri)
-     uint64_t value;
- 
-     int regno = ri->opc2 & 3;
--    int grp = ri->crm & 1 ? GICV3_G0 : GICV3_G1;
-+    int grp = (ri->crm & 1) ? GICV3_G1 : GICV3_G0;
- 
-     if (icv_access(env, grp == GICV3_G0 ? HCR_FMO : HCR_IMO)) {
-         return icv_ap_read(env, ri);
-@@ -1483,7 +1483,7 @@ static void icc_ap_write(CPUARMState *env, const ARMCPRegInfo *ri,
-     GICv3CPUState *cs = icc_cs_from_env(env);
- 
-     int regno = ri->opc2 & 3;
--    int grp = ri->crm & 1 ? GICV3_G0 : GICV3_G1;
-+    int grp = (ri->crm & 1) ? GICV3_G1 : GICV3_G0;
- 
-     if (icv_access(env, grp == GICV3_G0 ? HCR_FMO : HCR_IMO)) {
-         icv_ap_write(env, ri, value);
-@@ -2292,7 +2292,7 @@ static uint64_t ich_ap_read(CPUARMState *env, const ARMCPRegInfo *ri)
+ void hmp_delvm(Monitor *mon, const QDict *qdict)
  {
-     GICv3CPUState *cs = icc_cs_from_env(env);
-     int regno = ri->opc2 & 3;
--    int grp = ri->crm & 1 ? GICV3_G0 : GICV3_G1NS;
-+    int grp = (ri->crm & 1) ? GICV3_G1NS : GICV3_G0;
-     uint64_t value;
+-    BlockDriverState *bs;
+     Error *err = NULL;
+     const char *name = qdict_get_str(qdict, "name");
  
-     value = cs->ich_apr[grp][regno];
-@@ -2305,7 +2305,7 @@ static void ich_ap_write(CPUARMState *env, const ARMCPRegInfo *ri,
+-    if (bdrv_all_delete_snapshot(name, &bs, &err) < 0) {
+-        error_reportf_err(err,
+-                          "Error while deleting snapshot on device '%s': ",
+-                          bdrv_get_device_name(bs));
+-    }
++    qmp_delvm(name, &err);
+ }
+ 
+ void hmp_info_snapshots(Monitor *mon, const QDict *qdict)
+diff --git a/migration/savevm.c b/migration/savevm.c
+index 4251125831..3c830ca5a4 100644
+--- a/migration/savevm.c
++++ b/migration/savevm.c
+@@ -2515,6 +2515,33 @@ int save_snapshot(const char *name, Error **errp)
+     return ret;
+ }
+ 
++void qmp_savevm(bool has_name, const char *name, Error **errp)
++{
++    save_snapshot(has_name ? name : NULL, errp);
++}
++
++void qmp_loadvm(const char *name, Error **errp)
++{
++    int saved_vm_running  = runstate_is_running();
++
++    vm_stop(RUN_STATE_RESTORE_VM);
++
++    if (load_snapshot(name, errp) == 0 && saved_vm_running) {
++        vm_start();
++    }
++}
++
++void qmp_delvm(const char *name, Error **errp)
++{
++    BlockDriverState *bs;
++
++    if (bdrv_all_delete_snapshot(name, &bs, errp) < 0) {
++        error_reportf_err(*errp,
++                          "Error while deleting snapshot on device '%s': ",
++                          bdrv_get_device_name(bs));
++    }
++}
++
+ void qmp_xen_save_devices_state(const char *filename, bool has_live, bool live,
+                                 Error **errp)
  {
-     GICv3CPUState *cs = icc_cs_from_env(env);
-     int regno = ri->opc2 & 3;
--    int grp = ri->crm & 1 ? GICV3_G0 : GICV3_G1NS;
-+    int grp = (ri->crm & 1) ? GICV3_G1NS : GICV3_G0;
+diff --git a/qapi/misc.json b/qapi/misc.json
+index f5988cc0b5..cca7df0202 100644
+--- a/qapi/misc.json
++++ b/qapi/misc.json
+@@ -3097,6 +3097,60 @@
+ { 'enum': 'ReplayMode',
+   'data': [ 'none', 'record', 'play' ] }
  
-     trace_gicv3_ich_ap_write(ri->crm & 1, regno, gicv3_redist_affid(cs), value);
- 
++##
++# @savevm:
++#
++# Save a VM snapshot. Without a name new snapshot is created.
++#
++# @name: identifier of a snapshot to be saved
++#
++# Returns: Nothing on success
++#
++# Since: 2.12
++#
++# Example:
++#
++# -> { "execute": "savevm", "arguments": { "name": "snapshot1" } }
++# <- { "return": {} }
++##
++{ 'command': 'savevm', 'data': {'*name': 'str'} }
++
++##
++# @loadvm:
++#
++# Load a VM snapshot.
++#
++# @name: identifier of a snapshot to be loaded
++#
++# Returns: Nothing on success
++#
++# Since: 2.12
++#
++# Example:
++#
++# -> { "execute": "loadvm", "arguments": { "name": "snapshot1" } }
++# <- { "return": {} }
++##
++{ 'command': 'loadvm', 'data': {'name': 'str'} }
++
++##
++# @delvm:
++#
++# Delete a VM snapshot.
++#
++# @name: identifier of a snapshot to be deleted
++#
++# Returns: Nothing on success
++#
++# Since: 2.12
++#
++# Example:
++#
++# -> { "execute": "delvm", "arguments": { "name": "snapshot1" } }
++# <- { "return": {} }
++##
++{ 'command': 'delvm', 'data': {'name': 'str'} }
++
+ ##
+ # @xen-load-devices-state:
+ #
 -- 
-2.13.6
+2.16.1
