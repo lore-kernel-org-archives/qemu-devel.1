@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50643)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50652)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sstabellini@kernel.org>) id 1fLCJ3-0001cB-IB
-	for qemu-devel@nongnu.org; Tue, 22 May 2018 14:46:47 -0400
+	(envelope-from <sstabellini@kernel.org>) id 1fLCJ3-0001cC-UV
+	for qemu-devel@nongnu.org; Tue, 22 May 2018 14:46:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sstabellini@kernel.org>) id 1fLCJ2-0007PK-PG
-	for qemu-devel@nongnu.org; Tue, 22 May 2018 14:46:45 -0400
-Received: from mail.kernel.org ([198.145.29.99]:43466)
+	(envelope-from <sstabellini@kernel.org>) id 1fLCJ3-0007PV-5R
+	for qemu-devel@nongnu.org; Tue, 22 May 2018 14:46:46 -0400
+Received: from mail.kernel.org ([198.145.29.99]:43482)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <sstabellini@kernel.org>)
-	id 1fLCJ2-0007P3-Ia
-	for qemu-devel@nongnu.org; Tue, 22 May 2018 14:46:44 -0400
+	id 1fLCJ2-0007PC-Rt
+	for qemu-devel@nongnu.org; Tue, 22 May 2018 14:46:45 -0400
 From: Stefano Stabellini <sstabellini@kernel.org>
-Date: Tue, 22 May 2018 11:46:28 -0700
-Message-Id: <1527014802-11289-1-git-send-email-sstabellini@kernel.org>
+Date: Tue, 22 May 2018 11:46:29 -0700
+Message-Id: <1527014802-11289-2-git-send-email-sstabellini@kernel.org>
 In-Reply-To: <alpine.DEB.2.10.1805221136110.24793@sstabellini-ThinkPad-X260>
 References: <alpine.DEB.2.10.1805221136110.24793@sstabellini-ThinkPad-X260>
-Subject: [Qemu-devel] [PULL v2 01/15] xen-pvdevice: Introduce a simplistic
- xen-pvdevice save state
+Subject: [Qemu-devel] [PULL v2 02/15] xen/pt: use address_space_memory
+ object for memory region hooks
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,53 +30,40 @@ Cc: sstabellini@kernel.org, stefanha@redhat.com, anthony.perard@citrix.com, xen-
 
 From: Igor Druzhinin <igor.druzhinin@citrix.com>
 
-This should help to avoid problems with accessing the device after
-migration/resume without PV drivers by migrating its PCI configuration
-space state. Without an explicitly defined state record it resets
-every time a VM migrates which confuses the OS and makes every
-access to xen-pvdevice MMIO region to fail. PV tools enable some
-logic to save and restore PCI configuration state from within the VM
-every time it migrates which basically hides the issue.
+Commit 99605175c (xen-pt: Fix PCI devices re-attach failed) introduced
+a subtle bug. As soon as the guest switches off Bus Mastering on the
+device it immediately causes all the BARs be unmapped due to the DMA
+address space of the device being changed. This is undesired behavior
+because the guest may try to communicate with the device after that
+which triggers the following errors in the logs:
 
-Older systems will acquire the new record when migrated which should
-not change their state for worse.
+[00:05.0] xen_pt_bar_read: Error: Should not read BAR through QEMU. @0x0000000000000200
+[00:05.0] xen_pt_bar_write: Error: Should not write BAR through QEMU. @0x0000000000000200
+
+The issue that the original patch tried to workaround (uneven number of
+region_add/del calls on device attach/detach) was fixed in d25836cafd
+(memory: do explicit cleanup when remove listeners).
 
 Signed-off-by: Igor Druzhinin <igor.druzhinin@citrix.com>
-Reviewed-by: Paul Durrant <paul.durrant@citrix.com>
+Reported-by: Ross Lagerwall <ross.lagerwall@citrix.com>
 Acked-by: Anthony PERARD <anthony.perard@citrix.com>
 Signed-off-by: Stefano Stabellini <sstabellini@kernel.org>
 ---
- hw/i386/xen/xen_pvdevice.c | 11 +++++++++++
- 1 file changed, 11 insertions(+)
+ hw/xen/xen_pt.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/hw/i386/xen/xen_pvdevice.c b/hw/i386/xen/xen_pvdevice.c
-index f748823..a146f18 100644
---- a/hw/i386/xen/xen_pvdevice.c
-+++ b/hw/i386/xen/xen_pvdevice.c
-@@ -71,6 +71,16 @@ static const MemoryRegionOps xen_pv_mmio_ops = {
-     .endianness = DEVICE_LITTLE_ENDIAN,
- };
+diff --git a/hw/xen/xen_pt.c b/hw/xen/xen_pt.c
+index 9b7a960..e5a6eff 100644
+--- a/hw/xen/xen_pt.c
++++ b/hw/xen/xen_pt.c
+@@ -907,7 +907,7 @@ out:
+         }
+     }
  
-+static const VMStateDescription vmstate_xen_pvdevice = {
-+    .name = "xen-pvdevice",
-+    .version_id = 1,
-+    .minimum_version_id = 1,
-+    .fields = (VMStateField[]) {
-+        VMSTATE_PCI_DEVICE(parent_obj, XenPVDevice),
-+        VMSTATE_END_OF_LIST()
-+    }
-+};
-+
- static void xen_pv_realize(PCIDevice *pci_dev, Error **errp)
- {
-     XenPVDevice *d = XEN_PV_DEVICE(pci_dev);
-@@ -120,6 +130,7 @@ static void xen_pv_class_init(ObjectClass *klass, void *data)
-     k->class_id = PCI_CLASS_SYSTEM_OTHER;
-     dc->desc = "Xen PV Device";
-     dc->props = xen_pv_props;
-+    dc->vmsd = &vmstate_xen_pvdevice;
- }
- 
- static const TypeInfo xen_pv_type_info = {
+-    memory_listener_register(&s->memory_listener, &s->dev.bus_master_as);
++    memory_listener_register(&s->memory_listener, &address_space_memory);
+     memory_listener_register(&s->io_listener, &address_space_io);
+     s->listener_set = true;
+     XEN_PT_LOG(d,
 -- 
 1.9.1
