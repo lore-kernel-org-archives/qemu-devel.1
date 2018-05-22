@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39848)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39850)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Babu.Moger@amd.com>) id 1fKvMq-0002NJ-H4
+	(envelope-from <Babu.Moger@amd.com>) id 1fKvMr-0002NK-72
 	for qemu-devel@nongnu.org; Mon, 21 May 2018 20:41:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <Babu.Moger@amd.com>) id 1fKvMm-000791-7X
-	for qemu-devel@nongnu.org; Mon, 21 May 2018 20:41:32 -0400
+	(envelope-from <Babu.Moger@amd.com>) id 1fKvMm-00079I-N3
+	for qemu-devel@nongnu.org; Mon, 21 May 2018 20:41:33 -0400
 Received: from mail-co1nam03on0050.outbound.protection.outlook.com
 	([104.47.40.50]:16315
 	helo=NAM03-CO1-obe.outbound.protection.outlook.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <Babu.Moger@amd.com>) id 1fKvMl-00078T-Q7
+	(Exim 4.71) (envelope-from <Babu.Moger@amd.com>) id 1fKvMm-00078T-F6
 	for qemu-devel@nongnu.org; Mon, 21 May 2018 20:41:28 -0400
 From: Babu Moger <babu.moger@amd.com>
-Date: Mon, 21 May 2018 20:41:10 -0400
-Message-ID: <1526949675-106737-1-git-send-email-babu.moger@amd.com>
+Date: Mon, 21 May 2018 20:41:11 -0400
+Message-Id: <1526949675-106737-2-git-send-email-babu.moger@amd.com>
+In-Reply-To: <1526949675-106737-1-git-send-email-babu.moger@amd.com>
+References: <1526949675-106737-1-git-send-email-babu.moger@amd.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v10 0/5] i386: Enable TOPOEXT to support
- hyperthreading on AMD CPU
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH v10 1/5] i386: Clean up cache CPUID code
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,165 +30,265 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: mst@redhat.com, marcel.apfelbaum@gmail.com, pbonzini@redhat.com, rth@twiddle.net, ehabkost@redhat.com, mtosatti@redhat.com
 Cc: qemu-devel@nongnu.org, kvm@vger.kernel.org, babu.moger@amd.com, kash@tripleback.net, geoff@hostfission.com
 
-This series enables the TOPOEXT feature for AMD CPUs. This is required to
-support hyperthreading on kvm guests.
+From: Eduardo Habkost <ehabkost@redhat.com>
 
-This addresses the issues reported in these bugs:
-https://bugzilla.redhat.com/show_bug.cgi?id=3D1481253
-https://bugs.launchpad.net/qemu/+bug/1703506=20
+Always initialize CPUCaches structs with cache information, even
+if legacy_cache=true.  Use different CPUCaches struct for
+CPUID[2], CPUID[4], and the AMD CPUID leaves.
 
-v10:
- Based the patches on Eduardo's git://github.com/ehabkost/qemu.git x86-next
- Some of the earlier patches are already queued. So, submitting the rest of
- the series here. This series adds complete redesign of the cpu topology.
- Based on user given parameter, we try to build topology very close to the
- hardware. Maintains symmetry as much as possible. Added new function
- epyc_build_topology to build the topology based on user given nr_cores,
- nr_threads.
- Summary of changes.
- 1. Build the topology dinamically based on nr_cores and nr_threads
- 2. Added new epyc_build_topology to build the new topology.
- 3. Added new function num_sharing_l3_cache to calculate the L3 sharing
- 4. Added a check to verify the topology. Disabled the TOPOEXT if the
-    topology cannot be built.
+This will simplify a lot the logic inside cpu_x86_cpuid().
 
-v9:
- Based the patches on Eduardo's git://github.com/ehabkost/qemu.git x86-next
- tree. Following 3 patches from v8 are already queued.
-  i386: Add cache information in X86CPUDefinition
-  i386: Initialize cache information for EPYC family processors
-  i386: Helpers to encode cache information consistently
- So, submitting the rest of the series here.
+Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+Signed-off-by: Babu Moger <babu.moger@amd.com>
+---
+ target/i386/cpu.c | 117 +++++++++++++++++++++++++++---------------------------
+ target/i386/cpu.h |  14 ++++---
+ 2 files changed, 67 insertions(+), 64 deletions(-)
 
- Changes:
- 1. Included Eduardo's clean up patch
- 2. Added 2.13 machine types
- 3. Disabled topoext for 2.12 and below versions.
- 4. Added the assert to core_id as discussed.
-
-v8:
- Addressed feedback from Eduardo. Thanks Eduardo for being patient with me.
- Tested on AMD EPYC server and also did some basic testing on intel box.
- Summary of changes.
- 1. Reverted back l2 cache associativity. Kept it same as legacy.
- 2. Changed cache_info structure in X86CPUDefinition and CPUX86State to poi=
-nters.
- 3. Added legacy_cache property in PC_COMPAT_2_12 and initialized legacy_ca=
-che
-    based on static cache_info availability.
- 4. Squashed patch 4 and 5 and applied it before patch 3.
- 5. Added legacy cache check for cpuid[2] and cpuid[4] for consistancy.
- 6. Simplified NUM_SHARING_CACHE definition for readability,
- 7. Removed assert for core_id as it appeared redundant.
- 8. Simplified encode_cache_cpuid8000001d little bit.
- 9. Few more minor changes
-
-v7:
- Rebased on top of latest tree after 2.12 release and done few basic tests.=
- There are
- no changes except for few minor hunks. Hopefully this gets pulled into 2.1=
-3 release.
- Please review, let me know of any feedback.
-
-v6:
-1.Fixed problem with patch#4(Add new property to control cache info). The p=
-arameter
- legacy_cache should be "on" by default on machine type "pc-q35-2.10". This=
- was
- found by Alexandr Iarygin.
-2.Fixed the l3 cache size for EPYC based machines(patch#3). Also, fixed the=
- number of
- logical processors sharing the cache(patch#6). Only L3 cache is shared by =
-multiple
- cores but not L1 or L2. This was a bug while decoding. This was found by G=
-eoffrey McRae
- and he verified the fix.=20
-
-v5:
- In this series I tried to address the feedback from Eduardo Habkost.
- The discussion thread is here.
- https://patchwork.kernel.org/patch/10299745/
- The previous thread is here.
- http://patchwork.ozlabs.org/cover/884885/
-
-Reason for these changes.
- The cache properties for AMD family of processors have changed from
- previous releases. We don't want to display the new information on the
- old family of processors as this might cause compatibility issues.
-
-Changes:
-1.Based the patches on top of Eduardo's(patch#1) patch.
-  Changed few things.
-  Moved the Cache definitions to cpu.h file.
-  Changed the CPUID_4 names to generic names.
-2.Added a new propery "legacy-cache" in cpu object(patch#2). This can be
-  used to display the old property even if the host supports the new cache
-  properties.
-3.Added cache information in X86CPUDefinition and CPUX86State
-4.Patch 6-7 changed quite a bit from previous version does to new approach.
-5.Addressed few issues with CPUID_8000_001d and CPUID_8000_001E.
-
-v4:
-1.Removed the checks under cpuid 0x8000001D leaf(patch #2). These check are
-  not necessary. Found this during internal review.
-2.Added CPUID_EXT3_TOPOEXT feature for all the 17 family(patch #4). This wa=
-s
-  found by Kash Pande during his testing.
-3.Removed th hardcoded cpuid xlevel and dynamically extended if CPUID_EXT3_=
-TOPOEXT
-  is supported(Suggested by Brijesh Singh).=20
-
-v3:
-1.Removed the patch #1. Radim mentioned that original typo problem is in=20
-  linux kernel header. qemu is just copying those files.
-2.In previous version, I used the cpuid 4 definitions for AMDs cpuid leaf
-  0x8000001D. CPUID 4 is very intel specific and we dont want to expose tho=
-se
-  details under AMD. I have renamed some of these definitions as generic.
-  These changes are in patch#1. Radim, let me know if this is what you inte=
-nded.
-3.Added assert to for core_id(Suggested by Radim Krcm=C3=A1r).
-4.Changed the if condition under "L3 cache info"(Suggested by Gary Hook).
-5.Addressed few more text correction and code cleanup(Suggested by Thomas L=
-endacky).
-
-v2:
-  Fixed few more minor issues per Gary Hook's comments. Thank you Gary.
-  Removed the patch#1. We need to handle the instruction cache associativit=
-y=20
-  seperately. It varies based on the cpu family. I will comeback to that la=
-ter.
-  Added two more typo corrections in patch#1 and patch#5.
-
-v1:
-  Stanislav Lanci posted few patches earlier.=20
-  https://patchwork.kernel.org/patch/10040903/
-
-Rebased his patches with few changes.
-1.Spit the patches into two, separating cpuid functions=20
-  0x8000001D and 0x8000001E (Patch 2 and 3).
-2.Removed the generic non-intel check and made a separate patch
-  with some changes(Patch 5).
-3.Fixed L3_N_SETS_AMD(from 4096 to 8192) based on CPUID_Fn8000001D_ECX_x03.
-
-Added 2 more patches.
-Patch 1. Fixes cache associativity.
-Patch 4. Adds TOPOEXT feature on AMD EPYC CPU.
-Babu Moger (4):
-  i386: Populate AMD Processor Cache Information for cpuid 0x8000001D
-  i386: Add support for CPUID_8000_001E for AMD
-  i386: Enable TOPOEXT feature on AMD EPYC CPU
-  i386: Remove generic SMT thread check
-
-Eduardo Habkost (1):
-  i386: Clean up cache CPUID code
-
- include/hw/i386/pc.h |   4 +
- target/i386/cpu.c    | 357 +++++++++++++++++++++++++++++++++++++++++------=
-----
- target/i386/cpu.h    |  14 +-
- target/i386/kvm.c    |  29 ++++-
- 4 files changed, 329 insertions(+), 75 deletions(-)
-
---=20
+diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+index e5e66a7..d9773b6 100644
+--- a/target/i386/cpu.c
++++ b/target/i386/cpu.c
+@@ -1114,7 +1114,7 @@ struct X86CPUDefinition {
+ };
+ 
+ static CPUCaches epyc_cache_info = {
+-    .l1d_cache = {
++    .l1d_cache = &(CPUCacheInfo) {
+         .type = DCACHE,
+         .level = 1,
+         .size = 32 * KiB,
+@@ -1126,7 +1126,7 @@ static CPUCaches epyc_cache_info = {
+         .self_init = 1,
+         .no_invd_sharing = true,
+     },
+-    .l1i_cache = {
++    .l1i_cache = &(CPUCacheInfo) {
+         .type = ICACHE,
+         .level = 1,
+         .size = 64 * KiB,
+@@ -1138,7 +1138,7 @@ static CPUCaches epyc_cache_info = {
+         .self_init = 1,
+         .no_invd_sharing = true,
+     },
+-    .l2_cache = {
++    .l2_cache = &(CPUCacheInfo) {
+         .type = UNIFIED_CACHE,
+         .level = 2,
+         .size = 512 * KiB,
+@@ -1148,7 +1148,7 @@ static CPUCaches epyc_cache_info = {
+         .sets = 1024,
+         .lines_per_tag = 1,
+     },
+-    .l3_cache = {
++    .l3_cache = &(CPUCacheInfo) {
+         .type = UNIFIED_CACHE,
+         .level = 3,
+         .size = 8 * MiB,
+@@ -3342,9 +3342,8 @@ static void x86_cpu_load_def(X86CPU *cpu, X86CPUDefinition *def, Error **errp)
+         env->features[w] = def->features[w];
+     }
+ 
+-    /* Store Cache information from the X86CPUDefinition if available */
+-    env->cache_info = def->cache_info;
+-    cpu->legacy_cache = def->cache_info ? 0 : 1;
++    /* legacy-cache defaults to 'off' if CPU model provides cache info */
++    cpu->legacy_cache = !def->cache_info;
+ 
+     /* Special cases not set in the X86CPUDefinition structs: */
+     /* TODO: in-kernel irqchip for hvf */
+@@ -3695,21 +3694,11 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t index, uint32_t count,
+         if (!cpu->enable_l3_cache) {
+             *ecx = 0;
+         } else {
+-            if (env->cache_info && !cpu->legacy_cache) {
+-                *ecx = cpuid2_cache_descriptor(&env->cache_info->l3_cache);
+-            } else {
+-                *ecx = cpuid2_cache_descriptor(&legacy_l3_cache);
+-            }
+-        }
+-        if (env->cache_info && !cpu->legacy_cache) {
+-            *edx = (cpuid2_cache_descriptor(&env->cache_info->l1d_cache) << 16) |
+-                   (cpuid2_cache_descriptor(&env->cache_info->l1i_cache) <<  8) |
+-                   (cpuid2_cache_descriptor(&env->cache_info->l2_cache));
+-        } else {
+-            *edx = (cpuid2_cache_descriptor(&legacy_l1d_cache) << 16) |
+-                   (cpuid2_cache_descriptor(&legacy_l1i_cache) <<  8) |
+-                   (cpuid2_cache_descriptor(&legacy_l2_cache_cpuid2));
++            *ecx = cpuid2_cache_descriptor(env->cache_info_cpuid2.l3_cache);
+         }
++        *edx = (cpuid2_cache_descriptor(env->cache_info_cpuid2.l1d_cache) << 16) |
++               (cpuid2_cache_descriptor(env->cache_info_cpuid2.l1i_cache) <<  8) |
++               (cpuid2_cache_descriptor(env->cache_info_cpuid2.l2_cache));
+         break;
+     case 4:
+         /* cache info: needed for Core compatibility */
+@@ -3722,35 +3711,27 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t index, uint32_t count,
+             }
+         } else {
+             *eax = 0;
+-            CPUCacheInfo *l1d, *l1i, *l2, *l3;
+-            if (env->cache_info && !cpu->legacy_cache) {
+-                l1d = &env->cache_info->l1d_cache;
+-                l1i = &env->cache_info->l1i_cache;
+-                l2 = &env->cache_info->l2_cache;
+-                l3 = &env->cache_info->l3_cache;
+-            } else {
+-                l1d = &legacy_l1d_cache;
+-                l1i = &legacy_l1i_cache;
+-                l2 = &legacy_l2_cache;
+-                l3 = &legacy_l3_cache;
+-            }
+             switch (count) {
+             case 0: /* L1 dcache info */
+-                encode_cache_cpuid4(l1d, 1, cs->nr_cores,
++                encode_cache_cpuid4(env->cache_info_cpuid4.l1d_cache,
++                                    1, cs->nr_cores,
+                                     eax, ebx, ecx, edx);
+                 break;
+             case 1: /* L1 icache info */
+-                encode_cache_cpuid4(l1i, 1, cs->nr_cores,
++                encode_cache_cpuid4(env->cache_info_cpuid4.l1i_cache,
++                                    1, cs->nr_cores,
+                                     eax, ebx, ecx, edx);
+                 break;
+             case 2: /* L2 cache info */
+-                encode_cache_cpuid4(l2, cs->nr_threads, cs->nr_cores,
++                encode_cache_cpuid4(env->cache_info_cpuid4.l2_cache,
++                                    cs->nr_threads, cs->nr_cores,
+                                     eax, ebx, ecx, edx);
+                 break;
+             case 3: /* L3 cache info */
+                 pkg_offset = apicid_pkg_offset(cs->nr_cores, cs->nr_threads);
+                 if (cpu->enable_l3_cache) {
+-                    encode_cache_cpuid4(l3, (1 << pkg_offset), cs->nr_cores,
++                    encode_cache_cpuid4(env->cache_info_cpuid4.l3_cache,
++                                        (1 << pkg_offset), cs->nr_cores,
+                                         eax, ebx, ecx, edx);
+                     break;
+                 }
+@@ -3963,13 +3944,8 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t index, uint32_t count,
+                (L1_ITLB_2M_ASSOC <<  8) | (L1_ITLB_2M_ENTRIES);
+         *ebx = (L1_DTLB_4K_ASSOC << 24) | (L1_DTLB_4K_ENTRIES << 16) | \
+                (L1_ITLB_4K_ASSOC <<  8) | (L1_ITLB_4K_ENTRIES);
+-        if (env->cache_info && !cpu->legacy_cache) {
+-            *ecx = encode_cache_cpuid80000005(&env->cache_info->l1d_cache);
+-            *edx = encode_cache_cpuid80000005(&env->cache_info->l1i_cache);
+-        } else {
+-            *ecx = encode_cache_cpuid80000005(&legacy_l1d_cache_amd);
+-            *edx = encode_cache_cpuid80000005(&legacy_l1i_cache_amd);
+-        }
++        *ecx = encode_cache_cpuid80000005(env->cache_info_amd.l1d_cache);
++        *edx = encode_cache_cpuid80000005(env->cache_info_amd.l1i_cache);
+         break;
+     case 0x80000006:
+         /* cache info (L2 cache) */
+@@ -3985,17 +3961,10 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t index, uint32_t count,
+                (L2_DTLB_4K_ENTRIES << 16) | \
+                (AMD_ENC_ASSOC(L2_ITLB_4K_ASSOC) << 12) | \
+                (L2_ITLB_4K_ENTRIES);
+-        if (env->cache_info && !cpu->legacy_cache) {
+-            encode_cache_cpuid80000006(&env->cache_info->l2_cache,
+-                                       cpu->enable_l3_cache ?
+-                                       &env->cache_info->l3_cache : NULL,
+-                                       ecx, edx);
+-        } else {
+-            encode_cache_cpuid80000006(&legacy_l2_cache_amd,
+-                                       cpu->enable_l3_cache ?
+-                                       &legacy_l3_cache : NULL,
+-                                       ecx, edx);
+-        }
++        encode_cache_cpuid80000006(env->cache_info_amd.l2_cache,
++                                   cpu->enable_l3_cache ?
++                                   env->cache_info_amd.l3_cache : NULL,
++                                   ecx, edx);
+         break;
+     case 0x80000007:
+         *eax = 0;
+@@ -4692,6 +4661,37 @@ static void x86_cpu_realizefn(DeviceState *dev, Error **errp)
+             cpu->phys_bits = 32;
+         }
+     }
++
++    /* Cache information initialization */
++    if (!cpu->legacy_cache) {
++        if (!xcc->cpu_def || !xcc->cpu_def->cache_info) {
++            char *name = x86_cpu_class_get_model_name(xcc);
++            error_setg(errp,
++                       "CPU model '%s' doesn't support legacy-cache=off", name);
++            g_free(name);
++            return;
++        }
++        env->cache_info_cpuid2 = env->cache_info_cpuid4 = env->cache_info_amd =
++            *xcc->cpu_def->cache_info;
++    } else {
++        /* Build legacy cache information */
++        env->cache_info_cpuid2.l1d_cache = &legacy_l1d_cache;
++        env->cache_info_cpuid2.l1i_cache = &legacy_l1i_cache;
++        env->cache_info_cpuid2.l2_cache = &legacy_l2_cache_cpuid2;
++        env->cache_info_cpuid2.l3_cache = &legacy_l3_cache;
++
++        env->cache_info_cpuid4.l1d_cache = &legacy_l1d_cache;
++        env->cache_info_cpuid4.l1i_cache = &legacy_l1i_cache;
++        env->cache_info_cpuid4.l2_cache = &legacy_l2_cache;
++        env->cache_info_cpuid4.l3_cache = &legacy_l3_cache;
++
++        env->cache_info_amd.l1d_cache = &legacy_l1d_cache_amd;
++        env->cache_info_amd.l1i_cache = &legacy_l1i_cache_amd;
++        env->cache_info_amd.l2_cache = &legacy_l2_cache_amd;
++        env->cache_info_amd.l3_cache = &legacy_l3_cache;
++    }
++
++
+     cpu_exec_realizefn(cs, &local_err);
+     if (local_err != NULL) {
+         error_propagate(errp, local_err);
+@@ -5175,11 +5175,10 @@ static Property x86_cpu_properties[] = {
+     DEFINE_PROP_BOOL("vmware-cpuid-freq", X86CPU, vmware_cpuid_freq, true),
+     DEFINE_PROP_BOOL("tcg-cpuid", X86CPU, expose_tcg, true),
+     /*
+-     * lecacy_cache defaults to CPU model being chosen. This is set in
+-     * x86_cpu_load_def based on cache_info which is initialized in
+-     * builtin_x86_defs
++     * lecacy_cache defaults to true unless the CPU model provides its
++     * own cache information (see x86_cpu_load_def()).
+      */
+-    DEFINE_PROP_BOOL("legacy-cache", X86CPU, legacy_cache, false),
++    DEFINE_PROP_BOOL("legacy-cache", X86CPU, legacy_cache, true),
+ 
+     /*
+      * From "Requirements for Implementing the Microsoft
+diff --git a/target/i386/cpu.h b/target/i386/cpu.h
+index 8bc54d7..5098a12 100644
+--- a/target/i386/cpu.h
++++ b/target/i386/cpu.h
+@@ -1098,10 +1098,10 @@ typedef struct CPUCacheInfo {
+ 
+ 
+ typedef struct CPUCaches {
+-        CPUCacheInfo l1d_cache;
+-        CPUCacheInfo l1i_cache;
+-        CPUCacheInfo l2_cache;
+-        CPUCacheInfo l3_cache;
++        CPUCacheInfo *l1d_cache;
++        CPUCacheInfo *l1i_cache;
++        CPUCacheInfo *l2_cache;
++        CPUCacheInfo *l3_cache;
+ } CPUCaches;
+ 
+ typedef struct CPUX86State {
+@@ -1292,7 +1292,11 @@ typedef struct CPUX86State {
+     /* Features that were explicitly enabled/disabled */
+     FeatureWordArray user_features;
+     uint32_t cpuid_model[12];
+-    CPUCaches *cache_info;
++    /* Cache information for CPUID.  When legacy-cache=on, the cache data
++     * on each CPUID leaf will be different, because we keep compatibility
++     * with old QEMU versions.
++     */
++    CPUCaches cache_info_cpuid2, cache_info_cpuid4, cache_info_amd;
+ 
+     /* MTRRs */
+     uint64_t mtrr_fixed[11];
+-- 
 1.8.3.1
