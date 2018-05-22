@@ -1,34 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51731)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52333)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fLE0F-00049t-2S
-	for qemu-devel@nongnu.org; Tue, 22 May 2018 16:35:28 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fLE23-0004lt-7T
+	for qemu-devel@nongnu.org; Tue, 22 May 2018 16:37:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fLE0B-0003Db-4e
-	for qemu-devel@nongnu.org; Tue, 22 May 2018 16:35:27 -0400
-Received: from indium.canonical.com ([91.189.90.7]:49354)
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fLE1z-0004IC-AG
+	for qemu-devel@nongnu.org; Tue, 22 May 2018 16:37:19 -0400
+Received: from mail-qt0-x241.google.com ([2607:f8b0:400d:c0d::241]:43160)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1fLE0A-0003Cg-RM
-	for qemu-devel@nongnu.org; Tue, 22 May 2018 16:35:23 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1fLE09-0001Du-K0
-	for <qemu-devel@nongnu.org>; Tue, 22 May 2018 20:35:21 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 94B4C2E8023
-	for <qemu-devel@nongnu.org>; Tue, 22 May 2018 20:35:21 +0000 (UTC)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fLE1z-0004Hp-37
+	for qemu-devel@nongnu.org; Tue, 22 May 2018 16:37:15 -0400
+Received: by mail-qt0-x241.google.com with SMTP id f13-v6so25262216qtp.10
+	for <qemu-devel@nongnu.org>; Tue, 22 May 2018 13:37:14 -0700 (PDT)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20180522194943.24871-1-pbonzini@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <f8ad161c-f411-1b60-d81f-7d65cf4ec69f@amsat.org>
+Date: Tue, 22 May 2018 17:37:10 -0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 22 May 2018 20:18:58 -0000
-From: OIiver <1368204@bugs.launchpad.net>
-Reply-To: Bug 1368204 <1368204@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20140911122344.25076.48914.malonedeb@soybean.canonical.com>
-Message-Id: <152702033814.2944.2334478108670995407.malone@gac.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1368204] Re: WinME isn't able to detect QEMU's
- cdrom drive and other hard drives automatically
+In-Reply-To: <20180522194943.24871-1-pbonzini@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] hw: allow compiling out SCSI
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,52 +34,121 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
 
-As far as i can remember, this bug was still valid with QEMU version 2.5.0 =
-shipped with Kubuntu 16.04.
-I am planning to switch to Kubuntu 18.04 in the next couple of weeks. There=
- i can test it with QEMU version 2.11.x.
-https://packages.ubuntu.com/bionic/qemu
+Hi Paolo,
 
--- =
+On 05/22/2018 04:49 PM, Paolo Bonzini wrote:
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> ---
+>  default-configs/mips-softmmu-common.mak | 1 +
+>  default-configs/pci.mak                 | 1 +
+>  default-configs/riscv32-softmmu.mak     | 1 +
+>  default-configs/riscv64-softmmu.mak     | 1 +
+>  default-configs/s390x-softmmu.mak       | 1 +
+>  default-configs/sparc-softmmu.mak       | 1 +
+>  default-configs/usb.mak                 | 1 +
+>  hw/Makefile.objs                        | 2 +-
+>  8 files changed, 8 insertions(+), 1 deletion(-)
+> 
+> diff --git a/default-configs/mips-softmmu-common.mak b/default-configs/mips-softmmu-common.mak
+> index e31f046b3b..fae2347ee7 100644
+> --- a/default-configs/mips-softmmu-common.mak
+> +++ b/default-configs/mips-softmmu-common.mak
+> @@ -4,6 +4,7 @@ include pci.mak
+>  include sound.mak
+>  include usb.mak
+>  CONFIG_ESP=y
+> +CONFIG_SCSI=y
+>  CONFIG_VGA_ISA=y
+>  CONFIG_VGA_ISA_MM=y
+>  CONFIG_VGA_CIRRUS=y
+> diff --git a/default-configs/pci.mak b/default-configs/pci.mak
+> index 35e7596949..163dd814c7 100644
+> --- a/default-configs/pci.mak
+> +++ b/default-configs/pci.mak
+> @@ -15,6 +15,7 @@ CONFIG_PCNET_COMMON=y
+>  CONFIG_AC97=y
+>  CONFIG_HDA=y
+>  CONFIG_ES1370=y
+> +CONFIG_SCSI=y
+>  CONFIG_LSI_SCSI_PCI=y
+>  CONFIG_VMW_PVSCSI_SCSI_PCI=y
+>  CONFIG_MEGASAS_SCSI_PCI=y
+> diff --git a/default-configs/riscv32-softmmu.mak b/default-configs/riscv32-softmmu.mak
+> index f9e742120c..9159a4a8af 100644
+> --- a/default-configs/riscv32-softmmu.mak
+> +++ b/default-configs/riscv32-softmmu.mak
+> @@ -2,3 +2,4 @@
+>  
+>  CONFIG_SERIAL=y
+>  CONFIG_VIRTIO=y
+> +CONFIG_SCSI=y
+> diff --git a/default-configs/riscv64-softmmu.mak b/default-configs/riscv64-softmmu.mak
+> index f9e742120c..9159a4a8af 100644
+> --- a/default-configs/riscv64-softmmu.mak
+> +++ b/default-configs/riscv64-softmmu.mak
+> @@ -2,3 +2,4 @@
+>  
+>  CONFIG_SERIAL=y
+>  CONFIG_VIRTIO=y
+> +CONFIG_SCSI=y
+> diff --git a/default-configs/s390x-softmmu.mak b/default-configs/s390x-softmmu.mak
+> index 2f4bfe73b4..729033b25a 100644
+> --- a/default-configs/s390x-softmmu.mak
+> +++ b/default-configs/s390x-softmmu.mak
+> @@ -2,6 +2,7 @@ CONFIG_PCI=y
+>  CONFIG_VIRTIO_PCI=$(CONFIG_PCI)
+>  CONFIG_VHOST_USER_SCSI=$(call land,$(CONFIG_VHOST_USER),$(CONFIG_LINUX))
+>  CONFIG_VHOST_USER_BLK=$(call land,$(CONFIG_VHOST_USER),$(CONFIG_LINUX))
+> +CONFIG_SCSI=y
+>  CONFIG_VIRTIO=y
+>  CONFIG_SCLPCONSOLE=y
+>  CONFIG_TERMINAL3270=y
+> diff --git a/default-configs/sparc-softmmu.mak b/default-configs/sparc-softmmu.mak
+> index 004b0f4e77..12f97eeb20 100644
+> --- a/default-configs/sparc-softmmu.mak
+> +++ b/default-configs/sparc-softmmu.mak
+> @@ -2,6 +2,7 @@
+>  
+>  CONFIG_ISA_BUS=y
+>  CONFIG_ECC=y
+> +CONFIG_SCSI=y
+>  CONFIG_ESP=y
+>  CONFIG_ESCC=y
+>  CONFIG_M48T59=y
+> diff --git a/default-configs/usb.mak b/default-configs/usb.mak
+> index f4b85684f0..e42cfeabbe 100644
+> --- a/default-configs/usb.mak
+> +++ b/default-configs/usb.mak
+> @@ -3,6 +3,7 @@ CONFIG_USB_TABLET_WACOM=y
+>  CONFIG_USB_STORAGE_BOT=y
+>  CONFIG_USB_STORAGE_UAS=y
+>  CONFIG_USB_STORAGE_MTP=y
+> +CONFIG_SCSI=y
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1368204
+What about:
 
-Title:
-  WinME isn't able to detect QEMU's cdrom drive and other hard drives
-  automatically
+ifeq ($(CONFIG_SCSI),y)
+CONFIG_USB_STORAGE_BOT=y
+CONFIG_USB_STORAGE_UAS=y
+CONFIG_USB_STORAGE_MTP=y
+endif
 
-Status in QEMU:
-  Incomplete
-
-Bug description:
-  On a fresh installation of Windows Millennium (WinME) in qemu, Windows
-  Me isn't able to find the CD-ROM drive or additional hard drives other
-  than -hda at first place.
-
-  Only if i add manually an IDE controller driver in Windows ME's device ma=
-nager, the CD-ROM inserted in QEMU is found.
-  Thus an IDE controller isn't found automatically either.
-
-  This shouldn't be the case. On normal real hardware, Windows ME would
-  find at least one IDE or SCSI controller.
-
-  The command line that was used is the following:
-  sudo /usr/bin/qemu-system-i386 -hda WinME_QEMU.img -cdrom drivers.iso -bo=
-ot c -no-acpi -no-hpet -soundhw sb16 -net nic -cpu pentium3 -m 256 -vga cir=
-rus   =
-
-
-  qemu's version is:
-  qemu-system-i386 --version                                               =
-                                                                           =
-                                                =
-
-  QEMU emulator version 2.0.0 (Debian 2.0.0+dfsg-2ubuntu1.3), Copyright (c)=
- 2003-2008 Fabrice Bellard
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1368204/+subscriptions
+>  CONFIG_USB_SMARTCARD=y
+>  CONFIG_USB_AUDIO=y
+>  CONFIG_USB_SERIAL=y
+> diff --git a/hw/Makefile.objs b/hw/Makefile.objs
+> index 6a0ffe0afd..a19c1417ed 100644
+> --- a/hw/Makefile.objs
+> +++ b/hw/Makefile.objs
+> @@ -23,7 +23,7 @@ devices-dirs-$(CONFIG_SOFTMMU) += nvram/
+>  devices-dirs-$(CONFIG_SOFTMMU) += pci/
+>  devices-dirs-$(CONFIG_PCI) += pci-bridge/ pci-host/
+>  devices-dirs-$(CONFIG_SOFTMMU) += pcmcia/
+> -devices-dirs-$(CONFIG_SOFTMMU) += scsi/
+> +devices-dirs-$(CONFIG_SCSI) += scsi/
+>  devices-dirs-$(CONFIG_SOFTMMU) += sd/
+>  devices-dirs-$(CONFIG_SOFTMMU) += ssi/
+>  devices-dirs-$(CONFIG_SOFTMMU) += timer/
+> 
