@@ -1,28 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51758)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58041)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fL7FZ-00086C-7c
-	for qemu-devel@nongnu.org; Tue, 22 May 2018 09:22:58 -0400
+	(envelope-from <Babu.Moger@amd.com>) id 1fL7PS-00020W-Pw
+	for qemu-devel@nongnu.org; Tue, 22 May 2018 09:33:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fL7FO-0007K8-Cv
-	for qemu-devel@nongnu.org; Tue, 22 May 2018 09:22:49 -0400
-Received: from mail-oi0-x241.google.com ([2607:f8b0:4003:c06::241]:41551)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fL7FO-0007Jw-7y
-	for qemu-devel@nongnu.org; Tue, 22 May 2018 09:22:38 -0400
-Received: by mail-oi0-x241.google.com with SMTP id 11-v6so16153019ois.8
-	for <qemu-devel@nongnu.org>; Tue, 22 May 2018 06:22:38 -0700 (PDT)
+	(envelope-from <Babu.Moger@amd.com>) id 1fL7PO-0005ZK-0N
+	for qemu-devel@nongnu.org; Tue, 22 May 2018 09:33:02 -0400
+Received: from mail-by2nam03on0082.outbound.protection.outlook.com
+	([104.47.42.82]:46322
+	helo=NAM03-BY2-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <Babu.Moger@amd.com>) id 1fL7PN-0005YQ-DV
+	for qemu-devel@nongnu.org; Tue, 22 May 2018 09:32:57 -0400
+From: "Moger, Babu" <Babu.Moger@amd.com>
+Date: Tue, 22 May 2018 13:32:52 +0000
+Message-ID: <DM5PR12MB24713F0E6095C786E0AA8ED795940@DM5PR12MB2471.namprd12.prod.outlook.com>
+References: <1526949675-106737-1-git-send-email-babu.moger@amd.com>
+	<1526949675-106737-3-git-send-email-babu.moger@amd.com>
+	<CY4PR12MB181551D174221BF3CC5F209AF9940@CY4PR12MB1815.namprd12.prod.outlook.com>
+In-Reply-To: <CY4PR12MB181551D174221BF3CC5F209AF9940@CY4PR12MB1815.namprd12.prod.outlook.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-In-Reply-To: <47281818-f0cf-0ed1-c479-fbcaca5c5167@redhat.com>
-References: <20180521140402.23318-1-peter.maydell@linaro.org>
-	<20180521140402.23318-15-peter.maydell@linaro.org>
-	<47281818-f0cf-0ed1-c479-fbcaca5c5167@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 22 May 2018 14:22:17 +0100
-Message-ID: <CAFEAcA-R9t4K488viYM9ipmfArA=ijMMJn+FD1wekPdAbNOHvQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH 14/27] iommu: Add IOMMU index concept to
- IOMMU API
+Subject: Re: [Qemu-devel] [PATCH v10 2/5] i386: Populate AMD Processor Cache
+ Information for cpuid 0x8000001D
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,70 +32,160 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Auger Eric <eric.auger@redhat.com>
-Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>, "patches@linaro.org" <patches@linaro.org>
+To: "Duran, Leo" <leo.duran@amd.com>, "mst@redhat.com" <mst@redhat.com>, "marcel.apfelbaum@gmail.com" <marcel.apfelbaum@gmail.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "rth@twiddle.net" <rth@twiddle.net>, "ehabkost@redhat.com" <ehabkost@redhat.com>, "mtosatti@redhat.com" <mtosatti@redhat.com>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "kash@tripleback.net" <kash@tripleback.net>, "geoff@hostfission.com" <geoff@hostfission.com>
 
-On 22 May 2018 at 13:58, Auger Eric <eric.auger@redhat.com> wrote:
-> Hi Peter,
-> On 05/21/2018 04:03 PM, Peter Maydell wrote:
->> If an IOMMU supports mappings that care about the memory
->> transaction attributes, then it no longer has a unique
->> address -> output mapping, but more than one. We can
->> represent these using an IOMMU index, analogous to TCG's
->> mmu indexes.
->>
->> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
->> ---
->>  include/exec/memory.h | 52 +++++++++++++++++++++++++++++++++++++++++++
->>  memory.c              | 23 +++++++++++++++++++
->>  2 files changed, 75 insertions(+)
->>
->> diff --git a/include/exec/memory.h b/include/exec/memory.h
->> index 309fdfb89b..f6226fb263 100644
->> --- a/include/exec/memory.h
->> +++ b/include/exec/memory.h
->> @@ -206,6 +206,20 @@ enum IOMMUMemoryRegionAttr {
->>   * to report whenever mappings are changed, by calling
->>   * memory_region_notify_iommu() (or, if necessary, by calling
->>   * memory_region_notify_one() for each registered notifier).
->> + *
->> + * Conceptually an IOMMU provides a mapping from input address
->> + * to an output TLB entry.
-> actually it takes a source identifier too (ARM streamid + substreamID,
-> this latter is not yet supported).
-> At the moment we have 1 IOMMUMRRegion per sid on ARM. For each
-> IOMMUMRRegion we would now have 2 indexes (1 for secure and 1 for
-> unsecure). How do you see the implementation of PASIDs (substreamids).
-> Would that be based on indexes or not?
-
-Good question. I guess we would set that up so that the
-substream ID is in the memory transaction attributes as the
-requester_id and then use that as part of the IOMMU index ?
-Or you could use the indirection between tx attrs and indexes
-to allow you to map down a potentially large space of substream
-ID values to a smaller set of actually different configurations.
-
-How many substream IDs do we expect to see in practice?
-
->> +/**
->> + * memory_region_iommu_attrs_to_index: return the IOMMU index to
->> + * use for translations with the given memory transaction attributes.
->> + *
->> + * @iommu_mr: the memory region
->> + * @attrs: the memory transaction attributes
->> + */
->> +int memory_region_iommu_attrs_to_index(IOMMUMemoryRegion *iommu_mr,
->> +                                       MemTxAttrs attrs);
->> +
->> +/**
->> + * memory_region_iommu_num_indexes: return the total number of IOMMU
->> + * indexes that this IOMMU supports.
-> is it IOMMU wide characteristics or per IOMMUMRRegion (SID)?
-
-I generally in this API document have been treating "IOMMU" and
-"IOMMURegion" as synonymous, since from the perspective of the API
-we don't care whether there's a bigger underlying thing in common
-between IOMMURegions.
-
-thanks
--- PMM
+DQo+IC0tLS0tT3JpZ2luYWwgTWVzc2FnZS0tLS0tDQo+IEZyb206IER1cmFuLCBMZW8NCj4gU2Vu
+dDogTW9uZGF5LCBNYXkgMjEsIDIwMTggODozMiBQTQ0KPiBUbzogTW9nZXIsIEJhYnUgPEJhYnUu
+TW9nZXJAYW1kLmNvbT47IG1zdEByZWRoYXQuY29tOw0KPiBtYXJjZWwuYXBmZWxiYXVtQGdtYWls
+LmNvbTsgcGJvbnppbmlAcmVkaGF0LmNvbTsgcnRoQHR3aWRkbGUubmV0Ow0KPiBlaGFia29zdEBy
+ZWRoYXQuY29tOyBtdG9zYXR0aUByZWRoYXQuY29tDQo+IENjOiBxZW11LWRldmVsQG5vbmdudS5v
+cmc7IGt2bUB2Z2VyLmtlcm5lbC5vcmc7IGthc2hAdHJpcGxlYmFjay5uZXQ7DQo+IGdlb2ZmQGhv
+c3RmaXNzaW9uLmNvbQ0KPiBTdWJqZWN0OiBSRTogW1BBVENIIHYxMCAyLzVdIGkzODY6IFBvcHVs
+YXRlIEFNRCBQcm9jZXNzb3IgQ2FjaGUNCj4gSW5mb3JtYXRpb24gZm9yIGNwdWlkIDB4ODAwMDAw
+MUQNCj4gDQo+IEJhYnUsDQo+IA0KPiBJZiBudW1fc2hhcmluZ19sM19jYWNoZSgpIHVzZXMgTUFY
+X05PREVTX0VQWUMsIHRoZW4gdGhhdCBmdW5jdGlvbiBJdOKAmXMNCj4gRVBZQyBzcGVjaWZpYy4N
+Cj4gDQo+IEFuIGFsdGVybmF0aXZlIHdvdWxkIGJlIHRvIHVzZSBhIGRhdGEgbWVtYmVyIChlLmcu
+LA0KPiBtYXhfbm9kZXNfcGVyX3NvY2tldCkpIHRoYXQgZ2V0IGluaXRpYWxpemVkICh2aWEgYW5v
+dGhlciBoZWxwZXIgZnVuY3Rpb24pIHRvDQo+IE1BWF9OT0RFU19FUFlDLg0KDQpUaGFua3MgTGVv
+LiAgTGV0IG1lIHNlZSBob3cgd2UgY2FuIGhhbmRsZSB0aGlzLiBUaGlzIHJlcXVpcmVzIGNoYW5n
+ZXMgaW4gZ2VuZXJpYw0KRGF0YSBzdHJ1Y3R1cmUgd2hpY2ggSSB0cmllZCB0byBhdm9pZCBoZXJl
+LiAgSSB3aWxsIHdhaXQgZm9yIGFsbCB0aGUgY29tbWVudHMgZm9yIHdob2xlDQpzZXJpZXMgYmVm
+b3JlIG1ha2luZyB0aGlzIGNoYW5nZS4gIE5vdGUgdGhhdCByaWdodCBub3csIHRoaXMgZmVhdHVy
+ZSBpcyBvbmx5IGVuYWJsZWQNCmZvciBFUFlDLiBZZXMuIEkga25vdyB0aGlzIGNvdWxkIHRoaXMg
+aW4gZnV0dXJlLg0KDQo+IEJhc2ljYWxseSwgaWRlYWxseSB0aGUgZnVuY3Rpb25zIHRoYXQgcmV0
+dXJuIENQVUlEIGluZm9ybWF0aW9uIGRvICpub3QqIHVzZQ0KPiBFUFlDLXNwZWNpZmljIG1hY3Jv
+cywgbGlrZSBNQVhfTk9ERVNfRVBZQy4NCj4gDQo+IExlby4NCj4gDQo+ID4gLS0tLS1PcmlnaW5h
+bCBNZXNzYWdlLS0tLS0NCj4gPiBGcm9tOiBNb2dlciwgQmFidQ0KPiA+IFNlbnQ6IE1vbmRheSwg
+TWF5IDIxLCAyMDE4IDc6NDEgUE0NCj4gPiBUbzogbXN0QHJlZGhhdC5jb207IG1hcmNlbC5hcGZl
+bGJhdW1AZ21haWwuY29tOw0KPiBwYm9uemluaUByZWRoYXQuY29tOw0KPiA+IHJ0aEB0d2lkZGxl
+Lm5ldDsgZWhhYmtvc3RAcmVkaGF0LmNvbTsgbXRvc2F0dGlAcmVkaGF0LmNvbQ0KPiA+IENjOiBx
+ZW11LWRldmVsQG5vbmdudS5vcmc7IGt2bUB2Z2VyLmtlcm5lbC5vcmc7IE1vZ2VyLCBCYWJ1DQo+
+ID4gPEJhYnUuTW9nZXJAYW1kLmNvbT47IGthc2hAdHJpcGxlYmFjay5uZXQ7IGdlb2ZmQGhvc3Rm
+aXNzaW9uLmNvbQ0KPiA+IFN1YmplY3Q6IFtQQVRDSCB2MTAgMi81XSBpMzg2OiBQb3B1bGF0ZSBB
+TUQgUHJvY2Vzc29yIENhY2hlIEluZm9ybWF0aW9uDQo+ID4gZm9yIGNwdWlkIDB4ODAwMDAwMUQN
+Cj4gPg0KPiA+IEFkZCBpbmZvcm1hdGlvbiBmb3IgY3B1aWQgMHg4MDAwMDAxRCBsZWFmLiBQb3B1
+bGF0ZSBjYWNoZSB0b3BvbG9neQ0KPiA+IGluZm9ybWF0aW9uIGZvciBkaWZmZXJlbnQgY2FjaGUg
+dHlwZXMoRGF0YSBDYWNoZSwgSW5zdHJ1Y3Rpb24gQ2FjaGUsIEwyIGFuZA0KPiA+IEwzKSBzdXBw
+b3J0ZWQgYnkgMHg4MDAwMDAxRCBsZWFmLiBQbGVhc2UgcmVmZXIgUHJvY2Vzc29yIFByb2dyYW1t
+aW5nDQo+ID4gUmVmZXJlbmNlIChQUFIpIGZvciBBTUQgRmFtaWx5IDE3aCBNb2RlbCBmb3IgbW9y
+ZSBkZXRhaWxzLg0KPiA+DQo+ID4gU2lnbmVkLW9mZi1ieTogQmFidSBNb2dlciA8YmFidS5tb2dl
+ckBhbWQuY29tPg0KPiA+IC0tLQ0KPiA+ICB0YXJnZXQvaTM4Ni9jcHUuYyB8IDEwMw0KPiA+ICsr
+KysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKw0KPiA+
+ICB0YXJnZXQvaTM4Ni9rdm0uYyB8ICAyOSArKysrKysrKysrKysrLS0NCj4gPiAgMiBmaWxlcyBj
+aGFuZ2VkLCAxMjkgaW5zZXJ0aW9ucygrKSwgMyBkZWxldGlvbnMoLSkNCj4gPg0KPiA+IGRpZmYg
+LS1naXQgYS90YXJnZXQvaTM4Ni9jcHUuYyBiL3RhcmdldC9pMzg2L2NwdS5jIGluZGV4IGQ5Nzcz
+YjYuLjFkZDA2MGENCj4gPiAxMDA2NDQNCj4gPiAtLS0gYS90YXJnZXQvaTM4Ni9jcHUuYw0KPiA+
+ICsrKyBiL3RhcmdldC9pMzg2L2NwdS5jDQo+ID4gQEAgLTMzNiw2ICszMzYsODUgQEAgc3RhdGlj
+IHZvaWQNCj4gPiBlbmNvZGVfY2FjaGVfY3B1aWQ4MDAwMDAwNihDUFVDYWNoZUluZm8gKmwyLA0K
+PiA+ICAgICAgfQ0KPiA+ICB9DQo+ID4NCj4gPiArLyogRGVmaW5pdGlvbnMgdXNlZCBmb3IgYnVp
+bGRpbmcgQ1BVSUQgTGVhZiAweDgwMDAwMDFEIGFuZCAweDgwMDAwMDFFDQo+ID4gKyovDQo+ID4g
+Ky8qIFBsZWFzZSByZWZlciBBTUQ2NCBBcmNoaXRlY3R1cmUgUHJvZ3JhbW1lcuKAmXMgTWFudWFs
+IFZvbHVtZSAzICovDQo+ID4gKyNkZWZpbmUgTUFYX0NDWCAyICNkZWZpbmUgTUFYX0NPUkVTX0lO
+X0NDWCA0ICNkZWZpbmUNCj4gPiBNQVhfTk9ERVNfRVBZQyA0DQo+ID4gKyNkZWZpbmUgTUFYX0NP
+UkVTX0lOX05PREUgOA0KPiA+ICsNCj4gPiArLyogTnVtYmVyIG9mIGxvZ2ljYWwgcHJvY2Vzc29y
+cyBzaGFyaW5nIEwzIGNhY2hlICovDQo+ID4gKyNkZWZpbmUgTlVNX1NIQVJJTkdfQ0FDSEUodGhy
+ZWFkcywgbnVtX3NoYXJpbmcpICAgKCh0aHJlYWRzID4gMSkgPw0KPiBcDQo+ID4gKyAgICAgICAg
+ICAgICAgICAgICAgICAgICAoKChudW1fc2hhcmluZyAtIDEpICogdGhyZWFkcykgKyAxKSAgOiBc
+DQo+ID4gKyAgICAgICAgICAgICAgICAgICAgICAgICAobnVtX3NoYXJpbmcgLSAxKSkNCj4gPiAr
+LyoNCj4gPiArICogTDMgQ2FjaGUgaXMgc2hhcmVkIGJldHdlZW4gYWxsIHRoZSBjb3JlcyBpbiBh
+IGNvcmUgY29tcGxleC4NCj4gPiArICogTWF4aW11bSBjb3JlcyB0aGF0IGNhbiBzaGFyZSBMMyBp
+cyA0Lg0KPiA+ICsgKi8NCj4gPiArc3RhdGljIGludCBudW1fc2hhcmluZ19sM19jYWNoZShpbnQg
+bnJfY29yZXMpIHsNCj4gPiArICAgIGludCBpLCBub2RlcyA9IDE7DQo+ID4gKw0KPiA+ICsgICAg
+LyogQ2hlY2sgaWYgd2UgY2FuIGZpdCBhbGwgdGhlIGNvcmVzIGluIG9uZSBDQ1ggKi8NCj4gPiAr
+ICAgIGlmIChucl9jb3JlcyA8PSBNQVhfQ09SRVNfSU5fQ0NYKSB7DQo+ID4gKyAgICAgICAgcmV0
+dXJuIG5yX2NvcmVzOw0KPiA+ICsgICAgfQ0KPiA+ICsgICAgLyoNCj4gPiArICAgICAqIEZpZ3Vy
+ZSBvdXQgdGhlIG51bWJlciBvZiBub2RlcyhvciBkaWVzKSByZXF1aXJlZCB0byBidWlsZA0KPiA+
+ICsgICAgICogdGhpcyBjb25maWcuIE1heCBjb3JlcyBpbiBhIG5vZGUgaXMgOA0KPiA+ICsgICAg
+ICovDQo+ID4gKyAgICBmb3IgKGkgPSBub2RlczsgaSA8PSBNQVhfTk9ERVNfRVBZQzsgaSsrKSB7
+DQo+ID4gKyAgICAgICAgaWYgKG5yX2NvcmVzIDw9IChpICogTUFYX0NPUkVTX0lOX05PREUpKSB7
+DQo+ID4gKyAgICAgICAgICAgIG5vZGVzID0gaTsNCj4gPiArICAgICAgICAgICAgYnJlYWs7DQo+
+ID4gKyAgICAgICAgfQ0KPiA+ICsgICAgICAgIC8qIFdlIHN1cHBvcnQgbm9kZXMgMSwgMiwgNCAq
+Lw0KPiA+ICsgICAgICAgIGlmIChpID09IDMpIHsNCj4gPiArICAgICAgICAgICAgY29udGludWU7
+DQo+ID4gKyAgICAgICAgfQ0KPiA+ICsgICAgfQ0KPiA+ICsgICAgLyogU3ByZWFkIHRoZSBjb3Jl
+cyBhY2Nyb3MgYWxsIHRoZSBDQ1hzIGFuZCByZXR1cm4gbWF4IGNvcmVzIGluIGEgY2N4ICovDQo+
+ID4gKyAgICByZXR1cm4gKG5yX2NvcmVzIC8gKG5vZGVzICogTUFYX0NDWCkpICsNCj4gPiArICAg
+ICAgICAgICAgKChucl9jb3JlcyAlIChub2RlcyAqIE1BWF9DQ1gpKSA/IDEgOiAwKTsgfQ0KPiA+
+ICsNCj4gPiArLyogRW5jb2RlIGNhY2hlIGluZm8gZm9yIENQVUlEWzgwMDAwMDFEXSAqLyBzdGF0
+aWMgdm9pZA0KPiA+ICtlbmNvZGVfY2FjaGVfY3B1aWQ4MDAwMDAxZChDUFVDYWNoZUluZm8gKmNh
+Y2hlLCBDUFVTdGF0ZSAqY3MsDQo+ID4gKyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+dWludDMyX3QgKmVheCwgdWludDMyX3QgKmVieCwNCj4gPiArICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICB1aW50MzJfdCAqZWN4LCB1aW50MzJfdCAqZWR4KSB7DQo+ID4gKyAgICB1aW50
+MzJfdCBudW1fc2hhcmVfbDM7DQo+ID4gKyAgICBhc3NlcnQoY2FjaGUtPnNpemUgPT0gY2FjaGUt
+PmxpbmVfc2l6ZSAqIGNhY2hlLT5hc3NvY2lhdGl2aXR5ICoNCj4gPiArICAgICAgICAgICAgICAg
+ICAgICAgICAgICBjYWNoZS0+cGFydGl0aW9ucyAqIGNhY2hlLT5zZXRzKTsNCj4gPiArDQo+ID4g
+KyAgICAqZWF4ID0gQ0FDSEVfVFlQRShjYWNoZS0+dHlwZSkgfCBDQUNIRV9MRVZFTChjYWNoZS0+
+bGV2ZWwpIHwNCj4gPiArICAgICAgICAgICAgICAgKGNhY2hlLT5zZWxmX2luaXQgPyBDQUNIRV9T
+RUxGX0lOSVRfTEVWRUwgOiAwKTsNCj4gPiArDQo+ID4gKyAgICAvKiBMMyBpcyBzaGFyZWQgYW1v
+bmcgbXVsdGlwbGUgY29yZXMgKi8NCj4gPiArICAgIGlmIChjYWNoZS0+bGV2ZWwgPT0gMykgew0K
+PiA+ICsgICAgICAgIG51bV9zaGFyZV9sMyA9IG51bV9zaGFyaW5nX2wzX2NhY2hlKGNzLT5ucl9j
+b3Jlcyk7DQo+ID4gKyAgICAgICAgKmVheCB8PSAoTlVNX1NIQVJJTkdfQ0FDSEUoY3MtPm5yX3Ro
+cmVhZHMsIG51bV9zaGFyZV9sMykgPDwNCj4gPiAxNCk7DQo+ID4gKyAgICB9IGVsc2Ugew0KPiA+
+ICsgICAgICAgICplYXggfD0gKChjcy0+bnJfdGhyZWFkcyAtIDEpIDw8IDE0KTsNCj4gPiArICAg
+IH0NCj4gPiArDQo+ID4gKyAgICBhc3NlcnQoY2FjaGUtPmxpbmVfc2l6ZSA+IDApOw0KPiA+ICsg
+ICAgYXNzZXJ0KGNhY2hlLT5wYXJ0aXRpb25zID4gMCk7DQo+ID4gKyAgICBhc3NlcnQoY2FjaGUt
+PmFzc29jaWF0aXZpdHkgPiAwKTsNCj4gPiArICAgIC8qIFdlIGRvbid0IGltcGxlbWVudCBmdWxs
+eS1hc3NvY2lhdGl2ZSBjYWNoZXMgKi8NCj4gPiArICAgIGFzc2VydChjYWNoZS0+YXNzb2NpYXRp
+dml0eSA8IGNhY2hlLT5zZXRzKTsNCj4gPiArICAgICplYnggPSAoY2FjaGUtPmxpbmVfc2l6ZSAt
+IDEpIHwNCj4gPiArICAgICAgICAgICAoKGNhY2hlLT5wYXJ0aXRpb25zIC0gMSkgPDwgMTIpIHwN
+Cj4gPiArICAgICAgICAgICAoKGNhY2hlLT5hc3NvY2lhdGl2aXR5IC0gMSkgPDwgMjIpOw0KPiA+
+ICsNCj4gPiArICAgIGFzc2VydChjYWNoZS0+c2V0cyA+IDApOw0KPiA+ICsgICAgKmVjeCA9IGNh
+Y2hlLT5zZXRzIC0gMTsNCj4gPiArDQo+ID4gKyAgICAqZWR4ID0gKGNhY2hlLT5ub19pbnZkX3No
+YXJpbmcgPyBDQUNIRV9OT19JTlZEX1NIQVJJTkcgOiAwKSB8DQo+ID4gKyAgICAgICAgICAgKGNh
+Y2hlLT5pbmNsdXNpdmUgPyBDQUNIRV9JTkNMVVNJVkUgOiAwKSB8DQo+ID4gKyAgICAgICAgICAg
+KGNhY2hlLT5jb21wbGV4X2luZGV4aW5nID8gQ0FDSEVfQ09NUExFWF9JRFggOiAwKTsgfQ0KPiA+
+ICsNCj4gPiAgLyoNCj4gPiAgICogRGVmaW5pdGlvbnMgb2YgdGhlIGhhcmRjb2RlZCBjYWNoZSBl
+bnRyaWVzIHdlIGV4cG9zZToNCj4gPiAgICogVGhlc2UgYXJlIGxlZ2FjeSBjYWNoZSB2YWx1ZXMu
+IElmIHRoZXJlIGlzIGEgbmVlZCB0byBjaGFuZ2UgYW55IEBAIC0NCj4gPiA0MDA1LDYgKzQwODQs
+MzAgQEAgdm9pZCBjcHVfeDg2X2NwdWlkKENQVVg4NlN0YXRlICplbnYsIHVpbnQzMl90DQo+IGlu
+ZGV4LA0KPiA+IHVpbnQzMl90IGNvdW50LA0KPiA+ICAgICAgICAgICAgICAqZWR4ID0gMDsNCj4g
+PiAgICAgICAgICB9DQo+ID4gICAgICAgICAgYnJlYWs7DQo+ID4gKyAgICBjYXNlIDB4ODAwMDAw
+MUQ6DQo+ID4gKyAgICAgICAgKmVheCA9IDA7DQo+ID4gKyAgICAgICAgc3dpdGNoIChjb3VudCkg
+ew0KPiA+ICsgICAgICAgIGNhc2UgMDogLyogTDEgZGNhY2hlIGluZm8gKi8NCj4gPiArICAgICAg
+ICAgICAgZW5jb2RlX2NhY2hlX2NwdWlkODAwMDAwMWQoZW52LT5jYWNoZV9pbmZvX2FtZC5sMWRf
+Y2FjaGUsDQo+IGNzLA0KPiA+ICsgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICBlYXgsIGVieCwgZWN4LCBlZHgpOw0KPiA+ICsgICAgICAgICAgICBicmVhazsNCj4gPiArICAg
+ICAgICBjYXNlIDE6IC8qIEwxIGljYWNoZSBpbmZvICovDQo+ID4gKyAgICAgICAgICAgIGVuY29k
+ZV9jYWNoZV9jcHVpZDgwMDAwMDFkKGVudi0+Y2FjaGVfaW5mb19hbWQubDFpX2NhY2hlLCBjcywN
+Cj4gPiArICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgZWF4LCBlYngsIGVj
+eCwgZWR4KTsNCj4gPiArICAgICAgICAgICAgYnJlYWs7DQo+ID4gKyAgICAgICAgY2FzZSAyOiAv
+KiBMMiBjYWNoZSBpbmZvICovDQo+ID4gKyAgICAgICAgICAgIGVuY29kZV9jYWNoZV9jcHVpZDgw
+MDAwMDFkKGVudi0+Y2FjaGVfaW5mb19hbWQubDJfY2FjaGUsIGNzLA0KPiA+ICsgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICBlYXgsIGVieCwgZWN4LCBlZHgpOw0KPiA+ICsg
+ICAgICAgICAgICBicmVhazsNCj4gPiArICAgICAgICBjYXNlIDM6IC8qIEwzIGNhY2hlIGluZm8g
+Ki8NCj4gPiArICAgICAgICAgICAgZW5jb2RlX2NhY2hlX2NwdWlkODAwMDAwMWQoZW52LT5jYWNo
+ZV9pbmZvX2FtZC5sM19jYWNoZSwgY3MsDQo+ID4gKyAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgIGVheCwgZWJ4LCBlY3gsIGVkeCk7DQo+ID4gKyAgICAgICAgICAgIGJyZWFr
+Ow0KPiA+ICsgICAgICAgIGRlZmF1bHQ6IC8qIGVuZCBvZiBpbmZvICovDQo+ID4gKyAgICAgICAg
+ICAgICplYXggPSAqZWJ4ID0gKmVjeCA9ICplZHggPSAwOw0KPiA+ICsgICAgICAgICAgICBicmVh
+azsNCj4gPiArICAgICAgICB9DQo+ID4gKyAgICAgICAgYnJlYWs7DQo+ID4gICAgICBjYXNlIDB4
+QzAwMDAwMDA6DQo+ID4gICAgICAgICAgKmVheCA9IGVudi0+Y3B1aWRfeGxldmVsMjsNCj4gPiAg
+ICAgICAgICAqZWJ4ID0gMDsNCj4gPiBkaWZmIC0tZ2l0IGEvdGFyZ2V0L2kzODYva3ZtLmMgYi90
+YXJnZXQvaTM4Ni9rdm0uYyBpbmRleCBkNjY2NmE0Li5hOGJmN2ViDQo+ID4gMTAwNjQ0DQo+ID4g
+LS0tIGEvdGFyZ2V0L2kzODYva3ZtLmMNCj4gPiArKysgYi90YXJnZXQvaTM4Ni9rdm0uYw0KPiA+
+IEBAIC05NzksOSArOTc5LDMyIEBAIGludCBrdm1fYXJjaF9pbml0X3ZjcHUoQ1BVU3RhdGUgKmNz
+KQ0KPiA+ICAgICAgICAgIH0NCj4gPiAgICAgICAgICBjID0gJmNwdWlkX2RhdGEuZW50cmllc1tj
+cHVpZF9pKytdOw0KPiA+DQo+ID4gLSAgICAgICAgYy0+ZnVuY3Rpb24gPSBpOw0KPiA+IC0gICAg
+ICAgIGMtPmZsYWdzID0gMDsNCj4gPiAtICAgICAgICBjcHVfeDg2X2NwdWlkKGVudiwgaSwgMCwg
+JmMtPmVheCwgJmMtPmVieCwgJmMtPmVjeCwgJmMtPmVkeCk7DQo+ID4gKyAgICAgICAgc3dpdGNo
+IChpKSB7DQo+ID4gKyAgICAgICAgY2FzZSAweDgwMDAwMDFkOg0KPiA+ICsgICAgICAgICAgICAv
+KiBRdWVyeSBmb3IgYWxsIEFNRCBjYWNoZSBpbmZvcm1hdGlvbiBsZWF2ZXMgKi8NCj4gPiArICAg
+ICAgICAgICAgZm9yIChqID0gMDsgOyBqKyspIHsNCj4gPiArICAgICAgICAgICAgICAgIGMtPmZ1
+bmN0aW9uID0gaTsNCj4gPiArICAgICAgICAgICAgICAgIGMtPmZsYWdzID0gS1ZNX0NQVUlEX0ZM
+QUdfU0lHTklGQ0FOVF9JTkRFWDsNCj4gPiArICAgICAgICAgICAgICAgIGMtPmluZGV4ID0gajsN
+Cj4gPiArICAgICAgICAgICAgICAgIGNwdV94ODZfY3B1aWQoZW52LCBpLCBqLCAmYy0+ZWF4LCAm
+Yy0+ZWJ4LCAmYy0+ZWN4LA0KPiA+ICsgJmMtPmVkeCk7DQo+ID4gKw0KPiA+ICsgICAgICAgICAg
+ICAgICAgaWYgKGMtPmVheCA9PSAwKSB7DQo+ID4gKyAgICAgICAgICAgICAgICAgICAgYnJlYWs7
+DQo+ID4gKyAgICAgICAgICAgICAgICB9DQo+ID4gKyAgICAgICAgICAgICAgICBpZiAoY3B1aWRf
+aSA9PSBLVk1fTUFYX0NQVUlEX0VOVFJJRVMpIHsNCj4gPiArICAgICAgICAgICAgICAgICAgICBm
+cHJpbnRmKHN0ZGVyciwgImNwdWlkX2RhdGEgaXMgZnVsbCwgbm8gc3BhY2UgZm9yICINCj4gPiAr
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICJjcHVpZChlYXg6MHgleCxlY3g6MHgleClcbiIs
+IGksIGopOw0KPiA+ICsgICAgICAgICAgICAgICAgICAgIGFib3J0KCk7DQo+ID4gKyAgICAgICAg
+ICAgICAgICB9DQo+ID4gKyAgICAgICAgICAgICAgICBjID0gJmNwdWlkX2RhdGEuZW50cmllc1tj
+cHVpZF9pKytdOw0KPiA+ICsgICAgICAgICAgICB9DQo+ID4gKyAgICAgICAgICAgIGJyZWFrOw0K
+PiA+ICsgICAgICAgIGRlZmF1bHQ6DQo+ID4gKyAgICAgICAgICAgIGMtPmZ1bmN0aW9uID0gaTsN
+Cj4gPiArICAgICAgICAgICAgYy0+ZmxhZ3MgPSAwOw0KPiA+ICsgICAgICAgICAgICBjcHVfeDg2
+X2NwdWlkKGVudiwgaSwgMCwgJmMtPmVheCwgJmMtPmVieCwgJmMtPmVjeCwgJmMtPmVkeCk7DQo+
+ID4gKyAgICAgICAgICAgIGJyZWFrOw0KPiA+ICsgICAgICAgIH0NCj4gPiAgICAgIH0NCj4gPg0K
+PiA+ICAgICAgLyogQ2FsbCBDZW50YXVyJ3MgQ1BVSUQgaW5zdHJ1Y3Rpb25zIHRoZXkgYXJlIHN1
+cHBvcnRlZC4gKi8NCj4gPiAtLQ0KPiA+IDEuOC4zLjENCg0K
