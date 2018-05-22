@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42277)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42400)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fL4yk-0002ma-Nv
-	for qemu-devel@nongnu.org; Tue, 22 May 2018 06:57:19 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1fL4zZ-0003JF-4I
+	for qemu-devel@nongnu.org; Tue, 22 May 2018 06:58:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fL4yh-0003s8-NJ
-	for qemu-devel@nongnu.org; Tue, 22 May 2018 06:57:18 -0400
-Received: from mail-wm0-x242.google.com ([2a00:1450:400c:c09::242]:50868)
+	(envelope-from <alex.bennee@linaro.org>) id 1fL4zX-0004GS-Uc
+	for qemu-devel@nongnu.org; Tue, 22 May 2018 06:58:09 -0400
+Received: from mail-wm0-x244.google.com ([2a00:1450:400c:c09::244]:35041)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1fL4yh-0003rp-DO
-	for qemu-devel@nongnu.org; Tue, 22 May 2018 06:57:15 -0400
-Received: by mail-wm0-x242.google.com with SMTP id t11-v6so30772621wmt.0
-	for <qemu-devel@nongnu.org>; Tue, 22 May 2018 03:57:15 -0700 (PDT)
+	id 1fL4zX-0004GF-Kk
+	for qemu-devel@nongnu.org; Tue, 22 May 2018 06:58:07 -0400
+Received: by mail-wm0-x244.google.com with SMTP id o78-v6so32376131wmg.0
+	for <qemu-devel@nongnu.org>; Tue, 22 May 2018 03:58:07 -0700 (PDT)
 References: <20180521140402.23318-1-peter.maydell@linaro.org>
-	<20180521140402.23318-8-peter.maydell@linaro.org>
+	<20180521140402.23318-9-peter.maydell@linaro.org>
 From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <20180521140402.23318-8-peter.maydell@linaro.org>
-Date: Tue, 22 May 2018 11:57:12 +0100
-Message-ID: <87fu2kufef.fsf@linaro.org>
+In-reply-to: <20180521140402.23318-9-peter.maydell@linaro.org>
+Date: Tue, 22 May 2018 11:58:02 +0100
+Message-ID: <87efi4ufd1.fsf@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 07/27] Make memory_region_access_valid()
- take a MemTxAttrs argument
+Subject: Re: [Qemu-devel] [PATCH 08/27] Make MemoryRegion valid.accepts
+ callback take a MemTxAttrs argument
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,110 +38,193 @@ Cc: qemu-arm@nongnu.org, qemu-devel@nongnu.org, patches@linaro.org, Paolo Bonzin
 Peter Maydell <peter.maydell@linaro.org> writes:
 
 > As part of plumbing MemTxAttrs down to the IOMMU translate method,
-> add MemTxAttrs as an argument to memory_region_access_valid().
-> Its callers either have an attrs value to hand, or don't care
-> and can use MEMTXATTRS_UNSPECIFIED.
+> add MemTxAttrs as an argument to the MemoryRegion valid.accepts
+> callback. We'll need this for subpage_accepts().
 >
-> The callsite in flatview_access_valid() is part of a recursive
-> loop flatview_access_valid() -> memory_region_access_valid() ->
->  subpage_accepts() -> flatview_access_valid(); we make it pass
-> MEMTXATTRS_UNSPECIFIED for now, until the next several commits
-> have plumbed an attrs parameter through the rest of the loop
-> and we can add an attrs parameter to flatview_access_valid().
+> We could take the approach we used with the read and write
+> callbacks and add new a new _with_attrs version, but since there
+> are so few implementations of the accepts hook we just change
+> them all.
 >
 > Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 
 Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
 
 > ---
->  include/exec/memory-internal.h | 3 ++-
->  exec.c                         | 4 +++-
->  hw/s390x/s390-pci-inst.c       | 3 ++-
->  memory.c                       | 7 ++++---
->  4 files changed, 11 insertions(+), 6 deletions(-)
+>  include/exec/memory.h |  3 ++-
+>  exec.c                |  9 ++++++---
+>  hw/hppa/dino.c        |  3 ++-
+>  hw/nvram/fw_cfg.c     | 12 ++++++++----
+>  hw/scsi/esp.c         |  3 ++-
+>  hw/xen/xen_pt_msi.c   |  3 ++-
+>  memory.c              |  5 +++--
+>  7 files changed, 25 insertions(+), 13 deletions(-)
 >
-> diff --git a/include/exec/memory-internal.h b/include/exec/memory-interna=
-l.h
-> index 58399b9318..56c25c0ef7 100644
-> --- a/include/exec/memory-internal.h
-> +++ b/include/exec/memory-internal.h
-> @@ -37,7 +37,8 @@ void flatview_unref(FlatView *view);
->  extern const MemoryRegionOps unassigned_mem_ops;
->
->  bool memory_region_access_valid(MemoryRegion *mr, hwaddr addr,
-> -                                unsigned size, bool is_write);
-> +                                unsigned size, bool is_write,
-> +                                MemTxAttrs attrs);
->
->  void flatview_add_to_dispatch(FlatView *fv, MemoryRegionSection *section=
-);
->  AddressSpaceDispatch *address_space_dispatch_new(FlatView *fv);
+> diff --git a/include/exec/memory.h b/include/exec/memory.h
+> index 54263bd23b..444fceac55 100644
+> --- a/include/exec/memory.h
+> +++ b/include/exec/memory.h
+> @@ -166,7 +166,8 @@ struct MemoryRegionOps {
+>           * as a machine check exception).
+>           */
+>          bool (*accepts)(void *opaque, hwaddr addr,
+> -                        unsigned size, bool is_write);
+> +                        unsigned size, bool is_write,
+> +                        MemTxAttrs attrs);
+>      } valid;
+>      /* Internal implementation constraints: */
+>      struct {
 > diff --git a/exec.c b/exec.c
-> index 718b33921b..6cf97b5d28 100644
+> index 6cf97b5d28..b58eb0fedd 100644
 > --- a/exec.c
 > +++ b/exec.c
-> @@ -3468,7 +3468,9 @@ static bool flatview_access_valid(FlatView *fv, hwa=
-ddr addr, int len,
->          mr =3D flatview_translate(fv, addr, &xlat, &l, is_write);
->          if (!memory_access_is_direct(mr, is_write)) {
->              l =3D memory_access_size(mr, l, addr);
-> -            if (!memory_region_access_valid(mr, xlat, l, is_write)) {
-> +            /* When our callers all have attrs we'll pass them through h=
-ere */
-> +            if (!memory_region_access_valid(mr, xlat, l, is_write,
-> +                                            MEMTXATTRS_UNSPECIFIED)) {
->                  return false;
->              }
->          }
-> diff --git a/hw/s390x/s390-pci-inst.c b/hw/s390x/s390-pci-inst.c
-> index 02a815fd31..d1a5f79678 100644
-> --- a/hw/s390x/s390-pci-inst.c
-> +++ b/hw/s390x/s390-pci-inst.c
-> @@ -762,7 +762,8 @@ int pcistb_service_call(S390CPU *cpu, uint8_t r1, uin=
-t8_t r3, uint64_t gaddr,
->      mr =3D s390_get_subregion(mr, offset, len);
->      offset -=3D mr->addr;
+> @@ -2539,7 +2539,8 @@ static void notdirty_mem_write(void *opaque, hwaddr=
+ ram_addr,
+>  }
 >
-> -    if (!memory_region_access_valid(mr, offset, len, true)) {
-> +    if (!memory_region_access_valid(mr, offset, len, true,
-> +                                    MEMTXATTRS_UNSPECIFIED)) {
->          s390_program_interrupt(env, PGM_OPERAND, 6, ra);
->          return 0;
->      }
-> diff --git a/memory.c b/memory.c
-> index fc7f9b782b..279f7c9b4a 100644
-> --- a/memory.c
-> +++ b/memory.c
-> @@ -1347,7 +1347,8 @@ static const MemoryRegionOps ram_device_mem_ops =3D=
- {
->  bool memory_region_access_valid(MemoryRegion *mr,
->                                  hwaddr addr,
->                                  unsigned size,
-> -                                bool is_write)
-> +                                bool is_write,
+>  static bool notdirty_mem_accepts(void *opaque, hwaddr addr,
+> -                                 unsigned size, bool is_write)
+> +                                 unsigned size, bool is_write,
+> +                                 MemTxAttrs attrs)
+>  {
+>      return is_write;
+>  }
+> @@ -2762,7 +2763,8 @@ static MemTxResult subpage_write(void *opaque, hwad=
+dr addr,
+>  }
+>
+>  static bool subpage_accepts(void *opaque, hwaddr addr,
+> -                            unsigned len, bool is_write)
+> +                            unsigned len, bool is_write,
+> +                            MemTxAttrs attrs)
+>  {
+>      subpage_t *subpage =3D opaque;
+>  #if defined(DEBUG_SUBPAGE)
+> @@ -2845,7 +2847,8 @@ static void readonly_mem_write(void *opaque, hwaddr=
+ addr,
+>  }
+>
+>  static bool readonly_mem_accepts(void *opaque, hwaddr addr,
+> -                                 unsigned size, bool is_write)
+> +                                 unsigned size, bool is_write,
+> +                                 MemTxAttrs attrs)
+>  {
+>      return is_write;
+>  }
+> diff --git a/hw/hppa/dino.c b/hw/hppa/dino.c
+> index 15aefde09c..77463672a3 100644
+> --- a/hw/hppa/dino.c
+> +++ b/hw/hppa/dino.c
+> @@ -137,7 +137,8 @@ static void gsc_to_pci_forwarding(DinoState *s)
+>  }
+>
+>  static bool dino_chip_mem_valid(void *opaque, hwaddr addr,
+> -                                unsigned size, bool is_write)
+> +                                unsigned size, bool is_write,
 > +                                MemTxAttrs attrs)
 >  {
->      int access_size_min, access_size_max;
->      int access_size, i;
-> @@ -1416,7 +1417,7 @@ MemTxResult memory_region_dispatch_read(MemoryRegio=
-n *mr,
->  {
->      MemTxResult r;
+>      switch (addr) {
+>      case DINO_IAR0:
+> diff --git a/hw/nvram/fw_cfg.c b/hw/nvram/fw_cfg.c
+> index 2a0739d0e9..b23e7f64a8 100644
+> --- a/hw/nvram/fw_cfg.c
+> +++ b/hw/nvram/fw_cfg.c
+> @@ -420,14 +420,16 @@ static void fw_cfg_dma_mem_write(void *opaque, hwad=
+dr addr,
+>  }
 >
-> -    if (!memory_region_access_valid(mr, addr, size, false)) {
-> +    if (!memory_region_access_valid(mr, addr, size, false, attrs)) {
->          *pval =3D unassigned_mem_read(mr, addr, size);
->          return MEMTX_DECODE_ERROR;
->      }
-> @@ -1458,7 +1459,7 @@ MemTxResult memory_region_dispatch_write(MemoryRegi=
-on *mr,
->                                           unsigned size,
->                                           MemTxAttrs attrs)
+>  static bool fw_cfg_dma_mem_valid(void *opaque, hwaddr addr,
+> -                                  unsigned size, bool is_write)
+> +                                 unsigned size, bool is_write,
+> +                                 MemTxAttrs attrs)
 >  {
-> -    if (!memory_region_access_valid(mr, addr, size, true)) {
-> +    if (!memory_region_access_valid(mr, addr, size, true, attrs)) {
->          unassigned_mem_write(mr, addr, data, size);
->          return MEMTX_DECODE_ERROR;
+>      return !is_write || ((size =3D=3D 4 && (addr =3D=3D 0 || addr =3D=3D=
+ 4)) ||
+>                           (size =3D=3D 8 && addr =3D=3D 0));
+>  }
+>
+>  static bool fw_cfg_data_mem_valid(void *opaque, hwaddr addr,
+> -                                  unsigned size, bool is_write)
+> +                                  unsigned size, bool is_write,
+> +                                  MemTxAttrs attrs)
+>  {
+>      return addr =3D=3D 0;
+>  }
+> @@ -439,7 +441,8 @@ static void fw_cfg_ctl_mem_write(void *opaque, hwaddr=
+ addr,
+>  }
+>
+>  static bool fw_cfg_ctl_mem_valid(void *opaque, hwaddr addr,
+> -                                 unsigned size, bool is_write)
+> +                                 unsigned size, bool is_write,
+> +                                 MemTxAttrs attrs)
+>  {
+>      return is_write && size =3D=3D 2;
+>  }
+> @@ -458,7 +461,8 @@ static void fw_cfg_comb_write(void *opaque, hwaddr ad=
+dr,
+>  }
+>
+>  static bool fw_cfg_comb_valid(void *opaque, hwaddr addr,
+> -                                  unsigned size, bool is_write)
+> +                              unsigned size, bool is_write,
+> +                              MemTxAttrs attrs)
+>  {
+>      return (size =3D=3D 1) || (is_write && size =3D=3D 2);
+>  }
+> diff --git a/hw/scsi/esp.c b/hw/scsi/esp.c
+> index 64ec285826..9ed9727744 100644
+> --- a/hw/scsi/esp.c
+> +++ b/hw/scsi/esp.c
+> @@ -564,7 +564,8 @@ void esp_reg_write(ESPState *s, uint32_t saddr, uint6=
+4_t val)
+>  }
+>
+>  static bool esp_mem_accepts(void *opaque, hwaddr addr,
+> -                            unsigned size, bool is_write)
+> +                            unsigned size, bool is_write,
+> +                            MemTxAttrs attrs)
+>  {
+>      return (size =3D=3D 1) || (is_write && size =3D=3D 4);
+>  }
+> diff --git a/hw/xen/xen_pt_msi.c b/hw/xen/xen_pt_msi.c
+> index 6d1e3bdeb4..cc514f9157 100644
+> --- a/hw/xen/xen_pt_msi.c
+> +++ b/hw/xen/xen_pt_msi.c
+> @@ -498,7 +498,8 @@ static uint64_t pci_msix_read(void *opaque, hwaddr ad=
+dr,
+>  }
+>
+>  static bool pci_msix_accepts(void *opaque, hwaddr addr,
+> -                             unsigned size, bool is_write)
+> +                             unsigned size, bool is_write,
+> +                             MemTxAttrs attrs)
+>  {
+>      return !(addr & (size - 1));
+>  }
+> diff --git a/memory.c b/memory.c
+> index 279f7c9b4a..10fa2ddd31 100644
+> --- a/memory.c
+> +++ b/memory.c
+> @@ -1269,7 +1269,8 @@ static void unassigned_mem_write(void *opaque, hwad=
+dr addr,
+>  }
+>
+>  static bool unassigned_mem_accepts(void *opaque, hwaddr addr,
+> -                                   unsigned size, bool is_write)
+> +                                   unsigned size, bool is_write,
+> +                                   MemTxAttrs attrs)
+>  {
+>      return false;
+>  }
+> @@ -1374,7 +1375,7 @@ bool memory_region_access_valid(MemoryRegion *mr,
+>      access_size =3D MAX(MIN(size, access_size_max), access_size_min);
+>      for (i =3D 0; i < size; i +=3D access_size) {
+>          if (!mr->ops->valid.accepts(mr->opaque, addr + i, access_size,
+> -                                    is_write)) {
+> +                                    is_write, attrs)) {
+>              return false;
+>          }
 >      }
 
 
