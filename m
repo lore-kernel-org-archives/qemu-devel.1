@@ -1,34 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46582)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47045)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fL6zK-000440-82
-	for qemu-devel@nongnu.org; Tue, 22 May 2018 09:06:08 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1fL71F-0004ik-2U
+	for qemu-devel@nongnu.org; Tue, 22 May 2018 09:08:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fL6zA-0008Hq-D8
-	for qemu-devel@nongnu.org; Tue, 22 May 2018 09:06:02 -0400
-Received: from indium.canonical.com ([91.189.90.7]:35388)
+	(envelope-from <peter.maydell@linaro.org>) id 1fL71A-0000bq-Sv
+	for qemu-devel@nongnu.org; Tue, 22 May 2018 09:08:01 -0400
+Received: from mail-oi0-x244.google.com ([2607:f8b0:4003:c06::244]:34790)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1fL6zA-0008HQ-6p
-	for qemu-devel@nongnu.org; Tue, 22 May 2018 09:05:52 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1fL6z8-00014L-BK
-	for <qemu-devel@nongnu.org>; Tue, 22 May 2018 13:05:50 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 0F5EA2E8F45
-	for <qemu-devel@nongnu.org>; Tue, 22 May 2018 13:05:50 +0000 (UTC)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1fL71A-0000bc-N7
+	for qemu-devel@nongnu.org; Tue, 22 May 2018 09:07:56 -0400
+Received: by mail-oi0-x244.google.com with SMTP id l1-v6so16132237oii.1
+	for <qemu-devel@nongnu.org>; Tue, 22 May 2018 06:07:56 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 22 May 2018 12:59:38 -0000
-From: Thomas Huth <1772262@bugs.launchpad.net>
-Reply-To: Bug 1772262 <1772262@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <152682211859.2906.10549449814583426718.malonedeb@gac.canonical.com>
-Message-Id: <152699397906.16381.12814289861556084995.launchpad@soybean.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1772262] Re: Adding -spice doesn't respect
- environment variable QEMU_AUDIO_DRV
+In-Reply-To: <87o9h7q53u.fsf@dusky.pond.sub.org>
+References: <1526752108-21204-1-git-send-email-patryk@fala.ehost.pl>
+	<87o9h7q53u.fsf@dusky.pond.sub.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 22 May 2018 14:07:35 +0100
+Message-ID: <CAFEAcA-ce=r3izLyizhEo+a4Fkg5dQ-NnDgHRJ4GsomnqQsqRw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH] Remove unwanted crlf conversion in serial
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,83 +29,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Markus Armbruster <armbru@redhat.com>
+Cc: Patryk Olszewski <patryk@fala.ehost.pl>, Paolo Bonzini <pbonzini@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>
 
-** Changed in: qemu
-       Status: New =3D> Invalid
+On 22 May 2018 at 12:53, Markus Armbruster <armbru@redhat.com> wrote:
+> Patryk Olszewski <patryk@fala.ehost.pl> writes:
+>
+>> Signed-off-by: Patryk Olszewski <patryk@fala.ehost.pl>
+>> ---
+>>  chardev/char-serial.c | 2 +-
+>>  1 file changed, 1 insertion(+), 1 deletion(-)
+>>
+>> diff --git a/chardev/char-serial.c b/chardev/char-serial.c
+>> index feb52e5..ae548d2 100644
+>> --- a/chardev/char-serial.c
+>> +++ b/chardev/char-serial.c
+>> @@ -139,7 +139,7 @@ static void tty_serial_init(int fd, int speed,
+>>
+>>      tty.c_iflag &= ~(IGNBRK | BRKINT | PARMRK | ISTRIP
+>>                       | INLCR | IGNCR | ICRNL | IXON);
+>> -    tty.c_oflag |= OPOST;
+>> +    tty.c_oflag &= ~OPOST;
+>>      tty.c_lflag &= ~(ECHO | ECHONL | ICANON | IEXTEN | ISIG);
+>>      tty.c_cflag &= ~(CSIZE | PARENB | PARODD | CRTSCTS | CSTOPB);
+>>      switch (data_bits) {
+>
+> This change may well make sense, but your commit message needs to
+> explain *why*.
+>
+> For what it's worth, POSIX documents OPOST as "Post-process output", and
+> the Linux manual page as "Enable implementation-defined output
+> processing."
 
--- =
+We've set OPOST on our terminals since forever, right back to
+commit 0824d6fc674 in 2003. Not setting it seems like the right thing,
+though, since we're generally otherwise setting the thing up to be a
+raw mode tty (and if we're connecting this to a guest then raw seems
+like what we want).
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1772262
+I wonder whether connecting, say, the HMP monitor to a 'serial'
+chardev (a) works now (b) ends up with stair-step output after
+this change (c) is something we care about...
 
-Title:
-  Adding -spice doesn't respect environment variable QEMU_AUDIO_DRV
-
-Status in QEMU:
-  Invalid
-
-Bug description:
-  When -spice is added to the commandline, QEMU_AUDIO_DRV=3Dalsa is not
-  respected and I receive no audio from the guest using the alsa driver.
-  When -spice options are omitted, audio works as usual.
-
-  I want to channel mouse and keyboard events to the guest using spice
-  (with looking-glass) instead of a third-party product over a network
-  interface (with synergy), but audio ends up over the spice protocol as
-  well instead of using alsa despite asking otherwise.  For example, one
-  will only hear audio when a program like spicy is running.  Naturally
-  it would be nice if this were not needed, since spice audio is gappier
-  than regular audio on my machine.
-
-  Perhaps if -spice added an option similar to agent-mouse=3Doff but for
-  audio, (say audio-pipe=3Doff or so for example,) this might mitigate the
-  issue in a more naive fashion UX-wise, without having to force the
-  issue with environment variables that unfortunately for me don't seem
-  to work. :(
-
-  QEMU emulator version 2.12.0
-
-  Commandline
-
-          qemu-system-x86_64 \
-            -ctrl-grab \
-            -enable-kvm \
-            -cpu host,hv-time,kvm=3Doff \
-            -smp cores=3D4 \
-            -m 8G \
-            -M q35 \
-            -vga none \
-            -netdev tap,id=3Dhostnet,ifname=3Dtap1,script=3Dno,downscript=
-=3Dno \
-            -net nic,model=3Dvirtio,macaddr=3D52:54:FD:BF:F7:9A,netdev=3Dho=
-stnet \
-            -netdev user,id=3Dusernet,smb=3D/media/DRIVE-C/tux/vms/share \
-            -net nic,model=3Dvirtio,macaddr=3D52:54:2E:40:4F:C8,netdev=3Dus=
-ernet \
-            -usb \
-            -device usb-ehci,id=3Dehci \
-            -device ioh3420,bus=3Dpcie.0,addr=3D1c,multifunction=3Don,port=
-=3D1,chassis=3D1,id=3Droot.1 \
-            -device vfio-pci,host=3D07:00.0,bus=3Droot.1,addr=3D00.0,multif=
-unction=3Don,x-vga=3Don \
-            -device ich9-intel-hda \
-            -device hda-micro \
-            -drive if=3Dvirtio,file=3Dvm/win10/disk.img,media=3Ddisk \
-            -boot menu=3Don,splash=3Dsplash/boot.jpg,splash-time=3D5000 \
-            -name win10 \
-            -device ivshmem-plain,memdev=3Divshmem \
-            -object memory-backend-file,id=3Divshmem,share=3Don,mem-path=3D=
-/dev/shm/looking-glass,size=3D32M \
-            -device virtio-serial-pci \
-            -device virtserialport,chardev=3Dspicechannel0,name=3Dcom.redha=
-t.spice.0 \
-            -chardev spicevmc,id=3Dspicechannel0,name=3Dvdagent \
-            -spice addr=3D127.0.0.1,port=3D5900,disable-ticketing
-
-  When the last four options are not present, audio works as expected.
-  This is with both a windows 10 guest and a windows 7 guest.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1772262/+subscriptions
+thanks
+-- PMM
