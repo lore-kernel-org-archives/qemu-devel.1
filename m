@@ -1,28 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44095)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45186)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fL56L-00089u-7X
-	for qemu-devel@nongnu.org; Tue, 22 May 2018 07:05:10 -0400
+	(envelope-from <cohuck@redhat.com>) id 1fL59l-0002AF-HQ
+	for qemu-devel@nongnu.org; Tue, 22 May 2018 07:08:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fL56K-00077y-0O
-	for qemu-devel@nongnu.org; Tue, 22 May 2018 07:05:09 -0400
-Received: from mail-oi0-x242.google.com ([2607:f8b0:4003:c06::242]:45213)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fL56J-00077l-Rv
-	for qemu-devel@nongnu.org; Tue, 22 May 2018 07:05:07 -0400
-Received: by mail-oi0-x242.google.com with SMTP id b130-v6so15792481oif.12
-	for <qemu-devel@nongnu.org>; Tue, 22 May 2018 04:05:07 -0700 (PDT)
+	(envelope-from <cohuck@redhat.com>) id 1fL59g-0000CQ-La
+	for qemu-devel@nongnu.org; Tue, 22 May 2018 07:08:41 -0400
+Date: Tue, 22 May 2018 13:08:28 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20180522130828.0f3b19c9.cohuck@redhat.com>
+In-Reply-To: <20180522104000.9044-2-peter.maydell@linaro.org>
+References: <20180522104000.9044-1-peter.maydell@linaro.org>
+	<20180522104000.9044-2-peter.maydell@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <20180518114424.18054-2-alex.bennee@linaro.org>
-References: <20180518114424.18054-1-alex.bennee@linaro.org>
-	<20180518114424.18054-2-alex.bennee@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 22 May 2018 12:04:46 +0100
-Message-ID: <CAFEAcA9=gD31xOyvEQ-0-3f5p_Z8PQpOySpxB3fzcpWNZyeiiw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 1/2] target/arm: support reading of
- CNT[VCT|FRQ]_EL0 from user-space
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 1/5] qapi: Change "since 2.13" annotations
+ to "since 3.0"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,80 +24,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
-Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-devel@nongnu.org, patches@linaro.org, "Michael S. Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Christian Borntraeger <borntraeger@de.ibm.com>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, qemu-ppc@nongnu.org, qemu-s390x@nongnu.org
 
-On 18 May 2018 at 12:44, Alex Benn=C3=A9e <alex.bennee@linaro.org> wrote:
-> Since kernel commit a86bd139f2 (arm64: arch_timer: Enable CNTVCT_EL0
-> trap..) user-space has been able to read these system registers. As we
-> can't use QEMUTimer's in linux-user mode we just directly call
-> cpu_get_clock().
->
-> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
->
+On Tue, 22 May 2018 11:39:56 +0100
+Peter Maydell <peter.maydell@linaro.org> wrote:
+
+> We're going to make the next release be 3.0, not 2.13; change
+> the annotations in our json appropriately.
+> 
+> Changes produced with
+>   sed -i -e 's/2\.13/3.0/g' qapi/*.json
+> 
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 > ---
-> v2
->   - include CNTFRQ_EL0 for PL0_R only
-> ---
->  target/arm/helper.c | 27 ++++++++++++++++++++++++---
->  1 file changed, 24 insertions(+), 3 deletions(-)
->
-> diff --git a/target/arm/helper.c b/target/arm/helper.c
-> index db8bbe52a6..39098a15bf 100644
-> --- a/target/arm/helper.c
-> +++ b/target/arm/helper.c
-> @@ -2135,11 +2135,32 @@ static const ARMCPRegInfo generic_timer_cp_reginf=
-o[] =3D {
->  };
->
->  #else
-> -/* In user-mode none of the generic timer registers are accessible,
-> - * and their implementation depends on QEMU_CLOCK_VIRTUAL and qdev gpio =
-outputs,
-> - * so instead just don't register any of them.
-> +
-> +/* In user-mode most of the generic timer registers are inaccessible
-> + * however modern kernels (4.12+) allow access to cntvct_el0
->   */
-> +
-> +static uint64_t gt_virt_cnt_read(CPUARMState *env, const ARMCPRegInfo *r=
-i)
-> +{
-> +    /* Currently we have no support for QEMUTimer in linux-user so we
-> +     * can't call gt_get_countervalue(env), instead we directly
-> +     * call the lower level functions.
-> +     */
-> +    return cpu_get_clock() / GTIMER_SCALE;
-> +}
-> +
->  static const ARMCPRegInfo generic_timer_cp_reginfo[] =3D {
-> +    { .name =3D "CNTFRQ_EL0", .state =3D ARM_CP_STATE_AA64,
-> +      .opc0 =3D 3, .opc1 =3D 3, .crn =3D 14, .crm =3D 0, .opc2 =3D 0,
-> +      .access =3D PL0_R /* no PL1_RW in linux-user */,
-> +      .fieldoffset =3D offsetof(CPUARMState, cp15.c14_cntfrq),
-> +      .resetvalue =3D (1000 * 1000 * 1000) / GTIMER_SCALE,
+>  qapi/block-core.json |  4 ++--
+>  qapi/common.json     |  2 +-
+>  qapi/migration.json  | 16 ++++++++--------
+>  qapi/misc.json       |  4 ++--
+>  qapi/net.json        |  2 +-
+>  qapi/ui.json         |  2 +-
+>  6 files changed, 15 insertions(+), 15 deletions(-)
+> 
 
-You might as well just make this be .type =3D ARM_CP_CONST,
-since the CPU state field can never change.
+> diff --git a/qapi/misc.json b/qapi/misc.json
+> index f5988cc0b5..99bcaacd62 100644
+> --- a/qapi/misc.json
+> +++ b/qapi/misc.json
+> @@ -558,11 +558,11 @@
+>  # @props: properties describing to which node/socket/core/thread
+>  #         virtual CPU belongs to, provided if supported by board
+>  #
+> -# @arch: base architecture of the cpu; deprecated since 2.13.0 in favor
+> +# @arch: base architecture of the cpu; deprecated since 3.0.0 in favor
 
-Also, perhaps NANOSECONDS_PER_SECOND / GTIMER_SCALE.)
+Should this one use 3.0 instead of 3.0.0?
 
-> +    },
-> +    { .name =3D "CNTVCT_EL0", .state =3D ARM_CP_STATE_AA64,
-> +      .opc0 =3D 3, .opc1 =3D 3, .crn =3D 14, .crm =3D 0, .opc2 =3D 2,
-> +      .access =3D PL0_R, .type =3D ARM_CP_NO_RAW | ARM_CP_IO,
-> +      .readfn =3D gt_virt_cnt_read,
-> +    },
->      REGINFO_SENTINEL
->  };
+>  #        of @target
+>  #
+>  # @target: the QEMU system emulation target, which determines which
+> -#          additional fields will be listed (since 2.13)
+> +#          additional fields will be listed (since 3.0)
+>  #
+>  # Since: 2.12
+>  #
 
-Do we need to make the 32-bit registers accessible to linux-user
-processes too?
+Anyway,
 
-(Incidentally, another thing along these lines we should probably
-look at is that I think that newer kernels emulate ID register
-accesses from EL0, so we should do something to make those
-registers work too.)
-
-thanks
--- PMM
+Reviewed-by: Cornelia Huck <cohuck@redhat.com>
