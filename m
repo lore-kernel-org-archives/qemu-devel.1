@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33375)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33584)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1fLB6d-0002Ly-Pr
-	for qemu-devel@nongnu.org; Tue, 22 May 2018 13:29:52 -0400
+	(envelope-from <rth7680@gmail.com>) id 1fLB7E-0002pQ-0T
+	for qemu-devel@nongnu.org; Tue, 22 May 2018 13:30:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1fLB6Z-0004Mx-Rt
-	for qemu-devel@nongnu.org; Tue, 22 May 2018 13:29:51 -0400
+	(envelope-from <rth7680@gmail.com>) id 1fLB7D-0004ic-9T
+	for qemu-devel@nongnu.org; Tue, 22 May 2018 13:30:28 -0400
 Sender: Richard Henderson <rth7680@gmail.com>
 References: <20180521140402.23318-1-peter.maydell@linaro.org>
-	<20180521140402.23318-13-peter.maydell@linaro.org>
+	<20180521140402.23318-14-peter.maydell@linaro.org>
 From: Richard Henderson <rth@twiddle.net>
-Message-ID: <c3b76288-a06a-96df-368a-814a4087d1cc@twiddle.net>
-Date: Tue, 22 May 2018 10:29:44 -0700
+Message-ID: <a8bcf03c-3132-127d-741f-fcb6472b0bc9@twiddle.net>
+Date: Tue, 22 May 2018 10:30:16 -0700
 MIME-Version: 1.0
-In-Reply-To: <20180521140402.23318-13-peter.maydell@linaro.org>
+In-Reply-To: <20180521140402.23318-14-peter.maydell@linaro.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 12/27] Make flatview_do_translate() take a
- MemTxAttrs argument
+Subject: Re: [Qemu-devel] [PATCH 13/27] Make address_space_translate_iommu
+ take a MemTxAttrs argument
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,7 +31,7 @@ Cc: patches@linaro.org, Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?Q?Alex_Benn
 
 On 05/21/2018 07:03 AM, Peter Maydell wrote:
 > As part of plumbing MemTxAttrs down to the IOMMU translate method,
-> add MemTxAttrs as an argument to flatview_do_translate().
+> add MemTxAttrs as an argument to address_space_translate_iommu().
 > 
 > Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 > ---
