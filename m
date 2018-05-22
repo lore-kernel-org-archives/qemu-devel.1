@@ -1,28 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39213)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39276)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <crosa@redhat.com>) id 1fLDId-0003DQ-V7
-	for qemu-devel@nongnu.org; Tue, 22 May 2018 15:50:25 -0400
+	(envelope-from <paolo.bonzini@gmail.com>) id 1fLDJ3-0003UZ-36
+	for qemu-devel@nongnu.org; Tue, 22 May 2018 15:50:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <crosa@redhat.com>) id 1fLDIa-0001LC-6H
-	for qemu-devel@nongnu.org; Tue, 22 May 2018 15:50:24 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:39860 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <crosa@redhat.com>) id 1fLDIa-0001KS-0h
-	for qemu-devel@nongnu.org; Tue, 22 May 2018 15:50:20 -0400
-References: <a220810d5e1bcdfb789fbe1b2972550a311fa933.1526668271.git.alistair.francis@wdc.com>
-	<20180521031620.GE17725@lemon.usersys.redhat.com>
-	<CAKmqyKNJk2SbjXO3kR04u=xx8wCpoAjMjCC-m01=8PnPH2eoGQ@mail.gmail.com>
-	<07cc80b5-e25f-052c-bae9-7d948774e1af@amsat.org>
-From: Cleber Rosa <crosa@redhat.com>
-Message-ID: <69644776-0a9b-c7a8-a399-0454e82b683c@redhat.com>
-Date: Tue, 22 May 2018 15:50:18 -0400
-MIME-Version: 1.0
-In-Reply-To: <07cc80b5-e25f-052c-bae9-7d948774e1af@amsat.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 1/1] tests/docker: Add a Avocado Docker
- test
+	(envelope-from <paolo.bonzini@gmail.com>) id 1fLDIz-0001Re-4q
+	for qemu-devel@nongnu.org; Tue, 22 May 2018 15:50:49 -0400
+Received: from mail-pl0-x242.google.com ([2607:f8b0:400e:c01::242]:46477)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
+	id 1fLDIy-0001RS-MK
+	for qemu-devel@nongnu.org; Tue, 22 May 2018 15:50:44 -0400
+Received: by mail-pl0-x242.google.com with SMTP id 30-v6so11506499pld.13
+	for <qemu-devel@nongnu.org>; Tue, 22 May 2018 12:50:44 -0700 (PDT)
+Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Date: Tue, 22 May 2018 21:50:38 +0200
+Message-Id: <20180522195038.25280-1-pbonzini@redhat.com>
+Subject: [Qemu-devel] [PATCH RFC] hw: make virtio devices configurable via
+ default-configs/
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,217 +26,271 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Alistair Francis <alistair23@gmail.com>, Fam Zheng <famz@redhat.com>
-Cc: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, Alistair Francis <alistair.francis@wdc.com>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Amador Pahim <amador@pahim.org>, Lucas Meneghel Rodrigues <lookkas@gmail.com>
+To: qemu-devel@nongnu.org
+Cc: thuth@redhat.com, ehabkost@redhat.com
 
+This is only half of the work, because the proxy devices (virtio-*-pci,
+virtio-*-ccw, etc.) are still included unconditionally.  It is still a
+move in the right direction.
 
+Based-on: <20180522194943.24871-1-pbonzini@redhat.com>
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+---
+ default-configs/arm-softmmu.mak     |  1 +
+ default-configs/hppa-softmmu.mak    |  2 --
+ default-configs/pci.mak             |  4 +---
+ default-configs/riscv32-softmmu.mak |  4 ++--
+ default-configs/riscv64-softmmu.mak |  4 ++--
+ default-configs/s390x-softmmu.mak   |  5 +----
+ default-configs/virtio.mak          | 14 ++++++++++++++
+ hw/9pfs/Makefile.objs               |  6 ++++--
+ hw/block/Makefile.objs              |  6 ++----
+ hw/char/Makefile.objs               |  2 +-
+ hw/display/Makefile.objs            |  4 ++--
+ hw/input/Makefile.objs              |  6 +++---
+ hw/net/Makefile.objs                |  2 +-
+ hw/scsi/Makefile.objs               |  2 +-
+ hw/virtio/Makefile.objs             | 16 +++++++++-------
+ 15 files changed, 44 insertions(+), 34 deletions(-)
+ create mode 100644 default-configs/virtio.mak
 
-On 05/21/2018 07:32 PM, Philippe Mathieu-Daud=C3=A9 wrote:
-> On 05/21/2018 07:33 PM, Alistair Francis wrote:
->> On Sun, May 20, 2018 at 8:16 PM, Fam Zheng <famz@redhat.com> wrote:
->>> On Fri, 05/18 11:34, Alistair Francis wrote:
->>>> Avocado is not trivial to setup on non-Fedora systems. To simplfying
->>>> future testing add a docker test image that runs Avocado tests.
->>>>
->>>> Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
->>>> ---
->>>> v2:
->>>>  - Add a seperate fedora-avocado Docker image
->>>>  - Move the avocado vt-bootstrap into the Docker file
->>>>
->>>>  tests/docker/Makefile.include                 |  1 +
->>>>  .../docker/dockerfiles/fedora-avocado.docker  | 25 ++++++++++++++++=
+diff --git a/default-configs/arm-softmmu.mak b/default-configs/arm-softmmu.mak
+index dd29e741c2..8ba2558b36 100644
+--- a/default-configs/arm-softmmu.mak
++++ b/default-configs/arm-softmmu.mak
+@@ -41,6 +41,7 @@ CONFIG_USB=y
+ CONFIG_USB_MUSB=y
+ CONFIG_USB_EHCI_SYSBUS=y
+ CONFIG_PLATFORM_BUS=y
++CONFIG_VIRTIO_MMIO=y
+ 
+ CONFIG_ARM11MPCORE=y
+ CONFIG_A9MPCORE=y
+diff --git a/default-configs/hppa-softmmu.mak b/default-configs/hppa-softmmu.mak
+index 013e5f046f..4badc0521e 100644
+--- a/default-configs/hppa-softmmu.mak
++++ b/default-configs/hppa-softmmu.mak
+@@ -4,8 +4,6 @@ CONFIG_SERIAL=y
+ CONFIG_SERIAL_ISA=y
+ CONFIG_ISA_BUS=y
+ CONFIG_I8259=y
+-CONFIG_VIRTIO_PCI=$(CONFIG_PCI)
+-CONFIG_VIRTIO=y
+ CONFIG_E1000_PCI=y
+ CONFIG_IDE_ISA=y
+ CONFIG_IDE_CMD646=y
+diff --git a/default-configs/pci.mak b/default-configs/pci.mak
+index 163dd814c7..de53d20ac6 100644
+--- a/default-configs/pci.mak
++++ b/default-configs/pci.mak
+@@ -2,7 +2,7 @@ CONFIG_PCI=y
+ # For now, CONFIG_IDE_CORE requires ISA, so we enable it here
+ CONFIG_ISA_BUS=y
+ CONFIG_VIRTIO_PCI=y
+-CONFIG_VIRTIO=y
++include virtio.mak
+ CONFIG_USB_UHCI=y
+ CONFIG_USB_OHCI=y
+ CONFIG_USB_EHCI=y
+@@ -46,5 +46,3 @@ CONFIG_VGA=y
+ CONFIG_VGA_PCI=y
+ CONFIG_IVSHMEM_DEVICE=$(CONFIG_IVSHMEM)
+ CONFIG_ROCKER=y
+-CONFIG_VHOST_USER_SCSI=$(call land,$(CONFIG_VHOST_USER),$(CONFIG_LINUX))
+-CONFIG_VHOST_USER_BLK=$(call land,$(CONFIG_VHOST_USER),$(CONFIG_LINUX))
+diff --git a/default-configs/riscv32-softmmu.mak b/default-configs/riscv32-softmmu.mak
+index 9159a4a8af..20e670d99c 100644
+--- a/default-configs/riscv32-softmmu.mak
++++ b/default-configs/riscv32-softmmu.mak
+@@ -1,5 +1,5 @@
+ # Default configuration for riscv-softmmu
+ 
+ CONFIG_SERIAL=y
+-CONFIG_VIRTIO=y
+-CONFIG_SCSI=y
++CONFIG_VIRTIO_MMIO=y
++include virtio.mak
+diff --git a/default-configs/riscv64-softmmu.mak b/default-configs/riscv64-softmmu.mak
+index 9159a4a8af..20e670d99c 100644
+--- a/default-configs/riscv64-softmmu.mak
++++ b/default-configs/riscv64-softmmu.mak
+@@ -1,5 +1,5 @@
+ # Default configuration for riscv-softmmu
+ 
+ CONFIG_SERIAL=y
+-CONFIG_VIRTIO=y
+-CONFIG_SCSI=y
++CONFIG_VIRTIO_MMIO=y
++include virtio.mak
+diff --git a/default-configs/s390x-softmmu.mak b/default-configs/s390x-softmmu.mak
+index 729033b25a..d6b67d50f0 100644
+--- a/default-configs/s390x-softmmu.mak
++++ b/default-configs/s390x-softmmu.mak
+@@ -1,9 +1,6 @@
+ CONFIG_PCI=y
+ CONFIG_VIRTIO_PCI=$(CONFIG_PCI)
+-CONFIG_VHOST_USER_SCSI=$(call land,$(CONFIG_VHOST_USER),$(CONFIG_LINUX))
+-CONFIG_VHOST_USER_BLK=$(call land,$(CONFIG_VHOST_USER),$(CONFIG_LINUX))
+-CONFIG_SCSI=y
+-CONFIG_VIRTIO=y
++include virtio.mak
+ CONFIG_SCLPCONSOLE=y
+ CONFIG_TERMINAL3270=y
+ CONFIG_S390_FLIC=y
+diff --git a/default-configs/virtio.mak b/default-configs/virtio.mak
+new file mode 100644
+index 0000000000..1304849018
+--- /dev/null
++++ b/default-configs/virtio.mak
+@@ -0,0 +1,14 @@
++CONFIG_VHOST_USER_SCSI=$(call land,$(CONFIG_VHOST_USER),$(CONFIG_LINUX))
++CONFIG_VHOST_USER_BLK=$(call land,$(CONFIG_VHOST_USER),$(CONFIG_LINUX))
++CONFIG_VIRTIO=y
++CONFIG_VIRTIO_9P=y
++CONFIG_VIRTIO_BALLOON=y
++CONFIG_VIRTIO_BLK=y
++CONFIG_VIRTIO_CRYPTO=y
++CONFIG_VIRTIO_GPU=y
++CONFIG_VIRTIO_INPUT=y
++CONFIG_VIRTIO_NET=y
++CONFIG_VIRTIO_RNG=y
++CONFIG_SCSI=y
++CONFIG_VIRTIO_SCSI=y
++CONFIG_VIRTIO_SERIAL=y
+diff --git a/hw/9pfs/Makefile.objs b/hw/9pfs/Makefile.objs
+index fd90b62900..e3fa673665 100644
+--- a/hw/9pfs/Makefile.objs
++++ b/hw/9pfs/Makefile.objs
+@@ -1,3 +1,4 @@
++ifeq ($(call lor,$(CONFIG_VIRTIO_9P),$(CONFIG_XEN)),y)
+ common-obj-y  = 9p.o 9p-util.o
+ common-obj-y += 9p-local.o 9p-xattr.o
+ common-obj-y += 9p-xattr-user.o 9p-posix-acl.o
+@@ -5,6 +6,7 @@ common-obj-y += coth.o cofs.o codir.o cofile.o
+ common-obj-y += coxattr.o 9p-synth.o
+ common-obj-$(CONFIG_OPEN_BY_HANDLE) +=  9p-handle.o
+ common-obj-y += 9p-proxy.o
+-common-obj-$(CONFIG_XEN) += xen-9p-backend.o
++endif
+ 
+-obj-$(CONFIG_VIRTIO) += virtio-9p-device.o
++common-obj-$(CONFIG_XEN) += xen-9p-backend.o
++obj-$(CONFIG_VIRTIO_9P) += virtio-9p-device.o
+diff --git a/hw/block/Makefile.objs b/hw/block/Makefile.objs
+index 4c19a583c8..53ce5751ae 100644
+--- a/hw/block/Makefile.objs
++++ b/hw/block/Makefile.objs
+@@ -11,8 +11,6 @@ common-obj-$(CONFIG_NVME_PCI) += nvme.o
+ 
+ obj-$(CONFIG_SH4) += tc58128.o
+ 
+-obj-$(CONFIG_VIRTIO) += virtio-blk.o
+-obj-$(CONFIG_VIRTIO) += dataplane/
+-ifeq ($(CONFIG_VIRTIO),y)
++obj-$(CONFIG_VIRTIO_BLK) += virtio-blk.o
++obj-$(CONFIG_VIRTIO_BLK) += dataplane/
+ obj-$(CONFIG_VHOST_USER_BLK) += vhost-user-blk.o
+-endif
+diff --git a/hw/char/Makefile.objs b/hw/char/Makefile.objs
+index 1b979100b7..b570531291 100644
+--- a/hw/char/Makefile.objs
++++ b/hw/char/Makefile.objs
+@@ -6,7 +6,7 @@ common-obj-$(CONFIG_PL011) += pl011.o
+ common-obj-$(CONFIG_SERIAL) += serial.o
+ common-obj-$(CONFIG_SERIAL_ISA) += serial-isa.o
+ common-obj-$(CONFIG_SERIAL_PCI) += serial-pci.o
+-common-obj-$(CONFIG_VIRTIO) += virtio-console.o
++common-obj-$(CONFIG_VIRTIO_SERIAL) += virtio-console.o
+ common-obj-$(CONFIG_XILINX) += xilinx_uartlite.o
+ common-obj-$(CONFIG_XEN) += xen_console.o
+ common-obj-$(CONFIG_CADENCE) += cadence_uart.o
+diff --git a/hw/display/Makefile.objs b/hw/display/Makefile.objs
+index 11321e466b..ee087490ff 100644
+--- a/hw/display/Makefile.objs
++++ b/hw/display/Makefile.objs
+@@ -35,8 +35,8 @@ obj-$(CONFIG_VGA) += vga.o
+ 
+ common-obj-$(CONFIG_QXL) += qxl.o qxl-logger.o qxl-render.o
+ 
+-obj-$(CONFIG_VIRTIO) += virtio-gpu.o virtio-gpu-3d.o
+-obj-$(CONFIG_VIRTIO_PCI) += virtio-gpu-pci.o
++obj-$(CONFIG_VIRTIO_GPU) += virtio-gpu.o virtio-gpu-3d.o
++obj-$(call land,$(CONFIG_VIRTIO_GPU),$(CONFIG_VIRTIO_PCI)) += virtio-gpu-pci.o
+ obj-$(CONFIG_VIRTIO_VGA) += virtio-vga.o
+ virtio-gpu.o-cflags := $(VIRGL_CFLAGS)
+ virtio-gpu.o-libs += $(VIRGL_LIBS)
+diff --git a/hw/input/Makefile.objs b/hw/input/Makefile.objs
+index 77e53e6883..c8b00f71ec 100644
+--- a/hw/input/Makefile.objs
++++ b/hw/input/Makefile.objs
+@@ -7,10 +7,10 @@ common-obj-y += ps2.o
+ common-obj-$(CONFIG_STELLARIS_INPUT) += stellaris_input.o
+ common-obj-$(CONFIG_TSC2005) += tsc2005.o
+ 
+-common-obj-$(CONFIG_VIRTIO) += virtio-input.o
+-common-obj-$(CONFIG_VIRTIO) += virtio-input-hid.o
++common-obj-$(CONFIG_VIRTIO_INPUT) += virtio-input.o
++common-obj-$(CONFIG_VIRTIO_INPUT) += virtio-input-hid.o
+ ifeq ($(CONFIG_LINUX),y)
+-common-obj-$(CONFIG_VIRTIO) += virtio-input-host.o
++common-obj-$(CONFIG_VIRTIO_INPUT) += virtio-input-host.o
+ endif
+ 
+ obj-$(CONFIG_MILKYMIST) += milkymist-softusb.o
+diff --git a/hw/net/Makefile.objs b/hw/net/Makefile.objs
+index ab22968641..fa461d4463 100644
+--- a/hw/net/Makefile.objs
++++ b/hw/net/Makefile.objs
+@@ -36,7 +36,7 @@ obj-$(CONFIG_MILKYMIST) += milkymist-minimac2.o
+ obj-$(CONFIG_PSERIES) += spapr_llan.o
+ obj-$(CONFIG_XILINX_ETHLITE) += xilinx_ethlite.o
+ 
+-obj-$(CONFIG_VIRTIO) += virtio-net.o
++obj-$(CONFIG_VIRTIO_NET) += virtio-net.o
+ obj-y += vhost_net.o
+ 
+ obj-$(CONFIG_ETSEC) += fsl_etsec/etsec.o fsl_etsec/registers.o \
+diff --git a/hw/scsi/Makefile.objs b/hw/scsi/Makefile.objs
+index b188f7242b..718b4c2a68 100644
+--- a/hw/scsi/Makefile.objs
++++ b/hw/scsi/Makefile.objs
+@@ -8,7 +8,7 @@ common-obj-$(CONFIG_ESP) += esp.o
+ common-obj-$(CONFIG_ESP_PCI) += esp-pci.o
+ obj-$(CONFIG_PSERIES) += spapr_vscsi.o
+ 
+-ifeq ($(CONFIG_VIRTIO),y)
++ifeq ($(CONFIG_VIRTIO_SCSI),y)
+ obj-y += virtio-scsi.o virtio-scsi-dataplane.o
+ obj-$(CONFIG_VHOST_SCSI) += vhost-scsi-common.o vhost-scsi.o
+ obj-$(CONFIG_VHOST_USER_SCSI) += vhost-scsi-common.o vhost-user-scsi.o
+diff --git a/hw/virtio/Makefile.objs b/hw/virtio/Makefile.objs
+index 765d363c1f..1b2799cfd8 100644
+--- a/hw/virtio/Makefile.objs
++++ b/hw/virtio/Makefile.objs
+@@ -1,15 +1,17 @@
+ ifeq ($(CONFIG_VIRTIO),y)
+-common-obj-y += virtio-rng.o
+-common-obj-$(CONFIG_VIRTIO_PCI) += virtio-pci.o
+ common-obj-y += virtio-bus.o
+-common-obj-y += virtio-mmio.o
++obj-y += virtio.o
 +
->>>>  tests/docker/test-avocado                     | 28 ++++++++++++++++=
-+++
->>>>  3 files changed, 54 insertions(+)
->>>>  create mode 100644 tests/docker/dockerfiles/fedora-avocado.docker
->>>>  create mode 100755 tests/docker/test-avocado
->>>>
->>>> diff --git a/tests/docker/Makefile.include b/tests/docker/Makefile.i=
-nclude
->>>> index ef1a3e62eb..0e3d108dde 100644
->>>> --- a/tests/docker/Makefile.include
->>>> +++ b/tests/docker/Makefile.include
->>>> @@ -60,6 +60,7 @@ docker-image-debian-ppc64el-cross: docker-image-de=
-bian9
->>>>  docker-image-debian-s390x-cross: docker-image-debian9
->>>>  docker-image-debian-win32-cross: docker-image-debian8-mxe
->>>>  docker-image-debian-win64-cross: docker-image-debian8-mxe
->>>> +docker-image-fedora-avocado: docker-image-fedora
->>>>  docker-image-travis: NOUSER=3D1
->>>>
->>>>  # Expand all the pre-requistes for each docker image and test combi=
-nation
->>>> diff --git a/tests/docker/dockerfiles/fedora-avocado.docker b/tests/=
-docker/dockerfiles/fedora-avocado.docker
->>>> new file mode 100644
->>>> index 0000000000..55b19eebbf
->>>> --- /dev/null
->>>> +++ b/tests/docker/dockerfiles/fedora-avocado.docker
->>>> @@ -0,0 +1,25 @@
->>>> +FROM qemu:fedora
->>>> +
->>>> +ENV PACKAGES \
->>>> +    libvirt-devel \
->>>> +    nc \
->>>> +    python-avocado \
-
-python-avocado is a "Provides" of python2-avocado, but that may may go
-away soon (as soon as Fedora 29).  I'd recommend using python2-avocado,
-which is the proper package name available on Fedora.
-
->>>> +    python2-devel python3-devel \
->>>> +    qemu-kvm \
->>>> +    tcpdump \
->>>> +    xz
->>>> +ENV PIP_PACKAGES \
->>>> +    avocado-qemu \
-
-+CC: Amador Pahim
-
-This pip package was created by Amador Pahim, but was intended for demo
-purposes only.  Upon finding about this, he (cc'ed here) said that the
-package is going to be removed to avoid further confusion.
-
-BTW, the intention is to have this supporting code for QEMU tests in the
-QEMU tree itself.  Myself and Eduardo are working on a new version of
-that supporting code.  Also, based on what I see on the test-avocado
-file, this code is not needed at this point.
-
->>>> +    avocado-framework-plugin-runner-remote \
->>>> +    avocado-framework-plugin-runner-vm \
-
-These two plugins are only needed if you intend to run tests on remote
-machines.  Given "test-avocado" is not making use of those features,
-there's no need to install them.
-
-As a side note, plugins are also available on Fedora as RPM packages, so
-if I failed to understand the requirements for these plugins here, they
-could still be installed as the python2-avocado-plugins-runner-remote
-and python2-avocado-plugins-runner-vm RPM packages.
-
->>>> +    avocado-framework-plugin-vt
->>>> +
-
-+CC: Lucas Rodrigues
-
-This is a pip package created by Lucas Rodrigues, and this code is
-certainly used in the "test-avocado" file.  He told me he's using it to
-run Avocado-VT tests in a venv on Ubuntu, Amazon Linux, etc, and he's
-willing to maintain and update it.
-
->>>> +ENV QEMU_CONFIGURE_OPTS --python=3D/usr/bin/python3
-
-OK, "python3-avocado" is not yet available on Fedora, because it still
-tracks the 52.x (LTS) series.  So, if Python 3 is the version chosen, it
-maybe a good idea to remove "python-avocado" from "PACKAGES" completely
-and use "avocado-framework" instead on "PIP_PACKAGES".
-
->>>
->>> I think this is inherited from qemu:fedora, no?
->>
->> It is, I have removed it.
->>
->>>
->>>> +
->>>> +RUN dnf install -y $PACKAGES
->>>> +RUN pip install $PIP_PACKAGES
->>>> +RUN avocado vt-bootstrap --yes-to-all --vt-type qemu
->>>> +
->>>> +RUN rpm -q $PACKAGES | sort > /packages.txt
->>>
->>> Can you keep the parent image's list with ">>" or appending to the ol=
-d $PACKAGES
->>> in the above "ENV" directive?
->>>
->>>> +
->>>> +ENV FEATURES mingw clang pyyaml asan avocado
->>>
->>> Similarly, is it possible to append to the parent list instead of ove=
-rriding?
->>
->> I have changed both of these to append to the original variables.
->=20
-> Feel free to add my R-b then:
-> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
->=20
-> I'll wait your respin to try again, hoping I got my proxy issues solved=
-.
->=20
->>>
->>>> diff --git a/tests/docker/test-avocado b/tests/docker/test-avocado
->>>> new file mode 100755
->>>> index 0000000000..40474db2ce
->>>> --- /dev/null
->>>> +++ b/tests/docker/test-avocado
->>>> @@ -0,0 +1,28 @@
->>>> +#!/bin/bash -e
->>>> +#
->>>> +# Avocado tests on Fedora, as these are a real pain on Debian syste=
-ms
->>>
->>> Shouldn't pip packages work just well on Debian too? What are the pai=
-n?
->>> (Cc'ing Cleber who may want to know this).
->>
->> There is no debian package at the moment.
->>
-
-That's why Fam said *pip* packages.  In my experience with pip packages
-on Debian:
-
- * avocado-framework: installation and general usage works well.  Found
-one issue though when running on containers, though, with an easy
-workaround[1]
-
- * avocado-framework-plugins-vt: currently at version 57.x, and when
-used outside of venvs, doesn't get the "test-providers" directory
-right[2].  Same happened with latest master (using pip install -e
-git+https://github.com/avocado-framework/avocado-vt.git#egg=3Davocado-plu=
-gins-vt)
-
-[1] -
-https://trello.com/c/yEH8ixps/1328-avocado-crashes-on-systems-without-les=
-s
-
-[2] -
-https://trello.com/c/0BZZE4CR/1329-avocado-vt-bootstrap-from-pip-package-=
-fails-to-find-test-providers-dir
-
-- Cleber.
-
->> Alistair
->>
->>>
->>> Fam
->>>
->>>> +#
->>>> +# Copyright (c) 2018 Western Digital.
->>>> +#
->>>> +# Authors:
->>>> +#  Alistair Francis <alistair.francis@wdc.com>
->>>> +#
->>>> +# This work is licensed under the terms of the GNU GPL, version 2
->>>> +# or (at your option) any later version. See the COPYING file in
->>>> +# the top-level directory.
->>>> +#
->>>> +# Run this test: NOUSER=3D1 make docker-test-avocado@fedora-avocado
->>>> +
->>>> +. common.rc
->>>> +
->>>> +requires avocado
->>>> +
->>>> +cd "$BUILD_DIR"
->>>> +
->>>> +DEF_TARGET_LIST=3D"x86_64-softmmu"
->>>> +TARGET_LIST=3D${TARGET_LIST:-$DEF_TARGET_LIST} \
->>>> +build_qemu
->>>> +install_qemu
->>>> +
->>>> +export PATH=3D"${PATH}:$(pwd)"
->>>> +avocado run boot --vt-qemu-bin ./x86_64-softmmu/qemu-system-x86_64
->>>> --
->>>> 2.17.0
->>>>
->=20
++common-obj-$(CONFIG_VIRTIO_RNG) += virtio-rng.o
++common-obj-$(CONFIG_VIRTIO_PCI) += virtio-pci.o
++common-obj-$(CONFIG_VIRTIO_MMIO) += virtio-mmio.o
++obj-$(CONFIG_VIRTIO_BALLOON) += virtio-balloon.o
++obj-$(CONFIG_VIRTIO_CRYPTO) += virtio-crypto.o
++obj-$(call land,$(CONFIG_VIRTIO_CRYPTO),$(CONFIG_VIRTIO_PCI)) += virtio-crypto-pci.o
+ 
+-obj-y += virtio.o virtio-balloon.o 
+ obj-$(CONFIG_LINUX) += vhost.o vhost-backend.o vhost-user.o
+ obj-$(CONFIG_VHOST_VSOCK) += vhost-vsock.o
+-obj-y += virtio-crypto.o
+-obj-$(CONFIG_VIRTIO_PCI) += virtio-crypto-pci.o
+ endif
+ 
+-common-obj-$(call lnot,$(CONFIG_LINUX)) += vhost-stub.o
++common-obj-$(call lnot,$(call land,$(CONFIG_VIRTIO),$(CONFIG_LINUX))) += vhost-stub.o
+ common-obj-$(CONFIG_ALL) += vhost-stub.o
+-- 
+2.17.0
