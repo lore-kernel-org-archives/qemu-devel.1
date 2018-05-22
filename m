@@ -1,27 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38840)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39170)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1fLFIH-0002cL-M2
-	for qemu-devel@nongnu.org; Tue, 22 May 2018 17:58:10 -0400
+	(envelope-from <lersek@redhat.com>) id 1fLFKL-0003O6-9f
+	for qemu-devel@nongnu.org; Tue, 22 May 2018 18:00:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1fLFIE-0008Qg-K8
-	for qemu-devel@nongnu.org; Tue, 22 May 2018 17:58:09 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:38156 helo=mx1.redhat.com)
+	(envelope-from <lersek@redhat.com>) id 1fLFKI-0001A8-9Y
+	for qemu-devel@nongnu.org; Tue, 22 May 2018 18:00:17 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:37624 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1fLFIE-0008QF-Ep
-	for qemu-devel@nongnu.org; Tue, 22 May 2018 17:58:06 -0400
+	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1fLFKI-00019t-5t
+	for qemu-devel@nongnu.org; Tue, 22 May 2018 18:00:14 -0400
 References: <1526801333-30613-1-git-send-email-whois.zihan.yang@gmail.com>
 	<1526801333-30613-4-git-send-email-whois.zihan.yang@gmail.com>
 	<ef3fc85d-7726-c888-e8ca-9dfae1b908d3@gmail.com>
 	<17a3765f-b835-2d45-e8b9-ffd4aff909f9@redhat.com>
 	<cbdfe0d6-f071-3560-009d-3bbdde12b33c@gmail.com>
 	<f71a8c61-a0d7-6ebc-62ad-3dab8b9f8e5a@redhat.com>
-	<20180522151732.36122156@w520.home>
-	<20180523001822-mutt-send-email-mst@kernel.org>
+	<20180522234410-mutt-send-email-mst@kernel.org>
+	<20180522153659.2e33fbe0@w520.home>
+	<20180523004236-mutt-send-email-mst@kernel.org>
+	<20180522154741.3939d1e0@w520.home>
 From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <8fdd9ce2-991f-301d-2a95-0f8e35bb2b9b@redhat.com>
-Date: Tue, 22 May 2018 23:58:02 +0200
+Message-ID: <fc603491-7c41-e862-a583-2bae6f165b5a@redhat.com>
+Date: Wed, 23 May 2018 00:00:04 +0200
 MIME-Version: 1.0
-In-Reply-To: <20180523001822-mutt-send-email-mst@kernel.org>
+In-Reply-To: <20180522154741.3939d1e0@w520.home>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -35,40 +37,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>, Alex Williamson <alex.williamson@redhat.com>
-Cc: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Zihan Yang <whois.zihan.yang@gmail.com>, qemu-devel@nongnu.org, Wei Huang <wei@redhat.com>, Drew Jones <drjones@redhat.com>, Eric Auger <eauger@redhat.com>, Igor Mammedov <imammedo@redhat.com>
+To: Alex Williamson <alex.williamson@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Zihan Yang <whois.zihan.yang@gmail.com>, qemu-devel@nongnu.org, Igor Mammedov <imammedo@redhat.com>, Eric Auger <eauger@redhat.com>, Drew Jones <drjones@redhat.com>, Wei Huang <wei@redhat.com>
 
-On 05/22/18 23:22, Michael S. Tsirkin wrote:
-> On Tue, May 22, 2018 at 03:17:32PM -0600, Alex Williamson wrote:
->> On Tue, 22 May 2018 21:51:47 +0200
->> Laszlo Ersek <lersek@redhat.com> wrote:
-
->>> But 64-bit is ill-partitioned and/or crowded too: first you have the
->>> cold-plugged >4GB DRAM (whose size the firmware can interrogate), then
->>> the hotplug DIMM area up to "etc/reserved-memory-end" (ditto), then the
->>> 64-bit PCI MMIO aperture (whose size the firmware decides itself,
->>> because QEMU cannot be asked about it presently). Placing the additional
->>> MMCFGs somewhere would need extending the total order between these
->>> things at the design level, more fw_cfg files, more sanity checks in
->>> platform code in the firmware, and, quite importantly, adding support to
->>> multiple discontiguous MMCFGs to core edk2 code.
->>
->> Hmm, we're doing something wrong if we can't figure out some standards
->> within QEMU for placing per domain 64-bit MMIO and MMCFG ranges.
+On 05/22/18 23:47, Alex Williamson wrote:
+> On Wed, 23 May 2018 00:44:22 +0300
+> "Michael S. Tsirkin" <mst@redhat.com> wrote:
 > 
-> I thought in this patch it is done by firmware.
+>> On Tue, May 22, 2018 at 03:36:59PM -0600, Alex Williamson wrote:
+>>> On Tue, 22 May 2018 23:58:30 +0300
+>>> "Michael S. Tsirkin" <mst@redhat.com> wrote:   
+>>>>
+>>>> It's not hard to think of a use-case where >256 devices
+>>>> are helpful, for example a nested virt scenario where
+>>>> each device is passed on to a different nested guest.
+>>>>
+>>>> But I think the main feature this is needed for is numa modeling.
+>>>> Guests seem to assume a numa node per PCI root, ergo we need more PCI
+>>>> roots.  
+>>>
+>>> But even if we have NUMA affinity per PCI host bridge, a PCI host
+>>> bridge does not necessarily imply a new PCIe domain.  
+>>
+>> What are you calling a PCIe domain?
+> 
+> Domain/segment
+> 
+> 0000:00:00.0
+> ^^^^ This
+> 
+> Isn't that the only reason we'd need a new MCFG section and the reason
+> we're limited to 256 buses?  Thanks,
 
-Sure, the firmware programs the exbar registers already, but it needs to
-rely on some information to figure out the values it should program.
-(Also, the information should not arrive in the form of *just* an ACPI
-table; that's too hard and/or too late to parse for the firmware.) Right
-now the "information" is a hard-coded constant that's known not to
-conflict with other parts.
+(Just to confirm: this matches my understanding of the thread as well.)
 
-Furthermore, I didn't highlight it earlier, but we can't go arbitrarily
-high -- if EPT is enabled, then the physical address width of the host
-CPU limits the guest-physical memory address space (incl. memory mapped
-devices).
-
-Thanks
 Laszlo
