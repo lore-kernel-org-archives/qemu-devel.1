@@ -1,28 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58303)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59208)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fL4CU-0003ZP-3R
-	for qemu-devel@nongnu.org; Tue, 22 May 2018 06:07:26 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1fL4GT-0004Vo-C1
+	for qemu-devel@nongnu.org; Tue, 22 May 2018 06:11:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fL4CT-00084L-9j
-	for qemu-devel@nongnu.org; Tue, 22 May 2018 06:07:26 -0400
-Received: from mail-oi0-x234.google.com ([2607:f8b0:4003:c06::234]:39437)
+	(envelope-from <peter.maydell@linaro.org>) id 1fL4GS-0001jI-EJ
+	for qemu-devel@nongnu.org; Tue, 22 May 2018 06:11:33 -0400
+Received: from mail-oi0-x22c.google.com ([2607:f8b0:4003:c06::22c]:41907)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fL4CT-00083z-5Y
-	for qemu-devel@nongnu.org; Tue, 22 May 2018 06:07:25 -0400
-Received: by mail-oi0-x234.google.com with SMTP id n65-v6so15674296oig.6
-	for <qemu-devel@nongnu.org>; Tue, 22 May 2018 03:07:25 -0700 (PDT)
+	id 1fL4GS-0001ir-9X
+	for qemu-devel@nongnu.org; Tue, 22 May 2018 06:11:32 -0400
+Received: by mail-oi0-x22c.google.com with SMTP id 11-v6so15674067ois.8
+	for <qemu-devel@nongnu.org>; Tue, 22 May 2018 03:11:32 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20180430103312.GH3249@redhat.com>
-References: <CAFEAcA-hha7jMSfPTdNEVKhuJr4nwAx4wKmEk5E9+j-JS4U14w@mail.gmail.com>
-	<20180430103312.GH3249@redhat.com>
+In-Reply-To: <alpine.DEB.2.10.1805211229070.4520@sstabellini-ThinkPad-X260>
+References: <alpine.DEB.2.10.1805211229070.4520@sstabellini-ThinkPad-X260>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 22 May 2018 11:07:04 +0100
-Message-ID: <CAFEAcA9gt50-7UR5XuR5DVrxLbsFx1hP=BDR2mjUOwjxDPwkdw@mail.gmail.com>
+Date: Tue, 22 May 2018 11:11:11 +0100
+Message-ID: <CAFEAcA-Fm3v-kJdRuj1zijXi1G4Qydw3H0BkOZg95agdCdCqOw@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] release retrospective, next release timing,
- numbering
+Subject: Re: [Qemu-devel] [PULL 00/15] xen-20180521-tag
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,21 +28,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>
+To: Stefano Stabellini <sstabellini@kernel.org>
+Cc: Stefan Hajnoczi <stefanha@gmail.com>, Stefan Hajnoczi <stefanha@redhat.com>, Anthony PERARD <anthony.perard@citrix.com>, "open list:X86" <xen-devel@lists.xenproject.org>, QEMU Developers <qemu-devel@nongnu.org>
 
-On 30 April 2018 at 11:33, Daniel P. Berrang=C3=A9 <berrange@redhat.com> wr=
-ote:
->  a) Bump major version once a year, so we'll have 3.0, 3.1, 3.3,
->     4.0, 4.1, 4.2, 5.0, ...etc  We missed the first release this
->     year, so we would only have 3.0 and 3.1 this year.
+On 21 May 2018 at 20:34, Stefano Stabellini <sstabellini@kernel.org> wrote:
+> The following changes since commit d32e41a1188e929cc0fb16829ce3736046951e39:
+>
+>   Merge remote-tracking branch 'remotes/famz/tags/docker-and-block-pull-request' into staging (2018-05-18 14:11:52 +0100)
+>
+> are available in the git repository at:
+>
+>
+>   http://xenbits.xenproject.org/git-http/people/sstabellini/qemu-dm.git tags/xen-20180521-tag
+>
+> for you to fetch changes up to f03df99f09ee0ca27ea2298a1b77438e7999044d:
+>
+>   xen_disk: be consistent with use of xendev and blkdev->xendev (2018-05-18 11:13:01 -0700)
+>
+> ----------------------------------------------------------------
+> Xen 2018/05/21
+>
 
-I realised we didn't really come to a conclusion in this discussion.
-I've reread the thread, and my proposal is to arbitrarily pick
-something which accords with my aesthetic preferences, which is
-this one that Dan suggests.
-
-That will make the next release be 3.0.0.
+Hi Stefano -- my scripts can't find this tag. Did you forget to push
+it, perhaps?
 
 thanks
 -- PMM
