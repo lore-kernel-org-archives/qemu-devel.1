@@ -1,27 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38198)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38528)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fL7ub-0004Ul-Ur
-	for qemu-devel@nongnu.org; Tue, 22 May 2018 10:05:19 -0400
+	(envelope-from <bounces@canonical.com>) id 1fL7vT-0005Er-7h
+	for qemu-devel@nongnu.org; Tue, 22 May 2018 10:06:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fL7uW-0005gN-56
-	for qemu-devel@nongnu.org; Tue, 22 May 2018 10:05:13 -0400
-Received: from mail-ot0-x242.google.com ([2607:f8b0:4003:c0f::242]:41313)
+	(envelope-from <bounces@canonical.com>) id 1fL7vR-0006MG-LQ
+	for qemu-devel@nongnu.org; Tue, 22 May 2018 10:06:07 -0400
+Received: from indium.canonical.com ([91.189.90.7]:47152)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fL7uW-0005gA-05
-	for qemu-devel@nongnu.org; Tue, 22 May 2018 10:05:08 -0400
-Received: by mail-ot0-x242.google.com with SMTP id t1-v6so21080663oth.8
-	for <qemu-devel@nongnu.org>; Tue, 22 May 2018 07:05:07 -0700 (PDT)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1fL7vR-0006Lq-FF
+	for qemu-devel@nongnu.org; Tue, 22 May 2018 10:06:05 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1fL7vQ-0007NF-MW
+	for <qemu-devel@nongnu.org>; Tue, 22 May 2018 14:06:04 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id A639F2E8030
+	for <qemu-devel@nongnu.org>; Tue, 22 May 2018 14:06:04 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20180503214437.2749.37878.stgit@gimli.home>
-References: <20180503213458.2749.28566.stgit@gimli.home>
-	<20180503214437.2749.37878.stgit@gimli.home>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 22 May 2018 15:04:46 +0100
-Message-ID: <CAFEAcA_sg_kpHGM+YGcziUCmqtsOcJ563mBqb3xvN0sMpz9XUA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v3 1/6] scripts/update-linux-headers:
- Update handling of __aligned_u64
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 22 May 2018 13:50:17 -0000
+From: Thomas Huth <1175513@bugs.launchpad.net>
+Reply-To: Bug 1175513 <1175513@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20130502091433.32599.11761.malonedeb@soybean.canonical.com>
+Message-Id: <152699701792.8181.16871619190313336731.launchpad@chaenomeles.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1175513] Re: Qemu 1.5-git gpu clock control
+ doesn`t work after guest reboot
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,42 +37,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alex Williamson <alex.williamson@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Eric Auger <eric.auger@redhat.com>, Peter Xu <peterx@redhat.com>, kvm-devel <kvm@vger.kernel.org>
+To: qemu-devel@nongnu.org
 
-On 3 May 2018 at 22:44, Alex Williamson <alex.williamson@redhat.com> wrote:
-> We'll currently replace any 'u64' with a 'uint64_t' including when
-> it's embedded in an '__aligned_u64', creating a '__aligned_uint64_t'
-> which doesn't exist.  Add another sed entry to find these and convert
-> them back to their original form.
->
-> Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
-> ---
->  scripts/update-linux-headers.sh |    1 +
->  1 file changed, 1 insertion(+)
->
-> diff --git a/scripts/update-linux-headers.sh b/scripts/update-linux-headers.sh
-> index a017b53d8765..dd74cc8d5223 100755
-> --- a/scripts/update-linux-headers.sh
-> +++ b/scripts/update-linux-headers.sh
-> @@ -56,6 +56,7 @@ cp_portable() {
->          -e 's/__s\([0-9][0-9]*\)/int\1_t/g' \
->          -e 's/__le\([0-9][0-9]*\)/uint\1_t/g' \
->          -e 's/__be\([0-9][0-9]*\)/uint\1_t/g' \
-> +        -e 's/__aligned_uint\([0-9][0-9]*\)_t/__aligned_u\1/g' \
->          -e 's/"\(input-event-codes\.h\)"/"standard-headers\/linux\/\1"/' \
->          -e 's/<linux\/\([^>]*\)>/"standard-headers\/linux\/\1"/' \
->          -e 's/__bitwise//' \
+** No longer affects: qemu
 
-Hi -- I just ran into this as well, but this fix looks odd. This
-bit of the script is supposed to generate portable headers,
-so we need to do something with __aligned_u64; we can't just
-leave it the way it is. We should presumably be turning it into
-some typedef which we have a definition of in the QEMU headers.
+** Project changed: linux =3D> qemu
 
-(That u\([0-9][0-9]*\) substitution is really broad; we should
-probably switch to using perl instead so we can use regexes that
-match on word-boundaries so we only change what we intend to.)
+** Changed in: qemu
+       Status: New =3D> Incomplete
 
-thanks
--- PMM
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1175513
+
+Title:
+  Qemu 1.5-git gpu clock control doesn`t work after guest reboot
+
+Status in QEMU:
+  Incomplete
+
+Bug description:
+  I run qemu from git with such command:
+
+  qemu-system-x86_64 -nodefaults -m 4096 -smp 8,cores=3D4,threads=3D2,socke=
+ts=3D1 -cpu 'kvm64' -device usb-mouse -M q35 -vga qxl -no-hpet -boot once=
+=3Dc,menu=3Don -device vfio-pci,host=3D02:00.0,x-vga=3Don \
+  -enable-kvm -monitor stdio -chardev socket,path=3D/tmp/qga.sock,server,no=
+wait,id=3Dqga0 -device virtio-serial -device virtserialport,chardev=3Dqga0,=
+name=3Dorg.qemu.guest_agent.0 -net nic,vlan=3D0,model=3De1000 -net tap,ifna=
+me=3Dtap0,script=3D/etc/guest-ifup -usb -device intel-hda -device hda-duple=
+x \
+  -drive file=3D'/home/<user>/qemu/win7',if=3Dnone,id=3Ddrive-virtio-disk0,=
+cache=3Dwriteback,aio=3Dnative,format=3Dqed,discard=3Don -device virtio-blk=
+-pci,drive=3Ddrive-virtio-disk0,id=3Dvirtio-disk \
+  -drive file=3D'/dev/sr0',if=3Dnone,id=3Ddrive-ide1-0-0,media=3Dcdrom,snap=
+shot=3Doff,format=3Draw -device ide-drive,bus=3Dide.1,unit=3D0,drive=3Ddriv=
+e-ide1-0-0,id=3Dide1-0-0 \
+  -spice port=3D5930,disable-ticketing
+
+  Before guest (Windows 7) reboot, videocard works in 3D mode with full
+  frequency. But after reboot videocard works in 3D only with powersafe
+  frequency. Then I must reboot host for recover gpu clock control.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1175513/+subscriptions
