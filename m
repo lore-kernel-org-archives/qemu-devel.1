@@ -1,21 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41924)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42409)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1fL89A-0002Lu-VK
-	for qemu-devel@nongnu.org; Tue, 22 May 2018 10:20:20 -0400
+	(envelope-from <eric.auger@redhat.com>) id 1fL8Bl-0003i3-Uf
+	for qemu-devel@nongnu.org; Tue, 22 May 2018 10:22:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1fL899-0005f1-Qx
-	for qemu-devel@nongnu.org; Tue, 22 May 2018 10:20:16 -0400
-Date: Tue, 22 May 2018 17:19:50 +0300
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20180522171112-mutt-send-email-mst@kernel.org>
-References: <20180518180440-mutt-send-email-mst@kernel.org>
-	<20180518170956.GI8615@redhat.com>
-	<20180522073555.peibbwoqvbor7nrs@sirius.home.kraxel.org>
+	(envelope-from <eric.auger@redhat.com>) id 1fL8Bl-0007Kk-2j
+	for qemu-devel@nongnu.org; Tue, 22 May 2018 10:22:57 -0400
+References: <20180521140402.23318-1-peter.maydell@linaro.org>
+	<20180521140402.23318-15-peter.maydell@linaro.org>
+	<47281818-f0cf-0ed1-c479-fbcaca5c5167@redhat.com>
+	<CAFEAcA-R9t4K488viYM9ipmfArA=ijMMJn+FD1wekPdAbNOHvQ@mail.gmail.com>
+	<595dcb89-3856-3755-e8db-7791c1374284@redhat.com>
+	<CAFEAcA8Eq+EvtL1JuqtHePWMLPdkHG9zzAh7Wkrw7sNYw8jzUQ@mail.gmail.com>
+From: Auger Eric <eric.auger@redhat.com>
+Message-ID: <baee90f4-2006-ed78-c052-b735145527d3@redhat.com>
+Date: Tue, 22 May 2018 16:22:48 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180522073555.peibbwoqvbor7nrs@sirius.home.kraxel.org>
-Subject: Re: [Qemu-devel] storing machine data in qcow images?
+In-Reply-To: <CAFEAcA8Eq+EvtL1JuqtHePWMLPdkHG9zzAh7Wkrw7sNYw8jzUQ@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 14/27] iommu: Add IOMMU index concept to
+ IOMMU API
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,51 +28,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>
-Cc: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>, kwolf@redhat.com, ehabkost@redhat.com, qemu-block@nongnu.org, qemu-devel@nongnu.org, mreitz@redhat.com, stefanha@redhat.com
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: "patches@linaro.org" <patches@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, Richard Henderson <rth@twiddle.net>
 
-On Tue, May 22, 2018 at 09:35:55AM +0200, Gerd Hoffmann wrote:
->   Hi,
-> 
-> > You must /sometimes/ supply the correct machine type.
-> > 
-> > It is quite dependent on the guest OS you have installed, and even
-> > just how the guest OS is configured.  In general Linux is very
-> > flexible and can adapt to a wide range of hardware, automatically
-> > detecting things as needed. It is possible for a sysadmin to build
-> > a Linux image in a way that would only work with I440FX, but I
-> > don't think it would be common to see that.
-> 
-> I think it would be pretty hard to actually build such an image.
-> 
-> The more critical thing for linux guests is the storage driver which
-> must be included into the initrd so the image can mount the root
-> filesystem.  And the firmware, bios vs. uefi is more critical than
-> pc vs. q35.
 
-I think we can start by finding a location to embed a string in a qcow
-image, add ability for qemu-img to set and get this string.  We can
-discuss how it's formatted separately.
 
-> > That said I'm not really convinced that using the qcow2 headers is
-> > a good plan. We have many disk image formats in common use, qcow2
-> > is just one. Even if the user provides the image in qcow2 format,
-> > that doesn't mean that mgmt apps actually store the qcow2 file.
+On 05/22/2018 04:19 PM, Peter Maydell wrote:
+> On 22 May 2018 at 15:11, Auger Eric <eric.auger@redhat.com> wrote:
+>> Hi Peter,
+>>
+>> On 05/22/2018 03:22 PM, Peter Maydell wrote:
+>>> How many substream IDs do we expect to see in practice?
+>>
+>> Spec says max 20 bits, matching the max size of the PASID
 > 
-> > I tend to think we'd be better looking at what we can do in the context
-> > of an existing standard like OVF rather than inventing something that
-> > only works with qcow2. I think it would need to be more expressive than
-> > just a single list of key,value pairs for each item.
-> 
-> Embed OVF metadata in the qcow2 image?
-> 
-> cheers,
->   Gerd
+> Right, but do we actually expect to see transactions from
+> devices that use the whole 2^20 possible values, or will
+> they in practice mostly use 1..5, or somethnig else?
 
-What would be helpful is if we could tell the user who wonders
-how to run an image "hey you probably want flags X,Y and Z".
-I can see how we could have an option to either stick
-a bit of XML there, or just some QEMU flags.
+An example given in the spec mentions 8.
 
--- 
-MST
+"An example would be a compute accelerator with 8 contexts that might
+each map to a different user process, but where the single device has
+common configuration meaning it must be assigned to a VM whole."
+
+Thanks
+
+Eric
+> 
+> thanks
+> -- PMM
+> 
