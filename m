@@ -1,34 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33223)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33235)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fL7bp-00072y-NK
-	for qemu-devel@nongnu.org; Tue, 22 May 2018 09:45:50 -0400
+	(envelope-from <bounces@canonical.com>) id 1fL7br-00073A-H7
+	for qemu-devel@nongnu.org; Tue, 22 May 2018 09:45:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fL7bl-0003lK-0w
-	for qemu-devel@nongnu.org; Tue, 22 May 2018 09:45:49 -0400
-Received: from indium.canonical.com ([91.189.90.7]:51098)
+	(envelope-from <bounces@canonical.com>) id 1fL7bl-0003lh-DL
+	for qemu-devel@nongnu.org; Tue, 22 May 2018 09:45:51 -0400
+Received: from indium.canonical.com ([91.189.90.7]:51122)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1fL7bk-0003kX-RO
-	for qemu-devel@nongnu.org; Tue, 22 May 2018 09:45:44 -0400
+	id 1fL7bl-0003kn-7e
+	for qemu-devel@nongnu.org; Tue, 22 May 2018 09:45:45 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1fL7bj-0008Hr-Q9
-	for <qemu-devel@nongnu.org>; Tue, 22 May 2018 13:45:43 +0000
+	id 1fL7bk-0008Hq-BB
+	for <qemu-devel@nongnu.org>; Tue, 22 May 2018 13:45:44 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id C39A52E8F39
-	for <qemu-devel@nongnu.org>; Tue, 22 May 2018 13:45:43 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id 5387F2E8029
+	for <qemu-devel@nongnu.org>; Tue, 22 May 2018 13:45:44 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Tue, 22 May 2018 13:33:58 -0000
-From: Thomas Huth <1404278@bugs.launchpad.net>
-Reply-To: Bug 1404278 <1404278@bugs.launchpad.net>
+Date: Tue, 22 May 2018 13:35:16 -0000
+From: Thomas Huth <1402755@bugs.launchpad.net>
+Reply-To: Bug 1402755 <1402755@bugs.launchpad.net>
 Sender: bounces@canonical.com
-References: <20141219153639.25009.84583.malonedeb@wampee.canonical.com>
-Message-Id: <152699603815.8523.4346946182504984444.malone@chaenomeles.canonical.com>
+References: <20141215165955.16357.80461.malonedeb@soybean.canonical.com>
+Message-Id: <152699611640.8990.983462651697056873.malone@chaenomeles.canonical.com>
 Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1404278] Re: tap connections not working on
- windows host
+Subject: [Qemu-devel] [Bug 1402755] Re: qemu-kvm: e1000 RX ring is filled
+ with partial-pkt of size 0
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -49,32 +49,89 @@ with the latest version of QEMU? Or could we close this ticket nowadays?
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1404278
+https://bugs.launchpad.net/bugs/1402755
 
 Title:
-  tap connections not working on windows host
+  qemu-kvm: e1000 RX ring is filled with partial-pkt of size 0
 
 Status in QEMU:
   Incomplete
 
 Bug description:
-  using latest qemu 2.2.0 64bit for windows host (installed from
-  qemu-w64-setup-20141210.exe obtained from http://qemu.weilnetz.de/w64/
-  ),OpenVPN 2.6.3-I601 64bit tap adapter named tap01 and calling qemu
-  using the following.
+  Hello,
+  We are using CentOS 6.5 with qemu-kvm-0.12.1.2-2.415 as a host of or VMs.
+  In the VM we use e1000 as the NIC emulation.
+  We've modified the e1000 driver to our needs. This modification start the=
+ RX engine while the RX ring is empty (RDH =3D=3D RDT)
+  and at a later stage we fill the RX descriptors with buffers. This scheme=
+ works well on intel chips and VMware.
+  What we observe in this setup is that from time to time the RX ring is fi=
+lled with "partial packets" of size 0 (meaning, DD bit is set,
+  No other status bits are set and packet size is also 0).
 
-  qemu-system-x86_64.exe -m 512 -net nic -net tap,ifname=3Dtap01 -hda
-  "c:\\data\\images\\test.img"
+  Looking at the e1000 RX routine in qemu-kvm you can observe the following=
+ flow:
+  1. A packet is avail for receive:
+  2. The routine checks for RCTL_EN - it is enabled
+  3. The routine checks that the RDH equal RDT (they are as the ring is emp=
+ty) but also checks if rxov is on (it is still off) so it doesn=E2=80=99t
+  Exit as it is supposed to.
+  4. The routine now updates the descriptor status with the DD bit (and vla=
+n which we don=E2=80=99t care)
+  5. The routine checks if a buffer address is not NULL (it is as NULL sinc=
+e we haven=E2=80=99t filled it yet) =E2=80=93 so is logs something.
+  6. The routine now updates the guest memory with this value (DD is 1) =
 
-  where the image contains a slackware 14.0 64bit install.
-  The tap is bridged with the real network adapter and the bridge is given =
-an ip of 10.1.1.41 (which works as the ip for the windows host). The tap ad=
-apter (in network connections) shows connected when the qemu vm is running.=
- inside the vm, the network is given an ip of 10.1.1.143 (the netmask and d=
-efault gateway are the same for the virtual and real pc).
-  fault.
-  The vm cannot see the rest of the local network or visa-versa. This used =
-to work in early (0.9 32bit) versions of qemu.
+  7. The routine updates the check_rxov flag in order to allow ovf check th=
+e next time around. =
+
+  (but ovf will not occur since in the next iteration RDH !=3D RDT)
+  8. The routine loops over all the descriptors with the NULL buffer (which=
+ is all our ring) and writes the DD bit
+  9. We get this endless partial packet problem we see.
+
+  qemu-kvm-0.12.1.2-2.415.el6_5.3/qemu-kvm-0.12.1.2/hw/e1000.c
+  static ssize_t
+  e1000_receive(VLANClientState *nc, const uint8_t *buf, size_t size)
+  {
+  : : :
+  if (!(s->mac_reg[RCTL] & E1000_RCTL_EN))
+  return -1;
+
+  : : :
+  do {
+  if (s->mac_reg[RDH] =3D=3D s->mac_reg[RDT] && s->check_rxov) {
+  set_ics(s, 0, E1000_ICS_RXO);
+  return -1;
+  }
+  base =3D ((uint64_t)s->mac_reg[RDBAH] << 32) + s->mac_reg[RDBAL] +
+  sizeof(desc) * s->mac_reg[RDH];
+  cpu_physical_memory_read(base, (void *)&desc, sizeof(desc));
+  desc.special =3D vlan_special;
+  desc.status |=3D (vlan_status | E1000_RXD_STAT_DD);
+  if (desc.buffer_addr) {
+  cpu_physical_memory_write(le64_to_cpu(desc.buffer_addr),
+  (void *)(buf + vlan_offset), size);
+  desc.length =3D cpu_to_le16(size);
+  desc.status |=3D E1000_RXD_STAT_EOP|E1000_RXD_STAT_IXSM;
+  } else // as per intel docs; skip descriptors with null buf addr
+  DBGOUT(RX, "Null RX descriptor!!\n");
+  cpu_physical_memory_write(base, (void *)&desc, sizeof(desc));
+
+  : : :
+  if (++s->mac_reg[RDH] * sizeof(desc) >=3D s->mac_reg[RDLEN])
+  s->mac_reg[RDH] =3D 0;
+  s->check_rxov =3D 1;
+  : : :
+  } while (desc.buffer_addr =3D=3D 0);
+  }
+
+  =
+
+  A workaround is to enable the RX machine only after the descriptor ring i=
+s filled for the first time.
+
+  Moti
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1404278/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/1402755/+subscriptions
