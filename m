@@ -1,34 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57040)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34239)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fKzaA-00070u-A2
-	for qemu-devel@nongnu.org; Tue, 22 May 2018 01:11:35 -0400
+	(envelope-from <whois.zihan.yang@gmail.com>) id 1fL0K7-0003m0-VV
+	for qemu-devel@nongnu.org; Tue, 22 May 2018 01:59:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fKza5-0002cC-ON
-	for qemu-devel@nongnu.org; Tue, 22 May 2018 01:11:34 -0400
-Received: from mail-qk0-x241.google.com ([2607:f8b0:400d:c09::241]:45230)
+	(envelope-from <whois.zihan.yang@gmail.com>) id 1fL0K6-0000wN-OV
+	for qemu-devel@nongnu.org; Tue, 22 May 2018 01:59:04 -0400
+Received: from mail-lf0-x231.google.com ([2a00:1450:4010:c07::231]:45771)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fKza5-0002bl-I4
-	for qemu-devel@nongnu.org; Tue, 22 May 2018 01:11:29 -0400
-Received: by mail-qk0-x241.google.com with SMTP id a8-v6so13604883qkj.12
-	for <qemu-devel@nongnu.org>; Mon, 21 May 2018 22:11:29 -0700 (PDT)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20180509060104.4458-1-f4bug@amsat.org>
-	<20180509060104.4458-4-f4bug@amsat.org>
-	<CAFEAcA8Qm_CQFGUbFNc27fyetggt6AjfhCXxZkU3fnbMibzLFw@mail.gmail.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <69558af9-33da-0524-844d-10d4b4fb2ee3@amsat.org>
-Date: Tue, 22 May 2018 02:11:08 -0300
+	(Exim 4.71) (envelope-from <whois.zihan.yang@gmail.com>)
+	id 1fL0K6-0000vp-FL
+	for qemu-devel@nongnu.org; Tue, 22 May 2018 01:59:02 -0400
+Received: by mail-lf0-x231.google.com with SMTP id w202-v6so27252936lff.12
+	for <qemu-devel@nongnu.org>; Mon, 21 May 2018 22:59:01 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA8Qm_CQFGUbFNc27fyetggt6AjfhCXxZkU3fnbMibzLFw@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v2 3/4] sdcard: Implement the UHS-I
- SWITCH_FUNCTION entries (Spec v3)
+In-Reply-To: <aa70021d-242e-5923-9e37-154a93d36e95@gmail.com>
+References: <1526801333-30613-1-git-send-email-whois.zihan.yang@gmail.com>
+	<1526801333-30613-2-git-send-email-whois.zihan.yang@gmail.com>
+	<aa70021d-242e-5923-9e37-154a93d36e95@gmail.com>
+From: Zihan Yang <whois.zihan.yang@gmail.com>
+Date: Tue, 22 May 2018 13:59:00 +0800
+Message-ID: <CAKwiv-hBJHbOdEBn-_oQodfOirFCyQVaUoswpns0TW_xMX8d=g@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [RFC 1/3] pci_expander_bridge: reserve enough mcfg
+ space for pxb host
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,106 +31,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>, Alistair Francis <alistair@alistair23.me>, QEMU Developers <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
 
-On 05/14/2018 12:38 PM, Peter Maydell wrote:
-> On 9 May 2018 at 07:01, Philippe Mathieu-Daudé <f4bug@amsat.org> wrote:
->> [based on a patch from Alistair Francis <alistair.francis@xilinx.com>
->>  from qemu/xilinx tag xilinx-v2015.2]
->> Signed-off-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
->> [PMD: rebased, changed magic by definitions, use stw_be_p, add tracing,
->>  check all functions in group are correct before setting the values]
->> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
->> ---
-> 
->> +    /* Bits 376-399: function (4 bits each group)
->> +     *
->> +     * Do not write the values back directly:
->> +     * Check everything first writing to 'tmpbuf'
->> +     */
->> +    data_p = tmpbuf;
-> 
-> You don't need a tmpbuf here, because it doesn't matter if we
-> write something to the data array that it turns out we don't want
-> to write; we can always rewrite it later...
-> 
->> +    for (fn_grp = SD_FG_MAX; fn_grp >= SD_FG_MIN; fn_grp--) {
->> +        new_func = (arg >> ((fn_grp - 1) * 4)) & 0x0f;
->> +        if (new_func == SD_FN_NO_INFLUENCE) {
->> +            /* Guest requested no influence, so this function group
->> +             * stays the same.
->> +             */
->> +            new_func = sd->function_group[fn_grp - 1];
->> +        } else {
->> +            const sd_fn_support *def = &sd_fn_support_defs[fn_grp][new_func];
->> +            if (mode) {
->> +                if (!def->name) {
->> +                    qemu_log_mask(LOG_GUEST_ERROR,
->> +                                  "Function %d not valid for "
->> +                                  "function group %d\n",
->> +                                  new_func, fn_grp);
->> +                    invalid_function_selected = true;
->> +                    new_func = SD_FN_NO_INFLUENCE;
->> +                } else if (def->unimp) {
->> +                    qemu_log_mask(LOG_UNIMP,
->> +                                  "Function %s (fn grp %d) not implemented\n",
->> +                                  def->name, fn_grp);
->> +                    invalid_function_selected = true;
->> +                    new_func = SD_FN_NO_INFLUENCE;
->> +                } else if (def->uhs_only && !sd->uhs_activated) {
->> +                    qemu_log_mask(LOG_GUEST_ERROR,
->> +                                  "Function %s (fn grp %d) only "
->> +                                  "valid in UHS mode\n",
->> +                                  def->name, fn_grp);
->> +                    invalid_function_selected = true;
->> +                    new_func = SD_FN_NO_INFLUENCE;
->> +                } else {
->> +                    sd->function_group[fn_grp - 1] = new_func;
-> 
-> ...but don't want to update the function_group[n] to the new value until
-> we've checked that all the selected values in the command are OK,
-> so you either need a temporary for the new function values, or
-> you need to do one pass over the inputs to check and another one to set.
-> 
->> +                }
->> +            }
->> +            trace_sdcard_function_select(def->name, sd_fn_grp_name[fn_grp],
->> +                                         mode);
->> +        }
->> +        if (!(fn_grp & 0x1)) { /* evens go in high nibble */
->> +            *data_p = new_func << 4;
->> +        } else { /* odds go in low nibble */
->> +            *(data_p++) |= new_func;
->> +        }
->> +    }
->> +    if (invalid_function_selected) {
->> +        /* Ignore all the set values */
->> +        memset(&sd->data[14], 0, SD_FN_BUFSZ);
-> 
-> All-zeroes doesn't seem to match the spec. The spec says "The response
-> to an invalid selection of function will be 0xF", which is a bit unclear,
-> but has to mean at least that we return 0xf for the function groups which
-> were invalid selections. I'm not sure what we should return as status
-> for the function groups which weren't invalid; possibilities include:
->  * 0xf
->  * whatever the provided argument for that function group was
->  * whatever the current status for that function group is
-If selection is 0xF (No influence) to query, response is
-"whatever the current status for that function group is"
-per group.
+Hi Marcel,
 
-> 
-> I don't suppose you're in a position to find out what an actual
-> hardware SD card does?
+Thanks a lot for your feedback.
 
-I tested some SanDisk 'Ultra' card.
+> I don't think we should try to place the MMCFGs before 4G even if there
+> is enough room. Is better to place them always after 4G.
+>
+> "above_4g_mem" PCI hole it is reserved for PCI devices hotplug. We cannot
+use if for
+> MMCFGs. What I think we can do is to "move" the 64 bit PCI hole after the
+MMCFGs.
+> So the layout of over 4G space will be:
+>
+> [RAM hotplug][MMCFGs][PCI hotplug]...
 
-Tests output posted on this thread:
-http://lists.nongnu.org/archive/html/qemu-devel/2018-05/msg04840.html
+OK, I will reorganize the memory layout. Should the number of MMCFG be
+limited,
+as there might be insufficient memory above 4G?
 
-I'll now rework sd_function_switch() before to respin.
+> Do you need the  number of existing expander hosts? We have a
+pxbdev_list, just query it.
 
-Regards,
+Great, I think I missed that list.
 
-Phil.
+> The above will need to change. We move the pci hole, not resize it.
+> I am not sure this is the right place to handle it, maybe we add a new
+property
+> right beside pci_hole ones (extra-mmcfg?) and default it to 0.
+
+That sounds good, so that we just need to check this range when setting
+mcfg table instead of traversing the host bridge list.
+
+> You cannot use the MCH_HOST_BRIDGE_PCIEXBAR_DEFAULT as it is in use
+> by the "main" root complex MMCFG. Actually I don't think we can come up
+> with a valid default.
+
+I see, I'll replcae it with unmapped then.
+
+> Be aware this is used by both pxb and pxb-pcie devices, I think you
+should split the type
+>for each one and let the pxb's one as before.
+
+OK, I had thought it would make codes simpler, as TYPE_PCIE_HOST_BRIDGE
+is also the child of TYPE_PCI_HOST_BRIDGE, but I did forget about the pxb
+devices. I'll split it in v2.
+
+Thanks
+Zihan
