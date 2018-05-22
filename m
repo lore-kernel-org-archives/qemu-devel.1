@@ -1,16 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37088)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37019)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1fL4iF-0000tE-8Z
-	for qemu-devel@nongnu.org; Tue, 22 May 2018 06:40:16 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1fL4iC-0000qW-Bp
+	for qemu-devel@nongnu.org; Tue, 22 May 2018 06:40:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1fL4iE-0004mu-5H
-	for qemu-devel@nongnu.org; Tue, 22 May 2018 06:40:15 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1fL4iB-0004kG-8Q
+	for qemu-devel@nongnu.org; Tue, 22 May 2018 06:40:12 -0400
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 22 May 2018 11:39:59 +0100
-Message-Id: <20180522104000.9044-5-peter.maydell@linaro.org>
+Date: Tue, 22 May 2018 11:39:56 +0100
+Message-Id: <20180522104000.9044-2-peter.maydell@linaro.org>
 In-Reply-To: <20180522104000.9044-1-peter.maydell@linaro.org>
 References: <20180522104000.9044-1-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PATCH 4/5] ppc: Rename 2.13 machines to 3.0
+Subject: [Qemu-devel] [PATCH 1/5] qapi: Change "since 2.13" annotations to
+ "since 3.0"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,127 +23,165 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: patches@linaro.org, "Michael S. Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Cornelia Huck <cohuck@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, qemu-ppc@nongnu.org, qemu-s390x@nongnu.org
 
-Rename the 2.13 machines to match the number we're going to
-use for the next release.
+We're going to make the next release be 3.0, not 2.13; change
+the annotations in our json appropriately.
+
+Changes produced with
+  sed -i -e 's/2\.13/3.0/g' qapi/*.json
 
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- target/ppc/cpu.h                |  2 +-
- hw/ppc/spapr.c                  | 14 +++++++-------
- target/ppc/machine.c            |  8 ++++----
- target/ppc/translate_init.inc.c |  2 +-
- 4 files changed, 13 insertions(+), 13 deletions(-)
+ qapi/block-core.json |  4 ++--
+ qapi/common.json     |  2 +-
+ qapi/migration.json  | 16 ++++++++--------
+ qapi/misc.json       |  4 ++--
+ qapi/net.json        |  2 +-
+ qapi/ui.json         |  2 +-
+ 6 files changed, 15 insertions(+), 15 deletions(-)
 
-diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
-index 7ccd2f460e..0247c1f04c 100644
---- a/target/ppc/cpu.h
-+++ b/target/ppc/cpu.h
-@@ -1215,7 +1215,7 @@ struct PowerPCCPU {
-     uint64_t mig_insns_flags2;
-     uint32_t mig_nb_BATs;
-     bool pre_2_10_migration;
--    bool pre_2_13_migration;
-+    bool pre_3_0_migration;
-     int32_t mig_slb_nr;
- };
- 
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index ebf30dd60b..213f6f9599 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -4071,18 +4071,18 @@ static const TypeInfo spapr_machine_info = {
-     type_init(spapr_machine_register_##suffix)
- 
- /*
-- * pseries-2.13
-+ * pseries-3.0
-  */
--static void spapr_machine_2_13_instance_options(MachineState *machine)
-+static void spapr_machine_3_0_instance_options(MachineState *machine)
- {
- }
- 
--static void spapr_machine_2_13_class_options(MachineClass *mc)
-+static void spapr_machine_3_0_class_options(MachineClass *mc)
- {
-     /* Defaults for the latest behaviour inherited from the base class */
- }
- 
--DEFINE_SPAPR_MACHINE(2_13, "2.13", true);
-+DEFINE_SPAPR_MACHINE(3_0, "3.0", true);
- 
- /*
-  * pseries-2.12
-@@ -4091,18 +4091,18 @@ DEFINE_SPAPR_MACHINE(2_13, "2.13", true);
-     HW_COMPAT_2_12                                                     \
-     {                                                                  \
-         .driver = TYPE_POWERPC_CPU,                                    \
--        .property = "pre-2.13-migration",                              \
-+        .property = "pre-3.0-migration",                              \
-         .value    = "on",                                              \
-     },
- 
- static void spapr_machine_2_12_instance_options(MachineState *machine)
- {
--    spapr_machine_2_13_instance_options(machine);
-+    spapr_machine_3_0_instance_options(machine);
- }
- 
- static void spapr_machine_2_12_class_options(MachineClass *mc)
- {
--    spapr_machine_2_13_class_options(mc);
-+    spapr_machine_3_0_class_options(mc);
-     SET_MACHINE_COMPAT(mc, SPAPR_COMPAT_2_12);
- }
- 
-diff --git a/target/ppc/machine.c b/target/ppc/machine.c
-index ba1b9e531f..b2745ec4e5 100644
---- a/target/ppc/machine.c
-+++ b/target/ppc/machine.c
-@@ -150,11 +150,11 @@ static bool cpu_pre_2_8_migration(void *opaque, int version_id)
- }
- 
- #if defined(TARGET_PPC64)
--static bool cpu_pre_2_13_migration(void *opaque, int version_id)
-+static bool cpu_pre_3_0_migration(void *opaque, int version_id)
- {
-     PowerPCCPU *cpu = opaque;
- 
--    return cpu->pre_2_13_migration;
-+    return cpu->pre_3_0_migration;
- }
- #endif
- 
-@@ -220,7 +220,7 @@ static int cpu_pre_save(void *opaque)
-         cpu->mig_insns_flags2 = env->insns_flags2 & insns_compat_mask2;
-         cpu->mig_nb_BATs = env->nb_BATs;
-     }
--    if (cpu->pre_2_13_migration) {
-+    if (cpu->pre_3_0_migration) {
-         if (cpu->hash64_opts) {
-             cpu->mig_slb_nr = cpu->hash64_opts->slb_size;
-         }
-@@ -517,7 +517,7 @@ static const VMStateDescription vmstate_slb = {
-     .needed = slb_needed,
-     .post_load = slb_post_load,
-     .fields = (VMStateField[]) {
--        VMSTATE_INT32_TEST(mig_slb_nr, PowerPCCPU, cpu_pre_2_13_migration),
-+        VMSTATE_INT32_TEST(mig_slb_nr, PowerPCCPU, cpu_pre_3_0_migration),
-         VMSTATE_SLB_ARRAY(env.slb, PowerPCCPU, MAX_SLB_ENTRIES),
-         VMSTATE_END_OF_LIST()
-     }
-diff --git a/target/ppc/translate_init.inc.c b/target/ppc/translate_init.inc.c
-index a0b3f184b2..ab782cb32a 100644
---- a/target/ppc/translate_init.inc.c
-+++ b/target/ppc/translate_init.inc.c
-@@ -10427,7 +10427,7 @@ static Property ppc_cpu_properties[] = {
-     DEFINE_PROP_BOOL("pre-2.8-migration", PowerPCCPU, pre_2_8_migration, false),
-     DEFINE_PROP_BOOL("pre-2.10-migration", PowerPCCPU, pre_2_10_migration,
-                      false),
--    DEFINE_PROP_BOOL("pre-2.13-migration", PowerPCCPU, pre_2_13_migration,
-+    DEFINE_PROP_BOOL("pre-3.0-migration", PowerPCCPU, pre_3_0_migration,
-                      false),
-     DEFINE_PROP_END_OF_LIST(),
- };
+diff --git a/qapi/block-core.json b/qapi/block-core.json
+index 55728cb823..b5ce98856b 100644
+--- a/qapi/block-core.json
++++ b/qapi/block-core.json
+@@ -2510,7 +2510,7 @@
+ # @vxhs: Since 2.10
+ # @throttle: Since 2.11
+ # @nvme: Since 2.12
+-# @copy-on-read: Since 2.13
++# @copy-on-read: Since 3.0
+ #
+ # Since: 2.9
+ ##
+@@ -2538,7 +2538,7 @@
+ # @x-check-cache-dropped: whether to check that page cache was dropped on live
+ #                         migration.  May cause noticeable delays if the image
+ #                         file is large, do not use in production.
+-#                         (default: off) (since: 2.13)
++#                         (default: off) (since: 3.0)
+ #
+ # Since: 2.9
+ ##
+diff --git a/qapi/common.json b/qapi/common.json
+index c811d04984..c367adc4b6 100644
+--- a/qapi/common.json
++++ b/qapi/common.json
+@@ -140,7 +140,7 @@
+ #        prefix to produce the corresponding QEMU executable name. This
+ #        is true even for "qemu-system-x86_64".
+ #
+-# Since: 2.13
++# Since: 3.0
+ ##
+ { 'enum' : 'SysEmuTarget',
+   'data' : [ 'aarch64', 'alpha', 'arm', 'cris', 'hppa', 'i386', 'lm32',
+diff --git a/qapi/migration.json b/qapi/migration.json
+index 3ec418dabf..dc9cc85545 100644
+--- a/qapi/migration.json
++++ b/qapi/migration.json
+@@ -89,9 +89,9 @@
+ #
+ # @postcopy-active: like active, but now in postcopy mode. (since 2.5)
+ #
+-# @postcopy-paused: during postcopy but paused. (since 2.13)
++# @postcopy-paused: during postcopy but paused. (since 3.0)
+ #
+-# @postcopy-recover: trying to recover from a paused postcopy. (since 2.13)
++# @postcopy-recover: trying to recover from a paused postcopy. (since 3.0)
+ #
+ # @completed: migration is finished.
+ #
+@@ -163,11 +163,11 @@
+ #
+ # @postcopy-blocktime: total time when all vCPU were blocked during postcopy
+ #           live migration. This is only present when the postcopy-blocktime
+-#           migration capability is enabled. (Since 2.13)
++#           migration capability is enabled. (Since 3.0)
+ #
+ # @postcopy-vcpu-blocktime: list of the postcopy blocktime per vCPU.  This is
+ #           only present when the postcopy-blocktime migration capability
+-#           is enabled. (Since 2.13)
++#           is enabled. (Since 3.0)
+ #
+ #
+ # Since: 0.14.0
+@@ -374,7 +374,7 @@
+ #                 (since 2.12)
+ #
+ # @postcopy-blocktime: Calculate downtime for postcopy live migration
+-#                     (since 2.13)
++#                     (since 3.0)
+ #
+ # Since: 1.2
+ ##
+@@ -1034,7 +1034,7 @@
+ # @detach: this argument exists only for compatibility reasons and
+ #          is ignored by QEMU
+ #
+-# @resume: resume one paused migration, default "off". (since 2.13)
++# @resume: resume one paused migration, default "off". (since 3.0)
+ #
+ # Returns: nothing on success
+ #
+@@ -1208,7 +1208,7 @@
+ #      "arguments": { "uri": "tcp:192.168.1.200:12345" } }
+ # <- { "return": {} }
+ #
+-# Since: 2.13
++# Since: 3.0
+ ##
+ { 'command': 'migrate-recover', 'data': { 'uri': 'str' },
+   'allow-oob': true }
+@@ -1225,6 +1225,6 @@
+ # -> { "execute": "migrate-pause" }
+ # <- { "return": {} }
+ #
+-# Since: 2.13
++# Since: 3.0
+ ##
+ { 'command': 'migrate-pause', 'allow-oob': true }
+diff --git a/qapi/misc.json b/qapi/misc.json
+index f5988cc0b5..99bcaacd62 100644
+--- a/qapi/misc.json
++++ b/qapi/misc.json
+@@ -558,11 +558,11 @@
+ # @props: properties describing to which node/socket/core/thread
+ #         virtual CPU belongs to, provided if supported by board
+ #
+-# @arch: base architecture of the cpu; deprecated since 2.13.0 in favor
++# @arch: base architecture of the cpu; deprecated since 3.0.0 in favor
+ #        of @target
+ #
+ # @target: the QEMU system emulation target, which determines which
+-#          additional fields will be listed (since 2.13)
++#          additional fields will be listed (since 3.0)
+ #
+ # Since: 2.12
+ #
+diff --git a/qapi/net.json b/qapi/net.json
+index b8adf1f03f..5c1dc48890 100644
+--- a/qapi/net.json
++++ b/qapi/net.json
+@@ -498,7 +498,7 @@
+ #
+ # Since: 1.2
+ #
+-# 'vlan': dropped in 2.13
++# 'vlan': dropped in 3.0
+ ##
+ { 'struct': 'NetLegacy',
+   'data': {
+diff --git a/qapi/ui.json b/qapi/ui.json
+index 3ad7835992..fc18a05f0f 100644
+--- a/qapi/ui.json
++++ b/qapi/ui.json
+@@ -1031,7 +1031,7 @@
+  # @core: Use OpenGL with Core (desktop) Context.
+  # @es: Use OpenGL with ES (embedded systems) Context.
+  #
+- # Since: 2.13
++ # Since: 3.0
+  #
+  ##
+  { 'enum'    : 'DisplayGLMode',
 -- 
 2.17.0
