@@ -1,21 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43344)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46582)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1fL6rr-0002HA-RX
-	for qemu-devel@nongnu.org; Tue, 22 May 2018 08:58:23 -0400
+	(envelope-from <bounces@canonical.com>) id 1fL6zK-000440-82
+	for qemu-devel@nongnu.org; Tue, 22 May 2018 09:06:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1fL6rn-0003y5-SP
-	for qemu-devel@nongnu.org; Tue, 22 May 2018 08:58:19 -0400
-References: <20180521140402.23318-1-peter.maydell@linaro.org>
-	<20180521140402.23318-15-peter.maydell@linaro.org>
-From: Auger Eric <eric.auger@redhat.com>
-Message-ID: <47281818-f0cf-0ed1-c479-fbcaca5c5167@redhat.com>
-Date: Tue, 22 May 2018 14:58:07 +0200
+	(envelope-from <bounces@canonical.com>) id 1fL6zA-0008Hq-D8
+	for qemu-devel@nongnu.org; Tue, 22 May 2018 09:06:02 -0400
+Received: from indium.canonical.com ([91.189.90.7]:35388)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1fL6zA-0008HQ-6p
+	for qemu-devel@nongnu.org; Tue, 22 May 2018 09:05:52 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1fL6z8-00014L-BK
+	for <qemu-devel@nongnu.org>; Tue, 22 May 2018 13:05:50 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 0F5EA2E8F45
+	for <qemu-devel@nongnu.org>; Tue, 22 May 2018 13:05:50 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20180521140402.23318-15-peter.maydell@linaro.org>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 14/27] iommu: Add IOMMU index concept to
- IOMMU API
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 22 May 2018 12:59:38 -0000
+From: Thomas Huth <1772262@bugs.launchpad.net>
+Reply-To: Bug 1772262 <1772262@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <152682211859.2906.10549449814583426718.malonedeb@gac.canonical.com>
+Message-Id: <152699397906.16381.12814289861556084995.launchpad@soybean.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1772262] Re: Adding -spice doesn't respect
+ environment variable QEMU_AUDIO_DRV
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,144 +37,83 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, patches@linaro.org
+To: qemu-devel@nongnu.org
 
-Hi Peter,
-On 05/21/2018 04:03 PM, Peter Maydell wrote:
-> If an IOMMU supports mappings that care about the memory
-> transaction attributes, then it no longer has a unique
-> address -> output mapping, but more than one. We can
-> represent these using an IOMMU index, analogous to TCG's
-> mmu indexes.
-> 
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-> ---
->  include/exec/memory.h | 52 +++++++++++++++++++++++++++++++++++++++++++
->  memory.c              | 23 +++++++++++++++++++
->  2 files changed, 75 insertions(+)
-> 
-> diff --git a/include/exec/memory.h b/include/exec/memory.h
-> index 309fdfb89b..f6226fb263 100644
-> --- a/include/exec/memory.h
-> +++ b/include/exec/memory.h
-> @@ -206,6 +206,20 @@ enum IOMMUMemoryRegionAttr {
->   * to report whenever mappings are changed, by calling
->   * memory_region_notify_iommu() (or, if necessary, by calling
->   * memory_region_notify_one() for each registered notifier).
-> + *
-> + * Conceptually an IOMMU provides a mapping from input address
-> + * to an output TLB entry.
-actually it takes a source identifier too (ARM streamid + substreamID,
-this latter is not yet supported).
-At the moment we have 1 IOMMUMRRegion per sid on ARM. For each
-IOMMUMRRegion we would now have 2 indexes (1 for secure and 1 for
-unsecure). How do you see the implementation of PASIDs (substreamids).
-Would that be based on indexes or not?
- If the IOMMU is aware of memory transaction
-> + * attributes and the output TLB entry depends on the transaction
-> + * attributes, we represent this using IOMMU indexes. Each index
-> + * selects a particular translation table that the IOMMU has:
-> + *   @attrs_to_index returns the IOMMU index for a set of transaction attributes
-> + *   @translate takes an input address and an IOMMU index
-> + * and the mapping returned can only depend on the input address and the
-> + * IOMMU index.
-> + *
-> + * Most IOMMUs don't care about the transaction attributes and support
-> + * only a single IOMMU index. A more complex IOMMU might have one index
-> + * for secure transactions and one for non-secure transactions.
->   */
->  typedef struct IOMMUMemoryRegionClass {
->      /* private */
-> @@ -290,6 +304,26 @@ typedef struct IOMMUMemoryRegionClass {
->       */
->      int (*get_attr)(IOMMUMemoryRegion *iommu, enum IOMMUMemoryRegionAttr attr,
->                      void *data);
-> +
-> +    /* Return the IOMMU index to use for a given set of transaction attributes.
-> +     *
-> +     * Optional method: if an IOMMU only supports a single IOMMU index then
-> +     * the default implementation of memory_region_iommu_attrs_to_index()
-> +     * will return 0.
-> +     *
-> +     * The indexes supported by an IOMMU must be contiguous, starting at 0.
-> +     *
-> +     * @iommu: the IOMMUMemoryRegion
-> +     * @attrs: memory transaction attributes
-> +     */
-> +    int (*attrs_to_index)(IOMMUMemoryRegion *iommu, MemTxAttrs attrs);
-> +
-> +    /* Return the number of IOMMU indexes this IOMMU supports.
-> +     *
-> +     * Optional method: if this method is not provided, then
-> +     * memory_region_iommu_num_indexes() will return 1, indicating that
-> +     * only a single IOMMU index is supported.
-> +     */
->  } IOMMUMemoryRegionClass;
->  
->  typedef struct CoalescedMemoryRange CoalescedMemoryRange;
-> @@ -1077,6 +1111,24 @@ int memory_region_iommu_get_attr(IOMMUMemoryRegion *iommu_mr,
->                                   enum IOMMUMemoryRegionAttr attr,
->                                   void *data);
->  
-> +/**
-> + * memory_region_iommu_attrs_to_index: return the IOMMU index to
-> + * use for translations with the given memory transaction attributes.
-> + *
-> + * @iommu_mr: the memory region
-> + * @attrs: the memory transaction attributes
-> + */
-> +int memory_region_iommu_attrs_to_index(IOMMUMemoryRegion *iommu_mr,
-> +                                       MemTxAttrs attrs);
-> +
-> +/**
-> + * memory_region_iommu_num_indexes: return the total number of IOMMU
-> + * indexes that this IOMMU supports.
-is it IOMMU wide characteristics or per IOMMUMRRegion (SID)?
+** Changed in: qemu
+       Status: New =3D> Invalid
 
-Thanks
+-- =
 
-Eric
-> + *
-> + * @iommu_mr: the memory region
-> + */
-> +int memory_region_iommu_num_indexes(IOMMUMemoryRegion *iommu_mr);
-> +
->  /**
->   * memory_region_name: get a memory region's name
->   *
-> diff --git a/memory.c b/memory.c
-> index 10fa2ddd31..07d5fa7862 100644
-> --- a/memory.c
-> +++ b/memory.c
-> @@ -1918,6 +1918,29 @@ int memory_region_iommu_get_attr(IOMMUMemoryRegion *iommu_mr,
->      return imrc->get_attr(iommu_mr, attr, data);
->  }
->  
-> +int memory_region_iommu_attrs_to_index(IOMMUMemoryRegion *iommu_mr,
-> +                                       MemTxAttrs attrs)
-> +{
-> +    IOMMUMemoryRegionClass *imrc = IOMMU_MEMORY_REGION_GET_CLASS(iommu_mr);
-> +
-> +    if (!imrc->attrs_to_index) {
-> +        return 0;
-> +    }
-> +
-> +    return imrc->attrs_to_index(iommu_mr, attrs);
-> +}
-> +
-> +int memory_region_iommu_num_indexes(IOMMUMemoryRegion *iommu_mr)
-> +{
-> +    IOMMUMemoryRegionClass *imrc = IOMMU_MEMORY_REGION_GET_CLASS(iommu_mr);
-> +
-> +    if (!imrc->num_indexes) {
-> +        return 1;
-> +    }
-> +
-> +    return imrc->num_indexes(iommu_mr);
-> +}
-> +
->  void memory_region_set_log(MemoryRegion *mr, bool log, unsigned client)
->  {
->      uint8_t mask = 1 << client;
-> 
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1772262
+
+Title:
+  Adding -spice doesn't respect environment variable QEMU_AUDIO_DRV
+
+Status in QEMU:
+  Invalid
+
+Bug description:
+  When -spice is added to the commandline, QEMU_AUDIO_DRV=3Dalsa is not
+  respected and I receive no audio from the guest using the alsa driver.
+  When -spice options are omitted, audio works as usual.
+
+  I want to channel mouse and keyboard events to the guest using spice
+  (with looking-glass) instead of a third-party product over a network
+  interface (with synergy), but audio ends up over the spice protocol as
+  well instead of using alsa despite asking otherwise.  For example, one
+  will only hear audio when a program like spicy is running.  Naturally
+  it would be nice if this were not needed, since spice audio is gappier
+  than regular audio on my machine.
+
+  Perhaps if -spice added an option similar to agent-mouse=3Doff but for
+  audio, (say audio-pipe=3Doff or so for example,) this might mitigate the
+  issue in a more naive fashion UX-wise, without having to force the
+  issue with environment variables that unfortunately for me don't seem
+  to work. :(
+
+  QEMU emulator version 2.12.0
+
+  Commandline
+
+          qemu-system-x86_64 \
+            -ctrl-grab \
+            -enable-kvm \
+            -cpu host,hv-time,kvm=3Doff \
+            -smp cores=3D4 \
+            -m 8G \
+            -M q35 \
+            -vga none \
+            -netdev tap,id=3Dhostnet,ifname=3Dtap1,script=3Dno,downscript=
+=3Dno \
+            -net nic,model=3Dvirtio,macaddr=3D52:54:FD:BF:F7:9A,netdev=3Dho=
+stnet \
+            -netdev user,id=3Dusernet,smb=3D/media/DRIVE-C/tux/vms/share \
+            -net nic,model=3Dvirtio,macaddr=3D52:54:2E:40:4F:C8,netdev=3Dus=
+ernet \
+            -usb \
+            -device usb-ehci,id=3Dehci \
+            -device ioh3420,bus=3Dpcie.0,addr=3D1c,multifunction=3Don,port=
+=3D1,chassis=3D1,id=3Droot.1 \
+            -device vfio-pci,host=3D07:00.0,bus=3Droot.1,addr=3D00.0,multif=
+unction=3Don,x-vga=3Don \
+            -device ich9-intel-hda \
+            -device hda-micro \
+            -drive if=3Dvirtio,file=3Dvm/win10/disk.img,media=3Ddisk \
+            -boot menu=3Don,splash=3Dsplash/boot.jpg,splash-time=3D5000 \
+            -name win10 \
+            -device ivshmem-plain,memdev=3Divshmem \
+            -object memory-backend-file,id=3Divshmem,share=3Don,mem-path=3D=
+/dev/shm/looking-glass,size=3D32M \
+            -device virtio-serial-pci \
+            -device virtserialport,chardev=3Dspicechannel0,name=3Dcom.redha=
+t.spice.0 \
+            -chardev spicevmc,id=3Dspicechannel0,name=3Dvdagent \
+            -spice addr=3D127.0.0.1,port=3D5900,disable-ticketing
+
+  When the last four options are not present, audio works as expected.
+  This is with both a windows 10 guest and a windows 7 guest.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1772262/+subscriptions
