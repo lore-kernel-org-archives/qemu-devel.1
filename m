@@ -1,26 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41163)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42416)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1fLBb1-0004du-3Z
-	for qemu-devel@nongnu.org; Tue, 22 May 2018 14:01:16 -0400
+	(envelope-from <rth7680@gmail.com>) id 1fLBg0-000697-M2
+	for qemu-devel@nongnu.org; Tue, 22 May 2018 14:06:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1fLBaw-0006ro-T0
-	for qemu-devel@nongnu.org; Tue, 22 May 2018 14:01:15 -0400
-Resent-Message-Id: <E1fLBaw-0006ro-T0@eggs.gnu.org>
-Received: from sender-of-o51.zoho.com ([135.84.80.216]:21028)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1fLBaw-0006oy-KC
-	for qemu-devel@nongnu.org; Tue, 22 May 2018 14:01:10 -0400
-In-Reply-To: <20180522175629.24932-1-richard.henderson@linaro.org>
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <152701203898.99.15082609298964900346@d39dc562802a>
+	(envelope-from <rth7680@gmail.com>) id 1fLBfw-0008SG-Kk
+	for qemu-devel@nongnu.org; Tue, 22 May 2018 14:06:24 -0400
+Sender: Richard Henderson <rth7680@gmail.com>
+References: <20180521140402.23318-1-peter.maydell@linaro.org>
+	<20180521140402.23318-17-peter.maydell@linaro.org>
+From: Richard Henderson <rth@twiddle.net>
+Message-ID: <23332ec0-bf12-7e04-8261-533c52c3f314@twiddle.net>
+Date: Tue, 22 May 2018 11:06:16 -0700
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Tue, 22 May 2018 11:00:39 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PATCH] tcg: Fix helper function vs host abi for
- float16
+In-Reply-To: <20180521140402.23318-17-peter.maydell@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 16/27] iommu: Add IOMMU index argument to
+ translate method
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,47 +26,18 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: richard.henderson@linaro.org
-Cc: famz@redhat.com, qemu-devel@nongnu.org, peter.maydell@linaro.org, qemu-arm@nongnu.org
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, qemu-devel@nongnu.org
+Cc: patches@linaro.org, Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
-c3NhZ2UtaWQ6IDIwMTgwNTIyMTc1NjI5LjI0OTMyLTEtcmljaGFyZC5oZW5kZXJzb25AbGluYXJv
-Lm9yZwpTdWJqZWN0OiBbUWVtdS1kZXZlbF0gW1BBVENIXSB0Y2c6IEZpeCBoZWxwZXIgZnVuY3Rp
-b24gdnMgaG9zdCBhYmkgZm9yIGZsb2F0MTYKCj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEv
-YmluL2Jhc2gKCkJBU0U9YmFzZQpuPTEKdG90YWw9JChnaXQgbG9nIC0tb25lbGluZSAkQkFTRS4u
-IHwgd2MgLWwpCmZhaWxlZD0wCgpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAw
-CmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQpnaXQgY29uZmlnIC0tbG9jYWwg
-ZGlmZi5hbGdvcml0aG0gaGlzdG9ncmFtCgpjb21taXRzPSIkKGdpdCBsb2cgLS1mb3JtYXQ9JUgg
-LS1yZXZlcnNlICRCQVNFLi4pIgpmb3IgYyBpbiAkY29tbWl0czsgZG8KICAgIGVjaG8gIkNoZWNr
-aW5nIFBBVENIICRuLyR0b3RhbDogJChnaXQgbG9nIC1uIDEgLS1mb3JtYXQ9JXMgJGMpLi4uIgog
-ICAgaWYgISBnaXQgc2hvdyAkYyAtLWZvcm1hdD1lbWFpbCB8IC4vc2NyaXB0cy9jaGVja3BhdGNo
-LnBsIC0tbWFpbGJhY2sgLTsgdGhlbgogICAgICAgIGZhaWxlZD0xCiAgICAgICAgZWNobwogICAg
-ZmkKICAgIG49JCgobisxKSkKZG9uZQoKZXhpdCAkZmFpbGVkCj09PSBURVNUIFNDUklQVCBFTkQg
-PT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQxZGVmN2Y0NGJkODg4NzEzMzg0CkZy
-b20gaHR0cHM6Ly9naXRodWIuY29tL3BhdGNoZXctcHJvamVjdC9xZW11CiB0IFt0YWcgdXBkYXRl
-XSAgICAgICAgICAgIHBhdGNoZXcvMjAxODA1MjExNDA0MDIuMjMzMTgtMS1wZXRlci5tYXlkZWxs
-QGxpbmFyby5vcmcgLT4gcGF0Y2hldy8yMDE4MDUyMTE0MDQwMi4yMzMxOC0xLXBldGVyLm1heWRl
-bGxAbGluYXJvLm9yZwogKiBbbmV3IHRhZ10gICAgICAgICAgICAgICBwYXRjaGV3LzIwMTgwNTIy
-MTc1NjI5LjI0OTMyLTEtcmljaGFyZC5oZW5kZXJzb25AbGluYXJvLm9yZyAtPiBwYXRjaGV3LzIw
-MTgwNTIyMTc1NjI5LjI0OTMyLTEtcmljaGFyZC5oZW5kZXJzb25AbGluYXJvLm9yZwpTd2l0Y2hl
-ZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCmI1OTAxMzA2MGEgdGNnOiBGaXggaGVscGVyIGZ1bmN0
-aW9uIHZzIGhvc3QgYWJpIGZvciBmbG9hdDE2Cgo9PT0gT1VUUFVUIEJFR0lOID09PQpDaGVja2lu
-ZyBQQVRDSCAxLzE6IHRjZzogRml4IGhlbHBlciBmdW5jdGlvbiB2cyBob3N0IGFiaSBmb3IgZmxv
-YXQxNi4uLgpFUlJPUjogc3BhY2UgcHJvaGliaXRlZCBiZWZvcmUgdGhhdCBjbG9zZSBwYXJlbnRo
-ZXNpcyAnKScKIzIzMzogRklMRTogdGFyZ2V0L2FybS9oZWxwZXIuYzoxMTM2NzoKKyAgICBDT05W
-X0ZUT0kodmZwX3RvIyNuYW1lIyNwLCBmdHlwZSwgZnN6LCBzaWduLCApICAgICAgICBcCgpFUlJP
-Ujogc3BhY2UgcHJvaGliaXRlZCBiZWZvcmUgdGhhdCBjbG9zZSBwYXJlbnRoZXNpcyAnKScKIzI0
-MjogRklMRTogdGFyZ2V0L2FybS9oZWxwZXIuYzoxMTM3MDoKK0ZMT0FUX0NPTlZTKHNpLCBoLCB1
-aW50MzJfdCwgMTYsICkKCkVSUk9SOiBzcGFjZSBwcm9oaWJpdGVkIGJlZm9yZSB0aGF0IGNsb3Nl
-IHBhcmVudGhlc2lzICcpJwojMjQzOiBGSUxFOiB0YXJnZXQvYXJtL2hlbHBlci5jOjExMzcxOgor
-RkxPQVRfQ09OVlMoc2ksIHMsIGZsb2F0MzIsIDMyLCApCgpFUlJPUjogc3BhY2UgcHJvaGliaXRl
-ZCBiZWZvcmUgdGhhdCBjbG9zZSBwYXJlbnRoZXNpcyAnKScKIzI0NDogRklMRTogdGFyZ2V0L2Fy
-bS9oZWxwZXIuYzoxMTM3MjoKK0ZMT0FUX0NPTlZTKHNpLCBkLCBmbG9hdDY0LCA2NCwgKQoKdG90
-YWw6IDQgZXJyb3JzLCAwIHdhcm5pbmdzLCAzMTIgbGluZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBo
-YXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3Jz
-CmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpD
-SEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1h
-bmQgZXhpdGVkIHdpdGggY29kZTogMQoKCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxs
-eSBieSBQYXRjaGV3IFtodHRwOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVk
-YmFjayB0byBwYXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
+On 05/21/2018 07:03 AM, Peter Maydell wrote:
+> Add an IOMMU index argument to the translate method of
+> IOMMUs. Since all of our current IOMMU implementations
+> support only a single IOMMU index, this has no effect
+> on the behaviour.
+> 
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+> ---
+
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+
+r~
