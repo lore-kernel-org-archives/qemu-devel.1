@@ -1,14 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37801)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38840)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1fLFBM-0000jR-MZ
-	for qemu-devel@nongnu.org; Tue, 22 May 2018 17:51:01 -0400
+	(envelope-from <lersek@redhat.com>) id 1fLFIH-0002cL-M2
+	for qemu-devel@nongnu.org; Tue, 22 May 2018 17:58:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1fLFBJ-0004Oi-J9
-	for qemu-devel@nongnu.org; Tue, 22 May 2018 17:51:00 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:37920 helo=mx1.redhat.com)
+	(envelope-from <lersek@redhat.com>) id 1fLFIE-0008Qg-K8
+	for qemu-devel@nongnu.org; Tue, 22 May 2018 17:58:09 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:38156 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1fLFBJ-0004OO-DR
-	for qemu-devel@nongnu.org; Tue, 22 May 2018 17:50:57 -0400
+	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1fLFIE-0008QF-Ep
+	for qemu-devel@nongnu.org; Tue, 22 May 2018 17:58:06 -0400
 References: <1526801333-30613-1-git-send-email-whois.zihan.yang@gmail.com>
 	<1526801333-30613-4-git-send-email-whois.zihan.yang@gmail.com>
 	<ef3fc85d-7726-c888-e8ca-9dfae1b908d3@gmail.com>
@@ -16,11 +16,12 @@ References: <1526801333-30613-1-git-send-email-whois.zihan.yang@gmail.com>
 	<cbdfe0d6-f071-3560-009d-3bbdde12b33c@gmail.com>
 	<f71a8c61-a0d7-6ebc-62ad-3dab8b9f8e5a@redhat.com>
 	<20180522151732.36122156@w520.home>
+	<20180523001822-mutt-send-email-mst@kernel.org>
 From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <1d16a569-bdc2-93d8-09e7-cd76f3899c36@redhat.com>
-Date: Tue, 22 May 2018 23:50:54 +0200
+Message-ID: <8fdd9ce2-991f-301d-2a95-0f8e35bb2b9b@redhat.com>
+Date: Tue, 22 May 2018 23:58:02 +0200
 MIME-Version: 1.0
-In-Reply-To: <20180522151732.36122156@w520.home>
+In-Reply-To: <20180523001822-mutt-send-email-mst@kernel.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -34,66 +35,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alex Williamson <alex.williamson@redhat.com>
-Cc: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Zihan Yang <whois.zihan.yang@gmail.com>, qemu-devel@nongnu.org, Wei Huang <wei@redhat.com>, Drew Jones <drjones@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Eric Auger <eauger@redhat.com>, Igor Mammedov <imammedo@redhat.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>, Alex Williamson <alex.williamson@redhat.com>
+Cc: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Zihan Yang <whois.zihan.yang@gmail.com>, qemu-devel@nongnu.org, Wei Huang <wei@redhat.com>, Drew Jones <drjones@redhat.com>, Eric Auger <eauger@redhat.com>, Igor Mammedov <imammedo@redhat.com>
 
-On 05/22/18 23:17, Alex Williamson wrote:
-> On Tue, 22 May 2018 21:51:47 +0200
-> Laszlo Ersek <lersek@redhat.com> wrote:
+On 05/22/18 23:22, Michael S. Tsirkin wrote:
+> On Tue, May 22, 2018 at 03:17:32PM -0600, Alex Williamson wrote:
+>> On Tue, 22 May 2018 21:51:47 +0200
+>> Laszlo Ersek <lersek@redhat.com> wrote:
 
-Thanks Michael and Alex for the education on ARI.
-
-I'd just like to comment on one sub-topic:
-
->> There are signs that the edk2 core supports ARI if the underlying
->> platform supports it. (Which is not the case with multiple PCIe domains
->> / multiple ECAM ranges.)
+>>> But 64-bit is ill-partitioned and/or crowded too: first you have the
+>>> cold-plugged >4GB DRAM (whose size the firmware can interrogate), then
+>>> the hotplug DIMM area up to "etc/reserved-memory-end" (ditto), then the
+>>> 64-bit PCI MMIO aperture (whose size the firmware decides itself,
+>>> because QEMU cannot be asked about it presently). Placing the additional
+>>> MMCFGs somewhere would need extending the total order between these
+>>> things at the design level, more fw_cfg files, more sanity checks in
+>>> platform code in the firmware, and, quite importantly, adding support to
+>>> multiple discontiguous MMCFGs to core edk2 code.
+>>
+>> Hmm, we're doing something wrong if we can't figure out some standards
+>> within QEMU for placing per domain 64-bit MMIO and MMCFG ranges.
 > 
-> It's pretty surprising to me that edk2 wouldn't already have support
-> for multiple PCIe domains, they're really not *that* uncommon.  Some
-> architectures make almost gratuitous use of PCIe domains.  I certainly
-> know there were UEFI ia64 platforms with multiple domains.
+> I thought in this patch it is done by firmware.
 
->> Semantics :) Obviously, everything "can be done" in software; that's why
->> it's *soft*ware. Who is going to write it in practice? It had taken
->> years until the edk2 core gained a universal PciHostBridgeDxe driver
->> with a well-defined platform customization interface, and that interface
->> doesn't support multiple domains / segments. It had also taken years
->> until the same edk2 core driver gained support for nonzero MMIO address
->> translation (i.e. where the CPU view of system RAM addresses differs
->> from the PCI device view of the same, for DMA purposes) -- and that's
->> just a linear translation, not even about IOMMUs. The PCI core
->> maintainers in edk2 are always very busy, and upstreaming such changes
->> tends to take forever.
-> 
-> Wow, that's surprising, ia64 was doing all of that on UEFI platforms a
-> decade ago.
+Sure, the firmware programs the exbar registers already, but it needs to
+rely on some information to figure out the values it should program.
+(Also, the information should not arrive in the form of *just* an ACPI
+table; that's too hard and/or too late to parse for the firmware.) Right
+now the "information" is a hard-coded constant that's known not to
+conflict with other parts.
 
-Plenty of physical PI/UEFI platforms support multiple PCIe domains
-(similarly to how plenty of physical PI/UEFI platforms support CPU
-hotplug with SMM).
+Furthermore, I didn't highlight it earlier, but we can't go arbitrarily
+high -- if EPT is enabled, then the physical address width of the host
+CPU limits the guest-physical memory address space (incl. memory mapped
+devices).
 
-None of that is open source, to my knowledge, so it might as well not
-exist. EDK2 purposely does not accept any contributions under the GPL.
-Convincing proprietary downstreams to open up and upstream their code is
-nigh impossible, and even when it succeeds, it takes absolutely forever.
-
-Technically it also happens that a proprietary downstream contributes an
-independent (likely more limited) open source variant of a feature that
-their physical platforms support -- assuming they see (or are shown)
-value in allocating resources to such a contribution. This is very rare,
-and I'm including it for technical correctness.
-
-For open source edk2 this would be a development from zero; it would
-even conflict with some assumptions in edk2.
-
-(On May 4th I submitted a small library to core edk2 that parses the
-capabilities lists of a device and puts the capabilities into an
-associative array (basically a dictionary). So that we wouldn't have to
-open-code yet more caplist parsing loops when looking for specific
-capabilities. In 18 days I've pinged once and haven't gotten any
-technical feedback. I'm not even annoyed because I know they simply
-don't have time for reviewing larger than halfway trivial patches.)
-
-Thanks,
+Thanks
 Laszlo
