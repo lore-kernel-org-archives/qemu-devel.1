@@ -1,20 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43605)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46287)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1fLFkB-0003Ii-T3
-	for qemu-devel@nongnu.org; Tue, 22 May 2018 18:27:00 -0400
+	(envelope-from <lersek@redhat.com>) id 1fLFz5-0000Yq-1T
+	for qemu-devel@nongnu.org; Tue, 22 May 2018 18:42:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1fLFk7-00072I-0d
-	for qemu-devel@nongnu.org; Tue, 22 May 2018 18:26:59 -0400
-Received: from out3-smtp.messagingengine.com ([66.111.4.27]:36307)
+	(envelope-from <lersek@redhat.com>) id 1fLFz1-000889-Up
+	for qemu-devel@nongnu.org; Tue, 22 May 2018 18:42:23 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:47370 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cota@braap.org>) id 1fLFk6-00071V-QR
-	for qemu-devel@nongnu.org; Tue, 22 May 2018 18:26:54 -0400
-From: "Emilio G. Cota" <cota@braap.org>
-Date: Tue, 22 May 2018 18:26:51 -0400
-Message-Id: <1527028012-21888-5-git-send-email-cota@braap.org>
-In-Reply-To: <1527028012-21888-1-git-send-email-cota@braap.org>
-References: <1527028012-21888-1-git-send-email-cota@braap.org>
-Subject: [Qemu-devel] [PATCH 4/5] trace: add trace_mem_build_info_no_se_be/le
+	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1fLFz1-00087P-Ps
+	for qemu-devel@nongnu.org; Tue, 22 May 2018 18:42:19 -0400
+From: Laszlo Ersek <lersek@redhat.com>
+References: <1526801333-30613-1-git-send-email-whois.zihan.yang@gmail.com>
+	<1526801333-30613-4-git-send-email-whois.zihan.yang@gmail.com>
+	<ef3fc85d-7726-c888-e8ca-9dfae1b908d3@gmail.com>
+	<17a3765f-b835-2d45-e8b9-ffd4aff909f9@redhat.com>
+	<cbdfe0d6-f071-3560-009d-3bbdde12b33c@gmail.com>
+	<f71a8c61-a0d7-6ebc-62ad-3dab8b9f8e5a@redhat.com>
+Message-ID: <dd40007d-b63b-d965-505f-11ff0748e54f@redhat.com>
+Date: Wed, 23 May 2018 00:42:09 +0200
+MIME-Version: 1.0
+In-Reply-To: <f71a8c61-a0d7-6ebc-62ad-3dab8b9f8e5a@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [RFC 3/3] acpi-build: allocate mcfg for multiple
+ host bridges
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,36 +33,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Richard Henderson <richard.henderson@linaro.org>, Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Zihan Yang <whois.zihan.yang@gmail.com>, qemu-devel@nongnu.org
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Alex Williamson <alex.williamson@redhat.com>, Eric Auger <eauger@redhat.com>, Drew Jones <drjones@redhat.com>, Wei Huang <wei@redhat.com>
 
-These will be used by the following commit.
+Hold on,
 
-Signed-off-by: Emilio G. Cota <cota@braap.org>
----
- trace/mem-internal.h | 12 ++++++++++++
- 1 file changed, 12 insertions(+)
+On 05/22/18 21:51, Laszlo Ersek wrote:
 
-diff --git a/trace/mem-internal.h b/trace/mem-internal.h
-index a9e408e..f6efaf6 100644
---- a/trace/mem-internal.h
-+++ b/trace/mem-internal.h
-@@ -39,4 +39,16 @@ static inline uint8_t trace_mem_get_info(TCGMemOp op, bool store)
-                                 op & MO_BSWAP, store);
- }
- 
-+static inline
-+uint8_t trace_mem_build_info_no_se_be(int size_shift, bool store)
-+{
-+    return trace_mem_build_info(size_shift, false, MO_BE, store);
-+}
-+
-+static inline
-+uint8_t trace_mem_build_info_no_se_le(int size_shift, bool store)
-+{
-+    return trace_mem_build_info(size_shift, false, MO_LE, store);
-+}
-+
- #endif /* TRACE__MEM_INTERNAL_H */
--- 
-2.7.4
+> It had taken years until the edk2 core gained a universal
+> PciHostBridgeDxe driver with a well-defined platform customization
+> interface, and that interface doesn't support multiple domains /
+> segments.
+
+after doing a bit more research: I was wrong about this. What I
+remembered was not the current state. Edk2 does seem to support multiple
+domains, with different segment numbers, ECAM base addresses, and bus
+number ranges. If we figure out a placement strategy or an easy to
+consume representation of these data for the firmware, it might be
+possible for OVMF to hook them into the edk2 core (although not in the
+earliest firmware phases, such as SEC and PEI).
+
+In retrospect, I'm honestly surprised that so much multi-segment support
+has been upstreamed to the edk2 core. Sorry about the FUD. (My general
+points remain valid, for the record... But perhaps they no longer matter
+for this discussion.)
+
+(I meant to send this message soon after
+<http://mid.mail-archive.com/fc603491-7c41-e862-a583-2bae6f165b5a@redhat.com>,
+but my internet connection had to die right then.)
+
+Thanks
+Laszlo
