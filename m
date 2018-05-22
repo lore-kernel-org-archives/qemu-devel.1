@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58704)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59058)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1fLAuw-0006Tg-K1
-	for qemu-devel@nongnu.org; Tue, 22 May 2018 13:17:48 -0400
+	(envelope-from <mlureau@redhat.com>) id 1fLAvy-0006yK-KD
+	for qemu-devel@nongnu.org; Tue, 22 May 2018 13:18:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1fLAus-0000vR-Li
-	for qemu-devel@nongnu.org; Tue, 22 May 2018 13:17:46 -0400
-Received: from 4.mo177.mail-out.ovh.net ([46.105.37.72]:34567)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1fLAus-0000v3-En
-	for qemu-devel@nongnu.org; Tue, 22 May 2018 13:17:42 -0400
-Received: from player791.ha.ovh.net (unknown [10.109.120.16])
-	by mo177.mail-out.ovh.net (Postfix) with ESMTP id C6A26AE9DF
-	for <qemu-devel@nongnu.org>; Tue, 22 May 2018 19:17:40 +0200 (CEST)
-From: Greg Kurz <groug@kaod.org>
-Date: Tue, 22 May 2018 19:17:28 +0200
-Message-ID: <152700944859.346734.1389264286134807488.stgit@bahia.lan>
+	(envelope-from <mlureau@redhat.com>) id 1fLAvu-0001Ar-LF
+	for qemu-devel@nongnu.org; Tue, 22 May 2018 13:18:50 -0400
+Received: from mail-it0-f51.google.com ([209.85.214.51]:56257)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <mlureau@redhat.com>) id 1fLAvu-0001Ai-GJ
+	for qemu-devel@nongnu.org; Tue, 22 May 2018 13:18:46 -0400
+Received: by mail-it0-f51.google.com with SMTP id 144-v6so865028iti.5
+	for <qemu-devel@nongnu.org>; Tue, 22 May 2018 10:18:46 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] [PATCH for-2.11.2] spapr: make pseries-2.11 the
- default machine type
+In-Reply-To: <20180522165058.15404-7-kraxel@redhat.com>
+References: <20180522165058.15404-1-kraxel@redhat.com>
+	<20180522165058.15404-7-kraxel@redhat.com>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>
+Date: Tue, 22 May 2018 19:18:45 +0200
+Message-ID: <CAMxuvaxP+TrwQSuMmFxmQmJojyLB1WYijJY0MPfv+3S8VVdJaA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 6/6] MAINTAINERS: add vga entries
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,70 +29,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-stable@nongnu.org
-Cc: qemu-devel@nongnu.org, Michael Roth <mdroth@linux.vnet.ibm.com>, David Gibson <david@gibson.dropbear.id.au>
+To: Gerd Hoffmann <kraxel@redhat.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>
 
-The spapr capability framework was introduced in QEMU 2.12. It allows
-to have an explicit control on how host features are exposed to the
-guest. This is especially needed to handle migration between hetero-
-geneous hosts (eg, POWER8 to POWER9). It is also used to expose fixes/
-workarounds against speculative execution vulnerabilities to guests.
-The framework was hence backported to QEMU 2.11.1, especially these
-commits:
+On Tue, May 22, 2018 at 6:50 PM, Gerd Hoffmann <kraxel@redhat.com> wrote:
+> Add entries for standard vga, virtio-gpu and cirrus.
+>
+> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
 
-0fac4aa93074 spapr: Add pseries-2.12 machine type
-9070f408f491 spapr: Treat Hardware Transactional Memory (HTM) as an
- optional capability
+Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
-0fac4aa93074 has the confusing effect of making pseries-2.12 the default
-machine type for QEMU 2.11.1, instead of the expected pseries-2.11. This
-patch changes the default machine back to pseries-2.11.
-
-Unfortunately, 9070f408f491 enforces the HTM capability for pseries-2.11.
-This isn't supported by TCG and breaks 'make check'. So this patch also
-adds a hack to turn HTM off when using TCG.
-
-Signed-off-by: Greg Kurz <groug@kaod.org>
----
- hw/ppc/spapr.c      |    4 ++--
- hw/ppc/spapr_caps.c |    5 +++++
- 2 files changed, 7 insertions(+), 2 deletions(-)
-
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index 1a2dd1f597d9..6499a867520f 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -3820,7 +3820,7 @@ static void spapr_machine_2_12_class_options(MachineClass *mc)
-     /* Defaults for the latest behaviour inherited from the base class */
- }
- 
--DEFINE_SPAPR_MACHINE(2_12, "2.12", true);
-+DEFINE_SPAPR_MACHINE(2_12, "2.12", false);
- 
- /*
-  * pseries-2.11
-@@ -3842,7 +3842,7 @@ static void spapr_machine_2_11_class_options(MachineClass *mc)
-     SET_MACHINE_COMPAT(mc, SPAPR_COMPAT_2_11);
- }
- 
--DEFINE_SPAPR_MACHINE(2_11, "2.11", false);
-+DEFINE_SPAPR_MACHINE(2_11, "2.11", true);
- 
- /*
-  * pseries-2.10
-diff --git a/hw/ppc/spapr_caps.c b/hw/ppc/spapr_caps.c
-index 7b229517be38..82043e60e78b 100644
---- a/hw/ppc/spapr_caps.c
-+++ b/hw/ppc/spapr_caps.c
-@@ -285,6 +285,11 @@ static sPAPRCapabilities default_caps_with_cpu(sPAPRMachineState *spapr,
- 
-     caps = smc->default_caps;
- 
-+    /* HACK for 2.11.2: fix make check */
-+    if (tcg_enabled()) {
-+        caps.caps[SPAPR_CAP_HTM] = SPAPR_CAP_OFF;
-+    }
-+
-     if (!ppc_check_compat(cpu, CPU_POWERPC_LOGICAL_2_07,
-                           0, spapr->max_compat_pvr)) {
-         caps.caps[SPAPR_CAP_HTM] = SPAPR_CAP_OFF;
+> ---
+>  MAINTAINERS | 21 +++++++++++++++++++++
+>  1 file changed, 21 insertions(+)
+>
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index e187b1f18f..2af3ad5172 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -1314,6 +1314,27 @@ S: Maintained
+>  F: include/hw/misc/unimp.h
+>  F: hw/misc/unimp.c
+>
+> +Standard VGA
+> +M: Gerd Hoffmann <kraxel@redhat.com>
+> +S: Maintained
+> +F: hw/display/vga*
+> +F: hw/display/bochs-display.c
+> +F: include/hw/display/vga.h
+> +F: include/hw/display/bochs-vbe.h
+> +
+> +virtio-gpu
+> +M: Gerd Hoffmann <kraxel@redhat.com>
+> +S: Maintained
+> +F: hw/display/virtio-gpu*
+> +F: hw/display/virtio-vga.c
+> +F: include/hw/virtio/virtio-gpu.h
+> +
+> +Cirrus VGA
+> +M: Gerd Hoffmann <kraxel@redhat.com>
+> +S: Odd Fixes
+> +W: https://www.kraxel.org/blog/2014/10/qemu-using-cirrus-considered-harm=
+ful/
+> +F: hw/display/cirrus*
+> +
+>  Subsystems
+>  ----------
+>  Audio
+> --
+> 2.9.3
+>
