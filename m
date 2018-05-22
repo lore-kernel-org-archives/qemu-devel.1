@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34449)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35737)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fL6Of-0007d0-9m
-	for qemu-devel@nongnu.org; Tue, 22 May 2018 08:28:15 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1fL6UC-0001Iq-03
+	for qemu-devel@nongnu.org; Tue, 22 May 2018 08:33:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fL6Ob-0007GM-1y
-	for qemu-devel@nongnu.org; Tue, 22 May 2018 08:28:09 -0400
-Received: from mail-ot0-x243.google.com ([2607:f8b0:4003:c0f::243]:37156)
+	(envelope-from <peter.maydell@linaro.org>) id 1fL6UB-0000tg-2i
+	for qemu-devel@nongnu.org; Tue, 22 May 2018 08:33:52 -0400
+Received: from mail-oi0-x243.google.com ([2607:f8b0:4003:c06::243]:32882)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fL6Oa-0007G5-Ru
-	for qemu-devel@nongnu.org; Tue, 22 May 2018 08:28:04 -0400
-Received: by mail-ot0-x243.google.com with SMTP id 77-v6so20718090otd.4
-	for <qemu-devel@nongnu.org>; Tue, 22 May 2018 05:28:04 -0700 (PDT)
+	id 1fL6UA-0000tJ-Td
+	for qemu-devel@nongnu.org; Tue, 22 May 2018 08:33:51 -0400
+Received: by mail-oi0-x243.google.com with SMTP id k5-v6so16021643oiw.0
+	for <qemu-devel@nongnu.org>; Tue, 22 May 2018 05:33:50 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <1526222114-5324-4-git-send-email-eric.auger@redhat.com>
+In-Reply-To: <1526222114-5324-3-git-send-email-eric.auger@redhat.com>
 References: <1526222114-5324-1-git-send-email-eric.auger@redhat.com>
-	<1526222114-5324-4-git-send-email-eric.auger@redhat.com>
+	<1526222114-5324-3-git-send-email-eric.auger@redhat.com>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 22 May 2018 13:27:43 +0100
-Message-ID: <CAFEAcA8yo_NKY=mHNYFFTA1+eR-731ePUb5hDum0ubUM2XOxxg@mail.gmail.com>
+Date: Tue, 22 May 2018 13:33:29 +0100
+Message-ID: <CAFEAcA8T0sQ_dZ7079WSx0FHp21F3xiWfNY6OFgO4Z0uBAPpLA@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [RFC v2 3/7] hw/intc/arm_gicv3: Introduce
- redist-region-count array property
+Subject: Re: [Qemu-devel] [RFC v2 2/7] target/arm: Allow KVM device address
+ overwriting
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,126 +34,53 @@ To: Eric Auger <eric.auger@redhat.com>
 Cc: Eric Auger <eric.auger.pro@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Shannon Zhao <zhaoshenglong@huawei.com>, Christoffer Dall <christoffer.dall@arm.com>, Marc Zyngier <marc.zyngier@arm.com>, Andrew Jones <drjones@redhat.com>, Wei Huang <wei@redhat.com>
 
 On 13 May 2018 at 15:35, Eric Auger <eric.auger@redhat.com> wrote:
-> To prepare for multiple redistributor regions, we introduce
-> an array of uint32_t properties that stores the redistributor
-> count of each redistributor region.
+> for KVM_VGIC_V3_ADDR_TYPE_REDIST_REGION attribute, the attribute
+> data pointed to by kvm_device_attr.addr is a OR of the
+> redistributor region address and other fields such as the index
+> of the redistributor region and the number of redistributors the
+> region can contain.
 >
-> Non accelerated VGICv3 only supports a single redistributor region.
-> The capacity of all redist regions is checked against the number of
-> vcpus.
+> The existing machine init done notifier framework sets the address
+> field to the actual address of the device and does not allow to OR
+> this value with other fields.
 >
-> Machvirt is updated to set the count to 123 vcpus for the unique
-> redistributor region we currently have.
->
-> Signed-off-by: Eric Auger <eric.auger@redhat.com>
-> ---
->  hw/arm/virt.c                      |  6 ++++++
->  hw/intc/arm_gicv3.c                | 11 ++++++++++-
->  hw/intc/arm_gicv3_common.c         | 35 ++++++++++++++++++++++++++++++-----
->  hw/intc/arm_gicv3_kvm.c            |  9 +++++++--
->  include/hw/intc/arm_gicv3_common.h |  6 ++++--
->  5 files changed, 57 insertions(+), 10 deletions(-)
->
-> diff --git a/hw/arm/virt.c b/hw/arm/virt.c
-> index 11b9f59..c9d842d 100644
-> --- a/hw/arm/virt.c
-> +++ b/hw/arm/virt.c
-> @@ -525,6 +525,12 @@ static void create_gic(VirtMachineState *vms, qemu_irq *pic)
->      if (!kvm_irqchip_in_kernel()) {
->          qdev_prop_set_bit(gicdev, "has-security-extensions", vms->secure);
->      }
-> +
-> +    if (type == 3) {
-> +        qdev_prop_set_uint32(gicdev, "len-redist-region-count", 1);
-> +        qdev_prop_set_uint32(gicdev , "redist-region-count[0]",
-> +                             vms->memmap[VIRT_GIC_REDIST].size / 0x20000);
+> This patch extends the KVMDevice struct with a new kda_addr_fixup
+> member. Its value is passed at registration time and OR'ed with the
+> resolved address on kvm_arm_set_device_addr().
 
-We used to create a region which had num_cpu redistributors in it;
-won't this cause us to create one which has as many redistributors
-as will fit in the space ?
 
-> +    }
->      qdev_init_nofail(gicdev);
->      gicbusdev = SYS_BUS_DEVICE(gicdev);
->      sysbus_mmio_map(gicbusdev, 0, vms->memmap[VIRT_GIC_DIST].base);
-> diff --git a/hw/intc/arm_gicv3.c b/hw/intc/arm_gicv3.c
-> index 479c667..38d57ac 100644
-> --- a/hw/intc/arm_gicv3.c
-> +++ b/hw/intc/arm_gicv3.c
-> @@ -373,7 +373,16 @@ static void arm_gic_realize(DeviceState *dev, Error **errp)
->          return;
->      }
->
-> -    gicv3_init_irqs_and_mmio(s, gicv3_set_irq, gic_ops);
-> +    if (s->nb_redist_regions != 1) {
-> +        error_setg(errp, "VGICv3 redist region number(%d) not equal to 1",
-> +                   s->nb_redist_regions);
+> diff --git a/target/arm/kvm_arm.h b/target/arm/kvm_arm.h
+> index 1e23640..4050017 100644
+> --- a/target/arm/kvm_arm.h
+> +++ b/target/arm/kvm_arm.h
+> @@ -34,6 +34,7 @@ int kvm_arm_vcpu_init(CPUState *cs);
+>   * @group: device control API group for setting addresses
+>   * @attr: device control API address type
+>   * @dev_fd: device control device file descriptor (or -1 if not supported)
+> + * @addr_fixup: value to be OR'ed with resolved address
 
-Missing 'return' ?
+I think addr_fixup is a bit vague; how about
+ addr_fixed_bits ?
+(here and in the function argument name). Or something else if
+somebody has a better idea.
 
-> +    }
-> +
-> +    gicv3_init_irqs_and_mmio(s, gicv3_set_irq, gic_ops, &local_err);
-> +    if (local_err) {
-> +        error_propagate(errp, local_err);
-> +        return;
-> +    }
+>   *
+>   * Remember the memory region @mr, and when it is mapped by the
+>   * machine model, tell the kernel that base address using the
+> @@ -45,7 +46,7 @@ int kvm_arm_vcpu_init(CPUState *cs);
+>   * address at the point where machine init is complete.
+>   */
+>  void kvm_arm_register_device(MemoryRegion *mr, uint64_t devid, uint64_t group,
+> -                             uint64_t attr, int dev_fd);
+> +                             uint64_t attr, int dev_fd, uint64_t addr_fixup);
 >
->      gicv3_init_cpuif(s);
->  }
-> diff --git a/hw/intc/arm_gicv3_common.c b/hw/intc/arm_gicv3_common.c
-> index 7b54d52..f405ae1 100644
-> --- a/hw/intc/arm_gicv3_common.c
-> +++ b/hw/intc/arm_gicv3_common.c
-> @@ -169,9 +169,10 @@ static const VMStateDescription vmstate_gicv3 = {
->  };
->
->  void gicv3_init_irqs_and_mmio(GICv3State *s, qemu_irq_handler handler,
-> -                              const MemoryRegionOps *ops)
-> +                              const MemoryRegionOps *ops, Error **errp)
->  {
->      SysBusDevice *sbd = SYS_BUS_DEVICE(s);
-> +    int rdist_capacity = 0;
->      int i;
->
->      /* For the GIC, also expose incoming GPIO lines for PPIs for each CPU.
-> @@ -199,11 +200,25 @@ void gicv3_init_irqs_and_mmio(GICv3State *s, qemu_irq_handler handler,
->
->      memory_region_init_io(&s->iomem_dist, OBJECT(s), ops, s,
->                            "gicv3_dist", 0x10000);
-> -    memory_region_init_io(&s->iomem_redist, OBJECT(s), ops ? &ops[1] : NULL, s,
-> -                          "gicv3_redist", 0x20000 * s->num_cpu);
-> -
->      sysbus_init_mmio(sbd, &s->iomem_dist);
-> -    sysbus_init_mmio(sbd, &s->iomem_redist);
-> +
-> +    s->iomem_redist = g_new0(MemoryRegion, s->nb_redist_regions);
-> +    for (i = 0; i < s->nb_redist_regions; i++) {
-> +        char *name = g_strdup_printf("gicv3_redist_region[%d]", i);
-> +
-> +        memory_region_init_io(&s->iomem_redist[i], OBJECT(s),
-> +                              ops ? &ops[1] : NULL, s,
-> +                              name, 0x20000 * s->redist_region_count[i]);
-> +        sysbus_init_mmio(sbd, &s->iomem_redist[i]);
-> +        rdist_capacity += s->redist_region_count[i];
-> +        g_free(name);
-> +    }
-> +    if (rdist_capacity < s->num_cpu) {
-> +        error_setg(errp, "Capacity of the redist regions(%d) "
-> +                   "is less than number of vcpus(%d)",
-> +                   rdist_capacity, s->num_cpu);
+>  /**
+>   * kvm_arm_init_cpreg_list:
+> --
+> 2.5.5
 
-It would be better to make this check before we create a lot of
-memory regions, I think. (Though I'm very unsure of the rules about
-how to unwind what you've done in a realize method that's about to fail;
-we probably get it wrong a lot and don't care because realize failure
-is fatal for most uses of most devices.)
-
-> +    }
-> +
->  }
->
->  static void arm_gicv3_common_realize(DeviceState *dev, Error **errp)
+Otherwise
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 
 thanks
 -- PMM
