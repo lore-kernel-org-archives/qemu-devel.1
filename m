@@ -1,27 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35660)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37731)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <whois.zihan.yang@gmail.com>) id 1fL0Pm-0006Wr-Bp
-	for qemu-devel@nongnu.org; Tue, 22 May 2018 02:04:56 -0400
+	(envelope-from <bounces@canonical.com>) id 1fL0aL-0008IZ-3T
+	for qemu-devel@nongnu.org; Tue, 22 May 2018 02:15:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <whois.zihan.yang@gmail.com>) id 1fL0Pl-0003Nf-GR
-	for qemu-devel@nongnu.org; Tue, 22 May 2018 02:04:54 -0400
-Received: from mail-lf0-x22a.google.com ([2a00:1450:4010:c07::22a]:40339)
+	(envelope-from <bounces@canonical.com>) id 1fL0aH-0008CU-4c
+	for qemu-devel@nongnu.org; Tue, 22 May 2018 02:15:49 -0400
+Received: from indium.canonical.com ([91.189.90.7]:51012)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <whois.zihan.yang@gmail.com>)
-	id 1fL0Pl-0003NM-9h
-	for qemu-devel@nongnu.org; Tue, 22 May 2018 02:04:53 -0400
-Received: by mail-lf0-x22a.google.com with SMTP id f22-v6so119436lfc.7
-	for <qemu-devel@nongnu.org>; Mon, 21 May 2018 23:04:53 -0700 (PDT)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1fL0aG-0008C9-Uv
+	for qemu-devel@nongnu.org; Tue, 22 May 2018 02:15:45 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1fL0aF-0004pK-Cs
+	for <qemu-devel@nongnu.org>; Tue, 22 May 2018 06:15:43 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 607B62E8F36
+	for <qemu-devel@nongnu.org>; Tue, 22 May 2018 06:15:43 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <287ca613-aaeb-b2b6-77ac-df3b9ceaf7cd@gmail.com>
-References: <1526801333-30613-1-git-send-email-whois.zihan.yang@gmail.com>
-	<287ca613-aaeb-b2b6-77ac-df3b9ceaf7cd@gmail.com>
-From: Zihan Yang <whois.zihan.yang@gmail.com>
-Date: Tue, 22 May 2018 14:04:51 +0800
-Message-ID: <CAKwiv-iuzspx560N9q-6P47Z33AunBrmyRP7e037om72+qBOYw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [RFC 0/3] pci_expander_brdige: Put pxb host bridge
- into separate pci domain
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 22 May 2018 06:09:50 -0000
+From: Thomas Huth <1772166@bugs.launchpad.net>
+Reply-To: Bug 1772166 <1772166@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <152673788962.15828.1293088141981880409.malonedeb@wampee.canonical.com>
+Message-Id: <152696939027.8447.18210584528518528840.malone@chaenomeles.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] =?utf-8?b?W0J1ZyAxNzcyMTY2XSBSZTogcWVtdSAyLjQuMTog?=
+ =?utf-8?q?dereferencing_pointer_to_incomplete_type_=E2=80=98struct_uconte?=
+ =?utf-8?b?eHTigJk=?=
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,17 +38,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+To: qemu-devel@nongnu.org
 
-> Maybe we should add a parameter to the pxb-pci device specifying the PCI
-domain
-> instead of adding it on the fly. It will help ensuring the PCI domain
-will not change over
-> time due to code changes.In this case "bus sharing" should be off. For
-the moment
-> the pxb devices get the bus range from the same PCI domain.
+v2.4 is not maintained anymore, so closing this as WONTFIX.
 
-That's good advice. I'll do that in v2.
+** Changed in: qemu
+       Status: New =3D> Won't Fix
 
-Thanks,
-Zihan
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1772166
+
+Title:
+  qemu 2.4.1: dereferencing pointer to incomplete type =E2=80=98struct ucon=
+text=E2=80=99
+
+Status in QEMU:
+  Won't Fix
+
+Bug description:
+  Trying to compile qemu release 2.4.1
+
+  Getting compile error
+
+  user-exec.c: In function =E2=80=98cpu_resume_from_signal=E2=80=99:
+  user-exec.c:72:37: error: dereferencing pointer to incomplete type =E2=80=
+=98struct ucontext=E2=80=99
+           sigprocmask(SIG_SETMASK, &uc->uc_sigmask, NULL);
+                                       ^~
+  user-exec.c: In function =E2=80=98cpu_arm_signal_handler=E2=80=99:
+  user-exec.c:214:41: error: dereferencing pointer to incomplete type =E2=
+=80=98struct ucontext=E2=80=99
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1772166/+subscriptions
