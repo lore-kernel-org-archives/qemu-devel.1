@@ -1,27 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53306)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53308)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1fLAV7-0005w9-Rk
-	for qemu-devel@nongnu.org; Tue, 22 May 2018 12:51:06 -0400
+	(envelope-from <kraxel@redhat.com>) id 1fLAV8-0005wA-1w
+	for qemu-devel@nongnu.org; Tue, 22 May 2018 12:51:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1fLAV7-0007uB-5p
-	for qemu-devel@nongnu.org; Tue, 22 May 2018 12:51:05 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:60818 helo=mx1.redhat.com)
+	(envelope-from <kraxel@redhat.com>) id 1fLAV7-0007uE-6H
+	for qemu-devel@nongnu.org; Tue, 22 May 2018 12:51:06 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:58742 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1fLAV7-0007tn-1M
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1fLAV7-0007tl-1K
 	for qemu-devel@nongnu.org; Tue, 22 May 2018 12:51:05 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.3])
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.5])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 92A1240122BA
+	by mx1.redhat.com (Postfix) with ESMTPS id 8BBF6818BAF3
 	for <qemu-devel@nongnu.org>; Tue, 22 May 2018 16:51:04 +0000 (UTC)
 From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Tue, 22 May 2018 18:50:52 +0200
-Message-Id: <20180522165058.15404-1-kraxel@redhat.com>
+Date: Tue, 22 May 2018 18:50:56 +0200
+Message-Id: <20180522165058.15404-5-kraxel@redhat.com>
+In-Reply-To: <20180522165058.15404-1-kraxel@redhat.com>
+References: <20180522165058.15404-1-kraxel@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v2 0/6] display: add new bochs-display device
+Subject: [Qemu-devel] [PATCH v2 4/6] bochs-display: add dirty tracking
+ support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,29 +36,81 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>
 
-v2:
- - add header guards to include/hw/display/bochs-vbe.h
- - return error code from bochs_display_get_mode.
- - add MAINTAINER entries for vga.
+Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+---
+ hw/display/bochs-display.c | 34 ++++++++++++++++++++++++++++++++--
+ 1 file changed, 32 insertions(+), 2 deletions(-)
 
-Gerd Hoffmann (6):
-  vga: move bochs vbe defines to header file
-  vga-pci: use PCI_VGA_MMIO_SIZE
-  hw/display: add new bochs-display device
-  bochs-display: add dirty tracking support
-  bochs-display: add pcie support
-  MAINTAINERS: add vga entries
-
- hw/display/vga_int.h           |  35 +---
- include/hw/display/bochs-vbe.h |  69 ++++++++
- hw/display/bochs-display.c     | 363 +++++++++++++++++++++++++++++++++++=
-++++++
- hw/display/vga-pci.c           |  19 +--
- MAINTAINERS                    |  21 +++
- hw/display/Makefile.objs       |   1 +
- 6 files changed, 460 insertions(+), 48 deletions(-)
- create mode 100644 include/hw/display/bochs-vbe.h
- create mode 100644 hw/display/bochs-display.c
-
+diff --git a/hw/display/bochs-display.c b/hw/display/bochs-display.c
+index a523e81d1d..9607df1c34 100644
+--- a/hw/display/bochs-display.c
++++ b/hw/display/bochs-display.c
+@@ -191,10 +191,13 @@ static int bochs_display_get_mode(BochsDisplayState=
+ *s,
+ static void bochs_display_update(void *opaque)
+ {
+     BochsDisplayState *s =3D opaque;
++    DirtyBitmapSnapshot *snap =3D NULL;
++    bool full_update =3D false;
+     BochsDisplayMode mode;
+     DisplaySurface *ds;
+     uint8_t *ptr;
+-    int ret;
++    bool dirty;
++    int y, ys, ret;
+=20
+     ret =3D bochs_display_get_mode(s, &mode);
+     if (ret < 0) {
+@@ -212,9 +215,34 @@ static void bochs_display_update(void *opaque)
+                                              mode.stride,
+                                              ptr + mode.offset);
+         dpy_gfx_replace_surface(s->con, ds);
++        full_update =3D true;
+     }
+=20
+-    dpy_gfx_update_full(s->con);
++    if (full_update) {
++        dpy_gfx_update_full(s->con);
++    } else {
++        snap =3D memory_region_snapshot_and_clear_dirty(&s->vram,
++                                                      mode.offset, mode.=
+size,
++                                                      DIRTY_MEMORY_VGA);
++        ys =3D -1;
++        for (y =3D 0; y < mode.height; y++) {
++            dirty =3D memory_region_snapshot_get_dirty(&s->vram, snap,
++                                                     mode.offset + mode.=
+stride * y,
++                                                     mode.stride);
++            if (dirty && ys < 0) {
++                ys =3D y;
++            }
++            if (!dirty && ys >=3D 0) {
++                dpy_gfx_update(s->con, 0, ys,
++                               mode.width, y - ys);
++                ys =3D -1;
++            }
++        }
++        if (ys >=3D 0) {
++            dpy_gfx_update(s->con, 0, ys,
++                           mode.width, y - ys);
++        }
++    }
+ }
+=20
+ static const GraphicHwOps bochs_display_gfx_ops =3D {
+@@ -251,6 +279,8 @@ static void bochs_display_realize(PCIDevice *dev, Err=
+or **errp)
+     pci_set_byte(&s->pci.config[PCI_REVISION_ID], 2);
+     pci_register_bar(&s->pci, 0, PCI_BASE_ADDRESS_MEM_PREFETCH, &s->vram=
+);
+     pci_register_bar(&s->pci, 2, PCI_BASE_ADDRESS_SPACE_MEMORY, &s->mmio=
+);
++
++    memory_region_set_log(&s->vram, true, DIRTY_MEMORY_VGA);
+ }
+=20
+ static bool bochs_display_get_big_endian_fb(Object *obj, Error **errp)
 --=20
 2.9.3
