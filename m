@@ -1,28 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38002)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38060)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fL6eN-0005pg-0e
-	for qemu-devel@nongnu.org; Tue, 22 May 2018 08:44:23 -0400
+	(envelope-from <cohuck@redhat.com>) id 1fL6ea-0005z4-Bt
+	for qemu-devel@nongnu.org; Tue, 22 May 2018 08:44:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fL6eM-0005cA-9B
-	for qemu-devel@nongnu.org; Tue, 22 May 2018 08:44:23 -0400
-Received: from mail-ot0-x242.google.com ([2607:f8b0:4003:c0f::242]:42932)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fL6eM-0005bv-4B
-	for qemu-devel@nongnu.org; Tue, 22 May 2018 08:44:22 -0400
-Received: by mail-ot0-x242.google.com with SMTP id l13-v6so20742567otk.9
-	for <qemu-devel@nongnu.org>; Tue, 22 May 2018 05:44:21 -0700 (PDT)
+	(envelope-from <cohuck@redhat.com>) id 1fL6eV-0005sA-3V
+	for qemu-devel@nongnu.org; Tue, 22 May 2018 08:44:36 -0400
+Date: Tue, 22 May 2018 14:44:26 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20180522144426.0e683b60.cohuck@redhat.com>
+In-Reply-To: <b1a5eb12-4f1d-2f66-f59f-eb1baa87746d@redhat.com>
+References: <20180504072514.8450-1-cohuck@redhat.com>
+	<20180504072514.8450-9-cohuck@redhat.com>
+	<b1a5eb12-4f1d-2f66-f59f-eb1baa87746d@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA8T0sQ_dZ7079WSx0FHp21F3xiWfNY6OFgO4Z0uBAPpLA@mail.gmail.com>
-References: <1526222114-5324-1-git-send-email-eric.auger@redhat.com>
-	<1526222114-5324-3-git-send-email-eric.auger@redhat.com>
-	<CAFEAcA8T0sQ_dZ7079WSx0FHp21F3xiWfNY6OFgO4Z0uBAPpLA@mail.gmail.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 22 May 2018 13:44:01 +0100
-Message-ID: <CAFEAcA_KHPBO53Qnh5ZgJZwb7r+StnxenbRr0P+8jGou2CqzRw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [RFC v2 2/7] target/arm: Allow KVM device address
- overwriting
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PULL 08/15] pc-bios/s390-ccw: fix loadparm
+ initialization and int conversion
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,42 +25,114 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Auger <eric.auger@redhat.com>
-Cc: Eric Auger <eric.auger.pro@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Shannon Zhao <zhaoshenglong@huawei.com>, Christoffer Dall <christoffer.dall@arm.com>, Marc Zyngier <marc.zyngier@arm.com>, Andrew Jones <drjones@redhat.com>, Wei Huang <wei@redhat.com>
+To: Laszlo Ersek <lersek@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>, David Hildenbrand <david@redhat.com>, Alexander Graf <agraf@suse.de>, qemu-devel@nongnu.org, Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org, Collin Walling <walling@linux.ibm.com>, Richard Henderson <rth@twiddle.net>
 
-On 22 May 2018 at 13:33, Peter Maydell <peter.maydell@linaro.org> wrote:
-> On 13 May 2018 at 15:35, Eric Auger <eric.auger@redhat.com> wrote:
->> for KVM_VGIC_V3_ADDR_TYPE_REDIST_REGION attribute, the attribute
->> data pointed to by kvm_device_attr.addr is a OR of the
->> redistributor region address and other fields such as the index
->> of the redistributor region and the number of redistributors the
->> region can contain.
->>
->> The existing machine init done notifier framework sets the address
->> field to the actual address of the device and does not allow to OR
->> this value with other fields.
->>
->> This patch extends the KVMDevice struct with a new kda_addr_fixup
->> member. Its value is passed at registration time and OR'ed with the
->> resolved address on kvm_arm_set_device_addr().
->
->
->> diff --git a/target/arm/kvm_arm.h b/target/arm/kvm_arm.h
->> index 1e23640..4050017 100644
->> --- a/target/arm/kvm_arm.h
->> +++ b/target/arm/kvm_arm.h
->> @@ -34,6 +34,7 @@ int kvm_arm_vcpu_init(CPUState *cs);
->>   * @group: device control API group for setting addresses
->>   * @attr: device control API address type
->>   * @dev_fd: device control device file descriptor (or -1 if not supported)
->> + * @addr_fixup: value to be OR'ed with resolved address
->
-> I think addr_fixup is a bit vague; how about
->  addr_fixed_bits ?
-> (here and in the function argument name). Or something else if
-> somebody has a better idea.
+On Tue, 15 May 2018 10:45:02 +0200
+Laszlo Ersek <lersek@redhat.com> wrote:
 
-Thomas Huth suggested addr_ormask.
+> I've come across this patch in downstream review (although I really have
+> zero background in s390x), and Cornelia suggested I might want to repeat
+> my comments on the upstream list too:
+> 
+> On 05/04/18 09:25, Cornelia Huck wrote:
+> > From: Collin Walling <walling@linux.ibm.com>
+> > 
+> > Rename the loadparm char array in main.c to loadparm_str and
+> > increased the size by one byte to account for a null termination
+> > when converting the loadparm string to an int  via atoui. We
+> > also allow the boot menu to be enabled when loadparm is set to
+> > an empty string or a series of spaces.
+> > 
+> > Signed-off-by: Collin Walling <walling@linux.ibm.com>
+> > Reported-by: Vasily Gorbik <gor@linux.ibm.com>
+> > Reviewed-by: Thomas Huth <thuth@redhat.com>
+> > Reviewed-by: Janosch Frank <frankja@linux.ibm.com>
+> > Signed-off-by: Thomas Huth <thuth@redhat.com>
+> > ---
+> >  hw/s390x/ipl.c          |  4 ++++
+> >  pc-bios/s390-ccw/main.c | 14 +++++++-------
+> >  2 files changed, 11 insertions(+), 7 deletions(-)
+> > 
+> > diff --git a/hw/s390x/ipl.c b/hw/s390x/ipl.c
+> > index fb554ab156..150f6c0582 100644
+> > --- a/hw/s390x/ipl.c
+> > +++ b/hw/s390x/ipl.c
+> > @@ -373,6 +373,10 @@ int s390_ipl_set_loadparm(uint8_t *loadparm)
+> >              loadparm[i] = ascii2ebcdic[(uint8_t) lp[i]];
+> >          }
+> >  
+> > +        if (i < 8) {
+> > +            memset(loadparm + i, 0x40, 8 - i); /* fill with EBCDIC spaces */
+> > +        }
+> > +
+> >          g_free(lp);
+> >          return 0;
+> >      }
+> > diff --git a/pc-bios/s390-ccw/main.c b/pc-bios/s390-ccw/main.c
+> > index 9d9f8cf4d3..26f9adf84a 100644
+> > --- a/pc-bios/s390-ccw/main.c
+> > +++ b/pc-bios/s390-ccw/main.c
+> > @@ -15,11 +15,11 @@
+> >  char stack[PAGE_SIZE * 8] __attribute__((__aligned__(PAGE_SIZE)));
+> >  static SubChannelId blk_schid = { .one = 1 };
+> >  IplParameterBlock iplb __attribute__((__aligned__(PAGE_SIZE)));
+> > -static char loadparm[8] = { 0, 0, 0, 0, 0, 0, 0, 0 };
+> > +static char loadparm_str[9] = { 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+> >  QemuIplParameters qipl;
+> >  
+> >  #define LOADPARM_PROMPT "PROMPT  "
+> > -#define LOADPARM_EMPTY  "........"
+> > +#define LOADPARM_EMPTY  "        "
+> >  #define BOOT_MENU_FLAG_MASK (QIPL_FLAG_BM_OPTS_CMD | QIPL_FLAG_BM_OPTS_ZIPL)
+> >  
+> >  /*
+> > @@ -45,7 +45,7 @@ void panic(const char *string)
+> >  
+> >  unsigned int get_loadparm_index(void)
+> >  {
+> > -    return atoui(loadparm);
+> > +    return atoui(loadparm_str);
+> >  }
+> >  
+> >  static bool find_dev(Schib *schib, int dev_no)
+> > @@ -80,13 +80,13 @@ static bool find_dev(Schib *schib, int dev_no)
+> >  
+> >  static void menu_setup(void)
+> >  {
+> > -    if (memcmp(loadparm, LOADPARM_PROMPT, 8) == 0) {
+> > +    if (memcmp(loadparm_str, LOADPARM_PROMPT, 8) == 0) {
+> >          menu_set_parms(QIPL_FLAG_BM_OPTS_CMD, 0);
+> >          return;
+> >      }
+> >  
+> >      /* If loadparm was set to any other value, then do not enable menu */
+> > -    if (memcmp(loadparm, LOADPARM_EMPTY, 8) != 0) {
+> > +    if (memcmp(loadparm_str, LOADPARM_EMPTY, 8) != 0) {
+> >          return;
+> >      }
+> >  
+> > @@ -116,8 +116,8 @@ static void virtio_setup(void)
+> >       */
+> >      enable_mss_facility();
+> >  
+> > -    sclp_get_loadparm_ascii(loadparm);
+> > -    memcpy(ldp + 10, loadparm, 8);
+> > +    sclp_get_loadparm_ascii(loadparm_str);
+> > +    memcpy(ldp + 10, loadparm_str, 8);
+> >      sclp_print(ldp);
+> >  
+> >      memcpy(&qipl, early_qipl, sizeof(QemuIplParameters));
+> >   
+> 
+> So here I said, "There are a bunch of naked 8 constants; those should
+> all be (sizeof loadparm_str - 1), I think. Should be a separate patch,
+> of course."
 
-thanks
--- PMM
+Alternatively, as loadparm size is architectured IIRC and unlikely to
+change, do
+
+#define LOADPARM_LEN 8
+char loadparm_str[LOADPARM_LEN + 1];
+
+and compare against LOADPARM_LEN... opinions?
