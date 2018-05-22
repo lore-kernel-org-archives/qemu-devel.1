@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43196)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45572)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1fL8FR-0004wt-Fo
-	for qemu-devel@nongnu.org; Tue, 22 May 2018 10:26:46 -0400
+	(envelope-from <lersek@redhat.com>) id 1fL8Qe-0007mX-Fz
+	for qemu-devel@nongnu.org; Tue, 22 May 2018 10:38:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1fL8FM-0001BE-3n
-	for qemu-devel@nongnu.org; Tue, 22 May 2018 10:26:45 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:45600 helo=mx1.redhat.com)
+	(envelope-from <lersek@redhat.com>) id 1fL8QZ-0006Gb-HK
+	for qemu-devel@nongnu.org; Tue, 22 May 2018 10:38:19 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:46168 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1fL8FL-0001B6-Uw
-	for qemu-devel@nongnu.org; Tue, 22 May 2018 10:26:40 -0400
+	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1fL8QZ-0006GQ-Bv
+	for qemu-devel@nongnu.org; Tue, 22 May 2018 10:38:15 -0400
 References: <20180518122304.31020-1-marcandre.lureau@redhat.com>
-	<20180518122304.31020-4-marcandre.lureau@redhat.com>
 From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <92a15a53-49e2-76ea-848b-9aaaa43519c4@redhat.com>
-Date: Tue, 22 May 2018 16:26:36 +0200
+Message-ID: <b7e6a6bf-c4bb-f677-c269-d7b3e3a75151@redhat.com>
+Date: Tue, 22 May 2018 16:38:12 +0200
 MIME-Version: 1.0
-In-Reply-To: <20180518122304.31020-4-marcandre.lureau@redhat.com>
+In-Reply-To: <20180518122304.31020-1-marcandre.lureau@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [edk2] [PATCH v3 3/4] OvmfPkg: add
- Tcg2PhysicalPresenceLibQemu
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [edk2] [PATCH v3 0/4] RFC: ovmf: Add support for
+ TPM Physical Presence interface
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,168 +32,97 @@ To: marcandre.lureau@redhat.com, edk2-devel@lists.01.org
 Cc: qemu-devel@nongnu.org, javierm@redhat.com, pjones@redhat.com, jiewen.yao@intel.com
 
 On 05/18/18 14:23, marcandre.lureau@redhat.com wrote:
+> From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+>=20
+> Hi,
+>=20
+> The following series adds basic TPM PPI 1.3 support for OVMF-on-QEMU
+> with TPM2 (I haven't looked at TPM1, for lack of interest).
+>=20
+> PPI test runs successfully with Windows 10 WHLK, despite the limited
+> number of supported funcions (tpm2_ppi_funcs table, in particular, no
+> function allows to manipulate Tcg2PhysicalPresenceFlags)
+>=20
+> The way it works is relatively simple: a memory region is allocated by
+> QEMU to save PPI related variables. An ACPI interface is exposed by
+> QEMU to let the guest manipulate those. At boot, ovmf processes and
+> updates the PPI qemu region and request variables.
+>=20
+> I build edk2 with:
+>=20
+> $ build -DTPM2_ENABLE
+>=20
+> I test with qemu & swtpm/libtpms (tpm2 branches, swtpm_setup.sh --tpm2
+>  --tpm-state tpmstatedir)
+>=20
+> $ swtpm socket --tpmstate tpmstatedir --ctrl type=3Dunixio,path=3Dtpmso=
+ck
+>   --tpm2 &
+>=20
+> $ qemu .. -chardev socket,id=3Dchrtpm,path=3Dtpmsock -tpmdev
+>   emulator,id=3Dtpm0,chardev=3Dchrtpm -device tpm-crb,tpmdev=3Dtpm0
+>=20
+> Github trees:
+> https://github.com/elmarco/edk2/tree/tpm-ppi
+> https://github.com/elmarco/qemu/tree/tpm-ppi
+>=20
+> Thanks
+>=20
+> v3: after Laszlo review
+>  - dropped DxeTcg2PhysicalPresenceLib.uni
+>  - removed mTpm2PPIFuncs static initialization, use hard-coded assignme=
+nts
+>  - declared STATIC the functions that should be
+>  - fixed an OUT/IN decorator
+>  - use EFI_PROTOCOL_ERROR instead of EFI_INVALID_PARAMETER when PPI
+>    initialization fails
+>  - replaced EFI_D_INFO with DEBUG_INFO
+>  - added a check for mPpi address that it doesn't cross a page boundary
+>  - added a GetMemorySpaceDescriptor() check for memory type
+>  - declared *mPpi as volatile, to correct mmio access
+>  - a few more style changes
+>  - comments updated
+>  - some minor dead code/inclusion/defines removal
+>  - added a few r-b tags
+>=20
+> v2:
+>  - style and commit message fixes
+>=20
+> Marc-Andr=C3=A9 Lureau (4):
+>   OvmfPkg: add Tcg2PhysicalPresenceLibNull when !TPM2_ENABLE
+>   OvmfPkg/IndustryStandard: add QemuTpm.h header
+>   OvmfPkg: add Tcg2PhysicalPresenceLibQemu
+>   OvmfPkg/PlatformBootManagerLib: process TPM PPI request
+>=20
+>  OvmfPkg/OvmfPkgIa32.dsc                       |   4 +-
+>  OvmfPkg/OvmfPkgIa32X64.dsc                    |   4 +-
+>  OvmfPkg/OvmfPkgX64.dsc                        |   4 +-
+>  .../PlatformBootManagerLib.inf                |   2 +
+>  .../DxeTcg2PhysicalPresenceLib.inf            |  33 +
+>  .../DxeTcg2PhysicalPresenceLib.inf            |  46 +-
+>  OvmfPkg/Include/IndustryStandard/QemuTpm.h    |  69 ++
+>  .../PlatformBootManagerLib/BdsPlatform.c      |   6 +
+>  .../DxeTcg2PhysicalPresenceLib.c              |  20 +-
+>  .../DxeTcg2PhysicalPresenceLib.c              | 919 ++++++++++++++++++
+>  .../PhysicalPresenceStrings.uni               |  33 +-
+>  11 files changed, 1081 insertions(+), 59 deletions(-)
+>  create mode 100644 OvmfPkg/Library/Tcg2PhysicalPresenceLibNull/DxeTcg2=
+PhysicalPresenceLib.inf
+>  copy {SecurityPkg/Library/DxeTcg2PhysicalPresenceLib =3D> OvmfPkg/Libr=
+ary/Tcg2PhysicalPresenceLibQemu}/DxeTcg2PhysicalPresenceLib.inf (66%)
+>  create mode 100644 OvmfPkg/Include/IndustryStandard/QemuTpm.h
+>  copy EdkCompatibilityPkg/Foundation/Library/EdkIIGlueLib/Library/BaseL=
+ib/Ia32/CpuSleep.c =3D> OvmfPkg/Library/Tcg2PhysicalPresenceLibNull/DxeTc=
+g2PhysicalPresenceLib.c (55%)
+>  create mode 100644 OvmfPkg/Library/Tcg2PhysicalPresenceLibQemu/DxeTcg2=
+PhysicalPresenceLib.c
+>  copy {SecurityPkg/Library/DxeTcg2PhysicalPresenceLib =3D> OvmfPkg/Libr=
+ary/Tcg2PhysicalPresenceLibQemu}/PhysicalPresenceStrings.uni (56%)
+>=20
 
-> +/**
-> +  Initializes QEMU PPI memory region.
-> +
-> +  @retval EFI_SUCCESS           Operation completed successfully.
-> +  @retval EFI_PROTOCOL_ERROR    PPI address is invalid.
-> +**/
-> +STATIC
-> +EFI_STATUS
-> +QemuTpmInitPPI (
-> +  VOID
-> +  )
-> +{
-> +  EFI_STATUS                      Status;
-> +  QEMU_FWCFG_TPM_CONFIG           Config;
-> +  EFI_PHYSICAL_ADDRESS            PpiAddress64;
-> +  EFI_GCD_MEMORY_SPACE_DESCRIPTOR Descriptor;
-> +  int                             i;
+I briefly summarized the updates that I mentioned in review on the
+patches themselves, and pushed the series as commit range
+75135cc6988e..8d65d3b25e35.
 
-(1) This should be "UINTN Idx".
-
-> +
-> +  if (mPpi != NULL) {
-> +    return EFI_SUCCESS;
-> +  }
-> +
-> +  Status = QemuTpmReadConfig (&Config);
-> +  if (EFI_ERROR (Status)) {
-> +    return Status;
-> +  }
-> +
-> +  mPpi = (QEMU_TPM_PPI *)(UINTN)Config.PpiAddress;
-> +  if (mPpi == NULL) {
-> +    return EFI_PROTOCOL_ERROR;
-> +  }
-> +
-> +  DEBUG ((DEBUG_INFO, "[TPM2PP] mPpi=%p version=%d\n", mPpi, Config.TpmVersion));
-> +
-> +  PpiAddress64 = (UINTN)mPpi;
-> +  if ((PpiAddress64 & ~(UINT64)EFI_PAGE_MASK) !=
-> +      ((PpiAddress64 + sizeof *mPpi - 1) & ~(UINT64)EFI_PAGE_MASK)) {
-> +    DEBUG ((DEBUG_ERROR, "[TPM2PP] mPpi crosses a page boundary\n"));
-> +    return EFI_PROTOCOL_ERROR;
-> +  }
-> +
-> +  Status = gDS->GetMemorySpaceDescriptor (PpiAddress64, &Descriptor);
-> +  if (Status != EFI_SUCCESS && Status != EFI_NOT_FOUND) {
-> +    ASSERT_EFI_ERROR (Status);
-> +    return EFI_PROTOCOL_ERROR;
-> +  }
-> +  if (Status == EFI_SUCCESS && (
-> +        Descriptor.GcdMemoryType != EfiGcdMemoryTypeMemoryMappedIo &&
-> +        Descriptor.GcdMemoryType != EfiGcdMemoryTypeNonExistent)) {
-> +    DEBUG ((DEBUG_ERROR, "[TPM2PP] mPpi has an invalid memory type\n"));
-> +    return EFI_PROTOCOL_ERROR;
-> +  }
-
-(2) In edk2 we generally don't compare EFI_STATUS variables against
-EFI_SUCCESS, instead we write [!]EFI_ERROR (Status). Whether that's
-easier or harder to understand is anyone's guess, but either way that's
-the idiom.
-
-(3) The indentation / parentheses around "Descriptor.GcdMemoryType"
-aren't idiomatic.
-
-(4) I think the new checks introduce a new logic bug in this patch -- if
-we return EFI_PROTOCOL_ERROR, we should re-set mPpi to NULL. Otherwise
-the next call to QemuTpmInitPPI() will succeed, using a bogus mPpi
-value.
-
-> +
-> +  for (i = 0; i < sizeof (mPpi->Func); i++) {
-> +    mPpi->Func[i] = 0;
-> +  }
-
-(5) Functionally this is OK, because mPpi->Func has UINT8 elements;
-however we should really use ARRAY_SIZE() here.
-
-> +  if (Config.TpmVersion == QEMU_TPM_VERSION_2) {
-> +    mPpi->Func[TCG2_PHYSICAL_PRESENCE_NO_ACTION] = TPM_PPI_FLAGS;
-> +    mPpi->Func[TCG2_PHYSICAL_PRESENCE_CLEAR] = TPM_PPI_FLAGS;
-> +    mPpi->Func[TCG2_PHYSICAL_PRESENCE_ENABLE_CLEAR] = TPM_PPI_FLAGS;
-> +    mPpi->Func[TCG2_PHYSICAL_PRESENCE_ENABLE_CLEAR_2] = TPM_PPI_FLAGS;
-> +    mPpi->Func[TCG2_PHYSICAL_PRESENCE_ENABLE_CLEAR_3] = TPM_PPI_FLAGS;
-> +    mPpi->Func[TCG2_PHYSICAL_PRESENCE_SET_PCR_BANKS] = TPM_PPI_FLAGS;
-> +    mPpi->Func[TCG2_PHYSICAL_PRESENCE_CHANGE_EPS] = TPM_PPI_FLAGS;
-> +    mPpi->Func[TCG2_PHYSICAL_PRESENCE_LOG_ALL_DIGESTS] = TPM_PPI_FLAGS;
-> +    mPpi->Func[TCG2_PHYSICAL_PRESENCE_ENABLE_BLOCK_SID] = TPM_PPI_FLAGS;
-> +    mPpi->Func[TCG2_PHYSICAL_PRESENCE_DISABLE_BLOCK_SID] = TPM_PPI_FLAGS;
-> +  }
-> +
-> +  if (mPpi->In == 0) {
-> +    mPpi->In = 1;
-> +    mPpi->Request = TCG2_PHYSICAL_PRESENCE_NO_ACTION;
-> +    mPpi->LastRequest = TCG2_PHYSICAL_PRESENCE_NO_ACTION;
-> +    mPpi->NextStep = TCG2_PHYSICAL_PRESENCE_NO_ACTION;
-> +  }
-> +
-> +  return EFI_SUCCESS;
-> +}
-
-Thus, I've squashed the following patch into yours, and build-tested it:
-
-> diff --git a/OvmfPkg/Library/Tcg2PhysicalPresenceLibQemu/DxeTcg2PhysicalPresenceLib.c b/OvmfPkg/Library/Tcg2PhysicalPresenceLibQemu/DxeTcg2PhysicalPresenceLib.c
-> index cc4046228ba3..52913f573676 100644
-> --- a/OvmfPkg/Library/Tcg2PhysicalPresenceLibQemu/DxeTcg2PhysicalPresenceLib.c
-> +++ b/OvmfPkg/Library/Tcg2PhysicalPresenceLibQemu/DxeTcg2PhysicalPresenceLib.c
-> @@ -99,7 +99,7 @@ QemuTpmInitPPI (
->    QEMU_FWCFG_TPM_CONFIG           Config;
->    EFI_PHYSICAL_ADDRESS            PpiAddress64;
->    EFI_GCD_MEMORY_SPACE_DESCRIPTOR Descriptor;
-> -  int                             i;
-> +  UINTN                           Idx;
->
->    if (mPpi != NULL) {
->      return EFI_SUCCESS;
-> @@ -121,23 +121,23 @@ QemuTpmInitPPI (
->    if ((PpiAddress64 & ~(UINT64)EFI_PAGE_MASK) !=
->        ((PpiAddress64 + sizeof *mPpi - 1) & ~(UINT64)EFI_PAGE_MASK)) {
->      DEBUG ((DEBUG_ERROR, "[TPM2PP] mPpi crosses a page boundary\n"));
-> -    return EFI_PROTOCOL_ERROR;
-> +    goto InvalidPpiAddress;
->    }
->
->    Status = gDS->GetMemorySpaceDescriptor (PpiAddress64, &Descriptor);
-> -  if (Status != EFI_SUCCESS && Status != EFI_NOT_FOUND) {
-> +  if (EFI_ERROR (Status) && Status != EFI_NOT_FOUND) {
->      ASSERT_EFI_ERROR (Status);
-> -    return EFI_PROTOCOL_ERROR;
-> +    goto InvalidPpiAddress;
->    }
-> -  if (Status == EFI_SUCCESS && (
-> -        Descriptor.GcdMemoryType != EfiGcdMemoryTypeMemoryMappedIo &&
-> -        Descriptor.GcdMemoryType != EfiGcdMemoryTypeNonExistent)) {
-> +  if (!EFI_ERROR (Status) &&
-> +      (Descriptor.GcdMemoryType != EfiGcdMemoryTypeMemoryMappedIo &&
-> +       Descriptor.GcdMemoryType != EfiGcdMemoryTypeNonExistent)) {
->      DEBUG ((DEBUG_ERROR, "[TPM2PP] mPpi has an invalid memory type\n"));
-> -    return EFI_PROTOCOL_ERROR;
-> +    goto InvalidPpiAddress;
->    }
->
-> -  for (i = 0; i < sizeof (mPpi->Func); i++) {
-> -    mPpi->Func[i] = 0;
-> +  for (Idx = 0; Idx < ARRAY_SIZE (mPpi->Func); Idx++) {
-> +    mPpi->Func[Idx] = 0;
->    }
->    if (Config.TpmVersion == QEMU_TPM_VERSION_2) {
->      mPpi->Func[TCG2_PHYSICAL_PRESENCE_NO_ACTION] = TPM_PPI_FLAGS;
-> @@ -160,6 +160,10 @@ QemuTpmInitPPI (
->    }
->
->    return EFI_SUCCESS;
-> +
-> +InvalidPpiAddress:
-> +  mPpi = NULL;
-> +  return EFI_PROTOCOL_ERROR;
->  }
-
-With that:
-
-Reviewed-by: Laszlo Ersek <lersek@redhat.com>
-
-Thanks
+Thank you guys again!
 Laszlo
