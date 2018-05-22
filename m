@@ -1,26 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50811)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52227)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fL8j3-0004QX-O3
-	for qemu-devel@nongnu.org; Tue, 22 May 2018 10:57:23 -0400
+	(envelope-from <kwolf@redhat.com>) id 1fL8oH-0005Zr-GE
+	for qemu-devel@nongnu.org; Tue, 22 May 2018 11:02:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fL8iy-0006Oa-6c
-	for qemu-devel@nongnu.org; Tue, 22 May 2018 10:57:21 -0400
-Received: from mail-oi0-x236.google.com ([2607:f8b0:4003:c06::236]:33913)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fL8iy-0006OR-1L
-	for qemu-devel@nongnu.org; Tue, 22 May 2018 10:57:16 -0400
-Received: by mail-oi0-x236.google.com with SMTP id l1-v6so16490102oii.1
-	for <qemu-devel@nongnu.org>; Tue, 22 May 2018 07:57:15 -0700 (PDT)
+	(envelope-from <kwolf@redhat.com>) id 1fL8oB-0000R3-GZ
+	for qemu-devel@nongnu.org; Tue, 22 May 2018 11:02:45 -0400
+Date: Tue, 22 May 2018 17:02:21 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20180522150221.GF6233@localhost.localdomain>
+References: <20180518180440-mutt-send-email-mst@kernel.org>
+	<20180518170956.GI8615@redhat.com>
+	<20180522073555.peibbwoqvbor7nrs@sirius.home.kraxel.org>
+	<20180522171112-mutt-send-email-mst@kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <214c47f3-1583-6480-4837-8b8ced37f038@twiddle.net>
-References: <CAFEAcA-aD98+wh=XfMkY1iUwHjDJZ6dH7Juv0_o_VbgkcV0etw@mail.gmail.com>
-	<214c47f3-1583-6480-4837-8b8ced37f038@twiddle.net>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 22 May 2018 15:56:54 +0100
-Message-ID: <CAFEAcA9QN_EFbfwqps+5Bu7CKX4J7GLGjBMURmk-1Jk22iixKA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] TCG helpers that return f16
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180522171112-mutt-send-email-mst@kernel.org>
+Subject: Re: [Qemu-devel] storing machine data in qcow images?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,30 +25,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <rth@twiddle.net>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Gerd Hoffmann <kraxel@redhat.com>, Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>, ehabkost@redhat.com, qemu-block@nongnu.org, qemu-devel@nongnu.org, mreitz@redhat.com, stefanha@redhat.com
 
-On 22 May 2018 at 15:55, Richard Henderson <rth@twiddle.net> wrote:
-> On 05/22/2018 07:50 AM, Peter Maydell wrote:
->> Hi; I was reading about the x86-64 calling convention and I found
->> out that apparently for returns of smaller-than-register types the
->> high parts may contain garbage:
->> https://stackoverflow.com/questions/36706721/is-a-sign-or-zero-extension-required-when-adding-a-32bit-offset-to-a-pointer-for/36760539#36760539
->
-> Yes, that's one reason I didn't want to get involved in returning a "real"
-> 16-bit quantity.
->
->> However, for TCG helper functions, although we allow the helper
->> macro to say that the return type is 'f16', in helper-head.h we
->> seem to just alias f16 as i32, and in dh_sizemask() we only record
->> "is this 64 bits" and "is this signed". Am I missing the place
->> where we zero-extend the value we get back from the helper so
->> that it's the right thing in TCG's i32 ?
->
-> It happens in C, implicit in "typedef uint16_t float16".
+Am 22.05.2018 um 16:19 hat Michael S. Tsirkin geschrieben:
+> On Tue, May 22, 2018 at 09:35:55AM +0200, Gerd Hoffmann wrote:
+> >   Hi,
+> > 
+> > > You must /sometimes/ supply the correct machine type.
+> > > 
+> > > It is quite dependent on the guest OS you have installed, and even
+> > > just how the guest OS is configured.  In general Linux is very
+> > > flexible and can adapt to a wide range of hardware, automatically
+> > > detecting things as needed. It is possible for a sysadmin to build
+> > > a Linux image in a way that would only work with I440FX, but I
+> > > don't think it would be common to see that.
+> > 
+> > I think it would be pretty hard to actually build such an image.
+> > 
+> > The more critical thing for linux guests is the storage driver which
+> > must be included into the initrd so the image can mount the root
+> > filesystem.  And the firmware, bios vs. uefi is more critical than
+> > pc vs. q35.
+> 
+> I think we can start by finding a location to embed a string in a qcow
+> image, add ability for qemu-img to set and get this string.  We can
+> discuss how it's formatted separately.
 
-...but uint16_t is only 16 bits, so we are returning
-a "real" 16 bit quantity?
+If we want it, we'll find a place to store it.
 
-thanks
--- PMM
+But the first thing we need is a spec for what's actually in it. Just
+storing a machine type hint would be a one-off hack that wouldn't last
+very long before we want to add the next thing.
+
+Essentially, what we need is a description of the virtual machine that
+we suggest to use with this image. We can try to reuse something
+existing there, like libvirt XML or OVF, or invent something new (a JSON
+array describing runtime options?). One difference to existing formats
+is probably that we want only frontends and no backends in the
+description.
+
+Kevin
