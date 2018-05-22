@@ -1,34 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38528)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38541)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fL7vT-0005Er-7h
-	for qemu-devel@nongnu.org; Tue, 22 May 2018 10:06:08 -0400
+	(envelope-from <bounces@canonical.com>) id 1fL7vU-0005GC-Rk
+	for qemu-devel@nongnu.org; Tue, 22 May 2018 10:06:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fL7vR-0006MG-LQ
-	for qemu-devel@nongnu.org; Tue, 22 May 2018 10:06:07 -0400
-Received: from indium.canonical.com ([91.189.90.7]:47152)
+	(envelope-from <bounces@canonical.com>) id 1fL7vQ-0006L6-1e
+	for qemu-devel@nongnu.org; Tue, 22 May 2018 10:06:08 -0400
+Received: from indium.canonical.com ([91.189.90.7]:47104)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1fL7vR-0006Lq-FF
-	for qemu-devel@nongnu.org; Tue, 22 May 2018 10:06:05 -0400
+	id 1fL7vP-0006KY-SY
+	for qemu-devel@nongnu.org; Tue, 22 May 2018 10:06:03 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1fL7vQ-0007NF-MW
-	for <qemu-devel@nongnu.org>; Tue, 22 May 2018 14:06:04 +0000
+	id 1fL7vP-0007FL-1V
+	for <qemu-devel@nongnu.org>; Tue, 22 May 2018 14:06:03 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id A639F2E8030
-	for <qemu-devel@nongnu.org>; Tue, 22 May 2018 14:06:04 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id 0545C2E8F34
+	for <qemu-devel@nongnu.org>; Tue, 22 May 2018 14:06:03 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Tue, 22 May 2018 13:50:17 -0000
-From: Thomas Huth <1175513@bugs.launchpad.net>
-Reply-To: Bug 1175513 <1175513@bugs.launchpad.net>
+Date: Tue, 22 May 2018 13:53:47 -0000
+From: Thomas Huth <1242963@bugs.launchpad.net>
+Reply-To: Bug 1242963 <1242963@bugs.launchpad.net>
 Sender: bounces@canonical.com
-References: <20130502091433.32599.11761.malonedeb@soybean.canonical.com>
-Message-Id: <152699701792.8181.16871619190313336731.launchpad@chaenomeles.canonical.com>
+References: <20131022003829.24859.20433.malonedeb@wampee.canonical.com>
+Message-Id: <152699722748.8704.6250709738086440546.malone@chaenomeles.canonical.com>
 Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1175513] Re: Qemu 1.5-git gpu clock control
- doesn`t work after guest reboot
+Subject: [Qemu-devel] [Bug 1242963] Re: QEMU loadvm causes guest OS freeze
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,9 +38,8 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-** No longer affects: qemu
-
-** Project changed: linux =3D> qemu
+Looking through old bug tickets... can you still reproduce this issue
+with the latest version of QEMU? Or could we close this ticket nowadays?
 
 ** Changed in: qemu
        Status: New =3D> Incomplete
@@ -50,36 +48,45 @@ To: qemu-devel@nongnu.org
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1175513
+https://bugs.launchpad.net/bugs/1242963
 
 Title:
-  Qemu 1.5-git gpu clock control doesn`t work after guest reboot
+  QEMU loadvm causes guest OS freeze
 
 Status in QEMU:
   Incomplete
 
 Bug description:
-  I run qemu from git with such command:
+  HOST: ubuntu 13.10 x64
+  GUEST: winxp sp 3 x86
 
-  qemu-system-x86_64 -nodefaults -m 4096 -smp 8,cores=3D4,threads=3D2,socke=
-ts=3D1 -cpu 'kvm64' -device usb-mouse -M q35 -vga qxl -no-hpet -boot once=
-=3Dc,menu=3Don -device vfio-pci,host=3D02:00.0,x-vga=3Don \
-  -enable-kvm -monitor stdio -chardev socket,path=3D/tmp/qga.sock,server,no=
-wait,id=3Dqga0 -device virtio-serial -device virtserialport,chardev=3Dqga0,=
-name=3Dorg.qemu.guest_agent.0 -net nic,vlan=3D0,model=3De1000 -net tap,ifna=
-me=3Dtap0,script=3D/etc/guest-ifup -usb -device intel-hda -device hda-duple=
-x \
-  -drive file=3D'/home/<user>/qemu/win7',if=3Dnone,id=3Ddrive-virtio-disk0,=
-cache=3Dwriteback,aio=3Dnative,format=3Dqed,discard=3Don -device virtio-blk=
--pci,drive=3Ddrive-virtio-disk0,id=3Dvirtio-disk \
-  -drive file=3D'/dev/sr0',if=3Dnone,id=3Ddrive-ide1-0-0,media=3Dcdrom,snap=
-shot=3Doff,format=3Draw -device ide-drive,bus=3Dide.1,unit=3D0,drive=3Ddriv=
-e-ide1-0-0,id=3Dide1-0-0 \
-  -spice port=3D5930,disable-ticketing
+  AFFECT QEMU(tested): v1.5.2, v1.5.3,  v1.6.0, v1.6.1
 
-  Before guest (Windows 7) reboot, videocard works in 3D mode with full
-  frequency. But after reboot videocard works in 3D only with powersafe
-  frequency. Then I must reboot host for recover gpu clock control.
+  I compile QEMU by myself with "./configure --target-list=3Di386-softmmu &=
+& make && make install".
+  After installing a winxp sp3 into the qemu-system-i386 with command line:
+  > qemu-system-i386 -m 512 -hda xp.img -net user -net nic,model=3Drtl8139 =
+-rtc base=3Dlocaltime,clock=3Dvm
+
+  I use monitor to create a live snapshot: =
+
+  > stop
+  > savevm xxx
+  > cont
+
+  And then I load this snapshot (I also try it in commad line: -loadvm xxx):
+  > loadvm xxx
+  > cont
+
+  After that, the windows system is freeze (don't accept any keyboard or
+  mouse input, although I knew vcpu is still working).
+
+  If I compile with -enable-kvm and launch qemu-system-i386 with -enable-kv=
+m, it looks like everything works well.
+  I think it is a bug for qemu system.
+
+  BTW: freeze is not appearing 100%, but in my test, 95% cases would
+  cause system freeze.
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1175513/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/1242963/+subscriptions
