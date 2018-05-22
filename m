@@ -1,15 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55750)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33714)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fL5vu-0002Tq-75
-	for qemu-devel@nongnu.org; Tue, 22 May 2018 07:58:27 -0400
+	(envelope-from <eric.auger@redhat.com>) id 1fL6Kq-0006Tb-3B
+	for qemu-devel@nongnu.org; Tue, 22 May 2018 08:24:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fL5vp-0003rf-CM
-	for qemu-devel@nongnu.org; Tue, 22 May 2018 07:58:26 -0400
-From: Thomas Huth <thuth@redhat.com>
-Date: Tue, 22 May 2018 13:58:18 +0200
-Message-Id: <1526990298-17924-1-git-send-email-thuth@redhat.com>
-Subject: [Qemu-devel] [PATCH] qemu-options: Mark the non-functional -clock
- option as deprecated
+	(envelope-from <eric.auger@redhat.com>) id 1fL6Km-0005qe-Az
+	for qemu-devel@nongnu.org; Tue, 22 May 2018 08:24:12 -0400
+References: <20180521140402.23318-1-peter.maydell@linaro.org>
+	<20180521140402.23318-19-peter.maydell@linaro.org>
+	<5c004b51-6d28-58e8-2674-0df659c51e65@redhat.com>
+	<CAFEAcA_NWGczOhpRqRaZfdeeifubEiLqjZXytuYx+vRrv7rPTA@mail.gmail.com>
+From: Auger Eric <eric.auger@redhat.com>
+Message-ID: <40a90e77-cc48-bfdd-db74-f1938325a644@redhat.com>
+Date: Tue, 22 May 2018 14:23:56 +0200
+MIME-Version: 1.0
+In-Reply-To: <CAFEAcA_NWGczOhpRqRaZfdeeifubEiLqjZXytuYx+vRrv7rPTA@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 18/27] hw/misc/tz-mpc.c: Implement the Arm
+ TrustZone Memory Protection Controller
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -18,45 +26,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: qemu-trivial@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: "patches@linaro.org" <patches@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, Richard Henderson <rth@twiddle.net>
 
-The function is only ignored since QEMU version 1.7.0. Let's mark
-it as deprecated, so that we can finally completely remove it soon.
+Hi Peter,
 
-Signed-off-by: Thomas Huth <thuth@redhat.com>
----
- qemu-doc.texi | 5 +++++
- vl.c          | 1 +
- 2 files changed, 6 insertions(+)
+On 05/22/2018 01:56 PM, Peter Maydell wrote:
+> On 22 May 2018 at 12:30, Auger Eric <eric.auger@redhat.com> wrote:
+>> Hi Peter,
+>>
+>> On 05/21/2018 04:03 PM, Peter Maydell wrote:
+>>> Implement the Arm TrustZone Memory Protection Controller, which sits
+>>> in front of RAM and allows secure software to configure it to either
+>>> pass through or reject transactions.
+>>>
+>>> We implement the MPC as a QEMU IOMMU, which will direct transactions
+>>> either through to the devices and memory behind it or to a special
+>>> "never works" AddressSpace if they are blocked.
+>>>
+>>> This initial commit implements the skeleton of the device:
+>>>  * it always permits accesses
+>>>  * it doesn't implement most of the registers
+>>>  * it doesn't implement the interrupt or other behaviour
+>>>    for blocked transactions
+>>>
+>>> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+>>
+>> this patch does not seem to apply on master.
+> 
+> Clash in the MAINTAINERS file? There's a dependency on another
+> MAINTAINERS patch, see the Based-on: line in the cover letter.
 
-diff --git a/qemu-doc.texi b/qemu-doc.texi
-index 0e0e0ae..057a48e 100644
---- a/qemu-doc.texi
-+++ b/qemu-doc.texi
-@@ -2922,6 +2922,11 @@ The @code{-startdate} option has been replaced by @code{-rtc base=@var{date}}.
- Option @option{-virtioconsole} has been replaced by
- @option{-device virtconsole}.
- 
-+@subsection -clock (since 3.0.0)
-+
-+The @code{-clock} option is ignored since QEMU version 1.7.0. There is no
-+replacement since it is not needed anymore.
-+
- @section qemu-img command line arguments
- 
- @subsection convert -s (since 2.0.0)
-diff --git a/vl.c b/vl.c
-index d5836c6..f7c0a46 100644
---- a/vl.c
-+++ b/vl.c
-@@ -3829,6 +3829,7 @@ int main(int argc, char **argv, char **envp)
-                 /* Clock options no longer exist.  Keep this option for
-                  * backward compatibility.
-                  */
-+                warn_report("This option is ignored and will be removed soon");
-                 break;
-             case QEMU_OPTION_startdate:
-                 warn_report("This option is deprecated, use '-rtc base=' instead.");
--- 
-1.8.3.1
+Ah OK.
+
+Thanks
+
+Eric
+> 
+> thanks
+> -- PMM
+> 
