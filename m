@@ -1,22 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38060)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38692)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1fL6ea-0005z4-Bt
-	for qemu-devel@nongnu.org; Tue, 22 May 2018 08:44:37 -0400
+	(envelope-from <lersek@redhat.com>) id 1fL6iE-0007cW-31
+	for qemu-devel@nongnu.org; Tue, 22 May 2018 08:48:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1fL6eV-0005sA-3V
-	for qemu-devel@nongnu.org; Tue, 22 May 2018 08:44:36 -0400
-Date: Tue, 22 May 2018 14:44:26 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20180522144426.0e683b60.cohuck@redhat.com>
-In-Reply-To: <b1a5eb12-4f1d-2f66-f59f-eb1baa87746d@redhat.com>
-References: <20180504072514.8450-1-cohuck@redhat.com>
-	<20180504072514.8450-9-cohuck@redhat.com>
-	<b1a5eb12-4f1d-2f66-f59f-eb1baa87746d@redhat.com>
+	(envelope-from <lersek@redhat.com>) id 1fL6iA-0007bt-3a
+	for qemu-devel@nongnu.org; Tue, 22 May 2018 08:48:22 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:49590 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1fL6i9-0007bn-VI
+	for qemu-devel@nongnu.org; Tue, 22 May 2018 08:48:18 -0400
+References: <20180518122304.31020-1-marcandre.lureau@redhat.com>
+	<20180518122304.31020-2-marcandre.lureau@redhat.com>
+From: Laszlo Ersek <lersek@redhat.com>
+Message-ID: <811a060f-ea14-48c9-ceb2-b27b45bbc431@redhat.com>
+Date: Tue, 22 May 2018 14:48:10 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <20180518122304.31020-2-marcandre.lureau@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PULL 08/15] pc-bios/s390-ccw: fix loadparm
- initialization and int conversion
+Subject: Re: [Qemu-devel] [edk2] [PATCH v3 1/4] OvmfPkg: add
+ Tcg2PhysicalPresenceLibNull when !TPM2_ENABLE
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,114 +29,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laszlo Ersek <lersek@redhat.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>, David Hildenbrand <david@redhat.com>, Alexander Graf <agraf@suse.de>, qemu-devel@nongnu.org, Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org, Collin Walling <walling@linux.ibm.com>, Richard Henderson <rth@twiddle.net>
+To: marcandre.lureau@redhat.com, edk2-devel@lists.01.org
+Cc: qemu-devel@nongnu.org, javierm@redhat.com, pjones@redhat.com, jiewen.yao@intel.com
 
-On Tue, 15 May 2018 10:45:02 +0200
-Laszlo Ersek <lersek@redhat.com> wrote:
+On 05/18/18 14:23, marcandre.lureau@redhat.com wrote:
 
-> I've come across this patch in downstream review (although I really have
-> zero background in s390x), and Cornelia suggested I might want to repeat
-> my comments on the upstream list too:
-> 
-> On 05/04/18 09:25, Cornelia Huck wrote:
-> > From: Collin Walling <walling@linux.ibm.com>
-> > 
-> > Rename the loadparm char array in main.c to loadparm_str and
-> > increased the size by one byte to account for a null termination
-> > when converting the loadparm string to an int  via atoui. We
-> > also allow the boot menu to be enabled when loadparm is set to
-> > an empty string or a series of spaces.
-> > 
-> > Signed-off-by: Collin Walling <walling@linux.ibm.com>
-> > Reported-by: Vasily Gorbik <gor@linux.ibm.com>
-> > Reviewed-by: Thomas Huth <thuth@redhat.com>
-> > Reviewed-by: Janosch Frank <frankja@linux.ibm.com>
-> > Signed-off-by: Thomas Huth <thuth@redhat.com>
-> > ---
-> >  hw/s390x/ipl.c          |  4 ++++
-> >  pc-bios/s390-ccw/main.c | 14 +++++++-------
-> >  2 files changed, 11 insertions(+), 7 deletions(-)
-> > 
-> > diff --git a/hw/s390x/ipl.c b/hw/s390x/ipl.c
-> > index fb554ab156..150f6c0582 100644
-> > --- a/hw/s390x/ipl.c
-> > +++ b/hw/s390x/ipl.c
-> > @@ -373,6 +373,10 @@ int s390_ipl_set_loadparm(uint8_t *loadparm)
-> >              loadparm[i] = ascii2ebcdic[(uint8_t) lp[i]];
-> >          }
-> >  
-> > +        if (i < 8) {
-> > +            memset(loadparm + i, 0x40, 8 - i); /* fill with EBCDIC spaces */
-> > +        }
-> > +
-> >          g_free(lp);
-> >          return 0;
-> >      }
-> > diff --git a/pc-bios/s390-ccw/main.c b/pc-bios/s390-ccw/main.c
-> > index 9d9f8cf4d3..26f9adf84a 100644
-> > --- a/pc-bios/s390-ccw/main.c
-> > +++ b/pc-bios/s390-ccw/main.c
-> > @@ -15,11 +15,11 @@
-> >  char stack[PAGE_SIZE * 8] __attribute__((__aligned__(PAGE_SIZE)));
-> >  static SubChannelId blk_schid = { .one = 1 };
-> >  IplParameterBlock iplb __attribute__((__aligned__(PAGE_SIZE)));
-> > -static char loadparm[8] = { 0, 0, 0, 0, 0, 0, 0, 0 };
-> > +static char loadparm_str[9] = { 0, 0, 0, 0, 0, 0, 0, 0, 0 };
-> >  QemuIplParameters qipl;
-> >  
-> >  #define LOADPARM_PROMPT "PROMPT  "
-> > -#define LOADPARM_EMPTY  "........"
-> > +#define LOADPARM_EMPTY  "        "
-> >  #define BOOT_MENU_FLAG_MASK (QIPL_FLAG_BM_OPTS_CMD | QIPL_FLAG_BM_OPTS_ZIPL)
-> >  
-> >  /*
-> > @@ -45,7 +45,7 @@ void panic(const char *string)
-> >  
-> >  unsigned int get_loadparm_index(void)
-> >  {
-> > -    return atoui(loadparm);
-> > +    return atoui(loadparm_str);
-> >  }
-> >  
-> >  static bool find_dev(Schib *schib, int dev_no)
-> > @@ -80,13 +80,13 @@ static bool find_dev(Schib *schib, int dev_no)
-> >  
-> >  static void menu_setup(void)
-> >  {
-> > -    if (memcmp(loadparm, LOADPARM_PROMPT, 8) == 0) {
-> > +    if (memcmp(loadparm_str, LOADPARM_PROMPT, 8) == 0) {
-> >          menu_set_parms(QIPL_FLAG_BM_OPTS_CMD, 0);
-> >          return;
-> >      }
-> >  
-> >      /* If loadparm was set to any other value, then do not enable menu */
-> > -    if (memcmp(loadparm, LOADPARM_EMPTY, 8) != 0) {
-> > +    if (memcmp(loadparm_str, LOADPARM_EMPTY, 8) != 0) {
-> >          return;
-> >      }
-> >  
-> > @@ -116,8 +116,8 @@ static void virtio_setup(void)
-> >       */
-> >      enable_mss_facility();
-> >  
-> > -    sclp_get_loadparm_ascii(loadparm);
-> > -    memcpy(ldp + 10, loadparm, 8);
-> > +    sclp_get_loadparm_ascii(loadparm_str);
-> > +    memcpy(ldp + 10, loadparm_str, 8);
-> >      sclp_print(ldp);
-> >  
-> >      memcpy(&qipl, early_qipl, sizeof(QemuIplParameters));
-> >   
-> 
-> So here I said, "There are a bunch of naked 8 constants; those should
-> all be (sizeof loadparm_str - 1), I think. Should be a separate patch,
-> of course."
+> diff --git a/OvmfPkg/Library/Tcg2PhysicalPresenceLibNull/DxeTcg2PhysicalPresenceLib.inf b/OvmfPkg/Library/Tcg2PhysicalPresenceLibNull/DxeTcg2PhysicalPresenceLib.inf
+> new file mode 100644
+> index 000000000000..92ce5f04b37f
+> --- /dev/null
+> +++ b/OvmfPkg/Library/Tcg2PhysicalPresenceLibNull/DxeTcg2PhysicalPresenceLib.inf
+> @@ -0,0 +1,33 @@
+> +## @file
+> +#  NULL Tcg2PhysicalPresenceLib library instance
+> +#
+> +# Under SecurityPkg, the corresponding library instance will check and
+> +# execute TPM 2.0 request from OS or BIOS; the request may ask for user
+> +# confirmation before execution. This Null instance implements a no-op
+> +# Tcg2PhysicalPresenceLibProcessRequest(), without user interaction.
+> +#
+> +# Copyright (C) 2018, Red Hat, Inc.
+> +# Copyright (c) 2013 - 2016, Intel Corporation. All rights reserved.<BR>
+> +# This program and the accompanying materials
+> +# are licensed and made available under the terms and conditions of the BSD License
+> +# which accompanies this distribution. The full text of the license may be found at
+> +# http://opensource.org/licenses/bsd-license.php
+> +# THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+> +# WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+> +#
+> +##
+> +
+> +[Defines]
+> +  INF_VERSION                    = 0x00010005
+> +  BASE_NAME                      = DxeTcg2PhysicalPresenceLibNull
+> +  FILE_GUID                      = 2A6BA243-DC22-42D8-9C3D-AE3728DC7AFA
+> +  MODULE_TYPE                    = DXE_DRIVER
+> +  VERSION_STRING                 = 1.0
+> +  LIBRARY_CLASS                  = Tcg2PhysicalPresenceLib|DXE_DRIVER DXE_RUNTIME_DRIVER DXE_SAL_DRIVER UEFI_APPLICATION UEFI_DRIVER
+> +
+> +[Sources]
+> +  DxeTcg2PhysicalPresenceLib.c
+> +
+> +[Packages]
+> +  MdeModulePkg/MdeModulePkg.dec
+> +  SecurityPkg/SecurityPkg.dec
 
-Alternatively, as loadparm size is architectured IIRC and unlikely to
-change, do
+Here my suggestion was to drop MdeModulePkg.dec, and keep MdePkg.dec and
+SecurityPkg.dec.
 
-#define LOADPARM_LEN 8
-char loadparm_str[LOADPARM_LEN + 1];
+Anyway, I plan to fix that up for you.
 
-and compare against LOADPARM_LEN... opinions?
+With it fixed:
+
+Reviewed-by: Laszlo Ersek <lersek@redhat.com>
+
+Thanks
+Laszlo
