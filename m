@@ -1,23 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55310)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55999)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1fL8zk-0008G6-9q
-	for qemu-devel@nongnu.org; Tue, 22 May 2018 11:14:37 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1fL91Z-0000dN-51
+	for qemu-devel@nongnu.org; Tue, 22 May 2018 11:16:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1fL8zj-0007Bp-C6
-	for qemu-devel@nongnu.org; Tue, 22 May 2018 11:14:36 -0400
-Date: Tue, 22 May 2018 12:14:18 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20180522151418.GD25013@localhost.localdomain>
-References: <20180518180440-mutt-send-email-mst@kernel.org>
-	<20180518170956.GI8615@redhat.com>
-	<20180522073555.peibbwoqvbor7nrs@sirius.home.kraxel.org>
-	<20180522171112-mutt-send-email-mst@kernel.org>
-	<20180522150221.GF6233@localhost.localdomain>
+	(envelope-from <pbonzini@redhat.com>) id 1fL91T-00089t-9M
+	for qemu-devel@nongnu.org; Tue, 22 May 2018 11:16:29 -0400
+References: <1526990298-17924-1-git-send-email-thuth@redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <f3213c6f-2705-fb10-2509-9669fbe1e25e@redhat.com>
+Date: Tue, 22 May 2018 17:16:17 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180522150221.GF6233@localhost.localdomain>
-Subject: Re: [Qemu-devel] storing machine data in qcow images?
+In-Reply-To: <1526990298-17924-1-git-send-email-thuth@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] qemu-options: Mark the non-functional
+ -clock option as deprecated
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,55 +24,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org, mreitz@redhat.com, stefanha@redhat.com
+To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-trivial@nongnu.org
 
-On Tue, May 22, 2018 at 05:02:21PM +0200, Kevin Wolf wrote:
-> Am 22.05.2018 um 16:19 hat Michael S. Tsirkin geschrieben:
-> > On Tue, May 22, 2018 at 09:35:55AM +0200, Gerd Hoffmann wrote:
-> > >   Hi,
-> > > 
-> > > > You must /sometimes/ supply the correct machine type.
-> > > > 
-> > > > It is quite dependent on the guest OS you have installed, and even
-> > > > just how the guest OS is configured.  In general Linux is very
-> > > > flexible and can adapt to a wide range of hardware, automatically
-> > > > detecting things as needed. It is possible for a sysadmin to build
-> > > > a Linux image in a way that would only work with I440FX, but I
-> > > > don't think it would be common to see that.
-> > > 
-> > > I think it would be pretty hard to actually build such an image.
-> > > 
-> > > The more critical thing for linux guests is the storage driver which
-> > > must be included into the initrd so the image can mount the root
-> > > filesystem.  And the firmware, bios vs. uefi is more critical than
-> > > pc vs. q35.
-> > 
-> > I think we can start by finding a location to embed a string in a qcow
-> > image, add ability for qemu-img to set and get this string.  We can
-> > discuss how it's formatted separately.
+On 22/05/2018 13:58, Thomas Huth wrote:
+> The function is only ignored since QEMU version 1.7.0. Let's mark
+> it as deprecated, so that we can finally completely remove it soon.
 > 
-> If we want it, we'll find a place to store it.
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> ---
+>  qemu-doc.texi | 5 +++++
+>  vl.c          | 1 +
+>  2 files changed, 6 insertions(+)
 > 
-> But the first thing we need is a spec for what's actually in it. Just
-> storing a machine type hint would be a one-off hack that wouldn't last
-> very long before we want to add the next thing.
+> diff --git a/qemu-doc.texi b/qemu-doc.texi
+> index 0e0e0ae..057a48e 100644
+> --- a/qemu-doc.texi
+> +++ b/qemu-doc.texi
+> @@ -2922,6 +2922,11 @@ The @code{-startdate} option has been replaced by @code{-rtc base=@var{date}}.
+>  Option @option{-virtioconsole} has been replaced by
+>  @option{-device virtconsole}.
+>  
+> +@subsection -clock (since 3.0.0)
+> +
+> +The @code{-clock} option is ignored since QEMU version 1.7.0. There is no
+> +replacement since it is not needed anymore.
+> +
+>  @section qemu-img command line arguments
+>  
+>  @subsection convert -s (since 2.0.0)
+> diff --git a/vl.c b/vl.c
+> index d5836c6..f7c0a46 100644
+> --- a/vl.c
+> +++ b/vl.c
+> @@ -3829,6 +3829,7 @@ int main(int argc, char **argv, char **envp)
+>                  /* Clock options no longer exist.  Keep this option for
+>                   * backward compatibility.
+>                   */
+> +                warn_report("This option is ignored and will be removed soon");
+>                  break;
+>              case QEMU_OPTION_startdate:
+>                  warn_report("This option is deprecated, use '-rtc base=' instead.");
 > 
-> Essentially, what we need is a description of the virtual machine that
-> we suggest to use with this image. We can try to reuse something
-> existing there, like libvirt XML or OVF, or invent something new (a JSON
-> array describing runtime options?). One difference to existing formats
-> is probably that we want only frontends and no backends in the
-> description.
 
-The OVF virtual hardware description might be appropriate to
-define what's required vs what's recommended, to support multiple
-machine-types, and ranges of valid values for variables.
+Queued, thanks.
 
-Pro: management software can reuse exactly the same logic for
-qcow2 machine descriptions and OVF machine descriptions.
-
-Con: OVF is a pretty complex specification.
-
--- 
-Eduardo
+Paolo
