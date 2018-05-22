@@ -1,25 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47309)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53510)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jan.kiszka@siemens.com>) id 1fL1TE-00043S-Hc
-	for qemu-devel@nongnu.org; Tue, 22 May 2018 03:12:33 -0400
+	(envelope-from <kraxel@redhat.com>) id 1fL1qA-0007K0-ER
+	for qemu-devel@nongnu.org; Tue, 22 May 2018 03:36:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jan.kiszka@siemens.com>) id 1fL1TB-0004OV-Bz
-	for qemu-devel@nongnu.org; Tue, 22 May 2018 03:12:32 -0400
-Received: from goliath.siemens.de ([192.35.17.28]:53027)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jan.kiszka@siemens.com>)
-	id 1fL1TA-0004O1-Vg
-	for qemu-devel@nongnu.org; Tue, 22 May 2018 03:12:29 -0400
-From: Jan Kiszka <jan.kiszka@siemens.com>
-References: <cover.1522769774.git.jan.kiszka@web.de>
-Message-ID: <ca72bfeb-02c5-ac36-95d3-2ab2a02bbe3b@siemens.com>
-Date: Tue, 22 May 2018 09:12:24 +0200
+	(envelope-from <kraxel@redhat.com>) id 1fL1q4-0006hp-8f
+	for qemu-devel@nongnu.org; Tue, 22 May 2018 03:36:14 -0400
+Date: Tue, 22 May 2018 09:35:55 +0200
+From: Gerd Hoffmann <kraxel@redhat.com>
+Message-ID: <20180522073555.peibbwoqvbor7nrs@sirius.home.kraxel.org>
+References: <20180518180440-mutt-send-email-mst@kernel.org>
+	<20180518170956.GI8615@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <cover.1522769774.git.jan.kiszka@web.de>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 0/4] target-i386: Enhance SVM support
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180518170956.GI8615@redhat.com>
+Subject: Re: [Qemu-devel] storing machine data in qcow images?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,41 +23,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>
-Cc: Valentine Sinitsyn <valentine.sinitsyn@gmail.com>
+To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, kwolf@redhat.com, ehabkost@redhat.com, qemu-block@nongnu.org, qemu-devel@nongnu.org, mreitz@redhat.com, stefanha@redhat.com
 
-On 2018-04-03 17:36, Jan Kiszka wrote:
-> These patches allow to run Jailhouse in emulated x86-64 mode under QEMU.
-> AMD IOMMU only works with one additional hack, but that's a different
-> story, and we can test these changes without it.
-> 
-> Change in v2:
->  - build fix for 32-bit hosts
->  - replaces NPT exitinfo magics with symbolic constants
-> 
-> Jan
-> 
-> Jan Kiszka (4):
->   target-i386: Add NMI interception to SVM
->   target-i386: Allow interrupt injection after STGI
->   target-i386: Mark cpu_vmexit noreturn
->   target-i386: Add NPT support
-> 
->  target/i386/cpu.c         |   2 +-
->  target/i386/cpu.h         |  10 ++-
->  target/i386/excp_helper.c | 216 +++++++++++++++++++++++++++++++++++++++++++++-
->  target/i386/mem_helper.c  |   6 +-
->  target/i386/seg_helper.c  |   1 +
->  target/i386/svm.h         |  14 +++
->  target/i386/svm_helper.c  |  23 +++++
->  target/i386/translate.c   |   3 +-
->  8 files changed, 266 insertions(+), 9 deletions(-)
-> 
+  Hi,
 
-Ping on this series.
+> You must /sometimes/ supply the correct machine type.
+> 
+> It is quite dependent on the guest OS you have installed, and even
+> just how the guest OS is configured.  In general Linux is very
+> flexible and can adapt to a wide range of hardware, automatically
+> detecting things as needed. It is possible for a sysadmin to build
+> a Linux image in a way that would only work with I440FX, but I
+> don't think it would be common to see that.
 
-Jan
+I think it would be pretty hard to actually build such an image.
 
--- 
-Siemens AG, Corporate Technology, CT RDA IOT SES-DE
-Corporate Competence Center Embedded Linux
+The more critical thing for linux guests is the storage driver which
+must be included into the initrd so the image can mount the root
+filesystem.  And the firmware, bios vs. uefi is more critical than
+pc vs. q35.
+
+> That said I'm not really convinced that using the qcow2 headers is
+> a good plan. We have many disk image formats in common use, qcow2
+> is just one. Even if the user provides the image in qcow2 format,
+> that doesn't mean that mgmt apps actually store the qcow2 file.
+
+> I tend to think we'd be better looking at what we can do in the context
+> of an existing standard like OVF rather than inventing something that
+> only works with qcow2. I think it would need to be more expressive than
+> just a single list of key,value pairs for each item.
+
+Embed OVF metadata in the qcow2 image?
+
+cheers,
+  Gerd
