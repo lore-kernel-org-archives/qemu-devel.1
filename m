@@ -1,19 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40284)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42415)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fL2go-0007R0-EM
-	for qemu-devel@nongnu.org; Tue, 22 May 2018 04:30:39 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1fL2qw-0000s4-Vo
+	for qemu-devel@nongnu.org; Tue, 22 May 2018 04:41:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fL2gk-0003BU-BK
-	for qemu-devel@nongnu.org; Tue, 22 May 2018 04:30:38 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:42418 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1fL2gk-0003BF-74
-	for qemu-devel@nongnu.org; Tue, 22 May 2018 04:30:34 -0400
-From: Thomas Huth <thuth@redhat.com>
-Date: Tue, 22 May 2018 10:30:31 +0200
-Message-Id: <1526977831-31129-1-git-send-email-thuth@redhat.com>
-Subject: [Qemu-devel] [PATCH] tests/boot-serial: Do not delete the output
- file in case of errors
+	(envelope-from <peter.maydell@linaro.org>) id 1fL2qv-0000PE-UD
+	for qemu-devel@nongnu.org; Tue, 22 May 2018 04:41:07 -0400
+Received: from mail-oi0-x242.google.com ([2607:f8b0:4003:c06::242]:42402)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1fL2qv-0000On-NP
+	for qemu-devel@nongnu.org; Tue, 22 May 2018 04:41:05 -0400
+Received: by mail-oi0-x242.google.com with SMTP id t27-v6so15465511oij.9
+	for <qemu-devel@nongnu.org>; Tue, 22 May 2018 01:41:05 -0700 (PDT)
+MIME-Version: 1.0
+In-Reply-To: <20180522030333.GB17282@xz-mi>
+References: <20180521140402.23318-1-peter.maydell@linaro.org>
+	<20180521140402.23318-15-peter.maydell@linaro.org>
+	<20180522030333.GB17282@xz-mi>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 22 May 2018 09:40:44 +0100
+Message-ID: <CAFEAcA-iOYhuPfvDv+iD6jBqXMXqN-jfTpSSBub1Zp1i-JcDbQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH 14/27] iommu: Add IOMMU index concept to
+ IOMMU API
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,77 +31,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+To: Peter Xu <peterx@redhat.com>
+Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>, "patches@linaro.org" <patches@linaro.org>
 
-Peter reported that the boot-serial tester sometimes runs into timeouts
-with SPARC guests. It's currently completely unclear whether this is due
-to too much load on the host machine (so that the guest really just ran
-too slow), or whether there is something wrong with the guest's firmware
-boot. For further debugging, we need the serial output of the guest in
-case of errors, so instead of unlinking the file immediately, this is
-now only done in case of success. In case of error, print the name of the
-file with the serial output via g_error() (which then also calls abort()
-internally to mark the test as failed).
+On 22 May 2018 at 04:03, Peter Xu <peterx@redhat.com> wrote:
+> On Mon, May 21, 2018 at 03:03:49PM +0100, Peter Maydell wrote:
+>> If an IOMMU supports mappings that care about the memory
+>> transaction attributes, then it no longer has a unique
+>> address -> output mapping, but more than one. We can
+>> represent these using an IOMMU index, analogous to TCG's
+>> mmu indexes.
+>>
+>> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+>> ---
+>>  include/exec/memory.h | 52 +++++++++++++++++++++++++++++++++++++++++++
+>>  memory.c              | 23 +++++++++++++++++++
+>>  2 files changed, 75 insertions(+)
+>>
+>> diff --git a/include/exec/memory.h b/include/exec/memory.h
+>> index 309fdfb89b..f6226fb263 100644
+>> --- a/include/exec/memory.h
+>> +++ b/include/exec/memory.h
+>> @@ -206,6 +206,20 @@ enum IOMMUMemoryRegionAttr {
+>>   * to report whenever mappings are changed, by calling
+>>   * memory_region_notify_iommu() (or, if necessary, by calling
+>>   * memory_region_notify_one() for each registered notifier).
+>> + *
+>> + * Conceptually an IOMMU provides a mapping from input address
+>> + * to an output TLB entry. If the IOMMU is aware of memory transaction
+>> + * attributes and the output TLB entry depends on the transaction
+>> + * attributes, we represent this using IOMMU indexes. Each index
+>
+> Hi, Peter,
+>
+> In what case will an IOMMU translation depend on translation
+> attributes?  It seems to me that we should always pass in the
+> translation attributes into the translate() function.  The translate()
+> function can omit that parameter if the specific IOMMU does not need
+> that information, but still I am confused about why we need to index
+> IOMMU by translation attributes.
 
-Signed-off-by: Thomas Huth <thuth@redhat.com>
----
- tests/boot-serial-test.c | 17 +++++++++--------
- 1 file changed, 9 insertions(+), 8 deletions(-)
+The MPC implementation at the tail end of the patchset is
+one example -- it needs to look at attrs.secure, because
+"translation for secure access to address X" differs from
+that for address Y". The Arm SMMUv3 is the same when it supports
+TrustZone (the implementation in-tree does not), and it can also
+give different permissions for transactions with attrs.user = 0 vs 1.
 
-diff --git a/tests/boot-serial-test.c b/tests/boot-serial-test.c
-index 4d6815c..952a2e7 100644
---- a/tests/boot-serial-test.c
-+++ b/tests/boot-serial-test.c
-@@ -111,9 +111,8 @@ static testdef_t tests[] = {
-     { NULL }
- };
- 
--static void check_guest_output(const testdef_t *test, int fd)
-+static bool check_guest_output(const testdef_t *test, int fd)
- {
--    bool output_ok = false;
-     int i, nbr = 0, pos = 0, ccnt;
-     char ch;
- 
-@@ -125,8 +124,7 @@ static void check_guest_output(const testdef_t *test, int fd)
-                 pos += 1;
-                 if (test->expect[pos] == '\0') {
-                     /* We've reached the end of the expected string! */
--                    output_ok = true;
--                    goto done;
-+                    return true;
-                 }
-             } else {
-                 pos = 0;
-@@ -136,8 +134,7 @@ static void check_guest_output(const testdef_t *test, int fd)
-         g_usleep(10000);
-     }
- 
--done:
--    g_assert(output_ok);
-+    return false;
- }
- 
- static void test_machine(const void *data)
-@@ -180,12 +177,16 @@ static void test_machine(const void *data)
-                                 "-no-shutdown -serial chardev:serial0 %s",
-                                 codeparam, code ? codetmp : "",
-                                 test->machine, serialtmp, test->extra);
--    unlink(serialtmp);
-     if (code) {
-         unlink(codetmp);
-     }
- 
--    check_guest_output(test, ser_fd);
-+    if (!check_guest_output(test, ser_fd)) {
-+        g_error("Failed to find expected string. Please check '%s'",
-+                serialtmp);
-+    }
-+    unlink(serialtmp);
-+
-     qtest_quit(global_qtest);
- 
-     close(ser_fd);
--- 
-1.8.3.1
+The reason for not just passing in the transaction attributes to
+translate is that
+(a) the iommu index abstraction makes the notifier setup simpler:
+rather than having to have some indication in the API of which
+of the transaction attributes are important and which the notifier
+cares about, we can just use indexs
+(b) it means that it's harder to write an iommu with the bug that
+it looks at parts of the transaction attributes that it didn't
+claim were important in the notifier API
+
+> The num_indexes() definition is missing, and I saw that in the next
+> patch.  We'll possibly want to move it here.
+
+Huh. I ran into that and thought I'd fixed it in my local tree -- I must have
+failed to actually move the change to the right patch. Sorry about that.
+
+thanks
+-- PMM
