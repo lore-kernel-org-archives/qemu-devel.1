@@ -1,14 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37057)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37141)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1fL4iD-0000s9-PL
-	for qemu-devel@nongnu.org; Tue, 22 May 2018 06:40:19 -0400
+	(envelope-from <kwolf@redhat.com>) id 1fL4iJ-0000xi-Ps
+	for qemu-devel@nongnu.org; Tue, 22 May 2018 06:40:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1fL4iD-0004mA-46
-	for qemu-devel@nongnu.org; Tue, 22 May 2018 06:40:13 -0400
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 22 May 2018 11:39:55 +0100
-Message-Id: <20180522104000.9044-1-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PATCH 0/5] Make the next release be 3.0
+	(envelope-from <kwolf@redhat.com>) id 1fL4iH-0004pN-9L
+	for qemu-devel@nongnu.org; Tue, 22 May 2018 06:40:19 -0400
+Date: Tue, 22 May 2018 12:40:08 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20180522104008.GA6233@localhost.localdomain>
+References: <20180518132114.4070-1-kwolf@redhat.com>
+	<20180518132114.4070-37-kwolf@redhat.com>
+	<998828bf-31ce-1778-6139-2a47e2b11db4@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <998828bf-31ce-1778-6139-2a47e2b11db4@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2 36/40] job: Add lifecycle QMP commands
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -17,39 +24,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: patches@linaro.org, "Michael S. Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Cornelia Huck <cohuck@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, qemu-ppc@nongnu.org, qemu-s390x@nongnu.org
+To: Eric Blake <eblake@redhat.com>
+Cc: qemu-block@nongnu.org, mreitz@redhat.com, jsnow@redhat.com, jcody@redhat.com, armbru@redhat.com, qemu-devel@nongnu.org
 
-I think that we should number the next release 3.0
-(3.0.0, in long form). We already have a few places that
-have used "2.13", in machine-versions or in "feature
-exists since release X" annotations; update those.
+Am 18.05.2018 um 20:12 hat Eric Blake geschrieben:
+> On 05/18/2018 08:21 AM, Kevin Wolf wrote:
+> > This adds QMP commands that control the transition between states of the
+> > job lifecycle.
+> > 
+> > Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+> > ---
+> >   qapi/job.json |  99 +++++++++++++++++++++++++++++++++++++++++++
+> >   job-qmp.c     | 134 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+> >   MAINTAINERS   |   1 +
+> >   Makefile.objs |   1 +
+> >   trace-events  |   9 ++++
+> >   5 files changed, 244 insertions(+)
+> >   create mode 100644 job-qmp.c
+> > 
+> > +##
+> > +# @job-dismiss:
+> > +#
+> > +# Deletes a job that is in the CONCLUDED state. This command only needs to be
+> > +# run explicitly for jobs that don't have automatic dismiss enabled.
+> 
+> Did we decide whether it is valid to expect a job with automatic dismiss
+> enabled (old-style block jobs) to use the new job control commands?
 
-thanks
--- PMM
+"job control commands" is a pretty broad term, so I'd say yes, it's
+expected that you can use job-* commands on any job. For example,
+job-pause/resume make perfect sense on a job with auto-dismiss=true.
 
-Peter Maydell (5):
-  qapi: Change "since 2.13" annotations to "since 3.0"
-  hw/i386: Rename 2.13 machine types to 3.0
-  hw/s390x: Rename 2.13 machines to 3.0
-  ppc: Rename 2.13 machines to 3.0
-  qemu-doc.texi: Rename references to 2.13 to 3.0
+> Or would it be reasonable to require that 'job-dismiss' is an error on
+> jobs with auto-dismiss enabled
 
- qapi/block-core.json            |  4 ++--
- qapi/common.json                |  2 +-
- qapi/migration.json             | 16 ++++++++--------
- qapi/misc.json                  |  4 ++--
- qapi/net.json                   |  2 +-
- qapi/ui.json                    |  2 +-
- target/ppc/cpu.h                |  2 +-
- hw/i386/pc_piix.c               |  8 ++++----
- hw/i386/pc_q35.c                |  8 ++++----
- hw/ppc/spapr.c                  | 14 +++++++-------
- hw/s390x/s390-virtio-ccw.c      | 10 +++++-----
- target/ppc/machine.c            |  8 ++++----
- target/ppc/translate_init.inc.c |  2 +-
- qemu-doc.texi                   |  4 ++--
- 14 files changed, 43 insertions(+), 43 deletions(-)
+This, too, but only because it implicitly follows from the condition
+specified above: You'll never catch a job in the CONCLUDED state when
+you have auto-dismiss=true because it will immediately move on to NULL.
 
--- 
-2.17.0
+> (as in, if you're going to use new style jobs, you are guaranteed to
+> also have auto-dismiss false, because we don't expose a way to change
+> that flag in new-style jobs; and if you use old style jobs, all
+> management of the job should be done through the old interfaces).
+
+I'm not completely convinced that auto-dismiss=false is the only
+"correct" setting. That might be the case for libvirt, but possibly not
+for simple ad-hoc scripts with lower requirements.
+
+We don't have any new jobs yet, so whether we expose the auto-* flags
+there is a decision yet to be made.
+
+Kevin
