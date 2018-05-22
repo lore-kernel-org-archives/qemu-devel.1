@@ -1,27 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49534)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49867)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wlosh@bsdimp.com>) id 1fLAEz-0007EL-UM
-	for qemu-devel@nongnu.org; Tue, 22 May 2018 12:34:27 -0400
+	(envelope-from <rth7680@gmail.com>) id 1fLAFo-0007qI-SU
+	for qemu-devel@nongnu.org; Tue, 22 May 2018 12:35:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wlosh@bsdimp.com>) id 1fLAEy-0000GF-Um
-	for qemu-devel@nongnu.org; Tue, 22 May 2018 12:34:25 -0400
-Received: from mail-it0-x232.google.com ([2607:f8b0:4001:c0b::232]:52788)
+	(envelope-from <rth7680@gmail.com>) id 1fLAFm-0001CD-AN
+	for qemu-devel@nongnu.org; Tue, 22 May 2018 12:35:16 -0400
+Received: from mail-pl0-x234.google.com ([2607:f8b0:400e:c01::234]:42599)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <wlosh@bsdimp.com>) id 1fLAEy-0000Ex-Mq
-	for qemu-devel@nongnu.org; Tue, 22 May 2018 12:34:24 -0400
-Received: by mail-it0-x232.google.com with SMTP id y189-v6so706968itb.2
-	for <qemu-devel@nongnu.org>; Tue, 22 May 2018 09:34:24 -0700 (PDT)
+	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1fLAFm-0001BH-4r
+	for qemu-devel@nongnu.org; Tue, 22 May 2018 12:35:14 -0400
+Received: by mail-pl0-x234.google.com with SMTP id u6-v6so11224032pls.9
+	for <qemu-devel@nongnu.org>; Tue, 22 May 2018 09:35:14 -0700 (PDT)
+Sender: Richard Henderson <rth7680@gmail.com>
+References: <CAFEAcA-aD98+wh=XfMkY1iUwHjDJZ6dH7Juv0_o_VbgkcV0etw@mail.gmail.com>
+	<214c47f3-1583-6480-4837-8b8ced37f038@twiddle.net>
+	<CAFEAcA9QN_EFbfwqps+5Bu7CKX4J7GLGjBMURmk-1Jk22iixKA@mail.gmail.com>
+	<7af06713-7e42-6489-5945-85545bc02f26@twiddle.net>
+	<CAFEAcA90PcQH1Y-md7=dPTziP06ozripM7yPjqKJDgbk93gSzQ@mail.gmail.com>
+	<a801fc3e-2dc1-06de-1ec1-0b911ea29450@twiddle.net>
+	<CAFEAcA_u8f_S9ij2Yt4gYitjXrJfpn=DQbyDm-fp4QsDN+JWcw@mail.gmail.com>
+From: Richard Henderson <rth@twiddle.net>
+Message-ID: <f7faf066-10cd-fde6-0c1d-03d7cf33274b@twiddle.net>
+Date: Tue, 22 May 2018 09:35:11 -0700
 MIME-Version: 1.0
-Sender: wlosh@bsdimp.com
-In-Reply-To: <CAFEAcA-xqG+9SZ2_K5XFooJuKYyuRoL51K1JuwQ-SWGcCYcX=A@mail.gmail.com>
-References: <CAFEAcA9a-xrtibHYb4+-xu3QVmW3tJ1v9X0s_X_PMhQGFSJgdg@mail.gmail.com>
-	<CANCZdfpNMR_buj3L4xvqhh_T4QZOvV5JsXHK2Rzk-zs5iHvGrg@mail.gmail.com>
-	<CAFEAcA-xqG+9SZ2_K5XFooJuKYyuRoL51K1JuwQ-SWGcCYcX=A@mail.gmail.com>
-From: Warner Losh <imp@bsdimp.com>
-Date: Tue, 22 May 2018 10:34:23 -0600
-Message-ID: <CANCZdfq0_-t+HZhYmGOt0uCLd2p1VNUythUKrCMJffTtrWhz9Q@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] QEMU 3.0 proposed release schedule
+In-Reply-To: <CAFEAcA_u8f_S9ij2Yt4gYitjXrJfpn=DQbyDm-fp4QsDN+JWcw@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] TCG helpers that return f16
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,40 +37,13 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Michael Roth <mdroth@linux.vnet.ibm.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
 
-On Tue, May 22, 2018 at 9:50 AM, Peter Maydell <peter.maydell@linaro.org>
-wrote:
+On 05/22/2018 09:31 AM, Peter Maydell wrote:
+> Do we also want f16 inputs to mean uint32_t arguments?
 
-> On 22 May 2018 at 16:39, Warner Losh <imp@bsdimp.com> wrote:
-> > On Tue, May 22, 2018 at 9:24 AM, Peter Maydell <peter.maydell@linaro.org
-> >
-> > wrote:
-> >>
-> >> I've put up a draft release schedule at:
-> >> https://wiki.qemu.org/Planning/3.0
-> >>
-> >> 2018-04-24      Beginning of development phase
-> >> 2018-07-03      Soft feature freeze.
-> >> 2018-07-10      Hard feature freeze. Tag rc0
-> >> 2018-07-17      Tag rc1
-> >> 2018-07-24      Tag rc2
-> >> 2018-07-31      Tag rc3
-> >> 2018-08-07      Release, or if necessary, tag rc4
-> >> 2018-08-14      Release, if we needed rc4
->
-> > I'd love to get bsd-user into 3.0. At the moment, all the changes are in
-> > bsd-user, and my cleanup is trending to about 50 patches. Given
-> traditional
-> > timelines, when should I submit patches to the mailing list for that?
->
-> The usual recommendation is to submit early and often.
->
+Yes.  We don't want the compiler assuming zeros (for non-x86 abis) when we
+aren't providing them.
 
-Should I do a RFC or preview submission then of the first dozen patches
-maybe as I work out integrating back the bug/compile fixes into the early
-series? I'd love to get feedback, but don't want to waste people's time on
-something that I've not compile tested every change on (just the final
-results, which stands today at ~125 changes, but last week was at 200).
 
-Warner
+r~
