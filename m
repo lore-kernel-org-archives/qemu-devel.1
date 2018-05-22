@@ -1,41 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50742)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51774)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bala24@linux.vnet.ibm.com>) id 1fL5YF-0001hS-Tn
-	for qemu-devel@nongnu.org; Tue, 22 May 2018 07:34:01 -0400
+	(envelope-from <eric.auger@redhat.com>) id 1fL5f8-0002p0-Ob
+	for qemu-devel@nongnu.org; Tue, 22 May 2018 07:41:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bala24@linux.vnet.ibm.com>) id 1fL5YC-00022y-O0
-	for qemu-devel@nongnu.org; Tue, 22 May 2018 07:33:59 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:37368)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bala24@linux.vnet.ibm.com>)
-	id 1fL5YC-00021Z-E1
-	for qemu-devel@nongnu.org; Tue, 22 May 2018 07:33:56 -0400
-Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w4MBTUeN061742
-	for <qemu-devel@nongnu.org>; Tue, 22 May 2018 07:33:52 -0400
-Received: from e06smtp11.uk.ibm.com (e06smtp11.uk.ibm.com [195.75.94.107])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2j4gv7cbuk-1
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 22 May 2018 07:33:51 -0400
-Received: from localhost
-	by e06smtp11.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <bala24@linux.vnet.ibm.com>;
-	Tue, 22 May 2018 12:33:49 +0100
-Date: Tue, 22 May 2018 17:03:43 +0530
-From: Balamuruhan S <bala24@linux.vnet.ibm.com>
-References: <20180425071040.25542-1-bala24@linux.vnet.ibm.com>
-	<20180425071040.25542-2-bala24@linux.vnet.ibm.com>
-	<20180501143737.GA25113@9.122.211.20>
-	<d4e1788d-64c9-4b43-5fd6-4008b616362e@redhat.com>
+	(envelope-from <eric.auger@redhat.com>) id 1fL5f7-0005OJ-6T
+	for qemu-devel@nongnu.org; Tue, 22 May 2018 07:41:06 -0400
+References: <20180521140402.23318-1-peter.maydell@linaro.org>
+	<20180521140402.23318-2-peter.maydell@linaro.org>
+From: Auger Eric <eric.auger@redhat.com>
+Message-ID: <50b9fbd0-5571-a83f-1ae5-b44b1f7828a9@redhat.com>
+Date: Tue, 22 May 2018 13:40:53 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <d4e1788d-64c9-4b43-5fd6-4008b616362e@redhat.com>
-Message-Id: <20180522113343.GA11538@9.122.211.20>
-Subject: Re: [Qemu-devel] [PATCH v3 1/1] migration: calculate
- expected_downtime with ram_bytes_remaining()
+In-Reply-To: <20180521140402.23318-2-peter.maydell@linaro.org>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 01/27] memory.h: Improve IOMMU related
+ documentation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -44,194 +24,193 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laurent Vivier <lvivier@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, patches@linaro.org
 
-On Wed, May 16, 2018 at 03:43:48PM +0200, Laurent Vivier wrote:
-> Hi Bala,
+Hi Peter,
+
+On 05/21/2018 04:03 PM, Peter Maydell wrote:
+> Add more detail to the documentation for memory_region_init_iommu()
+> and other IOMMU-related functions and data structures.
 > 
-> I've tested you patch migrating a pseries between a P9 host and a P8
-> host with 1G huge page size on the P9 side and 16MB on P8 side and the
-> information are strange now.
-Hi Laurent,
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+Reviewed-by: Eric Auger <eric.auger@redhat.com>
 
-Thank you for testing the patch,
+Thanks
 
-I too have worked on recreate the same setup and my observation is that
-remaining ram is reducing where as expected_downtime remains to be same
-as 300 which is same as downtime-limit because, it gets assigned in
-migrate_fd_connect() as 300,
-
-s->expected_downtime = s->parameters.downtime_limit;
-
-expected_downtime is not calculated immediately after migration is
-started, it takes time to calculate expected_downtime even without this patch
-because of the condition in migration_update_counters(), 
-
-/*
- * if we haven't sent anything, we don't want to
- * recalculate. 10000 is a small enough number for our purposes
- */
-if (ram_counters.dirty_pages_rate && transferred > 10000) {
-    calculate expected_downtime
-}
-
-> "remaining ram" doesn't change, and after a while it can be set to "0"
-> and estimated downtime is 0 too, but the migration is not completed and
-
-I see remaining ram reduces continuously to a point and bumps up again.
-
-migration completes successfully after setting downtime-limit same as
-expected_dowtime which is calculated after it enters the condition
-mentioned above,
-
-Tested with this patch,
-
-(qemu) info migrate
-globals:
-store-global-state: on
-only-migratable: off
-send-configuration: on
-send-section-footer: on
-capabilities: xbzrle: off rdma-pin-all: off auto-converge: off zero-blocks: off compress: off events: off postcopy-ram: off x-colo: off release-ram: off block: off return-path: off pause-before-switchover: off x-multifd: off dirty-bitmaps: off postcopy-blocktime: off
-Migration status: active
-total time: 50753 milliseconds
-expected downtime: 46710 milliseconds
-setup: 15 milliseconds
-transferred ram: 582332 kbytes
-throughput: 95.33 mbps
-remaining ram: 543552 kbytes
-total ram: 8388864 kbytes
-duplicate: 1983194 pages
-skipped: 0 pages
-normal: 140950 pages
-normal bytes: 563800 kbytes
-dirty sync count: 2
-page size: 4 kbytes
-dirty pages rate: 49351 pages
-
-(qemu) migrate_set_parameter downtime-limit 46710
-
-(qemu) info migrate
-globals:
-store-global-state: on
-only-migratable: off
-send-configuration: on
-send-section-footer: on
-capabilities: xbzrle: off rdma-pin-all: off auto-converge: off zero-blocks: off compress: off events: off postcopy-ram: off x-colo: off release-ram: off block: off return-path: off pause-before-switchover: off x-multifd: off dirty-bitmaps: off postcopy-blocktime: off
-Migration status: completed
-total time: 118389 milliseconds
-downtime: 20324 milliseconds
-setup: 15 milliseconds
-transferred ram: 1355349 kbytes
-throughput: 94.07 mbps
-remaining ram: 0 kbytes
-total ram: 8388864 kbytes
-duplicate: 2139396 pages
-skipped: 0 pages
-normal: 333485 pages
-normal bytes: 1333940 kbytes
-dirty sync count: 6
-page size: 4 kbytes
-
-
-> "transferred ram" continues to increase.
-
-If we do not set the downtime-limit, the remaining ram and transferred
-ram gets bumped up and migration continues infinitely.
-
--- Bala
+Eric
+> ---
+> v2->v3 changes:
+>  * minor wording tweaks per Eric's review
+>  * moved the bit about requirements to notify out from the translate
+>    method docs to the top level class doc comment
+>  * added description of flags argument and in particular that it's
+>    just an optimization and callers can pass IOMMU_NONE to get the
+>    full permissions
+> v1 -> v2 changes:
+>  * documented replay method
+>  * added note about wanting RCU or big qemu lock while calling
+>    translate
+> ---
+>  include/exec/memory.h | 105 ++++++++++++++++++++++++++++++++++++++----
+>  1 file changed, 95 insertions(+), 10 deletions(-)
 > 
-> so think there is a problem somewhere...
-> 
-> thanks,
-> Laurent
-> 
-> On 01/05/2018 16:37, Balamuruhan S wrote:
-> > Hi,
-> > 
-> > Dave, David and Juan if you guys are okay with the patch, please
-> > help to merge it.
-> > 
-> > Thanks,
-> > Bala
-> > 
-> > On Wed, Apr 25, 2018 at 12:40:40PM +0530, Balamuruhan S wrote:
-> >> expected_downtime value is not accurate with dirty_pages_rate * page_size,
-> >> using ram_bytes_remaining would yeild it correct. It will initially be a
-> >> gross over-estimate, but for for non-converging migrations it should
-> >> approach a reasonable estimate later on.
-> >>
-> >> currently bandwidth and expected_downtime value are calculated in
-> >> migration_update_counters() during each iteration from
-> >> migration_thread(), where as remaining ram is calculated in
-> >> qmp_query_migrate() when we actually call "info migrate". Due to this
-> >> there is some difference in expected_downtime value being calculated.
-> >>
-> >> with this patch bandwidth, expected_downtime and remaining ram are
-> >> calculated in migration_update_counters(), retrieve the same value during
-> >> "info migrate". By this approach we get almost close enough value.
-> >>
-> >> Reported-by: Michael Roth <mdroth@linux.vnet.ibm.com>
-> >> Signed-off-by: Balamuruhan S <bala24@linux.vnet.ibm.com>
-> >> ---
-> >>  migration/migration.c | 11 ++++++++---
-> >>  migration/migration.h |  1 +
-> >>  2 files changed, 9 insertions(+), 3 deletions(-)
-> >>
-> >> diff --git a/migration/migration.c b/migration/migration.c
-> >> index 52a5092add..5d721ee481 100644
-> >> --- a/migration/migration.c
-> >> +++ b/migration/migration.c
-> >> @@ -614,7 +614,7 @@ static void populate_ram_info(MigrationInfo *info, MigrationState *s)
-> >>      }
-> >>
-> >>      if (s->state != MIGRATION_STATUS_COMPLETED) {
-> >> -        info->ram->remaining = ram_bytes_remaining();
-> >> +        info->ram->remaining = s->ram_bytes_remaining;
-> >>          info->ram->dirty_pages_rate = ram_counters.dirty_pages_rate;
-> >>      }
-> >>  }
-> >> @@ -2227,6 +2227,7 @@ static void migration_update_counters(MigrationState *s,
-> >>      transferred = qemu_ftell(s->to_dst_file) - s->iteration_initial_bytes;
-> >>      time_spent = current_time - s->iteration_start_time;
-> >>      bandwidth = (double)transferred / time_spent;
-> >> +    s->ram_bytes_remaining = ram_bytes_remaining();
-> >>      s->threshold_size = bandwidth * s->parameters.downtime_limit;
-> >>
-> >>      s->mbps = (((double) transferred * 8.0) /
-> >> @@ -2237,8 +2238,12 @@ static void migration_update_counters(MigrationState *s,
-> >>       * recalculate. 10000 is a small enough number for our purposes
-> >>       */
-> >>      if (ram_counters.dirty_pages_rate && transferred > 10000) {
-> >> -        s->expected_downtime = ram_counters.dirty_pages_rate *
-> >> -            qemu_target_page_size() / bandwidth;
-> >> +        /*
-> >> +         * It will initially be a gross over-estimate, but for for
-> >> +         * non-converging migrations it should approach a reasonable estimate
-> >> +         * later on
-> >> +         */
-> >> +        s->expected_downtime = s->ram_bytes_remaining / bandwidth;
-> >>      }
-> >>
-> >>      qemu_file_reset_rate_limit(s->to_dst_file);
-> >> diff --git a/migration/migration.h b/migration/migration.h
-> >> index 8d2f320c48..8584f8e22e 100644
-> >> --- a/migration/migration.h
-> >> +++ b/migration/migration.h
-> >> @@ -128,6 +128,7 @@ struct MigrationState
-> >>      int64_t downtime_start;
-> >>      int64_t downtime;
-> >>      int64_t expected_downtime;
-> >> +    int64_t ram_bytes_remaining;
-> >>      bool enabled_capabilities[MIGRATION_CAPABILITY__MAX];
-> >>      int64_t setup_time;
-> >>      /*
-> >> -- 
-> >> 2.14.3
-> >>
-> >>
-> > 
-> > 
-> 
+> diff --git a/include/exec/memory.h b/include/exec/memory.h
+> index 4fa1227f13..cce355d2d8 100644
+> --- a/include/exec/memory.h
+> +++ b/include/exec/memory.h
+> @@ -194,29 +194,100 @@ enum IOMMUMemoryRegionAttr {
+>      IOMMU_ATTR_SPAPR_TCE_FD
+>  };
+>  
+> +/**
+> + * IOMMUMemoryRegionClass:
+> + *
+> + * All IOMMU implementations need to subclass TYPE_IOMMU_MEMORY_REGION
+> + * and provide an implementation of at least the @translate method here
+> + * to handle requests to the memory region. Other methods are optional.
+> + *
+> + * The IOMMU implementation must use the IOMMU notifier infrastructure
+> + * to report whenever mappings are changed, by calling
+> + * memory_region_notify_iommu() (or, if necessary, by calling
+> + * memory_region_notify_one() for each registered notifier).
+> + */
+>  typedef struct IOMMUMemoryRegionClass {
+>      /* private */
+>      struct DeviceClass parent_class;
+>  
+>      /*
+> -     * Return a TLB entry that contains a given address. Flag should
+> -     * be the access permission of this translation operation. We can
+> -     * set flag to IOMMU_NONE to mean that we don't need any
+> -     * read/write permission checks, like, when for region replay.
+> +     * Return a TLB entry that contains a given address.
+> +     *
+> +     * The IOMMUAccessFlags indicated via @flag are optional and may
+> +     * be specified as IOMMU_NONE to indicate that the caller needs
+> +     * the full translation information for both reads and writes. If
+> +     * the access flags are specified then the IOMMU implementation
+> +     * may use this as an optimization, to stop doing a page table
+> +     * walk as soon as it knows that the requested permissions are not
+> +     * allowed. If IOMMU_NONE is passed then the IOMMU must do the
+> +     * full page table walk and report the permissions in the returned
+> +     * IOMMUTLBEntry. (Note that this implies that an IOMMU may not
+> +     * return different mappings for reads and writes.)
+> +     *
+> +     * The returned information remains valid while the caller is
+> +     * holding the big QEMU lock or is inside an RCU critical section;
+> +     * if the caller wishes to cache the mapping beyond that it must
+> +     * register an IOMMU notifier so it can invalidate its cached
+> +     * information when the IOMMU mapping changes.
+> +     *
+> +     * @iommu: the IOMMUMemoryRegion
+> +     * @hwaddr: address to be translated within the memory region
+> +     * @flag: requested access permissions
+>       */
+>      IOMMUTLBEntry (*translate)(IOMMUMemoryRegion *iommu, hwaddr addr,
+>                                 IOMMUAccessFlags flag);
+> -    /* Returns minimum supported page size */
+> +    /* Returns minimum supported page size in bytes.
+> +     * If this method is not provided then the minimum is assumed to
+> +     * be TARGET_PAGE_SIZE.
+> +     *
+> +     * @iommu: the IOMMUMemoryRegion
+> +     */
+>      uint64_t (*get_min_page_size)(IOMMUMemoryRegion *iommu);
+> -    /* Called when IOMMU Notifier flag changed */
+> +    /* Called when IOMMU Notifier flag changes (ie when the set of
+> +     * events which IOMMU users are requesting notification for changes).
+> +     * Optional method -- need not be provided if the IOMMU does not
+> +     * need to know exactly which events must be notified.
+> +     *
+> +     * @iommu: the IOMMUMemoryRegion
+> +     * @old_flags: events which previously needed to be notified
+> +     * @new_flags: events which now need to be notified
+> +     */
+>      void (*notify_flag_changed)(IOMMUMemoryRegion *iommu,
+>                                  IOMMUNotifierFlag old_flags,
+>                                  IOMMUNotifierFlag new_flags);
+> -    /* Set this up to provide customized IOMMU replay function */
+> +    /* Called to handle memory_region_iommu_replay().
+> +     *
+> +     * The default implementation of memory_region_iommu_replay() is to
+> +     * call the IOMMU translate method for every page in the address space
+> +     * with flag == IOMMU_NONE and then call the notifier if translate
+> +     * returns a valid mapping. If this method is implemented then it
+> +     * overrides the default behaviour, and must provide the full semantics
+> +     * of memory_region_iommu_replay(), by calling @notifier for every
+> +     * translation present in the IOMMU.
+> +     *
+> +     * Optional method -- an IOMMU only needs to provide this method
+> +     * if the default is inefficient or produces undesirable side effects.
+> +     *
+> +     * Note: this is not related to record-and-replay functionality.
+> +     */
+>      void (*replay)(IOMMUMemoryRegion *iommu, IOMMUNotifier *notifier);
+>  
+> -    /* Get IOMMU misc attributes */
+> -    int (*get_attr)(IOMMUMemoryRegion *iommu, enum IOMMUMemoryRegionAttr,
+> +    /* Get IOMMU misc attributes. This is an optional method that
+> +     * can be used to allow users of the IOMMU to get implementation-specific
+> +     * information. The IOMMU implements this method to handle calls
+> +     * by IOMMU users to memory_region_iommu_get_attr() by filling in
+> +     * the arbitrary data pointer for any IOMMUMemoryRegionAttr values that
+> +     * the IOMMU supports. If the method is unimplemented then
+> +     * memory_region_iommu_get_attr() will always return -EINVAL.
+> +     *
+> +     * @iommu: the IOMMUMemoryRegion
+> +     * @attr: attribute being queried
+> +     * @data: memory to fill in with the attribute data
+> +     *
+> +     * Returns 0 on success, or a negative errno; in particular
+> +     * returns -EINVAL for unrecognized or unimplemented attribute types.
+> +     */
+> +    int (*get_attr)(IOMMUMemoryRegion *iommu, enum IOMMUMemoryRegionAttr attr,
+>                      void *data);
+>  } IOMMUMemoryRegionClass;
+>  
+> @@ -705,6 +776,14 @@ static inline void memory_region_init_reservation(MemoryRegion *mr,
+>   * An IOMMU region translates addresses and forwards accesses to a target
+>   * memory region.
+>   *
+> + * The IOMMU implementation must define a subclass of TYPE_IOMMU_MEMORY_REGION.
+> + * @_iommu_mr should be a pointer to enough memory for an instance of
+> + * that subclass, @instance_size is the size of that subclass, and
+> + * @mrtypename is its name. This function will initialize @_iommu_mr as an
+> + * instance of the subclass, and its methods will then be called to handle
+> + * accesses to the memory region. See the documentation of
+> + * #IOMMUMemoryRegionClass for further details.
+> + *
+>   * @_iommu_mr: the #IOMMUMemoryRegion to be initialized
+>   * @instance_size: the IOMMUMemoryRegion subclass instance size
+>   * @mrtypename: the type name of the #IOMMUMemoryRegion
+> @@ -953,6 +1032,8 @@ void memory_region_register_iommu_notifier(MemoryRegion *mr,
+>   * a notifier with the minimum page granularity returned by
+>   * mr->iommu_ops->get_page_size().
+>   *
+> + * Note: this is not related to record-and-replay functionality.
+> + *
+>   * @iommu_mr: the memory region to observe
+>   * @n: the notifier to which to replay iommu mappings
+>   */
+> @@ -962,6 +1043,8 @@ void memory_region_iommu_replay(IOMMUMemoryRegion *iommu_mr, IOMMUNotifier *n);
+>   * memory_region_iommu_replay_all: replay existing IOMMU translations
+>   * to all the notifiers registered.
+>   *
+> + * Note: this is not related to record-and-replay functionality.
+> + *
+>   * @iommu_mr: the memory region to observe
+>   */
+>  void memory_region_iommu_replay_all(IOMMUMemoryRegion *iommu_mr);
+> @@ -981,7 +1064,9 @@ void memory_region_unregister_iommu_notifier(MemoryRegion *mr,
+>   * memory_region_iommu_get_attr: return an IOMMU attr if get_attr() is
+>   * defined on the IOMMU.
+>   *
+> - * Returns 0 if succeded, error code otherwise.
+> + * Returns 0 on success, or a negative errno otherwise. In particular,
+> + * -EINVAL indicates that the IOMMU does not support the requested
+> + * attribute.
+>   *
+>   * @iommu_mr: the memory region
+>   * @attr: the requested attribute
 > 
