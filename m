@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50747)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50753)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sstabellini@kernel.org>) id 1fLCJ9-0001fD-1v
+	(envelope-from <sstabellini@kernel.org>) id 1fLCJ9-0001fH-3u
 	for qemu-devel@nongnu.org; Tue, 22 May 2018 14:46:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sstabellini@kernel.org>) id 1fLCJ6-0007Rn-8b
+	(envelope-from <sstabellini@kernel.org>) id 1fLCJ4-0007QU-BY
 	for qemu-devel@nongnu.org; Tue, 22 May 2018 14:46:51 -0400
-Received: from mail.kernel.org ([198.145.29.99]:43618)
+Received: from mail.kernel.org ([198.145.29.99]:43546)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <sstabellini@kernel.org>)
-	id 1fLCJ5-0007RF-WE
-	for qemu-devel@nongnu.org; Tue, 22 May 2018 14:46:48 -0400
+	id 1fLCJ4-0007Pn-5r
+	for qemu-devel@nongnu.org; Tue, 22 May 2018 14:46:46 -0400
 From: Stefano Stabellini <sstabellini@kernel.org>
-Date: Tue, 22 May 2018 11:46:38 -0700
-Message-Id: <1527014802-11289-11-git-send-email-sstabellini@kernel.org>
+Date: Tue, 22 May 2018 11:46:33 -0700
+Message-Id: <1527014802-11289-6-git-send-email-sstabellini@kernel.org>
 In-Reply-To: <alpine.DEB.2.10.1805221136110.24793@sstabellini-ThinkPad-X260>
 References: <alpine.DEB.2.10.1805221136110.24793@sstabellini-ThinkPad-X260>
-Subject: [Qemu-devel] [PULL v2 11/15] xen_backend: add an emulation of grant
- copy
+Subject: [Qemu-devel] [PULL v2 06/15] checkpatch: generalize xen handle
+ matching in the list of types
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,89 +30,45 @@ Cc: sstabellini@kernel.org, stefanha@redhat.com, anthony.perard@citrix.com, xen-
 
 From: Paul Durrant <paul.durrant@citrix.com>
 
-Not all Xen environments support the xengnttab_grant_copy() operation.
-E.g. where the OS is FreeBSD or Xen is older than 4.8.0.
+All the xen stable APIs define handle types of the form:
 
-This patch introduces an emulation of that operation using
-xengnttab_map_domain_grant_refs() and memcpy() for those environments.
+xen<subject of API>_handle
+
+and some define additional handle types of the form:
+
+xen<subject of API>_<purpose of handle>_handle
+
+Examples of these are xenforeignmemory_handle and
+xenforeignmemory_resource_handle.
+
+Both of these types will be misparsed by checkpatch if they appear as the
+first token in a line since, as types defined by an external library, they
+do not conform to the QEMU CODING_STYLE, which suggests CamelCase.
+
+A previous patch (5ac067a24a8) added xendevicemodel_handle to the list
+of types. This patch changes that to xen\w+_handle such that it will
+match all Xen stable API handles of the forms detailed above.
 
 Signed-off-by: Paul Durrant <paul.durrant@citrix.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
 Acked-by: Anthony PERARD <anthony.perard@citrix.com>
 Signed-off-by: Stefano Stabellini <sstabellini@kernel.org>
 ---
- hw/xen/xen_backend.c | 53 ++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 53 insertions(+)
+ scripts/checkpatch.pl | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/hw/xen/xen_backend.c b/hw/xen/xen_backend.c
-index 50412d6..3c3fc2c 100644
---- a/hw/xen/xen_backend.c
-+++ b/hw/xen/xen_backend.c
-@@ -146,6 +146,55 @@ void xen_be_unmap_grant_refs(struct XenDevice *xendev, void *ptr,
-     }
- }
- 
-+static int compat_copy_grant_refs(struct XenDevice *xendev,
-+                                  bool to_domain,
-+                                  XenGrantCopySegment segs[],
-+                                  unsigned int nr_segs)
-+{
-+    uint32_t *refs = g_new(uint32_t, nr_segs);
-+    int prot = to_domain ? PROT_WRITE : PROT_READ;
-+    void *pages;
-+    unsigned int i;
-+
-+    for (i = 0; i < nr_segs; i++) {
-+        XenGrantCopySegment *seg = &segs[i];
-+
-+        refs[i] = to_domain ?
-+            seg->dest.foreign.ref : seg->source.foreign.ref;
-+    }
-+
-+    pages = xengnttab_map_domain_grant_refs(xendev->gnttabdev, nr_segs,
-+                                            xen_domid, refs, prot);
-+    if (!pages) {
-+        xen_pv_printf(xendev, 0,
-+                      "xengnttab_map_domain_grant_refs failed: %s\n",
-+                      strerror(errno));
-+        g_free(refs);
-+        return -1;
-+    }
-+
-+    for (i = 0; i < nr_segs; i++) {
-+        XenGrantCopySegment *seg = &segs[i];
-+        void *page = pages + (i * XC_PAGE_SIZE);
-+
-+        if (to_domain) {
-+            memcpy(page + seg->dest.foreign.offset, seg->source.virt,
-+                   seg->len);
-+        } else {
-+            memcpy(seg->dest.virt, page + seg->source.foreign.offset,
-+                   seg->len);
-+        }
-+    }
-+
-+    if (xengnttab_unmap(xendev->gnttabdev, pages, nr_segs)) {
-+        xen_pv_printf(xendev, 0, "xengnttab_unmap failed: %s\n",
-+                      strerror(errno));
-+    }
-+
-+    g_free(refs);
-+    return 0;
-+}
-+
- int xen_be_copy_grant_refs(struct XenDevice *xendev,
-                            bool to_domain,
-                            XenGrantCopySegment segs[],
-@@ -157,6 +206,10 @@ int xen_be_copy_grant_refs(struct XenDevice *xendev,
- 
-     assert(xendev->ops->flags & DEVOPS_FLAG_NEED_GNTDEV);
- 
-+    if (!xen_feature_grant_copy) {
-+        return compat_copy_grant_refs(xendev, to_domain, segs, nr_segs);
-+    }
-+
-     xengnttab_segs = g_new0(xengnttab_grant_copy_segment_t, nr_segs);
- 
-     for (i = 0; i < nr_segs; i++) {
+diff --git a/scripts/checkpatch.pl b/scripts/checkpatch.pl
+index cb1b652..e3d8c2c 100755
+--- a/scripts/checkpatch.pl
++++ b/scripts/checkpatch.pl
+@@ -271,7 +271,7 @@ our @typeList = (
+ 	qr{hwaddr},
+         # external libraries
+ 	qr{xml${Ident}},
+-	qr{xendevicemodel_handle},
++	qr{xen\w+_handle},
+ 	# Glib definitions
+ 	qr{gchar},
+ 	qr{gshort},
 -- 
 1.9.1
