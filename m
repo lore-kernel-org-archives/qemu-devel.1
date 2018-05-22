@@ -1,31 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49818)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50615)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcel.apfelbaum@gmail.com>) id 1fLCGI-0000TB-Q8
-	for qemu-devel@nongnu.org; Tue, 22 May 2018 14:43:55 -0400
+	(envelope-from <sstabellini@kernel.org>) id 1fLCIy-0001bX-Nd
+	for qemu-devel@nongnu.org; Tue, 22 May 2018 14:46:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcel.apfelbaum@gmail.com>) id 1fLCGD-0006Uh-V3
-	for qemu-devel@nongnu.org; Tue, 22 May 2018 14:43:54 -0400
-Received: from mail-wm0-x242.google.com ([2a00:1450:400c:c09::242]:33106)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <marcel.apfelbaum@gmail.com>)
-	id 1fLCGD-0006UL-OB
-	for qemu-devel@nongnu.org; Tue, 22 May 2018 14:43:49 -0400
-Received: by mail-wm0-x242.google.com with SMTP id x12-v6so17896419wmc.0
-	for <qemu-devel@nongnu.org>; Tue, 22 May 2018 11:43:49 -0700 (PDT)
-References: <1526801333-30613-1-git-send-email-whois.zihan.yang@gmail.com>
-	<1526801333-30613-4-git-send-email-whois.zihan.yang@gmail.com>
-	<ef3fc85d-7726-c888-e8ca-9dfae1b908d3@gmail.com>
-	<CAKwiv-gmfOhM_4BZbjH4VcTh4qmRQ0GuAskJ74T+M3KMHg6_mQ@mail.gmail.com>
-From: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
-Message-ID: <25bc34e0-3ecf-1465-cff7-6ba1a162dec1@gmail.com>
-Date: Tue, 22 May 2018 21:43:45 +0300
+	(envelope-from <sstabellini@kernel.org>) id 1fLCIt-0007Nl-OT
+	for qemu-devel@nongnu.org; Tue, 22 May 2018 14:46:40 -0400
+Received: from mail.kernel.org ([198.145.29.99]:43420)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <sstabellini@kernel.org>)
+	id 1fLCIt-0007Nb-IZ
+	for qemu-devel@nongnu.org; Tue, 22 May 2018 14:46:35 -0400
+Date: Tue, 22 May 2018 11:46:34 -0700 (PDT)
+From: Stefano Stabellini <sstabellini@kernel.org>
+Message-ID: <alpine.DEB.2.10.1805221136110.24793@sstabellini-ThinkPad-X260>
 MIME-Version: 1.0
-In-Reply-To: <CAKwiv-gmfOhM_4BZbjH4VcTh4qmRQ0GuAskJ74T+M3KMHg6_mQ@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-Subject: Re: [Qemu-devel] [RFC 3/3] acpi-build: allocate mcfg for multiple
- host bridges
+Content-Type: TEXT/PLAIN; charset=US-ASCII
+Subject: [Qemu-devel] [PULL v2 00/15] xen-20180522-tag
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,40 +24,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Zihan Yang <whois.zihan.yang@gmail.com>, qemu-devel@nongnu.org
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, lersek@redhat.com
+To: peter.maydell@linaro.org, stefanha@gmail.com
+Cc: sstabellini@kernel.org, stefanha@redhat.com, anthony.perard@citrix.com, xen-devel@lists.xenproject.org, qemu-devel@nongnu.org
+
+The following changes since commit d32e41a1188e929cc0fb16829ce3736046951e39:
+
+  Merge remote-tracking branch 'remotes/famz/tags/docker-and-block-pull-request' into staging (2018-05-18 14:11:52 +0100)
+
+are available in the git repository at:
 
 
+  http://xenbits.xenproject.org/git-http/people/sstabellini/qemu-dm.git tags/xen-20180522-tag
 
-On 05/22/2018 09:03 AM, Zihan Yang wrote:
-> > An interesting point is if we want to limit the MMFCG size for PXBs, 
-> as we may not be
-> > interested to use all the buses in a specific domain.
->
-> OK, perhaps providing an option for the user to specify the desired 
-> bus numbers?
->
+for you to fetch changes up to 443c3c9cf1a18afcc705745d18101a4ea4de5b26:
 
-Right, specifying the number of buses that can be used (e.g: max_busses) 
-will decrease a lot
-the amount of address space we have to reserve.
+  xen_disk: be consistent with use of xendev and blkdev->xendev (2018-05-22 11:43:22 -0700)
 
-> > For each bus we require some address space that remains unused.
->
-> Does this mean we should reserve some slots in a bus, or reduce
-> the number of buses used in each domain?
->
+----------------------------------------------------------------
+Xen 2018/05/22
 
-Limit the number of buses per PCI domain (excluding PCI domain 0, of course)
+----------------------------------------------------------------
+Anthony PERARD (1):
+      configure: Add explanation for --enable-xen-pci-passthrough
 
-> > [Adding Laszlo for his insights]
-> > Looking forward to see the SeaBIOS patches :)
->
-> I appreciate your reviews, I'll write the rest part as soon as possible.
->
+Igor Druzhinin (2):
+      xen-pvdevice: Introduce a simplistic xen-pvdevice save state
+      xen/pt: use address_space_memory object for memory region hooks
 
-Thanks,
-Marcel
+Paul Durrant (11):
+      xen-hvm: create separate function for ioreq server initialization
+      checkpatch: generalize xen handle matching in the list of types
+      xen: add a meaningful declaration of grant_copy_segment into xen_common.h
+      xen_backend: add grant table helpers
+      xen_disk: remove open-coded use of libxengnttab
+      xen: remove other open-coded use of libxengnttab
+      xen_backend: add an emulation of grant copy
+      xen_disk: remove use of grant map/unmap
+      xen_backend: make the xen_feature_grant_copy flag private
+      xen_disk: use a single entry iovec
+      xen_disk: be consistent with use of xendev and blkdev->xendev
 
-> Thanks
->
+Ross Lagerwall (1):
+      xen_pt: Present the size of 64 bit BARs correctly
+
+ configure                    |   2 +-
+ hw/9pfs/xen-9p-backend.c     |  32 ++-
+ hw/block/xen_disk.c          | 614 +++++++------------------------------------
+ hw/char/xen_console.c        |   9 +-
+ hw/i386/xen/xen-hvm.c        |  76 +++---
+ hw/i386/xen/xen_pvdevice.c   |  11 +
+ hw/net/xen_nic.c             |  33 +--
+ hw/usb/xen-usb.c             |  37 ++-
+ hw/xen/xen_backend.c         | 178 ++++++++++++-
+ hw/xen/xen_pt.c              |   2 +-
+ hw/xen/xen_pt_config_init.c  |   2 +
+ include/hw/xen/xen_backend.h |  34 ++-
+ include/hw/xen/xen_common.h  |  17 +-
+ scripts/checkpatch.pl        |   2 +-
+ 14 files changed, 427 insertions(+), 622 deletions(-)
