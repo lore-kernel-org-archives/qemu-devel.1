@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47739)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51758)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1fL74x-0005jX-3M
-	for qemu-devel@nongnu.org; Tue, 22 May 2018 09:11:52 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1fL7FZ-00086C-7c
+	for qemu-devel@nongnu.org; Tue, 22 May 2018 09:22:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1fL74t-0002Dr-Sr
-	for qemu-devel@nongnu.org; Tue, 22 May 2018 09:11:51 -0400
-Received: from 17.mo6.mail-out.ovh.net ([46.105.36.150]:40107)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1fL74t-00029C-Jd
-	for qemu-devel@nongnu.org; Tue, 22 May 2018 09:11:47 -0400
-Received: from player791.ha.ovh.net (unknown [10.109.122.44])
-	by mo6.mail-out.ovh.net (Postfix) with ESMTP id 9CD0615D5B4
-	for <qemu-devel@nongnu.org>; Tue, 22 May 2018 15:11:37 +0200 (CEST)
-Date: Tue, 22 May 2018 15:11:15 +0200
-From: Greg Kurz <groug@kaod.org>
-Message-ID: <20180522151115.7aa526cd@bahia.lan>
-In-Reply-To: <20180522104000.9044-5-peter.maydell@linaro.org>
-References: <20180522104000.9044-1-peter.maydell@linaro.org>
-	<20180522104000.9044-5-peter.maydell@linaro.org>
+	(envelope-from <peter.maydell@linaro.org>) id 1fL7FO-0007K8-Cv
+	for qemu-devel@nongnu.org; Tue, 22 May 2018 09:22:49 -0400
+Received: from mail-oi0-x241.google.com ([2607:f8b0:4003:c06::241]:41551)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1fL7FO-0007Jw-7y
+	for qemu-devel@nongnu.org; Tue, 22 May 2018 09:22:38 -0400
+Received: by mail-oi0-x241.google.com with SMTP id 11-v6so16153019ois.8
+	for <qemu-devel@nongnu.org>; Tue, 22 May 2018 06:22:38 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH 4/5] ppc: Rename 2.13 machines
- to 3.0
+In-Reply-To: <47281818-f0cf-0ed1-c479-fbcaca5c5167@redhat.com>
+References: <20180521140402.23318-1-peter.maydell@linaro.org>
+	<20180521140402.23318-15-peter.maydell@linaro.org>
+	<47281818-f0cf-0ed1-c479-fbcaca5c5167@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 22 May 2018 14:22:17 +0100
+Message-ID: <CAFEAcA-R9t4K488viYM9ipmfArA=ijMMJn+FD1wekPdAbNOHvQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH 14/27] iommu: Add IOMMU index concept to
+ IOMMU API
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,134 +31,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: qemu-devel@nongnu.org, Cornelia Huck <cohuck@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, patches@linaro.org, Markus Armbruster <armbru@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org, qemu-ppc@nongnu.org, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Eric Blake <eblake@redhat.com>, David Gibson <david@gibson.dropbear.id.au>
+To: Auger Eric <eric.auger@redhat.com>
+Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>, "patches@linaro.org" <patches@linaro.org>
 
-On Tue, 22 May 2018 11:39:59 +0100
-Peter Maydell <peter.maydell@linaro.org> wrote:
+On 22 May 2018 at 13:58, Auger Eric <eric.auger@redhat.com> wrote:
+> Hi Peter,
+> On 05/21/2018 04:03 PM, Peter Maydell wrote:
+>> If an IOMMU supports mappings that care about the memory
+>> transaction attributes, then it no longer has a unique
+>> address -> output mapping, but more than one. We can
+>> represent these using an IOMMU index, analogous to TCG's
+>> mmu indexes.
+>>
+>> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+>> ---
+>>  include/exec/memory.h | 52 +++++++++++++++++++++++++++++++++++++++++++
+>>  memory.c              | 23 +++++++++++++++++++
+>>  2 files changed, 75 insertions(+)
+>>
+>> diff --git a/include/exec/memory.h b/include/exec/memory.h
+>> index 309fdfb89b..f6226fb263 100644
+>> --- a/include/exec/memory.h
+>> +++ b/include/exec/memory.h
+>> @@ -206,6 +206,20 @@ enum IOMMUMemoryRegionAttr {
+>>   * to report whenever mappings are changed, by calling
+>>   * memory_region_notify_iommu() (or, if necessary, by calling
+>>   * memory_region_notify_one() for each registered notifier).
+>> + *
+>> + * Conceptually an IOMMU provides a mapping from input address
+>> + * to an output TLB entry.
+> actually it takes a source identifier too (ARM streamid + substreamID,
+> this latter is not yet supported).
+> At the moment we have 1 IOMMUMRRegion per sid on ARM. For each
+> IOMMUMRRegion we would now have 2 indexes (1 for secure and 1 for
+> unsecure). How do you see the implementation of PASIDs (substreamids).
+> Would that be based on indexes or not?
 
-> Rename the 2.13 machines to match the number we're going to
-> use for the next release.
-> 
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-> ---
+Good question. I guess we would set that up so that the
+substream ID is in the memory transaction attributes as the
+requester_id and then use that as part of the IOMMU index ?
+Or you could use the indirection between tx attrs and indexes
+to allow you to map down a potentially large space of substream
+ID values to a smaller set of actually different configurations.
 
-Reviewed-by: Greg Kurz <groug@kaod.org>
+How many substream IDs do we expect to see in practice?
 
->  target/ppc/cpu.h                |  2 +-
->  hw/ppc/spapr.c                  | 14 +++++++-------
->  target/ppc/machine.c            |  8 ++++----
->  target/ppc/translate_init.inc.c |  2 +-
->  4 files changed, 13 insertions(+), 13 deletions(-)
-> 
-> diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
-> index 7ccd2f460e..0247c1f04c 100644
-> --- a/target/ppc/cpu.h
-> +++ b/target/ppc/cpu.h
-> @@ -1215,7 +1215,7 @@ struct PowerPCCPU {
->      uint64_t mig_insns_flags2;
->      uint32_t mig_nb_BATs;
->      bool pre_2_10_migration;
-> -    bool pre_2_13_migration;
-> +    bool pre_3_0_migration;
->      int32_t mig_slb_nr;
->  };
->  
-> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> index ebf30dd60b..213f6f9599 100644
-> --- a/hw/ppc/spapr.c
-> +++ b/hw/ppc/spapr.c
-> @@ -4071,18 +4071,18 @@ static const TypeInfo spapr_machine_info = {
->      type_init(spapr_machine_register_##suffix)
->  
->  /*
-> - * pseries-2.13
-> + * pseries-3.0
->   */
-> -static void spapr_machine_2_13_instance_options(MachineState *machine)
-> +static void spapr_machine_3_0_instance_options(MachineState *machine)
->  {
->  }
->  
-> -static void spapr_machine_2_13_class_options(MachineClass *mc)
-> +static void spapr_machine_3_0_class_options(MachineClass *mc)
->  {
->      /* Defaults for the latest behaviour inherited from the base class */
->  }
->  
-> -DEFINE_SPAPR_MACHINE(2_13, "2.13", true);
-> +DEFINE_SPAPR_MACHINE(3_0, "3.0", true);
->  
->  /*
->   * pseries-2.12
-> @@ -4091,18 +4091,18 @@ DEFINE_SPAPR_MACHINE(2_13, "2.13", true);
->      HW_COMPAT_2_12                                                     \
->      {                                                                  \
->          .driver = TYPE_POWERPC_CPU,                                    \
-> -        .property = "pre-2.13-migration",                              \
-> +        .property = "pre-3.0-migration",                              \
->          .value    = "on",                                              \
->      },
->  
->  static void spapr_machine_2_12_instance_options(MachineState *machine)
->  {
-> -    spapr_machine_2_13_instance_options(machine);
-> +    spapr_machine_3_0_instance_options(machine);
->  }
->  
->  static void spapr_machine_2_12_class_options(MachineClass *mc)
->  {
-> -    spapr_machine_2_13_class_options(mc);
-> +    spapr_machine_3_0_class_options(mc);
->      SET_MACHINE_COMPAT(mc, SPAPR_COMPAT_2_12);
->  }
->  
-> diff --git a/target/ppc/machine.c b/target/ppc/machine.c
-> index ba1b9e531f..b2745ec4e5 100644
-> --- a/target/ppc/machine.c
-> +++ b/target/ppc/machine.c
-> @@ -150,11 +150,11 @@ static bool cpu_pre_2_8_migration(void *opaque, int version_id)
->  }
->  
->  #if defined(TARGET_PPC64)
-> -static bool cpu_pre_2_13_migration(void *opaque, int version_id)
-> +static bool cpu_pre_3_0_migration(void *opaque, int version_id)
->  {
->      PowerPCCPU *cpu = opaque;
->  
-> -    return cpu->pre_2_13_migration;
-> +    return cpu->pre_3_0_migration;
->  }
->  #endif
->  
-> @@ -220,7 +220,7 @@ static int cpu_pre_save(void *opaque)
->          cpu->mig_insns_flags2 = env->insns_flags2 & insns_compat_mask2;
->          cpu->mig_nb_BATs = env->nb_BATs;
->      }
-> -    if (cpu->pre_2_13_migration) {
-> +    if (cpu->pre_3_0_migration) {
->          if (cpu->hash64_opts) {
->              cpu->mig_slb_nr = cpu->hash64_opts->slb_size;
->          }
-> @@ -517,7 +517,7 @@ static const VMStateDescription vmstate_slb = {
->      .needed = slb_needed,
->      .post_load = slb_post_load,
->      .fields = (VMStateField[]) {
-> -        VMSTATE_INT32_TEST(mig_slb_nr, PowerPCCPU, cpu_pre_2_13_migration),
-> +        VMSTATE_INT32_TEST(mig_slb_nr, PowerPCCPU, cpu_pre_3_0_migration),
->          VMSTATE_SLB_ARRAY(env.slb, PowerPCCPU, MAX_SLB_ENTRIES),
->          VMSTATE_END_OF_LIST()
->      }
-> diff --git a/target/ppc/translate_init.inc.c b/target/ppc/translate_init.inc.c
-> index a0b3f184b2..ab782cb32a 100644
-> --- a/target/ppc/translate_init.inc.c
-> +++ b/target/ppc/translate_init.inc.c
-> @@ -10427,7 +10427,7 @@ static Property ppc_cpu_properties[] = {
->      DEFINE_PROP_BOOL("pre-2.8-migration", PowerPCCPU, pre_2_8_migration, false),
->      DEFINE_PROP_BOOL("pre-2.10-migration", PowerPCCPU, pre_2_10_migration,
->                       false),
-> -    DEFINE_PROP_BOOL("pre-2.13-migration", PowerPCCPU, pre_2_13_migration,
-> +    DEFINE_PROP_BOOL("pre-3.0-migration", PowerPCCPU, pre_3_0_migration,
->                       false),
->      DEFINE_PROP_END_OF_LIST(),
->  };
+>> +/**
+>> + * memory_region_iommu_attrs_to_index: return the IOMMU index to
+>> + * use for translations with the given memory transaction attributes.
+>> + *
+>> + * @iommu_mr: the memory region
+>> + * @attrs: the memory transaction attributes
+>> + */
+>> +int memory_region_iommu_attrs_to_index(IOMMUMemoryRegion *iommu_mr,
+>> +                                       MemTxAttrs attrs);
+>> +
+>> +/**
+>> + * memory_region_iommu_num_indexes: return the total number of IOMMU
+>> + * indexes that this IOMMU supports.
+> is it IOMMU wide characteristics or per IOMMUMRRegion (SID)?
+
+I generally in this API document have been treating "IOMMU" and
+"IOMMURegion" as synonymous, since from the perspective of the API
+we don't care whether there's a bigger underlying thing in common
+between IOMMURegions.
+
+thanks
+-- PMM
