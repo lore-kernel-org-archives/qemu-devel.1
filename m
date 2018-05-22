@@ -1,23 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48641)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50270)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fL8ct-0002Py-FB
-	for qemu-devel@nongnu.org; Tue, 22 May 2018 10:51:00 -0400
+	(envelope-from <rth7680@gmail.com>) id 1fL8gx-0003iv-78
+	for qemu-devel@nongnu.org; Tue, 22 May 2018 10:55:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fL8cs-00037x-DS
-	for qemu-devel@nongnu.org; Tue, 22 May 2018 10:50:59 -0400
-Received: from mail-ot0-x235.google.com ([2607:f8b0:4003:c0f::235]:44361)
+	(envelope-from <rth7680@gmail.com>) id 1fL8gu-0005FW-6A
+	for qemu-devel@nongnu.org; Tue, 22 May 2018 10:55:11 -0400
+Received: from mail-pf0-x233.google.com ([2607:f8b0:400e:c00::233]:38922)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fL8cs-00036y-7g
-	for qemu-devel@nongnu.org; Tue, 22 May 2018 10:50:58 -0400
-Received: by mail-ot0-x235.google.com with SMTP id g7-v6so21265556otj.11
-	for <qemu-devel@nongnu.org>; Tue, 22 May 2018 07:50:57 -0700 (PDT)
+	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1fL8gu-0005FC-07
+	for qemu-devel@nongnu.org; Tue, 22 May 2018 10:55:08 -0400
+Received: by mail-pf0-x233.google.com with SMTP id a22-v6so8897185pfn.6
+	for <qemu-devel@nongnu.org>; Tue, 22 May 2018 07:55:07 -0700 (PDT)
+Sender: Richard Henderson <rth7680@gmail.com>
+References: <CAFEAcA-aD98+wh=XfMkY1iUwHjDJZ6dH7Juv0_o_VbgkcV0etw@mail.gmail.com>
+From: Richard Henderson <rth@twiddle.net>
+Message-ID: <214c47f3-1583-6480-4837-8b8ced37f038@twiddle.net>
+Date: Tue, 22 May 2018 07:55:04 -0700
 MIME-Version: 1.0
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 22 May 2018 15:50:36 +0100
-Message-ID: <CAFEAcA-aD98+wh=XfMkY1iUwHjDJZ6dH7Juv0_o_VbgkcV0etw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: [Qemu-devel] TCG helpers that return f16
+In-Reply-To: <CAFEAcA-aD98+wh=XfMkY1iUwHjDJZ6dH7Juv0_o_VbgkcV0etw@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] TCG helpers that return f16
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,20 +30,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: QEMU Developers <qemu-devel@nongnu.org>
-Cc: Richard Henderson <rth@twiddle.net>, =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
+To: Peter Maydell <peter.maydell@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>
+Cc: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
 
-Hi; I was reading about the x86-64 calling convention and I found
-out that apparently for returns of smaller-than-register types the
-high parts may contain garbage:
-https://stackoverflow.com/questions/36706721/is-a-sign-or-zero-extension-required-when-adding-a-32bit-offset-to-a-pointer-for/36760539#36760539
+On 05/22/2018 07:50 AM, Peter Maydell wrote:
+> Hi; I was reading about the x86-64 calling convention and I found
+> out that apparently for returns of smaller-than-register types the
+> high parts may contain garbage:
+> https://stackoverflow.com/questions/36706721/is-a-sign-or-zero-extension-required-when-adding-a-32bit-offset-to-a-pointer-for/36760539#36760539
 
-However, for TCG helper functions, although we allow the helper
-macro to say that the return type is 'f16', in helper-head.h we
-seem to just alias f16 as i32, and in dh_sizemask() we only record
-"is this 64 bits" and "is this signed". Am I missing the place
-where we zero-extend the value we get back from the helper so
-that it's the right thing in TCG's i32 ?
+Yes, that's one reason I didn't want to get involved in returning a "real"
+16-bit quantity.
 
-thanks
--- PMM
+> However, for TCG helper functions, although we allow the helper
+> macro to say that the return type is 'f16', in helper-head.h we
+> seem to just alias f16 as i32, and in dh_sizemask() we only record
+> "is this 64 bits" and "is this signed". Am I missing the place
+> where we zero-extend the value we get back from the helper so
+> that it's the right thing in TCG's i32 ?
+
+It happens in C, implicit in "typedef uint16_t float16".
+
+
+r~
