@@ -1,34 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33235)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33224)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fL7br-00073A-H7
-	for qemu-devel@nongnu.org; Tue, 22 May 2018 09:45:52 -0400
+	(envelope-from <bounces@canonical.com>) id 1fL7bp-00072z-NL
+	for qemu-devel@nongnu.org; Tue, 22 May 2018 09:45:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fL7bl-0003lh-DL
-	for qemu-devel@nongnu.org; Tue, 22 May 2018 09:45:51 -0400
-Received: from indium.canonical.com ([91.189.90.7]:51122)
+	(envelope-from <bounces@canonical.com>) id 1fL7bk-0003kv-Rh
+	for qemu-devel@nongnu.org; Tue, 22 May 2018 09:45:49 -0400
+Received: from indium.canonical.com ([91.189.90.7]:51088)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1fL7bl-0003kn-7e
-	for qemu-devel@nongnu.org; Tue, 22 May 2018 09:45:45 -0400
+	id 1fL7bk-0003kS-LO
+	for qemu-devel@nongnu.org; Tue, 22 May 2018 09:45:44 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1fL7bk-0008Hq-BB
-	for <qemu-devel@nongnu.org>; Tue, 22 May 2018 13:45:44 +0000
+	id 1fL7bj-0008Hq-DJ
+	for <qemu-devel@nongnu.org>; Tue, 22 May 2018 13:45:43 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 5387F2E8029
-	for <qemu-devel@nongnu.org>; Tue, 22 May 2018 13:45:44 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id 4F9472E8F3A
+	for <qemu-devel@nongnu.org>; Tue, 22 May 2018 13:45:43 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Tue, 22 May 2018 13:35:16 -0000
-From: Thomas Huth <1402755@bugs.launchpad.net>
-Reply-To: Bug 1402755 <1402755@bugs.launchpad.net>
+Date: Tue, 22 May 2018 13:30:29 -0000
+From: Thomas Huth <1425597@bugs.launchpad.net>
+Reply-To: Bug 1425597 <1425597@bugs.launchpad.net>
 Sender: bounces@canonical.com
-References: <20141215165955.16357.80461.malonedeb@soybean.canonical.com>
-Message-Id: <152699611640.8990.983462651697056873.malone@chaenomeles.canonical.com>
+References: <20150225170051.24385.73738.malonedeb@wampee.canonical.com>
+Message-Id: <152699582914.2820.4360837946455559567.malone@gac.canonical.com>
 Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1402755] Re: qemu-kvm: e1000 RX ring is filled
- with partial-pkt of size 0
+Subject: [Qemu-devel] [Bug 1425597] Re: moving window + changing screen
+ resolution = bug
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -40,7 +40,9 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 
 Looking through old bug tickets... can you still reproduce this issue
-with the latest version of QEMU? Or could we close this ticket nowadays?
+with the latest version of QEMU, using SDL2? Or could we close this
+ticket nowadays? In case the problem persists, please also specify which
+host system (Linux? Window manager? Or Windows?) you are using!
 
 ** Changed in: qemu
        Status: New =3D> Incomplete
@@ -49,89 +51,31 @@ with the latest version of QEMU? Or could we close this ticket nowadays?
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1402755
+https://bugs.launchpad.net/bugs/1425597
 
 Title:
-  qemu-kvm: e1000 RX ring is filled with partial-pkt of size 0
+  moving window + changing screen resolution =3D bug
 
 Status in QEMU:
   Incomplete
 
 Bug description:
-  Hello,
-  We are using CentOS 6.5 with qemu-kvm-0.12.1.2-2.415 as a host of or VMs.
-  In the VM we use e1000 as the NIC emulation.
-  We've modified the e1000 driver to our needs. This modification start the=
- RX engine while the RX ring is empty (RDH =3D=3D RDT)
-  and at a later stage we fill the RX descriptors with buffers. This scheme=
- works well on intel chips and VMware.
-  What we observe in this setup is that from time to time the RX ring is fi=
-lled with "partial packets" of size 0 (meaning, DD bit is set,
-  No other status bits are set and packet size is also 0).
+  Steps to reproduce:
+  1. Run qemu (sdl)
+  2. Start moving the window
+  3. At that moment the virtualized OS should change its screen resolution =
+(for example, when switching from initial qemu screen to grub)
 
-  Looking at the e1000 RX routine in qemu-kvm you can observe the following=
- flow:
-  1. A packet is avail for receive:
-  2. The routine checks for RCTL_EN - it is enabled
-  3. The routine checks that the RDH equal RDT (they are as the ring is emp=
-ty) but also checks if rxov is on (it is still off) so it doesn=E2=80=99t
-  Exit as it is supposed to.
-  4. The routine now updates the descriptor status with the DD bit (and vla=
-n which we don=E2=80=99t care)
-  5. The routine checks if a buffer address is not NULL (it is as NULL sinc=
-e we haven=E2=80=99t filled it yet) =E2=80=93 so is logs something.
-  6. The routine now updates the guest memory with this value (DD is 1) =
+  What I see:
+  Window size doesn't change, but internal screen resolution changes, so, i=
+mage scale stops to be 1:1, now I see virtualized OS in wrong scale.
 
-  7. The routine updates the check_rxov flag in order to allow ovf check th=
-e next time around. =
+  What I expected to see:
+  Window size changes so, that it keeps synchronized with internal resoluti=
+on (as usual)
 
-  (but ovf will not occur since in the next iteration RDH !=3D RDT)
-  8. The routine loops over all the descriptors with the NULL buffer (which=
- is all our ring) and writes the DD bit
-  9. We get this endless partial packet problem we see.
-
-  qemu-kvm-0.12.1.2-2.415.el6_5.3/qemu-kvm-0.12.1.2/hw/e1000.c
-  static ssize_t
-  e1000_receive(VLANClientState *nc, const uint8_t *buf, size_t size)
-  {
-  : : :
-  if (!(s->mac_reg[RCTL] & E1000_RCTL_EN))
-  return -1;
-
-  : : :
-  do {
-  if (s->mac_reg[RDH] =3D=3D s->mac_reg[RDT] && s->check_rxov) {
-  set_ics(s, 0, E1000_ICS_RXO);
-  return -1;
-  }
-  base =3D ((uint64_t)s->mac_reg[RDBAH] << 32) + s->mac_reg[RDBAL] +
-  sizeof(desc) * s->mac_reg[RDH];
-  cpu_physical_memory_read(base, (void *)&desc, sizeof(desc));
-  desc.special =3D vlan_special;
-  desc.status |=3D (vlan_status | E1000_RXD_STAT_DD);
-  if (desc.buffer_addr) {
-  cpu_physical_memory_write(le64_to_cpu(desc.buffer_addr),
-  (void *)(buf + vlan_offset), size);
-  desc.length =3D cpu_to_le16(size);
-  desc.status |=3D E1000_RXD_STAT_EOP|E1000_RXD_STAT_IXSM;
-  } else // as per intel docs; skip descriptors with null buf addr
-  DBGOUT(RX, "Null RX descriptor!!\n");
-  cpu_physical_memory_write(base, (void *)&desc, sizeof(desc));
-
-  : : :
-  if (++s->mac_reg[RDH] * sizeof(desc) >=3D s->mac_reg[RDLEN])
-  s->mac_reg[RDH] =3D 0;
-  s->check_rxov =3D 1;
-  : : :
-  } while (desc.buffer_addr =3D=3D 0);
-  }
-
-  =
-
-  A workaround is to enable the RX machine only after the descriptor ring i=
-s filled for the first time.
-
-  Moti
+  This bug preserves at lastest git version at the moment, i. e.
+  3d30395f7fb3315e4ecf0de4e48790e1326bbd47
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1402755/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/1425597/+subscriptions
