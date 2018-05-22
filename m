@@ -1,28 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47594)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43259)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <leo.duran@amd.com>) id 1fKwAC-00029E-Hv
-	for qemu-devel@nongnu.org; Mon, 21 May 2018 21:32:34 -0400
+	(envelope-from <jan.kiszka@siemens.com>) id 1fL1A6-0006Wu-AK
+	for qemu-devel@nongnu.org; Tue, 22 May 2018 02:52:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <leo.duran@amd.com>) id 1fKwA9-0004l9-AH
-	for qemu-devel@nongnu.org; Mon, 21 May 2018 21:32:32 -0400
-Received: from mail-by2nam01on0042.outbound.protection.outlook.com
-	([104.47.34.42]:11495
-	helo=NAM01-BY2-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <leo.duran@amd.com>) id 1fKwA8-0004kU-My
-	for qemu-devel@nongnu.org; Mon, 21 May 2018 21:32:29 -0400
-From: "Duran, Leo" <leo.duran@amd.com>
-Date: Tue, 22 May 2018 01:32:20 +0000
-Message-ID: <CY4PR12MB181551D174221BF3CC5F209AF9940@CY4PR12MB1815.namprd12.prod.outlook.com>
-References: <1526949675-106737-1-git-send-email-babu.moger@amd.com>
-	<1526949675-106737-3-git-send-email-babu.moger@amd.com>
-In-Reply-To: <1526949675-106737-3-git-send-email-babu.moger@amd.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+	(envelope-from <jan.kiszka@siemens.com>) id 1fL1A2-0005dg-Bs
+	for qemu-devel@nongnu.org; Tue, 22 May 2018 02:52:46 -0400
+Received: from david.siemens.de ([192.35.17.14]:58427)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jan.kiszka@siemens.com>)
+	id 1fL1A2-0005d1-13
+	for qemu-devel@nongnu.org; Tue, 22 May 2018 02:52:42 -0400
+From: Jan Kiszka <jan.kiszka@siemens.com>
+Message-ID: <28b927d3-da58-bce4-cc13-bfec7f9b1cb9@siemens.com>
+Date: Tue, 22 May 2018 08:52:37 +0200
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v10 2/5] i386: Populate AMD Processor Cache
- Information for cpuid 0x8000001D
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: [Qemu-devel] [PATCH] hw/intc/arm_gicv3: Fix APxR<n> register
+ dispatching
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,139 +27,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Moger, Babu" <Babu.Moger@amd.com>, "mst@redhat.com" <mst@redhat.com>, "marcel.apfelbaum@gmail.com" <marcel.apfelbaum@gmail.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "rth@twiddle.net" <rth@twiddle.net>, "ehabkost@redhat.com" <ehabkost@redhat.com>, "mtosatti@redhat.com" <mtosatti@redhat.com>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "kash@tripleback.net" <kash@tripleback.net>, "geoff@hostfission.com" <geoff@hostfission.com>
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel <qemu-devel@nongnu.org>
 
-QmFidSwNCg0KSWYgbnVtX3NoYXJpbmdfbDNfY2FjaGUoKSB1c2VzIE1BWF9OT0RFU19FUFlDLCB0
-aGVuIHRoYXQgZnVuY3Rpb24gSXTigJlzIEVQWUMgc3BlY2lmaWMuDQoNCkFuIGFsdGVybmF0aXZl
-IHdvdWxkIGJlIHRvIHVzZSBhIGRhdGEgbWVtYmVyIChlLmcuLCBtYXhfbm9kZXNfcGVyX3NvY2tl
-dCkpIHRoYXQgZ2V0IGluaXRpYWxpemVkICh2aWEgYW5vdGhlciBoZWxwZXIgZnVuY3Rpb24pIHRv
-IE1BWF9OT0RFU19FUFlDLg0KDQpCYXNpY2FsbHksIGlkZWFsbHkgdGhlIGZ1bmN0aW9ucyB0aGF0
-IHJldHVybiBDUFVJRCBpbmZvcm1hdGlvbiBkbyAqbm90KiB1c2UgRVBZQy1zcGVjaWZpYyBtYWNy
-b3MsIGxpa2UgTUFYX05PREVTX0VQWUMuDQoNCkxlby4NCg0KPiAtLS0tLU9yaWdpbmFsIE1lc3Nh
-Z2UtLS0tLQ0KPiBGcm9tOiBNb2dlciwgQmFidQ0KPiBTZW50OiBNb25kYXksIE1heSAyMSwgMjAx
-OCA3OjQxIFBNDQo+IFRvOiBtc3RAcmVkaGF0LmNvbTsgbWFyY2VsLmFwZmVsYmF1bUBnbWFpbC5j
-b207IHBib256aW5pQHJlZGhhdC5jb207DQo+IHJ0aEB0d2lkZGxlLm5ldDsgZWhhYmtvc3RAcmVk
-aGF0LmNvbTsgbXRvc2F0dGlAcmVkaGF0LmNvbQ0KPiBDYzogcWVtdS1kZXZlbEBub25nbnUub3Jn
-OyBrdm1Admdlci5rZXJuZWwub3JnOyBNb2dlciwgQmFidQ0KPiA8QmFidS5Nb2dlckBhbWQuY29t
-Pjsga2FzaEB0cmlwbGViYWNrLm5ldDsgZ2VvZmZAaG9zdGZpc3Npb24uY29tDQo+IFN1YmplY3Q6
-IFtQQVRDSCB2MTAgMi81XSBpMzg2OiBQb3B1bGF0ZSBBTUQgUHJvY2Vzc29yIENhY2hlIEluZm9y
-bWF0aW9uDQo+IGZvciBjcHVpZCAweDgwMDAwMDFEDQo+IA0KPiBBZGQgaW5mb3JtYXRpb24gZm9y
-IGNwdWlkIDB4ODAwMDAwMUQgbGVhZi4gUG9wdWxhdGUgY2FjaGUgdG9wb2xvZ3kNCj4gaW5mb3Jt
-YXRpb24gZm9yIGRpZmZlcmVudCBjYWNoZSB0eXBlcyhEYXRhIENhY2hlLCBJbnN0cnVjdGlvbiBD
-YWNoZSwgTDIgYW5kDQo+IEwzKSBzdXBwb3J0ZWQgYnkgMHg4MDAwMDAxRCBsZWFmLiBQbGVhc2Ug
-cmVmZXIgUHJvY2Vzc29yIFByb2dyYW1taW5nDQo+IFJlZmVyZW5jZSAoUFBSKSBmb3IgQU1EIEZh
-bWlseSAxN2ggTW9kZWwgZm9yIG1vcmUgZGV0YWlscy4NCj4gDQo+IFNpZ25lZC1vZmYtYnk6IEJh
-YnUgTW9nZXIgPGJhYnUubW9nZXJAYW1kLmNvbT4NCj4gLS0tDQo+ICB0YXJnZXQvaTM4Ni9jcHUu
-YyB8IDEwMw0KPiArKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysr
-KysrKysrKysNCj4gIHRhcmdldC9pMzg2L2t2bS5jIHwgIDI5ICsrKysrKysrKysrKystLQ0KPiAg
-MiBmaWxlcyBjaGFuZ2VkLCAxMjkgaW5zZXJ0aW9ucygrKSwgMyBkZWxldGlvbnMoLSkNCj4gDQo+
-IGRpZmYgLS1naXQgYS90YXJnZXQvaTM4Ni9jcHUuYyBiL3RhcmdldC9pMzg2L2NwdS5jIGluZGV4
-IGQ5NzczYjYuLjFkZDA2MGENCj4gMTAwNjQ0DQo+IC0tLSBhL3RhcmdldC9pMzg2L2NwdS5jDQo+
-ICsrKyBiL3RhcmdldC9pMzg2L2NwdS5jDQo+IEBAIC0zMzYsNiArMzM2LDg1IEBAIHN0YXRpYyB2
-b2lkDQo+IGVuY29kZV9jYWNoZV9jcHVpZDgwMDAwMDA2KENQVUNhY2hlSW5mbyAqbDIsDQo+ICAg
-ICAgfQ0KPiAgfQ0KPiANCj4gKy8qIERlZmluaXRpb25zIHVzZWQgZm9yIGJ1aWxkaW5nIENQVUlE
-IExlYWYgMHg4MDAwMDAxRCBhbmQgMHg4MDAwMDAxRQ0KPiArKi8NCj4gKy8qIFBsZWFzZSByZWZl
-ciBBTUQ2NCBBcmNoaXRlY3R1cmUgUHJvZ3JhbW1lcuKAmXMgTWFudWFsIFZvbHVtZSAzICovDQo+
-ICsjZGVmaW5lIE1BWF9DQ1ggMiAjZGVmaW5lIE1BWF9DT1JFU19JTl9DQ1ggNCAjZGVmaW5lDQo+
-IE1BWF9OT0RFU19FUFlDIDQNCj4gKyNkZWZpbmUgTUFYX0NPUkVTX0lOX05PREUgOA0KPiArDQo+
-ICsvKiBOdW1iZXIgb2YgbG9naWNhbCBwcm9jZXNzb3JzIHNoYXJpbmcgTDMgY2FjaGUgKi8NCj4g
-KyNkZWZpbmUgTlVNX1NIQVJJTkdfQ0FDSEUodGhyZWFkcywgbnVtX3NoYXJpbmcpICAgKCh0aHJl
-YWRzID4gMSkgPyBcDQo+ICsgICAgICAgICAgICAgICAgICAgICAgICAgKCgobnVtX3NoYXJpbmcg
-LSAxKSAqIHRocmVhZHMpICsgMSkgIDogXA0KPiArICAgICAgICAgICAgICAgICAgICAgICAgIChu
-dW1fc2hhcmluZyAtIDEpKQ0KPiArLyoNCj4gKyAqIEwzIENhY2hlIGlzIHNoYXJlZCBiZXR3ZWVu
-IGFsbCB0aGUgY29yZXMgaW4gYSBjb3JlIGNvbXBsZXguDQo+ICsgKiBNYXhpbXVtIGNvcmVzIHRo
-YXQgY2FuIHNoYXJlIEwzIGlzIDQuDQo+ICsgKi8NCj4gK3N0YXRpYyBpbnQgbnVtX3NoYXJpbmdf
-bDNfY2FjaGUoaW50IG5yX2NvcmVzKSB7DQo+ICsgICAgaW50IGksIG5vZGVzID0gMTsNCj4gKw0K
-PiArICAgIC8qIENoZWNrIGlmIHdlIGNhbiBmaXQgYWxsIHRoZSBjb3JlcyBpbiBvbmUgQ0NYICov
-DQo+ICsgICAgaWYgKG5yX2NvcmVzIDw9IE1BWF9DT1JFU19JTl9DQ1gpIHsNCj4gKyAgICAgICAg
-cmV0dXJuIG5yX2NvcmVzOw0KPiArICAgIH0NCj4gKyAgICAvKg0KPiArICAgICAqIEZpZ3VyZSBv
-dXQgdGhlIG51bWJlciBvZiBub2RlcyhvciBkaWVzKSByZXF1aXJlZCB0byBidWlsZA0KPiArICAg
-ICAqIHRoaXMgY29uZmlnLiBNYXggY29yZXMgaW4gYSBub2RlIGlzIDgNCj4gKyAgICAgKi8NCj4g
-KyAgICBmb3IgKGkgPSBub2RlczsgaSA8PSBNQVhfTk9ERVNfRVBZQzsgaSsrKSB7DQo+ICsgICAg
-ICAgIGlmIChucl9jb3JlcyA8PSAoaSAqIE1BWF9DT1JFU19JTl9OT0RFKSkgew0KPiArICAgICAg
-ICAgICAgbm9kZXMgPSBpOw0KPiArICAgICAgICAgICAgYnJlYWs7DQo+ICsgICAgICAgIH0NCj4g
-KyAgICAgICAgLyogV2Ugc3VwcG9ydCBub2RlcyAxLCAyLCA0ICovDQo+ICsgICAgICAgIGlmIChp
-ID09IDMpIHsNCj4gKyAgICAgICAgICAgIGNvbnRpbnVlOw0KPiArICAgICAgICB9DQo+ICsgICAg
-fQ0KPiArICAgIC8qIFNwcmVhZCB0aGUgY29yZXMgYWNjcm9zIGFsbCB0aGUgQ0NYcyBhbmQgcmV0
-dXJuIG1heCBjb3JlcyBpbiBhIGNjeCAqLw0KPiArICAgIHJldHVybiAobnJfY29yZXMgLyAobm9k
-ZXMgKiBNQVhfQ0NYKSkgKw0KPiArICAgICAgICAgICAgKChucl9jb3JlcyAlIChub2RlcyAqIE1B
-WF9DQ1gpKSA/IDEgOiAwKTsgfQ0KPiArDQo+ICsvKiBFbmNvZGUgY2FjaGUgaW5mbyBmb3IgQ1BV
-SURbODAwMDAwMURdICovIHN0YXRpYyB2b2lkDQo+ICtlbmNvZGVfY2FjaGVfY3B1aWQ4MDAwMDAx
-ZChDUFVDYWNoZUluZm8gKmNhY2hlLCBDUFVTdGF0ZSAqY3MsDQo+ICsgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgIHVpbnQzMl90ICplYXgsIHVpbnQzMl90ICplYngsDQo+ICsgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgIHVpbnQzMl90ICplY3gsIHVpbnQzMl90ICplZHgpIHsN
-Cj4gKyAgICB1aW50MzJfdCBudW1fc2hhcmVfbDM7DQo+ICsgICAgYXNzZXJ0KGNhY2hlLT5zaXpl
-ID09IGNhY2hlLT5saW5lX3NpemUgKiBjYWNoZS0+YXNzb2NpYXRpdml0eSAqDQo+ICsgICAgICAg
-ICAgICAgICAgICAgICAgICAgIGNhY2hlLT5wYXJ0aXRpb25zICogY2FjaGUtPnNldHMpOw0KPiAr
-DQo+ICsgICAgKmVheCA9IENBQ0hFX1RZUEUoY2FjaGUtPnR5cGUpIHwgQ0FDSEVfTEVWRUwoY2Fj
-aGUtPmxldmVsKSB8DQo+ICsgICAgICAgICAgICAgICAoY2FjaGUtPnNlbGZfaW5pdCA/IENBQ0hF
-X1NFTEZfSU5JVF9MRVZFTCA6IDApOw0KPiArDQo+ICsgICAgLyogTDMgaXMgc2hhcmVkIGFtb25n
-IG11bHRpcGxlIGNvcmVzICovDQo+ICsgICAgaWYgKGNhY2hlLT5sZXZlbCA9PSAzKSB7DQo+ICsg
-ICAgICAgIG51bV9zaGFyZV9sMyA9IG51bV9zaGFyaW5nX2wzX2NhY2hlKGNzLT5ucl9jb3Jlcyk7
-DQo+ICsgICAgICAgICplYXggfD0gKE5VTV9TSEFSSU5HX0NBQ0hFKGNzLT5ucl90aHJlYWRzLCBu
-dW1fc2hhcmVfbDMpIDw8DQo+IDE0KTsNCj4gKyAgICB9IGVsc2Ugew0KPiArICAgICAgICAqZWF4
-IHw9ICgoY3MtPm5yX3RocmVhZHMgLSAxKSA8PCAxNCk7DQo+ICsgICAgfQ0KPiArDQo+ICsgICAg
-YXNzZXJ0KGNhY2hlLT5saW5lX3NpemUgPiAwKTsNCj4gKyAgICBhc3NlcnQoY2FjaGUtPnBhcnRp
-dGlvbnMgPiAwKTsNCj4gKyAgICBhc3NlcnQoY2FjaGUtPmFzc29jaWF0aXZpdHkgPiAwKTsNCj4g
-KyAgICAvKiBXZSBkb24ndCBpbXBsZW1lbnQgZnVsbHktYXNzb2NpYXRpdmUgY2FjaGVzICovDQo+
-ICsgICAgYXNzZXJ0KGNhY2hlLT5hc3NvY2lhdGl2aXR5IDwgY2FjaGUtPnNldHMpOw0KPiArICAg
-ICplYnggPSAoY2FjaGUtPmxpbmVfc2l6ZSAtIDEpIHwNCj4gKyAgICAgICAgICAgKChjYWNoZS0+
-cGFydGl0aW9ucyAtIDEpIDw8IDEyKSB8DQo+ICsgICAgICAgICAgICgoY2FjaGUtPmFzc29jaWF0
-aXZpdHkgLSAxKSA8PCAyMik7DQo+ICsNCj4gKyAgICBhc3NlcnQoY2FjaGUtPnNldHMgPiAwKTsN
-Cj4gKyAgICAqZWN4ID0gY2FjaGUtPnNldHMgLSAxOw0KPiArDQo+ICsgICAgKmVkeCA9IChjYWNo
-ZS0+bm9faW52ZF9zaGFyaW5nID8gQ0FDSEVfTk9fSU5WRF9TSEFSSU5HIDogMCkgfA0KPiArICAg
-ICAgICAgICAoY2FjaGUtPmluY2x1c2l2ZSA/IENBQ0hFX0lOQ0xVU0lWRSA6IDApIHwNCj4gKyAg
-ICAgICAgICAgKGNhY2hlLT5jb21wbGV4X2luZGV4aW5nID8gQ0FDSEVfQ09NUExFWF9JRFggOiAw
-KTsgfQ0KPiArDQo+ICAvKg0KPiAgICogRGVmaW5pdGlvbnMgb2YgdGhlIGhhcmRjb2RlZCBjYWNo
-ZSBlbnRyaWVzIHdlIGV4cG9zZToNCj4gICAqIFRoZXNlIGFyZSBsZWdhY3kgY2FjaGUgdmFsdWVz
-LiBJZiB0aGVyZSBpcyBhIG5lZWQgdG8gY2hhbmdlIGFueSBAQCAtDQo+IDQwMDUsNiArNDA4NCwz
-MCBAQCB2b2lkIGNwdV94ODZfY3B1aWQoQ1BVWDg2U3RhdGUgKmVudiwgdWludDMyX3QgaW5kZXgs
-DQo+IHVpbnQzMl90IGNvdW50LA0KPiAgICAgICAgICAgICAgKmVkeCA9IDA7DQo+ICAgICAgICAg
-IH0NCj4gICAgICAgICAgYnJlYWs7DQo+ICsgICAgY2FzZSAweDgwMDAwMDFEOg0KPiArICAgICAg
-ICAqZWF4ID0gMDsNCj4gKyAgICAgICAgc3dpdGNoIChjb3VudCkgew0KPiArICAgICAgICBjYXNl
-IDA6IC8qIEwxIGRjYWNoZSBpbmZvICovDQo+ICsgICAgICAgICAgICBlbmNvZGVfY2FjaGVfY3B1
-aWQ4MDAwMDAxZChlbnYtPmNhY2hlX2luZm9fYW1kLmwxZF9jYWNoZSwgY3MsDQo+ICsgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBlYXgsIGVieCwgZWN4LCBlZHgpOw0KPiAr
-ICAgICAgICAgICAgYnJlYWs7DQo+ICsgICAgICAgIGNhc2UgMTogLyogTDEgaWNhY2hlIGluZm8g
-Ki8NCj4gKyAgICAgICAgICAgIGVuY29kZV9jYWNoZV9jcHVpZDgwMDAwMDFkKGVudi0+Y2FjaGVf
-aW5mb19hbWQubDFpX2NhY2hlLCBjcywNCj4gKyAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgIGVheCwgZWJ4LCBlY3gsIGVkeCk7DQo+ICsgICAgICAgICAgICBicmVhazsNCj4g
-KyAgICAgICAgY2FzZSAyOiAvKiBMMiBjYWNoZSBpbmZvICovDQo+ICsgICAgICAgICAgICBlbmNv
-ZGVfY2FjaGVfY3B1aWQ4MDAwMDAxZChlbnYtPmNhY2hlX2luZm9fYW1kLmwyX2NhY2hlLCBjcywN
-Cj4gKyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIGVheCwgZWJ4LCBlY3gs
-IGVkeCk7DQo+ICsgICAgICAgICAgICBicmVhazsNCj4gKyAgICAgICAgY2FzZSAzOiAvKiBMMyBj
-YWNoZSBpbmZvICovDQo+ICsgICAgICAgICAgICBlbmNvZGVfY2FjaGVfY3B1aWQ4MDAwMDAxZChl
-bnYtPmNhY2hlX2luZm9fYW1kLmwzX2NhY2hlLCBjcywNCj4gKyAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgIGVheCwgZWJ4LCBlY3gsIGVkeCk7DQo+ICsgICAgICAgICAgICBi
-cmVhazsNCj4gKyAgICAgICAgZGVmYXVsdDogLyogZW5kIG9mIGluZm8gKi8NCj4gKyAgICAgICAg
-ICAgICplYXggPSAqZWJ4ID0gKmVjeCA9ICplZHggPSAwOw0KPiArICAgICAgICAgICAgYnJlYWs7
-DQo+ICsgICAgICAgIH0NCj4gKyAgICAgICAgYnJlYWs7DQo+ICAgICAgY2FzZSAweEMwMDAwMDAw
-Og0KPiAgICAgICAgICAqZWF4ID0gZW52LT5jcHVpZF94bGV2ZWwyOw0KPiAgICAgICAgICAqZWJ4
-ID0gMDsNCj4gZGlmZiAtLWdpdCBhL3RhcmdldC9pMzg2L2t2bS5jIGIvdGFyZ2V0L2kzODYva3Zt
-LmMgaW5kZXggZDY2NjZhNC4uYThiZjdlYg0KPiAxMDA2NDQNCj4gLS0tIGEvdGFyZ2V0L2kzODYv
-a3ZtLmMNCj4gKysrIGIvdGFyZ2V0L2kzODYva3ZtLmMNCj4gQEAgLTk3OSw5ICs5NzksMzIgQEAg
-aW50IGt2bV9hcmNoX2luaXRfdmNwdShDUFVTdGF0ZSAqY3MpDQo+ICAgICAgICAgIH0NCj4gICAg
-ICAgICAgYyA9ICZjcHVpZF9kYXRhLmVudHJpZXNbY3B1aWRfaSsrXTsNCj4gDQo+IC0gICAgICAg
-IGMtPmZ1bmN0aW9uID0gaTsNCj4gLSAgICAgICAgYy0+ZmxhZ3MgPSAwOw0KPiAtICAgICAgICBj
-cHVfeDg2X2NwdWlkKGVudiwgaSwgMCwgJmMtPmVheCwgJmMtPmVieCwgJmMtPmVjeCwgJmMtPmVk
-eCk7DQo+ICsgICAgICAgIHN3aXRjaCAoaSkgew0KPiArICAgICAgICBjYXNlIDB4ODAwMDAwMWQ6
-DQo+ICsgICAgICAgICAgICAvKiBRdWVyeSBmb3IgYWxsIEFNRCBjYWNoZSBpbmZvcm1hdGlvbiBs
-ZWF2ZXMgKi8NCj4gKyAgICAgICAgICAgIGZvciAoaiA9IDA7IDsgaisrKSB7DQo+ICsgICAgICAg
-ICAgICAgICAgYy0+ZnVuY3Rpb24gPSBpOw0KPiArICAgICAgICAgICAgICAgIGMtPmZsYWdzID0g
-S1ZNX0NQVUlEX0ZMQUdfU0lHTklGQ0FOVF9JTkRFWDsNCj4gKyAgICAgICAgICAgICAgICBjLT5p
-bmRleCA9IGo7DQo+ICsgICAgICAgICAgICAgICAgY3B1X3g4Nl9jcHVpZChlbnYsIGksIGosICZj
-LT5lYXgsICZjLT5lYngsICZjLT5lY3gsDQo+ICsgJmMtPmVkeCk7DQo+ICsNCj4gKyAgICAgICAg
-ICAgICAgICBpZiAoYy0+ZWF4ID09IDApIHsNCj4gKyAgICAgICAgICAgICAgICAgICAgYnJlYWs7
-DQo+ICsgICAgICAgICAgICAgICAgfQ0KPiArICAgICAgICAgICAgICAgIGlmIChjcHVpZF9pID09
-IEtWTV9NQVhfQ1BVSURfRU5UUklFUykgew0KPiArICAgICAgICAgICAgICAgICAgICBmcHJpbnRm
-KHN0ZGVyciwgImNwdWlkX2RhdGEgaXMgZnVsbCwgbm8gc3BhY2UgZm9yICINCj4gKyAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAiY3B1aWQoZWF4OjB4JXgsZWN4OjB4JXgpXG4iLCBpLCBqKTsN
-Cj4gKyAgICAgICAgICAgICAgICAgICAgYWJvcnQoKTsNCj4gKyAgICAgICAgICAgICAgICB9DQo+
-ICsgICAgICAgICAgICAgICAgYyA9ICZjcHVpZF9kYXRhLmVudHJpZXNbY3B1aWRfaSsrXTsNCj4g
-KyAgICAgICAgICAgIH0NCj4gKyAgICAgICAgICAgIGJyZWFrOw0KPiArICAgICAgICBkZWZhdWx0
-Og0KPiArICAgICAgICAgICAgYy0+ZnVuY3Rpb24gPSBpOw0KPiArICAgICAgICAgICAgYy0+Zmxh
-Z3MgPSAwOw0KPiArICAgICAgICAgICAgY3B1X3g4Nl9jcHVpZChlbnYsIGksIDAsICZjLT5lYXgs
-ICZjLT5lYngsICZjLT5lY3gsICZjLT5lZHgpOw0KPiArICAgICAgICAgICAgYnJlYWs7DQo+ICsg
-ICAgICAgIH0NCj4gICAgICB9DQo+IA0KPiAgICAgIC8qIENhbGwgQ2VudGF1cidzIENQVUlEIGlu
-c3RydWN0aW9ucyB0aGV5IGFyZSBzdXBwb3J0ZWQuICovDQo+IC0tDQo+IDEuOC4zLjENCg0K
+There was a nasty flip in identifying which register group an access is
+targeting. The issue caused spuriously raised priorities of the guest
+when handing CPUs over in the Jailhouse hypervisor.
+
+Signed-off-by: Jan Kiszka <jan.kiszka@siemens.com>
+---
+ hw/intc/arm_gicv3_cpuif.c | 12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
+
+diff --git a/hw/intc/arm_gicv3_cpuif.c b/hw/intc/arm_gicv3_cpuif.c
+index cb9a3a542d..5c89be1af0 100644
+--- a/hw/intc/arm_gicv3_cpuif.c
++++ b/hw/intc/arm_gicv3_cpuif.c
+@@ -427,7 +427,7 @@ static uint64_t icv_ap_read(CPUARMState *env, const ARMCPRegInfo *ri)
+ {
+     GICv3CPUState *cs = icc_cs_from_env(env);
+     int regno = ri->opc2 & 3;
+-    int grp = ri->crm & 1 ? GICV3_G0 : GICV3_G1NS;
++    int grp = (ri->crm & 1) ? GICV3_G1NS : GICV3_G0;
+     uint64_t value = cs->ich_apr[grp][regno];
+ 
+     trace_gicv3_icv_ap_read(ri->crm & 1, regno, gicv3_redist_affid(cs), value);
+@@ -439,7 +439,7 @@ static void icv_ap_write(CPUARMState *env, const ARMCPRegInfo *ri,
+ {
+     GICv3CPUState *cs = icc_cs_from_env(env);
+     int regno = ri->opc2 & 3;
+-    int grp = ri->crm & 1 ? GICV3_G0 : GICV3_G1NS;
++    int grp = (ri->crm & 1) ? GICV3_G1NS : GICV3_G0;
+ 
+     trace_gicv3_icv_ap_write(ri->crm & 1, regno, gicv3_redist_affid(cs), value);
+ 
+@@ -1461,7 +1461,7 @@ static uint64_t icc_ap_read(CPUARMState *env, const ARMCPRegInfo *ri)
+     uint64_t value;
+ 
+     int regno = ri->opc2 & 3;
+-    int grp = ri->crm & 1 ? GICV3_G0 : GICV3_G1;
++    int grp = (ri->crm & 1) ? GICV3_G1 : GICV3_G0;
+ 
+     if (icv_access(env, grp == GICV3_G0 ? HCR_FMO : HCR_IMO)) {
+         return icv_ap_read(env, ri);
+@@ -1483,7 +1483,7 @@ static void icc_ap_write(CPUARMState *env, const ARMCPRegInfo *ri,
+     GICv3CPUState *cs = icc_cs_from_env(env);
+ 
+     int regno = ri->opc2 & 3;
+-    int grp = ri->crm & 1 ? GICV3_G0 : GICV3_G1;
++    int grp = (ri->crm & 1) ? GICV3_G1 : GICV3_G0;
+ 
+     if (icv_access(env, grp == GICV3_G0 ? HCR_FMO : HCR_IMO)) {
+         icv_ap_write(env, ri, value);
+@@ -2292,7 +2292,7 @@ static uint64_t ich_ap_read(CPUARMState *env, const ARMCPRegInfo *ri)
+ {
+     GICv3CPUState *cs = icc_cs_from_env(env);
+     int regno = ri->opc2 & 3;
+-    int grp = ri->crm & 1 ? GICV3_G0 : GICV3_G1NS;
++    int grp = (ri->crm & 1) ? GICV3_G1NS : GICV3_G0;
+     uint64_t value;
+ 
+     value = cs->ich_apr[grp][regno];
+@@ -2305,7 +2305,7 @@ static void ich_ap_write(CPUARMState *env, const ARMCPRegInfo *ri,
+ {
+     GICv3CPUState *cs = icc_cs_from_env(env);
+     int regno = ri->opc2 & 3;
+-    int grp = ri->crm & 1 ? GICV3_G0 : GICV3_G1NS;
++    int grp = (ri->crm & 1) ? GICV3_G1NS : GICV3_G0;
+ 
+     trace_gicv3_ich_ap_write(ri->crm & 1, regno, gicv3_redist_affid(cs), value);
+ 
+-- 
+2.13.6
