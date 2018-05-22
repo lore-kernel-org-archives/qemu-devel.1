@@ -1,26 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37446)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43138)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fL9YX-0007pc-9S
-	for qemu-devel@nongnu.org; Tue, 22 May 2018 11:50:34 -0400
+	(envelope-from <rth7680@gmail.com>) id 1fL9t2-0004YW-0v
+	for qemu-devel@nongnu.org; Tue, 22 May 2018 12:11:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fL9YW-0005Ru-4L
-	for qemu-devel@nongnu.org; Tue, 22 May 2018 11:50:33 -0400
-Received: from mail-oi0-x230.google.com ([2607:f8b0:4003:c06::230]:44578)
+	(envelope-from <rth7680@gmail.com>) id 1fL9sx-00074H-RZ
+	for qemu-devel@nongnu.org; Tue, 22 May 2018 12:11:43 -0400
+Received: from mail-pl0-x22a.google.com ([2607:f8b0:400e:c01::22a]:34892)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fL9YV-0005Ri-VB
-	for qemu-devel@nongnu.org; Tue, 22 May 2018 11:50:32 -0400
-Received: by mail-oi0-x230.google.com with SMTP id e80-v6so16636335oig.11
-	for <qemu-devel@nongnu.org>; Tue, 22 May 2018 08:50:31 -0700 (PDT)
+	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1fL9sx-00073k-Kf
+	for qemu-devel@nongnu.org; Tue, 22 May 2018 12:11:39 -0400
+Received: by mail-pl0-x22a.google.com with SMTP id i5-v6so11188297plt.2
+	for <qemu-devel@nongnu.org>; Tue, 22 May 2018 09:11:39 -0700 (PDT)
+Sender: Richard Henderson <rth7680@gmail.com>
+References: <CAFEAcA-aD98+wh=XfMkY1iUwHjDJZ6dH7Juv0_o_VbgkcV0etw@mail.gmail.com>
+	<214c47f3-1583-6480-4837-8b8ced37f038@twiddle.net>
+	<CAFEAcA9QN_EFbfwqps+5Bu7CKX4J7GLGjBMURmk-1Jk22iixKA@mail.gmail.com>
+From: Richard Henderson <rth@twiddle.net>
+Message-ID: <7af06713-7e42-6489-5945-85545bc02f26@twiddle.net>
+Date: Tue, 22 May 2018 09:11:35 -0700
 MIME-Version: 1.0
-In-Reply-To: <CANCZdfpNMR_buj3L4xvqhh_T4QZOvV5JsXHK2Rzk-zs5iHvGrg@mail.gmail.com>
-References: <CAFEAcA9a-xrtibHYb4+-xu3QVmW3tJ1v9X0s_X_PMhQGFSJgdg@mail.gmail.com>
-	<CANCZdfpNMR_buj3L4xvqhh_T4QZOvV5JsXHK2Rzk-zs5iHvGrg@mail.gmail.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 22 May 2018 16:50:10 +0100
-Message-ID: <CAFEAcA-xqG+9SZ2_K5XFooJuKYyuRoL51K1JuwQ-SWGcCYcX=A@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] QEMU 3.0 proposed release schedule
+In-Reply-To: <CAFEAcA9QN_EFbfwqps+5Bu7CKX4J7GLGjBMURmk-1Jk22iixKA@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] TCG helpers that return f16
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,42 +32,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Warner Losh <imp@bsdimp.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Michael Roth <mdroth@linux.vnet.ibm.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
 
-On 22 May 2018 at 16:39, Warner Losh <imp@bsdimp.com> wrote:
-> On Tue, May 22, 2018 at 9:24 AM, Peter Maydell <peter.maydell@linaro.org>
-> wrote:
+On 05/22/2018 07:56 AM, Peter Maydell wrote:
+>>> However, for TCG helper functions, although we allow the helper
+>>> macro to say that the return type is 'f16', in helper-head.h we
+>>> seem to just alias f16 as i32, and in dh_sizemask() we only record
+>>> "is this 64 bits" and "is this signed". Am I missing the place
+>>> where we zero-extend the value we get back from the helper so
+>>> that it's the right thing in TCG's i32 ?
 >>
->> I've put up a draft release schedule at:
->> https://wiki.qemu.org/Planning/3.0
->>
->> 2018-04-24      Beginning of development phase
->> 2018-07-03      Soft feature freeze.
->> 2018-07-10      Hard feature freeze. Tag rc0
->> 2018-07-17      Tag rc1
->> 2018-07-24      Tag rc2
->> 2018-07-31      Tag rc3
->> 2018-08-07      Release, or if necessary, tag rc4
->> 2018-08-14      Release, if we needed rc4
+>> It happens in C, implicit in "typedef uint16_t float16".
+> 
+> ...but uint16_t is only 16 bits, so we are returning
+> a "real" 16 bit quantity?
 
-> I'd love to get bsd-user into 3.0. At the moment, all the changes are in
-> bsd-user, and my cleanup is trending to about 50 patches. Given traditional
-> timelines, when should I submit patches to the mailing list for that?
+The *helpers* are supposed to be returning uint32_t.  That should be enforced
+by the prototype generated from "f16" being aliased to "i32".
 
-The usual recommendation is to submit early and often.
-"softfreeze" means "any new feature to go in must already
-be in a pull request on the list by this date", but big
-features hitting the list late in the cycle are not fun to
-deal with and best avoided. Also, don't feel you need to hold
-on to the thing until all 50-odd patches are ready to submit;
-if you can break it up into smaller patchsets that's easier
-to deal with.
+The softfloat routines are supposed to be returning float16, aka uint16_t.
 
-> Alternatively, when would a future 3.1 be expected?
+So:
 
-We do 3 releases a year, generally in approximately April, August
-and December. So 3.1 will be early December.
+float16 f();
+uint32_t h() { return f(); }
 
-thanks
--- PMM
+will generate a zero-extend, in C, before returning to TCG generated code.
+
+
+r~
