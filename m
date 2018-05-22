@@ -1,25 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50710)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51731)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fLDwU-0002H3-S1
-	for qemu-devel@nongnu.org; Tue, 22 May 2018 16:31:35 -0400
+	(envelope-from <bounces@canonical.com>) id 1fLE0F-00049t-2S
+	for qemu-devel@nongnu.org; Tue, 22 May 2018 16:35:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fLDwT-0001hx-MP
-	for qemu-devel@nongnu.org; Tue, 22 May 2018 16:31:34 -0400
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20180522191743.12872-1-pbonzini@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <ab0d563a-89f7-ffdb-7f43-956d7213b231@amsat.org>
-Date: Tue, 22 May 2018 17:31:07 -0300
+	(envelope-from <bounces@canonical.com>) id 1fLE0B-0003Db-4e
+	for qemu-devel@nongnu.org; Tue, 22 May 2018 16:35:27 -0400
+Received: from indium.canonical.com ([91.189.90.7]:49354)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1fLE0A-0003Cg-RM
+	for qemu-devel@nongnu.org; Tue, 22 May 2018 16:35:23 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1fLE09-0001Du-K0
+	for <qemu-devel@nongnu.org>; Tue, 22 May 2018 20:35:21 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 94B4C2E8023
+	for <qemu-devel@nongnu.org>; Tue, 22 May 2018 20:35:21 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20180522191743.12872-1-pbonzini@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [Qemu-trivial] [PATCH] ppc: move at24c to its own
- CONFIG_ symbol
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 22 May 2018 20:18:58 -0000
+From: OIiver <1368204@bugs.launchpad.net>
+Reply-To: Bug 1368204 <1368204@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20140911122344.25076.48914.malonedeb@soybean.canonical.com>
+Message-Id: <152702033814.2944.2334478108670995407.malone@gac.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1368204] Re: WinME isn't able to detect QEMU's
+ cdrom drive and other hard drives automatically
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,45 +37,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-trivial@nongnu.org, qemu-ppc@nongnu.org
+To: qemu-devel@nongnu.org
 
-On 05/22/2018 04:17 PM, Paolo Bonzini wrote:
-> AT24c EEPROM is currently gated by CONFIG_I2C, and as such it is
-> being included in all emulators that use I2C, even if they do not
-> really need it.  Separate it and, since it was added for the e500
-> machines, add it to qemu-system-ppc and qemu-system-ppc64.
+As far as i can remember, this bug was still valid with QEMU version 2.5.0 =
+shipped with Kubuntu 16.04.
+I am planning to switch to Kubuntu 18.04 in the next couple of weeks. There=
+ i can test it with QEMU version 2.11.x.
+https://packages.ubuntu.com/bionic/qemu
 
-With your S-o-b:
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+-- =
 
-> ---
->  default-configs/ppc-softmmu.mak | 1 +
->  hw/nvram/Makefile.objs          | 2 +-
->  2 files changed, 2 insertions(+), 1 deletion(-)
-> 
-> diff --git a/default-configs/ppc-softmmu.mak b/default-configs/ppc-softmmu.mak
-> index 4d7be45ac5..c57e568121 100644
-> --- a/default-configs/ppc-softmmu.mak
-> +++ b/default-configs/ppc-softmmu.mak
-> @@ -26,6 +26,7 @@ CONFIG_USB_EHCI_SYSBUS=y
->  CONFIG_SM501=y
->  CONFIG_IDE_SII3112=y
->  CONFIG_I2C=y
-> +CONFIG_AT24C=y
->  
->  # For Macs
->  CONFIG_MAC=y
-> diff --git a/hw/nvram/Makefile.objs b/hw/nvram/Makefile.objs
-> index a912d25391..b318e53a43 100644
-> --- a/hw/nvram/Makefile.objs
-> +++ b/hw/nvram/Makefile.objs
-> @@ -1,6 +1,6 @@
->  common-obj-$(CONFIG_DS1225Y) += ds1225y.o
->  common-obj-y += eeprom93xx.o
-> -common-obj-$(CONFIG_I2C) += eeprom_at24c.o
-> +common-obj-$(CONFIG_AT24C) += eeprom_at24c.o
->  common-obj-y += fw_cfg.o
->  common-obj-y += chrp_nvram.o
->  common-obj-$(CONFIG_MAC_NVRAM) += mac_nvram.o
-> 
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1368204
+
+Title:
+  WinME isn't able to detect QEMU's cdrom drive and other hard drives
+  automatically
+
+Status in QEMU:
+  Incomplete
+
+Bug description:
+  On a fresh installation of Windows Millennium (WinME) in qemu, Windows
+  Me isn't able to find the CD-ROM drive or additional hard drives other
+  than -hda at first place.
+
+  Only if i add manually an IDE controller driver in Windows ME's device ma=
+nager, the CD-ROM inserted in QEMU is found.
+  Thus an IDE controller isn't found automatically either.
+
+  This shouldn't be the case. On normal real hardware, Windows ME would
+  find at least one IDE or SCSI controller.
+
+  The command line that was used is the following:
+  sudo /usr/bin/qemu-system-i386 -hda WinME_QEMU.img -cdrom drivers.iso -bo=
+ot c -no-acpi -no-hpet -soundhw sb16 -net nic -cpu pentium3 -m 256 -vga cir=
+rus   =
+
+
+  qemu's version is:
+  qemu-system-i386 --version                                               =
+                                                                           =
+                                                =
+
+  QEMU emulator version 2.0.0 (Debian 2.0.0+dfsg-2ubuntu1.3), Copyright (c)=
+ 2003-2008 Fabrice Bellard
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1368204/+subscriptions
