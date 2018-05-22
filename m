@@ -1,21 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41438)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41842)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1fL4v5-0001AE-4T
-	for qemu-devel@nongnu.org; Tue, 22 May 2018 06:53:32 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1fL4xL-000218-UP
+	for qemu-devel@nongnu.org; Tue, 22 May 2018 06:55:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1fL4v4-0002Nu-BM
-	for qemu-devel@nongnu.org; Tue, 22 May 2018 06:53:31 -0400
-Date: Tue, 22 May 2018 07:53:12 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20180522105312.GY25013@localhost.localdomain>
-References: <20180518180440-mutt-send-email-mst@kernel.org>
-	<20180518170956.GI8615@redhat.com>
-	<20180522073555.peibbwoqvbor7nrs@sirius.home.kraxel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180522073555.peibbwoqvbor7nrs@sirius.home.kraxel.org>
-Subject: Re: [Qemu-devel] storing machine data in qcow images?
+	(envelope-from <pm215@archaic.org.uk>) id 1fL4xL-00039V-AP
+	for qemu-devel@nongnu.org; Tue, 22 May 2018 06:55:52 -0400
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 22 May 2018 11:39:57 +0100
+Message-Id: <20180522104000.9044-3-peter.maydell@linaro.org>
+In-Reply-To: <20180522104000.9044-1-peter.maydell@linaro.org>
+References: <20180522104000.9044-1-peter.maydell@linaro.org>
+Subject: [Qemu-devel] [PATCH 2/5] hw/i386: Rename 2.13 machine types to 3.0
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,45 +19,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>
-Cc: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, kwolf@redhat.com, qemu-block@nongnu.org, qemu-devel@nongnu.org, mreitz@redhat.com, stefanha@redhat.com
+To: qemu-devel@nongnu.org
+Cc: patches@linaro.org, "Michael S. Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Cornelia Huck <cohuck@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, qemu-ppc@nongnu.org, qemu-s390x@nongnu.org
 
-On Tue, May 22, 2018 at 09:35:55AM +0200, Gerd Hoffmann wrote:
->   Hi,
-> 
-> > You must /sometimes/ supply the correct machine type.
-> > 
-> > It is quite dependent on the guest OS you have installed, and even
-> > just how the guest OS is configured.  In general Linux is very
-> > flexible and can adapt to a wide range of hardware, automatically
-> > detecting things as needed. It is possible for a sysadmin to build
-> > a Linux image in a way that would only work with I440FX, but I
-> > don't think it would be common to see that.
-> 
-> I think it would be pretty hard to actually build such an image.
-> 
-> The more critical thing for linux guests is the storage driver which
-> must be included into the initrd so the image can mount the root
-> filesystem.  And the firmware, bios vs. uefi is more critical than
-> pc vs. q35.
-> 
-> > That said I'm not really convinced that using the qcow2 headers is
-> > a good plan. We have many disk image formats in common use, qcow2
-> > is just one. Even if the user provides the image in qcow2 format,
-> > that doesn't mean that mgmt apps actually store the qcow2 file.
-> 
-> > I tend to think we'd be better looking at what we can do in the context
-> > of an existing standard like OVF rather than inventing something that
-> > only works with qcow2. I think it would need to be more expressive than
-> > just a single list of key,value pairs for each item.
-> 
-> Embed OVF metadata in the qcow2 image?
+Rename the 2.13 machine types to match what we're going to
+use as our next release number.
 
-I'm all for using the same standard for specifying machine hints
-on both cases.
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+---
+ hw/i386/pc_piix.c | 8 ++++----
+ hw/i386/pc_q35.c  | 8 ++++----
+ 2 files changed, 8 insertions(+), 8 deletions(-)
 
-Now, is there an existing mechanism for virtual hardware hints
-(not requirements) in OVF, or we have to invent one?
-
+diff --git a/hw/i386/pc_piix.c b/hw/i386/pc_piix.c
+index e36c7bbb40..b4c5b03274 100644
+--- a/hw/i386/pc_piix.c
++++ b/hw/i386/pc_piix.c
+@@ -425,19 +425,19 @@ static void pc_i440fx_machine_options(MachineClass *m)
+     m->default_display = "std";
+ }
+ 
+-static void pc_i440fx_2_13_machine_options(MachineClass *m)
++static void pc_i440fx_3_0_machine_options(MachineClass *m)
+ {
+     pc_i440fx_machine_options(m);
+     m->alias = "pc";
+     m->is_default = 1;
+ }
+ 
+-DEFINE_I440FX_MACHINE(v2_13, "pc-i440fx-2.13", NULL,
+-                      pc_i440fx_2_13_machine_options);
++DEFINE_I440FX_MACHINE(v3_0, "pc-i440fx-3.0", NULL,
++                      pc_i440fx_3_0_machine_options);
+ 
+ static void pc_i440fx_2_12_machine_options(MachineClass *m)
+ {
+-    pc_i440fx_2_13_machine_options(m);
++    pc_i440fx_3_0_machine_options(m);
+     m->is_default = 0;
+     m->alias = NULL;
+     SET_MACHINE_COMPAT(m, PC_COMPAT_2_12);
+diff --git a/hw/i386/pc_q35.c b/hw/i386/pc_q35.c
+index 2372457c6a..83d6d75efa 100644
+--- a/hw/i386/pc_q35.c
++++ b/hw/i386/pc_q35.c
+@@ -308,18 +308,18 @@ static void pc_q35_machine_options(MachineClass *m)
+     m->max_cpus = 288;
+ }
+ 
+-static void pc_q35_2_13_machine_options(MachineClass *m)
++static void pc_q35_3_0_machine_options(MachineClass *m)
+ {
+     pc_q35_machine_options(m);
+     m->alias = "q35";
+ }
+ 
+-DEFINE_Q35_MACHINE(v2_13, "pc-q35-2.13", NULL,
+-                    pc_q35_2_13_machine_options);
++DEFINE_Q35_MACHINE(v3_0, "pc-q35-3.0", NULL,
++                    pc_q35_3_0_machine_options);
+ 
+ static void pc_q35_2_12_machine_options(MachineClass *m)
+ {
+-    pc_q35_2_13_machine_options(m);
++    pc_q35_3_0_machine_options(m);
+     m->alias = NULL;
+     SET_MACHINE_COMPAT(m, PC_COMPAT_2_12);
+ }
 -- 
-Eduardo
+2.17.0
