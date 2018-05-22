@@ -1,25 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39852)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39851)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Babu.Moger@amd.com>) id 1fKvMr-0002NM-7X
+	(envelope-from <Babu.Moger@amd.com>) id 1fKvMr-0002NL-79
 	for qemu-devel@nongnu.org; Mon, 21 May 2018 20:41:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <Babu.Moger@amd.com>) id 1fKvMo-0007A8-7c
+	(envelope-from <Babu.Moger@amd.com>) id 1fKvMo-0007AL-NA
 	for qemu-devel@nongnu.org; Mon, 21 May 2018 20:41:33 -0400
 Received: from mail-co1nam03on0050.outbound.protection.outlook.com
 	([104.47.40.50]:16315
 	helo=NAM03-CO1-obe.outbound.protection.outlook.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <Babu.Moger@amd.com>) id 1fKvMn-00078T-Vi
+	(Exim 4.71) (envelope-from <Babu.Moger@amd.com>) id 1fKvMo-00078T-F6
 	for qemu-devel@nongnu.org; Mon, 21 May 2018 20:41:30 -0400
 From: Babu Moger <babu.moger@amd.com>
-Date: Mon, 21 May 2018 20:41:14 -0400
-Message-Id: <1526949675-106737-5-git-send-email-babu.moger@amd.com>
+Date: Mon, 21 May 2018 20:41:15 -0400
+Message-Id: <1526949675-106737-6-git-send-email-babu.moger@amd.com>
 In-Reply-To: <1526949675-106737-1-git-send-email-babu.moger@amd.com>
 References: <1526949675-106737-1-git-send-email-babu.moger@amd.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v10 4/5] i386: Enable TOPOEXT feature on AMD
- EPYC CPU
+Subject: [Qemu-devel] [PATCH v10 5/5] i386: Remove generic SMT thread check
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,115 +30,48 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: mst@redhat.com, marcel.apfelbaum@gmail.com, pbonzini@redhat.com, rth@twiddle.net, ehabkost@redhat.com, mtosatti@redhat.com
 Cc: qemu-devel@nongnu.org, kvm@vger.kernel.org, babu.moger@amd.com, kash@tripleback.net, geoff@hostfission.com
 
-Enable TOPOEXT feature on EPYC CPU. This is required to support
-hyperthreading on VM guests. Also extend xlevel to 0x8000001E.
+Remove generic non-intel check while validating hyperthreading support.
+Certain AMD CPUs can support hyperthreading now.
 
-Disable TOPOEXT feature for legacy machines and also disable
-TOPOEXT feature if the config cannot be supported.
+CPU family with TOPOEXT feature can support hyperthreading now.
 
 Signed-off-by: Babu Moger <babu.moger@amd.com>
+Tested-by: Geoffrey McRae <geoff@hostfission.com>
+Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
 ---
- include/hw/i386/pc.h |  4 ++++
- target/i386/cpu.c    | 37 +++++++++++++++++++++++++++++++++++--
- 2 files changed, 39 insertions(+), 2 deletions(-)
+ target/i386/cpu.c | 15 +++++++++------
+ 1 file changed, 9 insertions(+), 6 deletions(-)
 
-diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
-index a0c269f..9c8db3d 100644
---- a/include/hw/i386/pc.h
-+++ b/include/hw/i386/pc.h
-@@ -302,6 +302,10 @@ bool e820_get_entry(int, uint32_t, uint64_t *, uint64_t *);
-         .driver   = TYPE_X86_CPU,\
-         .property = "legacy-cache",\
-         .value    = "on",\
-+    },{\
-+        .driver   = "EPYC-" TYPE_X86_CPU,\
-+        .property = "topoext",\
-+        .value    = "off",\
-     },
- 
- #define PC_COMPAT_2_11 \
 diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-index d9ccaad..d20b305 100644
+index d20b305..7eba8cc 100644
 --- a/target/i386/cpu.c
 +++ b/target/i386/cpu.c
-@@ -496,6 +496,20 @@ static void encode_topo_cpuid8000001e(CPUState *cs, X86CPU *cpu,
- }
+@@ -4961,17 +4961,20 @@ static void x86_cpu_realizefn(DeviceState *dev, Error **errp)
  
- /*
-+ * Check if we can support this topology
-+ * Fail if number of cores are beyond the supported config
-+ * or nr_threads is more than 2
-+ */
-+static int verify_topology(int nr_cores, int nr_threads)
-+{
-+    if ((nr_cores > (MAX_CORES_IN_NODE * MAX_NODES_EPYC)) ||
-+        (nr_threads > 2)) {
-+        return 0;
-+    }
-+    return 1;
-+}
-+
-+/*
-  * Definitions of the hardcoded cache entries we expose:
-  * These are legacy cache values. If there is a need to change any
-  * of these values please use builtin_x86_defs
-@@ -2541,7 +2555,8 @@ static X86CPUDefinition builtin_x86_defs[] = {
-         .features[FEAT_8000_0001_ECX] =
-             CPUID_EXT3_OSVW | CPUID_EXT3_3DNOWPREFETCH |
-             CPUID_EXT3_MISALIGNSSE | CPUID_EXT3_SSE4A | CPUID_EXT3_ABM |
--            CPUID_EXT3_CR8LEG | CPUID_EXT3_SVM | CPUID_EXT3_LAHF_LM,
-+            CPUID_EXT3_CR8LEG | CPUID_EXT3_SVM | CPUID_EXT3_LAHF_LM |
-+            CPUID_EXT3_TOPOEXT,
-         .features[FEAT_7_0_EBX] =
-             CPUID_7_0_EBX_FSGSBASE | CPUID_7_0_EBX_BMI1 | CPUID_7_0_EBX_AVX2 |
-             CPUID_7_0_EBX_SMEP | CPUID_7_0_EBX_BMI2 | CPUID_7_0_EBX_RDSEED |
-@@ -2586,7 +2601,8 @@ static X86CPUDefinition builtin_x86_defs[] = {
-         .features[FEAT_8000_0001_ECX] =
-             CPUID_EXT3_OSVW | CPUID_EXT3_3DNOWPREFETCH |
-             CPUID_EXT3_MISALIGNSSE | CPUID_EXT3_SSE4A | CPUID_EXT3_ABM |
--            CPUID_EXT3_CR8LEG | CPUID_EXT3_SVM | CPUID_EXT3_LAHF_LM,
-+            CPUID_EXT3_CR8LEG | CPUID_EXT3_SVM | CPUID_EXT3_LAHF_LM |
-+            CPUID_EXT3_TOPOEXT,
-         .features[FEAT_8000_0008_EBX] =
-             CPUID_8000_0008_EBX_IBPB,
-         .features[FEAT_7_0_EBX] =
-@@ -4166,6 +4182,12 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t index, uint32_t count,
-         break;
-     case 0x8000001D:
-         *eax = 0;
-+        /* Check if we can support this topology */
-+        if (!verify_topology(cs->nr_cores, cs->nr_threads)) {
-+            /* Disable topology extention */
-+            env->features[FEAT_8000_0001_ECX] &= !CPUID_EXT3_TOPOEXT;
-+            break;
-+        }
-         switch (count) {
-         case 0: /* L1 dcache info */
-             encode_cache_cpuid8000001d(env->cache_info_amd.l1d_cache, cs,
-@@ -4190,6 +4212,12 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t index, uint32_t count,
-         break;
-     case 0x8000001E:
-         assert(cpu->core_id <= 255);
-+        /* Check if we can support this topology */
-+        if (!verify_topology(cs->nr_cores, cs->nr_threads)) {
-+            /* Disable topology extention */
-+            env->features[FEAT_8000_0001_ECX] &= !CPUID_EXT3_TOPOEXT;
-+            break;
-+        }
-         encode_topo_cpuid8000001e(cs, cpu,
-                                   eax, ebx, ecx, edx);
-         break;
-@@ -4654,6 +4682,11 @@ static void x86_cpu_expand_features(X86CPU *cpu, Error **errp)
-             x86_cpu_adjust_level(cpu, &env->cpuid_min_xlevel, 0x8000000A);
-         }
+     qemu_init_vcpu(cs);
  
-+        /* TOPOEXT feature requires 0x8000001E */
-+        if (env->features[FEAT_8000_0001_ECX] & CPUID_EXT3_TOPOEXT) {
-+            x86_cpu_adjust_level(cpu, &env->cpuid_min_xlevel, 0x8000001E);
-+        }
-+
-         /* SEV requires CPUID[0x8000001F] */
-         if (sev_enabled()) {
-             x86_cpu_adjust_level(cpu, &env->cpuid_min_xlevel, 0x8000001F);
+-    /* Only Intel CPUs support hyperthreading. Even though QEMU fixes this
+-     * issue by adjusting CPUID_0000_0001_EBX and CPUID_8000_0008_ECX
+-     * based on inputs (sockets,cores,threads), it is still better to gives
++    /* Most Intel and certain AMD CPUs support hyperthreading. Even though QEMU
++     * fixes this issue by adjusting CPUID_0000_0001_EBX and CPUID_8000_0008_ECX
++     * based on inputs (sockets,cores,threads), it is still better to give
+      * users a warning.
+      *
+      * NOTE: the following code has to follow qemu_init_vcpu(). Otherwise
+      * cs->nr_threads hasn't be populated yet and the checking is incorrect.
+      */
+-    if (!IS_INTEL_CPU(env) && cs->nr_threads > 1 && !ht_warned) {
+-        error_report("AMD CPU doesn't support hyperthreading. Please configure"
+-                     " -smp options properly.");
++     if (IS_AMD_CPU(env) &&
++         !(env->features[FEAT_8000_0001_ECX] & CPUID_EXT3_TOPOEXT) &&
++         cs->nr_threads > 1 && !ht_warned) {
++            error_report("This family of AMD CPU doesn't support "
++                         "hyperthreading(%d). Please configure -smp "
++                         "options properly.", cs->nr_threads);
+         ht_warned = true;
+     }
+ 
 -- 
 1.8.3.1
