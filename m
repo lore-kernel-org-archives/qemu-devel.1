@@ -1,31 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40508)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41404)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fLW5B-0006XG-Pm
-	for qemu-devel@nongnu.org; Wed, 23 May 2018 11:53:47 -0400
+	(envelope-from <ciro.santilli@gmail.com>) id 1fLW9K-0007YV-UW
+	for qemu-devel@nongnu.org; Wed, 23 May 2018 11:58:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fLW57-0008TT-Rf
-	for qemu-devel@nongnu.org; Wed, 23 May 2018 11:53:45 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:42224 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fLW57-0008T1-M7
-	for qemu-devel@nongnu.org; Wed, 23 May 2018 11:53:41 -0400
-From: Markus Armbruster <armbru@redhat.com>
-References: <20180517192325.8335-1-danielhb@linux.ibm.com>
-	<20180517192325.8335-2-danielhb@linux.ibm.com>
-	<87wow1gxi8.fsf@dusky.pond.sub.org>
-	<20180521181435.GN25013@localhost.localdomain>
-	<ab91cf9f-95c3-59dc-36cb-641a3db1171b@linux.ibm.com>
-	<20180521202616.GT25013@localhost.localdomain>
-	<874liyivcs.fsf@dusky.pond.sub.org>
-	<20180523122749.GC8988@localhost.localdomain>
-Date: Wed, 23 May 2018 17:53:34 +0200
-In-Reply-To: <20180523122749.GC8988@localhost.localdomain> (Eduardo Habkost's
-	message of "Wed, 23 May 2018 09:27:49 -0300")
-Message-ID: <87d0xmcqrl.fsf@dusky.pond.sub.org>
+	(envelope-from <ciro.santilli@gmail.com>) id 1fLW9J-00023e-SW
+	for qemu-devel@nongnu.org; Wed, 23 May 2018 11:58:03 -0400
+Received: from mail-it0-x233.google.com ([2607:f8b0:4001:c0b::233]:55617)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <ciro.santilli@gmail.com>)
+	id 1fLW9J-00023W-Mr
+	for qemu-devel@nongnu.org; Wed, 23 May 2018 11:58:01 -0400
+Received: by mail-it0-x233.google.com with SMTP id 144-v6so5020249iti.5
+	for <qemu-devel@nongnu.org>; Wed, 23 May 2018 08:58:01 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v7 1/3] qmp: adding
- 'wakeup-suspend-support' in query-target
+In-Reply-To: <000301d3f299$e1e20340$a5a609c0$@ru>
+References: <20180523064941.26016.74274.stgit@pasha-VirtualBox>
+	<CAFXrp_fOpwvT0qOZO+L+5LJJvGsj3bXp_GxhbLt-mZN9cN2nPg@mail.gmail.com>
+	<000301d3f299$e1e20340$a5a609c0$@ru>
+From: Ciro Santilli <ciro.santilli@gmail.com>
+Date: Wed, 23 May 2018 16:57:40 +0100
+Message-ID: <CAFXrp_foEgBeKhZGFmRhXYaK4skDF4y4_M_4HEDR0ucAT20oaQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v3 00/19] reverse debugging
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,131 +30,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: Stefano Stabellini <sstabellini@kernel.org>, "Michael S. Tsirkin" <mst@redhat.com>, libvir-list@redhat.com, Daniel Henrique Barboza <danielhb@linux.ibm.com>, qemu-devel@nongnu.org, mdroth@linux.vnet.ibm.com, Anthony Perard <anthony.perard@citrix.com>, Igor Mammedov <imammedo@redhat.com>, dgilbert@redhat.com
+To: Pavel Dovgalyuk <dovgaluk@ispras.ru>
+Cc: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>, QEMU Developers <qemu-devel@nongnu.org>
 
-Eduardo Habkost <ehabkost@redhat.com> writes:
-
-> On Wed, May 23, 2018 at 11:17:55AM +0200, Markus Armbruster wrote:
->> Eduardo Habkost <ehabkost@redhat.com> writes:
->> > On Mon, May 21, 2018 at 04:46:36PM -0300, Daniel Henrique Barboza wrote:
-> [...]
->> >> Since no objection was made back then, this logic was put into query-target
->> >> starting
->> >> in v2. Still, I don't have any favorites though: query-target looks ok,
->> >> query-machine
->> >> looks ok and a new API looks ok too. It's all about what makes (more) sense
->> >> in the
->> >> management level, I think.
+On Wed, May 23, 2018 at 2:28 PM, Pavel Dovgalyuk <dovgaluk@ispras.ru> wrote:
+>> From: Ciro Santilli [mailto:ciro.santilli@gmail.com]
+>> On Wed, May 23, 2018 at 7:49 AM, Pavel Dovgalyuk
+>> <Pavel.Dovgaluk@ispras.ru> wrote:
+>> > GDB remote protocol supports reverse debugging of the targets.
+>> > It includes 'reverse step' and 'reverse continue' operations.
+>> > The first one finds the previous step of the execution,
+>> > and the second one is intended to stop at the last breakpoint that
+>> > would happen when the program is executed normally.
 >> >
->> > I understand the original objection from Eric: having to add a
->> > new command for every runtime flag we want to expose to the user
->> > looks wrong to me.
->> 
->> Agreed.
->> 
->> > However, extending query-machines and query-target looks wrong
->> > too, however.  query-target looks wrong because this not a
->> > property of the target.  query-machines is wrong because this is
->> > not a static property of the machine-type, but of the running
->> > machine instance.
->> 
->> Of the two, query-machines looks less wrong.
->> 
->> Arguably, -no-acpi should not exist.  It's an ad hoc flag that sneakily
->> splits a few machine types into two variants, with and without ACPI.
->> It's silently ignored for other machine types, even APCI-capable ones.
->> 
->> If the machine type variants with and without ACPI were separate types,
->> wakeup-suspend-support would be a static property of the machine type.
->> 
->> However, "separate types" probably doesn't scale: I'm afraid we'd end up
->> with an undesirable number of machine types.  Avoiding that is exactly
->> why we have machine types with configurable options.  I suspect that's
->> how ACPI should be configured (if at all).
->> 
->> So, should we make -no-acpi sugar for a machine type parameter?  And
->> then deprecate -no-acpi for good measure?
+>> > Reverse debugging is possible in the replay mode, when at least
+>> > one snapshot was created at the record or replay phase.
+>> > QEMU can use these snapshots for travelling back in time with GDB.
+>> >
+>> > Running the execution in replay mode allows using GDB reverse debugging
+>> > commands:
+>> >  - reverse-stepi (or rsi): Steps one instruction to the past.
+>> >    QEMU loads on of the prior snapshots and proceeds to the desired
+>> >    instruction forward. When that step is reaches, execution stops.
+>> >  - reverse-continue (or rc): Runs execution "backwards".
+>> >    QEMU tries to find breakpoint or watchpoint by loaded prior snapshot
+>> >    and replaying the execution. Then QEMU loads snapshots again and
+>> >    replays to the latest breakpoint. When there are no breakpoints in
+>> >    the examined section of the execution, QEMU finds one more snapshot
+>> >    and tries again. After the first snapshot is processed, execution
+>> >    stops at this snapshot.
+>> >
+>> > The set of patches include the following modifications:
+>> >  - gdbstub update for reverse debugging support
+>> >  - functions that automatically perform reverse step and reverse
+>> >    continue operations
+>> >  - hmp/qmp commands for manipulating the replay process
+>> >  - improvement of the snapshotting for saving the execution step
+>> >    in the snapshot parameters
+>> >  - other record/replay fixes
+>> >
+>> > The patches are available in the repository:
+>> > https://github.com/ispras/qemu/tree/rr-180428
+>> >
+>>
+>> This branch appears to contain one month old commits, is it the correct one?
 >
-> I think we should.
-
-Would you like to take care of it?
-
->> > Can we have a new query command that could be an obvious
->> > container for simple machine capabilities that are not static?  A
->> > name like "query-machine" would be generic enough for that, I
->> > guess.
->> 
->> Having command names differ only in a single letter is awkward, but
->> let's focus on things other than naming now, and use
->> query-current-machine like a working title.
->> 
->> query-machines is wrong because wakeup-suspend-support isn't static for
->> some machine types.
->> 
->> query-current-machine is also kind of wrong because
->> wakeup-suspend-support *is* static for most machine types.
+> Right.
+> There were no significant changes except the fix which was already queued by Paolo.
+> As soon as it is upstreamed, I'll update the branch.
 >
-> The most appropriate solution depends a lot on how/when
-> management software needs to query this.
 
-Right.
+OK.
 
-> If they only need to query it at runtime for a running VM,
-> there's no reason for us to go of our way and add complexity just
-> to make it look like static data in query-machines.
+At the current branch 6b23df0d0ca0e5e999cd12af2b18b2a95faeb421 still
+observe the same behaviour as mentioned at:
+https://lists.gnu.org/archive/html/qemu-devel/2018-04/msg04669.html
+
+If I try to savevm during the debug replay to speedup up reverse
+execution, QEMU hangs.
+
+Have you managed to reproduce that? Or is this not an intended use
+case, i.e. only savevm during record is supported?
+
+Am I correct to understand that being able to do savevms in the middle
+of a long execution is the critical feature that this adds? Otherwise
+we are essentially replaying from the initial snapshot every time, so
+we might as well just restart a new replay, is that true?
+
+> Pavel Dovgalyuk
 >
-> On the other hand, if they really need to query it before
-> configuring/starting a VM, it won't be useful at all to make it
-> available only at runtime.
->
-> Daniel, when/how exactly software would need to query the new
-> flag?
->
->
->> Worse, a machine type property that is static for all machine types now
->> could conceivably become dynamic when we add a machine type
->> configuration knob.
->> 
->
-> This isn't the first time a machine capability that seems static
-> actually depends on other configuration arguments.  We will
-> probably need to address this eventually.
-
-Then the best time to address it is now, provided we can :)
-
->> Would a way to tie the property to the configuration knob help?
->> Something like wakeup-suspend-support taking values true (supported),
->> false (not supported), and "acpi" (supported if machine type
->> configuration knob "acpi" is switched on).
->> 
->
-> I would prefer a more generic mechanism.  Maybe make
-> 'query-machines' accept a 'machine-options' argument?
-
-This can support arbitrary configuration dependencies, unlike my
-proposal.  However, I fear combinatorial explosion would make querying
-anything but "default configuration" and "current configuration"
-impractical, and "default configuration" would be basically useless, as
-you can't predict how arguments will affect the value query-machines.
-
-Whether this is an issue depends on how management software wants to use
-query-machines.
-
-Whether the ability to support arbitrary configuration dependencies is a
-useful feature or an invitation to stupid stunts is another open
-question :)
-
-Here's a synthesis of the two proposals: have query-machines spell out
-which of its results are determinate, and which configuration bits need
-to be supplied to resolve the indeterminate ones.  For machine type
-"pc-q35-*", wakeup-suspend-support would always yield true, but for
-"pc-i440fx-*" it would return true when passed an acpi: true argument,
-false when passed an acpi: false argument, and an encoding of
-"indeterminate, you need to pass an acpi argument to learn more" when
-passed no acpi argument.
-
-I'm not saying this synthesis makes sense, I'm just exploring the design
-space.
-
-We need input from libvirt guys.
