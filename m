@@ -1,26 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58711)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59961)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1fLOM3-0002Ks-QX
-	for qemu-devel@nongnu.org; Wed, 23 May 2018 03:38:42 -0400
+	(envelope-from <jtomko@redhat.com>) id 1fLOVA-0003wK-QO
+	for qemu-devel@nongnu.org; Wed, 23 May 2018 03:48:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1fLOM0-0007ys-Jg
-	for qemu-devel@nongnu.org; Wed, 23 May 2018 03:38:39 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:36148 helo=mx1.redhat.com)
+	(envelope-from <jtomko@redhat.com>) id 1fLOV7-0002YO-O1
+	for qemu-devel@nongnu.org; Wed, 23 May 2018 03:48:04 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:36554 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eric.auger@redhat.com>)
-	id 1fLOM0-0007yk-DW
-	for qemu-devel@nongnu.org; Wed, 23 May 2018 03:38:36 -0400
-References: <20180510174519.11264-1-peter.maydell@linaro.org>
-	<20180510174519.11264-6-peter.maydell@linaro.org>
-From: Auger Eric <eric.auger@redhat.com>
-Message-ID: <a70da475-a9a4-5470-7d54-5615d5beb2f3@redhat.com>
-Date: Wed, 23 May 2018 09:38:33 +0200
+	(Exim 4.71) (envelope-from <jtomko@redhat.com>) id 1fLOV7-0002Y8-HO
+	for qemu-devel@nongnu.org; Wed, 23 May 2018 03:48:01 -0400
+Date: Wed, 23 May 2018 09:47:57 +0200
+From: =?iso-8859-1?B?SuFu?= Tomko <jtomko@redhat.com>
+Message-ID: <20180523074757.GI26766@dnr>
+References: <20180515113348.10516-1-zyimin@linux.ibm.com>
+	<20180515113348.10516-2-zyimin@linux.ibm.com>
+	<20180517124109.GJ17734@vader> <20180518075212.GE3416@dnr>
+	<20180518091916.GA22292@vader> <20180518130729.GF3416@dnr>
+	<7149dfa9-7d3a-a2ff-b326-7e9ba71f8fe1@linux.ibm.com>
 MIME-Version: 1.0
-In-Reply-To: <20180510174519.11264-6-peter.maydell@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PULL 05/21] arm/boot: split load_dtb() from
- arm_load_kernel()
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="poJSiGMzRSvrLGLs"
+Content-Disposition: inline
+In-Reply-To: <7149dfa9-7d3a-a2ff-b326-7e9ba71f8fe1@linux.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH v2 1/1] sandbox: disable -sandbox if
+ CONFIG_SECCOMP undefined
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,644 +32,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org, Igor Mammedov <imammedo@redhat.com>, Andrew Jones <drjones@redhat.com>
-
-Hi,
-
-On 05/10/2018 07:45 PM, Peter Maydell wrote:
-> From: Igor Mammedov <imammedo@redhat.com>
->=20
-> load_dtb() depends on arm_load_kernel() to figure out place
-> in RAM where it should be loaded, but it's not required for
-> arm_load_kernel() to work. Sometimes it's neccesary for
-> devices added with -device/device_add to be enumerated in
-> DTB as well, which's lead to [1] and surrounding commits to
-> add 2 more machine_done notifiers with non obvious ordering
-> to make dynamic sysbus devices initialization happen in
-> the right order.
->=20
-> However instead of moving whole arm_load_kernel() in to
-> machine_done, it's sufficient to move only load_dtb() into
-> virt_machine_done() notifier and remove ArmLoadKernelNotifier/
-> /PlatformBusFDTNotifierParams notifiers, which saves us ~90LOC
-> and simplifies code flow quite a bit.
-> Later would allow to consolidate DTB generation within one
-> function for 'mach-virt' board and make it reentrant so it
-> could generate updated DTB in device hotplug secenarios.
->=20
-> While at it rename load_dtb() to arm_load_dtb() since it's
-> public now.
->=20
-> Add additional field skip_dtb_autoload to struct arm_boot_info
-> to allow manual DTB load later in mach-virt and to avoid touching
-> all other boards to explicitly call arm_load_dtb().
->=20
->  1) (ac9d32e hw/arm/boot: arm_load_kernel implemented as a machine init=
- done notifier)
-
-I face a regression that looks to be caused by this patch (bisect
-session result). Reverting it allows the guest to boot. Otherwise I get:
-
-in kvm_device_access() at
-/home/augere/UPSTREAM/qemu/accel/kvm/kvm-all.c:2164:
-2018-05-22T18:02:17.210175Z qemu-system-aarch64: KVM_SET_DEVICE_ATTR
-failed: Group 6 attr 0x000000000000c665: Invalid argument
-
-It happens when booting with -bios option only (with dt, it boots fine).
-
-I have not identified the root cause yet.
-
-Thanks
-
-Eric
+To: Yi Min Zhao <zyimin@linux.ibm.com>
+Cc: Eduardo Otubo <otubo@redhat.com>, borntraeger@de.ibm.com, fiuczy@linux.ibm.com, qemu-devel@nongnu.org
 
 
->=20
-> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-> Reviewed-by: Andrew Jones <drjones@redhat.com>
-> Message-id: 1525691524-32265-4-git-send-email-imammedo@redhat.com
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-> ---
->  include/hw/arm/arm.h        | 45 +++++++++++++++++------
->  include/hw/arm/sysbus-fdt.h | 37 ++++---------------
->  hw/arm/boot.c               | 72 ++++++++++---------------------------
->  hw/arm/sysbus-fdt.c         | 61 +++----------------------------
->  hw/arm/virt.c               | 64 ++++++++++++++++-----------------
->  5 files changed, 94 insertions(+), 185 deletions(-)
->=20
-> diff --git a/include/hw/arm/arm.h b/include/hw/arm/arm.h
-> index ce769bde6a..70fa2287e2 100644
-> --- a/include/hw/arm/arm.h
-> +++ b/include/hw/arm/arm.h
-> @@ -39,15 +39,6 @@ DeviceState *armv7m_init(MemoryRegion *system_memory=
-, int mem_size, int num_irq,
->   */
->  void armv7m_load_kernel(ARMCPU *cpu, const char *kernel_filename, int =
-mem_size);
-> =20
-> -/*
-> - * struct used as a parameter of the arm_load_kernel machine init
-> - * done notifier
-> - */
-> -typedef struct {
-> -    Notifier notifier; /* actual notifier */
-> -    ARMCPU *cpu; /* handle to the first cpu object */
-> -} ArmLoadKernelNotifier;
-> -
->  /* arm_boot.c */
->  struct arm_boot_info {
->      uint64_t ram_size;
-> @@ -56,6 +47,13 @@ struct arm_boot_info {
->      const char *initrd_filename;
->      const char *dtb_filename;
->      hwaddr loader_start;
-> +    hwaddr dtb_start;
-> +    hwaddr dtb_limit;
-> +    /* If set to True, arm_load_kernel() will not load DTB.
-> +     * It allows board to load DTB manually later.
-> +     * (default: False)
-> +     */
-> +    bool skip_dtb_autoload;
->      /* multicore boards that use the default secondary core boot funct=
-ions
->       * need to put the address of the secondary boot code, the boot re=
-g,
->       * and the GIC address in the next 3 values, respectively. boards =
-that
-> @@ -94,8 +92,6 @@ struct arm_boot_info {
->       * the user it should implement this hook.
->       */
->      void (*modify_dtb)(const struct arm_boot_info *info, void *fdt);
-> -    /* machine init done notifier executing arm_load_dtb */
-> -    ArmLoadKernelNotifier load_kernel_notifier;
->      /* Used internally by arm_boot.c */
->      int is_linux;
->      hwaddr initrd_start;
-> @@ -143,6 +139,33 @@ struct arm_boot_info {
->   */
->  void arm_load_kernel(ARMCPU *cpu, struct arm_boot_info *info);
-> =20
-> +AddressSpace *arm_boot_address_space(ARMCPU *cpu,
-> +                                     const struct arm_boot_info *info)=
-;
-> +
-> +/**
-> + * arm_load_dtb() - load a device tree binary image into memory
-> + * @addr:       the address to load the image at
-> + * @binfo:      struct describing the boot environment
-> + * @addr_limit: upper limit of the available memory area at @addr
-> + * @as:         address space to load image to
-> + *
-> + * Load a device tree supplied by the machine or by the user  with the
-> + * '-dtb' command line option, and put it at offset @addr in target
-> + * memory.
-> + *
-> + * If @addr_limit contains a meaningful value (i.e., it is strictly gr=
-eater
-> + * than @addr), the device tree is only loaded if its size does not ex=
-ceed
-> + * the limit.
-> + *
-> + * Returns: the size of the device tree image on success,
-> + *          0 if the image size exceeds the limit,
-> + *          -1 on errors.
-> + *
-> + * Note: Must not be called unless have_dtb(binfo) is true.
-> + */
-> +int arm_load_dtb(hwaddr addr, const struct arm_boot_info *binfo,
-> +                 hwaddr addr_limit, AddressSpace *as);
-> +
->  /* Write a secure board setup routine with a dummy handler for SMCs */
->  void arm_write_secure_board_setup_dummy_smc(ARMCPU *cpu,
->                                              const struct arm_boot_info=
- *info,
-> diff --git a/include/hw/arm/sysbus-fdt.h b/include/hw/arm/sysbus-fdt.h
-> index e15bb81807..340c382cdd 100644
-> --- a/include/hw/arm/sysbus-fdt.h
-> +++ b/include/hw/arm/sysbus-fdt.h
-> @@ -24,37 +24,14 @@
->  #ifndef HW_ARM_SYSBUS_FDT_H
->  #define HW_ARM_SYSBUS_FDT_H
-> =20
-> -#include "hw/arm/arm.h"
-> -#include "qemu-common.h"
-> -#include "hw/sysbus.h"
-> -
-> -/*
-> - * struct that contains dimensioning parameters of the platform bus
-> - */
-> -typedef struct {
-> -    hwaddr platform_bus_base; /* start address of the bus */
-> -    hwaddr platform_bus_size; /* size of the bus */
-> -    int platform_bus_first_irq; /* first hwirq assigned to the bus */
-> -    int platform_bus_num_irqs; /* number of hwirq assigned to the bus =
-*/
-> -} ARMPlatformBusSystemParams;
-> -
-> -/*
-> - * struct that contains all relevant info to build the fdt nodes of
-> - * platform bus and attached dynamic sysbus devices
-> - * in the future might be augmented with additional info
-> - * such as PHY, CLK handles ...
-> - */
-> -typedef struct {
-> -    const ARMPlatformBusSystemParams *system_params;
-> -    struct arm_boot_info *binfo;
-> -    const char *intc; /* parent interrupt controller name */
-> -} ARMPlatformBusFDTParams;
-> +#include "exec/hwaddr.h"
-> =20
->  /**
-> - * arm_register_platform_bus_fdt_creator - register a machine init don=
-e
-> - * notifier that creates the device tree nodes of the platform bus and
-> - * associated dynamic sysbus devices
-> + * platform_bus_add_all_fdt_nodes - create all the platform bus nodes
-> + *
-> + * builds the parent platform bus node and all the nodes of dynamic
-> + * sysbus devices attached to it.
->   */
-> -void arm_register_platform_bus_fdt_creator(ARMPlatformBusFDTParams *fd=
-t_params);
-> -
-> +void platform_bus_add_all_fdt_nodes(void *fdt, const char *intc, hwadd=
-r addr,
-> +                                    hwaddr bus_size, int irq_start);
->  #endif
-> diff --git a/hw/arm/boot.c b/hw/arm/boot.c
-> index 1e2be20731..9496f331a8 100644
-> --- a/hw/arm/boot.c
-> +++ b/hw/arm/boot.c
-> @@ -36,8 +36,8 @@
->  #define ARM64_TEXT_OFFSET_OFFSET    8
->  #define ARM64_MAGIC_OFFSET          56
-> =20
-> -static AddressSpace *arm_boot_address_space(ARMCPU *cpu,
-> -                                            const struct arm_boot_info=
- *info)
-> +AddressSpace *arm_boot_address_space(ARMCPU *cpu,
-> +                                     const struct arm_boot_info *info)
->  {
->      /* Return the address space to use for bootloader reads and writes=
-.
->       * We prefer the secure address space if the CPU has it and we're
-> @@ -486,29 +486,8 @@ static void fdt_add_psci_node(void *fdt)
->      qemu_fdt_setprop_cell(fdt, "/psci", "migrate", migrate_fn);
->  }
-> =20
-> -/**
-> - * load_dtb() - load a device tree binary image into memory
-> - * @addr:       the address to load the image at
-> - * @binfo:      struct describing the boot environment
-> - * @addr_limit: upper limit of the available memory area at @addr
-> - * @as:         address space to load image to
-> - *
-> - * Load a device tree supplied by the machine or by the user  with the
-> - * '-dtb' command line option, and put it at offset @addr in target
-> - * memory.
-> - *
-> - * If @addr_limit contains a meaningful value (i.e., it is strictly gr=
-eater
-> - * than @addr), the device tree is only loaded if its size does not ex=
-ceed
-> - * the limit.
-> - *
-> - * Returns: the size of the device tree image on success,
-> - *          0 if the image size exceeds the limit,
-> - *          -1 on errors.
-> - *
-> - * Note: Must not be called unless have_dtb(binfo) is true.
-> - */
-> -static int load_dtb(hwaddr addr, const struct arm_boot_info *binfo,
-> -                    hwaddr addr_limit, AddressSpace *as)
-> +int arm_load_dtb(hwaddr addr, const struct arm_boot_info *binfo,
-> +                 hwaddr addr_limit, AddressSpace *as)
->  {
->      void *fdt =3D NULL;
->      int size, rc;
-> @@ -935,7 +914,7 @@ static uint64_t load_aarch64_image(const char *file=
-name, hwaddr mem_base,
->      return size;
->  }
-> =20
-> -static void arm_load_kernel_notify(Notifier *notifier, void *data)
-> +void arm_load_kernel(ARMCPU *cpu, struct arm_boot_info *info)
->  {
->      CPUState *cs;
->      int kernel_size;
-> @@ -945,11 +924,6 @@ static void arm_load_kernel_notify(Notifier *notif=
-ier, void *data)
->      int elf_machine;
->      hwaddr entry;
->      static const ARMInsnFixup *primary_loader;
-> -    ArmLoadKernelNotifier *n =3D DO_UPCAST(ArmLoadKernelNotifier,
-> -                                         notifier, notifier);
-> -    ARMCPU *cpu =3D n->cpu;
-> -    struct arm_boot_info *info =3D
-> -        container_of(n, struct arm_boot_info, load_kernel_notifier);
->      AddressSpace *as =3D arm_boot_address_space(cpu, info);
-> =20
->      /* The board code is not supposed to set secure_board_setup unless
-> @@ -959,6 +933,7 @@ static void arm_load_kernel_notify(Notifier *notifi=
-er, void *data)
->      assert(!(info->secure_board_setup && kvm_enabled()));
-> =20
->      info->dtb_filename =3D qemu_opt_get(qemu_get_machine_opts(), "dtb"=
-);
-> +    info->dtb_limit =3D 0;
-> =20
->      /* Load the kernel.  */
->      if (!info->kernel_filename || info->firmware_loaded) {
-> @@ -968,9 +943,7 @@ static void arm_load_kernel_notify(Notifier *notifi=
-er, void *data)
->               * the kernel is supposed to be loaded by the bootloader),=
- copy the
->               * DTB to the base of RAM for the bootloader to pick up.
->               */
-> -            if (load_dtb(info->loader_start, info, 0, as) < 0) {
-> -                exit(1);
-> -            }
-> +            info->dtb_start =3D info->loader_start;
->          }
-> =20
->          if (info->kernel_filename) {
-> @@ -1050,15 +1023,14 @@ static void arm_load_kernel_notify(Notifier *no=
-tifier, void *data)
->           */
->          if (elf_low_addr > info->loader_start
->              || elf_high_addr < info->loader_start) {
-> -            /* Pass elf_low_addr as address limit to load_dtb if it ma=
-y be
-> +            /* Set elf_low_addr as address limit for arm_load_dtb if i=
-t may be
->               * pointing into RAM, otherwise pass '0' (no limit)
->               */
->              if (elf_low_addr < info->loader_start) {
->                  elf_low_addr =3D 0;
->              }
-> -            if (load_dtb(info->loader_start, info, elf_low_addr, as) <=
- 0) {
-> -                exit(1);
-> -            }
-> +            info->dtb_start =3D info->loader_start;
-> +            info->dtb_limit =3D elf_low_addr;
->          }
->      }
->      entry =3D elf_entry;
-> @@ -1116,7 +1088,6 @@ static void arm_load_kernel_notify(Notifier *noti=
-fier, void *data)
->           */
->          if (have_dtb(info)) {
->              hwaddr align;
-> -            hwaddr dtb_start;
-> =20
->              if (elf_machine =3D=3D EM_AARCH64) {
->                  /*
-> @@ -1136,11 +1107,9 @@ static void arm_load_kernel_notify(Notifier *not=
-ifier, void *data)
->              }
-> =20
->              /* Place the DTB after the initrd in memory with alignment=
-. */
-> -            dtb_start =3D QEMU_ALIGN_UP(info->initrd_start + initrd_si=
-ze, align);
-> -            if (load_dtb(dtb_start, info, 0, as) < 0) {
-> -                exit(1);
-> -            }
-> -            fixupcontext[FIXUP_ARGPTR] =3D dtb_start;
-> +            info->dtb_start =3D QEMU_ALIGN_UP(info->initrd_start + ini=
-trd_size,
-> +                                           align);
-> +            fixupcontext[FIXUP_ARGPTR] =3D info->dtb_start;
->          } else {
->              fixupcontext[FIXUP_ARGPTR] =3D info->loader_start + KERNEL=
-_ARGS_ADDR;
->              if (info->ram_size >=3D (1ULL << 32)) {
-> @@ -1173,15 +1142,6 @@ static void arm_load_kernel_notify(Notifier *not=
-ifier, void *data)
->      for (cs =3D first_cpu; cs; cs =3D CPU_NEXT(cs)) {
->          ARM_CPU(cs)->env.boot_info =3D info;
->      }
-> -}
-> -
-> -void arm_load_kernel(ARMCPU *cpu, struct arm_boot_info *info)
-> -{
-> -    CPUState *cs;
-> -
-> -    info->load_kernel_notifier.cpu =3D cpu;
-> -    info->load_kernel_notifier.notifier.notify =3D arm_load_kernel_not=
-ify;
-> -    qemu_add_machine_init_done_notifier(&info->load_kernel_notifier.no=
-tifier);
-> =20
->      /* CPU objects (unlike devices) are not automatically reset on sys=
-tem
->       * reset, so we must always register a handler to do so. If we're
-> @@ -1191,6 +1151,12 @@ void arm_load_kernel(ARMCPU *cpu, struct arm_boo=
-t_info *info)
->      for (cs =3D first_cpu; cs; cs =3D CPU_NEXT(cs)) {
->          qemu_register_reset(do_cpu_reset, ARM_CPU(cs));
->      }
-> +
-> +    if (!info->skip_dtb_autoload && have_dtb(info)) {
-> +        if (arm_load_dtb(info->dtb_start, info, info->dtb_limit, as) <=
- 0) {
-> +            exit(1);
-> +        }
-> +    }
->  }
-> =20
->  static const TypeInfo arm_linux_boot_if_info =3D {
-> diff --git a/hw/arm/sysbus-fdt.c b/hw/arm/sysbus-fdt.c
-> index 80ff70e1ed..e4c492ea44 100644
-> --- a/hw/arm/sysbus-fdt.c
-> +++ b/hw/arm/sysbus-fdt.c
-> @@ -49,15 +49,6 @@ typedef struct PlatformBusFDTData {
->      PlatformBusDevice *pbus;
->  } PlatformBusFDTData;
-> =20
-> -/*
-> - * struct used when calling the machine init done notifier
-> - * that constructs the fdt nodes of platform bus devices
-> - */
-> -typedef struct PlatformBusFDTNotifierParams {
-> -    Notifier notifier;
-> -    ARMPlatformBusFDTParams *fdt_params;
-> -} PlatformBusFDTNotifierParams;
-> -
->  /* struct that associates a device type name and a node creation funct=
-ion */
->  typedef struct NodeCreationPair {
->      const char *typename;
-> @@ -453,42 +444,17 @@ static void add_fdt_node(SysBusDevice *sbdev, voi=
-d *opaque)
->      exit(1);
->  }
-> =20
-> -/**
-> - * add_all_platform_bus_fdt_nodes - create all the platform bus nodes
-> - *
-> - * builds the parent platform bus node and all the nodes of dynamic
-> - * sysbus devices attached to it.
-> - */
-> -static void add_all_platform_bus_fdt_nodes(ARMPlatformBusFDTParams *fd=
-t_params)
-> +void platform_bus_add_all_fdt_nodes(void *fdt, const char *intc, hwadd=
-r addr,
-> +                                    hwaddr bus_size, int irq_start)
->  {
->      const char platcomp[] =3D "qemu,platform\0simple-bus";
->      PlatformBusDevice *pbus;
->      DeviceState *dev;
->      gchar *node;
-> -    uint64_t addr, size;
-> -    int irq_start, dtb_size;
-> -    struct arm_boot_info *info =3D fdt_params->binfo;
-> -    const ARMPlatformBusSystemParams *params =3D fdt_params->system_pa=
-rams;
-> -    const char *intc =3D fdt_params->intc;
-> -    void *fdt =3D info->get_dtb(info, &dtb_size);
-> -
-> -    /*
-> -     * If the user provided a dtb, we assume the dynamic sysbus nodes
-> -     * already are integrated there. This corresponds to a use case wh=
-ere
-> -     * the dynamic sysbus nodes are complex and their generation is no=
-t yet
-> -     * supported. In that case the user can take charge of the guest d=
-t
-> -     * while qemu takes charge of the qom stuff.
-> -     */
-> -    if (info->dtb_filename) {
-> -        return;
-> -    }
-> =20
->      assert(fdt);
-> =20
-> -    node =3D g_strdup_printf("/platform@%"PRIx64, params->platform_bus=
-_base);
-> -    addr =3D params->platform_bus_base;
-> -    size =3D params->platform_bus_size;
-> -    irq_start =3D params->platform_bus_first_irq;
-> +    node =3D g_strdup_printf("/platform@%"PRIx64, addr);
-> =20
->      /* Create a /platform node that we can put all devices into */
->      qemu_fdt_add_subnode(fdt, node);
-> @@ -499,7 +465,7 @@ static void add_all_platform_bus_fdt_nodes(ARMPlatf=
-ormBusFDTParams *fdt_params)
->       */
->      qemu_fdt_setprop_cells(fdt, node, "#size-cells", 1);
->      qemu_fdt_setprop_cells(fdt, node, "#address-cells", 1);
-> -    qemu_fdt_setprop_cells(fdt, node, "ranges", 0, addr >> 32, addr, s=
-ize);
-> +    qemu_fdt_setprop_cells(fdt, node, "ranges", 0, addr >> 32, addr, b=
-us_size);
-> =20
->      qemu_fdt_setprop_phandle(fdt, node, "interrupt-parent", intc);
-> =20
-> @@ -518,22 +484,3 @@ static void add_all_platform_bus_fdt_nodes(ARMPlat=
-formBusFDTParams *fdt_params)
-> =20
->      g_free(node);
->  }
-> -
-> -static void platform_bus_fdt_notify(Notifier *notifier, void *data)
-> -{
-> -    PlatformBusFDTNotifierParams *p =3D DO_UPCAST(PlatformBusFDTNotifi=
-erParams,
-> -                                                notifier, notifier);
-> -
-> -    add_all_platform_bus_fdt_nodes(p->fdt_params);
-> -    g_free(p->fdt_params);
-> -    g_free(p);
-> -}
-> -
-> -void arm_register_platform_bus_fdt_creator(ARMPlatformBusFDTParams *fd=
-t_params)
-> -{
-> -    PlatformBusFDTNotifierParams *p =3D g_new(PlatformBusFDTNotifierPa=
-rams, 1);
-> -
-> -    p->fdt_params =3D fdt_params;
-> -    p->notifier.notify =3D platform_bus_fdt_notify;
-> -    qemu_add_machine_init_done_notifier(&p->notifier);
-> -}
-> diff --git a/hw/arm/virt.c b/hw/arm/virt.c
-> index 1f54223f19..6710be226f 100644
-> --- a/hw/arm/virt.c
-> +++ b/hw/arm/virt.c
-> @@ -94,8 +94,6 @@
-> =20
->  #define PLATFORM_BUS_NUM_IRQS 64
-> =20
-> -static ARMPlatformBusSystemParams platform_bus_params;
-> -
->  /* RAM limit in GB. Since VIRT_MEM starts at the 1GB mark, this means
->   * RAM can go up to the 256GB mark, leaving 256GB of the physical
->   * address space unallocated and free for future use between 256G and =
-512G.
-> @@ -1126,40 +1124,23 @@ static void create_platform_bus(VirtMachineStat=
-e *vms, qemu_irq *pic)
->      DeviceState *dev;
->      SysBusDevice *s;
->      int i;
-> -    ARMPlatformBusFDTParams *fdt_params =3D g_new(ARMPlatformBusFDTPar=
-ams, 1);
->      MemoryRegion *sysmem =3D get_system_memory();
-> =20
-> -    platform_bus_params.platform_bus_base =3D vms->memmap[VIRT_PLATFOR=
-M_BUS].base;
-> -    platform_bus_params.platform_bus_size =3D vms->memmap[VIRT_PLATFOR=
-M_BUS].size;
-> -    platform_bus_params.platform_bus_first_irq =3D vms->irqmap[VIRT_PL=
-ATFORM_BUS];
-> -    platform_bus_params.platform_bus_num_irqs =3D PLATFORM_BUS_NUM_IRQ=
-S;
-> -
-> -    fdt_params->system_params =3D &platform_bus_params;
-> -    fdt_params->binfo =3D &vms->bootinfo;
-> -    fdt_params->intc =3D "/intc";
-> -    /*
-> -     * register a machine init done notifier that creates the device t=
-ree
-> -     * nodes of the platform bus and its children dynamic sysbus devic=
-es
-> -     */
-> -    arm_register_platform_bus_fdt_creator(fdt_params);
-> -
->      dev =3D qdev_create(NULL, TYPE_PLATFORM_BUS_DEVICE);
->      dev->id =3D TYPE_PLATFORM_BUS_DEVICE;
-> -    qdev_prop_set_uint32(dev, "num_irqs",
-> -        platform_bus_params.platform_bus_num_irqs);
-> -    qdev_prop_set_uint32(dev, "mmio_size",
-> -        platform_bus_params.platform_bus_size);
-> +    qdev_prop_set_uint32(dev, "num_irqs", PLATFORM_BUS_NUM_IRQS);
-> +    qdev_prop_set_uint32(dev, "mmio_size", vms->memmap[VIRT_PLATFORM_B=
-US].size);
->      qdev_init_nofail(dev);
->      vms->platform_bus_dev =3D dev;
-> -    s =3D SYS_BUS_DEVICE(dev);
-> =20
-> -    for (i =3D 0; i < platform_bus_params.platform_bus_num_irqs; i++) =
-{
-> -        int irqn =3D platform_bus_params.platform_bus_first_irq + i;
-> +    s =3D SYS_BUS_DEVICE(dev);
-> +    for (i =3D 0; i < PLATFORM_BUS_NUM_IRQS; i++) {
-> +        int irqn =3D vms->irqmap[VIRT_PLATFORM_BUS] + i;
->          sysbus_connect_irq(s, i, pic[irqn]);
->      }
-> =20
->      memory_region_add_subregion(sysmem,
-> -                                platform_bus_params.platform_bus_base,
-> +                                vms->memmap[VIRT_PLATFORM_BUS].base,
->                                  sysbus_mmio_get_region(s, 0));
->  }
-> =20
-> @@ -1230,6 +1211,26 @@ void virt_machine_done(Notifier *notifier, void =
-*data)
->  {
->      VirtMachineState *vms =3D container_of(notifier, VirtMachineState,
->                                           machine_done);
-> +    ARMCPU *cpu =3D ARM_CPU(first_cpu);
-> +    struct arm_boot_info *info =3D &vms->bootinfo;
-> +    AddressSpace *as =3D arm_boot_address_space(cpu, info);
-> +
-> +    /*
-> +     * If the user provided a dtb, we assume the dynamic sysbus nodes
-> +     * already are integrated there. This corresponds to a use case wh=
-ere
-> +     * the dynamic sysbus nodes are complex and their generation is no=
-t yet
-> +     * supported. In that case the user can take charge of the guest d=
-t
-> +     * while qemu takes charge of the qom stuff.
-> +     */
-> +    if (info->dtb_filename =3D=3D NULL) {
-> +        platform_bus_add_all_fdt_nodes(vms->fdt, "/intc",
-> +                                       vms->memmap[VIRT_PLATFORM_BUS].=
-base,
-> +                                       vms->memmap[VIRT_PLATFORM_BUS].=
-size,
-> +                                       vms->irqmap[VIRT_PLATFORM_BUS])=
-;
-> +    }
-> +    if (arm_load_dtb(info->dtb_start, info, info->dtb_limit, as) < 0) =
-{
-> +        exit(1);
-> +    }
-> =20
->      virt_acpi_setup(vms);
->      virt_build_smbios(vms);
-> @@ -1457,8 +1458,7 @@ static void machvirt_init(MachineState *machine)
->      vms->fw_cfg =3D create_fw_cfg(vms, &address_space_memory);
->      rom_set_fw(vms->fw_cfg);
-> =20
-> -    vms->machine_done.notify =3D virt_machine_done;
-> -    qemu_add_machine_init_done_notifier(&vms->machine_done);
-> +    create_platform_bus(vms, pic);
-> =20
->      vms->bootinfo.ram_size =3D machine->ram_size;
->      vms->bootinfo.kernel_filename =3D machine->kernel_filename;
-> @@ -1468,16 +1468,12 @@ static void machvirt_init(MachineState *machine=
-)
->      vms->bootinfo.board_id =3D -1;
->      vms->bootinfo.loader_start =3D vms->memmap[VIRT_MEM].base;
->      vms->bootinfo.get_dtb =3D machvirt_dtb;
-> +    vms->bootinfo.skip_dtb_autoload =3D true;
->      vms->bootinfo.firmware_loaded =3D firmware_loaded;
->      arm_load_kernel(ARM_CPU(first_cpu), &vms->bootinfo);
-> =20
-> -    /*
-> -     * arm_load_kernel machine init done notifier registration must
-> -     * happen before the platform_bus_create call. In this latter,
-> -     * another notifier is registered which adds platform bus nodes.
-> -     * Notifiers are executed in registration reverse order.
-> -     */
-> -    create_platform_bus(vms, pic);
-> +    vms->machine_done.notify =3D virt_machine_done;
-> +    qemu_add_machine_init_done_notifier(&vms->machine_done);
->  }
-> =20
->  static bool virt_get_secure(Object *obj, Error **errp)
->=20
+--poJSiGMzRSvrLGLs
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Sat, May 19, 2018 at 04:20:37PM +0800, Yi Min Zhao wrote:
+>
+>
+>=E5=9C=A8 2018/5/18 =E4=B8=8B=E5=8D=889:07, J=C3=A1n Tomko =E5=86=99=E9=81=
+=93:
+>> On Fri, May 18, 2018 at 11:19:16AM +0200, Eduardo Otubo wrote:
+>>> On 18/05/2018 - 09:52:12, J=C3=A1n Tomko wrote:
+>>>> But now libvirt requires QEMU >=3D 1.5.0 which already supports
+>>>> query-command-line-options, so if you want the option gone completely
+>>>> --without-seccomp, I can add the code that probes for it and
+>>>> make seccomp_sandbox =3D 0 a no-op if it's compiled out.
+>>>
+>>> This looks like a good solution for the libvirt side. Can you add
+>>> this support
+>>> so we can merge this fix?
+>>>
+>>
+>> Patches proposed:
+>> https://www.redhat.com/archives/libvir-list/2018-May/msg01430.html
+>>
+>> Jano
+>Thanks for your work!
+
+Now pushed in libvirt master:
+commit b87222a90919040c12fb6d7c8dcc20f944a66495
+Author:     J=C3=A1n Tomko <jtomko@redhat.com>
+AuthorDate: 2018-05-18 14:57:51 +0200
+Commit:     J=C3=A1n Tomko <jtomko@redhat.com>
+CommitDate: 2018-05-23 09:45:48 +0200
+
+    qemu: only pass -sandbox off if supported
+
+    This way we don't rely on QEMU supplying the -sandbox option
+    without CONFIG_SECCOMP.
+
+    Signed-off-by: J=C3=A1n Tomko <jtomko@redhat.com>
+    Reviewed-by: John Ferlan <jferlan@redhat.com>
+
+git describe: v4.3.0-258-gb87222a909
+https://libvirt.org/git/?p=3Dlibvirt.git;a=3Dcommitdiff;h=3Db87222a90919040=
+c12fb6d7c8dcc20f944a66495
+
+Jano
+
+--poJSiGMzRSvrLGLs
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: Digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEyAry0cRMFDoj9m/ZyvpdPXT/AmkFAlsFHKYACgkQyvpdPXT/
+AmmntxAAh2tICQB/gomBFRLAl3LheimGa6iG5NCvrY1bkTYFV1H6jRBNRdLzrFmC
+Km9Z2CzqgNKSTMf8cLig/zwRpSuCy9kZgLd9GkASd+cHe58j9QhQHhsWCKDRi5R/
+b7zOZeLYSb6IZN2hbIiMPpjtOTRu9qP7f/fNZq8bsOOMoBf1Q0PGZjnVwUROwN0/
+Yy7swqrfMDeSnwXJ+XHgLbf7RWKJaKeWFE2+4WRZ54dZtTdQKsAMjdJBmv6VYL64
+beLFlLYh9Jk64fjoQgCQir1me5CY/deo+0JgQBLroEQWMPKIlKI4EWemXHvneaw7
+AJONlVVrxlTM/5sf/X7SERYTJLe9Z5qgafsKpwZ3s+rzmQUC7zGAXtZhkvlHAgH6
+QWnwZRcyM3VyTJQW8s3ga5MRfSiO0bvqAn+S5apu5bQMX1+HGYyfxd5Fxy16wv0n
+V/M6FnBAYSNypu/nOHI7jEtkLVjgJZ5uspn/rOjxMVwRe1Bbaa7isQTOKnfMr4op
+tFyVj6gofKTcQ+e6KTLO0QVAU7leHU0MLcuTaIAu73TxqYepeoardWAuPy8S1ffj
+a74nAHmHd9eyNxqwUlvat7jtzYy1zDVm4zGF7SyaW0iiXD2+lnc7sVR0YLRwHZyh
+5JjBjl1GjWYOJj0QOvQcf59a8nFq5Hs9Lq9sVDbzQbtaUhH0VUg=
+=xNF3
+-----END PGP SIGNATURE-----
+
+--poJSiGMzRSvrLGLs--
