@@ -1,25 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37340)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38810)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1fLSa6-00058N-Rc
-	for qemu-devel@nongnu.org; Wed, 23 May 2018 08:09:27 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1fLSeY-00063P-L0
+	for qemu-devel@nongnu.org; Wed, 23 May 2018 08:14:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1fLSa3-0005Fc-MS
-	for qemu-devel@nongnu.org; Wed, 23 May 2018 08:09:26 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:46558 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eric.auger@redhat.com>)
-	id 1fLSa3-0005EW-Hh
-	for qemu-devel@nongnu.org; Wed, 23 May 2018 08:09:23 -0400
-References: <1527070950-208350-1-git-send-email-imammedo@redhat.com>
-From: Auger Eric <eric.auger@redhat.com>
-Message-ID: <99505ab5-d5fe-11ba-7f85-ea24c6f39ae2@redhat.com>
-Date: Wed, 23 May 2018 14:09:20 +0200
+	(envelope-from <ehabkost@redhat.com>) id 1fLSeX-0007Di-BB
+	for qemu-devel@nongnu.org; Wed, 23 May 2018 08:14:02 -0400
+Date: Wed, 23 May 2018 09:13:44 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20180523121344.GB8988@localhost.localdomain>
+References: <20180518180440-mutt-send-email-mst@kernel.org>
+	<20180518170956.GI8615@redhat.com>
+	<20180518174133.GC25013@localhost.localdomain>
+	<87bmdc18q5.fsf@dusky.pond.sub.org>
+	<20180521182928.GO25013@localhost.localdomain>
+	<20180521184440.GB8214@redhat.com>
+	<20180521190112.GP25013@localhost.localdomain>
+	<87o9h6hb59.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <1527070950-208350-1-git-send-email-imammedo@redhat.com>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] arm: fix qemu crash on startup with -bios
- option
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <87o9h6hb59.fsf@dusky.pond.sub.org>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] storing machine data in qcow images?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,99 +30,126 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>, qemu-devel@nongnu.org
-Cc: Andrew Jones <drjones@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
+To: Markus Armbruster <armbru@redhat.com>
+Cc: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>, kwolf@redhat.com, qemu-block@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org, mreitz@redhat.com, stefanha@redhat.com
 
-Hi Igor,
+On Wed, May 23, 2018 at 01:19:46PM +0200, Markus Armbruster wrote:
+> Eduardo Habkost <ehabkost@redhat.com> writes:
+>=20
+> > On Mon, May 21, 2018 at 07:44:40PM +0100, Daniel P. Berrang=E9 wrote:
+> >> On Mon, May 21, 2018 at 03:29:28PM -0300, Eduardo Habkost wrote:
+> >> > On Sat, May 19, 2018 at 08:05:06AM +0200, Markus Armbruster wrote:
+> >> > > Eduardo Habkost <ehabkost@redhat.com> writes:
+> >> > >=20
+> >> > > [...]
+> >> > > > About being more expressive than just a single list of key,val=
+ue
+> >> > > > pairs, I don't see any evidence of that being necessary for th=
+e
+> >> > > > problems we're trying to address.
+> >> > >=20
+> >> > > Short history of a configuration format you might have encounter=
+ed:
+> >>=20
+> >> [snip]
+> >>=20
+> >> > > How confident are we a single list of (key, value) is really all=
+ we're
+> >> > > going to need?
+> >> > >=20
+> >> > > Even if we think it is, would it be possible to provide for a fu=
+ture
+> >> > > extension to trees at next to no cost?
+> >> >=20
+> >> > I'm confident that a list of key,values is all we need for the
+> >> > current problem.
+> >>=20
+> >> I'm not convinced. A disk image may work with Q35 or i440fx,  or
+> >> work with any of virtio, ide or sata disk. So that already means
+> >> values have to be arrays, not scalars. You could do that with a
+> >> simple key,value list, but only by defining a mapping of arrays
+> >> into a flattened form. eg do we allow repeated keys, or do we
+> >> allow array indexes on keys.=20
+> >
+> > No problem, we can support trees if it's necessary.
+> >
+> >
+> >> > The point here is to allow users to simply copy an existing disk
+> >> > image, and it will contain enough hints for a cloud stack to
+> >> > choose reasonable defaults for machine-type and disk type
+> >> > automatically.  Requiring the user to perform a separate step to
+> >> > encapsulate the disk image in another file format defeats the
+> >> > whole purpose of the proposal.
+> >>=20
+> >> It doesn't have to mean more work for the user - the application
+> >> that is used to create the image can do that on their behalf.
+> >> oVirt for example can import/export OVA files, containing OVF
+> >> metadata. I could imagine virt-manager, and other tools adding
+> >> export ability without much trouble if this was deemed a desirable
+> >> thing. Bundling gives ability to have multiple disk images in one
+> >> archive, which is something OVF does.
+> >
+> > I have the impression that "the application that is used to
+> > create the image" is a very large set.  It can be virt-manager,
+> > virt-install, virt-manager, or even QEMU itself.
+> >
+> > Today people can simply create a VM on virt-manager, or run QEMU
+> > manually, and upload the qcow2 image directly from its original
+> > location (they don't need to copy/export it).  Don't we want the
+> > same procedure to keep working instead of requiring users to use
+> > another tool?
+>=20
+> Today, I can take the disk out of my old computer, put it into my new
+> computer, and it just works.  Don't we want the same procedure to keep
+> working forever?
 
-On 05/23/2018 12:22 PM, Igor Mammedov wrote:
-> When QEMU is started with following CLI
->  -machine virt,gic-version=3,accel=kvm -cpu host -bios AAVMF_CODE.fd
-> it crashes with abort at
->  accel/kvm/kvm-all.c:2164:
->  KVM_SET_DEVICE_ATTR failed: Group 6 attr 0x000000000000c665: Invalid argument
-> 
-> Which is caused by implicit dependecy of kvm_arm_gicv3_reset() on
-dependency
-> arm_gicv3_icc_reset() where the later is called by CPU reset
-> reset callback.
-> 
-> However commit:
->  3b77f6c arm/boot: split load_dtb() from arm_load_kernel()
-> broke CPU reset callback registration in case
-> 
->   arm_load_kernel()
->       ...
->       if (!info->kernel_filename || info->firmware_loaded)
-> 
-> branch is taken, i.e. it's sufficient to provide a firmware
-> or do not provide kernel on CLI to skip cpu reset callback
-> registration, where before offending commit the callback
-> has been registered unconditionally.
-> 
-> Fix it by registering the callback right at the begging of
-beginning
-> arm_load_kernel() unconditionally instead of doing it at the end.
-> 
-> NOTE:
->  we probably should eleminate that dependency anyways as well as
-eliminate, anyway?
->  separate arch CPU reset parts from arm_load_kernel() into CPU
->  itself, but that refactoring that I probably would have to do
->  anyways later for CPU hotplug to work.
-may deserve some rewording.
-> 
-> Reported-by: Auger Eric <eric.auger@redhat.com>
-> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+I don't think the comparison is fair: downloading hard disk
+images for bare metal hardware is not as common as downloading
+guest disk images for cloud infrastructure.
 
-Thank you for the quick fix. It fixes the reported issue.
+>=20
+> Sadly, wanting something badly enough doesn't make actual solutions any
+> easier :)
 
-Reviewed-by: Eric Auger <eric.auger@redhat.com>
-Tested-by: Eric Auger <eric.auger@redhat.com>
+This part is true.  :)
 
-Thanks
+>=20
+> My point is: disk images (real or virtual) keep working in different
+> hardware contexts by a mixture of flexibility built into system softwar=
+e
+> on the image, disciplined evolution of hardware (real or virtual), and
+> dumb luck.  It works until it doesn't.  And then you get to tinker.
 
-Eric
-> ---
->  Thanks Andrew Jones <drjones@redhat.com> for host with reproducer.
-> ---
->  hw/arm/boot.c | 18 +++++++++---------
->  1 file changed, 9 insertions(+), 9 deletions(-)
-> 
-> diff --git a/hw/arm/boot.c b/hw/arm/boot.c
-> index 9496f33..1e48166 100644
-> --- a/hw/arm/boot.c
-> +++ b/hw/arm/boot.c
-> @@ -926,6 +926,15 @@ void arm_load_kernel(ARMCPU *cpu, struct arm_boot_info *info)
->      static const ARMInsnFixup *primary_loader;
->      AddressSpace *as = arm_boot_address_space(cpu, info);
->  
-> +    /* CPU objects (unlike devices) are not automatically reset on system
-> +     * reset, so we must always register a handler to do so. If we're
-> +     * actually loading a kernel, the handler is also responsible for
-> +     * arranging that we start it correctly.
-> +     */
-> +    for (cs = first_cpu; cs; cs = CPU_NEXT(cs)) {
-> +        qemu_register_reset(do_cpu_reset, ARM_CPU(cs));
-> +    }
-> +
->      /* The board code is not supposed to set secure_board_setup unless
->       * running its code in secure mode is actually possible, and KVM
->       * doesn't support secure.
-> @@ -1143,15 +1152,6 @@ void arm_load_kernel(ARMCPU *cpu, struct arm_boot_info *info)
->          ARM_CPU(cs)->env.boot_info = info;
->      }
->  
-> -    /* CPU objects (unlike devices) are not automatically reset on system
-> -     * reset, so we must always register a handler to do so. If we're
-> -     * actually loading a kernel, the handler is also responsible for
-> -     * arranging that we start it correctly.
-> -     */
-> -    for (cs = first_cpu; cs; cs = CPU_NEXT(cs)) {
-> -        qemu_register_reset(do_cpu_reset, ARM_CPU(cs));
-> -    }
-> -
->      if (!info->skip_dtb_autoload && have_dtb(info)) {
->          if (arm_load_dtb(info->dtb_start, info, info->dtb_limit, as) < 0) {
->              exit(1);
-> 
+Personally, I believe that tools for running and managing virtual
+hardware can and should be smarter than real hardware.
+
+>=20
+> With OVF, you solve the problem further up the stack: you do virtual
+> appliances instead of disk images.
+>=20
+
+I guess the main problem is that people are already using disk
+images as if they were virtual appliances.
+
+We can tell people to stop doing that and use OVF, but then we
+won't make anybody's life any easier: publishers of images might
+need to generate both qcow2 and OVF images if they want it to
+work with older hosts; consumers will need to find out if they
+need qcow2 or OVF.
+
+But I work too deep down the stack to tell if it's really
+important to avoid these problems or not.  And as you said, this
+doesn't make actual solutions any easier.
+
+
+> How much space that leaves for useful solutions at the level of QEMU I
+> can't say.
+
+I have no doubt about "useful", but I'm not sure about
+"important".
+
+I guess the question is if we have people with time and resources
+to work on solutions (whether using qcow2 or OVF).
+
+--=20
+Eduardo
