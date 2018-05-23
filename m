@@ -1,27 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38810)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39541)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1fLSeY-00063P-L0
-	for qemu-devel@nongnu.org; Wed, 23 May 2018 08:14:08 -0400
+	(envelope-from <bounces@canonical.com>) id 1fLSgQ-0007JX-45
+	for qemu-devel@nongnu.org; Wed, 23 May 2018 08:15:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1fLSeX-0007Di-BB
-	for qemu-devel@nongnu.org; Wed, 23 May 2018 08:14:02 -0400
-Date: Wed, 23 May 2018 09:13:44 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20180523121344.GB8988@localhost.localdomain>
-References: <20180518180440-mutt-send-email-mst@kernel.org>
-	<20180518170956.GI8615@redhat.com>
-	<20180518174133.GC25013@localhost.localdomain>
-	<87bmdc18q5.fsf@dusky.pond.sub.org>
-	<20180521182928.GO25013@localhost.localdomain>
-	<20180521184440.GB8214@redhat.com>
-	<20180521190112.GP25013@localhost.localdomain>
-	<87o9h6hb59.fsf@dusky.pond.sub.org>
+	(envelope-from <bounces@canonical.com>) id 1fLSgM-0008SB-VG
+	for qemu-devel@nongnu.org; Wed, 23 May 2018 08:15:58 -0400
+Received: from indium.canonical.com ([91.189.90.7]:39744)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1fLSgM-0008Ro-Od
+	for qemu-devel@nongnu.org; Wed, 23 May 2018 08:15:54 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1fLSgL-00039s-L8
+	for <qemu-devel@nongnu.org>; Wed, 23 May 2018 12:15:53 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 870562E8F3A
+	for <qemu-devel@nongnu.org>; Wed, 23 May 2018 12:15:53 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <87o9h6hb59.fsf@dusky.pond.sub.org>
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] storing machine data in qcow images?
+Date: Wed, 23 May 2018 11:58:45 -0000
+From: Askar Safin <safinaskar@mail.ru>
+Reply-To: Bug 1425597 <1425597@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20150225170051.24385.73738.malonedeb@wampee.canonical.com>
+Message-Id: <152707672571.15942.11447307121906676548.malone@wampee.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1425597] Re: moving window + changing screen
+ resolution = bug
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,126 +37,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>, kwolf@redhat.com, qemu-block@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org, mreitz@redhat.com, stefanha@redhat.com
+To: qemu-devel@nongnu.org
 
-On Wed, May 23, 2018 at 01:19:46PM +0200, Markus Armbruster wrote:
-> Eduardo Habkost <ehabkost@redhat.com> writes:
->=20
-> > On Mon, May 21, 2018 at 07:44:40PM +0100, Daniel P. Berrang=E9 wrote:
-> >> On Mon, May 21, 2018 at 03:29:28PM -0300, Eduardo Habkost wrote:
-> >> > On Sat, May 19, 2018 at 08:05:06AM +0200, Markus Armbruster wrote:
-> >> > > Eduardo Habkost <ehabkost@redhat.com> writes:
-> >> > >=20
-> >> > > [...]
-> >> > > > About being more expressive than just a single list of key,val=
-ue
-> >> > > > pairs, I don't see any evidence of that being necessary for th=
-e
-> >> > > > problems we're trying to address.
-> >> > >=20
-> >> > > Short history of a configuration format you might have encounter=
-ed:
-> >>=20
-> >> [snip]
-> >>=20
-> >> > > How confident are we a single list of (key, value) is really all=
- we're
-> >> > > going to need?
-> >> > >=20
-> >> > > Even if we think it is, would it be possible to provide for a fu=
-ture
-> >> > > extension to trees at next to no cost?
-> >> >=20
-> >> > I'm confident that a list of key,values is all we need for the
-> >> > current problem.
-> >>=20
-> >> I'm not convinced. A disk image may work with Q35 or i440fx,  or
-> >> work with any of virtio, ide or sata disk. So that already means
-> >> values have to be arrays, not scalars. You could do that with a
-> >> simple key,value list, but only by defining a mapping of arrays
-> >> into a flattened form. eg do we allow repeated keys, or do we
-> >> allow array indexes on keys.=20
-> >
-> > No problem, we can support trees if it's necessary.
-> >
-> >
-> >> > The point here is to allow users to simply copy an existing disk
-> >> > image, and it will contain enough hints for a cloud stack to
-> >> > choose reasonable defaults for machine-type and disk type
-> >> > automatically.  Requiring the user to perform a separate step to
-> >> > encapsulate the disk image in another file format defeats the
-> >> > whole purpose of the proposal.
-> >>=20
-> >> It doesn't have to mean more work for the user - the application
-> >> that is used to create the image can do that on their behalf.
-> >> oVirt for example can import/export OVA files, containing OVF
-> >> metadata. I could imagine virt-manager, and other tools adding
-> >> export ability without much trouble if this was deemed a desirable
-> >> thing. Bundling gives ability to have multiple disk images in one
-> >> archive, which is something OVF does.
-> >
-> > I have the impression that "the application that is used to
-> > create the image" is a very large set.  It can be virt-manager,
-> > virt-install, virt-manager, or even QEMU itself.
-> >
-> > Today people can simply create a VM on virt-manager, or run QEMU
-> > manually, and upload the qcow2 image directly from its original
-> > location (they don't need to copy/export it).  Don't we want the
-> > same procedure to keep working instead of requiring users to use
-> > another tool?
->=20
-> Today, I can take the disk out of my old computer, put it into my new
-> computer, and it just works.  Don't we want the same procedure to keep
-> working forever?
+The bug is not present in Qemu 2.12 (version reported by dpkg: qemu-
+system-x86 1:2.12+dfsg-1+b1). There is similar minor bug instead. The
+new bug doesn't harm me and I am not even sure is this a bug.
 
-I don't think the comparison is fair: downloading hard disk
-images for bare metal hardware is not as common as downloading
-guest disk images for cloud infrastructure.
+So, this is info about new minor bug.
 
->=20
-> Sadly, wanting something badly enough doesn't make actual solutions any
-> easier :)
+Host is Debian Sid installed today (23 May MSK) with mentioned Qemu
+2.12. I run Qemu in X using:
 
-This part is true.  :)
+# qemu-system-x86_64 -m 1024 -daemonize -snapshot -drive
+file=3D/dev/sda,format=3Draw,cache=3Dnone -kernel /boot/vmlinuz* -initrd
+/boot/initrd* -append root=3D/dev/sda
 
->=20
-> My point is: disk images (real or virtual) keep working in different
-> hardware contexts by a mixture of flexibility built into system softwar=
-e
-> on the image, disciplined evolution of hardware (real or virtual), and
-> dumb luck.  It works until it doesn't.  And then you get to tinker.
+Then I started to move Qemu window using mouse. I kept Qemu window
+catched by my mouse while guest OS boot. At some moment guest OS (Linux)
+switched from text mode to framebuffer. Internal screen resolution
+changed, but Qemu window didn't change its size (I kept moving Qemu
+window all this time), but likely window content didn't scale (this is
+as opposed to 3d30395f [3d30395f7fb3315e4ecf0de4e48790e1326bbd47]
+behavior, 3d30395f scaled window content). So text in window remain
+concrete (not fluid, as opposed to 3d30395f). Then I tried to resize
+Qemu window and window size imidiately became normal, i. e. it started
+to fit content.
 
-Personally, I believe that tools for running and managing virtual
-hardware can and should be smarter than real hardware.
+All this is acceptable for me. I. e. I see this is nothing wrong when
+Qemu cannot change its window size when I move Qemu window
 
->=20
-> With OVF, you solve the problem further up the stack: you do virtual
-> appliances instead of disk images.
->=20
+-- =
 
-I guess the main problem is that people are already using disk
-images as if they were virtual appliances.
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1425597
 
-We can tell people to stop doing that and use OVF, but then we
-won't make anybody's life any easier: publishers of images might
-need to generate both qcow2 and OVF images if they want it to
-work with older hosts; consumers will need to find out if they
-need qcow2 or OVF.
+Title:
+  moving window + changing screen resolution =3D bug
 
-But I work too deep down the stack to tell if it's really
-important to avoid these problems or not.  And as you said, this
-doesn't make actual solutions any easier.
+Status in QEMU:
+  Incomplete
 
+Bug description:
+  Steps to reproduce:
+  1. Run qemu (sdl)
+  2. Start moving the window
+  3. At that moment the virtualized OS should change its screen resolution =
+(for example, when switching from initial qemu screen to grub)
 
-> How much space that leaves for useful solutions at the level of QEMU I
-> can't say.
+  What I see:
+  Window size doesn't change, but internal screen resolution changes, so, i=
+mage scale stops to be 1:1, now I see virtualized OS in wrong scale.
 
-I have no doubt about "useful", but I'm not sure about
-"important".
+  What I expected to see:
+  Window size changes so, that it keeps synchronized with internal resoluti=
+on (as usual)
 
-I guess the question is if we have people with time and resources
-to work on solutions (whether using qcow2 or OVF).
+  This bug preserves at lastest git version at the moment, i. e.
+  3d30395f7fb3315e4ecf0de4e48790e1326bbd47
 
---=20
-Eduardo
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1425597/+subscriptions
