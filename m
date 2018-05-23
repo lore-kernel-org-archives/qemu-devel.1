@@ -1,29 +1,38 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56715)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57309)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <patryk@fala.ehost.pl>) id 1fLWwP-0001kM-PV
-	for qemu-devel@nongnu.org; Wed, 23 May 2018 12:48:46 -0400
+	(envelope-from <marcel.apfelbaum@gmail.com>) id 1fLWyb-0002av-IY
+	for qemu-devel@nongnu.org; Wed, 23 May 2018 12:51:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <patryk@fala.ehost.pl>) id 1fLWwL-00044E-P6
-	for qemu-devel@nongnu.org; Wed, 23 May 2018 12:48:45 -0400
-Received: from s16.ehost.pl ([193.143.77.16]:50030)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <patryk@fala.ehost.pl>)
-	id 1fLWwL-00043b-Dk
-	for qemu-devel@nongnu.org; Wed, 23 May 2018 12:48:41 -0400
-References: <1526752108-21204-1-git-send-email-patryk@fala.ehost.pl>
-	<87o9h7q53u.fsf@dusky.pond.sub.org>
-	<CAFEAcA-ce=r3izLyizhEo+a4Fkg5dQ-NnDgHRJ4GsomnqQsqRw@mail.gmail.com>
-	<187f5c5b-6ce3-a9d0-3431-4e0109292888@fala.ehost.pl>
-	<87zi0qba1n.fsf@dusky.pond.sub.org>
-From: Patryk Olszewski <patryk@fala.ehost.pl>
-Message-ID: <b3a6e022-5789-43a2-d32b-b22c8cccf7ef@fala.ehost.pl>
-Date: Wed, 23 May 2018 18:48:38 +0200
+	(envelope-from <marcel.apfelbaum@gmail.com>) id 1fLWyY-0005Aq-AJ
+	for qemu-devel@nongnu.org; Wed, 23 May 2018 12:51:01 -0400
+Received: from mail-wm0-x243.google.com ([2a00:1450:400c:c09::243]:55648)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <marcel.apfelbaum@gmail.com>)
+	id 1fLWyY-00059o-0W
+	for qemu-devel@nongnu.org; Wed, 23 May 2018 12:50:58 -0400
+Received: by mail-wm0-x243.google.com with SMTP id a8-v6so10808167wmg.5
+	for <qemu-devel@nongnu.org>; Wed, 23 May 2018 09:50:57 -0700 (PDT)
+References: <ef3fc85d-7726-c888-e8ca-9dfae1b908d3@gmail.com>
+	<17a3765f-b835-2d45-e8b9-ffd4aff909f9@redhat.com>
+	<cbdfe0d6-f071-3560-009d-3bbdde12b33c@gmail.com>
+	<f71a8c61-a0d7-6ebc-62ad-3dab8b9f8e5a@redhat.com>
+	<20180522234410-mutt-send-email-mst@kernel.org>
+	<20180522153659.2e33fbe0@w520.home>
+	<20180523004236-mutt-send-email-mst@kernel.org>
+	<20180522154741.3939d1e0@w520.home>
+	<20180523005048-mutt-send-email-mst@kernel.org>
+	<20180522222856.436c2c96@w520.home>
+	<20180523171028-mutt-send-email-mst@kernel.org>
+From: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+Message-ID: <74728cc8-0e18-d344-8a88-cf54fd8dc95f@gmail.com>
+Date: Wed, 23 May 2018 19:50:53 +0300
 MIME-Version: 1.0
-In-Reply-To: <87zi0qba1n.fsf@dusky.pond.sub.org>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <20180523171028-mutt-send-email-mst@kernel.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Content-Language: en-US
-Subject: Re: [Qemu-devel] [PATCH] Remove unwanted crlf conversion in serial
+Subject: Re: [Qemu-devel] [RFC 3/3] acpi-build: allocate mcfg for multiple
+ host bridges
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,79 +41,87 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>, Alex Williamson <alex.williamson@redhat.com>
+Cc: Laszlo Ersek <lersek@redhat.com>, Zihan Yang <whois.zihan.yang@gmail.com>, qemu-devel@nongnu.org, Igor Mammedov <imammedo@redhat.com>, Eric Auger <eauger@redhat.com>, Drew Jones <drjones@redhat.com>, Wei Huang <wei@redhat.com>
 
-W dniu 23.05.2018 o 18:40, Markus Armbruster pisze:
-> Patryk <patryk@fala.ehost.pl> writes:
->
->> W dniu 22.05.2018 o 15:07, Peter Maydell pisze:
->>> On 22 May 2018 at 12:53, Markus Armbruster <armbru@redhat.com> wrote:
->>>> Patryk Olszewski <patryk@fala.ehost.pl> writes:
+
+
+On 05/23/2018 05:25 PM, Michael S. Tsirkin wrote:
+> On Tue, May 22, 2018 at 10:28:56PM -0600, Alex Williamson wrote:
+>> On Wed, 23 May 2018 02:38:52 +0300
+>> "Michael S. Tsirkin" <mst@redhat.com> wrote:
+>>
+>>> On Tue, May 22, 2018 at 03:47:41PM -0600, Alex Williamson wrote:
+>>>> On Wed, 23 May 2018 00:44:22 +0300
+>>>> "Michael S. Tsirkin" <mst@redhat.com> wrote:
+>>>>    
+>>>>> On Tue, May 22, 2018 at 03:36:59PM -0600, Alex Williamson wrote:
+>>>>>> On Tue, 22 May 2018 23:58:30 +0300
+>>>>>> "Michael S. Tsirkin" <mst@redhat.com> wrote:
+>>>>>>> It's not hard to think of a use-case where >256 devices
+>>>>>>> are helpful, for example a nested virt scenario where
+>>>>>>> each device is passed on to a different nested guest.
+>>>>>>>
+>>>>>>> But I think the main feature this is needed for is numa modeling.
+>>>>>>> Guests seem to assume a numa node per PCI root, ergo we need more PCI
+>>>>>>> roots.
+>>>>>> But even if we have NUMA affinity per PCI host bridge, a PCI host
+>>>>>> bridge does not necessarily imply a new PCIe domain.
+>>>>> What are you calling a PCIe domain?
+>>>> Domain/segment
 >>>>
->>>>> Signed-off-by: Patryk Olszewski <patryk@fala.ehost.pl>
->>>>> ---
->>>>>  chardev/char-serial.c | 2 +-
->>>>>  1 file changed, 1 insertion(+), 1 deletion(-)
->>>>>
->>>>> diff --git a/chardev/char-serial.c b/chardev/char-serial.c
->>>>> index feb52e5..ae548d2 100644
->>>>> --- a/chardev/char-serial.c
->>>>> +++ b/chardev/char-serial.c
->>>>> @@ -139,7 +139,7 @@ static void tty_serial_init(int fd, int speed,
->>>>>
->>>>>      tty.c_iflag &= ~(IGNBRK | BRKINT | PARMRK | ISTRIP
->>>>>                       | INLCR | IGNCR | ICRNL | IXON);
->>>>> -    tty.c_oflag |= OPOST;
->>>>> +    tty.c_oflag &= ~OPOST;
->>>>>      tty.c_lflag &= ~(ECHO | ECHONL | ICANON | IEXTEN | ISIG);
->>>>>      tty.c_cflag &= ~(CSIZE | PARENB | PARODD | CRTSCTS | CSTOPB);
->>>>>      switch (data_bits) {
->>>> This change may well make sense, but your commit message needs to
->>>> explain *why*.
->>>>
->>>> For what it's worth, POSIX documents OPOST as "Post-process output", and
->>>> the Linux manual page as "Enable implementation-defined output
->>>> processing."
->>> We've set OPOST on our terminals since forever, right back to
->>> commit 0824d6fc674 in 2003. Not setting it seems like the right thing,
->>> though, since we're generally otherwise setting the thing up to be a
->>> raw mode tty (and if we're connecting this to a guest then raw seems
->>> like what we want).
->>>
->>> I wonder whether connecting, say, the HMP monitor to a 'serial'
->>> chardev (a) works now (b) ends up with stair-step output after
->>> this change (c) is something we care about...
->>>
->>> thanks
->>> -- PMM
->>>
->> This patch is here to help fix years old bug of lf being replaced with
->> crlf in serial, which is super problematic in binary transmissions,
->> making communication with devices through serial from guest almost
->> impossible.
->>
->> Setting OPOST flag in c_oflag enables the output processing, in other
->> words it makes any other flag set in c_oflag come into action. From my
->> quick experiment on serial devices on Linux I found out that by default
->> c_oflag has enabled ONLCR flag, which is the one responsible for the
->> crlf conversion. Unsetting OPOST disables it.
->>
->> Bug reports related to that:
->>
->> https://bugs.launchpad.net/qemu/+bug/1772086
->>
->> https://bugs.launchpad.net/qemu/+bug/1407813
->>
->> https://bugs.launchpad.net/qemu/+bug/1715296
->>
->> also
->>
->> https://lists.nongnu.org/archive/html/qemu-devel/2006-06/msg00196.html
-> Work that into your commit message, and you got a fine patch as far as
-> I'm concerned :)
+>>>> 0000:00:00.0
+>>>> ^^^^ This
+>>> Right. So we can thinkably have PCIe root complexes share an ACPI segment.
+>>> I don't see what this buys us by itself.
+>> The ability to define NUMA locality for a PCI sub-hierarchy while
+>> maintaining compatibility with non-segment aware OSes (and firmware).
+> Fur sure, but NUMA is a kind of advanced topic, MCFG has been around for
+> longer than various NUMA tables. Are there really non-segment aware
+> guests that also know how to make use of NUMA?
 >
-First time contribution to such large project. Trying to learn how to
-properly work with mailing lists and such. If there's something I
-actually have to do now I'd like to get some pointers on how to do it.
-Thank you,
+
+Yes, the current pxb devices accomplish exactly that. Multiple NUMA nodes
+while sharing PCI domain 0.
+
+Thanks,
+Marcel
+
+>>>> Isn't that the only reason we'd need a new MCFG section and the reason
+>>>> we're limited to 256 buses?  Thanks,
+>>>>
+>>>> Alex
+>>> I don't know whether a single MCFG section can describe multiple roots.
+>>> I think it would be certainly unusual.
+>> I'm not sure here if you're referring to the actual MCFG ACPI table or
+>> the MMCONFIG range, aka the ECAM.  Neither of these describe PCI host
+>> bridges.  The MCFG table can describe one or more ECAM ranges, which
+>> provides the ECAM base address, the PCI segment associated with that
+>> ECAM and the start and end bus numbers to know the offset and extent of
+>> the ECAM range.  PCI host bridges would then theoretically be separate
+>> ACPI objects with _SEG and _BBN methods to associate them to the
+>> correct ECAM range by segment number and base bus number.  So it seems
+>> that tooling exists that an ECAM/MMCONFIG range could be provided per
+>> PCI host bridge, even if they exist within the same domain, but in
+>> practice what I see on systems I have access to is a single MMCONFIG
+>> range supporting all of the host bridges.  It also seems there are
+>> numerous ways to describe the MMCONFIG range and I haven't actually
+>> found an example that seems to use the MCFG table.  Two have MCFG
+>> tables (that don't seem terribly complete) and the kernel claims to
+>> find the MMCONFIG via e820, another doesn't even have an MCFG table and
+>> the kernel claims to find MMCONFIG via an ACPI motherboard resource.
+>> I'm not sure if I can enable PCI segments on anything to see how the
+>> firmware changes.  Thanks,
+>>
+>> Alex
+> Let me clarify.  So MCFG have base address allocation structures.
+> Each maps a segment and a range of bus numbers into memory.
+> This structure is what I meant.
+>
+> IIUC you are saying on your systems everything is within a single
+> segment, right? Multiple pci hosts map into a single segment?
+>
+> If you do this you can do NUMA, but do not gain > 256 devices.
+>
+> Are we are the same page then?
+>
