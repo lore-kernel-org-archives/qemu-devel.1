@@ -1,31 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34330)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37166)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fLMAA-0004e4-Qf
-	for qemu-devel@nongnu.org; Wed, 23 May 2018 01:18:15 -0400
+	(envelope-from <thuth@redhat.com>) id 1fLMMH-0007Px-8t
+	for qemu-devel@nongnu.org; Wed, 23 May 2018 01:30:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fLMA7-00088o-Ms
-	for qemu-devel@nongnu.org; Wed, 23 May 2018 01:18:14 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:60664 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1fLMA7-00088g-IJ
-	for qemu-devel@nongnu.org; Wed, 23 May 2018 01:18:11 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.4])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id BE0E2401EF04
-	for <qemu-devel@nongnu.org>; Wed, 23 May 2018 05:18:10 +0000 (UTC)
-References: <20180522195038.25280-1-pbonzini@redhat.com>
+	(envelope-from <thuth@redhat.com>) id 1fLMMG-0004Xn-En
+	for qemu-devel@nongnu.org; Wed, 23 May 2018 01:30:45 -0400
+References: <20180522191743.12872-1-pbonzini@redhat.com>
 From: Thomas Huth <thuth@redhat.com>
-Message-ID: <76154838-8b84-31d0-c1de-0d36c8259aa5@redhat.com>
-Date: Wed, 23 May 2018 07:18:08 +0200
+Message-ID: <336d4fa2-623c-1cb6-829d-71cf7039431e@redhat.com>
+Date: Wed, 23 May 2018 07:30:34 +0200
 MIME-Version: 1.0
-In-Reply-To: <20180522195038.25280-1-pbonzini@redhat.com>
+In-Reply-To: <20180522191743.12872-1-pbonzini@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH RFC] hw: make virtio devices configurable
- via default-configs/
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH] ppc: move at24c to its own
+ CONFIG_ symbol
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,28 +25,48 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
-Cc: ehabkost@redhat.com
+Cc: qemu-trivial@nongnu.org, qemu-ppc@nongnu.org, qemu-arm@nongnu.org, Michael Davidsaver <mdavidsaver@gmail.com>
 
-On 22.05.2018 21:50, Paolo Bonzini wrote:
-> This is only half of the work, because the proxy devices (virtio-*-pci,
-> virtio-*-ccw, etc.) are still included unconditionally.  It is still a
-> move in the right direction.
-[...]
-> diff --git a/hw/virtio/Makefile.objs b/hw/virtio/Makefile.objs
-> index 765d363c1f..1b2799cfd8 100644
-> --- a/hw/virtio/Makefile.objs
-> +++ b/hw/virtio/Makefile.objs
-> @@ -1,15 +1,17 @@
->  ifeq ($(CONFIG_VIRTIO),y)
-> -common-obj-y +=3D virtio-rng.o
-> -common-obj-$(CONFIG_VIRTIO_PCI) +=3D virtio-pci.o
->  common-obj-y +=3D virtio-bus.o
-> -common-obj-y +=3D virtio-mmio.o
-> +obj-y +=3D virtio.o
+On 22.05.2018 21:17, Paolo Bonzini wrote:
+> AT24c EEPROM is currently gated by CONFIG_I2C, and as such it is
+> being included in all emulators that use I2C, even if they do not
+> really need it.  Separate it and, since it was added for the e500
+> machines, add it to qemu-system-ppc and qemu-system-ppc64.
+> ---
+>  default-configs/ppc-softmmu.mak | 1 +
+>  hw/nvram/Makefile.objs          | 2 +-
+>  2 files changed, 2 insertions(+), 1 deletion(-)
+> 
+> diff --git a/default-configs/ppc-softmmu.mak b/default-configs/ppc-softmmu.mak
+> index 4d7be45ac5..c57e568121 100644
+> --- a/default-configs/ppc-softmmu.mak
+> +++ b/default-configs/ppc-softmmu.mak
+> @@ -26,6 +26,7 @@ CONFIG_USB_EHCI_SYSBUS=y
+>  CONFIG_SM501=y
+>  CONFIG_IDE_SII3112=y
+>  CONFIG_I2C=y
+> +CONFIG_AT24C=y
+>  
+>  # For Macs
+>  CONFIG_MAC=y
+> diff --git a/hw/nvram/Makefile.objs b/hw/nvram/Makefile.objs
+> index a912d25391..b318e53a43 100644
+> --- a/hw/nvram/Makefile.objs
+> +++ b/hw/nvram/Makefile.objs
+> @@ -1,6 +1,6 @@
+>  common-obj-$(CONFIG_DS1225Y) += ds1225y.o
+>  common-obj-y += eeprom93xx.o
+> -common-obj-$(CONFIG_I2C) += eeprom_at24c.o
+> +common-obj-$(CONFIG_AT24C) += eeprom_at24c.o
+>  common-obj-y += fw_cfg.o
+>  common-obj-y += chrp_nvram.o
+>  common-obj-$(CONFIG_MAC_NVRAM) += mac_nvram.o
 
-While you're at it, I think you could also remove the ifeq at the
-beginning of this file, and change the virtio-bus.o and virtio.o lines
-to use $(CONFIG_VIRTIO) instead of "y".
-But it's just a matter of taste, so either way:
+Since this is a device that can only be added by the user (no board is
+using it automatically, as far as I can see), it could be useful for
+other machines, too, I guess? Anyway, it's a good idea to have a
+separate config switch available for it, and we can add it to other
+machines again later if somebody feels that it is necessary, so (once
+you add your SoB):
 
 Reviewed-by: Thomas Huth <thuth@redhat.com>
