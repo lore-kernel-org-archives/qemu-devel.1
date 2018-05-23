@@ -1,16 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57576)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57597)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fLQXd-0005iJ-6d
-	for qemu-devel@nongnu.org; Wed, 23 May 2018 05:58:45 -0400
+	(envelope-from <kwolf@redhat.com>) id 1fLQXf-0005jk-0p
+	for qemu-devel@nongnu.org; Wed, 23 May 2018 05:58:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fLQXc-0004dS-AC
-	for qemu-devel@nongnu.org; Wed, 23 May 2018 05:58:45 -0400
+	(envelope-from <kwolf@redhat.com>) id 1fLQXe-0004fl-Cb
+	for qemu-devel@nongnu.org; Wed, 23 May 2018 05:58:47 -0400
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Wed, 23 May 2018 11:58:29 +0200
-Message-Id: <20180523095830.24362-2-kwolf@redhat.com>
-In-Reply-To: <20180523095830.24362-1-kwolf@redhat.com>
-References: <20180523095830.24362-1-kwolf@redhat.com>
-Subject: [Qemu-devel] [PATCH 1/2] qemu-iotests: Add more tests to
+Date: Wed, 23 May 2018 11:58:28 +0200
+Message-Id: <20180523095830.24362-1-kwolf@redhat.com>
+Subject: [Qemu-devel] [PATCH 0/2] qemu-iotests: Add more tests to
  "migration" group
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -23,53 +21,14 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, quintela@redhat.com, qemu-devel@nongnu.org
 
-grep for "migrate" turns up a few test cases which use migration, but
-haven't been in the "migration" group so far. Add them to the group.
+Kevin Wolf (2):
+  qemu-iotests: Add more tests to "migration" group
+  qemu-iotests: Remove MIG_SOCKET from non-migration tests
 
-Signed-off-by: Kevin Wolf <kwolf@redhat.com>
----
+ tests/qemu-iotests/185   |  2 --
+ tests/qemu-iotests/191   |  2 --
  tests/qemu-iotests/group | 10 +++++-----
- 1 file changed, 5 insertions(+), 5 deletions(-)
+ 3 files changed, 5 insertions(+), 9 deletions(-)
 
-diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
-index cc8cd8cc8e..60ba31b292 100644
---- a/tests/qemu-iotests/group
-+++ b/tests/qemu-iotests/group
-@@ -97,7 +97,7 @@
- 088 rw auto quick
- 089 rw auto quick
- 090 rw auto quick
--091 rw auto
-+091 rw auto migration
- 092 rw auto quick
- 093 auto
- 094 rw auto quick
-@@ -169,7 +169,7 @@
- 162 auto quick
- 163 rw auto
- 165 rw auto quick
--169 rw auto quick
-+169 rw auto quick migration
- 170 rw auto quick
- 171 rw auto quick
- 172 auto
-@@ -194,14 +194,14 @@
- 192 rw auto quick
- 194 rw auto migration quick
- 195 rw auto quick
--196 rw auto quick
-+196 rw auto quick migration
- 197 rw auto quick
- 198 rw auto
--199 rw auto
-+199 rw auto migration
- 200 rw auto
- 201 rw auto migration
- 202 rw auto quick
--203 rw auto
-+203 rw auto migration
- 204 rw auto quick
- 205 rw auto quick
- 206 rw auto
 -- 
 2.13.6
