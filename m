@@ -1,32 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45514)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46203)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fLT6M-0003qD-GM
-	for qemu-devel@nongnu.org; Wed, 23 May 2018 08:42:48 -0400
+	id 1fLT9L-0004oN-ED
+	for qemu-devel@nongnu.org; Wed, 23 May 2018 08:45:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fLT6I-0004yx-RX
-	for qemu-devel@nongnu.org; Wed, 23 May 2018 08:42:46 -0400
-Received: from mail-qt0-x242.google.com ([2607:f8b0:400d:c0d::242]:42581)
+	id 1fLT9H-000692-GT
+	for qemu-devel@nongnu.org; Wed, 23 May 2018 08:45:51 -0400
+Received: from mail-qk0-x243.google.com ([2607:f8b0:400d:c09::243]:45974)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fLT6I-0004yn-Lv
-	for qemu-devel@nongnu.org; Wed, 23 May 2018 08:42:42 -0400
-Received: by mail-qt0-x242.google.com with SMTP id c2-v6so27798955qtn.9
-	for <qemu-devel@nongnu.org>; Wed, 23 May 2018 05:42:42 -0700 (PDT)
+	id 1fLT9H-00068u-9b
+	for qemu-devel@nongnu.org; Wed, 23 May 2018 08:45:47 -0400
+Received: by mail-qk0-x243.google.com with SMTP id a8-v6so17278059qkj.12
+	for <qemu-devel@nongnu.org>; Wed, 23 May 2018 05:45:47 -0700 (PDT)
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
 References: <1527034517-7851-1-git-send-email-mjc@sifive.com>
-	<1527034517-7851-21-git-send-email-mjc@sifive.com>
+	<1527034517-7851-30-git-send-email-mjc@sifive.com>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <9637c847-38ae-f12b-73ab-507b741b8238@amsat.org>
-Date: Wed, 23 May 2018 09:42:38 -0300
+Message-ID: <82d26b5c-c6a6-62d6-d167-aebc23366885@amsat.org>
+Date: Wed, 23 May 2018 09:45:41 -0300
 MIME-Version: 1.0
-In-Reply-To: <1527034517-7851-21-git-send-email-mjc@sifive.com>
+In-Reply-To: <1527034517-7851-30-git-send-email-mjc@sifive.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v1 20/30] RISC-V: Add misa to DisasContext
+Subject: Re: [Qemu-devel] [PATCH v1 29/30] RISC-V: Don't add NULL bootargs
+ to device-tree
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,304 +37,64 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Michael Clark <mjc@sifive.com>, qemu-devel@nongnu.org
-Cc: Sagar Karandikar <sagark@eecs.berkeley.edu>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Palmer Dabbelt <palmer@sifive.com>, "Emilio G . Cota" <cota@braap.org>, Alistair Francis <Alistair.Francis@wdc.com>, patches@groups.riscv.org
+Cc: patches@groups.riscv.org
 
 On 05/22/2018 09:15 PM, Michael Clark wrote:
-> gen methods should access state from DisasContext. Add misa
-> field to the DisasContext struct and remove CPURISCVState
-> argument from all gen methods.
-> 
-> Cc: Palmer Dabbelt <palmer@sifive.com>
-> Cc: Sagar Karandikar <sagark@eecs.berkeley.edu>
-> Cc: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
-> Cc: Alistair Francis <Alistair.Francis@wdc.com>
-> Cc: Emilio G. Cota <cota@braap.org>
-> Signed-off-by: Michael Clark <mjc@sifive.com>
-> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
-I already reviewed this one:
-http://lists.nongnu.org/archive/html/qemu-devel/2018-05/msg02255.html
-
+With your Signed-off-by:
 Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
 > ---
->  target/riscv/translate.c | 78 ++++++++++++++++++++++++++----------------------
->  1 file changed, 42 insertions(+), 36 deletions(-)
+>  hw/riscv/sifive_u.c | 4 +++-
+>  hw/riscv/spike.c    | 6 ++++--
+>  hw/riscv/virt.c     | 4 +++-
+>  3 files changed, 10 insertions(+), 4 deletions(-)
 > 
-> diff --git a/target/riscv/translate.c b/target/riscv/translate.c
-> index a980611eb611..fd21b133a5a4 100644
-> --- a/target/riscv/translate.c
-> +++ b/target/riscv/translate.c
-> @@ -45,6 +45,7 @@ typedef struct DisasContext {
->      target_ulong pc_succ_insn;
->      uint32_t opcode;
->      uint32_t mstatus_fs;
-> +    uint32_t misa;
->      uint32_t mem_idx;
->      /* Remember the rounding mode encoded in the previous fp instruction,
->         which we have already installed into env->fp_status.  Or -1 for
-> @@ -74,6 +75,11 @@ static const int tcg_memop_lookup[8] = {
->  #define CASE_OP_32_64(X) case X
->  #endif
+> diff --git a/hw/riscv/sifive_u.c b/hw/riscv/sifive_u.c
+> index 326b0f434cff..02721d43c474 100644
+> --- a/hw/riscv/sifive_u.c
+> +++ b/hw/riscv/sifive_u.c
+> @@ -206,7 +206,9 @@ static void create_fdt(SiFiveUState *s, const struct MemmapEntry *memmap,
 >  
-> +static inline bool has_ext(DisasContext *ctx, uint32_t ext)
-> +{
-> +    return ctx->misa & ext;
-> +}
-> +
->  static void generate_exception(DisasContext *ctx, int excp)
->  {
->      tcg_gen_movi_tl(cpu_pc, ctx->base.pc_next);
-> @@ -505,14 +511,13 @@ static void gen_arith_imm(DisasContext *ctx, uint32_t opc, int rd,
->      tcg_temp_free(source1);
+>      qemu_fdt_add_subnode(fdt, "/chosen");
+>      qemu_fdt_setprop_string(fdt, "/chosen", "stdout-path", nodename);
+> -    qemu_fdt_setprop_string(fdt, "/chosen", "bootargs", cmdline);
+> +    if (cmdline) {
+> +        qemu_fdt_setprop_string(fdt, "/chosen", "bootargs", cmdline);
+> +    }
+>      g_free(nodename);
 >  }
 >  
-> -static void gen_jal(CPURISCVState *env, DisasContext *ctx, int rd,
-> -                    target_ulong imm)
-> +static void gen_jal(DisasContext *ctx, int rd, target_ulong imm)
->  {
->      target_ulong next_pc;
+> diff --git a/hw/riscv/spike.c b/hw/riscv/spike.c
+> index f94e2b670799..5dd7d28aed4e 100644
+> --- a/hw/riscv/spike.c
+> +++ b/hw/riscv/spike.c
+> @@ -156,8 +156,10 @@ static void create_fdt(SpikeState *s, const struct MemmapEntry *memmap,
+>      g_free(cells);
+>      g_free(nodename);
 >  
->      /* check misaligned: */
->      next_pc = ctx->base.pc_next + imm;
-> -    if (!riscv_has_ext(env, RVC)) {
-> +    if (!has_ext(ctx, RVC)) {
->          if ((next_pc & 0x3) != 0) {
->              gen_exception_inst_addr_mis(ctx);
->              return;
-> @@ -526,8 +531,8 @@ static void gen_jal(CPURISCVState *env, DisasContext *ctx, int rd,
->      ctx->base.is_jmp = DISAS_NORETURN;
->  }
+> -    qemu_fdt_add_subnode(fdt, "/chosen");
+> -    qemu_fdt_setprop_string(fdt, "/chosen", "bootargs", cmdline);
+> +    if (cmdline) {
+> +        qemu_fdt_add_subnode(fdt, "/chosen");
+> +        qemu_fdt_setprop_string(fdt, "/chosen", "bootargs", cmdline);
+> +    }
+>   }
 >  
-> -static void gen_jalr(CPURISCVState *env, DisasContext *ctx, uint32_t opc,
-> -                     int rd, int rs1, target_long imm)
-> +static void gen_jalr(DisasContext *ctx, uint32_t opc, int rd, int rs1,
-> +                     target_long imm)
->  {
->      /* no chaining with JALR */
->      TCGLabel *misaligned = NULL;
-> @@ -539,7 +544,7 @@ static void gen_jalr(CPURISCVState *env, DisasContext *ctx, uint32_t opc,
->          tcg_gen_addi_tl(cpu_pc, cpu_pc, imm);
->          tcg_gen_andi_tl(cpu_pc, cpu_pc, (target_ulong)-2);
+>  static void spike_v1_10_0_board_init(MachineState *machine)
+> diff --git a/hw/riscv/virt.c b/hw/riscv/virt.c
+> index 321fa6e8122a..c889aa3cd269 100644
+> --- a/hw/riscv/virt.c
+> +++ b/hw/riscv/virt.c
+> @@ -253,7 +253,9 @@ static void *create_fdt(RISCVVirtState *s, const struct MemmapEntry *memmap,
 >  
-> -        if (!riscv_has_ext(env, RVC)) {
-> +        if (!has_ext(ctx, RVC)) {
->              misaligned = gen_new_label();
->              tcg_gen_andi_tl(t0, cpu_pc, 0x2);
->              tcg_gen_brcondi_tl(TCG_COND_NE, t0, 0x0, misaligned);
-> @@ -564,8 +569,8 @@ static void gen_jalr(CPURISCVState *env, DisasContext *ctx, uint32_t opc,
->      tcg_temp_free(t0);
->  }
+>      qemu_fdt_add_subnode(fdt, "/chosen");
+>      qemu_fdt_setprop_string(fdt, "/chosen", "stdout-path", nodename);
+> -    qemu_fdt_setprop_string(fdt, "/chosen", "bootargs", cmdline);
+> +    if (cmdline) {
+> +        qemu_fdt_setprop_string(fdt, "/chosen", "bootargs", cmdline);
+> +    }
+>      g_free(nodename);
 >  
-> -static void gen_branch(CPURISCVState *env, DisasContext *ctx, uint32_t opc,
-> -                       int rs1, int rs2, target_long bimm)
-> +static void gen_branch(DisasContext *ctx, uint32_t opc, int rs1, int rs2,
-> +                       target_long bimm)
->  {
->      TCGLabel *l = gen_new_label();
->      TCGv source1, source2;
-> @@ -602,7 +607,7 @@ static void gen_branch(CPURISCVState *env, DisasContext *ctx, uint32_t opc,
->  
->      gen_goto_tb(ctx, 1, ctx->pc_succ_insn);
->      gen_set_label(l); /* branch taken */
-> -    if (!riscv_has_ext(env, RVC) && ((ctx->base.pc_next + bimm) & 0x3)) {
-> +    if (!has_ext(ctx, RVC) && ((ctx->base.pc_next + bimm) & 0x3)) {
->          /* misaligned */
->          gen_exception_inst_addr_mis(ctx);
->      } else {
-> @@ -1311,8 +1316,8 @@ static void gen_fp_arith(DisasContext *ctx, uint32_t opc, int rd,
->      }
->  }
->  
-> -static void gen_system(CPURISCVState *env, DisasContext *ctx, uint32_t opc,
-> -                      int rd, int rs1, int csr)
-> +static void gen_system(DisasContext *ctx, uint32_t opc, int rd, int rs1,
-> +                       int csr)
->  {
->      TCGv source1, csr_store, dest, rs1_pass, imm_rs1;
->      source1 = tcg_temp_new();
-> @@ -1354,7 +1359,7 @@ static void gen_system(CPURISCVState *env, DisasContext *ctx, uint32_t opc,
->              gen_exception_illegal(ctx);
->              break;
->          case 0x102: /* SRET */
-> -            if (riscv_has_ext(env, RVS)) {
-> +            if (has_ext(ctx, RVS)) {
->                  gen_helper_sret(cpu_pc, cpu_env, cpu_pc);
->                  tcg_gen_exit_tb(0); /* no chaining */
->                  ctx->base.is_jmp = DISAS_NORETURN;
-> @@ -1495,7 +1500,7 @@ static void decode_RV32_64C0(DisasContext *ctx)
->      }
->  }
->  
-> -static void decode_RV32_64C1(CPURISCVState *env, DisasContext *ctx)
-> +static void decode_RV32_64C1(DisasContext *ctx)
->  {
->      uint8_t funct3 = extract32(ctx->opcode, 13, 3);
->      uint8_t rd_rs1 = GET_C_RS1(ctx->opcode);
-> @@ -1515,7 +1520,7 @@ static void decode_RV32_64C1(CPURISCVState *env, DisasContext *ctx)
->                        GET_C_IMM(ctx->opcode));
->  #else
->          /* C.JAL(RV32) -> jal x1, offset[11:1] */
-> -        gen_jal(env, ctx, 1, GET_C_J_IMM(ctx->opcode));
-> +        gen_jal(ctx, 1, GET_C_J_IMM(ctx->opcode));
->  #endif
->          break;
->      case 2:
-> @@ -1594,22 +1599,22 @@ static void decode_RV32_64C1(CPURISCVState *env, DisasContext *ctx)
->          break;
->      case 5:
->          /* C.J -> jal x0, offset[11:1]*/
-> -        gen_jal(env, ctx, 0, GET_C_J_IMM(ctx->opcode));
-> +        gen_jal(ctx, 0, GET_C_J_IMM(ctx->opcode));
->          break;
->      case 6:
->          /* C.BEQZ -> beq rs1', x0, offset[8:1]*/
->          rs1s = GET_C_RS1S(ctx->opcode);
-> -        gen_branch(env, ctx, OPC_RISC_BEQ, rs1s, 0, GET_C_B_IMM(ctx->opcode));
-> +        gen_branch(ctx, OPC_RISC_BEQ, rs1s, 0, GET_C_B_IMM(ctx->opcode));
->          break;
->      case 7:
->          /* C.BNEZ -> bne rs1', x0, offset[8:1]*/
->          rs1s = GET_C_RS1S(ctx->opcode);
-> -        gen_branch(env, ctx, OPC_RISC_BNE, rs1s, 0, GET_C_B_IMM(ctx->opcode));
-> +        gen_branch(ctx, OPC_RISC_BNE, rs1s, 0, GET_C_B_IMM(ctx->opcode));
->          break;
->      }
->  }
->  
-> -static void decode_RV32_64C2(CPURISCVState *env, DisasContext *ctx)
-> +static void decode_RV32_64C2(DisasContext *ctx)
->  {
->      uint8_t rd, rs2;
->      uint8_t funct3 = extract32(ctx->opcode, 13, 3);
-> @@ -1643,7 +1648,7 @@ static void decode_RV32_64C2(CPURISCVState *env, DisasContext *ctx)
->          if (extract32(ctx->opcode, 12, 1) == 0) {
->              if (rs2 == 0) {
->                  /* C.JR -> jalr x0, rs1, 0*/
-> -                gen_jalr(env, ctx, OPC_RISC_JALR, 0, rd, 0);
-> +                gen_jalr(ctx, OPC_RISC_JALR, 0, rd, 0);
->              } else {
->                  /* C.MV -> add rd, x0, rs2 */
->                  gen_arith(ctx, OPC_RISC_ADD, rd, 0, rs2);
-> @@ -1651,11 +1656,11 @@ static void decode_RV32_64C2(CPURISCVState *env, DisasContext *ctx)
->          } else {
->              if (rd == 0) {
->                  /* C.EBREAK -> ebreak*/
-> -                gen_system(env, ctx, OPC_RISC_ECALL, 0, 0, 0x1);
-> +                gen_system(ctx, OPC_RISC_ECALL, 0, 0, 0x1);
->              } else {
->                  if (rs2 == 0) {
->                      /* C.JALR -> jalr x1, rs1, 0*/
-> -                    gen_jalr(env, ctx, OPC_RISC_JALR, 1, rd, 0);
-> +                    gen_jalr(ctx, OPC_RISC_JALR, 1, rd, 0);
->                  } else {
->                      /* C.ADD -> add rd, rd, rs2 */
->                      gen_arith(ctx, OPC_RISC_ADD, rd, rd, rs2);
-> @@ -1687,7 +1692,7 @@ static void decode_RV32_64C2(CPURISCVState *env, DisasContext *ctx)
->      }
->  }
->  
-> -static void decode_RV32_64C(CPURISCVState *env, DisasContext *ctx)
-> +static void decode_RV32_64C(DisasContext *ctx)
->  {
->      uint8_t op = extract32(ctx->opcode, 0, 2);
->  
-> @@ -1696,15 +1701,15 @@ static void decode_RV32_64C(CPURISCVState *env, DisasContext *ctx)
->          decode_RV32_64C0(ctx);
->          break;
->      case 1:
-> -        decode_RV32_64C1(env, ctx);
-> +        decode_RV32_64C1(ctx);
->          break;
->      case 2:
-> -        decode_RV32_64C2(env, ctx);
-> +        decode_RV32_64C2(ctx);
->          break;
->      }
->  }
->  
-> -static void decode_RV32_64G(CPURISCVState *env, DisasContext *ctx)
-> +static void decode_RV32_64G(DisasContext *ctx)
->  {
->      int rs1;
->      int rs2;
-> @@ -1739,13 +1744,13 @@ static void decode_RV32_64G(CPURISCVState *env, DisasContext *ctx)
->          break;
->      case OPC_RISC_JAL:
->          imm = GET_JAL_IMM(ctx->opcode);
-> -        gen_jal(env, ctx, rd, imm);
-> +        gen_jal(ctx, rd, imm);
->          break;
->      case OPC_RISC_JALR:
-> -        gen_jalr(env, ctx, MASK_OP_JALR(ctx->opcode), rd, rs1, imm);
-> +        gen_jalr(ctx, MASK_OP_JALR(ctx->opcode), rd, rs1, imm);
->          break;
->      case OPC_RISC_BRANCH:
-> -        gen_branch(env, ctx, MASK_OP_BRANCH(ctx->opcode), rs1, rs2,
-> +        gen_branch(ctx, MASK_OP_BRANCH(ctx->opcode), rs1, rs2,
->                     GET_B_IMM(ctx->opcode));
->          break;
->      case OPC_RISC_LOAD:
-> @@ -1818,7 +1823,7 @@ static void decode_RV32_64G(CPURISCVState *env, DisasContext *ctx)
->  #endif
->          break;
->      case OPC_RISC_SYSTEM:
-> -        gen_system(env, ctx, MASK_OP_SYSTEM(ctx->opcode), rd, rs1,
-> +        gen_system(ctx, MASK_OP_SYSTEM(ctx->opcode), rd, rs1,
->                     (ctx->opcode & 0xFFF00000) >> 20);
->          break;
->      default:
-> @@ -1827,29 +1832,31 @@ static void decode_RV32_64G(CPURISCVState *env, DisasContext *ctx)
->      }
->  }
->  
-> -static void decode_opc(CPURISCVState *env, DisasContext *ctx)
-> +static void decode_opc(DisasContext *ctx)
->  {
->      /* check for compressed insn */
->      if (extract32(ctx->opcode, 0, 2) != 3) {
-> -        if (!riscv_has_ext(env, RVC)) {
-> +        if (!has_ext(ctx, RVC)) {
->              gen_exception_illegal(ctx);
->          } else {
->              ctx->pc_succ_insn = ctx->base.pc_next + 2;
-> -            decode_RV32_64C(env, ctx);
-> +            decode_RV32_64C(ctx);
->          }
->      } else {
->          ctx->pc_succ_insn = ctx->base.pc_next + 4;
-> -        decode_RV32_64G(env, ctx);
-> +        decode_RV32_64G(ctx);
->      }
->  }
->  
-> -static void riscv_tr_init_disas_context(DisasContextBase *dcbase, CPUState *cs)
-> +static void riscv_tr_init_disas_context(DisasContextBase *dcbase, CPUState *cpu)
->  {
->      DisasContext *ctx = container_of(dcbase, DisasContext, base);
-> +    CPURISCVState *env = cpu->env_ptr;
->  
->      ctx->pc_succ_insn = ctx->base.pc_first;
->      ctx->mem_idx = ctx->base.tb->flags & TB_FLAGS_MMU_MASK;
->      ctx->mstatus_fs = ctx->base.tb->flags & TB_FLAGS_MSTATUS_FS;
-> +    ctx->misa = env->misa;
->      ctx->frm = -1;  /* unknown rounding mode */
->  }
->  
-> @@ -1880,14 +1887,13 @@ static bool riscv_tr_breakpoint_check(DisasContextBase *dcbase, CPUState *cpu,
->      return true;
->  }
->  
-> -
->  static void riscv_tr_translate_insn(DisasContextBase *dcbase, CPUState *cpu)
->  {
->      DisasContext *ctx = container_of(dcbase, DisasContext, base);
->      CPURISCVState *env = cpu->env_ptr;
->  
->      ctx->opcode = cpu_ldl_code(env, ctx->base.pc_next);
-> -    decode_opc(env, ctx);
-> +    decode_opc(ctx);
->      ctx->base.pc_next = ctx->pc_succ_insn;
->  
->      if (ctx->base.is_jmp == DISAS_NEXT) {
+>      return fdt;
 > 
