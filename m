@@ -1,16 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35956)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35965)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1fLQxP-00083Y-NC
+	(envelope-from <vsementsov@virtuozzo.com>) id 1fLQxQ-000848-5A
 	for qemu-devel@nongnu.org; Wed, 23 May 2018 06:25:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1fLQxK-0003tb-3N
+	(envelope-from <vsementsov@virtuozzo.com>) id 1fLQxK-0003tU-3H
 	for qemu-devel@nongnu.org; Wed, 23 May 2018 06:25:23 -0400
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Wed, 23 May 2018 13:24:19 +0300
-Message-Id: <20180523102419.28665-6-vsementsov@virtuozzo.com>
+Date: Wed, 23 May 2018 13:24:16 +0300
+Message-Id: <20180523102419.28665-3-vsementsov@virtuozzo.com>
 In-Reply-To: <20180523102419.28665-1-vsementsov@virtuozzo.com>
 References: <20180523102419.28665-1-vsementsov@virtuozzo.com>
-Subject: [Qemu-devel] [PATCH v3 5/5] docs/interop: add nbd.txt
+Subject: [Qemu-devel] [PATCH v3 2/5] nbd/server: add
+ nbd_meta_empty_or_pattern helper
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,69 +23,131 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org, qemu-devel@nongnu.org
 Cc: armbru@redhat.com, pbonzini@redhat.com, eblake@redhat.com, mreitz@redhat.com, kwolf@redhat.com, vsementsov@virtuozzo.com, den@openvz.org
 
-Describe new metadata namespace: "qemu".
+Add nbd_meta_pattern() and nbd_meta_empty_or_pattern() helpers for
+metadata query parsing. nbd_meta_pattern() will be reused for "qemu"
+namespace in following patches.
 
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 ---
- docs/interop/nbd.txt | 37 +++++++++++++++++++++++++++++++++++++
- MAINTAINERS          |  1 +
- 2 files changed, 38 insertions(+)
- create mode 100644 docs/interop/nbd.txt
+ nbd/server.c | 82 ++++++++++++++++++++++++++++++++++++++++++------------------
+ 1 file changed, 57 insertions(+), 25 deletions(-)
 
-diff --git a/docs/interop/nbd.txt b/docs/interop/nbd.txt
-new file mode 100644
-index 0000000000..7366269fc0
---- /dev/null
-+++ b/docs/interop/nbd.txt
-@@ -0,0 +1,37 @@
-+Qemu supports NBD protocol, and has internal NBD client (look at
-+block/nbd.c), internal NBD server (look at blockdev-nbd.c) as well as
-+external NBD server tool - qemu-nbd.c. The common code is placed in
-+nbd/*.
-+
-+NBD protocol is specified here:
-+https://github.com/NetworkBlockDevice/nbd/blob/master/doc/proto.md
-+
-+This following paragraphs describe some specific properties of NBD
-+protocol realization in Qemu.
-+
-+
-+= Metadata namespaces =
-+
-+Qemu supports "base:allocation" metadata context as defined in the NBD
-+protocol specification and defines own metadata namespace: "qemu".
-+
-+
-+== "qemu" namespace ==
-+
-+For now, the only type of metadata context in the namespace is dirty
-+bitmap. All available metadata contexts have the following form:
-+
-+   qemu:dirty-bitmap:<dirty-bitmap-export-name>
-+
-+Each dirty-bitmap metadata context defines the only one flag for
-+extents in reply for NBD_CMD_BLOCK_STATUS:
-+
-+    bit 0: NBD_STATE_DIRTY, means that the extent is "dirty"
-+
-+For NBD_OPT_LIST_META_CONTEXT the following queries are supported
-+additionally to "qemu:dirty-bitmap:<dirty-bitmap-export-name>":
-+
-+* "qemu:" : returns list of all available metadata contexts in the
-+            namespace.
-+* "qemu:dirty-bitmap:" : returns list of all available dirty-bitmap
-+                         metadata contexts.
-diff --git a/MAINTAINERS b/MAINTAINERS
-index e187b1f18f..887b479440 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -1923,6 +1923,7 @@ F: nbd/
- F: include/block/nbd*
- F: qemu-nbd.*
- F: blockdev-nbd.c
-+F: docs/interop/nbd.txt
- T: git git://repo.or.cz/qemu/ericb.git nbd
+diff --git a/nbd/server.c b/nbd/server.c
+index 7584ff7dcc..8869dfe1f9 100644
+--- a/nbd/server.c
++++ b/nbd/server.c
+@@ -734,48 +734,79 @@ static int nbd_negotiate_send_meta_context(NBDClient *client,
+     return qio_channel_writev_all(client->ioc, iov, 2, errp) < 0 ? -EIO : 0;
+ }
  
- NFS
+-/* nbd_meta_base_query
+- *
+- * Handle query to 'base' namespace. For now, only base:allocation context is
+- * available in it.  'len' is the amount of text remaining to be read from
+- * the current name, after the 'base:' portion has been stripped.
++/* Read strlen(@pattern) bytes, and set @match to true if they match @pattern.
++ * @match is never set to false.
+  *
+  * Return -errno on I/O error, 0 if option was completely handled by
+  * sending a reply about inconsistent lengths, or 1 on success.
+  *
+- * Note: return code = 1 doesn't mean that we've parsed "base:allocation"
+- * namespace. It only means that there are no errors.*/
+-static int nbd_meta_base_query(NBDClient *client, NBDExportMetaContexts *meta,
+-                               uint32_t len, Error **errp)
++ * Note: return code = 1 doesn't mean that we've read exactly @pattern
++ * It only means that there are no errors. */
++static int nbd_meta_pattern(NBDClient *client, const char *pattern, bool *match,
++                            Error **errp)
+ {
+     int ret;
+-    char query[sizeof("allocation") - 1];
+-    size_t alen = strlen("allocation");
++    char *query;
++    int len = strlen(pattern);
++
++    assert(len);
++
++    query = g_malloc(len);
++    ret = nbd_opt_read(client, query, len, errp);
++    if (ret <= 0) {
++        g_free(query);
++        return ret;
++    }
++
++    if (strncmp(query, pattern, len) == 0) {
++        trace_nbd_negotiate_meta_query_parse(pattern);
++        *match = true;
++    }
++    g_free(query);
+ 
++    return 1;
++}
++
++/* Read @len bytes, and set @match to true if they match @pattern, or if @len
++ * is 0 and the client is performing _LIST_. @match is never set to false.
++ *
++ * Return -errno on I/O error, 0 if option was completely handled by
++ * sending a reply about inconsistent lengths, or 1 on success.
++ *
++ * Note: return code = 1 doesn't mean that we've read exactly @pattern
++ * It only means that there are no errors. */
++static int nbd_meta_empty_or_pattern(NBDClient *client, const char *pattern,
++                                     uint32_t len, bool *match, Error **errp)
++{
+     if (len == 0) {
+         if (client->opt == NBD_OPT_LIST_META_CONTEXT) {
+-            meta->base_allocation = true;
++            *match = true;
+         }
+-        trace_nbd_negotiate_meta_query_parse("base:");
++        trace_nbd_negotiate_meta_query_parse("empty");
+         return 1;
+     }
+ 
+-    if (len != alen) {
+-        trace_nbd_negotiate_meta_query_skip("not base:allocation");
++    if (len != strlen(pattern)) {
++        trace_nbd_negotiate_meta_query_skip("different lengths");
+         return nbd_opt_skip(client, len, errp);
+     }
+ 
+-    ret = nbd_opt_read(client, query, len, errp);
+-    if (ret <= 0) {
+-        return ret;
+-    }
+-
+-    if (strncmp(query, "allocation", alen) == 0) {
+-        trace_nbd_negotiate_meta_query_parse("base:allocation");
+-        meta->base_allocation = true;
+-    }
++    return nbd_meta_pattern(client, pattern, match, errp);
++}
+ 
+-    return 1;
++/* nbd_meta_base_query
++ *
++ * Handle query to 'base' namespace. For now, only base:allocation context is
++ * available in it.  'len' is the amount of text remaining to be read from
++ * the current name, after the 'base:' portion has been stripped.
++ *
++ * Return -errno on I/O error, 0 if option was completely handled by
++ * sending a reply about inconsistent lengths, or 1 on success. */
++static int nbd_meta_base_query(NBDClient *client, NBDExportMetaContexts *meta,
++                               uint32_t len, Error **errp)
++{
++    return nbd_meta_empty_or_pattern(client, "allocation", len,
++                                     &meta->base_allocation, errp);
+ }
+ 
+ /* nbd_negotiate_meta_query
+@@ -821,6 +852,7 @@ static int nbd_negotiate_meta_query(NBDClient *client,
+         return nbd_opt_skip(client, len, errp);
+     }
+ 
++    trace_nbd_negotiate_meta_query_parse("base:");
+     return nbd_meta_base_query(client, meta, len, errp);
+ }
+ 
 -- 
 2.11.1
