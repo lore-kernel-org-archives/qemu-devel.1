@@ -1,23 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43186)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43913)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <debby83729@gmail.com>) id 1fLRGw-00053w-Ql
-	for qemu-devel@nongnu.org; Wed, 23 May 2018 06:45:35 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1fLRL4-0006GA-VE
+	for qemu-devel@nongnu.org; Wed, 23 May 2018 06:49:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <debby83729@gmail.com>) id 1fLRGv-0000ja-N1
-	for qemu-devel@nongnu.org; Wed, 23 May 2018 06:45:34 -0400
-Received: from mail-wm0-x236.google.com ([2a00:1450:400c:c09::236]:40454)
+	(envelope-from <alex.bennee@linaro.org>) id 1fLRL0-0002nO-VK
+	for qemu-devel@nongnu.org; Wed, 23 May 2018 06:49:51 -0400
+Received: from mail-wm0-x243.google.com ([2a00:1450:400c:c09::243]:51871)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <debby83729@gmail.com>)
-	id 1fLRGv-0000iJ-Be
-	for qemu-devel@nongnu.org; Wed, 23 May 2018 06:45:33 -0400
-Received: by mail-wm0-x236.google.com with SMTP id j5-v6so7813050wme.5
-	for <qemu-devel@nongnu.org>; Wed, 23 May 2018 03:45:31 -0700 (PDT)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1fLRL0-0002mi-N0
+	for qemu-devel@nongnu.org; Wed, 23 May 2018 06:49:46 -0400
+Received: by mail-wm0-x243.google.com with SMTP id j4-v6so7732465wme.1
+	for <qemu-devel@nongnu.org>; Wed, 23 May 2018 03:49:46 -0700 (PDT)
+References: <20180521140402.23318-1-peter.maydell@linaro.org>
+	<20180521140402.23318-21-peter.maydell@linaro.org>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <20180521140402.23318-21-peter.maydell@linaro.org>
+Date: Wed, 23 May 2018 11:49:43 +0100
+Message-ID: <87y3gatznc.fsf@linaro.org>
 MIME-Version: 1.0
-From: Eva Chen <debby83729@gmail.com>
-Date: Wed, 23 May 2018 18:45:09 +0800
-Message-ID: <CAG0V3WS2DemUdkP+HpZiYTOsPGRpAFCwZLNJ9CfA-VGv5bgKRQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: [Qemu-devel] Questions about the flow of interrupt simulation
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 20/27] hw/misc/tz-mpc.c: Implement correct
+ blocked-access behaviour
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,46 +31,117 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-arm@nongnu.org, qemu-devel@nongnu.org, patches@linaro.org, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-Hi,
 
-I have added a new virtual device under qemu/hw, and a device driver in the
-source code of guest OS (I use arm linux).
-Since I want to add an interrupt to the virtual device, I am tracing the
-flow of interrupt simulation of QEMU.
-However, I have some questions about the flow of interrupt, and wondering
-if I could ask here for some help.
+Peter Maydell <peter.maydell@linaro.org> writes:
 
-I use $qemu-system-aarch64 -machine virt.
-Take the flow of interrupt that generated from the UART pl011 device as
-example.
-First an interrupt, CPU_INTERRUPT_HARD, will be sent from device to GIC for
-telling CPU that this device finished some job, then this interrupt wiil be
-transformed into EXCP_IRQ in aarch64_cpu_do_interrupt() and interrupt
-handled by CPU.
+> The MPC is guest-configurable for whether blocked accesses:
+>  * should be RAZ/WI or cause a bus error
+>  * should generate an interrupt or not
+>
+> Implement this behaviour in the blocked-access handlers.
+>
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+> ---
+>  hw/misc/tz-mpc.c | 50 ++++++++++++++++++++++++++++++++++++++++++++++--
+>  1 file changed, 48 insertions(+), 2 deletions(-)
+>
+> diff --git a/hw/misc/tz-mpc.c b/hw/misc/tz-mpc.c
+> index 93453cbef2..39a72563b7 100644
+> --- a/hw/misc/tz-mpc.c
+> +++ b/hw/misc/tz-mpc.c
+> @@ -43,6 +43,9 @@ REG32(INT_EN, 0x28)
+>      FIELD(INT_EN, IRQ, 0, 1)
+>  REG32(INT_INFO1, 0x2c)
+>  REG32(INT_INFO2, 0x30)
+> +    FIELD(INT_INFO2, HMASTER, 0, 16)
+> +    FIELD(INT_INFO2, HNONSEC, 16, 1)
+> +    FIELD(INT_INFO2, CFG_NS, 17, 1)
+>  REG32(INT_SET, 0x34)
+>      FIELD(INT_SET, IRQ, 0, 1)
+>  REG32(PIDR4, 0xfd0)
+> @@ -266,6 +269,45 @@ static const MemoryRegionOps tz_mpc_reg_ops =3D {
+>      .impl.max_access_size =3D 4,
+>  };
+>
+> +static inline bool tz_mpc_cfg_ns(TZMPC *s, hwaddr addr)
+> +{
+> +    /* Return the cfg_ns bit from the LUT for the specified address */
+> +    hwaddr blknum =3D addr / s->blocksize;
+> +    hwaddr blkword =3D blknum / 32;
+> +    uint32_t blkbit =3D 1U << (blknum % 32);
+> +
+> +    /* This would imply the address was larger than the size we
+> +     * defined this memory region to be, so it can't happen.
+> +     */
+> +    assert(blkword < s->blk_max);
+> +    return s->blk_lut[blkword] & blkbit;
+> +}
+> +
+> +static MemTxResult tz_mpc_handle_block(TZMPC *s, hwaddr addr, MemTxAttrs=
+ attrs)
+> +{
+> +    /* Handle a blocked transaction: raise IRQ, capture info, etc */
+> +    if (!s->int_stat) {
+> +        /* First blocked transfer: capture information into INT_INFO1 and
+> +         * INT_INFO2. Subsequent transfers are still blocked but don't
+> +         * capture information until the guest clears the interrupt.
+> +         */
+> +
+> +        s->int_info1 =3D addr;
+> +        s->int_info2 =3D 0;
+> +        s->int_info2 =3D FIELD_DP32(s->int_info2, INT_INFO2, HMASTER,
+> +                                  attrs.requester_id & 0xffff);
 
-- Details of function call:
-1. Device to GIC : pl011_write() => pl011_update() => gic_set_irq()
-2. CPU handling : cpu_exec() => arm_cpu_exec_interrupt() =>
-aarch64_cpu_do_interrupt()
-Guest CPU's pc (env->pc) will be changed to the address of interrupt
-service routine in aarch64_cpu_do_interrupt().
+Does this actually need masking given the source is a 16 bit wide bitfield?
 
-The question is:
-Will CPU execute the ISR that env->pc assigned?
-If yes, is the ISR defined in the guest OS (I use arm-linux kernel image)?
-How can I see the code that handling the EXCP_IRQ? Is there any method I
-can set some breakpoint in gdb or set some log flags to see the handler?
-If not, then is that all guest ISR will not be called by using QEMU?
+> +        s->int_info2 =3D FIELD_DP32(s->int_info2, INT_INFO2, HNONSEC,
+> +                                  ~attrs.secure);
+> +        s->int_info2 =3D FIELD_DP32(s->int_info2, INT_INFO2, CFG_NS,
+> +                                  tz_mpc_cfg_ns(s, addr));
+> +        s->int_stat |=3D R_INT_STAT_IRQ_MASK;
+> +        tz_mpc_irq_update(s);
+> +    }
+> +
+> +    /* Generate bus error if desired; otherwise RAZ/WI */
+> +    return (s->ctrl & R_CTRL_SEC_RESP_MASK) ? MEMTX_ERROR : MEMTX_OK;
+> +}
+> +
+>  /* Accesses only reach these read and write functions if the MPC is
+>   * blocking them; non-blocked accesses go directly to the downstream
+>   * memory region without passing through this code.
+> @@ -274,19 +316,23 @@ static MemTxResult tz_mpc_mem_blocked_read(void *op=
+aque, hwaddr addr,
+>                                             uint64_t *pdata,
+>                                             unsigned size, MemTxAttrs att=
+rs)
+>  {
+> +    TZMPC *s =3D TZ_MPC(opaque);
+> +
+>      trace_tz_mpc_mem_blocked_read(addr, size, attrs.secure);
+>
+>      *pdata =3D 0;
+> -    return MEMTX_OK;
+> +    return tz_mpc_handle_block(s, addr, attrs);
+>  }
+>
+>  static MemTxResult tz_mpc_mem_blocked_write(void *opaque, hwaddr addr,
+>                                              uint64_t value,
+>                                              unsigned size, MemTxAttrs at=
+trs)
+>  {
+> +    TZMPC *s =3D TZ_MPC(opaque);
+> +
+>      trace_tz_mpc_mem_blocked_write(addr, value, size, attrs.secure);
+>
+> -    return MEMTX_OK;
+> +    return tz_mpc_handle_block(s, addr, attrs);
+>  }
+>
+>  static const MemoryRegionOps tz_mpc_mem_blocked_ops =3D {
 
-The reason that I have this question is that I look into the cpu_exec(),
-find that tb_find() will be executed after handling an interrupt. At this
-time, the ISR address in env->pc should be replaced by the TB that is going
-to be executed. However, I don't know how to check my thought since I can't
-debug of execution in the TB so I ask for some help here.
 
-I will be grateful for any advice, thanks.
-
-Sincerely,
-Eva
+--
+Alex Benn=C3=A9e
