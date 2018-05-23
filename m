@@ -1,23 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48812)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48816)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1fLUyi-0001de-5y
+	(envelope-from <mst@redhat.com>) id 1fLUyi-0001e4-Me
 	for qemu-devel@nongnu.org; Wed, 23 May 2018 10:43:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1fLUyf-0000l6-1y
+	(envelope-from <mst@redhat.com>) id 1fLUyf-0000lE-H4
 	for qemu-devel@nongnu.org; Wed, 23 May 2018 10:43:00 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:39166)
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:46918 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1fLUye-0000ky-Rr
-	for qemu-devel@nongnu.org; Wed, 23 May 2018 10:42:56 -0400
-Date: Wed, 23 May 2018 17:42:46 +0300
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1fLUyf-0000lA-Ac
+	for qemu-devel@nongnu.org; Wed, 23 May 2018 10:42:57 -0400
+Date: Wed, 23 May 2018 17:42:55 +0300
 From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <1527086545-68024-5-git-send-email-mst@redhat.com>
+Message-ID: <1527086545-68024-6-git-send-email-mst@redhat.com>
 References: <1527086545-68024-1-git-send-email-mst@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 In-Reply-To: <1527086545-68024-1-git-send-email-mst@redhat.com>
-Subject: [Qemu-devel] [PULL 04/28] vhost: add trace for IOTLB miss
+Subject: [Qemu-devel] [PULL 05/28] update-linux-headers.sh: drop kvm_para.h
+ hacks
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,71 +28,71 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Peter Xu <peterx@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, Roman Kagan <rkagan@virtuozzo.com>, Gerd Hoffmann <kraxel@redhat.com>, Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Brijesh Singh <brijesh.singh@amd.com>
 
-From: Peter Xu <peterx@redhat.com>
+It turns out (as will be clear from follow-up patches)
+we do not really need any kvm para macros host side
+for now, except on x86, and there we need it
+unconditionally whether we run on kvm or we don't.
 
-Add some trace points for IOTLB translation for vhost. After vhost-user
-is setup, the only IO path that QEMU will participate should be the
-IOMMU translation, so it'll be good we can track this with explicit
-timestamps when needed to see how long time we take to do the
-translation, and whether there's anything stuck inside.  It might be
-useful for triaging vhost-user problems.
+Import the x86 asm/kvm_para.h into standard-headers,
+follow-up patches remove a bunch of code using this.
 
-Signed-off-by: Peter Xu <peterx@redhat.com>
-Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
 ---
- hw/virtio/vhost.c      | 7 +++++++
- hw/virtio/trace-events | 1 +
- 2 files changed, 8 insertions(+)
+ scripts/update-linux-headers.sh | 16 +++++-----------
+ 1 file changed, 5 insertions(+), 11 deletions(-)
 
-diff --git a/hw/virtio/vhost.c b/hw/virtio/vhost.c
-index 9d5850a..b082900 100644
---- a/hw/virtio/vhost.c
-+++ b/hw/virtio/vhost.c
-@@ -894,12 +894,15 @@ int vhost_device_iotlb_miss(struct vhost_dev *dev, uint64_t iova, int write)
+diff --git a/scripts/update-linux-headers.sh b/scripts/update-linux-headers.sh
+index b65c03f..4fa08d3 100755
+--- a/scripts/update-linux-headers.sh
++++ b/scripts/update-linux-headers.sh
+@@ -43,6 +43,7 @@ cp_portable() {
+                                      -e 'limits' \
+                                      -e 'linux/kernel' \
+                                      -e 'linux/sysinfo' \
++                                     -e 'asm-generic/kvm_para' \
+                                      > /dev/null
+     then
+         echo "Unexpected #include in input file $f".
+@@ -98,13 +99,9 @@ for arch in $ARCHLIST; do
  
-     rcu_read_lock();
+     rm -rf "$output/linux-headers/asm-$arch"
+     mkdir -p "$output/linux-headers/asm-$arch"
+-    for header in kvm.h kvm_para.h unistd.h; do
++    for header in kvm.h unistd.h; do
+         cp "$tmpdir/include/asm/$header" "$output/linux-headers/asm-$arch"
+     done
+-    if [ $arch = powerpc ]; then
+-        cp "$tmpdir/include/asm/epapr_hcalls.h" "$output/linux-headers/asm-powerpc/"
+-    fi
+-
+     rm -rf "$output/include/standard-headers/asm-$arch"
+     mkdir -p "$output/include/standard-headers/asm-$arch"
+     if [ $arch = s390 ]; then
+@@ -121,20 +118,17 @@ for arch in $ARCHLIST; do
+         cp "$tmpdir/include/asm/unistd_32.h" "$output/linux-headers/asm-x86/"
+         cp "$tmpdir/include/asm/unistd_x32.h" "$output/linux-headers/asm-x86/"
+         cp "$tmpdir/include/asm/unistd_64.h" "$output/linux-headers/asm-x86/"
++        cp_portable "$tmpdir/include/asm/kvm_para.h" "$output/include/standard-headers/asm-$arch"
+     fi
+ done
  
-+    trace_vhost_iotlb_miss(dev, 1);
+ rm -rf "$output/linux-headers/linux"
+ mkdir -p "$output/linux-headers/linux"
+-for header in kvm.h kvm_para.h vfio.h vfio_ccw.h vhost.h \
++for header in kvm.h vfio.h vfio_ccw.h vhost.h \
+               psci.h psp-sev.h userfaultfd.h; do
+     cp "$tmpdir/include/linux/$header" "$output/linux-headers/linux"
+ done
+-rm -rf "$output/linux-headers/asm-generic"
+-mkdir -p "$output/linux-headers/asm-generic"
+-for header in kvm_para.h; do
+-    cp "$tmpdir/include/asm-generic/$header" "$output/linux-headers/asm-generic"
+-done
 +
-     iotlb = address_space_get_iotlb_entry(dev->vdev->dma_as,
-                                           iova, write);
-     if (iotlb.target_as != NULL) {
-         ret = vhost_memory_region_lookup(dev, iotlb.translated_addr,
-                                          &uaddr, &len);
-         if (ret) {
-+            trace_vhost_iotlb_miss(dev, 3);
-             error_report("Fail to lookup the translated address "
-                          "%"PRIx64, iotlb.translated_addr);
-             goto out;
-@@ -911,10 +914,14 @@ int vhost_device_iotlb_miss(struct vhost_dev *dev, uint64_t iova, int write)
-         ret = vhost_backend_update_device_iotlb(dev, iova, uaddr,
-                                                 len, iotlb.perm);
-         if (ret) {
-+            trace_vhost_iotlb_miss(dev, 4);
-             error_report("Fail to update device iotlb");
-             goto out;
-         }
-     }
-+
-+    trace_vhost_iotlb_miss(dev, 2);
-+
- out:
-     rcu_read_unlock();
- 
-diff --git a/hw/virtio/trace-events b/hw/virtio/trace-events
-index 1422ff0..07bcbe9 100644
---- a/hw/virtio/trace-events
-+++ b/hw/virtio/trace-events
-@@ -6,6 +6,7 @@ vhost_region_add_section(const char *name, uint64_t gpa, uint64_t size, uint64_t
- vhost_region_add_section_merge(const char *name, uint64_t new_size, uint64_t gpa, uint64_t owr) "%s: size: 0x%"PRIx64 " gpa: 0x%"PRIx64 " owr: 0x%"PRIx64
- vhost_region_add_section_aligned(const char *name, uint64_t gpa, uint64_t size, uint64_t host) "%s: 0x%"PRIx64"+0x%"PRIx64" @ 0x%"PRIx64
- vhost_section(const char *name, int r) "%s:%d"
-+vhost_iotlb_miss(void *dev, int step) "%p step %d"
- 
- # hw/virtio/vhost-user.c
- vhost_user_postcopy_end_entry(void) ""
+ if [ -L "$linux/source" ]; then
+     cp "$linux/source/COPYING" "$output/linux-headers"
+ else
 -- 
 MST
