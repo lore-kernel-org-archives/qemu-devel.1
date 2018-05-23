@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48840)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48882)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1fLUyl-0001gU-D2
-	for qemu-devel@nongnu.org; Wed, 23 May 2018 10:43:09 -0400
+	(envelope-from <mst@redhat.com>) id 1fLUyr-0001ls-HY
+	for qemu-devel@nongnu.org; Wed, 23 May 2018 10:43:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1fLUyk-0000mL-Ds
-	for qemu-devel@nongnu.org; Wed, 23 May 2018 10:43:03 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:38578 helo=mx1.redhat.com)
+	(envelope-from <mst@redhat.com>) id 1fLUyq-0000nb-5Q
+	for qemu-devel@nongnu.org; Wed, 23 May 2018 10:43:09 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:38594 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1fLUyk-0000mD-7g
-	for qemu-devel@nongnu.org; Wed, 23 May 2018 10:43:02 -0400
-Date: Wed, 23 May 2018 17:43:00 +0300
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1fLUyp-0000nT-Us
+	for qemu-devel@nongnu.org; Wed, 23 May 2018 10:43:08 -0400
+Date: Wed, 23 May 2018 17:43:06 +0300
 From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <1527086545-68024-8-git-send-email-mst@redhat.com>
+Message-ID: <1527086545-68024-13-git-send-email-mst@redhat.com>
 References: <1527086545-68024-1-git-send-email-mst@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 In-Reply-To: <1527086545-68024-1-git-send-email-mst@redhat.com>
-Subject: [Qemu-devel] [PULL 07/28] x86/cpu: use
- standard-headers/asm-x86.kvm_para.h
+Subject: [Qemu-devel] [PULL 12/28] vhost-user: add Net prefix to internal
+ state structure
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,113 +28,187 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Marcelo Tosatti <mtosatti@redhat.com>, kvm@vger.kernel.org
+Cc: Peter Maydell <peter.maydell@linaro.org>, Tiwei Bie <tiwei.bie@intel.com>, Jason Wang <jasowang@redhat.com>
 
-Switch to the header we imported from Linux,
-this allows us to drop a hack in kvm_i386.h.
-More code will be dropped in the next patch.
+From: Tiwei Bie <tiwei.bie@intel.com>
 
+We are going to introduce a shared vhost user state which
+will be named as 'VhostUserState'. So add 'Net' prefix to
+the existing internal state structure in the vhost-user
+netdev to avoid conflict.
+
+Signed-off-by: Tiwei Bie <tiwei.bie@intel.com>
+Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
 ---
- include/sysemu/kvm.h   | 1 -
- target/i386/cpu.h      | 2 --
- target/i386/kvm_i386.h | 6 ------
- hw/i386/kvm/clock.c    | 2 +-
- target/i386/cpu.c      | 4 +---
- target/i386/kvm.c      | 4 ++--
- 6 files changed, 4 insertions(+), 15 deletions(-)
+ net/vhost-user.c | 38 +++++++++++++++++++-------------------
+ 1 file changed, 19 insertions(+), 19 deletions(-)
 
-diff --git a/include/sysemu/kvm.h b/include/sysemu/kvm.h
-index 23669c4..0b64b8e 100644
---- a/include/sysemu/kvm.h
-+++ b/include/sysemu/kvm.h
-@@ -22,7 +22,6 @@
- #ifdef NEED_CPU_H
- # ifdef CONFIG_KVM
- #  include <linux/kvm.h>
--#  include <linux/kvm_para.h>
- #  define CONFIG_KVM_IS_POSSIBLE
- # endif
- #else
-diff --git a/target/i386/cpu.h b/target/i386/cpu.h
-index 8ac13f6..6645046 100644
---- a/target/i386/cpu.h
-+++ b/target/i386/cpu.h
-@@ -688,8 +688,6 @@ typedef uint32_t FeatureWordArray[FEATURE_WORDS];
- #define CPUID_7_0_EDX_SPEC_CTRL     (1U << 26) /* Speculation Control */
- #define CPUID_7_0_EDX_SPEC_CTRL_SSBD  (1U << 31) /* Speculative Store Bypass Disable */
+diff --git a/net/vhost-user.c b/net/vhost-user.c
+index e0f16c8..fa28aad 100644
+--- a/net/vhost-user.c
++++ b/net/vhost-user.c
+@@ -20,38 +20,38 @@
+ #include "qemu/option.h"
+ #include "trace.h"
  
--#define KVM_HINTS_DEDICATED (1U << 0)
--
- #define CPUID_8000_0008_EBX_IBPB    (1U << 12) /* Indirect Branch Prediction Barrier */
+-typedef struct VhostUserState {
++typedef struct NetVhostUserState {
+     NetClientState nc;
+     CharBackend chr; /* only queue index 0 */
+     VHostNetState *vhost_net;
+     guint watch;
+     uint64_t acked_features;
+     bool started;
+-} VhostUserState;
++} NetVhostUserState;
  
- #define CPUID_XSAVE_XSAVEOPT   (1U << 0)
-diff --git a/target/i386/kvm_i386.h b/target/i386/kvm_i386.h
-index 1de9876..e5df24c 100644
---- a/target/i386/kvm_i386.h
-+++ b/target/i386/kvm_i386.h
-@@ -30,12 +30,6 @@
- #define kvm_pic_in_kernel()      0
- #define kvm_ioapic_in_kernel()   0
+ VHostNetState *vhost_user_get_vhost_net(NetClientState *nc)
+ {
+-    VhostUserState *s = DO_UPCAST(VhostUserState, nc, nc);
++    NetVhostUserState *s = DO_UPCAST(NetVhostUserState, nc, nc);
+     assert(nc->info->type == NET_CLIENT_DRIVER_VHOST_USER);
+     return s->vhost_net;
+ }
  
--/* These constants must never be used at runtime if kvm_enabled() is false.
-- * They exist so we don't need #ifdefs around KVM-specific code that already
-- * checks kvm_enabled() properly.
-- */
--#define KVM_CPUID_FEATURES       0
--
- #endif  /* CONFIG_KVM */
+ uint64_t vhost_user_get_acked_features(NetClientState *nc)
+ {
+-    VhostUserState *s = DO_UPCAST(VhostUserState, nc, nc);
++    NetVhostUserState *s = DO_UPCAST(NetVhostUserState, nc, nc);
+     assert(nc->info->type == NET_CLIENT_DRIVER_VHOST_USER);
+     return s->acked_features;
+ }
  
- bool kvm_allows_irq0_override(void);
-diff --git a/hw/i386/kvm/clock.c b/hw/i386/kvm/clock.c
-index 7dac319..0bf1c60 100644
---- a/hw/i386/kvm/clock.c
-+++ b/hw/i386/kvm/clock.c
-@@ -26,7 +26,7 @@
- #include "qapi/error.h"
+ static void vhost_user_stop(int queues, NetClientState *ncs[])
+ {
+-    VhostUserState *s;
++    NetVhostUserState *s;
+     int i;
  
- #include <linux/kvm.h>
--#include <linux/kvm_para.h>
-+#include "standard-headers/asm-x86/kvm_para.h"
+     for (i = 0; i < queues; i++) {
+         assert(ncs[i]->info->type == NET_CLIENT_DRIVER_VHOST_USER);
  
- #define TYPE_KVM_CLOCK "kvmclock"
- #define KVM_CLOCK(obj) OBJECT_CHECK(KVMClockState, (obj), TYPE_KVM_CLOCK)
-diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-index d95310f..9426041 100644
---- a/target/i386/cpu.c
-+++ b/target/i386/cpu.c
-@@ -40,9 +40,7 @@
- #include "qom/qom-qobject.h"
- #include "sysemu/arch_init.h"
+-        s = DO_UPCAST(VhostUserState, nc, ncs[i]);
++        s = DO_UPCAST(NetVhostUserState, nc, ncs[i]);
  
--#if defined(CONFIG_KVM)
--#include <linux/kvm_para.h>
--#endif
-+#include "standard-headers/asm-x86/kvm_para.h"
+         if (s->vhost_net) {
+             /* save acked features */
+@@ -68,7 +68,7 @@ static int vhost_user_start(int queues, NetClientState *ncs[], CharBackend *be)
+ {
+     VhostNetOptions options;
+     struct vhost_net *net = NULL;
+-    VhostUserState *s;
++    NetVhostUserState *s;
+     int max_queues;
+     int i;
  
- #include "sysemu/sysemu.h"
- #include "hw/qdev-properties.h"
-diff --git a/target/i386/kvm.c b/target/i386/kvm.c
-index 0c656a9..6511329 100644
---- a/target/i386/kvm.c
-+++ b/target/i386/kvm.c
-@@ -18,7 +18,7 @@
- #include <sys/utsname.h>
+@@ -77,7 +77,7 @@ static int vhost_user_start(int queues, NetClientState *ncs[], CharBackend *be)
+     for (i = 0; i < queues; i++) {
+         assert(ncs[i]->info->type == NET_CLIENT_DRIVER_VHOST_USER);
  
- #include <linux/kvm.h>
--#include <linux/kvm_para.h>
-+#include "standard-headers/asm-x86/kvm_para.h"
+-        s = DO_UPCAST(VhostUserState, nc, ncs[i]);
++        s = DO_UPCAST(NetVhostUserState, nc, ncs[i]);
  
- #include "qemu-common.h"
- #include "cpu.h"
-@@ -387,7 +387,7 @@ uint32_t kvm_arch_get_supported_cpuid(KVMState *s, uint32_t function,
-             ret &= ~(1U << KVM_FEATURE_PV_UNHALT);
-         }
-     } else if (function == KVM_CPUID_FEATURES && reg == R_EDX) {
--        ret |= KVM_HINTS_DEDICATED;
-+        ret |= 1U << KVM_HINTS_DEDICATED;
-         found = 1;
+         options.net_backend = ncs[i];
+         options.opaque      = be;
+@@ -123,7 +123,7 @@ static ssize_t vhost_user_receive(NetClientState *nc, const uint8_t *buf,
+        without GUEST_ANNOUNCE capability.
+      */
+     if (size == 60) {
+-        VhostUserState *s = DO_UPCAST(VhostUserState, nc, nc);
++        NetVhostUserState *s = DO_UPCAST(NetVhostUserState, nc, nc);
+         int r;
+         static int display_rarp_failure = 1;
+         char mac_addr[6];
+@@ -146,7 +146,7 @@ static ssize_t vhost_user_receive(NetClientState *nc, const uint8_t *buf,
+ 
+ static void vhost_user_cleanup(NetClientState *nc)
+ {
+-    VhostUserState *s = DO_UPCAST(VhostUserState, nc, nc);
++    NetVhostUserState *s = DO_UPCAST(NetVhostUserState, nc, nc);
+ 
+     if (s->vhost_net) {
+         vhost_net_cleanup(s->vhost_net);
+@@ -180,7 +180,7 @@ static bool vhost_user_has_ufo(NetClientState *nc)
+ 
+ static NetClientInfo net_vhost_user_info = {
+         .type = NET_CLIENT_DRIVER_VHOST_USER,
+-        .size = sizeof(VhostUserState),
++        .size = sizeof(NetVhostUserState),
+         .receive = vhost_user_receive,
+         .cleanup = vhost_user_cleanup,
+         .has_vnet_hdr = vhost_user_has_vnet_hdr,
+@@ -190,7 +190,7 @@ static NetClientInfo net_vhost_user_info = {
+ static gboolean net_vhost_user_watch(GIOChannel *chan, GIOCondition cond,
+                                            void *opaque)
+ {
+-    VhostUserState *s = opaque;
++    NetVhostUserState *s = opaque;
+ 
+     qemu_chr_fe_disconnect(&s->chr);
+ 
+@@ -203,7 +203,7 @@ static void chr_closed_bh(void *opaque)
+ {
+     const char *name = opaque;
+     NetClientState *ncs[MAX_QUEUE_NUM];
+-    VhostUserState *s;
++    NetVhostUserState *s;
+     Error *err = NULL;
+     int queues;
+ 
+@@ -212,7 +212,7 @@ static void chr_closed_bh(void *opaque)
+                                           MAX_QUEUE_NUM);
+     assert(queues < MAX_QUEUE_NUM);
+ 
+-    s = DO_UPCAST(VhostUserState, nc, ncs[0]);
++    s = DO_UPCAST(NetVhostUserState, nc, ncs[0]);
+ 
+     qmp_set_link(name, false, &err);
+     vhost_user_stop(queues, ncs);
+@@ -229,7 +229,7 @@ static void net_vhost_user_event(void *opaque, int event)
+ {
+     const char *name = opaque;
+     NetClientState *ncs[MAX_QUEUE_NUM];
+-    VhostUserState *s;
++    NetVhostUserState *s;
+     Chardev *chr;
+     Error *err = NULL;
+     int queues;
+@@ -239,7 +239,7 @@ static void net_vhost_user_event(void *opaque, int event)
+                                           MAX_QUEUE_NUM);
+     assert(queues < MAX_QUEUE_NUM);
+ 
+-    s = DO_UPCAST(VhostUserState, nc, ncs[0]);
++    s = DO_UPCAST(NetVhostUserState, nc, ncs[0]);
+     chr = qemu_chr_fe_get_driver(&s->chr);
+     trace_vhost_user_event(chr->label, event);
+     switch (event) {
+@@ -283,7 +283,7 @@ static int net_vhost_user_init(NetClientState *peer, const char *device,
+ {
+     Error *err = NULL;
+     NetClientState *nc, *nc0 = NULL;
+-    VhostUserState *s;
++    NetVhostUserState *s;
+     int i;
+ 
+     assert(name);
+@@ -296,7 +296,7 @@ static int net_vhost_user_init(NetClientState *peer, const char *device,
+         nc->queue_index = i;
+         if (!nc0) {
+             nc0 = nc;
+-            s = DO_UPCAST(VhostUserState, nc, nc);
++            s = DO_UPCAST(NetVhostUserState, nc, nc);
+             if (!qemu_chr_fe_init(&s->chr, chr, &err)) {
+                 error_report_err(err);
+                 return -1;
+@@ -305,7 +305,7 @@ static int net_vhost_user_init(NetClientState *peer, const char *device,
+ 
      }
  
+-    s = DO_UPCAST(VhostUserState, nc, nc0);
++    s = DO_UPCAST(NetVhostUserState, nc, nc0);
+     do {
+         if (qemu_chr_fe_wait_connected(&s->chr, &err) < 0) {
+             error_report_err(err);
 -- 
 MST
