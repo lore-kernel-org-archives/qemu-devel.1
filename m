@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39526)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34825)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <naravamudan@digitalocean.com>) id 1fLFLo-00047b-O1
-	for qemu-devel@nongnu.org; Tue, 22 May 2018 18:01:49 -0400
+	(envelope-from <famz@redhat.com>) id 1fLJGa-0001Mh-6B
+	for qemu-devel@nongnu.org; Tue, 22 May 2018 22:12:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <naravamudan@digitalocean.com>) id 1fLFLn-00027t-Qv
-	for qemu-devel@nongnu.org; Tue, 22 May 2018 18:01:48 -0400
-Received: from mail-io0-x236.google.com ([2607:f8b0:4001:c06::236]:42573)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <naravamudan@digitalocean.com>)
-	id 1fLFLn-00027R-Lg
-	for qemu-devel@nongnu.org; Tue, 22 May 2018 18:01:47 -0400
-Received: by mail-io0-x236.google.com with SMTP id a10-v6so20371408ioc.9
-	for <qemu-devel@nongnu.org>; Tue, 22 May 2018 15:01:47 -0700 (PDT)
+	(envelope-from <famz@redhat.com>) id 1fLJGZ-0005fy-2t
+	for qemu-devel@nongnu.org; Tue, 22 May 2018 22:12:40 -0400
+Date: Wed, 23 May 2018 10:12:21 +0800
+From: Fam Zheng <famz@redhat.com>
+Message-ID: <20180523021221.GE28114@lemon.usersys.redhat.com>
+References: <20180518180440-mutt-send-email-mst@kernel.org>
+	<20180518170956.GI8615@redhat.com>
+	<20180522073555.peibbwoqvbor7nrs@sirius.home.kraxel.org>
+	<20180522171112-mutt-send-email-mst@kernel.org>
+	<20180522150221.GF6233@localhost.localdomain>
 MIME-Version: 1.0
-From: Nishanth Aravamudan <naravamudan@digitalocean.com>
-Date: Tue, 22 May 2018 15:01:46 -0700
-Message-ID: <CAGtobs_PEYmSyPwbYG-6oNp9PxwQ52xHaFuXh59ELWcrAm6LSA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: [Qemu-devel] AIO error case
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180522150221.GF6233@localhost.localdomain>
+Subject: Re: [Qemu-devel] storing machine data in qcow images?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,33 +26,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, ehabkost@redhat.com, qemu-block@nongnu.org, qemu-devel@nongnu.org, mreitz@redhat.com, Gerd Hoffmann <kraxel@redhat.com>, stefanha@redhat.com, berrange@redhat.com
 
-Hi!
+On Tue, 05/22 17:02, Kevin Wolf wrote:
+> Am 22.05.2018 um 16:19 hat Michael S. Tsirkin geschrieben:
+> > On Tue, May 22, 2018 at 09:35:55AM +0200, Gerd Hoffmann wrote:
+> > >   Hi,
+> > > 
+> > > > You must /sometimes/ supply the correct machine type.
+> > > > 
+> > > > It is quite dependent on the guest OS you have installed, and even
+> > > > just how the guest OS is configured.  In general Linux is very
+> > > > flexible and can adapt to a wide range of hardware, automatically
+> > > > detecting things as needed. It is possible for a sysadmin to build
+> > > > a Linux image in a way that would only work with I440FX, but I
+> > > > don't think it would be common to see that.
+> > > 
+> > > I think it would be pretty hard to actually build such an image.
+> > > 
+> > > The more critical thing for linux guests is the storage driver which
+> > > must be included into the initrd so the image can mount the root
+> > > filesystem.  And the firmware, bios vs. uefi is more critical than
+> > > pc vs. q35.
+> > 
+> > I think we can start by finding a location to embed a string in a qcow
+> > image, add ability for qemu-img to set and get this string.  We can
+> > discuss how it's formatted separately.
+> 
+> If we want it, we'll find a place to store it.
+> 
+> But the first thing we need is a spec for what's actually in it. Just
+> storing a machine type hint would be a one-off hack that wouldn't last
+> very long before we want to add the next thing.
+> 
+> Essentially, what we need is a description of the virtual machine that
+> we suggest to use with this image. We can try to reuse something
+> existing there, like libvirt XML or OVF, or invent something new (a JSON
+> array describing runtime options?). One difference to existing formats
+> is probably that we want only frontends and no backends in the
+> description.
+> 
 
-I'm tracking an error case in the native AIO path, and was wondering if
-there was a latent (albeit possibly hard to hit) bug. Specifically
-util/async.c::aio_get_linux_aio:
+Do we really need a uniform way and require compliance to the standard we
+choose, and implement verification in the block driver, or can we get away with
+a description field that accepts any text and leave it to the user to decide
+what to put there? In the header we could assign a Content-type field that
+defaults to 'text/plain' to the description, that way apps can mark the data as
+"application/ovf" if they want, or whatever the upper layer decides.
 
-#ifdef CONFIG_LINUX_AIO
-LinuxAioState *aio_get_linux_aio(AioContext *ctx)
-{
-    if (!ctx->linux_aio) {
-        ctx->linux_aio = laio_init();
-        laio_attach_aio_context(ctx->linux_aio, ctx);
-    }
-    return ctx->linux_aio;
-}
-#endif
-
-laio_init() can in certain conditions return NULL, but that's not checked
-here and then the NULL result is passed directly into
-laio_attach_aio_context, which dereferences it without checking that the
-pointer is valid.
-
-I'm not sure what is appropriate if laio_init() returns NULL, returning
-NULL back to the caller of aio_get_linux_aio() has its own issues, because
-those callers don't seem to check its return value either.
-
-Thanks in advance!
--Nish
+Fam
