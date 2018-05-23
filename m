@@ -1,26 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41960)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42838)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcmvbkbc@gmail.com>) id 1fLPGQ-00045T-Rt
-	for qemu-devel@nongnu.org; Wed, 23 May 2018 04:36:55 -0400
+	(envelope-from <armbru@redhat.com>) id 1fLPJ0-0004zV-PN
+	for qemu-devel@nongnu.org; Wed, 23 May 2018 04:39:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcmvbkbc@gmail.com>) id 1fLPGQ-0006Tg-3v
-	for qemu-devel@nongnu.org; Wed, 23 May 2018 04:36:54 -0400
-Received: from mail-yb0-x241.google.com ([2607:f8b0:4002:c09::241]:38513)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <jcmvbkbc@gmail.com>) id 1fLPGQ-0006Ta-07
-	for qemu-devel@nongnu.org; Wed, 23 May 2018 04:36:54 -0400
-Received: by mail-yb0-x241.google.com with SMTP id w14-v6so7331006ybm.5
-	for <qemu-devel@nongnu.org>; Wed, 23 May 2018 01:36:53 -0700 (PDT)
+	(envelope-from <armbru@redhat.com>) id 1fLPIv-0007RC-Of
+	for qemu-devel@nongnu.org; Wed, 23 May 2018 04:39:34 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:43566 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fLPIv-0007R3-Jc
+	for qemu-devel@nongnu.org; Wed, 23 May 2018 04:39:29 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.3])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 1980E77060
+	for <qemu-devel@nongnu.org>; Wed, 23 May 2018 08:39:29 +0000 (UTC)
+From: Markus Armbruster <armbru@redhat.com>
+References: <20180509041734.14135-1-peterx@redhat.com>
+	<20180509041734.14135-5-peterx@redhat.com>
+	<87tvr6l9ix.fsf@dusky.pond.sub.org> <20180518105311.GP2569@xz-mi>
+	<877eo1f8tn.fsf@dusky.pond.sub.org> <20180521051846.GC27506@xz-mi>
+Date: Wed, 23 May 2018 10:39:20 +0200
+In-Reply-To: <20180521051846.GC27506@xz-mi> (Peter Xu's message of "Mon, 21
+	May 2018 13:18:46 +0800")
+Message-ID: <87fu2iix53.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <af55efd2-f889-c615-7eb9-1c6fe06860d5@linaro.org>
-References: <20180512175724.5923-1-richard.henderson@linaro.org>
-	<CAMo8Bf+EpjvJqjv2JqksbXUx_j4Eds5ULE8-Bvs-jm9TgyrgoQ@mail.gmail.com>
-	<af55efd2-f889-c615-7eb9-1c6fe06860d5@linaro.org>
-From: Max Filippov <jcmvbkbc@gmail.com>
-Date: Wed, 23 May 2018 01:36:52 -0700
-Message-ID: <CAMo8Bf+dA5-4-pVqeZqcqP03ozss5FsJAfxXifq0+bKDAYumiQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH 0/4] target/xtensa: Convert to TranslatorOps
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v5 4/4] monitor: add lock to protect
+ mon_fdsets
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,19 +36,104 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>
-Cc: qemu-devel <qemu-devel@nongnu.org>
+To: Peter Xu <peterx@redhat.com>
+Cc: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>, "Dr .
+	David Alan Gilbert" <dgilbert@redhat.com>
 
-On Tue, May 22, 2018 at 1:58 PM, Richard Henderson
-<richard.henderson@linaro.org> wrote:
-> On 05/22/2018 02:39 AM, Max Filippov wrote:
->> Would you like to do that change and carry the series yourself
->> or should I take it?
+Peter Xu <peterx@redhat.com> writes:
+
+> On Fri, May 18, 2018 at 02:27:00PM +0200, Markus Armbruster wrote:
+>> Peter Xu <peterx@redhat.com> writes:
+>> 
+>> > On Thu, May 17, 2018 at 03:03:02PM +0200, Markus Armbruster wrote:
+>> >
+>> > [...]
+>> >
+>> >> > @@ -2502,7 +2525,9 @@ int monitor_fdset_get_fd(int64_t fdset_id, int flags)
+>> >> >      MonFdset *mon_fdset;
+>> >> >      MonFdsetFd *mon_fdset_fd;
+>> >> >      int mon_fd_flags;
+>> >> > +    int ret = -1;
+>> >> 
+>> >> Suggest not to initialize ret, and instead ret = -1 on both failure
+>> >> paths.
+>> >
+>> > [1]
+>> >
+>> > But there is a third hidden failure path that we failed to find the fd
+>> > specified?  In that case we still need that initial value.
+>> 
+>> You're right.  However, that failure path could be made explicit easily:
+>> 
+>>         QLIST_FOREACH(mon_fdset, &mon_fdsets, next) {
+>>             [got out on error and on finding the right one...]
+>>         }
+>>         ret = -1;
+>>         errno = ENOENT;
+>> 
+>>     out:
+>>         qemu_mutex_unlock(&mon_fdsets_lock);
+>>         return ret;
+>> 
+>> I find this clearer.  Your choice.
 >
-> Would you take it, please.
+> Yes this works too.  Considering that I just posted v6, I'll
+> temporarily just keep the old way.
 
-Sure.
+Your v6 raced with my review of v5.  Do you intend to post v7?  If not,
+I need to figure out what I can and want to do to v6 on commit to my
+tree.
 
--- 
-Thanks.
--- Max
+>> > But I didn't really notice that this function is returning error with
+>> > -1 paired with errno.  So instead of set -1 here I may need to
+>> > initialize it to -ENOENT, and I can convert it back to errno when
+>> > return.  Please see below.
+>> >
+>> >> 
+>> >> >  
+>> >> > +    qemu_mutex_lock(&mon_fdsets_lock);
+>> >> >      QLIST_FOREACH(mon_fdset, &mon_fdsets, next) {
+>> >> >          if (mon_fdset->id != fdset_id) {
+>> >> >              continue;
+>> >> > @@ -2510,49 +2535,62 @@ int monitor_fdset_get_fd(int64_t fdset_id, int flags)
+>> >> >          QLIST_FOREACH(mon_fdset_fd, &mon_fdset->fds, next) {
+>> >> >              mon_fd_flags = fcntl(mon_fdset_fd->fd, F_GETFL);
+>> >> >              if (mon_fd_flags == -1) {
+>> >> > -                return -1;
+>> >> > +                goto out;
+>> >> 
+>> >> Preexisting: we fail without setting errno.  Smells buggy.
+>> >
+>> > Indeed.  Here I possibly need to set "ret = -errno" since at [2] below
+>> > the errno might be polluted by the mutex unlocking operation.
+>> 
+>> Good point.
+>> 
+>> >> Can we avoid setting errno and return a negative errno code instead?
+>> >
+>> > Yes that'll be nice, but it's getting out of the scope of this
+>> > patchset.  So I'll try to avoid touching that.  I mean qemu_open() and
+>> > its callers.
+>> 
+>> I'd change just monitor_fdset_get_fd(), and have its only caller
+>> qemu_open() do
+>> 
+>>         fd = monitor_fdset_get_fd(fdset_id, flags);
+>>         if (fd < 0) {
+>>             errno = -fd;
+>>             return -1;
+>>         }
+>
+> Yes this I can do.  I'll avoid resending for this change only (and
+> IMHO it can also be a follow-up patch).
+
+Followup patch is fine.
+
+>                                          If the latest version 6 will
+> need further refinings I'll touch up qemu_open() for this altogether.
+
+Just to avoid misunderstandings: I'm not asking you to change
+qemu_open()'s contract.  Since qemu_open() is basically a compatibility
+helper to emulate modern open() with O_CLOEXEC on old systems, with some
+entirely undocumented fd set functionality thrown in (grrr...), having
+it set errno on failure just like open() makes some sense.
