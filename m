@@ -1,22 +1,46 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41833)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44840)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mdavidsaver@gmail.com>) id 1fLURi-00078m-5E
-	for qemu-devel@nongnu.org; Wed, 23 May 2018 10:09:00 -0400
+	(envelope-from <danielhb@linux.ibm.com>) id 1fLUfo-0003lh-7H
+	for qemu-devel@nongnu.org; Wed, 23 May 2018 10:23:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mdavidsaver@gmail.com>) id 1fLURd-0004co-CL
-	for qemu-devel@nongnu.org; Wed, 23 May 2018 10:08:54 -0400
-References: <20180522191743.12872-1-pbonzini@redhat.com>
-	<336d4fa2-623c-1cb6-829d-71cf7039431e@redhat.com>
-From: Michael Davidsaver <mdavidsaver@gmail.com>
-Message-ID: <f2d5a6ca-6342-0e59-0003-7a6ec3a7275d@gmail.com>
-Date: Wed, 23 May 2018 07:08:05 -0700
+	(envelope-from <danielhb@linux.ibm.com>) id 1fLUfk-0002Ps-6l
+	for qemu-devel@nongnu.org; Wed, 23 May 2018 10:23:28 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:44368)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <danielhb@linux.ibm.com>)
+	id 1fLUfj-0002Ox-SB
+	for qemu-devel@nongnu.org; Wed, 23 May 2018 10:23:24 -0400
+Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w4NEJOqM130331
+	for <qemu-devel@nongnu.org>; Wed, 23 May 2018 10:23:21 -0400
+Received: from e34.co.us.ibm.com (e34.co.us.ibm.com [32.97.110.152])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2j58r0mqrb-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Wed, 23 May 2018 10:23:21 -0400
+Received: from localhost
+	by e34.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <danielhb@linux.ibm.com>;
+	Wed, 23 May 2018 08:23:20 -0600
+References: <20180517192325.8335-1-danielhb@linux.ibm.com>
+	<20180517192325.8335-2-danielhb@linux.ibm.com>
+	<87wow1gxi8.fsf@dusky.pond.sub.org>
+	<20180521181435.GN25013@localhost.localdomain>
+	<ab91cf9f-95c3-59dc-36cb-641a3db1171b@linux.ibm.com>
+	<20180521202616.GT25013@localhost.localdomain>
+	<874liyivcs.fsf@dusky.pond.sub.org>
+	<20180523122749.GC8988@localhost.localdomain>
+From: Daniel Henrique Barboza <danielhb@linux.ibm.com>
+Date: Wed, 23 May 2018 11:11:53 -0300
 MIME-Version: 1.0
-In-Reply-To: <336d4fa2-623c-1cb6-829d-71cf7039431e@redhat.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20180523122749.GC8988@localhost.localdomain>
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH] ppc: move at24c to its own
- CONFIG_ symbol
+Message-Id: <3628eeb1-0976-a001-f2ab-37aa9fa979ef@linux.ibm.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v7 1/3] qmp: adding
+ 'wakeup-suspend-support' in query-target
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,61 +49,126 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-trivial@nongnu.org, qemu-ppc@nongnu.org, qemu-arm@nongnu.org
+To: Eduardo Habkost <ehabkost@redhat.com>, Markus Armbruster <armbru@redhat.com>
+Cc: Stefano Stabellini <sstabellini@kernel.org>, "Michael S. Tsirkin" <mst@redhat.com>, libvir-list@redhat.com, qemu-devel@nongnu.org, mdroth@linux.vnet.ibm.com, Anthony Perard <anthony.perard@citrix.com>, Igor Mammedov <imammedo@redhat.com>, dgilbert@redhat.com
 
-On 05/22/2018 10:30 PM, Thomas Huth wrote:
-> On 22.05.2018 21:17, Paolo Bonzini wrote:
->> AT24c EEPROM is currently gated by CONFIG_I2C, and as such it is
->> being included in all emulators that use I2C, even if they do not
->> really need it.  Separate it and, since it was added for the e500
->> machines, add it to qemu-system-ppc and qemu-system-ppc64.
->> ---
->>  default-configs/ppc-softmmu.mak | 1 +
->>  hw/nvram/Makefile.objs          | 2 +-
->>  2 files changed, 2 insertions(+), 1 deletion(-)
+Hi,
+
+On 05/23/2018 09:27 AM, Eduardo Habkost wrote:
+> On Wed, May 23, 2018 at 11:17:55AM +0200, Markus Armbruster wrote:
+>> Eduardo Habkost <ehabkost@redhat.com> writes:
+>>> On Mon, May 21, 2018 at 04:46:36PM -0300, Daniel Henrique Barboza wro=
+te:
+> [...]
+>>>> Since no objection was made back then, this logic was put into query=
+-target
+>>>> starting
+>>>> in v2. Still, I don't have any favorites though: query-target looks =
+ok,
+>>>> query-machine
+>>>> looks ok and a new API looks ok too. It's all about what makes (more=
+) sense
+>>>> in the
+>>>> management level, I think.
+>>> I understand the original objection from Eric: having to add a
+>>> new command for every runtime flag we want to expose to the user
+>>> looks wrong to me.
+>> Agreed.
 >>
->> diff --git a/default-configs/ppc-softmmu.mak b/default-configs/ppc-softmmu.mak
->> index 4d7be45ac5..c57e568121 100644
->> --- a/default-configs/ppc-softmmu.mak
->> +++ b/default-configs/ppc-softmmu.mak
->> @@ -26,6 +26,7 @@ CONFIG_USB_EHCI_SYSBUS=y
->>  CONFIG_SM501=y
->>  CONFIG_IDE_SII3112=y
->>  CONFIG_I2C=y
->> +CONFIG_AT24C=y
->>  
->>  # For Macs
->>  CONFIG_MAC=y
->> diff --git a/hw/nvram/Makefile.objs b/hw/nvram/Makefile.objs
->> index a912d25391..b318e53a43 100644
->> --- a/hw/nvram/Makefile.objs
->> +++ b/hw/nvram/Makefile.objs
->> @@ -1,6 +1,6 @@
->>  common-obj-$(CONFIG_DS1225Y) += ds1225y.o
->>  common-obj-y += eeprom93xx.o
->> -common-obj-$(CONFIG_I2C) += eeprom_at24c.o
->> +common-obj-$(CONFIG_AT24C) += eeprom_at24c.o
->>  common-obj-y += fw_cfg.o
->>  common-obj-y += chrp_nvram.o
->>  common-obj-$(CONFIG_MAC_NVRAM) += mac_nvram.o
-> 
-> Since this is a device that can only be added by the user (no board is
-> using it automatically, as far as I can see),
+>>> However, extending query-machines and query-target looks wrong
+>>> too, however.  query-target looks wrong because this not a
+>>> property of the target.  query-machines is wrong because this is
+>>> not a static property of the machine-type, but of the running
+>>> machine instance.
+>> Of the two, query-machines looks less wrong.
+>>
+>> Arguably, -no-acpi should not exist.  It's an ad hoc flag that sneakil=
+y
+>> splits a few machine types into two variants, with and without ACPI.
+>> It's silently ignored for other machine types, even APCI-capable ones.
+>>
+>> If the machine type variants with and without ACPI were separate types=
+,
+>> wakeup-suspend-support would be a static property of the machine type.
+>>
+>> However, "separate types" probably doesn't scale: I'm afraid we'd end =
+up
+>> with an undesirable number of machine types.  Avoiding that is exactly
+>> why we have machine types with configurable options.  I suspect that's
+>> how ACPI should be configured (if at all).
+>>
+>> So, should we make -no-acpi sugar for a machine type parameter?  And
+>> then deprecate -no-acpi for good measure?
+> I think we should.
+>
+>
+>>> Can we have a new query command that could be an obvious
+>>> container for simple machine capabilities that are not static?  A
+>>> name like "query-machine" would be generic enough for that, I
+>>> guess.
+>> Having command names differ only in a single letter is awkward, but
+>> let's focus on things other than naming now, and use
+>> query-current-machine like a working title.
+>>
+>> query-machines is wrong because wakeup-suspend-support isn't static fo=
+r
+>> some machine types.
+>>
+>> query-current-machine is also kind of wrong because
+>> wakeup-suspend-support *is* static for most machine types.
+>>
+> The most appropriate solution depends a lot on how/when
+> management software needs to query this.
+>
+> If they only need to query it at runtime for a running VM,
+> there's no reason for us to go of our way and add complexity just
+> to make it look like static data in query-machines.
+>
+> On the other hand, if they really need to query it before
+> configuring/starting a VM, it won't be useful at all to make it
+> available only at runtime.
+>
+> Daniel, when/how exactly software would need to query the new
+> flag?
 
-The board which prompted me to add this device is still out there and
-I'm still intent on pursuing getting it into QEMU.  It's clearly going
-to be some time before this can happen as there are RTC and e500
-patches that would need to get in first, and my time to spend on this
-has been non-existent in recent months.
+The original idea of this series was to provide a way to inform managemen=
+t
+when not to execute a pm-suspend* command. This is a command from the
+guest agent, thus it's only available when the guest is already running.=20
+As far
+as I know there is no way to suspend the VM=C2=A0 without using the guest=
+ agent.
 
-https://github.com/mdavidsaver/qemu/commits/vme
+Thus, unless management wants to store this state to avoid querying it=20
+multiple
+times during the VM lifetime (I remember from Libvirt code that it=20
+stores some
+sort of capabilities of the domain in an internal state, although I=20
+can't recall if
+this info would be eligible for that), there is no need to query this=20
+until the VM
+is booted.
 
-> it could be useful for
-> other machines, too, I guess? Anyway, it's a good idea to have a
-> separate config switch available for it, and we can add it to other
-> machines again later if somebody feels that it is necessary, so (once
-> you add your SoB):
-> 
-> Reviewed-by: Thomas Huth <thuth@redhat.com>
-> 
+
+
+
+>
+>
+>> Worse, a machine type property that is static for all machine types no=
+w
+>> could conceivably become dynamic when we add a machine type
+>> configuration knob.
+>>
+> This isn't the first time a machine capability that seems static
+> actually depends on other configuration arguments.  We will
+> probably need to address this eventually.
+>
+>
+>> Would a way to tie the property to the configuration knob help?
+>> Something like wakeup-suspend-support taking values true (supported),
+>> false (not supported), and "acpi" (supported if machine type
+>> configuration knob "acpi" is switched on).
+>>
+> I would prefer a more generic mechanism.  Maybe make
+> 'query-machines' accept a 'machine-options' argument?
+>
