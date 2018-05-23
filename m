@@ -1,33 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41344)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41660)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fLSpa-0002ZZ-9f
-	for qemu-devel@nongnu.org; Wed, 23 May 2018 08:25:27 -0400
+	id 1fLSqm-0003Hu-Bc
+	for qemu-devel@nongnu.org; Wed, 23 May 2018 08:26:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fLSpW-0003ER-Ek
-	for qemu-devel@nongnu.org; Wed, 23 May 2018 08:25:26 -0400
-Received: from mail-qt0-x242.google.com ([2607:f8b0:400d:c0d::242]:40833)
+	id 1fLSqg-0003Ya-Ck
+	for qemu-devel@nongnu.org; Wed, 23 May 2018 08:26:40 -0400
+Received: from mail-qt0-x243.google.com ([2607:f8b0:400d:c0d::243]:39499)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fLSpW-0003EL-A1
-	for qemu-devel@nongnu.org; Wed, 23 May 2018 08:25:22 -0400
-Received: by mail-qt0-x242.google.com with SMTP id h2-v6so27735833qtp.7
-	for <qemu-devel@nongnu.org>; Wed, 23 May 2018 05:25:22 -0700 (PDT)
+	id 1fLSqg-0003YO-83
+	for qemu-devel@nongnu.org; Wed, 23 May 2018 08:26:34 -0400
+Received: by mail-qt0-x243.google.com with SMTP id f1-v6so27739625qtj.6
+	for <qemu-devel@nongnu.org>; Wed, 23 May 2018 05:26:34 -0700 (PDT)
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
 References: <1527034517-7851-1-git-send-email-mjc@sifive.com>
-	<1527034517-7851-12-git-send-email-mjc@sifive.com>
+	<1527034517-7851-14-git-send-email-mjc@sifive.com>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <6a7f5b63-21bc-6632-ea9d-c8d2f9a6d240@amsat.org>
-Date: Wed, 23 May 2018 09:25:17 -0300
+Message-ID: <d87c4c82-9762-efd1-19fd-3cfdf57466c1@amsat.org>
+Date: Wed, 23 May 2018 09:26:29 -0300
 MIME-Version: 1.0
-In-Reply-To: <1527034517-7851-12-git-send-email-mjc@sifive.com>
+In-Reply-To: <1527034517-7851-14-git-send-email-mjc@sifive.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v1 11/30] RISC-V: Split out mstatus_fs from
- tb_flags
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v1 13/30] RISC-V: Implement
+ mstatus.TSR/TW/TVM
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,98 +37,120 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Michael Clark <mjc@sifive.com>, qemu-devel@nongnu.org
-Cc: Sagar Karandikar <sagark@eecs.berkeley.edu>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Palmer Dabbelt <palmer@sifive.com>, Richard Henderson <richard.henderson@linaro.org>, Alistair Francis <Alistair.Francis@wdc.com>, patches@groups.riscv.org
+Cc: Matthew Suozzo <msuozzo@google.com>, Sagar Karandikar <sagark@eecs.berkeley.edu>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Palmer Dabbelt <palmer@sifive.com>, Alistair Francis <Alistair.Francis@wdc.com>, patches@groups.riscv.org
 
-On 05/22/2018 09:14 PM, Michael Clark wrote:
-> From: Richard Henderson <richard.henderson@linaro.org>
+Hi Michael,
+
+On 05/22/2018 09:15 PM, Michael Clark wrote:
+> This adds the necessary minimum to support S-mode
+> virtualization for priv ISA >= v1.10
 > 
 > Cc: Sagar Karandikar <sagark@eecs.berkeley.edu>
 > Cc: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
 > Cc: Palmer Dabbelt <palmer@sifive.com>
 > Cc: Alistair Francis <Alistair.Francis@wdc.com>
-> Cc: Richard Henderson <richard.henderson@linaro.org>
+> Cc: Matthew Suozzo <msuozzo@google.com>
 > Signed-off-by: Michael Clark <mjc@sifive.com>
-> Reviewed-by: Michael Clark <mjc@sifive.com>
-
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-
-> ---
->  target/riscv/cpu.h       |  6 +++---
->  target/riscv/translate.c | 10 +++++-----
->  2 files changed, 8 insertions(+), 8 deletions(-)
 > 
-> diff --git a/target/riscv/cpu.h b/target/riscv/cpu.h
-> index 3a3d91447736..242a8fcbe180 100644
-> --- a/target/riscv/cpu.h
-> +++ b/target/riscv/cpu.h
-> @@ -276,8 +276,8 @@ void QEMU_NORETURN do_raise_exception_err(CPURISCVState *env,
->  target_ulong cpu_riscv_get_fflags(CPURISCVState *env);
->  void cpu_riscv_set_fflags(CPURISCVState *env, target_ulong);
->  
-> -#define TB_FLAGS_MMU_MASK  3
-> -#define TB_FLAGS_FP_ENABLE MSTATUS_FS
-> +#define TB_FLAGS_MMU_MASK   3
-> +#define TB_FLAGS_MSTATUS_FS MSTATUS_FS
->  
->  static inline void cpu_get_tb_cpu_state(CPURISCVState *env, target_ulong *pc,
->                                          target_ulong *cs_base, uint32_t *flags)
-> @@ -285,7 +285,7 @@ static inline void cpu_get_tb_cpu_state(CPURISCVState *env, target_ulong *pc,
->      *pc = env->pc;
->      *cs_base = 0;
->  #ifdef CONFIG_USER_ONLY
-> -    *flags = TB_FLAGS_FP_ENABLE;
-> +    *flags = TB_FLAGS_MSTATUS_FS;
->  #else
->      *flags = cpu_mmu_index(env, 0) | (env->mstatus & MSTATUS_FS);
->  #endif
-> diff --git a/target/riscv/translate.c b/target/riscv/translate.c
-> index ee2bbc55b051..466b9551cbd9 100644
-> --- a/target/riscv/translate.c
-> +++ b/target/riscv/translate.c
-> @@ -44,7 +44,7 @@ typedef struct DisasContext {
->      /* pc_succ_insn points to the instruction following base.pc_next */
->      target_ulong pc_succ_insn;
->      uint32_t opcode;
-> -    uint32_t flags;
-> +    uint32_t mstatus_fs;
->      uint32_t mem_idx;
->      /* Remember the rounding mode encoded in the previous fp instruction,
->         which we have already installed into env->fp_status.  Or -1 for
-> @@ -656,7 +656,7 @@ static void gen_fp_load(DisasContext *ctx, uint32_t opc, int rd,
->  {
->      TCGv t0;
->  
-> -    if (!(ctx->flags & TB_FLAGS_FP_ENABLE)) {
-> +    if (ctx->mstatus_fs == 0) {
->          gen_exception_illegal(ctx);
->          return;
->      }
-> @@ -686,7 +686,7 @@ static void gen_fp_store(DisasContext *ctx, uint32_t opc, int rs1,
->  {
->      TCGv t0;
->  
-> -    if (!(ctx->flags & TB_FLAGS_FP_ENABLE)) {
-> +    if (ctx->mstatus_fs == 0) {
->          gen_exception_illegal(ctx);
->          return;
->      }
-> @@ -945,7 +945,7 @@ static void gen_fp_arith(DisasContext *ctx, uint32_t opc, int rd,
->  {
->      TCGv t0 = NULL;
->  
-> -    if (!(ctx->flags & TB_FLAGS_FP_ENABLE)) {
-> +    if (ctx->mstatus_fs == 0) {
->          goto do_illegal;
+> Co-authored-by: Matthew Suozzo <msuozzo@google.com>
+
+Isn't it simply another Signed-off-by?
+
+> Co-authored-by: Michael Clark <mjc@sifive.com>
+> ---
+>  target/riscv/csr.c       | 17 +++++++++++++----
+>  target/riscv/op_helper.c | 25 +++++++++++++++++++++----
+>  2 files changed, 34 insertions(+), 8 deletions(-)
+> 
+> diff --git a/target/riscv/csr.c b/target/riscv/csr.c
+> index b4452388ff02..509215327243 100644
+> --- a/target/riscv/csr.c
+> +++ b/target/riscv/csr.c
+> @@ -313,7 +313,8 @@ static int write_mstatus(CPURISCVState *env, int csrno, target_ulong val)
+>          }
+>          mask = MSTATUS_SIE | MSTATUS_SPIE | MSTATUS_MIE | MSTATUS_MPIE |
+>              MSTATUS_SPP | MSTATUS_FS | MSTATUS_MPRV | MSTATUS_SUM |
+> -            MSTATUS_MPP | MSTATUS_MXR;
+> +            MSTATUS_MPP | MSTATUS_MXR | MSTATUS_TVM | MSTATUS_TSR |
+> +            MSTATUS_TW;
 >      }
 >  
-> @@ -1810,8 +1810,8 @@ static void riscv_tr_init_disas_context(DisasContextBase *dcbase, CPUState *cs)
->      DisasContext *ctx = container_of(dcbase, DisasContext, base);
+>      /* silenty discard mstatus.mpp writes for unsupported modes */
+> @@ -654,7 +655,11 @@ static int read_satp(CPURISCVState *env, int csrno, target_ulong *val)
+>      if (!riscv_feature(env, RISCV_FEATURE_MMU)) {
+>          *val = 0;
+>      } else if (env->priv_ver >= PRIV_VERSION_1_10_0) {
+> -        *val = env->satp;
+> +        if (env->priv == PRV_S && get_field(env->mstatus, MSTATUS_TVM)) {
+> +            return -1;
+> +        } else {
+> +            *val = env->satp;
+> +        }
+>      } else {
+>          *val = env->sptbr;
+>      }
+> @@ -675,8 +680,12 @@ static int write_satp(CPURISCVState *env, int csrno, target_ulong val)
+>          validate_vm(env, get_field(val, SATP_MODE)) &&
+>          ((val ^ env->satp) & (SATP_MODE | SATP_ASID | SATP_PPN)))
+>      {
+> -        tlb_flush(CPU(riscv_env_get_cpu(env)));
+> -        env->satp = val;
+> +        if (env->priv == PRV_S && get_field(env->mstatus, MSTATUS_TVM)) {
+> +            return -1;
+> +        } else {
+> +            tlb_flush(CPU(riscv_env_get_cpu(env)));
+> +            env->satp = val;
+> +        }
+>      }
+>      return 0;
+>  }
+> diff --git a/target/riscv/op_helper.c b/target/riscv/op_helper.c
+> index 81bd1a77ea90..77c79ba36e0b 100644
+> --- a/target/riscv/op_helper.c
+> +++ b/target/riscv/op_helper.c
+> @@ -82,6 +82,11 @@ target_ulong helper_sret(CPURISCVState *env, target_ulong cpu_pc_deb)
+>          do_raise_exception_err(env, RISCV_EXCP_INST_ADDR_MIS, GETPC());
+>      }
 >  
->      ctx->pc_succ_insn = ctx->base.pc_first;
-> -    ctx->flags = ctx->base.tb->flags;
->      ctx->mem_idx = ctx->base.tb->flags & TB_FLAGS_MMU_MASK;
-> +    ctx->mstatus_fs = ctx->base.tb->flags & TB_FLAGS_MSTATUS_FS;
->      ctx->frm = -1;  /* unknown rounding mode */
+> +    if (env->priv_ver >= PRIV_VERSION_1_10_0 &&
+> +        get_field(env->mstatus, MSTATUS_TSR)) {
+> +        do_raise_exception_err(env, RISCV_EXCP_ILLEGAL_INST, GETPC());
+> +    }
+> +
+>      target_ulong mstatus = env->mstatus;
+>      target_ulong prev_priv = get_field(mstatus, MSTATUS_SPP);
+>      mstatus = set_field(mstatus,
+> @@ -125,16 +130,28 @@ void helper_wfi(CPURISCVState *env)
+>  {
+>      CPUState *cs = CPU(riscv_env_get_cpu(env));
+>  
+> -    cs->halted = 1;
+> -    cs->exception_index = EXCP_HLT;
+> -    cpu_loop_exit(cs);
+> +    if (env->priv == PRV_S &&
+> +        env->priv_ver >= PRIV_VERSION_1_10_0 &&
+> +        get_field(env->mstatus, MSTATUS_TW)) {
+> +        do_raise_exception_err(env, RISCV_EXCP_ILLEGAL_INST, GETPC());
+> +    } else {
+> +        cs->halted = 1;
+> +        cs->exception_index = EXCP_HLT;
+> +        cpu_loop_exit(cs);
+> +    }
 >  }
 >  
+>  void helper_tlb_flush(CPURISCVState *env)
+>  {
+>      RISCVCPU *cpu = riscv_env_get_cpu(env);
+>      CPUState *cs = CPU(cpu);
+> -    tlb_flush(cs);
+> +    if (env->priv == PRV_S &&
+> +        env->priv_ver >= PRIV_VERSION_1_10_0 &&
+> +        get_field(env->mstatus, MSTATUS_TVM)) {
+> +        do_raise_exception_err(env, RISCV_EXCP_ILLEGAL_INST, GETPC());
+> +    } else {
+> +        tlb_flush(cs);
+> +    }
+>  }
+>  
+>  #endif /* !CONFIG_USER_ONLY */
 > 
