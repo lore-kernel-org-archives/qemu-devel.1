@@ -1,23 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42541)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42595)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mjc@sifive.com>) id 1fLHTb-0000BP-9c
-	for qemu-devel@nongnu.org; Tue, 22 May 2018 20:18:00 -0400
+	(envelope-from <mjc@sifive.com>) id 1fLHTf-0000D3-CJ
+	for qemu-devel@nongnu.org; Tue, 22 May 2018 20:18:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mjc@sifive.com>) id 1fLHTZ-00017a-H9
-	for qemu-devel@nongnu.org; Tue, 22 May 2018 20:17:59 -0400
-Received: from mail-pl0-x244.google.com ([2607:f8b0:400e:c01::244]:34022)
+	(envelope-from <mjc@sifive.com>) id 1fLHTd-0001Bd-Nb
+	for qemu-devel@nongnu.org; Tue, 22 May 2018 20:18:03 -0400
+Received: from mail-pg0-x235.google.com ([2607:f8b0:400e:c05::235]:33486)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <mjc@sifive.com>) id 1fLHTZ-00016u-6O
-	for qemu-devel@nongnu.org; Tue, 22 May 2018 20:17:57 -0400
-Received: by mail-pl0-x244.google.com with SMTP id ay10-v6so11876625plb.1
-	for <qemu-devel@nongnu.org>; Tue, 22 May 2018 17:17:57 -0700 (PDT)
+	(Exim 4.71) (envelope-from <mjc@sifive.com>) id 1fLHTd-0001B8-FX
+	for qemu-devel@nongnu.org; Tue, 22 May 2018 20:18:01 -0400
+Received: by mail-pg0-x235.google.com with SMTP id e21-v6so3672926pgv.0
+	for <qemu-devel@nongnu.org>; Tue, 22 May 2018 17:18:01 -0700 (PDT)
 From: Michael Clark <mjc@sifive.com>
-Date: Wed, 23 May 2018 12:15:06 +1200
-Message-Id: <1527034517-7851-20-git-send-email-mjc@sifive.com>
+Date: Wed, 23 May 2018 12:15:07 +1200
+Message-Id: <1527034517-7851-21-git-send-email-mjc@sifive.com>
 In-Reply-To: <1527034517-7851-1-git-send-email-mjc@sifive.com>
 References: <1527034517-7851-1-git-send-email-mjc@sifive.com>
-Subject: [Qemu-devel] [PATCH v1 19/30] RISC-V: Allow interrupt controllers
- to claim interrupts
+Subject: [Qemu-devel] [PATCH v1 20/30] RISC-V: Add misa to DisasContext
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,129 +26,298 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: patches@groups.riscv.org, Michael Clark <mjc@sifive.com>, Palmer Dabbelt <palmer@sifive.com>, Sagar Karandikar <sagark@eecs.berkeley.edu>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Alistair Francis <Alistair.Francis@wdc.com>
+Cc: patches@groups.riscv.org, Michael Clark <mjc@sifive.com>, Palmer Dabbelt <palmer@sifive.com>, Sagar Karandikar <sagark@eecs.berkeley.edu>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Alistair Francis <Alistair.Francis@wdc.com>, "Emilio G . Cota" <cota@braap.org>
 
-We can't allow the supervisor to control SEIP as this would allow the
-supervisor to clear a pending external interrupt which will result in
-lost a interrupt in the case a PLIC is attached. The SEIP bit must be
-hardware controlled when a PLIC is attached.
-
-This logic was previously hard-coded so SEIP was always masked even
-if no PLIC was attached. This patch adds riscv_cpu_claim_interrupts
-so that the PLIC can register control of SEIP. In the case of models
-without a PLIC (spike), the SEIP bit remains software controlled.
-
-This interface allows for hardware control of supervisor timer and
-software interrupts by other interrupt controller models.
+gen methods should access state from DisasContext. Add misa
+field to the DisasContext struct and remove CPURISCVState
+argument from all gen methods.
 
 Cc: Palmer Dabbelt <palmer@sifive.com>
 Cc: Sagar Karandikar <sagark@eecs.berkeley.edu>
 Cc: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
 Cc: Alistair Francis <Alistair.Francis@wdc.com>
+Cc: Emilio G. Cota <cota@braap.org>
 Signed-off-by: Michael Clark <mjc@sifive.com>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- hw/riscv/sifive_plic.c    | 13 +++++++++++++
- target/riscv/cpu.h        |  2 ++
- target/riscv/cpu_helper.c | 11 +++++++++++
- target/riscv/csr.c        | 12 ++++--------
- 4 files changed, 30 insertions(+), 8 deletions(-)
+ target/riscv/translate.c | 78 ++++++++++++++++++++++++++----------------------
+ 1 file changed, 42 insertions(+), 36 deletions(-)
 
-diff --git a/hw/riscv/sifive_plic.c b/hw/riscv/sifive_plic.c
-index dc6f4924e282..28e28d932f7c 100644
---- a/hw/riscv/sifive_plic.c
-+++ b/hw/riscv/sifive_plic.c
-@@ -23,6 +23,7 @@
- #include "qemu/error-report.h"
- #include "hw/sysbus.h"
- #include "target/riscv/cpu.h"
-+#include "sysemu/sysemu.h"
- #include "hw/riscv/sifive_plic.h"
- 
- #define RISCV_DEBUG_PLIC 0
-@@ -447,6 +448,18 @@ static void sifive_plic_realize(DeviceState *dev, Error **errp)
-     for (i = 0; i <= plic->num_sources; i++) {
-         plic->irqs[i] = qemu_allocate_irq(sifive_plic_irq_request, plic, i);
-     }
-+
-+    /* We can't allow the supervisor to control SEIP as this would allow the
-+     * supervisor to clear a pending external interrupt which will result in
-+     * lost a interrupt in the case a PLIC is attached. The SEIP bit must be
-+     * hardware controlled when a PLIC is attached. */
-+    for (i = 0; i < smp_cpus; i++) {
-+        RISCVCPU *cpu = RISCV_CPU(qemu_get_cpu(i));
-+        if (riscv_cpu_claim_interrupts(cpu, MIP_SEIP) < 0) {
-+            error_report("sifive_plic_realize: SEIP already claimed");
-+            exit(1);
-+        }
-+    }
- }
- 
- static void sifive_plic_class_init(ObjectClass *klass, void *data)
-diff --git a/target/riscv/cpu.h b/target/riscv/cpu.h
-index d6bb3136db18..ae0e3f6a544d 100644
---- a/target/riscv/cpu.h
-+++ b/target/riscv/cpu.h
-@@ -138,6 +138,7 @@ struct CPURISCVState {
-      * mip is 32-bits to allow atomic_read on 32-bit hosts.
-      */
-     uint32_t mip;
-+    uint32_t miclaim;
- 
-     target_ulong mie;
-     target_ulong mideleg;
-@@ -262,6 +263,7 @@ void riscv_cpu_list(FILE *f, fprintf_function cpu_fprintf);
- #define cpu_mmu_index riscv_cpu_mmu_index
- 
- #ifndef CONFIG_USER_ONLY
-+int riscv_cpu_claim_interrupts(RISCVCPU *cpu, uint32_t interrupts);
- uint32_t riscv_cpu_update_mip(RISCVCPU *cpu, uint32_t mask, uint32_t value);
- #define BOOL_TO_MASK(x) (-!!(x)) /* helper for riscv_cpu_update_mip value */
+diff --git a/target/riscv/translate.c b/target/riscv/translate.c
+index a980611eb611..fd21b133a5a4 100644
+--- a/target/riscv/translate.c
++++ b/target/riscv/translate.c
+@@ -45,6 +45,7 @@ typedef struct DisasContext {
+     target_ulong pc_succ_insn;
+     uint32_t opcode;
+     uint32_t mstatus_fs;
++    uint32_t misa;
+     uint32_t mem_idx;
+     /* Remember the rounding mode encoded in the previous fp instruction,
+        which we have already installed into env->fp_status.  Or -1 for
+@@ -74,6 +75,11 @@ static const int tcg_memop_lookup[8] = {
+ #define CASE_OP_32_64(X) case X
  #endif
-diff --git a/target/riscv/cpu_helper.c b/target/riscv/cpu_helper.c
-index b4bbf7a9fa0a..7c9f6c46c75a 100644
---- a/target/riscv/cpu_helper.c
-+++ b/target/riscv/cpu_helper.c
-@@ -72,6 +72,17 @@ bool riscv_cpu_exec_interrupt(CPUState *cs, int interrupt_request)
  
- #if !defined(CONFIG_USER_ONLY)
- 
-+int riscv_cpu_claim_interrupts(RISCVCPU *cpu, uint32_t interrupts)
++static inline bool has_ext(DisasContext *ctx, uint32_t ext)
 +{
-+    CPURISCVState *env = &cpu->env;
-+    if (env->miclaim & interrupts) {
-+        return -1;
-+    } else {
-+        env->miclaim |= interrupts;
-+        return 0;
-+    }
++    return ctx->misa & ext;
 +}
 +
- /* iothread_mutex must be held */
- uint32_t riscv_cpu_update_mip(RISCVCPU *cpu, uint32_t mask, uint32_t value)
+ static void generate_exception(DisasContext *ctx, int excp)
  {
-diff --git a/target/riscv/csr.c b/target/riscv/csr.c
-index 45e33d876034..9bbe81a110a5 100644
---- a/target/riscv/csr.c
-+++ b/target/riscv/csr.c
-@@ -502,15 +502,11 @@ static int rmw_mip(CPURISCVState *env, int csrno, target_ulong *ret_value,
-                    target_ulong new_value, target_ulong write_mask)
+     tcg_gen_movi_tl(cpu_pc, ctx->base.pc_next);
+@@ -505,14 +511,13 @@ static void gen_arith_imm(DisasContext *ctx, uint32_t opc, int rd,
+     tcg_temp_free(source1);
+ }
+ 
+-static void gen_jal(CPURISCVState *env, DisasContext *ctx, int rd,
+-                    target_ulong imm)
++static void gen_jal(DisasContext *ctx, int rd, target_ulong imm)
  {
-     RISCVCPU *cpu = riscv_env_get_cpu(env);
--    target_ulong mask = write_mask & delegable_ints;
--    uint32_t old_mip;
+     target_ulong next_pc;
  
--    /* We can't allow the supervisor to control SEIP as this would allow the
--     * supervisor to clear a pending external interrupt which will result in
--     * lost a interrupt in the case a PLIC is attached. The SEIP bit must be
--     * hardware controlled when a PLIC is attached. This should be an option
--     * for CPUs with software-delegated Supervisor External Interrupts. */
--    mask &= ~MIP_SEIP;
-+    /* Allow software control of delegable interrupts not claimed by hardware */
-+    target_ulong mask = write_mask & delegable_ints & ~env->miclaim;
-+
-+    uint32_t old_mip;
+     /* check misaligned: */
+     next_pc = ctx->base.pc_next + imm;
+-    if (!riscv_has_ext(env, RVC)) {
++    if (!has_ext(ctx, RVC)) {
+         if ((next_pc & 0x3) != 0) {
+             gen_exception_inst_addr_mis(ctx);
+             return;
+@@ -526,8 +531,8 @@ static void gen_jal(CPURISCVState *env, DisasContext *ctx, int rd,
+     ctx->base.is_jmp = DISAS_NORETURN;
+ }
  
-     if (mask) {
-         qemu_mutex_lock_iothread();
+-static void gen_jalr(CPURISCVState *env, DisasContext *ctx, uint32_t opc,
+-                     int rd, int rs1, target_long imm)
++static void gen_jalr(DisasContext *ctx, uint32_t opc, int rd, int rs1,
++                     target_long imm)
+ {
+     /* no chaining with JALR */
+     TCGLabel *misaligned = NULL;
+@@ -539,7 +544,7 @@ static void gen_jalr(CPURISCVState *env, DisasContext *ctx, uint32_t opc,
+         tcg_gen_addi_tl(cpu_pc, cpu_pc, imm);
+         tcg_gen_andi_tl(cpu_pc, cpu_pc, (target_ulong)-2);
+ 
+-        if (!riscv_has_ext(env, RVC)) {
++        if (!has_ext(ctx, RVC)) {
+             misaligned = gen_new_label();
+             tcg_gen_andi_tl(t0, cpu_pc, 0x2);
+             tcg_gen_brcondi_tl(TCG_COND_NE, t0, 0x0, misaligned);
+@@ -564,8 +569,8 @@ static void gen_jalr(CPURISCVState *env, DisasContext *ctx, uint32_t opc,
+     tcg_temp_free(t0);
+ }
+ 
+-static void gen_branch(CPURISCVState *env, DisasContext *ctx, uint32_t opc,
+-                       int rs1, int rs2, target_long bimm)
++static void gen_branch(DisasContext *ctx, uint32_t opc, int rs1, int rs2,
++                       target_long bimm)
+ {
+     TCGLabel *l = gen_new_label();
+     TCGv source1, source2;
+@@ -602,7 +607,7 @@ static void gen_branch(CPURISCVState *env, DisasContext *ctx, uint32_t opc,
+ 
+     gen_goto_tb(ctx, 1, ctx->pc_succ_insn);
+     gen_set_label(l); /* branch taken */
+-    if (!riscv_has_ext(env, RVC) && ((ctx->base.pc_next + bimm) & 0x3)) {
++    if (!has_ext(ctx, RVC) && ((ctx->base.pc_next + bimm) & 0x3)) {
+         /* misaligned */
+         gen_exception_inst_addr_mis(ctx);
+     } else {
+@@ -1311,8 +1316,8 @@ static void gen_fp_arith(DisasContext *ctx, uint32_t opc, int rd,
+     }
+ }
+ 
+-static void gen_system(CPURISCVState *env, DisasContext *ctx, uint32_t opc,
+-                      int rd, int rs1, int csr)
++static void gen_system(DisasContext *ctx, uint32_t opc, int rd, int rs1,
++                       int csr)
+ {
+     TCGv source1, csr_store, dest, rs1_pass, imm_rs1;
+     source1 = tcg_temp_new();
+@@ -1354,7 +1359,7 @@ static void gen_system(CPURISCVState *env, DisasContext *ctx, uint32_t opc,
+             gen_exception_illegal(ctx);
+             break;
+         case 0x102: /* SRET */
+-            if (riscv_has_ext(env, RVS)) {
++            if (has_ext(ctx, RVS)) {
+                 gen_helper_sret(cpu_pc, cpu_env, cpu_pc);
+                 tcg_gen_exit_tb(0); /* no chaining */
+                 ctx->base.is_jmp = DISAS_NORETURN;
+@@ -1495,7 +1500,7 @@ static void decode_RV32_64C0(DisasContext *ctx)
+     }
+ }
+ 
+-static void decode_RV32_64C1(CPURISCVState *env, DisasContext *ctx)
++static void decode_RV32_64C1(DisasContext *ctx)
+ {
+     uint8_t funct3 = extract32(ctx->opcode, 13, 3);
+     uint8_t rd_rs1 = GET_C_RS1(ctx->opcode);
+@@ -1515,7 +1520,7 @@ static void decode_RV32_64C1(CPURISCVState *env, DisasContext *ctx)
+                       GET_C_IMM(ctx->opcode));
+ #else
+         /* C.JAL(RV32) -> jal x1, offset[11:1] */
+-        gen_jal(env, ctx, 1, GET_C_J_IMM(ctx->opcode));
++        gen_jal(ctx, 1, GET_C_J_IMM(ctx->opcode));
+ #endif
+         break;
+     case 2:
+@@ -1594,22 +1599,22 @@ static void decode_RV32_64C1(CPURISCVState *env, DisasContext *ctx)
+         break;
+     case 5:
+         /* C.J -> jal x0, offset[11:1]*/
+-        gen_jal(env, ctx, 0, GET_C_J_IMM(ctx->opcode));
++        gen_jal(ctx, 0, GET_C_J_IMM(ctx->opcode));
+         break;
+     case 6:
+         /* C.BEQZ -> beq rs1', x0, offset[8:1]*/
+         rs1s = GET_C_RS1S(ctx->opcode);
+-        gen_branch(env, ctx, OPC_RISC_BEQ, rs1s, 0, GET_C_B_IMM(ctx->opcode));
++        gen_branch(ctx, OPC_RISC_BEQ, rs1s, 0, GET_C_B_IMM(ctx->opcode));
+         break;
+     case 7:
+         /* C.BNEZ -> bne rs1', x0, offset[8:1]*/
+         rs1s = GET_C_RS1S(ctx->opcode);
+-        gen_branch(env, ctx, OPC_RISC_BNE, rs1s, 0, GET_C_B_IMM(ctx->opcode));
++        gen_branch(ctx, OPC_RISC_BNE, rs1s, 0, GET_C_B_IMM(ctx->opcode));
+         break;
+     }
+ }
+ 
+-static void decode_RV32_64C2(CPURISCVState *env, DisasContext *ctx)
++static void decode_RV32_64C2(DisasContext *ctx)
+ {
+     uint8_t rd, rs2;
+     uint8_t funct3 = extract32(ctx->opcode, 13, 3);
+@@ -1643,7 +1648,7 @@ static void decode_RV32_64C2(CPURISCVState *env, DisasContext *ctx)
+         if (extract32(ctx->opcode, 12, 1) == 0) {
+             if (rs2 == 0) {
+                 /* C.JR -> jalr x0, rs1, 0*/
+-                gen_jalr(env, ctx, OPC_RISC_JALR, 0, rd, 0);
++                gen_jalr(ctx, OPC_RISC_JALR, 0, rd, 0);
+             } else {
+                 /* C.MV -> add rd, x0, rs2 */
+                 gen_arith(ctx, OPC_RISC_ADD, rd, 0, rs2);
+@@ -1651,11 +1656,11 @@ static void decode_RV32_64C2(CPURISCVState *env, DisasContext *ctx)
+         } else {
+             if (rd == 0) {
+                 /* C.EBREAK -> ebreak*/
+-                gen_system(env, ctx, OPC_RISC_ECALL, 0, 0, 0x1);
++                gen_system(ctx, OPC_RISC_ECALL, 0, 0, 0x1);
+             } else {
+                 if (rs2 == 0) {
+                     /* C.JALR -> jalr x1, rs1, 0*/
+-                    gen_jalr(env, ctx, OPC_RISC_JALR, 1, rd, 0);
++                    gen_jalr(ctx, OPC_RISC_JALR, 1, rd, 0);
+                 } else {
+                     /* C.ADD -> add rd, rd, rs2 */
+                     gen_arith(ctx, OPC_RISC_ADD, rd, rd, rs2);
+@@ -1687,7 +1692,7 @@ static void decode_RV32_64C2(CPURISCVState *env, DisasContext *ctx)
+     }
+ }
+ 
+-static void decode_RV32_64C(CPURISCVState *env, DisasContext *ctx)
++static void decode_RV32_64C(DisasContext *ctx)
+ {
+     uint8_t op = extract32(ctx->opcode, 0, 2);
+ 
+@@ -1696,15 +1701,15 @@ static void decode_RV32_64C(CPURISCVState *env, DisasContext *ctx)
+         decode_RV32_64C0(ctx);
+         break;
+     case 1:
+-        decode_RV32_64C1(env, ctx);
++        decode_RV32_64C1(ctx);
+         break;
+     case 2:
+-        decode_RV32_64C2(env, ctx);
++        decode_RV32_64C2(ctx);
+         break;
+     }
+ }
+ 
+-static void decode_RV32_64G(CPURISCVState *env, DisasContext *ctx)
++static void decode_RV32_64G(DisasContext *ctx)
+ {
+     int rs1;
+     int rs2;
+@@ -1739,13 +1744,13 @@ static void decode_RV32_64G(CPURISCVState *env, DisasContext *ctx)
+         break;
+     case OPC_RISC_JAL:
+         imm = GET_JAL_IMM(ctx->opcode);
+-        gen_jal(env, ctx, rd, imm);
++        gen_jal(ctx, rd, imm);
+         break;
+     case OPC_RISC_JALR:
+-        gen_jalr(env, ctx, MASK_OP_JALR(ctx->opcode), rd, rs1, imm);
++        gen_jalr(ctx, MASK_OP_JALR(ctx->opcode), rd, rs1, imm);
+         break;
+     case OPC_RISC_BRANCH:
+-        gen_branch(env, ctx, MASK_OP_BRANCH(ctx->opcode), rs1, rs2,
++        gen_branch(ctx, MASK_OP_BRANCH(ctx->opcode), rs1, rs2,
+                    GET_B_IMM(ctx->opcode));
+         break;
+     case OPC_RISC_LOAD:
+@@ -1818,7 +1823,7 @@ static void decode_RV32_64G(CPURISCVState *env, DisasContext *ctx)
+ #endif
+         break;
+     case OPC_RISC_SYSTEM:
+-        gen_system(env, ctx, MASK_OP_SYSTEM(ctx->opcode), rd, rs1,
++        gen_system(ctx, MASK_OP_SYSTEM(ctx->opcode), rd, rs1,
+                    (ctx->opcode & 0xFFF00000) >> 20);
+         break;
+     default:
+@@ -1827,29 +1832,31 @@ static void decode_RV32_64G(CPURISCVState *env, DisasContext *ctx)
+     }
+ }
+ 
+-static void decode_opc(CPURISCVState *env, DisasContext *ctx)
++static void decode_opc(DisasContext *ctx)
+ {
+     /* check for compressed insn */
+     if (extract32(ctx->opcode, 0, 2) != 3) {
+-        if (!riscv_has_ext(env, RVC)) {
++        if (!has_ext(ctx, RVC)) {
+             gen_exception_illegal(ctx);
+         } else {
+             ctx->pc_succ_insn = ctx->base.pc_next + 2;
+-            decode_RV32_64C(env, ctx);
++            decode_RV32_64C(ctx);
+         }
+     } else {
+         ctx->pc_succ_insn = ctx->base.pc_next + 4;
+-        decode_RV32_64G(env, ctx);
++        decode_RV32_64G(ctx);
+     }
+ }
+ 
+-static void riscv_tr_init_disas_context(DisasContextBase *dcbase, CPUState *cs)
++static void riscv_tr_init_disas_context(DisasContextBase *dcbase, CPUState *cpu)
+ {
+     DisasContext *ctx = container_of(dcbase, DisasContext, base);
++    CPURISCVState *env = cpu->env_ptr;
+ 
+     ctx->pc_succ_insn = ctx->base.pc_first;
+     ctx->mem_idx = ctx->base.tb->flags & TB_FLAGS_MMU_MASK;
+     ctx->mstatus_fs = ctx->base.tb->flags & TB_FLAGS_MSTATUS_FS;
++    ctx->misa = env->misa;
+     ctx->frm = -1;  /* unknown rounding mode */
+ }
+ 
+@@ -1880,14 +1887,13 @@ static bool riscv_tr_breakpoint_check(DisasContextBase *dcbase, CPUState *cpu,
+     return true;
+ }
+ 
+-
+ static void riscv_tr_translate_insn(DisasContextBase *dcbase, CPUState *cpu)
+ {
+     DisasContext *ctx = container_of(dcbase, DisasContext, base);
+     CPURISCVState *env = cpu->env_ptr;
+ 
+     ctx->opcode = cpu_ldl_code(env, ctx->base.pc_next);
+-    decode_opc(env, ctx);
++    decode_opc(ctx);
+     ctx->base.pc_next = ctx->pc_succ_insn;
+ 
+     if (ctx->base.is_jmp == DISAS_NEXT) {
 -- 
 2.7.0
