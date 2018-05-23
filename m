@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50997)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51408)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1fLRmy-0006RG-Js
-	for qemu-devel@nongnu.org; Wed, 23 May 2018 07:18:41 -0400
+	(envelope-from <armbru@redhat.com>) id 1fLRoB-0007LE-V0
+	for qemu-devel@nongnu.org; Wed, 23 May 2018 07:19:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1fLRmw-0007GY-03
-	for qemu-devel@nongnu.org; Wed, 23 May 2018 07:18:40 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:44622 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1fLRmv-0007GM-SP
-	for qemu-devel@nongnu.org; Wed, 23 May 2018 07:18:37 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.6])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 8CE73195478
-	for <qemu-devel@nongnu.org>; Wed, 23 May 2018 11:18:37 +0000 (UTC)
-From: Juan Quintela <quintela@redhat.com>
-Date: Wed, 23 May 2018 13:18:17 +0200
-Message-Id: <20180523111817.1463-13-quintela@redhat.com>
-In-Reply-To: <20180523111817.1463-1-quintela@redhat.com>
-References: <20180523111817.1463-1-quintela@redhat.com>
-Subject: [Qemu-devel] [PATCH v13 12/12] migration: Stop sending whole pages
- through main channel
+	(envelope-from <armbru@redhat.com>) id 1fLRoA-0007lM-Qa
+	for qemu-devel@nongnu.org; Wed, 23 May 2018 07:19:55 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <20180518180440-mutt-send-email-mst@kernel.org>
+	<20180518170956.GI8615@redhat.com>
+	<20180518174133.GC25013@localhost.localdomain>
+	<87bmdc18q5.fsf@dusky.pond.sub.org>
+	<20180521182928.GO25013@localhost.localdomain>
+	<20180521184440.GB8214@redhat.com>
+	<20180521190112.GP25013@localhost.localdomain>
+Date: Wed, 23 May 2018 13:19:46 +0200
+In-Reply-To: <20180521190112.GP25013@localhost.localdomain> (Eduardo Habkost's
+	message of "Mon, 21 May 2018 16:01:12 -0300")
+Message-ID: <87o9h6hb59.fsf@dusky.pond.sub.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] storing machine data in qcow images?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,61 +29,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: dgilbert@redhat.com, lvivier@redhat.com, peterx@redhat.com
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: "Daniel P. =?utf-8?Q?Berrang=C3=A9?=" <berrange@redhat.com>, kwolf@redhat.com, qemu-block@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org, mreitz@redhat.com, stefanha@redhat.com
 
-We have to flush() the QEMUFile because now we sent really few data
-through that channel.
+Eduardo Habkost <ehabkost@redhat.com> writes:
 
-Signed-off-by: Juan Quintela <quintela@redhat.com>
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
----
- migration/ram.c | 11 +++--------
- 1 file changed, 3 insertions(+), 8 deletions(-)
+> On Mon, May 21, 2018 at 07:44:40PM +0100, Daniel P. Berrang=C3=A9 wrote:
+>> On Mon, May 21, 2018 at 03:29:28PM -0300, Eduardo Habkost wrote:
+>> > On Sat, May 19, 2018 at 08:05:06AM +0200, Markus Armbruster wrote:
+>> > > Eduardo Habkost <ehabkost@redhat.com> writes:
+>> > >=20
+>> > > [...]
+>> > > > About being more expressive than just a single list of key,value
+>> > > > pairs, I don't see any evidence of that being necessary for the
+>> > > > problems we're trying to address.
+>> > >=20
+>> > > Short history of a configuration format you might have encountered:
+>>=20
+>> [snip]
+>>=20
+>> > > How confident are we a single list of (key, value) is really all we'=
+re
+>> > > going to need?
+>> > >=20
+>> > > Even if we think it is, would it be possible to provide for a future
+>> > > extension to trees at next to no cost?
+>> >=20
+>> > I'm confident that a list of key,values is all we need for the
+>> > current problem.
+>>=20
+>> I'm not convinced. A disk image may work with Q35 or i440fx,  or
+>> work with any of virtio, ide or sata disk. So that already means
+>> values have to be arrays, not scalars. You could do that with a
+>> simple key,value list, but only by defining a mapping of arrays
+>> into a flattened form. eg do we allow repeated keys, or do we
+>> allow array indexes on keys.=20
+>
+> No problem, we can support trees if it's necessary.
+>
+>
+>> > The point here is to allow users to simply copy an existing disk
+>> > image, and it will contain enough hints for a cloud stack to
+>> > choose reasonable defaults for machine-type and disk type
+>> > automatically.  Requiring the user to perform a separate step to
+>> > encapsulate the disk image in another file format defeats the
+>> > whole purpose of the proposal.
+>>=20
+>> It doesn't have to mean more work for the user - the application
+>> that is used to create the image can do that on their behalf.
+>> oVirt for example can import/export OVA files, containing OVF
+>> metadata. I could imagine virt-manager, and other tools adding
+>> export ability without much trouble if this was deemed a desirable
+>> thing. Bundling gives ability to have multiple disk images in one
+>> archive, which is something OVF does.
+>
+> I have the impression that "the application that is used to
+> create the image" is a very large set.  It can be virt-manager,
+> virt-install, virt-manager, or even QEMU itself.
+>
+> Today people can simply create a VM on virt-manager, or run QEMU
+> manually, and upload the qcow2 image directly from its original
+> location (they don't need to copy/export it).  Don't we want the
+> same procedure to keep working instead of requiring users to use
+> another tool?
 
-diff --git a/migration/ram.c b/migration/ram.c
-index 62eea9e02f..b327805403 100644
---- a/migration/ram.c
-+++ b/migration/ram.c
-@@ -1771,15 +1771,7 @@ static int ram_save_page(RAMState *rs, PageSearchStatus *pss, bool last_stage)
- static int ram_save_multifd_page(RAMState *rs, RAMBlock *block,
-                                  ram_addr_t offset)
- {
--    uint8_t *p;
--
--    p = block->host + offset;
--
--    ram_counters.transferred += save_page_header(rs, rs->f, block,
--                                                 offset | RAM_SAVE_FLAG_PAGE);
-     multifd_queue_page(block, offset);
--    qemu_put_buffer(rs->f, p, TARGET_PAGE_SIZE);
--    ram_counters.transferred += TARGET_PAGE_SIZE;
-     ram_counters.normal++;
- 
-     return 1;
-@@ -3013,6 +3005,7 @@ static int ram_save_setup(QEMUFile *f, void *opaque)
- 
-     multifd_send_sync_main();
-     qemu_put_be64(f, RAM_SAVE_FLAG_EOS);
-+    qemu_fflush(f);
- 
-     return 0;
- }
-@@ -3090,6 +3083,7 @@ static int ram_save_iterate(QEMUFile *f, void *opaque)
-     multifd_send_sync_main();
- out:
-     qemu_put_be64(f, RAM_SAVE_FLAG_EOS);
-+    qemu_fflush(f);
-     ram_counters.transferred += 8;
- 
-     ret = qemu_file_get_error(f);
-@@ -3143,6 +3137,7 @@ static int ram_save_complete(QEMUFile *f, void *opaque)
- 
-     multifd_send_sync_main();
-     qemu_put_be64(f, RAM_SAVE_FLAG_EOS);
-+    qemu_fflush(f);
- 
-     return 0;
- }
--- 
-2.17.0
+Today, I can take the disk out of my old computer, put it into my new
+computer, and it just works.  Don't we want the same procedure to keep
+working forever?
+
+Sadly, wanting something badly enough doesn't make actual solutions any
+easier :)
+
+My point is: disk images (real or virtual) keep working in different
+hardware contexts by a mixture of flexibility built into system software
+on the image, disciplined evolution of hardware (real or virtual), and
+dumb luck.  It works until it doesn't.  And then you get to tinker.
+
+With OVF, you solve the problem further up the stack: you do virtual
+appliances instead of disk images.
+
+How much space that leaves for useful solutions at the level of QEMU I
+can't say.
