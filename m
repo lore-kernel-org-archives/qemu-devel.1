@@ -1,33 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53458)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56315)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1fLVHU-0000ik-Bi
-	for qemu-devel@nongnu.org; Wed, 23 May 2018 11:02:30 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fLVOF-00061v-GC
+	for qemu-devel@nongnu.org; Wed, 23 May 2018 11:09:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1fLVHO-0008WL-Dt
-	for qemu-devel@nongnu.org; Wed, 23 May 2018 11:02:24 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:19761)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1fLVHO-0008W3-5z
-	for qemu-devel@nongnu.org; Wed, 23 May 2018 11:02:18 -0400
-Date: Wed, 23 May 2018 18:01:56 +0300
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20180523180019-mutt-send-email-mst@kernel.org>
-References: <cbdfe0d6-f071-3560-009d-3bbdde12b33c@gmail.com>
-	<f71a8c61-a0d7-6ebc-62ad-3dab8b9f8e5a@redhat.com>
-	<20180522234410-mutt-send-email-mst@kernel.org>
-	<20180522153659.2e33fbe0@w520.home>
-	<20180523004236-mutt-send-email-mst@kernel.org>
-	<20180522154741.3939d1e0@w520.home>
-	<20180523005048-mutt-send-email-mst@kernel.org>
-	<20180522222856.436c2c96@w520.home>
-	<20180523171028-mutt-send-email-mst@kernel.org>
-	<20180523085751.1ff46b2e@w520.home>
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fLVOA-0003On-VB
+	for qemu-devel@nongnu.org; Wed, 23 May 2018 11:09:23 -0400
+Received: from mail-qk0-x242.google.com ([2607:f8b0:400d:c09::242]:39000)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fLVOA-0003OM-QJ
+	for qemu-devel@nongnu.org; Wed, 23 May 2018 11:09:18 -0400
+Received: by mail-qk0-x242.google.com with SMTP id z75-v6so17708764qkb.6
+	for <qemu-devel@nongnu.org>; Wed, 23 May 2018 08:09:18 -0700 (PDT)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20180523031805.27101-1-peterx@redhat.com>
+	<20180523031805.27101-3-peterx@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <fef183a9-2ad1-443e-b6f6-5fcd49be09aa@amsat.org>
+Date: Wed, 23 May 2018 12:09:14 -0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180523085751.1ff46b2e@w520.home>
-Subject: Re: [Qemu-devel] [RFC 3/3] acpi-build: allocate mcfg for multiple
- host bridges
+In-Reply-To: <20180523031805.27101-3-peterx@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v3 2/2] intel-iommu: start to use
+ error_report_once
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,117 +36,206 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alex Williamson <alex.williamson@redhat.com>
-Cc: Laszlo Ersek <lersek@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Zihan Yang <whois.zihan.yang@gmail.com>, qemu-devel@nongnu.org, Igor Mammedov <imammedo@redhat.com>, Eric Auger <eauger@redhat.com>, Drew Jones <drjones@redhat.com>, Wei Huang <wei@redhat.com>
+To: Peter Xu <peterx@redhat.com>, qemu-devel@nongnu.org
+Cc: "Michael S . Tsirkin" <mst@redhat.com>, Markus Armbruster <armbru@redhat.com>, Jason Wang <jasowang@redhat.com>
 
-On Wed, May 23, 2018 at 08:57:51AM -0600, Alex Williamson wrote:
-> On Wed, 23 May 2018 17:25:32 +0300
-> "Michael S. Tsirkin" <mst@redhat.com> wrote:
+On 05/23/2018 12:18 AM, Peter Xu wrote:
+> Replace existing trace_vtd_err() with error_report_once() then stderr
+> will capture something if any of the error happens, meanwhile we don't
+> suffer from any DDOS.  Then remove the trace point.  Since at it,
+> provide more information where proper (now we can pass parameters into
+> the report function).
 > 
-> > On Tue, May 22, 2018 at 10:28:56PM -0600, Alex Williamson wrote:
-> > > On Wed, 23 May 2018 02:38:52 +0300
-> > > "Michael S. Tsirkin" <mst@redhat.com> wrote:
-> > >   
-> > > > On Tue, May 22, 2018 at 03:47:41PM -0600, Alex Williamson wrote:  
-> > > > > On Wed, 23 May 2018 00:44:22 +0300
-> > > > > "Michael S. Tsirkin" <mst@redhat.com> wrote:
-> > > > >     
-> > > > > > On Tue, May 22, 2018 at 03:36:59PM -0600, Alex Williamson wrote:    
-> > > > > > > On Tue, 22 May 2018 23:58:30 +0300
-> > > > > > > "Michael S. Tsirkin" <mst@redhat.com> wrote:       
-> > > > > > > >
-> > > > > > > > It's not hard to think of a use-case where >256 devices
-> > > > > > > > are helpful, for example a nested virt scenario where
-> > > > > > > > each device is passed on to a different nested guest.
-> > > > > > > >
-> > > > > > > > But I think the main feature this is needed for is numa modeling.
-> > > > > > > > Guests seem to assume a numa node per PCI root, ergo we need more PCI
-> > > > > > > > roots.      
-> > > > > > > 
-> > > > > > > But even if we have NUMA affinity per PCI host bridge, a PCI host
-> > > > > > > bridge does not necessarily imply a new PCIe domain.      
-> > > > > > 
-> > > > > > What are you calling a PCIe domain?    
-> > > > > 
-> > > > > Domain/segment
-> > > > > 
-> > > > > 0000:00:00.0
-> > > > > ^^^^ This    
-> > > > 
-> > > > Right. So we can thinkably have PCIe root complexes share an ACPI segment.
-> > > > I don't see what this buys us by itself.  
-> > > 
-> > > The ability to define NUMA locality for a PCI sub-hierarchy while
-> > > maintaining compatibility with non-segment aware OSes (and firmware).  
-> > 
-> > Fur sure, but NUMA is a kind of advanced topic, MCFG has been around for
-> > longer than various NUMA tables. Are there really non-segment aware
-> > guests that also know how to make use of NUMA?
-> 
-> I can't answer that question, but I assume that multi-segment PCI
-> support is perhaps not as pervasive as we may think considering hardware
-> OEMs tend to avoid it for their default configurations with multiple
-> host bridges.
-> 
-> > > > > Isn't that the only reason we'd need a new MCFG section and the reason
-> > > > > we're limited to 256 buses?  Thanks,
-> > > > > 
-> > > > > Alex    
-> > > > 
-> > > > I don't know whether a single MCFG section can describe multiple roots.
-> > > > I think it would be certainly unusual.  
-> > > 
-> > > I'm not sure here if you're referring to the actual MCFG ACPI table or
-> > > the MMCONFIG range, aka the ECAM.  Neither of these describe PCI host
-> > > bridges.  The MCFG table can describe one or more ECAM ranges, which
-> > > provides the ECAM base address, the PCI segment associated with that
-> > > ECAM and the start and end bus numbers to know the offset and extent of
-> > > the ECAM range.  PCI host bridges would then theoretically be separate
-> > > ACPI objects with _SEG and _BBN methods to associate them to the
-> > > correct ECAM range by segment number and base bus number.  So it seems
-> > > that tooling exists that an ECAM/MMCONFIG range could be provided per
-> > > PCI host bridge, even if they exist within the same domain, but in
-> > > practice what I see on systems I have access to is a single MMCONFIG
-> > > range supporting all of the host bridges.  It also seems there are
-> > > numerous ways to describe the MMCONFIG range and I haven't actually
-> > > found an example that seems to use the MCFG table.  Two have MCFG
-> > > tables (that don't seem terribly complete) and the kernel claims to
-> > > find the MMCONFIG via e820, another doesn't even have an MCFG table and
-> > > the kernel claims to find MMCONFIG via an ACPI motherboard resource.
-> > > I'm not sure if I can enable PCI segments on anything to see how the
-> > > firmware changes.  Thanks,
-> > > 
-> > > Alex  
-> > 
-> > Let me clarify.  So MCFG have base address allocation structures.
-> > Each maps a segment and a range of bus numbers into memory.
-> > This structure is what I meant.
-> 
-> Ok, so this is the  ECAM/MMCONFIG range through which we do config
-> accesses, which is described by MCFG, among other options.
-> 
-> > IIUC you are saying on your systems everything is within a single
-> > segment, right? Multiple pci hosts map into a single segment?
-> 
-> Yes, for instance a single MMCONFIG range handles bus number ranges
-> 0x00-0x7f within segment 0x0 and the system has host bridges with base
-> bus numbers of 0x00 and 0x40, each with different NUMA locality.
-> 
-> > If you do this you can do NUMA, but do not gain > 256 devices.
-> 
-> Correct, but let's also clarify that we're not limited to 256 devices,
-> a segment is limited to 256 buses and each PCIe slot is a bus, so the
-> limitation is number of hotpluggable slots.  "Devices" implies that it
-> includes multi-function, ARI, and SR-IOV devices as well, but we can
-> have 256 of those per bus, we just don't have the desired hotplug
-> granularity for those.
+> Signed-off-by: Peter Xu <peterx@redhat.com>
 
-Right, I consider a group of PF and all its VFs a device,
-and all functions in a multi-function device a single
-device for this purpose.
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
-> > Are we are the same page then?
+> ---
+>  hw/i386/intel_iommu.c | 59 ++++++++++++++++++++++++-------------------
+>  hw/i386/trace-events  |  1 -
+>  2 files changed, 33 insertions(+), 27 deletions(-)
 > 
-> Seems so.  Thanks,
+> diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
+> index fb31de9416..fa6df921ee 100644
+> --- a/hw/i386/intel_iommu.c
+> +++ b/hw/i386/intel_iommu.c
+> @@ -285,14 +285,14 @@ static void vtd_generate_fault_event(IntelIOMMUState *s, uint32_t pre_fsts)
+>  {
+>      if (pre_fsts & VTD_FSTS_PPF || pre_fsts & VTD_FSTS_PFO ||
+>          pre_fsts & VTD_FSTS_IQE) {
+> -        trace_vtd_err("There are previous interrupt conditions "
+> -                      "to be serviced by software, fault event "
+> -                      "is not generated.");
+> +        error_report_once("There are previous interrupt conditions "
+> +                          "to be serviced by software, fault event "
+> +                          "is not generated");
+>          return;
+>      }
+>      vtd_set_clear_mask_long(s, DMAR_FECTL_REG, 0, VTD_FECTL_IP);
+>      if (vtd_get_long_raw(s, DMAR_FECTL_REG) & VTD_FECTL_IM) {
+> -        trace_vtd_err("Interrupt Mask set, irq is not generated.");
+> +        error_report_once("Interrupt Mask set, irq is not generated");
+>      } else {
+>          vtd_generate_interrupt(s, DMAR_FEADDR_REG, DMAR_FEDATA_REG);
+>          vtd_set_clear_mask_long(s, DMAR_FECTL_REG, VTD_FECTL_IP, 0);
+> @@ -400,20 +400,20 @@ static void vtd_report_dmar_fault(IntelIOMMUState *s, uint16_t source_id,
+>      trace_vtd_dmar_fault(source_id, fault, addr, is_write);
+>  
+>      if (fsts_reg & VTD_FSTS_PFO) {
+> -        trace_vtd_err("New fault is not recorded due to "
+> -                      "Primary Fault Overflow.");
+> +        error_report_once("New fault is not recorded due to "
+> +                          "Primary Fault Overflow");
+>          return;
+>      }
+>  
+>      if (vtd_try_collapse_fault(s, source_id)) {
+> -        trace_vtd_err("New fault is not recorded due to "
+> -                      "compression of faults.");
+> +        error_report_once("New fault is not recorded due to "
+> +                          "compression of faults");
+>          return;
+>      }
+>  
+>      if (vtd_is_frcd_set(s, s->next_frcd_reg)) {
+> -        trace_vtd_err("Next Fault Recording Reg is used, "
+> -                      "new fault is not recorded, set PFO field.");
+> +        error_report_once("Next Fault Recording Reg is used, "
+> +                          "new fault is not recorded, set PFO field");
+>          vtd_set_clear_mask_long(s, DMAR_FSTS_REG, 0, VTD_FSTS_PFO);
+>          return;
+>      }
+> @@ -421,8 +421,8 @@ static void vtd_report_dmar_fault(IntelIOMMUState *s, uint16_t source_id,
+>      vtd_record_frcd(s, s->next_frcd_reg, source_id, addr, fault, is_write);
+>  
+>      if (fsts_reg & VTD_FSTS_PPF) {
+> -        trace_vtd_err("There are pending faults already, "
+> -                      "fault event is not generated.");
+> +        error_report_once("There are pending faults already, "
+> +                          "fault event is not generated");
+>          vtd_set_frcd_and_update_ppf(s, s->next_frcd_reg);
+>          s->next_frcd_reg++;
+>          if (s->next_frcd_reg == DMAR_FRCD_REG_NR) {
+> @@ -1339,7 +1339,8 @@ static uint64_t vtd_context_cache_invalidate(IntelIOMMUState *s, uint64_t val)
+>          break;
+>  
+>      default:
+> -        trace_vtd_err("Context cache invalidate type error.");
+> +        error_report_once("%s: invalid context: 0x%"PRIx64,
+> +                          __func__, val);
+>          caig = 0;
+>      }
+>      return caig;
+> @@ -1445,7 +1446,8 @@ static uint64_t vtd_iotlb_flush(IntelIOMMUState *s, uint64_t val)
+>          am = VTD_IVA_AM(addr);
+>          addr = VTD_IVA_ADDR(addr);
+>          if (am > VTD_MAMV) {
+> -            trace_vtd_err("IOTLB PSI flush: address mask overflow.");
+> +            error_report_once("%s: address mask overflow: 0x%"PRIx64,
+> +                              __func__, vtd_get_quad_raw(s, DMAR_IVA_REG));
+>              iaig = 0;
+>              break;
+>          }
+> @@ -1454,7 +1456,8 @@ static uint64_t vtd_iotlb_flush(IntelIOMMUState *s, uint64_t val)
+>          break;
+>  
+>      default:
+> -        trace_vtd_err("IOTLB flush: invalid granularity.");
+> +        error_report_once("%s: invalid granularity: 0x%"PRIx64,
+> +                          __func__, val);
+>          iaig = 0;
+>      }
+>      return iaig;
+> @@ -1604,8 +1607,8 @@ static void vtd_handle_ccmd_write(IntelIOMMUState *s)
+>      /* Context-cache invalidation request */
+>      if (val & VTD_CCMD_ICC) {
+>          if (s->qi_enabled) {
+> -            trace_vtd_err("Queued Invalidation enabled, "
+> -                          "should not use register-based invalidation");
+> +            error_report_once("Queued Invalidation enabled, "
+> +                              "should not use register-based invalidation");
+>              return;
+>          }
+>          ret = vtd_context_cache_invalidate(s, val);
+> @@ -1625,8 +1628,8 @@ static void vtd_handle_iotlb_write(IntelIOMMUState *s)
+>      /* IOTLB invalidation request */
+>      if (val & VTD_TLB_IVT) {
+>          if (s->qi_enabled) {
+> -            trace_vtd_err("Queued Invalidation enabled, "
+> -                          "should not use register-based invalidation.");
+> +            error_report_once("Queued Invalidation enabled, "
+> +                              "should not use register-based invalidation");
+>              return;
+>          }
+>          ret = vtd_iotlb_flush(s, val);
+> @@ -1644,7 +1647,7 @@ static bool vtd_get_inv_desc(dma_addr_t base_addr, uint32_t offset,
+>      dma_addr_t addr = base_addr + offset * sizeof(*inv_desc);
+>      if (dma_memory_read(&address_space_memory, addr, inv_desc,
+>          sizeof(*inv_desc))) {
+> -        trace_vtd_err("Read INV DESC failed.");
+> +        error_report_once("Read INV DESC failed");
+>          inv_desc->lo = 0;
+>          inv_desc->hi = 0;
+>          return false;
+> @@ -1999,7 +2002,8 @@ static uint64_t vtd_mem_read(void *opaque, hwaddr addr, unsigned size)
+>      trace_vtd_reg_read(addr, size);
+>  
+>      if (addr + size > DMAR_REG_SIZE) {
+> -        trace_vtd_err("Read MMIO over range.");
+> +        error_report_once("%s: MMIO over range: addr=0x%"PRIx64
+> +                          " size=0x%u", __func__, addr, size);
+>          return (uint64_t)-1;
+>      }
+>  
+> @@ -2050,7 +2054,8 @@ static void vtd_mem_write(void *opaque, hwaddr addr,
+>      trace_vtd_reg_write(addr, size, val);
+>  
+>      if (addr + size > DMAR_REG_SIZE) {
+> -        trace_vtd_err("Write MMIO over range.");
+> +        error_report_once("%s: MMIO over range: addr=0x%"PRIx64
+> +                          " size=0x%u", __func__, addr, size);
+>          return;
+>      }
+>  
+> @@ -2432,7 +2437,8 @@ static int vtd_irte_get(IntelIOMMUState *iommu, uint16_t index,
+>      addr = iommu->intr_root + index * sizeof(*entry);
+>      if (dma_memory_read(&address_space_memory, addr, entry,
+>                          sizeof(*entry))) {
+> -        trace_vtd_err("Memory read failed for IRTE.");
+> +        error_report_once("%s: read failed: ind=0x%"PRIu16
+> +                          " addr=0x%"PRIx64, __func__, index, addr);
+>          return -VTD_FR_IR_ROOT_INVAL;
+>      }
+>  
+> @@ -2564,14 +2570,15 @@ static int vtd_interrupt_remap_msi(IntelIOMMUState *iommu,
+>      }
+>  
+>      if (origin->address & VTD_MSI_ADDR_HI_MASK) {
+> -        trace_vtd_err("MSI address high 32 bits non-zero when "
+> -                      "Interrupt Remapping enabled.");
+> +        error_report_once("%s: MSI address high 32 bits non-zero detected: "
+> +                          "address=0x%"PRIx64, __func__, origin->address);
+>          return -VTD_FR_IR_REQ_RSVD;
+>      }
+>  
+>      addr.data = origin->address & VTD_MSI_ADDR_LO_MASK;
+>      if (addr.addr.__head != 0xfee) {
+> -        trace_vtd_err("MSI addr low 32 bit invalid.");
+> +        error_report_once("%s: MSI address low 32 bit invalid: 0x%"PRIx32,
+> +                          __func__, addr.data);
+>          return -VTD_FR_IR_REQ_RSVD;
+>      }
+>  
+> diff --git a/hw/i386/trace-events b/hw/i386/trace-events
+> index 22d44648af..e08cf2a9a7 100644
+> --- a/hw/i386/trace-events
+> +++ b/hw/i386/trace-events
+> @@ -68,7 +68,6 @@ vtd_ir_remap_msi_req(uint64_t addr, uint64_t data) "addr 0x%"PRIx64" data 0x%"PR
+>  vtd_fsts_ppf(bool set) "FSTS PPF bit set to %d"
+>  vtd_fsts_clear_ip(void) ""
+>  vtd_frr_new(int index, uint64_t hi, uint64_t lo) "index %d high 0x%"PRIx64" low 0x%"PRIx64
+> -vtd_err(const char *str) "%s"
+>  vtd_err_dmar_iova_overflow(uint64_t iova) "iova 0x%"PRIx64
+>  vtd_err_dmar_slpte_read_error(uint64_t iova, int level) "iova 0x%"PRIx64" level %d"
+>  vtd_err_dmar_slpte_perm_error(uint64_t iova, int level, uint64_t slpte, bool is_write) "iova 0x%"PRIx64" level %d slpte 0x%"PRIx64" write %d"
 > 
-> Alex
