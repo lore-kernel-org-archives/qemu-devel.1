@@ -1,17 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52689)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52874)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fLTYx-0001m0-Kv
-	for qemu-devel@nongnu.org; Wed, 23 May 2018 09:12:21 -0400
+	(envelope-from <kwolf@redhat.com>) id 1fLTZ5-0001sx-6o
+	for qemu-devel@nongnu.org; Wed, 23 May 2018 09:12:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fLTYr-0006sF-TU
-	for qemu-devel@nongnu.org; Wed, 23 May 2018 09:12:19 -0400
+	(envelope-from <kwolf@redhat.com>) id 1fLTZ0-0006zq-Si
+	for qemu-devel@nongnu.org; Wed, 23 May 2018 09:12:27 -0400
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Wed, 23 May 2018 15:11:17 +0200
-Message-Id: <20180523131155.12359-9-kwolf@redhat.com>
+Date: Wed, 23 May 2018 15:11:21 +0200
+Message-Id: <20180523131155.12359-13-kwolf@redhat.com>
 In-Reply-To: <20180523131155.12359-1-kwolf@redhat.com>
 References: <20180523131155.12359-1-kwolf@redhat.com>
-Subject: [Qemu-devel] [PULL 08/46] blockjob: Improve BlockJobInfo.offset/len
- documentation
+Subject: [Qemu-devel] [PULL 12/46] job: Add job_delete()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,45 +22,60 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, qemu-devel@nongnu.org
 
-Clarify that len is just an estimation of the end value of offset, and
-that offset increases monotonically while len can change arbitrarily.
-
-While touching the documentation of offset, move it directly after len
-to match the order of the declaration below.
+This moves freeing the Job object and its fields from block_job_unref()
+to job_delete().
 
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
+Reviewed-by: Max Reitz <mreitz@redhat.com>
 Reviewed-by: John Snow <jsnow@redhat.com>
 ---
- qapi/block-core.json | 9 ++++++---
- 1 file changed, 6 insertions(+), 3 deletions(-)
+ include/qemu/job.h | 3 +++
+ blockjob.c         | 3 +--
+ job.c              | 6 ++++++
+ 3 files changed, 10 insertions(+), 2 deletions(-)
 
-diff --git a/qapi/block-core.json b/qapi/block-core.json
-index d32ec95666..0e29abf099 100644
---- a/qapi/block-core.json
-+++ b/qapi/block-core.json
-@@ -1148,7 +1148,12 @@
- # @device: The job identifier. Originally the device name but other
- #          values are allowed since QEMU 2.7
- #
--# @len: the maximum progress value
-+# @len: Estimated @offset value at the completion of the job. This value can
-+#       arbitrarily change while the job is running, in both directions.
-+#
-+# @offset: Progress made until now. The unit is arbitrary and the value can
-+#          only meaningfully be used for the ratio of @offset to @len. The
-+#          value is monotonically increasing.
- #
- # @busy: false if the job is known to be in a quiescent state, with
- #        no pending I/O.  Since 1.3.
-@@ -1156,8 +1161,6 @@
- # @paused: whether the job is paused or, if @busy is true, will
- #          pause itself as soon as possible.  Since 1.3.
- #
--# @offset: the current progress value
--#
- # @speed: the rate limit, bytes per second
- #
- # @io-status: the status of the job (since 1.3)
+diff --git a/include/qemu/job.h b/include/qemu/job.h
+index 279ce688fd..43dc2e4a7d 100644
+--- a/include/qemu/job.h
++++ b/include/qemu/job.h
+@@ -62,6 +62,9 @@ struct JobDriver {
+  */
+ void *job_create(const char *job_id, const JobDriver *driver, Error **errp);
+ 
++/** Frees the @job object. */
++void job_delete(Job *job);
++
+ /** Returns the JobType of a given Job. */
+ JobType job_type(const Job *job);
+ 
+diff --git a/blockjob.c b/blockjob.c
+index ea71ec0129..430a67ba63 100644
+--- a/blockjob.c
++++ b/blockjob.c
+@@ -261,9 +261,8 @@ void block_job_unref(BlockJob *job)
+                                         block_job_detach_aio_context, job);
+         blk_unref(job->blk);
+         error_free(job->blocker);
+-        g_free(job->job.id);
+         assert(!timer_pending(&job->sleep_timer));
+-        g_free(job);
++        job_delete(&job->job);
+     }
+ }
+ 
+diff --git a/job.c b/job.c
+index 83724a43de..cfdd008c52 100644
+--- a/job.c
++++ b/job.c
+@@ -56,3 +56,9 @@ void *job_create(const char *job_id, const JobDriver *driver, Error **errp)
+ 
+     return job;
+ }
++
++void job_delete(Job *job)
++{
++    g_free(job->id);
++    g_free(job);
++}
 -- 
 2.13.6
