@@ -1,29 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59585)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60300)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fLSKF-0000cw-79
-	for qemu-devel@nongnu.org; Wed, 23 May 2018 07:53:04 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1fLSMB-0001ke-Og
+	for qemu-devel@nongnu.org; Wed, 23 May 2018 07:55:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fLSKE-000627-Ai
-	for qemu-devel@nongnu.org; Wed, 23 May 2018 07:53:03 -0400
-Received: from mail-ot0-x243.google.com ([2607:f8b0:4003:c0f::243]:36147)
+	(envelope-from <peter.maydell@linaro.org>) id 1fLSMA-0006iQ-UQ
+	for qemu-devel@nongnu.org; Wed, 23 May 2018 07:55:03 -0400
+Received: from mail-ot0-x244.google.com ([2607:f8b0:4003:c0f::244]:44668)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fLSKE-00061t-4y
-	for qemu-devel@nongnu.org; Wed, 23 May 2018 07:53:02 -0400
-Received: by mail-ot0-x243.google.com with SMTP id m11-v6so24838972otf.3
-	for <qemu-devel@nongnu.org>; Wed, 23 May 2018 04:53:01 -0700 (PDT)
+	id 1fLSMA-0006i6-PE
+	for qemu-devel@nongnu.org; Wed, 23 May 2018 07:55:02 -0400
+Received: by mail-ot0-x244.google.com with SMTP id g7-v6so24827305otj.11
+	for <qemu-devel@nongnu.org>; Wed, 23 May 2018 04:55:02 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <8736yivgw3.fsf@linaro.org>
+In-Reply-To: <87y3gatznc.fsf@linaro.org>
 References: <20180521140402.23318-1-peter.maydell@linaro.org>
-	<20180521140402.23318-18-peter.maydell@linaro.org>
-	<8736yivgw3.fsf@linaro.org>
+	<20180521140402.23318-21-peter.maydell@linaro.org>
+	<87y3gatznc.fsf@linaro.org>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Wed, 23 May 2018 12:52:41 +0100
-Message-ID: <CAFEAcA-dzhUsTW+_+VPZT5W4ArvDi5hEs7jAnmdLzEod9=Bc4w@mail.gmail.com>
+Date: Wed, 23 May 2018 12:54:41 +0100
+Message-ID: <CAFEAcA82=CU=Pksgs5YO9_Vw5jqFgQqxnuFN+KZ1dw-ao8D7Xw@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 17/27] exec.c: Handle IOMMUs in
- address_space_translate_for_iotlb()
+Subject: Re: [Qemu-devel] [PATCH 20/27] hw/misc/tz-mpc.c: Implement correct
+ blocked-access behaviour
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,88 +35,75 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
 Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, "patches@linaro.org" <patches@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-On 23 May 2018 at 10:51, Alex Benn=C3=A9e <alex.bennee@linaro.org> wrote:
+On 23 May 2018 at 11:49, Alex Benn=C3=A9e <alex.bennee@linaro.org> wrote:
 >
 > Peter Maydell <peter.maydell@linaro.org> writes:
 >
->> Currently we don't support board configurations that put an IOMMU
->> in the path of the CPU's memory transactions, and instead just
->> assert() if the memory region fonud in address_space_translate_for_iotlb=
-()
->> is an IOMMUMemoryRegion.
+>> The MPC is guest-configurable for whether blocked accesses:
+>>  * should be RAZ/WI or cause a bus error
+>>  * should generate an interrupt or not
 >>
->> Remove this limitation by having the function handle IOMMUs.
->> This is mostly straightforward, but we must make sure we have
->> a notifier registered for every IOMMU that a transaction has
->> passed through, so that we can flush the TLB appropriately
->> when any of the IOMMUs change their mappings.
+>> Implement this behaviour in the blocked-access handlers.
 >>
 >> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 >> ---
->>  include/exec/exec-all.h |   3 +-
->>  include/qom/cpu.h       |   3 +
->>  accel/tcg/cputlb.c      |   3 +-
->>  exec.c                  | 147 +++++++++++++++++++++++++++++++++++++++-
->>  4 files changed, 152 insertions(+), 4 deletions(-)
+>>  hw/misc/tz-mpc.c | 50 ++++++++++++++++++++++++++++++++++++++++++++++--
+>>  1 file changed, 48 insertions(+), 2 deletions(-)
 >>
->> diff --git a/include/exec/exec-all.h b/include/exec/exec-all.h
->> index 4d09eaba72..e0ff19b711 100644
->> --- a/include/exec/exec-all.h
->> +++ b/include/exec/exec-all.h
->> @@ -469,7 +469,8 @@ void tb_flush_jmp_cache(CPUState *cpu, target_ulong =
-addr);
+>> diff --git a/hw/misc/tz-mpc.c b/hw/misc/tz-mpc.c
+>> index 93453cbef2..39a72563b7 100644
+>> --- a/hw/misc/tz-mpc.c
+>> +++ b/hw/misc/tz-mpc.c
+>> @@ -43,6 +43,9 @@ REG32(INT_EN, 0x28)
+>>      FIELD(INT_EN, IRQ, 0, 1)
+>>  REG32(INT_INFO1, 0x2c)
+>>  REG32(INT_INFO2, 0x30)
+>> +    FIELD(INT_INFO2, HMASTER, 0, 16)
+>> +    FIELD(INT_INFO2, HNONSEC, 16, 1)
+>> +    FIELD(INT_INFO2, CFG_NS, 17, 1)
+>>  REG32(INT_SET, 0x34)
+>>      FIELD(INT_SET, IRQ, 0, 1)
+>>  REG32(PIDR4, 0xfd0)
+>> @@ -266,6 +269,45 @@ static const MemoryRegionOps tz_mpc_reg_ops =3D {
+>>      .impl.max_access_size =3D 4,
+>>  };
 >>
->>  MemoryRegionSection *
->>  address_space_translate_for_iotlb(CPUState *cpu, int asidx, hwaddr addr=
-,
->> -                                  hwaddr *xlat, hwaddr *plen);
->> +                                  hwaddr *xlat, hwaddr *plen,
->> +                                  MemTxAttrs attrs, int *prot);
->>  hwaddr memory_region_section_get_iotlb(CPUState *cpu,
->>                                         MemoryRegionSection *section,
->>                                         target_ulong vaddr,
->> diff --git a/include/qom/cpu.h b/include/qom/cpu.h
->> index 9d3afc6c75..d4a30149dd 100644
->> --- a/include/qom/cpu.h
->> +++ b/include/qom/cpu.h
->> @@ -429,6 +429,9 @@ struct CPUState {
->>      uint16_t pending_tlb_flush;
->>
->>      int hvf_fd;
+>> +static inline bool tz_mpc_cfg_ns(TZMPC *s, hwaddr addr)
+>> +{
+>> +    /* Return the cfg_ns bit from the LUT for the specified address */
+>> +    hwaddr blknum =3D addr / s->blocksize;
+>> +    hwaddr blkword =3D blknum / 32;
+>> +    uint32_t blkbit =3D 1U << (blknum % 32);
 >> +
->> +    /* track IOMMUs whose translations we've cached in the TCG TLB */
->> +    GSList *iommu_notifiers;
+>> +    /* This would imply the address was larger than the size we
+>> +     * defined this memory region to be, so it can't happen.
+>> +     */
+>> +    assert(blkword < s->blk_max);
+>> +    return s->blk_lut[blkword] & blkbit;
+>> +}
+>> +
+>> +static MemTxResult tz_mpc_handle_block(TZMPC *s, hwaddr addr, MemTxAttr=
+s attrs)
+>> +{
+>> +    /* Handle a blocked transaction: raise IRQ, capture info, etc */
+>> +    if (!s->int_stat) {
+>> +        /* First blocked transfer: capture information into INT_INFO1 a=
+nd
+>> +         * INT_INFO2. Subsequent transfers are still blocked but don't
+>> +         * capture information until the guest clears the interrupt.
+>> +         */
+>> +
+>> +        s->int_info1 =3D addr;
+>> +        s->int_info2 =3D 0;
+>> +        s->int_info2 =3D FIELD_DP32(s->int_info2, INT_INFO2, HMASTER,
+>> +                                  attrs.requester_id & 0xffff);
 >
-> So we are only concerned about TCG IOMMU notifiers here, specifically
-> TCGIOMMUNotifier structures. Why not just use a GArray and save
-> ourselves chasing pointers?
+> Does this actually need masking given the source is a 16 bit wide bitfiel=
+d?
 
-I don't have a strong opinion about which data structure to use;
-but GSList has a "find an entry" API and GArray doesn't, so I
-picked the one that had the API that meant I didn't need to
-hand-code a search loop.
-
->> --- a/exec.c
->> +++ b/exec.c
->> @@ -650,18 +650,158 @@ MemoryRegion *flatview_translate(FlatView *fv, hw=
-addr addr, hwaddr *xlat,
->>      return mr;
->>  }
->>
->> +typedef struct TCGIOMMUNotifier {
->> +    IOMMUNotifier n;
->> +    MemoryRegion *mr;
->> +    CPUState *cpu;
->
-> This seems superfluous if we are storing the list of notifiers in the CPU=
-State
-
-You need it because in the notifier callback all you get is a pointer
-to the IOMMUNotifier, and we need to get from there to the CPUState*.
-
->> +    int iommu_idx;
->> +    bool active;
->> +} TCGIOMMUNotifier;
+That might change in future (eg Eric was talking about wanting
+to put SMMUv3 substream IDs in transaction attributes, and those
+are 20 bits wide, so we might want to widen requester_id to fit them).
 
 thanks
 -- PMM
