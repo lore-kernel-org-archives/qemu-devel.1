@@ -1,24 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48968)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49003)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1fLUz0-0001uy-Gm
-	for qemu-devel@nongnu.org; Wed, 23 May 2018 10:43:24 -0400
+	(envelope-from <mst@redhat.com>) id 1fLUz4-0001xF-Mz
+	for qemu-devel@nongnu.org; Wed, 23 May 2018 10:43:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1fLUyx-0000pj-CZ
-	for qemu-devel@nongnu.org; Wed, 23 May 2018 10:43:18 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:46960 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1fLUyx-0000pe-8F
-	for qemu-devel@nongnu.org; Wed, 23 May 2018 10:43:15 -0400
-Date: Wed, 23 May 2018 17:43:14 +0300
+	(envelope-from <mst@redhat.com>) id 1fLUz3-0000sS-DP
+	for qemu-devel@nongnu.org; Wed, 23 May 2018 10:43:22 -0400
+Date: Wed, 23 May 2018 17:43:17 +0300
 From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <1527086545-68024-19-git-send-email-mst@redhat.com>
+Message-ID: <1527086545-68024-22-git-send-email-mst@redhat.com>
 References: <1527086545-68024-1-git-send-email-mst@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 In-Reply-To: <1527086545-68024-1-git-send-email-mst@redhat.com>
-Subject: [Qemu-devel] [PULL 18/28] contrib/vhost-user-blk: enable protocol
- feature for vhost-user-blk
+Subject: [Qemu-devel] [PULL 21/28] intel-iommu: remove IntelIOMMUNotifierNode
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,45 +23,171 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Changpeng Liu <changpeng.liu@intel.com>, Stefan Hajnoczi <stefanha@redhat.com>, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Peter Xu <peterx@redhat.com>, QEMU Stable <qemu-stable@nongnu.org>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>
 
-From: Changpeng Liu <changpeng.liu@intel.com>
+From: Peter Xu <peterx@redhat.com>
 
-This patch reports the protocol feature that is only advertised by
-QEMU if the device implements the config ops.
+That is not really necessary.  Removing that node struct and put the
+list entry directly into VTDAddressSpace.  It simplfies the code a lot.
+Since at it, rename the old notifiers_list into vtd_as_with_notifiers.
 
-Signed-off-by: Changpeng Liu <changpeng.liu@intel.com>
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+CC: QEMU Stable <qemu-stable@nongnu.org>
+Signed-off-by: Peter Xu <peterx@redhat.com>
 Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
 ---
- contrib/vhost-user-blk/vhost-user-blk.c | 7 +++++++
- 1 file changed, 7 insertions(+)
+ include/hw/i386/intel_iommu.h |  9 ++-------
+ hw/i386/intel_iommu.c         | 41 +++++++++++------------------------------
+ 2 files changed, 13 insertions(+), 37 deletions(-)
 
-diff --git a/contrib/vhost-user-blk/vhost-user-blk.c b/contrib/vhost-user-blk/vhost-user-blk.c
-index 67dac81..a6a132a 100644
---- a/contrib/vhost-user-blk/vhost-user-blk.c
-+++ b/contrib/vhost-user-blk/vhost-user-blk.c
-@@ -311,6 +311,12 @@ vub_get_features(VuDev *dev)
-            1ull << VHOST_USER_F_PROTOCOL_FEATURES;
+diff --git a/include/hw/i386/intel_iommu.h b/include/hw/i386/intel_iommu.h
+index 45ec891..032e33b 100644
+--- a/include/hw/i386/intel_iommu.h
++++ b/include/hw/i386/intel_iommu.h
+@@ -67,7 +67,6 @@ typedef union VTD_IR_TableEntry VTD_IR_TableEntry;
+ typedef union VTD_IR_MSIAddress VTD_IR_MSIAddress;
+ typedef struct VTDIrq VTDIrq;
+ typedef struct VTD_MSIMessage VTD_MSIMessage;
+-typedef struct IntelIOMMUNotifierNode IntelIOMMUNotifierNode;
+ 
+ /* Context-Entry */
+ struct VTDContextEntry {
+@@ -93,6 +92,7 @@ struct VTDAddressSpace {
+     MemoryRegion iommu_ir;      /* Interrupt region: 0xfeeXXXXX */
+     IntelIOMMUState *iommu_state;
+     VTDContextCacheEntry context_cache_entry;
++    QLIST_ENTRY(VTDAddressSpace) next;
+ };
+ 
+ struct VTDBus {
+@@ -253,11 +253,6 @@ struct VTD_MSIMessage {
+ /* When IR is enabled, all MSI/MSI-X data bits should be zero */
+ #define VTD_IR_MSI_DATA          (0)
+ 
+-struct IntelIOMMUNotifierNode {
+-    VTDAddressSpace *vtd_as;
+-    QLIST_ENTRY(IntelIOMMUNotifierNode) next;
+-};
+-
+ /* The iommu (DMAR) device state struct */
+ struct IntelIOMMUState {
+     X86IOMMUState x86_iommu;
+@@ -295,7 +290,7 @@ struct IntelIOMMUState {
+     GHashTable *vtd_as_by_busptr;   /* VTDBus objects indexed by PCIBus* reference */
+     VTDBus *vtd_as_by_bus_num[VTD_PCI_BUS_MAX]; /* VTDBus objects indexed by bus number */
+     /* list of registered notifiers */
+-    QLIST_HEAD(, IntelIOMMUNotifierNode) notifiers_list;
++    QLIST_HEAD(, VTDAddressSpace) vtd_as_with_notifiers;
+ 
+     /* interrupt remapping */
+     bool intr_enabled;              /* Whether guest enabled IR */
+diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
+index b359efd..3df9045 100644
+--- a/hw/i386/intel_iommu.c
++++ b/hw/i386/intel_iommu.c
+@@ -1248,10 +1248,10 @@ static void vtd_interrupt_remap_table_setup(IntelIOMMUState *s)
+ 
+ static void vtd_iommu_replay_all(IntelIOMMUState *s)
+ {
+-    IntelIOMMUNotifierNode *node;
++    VTDAddressSpace *vtd_as;
+ 
+-    QLIST_FOREACH(node, &s->notifiers_list, next) {
+-        memory_region_iommu_replay_all(&node->vtd_as->iommu);
++    QLIST_FOREACH(vtd_as, &s->vtd_as_with_notifiers, next) {
++        memory_region_iommu_replay_all(&vtd_as->iommu);
+     }
  }
  
-+static uint64_t
-+vub_get_protocol_features(VuDev *dev)
-+{
-+    return 1ull << VHOST_USER_PROTOCOL_F_CONFIG;
-+}
-+
- static int
- vub_get_config(VuDev *vu_dev, uint8_t *config, uint32_t len)
+@@ -1372,7 +1372,6 @@ static void vtd_iotlb_global_invalidate(IntelIOMMUState *s)
+ 
+ static void vtd_iotlb_domain_invalidate(IntelIOMMUState *s, uint16_t domain_id)
  {
-@@ -373,6 +379,7 @@ vub_set_config(VuDev *vu_dev, const uint8_t *data,
- static const VuDevIface vub_iface = {
-     .get_features = vub_get_features,
-     .queue_set_started = vub_queue_set_started,
-+    .get_protocol_features = vub_get_protocol_features,
-     .get_config = vub_get_config,
-     .set_config = vub_set_config,
- };
+-    IntelIOMMUNotifierNode *node;
+     VTDContextEntry ce;
+     VTDAddressSpace *vtd_as;
+ 
+@@ -1381,8 +1380,7 @@ static void vtd_iotlb_domain_invalidate(IntelIOMMUState *s, uint16_t domain_id)
+     g_hash_table_foreach_remove(s->iotlb, vtd_hash_remove_by_domain,
+                                 &domain_id);
+ 
+-    QLIST_FOREACH(node, &s->notifiers_list, next) {
+-        vtd_as = node->vtd_as;
++    QLIST_FOREACH(vtd_as, &s->vtd_as_with_notifiers, next) {
+         if (!vtd_dev_to_context_entry(s, pci_bus_num(vtd_as->bus),
+                                       vtd_as->devfn, &ce) &&
+             domain_id == VTD_CONTEXT_ENTRY_DID(ce.hi)) {
+@@ -1402,12 +1400,11 @@ static void vtd_iotlb_page_invalidate_notify(IntelIOMMUState *s,
+                                            uint16_t domain_id, hwaddr addr,
+                                            uint8_t am)
+ {
+-    IntelIOMMUNotifierNode *node;
++    VTDAddressSpace *vtd_as;
+     VTDContextEntry ce;
+     int ret;
+ 
+-    QLIST_FOREACH(node, &(s->notifiers_list), next) {
+-        VTDAddressSpace *vtd_as = node->vtd_as;
++    QLIST_FOREACH(vtd_as, &(s->vtd_as_with_notifiers), next) {
+         ret = vtd_dev_to_context_entry(s, pci_bus_num(vtd_as->bus),
+                                        vtd_as->devfn, &ce);
+         if (!ret && domain_id == VTD_CONTEXT_ENTRY_DID(ce.hi)) {
+@@ -2344,8 +2341,6 @@ static void vtd_iommu_notify_flag_changed(IOMMUMemoryRegion *iommu,
+ {
+     VTDAddressSpace *vtd_as = container_of(iommu, VTDAddressSpace, iommu);
+     IntelIOMMUState *s = vtd_as->iommu_state;
+-    IntelIOMMUNotifierNode *node = NULL;
+-    IntelIOMMUNotifierNode *next_node = NULL;
+ 
+     if (!s->caching_mode && new & IOMMU_NOTIFIER_MAP) {
+         error_report("We need to set caching-mode=1 for intel-iommu to enable "
+@@ -2354,21 +2349,9 @@ static void vtd_iommu_notify_flag_changed(IOMMUMemoryRegion *iommu,
+     }
+ 
+     if (old == IOMMU_NOTIFIER_NONE) {
+-        node = g_malloc0(sizeof(*node));
+-        node->vtd_as = vtd_as;
+-        QLIST_INSERT_HEAD(&s->notifiers_list, node, next);
+-        return;
+-    }
+-
+-    /* update notifier node with new flags */
+-    QLIST_FOREACH_SAFE(node, &s->notifiers_list, next, next_node) {
+-        if (node->vtd_as == vtd_as) {
+-            if (new == IOMMU_NOTIFIER_NONE) {
+-                QLIST_REMOVE(node, next);
+-                g_free(node);
+-            }
+-            return;
+-        }
++        QLIST_INSERT_HEAD(&s->vtd_as_with_notifiers, vtd_as, next);
++    } else if (new == IOMMU_NOTIFIER_NONE) {
++        QLIST_REMOVE(vtd_as, next);
+     }
+ }
+ 
+@@ -2838,12 +2821,10 @@ static void vtd_address_space_unmap(VTDAddressSpace *as, IOMMUNotifier *n)
+ 
+ static void vtd_address_space_unmap_all(IntelIOMMUState *s)
+ {
+-    IntelIOMMUNotifierNode *node;
+     VTDAddressSpace *vtd_as;
+     IOMMUNotifier *n;
+ 
+-    QLIST_FOREACH(node, &s->notifiers_list, next) {
+-        vtd_as = node->vtd_as;
++    QLIST_FOREACH(vtd_as, &s->vtd_as_with_notifiers, next) {
+         IOMMU_NOTIFIER_FOREACH(n, &vtd_as->iommu) {
+             vtd_address_space_unmap(vtd_as, n);
+         }
+@@ -3088,7 +3069,7 @@ static void vtd_realize(DeviceState *dev, Error **errp)
+         return;
+     }
+ 
+-    QLIST_INIT(&s->notifiers_list);
++    QLIST_INIT(&s->vtd_as_with_notifiers);
+     memset(s->vtd_as_by_bus_num, 0, sizeof(s->vtd_as_by_bus_num));
+     memory_region_init_io(&s->csrmem, OBJECT(s), &vtd_mem_ops, s,
+                           "intel_iommu", DMAR_REG_SIZE);
 -- 
 MST
