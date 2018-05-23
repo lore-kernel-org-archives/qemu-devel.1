@@ -1,29 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60300)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:32829)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fLSMB-0001ke-Og
-	for qemu-devel@nongnu.org; Wed, 23 May 2018 07:55:04 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fLSOb-0002bd-1p
+	for qemu-devel@nongnu.org; Wed, 23 May 2018 07:57:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fLSMA-0006iQ-UQ
-	for qemu-devel@nongnu.org; Wed, 23 May 2018 07:55:03 -0400
-Received: from mail-ot0-x244.google.com ([2607:f8b0:4003:c0f::244]:44668)
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fLSOW-0007y4-77
+	for qemu-devel@nongnu.org; Wed, 23 May 2018 07:57:33 -0400
+Received: from mail-qt0-x242.google.com ([2607:f8b0:400d:c0d::242]:38655)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fLSMA-0006i6-PE
-	for qemu-devel@nongnu.org; Wed, 23 May 2018 07:55:02 -0400
-Received: by mail-ot0-x244.google.com with SMTP id g7-v6so24827305otj.11
-	for <qemu-devel@nongnu.org>; Wed, 23 May 2018 04:55:02 -0700 (PDT)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fLSOW-0007y0-2V
+	for qemu-devel@nongnu.org; Wed, 23 May 2018 07:57:28 -0400
+Received: by mail-qt0-x242.google.com with SMTP id m9-v6so27631015qtb.5
+	for <qemu-devel@nongnu.org>; Wed, 23 May 2018 04:57:27 -0700 (PDT)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Date: Wed, 23 May 2018 08:57:19 -0300
+Message-Id: <20180523115719.26679-1-f4bug@amsat.org>
 MIME-Version: 1.0
-In-Reply-To: <87y3gatznc.fsf@linaro.org>
-References: <20180521140402.23318-1-peter.maydell@linaro.org>
-	<20180521140402.23318-21-peter.maydell@linaro.org>
-	<87y3gatznc.fsf@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Wed, 23 May 2018 12:54:41 +0100
-Message-ID: <CAFEAcA82=CU=Pksgs5YO9_Vw5jqFgQqxnuFN+KZ1dw-ao8D7Xw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 20/27] hw/misc/tz-mpc.c: Implement correct
- blocked-access behaviour
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH] tests: Allow GTESTER_OPTIONS variable
+ expansion from command line
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,78 +32,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
-Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, "patches@linaro.org" <patches@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: Paolo Bonzini <pbonzini@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, Thomas Huth <thuth@redhat.com>, Juan Quintela <quintela@redhat.com>
 
-On 23 May 2018 at 11:49, Alex Benn=C3=A9e <alex.bennee@linaro.org> wrote:
->
-> Peter Maydell <peter.maydell@linaro.org> writes:
->
->> The MPC is guest-configurable for whether blocked accesses:
->>  * should be RAZ/WI or cause a bus error
->>  * should generate an interrupt or not
->>
->> Implement this behaviour in the blocked-access handlers.
->>
->> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
->> ---
->>  hw/misc/tz-mpc.c | 50 ++++++++++++++++++++++++++++++++++++++++++++++--
->>  1 file changed, 48 insertions(+), 2 deletions(-)
->>
->> diff --git a/hw/misc/tz-mpc.c b/hw/misc/tz-mpc.c
->> index 93453cbef2..39a72563b7 100644
->> --- a/hw/misc/tz-mpc.c
->> +++ b/hw/misc/tz-mpc.c
->> @@ -43,6 +43,9 @@ REG32(INT_EN, 0x28)
->>      FIELD(INT_EN, IRQ, 0, 1)
->>  REG32(INT_INFO1, 0x2c)
->>  REG32(INT_INFO2, 0x30)
->> +    FIELD(INT_INFO2, HMASTER, 0, 16)
->> +    FIELD(INT_INFO2, HNONSEC, 16, 1)
->> +    FIELD(INT_INFO2, CFG_NS, 17, 1)
->>  REG32(INT_SET, 0x34)
->>      FIELD(INT_SET, IRQ, 0, 1)
->>  REG32(PIDR4, 0xfd0)
->> @@ -266,6 +269,45 @@ static const MemoryRegionOps tz_mpc_reg_ops =3D {
->>      .impl.max_access_size =3D 4,
->>  };
->>
->> +static inline bool tz_mpc_cfg_ns(TZMPC *s, hwaddr addr)
->> +{
->> +    /* Return the cfg_ns bit from the LUT for the specified address */
->> +    hwaddr blknum =3D addr / s->blocksize;
->> +    hwaddr blkword =3D blknum / 32;
->> +    uint32_t blkbit =3D 1U << (blknum % 32);
->> +
->> +    /* This would imply the address was larger than the size we
->> +     * defined this memory region to be, so it can't happen.
->> +     */
->> +    assert(blkword < s->blk_max);
->> +    return s->blk_lut[blkword] & blkbit;
->> +}
->> +
->> +static MemTxResult tz_mpc_handle_block(TZMPC *s, hwaddr addr, MemTxAttr=
-s attrs)
->> +{
->> +    /* Handle a blocked transaction: raise IRQ, capture info, etc */
->> +    if (!s->int_stat) {
->> +        /* First blocked transfer: capture information into INT_INFO1 a=
-nd
->> +         * INT_INFO2. Subsequent transfers are still blocked but don't
->> +         * capture information until the guest clears the interrupt.
->> +         */
->> +
->> +        s->int_info1 =3D addr;
->> +        s->int_info2 =3D 0;
->> +        s->int_info2 =3D FIELD_DP32(s->int_info2, INT_INFO2, HMASTER,
->> +                                  attrs.requester_id & 0xffff);
->
-> Does this actually need masking given the source is a 16 bit wide bitfiel=
-d?
+The gtester utility offers the "-p=TESTPATH" option to
+"only run test cases matching TESTPATH".  We already use
+a $GTESTER_OPTIONS variable.
+Use make variable expansion to allow qtest path matching
+from command line:
 
-That might change in future (eg Eric was talking about wanting
-to put SMMUv3 substream IDs in transaction attributes, and those
-are 20 bits wide, so we might want to widen requester_id to fit them).
+  $ time make check-qtest-arm GTESTER_OPTIONS="-p /arm/boot-serial"
+    GTESTER check-qtest-arm
 
-thanks
--- PMM
+  user 0m1.548s
+
+Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+---
+I am more interested in the "-s" option (exclude pattern) but
+can't have it working :(
+
+i.e. "run all but qom/hmp":
+make check-qtest-arm GTESTER_OPTIONS="-s /arm/qom -s /arm/hmp"
+
+ tests/Makefile.include | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/tests/Makefile.include b/tests/Makefile.include
+index 3b9a5e31a2..b0ff3d988c 100644
+--- a/tests/Makefile.include
++++ b/tests/Makefile.include
+@@ -870,7 +870,7 @@ tests/test-qga$(EXESUF): qemu-ga$(EXESUF)
+ tests/test-qga$(EXESUF): tests/test-qga.o $(qtest-obj-y)
+ 
+ SPEED = quick
+-GTESTER_OPTIONS = -k $(if $(V),--verbose,-q)
++GTESTER_OPTIONS += -k $(if $(V),--verbose,-q)
+ GCOV_OPTIONS = -n $(if $(V),-f,)
+ 
+ # gtester tests, possibly with verbose output
+-- 
+2.17.0
