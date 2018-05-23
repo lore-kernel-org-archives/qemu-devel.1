@@ -1,20 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47290)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47495)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1fLXpo-0001mH-8w
-	for qemu-devel@nongnu.org; Wed, 23 May 2018 13:46:01 -0400
+	(envelope-from <cminyard@mvista.com>) id 1fLXqf-00028Y-TN
+	for qemu-devel@nongnu.org; Wed, 23 May 2018 13:46:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1fLXpn-0001qj-2F
-	for qemu-devel@nongnu.org; Wed, 23 May 2018 13:46:00 -0400
-References: <1527091418-11874-1-git-send-email-eric.auger@redhat.com>
-From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <ec6bc0b3-5f0b-bf0c-7d9b-0382e114ee9e@redhat.com>
-Date: Wed, 23 May 2018 19:45:45 +0200
+	(envelope-from <cminyard@mvista.com>) id 1fLXqb-00022T-WE
+	for qemu-devel@nongnu.org; Wed, 23 May 2018 13:46:53 -0400
+Received: from mail-pf0-x244.google.com ([2607:f8b0:400e:c00::244]:40704)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <cminyard@mvista.com>) id 1fLXqb-00022A-Kj
+	for qemu-devel@nongnu.org; Wed, 23 May 2018 13:46:49 -0400
+Received: by mail-pf0-x244.google.com with SMTP id f189-v6so10869247pfa.7
+	for <qemu-devel@nongnu.org>; Wed, 23 May 2018 10:46:49 -0700 (PDT)
+References: <1524670052-28373-1-git-send-email-minyard@acm.org>
+	<1524670052-28373-3-git-send-email-minyard@acm.org>
+	<CAJ+F1C+xyDCjjVhm1ypAEHQ6gSqbHVijYtoJ8n27mTqx+SXTWw@mail.gmail.com>
+From: Corey Minyard <cminyard@mvista.com>
+Message-ID: <d3e4a085-b7ad-82b3-5288-201af7819bce@mvista.com>
+Date: Wed, 23 May 2018 12:46:45 -0500
 MIME-Version: 1.0
-In-Reply-To: <1527091418-11874-1-git-send-email-eric.auger@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC 0/2] ARM virt: Support up to 256 PCIe buses
+In-Reply-To: <CAJ+F1C+xyDCjjVhm1ypAEHQ6gSqbHVijYtoJ8n27mTqx+SXTWw@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-GB
+Subject: Re: [Qemu-devel] [PATCH v3 2/3] ipmi: Use proper struct reference
+ for KCS vmstate
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,105 +32,173 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Auger <eric.auger@redhat.com>, eric.auger.pro@gmail.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org, peter.maydell@linaro.org
-Cc: drjones@redhat.com, wei@redhat.com, zhaoshenglong@huawei.com, ard.biesheuvel@linaro.org
+To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@gmail.com>, Corey Minyard <minyard@acm.org>
+Cc: "Dr . David Alan Gilbert" <dgilbert@redhat.com>, QEMU <qemu-devel@nongnu.org>
 
-Hi Eric,
-
-On 05/23/18 18:03, Eric Auger wrote:
-> Current Machvirt PCI host controller's ECAM region is 16MB large.
-> This limits the number of PCIe buses to 16.
+On 05/18/2018 10:45 AM, Marc-André Lureau wrote:
+> Hi Corey
 >
-> PC/Q35 machines have a 256MB region allowing up to 256 buses.
-> This series tries to bridge the gap.
+> On Wed, Apr 25, 2018 at 5:27 PM,  <minyard@acm.org> wrote:
+>> From: Corey Minyard <cminyard@mvista.com>
+>>
+>> The vmstate for isa_ipmi_kcs was referencing into the kcs structure,
+>> instead create a kcs structure separate and use that.
+>>
+>> There were also some issues in the state transfer.  The inlen field
+>> was not being transferred, so if a transaction was in process during
+>> the transfer it would be messed up.  And the use_irq field was
+>> transferred, but that should come from the configuration.
+>>
+>> To fix this, the new VMS_VSTRUCT macros are used so the exact
+>> version of the structure can be specified, depending on what
+>> version was being received.  So an upgrade should work for KCS.
+> Looks good overall,
 >
-> It declares a new ECAM region located beyond 256GB, of size 256MB
-> (just after the hypothetical new GICv3 RDIST region). The new
-> ECAM region is used as soon as the highmem option is set (default)
-> and disabled for machines older than 3.0.
+> You could easily split this patch further to help review/bisecting etc.
 >
-> Best Regards
+> Introduce VMSTATE_STRUCT, unuse use_irq, introduce version 2, add the
+> postload checks.
+
+That's probably fair.  I'll do that for v4.
+
+> You could also help reviewers by giving your test setup, so we can
+> more easily reproduce the fix and/or try variants.
+
+Hmm.  That's a little hard.  I'll see what I can do.  Maybe it's not too 
+bad,
+most distros should have the openipmi library available.
+
 >
-> Eric
->
-> Git: complete series available at
-> https://github.com/eauger/qemu/tree/v2.12.0-256MB-ECAM-RFCv1
->
-> - Tested with guest running in aarch64 and aarch32 modes (aarch64=off)
-> - In aarch32 mode I encountered the issue the vmalloc region may be
->   reported too small for the needs (dmesg excerpt below). So I had to
->   extend the vmalloc size by passing the "vmalloc=512M" option to the
->   bootargs and this eventually booted fine.
->
-> [    1.399581] pl061_gpio 9030000.pl061: PL061 GPIO chip @0x0000000009030000 registered
-> [    1.402636] OF: PCI: host bridge /pcie@10000000 ranges:
-> [    1.404506] OF: PCI:    IO 0x3eff0000..0x3effffff -> 0x00000000
-> [    1.406606] OF: PCI:   MEM 0x10000000..0x3efeffff -> 0x10000000
-> [    1.408690] OF: PCI:   MEM 0x8000000000..0xffffffffff -> 0x8000000000
-> [    1.411992] vmap allocation for size 1052672 failed: use vmalloc=<size> to increase size
-> [    1.414895] pci-host-generic 4010000000.pcie: ECAM ioremap failed
-> [    1.427472] pci-host-generic: probe of 4010000000.pcie failed with error -12
->
-> - Maybe this issue deserves introducing a new highmem_ecam option?
+> I also wonder if you could have used subsections, but the VSTRUCT type
+> seems a good approach to me, David would have to review it though.
 
-I refer to my earlier email here:
-
-  http://mid.mail-archive.com/13d95529-d61e-fc30-ffd4-f1ef93edad40@redhat.com
-
-This series flips the sole ECAM range that is exposed to the guest to a
-large one that is located above 4GB. That's a problem because -- to my
-understanding -- it breaks 32-bit ARM UEFI builds, unless you change the
-QEMU command line.
-
-(1) Please enable the "firmware repo" from Gerd's site:
-
-https://www.kraxel.org/repos/
-
-(2) Please install the "edk2.git-arm" package.
-
-(3) Please run the 32-bit ARM UEFI firmware, with qemu-system-aarch64,
-in a separate directory, as follows (note: TCG only, KVM not needed):
-
-  cp /usr/share/edk2.git/arm/vars-template-pflash.raw vars
-  FWBIN=/usr/share/edk2.git/arm/QEMU_EFI-pflash.raw
-
-  qemu-system-aarch64 \
-    -nodefaults \
-    -no-user-config \
-    \
-    -M virt \
-    -cpu cortex-a15 \
-    -m 1024 \
-    \
-    -drive if=pflash,format=raw,file=$FWBIN,readonly \
-    -drive if=pflash,format=raw,file=vars \
-    \
-    -device virtio-gpu-pci \
-    -device qemu-xhci \
-    -device usb-kbd \
-    \
-    -chardev stdio,signal=off,mux=on,id=char0 \
-    -mon chardev=char0,mode=readline \
-    -serial chardev:char0
-
-This will boot the UEFI shell for you in a graphical window and take
-input from the keyboard in that window. A virtio-gpu-pci device is used
-as GPU (a PCI Express virtio device) and a USB3.0 keyboard is used as
-human input device (the USB3.0 controller is also PCI Express).
-
-
-I didn't test it, but I expect that this series, when applied as-is,
-will break the above use case, unless highmem is explicitly disabled.
-
-I think the first patch is OK (modulo the runaway empty line at the end
-of acpi_dsdt_add_pci()), while realizing my review cannot be complete.
-:)
-
-Regarding the second patch, I do believe we need "more sophistication"
-there. For example, I guess it could be possible to distinguish "-cpu
-cortex-a15" from "-cpu cortex-a57" somehow, and stick with the low/small
-ECAM in the former case. (The 32-bit firmware already runs on cortex-a15
-only, and not on cortex-a57, according to my testing.)
+Yeah, I think we talked about subsections at one point, but this seemed 
+better.
+That will have to wait for David.
 
 Thanks,
-Laszlo
+
+-corey
+
+>
+>> Signed-off-by: Corey Minyard <cminyard@mvista.com>
+>> Cc: Dr. David Alan Gilbert <dgilbert@redhat.com>
+>> ---
+>>   hw/ipmi/isa_ipmi_kcs.c | 81 ++++++++++++++++++++++++++++++++++++++++----------
+>>   1 file changed, 66 insertions(+), 15 deletions(-)
+>>
+>> diff --git a/hw/ipmi/isa_ipmi_kcs.c b/hw/ipmi/isa_ipmi_kcs.c
+>> index 689587b..a794315 100644
+>> --- a/hw/ipmi/isa_ipmi_kcs.c
+>> +++ b/hw/ipmi/isa_ipmi_kcs.c
+>> @@ -22,6 +22,7 @@
+>>    * THE SOFTWARE.
+>>    */
+>>   #include "qemu/osdep.h"
+>> +#include "qemu/log.h"
+>>   #include "qapi/error.h"
+>>   #include "hw/hw.h"
+>>   #include "hw/ipmi/ipmi.h"
+>> @@ -422,24 +423,69 @@ static void ipmi_isa_realize(DeviceState *dev, Error **errp)
+>>       isa_register_ioport(isadev, &iik->kcs.io, iik->kcs.io_base);
+>>   }
+>>
+>> -const VMStateDescription vmstate_ISAIPMIKCSDevice = {
+>> +static int ipmi_kcs_vmstate_post_load(void *opaque, int version)
+>> +{
+>> +    IPMIKCS *ik = opaque;
+>> +
+>> +    /* Make sure all the values are sane. */
+>> +    if (ik->outpos >= MAX_IPMI_MSG_SIZE || ik->outlen >= MAX_IPMI_MSG_SIZE ||
+>> +        ik->outpos >= ik->outlen) {
+>> +        qemu_log_mask(LOG_GUEST_ERROR,
+>> +                      "ipmi:kcs: vmstate transfer received bad out values: %d %d\n",
+>> +                      ik->outpos, ik->outlen);
+>> +        ik->outpos = 0;
+>> +        ik->outlen = 0;
+>> +    }
+>> +
+>> +    if (ik->inlen >= MAX_IPMI_MSG_SIZE) {
+>> +        qemu_log_mask(LOG_GUEST_ERROR,
+>> +                      "ipmi:kcs: vmstate transfer received bad in value: %d\n",
+>> +                      ik->inlen);
+>> +        ik->inlen = 0;
+>> +    }
+>> +
+>> +    return 0;
+>> +}
+>> +
+>> +static bool vmstate_kcs_before_version2(void *opaque, int version)
+>> +{
+>> +    return version <= 1;
+>> +}
+>> +
+>> +static const VMStateDescription vmstate_IPMIKCS = {
+>> +    .name = TYPE_IPMI_INTERFACE_PREFIX "kcs",
+>> +    .version_id = 2,
+>> +    .minimum_version_id = 1,
+>> +    .post_load = ipmi_kcs_vmstate_post_load,
+>> +    .fields      = (VMStateField[]) {
+>> +        VMSTATE_BOOL(obf_irq_set, IPMIKCS),
+>> +        VMSTATE_BOOL(atn_irq_set, IPMIKCS),
+>> +        VMSTATE_UNUSED_TEST(vmstate_kcs_before_version2, 1), /* Was use_irq */
+>> +        VMSTATE_BOOL(irqs_enabled, IPMIKCS),
+>> +        VMSTATE_UINT32(outpos, IPMIKCS),
+>> +        VMSTATE_UINT32_V(outlen, IPMIKCS, 2),
+>> +        VMSTATE_UINT8_ARRAY(outmsg, IPMIKCS, MAX_IPMI_MSG_SIZE),
+>> +        VMSTATE_UINT32_V(inlen, IPMIKCS, 2),
+>> +        VMSTATE_UINT8_ARRAY(inmsg, IPMIKCS, MAX_IPMI_MSG_SIZE),
+>> +        VMSTATE_BOOL(write_end, IPMIKCS),
+>> +        VMSTATE_UINT8(status_reg, IPMIKCS),
+>> +        VMSTATE_UINT8(data_out_reg, IPMIKCS),
+>> +        VMSTATE_INT16(data_in_reg, IPMIKCS),
+>> +        VMSTATE_INT16(cmd_reg, IPMIKCS),
+>> +        VMSTATE_UINT8(waiting_rsp, IPMIKCS),
+>> +        VMSTATE_END_OF_LIST()
+>> +    }
+>> +};
+>> +
+>> +static const VMStateDescription vmstate_ISAIPMIKCSDevice = {
+>>       .name = TYPE_IPMI_INTERFACE,
+>> -    .version_id = 1,
+>> +    .version_id = 2,
+>>       .minimum_version_id = 1,
+>>       .fields      = (VMStateField[]) {
+>> -        VMSTATE_BOOL(kcs.obf_irq_set, ISAIPMIKCSDevice),
+>> -        VMSTATE_BOOL(kcs.atn_irq_set, ISAIPMIKCSDevice),
+>> -        VMSTATE_BOOL(kcs.use_irq, ISAIPMIKCSDevice),
+>> -        VMSTATE_BOOL(kcs.irqs_enabled, ISAIPMIKCSDevice),
+>> -        VMSTATE_UINT32(kcs.outpos, ISAIPMIKCSDevice),
+>> -        VMSTATE_UINT8_ARRAY(kcs.outmsg, ISAIPMIKCSDevice, MAX_IPMI_MSG_SIZE),
+>> -        VMSTATE_UINT8_ARRAY(kcs.inmsg, ISAIPMIKCSDevice, MAX_IPMI_MSG_SIZE),
+>> -        VMSTATE_BOOL(kcs.write_end, ISAIPMIKCSDevice),
+>> -        VMSTATE_UINT8(kcs.status_reg, ISAIPMIKCSDevice),
+>> -        VMSTATE_UINT8(kcs.data_out_reg, ISAIPMIKCSDevice),
+>> -        VMSTATE_INT16(kcs.data_in_reg, ISAIPMIKCSDevice),
+>> -        VMSTATE_INT16(kcs.cmd_reg, ISAIPMIKCSDevice),
+>> -        VMSTATE_UINT8(kcs.waiting_rsp, ISAIPMIKCSDevice),
+>> +        VMSTATE_VSTRUCT_TEST(kcs, ISAIPMIKCSDevice, vmstate_kcs_before_version2,
+>> +                             0, vmstate_IPMIKCS, IPMIKCS, 1),
+>> +        VMSTATE_VSTRUCT_V(kcs, ISAIPMIKCSDevice, 2, vmstate_IPMIKCS,
+>> +                          IPMIKCS, 2),
+>>           VMSTATE_END_OF_LIST()
+>>       }
+>>   };
+>> @@ -450,6 +496,11 @@ static void isa_ipmi_kcs_init(Object *obj)
+>>
+>>       ipmi_bmc_find_and_link(obj, (Object **) &iik->kcs.bmc);
+>>
+>> +    /*
+>> +     * Version 1 had an incorrect name, it clashed with the BT
+>> +     * IPMI device, so receive it, but transmit a different
+>> +     * version.
+>> +     */
+>>       vmstate_register(NULL, 0, &vmstate_ISAIPMIKCSDevice, iik);
+>>   }
+>>
+>> --
+>> 2.7.4
+>>
+>>
+>
+>
