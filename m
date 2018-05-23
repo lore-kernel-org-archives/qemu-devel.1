@@ -1,14 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35971)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35956)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1fLQxQ-00084N-8s
+	(envelope-from <vsementsov@virtuozzo.com>) id 1fLQxP-00083Y-NC
 	for qemu-devel@nongnu.org; Wed, 23 May 2018 06:25:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1fLQxK-0003tf-4v
+	(envelope-from <vsementsov@virtuozzo.com>) id 1fLQxK-0003tb-3N
 	for qemu-devel@nongnu.org; Wed, 23 May 2018 06:25:23 -0400
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Wed, 23 May 2018 13:24:14 +0300
-Message-Id: <20180523102419.28665-1-vsementsov@virtuozzo.com>
-Subject: [Qemu-devel] [PATCH v3 0/5] NBD export bitmaps
+Date: Wed, 23 May 2018 13:24:19 +0300
+Message-Id: <20180523102419.28665-6-vsementsov@virtuozzo.com>
+In-Reply-To: <20180523102419.28665-1-vsementsov@virtuozzo.com>
+References: <20180523102419.28665-1-vsementsov@virtuozzo.com>
+Subject: [Qemu-devel] [PATCH v3 5/5] docs/interop: add nbd.txt
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,73 +22,69 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org, qemu-devel@nongnu.org
 Cc: armbru@redhat.com, pbonzini@redhat.com, eblake@redhat.com, mreitz@redhat.com, kwolf@redhat.com, vsementsov@virtuozzo.com, den@openvz.org
 
-Hi all.
+Describe new metadata namespace: "qemu".
 
-This is a proposal and realization of new NBD meta context:
-qemu. (I hope to send corresponding proposal to NBD protocol soon)
-
-New possible queries will look like:
-qemu:dirty-bitmap:<export-bitmap-name>
-
-Mapping from export-bitmap-name to BdrvDirtyBitmap is done through qmp
-command nbd-server-add-bitmap. For now, only one bitmap export is
-allowed per NBD export, however it may be easily improved if needed 
-(we don't have such cases for now)
-
-Client and testing.
-I wrote client code for Virtuozzo, but it turned out to be unused,
-actually it's used only for tests. We don't have cases, where we need
-to import dirty bitmap through qemu nbd-client. All this done for
-exporting dirty bitmaps to the third tool. So, I think, it is not worth
-refactoring, rebasing and merging client part upstream, if there are no
-real usage cases.
-
-v3:
-01: new
-02: rewritten to satisfy changes in 03, drop r-b
-03: - fix comments
-    - rewrite nbd_meta_bitmap_query() and rename it to
-      nbd_meta_qemu_query(): parse 'qemu:dirty-bitmaps:' for LIST
-      option to represent list of all dirty-bitmap contexts.
-    - trace points
-    - s/512/BDRV_SECTOR_SIZE/
-      drop TODO comment
-04: s/2.13/3.0
-05: new
-
-v2:
-01 from v1 is dropped: actually, we don't need generic namespace
-parsing for now (especially, after moving to qemu: namespace, which has
-the same length as base:), lets postpone it.
-
-01: Improve comment wording (Eric), add Eric's r-b
-02: improve commit message
-    move NBD_STATE_DIRTY to header
-    add comment on NBD_MAX_BITMAP_EXTENTS
-    remove MAX_EXTENT_LENGTH and instead update add_extents() which
-      uses it
-    use export_bitmap_context instead of export_bitmap_name to reduce
-      operations on it
-    move from qemu-dirty-bitmap to qemu:dirty-bitmap
-    other way to parse namespace name
-    handle FLAG_DF
-03: Improve specification of new qmp command (Eric)
-
-Vladimir Sementsov-Ogievskiy (5):
-  nbd/server: fix trace
-  nbd/server: add nbd_meta_empty_or_pattern helper
-  nbd/server: implement dirty bitmap export
-  qapi: new qmp command nbd-server-add-bitmap
-  docs/interop: add nbd.txt
-
- docs/interop/nbd.txt |  37 ++++++
- qapi/block.json      |  23 ++++
- include/block/nbd.h  |   6 +
- blockdev-nbd.c       |  23 ++++
- nbd/server.c         | 322 ++++++++++++++++++++++++++++++++++++++++++++++-----
- MAINTAINERS          |   1 +
- 6 files changed, 383 insertions(+), 29 deletions(-)
+Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+---
+ docs/interop/nbd.txt | 37 +++++++++++++++++++++++++++++++++++++
+ MAINTAINERS          |  1 +
+ 2 files changed, 38 insertions(+)
  create mode 100644 docs/interop/nbd.txt
 
+diff --git a/docs/interop/nbd.txt b/docs/interop/nbd.txt
+new file mode 100644
+index 0000000000..7366269fc0
+--- /dev/null
++++ b/docs/interop/nbd.txt
+@@ -0,0 +1,37 @@
++Qemu supports NBD protocol, and has internal NBD client (look at
++block/nbd.c), internal NBD server (look at blockdev-nbd.c) as well as
++external NBD server tool - qemu-nbd.c. The common code is placed in
++nbd/*.
++
++NBD protocol is specified here:
++https://github.com/NetworkBlockDevice/nbd/blob/master/doc/proto.md
++
++This following paragraphs describe some specific properties of NBD
++protocol realization in Qemu.
++
++
++= Metadata namespaces =
++
++Qemu supports "base:allocation" metadata context as defined in the NBD
++protocol specification and defines own metadata namespace: "qemu".
++
++
++== "qemu" namespace ==
++
++For now, the only type of metadata context in the namespace is dirty
++bitmap. All available metadata contexts have the following form:
++
++   qemu:dirty-bitmap:<dirty-bitmap-export-name>
++
++Each dirty-bitmap metadata context defines the only one flag for
++extents in reply for NBD_CMD_BLOCK_STATUS:
++
++    bit 0: NBD_STATE_DIRTY, means that the extent is "dirty"
++
++For NBD_OPT_LIST_META_CONTEXT the following queries are supported
++additionally to "qemu:dirty-bitmap:<dirty-bitmap-export-name>":
++
++* "qemu:" : returns list of all available metadata contexts in the
++            namespace.
++* "qemu:dirty-bitmap:" : returns list of all available dirty-bitmap
++                         metadata contexts.
+diff --git a/MAINTAINERS b/MAINTAINERS
+index e187b1f18f..887b479440 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -1923,6 +1923,7 @@ F: nbd/
+ F: include/block/nbd*
+ F: qemu-nbd.*
+ F: blockdev-nbd.c
++F: docs/interop/nbd.txt
+ T: git git://repo.or.cz/qemu/ericb.git nbd
+ 
+ NFS
 -- 
 2.11.1
