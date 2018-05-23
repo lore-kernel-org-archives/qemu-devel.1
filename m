@@ -1,16 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52579)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52695)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fLTYs-0001hB-5H
-	for qemu-devel@nongnu.org; Wed, 23 May 2018 09:12:18 -0400
+	(envelope-from <kwolf@redhat.com>) id 1fLTYx-0001m3-RW
+	for qemu-devel@nongnu.org; Wed, 23 May 2018 09:12:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fLTYm-0006ob-H3
-	for qemu-devel@nongnu.org; Wed, 23 May 2018 09:12:14 -0400
+	(envelope-from <kwolf@redhat.com>) id 1fLTYr-0006sH-TD
+	for qemu-devel@nongnu.org; Wed, 23 May 2018 09:12:19 -0400
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Wed, 23 May 2018 15:11:10 +0200
-Message-Id: <20180523131155.12359-2-kwolf@redhat.com>
+Date: Wed, 23 May 2018 15:11:15 +0200
+Message-Id: <20180523131155.12359-7-kwolf@redhat.com>
 In-Reply-To: <20180523131155.12359-1-kwolf@redhat.com>
 References: <20180523131155.12359-1-kwolf@redhat.com>
-Subject: [Qemu-devel] [PULL 01/46] qemu-iotests: Fix paths for NFS
+Subject: [Qemu-devel] [PULL 06/46] qemu-iotests: Remove MIG_SOCKET from
+ non-migration tests
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,30 +23,41 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, qemu-devel@nongnu.org
 
-Test cases were trying to use nfs:// URLs as local filenames, which made
-every test fail for NFS. With TEST_IMG and TEST_IMG_FILE set like for
-the other protocols, NFS tests can pass again.
+185 and 191 define a MIG_SOCKET even though they don't do anything with
+migration. Remove the useless variable.
 
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-Reviewed-by: Fam Zheng <famz@redhat.com>
+Reviewed-by: Juan Quintela <quintela@redhat.com>
 ---
- tests/qemu-iotests/common.rc | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ tests/qemu-iotests/185 | 2 --
+ tests/qemu-iotests/191 | 2 --
+ 2 files changed, 4 deletions(-)
 
-diff --git a/tests/qemu-iotests/common.rc b/tests/qemu-iotests/common.rc
-index 9a65a11026..cb5fa14e7f 100644
---- a/tests/qemu-iotests/common.rc
-+++ b/tests/qemu-iotests/common.rc
-@@ -147,8 +147,8 @@ else
-         TEST_IMG_FILE=$TEST_DIR/t.$IMGFMT
-         TEST_IMG="ssh://127.0.0.1$TEST_IMG_FILE"
-     elif [ "$IMGPROTO" = "nfs" ]; then
--        TEST_DIR="nfs://127.0.0.1/$TEST_DIR"
--        TEST_IMG=$TEST_DIR/t.$IMGFMT
-+        TEST_IMG_FILE=$TEST_DIR/t.$IMGFMT
-+        TEST_IMG="nfs://127.0.0.1$TEST_IMG_FILE"
-     elif [ "$IMGPROTO" = "vxhs" ]; then
-         TEST_IMG_FILE=$TEST_DIR/t.$IMGFMT
-         TEST_IMG="vxhs://127.0.0.1:9999/t.$IMGFMT"
+diff --git a/tests/qemu-iotests/185 b/tests/qemu-iotests/185
+index 9a2d317414..deb42cc886 100755
+--- a/tests/qemu-iotests/185
++++ b/tests/qemu-iotests/185
+@@ -27,8 +27,6 @@ echo "QA output created by $seq"
+ here=`pwd`
+ status=1 # failure is the default!
+ 
+-MIG_SOCKET="${TEST_DIR}/migrate"
+-
+ _cleanup()
+ {
+     rm -f "${TEST_IMG}.mid"
+diff --git a/tests/qemu-iotests/191 b/tests/qemu-iotests/191
+index dfad6555e4..77224eb151 100755
+--- a/tests/qemu-iotests/191
++++ b/tests/qemu-iotests/191
+@@ -27,8 +27,6 @@ echo "QA output created by $seq"
+ here=`pwd`
+ status=1 # failure is the default!
+ 
+-MIG_SOCKET="${TEST_DIR}/migrate"
+-
+ _cleanup()
+ {
+     rm -f "${TEST_IMG}.mid"
 -- 
 2.13.6
