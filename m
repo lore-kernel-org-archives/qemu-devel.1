@@ -1,24 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58793)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58792)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <edgar.iglesias@gmail.com>) id 1fLcXy-0005Pi-2G
-	for qemu-devel@nongnu.org; Wed, 23 May 2018 18:47:54 -0400
+	(envelope-from <edgar.iglesias@gmail.com>) id 1fLcXy-0005Ph-2B
+	for qemu-devel@nongnu.org; Wed, 23 May 2018 18:47:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <edgar.iglesias@gmail.com>) id 1fLcXt-0003HA-UF
+	(envelope-from <edgar.iglesias@gmail.com>) id 1fLcXs-0003Gi-TZ
 	for qemu-devel@nongnu.org; Wed, 23 May 2018 18:47:54 -0400
-Received: from mail-wm0-x241.google.com ([2a00:1450:400c:c09::241]:33399)
+Received: from mail-wm0-x233.google.com ([2a00:1450:400c:c09::233]:33652)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <edgar.iglesias@gmail.com>)
-	id 1fLcXt-0003Gt-OF
-	for qemu-devel@nongnu.org; Wed, 23 May 2018 18:47:49 -0400
-Received: by mail-wm0-x241.google.com with SMTP id x12-v6so24112588wmc.0
-	for <qemu-devel@nongnu.org>; Wed, 23 May 2018 15:47:49 -0700 (PDT)
+	id 1fLcXs-0003G8-Mw
+	for qemu-devel@nongnu.org; Wed, 23 May 2018 18:47:48 -0400
+Received: by mail-wm0-x233.google.com with SMTP id x12-v6so24112521wmc.0
+	for <qemu-devel@nongnu.org>; Wed, 23 May 2018 15:47:48 -0700 (PDT)
 From: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
-Date: Thu, 24 May 2018 00:47:45 +0200
-Message-Id: <20180523224745.30402-2-edgar.iglesias@gmail.com>
-In-Reply-To: <20180523224745.30402-1-edgar.iglesias@gmail.com>
-References: <20180523224745.30402-1-edgar.iglesias@gmail.com>
-Subject: [Qemu-devel] [PATCH v4 09/38] target-microblaze: Conditionalize
- setting of PVR11_USE_MMU
+Date: Thu, 24 May 2018 00:47:44 +0200
+Message-Id: <20180523224745.30402-1-edgar.iglesias@gmail.com>
+Subject: [Qemu-devel] [PATCH v4 00/38] target-microblaze: Add support for
+ Extended Addressing
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,28 +30,98 @@ Cc: peter.maydell@linaro.org, richard.henderson@linaro.org, frederic.konrad@adac
 
 From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
 
-Conditionalize setting of PVR11_USE_MMU on the use_mmu
-CPU property, otherwise we may incorrectly advertise an
-MMU via PVR when the core in fact has none.
+This series adds support for Extended Addressing to our MicroBlaze
+models. It adds both the non-MMU load/store EA and the extended MMU
+addressing.
 
-Signed-off-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
----
- target/microblaze/cpu.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+There are several ways to implement this but since there are further
+64-bit extensions in the pipe, I've chosen to convert the cpu_SR
+special regs to 64-bit. Both non-EA and EA enabled cores run out of
+the same build with TARGET_LONG_BITS=64.
 
-diff --git a/target/microblaze/cpu.c b/target/microblaze/cpu.c
-index 06476f6efc..a6f1ce6549 100644
---- a/target/microblaze/cpu.c
-+++ b/target/microblaze/cpu.c
-@@ -201,7 +201,8 @@ static void mb_cpu_realizefn(DeviceState *dev, Error **errp)
-                                         PVR5_DCACHE_WRITEBACK_MASK : 0;
- 
-     env->pvr.regs[10] = 0x0c000000; /* Default to spartan 3a dsp family.  */
--    env->pvr.regs[11] = PVR11_USE_MMU | (16 << 17);
-+    env->pvr.regs[11] = (cpu->cfg.use_mmu ? PVR11_USE_MMU : 0) |
-+                        16 << 17;
- 
-     mcc->parent_realize(dev, errp);
- }
+Comments?
+
+The following lacks review:
+$ grep -L Reviewed v4/patches/*
+v4/patches/0000-cover-letter.patch
+v4/patches/0009-target-microblaze-Conditionalize-setting-of-PVR11_US.patch
+
+This time I'm only sending out patch #9.
+
+Thanks & Best regards,
+Edgar
+
+ChangeLog:
+
+v3 -> v4:
+* Add parenthese in PVR_USE_MMU setting
+* Tweak comment in compute_ldst_address
+
+v2 -> v3:
+* Add patch to consolidate MMU enabled checks
+* Remove patch to convert env_btaken to 64bits
+* Add patch to plug tcg_const leakage
+* Fix TLBLO access patch to avoid leaking tcg consts
+
+v1 -> v2:
+* Add patch to simplify address computation using tcg_gen_addi_i32()
+* Add patches to cleanup eval_cond_jmp using tcg_gen_movcond_i32()
+* Add patch to cleanup microblaze MMU logs
+* Correct trap_userspace() usage when adding Extended Addressing
+* Correct name for special register sr13 to redr
+
+Edgar E. Iglesias (38):
+  target-microblaze: dec_load: Use bool instead of unsigned int
+  target-microblaze: dec_store: Use bool instead of unsigned int
+  target-microblaze: compute_ldst_addr: Use bool instead of int
+  target-microblaze: Fallback to our latest CPU version
+  target-microblaze: Correct special register array sizes
+  target-microblaze: Correct the PVR array size
+  target-microblaze: Tighten up TCGv_i32 vs TCGv type usage
+  target-microblaze: Remove USE_MMU PVR checks
+  target-microblaze: Conditionalize setting of PVR11_USE_MMU
+  target-microblaze: Bypass MMU with MMU_NOMMU_IDX
+  target-microblaze: Make compute_ldst_addr always use a temp
+  target-microblaze: Remove pointer indirection for ld/st addresses
+  target-microblaze: Use TCGv for load/store addresses
+  target-microblaze: Name special registers we support
+  target-microblaze: Break out trap_userspace()
+  target-microblaze: Break out trap_illegal()
+  target-microblaze: dec_msr: Use bool and extract32
+  target-microblaze: dec_msr: Reuse more code when reg-decoding
+  target-microblaze: dec_msr: Fix MTS to FSR
+  target-microblaze: Make special registers 64-bit
+  target-microblaze: Setup for 64bit addressing
+  target-microblaze: Add Extended Addressing
+  target-microblaze: Implement MFSE EAR
+  target-microblaze: mmu: Add R_TBLX_MISS macros
+  target-microblaze: mmu: Remove unused register state
+  target-microblaze: mmu: Prepare for 64-bit addresses
+  target-microblaze: mmu: Add a configurable output address mask
+  target-microblaze: dec_msr: Plug a temp leak
+  target-microblaze: Add support for extended access to TLBLO
+  target-microblaze: Allow address sizes between 32 and 64 bits
+  target-microblaze: Simplify address computation using
+    tcg_gen_addi_i32()
+  target-microblaze: mmu: Cleanup debug log messages
+  target-microblaze: Use table based condition-codes conversion
+  target-microblaze: Remove argument b in eval_cc()
+  target-microblaze: Convert env_btarget to i64
+  target-microblaze: Use tcg_gen_movcond in eval_cond_jmp
+  target-microblaze: cpu_mmu_index: Fixup indentation
+  target-microblaze: Consolidate MMU enabled checks
+
+ configure                        |   1 +
+ linux-user/microblaze/cpu_loop.c |   4 +-
+ target/microblaze/cpu.c          |  30 +-
+ target/microblaze/cpu.h          |  34 +-
+ target/microblaze/helper.c       |  32 +-
+ target/microblaze/helper.h       |   8 +-
+ target/microblaze/mmu.c          |  81 ++--
+ target/microblaze/mmu.h          |  17 +-
+ target/microblaze/op_helper.c    |  30 +-
+ target/microblaze/translate.c    | 930 +++++++++++++++++++--------------------
+ 10 files changed, 598 insertions(+), 569 deletions(-)
+
 -- 
 2.14.1
