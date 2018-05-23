@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51408)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56342)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fLRoB-0007LE-V0
-	for qemu-devel@nongnu.org; Wed, 23 May 2018 07:19:57 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1fLS6P-0002rQ-JL
+	for qemu-devel@nongnu.org; Wed, 23 May 2018 07:38:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fLRoA-0007lM-Qa
-	for qemu-devel@nongnu.org; Wed, 23 May 2018 07:19:55 -0400
-From: Markus Armbruster <armbru@redhat.com>
-References: <20180518180440-mutt-send-email-mst@kernel.org>
-	<20180518170956.GI8615@redhat.com>
-	<20180518174133.GC25013@localhost.localdomain>
-	<87bmdc18q5.fsf@dusky.pond.sub.org>
-	<20180521182928.GO25013@localhost.localdomain>
-	<20180521184440.GB8214@redhat.com>
-	<20180521190112.GP25013@localhost.localdomain>
-Date: Wed, 23 May 2018 13:19:46 +0200
-In-Reply-To: <20180521190112.GP25013@localhost.localdomain> (Eduardo Habkost's
-	message of "Mon, 21 May 2018 16:01:12 -0300")
-Message-ID: <87o9h6hb59.fsf@dusky.pond.sub.org>
+	(envelope-from <alex.bennee@linaro.org>) id 1fLS6M-0008Ah-Gz
+	for qemu-devel@nongnu.org; Wed, 23 May 2018 07:38:45 -0400
+Received: from mail-wm0-x244.google.com ([2a00:1450:400c:c09::244]:34452)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1fLS6M-0008AM-7N
+	for qemu-devel@nongnu.org; Wed, 23 May 2018 07:38:42 -0400
+Received: by mail-wm0-x244.google.com with SMTP id q4-v6so2298531wmq.1
+	for <qemu-devel@nongnu.org>; Wed, 23 May 2018 04:38:42 -0700 (PDT)
+References: <20180521140402.23318-1-peter.maydell@linaro.org>
+	<20180521140402.23318-26-peter.maydell@linaro.org>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <20180521140402.23318-26-peter.maydell@linaro.org>
+Date: Wed, 23 May 2018 12:38:39 +0100
+Message-ID: <87vabetxds.fsf@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] storing machine data in qcow images?
+Subject: Re: [Qemu-devel] [PATCH 25/27] hw/arm/iotkit: Instantiate MPC
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,84 +30,122 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: "Daniel P. =?utf-8?Q?Berrang=C3=A9?=" <berrange@redhat.com>, kwolf@redhat.com, qemu-block@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org, mreitz@redhat.com, stefanha@redhat.com
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-arm@nongnu.org, qemu-devel@nongnu.org, patches@linaro.org, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-Eduardo Habkost <ehabkost@redhat.com> writes:
 
-> On Mon, May 21, 2018 at 07:44:40PM +0100, Daniel P. Berrang=C3=A9 wrote:
->> On Mon, May 21, 2018 at 03:29:28PM -0300, Eduardo Habkost wrote:
->> > On Sat, May 19, 2018 at 08:05:06AM +0200, Markus Armbruster wrote:
->> > > Eduardo Habkost <ehabkost@redhat.com> writes:
->> > >=20
->> > > [...]
->> > > > About being more expressive than just a single list of key,value
->> > > > pairs, I don't see any evidence of that being necessary for the
->> > > > problems we're trying to address.
->> > >=20
->> > > Short history of a configuration format you might have encountered:
->>=20
->> [snip]
->>=20
->> > > How confident are we a single list of (key, value) is really all we'=
-re
->> > > going to need?
->> > >=20
->> > > Even if we think it is, would it be possible to provide for a future
->> > > extension to trees at next to no cost?
->> >=20
->> > I'm confident that a list of key,values is all we need for the
->> > current problem.
->>=20
->> I'm not convinced. A disk image may work with Q35 or i440fx,  or
->> work with any of virtio, ide or sata disk. So that already means
->> values have to be arrays, not scalars. You could do that with a
->> simple key,value list, but only by defining a mapping of arrays
->> into a flattened form. eg do we allow repeated keys, or do we
->> allow array indexes on keys.=20
+Peter Maydell <peter.maydell@linaro.org> writes:
+
+> Wire up the one MPC that is part of the IoTKit itself. For the
+> moment we don't wire up its interrupt line.
 >
-> No problem, we can support trees if it's necessary.
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+
+Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+
+> ---
+>  include/hw/arm/iotkit.h |  2 ++
+>  hw/arm/iotkit.c         | 38 +++++++++++++++++++++++++++-----------
+>  2 files changed, 29 insertions(+), 11 deletions(-)
 >
+> diff --git a/include/hw/arm/iotkit.h b/include/hw/arm/iotkit.h
+> index c6129d926b..b21cf1ab9d 100644
+> --- a/include/hw/arm/iotkit.h
+> +++ b/include/hw/arm/iotkit.h
+> @@ -51,6 +51,7 @@
+>  #include "hw/arm/armv7m.h"
+>  #include "hw/misc/iotkit-secctl.h"
+>  #include "hw/misc/tz-ppc.h"
+> +#include "hw/misc/tz-mpc.h"
+>  #include "hw/timer/cmsdk-apb-timer.h"
+>  #include "hw/misc/unimp.h"
+>  #include "hw/or-irq.h"
+> @@ -74,6 +75,7 @@ typedef struct IoTKit {
+>      IoTKitSecCtl secctl;
+>      TZPPC apb_ppc0;
+>      TZPPC apb_ppc1;
+> +    TZMPC mpc;
+>      CMSDKAPBTIMER timer0;
+>      CMSDKAPBTIMER timer1;
+>      qemu_or_irq ppc_irq_orgate;
+> diff --git a/hw/arm/iotkit.c b/hw/arm/iotkit.c
+> index 234185e8f7..160e40c744 100644
+> --- a/hw/arm/iotkit.c
+> +++ b/hw/arm/iotkit.c
+> @@ -130,6 +130,7 @@ static void iotkit_init(Object *obj)
+>                        TYPE_TZ_PPC);
+>      init_sysbus_child(obj, "apb-ppc1", &s->apb_ppc1, sizeof(s->apb_ppc1),
+>                        TYPE_TZ_PPC);
+> +    init_sysbus_child(obj, "mpc", &s->mpc, sizeof(s->mpc), TYPE_TZ_MPC);
+>      init_sysbus_child(obj, "timer0", &s->timer0, sizeof(s->timer0),
+>                        TYPE_CMSDK_APB_TIMER);
+>      init_sysbus_child(obj, "timer1", &s->timer1, sizeof(s->timer1),
+> @@ -266,15 +267,6 @@ static void iotkit_realize(DeviceState *dev, Error *=
+*errp)
+>       */
+>      make_alias(s, &s->alias3, "alias 3", 0x50000000, 0x10000000, 0x40000=
+000);
 >
->> > The point here is to allow users to simply copy an existing disk
->> > image, and it will contain enough hints for a cloud stack to
->> > choose reasonable defaults for machine-type and disk type
->> > automatically.  Requiring the user to perform a separate step to
->> > encapsulate the disk image in another file format defeats the
->> > whole purpose of the proposal.
->>=20
->> It doesn't have to mean more work for the user - the application
->> that is used to create the image can do that on their behalf.
->> oVirt for example can import/export OVA files, containing OVF
->> metadata. I could imagine virt-manager, and other tools adding
->> export ability without much trouble if this was deemed a desirable
->> thing. Bundling gives ability to have multiple disk images in one
->> archive, which is something OVF does.
+> -    /* This RAM should be behind a Memory Protection Controller, but we
+> -     * don't implement that yet.
+> -     */
+> -    memory_region_init_ram(&s->sram0, NULL, "iotkit.sram0", 0x00008000, =
+&err);
+> -    if (err) {
+> -        error_propagate(errp, err);
+> -        return;
+> -    }
+> -    memory_region_add_subregion(&s->container, 0x20000000, &s->sram0);
 >
-> I have the impression that "the application that is used to
-> create the image" is a very large set.  It can be virt-manager,
-> virt-install, virt-manager, or even QEMU itself.
+>      /* Security controller */
+>      object_property_set_bool(OBJECT(&s->secctl), true, "realized", &err);
+> @@ -310,6 +302,32 @@ static void iotkit_realize(DeviceState *dev, Error *=
+*errp)
+>      qdev_connect_gpio_out_named(dev_secctl, "sec_resp_cfg", 0,
+>                                  qdev_get_gpio_in(dev_splitter, 0));
 >
-> Today people can simply create a VM on virt-manager, or run QEMU
-> manually, and upload the qcow2 image directly from its original
-> location (they don't need to copy/export it).  Don't we want the
-> same procedure to keep working instead of requiring users to use
-> another tool?
+> +    /* This RAM lives behind the Memory Protection Controller */
+> +    memory_region_init_ram(&s->sram0, NULL, "iotkit.sram0", 0x00008000, =
+&err);
+> +    if (err) {
+> +        error_propagate(errp, err);
+> +        return;
+> +    }
+> +    object_property_set_link(OBJECT(&s->mpc), OBJECT(&s->sram0),
+> +                             "downstream", &err);
+> +    if (err) {
+> +        error_propagate(errp, err);
+> +        return;
+> +    }
+> +    object_property_set_bool(OBJECT(&s->mpc), true, "realized", &err);
+> +    if (err) {
+> +        error_propagate(errp, err);
+> +        return;
+> +    }
+> +    /* Map the upstream end of the MPC into the right place... */
+> +    memory_region_add_subregion(&s->container, 0x20000000,
+> +                                sysbus_mmio_get_region(SYS_BUS_DEVICE(&s=
+->mpc),
+> +                                                       1));
+> +    /* ...and its register interface */
+> +    memory_region_add_subregion(&s->container, 0x50083000,
+> +                                sysbus_mmio_get_region(SYS_BUS_DEVICE(&s=
+->mpc),
+> +                                                       0));
+> +
+>      /* Devices behind APB PPC0:
+>       *   0x40000000: timer0
+>       *   0x40001000: timer1
+> @@ -473,8 +491,6 @@ static void iotkit_realize(DeviceState *dev, Error **=
+errp)
+>      create_unimplemented_device("NS watchdog", 0x40081000, 0x1000);
+>      create_unimplemented_device("S watchdog", 0x50081000, 0x1000);
+>
+> -    create_unimplemented_device("SRAM0 MPC", 0x50083000, 0x1000);
+> -
+>      for (i =3D 0; i < ARRAY_SIZE(s->ppc_irq_splitter); i++) {
+>          Object *splitter =3D OBJECT(&s->ppc_irq_splitter[i]);
 
-Today, I can take the disk out of my old computer, put it into my new
-computer, and it just works.  Don't we want the same procedure to keep
-working forever?
 
-Sadly, wanting something badly enough doesn't make actual solutions any
-easier :)
-
-My point is: disk images (real or virtual) keep working in different
-hardware contexts by a mixture of flexibility built into system software
-on the image, disciplined evolution of hardware (real or virtual), and
-dumb luck.  It works until it doesn't.  And then you get to tinker.
-
-With OVF, you solve the problem further up the stack: you do virtual
-appliances instead of disk images.
-
-How much space that leaves for useful solutions at the level of QEMU I
-can't say.
+--
+Alex Benn=C3=A9e
