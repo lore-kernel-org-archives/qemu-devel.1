@@ -1,33 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45301)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47290)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fLXft-0008Af-FZ
-	for qemu-devel@nongnu.org; Wed, 23 May 2018 13:35:46 -0400
+	(envelope-from <lersek@redhat.com>) id 1fLXpo-0001mH-8w
+	for qemu-devel@nongnu.org; Wed, 23 May 2018 13:46:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fLXfp-0006Du-IY
-	for qemu-devel@nongnu.org; Wed, 23 May 2018 13:35:45 -0400
-Received: from indium.canonical.com ([91.189.90.7]:51366)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1fLXfp-0006Dd-C6
-	for qemu-devel@nongnu.org; Wed, 23 May 2018 13:35:41 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1fLXfn-0004VY-DI
-	for <qemu-devel@nongnu.org>; Wed, 23 May 2018 17:35:39 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 6353F2E80CE
-	for <qemu-devel@nongnu.org>; Wed, 23 May 2018 17:35:39 +0000 (UTC)
+	(envelope-from <lersek@redhat.com>) id 1fLXpn-0001qj-2F
+	for qemu-devel@nongnu.org; Wed, 23 May 2018 13:46:00 -0400
+References: <1527091418-11874-1-git-send-email-eric.auger@redhat.com>
+From: Laszlo Ersek <lersek@redhat.com>
+Message-ID: <ec6bc0b3-5f0b-bf0c-7d9b-0382e114ee9e@redhat.com>
+Date: Wed, 23 May 2018 19:45:45 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 23 May 2018 17:30:26 -0000
-From: Bruce Rogers <brogers@suse.com>
-Reply-To: Bug 1769189 <1769189@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <152544791493.32626.6219738999075353422.malonedeb@gac.canonical.com>
-Message-Id: <152709662622.25254.17628763322832570415.malone@wampee.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1769189] Re: Issue with qemu 2.12.0 + SATA
+In-Reply-To: <1527091418-11874-1-git-send-email-eric.auger@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [RFC 0/2] ARM virt: Support up to 256 PCIe buses
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,49 +23,105 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Eric Auger <eric.auger@redhat.com>, eric.auger.pro@gmail.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org, peter.maydell@linaro.org
+Cc: drjones@redhat.com, wei@redhat.com, zhaoshenglong@huawei.com, ard.biesheuvel@linaro.org
 
-I've tried bisecting a few times, but since my reproducer wasn't
-reliable enough, I didn't identify the issue. (I see a bisect reported
-on qemu ML which seems like a bogus result, similar to mine).
+Hi Eric,
 
-In my case, after the "hang", Windows 10 resets the ahci device after 2
-minutes and it continues on until another hang happens. Seems fairly
-random. I increased the number of vcpu's assigned which seemed to
-increase the likelihood of the hang.
+On 05/23/18 18:03, Eric Auger wrote:
+> Current Machvirt PCI host controller's ECAM region is 16MB large.
+> This limits the number of PCIe buses to 16.
+>
+> PC/Q35 machines have a 256MB region allowing up to 256 buses.
+> This series tries to bridge the gap.
+>
+> It declares a new ECAM region located beyond 256GB, of size 256MB
+> (just after the hypothetical new GICv3 RDIST region). The new
+> ECAM region is used as soon as the highmem option is set (default)
+> and disabled for machines older than 3.0.
+>
+> Best Regards
+>
+> Eric
+>
+> Git: complete series available at
+> https://github.com/eauger/qemu/tree/v2.12.0-256MB-ECAM-RFCv1
+>
+> - Tested with guest running in aarch64 and aarch32 modes (aarch64=off)
+> - In aarch32 mode I encountered the issue the vmalloc region may be
+>   reported too small for the needs (dmesg excerpt below). So I had to
+>   extend the vmalloc size by passing the "vmalloc=512M" option to the
+>   bootargs and this eventually booted fine.
+>
+> [    1.399581] pl061_gpio 9030000.pl061: PL061 GPIO chip @0x0000000009030000 registered
+> [    1.402636] OF: PCI: host bridge /pcie@10000000 ranges:
+> [    1.404506] OF: PCI:    IO 0x3eff0000..0x3effffff -> 0x00000000
+> [    1.406606] OF: PCI:   MEM 0x10000000..0x3efeffff -> 0x10000000
+> [    1.408690] OF: PCI:   MEM 0x8000000000..0xffffffffff -> 0x8000000000
+> [    1.411992] vmap allocation for size 1052672 failed: use vmalloc=<size> to increase size
+> [    1.414895] pci-host-generic 4010000000.pcie: ECAM ioremap failed
+> [    1.427472] pci-host-generic: probe of 4010000000.pcie failed with error -12
+>
+> - Maybe this issue deserves introducing a new highmem_ecam option?
 
-I also went so far as to instrument an injection of the ahci interrupt
-via the monitor (total kludge, I know), and the guest did get out of the
-hung condition right away when I did that.
+I refer to my earlier email here:
 
--- =
+  http://mid.mail-archive.com/13d95529-d61e-fc30-ffd4-f1ef93edad40@redhat.com
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1769189
+This series flips the sole ECAM range that is exposed to the guest to a
+large one that is located above 4GB. That's a problem because -- to my
+understanding -- it breaks 32-bit ARM UEFI builds, unless you change the
+QEMU command line.
 
-Title:
-  Issue with qemu 2.12.0 + SATA
+(1) Please enable the "firmware repo" from Gerd's site:
 
-Status in QEMU:
-  New
+https://www.kraxel.org/repos/
 
-Bug description:
-  [EDIT: I first thought that OVMF was the issue, but it turns out to be
-  SATA]
+(2) Please install the "edk2.git-arm" package.
 
-  I had a Windows 10 VM running perfectly fine with a SATA drive, since
-  I upgraded to qemu 2.12, the guests hangs for a couple of minutes,
-  works for a few seconds, and hangs again, etc. By "hang" I mean it
-  doesn't freeze, but it looks like it's waiting on IO or something, I
-  can move the mouse but everything needing disk access is unresponsive.
+(3) Please run the 32-bit ARM UEFI firmware, with qemu-system-aarch64,
+in a separate directory, as follows (note: TCG only, KVM not needed):
 
-  What doesn't work: qemu 2.12 with SATA
-  What works: using VirIO-SCSI with qemu 2.12 or downgrading qemu to 2.11.1=
- and keep using SATA.
+  cp /usr/share/edk2.git/arm/vars-template-pflash.raw vars
+  FWBIN=/usr/share/edk2.git/arm/QEMU_EFI-pflash.raw
 
-  Platform is arch linux 4.16.7 on skylake and Haswell, I have attached
-  the vm xml file.
+  qemu-system-aarch64 \
+    -nodefaults \
+    -no-user-config \
+    \
+    -M virt \
+    -cpu cortex-a15 \
+    -m 1024 \
+    \
+    -drive if=pflash,format=raw,file=$FWBIN,readonly \
+    -drive if=pflash,format=raw,file=vars \
+    \
+    -device virtio-gpu-pci \
+    -device qemu-xhci \
+    -device usb-kbd \
+    \
+    -chardev stdio,signal=off,mux=on,id=char0 \
+    -mon chardev=char0,mode=readline \
+    -serial chardev:char0
 
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1769189/+subscriptions
+This will boot the UEFI shell for you in a graphical window and take
+input from the keyboard in that window. A virtio-gpu-pci device is used
+as GPU (a PCI Express virtio device) and a USB3.0 keyboard is used as
+human input device (the USB3.0 controller is also PCI Express).
+
+
+I didn't test it, but I expect that this series, when applied as-is,
+will break the above use case, unless highmem is explicitly disabled.
+
+I think the first patch is OK (modulo the runaway empty line at the end
+of acpi_dsdt_add_pci()), while realizing my review cannot be complete.
+:)
+
+Regarding the second patch, I do believe we need "more sophistication"
+there. For example, I guess it could be possible to distinguish "-cpu
+cortex-a15" from "-cpu cortex-a57" somehow, and stick with the low/small
+ECAM in the former case. (The 32-bit firmware already runs on cortex-a15
+only, and not on cortex-a57, according to my testing.)
+
+Thanks,
+Laszlo
