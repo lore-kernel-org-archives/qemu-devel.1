@@ -1,38 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52399)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38008)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1fLeZp-0006Nv-Pa
-	for qemu-devel@nongnu.org; Wed, 23 May 2018 20:58:00 -0400
+	(envelope-from <no-reply@patchew.org>) id 1fLfNF-0007Yq-Un
+	for qemu-devel@nongnu.org; Wed, 23 May 2018 21:49:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1fLeZn-000744-Ky
-	for qemu-devel@nongnu.org; Wed, 23 May 2018 20:57:57 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:46584)
+	(envelope-from <no-reply@patchew.org>) id 1fLfNC-0001Y0-R6
+	for qemu-devel@nongnu.org; Wed, 23 May 2018 21:49:02 -0400
+Resent-Message-Id: <E1fLfNC-0001Y0-R6@eggs.gnu.org>
+Received: from sender-of-o51.zoho.com ([135.84.80.216]:21035)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanb@linux.vnet.ibm.com>)
-	id 1fLeZn-000732-CC
-	for qemu-devel@nongnu.org; Wed, 23 May 2018 20:57:55 -0400
-Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w4O0sxHj125845
-	for <qemu-devel@nongnu.org>; Wed, 23 May 2018 20:57:54 -0400
-Received: from e36.co.us.ibm.com (e36.co.us.ibm.com [32.97.110.154])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2j5k9802f6-1
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Wed, 23 May 2018 20:57:54 -0400
-Received: from localhost
-	by e36.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <stefanb@linux.vnet.ibm.com>;
-	Wed, 23 May 2018 18:57:53 -0600
-From: Stefan Berger <stefanb@linux.vnet.ibm.com>
-Date: Wed, 23 May 2018 20:57:41 -0400
-In-Reply-To: <20180524005741.1042749-1-stefanb@linux.vnet.ibm.com>
-References: <20180524005741.1042749-1-stefanb@linux.vnet.ibm.com>
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1fLfNC-0001W7-Ik
+	for qemu-devel@nongnu.org; Wed, 23 May 2018 21:48:58 -0400
+In-Reply-To: <20180523131155.12359-1-kwolf@redhat.com>
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <152708416470.129.15403730634967425057@d39dc562802a>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Message-Id: <20180524005741.1042749-5-stefanb@linux.vnet.ibm.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL v1 4/4] test: Add test cases that use the
- external swtpm with CRB interface
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Wed, 23 May 2018 07:02:45 -0700 (PDT)
+Subject: Re: [Qemu-devel] [PULL 00/46] Block layer patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -41,577 +28,207 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, marcandre.lureau@redhat.com, Stefan Berger <stefanb@linux.vnet.ibm.com>
+To: kwolf@redhat.com
+Cc: famz@redhat.com, qemu-block@nongnu.org, qemu-devel@nongnu.org
 
-Add a test program for testing the CRB with the external swtpm.
-
-The 1st test case extends a PCR and reads back the value and compares
-it against an expected return packet.
-
-The 2nd test case repeats the 1st test case and then migrates the
-external swtpm's state along with the VM state to a destination
-QEMU and swtpm and checks that the PCR has the expected value now.
-
-The test cases require 'swtpm' to be installed on the system and
-in the PATH and 'swtpm' must support the --tpm2 option. If this is
-not the case, the test will be skipped.
-
-Signed-off-by: Stefan Berger <stefanb@linux.vnet.ibm.com>
-Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
----
- tests/Makefile.include     |   3 +
- tests/tpm-crb-swtpm-test.c | 247 +++++++++++++++++++++++++++++++++++++++=
-++++++
- tests/tpm-util.c           | 186 ++++++++++++++++++++++++++++++++++
- tests/tpm-util.h           |  36 +++++++
- 4 files changed, 472 insertions(+)
- create mode 100644 tests/tpm-crb-swtpm-test.c
- create mode 100644 tests/tpm-util.c
- create mode 100644 tests/tpm-util.h
-
-diff --git a/tests/Makefile.include b/tests/Makefile.include
-index 3b9a5e31a2..b499ba1813 100644
---- a/tests/Makefile.include
-+++ b/tests/Makefile.include
-@@ -297,6 +297,7 @@ check-qtest-i386-$(CONFIG_VHOST_USER_NET_TEST_i386) +=
-=3D tests/vhost-user-test$(EX
- ifeq ($(CONFIG_VHOST_USER_NET_TEST_i386),)
- check-qtest-x86_64-$(CONFIG_VHOST_USER_NET_TEST_x86_64) +=3D tests/vhost=
--user-test$(EXESUF)
- endif
-+check-qtest-i386-$(CONFIG_TPM) +=3D tests/tpm-crb-swtpm-test$(EXESUF)
- check-qtest-i386-$(CONFIG_TPM) +=3D tests/tpm-crb-test$(EXESUF)
- check-qtest-i386-$(CONFIG_TPM) +=3D tests/tpm-tis-test$(EXESUF)
- check-qtest-i386-$(CONFIG_SLIRP) +=3D tests/test-netfilter$(EXESUF)
-@@ -721,6 +722,8 @@ tests/test-util-sockets$(EXESUF): tests/test-util-soc=
-kets.o \
- tests/test-io-task$(EXESUF): tests/test-io-task.o $(test-io-obj-y)
- tests/test-io-channel-socket$(EXESUF): tests/test-io-channel-socket.o \
-         tests/io-channel-helpers.o tests/socket-helpers.o $(test-io-obj-=
-y)
-+tests/tpm-crb-swtpm-test$(EXESUF): tests/tpm-crb-swtpm-test.o tests/tpm-=
-emu.o \
-+	tests/tpm-util.o $(test-io-obj-y)
- tests/tpm-crb-test$(EXESUF): tests/tpm-crb-test.o tests/tpm-emu.o $(test=
--io-obj-y)
- tests/tpm-tis-test$(EXESUF): tests/tpm-tis-test.o tests/tpm-emu.o $(test=
--io-obj-y)
- tests/test-io-channel-file$(EXESUF): tests/test-io-channel-file.o \
-diff --git a/tests/tpm-crb-swtpm-test.c b/tests/tpm-crb-swtpm-test.c
-new file mode 100644
-index 0000000000..c2bde0cbaa
---- /dev/null
-+++ b/tests/tpm-crb-swtpm-test.c
-@@ -0,0 +1,247 @@
-+/*
-+ * QTest testcase for TPM CRB talking to external swtpm and swtpm migrat=
-ion
-+ *
-+ * Copyright (c) 2018 IBM Corporation
-+ *  with parts borrowed from migration-test.c that is:
-+ *     Copyright (c) 2016-2018 Red Hat, Inc. and/or its affiliates
-+ *
-+ * Authors:
-+ *   Stefan Berger <stefanb@linux.vnet.ibm.com>
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or la=
-ter.
-+ * See the COPYING file in the top-level directory.
-+ */
-+
-+#include "qemu/osdep.h"
-+#include <glib/gstdio.h>
-+
-+#include "hw/acpi/tpm.h"
-+#include "io/channel-socket.h"
-+#include "libqtest.h"
-+#include "tpm-util.h"
-+#include "sysemu/tpm.h"
-+#include "qapi/qmp/qdict.h"
-+
-+typedef struct TestState {
-+    char *src_tpm_path;
-+    char *dst_tpm_path;
-+    char *uri;
-+} TestState;
-+
-+bool got_stop;
-+
-+static void migrate(QTestState *who, const char *uri)
-+{
-+    QDict *rsp;
-+    gchar *cmd;
-+
-+    cmd =3D g_strdup_printf("{ 'execute': 'migrate',"
-+                          "'arguments': { 'uri': '%s' } }",
-+                          uri);
-+    rsp =3D qtest_qmp(who, cmd);
-+    g_free(cmd);
-+    g_assert(qdict_haskey(rsp, "return"));
-+    qobject_unref(rsp);
-+}
-+
-+/*
-+ * Events can get in the way of responses we are actually waiting for.
-+ */
-+static QDict *wait_command(QTestState *who, const char *command)
-+{
-+    const char *event_string;
-+    QDict *response;
-+
-+    response =3D qtest_qmp(who, command);
-+
-+    while (qdict_haskey(response, "event")) {
-+        /* OK, it was an event */
-+        event_string =3D qdict_get_str(response, "event");
-+        if (!strcmp(event_string, "STOP")) {
-+            got_stop =3D true;
-+        }
-+        qobject_unref(response);
-+        response =3D qtest_qmp_receive(who);
-+    }
-+    return response;
-+}
-+
-+static void wait_for_migration_complete(QTestState *who)
-+{
-+    while (true) {
-+        QDict *rsp, *rsp_return;
-+        bool completed;
-+        const char *status;
-+
-+        rsp =3D wait_command(who, "{ 'execute': 'query-migrate' }");
-+        rsp_return =3D qdict_get_qdict(rsp, "return");
-+        status =3D qdict_get_str(rsp_return, "status");
-+        completed =3D strcmp(status, "completed") =3D=3D 0;
-+        g_assert_cmpstr(status, !=3D,  "failed");
-+        qobject_unref(rsp);
-+        if (completed) {
-+            return;
-+        }
-+        usleep(1000);
-+    }
-+}
-+
-+static void migration_start_qemu(QTestState **src_qemu, QTestState **dst=
-_qemu,
-+                                 SocketAddress *src_tpm_addr,
-+                                 SocketAddress *dst_tpm_addr,
-+                                 const char *miguri)
-+{
-+    char *src_qemu_args, *dst_qemu_args;
-+
-+    src_qemu_args =3D g_strdup_printf(
-+        "-chardev socket,id=3Dchr,path=3D%s "
-+        "-tpmdev emulator,id=3Ddev,chardev=3Dchr "
-+        "-device tpm-crb,tpmdev=3Ddev ",
-+        src_tpm_addr->u.q_unix.path);
-+
-+    *src_qemu =3D qtest_init(src_qemu_args);
-+
-+    dst_qemu_args =3D g_strdup_printf(
-+        "-chardev socket,id=3Dchr,path=3D%s "
-+        "-tpmdev emulator,id=3Ddev,chardev=3Dchr "
-+        "-device tpm-crb,tpmdev=3Ddev "
-+        "-incoming %s",
-+        dst_tpm_addr->u.q_unix.path,
-+        miguri);
-+
-+    *dst_qemu =3D qtest_init(dst_qemu_args);
-+
-+    free(src_qemu_args);
-+    free(dst_qemu_args);
-+}
-+
-+static void tpm_crb_swtpm_test(const void *data)
-+{
-+    char *args =3D NULL;
-+    QTestState *s;
-+    SocketAddress *addr =3D NULL;
-+    gboolean succ;
-+    GPid swtpm_pid;
-+    GError *error =3D NULL;
-+    const TestState *ts =3D data;
-+
-+    succ =3D tpm_util_swtpm_start(ts->src_tpm_path, &swtpm_pid, &addr, &=
-error);
-+    /* succ may be false if swtpm is not available */
-+    if (!succ) {
-+        return;
-+    }
-+
-+    args =3D g_strdup_printf(
-+        "-chardev socket,id=3Dchr,path=3D%s "
-+        "-tpmdev emulator,id=3Ddev,chardev=3Dchr "
-+        "-device tpm-crb,tpmdev=3Ddev",
-+        addr->u.q_unix.path);
-+
-+    s =3D qtest_start(args);
-+    g_free(args);
-+
-+    tpm_util_startup(s, tpm_util_crb_transfer);
-+    tpm_util_pcrextend(s, tpm_util_crb_transfer);
-+
-+    unsigned char tpm_pcrread_resp[] =3D
-+        "\x80\x01\x00\x00\x00\x3e\x00\x00\x00\x00\x00\x00\x00\x16\x00\x0=
-0"
-+        "\x00\x01\x00\x0b\x03\x00\x04\x00\x00\x00\x00\x01\x00\x20\xf6\x8=
-5"
-+        "\x98\xe5\x86\x8d\xe6\x8b\x97\x29\x99\x60\xf2\x71\x7d\x17\x67\x8=
-9"
-+        "\xa4\x2f\x9a\xae\xa8\xc7\xb7\xaa\x79\xa8\x62\x56\xc1\xde";
-+    tpm_util_pcrread(s, tpm_util_crb_transfer, tpm_pcrread_resp,
-+                     sizeof(tpm_pcrread_resp));
-+
-+    qtest_end();
-+    tpm_util_swtpm_kill(swtpm_pid);
-+
-+    if (addr) {
-+        g_unlink(addr->u.q_unix.path);
-+        qapi_free_SocketAddress(addr);
-+    }
-+}
-+
-+static void tpm_crb_swtpm_migration_test(const void *data)
-+{
-+    const TestState *ts =3D data;
-+    gboolean succ;
-+    GPid src_tpm_pid, dst_tpm_pid;
-+    SocketAddress *src_tpm_addr =3D NULL, *dst_tpm_addr =3D NULL;
-+    GError *error =3D NULL;
-+    QTestState *src_qemu, *dst_qemu;
-+
-+    succ =3D tpm_util_swtpm_start(ts->src_tpm_path, &src_tpm_pid,
-+                                &src_tpm_addr, &error);
-+    /* succ may be false if swtpm is not available */
-+    if (!succ) {
-+        return;
-+    }
-+
-+    succ =3D tpm_util_swtpm_start(ts->dst_tpm_path, &dst_tpm_pid,
-+                                &dst_tpm_addr, &error);
-+    /* succ may be false if swtpm is not available */
-+    if (!succ) {
-+        goto err_src_tpm_kill;
-+    }
-+
-+    migration_start_qemu(&src_qemu, &dst_qemu, src_tpm_addr, dst_tpm_add=
-r,
-+                         ts->uri);
-+
-+    tpm_util_startup(src_qemu, tpm_util_crb_transfer);
-+    tpm_util_pcrextend(src_qemu, tpm_util_crb_transfer);
-+
-+    unsigned char tpm_pcrread_resp[] =3D
-+        "\x80\x01\x00\x00\x00\x3e\x00\x00\x00\x00\x00\x00\x00\x16\x00\x0=
-0"
-+        "\x00\x01\x00\x0b\x03\x00\x04\x00\x00\x00\x00\x01\x00\x20\xf6\x8=
-5"
-+        "\x98\xe5\x86\x8d\xe6\x8b\x97\x29\x99\x60\xf2\x71\x7d\x17\x67\x8=
-9"
-+        "\xa4\x2f\x9a\xae\xa8\xc7\xb7\xaa\x79\xa8\x62\x56\xc1\xde";
-+    tpm_util_pcrread(src_qemu, tpm_util_crb_transfer, tpm_pcrread_resp,
-+                     sizeof(tpm_pcrread_resp));
-+
-+    migrate(src_qemu, ts->uri);
-+    wait_for_migration_complete(src_qemu);
-+
-+    tpm_util_pcrread(dst_qemu, tpm_util_crb_transfer, tpm_pcrread_resp,
-+                     sizeof(tpm_pcrread_resp));
-+
-+    qtest_quit(dst_qemu);
-+    qtest_quit(src_qemu);
-+
-+    tpm_util_swtpm_kill(dst_tpm_pid);
-+    if (dst_tpm_addr) {
-+        g_unlink(dst_tpm_addr->u.q_unix.path);
-+        qapi_free_SocketAddress(dst_tpm_addr);
-+    }
-+
-+err_src_tpm_kill:
-+    tpm_util_swtpm_kill(src_tpm_pid);
-+    if (src_tpm_addr) {
-+        g_unlink(src_tpm_addr->u.q_unix.path);
-+        qapi_free_SocketAddress(src_tpm_addr);
-+    }
-+}
-+
-+int main(int argc, char **argv)
-+{
-+    int ret;
-+    TestState ts =3D { 0 };
-+
-+    ts.src_tpm_path =3D g_dir_make_tmp("qemu-tpm-crb-swtpm-test.XXXXXX",=
- NULL);
-+    ts.dst_tpm_path =3D g_dir_make_tmp("qemu-tpm-crb-swtpm-test.XXXXXX",=
- NULL);
-+    ts.uri =3D g_strdup_printf("unix:%s/migsocket", ts.src_tpm_path);
-+
-+    module_call_init(MODULE_INIT_QOM);
-+    g_test_init(&argc, &argv, NULL);
-+
-+    qtest_add_data_func("/tpm/crb-swtpm/test", &ts, tpm_crb_swtpm_test);
-+    qtest_add_data_func("/tpm/crb-swtpm-migration/test", &ts,
-+                        tpm_crb_swtpm_migration_test);
-+    ret =3D g_test_run();
-+
-+    g_rmdir(ts.dst_tpm_path);
-+    g_free(ts.dst_tpm_path);
-+    g_rmdir(ts.src_tpm_path);
-+    g_free(ts.src_tpm_path);
-+    g_free(ts.uri);
-+
-+    return ret;
-+}
-diff --git a/tests/tpm-util.c b/tests/tpm-util.c
-new file mode 100644
-index 0000000000..9072b6e850
---- /dev/null
-+++ b/tests/tpm-util.c
-@@ -0,0 +1,186 @@
-+/*
-+ * QTest TPM utilities
-+ *
-+ * Copyright (c) 2018 IBM Corporation
-+ * Copyright (c) 2018 Red Hat, Inc.
-+ *
-+ * Authors:
-+ *   Stefan Berger <stefanb@linux.vnet.ibm.com>
-+ *   Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or la=
-ter.
-+ * See the COPYING file in the top-level directory.
-+ */
-+
-+#include "qemu/osdep.h"
-+
-+#include "hw/acpi/tpm.h"
-+#include "libqtest.h"
-+#include "tpm-util.h"
-+
-+void tpm_util_crb_transfer(QTestState *s,
-+                           const unsigned char *req, size_t req_size,
-+                           unsigned char *rsp, size_t rsp_size)
-+{
-+    uint64_t caddr =3D qtest_readq(s, TPM_CRB_ADDR_BASE + A_CRB_CTRL_CMD=
-_LADDR);
-+    uint64_t raddr =3D qtest_readq(s, TPM_CRB_ADDR_BASE + A_CRB_CTRL_RSP=
-_ADDR);
-+
-+    qtest_writeb(s, TPM_CRB_ADDR_BASE + A_CRB_LOC_CTRL, 1);
-+
-+    qtest_memwrite(s, caddr, req, req_size);
-+
-+    uint32_t sts, start =3D 1;
-+    uint64_t end_time =3D g_get_monotonic_time() + 5 * G_TIME_SPAN_SECON=
-D;
-+    qtest_writel(s, TPM_CRB_ADDR_BASE + A_CRB_CTRL_START, start);
-+    while (true) {
-+        start =3D qtest_readl(s, TPM_CRB_ADDR_BASE + A_CRB_CTRL_START);
-+        if ((start & 1) =3D=3D 0) {
-+            break;
-+        }
-+        if (g_get_monotonic_time() >=3D end_time) {
-+            break;
-+        }
-+    };
-+    start =3D qtest_readl(s, TPM_CRB_ADDR_BASE + A_CRB_CTRL_START);
-+    g_assert_cmpint(start & 1, =3D=3D, 0);
-+    sts =3D qtest_readl(s, TPM_CRB_ADDR_BASE + A_CRB_CTRL_STS);
-+    g_assert_cmpint(sts & 1, =3D=3D, 0);
-+
-+    qtest_memread(s, raddr, rsp, rsp_size);
-+}
-+
-+void tpm_util_startup(QTestState *s, tx_func *tx)
-+{
-+    unsigned char buffer[1024];
-+    unsigned char tpm_startup[] =3D
-+        "\x80\x01\x00\x00\x00\x0c\x00\x00\x01\x44\x00\x00";
-+    unsigned char tpm_startup_resp[] =3D
-+        "\x80\x01\x00\x00\x00\x0a\x00\x00\x00\x00";
-+
-+    tx(s, tpm_startup, sizeof(tpm_startup), buffer, sizeof(buffer));
-+
-+    g_assert_cmpmem(buffer, sizeof(tpm_startup_resp),
-+                    tpm_startup_resp, sizeof(tpm_startup_resp));
-+}
-+
-+void tpm_util_pcrextend(QTestState *s, tx_func *tx)
-+{
-+    unsigned char buffer[1024];
-+    unsigned char tpm_pcrextend[] =3D
-+        "\x80\x02\x00\x00\x00\x41\x00\x00\x01\x82\x00\x00\x00\x0a\x00\x0=
-0"
-+        "\x00\x09\x40\x00\x00\x09\x00\x00\x00\x00\x00\x00\x00\x00\x01\x0=
-0"
-+        "\x0b\x74\x65\x73\x74\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x0=
-0"
-+        "\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x0=
-0"
-+        "\x00";
-+
-+    unsigned char tpm_pcrextend_resp[] =3D
-+        "\x80\x02\x00\x00\x00\x13\x00\x00\x00\x00\x00\x00\x00\x00\x00\x0=
-0"
-+        "\x01\x00\x00";
-+
-+    tx(s, tpm_pcrextend, sizeof(tpm_pcrextend), buffer, sizeof(buffer));
-+
-+    g_assert_cmpmem(buffer, sizeof(tpm_pcrextend_resp),
-+                    tpm_pcrextend_resp, sizeof(tpm_pcrextend_resp));
-+}
-+
-+void tpm_util_pcrread(QTestState *s, tx_func *tx,
-+                      const unsigned char *exp_resp, size_t exp_resp_siz=
-e)
-+{
-+    unsigned char buffer[1024];
-+    unsigned char tpm_pcrread[] =3D
-+        "\x80\x01\x00\x00\x00\x14\x00\x00\x01\x7e\x00\x00\x00\x01\x00\x0=
-b"
-+        "\x03\x00\x04\x00";
-+
-+    tx(s, tpm_pcrread, sizeof(tpm_pcrread), buffer, sizeof(buffer));
-+
-+    g_assert_cmpmem(buffer, exp_resp_size, exp_resp, exp_resp_size);
-+}
-+
-+static gboolean tpm_util_swtpm_has_tpm2(void)
-+{
-+    gint stdout;
-+    gboolean succ;
-+    unsigned i;
-+    char buffer[10240];
-+    ssize_t n;
-+    gchar *swtpm_argv[] =3D {
-+        g_strdup("swtpm"), g_strdup("socket"), g_strdup("--help"), NULL
-+    };
-+
-+    succ =3D g_spawn_async_with_pipes(NULL, swtpm_argv, NULL,
-+                                    G_SPAWN_SEARCH_PATH, NULL, NULL, NUL=
-L,
-+                                    NULL, &stdout, NULL, NULL);
-+    if (!succ) {
-+        goto cleanup;
-+    }
-+
-+    n =3D read(stdout, buffer, sizeof(buffer) - 1);
-+    if (n < 0) {
-+        goto cleanup;
-+    }
-+    buffer[n] =3D 0;
-+    if (!strstr(buffer, "--tpm2")) {
-+        succ =3D false;
-+    }
-+
-+ cleanup:
-+    for (i =3D 0; swtpm_argv[i]; i++) {
-+        g_free(swtpm_argv[i]);
-+    }
-+
-+    return succ;
-+}
-+
-+gboolean tpm_util_swtpm_start(const char *path, GPid *pid,
-+                              SocketAddress **addr, GError **error)
-+{
-+    char *swtpm_argv_tpmstate =3D g_strdup_printf("dir=3D%s", path);
-+    char *swtpm_argv_ctrl =3D g_strdup_printf("type=3Dunixio,path=3D%s/s=
-ock",
-+                                            path);
-+    gchar *swtpm_argv[] =3D {
-+        g_strdup("swtpm"), g_strdup("socket"),
-+        g_strdup("--tpmstate"), swtpm_argv_tpmstate,
-+        g_strdup("--ctrl"), swtpm_argv_ctrl,
-+        g_strdup("--tpm2"),
-+        NULL
-+    };
-+    gboolean succ;
-+    unsigned i;
-+
-+    succ =3D tpm_util_swtpm_has_tpm2();
-+    if (!succ) {
-+        goto cleanup;
-+    }
-+
-+    *addr =3D g_new0(SocketAddress, 1);
-+    (*addr)->type =3D SOCKET_ADDRESS_TYPE_UNIX;
-+    (*addr)->u.q_unix.path =3D g_build_filename(path, "sock", NULL);
-+
-+    succ =3D g_spawn_async(NULL, swtpm_argv, NULL, G_SPAWN_SEARCH_PATH,
-+                         NULL, NULL, pid, error);
-+
-+cleanup:
-+    for (i =3D 0; swtpm_argv[i]; i++) {
-+        g_free(swtpm_argv[i]);
-+    }
-+
-+    return succ;
-+}
-+
-+void tpm_util_swtpm_kill(GPid pid)
-+{
-+    int n;
-+
-+    if (!pid) {
-+        return;
-+    }
-+
-+    g_spawn_close_pid(pid);
-+
-+    n =3D kill(pid, 0);
-+    if (n < 0) {
-+        return;
-+    }
-+
-+    kill(pid, SIGKILL);
-+}
-diff --git a/tests/tpm-util.h b/tests/tpm-util.h
-new file mode 100644
-index 0000000000..d155d99aea
---- /dev/null
-+++ b/tests/tpm-util.h
-@@ -0,0 +1,36 @@
-+/*
-+ * QTest TPM utilities
-+ *
-+ * Copyright (c) 2018 IBM Corporation
-+ *
-+ * Authors:
-+ *   Stefan Berger <stefanb@linux.vnet.ibm.com>
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or la=
-ter.
-+ * See the COPYING file in the top-level directory.
-+ */
-+
-+#ifndef TESTS_TPM_UTIL_H
-+#define TESTS_TPM_UTIL_H
-+
-+#include "qemu/osdep.h"
-+#include "io/channel-socket.h"
-+
-+typedef void (tx_func)(QTestState *s,
-+                       const unsigned char *req, size_t req_size,
-+                       unsigned char *rsp, size_t rsp_size);
-+
-+void tpm_util_crb_transfer(QTestState *s,
-+                           const unsigned char *req, size_t req_size,
-+                           unsigned char *rsp, size_t rsp_size);
-+
-+void tpm_util_startup(QTestState *s, tx_func *tx);
-+void tpm_util_pcrextend(QTestState *s, tx_func *tx);
-+void tpm_util_pcrread(QTestState *s, tx_func *tx,
-+                      const unsigned char *exp_resp, size_t exp_resp_siz=
-e);
-+
-+gboolean tpm_util_swtpm_start(const char *path, GPid *pid,
-+                              SocketAddress **addr, GError **error);
-+void tpm_util_swtpm_kill(GPid pid);
-+
-+#endif /* TESTS_TPM_UTIL_H */
---=20
-2.14.3
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
+c3NhZ2UtaWQ6IDIwMTgwNTIzMTMxMTU1LjEyMzU5LTEta3dvbGZAcmVkaGF0LmNvbQpTdWJqZWN0
+OiBbUWVtdS1kZXZlbF0gW1BVTEwgMDAvNDZdIEJsb2NrIGxheWVyIHBhdGNoZXMKCj09PSBURVNU
+IFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKCkJBU0U9YmFzZQpuPTEKdG90YWw9JChnaXQg
+bG9nIC0tb25lbGluZSAkQkFTRS4uIHwgd2MgLWwpCmZhaWxlZD0wCgpnaXQgY29uZmlnIC0tbG9j
+YWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1
+ZQpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5hbGdvcml0aG0gaGlzdG9ncmFtCgpjb21taXRzPSIk
+KGdpdCBsb2cgLS1mb3JtYXQ9JUggLS1yZXZlcnNlICRCQVNFLi4pIgpmb3IgYyBpbiAkY29tbWl0
+czsgZG8KICAgIGVjaG8gIkNoZWNraW5nIFBBVENIICRuLyR0b3RhbDogJChnaXQgbG9nIC1uIDEg
+LS1mb3JtYXQ9JXMgJGMpLi4uIgogICAgaWYgISBnaXQgc2hvdyAkYyAtLWZvcm1hdD1lbWFpbCB8
+IC4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgLTsgdGhlbgogICAgICAgIGZhaWxl
+ZD0xCiAgICAgICAgZWNobwogICAgZmkKICAgIG49JCgobisxKSkKZG9uZQoKZXhpdCAkZmFpbGVk
+Cj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQx
+ZGVmN2Y0NGJkODg4NzEzMzg0CkZyb20gaHR0cHM6Ly9naXRodWIuY29tL3BhdGNoZXctcHJvamVj
+dC9xZW11CiB0IFt0YWcgdXBkYXRlXSAgICAgICAgICAgIHBhdGNoZXcvMTUyNzAzNDUxNy03ODUx
+LTEtZ2l0LXNlbmQtZW1haWwtbWpjQHNpZml2ZS5jb20gLT4gcGF0Y2hldy8xNTI3MDM0NTE3LTc4
+NTEtMS1naXQtc2VuZC1lbWFpbC1tamNAc2lmaXZlLmNvbQogdCBbdGFnIHVwZGF0ZV0gICAgICAg
+ICAgICBwYXRjaGV3LzE1MjcwNzA5NTAtMjA4MzUwLTEtZ2l0LXNlbmQtZW1haWwtaW1hbW1lZG9A
+cmVkaGF0LmNvbSAtPiBwYXRjaGV3LzE1MjcwNzA5NTAtMjA4MzUwLTEtZ2l0LXNlbmQtZW1haWwt
+aW1hbW1lZG9AcmVkaGF0LmNvbQogKiBbbmV3IHRhZ10gICAgICAgICAgICAgICBwYXRjaGV3LzIw
+MTgwNTIzMTMxMTU1LjEyMzU5LTEta3dvbGZAcmVkaGF0LmNvbSAtPiBwYXRjaGV3LzIwMTgwNTIz
+MTMxMTU1LjEyMzU5LTEta3dvbGZAcmVkaGF0LmNvbQpTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2gg
+J3Rlc3QnCmFhZTJlZWQ0YjEgcWVtdS1pb3Rlc3RzOiBUZXN0IGpvYi0qIHdpdGggYmxvY2sgam9i
+cwphNjg5YjE5NjZmIGlvdGVzdHM6IE1vdmUgcW1wX3RvX29wdHMoKSB0byBWTQowOGY1ZTA0OTdj
+IGJsb2Nram9iOiBSZW1vdmUgQmxvY2tKb2IuZHJpdmVyCjAwODViNjVjOTMgam9iOiBBZGQgcXVl
+cnktam9icyBRTVAgY29tbWFuZAoxZDViN2Q0OWZiIGpvYjogQWRkIGxpZmVjeWNsZSBRTVAgY29t
+bWFuZHMKYmVhNTEzN2ViNCBqb2I6IEFkZCBKT0JfU1RBVFVTX0NIQU5HRSBRTVAgZXZlbnQKNmUz
+ZjY2MGM2YyBqb2I6IEludHJvZHVjZSBxYXBpL2pvYi5qc29uCjUzNTViMWI1OGMgam9iOiBNb3Zl
+IHByb2dyZXNzIGZpZWxkcyB0byBKb2IKOWQyNjg3NjJkZCBqb2I6IEFkZCBqb2JfdHJhbnNpdGlv
+bl90b19yZWFkeSgpCjhlNzczZTllZWQgam9iOiBBZGQgam9iX2lzX3JlYWR5KCkKZjFlYzg2YTk4
+NSBqb2I6IEFkZCBqb2JfZGlzbWlzcygpCjQ3NTlmYjBjM2Igam9iOiBBZGQgam9iX3lpZWxkKCkK
+NjY1MTdiN2Q1NyBibG9jazogQ2FuY2VsIGpvYiBpbiBiZHJ2X2Nsb3NlX2FsbCgpIGNhbGxlcnMK
+YjRiMjkzMTE2NiBqb2I6IE1vdmUgY29tcGxldGlvbiBhbmQgY2FuY2VsbGF0aW9uIHRvIEpvYgpm
+NDJjYjBiZTQxIGpvYjogTW92ZSB0cmFuc2FjdGlvbnMgdG8gSm9iCjAxYjlmZGIzOWEgam9iOiBT
+d2l0Y2ggdHJhbnNhY3Rpb25zIHRvIEpvYlR4bgo5NzM0N2NhZGU2IGpvYjogTW92ZSBqb2JfZmlu
+aXNoX3N5bmMoKSB0byBKb2IKNGEyOWU0YmZhOSBqb2I6IE1vdmUgLmNvbXBsZXRlIGNhbGxiYWNr
+IHRvIEpvYgozZTljYTljN2EzIGpvYjogQWRkIGpvYl9kcmFpbigpCmQ0M2NhOTMzYWEgam9iOiBD
+b252ZXJ0IGJsb2NrX2pvYl9jYW5jZWxfYXN5bmMoKSB0byBKb2IKODI1OTZiZGMwNCBqb2I6IE1v
+dmUgc2luZ2xlIGpvYiBmaW5hbGlzYXRpb24gdG8gSm9iCjEzNjQ1ODdlZjQgam9iOiBBZGQgam9i
+X2V2ZW50XyooKQpjMjFmM2U1NWI1IGJsb2Nram9iOiBTcGxpdCBibG9ja19qb2JfZXZlbnRfcGVu
+ZGluZygpCmU3YzMzYzQ1YTIgam9iOiBNb3ZlIEJsb2NrSm9iQ3JlYXRlRmxhZ3MgdG8gSm9iCmY5
+NTRhZTBkZjcgam9iOiBSZXBsYWNlIEJsb2NrSm9iLmNvbXBsZXRlZCB3aXRoIGpvYl9pc19jb21w
+bGV0ZWQoKQo0NmZmYjMzYTE5IGpvYjogTW92ZSBwYXVzZS9yZXN1bWUgZnVuY3Rpb25zIHRvIEpv
+YgplMGIwYzUwNDEyIGpvYjogQWRkIGpvYl9zbGVlcF9ucygpCjVkOThiZDhlMzQgam9iOiBNb3Zl
+IGNvcm91dGluZSBhbmQgcmVsYXRlZCBjb2RlIHRvIEpvYgpjNGFlZWY2MmNlIGpvYjogTW92ZSBk
+ZWZlcl90b19tYWluX2xvb3AgdG8gSm9iCjgwMTk4ODBkNzEgam9iOiBBZGQgSm9iLmFpb19jb250
+ZXh0CmQxOGIzYTI5ODUgam9iOiBNb3ZlIGNhbmNlbGxlZCB0byBKb2IKNWMyZjBlZGZmOCBqb2I6
+IEFkZCByZWZlcmVuY2UgY291bnRpbmcKOTE5NzNjMWQ3NSBqb2I6IE1vdmUgc3RhdGUgdHJhbnNp
+dGlvbnMgdG8gSm9iCmY0YWZjNDI5Zjkgam9iOiBNYWludGFpbiBhIGxpc3Qgb2YgYWxsIGpvYnMK
+NjcwMTA0NDkxZSBqb2I6IEFkZCBqb2JfZGVsZXRlKCkKNTAyMjY2OTJlYyBqb2I6IEFkZCBKb2JE
+cml2ZXIuam9iX3R5cGUKODVjMmUyYjk5ZCBqb2I6IFJlbmFtZSBCbG9ja0pvYlR5cGUgaW50byBK
+b2JUeXBlCmUyOGE0YTYyNWYgam9iOiBDcmVhdGUgSm9iLCBKb2JEcml2ZXIgYW5kIGpvYl9jcmVh
+dGUoKQo2ZTBiOWQ2MjZmIGJsb2Nram9iOiBJbXByb3ZlIEJsb2NrSm9iSW5mby5vZmZzZXQvbGVu
+IGRvY3VtZW50YXRpb24KNWViOTljNGUxOSBibG9ja2pvYjogVXBkYXRlIGJsb2NrLWpvYi1wYXVz
+ZS9yZXN1bWUgZG9jdW1lbnRhdGlvbgpiODk2MDljY2ZjIHFlbXUtaW90ZXN0czogUmVtb3ZlIE1J
+R19TT0NLRVQgZnJvbSBub24tbWlncmF0aW9uIHRlc3RzCjE5Y2YzOTQxNGMgcWVtdS1pb3Rlc3Rz
+OiBBZGQgbW9yZSB0ZXN0cyB0byAibWlncmF0aW9uIiBncm91cAowYmI2OWY1N2Q1IHNoZWVwZG9n
+OiBSZW1vdmUgdW5uZWNlc3NhcnkgTlVMTCBjaGVjayBpbiBzZF9wcmVhbGxvYygpCjg3NjU0YWQx
+OTcgcWVtdS1pb3Rlc3RzOiAwODYgZG9lc24ndCB3b3JrIHdpdGggTkZTCmQ3NzI4OTU0YTkgcWVt
+dS1pb3Rlc3RzOiBGaWx0ZXIgTkZTIHBhdGhzCmVmMzYwZjI0NjIgcWVtdS1pb3Rlc3RzOiBGaXgg
+cGF0aHMgZm9yIE5GUwoKPT09IE9VVFBVVCBCRUdJTiA9PT0KQ2hlY2tpbmcgUEFUQ0ggMS80Njog
+cWVtdS1pb3Rlc3RzOiBGaXggcGF0aHMgZm9yIE5GUy4uLgpDaGVja2luZyBQQVRDSCAyLzQ2OiBx
+ZW11LWlvdGVzdHM6IEZpbHRlciBORlMgcGF0aHMuLi4KQ2hlY2tpbmcgUEFUQ0ggMy80NjogcWVt
+dS1pb3Rlc3RzOiAwODYgZG9lc24ndCB3b3JrIHdpdGggTkZTLi4uCkNoZWNraW5nIFBBVENIIDQv
+NDY6IHNoZWVwZG9nOiBSZW1vdmUgdW5uZWNlc3NhcnkgTlVMTCBjaGVjayBpbiBzZF9wcmVhbGxv
+YygpLi4uCkNoZWNraW5nIFBBVENIIDUvNDY6IHFlbXUtaW90ZXN0czogQWRkIG1vcmUgdGVzdHMg
+dG8gIm1pZ3JhdGlvbiIgZ3JvdXAuLi4KQ2hlY2tpbmcgUEFUQ0ggNi80NjogcWVtdS1pb3Rlc3Rz
+OiBSZW1vdmUgTUlHX1NPQ0tFVCBmcm9tIG5vbi1taWdyYXRpb24gdGVzdHMuLi4KQ2hlY2tpbmcg
+UEFUQ0ggNy80NjogYmxvY2tqb2I6IFVwZGF0ZSBibG9jay1qb2ItcGF1c2UvcmVzdW1lIGRvY3Vt
+ZW50YXRpb24uLi4KQ2hlY2tpbmcgUEFUQ0ggOC80NjogYmxvY2tqb2I6IEltcHJvdmUgQmxvY2tK
+b2JJbmZvLm9mZnNldC9sZW4gZG9jdW1lbnRhdGlvbi4uLgpDaGVja2luZyBQQVRDSCA5LzQ2OiBq
+b2I6IENyZWF0ZSBKb2IsIEpvYkRyaXZlciBhbmQgam9iX2NyZWF0ZSgpLi4uCldBUk5JTkc6IGFk
+ZGVkLCBtb3ZlZCBvciBkZWxldGVkIGZpbGUocyksIGRvZXMgTUFJTlRBSU5FUlMgbmVlZCB1cGRh
+dGluZz8KIzM1MzogCm5ldyBmaWxlIG1vZGUgMTAwNjQ0Cgp0b3RhbDogMCBlcnJvcnMsIDEgd2Fy
+bmluZ3MsIDQyNCBsaW5lcyBjaGVja2VkCgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVtcywg
+cGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZl
+cyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRB
+SU5FUlMuCkNoZWNraW5nIFBBVENIIDEwLzQ2OiBqb2I6IFJlbmFtZSBCbG9ja0pvYlR5cGUgaW50
+byBKb2JUeXBlLi4uCkNoZWNraW5nIFBBVENIIDExLzQ2OiBqb2I6IEFkZCBKb2JEcml2ZXIuam9i
+X3R5cGUuLi4KQ2hlY2tpbmcgUEFUQ0ggMTIvNDY6IGpvYjogQWRkIGpvYl9kZWxldGUoKS4uLgpD
+aGVja2luZyBQQVRDSCAxMy80Njogam9iOiBNYWludGFpbiBhIGxpc3Qgb2YgYWxsIGpvYnMuLi4K
+Q2hlY2tpbmcgUEFUQ0ggMTQvNDY6IGpvYjogTW92ZSBzdGF0ZSB0cmFuc2l0aW9ucyB0byBKb2Iu
+Li4KRVJST1I6IHNwYWNlIHByb2hpYml0ZWQgYmVmb3JlIG9wZW4gc3F1YXJlIGJyYWNrZXQgJ1sn
+CiMzNDM6IEZJTEU6IGpvYi5jOjM4OgorICAgIC8qIFU6ICovIFtKT0JfU1RBVFVTX1VOREVGSU5F
+RF0gPSB7MCwgMSwgMCwgMCwgMCwgMCwgMCwgMCwgMCwgMCwgMH0sCgpFUlJPUjogc3BhY2UgcHJv
+aGliaXRlZCBiZWZvcmUgb3BlbiBzcXVhcmUgYnJhY2tldCAnWycKIzM0NDogRklMRTogam9iLmM6
+Mzk6CisgICAgLyogQzogKi8gW0pPQl9TVEFUVVNfQ1JFQVRFRF0gICA9IHswLCAwLCAxLCAwLCAw
+LCAwLCAwLCAwLCAxLCAwLCAxfSwKCkVSUk9SOiBzcGFjZSBwcm9oaWJpdGVkIGJlZm9yZSBvcGVu
+IHNxdWFyZSBicmFja2V0ICdbJwojMzQ1OiBGSUxFOiBqb2IuYzo0MDoKKyAgICAvKiBSOiAqLyBb
+Sk9CX1NUQVRVU19SVU5OSU5HXSAgID0gezAsIDAsIDAsIDEsIDEsIDAsIDEsIDAsIDEsIDAsIDB9
+LAoKRVJST1I6IHNwYWNlIHByb2hpYml0ZWQgYmVmb3JlIG9wZW4gc3F1YXJlIGJyYWNrZXQgJ1sn
+CiMzNDY6IEZJTEU6IGpvYi5jOjQxOgorICAgIC8qIFA6ICovIFtKT0JfU1RBVFVTX1BBVVNFRF0g
+ICAgPSB7MCwgMCwgMSwgMCwgMCwgMCwgMCwgMCwgMCwgMCwgMH0sCgpFUlJPUjogc3BhY2UgcHJv
+aGliaXRlZCBiZWZvcmUgb3BlbiBzcXVhcmUgYnJhY2tldCAnWycKIzM0NzogRklMRTogam9iLmM6
+NDI6CisgICAgLyogWTogKi8gW0pPQl9TVEFUVVNfUkVBRFldICAgICA9IHswLCAwLCAwLCAwLCAw
+LCAxLCAxLCAwLCAxLCAwLCAwfSwKCkVSUk9SOiBzcGFjZSBwcm9oaWJpdGVkIGJlZm9yZSBvcGVu
+IHNxdWFyZSBicmFja2V0ICdbJwojMzQ4OiBGSUxFOiBqb2IuYzo0MzoKKyAgICAvKiBTOiAqLyBb
+Sk9CX1NUQVRVU19TVEFOREJZXSAgID0gezAsIDAsIDAsIDAsIDEsIDAsIDAsIDAsIDAsIDAsIDB9
+LAoKRVJST1I6IHNwYWNlIHByb2hpYml0ZWQgYmVmb3JlIG9wZW4gc3F1YXJlIGJyYWNrZXQgJ1sn
+CiMzNDk6IEZJTEU6IGpvYi5jOjQ0OgorICAgIC8qIFc6ICovIFtKT0JfU1RBVFVTX1dBSVRJTkdd
+ICAgPSB7MCwgMCwgMCwgMCwgMCwgMCwgMCwgMSwgMSwgMCwgMH0sCgpFUlJPUjogc3BhY2UgcHJv
+aGliaXRlZCBiZWZvcmUgb3BlbiBzcXVhcmUgYnJhY2tldCAnWycKIzM1MDogRklMRTogam9iLmM6
+NDU6CisgICAgLyogRDogKi8gW0pPQl9TVEFUVVNfUEVORElOR10gICA9IHswLCAwLCAwLCAwLCAw
+LCAwLCAwLCAwLCAxLCAxLCAwfSwKCkVSUk9SOiBzcGFjZSBwcm9oaWJpdGVkIGJlZm9yZSBvcGVu
+IHNxdWFyZSBicmFja2V0ICdbJwojMzUxOiBGSUxFOiBqb2IuYzo0NjoKKyAgICAvKiBYOiAqLyBb
+Sk9CX1NUQVRVU19BQk9SVElOR10gID0gezAsIDAsIDAsIDAsIDAsIDAsIDAsIDAsIDEsIDEsIDB9
+LAoKRVJST1I6IHNwYWNlIHByb2hpYml0ZWQgYmVmb3JlIG9wZW4gc3F1YXJlIGJyYWNrZXQgJ1sn
+CiMzNTI6IEZJTEU6IGpvYi5jOjQ3OgorICAgIC8qIEU6ICovIFtKT0JfU1RBVFVTX0NPTkNMVURF
+RF0gPSB7MCwgMCwgMCwgMCwgMCwgMCwgMCwgMCwgMCwgMCwgMX0sCgpFUlJPUjogc3BhY2UgcHJv
+aGliaXRlZCBiZWZvcmUgb3BlbiBzcXVhcmUgYnJhY2tldCAnWycKIzM1MzogRklMRTogam9iLmM6
+NDg6CisgICAgLyogTjogKi8gW0pPQl9TVEFUVVNfTlVMTF0gICAgICA9IHswLCAwLCAwLCAwLCAw
+LCAwLCAwLCAwLCAwLCAwLCAwfSwKCnRvdGFsOiAxMSBlcnJvcnMsIDAgd2FybmluZ3MsIDUyOCBs
+aW5lcyBjaGVja2VkCgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmll
+dy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhl
+bSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgpDaGVj
+a2luZyBQQVRDSCAxNS80Njogam9iOiBBZGQgcmVmZXJlbmNlIGNvdW50aW5nLi4uCkNoZWNraW5n
+IFBBVENIIDE2LzQ2OiBqb2I6IE1vdmUgY2FuY2VsbGVkIHRvIEpvYi4uLgpDaGVja2luZyBQQVRD
+SCAxNy80Njogam9iOiBBZGQgSm9iLmFpb19jb250ZXh0Li4uCkNoZWNraW5nIFBBVENIIDE4LzQ2
+OiBqb2I6IE1vdmUgZGVmZXJfdG9fbWFpbl9sb29wIHRvIEpvYi4uLgpDaGVja2luZyBQQVRDSCAx
+OS80Njogam9iOiBNb3ZlIGNvcm91dGluZSBhbmQgcmVsYXRlZCBjb2RlIHRvIEpvYi4uLgpDaGVj
+a2luZyBQQVRDSCAyMC80Njogam9iOiBBZGQgam9iX3NsZWVwX25zKCkuLi4KQ2hlY2tpbmcgUEFU
+Q0ggMjEvNDY6IGpvYjogTW92ZSBwYXVzZS9yZXN1bWUgZnVuY3Rpb25zIHRvIEpvYi4uLgpDaGVj
+a2luZyBQQVRDSCAyMi80Njogam9iOiBSZXBsYWNlIEJsb2NrSm9iLmNvbXBsZXRlZCB3aXRoIGpv
+Yl9pc19jb21wbGV0ZWQoKS4uLgpDaGVja2luZyBQQVRDSCAyMy80Njogam9iOiBNb3ZlIEJsb2Nr
+Sm9iQ3JlYXRlRmxhZ3MgdG8gSm9iLi4uCkNoZWNraW5nIFBBVENIIDI0LzQ2OiBibG9ja2pvYjog
+U3BsaXQgYmxvY2tfam9iX2V2ZW50X3BlbmRpbmcoKS4uLgpDaGVja2luZyBQQVRDSCAyNS80Njog
+am9iOiBBZGQgam9iX2V2ZW50XyooKS4uLgpDaGVja2luZyBQQVRDSCAyNi80Njogam9iOiBNb3Zl
+IHNpbmdsZSBqb2IgZmluYWxpc2F0aW9uIHRvIEpvYi4uLgpXQVJOSU5HOiBsaW5lIG92ZXIgODAg
+Y2hhcmFjdGVycwojNTA4OiBGSUxFOiBpbmNsdWRlL3FlbXUvam9iLmg6MjIxOgorICAgICAgICAg
+ICAgICAgICBpbnQgZmxhZ3MsIEJsb2NrQ29tcGxldGlvbkZ1bmMgKmNiLCB2b2lkICpvcGFxdWUs
+IEVycm9yICoqZXJycCk7CgpFUlJPUjogIihmb28qKSIgc2hvdWxkIGJlICIoZm9vICopIgojNTc4
+OiBGSUxFOiBqb2IuYzo0NjI6CisgICAgYmxvY2tfam9iX3R4bl9kZWxfam9iKChCbG9ja0pvYiop
+IGpvYik7CgpFUlJPUjogIihmb28qKSIgc2hvdWxkIGJlICIoZm9vICopIgojNjU5OiBGSUxFOiBq
+b2IuYzo1NDM6CisgICAgYmxvY2tfam9iX3R4bl9kZWxfam9iKChCbG9ja0pvYiopIGpvYik7Cgp0
+b3RhbDogMiBlcnJvcnMsIDEgd2FybmluZ3MsIDYyMCBsaW5lcyBjaGVja2VkCgpZb3VyIHBhdGNo
+IGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJv
+cnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2Vl
+CkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgpDaGVja2luZyBQQVRDSCAyNy80Njogam9iOiBD
+b252ZXJ0IGJsb2NrX2pvYl9jYW5jZWxfYXN5bmMoKSB0byBKb2IuLi4KQ2hlY2tpbmcgUEFUQ0gg
+MjgvNDY6IGpvYjogQWRkIGpvYl9kcmFpbigpLi4uCkNoZWNraW5nIFBBVENIIDI5LzQ2OiBqb2I6
+IE1vdmUgLmNvbXBsZXRlIGNhbGxiYWNrIHRvIEpvYi4uLgpDaGVja2luZyBQQVRDSCAzMC80Njog
+am9iOiBNb3ZlIGpvYl9maW5pc2hfc3luYygpIHRvIEpvYi4uLgpXQVJOSU5HOiBsaW5lIG92ZXIg
+ODAgY2hhcmFjdGVycwojMTM5OiBGSUxFOiBpbmNsdWRlL3FlbXUvam9iLmg6Mzk5OgoraW50IGpv
+Yl9maW5pc2hfc3luYyhKb2IgKmpvYiwgdm9pZCAoKmZpbmlzaCkoSm9iICosIEVycm9yICoqZXJy
+cCksIEVycm9yICoqZXJycCk7Cgp0b3RhbDogMCBlcnJvcnMsIDEgd2FybmluZ3MsIDE0NCBsaW5l
+cyBjaGVja2VkCgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4g
+IElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0
+byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCkNoZWNraW5n
+IFBBVENIIDMxLzQ2OiBqb2I6IFN3aXRjaCB0cmFuc2FjdGlvbnMgdG8gSm9iVHhuLi4uCkNoZWNr
+aW5nIFBBVENIIDMyLzQ2OiBqb2I6IE1vdmUgdHJhbnNhY3Rpb25zIHRvIEpvYi4uLgpDaGVja2lu
+ZyBQQVRDSCAzMy80Njogam9iOiBNb3ZlIGNvbXBsZXRpb24gYW5kIGNhbmNlbGxhdGlvbiB0byBK
+b2IuLi4KQ2hlY2tpbmcgUEFUQ0ggMzQvNDY6IGJsb2NrOiBDYW5jZWwgam9iIGluIGJkcnZfY2xv
+c2VfYWxsKCkgY2FsbGVycy4uLgpDaGVja2luZyBQQVRDSCAzNS80Njogam9iOiBBZGQgam9iX3lp
+ZWxkKCkuLi4KQ2hlY2tpbmcgUEFUQ0ggMzYvNDY6IGpvYjogQWRkIGpvYl9kaXNtaXNzKCkuLi4K
+Q2hlY2tpbmcgUEFUQ0ggMzcvNDY6IGpvYjogQWRkIGpvYl9pc19yZWFkeSgpLi4uCkNoZWNraW5n
+IFBBVENIIDM4LzQ2OiBqb2I6IEFkZCBqb2JfdHJhbnNpdGlvbl90b19yZWFkeSgpLi4uCkNoZWNr
+aW5nIFBBVENIIDM5LzQ2OiBqb2I6IE1vdmUgcHJvZ3Jlc3MgZmllbGRzIHRvIEpvYi4uLgpDaGVj
+a2luZyBQQVRDSCA0MC80Njogam9iOiBJbnRyb2R1Y2UgcWFwaS9qb2IuanNvbi4uLgpXQVJOSU5H
+OiBhZGRlZCwgbW92ZWQgb3IgZGVsZXRlZCBmaWxlKHMpLCBkb2VzIE1BSU5UQUlORVJTIG5lZWQg
+dXBkYXRpbmc/CiMyNDg6IApuZXcgZmlsZSBtb2RlIDEwMDY0NAoKdG90YWw6IDAgZXJyb3JzLCAx
+IHdhcm5pbmdzLCAzMDEgbGluZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxl
+bXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3Np
+dGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1B
+SU5UQUlORVJTLgpDaGVja2luZyBQQVRDSCA0MS80Njogam9iOiBBZGQgSk9CX1NUQVRVU19DSEFO
+R0UgUU1QIGV2ZW50Li4uCkNoZWNraW5nIFBBVENIIDQyLzQ2OiBqb2I6IEFkZCBsaWZlY3ljbGUg
+UU1QIGNvbW1hbmRzLi4uCldBUk5JTkc6IGFkZGVkLCBtb3ZlZCBvciBkZWxldGVkIGZpbGUocyks
+IGRvZXMgTUFJTlRBSU5FUlMgbmVlZCB1cGRhdGluZz8KIzM3OiAKbmV3IGZpbGUgbW9kZSAxMDA2
+NDQKCnRvdGFsOiAwIGVycm9ycywgMSB3YXJuaW5ncywgMjY1IGxpbmVzIGNoZWNrZWQKCllvdXIg
+cGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNl
+IGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVy
+LCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KQ2hlY2tpbmcgUEFUQ0ggNDMvNDY6IGpv
+YjogQWRkIHF1ZXJ5LWpvYnMgUU1QIGNvbW1hbmQuLi4KQ2hlY2tpbmcgUEFUQ0ggNDQvNDY6IGJs
+b2Nram9iOiBSZW1vdmUgQmxvY2tKb2IuZHJpdmVyLi4uCkVSUk9SOiBpbml0aWFsaXplciBmb3Ig
+c3RydWN0IEJsb2NrSm9iRHJpdmVyIHNob3VsZCBub3JtYWxseSBiZSBjb25zdAojMjE6IEZJTEU6
+IGJsb2Nram9iLmM6MTA3OgorICAgIEJsb2NrSm9iRHJpdmVyICpiamRydiA9IGNvbnRhaW5lcl9v
+ZihkcnYsIEJsb2NrSm9iRHJpdmVyLCBqb2JfZHJpdmVyKTsKCkVSUk9SOiBpbml0aWFsaXplciBm
+b3Igc3RydWN0IEJsb2NrSm9iRHJpdmVyIHNob3VsZCBub3JtYWxseSBiZSBjb25zdAojMzY6IEZJ
+TEU6IGJsb2Nram9iLmM6MTIxOgorICAgIEJsb2NrSm9iRHJpdmVyICpiamRydiA9IGNvbnRhaW5l
+cl9vZihkcnYsIEJsb2NrSm9iRHJpdmVyLCBqb2JfZHJpdmVyKTsKCnRvdGFsOiAyIGVycm9ycywg
+MCB3YXJuaW5ncywgNTQgbGluZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxl
+bXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3Np
+dGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1B
+SU5UQUlORVJTLgoKQ2hlY2tpbmcgUEFUQ0ggNDUvNDY6IGlvdGVzdHM6IE1vdmUgcW1wX3RvX29w
+dHMoKSB0byBWTS4uLgpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwojMTA5OiBGSUxF
+OiB0ZXN0cy9xZW11LWlvdGVzdHMvaW90ZXN0cy5weTo0NDg6CisgICAgICAgIHNlbGYuYXNzZXJ0
+RXF1YWwoc2VsZi52bS5mbGF0dGVuX3FtcF9vYmplY3QoanNvbi5sb2Fkcyhqc29uX2ZpbGVuYW1l
+WzU6XSkpLAoKdG90YWw6IDAgZXJyb3JzLCAxIHdhcm5pbmdzLCA4MyBsaW5lcyBjaGVja2VkCgpZ
+b3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0
+aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRh
+aW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCkNoZWNraW5nIFBBVENIIDQ2LzQ2
+OiBxZW11LWlvdGVzdHM6IFRlc3Qgam9iLSogd2l0aCBibG9jayBqb2JzLi4uCldBUk5JTkc6IGFk
+ZGVkLCBtb3ZlZCBvciBkZWxldGVkIGZpbGUocyksIGRvZXMgTUFJTlRBSU5FUlMgbmVlZCB1cGRh
+dGluZz8KIzEzOiAKbmV3IGZpbGUgbW9kZSAxMDA3NTUKCnRvdGFsOiAwIGVycm9ycywgMSB3YXJu
+aW5ncywgNTQwIGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBw
+bGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVz
+IHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJ
+TkVSUy4KPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTog
+MQoKCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwOi8v
+cGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVs
+QHJlZGhhdC5jb20=
