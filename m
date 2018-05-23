@@ -1,46 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40158)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41063)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zyimin@linux.ibm.com>) id 1fLSj7-0008TG-S4
-	for qemu-devel@nongnu.org; Wed, 23 May 2018 08:18:47 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fLSoL-0001bU-AY
+	for qemu-devel@nongnu.org; Wed, 23 May 2018 08:24:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zyimin@linux.ibm.com>) id 1fLSj3-0000ig-GQ
-	for qemu-devel@nongnu.org; Wed, 23 May 2018 08:18:45 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:48884)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <zyimin@linux.ibm.com>)
-	id 1fLSj3-0000iZ-78
-	for qemu-devel@nongnu.org; Wed, 23 May 2018 08:18:41 -0400
-Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w4NCG0ED042558
-	for <qemu-devel@nongnu.org>; Wed, 23 May 2018 08:18:39 -0400
-Received: from e33.co.us.ibm.com (e33.co.us.ibm.com [32.97.110.151])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2j557jsgy9-1
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Wed, 23 May 2018 08:18:37 -0400
-Received: from localhost
-	by e33.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <zyimin@linux.ibm.com>;
-	Wed, 23 May 2018 06:17:40 -0600
-References: <20180515113348.10516-1-zyimin@linux.ibm.com>
-	<20180515113348.10516-2-zyimin@linux.ibm.com>
-	<20180517124109.GJ17734@vader>
-	<20180518075212.GE3416@dnr> <20180518091916.GA22292@vader>
-	<20180518130729.GF3416@dnr>
-	<7149dfa9-7d3a-a2ff-b326-7e9ba71f8fe1@linux.ibm.com>
-	<20180523074757.GI26766@dnr>
-	<397e4f8c-0913-6ffd-13fa-743abbbd47e4@linux.ibm.com>
-	<eb079c9d-9251-bb2a-7cbc-5cb6423778db@redhat.com>
-From: Yi Min Zhao <zyimin@linux.ibm.com>
-Date: Wed, 23 May 2018 20:17:36 +0800
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fLSoF-0002k2-8e
+	for qemu-devel@nongnu.org; Wed, 23 May 2018 08:24:09 -0400
+Received: from mail-qt0-x243.google.com ([2607:f8b0:400d:c0d::243]:38015)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fLSoF-0002jw-2O
+	for qemu-devel@nongnu.org; Wed, 23 May 2018 08:24:03 -0400
+Received: by mail-qt0-x243.google.com with SMTP id m9-v6so27734613qtb.5
+	for <qemu-devel@nongnu.org>; Wed, 23 May 2018 05:24:03 -0700 (PDT)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <1527034517-7851-1-git-send-email-mjc@sifive.com>
+	<1527034517-7851-7-git-send-email-mjc@sifive.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <63c41eac-79e2-b070-cf03-2032ca25a8d0@amsat.org>
+Date: Wed, 23 May 2018 09:23:58 -0300
 MIME-Version: 1.0
-In-Reply-To: <eb079c9d-9251-bb2a-7cbc-5cb6423778db@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Message-Id: <c113aa1c-a829-7a96-9874-b8ab48e84a29@linux.ibm.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 1/1] sandbox: disable -sandbox if
- CONFIG_SECCOMP undefined
+In-Reply-To: <1527034517-7851-7-git-send-email-mjc@sifive.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v1 06/30] RISC-V: Move non-ops from
+ op_helper to cpu_helper
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -49,70 +36,142 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: otubo@redhat.com, =?UTF-8?Q?J=c3=a1n_Tomko?= <jtomko@redhat.com>
-Cc: borntraeger@de.ibm.com, fiuczy@linux.ibm.com, qemu-devel@nongnu.org, pbonzini@redhat.com
+To: Michael Clark <mjc@sifive.com>, qemu-devel@nongnu.org
+Cc: Sagar Karandikar <sagark@eecs.berkeley.edu>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Palmer Dabbelt <palmer@sifive.com>, Alistair Francis <Alistair.Francis@wdc.com>, patches@groups.riscv.org
 
+On 05/22/2018 09:14 PM, Michael Clark wrote:
+> This patch makes op_helper.c contain only instruction
+> operation helpers used by translate.c and moves any
+> unrelated cpu helpers into cpu_helper.c. No logic is
+> changed by this patch.
+> 
+> Cc: Sagar Karandikar <sagark@eecs.berkeley.edu>
+> Cc: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
+> Cc: Palmer Dabbelt <palmer@sifive.com>
+> Cc: Alistair Francis <Alistair.Francis@wdc.com>
+> Signed-off-by: Michael Clark <mjc@sifive.com>
+> Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
-=E5=9C=A8 2018/5/23 =E4=B8=8B=E5=8D=886:33, Eduardo Otubo =E5=86=99=E9=81=
-=93:
-> On 05/23/2018 11:16 AM, Yi Min Zhao wrote:
->>
->>
->> =E5=9C=A8 2018/5/23 =E4=B8=8B=E5=8D=883:47, J=C3=A1n Tomko =E5=86=99=E9=
-=81=93:
->>> On Sat, May 19, 2018 at 04:20:37PM +0800, Yi Min Zhao wrote:
->>>>
->>>>
->>>> =E5=9C=A8 2018/5/18 =E4=B8=8B=E5=8D=889:07, J=C3=A1n Tomko =E5=86=99=
-=E9=81=93:
->>>>> On Fri, May 18, 2018 at 11:19:16AM +0200, Eduardo Otubo wrote:
->>>>>> On 18/05/2018 - 09:52:12, J=C3=A1n Tomko wrote:
->>>>>>> But now libvirt requires QEMU >=3D 1.5.0 which already supports
->>>>>>> query-command-line-options, so if you want the option gone=20
->>>>>>> completely
->>>>>>> --without-seccomp, I can add the code that probes for it and
->>>>>>> make seccomp_sandbox =3D 0 a no-op if it's compiled out.
->>>>>>
->>>>>> This looks like a good solution for the libvirt side. Can you add
->>>>>> this support
->>>>>> so we can merge this fix?
->>>>>>
->>>>>
->>>>> Patches proposed:
->>>>> https://www.redhat.com/archives/libvir-list/2018-May/msg01430.html
->>>>>
->>>>> Jano
->>>> Thanks for your work!
->>>
->>> Now pushed in libvirt master:
->>> commit b87222a90919040c12fb6d7c8dcc20f944a66495
->>> Author:=C2=A0=C2=A0=C2=A0=C2=A0 J=C3=A1n Tomko <jtomko@redhat.com>
->>> AuthorDate: 2018-05-18 14:57:51 +0200
->>> Commit:=C2=A0=C2=A0=C2=A0=C2=A0 J=C3=A1n Tomko <jtomko@redhat.com>
->>> CommitDate: 2018-05-23 09:45:48 +0200
->>>
->>> =C2=A0=C2=A0 qemu: only pass -sandbox off if supported
->>>
->>> =C2=A0=C2=A0 This way we don't rely on QEMU supplying the -sandbox op=
-tion
->>> =C2=A0=C2=A0 without CONFIG_SECCOMP.
->>>
->>> =C2=A0=C2=A0 Signed-off-by: J=C3=A1n Tomko <jtomko@redhat.com>
->>> =C2=A0=C2=A0 Reviewed-by: John Ferlan <jferlan@redhat.com>
->>>
->>> git describe: v4.3.0-258-gb87222a909
->>> https://libvirt.org/git/?p=3Dlibvirt.git;a=3Dcommitdiff;h=3Db87222a90=
-919040c12fb6d7c8dcc20f944a66495=20
->>>
->>>
->>> Jano
->> Thanks! But I have not got response from Paolo.=C2=A0 I have added him=
- to=20
->> CC list.
->>
-> =C2=A0I'll just wait one more ACK and will send a pull request on the=20
-> seccomp queue. Thanks for the contribution.
->
->
-So... what I should do is wait?
+> ---
+>  target/riscv/Makefile.objs              |  2 +-
+>  target/riscv/{helper.c => cpu_helper.c} | 35 ++++++++++++++++++++++++++++++++-
+>  target/riscv/op_helper.c                | 34 --------------------------------
+>  3 files changed, 35 insertions(+), 36 deletions(-)
+>  rename target/riscv/{helper.c => cpu_helper.c} (95%)
+> 
+> diff --git a/target/riscv/Makefile.objs b/target/riscv/Makefile.objs
+> index abd0a7cde333..fcc5d34c1f2e 100644
+> --- a/target/riscv/Makefile.objs
+> +++ b/target/riscv/Makefile.objs
+> @@ -1 +1 @@
+> -obj-y += translate.o op_helper.o helper.o cpu.o fpu_helper.o gdbstub.o pmp.o
+> +obj-y += translate.o op_helper.o cpu_helper.o cpu.o fpu_helper.o gdbstub.o pmp.o
+> diff --git a/target/riscv/helper.c b/target/riscv/cpu_helper.c
+> similarity index 95%
+> rename from target/riscv/helper.c
+> rename to target/riscv/cpu_helper.c
+> index 47d116e9c13f..6c886e99055a 100644
+> --- a/target/riscv/helper.c
+> +++ b/target/riscv/cpu_helper.c
+> @@ -1,5 +1,5 @@
+>  /*
+> - * RISC-V emulation helpers for qemu.
+> + * RISC-V CPU helpers for qemu.
+>   *
+>   * Copyright (c) 2016-2017 Sagar Karandikar, sagark@eecs.berkeley.edu
+>   * Copyright (c) 2017-2018 SiFive, Inc.
+> @@ -72,6 +72,39 @@ bool riscv_cpu_exec_interrupt(CPUState *cs, int interrupt_request)
+>  
+>  #if !defined(CONFIG_USER_ONLY)
+>  
+> +/* iothread_mutex must be held */
+> +uint32_t riscv_cpu_update_mip(RISCVCPU *cpu, uint32_t mask, uint32_t value)
+> +{
+> +    CPURISCVState *env = &cpu->env;
+> +    uint32_t old, new, cmp = atomic_read(&env->mip);
+> +
+> +    do {
+> +        old = cmp;
+> +        new = (old & ~mask) | (value & mask);
+> +        cmp = atomic_cmpxchg(&env->mip, old, new);
+> +    } while (old != cmp);
+> +
+> +    if (new && !old) {
+> +        cpu_interrupt(CPU(cpu), CPU_INTERRUPT_HARD);
+> +    } else if (!new && old) {
+> +        cpu_reset_interrupt(CPU(cpu), CPU_INTERRUPT_HARD);
+> +    }
+> +
+> +    return old;
+> +}
+> +
+> +void riscv_set_mode(CPURISCVState *env, target_ulong newpriv)
+> +{
+> +    if (newpriv > PRV_M) {
+> +        g_assert_not_reached();
+> +    }
+> +    if (newpriv == PRV_H) {
+> +        newpriv = PRV_U;
+> +    }
+> +    /* tlb_flush is unnecessary as mode is contained in mmu_idx */
+> +    env->priv = newpriv;
+> +}
+> +
+>  /* get_physical_address - get the physical address for this virtual address
+>   *
+>   * Do a page table walk to obtain the physical address corresponding to a
+> diff --git a/target/riscv/op_helper.c b/target/riscv/op_helper.c
+> index 5a02795bf931..2b9dd9da6486 100644
+> --- a/target/riscv/op_helper.c
+> +++ b/target/riscv/op_helper.c
+> @@ -652,39 +652,6 @@ target_ulong helper_csrrc(CPURISCVState *env, target_ulong src,
+>  
+>  #ifndef CONFIG_USER_ONLY
+>  
+> -/* iothread_mutex must be held */
+> -uint32_t riscv_cpu_update_mip(RISCVCPU *cpu, uint32_t mask, uint32_t value)
+> -{
+> -    CPURISCVState *env = &cpu->env;
+> -    uint32_t old, new, cmp = atomic_read(&env->mip);
+> -
+> -    do {
+> -        old = cmp;
+> -        new = (old & ~mask) | (value & mask);
+> -        cmp = atomic_cmpxchg(&env->mip, old, new);
+> -    } while (old != cmp);
+> -
+> -    if (new && !old) {
+> -        cpu_interrupt(CPU(cpu), CPU_INTERRUPT_HARD);
+> -    } else if (!new && old) {
+> -        cpu_reset_interrupt(CPU(cpu), CPU_INTERRUPT_HARD);
+> -    }
+> -
+> -    return old;
+> -}
+> -
+> -void riscv_set_mode(CPURISCVState *env, target_ulong newpriv)
+> -{
+> -    if (newpriv > PRV_M) {
+> -        g_assert_not_reached();
+> -    }
+> -    if (newpriv == PRV_H) {
+> -        newpriv = PRV_U;
+> -    }
+> -    /* tlb_flush is unnecessary as mode is contained in mmu_idx */
+> -    env->priv = newpriv;
+> -}
+> -
+>  target_ulong helper_sret(CPURISCVState *env, target_ulong cpu_pc_deb)
+>  {
+>      if (!(env->priv >= PRV_S)) {
+> @@ -735,7 +702,6 @@ target_ulong helper_mret(CPURISCVState *env, target_ulong cpu_pc_deb)
+>      return retpc;
+>  }
+>  
+> -
+>  void helper_wfi(CPURISCVState *env)
+>  {
+>      CPUState *cs = CPU(riscv_env_get_cpu(env));
+> 
