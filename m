@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41990)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42007)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mjc@sifive.com>) id 1fLHSe-0007q6-Q3
-	for qemu-devel@nongnu.org; Tue, 22 May 2018 20:17:03 -0400
+	(envelope-from <mjc@sifive.com>) id 1fLHSg-0007qp-4U
+	for qemu-devel@nongnu.org; Tue, 22 May 2018 20:17:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mjc@sifive.com>) id 1fLHSb-0000Xt-Hy
-	for qemu-devel@nongnu.org; Tue, 22 May 2018 20:17:00 -0400
-Received: from mail-pl0-x241.google.com ([2607:f8b0:400e:c01::241]:34853)
+	(envelope-from <mjc@sifive.com>) id 1fLHSf-0000Zu-2L
+	for qemu-devel@nongnu.org; Tue, 22 May 2018 20:17:02 -0400
+Received: from mail-pg0-x234.google.com ([2607:f8b0:400e:c05::234]:37752)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <mjc@sifive.com>) id 1fLHSb-0000Wb-9l
-	for qemu-devel@nongnu.org; Tue, 22 May 2018 20:16:57 -0400
-Received: by mail-pl0-x241.google.com with SMTP id i5-v6so11868393plt.2
-	for <qemu-devel@nongnu.org>; Tue, 22 May 2018 17:16:57 -0700 (PDT)
+	(Exim 4.71) (envelope-from <mjc@sifive.com>) id 1fLHSe-0000ZL-T4
+	for qemu-devel@nongnu.org; Tue, 22 May 2018 20:17:01 -0400
+Received: by mail-pg0-x234.google.com with SMTP id a13-v6so8571054pgu.4
+	for <qemu-devel@nongnu.org>; Tue, 22 May 2018 17:17:00 -0700 (PDT)
 From: Michael Clark <mjc@sifive.com>
-Date: Wed, 23 May 2018 12:14:50 +1200
-Message-Id: <1527034517-7851-4-git-send-email-mjc@sifive.com>
+Date: Wed, 23 May 2018 12:14:51 +1200
+Message-Id: <1527034517-7851-5-git-send-email-mjc@sifive.com>
 In-Reply-To: <1527034517-7851-1-git-send-email-mjc@sifive.com>
 References: <1527034517-7851-1-git-send-email-mjc@sifive.com>
-Subject: [Qemu-devel] [PATCH v1 03/30] RISC-V: Use atomic_cmpxchg to update
- PLIC bitmaps
+Subject: [Qemu-devel] [PATCH v1 04/30] RISC-V: Simplify
+ riscv_cpu_local_irqs_pending
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,127 +29,71 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: patches@groups.riscv.org, Michael Clark <mjc@sifive.com>, Sagar Karandikar <sagark@eecs.berkeley.edu>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Palmer Dabbelt <palmer@sifive.com>, Alistair Francis <Alistair.Francis@wdc.com>
 
-The PLIC previously used a mutex to protect against concurrent
-access to the claimed and pending bitfields. Instead of using
-a mutex, we update the bitfields using atomic_cmpxchg.
-
-Rename sifive_plic_num_irqs_pending to sifive_plic_irqs_pending
-and add an early out if any interrupts are pending as the
-count of pending interrupts is not used.
+This commit is intended to improve readability.
+There is no change to the logic.
 
 Cc: Sagar Karandikar <sagark@eecs.berkeley.edu>
 Cc: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
 Cc: Palmer Dabbelt <palmer@sifive.com>
 Cc: Alistair Francis <Alistair.Francis@wdc.com>
 Signed-off-by: Michael Clark <mjc@sifive.com>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 ---
- hw/riscv/sifive_plic.c         | 49 +++++++++++++++++++-----------------------
- include/hw/riscv/sifive_plic.h |  1 -
- 2 files changed, 22 insertions(+), 28 deletions(-)
+ target/riscv/helper.c | 34 ++++++++++++----------------------
+ 1 file changed, 12 insertions(+), 22 deletions(-)
 
-diff --git a/hw/riscv/sifive_plic.c b/hw/riscv/sifive_plic.c
-index 874de2ebaf77..1af23c76e603 100644
---- a/hw/riscv/sifive_plic.c
-+++ b/hw/riscv/sifive_plic.c
-@@ -81,36 +81,32 @@ static void sifive_plic_print_state(SiFivePLICState *plic)
+diff --git a/target/riscv/helper.c b/target/riscv/helper.c
+index 3b57e1360549..47d116e9c13f 100644
+--- a/target/riscv/helper.c
++++ b/target/riscv/helper.c
+@@ -35,28 +35,18 @@ int riscv_cpu_mmu_index(CPURISCVState *env, bool ifetch)
+ }
+ 
+ #ifndef CONFIG_USER_ONLY
+-/*
+- * Return RISC-V IRQ number if an interrupt should be taken, else -1.
+- * Used in cpu-exec.c
+- *
+- * Adapted from Spike's processor_t::take_interrupt()
+- */
+-static int riscv_cpu_hw_interrupts_pending(CPURISCVState *env)
++static int riscv_cpu_local_irq_pending(CPURISCVState *env)
+ {
+-    target_ulong pending_interrupts = atomic_read(&env->mip) & env->mie;
+-
+-    target_ulong mie = get_field(env->mstatus, MSTATUS_MIE);
+-    target_ulong m_enabled = env->priv < PRV_M || (env->priv == PRV_M && mie);
+-    target_ulong enabled_interrupts = pending_interrupts &
+-                                      ~env->mideleg & -m_enabled;
+-
+-    target_ulong sie = get_field(env->mstatus, MSTATUS_SIE);
+-    target_ulong s_enabled = env->priv < PRV_S || (env->priv == PRV_S && sie);
+-    enabled_interrupts |= pending_interrupts & env->mideleg &
+-                          -s_enabled;
+-
+-    if (enabled_interrupts) {
+-        return ctz64(enabled_interrupts); /* since non-zero */
++    target_ulong mstatus_mie = get_field(env->mstatus, MSTATUS_MIE);
++    target_ulong mstatus_sie = get_field(env->mstatus, MSTATUS_SIE);
++    target_ulong pending = atomic_read(&env->mip) & env->mie;
++    target_ulong mie = env->priv < PRV_M || (env->priv == PRV_M && mstatus_mie);
++    target_ulong sie = env->priv < PRV_S || (env->priv == PRV_S && mstatus_sie);
++    target_ulong irqs = (pending & ~env->mideleg & -mie) |
++                        (pending &  env->mideleg & -sie);
++
++    if (irqs) {
++        return ctz64(irqs); /* since non-zero */
+     } else {
+         return EXCP_NONE; /* indicates no pending interrupt */
      }
- }
- 
--static
--void sifive_plic_set_pending(SiFivePLICState *plic, int irq, bool pending)
-+static uint32_t atomic_set_masked(uint32_t *a, uint32_t mask, uint32_t value)
- {
--    qemu_mutex_lock(&plic->lock);
--    uint32_t word = irq >> 5;
--    if (pending) {
--        plic->pending[word] |= (1 << (irq & 31));
--    } else {
--        plic->pending[word] &= ~(1 << (irq & 31));
--    }
--    qemu_mutex_unlock(&plic->lock);
-+    uint32_t old, new, cmp = atomic_read(a);
-+
-+    do {
-+        old = cmp;
-+        new = (old & ~mask) | (value & mask);
-+        cmp = atomic_cmpxchg(a, old, new);
-+    } while (old != cmp);
-+
-+    return old;
- }
- 
--static
--void sifive_plic_set_claimed(SiFivePLICState *plic, int irq, bool claimed)
-+static void sifive_plic_set_pending(SiFivePLICState *plic, int irq, bool level)
- {
--    qemu_mutex_lock(&plic->lock);
--    uint32_t word = irq >> 5;
--    if (claimed) {
--        plic->claimed[word] |= (1 << (irq & 31));
--    } else {
--        plic->claimed[word] &= ~(1 << (irq & 31));
--    }
--    qemu_mutex_unlock(&plic->lock);
-+    atomic_set_masked(&plic->pending[irq >> 5], 1 << (irq & 31), -!!level);
- }
- 
--static
--int sifive_plic_num_irqs_pending(SiFivePLICState *plic, uint32_t addrid)
-+static void sifive_plic_set_claimed(SiFivePLICState *plic, int irq, bool level)
- {
--    int i, j, count = 0;
-+    atomic_set_masked(&plic->claimed[irq >> 5], 1 << (irq & 31), -!!level);
-+}
-+
-+static int sifive_plic_irqs_pending(SiFivePLICState *plic, uint32_t addrid)
-+{
-+    int i, j;
-     for (i = 0; i < plic->bitfield_words; i++) {
-         uint32_t pending_enabled_not_claimed =
-             (plic->pending[i] & ~plic->claimed[i]) &
-@@ -123,11 +119,11 @@ int sifive_plic_num_irqs_pending(SiFivePLICState *plic, uint32_t addrid)
-             uint32_t prio = plic->source_priority[irq];
-             int enabled = pending_enabled_not_claimed & (1 << j);
-             if (enabled && prio > plic->target_priority[addrid]) {
--                count++;
-+                return 1;
-             }
-         }
-     }
--    return count;
-+    return 0;
- }
- 
- static void sifive_plic_update(SiFivePLICState *plic)
-@@ -143,7 +139,7 @@ static void sifive_plic_update(SiFivePLICState *plic)
-         if (!env) {
-             continue;
-         }
--        int level = sifive_plic_num_irqs_pending(plic, addrid) > 0;
-+        int level = sifive_plic_irqs_pending(plic, addrid);
-         switch (mode) {
-         case PLICMode_M:
-             riscv_set_local_interrupt(RISCV_CPU(cpu), MIP_MEIP, level);
-@@ -440,7 +436,6 @@ static void sifive_plic_realize(DeviceState *dev, Error **errp)
-     memory_region_init_io(&plic->mmio, OBJECT(dev), &sifive_plic_ops, plic,
-                           TYPE_SIFIVE_PLIC, plic->aperture_size);
-     parse_hart_config(plic);
--    qemu_mutex_init(&plic->lock);
-     plic->bitfield_words = (plic->num_sources + 31) >> 5;
-     plic->source_priority = g_new0(uint32_t, plic->num_sources);
-     plic->target_priority = g_new(uint32_t, plic->num_addrs);
-diff --git a/include/hw/riscv/sifive_plic.h b/include/hw/riscv/sifive_plic.h
-index 11a5a98df1f9..ff09a288261e 100644
---- a/include/hw/riscv/sifive_plic.h
-+++ b/include/hw/riscv/sifive_plic.h
-@@ -55,7 +55,6 @@ typedef struct SiFivePLICState {
-     uint32_t *pending;
-     uint32_t *claimed;
-     uint32_t *enable;
--    QemuMutex lock;
-     qemu_irq *irqs;
- 
-     /* config */
+@@ -69,7 +59,7 @@ bool riscv_cpu_exec_interrupt(CPUState *cs, int interrupt_request)
+     if (interrupt_request & CPU_INTERRUPT_HARD) {
+         RISCVCPU *cpu = RISCV_CPU(cs);
+         CPURISCVState *env = &cpu->env;
+-        int interruptno = riscv_cpu_hw_interrupts_pending(env);
++        int interruptno = riscv_cpu_local_irq_pending(env);
+         if (interruptno >= 0) {
+             cs->exception_index = RISCV_EXCP_INT_FLAG | interruptno;
+             riscv_cpu_do_interrupt(cs);
 -- 
 2.7.0
