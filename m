@@ -1,16 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43422)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44411)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1fLWFC-00036i-28
-	for qemu-devel@nongnu.org; Wed, 23 May 2018 12:04:14 -0400
+	(envelope-from <paolo.bonzini@gmail.com>) id 1fLWIW-0005Xl-0a
+	for qemu-devel@nongnu.org; Wed, 23 May 2018 12:07:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1fLWFA-0004HJ-Ou
-	for qemu-devel@nongnu.org; Wed, 23 May 2018 12:04:06 -0400
-From: Eric Auger <eric.auger@redhat.com>
-Date: Wed, 23 May 2018 18:03:37 +0200
-Message-Id: <1527091418-11874-2-git-send-email-eric.auger@redhat.com>
-In-Reply-To: <1527091418-11874-1-git-send-email-eric.auger@redhat.com>
-References: <1527091418-11874-1-git-send-email-eric.auger@redhat.com>
-Subject: [Qemu-devel] [RFC 1/2] hw/arm/virt: Add a new 256MB ECAM region
+	(envelope-from <paolo.bonzini@gmail.com>) id 1fLWIS-0005f5-Jg
+	for qemu-devel@nongnu.org; Wed, 23 May 2018 12:07:32 -0400
+Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Date: Wed, 23 May 2018 18:07:19 +0200
+Message-Id: <20180523160721.14018-1-pbonzini@redhat.com>
+Subject: [Qemu-devel] [PATCH v2 0/2] sheepdog: remove huge BSS object
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -19,164 +18,25 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: eric.auger.pro@gmail.com, eric.auger@redhat.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org, peter.maydell@linaro.org
-Cc: drjones@redhat.com, wei@redhat.com, zhaoshenglong@huawei.com, lersek@redhat.com, ard.biesheuvel@linaro.org
+To: qemu-devel@nongnu.org
+Cc: jcody@redhat.com, qemu-block@nongnu.org
 
-This patch defines a new ECAM region located after the 256GB limit.
+block/sheepdog.o has a 4M static variable that is 90% of QEMU's whole .bss
+section.  Since it doesn't really have to be static, we can just use a
+heap allocated block.  We can actually make it smaller too. :)
 
-The virt machine state is augmented with a new highmem_ecam field
-which guards the usage of this new ECAM region instead of the legacy
-16MB one. With the highmem ECAM region, up to 256 PCIe buses can be
-used.
+Patch 1 is a related cleanup since we're touching that area of the code.
 
-Signed-off-by: Eric Auger <eric.auger@redhat.com>
----
- hw/arm/virt-acpi-build.c | 22 ++++++++++++++--------
- hw/arm/virt.c            | 12 ++++++++----
- include/hw/arm/virt.h    |  2 ++
- 3 files changed, 24 insertions(+), 12 deletions(-)
+Paolo
 
-diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
-index 92ceee9..b72f041 100644
---- a/hw/arm/virt-acpi-build.c
-+++ b/hw/arm/virt-acpi-build.c
-@@ -150,16 +150,17 @@ static void acpi_dsdt_add_virtio(Aml *scope,
- }
- 
- static void acpi_dsdt_add_pci(Aml *scope, const MemMapEntry *memmap,
--                              uint32_t irq, bool use_highmem)
-+                              uint32_t irq, bool use_highmem, bool highmem_ecam)
- {
-+    int ecam_id = highmem_ecam ? VIRT_PCIE_ECAM_HIGH : VIRT_PCIE_ECAM;
-     Aml *method, *crs, *ifctx, *UUID, *ifctx1, *elsectx, *buf;
-     int i, bus_no;
-     hwaddr base_mmio = memmap[VIRT_PCIE_MMIO].base;
-     hwaddr size_mmio = memmap[VIRT_PCIE_MMIO].size;
-     hwaddr base_pio = memmap[VIRT_PCIE_PIO].base;
-     hwaddr size_pio = memmap[VIRT_PCIE_PIO].size;
--    hwaddr base_ecam = memmap[VIRT_PCIE_ECAM].base;
--    hwaddr size_ecam = memmap[VIRT_PCIE_ECAM].size;
-+    hwaddr base_ecam = memmap[ecam_id].base;
-+    hwaddr size_ecam = memmap[ecam_id].size;
-     int nr_pcie_buses = size_ecam / PCIE_MMCFG_SIZE_MIN;
- 
-     Aml *dev = aml_device("%s", "PCI0");
-@@ -173,7 +174,7 @@ static void acpi_dsdt_add_pci(Aml *scope, const MemMapEntry *memmap,
-     aml_append(dev, aml_name_decl("_CCA", aml_int(1)));
- 
-     /* Declare the PCI Routing Table. */
--    Aml *rt_pkg = aml_package(nr_pcie_buses * PCI_NUM_PINS);
-+    Aml *rt_pkg = aml_varpackage(nr_pcie_buses * PCI_NUM_PINS);
-     for (bus_no = 0; bus_no < nr_pcie_buses; bus_no++) {
-         for (i = 0; i < PCI_NUM_PINS; i++) {
-             int gsi = (i + bus_no) % PCI_NUM_PINS;
-@@ -316,10 +317,14 @@ static void acpi_dsdt_add_pci(Aml *scope, const MemMapEntry *memmap,
-     Aml *dev_res0 = aml_device("%s", "RES0");
-     aml_append(dev_res0, aml_name_decl("_HID", aml_string("PNP0C02")));
-     crs = aml_resource_template();
--    aml_append(crs, aml_memory32_fixed(base_ecam, size_ecam, AML_READ_WRITE));
-+    aml_append(crs,
-+        aml_qword_memory(AML_POS_DECODE, AML_MIN_FIXED, AML_MAX_FIXED,
-+                         AML_NON_CACHEABLE, AML_READ_WRITE, 0x0000, base_ecam,
-+                         base_ecam + size_ecam - 1, 0x0000, size_ecam));
-     aml_append(dev_res0, aml_name_decl("_CRS", crs));
-     aml_append(dev, dev_res0);
-     aml_append(scope, dev);
-+
- }
- 
- static void acpi_dsdt_add_gpio(Aml *scope, const MemMapEntry *gpio_memmap,
-@@ -563,16 +568,17 @@ build_mcfg(GArray *table_data, BIOSLinker *linker, VirtMachineState *vms)
- {
-     AcpiTableMcfg *mcfg;
-     const MemMapEntry *memmap = vms->memmap;
-+    int ecam_id = vms->highmem_ecam ? VIRT_PCIE_ECAM_HIGH : VIRT_PCIE_ECAM;
-     int len = sizeof(*mcfg) + sizeof(mcfg->allocation[0]);
-     int mcfg_start = table_data->len;
- 
-     mcfg = acpi_data_push(table_data, len);
--    mcfg->allocation[0].address = cpu_to_le64(memmap[VIRT_PCIE_ECAM].base);
-+    mcfg->allocation[0].address = cpu_to_le64(memmap[ecam_id].base);
- 
-     /* Only a single allocation so no need to play with segments */
-     mcfg->allocation[0].pci_segment = cpu_to_le16(0);
-     mcfg->allocation[0].start_bus_number = 0;
--    mcfg->allocation[0].end_bus_number = (memmap[VIRT_PCIE_ECAM].size
-+    mcfg->allocation[0].end_bus_number = (memmap[ecam_id].size
-                                           / PCIE_MMCFG_SIZE_MIN) - 1;
- 
-     build_header(linker, table_data, (void *)(table_data->data + mcfg_start),
-@@ -747,7 +753,7 @@ build_dsdt(GArray *table_data, BIOSLinker *linker, VirtMachineState *vms)
-     acpi_dsdt_add_virtio(scope, &memmap[VIRT_MMIO],
-                     (irqmap[VIRT_MMIO] + ARM_SPI_BASE), NUM_VIRTIO_TRANSPORTS);
-     acpi_dsdt_add_pci(scope, memmap, (irqmap[VIRT_PCIE] + ARM_SPI_BASE),
--                      vms->highmem);
-+                      vms->highmem, vms->highmem_ecam);
-     acpi_dsdt_add_gpio(scope, &memmap[VIRT_GPIO],
-                        (irqmap[VIRT_GPIO] + ARM_SPI_BASE));
-     acpi_dsdt_add_power_button(scope);
-diff --git a/hw/arm/virt.c b/hw/arm/virt.c
-index a3a28e2..a35550b 100644
---- a/hw/arm/virt.c
-+++ b/hw/arm/virt.c
-@@ -149,6 +149,7 @@ static const MemMapEntry a15memmap[] = {
-     [VIRT_PCIE_PIO] =           { 0x3eff0000, 0x00010000 },
-     [VIRT_PCIE_ECAM] =          { 0x3f000000, 0x01000000 },
-     [VIRT_MEM] =                { 0x40000000, RAMLIMIT_BYTES },
-+    [VIRT_PCIE_ECAM_HIGH] =     { 0x4010000000ULL, 0x10000000 },
-     /* Second PCIe window, 512GB wide at the 512GB boundary */
-     [VIRT_PCIE_MMIO_HIGH] =   { 0x8000000000ULL, 0x8000000000ULL },
- };
-@@ -1001,10 +1002,9 @@ static void create_pcie(VirtMachineState *vms, qemu_irq *pic)
-     hwaddr size_mmio_high = vms->memmap[VIRT_PCIE_MMIO_HIGH].size;
-     hwaddr base_pio = vms->memmap[VIRT_PCIE_PIO].base;
-     hwaddr size_pio = vms->memmap[VIRT_PCIE_PIO].size;
--    hwaddr base_ecam = vms->memmap[VIRT_PCIE_ECAM].base;
--    hwaddr size_ecam = vms->memmap[VIRT_PCIE_ECAM].size;
-+    hwaddr base_ecam, size_ecam;
-     hwaddr base = base_mmio;
--    int nr_pcie_buses = size_ecam / PCIE_MMCFG_SIZE_MIN;
-+    int nr_pcie_buses;
-     int irq = vms->irqmap[VIRT_PCIE];
-     MemoryRegion *mmio_alias;
-     MemoryRegion *mmio_reg;
-@@ -1012,12 +1012,16 @@ static void create_pcie(VirtMachineState *vms, qemu_irq *pic)
-     MemoryRegion *ecam_reg;
-     DeviceState *dev;
-     char *nodename;
--    int i;
-+    int i, ecam_memmap_id;
-     PCIHostState *pci;
- 
-     dev = qdev_create(NULL, TYPE_GPEX_HOST);
-     qdev_init_nofail(dev);
- 
-+    ecam_memmap_id = vms->highmem ? VIRT_PCIE_ECAM_HIGH : VIRT_PCIE_ECAM;
-+    base_ecam = vms->memmap[ecam_memmap_id].base;
-+    size_ecam = vms->memmap[ecam_memmap_id].size;
-+    nr_pcie_buses = size_ecam / PCIE_MMCFG_SIZE_MIN;
-     /* Map only the first size_ecam bytes of ECAM space */
-     ecam_alias = g_new0(MemoryRegion, 1);
-     ecam_reg = sysbus_mmio_get_region(SYS_BUS_DEVICE(dev), 0);
-diff --git a/include/hw/arm/virt.h b/include/hw/arm/virt.h
-index 4ac7ef6..e9423a7 100644
---- a/include/hw/arm/virt.h
-+++ b/include/hw/arm/virt.h
-@@ -69,6 +69,7 @@ enum {
-     VIRT_PCIE_MMIO,
-     VIRT_PCIE_PIO,
-     VIRT_PCIE_ECAM,
-+    VIRT_PCIE_ECAM_HIGH,
-     VIRT_PLATFORM_BUS,
-     VIRT_PCIE_MMIO_HIGH,
-     VIRT_GPIO,
-@@ -103,6 +104,7 @@ typedef struct {
-     FWCfgState *fw_cfg;
-     bool secure;
-     bool highmem;
-+    bool highmem_ecam;
-     bool its;
-     bool virt;
-     int32_t gic_version;
+v1->v2: free the data...
+
+Paolo Bonzini (2):
+  sheepdog: cleanup repeated expression
+  sheepdog: remove huge BSS object
+
+ block/sheepdog.c | 27 ++++++++++++++-------------
+ 1 file changed, 14 insertions(+), 13 deletions(-)
+
 -- 
-2.5.5
+2.17.0
