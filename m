@@ -1,46 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44840)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45524)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <danielhb@linux.ibm.com>) id 1fLUfo-0003lh-7H
-	for qemu-devel@nongnu.org; Wed, 23 May 2018 10:23:30 -0400
+	(envelope-from <mst@redhat.com>) id 1fLUi0-00050J-7l
+	for qemu-devel@nongnu.org; Wed, 23 May 2018 10:25:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <danielhb@linux.ibm.com>) id 1fLUfk-0002Ps-6l
-	for qemu-devel@nongnu.org; Wed, 23 May 2018 10:23:28 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:44368)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <danielhb@linux.ibm.com>)
-	id 1fLUfj-0002Ox-SB
-	for qemu-devel@nongnu.org; Wed, 23 May 2018 10:23:24 -0400
-Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w4NEJOqM130331
-	for <qemu-devel@nongnu.org>; Wed, 23 May 2018 10:23:21 -0400
-Received: from e34.co.us.ibm.com (e34.co.us.ibm.com [32.97.110.152])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2j58r0mqrb-1
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Wed, 23 May 2018 10:23:21 -0400
-Received: from localhost
-	by e34.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <danielhb@linux.ibm.com>;
-	Wed, 23 May 2018 08:23:20 -0600
-References: <20180517192325.8335-1-danielhb@linux.ibm.com>
-	<20180517192325.8335-2-danielhb@linux.ibm.com>
-	<87wow1gxi8.fsf@dusky.pond.sub.org>
-	<20180521181435.GN25013@localhost.localdomain>
-	<ab91cf9f-95c3-59dc-36cb-641a3db1171b@linux.ibm.com>
-	<20180521202616.GT25013@localhost.localdomain>
-	<874liyivcs.fsf@dusky.pond.sub.org>
-	<20180523122749.GC8988@localhost.localdomain>
-From: Daniel Henrique Barboza <danielhb@linux.ibm.com>
-Date: Wed, 23 May 2018 11:11:53 -0300
+	(envelope-from <mst@redhat.com>) id 1fLUhw-0003gU-7V
+	for qemu-devel@nongnu.org; Wed, 23 May 2018 10:25:44 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:57692 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1fLUhw-0003fh-2F
+	for qemu-devel@nongnu.org; Wed, 23 May 2018 10:25:40 -0400
+Date: Wed, 23 May 2018 17:25:32 +0300
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20180523171028-mutt-send-email-mst@kernel.org>
+References: <ef3fc85d-7726-c888-e8ca-9dfae1b908d3@gmail.com>
+	<17a3765f-b835-2d45-e8b9-ffd4aff909f9@redhat.com>
+	<cbdfe0d6-f071-3560-009d-3bbdde12b33c@gmail.com>
+	<f71a8c61-a0d7-6ebc-62ad-3dab8b9f8e5a@redhat.com>
+	<20180522234410-mutt-send-email-mst@kernel.org>
+	<20180522153659.2e33fbe0@w520.home>
+	<20180523004236-mutt-send-email-mst@kernel.org>
+	<20180522154741.3939d1e0@w520.home>
+	<20180523005048-mutt-send-email-mst@kernel.org>
+	<20180522222856.436c2c96@w520.home>
 MIME-Version: 1.0
-In-Reply-To: <20180523122749.GC8988@localhost.localdomain>
-Content-Language: en-US
-Message-Id: <3628eeb1-0976-a001-f2ab-37aa9fa979ef@linux.ibm.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v7 1/3] qmp: adding
- 'wakeup-suspend-support' in query-target
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180522222856.436c2c96@w520.home>
+Subject: Re: [Qemu-devel] [RFC 3/3] acpi-build: allocate mcfg for multiple
+ host bridges
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -49,126 +36,90 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>, Markus Armbruster <armbru@redhat.com>
-Cc: Stefano Stabellini <sstabellini@kernel.org>, "Michael S. Tsirkin" <mst@redhat.com>, libvir-list@redhat.com, qemu-devel@nongnu.org, mdroth@linux.vnet.ibm.com, Anthony Perard <anthony.perard@citrix.com>, Igor Mammedov <imammedo@redhat.com>, dgilbert@redhat.com
+To: Alex Williamson <alex.williamson@redhat.com>
+Cc: Laszlo Ersek <lersek@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Zihan Yang <whois.zihan.yang@gmail.com>, qemu-devel@nongnu.org, Igor Mammedov <imammedo@redhat.com>, Eric Auger <eauger@redhat.com>, Drew Jones <drjones@redhat.com>, Wei Huang <wei@redhat.com>
 
-Hi,
+On Tue, May 22, 2018 at 10:28:56PM -0600, Alex Williamson wrote:
+> On Wed, 23 May 2018 02:38:52 +0300
+> "Michael S. Tsirkin" <mst@redhat.com> wrote:
+> 
+> > On Tue, May 22, 2018 at 03:47:41PM -0600, Alex Williamson wrote:
+> > > On Wed, 23 May 2018 00:44:22 +0300
+> > > "Michael S. Tsirkin" <mst@redhat.com> wrote:
+> > >   
+> > > > On Tue, May 22, 2018 at 03:36:59PM -0600, Alex Williamson wrote:  
+> > > > > On Tue, 22 May 2018 23:58:30 +0300
+> > > > > "Michael S. Tsirkin" <mst@redhat.com> wrote:     
+> > > > > >
+> > > > > > It's not hard to think of a use-case where >256 devices
+> > > > > > are helpful, for example a nested virt scenario where
+> > > > > > each device is passed on to a different nested guest.
+> > > > > >
+> > > > > > But I think the main feature this is needed for is numa modeling.
+> > > > > > Guests seem to assume a numa node per PCI root, ergo we need more PCI
+> > > > > > roots.    
+> > > > > 
+> > > > > But even if we have NUMA affinity per PCI host bridge, a PCI host
+> > > > > bridge does not necessarily imply a new PCIe domain.    
+> > > > 
+> > > > What are you calling a PCIe domain?  
+> > > 
+> > > Domain/segment
+> > > 
+> > > 0000:00:00.0
+> > > ^^^^ This  
+> > 
+> > Right. So we can thinkably have PCIe root complexes share an ACPI segment.
+> > I don't see what this buys us by itself.
+> 
+> The ability to define NUMA locality for a PCI sub-hierarchy while
+> maintaining compatibility with non-segment aware OSes (and firmware).
 
-On 05/23/2018 09:27 AM, Eduardo Habkost wrote:
-> On Wed, May 23, 2018 at 11:17:55AM +0200, Markus Armbruster wrote:
->> Eduardo Habkost <ehabkost@redhat.com> writes:
->>> On Mon, May 21, 2018 at 04:46:36PM -0300, Daniel Henrique Barboza wro=
-te:
-> [...]
->>>> Since no objection was made back then, this logic was put into query=
--target
->>>> starting
->>>> in v2. Still, I don't have any favorites though: query-target looks =
-ok,
->>>> query-machine
->>>> looks ok and a new API looks ok too. It's all about what makes (more=
-) sense
->>>> in the
->>>> management level, I think.
->>> I understand the original objection from Eric: having to add a
->>> new command for every runtime flag we want to expose to the user
->>> looks wrong to me.
->> Agreed.
->>
->>> However, extending query-machines and query-target looks wrong
->>> too, however.  query-target looks wrong because this not a
->>> property of the target.  query-machines is wrong because this is
->>> not a static property of the machine-type, but of the running
->>> machine instance.
->> Of the two, query-machines looks less wrong.
->>
->> Arguably, -no-acpi should not exist.  It's an ad hoc flag that sneakil=
-y
->> splits a few machine types into two variants, with and without ACPI.
->> It's silently ignored for other machine types, even APCI-capable ones.
->>
->> If the machine type variants with and without ACPI were separate types=
-,
->> wakeup-suspend-support would be a static property of the machine type.
->>
->> However, "separate types" probably doesn't scale: I'm afraid we'd end =
-up
->> with an undesirable number of machine types.  Avoiding that is exactly
->> why we have machine types with configurable options.  I suspect that's
->> how ACPI should be configured (if at all).
->>
->> So, should we make -no-acpi sugar for a machine type parameter?  And
->> then deprecate -no-acpi for good measure?
-> I think we should.
->
->
->>> Can we have a new query command that could be an obvious
->>> container for simple machine capabilities that are not static?  A
->>> name like "query-machine" would be generic enough for that, I
->>> guess.
->> Having command names differ only in a single letter is awkward, but
->> let's focus on things other than naming now, and use
->> query-current-machine like a working title.
->>
->> query-machines is wrong because wakeup-suspend-support isn't static fo=
-r
->> some machine types.
->>
->> query-current-machine is also kind of wrong because
->> wakeup-suspend-support *is* static for most machine types.
->>
-> The most appropriate solution depends a lot on how/when
-> management software needs to query this.
->
-> If they only need to query it at runtime for a running VM,
-> there's no reason for us to go of our way and add complexity just
-> to make it look like static data in query-machines.
->
-> On the other hand, if they really need to query it before
-> configuring/starting a VM, it won't be useful at all to make it
-> available only at runtime.
->
-> Daniel, when/how exactly software would need to query the new
-> flag?
-
-The original idea of this series was to provide a way to inform managemen=
-t
-when not to execute a pm-suspend* command. This is a command from the
-guest agent, thus it's only available when the guest is already running.=20
-As far
-as I know there is no way to suspend the VM=C2=A0 without using the guest=
- agent.
-
-Thus, unless management wants to store this state to avoid querying it=20
-multiple
-times during the VM lifetime (I remember from Libvirt code that it=20
-stores some
-sort of capabilities of the domain in an internal state, although I=20
-can't recall if
-this info would be eligible for that), there is no need to query this=20
-until the VM
-is booted.
+Fur sure, but NUMA is a kind of advanced topic, MCFG has been around for
+longer than various NUMA tables. Are there really non-segment aware
+guests that also know how to make use of NUMA?
 
 
+> > > Isn't that the only reason we'd need a new MCFG section and the reason
+> > > we're limited to 256 buses?  Thanks,
+> > > 
+> > > Alex  
+> > 
+> > I don't know whether a single MCFG section can describe multiple roots.
+> > I think it would be certainly unusual.
+> 
+> I'm not sure here if you're referring to the actual MCFG ACPI table or
+> the MMCONFIG range, aka the ECAM.  Neither of these describe PCI host
+> bridges.  The MCFG table can describe one or more ECAM ranges, which
+> provides the ECAM base address, the PCI segment associated with that
+> ECAM and the start and end bus numbers to know the offset and extent of
+> the ECAM range.  PCI host bridges would then theoretically be separate
+> ACPI objects with _SEG and _BBN methods to associate them to the
+> correct ECAM range by segment number and base bus number.  So it seems
+> that tooling exists that an ECAM/MMCONFIG range could be provided per
+> PCI host bridge, even if they exist within the same domain, but in
+> practice what I see on systems I have access to is a single MMCONFIG
+> range supporting all of the host bridges.  It also seems there are
+> numerous ways to describe the MMCONFIG range and I haven't actually
+> found an example that seems to use the MCFG table.  Two have MCFG
+> tables (that don't seem terribly complete) and the kernel claims to
+> find the MMCONFIG via e820, another doesn't even have an MCFG table and
+> the kernel claims to find MMCONFIG via an ACPI motherboard resource.
+> I'm not sure if I can enable PCI segments on anything to see how the
+> firmware changes.  Thanks,
+> 
+> Alex
 
+Let me clarify.  So MCFG have base address allocation structures.
+Each maps a segment and a range of bus numbers into memory.
+This structure is what I meant.
 
->
->
->> Worse, a machine type property that is static for all machine types no=
-w
->> could conceivably become dynamic when we add a machine type
->> configuration knob.
->>
-> This isn't the first time a machine capability that seems static
-> actually depends on other configuration arguments.  We will
-> probably need to address this eventually.
->
->
->> Would a way to tie the property to the configuration knob help?
->> Something like wakeup-suspend-support taking values true (supported),
->> false (not supported), and "acpi" (supported if machine type
->> configuration knob "acpi" is switched on).
->>
-> I would prefer a more generic mechanism.  Maybe make
-> 'query-machines' accept a 'machine-options' argument?
->
+IIUC you are saying on your systems everything is within a single
+segment, right? Multiple pci hosts map into a single segment?
+
+If you do this you can do NUMA, but do not gain > 256 devices.
+
+Are we are the same page then?
+
+-- 
+MST
