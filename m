@@ -1,25 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49859)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49900)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1fLV2J-00051p-V3
-	for qemu-devel@nongnu.org; Wed, 23 May 2018 10:46:48 -0400
+	(envelope-from <cohuck@redhat.com>) id 1fLV2U-000581-N1
+	for qemu-devel@nongnu.org; Wed, 23 May 2018 10:46:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1fLV2J-00023r-0O
-	for qemu-devel@nongnu.org; Wed, 23 May 2018 10:46:44 -0400
-Date: Wed, 23 May 2018 17:46:38 +0300
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20180523174350-mutt-send-email-mst@kernel.org>
-References: <20180518180440-mutt-send-email-mst@kernel.org>
-	<20180518170956.GI8615@redhat.com>
-	<20180522073555.peibbwoqvbor7nrs@sirius.home.kraxel.org>
-	<20180522171112-mutt-send-email-mst@kernel.org>
-	<20180522150221.GF6233@localhost.localdomain>
-	<20180523021221.GE28114@lemon.usersys.redhat.com>
-	<20180523091604.GC7523@localhost.localdomain>
+	(envelope-from <cohuck@redhat.com>) id 1fLV2Q-00028L-NF
+	for qemu-devel@nongnu.org; Wed, 23 May 2018 10:46:54 -0400
+Date: Wed, 23 May 2018 16:46:40 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20180523164640.225908a9.cohuck@redhat.com>
+In-Reply-To: <a3ab7dfd-4cc1-5632-1590-bce4a40f063e@linux.ibm.com>
+References: <20180522221655.78979-1-pasic@linux.ibm.com>
+	<20180522221655.78979-2-pasic@linux.ibm.com>
+	<20180523113708.50b21a77.cohuck@redhat.com>
+	<a3ab7dfd-4cc1-5632-1590-bce4a40f063e@linux.ibm.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180523091604.GC7523@localhost.localdomain>
-Subject: Re: [Qemu-devel] storing machine data in qcow images?
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH v2 1/2] vfio-ccw: add force
+ unlimited prefetch property
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,66 +26,156 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: Fam Zheng <famz@redhat.com>, ehabkost@redhat.com, qemu-block@nongnu.org, qemu-devel@nongnu.org, mreitz@redhat.com, Gerd Hoffmann <kraxel@redhat.com>, stefanha@redhat.com, berrange@redhat.com
+To: Halil Pasic <pasic@linux.ibm.com>
+Cc: Dong Jia Shi <bjsdjshi@linux.ibm.com>, "Jason J. Herne" <jjherne@linux.ibm.com>, qemu-s390x@nongnu.org, qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>
 
-On Wed, May 23, 2018 at 11:16:04AM +0200, Kevin Wolf wrote:
-> Am 23.05.2018 um 04:12 hat Fam Zheng geschrieben:
-> > On Tue, 05/22 17:02, Kevin Wolf wrote:
-> > > Am 22.05.2018 um 16:19 hat Michael S. Tsirkin geschrieben:
-> > > > On Tue, May 22, 2018 at 09:35:55AM +0200, Gerd Hoffmann wrote:
-> > > > >   Hi,
-> > > > > 
-> > > > > > You must /sometimes/ supply the correct machine type.
-> > > > > > 
-> > > > > > It is quite dependent on the guest OS you have installed, and even
-> > > > > > just how the guest OS is configured.  In general Linux is very
-> > > > > > flexible and can adapt to a wide range of hardware, automatically
-> > > > > > detecting things as needed. It is possible for a sysadmin to build
-> > > > > > a Linux image in a way that would only work with I440FX, but I
-> > > > > > don't think it would be common to see that.
-> > > > > 
-> > > > > I think it would be pretty hard to actually build such an image.
-> > > > > 
-> > > > > The more critical thing for linux guests is the storage driver which
-> > > > > must be included into the initrd so the image can mount the root
-> > > > > filesystem.  And the firmware, bios vs. uefi is more critical than
-> > > > > pc vs. q35.
-> > > > 
-> > > > I think we can start by finding a location to embed a string in a qcow
-> > > > image, add ability for qemu-img to set and get this string.  We can
-> > > > discuss how it's formatted separately.
-> > > 
-> > > If we want it, we'll find a place to store it.
-> > > 
-> > > But the first thing we need is a spec for what's actually in it. Just
-> > > storing a machine type hint would be a one-off hack that wouldn't last
-> > > very long before we want to add the next thing.
-> > > 
-> > > Essentially, what we need is a description of the virtual machine that
-> > > we suggest to use with this image. We can try to reuse something
-> > > existing there, like libvirt XML or OVF, or invent something new (a JSON
-> > > array describing runtime options?). One difference to existing formats
-> > > is probably that we want only frontends and no backends in the
-> > > description.
-> > > 
+On Wed, 23 May 2018 16:31:53 +0200
+Halil Pasic <pasic@linux.ibm.com> wrote:
+
+> On 05/23/2018 11:37 AM, Cornelia Huck wrote:
+> > On Wed, 23 May 2018 00:16:54 +0200
+> > Halil Pasic <pasic@linux.ibm.com> wrote:
+> >   
+> >> There is at least one guest (OS) such that although it does not rely on
+> >> the guarantees provided by ORB 1 word 9 bit (aka unlimited prefetch, aka
+> >> P bit) not being set, it fails to tell this to the machine.
+> >>
+> >> Usually this ain't a big deal, as the original purpose of the P bit is to
+> >> allow for performance optimizations. vfio-ccw however can not provide the
+> >> guarantees required if the bit is not set.
+> >>
+> >> It is impossible to implement support for P bit not set (at impossible
+> >> least without transitioning to lower level protocols) for vfio-ccw.  
 > > 
-> > Do we really need a uniform way and require compliance to the standard we
-> > choose, and implement verification in the block driver, or can we get away with
-> > a description field that accepts any text and leave it to the user to decide
-> > what to put there? In the header we could assign a Content-type field that
-> > defaults to 'text/plain' to the description, that way apps can mark the data as
-> > "application/ovf" if they want, or whatever the upper layer decides.
+> > "It is not possible to implement support for the P bit not set without
+> > transitioning to lower level protocols for vfio-ccw."  
+> > > ?  
 > 
-> Yes, we can. But I'm not sure if I want. Providing low-level features
-> without telling users how they are supposed to be used usually results
-> in a big surprise for both sides eventually.
+> Sounds much better. My sentence is ungrammatical.
 > 
-> Kevin
+> >   
+> >> So
+> >> let's give the user the opportunity to force the P bit to set, if the  
+> > 
+> > s/to set/to be set/
+> >   
+> 
+> Why do we need the 'be'?
 
-The idea to include a format in there sounds very reasonable to me
-though. We can then start with a simple text format just showing the
-QEMU command line, and others can reuse it for OVF format, etc.
+Or "to force setting the P bit". It doesn't set itself :)
 
--- 
-MST
+> 
+> >> user knows this is safe.  For self modifying channel programs forcing the
+> >> P bit is not safe. If P bit is forced for a self modifying channel  
+> > 
+> > s/P bit/the P bit/
+> >   
+> 
+> Right.
+> 
+> >> program things are expected to break in strange ways.
+> >>
+> >> Signed-off-by: Halil Pasic <pasic@linux.ibm.com>
+> >> Suggested-by: Dong Jia Shi <bjsdjshi@linux.ibm.com>
+> >> Acked-by: Jason J. Herne <jjherne@linux.ibm.com>
+> >> Tested-by: Jason J. Herne <jjherne@linux.ibm.com>
+
+> >> diff --git a/hw/vfio/ccw.c b/hw/vfio/ccw.c
+> >> index e67392c5f9..62de4c9710 100644
+> >> --- a/hw/vfio/ccw.c
+> >> +++ b/hw/vfio/ccw.c
+> >> @@ -32,8 +32,20 @@ typedef struct VFIOCCWDevice {
+> >>       uint64_t io_region_offset;
+> >>       struct ccw_io_region *io_region;
+> >>       EventNotifier io_notifier;
+> >> +    bool force_orb_pfch;
+> >> +    bool warned_force_orb_pfch;
+> >>   } VFIOCCWDevice;
+> >>   
+> >> +#define WARN_ONCE(warned, fmt...) \
+> >> +({\
+> >> +if (!(warned)) {\
+> >> +    warn_report((fmt));\
+> >> +} \
+> >> +warned = true;\
+> >> +})  
+> > 
+> > I think introducing a macro for the single user is overkill here.
+> > 
+> > We might contemplate a generic "print this error once, controlled by
+> > this flag" functionality, if there are more users.
+> >  
+> 
+> I would prefer keeping the macro. If this generic functionality comes
+> along it will be easier to spot the home-brewn counterpart. Also it's
+> easier to read IMHO.
+
+I'm really not too fond of that macro...
+
+> BTW the macro could be an inline function like:
+> 
+>   static inline void warn_once(bool *warned, const char *fmt, ...)
+> {
+>      va_list ap;
+> 
+> 
+>      if (!warned || *warned) {
+>          return;
+>      }
+>      *warned= true;
+>      va_start(ap, fmt);
+>      vreport(REPORT_TYPE_WARNING, fmt, ap);
+>      va_end(ap);
+> }
+> 
+> if that's better.
+
+I think an inline function is a better choice.
+
+Also, if this is something that might be generally useful it should go
+into util/error.c. Let's cc: Markus.
+
+> 
+> >> +
+> >> +
+> >> +
+> >>   static void vfio_ccw_compute_needs_reset(VFIODevice *vdev)
+> >>   {
+> >>       vdev->needs_reset = false;
+> >> @@ -54,6 +66,18 @@ static IOInstEnding vfio_ccw_handle_request(SubchDev *sch)
+> >>       struct ccw_io_region *region = vcdev->io_region;
+> >>       int ret;
+> >>   
+> >> +    if (!(sch->orb.ctrl0 & ORB_CTRL0_MASK_PFCH)) {
+> >> +        if (!(vcdev->force_orb_pfch)) {
+> >> +            warn_report("vfio-ccw requires PFCH flag set");
+> >> +            sch_gen_unit_exception(sch);
+> >> +            css_inject_io_interrupt(sch);
+> >> +            return IOINST_CC_EXPECTED;
+> >> +        } else {
+> >> +            sch->orb.ctrl0 |= ORB_CTRL0_MASK_PFCH;
+> >> +            WARN_ONCE(vcdev->warned_force_orb_pfch, "PFCH flag forced");  
+> > 
+> > This message should probably mention vfio-ccw as well as the subchannel
+> > id?
+> >   
+> 
+> I was thinking about this. I think all it would make sense to have a common
+> prefix for all reports coming form vfio-ccw (QEMU). But then I was like, that
+> is a separate patch.
+> 
+> Maybe something like:
+> vfio-ccw (xx.xx.xxxx): specific message
+> 
+> OTOH we don't seem to do that elsewhere (git grep -e 'warn\|error_report\|error_setg' -- hw/s390x/).
+> AFAIR the error_setg captures context (like, src, line, func) but does not
+> necessarily report it. Another question is if this should be extended to
+> hw/s390x/s390-ccw.c
+> 
+> What do you think?
+
+I'm not sure that makes sense, especially as not everything might
+explicitly refer to a certain subchannel.
+
+Let's just add the subchannel id here? In this case, this is really a
+useful piece of information (which device is showing this behaviour?)
