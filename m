@@ -1,20 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48984)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48969)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1fLUz1-0001vA-8K
+	(envelope-from <mst@redhat.com>) id 1fLUz0-0001uz-H3
 	for qemu-devel@nongnu.org; Wed, 23 May 2018 10:43:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1fLUz0-0000qL-4m
-	for qemu-devel@nongnu.org; Wed, 23 May 2018 10:43:19 -0400
-Date: Wed, 23 May 2018 17:43:16 +0300
+	(envelope-from <mst@redhat.com>) id 1fLUyz-0000q1-7U
+	for qemu-devel@nongnu.org; Wed, 23 May 2018 10:43:18 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:38612 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1fLUyz-0000pv-3m
+	for qemu-devel@nongnu.org; Wed, 23 May 2018 10:43:17 -0400
+Date: Wed, 23 May 2018 17:43:14 +0300
 From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <1527086545-68024-21-git-send-email-mst@redhat.com>
+Message-ID: <1527086545-68024-20-git-send-email-mst@redhat.com>
 References: <1527086545-68024-1-git-send-email-mst@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 In-Reply-To: <1527086545-68024-1-git-send-email-mst@redhat.com>
-Subject: [Qemu-devel] [PULL 20/28] intel-iommu: send PSI always even if
- across PDEs
+Subject: [Qemu-devel] [PULL 19/28] nvdimm: fix typo in label-size definition
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,119 +27,49 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Peter Xu <peterx@redhat.com>, QEMU Stable <qemu-stable@nongnu.org>, Jason Wang <jasowang@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Ross Zwisler <ross.zwisler@linux.intel.com>, Stefan Hajnoczi <stefanha@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Haozhong Zhang <haozhong.zhang@intel.com>, Xiao Guangrong <xiaoguangrong.eric@gmail.com>
 
-From: Peter Xu <peterx@redhat.com>
+From: Ross Zwisler <ross.zwisler@linux.intel.com>
 
-SECURITY IMPLICATION: without this patch, any guest with both assigned
-device and a vIOMMU might encounter stale IO page mappings even if guest
-has already unmapped the page, which may lead to guest memory
-corruption.  The stale mappings will only be limited to the guest's own
-memory range, so it should not affect the host memory or other guests on
-the host.
-
-During IOVA page table walking, there is a special case when the PSI
-covers one whole PDE (Page Directory Entry, which contains 512 Page
-Table Entries) or more.  In the past, we skip that entry and we don't
-notify the IOMMU notifiers.  This is not correct.  We should send UNMAP
-notification to registered UNMAP notifiers in this case.
-
-For UNMAP only notifiers, this might cause IOTLBs cached in the devices
-even if they were already invalid.  For MAP/UNMAP notifiers like
-vfio-pci, this will cause stale page mappings.
-
-This special case doesn't trigger often, but it is very easy to be
-triggered by nested device assignments, since in that case we'll
-possibly map the whole L2 guest RAM region into the device's IOVA
-address space (several GBs at least), which is far bigger than normal
-kernel driver usages of the device (tens of MBs normally).
-
-Without this patch applied to L1 QEMU, nested device assignment to L2
-guests will dump some errors like:
-
-qemu-system-x86_64: VFIO_MAP_DMA: -17
-qemu-system-x86_64: vfio_dma_map(0x557305420c30, 0xad000, 0x1000,
-                    0x7f89a920d000) = -17 (File exists)
-
-CC: QEMU Stable <qemu-stable@nongnu.org>
-Acked-by: Jason Wang <jasowang@redhat.com>
-[peterx: rewrite the commit message]
-Signed-off-by: Peter Xu <peterx@redhat.com>
+Signed-off-by: Ross Zwisler <ross.zwisler@linux.intel.com>
+Fixes: commit da6789c27c2e ("nvdimm: add a macro for property "label-size"")
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+Cc: Haozhong Zhang <haozhong.zhang@intel.com>
+Cc: Michael S. Tsirkin <mst@redhat.com>
+Cc: Stefan Hajnoczi <stefanha@redhat.com>
 Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
 ---
- hw/i386/intel_iommu.c | 42 ++++++++++++++++++++++++++++++------------
- 1 file changed, 30 insertions(+), 12 deletions(-)
+ include/hw/mem/nvdimm.h | 2 +-
+ hw/mem/nvdimm.c         | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
-index fb31de9..b359efd 100644
---- a/hw/i386/intel_iommu.c
-+++ b/hw/i386/intel_iommu.c
-@@ -722,6 +722,15 @@ static int vtd_iova_to_slpte(VTDContextEntry *ce, uint64_t iova, bool is_write,
+diff --git a/include/hw/mem/nvdimm.h b/include/hw/mem/nvdimm.h
+index 7fd87c4..74c6033 100644
+--- a/include/hw/mem/nvdimm.h
++++ b/include/hw/mem/nvdimm.h
+@@ -48,7 +48,7 @@
+ #define NVDIMM_GET_CLASS(obj) OBJECT_GET_CLASS(NVDIMMClass, (obj), \
+                                                TYPE_NVDIMM)
  
- typedef int (*vtd_page_walk_hook)(IOMMUTLBEntry *entry, void *private);
+-#define NVDIMM_LABLE_SIZE_PROP "label-size"
++#define NVDIMM_LABEL_SIZE_PROP "label-size"
+ #define NVDIMM_UNARMED_PROP    "unarmed"
  
-+static int vtd_page_walk_one(IOMMUTLBEntry *entry, int level,
-+                             vtd_page_walk_hook hook_fn, void *private)
-+{
-+    assert(hook_fn);
-+    trace_vtd_page_walk_one(level, entry->iova, entry->translated_addr,
-+                            entry->addr_mask, entry->perm);
-+    return hook_fn(entry, private);
-+}
-+
- /**
-  * vtd_page_walk_level - walk over specific level for IOVA range
-  *
-@@ -781,28 +790,37 @@ static int vtd_page_walk_level(dma_addr_t addr, uint64_t start,
-          */
-         entry_valid = read_cur | write_cur;
+ struct NVDIMMDevice {
+diff --git a/hw/mem/nvdimm.c b/hw/mem/nvdimm.c
+index acb656b..4087aca 100644
+--- a/hw/mem/nvdimm.c
++++ b/hw/mem/nvdimm.c
+@@ -89,7 +89,7 @@ static void nvdimm_set_unarmed(Object *obj, bool value, Error **errp)
  
-+        entry.target_as = &address_space_memory;
-+        entry.iova = iova & subpage_mask;
-+        entry.perm = IOMMU_ACCESS_FLAG(read_cur, write_cur);
-+        entry.addr_mask = ~subpage_mask;
-+
-         if (vtd_is_last_slpte(slpte, level)) {
--            entry.target_as = &address_space_memory;
--            entry.iova = iova & subpage_mask;
-             /* NOTE: this is only meaningful if entry_valid == true */
-             entry.translated_addr = vtd_get_slpte_addr(slpte, aw);
--            entry.addr_mask = ~subpage_mask;
--            entry.perm = IOMMU_ACCESS_FLAG(read_cur, write_cur);
-             if (!entry_valid && !notify_unmap) {
-                 trace_vtd_page_walk_skip_perm(iova, iova_next);
-                 goto next;
-             }
--            trace_vtd_page_walk_one(level, entry.iova, entry.translated_addr,
--                                    entry.addr_mask, entry.perm);
--            if (hook_fn) {
--                ret = hook_fn(&entry, private);
--                if (ret < 0) {
--                    return ret;
--                }
-+            ret = vtd_page_walk_one(&entry, level, hook_fn, private);
-+            if (ret < 0) {
-+                return ret;
-             }
-         } else {
-             if (!entry_valid) {
--                trace_vtd_page_walk_skip_perm(iova, iova_next);
-+                if (notify_unmap) {
-+                    /*
-+                     * The whole entry is invalid; unmap it all.
-+                     * Translated address is meaningless, zero it.
-+                     */
-+                    entry.translated_addr = 0x0;
-+                    ret = vtd_page_walk_one(&entry, level, hook_fn, private);
-+                    if (ret < 0) {
-+                        return ret;
-+                    }
-+                } else {
-+                    trace_vtd_page_walk_skip_perm(iova, iova_next);
-+                }
-                 goto next;
-             }
-             ret = vtd_page_walk_level(vtd_get_slpte_addr(slpte, aw), iova,
+ static void nvdimm_init(Object *obj)
+ {
+-    object_property_add(obj, NVDIMM_LABLE_SIZE_PROP, "int",
++    object_property_add(obj, NVDIMM_LABEL_SIZE_PROP, "int",
+                         nvdimm_get_label_size, nvdimm_set_label_size, NULL,
+                         NULL, NULL);
+     object_property_add_bool(obj, NVDIMM_UNARMED_PROP,
 -- 
 MST
