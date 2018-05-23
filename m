@@ -1,29 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:32829)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37340)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fLSOb-0002bd-1p
-	for qemu-devel@nongnu.org; Wed, 23 May 2018 07:57:39 -0400
+	(envelope-from <eric.auger@redhat.com>) id 1fLSa6-00058N-Rc
+	for qemu-devel@nongnu.org; Wed, 23 May 2018 08:09:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fLSOW-0007y4-77
-	for qemu-devel@nongnu.org; Wed, 23 May 2018 07:57:33 -0400
-Received: from mail-qt0-x242.google.com ([2607:f8b0:400d:c0d::242]:38655)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fLSOW-0007y0-2V
-	for qemu-devel@nongnu.org; Wed, 23 May 2018 07:57:28 -0400
-Received: by mail-qt0-x242.google.com with SMTP id m9-v6so27631015qtb.5
-	for <qemu-devel@nongnu.org>; Wed, 23 May 2018 04:57:27 -0700 (PDT)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Date: Wed, 23 May 2018 08:57:19 -0300
-Message-Id: <20180523115719.26679-1-f4bug@amsat.org>
+	(envelope-from <eric.auger@redhat.com>) id 1fLSa3-0005Fc-MS
+	for qemu-devel@nongnu.org; Wed, 23 May 2018 08:09:26 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:46558 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eric.auger@redhat.com>)
+	id 1fLSa3-0005EW-Hh
+	for qemu-devel@nongnu.org; Wed, 23 May 2018 08:09:23 -0400
+References: <1527070950-208350-1-git-send-email-imammedo@redhat.com>
+From: Auger Eric <eric.auger@redhat.com>
+Message-ID: <99505ab5-d5fe-11ba-7f85-ea24c6f39ae2@redhat.com>
+Date: Wed, 23 May 2018 14:09:20 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH] tests: Allow GTESTER_OPTIONS variable
- expansion from command line
+In-Reply-To: <1527070950-208350-1-git-send-email-imammedo@redhat.com>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] arm: fix qemu crash on startup with -bios
+ option
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,43 +28,99 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, Thomas Huth <thuth@redhat.com>, Juan Quintela <quintela@redhat.com>
+To: Igor Mammedov <imammedo@redhat.com>, qemu-devel@nongnu.org
+Cc: Andrew Jones <drjones@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
 
-The gtester utility offers the "-p=TESTPATH" option to
-"only run test cases matching TESTPATH".  We already use
-a $GTESTER_OPTIONS variable.
-Use make variable expansion to allow qtest path matching
-from command line:
+Hi Igor,
 
-  $ time make check-qtest-arm GTESTER_OPTIONS="-p /arm/boot-serial"
-    GTESTER check-qtest-arm
+On 05/23/2018 12:22 PM, Igor Mammedov wrote:
+> When QEMU is started with following CLI
+>  -machine virt,gic-version=3,accel=kvm -cpu host -bios AAVMF_CODE.fd
+> it crashes with abort at
+>  accel/kvm/kvm-all.c:2164:
+>  KVM_SET_DEVICE_ATTR failed: Group 6 attr 0x000000000000c665: Invalid argument
+> 
+> Which is caused by implicit dependecy of kvm_arm_gicv3_reset() on
+dependency
+> arm_gicv3_icc_reset() where the later is called by CPU reset
+> reset callback.
+> 
+> However commit:
+>  3b77f6c arm/boot: split load_dtb() from arm_load_kernel()
+> broke CPU reset callback registration in case
+> 
+>   arm_load_kernel()
+>       ...
+>       if (!info->kernel_filename || info->firmware_loaded)
+> 
+> branch is taken, i.e. it's sufficient to provide a firmware
+> or do not provide kernel on CLI to skip cpu reset callback
+> registration, where before offending commit the callback
+> has been registered unconditionally.
+> 
+> Fix it by registering the callback right at the begging of
+beginning
+> arm_load_kernel() unconditionally instead of doing it at the end.
+> 
+> NOTE:
+>  we probably should eleminate that dependency anyways as well as
+eliminate, anyway?
+>  separate arch CPU reset parts from arm_load_kernel() into CPU
+>  itself, but that refactoring that I probably would have to do
+>  anyways later for CPU hotplug to work.
+may deserve some rewording.
+> 
+> Reported-by: Auger Eric <eric.auger@redhat.com>
+> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
 
-  user 0m1.548s
+Thank you for the quick fix. It fixes the reported issue.
 
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
----
-I am more interested in the "-s" option (exclude pattern) but
-can't have it working :(
+Reviewed-by: Eric Auger <eric.auger@redhat.com>
+Tested-by: Eric Auger <eric.auger@redhat.com>
 
-i.e. "run all but qom/hmp":
-make check-qtest-arm GTESTER_OPTIONS="-s /arm/qom -s /arm/hmp"
+Thanks
 
- tests/Makefile.include | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/tests/Makefile.include b/tests/Makefile.include
-index 3b9a5e31a2..b0ff3d988c 100644
---- a/tests/Makefile.include
-+++ b/tests/Makefile.include
-@@ -870,7 +870,7 @@ tests/test-qga$(EXESUF): qemu-ga$(EXESUF)
- tests/test-qga$(EXESUF): tests/test-qga.o $(qtest-obj-y)
- 
- SPEED = quick
--GTESTER_OPTIONS = -k $(if $(V),--verbose,-q)
-+GTESTER_OPTIONS += -k $(if $(V),--verbose,-q)
- GCOV_OPTIONS = -n $(if $(V),-f,)
- 
- # gtester tests, possibly with verbose output
--- 
-2.17.0
+Eric
+> ---
+>  Thanks Andrew Jones <drjones@redhat.com> for host with reproducer.
+> ---
+>  hw/arm/boot.c | 18 +++++++++---------
+>  1 file changed, 9 insertions(+), 9 deletions(-)
+> 
+> diff --git a/hw/arm/boot.c b/hw/arm/boot.c
+> index 9496f33..1e48166 100644
+> --- a/hw/arm/boot.c
+> +++ b/hw/arm/boot.c
+> @@ -926,6 +926,15 @@ void arm_load_kernel(ARMCPU *cpu, struct arm_boot_info *info)
+>      static const ARMInsnFixup *primary_loader;
+>      AddressSpace *as = arm_boot_address_space(cpu, info);
+>  
+> +    /* CPU objects (unlike devices) are not automatically reset on system
+> +     * reset, so we must always register a handler to do so. If we're
+> +     * actually loading a kernel, the handler is also responsible for
+> +     * arranging that we start it correctly.
+> +     */
+> +    for (cs = first_cpu; cs; cs = CPU_NEXT(cs)) {
+> +        qemu_register_reset(do_cpu_reset, ARM_CPU(cs));
+> +    }
+> +
+>      /* The board code is not supposed to set secure_board_setup unless
+>       * running its code in secure mode is actually possible, and KVM
+>       * doesn't support secure.
+> @@ -1143,15 +1152,6 @@ void arm_load_kernel(ARMCPU *cpu, struct arm_boot_info *info)
+>          ARM_CPU(cs)->env.boot_info = info;
+>      }
+>  
+> -    /* CPU objects (unlike devices) are not automatically reset on system
+> -     * reset, so we must always register a handler to do so. If we're
+> -     * actually loading a kernel, the handler is also responsible for
+> -     * arranging that we start it correctly.
+> -     */
+> -    for (cs = first_cpu; cs; cs = CPU_NEXT(cs)) {
+> -        qemu_register_reset(do_cpu_reset, ARM_CPU(cs));
+> -    }
+> -
+>      if (!info->skip_dtb_autoload && have_dtb(info)) {
+>          if (arm_load_dtb(info->dtb_start, info, info->dtb_limit, as) < 0) {
+>              exit(1);
+> 
