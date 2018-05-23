@@ -1,26 +1,44 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42893)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43121)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fLXYc-0004I2-FO
-	for qemu-devel@nongnu.org; Wed, 23 May 2018 13:28:17 -0400
+	(envelope-from <pasic@linux.ibm.com>) id 1fLXZ5-0004d0-IN
+	for qemu-devel@nongnu.org; Wed, 23 May 2018 13:28:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fLXYY-0001S6-Rd
-	for qemu-devel@nongnu.org; Wed, 23 May 2018 13:28:14 -0400
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20180522201056.1442-1-pbonzini@redhat.com>
-	<20180522201056.1442-3-pbonzini@redhat.com>
-	<20180523014339.GD28114@lemon.usersys.redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <a5cd9c22-eec5-60d1-67b2-017a328c791e@amsat.org>
-Date: Wed, 23 May 2018 14:25:29 -0300
+	(envelope-from <pasic@linux.ibm.com>) id 1fLXZ1-0002uL-Ed
+	for qemu-devel@nongnu.org; Wed, 23 May 2018 13:28:43 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:41038)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pasic@linux.ibm.com>) id 1fLXZ1-0002qu-63
+	for qemu-devel@nongnu.org; Wed, 23 May 2018 13:28:39 -0400
+Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w4NHO0hI034806
+	for <qemu-devel@nongnu.org>; Wed, 23 May 2018 13:28:38 -0400
+Received: from e06smtp11.uk.ibm.com (e06smtp11.uk.ibm.com [195.75.94.107])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2j5akj6yye-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Wed, 23 May 2018 13:28:37 -0400
+Received: from localhost
+	by e06smtp11.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <pasic@linux.ibm.com>;
+	Wed, 23 May 2018 18:28:34 +0100
+References: <20180522221655.78979-1-pasic@linux.ibm.com>
+	<20180522221655.78979-2-pasic@linux.ibm.com>
+	<20180523113708.50b21a77.cohuck@redhat.com>
+	<a3ab7dfd-4cc1-5632-1590-bce4a40f063e@linux.ibm.com>
+	<20180523164640.225908a9.cohuck@redhat.com>
+	<5de50b20-a331-78ea-a7f4-6fdd995ed083@linux.ibm.com>
+	<20180523185957.41af37b2.cohuck@redhat.com>
+From: Halil Pasic <pasic@linux.ibm.com>
+Date: Wed, 23 May 2018 19:28:31 +0200
 MIME-Version: 1.0
-In-Reply-To: <20180523014339.GD28114@lemon.usersys.redhat.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20180523185957.41af37b2.cohuck@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 2/2] sheepdog: remove huge BSS object
+Message-Id: <d99ca544-de44-422f-8bcd-cc9b53fd047b@linux.ibm.com>
+Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH v2 1/2] vfio-ccw: add force
+ unlimited prefetch property
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,86 +47,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, jcody@redhat.com, qemu-devel@nongnu.org, qemu-block@nongnu.org
+To: Cornelia Huck <cohuck@redhat.com>
+Cc: Dong Jia Shi <bjsdjshi@linux.ibm.com>, "Jason J. Herne" <jjherne@linux.ibm.com>, qemu-s390x@nongnu.org, qemu-devel@nongnu.org
 
-On 05/22/2018 10:43 PM, Fam Zheng wrote:
-> On Tue, 05/22 22:10, Paolo Bonzini wrote:
->> block/sheepdog.o has a 4M static variable that is 90% of QEMU's whole .bss
->> section.  Replace it with a heap-allocated block, and make it smaller too
->> since only the inode header is actually being used.
->>
->> bss size goes down from 4464280 to 269976.
->>
->> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
->> ---
->>  block/sheepdog.c | 21 +++++++++++----------
->>  1 file changed, 11 insertions(+), 10 deletions(-)
->>
->> diff --git a/block/sheepdog.c b/block/sheepdog.c
->> index 23cf5a8430..2068166e3e 100644
->> --- a/block/sheepdog.c
->> +++ b/block/sheepdog.c
->> @@ -2940,13 +2940,14 @@ static int sd_snapshot_list(BlockDriverState *bs, QEMUSnapshotInfo **psn_tab)
->>      QEMUSnapshotInfo *sn_tab = NULL;
->>      unsigned wlen, rlen;
->>      int found = 0;
->> -    static SheepdogInode inode;
->> +    SheepdogInode *inode;
->>      unsigned long *vdi_inuse;
->>      unsigned int start_nr;
->>      uint64_t hval;
->>      uint32_t vid;
->>  
->>      vdi_inuse = g_malloc(max);
->> +    inode = g_malloc(SD_INODE_HEADER_SIZE);
-> 
-> Should you g_free() it before returning?
 
-Oops good catch
 
+On 05/23/2018 06:59 PM, Cornelia Huck wrote:
+> On Wed, 23 May 2018 18:23:44 +0200
+> Halil Pasic <pasic@linux.ibm.com> wrote:
 > 
-> 
->>  
->>      fd = connect_to_sdog(s, &local_err);
->>      if (fd < 0) {
->> @@ -2989,7 +2990,7 @@ static int sd_snapshot_list(BlockDriverState *bs, QEMUSnapshotInfo **psn_tab)
->>          }
->>  
->>          /* we don't need to read entire object */
->> -        ret = read_object(fd, s->bs, (char *)&inode,
->> +        ret = read_object(fd, s->bs, (char *)inode,
->>                            vid_to_vdi_oid(vid),
->>                            0, SD_INODE_HEADER_SIZE, 0,
->>                            s->cache_flags);
->> @@ -2998,17 +2999,17 @@ static int sd_snapshot_list(BlockDriverState *bs, QEMUSnapshotInfo **psn_tab)
->>              continue;
->>          }
->>  
->> -        if (!strcmp(inode.name, s->name) && is_snapshot(&inode)) {
->> -            sn_tab[found].date_sec = inode.snap_ctime >> 32;
->> -            sn_tab[found].date_nsec = inode.snap_ctime & 0xffffffff;
->> -            sn_tab[found].vm_state_size = inode.vm_state_size;
->> -            sn_tab[found].vm_clock_nsec = inode.vm_clock_nsec;
->> +        if (!strcmp(inode->name, s->name) && is_snapshot(inode)) {
->> +            sn_tab[found].date_sec = inode->snap_ctime >> 32;
->> +            sn_tab[found].date_nsec = inode->snap_ctime & 0xffffffff;
->> +            sn_tab[found].vm_state_size = inode->vm_state_size;
->> +            sn_tab[found].vm_clock_nsec = inode->vm_clock_nsec;
->>  
->>              snprintf(sn_tab[found].id_str, sizeof(sn_tab[found].id_str),
->> -                     "%" PRIu32, inode.snap_id);
->> +                     "%" PRIu32, inode->snap_id);
->>              pstrcpy(sn_tab[found].name,
->> -                    MIN(sizeof(sn_tab[found].name), sizeof(inode.tag)),
->> -                    inode.tag);
->> +                    MIN(sizeof(sn_tab[found].name), sizeof(inode->tag)),
->> +                    inode->tag);
->>              found++;
->>          }
->>      }
->> -- 
->> 2.17.0
+>> On 05/23/2018 04:46 PM, Cornelia Huck wrote:
+>>>>>> +    if (!(sch->orb.ctrl0 & ORB_CTRL0_MASK_PFCH)) {
+>>>>>> +        if (!(vcdev->force_orb_pfch)) {
+>>>>>> +            warn_report("vfio-ccw requires PFCH flag set");
+>>>>>> +            sch_gen_unit_exception(sch);
+>>>>>> +            css_inject_io_interrupt(sch);
+>>>>>> +            return IOINST_CC_EXPECTED;
+>>>>>> +        } else {
+>>>>>> +            sch->orb.ctrl0 |= ORB_CTRL0_MASK_PFCH;
+>>>>>> +            WARN_ONCE(vcdev->warned_force_orb_pfch, "PFCH flag forced");
+>>>>> This message should probably mention vfio-ccw as well as the subchannel
+>>>>> id?
+>>>>>       
+>>>> I was thinking about this. I think all it would make sense to have a common
+>>>> prefix for all reports coming form vfio-ccw (QEMU). But then I was like, that
+>>>> is a separate patch.
+>>>>
+>>>> Maybe something like:
+>>>> vfio-ccw (xx.xx.xxxx): specific message
+>>>>
+>>>> OTOH we don't seem to do that elsewhere (git grep -e 'warn\|error_report\|error_setg' -- hw/s390x/).
+>>>> AFAIR the error_setg captures context (like, src, line, func) but does not
+>>>> necessarily report it. Another question is if this should be extended to
+>>>> hw/s390x/s390-ccw.c
+>>>>
+>>>> What do you think?
+>>> I'm not sure that makes sense, especially as not everything might
+>>> explicitly refer to a certain subchannel.
+>>>
+>>> Let's just add the subchannel id here? In this case, this is really a
+>>> useful piece of information (which device is showing this behaviour?)
+>>>    
 >>
->>
+>> The same applies to  warn_report("vfio-ccw requires PFCH flag set") (that is,
+>> on which device (that has no force-orb-pfch=on specified)  is the guest issuing
+>> ORBs with the PFCH unset), or?
+>> Should I go for
+>> "vfio-ccw (xx.xx.xxxx): vfio-ccw requires PFCH flag set"
+>> and
+>> "vfio-ccw (xx.xx.xxxx): PFCH flag forced"
+>> or just for the second one, or some third option?
 > 
+> Yes, it makes sense for both.
+> 
+> Related: Do we expect the guest driver to learn from its experience and
+> not try without pfch again? It is probably not very helpful if the logs
+> get filled with a lot of "vfio-ccw requires pfch" messages...
+> 
+
+Don't really know. Dong Jia is probably more qualified to answer that question.
+I don't expect the guest driver to do so. There are probably more intelligent
+strategies to deal with this, but the question is what do we gain in the end
+(linux guests are not affected). We should probably not overthink this.
+
+Regards,
+Halil
