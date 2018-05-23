@@ -1,33 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49280)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50806)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1fLRho-0003st-4X
-	for qemu-devel@nongnu.org; Wed, 23 May 2018 07:13:21 -0400
+	(envelope-from <quintela@redhat.com>) id 1fLRmj-0006Bm-Fw
+	for qemu-devel@nongnu.org; Wed, 23 May 2018 07:18:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1fLRhl-0005e9-Ej
-	for qemu-devel@nongnu.org; Wed, 23 May 2018 07:13:20 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:59816 helo=mx1.redhat.com)
+	(envelope-from <quintela@redhat.com>) id 1fLRmh-0007Av-5V
+	for qemu-devel@nongnu.org; Wed, 23 May 2018 07:18:25 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:44580 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1fLRhl-0005e2-Au
-	for qemu-devel@nongnu.org; Wed, 23 May 2018 07:13:17 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.5])
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1fLRmh-0007Aq-0P
+	for qemu-devel@nongnu.org; Wed, 23 May 2018 07:18:23 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.6])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id F02A24023112
-	for <qemu-devel@nongnu.org>; Wed, 23 May 2018 11:13:16 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id A827A7D83A
+	for <qemu-devel@nongnu.org>; Wed, 23 May 2018 11:18:22 +0000 (UTC)
 From: Juan Quintela <quintela@redhat.com>
-In-Reply-To: <20180426081815.GT9036@xz-mi> (Peter Xu's message of "Thu, 26 Apr
-	2018 16:18:15 +0800")
-References: <20180425112723.1111-1-quintela@redhat.com>
-	<20180425112723.1111-18-quintela@redhat.com>
-	<20180426081815.GT9036@xz-mi>
-Reply-To: quintela@redhat.com
-Date: Wed, 23 May 2018 13:13:12 +0200
-Message-ID: <87d0xmbp6f.fsf@secure.mitica>
-MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v12 17/21] migration: Create
- ram_multifd_page
+Date: Wed, 23 May 2018 13:18:06 +0200
+Message-Id: <20180523111817.1463-2-quintela@redhat.com>
+In-Reply-To: <20180523111817.1463-1-quintela@redhat.com>
+References: <20180523111817.1463-1-quintela@redhat.com>
+Subject: [Qemu-devel] [PATCH v13 01/12] migration: Create multipage support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,143 +29,167 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: qemu-devel@nongnu.org, dgilbert@redhat.com, lvivier@redhat.com
+To: qemu-devel@nongnu.org
+Cc: dgilbert@redhat.com, lvivier@redhat.com, peterx@redhat.com
 
-Peter Xu <peterx@redhat.com> wrote:
-> On Wed, Apr 25, 2018 at 01:27:19PM +0200, Juan Quintela wrote:
->> The function still don't use multifd, but we have simplified
->> ram_save_page, xbzrle and RDMA stuff is gone.  We have added a new
->> counter.
->> 
->> Signed-off-by: Juan Quintela <quintela@redhat.com>
->> 
->> --
->> Add last_page parameter
->> Add commets for done and address
->> Remove multifd field, it is the same than normal pages
->> Merge next patch, now we send multiple pages at a time
->> Remove counter for multifd pages, it is identical to normal pages
->> Use iovec's instead of creating the equivalent.
->> Clear memory used by pages (dave)
->> Use g_new0(danp)
->> define MULTIFD_CONTINUE
->> now pages member is a pointer
->> Fix off-by-one in number of pages in one packet
->> Remove RAM_SAVE_FLAG_MULTIFD_PAGE
->> s/multifd_pages_t/MultiFDPages_t/
->> ---
->>  migration/ram.c | 93 +++++++++++++++++++++++++++++++++++++++++++++++++
->>  1 file changed, 93 insertions(+)
->> 
->> diff --git a/migration/ram.c b/migration/ram.c
->> index 398cb0af3b..862ec53d32 100644
->> --- a/migration/ram.c
->> +++ b/migration/ram.c
->> @@ -54,6 +54,7 @@
->>  #include "migration/block.h"
->>  #include "sysemu/sysemu.h"
->>  #include "qemu/uuid.h"
->> +#include "qemu/iov.h"
->>  
->>  /***********************************************************/
->>  /* ram save/restore */
->> @@ -692,8 +693,65 @@ struct {
->>      QemuSemaphore sem_sync;
->>      /* global number of generated multifd packets */
->>      uint32_t seq;
->> +    /* send channels ready */
->> +    QemuSemaphore channels_ready;
->>  } *multifd_send_state;
->>  
->> +static void multifd_send_pages(void)
->> +{
->> +    int i;
->> +    static int next_channel;
->> +    MultiFDSendParams *p = NULL; /* make happy gcc */
->> +    MultiFDPages_t *pages = multifd_send_state->pages;
->> +
->> +    qemu_sem_wait(&multifd_send_state->channels_ready);
->
-> This sem is posted when a thread has finished its work.  However this
-> is called in the main migration thread.  If with this line, are the
-> threads really sending things in parallel?  Since it looks to me that
-> this function (and the main thread) won't send the 2nd page array if
-> the 1st hasn't finished, and won't send the 3rd if the 2nd hasn't,
-> vice versa...
->
-> Maybe I misunderstood something.  Please feel free to correct me.
+We only create/destry the page list here.  We will use it later.
 
-@@ -824,6 +888,7 @@ static void *multifd_send_thread(void *opaque)
-             if (flags & MULTIFD_FLAG_SYNC) {
-                 qemu_sem_post(&multifd_send_state->sem_sync);
-             }
-+            qemu_sem_post(&multifd_send_state->channels_ready);
-         } else if (p->quit) {
-             qemu_mutex_unlock(&p->mutex);
-             break;
+Signed-off-by: Juan Quintela <quintela@redhat.com>
+---
+ migration/ram.c | 57 +++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 57 insertions(+)
 
-
-Notice this bit on multifd_send_thread.  We are adding one to channels_ready.
-But we can enter there for two reasons:
-- we need to send a new packet full of pages
-- we need to send a syncronization packet.
-  this is what happens when we start.
-
-Before the main thread start, all the other channels have to be created,
-so we have that semaphore initialized to the right number of channels.
-
-How do you preffer this to be documented?
-
-Later, Juan.
-
-
-
->> +    for (i = next_channel;; i = (i + 1) % migrate_multifd_channels()) {
->> +        p = &multifd_send_state->params[i];
->> +
->> +        qemu_mutex_lock(&p->mutex);
->> +        if (!p->pending_job) {
->> +            p->pending_job++;
->> +            next_channel = (i + 1) % migrate_multifd_channels();
->> +            break;
->> +        }
->> +        qemu_mutex_unlock(&p->mutex);
->> +    }
->> +    p->pages->used = 0;
->> +    multifd_send_state->seq++;
->> +    p->seq = multifd_send_state->seq;
->> +    p->pages->block = NULL;
->> +    multifd_send_state->pages = p->pages;
->> +    p->pages = pages;
-
-[1]
-
->
-> Here we directly replaced MultiFDSendParams.pages with
-> multifd_send_state->pages.  Then are we always using a single
-> MultiFDPages_t struct?  And if so, will all the initial
-> MultiFDSendParams.pages memory leaked without freed?
-
-Multifdsend_state_pages is stored in pages variable.
-We stored it at [1].
-
-What we have (sending side) is:
-
-- 1 multifd_pages by channel
-- 1 multifd_pages by main thread
-
-What we do here is:
-
-  pages = multifd_send_state->pages;
-  multifd_send_state->pages = channel[i]->pages;
-  channel[i]->pages = pages;
-
-So we are just doing a swap.  We do that through the whole loop to have
-smaller names (ii.e. basically we do everything over pages->foo), buht
-the idea is what I put there. (Ok, what I called channel[i] is "p").
-
-But everywhere on that file (compression threads and multifd ones) use p
-to mean the parameters of a thread.
-
-Later, Juan.
+diff --git a/migration/ram.c b/migration/ram.c
+index 5bcbf7a9f9..23cc5625eb 100644
+--- a/migration/ram.c
++++ b/migration/ram.c
+@@ -510,6 +510,20 @@ typedef struct {
+     uint8_t id;
+ } __attribute__((packed)) MultiFDInit_t;
+ 
++typedef struct {
++    /* number of used pages */
++    uint32_t used;
++    /* number of allocated pages */
++    uint32_t allocated;
++    /* global number of generated multifd packets */
++    uint32_t seq;
++    /* offset of each page */
++    ram_addr_t *offset;
++    /* pointer to each page */
++    struct iovec *iov;
++    RAMBlock *block;
++} MultiFDPages_t;
++
+ typedef struct {
+     /* this fields are not changed once the thread is created */
+     /* channel number */
+@@ -528,6 +542,8 @@ typedef struct {
+     bool running;
+     /* should this thread finish */
+     bool quit;
++    /* array of pages to sent */
++    MultiFDPages_t *pages;
+ }  MultiFDSendParams;
+ 
+ typedef struct {
+@@ -548,6 +564,8 @@ typedef struct {
+     bool running;
+     /* should this thread finish */
+     bool quit;
++    /* array of pages to receive */
++    MultiFDPages_t *pages;
+ } MultiFDRecvParams;
+ 
+ static int multifd_send_initial_packet(MultiFDSendParams *p, Error **errp)
+@@ -612,10 +630,36 @@ static int multifd_recv_initial_packet(QIOChannel *c, Error **errp)
+     return msg.id;
+ }
+ 
++static MultiFDPages_t *multifd_pages_init(size_t size)
++{
++    MultiFDPages_t *pages = g_new0(MultiFDPages_t, 1);
++
++    pages->allocated = size;
++    pages->iov = g_new0(struct iovec, size);
++    pages->offset = g_new0(ram_addr_t, size);
++
++    return pages;
++}
++
++static void multifd_pages_clear(MultiFDPages_t *pages)
++{
++    pages->used = 0;
++    pages->allocated = 0;
++    pages->seq = 0;
++    pages->block = NULL;
++    g_free(pages->iov);
++    pages->iov = NULL;
++    g_free(pages->offset);
++    pages->offset = NULL;
++    g_free(pages);
++}
++
+ struct {
+     MultiFDSendParams *params;
+     /* number of created threads */
+     int count;
++    /* array of pages to sent */
++    MultiFDPages_t *pages;
+ } *multifd_send_state;
+ 
+ static void multifd_send_terminate_threads(Error *err)
+@@ -665,9 +709,13 @@ int multifd_save_cleanup(Error **errp)
+         qemu_sem_destroy(&p->sem);
+         g_free(p->name);
+         p->name = NULL;
++        multifd_pages_clear(p->pages);
++        p->pages = NULL;
+     }
+     g_free(multifd_send_state->params);
+     multifd_send_state->params = NULL;
++    multifd_pages_clear(multifd_send_state->pages);
++    multifd_send_state->pages = NULL;
+     g_free(multifd_send_state);
+     multifd_send_state = NULL;
+     return ret;
+@@ -728,6 +776,7 @@ static void multifd_new_send_channel_async(QIOTask *task, gpointer opaque)
+ int multifd_save_setup(void)
+ {
+     int thread_count;
++    uint32_t page_count = migrate_multifd_page_count();
+     uint8_t i;
+ 
+     if (!migrate_use_multifd()) {
+@@ -737,6 +786,8 @@ int multifd_save_setup(void)
+     multifd_send_state = g_malloc0(sizeof(*multifd_send_state));
+     multifd_send_state->params = g_new0(MultiFDSendParams, thread_count);
+     atomic_set(&multifd_send_state->count, 0);
++    multifd_send_state->pages = multifd_pages_init(page_count);
++
+     for (i = 0; i < thread_count; i++) {
+         MultiFDSendParams *p = &multifd_send_state->params[i];
+ 
+@@ -744,6 +795,7 @@ int multifd_save_setup(void)
+         qemu_sem_init(&p->sem, 0);
+         p->quit = false;
+         p->id = i;
++        p->pages = multifd_pages_init(page_count);
+         p->name = g_strdup_printf("multifdsend_%d", i);
+         socket_send_channel_create(multifd_new_send_channel_async, p);
+     }
+@@ -801,6 +853,8 @@ int multifd_load_cleanup(Error **errp)
+         qemu_sem_destroy(&p->sem);
+         g_free(p->name);
+         p->name = NULL;
++        multifd_pages_clear(p->pages);
++        p->pages = NULL;
+     }
+     g_free(multifd_recv_state->params);
+     multifd_recv_state->params = NULL;
+@@ -834,6 +888,7 @@ static void *multifd_recv_thread(void *opaque)
+ int multifd_load_setup(void)
+ {
+     int thread_count;
++    uint32_t page_count = migrate_multifd_page_count();
+     uint8_t i;
+ 
+     if (!migrate_use_multifd()) {
+@@ -843,6 +898,7 @@ int multifd_load_setup(void)
+     multifd_recv_state = g_malloc0(sizeof(*multifd_recv_state));
+     multifd_recv_state->params = g_new0(MultiFDRecvParams, thread_count);
+     atomic_set(&multifd_recv_state->count, 0);
++
+     for (i = 0; i < thread_count; i++) {
+         MultiFDRecvParams *p = &multifd_recv_state->params[i];
+ 
+@@ -850,6 +906,7 @@ int multifd_load_setup(void)
+         qemu_sem_init(&p->sem, 0);
+         p->quit = false;
+         p->id = i;
++        p->pages = multifd_pages_init(page_count);
+         p->name = g_strdup_printf("multifdrecv_%d", i);
+     }
+     return 0;
+-- 
+2.17.0
