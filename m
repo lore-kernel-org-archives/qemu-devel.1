@@ -1,23 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48914)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48937)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1fLUyv-0001pa-5x
-	for qemu-devel@nongnu.org; Wed, 23 May 2018 10:43:13 -0400
+	(envelope-from <mst@redhat.com>) id 1fLUyw-0001rI-Oi
+	for qemu-devel@nongnu.org; Wed, 23 May 2018 10:43:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1fLUyp-0000nP-Cp
-	for qemu-devel@nongnu.org; Wed, 23 May 2018 10:43:13 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:46940 helo=mx1.redhat.com)
+	(envelope-from <mst@redhat.com>) id 1fLUyw-0000pG-2J
+	for qemu-devel@nongnu.org; Wed, 23 May 2018 10:43:14 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:46954 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1fLUyp-0000nC-7y
-	for qemu-devel@nongnu.org; Wed, 23 May 2018 10:43:07 -0400
-Date: Wed, 23 May 2018 17:43:06 +0300
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1fLUyv-0000p7-TK
+	for qemu-devel@nongnu.org; Wed, 23 May 2018 10:43:13 -0400
+Date: Wed, 23 May 2018 17:43:12 +0300
 From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <1527086545-68024-12-git-send-email-mst@redhat.com>
+Message-ID: <1527086545-68024-17-git-send-email-mst@redhat.com>
 References: <1527086545-68024-1-git-send-email-mst@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 In-Reply-To: <1527086545-68024-1-git-send-email-mst@redhat.com>
-Subject: [Qemu-devel] [PULL 11/28] linux-headers: add kvm header for mips
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL 16/28] libvhost-user: Send messages with no data
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,70 +28,52 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>
+Cc: Peter Maydell <peter.maydell@linaro.org>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>, Maxime Coquelin <maxime.coquelin@redhat.com>, Yongji Xie <xieyongji@baidu.com>
 
-kvm header for MIPS was manually excluded from auto-updates.
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-Update it now to 4.17-rc2.
+The response to a VHOST_USER_POSTCOPY_ADVISE contains a fd but doesn't
+actually contain any data.   FIx vu_message_write so that it doesn't
+do a 0-byte write() call, since this was ending up with rc=3D0
+that was confusing the error handling code.
 
+Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
 ---
- linux-headers/asm-mips/kvm.h | 25 ++++++++++++++++++++++---
- 1 file changed, 22 insertions(+), 3 deletions(-)
+ contrib/libvhost-user/libvhost-user.c | 16 +++++++++-------
+ 1 file changed, 9 insertions(+), 7 deletions(-)
 
-diff --git a/linux-headers/asm-mips/kvm.h b/linux-headers/asm-mips/kvm.h
-index 6985eb5..edcf717 100644
---- a/linux-headers/asm-mips/kvm.h
-+++ b/linux-headers/asm-mips/kvm.h
-@@ -1,3 +1,4 @@
-+/* SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note */
- /*
-  * This file is subject to the terms and conditions of the GNU General Public
-  * License.  See the file "COPYING" in the main directory of this archive
-@@ -19,6 +20,10 @@
-  * Some parts derived from the x86 version of this file.
-  */
- 
-+#define __KVM_HAVE_READONLY_MEM
-+
-+#define KVM_COALESCED_MMIO_PAGE_OFFSET 1
-+
- /*
-  * for KVM_GET_REGS and KVM_SET_REGS
-  *
-@@ -52,9 +57,14 @@ struct kvm_fpu {
-  * Register set = 0: GP registers from kvm_regs (see definitions below).
-  *
-  * Register set = 1: CP0 registers.
-- *  bits[15..8]  - Must be zero.
-- *  bits[7..3]   - Register 'rd'  index.
-- *  bits[2..0]   - Register 'sel' index.
-+ *  bits[15..8]  - COP0 register set.
-+ *
-+ *  COP0 register set = 0: Main CP0 registers.
-+ *   bits[7..3]   - Register 'rd'  index.
-+ *   bits[2..0]   - Register 'sel' index.
-+ *
-+ *  COP0 register set = 1: MAARs.
-+ *   bits[7..0]   - MAAR index.
-  *
-  * Register set = 2: KVM specific registers (see definitions below).
-  *
-@@ -113,6 +123,15 @@ struct kvm_fpu {
- 
- 
- /*
-+ * KVM_REG_MIPS_CP0 - Coprocessor 0 registers.
-+ */
-+
-+#define KVM_REG_MIPS_MAAR	(KVM_REG_MIPS_CP0 | (1 << 8))
-+#define KVM_REG_MIPS_CP0_MAAR(n)	(KVM_REG_MIPS_MAAR | \
-+					 KVM_REG_SIZE_U64 | (n))
-+
-+
-+/*
-  * KVM_REG_MIPS_KVM - KVM specific control registers.
-  */
- 
--- 
+diff --git a/contrib/libvhost-user/libvhost-user.c b/contrib/libvhost-use=
+r/libvhost-user.c
+index beeed0c..54e643d 100644
+--- a/contrib/libvhost-user/libvhost-user.c
++++ b/contrib/libvhost-user/libvhost-user.c
+@@ -323,13 +323,15 @@ vu_message_write(VuDev *dev, int conn_fd, VhostUser=
+Msg *vmsg)
+         rc =3D sendmsg(conn_fd, &msg, 0);
+     } while (rc < 0 && (errno =3D=3D EINTR || errno =3D=3D EAGAIN));
+=20
+-    do {
+-        if (vmsg->data) {
+-            rc =3D write(conn_fd, vmsg->data, vmsg->size);
+-        } else {
+-            rc =3D write(conn_fd, p + VHOST_USER_HDR_SIZE, vmsg->size);
+-        }
+-    } while (rc < 0 && (errno =3D=3D EINTR || errno =3D=3D EAGAIN));
++    if (vmsg->size) {
++        do {
++            if (vmsg->data) {
++                rc =3D write(conn_fd, vmsg->data, vmsg->size);
++            } else {
++                rc =3D write(conn_fd, p + VHOST_USER_HDR_SIZE, vmsg->siz=
+e);
++            }
++        } while (rc < 0 && (errno =3D=3D EINTR || errno =3D=3D EAGAIN));
++    }
+=20
+     if (rc <=3D 0) {
+         vu_panic(dev, "Error while writing: %s", strerror(errno));
+--=20
 MST
