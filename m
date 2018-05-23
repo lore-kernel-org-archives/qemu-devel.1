@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42007)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42027)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mjc@sifive.com>) id 1fLHSg-0007qp-4U
-	for qemu-devel@nongnu.org; Tue, 22 May 2018 20:17:04 -0400
+	(envelope-from <mjc@sifive.com>) id 1fLHSk-0007t2-JJ
+	for qemu-devel@nongnu.org; Tue, 22 May 2018 20:17:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mjc@sifive.com>) id 1fLHSf-0000Zu-2L
-	for qemu-devel@nongnu.org; Tue, 22 May 2018 20:17:02 -0400
-Received: from mail-pg0-x234.google.com ([2607:f8b0:400e:c05::234]:37752)
+	(envelope-from <mjc@sifive.com>) id 1fLHSj-0000c5-4I
+	for qemu-devel@nongnu.org; Tue, 22 May 2018 20:17:06 -0400
+Received: from mail-pf0-x242.google.com ([2607:f8b0:400e:c00::242]:36915)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <mjc@sifive.com>) id 1fLHSe-0000ZL-T4
-	for qemu-devel@nongnu.org; Tue, 22 May 2018 20:17:01 -0400
-Received: by mail-pg0-x234.google.com with SMTP id a13-v6so8571054pgu.4
-	for <qemu-devel@nongnu.org>; Tue, 22 May 2018 17:17:00 -0700 (PDT)
+	(Exim 4.71) (envelope-from <mjc@sifive.com>) id 1fLHSi-0000bh-RP
+	for qemu-devel@nongnu.org; Tue, 22 May 2018 20:17:05 -0400
+Received: by mail-pf0-x242.google.com with SMTP id e9-v6so9563014pfi.4
+	for <qemu-devel@nongnu.org>; Tue, 22 May 2018 17:17:04 -0700 (PDT)
 From: Michael Clark <mjc@sifive.com>
-Date: Wed, 23 May 2018 12:14:51 +1200
-Message-Id: <1527034517-7851-5-git-send-email-mjc@sifive.com>
+Date: Wed, 23 May 2018 12:14:52 +1200
+Message-Id: <1527034517-7851-6-git-send-email-mjc@sifive.com>
 In-Reply-To: <1527034517-7851-1-git-send-email-mjc@sifive.com>
 References: <1527034517-7851-1-git-send-email-mjc@sifive.com>
-Subject: [Qemu-devel] [PATCH v1 04/30] RISC-V: Simplify
- riscv_cpu_local_irqs_pending
+Subject: [Qemu-devel] [PATCH v1 05/30] RISC-V: Allow setting and clearing
+ multiple irqs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,71 +29,180 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: patches@groups.riscv.org, Michael Clark <mjc@sifive.com>, Sagar Karandikar <sagark@eecs.berkeley.edu>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Palmer Dabbelt <palmer@sifive.com>, Alistair Francis <Alistair.Francis@wdc.com>
 
-This commit is intended to improve readability.
-There is no change to the logic.
+Change the API of riscv_set_local_interrupt to take a
+write mask and value to allow setting and clearing of
+multiple local interrupts atomically in a single call.
+Rename the new function to riscv_cpu_update_mip.
 
 Cc: Sagar Karandikar <sagark@eecs.berkeley.edu>
 Cc: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
 Cc: Palmer Dabbelt <palmer@sifive.com>
 Cc: Alistair Francis <Alistair.Francis@wdc.com>
 Signed-off-by: Michael Clark <mjc@sifive.com>
-Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 ---
- target/riscv/helper.c | 34 ++++++++++++----------------------
- 1 file changed, 12 insertions(+), 22 deletions(-)
+ hw/riscv/sifive_clint.c  |  8 ++++----
+ hw/riscv/sifive_plic.c   |  4 ++--
+ target/riscv/cpu.h       | 22 +++++++++++++---------
+ target/riscv/op_helper.c | 24 +++++++++++++++---------
+ 4 files changed, 34 insertions(+), 24 deletions(-)
 
-diff --git a/target/riscv/helper.c b/target/riscv/helper.c
-index 3b57e1360549..47d116e9c13f 100644
---- a/target/riscv/helper.c
-+++ b/target/riscv/helper.c
-@@ -35,28 +35,18 @@ int riscv_cpu_mmu_index(CPURISCVState *env, bool ifetch)
+diff --git a/hw/riscv/sifive_clint.c b/hw/riscv/sifive_clint.c
+index 7cc606e06546..0d2fd52487e6 100644
+--- a/hw/riscv/sifive_clint.c
++++ b/hw/riscv/sifive_clint.c
+@@ -47,12 +47,12 @@ static void sifive_clint_write_timecmp(RISCVCPU *cpu, uint64_t value)
+     if (cpu->env.timecmp <= rtc_r) {
+         /* if we're setting an MTIMECMP value in the "past",
+            immediately raise the timer interrupt */
+-        riscv_set_local_interrupt(cpu, MIP_MTIP, 1);
++        riscv_cpu_update_mip(cpu, MIP_MTIP, BOOL_TO_MASK(1));
+         return;
+     }
+ 
+     /* otherwise, set up the future timer interrupt */
+-    riscv_set_local_interrupt(cpu, MIP_MTIP, 0);
++    riscv_cpu_update_mip(cpu, MIP_MTIP, BOOL_TO_MASK(0));
+     diff = cpu->env.timecmp - rtc_r;
+     /* back to ns (note args switched in muldiv64) */
+     next = qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) +
+@@ -67,7 +67,7 @@ static void sifive_clint_write_timecmp(RISCVCPU *cpu, uint64_t value)
+ static void sifive_clint_timer_cb(void *opaque)
+ {
+     RISCVCPU *cpu = opaque;
+-    riscv_set_local_interrupt(cpu, MIP_MTIP, 1);
++    riscv_cpu_update_mip(cpu, MIP_MTIP, BOOL_TO_MASK(1));
  }
  
- #ifndef CONFIG_USER_ONLY
--/*
-- * Return RISC-V IRQ number if an interrupt should be taken, else -1.
-- * Used in cpu-exec.c
-- *
-- * Adapted from Spike's processor_t::take_interrupt()
-- */
--static int riscv_cpu_hw_interrupts_pending(CPURISCVState *env)
-+static int riscv_cpu_local_irq_pending(CPURISCVState *env)
- {
--    target_ulong pending_interrupts = atomic_read(&env->mip) & env->mie;
--
--    target_ulong mie = get_field(env->mstatus, MSTATUS_MIE);
--    target_ulong m_enabled = env->priv < PRV_M || (env->priv == PRV_M && mie);
--    target_ulong enabled_interrupts = pending_interrupts &
--                                      ~env->mideleg & -m_enabled;
--
--    target_ulong sie = get_field(env->mstatus, MSTATUS_SIE);
--    target_ulong s_enabled = env->priv < PRV_S || (env->priv == PRV_S && sie);
--    enabled_interrupts |= pending_interrupts & env->mideleg &
--                          -s_enabled;
--
--    if (enabled_interrupts) {
--        return ctz64(enabled_interrupts); /* since non-zero */
-+    target_ulong mstatus_mie = get_field(env->mstatus, MSTATUS_MIE);
-+    target_ulong mstatus_sie = get_field(env->mstatus, MSTATUS_SIE);
-+    target_ulong pending = atomic_read(&env->mip) & env->mie;
-+    target_ulong mie = env->priv < PRV_M || (env->priv == PRV_M && mstatus_mie);
-+    target_ulong sie = env->priv < PRV_S || (env->priv == PRV_S && mstatus_sie);
-+    target_ulong irqs = (pending & ~env->mideleg & -mie) |
-+                        (pending &  env->mideleg & -sie);
+ /* CPU wants to read rtc or timecmp register */
+@@ -132,7 +132,7 @@ static void sifive_clint_write(void *opaque, hwaddr addr, uint64_t value,
+         if (!env) {
+             error_report("clint: invalid timecmp hartid: %zu", hartid);
+         } else if ((addr & 0x3) == 0) {
+-            riscv_set_local_interrupt(RISCV_CPU(cpu), MIP_MSIP, value != 0);
++            riscv_cpu_update_mip(RISCV_CPU(cpu), MIP_MSIP, BOOL_TO_MASK(value));
+         } else {
+             error_report("clint: invalid sip write: %08x", (uint32_t)addr);
+         }
+diff --git a/hw/riscv/sifive_plic.c b/hw/riscv/sifive_plic.c
+index 1af23c76e603..b267ff88902d 100644
+--- a/hw/riscv/sifive_plic.c
++++ b/hw/riscv/sifive_plic.c
+@@ -142,10 +142,10 @@ static void sifive_plic_update(SiFivePLICState *plic)
+         int level = sifive_plic_irqs_pending(plic, addrid);
+         switch (mode) {
+         case PLICMode_M:
+-            riscv_set_local_interrupt(RISCV_CPU(cpu), MIP_MEIP, level);
++            riscv_cpu_update_mip(RISCV_CPU(cpu), MIP_MEIP, BOOL_TO_MASK(level));
+             break;
+         case PLICMode_S:
+-            riscv_set_local_interrupt(RISCV_CPU(cpu), MIP_SEIP, level);
++            riscv_cpu_update_mip(RISCV_CPU(cpu), MIP_SEIP, BOOL_TO_MASK(level));
+             break;
+         default:
+             break;
+diff --git a/target/riscv/cpu.h b/target/riscv/cpu.h
+index e0608e6d5f08..c5d485769cde 100644
+--- a/target/riscv/cpu.h
++++ b/target/riscv/cpu.h
+@@ -126,13 +126,18 @@ struct CPURISCVState {
+ 
+     target_ulong mhartid;
+     target_ulong mstatus;
 +
-+    if (irqs) {
-+        return ctz64(irqs); /* since non-zero */
-     } else {
-         return EXCP_NONE; /* indicates no pending interrupt */
+     /*
+      * CAUTION! Unlike the rest of this struct, mip is accessed asynchonously
+-     * by I/O threads and other vCPUs, so hold the iothread mutex before
+-     * operating on it.  CPU_INTERRUPT_HARD should be in effect iff this is
+-     * non-zero.  Use riscv_cpu_set_local_interrupt.
++     * by I/O threads. It should be read with atomic_read. It should be updated
++     * using riscv_cpu_update_mip with the iothread mutex held. The iothread
++     * mutex must be held because mip must be consistent with the CPU inturrept
++     * state. riscv_cpu_update_mip calls cpu_interrupt or cpu_reset_interrupt
++     * wuth the invariant that CPU_INTERRUPT_HARD is set iff mip is non-zero.
++     * mip is 32-bits to allow atomic_read on 32-bit hosts.
+      */
+-    uint32_t mip;        /* allow atomic_read for >= 32-bit hosts */
++    uint32_t mip;
++
+     target_ulong mie;
+     target_ulong mideleg;
+ 
+@@ -247,7 +252,6 @@ void  riscv_cpu_do_unaligned_access(CPUState *cs, vaddr addr,
+                                     uintptr_t retaddr);
+ int riscv_cpu_handle_mmu_fault(CPUState *cpu, vaddr address, int size,
+                               int rw, int mmu_idx);
+-
+ char *riscv_isa_string(RISCVCPU *cpu);
+ void riscv_cpu_list(FILE *f, fprintf_function cpu_fprintf);
+ 
+@@ -256,6 +260,10 @@ void riscv_cpu_list(FILE *f, fprintf_function cpu_fprintf);
+ #define cpu_list riscv_cpu_list
+ #define cpu_mmu_index riscv_cpu_mmu_index
+ 
++#ifndef CONFIG_USER_ONLY
++uint32_t riscv_cpu_update_mip(RISCVCPU *cpu, uint32_t mask, uint32_t value);
++#define BOOL_TO_MASK(x) (-!!(x)) /* helper for riscv_cpu_update_mip value */
++#endif
+ void riscv_set_mode(CPURISCVState *env, target_ulong newpriv);
+ 
+ void riscv_translate_init(void);
+@@ -286,10 +294,6 @@ void csr_write_helper(CPURISCVState *env, target_ulong val_to_write,
+         target_ulong csrno);
+ target_ulong csr_read_helper(CPURISCVState *env, target_ulong csrno);
+ 
+-#ifndef CONFIG_USER_ONLY
+-void riscv_set_local_interrupt(RISCVCPU *cpu, target_ulong mask, int value);
+-#endif
+-
+ #include "exec/cpu-all.h"
+ 
+ #endif /* RISCV_CPU_H */
+diff --git a/target/riscv/op_helper.c b/target/riscv/op_helper.c
+index 3abf52453cfc..5a02795bf931 100644
+--- a/target/riscv/op_helper.c
++++ b/target/riscv/op_helper.c
+@@ -171,10 +171,8 @@ void csr_write_helper(CPURISCVState *env, target_ulong val_to_write,
+          */
+         qemu_mutex_lock_iothread();
+         RISCVCPU *cpu = riscv_env_get_cpu(env);
+-        riscv_set_local_interrupt(cpu, MIP_SSIP,
+-                                  (val_to_write & MIP_SSIP) != 0);
+-        riscv_set_local_interrupt(cpu, MIP_STIP,
+-                                  (val_to_write & MIP_STIP) != 0);
++        riscv_cpu_update_mip(cpu, MIP_SSIP | MIP_STIP,
++                                  (val_to_write & (MIP_SSIP | MIP_STIP)));
+         /*
+          * csrs, csrc on mip.SEIP is not decomposable into separate read and
+          * write steps, so a different implementation is needed
+@@ -655,16 +653,24 @@ target_ulong helper_csrrc(CPURISCVState *env, target_ulong src,
+ #ifndef CONFIG_USER_ONLY
+ 
+ /* iothread_mutex must be held */
+-void riscv_set_local_interrupt(RISCVCPU *cpu, target_ulong mask, int value)
++uint32_t riscv_cpu_update_mip(RISCVCPU *cpu, uint32_t mask, uint32_t value)
+ {
+-    target_ulong old_mip = cpu->env.mip;
+-    cpu->env.mip = (old_mip & ~mask) | (value ? mask : 0);
++    CPURISCVState *env = &cpu->env;
++    uint32_t old, new, cmp = atomic_read(&env->mip);
+ 
+-    if (cpu->env.mip && !old_mip) {
++    do {
++        old = cmp;
++        new = (old & ~mask) | (value & mask);
++        cmp = atomic_cmpxchg(&env->mip, old, new);
++    } while (old != cmp);
++
++    if (new && !old) {
+         cpu_interrupt(CPU(cpu), CPU_INTERRUPT_HARD);
+-    } else if (!cpu->env.mip && old_mip) {
++    } else if (!new && old) {
+         cpu_reset_interrupt(CPU(cpu), CPU_INTERRUPT_HARD);
      }
-@@ -69,7 +59,7 @@ bool riscv_cpu_exec_interrupt(CPUState *cs, int interrupt_request)
-     if (interrupt_request & CPU_INTERRUPT_HARD) {
-         RISCVCPU *cpu = RISCV_CPU(cs);
-         CPURISCVState *env = &cpu->env;
--        int interruptno = riscv_cpu_hw_interrupts_pending(env);
-+        int interruptno = riscv_cpu_local_irq_pending(env);
-         if (interruptno >= 0) {
-             cs->exception_index = RISCV_EXCP_INT_FLAG | interruptno;
-             riscv_cpu_do_interrupt(cs);
++
++    return old;
+ }
+ 
+ void riscv_set_mode(CPURISCVState *env, target_ulong newpriv)
 -- 
 2.7.0
