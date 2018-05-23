@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35505)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36563)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fLYa4-0007ZE-1l
-	for qemu-devel@nongnu.org; Wed, 23 May 2018 14:33:48 -0400
+	(envelope-from <dan.j.williams@intel.com>) id 1fLYfH-0000Mn-1H
+	for qemu-devel@nongnu.org; Wed, 23 May 2018 14:39:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fLYa0-00033e-U3
-	for qemu-devel@nongnu.org; Wed, 23 May 2018 14:33:48 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:46668 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1fLYa0-00033B-Q1
-	for qemu-devel@nongnu.org; Wed, 23 May 2018 14:33:44 -0400
-References: <20180523115719.26679-1-f4bug@amsat.org>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <7f524be8-4807-64f1-7761-1d163524f2ec@redhat.com>
-Date: Wed, 23 May 2018 20:33:38 +0200
+	(envelope-from <dan.j.williams@intel.com>) id 1fLYfF-0004nf-QY
+	for qemu-devel@nongnu.org; Wed, 23 May 2018 14:39:11 -0400
+Received: from mail-oi0-x243.google.com ([2607:f8b0:4003:c06::243]:43600)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <dan.j.williams@intel.com>)
+	id 1fLYfF-0004nE-Iw
+	for qemu-devel@nongnu.org; Wed, 23 May 2018 14:39:09 -0400
+Received: by mail-oi0-x243.google.com with SMTP id p62-v6so20427478oie.10
+	for <qemu-devel@nongnu.org>; Wed, 23 May 2018 11:39:07 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20180523115719.26679-1-f4bug@amsat.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] tests: Allow GTESTER_OPTIONS variable
- expansion from command line
+In-Reply-To: <20180523140809.622F.E1E9C6FF@jp.fujitsu.com>
+References: <20180523140809.622F.E1E9C6FF@jp.fujitsu.com>
+From: Dan Williams <dan.j.williams@intel.com>
+Date: Wed, 23 May 2018 11:39:06 -0700
+Message-ID: <CAPcyv4g3pMV54bYwOOeMiFbi2swi5v9RTrBh8-_mtGpoOiw5XQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] Questions about vNVDIMM on qemu/KVM
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,54 +28,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Paolo Bonzini <pbonzini@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
-Cc: Juan Quintela <quintela@redhat.com>, qemu-devel@nongnu.org
+To: Yasunori Goto <y-goto@jp.fujitsu.com>
+Cc: Qemu Developers <qemu-devel@nongnu.org>, NVDIMM-ML <linux-nvdimm@lists.01.org>, Pankaj Gupta <pagupta@redhat.com>
 
-On 23.05.2018 13:57, Philippe Mathieu-Daud=C3=A9 wrote:
-> The gtester utility offers the "-p=3DTESTPATH" option to
-> "only run test cases matching TESTPATH".  We already use
-> a $GTESTER_OPTIONS variable.
-> Use make variable expansion to allow qtest path matching
-> from command line:
->=20
->   $ time make check-qtest-arm GTESTER_OPTIONS=3D"-p /arm/boot-serial"
->     GTESTER check-qtest-arm
->=20
->   user 0m1.548s
->=20
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-> ---
-> I am more interested in the "-s" option (exclude pattern) but
-> can't have it working :(
->=20
-> i.e. "run all but qom/hmp":
-> make check-qtest-arm GTESTER_OPTIONS=3D"-s /arm/qom -s /arm/hmp"
->=20
->  tests/Makefile.include | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->=20
-> diff --git a/tests/Makefile.include b/tests/Makefile.include
-> index 3b9a5e31a2..b0ff3d988c 100644
-> --- a/tests/Makefile.include
-> +++ b/tests/Makefile.include
-> @@ -870,7 +870,7 @@ tests/test-qga$(EXESUF): qemu-ga$(EXESUF)
->  tests/test-qga$(EXESUF): tests/test-qga.o $(qtest-obj-y)
-> =20
->  SPEED =3D quick
-> -GTESTER_OPTIONS =3D -k $(if $(V),--verbose,-q)
-> +GTESTER_OPTIONS +=3D -k $(if $(V),--verbose,-q)
->  GCOV_OPTIONS =3D -n $(if $(V),-f,)
-> =20
->  # gtester tests, possibly with verbose output
+On Tue, May 22, 2018 at 10:08 PM, Yasunori Goto <y-goto@jp.fujitsu.com> wrote:
+> Hello,
+>
+> I'm investigating status of vNVDIMM on qemu/KVM,
+> and I have some questions about it. I'm glad if anyone answer them.
+>
+> In my understanding, qemu/KVM has a feature to show NFIT for guest,
+> and it will be still updated about platform capability with this patch set.
+> https://lists.gnu.org/archive/html/qemu-devel/2018-05/msg04756.html
+>
+> And libvirt also supports this feature with <memory model='nvdimm'>
+> https://libvirt.org/formatdomain.html#elementsMemory
+>
+>
+> However, virtio-pmem is developing now, and it is better
+> for archtectures to detect regions of NVDIMM without ACPI (like s390x)
 
-"make check-help" says:
+I think you are confusing virtio-pmem (patches from Pankaj) and
+virtio-mem (patches from David)? ...or I'm confused.
 
- Default options are -k and (for make V=3D1) --verbose; they can be
- changed with variable GTESTER_OPTIONS.
+> In addition, It is also necessary to flush guest contents on vNVDIMM
+> who has a backend-file.
 
-So if you change the behavior here to amend to the variable instead, I
-think you should also adjust the help text. Not sure if it's a good
-idea, though, there might be people who want to run without "-k" and
-this can not be disabled anymore with your patch.
+virtio-pmem is a mechanism to use host page cache as pmem in a guest.
+It does not support high performance memory applications because it
+requires fsync/msync. I.e. it is not DAX it is the traditional mmap
+I/O model, but moving page cache management to the host rather than
+duplicating it in guests.
 
- Thomas
+> Q1) Does ACPI.NFIT bus of qemu/kvm remain with virtio-pmem?
+>     How do each roles become it if both NFIT and virtio-pmem will be available?
+>     If my understanding is correct, both NFIT and virtio-pmem is used to
+>     detect vNVDIMM regions, but only one seems to be necessary....
+
+We need both because they are different. Guest DAX should not be using
+virtio-pmem.
+
+>     Otherwize, is the NFIT bus just for keeping compatibility,
+>     and virtio-pmem is promising way?
+>
+>
+> Q2) What bus is(will be?) created for virtio-pmem?
+>     I could confirm the bus of NFIT is created with <memory model='nvdimm'>,
+>     and I heard other bus will be created for virtio-pmem, but I could not
+>     find what bus is created concretely.
+>     ---
+>       # ndctl list -B
+>       {
+>          "provider":"ACPI.NFIT",
+>          "dev":"ndbus0"
+>       }
+>     ---
+>
+>     I think it affects what operations user will be able to, and what
+>     notification is necessary for vNVDIMM.
+>     ACPI defines some operations like namespace controll, and notification
+>     for NVDIMM health status or others.
+>     (I suppose that other status notification might be necessary for vNVDIMM,
+>      but I'm not sure yet...)
+>
+> If my understanding is wrong, please correct me.
+
+The current plan, per my understanding, is a virtio-pmem SPA UUID
+added to the virtual NFIT so that the guest driver can load the pmem
+driver but also hook up the virtio command ring for forwarding
+WRITE_{FUA,FLUSH} commands as host fsync operations.
