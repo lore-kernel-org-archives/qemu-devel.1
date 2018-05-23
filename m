@@ -1,16 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53531)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53549)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fLTZq-0002j3-TP
-	for qemu-devel@nongnu.org; Wed, 23 May 2018 09:13:25 -0400
+	(envelope-from <armbru@redhat.com>) id 1fLTZw-0002ml-8o
+	for qemu-devel@nongnu.org; Wed, 23 May 2018 09:13:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fLTZe-0007PV-G1
-	for qemu-devel@nongnu.org; Wed, 23 May 2018 09:13:14 -0400
-From: Kevin Wolf <kwolf@redhat.com>
-Date: Wed, 23 May 2018 15:11:50 +0200
-Message-Id: <20180523131155.12359-42-kwolf@redhat.com>
-In-Reply-To: <20180523131155.12359-1-kwolf@redhat.com>
-References: <20180523131155.12359-1-kwolf@redhat.com>
-Subject: [Qemu-devel] [PULL 41/46] job: Add JOB_STATUS_CHANGE QMP event
+	(envelope-from <armbru@redhat.com>) id 1fLTZt-0007VK-Ft
+	for qemu-devel@nongnu.org; Wed, 23 May 2018 09:13:20 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:43432 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fLTZt-0007Uv-Bu
+	for qemu-devel@nongnu.org; Wed, 23 May 2018 09:13:17 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.5])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 51B018182D27
+	for <qemu-devel@nongnu.org>; Wed, 23 May 2018 13:13:16 +0000 (UTC)
+From: Markus Armbruster <armbru@redhat.com>
+References: <20180412061108.10875-1-peterx@redhat.com>
+	<87sh6iixvp.fsf@dusky.pond.sub.org> <20180523090450.GC2540@xz-mi>
+Date: Wed, 23 May 2018 15:13:07 +0200
+In-Reply-To: <20180523090450.GC2540@xz-mi> (Peter Xu's message of "Wed, 23 May
+	2018 17:04:50 +0800")
+Message-ID: <87vabeecrg.fsf@dusky.pond.sub.org>
+MIME-Version: 1.0
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v3] monitor: let cur_mon be per-thread
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -19,1321 +33,120 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-block@nongnu.org
-Cc: kwolf@redhat.com, qemu-devel@nongnu.org
+To: Peter Xu <peterx@redhat.com>
+Cc: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
 
-This adds a QMP event that is emitted whenever a job transitions from
-one status to another.
+Peter Xu <peterx@redhat.com> writes:
 
-Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
----
- qapi/job.json                 |  14 ++++
- job.c                         |  10 +++
- tests/qemu-iotests/030        |  17 +++-
- tests/qemu-iotests/040        |   2 +
- tests/qemu-iotests/041        |  17 +++-
- tests/qemu-iotests/094.out    |   7 ++
- tests/qemu-iotests/095        |   2 +-
- tests/qemu-iotests/095.out    |   6 ++
- tests/qemu-iotests/109        |   2 +-
- tests/qemu-iotests/109.out    | 178 ++++++++++++++++++++++++++++++++++++------
- tests/qemu-iotests/124        |   8 ++
- tests/qemu-iotests/127.out    |   7 ++
- tests/qemu-iotests/141        |  13 ++-
- tests/qemu-iotests/141.out    |  29 +++++++
- tests/qemu-iotests/144        |   2 +-
- tests/qemu-iotests/144.out    |   7 ++
- tests/qemu-iotests/156        |   2 +-
- tests/qemu-iotests/156.out    |   7 ++
- tests/qemu-iotests/185        |  12 +--
- tests/qemu-iotests/185.out    |  10 +++
- tests/qemu-iotests/191        |   4 +-
- tests/qemu-iotests/191.out    | 132 +++++++++++++++++++++++++++++++
- tests/qemu-iotests/iotests.py |   5 ++
- 23 files changed, 449 insertions(+), 44 deletions(-)
+> On Wed, May 23, 2018 at 10:23:22AM +0200, Markus Armbruster wrote:
+>> Peter Xu <peterx@redhat.com> writes:
+>> 
+>> > In the future the monitor iothread may be accessing the cur_mon as
+>> > well (via monitor_qmp_dispatch_one()).  Before we introduce a real
+>> > Out-Of-Band command,
+>> 
+>> Uh, inhowfar are the commands marked allow-oob: true now not real?
+>> These are migrate-recover, migrate-pause, x-oob-test.
+>
+> x-oob-test is unreal; the rest are real.
 
-diff --git a/qapi/job.json b/qapi/job.json
-index a472c0cb29..9fbdd0ccd9 100644
---- a/qapi/job.json
-+++ b/qapi/job.json
-@@ -92,3 +92,17 @@
- { 'enum': 'JobVerb',
-   'data': ['cancel', 'pause', 'resume', 'set-speed', 'complete', 'dismiss',
-            'finalize' ] }
-+
-+##
-+# @JOB_STATUS_CHANGE:
-+#
-+# Emitted when a job transitions to a different status.
-+#
-+# @id: The job identifier
-+# @status: The new job status
-+#
-+# Since: 2.13
-+##
-+{ 'event': 'JOB_STATUS_CHANGE',
-+  'data': { 'id': 'str',
-+            'status': 'JobStatus' } }
-diff --git a/job.c b/job.c
-index 2046d2f9d3..599a1042cf 100644
---- a/job.c
-+++ b/job.c
-@@ -30,6 +30,7 @@
- #include "qemu/id.h"
- #include "qemu/main-loop.h"
- #include "trace-root.h"
-+#include "qapi/qapi-events-job.h"
- 
- static QLIST_HEAD(, Job) jobs = QLIST_HEAD_INITIALIZER(jobs);
- 
-@@ -157,6 +158,11 @@ static int job_txn_apply(JobTxn *txn, int fn(Job *), bool lock)
-     return rc;
- }
- 
-+static bool job_is_internal(Job *job)
-+{
-+    return (job->id == NULL);
-+}
-+
- static void job_state_transition(Job *job, JobStatus s1)
- {
-     JobStatus s0 = job->status;
-@@ -166,6 +172,10 @@ static void job_state_transition(Job *job, JobStatus s1)
-                                JobStatus_str(s0), JobStatus_str(s1));
-     assert(JobSTT[s0][s1]);
-     job->status = s1;
-+
-+    if (!job_is_internal(job) && s1 != s0) {
-+        qapi_event_send_job_status_change(job->id, job->status, &error_abort);
-+    }
- }
- 
- int job_apply_verb(Job *job, JobVerb verb, Error **errp)
-diff --git a/tests/qemu-iotests/030 b/tests/qemu-iotests/030
-index 640a6dfd10..1dbc2ddc49 100755
---- a/tests/qemu-iotests/030
-+++ b/tests/qemu-iotests/030
-@@ -304,8 +304,7 @@ class TestParallelOps(iotests.QMPTestCase):
-         result = self.vm.qmp('block-stream', device='node5', base=self.imgs[3], job_id='stream-node6')
-         self.assert_qmp(result, 'error/class', 'GenericError')
- 
--        event = self.vm.get_qmp_event(wait=True)
--        self.assertEqual(event['event'], 'BLOCK_JOB_READY')
-+        event = self.vm.event_wait(name='BLOCK_JOB_READY')
-         self.assert_qmp(event, 'data/device', 'commit-drive0')
-         self.assert_qmp(event, 'data/type', 'commit')
-         self.assert_qmp_absent(event, 'data/error')
-@@ -565,6 +564,8 @@ class TestEIO(TestErrors):
-                     self.assert_qmp(event, 'data/offset', self.STREAM_BUFFER_SIZE)
-                     self.assert_qmp(event, 'data/len', self.image_len)
-                     completed = True
-+                elif event['event'] == 'JOB_STATUS_CHANGE':
-+                    self.assert_qmp(event, 'data/id', 'drive0')
- 
-         self.assert_no_active_block_jobs()
-         self.vm.shutdown()
-@@ -596,6 +597,8 @@ class TestEIO(TestErrors):
-                     self.assert_qmp(event, 'data/offset', self.image_len)
-                     self.assert_qmp(event, 'data/len', self.image_len)
-                     completed = True
-+                elif event['event'] == 'JOB_STATUS_CHANGE':
-+                    self.assert_qmp(event, 'data/id', 'drive0')
- 
-         self.assert_no_active_block_jobs()
-         self.vm.shutdown()
-@@ -637,6 +640,8 @@ class TestEIO(TestErrors):
-                     self.assert_qmp(event, 'data/offset', self.image_len)
-                     self.assert_qmp(event, 'data/len', self.image_len)
-                     completed = True
-+                elif event['event'] == 'JOB_STATUS_CHANGE':
-+                    self.assert_qmp(event, 'data/id', 'drive0')
- 
-         self.assert_no_active_block_jobs()
-         self.vm.shutdown()
-@@ -663,6 +668,8 @@ class TestEIO(TestErrors):
-                     self.assert_qmp(event, 'data/offset', self.STREAM_BUFFER_SIZE)
-                     self.assert_qmp(event, 'data/len', self.image_len)
-                     completed = True
-+                elif event['event'] == 'JOB_STATUS_CHANGE':
-+                    self.assert_qmp(event, 'data/id', 'drive0')
- 
-         self.assert_no_active_block_jobs()
-         self.vm.shutdown()
-@@ -722,6 +729,8 @@ class TestENOSPC(TestErrors):
-                     self.assert_qmp(event, 'data/offset', self.image_len)
-                     self.assert_qmp(event, 'data/len', self.image_len)
-                     completed = True
-+                elif event['event'] == 'JOB_STATUS_CHANGE':
-+                    self.assert_qmp(event, 'data/id', 'drive0')
- 
-         self.assert_no_active_block_jobs()
-         self.vm.shutdown()
-@@ -751,7 +760,9 @@ class TestStreamStop(iotests.QMPTestCase):
- 
-         time.sleep(0.1)
-         events = self.vm.get_qmp_events(wait=False)
--        self.assertEqual(events, [], 'unexpected QMP event: %s' % events)
-+        for e in events:
-+            self.assert_qmp(e, 'event', 'JOB_STATUS_CHANGE')
-+            self.assert_qmp(e, 'data/id', 'drive0')
- 
-         self.cancel_and_wait(resume=True)
- 
-diff --git a/tests/qemu-iotests/040 b/tests/qemu-iotests/040
-index 90b5b4f2ad..1beb5e6dab 100755
---- a/tests/qemu-iotests/040
-+++ b/tests/qemu-iotests/040
-@@ -162,6 +162,8 @@ class TestSingleDrive(ImageCommitTestCase):
-                 elif event['event'] == 'BLOCK_JOB_CANCELLED':
-                     self.assert_qmp(event, 'data/device', 'drive0')
-                     cancelled = True
-+                elif event['event'] == 'JOB_STATUS_CHANGE':
-+                    self.assert_qmp(event, 'data/id', 'drive0')
-                 else:
-                     self.fail("Unexpected event %s" % (event['event']))
- 
-diff --git a/tests/qemu-iotests/041 b/tests/qemu-iotests/041
-index a860a31e9a..e94587950c 100755
---- a/tests/qemu-iotests/041
-+++ b/tests/qemu-iotests/041
-@@ -445,6 +445,8 @@ new_state = "1"
-                     self.assert_qmp(event, 'data/device', 'drive0')
-                     self.assert_qmp(event, 'data/error', 'Input/output error')
-                     completed = True
-+                elif event['event'] == 'JOB_STATUS_CHANGE':
-+                    self.assert_qmp(event, 'data/id', 'drive0')
- 
-         self.assert_no_active_block_jobs()
-         self.vm.shutdown()
-@@ -457,6 +459,10 @@ new_state = "1"
-         self.assert_qmp(result, 'return', {})
- 
-         event = self.vm.get_qmp_event(wait=True)
-+        while event['event'] == 'JOB_STATUS_CHANGE':
-+            self.assert_qmp(event, 'data/id', 'drive0')
-+            event = self.vm.get_qmp_event(wait=True)
-+
-         self.assertEquals(event['event'], 'BLOCK_JOB_ERROR')
-         self.assert_qmp(event, 'data/device', 'drive0')
-         self.assert_qmp(event, 'data/operation', 'read')
-@@ -478,6 +484,10 @@ new_state = "1"
-         self.assert_qmp(result, 'return', {})
- 
-         event = self.vm.get_qmp_event(wait=True)
-+        while event['event'] == 'JOB_STATUS_CHANGE':
-+            self.assert_qmp(event, 'data/id', 'drive0')
-+            event = self.vm.get_qmp_event(wait=True)
-+
-         self.assertEquals(event['event'], 'BLOCK_JOB_ERROR')
-         self.assert_qmp(event, 'data/device', 'drive0')
-         self.assert_qmp(event, 'data/operation', 'read')
-@@ -608,7 +618,7 @@ new_state = "1"
-                              on_target_error='ignore')
-         self.assert_qmp(result, 'return', {})
- 
--        event = self.vm.get_qmp_event(wait=True)
-+        event = self.vm.event_wait(name='BLOCK_JOB_ERROR')
-         self.assertEquals(event['event'], 'BLOCK_JOB_ERROR')
-         self.assert_qmp(event, 'data/device', 'drive0')
-         self.assert_qmp(event, 'data/operation', 'write')
-@@ -784,7 +794,12 @@ class TestGranularity(iotests.QMPTestCase):
-                              sync='full', target=target_img,
-                              mode='absolute-paths', granularity=8192)
-         self.assert_qmp(result, 'return', {})
-+
-         event = self.vm.get_qmp_event(wait=60.0)
-+        while event['event'] == 'JOB_STATUS_CHANGE':
-+            self.assert_qmp(event, 'data/id', 'drive0')
-+            event = self.vm.get_qmp_event(wait=60.0)
-+
-         # Failures will manifest as COMPLETED/ERROR.
-         self.assert_qmp(event, 'event', 'BLOCK_JOB_READY')
-         self.complete_and_wait(drive='drive0', wait_ready=False)
-diff --git a/tests/qemu-iotests/094.out b/tests/qemu-iotests/094.out
-index f52baffe70..665b630b08 100644
---- a/tests/qemu-iotests/094.out
-+++ b/tests/qemu-iotests/094.out
-@@ -2,10 +2,17 @@ QA output created by 094
- Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=67108864
- Formatting 'TEST_DIR/source.IMGFMT', fmt=IMGFMT size=67108864
- {"return": {}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "created", "id": "src"}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "running", "id": "src"}}
- {"return": {}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "ready", "id": "src"}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_READY", "data": {"device": "src", "len": 67108864, "offset": 67108864, "speed": 0, "type": "mirror"}}
- {"return": {}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "waiting", "id": "src"}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "pending", "id": "src"}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_COMPLETED", "data": {"device": "src", "len": 67108864, "offset": 67108864, "speed": 0, "type": "mirror"}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "concluded", "id": "src"}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "null", "id": "src"}}
- {"return": {}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
- *** done
-diff --git a/tests/qemu-iotests/095 b/tests/qemu-iotests/095
-index 030adb22e1..72ecc22e1b 100755
---- a/tests/qemu-iotests/095
-+++ b/tests/qemu-iotests/095
-@@ -72,7 +72,7 @@ _send_qemu_cmd $h "{ 'execute': 'qmp_capabilities' }" "return"
- 
- _send_qemu_cmd $h "{ 'execute': 'block-commit',
-                                  'arguments': { 'device': 'test',
--                                 'top': '"${TEST_IMG}.snp1"' } }" "BLOCK_JOB_COMPLETED"
-+                                 'top': '"${TEST_IMG}.snp1"' } }" '"status": "null"'
- 
- _cleanup_qemu
- 
-diff --git a/tests/qemu-iotests/095.out b/tests/qemu-iotests/095.out
-index 73875cab40..8c093dfff3 100644
---- a/tests/qemu-iotests/095.out
-+++ b/tests/qemu-iotests/095.out
-@@ -11,8 +11,14 @@ virtual size: 5.0M (5242880 bytes)
- === Running QEMU Live Commit Test ===
- 
- {"return": {}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "created", "id": "test"}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "running", "id": "test"}}
- {"return": {}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "waiting", "id": "test"}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "pending", "id": "test"}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_COMPLETED", "data": {"device": "test", "len": 104857600, "offset": 104857600, "speed": 0, "type": "commit"}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "concluded", "id": "test"}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "null", "id": "test"}}
- 
- === Base image info after commit and resize ===
- image: TEST_DIR/t.IMGFMT.base
-diff --git a/tests/qemu-iotests/109 b/tests/qemu-iotests/109
-index d70b574d88..acbd079136 100755
---- a/tests/qemu-iotests/109
-+++ b/tests/qemu-iotests/109
-@@ -64,7 +64,7 @@ function run_qemu()
- 
-     _send_qemu_cmd $QEMU_HANDLE '' "$qmp_event"
-     if test "$qmp_event" = BLOCK_JOB_ERROR; then
--        _send_qemu_cmd $QEMU_HANDLE '' "BLOCK_JOB_COMPLETED"
-+        _send_qemu_cmd $QEMU_HANDLE '' '"status": "null"'
-     fi
-     _send_qemu_cmd $QEMU_HANDLE '{"execute":"query-block-jobs"}' "return"
-     _send_qemu_cmd $QEMU_HANDLE '{"execute":"quit"}' "return"
-diff --git a/tests/qemu-iotests/109.out b/tests/qemu-iotests/109.out
-index 8a9b93672b..ad0ee6fb48 100644
---- a/tests/qemu-iotests/109.out
-+++ b/tests/qemu-iotests/109.out
-@@ -6,23 +6,35 @@ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=67108864
- Formatting 'TEST_DIR/t.raw.src', fmt=IMGFMT size=67108864
- {"return": {}}
- WARNING: Image format was not specified for 'TEST_DIR/t.raw' and probing guessed raw.
--Automatically detecting the format is dangerous for raw images, write operations on block 0 will be restricted.
--Specify the 'raw' format explicitly to remove the restrictions.
-+         Automatically detecting the format is dangerous for raw images, write operations on block 0 will be restricted.
-+         Specify the 'raw' format explicitly to remove the restrictions.
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "created", "id": "src"}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "running", "id": "src"}}
- {"return": {}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_ERROR", "data": {"device": "src", "operation": "write", "action": "report"}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "aborting", "id": "src"}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_COMPLETED", "data": {"device": "src", "len": LEN, "offset": 0, "speed": 0, "type": "mirror", "error": "Operation not permitted"}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "concluded", "id": "src"}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "null", "id": "src"}}
- {"return": []}
- {"return": {}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
- read 65536/65536 bytes at offset 0
- 64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
- {"return": {}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "created", "id": "src"}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "running", "id": "src"}}
- {"return": {}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "ready", "id": "src"}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_READY", "data": {"device": "src", "len": 1024, "offset": 1024, "speed": 0, "type": "mirror"}}
- {"return": [{"auto-finalize": true, "io-status": "ok", "device": "src", "auto-dismiss": true, "busy": false, "len": 1024, "offset": 1024, "status": "ready", "paused": false, "speed": 0, "ready": true, "type": "mirror"}]}
- {"return": {}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "waiting", "id": "src"}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "pending", "id": "src"}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_COMPLETED", "data": {"device": "src", "len": 1024, "offset": 1024, "speed": 0, "type": "mirror"}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "concluded", "id": "src"}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "null", "id": "src"}}
- Warning: Image size mismatch!
- Images are identical.
- 
-@@ -32,23 +44,35 @@ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=67108864
- Formatting 'TEST_DIR/t.raw.src', fmt=IMGFMT size=67108864
- {"return": {}}
- WARNING: Image format was not specified for 'TEST_DIR/t.raw' and probing guessed raw.
--Automatically detecting the format is dangerous for raw images, write operations on block 0 will be restricted.
--Specify the 'raw' format explicitly to remove the restrictions.
-+         Automatically detecting the format is dangerous for raw images, write operations on block 0 will be restricted.
-+         Specify the 'raw' format explicitly to remove the restrictions.
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "created", "id": "src"}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "running", "id": "src"}}
- {"return": {}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_ERROR", "data": {"device": "src", "operation": "write", "action": "report"}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "aborting", "id": "src"}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_COMPLETED", "data": {"device": "src", "len": LEN, "offset": 512, "speed": 0, "type": "mirror", "error": "Operation not permitted"}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "concluded", "id": "src"}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "null", "id": "src"}}
- {"return": []}
- {"return": {}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
- read 65536/65536 bytes at offset 0
- 64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
- {"return": {}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "created", "id": "src"}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "running", "id": "src"}}
- {"return": {}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "ready", "id": "src"}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_READY", "data": {"device": "src", "len": 197120, "offset": 197120, "speed": 0, "type": "mirror"}}
- {"return": [{"auto-finalize": true, "io-status": "ok", "device": "src", "auto-dismiss": true, "busy": false, "len": 197120, "offset": 197120, "status": "ready", "paused": false, "speed": 0, "ready": true, "type": "mirror"}]}
- {"return": {}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "waiting", "id": "src"}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "pending", "id": "src"}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_COMPLETED", "data": {"device": "src", "len": 197120, "offset": 197120, "speed": 0, "type": "mirror"}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "concluded", "id": "src"}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "null", "id": "src"}}
- Warning: Image size mismatch!
- Images are identical.
- 
-@@ -58,23 +82,35 @@ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=67108864
- Formatting 'TEST_DIR/t.raw.src', fmt=IMGFMT size=67108864
- {"return": {}}
- WARNING: Image format was not specified for 'TEST_DIR/t.raw' and probing guessed raw.
--Automatically detecting the format is dangerous for raw images, write operations on block 0 will be restricted.
--Specify the 'raw' format explicitly to remove the restrictions.
-+         Automatically detecting the format is dangerous for raw images, write operations on block 0 will be restricted.
-+         Specify the 'raw' format explicitly to remove the restrictions.
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "created", "id": "src"}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "running", "id": "src"}}
- {"return": {}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_ERROR", "data": {"device": "src", "operation": "write", "action": "report"}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "aborting", "id": "src"}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_COMPLETED", "data": {"device": "src", "len": LEN, "offset": 262144, "speed": 0, "type": "mirror", "error": "Operation not permitted"}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "concluded", "id": "src"}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "null", "id": "src"}}
- {"return": []}
- {"return": {}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
- read 65536/65536 bytes at offset 0
- 64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
- {"return": {}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "created", "id": "src"}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "running", "id": "src"}}
- {"return": {}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "ready", "id": "src"}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_READY", "data": {"device": "src", "len": 327680, "offset": 327680, "speed": 0, "type": "mirror"}}
- {"return": [{"auto-finalize": true, "io-status": "ok", "device": "src", "auto-dismiss": true, "busy": false, "len": 327680, "offset": 327680, "status": "ready", "paused": false, "speed": 0, "ready": true, "type": "mirror"}]}
- {"return": {}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "waiting", "id": "src"}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "pending", "id": "src"}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_COMPLETED", "data": {"device": "src", "len": 327680, "offset": 327680, "speed": 0, "type": "mirror"}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "concluded", "id": "src"}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "null", "id": "src"}}
- Warning: Image size mismatch!
- Images are identical.
- 
-@@ -84,23 +120,35 @@ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=67108864
- Formatting 'TEST_DIR/t.raw.src', fmt=IMGFMT size=67108864
- {"return": {}}
- WARNING: Image format was not specified for 'TEST_DIR/t.raw' and probing guessed raw.
--Automatically detecting the format is dangerous for raw images, write operations on block 0 will be restricted.
--Specify the 'raw' format explicitly to remove the restrictions.
-+         Automatically detecting the format is dangerous for raw images, write operations on block 0 will be restricted.
-+         Specify the 'raw' format explicitly to remove the restrictions.
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "created", "id": "src"}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "running", "id": "src"}}
- {"return": {}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_ERROR", "data": {"device": "src", "operation": "write", "action": "report"}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "aborting", "id": "src"}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_COMPLETED", "data": {"device": "src", "len": LEN, "offset": 0, "speed": 0, "type": "mirror", "error": "Operation not permitted"}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "concluded", "id": "src"}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "null", "id": "src"}}
- {"return": []}
- {"return": {}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
- read 65536/65536 bytes at offset 0
- 64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
- {"return": {}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "created", "id": "src"}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "running", "id": "src"}}
- {"return": {}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "ready", "id": "src"}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_READY", "data": {"device": "src", "len": 1024, "offset": 1024, "speed": 0, "type": "mirror"}}
- {"return": [{"auto-finalize": true, "io-status": "ok", "device": "src", "auto-dismiss": true, "busy": false, "len": 1024, "offset": 1024, "status": "ready", "paused": false, "speed": 0, "ready": true, "type": "mirror"}]}
- {"return": {}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "waiting", "id": "src"}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "pending", "id": "src"}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_COMPLETED", "data": {"device": "src", "len": 1024, "offset": 1024, "speed": 0, "type": "mirror"}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "concluded", "id": "src"}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "null", "id": "src"}}
- Warning: Image size mismatch!
- Images are identical.
- 
-@@ -110,23 +158,35 @@ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=67108864
- Formatting 'TEST_DIR/t.raw.src', fmt=IMGFMT size=67108864
- {"return": {}}
- WARNING: Image format was not specified for 'TEST_DIR/t.raw' and probing guessed raw.
--Automatically detecting the format is dangerous for raw images, write operations on block 0 will be restricted.
--Specify the 'raw' format explicitly to remove the restrictions.
-+         Automatically detecting the format is dangerous for raw images, write operations on block 0 will be restricted.
-+         Specify the 'raw' format explicitly to remove the restrictions.
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "created", "id": "src"}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "running", "id": "src"}}
- {"return": {}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_ERROR", "data": {"device": "src", "operation": "write", "action": "report"}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "aborting", "id": "src"}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_COMPLETED", "data": {"device": "src", "len": LEN, "offset": 0, "speed": 0, "type": "mirror", "error": "Operation not permitted"}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "concluded", "id": "src"}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "null", "id": "src"}}
- {"return": []}
- {"return": {}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
- read 65536/65536 bytes at offset 0
- 64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
- {"return": {}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "created", "id": "src"}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "running", "id": "src"}}
- {"return": {}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "ready", "id": "src"}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_READY", "data": {"device": "src", "len": 65536, "offset": 65536, "speed": 0, "type": "mirror"}}
- {"return": [{"auto-finalize": true, "io-status": "ok", "device": "src", "auto-dismiss": true, "busy": false, "len": 65536, "offset": 65536, "status": "ready", "paused": false, "speed": 0, "ready": true, "type": "mirror"}]}
- {"return": {}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "waiting", "id": "src"}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "pending", "id": "src"}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_COMPLETED", "data": {"device": "src", "len": 65536, "offset": 65536, "speed": 0, "type": "mirror"}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "concluded", "id": "src"}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "null", "id": "src"}}
- Warning: Image size mismatch!
- Images are identical.
- 
-@@ -136,23 +196,35 @@ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=67108864
- Formatting 'TEST_DIR/t.raw.src', fmt=IMGFMT size=67108864
- {"return": {}}
- WARNING: Image format was not specified for 'TEST_DIR/t.raw' and probing guessed raw.
--Automatically detecting the format is dangerous for raw images, write operations on block 0 will be restricted.
--Specify the 'raw' format explicitly to remove the restrictions.
-+         Automatically detecting the format is dangerous for raw images, write operations on block 0 will be restricted.
-+         Specify the 'raw' format explicitly to remove the restrictions.
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "created", "id": "src"}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "running", "id": "src"}}
- {"return": {}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_ERROR", "data": {"device": "src", "operation": "write", "action": "report"}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "aborting", "id": "src"}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_COMPLETED", "data": {"device": "src", "len": LEN, "offset": 0, "speed": 0, "type": "mirror", "error": "Operation not permitted"}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "concluded", "id": "src"}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "null", "id": "src"}}
- {"return": []}
- {"return": {}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
- read 65536/65536 bytes at offset 0
- 64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
- {"return": {}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "created", "id": "src"}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "running", "id": "src"}}
- {"return": {}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "ready", "id": "src"}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_READY", "data": {"device": "src", "len": 2560, "offset": 2560, "speed": 0, "type": "mirror"}}
- {"return": [{"auto-finalize": true, "io-status": "ok", "device": "src", "auto-dismiss": true, "busy": false, "len": 2560, "offset": 2560, "status": "ready", "paused": false, "speed": 0, "ready": true, "type": "mirror"}]}
- {"return": {}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "waiting", "id": "src"}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "pending", "id": "src"}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_COMPLETED", "data": {"device": "src", "len": 2560, "offset": 2560, "speed": 0, "type": "mirror"}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "concluded", "id": "src"}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "null", "id": "src"}}
- Warning: Image size mismatch!
- Images are identical.
- 
-@@ -161,23 +233,35 @@ Images are identical.
- Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=67108864
- {"return": {}}
- WARNING: Image format was not specified for 'TEST_DIR/t.raw' and probing guessed raw.
--Automatically detecting the format is dangerous for raw images, write operations on block 0 will be restricted.
--Specify the 'raw' format explicitly to remove the restrictions.
-+         Automatically detecting the format is dangerous for raw images, write operations on block 0 will be restricted.
-+         Specify the 'raw' format explicitly to remove the restrictions.
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "created", "id": "src"}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "running", "id": "src"}}
- {"return": {}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_ERROR", "data": {"device": "src", "operation": "write", "action": "report"}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "aborting", "id": "src"}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_COMPLETED", "data": {"device": "src", "len": LEN, "offset": OFFSET, "speed": 0, "type": "mirror", "error": "Operation not permitted"}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "concluded", "id": "src"}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "null", "id": "src"}}
- {"return": []}
- {"return": {}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
- read 65536/65536 bytes at offset 0
- 64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
- {"return": {}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "created", "id": "src"}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "running", "id": "src"}}
- {"return": {}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "ready", "id": "src"}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_READY", "data": {"device": "src", "len": 2560, "offset": 2560, "speed": 0, "type": "mirror"}}
- {"return": [{"auto-finalize": true, "io-status": "ok", "device": "src", "auto-dismiss": true, "busy": false, "len": 2560, "offset": 2560, "status": "ready", "paused": false, "speed": 0, "ready": true, "type": "mirror"}]}
- {"return": {}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "waiting", "id": "src"}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "pending", "id": "src"}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_COMPLETED", "data": {"device": "src", "len": 2560, "offset": 2560, "speed": 0, "type": "mirror"}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "concluded", "id": "src"}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "null", "id": "src"}}
- Warning: Image size mismatch!
- Images are identical.
- 
-@@ -186,23 +270,35 @@ Images are identical.
- Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=67108864
- {"return": {}}
- WARNING: Image format was not specified for 'TEST_DIR/t.raw' and probing guessed raw.
--Automatically detecting the format is dangerous for raw images, write operations on block 0 will be restricted.
--Specify the 'raw' format explicitly to remove the restrictions.
-+         Automatically detecting the format is dangerous for raw images, write operations on block 0 will be restricted.
-+         Specify the 'raw' format explicitly to remove the restrictions.
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "created", "id": "src"}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "running", "id": "src"}}
- {"return": {}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_ERROR", "data": {"device": "src", "operation": "write", "action": "report"}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "aborting", "id": "src"}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_COMPLETED", "data": {"device": "src", "len": LEN, "offset": OFFSET, "speed": 0, "type": "mirror", "error": "Operation not permitted"}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "concluded", "id": "src"}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "null", "id": "src"}}
- {"return": []}
- {"return": {}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
- read 65536/65536 bytes at offset 0
- 64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
- {"return": {}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "created", "id": "src"}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "running", "id": "src"}}
- {"return": {}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "ready", "id": "src"}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_READY", "data": {"device": "src", "len": 31457280, "offset": 31457280, "speed": 0, "type": "mirror"}}
- {"return": [{"auto-finalize": true, "io-status": "ok", "device": "src", "auto-dismiss": true, "busy": false, "len": 31457280, "offset": 31457280, "status": "ready", "paused": false, "speed": 0, "ready": true, "type": "mirror"}]}
- {"return": {}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "waiting", "id": "src"}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "pending", "id": "src"}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_COMPLETED", "data": {"device": "src", "len": 31457280, "offset": 31457280, "speed": 0, "type": "mirror"}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "concluded", "id": "src"}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "null", "id": "src"}}
- Warning: Image size mismatch!
- Images are identical.
- 
-@@ -211,23 +307,35 @@ Images are identical.
- Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=67108864
- {"return": {}}
- WARNING: Image format was not specified for 'TEST_DIR/t.raw' and probing guessed raw.
--Automatically detecting the format is dangerous for raw images, write operations on block 0 will be restricted.
--Specify the 'raw' format explicitly to remove the restrictions.
-+         Automatically detecting the format is dangerous for raw images, write operations on block 0 will be restricted.
-+         Specify the 'raw' format explicitly to remove the restrictions.
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "created", "id": "src"}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "running", "id": "src"}}
- {"return": {}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_ERROR", "data": {"device": "src", "operation": "write", "action": "report"}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "aborting", "id": "src"}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_COMPLETED", "data": {"device": "src", "len": LEN, "offset": OFFSET, "speed": 0, "type": "mirror", "error": "Operation not permitted"}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "concluded", "id": "src"}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "null", "id": "src"}}
- {"return": []}
- {"return": {}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
- read 65536/65536 bytes at offset 0
- 64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
- {"return": {}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "created", "id": "src"}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "running", "id": "src"}}
- {"return": {}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "ready", "id": "src"}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_READY", "data": {"device": "src", "len": 327680, "offset": 327680, "speed": 0, "type": "mirror"}}
- {"return": [{"auto-finalize": true, "io-status": "ok", "device": "src", "auto-dismiss": true, "busy": false, "len": 327680, "offset": 327680, "status": "ready", "paused": false, "speed": 0, "ready": true, "type": "mirror"}]}
- {"return": {}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "waiting", "id": "src"}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "pending", "id": "src"}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_COMPLETED", "data": {"device": "src", "len": 327680, "offset": 327680, "speed": 0, "type": "mirror"}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "concluded", "id": "src"}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "null", "id": "src"}}
- Warning: Image size mismatch!
- Images are identical.
- 
-@@ -236,23 +344,35 @@ Images are identical.
- Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=67108864
- {"return": {}}
- WARNING: Image format was not specified for 'TEST_DIR/t.raw' and probing guessed raw.
--Automatically detecting the format is dangerous for raw images, write operations on block 0 will be restricted.
--Specify the 'raw' format explicitly to remove the restrictions.
-+         Automatically detecting the format is dangerous for raw images, write operations on block 0 will be restricted.
-+         Specify the 'raw' format explicitly to remove the restrictions.
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "created", "id": "src"}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "running", "id": "src"}}
- {"return": {}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_ERROR", "data": {"device": "src", "operation": "write", "action": "report"}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "aborting", "id": "src"}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_COMPLETED", "data": {"device": "src", "len": LEN, "offset": OFFSET, "speed": 0, "type": "mirror", "error": "Operation not permitted"}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "concluded", "id": "src"}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "null", "id": "src"}}
- {"return": []}
- {"return": {}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
- read 65536/65536 bytes at offset 0
- 64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
- {"return": {}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "created", "id": "src"}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "running", "id": "src"}}
- {"return": {}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "ready", "id": "src"}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_READY", "data": {"device": "src", "len": 2048, "offset": 2048, "speed": 0, "type": "mirror"}}
- {"return": [{"auto-finalize": true, "io-status": "ok", "device": "src", "auto-dismiss": true, "busy": false, "len": 2048, "offset": 2048, "status": "ready", "paused": false, "speed": 0, "ready": true, "type": "mirror"}]}
- {"return": {}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "waiting", "id": "src"}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "pending", "id": "src"}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_COMPLETED", "data": {"device": "src", "len": 2048, "offset": 2048, "speed": 0, "type": "mirror"}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "concluded", "id": "src"}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "null", "id": "src"}}
- Warning: Image size mismatch!
- Images are identical.
- 
-@@ -261,23 +381,37 @@ Images are identical.
- Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=67108864
- {"return": {}}
- WARNING: Image format was not specified for 'TEST_DIR/t.raw' and probing guessed raw.
--Automatically detecting the format is dangerous for raw images, write operations on block 0 will be restricted.
--Specify the 'raw' format explicitly to remove the restrictions.
-+         Automatically detecting the format is dangerous for raw images, write operations on block 0 will be restricted.
-+         Specify the 'raw' format explicitly to remove the restrictions.
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "created", "id": "src"}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "running", "id": "src"}}
- {"return": {}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "ready", "id": "src"}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_READY", "data": {"device": "src", "len": 512, "offset": 512, "speed": 0, "type": "mirror"}}
- {"return": [{"auto-finalize": true, "io-status": "ok", "device": "src", "auto-dismiss": true, "busy": false, "len": 512, "offset": 512, "status": "ready", "paused": false, "speed": 0, "ready": true, "type": "mirror"}]}
- {"return": {}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "waiting", "id": "src"}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "pending", "id": "src"}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_COMPLETED", "data": {"device": "src", "len": 512, "offset": 512, "speed": 0, "type": "mirror"}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "concluded", "id": "src"}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "null", "id": "src"}}
- Warning: Image size mismatch!
- Images are identical.
- {"return": {}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "created", "id": "src"}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "running", "id": "src"}}
- {"return": {}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "ready", "id": "src"}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_READY", "data": {"device": "src", "len": 512, "offset": 512, "speed": 0, "type": "mirror"}}
- {"return": [{"auto-finalize": true, "io-status": "ok", "device": "src", "auto-dismiss": true, "busy": false, "len": 512, "offset": 512, "status": "ready", "paused": false, "speed": 0, "ready": true, "type": "mirror"}]}
- {"return": {}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "waiting", "id": "src"}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "pending", "id": "src"}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_COMPLETED", "data": {"device": "src", "len": 512, "offset": 512, "speed": 0, "type": "mirror"}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "concluded", "id": "src"}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "null", "id": "src"}}
- Warning: Image size mismatch!
- Images are identical.
- *** done
-diff --git a/tests/qemu-iotests/124 b/tests/qemu-iotests/124
-index 8e76e62f93..3ea4ac53f5 100755
---- a/tests/qemu-iotests/124
-+++ b/tests/qemu-iotests/124
-@@ -151,10 +151,17 @@ class TestIncrementalBackupBase(iotests.QMPTestCase):
-         return self.wait_qmp_backup(kwargs['device'], error)
- 
- 
-+    def ignore_job_status_change_events(self):
-+        while True:
-+            e = self.vm.event_wait(name="JOB_STATUS_CHANGE")
-+            if e['data']['status'] == 'null':
-+                break
-+
-     def wait_qmp_backup(self, device, error='Input/output error'):
-         event = self.vm.event_wait(name="BLOCK_JOB_COMPLETED",
-                                    match={'data': {'device': device}})
-         self.assertNotEqual(event, None)
-+        self.ignore_job_status_change_events()
- 
-         try:
-             failure = self.dictpath(event, 'data/error')
-@@ -172,6 +179,7 @@ class TestIncrementalBackupBase(iotests.QMPTestCase):
-         event = self.vm.event_wait(name='BLOCK_JOB_CANCELLED',
-                                    match={'data': {'device': device}})
-         self.assertNotEqual(event, None)
-+        self.ignore_job_status_change_events()
- 
- 
-     def create_anchor_backup(self, drive=None):
-diff --git a/tests/qemu-iotests/127.out b/tests/qemu-iotests/127.out
-index 543d075005..83b522d4c2 100644
---- a/tests/qemu-iotests/127.out
-+++ b/tests/qemu-iotests/127.out
-@@ -5,10 +5,17 @@ Formatting 'TEST_DIR/t.IMGFMT.overlay1', fmt=IMGFMT size=65536 backing_file=TEST
- wrote 42/42 bytes at offset 0
- 42 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
- {"return": {}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "created", "id": "mirror"}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "running", "id": "mirror"}}
- {"return": {}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "ready", "id": "mirror"}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_READY", "data": {"device": "mirror", "len": 65536, "offset": 65536, "speed": 0, "type": "mirror"}}
- {"return": {}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "waiting", "id": "mirror"}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "pending", "id": "mirror"}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_COMPLETED", "data": {"device": "mirror", "len": 65536, "offset": 65536, "speed": 0, "type": "mirror"}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "concluded", "id": "mirror"}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "null", "id": "mirror"}}
- {"return": {}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
- *** done
-diff --git a/tests/qemu-iotests/141 b/tests/qemu-iotests/141
-index 2f9d7b9bc2..4246d387a1 100755
---- a/tests/qemu-iotests/141
-+++ b/tests/qemu-iotests/141
-@@ -107,7 +107,7 @@ test_blockjob \
-                     'format': '$IMGFMT',
-                     'sync': 'none'}}" \
-     'return' \
--    'BLOCK_JOB_CANCELLED'
-+    '"status": "null"'
- 
- echo
- echo '=== Testing drive-mirror ==='
-@@ -124,7 +124,7 @@ test_blockjob \
-                     'format': '$IMGFMT',
-                     'sync': 'none'}}" \
-     'BLOCK_JOB_READY' \
--    'BLOCK_JOB_COMPLETED'
-+    '"status": "null"'
- 
- echo
- echo '=== Testing active block-commit ==='
-@@ -138,7 +138,7 @@ test_blockjob \
-     "{'execute': 'block-commit',
-       'arguments': {'job-id': 'job0', 'device': 'drv0'}}" \
-     'BLOCK_JOB_READY' \
--    'BLOCK_JOB_COMPLETED'
-+    '"status": "null"'
- 
- echo
- echo '=== Testing non-active block-commit ==='
-@@ -157,7 +157,7 @@ test_blockjob \
-                     'top':    '$TEST_DIR/m.$IMGFMT',
-                     'speed':  1}}" \
-     'return' \
--    'BLOCK_JOB_CANCELLED'
-+    '"status": "null"'
- 
- echo
- echo '=== Testing block-stream ==='
-@@ -170,8 +170,7 @@ echo
- $QEMU_IO -c 'write 0 1M' "$TEST_DIR/b.$IMGFMT" | _filter_qemu_io
- 
- # With some data to stream (and @speed set to 1), block-stream will not complete
--# until we send the block-job-cancel command. Therefore, no event other than
--# BLOCK_JOB_CANCELLED will be emitted.
-+# until we send the block-job-cancel command.
- 
- test_blockjob \
-     "{'execute': 'block-stream',
-@@ -179,7 +178,7 @@ test_blockjob \
-                     'device': 'drv0',
-                     'speed': 1}}" \
-     'return' \
--    'BLOCK_JOB_CANCELLED'
-+    '"status": "null"'
- 
- _cleanup_qemu
- 
-diff --git a/tests/qemu-iotests/141.out b/tests/qemu-iotests/141.out
-index 82e763b68d..f252c86875 100644
---- a/tests/qemu-iotests/141.out
-+++ b/tests/qemu-iotests/141.out
-@@ -8,31 +8,50 @@ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1048576 backing_file=TEST_DIR/m.
- 
- {"return": {}}
- Formatting 'TEST_DIR/o.IMGFMT', fmt=IMGFMT size=1048576 backing_file=TEST_DIR/t.IMGFMT backing_fmt=IMGFMT
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "created", "id": "job0"}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "running", "id": "job0"}}
- {"return": {}}
- {"error": {"class": "GenericError", "desc": "Node drv0 is in use"}}
- {"return": {}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "aborting", "id": "job0"}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_CANCELLED", "data": {"device": "job0", "len": 1048576, "offset": 0, "speed": 0, "type": "backup"}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "concluded", "id": "job0"}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "null", "id": "job0"}}
- {"return": {}}
- 
- === Testing drive-mirror ===
- 
- {"return": {}}
- Formatting 'TEST_DIR/o.IMGFMT', fmt=IMGFMT size=1048576 backing_file=TEST_DIR/t.IMGFMT backing_fmt=IMGFMT
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "created", "id": "job0"}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "running", "id": "job0"}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "ready", "id": "job0"}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_READY", "data": {"device": "job0", "len": 0, "offset": 0, "speed": 0, "type": "mirror"}}
- {"return": {}}
- {"error": {"class": "GenericError", "desc": "Node 'drv0' is busy: node is used as backing hd of 'NODE_NAME'"}}
- {"return": {}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "waiting", "id": "job0"}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "pending", "id": "job0"}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_COMPLETED", "data": {"device": "job0", "len": 0, "offset": 0, "speed": 0, "type": "mirror"}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "concluded", "id": "job0"}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "null", "id": "job0"}}
- {"return": {}}
- 
- === Testing active block-commit ===
- 
- {"return": {}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "created", "id": "job0"}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "running", "id": "job0"}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "ready", "id": "job0"}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_READY", "data": {"device": "job0", "len": 0, "offset": 0, "speed": 0, "type": "commit"}}
- {"return": {}}
- {"error": {"class": "GenericError", "desc": "Node 'drv0' is busy: node is used as backing hd of 'NODE_NAME'"}}
- {"return": {}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "waiting", "id": "job0"}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "pending", "id": "job0"}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_COMPLETED", "data": {"device": "job0", "len": 0, "offset": 0, "speed": 0, "type": "commit"}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "concluded", "id": "job0"}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "null", "id": "job0"}}
- {"return": {}}
- 
- === Testing non-active block-commit ===
-@@ -40,10 +59,15 @@ Formatting 'TEST_DIR/o.IMGFMT', fmt=IMGFMT size=1048576 backing_file=TEST_DIR/t.
- wrote 1048576/1048576 bytes at offset 0
- 1 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
- {"return": {}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "created", "id": "job0"}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "running", "id": "job0"}}
- {"return": {}}
- {"error": {"class": "GenericError", "desc": "Node drv0 is in use"}}
- {"return": {}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "aborting", "id": "job0"}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_CANCELLED", "data": {"device": "job0", "len": 1048576, "offset": 524288, "speed": 1, "type": "commit"}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "concluded", "id": "job0"}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "null", "id": "job0"}}
- {"return": {}}
- 
- === Testing block-stream ===
-@@ -51,9 +75,14 @@ wrote 1048576/1048576 bytes at offset 0
- wrote 1048576/1048576 bytes at offset 0
- 1 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
- {"return": {}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "created", "id": "job0"}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "running", "id": "job0"}}
- {"return": {}}
- {"error": {"class": "GenericError", "desc": "Node drv0 is in use"}}
- {"return": {}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "aborting", "id": "job0"}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_CANCELLED", "data": {"device": "job0", "len": 1048576, "offset": 524288, "speed": 1, "type": "stream"}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "concluded", "id": "job0"}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "null", "id": "job0"}}
- {"return": {}}
- *** done
-diff --git a/tests/qemu-iotests/144 b/tests/qemu-iotests/144
-index 00de3c33cf..4b915718cd 100755
---- a/tests/qemu-iotests/144
-+++ b/tests/qemu-iotests/144
-@@ -93,7 +93,7 @@ _send_qemu_cmd $h "{ 'execute': 'block-job-complete',
-                                 'arguments': {
-                                                 'device': 'virtio0'
-                                               }
--                   }" "COMPLETED"
-+                   }" '"status": "null"'
- 
- echo
- echo === Performing Live Snapshot 2 ===
-diff --git a/tests/qemu-iotests/144.out b/tests/qemu-iotests/144.out
-index 014b2817ee..55299201e4 100644
---- a/tests/qemu-iotests/144.out
-+++ b/tests/qemu-iotests/144.out
-@@ -12,10 +12,17 @@ Formatting 'TEST_DIR/tmp.qcow2', fmt=qcow2 size=536870912 backing_file=TEST_DIR/
- 
- === Performing block-commit on active layer ===
- 
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "created", "id": "virtio0"}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "running", "id": "virtio0"}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "ready", "id": "virtio0"}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_READY", "data": {"device": "virtio0", "len": 0, "offset": 0, "speed": 0, "type": "commit"}}
- {"return": {}}
- {"return": {}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "waiting", "id": "virtio0"}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "pending", "id": "virtio0"}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_COMPLETED", "data": {"device": "virtio0", "len": 0, "offset": 0, "speed": 0, "type": "commit"}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "concluded", "id": "virtio0"}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "null", "id": "virtio0"}}
- 
- === Performing Live Snapshot 2 ===
- 
-diff --git a/tests/qemu-iotests/156 b/tests/qemu-iotests/156
-index e75dc4d743..0a9a09802e 100755
---- a/tests/qemu-iotests/156
-+++ b/tests/qemu-iotests/156
-@@ -119,7 +119,7 @@ _send_qemu_cmd $QEMU_HANDLE \
- 
- _send_qemu_cmd $QEMU_HANDLE \
-     '' \
--    'BLOCK_JOB_COMPLETED'
-+    '"status": "null"'
- 
- # Remove the source images
- rm -f "$TEST_IMG{,.backing,.overlay}"
-diff --git a/tests/qemu-iotests/156.out b/tests/qemu-iotests/156.out
-index f96a564c1d..34c057b626 100644
---- a/tests/qemu-iotests/156.out
-+++ b/tests/qemu-iotests/156.out
-@@ -12,13 +12,20 @@ wrote 131072/131072 bytes at offset 131072
- 128 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
- {"return": ""}
- Formatting 'TEST_DIR/t.IMGFMT.target.overlay', fmt=IMGFMT size=1048576 backing_file=TEST_DIR/t.IMGFMT.target
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "created", "id": "source"}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "running", "id": "source"}}
- {"return": {}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "ready", "id": "source"}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_READY", "data": {"device": "source", "len": 131072, "offset": 131072, "speed": 0, "type": "mirror"}}
- wrote 65536/65536 bytes at offset 196608
- 64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
- {"return": ""}
- {"return": {}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "waiting", "id": "source"}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "pending", "id": "source"}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_JOB_COMPLETED", "data": {"device": "source", "len": 196608, "offset": 196608, "speed": 0, "type": "mirror"}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "concluded", "id": "source"}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "null", "id": "source"}}
- 
- read 65536/65536 bytes at offset 0
- 64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-diff --git a/tests/qemu-iotests/185 b/tests/qemu-iotests/185
-index deb42cc886..7dcfdeac60 100755
---- a/tests/qemu-iotests/185
-+++ b/tests/qemu-iotests/185
-@@ -116,8 +116,10 @@ _send_qemu_cmd $h \
- # If we don't sleep here 'quit' command races with disk I/O
- sleep 0.5
- 
-+# Ignore the JOB_STATUS_CHANGE events while shutting down the VM. Depending on
-+# the timing, jobs may or may not transition through a paused state.
- _send_qemu_cmd $h "{ 'execute': 'quit' }" "return"
--wait=1 _cleanup_qemu
-+wait=1 _cleanup_qemu | grep -v 'JOB_STATUS_CHANGE'
- 
- echo
- echo === Start active commit job and exit qemu ===
-@@ -139,7 +141,7 @@ _send_qemu_cmd $h \
- sleep 0.5
- 
- _send_qemu_cmd $h "{ 'execute': 'quit' }" "return"
--wait=1 _cleanup_qemu
-+wait=1 _cleanup_qemu | grep -v 'JOB_STATUS_CHANGE'
- 
- echo
- echo === Start mirror job and exit qemu ===
-@@ -164,7 +166,7 @@ _send_qemu_cmd $h \
- sleep 0.5
- 
- _send_qemu_cmd $h "{ 'execute': 'quit' }" "return"
--wait=1 _cleanup_qemu
-+wait=1 _cleanup_qemu | grep -v 'JOB_STATUS_CHANGE'
- 
- echo
- echo === Start backup job and exit qemu ===
-@@ -188,7 +190,7 @@ _send_qemu_cmd $h \
- sleep 0.5
- 
- _send_qemu_cmd $h "{ 'execute': 'quit' }" "return"
--wait=1 _cleanup_qemu
-+wait=1 _cleanup_qemu | grep -v 'JOB_STATUS_CHANGE'
- 
- echo
- echo === Start streaming job and exit qemu ===
-@@ -209,7 +211,7 @@ _send_qemu_cmd $h \
- sleep 0.5
- 
- _send_qemu_cmd $h "{ 'execute': 'quit' }" "return"
--wait=1 _cleanup_qemu
-+wait=1 _cleanup_qemu | grep -v 'JOB_STATUS_CHANGE'
- 
- _check_test_img
- 
-diff --git a/tests/qemu-iotests/185.out b/tests/qemu-iotests/185.out
-index 57eaf8d699..4e0ca0dffa 100644
---- a/tests/qemu-iotests/185.out
-+++ b/tests/qemu-iotests/185.out
-@@ -17,6 +17,8 @@ Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=67108864 backing_file=TEST_DIR/t.q
- 
- === Start commit job and exit qemu ===
- 
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "created", "id": "disk"}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "running", "id": "disk"}}
- {"return": {}}
- {"return": {}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
-@@ -25,6 +27,8 @@ Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=67108864 backing_file=TEST_DIR/t.q
- === Start active commit job and exit qemu ===
- 
- {"return": {}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "created", "id": "disk"}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "running", "id": "disk"}}
- {"return": {}}
- {"return": {}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
-@@ -34,6 +38,8 @@ Formatting 'TEST_DIR/t.qcow2', fmt=qcow2 size=67108864 backing_file=TEST_DIR/t.q
- 
- {"return": {}}
- Formatting 'TEST_DIR/t.qcow2.copy', fmt=qcow2 size=67108864 cluster_size=65536 lazy_refcounts=off refcount_bits=16
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "created", "id": "disk"}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "running", "id": "disk"}}
- {"return": {}}
- {"return": {}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
-@@ -43,6 +49,8 @@ Formatting 'TEST_DIR/t.qcow2.copy', fmt=qcow2 size=67108864 cluster_size=65536 l
- 
- {"return": {}}
- Formatting 'TEST_DIR/t.qcow2.copy', fmt=qcow2 size=67108864 cluster_size=65536 lazy_refcounts=off refcount_bits=16
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "created", "id": "disk"}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "running", "id": "disk"}}
- {"return": {}}
- {"return": {}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
-@@ -51,6 +59,8 @@ Formatting 'TEST_DIR/t.qcow2.copy', fmt=qcow2 size=67108864 cluster_size=65536 l
- === Start streaming job and exit qemu ===
- 
- {"return": {}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "created", "id": "disk"}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "running", "id": "disk"}}
- {"return": {}}
- {"return": {}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
-diff --git a/tests/qemu-iotests/191 b/tests/qemu-iotests/191
-index 77224eb151..d6860e72f7 100755
---- a/tests/qemu-iotests/191
-+++ b/tests/qemu-iotests/191
-@@ -81,7 +81,7 @@ _send_qemu_cmd $h \
-                       'device': 'top',
-                       'base':'$TEST_IMG.base',
-                       'top': '$TEST_IMG.mid' } }" \
--    "BLOCK_JOB_COMPLETED"
-+    '"status": "null"'
- _send_qemu_cmd $h "" "^}"
- 
- echo
-@@ -129,7 +129,7 @@ _send_qemu_cmd $h \
-                       'device': 'top',
-                       'base':'$TEST_IMG.base',
-                       'top': '$TEST_IMG.mid' } }" \
--    "BLOCK_JOB_COMPLETED"
-+    '"status": "null"'
- _send_qemu_cmd $h "" "^}"
- 
- echo
-diff --git a/tests/qemu-iotests/191.out b/tests/qemu-iotests/191.out
-index 190c5f049a..31a0c7d4c4 100644
---- a/tests/qemu-iotests/191.out
-+++ b/tests/qemu-iotests/191.out
-@@ -16,6 +16,28 @@ wrote 65536/65536 bytes at offset 1048576
- === Perform commit job ===
- 
- {
-+    "timestamp": {
-+        "seconds":  TIMESTAMP,
-+        "microseconds":  TIMESTAMP
-+    },
-+    "event": "JOB_STATUS_CHANGE",
-+    "data": {
-+        "status": "created",
-+        "id": "commit0"
-+    }
-+}
-+{
-+    "timestamp": {
-+        "seconds":  TIMESTAMP,
-+        "microseconds":  TIMESTAMP
-+    },
-+    "event": "JOB_STATUS_CHANGE",
-+    "data": {
-+        "status": "running",
-+        "id": "commit0"
-+    }
-+}
-+{
-     "return": {
-     }
- }
-@@ -24,6 +46,28 @@ wrote 65536/65536 bytes at offset 1048576
-         "seconds":  TIMESTAMP,
-         "microseconds":  TIMESTAMP
-     },
-+    "event": "JOB_STATUS_CHANGE",
-+    "data": {
-+        "status": "waiting",
-+        "id": "commit0"
-+    }
-+}
-+{
-+    "timestamp": {
-+        "seconds":  TIMESTAMP,
-+        "microseconds":  TIMESTAMP
-+    },
-+    "event": "JOB_STATUS_CHANGE",
-+    "data": {
-+        "status": "pending",
-+        "id": "commit0"
-+    }
-+}
-+{
-+    "timestamp": {
-+        "seconds":  TIMESTAMP,
-+        "microseconds":  TIMESTAMP
-+    },
-     "event": "BLOCK_JOB_COMPLETED",
-     "data": {
-         "device": "commit0",
-@@ -33,6 +77,28 @@ wrote 65536/65536 bytes at offset 1048576
-         "type": "commit"
-     }
- }
-+{
-+    "timestamp": {
-+        "seconds":  TIMESTAMP,
-+        "microseconds":  TIMESTAMP
-+    },
-+    "event": "JOB_STATUS_CHANGE",
-+    "data": {
-+        "status": "concluded",
-+        "id": "commit0"
-+    }
-+}
-+{
-+    "timestamp": {
-+        "seconds":  TIMESTAMP,
-+        "microseconds":  TIMESTAMP
-+    },
-+    "event": "JOB_STATUS_CHANGE",
-+    "data": {
-+        "status": "null",
-+        "id": "commit0"
-+    }
-+}
- 
- === Check that both top and top2 point to base now ===
- 
-@@ -356,6 +422,28 @@ wrote 65536/65536 bytes at offset 1048576
- === Perform commit job ===
- 
- {
-+    "timestamp": {
-+        "seconds":  TIMESTAMP,
-+        "microseconds":  TIMESTAMP
-+    },
-+    "event": "JOB_STATUS_CHANGE",
-+    "data": {
-+        "status": "created",
-+        "id": "commit0"
-+    }
-+}
-+{
-+    "timestamp": {
-+        "seconds":  TIMESTAMP,
-+        "microseconds":  TIMESTAMP
-+    },
-+    "event": "JOB_STATUS_CHANGE",
-+    "data": {
-+        "status": "running",
-+        "id": "commit0"
-+    }
-+}
-+{
-     "return": {
-     }
- }
-@@ -364,6 +452,28 @@ wrote 65536/65536 bytes at offset 1048576
-         "seconds":  TIMESTAMP,
-         "microseconds":  TIMESTAMP
-     },
-+    "event": "JOB_STATUS_CHANGE",
-+    "data": {
-+        "status": "waiting",
-+        "id": "commit0"
-+    }
-+}
-+{
-+    "timestamp": {
-+        "seconds":  TIMESTAMP,
-+        "microseconds":  TIMESTAMP
-+    },
-+    "event": "JOB_STATUS_CHANGE",
-+    "data": {
-+        "status": "pending",
-+        "id": "commit0"
-+    }
-+}
-+{
-+    "timestamp": {
-+        "seconds":  TIMESTAMP,
-+        "microseconds":  TIMESTAMP
-+    },
-     "event": "BLOCK_JOB_COMPLETED",
-     "data": {
-         "device": "commit0",
-@@ -373,6 +483,28 @@ wrote 65536/65536 bytes at offset 1048576
-         "type": "commit"
-     }
- }
-+{
-+    "timestamp": {
-+        "seconds":  TIMESTAMP,
-+        "microseconds":  TIMESTAMP
-+    },
-+    "event": "JOB_STATUS_CHANGE",
-+    "data": {
-+        "status": "concluded",
-+        "id": "commit0"
-+    }
-+}
-+{
-+    "timestamp": {
-+        "seconds":  TIMESTAMP,
-+        "microseconds":  TIMESTAMP
-+    },
-+    "event": "JOB_STATUS_CHANGE",
-+    "data": {
-+        "status": "null",
-+        "id": "commit0"
-+    }
-+}
- 
- === Check that both top and top2 point to base now ===
- 
-diff --git a/tests/qemu-iotests/iotests.py b/tests/qemu-iotests/iotests.py
-index b25d48a91b..ed08e06e1f 100644
---- a/tests/qemu-iotests/iotests.py
-+++ b/tests/qemu-iotests/iotests.py
-@@ -464,6 +464,9 @@ class QMPTestCase(unittest.TestCase):
-                     self.assert_qmp(event, 'data/device', drive)
-                     result = event
-                     cancelled = True
-+                elif event['event'] == 'JOB_STATUS_CHANGE':
-+                    self.assert_qmp(event, 'data/id', drive)
-+
- 
-         self.assert_no_active_block_jobs()
-         return result
-@@ -479,6 +482,8 @@ class QMPTestCase(unittest.TestCase):
-                         self.assert_qmp(event, 'data/offset', event['data']['len'])
-                     self.assert_no_active_block_jobs()
-                     return event
-+                elif event['event'] == 'JOB_STATUS_CHANGE':
-+                    self.assert_qmp(event, 'data/id', drive)
- 
-     def wait_ready(self, drive='drive0'):
-         '''Wait until a block job BLOCK_JOB_READY event'''
--- 
-2.13.6
+Sounds like the commit message needs tweaking then.
+
+>> Aside: having x-oob-test in QEMU proper is awful.  Is there really no
+>> way around it?
+>
+> I tried hard to think of a way but failed.  I need to let the
+> dispatcher stuck for a while, nothing can guarantee that but a lock.
+
+Paraphrasing, to make sure I understand:
+
+0. We want to test an OOB command can "overtake" commands that hog the
+   monitor.
+
+1. We need a command to *reliably* take long enough for us to issue an
+   OOB command.  Since OOB commands must not hog the monitor, this
+   should be a non-OOB command.
+
+2. We need an OOB command to do the overtaking.
+
+3. We'd very much like to make the overaken command complete quickly
+   after the OOB command overtook it, to keep the test quick.
+
+Correct?
+
+Your solution uses x-oob-test both for 1. and 2.  Problematic, because
+x-oob-test is OOB, yet does something an OOB command must not do: block
+on a lock.  Fixable.
+
+>                                                                      I
+> was using migration before to make sure dispatcher won't quite very
+> soon, but we have problems there since:
+>
+> - some architectures may not even have RAM, so snapshot of those
+>   platforms can still be super fast;
+>
+> - even if we make sure RAM is big, the time will depend on the speed
+>   of system, say, what if the test environment is running on RAM-disk
+>   which is still super fast even to dump the whole RAM onto disk?  As
+>   a conclusion - time based command won't work, because time is always
+>   a relative value, which can be affected by OS scheduler and system
+>   environments.
+
+Hmm, using migration is actually a cute idea.  But making it take long
+enough (1.) is unreliable, as you found.  Also, we can't make it
+complete quickly (3.).
+
+> When there is better suggestion we can remove x-oob-test, but I can't
+> see any so far.
+
+The bit we actually need is having a command block on something we
+control.  You picked a QemuSemaphore, internal to QEMU.  What about some
+blocking system call?  Here's my idea:
+
+0. Create a named pipe with mkfifo(1)
+
+1. Issue some (non-OOB) QMP command that opens this pipe.  open()
+   blocks.
+
+2. Issue the OOB-command, verify it completes
+
+3. If the non-OOB command writes to the pipe, suck the pipe dry, say
+   with cat pipe | >/dev/null.  If it reads, give it something to read,
+   say echo >pipe.
+
+To make 3. complete quickly with a command that writes, you need one
+that writes only a small amount of data.  Candidates: memsave, pmemsave,
+screendump.
+
+>> >                      let's convert the cur_mon variable to be a
+>> > per-thread variable to make sure there won't be a race between threads.
+>> >
+>> > Note that thread variables are not initialized to a valid value when new
+>> > thread is created.  However for our case we don't need to set it up,
+>> > since the cur_mon variable is only used in such a pattern:
+>> >
+>> >   old_mon = cur_mon;
+>> >   cur_mon = xxx;
+>> >   (do something, read cur_mon if necessary in the stack)
+>> >   cur_mon = old_mon;
+>> >
+>> > It plays a role as stack variable, so no need to be initialized at all.
+>> > We only need to make sure the variable won't be changed unexpectedly by
+>> > other threads.
+>> 
+>> Do we plan to keep switching cur_mon forever?  Or do we intend to work
+>> towards a 1:1 association between Monitor struct and monitor thread?
+>
+> I still don't see a good way to remove the cur_mon switching... E.g.,
+> in qmp_human_monitor_command() we'll switch no matter what.
+
+That one's a hack.  We can make exceptions for hacks.  Where else do we
+switch?
+
+>> Even if we want the latter, I'm okay with this patch as an intermediate
+>> step.
+>
+> That'll be appreciated.  Thanks,
+>
+>> 
+>> > Signed-off-by: Peter Xu <peterx@redhat.com>
