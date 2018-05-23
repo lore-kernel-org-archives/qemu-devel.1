@@ -1,30 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47802)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49026)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1fLPhf-00015t-U4
-	for qemu-devel@nongnu.org; Wed, 23 May 2018 05:05:08 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1fLPlN-0002I5-MA
+	for qemu-devel@nongnu.org; Wed, 23 May 2018 05:08:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1fLPhc-0000rt-MB
-	for qemu-devel@nongnu.org; Wed, 23 May 2018 05:05:03 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:36212 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1fLPhc-0000rd-HJ
-	for qemu-devel@nongnu.org; Wed, 23 May 2018 05:05:00 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.3])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id E4C8D818BAF0
-	for <qemu-devel@nongnu.org>; Wed, 23 May 2018 09:04:59 +0000 (UTC)
-Date: Wed, 23 May 2018 17:04:50 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20180523090450.GC2540@xz-mi>
-References: <20180412061108.10875-1-peterx@redhat.com>
-	<87sh6iixvp.fsf@dusky.pond.sub.org>
+	(envelope-from <alex.bennee@linaro.org>) id 1fLPlK-0002KO-EA
+	for qemu-devel@nongnu.org; Wed, 23 May 2018 05:08:53 -0400
+Received: from mail-wm0-x241.google.com ([2a00:1450:400c:c09::241]:53493)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1fLPlK-0002Jq-7b
+	for qemu-devel@nongnu.org; Wed, 23 May 2018 05:08:50 -0400
+Received: by mail-wm0-x241.google.com with SMTP id a67-v6so6848995wmf.3
+	for <qemu-devel@nongnu.org>; Wed, 23 May 2018 02:08:50 -0700 (PDT)
+References: <20180521140402.23318-1-peter.maydell@linaro.org>
+	<20180521140402.23318-16-peter.maydell@linaro.org>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <20180521140402.23318-16-peter.maydell@linaro.org>
+Date: Wed, 23 May 2018 10:08:48 +0100
+Message-ID: <87603evivz.fsf@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <87sh6iixvp.fsf@dusky.pond.sub.org>
-Subject: Re: [Qemu-devel] [PATCH v3] monitor: let cur_mon be per-thread
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 15/27] iommu: Add IOMMU index argument to
+ notifier APIs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,74 +31,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: qemu-devel@nongnu.org, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-arm@nongnu.org, qemu-devel@nongnu.org, patches@linaro.org, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-On Wed, May 23, 2018 at 10:23:22AM +0200, Markus Armbruster wrote:
-> Peter Xu <peterx@redhat.com> writes:
-> 
-> > In the future the monitor iothread may be accessing the cur_mon as
-> > well (via monitor_qmp_dispatch_one()).  Before we introduce a real
-> > Out-Of-Band command,
-> 
-> Uh, inhowfar are the commands marked allow-oob: true now not real?
-> These are migrate-recover, migrate-pause, x-oob-test.
 
-x-oob-test is unreal; the rest are real.
+Peter Maydell <peter.maydell@linaro.org> writes:
 
-> 
-> Aside: having x-oob-test in QEMU proper is awful.  Is there really no
-> way around it?
+> Add support for multiple IOMMU indexes to the IOMMU notifier APIs.
+> When initializing a notifier with iommu_notifier_init(), the caller
+> must pass the IOMMU index that it is interested in. When a change
+> happens, the IOMMU implementation must pass
+> memory_region_notify_iommu() the IOMMU index that has changed and
+> that notifiers must be called for.
+>
+> IOMMUs which support only a single index don't need to change.
+> Callers which only really support working with IOMMUs with a single
+> index can use the result of passing MEMTXATTRS_UNSPECIFIED to
+> memory_region_iommu_attrs_to_index().
+>
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+> ---
+>  include/exec/memory.h    | 11 ++++++++++-
+>  hw/i386/intel_iommu.c    |  4 ++--
+>  hw/ppc/spapr_iommu.c     |  2 +-
+>  hw/s390x/s390-pci-inst.c |  4 ++--
+>  hw/vfio/common.c         |  6 +++++-
+>  hw/virtio/vhost.c        |  7 ++++++-
+>  memory.c                 |  8 +++++++-
+>  7 files changed, 33 insertions(+), 9 deletions(-)
+>
+> diff --git a/include/exec/memory.h b/include/exec/memory.h
+> index f6226fb263..4e6b125add 100644
+> --- a/include/exec/memory.h
+> +++ b/include/exec/memory.h
+> @@ -71,6 +71,7 @@ struct IOMMUTLBEntry {
+>      hwaddr           iova;
+>      hwaddr           translated_addr;
+>      hwaddr           addr_mask;  /* 0xfff =3D 4k translation */
+> +    int              iommu_idx;
+>      IOMMUAccessFlags perm;
+>  };
+>
+> @@ -98,18 +99,21 @@ struct IOMMUNotifier {
+>      /* Notify for address space range start <=3D addr <=3D end */
+>      hwaddr start;
+>      hwaddr end;
+> +    int iommu_idx;
 
-I tried hard to think of a way but failed.  I need to let the
-dispatcher stuck for a while, nothing can guarantee that but a lock. I
-was using migration before to make sure dispatcher won't quite very
-soon, but we have problems there since:
+Its a minor thing but are we ever expecting iommu_idx to ever be
+negative?
 
-- some architectures may not even have RAM, so snapshot of those
-  platforms can still be super fast;
+> --- a/memory.c
+> +++ b/memory.c
+> @@ -1802,6 +1802,9 @@ void memory_region_register_iommu_notifier(MemoryRe=
+gion *mr,
+>      iommu_mr =3D IOMMU_MEMORY_REGION(mr);
+>      assert(n->notifier_flags !=3D IOMMU_NOTIFIER_NONE);
+>      assert(n->start <=3D n->end);
+> +    assert(n->iommu_idx >=3D 0 &&
+> +           n->iommu_idx < memory_region_iommu_num_indexes(iommu_mr));
+> +
 
-- even if we make sure RAM is big, the time will depend on the speed
-  of system, say, what if the test environment is running on RAM-disk
-  which is still super fast even to dump the whole RAM onto disk?  As
-  a conclusion - time based command won't work, because time is always
-  a relative value, which can be affected by OS scheduler and system
-  environments.
+And then this would only have to assert we haven't exceeded the upper bound.
 
-When there is better suggestion we can remove x-oob-test, but I can't
-see any so far.
-
-> 
-> >                      let's convert the cur_mon variable to be a
-> > per-thread variable to make sure there won't be a race between threads.
-> >
-> > Note that thread variables are not initialized to a valid value when new
-> > thread is created.  However for our case we don't need to set it up,
-> > since the cur_mon variable is only used in such a pattern:
-> >
-> >   old_mon = cur_mon;
-> >   cur_mon = xxx;
-> >   (do something, read cur_mon if necessary in the stack)
-> >   cur_mon = old_mon;
-> >
-> > It plays a role as stack variable, so no need to be initialized at all.
-> > We only need to make sure the variable won't be changed unexpectedly by
-> > other threads.
-> 
-> Do we plan to keep switching cur_mon forever?  Or do we intend to work
-> towards a 1:1 association between Monitor struct and monitor thread?
-
-I still don't see a good way to remove the cur_mon switching... E.g.,
-in qmp_human_monitor_command() we'll switch no matter what.
-
-> 
-> Even if we want the latter, I'm okay with this patch as an intermediate
-> step.
-
-That'll be appreciated.  Thanks,
-
-> 
-> > Signed-off-by: Peter Xu <peterx@redhat.com>
-
--- 
-Peter Xu
+--
+Alex Benn=C3=A9e
