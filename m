@@ -1,21 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40025)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47256)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fLYxX-0003L6-4N
-	for qemu-devel@nongnu.org; Wed, 23 May 2018 14:58:03 -0400
+	(envelope-from <jsnow@redhat.com>) id 1fLZIG-00075Q-Up
+	for qemu-devel@nongnu.org; Wed, 23 May 2018 15:19:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fLYxW-0005rZ-DA
-	for qemu-devel@nongnu.org; Wed, 23 May 2018 14:58:03 -0400
-References: <20180523102419.28665-1-vsementsov@virtuozzo.com>
-	<20180523102419.28665-2-vsementsov@virtuozzo.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <2bfd177c-3112-77a0-b214-52feca6580dd@redhat.com>
-Date: Wed, 23 May 2018 13:57:54 -0500
+	(envelope-from <jsnow@redhat.com>) id 1fLZIG-0007mk-5u
+	for qemu-devel@nongnu.org; Wed, 23 May 2018 15:19:28 -0400
+References: <20180425183223.580566-1-eblake@redhat.com>
+	<20180425183223.580566-2-eblake@redhat.com>
+From: John Snow <jsnow@redhat.com>
+Message-ID: <3e7ce246-1af0-c246-ceeb-bba8d0cc28b3@redhat.com>
+Date: Wed, 23 May 2018 15:19:18 -0400
 MIME-Version: 1.0
-In-Reply-To: <20180523102419.28665-2-vsementsov@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <20180425183223.580566-2-eblake@redhat.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3 1/5] nbd/server: fix trace
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 1/8] parallels: Switch to
+ byte-based calls
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,38 +25,22 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: armbru@redhat.com, pbonzini@redhat.com, mreitz@redhat.com, kwolf@redhat.com, den@openvz.org
+To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, "Denis V. Lunev" <den@openvz.org>, "open list:parallels" <qemu-block@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>, Max Reitz <mreitz@redhat.com>
 
-On 05/23/2018 05:24 AM, Vladimir Sementsov-Ogievskiy wrote:
-> Return code = 1 doesn't mean that we parsed base:allocation. Move
-> trace point to appropriate place.
+
+
+On 04/25/2018 02:32 PM, Eric Blake wrote:
+> We are gradually moving away from sector-based interfaces, towards
+> byte-based.  Make the change for the last few sector-based calls
+> into the block layer from the parallels driver.
 > 
-> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> ---
->   nbd/server.c | 7 +++++--
->   1 file changed, 5 insertions(+), 2 deletions(-)
+> Ideally, the parallels driver should switch to doing everything
+> byte-based, but that's a more invasive change that requires a
+> bit more auditing.
 > 
+> Signed-off-by: Eric Blake <eblake@redhat.com>
 
-> @@ -768,10 +771,10 @@ static int nbd_meta_base_query(NBDClient *client, NBDExportMetaContexts *meta,
->       }
->   
->       if (strncmp(query, "allocation", alen) == 0) {
-> +        trace_nbd_negotiate_meta_query_parse("base:allocation");
->           meta->base_allocation = true;
->       }
+Older than a month, so I'm assuming this is dropped for now.
 
-It's probably worth tracing even when we successfully skip the request, 
-as in:
-
-if (strncmp...) {
-     trace_nbd_negotiate_meta_query_parse("base:allocation");
-     meta->base_allocation = true;
-} else {
-     trace_nbd_negotiate_meta_query_skip("unrecognized request %s", query);
-}
-
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+--js
