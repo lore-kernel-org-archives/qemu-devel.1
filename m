@@ -1,21 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50091)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50102)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1fLNal-0000p1-0i
-	for qemu-devel@nongnu.org; Wed, 23 May 2018 02:49:48 -0400
+	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1fLNam-0000pz-Pa
+	for qemu-devel@nongnu.org; Wed, 23 May 2018 02:49:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1fLNah-0000A4-UR
-	for qemu-devel@nongnu.org; Wed, 23 May 2018 02:49:47 -0400
-Received: from mail.ispras.ru ([83.149.199.45]:36058)
+	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1fLNal-0000Az-Tx
+	for qemu-devel@nongnu.org; Wed, 23 May 2018 02:49:48 -0400
+Received: from mail.ispras.ru ([83.149.199.45]:36078)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1fLNah-00009P-HZ
-	for qemu-devel@nongnu.org; Wed, 23 May 2018 02:49:43 -0400
+	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1fLNal-0000Ar-Lj
+	for qemu-devel@nongnu.org; Wed, 23 May 2018 02:49:47 -0400
 From: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
-Date: Wed, 23 May 2018 09:49:42 +0300
-Message-ID: <20180523064941.26016.74274.stgit@pasha-VirtualBox>
+Date: Wed, 23 May 2018 09:49:48 +0300
+Message-ID: <20180523064948.26016.22969.stgit@pasha-VirtualBox>
+In-Reply-To: <20180523064941.26016.74274.stgit@pasha-VirtualBox>
+References: <20180523064941.26016.74274.stgit@pasha-VirtualBox>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] [PATCH v3 00/19] reverse debugging
+Subject: [Qemu-devel] [PATCH v3 01/19] block: implement bdrv_snapshot_goto
+ for blkreplay
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,112 +30,41 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: kwolf@redhat.com, peter.maydell@linaro.org, war2jordan@live.com, crosthwaite.peter@gmail.com, boost.lists@gmail.com, quintela@redhat.com, ciro.santilli@gmail.com, jasowang@redhat.com, mst@redhat.com, zuban32s@gmail.com, armbru@redhat.com, maria.klimushenkova@ispras.ru, dovgaluk@ispras.ru, kraxel@redhat.com, pavel.dovgaluk@ispras.ru, thomas.dullien@googlemail.com, pbonzini@redhat.com, mreitz@redhat.com, alex.bennee@linaro.org, dgilbert@redhat.com, rth@twiddle.net
 
-GDB remote protocol supports reverse debugging of the targets.
-It includes 'reverse step' and 'reverse continue' operations.
-The first one finds the previous step of the execution,
-and the second one is intended to stop at the last breakpoint that
-would happen when the program is executed normally.
+From: Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>
 
-Reverse debugging is possible in the replay mode, when at least
-one snapshot was created at the record or replay phase.
-QEMU can use these snapshots for travelling back in time with GDB.
+This patch enables making snapshots with blkreplay used in
+block devices.
+This function is required to make bdrv_snapshot_goto without
+calling .bdrv_open which is not implemented.
 
-Running the execution in replay mode allows using GDB reverse debugging
-commands:
- - reverse-stepi (or rsi): Steps one instruction to the past.
-   QEMU loads on of the prior snapshots and proceeds to the desired
-   instruction forward. When that step is reaches, execution stops.
- - reverse-continue (or rc): Runs execution "backwards".
-   QEMU tries to find breakpoint or watchpoint by loaded prior snapshot
-   and replaying the execution. Then QEMU loads snapshots again and
-   replays to the latest breakpoint. When there are no breakpoints in
-   the examined section of the execution, QEMU finds one more snapshot
-   and tries again. After the first snapshot is processed, execution
-   stops at this snapshot.
-
-The set of patches include the following modifications:
- - gdbstub update for reverse debugging support
- - functions that automatically perform reverse step and reverse
-   continue operations
- - hmp/qmp commands for manipulating the replay process
- - improvement of the snapshotting for saving the execution step
-   in the snapshot parameters
- - other record/replay fixes
-
-The patches are available in the repository:
-https://github.com/ispras/qemu/tree/rr-180428
-
-v3 changes:
- - Fixed PS/2 bug with save/load vm, which caused failures of the replay.
-   The patch was sent separately.
- - Rebased to the new code base.
- - Minor fixes.
-
-v2 changes:
- - documented reverse debugging
- - fixed start vmstate loading in record mode
- - documented qcow2 changes (as suggested by Eric Blake)
- - made icount SnapshotInfo field optional (as suggested by Eric Blake)
- - renamed qmp commands (as suggested by Eric Blake)
- - minor changes
-
+Signed-off-by: Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>
 ---
+ block/blkreplay.c |    8 ++++++++
+ 1 file changed, 8 insertions(+)
 
-Pavel Dovgalyuk (19):
-      block: implement bdrv_snapshot_goto for blkreplay
-      replay: disable default snapshot for record/replay
-      replay: update docs for record/replay with block devices
-      replay: don't drain/flush bdrv queue while RR is working
-      replay: finish record/replay before closing the disks
-      qcow2: introduce icount field for snapshots
-      migration: introduce icount field for snapshots
-      replay: introduce info hmp/qmp command
-      replay: introduce breakpoint at the specified step
-      replay: implement replay-seek command to proceed to the desired step
-      replay: flush events when exiting
-      timer: remove replay clock probe in deadline calculation
-      replay: refine replay-time module
-      translator: fix breakpoint processing
-      replay: flush rr queue before loading the vmstate
-      gdbstub: add reverse step support in replay mode
-      gdbstub: add reverse continue support in replay mode
-      replay: describe reverse debugging in docs/replay.txt
-      replay: allow loading any snapshots before recording
-
-
- accel/tcg/translator.c    |    9 +
- block/blkreplay.c         |    8 +
- block/io.c                |   22 +++
- block/qapi.c              |   17 ++-
- block/qcow2-snapshot.c    |    9 +
- block/qcow2.h             |    2 
- blockdev.c                |   10 ++
- cpus.c                    |   19 ++-
- docs/interop/qcow2.txt    |    4 +
- docs/replay.txt           |   45 +++++++
- exec.c                    |    6 +
- gdbstub.c                 |   50 +++++++-
- hmp-commands-info.hx      |   14 ++
- hmp-commands.hx           |   30 +++++
- hmp.h                     |    3 
- include/block/snapshot.h  |    1 
- include/sysemu/replay.h   |   18 +++
- migration/savevm.c        |   15 +-
- qapi/block-core.json      |    5 +
- qapi/block.json           |    3 
- qapi/misc.json            |   68 +++++++++++
- replay/Makefile.objs      |    3 
- replay/replay-debugging.c |  287 +++++++++++++++++++++++++++++++++++++++++++++
- replay/replay-events.c    |   14 --
- replay/replay-internal.h  |   10 +-
- replay/replay-snapshot.c  |   17 ++-
- replay/replay-time.c      |   27 ++--
- replay/replay.c           |   22 +++
- stubs/replay.c            |   10 ++
- util/qemu-timer.c         |   11 --
- vl.c                      |   18 ++-
- 31 files changed, 696 insertions(+), 81 deletions(-)
- create mode 100644 replay/replay-debugging.c
-
--- 
-Pavel Dovgalyuk
+diff --git a/block/blkreplay.c b/block/blkreplay.c
+index b016dbe..72b3c7b 100755
+--- a/block/blkreplay.c
++++ b/block/blkreplay.c
+@@ -130,6 +130,12 @@ static int coroutine_fn blkreplay_co_flush(BlockDriverState *bs)
+     return ret;
+ }
+ 
++static int blkreplay_snapshot_goto(BlockDriverState *bs,
++                                   const char *snapshot_id)
++{
++    return bdrv_snapshot_goto(bs->file->bs, snapshot_id, NULL);
++}
++
+ static BlockDriver bdrv_blkreplay = {
+     .format_name            = "blkreplay",
+     .instance_size          = 0,
+@@ -145,6 +151,8 @@ static BlockDriver bdrv_blkreplay = {
+     .bdrv_co_pwrite_zeroes  = blkreplay_co_pwrite_zeroes,
+     .bdrv_co_pdiscard       = blkreplay_co_pdiscard,
+     .bdrv_co_flush          = blkreplay_co_flush,
++
++    .bdrv_snapshot_goto     = blkreplay_snapshot_goto,
+ };
+ 
+ static void bdrv_blkreplay_init(void)
