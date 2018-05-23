@@ -1,19 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51268)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54615)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhaoshenglong@huawei.com>) id 1fLKs6-0000AU-NA
-	for qemu-devel@nongnu.org; Tue, 22 May 2018 23:55:32 -0400
+	(envelope-from <alex.williamson@redhat.com>) id 1fLLOg-0003i3-EI
+	for qemu-devel@nongnu.org; Wed, 23 May 2018 00:29:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zhaoshenglong@huawei.com>) id 1fLKs5-0000bo-BQ
-	for qemu-devel@nongnu.org; Tue, 22 May 2018 23:55:30 -0400
-From: Shannon Zhao <zhaoshenglong@huawei.com>
-Date: Wed, 23 May 2018 11:53:53 +0800
-Message-ID: <1527047633-12368-2-git-send-email-zhaoshenglong@huawei.com>
-In-Reply-To: <1527047633-12368-1-git-send-email-zhaoshenglong@huawei.com>
-References: <1527047633-12368-1-git-send-email-zhaoshenglong@huawei.com>
+	(envelope-from <alex.williamson@redhat.com>) id 1fLLOd-0006MH-7B
+	for qemu-devel@nongnu.org; Wed, 23 May 2018 00:29:10 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:51618)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
+	id 1fLLOc-0006M0-Vg
+	for qemu-devel@nongnu.org; Wed, 23 May 2018 00:29:07 -0400
+Date: Tue, 22 May 2018 22:28:56 -0600
+From: Alex Williamson <alex.williamson@redhat.com>
+Message-ID: <20180522222856.436c2c96@w520.home>
+In-Reply-To: <20180523005048-mutt-send-email-mst@kernel.org>
+References: <1526801333-30613-1-git-send-email-whois.zihan.yang@gmail.com>
+	<1526801333-30613-4-git-send-email-whois.zihan.yang@gmail.com>
+	<ef3fc85d-7726-c888-e8ca-9dfae1b908d3@gmail.com>
+	<17a3765f-b835-2d45-e8b9-ffd4aff909f9@redhat.com>
+	<cbdfe0d6-f071-3560-009d-3bbdde12b33c@gmail.com>
+	<f71a8c61-a0d7-6ebc-62ad-3dab8b9f8e5a@redhat.com>
+	<20180522234410-mutt-send-email-mst@kernel.org>
+	<20180522153659.2e33fbe0@w520.home>
+	<20180523004236-mutt-send-email-mst@kernel.org>
+	<20180522154741.3939d1e0@w520.home>
+	<20180523005048-mutt-send-email-mst@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH V3 2/2] arm_gicv3_kvm: kvm_dist_get/put: skip
- the registers banked by GICR
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [RFC 3/3] acpi-build: allocate mcfg for multiple
+ host bridges
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,204 +38,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-arm@nongnu.org
-Cc: peter.maydell@linaro.org, eric.auger@redhat.com, qemu-devel@nongnu.org, shannon.zhaosl@gmail.com
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Laszlo Ersek <lersek@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Zihan Yang <whois.zihan.yang@gmail.com>, qemu-devel@nongnu.org, Igor Mammedov <imammedo@redhat.com>, Eric Auger <eauger@redhat.com>, Drew Jones <drjones@redhat.com>, Wei Huang <wei@redhat.com>
 
-While we skip the GIC_INTERNAL irqs, we don't change the register offset
-accordingly. This will overlap the GICR registers value and leave the
-last GIC_INTERNAL irq's registers out of update.
+On Wed, 23 May 2018 02:38:52 +0300
+"Michael S. Tsirkin" <mst@redhat.com> wrote:
 
-Fix this by skipping the registers banked by GICR.
+> On Tue, May 22, 2018 at 03:47:41PM -0600, Alex Williamson wrote:
+> > On Wed, 23 May 2018 00:44:22 +0300
+> > "Michael S. Tsirkin" <mst@redhat.com> wrote:
+> >   
+> > > On Tue, May 22, 2018 at 03:36:59PM -0600, Alex Williamson wrote:  
+> > > > On Tue, 22 May 2018 23:58:30 +0300
+> > > > "Michael S. Tsirkin" <mst@redhat.com> wrote:     
+> > > > >
+> > > > > It's not hard to think of a use-case where >256 devices
+> > > > > are helpful, for example a nested virt scenario where
+> > > > > each device is passed on to a different nested guest.
+> > > > >
+> > > > > But I think the main feature this is needed for is numa modeling.
+> > > > > Guests seem to assume a numa node per PCI root, ergo we need more PCI
+> > > > > roots.    
+> > > > 
+> > > > But even if we have NUMA affinity per PCI host bridge, a PCI host
+> > > > bridge does not necessarily imply a new PCIe domain.    
+> > > 
+> > > What are you calling a PCIe domain?  
+> > 
+> > Domain/segment
+> > 
+> > 0000:00:00.0
+> > ^^^^ This  
+> 
+> Right. So we can thinkably have PCIe root complexes share an ACPI segment.
+> I don't see what this buys us by itself.
 
-Also for migration compatibility if the migration source (old version
-qemu) doesn't send gicd_no_shift_bug = 1 to destination, then we shift
-the data of PPI to get the right data for SPI.
+The ability to define NUMA locality for a PCI sub-hierarchy while
+maintaining compatibility with non-segment aware OSes (and firmware).
 
-Fixes: 367b9f527becdd20ddf116e17a3c0c2bbc486920
-Cc: qemu-stable@nongnu.org
-Signed-off-by: Shannon Zhao <zhaoshenglong@huawei.com>
----
-Changes in V3: add migration compatibility and fix code style
----
- hw/intc/arm_gicv3_common.c         | 36 ++++++++++++++++++++++++
- hw/intc/arm_gicv3_kvm.c            | 56 +++++++++++++++++++++++++++++++++++++-
- include/hw/intc/arm_gicv3_common.h |  1 +
- 3 files changed, 92 insertions(+), 1 deletion(-)
+> > Isn't that the only reason we'd need a new MCFG section and the reason
+> > we're limited to 256 buses?  Thanks,
+> > 
+> > Alex  
+> 
+> I don't know whether a single MCFG section can describe multiple roots.
+> I think it would be certainly unusual.
 
-diff --git a/hw/intc/arm_gicv3_common.c b/hw/intc/arm_gicv3_common.c
-index 7b54d52..f93e5d2 100644
---- a/hw/intc/arm_gicv3_common.c
-+++ b/hw/intc/arm_gicv3_common.c
-@@ -141,6 +141,38 @@ static const VMStateDescription vmstate_gicv3_cpu = {
-     }
- };
- 
-+static int gicv3_gicd_no_shift_bug_pre_load(void *opaque)
-+{
-+    GICv3State *cs = opaque;
-+
-+   /*
-+    * If the gicd_no_shift_bug subsection is not transferred this
-+    * means gicd_no_shift_bug is 0x0 (which might not be the same as
-+    * our reset value).
-+    */
-+    cs->gicd_no_shift_bug = 0x0;
-+    return 0;
-+}
-+
-+static bool gicv3_gicd_no_shift_bug_needed(void *opaque)
-+{
-+    GICv3State *cs = opaque;
-+
-+    return cs->gicd_no_shift_bug;
-+}
-+
-+const VMStateDescription vmstate_gicv3_gicd_no_shift_bug = {
-+    .name = "arm_gicv3/gicd_no_shift_bug",
-+    .version_id = 1,
-+    .minimum_version_id = 1,
-+    .pre_load = gicv3_gicd_no_shift_bug_pre_load,
-+    .needed = gicv3_gicd_no_shift_bug_needed,
-+    .fields = (VMStateField[]) {
-+        VMSTATE_BOOL(gicd_no_shift_bug, GICv3State),
-+        VMSTATE_END_OF_LIST()
-+    }
-+};
-+
- static const VMStateDescription vmstate_gicv3 = {
-     .name = "arm_gicv3",
-     .version_id = 1,
-@@ -165,6 +197,10 @@ static const VMStateDescription vmstate_gicv3 = {
-         VMSTATE_STRUCT_VARRAY_POINTER_UINT32(cpu, GICv3State, num_cpu,
-                                              vmstate_gicv3_cpu, GICv3CPUState),
-         VMSTATE_END_OF_LIST()
-+    },
-+    .subsections = (const VMStateDescription * []) {
-+        &vmstate_gicv3_gicd_no_shift_bug,
-+        NULL
-     }
- };
- 
-diff --git a/hw/intc/arm_gicv3_kvm.c b/hw/intc/arm_gicv3_kvm.c
-index 3536795..bd961f1 100644
---- a/hw/intc/arm_gicv3_kvm.c
-+++ b/hw/intc/arm_gicv3_kvm.c
-@@ -136,6 +136,12 @@ static void kvm_dist_get_priority(GICv3State *s, uint32_t offset, uint8_t *bmp)
-     int irq;
- 
-     field = (uint32_t *)bmp;
-+    /* For the KVM GICv3, affinity routing is always enabled, and the first 8
-+     * GICD_IPRIORITYR<n> registers are always RAZ/WI. The corresponding
-+     * functionality is replaced by GICR_IPRIORITYR<n>. So it doesn't need to
-+     * sync them.
-+     */
-+    offset += (8 * sizeof(uint32_t));
-     for_each_dist_irq_reg(irq, s->num_irq, 8) {
-         kvm_gicd_access(s, offset, &reg, false);
-         *field = reg;
-@@ -149,7 +155,18 @@ static void kvm_dist_put_priority(GICv3State *s, uint32_t offset, uint8_t *bmp)
-     uint32_t reg, *field;
-     int irq;
- 
--    field = (uint32_t *)bmp;
-+    if (!s->gicd_no_shift_bug) {
-+        field = (uint32_t *)(bmp + 8 * sizeof(uint32_t));
-+    } else {
-+        field = (uint32_t *)bmp;
-+    }
-+
-+    /* For the KVM GICv3, affinity routing is always enabled, and the first 8
-+     * GICD_IPRIORITYR<n> registers are always RAZ/WI. The corresponding
-+     * functionality is replaced by GICR_IPRIORITYR<n>. So it doesn't need to
-+     * sync them.
-+     */
-+    offset += (8 * sizeof(uint32_t));
-     for_each_dist_irq_reg(irq, s->num_irq, 8) {
-         reg = *field;
-         kvm_gicd_access(s, offset, &reg, true);
-@@ -164,6 +181,12 @@ static void kvm_dist_get_edge_trigger(GICv3State *s, uint32_t offset,
-     uint32_t reg;
-     int irq;
- 
-+    /* For the KVM GICv3, affinity routing is always enabled, and the first 2
-+     * GICD_ICFGR<n> registers are always RAZ/WI. The corresponding
-+     * functionality is replaced by GICR_ICFGR<n>. So it doesn't need to sync
-+     * them.
-+     */
-+    offset += (2 * sizeof(uint32_t));
-     for_each_dist_irq_reg(irq, s->num_irq, 2) {
-         kvm_gicd_access(s, offset, &reg, false);
-         reg = half_unshuffle32(reg >> 1);
-@@ -181,6 +204,16 @@ static void kvm_dist_put_edge_trigger(GICv3State *s, uint32_t offset,
-     uint32_t reg;
-     int irq;
- 
-+    if (!s->gicd_no_shift_bug) {
-+        bmp += (2 * sizeof(uint32_t));
-+    }
-+
-+    /* For the KVM GICv3, affinity routing is always enabled, and the first 2
-+     * GICD_ICFGR<n> registers are always RAZ/WI. The corresponding
-+     * functionality is replaced by GICR_ICFGR<n>. So it doesn't need to sync
-+     * them.
-+     */
-+    offset += (2 * sizeof(uint32_t));
-     for_each_dist_irq_reg(irq, s->num_irq, 2) {
-         reg = *gic_bmp_ptr32(bmp, irq);
-         if (irq % 32 != 0) {
-@@ -222,6 +255,12 @@ static void kvm_dist_getbmp(GICv3State *s, uint32_t offset, uint32_t *bmp)
-     uint32_t reg;
-     int irq;
- 
-+    /* For the KVM GICv3, affinity routing is always enabled, and the
-+     * GICD_IGROUPR0/GICD_ISENABLER0/GICD_ISPENDR0/GICD_ISACTIVER0 registers
-+     * are always RAZ/WI. The corresponding functionality is replaced by the
-+     * GICR registers. So it doesn't need to sync them.
-+     */
-+    offset += (1 * sizeof(uint32_t));
-     for_each_dist_irq_reg(irq, s->num_irq, 1) {
-         kvm_gicd_access(s, offset, &reg, false);
-         *gic_bmp_ptr32(bmp, irq) = reg;
-@@ -235,6 +274,20 @@ static void kvm_dist_putbmp(GICv3State *s, uint32_t offset,
-     uint32_t reg;
-     int irq;
- 
-+    if (!s->gicd_no_shift_bug) {
-+        bmp += (1 * sizeof(uint32_t));
-+    }
-+
-+    /* For the KVM GICv3, affinity routing is always enabled, and the
-+     * GICD_IGROUPR0/GICD_ISENABLER0/GICD_ISPENDR0/GICD_ISACTIVER0 registers
-+     * are always RAZ/WI. The corresponding functionality is replaced by the
-+     * GICR registers. So it doesn't need to sync them.
-+     */
-+    offset += (1 * sizeof(uint32_t));
-+    if (clroffset != 0) {
-+        clroffset += (1 * sizeof(uint32_t));
-+    }
-+
-     for_each_dist_irq_reg(irq, s->num_irq, 1) {
-         /* If this bitmap is a set/clear register pair, first write to the
-          * clear-reg to clear all bits before using the set-reg to write
-@@ -651,6 +704,7 @@ static void kvm_arm_gicv3_reset(DeviceState *dev)
-         return;
-     }
- 
-+    s->gicd_no_shift_bug = 1;
-     kvm_arm_gicv3_put(s);
- }
- 
-diff --git a/include/hw/intc/arm_gicv3_common.h b/include/hw/intc/arm_gicv3_common.h
-index bccdfe1..13c28c0 100644
---- a/include/hw/intc/arm_gicv3_common.h
-+++ b/include/hw/intc/arm_gicv3_common.h
-@@ -217,6 +217,7 @@ struct GICv3State {
-     uint32_t revision;
-     bool security_extn;
-     bool irq_reset_nonsecure;
-+    bool gicd_no_shift_bug;
- 
-     int dev_fd; /* kvm device fd if backed by kvm vgic support */
-     Error *migration_blocker;
--- 
-2.0.4
+I'm not sure here if you're referring to the actual MCFG ACPI table or
+the MMCONFIG range, aka the ECAM.  Neither of these describe PCI host
+bridges.  The MCFG table can describe one or more ECAM ranges, which
+provides the ECAM base address, the PCI segment associated with that
+ECAM and the start and end bus numbers to know the offset and extent of
+the ECAM range.  PCI host bridges would then theoretically be separate
+ACPI objects with _SEG and _BBN methods to associate them to the
+correct ECAM range by segment number and base bus number.  So it seems
+that tooling exists that an ECAM/MMCONFIG range could be provided per
+PCI host bridge, even if they exist within the same domain, but in
+practice what I see on systems I have access to is a single MMCONFIG
+range supporting all of the host bridges.  It also seems there are
+numerous ways to describe the MMCONFIG range and I haven't actually
+found an example that seems to use the MCFG table.  Two have MCFG
+tables (that don't seem terribly complete) and the kernel claims to
+find the MMCONFIG via e820, another doesn't even have an MCFG table and
+the kernel claims to find MMCONFIG via an ACPI motherboard resource.
+I'm not sure if I can enable PCI segments on anything to see how the
+firmware changes.  Thanks,
+
+Alex
