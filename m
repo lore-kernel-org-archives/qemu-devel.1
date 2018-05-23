@@ -1,22 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35576)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35821)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1fLd1W-0000Rd-EX
-	for qemu-devel@nongnu.org; Wed, 23 May 2018 19:18:27 -0400
+	(envelope-from <tiwei.bie@intel.com>) id 1fLd3m-0001J5-TY
+	for qemu-devel@nongnu.org; Wed, 23 May 2018 19:20:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1fLd1V-0001nF-2d
-	for qemu-devel@nongnu.org; Wed, 23 May 2018 19:18:26 -0400
-References: <20180518132114.4070-1-kwolf@redhat.com>
-	<20180518132114.4070-22-kwolf@redhat.com>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <26778cd3-3150-734b-d8c6-afa6e41f0215@redhat.com>
-Date: Wed, 23 May 2018 19:18:18 -0400
+	(envelope-from <tiwei.bie@intel.com>) id 1fLd3j-0002Yw-Ns
+	for qemu-devel@nongnu.org; Wed, 23 May 2018 19:20:46 -0400
+Received: from mga12.intel.com ([192.55.52.136]:25097)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <tiwei.bie@intel.com>) id 1fLd3j-0002YJ-9y
+	for qemu-devel@nongnu.org; Wed, 23 May 2018 19:20:43 -0400
+Date: Thu, 24 May 2018 07:21:01 +0800
+From: Tiwei Bie <tiwei.bie@intel.com>
+Message-ID: <20180523232101.GB15604@debian>
+References: <20180412151232.17506-1-tiwei.bie@intel.com>
+	<20180412151232.17506-3-tiwei.bie@intel.com>
+	<20180523163116-mutt-send-email-mst@kernel.org>
+	<20180523183444-mutt-send-email-mst@kernel.org>
+	<20180523184001-mutt-send-email-mst@kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20180518132114.4070-22-kwolf@redhat.com>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 21/40] job: Convert
- block_job_cancel_async() to Job
+Content-Disposition: inline
+In-Reply-To: <20180523184001-mutt-send-email-mst@kernel.org>
+Subject: Re: [Qemu-devel] [PATCH v3 2/6] vhost-user: introduce shared
+ vhost-user state
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,181 +31,165 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, jcody@redhat.com, armbru@redhat.com, mreitz@redhat.com
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: jasowang@redhat.com, alex.williamson@redhat.com, pbonzini@redhat.com, stefanha@redhat.com, qemu-devel@nongnu.org, virtio-dev@lists.oasis-open.org, cunming.liang@intel.com, dan.daly@intel.com, jianfeng.tan@intel.com, zhihong.wang@intel.com, xiao.w.wang@intel.com
 
+On Wed, May 23, 2018 at 06:43:29PM +0300, Michael S. Tsirkin wrote:
+> On Wed, May 23, 2018 at 06:36:05PM +0300, Michael S. Tsirkin wrote:
+> > On Wed, May 23, 2018 at 04:44:51PM +0300, Michael S. Tsirkin wrote:
+> > > On Thu, Apr 12, 2018 at 11:12:28PM +0800, Tiwei Bie wrote:
+> > > > When multi queue is enabled e.g. for a virtio-net device,
+> > > > each queue pair will have a vhost_dev, and the only thing
+> > > > shared between vhost devs currently is the chardev. This
+> > > > patch introduces a vhost-user state structure which will
+> > > > be shared by all vhost devs of the same virtio device.
+> > > > 
+> > > > Signed-off-by: Tiwei Bie <tiwei.bie@intel.com>
+> > > 
+> > > Unfortunately this patch seems to cause crashes.
+> > > To reproduce, simply run
+> > > make check-qtest-x86_64
+> > > 
+> > > Sorry that it took me a while to find - it triggers 90% of runs but not
+> > > 100% which complicates bisection somewhat.
 
+It's my fault to not notice this bug before.
+I'm very sorry. Thank you so much for finding
+the root cause!
 
-On 05/18/2018 09:20 AM, Kevin Wolf wrote:
-> block_job_cancel_async() did two things that were still block job
-> specific:
+> > > 
+> > > > ---
+> > > >  backends/cryptodev-vhost-user.c     | 20 ++++++++++++++++++-
+> > > >  hw/block/vhost-user-blk.c           | 22 +++++++++++++++++++-
+> > > >  hw/scsi/vhost-user-scsi.c           | 20 ++++++++++++++++++-
+> > > >  hw/virtio/Makefile.objs             |  2 +-
+> > > >  hw/virtio/vhost-stub.c              | 10 ++++++++++
+> > > >  hw/virtio/vhost-user.c              | 31 +++++++++++++++++++---------
+> > > >  include/hw/virtio/vhost-user-blk.h  |  2 ++
+> > > >  include/hw/virtio/vhost-user-scsi.h |  2 ++
+> > > >  include/hw/virtio/vhost-user.h      | 20 +++++++++++++++++++
+> > > >  net/vhost-user.c                    | 40 ++++++++++++++++++++++++++++++-------
+> > > >  10 files changed, 149 insertions(+), 20 deletions(-)
+> > > >  create mode 100644 include/hw/virtio/vhost-user.h
+[...]
+> > > >          qemu_chr_fe_set_handlers(&s->chr, NULL, NULL,
+> > > >                                   net_vhost_user_event, NULL, nc0->name, NULL,
+> > > > @@ -319,6 +336,15 @@ static int net_vhost_user_init(NetClientState *peer, const char *device,
+> > > >      assert(s->vhost_net);
+> > > >  
+> > > >      return 0;
+> > > > +
+> > > > +err:
+> > > > +    if (user) {
+> > > > +        vhost_user_cleanup(user);
+> > > > +        g_free(user);
+> > > > +        s->vhost_user = NULL;
+> > > > +    }
+> > > > +
+> > > > +    return -1;
+> > > >  }
+> > > >  
+> > > >  static Chardev *net_vhost_claim_chardev(
+> > > > -- 
+> > > > 2.11.0
+> > 
+> > So far I figured out that commenting the free of
+> > the structure removes the crash, so we seem to
+> > be dealing with a use-after free here.
+> > I suspect that in a MQ situation, one queue gets
+> > closed and attempts to free the structure
+> > while others still use it.
+> > 
+> > diff --git a/net/vhost-user.c b/net/vhost-user.c
+> > index 525a061..6a1573b 100644
+> > --- a/net/vhost-user.c
+> > +++ b/net/vhost-user.c
+> > @@ -157,8 +157,8 @@ static void net_vhost_user_cleanup(NetClientState *nc)
+> >          s->vhost_net = NULL;
+> >      }
+> >      if (s->vhost_user) {
+> > -        vhost_user_cleanup(s->vhost_user);
+> > -        g_free(s->vhost_user);
+> > +        //vhost_user_cleanup(s->vhost_user);
+> > +        //g_free(s->vhost_user);
+> >          s->vhost_user = NULL;
+> >      }
+> >      if (nc->queue_index == 0) {
+> > @@ -339,8 +339,8 @@ static int net_vhost_user_init(NetClientState *peer, const char *device,
+> >  
+> >  err:
+> >      if (user) {
+> > -        vhost_user_cleanup(user);
+> > -        g_free(user);
+> > +        //vhost_user_cleanup(user);
+> > +        //g_free(user);
+> >          s->vhost_user = NULL;
+> >      }
+> >  
 > 
-> * Setting job->force. This field makes sense on the Job level, so we can
->   just move it. While at it, rename it to job->force_cancel to make its
->   purpose more obvious.
 > 
-> * Resetting the I/O status. This can't be moved because generic Jobs
->   don't have an I/O status. What the function really implements is a
->   user resume, except without entering the coroutine. Consequently, it
-
-You know, I had noticed this before but because this is called from
-contexts which are NOT user-initiated, I didn't want to share the callback.
-
-... I guess it's fine because the job is about to not exist anymore, so
-it probably won't spook anything.
-
->   makes sense to call the .user_resume driver callback here which
->   already resets the I/O status.
+> So the following at least gets rid of the crashes.
+> I am not sure it does not leak memory though,
+> and not sure there aren't any configurations where
+> the 1st queue gets cleaned up first.
 > 
->   The old block_job_cancel_async() has two separate if statements that
->   check job->iostatus != BLOCK_DEVICE_IO_STATUS_OK and job->user_paused.
->   However, the former condition always implies the latter (as is
->   asserted in block_job_iostatus_reset()), so changing the explicit call
->   of block_job_iostatus_reset() on the former condition with the
->   .user_resume callback on the latter condition is equivalent and
->   doesn't need to access any BlockJob specific state.
+> Thoughts?
 
-Oh, cool! This is nice.
+Thank you so much for catching it and fixing
+it! I'll keep your SoB there. Thank you so
+much! I do appreciate it!
+
+You are right. This structure is freed multiple
+times when multi-queue is enabled.
+
+I think it's safe to let the first queue pair
+free the vhost-user structure, because it won't
+be touched by other queue pairs during cleanup.
+
+Best regards,
+Tiwei Bie
+
 
 > 
-> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-> Reviewed-by: Max Reitz <mreitz@redhat.com>
+> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+> 
 > ---
->  include/block/blockjob.h |  6 ------
->  include/qemu/job.h       |  6 ++++++
->  block/mirror.c           |  4 ++--
->  blockjob.c               | 25 +++++++++++++------------
->  4 files changed, 21 insertions(+), 20 deletions(-)
 > 
-> diff --git a/include/block/blockjob.h b/include/block/blockjob.h
-> index 3f405d1fa7..d975efea20 100644
-> --- a/include/block/blockjob.h
-> +++ b/include/block/blockjob.h
-> @@ -51,12 +51,6 @@ typedef struct BlockJob {
->      BlockBackend *blk;
->  
->      /**
-> -     * Set to true if the job should abort immediately without waiting
-> -     * for data to be in sync.
-> -     */
-> -    bool force;
-> -
-> -    /**
->       * Set to true when the job is ready to be completed.
->       */
->      bool ready;
-> diff --git a/include/qemu/job.h b/include/qemu/job.h
-> index 3e817beee9..2648c74281 100644
-> --- a/include/qemu/job.h
-> +++ b/include/qemu/job.h
-> @@ -97,6 +97,12 @@ typedef struct Job {
->       */
->      bool cancelled;
->  
-> +    /**
-> +     * Set to true if the job should abort immediately without waiting
-> +     * for data to be in sync.
-> +     */
-> +    bool force_cancel;
-> +
-
-Does this comment need an update now, though?
-
-Actually, in terms of "new jobs" API, it'd be really nice if cancel
-*always meant cancel*.
-
-I think "cancel" should never be used to mean "successful completion,
-but different from the one we'd get if we used job_complete."
-
-i.e., either we need a job setting:
-
-job-set completion-mode=[pivot|no-pivot]
-
-or optional parameters to pass to job-complete:
-
-job-complete mode=[understood-by-job-type]
-
-or some other mechanism that accomplishes the same type of behavior. It
-would be nice if it did not have to be determined at job creation time
-but instead could be determined later.
-
-
->      /** Set to true when the job has deferred work to the main loop. */
->      bool deferred_to_main_loop;
->  
-> diff --git a/block/mirror.c b/block/mirror.c
-> index e9a90ea730..c3951d1ca2 100644
-> --- a/block/mirror.c
-> +++ b/block/mirror.c
-> @@ -871,7 +871,7 @@ static void coroutine_fn mirror_run(void *opaque)
->          trace_mirror_before_sleep(s, cnt, s->synced, delay_ns);
->          job_sleep_ns(&s->common.job, delay_ns);
->          if (job_is_cancelled(&s->common.job) &&
-> -            (!s->synced || s->common.force))
-> +            (!s->synced || s->common.job.force_cancel))
->          {
->              break;
->          }
-> @@ -884,7 +884,7 @@ immediate_exit:
->           * or it was cancelled prematurely so that we do not guarantee that
->           * the target is a copy of the source.
->           */
-> -        assert(ret < 0 || ((s->common.force || !s->synced) &&
-> +        assert(ret < 0 || ((s->common.job.force_cancel || !s->synced) &&
->                 job_is_cancelled(&s->common.job)));
->          assert(need_drain);
->          mirror_wait_for_all_io(s);
-> diff --git a/blockjob.c b/blockjob.c
-> index 34c57da304..4cac3670ad 100644
-> --- a/blockjob.c
-> +++ b/blockjob.c
-> @@ -270,19 +270,20 @@ static int block_job_prepare(BlockJob *job)
->      return job->job.ret;
->  }
->  
-> -static void block_job_cancel_async(BlockJob *job, bool force)
-> +static void job_cancel_async(Job *job, bool force)
->  {
-> -    if (job->iostatus != BLOCK_DEVICE_IO_STATUS_OK) {
-> -        block_job_iostatus_reset(job);
+> diff --git a/net/vhost-user.c b/net/vhost-user.c
+> index 525a061..7549d25 100644
+> --- a/net/vhost-user.c
+> +++ b/net/vhost-user.c
+> @@ -156,19 +156,20 @@ static void net_vhost_user_cleanup(NetClientState *nc)
+>          g_free(s->vhost_net);
+>          s->vhost_net = NULL;
+>      }
+> -    if (s->vhost_user) {
+> -        vhost_user_cleanup(s->vhost_user);
+> -        g_free(s->vhost_user);
+> -        s->vhost_user = NULL;
 > -    }
-> -    if (job->job.user_paused) {
-> -        /* Do not call block_job_enter here, the caller will handle it.  */
-> -        job->job.user_paused = false;
-> -        job->job.pause_count--;
-> +    if (job->user_paused) {
-> +        /* Do not call job_enter here, the caller will handle it.  */
-> +        job->user_paused = false;
-> +        if (job->driver->user_resume) {
-> +            job->driver->user_resume(job);
+>      if (nc->queue_index == 0) {
+>          if (s->watch) {
+>              g_source_remove(s->watch);
+>              s->watch = 0;
+>          }
+>          qemu_chr_fe_deinit(&s->chr, true);
+> +        if (s->vhost_user) {
+> +            vhost_user_cleanup(s->vhost_user);
+> +            g_free(s->vhost_user);
 > +        }
-> +        assert(job->pause_count > 0);
-> +        job->pause_count--;
 >      }
-> -    job->job.cancelled = true;
-> +    job->cancelled = true;
->      /* To prevent 'force == false' overriding a previous 'force == true' */
-> -    job->force |= force;
-> +    job->force_cancel |= force;
+>  
+> +    s->vhost_user = NULL;
+> +
+>      qemu_purge_queued_packets(nc);
 >  }
 >  
->  static int block_job_txn_apply(BlockJobTxn *txn, int fn(BlockJob *), bool lock)
-> @@ -367,7 +368,7 @@ static void block_job_completed_txn_abort(BlockJob *job)
->       * on the caller, so leave it. */
->      QLIST_FOREACH(other_job, &txn->jobs, txn_list) {
->          if (other_job != job) {
-> -            block_job_cancel_async(other_job, false);
-> +            job_cancel_async(&other_job->job, false);
->          }
+> @@ -341,7 +342,6 @@ err:
+>      if (user) {
+>          vhost_user_cleanup(user);
+>          g_free(user);
+> -        s->vhost_user = NULL;
 >      }
->      while (!QLIST_EMPTY(&txn->jobs)) {
-> @@ -527,7 +528,7 @@ void block_job_cancel(BlockJob *job, bool force)
->          job_do_dismiss(&job->job);
->          return;
->      }
-> -    block_job_cancel_async(job, force);
-> +    job_cancel_async(&job->job, force);
->      if (!job_started(&job->job)) {
->          block_job_completed(job, -ECANCELED);
->      } else if (job->job.deferred_to_main_loop) {
-> 
+>  
+>      return -1;
