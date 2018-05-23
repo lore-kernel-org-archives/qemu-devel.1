@@ -1,30 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38417)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40251)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jemmy858585@gmail.com>) id 1fLJdw-0005Jb-JP
-	for qemu-devel@nongnu.org; Tue, 22 May 2018 22:36:49 -0400
+	(envelope-from <famz@redhat.com>) id 1fLJsq-00077o-OU
+	for qemu-devel@nongnu.org; Tue, 22 May 2018 22:52:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jemmy858585@gmail.com>) id 1fLJdv-0004WN-MP
-	for qemu-devel@nongnu.org; Tue, 22 May 2018 22:36:48 -0400
-Received: from mail-io0-x243.google.com ([2607:f8b0:4001:c06::243]:33366)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <jemmy858585@gmail.com>)
-	id 1fLJdv-0004WF-Gy
-	for qemu-devel@nongnu.org; Tue, 22 May 2018 22:36:47 -0400
-Received: by mail-io0-x243.google.com with SMTP id e78-v6so20974921iod.0
-	for <qemu-devel@nongnu.org>; Tue, 22 May 2018 19:36:47 -0700 (PDT)
+	(envelope-from <famz@redhat.com>) id 1fLJsq-0000nn-0v
+	for qemu-devel@nongnu.org; Tue, 22 May 2018 22:52:12 -0400
+Date: Wed, 23 May 2018 10:52:02 +0800
+From: Fam Zheng <famz@redhat.com>
+Message-ID: <20180523025202.GI28114@lemon.usersys.redhat.com>
+References: <20180518142605.19846-1-kwolf@redhat.com>
+	<20180518142605.19846-2-kwolf@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <CAOGPPbdx1EPXFUibshPG+ZfgJ38ALpX4xBi2fk2LqkaLjbA6Yw@mail.gmail.com>
-References: <1525530936-21835-1-git-send-email-lidongchen@tencent.com>
-	<1525530936-21835-6-git-send-email-lidongchen@tencent.com>
-	<379b3f13-f53f-966b-ccbf-66517d45aa9d@redhat.com>
-	<CAOGPPbeVvm5OM+oNpYfYiAsNTK7bn7eFDgzyMuvm8YymM2sq_w@mail.gmail.com>
-	<CAOGPPbdx1EPXFUibshPG+ZfgJ38ALpX4xBi2fk2LqkaLjbA6Yw@mail.gmail.com>
-From: 858585 jemmy <jemmy858585@gmail.com>
-Date: Wed, 23 May 2018 10:36:46 +0800
-Message-ID: <CAOGPPbdGEmAdchPjDfxcnFC1H8peMhVkDTtOj-nOuG76NR79pQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v3 5/6] migration: implement bi-directional
- RDMA QIOChannel
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180518142605.19846-2-kwolf@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2 1/3] qemu-iotests: Fix paths for NFS
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,77 +23,14 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>
-Cc: Juan Quintela <quintela@redhat.com>, Dave Gilbert <dgilbert@redhat.com>, Adi Dotan <adido@mellanox.com>, Gal Shachaf <galsha@mellanox.com>, Aviad Yehezkel <aviadye@mellanox.com>, qemu-devel <qemu-devel@nongnu.org>, Lidong Chen <lidongchen@tencent.com>
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org
 
-ping.
+On Fri, 05/18 16:26, Kevin Wolf wrote:
+> Test cases were trying to use nfs:// URLs as local filenames, which made
+> every test fail for NFS. With TEST_IMG and TEST_IMG_FILE set like for
+> the other protocols, NFS tests can pass again.
+> 
+> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 
-On Mon, May 21, 2018 at 7:49 PM, 858585 jemmy <jemmy858585@gmail.com> wrote:
-> On Wed, May 16, 2018 at 5:36 PM, 858585 jemmy <jemmy858585@gmail.com> wrote:
->> On Tue, May 15, 2018 at 10:54 PM, Paolo Bonzini <pbonzini@redhat.com> wrote:
->>> On 05/05/2018 16:35, Lidong Chen wrote:
->>>> @@ -2635,12 +2637,20 @@ static ssize_t qio_channel_rdma_writev(QIOChannel *ioc,
->>>>  {
->>>>      QIOChannelRDMA *rioc = QIO_CHANNEL_RDMA(ioc);
->>>>      QEMUFile *f = rioc->file;
->>>> -    RDMAContext *rdma = rioc->rdma;
->>>> +    RDMAContext *rdma;
->>>>      int ret;
->>>>      ssize_t done = 0;
->>>>      size_t i;
->>>>      size_t len = 0;
->>>>
->>>> +    rcu_read_lock();
->>>> +    rdma = atomic_rcu_read(&rioc->rdmaout);
->>>> +
->>>> +    if (!rdma) {
->>>> +        rcu_read_unlock();
->>>> +        return -EIO;
->>>> +    }
->>>> +
->>>>      CHECK_ERROR_STATE();
->>>>
->>>>      /*
->>>
->>> I am not sure I understand this.  It would probably be wrong to use the
->>> output side from two threads at the same time, so why not use two mutexes?
->>
->> Two thread will not invoke qio_channel_rdma_writev at the same time.
->> The source qemu, migration thread only use writev, and the return path
->> thread only
->> use readv.
->> The destination qemu already have a mutex mis->rp_mutex to make sure
->> not use writev
->> at the same time.
->>
->> The rcu_read_lock is used to protect not use RDMAContext when another
->> thread closes it.
->
-> Any suggestion?
->
->>
->>>
->>> Also, who is calling qio_channel_rdma_close in such a way that another
->>> thread is still using it?  Would it be possible to synchronize with the
->>> other thread *before*, for example with qemu_thread_join?
->>
->> The MigrationState structure includes to_dst_file and from_dst_file
->> QEMUFile, the two QEMUFile use the same QIOChannel.
->> For example, if the return path thread call
->> qemu_fclose(ms->rp_state.from_dst_file),
->> It will also close the RDMAContext for ms->to_dst_file.
->>
->> For live migration, the source qemu invokes qemu_fclose in different
->> threads include main thread, migration thread, return path thread.
->>
->> The destination qemu invokes qemu_fclose in main thread, listen thread and
->> COLO incoming thread.
->>
->> I do not find an effective way to synchronize these threads.
->>
->> Thanks.
->>
->>>
->>> Thanks,
->>>
->>> Paolo
+Reviewed-by: Fam Zheng <famz@redhat.com>
