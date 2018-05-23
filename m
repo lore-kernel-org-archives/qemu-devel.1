@@ -1,29 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47845)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49664)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fLXsE-0002tB-Mk
-	for qemu-devel@nongnu.org; Wed, 23 May 2018 13:48:31 -0400
+	(envelope-from <jsnow@redhat.com>) id 1fLXx3-0004qx-U3
+	for qemu-devel@nongnu.org; Wed, 23 May 2018 13:53:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fLXsA-0002QD-Pl
-	for qemu-devel@nongnu.org; Wed, 23 May 2018 13:48:30 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:45558 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1fLXsA-0002Q3-KG
-	for qemu-devel@nongnu.org; Wed, 23 May 2018 13:48:26 -0400
-References: <1526752108-21204-1-git-send-email-patryk@fala.ehost.pl>
-	<87o9h7q53u.fsf@dusky.pond.sub.org>
-	<CAFEAcA-ce=r3izLyizhEo+a4Fkg5dQ-NnDgHRJ4GsomnqQsqRw@mail.gmail.com>
-	<187f5c5b-6ce3-a9d0-3431-4e0109292888@fala.ehost.pl>
-	<87zi0qba1n.fsf@dusky.pond.sub.org>
-	<b3a6e022-5789-43a2-d32b-b22c8cccf7ef@fala.ehost.pl>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <a24a1c97-9b6e-3b85-a8ac-d7c3d2c387c1@redhat.com>
-Date: Wed, 23 May 2018 12:48:24 -0500
+	(envelope-from <jsnow@redhat.com>) id 1fLXx3-0004fF-1V
+	for qemu-devel@nongnu.org; Wed, 23 May 2018 13:53:30 -0400
+References: <CAGtobs_PEYmSyPwbYG-6oNp9PxwQ52xHaFuXh59ELWcrAm6LSA@mail.gmail.com>
+From: John Snow <jsnow@redhat.com>
+Message-ID: <340670a5-c9f3-ccf0-6af2-1bc1dc471866@redhat.com>
+Date: Wed, 23 May 2018 13:53:23 -0400
 MIME-Version: 1.0
-In-Reply-To: <b3a6e022-5789-43a2-d32b-b22c8cccf7ef@fala.ehost.pl>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <CAGtobs_PEYmSyPwbYG-6oNp9PxwQ52xHaFuXh59ELWcrAm6LSA@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] Remove unwanted crlf conversion in serial
+Subject: Re: [Qemu-devel] AIO error case
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,71 +23,112 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Patryk Olszewski <patryk@fala.ehost.pl>, Markus Armbruster <armbru@redhat.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
-
-On 05/23/2018 11:48 AM, Patryk Olszewski wrote:
-
->>> This patch is here to help fix years old bug of lf being replaced with
->>> crlf in serial, which is super problematic in binary transmissions,
->>> making communication with devices through serial from guest almost
->>> impossible.
->>>
->>> Setting OPOST flag in c_oflag enables the output processing, in other
->>> words it makes any other flag set in c_oflag come into action. From my
->>> quick experiment on serial devices on Linux I found out that by default
->>> c_oflag has enabled ONLCR flag, which is the one responsible for the
->>> crlf conversion. Unsetting OPOST disables it.
->>>
->>> Bug reports related to that:
->>>
->>> https://bugs.launchpad.net/qemu/+bug/1772086
->>>
->>> https://bugs.launchpad.net/qemu/+bug/1407813
->>>
->>> https://bugs.launchpad.net/qemu/+bug/1715296
->>>
->>> also
->>>
->>> https://lists.nongnu.org/archive/html/qemu-devel/2006-06/msg00196.html
->> Work that into your commit message, and you got a fine patch as far as
->> I'm concerned :)
->>
-> First time contribution to such large project. Trying to learn how to
-> properly work with mailing lists and such. If there's something I
-> actually have to do now I'd like to get some pointers on how to do it.
-> Thank you,
-
-Then welcome to the qemu community!  In answer to your question, yes, 
-now that you've had some valid reviewer comments, the ball is back in 
-your court to incorporate the changes that were suggested to you, and 
-submit a new top-level thread with a v2 in the subject line.
-
-The easiest thing is to do 'git commit --amend' (works for a single 
-commit) or even 'git rebase -i' then change the patch from 'pick' to 
-'edit' (required when editing a patch series, but can also be used on a 
-single patch to learn the patch flow), make the requested edits (that 
-is, add your rationale into the commit message), and then send your new 
-patch revision ('git send-email -1 -v2' or similar).  It also helps if 
-version 2 contains a description after the '---' separator explaining 
-how it is improved from v1 (in this case, improving the commit message). 
-  Other patch submission hints can be found at 
-http://wiki.qemu.org/Contribute/SubmitAPatch
-
-Don't worry if you don't get everything perfect on your first try; we 
-were all once beginners, so we don't mind helping someone else learn. 
-But at the same time, demonstrating that you were able to make life 
-easier for reviewers by following as many suggestions as possible, 
-rather than leaving all the cleanup work to someone else, is an 
-important skill to have if you plan to stick around for further 
-contributions.
-
-Also, feel free to ask questions on IRC where you might get faster 
-response time, when it comes to figuring out your ideal setup for 
-submitting patches with git.
+To: Nishanth Aravamudan <naravamudan@digitalocean.com>, qemu-devel@nongnu.org, Qemu-block <qemu-block@nongnu.org>
 
 
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+
+On 05/22/2018 06:01 PM, Nishanth Aravamudan via Qemu-devel wrote:
+> Hi!
+> 
+
+Hi! CCing qemu-block@nongnu.org;
+
+> I'm tracking an error case in the native AIO path, and was wondering if
+> there was a latent (albeit possibly hard to hit) bug. Specifically
+> util/async.c::aio_get_linux_aio:
+> 
+> #ifdef CONFIG_LINUX_AIO
+> LinuxAioState *aio_get_linux_aio(AioContext *ctx)
+> {
+>     if (!ctx->linux_aio) {
+>         ctx->linux_aio = laio_init();
+>         laio_attach_aio_context(ctx->linux_aio, ctx);
+>     }
+>     return ctx->linux_aio;
+> }
+> #endif
+> 
+> laio_init() can in certain conditions return NULL, but that's not checked
+> here and then the NULL result is passed directly into
+> laio_attach_aio_context, which dereferences it without checking that the
+> pointer is valid.
+> 
+
+Looks like a good old-fashioned bug to me:
+
+``
+    if (event_notifier_init(&s->e, false) < 0) {
+        goto out_free_state;
+    }
+
+    if (io_setup(MAX_EVENTS, &s->ctx) != 0) {
+        goto out_close_efd;
+    }
+
+...
+
+out_close_efd:
+    event_notifier_cleanup(&s->e);
+out_free_state:
+    g_free(s);
+    return NULL;
+``
+
+event_notifier_init looks like it is... usually(?) going to return
+-errno on error, and the man page for io_setup suggests that the libaio
+wrapper for io_setup is supposed to return -errno if it fails; we could
+probably hold onto that error code.
+
+We probably ought to forward those error codes up to the caller; maybe:
+
+int laio_init(LinuxAioState **linux_aio);
+
+> I'm not sure what is appropriate if laio_init() returns NULL, returning
+> NULL back to the caller of aio_get_linux_aio() has its own issues, because
+> those callers don't seem to check its return value either.
+> 
+
+If laio_init can return NULL,  aio_get_linux_aio needs to check for that.
+
+Then callers of that ought to be amended to return some kind of error:
+
+raw_co_prw can return whatever laio_init returned as an error code.
+raw_aio_plug doesn't have a way to communicate errors, yet...
+raw_aio_unplug doesn't have an error reporting mechanism either.
+
+Those last two are defined here:
+
+    .bdrv_io_plug = raw_aio_plug,
+    .bdrv_io_unplug = raw_aio_unplug,
+
+but it looks like bdrv_io_un|plug doesn't return errors either.
+
+bdrv_io_plug is called by both blk_io_plug and itself, but has no other
+callers.
+
+blk_io_plug is called in two places:
+
+virtio_scsi_handle_cmd_req_prepare, which can report -errno error codes
+(so we can amend blk_io_plug and bdrv_io_plug to just bubble up errors), and
+
+virtio_blk_handle_vq -- which doesn't appear to be capable of handling
+an error, just indicating "progress".
+
+unplug has three usages, one in virtio-blk and two in virtio-scsi, all
+of which only appear to check for "progress" and don't seem to have
+explicit error reporting.
+
+Probably unplug can't actually fail like this though -- I'm assuming by
+the name that it must occur after a call to plug and that will have
+memoized the call to aio_get_linux_aio by then.
+
+So... probably what we need to do here is take a look at the virtio-blk
+usage of plug and do error-plumbing as necessary.
+
+Wanna send a patch?
+
+--js
+
+> Thanks in advance!
+> -Nish
+> 
