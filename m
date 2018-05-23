@@ -1,34 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45428)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47802)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1fLPVN-0007de-J1
-	for qemu-devel@nongnu.org; Wed, 23 May 2018 04:52:22 -0400
+	(envelope-from <peterx@redhat.com>) id 1fLPhf-00015t-U4
+	for qemu-devel@nongnu.org; Wed, 23 May 2018 05:05:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1fLPVJ-0004CG-L3
-	for qemu-devel@nongnu.org; Wed, 23 May 2018 04:52:21 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:56854 helo=mx1.redhat.com)
+	(envelope-from <peterx@redhat.com>) id 1fLPhc-0000rt-MB
+	for qemu-devel@nongnu.org; Wed, 23 May 2018 05:05:03 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:36212 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1fLPVJ-0004C4-Hh
-	for qemu-devel@nongnu.org; Wed, 23 May 2018 04:52:17 -0400
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1fLPhc-0000rd-HJ
+	for qemu-devel@nongnu.org; Wed, 23 May 2018 05:05:00 -0400
 Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
 	[10.11.54.3])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 1108F406E897
-	for <qemu-devel@nongnu.org>; Wed, 23 May 2018 08:52:17 +0000 (UTC)
-Date: Wed, 23 May 2018 16:52:08 +0800
+	by mx1.redhat.com (Postfix) with ESMTPS id E4C8D818BAF0
+	for <qemu-devel@nongnu.org>; Wed, 23 May 2018 09:04:59 +0000 (UTC)
+Date: Wed, 23 May 2018 17:04:50 +0800
 From: Peter Xu <peterx@redhat.com>
-Message-ID: <20180523085208.GB2540@xz-mi>
-References: <20180509041734.14135-1-peterx@redhat.com>
-	<20180509041734.14135-5-peterx@redhat.com>
-	<87tvr6l9ix.fsf@dusky.pond.sub.org> <20180518105311.GP2569@xz-mi>
-	<877eo1f8tn.fsf@dusky.pond.sub.org> <20180521051846.GC27506@xz-mi>
-	<87fu2iix53.fsf@dusky.pond.sub.org>
+Message-ID: <20180523090450.GC2540@xz-mi>
+References: <20180412061108.10875-1-peterx@redhat.com>
+	<87sh6iixvp.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <87fu2iix53.fsf@dusky.pond.sub.org>
-Subject: Re: [Qemu-devel] [PATCH v5 4/4] monitor: add lock to protect
- mon_fdsets
+In-Reply-To: <87sh6iixvp.fsf@dusky.pond.sub.org>
+Subject: Re: [Qemu-devel] [PATCH v3] monitor: let cur_mon be per-thread
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,62 +34,73 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Markus Armbruster <armbru@redhat.com>
-Cc: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+Cc: qemu-devel@nongnu.org, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-On Wed, May 23, 2018 at 10:39:20AM +0200, Markus Armbruster wrote:
+On Wed, May 23, 2018 at 10:23:22AM +0200, Markus Armbruster wrote:
 > Peter Xu <peterx@redhat.com> writes:
 > 
-> > On Fri, May 18, 2018 at 02:27:00PM +0200, Markus Armbruster wrote:
-> >> Peter Xu <peterx@redhat.com> writes:
-> >> 
-> >> > On Thu, May 17, 2018 at 03:03:02PM +0200, Markus Armbruster wrote:
-> >> >
-> >> > [...]
-> >> >
-> >> >> > @@ -2502,7 +2525,9 @@ int monitor_fdset_get_fd(int64_t fdset_id, int flags)
-> >> >> >      MonFdset *mon_fdset;
-> >> >> >      MonFdsetFd *mon_fdset_fd;
-> >> >> >      int mon_fd_flags;
-> >> >> > +    int ret = -1;
-> >> >> 
-> >> >> Suggest not to initialize ret, and instead ret = -1 on both failure
-> >> >> paths.
-> >> >
-> >> > [1]
-> >> >
-> >> > But there is a third hidden failure path that we failed to find the fd
-> >> > specified?  In that case we still need that initial value.
-> >> 
-> >> You're right.  However, that failure path could be made explicit easily:
-> >> 
-> >>         QLIST_FOREACH(mon_fdset, &mon_fdsets, next) {
-> >>             [got out on error and on finding the right one...]
-> >>         }
-> >>         ret = -1;
-> >>         errno = ENOENT;
-> >> 
-> >>     out:
-> >>         qemu_mutex_unlock(&mon_fdsets_lock);
-> >>         return ret;
-> >> 
-> >> I find this clearer.  Your choice.
-> >
-> > Yes this works too.  Considering that I just posted v6, I'll
-> > temporarily just keep the old way.
+> > In the future the monitor iothread may be accessing the cur_mon as
+> > well (via monitor_qmp_dispatch_one()).  Before we introduce a real
+> > Out-Of-Band command,
 > 
-> Your v6 raced with my review of v5.  Do you intend to post v7?  If not,
-> I need to figure out what I can and want to do to v6 on commit to my
-> tree.
+> Uh, inhowfar are the commands marked allow-oob: true now not real?
+> These are migrate-recover, migrate-pause, x-oob-test.
 
-I can repost v7 after we finish the discussion in the other thread:
+x-oob-test is unreal; the rest are real.
 
-  [PATCH v5 3/4] monitor: more comments on lock-free fleids/funcs
-  Message-ID: <87muwqixla.fsf@dusky.pond.sub.org>
+> 
+> Aside: having x-oob-test in QEMU proper is awful.  Is there really no
+> way around it?
 
-I think there is a comment to be refined, meanwhile I can at least
-pick up the qemu_open() suggestion too.
+I tried hard to think of a way but failed.  I need to let the
+dispatcher stuck for a while, nothing can guarantee that but a lock. I
+was using migration before to make sure dispatcher won't quite very
+soon, but we have problems there since:
 
-Regards,
+- some architectures may not even have RAM, so snapshot of those
+  platforms can still be super fast;
+
+- even if we make sure RAM is big, the time will depend on the speed
+  of system, say, what if the test environment is running on RAM-disk
+  which is still super fast even to dump the whole RAM onto disk?  As
+  a conclusion - time based command won't work, because time is always
+  a relative value, which can be affected by OS scheduler and system
+  environments.
+
+When there is better suggestion we can remove x-oob-test, but I can't
+see any so far.
+
+> 
+> >                      let's convert the cur_mon variable to be a
+> > per-thread variable to make sure there won't be a race between threads.
+> >
+> > Note that thread variables are not initialized to a valid value when new
+> > thread is created.  However for our case we don't need to set it up,
+> > since the cur_mon variable is only used in such a pattern:
+> >
+> >   old_mon = cur_mon;
+> >   cur_mon = xxx;
+> >   (do something, read cur_mon if necessary in the stack)
+> >   cur_mon = old_mon;
+> >
+> > It plays a role as stack variable, so no need to be initialized at all.
+> > We only need to make sure the variable won't be changed unexpectedly by
+> > other threads.
+> 
+> Do we plan to keep switching cur_mon forever?  Or do we intend to work
+> towards a 1:1 association between Monitor struct and monitor thread?
+
+I still don't see a good way to remove the cur_mon switching... E.g.,
+in qmp_human_monitor_command() we'll switch no matter what.
+
+> 
+> Even if we want the latter, I'm okay with this patch as an intermediate
+> step.
+
+That'll be appreciated.  Thanks,
+
+> 
+> > Signed-off-by: Peter Xu <peterx@redhat.com>
 
 -- 
 Peter Xu
