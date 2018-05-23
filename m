@@ -1,30 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53549)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55195)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fLTZw-0002ml-8o
-	for qemu-devel@nongnu.org; Wed, 23 May 2018 09:13:24 -0400
+	(envelope-from <ciro.santilli@gmail.com>) id 1fLTk3-0002D0-4P
+	for qemu-devel@nongnu.org; Wed, 23 May 2018 09:23:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fLTZt-0007VK-Ft
-	for qemu-devel@nongnu.org; Wed, 23 May 2018 09:13:20 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:43432 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fLTZt-0007Uv-Bu
-	for qemu-devel@nongnu.org; Wed, 23 May 2018 09:13:17 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.5])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 51B018182D27
-	for <qemu-devel@nongnu.org>; Wed, 23 May 2018 13:13:16 +0000 (UTC)
-From: Markus Armbruster <armbru@redhat.com>
-References: <20180412061108.10875-1-peterx@redhat.com>
-	<87sh6iixvp.fsf@dusky.pond.sub.org> <20180523090450.GC2540@xz-mi>
-Date: Wed, 23 May 2018 15:13:07 +0200
-In-Reply-To: <20180523090450.GC2540@xz-mi> (Peter Xu's message of "Wed, 23 May
-	2018 17:04:50 +0800")
-Message-ID: <87vabeecrg.fsf@dusky.pond.sub.org>
+	(envelope-from <ciro.santilli@gmail.com>) id 1fLTk1-0002oB-Ri
+	for qemu-devel@nongnu.org; Wed, 23 May 2018 09:23:47 -0400
+Received: from mail-it0-x229.google.com ([2607:f8b0:4001:c0b::229]:36400)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <ciro.santilli@gmail.com>)
+	id 1fLTk1-0002my-LP
+	for qemu-devel@nongnu.org; Wed, 23 May 2018 09:23:45 -0400
+Received: by mail-it0-x229.google.com with SMTP id e20-v6so4302056itc.1
+	for <qemu-devel@nongnu.org>; Wed, 23 May 2018 06:23:45 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v3] monitor: let cur_mon be per-thread
+In-Reply-To: <20180523064941.26016.74274.stgit@pasha-VirtualBox>
+References: <20180523064941.26016.74274.stgit@pasha-VirtualBox>
+From: Ciro Santilli <ciro.santilli@gmail.com>
+Date: Wed, 23 May 2018 14:23:24 +0100
+Message-ID: <CAFXrp_fOpwvT0qOZO+L+5LJJvGsj3bXp_GxhbLt-mZN9cN2nPg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v3 00/19] reverse debugging
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,120 +28,120 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+To: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-Peter Xu <peterx@redhat.com> writes:
-
-> On Wed, May 23, 2018 at 10:23:22AM +0200, Markus Armbruster wrote:
->> Peter Xu <peterx@redhat.com> writes:
->> 
->> > In the future the monitor iothread may be accessing the cur_mon as
->> > well (via monitor_qmp_dispatch_one()).  Before we introduce a real
->> > Out-Of-Band command,
->> 
->> Uh, inhowfar are the commands marked allow-oob: true now not real?
->> These are migrate-recover, migrate-pause, x-oob-test.
+On Wed, May 23, 2018 at 7:49 AM, Pavel Dovgalyuk
+<Pavel.Dovgaluk@ispras.ru> wrote:
+> GDB remote protocol supports reverse debugging of the targets.
+> It includes 'reverse step' and 'reverse continue' operations.
+> The first one finds the previous step of the execution,
+> and the second one is intended to stop at the last breakpoint that
+> would happen when the program is executed normally.
 >
-> x-oob-test is unreal; the rest are real.
-
-Sounds like the commit message needs tweaking then.
-
->> Aside: having x-oob-test in QEMU proper is awful.  Is there really no
->> way around it?
+> Reverse debugging is possible in the replay mode, when at least
+> one snapshot was created at the record or replay phase.
+> QEMU can use these snapshots for travelling back in time with GDB.
 >
-> I tried hard to think of a way but failed.  I need to let the
-> dispatcher stuck for a while, nothing can guarantee that but a lock.
-
-Paraphrasing, to make sure I understand:
-
-0. We want to test an OOB command can "overtake" commands that hog the
-   monitor.
-
-1. We need a command to *reliably* take long enough for us to issue an
-   OOB command.  Since OOB commands must not hog the monitor, this
-   should be a non-OOB command.
-
-2. We need an OOB command to do the overtaking.
-
-3. We'd very much like to make the overaken command complete quickly
-   after the OOB command overtook it, to keep the test quick.
-
-Correct?
-
-Your solution uses x-oob-test both for 1. and 2.  Problematic, because
-x-oob-test is OOB, yet does something an OOB command must not do: block
-on a lock.  Fixable.
-
->                                                                      I
-> was using migration before to make sure dispatcher won't quite very
-> soon, but we have problems there since:
+> Running the execution in replay mode allows using GDB reverse debugging
+> commands:
+>  - reverse-stepi (or rsi): Steps one instruction to the past.
+>    QEMU loads on of the prior snapshots and proceeds to the desired
+>    instruction forward. When that step is reaches, execution stops.
+>  - reverse-continue (or rc): Runs execution "backwards".
+>    QEMU tries to find breakpoint or watchpoint by loaded prior snapshot
+>    and replaying the execution. Then QEMU loads snapshots again and
+>    replays to the latest breakpoint. When there are no breakpoints in
+>    the examined section of the execution, QEMU finds one more snapshot
+>    and tries again. After the first snapshot is processed, execution
+>    stops at this snapshot.
 >
-> - some architectures may not even have RAM, so snapshot of those
->   platforms can still be super fast;
+> The set of patches include the following modifications:
+>  - gdbstub update for reverse debugging support
+>  - functions that automatically perform reverse step and reverse
+>    continue operations
+>  - hmp/qmp commands for manipulating the replay process
+>  - improvement of the snapshotting for saving the execution step
+>    in the snapshot parameters
+>  - other record/replay fixes
 >
-> - even if we make sure RAM is big, the time will depend on the speed
->   of system, say, what if the test environment is running on RAM-disk
->   which is still super fast even to dump the whole RAM onto disk?  As
->   a conclusion - time based command won't work, because time is always
->   a relative value, which can be affected by OS scheduler and system
->   environments.
-
-Hmm, using migration is actually a cute idea.  But making it take long
-enough (1.) is unreliable, as you found.  Also, we can't make it
-complete quickly (3.).
-
-> When there is better suggestion we can remove x-oob-test, but I can't
-> see any so far.
-
-The bit we actually need is having a command block on something we
-control.  You picked a QemuSemaphore, internal to QEMU.  What about some
-blocking system call?  Here's my idea:
-
-0. Create a named pipe with mkfifo(1)
-
-1. Issue some (non-OOB) QMP command that opens this pipe.  open()
-   blocks.
-
-2. Issue the OOB-command, verify it completes
-
-3. If the non-OOB command writes to the pipe, suck the pipe dry, say
-   with cat pipe | >/dev/null.  If it reads, give it something to read,
-   say echo >pipe.
-
-To make 3. complete quickly with a command that writes, you need one
-that writes only a small amount of data.  Candidates: memsave, pmemsave,
-screendump.
-
->> >                      let's convert the cur_mon variable to be a
->> > per-thread variable to make sure there won't be a race between threads.
->> >
->> > Note that thread variables are not initialized to a valid value when new
->> > thread is created.  However for our case we don't need to set it up,
->> > since the cur_mon variable is only used in such a pattern:
->> >
->> >   old_mon = cur_mon;
->> >   cur_mon = xxx;
->> >   (do something, read cur_mon if necessary in the stack)
->> >   cur_mon = old_mon;
->> >
->> > It plays a role as stack variable, so no need to be initialized at all.
->> > We only need to make sure the variable won't be changed unexpectedly by
->> > other threads.
->> 
->> Do we plan to keep switching cur_mon forever?  Or do we intend to work
->> towards a 1:1 association between Monitor struct and monitor thread?
+> The patches are available in the repository:
+> https://github.com/ispras/qemu/tree/rr-180428
 >
-> I still don't see a good way to remove the cur_mon switching... E.g.,
-> in qmp_human_monitor_command() we'll switch no matter what.
 
-That one's a hack.  We can make exceptions for hacks.  Where else do we
-switch?
+This branch appears to contain one month old commits, is it the correct one?
 
->> Even if we want the latter, I'm okay with this patch as an intermediate
->> step.
+> v3 changes:
+>  - Fixed PS/2 bug with save/load vm, which caused failures of the replay.
+>    The patch was sent separately.
+>  - Rebased to the new code base.
+>  - Minor fixes.
 >
-> That'll be appreciated.  Thanks,
+> v2 changes:
+>  - documented reverse debugging
+>  - fixed start vmstate loading in record mode
+>  - documented qcow2 changes (as suggested by Eric Blake)
+>  - made icount SnapshotInfo field optional (as suggested by Eric Blake)
+>  - renamed qmp commands (as suggested by Eric Blake)
+>  - minor changes
 >
->> 
->> > Signed-off-by: Peter Xu <peterx@redhat.com>
+> ---
+>
+> Pavel Dovgalyuk (19):
+>       block: implement bdrv_snapshot_goto for blkreplay
+>       replay: disable default snapshot for record/replay
+>       replay: update docs for record/replay with block devices
+>       replay: don't drain/flush bdrv queue while RR is working
+>       replay: finish record/replay before closing the disks
+>       qcow2: introduce icount field for snapshots
+>       migration: introduce icount field for snapshots
+>       replay: introduce info hmp/qmp command
+>       replay: introduce breakpoint at the specified step
+>       replay: implement replay-seek command to proceed to the desired step
+>       replay: flush events when exiting
+>       timer: remove replay clock probe in deadline calculation
+>       replay: refine replay-time module
+>       translator: fix breakpoint processing
+>       replay: flush rr queue before loading the vmstate
+>       gdbstub: add reverse step support in replay mode
+>       gdbstub: add reverse continue support in replay mode
+>       replay: describe reverse debugging in docs/replay.txt
+>       replay: allow loading any snapshots before recording
+>
+>
+>  accel/tcg/translator.c    |    9 +
+>  block/blkreplay.c         |    8 +
+>  block/io.c                |   22 +++
+>  block/qapi.c              |   17 ++-
+>  block/qcow2-snapshot.c    |    9 +
+>  block/qcow2.h             |    2
+>  blockdev.c                |   10 ++
+>  cpus.c                    |   19 ++-
+>  docs/interop/qcow2.txt    |    4 +
+>  docs/replay.txt           |   45 +++++++
+>  exec.c                    |    6 +
+>  gdbstub.c                 |   50 +++++++-
+>  hmp-commands-info.hx      |   14 ++
+>  hmp-commands.hx           |   30 +++++
+>  hmp.h                     |    3
+>  include/block/snapshot.h  |    1
+>  include/sysemu/replay.h   |   18 +++
+>  migration/savevm.c        |   15 +-
+>  qapi/block-core.json      |    5 +
+>  qapi/block.json           |    3
+>  qapi/misc.json            |   68 +++++++++++
+>  replay/Makefile.objs      |    3
+>  replay/replay-debugging.c |  287 +++++++++++++++++++++++++++++++++++++++++++++
+>  replay/replay-events.c    |   14 --
+>  replay/replay-internal.h  |   10 +-
+>  replay/replay-snapshot.c  |   17 ++-
+>  replay/replay-time.c      |   27 ++--
+>  replay/replay.c           |   22 +++
+>  stubs/replay.c            |   10 ++
+>  util/qemu-timer.c         |   11 --
+>  vl.c                      |   18 ++-
+>  31 files changed, 696 insertions(+), 81 deletions(-)
+>  create mode 100644 replay/replay-debugging.c
+>
+> --
+> Pavel Dovgalyuk
