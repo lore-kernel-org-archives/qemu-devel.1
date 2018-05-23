@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50979)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50933)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1fLRmv-0006OU-Hy
-	for qemu-devel@nongnu.org; Wed, 23 May 2018 07:18:38 -0400
+	(envelope-from <quintela@redhat.com>) id 1fLRms-0006Lk-Rx
+	for qemu-devel@nongnu.org; Wed, 23 May 2018 07:18:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1fLRmu-0007Fy-NW
-	for qemu-devel@nongnu.org; Wed, 23 May 2018 07:18:37 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:44614 helo=mx1.redhat.com)
+	(envelope-from <quintela@redhat.com>) id 1fLRms-0007En-3o
+	for qemu-devel@nongnu.org; Wed, 23 May 2018 07:18:34 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:60962 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1fLRmu-0007Fl-JS
-	for qemu-devel@nongnu.org; Wed, 23 May 2018 07:18:36 -0400
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1fLRmr-0007Ef-VK
+	for qemu-devel@nongnu.org; Wed, 23 May 2018 07:18:34 -0400
 Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
 	[10.11.54.6])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 3E2AB195478
-	for <qemu-devel@nongnu.org>; Wed, 23 May 2018 11:18:36 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 9F9B44071181
+	for <qemu-devel@nongnu.org>; Wed, 23 May 2018 11:18:33 +0000 (UTC)
 From: Juan Quintela <quintela@redhat.com>
-Date: Wed, 23 May 2018 13:18:16 +0200
-Message-Id: <20180523111817.1463-12-quintela@redhat.com>
+Date: Wed, 23 May 2018 13:18:14 +0200
+Message-Id: <20180523111817.1463-10-quintela@redhat.com>
 In-Reply-To: <20180523111817.1463-1-quintela@redhat.com>
 References: <20180523111817.1463-1-quintela@redhat.com>
-Subject: [Qemu-devel] [PATCH v13 11/12] migration: Remove not needed
- semaphore and quit
+Subject: [Qemu-devel] [PATCH v13 09/12] migration: Start sending messages
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,60 +32,78 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: dgilbert@redhat.com, lvivier@redhat.com, peterx@redhat.com
 
-We know quit closing the QIO.
-
 Signed-off-by: Juan Quintela <quintela@redhat.com>
 ---
- migration/ram.c | 11 ++---------
- 1 file changed, 2 insertions(+), 9 deletions(-)
+ migration/ram.c | 29 ++++++++++++++++++++++++-----
+ 1 file changed, 24 insertions(+), 5 deletions(-)
 
 diff --git a/migration/ram.c b/migration/ram.c
-index a707d3ae80..62eea9e02f 100644
+index 28f5cea4d8..2584130c85 100644
 --- a/migration/ram.c
 +++ b/migration/ram.c
-@@ -587,14 +587,10 @@ typedef struct {
-     QemuThread thread;
-     /* communication channel */
-     QIOChannel *c;
--    /* sem where to wait for more work */
--    QemuSemaphore sem;
-     /* this mutex protects the following parameters */
-     QemuMutex mutex;
-     /* is this channel thread running */
-     bool running;
--    /* should this thread finish */
--    bool quit;
-     /* array of pages to receive */
-     MultiFDPages_t *pages;
-     /* packet allocated len */
-@@ -1115,8 +1111,8 @@ static void multifd_recv_terminate_threads(Error *err)
-         MultiFDRecvParams *p = &multifd_recv_state->params[i];
+@@ -729,9 +729,6 @@ static int multifd_recv_unfill_packet(MultiFDRecvParams *p, Error **errp)
+     RAMBlock *block;
+     int i;
  
-         qemu_mutex_lock(&p->mutex);
--        p->quit = true;
--        qemu_sem_post(&p->sem);
-+        object_unref(OBJECT(p->c));
-+        p->c = NULL;
-         qemu_mutex_unlock(&p->mutex);
-     }
- }
-@@ -1139,7 +1135,6 @@ int multifd_load_cleanup(Error **errp)
-         object_unref(OBJECT(p->c));
-         p->c = NULL;
-         qemu_mutex_destroy(&p->mutex);
--        qemu_sem_destroy(&p->sem);
-         qemu_sem_destroy(&p->sem_sync);
-         g_free(p->name);
-         p->name = NULL;
-@@ -1262,9 +1257,7 @@ int multifd_load_setup(void)
-         MultiFDRecvParams *p = &multifd_recv_state->params[i];
+-    /* ToDo: We can't use it until we haven't received a message */
+-    return 0;
+-
+     be32_to_cpus(&packet->magic);
+     if (packet->magic != MULTIFD_MAGIC) {
+         error_setg(errp, "multifd: received packet "
+@@ -965,6 +962,7 @@ static void *multifd_send_thread(void *opaque)
+ {
+     MultiFDSendParams *p = opaque;
+     Error *local_err = NULL;
++    int ret;
  
-         qemu_mutex_init(&p->mutex);
--        qemu_sem_init(&p->sem, 0);
-         qemu_sem_init(&p->sem_sync, 0);
--        p->quit = false;
-         p->id = i;
-         p->pages = multifd_pages_init(page_count);
-         p->packet_len = sizeof(MultiFDPacket_t)
+     trace_multifd_send_thread_start(p->id);
+ 
+@@ -992,7 +990,16 @@ static void *multifd_send_thread(void *opaque)
+ 
+             trace_multifd_send(p->id, seq, used, flags);
+ 
+-            /* ToDo: send packet here */
++            ret = qio_channel_write_all(p->c, (void *)p->packet,
++                                        p->packet_len, &local_err);
++            if (ret != 0) {
++                break;
++            }
++
++            ret = qio_channel_writev_all(p->c, p->pages->iov, used, &local_err);
++            if (ret != 0) {
++                break;
++            }
+ 
+             qemu_mutex_lock(&p->mutex);
+             p->pending_job--;
+@@ -1204,7 +1211,14 @@ static void *multifd_recv_thread(void *opaque)
+             uint32_t flags;
+             qemu_mutex_unlock(&p->mutex);
+ 
+-            /* ToDo: recv packet here */
++            ret = qio_channel_read_all_eof(p->c, (void *)p->packet,
++                                           p->packet_len, &local_err);
++            if (ret == 0) {   /* EOF */
++                break;
++            }
++            if (ret == -1) {   /* Error */
++                break;
++            }
+ 
+             qemu_mutex_lock(&p->mutex);
+             ret = multifd_recv_unfill_packet(p, &local_err);
+@@ -1221,6 +1235,11 @@ static void *multifd_recv_thread(void *opaque)
+             p->num_pages += used;
+             qemu_mutex_unlock(&p->mutex);
+ 
++            ret = qio_channel_readv_all(p->c, p->pages->iov, used, &local_err);
++            if (ret != 0) {
++                break;
++            }
++
+             if (flags & MULTIFD_FLAG_SYNC) {
+                 qemu_sem_post(&multifd_recv_state->sem_sync);
+                 qemu_sem_wait(&p->sem_sync);
 -- 
 2.17.0
