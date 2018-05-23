@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41961)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41990)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mjc@sifive.com>) id 1fLHSY-0007mG-Ph
-	for qemu-devel@nongnu.org; Tue, 22 May 2018 20:16:56 -0400
+	(envelope-from <mjc@sifive.com>) id 1fLHSe-0007q6-Q3
+	for qemu-devel@nongnu.org; Tue, 22 May 2018 20:17:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mjc@sifive.com>) id 1fLHSX-0000UR-IO
-	for qemu-devel@nongnu.org; Tue, 22 May 2018 20:16:54 -0400
-Received: from mail-pl0-x231.google.com ([2607:f8b0:400e:c01::231]:37312)
+	(envelope-from <mjc@sifive.com>) id 1fLHSb-0000Xt-Hy
+	for qemu-devel@nongnu.org; Tue, 22 May 2018 20:17:00 -0400
+Received: from mail-pl0-x241.google.com ([2607:f8b0:400e:c01::241]:34853)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <mjc@sifive.com>) id 1fLHSX-0000U2-9o
-	for qemu-devel@nongnu.org; Tue, 22 May 2018 20:16:53 -0400
-Received: by mail-pl0-x231.google.com with SMTP id w19-v6so11865317plq.4
-	for <qemu-devel@nongnu.org>; Tue, 22 May 2018 17:16:53 -0700 (PDT)
+	(Exim 4.71) (envelope-from <mjc@sifive.com>) id 1fLHSb-0000Wb-9l
+	for qemu-devel@nongnu.org; Tue, 22 May 2018 20:16:57 -0400
+Received: by mail-pl0-x241.google.com with SMTP id i5-v6so11868393plt.2
+	for <qemu-devel@nongnu.org>; Tue, 22 May 2018 17:16:57 -0700 (PDT)
 From: Michael Clark <mjc@sifive.com>
-Date: Wed, 23 May 2018 12:14:49 +1200
-Message-Id: <1527034517-7851-3-git-send-email-mjc@sifive.com>
+Date: Wed, 23 May 2018 12:14:50 +1200
+Message-Id: <1527034517-7851-4-git-send-email-mjc@sifive.com>
 In-Reply-To: <1527034517-7851-1-git-send-email-mjc@sifive.com>
 References: <1527034517-7851-1-git-send-email-mjc@sifive.com>
-Subject: [Qemu-devel] [PATCH v1 02/30] RISC-V: Improve page table walker
- spec compliance
+Subject: [Qemu-devel] [PATCH v1 03/30] RISC-V: Use atomic_cmpxchg to update
+ PLIC bitmaps
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,134 +29,127 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: patches@groups.riscv.org, Michael Clark <mjc@sifive.com>, Sagar Karandikar <sagark@eecs.berkeley.edu>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Palmer Dabbelt <palmer@sifive.com>, Alistair Francis <Alistair.Francis@wdc.com>
 
-- Inline PTE_TABLE check for better readability
-- Change access checks from ternary operator to if
-- Improve readibility of User page U mode and SUM test
-- Disallow non U mode from fetching from User pages
-- Add reserved PTE flag check: W or W|X
-- Add misaligned PPN check
-- Set READ protection for PTE X flag and mstatus.mxr
-- Use memory_region_is_ram in pte update
+The PLIC previously used a mutex to protect against concurrent
+access to the claimed and pending bitfields. Instead of using
+a mutex, we update the bitfields using atomic_cmpxchg.
+
+Rename sifive_plic_num_irqs_pending to sifive_plic_irqs_pending
+and add an early out if any interrupts are pending as the
+count of pending interrupts is not used.
 
 Cc: Sagar Karandikar <sagark@eecs.berkeley.edu>
 Cc: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
 Cc: Palmer Dabbelt <palmer@sifive.com>
 Cc: Alistair Francis <Alistair.Francis@wdc.com>
 Signed-off-by: Michael Clark <mjc@sifive.com>
-Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/riscv/cpu_bits.h |  2 --
- target/riscv/helper.c   | 64 ++++++++++++++++++++++++++++++++++---------------
- 2 files changed, 45 insertions(+), 21 deletions(-)
+ hw/riscv/sifive_plic.c         | 49 +++++++++++++++++++-----------------------
+ include/hw/riscv/sifive_plic.h |  1 -
+ 2 files changed, 22 insertions(+), 28 deletions(-)
 
-diff --git a/target/riscv/cpu_bits.h b/target/riscv/cpu_bits.h
-index 64aa097181fa..12b4757088f4 100644
---- a/target/riscv/cpu_bits.h
-+++ b/target/riscv/cpu_bits.h
-@@ -407,5 +407,3 @@
- #define PTE_SOFT  0x300 /* Reserved for Software */
+diff --git a/hw/riscv/sifive_plic.c b/hw/riscv/sifive_plic.c
+index 874de2ebaf77..1af23c76e603 100644
+--- a/hw/riscv/sifive_plic.c
++++ b/hw/riscv/sifive_plic.c
+@@ -81,36 +81,32 @@ static void sifive_plic_print_state(SiFivePLICState *plic)
+     }
+ }
  
- #define PTE_PPN_SHIFT 10
--
--#define PTE_TABLE(PTE) (((PTE) & (PTE_V | PTE_R | PTE_W | PTE_X)) == PTE_V)
-diff --git a/target/riscv/helper.c b/target/riscv/helper.c
-index 95889f23b94d..3b57e1360549 100644
---- a/target/riscv/helper.c
-+++ b/target/riscv/helper.c
-@@ -185,16 +185,39 @@ restart:
- #endif
-         target_ulong ppn = pte >> PTE_PPN_SHIFT;
+-static
+-void sifive_plic_set_pending(SiFivePLICState *plic, int irq, bool pending)
++static uint32_t atomic_set_masked(uint32_t *a, uint32_t mask, uint32_t value)
+ {
+-    qemu_mutex_lock(&plic->lock);
+-    uint32_t word = irq >> 5;
+-    if (pending) {
+-        plic->pending[word] |= (1 << (irq & 31));
+-    } else {
+-        plic->pending[word] &= ~(1 << (irq & 31));
+-    }
+-    qemu_mutex_unlock(&plic->lock);
++    uint32_t old, new, cmp = atomic_read(a);
++
++    do {
++        old = cmp;
++        new = (old & ~mask) | (value & mask);
++        cmp = atomic_cmpxchg(a, old, new);
++    } while (old != cmp);
++
++    return old;
+ }
  
--        if (PTE_TABLE(pte)) { /* next level of page table */
-+        if (!(pte & PTE_V)) {
-+            /* Invalid PTE */
-+            return TRANSLATE_FAIL;
-+        } else if (!(pte & (PTE_R | PTE_W | PTE_X))) {
-+            /* Inner PTE, continue walking */
-             base = ppn << PGSHIFT;
--        } else if ((pte & PTE_U) ? (mode == PRV_S) && !sum : !(mode == PRV_S)) {
--            break;
--        } else if (!(pte & PTE_V) || (!(pte & PTE_R) && (pte & PTE_W))) {
--            break;
--        } else if (access_type == MMU_INST_FETCH ? !(pte & PTE_X) :
--                  access_type == MMU_DATA_LOAD ?  !(pte & PTE_R) &&
--                  !(mxr && (pte & PTE_X)) : !((pte & PTE_R) && (pte & PTE_W))) {
--            break;
-+        } else if ((pte & (PTE_R | PTE_W | PTE_X)) == PTE_W) {
-+            /* Reserved leaf PTE flags: PTE_W */
-+            return TRANSLATE_FAIL;
-+        } else if ((pte & (PTE_R | PTE_W | PTE_X)) == (PTE_W | PTE_X)) {
-+            /* Reserved leaf PTE flags: PTE_W + PTE_X */
-+            return TRANSLATE_FAIL;
-+        } else if ((pte & PTE_U) && ((mode != PRV_U) &&
-+                   (!sum || access_type == MMU_INST_FETCH))) {
-+            /* User PTE flags when not U mode and mstatus.SUM is not set,
-+               or the access type is an instruction fetch */
-+            return TRANSLATE_FAIL;
-+        } else if (!(pte & PTE_U) && (mode != PRV_S)) {
-+            /* Supervisor PTE flags when not S mode */
-+            return TRANSLATE_FAIL;
-+        } else if (ppn & ((1ULL << ptshift) - 1)) {
-+            /* Misasligned PPN */
-+            return TRANSLATE_FAIL;
-+        } else if (access_type == MMU_DATA_LOAD && !((pte & PTE_R) ||
-+                   ((pte & PTE_X) && mxr))) {
-+            /* Read access check failed */
-+            return TRANSLATE_FAIL;
-+        } else if (access_type == MMU_DATA_STORE && !(pte & PTE_W)) {
-+            /* Write access check failed */
-+            return TRANSLATE_FAIL;
-+        } else if (access_type == MMU_INST_FETCH && !(pte & PTE_X)) {
-+            /* Fetch access check failed */
-+            return TRANSLATE_FAIL;
-         } else {
-             /* if necessary, set accessed and dirty bits. */
-             target_ulong updated_pte = pte | PTE_A |
-@@ -202,16 +225,19 @@ restart:
+-static
+-void sifive_plic_set_claimed(SiFivePLICState *plic, int irq, bool claimed)
++static void sifive_plic_set_pending(SiFivePLICState *plic, int irq, bool level)
+ {
+-    qemu_mutex_lock(&plic->lock);
+-    uint32_t word = irq >> 5;
+-    if (claimed) {
+-        plic->claimed[word] |= (1 << (irq & 31));
+-    } else {
+-        plic->claimed[word] &= ~(1 << (irq & 31));
+-    }
+-    qemu_mutex_unlock(&plic->lock);
++    atomic_set_masked(&plic->pending[irq >> 5], 1 << (irq & 31), -!!level);
+ }
  
-             /* Page table updates need to be atomic with MTTCG enabled */
-             if (updated_pte != pte) {
--                /* if accessed or dirty bits need updating, and the PTE is
--                 * in RAM, then we do so atomically with a compare and swap.
--                 * if the PTE is in IO space, then it can't be updated.
--                 * if the PTE changed, then we must re-walk the page table
--                   as the PTE is no longer valid */
-+                /*
-+                 * - if accessed or dirty bits need updating, and the PTE is
-+                 *   in RAM, then we do so atomically with a compare and swap.
-+                 * - if the PTE is in IO space or ROM, then it can't be updated
-+                 *   and we return TRANSLATE_FAIL.
-+                 * - if the PTE changed by the time we went to update it, then
-+                 *   it is no longer valid and we must re-walk the page table.
-+                 */
-                 MemoryRegion *mr;
-                 hwaddr l = sizeof(target_ulong), addr1;
-                 mr = address_space_translate(cs->as, pte_addr,
-                     &addr1, &l, false);
--                if (memory_access_is_direct(mr, true)) {
-+                if (memory_region_is_ram(mr)) {
-                     target_ulong *pte_pa =
-                         qemu_map_ram_ptr(mr->ram_block, addr1);
- #if TCG_OVERSIZED_GUEST
-@@ -239,15 +265,15 @@ restart:
-             target_ulong vpn = addr >> PGSHIFT;
-             *physical = (ppn | (vpn & ((1L << ptshift) - 1))) << PGSHIFT;
- 
--            if ((pte & PTE_R)) {
-+            /* set permissions on the TLB entry */
-+            if ((pte & PTE_R) || ((pte & PTE_X) && mxr)) {
-                 *prot |= PAGE_READ;
+-static
+-int sifive_plic_num_irqs_pending(SiFivePLICState *plic, uint32_t addrid)
++static void sifive_plic_set_claimed(SiFivePLICState *plic, int irq, bool level)
+ {
+-    int i, j, count = 0;
++    atomic_set_masked(&plic->claimed[irq >> 5], 1 << (irq & 31), -!!level);
++}
++
++static int sifive_plic_irqs_pending(SiFivePLICState *plic, uint32_t addrid)
++{
++    int i, j;
+     for (i = 0; i < plic->bitfield_words; i++) {
+         uint32_t pending_enabled_not_claimed =
+             (plic->pending[i] & ~plic->claimed[i]) &
+@@ -123,11 +119,11 @@ int sifive_plic_num_irqs_pending(SiFivePLICState *plic, uint32_t addrid)
+             uint32_t prio = plic->source_priority[irq];
+             int enabled = pending_enabled_not_claimed & (1 << j);
+             if (enabled && prio > plic->target_priority[addrid]) {
+-                count++;
++                return 1;
              }
-             if ((pte & PTE_X)) {
-                 *prot |= PAGE_EXEC;
-             }
--           /* only add write permission on stores or if the page
--              is already dirty, so that we don't miss further
--              page table walks to update the dirty bit */
-+            /* add write permission on stores or if the page is already dirty,
-+               so that we TLB miss on later writes to update the dirty bit */
-             if ((pte & PTE_W) &&
-                     (access_type == MMU_DATA_STORE || (pte & PTE_D))) {
-                 *prot |= PAGE_WRITE;
+         }
+     }
+-    return count;
++    return 0;
+ }
+ 
+ static void sifive_plic_update(SiFivePLICState *plic)
+@@ -143,7 +139,7 @@ static void sifive_plic_update(SiFivePLICState *plic)
+         if (!env) {
+             continue;
+         }
+-        int level = sifive_plic_num_irqs_pending(plic, addrid) > 0;
++        int level = sifive_plic_irqs_pending(plic, addrid);
+         switch (mode) {
+         case PLICMode_M:
+             riscv_set_local_interrupt(RISCV_CPU(cpu), MIP_MEIP, level);
+@@ -440,7 +436,6 @@ static void sifive_plic_realize(DeviceState *dev, Error **errp)
+     memory_region_init_io(&plic->mmio, OBJECT(dev), &sifive_plic_ops, plic,
+                           TYPE_SIFIVE_PLIC, plic->aperture_size);
+     parse_hart_config(plic);
+-    qemu_mutex_init(&plic->lock);
+     plic->bitfield_words = (plic->num_sources + 31) >> 5;
+     plic->source_priority = g_new0(uint32_t, plic->num_sources);
+     plic->target_priority = g_new(uint32_t, plic->num_addrs);
+diff --git a/include/hw/riscv/sifive_plic.h b/include/hw/riscv/sifive_plic.h
+index 11a5a98df1f9..ff09a288261e 100644
+--- a/include/hw/riscv/sifive_plic.h
++++ b/include/hw/riscv/sifive_plic.h
+@@ -55,7 +55,6 @@ typedef struct SiFivePLICState {
+     uint32_t *pending;
+     uint32_t *claimed;
+     uint32_t *enable;
+-    QemuMutex lock;
+     qemu_irq *irqs;
+ 
+     /* config */
 -- 
 2.7.0
