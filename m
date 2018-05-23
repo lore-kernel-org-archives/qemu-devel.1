@@ -1,16 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53446)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53415)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fLTZY-0002UE-Ex
-	for qemu-devel@nongnu.org; Wed, 23 May 2018 09:13:02 -0400
+	(envelope-from <kwolf@redhat.com>) id 1fLTZV-0002Pn-Oc
+	for qemu-devel@nongnu.org; Wed, 23 May 2018 09:12:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fLTZT-0007Jh-J2
-	for qemu-devel@nongnu.org; Wed, 23 May 2018 09:12:56 -0400
+	(envelope-from <kwolf@redhat.com>) id 1fLTZU-0007KN-FZ
+	for qemu-devel@nongnu.org; Wed, 23 May 2018 09:12:53 -0400
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Wed, 23 May 2018 15:11:52 +0200
-Message-Id: <20180523131155.12359-44-kwolf@redhat.com>
+Date: Wed, 23 May 2018 15:11:53 +0200
+Message-Id: <20180523131155.12359-45-kwolf@redhat.com>
 In-Reply-To: <20180523131155.12359-1-kwolf@redhat.com>
 References: <20180523131155.12359-1-kwolf@redhat.com>
-Subject: [Qemu-devel] [PULL 43/46] job: Add query-jobs QMP command
+Subject: [Qemu-devel] [PULL 44/46] blockjob: Remove BlockJob.driver
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,160 +22,81 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, qemu-devel@nongnu.org
 
-This adds a minimal query-jobs implementation that shouldn't pose many
-design questions. It can later be extended to expose more information,
-and especially job-specific information.
+BlockJob.driver is redundant with Job.driver and only used in very few
+places any more. Remove it.
 
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 ---
- qapi/job.json      | 46 ++++++++++++++++++++++++++++++++++++++++++++++
- include/qemu/job.h |  3 +++
- job-qmp.c          | 54 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
- job.c              |  2 +-
- 4 files changed, 104 insertions(+), 1 deletion(-)
+ include/block/blockjob.h |  3 ---
+ blockjob.c               | 17 ++++++++++-------
+ 2 files changed, 10 insertions(+), 10 deletions(-)
 
-diff --git a/qapi/job.json b/qapi/job.json
-index b84dc6c820..970124de76 100644
---- a/qapi/job.json
-+++ b/qapi/job.json
-@@ -205,3 +205,49 @@
- # Since: 2.13
- ##
- { 'command': 'job-finalize', 'data': { 'id': 'str' } }
-+
-+##
-+# @JobInfo:
-+#
-+# Information about a job.
-+#
-+# @id:                  The job identifier
-+#
-+# @type:                The kind of job that is being performed
-+#
-+# @status:              Current job state/status
-+#
-+# @current-progress:    Progress made until now. The unit is arbitrary and the
-+#                       value can only meaningfully be used for the ratio of
-+#                       @current-progress to @total-progress. The value is
-+#                       monotonically increasing.
-+#
-+# @total-progress:      Estimated @current-progress value at the completion of
-+#                       the job. This value can arbitrarily change while the
-+#                       job is running, in both directions.
-+#
-+# @error:               If this field is present, the job failed; if it is
-+#                       still missing in the CONCLUDED state, this indicates
-+#                       successful completion.
-+#
-+#                       The value is a human-readable error message to describe
-+#                       the reason for the job failure. It should not be parsed
-+#                       by applications.
-+#
-+# Since: 2.13
-+##
-+{ 'struct': 'JobInfo',
-+  'data': { 'id': 'str', 'type': 'JobType', 'status': 'JobStatus',
-+            'current-progress': 'int', 'total-progress': 'int',
-+            '*error': 'str' } }
-+
-+##
-+# @query-jobs:
-+#
-+# Return information about jobs.
-+#
-+# Returns: a list with a @JobInfo for each active job
-+#
-+# Since: 2.13
-+##
-+{ 'command': 'query-jobs', 'returns': ['JobInfo'] }
-diff --git a/include/qemu/job.h b/include/qemu/job.h
-index 92d1d249fe..8c8badf75e 100644
---- a/include/qemu/job.h
-+++ b/include/qemu/job.h
-@@ -392,6 +392,9 @@ JobType job_type(const Job *job);
- /** Returns the enum string for the JobType of a given Job. */
- const char *job_type_str(const Job *job);
+diff --git a/include/block/blockjob.h b/include/block/blockjob.h
+index 3021d11126..32c00b7dc0 100644
+--- a/include/block/blockjob.h
++++ b/include/block/blockjob.h
+@@ -43,9 +43,6 @@ typedef struct BlockJob {
+     /** Data belonging to the generic Job infrastructure */
+     Job job;
  
-+/** Returns true if the job should not be visible to the management layer. */
-+bool job_is_internal(Job *job);
-+
- /** Returns whether the job is scheduled for cancellation. */
- bool job_is_cancelled(Job *job);
+-    /** The job type, including the job vtable.  */
+-    const BlockJobDriver *driver;
+-
+     /** The block device on which the job is operating.  */
+     BlockBackend *blk;
  
-diff --git a/job-qmp.c b/job-qmp.c
-index b2e18cfd9c..7f38f63336 100644
---- a/job-qmp.c
-+++ b/job-qmp.c
-@@ -132,3 +132,57 @@ void qmp_job_dismiss(const char *id, Error **errp)
-     job_dismiss(&job, errp);
-     aio_context_release(aio_context);
- }
-+
-+static JobInfo *job_query_single(Job *job, Error **errp)
-+{
-+    JobInfo *info;
-+    const char *errmsg = NULL;
-+
-+    assert(!job_is_internal(job));
-+
-+    if (job->ret < 0) {
-+        errmsg = strerror(-job->ret);
-+    }
-+
-+    info = g_new(JobInfo, 1);
-+    *info = (JobInfo) {
-+        .id                 = g_strdup(job->id),
-+        .type               = job_type(job),
-+        .status             = job->status,
-+        .current_progress   = job->progress_current,
-+        .total_progress     = job->progress_total,
-+        .has_error          = !!errmsg,
-+        .error              = g_strdup(errmsg),
-+    };
-+
-+    return info;
-+}
-+
-+JobInfoList *qmp_query_jobs(Error **errp)
-+{
-+    JobInfoList *head = NULL, **p_next = &head;
-+    Job *job;
-+
-+    for (job = job_next(NULL); job; job = job_next(job)) {
-+        JobInfoList *elem;
-+        AioContext *aio_context;
-+
-+        if (job_is_internal(job)) {
-+            continue;
-+        }
-+        elem = g_new0(JobInfoList, 1);
-+        aio_context = job->aio_context;
-+        aio_context_acquire(aio_context);
-+        elem->value = job_query_single(job, errp);
-+        aio_context_release(aio_context);
-+        if (!elem->value) {
-+            g_free(elem);
-+            qapi_free_JobInfoList(head);
-+            return NULL;
-+        }
-+        *p_next = elem;
-+        p_next = &elem->next;
-+    }
-+
-+    return head;
-+}
-diff --git a/job.c b/job.c
-index 599a1042cf..f026661b0f 100644
---- a/job.c
-+++ b/job.c
-@@ -158,7 +158,7 @@ static int job_txn_apply(JobTxn *txn, int fn(Job *), bool lock)
-     return rc;
- }
- 
--static bool job_is_internal(Job *job)
-+bool job_is_internal(Job *job)
+diff --git a/blockjob.c b/blockjob.c
+index 5c8ff6f846..0306533a2e 100644
+--- a/blockjob.c
++++ b/blockjob.c
+@@ -103,10 +103,12 @@ static void block_job_attached_aio_context(AioContext *new_context,
+                                            void *opaque)
  {
-     return (job->id == NULL);
+     BlockJob *job = opaque;
++    const JobDriver *drv = job->job.driver;
++    BlockJobDriver *bjdrv = container_of(drv, BlockJobDriver, job_driver);
+ 
+     job->job.aio_context = new_context;
+-    if (job->driver->attached_aio_context) {
+-        job->driver->attached_aio_context(job, new_context);
++    if (bjdrv->attached_aio_context) {
++        bjdrv->attached_aio_context(job, new_context);
+     }
+ 
+     job_resume(&job->job);
+@@ -115,10 +117,12 @@ static void block_job_attached_aio_context(AioContext *new_context,
+ void block_job_drain(Job *job)
+ {
+     BlockJob *bjob = container_of(job, BlockJob, job);
++    const JobDriver *drv = job->driver;
++    BlockJobDriver *bjdrv = container_of(drv, BlockJobDriver, job_driver);
+ 
+     blk_drain(bjob->blk);
+-    if (bjob->driver->drain) {
+-        bjob->driver->drain(bjob);
++    if (bjdrv->drain) {
++        bjdrv->drain(bjob);
+     }
  }
+ 
+@@ -201,7 +205,7 @@ bool block_job_is_internal(BlockJob *job)
+ 
+ const BlockJobDriver *block_job_driver(BlockJob *job)
+ {
+-    return job->driver;
++    return container_of(job->job.driver, BlockJobDriver, job_driver);
+ }
+ 
+ /* Assumes the job_mutex is held */
+@@ -386,8 +390,7 @@ void *block_job_create(const char *job_id, const BlockJobDriver *driver,
+     assert(job->job.driver->user_resume == &block_job_user_resume);
+     assert(job->job.driver->drain == &block_job_drain);
+ 
+-    job->driver        = driver;
+-    job->blk           = blk;
++    job->blk = blk;
+ 
+     job->finalize_cancelled_notifier.notify = block_job_event_cancelled;
+     job->finalize_completed_notifier.notify = block_job_event_completed;
 -- 
 2.13.6
