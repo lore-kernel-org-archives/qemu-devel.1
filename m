@@ -1,28 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43913)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44193)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fLRL4-0006GA-VE
-	for qemu-devel@nongnu.org; Wed, 23 May 2018 06:49:52 -0400
+	(envelope-from <quintela@redhat.com>) id 1fLRMY-0006yn-7T
+	for qemu-devel@nongnu.org; Wed, 23 May 2018 06:51:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fLRL0-0002nO-VK
-	for qemu-devel@nongnu.org; Wed, 23 May 2018 06:49:51 -0400
-Received: from mail-wm0-x243.google.com ([2a00:1450:400c:c09::243]:51871)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1fLRL0-0002mi-N0
-	for qemu-devel@nongnu.org; Wed, 23 May 2018 06:49:46 -0400
-Received: by mail-wm0-x243.google.com with SMTP id j4-v6so7732465wme.1
-	for <qemu-devel@nongnu.org>; Wed, 23 May 2018 03:49:46 -0700 (PDT)
-References: <20180521140402.23318-1-peter.maydell@linaro.org>
-	<20180521140402.23318-21-peter.maydell@linaro.org>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <20180521140402.23318-21-peter.maydell@linaro.org>
-Date: Wed, 23 May 2018 11:49:43 +0100
-Message-ID: <87y3gatznc.fsf@linaro.org>
+	(envelope-from <quintela@redhat.com>) id 1fLRMV-0003rB-1B
+	for qemu-devel@nongnu.org; Wed, 23 May 2018 06:51:22 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:39498 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1fLRMU-0003qB-T2
+	for qemu-devel@nongnu.org; Wed, 23 May 2018 06:51:18 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.6])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 2F200818BAF5
+	for <qemu-devel@nongnu.org>; Wed, 23 May 2018 10:51:18 +0000 (UTC)
+From: Juan Quintela <quintela@redhat.com>
+In-Reply-To: <20180503145501.GH2660@work-vm> (David Alan Gilbert's message of
+	"Thu, 3 May 2018 15:55:02 +0100")
+References: <20180425112723.1111-1-quintela@redhat.com>
+	<20180425112723.1111-19-quintela@redhat.com>
+	<20180503145501.GH2660@work-vm>
+Reply-To: quintela@redhat.com
+Date: Wed, 23 May 2018 12:51:15 +0200
+Message-ID: <87o9h6bq70.fsf@secure.mitica>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 20/27] hw/misc/tz-mpc.c: Implement correct
- blocked-access behaviour
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v12 18/21] migration: Start sending messages
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,117 +35,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: qemu-arm@nongnu.org, qemu-devel@nongnu.org, patches@linaro.org, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: qemu-devel@nongnu.org, lvivier@redhat.com, peterx@redhat.com
 
+"Dr. David Alan Gilbert" <dgilbert@redhat.com> wrote:
+> * Juan Quintela (quintela@redhat.com) wrote:
+>> Signed-off-by: Juan Quintela <quintela@redhat.com>
+>> ---
+>>  migration/ram.c | 30 ++++++++++++++++++++++++------
+>>  1 file changed, 24 insertions(+), 6 deletions(-)
+>> 
+>> diff --git a/migration/ram.c b/migration/ram.c
+>> index 862ec53d32..9adbaa81f9 100644
+>> --- a/migration/ram.c
+>> +++ b/migration/ram.c
+>> @@ -625,9 +625,6 @@ static int multifd_recv_unfill_packet(MultiFDRecvParams *p, Error **errp)
+>>      RAMBlock *block;
+>>      int i;
+>>  
+>> -    /* ToDo: We can't use it until we haven't received a message */
+>> -    return 0;
+>> -
+>>      be32_to_cpus(&packet->magic);
+>>      if (packet->magic != MULTIFD_MAGIC) {
+>>          error_setg(errp, "multifd: received packet "
+>> @@ -851,6 +848,7 @@ static void *multifd_send_thread(void *opaque)
+>>  {
+>>      MultiFDSendParams *p = opaque;
+>>      Error *local_err = NULL;
+>> +    int ret;
+>>  
+>>      trace_multifd_send_thread_start(p->id);
+>>  
+>> @@ -878,10 +876,18 @@ static void *multifd_send_thread(void *opaque)
+>>  
+>>              trace_multifd_send(p->id, seq, used, flags);
+>>  
+>> -            /* ToDo: send packet here */
+>> +            ret = qio_channel_write_all(p->c, (void *)p->packet,
+>> +                                        p->packet_len, &local_err);
+>> +            if (ret != 0) {
+>> +                break;
+>> +            }
+>> +
+>> +            ret = qio_channel_writev_all(p->c, p->pages->iov, used, &local_err);
+>> +            if (ret != 0) {
+>> +                break;
+>> +            }
+>>  
+>>              qemu_mutex_lock(&p->mutex);
+>> -            p->flags = 0;
+>
+> What's this change?
 
-Peter Maydell <peter.maydell@linaro.org> writes:
+Leftover from previous approach on patch 16, we already do that
+assignment several lines before.  Removed it on patch 16 as it should.
 
-> The MPC is guest-configurable for whether blocked accesses:
->  * should be RAZ/WI or cause a bus error
->  * should generate an interrupt or not
->
-> Implement this behaviour in the blocked-access handlers.
->
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-> ---
->  hw/misc/tz-mpc.c | 50 ++++++++++++++++++++++++++++++++++++++++++++++--
->  1 file changed, 48 insertions(+), 2 deletions(-)
->
-> diff --git a/hw/misc/tz-mpc.c b/hw/misc/tz-mpc.c
-> index 93453cbef2..39a72563b7 100644
-> --- a/hw/misc/tz-mpc.c
-> +++ b/hw/misc/tz-mpc.c
-> @@ -43,6 +43,9 @@ REG32(INT_EN, 0x28)
->      FIELD(INT_EN, IRQ, 0, 1)
->  REG32(INT_INFO1, 0x2c)
->  REG32(INT_INFO2, 0x30)
-> +    FIELD(INT_INFO2, HMASTER, 0, 16)
-> +    FIELD(INT_INFO2, HNONSEC, 16, 1)
-> +    FIELD(INT_INFO2, CFG_NS, 17, 1)
->  REG32(INT_SET, 0x34)
->      FIELD(INT_SET, IRQ, 0, 1)
->  REG32(PIDR4, 0xfd0)
-> @@ -266,6 +269,45 @@ static const MemoryRegionOps tz_mpc_reg_ops =3D {
->      .impl.max_access_size =3D 4,
->  };
->
-> +static inline bool tz_mpc_cfg_ns(TZMPC *s, hwaddr addr)
-> +{
-> +    /* Return the cfg_ns bit from the LUT for the specified address */
-> +    hwaddr blknum =3D addr / s->blocksize;
-> +    hwaddr blkword =3D blknum / 32;
-> +    uint32_t blkbit =3D 1U << (blknum % 32);
-> +
-> +    /* This would imply the address was larger than the size we
-> +     * defined this memory region to be, so it can't happen.
-> +     */
-> +    assert(blkword < s->blk_max);
-> +    return s->blk_lut[blkword] & blkbit;
-> +}
-> +
-> +static MemTxResult tz_mpc_handle_block(TZMPC *s, hwaddr addr, MemTxAttrs=
- attrs)
-> +{
-> +    /* Handle a blocked transaction: raise IRQ, capture info, etc */
-> +    if (!s->int_stat) {
-> +        /* First blocked transfer: capture information into INT_INFO1 and
-> +         * INT_INFO2. Subsequent transfers are still blocked but don't
-> +         * capture information until the guest clears the interrupt.
-> +         */
-> +
-> +        s->int_info1 =3D addr;
-> +        s->int_info2 =3D 0;
-> +        s->int_info2 =3D FIELD_DP32(s->int_info2, INT_INFO2, HMASTER,
-> +                                  attrs.requester_id & 0xffff);
-
-Does this actually need masking given the source is a 16 bit wide bitfield?
-
-> +        s->int_info2 =3D FIELD_DP32(s->int_info2, INT_INFO2, HNONSEC,
-> +                                  ~attrs.secure);
-> +        s->int_info2 =3D FIELD_DP32(s->int_info2, INT_INFO2, CFG_NS,
-> +                                  tz_mpc_cfg_ns(s, addr));
-> +        s->int_stat |=3D R_INT_STAT_IRQ_MASK;
-> +        tz_mpc_irq_update(s);
-> +    }
-> +
-> +    /* Generate bus error if desired; otherwise RAZ/WI */
-> +    return (s->ctrl & R_CTRL_SEC_RESP_MASK) ? MEMTX_ERROR : MEMTX_OK;
-> +}
-> +
->  /* Accesses only reach these read and write functions if the MPC is
->   * blocking them; non-blocked accesses go directly to the downstream
->   * memory region without passing through this code.
-> @@ -274,19 +316,23 @@ static MemTxResult tz_mpc_mem_blocked_read(void *op=
-aque, hwaddr addr,
->                                             uint64_t *pdata,
->                                             unsigned size, MemTxAttrs att=
-rs)
->  {
-> +    TZMPC *s =3D TZ_MPC(opaque);
-> +
->      trace_tz_mpc_mem_blocked_read(addr, size, attrs.secure);
->
->      *pdata =3D 0;
-> -    return MEMTX_OK;
-> +    return tz_mpc_handle_block(s, addr, attrs);
->  }
->
->  static MemTxResult tz_mpc_mem_blocked_write(void *opaque, hwaddr addr,
->                                              uint64_t value,
->                                              unsigned size, MemTxAttrs at=
-trs)
->  {
-> +    TZMPC *s =3D TZ_MPC(opaque);
-> +
->      trace_tz_mpc_mem_blocked_write(addr, value, size, attrs.secure);
->
-> -    return MEMTX_OK;
-> +    return tz_mpc_handle_block(s, addr, attrs);
->  }
->
->  static const MemoryRegionOps tz_mpc_mem_blocked_ops =3D {
-
-
---
-Alex Benn=C3=A9e
+Thanks, Juan.
