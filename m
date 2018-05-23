@@ -1,18 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44346)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44355)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1fLKI0-0000fR-RU
-	for qemu-devel@nongnu.org; Tue, 22 May 2018 23:18:13 -0400
+	(envelope-from <peterx@redhat.com>) id 1fLKI1-0000fT-9Y
+	for qemu-devel@nongnu.org; Tue, 22 May 2018 23:18:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1fLKHx-00087l-OT
-	for qemu-devel@nongnu.org; Tue, 22 May 2018 23:18:12 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:60374 helo=mx1.redhat.com)
+	(envelope-from <peterx@redhat.com>) id 1fLKI0-00088S-Fs
+	for qemu-devel@nongnu.org; Tue, 22 May 2018 23:18:13 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:60378 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1fLKHx-00087f-K6
-	for qemu-devel@nongnu.org; Tue, 22 May 2018 23:18:09 -0400
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1fLKI0-00088D-Az
+	for qemu-devel@nongnu.org; Tue, 22 May 2018 23:18:12 -0400
 From: Peter Xu <peterx@redhat.com>
-Date: Wed, 23 May 2018 11:18:03 +0800
-Message-Id: <20180523031805.27101-1-peterx@redhat.com>
-Subject: [Qemu-devel] [PATCH v3 0/2] error-report: introduce
+Date: Wed, 23 May 2018 11:18:04 +0800
+Message-Id: <20180523031805.27101-2-peterx@redhat.com>
+In-Reply-To: <20180523031805.27101-1-peterx@redhat.com>
+References: <20180523031805.27101-1-peterx@redhat.com>
+Subject: [Qemu-devel] [PATCH v3 1/2] qemu-error: introduce
  {error|warn}_report_once
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -25,29 +27,56 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: "Michael S . Tsirkin" <mst@redhat.com>, Markus Armbruster <armbru@redhat.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, peterx@redhat.com, Jason Wang <jasowang@redhat.com>
 
-v3:
-- reindent in patch 2, dump more things [Philippe]
+I stole the printk_once() macro.
 
-v2:
-- for patch 1: replace tabs, add trivial comment [Markus]
-  (I didn't add much comment otherwise I'll need to duplicate what's
-   there in error_report())
-- add patch 2
+I always wanted to be able to print some error directly if there is a
+buffer to dump, however we can't use error_report() where the code path
+can be triggered by DDOS attack.  To avoid that, we can introduce a
+print-once-like function for it.  Meanwhile, we also introduce the
+corresponding helper for warn_report().
 
-Patch 1 introduce the helpers.
+CC: Markus Armbruster <armbru@redhat.com>
+Signed-off-by: Peter Xu <peterx@redhat.com>
+---
+ include/qemu/error-report.h | 26 ++++++++++++++++++++++++++
+ 1 file changed, 26 insertions(+)
 
-Patch 2 use it to replace VT-d trace_vtd_err().
-
-Please review.  Thanks.
-
-Peter Xu (2):
-  qemu-error: introduce {error|warn}_report_once
-  intel-iommu: start to use error_report_once
-
- include/qemu/error-report.h | 26 ++++++++++++++++
- hw/i386/intel_iommu.c       | 59 +++++++++++++++++++++----------------
- hw/i386/trace-events        |  1 -
- 3 files changed, 59 insertions(+), 27 deletions(-)
-
+diff --git a/include/qemu/error-report.h b/include/qemu/error-report.h
+index e1c8ae1a52..3e6e84801f 100644
+--- a/include/qemu/error-report.h
++++ b/include/qemu/error-report.h
+@@ -44,6 +44,32 @@ void error_report(const char *fmt, ...) GCC_FMT_ATTR(1, 2);
+ void warn_report(const char *fmt, ...) GCC_FMT_ATTR(1, 2);
+ void info_report(const char *fmt, ...) GCC_FMT_ATTR(1, 2);
+ 
++/* Similar to error_report(), but it only prints the message once. */
++#define error_report_once(fmt, ...)             \
++    ({                                          \
++        static bool __print_once;               \
++        bool __ret_print_once = !__print_once;  \
++                                                \
++        if (!__print_once) {                    \
++            __print_once = true;                \
++            error_report(fmt, ##__VA_ARGS__);   \
++        }                                       \
++        unlikely(__ret_print_once);             \
++    })
++
++/* Similar to warn_report(), but it only prints the message once. */
++#define warn_report_once(fmt, ...)              \
++    ({                                          \
++        static bool __print_once;               \
++        bool __ret_print_once = !__print_once;  \
++                                                \
++        if (!__print_once) {                    \
++            __print_once = true;                \
++            warn_report(fmt, ##__VA_ARGS__);   \
++        }                                       \
++        unlikely(__ret_print_once);             \
++    })
++
+ const char *error_get_progname(void);
+ extern bool enable_timestamp_msg;
+ 
 -- 
 2.17.0
