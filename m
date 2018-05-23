@@ -1,21 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48746)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48812)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1fLUyX-0001Vi-3W
-	for qemu-devel@nongnu.org; Wed, 23 May 2018 10:42:50 -0400
+	(envelope-from <mst@redhat.com>) id 1fLUyi-0001de-5y
+	for qemu-devel@nongnu.org; Wed, 23 May 2018 10:43:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1fLUyT-0000hy-LL
-	for qemu-devel@nongnu.org; Wed, 23 May 2018 10:42:48 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:38564 helo=mx1.redhat.com)
+	(envelope-from <mst@redhat.com>) id 1fLUyf-0000l6-1y
+	for qemu-devel@nongnu.org; Wed, 23 May 2018 10:43:00 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:39166)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1fLUyT-0000hi-Eq
-	for qemu-devel@nongnu.org; Wed, 23 May 2018 10:42:45 -0400
-Date: Wed, 23 May 2018 17:42:44 +0300
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1fLUye-0000ky-Rr
+	for qemu-devel@nongnu.org; Wed, 23 May 2018 10:42:56 -0400
+Date: Wed, 23 May 2018 17:42:46 +0300
 From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <1527086545-68024-1-git-send-email-mst@redhat.com>
+Message-ID: <1527086545-68024-5-git-send-email-mst@redhat.com>
+References: <1527086545-68024-1-git-send-email-mst@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Subject: [Qemu-devel] [PULL 00/28] pc, pci, virtio, vhost: fixes, features
+In-Reply-To: <1527086545-68024-1-git-send-email-mst@redhat.com>
+Subject: [Qemu-devel] [PULL 04/28] vhost: add trace for IOTLB miss
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,150 +27,71 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Peter Xu <peterx@redhat.com>
 
-The following changes since commit 4f50c1673a89b07f376ce5c42d22d79a79cd466d:
+From: Peter Xu <peterx@redhat.com>
 
-  Merge remote-tracking branch 'remotes/ehabkost/tags/x86-next-pull-request' into staging (2018-05-22 09:43:58 +0100)
+Add some trace points for IOTLB translation for vhost. After vhost-user
+is setup, the only IO path that QEMU will participate should be the
+IOMMU translation, so it'll be good we can track this with explicit
+timestamps when needed to see how long time we take to do the
+translation, and whether there's anything stuck inside.  It might be
+useful for triaging vhost-user problems.
 
-are available in the git repository at:
-
-  git://git.kernel.org/pub/scm/virt/kvm/mst/qemu.git tags/for_upstream
-
-for you to fetch changes up to 63b88968f139b6a77f2f81e6f1eedf70c0170a85:
-
-  intel-iommu: rework the page walk logic (2018-05-23 17:34:05 +0300)
-
-----------------------------------------------------------------
-pc, pci, virtio, vhost: fixes, features
-
-Beginning of merging vDPA, new PCI ID, a new virtio balloon stat, intel
-iommu rework fixing a couple of security problems (no CVEs yet), fixes
-all over the place.
-
+Signed-off-by: Peter Xu <peterx@redhat.com>
+Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+---
+ hw/virtio/vhost.c      | 7 +++++++
+ hw/virtio/trace-events | 1 +
+ 2 files changed, 8 insertions(+)
 
-----------------------------------------------------------------
-Changpeng Liu (1):
-      contrib/vhost-user-blk: enable protocol feature for vhost-user-blk
-
-Dr. David Alan Gilbert (2):
-      vhost-user+postcopy: Use qemu_set_nonblock
-      libvhost-user: Send messages with no data
-
-Gerd Hoffmann (1):
-      allocate pci id for mdpy
-
-Jonathan Helman (1):
-      virtio-balloon: add hugetlb page allocation counts
-
-Michael S. Tsirkin (7):
-      update-linux-headers.sh: drop kvm_para.h hacks
-      include/standard-headers: add asm-x86/kvm_para.h
-      x86/cpu: use standard-headers/asm-x86.kvm_para.h
-      linux-headers: drop kvm_para.h
-      update-linux-headers.sh: unistd.h, kvm consistency
-      linux-headers: add unistd.h on all arches
-      linux-headers: add kvm header for mips
-
-Peter Xu (10):
-      vhost: add trace for IOTLB miss
-      intel-iommu: send PSI always even if across PDEs
-      intel-iommu: remove IntelIOMMUNotifierNode
-      intel-iommu: add iommu lock
-      intel-iommu: only do page walk for MAP notifiers
-      intel-iommu: introduce vtd_page_walk_info
-      intel-iommu: pass in address space when page walk
-      intel-iommu: trace domain id during page walk
-      util: implement simple iova tree
-      intel-iommu: rework the page walk logic
-
-Richard Henderson (1):
-      hw/virtio: Fix brace Werror with clang 6.0.0
-
-Ross Zwisler (1):
-      nvdimm: fix typo in label-size definition
-
-Tiwei Bie (3):
-      vhost-user: add Net prefix to internal state structure
-      vhost-user: support receiving file descriptors in slave_read
-      virtio: support setting memory region based host notifier
-
-Zihan Yang (1):
-      hw/pci-host/q35: Replace hardcoded value with macro
-
- docs/specs/pci-ids.txt                             |   1 +
- docs/virtio-balloon-stats.txt                      |   2 +
- include/hw/i386/intel_iommu.h                      |  19 +-
- include/hw/mem/nvdimm.h                            |   2 +-
- include/hw/pci/pci.h                               |   1 +
- include/hw/virtio/virtio-bus.h                     |   2 +
- include/hw/virtio/virtio.h                         |   2 +
- include/qemu/iova-tree.h                           | 134 ++++
- .../standard-headers}/asm-x86/kvm_para.h           |  49 +-
- include/standard-headers/linux/virtio_balloon.h    |   4 +-
- include/sysemu/kvm.h                               |   1 -
- linux-headers/asm-arm/bitsperlong.h                |   1 +
- linux-headers/asm-arm/kvm_para.h                   |   2 -
- linux-headers/asm-arm64/bitsperlong.h              |  24 +
- linux-headers/asm-arm64/kvm_para.h                 |   1 -
- linux-headers/asm-generic/bitsperlong.h            |  16 +
- linux-headers/asm-generic/kvm_para.h               |   4 -
- linux-headers/asm-generic/unistd.h                 | 781 +++++++++++++++++++++
- linux-headers/asm-mips/bitsperlong.h               |   9 +
- linux-headers/asm-mips/kvm.h                       |  25 +-
- linux-headers/asm-mips/kvm_para.h                  |   5 -
- linux-headers/asm-mips/sgidefs.h                   |  45 ++
- linux-headers/asm-mips/unistd.h                    |  44 +-
- linux-headers/asm-powerpc/bitsperlong.h            |  13 +
- linux-headers/asm-powerpc/epapr_hcalls.h           |  99 ---
- linux-headers/asm-powerpc/kvm_para.h               |  98 ---
- linux-headers/asm-s390/bitsperlong.h               |  14 +
- linux-headers/asm-s390/kvm_para.h                  |   8 -
- linux-headers/asm-s390/unistd_32.h                 |   1 +
- linux-headers/asm-s390/unistd_64.h                 |   1 +
- linux-headers/asm-x86/bitsperlong.h                |  14 +
- linux-headers/linux/kvm_para.h                     |  35 -
- target/i386/cpu.h                                  |   2 -
- target/i386/kvm_i386.h                             |   6 -
- contrib/libvhost-user/libvhost-user.c              |  16 +-
- contrib/vhost-user-blk/vhost-user-blk.c            |   7 +
- hw/i386/intel_iommu.c                              | 396 ++++++++---
- hw/i386/kvm/clock.c                                |   2 +-
- hw/mem/nvdimm.c                                    |   2 +-
- hw/pci-host/q35.c                                  |  17 +-
- hw/virtio/vhost-user.c                             |  45 +-
- hw/virtio/vhost.c                                  |   7 +
- hw/virtio/virtio-balloon.c                         |   2 +
- hw/virtio/virtio-pci.c                             |  22 +
- hw/virtio/virtio.c                                 |  13 +
- net/vhost-user.c                                   |  38 +-
- target/i386/cpu.c                                  |   4 +-
- target/i386/kvm.c                                  |   4 +-
- util/iova-tree.c                                   | 114 +++
- MAINTAINERS                                        |   6 +
- hw/i386/trace-events                               |   5 +-
- hw/virtio/trace-events                             |   1 +
- scripts/update-linux-headers.sh                    |  20 +-
- util/Makefile.objs                                 |   1 +
- 54 files changed, 1731 insertions(+), 456 deletions(-)
- create mode 100644 include/qemu/iova-tree.h
- rename {linux-headers => include/standard-headers}/asm-x86/kvm_para.h (80%)
- create mode 100644 linux-headers/asm-arm/bitsperlong.h
- delete mode 100644 linux-headers/asm-arm/kvm_para.h
- create mode 100644 linux-headers/asm-arm64/bitsperlong.h
- delete mode 100644 linux-headers/asm-arm64/kvm_para.h
- create mode 100644 linux-headers/asm-generic/bitsperlong.h
- delete mode 100644 linux-headers/asm-generic/kvm_para.h
- create mode 100644 linux-headers/asm-generic/unistd.h
- create mode 100644 linux-headers/asm-mips/bitsperlong.h
- delete mode 100644 linux-headers/asm-mips/kvm_para.h
- create mode 100644 linux-headers/asm-mips/sgidefs.h
- create mode 100644 linux-headers/asm-powerpc/bitsperlong.h
- delete mode 100644 linux-headers/asm-powerpc/epapr_hcalls.h
- delete mode 100644 linux-headers/asm-powerpc/kvm_para.h
- create mode 100644 linux-headers/asm-s390/bitsperlong.h
- delete mode 100644 linux-headers/asm-s390/kvm_para.h
- create mode 100644 linux-headers/asm-x86/bitsperlong.h
- delete mode 100644 linux-headers/linux/kvm_para.h
- create mode 100644 util/iova-tree.c
+diff --git a/hw/virtio/vhost.c b/hw/virtio/vhost.c
+index 9d5850a..b082900 100644
+--- a/hw/virtio/vhost.c
++++ b/hw/virtio/vhost.c
+@@ -894,12 +894,15 @@ int vhost_device_iotlb_miss(struct vhost_dev *dev, uint64_t iova, int write)
+ 
+     rcu_read_lock();
+ 
++    trace_vhost_iotlb_miss(dev, 1);
++
+     iotlb = address_space_get_iotlb_entry(dev->vdev->dma_as,
+                                           iova, write);
+     if (iotlb.target_as != NULL) {
+         ret = vhost_memory_region_lookup(dev, iotlb.translated_addr,
+                                          &uaddr, &len);
+         if (ret) {
++            trace_vhost_iotlb_miss(dev, 3);
+             error_report("Fail to lookup the translated address "
+                          "%"PRIx64, iotlb.translated_addr);
+             goto out;
+@@ -911,10 +914,14 @@ int vhost_device_iotlb_miss(struct vhost_dev *dev, uint64_t iova, int write)
+         ret = vhost_backend_update_device_iotlb(dev, iova, uaddr,
+                                                 len, iotlb.perm);
+         if (ret) {
++            trace_vhost_iotlb_miss(dev, 4);
+             error_report("Fail to update device iotlb");
+             goto out;
+         }
+     }
++
++    trace_vhost_iotlb_miss(dev, 2);
++
+ out:
+     rcu_read_unlock();
+ 
+diff --git a/hw/virtio/trace-events b/hw/virtio/trace-events
+index 1422ff0..07bcbe9 100644
+--- a/hw/virtio/trace-events
++++ b/hw/virtio/trace-events
+@@ -6,6 +6,7 @@ vhost_region_add_section(const char *name, uint64_t gpa, uint64_t size, uint64_t
+ vhost_region_add_section_merge(const char *name, uint64_t new_size, uint64_t gpa, uint64_t owr) "%s: size: 0x%"PRIx64 " gpa: 0x%"PRIx64 " owr: 0x%"PRIx64
+ vhost_region_add_section_aligned(const char *name, uint64_t gpa, uint64_t size, uint64_t host) "%s: 0x%"PRIx64"+0x%"PRIx64" @ 0x%"PRIx64
+ vhost_section(const char *name, int r) "%s:%d"
++vhost_iotlb_miss(void *dev, int step) "%p step %d"
+ 
+ # hw/virtio/vhost-user.c
+ vhost_user_postcopy_end_entry(void) ""
+-- 
+MST
