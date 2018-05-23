@@ -1,33 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41063)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41344)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fLSoL-0001bU-AY
-	for qemu-devel@nongnu.org; Wed, 23 May 2018 08:24:13 -0400
+	id 1fLSpa-0002ZZ-9f
+	for qemu-devel@nongnu.org; Wed, 23 May 2018 08:25:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fLSoF-0002k2-8e
-	for qemu-devel@nongnu.org; Wed, 23 May 2018 08:24:09 -0400
-Received: from mail-qt0-x243.google.com ([2607:f8b0:400d:c0d::243]:38015)
+	id 1fLSpW-0003ER-Ek
+	for qemu-devel@nongnu.org; Wed, 23 May 2018 08:25:26 -0400
+Received: from mail-qt0-x242.google.com ([2607:f8b0:400d:c0d::242]:40833)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fLSoF-0002jw-2O
-	for qemu-devel@nongnu.org; Wed, 23 May 2018 08:24:03 -0400
-Received: by mail-qt0-x243.google.com with SMTP id m9-v6so27734613qtb.5
-	for <qemu-devel@nongnu.org>; Wed, 23 May 2018 05:24:03 -0700 (PDT)
+	id 1fLSpW-0003EL-A1
+	for qemu-devel@nongnu.org; Wed, 23 May 2018 08:25:22 -0400
+Received: by mail-qt0-x242.google.com with SMTP id h2-v6so27735833qtp.7
+	for <qemu-devel@nongnu.org>; Wed, 23 May 2018 05:25:22 -0700 (PDT)
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
 References: <1527034517-7851-1-git-send-email-mjc@sifive.com>
-	<1527034517-7851-7-git-send-email-mjc@sifive.com>
+	<1527034517-7851-12-git-send-email-mjc@sifive.com>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <63c41eac-79e2-b070-cf03-2032ca25a8d0@amsat.org>
-Date: Wed, 23 May 2018 09:23:58 -0300
+Message-ID: <6a7f5b63-21bc-6632-ea9d-c8d2f9a6d240@amsat.org>
+Date: Wed, 23 May 2018 09:25:17 -0300
 MIME-Version: 1.0
-In-Reply-To: <1527034517-7851-7-git-send-email-mjc@sifive.com>
+In-Reply-To: <1527034517-7851-12-git-send-email-mjc@sifive.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v1 06/30] RISC-V: Move non-ops from
- op_helper to cpu_helper
+Subject: Re: [Qemu-devel] [PATCH v1 11/30] RISC-V: Split out mstatus_fs from
+ tb_flags
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,141 +37,98 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Michael Clark <mjc@sifive.com>, qemu-devel@nongnu.org
-Cc: Sagar Karandikar <sagark@eecs.berkeley.edu>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Palmer Dabbelt <palmer@sifive.com>, Alistair Francis <Alistair.Francis@wdc.com>, patches@groups.riscv.org
+Cc: Sagar Karandikar <sagark@eecs.berkeley.edu>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Palmer Dabbelt <palmer@sifive.com>, Richard Henderson <richard.henderson@linaro.org>, Alistair Francis <Alistair.Francis@wdc.com>, patches@groups.riscv.org
 
 On 05/22/2018 09:14 PM, Michael Clark wrote:
-> This patch makes op_helper.c contain only instruction
-> operation helpers used by translate.c and moves any
-> unrelated cpu helpers into cpu_helper.c. No logic is
-> changed by this patch.
+> From: Richard Henderson <richard.henderson@linaro.org>
 > 
 > Cc: Sagar Karandikar <sagark@eecs.berkeley.edu>
 > Cc: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
 > Cc: Palmer Dabbelt <palmer@sifive.com>
 > Cc: Alistair Francis <Alistair.Francis@wdc.com>
+> Cc: Richard Henderson <richard.henderson@linaro.org>
 > Signed-off-by: Michael Clark <mjc@sifive.com>
-> Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
+> Reviewed-by: Michael Clark <mjc@sifive.com>
 
 Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
 > ---
->  target/riscv/Makefile.objs              |  2 +-
->  target/riscv/{helper.c => cpu_helper.c} | 35 ++++++++++++++++++++++++++++++++-
->  target/riscv/op_helper.c                | 34 --------------------------------
->  3 files changed, 35 insertions(+), 36 deletions(-)
->  rename target/riscv/{helper.c => cpu_helper.c} (95%)
+>  target/riscv/cpu.h       |  6 +++---
+>  target/riscv/translate.c | 10 +++++-----
+>  2 files changed, 8 insertions(+), 8 deletions(-)
 > 
-> diff --git a/target/riscv/Makefile.objs b/target/riscv/Makefile.objs
-> index abd0a7cde333..fcc5d34c1f2e 100644
-> --- a/target/riscv/Makefile.objs
-> +++ b/target/riscv/Makefile.objs
-> @@ -1 +1 @@
-> -obj-y += translate.o op_helper.o helper.o cpu.o fpu_helper.o gdbstub.o pmp.o
-> +obj-y += translate.o op_helper.o cpu_helper.o cpu.o fpu_helper.o gdbstub.o pmp.o
-> diff --git a/target/riscv/helper.c b/target/riscv/cpu_helper.c
-> similarity index 95%
-> rename from target/riscv/helper.c
-> rename to target/riscv/cpu_helper.c
-> index 47d116e9c13f..6c886e99055a 100644
-> --- a/target/riscv/helper.c
-> +++ b/target/riscv/cpu_helper.c
-> @@ -1,5 +1,5 @@
->  /*
-> - * RISC-V emulation helpers for qemu.
-> + * RISC-V CPU helpers for qemu.
->   *
->   * Copyright (c) 2016-2017 Sagar Karandikar, sagark@eecs.berkeley.edu
->   * Copyright (c) 2017-2018 SiFive, Inc.
-> @@ -72,6 +72,39 @@ bool riscv_cpu_exec_interrupt(CPUState *cs, int interrupt_request)
+> diff --git a/target/riscv/cpu.h b/target/riscv/cpu.h
+> index 3a3d91447736..242a8fcbe180 100644
+> --- a/target/riscv/cpu.h
+> +++ b/target/riscv/cpu.h
+> @@ -276,8 +276,8 @@ void QEMU_NORETURN do_raise_exception_err(CPURISCVState *env,
+>  target_ulong cpu_riscv_get_fflags(CPURISCVState *env);
+>  void cpu_riscv_set_fflags(CPURISCVState *env, target_ulong);
 >  
->  #if !defined(CONFIG_USER_ONLY)
+> -#define TB_FLAGS_MMU_MASK  3
+> -#define TB_FLAGS_FP_ENABLE MSTATUS_FS
+> +#define TB_FLAGS_MMU_MASK   3
+> +#define TB_FLAGS_MSTATUS_FS MSTATUS_FS
 >  
-> +/* iothread_mutex must be held */
-> +uint32_t riscv_cpu_update_mip(RISCVCPU *cpu, uint32_t mask, uint32_t value)
-> +{
-> +    CPURISCVState *env = &cpu->env;
-> +    uint32_t old, new, cmp = atomic_read(&env->mip);
-> +
-> +    do {
-> +        old = cmp;
-> +        new = (old & ~mask) | (value & mask);
-> +        cmp = atomic_cmpxchg(&env->mip, old, new);
-> +    } while (old != cmp);
-> +
-> +    if (new && !old) {
-> +        cpu_interrupt(CPU(cpu), CPU_INTERRUPT_HARD);
-> +    } else if (!new && old) {
-> +        cpu_reset_interrupt(CPU(cpu), CPU_INTERRUPT_HARD);
-> +    }
-> +
-> +    return old;
-> +}
-> +
-> +void riscv_set_mode(CPURISCVState *env, target_ulong newpriv)
-> +{
-> +    if (newpriv > PRV_M) {
-> +        g_assert_not_reached();
-> +    }
-> +    if (newpriv == PRV_H) {
-> +        newpriv = PRV_U;
-> +    }
-> +    /* tlb_flush is unnecessary as mode is contained in mmu_idx */
-> +    env->priv = newpriv;
-> +}
-> +
->  /* get_physical_address - get the physical address for this virtual address
->   *
->   * Do a page table walk to obtain the physical address corresponding to a
-> diff --git a/target/riscv/op_helper.c b/target/riscv/op_helper.c
-> index 5a02795bf931..2b9dd9da6486 100644
-> --- a/target/riscv/op_helper.c
-> +++ b/target/riscv/op_helper.c
-> @@ -652,39 +652,6 @@ target_ulong helper_csrrc(CPURISCVState *env, target_ulong src,
->  
->  #ifndef CONFIG_USER_ONLY
->  
-> -/* iothread_mutex must be held */
-> -uint32_t riscv_cpu_update_mip(RISCVCPU *cpu, uint32_t mask, uint32_t value)
-> -{
-> -    CPURISCVState *env = &cpu->env;
-> -    uint32_t old, new, cmp = atomic_read(&env->mip);
-> -
-> -    do {
-> -        old = cmp;
-> -        new = (old & ~mask) | (value & mask);
-> -        cmp = atomic_cmpxchg(&env->mip, old, new);
-> -    } while (old != cmp);
-> -
-> -    if (new && !old) {
-> -        cpu_interrupt(CPU(cpu), CPU_INTERRUPT_HARD);
-> -    } else if (!new && old) {
-> -        cpu_reset_interrupt(CPU(cpu), CPU_INTERRUPT_HARD);
-> -    }
-> -
-> -    return old;
-> -}
-> -
-> -void riscv_set_mode(CPURISCVState *env, target_ulong newpriv)
-> -{
-> -    if (newpriv > PRV_M) {
-> -        g_assert_not_reached();
-> -    }
-> -    if (newpriv == PRV_H) {
-> -        newpriv = PRV_U;
-> -    }
-> -    /* tlb_flush is unnecessary as mode is contained in mmu_idx */
-> -    env->priv = newpriv;
-> -}
-> -
->  target_ulong helper_sret(CPURISCVState *env, target_ulong cpu_pc_deb)
+>  static inline void cpu_get_tb_cpu_state(CPURISCVState *env, target_ulong *pc,
+>                                          target_ulong *cs_base, uint32_t *flags)
+> @@ -285,7 +285,7 @@ static inline void cpu_get_tb_cpu_state(CPURISCVState *env, target_ulong *pc,
+>      *pc = env->pc;
+>      *cs_base = 0;
+>  #ifdef CONFIG_USER_ONLY
+> -    *flags = TB_FLAGS_FP_ENABLE;
+> +    *flags = TB_FLAGS_MSTATUS_FS;
+>  #else
+>      *flags = cpu_mmu_index(env, 0) | (env->mstatus & MSTATUS_FS);
+>  #endif
+> diff --git a/target/riscv/translate.c b/target/riscv/translate.c
+> index ee2bbc55b051..466b9551cbd9 100644
+> --- a/target/riscv/translate.c
+> +++ b/target/riscv/translate.c
+> @@ -44,7 +44,7 @@ typedef struct DisasContext {
+>      /* pc_succ_insn points to the instruction following base.pc_next */
+>      target_ulong pc_succ_insn;
+>      uint32_t opcode;
+> -    uint32_t flags;
+> +    uint32_t mstatus_fs;
+>      uint32_t mem_idx;
+>      /* Remember the rounding mode encoded in the previous fp instruction,
+>         which we have already installed into env->fp_status.  Or -1 for
+> @@ -656,7 +656,7 @@ static void gen_fp_load(DisasContext *ctx, uint32_t opc, int rd,
 >  {
->      if (!(env->priv >= PRV_S)) {
-> @@ -735,7 +702,6 @@ target_ulong helper_mret(CPURISCVState *env, target_ulong cpu_pc_deb)
->      return retpc;
+>      TCGv t0;
+>  
+> -    if (!(ctx->flags & TB_FLAGS_FP_ENABLE)) {
+> +    if (ctx->mstatus_fs == 0) {
+>          gen_exception_illegal(ctx);
+>          return;
+>      }
+> @@ -686,7 +686,7 @@ static void gen_fp_store(DisasContext *ctx, uint32_t opc, int rs1,
+>  {
+>      TCGv t0;
+>  
+> -    if (!(ctx->flags & TB_FLAGS_FP_ENABLE)) {
+> +    if (ctx->mstatus_fs == 0) {
+>          gen_exception_illegal(ctx);
+>          return;
+>      }
+> @@ -945,7 +945,7 @@ static void gen_fp_arith(DisasContext *ctx, uint32_t opc, int rd,
+>  {
+>      TCGv t0 = NULL;
+>  
+> -    if (!(ctx->flags & TB_FLAGS_FP_ENABLE)) {
+> +    if (ctx->mstatus_fs == 0) {
+>          goto do_illegal;
+>      }
+>  
+> @@ -1810,8 +1810,8 @@ static void riscv_tr_init_disas_context(DisasContextBase *dcbase, CPUState *cs)
+>      DisasContext *ctx = container_of(dcbase, DisasContext, base);
+>  
+>      ctx->pc_succ_insn = ctx->base.pc_first;
+> -    ctx->flags = ctx->base.tb->flags;
+>      ctx->mem_idx = ctx->base.tb->flags & TB_FLAGS_MMU_MASK;
+> +    ctx->mstatus_fs = ctx->base.tb->flags & TB_FLAGS_MSTATUS_FS;
+>      ctx->frm = -1;  /* unknown rounding mode */
 >  }
 >  
-> -
->  void helper_wfi(CPURISCVState *env)
->  {
->      CPUState *cs = CPU(riscv_env_get_cpu(env));
 > 
