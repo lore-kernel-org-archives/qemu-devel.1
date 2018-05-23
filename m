@@ -1,44 +1,37 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43121)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44798)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pasic@linux.ibm.com>) id 1fLXZ5-0004d0-IN
-	for qemu-devel@nongnu.org; Wed, 23 May 2018 13:28:44 -0400
+	(envelope-from <marcel.apfelbaum@gmail.com>) id 1fLXdh-00074R-DH
+	for qemu-devel@nongnu.org; Wed, 23 May 2018 13:33:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pasic@linux.ibm.com>) id 1fLXZ1-0002uL-Ed
-	for qemu-devel@nongnu.org; Wed, 23 May 2018 13:28:43 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:41038)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pasic@linux.ibm.com>) id 1fLXZ1-0002qu-63
-	for qemu-devel@nongnu.org; Wed, 23 May 2018 13:28:39 -0400
-Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w4NHO0hI034806
-	for <qemu-devel@nongnu.org>; Wed, 23 May 2018 13:28:38 -0400
-Received: from e06smtp11.uk.ibm.com (e06smtp11.uk.ibm.com [195.75.94.107])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2j5akj6yye-1
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Wed, 23 May 2018 13:28:37 -0400
-Received: from localhost
-	by e06smtp11.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <pasic@linux.ibm.com>;
-	Wed, 23 May 2018 18:28:34 +0100
-References: <20180522221655.78979-1-pasic@linux.ibm.com>
-	<20180522221655.78979-2-pasic@linux.ibm.com>
-	<20180523113708.50b21a77.cohuck@redhat.com>
-	<a3ab7dfd-4cc1-5632-1590-bce4a40f063e@linux.ibm.com>
-	<20180523164640.225908a9.cohuck@redhat.com>
-	<5de50b20-a331-78ea-a7f4-6fdd995ed083@linux.ibm.com>
-	<20180523185957.41af37b2.cohuck@redhat.com>
-From: Halil Pasic <pasic@linux.ibm.com>
-Date: Wed, 23 May 2018 19:28:31 +0200
+	(envelope-from <marcel.apfelbaum@gmail.com>) id 1fLXdc-0005P8-Dt
+	for qemu-devel@nongnu.org; Wed, 23 May 2018 13:33:29 -0400
+Received: from mail-wr0-x243.google.com ([2a00:1450:400c:c0c::243]:34570)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <marcel.apfelbaum@gmail.com>)
+	id 1fLXdc-0005Oy-6d
+	for qemu-devel@nongnu.org; Wed, 23 May 2018 13:33:24 -0400
+Received: by mail-wr0-x243.google.com with SMTP id j1-v6so17003847wrm.1
+	for <qemu-devel@nongnu.org>; Wed, 23 May 2018 10:33:24 -0700 (PDT)
+References: <1526801333-30613-1-git-send-email-whois.zihan.yang@gmail.com>
+	<1526801333-30613-4-git-send-email-whois.zihan.yang@gmail.com>
+	<ef3fc85d-7726-c888-e8ca-9dfae1b908d3@gmail.com>
+	<17a3765f-b835-2d45-e8b9-ffd4aff909f9@redhat.com>
+	<cbdfe0d6-f071-3560-009d-3bbdde12b33c@gmail.com>
+	<f71a8c61-a0d7-6ebc-62ad-3dab8b9f8e5a@redhat.com>
+	<dd40007d-b63b-d965-505f-11ff0748e54f@redhat.com>
+	<20180523023944-mutt-send-email-mst@kernel.org>
+	<e027866e-9740-0866-f1c4-45b8181a6f71@redhat.com>
+	<CAKwiv-jMKSUYusO4S4HR5HCMXLxGNrpYwywm1dWBWsFKMEGzpg@mail.gmail.com>
+From: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+Message-ID: <420701e8-5d6c-d8a7-60cb-5065ef7fbdc9@gmail.com>
+Date: Wed, 23 May 2018 20:33:19 +0300
 MIME-Version: 1.0
-In-Reply-To: <20180523185957.41af37b2.cohuck@redhat.com>
+In-Reply-To: <CAKwiv-jMKSUYusO4S4HR5HCMXLxGNrpYwywm1dWBWsFKMEGzpg@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Message-Id: <d99ca544-de44-422f-8bcd-cc9b53fd047b@linux.ibm.com>
-Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH v2 1/2] vfio-ccw: add force
- unlimited prefetch property
+Subject: Re: [Qemu-devel] [RFC 3/3] acpi-build: allocate mcfg for multiple
+ host bridges
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -47,68 +40,105 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>
-Cc: Dong Jia Shi <bjsdjshi@linux.ibm.com>, "Jason J. Herne" <jjherne@linux.ibm.com>, qemu-s390x@nongnu.org, qemu-devel@nongnu.org
+To: Zihan Yang <whois.zihan.yang@gmail.com>, lersek@redhat.com, qemu-devel@nongnu.org
+Cc: Igor Mammedov <imammedo@redhat.com>, alex.williamson@redhat.com, eauger@redhat.com, drjones@redhat.com, wei@redhat.com
 
 
 
-On 05/23/2018 06:59 PM, Cornelia Huck wrote:
-> On Wed, 23 May 2018 18:23:44 +0200
-> Halil Pasic <pasic@linux.ibm.com> wrote:
-> 
->> On 05/23/2018 04:46 PM, Cornelia Huck wrote:
->>>>>> +    if (!(sch->orb.ctrl0 & ORB_CTRL0_MASK_PFCH)) {
->>>>>> +        if (!(vcdev->force_orb_pfch)) {
->>>>>> +            warn_report("vfio-ccw requires PFCH flag set");
->>>>>> +            sch_gen_unit_exception(sch);
->>>>>> +            css_inject_io_interrupt(sch);
->>>>>> +            return IOINST_CC_EXPECTED;
->>>>>> +        } else {
->>>>>> +            sch->orb.ctrl0 |= ORB_CTRL0_MASK_PFCH;
->>>>>> +            WARN_ONCE(vcdev->warned_force_orb_pfch, "PFCH flag forced");
->>>>> This message should probably mention vfio-ccw as well as the subchannel
->>>>> id?
->>>>>       
->>>> I was thinking about this. I think all it would make sense to have a common
->>>> prefix for all reports coming form vfio-ccw (QEMU). But then I was like, that
->>>> is a separate patch.
->>>>
->>>> Maybe something like:
->>>> vfio-ccw (xx.xx.xxxx): specific message
->>>>
->>>> OTOH we don't seem to do that elsewhere (git grep -e 'warn\|error_report\|error_setg' -- hw/s390x/).
->>>> AFAIR the error_setg captures context (like, src, line, func) but does not
->>>> necessarily report it. Another question is if this should be extended to
->>>> hw/s390x/s390-ccw.c
->>>>
->>>> What do you think?
->>> I'm not sure that makes sense, especially as not everything might
->>> explicitly refer to a certain subchannel.
->>>
->>> Let's just add the subchannel id here? In this case, this is really a
->>> useful piece of information (which device is showing this behaviour?)
->>>    
->>
->> The same applies to  warn_report("vfio-ccw requires PFCH flag set") (that is,
->> on which device (that has no force-orb-pfch=on specified)  is the guest issuing
->> ORBs with the PFCH unset), or?
->> Should I go for
->> "vfio-ccw (xx.xx.xxxx): vfio-ccw requires PFCH flag set"
->> and
->> "vfio-ccw (xx.xx.xxxx): PFCH flag forced"
->> or just for the second one, or some third option?
-> 
-> Yes, it makes sense for both.
-> 
-> Related: Do we expect the guest driver to learn from its experience and
-> not try without pfch again? It is probably not very helpful if the logs
-> get filled with a lot of "vfio-ccw requires pfch" messages...
-> 
+On 05/23/2018 02:11 PM, Zihan Yang wrote:
+> Hi all,
+>
+> Thanks for all your comments and suggestions, I wasn't expecting so 
+> many professional
+> reviewers. Some of the things you mentioned are beyond my knowledge 
+> right now.
+> Please correct me if I'm wrong below.
+>
+> The original purpose was just to support multiple segments in Intel 
+> Q35 archtecure
+> for PCIe topology, which makes bus number a less scarce resource. The 
+> patches are
+> very primitive and many things are left for firmware to finish(the 
+> initial plan was
+> to implement it in SeaBIOS), the AML part in QEMU is not finished 
+> either. I'm not
+> familiar with OVMF or edk2, so there is no plan to touch it yet, but 
+> it seems not
+> necessary since it already supports multi-segment in the end.
+>
+> Also, in this patch the assumption is one domain per host bridge, 
+> described by '_SEG()'
+> in AML, which means a ECAM range per host bridge, but that should be 
+> configurable
+> if the user prefers to staying in the same domain, I guess?
 
-Don't really know. Dong Jia is probably more qualified to answer that question.
-I don't expect the guest driver to do so. There are probably more intelligent
-strategies to deal with this, but the question is what do we gain in the end
-(linux guests are not affected). We should probably not overthink this.
+Yes.
 
-Regards,
-Halil
+>
+> I'd like to list a few things you've discussed to confirm I don't get 
+> it wrong
+>
+> * ARI enlarges the number of functions, but they does not solve the 
+> hot-pluggable issue.
+>   The multifunction PCIe endpoints cannot span PCIe domains
+
+Right
+
+> * IOMMUs cannot span domains either, so bringing new domains 
+> introduces the need
+>   to add a VT-d DHRD or vIOMMU per PCIe domain
+
+Not really, you may have PCI domains not associated to an vIOMMU. As a 
+first step,
+you should not deal with it. The IOMMU can't span over multiple domains, 
+yes.
+
+> * 64-bit space is crowded and there are no standards within QEMU for 
+> placing per
+>   domain 64-bit MMIO and MMCFG ranges
+
+Yes, but we do have some layout for the "over 4G" area and we can continue
+building on it.
+
+> * NUMA modeling seems to be a stronger motivation than the limitation 
+> of 256 but
+>   nubmers, that each NUMA node holds its own PCI(e) sub-hierarchy
+
+No, the 256 devices limitation is the biggest issue we are trying to solve.
+
+> * We cannot put ECAM arbitrarily high because guest's PA width is 
+> limited by host's
+>   when EPT is enabled.
+
+Indeed, we should be careful about the size
+the MMCFGs to not exceed CPU addressable bits.
+
+> * Compatibility issues in platforms that do not have MCFG table at all 
+> (perhaps we limit
+>   it to only q35 at present in which MCFG is present).
+>
+
+For sure.
+
+> Based on your discussions, I guess this proposal is still worth doing 
+> overall, but it seems
+> many restrictions should be imposed to be compatible with some 
+> complicated situations.
+>
+
+Correct.
+
+> Please correct me if I get anything wrong or missing.
+>
+
+You are on the right path, this discussion is meant to help you 
+understand wider concerns
+and make you aware of different constrains we didn't think about.
+
+Good luck with the next version!
+
+Thanks,
+Marcel
+
+> Thanks
+> Zihan
