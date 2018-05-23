@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42768)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42876)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mjc@sifive.com>) id 1fLHTx-0000Sc-J7
-	for qemu-devel@nongnu.org; Tue, 22 May 2018 20:18:25 -0400
+	(envelope-from <mjc@sifive.com>) id 1fLHU5-0000br-7G
+	for qemu-devel@nongnu.org; Tue, 22 May 2018 20:18:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mjc@sifive.com>) id 1fLHTv-0001Oh-UG
-	for qemu-devel@nongnu.org; Tue, 22 May 2018 20:18:21 -0400
-Received: from mail-pf0-x243.google.com ([2607:f8b0:400e:c00::243]:42704)
+	(envelope-from <mjc@sifive.com>) id 1fLHTz-0001RG-RX
+	for qemu-devel@nongnu.org; Tue, 22 May 2018 20:18:29 -0400
+Received: from mail-pg0-x242.google.com ([2607:f8b0:400e:c05::242]:35803)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <mjc@sifive.com>) id 1fLHTv-0001O6-N4
-	for qemu-devel@nongnu.org; Tue, 22 May 2018 20:18:19 -0400
-Received: by mail-pf0-x243.google.com with SMTP id p14-v6so9553432pfh.9
-	for <qemu-devel@nongnu.org>; Tue, 22 May 2018 17:18:19 -0700 (PDT)
+	(Exim 4.71) (envelope-from <mjc@sifive.com>) id 1fLHTz-0001Qy-Ir
+	for qemu-devel@nongnu.org; Tue, 22 May 2018 20:18:23 -0400
+Received: by mail-pg0-x242.google.com with SMTP id 11-v6so6942781pge.2
+	for <qemu-devel@nongnu.org>; Tue, 22 May 2018 17:18:23 -0700 (PDT)
 From: Michael Clark <mjc@sifive.com>
-Date: Wed, 23 May 2018 12:15:12 +1200
-Message-Id: <1527034517-7851-26-git-send-email-mjc@sifive.com>
+Date: Wed, 23 May 2018 12:15:13 +1200
+Message-Id: <1527034517-7851-27-git-send-email-mjc@sifive.com>
 In-Reply-To: <1527034517-7851-1-git-send-email-mjc@sifive.com>
 References: <1527034517-7851-1-git-send-email-mjc@sifive.com>
-Subject: [Qemu-devel] [PATCH v1 25/30] RISC-V: Enable second UART on
- sifive_e and sifive_u
+Subject: [Qemu-devel] [PATCH v1 26/30] RISC-V: Remove unnecessary
+ disassembler constraints
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,10 +29,8 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: patches@groups.riscv.org, Michael Clark <mjc@sifive.com>, Palmer Dabbelt <palmer@sifive.com>, Sagar Karandikar <sagark@eecs.berkeley.edu>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Alistair Francis <Alistair.Francis@wdc.com>
 
-Previously the second UARTs on the sifive_e and sifive_u machines
-where disabled due to check-qtest-riscv32 and check-qtest-riscv64
-failures. Recent changes in the QEMU core serial code have
-resolved these failures so the second UARTs can be instantiated.
+Remove machine generated constraints that are not
+referenced by the pseudo-instruction constraints.
 
 Cc: Palmer Dabbelt <palmer@sifive.com>
 Cc: Sagar Karandikar <sagark@eecs.berkeley.edu>
@@ -40,39 +38,185 @@ Cc: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
 Cc: Alistair Francis <Alistair.Francis@wdc.com>
 Signed-off-by: Michael Clark <mjc@sifive.com>
 ---
- hw/riscv/sifive_e.c | 4 ++--
- hw/riscv/sifive_u.c | 4 ++--
- 2 files changed, 4 insertions(+), 4 deletions(-)
+ disas/riscv.c | 138 ----------------------------------------------------------
+ 1 file changed, 138 deletions(-)
 
-diff --git a/hw/riscv/sifive_e.c b/hw/riscv/sifive_e.c
-index e4ecb7aa4bb6..159209199537 100644
---- a/hw/riscv/sifive_e.c
-+++ b/hw/riscv/sifive_e.c
-@@ -155,8 +155,8 @@ static void riscv_sifive_e_init(MachineState *machine)
-         memmap[SIFIVE_E_QSPI0].base, memmap[SIFIVE_E_QSPI0].size);
-     sifive_mmio_emulate(sys_mem, "riscv.sifive.e.pwm0",
-         memmap[SIFIVE_E_PWM0].base, memmap[SIFIVE_E_PWM0].size);
--    /* sifive_uart_create(sys_mem, memmap[SIFIVE_E_UART1].base,
--        serial_hd(1), SIFIVE_PLIC(s->plic)->irqs[SIFIVE_E_UART1_IRQ]); */
-+    sifive_uart_create(sys_mem, memmap[SIFIVE_E_UART1].base,
-+        serial_hd(1), SIFIVE_PLIC(s->plic)->irqs[SIFIVE_E_UART1_IRQ]);
-     sifive_mmio_emulate(sys_mem, "riscv.sifive.e.qspi1",
-         memmap[SIFIVE_E_QSPI1].base, memmap[SIFIVE_E_QSPI1].size);
-     sifive_mmio_emulate(sys_mem, "riscv.sifive.e.pwm1",
-diff --git a/hw/riscv/sifive_u.c b/hw/riscv/sifive_u.c
-index c05dcbba955e..326b0f434cff 100644
---- a/hw/riscv/sifive_u.c
-+++ b/hw/riscv/sifive_u.c
-@@ -299,8 +299,8 @@ static void riscv_sifive_u_init(MachineState *machine)
-         memmap[SIFIVE_U_PLIC].size);
-     sifive_uart_create(system_memory, memmap[SIFIVE_U_UART0].base,
-         serial_hd(0), SIFIVE_PLIC(s->plic)->irqs[SIFIVE_U_UART0_IRQ]);
--    /* sifive_uart_create(system_memory, memmap[SIFIVE_U_UART1].base,
--        serial_hd(1), SIFIVE_PLIC(s->plic)->irqs[SIFIVE_U_UART1_IRQ]); */
-+    sifive_uart_create(system_memory, memmap[SIFIVE_U_UART1].base,
-+        serial_hd(1), SIFIVE_PLIC(s->plic)->irqs[SIFIVE_U_UART1_IRQ]);
-     sifive_clint_create(memmap[SIFIVE_U_CLINT].base,
-         memmap[SIFIVE_U_CLINT].size, smp_cpus,
-         SIFIVE_SIP_BASE, SIFIVE_TIMECMP_BASE, SIFIVE_TIME_BASE);
+diff --git a/disas/riscv.c b/disas/riscv.c
+index 7fd1019623ee..27546dd7902c 100644
+--- a/disas/riscv.c
++++ b/disas/riscv.c
+@@ -87,33 +87,10 @@ typedef enum {
+ 
+ typedef enum {
+     rvc_end,
+-    rvc_simm_6,
+-    rvc_imm_6,
+-    rvc_imm_7,
+-    rvc_imm_8,
+-    rvc_imm_9,
+-    rvc_imm_10,
+-    rvc_imm_12,
+-    rvc_imm_18,
+-    rvc_imm_nz,
+-    rvc_imm_x2,
+-    rvc_imm_x4,
+-    rvc_imm_x8,
+-    rvc_imm_x16,
+-    rvc_rd_b3,
+-    rvc_rs1_b3,
+-    rvc_rs2_b3,
+-    rvc_rd_eq_rs1,
+     rvc_rd_eq_ra,
+-    rvc_rd_eq_sp,
+     rvc_rd_eq_x0,
+-    rvc_rs1_eq_sp,
+     rvc_rs1_eq_x0,
+     rvc_rs2_eq_x0,
+-    rvc_rd_ne_x0_x2,
+-    rvc_rd_ne_x0,
+-    rvc_rs1_ne_x0,
+-    rvc_rs2_ne_x0,
+     rvc_rs2_eq_rs1,
+     rvc_rs1_eq_ra,
+     rvc_imm_eq_zero,
+@@ -2522,111 +2499,16 @@ static bool check_constraints(rv_decode *dec, const rvc_constraint *c)
+     uint8_t rd = dec->rd, rs1 = dec->rs1, rs2 = dec->rs2;
+     while (*c != rvc_end) {
+         switch (*c) {
+-        case rvc_simm_6:
+-            if (!(imm >= -32 && imm < 32)) {
+-                return false;
+-            }
+-            break;
+-        case rvc_imm_6:
+-            if (!(imm <= 63)) {
+-                return false;
+-            }
+-            break;
+-        case rvc_imm_7:
+-            if (!(imm <= 127)) {
+-                return false;
+-            }
+-            break;
+-        case rvc_imm_8:
+-            if (!(imm <= 255)) {
+-                return false;
+-            }
+-            break;
+-        case rvc_imm_9:
+-            if (!(imm <= 511)) {
+-                return false;
+-            }
+-            break;
+-        case rvc_imm_10:
+-            if (!(imm <= 1023)) {
+-                return false;
+-            }
+-            break;
+-        case rvc_imm_12:
+-            if (!(imm <= 4095)) {
+-                return false;
+-            }
+-            break;
+-        case rvc_imm_18:
+-            if (!(imm <= 262143)) {
+-                return false;
+-            }
+-            break;
+-        case rvc_imm_nz:
+-            if (!(imm != 0)) {
+-                return false;
+-            }
+-            break;
+-        case rvc_imm_x2:
+-            if (!((imm & 0b1) == 0)) {
+-                return false;
+-            }
+-            break;
+-        case rvc_imm_x4:
+-            if (!((imm & 0b11) == 0)) {
+-                return false;
+-            }
+-            break;
+-        case rvc_imm_x8:
+-            if (!((imm & 0b111) == 0)) {
+-                return false;
+-            }
+-            break;
+-        case rvc_imm_x16:
+-            if (!((imm & 0b1111) == 0)) {
+-                return false;
+-            }
+-            break;
+-        case rvc_rd_b3:
+-            if (!(rd  >= 8 && rd  <= 15)) {
+-                return false;
+-            }
+-            break;
+-        case rvc_rs1_b3:
+-            if (!(rs1 >= 8 && rs1 <= 15)) {
+-                return false;
+-            }
+-            break;
+-        case rvc_rs2_b3:
+-            if (!(rs2 >= 8 && rs2 <= 15)) {
+-                return false;
+-            }
+-            break;
+-        case rvc_rd_eq_rs1:
+-            if (!(rd == rs1)) {
+-                return false;
+-            }
+-            break;
+         case rvc_rd_eq_ra:
+             if (!(rd == 1)) {
+                 return false;
+             }
+             break;
+-        case rvc_rd_eq_sp:
+-            if (!(rd == 2)) {
+-                return false;
+-            }
+-            break;
+         case rvc_rd_eq_x0:
+             if (!(rd == 0)) {
+                 return false;
+             }
+             break;
+-        case rvc_rs1_eq_sp:
+-            if (!(rs1 == 2)) {
+-                return false;
+-            }
+-            break;
+         case rvc_rs1_eq_x0:
+             if (!(rs1 == 0)) {
+                 return false;
+@@ -2637,26 +2519,6 @@ static bool check_constraints(rv_decode *dec, const rvc_constraint *c)
+                 return false;
+             }
+             break;
+-        case rvc_rd_ne_x0_x2:
+-            if (!(rd != 0 && rd != 2)) {
+-                return false;
+-            }
+-            break;
+-        case rvc_rd_ne_x0:
+-            if (!(rd != 0)) {
+-                return false;
+-            }
+-            break;
+-        case rvc_rs1_ne_x0:
+-            if (!(rs1 != 0)) {
+-                return false;
+-            }
+-            break;
+-        case rvc_rs2_ne_x0:
+-            if (!(rs2 != 0)) {
+-                return false;
+-            }
+-            break;
+         case rvc_rs2_eq_rs1:
+             if (!(rs2 == rs1)) {
+                 return false;
 -- 
 2.7.0
