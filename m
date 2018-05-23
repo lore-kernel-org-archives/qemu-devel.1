@@ -1,32 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58130)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58869)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fLSF4-0006op-58
-	for qemu-devel@nongnu.org; Wed, 23 May 2018 07:47:43 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1fLSID-0007vl-I0
+	for qemu-devel@nongnu.org; Wed, 23 May 2018 07:50:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fLSEz-0003Wa-QC
-	for qemu-devel@nongnu.org; Wed, 23 May 2018 07:47:42 -0400
-Received: from mail-ot0-x244.google.com ([2607:f8b0:4003:c0f::244]:47061)
+	(envelope-from <peter.maydell@linaro.org>) id 1fLSIC-0005CM-PI
+	for qemu-devel@nongnu.org; Wed, 23 May 2018 07:50:57 -0400
+Received: from mail-ot0-x241.google.com ([2607:f8b0:4003:c0f::241]:37595)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fLSEz-0003WG-Jm
-	for qemu-devel@nongnu.org; Wed, 23 May 2018 07:47:37 -0400
-Received: by mail-ot0-x244.google.com with SMTP id t1-v6so24768185ott.13
-	for <qemu-devel@nongnu.org>; Wed, 23 May 2018 04:47:37 -0700 (PDT)
+	id 1fLSIC-0005Bz-KT
+	for qemu-devel@nongnu.org; Wed, 23 May 2018 07:50:56 -0400
+Received: by mail-ot0-x241.google.com with SMTP id 77-v6so24832709otd.4
+	for <qemu-devel@nongnu.org>; Wed, 23 May 2018 04:50:56 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20180523010636.GC31932@xz-mi>
-References: <20180521140402.23318-1-peter.maydell@linaro.org>
-	<20180521140402.23318-15-peter.maydell@linaro.org>
-	<20180522030333.GB17282@xz-mi>
-	<CAFEAcA-iOYhuPfvDv+iD6jBqXMXqN-jfTpSSBub1Zp1i-JcDbQ@mail.gmail.com>
-	<20180522110236.GB31932@xz-mi>
-	<CAFEAcA9b6dmpj+B=SO2YsB5sXsh=UPjkjN_U0i-uJhiDn20HHw@mail.gmail.com>
-	<20180523010636.GC31932@xz-mi>
+In-Reply-To: <013774a0-6ec4-7a37-79c7-d3068b4cc5bc@kaod.org>
+References: <20180522173713.26282-1-peter.maydell@linaro.org>
+	<d8c13782-48b1-0975-ee2c-0d2ec2eecebe@kaod.org>
+	<CAFEAcA_3P-JEsiz_3ZdVhG2kcQ+Y3yOAufLQtHknuzufRosANQ@mail.gmail.com>
+	<013774a0-6ec4-7a37-79c7-d3068b4cc5bc@kaod.org>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Wed, 23 May 2018 12:47:16 +0100
-Message-ID: <CAFEAcA840qn7Ms9hph9zzZgMbL8C7kN=cs4esGO9kxGXsgBg1A@mail.gmail.com>
+Date: Wed, 23 May 2018 12:50:35 +0100
+Message-ID: <CAFEAcA-2q246LU77uxfwsdfE_iQ3ZNnqsrqZ-PQUc+zWGRGpDg@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH 14/27] iommu: Add IOMMU index concept to
- IOMMU API
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] Correct CPACR reset value for v7 cores
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,109 +32,24 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>, "patches@linaro.org" <patches@linaro.org>, David Gibson <david@gibson.dropbear.id.au>, Alex Williamson <alex.williamson@redhat.com>
+To: =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@kaod.org>
+Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, "patches@linaro.org" <patches@linaro.org>
 
-On 23 May 2018 at 02:06, Peter Xu <peterx@redhat.com> wrote:
-> On Tue, May 22, 2018 at 12:11:38PM +0100, Peter Maydell wrote:
->> On 22 May 2018 at 12:02, Peter Xu <peterx@redhat.com> wrote:
->> > On Tue, May 22, 2018 at 09:40:44AM +0100, Peter Maydell wrote:
-
->> > And if we see current implementation for this (still, I copied code
->> > from other patch in the series to here to ease discussion):
->> >
->> > @@ -498,8 +498,15 @@ static MemoryRegionSection address_space_translate_iommu(IOMMUMemoryRegion *iomm
->> >      do {
->> >          hwaddr addr = *xlat;
->> >          IOMMUMemoryRegionClass *imrc = memory_region_get_iommu_class_nocheck(iommu_mr);
->> > -        IOMMUTLBEntry iotlb = imrc->translate(iommu_mr, addr, is_write ?
->> > -                                              IOMMU_WO : IOMMU_RO);
->> > +        int iommu_idx = 0;
->> > +        IOMMUTLBEntry iotlb;
->> > +
->> > +        if (imrc->attrs_to_index) {
->> > +            iommu_idx = imrc->attrs_to_index(iommu_mr, attrs);
->> > +        }
->> > +
->> > +        iotlb = imrc->translate(iommu_mr, addr, is_write ?
->> > +                                IOMMU_WO : IOMMU_RO, iommu_idx);
->> >
->> > Here what if we pass attrs directly into imrc->translate() and just
->> > call imrc->attrs_to_index() inside the arch-dependent translate()
->> > function?  Will that work too?
->>
->> You don't always have the attributes at the point where you want
->> to call translate. (For instance, memory_region_notify_iommu()
->> doesn't have attributes.)
->>
->> I started off with "pass the tx attrs into the translate method",
->> which is fine for the code flows which are actually doing
->> memory transactions, but breaks down when you try to incorporate
->> notifiers.
+On 23 May 2018 at 10:13, C=C3=A9dric Le Goater <clg@kaod.org> wrote:
+> On 05/22/2018 09:26 PM, Peter Maydell wrote:
+>> (You're not using trustzone, are you? I know of a bug with
+>> migration of cpus with TZ enabled which I'm probably going to
+>> look at later this week)
 >
-> Could you elaborate a bit more on why IOMMU notifier failed to
-> corporate when passing in MemTxAttrs?  I am not sure I caught the idea
-> here, but can we copy the MemTxAttrs into IOMMUTLBEntry when
-> translating, then in IOMMU notifiers we can know the attrs (if that is
-> what MPC wants)?
-
-(1) The notifier API lets you register a notifier before you've
-called the translate API
-(2) An IOMMUTLBEntry can be valid for more than just the txattrs
-that it was passed in (for instance, if an IOMMU doesn't care
-about txattrs at all, then the resulting TLB entry is valid for
-any txattrs; or if the IOMMU only cares about attrs.secure the
-resulting TLB entries are valid for both attrs.user=0 and
-attrs.user=1).
-(3) when the IOMMU calls the notifier because the guest config
-changed it doesn't have tx attributes, so it would have to
-fabricate some; and the guest config will invalidate transactions
-with some combinations of tx attributes and not others.
-
-As Paolo pointed out you could also implement this by rather
-of having an iommu_index concept, instead having some kind
-of "here is a mask of which txattrs fields matter, and here's
-another parameter with which txattrs fields are affected".
-That makes it awkward though to implement "txattrs.unspecified
-acts like txattrs.secure == 1" type behaviour, though, which is
-easy with an index abstraction layer. It also would be harder
-to implement the default 'replay' method, I think.
-
-Plus I think that handling this the same way TCG does is a
-reasonable approach -- we know that it's a usefully flexible
-concept.
-
->> > I had a quick glance at the series, I have no thorough idea on the
->> > whole stuff, but I'd say some of the patches are exactly what I wanted
->> > if to support MemTxAttrs in VT-d emulation one day (now DMAR of VT-d
->> > is bypassing MemTxAttrs and IMHO that's incorrect).  If we can somehow
->> > pass in the MemTxAttrs then that'll be perfect and I can continue to
->> > work on that.  If we pass in iommu_idx now instead, it would take some
->> > time for me to figure out how to further achieve the same goal for
->> > VT-d in the future, e.g., I would still want to pass in MemTxAttrs,
->> > but that's obviously duplicated with iommu_idx.
->>
->> The idea is that you should never need to pass in the MemTxAttrs,
->> because everything that the IOMMU might care about in the tx attrs
->> must be encoded into the iommu index. (The point where the IOMMU
->> gets to do that encoding is in its attrs_to_index() method.)
+> The PSR is :
 >
-> For the DMAR issue I would care about MemTxAttrs.requester_id.  Just
-> to confirm - do you mean I encode the 16bits field into iommu_idx too,
-> or is there any smarter way to do so?  Asked since otherwise iommu_idx
-> will gradually grow into another MemTxAttrs to me.
+>         PSR=3D20000093 --C- A S svc32
+>
+> 'S' for secure. Is that also trustzone ?
 
-It will only need to do so for IOMMUs that care about that field.
-
-(See also the other thread with Eric Auger talking about
-maybe caring about requester_id like that. Needing to look
-at requester_id is an area I haven't thought too much about,
-and it is a bit of an odd one because it's a much larger
-space than any of the other parts of the txattrs. In some
-cases it ought to be possible to say "requester_id lets
-us determine an iommu index, and there are a lot fewer
-than 2^16 actual iommu indexes because a lot of the requestor_id
-values indicate the same actual iommu translation", I suspect.)
+Yes. In that case this very likely is the same bug (we don't
+migrate the secure-bank registers properly, so if Linux
+is executing in secure state it doesn't resume right).
 
 thanks
 -- PMM
