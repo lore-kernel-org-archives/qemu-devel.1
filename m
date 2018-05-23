@@ -1,33 +1,41 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45524)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46710)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1fLUi0-00050J-7l
-	for qemu-devel@nongnu.org; Wed, 23 May 2018 10:25:48 -0400
+	(envelope-from <pasic@linux.ibm.com>) id 1fLUoA-0006cU-Le
+	for qemu-devel@nongnu.org; Wed, 23 May 2018 10:32:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1fLUhw-0003gU-7V
-	for qemu-devel@nongnu.org; Wed, 23 May 2018 10:25:44 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:57692 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1fLUhw-0003fh-2F
-	for qemu-devel@nongnu.org; Wed, 23 May 2018 10:25:40 -0400
-Date: Wed, 23 May 2018 17:25:32 +0300
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20180523171028-mutt-send-email-mst@kernel.org>
-References: <ef3fc85d-7726-c888-e8ca-9dfae1b908d3@gmail.com>
-	<17a3765f-b835-2d45-e8b9-ffd4aff909f9@redhat.com>
-	<cbdfe0d6-f071-3560-009d-3bbdde12b33c@gmail.com>
-	<f71a8c61-a0d7-6ebc-62ad-3dab8b9f8e5a@redhat.com>
-	<20180522234410-mutt-send-email-mst@kernel.org>
-	<20180522153659.2e33fbe0@w520.home>
-	<20180523004236-mutt-send-email-mst@kernel.org>
-	<20180522154741.3939d1e0@w520.home>
-	<20180523005048-mutt-send-email-mst@kernel.org>
-	<20180522222856.436c2c96@w520.home>
+	(envelope-from <pasic@linux.ibm.com>) id 1fLUo6-00063k-Nh
+	for qemu-devel@nongnu.org; Wed, 23 May 2018 10:32:06 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:58046
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pasic@linux.ibm.com>) id 1fLUo6-00063g-J8
+	for qemu-devel@nongnu.org; Wed, 23 May 2018 10:32:02 -0400
+Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w4NEUDZL120186
+	for <qemu-devel@nongnu.org>; Wed, 23 May 2018 10:32:01 -0400
+Received: from e06smtp11.uk.ibm.com (e06smtp11.uk.ibm.com [195.75.94.107])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2j58g75935-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Wed, 23 May 2018 10:32:01 -0400
+Received: from localhost
+	by e06smtp11.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <pasic@linux.ibm.com>;
+	Wed, 23 May 2018 15:31:57 +0100
+References: <20180522221655.78979-1-pasic@linux.ibm.com>
+	<20180522221655.78979-2-pasic@linux.ibm.com>
+	<20180523113708.50b21a77.cohuck@redhat.com>
+From: Halil Pasic <pasic@linux.ibm.com>
+Date: Wed, 23 May 2018 16:31:53 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180522222856.436c2c96@w520.home>
-Subject: Re: [Qemu-devel] [RFC 3/3] acpi-build: allocate mcfg for multiple
- host bridges
+In-Reply-To: <20180523113708.50b21a77.cohuck@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Message-Id: <a3ab7dfd-4cc1-5632-1590-bce4a40f063e@linux.ibm.com>
+Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH v2 1/2] vfio-ccw: add force
+ unlimited prefetch property
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,90 +44,186 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alex Williamson <alex.williamson@redhat.com>
-Cc: Laszlo Ersek <lersek@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Zihan Yang <whois.zihan.yang@gmail.com>, qemu-devel@nongnu.org, Igor Mammedov <imammedo@redhat.com>, Eric Auger <eauger@redhat.com>, Drew Jones <drjones@redhat.com>, Wei Huang <wei@redhat.com>
+To: Cornelia Huck <cohuck@redhat.com>
+Cc: Dong Jia Shi <bjsdjshi@linux.ibm.com>, "Jason J. Herne" <jjherne@linux.ibm.com>, qemu-s390x@nongnu.org, qemu-devel@nongnu.org
 
-On Tue, May 22, 2018 at 10:28:56PM -0600, Alex Williamson wrote:
-> On Wed, 23 May 2018 02:38:52 +0300
-> "Michael S. Tsirkin" <mst@redhat.com> wrote:
+
+
+On 05/23/2018 11:37 AM, Cornelia Huck wrote:
+> On Wed, 23 May 2018 00:16:54 +0200
+> Halil Pasic <pasic@linux.ibm.com> wrote:
 > 
-> > On Tue, May 22, 2018 at 03:47:41PM -0600, Alex Williamson wrote:
-> > > On Wed, 23 May 2018 00:44:22 +0300
-> > > "Michael S. Tsirkin" <mst@redhat.com> wrote:
-> > >   
-> > > > On Tue, May 22, 2018 at 03:36:59PM -0600, Alex Williamson wrote:  
-> > > > > On Tue, 22 May 2018 23:58:30 +0300
-> > > > > "Michael S. Tsirkin" <mst@redhat.com> wrote:     
-> > > > > >
-> > > > > > It's not hard to think of a use-case where >256 devices
-> > > > > > are helpful, for example a nested virt scenario where
-> > > > > > each device is passed on to a different nested guest.
-> > > > > >
-> > > > > > But I think the main feature this is needed for is numa modeling.
-> > > > > > Guests seem to assume a numa node per PCI root, ergo we need more PCI
-> > > > > > roots.    
-> > > > > 
-> > > > > But even if we have NUMA affinity per PCI host bridge, a PCI host
-> > > > > bridge does not necessarily imply a new PCIe domain.    
-> > > > 
-> > > > What are you calling a PCIe domain?  
-> > > 
-> > > Domain/segment
-> > > 
-> > > 0000:00:00.0
-> > > ^^^^ This  
-> > 
-> > Right. So we can thinkably have PCIe root complexes share an ACPI segment.
-> > I don't see what this buys us by itself.
+>> There is at least one guest (OS) such that although it does not rely on
+>> the guarantees provided by ORB 1 word 9 bit (aka unlimited prefetch, aka
+>> P bit) not being set, it fails to tell this to the machine.
+>>
+>> Usually this ain't a big deal, as the original purpose of the P bit is to
+>> allow for performance optimizations. vfio-ccw however can not provide the
+>> guarantees required if the bit is not set.
+>>
+>> It is impossible to implement support for P bit not set (at impossible
+>> least without transitioning to lower level protocols) for vfio-ccw.
 > 
-> The ability to define NUMA locality for a PCI sub-hierarchy while
-> maintaining compatibility with non-segment aware OSes (and firmware).
+> "It is not possible to implement support for the P bit not set without
+> transitioning to lower level protocols for vfio-ccw."
+> > ?
 
-Fur sure, but NUMA is a kind of advanced topic, MCFG has been around for
-longer than various NUMA tables. Are there really non-segment aware
-guests that also know how to make use of NUMA?
+Sounds much better. My sentence is ungrammatical.
 
-
-> > > Isn't that the only reason we'd need a new MCFG section and the reason
-> > > we're limited to 256 buses?  Thanks,
-> > > 
-> > > Alex  
-> > 
-> > I don't know whether a single MCFG section can describe multiple roots.
-> > I think it would be certainly unusual.
 > 
-> I'm not sure here if you're referring to the actual MCFG ACPI table or
-> the MMCONFIG range, aka the ECAM.  Neither of these describe PCI host
-> bridges.  The MCFG table can describe one or more ECAM ranges, which
-> provides the ECAM base address, the PCI segment associated with that
-> ECAM and the start and end bus numbers to know the offset and extent of
-> the ECAM range.  PCI host bridges would then theoretically be separate
-> ACPI objects with _SEG and _BBN methods to associate them to the
-> correct ECAM range by segment number and base bus number.  So it seems
-> that tooling exists that an ECAM/MMCONFIG range could be provided per
-> PCI host bridge, even if they exist within the same domain, but in
-> practice what I see on systems I have access to is a single MMCONFIG
-> range supporting all of the host bridges.  It also seems there are
-> numerous ways to describe the MMCONFIG range and I haven't actually
-> found an example that seems to use the MCFG table.  Two have MCFG
-> tables (that don't seem terribly complete) and the kernel claims to
-> find the MMCONFIG via e820, another doesn't even have an MCFG table and
-> the kernel claims to find MMCONFIG via an ACPI motherboard resource.
-> I'm not sure if I can enable PCI segments on anything to see how the
-> firmware changes.  Thanks,
+>> So
+>> let's give the user the opportunity to force the P bit to set, if the
 > 
-> Alex
+> s/to set/to be set/
+> 
 
-Let me clarify.  So MCFG have base address allocation structures.
-Each maps a segment and a range of bus numbers into memory.
-This structure is what I meant.
+Why do we need the 'be'?
 
-IIUC you are saying on your systems everything is within a single
-segment, right? Multiple pci hosts map into a single segment?
+>> user knows this is safe.  For self modifying channel programs forcing the
+>> P bit is not safe. If P bit is forced for a self modifying channel
+> 
+> s/P bit/the P bit/
+> 
 
-If you do this you can do NUMA, but do not gain > 256 devices.
+Right.
 
-Are we are the same page then?
+>> program things are expected to break in strange ways.
+>>
+>> Signed-off-by: Halil Pasic <pasic@linux.ibm.com>
+>> Suggested-by: Dong Jia Shi <bjsdjshi@linux.ibm.com>
+>> Acked-by: Jason J. Herne <jjherne@linux.ibm.com>
+>> Tested-by: Jason J. Herne <jjherne@linux.ibm.com>
+>>
+>> ---
+>> v1 -> v2:
+>> * reworded commit message
+>> * re-factored the code (Connie)
+>> * added warning when the P bit is forced the first time (Connie)
+>>
+>> ---
+>>   hw/s390x/css.c |  3 +--
+>>   hw/vfio/ccw.c  | 25 +++++++++++++++++++++++++
+>>   2 files changed, 26 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/hw/s390x/css.c b/hw/s390x/css.c
+>> index 56c3fa8c89..39ae5bbf7e 100644
+>> --- a/hw/s390x/css.c
+>> +++ b/hw/s390x/css.c
+>> @@ -1204,8 +1204,7 @@ static IOInstEnding sch_handle_start_func_passthrough(SubchDev *sch)
+>>        * Only support prefetch enable mode.
+>>        * Only support 64bit addressing idal.
+>>        */
+>> -    if (!(orb->ctrl0 & ORB_CTRL0_MASK_PFCH) ||
+>> -        !(orb->ctrl0 & ORB_CTRL0_MASK_C64)) {
+>> +    if (!(orb->ctrl0 & ORB_CTRL0_MASK_C64)) {
+>>           warn_report("vfio-ccw requires PFCH and C64 flags set");
+>>           sch_gen_unit_exception(sch);
+>>           css_inject_io_interrupt(sch);
+>> diff --git a/hw/vfio/ccw.c b/hw/vfio/ccw.c
+>> index e67392c5f9..62de4c9710 100644
+>> --- a/hw/vfio/ccw.c
+>> +++ b/hw/vfio/ccw.c
+>> @@ -32,8 +32,20 @@ typedef struct VFIOCCWDevice {
+>>       uint64_t io_region_offset;
+>>       struct ccw_io_region *io_region;
+>>       EventNotifier io_notifier;
+>> +    bool force_orb_pfch;
+>> +    bool warned_force_orb_pfch;
+>>   } VFIOCCWDevice;
+>>   
+>> +#define WARN_ONCE(warned, fmt...) \
+>> +({\
+>> +if (!(warned)) {\
+>> +    warn_report((fmt));\
+>> +} \
+>> +warned = true;\
+>> +})
+> 
+> I think introducing a macro for the single user is overkill here.
+> 
+> We might contemplate a generic "print this error once, controlled by
+> this flag" functionality, if there are more users.
+>
 
--- 
-MST
+I would prefer keeping the macro. If this generic functionality comes
+along it will be easier to spot the home-brewn counterpart. Also it's
+easier to read IMHO. BTW the macro could be an inline function like:
+
+  static inline void warn_once(bool *warned, const char *fmt, ...)
+{
+     va_list ap;
+
+
+     if (!warned || *warned) {
+         return;
+     }
+     *warned= true;
+     va_start(ap, fmt);
+     vreport(REPORT_TYPE_WARNING, fmt, ap);
+     va_end(ap);
+}
+
+if that's better.
+
+>> +
+>> +
+>> +
+>>   static void vfio_ccw_compute_needs_reset(VFIODevice *vdev)
+>>   {
+>>       vdev->needs_reset = false;
+>> @@ -54,6 +66,18 @@ static IOInstEnding vfio_ccw_handle_request(SubchDev *sch)
+>>       struct ccw_io_region *region = vcdev->io_region;
+>>       int ret;
+>>   
+>> +    if (!(sch->orb.ctrl0 & ORB_CTRL0_MASK_PFCH)) {
+>> +        if (!(vcdev->force_orb_pfch)) {
+>> +            warn_report("vfio-ccw requires PFCH flag set");
+>> +            sch_gen_unit_exception(sch);
+>> +            css_inject_io_interrupt(sch);
+>> +            return IOINST_CC_EXPECTED;
+>> +        } else {
+>> +            sch->orb.ctrl0 |= ORB_CTRL0_MASK_PFCH;
+>> +            WARN_ONCE(vcdev->warned_force_orb_pfch, "PFCH flag forced");
+> 
+> This message should probably mention vfio-ccw as well as the subchannel
+> id?
+> 
+
+I was thinking about this. I think all it would make sense to have a common
+prefix for all reports coming form vfio-ccw (QEMU). But then I was like, that
+is a separate patch.
+
+Maybe something like:
+vfio-ccw (xx.xx.xxxx): specific message
+
+OTOH we don't seem to do that elsewhere (git grep -e 'warn\|error_report\|error_setg' -- hw/s390x/).
+AFAIR the error_setg captures context (like, src, line, func) but does not
+necessarily report it. Another question is if this should be extended to
+hw/s390x/s390-ccw.c
+
+What do you think?
+
+
+>> +        }
+>> +    }
+>> +
+>>       QEMU_BUILD_BUG_ON(sizeof(region->orb_area) != sizeof(ORB));
+>>       QEMU_BUILD_BUG_ON(sizeof(region->scsw_area) != sizeof(SCSW));
+>>       QEMU_BUILD_BUG_ON(sizeof(region->irb_area) != sizeof(IRB));
+>> @@ -429,6 +453,7 @@ static void vfio_ccw_unrealize(DeviceState *dev, Error **errp)
+>>   
+>>   static Property vfio_ccw_properties[] = {
+>>       DEFINE_PROP_STRING("sysfsdev", VFIOCCWDevice, vdev.sysfsdev),
+>> +    DEFINE_PROP_BOOL("force-orb-pfch", VFIOCCWDevice, force_orb_pfch, false),
+>>       DEFINE_PROP_END_OF_LIST(),
+>>   };
+>>   
+> 
+> Otherwise, the changes look good.
+> 
+
+I guess there will be a v3 then.
+
+Thanks!
+
+Halil
