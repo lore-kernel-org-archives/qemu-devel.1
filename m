@@ -1,18 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50835)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51389)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <suhang16@mails.ucas.ac.cn>) id 1fLoQh-0005RA-IA
-	for qemu-devel@nongnu.org; Thu, 24 May 2018 07:29:18 -0400
+	(envelope-from <rjones@redhat.com>) id 1fLoUX-0007qA-FQ
+	for qemu-devel@nongnu.org; Thu, 24 May 2018 07:33:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <suhang16@mails.ucas.ac.cn>) id 1fLoQc-00015q-D2
-	for qemu-devel@nongnu.org; Thu, 24 May 2018 07:29:11 -0400
-Received: from smtp21.cstnet.cn ([159.226.251.21]:39719 helo=cstnet.cn)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <suhang16@mails.ucas.ac.cn>) id 1fLoQb-00014y-NF
-	for qemu-devel@nongnu.org; Thu, 24 May 2018 07:29:06 -0400
-From: Su Hang <suhang16@mails.ucas.ac.cn>
-Date: Thu, 24 May 2018 19:28:58 +0800
-Message-Id: <1527161340-3200-1-git-send-email-suhang16@mails.ucas.ac.cn>
-Subject: [Qemu-devel] [PULL 0/2] Implement Hex file loader and add test case
+	(envelope-from <rjones@redhat.com>) id 1fLoUV-00021Z-6W
+	for qemu-devel@nongnu.org; Thu, 24 May 2018 07:33:09 -0400
+Date: Thu, 24 May 2018 12:32:51 +0100
+From: "Richard W.M. Jones" <rjones@redhat.com>
+Message-ID: <20180524113251.GB4660@redhat.com>
+References: <20180518180440-mutt-send-email-mst@kernel.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20180518180440-mutt-send-email-mst@kernel.org>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] storing machine data in qcow images?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,35 +23,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: stefanha@gmail.com, jim@groklearning.com, joel@jms.id.au
-Cc: qemu-devel@nongnu.org
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: ehabkost@redhat.com, stefanha@redhat.com, kwolf@redhat.com, mreitz@redhat.com, qemu-devel@nongnu.org, qemu-block@nongnu.org
 
+I read the whole thread and the fundamental problem is that you're
+mixing layers.  Let qcow2 be a disk image format, and let management
+layers deal with metadata and how to run qemu.
 
-The following changes since commit 9cac60db4513f968b56e12720c1ea433be318cc3:
+What's going to happen when you have (eg) an OVA file containing qcow2
+files, and the qcow2 files all have different metadata from each other
+and from the actual metadata in the OVA?  Even the case where you've
+got =E2=80=98-hda file1.qcow2 -hdb file2.qcow2=E2=80=99 is not properly d=
+efined.  What
+happens if someone uses =E2=80=98-M mach1 -hda file.qcow2=E2=80=99 and th=
+e machine
+type in the qcow2 file conflicts with the command line?
 
-  Merge remote-tracking branch 'remotes/mwalle/tags/lm32-queue/20180521' into staging (2018-05-24 10:25:43 +0100)
+BTW we have a tooling (libguestfs) which can tell you what devices are
+supported by the guest.  virt-v2v already uses libguestfs to find out
+the full list of devices supported by guests, and uses that to drive
+conversion.  At some point we're going to extend virt-inspector to
+make this a bit easier (patches and other contributions welcome,
+there's a huge list of work to do on libguestfs and not enough
+developers to get through it).
 
-are available in the git repository at:
+There is however a seed of a good idea in the thread:
 
-  git://github.com/DarcySail/qemu.git foo.for-upstream
+> I don't think QEMU needs to use this information automatically,
+> necessarily.  I think the first step is to simply make QEMU save
+> this information in the disk image, and making qemu-img able to
+> read and write this information.
 
-for you to fetch changes up to a9120811a5b9109d79f704e0a79fb851860e9f04:
+It would be nice if qcow2 added arbitrary data sections (which would
+always be ignored by qemu) for storing additional data.  This could be
+used to create a compact qcow2 + metadata format to rival OVA for
+management layers to use, and there are various other uses too.
 
-  Add QTest testcase for the Intel Hexadecimal Object File Loader. (2018-05-24 18:54:02 +0800)
+Rich.
 
-----------------------------------------------------------------
-Su Hang (2):
-      Implement .hex file loader
-      Add QTest testcase for the Intel Hexadecimal Object File Loader.
-
- MAINTAINERS                          |   6 +
- configure                            |   4 +
- hw/arm/boot.c                        |   7 +-
- hw/core/loader.c                     | 246 +++++++++++++++++++++++++++++++++++
- include/hw/loader.h                  |  12 ++
- tests/Makefile.include               |   2 +
- tests/hex-loader-check-data/test.hex |  12 ++
- tests/hexloader-test.c               |  56 ++++++++
- 8 files changed, 344 insertions(+), 1 deletion(-)
- create mode 100644 tests/hex-loader-check-data/test.hex
- create mode 100644 tests/hexloader-test.c
+--=20
+Richard Jones, Virtualization Group, Red Hat http://people.redhat.com/~rj=
+ones
+Read my programming and virtualization blog: http://rwmj.wordpress.com
+Fedora Windows cross-compiler. Compile Windows programs, test, and
+build Windows installers. Over 100 libraries supported.
+http://fedoraproject.org/wiki/MinGW
