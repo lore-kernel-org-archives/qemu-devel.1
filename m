@@ -1,34 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43373)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44435)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fLntI-0003YK-7j
-	for qemu-devel@nongnu.org; Thu, 24 May 2018 06:54:41 -0400
+	(envelope-from <tiwei.bie@intel.com>) id 1fLnxs-0005IU-2T
+	for qemu-devel@nongnu.org; Thu, 24 May 2018 06:59:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fLntG-0000au-QH
-	for qemu-devel@nongnu.org; Thu, 24 May 2018 06:54:40 -0400
-Received: from mail-oi0-x244.google.com ([2607:f8b0:4003:c06::244]:33985)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fLntG-0000aK-IF
-	for qemu-devel@nongnu.org; Thu, 24 May 2018 06:54:38 -0400
-Received: by mail-oi0-x244.google.com with SMTP id l1-v6so1037966oii.1
-	for <qemu-devel@nongnu.org>; Thu, 24 May 2018 03:54:38 -0700 (PDT)
+	(envelope-from <tiwei.bie@intel.com>) id 1fLnxo-0002bs-5L
+	for qemu-devel@nongnu.org; Thu, 24 May 2018 06:59:24 -0400
+Received: from mga14.intel.com ([192.55.52.115]:61084)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <tiwei.bie@intel.com>) id 1fLnxn-0002av-RK
+	for qemu-devel@nongnu.org; Thu, 24 May 2018 06:59:20 -0400
+Date: Thu, 24 May 2018 18:59:36 +0800
+From: Tiwei Bie <tiwei.bie@intel.com>
+Message-ID: <20180524105936.GA22101@debian>
+References: <20180412151232.17506-1-tiwei.bie@intel.com>
+	<20180412151232.17506-3-tiwei.bie@intel.com>
+	<20180523163116-mutt-send-email-mst@kernel.org>
+	<20180523183444-mutt-send-email-mst@kernel.org>
+	<20180523184001-mutt-send-email-mst@kernel.org>
+	<20180523232101.GB15604@debian> <20180524022440.GA20792@debian>
 MIME-Version: 1.0
-In-Reply-To: <20180524062352.GA12122@xz-mi>
-References: <20180521140402.23318-1-peter.maydell@linaro.org>
-	<20180521140402.23318-15-peter.maydell@linaro.org>
-	<20180522030333.GB17282@xz-mi>
-	<CAFEAcA-iOYhuPfvDv+iD6jBqXMXqN-jfTpSSBub1Zp1i-JcDbQ@mail.gmail.com>
-	<20180522110236.GB31932@xz-mi>
-	<CAFEAcA9b6dmpj+B=SO2YsB5sXsh=UPjkjN_U0i-uJhiDn20HHw@mail.gmail.com>
-	<20180523010636.GC31932@xz-mi>
-	<CAFEAcA840qn7Ms9hph9zzZgMbL8C7kN=cs4esGO9kxGXsgBg1A@mail.gmail.com>
-	<20180524062352.GA12122@xz-mi>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 24 May 2018 11:54:17 +0100
-Message-ID: <CAFEAcA9SXirTw=H3wznVZDTmO1OB-LRNJAQ1MsyYm62SqvMqRQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH 14/27] iommu: Add IOMMU index concept to
- IOMMU API
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20180524022440.GA20792@debian>
+Subject: Re: [Qemu-devel] [PATCH v3 2/6] vhost-user: introduce shared
+ vhost-user state
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,153 +32,173 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>, "patches@linaro.org" <patches@linaro.org>, David Gibson <david@gibson.dropbear.id.au>, Alex Williamson <alex.williamson@redhat.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: jasowang@redhat.com, alex.williamson@redhat.com, pbonzini@redhat.com, stefanha@redhat.com, qemu-devel@nongnu.org, virtio-dev@lists.oasis-open.org, cunming.liang@intel.com, dan.daly@intel.com, jianfeng.tan@intel.com, zhihong.wang@intel.com, xiao.w.wang@intel.com
 
-On 24 May 2018 at 07:23, Peter Xu <peterx@redhat.com> wrote:
-> On Wed, May 23, 2018 at 12:47:16PM +0100, Peter Maydell wrote:
->> On 23 May 2018 at 02:06, Peter Xu <peterx@redhat.com> wrote:
->> > Could you elaborate a bit more on why IOMMU notifier failed to
->> > corporate when passing in MemTxAttrs?  I am not sure I caught the idea
->> > here, but can we copy the MemTxAttrs into IOMMUTLBEntry when
->> > translating, then in IOMMU notifiers we can know the attrs (if that is
->> > what MPC wants)?
->>
->> (1) The notifier API lets you register a notifier before you've
->> called the translate API
->
-> Yes.
->
->> (2) An IOMMUTLBEntry can be valid for more than just the txattrs
->> that it was passed in (for instance, if an IOMMU doesn't care
->> about txattrs at all, then the resulting TLB entry is valid for
->> any txattrs; or if the IOMMU only cares about attrs.secure the
->> resulting TLB entries are valid for both attrs.user=0 and
->> attrs.user=1).
->
-> [1]
->
-> Yes exactly, that's why I thought copying the txattrs into IOTLB
-> should work.
+On Thu, May 24, 2018 at 10:24:40AM +0800, Tiwei Bie wrote:
+> On Thu, May 24, 2018 at 07:21:01AM +0800, Tiwei Bie wrote:
+> > On Wed, May 23, 2018 at 06:43:29PM +0300, Michael S. Tsirkin wrote:
+> > > On Wed, May 23, 2018 at 06:36:05PM +0300, Michael S. Tsirkin wrote:
+> > > > On Wed, May 23, 2018 at 04:44:51PM +0300, Michael S. Tsirkin wrote:
+> > > > > On Thu, Apr 12, 2018 at 11:12:28PM +0800, Tiwei Bie wrote:
+> > > > > > When multi queue is enabled e.g. for a virtio-net device,
+> > > > > > each queue pair will have a vhost_dev, and the only thing
+> > > > > > shared between vhost devs currently is the chardev. This
+> > > > > > patch introduces a vhost-user state structure which will
+> > > > > > be shared by all vhost devs of the same virtio device.
+> > > > > > 
+> > > > > > Signed-off-by: Tiwei Bie <tiwei.bie@intel.com>
+> > > > > 
+> > > > > Unfortunately this patch seems to cause crashes.
+> > > > > To reproduce, simply run
+> > > > > make check-qtest-x86_64
+> > > > > 
+> > > > > Sorry that it took me a while to find - it triggers 90% of runs but not
+> > > > > 100% which complicates bisection somewhat.
+> > 
+> > It's my fault to not notice this bug before.
+> > I'm very sorry. Thank you so much for finding
+> > the root cause!
+> > 
+> > > > > 
+> > > > > > ---
+> > > > > >  backends/cryptodev-vhost-user.c     | 20 ++++++++++++++++++-
+> > > > > >  hw/block/vhost-user-blk.c           | 22 +++++++++++++++++++-
+> > > > > >  hw/scsi/vhost-user-scsi.c           | 20 ++++++++++++++++++-
+> > > > > >  hw/virtio/Makefile.objs             |  2 +-
+> > > > > >  hw/virtio/vhost-stub.c              | 10 ++++++++++
+> > > > > >  hw/virtio/vhost-user.c              | 31 +++++++++++++++++++---------
+> > > > > >  include/hw/virtio/vhost-user-blk.h  |  2 ++
+> > > > > >  include/hw/virtio/vhost-user-scsi.h |  2 ++
+> > > > > >  include/hw/virtio/vhost-user.h      | 20 +++++++++++++++++++
+> > > > > >  net/vhost-user.c                    | 40 ++++++++++++++++++++++++++++++-------
+> > > > > >  10 files changed, 149 insertions(+), 20 deletions(-)
+> > > > > >  create mode 100644 include/hw/virtio/vhost-user.h
+> > [...]
+> > > > > >          qemu_chr_fe_set_handlers(&s->chr, NULL, NULL,
+> > > > > >                                   net_vhost_user_event, NULL, nc0->name, NULL,
+> > > > > > @@ -319,6 +336,15 @@ static int net_vhost_user_init(NetClientState *peer, const char *device,
+> > > > > >      assert(s->vhost_net);
+> > > > > >  
+> > > > > >      return 0;
+> > > > > > +
+> > > > > > +err:
+> > > > > > +    if (user) {
+> > > > > > +        vhost_user_cleanup(user);
+> > > > > > +        g_free(user);
+> > > > > > +        s->vhost_user = NULL;
+> > > > > > +    }
+> > > > > > +
+> > > > > > +    return -1;
+> > > > > >  }
+> > > > > >  
+> > > > > >  static Chardev *net_vhost_claim_chardev(
+> > > > > > -- 
+> > > > > > 2.11.0
+> > > > 
+> > > > So far I figured out that commenting the free of
+> > > > the structure removes the crash, so we seem to
+> > > > be dealing with a use-after free here.
+> > > > I suspect that in a MQ situation, one queue gets
+> > > > closed and attempts to free the structure
+> > > > while others still use it.
+> > > > 
+> > > > diff --git a/net/vhost-user.c b/net/vhost-user.c
+> > > > index 525a061..6a1573b 100644
+> > > > --- a/net/vhost-user.c
+> > > > +++ b/net/vhost-user.c
+> > > > @@ -157,8 +157,8 @@ static void net_vhost_user_cleanup(NetClientState *nc)
+> > > >          s->vhost_net = NULL;
+> > > >      }
+> > > >      if (s->vhost_user) {
+> > > > -        vhost_user_cleanup(s->vhost_user);
+> > > > -        g_free(s->vhost_user);
+> > > > +        //vhost_user_cleanup(s->vhost_user);
+> > > > +        //g_free(s->vhost_user);
+> > > >          s->vhost_user = NULL;
+> > > >      }
+> > > >      if (nc->queue_index == 0) {
+> > > > @@ -339,8 +339,8 @@ static int net_vhost_user_init(NetClientState *peer, const char *device,
+> > > >  
+> > > >  err:
+> > > >      if (user) {
+> > > > -        vhost_user_cleanup(user);
+> > > > -        g_free(user);
+> > > > +        //vhost_user_cleanup(user);
+> > > > +        //g_free(user);
+> > > >          s->vhost_user = NULL;
+> > > >      }
+> > > >  
+> > > 
+> > > 
+> > > So the following at least gets rid of the crashes.
+> > > I am not sure it does not leak memory though,
+> > > and not sure there aren't any configurations where
+> > > the 1st queue gets cleaned up first.
+> > > 
+> > > Thoughts?
+> > 
+> > Thank you so much for catching it and fixing
+> > it! I'll keep your SoB there. Thank you so
+> > much! I do appreciate it!
+> > 
+> > You are right. This structure is freed multiple
+> > times when multi-queue is enabled.
+> 
+> After a deeper digging, I got your point now..
+> It could be a use-after-free instead of a double
+> free.. As it's safe to deinit the char which is
+> shared by all queue pairs when cleanup the 1st
+> queue pair, it should be safe to free vhost-user
+> structure there too.
 
-I'm a bit confused about why the IOMMUTLBEntry is relevant here.
-That's the thing returned from the translate method, so there's
-no point in copying txattrs into it, because the caller by definition
-already had them. At the point where the IOMMU notices a guest
-changed the config, it doesn't have an IOMMUTLBEntry or a set of
-tx attrs.
+One thing worried me is that, I can't reproduce
+the crash with `make check-qtest-x86_64`. I tried
+to run it a lot of times, but the only output I
+got each time was:
 
->> (3) when the IOMMU calls the notifier because the guest config
->> changed it doesn't have tx attributes, so it would have to
->> fabricate some; and the guest config will invalidate transactions
->> with some combinations of tx attributes and not others.
->
-> IMHO it doesn't directly matter with what we are discussing now.  That
-> IOMMU_NOTIFIER_[UN]MAP flag tells what kind of message would the
-> notifier be interested in from "what kind of mapping it is".  IMHO
-> it's not really related to some other attributes when translation
-> happens - in our case, it does not directly related to what txattrs
-> value is.  Here as mentioned at [1] above IMHO we can still check this
-> against txattrs in the notifier handler, then we ignore messages that
-> we don't care about.  Actually the IOMMU_NOTIFIER_[UN]MAP flags can be
-> removed and we can just do similar things (e.g., we can skip MAP
-> messages if we only care about UNMAP messages), but since it's a
-> general concept and easy to be generalized, so we provided these
-> MAP/UNMAP flags to ease the notifier hooks.
->
-> In other words, I think we can also add more flags for SECURE or not.
-> However I still don't see a reason (from above three points) on why we
-> can't pass in txattrs directly into translate(), and at the same time
-> we copy the txattrs into IOTLB so that IOMMUTLBEntry can contain some
-> context information. [2]
+        CHK version_gen.h
+  GTESTER check-qtest-x86_64
 
-I'm afraid I really don't understand the design you're proposing
-here. But overall I think the point of divergence is that
-the mapping from "transaction attributes" to "translation contexts"
-(ie, effectively different page tables) is not 1:1. So for instance:
+I did a quick glance of the `check-qtest-x86_64`
+target in the makefile, it seems that the relevant
+test is `tests/vhost-user-test`. So I also tried
+to run this test directly:
 
-Our current IOMMUs which don't care about txattrs:
+make tests/vhost-user-test
+while true; do
+  QTEST_QEMU_BINARY=x86_64-softmmu/qemu-system-x86_64 ./tests/vhost-user-test
+done
 
-  [any txattr at all] -> the one and only translation context
+And the only output in each loop I got was:
 
-An IOMMU which cares about attrs.secure, and also treats
-attrs.unspecified like secure:
-  [any txattr with attrs.secure = 1]  \-> 'secure' context'
-  MEMATTRS_UNSPECIFIED                /
+/x86_64/vhost-user/migrate: OK
+/x86_64/vhost-user/multiqueue: OK
+/x86_64/vhost-user/read-guest-mem/memfd: OK
+/x86_64/vhost-user/read-guest-mem/memfile: OK
 
-  [txattrs with secure = 1] -> 'nonsecure' context
+So I'm still not quite sure what caused the crash
+on your side. But it does make more sense to free
+the vhost-user structure only when cleanup the
+1st queue pair (i.e. where the `chr` is deinit-ed).
 
-An IOMMU which cares about attrs.secure and attrs.user:
-  [secure=1,user=1]   -> 'secure user' context
-  [secure=0,user=1]   -> 'ns user' context
-  [secure=1,user=0]   -> 's priv' context
-  [secure=0,user=0]   -> 'ns priv' context
+I have sent a new patch set with above change:
 
-The IOMMU index captures this idea that there is not a 1:1
-mapping, so we have a way to think about and refer to the
-actual set of translation contexts that the IOMMU has.
+http://lists.gnu.org/archive/html/qemu-devel/2018-05/msg05508.html
+https://patchwork.kernel.org/bundle/btw/vhost-user-host-notifiers/
 
->> As Paolo pointed out you could also implement this by rather
->> of having an iommu_index concept, instead having some kind
->> of "here is a mask of which txattrs fields matter, and here's
->> another parameter with which txattrs fields are affected".
->> That makes it awkward though to implement "txattrs.unspecified
->> acts like txattrs.secure == 1" type behaviour, though, which is
->> easy with an index abstraction layer. It also would be harder
->> to implement the default 'replay' method, I think.
->
-> Please refer to my above comment at [2] - I am still confused on why
-> we must use this iommu_idx concept.  How about we just introduce
-> IOMMU_NOTIFIER_SECURE (or something similar) and let TCG code register
-> with that?  Though for the rest of notifiers we'll need to touch up
-> too to make sure all existing notifiers will still receive all the
-> message, no matter whether it's secure or not.
+Because the above change is got from your diff
+and also based on your analysis, I kept your SoB
+in that patch (if you have any concern about it,
+please let me know).
 
-I think I would definitely prefer not to have the secure/nonsecure
-specific thing in the API. We've got good experience with TCG
-where we abstract away the specifics of what an MMU cares about
-into an mmu_index, and I'd like to keep that approach. Otherwise,
-you immediately get into "and now we need to change the API again
-to handle IOMMUs which care about attrs.user"; and then again
-for attrs.requester_id; and now what about IOMMUs that care
-about both secure and user... Better to have an abstraction so
-that we don't need to keep changing the core code. In particular,
-TCG doesn't know whether it's secure/nonsecure that matters -- that
-is mostly handled by the target-specific parts, and TCG core code
-just passes attributes around.
+In this patch set, I also introduced a protocol
+feature to allow slave to send fds to master via
+the slave channel.
 
-> I'd also appreciate if you could paste me the link for Paolo's
-> message, since I cannot find it.
+If you still see crashes with the new patch set,
+please provide me a bit more details, e.g. the
+crash message. Thanks a lot!
 
-This is the one I had in mind:
-https://lists.gnu.org/archive/html/qemu-devel/2018-05/msg03522.html
-
->> It will only need to do so for IOMMUs that care about that field.
->>
->> (See also the other thread with Eric Auger talking about
->> maybe caring about requester_id like that. Needing to look
->> at requester_id is an area I haven't thought too much about,
->> and it is a bit of an odd one because it's a much larger
->> space than any of the other parts of the txattrs. In some
->> cases it ought to be possible to say "requester_id lets
->> us determine an iommu index, and there are a lot fewer
->> than 2^16 actual iommu indexes because a lot of the requestor_id
->> values indicate the same actual iommu translation", I suspect.)
->
-> AFAIK requester_id will only be the same in very rare cases, for
-> example, when multiple PCI devices (no matter whether it's PCI or
-> PCIe) are under the same PCIe-to-PCI bridge, then all these devices
-> will use the bridge's requester ID as their own.  In most cases, each
-> PCIe device will have their own unique requester ID.  So it'll be
-> common that requester ID number can be at least equal to the number of
-> devices.
-
-I haven't looked at this, but my understanding is that at the moment
-we do per-device requester_id by having each PCI device get its own
-IOMMUMemoryRegion mapped into its address space. So we'd only need
-to look at requester_id for the case of devices with multiple
-subfunctions(?), and presumably most devices only have a handful
-of those.
-
-thanks
--- PMM
+Best regards,
+Tiwei Bie
