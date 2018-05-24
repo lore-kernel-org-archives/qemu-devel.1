@@ -1,25 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48328)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51701)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fLqBy-0008U9-If
-	for qemu-devel@nongnu.org; Thu, 24 May 2018 09:22:10 -0400
+	(envelope-from <berto@igalia.com>) id 1fLqPz-0003gY-3y
+	for qemu-devel@nongnu.org; Thu, 24 May 2018 09:36:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fLqBx-0004LS-Mh
-	for qemu-devel@nongnu.org; Thu, 24 May 2018 09:22:06 -0400
-Received: from mail-ot0-x230.google.com ([2607:f8b0:4003:c0f::230]:35216)
+	(envelope-from <berto@igalia.com>) id 1fLqPs-0003tW-Rr
+	for qemu-devel@nongnu.org; Thu, 24 May 2018 09:36:34 -0400
+Received: from fanzine.igalia.com ([91.117.99.155]:51549)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fLqBx-0004Kn-IB
-	for qemu-devel@nongnu.org; Thu, 24 May 2018 09:22:05 -0400
-Received: by mail-ot0-x230.google.com with SMTP id h8-v6so1891637otb.2
-	for <qemu-devel@nongnu.org>; Thu, 24 May 2018 06:22:05 -0700 (PDT)
+	(Exim 4.71) (envelope-from <berto@igalia.com>) id 1fLqPs-0003XY-Ev
+	for qemu-devel@nongnu.org; Thu, 24 May 2018 09:36:28 -0400
+From: Alberto Garcia <berto@igalia.com>
+In-Reply-To: <20170605123908.18777-20-pbonzini@redhat.com>
+References: <20170605123908.18777-1-pbonzini@redhat.com>
+	<20170605123908.18777-20-pbonzini@redhat.com>
+Date: Thu, 24 May 2018 15:35:50 +0200
+Message-ID: <w51in7dch1l.fsf@maestria.local.igalia.com>
 MIME-Version: 1.0
-In-Reply-To: <20180523131155.12359-1-kwolf@redhat.com>
-References: <20180523131155.12359-1-kwolf@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 24 May 2018 14:21:44 +0100
-Message-ID: <CAFEAcA98ab_8W1qtYW=nqQ0ePfaEWF7GeqN+_MB8e2YwwQg5TA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL 00/46] Block layer patches
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH 19/19] block: make accounting thread-safe
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,30 +26,25 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: Qemu-block <qemu-block@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
+To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
+Cc: famz@redhat.com
 
-On 23 May 2018 at 14:11, Kevin Wolf <kwolf@redhat.com> wrote:
-> The following changes since commit 4f50c1673a89b07f376ce5c42d22d79a79cd466d:
->
->   Merge remote-tracking branch 'remotes/ehabkost/tags/x86-next-pull-request' into staging (2018-05-22 09:43:58 +0100)
->
-> are available in the git repository at:
->
->   git://repo.or.cz/qemu/kevin.git tags/for-upstream
->
-> for you to fetch changes up to bdebdc712b06ba82e103d617c335830682cde242:
->
->   qemu-iotests: Test job-* with block jobs (2018-05-23 14:30:52 +0200)
->
-> ----------------------------------------------------------------
-> Block layer patches:
->
-> - Generic background jobs
-> - qemu-iotests fixes for NFS and the 'migration' group
-> - sheepdog: Minor code simplification
->
+On Mon 05 Jun 2017 02:39:08 PM CEST, Paolo Bonzini wrote:
+> @@ -102,6 +107,8 @@ static void block_account_one_io(BlockAcctStats *stats, BlockAcctCookie *cookie,
+>  
+>      assert(cookie->type < BLOCK_MAX_IOTYPE);
+>  
+> +    qemu_mutex_lock(&stats->lock);
 
-Applied, thanks.
+QEMU crashes because this lock is not initialized if you do aio_read
+directly from a BDS not attached to a BlockBackend (should that
+operation be legal at all?)
 
--- PMM
+$ qemu-system-x86_64 -monitor stdio \
+-blockdev driver=qcow2,file.driver=file,file.filename=hd0.img,node-name=hd0
+
+(qemu) qemu-io hd0 "aio_read 0 1M"
+qemu-system-x86_64: util/qemu-thread-posix.c:64: qemu_mutex_lock_impl: Assertion `mutex->initialized' failed.
+Aborted
+
+Berto
