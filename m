@@ -1,28 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46576)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48853)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fLtec-0004Tr-2x
-	for qemu-devel@nongnu.org; Thu, 24 May 2018 13:03:55 -0400
+	(envelope-from <groug@kaod.org>) id 1fLtqA-0007kR-HL
+	for qemu-devel@nongnu.org; Thu, 24 May 2018 13:15:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fLteb-00013C-7P
-	for qemu-devel@nongnu.org; Thu, 24 May 2018 13:03:54 -0400
-Received: from mail-ot0-x244.google.com ([2607:f8b0:4003:c0f::244]:39541)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fLtea-00012p-VC
-	for qemu-devel@nongnu.org; Thu, 24 May 2018 13:03:53 -0400
-Received: by mail-ot0-x244.google.com with SMTP id l12-v6so2793999oth.6
-	for <qemu-devel@nongnu.org>; Thu, 24 May 2018 10:03:52 -0700 (PDT)
+	(envelope-from <groug@kaod.org>) id 1fLtq5-0000ZO-Jb
+	for qemu-devel@nongnu.org; Thu, 24 May 2018 13:15:50 -0400
+Received: from 6.mo69.mail-out.ovh.net ([46.105.50.107]:52553)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1fLtq5-0000Vd-D0
+	for qemu-devel@nongnu.org; Thu, 24 May 2018 13:15:45 -0400
+Received: from player791.ha.ovh.net (unknown [10.109.122.11])
+	by mo69.mail-out.ovh.net (Postfix) with ESMTP id 19D6513C55
+	for <qemu-devel@nongnu.org>; Thu, 24 May 2018 19:15:37 +0200 (CEST)
+Date: Thu, 24 May 2018 19:15:31 +0200
+From: Greg Kurz <groug@kaod.org>
+Message-ID: <20180524191531.00fe263c@bahia.lan>
+In-Reply-To: <20180524165256.GA31656@stefanha-x1.localdomain>
+References: <152715298769.397287.11782572103987618822.stgit@bahia>
+	<20180524165256.GA31656@stefanha-x1.localdomain>
 MIME-Version: 1.0
-In-Reply-To: <0774094d-d3e1-5983-ccb8-3d3412bf44fc@redhat.com>
-References: <20180521140402.23318-1-peter.maydell@linaro.org>
-	<20180521140402.23318-16-peter.maydell@linaro.org>
-	<0774094d-d3e1-5983-ccb8-3d3412bf44fc@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 24 May 2018 18:03:31 +0100
-Message-ID: <CAFEAcA95XD7_4q0p0Q6aPCxHHxHoRrVaKc+Nq+niZp-4PV8JLw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH 15/27] iommu: Add IOMMU index argument to
- notifier APIs
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	boundary="Sig_/QYb3QGBUh8F0PFirbmlPPOv";
+	protocol="application/pgp-signature"
+Subject: Re: [Qemu-devel] [PATCH v2] block: fix QEMU crash with scsi-hd and
+ drive_del
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,75 +32,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Auger Eric <eric.auger@redhat.com>
-Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>, "patches@linaro.org" <patches@linaro.org>
+To: Stefan Hajnoczi <stefanha@redhat.com>
+Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-On 24 May 2018 at 16:29, Auger Eric <eric.auger@redhat.com> wrote:
-> On 05/21/2018 04:03 PM, Peter Maydell wrote:
->> diff --git a/include/exec/memory.h b/include/exec/memory.h
->> index f6226fb263..4e6b125add 100644
->> --- a/include/exec/memory.h
->> +++ b/include/exec/memory.h
->> @@ -71,6 +71,7 @@ struct IOMMUTLBEntry {
->>      hwaddr           iova;
->>      hwaddr           translated_addr;
->>      hwaddr           addr_mask;  /* 0xfff = 4k translation */
->> +    int              iommu_idx;
-> I don't get why ne need iommu_idx field here. On translate the caller
-> has it. On notify the notifier has it?
+--Sig_/QYb3QGBUh8F0PFirbmlPPOv
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-I think this is an accidental leftover from some earlier draft;
-nothing in the patchset actually reads or writes this field, and
-it should be deleted.
+On Thu, 24 May 2018 17:52:56 +0100
+Stefan Hajnoczi <stefanha@redhat.com> wrote:
 
->>      IOMMUAccessFlags perm;
->>  };
->>
+> On Thu, May 24, 2018 at 11:09:47AM +0200, Greg Kurz wrote:
+> > diff --git a/block.c b/block.c
+> > index 676e57f5623a..fc9379439883 100644
+> > --- a/block.c
+> > +++ b/block.c
+> > @@ -2127,12 +2127,16 @@ BdrvChild *bdrv_attach_child(BlockDriverState *=
+parent_bs,
+> > =20
+> >  static void bdrv_detach_child(BdrvChild *child)
+> >  {
+> > +    BlockDriverState *child_bs =3D child->bs;
+> > +
+> >      if (child->next.le_prev) {
+> >          QLIST_REMOVE(child, next);
+> >          child->next.le_prev =3D NULL;
+> >      } =20
+>=20
+> This child->next modification makes me nervous.  Please start the
+> drained region before modifying the graph.
 
->> diff --git a/hw/vfio/common.c b/hw/vfio/common.c
->> index 8e57265edf..fb396cf00a 100644
->> --- a/hw/vfio/common.c
->> +++ b/hw/vfio/common.c
->> @@ -507,6 +507,7 @@ static void vfio_listener_region_add(MemoryListener *listener,
->>      if (memory_region_is_iommu(section->mr)) {
->>          VFIOGuestIOMMU *giommu;
->>          IOMMUMemoryRegion *iommu_mr = IOMMU_MEMORY_REGION(section->mr);
->> +        int iommu_idx;
->>
->>          trace_vfio_listener_region_add_iommu(iova, end);
->>          /*
->> @@ -523,10 +524,13 @@ static void vfio_listener_region_add(MemoryListener *listener,
->>          llend = int128_add(int128_make64(section->offset_within_region),
->>                             section->size);
->>          llend = int128_sub(llend, int128_one());
->> +        iommu_idx = memory_region_iommu_attrs_to_index(iommu_mr,
->> +                                                       MEMTXATTRS_UNSPECIFIED);
-> In that case VFIO ideally wants to be notified for any guest update
-> (whatever the page set) to reprogram the physical IOMMU corresponding
-> entries and doesn't want to register a notifier per iommu_idx. Also it
-> does not know which ones are supported. Is there a corresponding
-> iommu_idx value? MEMTXATTRS_ANY?
+Ok, I'll send a v3, and Cc qemu-stable@nongnu.org instead of
+stable@vger.kernel.org this time :P
 
-If VFIO is actually dealing with an IOMMU that needs to handle
-multiple possible transactions for different tx attributes, then
-it needs to know about all of them, because how it programs
-the physical IOMMU needs to be different for "map X to Y for
-Secure transactions" versus "map X to Y for NonSecure" (say).
-(This would require new kernel APIs, I assume.)
+--Sig_/QYb3QGBUh8F0PFirbmlPPOv
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
 
-If, as is currently the case, the VFIO infrastructure assumes that
-the IOMMU will always translate any transaction from a device
-identically regardless of its transaction attributes, then it
-should just use MEMTXATTRS_UNSPECIFIED, and trust that the
-emulated IOMMU will translate those correctly. (There might be
-scope for VFIO checking that the IOMMU really does, eg that
-it is only using one iommu index?)
+-----BEGIN PGP SIGNATURE-----
 
-Basically, VFIO is shadowing the behaviour of the emulated
-IOMMU to reflect it into the kernel; if the IOMMU it's shadowing
-is complicated then VFIO is going to need to be similarly
-complicated, and "merge updates for different page tables
-down into one" is not going to be the right behaviour.
+iQIzBAEBCAAdFiEEtIKLr5QxQM7yo0kQcdTV5YIvc9YFAlsG8zMACgkQcdTV5YIv
+c9YIPQ//ej7QAtbdkswv106oHCpCLfq+bfrj/+Nw7+bxW1Msyu+IzqUyxEdvvaHo
+fJwy4CgCIc/FyB58khIULYSyLePOQEEJKpF+SY6t/HOCjT8DAE2gaqHq4yR1vJdy
+9UAPnWoRAC0b5QfprS9V+HGGpcir4zY4zFFxR6CLFfRseXm6Yu+DErz5vEWmRgt3
+uSUcXaX/MFUnMn3hjX4u2mFkvTrDXRSsdI9l70Dazat7zHj0RpOYUGZRv5owh0bL
+t7upEyuneASWPWwnL1iZ81veKTy2UaOzIHFD15PVCe+IoLelMq5WHOWLyg/AsvY6
+D80ITuwKNVzJfET1qoY0xhCWI8t/qyoEXr1RV/5QDagLaX43VjMzkk2Y2WPG3T6R
+ifznHLNrZhQuKdKgej8/PqWxj7FWVijon5jJgbB0T4BS14kknPaKtflzjSVk5phl
+Gxm6+EWMkjeOaTmJdnvXhOdBn3h+xNxirco/COfAv2I0ZtH0WRB699K0DqhukuZ5
+ASN6bJmXrkcFYq31KyOMHEEm+qdb/oQEcdZ9TMc9+ioeqRYGxrgQz1KlaZ4TvqtD
+3eK9aSG5Tmjk6xxpKevfzsKS5BkMiAQkMiavqiT6H6dFYYeUImUKk9hCUA39s5jo
+fx0qXMBuhCpyq+dwEYDvBWmQEKoG/OP5gl3Q2IcC7g8pRQo4aRE=
+=o+8G
+-----END PGP SIGNATURE-----
 
-thanks
--- PMM
+--Sig_/QYb3QGBUh8F0PFirbmlPPOv--
