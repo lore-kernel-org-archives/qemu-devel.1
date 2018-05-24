@@ -1,23 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53502)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39125)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Aaron.Wei@dell.com>) id 1fLmb3-0003oo-B0
-	for qemu-devel@nongnu.org; Thu, 24 May 2018 05:31:48 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1fLpWQ-0005BZ-2o
+	for qemu-devel@nongnu.org; Thu, 24 May 2018 08:39:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <Aaron.Wei@dell.com>) id 1fLmb0-00019g-6J
-	for qemu-devel@nongnu.org; Thu, 24 May 2018 05:31:45 -0400
-Received: from esa3.dell-outbound.iphmx.com ([68.232.153.94]:56776)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <Aaron.Wei@dell.com>) id 1fLmaz-00018n-IB
-	for qemu-devel@nongnu.org; Thu, 24 May 2018 05:31:42 -0400
-From: "Wei, Aaron" <Aaron.Wei@Dell.com>
-Date: Thu, 24 May 2018 09:31:20 +0000
-Message-ID: <09ACC28F0266D94FB9D1BC3F193A6478014E3D1B@MX303CL02.corp.emc.com>
-Content-Language: en-US
+	(envelope-from <peter.maydell@linaro.org>) id 1fLpWO-0008CK-Uj
+	for qemu-devel@nongnu.org; Thu, 24 May 2018 08:39:10 -0400
+Received: from mail-ot0-x242.google.com ([2607:f8b0:4003:c0f::242]:43811)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1fLpWO-0008C7-Pv
+	for qemu-devel@nongnu.org; Thu, 24 May 2018 08:39:08 -0400
+Received: by mail-ot0-x242.google.com with SMTP id y10-v6so1710811otg.10
+	for <qemu-devel@nongnu.org>; Thu, 24 May 2018 05:39:08 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] QEMU: Multiple PCI domains for x86 PCI Express Machine
- (Q35)
+In-Reply-To: <1527047633-12368-1-git-send-email-zhaoshenglong@huawei.com>
+References: <1527047633-12368-1-git-send-email-zhaoshenglong@huawei.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 24 May 2018 13:38:47 +0100
+Message-ID: <CAFEAcA-2kQ2pHz=8Hm=fE-3qJ8U29nmUaPC6SdEtmC7pJVKWeA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH V3 1/2] arm_gicv3_kvm: increase clroffset
+ accordingly
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,26 +29,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "marcel.apfelbaum@gmail.com" <marcel.apfelbaum@gmail.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "Fu, Bryan" <Bryan.Fu@dell.com>, "Xia, Robert" <Robert.Xia@dell.com>, "Zhou, Zhenzan" <Zhenzan.Zhou@dell.com>
+To: Shannon Zhao <zhaoshenglong@huawei.com>
+Cc: qemu-arm <qemu-arm@nongnu.org>, Eric Auger <eric.auger@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Shannon Zhao <shannon.zhaosl@gmail.com>
 
-Hi,  Marcel
+On 23 May 2018 at 04:53, Shannon Zhao <zhaoshenglong@huawei.com> wrote:
+> It forgot to increase clroffset during the loop. So it only clear the
+> first 4 bytes.
+>
+> Fixes: 367b9f527becdd20ddf116e17a3c0c2bbc486920
+> Cc: qemu-stable@nongnu.org
+> Signed-off-by: Shannon Zhao <zhaoshenglong@huawei.com>
+> Reviewed-by: Eric Auger <eric.auger@redhat.com>
+> ---
+> Changes in V3: Add reviewed-by tag
+> ---
+>  hw/intc/arm_gicv3_kvm.c | 1 +
+>  1 file changed, 1 insertion(+)
+>
+> diff --git a/hw/intc/arm_gicv3_kvm.c b/hw/intc/arm_gicv3_kvm.c
+> index ec37177..3536795 100644
+> --- a/hw/intc/arm_gicv3_kvm.c
+> +++ b/hw/intc/arm_gicv3_kvm.c
+> @@ -243,6 +243,7 @@ static void kvm_dist_putbmp(GICv3State *s, uint32_t offset,
+>          if (clroffset != 0) {
+>              reg = 0;
+>              kvm_gicd_access(s, clroffset, &reg, true);
+> +            clroffset += 4;
+>          }
+>          reg = *gic_bmp_ptr32(bmp, irq);
+>          kvm_gicd_access(s, offset, &reg, true);
+> --
 
-It's my pleasure to write to you on behalf of a team who is developing the =
-Intel VMD virtualization base on QEMU in Dell EMC.
+Applied this patch to target-arm.next.
 
->From https://www.outreachy.org. we find that you are working on the Multipl=
-e PCI domain feature which we think may be  very helpful to our current wor=
-k.
-We'll be grateful if you can share some information about,
+PS: if you could remember to always provide a cover letter
+for multi-patch series that would be helpful.
 
-1.       What's the present developing status?
-
-2.       When would it possibly be ready? Or when could we get it from QEMU=
- repo?
-
-We appreciate and  look forward to your reply.
-
-
-Best wishes,
-Aaron Wei
+thanks
+-- PMM
