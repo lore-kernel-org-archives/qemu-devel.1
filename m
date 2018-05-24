@@ -1,29 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37388)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38582)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1fLz1X-0007tJ-70
-	for qemu-devel@nongnu.org; Thu, 24 May 2018 18:47:56 -0400
+	(envelope-from <groug@kaod.org>) id 1fLz7c-00011L-Ie
+	for qemu-devel@nongnu.org; Thu, 24 May 2018 18:54:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1fLz1W-0001S3-2y
-	for qemu-devel@nongnu.org; Thu, 24 May 2018 18:47:55 -0400
-Received: from mail-wm0-x241.google.com ([2a00:1450:400c:c09::241]:50907)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alistair23@gmail.com>)
-	id 1fLz1V-0001Rs-ST
-	for qemu-devel@nongnu.org; Thu, 24 May 2018 18:47:54 -0400
-Received: by mail-wm0-x241.google.com with SMTP id t11-v6so9392563wmt.0
-	for <qemu-devel@nongnu.org>; Thu, 24 May 2018 15:47:53 -0700 (PDT)
+	(envelope-from <groug@kaod.org>) id 1fLz7Z-000393-E5
+	for qemu-devel@nongnu.org; Thu, 24 May 2018 18:54:12 -0400
+Received: from 1.mo2.mail-out.ovh.net ([46.105.63.121]:60393)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1fLz7Z-00038n-8e
+	for qemu-devel@nongnu.org; Thu, 24 May 2018 18:54:09 -0400
+Received: from player692.ha.ovh.net (unknown [10.109.122.80])
+	by mo2.mail-out.ovh.net (Postfix) with ESMTP id F3EF7131355
+	for <qemu-devel@nongnu.org>; Fri, 25 May 2018 00:54:06 +0200 (CEST)
+From: Greg Kurz <groug@kaod.org>
+Date: Fri, 25 May 2018 00:53:55 +0200
+Message-ID: <152720243501.517758.270483838608061631.stgit@bahia.lan>
 MIME-Version: 1.0
-In-Reply-To: <625fe1a3-fe18-6216-eeb2-393f90817bff@amsat.org>
-References: <1527034517-7851-1-git-send-email-mjc@sifive.com>
-	<1527034517-7851-16-git-send-email-mjc@sifive.com>
-	<625fe1a3-fe18-6216-eeb2-393f90817bff@amsat.org>
-From: Alistair Francis <alistair23@gmail.com>
-Date: Thu, 24 May 2018 15:47:22 -0700
-Message-ID: <CAKmqyKNGpOf1Sxrv9f2e9A_XP=JC0REgpwjzZfnsF7kePey0Gg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v1 15/30] RISC-V: Add hartid and \n to
- interrupt logging
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Subject: [Qemu-devel] [PATCH v3] block: fix QEMU crash with scsi-hd and
+ drive_del
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,88 +28,83 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
-Cc: Michael Clark <mjc@sifive.com>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Palmer Dabbelt <palmer@sifive.com>, Alistair Francis <Alistair.Francis@wdc.com>, Sagar Karandikar <sagark@eecs.berkeley.edu>, patches@groups.riscv.org
+To: qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, qemu-stable@nongnu.org
 
-On Wed, May 23, 2018 at 5:33 AM, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.o=
-rg> wrote:
-> Hi Michael,
->
-> On 05/22/2018 09:15 PM, Michael Clark wrote:
->> Add carriage return that was erroneously removed
->> when converting to qemu_log. Change hard coded
->> core number to the actual hartid.
->
-> I think it makes more sens to move this patch before your 6/30 "Move
-> non-ops from op_helper to cpu_helper".
->
->>
->> Cc: Sagar Karandikar <sagark@eecs.berkeley.edu>
->> Cc: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
->> Cc: Palmer Dabbelt <palmer@sifive.com>
->> Cc: Alistair Francis <Alistair.Francis@wdc.com>
->> Signed-off-by: Michael Clark <mjc@sifive.com>
->
-> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+Removing a drive with drive_del while it is being used to run an I/O
+intensive workload can cause QEMU to crash.
 
-Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
+An AIO flush can yield at some point:
 
-Alistair
+blk_aio_flush_entry()
+ blk_co_flush(blk)
+  bdrv_co_flush(blk->root->bs)
+   ...
+    qemu_coroutine_yield()
 
->
->> ---
->>  target/riscv/cpu_helper.c | 18 ++++++++++--------
->>  1 file changed, 10 insertions(+), 8 deletions(-)
->>
->> diff --git a/target/riscv/cpu_helper.c b/target/riscv/cpu_helper.c
->> index bc15e19022cc..69592c037042 100644
->> --- a/target/riscv/cpu_helper.c
->> +++ b/target/riscv/cpu_helper.c
->> @@ -446,11 +446,13 @@ void riscv_cpu_do_interrupt(CPUState *cs)
->>      if (RISCV_DEBUG_INTERRUPT) {
->>          int log_cause =3D cs->exception_index & RISCV_EXCP_INT_MASK;
->>          if (cs->exception_index & RISCV_EXCP_INT_FLAG) {
->> -            qemu_log_mask(LOG_TRACE, "core   0: trap %s, epc 0x" TARGET=
-_FMT_lx,
->> -                riscv_intr_names[log_cause], env->pc);
->> +            qemu_log_mask(LOG_TRACE, "core "
->> +                TARGET_FMT_ld ": trap %s, epc 0x" TARGET_FMT_lx "\n",
->> +                env->mhartid, riscv_intr_names[log_cause], env->pc);
->>          } else {
->> -            qemu_log_mask(LOG_TRACE, "core   0: intr %s, epc 0x" TARGET=
-_FMT_lx,
->> -                riscv_excp_names[log_cause], env->pc);
->> +            qemu_log_mask(LOG_TRACE, "core "
->> +                TARGET_FMT_ld ": intr %s, epc 0x" TARGET_FMT_lx "\n",
->> +                env->mhartid, riscv_excp_names[log_cause], env->pc);
->>          }
->>      }
->>
->> @@ -512,8 +514,8 @@ void riscv_cpu_do_interrupt(CPUState *cs)
->>
->>          if (hasbadaddr) {
->>              if (RISCV_DEBUG_INTERRUPT) {
->> -                qemu_log_mask(LOG_TRACE, "core " TARGET_FMT_ld
->> -                    ": badaddr 0x" TARGET_FMT_lx, env->mhartid, env->ba=
-daddr);
->> +                qemu_log_mask(LOG_TRACE, "core " TARGET_FMT_ld ": badad=
-dr 0x"
->> +                    TARGET_FMT_lx "\n", env->mhartid, env->badaddr);
->>              }
->>              env->sbadaddr =3D env->badaddr;
->>          } else {
->> @@ -537,8 +539,8 @@ void riscv_cpu_do_interrupt(CPUState *cs)
->>
->>          if (hasbadaddr) {
->>              if (RISCV_DEBUG_INTERRUPT) {
->> -                qemu_log_mask(LOG_TRACE, "core " TARGET_FMT_ld
->> -                    ": badaddr 0x" TARGET_FMT_lx, env->mhartid, env->ba=
-daddr);
->> +                qemu_log_mask(LOG_TRACE, "core " TARGET_FMT_ld ": badad=
-dr 0x"
->> +                    TARGET_FMT_lx "\n", env->mhartid, env->badaddr);
->>              }
->>              env->mbadaddr =3D env->badaddr;
->>          } else {
->>
->
+and let the HMP command to run, free blk->root and give control
+back to the AIO flush:
+
+    hmp_drive_del()
+     blk_remove_bs()
+      bdrv_root_unref_child(blk->root)
+       child_bs = blk->root->bs
+       bdrv_detach_child(blk->root)
+        bdrv_replace_child(blk->root, NULL)
+         blk->root->bs = NULL
+        g_free(blk->root) <============== blk->root becomes stale
+       bdrv_unref(child_bs)
+        bdrv_delete(child_bs)
+         bdrv_close()
+          bdrv_drained_begin()
+           bdrv_do_drained_begin()
+            bdrv_drain_recurse()
+             aio_poll()
+              ...
+              qemu_coroutine_switch()
+
+and the AIO flush completion ends up dereferencing blk->root:
+
+  blk_aio_complete()
+   scsi_aio_complete()
+    blk_get_aio_context(blk)
+     bs = blk_bs(blk)
+ ie, bs = blk->root ? blk->root->bs : NULL
+            ^^^^^
+            stale
+
+The problem is that we should avoid making block driver graph
+changes while we have in-flight requests. This patch hence adds
+a drained section to bdrv_detach_child(), so that we're sure
+all requests have been drained before blk->root becomes stale.
+
+Signed-off-by: Greg Kurz <groug@kaod.org>
+---
+v3: - start drained section before modifying the graph (Stefan)
+
+v2: - drain I/O requests when detaching the BDS (Stefan, Paolo)
+---
+ block.c |    4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/block.c b/block.c
+index 501b64c8193f..715c1b56c1e2 100644
+--- a/block.c
++++ b/block.c
+@@ -2127,12 +2127,16 @@ BdrvChild *bdrv_attach_child(BlockDriverState *parent_bs,
+ 
+ static void bdrv_detach_child(BdrvChild *child)
+ {
++    BlockDriverState *child_bs = child->bs;
++
++    bdrv_drained_begin(child_bs);
+     if (child->next.le_prev) {
+         QLIST_REMOVE(child, next);
+         child->next.le_prev = NULL;
+     }
+ 
+     bdrv_replace_child(child, NULL);
++    bdrv_drained_end(child_bs);
+ 
+     g_free(child->name);
+     g_free(child);
