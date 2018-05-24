@@ -1,24 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36972)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38426)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fLrUo-0002Je-Fw
-	for qemu-devel@nongnu.org; Thu, 24 May 2018 10:45:39 -0400
+	(envelope-from <tiwei.bie@intel.com>) id 1fLrdM-0004OD-Vq
+	for qemu-devel@nongnu.org; Thu, 24 May 2018 10:54:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fLrUl-00046O-B7
-	for qemu-devel@nongnu.org; Thu, 24 May 2018 10:45:38 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:56784 helo=mx1.redhat.com)
+	(envelope-from <tiwei.bie@intel.com>) id 1fLrdI-0000pY-Pz
+	for qemu-devel@nongnu.org; Thu, 24 May 2018 10:54:29 -0400
+Received: from mga05.intel.com ([192.55.52.43]:52821)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1fLrUl-00045z-6e
-	for qemu-devel@nongnu.org; Thu, 24 May 2018 10:45:35 -0400
-References: <1527172175-129517-1-git-send-email-mst@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <6b3cad0d-b849-6ba9-64cb-6a36a37cd19d@redhat.com>
-Date: Thu, 24 May 2018 16:45:31 +0200
+	(Exim 4.71) (envelope-from <tiwei.bie@intel.com>) id 1fLrdI-0000kc-DY
+	for qemu-devel@nongnu.org; Thu, 24 May 2018 10:54:24 -0400
+Date: Thu, 24 May 2018 22:54:38 +0800
+From: Tiwei Bie <tiwei.bie@intel.com>
+Message-ID: <20180524145438.GA26169@debian>
+References: <20180412151232.17506-1-tiwei.bie@intel.com>
+	<20180412151232.17506-3-tiwei.bie@intel.com>
+	<20180523163116-mutt-send-email-mst@kernel.org>
+	<20180523183444-mutt-send-email-mst@kernel.org>
+	<20180523184001-mutt-send-email-mst@kernel.org>
+	<20180523232101.GB15604@debian> <20180524022440.GA20792@debian>
+	<20180524105936.GA22101@debian>
+	<20180524165031-mutt-send-email-mst@kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <1527172175-129517-1-git-send-email-mst@redhat.com>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] libqtest: fail if child coredumps
+Content-Disposition: inline
+In-Reply-To: <20180524165031-mutt-send-email-mst@kernel.org>
+Subject: Re: [Qemu-devel] [virtio-dev] Re: [PATCH v3 2/6] vhost-user:
+ introduce shared vhost-user state
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,48 +34,244 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org
-Cc: Eric Blake <eblake@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Markus Armbruster <armbru@redhat.com>, Tiwei Bie <tiwei.bie@intel.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: jasowang@redhat.com, alex.williamson@redhat.com, pbonzini@redhat.com, stefanha@redhat.com, qemu-devel@nongnu.org, virtio-dev@lists.oasis-open.org, cunming.liang@intel.com, dan.daly@intel.com, jianfeng.tan@intel.com, zhihong.wang@intel.com, xiao.w.wang@intel.com
 
-On 24.05.2018 16:30, Michael S. Tsirkin wrote:
-> Right now tests report OK status if QEMU crashes during cleanup.
-> Let's catch that case and fail the test.
+On Thu, May 24, 2018 at 04:55:04PM +0300, Michael S. Tsirkin wrote:
+> On Thu, May 24, 2018 at 06:59:36PM +0800, Tiwei Bie wrote:
+> > On Thu, May 24, 2018 at 10:24:40AM +0800, Tiwei Bie wrote:
+> > > On Thu, May 24, 2018 at 07:21:01AM +0800, Tiwei Bie wrote:
+> > > > On Wed, May 23, 2018 at 06:43:29PM +0300, Michael S. Tsirkin wrote:
+> > > > > On Wed, May 23, 2018 at 06:36:05PM +0300, Michael S. Tsirkin wrote:
+> > > > > > On Wed, May 23, 2018 at 04:44:51PM +0300, Michael S. Tsirkin wrote:
+> > > > > > > On Thu, Apr 12, 2018 at 11:12:28PM +0800, Tiwei Bie wrote:
+> > > > > > > > When multi queue is enabled e.g. for a virtio-net device,
+> > > > > > > > each queue pair will have a vhost_dev, and the only thing
+> > > > > > > > shared between vhost devs currently is the chardev. This
+> > > > > > > > patch introduces a vhost-user state structure which will
+> > > > > > > > be shared by all vhost devs of the same virtio device.
+> > > > > > > > 
+> > > > > > > > Signed-off-by: Tiwei Bie <tiwei.bie@intel.com>
+> > > > > > > 
+> > > > > > > Unfortunately this patch seems to cause crashes.
+> > > > > > > To reproduce, simply run
+> > > > > > > make check-qtest-x86_64
+> > > > > > > 
+> > > > > > > Sorry that it took me a while to find - it triggers 90% of runs but not
+> > > > > > > 100% which complicates bisection somewhat.
+> > > > 
+> > > > It's my fault to not notice this bug before.
+> > > > I'm very sorry. Thank you so much for finding
+> > > > the root cause!
+> > > > 
+> > > > > > > 
+> > > > > > > > ---
+> > > > > > > >  backends/cryptodev-vhost-user.c     | 20 ++++++++++++++++++-
+> > > > > > > >  hw/block/vhost-user-blk.c           | 22 +++++++++++++++++++-
+> > > > > > > >  hw/scsi/vhost-user-scsi.c           | 20 ++++++++++++++++++-
+> > > > > > > >  hw/virtio/Makefile.objs             |  2 +-
+> > > > > > > >  hw/virtio/vhost-stub.c              | 10 ++++++++++
+> > > > > > > >  hw/virtio/vhost-user.c              | 31 +++++++++++++++++++---------
+> > > > > > > >  include/hw/virtio/vhost-user-blk.h  |  2 ++
+> > > > > > > >  include/hw/virtio/vhost-user-scsi.h |  2 ++
+> > > > > > > >  include/hw/virtio/vhost-user.h      | 20 +++++++++++++++++++
+> > > > > > > >  net/vhost-user.c                    | 40 ++++++++++++++++++++++++++++++-------
+> > > > > > > >  10 files changed, 149 insertions(+), 20 deletions(-)
+> > > > > > > >  create mode 100644 include/hw/virtio/vhost-user.h
+> > > > [...]
+> > > > > > > >          qemu_chr_fe_set_handlers(&s->chr, NULL, NULL,
+> > > > > > > >                                   net_vhost_user_event, NULL, nc0->name, NULL,
+> > > > > > > > @@ -319,6 +336,15 @@ static int net_vhost_user_init(NetClientState *peer, const char *device,
+> > > > > > > >      assert(s->vhost_net);
+> > > > > > > >  
+> > > > > > > >      return 0;
+> > > > > > > > +
+> > > > > > > > +err:
+> > > > > > > > +    if (user) {
+> > > > > > > > +        vhost_user_cleanup(user);
+> > > > > > > > +        g_free(user);
+> > > > > > > > +        s->vhost_user = NULL;
+> > > > > > > > +    }
+> > > > > > > > +
+> > > > > > > > +    return -1;
+> > > > > > > >  }
+> > > > > > > >  
+> > > > > > > >  static Chardev *net_vhost_claim_chardev(
+> > > > > > > > -- 
+> > > > > > > > 2.11.0
+> > > > > > 
+> > > > > > So far I figured out that commenting the free of
+> > > > > > the structure removes the crash, so we seem to
+> > > > > > be dealing with a use-after free here.
+> > > > > > I suspect that in a MQ situation, one queue gets
+> > > > > > closed and attempts to free the structure
+> > > > > > while others still use it.
+> > > > > > 
+> > > > > > diff --git a/net/vhost-user.c b/net/vhost-user.c
+> > > > > > index 525a061..6a1573b 100644
+> > > > > > --- a/net/vhost-user.c
+> > > > > > +++ b/net/vhost-user.c
+> > > > > > @@ -157,8 +157,8 @@ static void net_vhost_user_cleanup(NetClientState *nc)
+> > > > > >          s->vhost_net = NULL;
+> > > > > >      }
+> > > > > >      if (s->vhost_user) {
+> > > > > > -        vhost_user_cleanup(s->vhost_user);
+> > > > > > -        g_free(s->vhost_user);
+> > > > > > +        //vhost_user_cleanup(s->vhost_user);
+> > > > > > +        //g_free(s->vhost_user);
+> > > > > >          s->vhost_user = NULL;
+> > > > > >      }
+> > > > > >      if (nc->queue_index == 0) {
+> > > > > > @@ -339,8 +339,8 @@ static int net_vhost_user_init(NetClientState *peer, const char *device,
+> > > > > >  
+> > > > > >  err:
+> > > > > >      if (user) {
+> > > > > > -        vhost_user_cleanup(user);
+> > > > > > -        g_free(user);
+> > > > > > +        //vhost_user_cleanup(user);
+> > > > > > +        //g_free(user);
+> > > > > >          s->vhost_user = NULL;
+> > > > > >      }
+> > > > > >  
+> > > > > 
+> > > > > 
+> > > > > So the following at least gets rid of the crashes.
+> > > > > I am not sure it does not leak memory though,
+> > > > > and not sure there aren't any configurations where
+> > > > > the 1st queue gets cleaned up first.
+> > > > > 
+> > > > > Thoughts?
+> > > > 
+> > > > Thank you so much for catching it and fixing
+> > > > it! I'll keep your SoB there. Thank you so
+> > > > much! I do appreciate it!
+> > > > 
+> > > > You are right. This structure is freed multiple
+> > > > times when multi-queue is enabled.
+> > > 
+> > > After a deeper digging, I got your point now..
+> > > It could be a use-after-free instead of a double
+> > > free.. As it's safe to deinit the char which is
+> > > shared by all queue pairs when cleanup the 1st
+> > > queue pair, it should be safe to free vhost-user
+> > > structure there too.
+> > 
+> > One thing worried me is that, I can't reproduce
+> > the crash with `make check-qtest-x86_64`. I tried
+> > to run it a lot of times, but the only output I
+> > got each time was:
+> > 
+> >         CHK version_gen.h
+> >   GTESTER check-qtest-x86_64
 > 
-> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-> ---
->  tests/libqtest.c | 9 ++++++++-
->  1 file changed, 8 insertions(+), 1 deletion(-)
+> The issue triggers on cleanup, this is why the test passes. Enable
+> coredump, then you will see the core file afterwards.
 > 
-> diff --git a/tests/libqtest.c b/tests/libqtest.c
-> index 43fb97e..f869854 100644
-> --- a/tests/libqtest.c
-> +++ b/tests/libqtest.c
-> @@ -103,8 +103,15 @@ static int socket_accept(int sock)
->  static void kill_qemu(QTestState *s)
->  {
->      if (s->qemu_pid != -1) {
-> +        int wstatus = 0;
-> +        pid_t pid;
-> +
->          kill(s->qemu_pid, SIGTERM);
-> -        waitpid(s->qemu_pid, NULL, 0);
-> +        pid = waitpid(s->qemu_pid, &wstatus, 0);
-> +
-> +        if (pid == s->qemu_pid && WIFSIGNALED(wstatus)) {
-> +            assert(!WCOREDUMP(wstatus));
-> +        }
->      }
->  }
+> We should probably teach the tests to check qemu
+> return status, that will catch this faster.
 
-That's basically a good idea ... but I've already seen yet another issue
-in the past already: QEMU sometimes simply hangs in an endless loop
-during clean up and never terminates. I think we should detect that
-situation, too.
+Awesome! You're right. I met the coredump after my
+first try on my old patch set.
 
-So instead of killing QEMU at the end of the testing, I think we should
-rather try to terminate it with the QMP "quit" command. If QEMU does not
-terminate with an exit code of 0, then the test should be flagged a
-failed (and only if QEMU did not terminate at all, it should be killed
-with SIGKILL).
+I checked my new patch set with below script, and
+didn't meet the coredump any more:
 
- Thomas
+```
+SUCCESS_CNT=0
+FAILURE_CNT=0
+
+while true; do
+    echo "-------"
+    QTEST_QEMU_BINARY=x86_64-softmmu/qemu-system-x86_64 ./tests/vhost-user-test
+    if [[ -e core ]]; then
+        FAILURE_CNT=$((FAILURE_CNT+1))
+        rm -f core
+    else
+        SUCCESS_CNT=$((SUCCESS_CNT+1))
+    fi
+    echo "Success: $SUCCESS_CNT Failure: $FAILURE_CNT"
+done
+```
+
+......
+/x86_64/vhost-user/migrate: OK
+/x86_64/vhost-user/multiqueue: OK
+/x86_64/vhost-user/read-guest-mem/memfd: OK
+/x86_64/vhost-user/read-guest-mem/memfile: OK
+Success: 111 Failure: 0
+
+I.e. for the new patch set, after 111 tests, I didn't
+see any crash any more.
+
+But using the same script to test my old patch set,
+it always failed:
+
+......
+/x86_64/vhost-user/migrate: OK
+/x86_64/vhost-user/multiqueue: OK
+/x86_64/vhost-user/read-guest-mem/memfd: OK
+/x86_64/vhost-user/read-guest-mem/memfile: OK
+Success: 0 Failure: 26
+
+I think the crash has been fixed in the new patch set.
+
+FYI, below is the new patch set:
+http://lists.gnu.org/archive/html/qemu-devel/2018-05/msg05508.html
+And below is the patch that has been fixed in the new patch set:
+http://lists.gnu.org/archive/html/qemu-devel/2018-05/msg05506.html
+
+Thank you so much!
+
+Best regards,
+Tiwei Bie
+
+
+> 
+> 
+> > I did a quick glance of the `check-qtest-x86_64`
+> > target in the makefile, it seems that the relevant
+> > test is `tests/vhost-user-test`. So I also tried
+> > to run this test directly:
+> > 
+> > make tests/vhost-user-test
+> > while true; do
+> >   QTEST_QEMU_BINARY=x86_64-softmmu/qemu-system-x86_64 ./tests/vhost-user-test
+> > done
+> > 
+> > And the only output in each loop I got was:
+> > 
+> > /x86_64/vhost-user/migrate: OK
+> > /x86_64/vhost-user/multiqueue: OK
+> > /x86_64/vhost-user/read-guest-mem/memfd: OK
+> > /x86_64/vhost-user/read-guest-mem/memfile: OK
+> > 
+> > So I'm still not quite sure what caused the crash
+> > on your side. But it does make more sense to free
+> > the vhost-user structure only when cleanup the
+> > 1st queue pair (i.e. where the `chr` is deinit-ed).
+> > 
+> > I have sent a new patch set with above change:
+> > 
+> > http://lists.gnu.org/archive/html/qemu-devel/2018-05/msg05508.html
+> > https://patchwork.kernel.org/bundle/btw/vhost-user-host-notifiers/
+> > 
+> > Because the above change is got from your diff
+> > and also based on your analysis, I kept your SoB
+> > in that patch (if you have any concern about it,
+> > please let me know).
+> > 
+> > In this patch set, I also introduced a protocol
+> > feature to allow slave to send fds to master via
+> > the slave channel.
+> > 
+> > If you still see crashes with the new patch set,
+> > please provide me a bit more details, e.g. the
+> > crash message. Thanks a lot!
+> > 
+> > Best regards,
+> > Tiwei Bie
+> 
+> ---------------------------------------------------------------------
+> To unsubscribe, e-mail: virtio-dev-unsubscribe@lists.oasis-open.org
+> For additional commands, e-mail: virtio-dev-help@lists.oasis-open.org
+> 
