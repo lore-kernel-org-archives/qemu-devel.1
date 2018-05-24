@@ -1,22 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42080)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42895)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fLljc-0008Ga-Gq
-	for qemu-devel@nongnu.org; Thu, 24 May 2018 04:36:33 -0400
+	(envelope-from <armbru@redhat.com>) id 1fLloA-0000pG-J8
+	for qemu-devel@nongnu.org; Thu, 24 May 2018 04:41:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fLljb-0002ec-LN
-	for qemu-devel@nongnu.org; Thu, 24 May 2018 04:36:32 -0400
-Date: Thu, 24 May 2018 10:36:24 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20180524083624.GE4008@localhost.localdomain>
-References: <20180518132114.4070-1-kwolf@redhat.com>
-	<20180518132114.4070-36-kwolf@redhat.com>
-	<6b0e43c5-f35b-5865-e423-ff6de432bb86@redhat.com>
+	(envelope-from <armbru@redhat.com>) id 1fLlo7-0005X0-FT
+	for qemu-devel@nongnu.org; Thu, 24 May 2018 04:41:14 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:38072 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fLlo7-0005Wh-BA
+	for qemu-devel@nongnu.org; Thu, 24 May 2018 04:41:11 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.4])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id D1D37854E2
+	for <qemu-devel@nongnu.org>; Thu, 24 May 2018 08:41:10 +0000 (UTC)
+From: Markus Armbruster <armbru@redhat.com>
+References: <20180524043952.11245-1-peterx@redhat.com>
+	<20180524043952.11245-4-peterx@redhat.com>
+Date: Thu, 24 May 2018 10:41:09 +0200
+In-Reply-To: <20180524043952.11245-4-peterx@redhat.com> (Peter Xu's message of
+	"Thu, 24 May 2018 12:39:51 +0800")
+Message-ID: <8736yh8mze.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <6b0e43c5-f35b-5865-e423-ff6de432bb86@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2 35/40] job: Add JOB_STATUS_CHANGE QMP
- event
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v7 3/4] monitor: more comments on lock-free
+ fleids/funcs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,41 +34,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>
-Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, jcody@redhat.com, armbru@redhat.com, mreitz@redhat.com
+To: Peter Xu <peterx@redhat.com>
+Cc: qemu-devel@nongnu.org, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
 
-Am 24.05.2018 um 02:02 hat John Snow geschrieben:
-> 
-> 
-> On 05/18/2018 09:21 AM, Kevin Wolf wrote:
-> > This adds a QMP event that is emitted whenever a job transitions from
-> > one status to another.
-> > 
-> > Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-> 
-> That's a lot of events, and a lot are redundant to what we already
-> transmitted under block jobs; it also has the effect of making internal
-> state changes explicit behavior that we're responsible for maintaining
-> for external clients.
-> 
-> Is that what we want here?
-> 
-> (I mean, the answer is probably "Yes" because you're here writing the
-> patch, but I was hoping to find your motivation.)
+Regarding the subject: what are "fleids"?
 
-The state change is visible in query-jobs anyway, so allowing the client
-to get events rather than polling query-jobs doesn't change the amount
-of information that is exposed.
+Peter Xu <peterx@redhat.com> writes:
 
-You're right that some of the events are redundant with existing block
-job events, but that unavoidable because we can't send BLOCK_JOB_*
-events for non-block jobs. And not sending JOB_* for block jobs would be
-inconsistent.
+> Add some explicit comment for both Readline and cpu_set/cpu_get helpers
+> that they do not need the mon_lock protection.
+>
+> Signed-off-by: Peter Xu <peterx@redhat.com>
+> ---
+>  monitor.c | 12 +++++++++++-
+>  1 file changed, 11 insertions(+), 1 deletion(-)
+>
+> diff --git a/monitor.c b/monitor.c
+> index d6c3c08932..f01589f945 100644
+> --- a/monitor.c
+> +++ b/monitor.c
+> @@ -207,7 +207,16 @@ struct Monitor {
+>      int suspend_cnt;            /* Needs to be accessed atomically */
+>      bool skip_flush;
+>      bool use_io_thr;
+> +
+> +    /*
+> +     * State used only in the thread "owning" the monitor.
+> +     * If @use_io_thr, this is mon_global.mon_iothread.
+> +     * Else, it's the main thread.
+> +     * These members can be safely accessed without locks.
+> +     */
+>      ReadLineState *rs;
+> +    // other members that aren't shared
 
-The question that I was asking myself was just whether I'd literally
-duplicate the existing events, just with s/BLOCK_JOB_/JOB_/, or whether
-a single event with a status field can do. I think the latter is more
-elegant (also because it can be implemented in a single place), even if
-it is emitted a bit more often than strictly necessary.
+Whoops, misunderstanding!  I meant this line as a placeholder, to
+further illustrate my intent.  It should not be committed.  If we need a
+comment here, it should use /* traditional comment syntax */.
 
-Kevin
+> +
+>      MonitorQMP qmp;
+>      gchar *mon_cpu_path;
+>      BlockCompletionFunc *password_completion_cb;
+> @@ -1313,7 +1322,7 @@ void qmp_qmp_capabilities(bool has_enable, QMPCapabilityList *enable,
+>      cur_mon->qmp.commands = &qmp_commands;
+>  }
+>  
+> -/* set the current CPU defined by the user */
+> +/* Set the current CPU defined by the user. Callers must hold BQL. */
+>  int monitor_set_cpu(int cpu_index)
+>  {
+>      CPUState *cpu;
+> @@ -1327,6 +1336,7 @@ int monitor_set_cpu(int cpu_index)
+>      return 0;
+>  }
+>  
+> +/* Callers must hold BQL. */
+>  static CPUState *mon_get_cpu_sync(bool synchronize)
+>  {
+>      CPUState *cpu;
