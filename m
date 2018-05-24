@@ -1,28 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36757)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37530)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1fLuqN-0002KN-OJ
-	for qemu-devel@nongnu.org; Thu, 24 May 2018 14:20:08 -0400
+	(envelope-from <eblake@redhat.com>) id 1fLutK-000409-3u
+	for qemu-devel@nongnu.org; Thu, 24 May 2018 14:23:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1fLuqH-0006bm-TZ
-	for qemu-devel@nongnu.org; Thu, 24 May 2018 14:20:07 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:37250 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1fLuqH-0006bb-Oc
-	for qemu-devel@nongnu.org; Thu, 24 May 2018 14:20:01 -0400
-Date: Thu, 24 May 2018 21:20:00 +0300
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20180524211726-mutt-send-email-mst@kernel.org>
-References: <1527176250-178968-1-git-send-email-mst@redhat.com>
-	<d0edcb79-3dae-c3a5-f9f4-50b3062f8cff@redhat.com>
-	<70262dde-3b96-b650-f0fb-8143e869c4ab@redhat.com>
-	<20180524190123-mutt-send-email-mst@kernel.org>
-	<6492471e-f8a7-5f5b-9cf9-95cb604f203a@redhat.com>
+	(envelope-from <eblake@redhat.com>) id 1fLutJ-00083K-9i
+	for qemu-devel@nongnu.org; Thu, 24 May 2018 14:23:10 -0400
+References: <20180518132114.4070-1-kwolf@redhat.com>
+	<20180518132114.4070-36-kwolf@redhat.com>
+	<6b0e43c5-f35b-5865-e423-ff6de432bb86@redhat.com>
+	<20180524083624.GE4008@localhost.localdomain>
+	<d58401b0-18e6-5815-b46f-67e941ade836@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <b22b1f99-8205-b2ec-78e8-2b1f84bf754a@redhat.com>
+Date: Thu, 24 May 2018 13:22:59 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <6492471e-f8a7-5f5b-9cf9-95cb604f203a@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2 2/1] libqtest: add more exit status
- checks
+In-Reply-To: <d58401b0-18e6-5815-b46f-67e941ade836@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 35/40] job: Add JOB_STATUS_CHANGE QMP
+ event
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,32 +28,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: qemu-devel@nongnu.org, Thomas Huth <thuth@redhat.com>, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>, Markus Armbruster <armbru@redhat.com>
+To: John Snow <jsnow@redhat.com>, Kevin Wolf <kwolf@redhat.com>
+Cc: jcody@redhat.com, mreitz@redhat.com, qemu-devel@nongnu.org, qemu-block@nongnu.org, armbru@redhat.com
 
-On Thu, May 24, 2018 at 01:16:24PM -0500, Eric Blake wrote:
-> On 05/24/2018 11:01 AM, Michael S. Tsirkin wrote:
-> > On Thu, May 24, 2018 at 11:00:19AM -0500, Eric Blake wrote:
-> > > On 05/24/2018 10:52 AM, Eric Blake wrote:
-> > > 
-> > > > Also, since waitpid() can only return either s->qemu_pid or -1 as we
-> > > > aren't using WNOHANG, it may also be worth asserting that if pid == -1,
-> > > > we either have EAGAIN (but why aren't we looping in that case?) or
-> > > > ECHILD.
-> > > 
-> > > I meant EINTR, not EAGAIN.  But in general, using waitpid() to collect
-> > > process status without doing it in a loop is risky.
-> > 
-> > Interesting. Risky how?
+On 05/24/2018 12:36 PM, John Snow wrote:
+
+>>> On 05/18/2018 09:21 AM, Kevin Wolf wrote:
+>>>> This adds a QMP event that is emitted whenever a job transitions from
+>>>> one status to another.
+>>>>
+>>>> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+
+>>
+>> The question that I was asking myself was just whether I'd literally
+>> duplicate the existing events, just with s/BLOCK_JOB_/JOB_/, or whether
+>> a single event with a status field can do. I think the latter is more
+>> elegant (also because it can be implemented in a single place), even if
+>> it is emitted a bit more often than strictly necessary.
+>>
 > 
-> If your process has any signal handler installed, then an EINTR failure
-> means you interpret a transient failure to grab process status (because your
-> check was interrupted by something else) as a permanent failure, unless you
-> go back to another waitpid() in a loop.
+> Code-wise I agree that this is more elegant; just wondering if the
+> implications of the additional API guarantees were considered. This
+> means we have to be a bit more careful about how we restructure the
+> state machine in the future, I think.
+> 
+> It also makes the "NULL" state visible, which I didn't really intend...
+> It's probably fine, just a little quirky.
 
-I don't think we have a handler installed, though.
+Is it worth a special case to avoid emitting the event on transition to 
+the NULL state?
 
-> -- 
-> Eric Blake, Principal Software Engineer
-> Red Hat, Inc.           +1-919-301-3266
-> Virtualization:  qemu.org | libvirt.org
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
