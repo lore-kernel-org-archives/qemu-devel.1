@@ -1,25 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53452)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54102)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1fLu7Y-0006YD-Aw
-	for qemu-devel@nongnu.org; Thu, 24 May 2018 13:33:50 -0400
+	(envelope-from <jsnow@redhat.com>) id 1fLuAZ-000859-Hw
+	for qemu-devel@nongnu.org; Thu, 24 May 2018 13:36:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1fLu7U-0005VE-EZ
-	for qemu-devel@nongnu.org; Thu, 24 May 2018 13:33:48 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:35964 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1fLu7U-0005V0-9t
-	for qemu-devel@nongnu.org; Thu, 24 May 2018 13:33:44 -0400
-Date: Thu, 24 May 2018 20:33:43 +0300
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20180524203055-mutt-send-email-mst@kernel.org>
-References: <1527178151-181781-1-git-send-email-mst@redhat.com>
-	<bf33951f-d205-ec9c-4ceb-7703deea97f7@redhat.com>
+	(envelope-from <jsnow@redhat.com>) id 1fLuAY-0007GL-JG
+	for qemu-devel@nongnu.org; Thu, 24 May 2018 13:36:55 -0400
+References: <20180518132114.4070-1-kwolf@redhat.com>
+	<20180518132114.4070-36-kwolf@redhat.com>
+	<6b0e43c5-f35b-5865-e423-ff6de432bb86@redhat.com>
+	<20180524083624.GE4008@localhost.localdomain>
+From: John Snow <jsnow@redhat.com>
+Message-ID: <d58401b0-18e6-5815-b46f-67e941ade836@redhat.com>
+Date: Thu, 24 May 2018 13:36:48 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <bf33951f-d205-ec9c-4ceb-7703deea97f7@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v3 2/1] libqtest: add more exit status
- checks
+In-Reply-To: <20180524083624.GE4008@localhost.localdomain>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 35/40] job: Add JOB_STATUS_CHANGE QMP
+ event
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,60 +27,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: qemu-devel@nongnu.org, Eric Blake <eblake@redhat.com>, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>, Markus Armbruster <armbru@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, jcody@redhat.com, armbru@redhat.com, mreitz@redhat.com
 
-On Thu, May 24, 2018 at 07:26:16PM +0200, Thomas Huth wrote:
-> On 24.05.2018 18:11, Michael S. Tsirkin wrote:
-> > Add more checks on how did QEMU exit.
-> > 
-> > Legal ways to exit right now:
-> > - exit(0) or return from main
-> > - kill(SIGTERM) - sent by testing infrastructure
-> > 
-> > Anything else is illegal.
-> [...]
-> > -        if (pid == s->qemu_pid && WIFSIGNALED(wstatus)) {
-> > +        /* waitpid returns child PID on success */
-> > +        assert(pid == s->qemu_pid);
-> > +
-> > +        /* If exited on signal - check the reason: core dump is never OK */
-> > +        if (WIFSIGNALED(wstatus)) {
-> >              assert(!WCOREDUMP(wstatus));
-> >          }
-> > +        /* If exited normally - check exit status */
-> > +        if (WIFEXITED(wstatus)) {
-> > +            assert(!WEXITSTATUS(wstatus));
-> > +        }
-> > +        /* Valid ways to exit: right now only return from main or exit */
-> > +        assert(WIFEXITED(wstatus));
-> >      }
-> >  }
+
+
+On 05/24/2018 04:36 AM, Kevin Wolf wrote:
+> Am 24.05.2018 um 02:02 hat John Snow geschrieben:
+>>
+>>
+>> On 05/18/2018 09:21 AM, Kevin Wolf wrote:
+>>> This adds a QMP event that is emitted whenever a job transitions from
+>>> one status to another.
+>>>
+>>> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+>>
+>> That's a lot of events, and a lot are redundant to what we already
+>> transmitted under block jobs; it also has the effect of making internal
+>> state changes explicit behavior that we're responsible for maintaining
+>> for external clients.
+>>
+>> Is that what we want here?
+>>
+>> (I mean, the answer is probably "Yes" because you're here writing the
+>> patch, but I was hoping to find your motivation.)
 > 
-> It's strange that you always get WIFEXITED(wstatus) == true here, even
-> if QEMU has been terminated by SIGTERM? I assume that's due to the fact
-> that QEMU intercepts SIGTERM and terminates via exit() instead?
-
-Right now, yes. This can of course change, so it's not
-a good idea hard-coding this assumption to deep
-in the code, imho.
-
-> So I
-> think you could simply replace the last three asserts with:
+> The state change is visible in query-jobs anyway, so allowing the client
+> to get events rather than polling query-jobs doesn't change the amount
+> of information that is exposed.
 > 
-> 	assert(WIFEXITED(wstatus) && !WEXITSTATUS(wstatus));
+
+With differing amounts of guarantees, though; for querying you have to
+so happen to catch it and in practice you may never observe many of the
+status transitions. It's not something that an external client could
+rely on.
+
+With events, we're guaranteeing you will be able to listen to all
+possible state transitions. People may begin depending on them in ways
+we hadn't anticipated just yet.
+
+...Well, as long as the client is connected to the stream, which we
+suggest may not always be possible with the presence of the concluded state.
+
+> You're right that some of the events are redundant with existing block
+> job events, but that unavoidable because we can't send BLOCK_JOB_*
+> events for non-block jobs. And not sending JOB_* for block jobs would be
+> inconsistent.
 > 
->  Thomas
+> The question that I was asking myself was just whether I'd literally
+> duplicate the existing events, just with s/BLOCK_JOB_/JOB_/, or whether
+> a single event with a status field can do. I think the latter is more
+> elegant (also because it can be implemented in a single place), even if
+> it is emitted a bit more often than strictly necessary.
+> 
 
-I could but they would be harder to debug.
+Code-wise I agree that this is more elegant; just wondering if the
+implications of the additional API guarantees were considered. This
+means we have to be a bit more careful about how we restructure the
+state machine in the future, I think.
 
-If I see
-	"assertion failed: !WCOREDUMP(wstatus)"
-then that is very readable.
+It also makes the "NULL" state visible, which I didn't really intend...
+It's probably fine, just a little quirky.
 
-If I just see
-	"assertion failed: WIFEXITED(wstatus) && !WEXITSTATUS(wstatus)"
-then I just know something went wrong.
-
--- 
-MST
+> Kevin
+> 
