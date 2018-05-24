@@ -1,22 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43546)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43861)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1fLi7c-0006v5-Sp
-	for qemu-devel@nongnu.org; Thu, 24 May 2018 00:45:05 -0400
+	(envelope-from <no-reply@patchew.org>) id 1fLi96-0007ye-3K
+	for qemu-devel@nongnu.org; Thu, 24 May 2018 00:46:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1fLi7Y-00028S-2M
-	for qemu-devel@nongnu.org; Thu, 24 May 2018 00:45:04 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:42058 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1fLi7X-00028D-UH
-	for qemu-devel@nongnu.org; Thu, 24 May 2018 00:45:00 -0400
-From: Peter Xu <peterx@redhat.com>
-Date: Thu, 24 May 2018 12:44:52 +0800
-Message-Id: <20180524044454.11792-1-peterx@redhat.com>
+	(envelope-from <no-reply@patchew.org>) id 1fLi91-0002k5-KN
+	for qemu-devel@nongnu.org; Thu, 24 May 2018 00:46:36 -0400
+Resent-Message-Id: <E1fLi91-0002k5-KN@eggs.gnu.org>
+Received: from sender-of-o51.zoho.com ([135.84.80.216]:21036)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1fLi91-0002jn-FH
+	for qemu-devel@nongnu.org; Thu, 24 May 2018 00:46:31 -0400
+In-Reply-To: <20180524043952.11245-1-peterx@redhat.com>
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <152713717041.150.6588831627203825308@d39dc562802a>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v4 0/2] error-report: introduce
- {error|warn}_report_once
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Wed, 23 May 2018 21:46:11 -0700 (PDT)
+Subject: Re: [Qemu-devel] [PATCH v7 0/4] monitor: let Monitor be thread safe
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,38 +28,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, peterx@redhat.com, Jason Wang <jasowang@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>
+To: peterx@redhat.com
+Cc: famz@redhat.com, qemu-devel@nongnu.org, armbru@redhat.com, dgilbert@redhat.com, stefanha@redhat.com, marcandre.lureau@redhat.com
 
-v4:
-- patch 2: pick r-b from Philippe
-- patch 1: replace all __* variables into *_ [Eric]
-- patch 1: enhance the commit message of patch 1, mention return code
-  of macros [Markus]
-
-v3:
-- reindent in patch 2, dump more things [Philippe]
-
-v2:
-- for patch 1: replace tabs, add trivial comment [Markus]
-  (I didn't add much comment otherwise I'll need to duplicate what's
-   there in error_report())
-- add patch 2
-
-Patch 1 introduce the helpers.
-
-Patch 2 use it to replace VT-d trace_vtd_err().
-
-Please review.  Thanks.
-
-Peter Xu (2):
-  qemu-error: introduce {error|warn}_report_once
-  intel-iommu: start to use error_report_once
-
- include/qemu/error-report.h | 32 ++++++++++++++++++++
- hw/i386/intel_iommu.c       | 59 +++++++++++++++++++++----------------
- hw/i386/trace-events        |  1 -
- 3 files changed, 65 insertions(+), 27 deletions(-)
-
---=20
-2.17.0
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
+c3NhZ2UtaWQ6IDIwMTgwNTI0MDQzOTUyLjExMjQ1LTEtcGV0ZXJ4QHJlZGhhdC5jb20KU3ViamVj
+dDogW1FlbXUtZGV2ZWxdIFtQQVRDSCB2NyAwLzRdIG1vbml0b3I6IGxldCBNb25pdG9yIGJlIHRo
+cmVhZCBzYWZlCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCgpCQVNFPWJh
+c2UKbj0xCnRvdGFsPSQoZ2l0IGxvZyAtLW9uZWxpbmUgJEJBU0UuLiB8IHdjIC1sKQpmYWlsZWQ9
+MAoKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9j
+YWwgZGlmZi5yZW5hbWVzIFRydWUKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYuYWxnb3JpdGhtIGhp
+c3RvZ3JhbQoKY29tbWl0cz0iJChnaXQgbG9nIC0tZm9ybWF0PSVIIC0tcmV2ZXJzZSAkQkFTRS4u
+KSIKZm9yIGMgaW4gJGNvbW1pdHM7IGRvCiAgICBlY2hvICJDaGVja2luZyBQQVRDSCAkbi8kdG90
+YWw6ICQoZ2l0IGxvZyAtbiAxIC0tZm9ybWF0PSVzICRjKS4uLiIKICAgIGlmICEgZ2l0IHNob3cg
+JGMgLS1mb3JtYXQ9ZW1haWwgfCAuL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIC07
+IHRoZW4KICAgICAgICBmYWlsZWQ9MQogICAgICAgIGVjaG8KICAgIGZpCiAgICBuPSQoKG4rMSkp
+CmRvbmUKCmV4aXQgJGZhaWxlZAo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKVXBkYXRpbmcgM2M4
+Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApGcm9tIGh0dHBzOi8vZ2l0aHVi
+LmNvbS9wYXRjaGV3LXByb2plY3QvcWVtdQogdCBbdGFnIHVwZGF0ZV0gICAgICAgICAgICBwYXRj
+aGV3LzIwMTgwNTIyMDM1NjI5LjMwNDI4LTEtcGV0ZXJ4QHJlZGhhdC5jb20gLT4gcGF0Y2hldy8y
+MDE4MDUyMjAzNTYyOS4zMDQyOC0xLXBldGVyeEByZWRoYXQuY29tCiAqIFtuZXcgdGFnXSAgICAg
+ICAgICAgICAgIHBhdGNoZXcvMjAxODA1MjQwNDM5NTIuMTEyNDUtMS1wZXRlcnhAcmVkaGF0LmNv
+bSAtPiBwYXRjaGV3LzIwMTgwNTI0MDQzOTUyLjExMjQ1LTEtcGV0ZXJ4QHJlZGhhdC5jb20KU3dp
+dGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0JwpkYWRjYmEyMzc1IG1vbml0b3I6IGFkZCBsb2Nr
+IHRvIHByb3RlY3QgbW9uX2Zkc2V0cwplZGE2NjY3MWI5IG1vbml0b3I6IG1vcmUgY29tbWVudHMg
+b24gbG9jay1mcmVlIGZsZWlkcy9mdW5jcwpiN2QzNTZlMTYwIG1vbml0b3I6IHByb3RlY3QgbW9u
+LT5mZHMgd2l0aCBtb25fbG9jawozNWVhZGZhZmYyIG1vbml0b3I6IHJlbmFtZSBvdXRfbG9jayB0
+byBtb25fbG9jawoKPT09IE9VVFBVVCBCRUdJTiA9PT0KQ2hlY2tpbmcgUEFUQ0ggMS80OiBtb25p
+dG9yOiByZW5hbWUgb3V0X2xvY2sgdG8gbW9uX2xvY2suLi4KQ2hlY2tpbmcgUEFUQ0ggMi80OiBt
+b25pdG9yOiBwcm90ZWN0IG1vbi0+ZmRzIHdpdGggbW9uX2xvY2suLi4KQ2hlY2tpbmcgUEFUQ0gg
+My80OiBtb25pdG9yOiBtb3JlIGNvbW1lbnRzIG9uIGxvY2stZnJlZSBmbGVpZHMvZnVuY3MuLi4K
+RVJST1I6IGRvIG5vdCB1c2UgQzk5IC8vIGNvbW1lbnRzCiMyODogRklMRTogbW9uaXRvci5jOjIx
+ODoKKyAgICAvLyBvdGhlciBtZW1iZXJzIHRoYXQgYXJlbid0IHNoYXJlZAoKdG90YWw6IDEgZXJy
+b3JzLCAwIHdhcm5pbmdzLCAzMSBsaW5lcyBjaGVja2VkCgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBw
+cm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNl
+IHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0gg
+aW4gTUFJTlRBSU5FUlMuCgpDaGVja2luZyBQQVRDSCA0LzQ6IG1vbml0b3I6IGFkZCBsb2NrIHRv
+IHByb3RlY3QgbW9uX2Zkc2V0cy4uLgo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29tbWFuZCBl
+eGl0ZWQgd2l0aCBjb2RlOiAxCgoKLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5
+IFBhdGNoZXcgW2h0dHA6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNr
+IHRvIHBhdGNoZXctZGV2ZWxAcmVkaGF0LmNvbQ==
