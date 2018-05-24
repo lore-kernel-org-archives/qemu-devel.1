@@ -1,26 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39262)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42562)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1fLv2U-0001Px-Vk
-	for qemu-devel@nongnu.org; Thu, 24 May 2018 14:32:43 -0400
+	(envelope-from <quintela@redhat.com>) id 1fLvLn-00074n-M7
+	for qemu-devel@nongnu.org; Thu, 24 May 2018 14:52:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1fLv2U-00039l-4Z
-	for qemu-devel@nongnu.org; Thu, 24 May 2018 14:32:39 -0400
-References: <20180518132114.4070-1-kwolf@redhat.com>
-	<20180518132114.4070-36-kwolf@redhat.com>
-	<6b0e43c5-f35b-5865-e423-ff6de432bb86@redhat.com>
-	<20180524083624.GE4008@localhost.localdomain>
-	<d58401b0-18e6-5815-b46f-67e941ade836@redhat.com>
-	<b22b1f99-8205-b2ec-78e8-2b1f84bf754a@redhat.com>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <b2a6d650-a03b-8c85-a139-9e9e1ec63130@redhat.com>
-Date: Thu, 24 May 2018 14:32:31 -0400
+	(envelope-from <quintela@redhat.com>) id 1fLvLl-0001Uv-2t
+	for qemu-devel@nongnu.org; Thu, 24 May 2018 14:52:35 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:59190 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1fLvLk-0001Uh-Uc
+	for qemu-devel@nongnu.org; Thu, 24 May 2018 14:52:33 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.6])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 8F58C4022407
+	for <qemu-devel@nongnu.org>; Thu, 24 May 2018 18:52:31 +0000 (UTC)
+From: Juan Quintela <quintela@redhat.com>
+In-Reply-To: <64410e07-30ba-c714-e3f4-99149ad22a76@redhat.com> (John Snow's
+	message of "Thu, 24 May 2018 13:50:08 -0400")
+References: <20180523091411.1073-1-quintela@redhat.com>
+	<64410e07-30ba-c714-e3f4-99149ad22a76@redhat.com>
+Reply-To: quintela@redhat.com
+Date: Thu, 24 May 2018 20:52:27 +0200
+Message-ID: <87603cvqc4.fsf@secure.mitica>
 MIME-Version: 1.0
-In-Reply-To: <b22b1f99-8205-b2ec-78e8-2b1f84bf754a@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 35/40] job: Add JOB_STATUS_CHANGE QMP
- event
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH] migration: fix exec/fd migrations
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,55 +34,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, Kevin Wolf <kwolf@redhat.com>
-Cc: jcody@redhat.com, mreitz@redhat.com, qemu-devel@nongnu.org, qemu-block@nongnu.org, armbru@redhat.com
+To: John Snow <jsnow@redhat.com>
+Cc: qemu-devel@nongnu.org, lvivier@redhat.com, dgilbert@redhat.com, peterx@redhat.com
 
+John Snow <jsnow@redhat.com> wrote:
+> On 05/23/2018 05:14 AM, Juan Quintela wrote:
+>> Commit:
+>> 
+>> commit 36c2f8be2c4eb0003ac77a14910842b7ddd7337e
+>> Author: Juan Quintela <quintela@redhat.com>
+>> Date:   Wed Mar 7 08:40:52 2018 +0100
+>> 
+>>     migration: Delay start of migration main routines
+>> 
+>> Missed tcp and fd transports.  This fix its.
+>> 
+>> Reported-by: Kevin Wolf <kwolf@redhat.com>
+>> Signed-off-by: Juan Quintela <quintela@redhat.com>
+>
+> Fixes things for me, but I see that Peter Xu has more concerns.
+>
+> Would be happy with checking this in for now and following up with
+> better refactors so that iotests works again in the meantime.
+>
+> Tested-by: John Snow <jsnow@redhat.com>
 
+That is my plan.  Will send a pull request Tomorrow, and we can go from
+there.  Peter suggestion is good but requires developtemt and testing.
 
-On 05/24/2018 02:22 PM, Eric Blake wrote:
-> On 05/24/2018 12:36 PM, John Snow wrote:
-> 
->>>> On 05/18/2018 09:21 AM, Kevin Wolf wrote:
->>>>> This adds a QMP event that is emitted whenever a job transitions from
->>>>> one status to another.
->>>>>
->>>>> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-> 
->>>
->>> The question that I was asking myself was just whether I'd literally
->>> duplicate the existing events, just with s/BLOCK_JOB_/JOB_/, or whether
->>> a single event with a status field can do. I think the latter is more
->>> elegant (also because it can be implemented in a single place), even if
->>> it is emitted a bit more often than strictly necessary.
->>>
->>
->> Code-wise I agree that this is more elegant; just wondering if the
->> implications of the additional API guarantees were considered. This
->> means we have to be a bit more careful about how we restructure the
->> state machine in the future, I think.
->>
->> It also makes the "NULL" state visible, which I didn't really intend...
->> It's probably fine, just a little quirky.
-> 
-> Is it worth a special case to avoid emitting the event on transition to
-> the NULL state?
-> 
-
-I would have done it, but it also doesn't necessarily hurt anything to
-have it in here either.
-
-Maybe it provides a benefit: I suppose it would definitely indicate to a
-client that -- regardless of how they configured the job (with
-auto-dismiss or not) that it serves as final record that the job has
-*definitely absolutely gone* and can no longer be addressed.
-
-It's just a strange state name for that purpose; I simply didn't
-*intend* to expose it.
-
-...OTOH, for early failures it seems like an obviously spurious message
-that we don't need or want.
-
-Well, glad I can give you precisely conflicting feelings on it and
-arrive at no opinion. Good job everyone, see you tomorrow.
-
---js
+Thanks, Juan.
