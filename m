@@ -1,25 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38008)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45455)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1fLfNF-0007Yq-Un
-	for qemu-devel@nongnu.org; Wed, 23 May 2018 21:49:03 -0400
+	(envelope-from <tiwei.bie@intel.com>) id 1fLfvZ-0006Uh-KR
+	for qemu-devel@nongnu.org; Wed, 23 May 2018 22:24:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1fLfNC-0001Y0-R6
-	for qemu-devel@nongnu.org; Wed, 23 May 2018 21:49:02 -0400
-Resent-Message-Id: <E1fLfNC-0001Y0-R6@eggs.gnu.org>
-Received: from sender-of-o51.zoho.com ([135.84.80.216]:21035)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1fLfNC-0001W7-Ik
-	for qemu-devel@nongnu.org; Wed, 23 May 2018 21:48:58 -0400
-In-Reply-To: <20180523131155.12359-1-kwolf@redhat.com>
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <152708416470.129.15403730634967425057@d39dc562802a>
+	(envelope-from <tiwei.bie@intel.com>) id 1fLfvV-0006Q0-KH
+	for qemu-devel@nongnu.org; Wed, 23 May 2018 22:24:29 -0400
+Received: from mga17.intel.com ([192.55.52.151]:45599)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <tiwei.bie@intel.com>) id 1fLfvV-0006NM-7B
+	for qemu-devel@nongnu.org; Wed, 23 May 2018 22:24:25 -0400
+Date: Thu, 24 May 2018 10:24:40 +0800
+From: Tiwei Bie <tiwei.bie@intel.com>
+Message-ID: <20180524022440.GA20792@debian>
+References: <20180412151232.17506-1-tiwei.bie@intel.com>
+	<20180412151232.17506-3-tiwei.bie@intel.com>
+	<20180523163116-mutt-send-email-mst@kernel.org>
+	<20180523183444-mutt-send-email-mst@kernel.org>
+	<20180523184001-mutt-send-email-mst@kernel.org>
+	<20180523232101.GB15604@debian>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Wed, 23 May 2018 07:02:45 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PULL 00/46] Block layer patches
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20180523232101.GB15604@debian>
+Subject: Re: [Qemu-devel] [PATCH v3 2/6] vhost-user: introduce shared
+ vhost-user state
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,207 +32,198 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: kwolf@redhat.com
-Cc: famz@redhat.com, qemu-block@nongnu.org, qemu-devel@nongnu.org
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: jasowang@redhat.com, alex.williamson@redhat.com, pbonzini@redhat.com, stefanha@redhat.com, qemu-devel@nongnu.org, virtio-dev@lists.oasis-open.org, cunming.liang@intel.com, dan.daly@intel.com, jianfeng.tan@intel.com, zhihong.wang@intel.com, xiao.w.wang@intel.com
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
-c3NhZ2UtaWQ6IDIwMTgwNTIzMTMxMTU1LjEyMzU5LTEta3dvbGZAcmVkaGF0LmNvbQpTdWJqZWN0
-OiBbUWVtdS1kZXZlbF0gW1BVTEwgMDAvNDZdIEJsb2NrIGxheWVyIHBhdGNoZXMKCj09PSBURVNU
-IFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKCkJBU0U9YmFzZQpuPTEKdG90YWw9JChnaXQg
-bG9nIC0tb25lbGluZSAkQkFTRS4uIHwgd2MgLWwpCmZhaWxlZD0wCgpnaXQgY29uZmlnIC0tbG9j
-YWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1
-ZQpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5hbGdvcml0aG0gaGlzdG9ncmFtCgpjb21taXRzPSIk
-KGdpdCBsb2cgLS1mb3JtYXQ9JUggLS1yZXZlcnNlICRCQVNFLi4pIgpmb3IgYyBpbiAkY29tbWl0
-czsgZG8KICAgIGVjaG8gIkNoZWNraW5nIFBBVENIICRuLyR0b3RhbDogJChnaXQgbG9nIC1uIDEg
-LS1mb3JtYXQ9JXMgJGMpLi4uIgogICAgaWYgISBnaXQgc2hvdyAkYyAtLWZvcm1hdD1lbWFpbCB8
-IC4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgLTsgdGhlbgogICAgICAgIGZhaWxl
-ZD0xCiAgICAgICAgZWNobwogICAgZmkKICAgIG49JCgobisxKSkKZG9uZQoKZXhpdCAkZmFpbGVk
-Cj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQx
-ZGVmN2Y0NGJkODg4NzEzMzg0CkZyb20gaHR0cHM6Ly9naXRodWIuY29tL3BhdGNoZXctcHJvamVj
-dC9xZW11CiB0IFt0YWcgdXBkYXRlXSAgICAgICAgICAgIHBhdGNoZXcvMTUyNzAzNDUxNy03ODUx
-LTEtZ2l0LXNlbmQtZW1haWwtbWpjQHNpZml2ZS5jb20gLT4gcGF0Y2hldy8xNTI3MDM0NTE3LTc4
-NTEtMS1naXQtc2VuZC1lbWFpbC1tamNAc2lmaXZlLmNvbQogdCBbdGFnIHVwZGF0ZV0gICAgICAg
-ICAgICBwYXRjaGV3LzE1MjcwNzA5NTAtMjA4MzUwLTEtZ2l0LXNlbmQtZW1haWwtaW1hbW1lZG9A
-cmVkaGF0LmNvbSAtPiBwYXRjaGV3LzE1MjcwNzA5NTAtMjA4MzUwLTEtZ2l0LXNlbmQtZW1haWwt
-aW1hbW1lZG9AcmVkaGF0LmNvbQogKiBbbmV3IHRhZ10gICAgICAgICAgICAgICBwYXRjaGV3LzIw
-MTgwNTIzMTMxMTU1LjEyMzU5LTEta3dvbGZAcmVkaGF0LmNvbSAtPiBwYXRjaGV3LzIwMTgwNTIz
-MTMxMTU1LjEyMzU5LTEta3dvbGZAcmVkaGF0LmNvbQpTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2gg
-J3Rlc3QnCmFhZTJlZWQ0YjEgcWVtdS1pb3Rlc3RzOiBUZXN0IGpvYi0qIHdpdGggYmxvY2sgam9i
-cwphNjg5YjE5NjZmIGlvdGVzdHM6IE1vdmUgcW1wX3RvX29wdHMoKSB0byBWTQowOGY1ZTA0OTdj
-IGJsb2Nram9iOiBSZW1vdmUgQmxvY2tKb2IuZHJpdmVyCjAwODViNjVjOTMgam9iOiBBZGQgcXVl
-cnktam9icyBRTVAgY29tbWFuZAoxZDViN2Q0OWZiIGpvYjogQWRkIGxpZmVjeWNsZSBRTVAgY29t
-bWFuZHMKYmVhNTEzN2ViNCBqb2I6IEFkZCBKT0JfU1RBVFVTX0NIQU5HRSBRTVAgZXZlbnQKNmUz
-ZjY2MGM2YyBqb2I6IEludHJvZHVjZSBxYXBpL2pvYi5qc29uCjUzNTViMWI1OGMgam9iOiBNb3Zl
-IHByb2dyZXNzIGZpZWxkcyB0byBKb2IKOWQyNjg3NjJkZCBqb2I6IEFkZCBqb2JfdHJhbnNpdGlv
-bl90b19yZWFkeSgpCjhlNzczZTllZWQgam9iOiBBZGQgam9iX2lzX3JlYWR5KCkKZjFlYzg2YTk4
-NSBqb2I6IEFkZCBqb2JfZGlzbWlzcygpCjQ3NTlmYjBjM2Igam9iOiBBZGQgam9iX3lpZWxkKCkK
-NjY1MTdiN2Q1NyBibG9jazogQ2FuY2VsIGpvYiBpbiBiZHJ2X2Nsb3NlX2FsbCgpIGNhbGxlcnMK
-YjRiMjkzMTE2NiBqb2I6IE1vdmUgY29tcGxldGlvbiBhbmQgY2FuY2VsbGF0aW9uIHRvIEpvYgpm
-NDJjYjBiZTQxIGpvYjogTW92ZSB0cmFuc2FjdGlvbnMgdG8gSm9iCjAxYjlmZGIzOWEgam9iOiBT
-d2l0Y2ggdHJhbnNhY3Rpb25zIHRvIEpvYlR4bgo5NzM0N2NhZGU2IGpvYjogTW92ZSBqb2JfZmlu
-aXNoX3N5bmMoKSB0byBKb2IKNGEyOWU0YmZhOSBqb2I6IE1vdmUgLmNvbXBsZXRlIGNhbGxiYWNr
-IHRvIEpvYgozZTljYTljN2EzIGpvYjogQWRkIGpvYl9kcmFpbigpCmQ0M2NhOTMzYWEgam9iOiBD
-b252ZXJ0IGJsb2NrX2pvYl9jYW5jZWxfYXN5bmMoKSB0byBKb2IKODI1OTZiZGMwNCBqb2I6IE1v
-dmUgc2luZ2xlIGpvYiBmaW5hbGlzYXRpb24gdG8gSm9iCjEzNjQ1ODdlZjQgam9iOiBBZGQgam9i
-X2V2ZW50XyooKQpjMjFmM2U1NWI1IGJsb2Nram9iOiBTcGxpdCBibG9ja19qb2JfZXZlbnRfcGVu
-ZGluZygpCmU3YzMzYzQ1YTIgam9iOiBNb3ZlIEJsb2NrSm9iQ3JlYXRlRmxhZ3MgdG8gSm9iCmY5
-NTRhZTBkZjcgam9iOiBSZXBsYWNlIEJsb2NrSm9iLmNvbXBsZXRlZCB3aXRoIGpvYl9pc19jb21w
-bGV0ZWQoKQo0NmZmYjMzYTE5IGpvYjogTW92ZSBwYXVzZS9yZXN1bWUgZnVuY3Rpb25zIHRvIEpv
-YgplMGIwYzUwNDEyIGpvYjogQWRkIGpvYl9zbGVlcF9ucygpCjVkOThiZDhlMzQgam9iOiBNb3Zl
-IGNvcm91dGluZSBhbmQgcmVsYXRlZCBjb2RlIHRvIEpvYgpjNGFlZWY2MmNlIGpvYjogTW92ZSBk
-ZWZlcl90b19tYWluX2xvb3AgdG8gSm9iCjgwMTk4ODBkNzEgam9iOiBBZGQgSm9iLmFpb19jb250
-ZXh0CmQxOGIzYTI5ODUgam9iOiBNb3ZlIGNhbmNlbGxlZCB0byBKb2IKNWMyZjBlZGZmOCBqb2I6
-IEFkZCByZWZlcmVuY2UgY291bnRpbmcKOTE5NzNjMWQ3NSBqb2I6IE1vdmUgc3RhdGUgdHJhbnNp
-dGlvbnMgdG8gSm9iCmY0YWZjNDI5Zjkgam9iOiBNYWludGFpbiBhIGxpc3Qgb2YgYWxsIGpvYnMK
-NjcwMTA0NDkxZSBqb2I6IEFkZCBqb2JfZGVsZXRlKCkKNTAyMjY2OTJlYyBqb2I6IEFkZCBKb2JE
-cml2ZXIuam9iX3R5cGUKODVjMmUyYjk5ZCBqb2I6IFJlbmFtZSBCbG9ja0pvYlR5cGUgaW50byBK
-b2JUeXBlCmUyOGE0YTYyNWYgam9iOiBDcmVhdGUgSm9iLCBKb2JEcml2ZXIgYW5kIGpvYl9jcmVh
-dGUoKQo2ZTBiOWQ2MjZmIGJsb2Nram9iOiBJbXByb3ZlIEJsb2NrSm9iSW5mby5vZmZzZXQvbGVu
-IGRvY3VtZW50YXRpb24KNWViOTljNGUxOSBibG9ja2pvYjogVXBkYXRlIGJsb2NrLWpvYi1wYXVz
-ZS9yZXN1bWUgZG9jdW1lbnRhdGlvbgpiODk2MDljY2ZjIHFlbXUtaW90ZXN0czogUmVtb3ZlIE1J
-R19TT0NLRVQgZnJvbSBub24tbWlncmF0aW9uIHRlc3RzCjE5Y2YzOTQxNGMgcWVtdS1pb3Rlc3Rz
-OiBBZGQgbW9yZSB0ZXN0cyB0byAibWlncmF0aW9uIiBncm91cAowYmI2OWY1N2Q1IHNoZWVwZG9n
-OiBSZW1vdmUgdW5uZWNlc3NhcnkgTlVMTCBjaGVjayBpbiBzZF9wcmVhbGxvYygpCjg3NjU0YWQx
-OTcgcWVtdS1pb3Rlc3RzOiAwODYgZG9lc24ndCB3b3JrIHdpdGggTkZTCmQ3NzI4OTU0YTkgcWVt
-dS1pb3Rlc3RzOiBGaWx0ZXIgTkZTIHBhdGhzCmVmMzYwZjI0NjIgcWVtdS1pb3Rlc3RzOiBGaXgg
-cGF0aHMgZm9yIE5GUwoKPT09IE9VVFBVVCBCRUdJTiA9PT0KQ2hlY2tpbmcgUEFUQ0ggMS80Njog
-cWVtdS1pb3Rlc3RzOiBGaXggcGF0aHMgZm9yIE5GUy4uLgpDaGVja2luZyBQQVRDSCAyLzQ2OiBx
-ZW11LWlvdGVzdHM6IEZpbHRlciBORlMgcGF0aHMuLi4KQ2hlY2tpbmcgUEFUQ0ggMy80NjogcWVt
-dS1pb3Rlc3RzOiAwODYgZG9lc24ndCB3b3JrIHdpdGggTkZTLi4uCkNoZWNraW5nIFBBVENIIDQv
-NDY6IHNoZWVwZG9nOiBSZW1vdmUgdW5uZWNlc3NhcnkgTlVMTCBjaGVjayBpbiBzZF9wcmVhbGxv
-YygpLi4uCkNoZWNraW5nIFBBVENIIDUvNDY6IHFlbXUtaW90ZXN0czogQWRkIG1vcmUgdGVzdHMg
-dG8gIm1pZ3JhdGlvbiIgZ3JvdXAuLi4KQ2hlY2tpbmcgUEFUQ0ggNi80NjogcWVtdS1pb3Rlc3Rz
-OiBSZW1vdmUgTUlHX1NPQ0tFVCBmcm9tIG5vbi1taWdyYXRpb24gdGVzdHMuLi4KQ2hlY2tpbmcg
-UEFUQ0ggNy80NjogYmxvY2tqb2I6IFVwZGF0ZSBibG9jay1qb2ItcGF1c2UvcmVzdW1lIGRvY3Vt
-ZW50YXRpb24uLi4KQ2hlY2tpbmcgUEFUQ0ggOC80NjogYmxvY2tqb2I6IEltcHJvdmUgQmxvY2tK
-b2JJbmZvLm9mZnNldC9sZW4gZG9jdW1lbnRhdGlvbi4uLgpDaGVja2luZyBQQVRDSCA5LzQ2OiBq
-b2I6IENyZWF0ZSBKb2IsIEpvYkRyaXZlciBhbmQgam9iX2NyZWF0ZSgpLi4uCldBUk5JTkc6IGFk
-ZGVkLCBtb3ZlZCBvciBkZWxldGVkIGZpbGUocyksIGRvZXMgTUFJTlRBSU5FUlMgbmVlZCB1cGRh
-dGluZz8KIzM1MzogCm5ldyBmaWxlIG1vZGUgMTAwNjQ0Cgp0b3RhbDogMCBlcnJvcnMsIDEgd2Fy
-bmluZ3MsIDQyNCBsaW5lcyBjaGVja2VkCgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVtcywg
-cGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZl
-cyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRB
-SU5FUlMuCkNoZWNraW5nIFBBVENIIDEwLzQ2OiBqb2I6IFJlbmFtZSBCbG9ja0pvYlR5cGUgaW50
-byBKb2JUeXBlLi4uCkNoZWNraW5nIFBBVENIIDExLzQ2OiBqb2I6IEFkZCBKb2JEcml2ZXIuam9i
-X3R5cGUuLi4KQ2hlY2tpbmcgUEFUQ0ggMTIvNDY6IGpvYjogQWRkIGpvYl9kZWxldGUoKS4uLgpD
-aGVja2luZyBQQVRDSCAxMy80Njogam9iOiBNYWludGFpbiBhIGxpc3Qgb2YgYWxsIGpvYnMuLi4K
-Q2hlY2tpbmcgUEFUQ0ggMTQvNDY6IGpvYjogTW92ZSBzdGF0ZSB0cmFuc2l0aW9ucyB0byBKb2Iu
-Li4KRVJST1I6IHNwYWNlIHByb2hpYml0ZWQgYmVmb3JlIG9wZW4gc3F1YXJlIGJyYWNrZXQgJ1sn
-CiMzNDM6IEZJTEU6IGpvYi5jOjM4OgorICAgIC8qIFU6ICovIFtKT0JfU1RBVFVTX1VOREVGSU5F
-RF0gPSB7MCwgMSwgMCwgMCwgMCwgMCwgMCwgMCwgMCwgMCwgMH0sCgpFUlJPUjogc3BhY2UgcHJv
-aGliaXRlZCBiZWZvcmUgb3BlbiBzcXVhcmUgYnJhY2tldCAnWycKIzM0NDogRklMRTogam9iLmM6
-Mzk6CisgICAgLyogQzogKi8gW0pPQl9TVEFUVVNfQ1JFQVRFRF0gICA9IHswLCAwLCAxLCAwLCAw
-LCAwLCAwLCAwLCAxLCAwLCAxfSwKCkVSUk9SOiBzcGFjZSBwcm9oaWJpdGVkIGJlZm9yZSBvcGVu
-IHNxdWFyZSBicmFja2V0ICdbJwojMzQ1OiBGSUxFOiBqb2IuYzo0MDoKKyAgICAvKiBSOiAqLyBb
-Sk9CX1NUQVRVU19SVU5OSU5HXSAgID0gezAsIDAsIDAsIDEsIDEsIDAsIDEsIDAsIDEsIDAsIDB9
-LAoKRVJST1I6IHNwYWNlIHByb2hpYml0ZWQgYmVmb3JlIG9wZW4gc3F1YXJlIGJyYWNrZXQgJ1sn
-CiMzNDY6IEZJTEU6IGpvYi5jOjQxOgorICAgIC8qIFA6ICovIFtKT0JfU1RBVFVTX1BBVVNFRF0g
-ICAgPSB7MCwgMCwgMSwgMCwgMCwgMCwgMCwgMCwgMCwgMCwgMH0sCgpFUlJPUjogc3BhY2UgcHJv
-aGliaXRlZCBiZWZvcmUgb3BlbiBzcXVhcmUgYnJhY2tldCAnWycKIzM0NzogRklMRTogam9iLmM6
-NDI6CisgICAgLyogWTogKi8gW0pPQl9TVEFUVVNfUkVBRFldICAgICA9IHswLCAwLCAwLCAwLCAw
-LCAxLCAxLCAwLCAxLCAwLCAwfSwKCkVSUk9SOiBzcGFjZSBwcm9oaWJpdGVkIGJlZm9yZSBvcGVu
-IHNxdWFyZSBicmFja2V0ICdbJwojMzQ4OiBGSUxFOiBqb2IuYzo0MzoKKyAgICAvKiBTOiAqLyBb
-Sk9CX1NUQVRVU19TVEFOREJZXSAgID0gezAsIDAsIDAsIDAsIDEsIDAsIDAsIDAsIDAsIDAsIDB9
-LAoKRVJST1I6IHNwYWNlIHByb2hpYml0ZWQgYmVmb3JlIG9wZW4gc3F1YXJlIGJyYWNrZXQgJ1sn
-CiMzNDk6IEZJTEU6IGpvYi5jOjQ0OgorICAgIC8qIFc6ICovIFtKT0JfU1RBVFVTX1dBSVRJTkdd
-ICAgPSB7MCwgMCwgMCwgMCwgMCwgMCwgMCwgMSwgMSwgMCwgMH0sCgpFUlJPUjogc3BhY2UgcHJv
-aGliaXRlZCBiZWZvcmUgb3BlbiBzcXVhcmUgYnJhY2tldCAnWycKIzM1MDogRklMRTogam9iLmM6
-NDU6CisgICAgLyogRDogKi8gW0pPQl9TVEFUVVNfUEVORElOR10gICA9IHswLCAwLCAwLCAwLCAw
-LCAwLCAwLCAwLCAxLCAxLCAwfSwKCkVSUk9SOiBzcGFjZSBwcm9oaWJpdGVkIGJlZm9yZSBvcGVu
-IHNxdWFyZSBicmFja2V0ICdbJwojMzUxOiBGSUxFOiBqb2IuYzo0NjoKKyAgICAvKiBYOiAqLyBb
-Sk9CX1NUQVRVU19BQk9SVElOR10gID0gezAsIDAsIDAsIDAsIDAsIDAsIDAsIDAsIDEsIDEsIDB9
-LAoKRVJST1I6IHNwYWNlIHByb2hpYml0ZWQgYmVmb3JlIG9wZW4gc3F1YXJlIGJyYWNrZXQgJ1sn
-CiMzNTI6IEZJTEU6IGpvYi5jOjQ3OgorICAgIC8qIEU6ICovIFtKT0JfU1RBVFVTX0NPTkNMVURF
-RF0gPSB7MCwgMCwgMCwgMCwgMCwgMCwgMCwgMCwgMCwgMCwgMX0sCgpFUlJPUjogc3BhY2UgcHJv
-aGliaXRlZCBiZWZvcmUgb3BlbiBzcXVhcmUgYnJhY2tldCAnWycKIzM1MzogRklMRTogam9iLmM6
-NDg6CisgICAgLyogTjogKi8gW0pPQl9TVEFUVVNfTlVMTF0gICAgICA9IHswLCAwLCAwLCAwLCAw
-LCAwLCAwLCAwLCAwLCAwLCAwfSwKCnRvdGFsOiAxMSBlcnJvcnMsIDAgd2FybmluZ3MsIDUyOCBs
-aW5lcyBjaGVja2VkCgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmll
-dy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhl
-bSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgpDaGVj
-a2luZyBQQVRDSCAxNS80Njogam9iOiBBZGQgcmVmZXJlbmNlIGNvdW50aW5nLi4uCkNoZWNraW5n
-IFBBVENIIDE2LzQ2OiBqb2I6IE1vdmUgY2FuY2VsbGVkIHRvIEpvYi4uLgpDaGVja2luZyBQQVRD
-SCAxNy80Njogam9iOiBBZGQgSm9iLmFpb19jb250ZXh0Li4uCkNoZWNraW5nIFBBVENIIDE4LzQ2
-OiBqb2I6IE1vdmUgZGVmZXJfdG9fbWFpbl9sb29wIHRvIEpvYi4uLgpDaGVja2luZyBQQVRDSCAx
-OS80Njogam9iOiBNb3ZlIGNvcm91dGluZSBhbmQgcmVsYXRlZCBjb2RlIHRvIEpvYi4uLgpDaGVj
-a2luZyBQQVRDSCAyMC80Njogam9iOiBBZGQgam9iX3NsZWVwX25zKCkuLi4KQ2hlY2tpbmcgUEFU
-Q0ggMjEvNDY6IGpvYjogTW92ZSBwYXVzZS9yZXN1bWUgZnVuY3Rpb25zIHRvIEpvYi4uLgpDaGVj
-a2luZyBQQVRDSCAyMi80Njogam9iOiBSZXBsYWNlIEJsb2NrSm9iLmNvbXBsZXRlZCB3aXRoIGpv
-Yl9pc19jb21wbGV0ZWQoKS4uLgpDaGVja2luZyBQQVRDSCAyMy80Njogam9iOiBNb3ZlIEJsb2Nr
-Sm9iQ3JlYXRlRmxhZ3MgdG8gSm9iLi4uCkNoZWNraW5nIFBBVENIIDI0LzQ2OiBibG9ja2pvYjog
-U3BsaXQgYmxvY2tfam9iX2V2ZW50X3BlbmRpbmcoKS4uLgpDaGVja2luZyBQQVRDSCAyNS80Njog
-am9iOiBBZGQgam9iX2V2ZW50XyooKS4uLgpDaGVja2luZyBQQVRDSCAyNi80Njogam9iOiBNb3Zl
-IHNpbmdsZSBqb2IgZmluYWxpc2F0aW9uIHRvIEpvYi4uLgpXQVJOSU5HOiBsaW5lIG92ZXIgODAg
-Y2hhcmFjdGVycwojNTA4OiBGSUxFOiBpbmNsdWRlL3FlbXUvam9iLmg6MjIxOgorICAgICAgICAg
-ICAgICAgICBpbnQgZmxhZ3MsIEJsb2NrQ29tcGxldGlvbkZ1bmMgKmNiLCB2b2lkICpvcGFxdWUs
-IEVycm9yICoqZXJycCk7CgpFUlJPUjogIihmb28qKSIgc2hvdWxkIGJlICIoZm9vICopIgojNTc4
-OiBGSUxFOiBqb2IuYzo0NjI6CisgICAgYmxvY2tfam9iX3R4bl9kZWxfam9iKChCbG9ja0pvYiop
-IGpvYik7CgpFUlJPUjogIihmb28qKSIgc2hvdWxkIGJlICIoZm9vICopIgojNjU5OiBGSUxFOiBq
-b2IuYzo1NDM6CisgICAgYmxvY2tfam9iX3R4bl9kZWxfam9iKChCbG9ja0pvYiopIGpvYik7Cgp0
-b3RhbDogMiBlcnJvcnMsIDEgd2FybmluZ3MsIDYyMCBsaW5lcyBjaGVja2VkCgpZb3VyIHBhdGNo
-IGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJv
-cnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2Vl
-CkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgpDaGVja2luZyBQQVRDSCAyNy80Njogam9iOiBD
-b252ZXJ0IGJsb2NrX2pvYl9jYW5jZWxfYXN5bmMoKSB0byBKb2IuLi4KQ2hlY2tpbmcgUEFUQ0gg
-MjgvNDY6IGpvYjogQWRkIGpvYl9kcmFpbigpLi4uCkNoZWNraW5nIFBBVENIIDI5LzQ2OiBqb2I6
-IE1vdmUgLmNvbXBsZXRlIGNhbGxiYWNrIHRvIEpvYi4uLgpDaGVja2luZyBQQVRDSCAzMC80Njog
-am9iOiBNb3ZlIGpvYl9maW5pc2hfc3luYygpIHRvIEpvYi4uLgpXQVJOSU5HOiBsaW5lIG92ZXIg
-ODAgY2hhcmFjdGVycwojMTM5OiBGSUxFOiBpbmNsdWRlL3FlbXUvam9iLmg6Mzk5OgoraW50IGpv
-Yl9maW5pc2hfc3luYyhKb2IgKmpvYiwgdm9pZCAoKmZpbmlzaCkoSm9iICosIEVycm9yICoqZXJy
-cCksIEVycm9yICoqZXJycCk7Cgp0b3RhbDogMCBlcnJvcnMsIDEgd2FybmluZ3MsIDE0NCBsaW5l
-cyBjaGVja2VkCgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4g
-IElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0
-byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCkNoZWNraW5n
-IFBBVENIIDMxLzQ2OiBqb2I6IFN3aXRjaCB0cmFuc2FjdGlvbnMgdG8gSm9iVHhuLi4uCkNoZWNr
-aW5nIFBBVENIIDMyLzQ2OiBqb2I6IE1vdmUgdHJhbnNhY3Rpb25zIHRvIEpvYi4uLgpDaGVja2lu
-ZyBQQVRDSCAzMy80Njogam9iOiBNb3ZlIGNvbXBsZXRpb24gYW5kIGNhbmNlbGxhdGlvbiB0byBK
-b2IuLi4KQ2hlY2tpbmcgUEFUQ0ggMzQvNDY6IGJsb2NrOiBDYW5jZWwgam9iIGluIGJkcnZfY2xv
-c2VfYWxsKCkgY2FsbGVycy4uLgpDaGVja2luZyBQQVRDSCAzNS80Njogam9iOiBBZGQgam9iX3lp
-ZWxkKCkuLi4KQ2hlY2tpbmcgUEFUQ0ggMzYvNDY6IGpvYjogQWRkIGpvYl9kaXNtaXNzKCkuLi4K
-Q2hlY2tpbmcgUEFUQ0ggMzcvNDY6IGpvYjogQWRkIGpvYl9pc19yZWFkeSgpLi4uCkNoZWNraW5n
-IFBBVENIIDM4LzQ2OiBqb2I6IEFkZCBqb2JfdHJhbnNpdGlvbl90b19yZWFkeSgpLi4uCkNoZWNr
-aW5nIFBBVENIIDM5LzQ2OiBqb2I6IE1vdmUgcHJvZ3Jlc3MgZmllbGRzIHRvIEpvYi4uLgpDaGVj
-a2luZyBQQVRDSCA0MC80Njogam9iOiBJbnRyb2R1Y2UgcWFwaS9qb2IuanNvbi4uLgpXQVJOSU5H
-OiBhZGRlZCwgbW92ZWQgb3IgZGVsZXRlZCBmaWxlKHMpLCBkb2VzIE1BSU5UQUlORVJTIG5lZWQg
-dXBkYXRpbmc/CiMyNDg6IApuZXcgZmlsZSBtb2RlIDEwMDY0NAoKdG90YWw6IDAgZXJyb3JzLCAx
-IHdhcm5pbmdzLCAzMDEgbGluZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxl
-bXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3Np
-dGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1B
-SU5UQUlORVJTLgpDaGVja2luZyBQQVRDSCA0MS80Njogam9iOiBBZGQgSk9CX1NUQVRVU19DSEFO
-R0UgUU1QIGV2ZW50Li4uCkNoZWNraW5nIFBBVENIIDQyLzQ2OiBqb2I6IEFkZCBsaWZlY3ljbGUg
-UU1QIGNvbW1hbmRzLi4uCldBUk5JTkc6IGFkZGVkLCBtb3ZlZCBvciBkZWxldGVkIGZpbGUocyks
-IGRvZXMgTUFJTlRBSU5FUlMgbmVlZCB1cGRhdGluZz8KIzM3OiAKbmV3IGZpbGUgbW9kZSAxMDA2
-NDQKCnRvdGFsOiAwIGVycm9ycywgMSB3YXJuaW5ncywgMjY1IGxpbmVzIGNoZWNrZWQKCllvdXIg
-cGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNl
-IGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVy
-LCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KQ2hlY2tpbmcgUEFUQ0ggNDMvNDY6IGpv
-YjogQWRkIHF1ZXJ5LWpvYnMgUU1QIGNvbW1hbmQuLi4KQ2hlY2tpbmcgUEFUQ0ggNDQvNDY6IGJs
-b2Nram9iOiBSZW1vdmUgQmxvY2tKb2IuZHJpdmVyLi4uCkVSUk9SOiBpbml0aWFsaXplciBmb3Ig
-c3RydWN0IEJsb2NrSm9iRHJpdmVyIHNob3VsZCBub3JtYWxseSBiZSBjb25zdAojMjE6IEZJTEU6
-IGJsb2Nram9iLmM6MTA3OgorICAgIEJsb2NrSm9iRHJpdmVyICpiamRydiA9IGNvbnRhaW5lcl9v
-ZihkcnYsIEJsb2NrSm9iRHJpdmVyLCBqb2JfZHJpdmVyKTsKCkVSUk9SOiBpbml0aWFsaXplciBm
-b3Igc3RydWN0IEJsb2NrSm9iRHJpdmVyIHNob3VsZCBub3JtYWxseSBiZSBjb25zdAojMzY6IEZJ
-TEU6IGJsb2Nram9iLmM6MTIxOgorICAgIEJsb2NrSm9iRHJpdmVyICpiamRydiA9IGNvbnRhaW5l
-cl9vZihkcnYsIEJsb2NrSm9iRHJpdmVyLCBqb2JfZHJpdmVyKTsKCnRvdGFsOiAyIGVycm9ycywg
-MCB3YXJuaW5ncywgNTQgbGluZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxl
-bXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3Np
-dGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1B
-SU5UQUlORVJTLgoKQ2hlY2tpbmcgUEFUQ0ggNDUvNDY6IGlvdGVzdHM6IE1vdmUgcW1wX3RvX29w
-dHMoKSB0byBWTS4uLgpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwojMTA5OiBGSUxF
-OiB0ZXN0cy9xZW11LWlvdGVzdHMvaW90ZXN0cy5weTo0NDg6CisgICAgICAgIHNlbGYuYXNzZXJ0
-RXF1YWwoc2VsZi52bS5mbGF0dGVuX3FtcF9vYmplY3QoanNvbi5sb2Fkcyhqc29uX2ZpbGVuYW1l
-WzU6XSkpLAoKdG90YWw6IDAgZXJyb3JzLCAxIHdhcm5pbmdzLCA4MyBsaW5lcyBjaGVja2VkCgpZ
-b3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0
-aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRh
-aW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCkNoZWNraW5nIFBBVENIIDQ2LzQ2
-OiBxZW11LWlvdGVzdHM6IFRlc3Qgam9iLSogd2l0aCBibG9jayBqb2JzLi4uCldBUk5JTkc6IGFk
-ZGVkLCBtb3ZlZCBvciBkZWxldGVkIGZpbGUocyksIGRvZXMgTUFJTlRBSU5FUlMgbmVlZCB1cGRh
-dGluZz8KIzEzOiAKbmV3IGZpbGUgbW9kZSAxMDA3NTUKCnRvdGFsOiAwIGVycm9ycywgMSB3YXJu
-aW5ncywgNTQwIGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBw
-bGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVz
-IHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJ
-TkVSUy4KPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTog
-MQoKCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwOi8v
-cGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVs
-QHJlZGhhdC5jb20=
+On Thu, May 24, 2018 at 07:21:01AM +0800, Tiwei Bie wrote:
+> On Wed, May 23, 2018 at 06:43:29PM +0300, Michael S. Tsirkin wrote:
+> > On Wed, May 23, 2018 at 06:36:05PM +0300, Michael S. Tsirkin wrote:
+> > > On Wed, May 23, 2018 at 04:44:51PM +0300, Michael S. Tsirkin wrote:
+> > > > On Thu, Apr 12, 2018 at 11:12:28PM +0800, Tiwei Bie wrote:
+> > > > > When multi queue is enabled e.g. for a virtio-net device,
+> > > > > each queue pair will have a vhost_dev, and the only thing
+> > > > > shared between vhost devs currently is the chardev. This
+> > > > > patch introduces a vhost-user state structure which will
+> > > > > be shared by all vhost devs of the same virtio device.
+> > > > > 
+> > > > > Signed-off-by: Tiwei Bie <tiwei.bie@intel.com>
+> > > > 
+> > > > Unfortunately this patch seems to cause crashes.
+> > > > To reproduce, simply run
+> > > > make check-qtest-x86_64
+> > > > 
+> > > > Sorry that it took me a while to find - it triggers 90% of runs but not
+> > > > 100% which complicates bisection somewhat.
+> 
+> It's my fault to not notice this bug before.
+> I'm very sorry. Thank you so much for finding
+> the root cause!
+> 
+> > > > 
+> > > > > ---
+> > > > >  backends/cryptodev-vhost-user.c     | 20 ++++++++++++++++++-
+> > > > >  hw/block/vhost-user-blk.c           | 22 +++++++++++++++++++-
+> > > > >  hw/scsi/vhost-user-scsi.c           | 20 ++++++++++++++++++-
+> > > > >  hw/virtio/Makefile.objs             |  2 +-
+> > > > >  hw/virtio/vhost-stub.c              | 10 ++++++++++
+> > > > >  hw/virtio/vhost-user.c              | 31 +++++++++++++++++++---------
+> > > > >  include/hw/virtio/vhost-user-blk.h  |  2 ++
+> > > > >  include/hw/virtio/vhost-user-scsi.h |  2 ++
+> > > > >  include/hw/virtio/vhost-user.h      | 20 +++++++++++++++++++
+> > > > >  net/vhost-user.c                    | 40 ++++++++++++++++++++++++++++++-------
+> > > > >  10 files changed, 149 insertions(+), 20 deletions(-)
+> > > > >  create mode 100644 include/hw/virtio/vhost-user.h
+> [...]
+> > > > >          qemu_chr_fe_set_handlers(&s->chr, NULL, NULL,
+> > > > >                                   net_vhost_user_event, NULL, nc0->name, NULL,
+> > > > > @@ -319,6 +336,15 @@ static int net_vhost_user_init(NetClientState *peer, const char *device,
+> > > > >      assert(s->vhost_net);
+> > > > >  
+> > > > >      return 0;
+> > > > > +
+> > > > > +err:
+> > > > > +    if (user) {
+> > > > > +        vhost_user_cleanup(user);
+> > > > > +        g_free(user);
+> > > > > +        s->vhost_user = NULL;
+> > > > > +    }
+> > > > > +
+> > > > > +    return -1;
+> > > > >  }
+> > > > >  
+> > > > >  static Chardev *net_vhost_claim_chardev(
+> > > > > -- 
+> > > > > 2.11.0
+> > > 
+> > > So far I figured out that commenting the free of
+> > > the structure removes the crash, so we seem to
+> > > be dealing with a use-after free here.
+> > > I suspect that in a MQ situation, one queue gets
+> > > closed and attempts to free the structure
+> > > while others still use it.
+> > > 
+> > > diff --git a/net/vhost-user.c b/net/vhost-user.c
+> > > index 525a061..6a1573b 100644
+> > > --- a/net/vhost-user.c
+> > > +++ b/net/vhost-user.c
+> > > @@ -157,8 +157,8 @@ static void net_vhost_user_cleanup(NetClientState *nc)
+> > >          s->vhost_net = NULL;
+> > >      }
+> > >      if (s->vhost_user) {
+> > > -        vhost_user_cleanup(s->vhost_user);
+> > > -        g_free(s->vhost_user);
+> > > +        //vhost_user_cleanup(s->vhost_user);
+> > > +        //g_free(s->vhost_user);
+> > >          s->vhost_user = NULL;
+> > >      }
+> > >      if (nc->queue_index == 0) {
+> > > @@ -339,8 +339,8 @@ static int net_vhost_user_init(NetClientState *peer, const char *device,
+> > >  
+> > >  err:
+> > >      if (user) {
+> > > -        vhost_user_cleanup(user);
+> > > -        g_free(user);
+> > > +        //vhost_user_cleanup(user);
+> > > +        //g_free(user);
+> > >          s->vhost_user = NULL;
+> > >      }
+> > >  
+> > 
+> > 
+> > So the following at least gets rid of the crashes.
+> > I am not sure it does not leak memory though,
+> > and not sure there aren't any configurations where
+> > the 1st queue gets cleaned up first.
+> > 
+> > Thoughts?
+> 
+> Thank you so much for catching it and fixing
+> it! I'll keep your SoB there. Thank you so
+> much! I do appreciate it!
+> 
+> You are right. This structure is freed multiple
+> times when multi-queue is enabled.
+
+After a deeper digging, I got your point now..
+It could be a use-after-free instead of a double
+free.. As it's safe to deinit the char which is
+shared by all queue pairs when cleanup the 1st
+queue pair, it should be safe to free vhost-user
+structure there too.
+
+> 
+> I think it's safe to let the first queue pair
+> free the vhost-user structure, because it won't
+> be touched by other queue pairs during cleanup.
+> 
+> Best regards,
+> Tiwei Bie
+> 
+> 
+> > 
+> > Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+> > 
+> > ---
+> > 
+> > diff --git a/net/vhost-user.c b/net/vhost-user.c
+> > index 525a061..7549d25 100644
+> > --- a/net/vhost-user.c
+> > +++ b/net/vhost-user.c
+> > @@ -156,19 +156,20 @@ static void net_vhost_user_cleanup(NetClientState *nc)
+> >          g_free(s->vhost_net);
+> >          s->vhost_net = NULL;
+> >      }
+> > -    if (s->vhost_user) {
+> > -        vhost_user_cleanup(s->vhost_user);
+> > -        g_free(s->vhost_user);
+> > -        s->vhost_user = NULL;
+> > -    }
+> >      if (nc->queue_index == 0) {
+> >          if (s->watch) {
+> >              g_source_remove(s->watch);
+> >              s->watch = 0;
+> >          }
+> >          qemu_chr_fe_deinit(&s->chr, true);
+> > +        if (s->vhost_user) {
+> > +            vhost_user_cleanup(s->vhost_user);
+> > +            g_free(s->vhost_user);
+> > +        }
+> >      }
+> >  
+> > +    s->vhost_user = NULL;
+
+Maybe we should move above line, like:
+
+     if (nc->queue_index == 0) {
+         if (s->watch) {
+             g_source_remove(s->watch);
+             s->watch = 0;
+         }
+         qemu_chr_fe_deinit(&s->chr, true);
++        if (s->vhost_user) {
++            vhost_user_cleanup(s->vhost_user);
++            g_free(s->vhost_user);
++            s->vhost_user = NULL;
++        }
+     }
+
+otherwise s->vhost_user may not be freed.
+
+> > +
+> >      qemu_purge_queued_packets(nc);
+> >  }
+> >  
+> > @@ -341,7 +342,6 @@ err:
+> >      if (user) {
+> >          vhost_user_cleanup(user);
+> >          g_free(user);
+> > -        s->vhost_user = NULL;
+
+I don't get why cannot zero it in this case.
+
+> >      }
+> >  
+> >      return -1;
+
+Best regards,
+Tiwei Bie
