@@ -1,21 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40354)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40493)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1fLlc3-00053T-OI
-	for qemu-devel@nongnu.org; Thu, 24 May 2018 04:28:44 -0400
+	(envelope-from <armbru@redhat.com>) id 1fLlcp-0005TS-OQ
+	for qemu-devel@nongnu.org; Thu, 24 May 2018 04:29:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1fLlc0-00066f-HS
-	for qemu-devel@nongnu.org; Thu, 24 May 2018 04:28:43 -0400
-Date: Thu, 24 May 2018 16:28:25 +0800
-From: Fam Zheng <famz@redhat.com>
-Message-ID: <20180524082825.GB12594@lemon.usersys.redhat.com>
-References: <20180523030436.29097-1-famz@redhat.com>
-	<20180523030436.29097-3-famz@redhat.com>
-	<f2c6a98f-693b-8d60-3df5-fe0056c0b712@redhat.com>
+	(envelope-from <armbru@redhat.com>) id 1fLlcm-0006Un-He
+	for qemu-devel@nongnu.org; Thu, 24 May 2018 04:29:31 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:47628 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fLlcm-0006Ud-DV
+	for qemu-devel@nongnu.org; Thu, 24 May 2018 04:29:28 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.3])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id F3EA9805A52F
+	for <qemu-devel@nongnu.org>; Thu, 24 May 2018 08:29:27 +0000 (UTC)
+From: Markus Armbruster <armbru@redhat.com>
+References: <20180524043952.11245-1-peterx@redhat.com>
+	<20180524043952.11245-2-peterx@redhat.com>
+Date: Thu, 24 May 2018 10:29:20 +0200
+In-Reply-To: <20180524043952.11245-2-peterx@redhat.com> (Peter Xu's message of
+	"Thu, 24 May 2018 12:39:49 +0800")
+Message-ID: <877ent8nj3.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <f2c6a98f-693b-8d60-3df5-fe0056c0b712@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v5 02/10] raw: Check byte range uniformly
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v7 1/4] monitor: rename out_lock to mon_lock
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,88 +33,22 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Ronnie Sahlberg <ronniesahlberg@gmail.com>, qemu-block@nongnu.org, Peter Lieven <pl@kamp.de>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
+To: Peter Xu <peterx@redhat.com>
+Cc: qemu-devel@nongnu.org, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
 
-On Wed, 05/23 13:28, Eric Blake wrote:
-> On 05/22/2018 10:04 PM, Fam Zheng wrote:
-> > We don't verify the request range against s->size in the I/O callbacks
-> > except for raw_co_pwritev. This is wrong (especially for
-> > raw_co_pwrite_zeroes and raw_co_pdiscard), so fix them.
-> 
-> I'd also mention ...
-> 
-> > 
-> > Signed-off-by: Fam Zheng <famz@redhat.com>
-> > ---
-> >   block/raw-format.c | 64 +++++++++++++++++++++++++++++++++---------------------
-> >   1 file changed, 39 insertions(+), 25 deletions(-)
-> 
-> Should this cc: qemu-stable?
-> 
-> Do we have iotests coverage of this?
+Peter Xu <peterx@redhat.com> writes:
 
-No for both questions.
+> The out_lock is protecting a few Monitor fields.  In the future the
+> monitor code will start to run in multiple threads.  We are going to
+> turn it into a bigger lock to protect not only the out buffer but also
+> all the rest.
 
-This is not reachable from the user interface. In that sense "wrong" is not
-accurate in the commit message, "inconsistent" or "confusing" might be more
-appropriate.
+Hmm, not sure about "all the rest": PATCH 3 marks a member as not
+needing protection.  Shall I change this to "most of the rest" when I
+apply?
 
-Out of range requests can only reach us if blk_set_allow_write_beyond_eof(blk,
-true) was called, which can only happen when creating image, where the I/O are
-all generated internally.
-
-So there is no behavior change in this patch. But verifying and returning error
-is still better than asserting, IMO, since we don't want to assert how block
-layer uses the driver callbacks. I'll tweak the commit message.
-
-> 
-> > 
-> > diff --git a/block/raw-format.c b/block/raw-format.c
-> > index fe33693a2d..b69a0674b3 100644
-> > --- a/block/raw-format.c
-> > +++ b/block/raw-format.c
-> > @@ -167,16 +167,37 @@ static void raw_reopen_abort(BDRVReopenState *state)
-> >       state->opaque = NULL;
-> >   }
-> > +/* Check and adjust the offset, against 'offset' and 'size' options. */
-> > +static inline int raw_adjust_offset(BlockDriverState *bs, uint64_t *offset,
-> > +                                    uint64_t bytes, bool is_write)
-> > +{
-> > +    BDRVRawState *s = bs->opaque;
-> > +
-> > +    if (s->has_size && (*offset > s->size || bytes > (s->size - *offset))) {
-> > +        /* There's not enough space for the write, or the read request is
-> > +         * out-of-range. Don't read/write anything to prevent leaking out of
-> > +         * the size specified in options. */
-> > +        return is_write ? -ENOSPC : -EINVAL;;
-> > +    }
-> > +
-> > +    if (*offset > INT64_MAX - s->offset) {
-> > +        return -EINVAL;
-> 
-> ...that this change to a 63-bit check...
-> 
-> > @@ -186,23 +207,11 @@ static int coroutine_fn raw_co_pwritev(BlockDriverState *bs, uint64_t offset,
-> 
-> > -    if (offset > UINT64_MAX - s->offset) {
-> > -        ret = -EINVAL;
-> > -        goto fail;
-> > -    }
-> 
-> ...from a previous 64-bit check is intentional.
-
-OK!
-
-> 
-> With improved commit message, and ideally with followup commits that add
-> iotest coverage,
-> 
-> Reviewed-by: Eric Blake <eblake@redhat.com>
-> 
-> -- 
-> Eric Blake, Principal Software Engineer
-> Red Hat, Inc.           +1-919-301-3266
-> Virtualization:  qemu.org | libvirt.org
-
-Fam
+>
+> Since at it, rearrange the Monitor struct a bit.
+>
+> Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+> Signed-off-by: Peter Xu <peterx@redhat.com>
