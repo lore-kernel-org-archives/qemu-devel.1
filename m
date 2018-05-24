@@ -1,25 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49828)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50129)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1fLmGC-0005cI-B7
-	for qemu-devel@nongnu.org; Thu, 24 May 2018 05:10:19 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1fLmHU-0006Im-F2
+	for qemu-devel@nongnu.org; Thu, 24 May 2018 05:11:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1fLmG2-0000J5-R9
-	for qemu-devel@nongnu.org; Thu, 24 May 2018 05:10:12 -0400
-Received: from 10.mo69.mail-out.ovh.net ([46.105.73.241]:46538)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1fLmG2-0000I5-G0
-	for qemu-devel@nongnu.org; Thu, 24 May 2018 05:10:02 -0400
-Received: from player791.ha.ovh.net (unknown [10.109.120.34])
-	by mo69.mail-out.ovh.net (Postfix) with ESMTP id 62F7D16BBF
-	for <qemu-devel@nongnu.org>; Thu, 24 May 2018 11:09:59 +0200 (CEST)
-From: Greg Kurz <groug@kaod.org>
-Date: Thu, 24 May 2018 11:09:47 +0200
-Message-ID: <152715298769.397287.11782572103987618822.stgit@bahia>
+	(envelope-from <peter.maydell@linaro.org>) id 1fLmHP-0001PJ-TG
+	for qemu-devel@nongnu.org; Thu, 24 May 2018 05:11:32 -0400
+Received: from mail-ot0-x241.google.com ([2607:f8b0:4003:c0f::241]:36149)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1fLmHP-0001Oj-PA
+	for qemu-devel@nongnu.org; Thu, 24 May 2018 05:11:27 -0400
+Received: by mail-ot0-x241.google.com with SMTP id m11-v6so1069771otf.3
+	for <qemu-devel@nongnu.org>; Thu, 24 May 2018 02:11:27 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] [PATCH v2] block: fix QEMU crash with scsi-hd and
- drive_del
+In-Reply-To: <22c4e504-a7b4-e6dd-b2cc-618d306b6f0c@redhat.com>
+References: <1527091418-11874-1-git-send-email-eric.auger@redhat.com>
+	<ec6bc0b3-5f0b-bf0c-7d9b-0382e114ee9e@redhat.com>
+	<bf99311a-823d-34e8-1892-be27534afc32@redhat.com>
+	<22c4e504-a7b4-e6dd-b2cc-618d306b6f0c@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 24 May 2018 10:11:06 +0100
+Message-ID: <CAFEAcA9LMV_-vVAwUkuY=uw2Gf6XLvsgmi8y0PgHPJnQZkWC0w@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [RFC 0/2] ARM virt: Support up to 256 PCIe buses
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,81 +31,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, stable@vger.kernel.org
+To: Laszlo Ersek <lersek@redhat.com>
+Cc: Auger Eric <eric.auger@redhat.com>, Eric Auger <eric.auger.pro@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Wei Huang <wei@redhat.com>, Andrew Jones <drjones@redhat.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Shannon Zhao <zhaoshenglong@huawei.com>
 
-Removing a drive with drive_del while it is being used to run an I/O
-intensive workload can cause QEMU to crash.
+On 23 May 2018 at 21:52, Laszlo Ersek <lersek@redhat.com> wrote:
+> On 05/23/18 22:40, Auger Eric wrote:
+>> On 05/23/2018 07:45 PM, Laszlo Ersek wrote:
+>
+>>> Regarding the second patch, I do believe we need "more sophistication"
+>>> there. For example, I guess it could be possible to distinguish "-cpu
+>>> cortex-a15" from "-cpu cortex-a57" somehow, and stick with the low/small
+>>> ECAM in the former case. (The 32-bit firmware already runs on cortex-a15
+>>> only, and not on cortex-a57, according to my testing.)
+>>
+>> So we should detect we are in ACPI boot  + aarch32 mode to force legacy
+>> ECAM region, right?
+>
+> Agree about the aarch32 subcondition.
+>
+> However, "ACPI vs. DT" is not the right "other" subcondition here;
+> instead we should (minimally) check "firmware vs. no firmware". See the
+> "firmware_loaded" boolean field.
 
-An AIO flush can yield at some point:
+Won't it also break a guest which is just Linux loaded not via
+firmware which is an aarch32 kernel without LPAE support?
 
-blk_aio_flush_entry()
- blk_co_flush(blk)
-  bdrv_co_flush(blk->root->bs)
-   ...
-    qemu_coroutine_yield()
-
-and let the HMP command to run, free blk->root and give control
-back to the AIO flush:
-
-    hmp_drive_del()
-     blk_remove_bs()
-      bdrv_root_unref_child(blk->root)
-       child_bs = blk->root->bs
-       bdrv_detach_child(blk->root)
-        bdrv_replace_child(blk->root, NULL)
-         blk->root->bs = NULL
-        g_free(blk->root) <============== blk->root becomes stale
-       bdrv_unref(child_bs)
-        bdrv_delete(child_bs)
-         bdrv_close()
-          bdrv_drained_begin()
-           bdrv_do_drained_begin()
-            bdrv_drain_recurse()
-             aio_poll()
-              ...
-              qemu_coroutine_switch()
-
-and the AIO flush completion ends up dereferencing blk->root:
-
-  blk_aio_complete()
-   scsi_aio_complete()
-    blk_get_aio_context(blk)
-     bs = blk_bs(blk)
- ie, bs = blk->root ? blk->root->bs : NULL
-            ^^^^^
-            stale
-
-The problem is that we should avoid making block driver graph
-changes while we have in-flight requests. This patch hence adds
-a drained section to bdrv_detach_child(), so that we're sure
-all requests have been drained when blk->root is freed.
-
-Signed-off-by: Greg Kurz <groug@kaod.org>
----
-v2: - drain I/O requests when detaching the BDS (Stefan, Paolo)
----
- block.c |    4 ++++
- 1 file changed, 4 insertions(+)
-
-diff --git a/block.c b/block.c
-index 676e57f5623a..fc9379439883 100644
---- a/block.c
-+++ b/block.c
-@@ -2127,12 +2127,16 @@ BdrvChild *bdrv_attach_child(BlockDriverState *parent_bs,
- 
- static void bdrv_detach_child(BdrvChild *child)
- {
-+    BlockDriverState *child_bs = child->bs;
-+
-     if (child->next.le_prev) {
-         QLIST_REMOVE(child, next);
-         child->next.le_prev = NULL;
-     }
- 
-+    bdrv_drained_begin(child_bs);
-     bdrv_replace_child(child, NULL);
-+    bdrv_drained_end(child_bs);
- 
-     g_free(child->name);
-     g_free(child);
+thanks
+-- PMM
