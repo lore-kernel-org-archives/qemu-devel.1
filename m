@@ -1,47 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52127)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52365)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pasic@linux.ibm.com>) id 1fLsOA-0006L9-Eo
-	for qemu-devel@nongnu.org; Thu, 24 May 2018 11:42:51 -0400
+	(envelope-from <Babu.Moger@amd.com>) id 1fLsPB-00070B-S7
+	for qemu-devel@nongnu.org; Thu, 24 May 2018 11:43:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pasic@linux.ibm.com>) id 1fLsO6-0001jy-IN
-	for qemu-devel@nongnu.org; Thu, 24 May 2018 11:42:50 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:56510)
+	(envelope-from <Babu.Moger@amd.com>) id 1fLsP7-00024n-V2
+	for qemu-devel@nongnu.org; Thu, 24 May 2018 11:43:53 -0400
+Received: from mail-bl2nam02on0085.outbound.protection.outlook.com
+	([104.47.38.85]:47363
+	helo=NAM02-BL2-obe.outbound.protection.outlook.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pasic@linux.ibm.com>) id 1fLsO6-0001jQ-9I
-	for qemu-devel@nongnu.org; Thu, 24 May 2018 11:42:46 -0400
-Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w4OFYXFv014146
-	for <qemu-devel@nongnu.org>; Thu, 24 May 2018 11:42:45 -0400
-Received: from e06smtp11.uk.ibm.com (e06smtp11.uk.ibm.com [195.75.94.107])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2j5xq2nd2c-1
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Thu, 24 May 2018 11:42:44 -0400
-Received: from localhost
-	by e06smtp11.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <pasic@linux.ibm.com>;
-	Thu, 24 May 2018 16:42:42 +0100
-From: Halil Pasic <pasic@linux.ibm.com>
-References: <20180522221655.78979-1-pasic@linux.ibm.com>
-	<20180522221655.78979-2-pasic@linux.ibm.com>
-	<20180523113708.50b21a77.cohuck@redhat.com>
-	<a3ab7dfd-4cc1-5632-1590-bce4a40f063e@linux.ibm.com>
-	<20180523164640.225908a9.cohuck@redhat.com>
-	<5de50b20-a331-78ea-a7f4-6fdd995ed083@linux.ibm.com>
-	<20180523185957.41af37b2.cohuck@redhat.com>
-	<d99ca544-de44-422f-8bcd-cc9b53fd047b@linux.ibm.com>
-	<20180524091608.1c4e8b00.cohuck@redhat.com>
-	<8bb3b068-15d3-cb3e-724d-ca7589750175@linux.ibm.com>
-Date: Thu, 24 May 2018 17:42:38 +0200
+	(Exim 4.71) (envelope-from <Babu.Moger@amd.com>) id 1fLsP7-00024V-Eu
+	for qemu-devel@nongnu.org; Thu, 24 May 2018 11:43:49 -0400
+From: Babu Moger <babu.moger@amd.com>
+Date: Thu, 24 May 2018 11:43:29 -0400
+Message-ID: <1527176614-26271-1-git-send-email-babu.moger@amd.com>
 MIME-Version: 1.0
-In-Reply-To: <8bb3b068-15d3-cb3e-724d-ca7589750175@linux.ibm.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Message-Id: <c22ba5bf-70f0-9769-c29b-099e44c0676f@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH v2 1/2] vfio-ccw: add force
- unlimited prefetch property
+Subject: [Qemu-devel] [PATCH v11 0/5] i386: Enable TOPOEXT to support
+ hyperthreading on AMD CPU
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -50,74 +27,184 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>
-Cc: Dong Jia Shi <bjsdjshi@linux.ibm.com>, "Jason J. Herne" <jjherne@linux.ibm.com>, qemu-s390x@nongnu.org, qemu-devel@nongnu.org
+To: mst@redhat.com, marcel.apfelbaum@gmail.com, pbonzini@redhat.com, rth@twiddle.net, ehabkost@redhat.com, mtosatti@redhat.com
+Cc: qemu-devel@nongnu.org, kvm@vger.kernel.org, babu.moger@amd.com, kash@tripleback.net, geoff@hostfission.com
 
+This series enables the TOPOEXT feature for AMD CPUs. This is required to
+support hyperthreading on kvm guests.
 
+This addresses the issues reported in these bugs:
+https://bugzilla.redhat.com/show_bug.cgi?id=3D1481253
+https://bugs.launchpad.net/qemu/+bug/1703506=20
 
-On 05/24/2018 12:29 PM, Halil Pasic wrote:
->=20
->=20
-> On 05/24/2018 09:16 AM, Cornelia Huck wrote:
->> On Wed, 23 May 2018 19:28:31 +0200
->> Halil Pasic <pasic@linux.ibm.com> wrote:
->>
->>> On 05/23/2018 06:59 PM, Cornelia Huck wrote:
->>>> On Wed, 23 May 2018 18:23:44 +0200
->>>> Halil Pasic <pasic@linux.ibm.com> wrote:
->>>>> On 05/23/2018 04:46 PM, Cornelia Huck wrote:
->>>>>>>>> +=C2=A0=C2=A0=C2=A0 if (!(sch->orb.ctrl0 & ORB_CTRL0_MASK_PFCH)=
-) {
->>>>>>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (!(vcdev->force_=
-orb_pfch)) {
->>>>>>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0 warn_report("vfio-ccw requires PFCH flag set");
->>>>>>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0 sch_gen_unit_exception(sch);
->>>>>>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0 css_inject_io_interrupt(sch);
->>>>>>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0 return IOINST_CC_EXPECTED;
->>>>>>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 } else {
->>>>>>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0 sch->orb.ctrl0 |=3D ORB_CTRL0_MASK_PFCH;
->>>>>>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0 WARN_ONCE(vcdev->warned_force_orb_pfch, "PFCH flag forced");
->>>>>>>> This message should probably mention vfio-ccw as well as the sub=
-channel
->>>>>>>> id?
->>>>>>> I was thinking about this. I think all it would make sense to hav=
-e a common
->>>>>>> prefix for all reports coming form vfio-ccw (QEMU). But then I wa=
-s like, that
->>>>>>> is a separate patch.
->>>>>>>
->>>>>>> Maybe something like:
->>>>>>> vfio-ccw (xx.xx.xxxx): specific message
->>>>>>>
->>>>>>> OTOH we don't seem to do that elsewhere (git grep -e 'warn\|error=
-_report\|error_setg' -- hw/s390x/).
->>>>>>> AFAIR the error_setg captures context (like, src, line, func) but=
- does not
->>>>>>> necessarily report it. Another question is if this should be exte=
-nded to
->>>>>>> hw/s390x/s390-ccw.c
->>>>>>>
->>>>>>> What do you think?
->>>>>> I'm not sure that makes sense, especially as not everything might
->>>>>> explicitly refer to a certain subchannel.
->>>>>>
->>>>>> Let's just add the subchannel id here? In this case, this is reall=
-y a
->>>>>> useful piece of information (which device is showing this behaviou=
-r?)
+v11:
+ Patches are based off of Eduardo's git://github.com/ehabkost/qemu.git x86-=
+next.
+ Summary of changes.
+ 1.Added more comments explaining different constants and variables.
+ 2.Removed NUM_SHARING_CACHE macro and made the code simpler.
+ 3.Changed the function name num_sharing_l3_cache to cores_in_core_complex.
+   This function is actually finding the number of cores in a core complex.
+   Purpose here is to re-use the code in couple more places.
+ 4.Added new function nodes_in_socket to find number of nodes in the config=
+.
+   Purpose here is to re-use the code.
+ 5.Used DIV_ROUND_UP wherever applicable.
+ 6.Renamed few constants and functions to generic names.
+ 7.Few more text corrections.
+=20
+v10:
+ Based the patches on Eduardo's git://github.com/ehabkost/qemu.git x86-next
+ Some of the earlier patches are already queued. So, submitting the rest of
+ the series here. This series adds complete redesign of the cpu topology.
+ Based on user given parameter, we try to build topology very close to the
+ hardware. Maintains symmetry as much as possible. Added new function
+ epyc_build_topology to build the topology based on user given nr_cores,
+ nr_threads.
+ Summary of changes.
+ 1. Build the topology dinamically based on nr_cores and nr_threads
+ 2. Added new epyc_build_topology to build the new topology.
+ 3. Added new function num_sharing_l3_cache to calculate the L3 sharing
+ 4. Added a check to verify the topology. Disabled the TOPOEXT if the
+    topology cannot be built.
 
-I'm doing the changes right now. And while doing it occurred to to me tha=
-t
-a device number is probably preferable over the subchannel id, ie. cssid.=
-ssid.devno
-is probably better that cssid.ssid.schid. What we really want to tell is,
-which device is affected and not over which subchannel is this device tal=
-king.
+v9:
+ Based the patches on Eduardo's git://github.com/ehabkost/qemu.git x86-next
+ tree. Following 3 patches from v8 are already queued.
+  i386: Add cache information in X86CPUDefinition
+  i386: Initialize cache information for EPYC family processors
+  i386: Helpers to encode cache information consistently
+ So, submitting the rest of the series here.
 
-Agree, disagree?
+ Changes:
+ 1. Included Eduardo's clean up patch
+ 2. Added 2.13 machine types
+ 3. Disabled topoext for 2.12 and below versions.
+ 4. Added the assert to core_id as discussed.
+
+v8:
+ Addressed feedback from Eduardo. Thanks Eduardo for being patient with me.
+ Tested on AMD EPYC server and also did some basic testing on intel box.
+ Summary of changes.
+ 1. Reverted back l2 cache associativity. Kept it same as legacy.
+ 2. Changed cache_info structure in X86CPUDefinition and CPUX86State to poi=
+nters.
+ 3. Added legacy_cache property in PC_COMPAT_2_12 and initialized legacy_ca=
+che
+    based on static cache_info availability.
+ 4. Squashed patch 4 and 5 and applied it before patch 3.
+ 5. Added legacy cache check for cpuid[2] and cpuid[4] for consistancy.
+ 6. Simplified NUM_SHARING_CACHE definition for readability,
+ 7. Removed assert for core_id as it appeared redundant.
+ 8. Simplified encode_cache_cpuid8000001d little bit.
+ 9. Few more minor changes
+
+v7:
+ Rebased on top of latest tree after 2.12 release and done few basic tests.=
+ There are
+ no changes except for few minor hunks. Hopefully this gets pulled into 2.1=
+3 release.
+ Please review, let me know of any feedback.
+
+v6:
+1.Fixed problem with patch#4(Add new property to control cache info). The p=
+arameter
+ legacy_cache should be "on" by default on machine type "pc-q35-2.10". This=
+ was
+ found by Alexandr Iarygin.
+2.Fixed the l3 cache size for EPYC based machines(patch#3). Also, fixed the=
+ number of
+ logical processors sharing the cache(patch#6). Only L3 cache is shared by =
+multiple
+ cores but not L1 or L2. This was a bug while decoding. This was found by G=
+eoffrey McRae
+ and he verified the fix.=20
+
+v5:
+ In this series I tried to address the feedback from Eduardo Habkost.
+ The discussion thread is here.
+ https://patchwork.kernel.org/patch/10299745/
+ The previous thread is here.
+ http://patchwork.ozlabs.org/cover/884885/
+
+Reason for these changes.
+ The cache properties for AMD family of processors have changed from
+ previous releases. We don't want to display the new information on the
+ old family of processors as this might cause compatibility issues.
+
+Changes:
+1.Based the patches on top of Eduardo's(patch#1) patch.
+  Changed few things.
+  Moved the Cache definitions to cpu.h file.
+  Changed the CPUID_4 names to generic names.
+2.Added a new propery "legacy-cache" in cpu object(patch#2). This can be
+  used to display the old property even if the host supports the new cache
+  properties.
+3.Added cache information in X86CPUDefinition and CPUX86State
+4.Patch 6-7 changed quite a bit from previous version does to new approach.
+5.Addressed few issues with CPUID_8000_001d and CPUID_8000_001E.
+
+v4:
+1.Removed the checks under cpuid 0x8000001D leaf(patch #2). These check are
+  not necessary. Found this during internal review.
+2.Added CPUID_EXT3_TOPOEXT feature for all the 17 family(patch #4). This wa=
+s
+  found by Kash Pande during his testing.
+3.Removed th hardcoded cpuid xlevel and dynamically extended if CPUID_EXT3_=
+TOPOEXT
+  is supported(Suggested by Brijesh Singh).=20
+
+v3:
+1.Removed the patch #1. Radim mentioned that original typo problem is in=20
+  linux kernel header. qemu is just copying those files.
+2.In previous version, I used the cpuid 4 definitions for AMDs cpuid leaf
+  0x8000001D. CPUID 4 is very intel specific and we dont want to expose tho=
+se
+  details under AMD. I have renamed some of these definitions as generic.
+  These changes are in patch#1. Radim, let me know if this is what you inte=
+nded.
+3.Added assert to for core_id(Suggested by Radim Krcm=C3=A1r).
+4.Changed the if condition under "L3 cache info"(Suggested by Gary Hook).
+5.Addressed few more text correction and code cleanup(Suggested by Thomas L=
+endacky).
+
+v2:
+  Fixed few more minor issues per Gary Hook's comments. Thank you Gary.
+  Removed the patch#1. We need to handle the instruction cache associativit=
+y=20
+  seperately. It varies based on the cpu family. I will comeback to that la=
+ter.
+  Added two more typo corrections in patch#1 and patch#5.
+
+v1:
+  Stanislav Lanci posted few patches earlier.=20
+  https://patchwork.kernel.org/patch/10040903/
+
+Rebased his patches with few changes.
+1.Spit the patches into two, separating cpuid functions=20
+  0x8000001D and 0x8000001E (Patch 2 and 3).
+2.Removed the generic non-intel check and made a separate patch
+  with some changes(Patch 5).
+3.Fixed L3_N_SETS_AMD(from 4096 to 8192) based on CPUID_Fn8000001D_ECX_x03.
+Added 2 more patches.
+Patch 1. Fixes cache associativity.
+Patch 4. Adds TOPOEXT feature on AMD EPYC CPU.
+
+Babu Moger (4):
+  i386: Populate AMD Processor Cache Information for cpuid 0x8000001D
+  i386: Add support for CPUID_8000_001E for AMD
+  i386: Enable TOPOEXT feature on AMD EPYC CPU
+  i386: Remove generic SMT thread check
+
+Eduardo Habkost (1):
+  i386: Clean up cache CPUID code
+
+ include/hw/i386/pc.h |   4 +
+ target/i386/cpu.c    | 347 +++++++++++++++++++++++++++++++++++++++++------=
+----
+ target/i386/cpu.h    |  14 ++-
+ target/i386/kvm.c    |  29 ++++-
+ 4 files changed, 319 insertions(+), 75 deletions(-)
+
+--=20
+1.8.3.1
