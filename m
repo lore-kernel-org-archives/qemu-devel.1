@@ -1,23 +1,38 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34703)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38145)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fLt3G-000827-7Z
-	for qemu-devel@nongnu.org; Thu, 24 May 2018 12:25:21 -0400
+	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1fLtD8-0004w9-O9
+	for qemu-devel@nongnu.org; Thu, 24 May 2018 12:35:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fLt3C-0002Jy-7t
-	for qemu-devel@nongnu.org; Thu, 24 May 2018 12:25:18 -0400
-From: Markus Armbruster <armbru@redhat.com>
-References: <20180518180440-mutt-send-email-mst@kernel.org>
-	<20180524113251.GB4660@redhat.com>
-	<20180524174603-mutt-send-email-mst@kernel.org>
-	<20180524150817.GF4008@localhost.localdomain>
-	<20180524152014.GW2209@redhat.com>
-Date: Thu, 24 May 2018 18:25:05 +0200
-In-Reply-To: <20180524152014.GW2209@redhat.com> (Richard W. M. Jones's message
-	of "Thu, 24 May 2018 16:20:14 +0100")
-Message-ID: <87y3g9yqam.fsf@dusky.pond.sub.org>
+	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1fLtD4-0008MF-Mn
+	for qemu-devel@nongnu.org; Thu, 24 May 2018 12:35:30 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:50056)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <stefanb@linux.vnet.ibm.com>)
+	id 1fLtD4-0008KC-1R
+	for qemu-devel@nongnu.org; Thu, 24 May 2018 12:35:26 -0400
+Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w4OGZ0G9084230
+	for <qemu-devel@nongnu.org>; Thu, 24 May 2018 12:35:24 -0400
+Received: from e17.ny.us.ibm.com (e17.ny.us.ibm.com [129.33.205.207])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2j60rq11f8-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Thu, 24 May 2018 12:35:24 -0400
+Received: from localhost
+	by e17.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <stefanb@linux.vnet.ibm.com>;
+	Thu, 24 May 2018 12:35:22 -0400
+References: <20180524161435.3012991-1-stefanb@linux.vnet.ibm.com>
+From: Stefan Berger <stefanb@linux.vnet.ibm.com>
+Date: Thu, 24 May 2018 12:35:20 -0400
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] storing machine data in qcow images?
+In-Reply-To: <20180524161435.3012991-1-stefanb@linux.vnet.ibm.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-MW
+Message-Id: <541cbd53-5ccb-db5e-123b-323684724244@linux.vnet.ibm.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PULL v2 0/4] Merge tpm 2018/05/23
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,48 +41,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Richard W.M. Jones" <rjones@redhat.com>
-Cc: Kevin Wolf <kwolf@redhat.com>, ehabkost@redhat.com, qemu-block@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org, mreitz@redhat.com, stefanha@redhat.com
+To: qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org, marcandre.lureau@redhat.com
 
-"Richard W.M. Jones" <rjones@redhat.com> writes:
-
-> On Thu, May 24, 2018 at 05:08:17PM +0200, Kevin Wolf wrote:
->> Am 24.05.2018 um 16:56 hat Michael S. Tsirkin geschrieben:
->> > On Thu, May 24, 2018 at 12:32:51PM +0100, Richard W.M. Jones wrote:
->> > > There is however a seed of a good idea in the thread:
->> > > 
->> > > > I don't think QEMU needs to use this information automatically,
->> > > > necessarily.  I think the first step is to simply make QEMU save
->> > > > this information in the disk image, and making qemu-img able to
->> > > > read and write this information.
->> > > 
->> > > It would be nice if qcow2 added arbitrary data sections (which would
->> > > always be ignored by qemu) for storing additional data.  This could be
->> > > used to create a compact qcow2 + metadata format to rival OVA for
->> > > management layers to use, and there are various other uses too.
->> > > 
->> > > Rich.
->> > 
->> > I think this part is pretty uncontroversial.
->> > 
->> > But can we add data without changing the verion?
->> 
->> Yes. Don't worry about where to store it, we'll solve this. Do worry
->> about what to store.
+On 05/24/2018 12:14 PM, Stefan Berger wrote:
+> This series of patches adds TPM emulator state migration support and a
+> test case for testing (local) migration.
 >
-> Ideally from my point of view: named blobs.  More formally, any number
-> of (key, value) pairs where the key is a simple string, and the value
-> is a binary blob.  The binary blobs might really be XML or YAML or an
-> icon or whatever, but qemu would not need to look inside them.
+>     Stefan
 >
-> We could then attach metadata (in some to-be-decided format) to qcow2
-> files and create a compact rival to OVA without needing to encode any
-> knowledge of the metadata into qemu at all.
+> The following changes since commit 4f50c1673a89b07f376ce5c42d22d79a79cd=
+466d:
 >
-> Another use for this is allowing qcow2 files to contain names, titles,
-> descriptions, creation date, OS icons, etc. which could be displayed
-> in file managers.
+>    Merge remote-tracking branch 'remotes/ehabkost/tags/x86-next-pull-re=
+quest' into staging (2018-05-22 09:43:58 +0100)
+>
+> are available in the Git repository at:
+>
+>    git://github.com/stefanberger/qemu-tpm.git tags/pull-tpm-2018-05-23-=
+1
 
-Have we just reinvented resource forks?
+EBADTAG: That should be a '-2'. I guess I will have to fix this in a v3.
 
-SCNR ;)
+ =C2=A0=C2=A0 Stefan
