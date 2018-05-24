@@ -1,29 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38889)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40673)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1fLjN5-0000gU-3f
-	for qemu-devel@nongnu.org; Thu, 24 May 2018 02:05:09 -0400
+	(envelope-from <armbru@redhat.com>) id 1fLjXR-00036f-P4
+	for qemu-devel@nongnu.org; Thu, 24 May 2018 02:15:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1fLjN0-0007jW-3R
-	for qemu-devel@nongnu.org; Thu, 24 May 2018 02:05:06 -0400
-Received: from mail-pf0-f181.google.com ([209.85.192.181]:36501)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1fLjMz-0007jK-U7
-	for qemu-devel@nongnu.org; Thu, 24 May 2018 02:05:02 -0400
-Received: by mail-pf0-f181.google.com with SMTP id w129-v6so307026pfd.3
-	for <qemu-devel@nongnu.org>; Wed, 23 May 2018 23:05:01 -0700 (PDT)
-References: <152646971421.34839.18198173866060880395.stgit@bahia.lan>
-	<20180518153246.GE31915@stefanha-x1.localdomain>
-	<20180523164610.09ec083b@bahia.lan>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <ede94233-e969-0de4-c8ee-a9ff91ce808a@redhat.com>
-Date: Thu, 24 May 2018 08:04:59 +0200
+	(envelope-from <armbru@redhat.com>) id 1fLjXN-0003cf-Ol
+	for qemu-devel@nongnu.org; Thu, 24 May 2018 02:15:49 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:36088 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fLjXN-0003cZ-KM
+	for qemu-devel@nongnu.org; Thu, 24 May 2018 02:15:45 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <1527105041-21013-1-git-send-email-patryk@fala.ehost.pl>
+Date: Thu, 24 May 2018 08:15:41 +0200
+In-Reply-To: <1527105041-21013-1-git-send-email-patryk@fala.ehost.pl> (Patryk
+	Olszewski's message of "Wed, 23 May 2018 21:50:41 +0200")
+Message-ID: <87a7spbmuq.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <20180523164610.09ec083b@bahia.lan>
-Content-Type: text/plain; charset=windows-1252
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] block: fix QEMU crash with scsi-hd and
- drive_del
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v2] Remove unwanted crlf conversion in
+ serial
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,24 +27,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>, Stefan Hajnoczi <stefanha@redhat.com>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>
+To: Patryk Olszewski <patryk@fala.ehost.pl>
+Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, thuth@redhat.com, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
 
-On 23/05/2018 16:46, Greg Kurz wrote:
-> Maybe change bdrv_root_unref_child() to ensure we don't call
-> bdrv_close() with pending I/O requests ?
-> 
->  void bdrv_root_unref_child(BdrvChild *child)
->  {
->      BlockDriverState *child_bs;
+Patryk Olszewski <patryk@fala.ehost.pl> writes:
+
+> This patch fixes bug in serial that made it almost impossible for guest
+> to communicate with devices through host's serial.
+
+Well, "almost impossible" for some applications.  Text works fine.  But
+I get what you mean.
+
+> OPOST flag in c_oflag enables output processing letting other flags in
+> c_oflag take effect. Usually in c_oflag ONLCR flag is also set, which
+> causes crlf to be sent in place of lf. This breaks binary transmissions.
+> Unsetting OPOST flag turns off any output processing which fixes the bug.
+>
+> Bug reports related:
+> https://bugs.launchpad.net/qemu/+bug/1772086
+> https://bugs.launchpad.net/qemu/+bug/1407813
+> https://bugs.launchpad.net/qemu/+bug/1715296
+> also
+> https://lists.nongnu.org/archive/html/qemu-devel/2006-06/msg00196.html
+>
+> Signed-off-by: Patryk Olszewski <patryk@fala.ehost.pl>
+> ---
+>  chardev/char-serial.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/chardev/char-serial.c b/chardev/char-serial.c
+> index feb52e5..ae548d2 100644
+> --- a/chardev/char-serial.c
+> +++ b/chardev/char-serial.c
+> @@ -139,7 +139,7 @@ static void tty_serial_init(int fd, int speed,
 >  
->      child_bs = child->bs;
-> +    bdrv_drained_begin(child_bs);
->      bdrv_detach_child(child);
-> +    bdrv_drained_end(child_bs);
->      bdrv_unref(child_bs);
->  }
+>      tty.c_iflag &= ~(IGNBRK | BRKINT | PARMRK | ISTRIP
+>                       | INLCR | IGNCR | ICRNL | IXON);
+> -    tty.c_oflag |= OPOST;
+> +    tty.c_oflag &= ~OPOST;
+>      tty.c_lflag &= ~(ECHO | ECHONL | ICANON | IEXTEN | ISIG);
+>      tty.c_cflag &= ~(CSIZE | PARENB | PARODD | CRTSCTS | CSTOPB);
+>      switch (data_bits) {
 
-Maybe bdrv_detach_child should do it.
-
-Paolo
+Reviewed-by: Markus Armbruster <armbru@redhat.com>
