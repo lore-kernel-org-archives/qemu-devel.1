@@ -1,39 +1,38 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60477)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60533)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1fLst6-0008Bj-R8
-	for qemu-devel@nongnu.org; Thu, 24 May 2018 12:14:51 -0400
+	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1fLstD-0008Gq-9K
+	for qemu-devel@nongnu.org; Thu, 24 May 2018 12:15:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1fLst1-0004Bu-Lv
-	for qemu-devel@nongnu.org; Thu, 24 May 2018 12:14:48 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:49728
-	helo=mx0a-001b2d01.pphosted.com)
+	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1fLst8-0004Fv-4M
+	for qemu-devel@nongnu.org; Thu, 24 May 2018 12:14:55 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:46050)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <stefanb@linux.vnet.ibm.com>)
-	id 1fLst1-0004AZ-F9
-	for qemu-devel@nongnu.org; Thu, 24 May 2018 12:14:43 -0400
-Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
+	id 1fLst7-0004FC-Ql
+	for qemu-devel@nongnu.org; Thu, 24 May 2018 12:14:50 -0400
+Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
 	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w4OGE71j067889
-	for <qemu-devel@nongnu.org>; Thu, 24 May 2018 12:14:42 -0400
-Received: from e34.co.us.ibm.com (e34.co.us.ibm.com [32.97.110.152])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2j5xsqekt0-1
+	w4OGE999031273
+	for <qemu-devel@nongnu.org>; Thu, 24 May 2018 12:14:49 -0400
+Received: from e38.co.us.ibm.com (e38.co.us.ibm.com [32.97.110.159])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2j5xq2puw9-1
 	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Thu, 24 May 2018 12:14:42 -0400
+	for <qemu-devel@nongnu.org>; Thu, 24 May 2018 12:14:48 -0400
 Received: from localhost
-	by e34.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	by e38.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
 	Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <stefanb@linux.vnet.ibm.com>;
-	Thu, 24 May 2018 10:14:41 -0600
+	Thu, 24 May 2018 10:14:47 -0600
 From: Stefan Berger <stefanb@linux.vnet.ibm.com>
-Date: Thu, 24 May 2018 12:14:32 -0400
+Date: Thu, 24 May 2018 12:14:35 -0400
 In-Reply-To: <20180524161435.3012991-1-stefanb@linux.vnet.ibm.com>
 References: <20180524161435.3012991-1-stefanb@linux.vnet.ibm.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-Message-Id: <20180524161435.3012991-2-stefanb@linux.vnet.ibm.com>
+Message-Id: <20180524161435.3012991-5-stefanb@linux.vnet.ibm.com>
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL v2 1/4] tpm: extend TPM emulator with state
- migration support
+Subject: [Qemu-devel] [PULL v2 4/4] test: Add test cases that use the
+ external swtpm with CRB interface
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -45,493 +44,574 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: peter.maydell@linaro.org, marcandre.lureau@redhat.com, Stefan Berger <stefanb@linux.vnet.ibm.com>
 
-Extend the TPM emulator backend device with state migration support.
+Add a test program for testing the CRB with the external swtpm.
 
-The external TPM emulator 'swtpm' provides a protocol over
-its control channel to retrieve its state blobs. We implement
-functions for getting and setting the different state blobs.
-In case the setting of the state blobs fails, we return a
-negative errno code to fail the start of the VM.
+The 1st test case extends a PCR and reads back the value and compares
+it against an expected return packet.
 
-Since we have an external TPM emulator, we need to make sure
-that we do not migrate the state for as long as it is busy
-processing a request. We need to wait for notification that
-the request has completed processing.
+The 2nd test case repeats the 1st test case and then migrates the
+external swtpm's state along with the VM state to a destination
+QEMU and swtpm and checks that the PCR has the expected value now.
+
+The test cases require 'swtpm' to be installed on the system and
+in the PATH and 'swtpm' must support the --tpm2 option. If this is
+not the case, the test will be skipped.
 
 Signed-off-by: Stefan Berger <stefanb@linux.vnet.ibm.com>
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 ---
- hw/tpm/tpm_emulator.c | 323 ++++++++++++++++++++++++++++++++++++++++++++=
-++++--
- hw/tpm/trace-events   |   8 +-
- 2 files changed, 319 insertions(+), 12 deletions(-)
+ tests/Makefile.include     |   3 +
+ tests/tpm-crb-swtpm-test.c | 247 +++++++++++++++++++++++++++++++++++++++=
+++++++
+ tests/tpm-util.c           | 186 ++++++++++++++++++++++++++++++++++
+ tests/tpm-util.h           |  36 +++++++
+ 4 files changed, 472 insertions(+)
+ create mode 100644 tests/tpm-crb-swtpm-test.c
+ create mode 100644 tests/tpm-util.c
+ create mode 100644 tests/tpm-util.h
 
-diff --git a/hw/tpm/tpm_emulator.c b/hw/tpm/tpm_emulator.c
-index 6418ef0831..10bc20dbec 100644
---- a/hw/tpm/tpm_emulator.c
-+++ b/hw/tpm/tpm_emulator.c
-@@ -4,7 +4,7 @@
-  *  Copyright (c) 2017 Intel Corporation
-  *  Author: Amarnath Valluri <amarnath.valluri@intel.com>
-  *
-- *  Copyright (c) 2010 - 2013 IBM Corporation
-+ *  Copyright (c) 2010 - 2013, 2018 IBM Corporation
-  *  Authors:
-  *    Stefan Berger <stefanb@us.ibm.com>
-  *
-@@ -49,6 +49,19 @@
- #define TPM_EMULATOR_IMPLEMENTS_ALL_CAPS(S, cap) (((S)->caps & (cap)) =3D=
-=3D (cap))
-=20
- /* data structures */
-+
-+/* blobs from the TPM; part of VM state when migrating */
-+typedef struct TPMBlobBuffers {
-+    uint32_t permanent_flags;
-+    TPMSizedBuffer permanent;
-+
-+    uint32_t volatil_flags;
-+    TPMSizedBuffer volatil;
-+
-+    uint32_t savestate_flags;
-+    TPMSizedBuffer savestate;
-+} TPMBlobBuffers;
-+
- typedef struct TPMEmulator {
-     TPMBackend parent;
-=20
-@@ -64,6 +77,8 @@ typedef struct TPMEmulator {
-=20
-     unsigned int established_flag:1;
-     unsigned int established_flag_cached:1;
-+
-+    TPMBlobBuffers state_blobs;
- } TPMEmulator;
-=20
-=20
-@@ -293,7 +308,8 @@ static int tpm_emulator_set_buffer_size(TPMBackend *t=
-b,
-     return 0;
- }
-=20
--static int tpm_emulator_startup_tpm(TPMBackend *tb, size_t buffersize)
-+static int tpm_emulator_startup_tpm_resume(TPMBackend *tb, size_t buffer=
-size,
-+                                     bool is_resume)
- {
-     TPMEmulator *tpm_emu =3D TPM_EMULATOR(tb);
-     ptm_init init =3D {
-@@ -301,12 +317,17 @@ static int tpm_emulator_startup_tpm(TPMBackend *tb,=
- size_t buffersize)
-     };
-     ptm_res res;
-=20
-+    trace_tpm_emulator_startup_tpm_resume(is_resume, buffersize);
-+
-     if (buffersize !=3D 0 &&
-         tpm_emulator_set_buffer_size(tb, buffersize, NULL) < 0) {
-         goto err_exit;
-     }
-=20
--    trace_tpm_emulator_startup_tpm();
-+    if (is_resume) {
-+        init.u.req.init_flags |=3D cpu_to_be32(PTM_INIT_FLAG_DELETE_VOLA=
-TILE);
-+    }
-+
-     if (tpm_emulator_ctrlcmd(tpm_emu, CMD_INIT, &init, sizeof(init),
-                              sizeof(init)) < 0) {
-         error_report("tpm-emulator: could not send INIT: %s",
-@@ -325,6 +346,11 @@ err_exit:
-     return -1;
- }
-=20
-+static int tpm_emulator_startup_tpm(TPMBackend *tb, size_t buffersize)
-+{
-+    return tpm_emulator_startup_tpm_resume(tb, buffersize, false);
-+}
-+
- static bool tpm_emulator_get_tpm_established_flag(TPMBackend *tb)
- {
-     TPMEmulator *tpm_emu =3D TPM_EMULATOR(tb);
-@@ -423,16 +449,21 @@ static size_t tpm_emulator_get_buffer_size(TPMBacke=
-nd *tb)
- static int tpm_emulator_block_migration(TPMEmulator *tpm_emu)
- {
-     Error *err =3D NULL;
-+    ptm_cap caps =3D PTM_CAP_GET_STATEBLOB | PTM_CAP_SET_STATEBLOB |
-+                   PTM_CAP_STOP;
-=20
--    error_setg(&tpm_emu->migration_blocker,
--               "Migration disabled: TPM emulator not yet migratable");
--    migrate_add_blocker(tpm_emu->migration_blocker, &err);
--    if (err) {
--        error_report_err(err);
--        error_free(tpm_emu->migration_blocker);
--        tpm_emu->migration_blocker =3D NULL;
-+    if (!TPM_EMULATOR_IMPLEMENTS_ALL_CAPS(tpm_emu, caps)) {
-+        error_setg(&tpm_emu->migration_blocker,
-+                   "Migration disabled: TPM emulator does not support "
-+                   "migration");
-+        migrate_add_blocker(tpm_emu->migration_blocker, &err);
-+        if (err) {
-+            error_report_err(err);
-+            error_free(tpm_emu->migration_blocker);
-+            tpm_emu->migration_blocker =3D NULL;
-=20
--        return -1;
-+            return -1;
-+        }
-     }
-=20
-     return 0;
-@@ -570,6 +601,267 @@ static const QemuOptDesc tpm_emulator_cmdline_opts[=
-] =3D {
-     { /* end of list */ },
- };
-=20
+diff --git a/tests/Makefile.include b/tests/Makefile.include
+index 3b9a5e31a2..b499ba1813 100644
+--- a/tests/Makefile.include
++++ b/tests/Makefile.include
+@@ -297,6 +297,7 @@ check-qtest-i386-$(CONFIG_VHOST_USER_NET_TEST_i386) +=
+=3D tests/vhost-user-test$(EX
+ ifeq ($(CONFIG_VHOST_USER_NET_TEST_i386),)
+ check-qtest-x86_64-$(CONFIG_VHOST_USER_NET_TEST_x86_64) +=3D tests/vhost=
+-user-test$(EXESUF)
+ endif
++check-qtest-i386-$(CONFIG_TPM) +=3D tests/tpm-crb-swtpm-test$(EXESUF)
+ check-qtest-i386-$(CONFIG_TPM) +=3D tests/tpm-crb-test$(EXESUF)
+ check-qtest-i386-$(CONFIG_TPM) +=3D tests/tpm-tis-test$(EXESUF)
+ check-qtest-i386-$(CONFIG_SLIRP) +=3D tests/test-netfilter$(EXESUF)
+@@ -721,6 +722,8 @@ tests/test-util-sockets$(EXESUF): tests/test-util-soc=
+kets.o \
+ tests/test-io-task$(EXESUF): tests/test-io-task.o $(test-io-obj-y)
+ tests/test-io-channel-socket$(EXESUF): tests/test-io-channel-socket.o \
+         tests/io-channel-helpers.o tests/socket-helpers.o $(test-io-obj-=
+y)
++tests/tpm-crb-swtpm-test$(EXESUF): tests/tpm-crb-swtpm-test.o tests/tpm-=
+emu.o \
++	tests/tpm-util.o $(test-io-obj-y)
+ tests/tpm-crb-test$(EXESUF): tests/tpm-crb-test.o tests/tpm-emu.o $(test=
+-io-obj-y)
+ tests/tpm-tis-test$(EXESUF): tests/tpm-tis-test.o tests/tpm-emu.o $(test=
+-io-obj-y)
+ tests/test-io-channel-file$(EXESUF): tests/test-io-channel-file.o \
+diff --git a/tests/tpm-crb-swtpm-test.c b/tests/tpm-crb-swtpm-test.c
+new file mode 100644
+index 0000000000..c2bde0cbaa
+--- /dev/null
++++ b/tests/tpm-crb-swtpm-test.c
+@@ -0,0 +1,247 @@
 +/*
-+ * Transfer a TPM state blob from the TPM into a provided buffer.
++ * QTest testcase for TPM CRB talking to external swtpm and swtpm migrat=
+ion
 + *
-+ * @tpm_emu: TPMEmulator
-+ * @type: the type of blob to transfer
-+ * @tsb: the TPMSizeBuffer to fill with the blob
-+ * @flags: the flags to return to the caller
++ * Copyright (c) 2018 IBM Corporation
++ *  with parts borrowed from migration-test.c that is:
++ *     Copyright (c) 2016-2018 Red Hat, Inc. and/or its affiliates
++ *
++ * Authors:
++ *   Stefan Berger <stefanb@linux.vnet.ibm.com>
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or la=
+ter.
++ * See the COPYING file in the top-level directory.
 + */
-+static int tpm_emulator_get_state_blob(TPMEmulator *tpm_emu,
-+                                       uint8_t type,
-+                                       TPMSizedBuffer *tsb,
-+                                       uint32_t *flags)
++
++#include "qemu/osdep.h"
++#include <glib/gstdio.h>
++
++#include "hw/acpi/tpm.h"
++#include "io/channel-socket.h"
++#include "libqtest.h"
++#include "tpm-util.h"
++#include "sysemu/tpm.h"
++#include "qapi/qmp/qdict.h"
++
++typedef struct TestState {
++    char *src_tpm_path;
++    char *dst_tpm_path;
++    char *uri;
++} TestState;
++
++bool got_stop;
++
++static void migrate(QTestState *who, const char *uri)
 +{
-+    ptm_getstate pgs;
-+    ptm_res res;
-+    ssize_t n;
-+    uint32_t totlength, length;
++    QDict *rsp;
++    gchar *cmd;
 +
-+    tpm_sized_buffer_reset(tsb);
-+
-+    pgs.u.req.state_flags =3D cpu_to_be32(PTM_STATE_FLAG_DECRYPTED);
-+    pgs.u.req.type =3D cpu_to_be32(type);
-+    pgs.u.req.offset =3D 0;
-+
-+    if (tpm_emulator_ctrlcmd(tpm_emu, CMD_GET_STATEBLOB,
-+                             &pgs, sizeof(pgs.u.req),
-+                             offsetof(ptm_getstate, u.resp.data)) < 0) {
-+        error_report("tpm-emulator: could not get state blob type %d : %=
-s",
-+                     type, strerror(errno));
-+        return -1;
-+    }
-+
-+    res =3D be32_to_cpu(pgs.u.resp.tpm_result);
-+    if (res !=3D 0 && (res & 0x800) =3D=3D 0) {
-+        error_report("tpm-emulator: Getting the stateblob (type %d) fail=
-ed "
-+                     "with a TPM error 0x%x", type, res);
-+        return -1;
-+    }
-+
-+    totlength =3D be32_to_cpu(pgs.u.resp.totlength);
-+    length =3D be32_to_cpu(pgs.u.resp.length);
-+    if (totlength !=3D length) {
-+        error_report("tpm-emulator: Expecting to read %u bytes "
-+                     "but would get %u", totlength, length);
-+        return -1;
-+    }
-+
-+    *flags =3D be32_to_cpu(pgs.u.resp.state_flags);
-+
-+    if (totlength > 0) {
-+        tsb->buffer =3D g_try_malloc(totlength);
-+        if (!tsb->buffer) {
-+            error_report("tpm-emulator: Out of memory allocating %u byte=
-s",
-+                         totlength);
-+            return -1;
-+        }
-+
-+        n =3D qemu_chr_fe_read_all(&tpm_emu->ctrl_chr, tsb->buffer, totl=
-ength);
-+        if (n !=3D totlength) {
-+            error_report("tpm-emulator: Could not read stateblob (type %=
-d); "
-+                         "expected %u bytes, got %zd",
-+                         type, totlength, n);
-+            return -1;
-+        }
-+    }
-+    tsb->size =3D totlength;
-+
-+    trace_tpm_emulator_get_state_blob(type, tsb->size, *flags);
-+
-+    return 0;
-+}
-+
-+static int tpm_emulator_get_state_blobs(TPMEmulator *tpm_emu)
-+{
-+    TPMBlobBuffers *state_blobs =3D &tpm_emu->state_blobs;
-+
-+    if (tpm_emulator_get_state_blob(tpm_emu, PTM_BLOB_TYPE_PERMANENT,
-+                                    &state_blobs->permanent,
-+                                    &state_blobs->permanent_flags) < 0 |=
-|
-+        tpm_emulator_get_state_blob(tpm_emu, PTM_BLOB_TYPE_VOLATILE,
-+                                    &state_blobs->volatil,
-+                                    &state_blobs->volatil_flags) < 0 ||
-+        tpm_emulator_get_state_blob(tpm_emu, PTM_BLOB_TYPE_SAVESTATE,
-+                                    &state_blobs->savestate,
-+                                    &state_blobs->savestate_flags) < 0) =
-{
-+        goto err_exit;
-+    }
-+
-+    return 0;
-+
-+ err_exit:
-+    tpm_sized_buffer_reset(&state_blobs->volatil);
-+    tpm_sized_buffer_reset(&state_blobs->permanent);
-+    tpm_sized_buffer_reset(&state_blobs->savestate);
-+
-+    return -1;
++    cmd =3D g_strdup_printf("{ 'execute': 'migrate',"
++                          "'arguments': { 'uri': '%s' } }",
++                          uri);
++    rsp =3D qtest_qmp(who, cmd);
++    g_free(cmd);
++    g_assert(qdict_haskey(rsp, "return"));
++    qobject_unref(rsp);
 +}
 +
 +/*
-+ * Transfer a TPM state blob to the TPM emulator.
-+ *
-+ * @tpm_emu: TPMEmulator
-+ * @type: the type of TPM state blob to transfer
-+ * @tsb: TPMSizedBuffer containing the TPM state blob
-+ * @flags: Flags describing the (encryption) state of the TPM state blob
++ * Events can get in the way of responses we are actually waiting for.
 + */
-+static int tpm_emulator_set_state_blob(TPMEmulator *tpm_emu,
-+                                       uint32_t type,
-+                                       TPMSizedBuffer *tsb,
-+                                       uint32_t flags)
++static QDict *wait_command(QTestState *who, const char *command)
 +{
-+    ssize_t n;
-+    ptm_setstate pss;
-+    ptm_res tpm_result;
++    const char *event_string;
++    QDict *response;
 +
-+    if (tsb->size =3D=3D 0) {
-+        return 0;
++    response =3D qtest_qmp(who, command);
++
++    while (qdict_haskey(response, "event")) {
++        /* OK, it was an event */
++        event_string =3D qdict_get_str(response, "event");
++        if (!strcmp(event_string, "STOP")) {
++            got_stop =3D true;
++        }
++        qobject_unref(response);
++        response =3D qtest_qmp_receive(who);
++    }
++    return response;
++}
++
++static void wait_for_migration_complete(QTestState *who)
++{
++    while (true) {
++        QDict *rsp, *rsp_return;
++        bool completed;
++        const char *status;
++
++        rsp =3D wait_command(who, "{ 'execute': 'query-migrate' }");
++        rsp_return =3D qdict_get_qdict(rsp, "return");
++        status =3D qdict_get_str(rsp_return, "status");
++        completed =3D strcmp(status, "completed") =3D=3D 0;
++        g_assert_cmpstr(status, !=3D,  "failed");
++        qobject_unref(rsp);
++        if (completed) {
++            return;
++        }
++        usleep(1000);
++    }
++}
++
++static void migration_start_qemu(QTestState **src_qemu, QTestState **dst=
+_qemu,
++                                 SocketAddress *src_tpm_addr,
++                                 SocketAddress *dst_tpm_addr,
++                                 const char *miguri)
++{
++    char *src_qemu_args, *dst_qemu_args;
++
++    src_qemu_args =3D g_strdup_printf(
++        "-chardev socket,id=3Dchr,path=3D%s "
++        "-tpmdev emulator,id=3Ddev,chardev=3Dchr "
++        "-device tpm-crb,tpmdev=3Ddev ",
++        src_tpm_addr->u.q_unix.path);
++
++    *src_qemu =3D qtest_init(src_qemu_args);
++
++    dst_qemu_args =3D g_strdup_printf(
++        "-chardev socket,id=3Dchr,path=3D%s "
++        "-tpmdev emulator,id=3Ddev,chardev=3Dchr "
++        "-device tpm-crb,tpmdev=3Ddev "
++        "-incoming %s",
++        dst_tpm_addr->u.q_unix.path,
++        miguri);
++
++    *dst_qemu =3D qtest_init(dst_qemu_args);
++
++    free(src_qemu_args);
++    free(dst_qemu_args);
++}
++
++static void tpm_crb_swtpm_test(const void *data)
++{
++    char *args =3D NULL;
++    QTestState *s;
++    SocketAddress *addr =3D NULL;
++    gboolean succ;
++    GPid swtpm_pid;
++    GError *error =3D NULL;
++    const TestState *ts =3D data;
++
++    succ =3D tpm_util_swtpm_start(ts->src_tpm_path, &swtpm_pid, &addr, &=
+error);
++    /* succ may be false if swtpm is not available */
++    if (!succ) {
++        return;
 +    }
 +
-+    pss =3D (ptm_setstate) {
-+        .u.req.state_flags =3D cpu_to_be32(flags),
-+        .u.req.type =3D cpu_to_be32(type),
-+        .u.req.length =3D cpu_to_be32(tsb->size),
++    args =3D g_strdup_printf(
++        "-chardev socket,id=3Dchr,path=3D%s "
++        "-tpmdev emulator,id=3Ddev,chardev=3Dchr "
++        "-device tpm-crb,tpmdev=3Ddev",
++        addr->u.q_unix.path);
++
++    s =3D qtest_start(args);
++    g_free(args);
++
++    tpm_util_startup(s, tpm_util_crb_transfer);
++    tpm_util_pcrextend(s, tpm_util_crb_transfer);
++
++    unsigned char tpm_pcrread_resp[] =3D
++        "\x80\x01\x00\x00\x00\x3e\x00\x00\x00\x00\x00\x00\x00\x16\x00\x0=
+0"
++        "\x00\x01\x00\x0b\x03\x00\x04\x00\x00\x00\x00\x01\x00\x20\xf6\x8=
+5"
++        "\x98\xe5\x86\x8d\xe6\x8b\x97\x29\x99\x60\xf2\x71\x7d\x17\x67\x8=
+9"
++        "\xa4\x2f\x9a\xae\xa8\xc7\xb7\xaa\x79\xa8\x62\x56\xc1\xde";
++    tpm_util_pcrread(s, tpm_util_crb_transfer, tpm_pcrread_resp,
++                     sizeof(tpm_pcrread_resp));
++
++    qtest_end();
++    tpm_util_swtpm_kill(swtpm_pid);
++
++    if (addr) {
++        g_unlink(addr->u.q_unix.path);
++        qapi_free_SocketAddress(addr);
++    }
++}
++
++static void tpm_crb_swtpm_migration_test(const void *data)
++{
++    const TestState *ts =3D data;
++    gboolean succ;
++    GPid src_tpm_pid, dst_tpm_pid;
++    SocketAddress *src_tpm_addr =3D NULL, *dst_tpm_addr =3D NULL;
++    GError *error =3D NULL;
++    QTestState *src_qemu, *dst_qemu;
++
++    succ =3D tpm_util_swtpm_start(ts->src_tpm_path, &src_tpm_pid,
++                                &src_tpm_addr, &error);
++    /* succ may be false if swtpm is not available */
++    if (!succ) {
++        return;
++    }
++
++    succ =3D tpm_util_swtpm_start(ts->dst_tpm_path, &dst_tpm_pid,
++                                &dst_tpm_addr, &error);
++    /* succ may be false if swtpm is not available */
++    if (!succ) {
++        goto err_src_tpm_kill;
++    }
++
++    migration_start_qemu(&src_qemu, &dst_qemu, src_tpm_addr, dst_tpm_add=
+r,
++                         ts->uri);
++
++    tpm_util_startup(src_qemu, tpm_util_crb_transfer);
++    tpm_util_pcrextend(src_qemu, tpm_util_crb_transfer);
++
++    unsigned char tpm_pcrread_resp[] =3D
++        "\x80\x01\x00\x00\x00\x3e\x00\x00\x00\x00\x00\x00\x00\x16\x00\x0=
+0"
++        "\x00\x01\x00\x0b\x03\x00\x04\x00\x00\x00\x00\x01\x00\x20\xf6\x8=
+5"
++        "\x98\xe5\x86\x8d\xe6\x8b\x97\x29\x99\x60\xf2\x71\x7d\x17\x67\x8=
+9"
++        "\xa4\x2f\x9a\xae\xa8\xc7\xb7\xaa\x79\xa8\x62\x56\xc1\xde";
++    tpm_util_pcrread(src_qemu, tpm_util_crb_transfer, tpm_pcrread_resp,
++                     sizeof(tpm_pcrread_resp));
++
++    migrate(src_qemu, ts->uri);
++    wait_for_migration_complete(src_qemu);
++
++    tpm_util_pcrread(dst_qemu, tpm_util_crb_transfer, tpm_pcrread_resp,
++                     sizeof(tpm_pcrread_resp));
++
++    qtest_quit(dst_qemu);
++    qtest_quit(src_qemu);
++
++    tpm_util_swtpm_kill(dst_tpm_pid);
++    if (dst_tpm_addr) {
++        g_unlink(dst_tpm_addr->u.q_unix.path);
++        qapi_free_SocketAddress(dst_tpm_addr);
++    }
++
++err_src_tpm_kill:
++    tpm_util_swtpm_kill(src_tpm_pid);
++    if (src_tpm_addr) {
++        g_unlink(src_tpm_addr->u.q_unix.path);
++        qapi_free_SocketAddress(src_tpm_addr);
++    }
++}
++
++int main(int argc, char **argv)
++{
++    int ret;
++    TestState ts =3D { 0 };
++
++    ts.src_tpm_path =3D g_dir_make_tmp("qemu-tpm-crb-swtpm-test.XXXXXX",=
+ NULL);
++    ts.dst_tpm_path =3D g_dir_make_tmp("qemu-tpm-crb-swtpm-test.XXXXXX",=
+ NULL);
++    ts.uri =3D g_strdup_printf("unix:%s/migsocket", ts.src_tpm_path);
++
++    module_call_init(MODULE_INIT_QOM);
++    g_test_init(&argc, &argv, NULL);
++
++    qtest_add_data_func("/tpm/crb-swtpm/test", &ts, tpm_crb_swtpm_test);
++    qtest_add_data_func("/tpm/crb-swtpm-migration/test", &ts,
++                        tpm_crb_swtpm_migration_test);
++    ret =3D g_test_run();
++
++    g_rmdir(ts.dst_tpm_path);
++    g_free(ts.dst_tpm_path);
++    g_rmdir(ts.src_tpm_path);
++    g_free(ts.src_tpm_path);
++    g_free(ts.uri);
++
++    return ret;
++}
+diff --git a/tests/tpm-util.c b/tests/tpm-util.c
+new file mode 100644
+index 0000000000..9072b6e850
+--- /dev/null
++++ b/tests/tpm-util.c
+@@ -0,0 +1,186 @@
++/*
++ * QTest TPM utilities
++ *
++ * Copyright (c) 2018 IBM Corporation
++ * Copyright (c) 2018 Red Hat, Inc.
++ *
++ * Authors:
++ *   Stefan Berger <stefanb@linux.vnet.ibm.com>
++ *   Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or la=
+ter.
++ * See the COPYING file in the top-level directory.
++ */
++
++#include "qemu/osdep.h"
++
++#include "hw/acpi/tpm.h"
++#include "libqtest.h"
++#include "tpm-util.h"
++
++void tpm_util_crb_transfer(QTestState *s,
++                           const unsigned char *req, size_t req_size,
++                           unsigned char *rsp, size_t rsp_size)
++{
++    uint64_t caddr =3D qtest_readq(s, TPM_CRB_ADDR_BASE + A_CRB_CTRL_CMD=
+_LADDR);
++    uint64_t raddr =3D qtest_readq(s, TPM_CRB_ADDR_BASE + A_CRB_CTRL_RSP=
+_ADDR);
++
++    qtest_writeb(s, TPM_CRB_ADDR_BASE + A_CRB_LOC_CTRL, 1);
++
++    qtest_memwrite(s, caddr, req, req_size);
++
++    uint32_t sts, start =3D 1;
++    uint64_t end_time =3D g_get_monotonic_time() + 5 * G_TIME_SPAN_SECON=
+D;
++    qtest_writel(s, TPM_CRB_ADDR_BASE + A_CRB_CTRL_START, start);
++    while (true) {
++        start =3D qtest_readl(s, TPM_CRB_ADDR_BASE + A_CRB_CTRL_START);
++        if ((start & 1) =3D=3D 0) {
++            break;
++        }
++        if (g_get_monotonic_time() >=3D end_time) {
++            break;
++        }
++    };
++    start =3D qtest_readl(s, TPM_CRB_ADDR_BASE + A_CRB_CTRL_START);
++    g_assert_cmpint(start & 1, =3D=3D, 0);
++    sts =3D qtest_readl(s, TPM_CRB_ADDR_BASE + A_CRB_CTRL_STS);
++    g_assert_cmpint(sts & 1, =3D=3D, 0);
++
++    qtest_memread(s, raddr, rsp, rsp_size);
++}
++
++void tpm_util_startup(QTestState *s, tx_func *tx)
++{
++    unsigned char buffer[1024];
++    unsigned char tpm_startup[] =3D
++        "\x80\x01\x00\x00\x00\x0c\x00\x00\x01\x44\x00\x00";
++    unsigned char tpm_startup_resp[] =3D
++        "\x80\x01\x00\x00\x00\x0a\x00\x00\x00\x00";
++
++    tx(s, tpm_startup, sizeof(tpm_startup), buffer, sizeof(buffer));
++
++    g_assert_cmpmem(buffer, sizeof(tpm_startup_resp),
++                    tpm_startup_resp, sizeof(tpm_startup_resp));
++}
++
++void tpm_util_pcrextend(QTestState *s, tx_func *tx)
++{
++    unsigned char buffer[1024];
++    unsigned char tpm_pcrextend[] =3D
++        "\x80\x02\x00\x00\x00\x41\x00\x00\x01\x82\x00\x00\x00\x0a\x00\x0=
+0"
++        "\x00\x09\x40\x00\x00\x09\x00\x00\x00\x00\x00\x00\x00\x00\x01\x0=
+0"
++        "\x0b\x74\x65\x73\x74\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x0=
+0"
++        "\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x0=
+0"
++        "\x00";
++
++    unsigned char tpm_pcrextend_resp[] =3D
++        "\x80\x02\x00\x00\x00\x13\x00\x00\x00\x00\x00\x00\x00\x00\x00\x0=
+0"
++        "\x01\x00\x00";
++
++    tx(s, tpm_pcrextend, sizeof(tpm_pcrextend), buffer, sizeof(buffer));
++
++    g_assert_cmpmem(buffer, sizeof(tpm_pcrextend_resp),
++                    tpm_pcrextend_resp, sizeof(tpm_pcrextend_resp));
++}
++
++void tpm_util_pcrread(QTestState *s, tx_func *tx,
++                      const unsigned char *exp_resp, size_t exp_resp_siz=
+e)
++{
++    unsigned char buffer[1024];
++    unsigned char tpm_pcrread[] =3D
++        "\x80\x01\x00\x00\x00\x14\x00\x00\x01\x7e\x00\x00\x00\x01\x00\x0=
+b"
++        "\x03\x00\x04\x00";
++
++    tx(s, tpm_pcrread, sizeof(tpm_pcrread), buffer, sizeof(buffer));
++
++    g_assert_cmpmem(buffer, exp_resp_size, exp_resp, exp_resp_size);
++}
++
++static gboolean tpm_util_swtpm_has_tpm2(void)
++{
++    gint stdout;
++    gboolean succ;
++    unsigned i;
++    char buffer[10240];
++    ssize_t n;
++    gchar *swtpm_argv[] =3D {
++        g_strdup("swtpm"), g_strdup("socket"), g_strdup("--help"), NULL
 +    };
 +
-+    /* write the header only */
-+    if (tpm_emulator_ctrlcmd(tpm_emu, CMD_SET_STATEBLOB, &pss,
-+                             offsetof(ptm_setstate, u.req.data), 0) < 0)=
- {
-+        error_report("tpm-emulator: could not set state blob type %d : %=
-s",
-+                     type, strerror(errno));
-+        return -1;
++    succ =3D g_spawn_async_with_pipes(NULL, swtpm_argv, NULL,
++                                    G_SPAWN_SEARCH_PATH, NULL, NULL, NUL=
+L,
++                                    NULL, &stdout, NULL, NULL);
++    if (!succ) {
++        goto cleanup;
 +    }
 +
-+    /* now the body */
-+    n =3D qemu_chr_fe_write_all(&tpm_emu->ctrl_chr, tsb->buffer, tsb->si=
-ze);
-+    if (n !=3D tsb->size) {
-+        error_report("tpm-emulator: Writing the stateblob (type %d) "
-+                     "failed; could not write %u bytes, but only %zd",
-+                     type, tsb->size, n);
-+        return -1;
++    n =3D read(stdout, buffer, sizeof(buffer) - 1);
++    if (n < 0) {
++        goto cleanup;
++    }
++    buffer[n] =3D 0;
++    if (!strstr(buffer, "--tpm2")) {
++        succ =3D false;
 +    }
 +
-+    /* now get the result */
-+    n =3D qemu_chr_fe_read_all(&tpm_emu->ctrl_chr,
-+                             (uint8_t *)&pss, sizeof(pss.u.resp));
-+    if (n !=3D sizeof(pss.u.resp)) {
-+        error_report("tpm-emulator: Reading response from writing stateb=
-lob "
-+                     "(type %d) failed; expected %zu bytes, got %zd", ty=
-pe,
-+                     sizeof(pss.u.resp), n);
-+        return -1;
++ cleanup:
++    for (i =3D 0; swtpm_argv[i]; i++) {
++        g_free(swtpm_argv[i]);
 +    }
 +
-+    tpm_result =3D be32_to_cpu(pss.u.resp.tpm_result);
-+    if (tpm_result !=3D 0) {
-+        error_report("tpm-emulator: Setting the stateblob (type %d) fail=
-ed "
-+                     "with a TPM error 0x%x", type, tpm_result);
-+        return -1;
-+    }
-+
-+    trace_tpm_emulator_set_state_blob(type, tsb->size, flags);
-+
-+    return 0;
++    return succ;
 +}
 +
++gboolean tpm_util_swtpm_start(const char *path, GPid *pid,
++                              SocketAddress **addr, GError **error)
++{
++    char *swtpm_argv_tpmstate =3D g_strdup_printf("dir=3D%s", path);
++    char *swtpm_argv_ctrl =3D g_strdup_printf("type=3Dunixio,path=3D%s/s=
+ock",
++                                            path);
++    gchar *swtpm_argv[] =3D {
++        g_strdup("swtpm"), g_strdup("socket"),
++        g_strdup("--tpmstate"), swtpm_argv_tpmstate,
++        g_strdup("--ctrl"), swtpm_argv_ctrl,
++        g_strdup("--tpm2"),
++        NULL
++    };
++    gboolean succ;
++    unsigned i;
++
++    succ =3D tpm_util_swtpm_has_tpm2();
++    if (!succ) {
++        goto cleanup;
++    }
++
++    *addr =3D g_new0(SocketAddress, 1);
++    (*addr)->type =3D SOCKET_ADDRESS_TYPE_UNIX;
++    (*addr)->u.q_unix.path =3D g_build_filename(path, "sock", NULL);
++
++    succ =3D g_spawn_async(NULL, swtpm_argv, NULL, G_SPAWN_SEARCH_PATH,
++                         NULL, NULL, pid, error);
++
++cleanup:
++    for (i =3D 0; swtpm_argv[i]; i++) {
++        g_free(swtpm_argv[i]);
++    }
++
++    return succ;
++}
++
++void tpm_util_swtpm_kill(GPid pid)
++{
++    int n;
++
++    if (!pid) {
++        return;
++    }
++
++    g_spawn_close_pid(pid);
++
++    n =3D kill(pid, 0);
++    if (n < 0) {
++        return;
++    }
++
++    kill(pid, SIGKILL);
++}
+diff --git a/tests/tpm-util.h b/tests/tpm-util.h
+new file mode 100644
+index 0000000000..d155d99aea
+--- /dev/null
++++ b/tests/tpm-util.h
+@@ -0,0 +1,36 @@
 +/*
-+ * Set all the TPM state blobs.
++ * QTest TPM utilities
 + *
-+ * Returns a negative errno code in case of error.
-+ */
-+static int tpm_emulator_set_state_blobs(TPMBackend *tb)
-+{
-+    TPMEmulator *tpm_emu =3D TPM_EMULATOR(tb);
-+    TPMBlobBuffers *state_blobs =3D &tpm_emu->state_blobs;
-+
-+    trace_tpm_emulator_set_state_blobs();
-+
-+    if (tpm_emulator_stop_tpm(tb) < 0) {
-+        trace_tpm_emulator_set_state_blobs_error("Could not stop TPM");
-+        return -EIO;
-+    }
-+
-+    if (tpm_emulator_set_state_blob(tpm_emu, PTM_BLOB_TYPE_PERMANENT,
-+                                    &state_blobs->permanent,
-+                                    state_blobs->permanent_flags) < 0 ||
-+        tpm_emulator_set_state_blob(tpm_emu, PTM_BLOB_TYPE_VOLATILE,
-+                                    &state_blobs->volatil,
-+                                    state_blobs->volatil_flags) < 0 ||
-+        tpm_emulator_set_state_blob(tpm_emu, PTM_BLOB_TYPE_SAVESTATE,
-+                                    &state_blobs->savestate,
-+                                    state_blobs->savestate_flags) < 0) {
-+        return -EIO;
-+    }
-+
-+    trace_tpm_emulator_set_state_blobs_done();
-+
-+    return 0;
-+}
-+
-+static int tpm_emulator_pre_save(void *opaque)
-+{
-+    TPMBackend *tb =3D opaque;
-+    TPMEmulator *tpm_emu =3D TPM_EMULATOR(tb);
-+
-+    trace_tpm_emulator_pre_save();
-+
-+    tpm_backend_finish_sync(tb);
-+
-+    /* get the state blobs from the TPM */
-+    return tpm_emulator_get_state_blobs(tpm_emu);
-+}
-+
-+/*
-+ * Load the TPM state blobs into the TPM.
++ * Copyright (c) 2018 IBM Corporation
 + *
-+ * Returns negative errno codes in case of error.
++ * Authors:
++ *   Stefan Berger <stefanb@linux.vnet.ibm.com>
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or la=
+ter.
++ * See the COPYING file in the top-level directory.
 + */
-+static int tpm_emulator_post_load(void *opaque, int version_id)
-+{
-+    TPMBackend *tb =3D opaque;
-+    int ret;
 +
-+    ret =3D tpm_emulator_set_state_blobs(tb);
-+    if (ret < 0) {
-+        return ret;
-+    }
++#ifndef TESTS_TPM_UTIL_H
++#define TESTS_TPM_UTIL_H
 +
-+    if (tpm_emulator_startup_tpm_resume(tb, 0, true) < 0) {
-+        return -EIO;
-+    }
++#include "qemu/osdep.h"
++#include "io/channel-socket.h"
 +
-+    return 0;
-+}
++typedef void (tx_func)(QTestState *s,
++                       const unsigned char *req, size_t req_size,
++                       unsigned char *rsp, size_t rsp_size);
 +
-+static const VMStateDescription vmstate_tpm_emulator =3D {
-+    .name =3D "tpm-emulator",
-+    .version_id =3D 0,
-+    .pre_save =3D tpm_emulator_pre_save,
-+    .post_load =3D tpm_emulator_post_load,
-+    .fields =3D (VMStateField[]) {
-+        VMSTATE_UINT32(state_blobs.permanent_flags, TPMEmulator),
-+        VMSTATE_UINT32(state_blobs.permanent.size, TPMEmulator),
-+        VMSTATE_VBUFFER_ALLOC_UINT32(state_blobs.permanent.buffer,
-+                                     TPMEmulator, 0, 0,
-+                                     state_blobs.permanent.size),
++void tpm_util_crb_transfer(QTestState *s,
++                           const unsigned char *req, size_t req_size,
++                           unsigned char *rsp, size_t rsp_size);
 +
-+        VMSTATE_UINT32(state_blobs.volatil_flags, TPMEmulator),
-+        VMSTATE_UINT32(state_blobs.volatil.size, TPMEmulator),
-+        VMSTATE_VBUFFER_ALLOC_UINT32(state_blobs.volatil.buffer,
-+                                     TPMEmulator, 0, 0,
-+                                     state_blobs.volatil.size),
++void tpm_util_startup(QTestState *s, tx_func *tx);
++void tpm_util_pcrextend(QTestState *s, tx_func *tx);
++void tpm_util_pcrread(QTestState *s, tx_func *tx,
++                      const unsigned char *exp_resp, size_t exp_resp_siz=
+e);
 +
-+        VMSTATE_UINT32(state_blobs.savestate_flags, TPMEmulator),
-+        VMSTATE_UINT32(state_blobs.savestate.size, TPMEmulator),
-+        VMSTATE_VBUFFER_ALLOC_UINT32(state_blobs.savestate.buffer,
-+                                     TPMEmulator, 0, 0,
-+                                     state_blobs.savestate.size),
++gboolean tpm_util_swtpm_start(const char *path, GPid *pid,
++                              SocketAddress **addr, GError **error);
++void tpm_util_swtpm_kill(GPid pid);
 +
-+        VMSTATE_END_OF_LIST()
-+    }
-+};
-+
- static void tpm_emulator_inst_init(Object *obj)
- {
-     TPMEmulator *tpm_emu =3D TPM_EMULATOR(obj);
-@@ -579,6 +871,8 @@ static void tpm_emulator_inst_init(Object *obj)
-     tpm_emu->options =3D g_new0(TPMEmulatorOptions, 1);
-     tpm_emu->cur_locty_number =3D ~0;
-     qemu_mutex_init(&tpm_emu->mutex);
-+
-+    vmstate_register(NULL, -1, &vmstate_tpm_emulator, obj);
- }
-=20
- /*
-@@ -600,6 +894,7 @@ static void tpm_emulator_shutdown(TPMEmulator *tpm_em=
-u)
- static void tpm_emulator_inst_finalize(Object *obj)
- {
-     TPMEmulator *tpm_emu =3D TPM_EMULATOR(obj);
-+    TPMBlobBuffers *state_blobs =3D &tpm_emu->state_blobs;
-=20
-     tpm_emulator_shutdown(tpm_emu);
-=20
-@@ -614,7 +909,13 @@ static void tpm_emulator_inst_finalize(Object *obj)
-         error_free(tpm_emu->migration_blocker);
-     }
-=20
-+    tpm_sized_buffer_reset(&state_blobs->volatil);
-+    tpm_sized_buffer_reset(&state_blobs->permanent);
-+    tpm_sized_buffer_reset(&state_blobs->savestate);
-+
-     qemu_mutex_destroy(&tpm_emu->mutex);
-+
-+    vmstate_unregister(NULL, &vmstate_tpm_emulator, obj);
- }
-=20
- static void tpm_emulator_class_init(ObjectClass *klass, void *data)
-diff --git a/hw/tpm/trace-events b/hw/tpm/trace-events
-index 9a65384088..c5bfbf1d4b 100644
---- a/hw/tpm/trace-events
-+++ b/hw/tpm/trace-events
-@@ -20,13 +20,19 @@ tpm_emulator_set_locality(uint8_t locty) "setting loc=
-ality to %d"
- tpm_emulator_handle_request(void) "processing TPM command"
- tpm_emulator_probe_caps(uint64_t caps) "capabilities: 0x%"PRIx64
- tpm_emulator_set_buffer_size(uint32_t buffersize, uint32_t minsize, uint=
-32_t maxsize) "buffer size: %u, min: %u, max: %u"
--tpm_emulator_startup_tpm(void) "startup"
-+tpm_emulator_startup_tpm_resume(bool is_resume, size_t buffersize) "is_r=
-esume: %d, buffer size: %zu"
- tpm_emulator_get_tpm_established_flag(uint8_t flag) "got established fla=
-g: %d"
- tpm_emulator_cancel_cmd_not_supt(void) "Backend does not support CANCEL_=
-TPM_CMD"
- tpm_emulator_handle_device_opts_tpm12(void) "TPM Version 1.2"
- tpm_emulator_handle_device_opts_tpm2(void) "TPM Version 2"
- tpm_emulator_handle_device_opts_unspec(void) "TPM Version Unspecified"
- tpm_emulator_handle_device_opts_startup_error(void) "Startup error"
-+tpm_emulator_get_state_blob(uint8_t type, uint32_t size, uint32_t flags)=
- "got state blob type %d, %u bytes, flags 0x%08x"
-+tpm_emulator_set_state_blob(uint8_t type, uint32_t size, uint32_t flags)=
- "set state blob type %d, %u bytes, flags 0x%08x"
-+tpm_emulator_set_state_blobs(void) "setting state blobs"
-+tpm_emulator_set_state_blobs_error(const char *msg) "error while setting=
- state blobs: %s"
-+tpm_emulator_set_state_blobs_done(void) "Done setting state blobs"
-+tpm_emulator_pre_save(void) ""
- tpm_emulator_inst_init(void) ""
-=20
- # hw/tpm/tpm_tis.c
++#endif /* TESTS_TPM_UTIL_H */
 --=20
 2.14.3
