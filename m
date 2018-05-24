@@ -1,29 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52894)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52908)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1fLsRL-0000QY-IN
-	for qemu-devel@nongnu.org; Thu, 24 May 2018 11:46:09 -0400
+	(envelope-from <thuth@redhat.com>) id 1fLsRR-0000W7-1M
+	for qemu-devel@nongnu.org; Thu, 24 May 2018 11:46:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1fLsRE-000315-Nw
-	for qemu-devel@nongnu.org; Thu, 24 May 2018 11:46:07 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:53648 helo=mx1.redhat.com)
+	(envelope-from <thuth@redhat.com>) id 1fLsRN-000341-5d
+	for qemu-devel@nongnu.org; Thu, 24 May 2018 11:46:13 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:54956 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1fLsRE-00030x-J4
-	for qemu-devel@nongnu.org; Thu, 24 May 2018 11:46:00 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.3])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 2730340201A8
-	for <qemu-devel@nongnu.org>; Thu, 24 May 2018 15:46:00 +0000 (UTC)
-From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Thu, 24 May 2018 17:45:53 +0200
-Message-Id: <20180524154556.17876-5-kraxel@redhat.com>
-In-Reply-To: <20180524154556.17876-1-kraxel@redhat.com>
-References: <20180524154556.17876-1-kraxel@redhat.com>
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1fLsRN-00033s-10
+	for qemu-devel@nongnu.org; Thu, 24 May 2018 11:46:09 -0400
+References: <1527172175-129517-1-git-send-email-mst@redhat.com>
+	<6b3cad0d-b849-6ba9-64cb-6a36a37cd19d@redhat.com>
+	<20180524175709-mutt-send-email-mst@kernel.org>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <681ace2f-f827-0e00-af77-f39dc2f7ccc1@redhat.com>
+Date: Thu, 24 May 2018 17:46:05 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+In-Reply-To: <20180524175709-mutt-send-email-mst@kernel.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 4/7] hw/display: add new bochs-display device
+Subject: Re: [Qemu-devel] [PATCH] libqtest: fail if child coredumps
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,393 +29,93 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Gerd Hoffmann <kraxel@redhat.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: qemu-devel@nongnu.org, Eric Blake <eblake@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Markus Armbruster <armbru@redhat.com>, Tiwei Bie <tiwei.bie@intel.com>
 
-After writing up the virtual mdev device emulating a display supporting
-the bochs vbe dispi interface (mbochs.ko) and seeing how simple it
-actually is I've figured that would be useful for qemu too.
+On 24.05.2018 17:00, Michael S. Tsirkin wrote:
+> On Thu, May 24, 2018 at 04:45:31PM +0200, Thomas Huth wrote:
+>> On 24.05.2018 16:30, Michael S. Tsirkin wrote:
+>>> Right now tests report OK status if QEMU crashes during cleanup.
+>>> Let's catch that case and fail the test.
+>>>
+>>> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+>>> ---
+>>>  tests/libqtest.c | 9 ++++++++-
+>>>  1 file changed, 8 insertions(+), 1 deletion(-)
+>>>
+>>> diff --git a/tests/libqtest.c b/tests/libqtest.c
+>>> index 43fb97e..f869854 100644
+>>> --- a/tests/libqtest.c
+>>> +++ b/tests/libqtest.c
+>>> @@ -103,8 +103,15 @@ static int socket_accept(int sock)
+>>>  static void kill_qemu(QTestState *s)
+>>>  {
+>>>      if (s->qemu_pid !=3D -1) {
+>>> +        int wstatus =3D 0;
+>>> +        pid_t pid;
+>>> +
+>>>          kill(s->qemu_pid, SIGTERM);
+>>> -        waitpid(s->qemu_pid, NULL, 0);
+>>> +        pid =3D waitpid(s->qemu_pid, &wstatus, 0);
+>>> +
+>>> +        if (pid =3D=3D s->qemu_pid && WIFSIGNALED(wstatus)) {
+>>> +            assert(!WCOREDUMP(wstatus));
+>>> +        }
+>>>      }
+>>>  }
+>>
+>> That's basically a good idea ... but I've already seen yet another iss=
+ue
+>> in the past already: QEMU sometimes simply hangs in an endless loop
+>> during clean up and never terminates. I think we should detect that
+>> situation, too. So instead of killing QEMU at the end of the testing, =
+I think we should
+>> rather try to terminate it with the QMP "quit" command. If QEMU does n=
+ot
+>> terminate with an exit code of 0, then the test should be flagged a
+>> failed (and only if QEMU did not terminate at all, it should be killed
+>> with SIGKILL).
+>>
+>>  Thomas
+>=20
+> Fine but can we agree to do this as a patch on top? And do you have
+> the time to implement this?
 
-So, here it is, -device bochs-display.  It is basically -device VGA
-without legacy vga emulation.  PCI bar 0 is the framebuffer, PCI bar 2
-is mmio with the registers.  The vga registers are simply not there
-though, neither in the legacy ioport location nor in the mmio bar.
-Consequently it is PCI class DISPLAY_OTHER not DISPLAY_VGA.
+Fine for me if we do that later. And no, I currently don't have time to
+work on this (but I've got it on my TODO list somewhere, so I hope I
+won't forget about it later...).
 
-So there is no text mode emulation, no weird video modes (planar,
-256color palette), no memory window at 0xa0000.  Just a linear
-framebuffer in the pci memory bar.  And the amount of code to emulate
-this (and therefore the attack surface) is an order of magnitude smaller
-when compared to vga emulation.
+> I'm seeing patches that cause crash on cleanup, it's not a theoretical
+> problem for me, so I'd like this one to go in first.
 
-Compatibility wise it works with OVMF (latest git master).
-The bochs-drm.ko linux kernel module can handle it just fine too.
-So UEFI guests should not see any functional difference to VGA.
+Ok, so here are the two problems that I remember:
 
-Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
-Tested-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-Message-id: 20180522165058.15404-4-kraxel@redhat.com
----
- hw/display/bochs-display.c | 325 +++++++++++++++++++++++++++++++++++++++=
-++++++
- hw/display/Makefile.objs   |   1 +
- 2 files changed, 326 insertions(+)
- create mode 100644 hw/display/bochs-display.c
+1)
 
-diff --git a/hw/display/bochs-display.c b/hw/display/bochs-display.c
-new file mode 100644
-index 0000000000..a523e81d1d
---- /dev/null
-+++ b/hw/display/bochs-display.c
-@@ -0,0 +1,325 @@
-+/*
-+ * QEMU PCI bochs display adapter.
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or la=
-ter.
-+ * See the COPYING file in the top-level directory.
-+ */
-+#include "qemu/osdep.h"
-+#include "hw/hw.h"
-+#include "hw/pci/pci.h"
-+#include "hw/display/bochs-vbe.h"
-+
-+#include "qapi/error.h"
-+
-+#include "ui/console.h"
-+#include "ui/qemu-pixman.h"
-+
-+typedef struct BochsDisplayMode {
-+    pixman_format_code_t format;
-+    uint32_t             bytepp;
-+    uint32_t             width;
-+    uint32_t             height;
-+    uint32_t             stride;
-+    uint64_t             offset;
-+    uint64_t             size;
-+} BochsDisplayMode;
-+
-+typedef struct BochsDisplayState {
-+    /* parent */
-+    PCIDevice        pci;
-+
-+    /* device elements */
-+    QemuConsole      *con;
-+    MemoryRegion     vram;
-+    MemoryRegion     mmio;
-+    MemoryRegion     vbe;
-+    MemoryRegion     qext;
-+
-+    /* device config */
-+    uint64_t         vgamem;
-+
-+    /* device registers */
-+    uint16_t         vbe_regs[VBE_DISPI_INDEX_NB];
-+    bool             big_endian_fb;
-+
-+    /* device state */
-+    BochsDisplayMode mode;
-+} BochsDisplayState;
-+
-+#define TYPE_BOCHS_DISPLAY "bochs-display"
-+#define BOCHS_DISPLAY(obj) OBJECT_CHECK(BochsDisplayState, (obj), \
-+                                        TYPE_BOCHS_DISPLAY)
-+
-+static const VMStateDescription vmstate_bochs_display =3D {
-+    .name =3D "bochs-display",
-+    .fields =3D (VMStateField[]) {
-+        VMSTATE_PCI_DEVICE(pci, BochsDisplayState),
-+        VMSTATE_UINT16_ARRAY(vbe_regs, BochsDisplayState, VBE_DISPI_INDE=
-X_NB),
-+        VMSTATE_BOOL(big_endian_fb, BochsDisplayState),
-+        VMSTATE_END_OF_LIST()
-+    }
-+};
-+
-+static uint64_t bochs_display_vbe_read(void *ptr, hwaddr addr,
-+                                       unsigned size)
-+{
-+    BochsDisplayState *s =3D ptr;
-+    unsigned int index =3D addr >> 1;
-+
-+    switch (index) {
-+    case VBE_DISPI_INDEX_ID:
-+        return VBE_DISPI_ID5;
-+    case VBE_DISPI_INDEX_VIDEO_MEMORY_64K:
-+        return s->vgamem / (64 * 1024);
-+    }
-+
-+    if (index >=3D ARRAY_SIZE(s->vbe_regs)) {
-+        return -1;
-+    }
-+    return s->vbe_regs[index];
-+}
-+
-+static void bochs_display_vbe_write(void *ptr, hwaddr addr,
-+                                    uint64_t val, unsigned size)
-+{
-+    BochsDisplayState *s =3D ptr;
-+    unsigned int index =3D addr >> 1;
-+
-+    if (index >=3D ARRAY_SIZE(s->vbe_regs)) {
-+        return;
-+    }
-+    s->vbe_regs[index] =3D val;
-+}
-+
-+static const MemoryRegionOps bochs_display_vbe_ops =3D {
-+    .read =3D bochs_display_vbe_read,
-+    .write =3D bochs_display_vbe_write,
-+    .valid.min_access_size =3D 1,
-+    .valid.max_access_size =3D 4,
-+    .impl.min_access_size =3D 2,
-+    .impl.max_access_size =3D 2,
-+    .endianness =3D DEVICE_LITTLE_ENDIAN,
-+};
-+
-+static uint64_t bochs_display_qext_read(void *ptr, hwaddr addr,
-+                                        unsigned size)
-+{
-+    BochsDisplayState *s =3D ptr;
-+
-+    switch (addr) {
-+    case PCI_VGA_QEXT_REG_SIZE:
-+        return PCI_VGA_QEXT_SIZE;
-+    case PCI_VGA_QEXT_REG_BYTEORDER:
-+        return s->big_endian_fb ?
-+            PCI_VGA_QEXT_BIG_ENDIAN : PCI_VGA_QEXT_LITTLE_ENDIAN;
-+    default:
-+        return 0;
-+    }
-+}
-+
-+static void bochs_display_qext_write(void *ptr, hwaddr addr,
-+                                     uint64_t val, unsigned size)
-+{
-+    BochsDisplayState *s =3D ptr;
-+
-+    switch (addr) {
-+    case PCI_VGA_QEXT_REG_BYTEORDER:
-+        if (val =3D=3D PCI_VGA_QEXT_BIG_ENDIAN) {
-+            s->big_endian_fb =3D true;
-+        }
-+        if (val =3D=3D PCI_VGA_QEXT_LITTLE_ENDIAN) {
-+            s->big_endian_fb =3D false;
-+        }
-+        break;
-+    }
-+}
-+
-+static const MemoryRegionOps bochs_display_qext_ops =3D {
-+    .read =3D bochs_display_qext_read,
-+    .write =3D bochs_display_qext_write,
-+    .valid.min_access_size =3D 4,
-+    .valid.max_access_size =3D 4,
-+    .endianness =3D DEVICE_LITTLE_ENDIAN,
-+};
-+
-+static int bochs_display_get_mode(BochsDisplayState *s,
-+                                   BochsDisplayMode *mode)
-+{
-+    uint16_t *vbe =3D s->vbe_regs;
-+    uint32_t virt_width;
-+
-+    if (!(vbe[VBE_DISPI_INDEX_ENABLE] & VBE_DISPI_ENABLED)) {
-+        return -1;
-+    }
-+
-+    memset(mode, 0, sizeof(*mode));
-+    switch (vbe[VBE_DISPI_INDEX_BPP]) {
-+    case 16:
-+        /* best effort: support native endianess only */
-+        mode->format =3D PIXMAN_r5g6b5;
-+        mode->bytepp =3D 2;
-+    case 32:
-+        mode->format =3D s->big_endian_fb
-+            ? PIXMAN_BE_x8r8g8b8
-+            : PIXMAN_LE_x8r8g8b8;
-+        mode->bytepp =3D 4;
-+        break;
-+    default:
-+        return -1;
-+    }
-+
-+    mode->width  =3D vbe[VBE_DISPI_INDEX_XRES];
-+    mode->height =3D vbe[VBE_DISPI_INDEX_YRES];
-+    virt_width  =3D vbe[VBE_DISPI_INDEX_VIRT_WIDTH];
-+    if (virt_width < mode->width) {
-+        virt_width =3D mode->width;
-+    }
-+    mode->stride =3D virt_width * mode->bytepp;
-+    mode->size   =3D (uint64_t)mode->stride * mode->height;
-+    mode->offset =3D ((uint64_t)vbe[VBE_DISPI_INDEX_X_OFFSET] * mode->by=
-tepp +
-+                    (uint64_t)vbe[VBE_DISPI_INDEX_Y_OFFSET] * mode->stri=
-de);
-+
-+    if (mode->width < 64 || mode->height < 64) {
-+        return -1;
-+    }
-+    if (mode->offset + mode->size > s->vgamem) {
-+        return -1;
-+    }
-+    return 0;
-+}
-+
-+static void bochs_display_update(void *opaque)
-+{
-+    BochsDisplayState *s =3D opaque;
-+    BochsDisplayMode mode;
-+    DisplaySurface *ds;
-+    uint8_t *ptr;
-+    int ret;
-+
-+    ret =3D bochs_display_get_mode(s, &mode);
-+    if (ret < 0) {
-+        /* no (valid) video mode */
-+        return;
-+    }
-+
-+    if (memcmp(&s->mode, &mode, sizeof(mode)) !=3D 0) {
-+        /* video mode switch */
-+        s->mode =3D mode;
-+        ptr =3D memory_region_get_ram_ptr(&s->vram);
-+        ds =3D qemu_create_displaysurface_from(mode.width,
-+                                             mode.height,
-+                                             mode.format,
-+                                             mode.stride,
-+                                             ptr + mode.offset);
-+        dpy_gfx_replace_surface(s->con, ds);
-+    }
-+
-+    dpy_gfx_update_full(s->con);
-+}
-+
-+static const GraphicHwOps bochs_display_gfx_ops =3D {
-+    .gfx_update =3D bochs_display_update,
-+};
-+
-+static void bochs_display_realize(PCIDevice *dev, Error **errp)
-+{
-+    BochsDisplayState *s =3D BOCHS_DISPLAY(dev);
-+    Object *obj =3D OBJECT(dev);
-+
-+    s->con =3D graphic_console_init(DEVICE(dev), 0, &bochs_display_gfx_o=
-ps, s);
-+
-+    if (s->vgamem < (4 * 1024 * 1024)) {
-+        error_setg(errp, "bochs-display: video memory too small");
-+    }
-+    if (s->vgamem > (256 * 1024 * 1024)) {
-+        error_setg(errp, "bochs-display: video memory too big");
-+    }
-+    s->vgamem =3D pow2ceil(s->vgamem);
-+
-+    memory_region_init_ram(&s->vram, obj, "bochs-display-vram", s->vgame=
-m,
-+                           &error_fatal);
-+    memory_region_init_io(&s->vbe, obj, &bochs_display_vbe_ops, s,
-+                          "bochs dispi interface", PCI_VGA_BOCHS_SIZE);
-+    memory_region_init_io(&s->qext, obj, &bochs_display_qext_ops, s,
-+                          "qemu extended regs", PCI_VGA_QEXT_SIZE);
-+
-+    memory_region_init(&s->mmio, obj, "bochs-display-mmio",
-+                       PCI_VGA_MMIO_SIZE);
-+    memory_region_add_subregion(&s->mmio, PCI_VGA_BOCHS_OFFSET, &s->vbe)=
-;
-+    memory_region_add_subregion(&s->mmio, PCI_VGA_QEXT_OFFSET, &s->qext)=
-;
-+
-+    pci_set_byte(&s->pci.config[PCI_REVISION_ID], 2);
-+    pci_register_bar(&s->pci, 0, PCI_BASE_ADDRESS_MEM_PREFETCH, &s->vram=
-);
-+    pci_register_bar(&s->pci, 2, PCI_BASE_ADDRESS_SPACE_MEMORY, &s->mmio=
-);
-+}
-+
-+static bool bochs_display_get_big_endian_fb(Object *obj, Error **errp)
-+{
-+    BochsDisplayState *s =3D BOCHS_DISPLAY(obj);
-+
-+    return s->big_endian_fb;
-+}
-+
-+static void bochs_display_set_big_endian_fb(Object *obj, bool value,
-+                                            Error **errp)
-+{
-+    BochsDisplayState *s =3D BOCHS_DISPLAY(obj);
-+
-+    s->big_endian_fb =3D value;
-+}
-+
-+static void bochs_display_init(Object *obj)
-+{
-+    /* Expose framebuffer byteorder via QOM */
-+    object_property_add_bool(obj, "big-endian-framebuffer",
-+                             bochs_display_get_big_endian_fb,
-+                             bochs_display_set_big_endian_fb,
-+                             NULL);
-+}
-+
-+static void bochs_display_exit(PCIDevice *dev)
-+{
-+    BochsDisplayState *s =3D BOCHS_DISPLAY(dev);
-+
-+    graphic_console_close(s->con);
-+}
-+
-+static Property bochs_display_properties[] =3D {
-+    DEFINE_PROP_SIZE("vgamem", BochsDisplayState, vgamem, 16 * 1024 * 10=
-24),
-+    DEFINE_PROP_END_OF_LIST(),
-+};
-+
-+static void bochs_display_class_init(ObjectClass *klass, void *data)
-+{
-+    DeviceClass *dc =3D DEVICE_CLASS(klass);
-+    PCIDeviceClass *k =3D PCI_DEVICE_CLASS(klass);
-+
-+    k->class_id  =3D PCI_CLASS_DISPLAY_OTHER;
-+    k->vendor_id =3D PCI_VENDOR_ID_QEMU;
-+    k->device_id =3D PCI_DEVICE_ID_QEMU_VGA;
-+
-+    k->realize   =3D bochs_display_realize;
-+    k->exit      =3D bochs_display_exit;
-+    dc->vmsd     =3D &vmstate_bochs_display;
-+    dc->props    =3D bochs_display_properties;
-+    set_bit(DEVICE_CATEGORY_DISPLAY, dc->categories);
-+}
-+
-+static const TypeInfo bochs_display_type_info =3D {
-+    .name           =3D TYPE_BOCHS_DISPLAY,
-+    .parent         =3D TYPE_PCI_DEVICE,
-+    .instance_size  =3D sizeof(BochsDisplayState),
-+    .instance_init  =3D bochs_display_init,
-+    .class_init     =3D bochs_display_class_init,
-+    .interfaces     =3D (InterfaceInfo[]) {
-+        { INTERFACE_CONVENTIONAL_PCI_DEVICE },
-+        { },
-+    },
-+};
-+
-+static void bochs_display_register_types(void)
-+{
-+    type_register_static(&bochs_display_type_info);
-+}
-+
-+type_init(bochs_display_register_types)
-diff --git a/hw/display/Makefile.objs b/hw/display/Makefile.objs
-index 11321e466b..d907b381ae 100644
---- a/hw/display/Makefile.objs
-+++ b/hw/display/Makefile.objs
-@@ -9,6 +9,7 @@ common-obj-$(CONFIG_SSD0323) +=3D ssd0323.o
- common-obj-$(CONFIG_XEN) +=3D xenfb.o
-=20
- common-obj-$(CONFIG_VGA_PCI) +=3D vga-pci.o
-+common-obj-$(CONFIG_VGA_PCI) +=3D bochs-display.o
- common-obj-$(CONFIG_VGA_ISA) +=3D vga-isa.o
- common-obj-$(CONFIG_VGA_ISA_MM) +=3D vga-isa-mm.o
- common-obj-$(CONFIG_VMWARE_VGA) +=3D vmware_vga.o
---=20
-2.9.3
+git checkout 17bd9597be45b96ae00716b0ae01a4d11bbee1ab~1
+make -j4 subdir-nios2-softmmu
+nios2-softmmu/qemu-system-nios2 -monitor stdio
+
+=3D=3D> You can neither "quit" from the HMP prompt, nor kill QEMU with
+SIGTERM, you've got to use SIGKILL instead.
+
+Ok, libqtest likely would not have reported success in this case, too,
+we just did not notice since there is no libqtest in place that tests
+the nios2 machine in TCG mode. Anyway, it would be nice if qtest would
+properly detect the situation and report an error instead of just
+hanging in waitpid().
+
+2)
+
+git checkout b39b61e410022f96ceb53d4381d25cba5126ac44~1
+make -j4 subdir-ppc-softmmu
+ppc-softmmu/qemu-system-ppc -M 40p -monitor stdio
+
+=3D=3D=3D> QEMU asserts here with both, HMP "quit" and SIGTERM. This was =
+the
+problem where libqtest did not report an error though it should have
+reported one. So QEMU was not hanging in an endless loop here, but core
+dumped ... Sorry, I apparently mixed this up in my mind with the first
+case. That means we should be fine here with your patch.
+
+ Thomas
