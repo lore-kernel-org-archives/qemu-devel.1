@@ -1,23 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51629)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51768)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1fLtzt-0003UL-9H
-	for qemu-devel@nongnu.org; Thu, 24 May 2018 13:25:54 -0400
+	(envelope-from <thuth@redhat.com>) id 1fLu0N-0003mk-Ut
+	for qemu-devel@nongnu.org; Thu, 24 May 2018 13:26:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1fLtzr-0008GH-Sz
-	for qemu-devel@nongnu.org; Thu, 24 May 2018 13:25:53 -0400
-References: <20180518132114.4070-1-kwolf@redhat.com>
-	<20180518132114.4070-32-kwolf@redhat.com>
-	<8af81ec5-9a7b-e787-25cd-61deec9a40dc@redhat.com>
-	<20180524083020.GD4008@localhost.localdomain>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <1f9b1685-1d1c-b1d4-0408-d11a12f2a199@redhat.com>
-Date: Thu, 24 May 2018 13:25:45 -0400
+	(envelope-from <thuth@redhat.com>) id 1fLu0K-0000E9-1k
+	for qemu-devel@nongnu.org; Thu, 24 May 2018 13:26:23 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:56486 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1fLu0J-0000Dx-Uj
+	for qemu-devel@nongnu.org; Thu, 24 May 2018 13:26:19 -0400
+References: <1527178151-181781-1-git-send-email-mst@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <bf33951f-d205-ec9c-4ceb-7703deea97f7@redhat.com>
+Date: Thu, 24 May 2018 19:26:16 +0200
 MIME-Version: 1.0
-In-Reply-To: <20180524083020.GD4008@localhost.localdomain>
+In-Reply-To: <1527178151-181781-1-git-send-email-mst@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 31/40] job: Add job_is_ready()
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v3 2/1] libqtest: add more exit status
+ checks
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,168 +28,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, jcody@redhat.com, armbru@redhat.com, mreitz@redhat.com
+To: "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org
+Cc: Eric Blake <eblake@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Markus Armbruster <armbru@redhat.com>
 
+On 24.05.2018 18:11, Michael S. Tsirkin wrote:
+> Add more checks on how did QEMU exit.
+>=20
+> Legal ways to exit right now:
+> - exit(0) or return from main
+> - kill(SIGTERM) - sent by testing infrastructure
+>=20
+> Anything else is illegal.
+[...]
+> -        if (pid =3D=3D s->qemu_pid && WIFSIGNALED(wstatus)) {
+> +        /* waitpid returns child PID on success */
+> +        assert(pid =3D=3D s->qemu_pid);
+> +
+> +        /* If exited on signal - check the reason: core dump is never =
+OK */
+> +        if (WIFSIGNALED(wstatus)) {
+>              assert(!WCOREDUMP(wstatus));
+>          }
+> +        /* If exited normally - check exit status */
+> +        if (WIFEXITED(wstatus)) {
+> +            assert(!WEXITSTATUS(wstatus));
+> +        }
+> +        /* Valid ways to exit: right now only return from main or exit=
+ */
+> +        assert(WIFEXITED(wstatus));
+>      }
+>  }
 
+It's strange that you always get WIFEXITED(wstatus) =3D=3D true here, eve=
+n
+if QEMU has been terminated by SIGTERM? I assume that's due to the fact
+that QEMU intercepts SIGTERM and terminates via exit() instead? So I
+think you could simply replace the last three asserts with:
 
-On 05/24/2018 04:30 AM, Kevin Wolf wrote:
-> Am 24.05.2018 um 01:42 hat John Snow geschrieben:
->> On 05/18/2018 09:21 AM, Kevin Wolf wrote:
->>> Instead of having a 'bool ready' in BlockJob, add a function that
->>> derives its value from the job status.
->>>
->>> At the same time, this fixes the behaviour to match what the QAPI
->>> documentation promises for query-block-job: 'true if the job may be
->>> completed'. When the ready flag was introduced in commit ef6dbf1e46e,
->>> the flag never had to be reset to match the description because after
->>> being ready, the jobs would immediately complete and disappear.
->>>
->>> Job transactions and manual job finalisation were introduced only later.
->>> With these changes, jobs may stay around even after having completed
->>> (and they are not ready to be completed a second time), however their
->>> patches forgot to reset the ready flag.
->>>
->>> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
->>> Reviewed-by: Max Reitz <mreitz@redhat.com>
->>> ---
->>>  include/block/blockjob.h |  5 -----
->>>  include/qemu/job.h       |  3 +++
->>>  blockjob.c               |  3 +--
->>>  job.c                    | 22 ++++++++++++++++++++++
->>>  qemu-img.c               |  2 +-
->>>  tests/test-blockjob.c    |  2 +-
->>>  6 files changed, 28 insertions(+), 9 deletions(-)
->>>
->>> diff --git a/include/block/blockjob.h b/include/block/blockjob.h
->>> index 5a81afc6c3..8e1e1ee0de 100644
->>> --- a/include/block/blockjob.h
->>> +++ b/include/block/blockjob.h
->>> @@ -49,11 +49,6 @@ typedef struct BlockJob {
->>>      /** The block device on which the job is operating.  */
->>>      BlockBackend *blk;
->>>  
->>> -    /**
->>> -     * Set to true when the job is ready to be completed.
->>> -     */
->>> -    bool ready;
->>> -
->>>      /** Status that is published by the query-block-jobs QMP API */
->>>      BlockDeviceIoStatus iostatus;
->>>  
->>> diff --git a/include/qemu/job.h b/include/qemu/job.h
->>> index 1e8050c6fb..487f9d9a32 100644
->>> --- a/include/qemu/job.h
->>> +++ b/include/qemu/job.h
->>> @@ -367,6 +367,9 @@ bool job_is_cancelled(Job *job);
->>>  /** Returns whether the job is in a completed state. */
->>>  bool job_is_completed(Job *job);
->>>  
->>> +/** Returns whether the job is ready to be completed. */
->>> +bool job_is_ready(Job *job);
->>> +
->>>  /**
->>>   * Request @job to pause at the next pause point. Must be paired with
->>>   * job_resume(). If the job is supposed to be resumed by user action, call
->>> diff --git a/blockjob.c b/blockjob.c
->>> index 3ca009bea5..38f18e9ba3 100644
->>> --- a/blockjob.c
->>> +++ b/blockjob.c
->>> @@ -269,7 +269,7 @@ BlockJobInfo *block_job_query(BlockJob *job, Error **errp)
->>>      info->offset    = job->offset;
->>>      info->speed     = job->speed;
->>>      info->io_status = job->iostatus;
->>> -    info->ready     = job->ready;
->>> +    info->ready     = job_is_ready(&job->job),
->>>      info->status    = job->job.status;
->>>      info->auto_finalize = job->job.auto_finalize;
->>>      info->auto_dismiss  = job->job.auto_dismiss;
->>> @@ -436,7 +436,6 @@ void block_job_user_resume(Job *job)
->>>  void block_job_event_ready(BlockJob *job)
->>>  {
->>>      job_state_transition(&job->job, JOB_STATUS_READY);
->>> -    job->ready = true;
->>>  
->>>      if (block_job_is_internal(job)) {
->>>          return;
->>> diff --git a/job.c b/job.c
->>> index af31de4669..66ee26f2a0 100644
->>> --- a/job.c
->>> +++ b/job.c
->>> @@ -199,6 +199,28 @@ bool job_is_cancelled(Job *job)
->>>      return job->cancelled;
->>>  }
->>>  
->>> +bool job_is_ready(Job *job)
->>> +{
->>> +    switch (job->status) {
->>> +    case JOB_STATUS_UNDEFINED:
->>> +    case JOB_STATUS_CREATED:
->>> +    case JOB_STATUS_RUNNING:
->>> +    case JOB_STATUS_PAUSED:
->>> +    case JOB_STATUS_WAITING:
->>> +    case JOB_STATUS_PENDING:
->>> +    case JOB_STATUS_ABORTING:
->>> +    case JOB_STATUS_CONCLUDED:
->>> +    case JOB_STATUS_NULL:
->>> +        return false;
->>> +    case JOB_STATUS_READY:
->>> +    case JOB_STATUS_STANDBY:
->>> +        return true;
->>> +    default:
->>> +        g_assert_not_reached();
->>> +    }
->>> +    return false;
->>> +}
->>> +
->>
->> What's the benefit to a switch statement with a default clause here,
->> over the shorter:
->>
->> if (job->status == READY || job->status == STANDBY) {
->>   return true;
->> }
->> return false;
->>
->> (Yes, I realize you already merged this code, but I'm still curious and
->> I need to read the series anyway to see what's changed...)
-> 
-> That it's easy to copy and paste from job_is_completed()? :-P
-> 
+	assert(WIFEXITED(wstatus) && !WEXITSTATUS(wstatus));
 
-Haha! Sure!
-
-> I guess you could argue that the switch ensures that we don't forget to
-> explicitly handle every state if we ever add a new one, but the real
-> reason is more like, job_is_completed() was already there and I didn't
-> see a reason to do something different here.
-> 
-
-I think the "default" case removes that benefit somewhat; it's nicer
-when the compiler yelps at you for forgetting. The cases that might
-cause an assertion could be harder to hit.
-
-No need to change anything though, I was really just curious about your
-style preferences.
-
-(I often like to write switch/case statements without a default clause
-hoping that the compiler will catch when I don't check all possible
-enumerations, but this doesn't work well with QAPI values because of the
-__MAX enumeration we like to add at the end. You can fix it by adding a
-case MY_ENUM__MAX: g_assert_not_reached();, but I'm often afraid this
-looks too hacky and silly to check in. I wish C had slightly nicer
-enumerations as first class citizens a lot. I also wish I had a yacht
-sometimes.)
-
-> (And actually, I seem to remember that I initially had everything after
-> READY return true as well, but then I noticed that you can reach those
-> states through ABORTED as well, which should not result in
-> job_is_ready() returning true.)
-> 
-
-Makes much more sense.
-
-Thanks!
-
-> Kevin
-> 
+ Thomas
