@@ -1,23 +1,37 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51701)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52412)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1fLqPz-0003gY-3y
-	for qemu-devel@nongnu.org; Thu, 24 May 2018 09:36:36 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1fLqTm-0004l9-4u
+	for qemu-devel@nongnu.org; Thu, 24 May 2018 09:40:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1fLqPs-0003tW-Rr
-	for qemu-devel@nongnu.org; Thu, 24 May 2018 09:36:34 -0400
-Received: from fanzine.igalia.com ([91.117.99.155]:51549)
+	(envelope-from <pbonzini@redhat.com>) id 1fLqTi-0005yV-DJ
+	for qemu-devel@nongnu.org; Thu, 24 May 2018 09:40:30 -0400
+Received: from mail-wr0-f196.google.com ([209.85.128.196]:44806)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <berto@igalia.com>) id 1fLqPs-0003XY-Ev
-	for qemu-devel@nongnu.org; Thu, 24 May 2018 09:36:28 -0400
-From: Alberto Garcia <berto@igalia.com>
-In-Reply-To: <20170605123908.18777-20-pbonzini@redhat.com>
-References: <20170605123908.18777-1-pbonzini@redhat.com>
-	<20170605123908.18777-20-pbonzini@redhat.com>
-Date: Thu, 24 May 2018 15:35:50 +0200
-Message-ID: <w51in7dch1l.fsf@maestria.local.igalia.com>
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1fLqTh-0005xo-Vq
+	for qemu-devel@nongnu.org; Thu, 24 May 2018 09:40:26 -0400
+Received: by mail-wr0-f196.google.com with SMTP id y15-v6so3199166wrg.11
+	for <qemu-devel@nongnu.org>; Thu, 24 May 2018 06:40:25 -0700 (PDT)
+References: <20180515113348.10516-1-zyimin@linux.ibm.com>
+	<20180515113348.10516-2-zyimin@linux.ibm.com>
+	<20180517124109.GJ17734@vader>
+	<20180518075212.GE3416@dnr> <20180518091916.GA22292@vader>
+	<20180518130729.GF3416@dnr>
+	<7149dfa9-7d3a-a2ff-b326-7e9ba71f8fe1@linux.ibm.com>
+	<20180523074757.GI26766@dnr>
+	<397e4f8c-0913-6ffd-13fa-743abbbd47e4@linux.ibm.com>
+	<eb079c9d-9251-bb2a-7cbc-5cb6423778db@redhat.com>
+	<c113aa1c-a829-7a96-9874-b8ab48e84a29@linux.ibm.com>
+	<8de364b2-a1c8-7a29-284c-6356d687638b@redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <33d11137-210b-1a13-e258-d509f4876d67@redhat.com>
+Date: Thu, 24 May 2018 15:40:10 +0200
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH 19/19] block: make accounting thread-safe
+In-Reply-To: <8de364b2-a1c8-7a29-284c-6356d687638b@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v2 1/1] sandbox: disable -sandbox if
+ CONFIG_SECCOMP undefined
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,25 +40,25 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
-Cc: famz@redhat.com
+To: otubo@redhat.com, Yi Min Zhao <zyimin@linux.ibm.com>, =?UTF-8?Q?J=c3=a1n_Tomko?= <jtomko@redhat.com>
+Cc: borntraeger@de.ibm.com, fiuczy@linux.ibm.com, qemu-devel@nongnu.org
 
-On Mon 05 Jun 2017 02:39:08 PM CEST, Paolo Bonzini wrote:
-> @@ -102,6 +107,8 @@ static void block_account_one_io(BlockAcctStats *stats, BlockAcctCookie *cookie,
->  
->      assert(cookie->type < BLOCK_MAX_IOTYPE);
->  
-> +    qemu_mutex_lock(&stats->lock);
+On 24/05/2018 09:53, Eduardo Otubo wrote:
+>>>>>
+>>>> Thanks! But I have not got response from Paolo.  I have added him to
+>>>> CC list.
+>>>>
+>>>  I'll just wait one more ACK and will send a pull request on the
+>>> seccomp queue. Thanks for the contribution.
+>>>
+>>>
+>> So... what I should do is wait?
+>>
+> Yes, even though I think we're safe to proceed without his explicit ack.
 
-QEMU crashes because this lock is not initialized if you do aio_read
-directly from a BDS not attached to a BlockBackend (should that
-operation be legal at all?)
+The patch is okay; however, as a follow-up, you could consider moving
+all the CONFIG_SECCOMP code to qemu-seccomp.c.
 
-$ qemu-system-x86_64 -monitor stdio \
--blockdev driver=qcow2,file.driver=file,file.filename=hd0.img,node-name=hd0
+This way, the only #ifdef remains the one around qemu_opts_foreach.
 
-(qemu) qemu-io hd0 "aio_read 0 1M"
-qemu-system-x86_64: util/qemu-thread-posix.c:64: qemu_mutex_lock_impl: Assertion `mutex->initialized' failed.
-Aborted
-
-Berto
+Paolo
