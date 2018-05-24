@@ -1,20 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51389)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55076)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rjones@redhat.com>) id 1fLoUX-0007qA-FQ
-	for qemu-devel@nongnu.org; Thu, 24 May 2018 07:33:10 -0400
+	(envelope-from <marcel.apfelbaum@gmail.com>) id 1fLopF-00033q-Ev
+	for qemu-devel@nongnu.org; Thu, 24 May 2018 07:54:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rjones@redhat.com>) id 1fLoUV-00021Z-6W
-	for qemu-devel@nongnu.org; Thu, 24 May 2018 07:33:09 -0400
-Date: Thu, 24 May 2018 12:32:51 +0100
-From: "Richard W.M. Jones" <rjones@redhat.com>
-Message-ID: <20180524113251.GB4660@redhat.com>
-References: <20180518180440-mutt-send-email-mst@kernel.org>
+	(envelope-from <marcel.apfelbaum@gmail.com>) id 1fLopC-0000p6-8m
+	for qemu-devel@nongnu.org; Thu, 24 May 2018 07:54:33 -0400
+Received: from mail-wr0-x234.google.com ([2a00:1450:400c:c0c::234]:38465)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <marcel.apfelbaum@gmail.com>)
+	id 1fLopC-0000ou-2P
+	for qemu-devel@nongnu.org; Thu, 24 May 2018 07:54:30 -0400
+Received: by mail-wr0-x234.google.com with SMTP id 94-v6so2586140wrf.5
+	for <qemu-devel@nongnu.org>; Thu, 24 May 2018 04:54:29 -0700 (PDT)
+References: <09ACC28F0266D94FB9D1BC3F193A6478014E3D1B@MX303CL02.corp.emc.com>
+From: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+Message-ID: <7bc63c59-de50-dbeb-dee8-bca3e6dd12cd@gmail.com>
+Date: Thu, 24 May 2018 14:54:25 +0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20180518180440-mutt-send-email-mst@kernel.org>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] storing machine data in qcow images?
+In-Reply-To: <09ACC28F0266D94FB9D1BC3F193A6478014E3D1B@MX303CL02.corp.emc.com>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
+Subject: Re: [Qemu-devel] QEMU: Multiple PCI domains for x86 PCI Express
+ Machine (Q35)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,48 +31,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: ehabkost@redhat.com, stefanha@redhat.com, kwolf@redhat.com, mreitz@redhat.com, qemu-devel@nongnu.org, qemu-block@nongnu.org
+To: "Wei, Aaron" <Aaron.Wei@Dell.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: "Fu, Bryan" <Bryan.Fu@dell.com>, "Xia, Robert" <Robert.Xia@dell.com>, "Zhou, Zhenzan" <Zhenzan.Zhou@dell.com>, Zihan Yang <whois.zihan.yang@gmail.com>
 
-I read the whole thread and the fundamental problem is that you're
-mixing layers.  Let qcow2 be a disk image format, and let management
-layers deal with metadata and how to run qemu.
+Hi Aaron
 
-What's going to happen when you have (eg) an OVA file containing qcow2
-files, and the qcow2 files all have different metadata from each other
-and from the actual metadata in the OVA?  Even the case where you've
-got =E2=80=98-hda file1.qcow2 -hdb file2.qcow2=E2=80=99 is not properly d=
-efined.  What
-happens if someone uses =E2=80=98-M mach1 -hda file.qcow2=E2=80=99 and th=
-e machine
-type in the qcow2 file conflicts with the command line?
+On 05/24/2018 12:31 PM, Wei, Aaron wrote:
+>
+> Hi,  Marcel
+>
+> It's my pleasure to write to you on behalf of a team who is developing 
+> the Intel VMD virtualization base on QEMU in Dell EMC.
+>
+> From https://www.outreachy.org. we find that you are working on the 
+> Multiple PCI domain feature which we think may be  very helpful to our 
+> current work.
+>
 
-BTW we have a tooling (libguestfs) which can tell you what devices are
-supported by the guest.  virt-v2v already uses libguestfs to find out
-the full list of devices supported by guests, and uses that to drive
-conversion.  At some point we're going to extend virt-inspector to
-make this a bit easier (patches and other contributions welcome,
-there's a huge list of work to do on libguestfs and not enough
-developers to get through it).
+We are glad you are considering using the project.
+The project got delayed for next "Outreachy/GSOC" round, however Zihan 
+Yang <whois.zihan.yang@gmail.com>,
+a PhD student, graciously offered to try it in his private time.
 
-There is however a seed of a good idea in the thread:
+> We’ll be grateful if you can share some information about,
+>
+> 1.What’s the present developing status?
+>
 
-> I don't think QEMU needs to use this information automatically,
-> necessarily.  I think the first step is to simply make QEMU save
-> this information in the disk image, and making qemu-img able to
-> read and write this information.
+An early RFC (not a working version) was posted here:
+https://lists.gnu.org/archive/html/qemu-devel/2018-05/msg04664.html
+The mail thread includes an interesting discussion on issues and constrains.
 
-It would be nice if qcow2 added arbitrary data sections (which would
-always be ignored by qemu) for storing additional data.  This could be
-used to create a compact qcow2 + metadata format to rival OVA for
-management layers to use, and there are various other uses too.
+> 2.When would it possibly be ready? Or when could we get it from QEMU repo?
+>
 
-Rich.
+Since is currently developed as a side project we don't have a clear 
+timeline,
+you are welcome to contribute with ideas, reviews, tests and patches :) .
+Any help is appreciated.
 
---=20
-Richard Jones, Virtualization Group, Red Hat http://people.redhat.com/~rj=
-ones
-Read my programming and virtualization blog: http://rwmj.wordpress.com
-Fedora Windows cross-compiler. Compile Windows programs, test, and
-build Windows installers. Over 100 libraries supported.
-http://fedoraproject.org/wiki/MinGW
+> We appreciate and  look forward to your reply.
+>
+
+I hope I helped.
+
+Thanks,
+Marcel
+>
+> Best wishes,
+>
+> Aaron Wei
+>
