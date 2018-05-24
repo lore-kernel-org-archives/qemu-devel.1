@@ -1,33 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38153)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39262)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1fLuwj-000688-K7
-	for qemu-devel@nongnu.org; Thu, 24 May 2018 14:26:42 -0400
+	(envelope-from <jsnow@redhat.com>) id 1fLv2U-0001Px-Vk
+	for qemu-devel@nongnu.org; Thu, 24 May 2018 14:32:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1fLuwg-0000z8-CI
-	for qemu-devel@nongnu.org; Thu, 24 May 2018 14:26:41 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:34214)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1fLuwg-0000yj-6Y
-	for qemu-devel@nongnu.org; Thu, 24 May 2018 14:26:38 -0400
-Received: from smtp.corp.redhat.com (int-mx11.intmail.prod.int.phx2.redhat.com
-	[10.5.11.26])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id BA26913793F
-	for <qemu-devel@nongnu.org>; Thu, 24 May 2018 18:26:36 +0000 (UTC)
-Date: Thu, 24 May 2018 15:26:34 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20180524182634.GH8988@localhost.localdomain>
-References: <1525423069-61903-1-git-send-email-imammedo@redhat.com>
-	<1525423069-61903-5-git-send-email-imammedo@redhat.com>
-	<87h8mx11t9.fsf@dusky.pond.sub.org>
-	<87lgc8zzpn.fsf@dusky.pond.sub.org>
+	(envelope-from <jsnow@redhat.com>) id 1fLv2U-00039l-4Z
+	for qemu-devel@nongnu.org; Thu, 24 May 2018 14:32:39 -0400
+References: <20180518132114.4070-1-kwolf@redhat.com>
+	<20180518132114.4070-36-kwolf@redhat.com>
+	<6b0e43c5-f35b-5865-e423-ff6de432bb86@redhat.com>
+	<20180524083624.GE4008@localhost.localdomain>
+	<d58401b0-18e6-5815-b46f-67e941ade836@redhat.com>
+	<b22b1f99-8205-b2ec-78e8-2b1f84bf754a@redhat.com>
+From: John Snow <jsnow@redhat.com>
+Message-ID: <b2a6d650-a03b-8c85-a139-9e9e1ec63130@redhat.com>
+Date: Thu, 24 May 2018 14:32:31 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <87lgc8zzpn.fsf@dusky.pond.sub.org>
-Subject: Re: [Qemu-devel] [PATCH v7 04/11] hmp: disable monitor in preconfig
- state
+In-Reply-To: <b22b1f99-8205-b2ec-78e8-2b1f84bf754a@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 35/40] job: Add JOB_STATUS_CHANGE QMP
+ event
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,68 +29,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: Igor Mammedov <imammedo@redhat.com>, qemu-devel@nongnu.org, pkrempa@redhat.com
+To: Eric Blake <eblake@redhat.com>, Kevin Wolf <kwolf@redhat.com>
+Cc: jcody@redhat.com, mreitz@redhat.com, qemu-devel@nongnu.org, qemu-block@nongnu.org, armbru@redhat.com
 
-On Thu, May 24, 2018 at 08:16:20PM +0200, Markus Armbruster wrote:
-> Markus Armbruster <armbru@redhat.com> writes:
+
+
+On 05/24/2018 02:22 PM, Eric Blake wrote:
+> On 05/24/2018 12:36 PM, John Snow wrote:
 > 
-> > Igor Mammedov <imammedo@redhat.com> writes:
-> >
-> >> Ban it for now, if someone would need it to work early,
-> >> one would have to implement checks if HMP command is valid
-> >> at preconfig state.
-> >>
-> >> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-> >> Reviewed-by: Eric Blake <eblake@redhat.com>
-> >> ---
-> >> v5:
-> >>   * add 'use QMP instead" to error message, suggesting user
-> >>     the right interface to use
-> >> v4:
-> >>   * v3 was only printing error but not preventing command execution,
-> >>     Fix it by returning after printing error message.
-> >>     ("Dr. David Alan Gilbert" <dgilbert@redhat.com>)
-> >> ---
-> >>  monitor.c | 6 ++++++
-> >>  1 file changed, 6 insertions(+)
-> >>
-> >> diff --git a/monitor.c b/monitor.c
-> >> index 39f8ee1..0ffdf1d 100644
-> >> --- a/monitor.c
-> >> +++ b/monitor.c
-> >> @@ -3374,6 +3374,12 @@ static void handle_hmp_command(Monitor *mon, const char *cmdline)
-> >>  
-> >>      trace_handle_hmp_command(mon, cmdline);
-> >>  
-> >> +    if (runstate_check(RUN_STATE_PRECONFIG)) {
-> >> +        monitor_printf(mon, "HMP not available in preconfig state, "
-> >> +                            "use QMP instead\n");
-> >> +        return;
-> >> +    }
-> >> +
-> >>      cmd = monitor_parse_command(mon, cmdline, &cmdline, mon->cmd_table);
-> >>      if (!cmd) {
-> >>          return;
-> >
-> > So we offer the user an HMP monitor, but we summarily fail all commands.
-> > I'm sorry, but that's... searching for polite word... embarrassing.  We
-> > should accept HMP output only when we're ready to accept it.  Yes, that
-> > would involve a bit more surgery rather than this cheap hack.  The whole
-> > preconfig thing smells like a cheap hack to me, but let's not overdo it.
+>>>> On 05/18/2018 09:21 AM, Kevin Wolf wrote:
+>>>>> This adds a QMP event that is emitted whenever a job transitions from
+>>>>> one status to another.
+>>>>>
+>>>>> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 > 
-> Clarification: I don't think we need to hold the series because of
-> this.  I do think you should investigate delaying HMP until it can work.
+>>>
+>>> The question that I was asking myself was just whether I'd literally
+>>> duplicate the existing events, just with s/BLOCK_JOB_/JOB_/, or whether
+>>> a single event with a status field can do. I think the latter is more
+>>> elegant (also because it can be implemented in a single place), even if
+>>> it is emitted a bit more often than strictly necessary.
+>>>
+>>
+>> Code-wise I agree that this is more elegant; just wondering if the
+>> implications of the additional API guarantees were considered. This
+>> means we have to be a bit more careful about how we restructure the
+>> state machine in the future, I think.
+>>
+>> It also makes the "NULL" state visible, which I didn't really intend...
+>> It's probably fine, just a little quirky.
+> 
+> Is it worth a special case to avoid emitting the event on transition to
+> the NULL state?
+> 
 
-What would it mean to delay HMP?  Not creating the socket?
-Creating the socket but not accepting clients?  Accepting clients
-but not consuming any input from the socket until we are out of
-preconfig?
+I would have done it, but it also doesn't necessarily hurt anything to
+have it in here either.
 
-I'm not sure if any of those options would be better.  If a human
-is already trying to talk on the other side, it seems better to
-show QEMU is alive (but not ready to hold a conversation yet)
-than staying silent.
+Maybe it provides a benefit: I suppose it would definitely indicate to a
+client that -- regardless of how they configured the job (with
+auto-dismiss or not) that it serves as final record that the job has
+*definitely absolutely gone* and can no longer be addressed.
 
--- 
-Eduardo
+It's just a strange state name for that purpose; I simply didn't
+*intend* to expose it.
+
+...OTOH, for early failures it seems like an obviously spurious message
+that we don't need or want.
+
+Well, glad I can give you precisely conflicting feelings on it and
+arrive at no opinion. Good job everyone, see you tomorrow.
+
+--js
