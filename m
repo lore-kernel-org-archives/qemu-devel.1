@@ -1,20 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37645)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38379)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1fLlNf-0000pT-9g
-	for qemu-devel@nongnu.org; Thu, 24 May 2018 04:13:52 -0400
+	(envelope-from <kwolf@redhat.com>) id 1fLlRA-0001tf-Hp
+	for qemu-devel@nongnu.org; Thu, 24 May 2018 04:17:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1fLlNe-00018J-DE
-	for qemu-devel@nongnu.org; Thu, 24 May 2018 04:13:51 -0400
-From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-References: <20180524053958.5554-1-mark.cave-ayland@ilande.co.uk>
-Message-ID: <5a137fc3-5e90-1886-3d77-badde7c16c38@ilande.co.uk>
-Date: Thu, 24 May 2018 09:13:23 +0100
+	(envelope-from <kwolf@redhat.com>) id 1fLlR9-0001pb-CJ
+	for qemu-devel@nongnu.org; Thu, 24 May 2018 04:17:28 -0400
+Date: Thu, 24 May 2018 10:17:15 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20180524081715.GB4008@localhost.localdomain>
+References: <20180518132114.4070-1-kwolf@redhat.com>
+	<20180518132114.4070-18-kwolf@redhat.com>
+	<fa219be9-84e4-07ec-69a5-1fddb608ccbb@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20180524053958.5554-1-mark.cave-ayland@ilande.co.uk>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-GB
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH] prep: fix keyboard for the 40p machine
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <fa219be9-84e4-07ec-69a5-1fddb608ccbb@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2 17/40] job: Move BlockJobCreateFlags to
+ Job
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,43 +25,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, hpoussin@reactos.org, f4bug@amsat.org, david@gibson.dropbear.id.au
+To: John Snow <jsnow@redhat.com>
+Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, jcody@redhat.com, armbru@redhat.com, mreitz@redhat.com
 
-On 24/05/18 06:39, Mark Cave-Ayland wrote:
-
-> Commit 72d3d8f052 "hw/isa/superio: Add a keyboard/mouse controller (8042)"
-> added an 8042 keyboard device to the PC87312 superio device to replace that
-> being used by the prep machine.
+Am 24.05.2018 um 00:24 hat John Snow geschrieben:
 > 
-> Unfortunately this commit didn't do the same for the 40p machine which broke
-> the keyboard by registering two 8042 keyboard devices at the same address.
 > 
-> Resolve this by similarly removing the 8042 keyboard from the 40p machine as
-> done for the prep machine in commit 72d3d8f052.
+> On 05/18/2018 09:20 AM, Kevin Wolf wrote:
+> > +    job->auto_finalize = !(flags & JOB_MANUAL_FINALIZE);
+> > +    job->auto_dismiss  = !(flags & JOB_MANUAL_DISMISS);
 > 
-> Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-> ---
->   hw/ppc/prep.c | 1 -
->   1 file changed, 1 deletion(-)
+> Job API might be a good chance to say "No, this is the default behavior
+> for this API."
 > 
-> diff --git a/hw/ppc/prep.c b/hw/ppc/prep.c
-> index a1e7219db6..be4db6a687 100644
-> --- a/hw/ppc/prep.c
-> +++ b/hw/ppc/prep.c
-> @@ -770,7 +770,6 @@ static void ibm_40p_init(MachineState *machine)
->   
->       /* add some more devices */
->       if (defaults_enabled()) {
-> -        isa_create_simple(isa_bus, TYPE_I8042);
->           m48t59 = NVRAM(isa_create_simple(isa_bus, "isa-m48t59"));
->   
->           dev = DEVICE(isa_create(isa_bus, "cs4231a"));
+> I don't know how possible this is, but could we remove these behavior
+> flags for jobs (but keep them for block jobs), and then any legacy block
+> job creation interfaces we have can enable/disable them as the user
+> requested,
 > 
+> and the block job layer itself has hooks that persuade the core job
+> layer to automatically transition without user input, if appropriate.
+> 
+> (Unless that happens later?)
 
-FWIW I see this patchset was applied just before the 2.12 release so 
-it's probably worth a CC to qemu-stable@ once Hervé is satisfied.
+That's really a question for job-create, which we don't have yet. I'm
+not sure whether job-create would expose those options, and if so, what
+the defaults would be.
 
+I think auto-dismiss=false is a good default because the reason for
+having a manual job-dismiss is shared by all jobs (you want to be able
+to query the job result after it finished).
 
-ATB,
+auto-finalize is different. We introduced it to avoid surprise graph
+changes, but this implies that every job changes the block graph when it
+completes. This is obviously not true for non-block jobs. They might
+still commonly change something else that shouldn't be done as a
+surprise, but I am working right now on at least a single job type that
+doesn't do anything like that on completion (blockdev-create).
 
-Mark.
+For now, I made it unconditionally auto-finalize=true and
+auto-dismiss=false without offering the options in QMP, but that's open
+for discussion.
+
+Kevin
