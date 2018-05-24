@@ -1,28 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34600)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34703)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <tiwei.bie@intel.com>) id 1fLt35-0007pn-E9
-	for qemu-devel@nongnu.org; Thu, 24 May 2018 12:25:09 -0400
+	(envelope-from <armbru@redhat.com>) id 1fLt3G-000827-7Z
+	for qemu-devel@nongnu.org; Thu, 24 May 2018 12:25:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <tiwei.bie@intel.com>) id 1fLt2z-00023T-Eh
-	for qemu-devel@nongnu.org; Thu, 24 May 2018 12:25:07 -0400
-Received: from mga17.intel.com ([192.55.52.151]:22859)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <tiwei.bie@intel.com>) id 1fLt2z-00022Y-49
-	for qemu-devel@nongnu.org; Thu, 24 May 2018 12:25:01 -0400
-Date: Fri, 25 May 2018 00:25:19 +0800
-From: Tiwei Bie <tiwei.bie@intel.com>
-Message-ID: <20180524162519.GA24120@debian>
-References: <20180524103336.21233-1-tiwei.bie@intel.com>
-	<20180524103336.21233-5-tiwei.bie@intel.com>
-	<20180524184438-mutt-send-email-mst@kernel.org>
-	<20180524160549.GA15321@debian>
-	<20180524191330-mutt-send-email-mst@kernel.org>
+	(envelope-from <armbru@redhat.com>) id 1fLt3C-0002Jy-7t
+	for qemu-devel@nongnu.org; Thu, 24 May 2018 12:25:18 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <20180518180440-mutt-send-email-mst@kernel.org>
+	<20180524113251.GB4660@redhat.com>
+	<20180524174603-mutt-send-email-mst@kernel.org>
+	<20180524150817.GF4008@localhost.localdomain>
+	<20180524152014.GW2209@redhat.com>
+Date: Thu, 24 May 2018 18:25:05 +0200
+In-Reply-To: <20180524152014.GW2209@redhat.com> (Richard W. M. Jones's message
+	of "Thu, 24 May 2018 16:20:14 +0100")
+Message-ID: <87y3g9yqam.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20180524191330-mutt-send-email-mst@kernel.org>
-Subject: Re: [Qemu-devel] [PATCH 4/6] vhost-user: support registering
- external host notifiers
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] storing machine data in qcow images?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,68 +26,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: jasowang@redhat.com, qemu-devel@nongnu.org, virtio-dev@lists.oasis-open.org
+To: "Richard W.M. Jones" <rjones@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, ehabkost@redhat.com, qemu-block@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org, mreitz@redhat.com, stefanha@redhat.com
 
-On Thu, May 24, 2018 at 07:15:24PM +0300, Michael S. Tsirkin wrote:
-> On Fri, May 25, 2018 at 12:05:50AM +0800, Tiwei Bie wrote:
-> > On Thu, May 24, 2018 at 06:49:47PM +0300, Michael S. Tsirkin wrote:
-> > > On Thu, May 24, 2018 at 06:33:34PM +0800, Tiwei Bie wrote:
-> > > > This patch introduces VHOST_USER_PROTOCOL_F_HOST_NOTIFIER.
-> > > > With this feature negotiated, vhost-user backend can register
-> > > > memory region based host notifiers. And it will allow the guest
-> > > > driver in the VM to notify the hardware accelerator at the
-> > > > vhost-user backend directly.
-> > > > 
-> > > > Signed-off-by: Tiwei Bie <tiwei.bie@intel.com>
-> > > 
-> > > So maybe we don't need a new VHOST_USER_PROTOCOL_F_SLAVE_SEND_FD?
-> > > Let's check VHOST_USER_PROTOCOL_F_HOST_NOTIFIER instead?
-> > 
-> > Yeah. I think it would be the best choice!
-> > 
-> > If this feature (HOST NOTIFIER) is negotiated, it means
-> > the QEMU is able to safely receive (the expected number
-> > of) file descriptors.
-> > 
-> > > 
-> > > > ---
-> > [...]
-> > > > +typedef struct VhostUserHostNotifier {
-> > > > +    MemoryRegion mr;
-> > > > +    void *addr;
-> > > > +    bool set;
-> > > > +} VhostUserHostNotifier;
-> > > >  
-> > > >  typedef struct VhostUserState {
-> > > >      CharBackend *chr;
-> > > > +    VhostUserHostNotifier notifier[VIRTIO_QUEUE_MAX];
-> > > >  } VhostUserState;
-> > > 
-> > > So this notifier is per-queue. Can't we maintain it in
-> > > NetVhostUserState then?
-> > 
-> > This notifier is per virtio-queue. But NetVhostUserState
-> > is per net-queue-pair.
-> > 
-> > And ideally, I think this structure shouldn't be visible
-> > to net/vhost-user, vhost-user-scsi, vhost-user-crypto, etc.
-> > 
-> > Best regards,
-> > Tiwei Bie
-> 
-> I wonder whether we can create a new per vq structure.
+"Richard W.M. Jones" <rjones@redhat.com> writes:
 
-Maybe something like:
+> On Thu, May 24, 2018 at 05:08:17PM +0200, Kevin Wolf wrote:
+>> Am 24.05.2018 um 16:56 hat Michael S. Tsirkin geschrieben:
+>> > On Thu, May 24, 2018 at 12:32:51PM +0100, Richard W.M. Jones wrote:
+>> > > There is however a seed of a good idea in the thread:
+>> > > 
+>> > > > I don't think QEMU needs to use this information automatically,
+>> > > > necessarily.  I think the first step is to simply make QEMU save
+>> > > > this information in the disk image, and making qemu-img able to
+>> > > > read and write this information.
+>> > > 
+>> > > It would be nice if qcow2 added arbitrary data sections (which would
+>> > > always be ignored by qemu) for storing additional data.  This could be
+>> > > used to create a compact qcow2 + metadata format to rival OVA for
+>> > > management layers to use, and there are various other uses too.
+>> > > 
+>> > > Rich.
+>> > 
+>> > I think this part is pretty uncontroversial.
+>> > 
+>> > But can we add data without changing the verion?
+>> 
+>> Yes. Don't worry about where to store it, we'll solve this. Do worry
+>> about what to store.
+>
+> Ideally from my point of view: named blobs.  More formally, any number
+> of (key, value) pairs where the key is a simple string, and the value
+> is a binary blob.  The binary blobs might really be XML or YAML or an
+> icon or whatever, but qemu would not need to look inside them.
+>
+> We could then attach metadata (in some to-be-decided format) to qcow2
+> files and create a compact rival to OVA without needing to encode any
+> knowledge of the metadata into qemu at all.
+>
+> Another use for this is allowing qcow2 files to contain names, titles,
+> descriptions, creation date, OS icons, etc. which could be displayed
+> in file managers.
 
-typedef struct VhostUserStatePerVQ {
-    VhostUserHostNotifier notifier;
-} VhostUserStatePerVQ;
+Have we just reinvented resource forks?
 
-typedef struct VhostUserState {
-    CharBackend *chr;
-    VhostUserStatePerVQ queue[VIRTIO_QUEUE_MAX];
-} VhostUserState;
-
-Best regards,
-Tiwei Bie
+SCNR ;)
