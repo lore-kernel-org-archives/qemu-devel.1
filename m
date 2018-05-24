@@ -1,30 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55555)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56527)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1fLqi2-0003jt-8k
-	for qemu-devel@nongnu.org; Thu, 24 May 2018 09:55:15 -0400
+	(envelope-from <lersek@redhat.com>) id 1fLqmD-0005Ea-F6
+	for qemu-devel@nongnu.org; Thu, 24 May 2018 09:59:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1fLqhz-00032Z-6W
-	for qemu-devel@nongnu.org; Thu, 24 May 2018 09:55:14 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:50054 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1fLqhy-00032I-Vw
-	for qemu-devel@nongnu.org; Thu, 24 May 2018 09:55:11 -0400
-Date: Thu, 24 May 2018 16:55:04 +0300
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20180524165031-mutt-send-email-mst@kernel.org>
-References: <20180412151232.17506-1-tiwei.bie@intel.com>
-	<20180412151232.17506-3-tiwei.bie@intel.com>
-	<20180523163116-mutt-send-email-mst@kernel.org>
-	<20180523183444-mutt-send-email-mst@kernel.org>
-	<20180523184001-mutt-send-email-mst@kernel.org>
-	<20180523232101.GB15604@debian> <20180524022440.GA20792@debian>
-	<20180524105936.GA22101@debian>
+	(envelope-from <lersek@redhat.com>) id 1fLqmC-00060M-Kj
+	for qemu-devel@nongnu.org; Thu, 24 May 2018 09:59:33 -0400
+References: <1527091418-11874-1-git-send-email-eric.auger@redhat.com>
+	<ec6bc0b3-5f0b-bf0c-7d9b-0382e114ee9e@redhat.com>
+	<bf99311a-823d-34e8-1892-be27534afc32@redhat.com>
+	<22c4e504-a7b4-e6dd-b2cc-618d306b6f0c@redhat.com>
+	<CAFEAcA9LMV_-vVAwUkuY=uw2Gf6XLvsgmi8y0PgHPJnQZkWC0w@mail.gmail.com>
+	<550464ac-5155-6311-d0f7-92c7c0813f82@redhat.com>
+	<CAFEAcA-hobu_=VKhYQ+UZ1WX_JFfwCarkPKQhiBtXc3fre57rg@mail.gmail.com>
+From: Laszlo Ersek <lersek@redhat.com>
+Message-ID: <ee204f5f-600f-2425-a1ff-0418b4611e96@redhat.com>
+Date: Thu, 24 May 2018 15:59:17 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180524105936.GA22101@debian>
-Subject: Re: [Qemu-devel] [PATCH v3 2/6] vhost-user: introduce shared
- vhost-user state
+In-Reply-To: <CAFEAcA-hobu_=VKhYQ+UZ1WX_JFfwCarkPKQhiBtXc3fre57rg@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [RFC 0/2] ARM virt: Support up to 256 PCIe buses
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,181 +29,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Tiwei Bie <tiwei.bie@intel.com>
-Cc: jasowang@redhat.com, alex.williamson@redhat.com, pbonzini@redhat.com, stefanha@redhat.com, qemu-devel@nongnu.org, virtio-dev@lists.oasis-open.org, cunming.liang@intel.com, dan.daly@intel.com, jianfeng.tan@intel.com, zhihong.wang@intel.com, xiao.w.wang@intel.com
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Auger Eric <eric.auger@redhat.com>, Eric Auger <eric.auger.pro@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Wei Huang <wei@redhat.com>, Andrew Jones <drjones@redhat.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Shannon Zhao <zhaoshenglong@huawei.com>
 
-On Thu, May 24, 2018 at 06:59:36PM +0800, Tiwei Bie wrote:
-> On Thu, May 24, 2018 at 10:24:40AM +0800, Tiwei Bie wrote:
-> > On Thu, May 24, 2018 at 07:21:01AM +0800, Tiwei Bie wrote:
-> > > On Wed, May 23, 2018 at 06:43:29PM +0300, Michael S. Tsirkin wrote:
-> > > > On Wed, May 23, 2018 at 06:36:05PM +0300, Michael S. Tsirkin wrote:
-> > > > > On Wed, May 23, 2018 at 04:44:51PM +0300, Michael S. Tsirkin wrote:
-> > > > > > On Thu, Apr 12, 2018 at 11:12:28PM +0800, Tiwei Bie wrote:
-> > > > > > > When multi queue is enabled e.g. for a virtio-net device,
-> > > > > > > each queue pair will have a vhost_dev, and the only thing
-> > > > > > > shared between vhost devs currently is the chardev. This
-> > > > > > > patch introduces a vhost-user state structure which will
-> > > > > > > be shared by all vhost devs of the same virtio device.
-> > > > > > > 
-> > > > > > > Signed-off-by: Tiwei Bie <tiwei.bie@intel.com>
-> > > > > > 
-> > > > > > Unfortunately this patch seems to cause crashes.
-> > > > > > To reproduce, simply run
-> > > > > > make check-qtest-x86_64
-> > > > > > 
-> > > > > > Sorry that it took me a while to find - it triggers 90% of runs but not
-> > > > > > 100% which complicates bisection somewhat.
-> > > 
-> > > It's my fault to not notice this bug before.
-> > > I'm very sorry. Thank you so much for finding
-> > > the root cause!
-> > > 
-> > > > > > 
-> > > > > > > ---
-> > > > > > >  backends/cryptodev-vhost-user.c     | 20 ++++++++++++++++++-
-> > > > > > >  hw/block/vhost-user-blk.c           | 22 +++++++++++++++++++-
-> > > > > > >  hw/scsi/vhost-user-scsi.c           | 20 ++++++++++++++++++-
-> > > > > > >  hw/virtio/Makefile.objs             |  2 +-
-> > > > > > >  hw/virtio/vhost-stub.c              | 10 ++++++++++
-> > > > > > >  hw/virtio/vhost-user.c              | 31 +++++++++++++++++++---------
-> > > > > > >  include/hw/virtio/vhost-user-blk.h  |  2 ++
-> > > > > > >  include/hw/virtio/vhost-user-scsi.h |  2 ++
-> > > > > > >  include/hw/virtio/vhost-user.h      | 20 +++++++++++++++++++
-> > > > > > >  net/vhost-user.c                    | 40 ++++++++++++++++++++++++++++++-------
-> > > > > > >  10 files changed, 149 insertions(+), 20 deletions(-)
-> > > > > > >  create mode 100644 include/hw/virtio/vhost-user.h
-> > > [...]
-> > > > > > >          qemu_chr_fe_set_handlers(&s->chr, NULL, NULL,
-> > > > > > >                                   net_vhost_user_event, NULL, nc0->name, NULL,
-> > > > > > > @@ -319,6 +336,15 @@ static int net_vhost_user_init(NetClientState *peer, const char *device,
-> > > > > > >      assert(s->vhost_net);
-> > > > > > >  
-> > > > > > >      return 0;
-> > > > > > > +
-> > > > > > > +err:
-> > > > > > > +    if (user) {
-> > > > > > > +        vhost_user_cleanup(user);
-> > > > > > > +        g_free(user);
-> > > > > > > +        s->vhost_user = NULL;
-> > > > > > > +    }
-> > > > > > > +
-> > > > > > > +    return -1;
-> > > > > > >  }
-> > > > > > >  
-> > > > > > >  static Chardev *net_vhost_claim_chardev(
-> > > > > > > -- 
-> > > > > > > 2.11.0
-> > > > > 
-> > > > > So far I figured out that commenting the free of
-> > > > > the structure removes the crash, so we seem to
-> > > > > be dealing with a use-after free here.
-> > > > > I suspect that in a MQ situation, one queue gets
-> > > > > closed and attempts to free the structure
-> > > > > while others still use it.
-> > > > > 
-> > > > > diff --git a/net/vhost-user.c b/net/vhost-user.c
-> > > > > index 525a061..6a1573b 100644
-> > > > > --- a/net/vhost-user.c
-> > > > > +++ b/net/vhost-user.c
-> > > > > @@ -157,8 +157,8 @@ static void net_vhost_user_cleanup(NetClientState *nc)
-> > > > >          s->vhost_net = NULL;
-> > > > >      }
-> > > > >      if (s->vhost_user) {
-> > > > > -        vhost_user_cleanup(s->vhost_user);
-> > > > > -        g_free(s->vhost_user);
-> > > > > +        //vhost_user_cleanup(s->vhost_user);
-> > > > > +        //g_free(s->vhost_user);
-> > > > >          s->vhost_user = NULL;
-> > > > >      }
-> > > > >      if (nc->queue_index == 0) {
-> > > > > @@ -339,8 +339,8 @@ static int net_vhost_user_init(NetClientState *peer, const char *device,
-> > > > >  
-> > > > >  err:
-> > > > >      if (user) {
-> > > > > -        vhost_user_cleanup(user);
-> > > > > -        g_free(user);
-> > > > > +        //vhost_user_cleanup(user);
-> > > > > +        //g_free(user);
-> > > > >          s->vhost_user = NULL;
-> > > > >      }
-> > > > >  
-> > > > 
-> > > > 
-> > > > So the following at least gets rid of the crashes.
-> > > > I am not sure it does not leak memory though,
-> > > > and not sure there aren't any configurations where
-> > > > the 1st queue gets cleaned up first.
-> > > > 
-> > > > Thoughts?
-> > > 
-> > > Thank you so much for catching it and fixing
-> > > it! I'll keep your SoB there. Thank you so
-> > > much! I do appreciate it!
-> > > 
-> > > You are right. This structure is freed multiple
-> > > times when multi-queue is enabled.
-> > 
-> > After a deeper digging, I got your point now..
-> > It could be a use-after-free instead of a double
-> > free.. As it's safe to deinit the char which is
-> > shared by all queue pairs when cleanup the 1st
-> > queue pair, it should be safe to free vhost-user
-> > structure there too.
+On 05/24/18 15:07, Peter Maydell wrote:
+> On 24 May 2018 at 13:59, Laszlo Ersek <lersek@redhat.com> wrote:
+>> On 05/24/18 11:11, Peter Maydell wrote:
+>>> Won't it also break a guest which is just Linux loaded not via
+>>> firmware which is an aarch32 kernel without LPAE support?
+>>
+>> Does such a thing exist? (I honestly have no clue.)
 > 
-> One thing worried me is that, I can't reproduce
-> the crash with `make check-qtest-x86_64`. I tried
-> to run it a lot of times, but the only output I
-> got each time was:
-> 
->         CHK version_gen.h
->   GTESTER check-qtest-x86_64
+> Yes, it does; LPAE isn't a mandatory kernel config option.
+> This is why we have the machine 'highmem' option, so that
+> we can run on those kernels by not putting anything above
+> the 4G boundary. Looking back at the history on that, we
+> opted at the time for "default to highmem on, and if you're
+> running an non-lpae kernel you need to turn it off manually".
 
-The issue triggers on cleanup, this is why the test passes. Enable
-coredump, then you will see the core file afterwards.
+Ah, OK, I didn't know that.
 
-We should probably teach the tests to check qemu
-return status, that will catch this faster.
+> So we can handle those kernels by just not putting ECAM
+> above 4G if highmem is false.
 
+The problem is we can have a combination of 32-bit UEFI firmware (which
+certainly lacks LPAE) and a 32-bit kernel which supports LPAE.
+Previously, you wouldn't specify highmem=off, and things would just work
+-- the firmware would simply ignore the >=4GB MMIO aperture, and use the
+32-bit MMIO aperture only (and use the sole 32-bit ECAM). The kernel
+could then use both low and high MMIO apertures, however (I gather?).
 
-> I did a quick glance of the `check-qtest-x86_64`
-> target in the makefile, it seems that the relevant
-> test is `tests/vhost-user-test`. So I also tried
-> to run this test directly:
-> 
-> make tests/vhost-user-test
-> while true; do
->   QTEST_QEMU_BINARY=x86_64-softmmu/qemu-system-x86_64 ./tests/vhost-user-test
-> done
-> 
-> And the only output in each loop I got was:
-> 
-> /x86_64/vhost-user/migrate: OK
-> /x86_64/vhost-user/multiqueue: OK
-> /x86_64/vhost-user/read-guest-mem/memfd: OK
-> /x86_64/vhost-user/read-guest-mem/memfile: OK
-> 
-> So I'm still not quite sure what caused the crash
-> on your side. But it does make more sense to free
-> the vhost-user structure only when cleanup the
-> 1st queue pair (i.e. where the `chr` is deinit-ed).
-> 
-> I have sent a new patch set with above change:
-> 
-> http://lists.gnu.org/archive/html/qemu-devel/2018-05/msg05508.html
-> https://patchwork.kernel.org/bundle/btw/vhost-user-host-notifiers/
-> 
-> Because the above change is got from your diff
-> and also based on your analysis, I kept your SoB
-> in that patch (if you have any concern about it,
-> please let me know).
-> 
-> In this patch set, I also introduced a protocol
-> feature to allow slave to send fds to master via
-> the slave channel.
-> 
-> If you still see crashes with the new patch set,
-> please provide me a bit more details, e.g. the
-> crash message. Thanks a lot!
-> 
-> Best regards,
-> Tiwei Bie
+The difference with "high ECAM" is that it is *moved* (not *added*), so
+the 32-bit firmware is left with nothing for config space access. For
+booting the same combination as above, you are suddenly forced to add
+highmem=off, just to keep the ECAM low -- and that, while it keeps the
+firmware happy, prevents the LPAE-capable kernel from using the high
+MMIO aperture.
+
+So I think "highmem_ecam" should be computed like this:
+
+  highmem_ecam = highmem_ecam_machtype_default &&
+                 highmem &&
+                 (!firmware_loaded || aarch64);
+
+Thanks,
+Laszlo
