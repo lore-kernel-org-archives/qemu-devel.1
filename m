@@ -1,32 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35973)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35984)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fLumo-00086q-9M
-	for qemu-devel@nongnu.org; Thu, 24 May 2018 14:16:27 -0400
+	(envelope-from <eblake@redhat.com>) id 1fLump-00087l-CP
+	for qemu-devel@nongnu.org; Thu, 24 May 2018 14:16:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fLumk-0004uy-6F
-	for qemu-devel@nongnu.org; Thu, 24 May 2018 14:16:26 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:57956 helo=mx1.redhat.com)
+	(envelope-from <eblake@redhat.com>) id 1fLumo-0004wh-AV
+	for qemu-devel@nongnu.org; Thu, 24 May 2018 14:16:27 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:57624 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fLumk-0004ug-2O
-	for qemu-devel@nongnu.org; Thu, 24 May 2018 14:16:22 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.5])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id B9CAC40BC054
-	for <qemu-devel@nongnu.org>; Thu, 24 May 2018 18:16:21 +0000 (UTC)
-From: Markus Armbruster <armbru@redhat.com>
-References: <1525423069-61903-1-git-send-email-imammedo@redhat.com>
-	<1525423069-61903-5-git-send-email-imammedo@redhat.com>
-	<87h8mx11t9.fsf@dusky.pond.sub.org>
-Date: Thu, 24 May 2018 20:16:20 +0200
-In-Reply-To: <87h8mx11t9.fsf@dusky.pond.sub.org> (Markus Armbruster's message
-	of "Thu, 24 May 2018 18:00:18 +0200")
-Message-ID: <87lgc8zzpn.fsf@dusky.pond.sub.org>
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1fLumo-0004wU-5j
+	for qemu-devel@nongnu.org; Thu, 24 May 2018 14:16:26 -0400
+References: <1527176250-178968-1-git-send-email-mst@redhat.com>
+	<d0edcb79-3dae-c3a5-f9f4-50b3062f8cff@redhat.com>
+	<70262dde-3b96-b650-f0fb-8143e869c4ab@redhat.com>
+	<20180524190123-mutt-send-email-mst@kernel.org>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <6492471e-f8a7-5f5b-9cf9-95cb604f203a@redhat.com>
+Date: Thu, 24 May 2018 13:16:24 -0500
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v7 04/11] hmp: disable monitor in preconfig
- state
+In-Reply-To: <20180524190123-mutt-send-email-mst@kernel.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 2/1] libqtest: add more exit status
+ checks
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,54 +31,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: qemu-devel@nongnu.org, pkrempa@redhat.com, ehabkost@redhat.com
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: qemu-devel@nongnu.org, Thomas Huth <thuth@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Markus Armbruster <armbru@redhat.com>
 
-Markus Armbruster <armbru@redhat.com> writes:
-
-> Igor Mammedov <imammedo@redhat.com> writes:
->
->> Ban it for now, if someone would need it to work early,
->> one would have to implement checks if HMP command is valid
->> at preconfig state.
+On 05/24/2018 11:01 AM, Michael S. Tsirkin wrote:
+> On Thu, May 24, 2018 at 11:00:19AM -0500, Eric Blake wrote:
+>> On 05/24/2018 10:52 AM, Eric Blake wrote:
 >>
->> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
->> Reviewed-by: Eric Blake <eblake@redhat.com>
->> ---
->> v5:
->>   * add 'use QMP instead" to error message, suggesting user
->>     the right interface to use
->> v4:
->>   * v3 was only printing error but not preventing command execution,
->>     Fix it by returning after printing error message.
->>     ("Dr. David Alan Gilbert" <dgilbert@redhat.com>)
->> ---
->>  monitor.c | 6 ++++++
->>  1 file changed, 6 insertions(+)
+>>> Also, since waitpid() can only return either s->qemu_pid or -1 as we
+>>> aren't using WNOHANG, it may also be worth asserting that if pid == -1,
+>>> we either have EAGAIN (but why aren't we looping in that case?) or
+>>> ECHILD.
 >>
->> diff --git a/monitor.c b/monitor.c
->> index 39f8ee1..0ffdf1d 100644
->> --- a/monitor.c
->> +++ b/monitor.c
->> @@ -3374,6 +3374,12 @@ static void handle_hmp_command(Monitor *mon, const char *cmdline)
->>  
->>      trace_handle_hmp_command(mon, cmdline);
->>  
->> +    if (runstate_check(RUN_STATE_PRECONFIG)) {
->> +        monitor_printf(mon, "HMP not available in preconfig state, "
->> +                            "use QMP instead\n");
->> +        return;
->> +    }
->> +
->>      cmd = monitor_parse_command(mon, cmdline, &cmdline, mon->cmd_table);
->>      if (!cmd) {
->>          return;
->
-> So we offer the user an HMP monitor, but we summarily fail all commands.
-> I'm sorry, but that's... searching for polite word... embarrassing.  We
-> should accept HMP output only when we're ready to accept it.  Yes, that
-> would involve a bit more surgery rather than this cheap hack.  The whole
-> preconfig thing smells like a cheap hack to me, but let's not overdo it.
+>> I meant EINTR, not EAGAIN.  But in general, using waitpid() to collect
+>> process status without doing it in a loop is risky.
+> 
+> Interesting. Risky how?
 
-Clarification: I don't think we need to hold the series because of
-this.  I do think you should investigate delaying HMP until it can work.
+If your process has any signal handler installed, then an EINTR failure 
+means you interpret a transient failure to grab process status (because 
+your check was interrupted by something else) as a permanent failure, 
+unless you go back to another waitpid() in a loop.
+
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
