@@ -1,28 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40359)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40982)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <SRS0=We5Z=IL=linuxfoundation.org=gregkh@kernel.org>)
-	id 1fLrlE-000164-LZ
-	for qemu-devel@nongnu.org; Thu, 24 May 2018 11:02:37 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1fLrlz-0001Z0-44
+	for qemu-devel@nongnu.org; Thu, 24 May 2018 11:03:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <SRS0=We5Z=IL=linuxfoundation.org=gregkh@kernel.org>)
-	id 1fLrl9-0006gr-Qn
-	for qemu-devel@nongnu.org; Thu, 24 May 2018 11:02:36 -0400
-Received: from mail.kernel.org ([198.145.29.99]:59848)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71)
-	(envelope-from <SRS0=We5Z=IL=linuxfoundation.org=gregkh@kernel.org>)
-	id 1fLrl9-0006fm-KW
-	for qemu-devel@nongnu.org; Thu, 24 May 2018 11:02:31 -0400
-Date: Thu, 24 May 2018 17:02:12 +0200
-From: Greg KH <gregkh@linuxfoundation.org>
-Message-ID: <20180524150212.GB14124@kroah.com>
-References: <152715298769.397287.11782572103987618822.stgit@bahia>
+	(envelope-from <peter.maydell@linaro.org>) id 1fLrln-0007ER-Ik
+	for qemu-devel@nongnu.org; Thu, 24 May 2018 11:03:23 -0400
+Received: from mail-ot0-x22d.google.com ([2607:f8b0:4003:c0f::22d]:36205)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1fLrln-0007Dv-EM
+	for qemu-devel@nongnu.org; Thu, 24 May 2018 11:03:11 -0400
+Received: by mail-ot0-x22d.google.com with SMTP id m11-v6so2312180otf.3
+	for <qemu-devel@nongnu.org>; Thu, 24 May 2018 08:03:11 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <152715298769.397287.11782572103987618822.stgit@bahia>
-Subject: Re: [Qemu-devel] [PATCH v2] block: fix QEMU crash with scsi-hd and
- drive_del
+In-Reply-To: <1527172175-129517-1-git-send-email-mst@redhat.com>
+References: <1527172175-129517-1-git-send-email-mst@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 24 May 2018 16:02:50 +0100
+Message-ID: <CAFEAcA89eVunGQA8zFLzKa5g-d59WuvvL4MUT8sEZKkt8MyZQA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH] libqtest: fail if child coredumps
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,69 +28,16 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>
-Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, stable@vger.kernel.org
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Thomas Huth <thuth@redhat.com>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>, Tiwei Bie <tiwei.bie@intel.com>, Markus Armbruster <armbru@redhat.com>
 
-On Thu, May 24, 2018 at 11:09:47AM +0200, Greg Kurz wrote:
-> Removing a drive with drive_del while it is being used to run an I/O
-> intensive workload can cause QEMU to crash.
-> 
-> An AIO flush can yield at some point:
-> 
-> blk_aio_flush_entry()
->  blk_co_flush(blk)
->   bdrv_co_flush(blk->root->bs)
->    ...
->     qemu_coroutine_yield()
-> 
-> and let the HMP command to run, free blk->root and give control
-> back to the AIO flush:
-> 
->     hmp_drive_del()
->      blk_remove_bs()
->       bdrv_root_unref_child(blk->root)
->        child_bs = blk->root->bs
->        bdrv_detach_child(blk->root)
->         bdrv_replace_child(blk->root, NULL)
->          blk->root->bs = NULL
->         g_free(blk->root) <============== blk->root becomes stale
->        bdrv_unref(child_bs)
->         bdrv_delete(child_bs)
->          bdrv_close()
->           bdrv_drained_begin()
->            bdrv_do_drained_begin()
->             bdrv_drain_recurse()
->              aio_poll()
->               ...
->               qemu_coroutine_switch()
-> 
-> and the AIO flush completion ends up dereferencing blk->root:
-> 
->   blk_aio_complete()
->    scsi_aio_complete()
->     blk_get_aio_context(blk)
->      bs = blk_bs(blk)
->  ie, bs = blk->root ? blk->root->bs : NULL
->             ^^^^^
->             stale
-> 
-> The problem is that we should avoid making block driver graph
-> changes while we have in-flight requests. This patch hence adds
-> a drained section to bdrv_detach_child(), so that we're sure
-> all requests have been drained when blk->root is freed.
-> 
-> Signed-off-by: Greg Kurz <groug@kaod.org>
-> ---
-> v2: - drain I/O requests when detaching the BDS (Stefan, Paolo)
-> ---
->  block.c |    4 ++++
->  1 file changed, 4 insertions(+)
+On 24 May 2018 at 15:30, Michael S. Tsirkin <mst@redhat.com> wrote:
+> Right now tests report OK status if QEMU crashes during cleanup.
+> Let's catch that case and fail the test.
+>
 
-<formletter>
+Ha -- I've occasionally wondered why some obvious
+test failures got reported as OK. Thanks for tracking
+down what was going on.
 
-This is not the correct way to submit patches for inclusion in the
-stable kernel tree.  Please read:
-    https://www.kernel.org/doc/html/latest/process/stable-kernel-rules.html
-for how to do this properly.
-
-</formletter>
+-- PMM
