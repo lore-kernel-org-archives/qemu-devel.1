@@ -1,29 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48653)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50399)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1fLkIe-00031Q-Pt
-	for qemu-devel@nongnu.org; Thu, 24 May 2018 03:04:38 -0400
+	(envelope-from <armbru@redhat.com>) id 1fLkN9-000402-Ht
+	for qemu-devel@nongnu.org; Thu, 24 May 2018 03:09:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1fLkIZ-0003XL-QD
-	for qemu-devel@nongnu.org; Thu, 24 May 2018 03:04:36 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:37478 helo=mx1.redhat.com)
+	(envelope-from <armbru@redhat.com>) id 1fLkN4-0006wF-Pz
+	for qemu-devel@nongnu.org; Thu, 24 May 2018 03:09:15 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:46944 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1fLkIZ-0003XA-K1
-	for qemu-devel@nongnu.org; Thu, 24 May 2018 03:04:31 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.5])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id DB1994022407
-	for <qemu-devel@nongnu.org>; Thu, 24 May 2018 07:04:30 +0000 (UTC)
-Date: Thu, 24 May 2018 15:04:25 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20180524070425.GB12122@xz-mi>
-References: <20180523091411.1073-1-quintela@redhat.com>
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fLkN4-0006v3-L6
+	for qemu-devel@nongnu.org; Thu, 24 May 2018 03:09:10 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <20180521084249.10640-1-peterx@redhat.com>
+	<8ef2c984-7817-a54f-ebae-a1f14e453b6a@redhat.com>
+	<20180522033954.GC17282@xz-mi>
+Date: Thu, 24 May 2018 09:08:58 +0200
+In-Reply-To: <20180522033954.GC17282@xz-mi> (Peter Xu's message of "Tue, 22
+	May 2018 11:39:54 +0800")
+Message-ID: <87y3g9a5th.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20180523091411.1073-1-quintela@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] migration: fix exec/fd migrations
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [RFC] monitor: turn on Out-Of-Band by default again
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,180 +28,234 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Juan Quintela <quintela@redhat.com>
-Cc: qemu-devel@nongnu.org, dgilbert@redhat.com, lvivier@redhat.com, "Daniel P. Berrange" <berrange@redhat.com>, Kevin Wolf <kwolf@redhat.com>
+To: Peter Xu <peterx@redhat.com>
+Cc: Eric Blake <eblake@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Fam Zheng <famz@redhat.com>, Eric Auger <eric.auger@redhat.com>, qemu-devel@nongnu.org, Christian Borntraeger <borntraeger@de.ibm.com>, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>, Max Reitz <mreitz@redhat.com>, John Snow <jsnow@redhat.com>
 
-On Wed, May 23, 2018 at 11:14:11AM +0200, Juan Quintela wrote:
-> Commit:
-> 
-> commit 36c2f8be2c4eb0003ac77a14910842b7ddd7337e
-> Author: Juan Quintela <quintela@redhat.com>
-> Date:   Wed Mar 7 08:40:52 2018 +0100
-> 
->     migration: Delay start of migration main routines
-> 
-> Missed tcp and fd transports.  This fix its.
-> 
-> Reported-by: Kevin Wolf <kwolf@redhat.com>
-> Signed-off-by: Juan Quintela <quintela@redhat.com>
-> ---
->  migration/exec.c | 4 ++++
->  migration/fd.c   | 4 ++++
->  2 files changed, 8 insertions(+)
-> 
-> diff --git a/migration/exec.c b/migration/exec.c
-> index 9d0f82f1f0..0bbeb63c97 100644
-> --- a/migration/exec.c
-> +++ b/migration/exec.c
-> @@ -20,6 +20,7 @@
->  #include "qemu/osdep.h"
->  #include "channel.h"
->  #include "exec.h"
-> +#include "migration.h"
->  #include "io/channel-command.h"
->  #include "trace.h"
->  
-> @@ -48,6 +49,9 @@ static gboolean exec_accept_incoming_migration(QIOChannel *ioc,
->  {
->      migration_channel_process_incoming(ioc);
->      object_unref(OBJECT(ioc));
-> +    if (!migrate_use_multifd()) {
-> +        migration_incoming_process();
-> +    }
->      return G_SOURCE_REMOVE;
->  }
->  
-> diff --git a/migration/fd.c b/migration/fd.c
-> index 9a380bbbc4..fee34ffdc0 100644
-> --- a/migration/fd.c
-> +++ b/migration/fd.c
-> @@ -17,6 +17,7 @@
->  #include "qemu/osdep.h"
->  #include "channel.h"
->  #include "fd.h"
-> +#include "migration.h"
->  #include "monitor/monitor.h"
->  #include "io/channel-util.h"
->  #include "trace.h"
-> @@ -48,6 +49,9 @@ static gboolean fd_accept_incoming_migration(QIOChannel *ioc,
->  {
->      migration_channel_process_incoming(ioc);
->      object_unref(OBJECT(ioc));
-> +    if (!migrate_use_multifd()) {
-> +        migration_incoming_process();
-> +    }
->      return G_SOURCE_REMOVE;
->  }
+Peter Xu <peterx@redhat.com> writes:
 
-We are calling migration_incoming_process() everywhere...  But
-actually we have a single entrance at
-migration_ioc_process_incoming().  How about we still use a single
-entrance for migration instead (and actually I just noticed that
-postcopy recovery should be broken now on master since now we don't
-call migration_fd_process_incoming at all...).  I mean something like
-this (even not tested with compile, just to show what I mean):
+> On Mon, May 21, 2018 at 09:13:06AM -0500, Eric Blake wrote:
+>> On 05/21/2018 03:42 AM, Peter Xu wrote:
+>> > We turned Out-Of-Band feature of monitors off for 2.12 release.  Now we
+>> > try to turn that on again.
+>> 
+>> "try to turn" sounds weak, like you aren't sure of this patch.  If you
+>> aren't sure, then why should we feel safe in applying it?  This text is
+>> going in the permanent git history, so sound bold, rather than hesitant!
+>
+> Yeah I am not really strong at turn that on by default, that's why I
+> marked the patch as RFC.  I wanted to hear from your opinions.  For
+> now IMHO even with x-oob, postcopy can start to work with network
+> recovery, then the requirement from my part is done.  However I'm
+> thinking maybe we should still turn that on for all the people.  One
+> reason is that we already have the QMP capability negotiation so it
+> seems redundant (as you mentioned before), meanwhile exposing it to
+> broader users can let broader users to leverage this new bits directly
+> (meanwhile easier to expose potential issues for OOB too).
+>
+> Meanwhile I'm not confident too on that there can be other test cases
+> that has not yet been run with Out-Of-Band, so even if we solved all
+> existing problems I can't be sure that no further test will broke.
+> However I don't see it a problem for merging, since AFAIU I can't
+> really know what will break again (if there is) unless we apply that
+> to master again... :)
 
-diff --git a/migration/migration.c b/migration/migration.c
-index 05aec2c905..fb27daf940 100644
---- a/migration/migration.c
-+++ b/migration/migration.c
-@@ -468,7 +468,6 @@ void migration_fd_process_incoming(QEMUFile *f)
-         qemu_sem_post(&mis->postcopy_pause_sem_dst);
-     } else {
-         /* New incoming migration */
--        migration_incoming_setup(f);
-         migration_incoming_process();
-     }
- }
-@@ -476,13 +475,24 @@ void migration_fd_process_incoming(QEMUFile *f)
- void migration_ioc_process_incoming(QIOChannel *ioc)
- {
-     MigrationIncomingState *mis = migration_incoming_get_current();
-+    bool start_migration = true;
- 
-     if (!mis->from_src_file) {
-         QEMUFile *f = qemu_fopen_channel_input(ioc);
-         migration_incoming_setup(f);
--        return;
-+        if (migrate_use_multifd()) {
-+            /* We need to wait until all channels settled */
-+            return;
-+        }
-+    }
-+
-+    if (migrate_use_multifd()) {
-+        start_migration = multifd_recv_new_channel(ioc);
-+    }
-+
-+    if (start_migration) {
-+        migration_fd_process_incoming(mis->from_src_file);
-     }
--    multifd_recv_new_channel(ioc);
- }
- 
- /**
-diff --git a/migration/ram.c b/migration/ram.c
-index 5bcbf7a9f9..dad3ed03b8 100644
---- a/migration/ram.c
-+++ b/migration/ram.c
-@@ -866,7 +866,8 @@ bool multifd_recv_all_channels_created(void)
-     return thread_count == atomic_read(&multifd_recv_state->count);
- }
- 
--void multifd_recv_new_channel(QIOChannel *ioc)
-+/* Return true if we have all the channels ready; otherwise false */
-+bool multifd_recv_new_channel(QIOChannel *ioc)
- {
-     MultiFDRecvParams *p;
-     Error *local_err = NULL;
-@@ -892,9 +893,8 @@ void multifd_recv_new_channel(QIOChannel *ioc)
-     qemu_thread_create(&p->thread, p->name, multifd_recv_thread, p,
-                        QEMU_THREAD_JOINABLE);
-     atomic_inc(&multifd_recv_state->count);
--    if (multifd_recv_state->count == migrate_multifd_channels()) {
--        migration_incoming_process();
--    }
-+
-+    return multifd_recv_state->count == migrate_multifd_channels();
- }
- 
- /**
-diff --git a/migration/rdma.c b/migration/rdma.c
-index 7d233b0820..6f8c6d9abc 100644
---- a/migration/rdma.c
-+++ b/migration/rdma.c
-@@ -3696,6 +3696,7 @@ static void rdma_accept_incoming_migration(void *opaque)
-     }
- 
-     rdma->migration_started_on_destination = 1;
-+    migration_incoming_setup(f);
-     migration_fd_process_incoming(f);
- }
- 
-diff --git a/migration/socket.c b/migration/socket.c
-index 3456eb76e9..18321c9605 100644
---- a/migration/socket.c
-+++ b/migration/socket.c
-@@ -170,10 +170,6 @@ static void socket_accept_incoming_migration(QIONetListener *listener,
-         qio_net_listener_disconnect(listener);
- 
-         object_unref(OBJECT(listener));
--
--        if (!migrate_use_multifd()) {
--            migration_incoming_process();
--        }
-     }
- }
- 
-This patch will make sure we call migration_incoming_process() only
-once, logically speaking it should also fix the breakage of postcopy
-recovery.
+The time to switch it on is now.  I don't think we can find remaining
+issues (if any) unless we do.
 
-What do you think?
+The time for doubts is the day before rc0 ;)
 
-CC Dan too.
+>> "We have resolved the issues from last time (commit 3fd2457d reverted by
+>> commit a4f90923):
+>> - issue 1 ...
+>> - issue 2 ...
+>> So now we are ready to enable advertisement of the feature by default"
+>> 
+>> with better descriptions of the issues that you fixed (I can think of at
+>> least the fixes adding thread-safety to the current monitor, and fixing
+>> early use of the monitor before qmp_capabilities completes; there may also
+>> be other issues that you want to call out).
+>
+> Some of the monitor patches are not really related to previous OOB
+> breakage, the only one that really matters should be the ARM+Libvirt
+> one, which I will definitely mention in my next post.  The rest
+> (including per-thread cur_mon, monitor thread-safety, etc.) should
+> mostly for future new commands of Out-Of-Band but not for now.  For
+> example, current OOB commands are rare, now they don't use the
+> get_fd()/set_fd() interface, then the mon_fdsets won't need to be
+> protected at all.
 
-Thanks,
+A lock works only when all its critical sections are guaranteed to
+execute quickly!  Remember, for OOB to work, all OOB commands must
+execute quickly, always.  Rule of thumb: treat OOB command code like
+realtime code.
 
--- 
-Peter Xu
+>                    But we can't guarantee that new OOB commands won't
+> use them too, so we still need to protect them with locks.
+
+When creating or modifying an OOB command, you need to be extra careful
+about shared state: you may have to add suitable synchronization.
+
+Please add suitable warnings about use of allow-oob to
+docs/qapi-code-gen.txt.  Perhaps even a separate document on OOB,
+pointed to by qapi-code-gen.txt.
+
+>> > 
+>> > Signed-off-by: Peter Xu <peterx@redhat.com>
+>> > --
+>> > Now OOB should be okay with all known tests (except iotest qcow2, since
+>> > it is still broken on master),
+>> 
+>> Which tests are still failing for you?  Ideally, you can still demonstrate
+>> that the tests not failing without this patch continue to pass with this
+>> patch, even if you call out the tests that have known issues to still be
+>> resolved.
+>
+> I didn't remember.  We can first settle down on whether we'd like to
+> turn on this default value, then I can perform this test for my next
+> post to make sure good tests won't break.
+>
+>> 
+>> > and AFAIK now we should also be okay with
+>> > ARM+Libvirt (not testsed, but Eric Auger helped to verify that before
+>> > the release).  So I think it's now safe to turn OOB on again.  Please
+>> > feel free to test this against any of existing testsuites to see whether
+>> > it'll still break any stuff.  Thanks,
+>> > 
+>> > Signed-off-by: Peter Xu <peterx@redhat.com>
+>> > ---
+>> >   monitor.c        | 13 +++----------
+>> >   tests/qmp-test.c |  2 +-
+>> >   vl.c             |  9 ++++-----
+>> >   3 files changed, 8 insertions(+), 16 deletions(-)
+>> > 
+>> > diff --git a/monitor.c b/monitor.c
+>> > index 46814af533..ce5cc5e34e 100644
+>> > --- a/monitor.c
+>> > +++ b/monitor.c
+>> > @@ -4560,16 +4560,9 @@ void monitor_init(Chardev *chr, int flags)
+>> >       bool use_readline = flags & MONITOR_USE_READLINE;
+>> >       bool use_oob = flags & MONITOR_USE_OOB;
+>> > -    if (use_oob) {
+>> > -        if (CHARDEV_IS_MUX(chr)) {
+>> > -            error_report("Monitor Out-Of-Band is not supported with "
+>> > -                         "MUX typed chardev backend");
+>> > -            exit(1);
+>> > -        }
+>> > -        if (use_readline) {
+>> > -            error_report("Monitor Out-Of-band is only supported by QMP");
+>> > -            exit(1);
+>> > -        }
+>> > +    if (CHARDEV_IS_MUX(chr)) {
+>> > +        /* MUX is still not supported for Out-Of-Band */
+>> > +        use_oob = false;
+>> 
+>> This isn't a mere reinstatement of 3fd2457d, but is now advertising OOB when
+>> using readline (which presumably is a synonym for using HMP).
+
+It effectively is a synonm now, but exploiting it would be unclean.  The
+clean test for HMP is !(flags & MONITOR_USE_CONTROL).
+
+>>                                                                Is that
+>> intentional?  If so, the commit message should mention it.
+>
+> At [1] below I directly moved the chunk into "mode=control" path, so
+> the QMP check is already there.  Here I turn OOB off explicitly for
+> MUX no matter HMP/QMP.  It should have the same affect as 3fd2457d.
+
+Switching off OOB silently for mux'ed chardev is ugly.  But I don't have
+better ideas.
+
+What's keeping us from supporting OOB there?
+
+Is anyone using QMP over a mux'ed chardev in anger?  I guess we don't
+know.
+
+>> >       }
+>> >       monitor_data_init(mon, false, use_oob);
+>> > diff --git a/tests/qmp-test.c b/tests/qmp-test.c
+>> > index 88f867f8c0..c85a3964d9 100644
+>> > --- a/tests/qmp-test.c
+>> > +++ b/tests/qmp-test.c
+>> > @@ -89,7 +89,7 @@ static void test_qmp_protocol(void)
+>> >       g_assert(q);
+>> >       test_version(qdict_get(q, "version"));
+>> >       capabilities = qdict_get_qlist(q, "capabilities");
+>> > -    g_assert(capabilities && qlist_empty(capabilities));
+>> > +    g_assert(capabilities);
+>> >       qobject_unref(resp);
+>> >       /* Test valid command before handshake */
+
+Let's check contents of @capabilities matches expectations.
+
+>> > diff --git a/vl.c b/vl.c
+>> > index 3b39bbd7a8..b71fb8eb25 100644
+>> > --- a/vl.c
+>> > +++ b/vl.c
+>> > @@ -2394,6 +2394,10 @@ static int mon_init_func(void *opaque, QemuOpts *opts, Error **errp)
+>> >           flags = MONITOR_USE_READLINE;
+>> >       } else if (strcmp(mode, "control") == 0) {
+>> >           flags = MONITOR_USE_CONTROL;
+>> > +        /* Out-Of-Band is on by default */
+>> > +        if (qemu_opt_get_bool(opts, "x-oob", 1)) {
+>> > +            flags |= MONITOR_USE_OOB;
+>> > +        }
+>
+> [1]
+>
+>> 
+>> Do we really still need the x-oob property, vs. outright deletion of this
+>> bandaid?  Then again, I guess keeping it for one more release makes it
+>> easier to forcefully turn things off for temporary testing when isolating
+>> whether OOB is a culprit in something breaking.
+>
+> Yes, since we already have it, I didn't have strong opinion to remove
+> it, so I kept it.  Actually now we can't turn OOB off completely
+> already - it's fully embeded in QMP internal logic (e.g., now we'll
+> always have completely isolated parser, dispatcher, responder; we
+> can't go back to the old func-call ways any more).  So maybe I can
+> remove that parameter directly next time.
+
+I'm leaning towards removing it, because:
+
+* There's no test coverage for x-oob=off
+
+* We already have a way to disable OOB: the QMP client can decline the
+  capability
+
+* MONITOR_USE_OOB makes monitor flags even uglier: of the four flag
+  bits' sixteen combinations, only a few actually occur:
+
+    MONITOR_USE_READLINE  on   off
+    MONITOR_USE_CONTROL   off  on
+    MONITOR_USE_PRETTY    N/A  either
+    MONITOR_USE_OOB       N/A  on unless mux'ed
+
+  That's just three genuine configurations (HMP, QMP, pretty QMP), if we
+  ignore the "mux'ed can't do OOB, yet" bit.
+
+  Without x-oob, we can drop MONITOR_USE_OOB, I think.
+
+>
+> Thanks,
+>
+>> 
+>> >       } else {
+>> >           error_report("unknown monitor mode \"%s\"", mode);
+>> >           exit(1);
+>> > @@ -2402,11 +2406,6 @@ static int mon_init_func(void *opaque, QemuOpts *opts, Error **errp)
+>> >       if (qemu_opt_get_bool(opts, "pretty", 0))
+>> >           flags |= MONITOR_USE_PRETTY;
+>> > -    /* OOB is off by default */
+>> > -    if (qemu_opt_get_bool(opts, "x-oob", 0)) {
+>> > -        flags |= MONITOR_USE_OOB;
+>> > -    }
+>> > -
+>> >       chardev = qemu_opt_get(opts, "chardev");
+>> >       chr = qemu_chr_find(chardev);
+>> >       if (chr == NULL) {
+>> > 
+>> 
+>> -- 
+>> Eric Blake, Principal Software Engineer
+>> Red Hat, Inc.           +1-919-301-3266
+>> Virtualization:  qemu.org | libvirt.org
