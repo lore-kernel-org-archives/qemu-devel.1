@@ -1,24 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52368)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52383)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Babu.Moger@amd.com>) id 1fLsPC-00070Y-GF
-	for qemu-devel@nongnu.org; Thu, 24 May 2018 11:43:56 -0400
+	(envelope-from <Babu.Moger@amd.com>) id 1fLsPD-00071Q-UO
+	for qemu-devel@nongnu.org; Thu, 24 May 2018 11:43:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <Babu.Moger@amd.com>) id 1fLsP8-00024y-Jt
-	for qemu-devel@nongnu.org; Thu, 24 May 2018 11:43:54 -0400
-Received: from mail-bl2nam02on0079.outbound.protection.outlook.com
-	([104.47.38.79]:5536
+	(envelope-from <Babu.Moger@amd.com>) id 1fLsP9-00025h-Vy
+	for qemu-devel@nongnu.org; Thu, 24 May 2018 11:43:56 -0400
+Received: from mail-bl2nam02on0040.outbound.protection.outlook.com
+	([104.47.38.40]:18592
 	helo=NAM02-BL2-obe.outbound.protection.outlook.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <Babu.Moger@amd.com>) id 1fLsP8-00024u-Do
-	for qemu-devel@nongnu.org; Thu, 24 May 2018 11:43:50 -0400
+	(Exim 4.71) (envelope-from <Babu.Moger@amd.com>) id 1fLsP9-00025U-Pv
+	for qemu-devel@nongnu.org; Thu, 24 May 2018 11:43:51 -0400
 From: Babu Moger <babu.moger@amd.com>
-Date: Thu, 24 May 2018 11:43:30 -0400
-Message-Id: <1527176614-26271-2-git-send-email-babu.moger@amd.com>
+Date: Thu, 24 May 2018 11:43:31 -0400
+Message-ID: <1527176614-26271-3-git-send-email-babu.moger@amd.com>
 In-Reply-To: <1527176614-26271-1-git-send-email-babu.moger@amd.com>
 References: <1527176614-26271-1-git-send-email-babu.moger@amd.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v11 1/5] i386: Clean up cache CPUID code
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v11 2/5] i386: Populate AMD Processor Cache
+ Information for cpuid 0x8000001D
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,265 +32,203 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: mst@redhat.com, marcel.apfelbaum@gmail.com, pbonzini@redhat.com, rth@twiddle.net, ehabkost@redhat.com, mtosatti@redhat.com
 Cc: qemu-devel@nongnu.org, kvm@vger.kernel.org, babu.moger@amd.com, kash@tripleback.net, geoff@hostfission.com
 
-From: Eduardo Habkost <ehabkost@redhat.com>
+Add information for cpuid 0x8000001D leaf. Populate cache topology informat=
+ion
+for different cache types (Data Cache, Instruction Cache, L2 and L3) suppor=
+ted
+by 0x8000001D leaf. Please refer to the Processor Programming Reference (PP=
+R)
+for AMD Family 17h Model for more details.
 
-Always initialize CPUCaches structs with cache information, even
-if legacy_cache=true.  Use different CPUCaches struct for
-CPUID[2], CPUID[4], and the AMD CPUID leaves.
-
-This will simplify a lot the logic inside cpu_x86_cpuid().
-
-Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 Signed-off-by: Babu Moger <babu.moger@amd.com>
 ---
- target/i386/cpu.c | 117 +++++++++++++++++++++++++++---------------------------
- target/i386/cpu.h |  14 ++++---
- 2 files changed, 67 insertions(+), 64 deletions(-)
+ target/i386/cpu.c | 117 ++++++++++++++++++++++++++++++++++++++++++++++++++=
+++++
+ target/i386/kvm.c |  29 ++++++++++++--
+ 2 files changed, 143 insertions(+), 3 deletions(-)
 
 diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-index d95310f..5c9bdc9 100644
+index 5c9bdc9..0d423e5 100644
 --- a/target/i386/cpu.c
 +++ b/target/i386/cpu.c
-@@ -1114,7 +1114,7 @@ struct X86CPUDefinition {
- };
- 
- static CPUCaches epyc_cache_info = {
--    .l1d_cache = {
-+    .l1d_cache = &(CPUCacheInfo) {
-         .type = DCACHE,
-         .level = 1,
-         .size = 32 * KiB,
-@@ -1126,7 +1126,7 @@ static CPUCaches epyc_cache_info = {
-         .self_init = 1,
-         .no_invd_sharing = true,
-     },
--    .l1i_cache = {
-+    .l1i_cache = &(CPUCacheInfo) {
-         .type = ICACHE,
-         .level = 1,
-         .size = 64 * KiB,
-@@ -1138,7 +1138,7 @@ static CPUCaches epyc_cache_info = {
-         .self_init = 1,
-         .no_invd_sharing = true,
-     },
--    .l2_cache = {
-+    .l2_cache = &(CPUCacheInfo) {
-         .type = UNIFIED_CACHE,
-         .level = 2,
-         .size = 512 * KiB,
-@@ -1148,7 +1148,7 @@ static CPUCaches epyc_cache_info = {
-         .sets = 1024,
-         .lines_per_tag = 1,
-     },
--    .l3_cache = {
-+    .l3_cache = &(CPUCacheInfo) {
-         .type = UNIFIED_CACHE,
-         .level = 3,
-         .size = 8 * MiB,
-@@ -3342,9 +3342,8 @@ static void x86_cpu_load_def(X86CPU *cpu, X86CPUDefinition *def, Error **errp)
-         env->features[w] = def->features[w];
-     }
- 
--    /* Store Cache information from the X86CPUDefinition if available */
--    env->cache_info = def->cache_info;
--    cpu->legacy_cache = def->cache_info ? 0 : 1;
-+    /* legacy-cache defaults to 'off' if CPU model provides cache info */
-+    cpu->legacy_cache = !def->cache_info;
- 
-     /* Special cases not set in the X86CPUDefinition structs: */
-     /* TODO: in-kernel irqchip for hvf */
-@@ -3695,21 +3694,11 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t index, uint32_t count,
-         if (!cpu->enable_l3_cache) {
-             *ecx = 0;
-         } else {
--            if (env->cache_info && !cpu->legacy_cache) {
--                *ecx = cpuid2_cache_descriptor(&env->cache_info->l3_cache);
--            } else {
--                *ecx = cpuid2_cache_descriptor(&legacy_l3_cache);
--            }
--        }
--        if (env->cache_info && !cpu->legacy_cache) {
--            *edx = (cpuid2_cache_descriptor(&env->cache_info->l1d_cache) << 16) |
--                   (cpuid2_cache_descriptor(&env->cache_info->l1i_cache) <<  8) |
--                   (cpuid2_cache_descriptor(&env->cache_info->l2_cache));
--        } else {
--            *edx = (cpuid2_cache_descriptor(&legacy_l1d_cache) << 16) |
--                   (cpuid2_cache_descriptor(&legacy_l1i_cache) <<  8) |
--                   (cpuid2_cache_descriptor(&legacy_l2_cache_cpuid2));
-+            *ecx = cpuid2_cache_descriptor(env->cache_info_cpuid2.l3_cache);
-         }
-+        *edx = (cpuid2_cache_descriptor(env->cache_info_cpuid2.l1d_cache) << 16) |
-+               (cpuid2_cache_descriptor(env->cache_info_cpuid2.l1i_cache) <<  8) |
-+               (cpuid2_cache_descriptor(env->cache_info_cpuid2.l2_cache));
-         break;
-     case 4:
-         /* cache info: needed for Core compatibility */
-@@ -3722,35 +3711,27 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t index, uint32_t count,
-             }
-         } else {
-             *eax = 0;
--            CPUCacheInfo *l1d, *l1i, *l2, *l3;
--            if (env->cache_info && !cpu->legacy_cache) {
--                l1d = &env->cache_info->l1d_cache;
--                l1i = &env->cache_info->l1i_cache;
--                l2 = &env->cache_info->l2_cache;
--                l3 = &env->cache_info->l3_cache;
--            } else {
--                l1d = &legacy_l1d_cache;
--                l1i = &legacy_l1i_cache;
--                l2 = &legacy_l2_cache;
--                l3 = &legacy_l3_cache;
--            }
-             switch (count) {
-             case 0: /* L1 dcache info */
--                encode_cache_cpuid4(l1d, 1, cs->nr_cores,
-+                encode_cache_cpuid4(env->cache_info_cpuid4.l1d_cache,
-+                                    1, cs->nr_cores,
-                                     eax, ebx, ecx, edx);
-                 break;
-             case 1: /* L1 icache info */
--                encode_cache_cpuid4(l1i, 1, cs->nr_cores,
-+                encode_cache_cpuid4(env->cache_info_cpuid4.l1i_cache,
-+                                    1, cs->nr_cores,
-                                     eax, ebx, ecx, edx);
-                 break;
-             case 2: /* L2 cache info */
--                encode_cache_cpuid4(l2, cs->nr_threads, cs->nr_cores,
-+                encode_cache_cpuid4(env->cache_info_cpuid4.l2_cache,
-+                                    cs->nr_threads, cs->nr_cores,
-                                     eax, ebx, ecx, edx);
-                 break;
-             case 3: /* L3 cache info */
-                 pkg_offset = apicid_pkg_offset(cs->nr_cores, cs->nr_threads);
-                 if (cpu->enable_l3_cache) {
--                    encode_cache_cpuid4(l3, (1 << pkg_offset), cs->nr_cores,
-+                    encode_cache_cpuid4(env->cache_info_cpuid4.l3_cache,
-+                                        (1 << pkg_offset), cs->nr_cores,
-                                         eax, ebx, ecx, edx);
-                     break;
-                 }
-@@ -3963,13 +3944,8 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t index, uint32_t count,
-                (L1_ITLB_2M_ASSOC <<  8) | (L1_ITLB_2M_ENTRIES);
-         *ebx = (L1_DTLB_4K_ASSOC << 24) | (L1_DTLB_4K_ENTRIES << 16) | \
-                (L1_ITLB_4K_ASSOC <<  8) | (L1_ITLB_4K_ENTRIES);
--        if (env->cache_info && !cpu->legacy_cache) {
--            *ecx = encode_cache_cpuid80000005(&env->cache_info->l1d_cache);
--            *edx = encode_cache_cpuid80000005(&env->cache_info->l1i_cache);
--        } else {
--            *ecx = encode_cache_cpuid80000005(&legacy_l1d_cache_amd);
--            *edx = encode_cache_cpuid80000005(&legacy_l1i_cache_amd);
--        }
-+        *ecx = encode_cache_cpuid80000005(env->cache_info_amd.l1d_cache);
-+        *edx = encode_cache_cpuid80000005(env->cache_info_amd.l1i_cache);
-         break;
-     case 0x80000006:
-         /* cache info (L2 cache) */
-@@ -3985,17 +3961,10 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t index, uint32_t count,
-                (L2_DTLB_4K_ENTRIES << 16) | \
-                (AMD_ENC_ASSOC(L2_ITLB_4K_ASSOC) << 12) | \
-                (L2_ITLB_4K_ENTRIES);
--        if (env->cache_info && !cpu->legacy_cache) {
--            encode_cache_cpuid80000006(&env->cache_info->l2_cache,
--                                       cpu->enable_l3_cache ?
--                                       &env->cache_info->l3_cache : NULL,
--                                       ecx, edx);
--        } else {
--            encode_cache_cpuid80000006(&legacy_l2_cache_amd,
--                                       cpu->enable_l3_cache ?
--                                       &legacy_l3_cache : NULL,
--                                       ecx, edx);
--        }
-+        encode_cache_cpuid80000006(env->cache_info_amd.l2_cache,
-+                                   cpu->enable_l3_cache ?
-+                                   env->cache_info_amd.l3_cache : NULL,
-+                                   ecx, edx);
-         break;
-     case 0x80000007:
-         *eax = 0;
-@@ -4692,6 +4661,37 @@ static void x86_cpu_realizefn(DeviceState *dev, Error **errp)
-             cpu->phys_bits = 32;
-         }
-     }
+@@ -337,6 +337,99 @@ static void encode_cache_cpuid80000006(CPUCacheInfo *l=
+2,
+ }
+=20
+ /*
++ * Definitions used for building CPUID Leaf 0x8000001D and 0x8000001E
++ * Please refer to the AMD64 Architecture Programmer=E2=80=99s Manual Volu=
+me 3.
++ * Define the constants to build the cpu topology. Right now, TOPOEXT
++ * feature is enabled only on EPYC. So, these constants are based on
++ * EPYC supported configurations. We may need to handle the cases if
++ * these values change in future.
++ */
++/* Maximum core complexes in a node */
++#define MAX_CCX 2
++/* Maximum cores in a core complex */
++#define MAX_CORES_IN_CCX 4
++/* Maximum cores in a node */
++#define MAX_CORES_IN_NODE 8
++/* Maximum nodes in a socket */
++#define MAX_NODES_PER_SOCKET 4
 +
-+    /* Cache information initialization */
-+    if (!cpu->legacy_cache) {
-+        if (!xcc->cpu_def || !xcc->cpu_def->cache_info) {
-+            char *name = x86_cpu_class_get_model_name(xcc);
-+            error_setg(errp,
-+                       "CPU model '%s' doesn't support legacy-cache=off", name);
-+            g_free(name);
-+            return;
-+        }
-+        env->cache_info_cpuid2 = env->cache_info_cpuid4 = env->cache_info_amd =
-+            *xcc->cpu_def->cache_info;
++/*
++ * Figure out the number of nodes required to build this config.
++ * Max cores in a node is 8
++ */
++static int nodes_in_socket(int nr_cores)
++{
++    int nodes;
++
++    nodes =3D DIV_ROUND_UP(nr_cores, MAX_CORES_IN_NODE);
++
++   /* Hardware does not support config with 3 nodes, return 4 in that case=
+ */
++    return (nodes =3D=3D 3) ? 4 : nodes;
++}
++
++/*
++ * Decide the number of cores in a core complex with the given nr_cores us=
+ing
++ * following set constants MAX_CCX, MAX_CORES_IN_CCX, MAX_CORES_IN_NODE an=
+d
++ * MAX_NODES_PER_SOCKET. Maintain symmetry as much as possible
++ * L3 cache is shared across all cores in a core complex. So, this will al=
+so
++ * tell us how many cores are sharing the L3 cache.
++ */
++static int cores_in_core_complex(int nr_cores)
++{
++    int nodes;
++
++    /* Check if we can fit all the cores in one core complex */
++    if (nr_cores <=3D MAX_CORES_IN_CCX) {
++        return nr_cores;
++    }
++    /* Get the number of nodes required to build this config */
++    nodes =3D nodes_in_socket(nr_cores);
++
++    /*
++     * Divide the cores accros all the core complexes
++     * Return rounded up value
++     */
++    return DIV_ROUND_UP(nr_cores, nodes * MAX_CCX);
++}
++
++/* Encode cache info for CPUID[8000001D] */
++static void encode_cache_cpuid8000001d(CPUCacheInfo *cache, CPUState *cs,
++                                uint32_t *eax, uint32_t *ebx,
++                                uint32_t *ecx, uint32_t *edx)
++{
++    uint32_t l3_cores;
++    assert(cache->size =3D=3D cache->line_size * cache->associativity *
++                          cache->partitions * cache->sets);
++
++    *eax =3D CACHE_TYPE(cache->type) | CACHE_LEVEL(cache->level) |
++               (cache->self_init ? CACHE_SELF_INIT_LEVEL : 0);
++
++    /* L3 is shared among multiple cores */
++    if (cache->level =3D=3D 3) {
++        l3_cores =3D cores_in_core_complex(cs->nr_cores);
++        *eax |=3D ((l3_cores * cs->nr_threads) - 1) << 14;
 +    } else {
-+        /* Build legacy cache information */
-+        env->cache_info_cpuid2.l1d_cache = &legacy_l1d_cache;
-+        env->cache_info_cpuid2.l1i_cache = &legacy_l1i_cache;
-+        env->cache_info_cpuid2.l2_cache = &legacy_l2_cache_cpuid2;
-+        env->cache_info_cpuid2.l3_cache = &legacy_l3_cache;
-+
-+        env->cache_info_cpuid4.l1d_cache = &legacy_l1d_cache;
-+        env->cache_info_cpuid4.l1i_cache = &legacy_l1i_cache;
-+        env->cache_info_cpuid4.l2_cache = &legacy_l2_cache;
-+        env->cache_info_cpuid4.l3_cache = &legacy_l3_cache;
-+
-+        env->cache_info_amd.l1d_cache = &legacy_l1d_cache_amd;
-+        env->cache_info_amd.l1i_cache = &legacy_l1i_cache_amd;
-+        env->cache_info_amd.l2_cache = &legacy_l2_cache_amd;
-+        env->cache_info_amd.l3_cache = &legacy_l3_cache;
++        *eax |=3D ((cs->nr_threads - 1) << 14);
 +    }
 +
++    assert(cache->line_size > 0);
++    assert(cache->partitions > 0);
++    assert(cache->associativity > 0);
++    /* We don't implement fully-associative caches */
++    assert(cache->associativity < cache->sets);
++    *ebx =3D (cache->line_size - 1) |
++           ((cache->partitions - 1) << 12) |
++           ((cache->associativity - 1) << 22);
 +
-     cpu_exec_realizefn(cs, &local_err);
-     if (local_err != NULL) {
-         error_propagate(errp, local_err);
-@@ -5175,11 +5175,10 @@ static Property x86_cpu_properties[] = {
-     DEFINE_PROP_BOOL("vmware-cpuid-freq", X86CPU, vmware_cpuid_freq, true),
-     DEFINE_PROP_BOOL("tcg-cpuid", X86CPU, expose_tcg, true),
-     /*
--     * lecacy_cache defaults to CPU model being chosen. This is set in
--     * x86_cpu_load_def based on cache_info which is initialized in
--     * builtin_x86_defs
-+     * lecacy_cache defaults to true unless the CPU model provides its
-+     * own cache information (see x86_cpu_load_def()).
-      */
--    DEFINE_PROP_BOOL("legacy-cache", X86CPU, legacy_cache, false),
-+    DEFINE_PROP_BOOL("legacy-cache", X86CPU, legacy_cache, true),
- 
-     /*
-      * From "Requirements for Implementing the Microsoft
-diff --git a/target/i386/cpu.h b/target/i386/cpu.h
-index 8ac13f6..5ddb0e6 100644
---- a/target/i386/cpu.h
-+++ b/target/i386/cpu.h
-@@ -1100,10 +1100,10 @@ typedef struct CPUCacheInfo {
- 
- 
- typedef struct CPUCaches {
--        CPUCacheInfo l1d_cache;
--        CPUCacheInfo l1i_cache;
--        CPUCacheInfo l2_cache;
--        CPUCacheInfo l3_cache;
-+        CPUCacheInfo *l1d_cache;
-+        CPUCacheInfo *l1i_cache;
-+        CPUCacheInfo *l2_cache;
-+        CPUCacheInfo *l3_cache;
- } CPUCaches;
- 
- typedef struct CPUX86State {
-@@ -1295,7 +1295,11 @@ typedef struct CPUX86State {
-     /* Features that were explicitly enabled/disabled */
-     FeatureWordArray user_features;
-     uint32_t cpuid_model[12];
--    CPUCaches *cache_info;
-+    /* Cache information for CPUID.  When legacy-cache=on, the cache data
-+     * on each CPUID leaf will be different, because we keep compatibility
-+     * with old QEMU versions.
-+     */
-+    CPUCaches cache_info_cpuid2, cache_info_cpuid4, cache_info_amd;
- 
-     /* MTRRs */
-     uint64_t mtrr_fixed[11];
--- 
++    assert(cache->sets > 0);
++    *ecx =3D cache->sets - 1;
++
++    *edx =3D (cache->no_invd_sharing ? CACHE_NO_INVD_SHARING : 0) |
++           (cache->inclusive ? CACHE_INCLUSIVE : 0) |
++           (cache->complex_indexing ? CACHE_COMPLEX_IDX : 0);
++}
++
++/*
+  * Definitions of the hardcoded cache entries we expose:
+  * These are legacy cache values. If there is a need to change any
+  * of these values please use builtin_x86_defs
+@@ -4005,6 +4098,30 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t index,=
+ uint32_t count,
+             *edx =3D 0;
+         }
+         break;
++    case 0x8000001D:
++        *eax =3D 0;
++        switch (count) {
++        case 0: /* L1 dcache info */
++            encode_cache_cpuid8000001d(env->cache_info_amd.l1d_cache, cs,
++                                       eax, ebx, ecx, edx);
++            break;
++        case 1: /* L1 icache info */
++            encode_cache_cpuid8000001d(env->cache_info_amd.l1i_cache, cs,
++                                       eax, ebx, ecx, edx);
++            break;
++        case 2: /* L2 cache info */
++            encode_cache_cpuid8000001d(env->cache_info_amd.l2_cache, cs,
++                                       eax, ebx, ecx, edx);
++            break;
++        case 3: /* L3 cache info */
++            encode_cache_cpuid8000001d(env->cache_info_amd.l3_cache, cs,
++                                       eax, ebx, ecx, edx);
++            break;
++        default: /* end of info */
++            *eax =3D *ebx =3D *ecx =3D *edx =3D 0;
++            break;
++        }
++        break;
+     case 0xC0000000:
+         *eax =3D env->cpuid_xlevel2;
+         *ebx =3D 0;
+diff --git a/target/i386/kvm.c b/target/i386/kvm.c
+index 0c656a9..871d1ef 100644
+--- a/target/i386/kvm.c
++++ b/target/i386/kvm.c
+@@ -980,9 +980,32 @@ int kvm_arch_init_vcpu(CPUState *cs)
+         }
+         c =3D &cpuid_data.entries[cpuid_i++];
+=20
+-        c->function =3D i;
+-        c->flags =3D 0;
+-        cpu_x86_cpuid(env, i, 0, &c->eax, &c->ebx, &c->ecx, &c->edx);
++        switch (i) {
++        case 0x8000001d:
++            /* Query for all AMD cache information leaves */
++            for (j =3D 0; ; j++) {
++                c->function =3D i;
++                c->flags =3D KVM_CPUID_FLAG_SIGNIFCANT_INDEX;
++                c->index =3D j;
++                cpu_x86_cpuid(env, i, j, &c->eax, &c->ebx, &c->ecx, &c->ed=
+x);
++
++                if (c->eax =3D=3D 0) {
++                    break;
++                }
++                if (cpuid_i =3D=3D KVM_MAX_CPUID_ENTRIES) {
++                    fprintf(stderr, "cpuid_data is full, no space for "
++                            "cpuid(eax:0x%x,ecx:0x%x)\n", i, j);
++                    abort();
++                }
++                c =3D &cpuid_data.entries[cpuid_i++];
++            }
++            break;
++        default:
++            c->function =3D i;
++            c->flags =3D 0;
++            cpu_x86_cpuid(env, i, 0, &c->eax, &c->ebx, &c->ecx, &c->edx);
++            break;
++        }
+     }
+=20
+     /* Call Centaur's CPUID instructions they are supported. */
+--=20
 1.8.3.1
