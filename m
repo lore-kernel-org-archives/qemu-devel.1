@@ -1,24 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56725)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57991)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1fLuK8-0003F4-7N
-	for qemu-devel@nongnu.org; Thu, 24 May 2018 13:46:49 -0400
+	(envelope-from <jsnow@redhat.com>) id 1fLuNQ-0004tg-VT
+	for qemu-devel@nongnu.org; Thu, 24 May 2018 13:50:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1fLuK7-0007an-9u
-	for qemu-devel@nongnu.org; Thu, 24 May 2018 13:46:48 -0400
-References: <20180518132114.4070-1-kwolf@redhat.com>
-	<20180518132114.4070-18-kwolf@redhat.com>
-	<fa219be9-84e4-07ec-69a5-1fddb608ccbb@redhat.com>
-	<20180524081715.GB4008@localhost.localdomain>
+	(envelope-from <jsnow@redhat.com>) id 1fLuNN-00022B-L4
+	for qemu-devel@nongnu.org; Thu, 24 May 2018 13:50:12 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:38102 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1fLuNN-00021e-FN
+	for qemu-devel@nongnu.org; Thu, 24 May 2018 13:50:09 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.4])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 0093B401EF00
+	for <qemu-devel@nongnu.org>; Thu, 24 May 2018 17:50:09 +0000 (UTC)
+References: <20180523091411.1073-1-quintela@redhat.com>
 From: John Snow <jsnow@redhat.com>
-Message-ID: <e9acffe3-7f83-3555-1e91-9cdcaeeef158@redhat.com>
-Date: Thu, 24 May 2018 13:46:38 -0400
+Message-ID: <64410e07-30ba-c714-e3f4-99149ad22a76@redhat.com>
+Date: Thu, 24 May 2018 13:50:08 -0400
 MIME-Version: 1.0
-In-Reply-To: <20180524081715.GB4008@localhost.localdomain>
+In-Reply-To: <20180523091411.1073-1-quintela@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 17/40] job: Move BlockJobCreateFlags to
- Job
+Subject: Re: [Qemu-devel] [PATCH] migration: fix exec/fd migrations
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,61 +33,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, jcody@redhat.com, armbru@redhat.com, mreitz@redhat.com
+To: Juan Quintela <quintela@redhat.com>, qemu-devel@nongnu.org
+Cc: lvivier@redhat.com, dgilbert@redhat.com, peterx@redhat.com
 
 
 
-On 05/24/2018 04:17 AM, Kevin Wolf wrote:
-> Am 24.05.2018 um 00:24 hat John Snow geschrieben:
->>
->>
->> On 05/18/2018 09:20 AM, Kevin Wolf wrote:
->>> +    job->auto_finalize = !(flags & JOB_MANUAL_FINALIZE);
->>> +    job->auto_dismiss  = !(flags & JOB_MANUAL_DISMISS);
->>
->> Job API might be a good chance to say "No, this is the default behavior
->> for this API."
->>
->> I don't know how possible this is, but could we remove these behavior
->> flags for jobs (but keep them for block jobs), and then any legacy block
->> job creation interfaces we have can enable/disable them as the user
->> requested,
->>
->> and the block job layer itself has hooks that persuade the core job
->> layer to automatically transition without user input, if appropriate.
->>
->> (Unless that happens later?)
+On 05/23/2018 05:14 AM, Juan Quintela wrote:
+> Commit:
 > 
-> That's really a question for job-create, which we don't have yet. I'm
-> not sure whether job-create would expose those options, and if so, what
-> the defaults would be.
+> commit 36c2f8be2c4eb0003ac77a14910842b7ddd7337e
+> Author: Juan Quintela <quintela@redhat.com>
+> Date:   Wed Mar 7 08:40:52 2018 +0100
 > 
-> I think auto-dismiss=false is a good default because the reason for
-> having a manual job-dismiss is shared by all jobs (you want to be able
-> to query the job result after it finished).
+>     migration: Delay start of migration main routines
 > 
-
-Sounds good to me.
-
-> auto-finalize is different. We introduced it to avoid surprise graph
-> changes, but this implies that every job changes the block graph when it
-> completes. This is obviously not true for non-block jobs. They might
-> still commonly change something else that shouldn't be done as a
-> surprise, but I am working right now on at least a single job type that
-> doesn't do anything like that on completion (blockdev-create).
+> Missed tcp and fd transports.  This fix its.
 > 
+> Reported-by: Kevin Wolf <kwolf@redhat.com>
+> Signed-off-by: Juan Quintela <quintela@redhat.com>
 
-I'll have to stay tuned.
+Fixes things for me, but I see that Peter Xu has more concerns.
 
-> For now, I made it unconditionally auto-finalize=true and
-> auto-dismiss=false without offering the options in QMP, but that's open
-> for discussion.
+Would be happy with checking this in for now and following up with
+better refactors so that iotests works again in the meantime.
 
-Sure. I was wondering if we didn't want to change the internal API's
-defaults around, but I guess that can happen whenever based on what the
-QMP looks like.
-
-> 
-> Kevin
-> 
+Tested-by: John Snow <jsnow@redhat.com>
