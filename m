@@ -1,31 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56669)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56681)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fLsfC-0004ZE-I1
-	for qemu-devel@nongnu.org; Thu, 24 May 2018 12:00:27 -0400
+	(envelope-from <mst@redhat.com>) id 1fLsfE-0004b8-AA
+	for qemu-devel@nongnu.org; Thu, 24 May 2018 12:00:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fLsf6-00043D-SJ
-	for qemu-devel@nongnu.org; Thu, 24 May 2018 12:00:26 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:33442 helo=mx1.redhat.com)
+	(envelope-from <mst@redhat.com>) id 1fLsf8-00047x-CQ
+	for qemu-devel@nongnu.org; Thu, 24 May 2018 12:00:28 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:33448 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fLsf6-00042E-IC
-	for qemu-devel@nongnu.org; Thu, 24 May 2018 12:00:20 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.3])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id AFC9581902A1
-	for <qemu-devel@nongnu.org>; Thu, 24 May 2018 16:00:19 +0000 (UTC)
-From: Markus Armbruster <armbru@redhat.com>
-References: <1525423069-61903-1-git-send-email-imammedo@redhat.com>
-	<1525423069-61903-5-git-send-email-imammedo@redhat.com>
-Date: Thu, 24 May 2018 18:00:18 +0200
-In-Reply-To: <1525423069-61903-5-git-send-email-imammedo@redhat.com> (Igor
-	Mammedov's message of "Fri, 4 May 2018 10:37:42 +0200")
-Message-ID: <87h8mx11t9.fsf@dusky.pond.sub.org>
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1fLsf8-00046H-7d
+	for qemu-devel@nongnu.org; Thu, 24 May 2018 12:00:22 -0400
+Date: Thu, 24 May 2018 19:00:21 +0300
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20180524185656-mutt-send-email-mst@kernel.org>
+References: <1527176250-178968-1-git-send-email-mst@redhat.com>
+	<d0edcb79-3dae-c3a5-f9f4-50b3062f8cff@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v7 04/11] hmp: disable monitor in preconfig
- state
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <d0edcb79-3dae-c3a5-f9f4-50b3062f8cff@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2 2/1] libqtest: add more exit status
+ checks
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,49 +28,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: qemu-devel@nongnu.org, pkrempa@redhat.com, ehabkost@redhat.com
+To: Eric Blake <eblake@redhat.com>
+Cc: qemu-devel@nongnu.org, Thomas Huth <thuth@redhat.com>, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>, Markus Armbruster <armbru@redhat.com>
 
-Igor Mammedov <imammedo@redhat.com> writes:
+On Thu, May 24, 2018 at 10:52:26AM -0500, Eric Blake wrote:
+> On 05/24/2018 10:38 AM, Michael S. Tsirkin wrote:
+> > Add more checks on how did QEMU exit.
+> > 
+> > Legal ways to exit right now:
+> > - exit(0) or return from main
+> > - kill(SIGTERM) - sent by testing infrastructure
+> > 
+> > Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+> > ---
+> > 
+> > Changes from v1:
+> > - drop SIGTERM as suggested by Eric
+> > 
+> 
+> > +++ b/tests/libqtest.c
+> > @@ -110,7 +110,12 @@ static void kill_qemu(QTestState *s)
+> >           pid = waitpid(s->qemu_pid, &wstatus, 0);
+> >           if (pid == s->qemu_pid && WIFSIGNALED(wstatus)) {
+> 
+> Wait a moment. If WIFSIGNALED() is true...
+> 
+> > +            /* Core dump is never OK */
+> >               assert(!WCOREDUMP(wstatus));
+> > +            /* Must exit normally */
+> > +            assert(WIFEXITED(wstatus));
+> 
+> ...then WIFEXITED() is false.  This is bogus.
+> 
+> > +            /* If exited normally - check exit status */
+> > +            assert(!WIFEXITED(wstatus) || !WEXITSTATUS(wstatus));
+> 
+> And you have some redundancy - !WIFEXITED() is not possible if you just
+> asserted WIFEXITED().
+> 
+> Better would be:
+> 
+> if (pid == s->qemu_pid) {
+>     /*
+>      * Since sending SIGTERM turns into a normal exit, we want to flag
+>      * any non-normal exit, whether or not it dumped core, as a test
+>      * failure (even if it was a SIGKILL from someone desperate to stop
+>      * the testsuite).
+>      */
+>     assert(WIFEXITED(wstatus) && !WEXITSTATUS(wstatus));
+> }
+> 
+> Also, since waitpid() can only return either s->qemu_pid or -1 as we aren't
+> using WNOHANG,
 
-> Ban it for now, if someone would need it to work early,
-> one would have to implement checks if HMP command is valid
-> at preconfig state.
->
-> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-> Reviewed-by: Eric Blake <eblake@redhat.com>
-> ---
-> v5:
->   * add 'use QMP instead" to error message, suggesting user
->     the right interface to use
-> v4:
->   * v3 was only printing error but not preventing command execution,
->     Fix it by returning after printing error message.
->     ("Dr. David Alan Gilbert" <dgilbert@redhat.com>)
-> ---
->  monitor.c | 6 ++++++
->  1 file changed, 6 insertions(+)
->
-> diff --git a/monitor.c b/monitor.c
-> index 39f8ee1..0ffdf1d 100644
-> --- a/monitor.c
-> +++ b/monitor.c
-> @@ -3374,6 +3374,12 @@ static void handle_hmp_command(Monitor *mon, const char *cmdline)
->  
->      trace_handle_hmp_command(mon, cmdline);
->  
-> +    if (runstate_check(RUN_STATE_PRECONFIG)) {
-> +        monitor_printf(mon, "HMP not available in preconfig state, "
-> +                            "use QMP instead\n");
-> +        return;
-> +    }
-> +
->      cmd = monitor_parse_command(mon, cmdline, &cmdline, mon->cmd_table);
->      if (!cmd) {
->          return;
 
-So we offer the user an HMP monitor, but we summarily fail all commands.
-I'm sorry, but that's... searching for polite word... embarrassing.  We
-should accept HMP output only when we're ready to accept it.  Yes, that
-would involve a bit more surgery rather than this cheap hack.  The whole
-preconfig thing smells like a cheap hack to me, but let's not overdo it.
+> it may also be worth asserting that if pid == -1, we either
+> have EAGAIN (but why aren't we looping in that case?)
+
+I don't think waitpid can return EAGAIN
+
+> or ECHILD.
+
+Right but checking for known failures explicitly is helpful for debugging.
+
+
+> -- 
+> Eric Blake, Principal Software Engineer
+> Red Hat, Inc.           +1-919-301-3266
+> Virtualization:  qemu.org | libvirt.org
