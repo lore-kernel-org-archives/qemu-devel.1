@@ -1,29 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54547)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54999)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1fLqdJ-0000xT-V2
-	for qemu-devel@nongnu.org; Thu, 24 May 2018 09:50:28 -0400
+	(envelope-from <stefanha@gmail.com>) id 1fLqf4-0002KK-4O
+	for qemu-devel@nongnu.org; Thu, 24 May 2018 09:52:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1fLqdD-0007P8-Rd
-	for qemu-devel@nongnu.org; Thu, 24 May 2018 09:50:22 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:50046 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1fLqdD-0007OV-M8
-	for qemu-devel@nongnu.org; Thu, 24 May 2018 09:50:15 -0400
-Date: Thu, 24 May 2018 16:50:09 +0300
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20180524164928-mutt-send-email-mst@kernel.org>
-References: <20180412151232.17506-1-tiwei.bie@intel.com>
-	<20180412151232.17506-3-tiwei.bie@intel.com>
-	<20180523163116-mutt-send-email-mst@kernel.org>
-	<20180523183444-mutt-send-email-mst@kernel.org>
-	<20180523184001-mutt-send-email-mst@kernel.org>
-	<20180523232101.GB15604@debian> <20180524022440.GA20792@debian>
+	(envelope-from <stefanha@gmail.com>) id 1fLqez-0008Fp-I1
+	for qemu-devel@nongnu.org; Thu, 24 May 2018 09:52:10 -0400
+Received: from mail-wr0-x242.google.com ([2a00:1450:400c:c0c::242]:46704)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1fLqez-0008FN-Af
+	for qemu-devel@nongnu.org; Thu, 24 May 2018 09:52:05 -0400
+Received: by mail-wr0-x242.google.com with SMTP id x9-v6so3273474wrl.13
+	for <qemu-devel@nongnu.org>; Thu, 24 May 2018 06:52:04 -0700 (PDT)
+Date: Thu, 24 May 2018 14:52:02 +0100
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20180524135202.GA28984@stefanha-x1.localdomain>
+References: <20180515143548.29841-1-pbonzini@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="RnlQjJ0d97Da+TV1"
 Content-Disposition: inline
-In-Reply-To: <20180524022440.GA20792@debian>
-Subject: Re: [Qemu-devel] [PATCH v3 2/6] vhost-user: introduce shared
- vhost-user state
+In-Reply-To: <20180515143548.29841-1-pbonzini@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] memory: get rid of
+ memory_region_init_reservation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,203 +30,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Tiwei Bie <tiwei.bie@intel.com>
-Cc: jasowang@redhat.com, alex.williamson@redhat.com, pbonzini@redhat.com, stefanha@redhat.com, qemu-devel@nongnu.org, virtio-dev@lists.oasis-open.org, cunming.liang@intel.com, dan.daly@intel.com, jianfeng.tan@intel.com, zhihong.wang@intel.com, xiao.w.wang@intel.com
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-devel@nongnu.org, peter.maydell@linaro.org
 
-On Thu, May 24, 2018 at 10:24:40AM +0800, Tiwei Bie wrote:
-> On Thu, May 24, 2018 at 07:21:01AM +0800, Tiwei Bie wrote:
-> > On Wed, May 23, 2018 at 06:43:29PM +0300, Michael S. Tsirkin wrote:
-> > > On Wed, May 23, 2018 at 06:36:05PM +0300, Michael S. Tsirkin wrote:
-> > > > On Wed, May 23, 2018 at 04:44:51PM +0300, Michael S. Tsirkin wrote:
-> > > > > On Thu, Apr 12, 2018 at 11:12:28PM +0800, Tiwei Bie wrote:
-> > > > > > When multi queue is enabled e.g. for a virtio-net device,
-> > > > > > each queue pair will have a vhost_dev, and the only thing
-> > > > > > shared between vhost devs currently is the chardev. This
-> > > > > > patch introduces a vhost-user state structure which will
-> > > > > > be shared by all vhost devs of the same virtio device.
-> > > > > > 
-> > > > > > Signed-off-by: Tiwei Bie <tiwei.bie@intel.com>
-> > > > > 
-> > > > > Unfortunately this patch seems to cause crashes.
-> > > > > To reproduce, simply run
-> > > > > make check-qtest-x86_64
-> > > > > 
-> > > > > Sorry that it took me a while to find - it triggers 90% of runs but not
-> > > > > 100% which complicates bisection somewhat.
-> > 
-> > It's my fault to not notice this bug before.
-> > I'm very sorry. Thank you so much for finding
-> > the root cause!
-> > 
-> > > > > 
-> > > > > > ---
-> > > > > >  backends/cryptodev-vhost-user.c     | 20 ++++++++++++++++++-
-> > > > > >  hw/block/vhost-user-blk.c           | 22 +++++++++++++++++++-
-> > > > > >  hw/scsi/vhost-user-scsi.c           | 20 ++++++++++++++++++-
-> > > > > >  hw/virtio/Makefile.objs             |  2 +-
-> > > > > >  hw/virtio/vhost-stub.c              | 10 ++++++++++
-> > > > > >  hw/virtio/vhost-user.c              | 31 +++++++++++++++++++---------
-> > > > > >  include/hw/virtio/vhost-user-blk.h  |  2 ++
-> > > > > >  include/hw/virtio/vhost-user-scsi.h |  2 ++
-> > > > > >  include/hw/virtio/vhost-user.h      | 20 +++++++++++++++++++
-> > > > > >  net/vhost-user.c                    | 40 ++++++++++++++++++++++++++++++-------
-> > > > > >  10 files changed, 149 insertions(+), 20 deletions(-)
-> > > > > >  create mode 100644 include/hw/virtio/vhost-user.h
-> > [...]
-> > > > > >          qemu_chr_fe_set_handlers(&s->chr, NULL, NULL,
-> > > > > >                                   net_vhost_user_event, NULL, nc0->name, NULL,
-> > > > > > @@ -319,6 +336,15 @@ static int net_vhost_user_init(NetClientState *peer, const char *device,
-> > > > > >      assert(s->vhost_net);
-> > > > > >  
-> > > > > >      return 0;
-> > > > > > +
-> > > > > > +err:
-> > > > > > +    if (user) {
-> > > > > > +        vhost_user_cleanup(user);
-> > > > > > +        g_free(user);
-> > > > > > +        s->vhost_user = NULL;
-> > > > > > +    }
-> > > > > > +
-> > > > > > +    return -1;
-> > > > > >  }
-> > > > > >  
-> > > > > >  static Chardev *net_vhost_claim_chardev(
-> > > > > > -- 
-> > > > > > 2.11.0
-> > > > 
-> > > > So far I figured out that commenting the free of
-> > > > the structure removes the crash, so we seem to
-> > > > be dealing with a use-after free here.
-> > > > I suspect that in a MQ situation, one queue gets
-> > > > closed and attempts to free the structure
-> > > > while others still use it.
-> > > > 
-> > > > diff --git a/net/vhost-user.c b/net/vhost-user.c
-> > > > index 525a061..6a1573b 100644
-> > > > --- a/net/vhost-user.c
-> > > > +++ b/net/vhost-user.c
-> > > > @@ -157,8 +157,8 @@ static void net_vhost_user_cleanup(NetClientState *nc)
-> > > >          s->vhost_net = NULL;
-> > > >      }
-> > > >      if (s->vhost_user) {
-> > > > -        vhost_user_cleanup(s->vhost_user);
-> > > > -        g_free(s->vhost_user);
-> > > > +        //vhost_user_cleanup(s->vhost_user);
-> > > > +        //g_free(s->vhost_user);
-> > > >          s->vhost_user = NULL;
-> > > >      }
-> > > >      if (nc->queue_index == 0) {
-> > > > @@ -339,8 +339,8 @@ static int net_vhost_user_init(NetClientState *peer, const char *device,
-> > > >  
-> > > >  err:
-> > > >      if (user) {
-> > > > -        vhost_user_cleanup(user);
-> > > > -        g_free(user);
-> > > > +        //vhost_user_cleanup(user);
-> > > > +        //g_free(user);
-> > > >          s->vhost_user = NULL;
-> > > >      }
-> > > >  
-> > > 
-> > > 
-> > > So the following at least gets rid of the crashes.
-> > > I am not sure it does not leak memory though,
-> > > and not sure there aren't any configurations where
-> > > the 1st queue gets cleaned up first.
-> > > 
-> > > Thoughts?
-> > 
-> > Thank you so much for catching it and fixing
-> > it! I'll keep your SoB there. Thank you so
-> > much! I do appreciate it!
-> > 
-> > You are right. This structure is freed multiple
-> > times when multi-queue is enabled.
-> 
-> After a deeper digging, I got your point now..
-> It could be a use-after-free instead of a double
-> free.. As it's safe to deinit the char which is
-> shared by all queue pairs when cleanup the 1st
-> queue pair, it should be safe to free vhost-user
-> structure there too.
-> 
-> > 
-> > I think it's safe to let the first queue pair
-> > free the vhost-user structure, because it won't
-> > be touched by other queue pairs during cleanup.
-> > 
-> > Best regards,
-> > Tiwei Bie
-> > 
-> > 
-> > > 
-> > > Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-> > > 
-> > > ---
-> > > 
-> > > diff --git a/net/vhost-user.c b/net/vhost-user.c
-> > > index 525a061..7549d25 100644
-> > > --- a/net/vhost-user.c
-> > > +++ b/net/vhost-user.c
-> > > @@ -156,19 +156,20 @@ static void net_vhost_user_cleanup(NetClientState *nc)
-> > >          g_free(s->vhost_net);
-> > >          s->vhost_net = NULL;
-> > >      }
-> > > -    if (s->vhost_user) {
-> > > -        vhost_user_cleanup(s->vhost_user);
-> > > -        g_free(s->vhost_user);
-> > > -        s->vhost_user = NULL;
-> > > -    }
-> > >      if (nc->queue_index == 0) {
-> > >          if (s->watch) {
-> > >              g_source_remove(s->watch);
-> > >              s->watch = 0;
-> > >          }
-> > >          qemu_chr_fe_deinit(&s->chr, true);
-> > > +        if (s->vhost_user) {
-> > > +            vhost_user_cleanup(s->vhost_user);
-> > > +            g_free(s->vhost_user);
-> > > +        }
-> > >      }
-> > >  
-> > > +    s->vhost_user = NULL;
-> 
-> Maybe we should move above line, like:
-> 
->      if (nc->queue_index == 0) {
->          if (s->watch) {
->              g_source_remove(s->watch);
->              s->watch = 0;
->          }
->          qemu_chr_fe_deinit(&s->chr, true);
-> +        if (s->vhost_user) {
-> +            vhost_user_cleanup(s->vhost_user);
-> +            g_free(s->vhost_user);
-> +            s->vhost_user = NULL;
-> +        }
->      }
-> 
-> otherwise s->vhost_user may not be freed.
-> 
-> > > +
-> > >      qemu_purge_queued_packets(nc);
-> > >  }
-> > >  
-> > > @@ -341,7 +342,6 @@ err:
-> > >      if (user) {
-> > >          vhost_user_cleanup(user);
-> > >          g_free(user);
-> > > -        s->vhost_user = NULL;
-> 
-> I don't get why cannot zero it in this case.
 
-You don't even know s is initialized.
-Just make sure s->vhost_user is only set after you know
-init succeeded.
+--RnlQjJ0d97Da+TV1
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-> > >      }
-> > >  
-> > >      return -1;
-> 
-> Best regards,
-> Tiwei Bie
+On Tue, May 15, 2018 at 04:35:48PM +0200, Paolo Bonzini wrote:
+> The function has been deprecated for 2.5 years, and there are just a hand=
+ful
+> of users.  Convert them to memory_region_init_io with NULL callbacks,
+> and while at it pass the right device as the owner.
+>=20
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> ---
+>  docs/devel/memory.txt |  5 ++---
+>  hw/i386/kvm/i8254.c   |  2 +-
+>  hw/i386/kvm/i8259.c   |  4 ++--
+>  hw/i386/kvm/ioapic.c  |  2 +-
+>  include/exec/memory.h | 23 -----------------------
+>  5 files changed, 6 insertions(+), 30 deletions(-)
+
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+
+--RnlQjJ0d97Da+TV1
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJbBsOCAAoJEJykq7OBq3PIdgMH/1AgpcJOUHtabjmPQB2PklcH
+D+ArxjHTF06LjvOHaVHrki0JgJiPIWNagNtKvEQ6v0sFHm3elSYI6eUrN6tdRqTc
+DQ3lk1qGq0aqVphGT2PSV2wwLOhz9lamGoM1KQPATGCar4i81mvPe1DAJw7XbF1U
+olK8tSCvJcTc2yuVmz5ahIO5T/N6Gk85PzjGfWRTXLgX03JjQXzsdu0mRvVRj8bZ
+lfUAr90NYoQ0exG/JCHzMDOC9GxQvOq7jOKNpCB8UfKtIPKJbNYeiAs4qtT8ot4q
+0h4oyHh2GzH/ie7cX5QFaDJvwd6h+L8K/tfor7wi6w1ghJmyS01sULfJfd9sQYU=
+=x03Q
+-----END PGP SIGNATURE-----
+
+--RnlQjJ0d97Da+TV1--
