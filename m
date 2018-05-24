@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35654)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35840)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fLrPn-0000fT-2W
-	for qemu-devel@nongnu.org; Thu, 24 May 2018 10:40:28 -0400
+	(envelope-from <eric.auger@redhat.com>) id 1fLrQW-0000yc-4M
+	for qemu-devel@nongnu.org; Thu, 24 May 2018 10:41:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fLrPl-0001s1-QR
-	for qemu-devel@nongnu.org; Thu, 24 May 2018 10:40:27 -0400
-Received: from mail-ot0-x243.google.com ([2607:f8b0:4003:c0f::243]:37006)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fLrPl-0001rh-KO
-	for qemu-devel@nongnu.org; Thu, 24 May 2018 10:40:25 -0400
-Received: by mail-ot0-x243.google.com with SMTP id 77-v6so2212434otd.4
-	for <qemu-devel@nongnu.org>; Thu, 24 May 2018 07:40:25 -0700 (PDT)
+	(envelope-from <eric.auger@redhat.com>) id 1fLrQS-00028N-15
+	for qemu-devel@nongnu.org; Thu, 24 May 2018 10:41:12 -0400
+References: <1527047633-12368-1-git-send-email-zhaoshenglong@huawei.com>
+	<1527047633-12368-2-git-send-email-zhaoshenglong@huawei.com>
+	<acca5b80-f527-bc39-0b63-147e53affb4b@redhat.com>
+	<CAFEAcA-xbHtxora5TU9psYnBgP0+N8_nznhVppEkg7fmmwip3w@mail.gmail.com>
+	<10801e6c-5028-add6-b082-22c5dc9758ca@redhat.com>
+	<CAFEAcA-eW_1M42c+Fjt98AgVsnbwjwWap3JZFHNU9f8S0H_qww@mail.gmail.com>
+From: Auger Eric <eric.auger@redhat.com>
+Message-ID: <38aee779-1baf-ab96-7489-0f34bda2f8e6@redhat.com>
+Date: Thu, 24 May 2018 16:40:58 +0200
 MIME-Version: 1.0
-In-Reply-To: <1527161340-3200-2-git-send-email-suhang16@mails.ucas.ac.cn>
-References: <1527161340-3200-1-git-send-email-suhang16@mails.ucas.ac.cn>
-	<1527161340-3200-2-git-send-email-suhang16@mails.ucas.ac.cn>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 24 May 2018 15:40:04 +0100
-Message-ID: <CAFEAcA9Y05BF6iwRuEWQK6G12jxjeWT5F4cxTMTU2bb9MWtS-g@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL 1/2] Implement .hex file loader
+In-Reply-To: <CAFEAcA-eW_1M42c+Fjt98AgVsnbwjwWap3JZFHNU9f8S0H_qww@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH V3 2/2] arm_gicv3_kvm: kvm_dist_get/put:
+ skip the registers banked by GICR
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,68 +28,92 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Su Hang <suhang16@mails.ucas.ac.cn>
-Cc: Stefan Hajnoczi <stefanha@gmail.com>, jim@groklearning.com, Joel Stanley <joel@jms.id.au>, QEMU Developers <qemu-devel@nongnu.org>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Shannon Zhao <shannon.zhaosl@gmail.com>, qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, Shannon Zhao <zhaoshenglong@huawei.com>
 
-On 24 May 2018 at 12:28, Su Hang <suhang16@mails.ucas.ac.cn> wrote:
-> This patch adds Intel Hexadecimal Object File format support to
-> the loader.  The file format specification is available here:
-> http://www.piclist.com/techref/fileext/hex/intel.htm
->
-> The file format is mainly intended for embedded systems
-> and microcontrollers, such as Micro:bit Arduino, ARM, STM32, etc.
+Hi Peter,
 
-Could we have some more rationale here, please? For instance,
-we could mention who ships binaries in this format, what other
-boot loaders handle this, and so on. The idea is to explain
-why it's worth our having this code, rather than just having
-users convert their hex files to a format we already handle
-(ie why there is a significant body of users with hex format
-images they want to load).
+On 05/24/2018 04:16 PM, Peter Maydell wrote:
+> On 24 May 2018 at 14:59, Auger Eric <eric.auger@redhat.com> wrote:
+>> Hi,
+>>
+>> On 05/24/2018 03:14 PM, Peter Maydell wrote:
+>>> On 24 May 2018 at 10:04, Auger Eric <eric.auger@redhat.com> wrote:
+>>>> Now I am unclear about the semantics of the s->gicd_ipriority & friends.
+>>>> With that change, is it supposed to contain only the states of SPIs or
+>>>> contain the RAZ states of PPI/SGIs + states of SPIs. The array is
+>>>> dimensionned to contain states for PPI/SGI+SPIs, right? In other words,
+>>>> shouldn't we also shift field?
+>>>
+>>> The semantics of the gicd_ipriority and other data structures are
+>>> set by the TCG GIC implementation, and include blank space at
+>>> the start where the PPI/SGI bits would live. See this comment
+>>> from arm_gicv3_common.h:
+>>>
+>>>  * Each bitmap contains a bit for each interrupt. Although there is
+>>>  * space for the PPIs and SGIs, those bits (the first 32) are never
+>>>  * used as that state lives in the redistributor. The unused bits are
+>>>  * provided purely so that interrupt X's state is always in bit X; this
+>>>  * avoids bugs where we forget to subtract GIC_INTERNAL from an
+>>>  * interrupt number.
+>>
+>> If I understand Shannon's code correctly, the space for PPIs/SGIs is
+>> currently overwritten by SPI state, hence my comment.
+> 
+> Only for KVM, not for TCG, and it's the other way round: we
+> end up with two lots of PPI/SGI space in the data structure
+> by mistake. Let me fish out the comment I made on the v2 of this
+> series:
+> 
+> In the code in master, we have QEMU data structures
+> (bitmaps, etc) which have one entry for each of GICV3_MAXIRQ
+> irqs. That includes the RAZ/WI unused space for the SPIs/PPIs, so
+> for a 1-bit-per-irq bitmap:
+>  [0x00000000, irq 32, irq 33, .... ]
+> 
+> When we fill in the values from KVM into these data structures,
+> we start after the unused space, because the for_each_dist_irq_reg()
+> macro starts with _irq = GIC_INTERNAL. But we forgot to adjust
+> the offset value we use for the KVM access, so we start by
+> reading the RAZ/WI values from KVM, and the data structure
+> contents end up with:
+>  [0x00000000, 0x00000000, irq 32, irq 33, ... ]
+> (and the last irqs wouldn't get transferred).
+In kvm_dist_get_priority (new code), the offset is where we read and
+field is where we write, correct? Offset was shifted so we effectively
+read in KVM regs the num_irq-32 SPI states now but don't we start
+writing at the beginning of bmp, (ie s->gicd_ipriority), at PPI/SGI
+offset? What am I missing?
 
-> diff --git a/hw/arm/boot.c b/hw/arm/boot.c
-> index 9496f331a8fa..17fe1a8c287b 100644
-> --- a/hw/arm/boot.c
-> +++ b/hw/arm/boot.c
-> @@ -1038,12 +1038,17 @@ void arm_load_kernel(ARMCPU *cpu, struct arm_boot_info *info)
->          kernel_size = load_uimage_as(info->kernel_filename, &entry, NULL,
->                                       &is_linux, NULL, NULL, as);
->      }
-> +    if (kernel_size < 0) {
-> +        /* 32-bit ARM Intel HEX file */
-> +        entry = 0;
-> +        kernel_size = load_targphys_hex_as(info->kernel_filename, &entry, as);
-> +    }
->      if (arm_feature(&cpu->env, ARM_FEATURE_AARCH64) && kernel_size < 0) {
->          kernel_size = load_aarch64_image(info->kernel_filename,
->                                           info->loader_start, &entry, as);
->          is_linux = 1;
->      } else if (kernel_size < 0) {
-> -        /* 32-bit ARM */
-> +        /* 32-bit ARM binary file */
->          entry = info->loader_start + KERNEL_LOAD_ADDR;
->          kernel_size = load_image_targphys_as(info->kernel_filename, entry,
->                                               info->ram_size - KERNEL_LOAD_ADDR,
+I don't understand you TCG remark above, sorry.
 
-I don't think it makes sense to add support for this format here.
-Who is using hex files to provide A-class Linux kernels?
+Thanks
 
-(Note that hw/arm/boot.c does *not* handle -kernel for M-class cores.)
-
-There might be an argument for wiring up hex file support
-in the "generic loader" hw/misc/generic-loader.c
-(documentation in docs/generic-loader.txt).
-
-It looks like your implementation calls rom_add_blob_fixed_as()
-as it goes along to add chunks of data to guest memory, but
-it doesn't do anything to undo that if it detects an error
-in the input halfway through and returns a failure code.
-That matters if you want to put it in a chain of "try this
-format? if that didn't work, try this other format; last
-resort, load as binary" calls like you have here.
-
-It's probably worth splitting the "add load_targphys_hex_as()"
-patch from the one that wires it up for a specific loader.
-
-thanks
--- PMM
+Eric
+> 
+> With this change to the code we will get the offset right and
+> the data structure will be filled as
+>  [0x00000000, irq 32, irq 33, .... ]
+> For TCG, where we never had this bug, this is how the data
+> structure has always looked.
+> 
+> But for migration from the old version, the data structure
+> we receive from the migration source will contain the old
+> broken layout of
+>  [0x00000000, 0x00000000, irq 32, irq 33, ... ]
+> 
+> So we need in inbound migration to identify when we need
+> to fix this up (by copying the data down to get rid of that
+> extra 0x00000000), which is "when KVM is enabled and the source
+> is not a version new enough to have fixed this bug".
+> 
+>> If we stick to the
+>> current semantics, can't we just add the last missing 32 SPI states and
+>> we don't need the subsection?
+> 
+> You need a subsection, because that's how you get migration
+> compatibility.
+> 
+> thanks
+> -- PMM
+> 
