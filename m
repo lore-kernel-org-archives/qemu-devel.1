@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52383)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52403)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Babu.Moger@amd.com>) id 1fLsPD-00071Q-UO
+	(envelope-from <Babu.Moger@amd.com>) id 1fLsPE-000726-RU
 	for qemu-devel@nongnu.org; Thu, 24 May 2018 11:43:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <Babu.Moger@amd.com>) id 1fLsP9-00025h-Vy
+	(envelope-from <Babu.Moger@amd.com>) id 1fLsPA-00026E-VQ
 	for qemu-devel@nongnu.org; Thu, 24 May 2018 11:43:56 -0400
-Received: from mail-bl2nam02on0040.outbound.protection.outlook.com
-	([104.47.38.40]:18592
+Received: from mail-bl2nam02on0052.outbound.protection.outlook.com
+	([104.47.38.52]:37315
 	helo=NAM02-BL2-obe.outbound.protection.outlook.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <Babu.Moger@amd.com>) id 1fLsP9-00025U-Pv
-	for qemu-devel@nongnu.org; Thu, 24 May 2018 11:43:51 -0400
+	(Exim 4.71) (envelope-from <Babu.Moger@amd.com>) id 1fLsPA-00025z-PQ
+	for qemu-devel@nongnu.org; Thu, 24 May 2018 11:43:52 -0400
 From: Babu Moger <babu.moger@amd.com>
-Date: Thu, 24 May 2018 11:43:31 -0400
-Message-ID: <1527176614-26271-3-git-send-email-babu.moger@amd.com>
+Date: Thu, 24 May 2018 11:43:32 -0400
+Message-Id: <1527176614-26271-4-git-send-email-babu.moger@amd.com>
 In-Reply-To: <1527176614-26271-1-git-send-email-babu.moger@amd.com>
 References: <1527176614-26271-1-git-send-email-babu.moger@amd.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v11 2/5] i386: Populate AMD Processor Cache
- Information for cpuid 0x8000001D
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH v11 3/5] i386: Add support for CPUID_8000_001E
+ for AMD
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,203 +31,93 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: mst@redhat.com, marcel.apfelbaum@gmail.com, pbonzini@redhat.com, rth@twiddle.net, ehabkost@redhat.com, mtosatti@redhat.com
 Cc: qemu-devel@nongnu.org, kvm@vger.kernel.org, babu.moger@amd.com, kash@tripleback.net, geoff@hostfission.com
 
-Add information for cpuid 0x8000001D leaf. Populate cache topology informat=
-ion
-for different cache types (Data Cache, Instruction Cache, L2 and L3) suppor=
-ted
-by 0x8000001D leaf. Please refer to the Processor Programming Reference (PP=
-R)
-for AMD Family 17h Model for more details.
+Add support for cpuid leaf CPUID_8000_001E. Build the config that closely
+match the underlying hardware. Please refer to the Processor Programming
+Reference (PPR) for AMD Family 17h Model for more details.
 
 Signed-off-by: Babu Moger <babu.moger@amd.com>
 ---
- target/i386/cpu.c | 117 ++++++++++++++++++++++++++++++++++++++++++++++++++=
-++++
- target/i386/kvm.c |  29 ++++++++++++--
- 2 files changed, 143 insertions(+), 3 deletions(-)
+ target/i386/cpu.c | 61 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 61 insertions(+)
 
 diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-index 5c9bdc9..0d423e5 100644
+index 0d423e5..9f8bad9 100644
 --- a/target/i386/cpu.c
 +++ b/target/i386/cpu.c
-@@ -337,6 +337,99 @@ static void encode_cache_cpuid80000006(CPUCacheInfo *l=
-2,
+@@ -429,6 +429,62 @@ static void encode_cache_cpuid8000001d(CPUCacheInfo *cache, CPUState *cs,
+            (cache->complex_indexing ? CACHE_COMPLEX_IDX : 0);
  }
-=20
- /*
-+ * Definitions used for building CPUID Leaf 0x8000001D and 0x8000001E
-+ * Please refer to the AMD64 Architecture Programmer=E2=80=99s Manual Volu=
-me 3.
-+ * Define the constants to build the cpu topology. Right now, TOPOEXT
-+ * feature is enabled only on EPYC. So, these constants are based on
-+ * EPYC supported configurations. We may need to handle the cases if
-+ * these values change in future.
-+ */
-+/* Maximum core complexes in a node */
-+#define MAX_CCX 2
-+/* Maximum cores in a core complex */
-+#define MAX_CORES_IN_CCX 4
-+/* Maximum cores in a node */
-+#define MAX_CORES_IN_NODE 8
-+/* Maximum nodes in a socket */
-+#define MAX_NODES_PER_SOCKET 4
+ 
++/* Data structure to hold the configuration info for a given core index */
++struct core_topology {
++    /* core complex id of the current core index */
++    int ccx_id;
++    /* Adjusted core id for this core index in the topology */
++    int core_id;
++    /* Node id for this core index */
++    int node_id;
++    /* Number of nodes in this config, 0 based */
++    int num_nodes;
++};
 +
 +/*
-+ * Figure out the number of nodes required to build this config.
-+ * Max cores in a node is 8
++ * Build the configuration closely match the EPYC hardware. Using the EPYC
++ * hardware configuration values (MAX_CCX, MAX_CORES_IN_CCX, MAX_CORES_IN_NODE)
++ * right now. This could change in future.
++ * nr_cores : Total number of cores in the config
++ * core_id  : Core index of the current CPU
++ * topo     : Data structure to hold all the config info for this core index
 + */
-+static int nodes_in_socket(int nr_cores)
++static void build_core_topology(int nr_cores, int core_id,
++                                struct core_topology *topo)
 +{
-+    int nodes;
++    int nodes, cores_in_ccx;
 +
-+    nodes =3D DIV_ROUND_UP(nr_cores, MAX_CORES_IN_NODE);
++    /* First get the number of nodes required */
++    nodes = nodes_in_socket(nr_cores);
 +
-+   /* Hardware does not support config with 3 nodes, return 4 in that case=
- */
-+    return (nodes =3D=3D 3) ? 4 : nodes;
++    cores_in_ccx = cores_in_core_complex(nr_cores);
++
++    topo->node_id = core_id / (cores_in_ccx * MAX_CCX);
++    topo->ccx_id = (core_id % (cores_in_ccx * MAX_CCX)) / cores_in_ccx;
++    topo->core_id = core_id % cores_in_ccx;
++    /* num_nodes is 0 based, return n - 1 */
++    topo->num_nodes = nodes - 1;
 +}
 +
-+/*
-+ * Decide the number of cores in a core complex with the given nr_cores us=
-ing
-+ * following set constants MAX_CCX, MAX_CORES_IN_CCX, MAX_CORES_IN_NODE an=
-d
-+ * MAX_NODES_PER_SOCKET. Maintain symmetry as much as possible
-+ * L3 cache is shared across all cores in a core complex. So, this will al=
-so
-+ * tell us how many cores are sharing the L3 cache.
-+ */
-+static int cores_in_core_complex(int nr_cores)
++/* Encode cache info for CPUID[8000001E] */
++static void encode_topo_cpuid8000001e(CPUState *cs, X86CPU *cpu,
++                                       uint32_t *eax, uint32_t *ebx,
++                                       uint32_t *ecx, uint32_t *edx)
 +{
-+    int nodes;
++    struct core_topology topo = {0};
 +
-+    /* Check if we can fit all the cores in one core complex */
-+    if (nr_cores <=3D MAX_CORES_IN_CCX) {
-+        return nr_cores;
-+    }
-+    /* Get the number of nodes required to build this config */
-+    nodes =3D nodes_in_socket(nr_cores);
-+
-+    /*
-+     * Divide the cores accros all the core complexes
-+     * Return rounded up value
-+     */
-+    return DIV_ROUND_UP(nr_cores, nodes * MAX_CCX);
-+}
-+
-+/* Encode cache info for CPUID[8000001D] */
-+static void encode_cache_cpuid8000001d(CPUCacheInfo *cache, CPUState *cs,
-+                                uint32_t *eax, uint32_t *ebx,
-+                                uint32_t *ecx, uint32_t *edx)
-+{
-+    uint32_t l3_cores;
-+    assert(cache->size =3D=3D cache->line_size * cache->associativity *
-+                          cache->partitions * cache->sets);
-+
-+    *eax =3D CACHE_TYPE(cache->type) | CACHE_LEVEL(cache->level) |
-+               (cache->self_init ? CACHE_SELF_INIT_LEVEL : 0);
-+
-+    /* L3 is shared among multiple cores */
-+    if (cache->level =3D=3D 3) {
-+        l3_cores =3D cores_in_core_complex(cs->nr_cores);
-+        *eax |=3D ((l3_cores * cs->nr_threads) - 1) << 14;
++    build_core_topology(cs->nr_cores, cpu->core_id, &topo);
++    *eax = cpu->apic_id;
++    if (cs->nr_threads - 1) {
++        *ebx = ((cs->nr_threads - 1) << 8) | (topo.node_id << 3) |
++                (topo.ccx_id << 2) | topo.core_id;
 +    } else {
-+        *eax |=3D ((cs->nr_threads - 1) << 14);
++        *ebx = (topo.node_id << 4) | (topo.ccx_id << 3) | topo.core_id;
 +    }
-+
-+    assert(cache->line_size > 0);
-+    assert(cache->partitions > 0);
-+    assert(cache->associativity > 0);
-+    /* We don't implement fully-associative caches */
-+    assert(cache->associativity < cache->sets);
-+    *ebx =3D (cache->line_size - 1) |
-+           ((cache->partitions - 1) << 12) |
-+           ((cache->associativity - 1) << 22);
-+
-+    assert(cache->sets > 0);
-+    *ecx =3D cache->sets - 1;
-+
-+    *edx =3D (cache->no_invd_sharing ? CACHE_NO_INVD_SHARING : 0) |
-+           (cache->inclusive ? CACHE_INCLUSIVE : 0) |
-+           (cache->complex_indexing ? CACHE_COMPLEX_IDX : 0);
++    *ecx = (topo.num_nodes << 8) | (cpu->socket_id << 2) | topo.node_id;
++    *edx = 0;
 +}
 +
-+/*
+ /*
   * Definitions of the hardcoded cache entries we expose:
   * These are legacy cache values. If there is a need to change any
-  * of these values please use builtin_x86_defs
-@@ -4005,6 +4098,30 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t index,=
- uint32_t count,
-             *edx =3D 0;
+@@ -4122,6 +4178,11 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t index, uint32_t count,
+             break;
          }
          break;
-+    case 0x8000001D:
-+        *eax =3D 0;
-+        switch (count) {
-+        case 0: /* L1 dcache info */
-+            encode_cache_cpuid8000001d(env->cache_info_amd.l1d_cache, cs,
-+                                       eax, ebx, ecx, edx);
-+            break;
-+        case 1: /* L1 icache info */
-+            encode_cache_cpuid8000001d(env->cache_info_amd.l1i_cache, cs,
-+                                       eax, ebx, ecx, edx);
-+            break;
-+        case 2: /* L2 cache info */
-+            encode_cache_cpuid8000001d(env->cache_info_amd.l2_cache, cs,
-+                                       eax, ebx, ecx, edx);
-+            break;
-+        case 3: /* L3 cache info */
-+            encode_cache_cpuid8000001d(env->cache_info_amd.l3_cache, cs,
-+                                       eax, ebx, ecx, edx);
-+            break;
-+        default: /* end of info */
-+            *eax =3D *ebx =3D *ecx =3D *edx =3D 0;
-+            break;
-+        }
++    case 0x8000001E:
++        assert(cpu->core_id <= 255);
++        encode_topo_cpuid8000001e(cs, cpu,
++                                  eax, ebx, ecx, edx);
 +        break;
      case 0xC0000000:
-         *eax =3D env->cpuid_xlevel2;
-         *ebx =3D 0;
-diff --git a/target/i386/kvm.c b/target/i386/kvm.c
-index 0c656a9..871d1ef 100644
---- a/target/i386/kvm.c
-+++ b/target/i386/kvm.c
-@@ -980,9 +980,32 @@ int kvm_arch_init_vcpu(CPUState *cs)
-         }
-         c =3D &cpuid_data.entries[cpuid_i++];
-=20
--        c->function =3D i;
--        c->flags =3D 0;
--        cpu_x86_cpuid(env, i, 0, &c->eax, &c->ebx, &c->ecx, &c->edx);
-+        switch (i) {
-+        case 0x8000001d:
-+            /* Query for all AMD cache information leaves */
-+            for (j =3D 0; ; j++) {
-+                c->function =3D i;
-+                c->flags =3D KVM_CPUID_FLAG_SIGNIFCANT_INDEX;
-+                c->index =3D j;
-+                cpu_x86_cpuid(env, i, j, &c->eax, &c->ebx, &c->ecx, &c->ed=
-x);
-+
-+                if (c->eax =3D=3D 0) {
-+                    break;
-+                }
-+                if (cpuid_i =3D=3D KVM_MAX_CPUID_ENTRIES) {
-+                    fprintf(stderr, "cpuid_data is full, no space for "
-+                            "cpuid(eax:0x%x,ecx:0x%x)\n", i, j);
-+                    abort();
-+                }
-+                c =3D &cpuid_data.entries[cpuid_i++];
-+            }
-+            break;
-+        default:
-+            c->function =3D i;
-+            c->flags =3D 0;
-+            cpu_x86_cpuid(env, i, 0, &c->eax, &c->ebx, &c->ecx, &c->edx);
-+            break;
-+        }
-     }
-=20
-     /* Call Centaur's CPUID instructions they are supported. */
---=20
+         *eax = env->cpuid_xlevel2;
+         *ebx = 0;
+-- 
 1.8.3.1
