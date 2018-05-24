@@ -1,23 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56556)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57710)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1fLqmK-0005Mt-Jk
-	for qemu-devel@nongnu.org; Thu, 24 May 2018 09:59:46 -0400
+	(envelope-from <stefanha@gmail.com>) id 1fLqrW-0007SH-5T
+	for qemu-devel@nongnu.org; Thu, 24 May 2018 10:05:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1fLqmG-00062o-T5
-	for qemu-devel@nongnu.org; Thu, 24 May 2018 09:59:40 -0400
-References: <1527047633-12368-1-git-send-email-zhaoshenglong@huawei.com>
-	<1527047633-12368-2-git-send-email-zhaoshenglong@huawei.com>
-	<acca5b80-f527-bc39-0b63-147e53affb4b@redhat.com>
-	<CAFEAcA-xbHtxora5TU9psYnBgP0+N8_nznhVppEkg7fmmwip3w@mail.gmail.com>
-From: Auger Eric <eric.auger@redhat.com>
-Message-ID: <10801e6c-5028-add6-b082-22c5dc9758ca@redhat.com>
-Date: Thu, 24 May 2018 15:59:25 +0200
+	(envelope-from <stefanha@gmail.com>) id 1fLqrQ-0000fr-FV
+	for qemu-devel@nongnu.org; Thu, 24 May 2018 10:05:02 -0400
+Date: Thu, 24 May 2018 15:04:53 +0100
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20180524140453.GB28984@stefanha-x1.localdomain>
+References: <42ec7519-653d-09e2-abc6-78f04733ca47@linux.ibm.com>
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA-xbHtxora5TU9psYnBgP0+N8_nznhVppEkg7fmmwip3w@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH V3 2/2] arm_gicv3_kvm: kvm_dist_get/put:
- skip the registers banked by GICR
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="mojUlQ0s9EVzWg2t"
+Content-Disposition: inline
+In-Reply-To: <42ec7519-653d-09e2-abc6-78f04733ca47@linux.ibm.com>
+Subject: Re: [Qemu-devel] [Qemu-block] Problem with data miscompare using
+ scsi-hd, cache=none and io=threads
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,40 +24,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Shannon Zhao <shannon.zhaosl@gmail.com>, qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, Shannon Zhao <zhaoshenglong@huawei.com>
+To: Daniel Henrique Barboza <danielhb@linux.ibm.com>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Fam Zheng <famz@redhat.com>
 
-Hi,
 
-On 05/24/2018 03:14 PM, Peter Maydell wrote:
-> On 24 May 2018 at 10:04, Auger Eric <eric.auger@redhat.com> wrote:
->> Now I am unclear about the semantics of the s->gicd_ipriority & friends.
->> With that change, is it supposed to contain only the states of SPIs or
->> contain the RAZ states of PPI/SGIs + states of SPIs. The array is
->> dimensionned to contain states for PPI/SGI+SPIs, right? In other words,
->> shouldn't we also shift field?
-> 
-> The semantics of the gicd_ipriority and other data structures are
-> set by the TCG GIC implementation, and include blank space at
-> the start where the PPI/SGI bits would live. See this comment
-> from arm_gicv3_common.h:
-> 
->  * Each bitmap contains a bit for each interrupt. Although there is
->  * space for the PPIs and SGIs, those bits (the first 32) are never
->  * used as that state lives in the redistributor. The unused bits are
->  * provided purely so that interrupt X's state is always in bit X; this
->  * avoids bugs where we forget to subtract GIC_INTERNAL from an
->  * interrupt number.
+--mojUlQ0s9EVzWg2t
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-If I understand Shannon's code correctly, the space for PPIs/SGIs is
-currently overwritten by SPI state, hence my comment. If we stick to the
-current semantics, can't we just add the last missing 32 SPI states and
-we don't need the subsection?
+On Tue, May 15, 2018 at 06:25:46PM -0300, Daniel Henrique Barboza wrote:
+> This means that the test executed a write at=A0 LBA 0x94fa and, after
+> confirming that the write was completed, issue 2 reads in the same LBA to
+> assert the written contents and found out a mismatch.
 
-Thanks
+Have you confirmed this pattern at various levels in the stack:
+1. Application inside the guest (strace)
+2. Guest kernel block layer (blktrace)
+3. QEMU (strace)
+4. Host kernel block layer (blktrace)
 
-Eric
-> 
-> thanks
-> -- PMM
-> 
+The key thing is that the write completes before the 2 reads are
+submitted.
+
+Have you tried running the test on bare metal?
+
+Stefan
+
+--mojUlQ0s9EVzWg2t
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJbBsaFAAoJEJykq7OBq3PI3OkIAMIVtABzSHMf2gJ8abYDStIk
+NCmbjfN5cV++Xptc94inBD8l/4rvEsIytvDY17WCTvOp8kqvPKBBm3QbSnAX3GmG
+CiSGG5VGbAPO+OkmqHZwrzEdfPjfl1nd/4SGv5To8xo5uxRLAXWIFynw/jxhoR8X
+GIZn7VsI3+V1lc2fLPJOxj16Q5RQkBpAcdAOGfFmE2FyqICjASIarBifP8qHWdcr
+txdtKmWO70dhbkBc6qHcEX8PR2AHBnwrqijcK9N24BpNrZNKkTkvJ+yWOIYR4Wyq
+OBPYMtM14cWIQVmu6fuIM2jc0v0aUiANsSqMfDhQuKb3xwv4VD3XMXVFJtFLdpE=
+=Huvb
+-----END PGP SIGNATURE-----
+
+--mojUlQ0s9EVzWg2t--
