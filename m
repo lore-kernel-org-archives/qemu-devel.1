@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54132)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54176)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kash@tripleback.net>) id 1fLsWj-0005qp-F9
-	for qemu-devel@nongnu.org; Thu, 24 May 2018 11:51:44 -0400
+	(envelope-from <mst@redhat.com>) id 1fLsWr-0005vs-9c
+	for qemu-devel@nongnu.org; Thu, 24 May 2018 11:51:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kash@tripleback.net>) id 1fLsWd-0006HL-Rj
-	for qemu-devel@nongnu.org; Thu, 24 May 2018 11:51:41 -0400
-Received: from mail.tripleback.net ([198.50.226.104]:37726)
+	(envelope-from <mst@redhat.com>) id 1fLsWq-0006ZO-7r
+	for qemu-devel@nongnu.org; Thu, 24 May 2018 11:51:49 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:55206 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kash@tripleback.net>) id 1fLsWd-0006Ev-L1
-	for qemu-devel@nongnu.org; Thu, 24 May 2018 11:51:35 -0400
-References: <1527176614-26271-1-git-send-email-babu.moger@amd.com>
-From: Kash Pande <kash@tripleback.net>
-Message-ID: <4e7811da-f900-bbf4-ea88-cf8983a6675f@tripleback.net>
-Date: Thu, 24 May 2018 11:51:29 -0400
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1fLsWq-0006Yn-2Q
+	for qemu-devel@nongnu.org; Thu, 24 May 2018 11:51:48 -0400
+Date: Thu, 24 May 2018 18:51:45 +0300
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20180524185033-mutt-send-email-mst@kernel.org>
+References: <1527172175-129517-1-git-send-email-mst@redhat.com>
+	<6b3cad0d-b849-6ba9-64cb-6a36a37cd19d@redhat.com>
+	<20180524175709-mutt-send-email-mst@kernel.org>
+	<681ace2f-f827-0e00-af77-f39dc2f7ccc1@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <1527176614-26271-1-git-send-email-babu.moger@amd.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="qWUBCsyHYs17HFs51jn2CvcfayoWLwiWp"
-Subject: Re: [Qemu-devel] [PATCH v11 0/5] i386: Enable TOPOEXT to support
- hyperthreading on AMD CPU
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <681ace2f-f827-0e00-af77-f39dc2f7ccc1@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] libqtest: fail if child coredumps
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,78 +29,93 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Babu Moger <babu.moger@amd.com>, mst@redhat.com, marcel.apfelbaum@gmail.com, pbonzini@redhat.com, rth@twiddle.net, ehabkost@redhat.com, mtosatti@redhat.com
-Cc: qemu-devel@nongnu.org, kvm@vger.kernel.org, geoff@hostfission.com
+To: Thomas Huth <thuth@redhat.com>
+Cc: qemu-devel@nongnu.org, Eric Blake <eblake@redhat.com>, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>, Markus Armbruster <armbru@redhat.com>, Tiwei Bie <tiwei.bie@intel.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---qWUBCsyHYs17HFs51jn2CvcfayoWLwiWp
-From: Kash Pande <kash@tripleback.net>
-To: Babu Moger <babu.moger@amd.com>, mst@redhat.com,
- marcel.apfelbaum@gmail.com, pbonzini@redhat.com, rth@twiddle.net,
- ehabkost@redhat.com, mtosatti@redhat.com
-Cc: qemu-devel@nongnu.org, kvm@vger.kernel.org, geoff@hostfission.com
-Message-ID: <4e7811da-f900-bbf4-ea88-cf8983a6675f@tripleback.net>
-Subject: Re: [PATCH v11 0/5] i386: Enable TOPOEXT to support hyperthreading on
- AMD CPU
-References: <1527176614-26271-1-git-send-email-babu.moger@amd.com>
-In-Reply-To: <1527176614-26271-1-git-send-email-babu.moger@amd.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On Thu, May 24, 2018 at 05:46:05PM +0200, Thomas Huth wrote:
+> On 24.05.2018 17:00, Michael S. Tsirkin wrote:
+> > On Thu, May 24, 2018 at 04:45:31PM +0200, Thomas Huth wrote:
+> >> On 24.05.2018 16:30, Michael S. Tsirkin wrote:
+> >>> Right now tests report OK status if QEMU crashes during cleanup.
+> >>> Let's catch that case and fail the test.
+> >>>
+> >>> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+> >>> ---
+> >>>  tests/libqtest.c | 9 ++++++++-
+> >>>  1 file changed, 8 insertions(+), 1 deletion(-)
+> >>>
+> >>> diff --git a/tests/libqtest.c b/tests/libqtest.c
+> >>> index 43fb97e..f869854 100644
+> >>> --- a/tests/libqtest.c
+> >>> +++ b/tests/libqtest.c
+> >>> @@ -103,8 +103,15 @@ static int socket_accept(int sock)
+> >>>  static void kill_qemu(QTestState *s)
+> >>>  {
+> >>>      if (s->qemu_pid != -1) {
+> >>> +        int wstatus = 0;
+> >>> +        pid_t pid;
+> >>> +
+> >>>          kill(s->qemu_pid, SIGTERM);
+> >>> -        waitpid(s->qemu_pid, NULL, 0);
+> >>> +        pid = waitpid(s->qemu_pid, &wstatus, 0);
+> >>> +
+> >>> +        if (pid == s->qemu_pid && WIFSIGNALED(wstatus)) {
+> >>> +            assert(!WCOREDUMP(wstatus));
+> >>> +        }
+> >>>      }
+> >>>  }
+> >>
+> >> That's basically a good idea ... but I've already seen yet another issue
+> >> in the past already: QEMU sometimes simply hangs in an endless loop
+> >> during clean up and never terminates. I think we should detect that
+> >> situation, too. So instead of killing QEMU at the end of the testing, I think we should
+> >> rather try to terminate it with the QMP "quit" command. If QEMU does not
+> >> terminate with an exit code of 0, then the test should be flagged a
+> >> failed (and only if QEMU did not terminate at all, it should be killed
+> >> with SIGKILL).
+> >>
+> >>  Thomas
+> > 
+> > Fine but can we agree to do this as a patch on top? And do you have
+> > the time to implement this?
+> 
+> Fine for me if we do that later. And no, I currently don't have time to
+> work on this (but I've got it on my TODO list somewhere, so I hope I
+> won't forget about it later...).
+> 
+> > I'm seeing patches that cause crash on cleanup, it's not a theoretical
+> > problem for me, so I'd like this one to go in first.
+> 
+> Ok, so here are the two problems that I remember:
+> 
+> 1)
+> 
+> git checkout 17bd9597be45b96ae00716b0ae01a4d11bbee1ab~1
+> make -j4 subdir-nios2-softmmu
+> nios2-softmmu/qemu-system-nios2 -monitor stdio
+> 
+> ==> You can neither "quit" from the HMP prompt, nor kill QEMU with
+> SIGTERM, you've got to use SIGKILL instead.
+> 
+> Ok, libqtest likely would not have reported success in this case, too,
+> we just did not notice since there is no libqtest in place that tests
+> the nios2 machine in TCG mode. Anyway, it would be nice if qtest would
+> properly detect the situation and report an error instead of just
+> hanging in waitpid().
 
-Tested-by: Kash Pande <kash@tripleback.net>
+That's a tall order, it assumes we can define a reasonable
+time during which QEMU should exit.
 
-
-Hopefully we can get this merged because it's taken a ridiculously long
-time with many back-and-forths for small issues that could have been put
-off til later.
-
-Kash
-
-On 2018-05-24 11:43 AM, Babu Moger wrote:
-> This series enables the TOPOEXT feature for AMD CPUs. This is required =
-to
-> support hyperthreading on kvm guests.
->
-> This addresses the issues reported in these bugs:
-> https://bugzilla.redhat.com/show_bug.cgi?id=3D1481253
-> https://bugs.launchpad.net/qemu/+bug/1703506=20
->
-> v11:
->  Patches are based off of Eduardo's git://github.com/ehabkost/qemu.git =
-x86-next.
->  Summary of changes.
->  1.Added more comments explaining different constants and variables.
->  2.Removed NUM_SHARING_CACHE macro and made the code simpler.
->  3.Changed the function name num_sharing_l3_cache to cores_in_core_comp=
-lex.
->    This function is actually finding the number of cores in a core comp=
-lex.
->    Purpose here is to re-use the code in couple more places.
->  4.Added new function nodes_in_socket to find number of nodes in the co=
-nfig.
->    Purpose here is to re-use the code.
->  5.Used DIV_ROUND_UP wherever applicable.
->  6.Renamed few constants and functions to generic names.
->  7.Few more text corrections.
-> =20
-
-
-
---qWUBCsyHYs17HFs51jn2CvcfayoWLwiWp
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEE5MQWwRLWQeWW1A0MLHWyk7icJXgFAlsG34QACgkQLHWyk7ic
-JXg0Ogf/Uz/WKkeSCalDDFLb2apOnotGUJF2YBOTkz+wtARojTLebmIPB2YLGtnC
-7rthYEYuNdI1PykHvEluZetWf3exW1VnyG9iceXN/BjjitJkSCvgNirjW1l2HgQB
-fHx08sdX7wf0fxV4o6l0I7vJsiUf6/T8dSLBpuWce/knZQ9B4efH8ltakI3eu6xv
-H0oqW0GpFfAbNbg9957dx8/gS7qQAGBKVAMi3qMXGdpzIv8xPPkQHNAmtUND810z
-L914g9/uQIZ6rN9JUZGzBtyy+wCNHs+Tf4jFCsX3WG8Ho5rpmgvbPJuAMlQ0tmYI
-sAjTVOT4VEtlCPyc/r79K6Vsqwdzvw==
-=8tal
------END PGP SIGNATURE-----
-
---qWUBCsyHYs17HFs51jn2CvcfayoWLwiWp--
+> 2)
+> 
+> git checkout b39b61e410022f96ceb53d4381d25cba5126ac44~1
+> make -j4 subdir-ppc-softmmu
+> ppc-softmmu/qemu-system-ppc -M 40p -monitor stdio
+> 
+> ===> QEMU asserts here with both, HMP "quit" and SIGTERM. This was the
+> problem where libqtest did not report an error though it should have
+> reported one. So QEMU was not hanging in an endless loop here, but core
+> dumped ... Sorry, I apparently mixed this up in my mind with the first
+> case. That means we should be fine here with your patch.
+> 
+>  Thomas
