@@ -1,31 +1,38 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41337)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41656)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fLtOF-0001as-1w
-	for qemu-devel@nongnu.org; Thu, 24 May 2018 12:47:00 -0400
+	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1fLtQL-0002oD-4J
+	for qemu-devel@nongnu.org; Thu, 24 May 2018 12:49:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fLtOD-0005j5-VV
-	for qemu-devel@nongnu.org; Thu, 24 May 2018 12:46:59 -0400
-Received: from mail-ot0-x242.google.com ([2607:f8b0:4003:c0f::242]:32882)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fLtOD-0005ij-Fq
-	for qemu-devel@nongnu.org; Thu, 24 May 2018 12:46:57 -0400
-Received: by mail-ot0-x242.google.com with SMTP id l22-v6so2739206otj.0
-	for <qemu-devel@nongnu.org>; Thu, 24 May 2018 09:46:57 -0700 (PDT)
+	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1fLtQJ-0006QC-CF
+	for qemu-devel@nongnu.org; Thu, 24 May 2018 12:49:09 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:52684)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <stefanb@linux.vnet.ibm.com>)
+	id 1fLtQJ-0006Pl-49
+	for qemu-devel@nongnu.org; Thu, 24 May 2018 12:49:07 -0400
+Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w4OGdiql039542
+	for <qemu-devel@nongnu.org>; Thu, 24 May 2018 12:49:05 -0400
+Received: from e18.ny.us.ibm.com (e18.ny.us.ibm.com [129.33.205.208])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2j5yq5d0m8-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Thu, 24 May 2018 12:49:05 -0400
+Received: from localhost
+	by e18.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <stefanb@linux.vnet.ibm.com>;
+	Thu, 24 May 2018 12:49:04 -0400
+From: Stefan Berger <stefanb@linux.vnet.ibm.com>
+Date: Thu, 24 May 2018 12:48:55 -0400
+In-Reply-To: <20180524164857.3014670-1-stefanb@linux.vnet.ibm.com>
+References: <20180524164857.3014670-1-stefanb@linux.vnet.ibm.com>
 MIME-Version: 1.0
-In-Reply-To: <0d3fb5f8-a8b1-57b8-2f16-294e1f824aab@vivier.eu>
-References: <20180519092956.15134-1-laurent@vivier.eu>
-	<20180519092956.15134-7-laurent@vivier.eu>
-	<CAFEAcA8Wc2boEtJQC2feZ_N07no-ErGGk-Hhwyyuo91kGaTc2w@mail.gmail.com>
-	<a423df2b-02a1-07f9-075f-55e68607f357@vivier.eu>
-	<0d3fb5f8-a8b1-57b8-2f16-294e1f824aab@vivier.eu>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 24 May 2018 17:46:36 +0100
-Message-ID: <CAFEAcA9sTRXt2EQvarSwUXwL_moPSYZ7vC_y-odRC4QoTZfSPw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=UTF-8
+Message-Id: <20180524164857.3014670-3-stefanb@linux.vnet.ibm.com>
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v3 6/8] linux-user: update
- ARCH_HAS_SOCKET_TYPES use
+Subject: [Qemu-devel] [PULL v3 2/4] tpm: extend TPM TIS with state migration
+ support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,24 +41,100 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laurent Vivier <laurent@vivier.eu>
-Cc: Riku Voipio <riku.voipio@iki.fi>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>, QEMU Developers <qemu-devel@nongnu.org>, Yongbok Kim <yongbok.kim@mips.com>, Richard Henderson <rth@twiddle.net>
+To: qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org, marcandre.lureau@redhat.com, Stefan Berger <stefanb@linux.vnet.ibm.com>
 
-On 24 May 2018 at 16:50, Laurent Vivier <laurent@vivier.eu> wrote:
-> Le 24/05/2018 =C3=A0 17:29, Laurent Vivier a =C3=A9crit :
->> Le 21/05/2018 =C3=A0 11:19, Peter Maydell a =C3=A9crit :
->>> On 19 May 2018 at 10:29, Laurent Vivier <laurent@vivier.eu> wrote:
->>>> to be like in the kernel and rename it TARGET_ARCH_HAS_SOCKET_TYPES
->>>
->>> You could note in the commit message that this fixes our
->>> incorrect definition of TARGET_SOCK_CLOEXEC for SPARC.
->>
->> I agree
->
-> In fact it doesn't change the value of TARGET_SOCK_CLOEXEC for SPARC,
-> because original value is 020000000 (0x400000) and the new value from
-> linux-user/socket.h is TARGET_O_CLOEXEC which is also 0x400000 for SPARC.
+Extend the TPM TIS interface with state migration support.
 
-Argh, octal vs hex. Thanks for checking that.
+We need to synchronize with the backend thread to make sure that a comman=
+d
+being processed by the external TPM emulator has completed and its
+response been received.
 
--- PMM
+Signed-off-by: Stefan Berger <stefanb@linux.vnet.ibm.com>
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+---
+ hw/tpm/tpm_tis.c    | 52 +++++++++++++++++++++++++++++++++++++++++++++++=
++++--
+ hw/tpm/trace-events |  1 +
+ 2 files changed, 51 insertions(+), 2 deletions(-)
+
+diff --git a/hw/tpm/tpm_tis.c b/hw/tpm/tpm_tis.c
+index 2ac7e74307..12f5c9a759 100644
+--- a/hw/tpm/tpm_tis.c
++++ b/hw/tpm/tpm_tis.c
+@@ -894,9 +894,57 @@ static void tpm_tis_reset(DeviceState *dev)
+     tpm_backend_startup_tpm(s->be_driver, s->be_buffer_size);
+ }
+=20
++/* persistent state handling */
++
++static int tpm_tis_pre_save(void *opaque)
++{
++    TPMState *s =3D opaque;
++    uint8_t locty =3D s->active_locty;
++
++    trace_tpm_tis_pre_save(locty, s->rw_offset);
++
++    if (DEBUG_TIS) {
++        tpm_tis_dump_state(opaque, 0);
++    }
++
++    /*
++     * Synchronize with backend completion.
++     */
++    tpm_backend_finish_sync(s->be_driver);
++
++    return 0;
++}
++
++static const VMStateDescription vmstate_locty =3D {
++    .name =3D "tpm-tis/locty",
++    .version_id =3D 0,
++    .fields      =3D (VMStateField[]) {
++        VMSTATE_UINT32(state, TPMLocality),
++        VMSTATE_UINT32(inte, TPMLocality),
++        VMSTATE_UINT32(ints, TPMLocality),
++        VMSTATE_UINT8(access, TPMLocality),
++        VMSTATE_UINT32(sts, TPMLocality),
++        VMSTATE_UINT32(iface_id, TPMLocality),
++        VMSTATE_END_OF_LIST(),
++    }
++};
++
+ static const VMStateDescription vmstate_tpm_tis =3D {
+-    .name =3D "tpm",
+-    .unmigratable =3D 1,
++    .name =3D "tpm-tis",
++    .version_id =3D 0,
++    .pre_save  =3D tpm_tis_pre_save,
++    .fields =3D (VMStateField[]) {
++        VMSTATE_BUFFER(buffer, TPMState),
++        VMSTATE_UINT16(rw_offset, TPMState),
++        VMSTATE_UINT8(active_locty, TPMState),
++        VMSTATE_UINT8(aborting_locty, TPMState),
++        VMSTATE_UINT8(next_locty, TPMState),
++
++        VMSTATE_STRUCT_ARRAY(loc, TPMState, TPM_TIS_NUM_LOCALITIES, 0,
++                             vmstate_locty, TPMLocality),
++
++        VMSTATE_END_OF_LIST()
++    }
+ };
+=20
+ static Property tpm_tis_properties[] =3D {
+diff --git a/hw/tpm/trace-events b/hw/tpm/trace-events
+index c5bfbf1d4b..25bee0cecf 100644
+--- a/hw/tpm/trace-events
++++ b/hw/tpm/trace-events
+@@ -50,3 +50,4 @@ tpm_tis_mmio_write_locty_seized(uint8_t locty, uint8_t =
+active) "Locality %d seiz
+ tpm_tis_mmio_write_init_abort(void) "Initiating abort"
+ tpm_tis_mmio_write_lowering_irq(void) "Lowering IRQ"
+ tpm_tis_mmio_write_data2send(uint32_t value, unsigned size) "Data to sen=
+d to TPM: 0x%08x (size=3D%d)"
++tpm_tis_pre_save(uint8_t locty, uint32_t rw_offset) "locty: %d, rw_offse=
+t =3D %u"
+--=20
+2.14.3
