@@ -1,27 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54079)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54307)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1fLqbK-0007iu-1W
-	for qemu-devel@nongnu.org; Thu, 24 May 2018 09:48:23 -0400
+	(envelope-from <berto@igalia.com>) id 1fLqc8-00087a-T7
+	for qemu-devel@nongnu.org; Thu, 24 May 2018 09:49:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1fLqbE-0006Qx-5p
-	for qemu-devel@nongnu.org; Thu, 24 May 2018 09:48:18 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:54344 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1fLqbE-0006QU-05
-	for qemu-devel@nongnu.org; Thu, 24 May 2018 09:48:12 -0400
-Date: Thu, 24 May 2018 16:48:09 +0300
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20180524164727-mutt-send-email-mst@kernel.org>
-References: <20180412151232.17506-1-tiwei.bie@intel.com>
-	<20180412151232.17506-4-tiwei.bie@intel.com>
-	<20180524002447-mutt-send-email-mst@kernel.org>
-	<20180523231215.GA15604@debian>
+	(envelope-from <berto@igalia.com>) id 1fLqc3-0006sh-3l
+	for qemu-devel@nongnu.org; Thu, 24 May 2018 09:49:09 -0400
+Received: from fanzine.igalia.com ([91.117.99.155]:53821)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <berto@igalia.com>) id 1fLqc2-0006rr-Nj
+	for qemu-devel@nongnu.org; Thu, 24 May 2018 09:49:03 -0400
+From: Alberto Garcia <berto@igalia.com>
+In-Reply-To: <w51in7dch1l.fsf@maestria.local.igalia.com>
+References: <20170605123908.18777-1-pbonzini@redhat.com>
+	<20170605123908.18777-20-pbonzini@redhat.com>
+	<w51in7dch1l.fsf@maestria.local.igalia.com>
+Date: Thu, 24 May 2018 15:49:00 +0200
+Message-ID: <w51fu2hcgfn.fsf@maestria.local.igalia.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180523231215.GA15604@debian>
-Subject: Re: [Qemu-devel] [virtio-dev] Re: [PATCH v3 3/6] vhost-user:
- support receiving file descriptors in slave_read
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH 19/19] block: make accounting thread-safe
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,117 +27,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Tiwei Bie <tiwei.bie@intel.com>
-Cc: jasowang@redhat.com, alex.williamson@redhat.com, pbonzini@redhat.com, stefanha@redhat.com, qemu-devel@nongnu.org, virtio-dev@lists.oasis-open.org, cunming.liang@intel.com, dan.daly@intel.com, jianfeng.tan@intel.com, zhihong.wang@intel.com, xiao.w.wang@intel.com
+To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
+Cc: famz@redhat.com
 
-On Thu, May 24, 2018 at 07:12:15AM +0800, Tiwei Bie wrote:
-> On Thu, May 24, 2018 at 12:25:23AM +0300, Michael S. Tsirkin wrote:
-> > On Thu, Apr 12, 2018 at 11:12:29PM +0800, Tiwei Bie wrote:
-> > > Signed-off-by: Tiwei Bie <tiwei.bie@intel.com>
-> > 
-> > 
-> > Thinking about it, I think we should add a protocol
-> > feature for this. This way remote can find out whether
-> > it's safe to send this data to us.
-> 
-> Okay, I can add a protocol feature for this.
-> Do you think it's OK to keep this patch as is
-> (this patch just extends slave_read() to support
-> receiving file descriptors) and introduce the
-> new protocol feature in a new patch to allow
-> backends to send file descriptors?
-> 
-> Best regards,
-> Tiwei Bie
+On Thu 24 May 2018 03:35:50 PM CEST, Alberto Garcia wrote:
+> On Mon 05 Jun 2017 02:39:08 PM CEST, Paolo Bonzini wrote:
+>> @@ -102,6 +107,8 @@ static void block_account_one_io(BlockAcctStats *stats, BlockAcctCookie *cookie,
+>>  
+>>      assert(cookie->type < BLOCK_MAX_IOTYPE);
+>>  
+>> +    qemu_mutex_lock(&stats->lock);
+>
+> QEMU crashes because this lock is not initialized if you do aio_read
+> directly from a BDS not attached to a BlockBackend (should that
+> operation be legal at all?)
 
-I already merged patch as is, we can add a patch on top that limits this
-to a protocol feature.
+I see, hmp_qemu_io() creates a temporary BlockBackend in these
+situations, so I guess what we need is something like this:
 
-> > 
-> > > ---
-> > >  hw/virtio/vhost-user.c | 41 ++++++++++++++++++++++++++++++++++++++++-
-> > >  1 file changed, 40 insertions(+), 1 deletion(-)
-> > > 
-> > > diff --git a/hw/virtio/vhost-user.c b/hw/virtio/vhost-user.c
-> > > index 91edd95453..9cea2c8c51 100644
-> > > --- a/hw/virtio/vhost-user.c
-> > > +++ b/hw/virtio/vhost-user.c
-> > > @@ -854,14 +854,44 @@ static void slave_read(void *opaque)
-> > >      VhostUserHeader hdr = { 0, };
-> > >      VhostUserPayload payload = { 0, };
-> > >      int size, ret = 0;
-> > > +    struct iovec iov;
-> > > +    struct msghdr msgh;
-> > > +    int fd = -1;
-> > > +    char control[CMSG_SPACE(sizeof(fd))];
-> > > +    struct cmsghdr *cmsg;
-> > > +    size_t fdsize;
-> > > +
-> > > +    memset(&msgh, 0, sizeof(msgh));
-> > > +    msgh.msg_iov = &iov;
-> > > +    msgh.msg_iovlen = 1;
-> > > +    msgh.msg_control = control;
-> > > +    msgh.msg_controllen = sizeof(control);
-> > >  
-> > >      /* Read header */
-> > > -    size = read(u->slave_fd, &hdr, VHOST_USER_HDR_SIZE);
-> > > +    iov.iov_base = &hdr;
-> > > +    iov.iov_len = VHOST_USER_HDR_SIZE;
-> > > +
-> > > +    size = recvmsg(u->slave_fd, &msgh, 0);
-> > >      if (size != VHOST_USER_HDR_SIZE) {
-> > >          error_report("Failed to read from slave.");
-> > >          goto err;
-> > >      }
-> > >  
-> > > +    if (msgh.msg_flags & MSG_CTRUNC) {
-> > > +        error_report("Truncated message.");
-> > > +        goto err;
-> > > +    }
-> > > +
-> > > +    for (cmsg = CMSG_FIRSTHDR(&msgh); cmsg != NULL;
-> > > +         cmsg = CMSG_NXTHDR(&msgh, cmsg)) {
-> > > +            if (cmsg->cmsg_level == SOL_SOCKET &&
-> > > +                cmsg->cmsg_type == SCM_RIGHTS) {
-> > > +                    fdsize = cmsg->cmsg_len - CMSG_LEN(0);
-> > > +                    memcpy(&fd, CMSG_DATA(cmsg), fdsize);
-> > > +                    break;
-> > > +            }
-> > > +    }
-> > > +
-> > >      if (hdr.size > VHOST_USER_PAYLOAD_SIZE) {
-> > >          error_report("Failed to read msg header."
-> > >                  " Size %d exceeds the maximum %zu.", hdr.size,
-> > > @@ -885,9 +915,15 @@ static void slave_read(void *opaque)
-> > >          break;
-> > >      default:
-> > >          error_report("Received unexpected msg type.");
-> > > +        if (fd != -1) {
-> > > +            close(fd);
-> > > +        }
-> > >          ret = -EINVAL;
-> > >      }
-> > >  
-> > > +    /* Message handlers need to make sure that fd will be consumed. */
-> > > +    fd = -1;
-> > > +
-> > >      /*
-> > >       * REPLY_ACK feature handling. Other reply types has to be managed
-> > >       * directly in their request handlers.
-> > > @@ -920,6 +956,9 @@ err:
-> > >      qemu_set_fd_handler(u->slave_fd, NULL, NULL, NULL);
-> > >      close(u->slave_fd);
-> > >      u->slave_fd = -1;
-> > > +    if (fd != -1) {
-> > > +        close(fd);
-> > > +    }
-> > >      return;
-> > >  }
-> > >  
-> > > -- 
-> > > 2.11.0
-> > 
-> > ---------------------------------------------------------------------
-> > To unsubscribe, e-mail: virtio-dev-unsubscribe@lists.oasis-open.org
-> > For additional commands, e-mail: virtio-dev-help@lists.oasis-open.org
-> > 
+diff --git a/qemu-io-cmds.c b/qemu-io-cmds.c
+index 9b3cd00af6..7b195ec4e3 100644
+--- a/qemu-io-cmds.c
++++ b/qemu-io-cmds.c
+@@ -1294,6 +1294,7 @@ static void aio_read_done(void *opaque, int ret)
+     print_report("read", &t2, ctx->offset, ctx->qiov.size,
+                  ctx->qiov.size, 1, ctx->Cflag);
+ out:
++    blk_unref(ctx->blk);
+     qemu_io_free(ctx->buf);
+     qemu_iovec_destroy(&ctx->qiov);
+     g_free(ctx);
+@@ -1392,6 +1393,7 @@ static int aio_read_f(BlockBackend *blk, int argc, char **argv)
+     gettimeofday(&ctx->t1, NULL);
+     block_acct_start(blk_get_stats(blk), &ctx->acct, ctx->qiov.size,
+                      BLOCK_ACCT_READ);
++    blk_ref(blk);
+     blk_aio_preadv(blk, ctx->offset, &ctx->qiov, 0, aio_read_done,
+     ctx);
+     return 0;
+ }
+
+Berto
