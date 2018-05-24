@@ -1,24 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42582)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42583)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1fLi2j-0003Og-UU
-	for qemu-devel@nongnu.org; Thu, 24 May 2018 00:40:02 -0400
+	(envelope-from <peterx@redhat.com>) id 1fLi2j-0003Oh-UX
+	for qemu-devel@nongnu.org; Thu, 24 May 2018 00:40:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1fLi2f-0008P4-2O
+	(envelope-from <peterx@redhat.com>) id 1fLi2i-0008St-DN
 	for qemu-devel@nongnu.org; Thu, 24 May 2018 00:40:01 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:33946 helo=mx1.redhat.com)
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:43344 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1fLi2e-0008Ok-UM
-	for qemu-devel@nongnu.org; Thu, 24 May 2018 00:39:56 -0400
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1fLi2i-0008Si-8L
+	for qemu-devel@nongnu.org; Thu, 24 May 2018 00:40:00 -0400
 Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
 	[10.11.54.4])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 82A0A40267C3
-	for <qemu-devel@nongnu.org>; Thu, 24 May 2018 04:39:56 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id C5722401EF03
+	for <qemu-devel@nongnu.org>; Thu, 24 May 2018 04:39:59 +0000 (UTC)
 From: Peter Xu <peterx@redhat.com>
-Date: Thu, 24 May 2018 12:39:48 +0800
-Message-Id: <20180524043952.11245-1-peterx@redhat.com>
-Subject: [Qemu-devel] [PATCH v7 0/4] monitor: let Monitor be thread safe
+Date: Thu, 24 May 2018 12:39:49 +0800
+Message-Id: <20180524043952.11245-2-peterx@redhat.com>
+In-Reply-To: <20180524043952.11245-1-peterx@redhat.com>
+References: <20180524043952.11245-1-peterx@redhat.com>
+Subject: [Qemu-devel] [PATCH v7 1/4] monitor: rename out_lock to mon_lock
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,50 +32,165 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Eric Blake <eblake@redhat.com>, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, Markus Armbruster <armbru@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, peterx@redhat.com
 
-v7:
-- let monitor_fdset_get_fd() return -errno, touch up qemu_open() to
-  translate that into errno.  [Markus]
-- touch up comment for Monitor.rs
-- rebase, and torture the code a bit with qtest.
+The out_lock is protecting a few Monitor fields.  In the future the
+monitor code will start to run in multiple threads.  We are going to
+turn it into a bigger lock to protect not only the out buffer but also
+all the rest.
 
-v6:
-- add/drop some r-bs
-- address all the comments from Markus
-- rebase, and run some simple qtests to make sure nothing breaks
+Since at it, rearrange the Monitor struct a bit.
 
-v5:
-- collect r-bs and rebase
-- move two close()s outside critical section [Dave]
-- move comment to end of line [Stefan]
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+Signed-off-by: Peter Xu <peterx@redhat.com>
+---
+ monitor.c | 53 +++++++++++++++++++++++++++++------------------------
+ 1 file changed, 29 insertions(+), 24 deletions(-)
 
-v4:
-- fix a s/cur_mon/mon/ typo
-
-v3:
-- add comment for fields that are protected by monitor lock [Stefan]
-- drop most of patch 2, only keep the protections for mon->fds [Stefan]
-- add one trivial patch to add some more comments for either readline
-  and cpu_get/cpu_set [Stefan]
-- add protection for monitor_fdset_get_fd() [Stefan]
-
-v2:
-- cc correct people... sorry.
-
-Stefan reported this problem that in the future we might start to have
-more threads operating on the same Monitor object.  This seris try to
-add fundamental support for it.
-
-Please review.  Thanks,
-
-Peter Xu (4):
-  monitor: rename out_lock to mon_lock
-  monitor: protect mon->fds with mon_lock
-  monitor: more comments on lock-free fleids/funcs
-  monitor: add lock to protect mon_fdsets
-
- monitor.c    | 155 +++++++++++++++++++++++++++++++++++++--------------
- util/osdep.c |   3 +-
- 2 files changed, 115 insertions(+), 43 deletions(-)
-
+diff --git a/monitor.c b/monitor.c
+index 46814af533..14c681dc8a 100644
+--- a/monitor.c
++++ b/monitor.c
+@@ -207,15 +207,6 @@ struct Monitor {
+     int suspend_cnt;            /* Needs to be accessed atomically */
+     bool skip_flush;
+     bool use_io_thr;
+-
+-    /* We can't access guest memory when holding the lock */
+-    QemuMutex out_lock;
+-    QString *outbuf;
+-    guint out_watch;
+-
+-    /* Read under either BQL or out_lock, written with BQL+out_lock.  */
+-    int mux_out;
+-
+     ReadLineState *rs;
+     MonitorQMP qmp;
+     gchar *mon_cpu_path;
+@@ -224,6 +215,20 @@ struct Monitor {
+     mon_cmd_t *cmd_table;
+     QLIST_HEAD(,mon_fd_t) fds;
+     QTAILQ_ENTRY(Monitor) entry;
++
++    /*
++     * The per-monitor lock. We can't access guest memory when holding
++     * the lock.
++     */
++    QemuMutex mon_lock;
++
++    /*
++     * Fields that are protected by the per-monitor lock.
++     */
++    QString *outbuf;
++    guint out_watch;
++    /* Read under either BQL or mon_lock, written with BQL+mon_lock.  */
++    int mux_out;
+ };
+ 
+ /* Let's add monitor global variables to this struct. */
+@@ -366,14 +371,14 @@ static gboolean monitor_unblocked(GIOChannel *chan, GIOCondition cond,
+ {
+     Monitor *mon = opaque;
+ 
+-    qemu_mutex_lock(&mon->out_lock);
++    qemu_mutex_lock(&mon->mon_lock);
+     mon->out_watch = 0;
+     monitor_flush_locked(mon);
+-    qemu_mutex_unlock(&mon->out_lock);
++    qemu_mutex_unlock(&mon->mon_lock);
+     return FALSE;
+ }
+ 
+-/* Called with mon->out_lock held.  */
++/* Called with mon->mon_lock held.  */
+ static void monitor_flush_locked(Monitor *mon)
+ {
+     int rc;
+@@ -411,9 +416,9 @@ static void monitor_flush_locked(Monitor *mon)
+ 
+ void monitor_flush(Monitor *mon)
+ {
+-    qemu_mutex_lock(&mon->out_lock);
++    qemu_mutex_lock(&mon->mon_lock);
+     monitor_flush_locked(mon);
+-    qemu_mutex_unlock(&mon->out_lock);
++    qemu_mutex_unlock(&mon->mon_lock);
+ }
+ 
+ /* flush at every end of line */
+@@ -421,7 +426,7 @@ static void monitor_puts(Monitor *mon, const char *str)
+ {
+     char c;
+ 
+-    qemu_mutex_lock(&mon->out_lock);
++    qemu_mutex_lock(&mon->mon_lock);
+     for(;;) {
+         c = *str++;
+         if (c == '\0')
+@@ -434,7 +439,7 @@ static void monitor_puts(Monitor *mon, const char *str)
+             monitor_flush_locked(mon);
+         }
+     }
+-    qemu_mutex_unlock(&mon->out_lock);
++    qemu_mutex_unlock(&mon->mon_lock);
+ }
+ 
+ void monitor_vprintf(Monitor *mon, const char *fmt, va_list ap)
+@@ -725,7 +730,7 @@ static void monitor_data_init(Monitor *mon, bool skip_flush,
+                               bool use_io_thr)
+ {
+     memset(mon, 0, sizeof(Monitor));
+-    qemu_mutex_init(&mon->out_lock);
++    qemu_mutex_init(&mon->mon_lock);
+     qemu_mutex_init(&mon->qmp.qmp_queue_lock);
+     mon->outbuf = qstring_new();
+     /* Use *mon_cmds by default. */
+@@ -745,7 +750,7 @@ static void monitor_data_destroy(Monitor *mon)
+     }
+     readline_free(mon->rs);
+     qobject_unref(mon->outbuf);
+-    qemu_mutex_destroy(&mon->out_lock);
++    qemu_mutex_destroy(&mon->mon_lock);
+     qemu_mutex_destroy(&mon->qmp.qmp_queue_lock);
+     monitor_qmp_cleanup_req_queue_locked(mon);
+     monitor_qmp_cleanup_resp_queue_locked(mon);
+@@ -777,13 +782,13 @@ char *qmp_human_monitor_command(const char *command_line, bool has_cpu_index,
+     handle_hmp_command(&hmp, command_line);
+     cur_mon = old_mon;
+ 
+-    qemu_mutex_lock(&hmp.out_lock);
++    qemu_mutex_lock(&hmp.mon_lock);
+     if (qstring_get_length(hmp.outbuf) > 0) {
+         output = g_strdup(qstring_get_str(hmp.outbuf));
+     } else {
+         output = g_strdup("");
+     }
+-    qemu_mutex_unlock(&hmp.out_lock);
++    qemu_mutex_unlock(&hmp.mon_lock);
+ 
+ out:
+     monitor_data_destroy(&hmp);
+@@ -4377,9 +4382,9 @@ static void monitor_event(void *opaque, int event)
+ 
+     switch (event) {
+     case CHR_EVENT_MUX_IN:
+-        qemu_mutex_lock(&mon->out_lock);
++        qemu_mutex_lock(&mon->mon_lock);
+         mon->mux_out = 0;
+-        qemu_mutex_unlock(&mon->out_lock);
++        qemu_mutex_unlock(&mon->mon_lock);
+         if (mon->reset_seen) {
+             readline_restart(mon->rs);
+             monitor_resume(mon);
+@@ -4399,9 +4404,9 @@ static void monitor_event(void *opaque, int event)
+         } else {
+             atomic_inc(&mon->suspend_cnt);
+         }
+-        qemu_mutex_lock(&mon->out_lock);
++        qemu_mutex_lock(&mon->mon_lock);
+         mon->mux_out = 1;
+-        qemu_mutex_unlock(&mon->out_lock);
++        qemu_mutex_unlock(&mon->mon_lock);
+         break;
+ 
+     case CHR_EVENT_OPENED:
 -- 
 2.17.0
