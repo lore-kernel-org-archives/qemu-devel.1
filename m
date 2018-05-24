@@ -1,24 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50838)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55136)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1fLvua-0001JM-7r
-	for qemu-devel@nongnu.org; Thu, 24 May 2018 15:28:33 -0400
+	(envelope-from <eric.auger@redhat.com>) id 1fLwJg-0006Ll-QS
+	for qemu-devel@nongnu.org; Thu, 24 May 2018 15:54:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1fLvuX-0000Yj-Jf
-	for qemu-devel@nongnu.org; Thu, 24 May 2018 15:28:32 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:46526)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1fLvuX-0000YY-DN
-	for qemu-devel@nongnu.org; Thu, 24 May 2018 15:28:29 -0400
-Date: Thu, 24 May 2018 16:28:21 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20180524192821.GM8988@localhost.localdomain>
-References: <1527176614-26271-1-git-send-email-babu.moger@amd.com>
-	<1527176614-26271-2-git-send-email-babu.moger@amd.com>
+	(envelope-from <eric.auger@redhat.com>) id 1fLwJf-00004y-Cf
+	for qemu-devel@nongnu.org; Thu, 24 May 2018 15:54:28 -0400
+References: <20180521140402.23318-1-peter.maydell@linaro.org>
+	<20180521140402.23318-18-peter.maydell@linaro.org>
+	<8736yivgw3.fsf@linaro.org>
+From: Auger Eric <eric.auger@redhat.com>
+Message-ID: <f568933d-2d8c-da22-c588-3ca4d3140538@redhat.com>
+Date: Thu, 24 May 2018 21:54:18 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1527176614-26271-2-git-send-email-babu.moger@amd.com>
-Subject: Re: [Qemu-devel] [PATCH v11 1/5] i386: Clean up cache CPUID code
+In-Reply-To: <8736yivgw3.fsf@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 17/27] exec.c: Handle IOMMUs in
+ address_space_translate_for_iotlb()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,22 +25,309 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Babu Moger <babu.moger@amd.com>
-Cc: mst@redhat.com, marcel.apfelbaum@gmail.com, pbonzini@redhat.com, rth@twiddle.net, mtosatti@redhat.com, qemu-devel@nongnu.org, kvm@vger.kernel.org, kash@tripleback.net, geoff@hostfission.com
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, Peter Maydell <peter.maydell@linaro.org>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, qemu-arm@nongnu.org, qemu-devel@nongnu.org, patches@linaro.org
 
-On Thu, May 24, 2018 at 11:43:30AM -0400, Babu Moger wrote:
-> From: Eduardo Habkost <ehabkost@redhat.com>
-> 
-> Always initialize CPUCaches structs with cache information, even
-> if legacy_cache=true.  Use different CPUCaches struct for
-> CPUID[2], CPUID[4], and the AMD CPUID leaves.
-> 
-> This will simplify a lot the logic inside cpu_x86_cpuid().
-> 
-> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
-> Signed-off-by: Babu Moger <babu.moger@amd.com>
+Hi Peter,
 
-Queued, thanks.
+On 05/23/2018 11:51 AM, Alex Benn=C3=A9e wrote:
+>=20
+> Peter Maydell <peter.maydell@linaro.org> writes:
+>=20
+>> Currently we don't support board configurations that put an IOMMU
+>> in the path of the CPU's memory transactions, and instead just
+>> assert() if the memory region fonud in address_space_translate_for_iot=
+lb()
+found
+>> is an IOMMUMemoryRegion.
+>>
+>> Remove this limitation by having the function handle IOMMUs.
+>> This is mostly straightforward, but we must make sure we have
+>> a notifier registered for every IOMMU that a transaction has
+>> passed through, so that we can flush the TLB appropriately
+Can you elaborate on what (TCG) TLB we are talking about?
 
--- 
-Eduardo
+The concept of IOMMUs downstream to a CPU is not obvious to me. Maybe an
+example may be documented in the commit message?
+>> when any of the IOMMUs change their mappings.
+>>
+>> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+>> ---
+>>  include/exec/exec-all.h |   3 +-
+>>  include/qom/cpu.h       |   3 +
+>>  accel/tcg/cputlb.c      |   3 +-
+>>  exec.c                  | 147 +++++++++++++++++++++++++++++++++++++++=
+-
+>>  4 files changed, 152 insertions(+), 4 deletions(-)
+>>
+>> diff --git a/include/exec/exec-all.h b/include/exec/exec-all.h
+>> index 4d09eaba72..e0ff19b711 100644
+>> --- a/include/exec/exec-all.h
+>> +++ b/include/exec/exec-all.h
+>> @@ -469,7 +469,8 @@ void tb_flush_jmp_cache(CPUState *cpu, target_ulon=
+g addr);
+>>
+>>  MemoryRegionSection *
+>>  address_space_translate_for_iotlb(CPUState *cpu, int asidx, hwaddr ad=
+dr,
+>> -                                  hwaddr *xlat, hwaddr *plen);
+>> +                                  hwaddr *xlat, hwaddr *plen,
+>> +                                  MemTxAttrs attrs, int *prot);
+>>  hwaddr memory_region_section_get_iotlb(CPUState *cpu,
+>>                                         MemoryRegionSection *section,
+>>                                         target_ulong vaddr,
+>> diff --git a/include/qom/cpu.h b/include/qom/cpu.h
+>> index 9d3afc6c75..d4a30149dd 100644
+>> --- a/include/qom/cpu.h
+>> +++ b/include/qom/cpu.h
+>> @@ -429,6 +429,9 @@ struct CPUState {
+>>      uint16_t pending_tlb_flush;
+>>
+>>      int hvf_fd;
+>> +
+>> +    /* track IOMMUs whose translations we've cached in the TCG TLB */
+>> +    GSList *iommu_notifiers;
+>=20
+> So we are only concerned about TCG IOMMU notifiers here, specifically
+> TCGIOMMUNotifier structures. Why not just use a GArray and save
+> ourselves chasing pointers?
+>=20
+>>  };
+>>
+>>  QTAILQ_HEAD(CPUTailQ, CPUState);
+>> diff --git a/accel/tcg/cputlb.c b/accel/tcg/cputlb.c
+>> index 05439039e9..c8acaf21e9 100644
+>> --- a/accel/tcg/cputlb.c
+>> +++ b/accel/tcg/cputlb.c
+>> @@ -632,7 +632,8 @@ void tlb_set_page_with_attrs(CPUState *cpu, target=
+_ulong vaddr,
+>>      }
+>>
+>>      sz =3D size;
+>> -    section =3D address_space_translate_for_iotlb(cpu, asidx, paddr, =
+&xlat, &sz);
+>> +    section =3D address_space_translate_for_iotlb(cpu, asidx, paddr, =
+&xlat, &sz,
+>> +                                                attrs, &prot);
+>>      assert(sz >=3D TARGET_PAGE_SIZE);
+>>
+>>      tlb_debug("vaddr=3D" TARGET_FMT_lx " paddr=3D0x" TARGET_FMT_plx
+>> diff --git a/exec.c b/exec.c
+>> index c9285c9c39..6c8f2dcc3f 100644
+>> --- a/exec.c
+>> +++ b/exec.c
+>> @@ -650,18 +650,158 @@ MemoryRegion *flatview_translate(FlatView *fv, =
+hwaddr addr, hwaddr *xlat,
+>>      return mr;
+>>  }
+>>
+>> +typedef struct TCGIOMMUNotifier {
+>> +    IOMMUNotifier n;
+>> +    MemoryRegion *mr;
+>> +    CPUState *cpu;
+>=20
+> This seems superfluous if we are storing the list of notifiers in the C=
+PUState
+>=20
+>> +    int iommu_idx;
+>> +    bool active;
+>> +} TCGIOMMUNotifier;
+>> +
+>> +static void tcg_iommu_unmap_notify(IOMMUNotifier *n, IOMMUTLBEntry *i=
+otlb)
+>> +{
+>> +    TCGIOMMUNotifier *notifier =3D container_of(n, TCGIOMMUNotifier, =
+n);
+>> +
+>> +    if (!notifier->active) {
+>> +        return;
+>> +    }
+>> +    tlb_flush(notifier->cpu);
+>> +    notifier->active =3D false;
+>> +    /* We leave the notifier struct on the list to avoid reallocating=
+ it later.
+>> +     * Generally the number of IOMMUs a CPU deals with will be small.
+>> +     * In any case we can't unregister the iommu notifier from a noti=
+fy
+>> +     * callback.
+>> +     */
+I don't get the life cycle of the notifier and why it becomes inactive
+after the invalidate. Could you detail the specificity of this one?
+>> +}
+>> +
+>> +static gint tcg_iommu_find_notifier(gconstpointer a, gconstpointer b)
+>> +{
+>> +    TCGIOMMUNotifier *notifier =3D (TCGIOMMUNotifier *)a;
+>> +    TCGIOMMUNotifier *seeking =3D (TCGIOMMUNotifier *)b;
+>> +
+>> +    if (notifier->mr =3D=3D seeking->mr &&
+>> +        notifier->iommu_idx =3D=3D seeking->iommu_idx) {
+>> +        return 0;
+>> +    }
+>> +    return 1;
+>> +}
+>> +
+>> +static void tcg_register_iommu_notifier(CPUState *cpu,
+>> +                                        IOMMUMemoryRegion *iommu_mr,
+>> +                                        int iommu_idx)
+>> +{
+>> +    /* Make sure this CPU has an IOMMU notifier registered for this
+>> +     * IOMMU/IOMMU index combination, so that we can flush its TLB
+>> +     * when the IOMMU tells us the mappings we've cached have changed=
+.
+>> +     */
+>> +    TCGIOMMUNotifier seeking =3D {
+>> +        .mr =3D MEMORY_REGION(iommu_mr),
+>> +        .iommu_idx =3D iommu_idx,
+>> +    };
+>> +    TCGIOMMUNotifier *notifier;
+>> +    GSList *found =3D g_slist_find_custom(cpu->iommu_notifiers,
+>> +                                        &seeking,
+>> +                                        tcg_iommu_find_notifier);
+>> +    if (found) {
+>> +        notifier =3D found->data;
+>> +    } else {
+>> +        notifier =3D g_new0(TCGIOMMUNotifier, 1);
+>> +        notifier->mr =3D seeking.mr;
+>> +        notifier->iommu_idx =3D iommu_idx;
+>> +        notifier->cpu =3D cpu;
+>> +        /* Rather than trying to register interest in the specific pa=
+rt
+>> +         * of the iommu's address space that we've accessed and then
+>> +         * expand it later as subsequent accesses touch more of it, w=
+e
+>> +         * just register interest in the whole thing, on the assumpti=
+on
+>> +         * that iommu reconfiguration will be rare.
+>> +         */
+>> +        iommu_notifier_init(&notifier->n,
+>> +                            tcg_iommu_unmap_notify,
+>> +                            IOMMU_NOTIFIER_UNMAP,
+>> +                            0,
+>> +                            HWADDR_MAX,
+>> +                            iommu_idx);
+>> +        memory_region_register_iommu_notifier(notifier->mr, &notifier=
+->n);
+>> +        cpu->iommu_notifiers =3D g_slist_prepend(cpu->iommu_notifiers=
+,
+>> +                                               notifier);
+>> +    }
+>> +    if (!notifier->active) {
+>> +        notifier->active =3D true;
+>> +    }
+>> +}
+>> +
+>> +static void tcg_iommu_notifier_destroy(gpointer data)
+>> +{
+>> +    TCGIOMMUNotifier *notifier =3D data;
+>> +
+>> +    if (notifier->active) {
+>> +        memory_region_unregister_iommu_notifier(notifier->mr, &notifi=
+er->n);
+>> +    }
+Is it safe to leave the notifier registered to an IOMMU whereas it gets
+freed?
+
+Thanks
+
+Eric
+>> +    g_free(notifier);
+>> +}
+>> +
+>> +static void tcg_iommu_free_notifier_list(CPUState *cpu)
+>> +{
+>> +    /* Destroy the CPU's notifier list */
+>> +    g_slist_free_full(cpu->iommu_notifiers, tcg_iommu_notifier_destro=
+y);
+>> +    cpu->iommu_notifiers =3D NULL;
+>> +}
+>> +
+>>  /* Called from RCU critical section */
+>>  MemoryRegionSection *
+>>  address_space_translate_for_iotlb(CPUState *cpu, int asidx, hwaddr ad=
+dr,
+>> -                                  hwaddr *xlat, hwaddr *plen)
+>> +                                  hwaddr *xlat, hwaddr *plen,
+>> +                                  MemTxAttrs attrs, int *prot)
+>>  {
+>>      MemoryRegionSection *section;
+>> +    IOMMUMemoryRegion *iommu_mr;
+>> +    IOMMUMemoryRegionClass *imrc;
+>> +    IOMMUTLBEntry iotlb;
+>> +    int iommu_idx;
+>>      AddressSpaceDispatch *d =3D atomic_rcu_read(&cpu->cpu_ases[asidx]=
+.memory_dispatch);
+>>
+>> -    section =3D address_space_translate_internal(d, addr, xlat, plen,=
+ false);
+>> +    for (;;) {
+>> +        section =3D address_space_translate_internal(d, addr, &addr, =
+plen, false);
+>> +
+>> +        iommu_mr =3D memory_region_get_iommu(section->mr);
+>> +        if (!iommu_mr) {
+>> +            break;
+>> +        }
+>> +
+>> +        imrc =3D memory_region_get_iommu_class_nocheck(iommu_mr);
+>> +
+>> +        iommu_idx =3D imrc->attrs_to_index(iommu_mr, attrs);
+>> +        tcg_register_iommu_notifier(cpu, iommu_mr, iommu_idx);
+>> +        /* We need all the permissions, so pass IOMMU_NONE so the IOM=
+MU
+>> +         * doesn't short-cut its translation table walk.
+it is not clear to me why you don't use the access flag as you seem to
+handle the perm fault after the translate() call.
+
+Thanks
+
+Eric
+>> +         */
+>> +        iotlb =3D imrc->translate(iommu_mr, addr, IOMMU_NONE, iommu_i=
+dx);
+>> +        addr =3D ((iotlb.translated_addr & ~iotlb.addr_mask)
+>> +                | (addr & iotlb.addr_mask));
+>> +        /* Update the caller's prot bits to remove permissions the IO=
+MMU
+>> +         * is giving us a failure response for. If we get down to no
+>> +         * permissions left at all we can give up now.
+>> +         */
+>> +        if (!(iotlb.perm & IOMMU_RO)) {
+>> +            *prot &=3D ~(PAGE_READ | PAGE_EXEC);
+>> +        }
+>> +        if (!(iotlb.perm & IOMMU_WO)) {
+>> +            *prot &=3D ~PAGE_WRITE;
+>> +        }
+>> +
+>> +        if (!*prot) {
+>> +            goto translate_fail;
+>> +        }
+>> +
+>> +        d =3D flatview_to_dispatch(address_space_to_flatview(iotlb.ta=
+rget_as));
+>> +    }
+>>
+>>      assert(!memory_region_is_iommu(section->mr));
+>> +    *xlat =3D addr;
+>>      return section;
+>> +
+>> +translate_fail:
+>> +    return &d->map.sections[PHYS_SECTION_UNASSIGNED];
+>>  }
+>>  #endif
+>>
+>> @@ -820,6 +960,9 @@ void cpu_exec_unrealizefn(CPUState *cpu)
+>>      if (qdev_get_vmsd(DEVICE(cpu)) =3D=3D NULL) {
+>>          vmstate_unregister(NULL, &vmstate_cpu_common, cpu);
+>>      }
+>> +#ifndef CONFIG_USER_ONLY
+>> +    tcg_iommu_free_notifier_list(cpu);
+>> +#endif
+>>  }
+>>
+>>  Property cpu_common_props[] =3D {
+>=20
+>=20
+> --
+> Alex Benn=C3=A9e
+>=20
