@@ -1,35 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33374)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34179)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fLiqe-0000gm-D8
-	for qemu-devel@nongnu.org; Thu, 24 May 2018 01:31:39 -0400
+	(envelope-from <thuth@redhat.com>) id 1fLivu-0002xn-NE
+	for qemu-devel@nongnu.org; Thu, 24 May 2018 01:37:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fLiqc-0000aE-A7
-	for qemu-devel@nongnu.org; Thu, 24 May 2018 01:31:36 -0400
-Received: from indium.canonical.com ([91.189.90.7]:48980)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1fLiqc-0000ZV-1B
-	for qemu-devel@nongnu.org; Thu, 24 May 2018 01:31:34 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1fLiqZ-0008AP-CP
-	for <qemu-devel@nongnu.org>; Thu, 24 May 2018 05:31:31 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 4A75D2E80DD
-	for <qemu-devel@nongnu.org>; Thu, 24 May 2018 05:31:31 +0000 (UTC)
+	(envelope-from <thuth@redhat.com>) id 1fLivq-0003Hs-Ho
+	for qemu-devel@nongnu.org; Thu, 24 May 2018 01:37:02 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:44630 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1fLivq-0003Ha-Cs
+	for qemu-devel@nongnu.org; Thu, 24 May 2018 01:36:58 -0400
+References: <1527105041-21013-1-git-send-email-patryk@fala.ehost.pl>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <c02439be-e6af-0e10-cb0a-ddb62b48b5de@redhat.com>
+Date: Thu, 24 May 2018 07:36:52 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <1527105041-21013-1-git-send-email-patryk@fala.ehost.pl>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Date: Thu, 24 May 2018 05:17:16 -0000
-From: =?utf-8?b?7oO/IENocmlzdGlhbiBFaHJoYXJkdCDug78=?=
-	<1722074@bugs.launchpad.net>
-Reply-To: Bug 1722074 <1722074@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <150746661053.7454.6898170418757179619.malonedeb@wampee.canonical.com>
-Message-Id: <152713903651.25605.4206607231539261664.malone@wampee.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1722074] Re: warning: host doesn't support
- requested feature: CPUID.01H:ECX.vmx
+Subject: Re: [Qemu-devel] [PATCH v2] Remove unwanted crlf conversion in
+ serial
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,111 +28,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Patryk Olszewski <patryk@fala.ehost.pl>, qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>
 
-And sorry for the status update noise, one can clearly see that I start
-to fail once I have to use my mouse :-)
+On 23.05.2018 21:50, Patryk Olszewski wrote:
+> This patch fixes bug in serial that made it almost impossible for guest
+> to communicate with devices through host's serial.
+>=20
+> OPOST flag in c_oflag enables output processing letting other flags in
+> c_oflag take effect. Usually in c_oflag ONLCR flag is also set, which
+> causes crlf to be sent in place of lf. This breaks binary transmissions=
+.
+> Unsetting OPOST flag turns off any output processing which fixes the bu=
+g.
+>=20
+> Bug reports related:
+> https://bugs.launchpad.net/qemu/+bug/1772086
+> https://bugs.launchpad.net/qemu/+bug/1407813
+> https://bugs.launchpad.net/qemu/+bug/1715296
+> also
+> https://lists.nongnu.org/archive/html/qemu-devel/2006-06/msg00196.html
+>=20
+> Signed-off-by: Patryk Olszewski <patryk@fala.ehost.pl>
+> ---
+>  chardev/char-serial.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>=20
+> diff --git a/chardev/char-serial.c b/chardev/char-serial.c
+> index feb52e5..ae548d2 100644
+> --- a/chardev/char-serial.c
+> +++ b/chardev/char-serial.c
+> @@ -139,7 +139,7 @@ static void tty_serial_init(int fd, int speed,
+> =20
+>      tty.c_iflag &=3D ~(IGNBRK | BRKINT | PARMRK | ISTRIP
+>                       | INLCR | IGNCR | ICRNL | IXON);
+> -    tty.c_oflag |=3D OPOST;
+> +    tty.c_oflag &=3D ~OPOST;
+>      tty.c_lflag &=3D ~(ECHO | ECHONL | ICANON | IEXTEN | ISIG);
+>      tty.c_cflag &=3D ~(CSIZE | PARENB | PARODD | CRTSCTS | CSTOPB);
+>      switch (data_bits) {
+>=20
 
--- =
+I think this bug has good chances to win the price "Oldest bug of the
+year". If we'd wait one more months, it has its 15th anniversary: The
+code has originally been added in 2003, see commit 0824d6fc674084519c85,
+it has just been moved around to other files afterwards. Thus this is
+almost as old as QEMU itself!
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1722074
+Anyway, I think disabling output processing is the right thing to do
+here, so:
 
-Title:
-  warning: host doesn't support requested feature: CPUID.01H:ECX.vmx
-
-Status in QEMU:
-  Invalid
-Status in qemu package in Ubuntu:
-  Confirmed
-
-Bug description:
-  =
-
-  I encountered the bug today (when using qemu to boot up images - which us=
-ed to work on my Intel CPU box):
-
-  warning: host doesn't support requested feature: CPUID.01H:ECX.vmx
-
-  The bug is a show-stopper - I completely cannot load my kernel images
-  at all.
-
-  My Ubuntu have this version of QEMU installed:
-
-  qemu-system-x86_64 --version
-
-  QEMU emulator version 2.5.0 (Debian 1:2.5+dfsg-5ubuntu10.16),
-  Copyright (c) 2003-2008 Fabrice Bellard
-
-  And PC is a AMD Ryzen7 CPU built, and this is the first time I am
-  using it to load QEMU images.   My host information:
-
-  cat /proc/cpuinfo |more
-
-  processor	: 0
-  vendor_id	: AuthenticAMD
-  cpu family	: 23
-  model		: 1
-  model name	: AMD Ryzen 7 1700X Eight-Core Processor
-  stepping	: 1
-  microcode	: 0x800110e
-  cpu MHz		: 2200.000
-  cache size	: 512 KB
-  physical id	: 0
-  siblings	: 16
-  core id		: 0
-  cpu cores	: 8
-  apicid		: 0
-  initial apicid	: 0
-  fpu		: yes
-  fpu_exception	: yes
-  cpuid level	: 13
-  wp		: yes
-  flags		: fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov
-  pat pse36 clflush mmx fxsr sse sse2 ht syscall nx mmxext fxsr_opt pdpe1gb=
- rdtscp
-  =C2=A0lm constant_tsc rep_good nopl nonstop_tsc extd_apicid aperfmperf pn=
-i pclmulqdq
-  monitor ssse3 fma cx16 sse4_1 sse4_2 movbe popcnt aes xsave avx f16c rdra=
-nd lahf
-  _lm cmp_legacy svm extapic cr8_legacy abm sse4a misalignsse 3dnowprefetch=
- osvw s
-  kinit wdt tce topoext perfctr_core perfctr_nb bpext perfctr_l2 mwaitx hw_=
-pstate
-  vmmcall fsgsbase bmi1 avx2 smep bmi2 rdseed adx smap clflushopt sha_ni xs=
-aveopt
-  xsavec xgetbv1 xsaves clzero irperf arat npt lbrv svm_lock nrip_save tsc_=
-scale v
-  mcb_clean flushbyasid decodeassists pausefilter pfthreshold avic overflow=
-_recov
-  succor smca
-  bugs		: fxsave_leak sysret_ss_attrs null_seg
-  bogomips	: 6787.24
-  TLB size	: 2560 4K pages
-  clflush size	: 64
-  cache_alignment	: 64
-  address sizes	: 48 bits physical, 48 bits virtual
-  power management: ts ttp tm hwpstate eff_freq_ro [13] [14]
-
-  processor	: 1
-  vendor_id	: AuthenticAMD
-  cpu family	: 23
-  model		: 1
-  model name	: AMD Ryzen 7 1700X Eight-Core Processor
-  stepping	: 1
-  microcode	: 0x800110e
-  cpu MHz		: 2200.000
-  cache size	: 512 KB
-
-  From other places, it can be seen that this is an AMD CPU issue:
-
-  https://www.virtualmin.com/node/52227
-
-  not sure?
-
-  The bug will also affect the host negatively:  it will completely go
-  into a hung mode - the entire host becomes completely unsable.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1722074/+subscriptions
+Reviewed-by: Thomas Huth <thuth@redhat.com>
