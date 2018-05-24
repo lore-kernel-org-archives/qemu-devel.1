@@ -1,29 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48853)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49008)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1fLtqA-0007kR-HL
-	for qemu-devel@nongnu.org; Thu, 24 May 2018 13:15:51 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1fLtr3-00083l-Cl
+	for qemu-devel@nongnu.org; Thu, 24 May 2018 13:16:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1fLtq5-0000ZO-Jb
-	for qemu-devel@nongnu.org; Thu, 24 May 2018 13:15:50 -0400
-Received: from 6.mo69.mail-out.ovh.net ([46.105.50.107]:52553)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1fLtq5-0000Vd-D0
-	for qemu-devel@nongnu.org; Thu, 24 May 2018 13:15:45 -0400
-Received: from player791.ha.ovh.net (unknown [10.109.122.11])
-	by mo69.mail-out.ovh.net (Postfix) with ESMTP id 19D6513C55
-	for <qemu-devel@nongnu.org>; Thu, 24 May 2018 19:15:37 +0200 (CEST)
-Date: Thu, 24 May 2018 19:15:31 +0200
-From: Greg Kurz <groug@kaod.org>
-Message-ID: <20180524191531.00fe263c@bahia.lan>
-In-Reply-To: <20180524165256.GA31656@stefanha-x1.localdomain>
-References: <152715298769.397287.11782572103987618822.stgit@bahia>
-	<20180524165256.GA31656@stefanha-x1.localdomain>
+	(envelope-from <pbonzini@redhat.com>) id 1fLtr2-00019P-Gr
+	for qemu-devel@nongnu.org; Thu, 24 May 2018 13:16:45 -0400
+References: <20180521063516.5479-1-famz@redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <677208b5-586b-354a-5fd4-67468152510e@redhat.com>
+Date: Thu, 24 May 2018 19:16:30 +0200
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	boundary="Sig_/QYb3QGBUh8F0PFirbmlPPOv";
-	protocol="application/pgp-signature"
-Subject: Re: [Qemu-devel] [PATCH v2] block: fix QEMU crash with scsi-hd and
- drive_del
+In-Reply-To: <20180521063516.5479-1-famz@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] nvme: Make nvme_init error handling code
+ more readable
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,58 +24,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@redhat.com>
-Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
 
---Sig_/QYb3QGBUh8F0PFirbmlPPOv
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+On 21/05/2018 08:35, Fam Zheng wrote:
+> Coverity doesn't like the tests under fail label (report CID 1385847).
+> Reset the fields so the clean up order is more apparent.
+> 
+> Signed-off-by: Fam Zheng <famz@redhat.com>
+> ---
+>  block/nvme.c | 7 +++++++
+>  1 file changed, 7 insertions(+)
+> 
+> diff --git a/block/nvme.c b/block/nvme.c
+> index 6f71122bf5..8239b920c8 100644
+> --- a/block/nvme.c
+> +++ b/block/nvme.c
+> @@ -560,6 +560,13 @@ static int nvme_init(BlockDriverState *bs, const char *device, int namespace,
+>      qemu_co_queue_init(&s->dma_flush_queue);
+>      s->nsid = namespace;
+>      s->aio_context = bdrv_get_aio_context(bs);
+> +
+> +    /* Fields we've not touched should be zero-initialized by block layer
+> +     * already, but reset them anyway to make the error handling code easier to
+> +     * reason. */
+> +    s->regs = NULL;
+> +    s->vfio = NULL;
+> +
+>      ret = event_notifier_init(&s->irq_notifier, 0);
+>      if (ret) {
+>          error_setg(errp, "Failed to init event notifier");
+> 
 
-On Thu, 24 May 2018 17:52:56 +0100
-Stefan Hajnoczi <stefanha@redhat.com> wrote:
+I think we should just mark it as a false positive or do something like
 
-> On Thu, May 24, 2018 at 11:09:47AM +0200, Greg Kurz wrote:
-> > diff --git a/block.c b/block.c
-> > index 676e57f5623a..fc9379439883 100644
-> > --- a/block.c
-> > +++ b/block.c
-> > @@ -2127,12 +2127,16 @@ BdrvChild *bdrv_attach_child(BlockDriverState *=
-parent_bs,
-> > =20
-> >  static void bdrv_detach_child(BdrvChild *child)
-> >  {
-> > +    BlockDriverState *child_bs =3D child->bs;
-> > +
-> >      if (child->next.le_prev) {
-> >          QLIST_REMOVE(child, next);
-> >          child->next.le_prev =3D NULL;
-> >      } =20
->=20
-> This child->next modification makes me nervous.  Please start the
-> drained region before modifying the graph.
+fail_regs:
+    qemu_vfio_pci_unmap_bar(s->vfio, 0, (void *)s->regs, 0, NVME_BAR_SIZE);
+fail_vfio:
+    qemu_vfio_close(s->vfio);
+fail:
+    g_free(s->queues);
+    event_notifier_cleanup(&s->irq_notifier);
+    return ret;
 
-Ok, I'll send a v3, and Cc qemu-stable@nongnu.org instead of
-stable@vger.kernel.org this time :P
+even though it's a larger patch.
 
---Sig_/QYb3QGBUh8F0PFirbmlPPOv
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEtIKLr5QxQM7yo0kQcdTV5YIvc9YFAlsG8zMACgkQcdTV5YIv
-c9YIPQ//ej7QAtbdkswv106oHCpCLfq+bfrj/+Nw7+bxW1Msyu+IzqUyxEdvvaHo
-fJwy4CgCIc/FyB58khIULYSyLePOQEEJKpF+SY6t/HOCjT8DAE2gaqHq4yR1vJdy
-9UAPnWoRAC0b5QfprS9V+HGGpcir4zY4zFFxR6CLFfRseXm6Yu+DErz5vEWmRgt3
-uSUcXaX/MFUnMn3hjX4u2mFkvTrDXRSsdI9l70Dazat7zHj0RpOYUGZRv5owh0bL
-t7upEyuneASWPWwnL1iZ81veKTy2UaOzIHFD15PVCe+IoLelMq5WHOWLyg/AsvY6
-D80ITuwKNVzJfET1qoY0xhCWI8t/qyoEXr1RV/5QDagLaX43VjMzkk2Y2WPG3T6R
-ifznHLNrZhQuKdKgej8/PqWxj7FWVijon5jJgbB0T4BS14kknPaKtflzjSVk5phl
-Gxm6+EWMkjeOaTmJdnvXhOdBn3h+xNxirco/COfAv2I0ZtH0WRB699K0DqhukuZ5
-ASN6bJmXrkcFYq31KyOMHEEm+qdb/oQEcdZ9TMc9+ioeqRYGxrgQz1KlaZ4TvqtD
-3eK9aSG5Tmjk6xxpKevfzsKS5BkMiAQkMiavqiT6H6dFYYeUImUKk9hCUA39s5jo
-fx0qXMBuhCpyq+dwEYDvBWmQEKoG/OP5gl3Q2IcC7g8pRQo4aRE=
-=o+8G
------END PGP SIGNATURE-----
-
---Sig_/QYb3QGBUh8F0PFirbmlPPOv--
+Paolo
