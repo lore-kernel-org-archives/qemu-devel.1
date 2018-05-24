@@ -1,28 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46987)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48232)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fLq4m-0006oQ-NO
-	for qemu-devel@nongnu.org; Thu, 24 May 2018 09:14:41 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1fLqBa-0008KE-51
+	for qemu-devel@nongnu.org; Thu, 24 May 2018 09:21:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fLq4l-0006e3-SD
-	for qemu-devel@nongnu.org; Thu, 24 May 2018 09:14:40 -0400
-Received: from mail-oi0-x244.google.com ([2607:f8b0:4003:c06::244]:45351)
+	(envelope-from <peter.maydell@linaro.org>) id 1fLqBV-0003sp-Gb
+	for qemu-devel@nongnu.org; Thu, 24 May 2018 09:21:42 -0400
+Received: from mail-ot0-x244.google.com ([2607:f8b0:4003:c0f::244]:38425)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fLq4l-0006dR-NK
-	for qemu-devel@nongnu.org; Thu, 24 May 2018 09:14:39 -0400
-Received: by mail-oi0-x244.google.com with SMTP id b130-v6so1358500oif.12
-	for <qemu-devel@nongnu.org>; Thu, 24 May 2018 06:14:39 -0700 (PDT)
+	id 1fLqBV-0003s0-Bk
+	for qemu-devel@nongnu.org; Thu, 24 May 2018 09:21:37 -0400
+Received: by mail-ot0-x244.google.com with SMTP id n3-v6so1889077ota.5
+	for <qemu-devel@nongnu.org>; Thu, 24 May 2018 06:21:37 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <acca5b80-f527-bc39-0b63-147e53affb4b@redhat.com>
-References: <1527047633-12368-1-git-send-email-zhaoshenglong@huawei.com>
-	<1527047633-12368-2-git-send-email-zhaoshenglong@huawei.com>
-	<acca5b80-f527-bc39-0b63-147e53affb4b@redhat.com>
+In-Reply-To: <20180522175629.24932-1-richard.henderson@linaro.org>
+References: <20180522175629.24932-1-richard.henderson@linaro.org>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 24 May 2018 14:14:18 +0100
-Message-ID: <CAFEAcA-xbHtxora5TU9psYnBgP0+N8_nznhVppEkg7fmmwip3w@mail.gmail.com>
+Date: Thu, 24 May 2018 14:21:16 +0100
+Message-ID: <CAFEAcA_-tuEXm0gGNkzs0xb2Rm90Nm_t2i3pYJRULay08h_FLg@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH V3 2/2] arm_gicv3_kvm: kvm_dist_get/put:
- skip the registers banked by GICR
+Subject: Re: [Qemu-devel] [PATCH] tcg: Fix helper function vs host abi for
+ float16
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,27 +29,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Auger Eric <eric.auger@redhat.com>
-Cc: Shannon Zhao <zhaoshenglong@huawei.com>, qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, Shannon Zhao <shannon.zhaosl@gmail.com>
+To: Richard Henderson <richard.henderson@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>
 
-On 24 May 2018 at 10:04, Auger Eric <eric.auger@redhat.com> wrote:
-> Now I am unclear about the semantics of the s->gicd_ipriority & friends.
-> With that change, is it supposed to contain only the states of SPIs or
-> contain the RAZ states of PPI/SGIs + states of SPIs. The array is
-> dimensionned to contain states for PPI/SGI+SPIs, right? In other words,
-> shouldn't we also shift field?
+On 22 May 2018 at 18:56, Richard Henderson <richard.henderson@linaro.org> wrote:
+> Depending on the host abi, float16, aka uint16_t, values are
+> passed and returned either zero-extended in the host register
+> or with garbage at the top of the host register.
+>
+> The tcg code generator has so far been assuming garbage, as that
+> matches the x86 abi, but this is incorrect for other host abis.
+> Further, target/arm has so far been assuming zero-extended results,
+> so that it may store the 16-bit value into a 32-bit slot with the
+> high 16-bits already clear.
+>
+> Rectify both problems by mapping "f16" in the helper definition
+> to uint32_t instead of (a typedef for) uint16_t.  This forces
+> the host compiler to assume garbage in the upper 16 bits on input
+> and to zero-extend the result on output.
+>
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 
-The semantics of the gicd_ipriority and other data structures are
-set by the TCG GIC implementation, and include blank space at
-the start where the PPI/SGI bits would live. See this comment
-from arm_gicv3_common.h:
-
- * Each bitmap contains a bit for each interrupt. Although there is
- * space for the PPIs and SGIs, those bits (the first 32) are never
- * used as that state lives in the redistributor. The unused bits are
- * provided purely so that interrupt X's state is always in bit X; this
- * avoids bugs where we forget to subtract GIC_INTERNAL from an
- * interrupt number.
+Applied to target-arm.next, thanks. Is it worth marking this as
+cc:stable?
 
 thanks
 -- PMM
