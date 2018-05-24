@@ -1,24 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33510)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33536)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fLsz6-0004Vu-HH
-	for qemu-devel@nongnu.org; Thu, 24 May 2018 12:21:01 -0400
+	(envelope-from <clg@kaod.org>) id 1fLszE-0004cm-7P
+	for qemu-devel@nongnu.org; Thu, 24 May 2018 12:21:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fLsz5-0008A5-Gb
-	for qemu-devel@nongnu.org; Thu, 24 May 2018 12:21:00 -0400
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20180524053958.5554-1-mark.cave-ayland@ilande.co.uk>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <0d9436e3-9514-8d78-9c39-7d7da75ea8e8@amsat.org>
-Date: Thu, 24 May 2018 13:20:44 -0300
+	(envelope-from <clg@kaod.org>) id 1fLsz9-0008CJ-3D
+	for qemu-devel@nongnu.org; Thu, 24 May 2018 12:21:08 -0400
+Received: from 6.mo173.mail-out.ovh.net ([46.105.43.93]:37824)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1fLsz8-00087f-Na
+	for qemu-devel@nongnu.org; Thu, 24 May 2018 12:21:03 -0400
+Received: from player168.ha.ovh.net (unknown [10.109.120.85])
+	by mo173.mail-out.ovh.net (Postfix) with ESMTP id CC796BF4A6
+	for <qemu-devel@nongnu.org>; Thu, 24 May 2018 18:20:53 +0200 (CEST)
+References: <20180517131814.26679-1-clg@kaod.org>
+	<20180518110041.71464bf3@bahia.lan>
+	<f03083c9-d17b-1d32-ef3a-2d4df1dddfb4@kaod.org>
+	<20180523160416.4ca6fff1@bahia.lan>
+From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Message-ID: <e069e32a-328e-d7af-9e48-2517c70cb5d1@kaod.org>
+Date: Thu, 24 May 2018 18:20:45 +0200
 MIME-Version: 1.0
-In-Reply-To: <20180524053958.5554-1-mark.cave-ayland@ilande.co.uk>
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature";
-	boundary="VUMm4I5lFivifHcKgPF0DN1avdjuLnq13"
-Subject: Re: [Qemu-devel] [PATCH] prep: fix keyboard for the 40p machine
+In-Reply-To: <20180523160416.4ca6fff1@bahia.lan>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] pnv: add a physical mapping array
+ describing MMIO ranges in each chip
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,88 +34,447 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, hpoussin@reactos.org, david@gibson.dropbear.id.au
+To: Greg Kurz <groug@kaod.org>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, David Gibson <david@gibson.dropbear.id.au>, Thomas Huth <thuth@redhat.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---VUMm4I5lFivifHcKgPF0DN1avdjuLnq13
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-devel@nongnu.org,
- qemu-ppc@nongnu.org, hpoussin@reactos.org, david@gibson.dropbear.id.au
-Message-ID: <0d9436e3-9514-8d78-9c39-7d7da75ea8e8@amsat.org>
-Subject: Re: [Qemu-devel] [PATCH] prep: fix keyboard for the 40p machine
-References: <20180524053958.5554-1-mark.cave-ayland@ilande.co.uk>
-In-Reply-To: <20180524053958.5554-1-mark.cave-ayland@ilande.co.uk>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-On 05/24/2018 02:39 AM, Mark Cave-Ayland wrote:
-> Commit 72d3d8f052 "hw/isa/superio: Add a keyboard/mouse controller (804=
-2)"
-> added an 8042 keyboard device to the PC87312 superio device to replace =
-that
-> being used by the prep machine.
+On 05/23/2018 04:04 PM, Greg Kurz wrote:
+> On Wed, 23 May 2018 14:37:30 +0200
+> C=C3=A9dric Le Goater <clg@kaod.org> wrote:
 >=20
-> Unfortunately this commit didn't do the same for the 40p machine which =
-broke
-> the keyboard by registering two 8042 keyboard devices at the same addre=
-ss.
-
-Oops sorry... I have this fixed in the following up series after SuperIO
-cleanup, which is SouthBridge cleanup, involving a good rework of the
-PIIX and I82378 chipsets, using Herv=C3=A9 Poussineau patches.
-But I have 2 more prioritary series to finish before returning to this
-one :/
-
-> Resolve this by similarly removing the 8042 keyboard from the 40p machi=
-ne as
-> done for the prep machine in commit 72d3d8f052.
+>> On 05/18/2018 11:00 AM, Greg Kurz wrote:
+>>> On Thu, 17 May 2018 15:18:14 +0200
+>>> C=C3=A9dric Le Goater <clg@kaod.org> wrote:
+>>>  =20
+>>>> Based on previous work done in skiboot, the physical mapping array
+>>>> helps in calculating the MMIO ranges of each controller depending on
+>>>> the chip id and the chip type. This is will be particularly useful f=
+or
+>>>> the P9 models which use less the XSCOM bus and rely more on MMIOs.
+>>>>
+>>>> A link on the chip is now necessary to calculate MMIO BARs and
+>>>> sizes. This is why such a link is introduced in the PSIHB model.
+>>>>
+>>>> Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
+>>>> ---
+>>>>  hw/ppc/pnv.c         | 32 +++++++++++++++++++++--------
+>>>>  hw/ppc/pnv_psi.c     | 11 +++++++++-
+>>>>  hw/ppc/pnv_xscom.c   |  8 ++++----
+>>>>  include/hw/ppc/pnv.h | 58 +++++++++++++++++++++++++++++++++++++----=
+-----------
+>>>>  4 files changed, 80 insertions(+), 29 deletions(-)
+>>>>
+>>>> diff --git a/hw/ppc/pnv.c b/hw/ppc/pnv.c
+>>>> index 031488131629..330bf6f74810 100644
+>>>> --- a/hw/ppc/pnv.c
+>>>> +++ b/hw/ppc/pnv.c
+>>>> @@ -712,6 +712,16 @@ static uint32_t pnv_chip_core_pir_p9(PnvChip *c=
+hip, uint32_t core_id)
+>>>>   */
+>>>>  #define POWER9_CORE_MASK   (0xffffffffffffffull)
+>>>> =20
+>>>> +/*
+>>>> + * POWER8 MMIOs
+>>>> + */
+>>>> +static const PnvPhysMapEntry pnv_chip_power8_phys_map[] =3D {
+>>>> +    [PNV_MAP_XSCOM]     =3D { 0x0003fc0000000000ull, 0x000000080000=
+0000ull },
+>>>> +    [PNV_MAP_ICP]       =3D { 0x0003ffff80000000ull, 0x000000000010=
+0000ull },
+>>>> +    [PNV_MAP_PSIHB]     =3D { 0x0003fffe80000000ull, 0x000000000010=
+0000ull },
+>>>> +    [PNV_MAP_PSIHB_FSP] =3D { 0x0003ffe000000000ull, 0x000000010000=
+0000ull },
+>>>> +};
+>>>> +
+>>>>  static void pnv_chip_power8e_class_init(ObjectClass *klass, void *d=
+ata)
+>>>>  {
+>>>>      DeviceClass *dc =3D DEVICE_CLASS(klass);
+>>>> @@ -721,7 +731,7 @@ static void pnv_chip_power8e_class_init(ObjectCl=
+ass *klass, void *data)
+>>>>      k->chip_cfam_id =3D 0x221ef04980000000ull;  /* P8 Murano DD2.1 =
+*/
+>>>>      k->cores_mask =3D POWER8E_CORE_MASK;
+>>>>      k->core_pir =3D pnv_chip_core_pir_p8;
+>>>> -    k->xscom_base =3D 0x003fc0000000000ull;
+>>>> +    k->phys_map =3D pnv_chip_power8_phys_map;
+>>>>      dc->desc =3D "PowerNV Chip POWER8E";
+>>>>  }
+>>>> =20
+>>>> @@ -734,7 +744,7 @@ static void pnv_chip_power8_class_init(ObjectCla=
+ss *klass, void *data)
+>>>>      k->chip_cfam_id =3D 0x220ea04980000000ull; /* P8 Venice DD2.0 *=
+/
+>>>>      k->cores_mask =3D POWER8_CORE_MASK;
+>>>>      k->core_pir =3D pnv_chip_core_pir_p8;
+>>>> -    k->xscom_base =3D 0x003fc0000000000ull;
+>>>> +    k->phys_map =3D pnv_chip_power8_phys_map;
+>>>>      dc->desc =3D "PowerNV Chip POWER8";
+>>>>  }
+>>>> =20
+>>>> @@ -747,10 +757,17 @@ static void pnv_chip_power8nvl_class_init(Obje=
+ctClass *klass, void *data)
+>>>>      k->chip_cfam_id =3D 0x120d304980000000ull;  /* P8 Naples DD1.0 =
+*/
+>>>>      k->cores_mask =3D POWER8_CORE_MASK;
+>>>>      k->core_pir =3D pnv_chip_core_pir_p8;
+>>>> -    k->xscom_base =3D 0x003fc0000000000ull;
+>>>> +    k->phys_map =3D pnv_chip_power8_phys_map;
+>>>>      dc->desc =3D "PowerNV Chip POWER8NVL";
+>>>>  }
+>>>> =20
+>>>> +/*
+>>>> + * POWER9 MMIOs
+>>>> + */
+>>>> +static const PnvPhysMapEntry pnv_chip_power9_phys_map[] =3D {
+>>>> +    [PNV_MAP_XSCOM]     =3D { 0x000603fc00000000ull, 0x000004000000=
+0000ull },
+>>>> +};
+>>>> +
+>>>>  static void pnv_chip_power9_class_init(ObjectClass *klass, void *da=
+ta)
+>>>>  {
+>>>>      DeviceClass *dc =3D DEVICE_CLASS(klass);
+>>>> @@ -760,7 +777,7 @@ static void pnv_chip_power9_class_init(ObjectCla=
+ss *klass, void *data)
+>>>>      k->chip_cfam_id =3D 0x220d104900008000ull; /* P9 Nimbus DD2.0 *=
+/
+>>>>      k->cores_mask =3D POWER9_CORE_MASK;
+>>>>      k->core_pir =3D pnv_chip_core_pir_p9;
+>>>> -    k->xscom_base =3D 0x00603fc00000000ull;
+>>>> +    k->phys_map =3D pnv_chip_power9_phys_map;
+>>>>      dc->desc =3D "PowerNV Chip POWER9";
+>>>>  }
+>>>> =20
+>>>> @@ -797,15 +814,14 @@ static void pnv_chip_core_sanitize(PnvChip *ch=
+ip, Error **errp)
+>>>>  static void pnv_chip_init(Object *obj)
+>>>>  {
+>>>>      PnvChip *chip =3D PNV_CHIP(obj);
+>>>> -    PnvChipClass *pcc =3D PNV_CHIP_GET_CLASS(chip);
+>>>> -
+>>>> -    chip->xscom_base =3D pcc->xscom_base;
+>>>> =20
+>>>>      object_initialize(&chip->lpc, sizeof(chip->lpc), TYPE_PNV_LPC);
+>>>>      object_property_add_child(obj, "lpc", OBJECT(&chip->lpc), NULL)=
+;
+>>>> =20
+>>>>      object_initialize(&chip->psi, sizeof(chip->psi), TYPE_PNV_PSI);
+>>>>      object_property_add_child(obj, "psi", OBJECT(&chip->psi), NULL)=
+;
+>>>> +    object_property_add_const_link(OBJECT(&chip->psi), "chip", obj,
+>>>> +                                   &error_abort);
+>>>>      object_property_add_const_link(OBJECT(&chip->psi), "xics",
+>>>>                                     OBJECT(qdev_get_machine()), &err=
+or_abort);
+>>>> =20
+>>>> @@ -829,7 +845,7 @@ static void pnv_chip_icp_realize(PnvChip *chip, =
+Error **errp)
+>>>>      XICSFabric *xi =3D XICS_FABRIC(qdev_get_machine());
+>>>> =20
+>>>>      name =3D g_strdup_printf("icp-%x", chip->chip_id);
+>>>> -    memory_region_init(&chip->icp_mmio, OBJECT(chip), name, PNV_ICP=
+_SIZE);
+>>>> +    memory_region_init(&chip->icp_mmio, OBJECT(chip), name, PNV_ICP=
+_SIZE(chip));
+>>>>      sysbus_init_mmio(SYS_BUS_DEVICE(chip), &chip->icp_mmio);
+>>>>      g_free(name);
+>>>> =20
+>>>> diff --git a/hw/ppc/pnv_psi.c b/hw/ppc/pnv_psi.c
+>>>> index 5b969127c303..dd7707b971c9 100644
+>>>> --- a/hw/ppc/pnv_psi.c
+>>>> +++ b/hw/ppc/pnv_psi.c
+>>>> @@ -465,6 +465,15 @@ static void pnv_psi_realize(DeviceState *dev, E=
+rror **errp)
+>>>>      Object *obj;
+>>>>      Error *err =3D NULL;
+>>>>      unsigned int i;
+>>>> +    PnvChip *chip;
+>>>> +
+>>>> +    obj =3D object_property_get_link(OBJECT(dev), "chip", &err);
+>>>> +    if (!obj) {
+>>>> +        error_setg(errp, "%s: required link 'chip' not found: %s",
+>>>> +                   __func__, error_get_pretty(err));
+>>>> +        return; =20
+>>>
+>>> err was dynamically allocated and must be freed with error_free(). =20
+>>
+>> ok. There are quite a few places not doing it right then.=20
+>>
 >=20
-> Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-
-Thanks for fixing this (too bad there are no keyboard qtests and this
-got unnoticed).
-
-> ---
->  hw/ppc/prep.c | 1 -
->  1 file changed, 1 deletion(-)
+> Yeah, error_get_pretty users are the usual suspects here.
 >=20
-> diff --git a/hw/ppc/prep.c b/hw/ppc/prep.c
-> index a1e7219db6..be4db6a687 100644
-> --- a/hw/ppc/prep.c
-> +++ b/hw/ppc/prep.c
-> @@ -770,7 +770,6 @@ static void ibm_40p_init(MachineState *machine)
-> =20
->      /* add some more devices */
->      if (defaults_enabled()) {
-> -        isa_create_simple(isa_bus, TYPE_I8042);
->          m48t59 =3D NVRAM(isa_create_simple(isa_bus, "isa-m48t59"));
-> =20
->          dev =3D DEVICE(isa_create(isa_bus, "cs4231a"));
+>>> This being said, the link is supposed to have been set in pnv_chip_in=
+it()
+>>> already, so if we can't get it here, it's likely a bug in QEMU. I'd r=
+ather
+>>> pass &error_abort. =20
+>>
+>> The followed pattern in pnv is most of the time :
+>>
+>>     object_property_add_const_link(OBJECT(&chip->bar), "foo", obj,
+>>                                    &error_abort);
+>>
+>> and in the realize function :=20
+>>
+>>     Error *local_err =3D NULL;
+>>   =20
+>>     obj =3D object_property_get_link(OBJECT(dev), "foo", &local_err);
+>>     if (!obj) {
+>>         error_setg(errp, "%s: required link 'foo' not found: %s",
+>>                    __func__, error_get_pretty(local_err));
+>>         return;
+>>     }
+>>
+>> but you propose that we should rather simply do :
+>>  =20
+>>     obj =3D object_property_get_link(OBJECT(dev), "foo", &error_abort)=
+;
+>>
+>> Correct ?=20
+>> =20
 >=20
+> Yes, but this is questionable :)
+>=20
+> The realize function has an Error ** arg, ie, it is expected to propaga=
+te
+> errors and let the caller decide... so it is a matter of taste here.
+>=20
+> Another option to using error_get_pretty() is to use error_propagate() =
+and
+> error_prepend(), as suggested in include/qapi/error.h .
+>=20
+> See commit a1a6bbde4f6a29368f8f605cea2e73630ec1bc7c for an example.
+>=20
+>>>> +    }
+>>>> +    chip =3D PNV_CHIP(obj);
+>>>> =20
+>>>>      obj =3D object_property_get_link(OBJECT(dev), "xics", &err);
+>>>>      if (!obj) {
+>>>> @@ -497,7 +506,7 @@ static void pnv_psi_realize(DeviceState *dev, Er=
+ror **errp)
+>>>> =20
+>>>>      /* Initialize MMIO region */
+>>>>      memory_region_init_io(&psi->regs_mr, OBJECT(dev), &psi_mmio_ops=
+, psi,
+>>>> -                          "psihb", PNV_PSIHB_SIZE);
+>>>> +                          "psihb", PNV_PSIHB_SIZE(chip));
+>>>> =20
+>>>>      /* Default BAR for MMIO region */
+>>>>      pnv_psi_set_bar(psi, psi->bar | PSIHB_BAR_EN);
+>>>> diff --git a/hw/ppc/pnv_xscom.c b/hw/ppc/pnv_xscom.c
+>>>> index 46fae41f32b0..20ffc233174c 100644
+>>>> --- a/hw/ppc/pnv_xscom.c
+>>>> +++ b/hw/ppc/pnv_xscom.c
+>>>> @@ -50,7 +50,7 @@ static void xscom_complete(CPUState *cs, uint64_t =
+hmer_bits)
+>>>> =20
+>>>>  static uint32_t pnv_xscom_pcba(PnvChip *chip, uint64_t addr)
+>>>>  {
+>>>> -    addr &=3D (PNV_XSCOM_SIZE - 1);
+>>>> +    addr &=3D (PNV_XSCOM_SIZE(chip) - 1);
+>>>> =20
+>>>>      if (pnv_chip_is_power9(chip)) {
+>>>>          return addr >> 3;
+>>>> @@ -179,10 +179,10 @@ void pnv_xscom_realize(PnvChip *chip, Error **=
+errp)
+>>>> =20
+>>>>      name =3D g_strdup_printf("xscom-%x", chip->chip_id);
+>>>>      memory_region_init_io(&chip->xscom_mmio, OBJECT(chip), &pnv_xsc=
+om_ops,
+>>>> -                          chip, name, PNV_XSCOM_SIZE);
+>>>> +                          chip, name, PNV_XSCOM_SIZE(chip));
+>>>>      sysbus_init_mmio(sbd, &chip->xscom_mmio);
+>>>> =20
+>>>> -    memory_region_init(&chip->xscom, OBJECT(chip), name, PNV_XSCOM_=
+SIZE);
+>>>> +    memory_region_init(&chip->xscom, OBJECT(chip), name, PNV_XSCOM_=
+SIZE(chip));
+>>>>      address_space_init(&chip->xscom_as, &chip->xscom, name);
+>>>>      g_free(name);
+>>>>  }
+>>>> @@ -225,7 +225,7 @@ static const char compat_p9[] =3D "ibm,power9-xs=
+com\0ibm,xscom";
+>>>>  int pnv_dt_xscom(PnvChip *chip, void *fdt, int root_offset)
+>>>>  {
+>>>>      uint64_t reg[] =3D { cpu_to_be64(PNV_XSCOM_BASE(chip)),
+>>>> -                       cpu_to_be64(PNV_XSCOM_SIZE) };
+>>>> +                       cpu_to_be64(PNV_XSCOM_SIZE(chip)) };
+>>>>      int xscom_offset;
+>>>>      ForeachPopulateArgs args;
+>>>>      char *name;
+>>>> diff --git a/include/hw/ppc/pnv.h b/include/hw/ppc/pnv.h
+>>>> index 90759240a7b1..b810e7b84ec0 100644
+>>>> --- a/include/hw/ppc/pnv.h
+>>>> +++ b/include/hw/ppc/pnv.h
+>>>> @@ -53,7 +53,6 @@ typedef struct PnvChip {
+>>>>      uint64_t     cores_mask;
+>>>>      void         *cores;
+>>>> =20
+>>>> -    hwaddr       xscom_base;
+>>>>      MemoryRegion xscom_mmio;
+>>>>      MemoryRegion xscom;
+>>>>      AddressSpace xscom_as;
+>>>> @@ -64,6 +63,19 @@ typedef struct PnvChip {
+>>>>      PnvOCC       occ;
+>>>>  } PnvChip;
+>>>> =20
+>>>> +typedef enum PnvPhysMapType {
+>>>> +    PNV_MAP_XSCOM,
+>>>> +    PNV_MAP_ICP,
+>>>> +    PNV_MAP_PSIHB,
+>>>> +    PNV_MAP_PSIHB_FSP,
+>>>> +    PNV_MAP_MAX,
+>>>> +} PnvPhysMapType;
+>>>> +
+>>>> +typedef struct PnvPhysMapEntry {
+>>>> +    uint64_t        base;
+>>>> +    uint64_t        size;
+>>>> +} PnvPhysMapEntry;
+>>>> +
+>>>>  typedef struct PnvChipClass {
+>>>>      /*< private >*/
+>>>>      SysBusDeviceClass parent_class;
+>>>> @@ -73,7 +85,7 @@ typedef struct PnvChipClass {
+>>>>      uint64_t     chip_cfam_id;
+>>>>      uint64_t     cores_mask;
+>>>> =20
+>>>> -    hwaddr       xscom_base;
+>>>> +    const PnvPhysMapEntry *phys_map;
+>>>> =20
+>>>>      uint32_t (*core_pir)(PnvChip *chip, uint32_t core_id);
+>>>>  } PnvChipClass;
+>>>> @@ -159,9 +171,28 @@ void pnv_bmc_powerdown(IPMIBmc *bmc);
+>>>>  /*
+>>>>   * POWER8 MMIO base addresses
+>>>>   */
+>>>> -#define PNV_XSCOM_SIZE        0x800000000ull
+>>>> -#define PNV_XSCOM_BASE(chip)                                       =
+     \
+>>>> -    (chip->xscom_base + ((uint64_t)(chip)->chip_id) * PNV_XSCOM_SIZ=
+E)
+>>>> +static inline uint64_t pnv_map_size(const PnvChip *chip, PnvPhysMap=
+Type type)
+>>>> +{
+>>>> +    PnvChipClass *pcc =3D PNV_CHIP_GET_CLASS(chip);
+>>>> +    const PnvPhysMapEntry *map =3D &pcc->phys_map[type];
+>>>> +
+>>>> +    return map->size;
+>>>> +}
+>>>> +
+>>>> +static inline uint64_t pnv_map_base(const PnvChip *chip, PnvPhysMap=
+Type type)
+>>>> +{
+>>>> +    PnvChipClass *pcc =3D PNV_CHIP_GET_CLASS(chip);
+>>>> +    const PnvPhysMapEntry *map =3D &pcc->phys_map[type];
+>>>> +
+>>>> +    if (pnv_chip_is_power9(chip)) {
+>>>> +        return map->base + ((uint64_t) chip->chip_id << 42); =20
+>>>
+>>> So this patch also changes the way the base address is computed
+>>> with POWER9. Shouldn't this go to a separate patch or at least
+>>> mention the functional change in the changelog ? =20
+>>
+>> P9 is not really supported, multi P9 chips even less. But yes, I can
+>> mention that the P9 MMIO base address is being fixed.=20
+>> =20
+>>> Also, shouldn't this be a PnvChipClass level function rather than
+>>> doing a runtime check ? =20
+>>
+>> Hmm. pnv_map_base() needs the 'chip_id' to calculate the base
+>> address which is not a class level attribute. The P9 check only=20
+>> needs the chip class but it is more convenient to use a PnvChip.=20
+>> Only class_init routines use class variables.=20
+>=20
+> Not sure to understand... My suggestion was just to add a new function
+> attribute to PnvChipClass:
+>=20
+>     uint64_t (*map_base)(const PnvChip *chip, PnvPhysMapType type);
+>=20
+> And have two separate implementations for P8 and P9:
+>=20
+> static uint64_t pnv_chip_map_base_p8(const PnvChip *chip,
+>                                      const PnvPhysMapEntry *map)
+> {
+>     return map->base + chip->chip_id * map->size;
+> }
+>=20
+> static uint64_t pnv_chip_map_base_p9(const PnvChip *chip,
+>                                      const PnvPhysMapEntry *map)
+> {
+>     return map->base + ((uint64_t) chip->chip_id << 42);
+> }
+>=20
+> And pnv_map_base() would be:
+>=20
+> static inline uint64_t pnv_map_base(const PnvChip *chip, PnvPhysMapType=
+ type)
+> {
+>     PnvChipClass *pcc =3D PNV_CHIP_GET_CLASS(chip);
+>=20
+>     return pcc->map_base(chip, &pcc->phys_map[type]);
+> }
+
+ok. yes, that's a nice proposition.=20
+
+Thanks,
+
+C.
 
 
---VUMm4I5lFivifHcKgPF0DN1avdjuLnq13
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCgAdFiEE+qvnXhKRciHc/Wuy4+MsLN6twN4FAlsG5lwACgkQ4+MsLN6t
-wN4VohAAvSLry+Z972otHYNok7at1Z8puo5loHFqsR7CD1ird9O4hJZjShfJ83kf
-BG0N9to+UzfeUgOBieAcd/qSqJb5HsEqL4Z1jIjr92NZNzgrEZdjMQByms9343T9
-dZVKQDMsWELjywFhq4fpu3kYRkXS0FmSkFXDYze1Q8C0Dd5MQSBHiVE5/mdef8Fi
-q3EtJxg0eUbOR+D00kFk/2ESko2x+Pk/ffcVLZN1hY30bdY6topANwIkolCXnDrh
-NEOOSgVcpaCWi5Pmf638xPi0N1rzYUxW/Ehqy1jVK8ttPbdUBIeXgTQciCDvCnD1
-91Saz03thqVncdMt09zNODR2ElcKS2DrrDWVfyzp8QvNs+dSFuLDu151T24RqlNX
-HeBtIbLIwuy6je5vuIxQsFZ0khW1G6us/WBoscPafU4zlLb9Gw/YdzvMsn5D0jWM
-CABUzqkJ3wvBFiBtEa5HQyKNM3xnh+2l/DrvBfFn+zz/mZ7x00BrRFc7pYMcfnN3
-jYx96PpZCcF4L6HrXfLeVCQKDYD2gnuj10CiTNr30LVaAxrqvEMFvI6zLgu6rPe9
-tqBx9CqOAN48Hh1IHzrZeJXA+G+XzSZQK/OzscWPt5rsxNFkQIbLlHzkWlMeTxAI
-DAOkkF95Uhrngbsizfi9weL3G2gfdlm0lN0wd2IAnfftnbZuxCY=
-=6v/8
------END PGP SIGNATURE-----
-
---VUMm4I5lFivifHcKgPF0DN1avdjuLnq13--
+>=20
+>>> The rest of the patch looks good. =20
+>>
+>> Thanks,
+>>
+>> C.=20
+>> =20
+>>>> +    } else  {
+>>>> +        return map->base + chip->chip_id * map->size;
+>>>> +    }
+>>>> +}
+>>>> +
+>>>> +#define PNV_XSCOM_SIZE(chip)         pnv_map_size(chip, PNV_MAP_XSC=
+OM)
+>>>> +#define PNV_XSCOM_BASE(chip)         pnv_map_base(chip, PNV_MAP_XSC=
+OM)
+>>>> =20
+>>>>  /*
+>>>>   * XSCOM 0x20109CA defines the ICP BAR:
+>>>> @@ -177,18 +208,13 @@ void pnv_bmc_powerdown(IPMIBmc *bmc);
+>>>>   *      0xffffe02200000000 -> 0x0003ffff80800000
+>>>>   *      0xffffe02600000000 -> 0x0003ffff80900000
+>>>>   */
+>>>> -#define PNV_ICP_SIZE         0x0000000000100000ull
+>>>> -#define PNV_ICP_BASE(chip)                                         =
+     \
+>>>> -    (0x0003ffff80000000ull + (uint64_t) PNV_CHIP_INDEX(chip) * PNV_=
+ICP_SIZE)
+>>>> -
+>>>> +#define PNV_ICP_SIZE(chip)           pnv_map_size(chip, PNV_MAP_ICP=
+)
+>>>> +#define PNV_ICP_BASE(chip)           pnv_map_base(chip, PNV_MAP_ICP=
+)
+>>>> =20
+>>>> -#define PNV_PSIHB_SIZE       0x0000000000100000ull
+>>>> -#define PNV_PSIHB_BASE(chip) \
+>>>> -    (0x0003fffe80000000ull + (uint64_t)PNV_CHIP_INDEX(chip) * PNV_P=
+SIHB_SIZE)
+>>>> +#define PNV_PSIHB_SIZE(chip)         pnv_map_size(chip, PNV_MAP_PSI=
+HB)
+>>>> +#define PNV_PSIHB_BASE(chip)         pnv_map_base(chip, PNV_MAP_PSI=
+HB)
+>>>> =20
+>>>> -#define PNV_PSIHB_FSP_SIZE   0x0000000100000000ull
+>>>> -#define PNV_PSIHB_FSP_BASE(chip) \
+>>>> -    (0x0003ffe000000000ull + (uint64_t)PNV_CHIP_INDEX(chip) * \
+>>>> -     PNV_PSIHB_FSP_SIZE)
+>>>> +#define PNV_PSIHB_FSP_SIZE(chip)     pnv_map_size(chip, PNV_MAP_PSI=
+HB_FSP)
+>>>> +#define PNV_PSIHB_FSP_BASE(chip)     pnv_map_base(chip, PNV_MAP_PSI=
+HB_FSP)
+>>>> =20
+>>>>  #endif /* _PPC_PNV_H */ =20
+>>>  =20
+>>
+>=20
