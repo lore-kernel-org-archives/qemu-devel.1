@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45080)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46576)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1fLtZV-0002Im-Je
-	for qemu-devel@nongnu.org; Thu, 24 May 2018 12:58:38 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1fLtec-0004Tr-2x
+	for qemu-devel@nongnu.org; Thu, 24 May 2018 13:03:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1fLtZU-0005CF-Pm
-	for qemu-devel@nongnu.org; Thu, 24 May 2018 12:58:37 -0400
-References: <1527091418-11874-1-git-send-email-eric.auger@redhat.com>
-	<ec6bc0b3-5f0b-bf0c-7d9b-0382e114ee9e@redhat.com>
-	<bf99311a-823d-34e8-1892-be27534afc32@redhat.com>
-	<22c4e504-a7b4-e6dd-b2cc-618d306b6f0c@redhat.com>
-	<CAFEAcA9LMV_-vVAwUkuY=uw2Gf6XLvsgmi8y0PgHPJnQZkWC0w@mail.gmail.com>
-	<550464ac-5155-6311-d0f7-92c7c0813f82@redhat.com>
-	<CAFEAcA-hobu_=VKhYQ+UZ1WX_JFfwCarkPKQhiBtXc3fre57rg@mail.gmail.com>
-	<ee204f5f-600f-2425-a1ff-0418b4611e96@redhat.com>
-	<a8485329-0986-c99b-ad64-ec5af0a987b8@redhat.com>
-From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <694034a3-9d4c-3e7e-759d-6fd8f8cfd9c8@redhat.com>
-Date: Thu, 24 May 2018 18:58:22 +0200
+	(envelope-from <peter.maydell@linaro.org>) id 1fLteb-00013C-7P
+	for qemu-devel@nongnu.org; Thu, 24 May 2018 13:03:54 -0400
+Received: from mail-ot0-x244.google.com ([2607:f8b0:4003:c0f::244]:39541)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1fLtea-00012p-VC
+	for qemu-devel@nongnu.org; Thu, 24 May 2018 13:03:53 -0400
+Received: by mail-ot0-x244.google.com with SMTP id l12-v6so2793999oth.6
+	for <qemu-devel@nongnu.org>; Thu, 24 May 2018 10:03:52 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <a8485329-0986-c99b-ad64-ec5af0a987b8@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC 0/2] ARM virt: Support up to 256 PCIe buses
+In-Reply-To: <0774094d-d3e1-5983-ccb8-3d3412bf44fc@redhat.com>
+References: <20180521140402.23318-1-peter.maydell@linaro.org>
+	<20180521140402.23318-16-peter.maydell@linaro.org>
+	<0774094d-d3e1-5983-ccb8-3d3412bf44fc@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 24 May 2018 18:03:31 +0100
+Message-ID: <CAFEAcA95XD7_4q0p0Q6aPCxHHxHoRrVaKc+Nq+niZp-4PV8JLw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH 15/27] iommu: Add IOMMU index argument to
+ notifier APIs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,39 +31,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Auger Eric <eric.auger@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
-Cc: Wei Huang <wei@redhat.com>, Andrew Jones <drjones@redhat.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Shannon Zhao <zhaoshenglong@huawei.com>, Eric Auger <eric.auger.pro@gmail.com>
+To: Auger Eric <eric.auger@redhat.com>
+Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>, "patches@linaro.org" <patches@linaro.org>
 
-On 05/24/18 16:09, Auger Eric wrote:
-> Hi Laszlo,
-> 
-> On 05/24/2018 03:59 PM, Laszlo Ersek wrote:
->> On 05/24/18 15:07, Peter Maydell wrote:
->>> On 24 May 2018 at 13:59, Laszlo Ersek <lersek@redhat.com> wrote:
->>>> On 05/24/18 11:11, Peter Maydell wrote:
->>>>> Won't it also break a guest which is just Linux loaded not via
->>>>> firmware which is an aarch32 kernel without LPAE support?
->>>>
->>>> Does such a thing exist? (I honestly have no clue.)
->>>
->>> Yes, it does; LPAE isn't a mandatory kernel config option.
->>> This is why we have the machine 'highmem' option, so that
->>> we can run on those kernels by not putting anything above
->>> the 4G boundary. Looking back at the history on that, we
->>> opted at the time for "default to highmem on, and if you're
->>> running an non-lpae kernel you need to turn it off manually".
->>
->> Ah, OK, I didn't know that.
->>
->>> So we can handle those kernels by just not putting ECAM
->>> above 4G if highmem is false.
->>
->> The problem is we can have a combination of 32-bit UEFI firmware (which
->> certainly lacks LPAE) and a 32-bit kernel which supports LPAE.
-> 
-> Is it what happens with the FW you provided to me? There is no LPAE in it?
+On 24 May 2018 at 16:29, Auger Eric <eric.auger@redhat.com> wrote:
+> On 05/21/2018 04:03 PM, Peter Maydell wrote:
+>> diff --git a/include/exec/memory.h b/include/exec/memory.h
+>> index f6226fb263..4e6b125add 100644
+>> --- a/include/exec/memory.h
+>> +++ b/include/exec/memory.h
+>> @@ -71,6 +71,7 @@ struct IOMMUTLBEntry {
+>>      hwaddr           iova;
+>>      hwaddr           translated_addr;
+>>      hwaddr           addr_mask;  /* 0xfff = 4k translation */
+>> +    int              iommu_idx;
+> I don't get why ne need iommu_idx field here. On translate the caller
+> has it. On notify the notifier has it?
 
-That's the case, to my knowledge.
+I think this is an accidental leftover from some earlier draft;
+nothing in the patchset actually reads or writes this field, and
+it should be deleted.
 
-Thanks
-Laszlo
+>>      IOMMUAccessFlags perm;
+>>  };
+>>
+
+>> diff --git a/hw/vfio/common.c b/hw/vfio/common.c
+>> index 8e57265edf..fb396cf00a 100644
+>> --- a/hw/vfio/common.c
+>> +++ b/hw/vfio/common.c
+>> @@ -507,6 +507,7 @@ static void vfio_listener_region_add(MemoryListener *listener,
+>>      if (memory_region_is_iommu(section->mr)) {
+>>          VFIOGuestIOMMU *giommu;
+>>          IOMMUMemoryRegion *iommu_mr = IOMMU_MEMORY_REGION(section->mr);
+>> +        int iommu_idx;
+>>
+>>          trace_vfio_listener_region_add_iommu(iova, end);
+>>          /*
+>> @@ -523,10 +524,13 @@ static void vfio_listener_region_add(MemoryListener *listener,
+>>          llend = int128_add(int128_make64(section->offset_within_region),
+>>                             section->size);
+>>          llend = int128_sub(llend, int128_one());
+>> +        iommu_idx = memory_region_iommu_attrs_to_index(iommu_mr,
+>> +                                                       MEMTXATTRS_UNSPECIFIED);
+> In that case VFIO ideally wants to be notified for any guest update
+> (whatever the page set) to reprogram the physical IOMMU corresponding
+> entries and doesn't want to register a notifier per iommu_idx. Also it
+> does not know which ones are supported. Is there a corresponding
+> iommu_idx value? MEMTXATTRS_ANY?
+
+If VFIO is actually dealing with an IOMMU that needs to handle
+multiple possible transactions for different tx attributes, then
+it needs to know about all of them, because how it programs
+the physical IOMMU needs to be different for "map X to Y for
+Secure transactions" versus "map X to Y for NonSecure" (say).
+(This would require new kernel APIs, I assume.)
+
+If, as is currently the case, the VFIO infrastructure assumes that
+the IOMMU will always translate any transaction from a device
+identically regardless of its transaction attributes, then it
+should just use MEMTXATTRS_UNSPECIFIED, and trust that the
+emulated IOMMU will translate those correctly. (There might be
+scope for VFIO checking that the IOMMU really does, eg that
+it is only using one iommu index?)
+
+Basically, VFIO is shadowing the behaviour of the emulated
+IOMMU to reflect it into the kernel; if the IOMMU it's shadowing
+is complicated then VFIO is going to need to be similarly
+complicated, and "merge updates for different page tables
+down into one" is not going to be the right behaviour.
+
+thanks
+-- PMM
