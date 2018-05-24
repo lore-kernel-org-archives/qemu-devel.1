@@ -1,25 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50789)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50884)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1fLyC5-0003hF-22
-	for qemu-devel@nongnu.org; Thu, 24 May 2018 17:54:45 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fLyCf-0003wk-6U
+	for qemu-devel@nongnu.org; Thu, 24 May 2018 17:55:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1fLyC0-0002yE-78
-	for qemu-devel@nongnu.org; Thu, 24 May 2018 17:54:45 -0400
-Received: from mail-pl0-x232.google.com ([2607:f8b0:400e:c01::232]:40963)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1fLyC0-0002wa-0d
-	for qemu-devel@nongnu.org; Thu, 24 May 2018 17:54:40 -0400
-Received: by mail-pl0-x232.google.com with SMTP id az12-v6so1843016plb.8
-	for <qemu-devel@nongnu.org>; Thu, 24 May 2018 14:54:39 -0700 (PDT)
-Sender: Richard Henderson <rth7680@gmail.com>
-From: Richard Henderson <rth@twiddle.net>
-Message-ID: <78dbf5ad-a067-0e0e-a073-1b854109df7e@twiddle.net>
-Date: Thu, 24 May 2018 14:54:35 -0700
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fLyCa-0003Qp-7q
+	for qemu-devel@nongnu.org; Thu, 24 May 2018 17:55:21 -0400
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20180524213756.7528-1-pbonzini@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <b3d15f99-2e67-c0d4-7741-3af67d566734@amsat.org>
+Date: Thu, 24 May 2018 18:55:11 -0300
 MIME-Version: 1.0
+In-Reply-To: <20180524213756.7528-1-pbonzini@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] [RISC-V] Coverity 1390849, Logically dead code
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH] arm: fix malloc type mismatch
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,26 +27,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Michael Clark <mjc@sifive.com>, qemu-devel <qemu-devel@nongnu.org>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-arm@nongnu.org, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 
-In the latest Coverity scan, it reports
+Cc'ing qemu-devel for patchew and co
 
-405    if (csrno >= CSR_MHPMCOUNTER3 && csrno <= CSR_MHPMCOUNTER31) {
-406        return 0;
-407    }
-408#if defined(TARGET_RISCV32)
-409    if (csrno >= CSR_MHPMCOUNTER3 && csrno <= CSR_MHPMCOUNTER31) {
-   	
-CID 1390849 (#1 of 1): Logically dead code (DEADCODE)
-dead_error_line: Execution cannot reach this statement: return 0U;.
+On 05/24/2018 06:37 PM, Paolo Bonzini wrote:
+> cpregs_keys is an uint32_t* so the allocation should use uint32_t.
+> g_new is even better because it is type-safe.
+> 
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 
-410        return 0;
-411    }
-412#endif
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
-
-I believe the condition at op_helper.c:409 should be testing CSR_MHPMCOUNTER3H
-and CSR_MHPMCOUNTER31H.  Must run now, otherwise I'd also send the trivial patch.
-
-
-r~
+> ---
+>  target/arm/gdbstub.c | 3 +--
+>  1 file changed, 1 insertion(+), 2 deletions(-)
+> 
+> diff --git a/target/arm/gdbstub.c b/target/arm/gdbstub.c
+> index e80cfb47c7..0c64c0292e 100644
+> --- a/target/arm/gdbstub.c
+> +++ b/target/arm/gdbstub.c
+> @@ -157,8 +157,7 @@ int arm_gen_dynamic_xml(CPUState *cs)
+>      RegisterSysregXmlParam param = {cs, s};
+>  
+>      cpu->dyn_xml.num_cpregs = 0;
+> -    cpu->dyn_xml.cpregs_keys = g_malloc(sizeof(uint32_t *) *
+> -                                        g_hash_table_size(cpu->cp_regs));
+> +    cpu->dyn_xml.cpregs_keys = g_new(uint32_t, g_hash_table_size(cpu->cp_regs));
+>      g_string_printf(s, "<?xml version=\"1.0\"?>");
+>      g_string_append_printf(s, "<!DOCTYPE target SYSTEM \"gdb-target.dtd\">");
+>      g_string_append_printf(s, "<feature name=\"org.qemu.gdb.arm.sys.regs\">");
+> 
