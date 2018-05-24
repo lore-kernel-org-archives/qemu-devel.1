@@ -1,29 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44435)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47327)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <tiwei.bie@intel.com>) id 1fLnxs-0005IU-2T
-	for qemu-devel@nongnu.org; Thu, 24 May 2018 06:59:25 -0400
+	(envelope-from <armbru@redhat.com>) id 1fLoBo-0000Sz-Sb
+	for qemu-devel@nongnu.org; Thu, 24 May 2018 07:13:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <tiwei.bie@intel.com>) id 1fLnxo-0002bs-5L
-	for qemu-devel@nongnu.org; Thu, 24 May 2018 06:59:24 -0400
-Received: from mga14.intel.com ([192.55.52.115]:61084)
+	(envelope-from <armbru@redhat.com>) id 1fLoBl-0002o2-DO
+	for qemu-devel@nongnu.org; Thu, 24 May 2018 07:13:48 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:52692 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <tiwei.bie@intel.com>) id 1fLnxn-0002av-RK
-	for qemu-devel@nongnu.org; Thu, 24 May 2018 06:59:20 -0400
-Date: Thu, 24 May 2018 18:59:36 +0800
-From: Tiwei Bie <tiwei.bie@intel.com>
-Message-ID: <20180524105936.GA22101@debian>
-References: <20180412151232.17506-1-tiwei.bie@intel.com>
-	<20180412151232.17506-3-tiwei.bie@intel.com>
-	<20180523163116-mutt-send-email-mst@kernel.org>
-	<20180523183444-mutt-send-email-mst@kernel.org>
-	<20180523184001-mutt-send-email-mst@kernel.org>
-	<20180523232101.GB15604@debian> <20180524022440.GA20792@debian>
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fLoBl-0002ng-8F
+	for qemu-devel@nongnu.org; Thu, 24 May 2018 07:13:45 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.4])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id AD506818BAF4
+	for <qemu-devel@nongnu.org>; Thu, 24 May 2018 11:13:44 +0000 (UTC)
+From: Markus Armbruster <armbru@redhat.com>
+References: <20180412061108.10875-1-peterx@redhat.com>
+	<87sh6iixvp.fsf@dusky.pond.sub.org> <20180523090450.GC2540@xz-mi>
+	<87vabeecrg.fsf@dusky.pond.sub.org> <20180524042906.GE756@xz-mi>
+	<87bmd58ntz.fsf@dusky.pond.sub.org> <20180524084214.GD12122@xz-mi>
+Date: Thu, 24 May 2018 13:13:43 +0200
+In-Reply-To: <20180524084214.GD12122@xz-mi> (Peter Xu's message of "Thu, 24
+	May 2018 16:42:14 +0800")
+Message-ID: <87k1rt5ms8.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20180524022440.GA20792@debian>
-Subject: Re: [Qemu-devel] [PATCH v3 2/6] vhost-user: introduce shared
- vhost-user state
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v3] monitor: let cur_mon be per-thread
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,173 +35,140 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: jasowang@redhat.com, alex.williamson@redhat.com, pbonzini@redhat.com, stefanha@redhat.com, qemu-devel@nongnu.org, virtio-dev@lists.oasis-open.org, cunming.liang@intel.com, dan.daly@intel.com, jianfeng.tan@intel.com, zhihong.wang@intel.com, xiao.w.wang@intel.com
+To: Peter Xu <peterx@redhat.com>
+Cc: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org
 
-On Thu, May 24, 2018 at 10:24:40AM +0800, Tiwei Bie wrote:
-> On Thu, May 24, 2018 at 07:21:01AM +0800, Tiwei Bie wrote:
-> > On Wed, May 23, 2018 at 06:43:29PM +0300, Michael S. Tsirkin wrote:
-> > > On Wed, May 23, 2018 at 06:36:05PM +0300, Michael S. Tsirkin wrote:
-> > > > On Wed, May 23, 2018 at 04:44:51PM +0300, Michael S. Tsirkin wrote:
-> > > > > On Thu, Apr 12, 2018 at 11:12:28PM +0800, Tiwei Bie wrote:
-> > > > > > When multi queue is enabled e.g. for a virtio-net device,
-> > > > > > each queue pair will have a vhost_dev, and the only thing
-> > > > > > shared between vhost devs currently is the chardev. This
-> > > > > > patch introduces a vhost-user state structure which will
-> > > > > > be shared by all vhost devs of the same virtio device.
-> > > > > > 
-> > > > > > Signed-off-by: Tiwei Bie <tiwei.bie@intel.com>
-> > > > > 
-> > > > > Unfortunately this patch seems to cause crashes.
-> > > > > To reproduce, simply run
-> > > > > make check-qtest-x86_64
-> > > > > 
-> > > > > Sorry that it took me a while to find - it triggers 90% of runs but not
-> > > > > 100% which complicates bisection somewhat.
-> > 
-> > It's my fault to not notice this bug before.
-> > I'm very sorry. Thank you so much for finding
-> > the root cause!
-> > 
-> > > > > 
-> > > > > > ---
-> > > > > >  backends/cryptodev-vhost-user.c     | 20 ++++++++++++++++++-
-> > > > > >  hw/block/vhost-user-blk.c           | 22 +++++++++++++++++++-
-> > > > > >  hw/scsi/vhost-user-scsi.c           | 20 ++++++++++++++++++-
-> > > > > >  hw/virtio/Makefile.objs             |  2 +-
-> > > > > >  hw/virtio/vhost-stub.c              | 10 ++++++++++
-> > > > > >  hw/virtio/vhost-user.c              | 31 +++++++++++++++++++---------
-> > > > > >  include/hw/virtio/vhost-user-blk.h  |  2 ++
-> > > > > >  include/hw/virtio/vhost-user-scsi.h |  2 ++
-> > > > > >  include/hw/virtio/vhost-user.h      | 20 +++++++++++++++++++
-> > > > > >  net/vhost-user.c                    | 40 ++++++++++++++++++++++++++++++-------
-> > > > > >  10 files changed, 149 insertions(+), 20 deletions(-)
-> > > > > >  create mode 100644 include/hw/virtio/vhost-user.h
-> > [...]
-> > > > > >          qemu_chr_fe_set_handlers(&s->chr, NULL, NULL,
-> > > > > >                                   net_vhost_user_event, NULL, nc0->name, NULL,
-> > > > > > @@ -319,6 +336,15 @@ static int net_vhost_user_init(NetClientState *peer, const char *device,
-> > > > > >      assert(s->vhost_net);
-> > > > > >  
-> > > > > >      return 0;
-> > > > > > +
-> > > > > > +err:
-> > > > > > +    if (user) {
-> > > > > > +        vhost_user_cleanup(user);
-> > > > > > +        g_free(user);
-> > > > > > +        s->vhost_user = NULL;
-> > > > > > +    }
-> > > > > > +
-> > > > > > +    return -1;
-> > > > > >  }
-> > > > > >  
-> > > > > >  static Chardev *net_vhost_claim_chardev(
-> > > > > > -- 
-> > > > > > 2.11.0
-> > > > 
-> > > > So far I figured out that commenting the free of
-> > > > the structure removes the crash, so we seem to
-> > > > be dealing with a use-after free here.
-> > > > I suspect that in a MQ situation, one queue gets
-> > > > closed and attempts to free the structure
-> > > > while others still use it.
-> > > > 
-> > > > diff --git a/net/vhost-user.c b/net/vhost-user.c
-> > > > index 525a061..6a1573b 100644
-> > > > --- a/net/vhost-user.c
-> > > > +++ b/net/vhost-user.c
-> > > > @@ -157,8 +157,8 @@ static void net_vhost_user_cleanup(NetClientState *nc)
-> > > >          s->vhost_net = NULL;
-> > > >      }
-> > > >      if (s->vhost_user) {
-> > > > -        vhost_user_cleanup(s->vhost_user);
-> > > > -        g_free(s->vhost_user);
-> > > > +        //vhost_user_cleanup(s->vhost_user);
-> > > > +        //g_free(s->vhost_user);
-> > > >          s->vhost_user = NULL;
-> > > >      }
-> > > >      if (nc->queue_index == 0) {
-> > > > @@ -339,8 +339,8 @@ static int net_vhost_user_init(NetClientState *peer, const char *device,
-> > > >  
-> > > >  err:
-> > > >      if (user) {
-> > > > -        vhost_user_cleanup(user);
-> > > > -        g_free(user);
-> > > > +        //vhost_user_cleanup(user);
-> > > > +        //g_free(user);
-> > > >          s->vhost_user = NULL;
-> > > >      }
-> > > >  
-> > > 
-> > > 
-> > > So the following at least gets rid of the crashes.
-> > > I am not sure it does not leak memory though,
-> > > and not sure there aren't any configurations where
-> > > the 1st queue gets cleaned up first.
-> > > 
-> > > Thoughts?
-> > 
-> > Thank you so much for catching it and fixing
-> > it! I'll keep your SoB there. Thank you so
-> > much! I do appreciate it!
-> > 
-> > You are right. This structure is freed multiple
-> > times when multi-queue is enabled.
-> 
-> After a deeper digging, I got your point now..
-> It could be a use-after-free instead of a double
-> free.. As it's safe to deinit the char which is
-> shared by all queue pairs when cleanup the 1st
-> queue pair, it should be safe to free vhost-user
-> structure there too.
+Peter Xu <peterx@redhat.com> writes:
 
-One thing worried me is that, I can't reproduce
-the crash with `make check-qtest-x86_64`. I tried
-to run it a lot of times, but the only output I
-got each time was:
+> On Thu, May 24, 2018 at 10:22:48AM +0200, Markus Armbruster wrote:
+>> Peter Xu <peterx@redhat.com> writes:
+>> 
+>> > On Wed, May 23, 2018 at 03:13:07PM +0200, Markus Armbruster wrote:
+>> >> Peter Xu <peterx@redhat.com> writes:
+>> >> 
+>> >> > On Wed, May 23, 2018 at 10:23:22AM +0200, Markus Armbruster wrote:
+>> >> >> Peter Xu <peterx@redhat.com> writes:
+>> >> >> 
+>> >> >> > In the future the monitor iothread may be accessing the cur_mon as
+>> >> >> > well (via monitor_qmp_dispatch_one()).  Before we introduce a real
+>> >> >> > Out-Of-Band command,
+>> >> >> 
+>> >> >> Uh, inhowfar are the commands marked allow-oob: true now not real?
+>> >> >> These are migrate-recover, migrate-pause, x-oob-test.
+>> >> >
+>> >> > x-oob-test is unreal; the rest are real.
+>> >> 
+>> >> Sounds like the commit message needs tweaking then.
+>> >
+>> > Ah yes.  When I drafted this patch we don't really have the other two
+>> > commands yet.  They are there only after the postcopy recovery series.
+>> >
+>> > Do you want me to repost one?
+>> 
+>> Repost is fine, but I'm also happy to edit commit messages when I apply
+>> to qapi-next.
+>
+> If this is the only thing to touch up, I would appreciate if you can
+> do that to avoid message bounces.
 
-        CHK version_gen.h
-  GTESTER check-qtest-x86_64
+Okay.
 
-I did a quick glance of the `check-qtest-x86_64`
-target in the makefile, it seems that the relevant
-test is `tests/vhost-user-test`. So I also tried
-to run this test directly:
+> [...]
+>
+>> >> > When there is better suggestion we can remove x-oob-test, but I can't
+>> >> > see any so far.
+>> >> 
+>> >> The bit we actually need is having a command block on something we
+>> >> control.  You picked a QemuSemaphore, internal to QEMU.  What about some
+>> >> blocking system call?  Here's my idea:
+>> >> 
+>> >> 0. Create a named pipe with mkfifo(1)
+>> >> 
+>> >> 1. Issue some (non-OOB) QMP command that opens this pipe.  open()
+>> >>    blocks.
+>> >> 
+>> >> 2. Issue the OOB-command, verify it completes
+>> >> 
+>> >> 3. If the non-OOB command writes to the pipe, suck the pipe dry, say
+>> >>    with cat pipe | >/dev/null.  If it reads, give it something to read,
+>> >>    say echo >pipe.
+>> >> 
+>> >> To make 3. complete quickly with a command that writes, you need one
+>> >> that writes only a small amount of data.  Candidates: memsave, pmemsave,
+>> >> screendump.
+>> >
+>> > I am not sure I have fully understood above, please correct me if I
+>> > haven't.
+>> >
+>> > IMHO they are just similar ideas just like when we use semaphores.
+>> > Semaphores are QEMU internal, but underneath that it'll also do
+>> > syscalls (I believe we are using futex() syscalls for semaphores,
+>> > though that should be in libc code not QEMU).  I believe fifos can be
+>> > as easy to implement as semaphores, but I don't see much difference
+>> > here - IMHO fifo just use its own way to do similar thing.  On the
+>> > kernel side, both of them will basically do:
+>> >
+>> > (1) schedule() self process out to wait for the event
+>> > (2) wake_up() by another process
+>> >
+>> > From that point of view, they are same to me.
+>> 
+>> The difference is we don't need a special command just for the test.
+>
+> Ah I see the point now - an existing command that will open a fifo.
+> Yes that works too, though we'll need to find a good candidate, add
+> some work to prepare the testbed and make sure there's no side effect.
+> Anyway, I am totally fine with it once we really want it that way.
 
-make tests/vhost-user-test
-while true; do
-  QTEST_QEMU_BINARY=x86_64-softmmu/qemu-system-x86_64 ./tests/vhost-user-test
-done
+Separate patch, not blocking this series.
 
-And the only output in each loop I got was:
+>> > In other words, since we don't allow OOB-capable command handlers to
+>> > take risky locks, meanwhile we should also expand that idea further
+>> > into any operation that might block for some time.  Reading a fifo
+>> > here is the same as taking a risky lock - we need to make sure the
+>> > fifo read won't block for long or we should never do that in OOB
+>> > command handlers.
+>> 
+>> Absolutely.  Any code that can run in an OOB command is realtime code,
+>> and that means it must not block for an indeterminate time.  Synchronous
+>> read() is right out.
+>> 
+>> >> >> >                      let's convert the cur_mon variable to be a
+>> >> >> > per-thread variable to make sure there won't be a race between threads.
+>> >> >> >
+>> >> >> > Note that thread variables are not initialized to a valid value when new
+>> >> >> > thread is created.  However for our case we don't need to set it up,
+>> >> >> > since the cur_mon variable is only used in such a pattern:
+>> >> >> >
+>> >> >> >   old_mon = cur_mon;
+>> >> >> >   cur_mon = xxx;
+>> >> >> >   (do something, read cur_mon if necessary in the stack)
+>> >> >> >   cur_mon = old_mon;
+>> >> >> >
+>> >> >> > It plays a role as stack variable, so no need to be initialized at all.
+>> >> >> > We only need to make sure the variable won't be changed unexpectedly by
+>> >> >> > other threads.
+>> >> >> 
+>> >> >> Do we plan to keep switching cur_mon forever?  Or do we intend to work
+>> >> >> towards a 1:1 association between Monitor struct and monitor thread?
+>> >> >
+>> >> > I still don't see a good way to remove the cur_mon switching... E.g.,
+>> >> > in qmp_human_monitor_command() we'll switch no matter what.
+>> >> 
+>> >> That one's a hack.  We can make exceptions for hacks.  Where else do we
+>> >> switch?
+>> >
+>> > Yeah, the major one should be monitor_qmp_dispatch_one().  If we can
+>> > have one thread per monitor, it seems to be good we can at least omit
+>> > the switching for this one.
+>> 
+>> Yes, please.
+>
+> Note that currently it's still not 1:1 - we only have one thread for
+> all the monitors, so now it seems that we still cannot omit it.  And
+> I'm not sure whether we should do that only to omit this cur_mon
+> fiddling, since it might be an overkill too.
 
-/x86_64/vhost-user/migrate: OK
-/x86_64/vhost-user/multiqueue: OK
-/x86_64/vhost-user/read-guest-mem/memfd: OK
-/x86_64/vhost-user/read-guest-mem/memfile: OK
-
-So I'm still not quite sure what caused the crash
-on your side. But it does make more sense to free
-the vhost-user structure only when cleanup the
-1st queue pair (i.e. where the `chr` is deinit-ed).
-
-I have sent a new patch set with above change:
-
-http://lists.gnu.org/archive/html/qemu-devel/2018-05/msg05508.html
-https://patchwork.kernel.org/bundle/btw/vhost-user-host-notifiers/
-
-Because the above change is got from your diff
-and also based on your analysis, I kept your SoB
-in that patch (if you have any concern about it,
-please let me know).
-
-In this patch set, I also introduced a protocol
-feature to allow slave to send fds to master via
-the slave channel.
-
-If you still see crashes with the new patch set,
-please provide me a bit more details, e.g. the
-crash message. Thanks a lot!
-
-Best regards,
-Tiwei Bie
+If we decide we want 1:1, we should make 1:1 as obvious as we can in its
+implementation.  That means getting rid of cur_mon switching.  Anyway,
+not an immediate worry.
