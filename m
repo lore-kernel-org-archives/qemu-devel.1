@@ -1,29 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59799)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59809)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fLr33-0002PU-Jr
-	for qemu-devel@nongnu.org; Thu, 24 May 2018 10:16:58 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1fLr34-0002PW-2I
+	for qemu-devel@nongnu.org; Thu, 24 May 2018 10:16:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fLr2x-0006qZ-QS
-	for qemu-devel@nongnu.org; Thu, 24 May 2018 10:16:57 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:60176 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fLr2x-0006q9-LA
-	for qemu-devel@nongnu.org; Thu, 24 May 2018 10:16:51 -0400
-From: Markus Armbruster <armbru@redhat.com>
-References: <1525445354-16233-1-git-send-email-walling@linux.ibm.com>
-	<7e9e9dfd-795b-47f2-453a-59bf65f28229@redhat.com>
-	<7274b001-02f2-6584-ea0a-c3d0f96d46b8@linux.ibm.com>
-	<89dc884d-97af-4922-bd69-1cb7308399d8@redhat.com>
-	<724592be-f5ac-7a40-8c26-5d2dd200ef82@linux.ibm.com>
-	<ee680f5e-ac9a-479d-f65e-9f8ae9cfe5d4@linux.ibm.com>
-Date: Thu, 24 May 2018 16:16:49 +0200
-In-Reply-To: <ee680f5e-ac9a-479d-f65e-9f8ae9cfe5d4@linux.ibm.com> (Collin
-	Walling's message of "Mon, 7 May 2018 10:30:54 -0400")
-Message-ID: <87y3g916lq.fsf@dusky.pond.sub.org>
+	(envelope-from <peter.maydell@linaro.org>) id 1fLr32-0006sA-Td
+	for qemu-devel@nongnu.org; Thu, 24 May 2018 10:16:58 -0400
+Received: from mail-ot0-x242.google.com ([2607:f8b0:4003:c0f::242]:41327)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1fLr32-0006ru-O3
+	for qemu-devel@nongnu.org; Thu, 24 May 2018 10:16:56 -0400
+Received: by mail-ot0-x242.google.com with SMTP id t1-v6so2110350oth.8
+	for <qemu-devel@nongnu.org>; Thu, 24 May 2018 07:16:56 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v2] monitor: report entirety of hmp command
- on error
+In-Reply-To: <10801e6c-5028-add6-b082-22c5dc9758ca@redhat.com>
+References: <1527047633-12368-1-git-send-email-zhaoshenglong@huawei.com>
+	<1527047633-12368-2-git-send-email-zhaoshenglong@huawei.com>
+	<acca5b80-f527-bc39-0b63-147e53affb4b@redhat.com>
+	<CAFEAcA-xbHtxora5TU9psYnBgP0+N8_nznhVppEkg7fmmwip3w@mail.gmail.com>
+	<10801e6c-5028-add6-b082-22c5dc9758ca@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 24 May 2018 15:16:35 +0100
+Message-ID: <CAFEAcA-eW_1M42c+Fjt98AgVsnbwjwWap3JZFHNU9f8S0H_qww@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH V3 2/2] arm_gicv3_kvm: kvm_dist_get/put:
+ skip the registers banked by GICR
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,51 +33,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Alan Gilbert <dgilbert@redhat.com>
-Cc: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org, Collin Walling <walling@linux.ibm.com>
+To: Auger Eric <eric.auger@redhat.com>
+Cc: Shannon Zhao <shannon.zhaosl@gmail.com>, qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, Shannon Zhao <zhaoshenglong@huawei.com>
 
-David, looks like your turf.
+On 24 May 2018 at 14:59, Auger Eric <eric.auger@redhat.com> wrote:
+> Hi,
+>
+> On 05/24/2018 03:14 PM, Peter Maydell wrote:
+>> On 24 May 2018 at 10:04, Auger Eric <eric.auger@redhat.com> wrote:
+>>> Now I am unclear about the semantics of the s->gicd_ipriority & friends.
+>>> With that change, is it supposed to contain only the states of SPIs or
+>>> contain the RAZ states of PPI/SGIs + states of SPIs. The array is
+>>> dimensionned to contain states for PPI/SGI+SPIs, right? In other words,
+>>> shouldn't we also shift field?
+>>
+>> The semantics of the gicd_ipriority and other data structures are
+>> set by the TCG GIC implementation, and include blank space at
+>> the start where the PPI/SGI bits would live. See this comment
+>> from arm_gicv3_common.h:
+>>
+>>  * Each bitmap contains a bit for each interrupt. Although there is
+>>  * space for the PPIs and SGIs, those bits (the first 32) are never
+>>  * used as that state lives in the redistributor. The unused bits are
+>>  * provided purely so that interrupt X's state is always in bit X; this
+>>  * avoids bugs where we forget to subtract GIC_INTERNAL from an
+>>  * interrupt number.
+>
+> If I understand Shannon's code correctly, the space for PPIs/SGIs is
+> currently overwritten by SPI state, hence my comment.
 
-Collin Walling <walling@linux.ibm.com> writes:
+Only for KVM, not for TCG, and it's the other way round: we
+end up with two lots of PPI/SGI space in the data structure
+by mistake. Let me fish out the comment I made on the v2 of this
+series:
 
-> When a user incorrectly provides an hmp command, an error response will be
-> printed that prompts the user to try "help <command name>". However, when
-> the command contains multiple parts e.g. "info uuid xyz", only the last
-> whitespace delimited string will be reported (in this example "info" will
-> be dropped and the message will read "Try "help uuid" for more information",
-> which is incorrect).
->
-> Let's correct this by capturing the entirety of the command from the command
-> line -- excluding any extraneous characters.
->
-> Reported-by: Mikhail Fokin <fokin@de.ibm.com>
-> Signed-off-by: Collin Walling <walling@linux.ibm.com>
-> ---
->  monitor.c | 8 ++++++--
->  1 file changed, 6 insertions(+), 2 deletions(-)
->
-> diff --git a/monitor.c b/monitor.c
-> index 39f8ee1..38736b3 100644
-> --- a/monitor.c
-> +++ b/monitor.c
-> @@ -3371,6 +3371,7 @@ static void handle_hmp_command(Monitor *mon, const char *cmdline)
->  {
->      QDict *qdict;
->      const mon_cmd_t *cmd;
-> +    const char *cmd_start = cmdline;
->  
->      trace_handle_hmp_command(mon, cmdline);
->  
-> @@ -3381,8 +3382,11 @@ static void handle_hmp_command(Monitor *mon, const char *cmdline)
->  
->      qdict = monitor_parse_arguments(mon, &cmdline, cmd);
->      if (!qdict) {
-> -        monitor_printf(mon, "Try \"help %s\" for more information\n",
-> -                       cmd->name);
-> +        while (cmdline > cmd_start && qemu_isspace(cmdline[-1])) {
-> +            cmdline--;
-> +        }
-> +        monitor_printf(mon, "Try \"help %.*s\" for more information\n",
-> +                       (int)(cmdline - cmd_start), cmd_start);
->          return;
->      }
+In the code in master, we have QEMU data structures
+(bitmaps, etc) which have one entry for each of GICV3_MAXIRQ
+irqs. That includes the RAZ/WI unused space for the SPIs/PPIs, so
+for a 1-bit-per-irq bitmap:
+ [0x00000000, irq 32, irq 33, .... ]
+
+When we fill in the values from KVM into these data structures,
+we start after the unused space, because the for_each_dist_irq_reg()
+macro starts with _irq = GIC_INTERNAL. But we forgot to adjust
+the offset value we use for the KVM access, so we start by
+reading the RAZ/WI values from KVM, and the data structure
+contents end up with:
+ [0x00000000, 0x00000000, irq 32, irq 33, ... ]
+(and the last irqs wouldn't get transferred).
+
+With this change to the code we will get the offset right and
+the data structure will be filled as
+ [0x00000000, irq 32, irq 33, .... ]
+For TCG, where we never had this bug, this is how the data
+structure has always looked.
+
+But for migration from the old version, the data structure
+we receive from the migration source will contain the old
+broken layout of
+ [0x00000000, 0x00000000, irq 32, irq 33, ... ]
+
+So we need in inbound migration to identify when we need
+to fix this up (by copying the data down to get rid of that
+extra 0x00000000), which is "when KVM is enabled and the source
+is not a version new enough to have fixed this bug".
+
+> If we stick to the
+> current semantics, can't we just add the last missing 32 SPI states and
+> we don't need the subsection?
+
+You need a subsection, because that's how you get migration
+compatibility.
+
+thanks
+-- PMM
