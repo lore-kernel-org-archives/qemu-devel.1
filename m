@@ -1,27 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36348)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53502)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fLpMu-0001ce-9s
-	for qemu-devel@nongnu.org; Thu, 24 May 2018 08:29:24 -0400
+	(envelope-from <Aaron.Wei@dell.com>) id 1fLmb3-0003oo-B0
+	for qemu-devel@nongnu.org; Thu, 24 May 2018 05:31:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fLpMt-0004qb-Bm
-	for qemu-devel@nongnu.org; Thu, 24 May 2018 08:29:20 -0400
-Received: from mail-oi0-x242.google.com ([2607:f8b0:4003:c06::242]:36881)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fLpMt-0004qF-77
-	for qemu-devel@nongnu.org; Thu, 24 May 2018 08:29:19 -0400
-Received: by mail-oi0-x242.google.com with SMTP id w123-v6so1261491oia.4
-	for <qemu-devel@nongnu.org>; Thu, 24 May 2018 05:29:19 -0700 (PDT)
+	(envelope-from <Aaron.Wei@dell.com>) id 1fLmb0-00019g-6J
+	for qemu-devel@nongnu.org; Thu, 24 May 2018 05:31:45 -0400
+Received: from esa3.dell-outbound.iphmx.com ([68.232.153.94]:56776)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <Aaron.Wei@dell.com>) id 1fLmaz-00018n-IB
+	for qemu-devel@nongnu.org; Thu, 24 May 2018 05:31:42 -0400
+From: "Wei, Aaron" <Aaron.Wei@Dell.com>
+Date: Thu, 24 May 2018 09:31:20 +0000
+Message-ID: <09ACC28F0266D94FB9D1BC3F193A6478014E3D1B@MX303CL02.corp.emc.com>
+Content-Language: en-US
 MIME-Version: 1.0
-In-Reply-To: <CABoDooOCO+NCjZaPVa6jFzEWztHSBDEMfsmjbJ_gOGNk3PRWNw@mail.gmail.com>
-References: <20180522175629.24932-1-richard.henderson@linaro.org>
-	<CABoDooOCO+NCjZaPVa6jFzEWztHSBDEMfsmjbJ_gOGNk3PRWNw@mail.gmail.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 24 May 2018 13:28:58 +0100
-Message-ID: <CAFEAcA_YoGsJ_Yuc5EFBJwnANdNXb6YQ3tV5pyDr8RD=0itXbg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH] tcg: Fix helper function vs host abi for
- float16
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] QEMU: Multiple PCI domains for x86 PCI Express Machine
+ (Q35)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,34 +26,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laurent Desnogues <laurent.desnogues@gmail.com>
-Cc: Richard Henderson <richard.henderson@linaro.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>
+To: "marcel.apfelbaum@gmail.com" <marcel.apfelbaum@gmail.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: "Fu, Bryan" <Bryan.Fu@dell.com>, "Xia, Robert" <Robert.Xia@dell.com>, "Zhou, Zhenzan" <Zhenzan.Zhou@dell.com>
 
-On 23 May 2018 at 06:10, Laurent Desnogues <laurent.desnogues@gmail.com> wrote:
-> Some AArch64 tests I had that previously failed on a x86-64 host now pass.
->
-> Tested-by: Laurent Desnogues <laurent.desnogues@gmail.com>
+Hi,  Marcel
 
-Thanks for the testing.
+It's my pleasure to write to you on behalf of a team who is developing the =
+Intel VMD virtualization base on QEMU in Dell EMC.
 
-> Perhaps the two occurrences of the following comment in
-> target/arm/translate-a64.c could be removed along with this patch:
->
->             /* write_fp_sreg is OK here because top half of tcg_rd is zero */
+>From https://www.outreachy.org. we find that you are working on the Multipl=
+e PCI domain feature which we think may be  very helpful to our current wor=
+k.
+We'll be grateful if you can share some information about,
 
-I think this comment remains correct, doesn't it? At this point
-we've just called a helper routine which is 'f16' return. With
-this patch, that means that (by virtue of being uint16_t return
-type as far as C is concerned), it will have returned a 32 bit
-value into the TCGv_i32 whose bits [31:16] are zero, as the
-comment says. We require that because we're using
-write_fp_sreg() to update the vector register, and that function
-zeroes out bits [127:32] and assumes [31:16] from its input
-should all go into the vector register; but the instruction's
-semantics require [127:16] to be zeroed, and it's only because
-we know [31:16] are zero in the return value that we can
-get away with calling write_fp_sreg() rather than requiring a
-new write_fp_hreg().
+1.       What's the present developing status?
 
-thanks
--- PMM
+2.       When would it possibly be ready? Or when could we get it from QEMU=
+ repo?
+
+We appreciate and  look forward to your reply.
+
+
+Best wishes,
+Aaron Wei
