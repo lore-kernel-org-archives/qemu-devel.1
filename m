@@ -1,38 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38145)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41337)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1fLtD8-0004w9-O9
-	for qemu-devel@nongnu.org; Thu, 24 May 2018 12:35:31 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1fLtOF-0001as-1w
+	for qemu-devel@nongnu.org; Thu, 24 May 2018 12:47:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1fLtD4-0008MF-Mn
-	for qemu-devel@nongnu.org; Thu, 24 May 2018 12:35:30 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:50056)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanb@linux.vnet.ibm.com>)
-	id 1fLtD4-0008KC-1R
-	for qemu-devel@nongnu.org; Thu, 24 May 2018 12:35:26 -0400
-Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w4OGZ0G9084230
-	for <qemu-devel@nongnu.org>; Thu, 24 May 2018 12:35:24 -0400
-Received: from e17.ny.us.ibm.com (e17.ny.us.ibm.com [129.33.205.207])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2j60rq11f8-1
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Thu, 24 May 2018 12:35:24 -0400
-Received: from localhost
-	by e17.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <stefanb@linux.vnet.ibm.com>;
-	Thu, 24 May 2018 12:35:22 -0400
-References: <20180524161435.3012991-1-stefanb@linux.vnet.ibm.com>
-From: Stefan Berger <stefanb@linux.vnet.ibm.com>
-Date: Thu, 24 May 2018 12:35:20 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1fLtOD-0005j5-VV
+	for qemu-devel@nongnu.org; Thu, 24 May 2018 12:46:59 -0400
+Received: from mail-ot0-x242.google.com ([2607:f8b0:4003:c0f::242]:32882)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1fLtOD-0005ij-Fq
+	for qemu-devel@nongnu.org; Thu, 24 May 2018 12:46:57 -0400
+Received: by mail-ot0-x242.google.com with SMTP id l22-v6so2739206otj.0
+	for <qemu-devel@nongnu.org>; Thu, 24 May 2018 09:46:57 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20180524161435.3012991-1-stefanb@linux.vnet.ibm.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-MW
-Message-Id: <541cbd53-5ccb-db5e-123b-323684724244@linux.vnet.ibm.com>
+In-Reply-To: <0d3fb5f8-a8b1-57b8-2f16-294e1f824aab@vivier.eu>
+References: <20180519092956.15134-1-laurent@vivier.eu>
+	<20180519092956.15134-7-laurent@vivier.eu>
+	<CAFEAcA8Wc2boEtJQC2feZ_N07no-ErGGk-Hhwyyuo91kGaTc2w@mail.gmail.com>
+	<a423df2b-02a1-07f9-075f-55e68607f357@vivier.eu>
+	<0d3fb5f8-a8b1-57b8-2f16-294e1f824aab@vivier.eu>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 24 May 2018 17:46:36 +0100
+Message-ID: <CAFEAcA9sTRXt2EQvarSwUXwL_moPSYZ7vC_y-odRC4QoTZfSPw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PULL v2 0/4] Merge tpm 2018/05/23
+Subject: Re: [Qemu-devel] [PATCH v3 6/8] linux-user: update
+ ARCH_HAS_SOCKET_TYPES use
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -41,26 +34,24 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, marcandre.lureau@redhat.com
+To: Laurent Vivier <laurent@vivier.eu>
+Cc: Riku Voipio <riku.voipio@iki.fi>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>, QEMU Developers <qemu-devel@nongnu.org>, Yongbok Kim <yongbok.kim@mips.com>, Richard Henderson <rth@twiddle.net>
 
-On 05/24/2018 12:14 PM, Stefan Berger wrote:
-> This series of patches adds TPM emulator state migration support and a
-> test case for testing (local) migration.
+On 24 May 2018 at 16:50, Laurent Vivier <laurent@vivier.eu> wrote:
+> Le 24/05/2018 =C3=A0 17:29, Laurent Vivier a =C3=A9crit :
+>> Le 21/05/2018 =C3=A0 11:19, Peter Maydell a =C3=A9crit :
+>>> On 19 May 2018 at 10:29, Laurent Vivier <laurent@vivier.eu> wrote:
+>>>> to be like in the kernel and rename it TARGET_ARCH_HAS_SOCKET_TYPES
+>>>
+>>> You could note in the commit message that this fixes our
+>>> incorrect definition of TARGET_SOCK_CLOEXEC for SPARC.
+>>
+>> I agree
 >
->     Stefan
->
-> The following changes since commit 4f50c1673a89b07f376ce5c42d22d79a79cd=
-466d:
->
->    Merge remote-tracking branch 'remotes/ehabkost/tags/x86-next-pull-re=
-quest' into staging (2018-05-22 09:43:58 +0100)
->
-> are available in the Git repository at:
->
->    git://github.com/stefanberger/qemu-tpm.git tags/pull-tpm-2018-05-23-=
-1
+> In fact it doesn't change the value of TARGET_SOCK_CLOEXEC for SPARC,
+> because original value is 020000000 (0x400000) and the new value from
+> linux-user/socket.h is TARGET_O_CLOEXEC which is also 0x400000 for SPARC.
 
-EBADTAG: That should be a '-2'. I guess I will have to fix this in a v3.
+Argh, octal vs hex. Thanks for checking that.
 
- =C2=A0=C2=A0 Stefan
+-- PMM
