@@ -1,25 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35840)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36972)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1fLrQW-0000yc-4M
-	for qemu-devel@nongnu.org; Thu, 24 May 2018 10:41:15 -0400
+	(envelope-from <thuth@redhat.com>) id 1fLrUo-0002Je-Fw
+	for qemu-devel@nongnu.org; Thu, 24 May 2018 10:45:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1fLrQS-00028N-15
-	for qemu-devel@nongnu.org; Thu, 24 May 2018 10:41:12 -0400
-References: <1527047633-12368-1-git-send-email-zhaoshenglong@huawei.com>
-	<1527047633-12368-2-git-send-email-zhaoshenglong@huawei.com>
-	<acca5b80-f527-bc39-0b63-147e53affb4b@redhat.com>
-	<CAFEAcA-xbHtxora5TU9psYnBgP0+N8_nznhVppEkg7fmmwip3w@mail.gmail.com>
-	<10801e6c-5028-add6-b082-22c5dc9758ca@redhat.com>
-	<CAFEAcA-eW_1M42c+Fjt98AgVsnbwjwWap3JZFHNU9f8S0H_qww@mail.gmail.com>
-From: Auger Eric <eric.auger@redhat.com>
-Message-ID: <38aee779-1baf-ab96-7489-0f34bda2f8e6@redhat.com>
-Date: Thu, 24 May 2018 16:40:58 +0200
+	(envelope-from <thuth@redhat.com>) id 1fLrUl-00046O-B7
+	for qemu-devel@nongnu.org; Thu, 24 May 2018 10:45:38 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:56784 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1fLrUl-00045z-6e
+	for qemu-devel@nongnu.org; Thu, 24 May 2018 10:45:35 -0400
+References: <1527172175-129517-1-git-send-email-mst@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <6b3cad0d-b849-6ba9-64cb-6a36a37cd19d@redhat.com>
+Date: Thu, 24 May 2018 16:45:31 +0200
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA-eW_1M42c+Fjt98AgVsnbwjwWap3JZFHNU9f8S0H_qww@mail.gmail.com>
+In-Reply-To: <1527172175-129517-1-git-send-email-mst@redhat.com>
 Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH V3 2/2] arm_gicv3_kvm: kvm_dist_get/put:
- skip the registers banked by GICR
+Subject: Re: [Qemu-devel] [PATCH] libqtest: fail if child coredumps
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,92 +27,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Shannon Zhao <shannon.zhaosl@gmail.com>, qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, Shannon Zhao <zhaoshenglong@huawei.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org
+Cc: Eric Blake <eblake@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Markus Armbruster <armbru@redhat.com>, Tiwei Bie <tiwei.bie@intel.com>
 
-Hi Peter,
+On 24.05.2018 16:30, Michael S. Tsirkin wrote:
+> Right now tests report OK status if QEMU crashes during cleanup.
+> Let's catch that case and fail the test.
+> 
+> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+> ---
+>  tests/libqtest.c | 9 ++++++++-
+>  1 file changed, 8 insertions(+), 1 deletion(-)
+> 
+> diff --git a/tests/libqtest.c b/tests/libqtest.c
+> index 43fb97e..f869854 100644
+> --- a/tests/libqtest.c
+> +++ b/tests/libqtest.c
+> @@ -103,8 +103,15 @@ static int socket_accept(int sock)
+>  static void kill_qemu(QTestState *s)
+>  {
+>      if (s->qemu_pid != -1) {
+> +        int wstatus = 0;
+> +        pid_t pid;
+> +
+>          kill(s->qemu_pid, SIGTERM);
+> -        waitpid(s->qemu_pid, NULL, 0);
+> +        pid = waitpid(s->qemu_pid, &wstatus, 0);
+> +
+> +        if (pid == s->qemu_pid && WIFSIGNALED(wstatus)) {
+> +            assert(!WCOREDUMP(wstatus));
+> +        }
+>      }
+>  }
 
-On 05/24/2018 04:16 PM, Peter Maydell wrote:
-> On 24 May 2018 at 14:59, Auger Eric <eric.auger@redhat.com> wrote:
->> Hi,
->>
->> On 05/24/2018 03:14 PM, Peter Maydell wrote:
->>> On 24 May 2018 at 10:04, Auger Eric <eric.auger@redhat.com> wrote:
->>>> Now I am unclear about the semantics of the s->gicd_ipriority & friends.
->>>> With that change, is it supposed to contain only the states of SPIs or
->>>> contain the RAZ states of PPI/SGIs + states of SPIs. The array is
->>>> dimensionned to contain states for PPI/SGI+SPIs, right? In other words,
->>>> shouldn't we also shift field?
->>>
->>> The semantics of the gicd_ipriority and other data structures are
->>> set by the TCG GIC implementation, and include blank space at
->>> the start where the PPI/SGI bits would live. See this comment
->>> from arm_gicv3_common.h:
->>>
->>>  * Each bitmap contains a bit for each interrupt. Although there is
->>>  * space for the PPIs and SGIs, those bits (the first 32) are never
->>>  * used as that state lives in the redistributor. The unused bits are
->>>  * provided purely so that interrupt X's state is always in bit X; this
->>>  * avoids bugs where we forget to subtract GIC_INTERNAL from an
->>>  * interrupt number.
->>
->> If I understand Shannon's code correctly, the space for PPIs/SGIs is
->> currently overwritten by SPI state, hence my comment.
-> 
-> Only for KVM, not for TCG, and it's the other way round: we
-> end up with two lots of PPI/SGI space in the data structure
-> by mistake. Let me fish out the comment I made on the v2 of this
-> series:
-> 
-> In the code in master, we have QEMU data structures
-> (bitmaps, etc) which have one entry for each of GICV3_MAXIRQ
-> irqs. That includes the RAZ/WI unused space for the SPIs/PPIs, so
-> for a 1-bit-per-irq bitmap:
->  [0x00000000, irq 32, irq 33, .... ]
-> 
-> When we fill in the values from KVM into these data structures,
-> we start after the unused space, because the for_each_dist_irq_reg()
-> macro starts with _irq = GIC_INTERNAL. But we forgot to adjust
-> the offset value we use for the KVM access, so we start by
-> reading the RAZ/WI values from KVM, and the data structure
-> contents end up with:
->  [0x00000000, 0x00000000, irq 32, irq 33, ... ]
-> (and the last irqs wouldn't get transferred).
-In kvm_dist_get_priority (new code), the offset is where we read and
-field is where we write, correct? Offset was shifted so we effectively
-read in KVM regs the num_irq-32 SPI states now but don't we start
-writing at the beginning of bmp, (ie s->gicd_ipriority), at PPI/SGI
-offset? What am I missing?
+That's basically a good idea ... but I've already seen yet another issue
+in the past already: QEMU sometimes simply hangs in an endless loop
+during clean up and never terminates. I think we should detect that
+situation, too.
 
-I don't understand you TCG remark above, sorry.
+So instead of killing QEMU at the end of the testing, I think we should
+rather try to terminate it with the QMP "quit" command. If QEMU does not
+terminate with an exit code of 0, then the test should be flagged a
+failed (and only if QEMU did not terminate at all, it should be killed
+with SIGKILL).
 
-Thanks
-
-Eric
-> 
-> With this change to the code we will get the offset right and
-> the data structure will be filled as
->  [0x00000000, irq 32, irq 33, .... ]
-> For TCG, where we never had this bug, this is how the data
-> structure has always looked.
-> 
-> But for migration from the old version, the data structure
-> we receive from the migration source will contain the old
-> broken layout of
->  [0x00000000, 0x00000000, irq 32, irq 33, ... ]
-> 
-> So we need in inbound migration to identify when we need
-> to fix this up (by copying the data down to get rid of that
-> extra 0x00000000), which is "when KVM is enabled and the source
-> is not a version new enough to have fixed this bug".
-> 
->> If we stick to the
->> current semantics, can't we just add the last missing 32 SPI states and
->> we don't need the subsection?
-> 
-> You need a subsection, because that's how you get migration
-> compatibility.
-> 
-> thanks
-> -- PMM
-> 
+ Thomas
