@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55629)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56725)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1fLuGd-0001sS-RB
-	for qemu-devel@nongnu.org; Thu, 24 May 2018 13:43:17 -0400
+	(envelope-from <jsnow@redhat.com>) id 1fLuK8-0003F4-7N
+	for qemu-devel@nongnu.org; Thu, 24 May 2018 13:46:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1fLuGa-0003IY-GU
-	for qemu-devel@nongnu.org; Thu, 24 May 2018 13:43:11 -0400
+	(envelope-from <jsnow@redhat.com>) id 1fLuK7-0007an-9u
+	for qemu-devel@nongnu.org; Thu, 24 May 2018 13:46:48 -0400
 References: <20180518132114.4070-1-kwolf@redhat.com>
-	<20180518132114.4070-22-kwolf@redhat.com>
-	<26778cd3-3150-734b-d8c6-afa6e41f0215@redhat.com>
-	<20180524082412.GC4008@localhost.localdomain>
+	<20180518132114.4070-18-kwolf@redhat.com>
+	<fa219be9-84e4-07ec-69a5-1fddb608ccbb@redhat.com>
+	<20180524081715.GB4008@localhost.localdomain>
 From: John Snow <jsnow@redhat.com>
-Message-ID: <1988292d-467a-9c63-e64d-035b0e93348a@redhat.com>
-Date: Thu, 24 May 2018 13:42:57 -0400
+Message-ID: <e9acffe3-7f83-3555-1e91-9cdcaeeef158@redhat.com>
+Date: Thu, 24 May 2018 13:46:38 -0400
 MIME-Version: 1.0
-In-Reply-To: <20180524082412.GC4008@localhost.localdomain>
+In-Reply-To: <20180524081715.GB4008@localhost.localdomain>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 21/40] job: Convert
- block_job_cancel_async() to Job
+Subject: Re: [Qemu-devel] [PATCH v2 17/40] job: Move BlockJobCreateFlags to
+ Job
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,58 +32,56 @@ Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, jcody@redhat.com, armbru@redha
 
 
 
-On 05/24/2018 04:24 AM, Kevin Wolf wrote:
-> Am 24.05.2018 um 01:18 hat John Snow geschrieben:
->>> diff --git a/include/qemu/job.h b/include/qemu/job.h
->>> index 3e817beee9..2648c74281 100644
->>> --- a/include/qemu/job.h
->>> +++ b/include/qemu/job.h
->>> @@ -97,6 +97,12 @@ typedef struct Job {
->>>       */
->>>      bool cancelled;
->>>  
->>> +    /**
->>> +     * Set to true if the job should abort immediately without waiting
->>> +     * for data to be in sync.
->>> +     */
->>> +    bool force_cancel;
->>> +
+On 05/24/2018 04:17 AM, Kevin Wolf wrote:
+> Am 24.05.2018 um 00:24 hat John Snow geschrieben:
 >>
->> Does this comment need an update now, though?
 >>
->> Actually, in terms of "new jobs" API, it'd be really nice if cancel
->> *always meant cancel*.
+>> On 05/18/2018 09:20 AM, Kevin Wolf wrote:
+>>> +    job->auto_finalize = !(flags & JOB_MANUAL_FINALIZE);
+>>> +    job->auto_dismiss  = !(flags & JOB_MANUAL_DISMISS);
 >>
->> I think "cancel" should never be used to mean "successful completion,
->> but different from the one we'd get if we used job_complete."
+>> Job API might be a good chance to say "No, this is the default behavior
+>> for this API."
 >>
->> i.e., either we need a job setting:
+>> I don't know how possible this is, but could we remove these behavior
+>> flags for jobs (but keep them for block jobs), and then any legacy block
+>> job creation interfaces we have can enable/disable them as the user
+>> requested,
 >>
->> job-set completion-mode=[pivot|no-pivot]
+>> and the block job layer itself has hooks that persuade the core job
+>> layer to automatically transition without user input, if appropriate.
 >>
->> or optional parameters to pass to job-complete:
->>
->> job-complete mode=[understood-by-job-type]
->>
->> or some other mechanism that accomplishes the same type of behavior. It
->> would be nice if it did not have to be determined at job creation time
->> but instead could be determined later.
+>> (Unless that happens later?)
 > 
-> I agree. We already made sure that job-cancel really means cancel on the
-> QAPI level, so we're free to do that. We just need to keep supporting
-> block-job-cancel with the old semantics, so what I have is the easy
-> conversion. We can change the internal implementation when we actually
-> implement the selection of a completion mode.
+> That's really a question for job-create, which we don't have yet. I'm
+> not sure whether job-create would expose those options, and if so, what
+> the defaults would be.
+> 
+> I think auto-dismiss=false is a good default because the reason for
+> having a manual job-dismiss is shared by all jobs (you want to be able
+> to query the job result after it finished).
+> 
+
+Sounds good to me.
+
+> auto-finalize is different. We introduced it to avoid surprise graph
+> changes, but this implies that every job changes the block graph when it
+> completes. This is obviously not true for non-block jobs. They might
+> still commonly change something else that shouldn't be done as a
+> surprise, but I am working right now on at least a single job type that
+> doesn't do anything like that on completion (blockdev-create).
+> 
+
+I'll have to stay tuned.
+
+> For now, I made it unconditionally auto-finalize=true and
+> auto-dismiss=false without offering the options in QMP, but that's open
+> for discussion.
+
+Sure. I was wondering if we didn't want to change the internal API's
+defaults around, but I guess that can happen whenever based on what the
+QMP looks like.
+
 > 
 > Kevin
 > 
-
-We need this before 3.0 though, yeah? unless we make job-cancel
-x-job-cancel or some other warning that the way it works might change, yeah?
-
-Or do I misunderstand our leeway to change this at a later point in time?
-
-(can job-cancel apply to block jobs created with the legacy
-infrastructure? My reading was "yes.")
-
---js
