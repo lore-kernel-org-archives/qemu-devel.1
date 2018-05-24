@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43224)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44941)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1fLrs9-0006cd-8y
-	for qemu-devel@nongnu.org; Thu, 24 May 2018 11:09:49 -0400
+	(envelope-from <eblake@redhat.com>) id 1fLrzC-0000tu-AK
+	for qemu-devel@nongnu.org; Thu, 24 May 2018 11:17:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1fLrs3-0004Wf-De
-	for qemu-devel@nongnu.org; Thu, 24 May 2018 11:09:45 -0400
-References: <1527047633-12368-1-git-send-email-zhaoshenglong@huawei.com>
-	<1527047633-12368-2-git-send-email-zhaoshenglong@huawei.com>
-	<acca5b80-f527-bc39-0b63-147e53affb4b@redhat.com>
-	<CAFEAcA-xbHtxora5TU9psYnBgP0+N8_nznhVppEkg7fmmwip3w@mail.gmail.com>
-	<10801e6c-5028-add6-b082-22c5dc9758ca@redhat.com>
-	<CAFEAcA-eW_1M42c+Fjt98AgVsnbwjwWap3JZFHNU9f8S0H_qww@mail.gmail.com>
-	<38aee779-1baf-ab96-7489-0f34bda2f8e6@redhat.com>
-	<CAFEAcA9oCppg2C32vd3YKKmvfO7n1KnFeXG14CV7UHcZpxcTqA@mail.gmail.com>
-From: Auger Eric <eric.auger@redhat.com>
-Message-ID: <362b56e4-5e15-d01d-2aae-5efe1aaf661d@redhat.com>
-Date: Thu, 24 May 2018 17:09:32 +0200
+	(envelope-from <eblake@redhat.com>) id 1fLrz4-0003cH-LB
+	for qemu-devel@nongnu.org; Thu, 24 May 2018 11:17:02 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:58364 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1fLrz4-0003bp-GV
+	for qemu-devel@nongnu.org; Thu, 24 May 2018 11:16:54 -0400
+References: <1527161340-3200-1-git-send-email-suhang16@mails.ucas.ac.cn>
+	<1527161340-3200-3-git-send-email-suhang16@mails.ucas.ac.cn>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <13868e98-f6ab-40d1-0ebc-27d11985eaad@redhat.com>
+Date: Thu, 24 May 2018 10:16:52 -0500
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA9oCppg2C32vd3YKKmvfO7n1KnFeXG14CV7UHcZpxcTqA@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <1527161340-3200-3-git-send-email-suhang16@mails.ucas.ac.cn>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH V3 2/2] arm_gicv3_kvm: kvm_dist_get/put:
- skip the registers banked by GICR
+Subject: Re: [Qemu-devel] [PULL 2/2] Add QTest testcase for the Intel
+ Hexadecimal
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,86 +29,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Shannon Zhao <shannon.zhaosl@gmail.com>, qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, Shannon Zhao <zhaoshenglong@huawei.com>
+To: Su Hang <suhang16@mails.ucas.ac.cn>, stefanha@gmail.com, jim@groklearning.com, joel@jms.id.au
+Cc: qemu-devel@nongnu.org
 
-Hi Peter,
+On 05/24/2018 06:29 AM, Su Hang wrote:
+> 'test.hex' file is a bare metal ARM software stored in Hexadecimal
+> Object Format. When it's loaded by QEMU, it will print "Hello world!\n"
+> on console.
+> 
+> `pre_store` array in 'hexloader-test.c' file, stores the binary format
+> of 'test.hex' file, which is used to verify correctness.
+> 
+> Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+> Suggested-by: Steffen Gortz <qemu.ml@steffen-goertz.de>
+> Suggested-by: Stefan Hajnoczi <stefanha@redhat.com>
+> Signed-off-by: Su Hang <suhang16@mails.ucas.ac.cn>
+> ---
+>   MAINTAINERS                          |  6 ++++
+>   configure                            |  4 +++
+>   tests/Makefile.include               |  2 ++
+>   tests/hex-loader-check-data/test.hex | 12 ++++++++
+>   tests/hexloader-test.c               | 56 ++++++++++++++++++++++++++++++++++++
 
-On 05/24/2018 04:56 PM, Peter Maydell wrote:
-> On 24 May 2018 at 15:40, Auger Eric <eric.auger@redhat.com> wrote:
->> Hi Peter,
->>
->> On 05/24/2018 04:16 PM, Peter Maydell wrote:
->>> Only for KVM, not for TCG, and it's the other way round: we
->>> end up with two lots of PPI/SGI space in the data structure
->>> by mistake. Let me fish out the comment I made on the v2 of this
->>> series:
->>>
->>> In the code in master, we have QEMU data structures
->>> (bitmaps, etc) which have one entry for each of GICV3_MAXIRQ
->>> irqs. That includes the RAZ/WI unused space for the SPIs/PPIs, so
->>> for a 1-bit-per-irq bitmap:
->>>  [0x00000000, irq 32, irq 33, .... ]
->>>
->>> When we fill in the values from KVM into these data structures,
->>> we start after the unused space, because the for_each_dist_irq_reg()
->>> macro starts with _irq = GIC_INTERNAL. But we forgot to adjust
->>> the offset value we use for the KVM access, so we start by
->>> reading the RAZ/WI values from KVM, and the data structure
->>> contents end up with:
->>>  [0x00000000, 0x00000000, irq 32, irq 33, ... ]
->>> (and the last irqs wouldn't get transferred).
->> In kvm_dist_get_priority (new code), the offset is where we read and
->> field is where we write, correct? Offset was shifted so we effectively
->> read in KVM regs the num_irq-32 SPI states now but don't we start
->> writing at the beginning of bmp, (ie s->gicd_ipriority), at PPI/SGI
->> offset? What am I missing?
-> 
-> Oops, yes, you're right. My explanation applies to the
-> various other bitmaps, where we are accessing the
-> fields in the data structure using gic_bmp_ptr32(bmp, irq),
-> but not to gicd_ipriority[], which we are directly accessing
-> starting with the first word, not by indexing via bmp[irq].
-> 
-> So we need to handle these two cases differently.
-> You're correct that for gicd_ipriority[], the code in
-> master reads and writes to that data structure as:
->  [0, 0, ..., 0, irq 32, irq 33, ..., 0, 0, ... 0]
-> so all the values are in the right place but we:
->  (a) unnecessarily read/write zeroes for the PPI/SGI fields
->  (b) fail to transfer the last 32 interrupts
-> 
-> We can fix the gicd_ipriority[] case simply by adding
->    bmp = GIC_INTERNAL;
-> before the assignment to 'field' in both kvm_dist_get_priority()
-> and kvm_dist_put_priority(). This doesn't affect migration
-> compatibility. We should do this separately from fixing the
-> other bitmaps, because it's simpler.
+The previous patch also touched:
 
-Agreed for the other bitmaps. I actually stumbled on
-kvm_dist_get_priority and got stuck there ;-) So indeed the subsection
-is needed.
-> 
->> I don't understand you TCG remark above, sorry.
-> 
-> You can migrate a TCG VM as well as a KVM one. The
-> TCG GICv3 doesn't use any of this code in hw/intc/arm_gicv3_kvm.c,
-> so it doesn't have any of these bugs. So any fixups for the
-> KVM bugs so we get migration correct in the
-> "buggy VM" -> "not buggy VM" situation should not misidentify
-> a TCG VM as "buggy".
+  hw/arm/boot.c       |   7 +-
+  hw/core/loader.c    | 246 
+++++++++++++++++++++++++++++++++++++++++++++++++++++
+  include/hw/loader.h |  12 +++
 
-Ah OK. Thank you for the clarification
+> +++ b/MAINTAINERS
+> @@ -1291,6 +1291,12 @@ F: hw/core/generic-loader.c
+>   F: include/hw/core/generic-loader.h
+>   F: docs/generic-loader.txt
+> 
+> +Intel Hexadecimal Object File Loader
+> +M: Su Hang <suhang16@mails.ucas.ac.cn>
+> +S: Maintained
+> +F: tests/hexloader-test.c
+> +F: tests/hex-loader-check-data/test.hex
+> +
 
-Eric
-> 
-> PS: I have a feeling that kvm_dist_get/set_priority have
-> an endianness problem -- the 'reg' we read from the kernel
-> will be a 32-bit value with the priority byte for the
-> lowest-numbered IRQ in its least significant byte, but if
-> the host is big-endian we'll write that to the wrong offset
-> in the gicd_priority[] array...
-> 
-> thanks
-> -- PMM
-> 
+It looks odd having a maintainer that claims only test files; do you 
+want to also list some of the other files touched by this patch so that 
+you get notification if one of the implementation files has subsequent 
+patches (rather than just the test files)?
+
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
