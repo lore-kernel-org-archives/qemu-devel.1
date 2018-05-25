@@ -1,24 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35840)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37045)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fM7ee-00064L-Hd
-	for qemu-devel@nongnu.org; Fri, 25 May 2018 04:00:57 -0400
+	(envelope-from <kwolf@redhat.com>) id 1fM7kJ-00080f-Rm
+	for qemu-devel@nongnu.org; Fri, 25 May 2018 04:06:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fM7ea-00005K-J6
-	for qemu-devel@nongnu.org; Fri, 25 May 2018 04:00:52 -0400
-Date: Fri, 25 May 2018 10:00:35 +0200
+	(envelope-from <kwolf@redhat.com>) id 1fM7kF-0003Ak-2n
+	for qemu-devel@nongnu.org; Fri, 25 May 2018 04:06:43 -0400
+Date: Fri, 25 May 2018 10:06:32 +0200
 From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20180525080035.GA5562@localhost.localdomain>
+Message-ID: <20180525080632.GB5562@localhost.localdomain>
 References: <20180518132114.4070-1-kwolf@redhat.com>
-	<20180518132114.4070-22-kwolf@redhat.com>
-	<26778cd3-3150-734b-d8c6-afa6e41f0215@redhat.com>
-	<20180524082412.GC4008@localhost.localdomain>
-	<1988292d-467a-9c63-e64d-035b0e93348a@redhat.com>
+	<20180518132114.4070-32-kwolf@redhat.com>
+	<8af81ec5-9a7b-e787-25cd-61deec9a40dc@redhat.com>
+	<20180524083020.GD4008@localhost.localdomain>
+	<1f9b1685-1d1c-b1d4-0408-d11a12f2a199@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1988292d-467a-9c63-e64d-035b0e93348a@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2 21/40] job: Convert
- block_job_cancel_async() to Job
+In-Reply-To: <1f9b1685-1d1c-b1d4-0408-d11a12f2a199@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2 31/40] job: Add job_is_ready()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,72 +29,71 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: John Snow <jsnow@redhat.com>
 Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, jcody@redhat.com, armbru@redhat.com, mreitz@redhat.com
 
-Am 24.05.2018 um 19:42 hat John Snow geschrieben:
-> 
-> 
-> On 05/24/2018 04:24 AM, Kevin Wolf wrote:
-> > Am 24.05.2018 um 01:18 hat John Snow geschrieben:
-> >>> diff --git a/include/qemu/job.h b/include/qemu/job.h
-> >>> index 3e817beee9..2648c74281 100644
-> >>> --- a/include/qemu/job.h
-> >>> +++ b/include/qemu/job.h
-> >>> @@ -97,6 +97,12 @@ typedef struct Job {
-> >>>       */
-> >>>      bool cancelled;
+Am 24.05.2018 um 19:25 hat John Snow geschrieben:
+> >>> diff --git a/job.c b/job.c
+> >>> index af31de4669..66ee26f2a0 100644
+> >>> --- a/job.c
+> >>> +++ b/job.c
+> >>> @@ -199,6 +199,28 @@ bool job_is_cancelled(Job *job)
+> >>>      return job->cancelled;
+> >>>  }
 > >>>  
-> >>> +    /**
-> >>> +     * Set to true if the job should abort immediately without waiting
-> >>> +     * for data to be in sync.
-> >>> +     */
-> >>> +    bool force_cancel;
+> >>> +bool job_is_ready(Job *job)
+> >>> +{
+> >>> +    switch (job->status) {
+> >>> +    case JOB_STATUS_UNDEFINED:
+> >>> +    case JOB_STATUS_CREATED:
+> >>> +    case JOB_STATUS_RUNNING:
+> >>> +    case JOB_STATUS_PAUSED:
+> >>> +    case JOB_STATUS_WAITING:
+> >>> +    case JOB_STATUS_PENDING:
+> >>> +    case JOB_STATUS_ABORTING:
+> >>> +    case JOB_STATUS_CONCLUDED:
+> >>> +    case JOB_STATUS_NULL:
+> >>> +        return false;
+> >>> +    case JOB_STATUS_READY:
+> >>> +    case JOB_STATUS_STANDBY:
+> >>> +        return true;
+> >>> +    default:
+> >>> +        g_assert_not_reached();
+> >>> +    }
+> >>> +    return false;
+> >>> +}
 > >>> +
 > >>
-> >> Does this comment need an update now, though?
+> >> What's the benefit to a switch statement with a default clause here,
+> >> over the shorter:
 > >>
-> >> Actually, in terms of "new jobs" API, it'd be really nice if cancel
-> >> *always meant cancel*.
+> >> if (job->status == READY || job->status == STANDBY) {
+> >>   return true;
+> >> }
+> >> return false;
 > >>
-> >> I think "cancel" should never be used to mean "successful completion,
-> >> but different from the one we'd get if we used job_complete."
-> >>
-> >> i.e., either we need a job setting:
-> >>
-> >> job-set completion-mode=[pivot|no-pivot]
-> >>
-> >> or optional parameters to pass to job-complete:
-> >>
-> >> job-complete mode=[understood-by-job-type]
-> >>
-> >> or some other mechanism that accomplishes the same type of behavior. It
-> >> would be nice if it did not have to be determined at job creation time
-> >> but instead could be determined later.
+> >> (Yes, I realize you already merged this code, but I'm still curious and
+> >> I need to read the series anyway to see what's changed...)
 > > 
-> > I agree. We already made sure that job-cancel really means cancel on the
-> > QAPI level, so we're free to do that. We just need to keep supporting
-> > block-job-cancel with the old semantics, so what I have is the easy
-> > conversion. We can change the internal implementation when we actually
-> > implement the selection of a completion mode.
-> > 
-> > Kevin
+> > That it's easy to copy and paste from job_is_completed()? :-P
 > > 
 > 
-> We need this before 3.0 though, yeah? unless we make job-cancel
-> x-job-cancel or some other warning that the way it works might change, yeah?
+> Haha! Sure!
 > 
-> Or do I misunderstand our leeway to change this at a later point in time?
+> > I guess you could argue that the switch ensures that we don't forget to
+> > explicitly handle every state if we ever add a new one, but the real
+> > reason is more like, job_is_completed() was already there and I didn't
+> > see a reason to do something different here.
+> > 
 > 
-> (can job-cancel apply to block jobs created with the legacy
-> infrastructure? My reading was "yes.")
+> I think the "default" case removes that benefit somewhat; it's nicer
+> when the compiler yelps at you for forgetting. The cases that might
+> cause an assertion could be harder to hit.
 
-It can, and it already has its final semantics, so nothing has to change
-before 3.0. job-cancel is equivalent to block-job-cancel with fixed
-force=true. If you want the complete-by-cancel behaviour of mirror, you
-have to use block-job-cancel for now, because job-cancel doesn't provide
-that functionality.
+Good point. I'm not sure which compilers would actually warn here, while
+asserting makes sure to crash some tests, but in this context I think we
+could actually have both: All enum values that are handled return inside
+the switch statement. So if we move the g_assert_not_reached() just
+after the switch block, we should get both the compiler warning and the
+crash.
 
-So what we can change later is adding a way to initiate this secondary
-completion mode with a job-* command (probably with a new option for
-job-complete). But we wouldn't change the semantics of exisiting
-commands.
+Would you like to send a patch?
 
 Kevin
