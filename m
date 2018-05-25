@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59305)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59302)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1fMB2E-0008Sa-LJ
+	(envelope-from <david@redhat.com>) id 1fMB2E-0008SE-E4
 	for qemu-devel@nongnu.org; Fri, 25 May 2018 07:37:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1fMB2D-0001QS-Q4
+	(envelope-from <david@redhat.com>) id 1fMB2B-0001Pm-QN
 	for qemu-devel@nongnu.org; Fri, 25 May 2018 07:37:26 -0400
 From: David Hildenbrand <david@redhat.com>
-Date: Fri, 25 May 2018 13:37:08 +0200
-Message-Id: <20180525113708.29856-8-david@redhat.com>
+Date: Fri, 25 May 2018 13:37:07 +0200
+Message-Id: <20180525113708.29856-7-david@redhat.com>
 In-Reply-To: <20180525113708.29856-1-david@redhat.com>
 References: <20180525113708.29856-1-david@redhat.com>
-Subject: [Qemu-devel] [PATCH v1 7/7] s390x/tcg: fix CPU hotplug with
- single-threaded TCG
+Subject: [Qemu-devel] [PATCH v1 6/7] s390x/tcg: rearm the CKC timer during
+ migration
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,38 +23,31 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-s390x@nongnu.org
 Cc: qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>, Alexander Graf <agraf@suse.de>, Cornelia Huck <cohuck@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Thomas Huth <thuth@redhat.com>, "Jason J . Herne" <jjherne@linux.ibm.com>, "Collin L . Walling" <walling@linux.ibm.com>, david@redhat.com
 
-run_on_cpu() doesn't seem to work reliably until the CPU has been fully
-created if the single-threaded TCG main loop is already running.
-
-Therefore, let's use run_on_cpu() for KVM only - KVM requires it due to
-the initial CPU reset ioctl.
+If the CPU data is migrated after the TOD clock, the CKC timer of a CPU
+is not rearmed. Let's rearm it when loading the CPU state.
 
 Signed-off-by: David Hildenbrand <david@redhat.com>
 ---
- target/s390x/cpu.c | 11 ++++++-----
- 1 file changed, 6 insertions(+), 5 deletions(-)
+ target/s390x/machine.c | 7 +++++++
+ 1 file changed, 7 insertions(+)
 
-diff --git a/target/s390x/cpu.c b/target/s390x/cpu.c
-index e4d7e82a23..5fceed7948 100644
---- a/target/s390x/cpu.c
-+++ b/target/s390x/cpu.c
-@@ -220,11 +220,12 @@ static void s390_cpu_realizefn(DeviceState *dev, Error **errp)
- #endif
-     s390_cpu_gdb_init(cs);
-     qemu_init_vcpu(cs);
--#if !defined(CONFIG_USER_ONLY)
--    run_on_cpu(cs, s390_do_cpu_full_reset, RUN_ON_CPU_NULL);
--#else
--    cpu_reset(cs);
--#endif
-+
-+    if (kvm_enabled()) {
-+        run_on_cpu(cs, s390_do_cpu_full_reset, RUN_ON_CPU_NULL);
-+    } else {
-+        cpu_reset(cs);
-+    }
+diff --git a/target/s390x/machine.c b/target/s390x/machine.c
+index 84b4928755..53d226ff48 100644
+--- a/target/s390x/machine.c
++++ b/target/s390x/machine.c
+@@ -34,6 +34,13 @@ static int cpu_post_load(void *opaque, int version_id)
+         return kvm_s390_vcpu_interrupt_post_load(cpu);
+     }
  
-     scc->parent_realize(dev, &err);
- out:
++#ifdef CONFIG_TCG
++    if (tcg_enabled()) {
++        /* Rearm the CKC timer if necessary */
++        tcg_s390_tod_updated(CPU(cpu), RUN_ON_CPU_NULL);
++    }
++#endif
++
+     return 0;
+ }
+ 
 -- 
 2.17.0
