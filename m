@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58978)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60007)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <info@vintageelectronics.ca>) id 1fMdnp-00020k-1S
-	for qemu-devel@nongnu.org; Sat, 26 May 2018 14:20:30 -0400
+	(envelope-from <no-reply@patchew.org>) id 1fMgeQ-00012A-N1
+	for qemu-devel@nongnu.org; Sat, 26 May 2018 17:22:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <info@vintageelectronics.ca>) id 1fMdnk-0007TU-Mv
-	for qemu-devel@nongnu.org; Sat, 26 May 2018 14:20:28 -0400
-Received: from 24-65.162.static.aei.ca ([216.162.65.24]:10924
-	helo=mail.earthlovesme.ca)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <info@vintageelectronics.ca>)
-	id 1fMdnj-0007Ob-6k
-	for qemu-devel@nongnu.org; Sat, 26 May 2018 14:20:24 -0400
-From: info@vintageelectronics.ca
-Message-ID: <e9e38261-5957-7c61-b69f-6aa770cea287@vintageelectronics.ca>
-Date: Sat, 26 May 2018 13:19:20 -0400
+	(envelope-from <no-reply@patchew.org>) id 1fMgeN-0007qI-FD
+	for qemu-devel@nongnu.org; Sat, 26 May 2018 17:22:58 -0400
+Resent-Message-Id: <E1fMgeN-0007qI-FD@eggs.gnu.org>
+Received: from sender-of-o51.zoho.com ([135.84.80.216]:21048)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1fMgeN-0007py-5S
+	for qemu-devel@nongnu.org; Sat, 26 May 2018 17:22:55 -0400
+In-Reply-To: <20180525132755.21839-1-peter.maydell@linaro.org>
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <152725535889.237.9184700602653893025@d39dc562802a>
 MIME-Version: 1.0
-Content-Language: en-CA
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] Not able to install QNX into a VM
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Fri, 25 May 2018 06:35:59 -0700 (PDT)
+Subject: Re: [Qemu-devel] [PATCH 0/6] Update Linux headers to 4.17-rc6
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,39 +28,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: peter.maydell@linaro.org
+Cc: famz@redhat.com, qemu-devel@nongnu.org, pbonzini@redhat.com, alex.williamson@redhat.com, mst@redhat.com, stefanha@redhat.com, patches@linaro.org
 
-Hi all,
-
-
-I tried to create a VM for QNX in a Virtualbox first. It installed 
-successfully, but then could not boot from the virtual HDD. I googled, 
-and found a couple of posts about how at some point VB and QEMU both 
-implemented the busmaster bit for storage controllers and that broke QNX 
-and some other OSs, but then VB team refused to address that, while QEMU 
-team created a patch which is in the latest QEMU.
-
-So I installed QEMU (the latest as of this moment) into a Fedora 26 host 
-and created a new VM. I set CDROM to be the device 0 on IDE and HDD to 
-be the device 1. Then I booted into this VM and hit F2 to advance into 
-the "Auto-detecting Hardware..." screen of the QNX installer.
-
-Unlike Virtualbox, the QEMU VM takes quite some time to detect the 
-devices, and especially long to detect cd0.0. Once detection completes, 
-I see not one CD device, but two:
-
-Then if I press F2, QNX installer asks to insert the installation CD 
-into the drive.
-
-This does not occur under Virtualbox. It only shows one CD device.
-
-and once I hit F2 it advances to the next screen w/o a prompt to insert 
-the CDROM
-
-What is missing in QEMU VM that it does not see the CD which it just 
-booted the OS installer from?
-
-
-Thank you
-
-Alex
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
+c3NhZ2UtaWQ6IDIwMTgwNTI1MTMyNzU1LjIxODM5LTEtcGV0ZXIubWF5ZGVsbEBsaW5hcm8ub3Jn
+ClN1YmplY3Q6IFtRZW11LWRldmVsXSBbUEFUQ0ggMC82XSBVcGRhdGUgTGludXggaGVhZGVycyB0
+byA0LjE3LXJjNgoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFzaAoKQkFTRT1i
+YXNlCm49MQp0b3RhbD0kKGdpdCBsb2cgLS1vbmVsaW5lICRCQVNFLi4gfCB3YyAtbCkKZmFpbGVk
+PTAKCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxpbWl0IDAKZ2l0IGNvbmZpZyAtLWxv
+Y2FsIGRpZmYucmVuYW1lcyBUcnVlCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLmFsZ29yaXRobSBo
+aXN0b2dyYW0KCmNvbW1pdHM9IiQoZ2l0IGxvZyAtLWZvcm1hdD0lSCAtLXJldmVyc2UgJEJBU0Uu
+LikiCmZvciBjIGluICRjb21taXRzOyBkbwogICAgZWNobyAiQ2hlY2tpbmcgUEFUQ0ggJG4vJHRv
+dGFsOiAkKGdpdCBsb2cgLW4gMSAtLWZvcm1hdD0lcyAkYykuLi4iCiAgICBpZiAhIGdpdCBzaG93
+ICRjIC0tZm9ybWF0PWVtYWlsIHwgLi9zY3JpcHRzL2NoZWNrcGF0Y2gucGwgLS1tYWlsYmFjayAt
+OyB0aGVuCiAgICAgICAgZmFpbGVkPTEKICAgICAgICBlY2hvCiAgICBmaQogICAgbj0kKChuKzEp
+KQpkb25lCgpleGl0ICRmYWlsZWQKPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KClVwZGF0aW5nIDNj
+OGNmNWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMzODQKRnJvbSBodHRwczovL2dpdGh1
+Yi5jb20vcGF0Y2hldy1wcm9qZWN0L3FlbXUKICogW25ldyB0YWddICAgICAgICAgICAgICAgcGF0
+Y2hldy8yMDE4MDUyNTEzMjc1NS4yMTgzOS0xLXBldGVyLm1heWRlbGxAbGluYXJvLm9yZyAtPiBw
+YXRjaGV3LzIwMTgwNTI1MTMyNzU1LjIxODM5LTEtcGV0ZXIubWF5ZGVsbEBsaW5hcm8ub3JnClN3
+aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKMzBkNGVjMjcyZSB0YXJnZXQvaTM4Ni9rdm0u
+YzogUmVtb3ZlIGNvbXBhdGliaWxpdHkgc2hpbSBmb3IgS1ZNX0hJTlRTX1JFQUxUSU1FCmM5MDg5
+MWRjNGUgVXBkYXRlIExpbnV4IGhlYWRlcnMgdG8gNC4xNy1yYzYKNzBhOWJiZjc5OCB0YXJnZXQv
+aTM4Ni9rdm0uYzogSGFuZGxlIHJlbmFtaW5nIG9mIEtWTV9ISU5UU19ERURJQ0FURUQKZmU3NTAx
+YTdkYiBzY3JpcHRzL3VwZGF0ZS1saW51eC1oZWFkZXJzOiBIYW5kbGUga2VybmVsIGxpY2Vuc2Ug
+bm8gbG9uZ2VyIGJlaW5nIG9uZSBmaWxlCmFjNGQ4YTUxZDYgc2NyaXB0cy91cGRhdGUtbGludXgt
+aGVhZGVyczogSGFuZGxlIF9fYWxpZ25lZF91NjQKYzQ5YTQ3YTU2OCB2aXJ0aW8tZ3B1LTNkOiBE
+ZWZpbmUgVklSVElPX0dQVV9DQVBTRVRfVklSR0wyIGVsc2V3aGVyZQoKPT09IE9VVFBVVCBCRUdJ
+TiA9PT0KQ2hlY2tpbmcgUEFUQ0ggMS82OiB2aXJ0aW8tZ3B1LTNkOiBEZWZpbmUgVklSVElPX0dQ
+VV9DQVBTRVRfVklSR0wyIGVsc2V3aGVyZS4uLgpDaGVja2luZyBQQVRDSCAyLzY6IHNjcmlwdHMv
+dXBkYXRlLWxpbnV4LWhlYWRlcnM6IEhhbmRsZSBfX2FsaWduZWRfdTY0Li4uCkNoZWNraW5nIFBB
+VENIIDMvNjogc2NyaXB0cy91cGRhdGUtbGludXgtaGVhZGVyczogSGFuZGxlIGtlcm5lbCBsaWNl
+bnNlIG5vIGxvbmdlciBiZWluZyBvbmUgZmlsZS4uLgpDaGVja2luZyBQQVRDSCA0LzY6IHRhcmdl
+dC9pMzg2L2t2bS5jOiBIYW5kbGUgcmVuYW1pbmcgb2YgS1ZNX0hJTlRTX0RFRElDQVRFRC4uLgpD
+aGVja2luZyBQQVRDSCA1LzY6IFVwZGF0ZSBMaW51eCBoZWFkZXJzIHRvIDQuMTctcmM2Li4uCldB
+Uk5JTkc6IGFkZGVkLCBtb3ZlZCBvciBkZWxldGVkIGZpbGUocyksIGRvZXMgTUFJTlRBSU5FUlMg
+bmVlZCB1cGRhdGluZz8KIzEzOiAKZGVsZXRlZCBmaWxlIG1vZGUgMTAwNjQ0CgpFUlJPUjogSW52
+YWxpZCBVVEYtOCwgcGF0Y2ggYW5kIGNvbW1pdCBtZXNzYWdlIHNob3VsZCBiZSBlbmNvZGVkIGlu
+IFVURi04CiM5MzA6IEZJTEU6IGxpbnV4LWhlYWRlcnMvTElDRU5TRVMvcHJlZmVycmVkL0dQTC0y
+LjA6NzE6CisMCiBeCgpFUlJPUjogSW52YWxpZCBVVEYtOCwgcGF0Y2ggYW5kIGNvbW1pdCBtZXNz
+YWdlIHNob3VsZCBiZSBlbmNvZGVkIGluIFVURi04CiM5ODU6IEZJTEU6IGxpbnV4LWhlYWRlcnMv
+TElDRU5TRVMvcHJlZmVycmVkL0dQTC0yLjA6MTI2OgorDAogXgoKRVJST1I6IEludmFsaWQgVVRG
+LTgsIHBhdGNoIGFuZCBjb21taXQgbWVzc2FnZSBzaG91bGQgYmUgZW5jb2RlZCBpbiBVVEYtOAoj
+MTA0MzogRklMRTogbGludXgtaGVhZGVycy9MSUNFTlNFUy9wcmVmZXJyZWQvR1BMLTIuMDoxODQ6
+CisMCiBeCgpFUlJPUjogSW52YWxpZCBVVEYtOCwgcGF0Y2ggYW5kIGNvbW1pdCBtZXNzYWdlIHNo
+b3VsZCBiZSBlbmNvZGVkIGluIFVURi04CiMxMTAwOiBGSUxFOiBsaW51eC1oZWFkZXJzL0xJQ0VO
+U0VTL3ByZWZlcnJlZC9HUEwtMi4wOjI0MToKKwwKIF4KCkVSUk9SOiBJbnZhbGlkIFVURi04LCBw
+YXRjaCBhbmQgY29tbWl0IG1lc3NhZ2Ugc2hvdWxkIGJlIGVuY29kZWQgaW4gVVRGLTgKIzExNTM6
+IEZJTEU6IGxpbnV4LWhlYWRlcnMvTElDRU5TRVMvcHJlZmVycmVkL0dQTC0yLjA6Mjk0OgorDAog
+XgoKdG90YWw6IDUgZXJyb3JzLCAxIHdhcm5pbmdzLCAxMjgxIGxpbmVzIGNoZWNrZWQKCllvdXIg
+cGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNl
+IGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVy
+LCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCkNoZWNraW5nIFBBVENIIDYvNjogdGFy
+Z2V0L2kzODYva3ZtLmM6IFJlbW92ZSBjb21wYXRpYmlsaXR5IHNoaW0gZm9yIEtWTV9ISU5UU19S
+RUFMVElNRS4uLgo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29tbWFuZCBleGl0ZWQgd2l0aCBj
+b2RlOiAxCgoKLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0
+dHA6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXct
+ZGV2ZWxAcmVkaGF0LmNvbQ==
