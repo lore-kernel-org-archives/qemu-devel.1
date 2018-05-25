@@ -1,26 +1,41 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40658)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41131)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1fMGkc-0002V4-PS
-	for qemu-devel@nongnu.org; Fri, 25 May 2018 13:43:39 -0400
+	(envelope-from <pasic@linux.ibm.com>) id 1fMGnb-0003Zn-JP
+	for qemu-devel@nongnu.org; Fri, 25 May 2018 13:46:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1fMGkb-0008QP-UV
-	for qemu-devel@nongnu.org; Fri, 25 May 2018 13:43:38 -0400
-References: <20180518132114.4070-1-kwolf@redhat.com>
-	<20180518132114.4070-22-kwolf@redhat.com>
-	<26778cd3-3150-734b-d8c6-afa6e41f0215@redhat.com>
-	<20180524082412.GC4008@localhost.localdomain>
-	<1988292d-467a-9c63-e64d-035b0e93348a@redhat.com>
-	<20180525080035.GA5562@localhost.localdomain>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <3257b09f-ccbc-01aa-2384-8b7185392864@redhat.com>
-Date: Fri, 25 May 2018 13:43:29 -0400
+	(envelope-from <pasic@linux.ibm.com>) id 1fMGnW-00013e-Nf
+	for qemu-devel@nongnu.org; Fri, 25 May 2018 13:46:43 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:52482
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pasic@linux.ibm.com>) id 1fMGnW-00013H-Gr
+	for qemu-devel@nongnu.org; Fri, 25 May 2018 13:46:38 -0400
+Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w4PHiCuK062395
+	for <qemu-devel@nongnu.org>; Fri, 25 May 2018 13:46:37 -0400
+Received: from e06smtp14.uk.ibm.com (e06smtp14.uk.ibm.com [195.75.94.110])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2j6q0srdxt-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Fri, 25 May 2018 13:46:37 -0400
+Received: from localhost
+	by e06smtp14.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <pasic@linux.ibm.com>;
+	Fri, 25 May 2018 18:46:35 +0100
+References: <20180524175828.3143-1-pasic@linux.ibm.com>
+	<20180524175828.3143-2-pasic@linux.ibm.com>
+	<20180525114033.3c514091.cohuck@redhat.com>
+From: Halil Pasic <pasic@linux.ibm.com>
+Date: Fri, 25 May 2018 19:46:29 +0200
 MIME-Version: 1.0
-In-Reply-To: <20180525080035.GA5562@localhost.localdomain>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20180525114033.3c514091.cohuck@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 21/40] job: Convert
- block_job_cancel_async() to Job
+Message-Id: <c1c246bd-c0a8-7e30-dd0c-ba99c2346d15@linux.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH v3 1/2] vfio-ccw: add force unlimited
+ prefetch property
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,82 +44,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, jcody@redhat.com, armbru@redhat.com, mreitz@redhat.com
+To: Cornelia Huck <cohuck@redhat.com>
+Cc: Dong Jia Shi <bjsdjshi@linux.ibm.com>, "Jason J. Herne" <jjherne@linux.ibm.com>, qemu-s390x@nongnu.org, qemu-devel@nongnu.org
 
 
 
-On 05/25/2018 04:00 AM, Kevin Wolf wrote:
-> Am 24.05.2018 um 19:42 hat John Snow geschrieben:
->>
->>
->> On 05/24/2018 04:24 AM, Kevin Wolf wrote:
->>> Am 24.05.2018 um 01:18 hat John Snow geschrieben:
->>>>> diff --git a/include/qemu/job.h b/include/qemu/job.h
->>>>> index 3e817beee9..2648c74281 100644
->>>>> --- a/include/qemu/job.h
->>>>> +++ b/include/qemu/job.h
->>>>> @@ -97,6 +97,12 @@ typedef struct Job {
->>>>>       */
->>>>>      bool cancelled;
->>>>>  
->>>>> +    /**
->>>>> +     * Set to true if the job should abort immediately without waiting
->>>>> +     * for data to be in sync.
->>>>> +     */
->>>>> +    bool force_cancel;
->>>>> +
->>>>
->>>> Does this comment need an update now, though?
->>>>
->>>> Actually, in terms of "new jobs" API, it'd be really nice if cancel
->>>> *always meant cancel*.
->>>>
->>>> I think "cancel" should never be used to mean "successful completion,
->>>> but different from the one we'd get if we used job_complete."
->>>>
->>>> i.e., either we need a job setting:
->>>>
->>>> job-set completion-mode=[pivot|no-pivot]
->>>>
->>>> or optional parameters to pass to job-complete:
->>>>
->>>> job-complete mode=[understood-by-job-type]
->>>>
->>>> or some other mechanism that accomplishes the same type of behavior. It
->>>> would be nice if it did not have to be determined at job creation time
->>>> but instead could be determined later.
->>>
->>> I agree. We already made sure that job-cancel really means cancel on the
->>> QAPI level, so we're free to do that. We just need to keep supporting
->>> block-job-cancel with the old semantics, so what I have is the easy
->>> conversion. We can change the internal implementation when we actually
->>> implement the selection of a completion mode.
->>>
->>> Kevin
->>>
->>
->> We need this before 3.0 though, yeah? unless we make job-cancel
->> x-job-cancel or some other warning that the way it works might change, yeah?
->>
->> Or do I misunderstand our leeway to change this at a later point in time?
->>
->> (can job-cancel apply to block jobs created with the legacy
->> infrastructure? My reading was "yes.")
+On 05/25/2018 11:40 AM, Cornelia Huck wrote:
+> On Thu, 24 May 2018 19:58:27 +0200
+> Halil Pasic <pasic@linux.ibm.com> wrote:
 > 
-> It can, and it already has its final semantics, so nothing has to change
-> before 3.0. job-cancel is equivalent to block-job-cancel with fixed
-> force=true. If you want the complete-by-cancel behaviour of mirror, you
-> have to use block-job-cancel for now, because job-cancel doesn't provide
-> that functionality.
+>> There is at least one guest (OS) such that although it does not rely on
+>> the guarantees provided by ORB 1 word 9 bit (aka unlimited prefetch, aka
+>> P bit) not being set, it fails to tell this to the machine.
+
+[..]
+
+>> +static inline void warn_once(bool *warned, const char *fmt, ...)
+>> +{
+>> +    va_list ap;
+>> +
+>> +    if (!warned || *warned) {
+>> +        return;
+>> +    }
+>> +    *warned = true;
+>> +    va_start(ap, fmt);
+>> +    warn_vreport(fmt, ap);
+>> +    va_end(ap);
+>> +}
+>> +
+>> +static inline void warn_once_pfch(VFIOCCWDevice *vcdev, SubchDev *sch,
+>> +                                  const char *msg)
+>> +{
+>> +    warn_once(&vcdev->warned_orb_pfch, "vfio-ccw (devno %x.%x.%04x): %s",
+>> +              sch->cssid, sch->ssid, sch->devno, msg);
+>> +}
+>> +
 > 
-> So what we can change later is adding a way to initiate this secondary
-> completion mode with a job-* command (probably with a new option for
-> job-complete). But we wouldn't change the semantics of exisiting
-> commands.
+> While I still think we want warn_once() in common error handling code,
+> this looks reasonable enough. We can still move it later.
+>
+
+I agree. I was a bit surprised to not find any warn_once functionality.
+Let see what Markus says.
+  
+>>   static void vfio_ccw_compute_needs_reset(VFIODevice *vdev)
+>>   {
+>>       vdev->needs_reset = false;
+>> @@ -54,6 +76,18 @@ static IOInstEnding vfio_ccw_handle_request(SubchDev *sch)
+>>       struct ccw_io_region *region = vcdev->io_region;
+>>       int ret;
+>>   
+>> +    if (!(sch->orb.ctrl0 & ORB_CTRL0_MASK_PFCH)) {
+>> +        if (!(vcdev->force_orb_pfch)) {
+>> +            warn_once_pfch(vcdev, sch, "requires PFCH flag set");
+>> +            sch_gen_unit_exception(sch);
+>> +            css_inject_io_interrupt(sch);
+>> +            return IOINST_CC_EXPECTED;
+>> +        } else {
+>> +            sch->orb.ctrl0 |= ORB_CTRL0_MASK_PFCH;
+>> +            warn_once_pfch(vcdev, sch, "PFCH flag forced");
+>> +        }
+>> +    }
+>> +
 > 
-> Kevin
+> Looks good to me. I plan to queue this (and the other patch) to
+> s390-next, but (as always) further tags are still welcome :)
 > 
 
-Oho, I _was_ missing something. I hadn't realized cancel takes on the
-newer semantics. Thanks.
+Thanks!
+
+Halil
