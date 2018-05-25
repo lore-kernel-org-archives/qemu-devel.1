@@ -1,17 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59247)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59282)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1fMB28-0008Jc-Hc
-	for qemu-devel@nongnu.org; Fri, 25 May 2018 07:37:21 -0400
+	(envelope-from <david@redhat.com>) id 1fMB2A-0008MX-St
+	for qemu-devel@nongnu.org; Fri, 25 May 2018 07:37:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1fMB27-0001MH-PG
-	for qemu-devel@nongnu.org; Fri, 25 May 2018 07:37:20 -0400
+	(envelope-from <david@redhat.com>) id 1fMB29-0001OU-SW
+	for qemu-devel@nongnu.org; Fri, 25 May 2018 07:37:22 -0400
 From: David Hildenbrand <david@redhat.com>
-Date: Fri, 25 May 2018 13:37:05 +0200
-Message-Id: <20180525113708.29856-5-david@redhat.com>
+Date: Fri, 25 May 2018 13:37:06 +0200
+Message-Id: <20180525113708.29856-6-david@redhat.com>
 In-Reply-To: <20180525113708.29856-1-david@redhat.com>
 References: <20180525113708.29856-1-david@redhat.com>
-Subject: [Qemu-devel] [PATCH v1 4/7] s390x/tcg: SET CLOCK COMPARATOR can
- clear CKC interrupts
+Subject: [Qemu-devel] [PATCH v1 5/7] s390x/tcg: implement SET CLOCK
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,30 +22,95 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-s390x@nongnu.org
 Cc: qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>, Alexander Graf <agraf@suse.de>, Cornelia Huck <cohuck@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Thomas Huth <thuth@redhat.com>, "Jason J . Herne" <jjherne@linux.ibm.com>, "Collin L . Walling" <walling@linux.ibm.com>, david@redhat.com
 
-Let's stop the timer and delete any pending CKC IRQ before doing
-anything else.
+This allows a guest to change its TOD. We already take care of updating
+all CKC timers from within S390TODClass.
+
+Use MO_ALIGN to load the operand manually - this will properly trigger a
+SPECIFICATION exception.
 
 Signed-off-by: David Hildenbrand <david@redhat.com>
 ---
- target/s390x/misc_helper.c | 6 ++++++
- 1 file changed, 6 insertions(+)
+ target/s390x/helper.h      |  1 +
+ target/s390x/insn-data.def |  3 +--
+ target/s390x/misc_helper.c | 19 +++++++++++++++++++
+ target/s390x/translate.c   |  9 +++++++++
+ 4 files changed, 30 insertions(+), 2 deletions(-)
 
+diff --git a/target/s390x/helper.h b/target/s390x/helper.h
+index 59cba86a27..97c60ca7bc 100644
+--- a/target/s390x/helper.h
++++ b/target/s390x/helper.h
+@@ -127,6 +127,7 @@ DEF_HELPER_4(diag, void, env, i32, i32, i32)
+ DEF_HELPER_3(load_psw, noreturn, env, i64, i64)
+ DEF_HELPER_FLAGS_2(spx, TCG_CALL_NO_RWG, void, env, i64)
+ DEF_HELPER_FLAGS_1(stck, TCG_CALL_NO_RWG_SE, i64, env)
++DEF_HELPER_FLAGS_2(sck, TCG_CALL_NO_RWG, i32, env, i64)
+ DEF_HELPER_FLAGS_2(sckc, TCG_CALL_NO_RWG, void, env, i64)
+ DEF_HELPER_FLAGS_2(sckpf, TCG_CALL_NO_RWG, void, env, i64)
+ DEF_HELPER_FLAGS_1(stckc, TCG_CALL_NO_RWG, i64, env)
+diff --git a/target/s390x/insn-data.def b/target/s390x/insn-data.def
+index 157619403d..5c6f33ed9c 100644
+--- a/target/s390x/insn-data.def
++++ b/target/s390x/insn-data.def
+@@ -997,8 +997,7 @@
+ /* SET ADDRESS SPACE CONTROL FAST */
+     C(0xb279, SACF,    S,     Z,   0, a2, 0, 0, sacf, 0)
+ /* SET CLOCK */
+-    /* ??? Not implemented - is it necessary? */
+-    C(0xb204, SCK,     S,     Z,   0, 0, 0, 0, 0, 0)
++    C(0xb204, SCK,     S,     Z,   la2, 0, 0, 0, sck, 0)
+ /* SET CLOCK COMPARATOR */
+     C(0xb206, SCKC,    S,     Z,   0, m2_64a, 0, 0, sckc, 0)
+ /* SET CLOCK PROGRAMMABLE FIELD */
 diff --git a/target/s390x/misc_helper.c b/target/s390x/misc_helper.c
-index 418326e551..2ef9de1cca 100644
+index 2ef9de1cca..2f5cd6d22a 100644
 --- a/target/s390x/misc_helper.c
 +++ b/target/s390x/misc_helper.c
-@@ -158,6 +158,12 @@ void HELPER(sckc)(CPUS390XState *env, uint64_t time)
-     Error *err = NULL;
-     S390TOD tod_base;
+@@ -191,6 +191,25 @@ void tcg_s390_tod_updated(CPUState *cs, run_on_cpu_data opaque)
+     helper_sckc(env, env->ckc);
+ }
  
-+    /* stop the timer and remove pending CKC IRQs */
-+    timer_del(env->tod_timer);
-+    qemu_mutex_lock_iothread();
-+    env->pending_int &= ~INTERRUPT_EXT_CLOCK_COMPARATOR;
-+    qemu_mutex_unlock_iothread();
++/* Set Clock */
++uint32_t HELPER(sck)(CPUS390XState *env, uint64_t tod_low)
++{
++    S390TODState *td = s390_get_tod();
++    S390TODClass *tdc = S390_TOD_GET_CLASS(td);
++    S390TOD tod = {
++        .high = 0,
++        .low = tod_low,
++    };
++    Error *err = NULL;
 +
-     if (time == -1ULL) {
-         return;
-     }
++    qemu_mutex_lock_iothread();
++    tdc->set(td, &tod, &err);
++    qemu_mutex_unlock_iothread();
++    g_assert(!err);
++
++    return 0;
++}
++
+ /* Set Tod Programmable Field */
+ void HELPER(sckpf)(CPUS390XState *env, uint64_t r0)
+ {
+diff --git a/target/s390x/translate.c b/target/s390x/translate.c
+index 82309faa11..c6ed9507de 100644
+--- a/target/s390x/translate.c
++++ b/target/s390x/translate.c
+@@ -4016,6 +4016,15 @@ static DisasJumpType op_stcke(DisasContext *s, DisasOps *o)
+     return DISAS_NEXT;
+ }
+ 
++static DisasJumpType op_sck(DisasContext *s, DisasOps *o)
++{
++    check_privileged(s);
++    tcg_gen_qemu_ld_i64(o->in1, o->addr1, get_mem_index(s), MO_TEQ | MO_ALIGN);
++    gen_helper_sck(cc_op, cpu_env, o->in1);
++    set_cc_static(s);
++    return DISAS_NEXT;
++}
++
+ static DisasJumpType op_sckc(DisasContext *s, DisasOps *o)
+ {
+     check_privileged(s);
 -- 
 2.17.0
