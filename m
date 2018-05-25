@@ -1,28 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47789)
+Received: from eggs.gnu.org ([208.118.235.92]:41491)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fMFNE-0003LP-G5
-	for qemu-devel@nongnu.org; Fri, 25 May 2018 12:16:10 -0400
+	(envelope-from <crosa@redhat.com>) id 1fMFO4-0003ik-QN
+	for qemu-devel@nongnu.org; Fri, 25 May 2018 12:16:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fMFMI-0007qm-GE
-	for qemu-devel@nongnu.org; Fri, 25 May 2018 12:15:23 -0400
-Received: from mail-wm0-x242.google.com ([2a00:1450:400c:c09::242]:38941)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1fMFMI-0007pg-1g
-	for qemu-devel@nongnu.org; Fri, 25 May 2018 12:14:26 -0400
-Received: by mail-wm0-x242.google.com with SMTP id f8-v6so16039767wmc.4
-	for <qemu-devel@nongnu.org>; Fri, 25 May 2018 09:14:25 -0700 (PDT)
-References: <20180501142222.19154-1-kbastian@mail.uni-paderborn.de>
-	<20180501142222.19154-2-kbastian@mail.uni-paderborn.de>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <20180501142222.19154-2-kbastian@mail.uni-paderborn.de>
-Date: Fri, 25 May 2018 17:14:23 +0100
-Message-ID: <87muwnsof4.fsf@linaro.org>
+	(envelope-from <crosa@redhat.com>) id 1fMFNM-0000b4-Jn
+	for qemu-devel@nongnu.org; Fri, 25 May 2018 12:16:16 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:37070 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <crosa@redhat.com>) id 1fMFNM-0000aF-6u
+	for qemu-devel@nongnu.org; Fri, 25 May 2018 12:15:32 -0400
+References: <20180525005839.11556-1-crosa@redhat.com>
+	<20180525005839.11556-2-crosa@redhat.com>
+	<20180525053358.GA28589@lemon.usersys.redhat.com>
+From: Cleber Rosa <crosa@redhat.com>
+Message-ID: <fd13b0c9-c375-9781-626a-d3c0714defcb@redhat.com>
+Date: Fri, 25 May 2018 12:15:29 -0400
 MIME-Version: 1.0
+In-Reply-To: <20180525053358.GA28589@lemon.usersys.redhat.com>
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC PATCH 01/12] hw/tricore: Add testdevice for
- tests in tests/tcg/
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 1/5] Add functional/acceptance tests
+ infrastructure
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,216 +30,272 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
-Cc: qemu-devel@nongnu.org
+To: Fam Zheng <famz@redhat.com>
+Cc: Amador Pahim <amador@pahim.org>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>
 
 
-Bastian Koppelmann <kbastian@mail.uni-paderborn.de> writes:
 
-> this device is used to verify the correctness of regression tests by
-> allowing guests to write their exit status to this device. This is then
-> used by qemu to exit using the written status.
+On 05/25/2018 01:33 AM, Fam Zheng wrote:
+> On Thu, 05/24 20:58, Cleber Rosa wrote:
+>> This patch adds the very minimum infrastructure necessary for writing
+>> and running functional/acceptance tests, including:
+>>
+>>  * Documentation
+>>  * The avocado_qemu.Test base test class
+>>  * One example tests (test_version.py)
+>>
+>> Additional functionality is expected to be added along the tests that
+>> require them.
+>>
+>> Signed-off-by: Cleber Rosa <crosa@redhat.com>
+>> ---
+>>  tests/acceptance/README.rst               | 141 ++++++++++++++++++++++
+> 
+> Could you add the actual doc text to docs/devel/testing.rst and reference it
+> here?
+> 
 
-My initial thoughts are this replicates the functionality of
-virtio-console for chr-testdev used by kvm-unit-tests
-(chardev/testdev.c). But on closer inspection it seems this is a
-per-arch thing anyway.
+Yes, sure.
 
->
-> Signed-off-by: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
+>>  tests/acceptance/avocado_qemu/__init__.py |  45 +++++++
+>>  tests/acceptance/test_version.py          |  13 ++
+>>  3 files changed, 199 insertions(+)
+>>  create mode 100644 tests/acceptance/README.rst
+>>  create mode 100644 tests/acceptance/avocado_qemu/__init__.py
+>>  create mode 100644 tests/acceptance/test_version.py
+>>
+>> diff --git a/tests/acceptance/README.rst b/tests/acceptance/README.rst
+>> new file mode 100644
+>> index 0000000000..f1434177da
+>> --- /dev/null
+>> +++ b/tests/acceptance/README.rst
+>> @@ -0,0 +1,141 @@
+>> +==============================================
+>> + Acceptance tests using the Avocado Framework
+>> +==============================================
+>> +
+>> +This directory hosts functional tests, also known as acceptance level
+>> +tests.  They're usually higher level, and may interact with external
+>> +resources and with various guest operating systems.
+>> +
+>> +The tests are written using the Avocado Testing Framework, in
+>> +conjunction with a the ``avocado_qemu.Test`` class, distributed here.
+>> +
+>> +Installation
+>> +============
+>> +
+>> +To install Avocado and its dependencies, run::
+>> +
+>> +  pip install --user avocado-framework
+>> +
+>> +Alternatively, follow the instructions on this link:
+>> +
+>> +  http://avocado-framework.readthedocs.io/en/latest/GetStartedGuide.html#installing-avocado
+>> +
+>> +Overview
+>> +========
+>> +
+>> +This directory provides the ``avocado_qemu`` Python module, containing
+>> +the ``avocado_qemu.Test`` class.  Here's a simple usage example::
+>> +
+>> +  from avocado_qemu import Test
+>> +
+>> +
+>> +  class Version(Test):
+>> +      """
+>> +      :avocado: enable
+>> +      :avocado: tags=quick
+>> +      """
+>> +      def test_qmp_human_info_version(self):
+>> +          self.vm.launch()
+>> +          res = self.vm.command('human-monitor-command',
+>> +                                command_line='info version')
+>> +          self.assertRegexpMatches(res, r'^(\d+\.\d+\.\d)')
+>> +
+>> +To execute your test, run::
+>> +
+>> +  avocado run test_version.py
+>> +
+>> +To run all tests in the current directory, tagged in a particular way,
+>> +run::
+>> +
+>> +  avocado run -t <TAG> .
+>> +
+>> +The ``avocado_qemu.Test`` base test class
+>> +=========================================
+>> +
+>> +The ``avocado_qemu.Test`` class has a number of characteristics that
+>> +are worth being mentioned right away.
+>> +
+>> +First of all, it attempts to give each test a ready to use QEMUMachine
+>> +instance, available at ``self.vm``.  Because many tests will tweak the
+>> +QEMU command line, launching the QEMUMachine (by using ``self.vm.launch()``)
+>> +is left to the test writer.
+>> +
+>> +At test "tear down", ``avocado_qemu.Test`` handles the QEMUMachine
+>> +shutdown.
+>> +
+>> +QEMUMachine
+>> +-----------
+>> +
+>> +The QEMUMachine API should be somewhat familiar to QEMU hackers.  It's
+>> +used in the Python iotests, device-crash-test and other Python scripts.
+>> +
+>> +QEMU binary selection
+>> +---------------------
+>> +
+>> +The QEMU binary used for the ``self.vm`` QEMUMachine instance will
+>> +primarily depend on the value of the ``qemu_bin`` parameter.  If it's
+>> +not explicitly set, its default value will be the result of a dynamic
+>> +probe in the same source tree.  A suitable binary will be one that
+>> +targets the architecture matching host machine.
+>> +
+>> +Based on this description, test writers will usually rely on one of
+>> +the following approaches:
+>> +
+>> +1) Set ``qemu_bin``, and use the given binary
+>> +
+>> +2) Do not set ``qemu_bin``, and use a QEMU binary named like
+>> +   "${arch}-softmmu/qemu-system-${arch}", either in the current
+>> +   working directory, or in the current source tree.
+>> +
+>> +The resulting ``qemu_bin`` value will be preserved in the
+>> +``avocado_qemu.Test`` as an attribute with the same name.
+>> +
+>> +Attribute reference
+>> +===================
+>> +
+>> +Besides the attributes and methods that are part of the base
+>> +``avocado.Test`` class, the following attributes are available on any
+>> +``avocado_qemu.Test`` instance.
+>> +
+>> +vm
+>> +--
+>> +
+>> +A QEMUMachine instance, initially configured according to the given
+>> +``qemu_bin`` parameter.
+>> +
+>> +qemu_bin
+>> +--------
+>> +
+>> +The preserved value of the ``qemu_bin`` parameter or the result of the
+>> +dynamic probe for a QEMU binary in the current working directory or
+>> +source tree.
+>> +
+>> +Parameter reference
+>> +===================
+>> +
+>> +To understand how Avocado parameters are accessed by tests, and how
+>> +they can be passed to tests, please refer to::
+>> +
+>> +  http://avocado-framework.readthedocs.io/en/latest/WritingTests.html#accessing-test-parameters
+>> +
+>> +Parameter values can be easily seen in the log files, and will look
+>> +like the following::
+>> +
+>> +  PARAMS (key=qemu_bin, path=*, default=x86_64-softmmu/qemu-system-x86_64) => 'x86_64-softmmu/qemu-system-x86_64
+>> +
+>> +qemu_bin
+>> +--------
+>> +
+>> +The exact QEMU binary to be used on QEMUMachine.
+>> +
+>> +Uninstalling Avocado
+>> +====================
+>> +
+>> +If you've followed the installation instructions above, you can easily
+>> +uninstall Avocado.  Start by listing the packages you have installed::
+>> +
+>> +  pip list --user
+>> +
+>> +And remove any package you want with::
+>> +
+>> +  pip uninstall <package_name>
+>> diff --git a/tests/acceptance/avocado_qemu/__init__.py b/tests/acceptance/avocado_qemu/__init__.py
+>> new file mode 100644
+>> index 0000000000..dcd58047a3
+>> --- /dev/null
+>> +++ b/tests/acceptance/avocado_qemu/__init__.py
+>> @@ -0,0 +1,45 @@
+> 
+> A copy right header is necessary here.
+> 
 
-Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+OK.
 
-> ---
->  hw/tricore/Makefile.objs                |  1 +
->  hw/tricore/tricore_testboard.c          |  8 ++++
->  hw/tricore/tricore_testdevice.c         | 81 +++++++++++++++++++++++++++=
-++++++
->  include/hw/tricore/tricore_testdevice.h | 38 ++++++++++++++++
->  4 files changed, 128 insertions(+)
->  create mode 100644 hw/tricore/tricore_testdevice.c
->  create mode 100644 include/hw/tricore/tricore_testdevice.h
->
-> diff --git a/hw/tricore/Makefile.objs b/hw/tricore/Makefile.objs
-> index 435e095cff..9e871a01e2 100644
-> --- a/hw/tricore/Makefile.objs
-> +++ b/hw/tricore/Makefile.objs
-> @@ -1 +1,2 @@
->  obj-y +=3D tricore_testboard.o
-> +obj-y +=3D tricore_testdevice.o
-> diff --git a/hw/tricore/tricore_testboard.c b/hw/tricore/tricore_testboar=
-d.c
-> index 8e61dfc3e6..ee0a332e12 100644
-> --- a/hw/tricore/tricore_testboard.c
-> +++ b/hw/tricore/tricore_testboard.c
-> @@ -31,6 +31,7 @@
->  #include "exec/address-spaces.h"
->  #include "elf.h"
->  #include "hw/tricore/tricore.h"
-> +#include "hw/tricore/tricore_testdevice.h"
->  #include "qemu/error-report.h"
->
->
-> @@ -60,6 +61,7 @@ static void tricore_testboard_init(MachineState *machin=
-e, int board_id)
->  {
->      TriCoreCPU *cpu;
->      CPUTriCoreState *env;
-> +    TriCoreTestDeviceState *test_dev;
->
->      MemoryRegion *sysmem =3D get_system_memory();
->      MemoryRegion *ext_cram =3D g_new(MemoryRegion, 1);
-> @@ -91,6 +93,12 @@ static void tricore_testboard_init(MachineState *machi=
-ne, int board_id)
->      memory_region_add_subregion(sysmem, 0xf0050000, pcp_data);
->      memory_region_add_subregion(sysmem, 0xf0060000, pcp_text);
->
-> +    /* test device */
-> +    test_dev =3D g_new(TriCoreTestDeviceState, 1);
-> +    object_initialize(test_dev, sizeof(TriCoreTestDeviceState),
-> +                      TYPE_TRICORE_TESTDEVICE);
-> +    memory_region_add_subregion(sysmem, 0xf0000000, &test_dev->iomem);
-> +
->      tricoretb_binfo.ram_size =3D machine->ram_size;
->      tricoretb_binfo.kernel_filename =3D machine->kernel_filename;
->
-> diff --git a/hw/tricore/tricore_testdevice.c b/hw/tricore/tricore_testdev=
-ice.c
-> new file mode 100644
-> index 0000000000..ce4c67fcae
-> --- /dev/null
-> +++ b/hw/tricore/tricore_testdevice.c
-> @@ -0,0 +1,81 @@
-> +/*
-> + *  Copyright (c) 2018 Bastian Koppelmann Paderborn University
-> + *
-> + * This library is free software; you can redistribute it and/or
-> + * modify it under the terms of the GNU Lesser General Public
-> + * License as published by the Free Software Foundation; either
-> + * version 2 of the License, or (at your option) any later version.
-> + *
-> + * This library is distributed in the hope that it will be useful,
-> + * but WITHOUT ANY WARRANTY; without even the implied warranty of
-> + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-> + * Lesser General Public License for more details.
-> + *
-> + * You should have received a copy of the GNU Lesser General Public
-> + * License along with this library; if not, see <http://www.gnu.org/lice=
-nses/>.
-> + */
-> +
-> +#include "qemu/osdep.h"
-> +#include "hw/sysbus.h"
-> +#include "hw/tricore/tricore_testdevice.h"
-> +
-> +static void tricore_testdevice_write(void *opaque, hwaddr offset,
-> +                                      uint64_t value, unsigned size)
-> +{
-> +    exit(value);
-> +}
-> +
-> +static uint64_t tricore_testdevice_read(void *opaque, hwaddr offset,
-> +                                         unsigned size)
-> +{
-> +    return 0xdeadbeef;
-> +}
-> +
-> +static void tricore_testdevice_reset(DeviceState *dev)
-> +{
-> +}
-> +
-> +static const MemoryRegionOps tricore_testdevice_ops =3D {
-> +    .read =3D tricore_testdevice_read,
-> +    .write =3D tricore_testdevice_write,
-> +    .valid =3D {
-> +        .min_access_size =3D 4,
-> +        .max_access_size =3D 4,
-> +    },
-> +    .endianness =3D DEVICE_NATIVE_ENDIAN,
-> +};
-> +
-> +static void tricore_testdevice_init(Object *obj)
-> +{
-> +    TriCoreTestDeviceState *s =3D TRICORE_TESTDEVICE(obj);
-> +   /* map memory */
-> +    memory_region_init_io(&s->iomem, OBJECT(s), &tricore_testdevice_ops,=
- s,
-> +                          "tricore_testdevice", 0x4);
-> +}
-> +
-> +static Property tricore_testdevice_properties[] =3D {
-> +    DEFINE_PROP_END_OF_LIST()
-> +};
-> +
-> +static void tricore_testdevice_class_init(ObjectClass *klass, void *data)
-> +{
-> +    DeviceClass *dc =3D DEVICE_CLASS(klass);
-> +
-> +    dc->props =3D tricore_testdevice_properties;
-> +    dc->reset =3D tricore_testdevice_reset;
-> +}
-> +
-> +static const TypeInfo tricore_testdevice_info =3D {
-> +    .name          =3D TYPE_TRICORE_TESTDEVICE,
-> +    .parent        =3D TYPE_SYS_BUS_DEVICE,
-> +    .instance_size =3D sizeof(TriCoreTestDeviceState),
-> +    .instance_init =3D tricore_testdevice_init,
-> +    .class_init    =3D tricore_testdevice_class_init,
-> +};
-> +
-> +static void tricore_testdevice_register_types(void)
-> +{
-> +    type_register_static(&tricore_testdevice_info);
-> +}
-> +
-> +type_init(tricore_testdevice_register_types)
-> diff --git a/include/hw/tricore/tricore_testdevice.h b/include/hw/tricore=
-/tricore_testdevice.h
-> new file mode 100644
-> index 0000000000..5b2df219e3
-> --- /dev/null
-> +++ b/include/hw/tricore/tricore_testdevice.h
-> @@ -0,0 +1,38 @@
-> +/*
-> + *  Copyright (c) 2018  Bastian Koppelmann Paderborn University
-> + *
-> + * This library is free software; you can redistribute it and/or
-> + * modify it under the terms of the GNU Lesser General Public
-> + * License as published by the Free Software Foundation; either
-> + * version 2 of the License, or (at your option) any later version.
-> + *
-> + * This library is distributed in the hope that it will be useful,
-> + * but WITHOUT ANY WARRANTY; without even the implied warranty of
-> + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-> + * Lesser General Public License for more details.
-> + *
-> + * You should have received a copy of the GNU Lesser General Public
-> + * License along with this library; if not, see <http://www.gnu.org/lice=
-nses/>.
-> + */
-> +
-> +
-> +#ifndef HW_TRICORE_TESTDEV_H
-> +#define HW_TRICORE_TESTDEV_H
-> +
-> +#include "hw/sysbus.h"
-> +#include "hw/hw.h"
-> +
-> +#define TYPE_TRICORE_TESTDEVICE "tricore_testdevice"
-> +#define TRICORE_TESTDEVICE(obj) \
-> +    OBJECT_CHECK(TriCoreTestDeviceState, (obj), TYPE_TRICORE_TESTDEVICE)
-> +
-> +typedef struct {
-> +    /* <private> */
-> +    SysBusDevice parent_obj;
-> +
-> +    /* <public> */
-> +    MemoryRegion iomem;
-> +
-> +} TriCoreTestDeviceState;
-> +
-> +#endif
+>> +import os
+>> +import sys
+>> +
+>> +import avocado
+>> +
+>> +SRC_ROOT_DIR = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
+>> +SRC_ROOT_DIR = os.path.abspath(os.path.dirname(SRC_ROOT_DIR))
+>> +sys.path.append(os.path.join(SRC_ROOT_DIR, 'scripts'))
+>> +
+>> +from qemu import QEMUMachine
+>> +
+>> +def is_readable_executable_file(path):
+>> +    return os.path.isfile(path) and os.access(path, os.R_OK | os.X_OK)
+>> +
+>> +
+>> +def pick_default_qemu_bin():
+>> +    """
+>> +    Picks the path of a QEMU binary, starting either in the current working
+>> +    directory or in the source tree root directory.
+>> +    """
+>> +    arch = os.uname()[4]
+>> +    qemu_bin_relative_path = os.path.join("%s-softmmu" % arch,
+>> +                                          "qemu-system-%s" % arch)
+>> +    if is_readable_executable_file(qemu_bin_relative_path):
+>> +        return qemu_bin_relative_path
+>> +
+>> +    qemu_bin_from_src_dir_path = os.path.join(SRC_ROOT_DIR,
+>> +                                              qemu_bin_relative_path)
+>> +    if is_readable_executable_file(qemu_bin_from_src_dir_path):
+>> +        return qemu_bin_from_src_dir_path
+>> +
+>> +
+>> +class Test(avocado.Test):
+>> +    def setUp(self):
+>> +        self.vm = None
+>> +        self.qemu_bin = None
+>> +        self.qemu_bin = self.params.get('qemu_bin',
+>> +                                        default=pick_default_qemu_bin())
+>> +        if self.qemu_bin is None:
+>> +            self.cancel("No QEMU binary defined or found in the source tree")
+>> +        self.vm = QEMUMachine(self.qemu_bin)
+>> +
+>> +    def tearDown(self):
+>> +        if self.vm is not None:
+>> +            self.vm.shutdown()
+>> diff --git a/tests/acceptance/test_version.py b/tests/acceptance/test_version.py
+>> new file mode 100644
+>> index 0000000000..e397f07d83
+>> --- /dev/null
+>> +++ b/tests/acceptance/test_version.py
+>> @@ -0,0 +1,13 @@
+>> +from avocado_qemu import Test
+> 
+> Same here.
+> 
 
+Sure.
 
---
-Alex Benn=C3=A9e
+- Cleber.
+
+>> +
+>> +
+>> +class Version(Test):
+>> +    """
+>> +    :avocado: enable
+>> +    :avocado: tags=quick
+>> +    """
+>> +    def test_qmp_human_info_version(self):
+>> +        self.vm.launch()
+>> +        res = self.vm.command('human-monitor-command',
+>> +                              command_line='info version')
+>> +        self.assertRegexpMatches(res, r'^(\d+\.\d+\.\d)')
+>> -- 
+>> 2.17.0
+>>
+> 
