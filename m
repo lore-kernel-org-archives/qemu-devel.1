@@ -1,26 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53579)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53840)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fMAo2-000301-6K
-	for qemu-devel@nongnu.org; Fri, 25 May 2018 07:22:48 -0400
+	(envelope-from <zhaoshenglong@huawei.com>) id 1fMAof-0003KB-FN
+	for qemu-devel@nongnu.org; Fri, 25 May 2018 07:23:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fMAnx-0002fV-9c
-	for qemu-devel@nongnu.org; Fri, 25 May 2018 07:22:46 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:36372 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1fMAnx-0002f7-5D
-	for qemu-devel@nongnu.org; Fri, 25 May 2018 07:22:41 -0400
-From: Thomas Huth <thuth@redhat.com>
-References: <1527186303-192100-1-git-send-email-mst@redhat.com>
-	<1527186303-192100-3-git-send-email-mst@redhat.com>
-	<ac1f972f-2769-9945-868d-e80a01842f4f@redhat.com>
-Message-ID: <119d0c85-2836-8a9f-9df2-4d26c9c6c9a4@redhat.com>
-Date: Fri, 25 May 2018 13:22:38 +0200
+	(envelope-from <zhaoshenglong@huawei.com>) id 1fMAoe-0002yu-HO
+	for qemu-devel@nongnu.org; Fri, 25 May 2018 07:23:25 -0400
+From: Shannon Zhao <zhaoshenglong@huawei.com>
+Date: Fri, 25 May 2018 19:22:50 +0800
+Message-ID: <1527247371-10592-2-git-send-email-zhaoshenglong@huawei.com>
+In-Reply-To: <1527247371-10592-1-git-send-email-zhaoshenglong@huawei.com>
+References: <1527247371-10592-1-git-send-email-zhaoshenglong@huawei.com>
 MIME-Version: 1.0
-In-Reply-To: <ac1f972f-2769-9945-868d-e80a01842f4f@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v4 2/3] libqtest: fail if child coredumps
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH v4 1/2] arm_gicv3_kvm:
+ kvm_dist_get/put_priority: skip the registers banked by GICR_IPRIORITYR
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,57 +22,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org
-Cc: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Markus Armbruster <armbru@redhat.com>
+To: qemu-arm@nongnu.org
+Cc: peter.maydell@linaro.org, eric.auger@redhat.com, qemu-devel@nongnu.org, shannon.zhaosl@gmail.com, Shannon Zhao <zhaoshenglong@huawei.com>, qemu-stable@nongnu.org
 
-On 25.05.2018 08:10, Thomas Huth wrote:
-> On 24.05.2018 20:25, Michael S. Tsirkin wrote:
->> Right now tests report OK status if QEMU crashes during cleanup.
->> Let's catch that case and fail the test.
->>
->> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
->> ---
->>  tests/libqtest.c | 9 ++++++++-
->>  1 file changed, 8 insertions(+), 1 deletion(-)
->>
->> diff --git a/tests/libqtest.c b/tests/libqtest.c
->> index 43fb97e..f869854 100644
->> --- a/tests/libqtest.c
->> +++ b/tests/libqtest.c
->> @@ -103,8 +103,15 @@ static int socket_accept(int sock)
->>  static void kill_qemu(QTestState *s)
->>  {
->>      if (s->qemu_pid != -1) {
->> +        int wstatus = 0;
->> +        pid_t pid;
->> +
->>          kill(s->qemu_pid, SIGTERM);
->> -        waitpid(s->qemu_pid, NULL, 0);
->> +        pid = waitpid(s->qemu_pid, &wstatus, 0);
->> +
->> +        if (pid == s->qemu_pid && WIFSIGNALED(wstatus)) {
->> +            assert(!WCOREDUMP(wstatus));
-> 
-> Another ugliness that I just discovered: kill_qemu is also called from
-> the SIGABRT handler. So if a qtest assert() triggers an abort(), the
-> abort handler runs kill_qemu which now could trigger another assert()
-> and thus abort(). It's likely not a real problem since the abort handler
-> has been installed with SA_RESETHAND, but it's still quite confusing code.
-> 
-> Please let's clean up this ugliness properly: I think kill_qemu should
-> *only* be used by the abort handler, and then kill QEMU with SIGKILL for
-> good, to make sure that there are no stuck QEMU processes hanging around
-> anymore.
-> 
-> qtest_quit() should simply try to quit QEMU via QMP instead, and then
-> check for WIFEXITED(wstatus) && !WEXITSTATUS(wstatus) instead of using
-> the kill_qemu() function.
+While for_each_dist_irq_reg loop starts from GIC_INTERNAL, it forgot to
+offset the date array and index. This will overlap the GICR registers
+value and leave the last GIC_INTERNAL irq's registers out of update.
 
-I just did some experiments with that, and using QMP 'quit' to exit QEMU
-is also not working very reliable - some tests apparently mess up QMP
-quite badly, so the 'quit' does not work during qtest_quit anymore.
-Looks like we have to continue to send SIGTERM during qtest_quit(). But
-I still think we should separate the logic from the abort handler (which
-should use SIGKILL in case SIGTERM does not work as expected).
+Fixes: 367b9f527becdd20ddf116e17a3c0c2bbc486920
+Cc: qemu-stable@nongnu.org
+Signed-off-by: Shannon Zhao <zhaoshenglong@huawei.com>
+---
+ hw/intc/arm_gicv3_kvm.c | 18 ++++++++++++++++--
+ 1 file changed, 16 insertions(+), 2 deletions(-)
 
- Thomas
+diff --git a/hw/intc/arm_gicv3_kvm.c b/hw/intc/arm_gicv3_kvm.c
+index 3536795..147e691 100644
+--- a/hw/intc/arm_gicv3_kvm.c
++++ b/hw/intc/arm_gicv3_kvm.c
+@@ -135,7 +135,14 @@ static void kvm_dist_get_priority(GICv3State *s, uint32_t offset, uint8_t *bmp)
+     uint32_t reg, *field;
+     int irq;
+ 
+-    field = (uint32_t *)bmp;
++    /* For the KVM GICv3, affinity routing is always enabled, and the first 8
++     * GICD_IPRIORITYR<n> registers are always RAZ/WI. The corresponding
++     * functionality is replaced by GICR_IPRIORITYR<n>. It doesn't need to
++     * sync them. So it needs to skip the field of GIC_INTERNAL irqs in bmp and
++     * offset.
++     */
++    field = (uint32_t *)(bmp + GIC_INTERNAL);
++    offset += (GIC_INTERNAL * 8) / 8;
+     for_each_dist_irq_reg(irq, s->num_irq, 8) {
+         kvm_gicd_access(s, offset, &reg, false);
+         *field = reg;
+@@ -149,7 +156,14 @@ static void kvm_dist_put_priority(GICv3State *s, uint32_t offset, uint8_t *bmp)
+     uint32_t reg, *field;
+     int irq;
+ 
+-    field = (uint32_t *)bmp;
++    /* For the KVM GICv3, affinity routing is always enabled, and the first 8
++     * GICD_IPRIORITYR<n> registers are always RAZ/WI. The corresponding
++     * functionality is replaced by GICR_IPRIORITYR<n>. It doesn't need to
++     * sync them. So it needs to skip the field of GIC_INTERNAL irqs in bmp and
++     * offset.
++     */
++    field = (uint32_t *)(bmp + GIC_INTERNAL);
++    offset += (GIC_INTERNAL * 8) / 8;
+     for_each_dist_irq_reg(irq, s->num_irq, 8) {
+         reg = *field;
+         kvm_gicd_access(s, offset, &reg, true);
+-- 
+2.0.4
