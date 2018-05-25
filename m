@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53030)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56957)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1fMCEs-0004Zs-0f
-	for qemu-devel@nongnu.org; Fri, 25 May 2018 08:54:35 -0400
+	(envelope-from <eblake@redhat.com>) id 1fMCRZ-0008JM-Fi
+	for qemu-devel@nongnu.org; Fri, 25 May 2018 09:07:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1fMCEo-0000nL-3O
-	for qemu-devel@nongnu.org; Fri, 25 May 2018 08:54:34 -0400
-Received: from 12.mo4.mail-out.ovh.net ([178.33.104.253]:42318)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1fMCEn-0000lH-T0
-	for qemu-devel@nongnu.org; Fri, 25 May 2018 08:54:30 -0400
-Received: from player797.ha.ovh.net (unknown [10.109.122.227])
-	by mo4.mail-out.ovh.net (Postfix) with ESMTP id A8760177F24
-	for <qemu-devel@nongnu.org>; Fri, 25 May 2018 14:54:27 +0200 (CEST)
-From: Greg Kurz <groug@kaod.org>
-Date: Fri, 25 May 2018 14:54:12 +0200
-Message-ID: <152725285229.537901.6934923933763529191.stgit@bahia.lan>
+	(envelope-from <eblake@redhat.com>) id 1fMCRW-00076W-8v
+	for qemu-devel@nongnu.org; Fri, 25 May 2018 09:07:41 -0400
+References: <20180521063516.5479-1-famz@redhat.com>
+	<677208b5-586b-354a-5fd4-67468152510e@redhat.com>
+	<20180525021641.GD12594@lemon.usersys.redhat.com>
+	<87a7soxp5j.fsf@dusky.pond.sub.org>
+	<20180525062503.GE28589@lemon.usersys.redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <f89ee2a6-03e1-ee56-4d7d-e6d0d513094d@redhat.com>
+Date: Fri, 25 May 2018 08:07:24 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <20180525062503.GE28589@lemon.usersys.redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] [PATCH] spapr: don't call KVM_PPC_CONFIGURE_V3_MMU if
- HPT is in userspace
+Subject: Re: [Qemu-devel] [PATCH] nvme: Make nvme_init error handling code
+ more readable
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,70 +28,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>, Laurent Vivier <lvivier@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, Paul Mackerras <paulus@samba.org>, qemu-stable@nongnu.org
+To: Fam Zheng <famz@redhat.com>, Markus Armbruster <armbru@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
 
-Since the kernel commit "dbfcf3cb9c68 powerpc/64: Call H_REGISTER_PROC_TBL
-when running as a HPT guest on POWER9", a nested guest running with PR KVM
-hangs at boot:
+On 05/25/2018 01:25 AM, Fam Zheng wrote:
 
-Preparing to boot Linux version 4.16.0-kvm-pr-hang-gku+ (greg@qemu2222.boston16) (gcc version 8.1.1 20180502 (Red Hat 8.1.1-1) (GCC)) #19 SMP Fri May 25 08:41:55 CEST 2018
-Detected machine type: 0000000000000101
-command line: root=UUID=22128c5c-30b1-4e0a-ac16-95853df31131 ro rhgb console=hvc0 early_printk disable-radix=on
-Max number of cores passed to firmware: 1024 (NR_CPUS = 1024)
-Calling ibm,client-architecture-support... done
-memory layout at init:
-  memory_limit : 0000000000000000 (16 MB aligned)
-  alloc_bottom : 0000000001b80000
-  alloc_top    : 0000000030000000
-  alloc_top_hi : 0000000100000000
-  rmo_top      : 0000000030000000
-  ram_top      : 0000000100000000
-instantiating rtas at 0x000000002fff0000... done
-prom_hold_cpus: skipped
-copying OF device tree...
-Building dt strings...
-Building dt structure...
-Device tree strings 0x0000000003d90000 -> 0x0000000003d90abb
-Device tree struct  0x0000000003da0000 -> 0x0000000003db0000
-Quiescing Open Firmware ...
-Booting Linux via __start() @ 0x0000000000400000 ...
+>>> And that makes five labels in total, I'm not sure I like it:
+>>>
+>>> fail_handler:
+>>>      aio_set_event_notifier(bdrv_get_aio_context(bs), &s->irq_notifier,
+>>>                             false, NULL, NULL);
+>>> fail_queue:
+>>>      nvme_free_queue_pair(bs, s->queues[0]);
+>>> fail_regs:
+>>>      qemu_vfio_pci_unmap_bar(s->vfio, 0, (void *)s->regs, 0, NVME_BAR_SIZE);
+>>> fail_vfio:
+>>>      qemu_vfio_close(s->vfio);
+>>> fail:
+>>>      g_free(s->queues);
+>>>      event_notifier_cleanup(&s->irq_notifier);
+>>>      return ret;
+>>
+>> Doesn't look materially worse to me :)
+> 
+> The labels themselves are not ugly or bad, but the goto statements above will be
+> harder to manage.
+> 
+>>
+>> With nice cleanup functions that detect "hasn't been set up" and do
+>> nothing then, like free(NULL), you can use just one label.  Sadly,
+>> cleanup functions are often not nice that way.
+> 
+> nvme_free_queue_pair and qemu_vfio_close are cleanup functions and we can
+> improve them, but to make qemu_vfio_pci_unmap_bar behave similarly is just odd:
+> it's not a clean up function, at least not for s->vfio.
 
-This happens because the H_REGISTER_PROC_TBL implementation in QEMU
-always call KVM_PPC_CONFIGURE_V3_MMU when KVM is present. This fails
-in the case of PR KVM, which doesn't implement it, and QEMU returns
-H_PARAMETER to the guest, which is a BUG() condition in linux.
+But even then, you can do:
 
-In the case of PR, the HPT is allocated in userspace by QEMU, so it
-doesn't make sense to call KVM_PPC_CONFIGURE_V3_MMU in the first
-place. So, skip it in this case and let the guest boot.
-
-Signed-off-by: Greg Kurz <groug@kaod.org>
----
-
-Note that PR KVM requires this patch from Paul to work on POWER9:
-
-    https://patchwork.ozlabs.org/patch/916766/
-
-The original request was coming from people who want to run openQA in
-fedora28 under PowerVM on a POWER9 system. This requires PR KVM, which
-will be running in HPT-mode since pHyp doesn't do radix.
-
-Cc'ing stable because fedora28 ships QEMU 2.11.x.
----
- hw/ppc/spapr_hcall.c |    2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/hw/ppc/spapr_hcall.c b/hw/ppc/spapr_hcall.c
-index 022f6d810182..12cbb317e5e8 100644
---- a/hw/ppc/spapr_hcall.c
-+++ b/hw/ppc/spapr_hcall.c
-@@ -1420,7 +1420,7 @@ static target_ulong h_register_process_table(PowerPCCPU *cpu,
-                   ((flags & FLAG_GTSE) ? LPCR_GTSE : 0),
-                   LPCR_UPRT | LPCR_GTSE);
- 
--    if (kvm_enabled()) {
-+    if (kvm_enabled() && !spapr->htab) {
-         return kvmppc_configure_v3_mmu(cpu, flags & FLAG_RADIX,
-                                        flags & FLAG_GTSE, cproc);
+fail:
+     if (s->vfio) {
+         qemu_vfio_close(s->vfio);
      }
+
+That is, there are ways to make a single cleanup path more applicable, 
+regardless of where you decided you needed an early cleanup.
+
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
