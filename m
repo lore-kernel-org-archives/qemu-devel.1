@@ -1,21 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54410)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56200)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1fM9DE-00051w-Fx
-	for qemu-devel@nongnu.org; Fri, 25 May 2018 05:40:41 -0400
+	(envelope-from <eric.auger@redhat.com>) id 1fM9N6-0006ei-5I
+	for qemu-devel@nongnu.org; Fri, 25 May 2018 05:50:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1fM9DB-0002lP-82
-	for qemu-devel@nongnu.org; Fri, 25 May 2018 05:40:40 -0400
-Date: Fri, 25 May 2018 11:40:33 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20180525114033.3c514091.cohuck@redhat.com>
-In-Reply-To: <20180524175828.3143-2-pasic@linux.ibm.com>
-References: <20180524175828.3143-1-pasic@linux.ibm.com>
-	<20180524175828.3143-2-pasic@linux.ibm.com>
+	(envelope-from <eric.auger@redhat.com>) id 1fM9N5-0007ln-2K
+	for qemu-devel@nongnu.org; Fri, 25 May 2018 05:50:52 -0400
+References: <20180521140402.23318-1-peter.maydell@linaro.org>
+	<20180521140402.23318-18-peter.maydell@linaro.org>
+	<8736yivgw3.fsf@linaro.org>
+	<f568933d-2d8c-da22-c588-3ca4d3140538@redhat.com>
+	<CAFEAcA--wyed8qg=4P-DG9QyZe1eACWh+68g99Gowx71CFAh_w@mail.gmail.com>
+From: Auger Eric <eric.auger@redhat.com>
+Message-ID: <e253665e-18db-49c7-afca-8284e975b80f@redhat.com>
+Date: Fri, 25 May 2018 11:50:43 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3 1/2] vfio-ccw: add force unlimited
- prefetch property
+In-Reply-To: <CAFEAcA--wyed8qg=4P-DG9QyZe1eACWh+68g99Gowx71CFAh_w@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 17/27] exec.c: Handle IOMMUs in
+ address_space_translate_for_iotlb()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,79 +27,157 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Halil Pasic <pasic@linux.ibm.com>
-Cc: Dong Jia Shi <bjsdjshi@linux.ibm.com>, "Jason J. Herne" <jjherne@linux.ibm.com>, qemu-s390x@nongnu.org, qemu-devel@nongnu.org
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: "patches@linaro.org" <patches@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, Richard Henderson <rth@twiddle.net>
 
-On Thu, 24 May 2018 19:58:27 +0200
-Halil Pasic <pasic@linux.ibm.com> wrote:
+Hi Peter,
 
-> There is at least one guest (OS) such that although it does not rely on
-> the guarantees provided by ORB 1 word 9 bit (aka unlimited prefetch, aka
-> P bit) not being set, it fails to tell this to the machine.
-> 
-> Usually this ain't a big deal, as the original purpose of the P bit is to
-> allow for performance optimizations. vfio-ccw however can not provide the
-> guarantees required if the bit is not set.
-> 
-> It is not possible to implement support for the P bit not set without
-> transitioning to lower level protocols for vfio-ccw.  So let's give the
-> user the opportunity to force setting the P bit, if the user knows this
-> is safe.  For self modifying channel programs forcing the P bit is not
-> safe.  If the P bit is forced for a self modifying channel program things
-> are expected to break in strange ways.
-> 
-> Let's also avoid warning multiple about P bit not set in the ORB in case
-> P bit is not told to be forced, and designate the affected vfio-ccw
-> device.
-> 
-> Signed-off-by: Halil Pasic <pasic@linux.ibm.com>
-> Suggested-by: Dong Jia Shi <bjsdjshi@linux.ibm.com>
-> Acked-by: Jason J. Herne <jjherne@linux.ibm.com>
-> Tested-by: Jason J. Herne <jjherne@linux.ibm.com>
+On 05/25/2018 10:52 AM, Peter Maydell wrote:
+> On 24 May 2018 at 20:54, Auger Eric <eric.auger@redhat.com> wrote:
+>> Hi Peter,
+>>
+>> On 05/23/2018 11:51 AM, Alex Benn=C3=A9e wrote:
+>>>
+>>> Peter Maydell <peter.maydell@linaro.org> writes:
+>>>
+>>>> Currently we don't support board configurations that put an IOMMU
+>>>> in the path of the CPU's memory transactions, and instead just
+>>>> assert() if the memory region fonud in address_space_translate_for_i=
+otlb()
+>> found
+>>>> is an IOMMUMemoryRegion.
+>>>>
+>>>> Remove this limitation by having the function handle IOMMUs.
+>>>> This is mostly straightforward, but we must make sure we have
+>>>> a notifier registered for every IOMMU that a transaction has
+>>>> passed through, so that we can flush the TLB appropriately
+>> Can you elaborate on what (TCG) TLB we are talking about?
+>=20
+> The TCG TLB, as implemented in accel/tcg/cputlb.c. Basically
+> the thing that caches the results it gets back from the memory
+> system so it can fast path device and memory accesses.
+>=20
+>> The concept of IOMMUs downstream to a CPU is not obvious to me. Maybe =
+an
+>> example may be documented in the commit message?
+>=20
+> The MPC implemented in this patchset is an example.
+>=20
+>=20
+>=20
+>>>> +static void tcg_iommu_unmap_notify(IOMMUNotifier *n, IOMMUTLBEntry =
+*iotlb)
+>>>> +{
+>>>> +    TCGIOMMUNotifier *notifier =3D container_of(n, TCGIOMMUNotifier=
+, n);
+>>>> +
+>>>> +    if (!notifier->active) {
+>>>> +        return;
+>>>> +    }
+>>>> +    tlb_flush(notifier->cpu);
+>>>> +    notifier->active =3D false;
+>>>> +    /* We leave the notifier struct on the list to avoid reallocati=
+ng it later.
+>>>> +     * Generally the number of IOMMUs a CPU deals with will be smal=
+l.
+>>>> +     * In any case we can't unregister the iommu notifier from a no=
+tify
+>>>> +     * callback.
+>>>> +     */
+>> I don't get the life cycle of the notifier and why it becomes inactive
+>> after the invalidate. Could you detail the specificity of this one?
+>=20
+> Once we've flushed the TLB it is empty and will have no cached
+> information from the IOMMU. So there's no point in flushing the
+> TLB again (which is expensive) until the next time a transaction
+> goes through the IOMMU and we're caching something from it.
+Ak OK. there is no finer granularity for TLB flush?
 
-> +static inline void warn_once(bool *warned, const char *fmt, ...)
-> +{
-> +    va_list ap;
-> +
-> +    if (!warned || *warned) {
-> +        return;
-> +    }
-> +    *warned = true;
-> +    va_start(ap, fmt);
-> +    warn_vreport(fmt, ap);
-> +    va_end(ap);
-> +}
-> +
-> +static inline void warn_once_pfch(VFIOCCWDevice *vcdev, SubchDev *sch,
-> +                                  const char *msg)
-> +{
-> +    warn_once(&vcdev->warned_orb_pfch, "vfio-ccw (devno %x.%x.%04x): %s",
-> +              sch->cssid, sch->ssid, sch->devno, msg);
-> +}
-> +
+>=20
+> So the cycle goes:
+>  * CPU makes transaction that goes through an IOMMU
+>  * in tcg_register_iommu_notifier() we register the notifier
+>    if we haven't already, and make sure it's got active =3D true
+>  * in the unmap notify, we flush the whole TLB for the CPU, and
+>    set active =3D false
+>  * repeat...
+OK thank you for the explanation
+>=20
+>=20
+>>>> +static void tcg_iommu_notifier_destroy(gpointer data)
+>>>> +{
+>>>> +    TCGIOMMUNotifier *notifier =3D data;
+>>>> +
+>>>> +    if (notifier->active) {
+>>>> +        memory_region_unregister_iommu_notifier(notifier->mr, &noti=
+fier->n);
+>>>> +    }
+>> Is it safe to leave the notifier registered to an IOMMU whereas it get=
+s
+>> freed?
+>=20
+> Oh, this is a bug, left over from my first idea (which was to
+> unregister the IOMMU notifier in the notifier unmap callback,
+> in which case active =3D=3D true would be the only case when we
+> had a registered notifier).
+>=20
+> We should unconditionally unregister the notifier here.
+>=20
+>=20
+>>>>  /* Called from RCU critical section */
+>>>>  MemoryRegionSection *
+>>>>  address_space_translate_for_iotlb(CPUState *cpu, int asidx, hwaddr =
+addr,
+>>>> -                                  hwaddr *xlat, hwaddr *plen)
+>>>> +                                  hwaddr *xlat, hwaddr *plen,
+>>>> +                                  MemTxAttrs attrs, int *prot)
+>>>>  {
+>>>>      MemoryRegionSection *section;
+>>>> +    IOMMUMemoryRegion *iommu_mr;
+>>>> +    IOMMUMemoryRegionClass *imrc;
+>>>> +    IOMMUTLBEntry iotlb;
+>>>> +    int iommu_idx;
+>>>>      AddressSpaceDispatch *d =3D atomic_rcu_read(&cpu->cpu_ases[asid=
+x].memory_dispatch);
+>>>>
+>>>> -    section =3D address_space_translate_internal(d, addr, xlat, ple=
+n, false);
+>>>> +    for (;;) {
+>>>> +        section =3D address_space_translate_internal(d, addr, &addr=
+, plen, false);
+>>>> +
+>>>> +        iommu_mr =3D memory_region_get_iommu(section->mr);
+>>>> +        if (!iommu_mr) {
+>>>> +            break;
+>>>> +        }
+>>>> +
+>>>> +        imrc =3D memory_region_get_iommu_class_nocheck(iommu_mr);
+>>>> +
+>>>> +        iommu_idx =3D imrc->attrs_to_index(iommu_mr, attrs);
+>>>> +        tcg_register_iommu_notifier(cpu, iommu_mr, iommu_idx);
+>>>> +        /* We need all the permissions, so pass IOMMU_NONE so the I=
+OMMU
+>>>> +         * doesn't short-cut its translation table walk.
+>> it is not clear to me why you don't use the access flag as you seem to
+>> handle the perm fault after the translate() call.
+>=20
+> We need to know all the permissions (because we'll cache the result
+> in the TCG TLB and later use them for future read and write accesses),
+> so we pass IOMMU_NONE.
+>=20
+> My understanding from previous discussion is that the only
+> reason to pass in some other access flag value is if you
+> only care about one of read or write and want to allow the
+> IOMMU to stop walking the page table early as soon as it decides
+> it doesn't have permissions.
 
-While I still think we want warn_once() in common error handling code,
-this looks reasonable enough. We can still move it later.
+agreed. So you need to fetch the whole set of table permissions to
+update the TLB. By the way where is the TLB updated?
 
->  static void vfio_ccw_compute_needs_reset(VFIODevice *vdev)
->  {
->      vdev->needs_reset = false;
-> @@ -54,6 +76,18 @@ static IOInstEnding vfio_ccw_handle_request(SubchDev *sch)
->      struct ccw_io_region *region = vcdev->io_region;
->      int ret;
->  
-> +    if (!(sch->orb.ctrl0 & ORB_CTRL0_MASK_PFCH)) {
-> +        if (!(vcdev->force_orb_pfch)) {
-> +            warn_once_pfch(vcdev, sch, "requires PFCH flag set");
-> +            sch_gen_unit_exception(sch);
-> +            css_inject_io_interrupt(sch);
-> +            return IOINST_CC_EXPECTED;
-> +        } else {
-> +            sch->orb.ctrl0 |= ORB_CTRL0_MASK_PFCH;
-> +            warn_once_pfch(vcdev, sch, "PFCH flag forced");
-> +        }
-> +    }
-> +
+Thanks
 
-Looks good to me. I plan to queue this (and the other patch) to
-s390-next, but (as always) further tags are still welcome :)
+Eric
+>=20
+> thanks
+> -- PMM
+>=20
