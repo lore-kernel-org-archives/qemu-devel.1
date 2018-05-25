@@ -1,27 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44065)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45895)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhaoshenglong@huawei.com>) id 1fM8Jv-0005jZ-5N
-	for qemu-devel@nongnu.org; Fri, 25 May 2018 04:43:32 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1fM8Sg-0007s0-Fd
+	for qemu-devel@nongnu.org; Fri, 25 May 2018 04:52:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zhaoshenglong@huawei.com>) id 1fM8Ju-0005Ej-7j
-	for qemu-devel@nongnu.org; Fri, 25 May 2018 04:43:31 -0400
-Message-ID: <5B07CC79.1070905@huawei.com>
-Date: Fri, 25 May 2018 16:42:33 +0800
-From: Shannon Zhao <zhaoshenglong@huawei.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1fM8Sf-0001h5-DQ
+	for qemu-devel@nongnu.org; Fri, 25 May 2018 04:52:34 -0400
+Received: from mail-oi0-x244.google.com ([2607:f8b0:4003:c06::244]:34471)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1fM8Se-0001gq-Td
+	for qemu-devel@nongnu.org; Fri, 25 May 2018 04:52:33 -0400
+Received: by mail-oi0-x244.google.com with SMTP id l1-v6so3939330oii.1
+	for <qemu-devel@nongnu.org>; Fri, 25 May 2018 01:52:32 -0700 (PDT)
 MIME-Version: 1.0
-References: <1527047633-12368-1-git-send-email-zhaoshenglong@huawei.com>
-	<1527047633-12368-2-git-send-email-zhaoshenglong@huawei.com>
-	<acca5b80-f527-bc39-0b63-147e53affb4b@redhat.com>
-	<CAFEAcA-xbHtxora5TU9psYnBgP0+N8_nznhVppEkg7fmmwip3w@mail.gmail.com>
-	<10801e6c-5028-add6-b082-22c5dc9758ca@redhat.com>
-	<CAFEAcA-eW_1M42c+Fjt98AgVsnbwjwWap3JZFHNU9f8S0H_qww@mail.gmail.com>
-	<38aee779-1baf-ab96-7489-0f34bda2f8e6@redhat.com>
-	<CAFEAcA9oCppg2C32vd3YKKmvfO7n1KnFeXG14CV7UHcZpxcTqA@mail.gmail.com>
-In-Reply-To: <CAFEAcA9oCppg2C32vd3YKKmvfO7n1KnFeXG14CV7UHcZpxcTqA@mail.gmail.com>
+In-Reply-To: <f568933d-2d8c-da22-c588-3ca4d3140538@redhat.com>
+References: <20180521140402.23318-1-peter.maydell@linaro.org>
+	<20180521140402.23318-18-peter.maydell@linaro.org>
+	<8736yivgw3.fsf@linaro.org>
+	<f568933d-2d8c-da22-c588-3ca4d3140538@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 25 May 2018 09:52:11 +0100
+Message-ID: <CAFEAcA--wyed8qg=4P-DG9QyZe1eACWh+68g99Gowx71CFAh_w@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH V3 2/2] arm_gicv3_kvm: kvm_dist_get/put:
- skip the registers banked by GICR
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 17/27] exec.c: Handle IOMMUs in
+ address_space_translate_for_iotlb()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,64 +33,140 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, Auger Eric <eric.auger@redhat.com>
-Cc: Shannon Zhao <shannon.zhaosl@gmail.com>, qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
+To: Auger Eric <eric.auger@redhat.com>
+Cc: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, "patches@linaro.org" <patches@linaro.org>
+
+On 24 May 2018 at 20:54, Auger Eric <eric.auger@redhat.com> wrote:
+> Hi Peter,
+>
+> On 05/23/2018 11:51 AM, Alex Benn=C3=A9e wrote:
+>>
+>> Peter Maydell <peter.maydell@linaro.org> writes:
+>>
+>>> Currently we don't support board configurations that put an IOMMU
+>>> in the path of the CPU's memory transactions, and instead just
+>>> assert() if the memory region fonud in address_space_translate_for_iotl=
+b()
+> found
+>>> is an IOMMUMemoryRegion.
+>>>
+>>> Remove this limitation by having the function handle IOMMUs.
+>>> This is mostly straightforward, but we must make sure we have
+>>> a notifier registered for every IOMMU that a transaction has
+>>> passed through, so that we can flush the TLB appropriately
+> Can you elaborate on what (TCG) TLB we are talking about?
+
+The TCG TLB, as implemented in accel/tcg/cputlb.c. Basically
+the thing that caches the results it gets back from the memory
+system so it can fast path device and memory accesses.
+
+> The concept of IOMMUs downstream to a CPU is not obvious to me. Maybe an
+> example may be documented in the commit message?
+
+The MPC implemented in this patchset is an example.
 
 
 
-On 2018/5/24 22:56, Peter Maydell wrote:
-> On 24 May 2018 at 15:40, Auger Eric <eric.auger@redhat.com> wrote:
->> > Hi Peter,
->> >
->> > On 05/24/2018 04:16 PM, Peter Maydell wrote:
->>> >> Only for KVM, not for TCG, and it's the other way round: we
->>> >> end up with two lots of PPI/SGI space in the data structure
->>> >> by mistake. Let me fish out the comment I made on the v2 of this
->>> >> series:
->>> >>
->>> >> In the code in master, we have QEMU data structures
->>> >> (bitmaps, etc) which have one entry for each of GICV3_MAXIRQ
->>> >> irqs. That includes the RAZ/WI unused space for the SPIs/PPIs, so
->>> >> for a 1-bit-per-irq bitmap:
->>> >>  [0x00000000, irq 32, irq 33, .... ]
->>> >>
->>> >> When we fill in the values from KVM into these data structures,
->>> >> we start after the unused space, because the for_each_dist_irq_reg()
->>> >> macro starts with _irq = GIC_INTERNAL. But we forgot to adjust
->>> >> the offset value we use for the KVM access, so we start by
->>> >> reading the RAZ/WI values from KVM, and the data structure
->>> >> contents end up with:
->>> >>  [0x00000000, 0x00000000, irq 32, irq 33, ... ]
->>> >> (and the last irqs wouldn't get transferred).
->> > In kvm_dist_get_priority (new code), the offset is where we read and
->> > field is where we write, correct? Offset was shifted so we effectively
->> > read in KVM regs the num_irq-32 SPI states now but don't we start
->> > writing at the beginning of bmp, (ie s->gicd_ipriority), at PPI/SGI
->> > offset? What am I missing?
-> Oops, yes, you're right. My explanation applies to the
-> various other bitmaps, where we are accessing the
-> fields in the data structure using gic_bmp_ptr32(bmp, irq),
-> but not to gicd_ipriority[], which we are directly accessing
-> starting with the first word, not by indexing via bmp[irq].
-> 
-> So we need to handle these two cases differently.
-> You're correct that for gicd_ipriority[], the code in
-> master reads and writes to that data structure as:
->  [0, 0, ..., 0, irq 32, irq 33, ..., 0, 0, ... 0]
-> so all the values are in the right place but we:
->  (a) unnecessarily read/write zeroes for the PPI/SGI fields
->  (b) fail to transfer the last 32 interrupts
-> 
-> We can fix the gicd_ipriority[] case simply by adding
->    bmp = GIC_INTERNAL;
-> before the assignment to 'field' in both kvm_dist_get_priority()
-> and kvm_dist_put_priority(). This doesn't affect migration
-> compatibility. We should do this separately from fixing the
-> other bitmaps, because it's simpler.
-> 
-If we do bmp += GIC_INTERNAL, we should also add this to offset,
-otherwise we will put the SGI/PPIs data to SPIs, right?
+>>> +static void tcg_iommu_unmap_notify(IOMMUNotifier *n, IOMMUTLBEntry *io=
+tlb)
+>>> +{
+>>> +    TCGIOMMUNotifier *notifier =3D container_of(n, TCGIOMMUNotifier, n=
+);
+>>> +
+>>> +    if (!notifier->active) {
+>>> +        return;
+>>> +    }
+>>> +    tlb_flush(notifier->cpu);
+>>> +    notifier->active =3D false;
+>>> +    /* We leave the notifier struct on the list to avoid reallocating =
+it later.
+>>> +     * Generally the number of IOMMUs a CPU deals with will be small.
+>>> +     * In any case we can't unregister the iommu notifier from a notif=
+y
+>>> +     * callback.
+>>> +     */
+> I don't get the life cycle of the notifier and why it becomes inactive
+> after the invalidate. Could you detail the specificity of this one?
 
-Thanks,
--- 
-Shannon
+Once we've flushed the TLB it is empty and will have no cached
+information from the IOMMU. So there's no point in flushing the
+TLB again (which is expensive) until the next time a transaction
+goes through the IOMMU and we're caching something from it.
+
+So the cycle goes:
+ * CPU makes transaction that goes through an IOMMU
+ * in tcg_register_iommu_notifier() we register the notifier
+   if we haven't already, and make sure it's got active =3D true
+ * in the unmap notify, we flush the whole TLB for the CPU, and
+   set active =3D false
+ * repeat...
+
+
+>>> +static void tcg_iommu_notifier_destroy(gpointer data)
+>>> +{
+>>> +    TCGIOMMUNotifier *notifier =3D data;
+>>> +
+>>> +    if (notifier->active) {
+>>> +        memory_region_unregister_iommu_notifier(notifier->mr, &notifie=
+r->n);
+>>> +    }
+> Is it safe to leave the notifier registered to an IOMMU whereas it gets
+> freed?
+
+Oh, this is a bug, left over from my first idea (which was to
+unregister the IOMMU notifier in the notifier unmap callback,
+in which case active =3D=3D true would be the only case when we
+had a registered notifier).
+
+We should unconditionally unregister the notifier here.
+
+
+>>>  /* Called from RCU critical section */
+>>>  MemoryRegionSection *
+>>>  address_space_translate_for_iotlb(CPUState *cpu, int asidx, hwaddr add=
+r,
+>>> -                                  hwaddr *xlat, hwaddr *plen)
+>>> +                                  hwaddr *xlat, hwaddr *plen,
+>>> +                                  MemTxAttrs attrs, int *prot)
+>>>  {
+>>>      MemoryRegionSection *section;
+>>> +    IOMMUMemoryRegion *iommu_mr;
+>>> +    IOMMUMemoryRegionClass *imrc;
+>>> +    IOMMUTLBEntry iotlb;
+>>> +    int iommu_idx;
+>>>      AddressSpaceDispatch *d =3D atomic_rcu_read(&cpu->cpu_ases[asidx].=
+memory_dispatch);
+>>>
+>>> -    section =3D address_space_translate_internal(d, addr, xlat, plen, =
+false);
+>>> +    for (;;) {
+>>> +        section =3D address_space_translate_internal(d, addr, &addr, p=
+len, false);
+>>> +
+>>> +        iommu_mr =3D memory_region_get_iommu(section->mr);
+>>> +        if (!iommu_mr) {
+>>> +            break;
+>>> +        }
+>>> +
+>>> +        imrc =3D memory_region_get_iommu_class_nocheck(iommu_mr);
+>>> +
+>>> +        iommu_idx =3D imrc->attrs_to_index(iommu_mr, attrs);
+>>> +        tcg_register_iommu_notifier(cpu, iommu_mr, iommu_idx);
+>>> +        /* We need all the permissions, so pass IOMMU_NONE so the IOMM=
+U
+>>> +         * doesn't short-cut its translation table walk.
+> it is not clear to me why you don't use the access flag as you seem to
+> handle the perm fault after the translate() call.
+
+We need to know all the permissions (because we'll cache the result
+in the TCG TLB and later use them for future read and write accesses),
+so we pass IOMMU_NONE.
+
+My understanding from previous discussion is that the only
+reason to pass in some other access flag value is if you
+only care about one of read or write and want to allow the
+IOMMU to stop walking the page table early as soon as it decides
+it doesn't have permissions.
+
+thanks
+-- PMM
