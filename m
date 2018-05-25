@@ -1,38 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53937)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54410)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <otubo@redhat.com>) id 1fM99e-0003uh-7K
-	for qemu-devel@nongnu.org; Fri, 25 May 2018 05:36:59 -0400
+	(envelope-from <cohuck@redhat.com>) id 1fM9DE-00051w-Fx
+	for qemu-devel@nongnu.org; Fri, 25 May 2018 05:40:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <otubo@redhat.com>) id 1fM99b-0000qB-0p
-	for qemu-devel@nongnu.org; Fri, 25 May 2018 05:36:58 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:34568 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <otubo@redhat.com>) id 1fM99a-0000pT-SI
-	for qemu-devel@nongnu.org; Fri, 25 May 2018 05:36:54 -0400
-Reply-To: otubo@redhat.com
-References: <20180515113348.10516-1-zyimin@linux.ibm.com>
-	<20180515113348.10516-2-zyimin@linux.ibm.com>
-	<20180517124109.GJ17734@vader>
-	<20180518075212.GE3416@dnr> <20180518091916.GA22292@vader>
-	<20180518130729.GF3416@dnr>
-	<7149dfa9-7d3a-a2ff-b326-7e9ba71f8fe1@linux.ibm.com>
-	<20180523074757.GI26766@dnr>
-	<397e4f8c-0913-6ffd-13fa-743abbbd47e4@linux.ibm.com>
-	<eb079c9d-9251-bb2a-7cbc-5cb6423778db@redhat.com>
-	<c113aa1c-a829-7a96-9874-b8ab48e84a29@linux.ibm.com>
-	<8de364b2-a1c8-7a29-284c-6356d687638b@redhat.com>
-	<33d11137-210b-1a13-e258-d509f4876d67@redhat.com>
-	<1165274f-53fa-ce25-380f-d6509ec083e5@linux.ibm.com>
-From: Eduardo Otubo <otubo@redhat.com>
-Message-ID: <f497ad72-b7c6-4b59-b346-9a4038531b09@redhat.com>
-Date: Fri, 25 May 2018 11:36:50 +0200
+	(envelope-from <cohuck@redhat.com>) id 1fM9DB-0002lP-82
+	for qemu-devel@nongnu.org; Fri, 25 May 2018 05:40:40 -0400
+Date: Fri, 25 May 2018 11:40:33 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20180525114033.3c514091.cohuck@redhat.com>
+In-Reply-To: <20180524175828.3143-2-pasic@linux.ibm.com>
+References: <20180524175828.3143-1-pasic@linux.ibm.com>
+	<20180524175828.3143-2-pasic@linux.ibm.com>
 MIME-Version: 1.0
-In-Reply-To: <1165274f-53fa-ce25-380f-d6509ec083e5@linux.ibm.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 1/1] sandbox: disable -sandbox if
- CONFIG_SECCOMP undefined
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v3 1/2] vfio-ccw: add force unlimited
+ prefetch property
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -41,42 +24,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Yi Min Zhao <zyimin@linux.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?Q?J=c3=a1n_Tomko?= <jtomko@redhat.com>
-Cc: borntraeger@de.ibm.com, fiuczy@linux.ibm.com, qemu-devel@nongnu.org
+To: Halil Pasic <pasic@linux.ibm.com>
+Cc: Dong Jia Shi <bjsdjshi@linux.ibm.com>, "Jason J. Herne" <jjherne@linux.ibm.com>, qemu-s390x@nongnu.org, qemu-devel@nongnu.org
 
-On 05/25/2018 06:23 AM, Yi Min Zhao wrote:
->=20
->=20
-> =E5=9C=A8 2018/5/24 =E4=B8=8B=E5=8D=889:40, Paolo Bonzini =E5=86=99=E9=81=
-=93:
->> On 24/05/2018 09:53, Eduardo Otubo wrote:
->>>>>> Thanks! But I have not got response from Paolo.=C2=A0 I have added=
- him to
->>>>>> CC list.
->>>>>>
->>>>> =C2=A0=C2=A0I'll just wait one more ACK and will send a pull reques=
-t on the
->>>>> seccomp queue. Thanks for the contribution.
->>>>>
->>>>>
->>>> So... what I should do is wait?
->>>>
->>> Yes, even though I think we're safe to proceed without his explicit a=
-ck.
->> The patch is okay; however, as a follow-up, you could consider moving
->> all the CONFIG_SECCOMP code to qemu-seccomp.c.
->>
->> This way, the only #ifdef remains the one around qemu_opts_foreach.
->>
->> Paolo
->>
->>
-> Thanks for your comment! Indeed, moving to the single C file is much=20
-> more clear.
-> I will do this after this patch.
->=20
-> @Otubo, what about next step?
->=20
->=20
-If you're willing to send v3 with the changes Paolo suggested, I can=20
-wait to send the pull request. No worries.
+On Thu, 24 May 2018 19:58:27 +0200
+Halil Pasic <pasic@linux.ibm.com> wrote:
+
+> There is at least one guest (OS) such that although it does not rely on
+> the guarantees provided by ORB 1 word 9 bit (aka unlimited prefetch, aka
+> P bit) not being set, it fails to tell this to the machine.
+> 
+> Usually this ain't a big deal, as the original purpose of the P bit is to
+> allow for performance optimizations. vfio-ccw however can not provide the
+> guarantees required if the bit is not set.
+> 
+> It is not possible to implement support for the P bit not set without
+> transitioning to lower level protocols for vfio-ccw.  So let's give the
+> user the opportunity to force setting the P bit, if the user knows this
+> is safe.  For self modifying channel programs forcing the P bit is not
+> safe.  If the P bit is forced for a self modifying channel program things
+> are expected to break in strange ways.
+> 
+> Let's also avoid warning multiple about P bit not set in the ORB in case
+> P bit is not told to be forced, and designate the affected vfio-ccw
+> device.
+> 
+> Signed-off-by: Halil Pasic <pasic@linux.ibm.com>
+> Suggested-by: Dong Jia Shi <bjsdjshi@linux.ibm.com>
+> Acked-by: Jason J. Herne <jjherne@linux.ibm.com>
+> Tested-by: Jason J. Herne <jjherne@linux.ibm.com>
+
+> +static inline void warn_once(bool *warned, const char *fmt, ...)
+> +{
+> +    va_list ap;
+> +
+> +    if (!warned || *warned) {
+> +        return;
+> +    }
+> +    *warned = true;
+> +    va_start(ap, fmt);
+> +    warn_vreport(fmt, ap);
+> +    va_end(ap);
+> +}
+> +
+> +static inline void warn_once_pfch(VFIOCCWDevice *vcdev, SubchDev *sch,
+> +                                  const char *msg)
+> +{
+> +    warn_once(&vcdev->warned_orb_pfch, "vfio-ccw (devno %x.%x.%04x): %s",
+> +              sch->cssid, sch->ssid, sch->devno, msg);
+> +}
+> +
+
+While I still think we want warn_once() in common error handling code,
+this looks reasonable enough. We can still move it later.
+
+>  static void vfio_ccw_compute_needs_reset(VFIODevice *vdev)
+>  {
+>      vdev->needs_reset = false;
+> @@ -54,6 +76,18 @@ static IOInstEnding vfio_ccw_handle_request(SubchDev *sch)
+>      struct ccw_io_region *region = vcdev->io_region;
+>      int ret;
+>  
+> +    if (!(sch->orb.ctrl0 & ORB_CTRL0_MASK_PFCH)) {
+> +        if (!(vcdev->force_orb_pfch)) {
+> +            warn_once_pfch(vcdev, sch, "requires PFCH flag set");
+> +            sch_gen_unit_exception(sch);
+> +            css_inject_io_interrupt(sch);
+> +            return IOINST_CC_EXPECTED;
+> +        } else {
+> +            sch->orb.ctrl0 |= ORB_CTRL0_MASK_PFCH;
+> +            warn_once_pfch(vcdev, sch, "PFCH flag forced");
+> +        }
+> +    }
+> +
+
+Looks good to me. I plan to queue this (and the other patch) to
+s390-next, but (as always) further tags are still welcome :)
