@@ -1,23 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46349)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46772)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1fM5u0-0007EO-2Q
-	for qemu-devel@nongnu.org; Fri, 25 May 2018 02:08:37 -0400
+	(envelope-from <thuth@redhat.com>) id 1fM5wK-0008Ur-Tg
+	for qemu-devel@nongnu.org; Fri, 25 May 2018 02:11:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1fM5tw-0005kd-9d
-	for qemu-devel@nongnu.org; Fri, 25 May 2018 02:08:36 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:59250 helo=mx1.redhat.com)
+	(envelope-from <thuth@redhat.com>) id 1fM5wE-00072w-JY
+	for qemu-devel@nongnu.org; Fri, 25 May 2018 02:11:00 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:59394 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1fM5tw-0005kL-3z
-	for qemu-devel@nongnu.org; Fri, 25 May 2018 02:08:32 -0400
-Date: Fri, 25 May 2018 14:08:27 +0800
-From: Fam Zheng <famz@redhat.com>
-Message-ID: <20180525060827.GD28589@lemon.usersys.redhat.com>
-References: <20180525005839.11556-1-crosa@redhat.com>
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1fM5wE-00072W-F7
+	for qemu-devel@nongnu.org; Fri, 25 May 2018 02:10:54 -0400
+References: <1527186303-192100-1-git-send-email-mst@redhat.com>
+	<1527186303-192100-3-git-send-email-mst@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <ac1f972f-2769-9945-868d-e80a01842f4f@redhat.com>
+Date: Fri, 25 May 2018 08:10:48 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180525005839.11556-1-crosa@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 0/5] Acceptance/functional tests
+In-Reply-To: <1527186303-192100-3-git-send-email-mst@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v4 2/3] libqtest: fail if child coredumps
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,104 +28,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cleber Rosa <crosa@redhat.com>
-Cc: qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>, Stefan Hajnoczi <stefanha@redhat.com>, Amador Pahim <amador@pahim.org>
+To: "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org
+Cc: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Markus Armbruster <armbru@redhat.com>, Eric Blake <eblake@redhat.com>
 
-On Thu, 05/24 20:58, Cleber Rosa wrote:
-> TL;DR
-> =====
-> 
-> Another version, with a minimalist approach, to the acceptance tests
-> infrastructure for QEMU, based on the Avocado Testing Framework.
-> 
-> Background
-> ==========
-> 
-> The previous version, still considered an RFC, was sent to the list by
-> Eduardo[1] was based on the work held in Amador's branch[2].  After
-> reviewing in under a different light, including the experiences
-> done and reported by Philippe[3].
-> 
-> Differences from previous versions
-> ==================================
-> 
-> The main difference is that this series include only the minimal
-> changes deemed necessary to have a starting point.  I like to think
-> that it's better connected to the QEMU community and project needs,
-> and will hopefully allow for a more organic growth.
-> 
-> Since this version has less features than the previous versions,
-> provided it's accepted, these are the next probable development tasks:
-> 
->  * Provide a simple variants mechanism to allow the same tests to be
->    run under different targets, machine models and devices (present on
->    the previous versions as a "YAML to Mux" file with architecture
->    definitions)
->  * Implement QEMUMachine migration support (present on the previous
->    version in the "avocado_qemu.test._VM" class)
->  * Implement Guest OS image selection and download (mostly an Avocado
->    feature, paired with a parameter convention and cloud-init support
->    code)
->  * Implement interactive support for Guest OS sessions (present on
->    the previous versions, supported by the aexpect Python module)
-> 
-> Even though this version shares very little (if any) code with the
-> previous versions, the following is a list of noteworthy changes:
-> 
->  * Tests directory is now "tests/acceptance" (was "tests/avocado")
->  * Base test class is now "avocado_qemu.Test" (was
->    "avocado_qemu.test.QemuTest")
->  * Base test class is now hosted in "avocado_qemu/__init__.py" (was
->    "avocado_qemu/test.py")
->  * Direct use of "qemu.QEMUMachine", that is, the
->    avocado_qemu.test._VM class is gone
->  * avocado_qemu.Test won't search for QEMU binaries on $PATH.  To use
->    QEMU binary on a custom system location it's necessary to use the
->    "qemu_bin" parameter
->  * Example test in README.rst is distributed as a real test
->    ("test_version.py")
->  * A new "Linux boot console" test, loosely modeled after Phillipe's
->    use case
-
-I like the direction this series is leading us to.  Making it easy to write
-'correct' and 'effective' tests is the most important thing IMO, and the few
-tests you add here look promising.
-
-I'm also curious to see a test case involving a guest OS image. (I'm also open to
-a re-implementation of tests/vm/basevm.py with Avocado, if you find it
-worthwhile.)
-
-Fam
-
-> 
-> Commit summary
-> ==============
-> 
-> Cleber Rosa (5):
->   Add functional/acceptance tests infrastructure
->   scripts/qemu.py: allow adding to the list of extra arguments
->   Acceptance tests: add quick VNC tests
->   scripts/qemu.py: introduce set_console() method
->   Acceptance tests: add Linux kernel boot and console checking test
-> 
->  scripts/qemu.py                             | 103 +++++++++++++++-
->  scripts/test_qemu.py                        | 176 +++++++++++++++++++++++++++
->  tests/acceptance/README.rst                 | 141 +++++++++++++++++++++
->  tests/acceptance/avocado_qemu/__init__.py   |  45 +++++++
->  tests/acceptance/test_boot_linux_console.py |  37 ++++++
->  tests/acceptance/test_version.py            |  13 ++
->  tests/acceptance/test_vnc.py                |  50 ++++++++
->  7 files changed, 564 insertions(+), 1 deletion(-)
->  create mode 100644 scripts/test_qemu.py
->  create mode 100644 tests/acceptance/README.rst
->  create mode 100644 tests/acceptance/avocado_qemu/__init__.py
->  create mode 100644 tests/acceptance/test_boot_linux_console.py
->  create mode 100644 tests/acceptance/test_version.py
->  create mode 100644 tests/acceptance/test_vnc.py
-> 
+On 24.05.2018 20:25, Michael S. Tsirkin wrote:
+> Right now tests report OK status if QEMU crashes during cleanup.
+> Let's catch that case and fail the test.
+>=20
+> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
 > ---
-> 
-> [1] https://lists.gnu.org/archive/html/qemu-devel/2018-04/msg03443.html
-> [2] https://github.com/apahim/qemu/commits/avocado_qemu
-> [3] https://lists.gnu.org/archive/html/qemu-devel/2018-04/msg03076.html
-> 
+>  tests/libqtest.c | 9 ++++++++-
+>  1 file changed, 8 insertions(+), 1 deletion(-)
+>=20
+> diff --git a/tests/libqtest.c b/tests/libqtest.c
+> index 43fb97e..f869854 100644
+> --- a/tests/libqtest.c
+> +++ b/tests/libqtest.c
+> @@ -103,8 +103,15 @@ static int socket_accept(int sock)
+>  static void kill_qemu(QTestState *s)
+>  {
+>      if (s->qemu_pid !=3D -1) {
+> +        int wstatus =3D 0;
+> +        pid_t pid;
+> +
+>          kill(s->qemu_pid, SIGTERM);
+> -        waitpid(s->qemu_pid, NULL, 0);
+> +        pid =3D waitpid(s->qemu_pid, &wstatus, 0);
+> +
+> +        if (pid =3D=3D s->qemu_pid && WIFSIGNALED(wstatus)) {
+> +            assert(!WCOREDUMP(wstatus));
+
+Another ugliness that I just discovered: kill_qemu is also called from
+the SIGABRT handler. So if a qtest assert() triggers an abort(), the
+abort handler runs kill_qemu which now could trigger another assert()
+and thus abort(). It's likely not a real problem since the abort handler
+has been installed with SA_RESETHAND, but it's still quite confusing code=
+.
+
+Please let's clean up this ugliness properly: I think kill_qemu should
+*only* be used by the abort handler, and then kill QEMU with SIGKILL for
+good, to make sure that there are no stuck QEMU processes hanging around
+anymore.
+
+qtest_quit() should simply try to quit QEMU via QMP instead, and then
+check for WIFEXITED(wstatus) && !WEXITSTATUS(wstatus) instead of using
+the kill_qemu() function.
+
+ Thomas
