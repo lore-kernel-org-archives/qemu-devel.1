@@ -1,21 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40770)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42341)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1fM2Hk-0006Dj-J3
-	for qemu-devel@nongnu.org; Thu, 24 May 2018 22:16:53 -0400
+	(envelope-from <suhang16@mails.ucas.ac.cn>) id 1fM2RH-00019d-Md
+	for qemu-devel@nongnu.org; Thu, 24 May 2018 22:26:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1fM2Hj-0001NV-Ey
-	for qemu-devel@nongnu.org; Thu, 24 May 2018 22:16:52 -0400
-Date: Fri, 25 May 2018 10:16:41 +0800
-From: Fam Zheng <famz@redhat.com>
-Message-ID: <20180525021641.GD12594@lemon.usersys.redhat.com>
-References: <20180521063516.5479-1-famz@redhat.com>
-	<677208b5-586b-354a-5fd4-67468152510e@redhat.com>
+	(envelope-from <suhang16@mails.ucas.ac.cn>) id 1fM2RD-0005hw-C1
+	for qemu-devel@nongnu.org; Thu, 24 May 2018 22:26:43 -0400
+Received: from smtp67.cstnet.cn ([159.226.251.67]:34855 helo=cstnet.cn)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <suhang16@mails.ucas.ac.cn>) id 1fM2RC-0005fH-Nm
+	for qemu-devel@nongnu.org; Thu, 24 May 2018 22:26:39 -0400
+Date: Fri, 25 May 2018 10:26:33 +0800 (GMT+08:00)
+From: "Su Hang" <suhang16@mails.ucas.ac.cn>
+In-Reply-To: <13868e98-f6ab-40d1-0ebc-27d11985eaad@redhat.com>
+References: <1527161340-3200-1-git-send-email-suhang16@mails.ucas.ac.cn>
+	<1527161340-3200-3-git-send-email-suhang16@mails.ucas.ac.cn>
+	<13868e98-f6ab-40d1-0ebc-27d11985eaad@redhat.com>
+Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset=UTF-8
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <677208b5-586b-354a-5fd4-67468152510e@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] nvme: Make nvme_init error handling code
- more readable
+Message-ID: <278d33d7.10b9.163951e7e74.Coremail.suhang16@mails.ucas.ac.cn>
+Subject: Re: [Qemu-devel] [PULL 2/2] Add QTest testcase for the Intel
+ Hexadecimal
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,68 +29,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
+To: Eric Blake <eblake@redhat.com>
+Cc: stefanha@gmail.com, jim@groklearning.com, joel@jms.id.au, qemu-devel@nongnu.org
 
-On Thu, 05/24 19:16, Paolo Bonzini wrote:
-> On 21/05/2018 08:35, Fam Zheng wrote:
-> > Coverity doesn't like the tests under fail label (report CID 1385847).
-> > Reset the fields so the clean up order is more apparent.
-> > 
-> > Signed-off-by: Fam Zheng <famz@redhat.com>
-> > ---
-> >  block/nvme.c | 7 +++++++
-> >  1 file changed, 7 insertions(+)
-> > 
-> > diff --git a/block/nvme.c b/block/nvme.c
-> > index 6f71122bf5..8239b920c8 100644
-> > --- a/block/nvme.c
-> > +++ b/block/nvme.c
-> > @@ -560,6 +560,13 @@ static int nvme_init(BlockDriverState *bs, const char *device, int namespace,
-> >      qemu_co_queue_init(&s->dma_flush_queue);
-> >      s->nsid = namespace;
-> >      s->aio_context = bdrv_get_aio_context(bs);
-> > +
-> > +    /* Fields we've not touched should be zero-initialized by block layer
-> > +     * already, but reset them anyway to make the error handling code easier to
-> > +     * reason. */
-> > +    s->regs = NULL;
-> > +    s->vfio = NULL;
-> > +
-> >      ret = event_notifier_init(&s->irq_notifier, 0);
-> >      if (ret) {
-> >          error_setg(errp, "Failed to init event notifier");
-> > 
-> 
-> I think we should just mark it as a false positive or do something like
-> 
-> fail_regs:
->     qemu_vfio_pci_unmap_bar(s->vfio, 0, (void *)s->regs, 0, NVME_BAR_SIZE);
-> fail_vfio:
->     qemu_vfio_close(s->vfio);
-> fail:
->     g_free(s->queues);
->     event_notifier_cleanup(&s->irq_notifier);
->     return ret;
-> 
-> even though it's a larger patch.
-
-And that makes five labels in total, I'm not sure I like it:
-
-fail_handler:
-    aio_set_event_notifier(bdrv_get_aio_context(bs), &s->irq_notifier,
-                           false, NULL, NULL);
-fail_queue:
-    nvme_free_queue_pair(bs, s->queues[0]);
-fail_regs:
-    qemu_vfio_pci_unmap_bar(s->vfio, 0, (void *)s->regs, 0, NVME_BAR_SIZE);
-fail_vfio:
-    qemu_vfio_close(s->vfio);
-fail:
-    g_free(s->queues);
-    event_notifier_cleanup(&s->irq_notifier);
-    return ret;
-
-Maybe we just mark it as false positive then?
-
-Fam
+U3VyZSwgSSB3aWxsIGxpc3Qgb3RoZXIgaW52b2x2ZWQgZmlsZXMuIFRoYW5rcyBmb3IgeW91IHN1
+Z2dlc3Rpb24uCgpTVSBIYW5nCgoiRXJpYyBCbGFrZSIgPGVibGFrZUByZWRoYXQuY29tPndyb3Rl
+Ogo+IE9uIDA1LzI0LzIwMTggMDY6MjkgQU0sIFN1IEhhbmcgd3JvdGU6DQo+ID4gJ3Rlc3QuaGV4
+JyBmaWxlIGlzIGEgYmFyZSBtZXRhbCBBUk0gc29mdHdhcmUgc3RvcmVkIGluIEhleGFkZWNpbWFs
+DQo+ID4gT2JqZWN0IEZvcm1hdC4gV2hlbiBpdCdzIGxvYWRlZCBieSBRRU1VLCBpdCB3aWxsIHBy
+aW50ICJIZWxsbyB3b3JsZCFcbiINCj4gPiBvbiBjb25zb2xlLg0KPiA+IA0KPiA+IGBwcmVfc3Rv
+cmVgIGFycmF5IGluICdoZXhsb2FkZXItdGVzdC5jJyBmaWxlLCBzdG9yZXMgdGhlIGJpbmFyeSBm
+b3JtYXQNCj4gPiBvZiAndGVzdC5oZXgnIGZpbGUsIHdoaWNoIGlzIHVzZWQgdG8gdmVyaWZ5IGNv
+cnJlY3RuZXNzLg0KPiA+IA0KPiA+IFJldmlld2VkLWJ5OiBTdGVmYW4gSGFqbm9jemkgPHN0ZWZh
+bmhhQHJlZGhhdC5jb20+DQo+ID4gU3VnZ2VzdGVkLWJ5OiBTdGVmZmVuIEdvcnR6IDxxZW11Lm1s
+QHN0ZWZmZW4tZ29lcnR6LmRlPg0KPiA+IFN1Z2dlc3RlZC1ieTogU3RlZmFuIEhham5vY3ppIDxz
+dGVmYW5oYUByZWRoYXQuY29tPg0KPiA+IFNpZ25lZC1vZmYtYnk6IFN1IEhhbmcgPHN1aGFuZzE2
+QG1haWxzLnVjYXMuYWMuY24+DQo+ID4gLS0tDQo+ID4gICBNQUlOVEFJTkVSUyAgICAgICAgICAg
+ICAgICAgICAgICAgICAgfCAgNiArKysrDQo+ID4gICBjb25maWd1cmUgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgfCAgNCArKysNCj4gPiAgIHRlc3RzL01ha2VmaWxlLmluY2x1ZGUgICAgICAg
+ICAgICAgICB8ICAyICsrDQo+ID4gICB0ZXN0cy9oZXgtbG9hZGVyLWNoZWNrLWRhdGEvdGVzdC5o
+ZXggfCAxMiArKysrKysrKw0KPiA+ICAgdGVzdHMvaGV4bG9hZGVyLXRlc3QuYyAgICAgICAgICAg
+ICAgIHwgNTYgKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrDQo+IA0KPiBUaGUg
+cHJldmlvdXMgcGF0Y2ggYWxzbyB0b3VjaGVkOg0KPiANCj4gICBody9hcm0vYm9vdC5jICAgICAg
+IHwgICA3ICstDQo+ICAgaHcvY29yZS9sb2FkZXIuYyAgICB8IDI0NiANCj4gKysrKysrKysrKysr
+KysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKw0KPiAgIGluY2x1ZGUvaHcv
+bG9hZGVyLmggfCAgMTIgKysrDQo+IA0KPiA+ICsrKyBiL01BSU5UQUlORVJTDQo+ID4gQEAgLTEy
+OTEsNiArMTI5MSwxMiBAQCBGOiBody9jb3JlL2dlbmVyaWMtbG9hZGVyLmMNCj4gPiAgIEY6IGlu
+Y2x1ZGUvaHcvY29yZS9nZW5lcmljLWxvYWRlci5oDQo+ID4gICBGOiBkb2NzL2dlbmVyaWMtbG9h
+ZGVyLnR4dA0KPiA+IA0KPiA+ICtJbnRlbCBIZXhhZGVjaW1hbCBPYmplY3QgRmlsZSBMb2FkZXIN
+Cj4gPiArTTogU3UgSGFuZyA8c3VoYW5nMTZAbWFpbHMudWNhcy5hYy5jbj4NCj4gPiArUzogTWFp
+bnRhaW5lZA0KPiA+ICtGOiB0ZXN0cy9oZXhsb2FkZXItdGVzdC5jDQo+ID4gK0Y6IHRlc3RzL2hl
+eC1sb2FkZXItY2hlY2stZGF0YS90ZXN0LmhleA0KPiA+ICsNCj4gDQo+IEl0IGxvb2tzIG9kZCBo
+YXZpbmcgYSBtYWludGFpbmVyIHRoYXQgY2xhaW1zIG9ubHkgdGVzdCBmaWxlczsgZG8geW91IA0K
+PiB3YW50IHRvIGFsc28gbGlzdCBzb21lIG9mIHRoZSBvdGhlciBmaWxlcyB0b3VjaGVkIGJ5IHRo
+aXMgcGF0Y2ggc28gdGhhdCANCj4geW91IGdldCBub3RpZmljYXRpb24gaWYgb25lIG9mIHRoZSBp
+bXBsZW1lbnRhdGlvbiBmaWxlcyBoYXMgc3Vic2VxdWVudCANCj4gcGF0Y2hlcyAocmF0aGVyIHRo
+YW4ganVzdCB0aGUgdGVzdCBmaWxlcyk/DQo+IA0KPiAtLSANCj4gRXJpYyBCbGFrZSwgUHJpbmNp
+cGFsIFNvZnR3YXJlIEVuZ2luZWVyDQo+IFJlZCBIYXQsIEluYy4gICAgICAgICAgICsxLTkxOS0z
+MDEtMzI2Ng0KPiBWaXJ0dWFsaXphdGlvbjogIHFlbXUub3JnIHwgbGlidmlydC5vcmcNCg==
