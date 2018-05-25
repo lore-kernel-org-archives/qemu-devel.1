@@ -1,27 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49411)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50084)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fMAYR-0005GN-Va
-	for qemu-devel@nongnu.org; Fri, 25 May 2018 07:06:40 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1fMAb0-00078g-Iz
+	for qemu-devel@nongnu.org; Fri, 25 May 2018 07:09:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fMAYQ-0002HB-Qj
-	for qemu-devel@nongnu.org; Fri, 25 May 2018 07:06:39 -0400
-Received: from mail-ot0-x241.google.com ([2607:f8b0:4003:c0f::241]:44885)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fMAYQ-0002Gl-Le
-	for qemu-devel@nongnu.org; Fri, 25 May 2018 07:06:38 -0400
-Received: by mail-ot0-x241.google.com with SMTP id g7-v6so5597349otj.11
-	for <qemu-devel@nongnu.org>; Fri, 25 May 2018 04:06:38 -0700 (PDT)
-MIME-Version: 1.0
-In-Reply-To: <1527086545-68024-8-git-send-email-mst@redhat.com>
-References: <1527086545-68024-1-git-send-email-mst@redhat.com>
-	<1527086545-68024-8-git-send-email-mst@redhat.com>
+	(envelope-from <pm215@archaic.org.uk>) id 1fMAaz-0003Z3-LP
+	for qemu-devel@nongnu.org; Fri, 25 May 2018 07:09:18 -0400
+Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:42162)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
+	id 1fMAaz-0003Y3-F9
+	for qemu-devel@nongnu.org; Fri, 25 May 2018 07:09:17 -0400
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 25 May 2018 12:06:17 +0100
-Message-ID: <CAFEAcA9JwWR29YSBKGS1fmmOE=wrSQY+OeJxQc4kmAEHRXUzWQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL 07/28] x86/cpu: use
- standard-headers/asm-x86.kvm_para.h
+Date: Fri, 25 May 2018 12:09:14 +0100
+Message-Id: <20180525110914.22348-1-peter.maydell@linaro.org>
+Subject: [Qemu-devel] [PATCH] scripts/update-linux-headers: Handle
+ __aligned_u64
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,49 +23,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Marcelo Tosatti <mtosatti@redhat.com>, kvm-devel <kvm@vger.kernel.org>
+To: qemu-devel@nongnu.org
+Cc: patches@linaro.org, Alex Williamson <alex.williamson@redhat.com>
 
-On 23 May 2018 at 15:43, Michael S. Tsirkin <mst@redhat.com> wrote:
-> Switch to the header we imported from Linux,
-> this allows us to drop a hack in kvm_i386.h.
-> More code will be dropped in the next patch.
->
-> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+We'll currently replace any 'u64' with a 'uint64_t' including when
+it's embedded in an '__aligned_u64', creating a '__aligned_uint64_t'
+which doesn't exist. We need to instead expand out the kernel's
+definition of __aligned_u64:
+   #define __aligned_u64 __u64 __attribute__((aligned(8)))
+before we convert the __u64 to uint64_t.
 
-> --- a/target/i386/cpu.h
-> +++ b/target/i386/cpu.h
-> @@ -688,8 +688,6 @@ typedef uint32_t FeatureWordArray[FEATURE_WORDS];
->  #define CPUID_7_0_EDX_SPEC_CTRL     (1U << 26) /* Speculation Control */
->  #define CPUID_7_0_EDX_SPEC_CTRL_SSBD  (1U << 31) /* Speculative Store Bypass Disable */
->
-> -#define KVM_HINTS_DEDICATED (1U << 0)
-> -
->  #define CPUID_8000_0008_EBX_IBPB    (1U << 12) /* Indirect Branch Prediction Barrier */
->
->  #define CPUID_XSAVE_XSAVEOPT   (1U << 0)
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+---
+Alex's "scripts/update-linux-headers: Update handling of __aligned_u64"
+patch also addresses this problem, but I think we need to take this
+approach, because the resulting header is supposed to be host-OS-portable.
 
-Hi -- this seems like it will break compilation when we next
-update our copy of the Linux kernel headers, because (as of
-4.17-rc6, at least), asm-x86/kvm_para.h doesn't define
-KVM_HINTS_DEDICATED. Here's the diff I get as part of
-my attempt to run update-linux-headers:
+ scripts/update-linux-headers.sh | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
---- a/include/standard-headers/asm-x86/kvm_para.h
-+++ b/include/standard-headers/asm-x86/kvm_para.h
-@@ -29,7 +29,7 @@
- #define KVM_FEATURE_PV_TLB_FLUSH       9
- #define KVM_FEATURE_ASYNC_PF_VMEXIT    10
-
--#define KVM_HINTS_DEDICATED      0
-+#define KVM_HINTS_REALTIME      0
-
- /* The last 8 bits are used to indicate how to interpret the flags field
-  * in pvclock structure. If no bits are set, all flags are ignored.
-
-I'm not sure what's going on here -- commit 633711e8287 in
-the kernel just renames the constant, but doesn't that
-break userspace API ?
-
-thanks
--- PMM
+diff --git a/scripts/update-linux-headers.sh b/scripts/update-linux-headers.sh
+index 947dec2852..1fe54f8ab1 100755
+--- a/scripts/update-linux-headers.sh
++++ b/scripts/update-linux-headers.sh
+@@ -51,7 +51,8 @@ cp_portable() {
+     fi
+ 
+     header=$(basename "$f");
+-    sed -e 's/__u\([0-9][0-9]*\)/uint\1_t/g' \
++    sed -e 's/__aligned_u64/__u64 __attribute__((aligned(8)))/g' \
++        -e 's/__u\([0-9][0-9]*\)/uint\1_t/g' \
+         -e 's/u\([0-9][0-9]*\)/uint\1_t/g' \
+         -e 's/__s\([0-9][0-9]*\)/int\1_t/g' \
+         -e 's/__le\([0-9][0-9]*\)/uint\1_t/g' \
+-- 
+2.17.0
