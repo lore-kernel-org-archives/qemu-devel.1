@@ -1,24 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50613)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51797)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1fM8tT-0007nI-DA
-	for qemu-devel@nongnu.org; Fri, 25 May 2018 05:20:16 -0400
+	(envelope-from <mjc@sifive.com>) id 1fM8z1-00013h-Tr
+	for qemu-devel@nongnu.org; Fri, 25 May 2018 05:26:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1fM8tP-0007MY-AC
-	for qemu-devel@nongnu.org; Fri, 25 May 2018 05:20:15 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:40982 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1fM8tP-0007Ls-6r
-	for qemu-devel@nongnu.org; Fri, 25 May 2018 05:20:11 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.5])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id D2129C12A8
-	for <qemu-devel@nongnu.org>; Fri, 25 May 2018 09:20:10 +0000 (UTC)
-From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Fri, 25 May 2018 11:20:04 +0200
-Message-Id: <20180525092004.13241-1-kraxel@redhat.com>
-Subject: [Qemu-devel] [PATCH] usb: update docs
+	(envelope-from <mjc@sifive.com>) id 1fM8z0-00026f-Cd
+	for qemu-devel@nongnu.org; Fri, 25 May 2018 05:25:59 -0400
+Received: from mail-ot0-x243.google.com ([2607:f8b0:4003:c0f::243]:46615)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <mjc@sifive.com>) id 1fM8z0-000266-5t
+	for qemu-devel@nongnu.org; Fri, 25 May 2018 05:25:58 -0400
+Received: by mail-ot0-x243.google.com with SMTP id t1-v6so5313366ott.13
+	for <qemu-devel@nongnu.org>; Fri, 25 May 2018 02:25:58 -0700 (PDT)
+MIME-Version: 1.0
+In-Reply-To: <4926fd94-b29b-8dad-bbdb-e19729bfa39f@vivier.eu>
+References: <1527232960-51123-1-git-send-email-mjc@sifive.com>
+	<4926fd94-b29b-8dad-bbdb-e19729bfa39f@vivier.eu>
+From: Michael Clark <mjc@sifive.com>
+Date: Fri, 25 May 2018 21:25:57 +1200
+Message-ID: <CAHNT7NvTAh9iWPvJaaH+Jr8wbtyp5JOvDCaGvnMqugwHvRfy1g@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2] elf: Add RISC-V PSABI ELF header defines
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,85 +29,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Gerd Hoffmann <kraxel@redhat.com>
+To: Laurent Vivier <laurent@vivier.eu>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-trivial@nongnu.org, RISC-V Patches <patches@groups.riscv.org>, Michael Tokarev <mjt@tls.msk.ru>, Richard Henderson <richard.henderson@linaro.org>, Alistair Francis <Alistair.Francis@wdc.com>, Jim Wilson <jimw@sifive.com>
 
-xhci is rock solid meanwhile.  So move it up in the docs and feature it
-as prefered usb host adapter, instead of the old shy version saying "you
-might want try ...".
+On Fri, May 25, 2018 at 7:53 PM, Laurent Vivier <laurent@vivier.eu> wrote:
 
-Also a minor text update for the companion controller setup.
+> Le 25/05/2018 =C3=A0 09:22, Michael Clark a =C3=A9crit :
+> > Refer to the RISC-V PSABI specification for details:
+> >
+> > - https://github.com/riscv/riscv-elf-psabi-doc/blob/master/riscv-elf.md
+> >
+> > Cc: Michael Tokarev <mjt@tls.msk.ru>
+> > Cc: Laurent Vivier <laurent@vivier.eu>
+> > Cc: Richard Henderson <richard.henderson@linaro.org>
+> > Cc: Alistair Francis <Alistair.Francis@wdc.com>
+> > Signed-off-by: Michael Clark <mjc@sifive.com>
+> > ---
+> >  include/elf.h | 8 ++++++++
+> >  1 file changed, 8 insertions(+)
+> >
+> > diff --git a/include/elf.h b/include/elf.h
+> > index 934dbbd6b3ae..bd0493f43d19 100644
+> > --- a/include/elf.h
+> > +++ b/include/elf.h
+> > @@ -1285,6 +1285,14 @@ typedef struct {
+> >  #define R_IA64_DTPREL64LSB   0xb7    /* @dtprel(sym + add), data8 LSB =
+*/
+> >  #define R_IA64_LTOFF_DTPREL22        0xba    /* @ltoff(@dtprel(s+a)),
+> imm22 */
+> >
+> > +/* RISC-V specific definitions.  */
+> > +#define EF_RISCV_RVC 0x0001
+> > +#define EF_RISCV_FLOAT_ABI_SINGLE 0x0002
+> > +#define EF_RISCV_FLOAT_ABI_DOUBLE 0x0004
+> > +#define EF_RISCV_FLOAT_ABI_QUAD 0x0006
+> > +#define EF_RISCV_RVE 0x0008
+> > +#define EF_RISCV_TSO 0x0010
+> > +
+> >  typedef struct elf32_rel {
+> >    Elf32_Addr r_offset;
+> >    Elf32_Word r_info;
+> >
+>
+> from glibc (and binutils), I have:
+>
+>   /* RISC-V ELF Flags */
+>   #define EF_RISCV_RVC                    0x0001
+>   #define EF_RISCV_FLOAT_ABI              0x0006
+>   #define EF_RISCV_FLOAT_ABI_SOFT         0x0000
+>   #define EF_RISCV_FLOAT_ABI_SINGLE       0x0002
+>   #define EF_RISCV_FLOAT_ABI_DOUBLE       0x0004
+>   #define EF_RISCV_FLOAT_ABI_QUAD         0x0006
+>
+> Perhaps you can also define EF_RISCV_FLOAT_ABI_SOFT and EF_RISCV_FLOAT_AB=
+I?
+>
 
-Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
----
- docs/usb2.txt | 44 +++++++++++++++++++++++++-------------------
- 1 file changed, 25 insertions(+), 19 deletions(-)
+Will do. I'll align them also.
 
-diff --git a/docs/usb2.txt b/docs/usb2.txt
-index 09df45b5b1..1b0e62d187 100644
---- a/docs/usb2.txt
-+++ b/docs/usb2.txt
-@@ -1,6 +1,26 @@
- 
--USB 2.0 Quick Start
--===================
-+USB Quick Start
-+===============
-+
-+xhci controller support
-+-----------------------
-+
-+Qemu has xhci host adapter support.  The xhci hardware design is much
-+more virtualization-friendly when compared to ehci and uhci, thus xhci
-+emulation uses less resources (especially cpu).  So if your guest
-+supports xhci (which should be the case for any operating system
-+released in recent years) I recommend using it:
-+
-+    qemu -device qemu-xhci
-+
-+xhci supports USB 1.1, USB 2.0 and USB 3.0 devices, so this is the
-+only controller you need.  With only a single usb controller (and
-+therefore only a single usb bus) being present in the system there is
-+no need to use the bus= parameter when adding usb devices.
-+
-+
-+ehci controller support
-+-----------------------
- 
- The QEMU EHCI Adapter can be used with and without companion
- controllers.  See below for the companion controller mode.
-@@ -47,29 +67,15 @@ specifies the first port the controller should attach to, which is
- needed as usually one ehci controller with six ports has three uhci
- companion controllers with two ports each.
- 
--There is a config file in docs which will do all this for you, just
--try ...
-+Result is a single usb bus which supports both USB 1.1 and USB 2.0
-+devices.  There is a config file in docs which will do all this for
-+you, just try ...
- 
-     qemu -readconfig docs/config/ich9-ehci-uhci.cfg
- 
- ... then use "bus=ehci.0" to assign your usb devices to that bus.
- 
- 
--xhci controller support
-------------------------
--
--There is also xhci host controller support available.  It got a lot
--less testing than ehci and there are a bunch of known limitations, so
--ehci may work better for you.  On the other hand the xhci hardware
--design is much more virtualization-friendly, thus xhci emulation uses
--less resources (especially cpu).  If you want to give xhci a try
--use this to add the host controller ...
--
--    qemu -device nec-usb-xhci,id=xhci
--
--... then use "bus=xhci.0" when assigning usb devices.
--
--
- More USB tips & tricks
- ======================
- 
--- 
-2.9.3
+Anyway:
+>
+> Reviewed-by: Laurent Vivier <laurent@vivier.eu>
+>
+>
+Thanks for checking glibc and binutils. I'll update to add the extra
+definitions before I make a PR. Thanks!
+
+Michael.
