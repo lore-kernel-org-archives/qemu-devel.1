@@ -1,42 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58062)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36040)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pasic@linux.ibm.com>) id 1fMI7t-0004Iy-R3
-	for qemu-devel@nongnu.org; Fri, 25 May 2018 15:11:46 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1fMIYw-0000Qn-85
+	for qemu-devel@nongnu.org; Fri, 25 May 2018 15:39:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pasic@linux.ibm.com>) id 1fMI7p-0000r4-QD
-	for qemu-devel@nongnu.org; Fri, 25 May 2018 15:11:45 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:50380)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pasic@linux.ibm.com>) id 1fMI7p-0000pW-IP
-	for qemu-devel@nongnu.org; Fri, 25 May 2018 15:11:41 -0400
-Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w4PJ9Ecp122117
-	for <qemu-devel@nongnu.org>; Fri, 25 May 2018 15:11:40 -0400
-Received: from e06smtp13.uk.ibm.com (e06smtp13.uk.ibm.com [195.75.94.109])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2j6qvx16qa-1
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Fri, 25 May 2018 15:11:40 -0400
-Received: from localhost
-	by e06smtp13.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <pasic@linux.ibm.com>;
-	Fri, 25 May 2018 20:11:37 +0100
-References: <20180524175828.3143-1-pasic@linux.ibm.com>
-	<20180524175828.3143-2-pasic@linux.ibm.com>
-	<20180525114033.3c514091.cohuck@redhat.com>
-	<c1c246bd-c0a8-7e30-dd0c-ba99c2346d15@linux.ibm.com>
-	<0787e807-53c3-7288-6d3f-e354f7fb4db9@redhat.com>
-From: Halil Pasic <pasic@linux.ibm.com>
-Date: Fri, 25 May 2018 21:11:32 +0200
+	(envelope-from <ehabkost@redhat.com>) id 1fMIYt-0000zB-3r
+	for qemu-devel@nongnu.org; Fri, 25 May 2018 15:39:42 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:38308)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1fMIYs-0000vv-S1
+	for qemu-devel@nongnu.org; Fri, 25 May 2018 15:39:39 -0400
+Received: from smtp.corp.redhat.com (int-mx11.intmail.prod.int.phx2.redhat.com
+	[10.5.11.26])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 089C92DC412
+	for <qemu-devel@nongnu.org>; Fri, 25 May 2018 19:39:36 +0000 (UTC)
+Date: Fri, 25 May 2018 16:39:34 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20180525193934.GN8988@localhost.localdomain>
+References: <1525423069-61903-1-git-send-email-imammedo@redhat.com>
+	<1525423069-61903-5-git-send-email-imammedo@redhat.com>
+	<87h8mx11t9.fsf@dusky.pond.sub.org>
+	<87lgc8zzpn.fsf@dusky.pond.sub.org>
+	<20180524182634.GH8988@localhost.localdomain>
+	<87603cxob9.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <0787e807-53c3-7288-6d3f-e354f7fb4db9@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Message-Id: <eb287a06-4f7a-9ac9-c09b-869a123db385@linux.ibm.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v3 1/2] vfio-ccw: add force unlimited
- prefetch property
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <87603cxob9.fsf@dusky.pond.sub.org>
+Subject: Re: [Qemu-devel] [PATCH v7 04/11] hmp: disable monitor in preconfig
+ state
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -45,54 +38,106 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, Cornelia Huck <cohuck@redhat.com>
-Cc: Dong Jia Shi <bjsdjshi@linux.ibm.com>, "Jason J. Herne" <jjherne@linux.ibm.com>, qemu-s390x@nongnu.org, qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>
+Cc: Igor Mammedov <imammedo@redhat.com>, pkrempa@redhat.com, qemu-devel@nongnu.org
 
+On Fri, May 25, 2018 at 08:05:30AM +0200, Markus Armbruster wrote:
+> Eduardo Habkost <ehabkost@redhat.com> writes:
+> 
+> > On Thu, May 24, 2018 at 08:16:20PM +0200, Markus Armbruster wrote:
+> >> Markus Armbruster <armbru@redhat.com> writes:
+> >> 
+> >> > Igor Mammedov <imammedo@redhat.com> writes:
+> >> >
+> >> >> Ban it for now, if someone would need it to work early,
+> >> >> one would have to implement checks if HMP command is valid
+> >> >> at preconfig state.
+> >> >>
+> >> >> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+> >> >> Reviewed-by: Eric Blake <eblake@redhat.com>
+> >> >> ---
+> >> >> v5:
+> >> >>   * add 'use QMP instead" to error message, suggesting user
+> >> >>     the right interface to use
+> >> >> v4:
+> >> >>   * v3 was only printing error but not preventing command execution,
+> >> >>     Fix it by returning after printing error message.
+> >> >>     ("Dr. David Alan Gilbert" <dgilbert@redhat.com>)
+> >> >> ---
+> >> >>  monitor.c | 6 ++++++
+> >> >>  1 file changed, 6 insertions(+)
+> >> >>
+> >> >> diff --git a/monitor.c b/monitor.c
+> >> >> index 39f8ee1..0ffdf1d 100644
+> >> >> --- a/monitor.c
+> >> >> +++ b/monitor.c
+> >> >> @@ -3374,6 +3374,12 @@ static void handle_hmp_command(Monitor *mon, const char *cmdline)
+> >> >>  
+> >> >>      trace_handle_hmp_command(mon, cmdline);
+> >> >>  
+> >> >> +    if (runstate_check(RUN_STATE_PRECONFIG)) {
+> >> >> +        monitor_printf(mon, "HMP not available in preconfig state, "
+> >> >> +                            "use QMP instead\n");
+> >> >> +        return;
+> >> >> +    }
+> >> >> +
+> >> >>      cmd = monitor_parse_command(mon, cmdline, &cmdline, mon->cmd_table);
+> >> >>      if (!cmd) {
+> >> >>          return;
+> >> >
+> >> > So we offer the user an HMP monitor, but we summarily fail all commands.
+> >> > I'm sorry, but that's... searching for polite word... embarrassing.  We
+> >> > should accept HMP output only when we're ready to accept it.  Yes, that
+> >> > would involve a bit more surgery rather than this cheap hack.  The whole
+> >> > preconfig thing smells like a cheap hack to me, but let's not overdo it.
+> >> 
+> >> Clarification: I don't think we need to hold the series because of
+> >> this.  I do think you should investigate delaying HMP until it can work.
+> >
+> > What would it mean to delay HMP?  Not creating the socket?
+> > Creating the socket but not accepting clients?  Accepting clients
+> > but not consuming any input from the socket until we are out of
+> > preconfig?
+> >
+> > I'm not sure if any of those options would be better.  If a human
+> > is already trying to talk on the other side, it seems better to
+> > show QEMU is alive (but not ready to hold a conversation yet)
+> > than staying silent.
+> 
+> If this
+> 
+>     QEMU 2.12.50 monitor - type 'help' for more information
+>     (qemu) help
+>     HMP not available in preconfig state, use QMP instead
+>     (qemu) quit
+>     HMP not available in preconfig state, use QMP instead
+>     (qemu) let me out dammit
+>     HMP not available in preconfig state, use QMP instead
+>     (qemu) 
+> 
+> is better than the alternatives, then I wonder how much more
+> entertainment the alternatives could provide!
+> 
+> We *can* do better.  Start like this:
+> 
+>     QEMU 2.12.50 monitor is not ready with -preconfig until you complete
+>     configuration with QMP
+> 
+> and when we exit preconfig state, add:
+> 
+>     QEMU 2.12.50 monitor - type 'help' for more information
+>     (qemu) 
+> 
+> Note that this is upfront about the monitor not being ready, avoids
+> misleading the user about "help", talks to the user in the user's terms
+> (-preconfig) instead of internal terms (preconfig state), and is more
+> specific on how to ready the monitor.
 
+Yes, this sounds better than any of the options I have
+considered.
 
-On 05/25/2018 08:08 PM, Eric Blake wrote:
-> On 05/25/2018 12:46 PM, Halil Pasic wrote:
->=20
->>>> +static inline void warn_once(bool *warned, const char *fmt, ...)
->>>> +{
->>>> +=C2=A0=C2=A0=C2=A0 va_list ap;
->>>> +
->>>> +=C2=A0=C2=A0=C2=A0 if (!warned || *warned) {
->>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return;
->>>> +=C2=A0=C2=A0=C2=A0 }
->>>> +=C2=A0=C2=A0=C2=A0 *warned =3D true;
->>>> +=C2=A0=C2=A0=C2=A0 va_start(ap, fmt);
->>>> +=C2=A0=C2=A0=C2=A0 warn_vreport(fmt, ap);
->>>> +=C2=A0=C2=A0=C2=A0 va_end(ap);
->>>> +}
->>>> +
->>>> +static inline void warn_once_pfch(VFIOCCWDevice *vcdev, SubchDev *s=
-ch,
->>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 const char *msg)
->>>> +{
->>>> +=C2=A0=C2=A0=C2=A0 warn_once(&vcdev->warned_orb_pfch, "vfio-ccw (de=
-vno %x.%x.%04x): %s",
->>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0 sch->cssid, sch->ssid, sch->devno, msg);
->>>> +}
->>>> +
->>>
->>> While I still think we want warn_once() in common error handling code=
-,
->>> this looks reasonable enough. We can still move it later.
->>>
->>
->> I agree. I was a bit surprised to not find any warn_once functionality.
->=20
-> That has been proposed:
-> https://lists.gnu.org/archive/html/qemu-devel/2018-05/msg05457.html
->=20
+Making at least 'help', 'quit', and 'exit-preconfig' work might
+be even better, though.
 
-Thanks! I was not aware of this. If we were to use that we would
-AFAIU have to transition to once-once instead of once per device
-as done in my patch based on Connie's request.
-
-Regards,
-Halil
+-- 
+Eduardo
