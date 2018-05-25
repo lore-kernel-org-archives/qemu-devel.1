@@ -1,24 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36861)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40770)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1fM1sc-0002Ad-57
-	for qemu-devel@nongnu.org; Thu, 24 May 2018 21:50:55 -0400
+	(envelope-from <famz@redhat.com>) id 1fM2Hk-0006Dj-J3
+	for qemu-devel@nongnu.org; Thu, 24 May 2018 22:16:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1fM1sX-0007oK-7Z
-	for qemu-devel@nongnu.org; Thu, 24 May 2018 21:50:54 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:50626 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1fM1sX-0007oA-3U
-	for qemu-devel@nongnu.org; Thu, 24 May 2018 21:50:49 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.3])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 4EA69401EF2C
-	for <qemu-devel@nongnu.org>; Fri, 25 May 2018 01:50:48 +0000 (UTC)
-From: Peter Xu <peterx@redhat.com>
-Date: Fri, 25 May 2018 09:50:42 +0800
-Message-Id: <20180525015042.31778-1-peterx@redhat.com>
-Subject: [Qemu-devel] [PATCH] migration: use g_free for ram load bitmap
+	(envelope-from <famz@redhat.com>) id 1fM2Hj-0001NV-Ey
+	for qemu-devel@nongnu.org; Thu, 24 May 2018 22:16:52 -0400
+Date: Fri, 25 May 2018 10:16:41 +0800
+From: Fam Zheng <famz@redhat.com>
+Message-ID: <20180525021641.GD12594@lemon.usersys.redhat.com>
+References: <20180521063516.5479-1-famz@redhat.com>
+	<677208b5-586b-354a-5fd4-67468152510e@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <677208b5-586b-354a-5fd4-67468152510e@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] nvme: Make nvme_init error handling code
+ more readable
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,73 +24,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Juan Quintela <quintela@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, peterx@redhat.com
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
 
-Buffers allocated with bitmap_new() should be freed with g_free().
+On Thu, 05/24 19:16, Paolo Bonzini wrote:
+> On 21/05/2018 08:35, Fam Zheng wrote:
+> > Coverity doesn't like the tests under fail label (report CID 1385847).
+> > Reset the fields so the clean up order is more apparent.
+> > 
+> > Signed-off-by: Fam Zheng <famz@redhat.com>
+> > ---
+> >  block/nvme.c | 7 +++++++
+> >  1 file changed, 7 insertions(+)
+> > 
+> > diff --git a/block/nvme.c b/block/nvme.c
+> > index 6f71122bf5..8239b920c8 100644
+> > --- a/block/nvme.c
+> > +++ b/block/nvme.c
+> > @@ -560,6 +560,13 @@ static int nvme_init(BlockDriverState *bs, const char *device, int namespace,
+> >      qemu_co_queue_init(&s->dma_flush_queue);
+> >      s->nsid = namespace;
+> >      s->aio_context = bdrv_get_aio_context(bs);
+> > +
+> > +    /* Fields we've not touched should be zero-initialized by block layer
+> > +     * already, but reset them anyway to make the error handling code easier to
+> > +     * reason. */
+> > +    s->regs = NULL;
+> > +    s->vfio = NULL;
+> > +
+> >      ret = event_notifier_init(&s->irq_notifier, 0);
+> >      if (ret) {
+> >          error_setg(errp, "Failed to init event notifier");
+> > 
+> 
+> I think we should just mark it as a false positive or do something like
+> 
+> fail_regs:
+>     qemu_vfio_pci_unmap_bar(s->vfio, 0, (void *)s->regs, 0, NVME_BAR_SIZE);
+> fail_vfio:
+>     qemu_vfio_close(s->vfio);
+> fail:
+>     g_free(s->queues);
+>     event_notifier_cleanup(&s->irq_notifier);
+>     return ret;
+> 
+> even though it's a larger patch.
 
-Both reported by Coverity:
+And that makes five labels in total, I'm not sure I like it:
 
-*** CID 1391300:  API usage errors  (ALLOC_FREE_MISMATCH)
-/migration/ram.c: 3517 in ram_dirty_bitmap_reload()
-3511          * the last one to sync, we need to notify the main send thread.
-3512          */
-3513         ram_dirty_bitmap_reload_notify(s);
-3514
-3515         ret = 0;
-3516     out:
->>>     CID 1391300:  API usage errors  (ALLOC_FREE_MISMATCH)
->>>     Calling "free" frees "le_bitmap" using "free" but it should have been freed using "g_free".
-3517         free(le_bitmap);
-3518         return ret;
-3519     }
-3520
-3521     static int ram_resume_prepare(MigrationState *s, void *opaque)
-3522     {
+fail_handler:
+    aio_set_event_notifier(bdrv_get_aio_context(bs), &s->irq_notifier,
+                           false, NULL, NULL);
+fail_queue:
+    nvme_free_queue_pair(bs, s->queues[0]);
+fail_regs:
+    qemu_vfio_pci_unmap_bar(s->vfio, 0, (void *)s->regs, 0, NVME_BAR_SIZE);
+fail_vfio:
+    qemu_vfio_close(s->vfio);
+fail:
+    g_free(s->queues);
+    event_notifier_cleanup(&s->irq_notifier);
+    return ret;
 
-*** CID 1391292:  API usage errors  (ALLOC_FREE_MISMATCH)
-/migration/ram.c: 249 in ramblock_recv_bitmap_send()
-243          * Mark as an end, in case the middle part is screwed up due to
-244          * some "misterious" reason.
-245          */
-246         qemu_put_be64(file, RAMBLOCK_RECV_BITMAP_ENDING);
-247         qemu_fflush(file);
-248
->>>     CID 1391292:  API usage errors  (ALLOC_FREE_MISMATCH)
->>>     Calling "free" frees "le_bitmap" using "free" but it should have been freed using "g_free".
-249         free(le_bitmap);
-250
-251         if (qemu_file_get_error(file)) {
-252             return qemu_file_get_error(file);
-253         }
-254
+Maybe we just mark it as false positive then?
 
-Signed-off-by: Peter Xu <peterx@redhat.com>
----
- migration/ram.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
-
-diff --git a/migration/ram.c b/migration/ram.c
-index 5bcbf7a9f9..c53e8369a3 100644
---- a/migration/ram.c
-+++ b/migration/ram.c
-@@ -246,7 +246,7 @@ int64_t ramblock_recv_bitmap_send(QEMUFile *file,
-     qemu_put_be64(file, RAMBLOCK_RECV_BITMAP_ENDING);
-     qemu_fflush(file);
- 
--    free(le_bitmap);
-+    g_free(le_bitmap);
- 
-     if (qemu_file_get_error(file)) {
-         return qemu_file_get_error(file);
-@@ -3514,7 +3514,7 @@ int ram_dirty_bitmap_reload(MigrationState *s, RAMBlock *block)
- 
-     ret = 0;
- out:
--    free(le_bitmap);
-+    g_free(le_bitmap);
-     return ret;
- }
- 
--- 
-2.17.0
+Fam
