@@ -1,20 +1,42 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53084)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58062)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <crosa@redhat.com>) id 1fMHfv-0005OD-CB
-	for qemu-devel@nongnu.org; Fri, 25 May 2018 14:42:53 -0400
+	(envelope-from <pasic@linux.ibm.com>) id 1fMI7t-0004Iy-R3
+	for qemu-devel@nongnu.org; Fri, 25 May 2018 15:11:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <crosa@redhat.com>) id 1fMHfp-0007dw-Td
-	for qemu-devel@nongnu.org; Fri, 25 May 2018 14:42:51 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:40902 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <crosa@redhat.com>) id 1fMHfp-0007dq-ON
-	for qemu-devel@nongnu.org; Fri, 25 May 2018 14:42:45 -0400
-From: Cleber Rosa <crosa@redhat.com>
-Date: Fri, 25 May 2018 14:42:17 -0400
-Message-Id: <20180525184219.14440-4-crosa@redhat.com>
-In-Reply-To: <20180525184219.14440-1-crosa@redhat.com>
-References: <20180525184219.14440-1-crosa@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 3/5] Acceptance tests: add quick VNC tests
+	(envelope-from <pasic@linux.ibm.com>) id 1fMI7p-0000r4-QD
+	for qemu-devel@nongnu.org; Fri, 25 May 2018 15:11:45 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:50380)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pasic@linux.ibm.com>) id 1fMI7p-0000pW-IP
+	for qemu-devel@nongnu.org; Fri, 25 May 2018 15:11:41 -0400
+Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w4PJ9Ecp122117
+	for <qemu-devel@nongnu.org>; Fri, 25 May 2018 15:11:40 -0400
+Received: from e06smtp13.uk.ibm.com (e06smtp13.uk.ibm.com [195.75.94.109])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2j6qvx16qa-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Fri, 25 May 2018 15:11:40 -0400
+Received: from localhost
+	by e06smtp13.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <pasic@linux.ibm.com>;
+	Fri, 25 May 2018 20:11:37 +0100
+References: <20180524175828.3143-1-pasic@linux.ibm.com>
+	<20180524175828.3143-2-pasic@linux.ibm.com>
+	<20180525114033.3c514091.cohuck@redhat.com>
+	<c1c246bd-c0a8-7e30-dd0c-ba99c2346d15@linux.ibm.com>
+	<0787e807-53c3-7288-6d3f-e354f7fb4db9@redhat.com>
+From: Halil Pasic <pasic@linux.ibm.com>
+Date: Fri, 25 May 2018 21:11:32 +0200
+MIME-Version: 1.0
+In-Reply-To: <0787e807-53c3-7288-6d3f-e354f7fb4db9@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Message-Id: <eb287a06-4f7a-9ac9-c09b-869a123db385@linux.ibm.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v3 1/2] vfio-ccw: add force unlimited
+ prefetch property
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,82 +45,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Eduardo Habkost <ehabkost@redhat.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Stefan Hajnoczi <stefanha@redhat.com>, Fam Zheng <famz@redhat.com>, Amador Pahim <amador@pahim.org>, Cleber Rosa <crosa@redhat.com>
+To: Eric Blake <eblake@redhat.com>, Cornelia Huck <cohuck@redhat.com>
+Cc: Dong Jia Shi <bjsdjshi@linux.ibm.com>, "Jason J. Herne" <jjherne@linux.ibm.com>, qemu-s390x@nongnu.org, qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>
 
-This patch adds a few simple behavior tests for VNC.
 
-Signed-off-by: Cleber Rosa <crosa@redhat.com>
----
- tests/acceptance/test_vnc.py | 60 ++++++++++++++++++++++++++++++++++++
- 1 file changed, 60 insertions(+)
- create mode 100644 tests/acceptance/test_vnc.py
 
-diff --git a/tests/acceptance/test_vnc.py b/tests/acceptance/test_vnc.py
-new file mode 100644
-index 0000000000..b1ef9d71b1
---- /dev/null
-+++ b/tests/acceptance/test_vnc.py
-@@ -0,0 +1,60 @@
-+# Simple functional tests for VNC functionality
-+#
-+# Copyright (c) 2018 Red Hat, Inc.
-+#
-+# Author:
-+#  Cleber Rosa <crosa@redhat.com>
-+#
-+# This work is licensed under the terms of the GNU GPL, version 2 or
-+# later.  See the COPYING file in the top-level directory.
-+
-+from avocado_qemu import Test
-+
-+
-+class Vnc(Test):
-+    """
-+    :avocado: enable
-+    :avocado: tags=vnc,quick
-+    """
-+    def test_no_vnc(self):
-+        self.vm.add_args('-nodefaults', '-S')
-+        self.vm.launch()
-+        self.assertFalse(self.vm.qmp('query-vnc')['return']['enabled'])
-+
-+    def test_no_vnc_change_password(self):
-+        self.vm.add_args('-nodefaults', '-S')
-+        self.vm.launch()
-+        self.assertFalse(self.vm.qmp('query-vnc')['return']['enabled'])
-+        set_password_response = self.vm.qmp('change',
-+                                            device='vnc',
-+                                            target='password',
-+                                            arg='new_password')
-+        self.assertIn('error', set_password_response)
-+        self.assertEqual(set_password_response['error']['class'],
-+                         'GenericError')
-+        self.assertEqual(set_password_response['error']['desc'],
-+                         'Could not set password')
-+
-+    def test_vnc_change_password_requires_a_password(self):
-+        self.vm.add_args('-nodefaults', '-S', '-vnc', ':0')
-+        self.vm.launch()
-+        self.assertTrue(self.vm.qmp('query-vnc')['return']['enabled'])
-+        set_password_response = self.vm.qmp('change',
-+                                            device='vnc',
-+                                            target='password',
-+                                            arg='new_password')
-+        self.assertIn('error', set_password_response)
-+        self.assertEqual(set_password_response['error']['class'],
-+                         'GenericError')
-+        self.assertEqual(set_password_response['error']['desc'],
-+                         'Could not set password')
-+
-+    def test_vnc_change_password(self):
-+        self.vm.add_args('-nodefaults', '-S', '-vnc', ':0,password')
-+        self.vm.launch()
-+        self.assertTrue(self.vm.qmp('query-vnc')['return']['enabled'])
-+        set_password_response = self.vm.qmp('change',
-+                                            device='vnc',
-+                                            target='password',
-+                                            arg='new_password')
-+        self.assertEqual(set_password_response['return'], {})
--- 
-2.17.0
+On 05/25/2018 08:08 PM, Eric Blake wrote:
+> On 05/25/2018 12:46 PM, Halil Pasic wrote:
+>=20
+>>>> +static inline void warn_once(bool *warned, const char *fmt, ...)
+>>>> +{
+>>>> +=C2=A0=C2=A0=C2=A0 va_list ap;
+>>>> +
+>>>> +=C2=A0=C2=A0=C2=A0 if (!warned || *warned) {
+>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return;
+>>>> +=C2=A0=C2=A0=C2=A0 }
+>>>> +=C2=A0=C2=A0=C2=A0 *warned =3D true;
+>>>> +=C2=A0=C2=A0=C2=A0 va_start(ap, fmt);
+>>>> +=C2=A0=C2=A0=C2=A0 warn_vreport(fmt, ap);
+>>>> +=C2=A0=C2=A0=C2=A0 va_end(ap);
+>>>> +}
+>>>> +
+>>>> +static inline void warn_once_pfch(VFIOCCWDevice *vcdev, SubchDev *s=
+ch,
+>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 const char *msg)
+>>>> +{
+>>>> +=C2=A0=C2=A0=C2=A0 warn_once(&vcdev->warned_orb_pfch, "vfio-ccw (de=
+vno %x.%x.%04x): %s",
+>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0 sch->cssid, sch->ssid, sch->devno, msg);
+>>>> +}
+>>>> +
+>>>
+>>> While I still think we want warn_once() in common error handling code=
+,
+>>> this looks reasonable enough. We can still move it later.
+>>>
+>>
+>> I agree. I was a bit surprised to not find any warn_once functionality.
+>=20
+> That has been proposed:
+> https://lists.gnu.org/archive/html/qemu-devel/2018-05/msg05457.html
+>=20
+
+Thanks! I was not aware of this. If we were to use that we would
+AFAIU have to transition to once-once instead of once per device
+as done in my patch based on Connie's request.
+
+Regards,
+Halil
