@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35781)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40658)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fMGF6-0004Lp-Hj
-	for qemu-devel@nongnu.org; Fri, 25 May 2018 13:11:05 -0400
+	(envelope-from <jsnow@redhat.com>) id 1fMGkc-0002V4-PS
+	for qemu-devel@nongnu.org; Fri, 25 May 2018 13:43:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fMGF5-0005kA-A7
-	for qemu-devel@nongnu.org; Fri, 25 May 2018 13:11:04 -0400
-Received: from mail-oi0-x243.google.com ([2607:f8b0:4003:c06::243]:34683)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fMGF5-0005jg-1B
-	for qemu-devel@nongnu.org; Fri, 25 May 2018 13:11:03 -0400
-Received: by mail-oi0-x243.google.com with SMTP id l1-v6so5189804oii.1
-	for <qemu-devel@nongnu.org>; Fri, 25 May 2018 10:11:03 -0700 (PDT)
+	(envelope-from <jsnow@redhat.com>) id 1fMGkb-0008QP-UV
+	for qemu-devel@nongnu.org; Fri, 25 May 2018 13:43:38 -0400
+References: <20180518132114.4070-1-kwolf@redhat.com>
+	<20180518132114.4070-22-kwolf@redhat.com>
+	<26778cd3-3150-734b-d8c6-afa6e41f0215@redhat.com>
+	<20180524082412.GC4008@localhost.localdomain>
+	<1988292d-467a-9c63-e64d-035b0e93348a@redhat.com>
+	<20180525080035.GA5562@localhost.localdomain>
+From: John Snow <jsnow@redhat.com>
+Message-ID: <3257b09f-ccbc-01aa-2384-8b7185392864@redhat.com>
+Date: Fri, 25 May 2018 13:43:29 -0400
 MIME-Version: 1.0
-In-Reply-To: <20180515154033.19899-21-kwolf@redhat.com>
-References: <20180515154033.19899-1-kwolf@redhat.com>
-	<20180515154033.19899-21-kwolf@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 25 May 2018 18:10:41 +0100
-Message-ID: <CAFEAcA-FhMC0LqkYcRh3fV864wNSAJnHbT3657Y55MN9=RO72Q@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL 20/37] qcow2: Give the refcount cache the
- minimum possible size by default
+In-Reply-To: <20180525080035.GA5562@localhost.localdomain>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 21/40] job: Convert
+ block_job_cancel_async() to Job
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,75 +30,81 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Kevin Wolf <kwolf@redhat.com>
-Cc: Qemu-block <qemu-block@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
-
-On 15 May 2018 at 16:40, Kevin Wolf <kwolf@redhat.com> wrote:
-> From: Alberto Garcia <berto@igalia.com>
->
-> The L2 and refcount caches have default sizes that can be overridden
-> using the l2-cache-size and refcount-cache-size (an additional
-> parameter named cache-size sets the combined size of both caches).
-
-Hi; Coverity raises a nit about this patch (CID 1391229):
+Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, jcody@redhat.com, armbru@redhat.com, mreitz@redhat.com
 
 
-> diff --git a/block/qcow2.c b/block/qcow2.c
-> index 2f36e632f9..6d532470a8 100644
-> --- a/block/qcow2.c
-> +++ b/block/qcow2.c
-> @@ -802,23 +802,30 @@ static void read_cache_sizes(BlockDriverState *bs, QemuOpts *opts,
->          } else if (refcount_cache_size_set) {
->              *l2_cache_size = combined_cache_size - *refcount_cache_size;
->          } else {
-> -            *refcount_cache_size = combined_cache_size
-> -                                 / (DEFAULT_L2_REFCOUNT_SIZE_RATIO + 1);
-> -            *l2_cache_size = combined_cache_size - *refcount_cache_size;
-> +            uint64_t virtual_disk_size = bs->total_sectors * BDRV_SECTOR_SIZE;
-> +            uint64_t max_l2_cache = virtual_disk_size / (s->cluster_size / 8);
-> +            uint64_t min_refcount_cache =
-> +                (uint64_t) MIN_REFCOUNT_CACHE_SIZE * s->cluster_size;
 
-Here we have a (uint64_t) cast that ensures we're doing a 64x64 multiply
-rather than a 32x32 one...
+On 05/25/2018 04:00 AM, Kevin Wolf wrote:
+> Am 24.05.2018 um 19:42 hat John Snow geschrieben:
+>>
+>>
+>> On 05/24/2018 04:24 AM, Kevin Wolf wrote:
+>>> Am 24.05.2018 um 01:18 hat John Snow geschrieben:
+>>>>> diff --git a/include/qemu/job.h b/include/qemu/job.h
+>>>>> index 3e817beee9..2648c74281 100644
+>>>>> --- a/include/qemu/job.h
+>>>>> +++ b/include/qemu/job.h
+>>>>> @@ -97,6 +97,12 @@ typedef struct Job {
+>>>>>       */
+>>>>>      bool cancelled;
+>>>>>  
+>>>>> +    /**
+>>>>> +     * Set to true if the job should abort immediately without waiting
+>>>>> +     * for data to be in sync.
+>>>>> +     */
+>>>>> +    bool force_cancel;
+>>>>> +
+>>>>
+>>>> Does this comment need an update now, though?
+>>>>
+>>>> Actually, in terms of "new jobs" API, it'd be really nice if cancel
+>>>> *always meant cancel*.
+>>>>
+>>>> I think "cancel" should never be used to mean "successful completion,
+>>>> but different from the one we'd get if we used job_complete."
+>>>>
+>>>> i.e., either we need a job setting:
+>>>>
+>>>> job-set completion-mode=[pivot|no-pivot]
+>>>>
+>>>> or optional parameters to pass to job-complete:
+>>>>
+>>>> job-complete mode=[understood-by-job-type]
+>>>>
+>>>> or some other mechanism that accomplishes the same type of behavior. It
+>>>> would be nice if it did not have to be determined at job creation time
+>>>> but instead could be determined later.
+>>>
+>>> I agree. We already made sure that job-cancel really means cancel on the
+>>> QAPI level, so we're free to do that. We just need to keep supporting
+>>> block-job-cancel with the old semantics, so what I have is the easy
+>>> conversion. We can change the internal implementation when we actually
+>>> implement the selection of a completion mode.
+>>>
+>>> Kevin
+>>>
+>>
+>> We need this before 3.0 though, yeah? unless we make job-cancel
+>> x-job-cancel or some other warning that the way it works might change, yeah?
+>>
+>> Or do I misunderstand our leeway to change this at a later point in time?
+>>
+>> (can job-cancel apply to block jobs created with the legacy
+>> infrastructure? My reading was "yes.")
+> 
+> It can, and it already has its final semantics, so nothing has to change
+> before 3.0. job-cancel is equivalent to block-job-cancel with fixed
+> force=true. If you want the complete-by-cancel behaviour of mirror, you
+> have to use block-job-cancel for now, because job-cancel doesn't provide
+> that functionality.
+> 
+> So what we can change later is adding a way to initiate this secondary
+> completion mode with a job-* command (probably with a new option for
+> job-complete). But we wouldn't change the semantics of exisiting
+> commands.
+> 
+> Kevin
+> 
 
-> +
-> +            /* Assign as much memory as possible to the L2 cache, and
-> +             * use the remainder for the refcount cache */
-> +            if (combined_cache_size >= max_l2_cache + min_refcount_cache) {
-> +                *l2_cache_size = max_l2_cache;
-> +                *refcount_cache_size = combined_cache_size - *l2_cache_size;
-> +            } else {
-> +                *refcount_cache_size =
-> +                    MIN(combined_cache_size, min_refcount_cache);
-> +                *l2_cache_size = combined_cache_size - *refcount_cache_size;
-> +            }
->          }
->      } else {
-> -        if (!l2_cache_size_set && !refcount_cache_size_set) {
-> +        if (!l2_cache_size_set) {
->              *l2_cache_size = MAX(DEFAULT_L2_CACHE_BYTE_SIZE,
->                                   (uint64_t)DEFAULT_L2_CACHE_CLUSTERS
->                                   * s->cluster_size);
-> -            *refcount_cache_size = *l2_cache_size
-> -                                 / DEFAULT_L2_REFCOUNT_SIZE_RATIO;
-> -        } else if (!l2_cache_size_set) {
-> -            *l2_cache_size = *refcount_cache_size
-> -                           * DEFAULT_L2_REFCOUNT_SIZE_RATIO;
-> -        } else if (!refcount_cache_size_set) {
-> -            *refcount_cache_size = *l2_cache_size
-> -                                 / DEFAULT_L2_REFCOUNT_SIZE_RATIO;
-> +        }
-> +        if (!refcount_cache_size_set) {
-> +            *refcount_cache_size = MIN_REFCOUNT_CACHE_SIZE * s->cluster_size;
-
-...but in the else clause down here, we don't have the cast, and
-Coverity complains that we evaluate a 32-bit result and then
-put it in a 64-bit variable. Should this have the (uint64_t)
-cast as well ?
-
->          }
->      }
->
-
-thanks
--- PMM
+Oho, I _was_ missing something. I hadn't realized cancel takes on the
+newer semantics. Thanks.
