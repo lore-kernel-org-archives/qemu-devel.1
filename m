@@ -1,34 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50001)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51079)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fMBzG-0007Y4-1U
-	for qemu-devel@nongnu.org; Fri, 25 May 2018 08:38:30 -0400
+	(envelope-from <david@redhat.com>) id 1fMC4Y-00011q-Bm
+	for qemu-devel@nongnu.org; Fri, 25 May 2018 08:43:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fMBzD-0000UN-VJ
-	for qemu-devel@nongnu.org; Fri, 25 May 2018 08:38:26 -0400
-Received: from mail-oi0-x242.google.com ([2607:f8b0:4003:c06::242]:40951)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fMBzD-0000Te-MU
-	for qemu-devel@nongnu.org; Fri, 25 May 2018 08:38:23 -0400
-Received: by mail-oi0-x242.google.com with SMTP id c203-v6so4430035oib.7
-	for <qemu-devel@nongnu.org>; Fri, 25 May 2018 05:38:23 -0700 (PDT)
+	(envelope-from <david@redhat.com>) id 1fMC4U-0003Oj-D7
+	for qemu-devel@nongnu.org; Fri, 25 May 2018 08:43:54 -0400
+References: <20180517081527.14410-1-david@redhat.com>
+From: David Hildenbrand <david@redhat.com>
+Message-ID: <451cd080-12ab-42bd-0150-e1dbf0abd859@redhat.com>
+Date: Fri, 25 May 2018 14:43:39 +0200
 MIME-Version: 1.0
-In-Reply-To: <20180525153236-mutt-send-email-mst@kernel.org>
-References: <1527086545-68024-1-git-send-email-mst@redhat.com>
-	<1527086545-68024-8-git-send-email-mst@redhat.com>
-	<CAFEAcA9JwWR29YSBKGS1fmmOE=wrSQY+OeJxQc4kmAEHRXUzWQ@mail.gmail.com>
-	<CAFEAcA9mAMCznsf1hao2PFziXnATrCxa8Of33NckUGXxFU6yEQ@mail.gmail.com>
-	<20180525151719-mutt-send-email-mst@kernel.org>
-	<CAFEAcA_bDdefEuy183ma4oso5bZ2QxheDs9oOObBCKPL2hx+Uw@mail.gmail.com>
-	<20180525152433-mutt-send-email-mst@kernel.org>
-	<CAFEAcA9M5c=R004dH2NR7-2yA2Mz13urCmj8Bs=uCAumHP8kMA@mail.gmail.com>
-	<20180525153236-mutt-send-email-mst@kernel.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 25 May 2018 13:38:02 +0100
-Message-ID: <CAFEAcA9Y2pWkotwiwE7bb6t6jWt+YJ_RVrfvTuSQqTd9FbBGRg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL 07/28] x86/cpu: use
- standard-headers/asm-x86.kvm_para.h
+In-Reply-To: <20180517081527.14410-1-david@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH v4 00/14] MemoryDevice: use
+ multi stage hotplug handlers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,30 +24,86 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Marcelo Tosatti <mtosatti@redhat.com>, kvm-devel <kvm@vger.kernel.org>
+To: qemu-devel@nongnu.org
+Cc: Pankaj Gupta <pagupta@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Cornelia Huck <cohuck@redhat.com>, Markus Armbruster <armbru@redhat.com>, Alexander Graf <agraf@suse.de>, Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org, qemu-ppc@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Luiz Capitulino <lcapitulino@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Richard Henderson <rth@twiddle.net>
 
-On 25 May 2018 at 13:35, Michael S. Tsirkin <mst@redhat.com> wrote:
-> On Fri, May 25, 2018 at 01:30:00PM +0100, Peter Maydell wrote:
->> On 25 May 2018 at 13:27, Michael S. Tsirkin <mst@redhat.com> wrote:
->> > I see.  I guess you did all the work already, do you still need help
->> > or will you just go ahead and post it? Or even commit directly,
->> > it's a trivial enough patch.
->>
->> I'll send a series later this afternoon that does an update
->> to 4.17-rc6; it has a couple of other prerequisites in it,
->> to handle __aligned_u64 in the update script (patch already
->> posted this morning, but I'll put it in the series), and to deal
->> with the kernel headers not yet defining VIRTIO_GPU_CAPSET_VIRGL2.
->
->
-> You mean like this:
-> http://patchwork.ozlabs.org/patch/907121/
->
-> ?
+On 17.05.2018 10:15, David Hildenbrand wrote:
+> We can have devices that need certain other resources that are e.g.
+> system resources managed by the machine. We need a clean way to assign
+> these resources (without violating layers as brought up by Igor).
+> 
+> One example is virtio-mem/virtio-pmem. Both device types need to be
+> assigned some region in guest physical address space. This device memory
+> belongs to the machine and is managed by it. However, virito devices are
+> hotplugged using the hotplug handler their proxy device implements. So we
+> could trigger e.g. a PCI hotplug handler for virtio-pci or a CSS/CCW
+> hotplug handler for virtio-ccw. But definetly not the machine.
+> 
+> Now, we can route other devices through the machine hotplug handler, to
+> properly assign/unassign resources - like a portion in guest physical
+> address space.
+> 
+> v3 -> v4:
+> - Removed the s390x bits, will send that out separately (was just a proof
+>   that it works just fine with s390x)
+> - Fixed a typo and reworded a comment
+> 
+> v2 -> v3:
+> - Added "memory-device: introduce separate config option"
+> - Dropped "parent_bus" check from hotplug handler lookup functions
+> - "Handly" -> "Handle" in patch description.
+> 
+> v1 -> v2:
+> - Use multi stage hotplug handler instead of resource handler
+> - MemoryDevices only compiled if necessary (CONFIG_MEM_HOTPLUG)
+> - Prepare PC/SPAPR machines properly for multi stage hotplug handlers
+> - Route SPAPR unplug code via the hotunplug handler
+> - Directly include s390x support. But there are no usable memory devices
+>   yet (well, only my virtio-mem prototype)
+> - Included "memory-device: drop assert related to align and start of address
+>   space"
+> 
+> David Hildenbrand (13):
+>   memory-device: drop assert related to align and start of address space
+>   memory-device: introduce separate config option
+>   pc: prepare for multi stage hotplug handlers
+>   pc: route all memory devices through the machine hotplug handler
+>   spapr: prepare for multi stage hotplug handlers
+>   spapr: route all memory devices through the machine hotplug handler
+>   spapr: handle pc-dimm unplug via hotplug handler chain
+>   spapr: handle cpu core unplug via hotplug handler chain
+>   memory-device: new functions to handle plug/unplug
+>   pc-dimm: implement new memory device functions
+>   memory-device: factor out pre-plug into hotplug handler
+>   memory-device: factor out unplug into hotplug handler
+>   memory-device: factor out plug into hotplug handler
+> 
+> Igor Mammedov (1):
+>   qdev: let machine hotplug handler to override bus hotplug handler
+> 
+>  default-configs/i386-softmmu.mak   |   3 +-
+>  default-configs/ppc64-softmmu.mak  |   3 +-
+>  default-configs/x86_64-softmmu.mak |   3 +-
+>  hw/Makefile.objs                   |   2 +-
+>  hw/core/qdev.c                     |   6 +-
+>  hw/i386/pc.c                       | 102 ++++++++++++++++++++++-------
+>  hw/mem/Makefile.objs               |   4 +-
+>  hw/mem/memory-device.c             | 129 +++++++++++++++++++++++--------------
+>  hw/mem/pc-dimm.c                   |  48 ++++++--------
+>  hw/mem/trace-events                |   4 +-
+>  hw/ppc/spapr.c                     | 129 +++++++++++++++++++++++++++++++------
+>  include/hw/mem/memory-device.h     |  21 ++++--
+>  include/hw/mem/pc-dimm.h           |   3 +-
+>  include/hw/qdev-core.h             |  11 ++++
+>  qapi/misc.json                     |   2 +-
+>  15 files changed, 330 insertions(+), 140 deletions(-)
+> 
 
-Yes; I missed that (found a mail thread pointing out the problem
-but not the patch with the fix); I'll pick it up for the series.
+As there was no negative feedback so far, I will go ahead and assume
+that this approach is the right thing to do.
 
-thanks
--- PMM
+-- 
+
+Thanks,
+
+David / dhildenb
