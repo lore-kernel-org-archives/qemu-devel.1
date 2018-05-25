@@ -1,36 +1,38 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53692)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53937)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fM980-0003B7-3P
-	for qemu-devel@nongnu.org; Fri, 25 May 2018 05:35:16 -0400
+	(envelope-from <otubo@redhat.com>) id 1fM99e-0003uh-7K
+	for qemu-devel@nongnu.org; Fri, 25 May 2018 05:36:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fM97z-0008FI-CX
-	for qemu-devel@nongnu.org; Fri, 25 May 2018 05:35:16 -0400
-Received: from mail-oi0-x234.google.com ([2607:f8b0:4003:c06::234]:37852)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fM97y-0008EJ-W1
-	for qemu-devel@nongnu.org; Fri, 25 May 2018 05:35:15 -0400
-Received: by mail-oi0-x234.google.com with SMTP id w123-v6so4033738oia.4
-	for <qemu-devel@nongnu.org>; Fri, 25 May 2018 02:35:14 -0700 (PDT)
+	(envelope-from <otubo@redhat.com>) id 1fM99b-0000qB-0p
+	for qemu-devel@nongnu.org; Fri, 25 May 2018 05:36:58 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:34568 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <otubo@redhat.com>) id 1fM99a-0000pT-SI
+	for qemu-devel@nongnu.org; Fri, 25 May 2018 05:36:54 -0400
+Reply-To: otubo@redhat.com
+References: <20180515113348.10516-1-zyimin@linux.ibm.com>
+	<20180515113348.10516-2-zyimin@linux.ibm.com>
+	<20180517124109.GJ17734@vader>
+	<20180518075212.GE3416@dnr> <20180518091916.GA22292@vader>
+	<20180518130729.GF3416@dnr>
+	<7149dfa9-7d3a-a2ff-b326-7e9ba71f8fe1@linux.ibm.com>
+	<20180523074757.GI26766@dnr>
+	<397e4f8c-0913-6ffd-13fa-743abbbd47e4@linux.ibm.com>
+	<eb079c9d-9251-bb2a-7cbc-5cb6423778db@redhat.com>
+	<c113aa1c-a829-7a96-9874-b8ab48e84a29@linux.ibm.com>
+	<8de364b2-a1c8-7a29-284c-6356d687638b@redhat.com>
+	<33d11137-210b-1a13-e258-d509f4876d67@redhat.com>
+	<1165274f-53fa-ce25-380f-d6509ec083e5@linux.ibm.com>
+From: Eduardo Otubo <otubo@redhat.com>
+Message-ID: <f497ad72-b7c6-4b59-b346-9a4038531b09@redhat.com>
+Date: Fri, 25 May 2018 11:36:50 +0200
 MIME-Version: 1.0
-In-Reply-To: <5f966d9b-1eb9-f447-69bc-2d93df4c6d2b@redhat.com>
-References: <20180521140402.23318-1-peter.maydell@linaro.org>
-	<20180521140402.23318-15-peter.maydell@linaro.org>
-	<20180522030333.GB17282@xz-mi>
-	<CAFEAcA-iOYhuPfvDv+iD6jBqXMXqN-jfTpSSBub1Zp1i-JcDbQ@mail.gmail.com>
-	<20180522110236.GB31932@xz-mi>
-	<CAFEAcA9b6dmpj+B=SO2YsB5sXsh=UPjkjN_U0i-uJhiDn20HHw@mail.gmail.com>
-	<20180523010636.GC31932@xz-mi>
-	<CAFEAcA840qn7Ms9hph9zzZgMbL8C7kN=cs4esGO9kxGXsgBg1A@mail.gmail.com>
-	<20180524062352.GA12122@xz-mi>
-	<CAFEAcA9SXirTw=H3wznVZDTmO1OB-LRNJAQ1MsyYm62SqvMqRQ@mail.gmail.com>
-	<5f966d9b-1eb9-f447-69bc-2d93df4c6d2b@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 25 May 2018 10:34:53 +0100
-Message-ID: <CAFEAcA_emEZrZk61xyJEY=R_dAtB0yfg_3ML_zQFbS0dWC9XLw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH 14/27] iommu: Add IOMMU index concept to
- IOMMU API
+In-Reply-To: <1165274f-53fa-ce25-380f-d6509ec083e5@linux.ibm.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 1/1] sandbox: disable -sandbox if
+ CONFIG_SECCOMP undefined
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,26 +41,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Auger Eric <eric.auger@redhat.com>
-Cc: Peter Xu <peterx@redhat.com>, "patches@linaro.org" <patches@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, Alex Williamson <alex.williamson@redhat.com>, qemu-arm <qemu-arm@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>, Richard Henderson <rth@twiddle.net>
+To: Yi Min Zhao <zyimin@linux.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?Q?J=c3=a1n_Tomko?= <jtomko@redhat.com>
+Cc: borntraeger@de.ibm.com, fiuczy@linux.ibm.com, qemu-devel@nongnu.org
 
-On 25 May 2018 at 10:27, Auger Eric <eric.auger@redhat.com> wrote:
-> I fail to understand the PRIV attribute usage in SMMUv3.
-> My understanding is the STRW (ie. stream world, kind of indication of
-> the exception level the SID is used along) in the STE is used to
-> determine the correct TTB*. Isn't PRIV checked against the page table
-> attributes only?
-
-I haven't looked too closely at the details for the SMMUv3.
-But basically if you can return different results for
-"transaction is priv" vs "transaction is user" then you need
-separate iommu indexes, even if the only difference might
-be in the permissions. (This is because an IOMMUTLBEntry
-can only specify one set of r/w permissions; it can't
-tell you the permissions separately for priv vs user.) If the
-SMMUv3 always reports the same permissions and address regardless
-of the transaction's priv attribute, then it doesn't need
-to use separate indexes for them.
-
-thanks
--- PMM
+On 05/25/2018 06:23 AM, Yi Min Zhao wrote:
+>=20
+>=20
+> =E5=9C=A8 2018/5/24 =E4=B8=8B=E5=8D=889:40, Paolo Bonzini =E5=86=99=E9=81=
+=93:
+>> On 24/05/2018 09:53, Eduardo Otubo wrote:
+>>>>>> Thanks! But I have not got response from Paolo.=C2=A0 I have added=
+ him to
+>>>>>> CC list.
+>>>>>>
+>>>>> =C2=A0=C2=A0I'll just wait one more ACK and will send a pull reques=
+t on the
+>>>>> seccomp queue. Thanks for the contribution.
+>>>>>
+>>>>>
+>>>> So... what I should do is wait?
+>>>>
+>>> Yes, even though I think we're safe to proceed without his explicit a=
+ck.
+>> The patch is okay; however, as a follow-up, you could consider moving
+>> all the CONFIG_SECCOMP code to qemu-seccomp.c.
+>>
+>> This way, the only #ifdef remains the one around qemu_opts_foreach.
+>>
+>> Paolo
+>>
+>>
+> Thanks for your comment! Indeed, moving to the single C file is much=20
+> more clear.
+> I will do this after this patch.
+>=20
+> @Otubo, what about next step?
+>=20
+>=20
+If you're willing to send v3 with the changes Paolo suggested, I can=20
+wait to send the pull request. No worries.
