@@ -1,21 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51079)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53030)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1fMC4Y-00011q-Bm
-	for qemu-devel@nongnu.org; Fri, 25 May 2018 08:43:55 -0400
+	(envelope-from <groug@kaod.org>) id 1fMCEs-0004Zs-0f
+	for qemu-devel@nongnu.org; Fri, 25 May 2018 08:54:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1fMC4U-0003Oj-D7
-	for qemu-devel@nongnu.org; Fri, 25 May 2018 08:43:54 -0400
-References: <20180517081527.14410-1-david@redhat.com>
-From: David Hildenbrand <david@redhat.com>
-Message-ID: <451cd080-12ab-42bd-0150-e1dbf0abd859@redhat.com>
-Date: Fri, 25 May 2018 14:43:39 +0200
+	(envelope-from <groug@kaod.org>) id 1fMCEo-0000nL-3O
+	for qemu-devel@nongnu.org; Fri, 25 May 2018 08:54:34 -0400
+Received: from 12.mo4.mail-out.ovh.net ([178.33.104.253]:42318)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1fMCEn-0000lH-T0
+	for qemu-devel@nongnu.org; Fri, 25 May 2018 08:54:30 -0400
+Received: from player797.ha.ovh.net (unknown [10.109.122.227])
+	by mo4.mail-out.ovh.net (Postfix) with ESMTP id A8760177F24
+	for <qemu-devel@nongnu.org>; Fri, 25 May 2018 14:54:27 +0200 (CEST)
+From: Greg Kurz <groug@kaod.org>
+Date: Fri, 25 May 2018 14:54:12 +0200
+Message-ID: <152725285229.537901.6934923933763529191.stgit@bahia.lan>
 MIME-Version: 1.0
-In-Reply-To: <20180517081527.14410-1-david@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH v4 00/14] MemoryDevice: use
- multi stage hotplug handlers
+Subject: [Qemu-devel] [PATCH] spapr: don't call KVM_PPC_CONFIGURE_V3_MMU if
+ HPT is in userspace
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,85 +29,69 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Pankaj Gupta <pagupta@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Cornelia Huck <cohuck@redhat.com>, Markus Armbruster <armbru@redhat.com>, Alexander Graf <agraf@suse.de>, Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org, qemu-ppc@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Luiz Capitulino <lcapitulino@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Richard Henderson <rth@twiddle.net>
+Cc: qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>, Laurent Vivier <lvivier@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, Paul Mackerras <paulus@samba.org>, qemu-stable@nongnu.org
 
-On 17.05.2018 10:15, David Hildenbrand wrote:
-> We can have devices that need certain other resources that are e.g.
-> system resources managed by the machine. We need a clean way to assign
-> these resources (without violating layers as brought up by Igor).
-> 
-> One example is virtio-mem/virtio-pmem. Both device types need to be
-> assigned some region in guest physical address space. This device memory
-> belongs to the machine and is managed by it. However, virito devices are
-> hotplugged using the hotplug handler their proxy device implements. So we
-> could trigger e.g. a PCI hotplug handler for virtio-pci or a CSS/CCW
-> hotplug handler for virtio-ccw. But definetly not the machine.
-> 
-> Now, we can route other devices through the machine hotplug handler, to
-> properly assign/unassign resources - like a portion in guest physical
-> address space.
-> 
-> v3 -> v4:
-> - Removed the s390x bits, will send that out separately (was just a proof
->   that it works just fine with s390x)
-> - Fixed a typo and reworded a comment
-> 
-> v2 -> v3:
-> - Added "memory-device: introduce separate config option"
-> - Dropped "parent_bus" check from hotplug handler lookup functions
-> - "Handly" -> "Handle" in patch description.
-> 
-> v1 -> v2:
-> - Use multi stage hotplug handler instead of resource handler
-> - MemoryDevices only compiled if necessary (CONFIG_MEM_HOTPLUG)
-> - Prepare PC/SPAPR machines properly for multi stage hotplug handlers
-> - Route SPAPR unplug code via the hotunplug handler
-> - Directly include s390x support. But there are no usable memory devices
->   yet (well, only my virtio-mem prototype)
-> - Included "memory-device: drop assert related to align and start of address
->   space"
-> 
-> David Hildenbrand (13):
->   memory-device: drop assert related to align and start of address space
->   memory-device: introduce separate config option
->   pc: prepare for multi stage hotplug handlers
->   pc: route all memory devices through the machine hotplug handler
->   spapr: prepare for multi stage hotplug handlers
->   spapr: route all memory devices through the machine hotplug handler
->   spapr: handle pc-dimm unplug via hotplug handler chain
->   spapr: handle cpu core unplug via hotplug handler chain
->   memory-device: new functions to handle plug/unplug
->   pc-dimm: implement new memory device functions
->   memory-device: factor out pre-plug into hotplug handler
->   memory-device: factor out unplug into hotplug handler
->   memory-device: factor out plug into hotplug handler
-> 
-> Igor Mammedov (1):
->   qdev: let machine hotplug handler to override bus hotplug handler
-> 
->  default-configs/i386-softmmu.mak   |   3 +-
->  default-configs/ppc64-softmmu.mak  |   3 +-
->  default-configs/x86_64-softmmu.mak |   3 +-
->  hw/Makefile.objs                   |   2 +-
->  hw/core/qdev.c                     |   6 +-
->  hw/i386/pc.c                       | 102 ++++++++++++++++++++++-------
->  hw/mem/Makefile.objs               |   4 +-
->  hw/mem/memory-device.c             | 129 +++++++++++++++++++++++--------------
->  hw/mem/pc-dimm.c                   |  48 ++++++--------
->  hw/mem/trace-events                |   4 +-
->  hw/ppc/spapr.c                     | 129 +++++++++++++++++++++++++++++++------
->  include/hw/mem/memory-device.h     |  21 ++++--
->  include/hw/mem/pc-dimm.h           |   3 +-
->  include/hw/qdev-core.h             |  11 ++++
->  qapi/misc.json                     |   2 +-
->  15 files changed, 330 insertions(+), 140 deletions(-)
-> 
+Since the kernel commit "dbfcf3cb9c68 powerpc/64: Call H_REGISTER_PROC_TBL
+when running as a HPT guest on POWER9", a nested guest running with PR KVM
+hangs at boot:
 
-As there was no negative feedback so far, I will go ahead and assume
-that this approach is the right thing to do.
+Preparing to boot Linux version 4.16.0-kvm-pr-hang-gku+ (greg@qemu2222.boston16) (gcc version 8.1.1 20180502 (Red Hat 8.1.1-1) (GCC)) #19 SMP Fri May 25 08:41:55 CEST 2018
+Detected machine type: 0000000000000101
+command line: root=UUID=22128c5c-30b1-4e0a-ac16-95853df31131 ro rhgb console=hvc0 early_printk disable-radix=on
+Max number of cores passed to firmware: 1024 (NR_CPUS = 1024)
+Calling ibm,client-architecture-support... done
+memory layout at init:
+  memory_limit : 0000000000000000 (16 MB aligned)
+  alloc_bottom : 0000000001b80000
+  alloc_top    : 0000000030000000
+  alloc_top_hi : 0000000100000000
+  rmo_top      : 0000000030000000
+  ram_top      : 0000000100000000
+instantiating rtas at 0x000000002fff0000... done
+prom_hold_cpus: skipped
+copying OF device tree...
+Building dt strings...
+Building dt structure...
+Device tree strings 0x0000000003d90000 -> 0x0000000003d90abb
+Device tree struct  0x0000000003da0000 -> 0x0000000003db0000
+Quiescing Open Firmware ...
+Booting Linux via __start() @ 0x0000000000400000 ...
 
--- 
+This happens because the H_REGISTER_PROC_TBL implementation in QEMU
+always call KVM_PPC_CONFIGURE_V3_MMU when KVM is present. This fails
+in the case of PR KVM, which doesn't implement it, and QEMU returns
+H_PARAMETER to the guest, which is a BUG() condition in linux.
 
-Thanks,
+In the case of PR, the HPT is allocated in userspace by QEMU, so it
+doesn't make sense to call KVM_PPC_CONFIGURE_V3_MMU in the first
+place. So, skip it in this case and let the guest boot.
 
-David / dhildenb
+Signed-off-by: Greg Kurz <groug@kaod.org>
+---
+
+Note that PR KVM requires this patch from Paul to work on POWER9:
+
+    https://patchwork.ozlabs.org/patch/916766/
+
+The original request was coming from people who want to run openQA in
+fedora28 under PowerVM on a POWER9 system. This requires PR KVM, which
+will be running in HPT-mode since pHyp doesn't do radix.
+
+Cc'ing stable because fedora28 ships QEMU 2.11.x.
+---
+ hw/ppc/spapr_hcall.c |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/hw/ppc/spapr_hcall.c b/hw/ppc/spapr_hcall.c
+index 022f6d810182..12cbb317e5e8 100644
+--- a/hw/ppc/spapr_hcall.c
++++ b/hw/ppc/spapr_hcall.c
+@@ -1420,7 +1420,7 @@ static target_ulong h_register_process_table(PowerPCCPU *cpu,
+                   ((flags & FLAG_GTSE) ? LPCR_GTSE : 0),
+                   LPCR_UPRT | LPCR_GTSE);
+ 
+-    if (kvm_enabled()) {
++    if (kvm_enabled() && !spapr->htab) {
+         return kvmppc_configure_v3_mmu(cpu, flags & FLAG_RADIX,
+                                        flags & FLAG_GTSE, cproc);
+     }
