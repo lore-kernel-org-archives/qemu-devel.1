@@ -1,20 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34916)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35840)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1fM7Y1-0004dQ-Uc
-	for qemu-devel@nongnu.org; Fri, 25 May 2018 03:54:03 -0400
+	(envelope-from <kwolf@redhat.com>) id 1fM7ee-00064L-Hd
+	for qemu-devel@nongnu.org; Fri, 25 May 2018 04:00:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1fM7Xy-0005eO-SE
-	for qemu-devel@nongnu.org; Fri, 25 May 2018 03:54:02 -0400
-References: <1527232960-51123-1-git-send-email-mjc@sifive.com>
-From: Laurent Vivier <laurent@vivier.eu>
-Message-ID: <4926fd94-b29b-8dad-bbdb-e19729bfa39f@vivier.eu>
-Date: Fri, 25 May 2018 09:53:48 +0200
+	(envelope-from <kwolf@redhat.com>) id 1fM7ea-00005K-J6
+	for qemu-devel@nongnu.org; Fri, 25 May 2018 04:00:52 -0400
+Date: Fri, 25 May 2018 10:00:35 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20180525080035.GA5562@localhost.localdomain>
+References: <20180518132114.4070-1-kwolf@redhat.com>
+	<20180518132114.4070-22-kwolf@redhat.com>
+	<26778cd3-3150-734b-d8c6-afa6e41f0215@redhat.com>
+	<20180524082412.GC4008@localhost.localdomain>
+	<1988292d-467a-9c63-e64d-035b0e93348a@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <1527232960-51123-1-git-send-email-mjc@sifive.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v2] elf: Add RISC-V PSABI ELF header defines
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1988292d-467a-9c63-e64d-035b0e93348a@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2 21/40] job: Convert
+ block_job_cancel_async() to Job
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,56 +27,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Michael Clark <mjc@sifive.com>, qemu-devel@nongnu.org, qemu-trivial@nongnu.org
-Cc: patches@groups.riscv.org, Michael Tokarev <mjt@tls.msk.ru>, Richard Henderson <richard.henderson@linaro.org>, Alistair Francis <Alistair.Francis@wdc.com>
+To: John Snow <jsnow@redhat.com>
+Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, jcody@redhat.com, armbru@redhat.com, mreitz@redhat.com
 
-Le 25/05/2018 à 09:22, Michael Clark a écrit :
-> Refer to the RISC-V PSABI specification for details:
+Am 24.05.2018 um 19:42 hat John Snow geschrieben:
 > 
-> - https://github.com/riscv/riscv-elf-psabi-doc/blob/master/riscv-elf.md
 > 
-> Cc: Michael Tokarev <mjt@tls.msk.ru>
-> Cc: Laurent Vivier <laurent@vivier.eu>
-> Cc: Richard Henderson <richard.henderson@linaro.org>
-> Cc: Alistair Francis <Alistair.Francis@wdc.com>
-> Signed-off-by: Michael Clark <mjc@sifive.com>
-> ---
->  include/elf.h | 8 ++++++++
->  1 file changed, 8 insertions(+)
+> On 05/24/2018 04:24 AM, Kevin Wolf wrote:
+> > Am 24.05.2018 um 01:18 hat John Snow geschrieben:
+> >>> diff --git a/include/qemu/job.h b/include/qemu/job.h
+> >>> index 3e817beee9..2648c74281 100644
+> >>> --- a/include/qemu/job.h
+> >>> +++ b/include/qemu/job.h
+> >>> @@ -97,6 +97,12 @@ typedef struct Job {
+> >>>       */
+> >>>      bool cancelled;
+> >>>  
+> >>> +    /**
+> >>> +     * Set to true if the job should abort immediately without waiting
+> >>> +     * for data to be in sync.
+> >>> +     */
+> >>> +    bool force_cancel;
+> >>> +
+> >>
+> >> Does this comment need an update now, though?
+> >>
+> >> Actually, in terms of "new jobs" API, it'd be really nice if cancel
+> >> *always meant cancel*.
+> >>
+> >> I think "cancel" should never be used to mean "successful completion,
+> >> but different from the one we'd get if we used job_complete."
+> >>
+> >> i.e., either we need a job setting:
+> >>
+> >> job-set completion-mode=[pivot|no-pivot]
+> >>
+> >> or optional parameters to pass to job-complete:
+> >>
+> >> job-complete mode=[understood-by-job-type]
+> >>
+> >> or some other mechanism that accomplishes the same type of behavior. It
+> >> would be nice if it did not have to be determined at job creation time
+> >> but instead could be determined later.
+> > 
+> > I agree. We already made sure that job-cancel really means cancel on the
+> > QAPI level, so we're free to do that. We just need to keep supporting
+> > block-job-cancel with the old semantics, so what I have is the easy
+> > conversion. We can change the internal implementation when we actually
+> > implement the selection of a completion mode.
+> > 
+> > Kevin
+> > 
 > 
-> diff --git a/include/elf.h b/include/elf.h
-> index 934dbbd6b3ae..bd0493f43d19 100644
-> --- a/include/elf.h
-> +++ b/include/elf.h
-> @@ -1285,6 +1285,14 @@ typedef struct {
->  #define R_IA64_DTPREL64LSB	0xb7	/* @dtprel(sym + add), data8 LSB */
->  #define R_IA64_LTOFF_DTPREL22	0xba	/* @ltoff(@dtprel(s+a)), imm22 */
->  
-> +/* RISC-V specific definitions.  */
-> +#define EF_RISCV_RVC 0x0001
-> +#define EF_RISCV_FLOAT_ABI_SINGLE 0x0002
-> +#define EF_RISCV_FLOAT_ABI_DOUBLE 0x0004
-> +#define EF_RISCV_FLOAT_ABI_QUAD 0x0006
-> +#define EF_RISCV_RVE 0x0008
-> +#define EF_RISCV_TSO 0x0010
-> +
->  typedef struct elf32_rel {
->    Elf32_Addr	r_offset;
->    Elf32_Word	r_info;
+> We need this before 3.0 though, yeah? unless we make job-cancel
+> x-job-cancel or some other warning that the way it works might change, yeah?
 > 
+> Or do I misunderstand our leeway to change this at a later point in time?
+> 
+> (can job-cancel apply to block jobs created with the legacy
+> infrastructure? My reading was "yes.")
 
-from glibc (and binutils), I have:
+It can, and it already has its final semantics, so nothing has to change
+before 3.0. job-cancel is equivalent to block-job-cancel with fixed
+force=true. If you want the complete-by-cancel behaviour of mirror, you
+have to use block-job-cancel for now, because job-cancel doesn't provide
+that functionality.
 
-  /* RISC-V ELF Flags */
-  #define EF_RISCV_RVC                    0x0001
-  #define EF_RISCV_FLOAT_ABI              0x0006
-  #define EF_RISCV_FLOAT_ABI_SOFT         0x0000
-  #define EF_RISCV_FLOAT_ABI_SINGLE       0x0002
-  #define EF_RISCV_FLOAT_ABI_DOUBLE       0x0004
-  #define EF_RISCV_FLOAT_ABI_QUAD         0x0006
+So what we can change later is adding a way to initiate this secondary
+completion mode with a job-* command (probably with a new option for
+job-complete). But we wouldn't change the semantics of exisiting
+commands.
 
-Perhaps you can also define EF_RISCV_FLOAT_ABI_SOFT and EF_RISCV_FLOAT_ABI?
-
-Anyway:
-
-Reviewed-by: Laurent Vivier <laurent@vivier.eu>
+Kevin
