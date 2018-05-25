@@ -1,26 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35574)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35586)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fMD1c-00025D-E8
-	for qemu-devel@nongnu.org; Fri, 25 May 2018 09:44:57 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1fMD1d-00026f-Lk
+	for qemu-devel@nongnu.org; Fri, 25 May 2018 09:44:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fMD1b-0008TM-Gn
-	for qemu-devel@nongnu.org; Fri, 25 May 2018 09:44:56 -0400
-Received: from mail-wr0-x242.google.com ([2a00:1450:400c:c0c::242]:43493)
+	(envelope-from <alex.bennee@linaro.org>) id 1fMD1c-0008Tw-TV
+	for qemu-devel@nongnu.org; Fri, 25 May 2018 09:44:57 -0400
+Received: from mail-wr0-x22a.google.com ([2a00:1450:400c:c0c::22a]:40370)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1fMD1b-0008St-Bb
-	for qemu-devel@nongnu.org; Fri, 25 May 2018 09:44:55 -0400
-Received: by mail-wr0-x242.google.com with SMTP id r13-v6so9335588wrj.10
-	for <qemu-devel@nongnu.org>; Fri, 25 May 2018 06:44:55 -0700 (PDT)
+	id 1fMD1c-0008Ta-Mb
+	for qemu-devel@nongnu.org; Fri, 25 May 2018 09:44:56 -0400
+Received: by mail-wr0-x22a.google.com with SMTP id l41-v6so9363996wre.7
+	for <qemu-devel@nongnu.org>; Fri, 25 May 2018 06:44:56 -0700 (PDT)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Fri, 25 May 2018 14:38:22 +0100
-Message-Id: <20180525133851.27161-21-alex.bennee@linaro.org>
+Date: Fri, 25 May 2018 14:38:21 +0100
+Message-Id: <20180525133851.27161-20-alex.bennee@linaro.org>
 In-Reply-To: <20180525133851.27161-1-alex.bennee@linaro.org>
 References: <20180525133851.27161-1-alex.bennee@linaro.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v5 20/49] tests/tcg/i386: fix test-i386
+Subject: [Qemu-devel] [PATCH v5 19/49] tests/tcg/i386: Build fix for
+ hello-i386
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,34 +28,31 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: cota@braap.org, famz@redhat.com, berrange@redhat.com, f4bug@amsat.org, richard.henderson@linaro.org, balrogg@gmail.com, aurelien@aurel32.net, agraf@suse.de
-Cc: qemu-devel@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>
+Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>
 
-We don't include anything from qemu itself for the build.
+From: Fam Zheng <famz@redhat.com>
 
-Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+We have -Werror=missing-prototype, add a dummy prototype to avoid that
+warning.
+
+Signed-off-by: Fam Zheng <famz@redhat.com>
 Reviewed-by: Thomas Huth <thuth@redhat.com>
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Tested-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-
 ---
-v4
-  - reword commit message to be more accurate
----
- tests/tcg/i386/test-i386.c | 1 -
- 1 file changed, 1 deletion(-)
+ tests/tcg/i386/hello-i386.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/tests/tcg/i386/test-i386.c b/tests/tcg/i386/test-i386.c
-index 9599204895..cae6a7773a 100644
---- a/tests/tcg/i386/test-i386.c
-+++ b/tests/tcg/i386/test-i386.c
-@@ -17,7 +17,6 @@
-  *  along with this program; if not, see <http://www.gnu.org/licenses/>.
-  */
- #define _GNU_SOURCE
--#include "qemu/compiler.h"
- #include <stdlib.h>
- #include <stdio.h>
- #include <string.h>
+diff --git a/tests/tcg/i386/hello-i386.c b/tests/tcg/i386/hello-i386.c
+index fa00380de2..cfeb24b2f5 100644
+--- a/tests/tcg/i386/hello-i386.c
++++ b/tests/tcg/i386/hello-i386.c
+@@ -20,6 +20,7 @@ static inline int write(int fd, const char * buf, int len)
+   return status;
+ }
+ 
++void _start(void);
+ void _start(void)
+ {
+     write(1, "Hello World\n", 12);
 -- 
 2.17.0
