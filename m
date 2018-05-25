@@ -1,23 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58675)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59938)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1fMFt8-0004AL-HM
-	for qemu-devel@nongnu.org; Fri, 25 May 2018 12:48:23 -0400
+	(envelope-from <no-reply@patchew.org>) id 1fMFxK-0007YQ-Eh
+	for qemu-devel@nongnu.org; Fri, 25 May 2018 12:52:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1fMFt4-0002wz-If
-	for qemu-devel@nongnu.org; Fri, 25 May 2018 12:48:22 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:45636 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1fMFt4-0002wo-EB
-	for qemu-devel@nongnu.org; Fri, 25 May 2018 12:48:18 -0400
-Date: Fri, 25 May 2018 19:48:17 +0300
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <1527266793-301361-21-git-send-email-mst@redhat.com>
-References: <1527266793-301361-1-git-send-email-mst@redhat.com>
+	(envelope-from <no-reply@patchew.org>) id 1fMFxG-0005fx-El
+	for qemu-devel@nongnu.org; Fri, 25 May 2018 12:52:42 -0400
+Resent-Message-Id: <E1fMFxG-0005fx-El@eggs.gnu.org>
+Received: from sender-of-o51.zoho.com ([135.84.80.216]:21050)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1fMFxG-0005fT-4m
+	for qemu-devel@nongnu.org; Fri, 25 May 2018 12:52:38 -0400
+In-Reply-To: <20180525163327.23097-1-kwolf@redhat.com>
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <152726713071.237.9869884341832161250@d39dc562802a>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1527266793-301361-1-git-send-email-mst@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 20/20] arch_init: sort architectures
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Fri, 25 May 2018 09:52:11 -0700 (PDT)
+Subject: Re: [Qemu-devel] [PATCH 00/14] block: Make blockdev-create a job
+ and stable API
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,56 +29,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: eblake@redhat.com, peter.maydell@linaro.org, Markus Armbruster <armbru@redhat.com>, Richard Henderson <richard.henderson@linaro.org>, Laszlo Ersek <lersek@redhat.com>
+To: kwolf@redhat.com
+Cc: famz@redhat.com, qemu-block@nongnu.org, pkrempa@redhat.com, jsnow@redhat.com, qemu-devel@nongnu.org, mreitz@redhat.com
 
-Sort alphabetically. Will help us see if anything is missing (e.g. tile
-is not there now).
-
-Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
----
- arch_init.c | 16 ++++++++--------
- 1 file changed, 8 insertions(+), 8 deletions(-)
-
-diff --git a/arch_init.c b/arch_init.c
-index 9597218..f4f3f61 100644
---- a/arch_init.c
-+++ b/arch_init.c
-@@ -52,14 +52,14 @@ int graphic_depth = 32;
- #define QEMU_ARCH QEMU_ARCH_ARM
- #elif defined(TARGET_CRIS)
- #define QEMU_ARCH QEMU_ARCH_CRIS
--#elif defined(TARGET_I386)
--#define QEMU_ARCH QEMU_ARCH_I386
- #elif defined(TARGET_HPPA)
- #define QEMU_ARCH QEMU_ARCH_HPPA
--#elif defined(TARGET_M68K)
--#define QEMU_ARCH QEMU_ARCH_M68K
-+#elif defined(TARGET_I386)
-+#define QEMU_ARCH QEMU_ARCH_I386
- #elif defined(TARGET_LM32)
- #define QEMU_ARCH QEMU_ARCH_LM32
-+#elif defined(TARGET_M68K)
-+#define QEMU_ARCH QEMU_ARCH_M68K
- #elif defined(TARGET_MICROBLAZE)
- #define QEMU_ARCH QEMU_ARCH_MICROBLAZE
- #elif defined(TARGET_MIPS)
-@@ -80,12 +80,12 @@ int graphic_depth = 32;
- #define QEMU_ARCH QEMU_ARCH_SH4
- #elif defined(TARGET_SPARC)
- #define QEMU_ARCH QEMU_ARCH_SPARC
--#elif defined(TARGET_XTENSA)
--#define QEMU_ARCH QEMU_ARCH_XTENSA
--#elif defined(TARGET_UNICORE32)
--#define QEMU_ARCH QEMU_ARCH_UNICORE32
- #elif defined(TARGET_TRICORE)
- #define QEMU_ARCH QEMU_ARCH_TRICORE
-+#elif defined(TARGET_UNICORE32)
-+#define QEMU_ARCH QEMU_ARCH_UNICORE32
-+#elif defined(TARGET_XTENSA)
-+#define QEMU_ARCH QEMU_ARCH_XTENSA
- #endif
- 
- const uint32_t arch_type = QEMU_ARCH;
--- 
-MST
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
+c3NhZ2UtaWQ6IDIwMTgwNTI1MTYzMzI3LjIzMDk3LTEta3dvbGZAcmVkaGF0LmNvbQpTdWJqZWN0
+OiBbUWVtdS1kZXZlbF0gW1BBVENIIDAwLzE0XSBibG9jazogTWFrZSBibG9ja2Rldi1jcmVhdGUg
+YSBqb2IgYW5kIHN0YWJsZSBBUEkKCj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jh
+c2gKCkJBU0U9YmFzZQpuPTEKdG90YWw9JChnaXQgbG9nIC0tb25lbGluZSAkQkFTRS4uIHwgd2Mg
+LWwpCmZhaWxlZD0wCgpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBj
+b25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5h
+bGdvcml0aG0gaGlzdG9ncmFtCgpjb21taXRzPSIkKGdpdCBsb2cgLS1mb3JtYXQ9JUggLS1yZXZl
+cnNlICRCQVNFLi4pIgpmb3IgYyBpbiAkY29tbWl0czsgZG8KICAgIGVjaG8gIkNoZWNraW5nIFBB
+VENIICRuLyR0b3RhbDogJChnaXQgbG9nIC1uIDEgLS1mb3JtYXQ9JXMgJGMpLi4uIgogICAgaWYg
+ISBnaXQgc2hvdyAkYyAtLWZvcm1hdD1lbWFpbCB8IC4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0t
+bWFpbGJhY2sgLTsgdGhlbgogICAgICAgIGZhaWxlZD0xCiAgICAgICAgZWNobwogICAgZmkKICAg
+IG49JCgobisxKSkKZG9uZQoKZXhpdCAkZmFpbGVkCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpV
+cGRhdGluZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQxZGVmN2Y0NGJkODg4NzEzMzg0CkZyb20gaHR0
+cHM6Ly9naXRodWIuY29tL3BhdGNoZXctcHJvamVjdC9xZW11CiB0IFt0YWcgdXBkYXRlXSAgICAg
+ICAgICAgIHBhdGNoZXcvMjAxODA0MjUxODMyMjMuNTgwNTY2LTEtZWJsYWtlQHJlZGhhdC5jb20g
+LT4gcGF0Y2hldy8yMDE4MDQyNTE4MzIyMy41ODA1NjYtMS1lYmxha2VAcmVkaGF0LmNvbQogdCBb
+dGFnIHVwZGF0ZV0gICAgICAgICAgICBwYXRjaGV3LzIwMTgwNTAxMTQyMjIyLjE5MTU0LTEta2Jh
+c3RpYW5AbWFpbC51bmktcGFkZXJib3JuLmRlIC0+IHBhdGNoZXcvMjAxODA1MDExNDIyMjIuMTkx
+NTQtMS1rYmFzdGlhbkBtYWlsLnVuaS1wYWRlcmJvcm4uZGUKICogW25ldyB0YWddICAgICAgICAg
+ICAgICAgcGF0Y2hldy8yMDE4MDUyNTE2MzMyNy4yMzA5Ny0xLWt3b2xmQHJlZGhhdC5jb20gLT4g
+cGF0Y2hldy8yMDE4MDUyNTE2MzMyNy4yMzA5Ny0xLWt3b2xmQHJlZGhhdC5jb20KU3dpdGNoZWQg
+dG8gYSBuZXcgYnJhbmNoICd0ZXN0Jwo3YzUzNzY3N2M1IGJsb2NrL2NyZWF0ZTogTWFyayBibG9j
+a2Rldi1jcmVhdGUgc3RhYmxlCjJlMjcwOTJhMTQgcWVtdS1pb3Rlc3RzOiBSZXdyaXRlIDIxMyBm
+b3IgYmxvY2tkZXYtY3JlYXRlIGpvYgpkNjI1MWQ0M2YwIHFlbXUtaW90ZXN0czogUmV3cml0ZSAy
+MTIgZm9yIGJsb2NrZGV2LWNyZWF0ZSBqb2IKZDZiYzBmNDg5NCBxZW11LWlvdGVzdHM6IFJld3Jp
+dGUgMjExIGZvciBibG9ja2Rldi1jcmVhdGUgam9iCjViMDgxNGQxZTQgcWVtdS1pb3Rlc3RzOiBS
+ZXdyaXRlIDIxMCBmb3IgYmxvY2tkZXYtY3JlYXRlIGpvYgowM2JmNTliMjU0IHFlbXUtaW90ZXN0
+czogUmV3cml0ZSAyMDcgZm9yIGJsb2NrZGV2LWNyZWF0ZSBqb2IKZjYwMmE2NjEwYiBxZW11LWlv
+dGVzdHM6IFJld3JpdGUgMjA2IGZvciBibG9ja2Rldi1jcmVhdGUgam9iCmE5ZDhhNWM4OGUgcWVt
+dS1pb3Rlc3RzOiBBZGQgaW90ZXN0cy5pbWdfaW5mb19sb2coKQplYjkyNDhiMGVjIHFlbXUtaW90
+ZXN0czogQWRkIFZNLnFtcF9sb2coKQo3YzllNWU4MTU0IHFlbXUtaW90ZXN0czogQWRkIFZNLmdl
+dF9xbXBfZXZlbnRzX2ZpbHRlcmVkKCkKNzExYjBkOWFkOCBibG9jay9jcmVhdGU6IE1ha2UgeC1i
+bG9ja2Rldi1jcmVhdGUgYSBqb2IKYmM3Y2ZjYmQ0YiBqb2I6IEFkZCBlcnJvciBtZXNzYWdlIGZv
+ciBmYWlsaW5nIGpvYnMKM2VmZGQ2OTA1ZSB2aGR4OiBGaXggdmhkeF9jb19jcmVhdGUoKSByZXR1
+cm4gdmFsdWUKMGEzZjk5ZWFkMCB2ZGk6IEZpeCB2ZGlfY29fZG9fY3JlYXRlKCkgcmV0dXJuIHZh
+bHVlCgo9PT0gT1VUUFVUIEJFR0lOID09PQpDaGVja2luZyBQQVRDSCAxLzE0OiB2ZGk6IEZpeCB2
+ZGlfY29fZG9fY3JlYXRlKCkgcmV0dXJuIHZhbHVlLi4uCkNoZWNraW5nIFBBVENIIDIvMTQ6IHZo
+ZHg6IEZpeCB2aGR4X2NvX2NyZWF0ZSgpIHJldHVybiB2YWx1ZS4uLgpDaGVja2luZyBQQVRDSCAz
+LzE0OiBqb2I6IEFkZCBlcnJvciBtZXNzYWdlIGZvciBmYWlsaW5nIGpvYnMuLi4KQ2hlY2tpbmcg
+UEFUQ0ggNC8xNDogYmxvY2svY3JlYXRlOiBNYWtlIHgtYmxvY2tkZXYtY3JlYXRlIGEgam9iLi4u
+CkNoZWNraW5nIFBBVENIIDUvMTQ6IHFlbXUtaW90ZXN0czogQWRkIFZNLmdldF9xbXBfZXZlbnRz
+X2ZpbHRlcmVkKCkuLi4KQ2hlY2tpbmcgUEFUQ0ggNi8xNDogcWVtdS1pb3Rlc3RzOiBBZGQgVk0u
+cW1wX2xvZygpLi4uCkNoZWNraW5nIFBBVENIIDcvMTQ6IHFlbXUtaW90ZXN0czogQWRkIGlvdGVz
+dHMuaW1nX2luZm9fbG9nKCkuLi4KRVJST1I6IGxpbmUgb3ZlciA5MCBjaGFyYWN0ZXJzCiM0MDog
+RklMRTogdGVzdHMvcWVtdS1pb3Rlc3RzL2lvdGVzdHMucHk6MjI1OgorICAgICAgICBsaW5lID0g
+cmUuc3ViKCd1dWlkOiBbLWEtZjAtOV0rJywgJ3V1aWQ6IFhYWFhYWFhYLVhYWFgtWFhYWC1YWFhY
+LVhYWFhYWFhYWFhYWCcsIGxpbmUpCgp0b3RhbDogMSBlcnJvcnMsIDAgd2FybmluZ3MsIDI4IGxp
+bmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3
+LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVt
+IHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCkNoZWNr
+aW5nIFBBVENIIDgvMTQ6IHFlbXUtaW90ZXN0czogUmV3cml0ZSAyMDYgZm9yIGJsb2NrZGV2LWNy
+ZWF0ZSBqb2IuLi4KQ2hlY2tpbmcgUEFUQ0ggOS8xNDogcWVtdS1pb3Rlc3RzOiBSZXdyaXRlIDIw
+NyBmb3IgYmxvY2tkZXYtY3JlYXRlIGpvYi4uLgpDaGVja2luZyBQQVRDSCAxMC8xNDogcWVtdS1p
+b3Rlc3RzOiBSZXdyaXRlIDIxMCBmb3IgYmxvY2tkZXYtY3JlYXRlIGpvYi4uLgpDaGVja2luZyBQ
+QVRDSCAxMS8xNDogcWVtdS1pb3Rlc3RzOiBSZXdyaXRlIDIxMSBmb3IgYmxvY2tkZXYtY3JlYXRl
+IGpvYi4uLgpDaGVja2luZyBQQVRDSCAxMi8xNDogcWVtdS1pb3Rlc3RzOiBSZXdyaXRlIDIxMiBm
+b3IgYmxvY2tkZXYtY3JlYXRlIGpvYi4uLgpDaGVja2luZyBQQVRDSCAxMy8xNDogcWVtdS1pb3Rl
+c3RzOiBSZXdyaXRlIDIxMyBmb3IgYmxvY2tkZXYtY3JlYXRlIGpvYi4uLgpDaGVja2luZyBQQVRD
+SCAxNC8xNDogYmxvY2svY3JlYXRlOiBNYXJrIGJsb2NrZGV2LWNyZWF0ZSBzdGFibGUuLi4KPT09
+IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKCi0tLQpF
+bWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwOi8vcGF0Y2hldy5v
+cmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJlZGhhdC5j
+b20=
