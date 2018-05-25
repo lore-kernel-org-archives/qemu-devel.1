@@ -1,28 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44062)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44232)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1fMDXc-0000I4-M6
-	for qemu-devel@nongnu.org; Fri, 25 May 2018 10:18:01 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1fMDYl-0000nq-6j
+	for qemu-devel@nongnu.org; Fri, 25 May 2018 10:19:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1fMDXY-0008Ga-NQ
-	for qemu-devel@nongnu.org; Fri, 25 May 2018 10:18:00 -0400
-Received: from mail-pg0-f67.google.com ([74.125.83.67]:45555)
+	(envelope-from <alex.bennee@linaro.org>) id 1fMDYh-0000GQ-67
+	for qemu-devel@nongnu.org; Fri, 25 May 2018 10:19:11 -0400
+Received: from mail-wm0-x243.google.com ([2a00:1450:400c:c09::243]:39005)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1fMDXY-0008G1-GJ
-	for qemu-devel@nongnu.org; Fri, 25 May 2018 10:17:56 -0400
-Received: by mail-pg0-f67.google.com with SMTP id w3-v6so2357315pgv.12
-	for <qemu-devel@nongnu.org>; Fri, 25 May 2018 07:17:56 -0700 (PDT)
-References: <20180525132755.21839-1-peter.maydell@linaro.org>
-	<20180525132755.21839-5-peter.maydell@linaro.org>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <decba0c5-91d8-57f4-762d-fe4bf584eea5@redhat.com>
-Date: Fri, 25 May 2018 16:17:53 +0200
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1fMDYg-0000Fw-Va
+	for qemu-devel@nongnu.org; Fri, 25 May 2018 10:19:07 -0400
+Received: by mail-wm0-x243.google.com with SMTP id f8-v6so15092625wmc.4
+	for <qemu-devel@nongnu.org>; Fri, 25 May 2018 07:19:06 -0700 (PDT)
+From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+Date: Fri, 25 May 2018 15:18:56 +0100
+Message-Id: <20180525141903.6257-1-alex.bennee@linaro.org>
+In-Reply-To: <20180525133851.27161-1-alex.bennee@linaro.org>
+References: <20180525133851.27161-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <20180525132755.21839-5-peter.maydell@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 4/6] target/i386/kvm.c: Handle renaming of
- KVM_HINTS_DEDICATED
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH v5 22/49] tests/tcg/x86_64: add Makefile.target
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,52 +29,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
-Cc: patches@linaro.org, "Michael S . Tsirkin" <mst@redhat.com>, Alex Williamson <alex.williamson@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
+To: cota@braap.org, famz@redhat.com, berrange@redhat.com, f4bug@amsat.org, richard.henderson@linaro.org, balrogg@gmail.com, aurelien@aurel32.net, agraf@suse.de
+Cc: qemu-devel@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>
 
-On 25/05/2018 15:27, Peter Maydell wrote:
-> In kernel header commit 633711e8287, the define KVM_HINTS_DEDICATED
-> was renamed to KVM_HINTS_REALTIME. Work around this compatibility
-> break by (a) using the new constant name, and (b) defining it
-> if the headers don't.
-> 
-> Part (b) can be removed once we've updated our copy of the kernel
-> headers to a version that defines KVM_HINTS_REALTIME.
-> 
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-> ---
->  target/i386/kvm.c | 7 ++++++-
->  1 file changed, 6 insertions(+), 1 deletion(-)
-> 
-> diff --git a/target/i386/kvm.c b/target/i386/kvm.c
-> index 6511329d11..c2699f2f44 100644
-> --- a/target/i386/kvm.c
-> +++ b/target/i386/kvm.c
-> @@ -48,6 +48,11 @@
->  #include "exec/memattrs.h"
->  #include "trace.h"
->  
-> +/* Work around this kernel header constant changing its name */
-> +#ifndef KVM_HINTS_REALTIME
-> +#define KVM_HINTS_REALTIME KVM_HINTS_DEDICATED
-> +#endif
-> +
->  //#define DEBUG_KVM
->  
->  #ifdef DEBUG_KVM
-> @@ -387,7 +392,7 @@ uint32_t kvm_arch_get_supported_cpuid(KVMState *s, uint32_t function,
->              ret &= ~(1U << KVM_FEATURE_PV_UNHALT);
->          }
->      } else if (function == KVM_CPUID_FEATURES && reg == R_EDX) {
-> -        ret |= 1U << KVM_HINTS_DEDICATED;
-> +        ret |= 1U << KVM_HINTS_REALTIME;
->          found = 1;
->      }
->  
-> 
+The sources for x86_64 are shared in the i386 directory which will be
+included thanks to TARGET_BASE_ARCH. However not all sources build so
+we need to filter out the ones we can't build in the 64 bit world and
+those that can't be built for 32 bit.
 
-Acked-by: Paolo Bonzini <pbonzini@redhat.com>
+Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Tested-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
-I would be okay with squashing 4-6 too though.
+---
+v4
+  - update MAINTAINERS
+v5
+  - merge with disable i386 version of test-i386-ssse
+---
+ MAINTAINERS                      |  1 +
+ tests/tcg/i386/Makefile.target   |  4 ++--
+ tests/tcg/x86_64/Makefile.target | 15 +++++++++++++++
+ 3 files changed, 18 insertions(+), 2 deletions(-)
+ create mode 100644 tests/tcg/x86_64/Makefile.target
 
-Paolo
+diff --git a/MAINTAINERS b/MAINTAINERS
+index d5bcedfe1a..366f1c3694 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -284,6 +284,7 @@ M: Eduardo Habkost <ehabkost@redhat.com>
+ S: Maintained
+ F: target/i386/
+ F: tests/tcg/i386/
++F: tests/tcg/x86_64/
+ F: hw/i386/
+ F: disas/i386.c
+ T: git git://github.com/ehabkost/qemu.git x86-next
+diff --git a/tests/tcg/i386/Makefile.target b/tests/tcg/i386/Makefile.target
+index 937d4de7f5..d5c6f32b93 100644
+--- a/tests/tcg/i386/Makefile.target
++++ b/tests/tcg/i386/Makefile.target
+@@ -7,9 +7,9 @@ VPATH 		+= $(I386_SRC)
+ 
+ I386_SRCS=$(notdir $(wildcard $(I386_SRC)/*.c))
+ I386_TESTS=$(I386_SRCS:.c=)
+-
++I386_ONLY_TESTS=$(filter-out test-i386-ssse3, $(I386_TESTS))
+ # Update TESTS
+-TESTS+=$(I386_TESTS)
++TESTS+=$(I386_ONLY_TESTS)
+ 
+ ifneq ($(TARGET_NAME),x86_64)
+ CFLAGS+=-m32
+diff --git a/tests/tcg/x86_64/Makefile.target b/tests/tcg/x86_64/Makefile.target
+new file mode 100644
+index 0000000000..74f170b9ed
+--- /dev/null
++++ b/tests/tcg/x86_64/Makefile.target
+@@ -0,0 +1,15 @@
++# -*- Mode: makefile -*-
++#
++# x86_64 tests - included from tests/tcg/Makefile.target
++#
++# Currently we only build test-x86_64 and test-i386-ssse3 from
++# $(SRC)/tests/tcg/i386/
++#
++
++X86_64_TESTS=$(filter-out $(I386_ONLY_TESTS), $(TESTS))
++X86_64_TESTS+=test-x86_64
++TESTS:=$(X86_64_TESTS)
++
++test-x86_64: LDFLAGS+=-lm -lc
++test-x86_64: test-i386.c test-i386.h test-i386-shift.h test-i386-muldiv.h
++	$(CC) $(CFLAGS) $< -o $@ $(LDFLAGS)
+-- 
+2.17.0
