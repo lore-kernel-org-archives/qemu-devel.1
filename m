@@ -1,20 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42506)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44065)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fM8Dz-0003eT-3l
-	for qemu-devel@nongnu.org; Fri, 25 May 2018 04:37:24 -0400
+	(envelope-from <zhaoshenglong@huawei.com>) id 1fM8Jv-0005jZ-5N
+	for qemu-devel@nongnu.org; Fri, 25 May 2018 04:43:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fM8Dv-0000RX-5g
-	for qemu-devel@nongnu.org; Fri, 25 May 2018 04:37:23 -0400
-Date: Fri, 25 May 2018 10:37:15 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20180525083715.GC5562@localhost.localdomain>
-References: <152720243501.517758.270483838608061631.stgit@bahia.lan>
+	(envelope-from <zhaoshenglong@huawei.com>) id 1fM8Ju-0005Ej-7j
+	for qemu-devel@nongnu.org; Fri, 25 May 2018 04:43:31 -0400
+Message-ID: <5B07CC79.1070905@huawei.com>
+Date: Fri, 25 May 2018 16:42:33 +0800
+From: Shannon Zhao <zhaoshenglong@huawei.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <152720243501.517758.270483838608061631.stgit@bahia.lan>
-Subject: Re: [Qemu-devel] [PATCH v3] block: fix QEMU crash with scsi-hd and
- drive_del
+References: <1527047633-12368-1-git-send-email-zhaoshenglong@huawei.com>
+	<1527047633-12368-2-git-send-email-zhaoshenglong@huawei.com>
+	<acca5b80-f527-bc39-0b63-147e53affb4b@redhat.com>
+	<CAFEAcA-xbHtxora5TU9psYnBgP0+N8_nznhVppEkg7fmmwip3w@mail.gmail.com>
+	<10801e6c-5028-add6-b082-22c5dc9758ca@redhat.com>
+	<CAFEAcA-eW_1M42c+Fjt98AgVsnbwjwWap3JZFHNU9f8S0H_qww@mail.gmail.com>
+	<38aee779-1baf-ab96-7489-0f34bda2f8e6@redhat.com>
+	<CAFEAcA9oCppg2C32vd3YKKmvfO7n1KnFeXG14CV7UHcZpxcTqA@mail.gmail.com>
+In-Reply-To: <CAFEAcA9oCppg2C32vd3YKKmvfO7n1KnFeXG14CV7UHcZpxcTqA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH V3 2/2] arm_gicv3_kvm: kvm_dist_get/put:
+ skip the registers banked by GICR
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,101 +30,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>
-Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, qemu-stable@nongnu.org
+To: Peter Maydell <peter.maydell@linaro.org>, Auger Eric <eric.auger@redhat.com>
+Cc: Shannon Zhao <shannon.zhaosl@gmail.com>, qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
 
-Am 25.05.2018 um 00:53 hat Greg Kurz geschrieben:
-> Removing a drive with drive_del while it is being used to run an I/O
-> intensive workload can cause QEMU to crash.
-> 
-> An AIO flush can yield at some point:
-> 
-> blk_aio_flush_entry()
->  blk_co_flush(blk)
->   bdrv_co_flush(blk->root->bs)
->    ...
->     qemu_coroutine_yield()
-> 
-> and let the HMP command to run, free blk->root and give control
-> back to the AIO flush:
-> 
->     hmp_drive_del()
->      blk_remove_bs()
->       bdrv_root_unref_child(blk->root)
->        child_bs = blk->root->bs
->        bdrv_detach_child(blk->root)
->         bdrv_replace_child(blk->root, NULL)
->          blk->root->bs = NULL
->         g_free(blk->root) <============== blk->root becomes stale
->        bdrv_unref(child_bs)
->         bdrv_delete(child_bs)
->          bdrv_close()
->           bdrv_drained_begin()
->            bdrv_do_drained_begin()
->             bdrv_drain_recurse()
->              aio_poll()
->               ...
->               qemu_coroutine_switch()
-> 
-> and the AIO flush completion ends up dereferencing blk->root:
-> 
->   blk_aio_complete()
->    scsi_aio_complete()
->     blk_get_aio_context(blk)
->      bs = blk_bs(blk)
->  ie, bs = blk->root ? blk->root->bs : NULL
->             ^^^^^
->             stale
-> 
-> The problem is that we should avoid making block driver graph
-> changes while we have in-flight requests. This patch hence adds
-> a drained section to bdrv_detach_child(), so that we're sure
-> all requests have been drained before blk->root becomes stale.
-> 
-> Signed-off-by: Greg Kurz <groug@kaod.org>
-> ---
-> v3: - start drained section before modifying the graph (Stefan)
-> 
-> v2: - drain I/O requests when detaching the BDS (Stefan, Paolo)
-> ---
->  block.c |    4 ++++
->  1 file changed, 4 insertions(+)
-> 
-> diff --git a/block.c b/block.c
-> index 501b64c8193f..715c1b56c1e2 100644
-> --- a/block.c
-> +++ b/block.c
-> @@ -2127,12 +2127,16 @@ BdrvChild *bdrv_attach_child(BlockDriverState *parent_bs,
->  
->  static void bdrv_detach_child(BdrvChild *child)
->  {
-> +    BlockDriverState *child_bs = child->bs;
-> +
-> +    bdrv_drained_begin(child_bs);
->      if (child->next.le_prev) {
->          QLIST_REMOVE(child, next);
->          child->next.le_prev = NULL;
->      }
->  
->      bdrv_replace_child(child, NULL);
-> +    bdrv_drained_end(child_bs);
->  
->      g_free(child->name);
->      g_free(child);
 
-I wonder if the better fix would be calling blk_drain() in
-blk_remove_bs() (which would also better be blk_drained_begin/end...).
 
-Doing the proposed change in bdrv_detach_child() should fix the problem
-that you're seeing, but at first sight it promises that callers don't
-have to care about shutting down their activity on the child node first.
-This isn't necessarily correct if the parent may still issue a new
-request (e.g. in response to the completion of an old one). What really
-needs to be drained is the parent's use of the child, not the activity
-of the child.
+On 2018/5/24 22:56, Peter Maydell wrote:
+> On 24 May 2018 at 15:40, Auger Eric <eric.auger@redhat.com> wrote:
+>> > Hi Peter,
+>> >
+>> > On 05/24/2018 04:16 PM, Peter Maydell wrote:
+>>> >> Only for KVM, not for TCG, and it's the other way round: we
+>>> >> end up with two lots of PPI/SGI space in the data structure
+>>> >> by mistake. Let me fish out the comment I made on the v2 of this
+>>> >> series:
+>>> >>
+>>> >> In the code in master, we have QEMU data structures
+>>> >> (bitmaps, etc) which have one entry for each of GICV3_MAXIRQ
+>>> >> irqs. That includes the RAZ/WI unused space for the SPIs/PPIs, so
+>>> >> for a 1-bit-per-irq bitmap:
+>>> >>  [0x00000000, irq 32, irq 33, .... ]
+>>> >>
+>>> >> When we fill in the values from KVM into these data structures,
+>>> >> we start after the unused space, because the for_each_dist_irq_reg()
+>>> >> macro starts with _irq = GIC_INTERNAL. But we forgot to adjust
+>>> >> the offset value we use for the KVM access, so we start by
+>>> >> reading the RAZ/WI values from KVM, and the data structure
+>>> >> contents end up with:
+>>> >>  [0x00000000, 0x00000000, irq 32, irq 33, ... ]
+>>> >> (and the last irqs wouldn't get transferred).
+>> > In kvm_dist_get_priority (new code), the offset is where we read and
+>> > field is where we write, correct? Offset was shifted so we effectively
+>> > read in KVM regs the num_irq-32 SPI states now but don't we start
+>> > writing at the beginning of bmp, (ie s->gicd_ipriority), at PPI/SGI
+>> > offset? What am I missing?
+> Oops, yes, you're right. My explanation applies to the
+> various other bitmaps, where we are accessing the
+> fields in the data structure using gic_bmp_ptr32(bmp, irq),
+> but not to gicd_ipriority[], which we are directly accessing
+> starting with the first word, not by indexing via bmp[irq].
+> 
+> So we need to handle these two cases differently.
+> You're correct that for gicd_ipriority[], the code in
+> master reads and writes to that data structure as:
+>  [0, 0, ..., 0, irq 32, irq 33, ..., 0, 0, ... 0]
+> so all the values are in the right place but we:
+>  (a) unnecessarily read/write zeroes for the PPI/SGI fields
+>  (b) fail to transfer the last 32 interrupts
+> 
+> We can fix the gicd_ipriority[] case simply by adding
+>    bmp = GIC_INTERNAL;
+> before the assignment to 'field' in both kvm_dist_get_priority()
+> and kvm_dist_put_priority(). This doesn't affect migration
+> compatibility. We should do this separately from fixing the
+> other bitmaps, because it's simpler.
+> 
+If we do bmp += GIC_INTERNAL, we should also add this to offset,
+otherwise we will put the SGI/PPIs data to SPIs, right?
 
-Another minor problem with your approach: If a child node is used by
-more than one parent, this patch would unnecessarily quiesce those other
-parents and wait for the completion of their requests.
-
-Kevin
+Thanks,
+-- 
+Shannon
