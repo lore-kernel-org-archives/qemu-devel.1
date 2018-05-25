@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55265)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55847)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1fMJlf-0004rx-IF
-	for qemu-devel@nongnu.org; Fri, 25 May 2018 16:56:56 -0400
+	(envelope-from <mst@redhat.com>) id 1fMJmf-0005M4-70
+	for qemu-devel@nongnu.org; Fri, 25 May 2018 16:57:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1fMJle-0006gm-Qr
-	for qemu-devel@nongnu.org; Fri, 25 May 2018 16:56:55 -0400
-Date: Fri, 25 May 2018 23:56:48 +0300
+	(envelope-from <mst@redhat.com>) id 1fMJme-0007Wv-CB
+	for qemu-devel@nongnu.org; Fri, 25 May 2018 16:57:57 -0400
+Date: Fri, 25 May 2018 23:57:46 +0300
 From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20180525235613-mutt-send-email-mst@kernel.org>
+Message-ID: <20180525235655-mutt-send-email-mst@kernel.org>
 References: <1527266793-301361-1-git-send-email-mst@redhat.com>
 	<1527266793-301361-16-git-send-email-mst@redhat.com>
-	<df745a8b-a48b-3e9a-f44f-ebff27111847@redhat.com>
+	<87vabb1thk.fsf@secure.laptop>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <df745a8b-a48b-3e9a-f44f-ebff27111847@redhat.com>
+In-Reply-To: <87vabb1thk.fsf@secure.laptop>
 Subject: Re: [Qemu-devel] [PATCH v2 15/20] migration: use local path for
  local headers
 List-Id: <qemu-devel.nongnu.org>
@@ -25,35 +25,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: qemu-devel@nongnu.org, peter.maydell@linaro.org, Stefan Hajnoczi <stefanha@redhat.com>, Fam Zheng <famz@redhat.com>, Juan Quintela <quintela@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-block@nongnu.org
+To: Juan Quintela <quintela@redhat.com>
+Cc: qemu-devel@nongnu.org, eblake@redhat.com, peter.maydell@linaro.org, Stefan Hajnoczi <stefanha@redhat.com>, Fam Zheng <famz@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-block@nongnu.org
 
-On Fri, May 25, 2018 at 01:24:08PM -0500, Eric Blake wrote:
-> On 05/25/2018 11:48 AM, Michael S. Tsirkin wrote:
+On Fri, May 25, 2018 at 08:27:03PM +0200, Juan Quintela wrote:
+> "Michael S. Tsirkin" <mst@redhat.com> wrote:
 > > When pulling in headers that are in the same directory as C file (as
-> 
-> s/as C/as the C/ (here and in many other messages)
-
-Will fix, thanks.
-
 > > opposed to one in include/), we should use its relative path, without a
 > > directory. Directory based path works more or less by accident.
 > 
-> Missed trimming this out of your commit message.
+> I don't agree with the comment that they work by accident,
 
-Will fix, thanks.
+Oh I removed this from most commit messages but somehow this one managed
+to sneek in.  I agree, will drop this sentence.
 
-> Or, if you want, on many of these commits, you could be more explicit about
-> intention:
+> it is
+> "by-design".  But if you want to change the design, I agree with
+> removing "$ROOT" from the default include path.
 > 
-> When pulling in headers that are in the same directory as the C file (as
-> opposed to one in include/), we prefer to use its relative path without a
-> directory, rather than relying on the global -I$(SRC_DIR) that may be
-> removed in a later patch.
+> >
+> > Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+> 
+> Reviewed-by: Juan Quintela <quintela@redhat.com>
+> 
+> Later, Juan.
 
-I'm no longer sure we'll be able to.
-
-> -- 
-> Eric Blake, Principal Software Engineer
-> Red Hat, Inc.           +1-919-301-3266
-> Virtualization:  qemu.org | libvirt.org
+Thanks!
