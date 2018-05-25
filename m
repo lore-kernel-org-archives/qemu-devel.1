@@ -1,28 +1,26 @@
-Received: from eggs.gnu.org ([208.118.235.92]:44736)
+Received: from eggs.gnu.org ([208.118.235.92]:45579)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <frasse.iglesias@gmail.com>) id 1fMFVk-00065d-Sx
-	for qemu-devel@nongnu.org; Fri, 25 May 2018 12:24:14 -0400
+	(envelope-from <crosa@redhat.com>) id 1fMFZJ-00078X-H8
+	for qemu-devel@nongnu.org; Fri, 25 May 2018 12:27:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <frasse.iglesias@gmail.com>) id 1fMFVj-0000yQ-N8
-	for qemu-devel@nongnu.org; Fri, 25 May 2018 12:24:12 -0400
-Received: from mail-pl0-x22e.google.com ([2607:f8b0:400e:c01::22e]:33271)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <frasse.iglesias@gmail.com>)
-	id 1fMFVj-0000x1-DM
-	for qemu-devel@nongnu.org; Fri, 25 May 2018 12:24:11 -0400
-Received: by mail-pl0-x22e.google.com with SMTP id n10-v6so3441782plp.0
-	for <qemu-devel@nongnu.org>; Fri, 25 May 2018 09:24:11 -0700 (PDT)
+	(envelope-from <crosa@redhat.com>) id 1fMFZE-0005g5-G8
+	for qemu-devel@nongnu.org; Fri, 25 May 2018 12:27:53 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:46516 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <crosa@redhat.com>) id 1fMFZE-0005fY-9j
+	for qemu-devel@nongnu.org; Fri, 25 May 2018 12:27:48 -0400
+References: <20180525005839.11556-1-crosa@redhat.com>
+	<20180525005839.11556-4-crosa@redhat.com>
+	<20180525053718.GB28589@lemon.usersys.redhat.com>
+From: Cleber Rosa <crosa@redhat.com>
+Message-ID: <65f0262a-20ff-f243-7434-a48daf7e5225@redhat.com>
+Date: Fri, 25 May 2018 12:27:46 -0400
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA-RkvGiorW3AqJg=DGebmeSdKtcbdXb=oLe2aEN4M5Nzw@mail.gmail.com>
-References: <20180518172009.14416-1-peter.maydell@linaro.org>
-	<20180518172009.14416-5-peter.maydell@linaro.org>
-	<CAFEAcA-RkvGiorW3AqJg=DGebmeSdKtcbdXb=oLe2aEN4M5Nzw@mail.gmail.com>
-From: francisco iglesias <frasse.iglesias@gmail.com>
-Date: Fri, 25 May 2018 18:24:09 +0200
-Message-ID: <CAAYMZQtBJ5TuNz44R7ussH69CSRoKH2ZPaEfTPOHwBNFkNmVCw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: [Qemu-devel] [PULL 04/32] xlnx-zdma: Add a model of the Xilinx
- ZynqMP generic DMA
+In-Reply-To: <20180525053718.GB28589@lemon.usersys.redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 3/5] Acceptance tests: add quick VNC tests
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,75 +29,111 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Edgar Iglesias <edgar.iglesias@xilinx.com>
-
-On Friday, 25 May 2018, Peter Maydell <peter.maydell@linaro.org> wrote:
-
-> On 18 May 2018 at 18:19, Peter Maydell <peter.maydell@linaro.org> wrote:
-> > From: Francisco Iglesias <frasse.iglesias@gmail.com>
-> >
-> > Add a model of the generic DMA found on Xilinx ZynqMP.
->
-> Hi; the latest Coverity run finds a couple of issues in this code:
->
->
-> > +static uint64_t zdma_read(void *opaque, hwaddr addr, unsigned size)
-> > +{
-> > +    XlnxZDMA *s = XLNX_ZDMA(opaque);
-> > +    RegisterInfo *r = &s->regs_info[addr / 4];
-> > +
-> > +    if (!r->data) {
-> > +        qemu_log("%s: Decode error: read from %" HWADDR_PRIx "\n",
-> > +                 object_get_canonical_path(OBJECT(s)),
-> > +                 addr);
->
-> object_get_canonical_path() returns a string that the caller
-> takes ownership of, so you have to g_free() it when you've
-> finished with it. (CID 1391294)
->
-> > +        ARRAY_FIELD_DP32(s->regs, ZDMA_CH_ISR, INV_APB, true);
-> > +        zdma_ch_imr_update_irq(s);
-> > +        return 0;
-> > +    }
-> > +    return register_read(r, ~0, NULL, false);
-> > +}
-> > +
-> > +static void zdma_write(void *opaque, hwaddr addr, uint64_t value,
-> > +                      unsigned size)
-> > +{
-> > +    XlnxZDMA *s = XLNX_ZDMA(opaque);
-> > +    RegisterInfo *r = &s->regs_info[addr / 4];
-> > +
-> > +    if (!r->data) {
-> > +        qemu_log("%s: Decode error: write to %" HWADDR_PRIx "=%" PRIx64
-> "\n",
-> > +                 object_get_canonical_path(OBJECT(s)),
-> > +                 addr, value);
->
-> Similarly here. (CID 1391293)
->
-> > +        ARRAY_FIELD_DP32(s->regs, ZDMA_CH_ISR, INV_APB, true);
-> > +        zdma_ch_imr_update_irq(s);
-> > +        return;
-> > +    }
-> > +    register_write(r, value, ~0, NULL, false);
-> > +}
->
-> Could you write a patch that adds the missing g_free()s, please?
->
-> Hi Peter,
-
-Absolutly! I'll be back with a patch with the corrections asap! Thank you
-for explaining the issues!
-
-Brst regards,
-Francisco Iglesias
+To: Fam Zheng <famz@redhat.com>
+Cc: Amador Pahim <amador@pahim.org>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>
 
 
 
+On 05/25/2018 01:37 AM, Fam Zheng wrote:
+> On Thu, 05/24 20:58, Cleber Rosa wrote:
+>> This patch adds a few simple behavior tests for VNC.  These tests
+>> introduce manipulation of the QEMUMachine arguments, by setting
+>> the arguments, instead of adding to the existing ones.
+> 
+> I'm confused by this. The code uses 'add_args', so it does add to the arguments,
+> no?
+> 
 
+And you should be.  I changed the code to just add args, and forgot to
+update the commit message.  If a better example comes up that requires
+setting arguments, I'll get back to this.
 
-> thanks
-> -- PMM
->
+>>
+>> Signed-off-by: Cleber Rosa <crosa@redhat.com>
+>> ---
+>>  tests/acceptance/test_vnc.py | 50 ++++++++++++++++++++++++++++++++++++
+>>  1 file changed, 50 insertions(+)
+>>  create mode 100644 tests/acceptance/test_vnc.py
+>>
+>> diff --git a/tests/acceptance/test_vnc.py b/tests/acceptance/test_vnc.py
+>> new file mode 100644
+>> index 0000000000..9d9a35cf55
+>> --- /dev/null
+>> +++ b/tests/acceptance/test_vnc.py
+>> @@ -0,0 +1,50 @@
+> 
+> Copyright header is missing here too.
+> 
+
+Indeed.
+
+> Fam
+> 
+>> +from avocado_qemu import Test
+>> +
+>> +
+>> +class Vnc(Test):
+> 
+> Should VncTest be a better class name?
+> 
+
+I'm favoring simpler names.  If you think about the complete test names,
+it's already too verbose IMO: "test_vnc.Vnc.test_no_vnc".
+
+That's actually an interesting point: how would you feel about dropping
+the "test_" prefix from the file names?
+
+- Cleber.
+
+>> +    """
+>> +    :avocado: enable
+>> +    :avocado: tags=vnc,quick
+>> +    """
+>> +    def test_no_vnc(self):
+>> +        self.vm.add_args('-nodefaults', '-S')
+>> +        self.vm.launch()
+>> +        self.assertFalse(self.vm.qmp('query-vnc')['return']['enabled'])
+>> +
+>> +    def test_no_vnc_change_password(self):
+>> +        self.vm.add_args('-nodefaults', '-S')
+>> +        self.vm.launch()
+>> +        self.assertFalse(self.vm.qmp('query-vnc')['return']['enabled'])
+>> +        set_password_response = self.vm.qmp('change',
+>> +                                            device='vnc',
+>> +                                            target='password',
+>> +                                            arg='new_password')
+>> +        self.assertIn('error', set_password_response)
+>> +        self.assertEqual(set_password_response['error']['class'],
+>> +                         'GenericError')
+>> +        self.assertEqual(set_password_response['error']['desc'],
+>> +                         'Could not set password')
+>> +
+>> +    def test_vnc_change_password_requires_a_password(self):
+>> +        self.vm.add_args('-nodefaults', '-S', '-vnc', ':0')
+>> +        self.vm.launch()
+>> +        self.assertTrue(self.vm.qmp('query-vnc')['return']['enabled'])
+>> +        set_password_response = self.vm.qmp('change',
+>> +                                            device='vnc',
+>> +                                            target='password',
+>> +                                            arg='new_password')
+>> +        self.assertIn('error', set_password_response)
+>> +        self.assertEqual(set_password_response['error']['class'],
+>> +                         'GenericError')
+>> +        self.assertEqual(set_password_response['error']['desc'],
+>> +                         'Could not set password')
+>> +
+>> +    def test_vnc_change_password(self):
+>> +        self.vm.add_args('-nodefaults', '-S', '-vnc', ':0,password')
+>> +        self.vm.launch()
+>> +        self.assertTrue(self.vm.qmp('query-vnc')['return']['enabled'])
+>> +        set_password_response = self.vm.qmp('change',
+>> +                                            device='vnc',
+>> +                                            target='password',
+>> +                                            arg='new_password')
+>> +        self.assertEqual(set_password_response['return'], {})
+>> -- 
+>> 2.17.0
+>>
+> 
+> Fam
+> 
