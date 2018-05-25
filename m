@@ -1,24 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57993)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58699)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1fMCXA-0001od-BX
-	for qemu-devel@nongnu.org; Fri, 25 May 2018 09:13:29 -0400
+	(envelope-from <rth7680@gmail.com>) id 1fMCbb-0003aM-5E
+	for qemu-devel@nongnu.org; Fri, 25 May 2018 09:18:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1fMCX5-000229-8n
-	for qemu-devel@nongnu.org; Fri, 25 May 2018 09:13:28 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:59686 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1fMCX5-00021k-3T
-	for qemu-devel@nongnu.org; Fri, 25 May 2018 09:13:23 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.4])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id B68EA4022414
-	for <qemu-devel@nongnu.org>; Fri, 25 May 2018 13:13:22 +0000 (UTC)
-From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Fri, 25 May 2018 15:13:18 +0200
-Message-Id: <20180525131318.28437-1-kraxel@redhat.com>
-Subject: [Qemu-devel] [PATCH] vga: cleanup surface handling
+	(envelope-from <rth7680@gmail.com>) id 1fMCbW-0004tV-UX
+	for qemu-devel@nongnu.org; Fri, 25 May 2018 09:18:03 -0400
+Sender: Richard Henderson <rth7680@gmail.com>
+References: <1527229488-49822-1-git-send-email-mjc@sifive.com>
+From: Richard Henderson <rth@twiddle.net>
+Message-ID: <83728e91-de69-c376-a768-0aad501ff64e@twiddle.net>
+Date: Fri, 25 May 2018 06:17:53 -0700
+MIME-Version: 1.0
+In-Reply-To: <1527229488-49822-1-git-send-email-mjc@sifive.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] RISC-V: Correct typo in RV32 perf counters
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,77 +24,23 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Gerd Hoffmann <kraxel@redhat.com>
+To: Michael Clark <mjc@sifive.com>, qemu-trivial@nongnu.org, qemu-devel@nongnu.org
+Cc: patches@groups.riscv.org
 
-Just set the full_update flag if we need a new DisplaySurface.  Create
-a new surface when the flag is set instead of having two places where
-qemu_create_displaysurface_from() is called.
+On 05/24/2018 11:24 PM, Michael Clark wrote:
+> This patch enables mhpmcounter3h through mhpmcounter31h on RV32.
+> Previously the RV32 h versions (high 32-bits of 64-bit counters)
+> of these counters would trap with an illegal instruction instead
+> of returning 0 as intended.
+> 
+> Reported-by: Richard Henderson <rth@twiddle.net>
+> Signed-off-by: Michael Clark <mjc@sifive.com>
+> ---
+>  target/riscv/op_helper.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 
-Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
----
- hw/display/vga.c | 36 +++++++++++++++++++-----------------
- 1 file changed, 19 insertions(+), 17 deletions(-)
+Fixes: Coverity CID 1390849
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
-diff --git a/hw/display/vga.c b/hw/display/vga.c
-index a7794f6d1f..ed476e4e80 100644
---- a/hw/display/vga.c
-+++ b/hw/display/vga.c
-@@ -1548,12 +1548,31 @@ static void vga_draw_graphic(VGACommonState *s, int full_update)
-     } else {
-         share_surface = false;
-     }
-+
-     if (s->line_offset != s->last_line_offset ||
-         disp_width != s->last_width ||
-         height != s->last_height ||
-         s->last_depth != depth ||
-         s->last_byteswap != byteswap ||
-         share_surface != is_buffer_shared(surface)) {
-+        /* display parameters changed -> need new display surface */
-+        s->last_scr_width = disp_width;
-+        s->last_scr_height = height;
-+        s->last_width = disp_width;
-+        s->last_height = height;
-+        s->last_line_offset = s->line_offset;
-+        s->last_depth = depth;
-+        s->last_byteswap = byteswap;
-+        full_update = 1;
-+    }
-+    if (surface_data(surface) != s->vram_ptr + (s->start_addr * 4)
-+        && is_buffer_shared(surface)) {
-+        /* base address changed (page flip) -> shared display surfaces
-+         * must be updated with the new base address */
-+        full_update = 1;
-+    }
-+
-+    if (full_update) {
-         if (share_surface) {
-             surface = qemu_create_displaysurface_from(disp_width,
-                     height, format, s->line_offset,
-@@ -1563,23 +1582,6 @@ static void vga_draw_graphic(VGACommonState *s, int full_update)
-             qemu_console_resize(s->con, disp_width, height);
-             surface = qemu_console_surface(s->con);
-         }
--        s->last_scr_width = disp_width;
--        s->last_scr_height = height;
--        s->last_width = disp_width;
--        s->last_height = height;
--        s->last_line_offset = s->line_offset;
--        s->last_depth = depth;
--        s->last_byteswap = byteswap;
--        full_update = 1;
--    } else if (is_buffer_shared(surface) &&
--               (full_update || surface_data(surface) != s->vram_ptr
--                + (s->start_addr * 4))) {
--        pixman_format_code_t format =
--            qemu_default_pixman_format(depth, !byteswap);
--        surface = qemu_create_displaysurface_from(disp_width,
--                height, format, s->line_offset,
--                s->vram_ptr + (s->start_addr * 4));
--        dpy_gfx_replace_surface(s->con, surface);
-     }
- 
-     if (shift_control == 0) {
--- 
-2.9.3
+
+r~
