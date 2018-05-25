@@ -1,28 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39164)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39243)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1fMDJD-00077r-Kl
-	for qemu-devel@nongnu.org; Fri, 25 May 2018 10:03:12 -0400
+	(envelope-from <petrutlucian94@gmail.com>) id 1fMDJO-0007Dm-KM
+	for qemu-devel@nongnu.org; Fri, 25 May 2018 10:03:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1fMDJ8-0000RW-Mm
-	for qemu-devel@nongnu.org; Fri, 25 May 2018 10:03:07 -0400
-Received: from 14.mo3.mail-out.ovh.net ([188.165.43.98]:58037)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1fMDJ8-0000R4-DO
-	for qemu-devel@nongnu.org; Fri, 25 May 2018 10:03:02 -0400
-Received: from player791.ha.ovh.net (unknown [10.109.122.22])
-	by mo3.mail-out.ovh.net (Postfix) with ESMTP id AB5B61B9456
-	for <qemu-devel@nongnu.org>; Fri, 25 May 2018 16:03:00 +0200 (CEST)
-Date: Fri, 25 May 2018 16:02:49 +0200
-From: Greg Kurz <groug@kaod.org>
-Message-ID: <20180525160249.7cb0a5bc@bahia.lan>
-In-Reply-To: <20180518164405.11804-2-clg@kaod.org>
-References: <20180518164405.11804-1-clg@kaod.org>
-	<20180518164405.11804-2-clg@kaod.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 1/4] spapr: remove irq_hint parameter from
- spapr_irq_alloc()
+	(envelope-from <petrutlucian94@gmail.com>) id 1fMDJI-0000Vm-Ng
+	for qemu-devel@nongnu.org; Fri, 25 May 2018 10:03:18 -0400
+Received: from mail-wm0-x243.google.com ([2a00:1450:400c:c09::243]:35898)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <petrutlucian94@gmail.com>)
+	id 1fMDJI-0000V8-Hj
+	for qemu-devel@nongnu.org; Fri, 25 May 2018 10:03:12 -0400
+Received: by mail-wm0-x243.google.com with SMTP id n10-v6so14895884wmc.1
+	for <qemu-devel@nongnu.org>; Fri, 25 May 2018 07:03:12 -0700 (PDT)
+From: petrutlucian94@gmail.com
+Date: Fri, 25 May 2018 17:02:21 +0300
+Message-Id: <1527256943-7667-1-git-send-email-lpetrut@cloudbasesolutions.com>
+Subject: [Qemu-devel] [PATCH v3 1/3] WHPX Add signature CPUID
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,145 +24,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?B?Q8OpZHJpYw==?= Le Goater <clg@kaod.org>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, David Gibson <david@gibson.dropbear.id.au>, Alexey Kardashevskiy <aik@ozlabs.ru>, Thomas Huth <thuth@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: Lucian Petrut <lpetrut@cloudbasesolutions.com>, Alessandro Pilotti <apilotti@cloudbasesolutions.com>, Justin Terry <juterry@microsoft.com>
 
-On Fri, 18 May 2018 18:44:02 +0200
-C=C3=A9dric Le Goater <clg@kaod.org> wrote:
+From: Lucian Petrut <lpetrut@cloudbasesolutions.com>
 
-> This IRQ number hint can possibly be used by the VIO devices if the
-> "irq" property is defined on the command line but it seems it is never
-> the case. It is not used in libvirt for instance. So, let's remove it
-> to simplify future changes.
->=20
+Adds the CPUID trap for CPUID 0x40000000, sending the WHPX signature
+to the guest upon request. This is consistent with other QEMU
+accelerators (KVM).
 
-Setting an irq manually looks a bit anachronistic. I doubt anyone would
-do that nowadays, and the patch does a nice cleanup. So this looks like
-a good idea.
+Signed-off-by: Alessandro Pilotti <apilotti@cloudbasesolutions.com>
+Signed-off-by: Justin Terry (VM) <juterry@microsoft.com>
+Signed-off-by: Lucian Petrut <lpetrut@cloudbasesolutions.com>
+---
+ target/i386/whpx-all.c | 23 +++++++++++++++++++++++
+ 1 file changed, 23 insertions(+)
 
-> Nevertheless, this is a compatibbility breakage that will be addressed
-                                 ^^
-                                typo
-
-> by the subsequent patches which introduce IRQ number allocator
-> handlers per machine version.
->=20
-
-Indeed, this silently breaks the "irq" property of VIO devices, and I
-don't quite see how the other patches address this specific breakage.
-
-> Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
-> ---
->  include/hw/ppc/spapr.h |  3 +--
->  hw/ppc/spapr.c         | 21 ++++++---------------
->  hw/ppc/spapr_events.c  |  7 +++----
->  hw/ppc/spapr_vio.c     |  2 +-
->  4 files changed, 11 insertions(+), 22 deletions(-)
->=20
-> diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
-> index d60b7c6d7a8b..2cfdfdd67eaf 100644
-> --- a/include/hw/ppc/spapr.h
-> +++ b/include/hw/ppc/spapr.h
-> @@ -773,8 +773,7 @@ int spapr_get_vcpu_id(PowerPCCPU *cpu);
->  void spapr_set_vcpu_id(PowerPCCPU *cpu, int cpu_index, Error **errp);
->  PowerPCCPU *spapr_find_cpu(int vcpu_id);
-> =20
-> -int spapr_irq_alloc(sPAPRMachineState *spapr, int irq_hint, bool lsi,
-> -                    Error **errp);
-> +int spapr_irq_alloc(sPAPRMachineState *spapr, bool lsi, Error **errp);
->  int spapr_irq_alloc_block(sPAPRMachineState *spapr, int num, bool lsi,
->                            bool align, Error **errp);
->  void spapr_irq_free(sPAPRMachineState *spapr, int irq, int num);
-> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> index 32ab3c43b6c0..05a924a5f2da 100644
-> --- a/hw/ppc/spapr.c
-> +++ b/hw/ppc/spapr.c
-> @@ -3798,28 +3798,19 @@ static void spapr_irq_set_lsi(sPAPRMachineState *=
-spapr, int irq, bool lsi)
->      ics_set_irq_type(spapr->ics, irq - spapr->ics->offset, lsi);
->  }
-> =20
-> -int spapr_irq_alloc(sPAPRMachineState *spapr, int irq_hint, bool lsi,
-> -                    Error **errp)
-> +int spapr_irq_alloc(sPAPRMachineState *spapr, bool lsi, Error **errp)
->  {
->      ICSState *ics =3D spapr->ics;
->      int irq;
-> =20
->      assert(ics);
-> =20
-> -    if (irq_hint) {
-> -        if (!ICS_IRQ_FREE(ics, irq_hint - ics->offset)) {
-> -            error_setg(errp, "can't allocate IRQ %d: already in use", ir=
-q_hint);
-> -            return -1;
-> -        }
-> -        irq =3D irq_hint;
-> -    } else {
-> -        irq =3D ics_find_free_block(ics, 1, 1);
-> -        if (irq < 0) {
-> -            error_setg(errp, "can't allocate IRQ: no IRQ left");
-> -            return -1;
-> -        }
-> -        irq +=3D ics->offset;
-> +    irq =3D ics_find_free_block(ics, 1, 1);
-> +    if (irq < 0) {
-> +        error_setg(errp, "can't allocate IRQ: no IRQ left");
-> +        return -1;
->      }
-> +    irq +=3D ics->offset;
-> =20
->      spapr_irq_set_lsi(spapr, irq, lsi);
->      trace_spapr_irq_alloc(irq);
-> diff --git a/hw/ppc/spapr_events.c b/hw/ppc/spapr_events.c
-> index 86836f0626dc..64a67439beac 100644
-> --- a/hw/ppc/spapr_events.c
-> +++ b/hw/ppc/spapr_events.c
-> @@ -712,8 +712,7 @@ void spapr_events_init(sPAPRMachineState *spapr)
->      spapr->event_sources =3D spapr_event_sources_new();
-> =20
->      spapr_event_sources_register(spapr->event_sources, EVENT_CLASS_EPOW,
-> -                                 spapr_irq_alloc(spapr, 0, false,
-> -                                                  &error_fatal));
-> +                                 spapr_irq_alloc(spapr, false, &error_fa=
-tal));
-> =20
->      /* NOTE: if machine supports modern/dedicated hotplug event source,
->       * we add it to the device-tree unconditionally. This means we may
-> @@ -725,8 +724,8 @@ void spapr_events_init(sPAPRMachineState *spapr)
->       */
->      if (spapr->use_hotplug_event_source) {
->          spapr_event_sources_register(spapr->event_sources, EVENT_CLASS_H=
-OT_PLUG,
-> -                                     spapr_irq_alloc(spapr, 0, false,
-> -                                                      &error_fatal));
-> +                                     spapr_irq_alloc(spapr, false,
-> +                                                     &error_fatal));
->      }
-> =20
->      spapr->epow_notifier.notify =3D spapr_powerdown_req;
-> diff --git a/hw/ppc/spapr_vio.c b/hw/ppc/spapr_vio.c
-> index 472dd6f33a96..cc064f64fccf 100644
-> --- a/hw/ppc/spapr_vio.c
-> +++ b/hw/ppc/spapr_vio.c
-> @@ -455,7 +455,7 @@ static void spapr_vio_busdev_realize(DeviceState *qde=
-v, Error **errp)
->          dev->qdev.id =3D id;
->      }
-> =20
-> -    dev->irq =3D spapr_irq_alloc(spapr, dev->irq, false, &local_err);
-> +    dev->irq =3D spapr_irq_alloc(spapr, false, &local_err);
-
-Silently breaking "irq" like this looks wrong. I'd rather officially remove
-it first (ie, kill spapr_vio_props, -5 lines in spapr_vio.c).
-
-Of course, this raises the question of interface deprecation, and it should
-theoretically follow the process described at:
-
-https://wiki.qemu.org/Features/LegacyRemoval#Rules_for_removing_an_interface
-
-Cc'ing Thomas, our Chief Deprecation Officer, for insights :)
-
->      if (local_err) {
->          error_propagate(errp, local_err);
->          return;
+diff --git a/target/i386/whpx-all.c b/target/i386/whpx-all.c
+index 5843517..ffc083e 100644
+--- a/target/i386/whpx-all.c
++++ b/target/i386/whpx-all.c
+@@ -29,6 +29,8 @@
+ #include <WinHvPlatform.h>
+ #include <WinHvEmulation.h>
+ 
++#define WHPX_CPUID_SIGNATURE 0x40000000
++
+ struct whpx_state {
+     uint64_t mem_quota;
+     WHV_PARTITION_HANDLE partition;
+@@ -1349,6 +1351,27 @@ static int whpx_accel_init(MachineState *ms)
+         goto error;
+     }
+ 
++    UINT32 signature[3] = {0};
++    memcpy(signature, "Hv#1\0\0\0\0\0\0\0\0", 12);
++
++    WHV_X64_CPUID_RESULT cpuidResultList[1] = {0};
++    cpuidResultList[0].Function = WHPX_CPUID_SIGNATURE;
++    cpuidResultList[0].Eax = 0;
++    cpuidResultList[0].Ebx = signature[0];
++    cpuidResultList[0].Ecx = signature[1];
++    cpuidResultList[0].Edx = signature[2];
++    hr = WHvSetPartitionProperty(whpx->partition,
++                                 WHvPartitionPropertyCodeCpuidResultList,
++                                 cpuidResultList,
++                                 RTL_NUMBER_OF(cpuidResultList) *
++                                    sizeof(WHV_X64_CPUID_RESULT));
++    if (FAILED(hr)) {
++        error_report("WHPX: Failed to set partition CpuidResultList hr=%08lx",
++                     hr);
++        ret = -EINVAL;
++        goto error;
++    }
++
+     hr = WHvSetupPartition(whpx->partition);
+     if (FAILED(hr)) {
+         error_report("WHPX: Failed to setup partition, hr=%08lx", hr);
+-- 
+2.7.4
