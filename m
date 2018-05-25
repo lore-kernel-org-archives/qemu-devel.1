@@ -1,27 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41462)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42708)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fMDNv-0002FT-55
-	for qemu-devel@nongnu.org; Fri, 25 May 2018 10:07:59 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1fMDQI-000443-Dl
+	for qemu-devel@nongnu.org; Fri, 25 May 2018 10:10:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fMDNq-000377-6x
-	for qemu-devel@nongnu.org; Fri, 25 May 2018 10:07:59 -0400
-Received: from mail-pl0-x233.google.com ([2607:f8b0:400e:c01::233]:32916)
+	(envelope-from <richard.henderson@linaro.org>) id 1fMDQD-0004vq-ML
+	for qemu-devel@nongnu.org; Fri, 25 May 2018 10:10:26 -0400
+Received: from mail-qk0-x242.google.com ([2607:f8b0:400d:c09::242]:46059)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1fMDNp-00036Y-Td
-	for qemu-devel@nongnu.org; Fri, 25 May 2018 10:07:54 -0400
-Received: by mail-pl0-x233.google.com with SMTP id n10-v6so3239435plp.0
-	for <qemu-devel@nongnu.org>; Fri, 25 May 2018 07:07:53 -0700 (PDT)
-References: <CABoDooMwdGR7fJKc=b9zjFGgxPniXyZ8vevKg7fjuWEDioTB9Q@mail.gmail.com>
+	id 1fMDQD-0004uk-Il
+	for qemu-devel@nongnu.org; Fri, 25 May 2018 10:10:21 -0400
+Received: by mail-qk0-x242.google.com with SMTP id c198-v6so4147607qkg.12
+	for <qemu-devel@nongnu.org>; Fri, 25 May 2018 07:10:21 -0700 (PDT)
+References: <20180523224745.30402-1-edgar.iglesias@gmail.com>
+	<20180523224745.30402-2-edgar.iglesias@gmail.com>
 From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <666d7574-6d61-e490-08a5-702ea3d65fb3@linaro.org>
-Date: Fri, 25 May 2018 07:07:48 -0700
+Message-ID: <9e3d1f80-68bf-43fb-b3a0-7b734215398f@linaro.org>
+Date: Fri, 25 May 2018 07:10:15 -0700
 MIME-Version: 1.0
-In-Reply-To: <CABoDooMwdGR7fJKc=b9zjFGgxPniXyZ8vevKg7fjuWEDioTB9Q@mail.gmail.com>
+In-Reply-To: <20180523224745.30402-2-edgar.iglesias@gmail.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] AArch64: ZCR and ARM_CP_SVE/ARM_CP_FPU flags
+Subject: Re: [Qemu-devel] [PATCH v4 09/38] target-microblaze: Conditionalize
+ setting of PVR11_USE_MMU
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,33 +32,22 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laurent Desnogues <laurent.desnogues@gmail.com>, Peter Maydell <peter.maydell@linaro.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+To: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org, frederic.konrad@adacore.com, alistair@alistair23.me, frasse.iglesias@gmail.com, sstabellini@kernel.org, sai.pavan.boddu@xilinx.com, edgar.iglesias@xilinx.com
 
-On 05/22/2018 11:49 PM, Laurent Desnogues wrote:
-> ZCR system registers are both flagged as ARM_CP_SVE and ARM_CP_FPU,
-> which results in an assertion failure in fp_access_check due to the
-> check of these flags in handle_sys:
+On 05/23/2018 03:47 PM, Edgar E. Iglesias wrote:
+> From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
 > 
->     if ((ri->type & ARM_CP_SVE) && !sve_access_check(s)) {
->         return;
->     }
->     if ((ri->type & ARM_CP_FPU) && !fp_access_check(s)) {
->         return;
->     }
+> Conditionalize setting of PVR11_USE_MMU on the use_mmu
+> CPU property, otherwise we may incorrectly advertise an
+> MMU via PVR when the core in fact has none.
 > 
-> sve_access_check calls fp_access_check so the assert
-> !s->fp_access_checked in the second call to fp_access_check will fail.
+> Signed-off-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
+> ---
+>  target/microblaze/cpu.c | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
 
-Hah.  Yes, these checks have migrated a bit since I first wrote them, and I
-have (perhaps obviously) done zero system-level testing so far.
-
-> I took a quick look at sve_exception_el and given that it checks that
-> FPU is enabled, can't we just remove the ARM_CP_FPU flag from ZCR?
-> 
-> Alternatively the second call to fp_access_check when ARM_CP_FPU is
-> defined could be skipped if ARM_CP_SVE is set.
-
-I would say the first -- removing FPU -- but will defer to Peter.
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
 
 r~
