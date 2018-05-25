@@ -1,24 +1,49 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55275)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33407)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fM3Xk-00071M-2P
-	for qemu-devel@nongnu.org; Thu, 24 May 2018 23:37:29 -0400
+	(envelope-from <zyimin@linux.ibm.com>) id 1fM4GG-0004EE-Bh
+	for qemu-devel@nongnu.org; Fri, 25 May 2018 00:23:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fM3Xg-0005QR-5Y
-	for qemu-devel@nongnu.org; Thu, 24 May 2018 23:37:28 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:53028 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1fM3Xg-0005Oo-1V
-	for qemu-devel@nongnu.org; Thu, 24 May 2018 23:37:24 -0400
-References: <20180524223458.5651-1-f4bug@amsat.org>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <7163a9ba-3640-68e8-4b4e-ff57189de65e@redhat.com>
-Date: Fri, 25 May 2018 05:37:12 +0200
+	(envelope-from <zyimin@linux.ibm.com>) id 1fM4GC-0007HK-8P
+	for qemu-devel@nongnu.org; Fri, 25 May 2018 00:23:28 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:47088)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <zyimin@linux.ibm.com>)
+	id 1fM4GC-0007Gy-0r
+	for qemu-devel@nongnu.org; Fri, 25 May 2018 00:23:24 -0400
+Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w4P4Ip3F100012
+	for <qemu-devel@nongnu.org>; Fri, 25 May 2018 00:23:21 -0400
+Received: from e17.ny.us.ibm.com (e17.ny.us.ibm.com [129.33.205.207])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2j6atr96rg-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Fri, 25 May 2018 00:23:21 -0400
+Received: from localhost
+	by e17.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <zyimin@linux.ibm.com>;
+	Fri, 25 May 2018 00:23:20 -0400
+References: <20180515113348.10516-1-zyimin@linux.ibm.com>
+	<20180515113348.10516-2-zyimin@linux.ibm.com>
+	<20180517124109.GJ17734@vader>
+	<20180518075212.GE3416@dnr> <20180518091916.GA22292@vader>
+	<20180518130729.GF3416@dnr>
+	<7149dfa9-7d3a-a2ff-b326-7e9ba71f8fe1@linux.ibm.com>
+	<20180523074757.GI26766@dnr>
+	<397e4f8c-0913-6ffd-13fa-743abbbd47e4@linux.ibm.com>
+	<eb079c9d-9251-bb2a-7cbc-5cb6423778db@redhat.com>
+	<c113aa1c-a829-7a96-9874-b8ab48e84a29@linux.ibm.com>
+	<8de364b2-a1c8-7a29-284c-6356d687638b@redhat.com>
+	<33d11137-210b-1a13-e258-d509f4876d67@redhat.com>
+From: Yi Min Zhao <zyimin@linux.ibm.com>
+Date: Fri, 25 May 2018 12:23:12 +0800
 MIME-Version: 1.0
-In-Reply-To: <20180524223458.5651-1-f4bug@amsat.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+In-Reply-To: <33d11137-210b-1a13-e258-d509f4876d67@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Message-Id: <1165274f-53fa-ce25-380f-d6509ec083e5@linux.ibm.com>
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] gdbstub: Prevent fd leakage
+Subject: Re: [Qemu-devel] [PATCH v2 1/1] sandbox: disable -sandbox if
+ CONFIG_SECCOMP undefined
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,29 +52,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>
-Cc: qemu-devel@nongnu.org, Michael Tokarev <mjt@tls.msk.ru>
+To: Paolo Bonzini <pbonzini@redhat.com>, otubo@redhat.com, =?UTF-8?Q?J=c3=a1n_Tomko?= <jtomko@redhat.com>
+Cc: borntraeger@de.ibm.com, fiuczy@linux.ibm.com, qemu-devel@nongnu.org
 
-On 25.05.2018 00:34, Philippe Mathieu-Daud=C3=A9 wrote:
-> Since 2f652224f7, we now check if socket_set_nodelay() errored,
-> but forgot to close the socket before reporting an error.
->=20
-> Fixes: Coverity CID 1391290 (RESOURCE_LEAK)
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-> ---
->  gdbstub.c | 1 +
->  1 file changed, 1 insertion(+)
->=20
-> diff --git a/gdbstub.c b/gdbstub.c
-> index e4ece2f5bc..9c860cd81c 100644
-> --- a/gdbstub.c
-> +++ b/gdbstub.c
-> @@ -1836,6 +1836,7 @@ static bool gdb_accept(void)
->      /* set short latency */
->      if (socket_set_nodelay(fd)) {
->          perror("setsockopt");
-> +        close(fd);
->          return false;
->      }
 
-Reviewed-by: Thomas Huth <thuth@redhat.com>
+
+=E5=9C=A8 2018/5/24 =E4=B8=8B=E5=8D=889:40, Paolo Bonzini =E5=86=99=E9=81=
+=93:
+> On 24/05/2018 09:53, Eduardo Otubo wrote:
+>>>>> Thanks! But I have not got response from Paolo.=C2=A0 I have added =
+him to
+>>>>> CC list.
+>>>>>
+>>>>  =C2=A0I'll just wait one more ACK and will send a pull request on t=
+he
+>>>> seccomp queue. Thanks for the contribution.
+>>>>
+>>>>
+>>> So... what I should do is wait?
+>>>
+>> Yes, even though I think we're safe to proceed without his explicit ac=
+k.
+> The patch is okay; however, as a follow-up, you could consider moving
+> all the CONFIG_SECCOMP code to qemu-seccomp.c.
+>
+> This way, the only #ifdef remains the one around qemu_opts_foreach.
+>
+> Paolo
+>
+>
+Thanks for your comment! Indeed, moving to the single C file is much=20
+more clear.
+I will do this after this patch.
+
+@Otubo, what about next step?
