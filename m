@@ -1,25 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34271)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35781)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <crosa@redhat.com>) id 1fMG9I-0000NM-CM
-	for qemu-devel@nongnu.org; Fri, 25 May 2018 13:05:10 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1fMGF6-0004Lp-Hj
+	for qemu-devel@nongnu.org; Fri, 25 May 2018 13:11:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <crosa@redhat.com>) id 1fMG9G-00037a-Uo
-	for qemu-devel@nongnu.org; Fri, 25 May 2018 13:05:04 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:38410 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <crosa@redhat.com>) id 1fMG9G-00037P-Pq
-	for qemu-devel@nongnu.org; Fri, 25 May 2018 13:05:02 -0400
-References: <20180525005839.11556-1-crosa@redhat.com>
-	<20180525060827.GD28589@lemon.usersys.redhat.com>
-From: Cleber Rosa <crosa@redhat.com>
-Message-ID: <c62333c5-aca4-9d9b-2c1c-af040d5ec7cb@redhat.com>
-Date: Fri, 25 May 2018 13:04:57 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1fMGF5-0005kA-A7
+	for qemu-devel@nongnu.org; Fri, 25 May 2018 13:11:04 -0400
+Received: from mail-oi0-x243.google.com ([2607:f8b0:4003:c06::243]:34683)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1fMGF5-0005jg-1B
+	for qemu-devel@nongnu.org; Fri, 25 May 2018 13:11:03 -0400
+Received: by mail-oi0-x243.google.com with SMTP id l1-v6so5189804oii.1
+	for <qemu-devel@nongnu.org>; Fri, 25 May 2018 10:11:03 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20180525060827.GD28589@lemon.usersys.redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 0/5] Acceptance/functional tests
+In-Reply-To: <20180515154033.19899-21-kwolf@redhat.com>
+References: <20180515154033.19899-1-kwolf@redhat.com>
+	<20180515154033.19899-21-kwolf@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 25 May 2018 18:10:41 +0100
+Message-ID: <CAFEAcA-FhMC0LqkYcRh3fV864wNSAJnHbT3657Y55MN9=RO72Q@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL 20/37] qcow2: Give the refcount cache the
+ minimum possible size by default
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,122 +30,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>
-Cc: Amador Pahim <amador@pahim.org>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: Qemu-block <qemu-block@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
+
+On 15 May 2018 at 16:40, Kevin Wolf <kwolf@redhat.com> wrote:
+> From: Alberto Garcia <berto@igalia.com>
+>
+> The L2 and refcount caches have default sizes that can be overridden
+> using the l2-cache-size and refcount-cache-size (an additional
+> parameter named cache-size sets the combined size of both caches).
+
+Hi; Coverity raises a nit about this patch (CID 1391229):
 
 
+> diff --git a/block/qcow2.c b/block/qcow2.c
+> index 2f36e632f9..6d532470a8 100644
+> --- a/block/qcow2.c
+> +++ b/block/qcow2.c
+> @@ -802,23 +802,30 @@ static void read_cache_sizes(BlockDriverState *bs, QemuOpts *opts,
+>          } else if (refcount_cache_size_set) {
+>              *l2_cache_size = combined_cache_size - *refcount_cache_size;
+>          } else {
+> -            *refcount_cache_size = combined_cache_size
+> -                                 / (DEFAULT_L2_REFCOUNT_SIZE_RATIO + 1);
+> -            *l2_cache_size = combined_cache_size - *refcount_cache_size;
+> +            uint64_t virtual_disk_size = bs->total_sectors * BDRV_SECTOR_SIZE;
+> +            uint64_t max_l2_cache = virtual_disk_size / (s->cluster_size / 8);
+> +            uint64_t min_refcount_cache =
+> +                (uint64_t) MIN_REFCOUNT_CACHE_SIZE * s->cluster_size;
 
-On 05/25/2018 02:08 AM, Fam Zheng wrote:
-> On Thu, 05/24 20:58, Cleber Rosa wrote:
->> TL;DR
->> =====
->>
->> Another version, with a minimalist approach, to the acceptance tests
->> infrastructure for QEMU, based on the Avocado Testing Framework.
->>
->> Background
->> ==========
->>
->> The previous version, still considered an RFC, was sent to the list by
->> Eduardo[1] was based on the work held in Amador's branch[2].  After
->> reviewing in under a different light, including the experiences
->> done and reported by Philippe[3].
->>
->> Differences from previous versions
->> ==================================
->>
->> The main difference is that this series include only the minimal
->> changes deemed necessary to have a starting point.  I like to think
->> that it's better connected to the QEMU community and project needs,
->> and will hopefully allow for a more organic growth.
->>
->> Since this version has less features than the previous versions,
->> provided it's accepted, these are the next probable development tasks:
->>
->>  * Provide a simple variants mechanism to allow the same tests to be
->>    run under different targets, machine models and devices (present on
->>    the previous versions as a "YAML to Mux" file with architecture
->>    definitions)
->>  * Implement QEMUMachine migration support (present on the previous
->>    version in the "avocado_qemu.test._VM" class)
->>  * Implement Guest OS image selection and download (mostly an Avocado
->>    feature, paired with a parameter convention and cloud-init support
->>    code)
->>  * Implement interactive support for Guest OS sessions (present on
->>    the previous versions, supported by the aexpect Python module)
->>
->> Even though this version shares very little (if any) code with the
->> previous versions, the following is a list of noteworthy changes:
->>
->>  * Tests directory is now "tests/acceptance" (was "tests/avocado")
->>  * Base test class is now "avocado_qemu.Test" (was
->>    "avocado_qemu.test.QemuTest")
->>  * Base test class is now hosted in "avocado_qemu/__init__.py" (was
->>    "avocado_qemu/test.py")
->>  * Direct use of "qemu.QEMUMachine", that is, the
->>    avocado_qemu.test._VM class is gone
->>  * avocado_qemu.Test won't search for QEMU binaries on $PATH.  To use
->>    QEMU binary on a custom system location it's necessary to use the
->>    "qemu_bin" parameter
->>  * Example test in README.rst is distributed as a real test
->>    ("test_version.py")
->>  * A new "Linux boot console" test, loosely modeled after Phillipe's
->>    use case
-> 
-> I like the direction this series is leading us to.  Making it easy to write
-> 'correct' and 'effective' tests is the most important thing IMO, and the few
-> tests you add here look promising.
-> 
+Here we have a (uint64_t) cast that ensures we're doing a 64x64 multiply
+rather than a 32x32 one...
 
-The soft targets that these adjectives ("easy", "correct" and
-"effective") bring, are kind of hard to get right, but I'm really glad
-you like what you see.
+> +
+> +            /* Assign as much memory as possible to the L2 cache, and
+> +             * use the remainder for the refcount cache */
+> +            if (combined_cache_size >= max_l2_cache + min_refcount_cache) {
+> +                *l2_cache_size = max_l2_cache;
+> +                *refcount_cache_size = combined_cache_size - *l2_cache_size;
+> +            } else {
+> +                *refcount_cache_size =
+> +                    MIN(combined_cache_size, min_refcount_cache);
+> +                *l2_cache_size = combined_cache_size - *refcount_cache_size;
+> +            }
+>          }
+>      } else {
+> -        if (!l2_cache_size_set && !refcount_cache_size_set) {
+> +        if (!l2_cache_size_set) {
+>              *l2_cache_size = MAX(DEFAULT_L2_CACHE_BYTE_SIZE,
+>                                   (uint64_t)DEFAULT_L2_CACHE_CLUSTERS
+>                                   * s->cluster_size);
+> -            *refcount_cache_size = *l2_cache_size
+> -                                 / DEFAULT_L2_REFCOUNT_SIZE_RATIO;
+> -        } else if (!l2_cache_size_set) {
+> -            *l2_cache_size = *refcount_cache_size
+> -                           * DEFAULT_L2_REFCOUNT_SIZE_RATIO;
+> -        } else if (!refcount_cache_size_set) {
+> -            *refcount_cache_size = *l2_cache_size
+> -                                 / DEFAULT_L2_REFCOUNT_SIZE_RATIO;
+> +        }
+> +        if (!refcount_cache_size_set) {
+> +            *refcount_cache_size = MIN_REFCOUNT_CACHE_SIZE * s->cluster_size;
 
-> I'm also curious to see a test case involving a guest OS image. (I'm also open to
-> a re-implementation of tests/vm/basevm.py with Avocado, if you find it
-> worthwhile.)
-> 
+...but in the else clause down here, we don't have the cast, and
+Coverity complains that we evaluate a 32-bit result and then
+put it in a 64-bit variable. Should this have the (uint64_t)
+cast as well ?
 
-We had such tests in the previous incarnations of this work[1].  But by
-doing it in smaller steps, I believe we can achieve a better result,
-specially when it comes to the exposed API.
+>          }
+>      }
+>
 
-- Cleber.
-
-[1] https://lists.gnu.org/archive/html/qemu-devel/2018-04/msg03466.html
-
-> Fam
-> 
->>
->> Commit summary
->> ==============
->>
->> Cleber Rosa (5):
->>   Add functional/acceptance tests infrastructure
->>   scripts/qemu.py: allow adding to the list of extra arguments
->>   Acceptance tests: add quick VNC tests
->>   scripts/qemu.py: introduce set_console() method
->>   Acceptance tests: add Linux kernel boot and console checking test
->>
->>  scripts/qemu.py                             | 103 +++++++++++++++-
->>  scripts/test_qemu.py                        | 176 +++++++++++++++++++++++++++
->>  tests/acceptance/README.rst                 | 141 +++++++++++++++++++++
->>  tests/acceptance/avocado_qemu/__init__.py   |  45 +++++++
->>  tests/acceptance/test_boot_linux_console.py |  37 ++++++
->>  tests/acceptance/test_version.py            |  13 ++
->>  tests/acceptance/test_vnc.py                |  50 ++++++++
->>  7 files changed, 564 insertions(+), 1 deletion(-)
->>  create mode 100644 scripts/test_qemu.py
->>  create mode 100644 tests/acceptance/README.rst
->>  create mode 100644 tests/acceptance/avocado_qemu/__init__.py
->>  create mode 100644 tests/acceptance/test_boot_linux_console.py
->>  create mode 100644 tests/acceptance/test_version.py
->>  create mode 100644 tests/acceptance/test_vnc.py
->>
->> ---
->>
->> [1] https://lists.gnu.org/archive/html/qemu-devel/2018-04/msg03443.html
->> [2] https://github.com/apahim/qemu/commits/avocado_qemu
->> [3] https://lists.gnu.org/archive/html/qemu-devel/2018-04/msg03076.html
->>
-> 
+thanks
+-- PMM
