@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45484)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45478)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fMDeK-0005kL-0l
+	(envelope-from <alex.bennee@linaro.org>) id 1fMDeJ-0005kA-Od
 	for qemu-devel@nongnu.org; Fri, 25 May 2018 10:24:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fMDeI-0003tt-BL
-	for qemu-devel@nongnu.org; Fri, 25 May 2018 10:24:56 -0400
-Received: from mail-wr0-x241.google.com ([2a00:1450:400c:c0c::241]:46278)
+	(envelope-from <alex.bennee@linaro.org>) id 1fMDeH-0003tD-7U
+	for qemu-devel@nongnu.org; Fri, 25 May 2018 10:24:55 -0400
+Received: from mail-wr0-x243.google.com ([2a00:1450:400c:c0c::243]:38830)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1fMDeI-0003tW-1N
-	for qemu-devel@nongnu.org; Fri, 25 May 2018 10:24:54 -0400
-Received: by mail-wr0-x241.google.com with SMTP id x9-v6so9571023wrl.13
-	for <qemu-devel@nongnu.org>; Fri, 25 May 2018 07:24:53 -0700 (PDT)
+	id 1fMDeG-0003sf-UT
+	for qemu-devel@nongnu.org; Fri, 25 May 2018 10:24:53 -0400
+Received: by mail-wr0-x243.google.com with SMTP id 94-v6so9575830wrf.5
+	for <qemu-devel@nongnu.org>; Fri, 25 May 2018 07:24:52 -0700 (PDT)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Fri, 25 May 2018 15:19:12 +0100
-Message-Id: <20180525141915.6497-7-alex.bennee@linaro.org>
+Date: Fri, 25 May 2018 15:19:09 +0100
+Message-Id: <20180525141915.6497-4-alex.bennee@linaro.org>
 In-Reply-To: <20180525141915.6497-1-alex.bennee@linaro.org>
 References: <20180525133851.27161-1-alex.bennee@linaro.org>
 	<20180525141915.6497-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v5 46/49] Makefile.target: add
- (clean-/build-)guest-tests targets
+Subject: [Qemu-devel] [PATCH v5 43/49] docker: move debian-powerpc-cross to
+ sid based build
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,149 +34,164 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: cota@braap.org, famz@redhat.com, berrange@redhat.com, f4bug@amsat.org, richard.henderson@linaro.org, balrogg@gmail.com, aurelien@aurel32.net, agraf@suse.de
 Cc: qemu-devel@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 
-Now all the build infrastructure is in place we can build tests for
-each guest that we support. That support mainly depends on having
-cross compilers installed or docker setup. To keep all the logic for
-that together we put the rules in tests/tcg/Makefile.include and
-include it from the main Makefile.target.
+The original Jessie based cross builder hasn't worked for a while. The
+state of the libraries is still perilous for cross-building QEMU but
+we can use it for building TCG tests.
+
+The debian-apt-fake.sh script can also be dropped as it is no longer
+used.
 
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-
 ---
-v4
-  - pulled Makefile.include bits from next patch
-  - added qemu-$(TARGET_NAME) dependency for running tests
-  - accept SPEED parameter to run slow tests
-  - pass BUILD_STATIC
-  - update MAINTAINERS
----
- MAINTAINERS                |  1 +
- Makefile.target            |  5 +++
- tests/tcg/Makefile.include | 88 ++++++++++++++++++++++++++++++++++++++
- 3 files changed, 94 insertions(+)
- create mode 100644 tests/tcg/Makefile.include
+ tests/docker/Makefile.include                 |  4 +-
+ tests/docker/dockerfiles/debian-apt-fake.sh   | 46 -------------------
+ .../dockerfiles/debian-powerpc-cross.docker   | 39 +++-------------
+ tests/docker/dockerfiles/debian8.docker       |  3 --
+ 4 files changed, 7 insertions(+), 85 deletions(-)
+ delete mode 100755 tests/docker/dockerfiles/debian-apt-fake.sh
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index bfa8d0fb9c..e575bad174 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -2141,6 +2141,7 @@ W: http://patchew.org/QEMU/
- Guest Test Compilation Support
- M: Alex Bennée <alex.bennee@linaro.org>
- F: tests/tcg/Makefile
-+F: tests/tcg/Makefile.include
- L: qemu-devel@nongnu.org
+diff --git a/tests/docker/Makefile.include b/tests/docker/Makefile.include
+index 36779645d7..d59314ee65 100644
+--- a/tests/docker/Makefile.include
++++ b/tests/docker/Makefile.include
+@@ -46,8 +46,6 @@ docker-image-%: $(DOCKER_FILES_DIR)/%.docker
+ 		$(if $(EXECUTABLE),--include-executable=$(EXECUTABLE)),\
+ 		"BUILD","$*")
  
- Documentation
-diff --git a/Makefile.target b/Makefile.target
-index d0ec77a307..a30fd40257 100644
---- a/Makefile.target
-+++ b/Makefile.target
-@@ -36,6 +36,11 @@ endif
- PROGS=$(QEMU_PROG) $(QEMU_PROGW)
- STPFILES=
+-docker-image-debian-powerpc-cross: EXTRA_FILES:=$(SRC_PATH)/tests/docker/dockerfiles/debian-apt-fake.sh
+-
+ # Enforce dependencies for composite images
+ docker-image-debian: docker-image-debian9
+ docker-image-debian8-mxe: docker-image-debian8
+@@ -57,7 +55,6 @@ docker-image-debian-armhf-cross: docker-image-debian9
+ docker-image-debian-arm64-cross: docker-image-debian9
+ docker-image-debian-mips-cross: docker-image-debian9
+ docker-image-debian-mips64el-cross: docker-image-debian9
+-docker-image-debian-powerpc-cross: docker-image-debian8
+ docker-image-debian-ppc64el-cross: docker-image-debian9
+ docker-image-debian-s390x-cross: docker-image-debian9
+ docker-image-debian-win32-cross: docker-image-debian8-mxe
+@@ -69,6 +66,7 @@ docker-image-debian-sh4-cross: docker-image-debian-sid
+ docker-image-debian-sparc64-cross: docker-image-debian-sid
+ docker-image-debian-mips64-cross: docker-image-debian-sid
+ docker-image-debian-riscv64-cross: docker-image-debian-sid
++docker-image-debian-powerpc-cross: docker-image-debian-sid
+ docker-image-travis: NOUSER=1
  
-+# Makefile Tests
-+ifdef CONFIG_USER_ONLY
-+include $(SRC_PATH)/tests/tcg/Makefile.include
-+endif
-+
- config-target.h: config-target.h-timestamp
- config-target.h-timestamp: config-target.mak
+ # Expand all the pre-requistes for each docker image and test combination
+diff --git a/tests/docker/dockerfiles/debian-apt-fake.sh b/tests/docker/dockerfiles/debian-apt-fake.sh
+deleted file mode 100755
+index 2ec0fdf47a..0000000000
+--- a/tests/docker/dockerfiles/debian-apt-fake.sh
++++ /dev/null
+@@ -1,46 +0,0 @@
+-#! /bin/sh
+-#
+-# Generate fake debian package to resolve unimportant unmet dependencies held
+-# by upstream multiarch broken packages.
+-#
+-# Copyright (c) 2017 Philippe Mathieu-Daudé <f4bug@amsat.org>
+-#
+-# This work is licensed under the terms of the GNU GPL, version 2
+-# or (at your option) any later version. See the COPYING file in
+-# the top-level directory.
+-
+-test $1 = "install" && shift 1
+-
+-fake_install()
+-{
+-    echo "Generating fake $2 $1 $3 ..."
+-    (cd /var/cache/apt/archives
+-        (cat << 'EOF'
+-Section: misc
+-Priority: optional
+-Standards-Version: 3.9.2
+-
+-Package: NAME
+-Version: VERSION
+-Maintainer: qemu-devel@nongnu.org
+-Architecture: any
+-Multi-Arch: same
+-Description: fake NAME
+-EOF
+-        ) | sed s/NAME/$2/g | sed s/VERSION/$3/g > $2.control
+-        equivs-build -a $1 $2.control 1>/dev/null 2>/dev/null
+-        dpkg -i --force-overwrite $2_$3_$1.deb
+-    )
+-}
+-
+-try_install()
+-{
+-    name=$(echo $1|sed "s/\(.*\):\(.*\)=\(.*\)/\1/")
+-    arch=$(echo $1|sed "s/\(.*\):\(.*\)=\(.*\)/\2/")
+-    vers=$(echo $1|sed "s/\(.*\):\(.*\)=\(.*\)/\3/")
+-    apt-get install -q -yy $1 || fake_install $arch $name $vers
+-}
+-
+-for package in $*; do
+-    try_install $package
+-done
+diff --git a/tests/docker/dockerfiles/debian-powerpc-cross.docker b/tests/docker/dockerfiles/debian-powerpc-cross.docker
+index a5dd46b4ac..5e62ca0df1 100644
+--- a/tests/docker/dockerfiles/debian-powerpc-cross.docker
++++ b/tests/docker/dockerfiles/debian-powerpc-cross.docker
+@@ -1,40 +1,13 @@
+ #
+ # Docker powerpc cross-compiler target
+ #
+-# This docker target builds on the debian Jessie base image.
++# This docker target builds on the debian sid base image which
++# contains cross compilers for Debian "ports" targets. The original
++# Jessie based no longer builds.
+ #
+-FROM qemu:debian8
+-MAINTAINER Philippe Mathieu-Daudé <f4bug@amsat.org>
++FROM qemu:debian-sid
  
-diff --git a/tests/tcg/Makefile.include b/tests/tcg/Makefile.include
-new file mode 100644
-index 0000000000..fbefc8b23b
---- /dev/null
-+++ b/tests/tcg/Makefile.include
-@@ -0,0 +1,88 @@
-+# -*- Mode: makefile -*-
-+#
-+# TCG tests (per-target rules)
-+#
-+# This Makefile fragement is included from the per-target
-+# Makefile.target so will be invoked for each linux-user program we
-+# build. We have two options for compiling, either using a configured
-+# guest compiler or calling one of our docker images to do it for us.
-+#
-+
-+# The per ARCH makefile, if it exists, holds extra information about
-+# useful docker images or alternative compiler flags.
-+
-+-include $(SRC_PATH)/tests/tcg/$(TARGET_BASE_ARCH)/Makefile.include
-+-include $(SRC_PATH)/tests/tcg/$(TARGET_NAME)/Makefile.include
-+
-+GUEST_BUILD=
-+TCG_MAKE=$(SRC_PATH)/tests/tcg/Makefile
-+# Support installed Cross Compilers
-+
-+ifdef CROSS_CC_GUEST
-+
-+.PHONY: cross-build-guest-tests
-+cross-build-guest-tests:
-+	$(call quiet-command, \
-+	   (mkdir -p tests && cd tests && \
-+	    make -f $(TCG_MAKE) CC=$(CROSS_CC_GUEST) \
-+				BUILD_STATIC=$(CROSS_CC_GUEST_STATIC) \
-+				EXTRA_CFLAGS=$(CROSS_CC_GUEST_CFLAGS)), \
-+	"CROSS-BUILD","$(TARGET_NAME) guest-tests with $(CROSS_CC_GUEST)")
-+
-+GUEST_BUILD=cross-build-guest-tests
-+
-+endif
-+
-+# Support building with Docker
-+
-+ifeq ($(HAVE_USER_DOCKER)$(GUEST_BUILD),y)
-+ifneq ($(DOCKER_IMAGE),)
-+
-+# We also need the Docker make rules to depend on
-+include $(SRC_PATH)/tests/docker/Makefile.include
-+
-+DOCKER_COMPILE_CMD="$(DOCKER_SCRIPT) cc --user $(shell id -u) \
-+		--cc $(DOCKER_CROSS_COMPILER) \
-+		-i qemu:$(DOCKER_IMAGE) \
-+		-s $(SRC_PATH) -- "
-+DOCKER_PREREQ=docker-image-$(DOCKER_IMAGE)
-+
-+.PHONY: docker-build-guest-tests
-+docker-build-guest-tests: $(DOCKER_PREREQ)
-+	$(call quiet-command, \
-+	  (mkdir -p tests && cd tests && \
-+	   make -f $(TCG_MAKE) CC=$(DOCKER_COMPILE_CMD) \
-+			       BUILD_STATIC=y \
-+			       EXTRA_CFLAGS=$(DOCKER_CROSS_COMPILER_CFLAGS)), \
-+	"CROSS-BUILD","$(TARGET_NAME) guest-tests with docker qemu:$(DOCKER_IMAGE)")
-+
-+GUEST_BUILD=docker-build-guest-tests
-+
-+endif
-+endif
-+
-+# Final targets
-+.PHONY: guest-tests
-+
-+ifneq ($(GUEST_BUILD),)
-+guest-tests: $(GUEST_BUILD)
-+
-+run-guest-tests: guest-tests qemu-$(TARGET_NAME)
-+	$(call quiet-command, \
-+	(cd tests && make -f $(TCG_MAKE) SPEED=$(SPEED) run), \
-+	"RUN-TESTS", "for $(TARGET_NAME)")
-+
-+else
-+guest-tests:
-+	$(call quiet-command, /bin/true, "CROSS-BUILD", \
-+		"$(TARGET_NAME) guest-tests SKIPPED")
-+
-+run-guest-tests:
-+	$(call quiet-command, /bin/true, "RUN-TESTS", \
-+		"for $(TARGET_NAME) SKIPPED")
-+endif
-+
-+# It doesn't mater if these don't exits
-+.PHONY: clean-guest-tests
-+clean-guest-tests:
-+	rm -rf tests || echo "no $(TARGET_NAME) tests to remove"
+-# Add the foreign architecture we want and install dependencies
+-RUN dpkg --add-architecture powerpc
+-RUN apt-get update
+ RUN DEBIAN_FRONTEND=noninteractive eatmydata \
+     apt-get install -y --no-install-recommends \
+-        crossbuild-essential-powerpc
+-
+-# <kludge> to fix "following packages have unmet dependencies" ...
+-ADD debian-apt-fake.sh /usr/local/bin/apt-fake
+-RUN apt-get install -y --no-install-recommends \
+-        equivs \
+-        pkg-config
+-RUN apt-fake install \
+-        pkg-config:powerpc=0.28-1.1-fake && \
+-    ln -s pkg-config /usr/bin/powerpc-linux-gnu-pkg-config
+-ENV PKG_CONFIG_PATH /usr/lib/powerpc-linux-gnu/pkgconfig
+-# </kludge>
+-
+-# Specify the cross prefix for this image (see tests/docker/common.rc)
+-ENV QEMU_CONFIGURE_OPTS --cross-prefix=powerpc-linux-gnu-
+-
+-RUN DEBIAN_FRONTEND=noninteractive eatmydata \
+-    apt-get build-dep -yy -a powerpc qemu
+-RUN DEBIAN_FRONTEND=noninteractive \
+-    apt-get install -y --no-install-recommends \
+-        glusterfs-common:powerpc \
+-        libbz2-dev:powerpc \
+-        liblzo2-dev:powerpc \
+-        libncursesw5-dev:powerpc \
+-        libnfs-dev:powerpc \
+-        librdmacm-dev:powerpc \
+-        libsnappy-dev:powerpc
++        gcc-powerpc-linux-gnu \
++        libc6-dev-powerpc-cross || { echo "Failed to build - see debian-sid.docker notes"; exit 1; }
+diff --git a/tests/docker/dockerfiles/debian8.docker b/tests/docker/dockerfiles/debian8.docker
+index 1bcf2e3d2f..52945631cd 100644
+--- a/tests/docker/dockerfiles/debian8.docker
++++ b/tests/docker/dockerfiles/debian8.docker
+@@ -32,6 +32,3 @@ RUN DEBIAN_FRONTEND=noninteractive eatmydata \
+         pkg-config \
+         python-minimal
+ 
+-# Setup Emdebian [emdebian-archive-keyring]
+-RUN echo "deb http://emdebian.org/tools/debian/ jessie main" > /etc/apt/sources.list.d/emdebian.list && \
+-    curl http://emdebian.org/tools/debian/emdebian-toolchain-archive.key | apt-key add -
 -- 
 2.17.0
