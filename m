@@ -1,32 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56371)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57056)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fMKS9-0001pC-Vn
-	for qemu-devel@nongnu.org; Fri, 25 May 2018 17:40:51 -0400
+	id 1fMKTL-0002V6-EZ
+	for qemu-devel@nongnu.org; Fri, 25 May 2018 17:42:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fMKS6-0005Vi-S9
-	for qemu-devel@nongnu.org; Fri, 25 May 2018 17:40:50 -0400
-Received: from mail-qt0-x243.google.com ([2607:f8b0:400d:c0d::243]:43577)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fMKS6-0005VL-Mg
-	for qemu-devel@nongnu.org; Fri, 25 May 2018 17:40:46 -0400
-Received: by mail-qt0-x243.google.com with SMTP id f13-v6so8303021qtp.10
-	for <qemu-devel@nongnu.org>; Fri, 25 May 2018 14:40:46 -0700 (PDT)
+	id 1fMKTK-0006T1-2c
+	for qemu-devel@nongnu.org; Fri, 25 May 2018 17:42:03 -0400
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
 References: <1527266793-301361-1-git-send-email-mst@redhat.com>
-	<1527266793-301361-3-git-send-email-mst@redhat.com>
+	<1527266793-301361-2-git-send-email-mst@redhat.com>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <7d42b15f-79b9-1a8c-0183-29a10a29669c@amsat.org>
-Date: Fri, 25 May 2018 18:40:42 -0300
+Message-ID: <20665619-b2ad-4a4a-b28d-06cfc023d47b@amsat.org>
+Date: Fri, 25 May 2018 18:41:52 -0300
 MIME-Version: 1.0
-In-Reply-To: <1527266793-301361-3-git-send-email-mst@redhat.com>
+In-Reply-To: <1527266793-301361-2-git-send-email-mst@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v2 02/20] crypto: use local path for local
+Subject: Re: [Qemu-devel] [PATCH v2 01/20] block: use local path for local
  headers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -37,7 +30,7 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org
+Cc: Kevin Wolf <kwolf@redhat.com>, peter.maydell@linaro.org, qemu-block@nongnu.org, Jeff Cody <jcody@redhat.com>, Max Reitz <mreitz@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
 On 05/25/2018 01:47 PM, Michael S. Tsirkin wrote:
 > When pulling in headers that are in the same directory as C file (as
@@ -50,246 +43,169 @@ Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 Tested-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
 > ---
->  crypto/block-luks.h    | 2 +-
->  crypto/block-qcow.h    | 2 +-
->  crypto/ivgen-essiv.h   | 2 +-
->  crypto/ivgen-plain.h   | 2 +-
->  crypto/ivgen-plain64.h | 2 +-
->  crypto/block-luks.c    | 2 +-
->  crypto/block-qcow.c    | 2 +-
->  crypto/block.c         | 6 +++---
->  crypto/cipher.c        | 6 +++---
->  crypto/ivgen-essiv.c   | 2 +-
->  crypto/ivgen-plain.c   | 2 +-
->  crypto/ivgen-plain64.c | 2 +-
->  crypto/ivgen.c         | 8 ++++----
->  crypto/tlscreds.c      | 2 +-
->  crypto/tlscredsanon.c  | 2 +-
->  crypto/tlscredsx509.c  | 2 +-
->  16 files changed, 23 insertions(+), 23 deletions(-)
+>  block/crypto.c         | 2 +-
+>  block/nbd.c            | 2 +-
+>  block/qcow.c           | 2 +-
+>  block/qcow2-bitmap.c   | 2 +-
+>  block/qcow2-cluster.c  | 2 +-
+>  block/qcow2-refcount.c | 2 +-
+>  block/qcow2-snapshot.c | 2 +-
+>  block/qcow2.c          | 4 ++--
+>  block/vhdx-endian.c    | 2 +-
+>  block/vhdx-log.c       | 2 +-
+>  block/vhdx.c           | 2 +-
+>  11 files changed, 12 insertions(+), 12 deletions(-)
 > 
-> diff --git a/crypto/block-luks.h b/crypto/block-luks.h
-> index b2d8a35..befd8b2 100644
-> --- a/crypto/block-luks.h
-> +++ b/crypto/block-luks.h
-> @@ -21,7 +21,7 @@
->  #ifndef QCRYPTO_BLOCK_LUKS_H
->  #define QCRYPTO_BLOCK_LUKS_H
->  
-> -#include "crypto/blockpriv.h"
-> +#include "blockpriv.h"
->  
->  extern const QCryptoBlockDriver qcrypto_block_driver_luks;
->  
-> diff --git a/crypto/block-qcow.h b/crypto/block-qcow.h
-> index 3e2c0a8..6988fb2 100644
-> --- a/crypto/block-qcow.h
-> +++ b/crypto/block-qcow.h
-> @@ -21,7 +21,7 @@
->  #ifndef QCRYPTO_BLOCK_QCOW_H
->  #define QCRYPTO_BLOCK_QCOW_H
->  
-> -#include "crypto/blockpriv.h"
-> +#include "blockpriv.h"
->  
->  extern const QCryptoBlockDriver qcrypto_block_driver_qcow;
->  
-> diff --git a/crypto/ivgen-essiv.h b/crypto/ivgen-essiv.h
-> index 4a00af8..f34dbab 100644
-> --- a/crypto/ivgen-essiv.h
-> +++ b/crypto/ivgen-essiv.h
-> @@ -18,7 +18,7 @@
->   *
->   */
->  
-> -#include "crypto/ivgenpriv.h"
-> +#include "ivgenpriv.h"
->  
->  #ifndef QCRYPTO_IVGEN_ESSIV_H__
->  #define QCRYPTO_IVGEN_ESSIV_H__
-> diff --git a/crypto/ivgen-plain.h b/crypto/ivgen-plain.h
-> index 0fe8835..16e1ae5 100644
-> --- a/crypto/ivgen-plain.h
-> +++ b/crypto/ivgen-plain.h
-> @@ -18,7 +18,7 @@
->   *
->   */
->  
-> -#include "crypto/ivgenpriv.h"
-> +#include "ivgenpriv.h"
->  
->  #ifndef QCRYPTO_IVGEN_PLAIN_H__
->  #define QCRYPTO_IVGEN_PLAIN_H__
-> diff --git a/crypto/ivgen-plain64.h b/crypto/ivgen-plain64.h
-> index c410445..f8611bd 100644
-> --- a/crypto/ivgen-plain64.h
-> +++ b/crypto/ivgen-plain64.h
-> @@ -18,7 +18,7 @@
->   *
->   */
->  
-> -#include "crypto/ivgenpriv.h"
-> +#include "ivgenpriv.h"
->  
->  #ifndef QCRYPTO_IVGEN_PLAIN64_H__
->  #define QCRYPTO_IVGEN_PLAIN64_H__
-> diff --git a/crypto/block-luks.c b/crypto/block-luks.c
-> index d418ac3..5738124 100644
-> --- a/crypto/block-luks.c
-> +++ b/crypto/block-luks.c
-> @@ -22,7 +22,7 @@
+> diff --git a/block/crypto.c b/block/crypto.c
+> index 7e7ad2d..bc322b5 100644
+> --- a/block/crypto.c
+> +++ b/block/crypto.c
+> @@ -29,7 +29,7 @@
+>  #include "qapi/qobject-input-visitor.h"
 >  #include "qapi/error.h"
->  #include "qemu/bswap.h"
+>  #include "qemu/option.h"
+> -#include "block/crypto.h"
+> +#include "crypto.h"
 >  
-> -#include "crypto/block-luks.h"
-> +#include "block-luks.h"
+>  typedef struct BlockCrypto BlockCrypto;
 >  
->  #include "crypto/hash.h"
->  #include "crypto/afsplit.h"
-> diff --git a/crypto/block-qcow.c b/crypto/block-qcow.c
-> index 8817d6a..4284e05 100644
-> --- a/crypto/block-qcow.c
-> +++ b/crypto/block-qcow.c
+> diff --git a/block/nbd.c b/block/nbd.c
+> index 3e1693c..ff8333e 100644
+> --- a/block/nbd.c
+> +++ b/block/nbd.c
 > @@ -27,7 +27,7 @@
+>   */
+>  
 >  #include "qemu/osdep.h"
+> -#include "block/nbd-client.h"
+> +#include "nbd-client.h"
 >  #include "qapi/error.h"
+>  #include "qemu/uri.h"
+>  #include "block/block_int.h"
+> diff --git a/block/qcow.c b/block/qcow.c
+> index 3ba2ca2..1f866af 100644
+> --- a/block/qcow.c
+> +++ b/block/qcow.c
+> @@ -37,7 +37,7 @@
+>  #include "qapi/qapi-visit-block-core.h"
+>  #include "crypto/block.h"
+>  #include "migration/blocker.h"
+> -#include "block/crypto.h"
+> +#include "crypto.h"
 >  
-> -#include "crypto/block-qcow.h"
-> +#include "block-qcow.h"
->  #include "crypto/secret.h"
+>  /**************************************************************/
+>  /* QEMU COW block driver with compression and encryption support */
+> diff --git a/block/qcow2-bitmap.c b/block/qcow2-bitmap.c
+> index 6e93ec4..60d5290 100644
+> --- a/block/qcow2-bitmap.c
+> +++ b/block/qcow2-bitmap.c
+> @@ -30,7 +30,7 @@
+>  #include "qemu/cutils.h"
 >  
->  #define QCRYPTO_BLOCK_QCOW_SECTOR_SIZE 512
-> diff --git a/crypto/block.c b/crypto/block.c
-> index f206d5e..e59d114 100644
-> --- a/crypto/block.c
-> +++ b/crypto/block.c
-> @@ -20,9 +20,9 @@
+>  #include "block/block_int.h"
+> -#include "block/qcow2.h"
+> +#include "qcow2.h"
 >  
->  #include "qemu/osdep.h"
+>  /* NOTICE: BME here means Bitmaps Extension and used as a namespace for
+>   * _internal_ constants. Please do not use this _internal_ abbreviation for
+> diff --git a/block/qcow2-cluster.c b/block/qcow2-cluster.c
+> index 1aee726..0d74584 100644
+> --- a/block/qcow2-cluster.c
+> +++ b/block/qcow2-cluster.c
+> @@ -28,7 +28,7 @@
 >  #include "qapi/error.h"
-> -#include "crypto/blockpriv.h"
-> -#include "crypto/block-qcow.h"
-> -#include "crypto/block-luks.h"
-> +#include "blockpriv.h"
-> +#include "block-qcow.h"
-> +#include "block-luks.h"
->  
->  static const QCryptoBlockDriver *qcrypto_block_drivers[] = {
->      [Q_CRYPTO_BLOCK_FORMAT_QCOW] = &qcrypto_block_driver_qcow,
-> diff --git a/crypto/cipher.c b/crypto/cipher.c
-> index bcbfb3d..b3af579 100644
-> --- a/crypto/cipher.c
-> +++ b/crypto/cipher.c
-> @@ -150,11 +150,11 @@ qcrypto_cipher_munge_des_rfb_key(const uint8_t *key,
->  #endif /* CONFIG_GCRYPT || CONFIG_NETTLE */
->  
->  #ifdef CONFIG_GCRYPT
-> -#include "crypto/cipher-gcrypt.c"
-> +#include "cipher-gcrypt.c"
->  #elif defined CONFIG_NETTLE
-> -#include "crypto/cipher-nettle.c"
-> +#include "cipher-nettle.c"
->  #else
-> -#include "crypto/cipher-builtin.c"
-> +#include "cipher-builtin.c"
->  #endif
->  
->  QCryptoCipher *qcrypto_cipher_new(QCryptoCipherAlgorithm alg,
-> diff --git a/crypto/ivgen-essiv.c b/crypto/ivgen-essiv.c
-> index aeaa8fc..43e258c 100644
-> --- a/crypto/ivgen-essiv.c
-> +++ b/crypto/ivgen-essiv.c
-> @@ -20,7 +20,7 @@
->  
->  #include "qemu/osdep.h"
+>  #include "qemu-common.h"
+>  #include "block/block_int.h"
+> -#include "block/qcow2.h"
+> +#include "qcow2.h"
 >  #include "qemu/bswap.h"
-> -#include "crypto/ivgen-essiv.h"
-> +#include "ivgen-essiv.h"
->  
->  typedef struct QCryptoIVGenESSIV QCryptoIVGenESSIV;
->  struct QCryptoIVGenESSIV {
-> diff --git a/crypto/ivgen-plain.c b/crypto/ivgen-plain.c
-> index bf2fb7a..06f4145 100644
-> --- a/crypto/ivgen-plain.c
-> +++ b/crypto/ivgen-plain.c
-> @@ -20,7 +20,7 @@
->  
->  #include "qemu/osdep.h"
->  #include "qemu/bswap.h"
-> -#include "crypto/ivgen-plain.h"
-> +#include "ivgen-plain.h"
->  
->  static int qcrypto_ivgen_plain_init(QCryptoIVGen *ivgen,
->                                      const uint8_t *key, size_t nkey,
-> diff --git a/crypto/ivgen-plain64.c b/crypto/ivgen-plain64.c
-> index e4679a1..fbb7724 100644
-> --- a/crypto/ivgen-plain64.c
-> +++ b/crypto/ivgen-plain64.c
-> @@ -20,7 +20,7 @@
->  
->  #include "qemu/osdep.h"
->  #include "qemu/bswap.h"
-> -#include "crypto/ivgen-plain.h"
-> +#include "ivgen-plain.h"
->  
->  static int qcrypto_ivgen_plain_init(QCryptoIVGen *ivgen,
->                                      const uint8_t *key, size_t nkey,
-> diff --git a/crypto/ivgen.c b/crypto/ivgen.c
-> index f664351..6a2b3ad 100644
-> --- a/crypto/ivgen.c
-> +++ b/crypto/ivgen.c
-> @@ -21,10 +21,10 @@
->  #include "qemu/osdep.h"
->  #include "qapi/error.h"
->  
-> -#include "crypto/ivgenpriv.h"
-> -#include "crypto/ivgen-plain.h"
-> -#include "crypto/ivgen-plain64.h"
-> -#include "crypto/ivgen-essiv.h"
-> +#include "ivgenpriv.h"
-> +#include "ivgen-plain.h"
-> +#include "ivgen-plain64.h"
-> +#include "ivgen-essiv.h"
->  
->  
->  QCryptoIVGen *qcrypto_ivgen_new(QCryptoIVGenAlgorithm alg,
-> diff --git a/crypto/tlscreds.c b/crypto/tlscreds.c
-> index 3cd4103..02255a6 100644
-> --- a/crypto/tlscreds.c
-> +++ b/crypto/tlscreds.c
-> @@ -20,7 +20,7 @@
->  
->  #include "qemu/osdep.h"
->  #include "qapi/error.h"
-> -#include "crypto/tlscredspriv.h"
-> +#include "tlscredspriv.h"
 >  #include "trace.h"
 >  
->  #define DH_BITS 2048
-> diff --git a/crypto/tlscredsanon.c b/crypto/tlscredsanon.c
-> index 1464220..7ad66d1 100644
-> --- a/crypto/tlscredsanon.c
-> +++ b/crypto/tlscredsanon.c
-> @@ -20,7 +20,7 @@
->  
->  #include "qemu/osdep.h"
->  #include "crypto/tlscredsanon.h"
-> -#include "crypto/tlscredspriv.h"
-> +#include "tlscredspriv.h"
+> diff --git a/block/qcow2-refcount.c b/block/qcow2-refcount.c
+> index 2dc2300..4032362 100644
+> --- a/block/qcow2-refcount.c
+> +++ b/block/qcow2-refcount.c
+> @@ -26,7 +26,7 @@
 >  #include "qapi/error.h"
->  #include "qom/object_interfaces.h"
->  #include "trace.h"
-> diff --git a/crypto/tlscredsx509.c b/crypto/tlscredsx509.c
-> index 50eb54f..98ee042 100644
-> --- a/crypto/tlscredsx509.c
-> +++ b/crypto/tlscredsx509.c
-> @@ -20,7 +20,7 @@
->  
+>  #include "qemu-common.h"
+>  #include "block/block_int.h"
+> -#include "block/qcow2.h"
+> +#include "qcow2.h"
+>  #include "qemu/range.h"
+>  #include "qemu/bswap.h"
+>  #include "qemu/cutils.h"
+> diff --git a/block/qcow2-snapshot.c b/block/qcow2-snapshot.c
+> index 74293be..bb6a5b7 100644
+> --- a/block/qcow2-snapshot.c
+> +++ b/block/qcow2-snapshot.c
+> @@ -25,7 +25,7 @@
 >  #include "qemu/osdep.h"
->  #include "crypto/tlscredsx509.h"
-> -#include "crypto/tlscredspriv.h"
-> +#include "tlscredspriv.h"
->  #include "crypto/secret.h"
 >  #include "qapi/error.h"
->  #include "qom/object_interfaces.h"
+>  #include "block/block_int.h"
+> -#include "block/qcow2.h"
+> +#include "qcow2.h"
+>  #include "qemu/bswap.h"
+>  #include "qemu/error-report.h"
+>  #include "qemu/cutils.h"
+> diff --git a/block/qcow2.c b/block/qcow2.c
+> index 6d53247..db13109 100644
+> --- a/block/qcow2.c
+> +++ b/block/qcow2.c
+> @@ -27,7 +27,7 @@
+>  #include "sysemu/block-backend.h"
+>  #include "qemu/module.h"
+>  #include <zlib.h>
+> -#include "block/qcow2.h"
+> +#include "qcow2.h"
+>  #include "qemu/error-report.h"
+>  #include "qapi/error.h"
+>  #include "qapi/qapi-events-block-core.h"
+> @@ -39,7 +39,7 @@
+>  #include "qemu/bswap.h"
+>  #include "qapi/qobject-input-visitor.h"
+>  #include "qapi/qapi-visit-block-core.h"
+> -#include "block/crypto.h"
+> +#include "crypto.h"
+>  
+>  /*
+>    Differences with QCOW:
+> diff --git a/block/vhdx-endian.c b/block/vhdx-endian.c
+> index 429d755..41fbdd2 100644
+> --- a/block/vhdx-endian.c
+> +++ b/block/vhdx-endian.c
+> @@ -19,7 +19,7 @@
+>  #include "qemu-common.h"
+>  #include "block/block_int.h"
+>  #include "qemu/bswap.h"
+> -#include "block/vhdx.h"
+> +#include "vhdx.h"
+>  
+>  /*
+>   * All the VHDX formats on disk are little endian - the following
+> diff --git a/block/vhdx-log.c b/block/vhdx-log.c
+> index 0ac4863..d2f1b98 100644
+> --- a/block/vhdx-log.c
+> +++ b/block/vhdx-log.c
+> @@ -24,7 +24,7 @@
+>  #include "qemu/error-report.h"
+>  #include "qemu/module.h"
+>  #include "qemu/bswap.h"
+> -#include "block/vhdx.h"
+> +#include "vhdx.h"
+>  
+>  
+>  typedef struct VHDXLogSequence {
+> diff --git a/block/vhdx.c b/block/vhdx.c
+> index 0b1e21c..79c68a2 100644
+> --- a/block/vhdx.c
+> +++ b/block/vhdx.c
+> @@ -23,7 +23,7 @@
+>  #include "qemu/option.h"
+>  #include "qemu/crc32c.h"
+>  #include "qemu/bswap.h"
+> -#include "block/vhdx.h"
+> +#include "vhdx.h"
+>  #include "migration/blocker.h"
+>  #include "qemu/uuid.h"
+>  #include "qapi/qmp/qdict.h"
 > 
