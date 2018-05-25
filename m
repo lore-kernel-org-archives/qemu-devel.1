@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38498)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41959)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1fM7vf-0001mi-3u
-	for qemu-devel@nongnu.org; Fri, 25 May 2018 04:18:30 -0400
+	(envelope-from <no-reply@patchew.org>) id 1fM89c-0002cs-BB
+	for qemu-devel@nongnu.org; Fri, 25 May 2018 04:32:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1fM7vY-0008Fm-KW
-	for qemu-devel@nongnu.org; Fri, 25 May 2018 04:18:27 -0400
-Received: from mout.kundenserver.de ([212.227.17.13]:50317)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1fM7vY-0008Ew-BZ
-	for qemu-devel@nongnu.org; Fri, 25 May 2018 04:18:20 -0400
-From: Laurent Vivier <laurent@vivier.eu>
-Date: Fri, 25 May 2018 10:17:48 +0200
-Message-Id: <20180525081754.29506-8-laurent@vivier.eu>
+	(envelope-from <no-reply@patchew.org>) id 1fM89Y-0006I8-C1
+	for qemu-devel@nongnu.org; Fri, 25 May 2018 04:32:52 -0400
+Resent-Message-Id: <E1fM89Y-0006I8-C1@eggs.gnu.org>
+Received: from sender-of-o51.zoho.com ([135.84.80.216]:21014)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1fM89Y-0006Gc-4l
+	for qemu-devel@nongnu.org; Fri, 25 May 2018 04:32:48 -0400
 In-Reply-To: <20180525081754.29506-1-laurent@vivier.eu>
-References: <20180525081754.29506-1-laurent@vivier.eu>
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <152723713497.219.16022060837703743762@d39dc562802a>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 07/13] linux-user: move sparc/sparc64 socket.h
- definitions to sparc/sockbits.h
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Fri, 25 May 2018 01:32:15 -0700 (PDT)
+Subject: Re: [Qemu-devel] [PULL 00/13] Linux user for 2.13 patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,185 +28,88 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Riku Voipio <riku.voipio@iki.fi>, Laurent Vivier <laurent@vivier.eu>
+To: laurent@vivier.eu
+Cc: famz@redhat.com, qemu-devel@nongnu.org, riku.voipio@iki.fi
 
-No code change.
-
-Signed-off-by: Laurent Vivier <laurent@vivier.eu>
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Message-Id: <20180519092956.15134-4-laurent@vivier.eu>
----
- linux-user/socket.h           | 44 +-------------------
- linux-user/sparc/sockbits.h   | 94 +++++++++++++++++++++++++++++++++++++++++++
- linux-user/sparc64/sockbits.h |  1 +
- 3 files changed, 97 insertions(+), 42 deletions(-)
- create mode 100644 linux-user/sparc/sockbits.h
- create mode 100644 linux-user/sparc64/sockbits.h
-
-diff --git a/linux-user/socket.h b/linux-user/socket.h
-index 1328906205..8eb62ea3f2 100644
---- a/linux-user/socket.h
-+++ b/linux-user/socket.h
-@@ -1,49 +1,9 @@
- 
--#if defined(TARGET_MIPS) || defined(TARGET_HPPA) || defined(TARGET_ALPHA)
-+#if defined(TARGET_MIPS) || defined(TARGET_HPPA) || defined(TARGET_ALPHA) || \
-+    defined(TARGET_SPARC)
- #include "sockbits.h"
--#else
--
--#if defined(TARGET_SPARC)
--    /** sock_type - Socket types
--     *
--     * Please notice that for binary compat reasons SPARC has to
--     * override the enum sock_type in include/linux/net.h, so
--     * we define ARCH_HAS_SOCKET_TYPES here.
--     *
--     * @SOCK_DGRAM - datagram (conn.less) socket
--     * @SOCK_STREAM - stream (connection) socket
--     * @SOCK_RAW - raw socket
--     * @SOCK_RDM - reliably-delivered message
--     * @SOCK_SEQPACKET - sequential packet socket
--     * @SOCK_DCCP - Datagram Congestion Control Protocol socket
--     * @SOCK_PACKET - linux specific way of getting packets at the dev level.
--     *                For writing rarp and other similar things on the user
--     *                level.
--     * @SOCK_CLOEXEC - sets the close-on-exec (FD_CLOEXEC) flag.
--     * @SOCK_NONBLOCK - sets the O_NONBLOCK file status flag.
--     */
--
--    #define ARCH_HAS_SOCKET_TYPES          1
--
--    enum sock_type {
--           TARGET_SOCK_STREAM      = 1,
--           TARGET_SOCK_DGRAM       = 2,
--           TARGET_SOCK_RAW         = 3,
--           TARGET_SOCK_RDM         = 4,
--           TARGET_SOCK_SEQPACKET   = 5,
--           TARGET_SOCK_DCCP        = 6,
--           TARGET_SOCK_PACKET      = 10,
--           TARGET_SOCK_CLOEXEC     = 020000000,
--           TARGET_SOCK_NONBLOCK    = 040000,
--    };
--
--    #define TARGET_SOCK_MAX (TARGET_SOCK_PACKET + 1)
--    #define TARGET_SOCK_TYPE_MASK    0xf  /* Covers up to TARGET_SOCK_MAX-1. */
--
--    #define TARGET_SO_PASSSEC        31
- #else
-     #define TARGET_SO_PASSSEC        34
--#endif
- 
-     /* For setsockopt(2) */
-     #define TARGET_SOL_SOCKET      1
-diff --git a/linux-user/sparc/sockbits.h b/linux-user/sparc/sockbits.h
-new file mode 100644
-index 0000000000..385061c8b0
---- /dev/null
-+++ b/linux-user/sparc/sockbits.h
-@@ -0,0 +1,94 @@
-+/*
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License version 2 as
-+ * published by the Free Software Foundation, or (at your option) any
-+ * later version. See the COPYING file in the top-level directory.
-+ */
-+
-+#ifndef SPARC_SOCKBITS_H
-+#define SPARC_SOCKBITS_H
-+
-+/** sock_type - Socket types
-+ *
-+ * Please notice that for binary compat reasons SPARC has to
-+ * override the enum sock_type in include/linux/net.h, so
-+ * we define ARCH_HAS_SOCKET_TYPES here.
-+ *
-+ * @SOCK_DGRAM - datagram (conn.less) socket
-+ * @SOCK_STREAM - stream (connection) socket
-+ * @SOCK_RAW - raw socket
-+ * @SOCK_RDM - reliably-delivered message
-+ * @SOCK_SEQPACKET - sequential packet socket
-+ * @SOCK_DCCP - Datagram Congestion Control Protocol socket
-+ * @SOCK_PACKET - linux specific way of getting packets at the dev level.
-+ *                For writing rarp and other similar things on the user
-+ *                level.
-+ * @SOCK_CLOEXEC - sets the close-on-exec (FD_CLOEXEC) flag.
-+ * @SOCK_NONBLOCK - sets the O_NONBLOCK file status flag.
-+ */
-+
-+#define ARCH_HAS_SOCKET_TYPES          1
-+
-+enum sock_type {
-+       TARGET_SOCK_STREAM      = 1,
-+       TARGET_SOCK_DGRAM       = 2,
-+       TARGET_SOCK_RAW         = 3,
-+       TARGET_SOCK_RDM         = 4,
-+       TARGET_SOCK_SEQPACKET   = 5,
-+       TARGET_SOCK_DCCP        = 6,
-+       TARGET_SOCK_PACKET      = 10,
-+       TARGET_SOCK_CLOEXEC     = 020000000,
-+       TARGET_SOCK_NONBLOCK    = 040000,
-+};
-+
-+#define TARGET_SOCK_MAX (TARGET_SOCK_PACKET + 1)
-+#define TARGET_SOCK_TYPE_MASK    0xf  /* Covers up to TARGET_SOCK_MAX-1. */
-+
-+#define TARGET_SO_PASSSEC        31
-+
-+/* For setsockopt(2) */
-+#define TARGET_SOL_SOCKET      1
-+
-+#define TARGET_SO_DEBUG        1
-+#define TARGET_SO_REUSEADDR    2
-+#define TARGET_SO_TYPE         3
-+#define TARGET_SO_ERROR        4
-+#define TARGET_SO_DONTROUTE    5
-+#define TARGET_SO_BROADCAST    6
-+#define TARGET_SO_SNDBUF       7
-+#define TARGET_SO_RCVBUF       8
-+#define TARGET_SO_SNDBUFFORCE  32
-+#define TARGET_SO_RCVBUFFORCE  33
-+#define TARGET_SO_KEEPALIVE    9
-+#define TARGET_SO_OOBINLINE    10
-+#define TARGET_SO_NO_CHECK     11
-+#define TARGET_SO_PRIORITY     12
-+#define TARGET_SO_LINGER       13
-+#define TARGET_SO_BSDCOMPAT    14
-+/* To add :#define TARGET_SO_REUSEPORT 15 */
-+#define TARGET_SO_PASSCRED     16
-+#define TARGET_SO_PEERCRED     17
-+#define TARGET_SO_RCVLOWAT     18
-+#define TARGET_SO_SNDLOWAT     19
-+#define TARGET_SO_RCVTIMEO     20
-+#define TARGET_SO_SNDTIMEO     21
-+
-+/* Security levels - as per NRL IPv6 - don't actually do anything */
-+#define TARGET_SO_SECURITY_AUTHENTICATION              22
-+#define TARGET_SO_SECURITY_ENCRYPTION_TRANSPORT        23
-+#define TARGET_SO_SECURITY_ENCRYPTION_NETWORK          24
-+
-+#define TARGET_SO_BINDTODEVICE 25
-+
-+/* Socket filtering */
-+#define TARGET_SO_ATTACH_FILTER        26
-+#define TARGET_SO_DETACH_FILTER        27
-+
-+#define TARGET_SO_PEERNAME             28
-+#define TARGET_SO_TIMESTAMP            29
-+#define TARGET_SCM_TIMESTAMP           TARGET_SO_TIMESTAMP
-+
-+#define TARGET_SO_ACCEPTCONN           30
-+
-+#define TARGET_SO_PEERSEC              31
-+#endif
-diff --git a/linux-user/sparc64/sockbits.h b/linux-user/sparc64/sockbits.h
-new file mode 100644
-index 0000000000..658899e4d3
---- /dev/null
-+++ b/linux-user/sparc64/sockbits.h
-@@ -0,0 +1 @@
-+#include "../sparc/sockbits.h"
--- 
-2.14.3
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
+c3NhZ2UtaWQ6IDIwMTgwNTI1MDgxNzU0LjI5NTA2LTEtbGF1cmVudEB2aXZpZXIuZXUKU3ViamVj
+dDogW1FlbXUtZGV2ZWxdIFtQVUxMIDAwLzEzXSBMaW51eCB1c2VyIGZvciAyLjEzIHBhdGNoZXMK
+Cj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKCkJBU0U9YmFzZQpuPTEKdG90
+YWw9JChnaXQgbG9nIC0tb25lbGluZSAkQkFTRS4uIHwgd2MgLWwpCmZhaWxlZD0wCgpnaXQgY29u
+ZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJl
+bmFtZXMgVHJ1ZQpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5hbGdvcml0aG0gaGlzdG9ncmFtCgpj
+b21taXRzPSIkKGdpdCBsb2cgLS1mb3JtYXQ9JUggLS1yZXZlcnNlICRCQVNFLi4pIgpmb3IgYyBp
+biAkY29tbWl0czsgZG8KICAgIGVjaG8gIkNoZWNraW5nIFBBVENIICRuLyR0b3RhbDogJChnaXQg
+bG9nIC1uIDEgLS1mb3JtYXQ9JXMgJGMpLi4uIgogICAgaWYgISBnaXQgc2hvdyAkYyAtLWZvcm1h
+dD1lbWFpbCB8IC4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgLTsgdGhlbgogICAg
+ICAgIGZhaWxlZD0xCiAgICAgICAgZWNobwogICAgZmkKICAgIG49JCgobisxKSkKZG9uZQoKZXhp
+dCAkZmFpbGVkCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZm
+ODc4MjE2NGQxZGVmN2Y0NGJkODg4NzEzMzg0CkZyb20gaHR0cHM6Ly9naXRodWIuY29tL3BhdGNo
+ZXctcHJvamVjdC9xZW11CiB0IFt0YWcgdXBkYXRlXSAgICAgICAgICAgIHBhdGNoZXcvMTUyNzIz
+Mjk2MC01MTEyMy0xLWdpdC1zZW5kLWVtYWlsLW1qY0BzaWZpdmUuY29tIC0+IHBhdGNoZXcvMTUy
+NzIzMjk2MC01MTEyMy0xLWdpdC1zZW5kLWVtYWlsLW1qY0BzaWZpdmUuY29tCiAqIFtuZXcgdGFn
+XSAgICAgICAgICAgICAgIHBhdGNoZXcvMjAxODA1MjUwODE3NTQuMjk1MDYtMS1sYXVyZW50QHZp
+dmllci5ldSAtPiBwYXRjaGV3LzIwMTgwNTI1MDgxNzU0LjI5NTA2LTEtbGF1cmVudEB2aXZpZXIu
+ZXUKU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0JwoyNGM3YjBkZGIyIGdkYnN0dWI6IENs
+YXJpZnkgd2hhdCBnZGJfaGFuZGxlc2lnKCkgaXMgZG9pbmcKNjFmNWM3ZmFkYyBsaW51eC11c2Vy
+OiBkZWZpbmUgVEFSR0VUX1NPX1JFVVNFUE9SVAozMGNmMzUyM2Q3IGxpbnV4LXVzZXI6IGNvcHkg
+c3BhcmMvc29ja2JpdHMuaCBkZWZpbml0aW9ucyBmcm9tIGxpbnV4CjMyYWI4Njc5OGYgbGludXgt
+dXNlcjogdXBkYXRlIEFSQ0hfSEFTX1NPQ0tFVF9UWVBFUyB1c2UKM2MxZTExNWY2ZSBsaW51eC11
+c2VyOiBtb3ZlIHBwYyBzb2NrZXQuaCBkZWZpbml0aW9ucyB0byBwcGMvc29ja2JpdHMuaAozMmE4
+YjE5NDkzIGxpbnV4LXVzZXI6IG1vdmUgc29ja2V0LmggZ2VuZXJpYyBkZWZpbml0aW9ucyB0byBn
+ZW5lcmljL3NvY2tiaXRzLmgKYzZhM2Q2YjAyMyBsaW51eC11c2VyOiBtb3ZlIHNwYXJjL3NwYXJj
+NjQgc29ja2V0LmggZGVmaW5pdGlvbnMgdG8gc3BhcmMvc29ja2JpdHMuaAo1MjcyMDlhMmExIGxp
+bnV4LXVzZXI6IG1vdmUgYWxwaGEgc29ja2V0LmggZGVmaW5pdGlvbnMgdG8gYWxwaGEvc29ja2Jp
+dHMuaAo2MTJkYWNhOThmIGxpbnV4LXVzZXI6IG1vdmUgbWlwcyBzb2NrZXQuaCBkZWZpbml0aW9u
+cyB0byBtaXBzL3NvY2tiaXRzLmgKZTQ1MjhjYTIwMCBsaW51eC11c2VyOiBGaXggcGF5bG9hZCBz
+aXplIGxvZ2ljIGluIGhvc3RfdG9fdGFyZ2V0X2Ntc2coKQo1NzZhMGY4M2YyIGxpbnV4LXVzZXI6
+IHVwZGF0ZSBjb21tZW50cyB0byBwb2ludCB0byB0Y2dfZXhlY19pbml0KCkKZDdjZjg1MWJmZSBs
+aW51eC11c2VyOiB1cGRhdGUgbmV0bGluayBlbXVsYXRpb24KZDAyZmU5YjRmMSBsaW51eC11c2Vy
+OiBBc3NlcnQgb24gYmFkIHR5cGUgaW4gdGh1bmtfdHlwZV9hbGlnbigpIGFuZCB0aHVua190eXBl
+X3NpemUoKQoKPT09IE9VVFBVVCBCRUdJTiA9PT0KQ2hlY2tpbmcgUEFUQ0ggMS8xMzogbGludXgt
+dXNlcjogQXNzZXJ0IG9uIGJhZCB0eXBlIGluIHRodW5rX3R5cGVfYWxpZ24oKSBhbmQgdGh1bmtf
+dHlwZV9zaXplKCkuLi4KQ2hlY2tpbmcgUEFUQ0ggMi8xMzogbGludXgtdXNlcjogdXBkYXRlIG5l
+dGxpbmsgZW11bGF0aW9uLi4uCkNoZWNraW5nIFBBVENIIDMvMTM6IGxpbnV4LXVzZXI6IHVwZGF0
+ZSBjb21tZW50cyB0byBwb2ludCB0byB0Y2dfZXhlY19pbml0KCkuLi4KQ2hlY2tpbmcgUEFUQ0gg
+NC8xMzogbGludXgtdXNlcjogRml4IHBheWxvYWQgc2l6ZSBsb2dpYyBpbiBob3N0X3RvX3Rhcmdl
+dF9jbXNnKCkuLi4KQ2hlY2tpbmcgUEFUQ0ggNS8xMzogbGludXgtdXNlcjogbW92ZSBtaXBzIHNv
+Y2tldC5oIGRlZmluaXRpb25zIHRvIG1pcHMvc29ja2JpdHMuaC4uLgpXQVJOSU5HOiBhZGRlZCwg
+bW92ZWQgb3IgZGVsZXRlZCBmaWxlKHMpLCBkb2VzIE1BSU5UQUlORVJTIG5lZWQgdXBkYXRpbmc/
+CiMxODogCm5ldyBmaWxlIG1vZGUgMTAwNjQ0CgpFUlJPUjogaWYgdGhpcyBjb2RlIGlzIHJlZHVu
+ZGFudCBjb25zaWRlciByZW1vdmluZyBpdAojNTM6IEZJTEU6IGxpbnV4LXVzZXIvbWlwcy9zb2Nr
+Yml0cy5oOjMxOgorI2lmIDAKCnRvdGFsOiAxIGVycm9ycywgMSB3YXJuaW5ncywgMjI3IGxpbmVz
+IGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAg
+SWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRv
+IHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCkNoZWNraW5n
+IFBBVENIIDYvMTM6IGxpbnV4LXVzZXI6IG1vdmUgYWxwaGEgc29ja2V0LmggZGVmaW5pdGlvbnMg
+dG8gYWxwaGEvc29ja2JpdHMuaC4uLgpXQVJOSU5HOiBhZGRlZCwgbW92ZWQgb3IgZGVsZXRlZCBm
+aWxlKHMpLCBkb2VzIE1BSU5UQUlORVJTIG5lZWQgdXBkYXRpbmc/CiMxOTogCm5ldyBmaWxlIG1v
+ZGUgMTAwNjQ0Cgp0b3RhbDogMCBlcnJvcnMsIDEgd2FybmluZ3MsIDIyNCBsaW5lcyBjaGVja2Vk
+CgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBv
+ZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFp
+bnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCkNoZWNraW5nIFBBVENIIDcv
+MTM6IGxpbnV4LXVzZXI6IG1vdmUgc3BhcmMvc3BhcmM2NCBzb2NrZXQuaCBkZWZpbml0aW9ucyB0
+byBzcGFyYy9zb2NrYml0cy5oLi4uCldBUk5JTkc6IGFkZGVkLCBtb3ZlZCBvciBkZWxldGVkIGZp
+bGUocyksIGRvZXMgTUFJTlRBSU5FUlMgbmVlZCB1cGRhdGluZz8KIzc1OiAKbmV3IGZpbGUgbW9k
+ZSAxMDA2NDQKCnRvdGFsOiAwIGVycm9ycywgMSB3YXJuaW5ncywgMTQ2IGxpbmVzIGNoZWNrZWQK
+CllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9m
+IHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWlu
+dGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KQ2hlY2tpbmcgUEFUQ0ggOC8x
+MzogbGludXgtdXNlcjogbW92ZSBzb2NrZXQuaCBnZW5lcmljIGRlZmluaXRpb25zIHRvIGdlbmVy
+aWMvc29ja2JpdHMuaC4uLgpXQVJOSU5HOiBhZGRlZCwgbW92ZWQgb3IgZGVsZXRlZCBmaWxlKHMp
+LCBkb2VzIE1BSU5UQUlORVJTIG5lZWQgdXBkYXRpbmc/CiMxNTogCm5ldyBmaWxlIG1vZGUgMTAw
+NjQ0Cgp0b3RhbDogMCBlcnJvcnMsIDEgd2FybmluZ3MsIDE0OCBsaW5lcyBjaGVja2VkCgpZb3Vy
+IHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVz
+ZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5l
+ciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCkNoZWNraW5nIFBBVENIIDkvMTM6IGxp
+bnV4LXVzZXI6IG1vdmUgcHBjIHNvY2tldC5oIGRlZmluaXRpb25zIHRvIHBwYy9zb2NrYml0cy5o
+Li4uCkNoZWNraW5nIFBBVENIIDEwLzEzOiBsaW51eC11c2VyOiB1cGRhdGUgQVJDSF9IQVNfU09D
+S0VUX1RZUEVTIHVzZS4uLgpDaGVja2luZyBQQVRDSCAxMS8xMzogbGludXgtdXNlcjogY29weSBz
+cGFyYy9zb2NrYml0cy5oIGRlZmluaXRpb25zIGZyb20gbGludXguLi4KQ2hlY2tpbmcgUEFUQ0gg
+MTIvMTM6IGxpbnV4LXVzZXI6IGRlZmluZSBUQVJHRVRfU09fUkVVU0VQT1JULi4uCkNoZWNraW5n
+IFBBVENIIDEzLzEzOiBnZGJzdHViOiBDbGFyaWZ5IHdoYXQgZ2RiX2hhbmRsZXNpZygpIGlzIGRv
+aW5nLi4uCj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6
+IDEKCgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cDov
+L3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZl
+bEByZWRoYXQuY29t
