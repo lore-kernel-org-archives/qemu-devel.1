@@ -1,20 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58470)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58829)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mjc@sifive.com>) id 1fM75e-0007Pr-MG
-	for qemu-devel@nongnu.org; Fri, 25 May 2018 03:24:44 -0400
+	(envelope-from <armbru@redhat.com>) id 1fM78a-0008BY-3C
+	for qemu-devel@nongnu.org; Fri, 25 May 2018 03:27:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mjc@sifive.com>) id 1fM75b-0000ED-LN
-	for qemu-devel@nongnu.org; Fri, 25 May 2018 03:24:42 -0400
-Received: from mail-pl0-x22a.google.com ([2607:f8b0:400e:c01::22a]:37007)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <mjc@sifive.com>) id 1fM75b-0000Dq-GD
-	for qemu-devel@nongnu.org; Fri, 25 May 2018 03:24:39 -0400
-Received: by mail-pl0-x22a.google.com with SMTP id w19-v6so2627810plq.4
-	for <qemu-devel@nongnu.org>; Fri, 25 May 2018 00:24:39 -0700 (PDT)
-From: Michael Clark <mjc@sifive.com>
-Date: Fri, 25 May 2018 19:22:40 +1200
-Message-Id: <1527232960-51123-1-git-send-email-mjc@sifive.com>
-Subject: [Qemu-devel] [PATCH v2] elf: Add RISC-V PSABI ELF header defines
+	(envelope-from <armbru@redhat.com>) id 1fM78Z-0001Hv-4w
+	for qemu-devel@nongnu.org; Fri, 25 May 2018 03:27:44 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <20180521063516.5479-1-famz@redhat.com>
+	<677208b5-586b-354a-5fd4-67468152510e@redhat.com>
+	<20180525021641.GD12594@lemon.usersys.redhat.com>
+	<87a7soxp5j.fsf@dusky.pond.sub.org>
+	<20180525062503.GE28589@lemon.usersys.redhat.com>
+Date: Fri, 25 May 2018 09:27:34 +0200
+In-Reply-To: <20180525062503.GE28589@lemon.usersys.redhat.com> (Fam Zheng's
+	message of "Fri, 25 May 2018 14:25:03 +0800")
+Message-ID: <87sh6gurdl.fsf@dusky.pond.sub.org>
+MIME-Version: 1.0
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH] nvme: Make nvme_init error handling code
+ more readable
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,40 +27,88 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, qemu-trivial@nongnu.org
-Cc: patches@groups.riscv.org, Michael Clark <mjc@sifive.com>, Michael Tokarev <mjt@tls.msk.ru>, Laurent Vivier <laurent@vivier.eu>, Richard Henderson <richard.henderson@linaro.org>, Alistair Francis <Alistair.Francis@wdc.com>
+To: Fam Zheng <famz@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
 
-Refer to the RISC-V PSABI specification for details:
+Fam Zheng <famz@redhat.com> writes:
 
-- https://github.com/riscv/riscv-elf-psabi-doc/blob/master/riscv-elf.md
+> On Fri, 05/25 07:47, Markus Armbruster wrote:
+>> Fam Zheng <famz@redhat.com> writes:
+>> 
+>> > On Thu, 05/24 19:16, Paolo Bonzini wrote:
+>> >> On 21/05/2018 08:35, Fam Zheng wrote:
+>> >> > Coverity doesn't like the tests under fail label (report CID 1385847).
+>> >> > Reset the fields so the clean up order is more apparent.
+>> >> > 
+>> >> > Signed-off-by: Fam Zheng <famz@redhat.com>
+>> >> > ---
+>> >> >  block/nvme.c | 7 +++++++
+>> >> >  1 file changed, 7 insertions(+)
+>> >> > 
+>> >> > diff --git a/block/nvme.c b/block/nvme.c
+>> >> > index 6f71122bf5..8239b920c8 100644
+>> >> > --- a/block/nvme.c
+>> >> > +++ b/block/nvme.c
+>> >> > @@ -560,6 +560,13 @@ static int nvme_init(BlockDriverState *bs, const char *device, int namespace,
+>> >> >      qemu_co_queue_init(&s->dma_flush_queue);
+>> >> >      s->nsid = namespace;
+>> >> >      s->aio_context = bdrv_get_aio_context(bs);
+>> >> > +
+>> >> > +    /* Fields we've not touched should be zero-initialized by block layer
+>> >> > +     * already, but reset them anyway to make the error handling code easier to
+>> >> > +     * reason. */
+>> >> > +    s->regs = NULL;
+>> >> > +    s->vfio = NULL;
+>> >> > +
+>> >> >      ret = event_notifier_init(&s->irq_notifier, 0);
+>> >> >      if (ret) {
+>> >> >          error_setg(errp, "Failed to init event notifier");
+>> >> > 
+>> >> 
+>> >> I think we should just mark it as a false positive or do something like
+>> >> 
+>> >> fail_regs:
+>> >>     qemu_vfio_pci_unmap_bar(s->vfio, 0, (void *)s->regs, 0, NVME_BAR_SIZE);
+>> >> fail_vfio:
+>> >>     qemu_vfio_close(s->vfio);
+>> >> fail:
+>> >>     g_free(s->queues);
+>> >>     event_notifier_cleanup(&s->irq_notifier);
+>> >>     return ret;
+>> >> 
+>> >> even though it's a larger patch.
+>> >
+>> > And that makes five labels in total, I'm not sure I like it:
+>> >
+>> > fail_handler:
+>> >     aio_set_event_notifier(bdrv_get_aio_context(bs), &s->irq_notifier,
+>> >                            false, NULL, NULL);
+>> > fail_queue:
+>> >     nvme_free_queue_pair(bs, s->queues[0]);
+>> > fail_regs:
+>> >     qemu_vfio_pci_unmap_bar(s->vfio, 0, (void *)s->regs, 0, NVME_BAR_SIZE);
+>> > fail_vfio:
+>> >     qemu_vfio_close(s->vfio);
+>> > fail:
+>> >     g_free(s->queues);
+>> >     event_notifier_cleanup(&s->irq_notifier);
+>> >     return ret;
+>> 
+>> Doesn't look materially worse to me :)
+>
+> The labels themselves are not ugly or bad, but the goto statements above will be
+> harder to manage.
 
-Cc: Michael Tokarev <mjt@tls.msk.ru>
-Cc: Laurent Vivier <laurent@vivier.eu>
-Cc: Richard Henderson <richard.henderson@linaro.org>
-Cc: Alistair Francis <Alistair.Francis@wdc.com>
-Signed-off-by: Michael Clark <mjc@sifive.com>
----
- include/elf.h | 8 ++++++++
- 1 file changed, 8 insertions(+)
+Slightly.  The difference between three and five feels smaller than say
+the one between one and three.  Admittedly subjective.
 
-diff --git a/include/elf.h b/include/elf.h
-index 934dbbd6b3ae..bd0493f43d19 100644
---- a/include/elf.h
-+++ b/include/elf.h
-@@ -1285,6 +1285,14 @@ typedef struct {
- #define R_IA64_DTPREL64LSB	0xb7	/* @dtprel(sym + add), data8 LSB */
- #define R_IA64_LTOFF_DTPREL22	0xba	/* @ltoff(@dtprel(s+a)), imm22 */
- 
-+/* RISC-V specific definitions.  */
-+#define EF_RISCV_RVC 0x0001
-+#define EF_RISCV_FLOAT_ABI_SINGLE 0x0002
-+#define EF_RISCV_FLOAT_ABI_DOUBLE 0x0004
-+#define EF_RISCV_FLOAT_ABI_QUAD 0x0006
-+#define EF_RISCV_RVE 0x0008
-+#define EF_RISCV_TSO 0x0010
-+
- typedef struct elf32_rel {
-   Elf32_Addr	r_offset;
-   Elf32_Word	r_info;
--- 
-2.7.0
+>> With nice cleanup functions that detect "hasn't been set up" and do
+>> nothing then, like free(NULL), you can use just one label.  Sadly,
+>> cleanup functions are often not nice that way.
+>
+> nvme_free_queue_pair and qemu_vfio_close are cleanup functions and we can
+> improve them, but to make qemu_vfio_pci_unmap_bar behave similarly is just odd:
+> it's not a clean up function, at least not for s->vfio.
+
+The technique isn't "all or nothing".  Reducing the number of labels is
+nice even when you can't reduce them to one.
