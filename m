@@ -1,30 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35186)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35552)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1fMCzs-0000FS-NB
-	for qemu-devel@nongnu.org; Fri, 25 May 2018 09:43:09 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1fMD1b-00024F-E2
+	for qemu-devel@nongnu.org; Fri, 25 May 2018 09:44:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1fMCzp-0007pF-Kl
-	for qemu-devel@nongnu.org; Fri, 25 May 2018 09:43:08 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:60350 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1fMCzp-0007p5-G7
-	for qemu-devel@nongnu.org; Fri, 25 May 2018 09:43:05 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.4])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id E6F1A4071188
-	for <qemu-devel@nongnu.org>; Fri, 25 May 2018 13:43:04 +0000 (UTC)
-Date: Fri, 25 May 2018 15:43:03 +0200
-From: Gerd Hoffmann <kraxel@redhat.com>
-Message-ID: <20180525134303.qugv3kiqxjbmumoq@sirius.home.kraxel.org>
-References: <20180525092004.13241-1-kraxel@redhat.com>
-	<87zi0ot27i.fsf@dusky.pond.sub.org>
+	(envelope-from <alex.bennee@linaro.org>) id 1fMD1a-0008Sl-Fm
+	for qemu-devel@nongnu.org; Fri, 25 May 2018 09:44:55 -0400
+Received: from mail-wr0-x243.google.com ([2a00:1450:400c:c0c::243]:37285)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1fMD1a-0008SN-9T
+	for qemu-devel@nongnu.org; Fri, 25 May 2018 09:44:54 -0400
+Received: by mail-wr0-x243.google.com with SMTP id i12-v6so9367731wrc.4
+	for <qemu-devel@nongnu.org>; Fri, 25 May 2018 06:44:54 -0700 (PDT)
+From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+Date: Fri, 25 May 2018 14:38:20 +0100
+Message-Id: <20180525133851.27161-19-alex.bennee@linaro.org>
+In-Reply-To: <20180525133851.27161-1-alex.bennee@linaro.org>
+References: <20180525133851.27161-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <87zi0ot27i.fsf@dusky.pond.sub.org>
-Subject: Re: [Qemu-devel] [PATCH] usb: update docs
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH v5 18/49] tests/tcg: enable building for i386
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,50 +29,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: cota@braap.org, famz@redhat.com, berrange@redhat.com, f4bug@amsat.org, richard.henderson@linaro.org, balrogg@gmail.com, aurelien@aurel32.net, agraf@suse.de
+Cc: qemu-devel@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>
 
-> > diff --git a/docs/usb2.txt b/docs/usb2.txt
-> > index 09df45b5b1..1b0e62d187 100644
-> > --- a/docs/usb2.txt
-> > +++ b/docs/usb2.txt
-> > @@ -1,6 +1,26 @@
-> >  
-> > -USB 2.0 Quick Start
-> > -===================
-> > +USB Quick Start
-> 
-> Would you like to renamed the file from usb2.txt to usb.txt, too?
+While you can construct a compile command that does work using the
+x86_64 host compiler that most people use this is flakey. Different
+distros handle this is different ways so we default to using a known
+good i386 compiler via docker.
 
-Good question.  At least I link to qemu cgit now and then when refering
-to qemu documentation.  Renaming the file would break the links ...
+Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Tested-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
-> > +===============
-> > +
-> > +xhci controller support
-> > +-----------------------
-> > +
-> > +Qemu has xhci host adapter support.  The xhci hardware design is much
-> > +more virtualization-friendly when compared to ehci and uhci, thus xhci
-> > +emulation uses less resources (especially cpu).  So if your guest
-> > +supports xhci (which should be the case for any operating system
-> > +released in recent years) I recommend using it:
-> 
-> I'm afraid "recent years" won't age gracefully.  Perhaps "after 2011 or
-> so"?
+---
+v3
+  - add runner for runcom
+v4
+  - runcom pi10.com directly from SRC_DIR
+v5
+  - define extra test-mmap runs
+---
+ tests/tcg/i386/Makefile.include | 9 +++++++++
+ tests/tcg/i386/Makefile.target  | 7 +++++++
+ 2 files changed, 16 insertions(+)
+ create mode 100644 tests/tcg/i386/Makefile.include
 
-Makes sense.
-
-> > @@ -47,29 +67,15 @@ specifies the first port the controller should attach to, which is
->    Companion controller support
->    ----------------------------
-> 
->    Companion controller support has been added recently.  The operational
-> 
-> For a value of "recently" :)  Rephrase the first sentence?
-
-Well, to be exact pretty much all ehci/uhci text could use a major
-rework.  Left that for another day ...
-
-cheers,
-  Gerd
+diff --git a/tests/tcg/i386/Makefile.include b/tests/tcg/i386/Makefile.include
+new file mode 100644
+index 0000000000..be1c3008dd
+--- /dev/null
++++ b/tests/tcg/i386/Makefile.include
+@@ -0,0 +1,9 @@
++#
++# Makefile.include for all i386
++#
++# There is enough brokeness in x86_64 compilers that we don't default
++# to using the x86_64 system compiler for i386 binaries.
++#
++
++DOCKER_IMAGE=fedora-i386-cross
++DOCKER_CROSS_COMPILER=gcc
+diff --git a/tests/tcg/i386/Makefile.target b/tests/tcg/i386/Makefile.target
+index 2f27b65e2d..8b46cc021e 100644
+--- a/tests/tcg/i386/Makefile.target
++++ b/tests/tcg/i386/Makefile.target
+@@ -28,3 +28,10 @@ hello-i386: LDFLAGS+=-nostdlib
+ test-i386: test-i386.c test-i386-code16.S test-i386-vm86.S test-i386.h test-i386-shift.h test-i386-muldiv.h
+ 	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ \
+ 	   $(<D)/test-i386.c $(<D)/test-i386-code16.S $(<D)/test-i386-vm86.S -lm
++
++# Specialist test runners
++run-runcom: runcom pi_10.com
++	$(call quiet-command, $(QEMU) ./runcom $(I386_SRC)/pi_10.com > runcom.out, "TEST", "$< on $(TARGET_NAME)")
++
++# On i386 and x86_64 Linux only supports 4k pages (large pages are a different hack)
++EXTRA_RUNS+=run-test-mmap-4096
+-- 
+2.17.0
