@@ -1,27 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58749)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59182)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <tiwei.bie@intel.com>) id 1fMB0R-0007eI-A5
-	for qemu-devel@nongnu.org; Fri, 25 May 2018 07:35:36 -0400
+	(envelope-from <david@redhat.com>) id 1fMB24-0008HL-LY
+	for qemu-devel@nongnu.org; Fri, 25 May 2018 07:37:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <tiwei.bie@intel.com>) id 1fMB0N-0000cI-Cu
-	for qemu-devel@nongnu.org; Fri, 25 May 2018 07:35:35 -0400
-Received: from mga09.intel.com ([134.134.136.24]:64196)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <tiwei.bie@intel.com>) id 1fMB0N-0000bv-3T
-	for qemu-devel@nongnu.org; Fri, 25 May 2018 07:35:31 -0400
-Date: Fri, 25 May 2018 19:35:49 +0800
-From: Tiwei Bie <tiwei.bie@intel.com>
-Message-ID: <20180525113549.GA8547@debian>
-References: <20180525110441.7185-1-tiwei.bie@intel.com>
-	<20180525110441.7185-4-tiwei.bie@intel.com>
-	<ae867b0d-2f70-f3ab-6d32-914935b5dd23@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <ae867b0d-2f70-f3ab-6d32-914935b5dd23@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2 3/5] vhost-user: support registering
- external host notifiers
+	(envelope-from <david@redhat.com>) id 1fMB23-0001KB-Qj
+	for qemu-devel@nongnu.org; Fri, 25 May 2018 07:37:16 -0400
+From: David Hildenbrand <david@redhat.com>
+Date: Fri, 25 May 2018 13:37:03 +0200
+Message-Id: <20180525113708.29856-3-david@redhat.com>
+In-Reply-To: <20180525113708.29856-1-david@redhat.com>
+References: <20180525113708.29856-1-david@redhat.com>
+Subject: [Qemu-devel] [PATCH v1 2/7] s390x/tcg: drop tod_basetime
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,61 +19,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jason Wang <jasowang@redhat.com>
-Cc: mst@redhat.com, qemu-devel@nongnu.org, virtio-dev@lists.oasis-open.org
+To: qemu-s390x@nongnu.org
+Cc: qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>, Alexander Graf <agraf@suse.de>, Cornelia Huck <cohuck@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Thomas Huth <thuth@redhat.com>, "Jason J . Herne" <jjherne@linux.ibm.com>, "Collin L . Walling" <walling@linux.ibm.com>, david@redhat.com
 
-On Fri, May 25, 2018 at 07:26:05PM +0800, Jason Wang wrote:
-> On 2018年05月25日 19:04, Tiwei Bie wrote:
-[...]
-> > +static int vhost_user_slave_handle_vring_host_notifier(struct vhost_dev *dev,
-> > +                                                       VhostUserVringArea *area,
-> > +                                                       int fd)
-> > +{
-> > +    int queue_idx = area->u64 & VHOST_USER_VRING_IDX_MASK;
-> > +    size_t page_size = qemu_real_host_page_size;
-> > +    struct vhost_user *u = dev->opaque;
-> > +    VhostUserState *user = u->user;
-> > +    VirtIODevice *vdev = dev->vdev;
-> > +    VhostUserHostNotifier *n;
-> > +    int ret = 0;
-> > +    void *addr;
-> > +    char *name;
-> > +
-> > +    if (!virtio_has_feature(dev->protocol_features,
-> > +                            VHOST_USER_PROTOCOL_F_HOST_NOTIFIER) ||
-> > +        vdev == NULL || queue_idx >= virtio_get_num_queues(vdev)) {
-> > +        ret = -1;
-> > +        goto out;
-> > +    }
-> > +
-> > +    n = &user->notifier[queue_idx];
-> > +
-> > +    if (n->addr) {
-> > +        virtio_queue_set_host_notifier_mr(vdev, queue_idx, &n->mr, false);
-> > +        object_unparent(OBJECT(&n->mr));
-> > +        munmap(n->addr, page_size);
-> > +        n->addr = NULL;
-> > +    }
-> > +
-> > +    if (area->u64 & VHOST_USER_VRING_NOFD_MASK) {
-> > +        goto out;
-> > +    }
-> > +
-> > +    /* Sanity check. */
-> > +    if (area->size != page_size) {
-> > +        ret = -1;
-> > +        goto out;
-> > +    }
-> > +
-> > +    addr = mmap(NULL, page_size, PROT_READ | PROT_WRITE, MAP_SHARED,
-> 
-> It looks to me that PROT_WRITE is sufficient here?
-> 
-> Thanks
-> 
+Never set to anything but 0.
 
-I think it's safer to add PROT_READ. And there's
-no harm to do that.
+Signed-off-by: David Hildenbrand <david@redhat.com>
+---
+ target/s390x/cpu.c         | 1 -
+ target/s390x/cpu.h         | 1 -
+ target/s390x/misc_helper.c | 4 ++--
+ 3 files changed, 2 insertions(+), 4 deletions(-)
 
-Best regards,
-Tiwei Bie
+diff --git a/target/s390x/cpu.c b/target/s390x/cpu.c
+index 167d089722..557074165a 100644
+--- a/target/s390x/cpu.c
++++ b/target/s390x/cpu.c
+@@ -290,7 +290,6 @@ static void s390_cpu_initfn(Object *obj)
+     qemu_get_timedate(&tm, 0);
+     env->tod_offset = TOD_UNIX_EPOCH +
+                       (time2tod(mktimegm(&tm)) * 1000000000ULL);
+-    env->tod_basetime = 0;
+     env->tod_timer = timer_new_ns(QEMU_CLOCK_VIRTUAL, s390x_tod_timer, cpu);
+     env->cpu_timer = timer_new_ns(QEMU_CLOCK_VIRTUAL, s390x_cpu_timer, cpu);
+     s390_cpu_set_state(S390_CPU_STATE_STOPPED, cpu);
+diff --git a/target/s390x/cpu.h b/target/s390x/cpu.h
+index ac51c17fb4..4abfe88a3d 100644
+--- a/target/s390x/cpu.h
++++ b/target/s390x/cpu.h
+@@ -131,7 +131,6 @@ struct CPUS390XState {
+ #endif
+ 
+     uint64_t tod_offset;
+-    uint64_t tod_basetime;
+     QEMUTimer *tod_timer;
+ 
+     QEMUTimer *cpu_timer;
+diff --git a/target/s390x/misc_helper.c b/target/s390x/misc_helper.c
+index 1f834f35ef..044ffc64c4 100644
+--- a/target/s390x/misc_helper.c
++++ b/target/s390x/misc_helper.c
+@@ -142,7 +142,7 @@ uint64_t HELPER(stck)(CPUS390XState *env)
+     uint64_t time;
+ 
+     time = env->tod_offset +
+-        time2tod(qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) - env->tod_basetime);
++        time2tod(qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL));
+ 
+     return time;
+ }
+@@ -162,7 +162,7 @@ void HELPER(sckc)(CPUS390XState *env, uint64_t time)
+     /* nanoseconds */
+     time = tod2time(time);
+ 
+-    timer_mod(env->tod_timer, env->tod_basetime + time);
++    timer_mod(env->tod_timer, time);
+ }
+ 
+ /* Set Tod Programmable Field */
+-- 
+2.17.0
