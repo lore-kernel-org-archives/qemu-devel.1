@@ -1,30 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49929)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50194)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1fM8ps-0005jz-RD
-	for qemu-devel@nongnu.org; Fri, 25 May 2018 05:16:33 -0400
+	(envelope-from <stefanha@redhat.com>) id 1fM8qr-0006KH-Kw
+	for qemu-devel@nongnu.org; Fri, 25 May 2018 05:17:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1fM8po-0004vh-H5
-	for qemu-devel@nongnu.org; Fri, 25 May 2018 05:16:32 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:40878 helo=mx1.redhat.com)
+	(envelope-from <stefanha@redhat.com>) id 1fM8qo-0005Ma-UN
+	for qemu-devel@nongnu.org; Fri, 25 May 2018 05:17:33 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:40904 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1fM8po-0004vS-Dh
-	for qemu-devel@nongnu.org; Fri, 25 May 2018 05:16:28 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.6])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id D514BBB413
-	for <qemu-devel@nongnu.org>; Fri, 25 May 2018 09:16:27 +0000 (UTC)
-From: Juan Quintela <quintela@redhat.com>
-In-Reply-To: <20180525015042.31778-1-peterx@redhat.com> (Peter Xu's message of
-	"Fri, 25 May 2018 09:50:42 +0800")
-References: <20180525015042.31778-1-peterx@redhat.com>
-Reply-To: quintela@redhat.com
-Date: Fri, 25 May 2018 11:16:21 +0200
-Message-ID: <87sh6gnli2.fsf@secure.mitica>
+	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1fM8qo-0005ME-Pj
+	for qemu-devel@nongnu.org; Fri, 25 May 2018 05:17:30 -0400
+Date: Fri, 25 May 2018 10:17:24 +0100
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <20180525091724.GC14757@stefanha-x1.localdomain>
+References: <20180518091440.1559-1-alex.bennee@linaro.org>
+	<20180518091440.1559-3-alex.bennee@linaro.org>
+	<20180518120239.GA31915@stefanha-x1.localdomain>
+	<87h8n5dmrk.fsf@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH] migration: use g_free for ram load bitmap
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="TYecfFk8j8mZq+dy"
+Content-Disposition: inline
+In-Reply-To: <87h8n5dmrk.fsf@linaro.org>
+Subject: Re: [Qemu-devel] [RFC PATCH 2/2] tests/Makefile: comment out flakey
+ tests
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,77 +31,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: qemu-devel@nongnu.org, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: famz@redhat.com, Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>, stefanb@linux.vnet.ibm.com, marcandre.lureau@redhat.com, qemu-devel@nongnu.org
 
-Peter Xu <peterx@redhat.com> wrote:
-> Buffers allocated with bitmap_new() should be freed with g_free().
->
-> Both reported by Coverity:
->
-> *** CID 1391300:  API usage errors  (ALLOC_FREE_MISMATCH)
-> /migration/ram.c: 3517 in ram_dirty_bitmap_reload()
-> 3511          * the last one to sync, we need to notify the main send thread.
-> 3512          */
-> 3513         ram_dirty_bitmap_reload_notify(s);
-> 3514
-> 3515         ret = 0;
-> 3516     out:
->>>>     CID 1391300:  API usage errors  (ALLOC_FREE_MISMATCH)
->>>>     Calling "free" frees "le_bitmap" using "free" but it should
->>>> have been freed using "g_free".
-> 3517         free(le_bitmap);
-> 3518         return ret;
-> 3519     }
-> 3520
-> 3521     static int ram_resume_prepare(MigrationState *s, void *opaque)
-> 3522     {
->
-> *** CID 1391292:  API usage errors  (ALLOC_FREE_MISMATCH)
-> /migration/ram.c: 249 in ramblock_recv_bitmap_send()
-> 243          * Mark as an end, in case the middle part is screwed up due to
-> 244          * some "misterious" reason.
-> 245          */
-> 246         qemu_put_be64(file, RAMBLOCK_RECV_BITMAP_ENDING);
-> 247         qemu_fflush(file);
-> 248
->>>>     CID 1391292:  API usage errors  (ALLOC_FREE_MISMATCH)
->>>>     Calling "free" frees "le_bitmap" using "free" but it should
->>>> have been freed using "g_free".
-> 249         free(le_bitmap);
-> 250
-> 251         if (qemu_file_get_error(file)) {
-> 252             return qemu_file_get_error(file);
-> 253         }
-> 254
->
-> Signed-off-by: Peter Xu <peterx@redhat.com>
-> ---
->  migration/ram.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
->
-> diff --git a/migration/ram.c b/migration/ram.c
-> index 5bcbf7a9f9..c53e8369a3 100644
-> --- a/migration/ram.c
-> +++ b/migration/ram.c
-> @@ -246,7 +246,7 @@ int64_t ramblock_recv_bitmap_send(QEMUFile *file,
->      qemu_put_be64(file, RAMBLOCK_RECV_BITMAP_ENDING);
->      qemu_fflush(file);
->  
-> -    free(le_bitmap);
-> +    g_free(le_bitmap);
->  
->      if (qemu_file_get_error(file)) {
->          return qemu_file_get_error(file);
-> @@ -3514,7 +3514,7 @@ int ram_dirty_bitmap_reload(MigrationState *s, RAMBlock *block)
->  
->      ret = 0;
->  out:
-> -    free(le_bitmap);
-> +    g_free(le_bitmap);
->      return ret;
->  }
 
-Reviewed-by: Juan Quintela <quintela@redhat.com>
+--TYecfFk8j8mZq+dy
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Queued
+On Fri, May 18, 2018 at 04:08:47PM +0100, Alex Benn=E9e wrote:
+>=20
+> Stefan Hajnoczi <stefanha@redhat.com> writes:
+>=20
+> > On Fri, May 18, 2018 at 10:14:40AM +0100, Alex Benn=E9e wrote:
+> >> The following tests keep showing up in failed Travis runs:
+> >>
+> >>   - test-aio
+> >
+> > What is the issue?
+>=20
+> GTESTER tests/test-thread-pool
+> **
+> ERROR:tests/test-aio.c:501:test_timer_schedule: assertion failed: (aio_po=
+ll(ctx, true))
+> GTester: last random seed: R02S66126aca97f9606b33e5d7be7fc9b625
+> make: *** [check-tests/test-aio] Error 1
+> make: *** Waiting for unfinished jobs....
+
+The test_timer_schedule test case relies on timing and is
+non-deterministic.
+
+I couldn't figure out how it managed to fail that specific assertion.
+aio_poll(ctx, true) =3D=3D false happens when aio_notify() was called but I
+don't understand why it happened here.
+
+However, I do see that this test case will fail if the machine is very
+heavily loaded.  The test simply won't reach the places where it should
+wait for the timer.  The timer may expire too early.
+
+Maybe a steppable clock should be used (vmclock), but then the test
+would have to be simplified because the aio_poll(ctx, true) part relies
+on ppoll(2)'s timeout.
+
+Any thoughts, Paolo?
+
+Stefan
+
+--TYecfFk8j8mZq+dy
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJbB9SkAAoJEJykq7OBq3PI4L8H/AhfbpkLDxxXmJgel8up30ar
+wUXHHHPSwwnzsDlaEOQWGUCcaFNcH7Hs/gU7Nl9tmV3jdebc4VVZjjvpDU7oAKbr
+++ny8Jux+ht7OAyF/SMncOnfkyBjaZjdeeX9zeuUQVvW8G3r1UXB/X5S9uvHPaep
+yxuqE9A5R2Z5GFJkgK+BnXu5XVGykhcxCD6PX4vMKBGIdnufUkr3X08uodFat1aa
+z+OYx7t6R7niWS5tRIhM2f2XdN0fqJzs5kQz9JdFmJTKQUJ+5tJ+jMWv7TKw59UB
+AzfHLyBLxAJFQt0O3a78nNGyzuaV/TPlsmoJK/nxdjOVRYB5LTVPrMKG0Yrr+h8=
+=+uc1
+-----END PGP SIGNATURE-----
+
+--TYecfFk8j8mZq+dy--
