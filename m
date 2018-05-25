@@ -1,34 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45873)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46349)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fM5r7-0006AL-Kp
-	for qemu-devel@nongnu.org; Fri, 25 May 2018 02:05:40 -0400
+	(envelope-from <famz@redhat.com>) id 1fM5u0-0007EO-2Q
+	for qemu-devel@nongnu.org; Fri, 25 May 2018 02:08:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fM5r2-0004WP-NI
-	for qemu-devel@nongnu.org; Fri, 25 May 2018 02:05:37 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:59178 helo=mx1.redhat.com)
+	(envelope-from <famz@redhat.com>) id 1fM5tw-0005kd-9d
+	for qemu-devel@nongnu.org; Fri, 25 May 2018 02:08:36 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:59250 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fM5r2-0004WA-Ij
-	for qemu-devel@nongnu.org; Fri, 25 May 2018 02:05:32 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.4])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 1A484854E2
-	for <qemu-devel@nongnu.org>; Fri, 25 May 2018 06:05:32 +0000 (UTC)
-From: Markus Armbruster <armbru@redhat.com>
-References: <1525423069-61903-1-git-send-email-imammedo@redhat.com>
-	<1525423069-61903-5-git-send-email-imammedo@redhat.com>
-	<87h8mx11t9.fsf@dusky.pond.sub.org>
-	<87lgc8zzpn.fsf@dusky.pond.sub.org>
-	<20180524182634.GH8988@localhost.localdomain>
-Date: Fri, 25 May 2018 08:05:30 +0200
-In-Reply-To: <20180524182634.GH8988@localhost.localdomain> (Eduardo Habkost's
-	message of "Thu, 24 May 2018 15:26:34 -0300")
-Message-ID: <87603cxob9.fsf@dusky.pond.sub.org>
+	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1fM5tw-0005kL-3z
+	for qemu-devel@nongnu.org; Fri, 25 May 2018 02:08:32 -0400
+Date: Fri, 25 May 2018 14:08:27 +0800
+From: Fam Zheng <famz@redhat.com>
+Message-ID: <20180525060827.GD28589@lemon.usersys.redhat.com>
+References: <20180525005839.11556-1-crosa@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v7 04/11] hmp: disable monitor in preconfig
- state
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180525005839.11556-1-crosa@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 0/5] Acceptance/functional tests
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,96 +26,104 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: Igor Mammedov <imammedo@redhat.com>, pkrempa@redhat.com, qemu-devel@nongnu.org
+To: Cleber Rosa <crosa@redhat.com>
+Cc: qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>, Stefan Hajnoczi <stefanha@redhat.com>, Amador Pahim <amador@pahim.org>
 
-Eduardo Habkost <ehabkost@redhat.com> writes:
+On Thu, 05/24 20:58, Cleber Rosa wrote:
+> TL;DR
+> =====
+> 
+> Another version, with a minimalist approach, to the acceptance tests
+> infrastructure for QEMU, based on the Avocado Testing Framework.
+> 
+> Background
+> ==========
+> 
+> The previous version, still considered an RFC, was sent to the list by
+> Eduardo[1] was based on the work held in Amador's branch[2].  After
+> reviewing in under a different light, including the experiences
+> done and reported by Philippe[3].
+> 
+> Differences from previous versions
+> ==================================
+> 
+> The main difference is that this series include only the minimal
+> changes deemed necessary to have a starting point.  I like to think
+> that it's better connected to the QEMU community and project needs,
+> and will hopefully allow for a more organic growth.
+> 
+> Since this version has less features than the previous versions,
+> provided it's accepted, these are the next probable development tasks:
+> 
+>  * Provide a simple variants mechanism to allow the same tests to be
+>    run under different targets, machine models and devices (present on
+>    the previous versions as a "YAML to Mux" file with architecture
+>    definitions)
+>  * Implement QEMUMachine migration support (present on the previous
+>    version in the "avocado_qemu.test._VM" class)
+>  * Implement Guest OS image selection and download (mostly an Avocado
+>    feature, paired with a parameter convention and cloud-init support
+>    code)
+>  * Implement interactive support for Guest OS sessions (present on
+>    the previous versions, supported by the aexpect Python module)
+> 
+> Even though this version shares very little (if any) code with the
+> previous versions, the following is a list of noteworthy changes:
+> 
+>  * Tests directory is now "tests/acceptance" (was "tests/avocado")
+>  * Base test class is now "avocado_qemu.Test" (was
+>    "avocado_qemu.test.QemuTest")
+>  * Base test class is now hosted in "avocado_qemu/__init__.py" (was
+>    "avocado_qemu/test.py")
+>  * Direct use of "qemu.QEMUMachine", that is, the
+>    avocado_qemu.test._VM class is gone
+>  * avocado_qemu.Test won't search for QEMU binaries on $PATH.  To use
+>    QEMU binary on a custom system location it's necessary to use the
+>    "qemu_bin" parameter
+>  * Example test in README.rst is distributed as a real test
+>    ("test_version.py")
+>  * A new "Linux boot console" test, loosely modeled after Phillipe's
+>    use case
 
-> On Thu, May 24, 2018 at 08:16:20PM +0200, Markus Armbruster wrote:
->> Markus Armbruster <armbru@redhat.com> writes:
->> 
->> > Igor Mammedov <imammedo@redhat.com> writes:
->> >
->> >> Ban it for now, if someone would need it to work early,
->> >> one would have to implement checks if HMP command is valid
->> >> at preconfig state.
->> >>
->> >> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
->> >> Reviewed-by: Eric Blake <eblake@redhat.com>
->> >> ---
->> >> v5:
->> >>   * add 'use QMP instead" to error message, suggesting user
->> >>     the right interface to use
->> >> v4:
->> >>   * v3 was only printing error but not preventing command execution,
->> >>     Fix it by returning after printing error message.
->> >>     ("Dr. David Alan Gilbert" <dgilbert@redhat.com>)
->> >> ---
->> >>  monitor.c | 6 ++++++
->> >>  1 file changed, 6 insertions(+)
->> >>
->> >> diff --git a/monitor.c b/monitor.c
->> >> index 39f8ee1..0ffdf1d 100644
->> >> --- a/monitor.c
->> >> +++ b/monitor.c
->> >> @@ -3374,6 +3374,12 @@ static void handle_hmp_command(Monitor *mon, const char *cmdline)
->> >>  
->> >>      trace_handle_hmp_command(mon, cmdline);
->> >>  
->> >> +    if (runstate_check(RUN_STATE_PRECONFIG)) {
->> >> +        monitor_printf(mon, "HMP not available in preconfig state, "
->> >> +                            "use QMP instead\n");
->> >> +        return;
->> >> +    }
->> >> +
->> >>      cmd = monitor_parse_command(mon, cmdline, &cmdline, mon->cmd_table);
->> >>      if (!cmd) {
->> >>          return;
->> >
->> > So we offer the user an HMP monitor, but we summarily fail all commands.
->> > I'm sorry, but that's... searching for polite word... embarrassing.  We
->> > should accept HMP output only when we're ready to accept it.  Yes, that
->> > would involve a bit more surgery rather than this cheap hack.  The whole
->> > preconfig thing smells like a cheap hack to me, but let's not overdo it.
->> 
->> Clarification: I don't think we need to hold the series because of
->> this.  I do think you should investigate delaying HMP until it can work.
->
-> What would it mean to delay HMP?  Not creating the socket?
-> Creating the socket but not accepting clients?  Accepting clients
-> but not consuming any input from the socket until we are out of
-> preconfig?
->
-> I'm not sure if any of those options would be better.  If a human
-> is already trying to talk on the other side, it seems better to
-> show QEMU is alive (but not ready to hold a conversation yet)
-> than staying silent.
+I like the direction this series is leading us to.  Making it easy to write
+'correct' and 'effective' tests is the most important thing IMO, and the few
+tests you add here look promising.
 
-If this
+I'm also curious to see a test case involving a guest OS image. (I'm also open to
+a re-implementation of tests/vm/basevm.py with Avocado, if you find it
+worthwhile.)
 
-    QEMU 2.12.50 monitor - type 'help' for more information
-    (qemu) help
-    HMP not available in preconfig state, use QMP instead
-    (qemu) quit
-    HMP not available in preconfig state, use QMP instead
-    (qemu) let me out dammit
-    HMP not available in preconfig state, use QMP instead
-    (qemu) 
+Fam
 
-is better than the alternatives, then I wonder how much more
-entertainment the alternatives could provide!
-
-We *can* do better.  Start like this:
-
-    QEMU 2.12.50 monitor is not ready with -preconfig until you complete
-    configuration with QMP
-
-and when we exit preconfig state, add:
-
-    QEMU 2.12.50 monitor - type 'help' for more information
-    (qemu) 
-
-Note that this is upfront about the monitor not being ready, avoids
-misleading the user about "help", talks to the user in the user's terms
-(-preconfig) instead of internal terms (preconfig state), and is more
-specific on how to ready the monitor.
+> 
+> Commit summary
+> ==============
+> 
+> Cleber Rosa (5):
+>   Add functional/acceptance tests infrastructure
+>   scripts/qemu.py: allow adding to the list of extra arguments
+>   Acceptance tests: add quick VNC tests
+>   scripts/qemu.py: introduce set_console() method
+>   Acceptance tests: add Linux kernel boot and console checking test
+> 
+>  scripts/qemu.py                             | 103 +++++++++++++++-
+>  scripts/test_qemu.py                        | 176 +++++++++++++++++++++++++++
+>  tests/acceptance/README.rst                 | 141 +++++++++++++++++++++
+>  tests/acceptance/avocado_qemu/__init__.py   |  45 +++++++
+>  tests/acceptance/test_boot_linux_console.py |  37 ++++++
+>  tests/acceptance/test_version.py            |  13 ++
+>  tests/acceptance/test_vnc.py                |  50 ++++++++
+>  7 files changed, 564 insertions(+), 1 deletion(-)
+>  create mode 100644 scripts/test_qemu.py
+>  create mode 100644 tests/acceptance/README.rst
+>  create mode 100644 tests/acceptance/avocado_qemu/__init__.py
+>  create mode 100644 tests/acceptance/test_boot_linux_console.py
+>  create mode 100644 tests/acceptance/test_version.py
+>  create mode 100644 tests/acceptance/test_vnc.py
+> 
+> ---
+> 
+> [1] https://lists.gnu.org/archive/html/qemu-devel/2018-04/msg03443.html
+> [2] https://github.com/apahim/qemu/commits/avocado_qemu
+> [3] https://lists.gnu.org/archive/html/qemu-devel/2018-04/msg03076.html
+> 
