@@ -1,21 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38464)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38483)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1fM7ve-0001mG-1D
+	(envelope-from <laurent@vivier.eu>) id 1fM7ve-0001mc-P5
 	for qemu-devel@nongnu.org; Fri, 25 May 2018 04:18:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1fM7vZ-0008Gu-Jv
+	(envelope-from <laurent@vivier.eu>) id 1fM7vZ-0008HI-MT
 	for qemu-devel@nongnu.org; Fri, 25 May 2018 04:18:26 -0400
-Received: from mout.kundenserver.de ([217.72.192.74]:50271)
+Received: from mout.kundenserver.de ([217.72.192.74]:33583)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1fM7vZ-0008Fc-AN
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1fM7vZ-0008Fj-Dn
 	for qemu-devel@nongnu.org; Fri, 25 May 2018 04:18:21 -0400
 From: Laurent Vivier <laurent@vivier.eu>
-Date: Fri, 25 May 2018 10:17:49 +0200
-Message-Id: <20180525081754.29506-9-laurent@vivier.eu>
+Date: Fri, 25 May 2018 10:17:43 +0200
+Message-Id: <20180525081754.29506-3-laurent@vivier.eu>
 In-Reply-To: <20180525081754.29506-1-laurent@vivier.eu>
 References: <20180525081754.29506-1-laurent@vivier.eu>
-Subject: [Qemu-devel] [PULL 08/13] linux-user: move socket.h generic
- definitions to generic/sockbits.h
+Subject: [Qemu-devel] [PULL 02/13] linux-user: update netlink emulation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,295 +26,156 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Riku Voipio <riku.voipio@iki.fi>, Laurent Vivier <laurent@vivier.eu>
 
-and include the file from architectures without specific definitions
+Update enums with entries from linux 4.17
+
+Translate entries that generate logs with iproute2 4.9.0 and
+host kernel 4.15:
+
+  # ip address show
+  Unknown host QEMU_IFLA type: 43
+  Unknown host QEMU_IFLA type: 43
+  Unknown host QEMU_IFLA type: 43
+  Unknown QEMU_IFLA_BR type 41
+  Unknown QEMU_IFLA_BR type 42
+  Unknown QEMU_IFLA_BR type 43
+  Unknown QEMU_IFLA_BR type 44
+  Unknown host QEMU_IFLA type: 43
+  Unknown QEMU_IFLA_BR type 41
+  Unknown QEMU_IFLA_BR type 42
+  Unknown QEMU_IFLA_BR type 43
+  Unknown QEMU_IFLA_BR type 44
+  Unknown host QEMU_IFLA type: 43
 
 Signed-off-by: Laurent Vivier <laurent@vivier.eu>
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
-Message-Id: <20180519092956.15134-5-laurent@vivier.eu>
+Message-Id: <20180516221213.11111-1-laurent@vivier.eu>
 ---
- linux-user/aarch64/sockbits.h    |  1 +
- linux-user/arm/sockbits.h        |  1 +
- linux-user/cris/sockbits.h       |  1 +
- linux-user/generic/sockbits.h    | 67 ++++++++++++++++++++++++++++++++++++++++
- linux-user/i386/sockbits.h       |  1 +
- linux-user/m68k/sockbits.h       |  1 +
- linux-user/microblaze/sockbits.h |  1 +
- linux-user/nios2/sockbits.h      |  1 +
- linux-user/openrisc/sockbits.h   |  1 +
- linux-user/ppc/sockbits.h        |  1 +
- linux-user/riscv/sockbits.h      |  1 +
- linux-user/s390x/sockbits.h      |  1 +
- linux-user/sh4/sockbits.h        |  1 +
- linux-user/socket.h              | 61 ------------------------------------
- linux-user/tilegx/sockbits.h     |  1 +
- linux-user/x86_64/sockbits.h     |  1 +
- linux-user/xtensa/sockbits.h     |  1 +
- 17 files changed, 82 insertions(+), 61 deletions(-)
- create mode 100644 linux-user/aarch64/sockbits.h
- create mode 100644 linux-user/arm/sockbits.h
- create mode 100644 linux-user/cris/sockbits.h
- create mode 100644 linux-user/generic/sockbits.h
- create mode 100644 linux-user/i386/sockbits.h
- create mode 100644 linux-user/m68k/sockbits.h
- create mode 100644 linux-user/microblaze/sockbits.h
- create mode 100644 linux-user/nios2/sockbits.h
- create mode 100644 linux-user/openrisc/sockbits.h
- create mode 100644 linux-user/ppc/sockbits.h
- create mode 100644 linux-user/riscv/sockbits.h
- create mode 100644 linux-user/s390x/sockbits.h
- create mode 100644 linux-user/sh4/sockbits.h
- create mode 100644 linux-user/tilegx/sockbits.h
- create mode 100644 linux-user/x86_64/sockbits.h
- create mode 100644 linux-user/xtensa/sockbits.h
+ linux-user/syscall.c | 58 ++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 58 insertions(+)
 
-diff --git a/linux-user/aarch64/sockbits.h b/linux-user/aarch64/sockbits.h
-new file mode 100644
-index 0000000000..0e4c8f012d
---- /dev/null
-+++ b/linux-user/aarch64/sockbits.h
-@@ -0,0 +1 @@
-+#include "../generic/sockbits.h"
-diff --git a/linux-user/arm/sockbits.h b/linux-user/arm/sockbits.h
-new file mode 100644
-index 0000000000..0e4c8f012d
---- /dev/null
-+++ b/linux-user/arm/sockbits.h
-@@ -0,0 +1 @@
-+#include "../generic/sockbits.h"
-diff --git a/linux-user/cris/sockbits.h b/linux-user/cris/sockbits.h
-new file mode 100644
-index 0000000000..0e4c8f012d
---- /dev/null
-+++ b/linux-user/cris/sockbits.h
-@@ -0,0 +1 @@
-+#include "../generic/sockbits.h"
-diff --git a/linux-user/generic/sockbits.h b/linux-user/generic/sockbits.h
-new file mode 100644
-index 0000000000..093faf0a48
---- /dev/null
-+++ b/linux-user/generic/sockbits.h
-@@ -0,0 +1,67 @@
-+/*
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License version 2 as
-+ * published by the Free Software Foundation, or (at your option) any
-+ * later version. See the COPYING file in the top-level directory.
-+ */
-+
-+#ifndef GENERIC_SOCKBITS_H
-+#define GENERIC_SOCKBITS_H
-+
-+#define TARGET_SO_PASSSEC        34
-+
-+/* For setsockopt(2) */
-+#define TARGET_SOL_SOCKET      1
-+
-+#define TARGET_SO_DEBUG        1
-+#define TARGET_SO_REUSEADDR    2
-+#define TARGET_SO_TYPE         3
-+#define TARGET_SO_ERROR        4
-+#define TARGET_SO_DONTROUTE    5
-+#define TARGET_SO_BROADCAST    6
-+#define TARGET_SO_SNDBUF       7
-+#define TARGET_SO_RCVBUF       8
-+#define TARGET_SO_SNDBUFFORCE  32
-+#define TARGET_SO_RCVBUFFORCE  33
-+#define TARGET_SO_KEEPALIVE    9
-+#define TARGET_SO_OOBINLINE    10
-+#define TARGET_SO_NO_CHECK     11
-+#define TARGET_SO_PRIORITY     12
-+#define TARGET_SO_LINGER       13
-+#define TARGET_SO_BSDCOMPAT    14
-+/* To add :#define TARGET_SO_REUSEPORT 15 */
-+#if defined(TARGET_PPC)
-+#define TARGET_SO_RCVLOWAT     16
-+#define TARGET_SO_SNDLOWAT     17
-+#define TARGET_SO_RCVTIMEO     18
-+#define TARGET_SO_SNDTIMEO     19
-+#define TARGET_SO_PASSCRED     20
-+#define TARGET_SO_PEERCRED     21
-+#else
-+#define TARGET_SO_PASSCRED     16
-+#define TARGET_SO_PEERCRED     17
-+#define TARGET_SO_RCVLOWAT     18
-+#define TARGET_SO_SNDLOWAT     19
-+#define TARGET_SO_RCVTIMEO     20
-+#define TARGET_SO_SNDTIMEO     21
-+#endif
-+
-+/* Security levels - as per NRL IPv6 - don't actually do anything */
-+#define TARGET_SO_SECURITY_AUTHENTICATION              22
-+#define TARGET_SO_SECURITY_ENCRYPTION_TRANSPORT        23
-+#define TARGET_SO_SECURITY_ENCRYPTION_NETWORK          24
-+
-+#define TARGET_SO_BINDTODEVICE 25
-+
-+/* Socket filtering */
-+#define TARGET_SO_ATTACH_FILTER        26
-+#define TARGET_SO_DETACH_FILTER        27
-+
-+#define TARGET_SO_PEERNAME             28
-+#define TARGET_SO_TIMESTAMP            29
-+#define TARGET_SCM_TIMESTAMP           TARGET_SO_TIMESTAMP
-+
-+#define TARGET_SO_ACCEPTCONN           30
-+
-+#define TARGET_SO_PEERSEC              31
-+#endif
-diff --git a/linux-user/i386/sockbits.h b/linux-user/i386/sockbits.h
-new file mode 100644
-index 0000000000..0e4c8f012d
---- /dev/null
-+++ b/linux-user/i386/sockbits.h
-@@ -0,0 +1 @@
-+#include "../generic/sockbits.h"
-diff --git a/linux-user/m68k/sockbits.h b/linux-user/m68k/sockbits.h
-new file mode 100644
-index 0000000000..0e4c8f012d
---- /dev/null
-+++ b/linux-user/m68k/sockbits.h
-@@ -0,0 +1 @@
-+#include "../generic/sockbits.h"
-diff --git a/linux-user/microblaze/sockbits.h b/linux-user/microblaze/sockbits.h
-new file mode 100644
-index 0000000000..0e4c8f012d
---- /dev/null
-+++ b/linux-user/microblaze/sockbits.h
-@@ -0,0 +1 @@
-+#include "../generic/sockbits.h"
-diff --git a/linux-user/nios2/sockbits.h b/linux-user/nios2/sockbits.h
-new file mode 100644
-index 0000000000..0e4c8f012d
---- /dev/null
-+++ b/linux-user/nios2/sockbits.h
-@@ -0,0 +1 @@
-+#include "../generic/sockbits.h"
-diff --git a/linux-user/openrisc/sockbits.h b/linux-user/openrisc/sockbits.h
-new file mode 100644
-index 0000000000..0e4c8f012d
---- /dev/null
-+++ b/linux-user/openrisc/sockbits.h
-@@ -0,0 +1 @@
-+#include "../generic/sockbits.h"
-diff --git a/linux-user/ppc/sockbits.h b/linux-user/ppc/sockbits.h
-new file mode 100644
-index 0000000000..0e4c8f012d
---- /dev/null
-+++ b/linux-user/ppc/sockbits.h
-@@ -0,0 +1 @@
-+#include "../generic/sockbits.h"
-diff --git a/linux-user/riscv/sockbits.h b/linux-user/riscv/sockbits.h
-new file mode 100644
-index 0000000000..0e4c8f012d
---- /dev/null
-+++ b/linux-user/riscv/sockbits.h
-@@ -0,0 +1 @@
-+#include "../generic/sockbits.h"
-diff --git a/linux-user/s390x/sockbits.h b/linux-user/s390x/sockbits.h
-new file mode 100644
-index 0000000000..0e4c8f012d
---- /dev/null
-+++ b/linux-user/s390x/sockbits.h
-@@ -0,0 +1 @@
-+#include "../generic/sockbits.h"
-diff --git a/linux-user/sh4/sockbits.h b/linux-user/sh4/sockbits.h
-new file mode 100644
-index 0000000000..0e4c8f012d
---- /dev/null
-+++ b/linux-user/sh4/sockbits.h
-@@ -0,0 +1 @@
-+#include "../generic/sockbits.h"
-diff --git a/linux-user/socket.h b/linux-user/socket.h
-index 8eb62ea3f2..135f438bdf 100644
---- a/linux-user/socket.h
-+++ b/linux-user/socket.h
-@@ -1,66 +1,5 @@
+diff --git a/linux-user/syscall.c b/linux-user/syscall.c
+index af8603f1b7..dd77f86ea2 100644
+--- a/linux-user/syscall.c
++++ b/linux-user/syscall.c
+@@ -405,6 +405,8 @@ enum {
+     QEMU_IFLA_BR_PAD,
+     QEMU_IFLA_BR_VLAN_STATS_ENABLED,
+     QEMU_IFLA_BR_MCAST_STATS_ENABLED,
++    QEMU_IFLA_BR_MCAST_IGMP_VERSION,
++    QEMU_IFLA_BR_MCAST_MLD_VERSION,
+     QEMU___IFLA_BR_MAX,
+ };
  
--#if defined(TARGET_MIPS) || defined(TARGET_HPPA) || defined(TARGET_ALPHA) || \
--    defined(TARGET_SPARC)
- #include "sockbits.h"
--#else
--    #define TARGET_SO_PASSSEC        34
--
--    /* For setsockopt(2) */
--    #define TARGET_SOL_SOCKET      1
--
--    #define TARGET_SO_DEBUG        1
--    #define TARGET_SO_REUSEADDR    2
--    #define TARGET_SO_TYPE         3
--    #define TARGET_SO_ERROR        4
--    #define TARGET_SO_DONTROUTE    5
--    #define TARGET_SO_BROADCAST    6
--    #define TARGET_SO_SNDBUF       7
--    #define TARGET_SO_RCVBUF       8
--    #define TARGET_SO_SNDBUFFORCE  32
--    #define TARGET_SO_RCVBUFFORCE  33
--    #define TARGET_SO_KEEPALIVE    9
--    #define TARGET_SO_OOBINLINE    10
--    #define TARGET_SO_NO_CHECK     11
--    #define TARGET_SO_PRIORITY     12
--    #define TARGET_SO_LINGER       13
--    #define TARGET_SO_BSDCOMPAT    14
--    /* To add :#define TARGET_SO_REUSEPORT 15 */
--#if defined(TARGET_PPC)
--    #define TARGET_SO_RCVLOWAT     16
--    #define TARGET_SO_SNDLOWAT     17
--    #define TARGET_SO_RCVTIMEO     18
--    #define TARGET_SO_SNDTIMEO     19
--    #define TARGET_SO_PASSCRED     20
--    #define TARGET_SO_PEERCRED     21
--#else
--    #define TARGET_SO_PASSCRED     16
--    #define TARGET_SO_PEERCRED     17
--    #define TARGET_SO_RCVLOWAT     18
--    #define TARGET_SO_SNDLOWAT     19
--    #define TARGET_SO_RCVTIMEO     20
--    #define TARGET_SO_SNDTIMEO     21
--#endif
--
--    /* Security levels - as per NRL IPv6 - don't actually do anything */
--    #define TARGET_SO_SECURITY_AUTHENTICATION              22
--    #define TARGET_SO_SECURITY_ENCRYPTION_TRANSPORT        23
--    #define TARGET_SO_SECURITY_ENCRYPTION_NETWORK          24
--
--    #define TARGET_SO_BINDTODEVICE 25
--
--    /* Socket filtering */
--    #define TARGET_SO_ATTACH_FILTER        26
--    #define TARGET_SO_DETACH_FILTER        27
--
--    #define TARGET_SO_PEERNAME             28
--    #define TARGET_SO_TIMESTAMP            29
--    #define TARGET_SCM_TIMESTAMP           TARGET_SO_TIMESTAMP
--
--    #define TARGET_SO_ACCEPTCONN           30
--
--    #define TARGET_SO_PEERSEC              31
--
--#endif
+@@ -453,6 +455,12 @@ enum {
+     QEMU_IFLA_GSO_MAX_SIZE,
+     QEMU_IFLA_PAD,
+     QEMU_IFLA_XDP,
++    QEMU_IFLA_EVENT,
++    QEMU_IFLA_NEW_NETNSID,
++    QEMU_IFLA_IF_NETNSID,
++    QEMU_IFLA_CARRIER_UP_COUNT,
++    QEMU_IFLA_CARRIER_DOWN_COUNT,
++    QEMU_IFLA_NEW_IFINDEX,
+     QEMU___IFLA_MAX
+ };
  
- #ifndef ARCH_HAS_SOCKET_TYPES
-     /** sock_type - Socket types - default values
-diff --git a/linux-user/tilegx/sockbits.h b/linux-user/tilegx/sockbits.h
-new file mode 100644
-index 0000000000..0e4c8f012d
---- /dev/null
-+++ b/linux-user/tilegx/sockbits.h
-@@ -0,0 +1 @@
-+#include "../generic/sockbits.h"
-diff --git a/linux-user/x86_64/sockbits.h b/linux-user/x86_64/sockbits.h
-new file mode 100644
-index 0000000000..0e4c8f012d
---- /dev/null
-+++ b/linux-user/x86_64/sockbits.h
-@@ -0,0 +1 @@
-+#include "../generic/sockbits.h"
-diff --git a/linux-user/xtensa/sockbits.h b/linux-user/xtensa/sockbits.h
-new file mode 100644
-index 0000000000..0e4c8f012d
---- /dev/null
-+++ b/linux-user/xtensa/sockbits.h
-@@ -0,0 +1 @@
-+#include "../generic/sockbits.h"
+@@ -484,6 +492,12 @@ enum {
+     QEMU_IFLA_BRPORT_FLUSH,
+     QEMU_IFLA_BRPORT_MULTICAST_ROUTER,
+     QEMU_IFLA_BRPORT_PAD,
++    QEMU_IFLA_BRPORT_MCAST_FLOOD,
++    QEMU_IFLA_BRPORT_MCAST_TO_UCAST,
++    QEMU_IFLA_BRPORT_VLAN_TUNNEL,
++    QEMU_IFLA_BRPORT_BCAST_FLOOD,
++    QEMU_IFLA_BRPORT_GROUP_FWD_MASK,
++    QEMU_IFLA_BRPORT_NEIGH_SUPPRESS,
+     QEMU___IFLA_BRPORT_MAX
+ };
+ 
+@@ -516,6 +530,15 @@ enum {
+     QEMU___IFLA_INET6_MAX
+ };
+ 
++enum {
++    QEMU_IFLA_XDP_UNSPEC,
++    QEMU_IFLA_XDP_FD,
++    QEMU_IFLA_XDP_ATTACHED,
++    QEMU_IFLA_XDP_FLAGS,
++    QEMU_IFLA_XDP_PROG_ID,
++    QEMU___IFLA_XDP_MAX,
++};
++
+ typedef abi_long (*TargetFdDataFunc)(void *, size_t);
+ typedef abi_long (*TargetFdAddrFunc)(void *, abi_ulong, socklen_t);
+ typedef struct TargetFdTrans {
+@@ -2182,6 +2205,10 @@ static abi_long host_to_target_data_bridge_nlattr(struct nlattr *nlattr,
+     case QEMU_IFLA_BR_NF_CALL_IPTABLES:
+     case QEMU_IFLA_BR_NF_CALL_IP6TABLES:
+     case QEMU_IFLA_BR_NF_CALL_ARPTABLES:
++    case QEMU_IFLA_BR_VLAN_STATS_ENABLED:
++    case QEMU_IFLA_BR_MCAST_STATS_ENABLED:
++    case QEMU_IFLA_BR_MCAST_IGMP_VERSION:
++    case QEMU_IFLA_BR_MCAST_MLD_VERSION:
+         break;
+     /* uint16_t */
+     case QEMU_IFLA_BR_PRIORITY:
+@@ -2253,6 +2280,11 @@ static abi_long host_to_target_slave_data_bridge_nlattr(struct nlattr *nlattr,
+     case QEMU_IFLA_BRPORT_TOPOLOGY_CHANGE_ACK:
+     case QEMU_IFLA_BRPORT_CONFIG_PENDING:
+     case QEMU_IFLA_BRPORT_MULTICAST_ROUTER:
++    case QEMU_IFLA_BRPORT_MCAST_FLOOD:
++    case QEMU_IFLA_BRPORT_MCAST_TO_UCAST:
++    case QEMU_IFLA_BRPORT_VLAN_TUNNEL:
++    case QEMU_IFLA_BRPORT_BCAST_FLOOD:
++    case QEMU_IFLA_BRPORT_NEIGH_SUPPRESS:
+         break;
+     /* uint16_t */
+     case QEMU_IFLA_BRPORT_PRIORITY:
+@@ -2260,6 +2292,7 @@ static abi_long host_to_target_slave_data_bridge_nlattr(struct nlattr *nlattr,
+     case QEMU_IFLA_BRPORT_DESIGNATED_COST:
+     case QEMU_IFLA_BRPORT_ID:
+     case QEMU_IFLA_BRPORT_NO:
++    case QEMU_IFLA_BRPORT_GROUP_FWD_MASK:
+         u16 = NLA_DATA(nlattr);
+         *u16 = tswap16(*u16);
+         break;
+@@ -2434,6 +2467,27 @@ static abi_long host_to_target_data_spec_nlattr(struct nlattr *nlattr,
+     return 0;
+ }
+ 
++static abi_long host_to_target_data_xdp_nlattr(struct nlattr *nlattr,
++                                               void *context)
++{
++    uint32_t *u32;
++
++    switch (nlattr->nla_type) {
++    /* uint8_t */
++    case QEMU_IFLA_XDP_ATTACHED:
++        break;
++    /* uint32_t */
++    case QEMU_IFLA_XDP_PROG_ID:
++        u32 = NLA_DATA(nlattr);
++        *u32 = tswap32(*u32);
++        break;
++    default:
++        gemu_log("Unknown host XDP type: %d\n", nlattr->nla_type);
++        break;
++    }
++    return 0;
++}
++
+ static abi_long host_to_target_data_link_rtattr(struct rtattr *rtattr)
+ {
+     uint32_t *u32;
+@@ -2559,6 +2613,10 @@ static abi_long host_to_target_data_link_rtattr(struct rtattr *rtattr)
+         return host_to_target_for_each_nlattr(RTA_DATA(rtattr), rtattr->rta_len,
+                                               NULL,
+                                              host_to_target_data_spec_nlattr);
++    case QEMU_IFLA_XDP:
++        return host_to_target_for_each_nlattr(RTA_DATA(rtattr), rtattr->rta_len,
++                                              NULL,
++                                                host_to_target_data_xdp_nlattr);
+     default:
+         gemu_log("Unknown host QEMU_IFLA type: %d\n", rtattr->rta_type);
+         break;
 -- 
 2.14.3
