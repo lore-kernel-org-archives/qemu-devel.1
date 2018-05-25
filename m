@@ -1,28 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45466)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51956)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fMDeJ-0005jm-BH
-	for qemu-devel@nongnu.org; Fri, 25 May 2018 10:25:00 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1fME7x-0000bb-B8
+	for qemu-devel@nongnu.org; Fri, 25 May 2018 10:55:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fMDeF-0003sL-Ki
-	for qemu-devel@nongnu.org; Fri, 25 May 2018 10:24:55 -0400
-Received: from mail-wr0-x244.google.com ([2a00:1450:400c:c0c::244]:39140)
+	(envelope-from <richard.henderson@linaro.org>) id 1fME7s-0006bx-Gg
+	for qemu-devel@nongnu.org; Fri, 25 May 2018 10:55:33 -0400
+Received: from mail-qk0-x242.google.com ([2607:f8b0:400d:c09::242]:34001)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1fMDeF-0003ru-Bh
-	for qemu-devel@nongnu.org; Fri, 25 May 2018 10:24:51 -0400
-Received: by mail-wr0-x244.google.com with SMTP id w18-v6so9584740wrn.6
-	for <qemu-devel@nongnu.org>; Fri, 25 May 2018 07:24:51 -0700 (PDT)
-From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Fri, 25 May 2018 15:19:11 +0100
-Message-Id: <20180525141915.6497-6-alex.bennee@linaro.org>
-In-Reply-To: <20180525141915.6497-1-alex.bennee@linaro.org>
-References: <20180525133851.27161-1-alex.bennee@linaro.org>
-	<20180525141915.6497-1-alex.bennee@linaro.org>
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1fME7s-0006bI-2X
+	for qemu-devel@nongnu.org; Fri, 25 May 2018 10:55:28 -0400
+Received: by mail-qk0-x242.google.com with SMTP id p186-v6so4279947qkd.1
+	for <qemu-devel@nongnu.org>; Fri, 25 May 2018 07:55:27 -0700 (PDT)
+References: <20180525132755.21839-1-peter.maydell@linaro.org>
+	<20180525132755.21839-3-peter.maydell@linaro.org>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <d37b2ff8-bb7e-bc2a-c9b8-133854c05d99@linaro.org>
+Date: Fri, 25 May 2018 07:55:21 -0700
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v5 45/49] tests/tcg/Makefile: update to be
- called from Makefile.target
+In-Reply-To: <20180525132755.21839-3-peter.maydell@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 2/6] scripts/update-linux-headers: Handle
+ __aligned_u64
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,259 +32,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: cota@braap.org, famz@redhat.com, berrange@redhat.com, f4bug@amsat.org, richard.henderson@linaro.org, balrogg@gmail.com, aurelien@aurel32.net, agraf@suse.de
-Cc: qemu-devel@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Alex Williamson <alex.williamson@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, patches@linaro.org
 
-This make is now invoked from each individual target make with the
-appropriate CC and EXTRA_CFLAGS set for each guest. It then includes
-additional Makefile.targets from:
+On 05/25/2018 06:27 AM, Peter Maydell wrote:
+> We'll currently replace any 'u64' with a 'uint64_t' including when
+> it's embedded in an '__aligned_u64', creating a '__aligned_uint64_t'
+> which doesn't exist. We need to instead expand out the kernel's
+> definition of __aligned_u64:
+>    #define __aligned_u64 __u64 __attribute__((aligned(8)))
+> before we convert the __u64 to uint64_t.
 
-  - tests/tcg/multiarch (always)
-  - tests/tcg/$(TARGET_BASE_ARCH) (if available)
-  - tests/tcg/$(TARGET_NAME)
+Wow.  I did not believe that would work.  I expected that you'd need to define
+a typedef, or somehow sort the attribute after the identifier to which it applies.
 
-The order is important as the later Makefile's may want to suppress
-TESTS from its base arch profile. Each included Makefile.target is
-responsible for adding TESTS as well as defining any special build
-instructions for individual tests.
+However
 
-Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+typedef unsigned long uint64_t;
+uint64_t __attribute__((aligned(16))) a;
+struct bar { uint64_t __attribute__((aligned(16))) foo; } b;
+
+produces the expected alignments with both gcc(8) and clang(6).
+
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Tested-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
----
-v2
-  - cleaner approach to include sub makefiles
-  - move TESTS/VPATH manipulation into sub-makefile
-  - avoid double inclusion when TARGET_BASE_ARCH==TARGET_NAME
-v4
-  - add timeout to default runner
-  - clean-up comments about build flags
-  - update to handle BUILD_STATIC
-  - add MAINTAINERS entry
-v5
-  - support EXTRA_RUNS for run variants
----
- MAINTAINERS        |   5 ++
- tests/tcg/Makefile | 179 ++++++++++++++++++---------------------------
- 2 files changed, 76 insertions(+), 108 deletions(-)
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index ec385a15df..bfa8d0fb9c 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -2138,6 +2138,11 @@ W: https://travis-ci.org/qemu/qemu
- W: https://app.shippable.com/github/qemu/qemu
- W: http://patchew.org/QEMU/
- 
-+Guest Test Compilation Support
-+M: Alex Bennée <alex.bennee@linaro.org>
-+F: tests/tcg/Makefile
-+L: qemu-devel@nongnu.org
-+
- Documentation
- -------------
- Build system architecture
-diff --git a/tests/tcg/Makefile b/tests/tcg/Makefile
-index e12395117a..8158c1f099 100644
---- a/tests/tcg/Makefile
-+++ b/tests/tcg/Makefile
-@@ -1,125 +1,88 @@
-+# -*- Mode: makefile -*-
-+#
-+# TCG tests
-+#
-+# These are complicated by the fact we want to build them for guest
-+# systems. This requires knowing what guests we are building and which
-+# ones we have cross-compilers for or docker images with
-+# cross-compilers.
-+#
-+# The tests themselves should be as minimal as possible as
-+# cross-compilers don't always have a large amount of libraries
-+# available.
-+#
-+# We only include the host build system for SRC_PATH and we don't
-+# bother with the common rules.mk. We expect the following:
-+#
-+#   CC - the C compiler command
-+#   EXTRA_CFLAGS - any extra CFLAGS
-+#   BUILD_STATIC - are we building static binaries
-+#
-+# By default all tests are statically compiled but some host systems
-+# may not package static libraries by default. If an external
-+# cross-compiler can only build dynamic libraries the user might need
-+# to make extra efforts to ensure ld.so can link at runtime when the
-+# tests are run.
-+#
-+# We also accept SPEED=slow to enable slower running tests
-+#
-+# We also expect to be in the tests build dir for the FOO-linux-user.
-+#
-+
- -include ../../config-host.mak
---include $(SRC_PATH)/rules.mak
-+-include ../config-target.mak
- 
--$(call set-vpath, $(SRC_PATH)/tests/tcg)
-+quiet-command = $(if $(V),$1,$(if $(2),@printf "  %-7s %s\n" $2 $3 && $1, @$1))
- 
--QEMU=../../i386-linux-user/qemu-i386
--QEMU_X86_64=../../x86_64-linux-user/qemu-x86_64
--CC_X86_64=$(CC_I386) -m64
-+# Tests we are building
-+TESTS=
- 
--QEMU_INCLUDES += -I../..
--CFLAGS=-Wall -O2 -g -fno-strict-aliasing
--#CFLAGS+=-msse2
-+# Start with a blank slate, the build targets get to add stuff first
-+CFLAGS=
-+QEMU_CFLAGS=
- LDFLAGS=
- 
--# TODO: automatically detect ARM and MIPS compilers, and run those too
--
--# runcom maps page 0, so it requires root privileges
--# also, pi_10.com runs indefinitely
--
--I386_TESTS=hello-i386 \
--	   sha1-i386 \
--	   test-i386 \
--	   test-i386-fprem \
--	   # runcom
-+# The QEMU for this TARGET
-+QEMU=../qemu-$(TARGET_NAME)
-+TIMEOUT=15
- 
--# native i386 compilers sometimes are not biarch.  assume cross-compilers are
--ifneq ($(ARCH),i386)
--I386_TESTS+=run-test-x86_64
-+# The order we include is important. We include multiarch, base arch
-+# and finally arch if it's not the same as base arch.
-+-include $(SRC_PATH)/tests/tcg/multiarch/Makefile.target
-+-include $(SRC_PATH)/tests/tcg/$(TARGET_BASE_ARCH)/Makefile.target
-+ifneq ($(TARGET_BASE_ARCH),$(TARGET_NAME))
-+-include $(SRC_PATH)/tests/tcg/$(TARGET_NAME)/Makefile.target
- endif
- 
--TESTS = test_path
--ifneq ($(call find-in-path, $(CC_I386)),)
--TESTS += $(I386_TESTS)
-+# Add the common build options
-+CFLAGS+=-Wall -O0 -g -fno-strict-aliasing
-+ifeq ($(BUILD_STATIC),y)
-+LDFLAGS+=-static
- endif
- 
--all: $(patsubst %,run-%,$(TESTS))
--test: all
--
--# rules to run tests
--
--.PHONY: $(patsubst %,run-%,$(TESTS))
--
--run-%: %
--	-$(QEMU) ./$*
--
--run-hello-i386: hello-i386
--run-sha1-i386: sha1-i386
--
--run-test-i386: test-i386
--	./test-i386 > test-i386.ref
--	-$(QEMU) test-i386 > test-i386.out
--	@if diff -u test-i386.ref test-i386.out ; then echo "Auto Test OK"; fi
--
--run-test-i386-fprem: test-i386-fprem
--	./test-i386-fprem > test-i386-fprem.ref
--	-$(QEMU) test-i386-fprem > test-i386-fprem.out
--	@if diff -u test-i386-fprem.ref test-i386-fprem.out ; then echo "Auto Test OK"; fi
--
--run-test-x86_64: test-x86_64
--	./test-x86_64 > test-x86_64.ref
--	-$(QEMU_X86_64) test-x86_64 > test-x86_64.out
--	@if diff -u test-x86_64.ref test-x86_64.out ; then echo "Auto Test OK"; fi
--
-+%: %.c
-+	$(CC) $(CFLAGS) $(EXTRA_CFLAGS) $< -o $@ $(LDFLAGS)
- 
--run-runcom: runcom
--	-$(QEMU) ./runcom $(SRC_PATH)/tests/pi_10.com
-+all: $(TESTS)
- 
--run-test_path: test_path
--	./test_path
-+#
-+# Test Runners
-+#
-+# By default we just run the test with the appropriate QEMU for the
-+# target. More advanced tests may want to override the runner in their
-+# specific make rules. Additional runners for the same binary should
-+# be added to EXTRA_RUNS.
-+#
- 
--# rules to compile tests
-+RUN_TESTS=$(patsubst %,run-%, $(TESTS))
-+RUN_TESTS+=$(EXTRA_RUNS)
- 
--hello-i386: hello-i386.c
--	$(CC_I386) -nostdlib $(CFLAGS) -static $(LDFLAGS) -o $@ $<
--	strip $@
--
--# i386/x86_64 emulation test (test various opcodes) */
--test-i386: test-i386.c test-i386-code16.S test-i386-vm86.S \
--           test-i386.h test-i386-shift.h test-i386-muldiv.h
--	$(CC_I386) $(QEMU_INCLUDES) $(CFLAGS) $(LDFLAGS) -o $@ \
--              $(<D)/test-i386.c $(<D)/test-i386-code16.S $(<D)/test-i386-vm86.S -lm
--
--test-i386-fprem: test-i386-fprem.c
--	$(CC_I386) $(QEMU_INCLUDES) $(CFLAGS) $(LDFLAGS) -o $@ $^
--
--test-x86_64: test-i386.c \
--           test-i386.h test-i386-shift.h test-i386-muldiv.h
--	$(CC_X86_64) $(QEMU_INCLUDES) $(CFLAGS) $(LDFLAGS) -o $@ $(<D)/test-i386.c -lm
--
--# vm86 test
--runcom: runcom.c
--	$(CC_I386) $(CFLAGS) $(LDFLAGS) -o $@ $<
--
--# speed test
--sha1-i386: sha1.c
--	$(CC_I386) $(CFLAGS) $(LDFLAGS) -o $@ $<
--
--# arm test
--hello-arm: hello-arm.o
--	arm-linux-ld -o $@ $<
--
--hello-arm.o: hello-arm.c
--	arm-linux-gcc -Wall -g -O2 -c -o $@ $<
--
--test-arm-iwmmxt: test-arm-iwmmxt.s
--	cpp < $< | arm-linux-gnu-gcc -Wall -static -march=iwmmxt -mabi=aapcs -x assembler - -o $@
--
--# MIPS test
--hello-mips: hello-mips.c
--	mips-linux-gnu-gcc -nostdlib -static -mno-abicalls -fno-PIC -mabi=32 -Wall -Wextra -g -O2 -o $@ $<
--
--hello-mipsel: hello-mips.c
--	mipsel-linux-gnu-gcc -nostdlib -static -mno-abicalls -fno-PIC -mabi=32 -Wall -Wextra -g -O2 -o $@ $<
--
--# testsuite for the CRIS port.
--test-cris:
--	$(MAKE) -C cris check
-+run-%: %
-+	$(call quiet-command, \
-+		timeout $(TIMEOUT) $(QEMU) $< > $<.out, \
-+		"TEST", "$< on $(TARGET_NAME)")
- 
--# testsuite for the LM32 port.
--test-lm32:
--	$(MAKE) -C lm32 check
-+.PHONY: run
-+run: $(RUN_TESTS)
- 
--clean:
--	rm -f *~ *.o test-i386.out test-i386.ref \
--           test-x86_64.log test-x86_64.ref qruncom $(TESTS)
-+# There is no clean target, the calling make just rm's the tests build dir
--- 
-2.17.0
+
+r~
