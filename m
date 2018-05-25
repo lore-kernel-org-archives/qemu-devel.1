@@ -1,16 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54497)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54576)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fMFfT-00011U-HL
-	for qemu-devel@nongnu.org; Fri, 25 May 2018 12:34:20 -0400
+	(envelope-from <kwolf@redhat.com>) id 1fMFfY-00016o-Oz
+	for qemu-devel@nongnu.org; Fri, 25 May 2018 12:34:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fMFfQ-0002xo-Rd
-	for qemu-devel@nongnu.org; Fri, 25 May 2018 12:34:15 -0400
+	(envelope-from <kwolf@redhat.com>) id 1fMFfU-00031Q-Ua
+	for qemu-devel@nongnu.org; Fri, 25 May 2018 12:34:20 -0400
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Fri, 25 May 2018 18:33:22 +0200
-Message-Id: <20180525163327.23097-10-kwolf@redhat.com>
+Date: Fri, 25 May 2018 18:33:24 +0200
+Message-Id: <20180525163327.23097-12-kwolf@redhat.com>
 In-Reply-To: <20180525163327.23097-1-kwolf@redhat.com>
 References: <20180525163327.23097-1-kwolf@redhat.com>
-Subject: [Qemu-devel] [PATCH 09/14] qemu-iotests: Rewrite 207 for
+Subject: [Qemu-devel] [PATCH 11/14] qemu-iotests: Rewrite 211 for
  blockdev-create job
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -23,31 +23,28 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, mreitz@redhat.com, jsnow@redhat.com, eblake@redhat.com, pkrempa@redhat.com, qemu-devel@nongnu.org
 
-This rewrites the test case 207 to work with the new x-blockdev-create
+This rewrites the test case 211 to work with the new x-blockdev-create
 job rather than the old synchronous version of the command.
 
-Most of the test cases stay the same as before (the exception being some
-improved 'size' options that allow distinguishing which command created
-the image), but in order to be able to implement proper job handling,
-the test case is rewritten in Python.
+All of the test cases stay the same as before, but in order to be able
+to implement proper job handling, the test case is rewritten in Python.
 
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 ---
- tests/qemu-iotests/207        | 435 +++++++++++++++++++-----------------------
- tests/qemu-iotests/207.out    |  89 +++++----
- tests/qemu-iotests/group      |   6 +-
- tests/qemu-iotests/iotests.py |  23 ++-
- 4 files changed, 264 insertions(+), 289 deletions(-)
+ tests/qemu-iotests/211     | 384 ++++++++++++++++++---------------------------
+ tests/qemu-iotests/211.out | 123 ++++++++-------
+ tests/qemu-iotests/group   |   2 +-
+ 3 files changed, 227 insertions(+), 282 deletions(-)
 
-diff --git a/tests/qemu-iotests/207 b/tests/qemu-iotests/207
-index f5c77852d1..91c1f7e811 100755
---- a/tests/qemu-iotests/207
-+++ b/tests/qemu-iotests/207
+diff --git a/tests/qemu-iotests/211 b/tests/qemu-iotests/211
+index 1edec26517..2fd89cfb32 100755
+--- a/tests/qemu-iotests/211
++++ b/tests/qemu-iotests/211
 @@ -1,9 +1,11 @@
 -#!/bin/bash
 +#!/usr/bin/env python
  #
- # Test ssh image creation
+ # Test VDI and file image creation
  #
  # Copyright (C) 2018 Red Hat, Inc.
  #
@@ -56,7 +53,7 @@ index f5c77852d1..91c1f7e811 100755
  # This program is free software; you can redistribute it and/or modify
  # it under the terms of the GNU General Public License as published by
  # the Free Software Foundation; either version 2 of the License, or
-@@ -18,244 +20,193 @@
+@@ -18,229 +20,157 @@
  # along with this program.  If not, see <http://www.gnu.org/licenses/>.
  #
  
@@ -73,8 +70,8 @@ index f5c77852d1..91c1f7e811 100755
 -. ./common.rc
 -. ./common.filter
 -
--_supported_fmt raw
--_supported_proto ssh
+-_supported_fmt vdi
+-_supported_proto file
 -_supported_os Linux
 -
 -function do_run_qemu()
@@ -95,165 +92,130 @@ index f5c77852d1..91c1f7e811 100755
 -echo "=== Successful image creation (defaults) ==="
 -echo
 -
+-size=$((128 * 1024 * 1024))
+-
 -run_qemu <<EOF
 -{ "execute": "qmp_capabilities" }
 -{ "execute": "x-blockdev-create",
 -  "arguments": {
--      "driver": "ssh",
--      "location": {
--          "path": "$TEST_IMG_FILE",
--          "server": {
--              "host": "127.0.0.1",
--              "port": "22"
--          }
--      },
--      "size": 4194304
+-      "driver": "file",
+-      "filename": "$TEST_IMG",
+-      "size": 0
+-  }
+-}
+-{ "execute": "blockdev-add",
+-  "arguments": {
+-      "driver": "file",
+-      "node-name": "imgfile",
+-      "filename": "$TEST_IMG"
+-  }
+-}
+-{ "execute": "x-blockdev-create",
+-  "arguments": {
+-      "driver": "$IMGFMT",
+-      "file": "imgfile",
+-      "size": $size
 -  }
 -}
 -{ "execute": "quit" }
 -EOF
 -
--_img_info | _filter_img_info
+-_img_info --format-specific | _filter_img_info --format-specific
+-$QEMU_IMG map --output=json "$TEST_IMG" | _filter_qemu_img_map
+-
 -echo
--TEST_IMG=$TEST_IMG_FILE _img_info | _filter_img_info
--
--echo
--echo "=== Test host-key-check options ==="
+-echo "=== Successful image creation (explicit defaults) ==="
 -echo
 -
+-# Choose a different size to show that we got a new image
+-size=$((64 * 1024 * 1024))
+-
 -run_qemu <<EOF
 -{ "execute": "qmp_capabilities" }
 -{ "execute": "x-blockdev-create",
 -  "arguments": {
--      "driver": "ssh",
--      "location": {
--          "path": "$TEST_IMG_FILE",
--          "server": {
--              "host": "127.0.0.1",
--              "port": "22"
--          },
--          "host-key-check": {
--              "mode": "none"
--          }
+-      "driver": "file",
+-      "filename": "$TEST_IMG",
+-      "size": 0
+-  }
+-}
+-{ "execute": "x-blockdev-create",
+-  "arguments": {
+-      "driver": "$IMGFMT",
+-      "file": {
+-          "driver": "file",
+-          "filename": "$TEST_IMG"
 -      },
--      "size": 8388608
+-      "size": $size,
+-      "preallocation": "off"
 -  }
 -}
 -{ "execute": "quit" }
 -EOF
 -
--_img_info | _filter_img_info
+-_img_info --format-specific | _filter_img_info --format-specific
+-$QEMU_IMG map --output=json "$TEST_IMG" | _filter_qemu_img_map
+-
+-echo
+-echo "=== Successful image creation (with non-default options) ==="
+-echo
+-
+-# Choose a different size to show that we got a new image
+-size=$((32 * 1024 * 1024))
 -
 -run_qemu <<EOF
 -{ "execute": "qmp_capabilities" }
 -{ "execute": "x-blockdev-create",
 -  "arguments": {
--      "driver": "ssh",
--      "location": {
--          "path": "$TEST_IMG_FILE",
--          "server": {
--              "host": "127.0.0.1",
--              "port": "22"
--          },
--          "host-key-check": {
--              "mode": "known_hosts"
--          }
+-      "driver": "file",
+-      "filename": "$TEST_IMG",
+-      "size": 0
+-  }
+-}
+-{ "execute": "x-blockdev-create",
+-  "arguments": {
+-      "driver": "$IMGFMT",
+-      "file": {
+-          "driver": "file",
+-          "filename": "$TEST_IMG"
 -      },
--      "size": 4194304
+-      "size": $size,
+-      "preallocation": "metadata"
 -  }
 -}
 -{ "execute": "quit" }
 -EOF
 -
--_img_info | _filter_img_info
+-_img_info --format-specific | _filter_img_info --format-specific
+-$QEMU_IMG map --output=json "$TEST_IMG" | _filter_qemu_img_map
 -
--
--key=$(ssh-keyscan -t rsa 127.0.0.1 2>/dev/null | grep -v "\\^#" |
--      cut -d" " -f3 | base64 -d | md5sum -b | cut -d" " -f1)
+-echo
+-echo "=== Invalid BlockdevRef ==="
+-echo
 -
 -run_qemu <<EOF
 -{ "execute": "qmp_capabilities" }
 -{ "execute": "x-blockdev-create",
 -  "arguments": {
--      "driver": "ssh",
--      "location": {
--          "path": "$TEST_IMG_FILE",
--          "server": {
--              "host": "127.0.0.1",
--              "port": "22"
--          },
--          "host-key-check": {
--              "mode": "hash",
--              "type": "md5",
--              "hash": "wrong"
--          }
--      },
--      "size": 8388608
--  }
--}
--{ "execute": "x-blockdev-create",
--  "arguments": {
--      "driver": "ssh",
--      "location": {
--          "path": "$TEST_IMG_FILE",
--          "server": {
--              "host": "127.0.0.1",
--              "port": "22"
--          },
--          "host-key-check": {
--              "mode": "hash",
--              "type": "md5",
--              "hash": "$key"
--          }
--      },
--      "size": 8388608
+-      "driver": "$IMGFMT",
+-      "file": "this doesn't exist",
+-      "size": $size
 -  }
 -}
 -{ "execute": "quit" }
 -EOF
 -
--_img_info | _filter_img_info
+-echo
+-echo "=== Zero size ==="
+-echo
 -
--
--key=$(ssh-keyscan -t rsa 127.0.0.1 2>/dev/null | grep -v "\\^#" |
--      cut -d" " -f3 | base64 -d | sha1sum -b | cut -d" " -f1)
--
--run_qemu <<EOF
+-run_qemu -blockdev driver=file,filename="$TEST_IMG",node-name=node0 <<EOF
 -{ "execute": "qmp_capabilities" }
 -{ "execute": "x-blockdev-create",
 -  "arguments": {
--      "driver": "ssh",
--      "location": {
--          "path": "$TEST_IMG_FILE",
--          "server": {
--              "host": "127.0.0.1",
--              "port": "22"
--          },
--          "host-key-check": {
--              "mode": "hash",
--              "type": "sha1",
--              "hash": "wrong"
--          }
--      },
--      "size": 4194304
--  }
--}
--{ "execute": "x-blockdev-create",
--  "arguments": {
--      "driver": "ssh",
--      "location": {
--          "path": "$TEST_IMG_FILE",
--          "server": {
--              "host": "127.0.0.1",
--              "port": "22"
--          },
--          "host-key-check": {
--              "mode": "hash",
--              "type": "sha1",
--              "hash": "$key"
--          }
--      },
--      "size": 4194304
+-      "driver": "$IMGFMT",
+-      "file": "node0",
+-      "size": 0
 -  }
 -}
 -{ "execute": "quit" }
@@ -262,36 +224,56 @@ index f5c77852d1..91c1f7e811 100755
 -_img_info | _filter_img_info
 -
 -echo
--echo "=== Invalid path and user ==="
+-echo "=== Maximum size ==="
 -echo
 -
--run_qemu <<EOF
+-run_qemu -blockdev driver=file,filename="$TEST_IMG",node-name=node0 <<EOF
 -{ "execute": "qmp_capabilities" }
 -{ "execute": "x-blockdev-create",
 -  "arguments": {
--      "driver": "ssh",
--      "location": {
--          "path": "/this/is/not/an/existing/path",
--          "server": {
--              "host": "127.0.0.1",
--              "port": "22"
--          }
--      },
--      "size": 4194304
+-      "driver": "$IMGFMT",
+-      "file": "node0",
+-      "size": 562949819203584
+-  }
+-}
+-{ "execute": "quit" }
+-EOF
+-
+-_img_info | _filter_img_info
+-
+-echo
+-echo "=== Invalid sizes ==="
+-echo
+-
+-# TODO Negative image sizes aren't handled correctly, but this is a problem
+-# with QAPI's implementation of the 'size' type and affects other commands as
+-# well. Once this is fixed, we may want to add a test case here.
+-
+-# 1. 2^64 - 512
+-# 2. 2^63 = 8 EB (qemu-img enforces image sizes less than this)
+-# 3. 0x1fffff8000001 (one byte more than maximum image size for VDI)
+-
+-run_qemu -blockdev driver=file,filename="$TEST_IMG",node-name=node0 <<EOF
+-{ "execute": "qmp_capabilities" }
+-{ "execute": "x-blockdev-create",
+-  "arguments": {
+-      "driver": "$IMGFMT",
+-      "file": "node0",
+-      "size": 18446744073709551104
 -  }
 -}
 -{ "execute": "x-blockdev-create",
 -  "arguments": {
--      "driver": "ssh",
--      "location": {
--          "path": "$TEST_IMG_FILE",
--          "user": "invalid user",
--          "server": {
--              "host": "127.0.0.1",
--              "port": "22"
--          }
--      },
--      "size": 4194304
+-      "driver": "$IMGFMT",
+-      "file": "node0",
+-      "size": 9223372036854775808
+-  }
+-}
+-{ "execute": "x-blockdev-create",
+-  "arguments": {
+-      "driver": "$IMGFMT",
+-      "file": "node0",
+-      "size": 562949819203585
 -  }
 -}
 -{ "execute": "quit" }
@@ -302,10 +284,10 @@ index f5c77852d1..91c1f7e811 100755
 -rm -f $seq.full
 -status=0
 +import iotests
-+import subprocess
++from iotests import imgfmt
 +
-+iotests.verify_image_format(supported_fmts=['raw'])
-+iotests.verify_protocol(supported=['ssh'])
++iotests.verify_image_format(supported_fmts=['vdi'])
++iotests.verify_protocol(supported=['file'])
 +
 +def blockdev_create(vm, options):
 +    result = vm.qmp_log('x-blockdev-create', job_id='job0', options=options)
@@ -315,10 +297,8 @@ index f5c77852d1..91c1f7e811 100755
 +        vm.run_job('job0')
 +    iotests.log("")
 +
-+with iotests.FilePath('t.img') as disk_path, \
++with iotests.FilePath('t.vdi') as disk_path, \
 +     iotests.VM() as vm:
-+
-+    remote_path = iotests.remote_filename(disk_path)
 +
 +    #
 +    # Successful image creation (defaults)
@@ -326,177 +306,143 @@ index f5c77852d1..91c1f7e811 100755
 +    iotests.log("=== Successful image creation (defaults) ===")
 +    iotests.log("")
 +
++    size = 128 * 1024 * 1024
++
 +    vm.launch()
-+    blockdev_create(vm, { 'driver': 'ssh',
-+                          'location': {
-+                              'path': disk_path,
-+                              'server': {
-+                                  'host': '127.0.0.1',
-+                                  'port': '22'
-+                              }
-+                          },
-+                          'size': 4194304 })
++    blockdev_create(vm, { 'driver': 'file',
++                          'filename': disk_path,
++                          'size': 0 })
++
++    vm.qmp_log('blockdev-add', driver='file', filename=disk_path,
++               node_name='imgfile')
++
++    blockdev_create(vm, { 'driver': imgfmt,
++                          'file': 'imgfile',
++                          'size': size })
 +    vm.shutdown()
 +
-+    iotests.img_info_log(remote_path, filter_path=disk_path)
++    iotests.img_info_log(disk_path)
++    iotests.log(iotests.filter_testfiles(iotests.qemu_img_pipe(
++        'map', '--output=json', disk_path)))
++
++    #
++    # Successful image creation (explicit defaults)
++    #
++    iotests.log("=== Successful image creation (explicit defaults) ===")
 +    iotests.log("")
++
++    size = 64 * 1024 * 1024
++
++    vm.launch()
++    blockdev_create(vm, { 'driver': 'file',
++                          'filename': disk_path,
++                          'size': 0 })
++    blockdev_create(vm, { 'driver': imgfmt,
++                          'file': {
++                              'driver': 'file',
++                              'filename': disk_path,
++                          },
++                          'size': size,
++                          'preallocation': 'off' })
++    vm.shutdown()
++
++    iotests.img_info_log(disk_path)
++    iotests.log(iotests.filter_testfiles(iotests.qemu_img_pipe(
++        'map', '--output=json', disk_path)))
++
++    #
++    # Successful image creation (with non-default options)
++    #
++    iotests.log("=== Successful image creation (with non-default options) ===")
++    iotests.log("")
++
++    size = 32 * 1024 * 1024
++
++    vm.launch()
++    blockdev_create(vm, { 'driver': 'file',
++                          'filename': disk_path,
++                          'size': 0 })
++    blockdev_create(vm, { 'driver': imgfmt,
++                          'file': {
++                              'driver': 'file',
++                              'filename': disk_path,
++                          },
++                          'size': size,
++                          'preallocation': 'metadata' })
++    vm.shutdown()
++
++    iotests.img_info_log(disk_path)
++    iotests.log(iotests.filter_testfiles(iotests.qemu_img_pipe(
++        'map', '--output=json', disk_path)))
++
++    #
++    # Invalid BlockdevRef
++    #
++    iotests.log("=== Invalid BlockdevRef ===")
++    iotests.log("")
++
++    vm.launch()
++    blockdev_create(vm, { 'driver': imgfmt,
++                          'file': "this doesn't exist",
++                          'size': size })
++    vm.shutdown()
++
++    #
++    # Zero size
++    #
++    iotests.log("=== Zero size ===")
++    iotests.log("")
++
++    vm.add_blockdev('driver=file,filename=%s,node-name=node0' % (disk_path))
++    vm.launch()
++    blockdev_create(vm, { 'driver': imgfmt,
++                          'file': 'node0',
++                          'size': 0 })
++    vm.shutdown()
++
 +    iotests.img_info_log(disk_path)
 +
 +    #
-+    # Test host-key-check options
++    # Maximum size
 +    #
-+    iotests.log("=== Test host-key-check options ===")
++    iotests.log("=== Maximum size ===")
 +    iotests.log("")
 +
 +    vm.launch()
-+    blockdev_create(vm, { 'driver': 'ssh',
-+                          'location': {
-+                              'path': disk_path,
-+                              'server': {
-+                                  'host': '127.0.0.1',
-+                                  'port': '22'
-+                              },
-+                              'host-key-check': {
-+                                  'mode': 'none'
-+                              }
-+                          },
-+                          'size': 8388608 })
++    blockdev_create(vm, { 'driver': imgfmt,
++                          'file': 'node0',
++                          'size': 562949819203584 })
 +    vm.shutdown()
 +
-+    iotests.img_info_log(remote_path, filter_path=disk_path)
-+
-+    vm.launch()
-+    blockdev_create(vm, { 'driver': 'ssh',
-+                          'location': {
-+                              'path': disk_path,
-+                              'server': {
-+                                  'host': '127.0.0.1',
-+                                  'port': '22'
-+                              },
-+                              'host-key-check': {
-+                                  'mode': 'known_hosts'
-+                              }
-+                          },
-+                          'size': 4194304 })
-+    vm.shutdown()
-+
-+    iotests.img_info_log(remote_path, filter_path=disk_path)
-+
-+    md5_key = subprocess.check_output(
-+        'ssh-keyscan -t rsa 127.0.0.1 2>/dev/null | grep -v "\\^#" | ' +
-+        'cut -d" " -f3 | base64 -d | md5sum -b | cut -d" " -f1',
-+        shell=True).rstrip()
-+
-+    vm.launch()
-+    blockdev_create(vm, { 'driver': 'ssh',
-+                          'location': {
-+                              'path': disk_path,
-+                              'server': {
-+                                  'host': '127.0.0.1',
-+                                  'port': '22'
-+                              },
-+                              'host-key-check': {
-+                                  'mode': 'hash',
-+                                  'type': 'md5',
-+                                  'hash': 'wrong',
-+                              }
-+                          },
-+                          'size': 2097152 })
-+    blockdev_create(vm, { 'driver': 'ssh',
-+                          'location': {
-+                              'path': disk_path,
-+                              'server': {
-+                                  'host': '127.0.0.1',
-+                                  'port': '22'
-+                              },
-+                              'host-key-check': {
-+                                  'mode': 'hash',
-+                                  'type': 'md5',
-+                                  'hash': md5_key,
-+                              }
-+                          },
-+                          'size': 8388608 })
-+    vm.shutdown()
-+
-+    iotests.img_info_log(remote_path, filter_path=disk_path)
-+
-+    sha1_key = subprocess.check_output(
-+        'ssh-keyscan -t rsa 127.0.0.1 2>/dev/null | grep -v "\\^#" | ' +
-+        'cut -d" " -f3 | base64 -d | sha1sum -b | cut -d" " -f1',
-+        shell=True).rstrip()
-+
-+    vm.launch()
-+    blockdev_create(vm, { 'driver': 'ssh',
-+                          'location': {
-+                              'path': disk_path,
-+                              'server': {
-+                                  'host': '127.0.0.1',
-+                                  'port': '22'
-+                              },
-+                              'host-key-check': {
-+                                  'mode': 'hash',
-+                                  'type': 'sha1',
-+                                  'hash': 'wrong',
-+                              }
-+                          },
-+                          'size': 2097152 })
-+    blockdev_create(vm, { 'driver': 'ssh',
-+                          'location': {
-+                              'path': disk_path,
-+                              'server': {
-+                                  'host': '127.0.0.1',
-+                                  'port': '22'
-+                              },
-+                              'host-key-check': {
-+                                  'mode': 'hash',
-+                                  'type': 'sha1',
-+                                  'hash': sha1_key,
-+                              }
-+                          },
-+                          'size': 4194304 })
-+    vm.shutdown()
-+
-+    iotests.img_info_log(remote_path, filter_path=disk_path)
++    iotests.img_info_log(disk_path)
 +
 +    #
-+    # Invalid path and user
++    # Invalid sizes
 +    #
-+    iotests.log("=== Invalid path and user ===")
++
++    # TODO Negative image sizes aren't handled correctly, but this is a problem
++    # with QAPI's implementation of the 'size' type and affects other commands
++    # as well. Once this is fixed, we may want to add a test case here.
++
++    # 1. 2^64 - 512
++    # 2. 2^63 = 8 EB (qemu-img enforces image sizes less than this)
++    # 3. 0x1fffff8000001 (one byte more than maximum image size for VDI)
++
++    iotests.log("=== Invalid sizes ===")
 +    iotests.log("")
 +
 +    vm.launch()
-+    blockdev_create(vm, { 'driver': 'ssh',
-+                          'location': {
-+                              'path': '/this/is/not/an/existing/path',
-+                              'server': {
-+                                  'host': '127.0.0.1',
-+                                  'port': '22'
-+                              },
-+                              'host-key-check': {
-+                                  'mode': 'none'
-+                              }
-+                          },
-+                          'size': 4194304 })
-+    blockdev_create(vm, { 'driver': 'ssh',
-+                          'location': {
-+                              'path': disk_path,
-+                              'user': 'invalid user',
-+                              'server': {
-+                                  'host': '127.0.0.1',
-+                                  'port': '22'
-+                              },
-+                              'host-key-check': {
-+                                  'mode': 'none'
-+                              }
-+                          },
-+                          'size': 4194304 })
++    for size in [ 18446744073709551104, 9223372036854775808, 562949819203585 ]:
++        blockdev_create(vm, { 'driver': imgfmt,
++                              'file': 'node0',
++                              'size': size })
 +    vm.shutdown()
-diff --git a/tests/qemu-iotests/207.out b/tests/qemu-iotests/207.out
-index 417deee970..299650872c 100644
---- a/tests/qemu-iotests/207.out
-+++ b/tests/qemu-iotests/207.out
-@@ -1,62 +1,64 @@
--QA output created by 207
+diff --git a/tests/qemu-iotests/211.out b/tests/qemu-iotests/211.out
+index 3247bbaa64..31ef74db4c 100644
+--- a/tests/qemu-iotests/211.out
++++ b/tests/qemu-iotests/211.out
+@@ -1,97 +1,112 @@
+-QA output created by 211
 -
  === Successful image creation (defaults) ===
  
@@ -505,186 +451,177 @@ index 417deee970..299650872c 100644
 -{"return": {}}
 -{"return": {}}
 -{"return": {}}
+-{"return": {}}
+-{"return": {}}
 -{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
-+{'execute': 'x-blockdev-create', 'arguments': {'job_id': 'job0', 'options': {'driver': 'ssh', 'location': {'path': 'TEST_DIR/t.img', 'server': {'host': '127.0.0.1', 'port': '22'}}, 'size': 4194304}}}
++{'execute': 'x-blockdev-create', 'arguments': {'job_id': 'job0', 'options': {'size': 0, 'driver': 'file', 'filename': 'TEST_DIR/t.vdi'}}}
++{u'return': {}}
++{'execute': 'job-dismiss', 'arguments': {'id': 'job0'}}
++{u'return': {}}
++
++{'execute': 'blockdev-add', 'arguments': {'node_name': 'imgfile', 'driver': 'file', 'filename': 'TEST_DIR/t.vdi'}}
++{u'return': {}}
++{'execute': 'x-blockdev-create', 'arguments': {'job_id': 'job0', 'options': {'driver': 'vdi', 'file': 'imgfile', 'size': 134217728}}}
 +{u'return': {}}
 +{'execute': 'job-dismiss', 'arguments': {'id': 'job0'}}
 +{u'return': {}}
  
- image: json:{"driver": "IMGFMT", "file": {"server.host": "127.0.0.1", "server.port": "22", "driver": "ssh", "path": "TEST_DIR/t.IMGFMT"}}
- file format: IMGFMT
- virtual size: 4.0M (4194304 bytes)
- 
-+
  image: TEST_DIR/t.IMGFMT
  file format: IMGFMT
- virtual size: 4.0M (4194304 bytes)
+ virtual size: 128M (134217728 bytes)
++cluster_size: 1048576
++
+ [{ "start": 0, "length": 134217728, "depth": 0, "zero": true, "data": false}]
  
- === Test host-key-check options ===
+ === Successful image creation (explicit defaults) ===
  
 -Testing:
 -QMP_VERSION
 -{"return": {}}
 -{"return": {}}
 -{"return": {}}
+-{"return": {}}
 -{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
-+{'execute': 'x-blockdev-create', 'arguments': {'job_id': 'job0', 'options': {'driver': 'ssh', 'location': {'path': 'TEST_DIR/t.img', 'host-key-check': {'mode': 'none'}, 'server': {'host': '127.0.0.1', 'port': '22'}}, 'size': 8388608}}}
++{'execute': 'x-blockdev-create', 'arguments': {'job_id': 'job0', 'options': {'size': 0, 'driver': 'file', 'filename': 'TEST_DIR/t.vdi'}}}
++{u'return': {}}
++{'execute': 'job-dismiss', 'arguments': {'id': 'job0'}}
++{u'return': {}}
++
++{'execute': 'x-blockdev-create', 'arguments': {'job_id': 'job0', 'options': {'preallocation': 'off', 'driver': 'vdi', 'file': {'driver': 'file', 'filename': 'TEST_DIR/t.vdi'}, 'size': 67108864}}}
 +{u'return': {}}
 +{'execute': 'job-dismiss', 'arguments': {'id': 'job0'}}
 +{u'return': {}}
  
- image: json:{"driver": "IMGFMT", "file": {"server.host": "127.0.0.1", "server.port": "22", "driver": "ssh", "path": "TEST_DIR/t.IMGFMT"}}
+ image: TEST_DIR/t.IMGFMT
  file format: IMGFMT
- virtual size: 8.0M (8388608 bytes)
+ virtual size: 64M (67108864 bytes)
++cluster_size: 1048576
++
+ [{ "start": 0, "length": 67108864, "depth": 0, "zero": true, "data": false}]
+ 
+ === Successful image creation (with non-default options) ===
+ 
 -Testing:
 -QMP_VERSION
 -{"return": {}}
 -{"return": {}}
 -{"return": {}}
+-{"return": {}}
 -{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
++{'execute': 'x-blockdev-create', 'arguments': {'job_id': 'job0', 'options': {'size': 0, 'driver': 'file', 'filename': 'TEST_DIR/t.vdi'}}}
++{u'return': {}}
++{'execute': 'job-dismiss', 'arguments': {'id': 'job0'}}
++{u'return': {}}
 +
-+{'execute': 'x-blockdev-create', 'arguments': {'job_id': 'job0', 'options': {'driver': 'ssh', 'location': {'path': 'TEST_DIR/t.img', 'host-key-check': {'mode': 'known_hosts'}, 'server': {'host': '127.0.0.1', 'port': '22'}}, 'size': 4194304}}}
++{'execute': 'x-blockdev-create', 'arguments': {'job_id': 'job0', 'options': {'preallocation': 'metadata', 'driver': 'vdi', 'file': {'driver': 'file', 'filename': 'TEST_DIR/t.vdi'}, 'size': 33554432}}}
 +{u'return': {}}
 +{'execute': 'job-dismiss', 'arguments': {'id': 'job0'}}
 +{u'return': {}}
  
- image: json:{"driver": "IMGFMT", "file": {"server.host": "127.0.0.1", "server.port": "22", "driver": "ssh", "path": "TEST_DIR/t.IMGFMT"}}
+ image: TEST_DIR/t.IMGFMT
  file format: IMGFMT
- virtual size: 4.0M (4194304 bytes)
+ virtual size: 32M (33554432 bytes)
+-[{ "start": 0, "length": 3072, "depth": 0, "zero": false, "data": true, "offset": OFFSET},
+-{ "start": 3072, "length": 33551360, "depth": 0, "zero": true, "data": true, "offset": OFFSET}]
++cluster_size: 1048576
+ 
+-=== Invalid BlockdevRef ===
++[{ "start": 0, "length": 3072, "depth": 0, "zero": false, "data": true, "offset": 1024},
++{ "start": 3072, "length": 33551360, "depth": 0, "zero": true, "data": true, "offset": 4096}]
+ 
 -Testing:
 -QMP_VERSION
 -{"return": {}}
--{"error": {"class": "GenericError", "desc": "remote host key does not match host_key_check 'wrong'"}}
+-{"error": {"class": "GenericError", "desc": "Cannot find device=this doesn't exist nor node_name=this doesn't exist"}}
+-{"return": {}}
+-{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
++=== Invalid BlockdevRef ===
+ 
++{'execute': 'x-blockdev-create', 'arguments': {'job_id': 'job0', 'options': {'driver': 'vdi', 'file': "this doesn't exist", 'size': 33554432}}}
++{u'return': {}}
++Job failed: Cannot find device=this doesn't exist nor node_name=this doesn't exist
++{'execute': 'job-dismiss', 'arguments': {'id': 'job0'}}
++{u'return': {}}
+ 
+ === Zero size ===
+ 
+-Testing: -blockdev driver=file,filename=TEST_DIR/t.IMGFMT,node-name=node0
+-QMP_VERSION
+-{"return": {}}
 -{"return": {}}
 -{"return": {}}
 -{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
-+
-+{'execute': 'x-blockdev-create', 'arguments': {'job_id': 'job0', 'options': {'driver': 'ssh', 'location': {'path': 'TEST_DIR/t.img', 'host-key-check': {'hash': 'wrong', 'type': 'md5', 'mode': 'hash'}, 'server': {'host': '127.0.0.1', 'port': '22'}}, 'size': 2097152}}}
-+{u'return': {}}
-+Job failed: remote host key does not match host_key_check 'wrong'
-+{'execute': 'job-dismiss', 'arguments': {'id': 'job0'}}
-+{u'return': {}}
-+
-+{'execute': 'x-blockdev-create', 'arguments': {'job_id': 'job0', 'options': {'driver': 'ssh', 'location': {'path': 'TEST_DIR/t.img', 'host-key-check': {'hash': 'f3386a5742ddc4a04244118e59a1f92b', 'type': 'md5', 'mode': 'hash'}, 'server': {'host': '127.0.0.1', 'port': '22'}}, 'size': 8388608}}}
++{'execute': 'x-blockdev-create', 'arguments': {'job_id': 'job0', 'options': {'driver': 'vdi', 'file': 'node0', 'size': 0}}}
 +{u'return': {}}
 +{'execute': 'job-dismiss', 'arguments': {'id': 'job0'}}
 +{u'return': {}}
  
- image: json:{"driver": "IMGFMT", "file": {"server.host": "127.0.0.1", "server.port": "22", "driver": "ssh", "path": "TEST_DIR/t.IMGFMT"}}
+ image: TEST_DIR/t.IMGFMT
  file format: IMGFMT
- virtual size: 8.0M (8388608 bytes)
--Testing:
+ virtual size: 0 (0 bytes)
++cluster_size: 1048576
+ 
+ === Maximum size ===
+ 
+-Testing: -blockdev driver=file,filename=TEST_DIR/t.IMGFMT,node-name=node0
 -QMP_VERSION
 -{"return": {}}
--{"error": {"class": "GenericError", "desc": "remote host key does not match host_key_check 'wrong'"}}
 -{"return": {}}
 -{"return": {}}
 -{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
-+
-+{'execute': 'x-blockdev-create', 'arguments': {'job_id': 'job0', 'options': {'driver': 'ssh', 'location': {'path': 'TEST_DIR/t.img', 'host-key-check': {'hash': 'wrong', 'type': 'sha1', 'mode': 'hash'}, 'server': {'host': '127.0.0.1', 'port': '22'}}, 'size': 2097152}}}
-+{u'return': {}}
-+Job failed: remote host key does not match host_key_check 'wrong'
-+{'execute': 'job-dismiss', 'arguments': {'id': 'job0'}}
-+{u'return': {}}
-+
-+{'execute': 'x-blockdev-create', 'arguments': {'job_id': 'job0', 'options': {'driver': 'ssh', 'location': {'path': 'TEST_DIR/t.img', 'host-key-check': {'hash': 'c6142e54650531177fa3d88ac52501ae00ccff69', 'type': 'sha1', 'mode': 'hash'}, 'server': {'host': '127.0.0.1', 'port': '22'}}, 'size': 4194304}}}
++{'execute': 'x-blockdev-create', 'arguments': {'job_id': 'job0', 'options': {'driver': 'vdi', 'file': 'node0', 'size': 562949819203584}}}
 +{u'return': {}}
 +{'execute': 'job-dismiss', 'arguments': {'id': 'job0'}}
 +{u'return': {}}
  
- image: json:{"driver": "IMGFMT", "file": {"server.host": "127.0.0.1", "server.port": "22", "driver": "ssh", "path": "TEST_DIR/t.IMGFMT"}}
+ image: TEST_DIR/t.IMGFMT
  file format: IMGFMT
-@@ -64,12 +66,15 @@ virtual size: 4.0M (4194304 bytes)
+ virtual size: 512T (562949819203584 bytes)
++cluster_size: 1048576
  
- === Invalid path and user ===
+ === Invalid sizes ===
  
--Testing:
+-Testing: -blockdev driver=file,filename=TEST_DIR/t.IMGFMT,node-name=node0
 -QMP_VERSION
 -{"return": {}}
--{"error": {"class": "GenericError", "desc": "failed to open remote file '/this/is/not/an/existing/path': Failed opening remote file (libssh2 error code: -31)"}}
--{"error": {"class": "GenericError", "desc": "failed to authenticate using publickey authentication and the identities held by your ssh-agent"}}
+-{"error": {"class": "GenericError", "desc": "Unsupported VDI image size (size is 0xfffffffffffffe00, max supported is 0x1fffff8000000)"}}
+-{"error": {"class": "GenericError", "desc": "Unsupported VDI image size (size is 0x8000000000000000, max supported is 0x1fffff8000000)"}}
+-{"error": {"class": "GenericError", "desc": "Unsupported VDI image size (size is 0x1fffff8000001, max supported is 0x1fffff8000000)"}}
 -{"return": {}}
 -{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
-+{'execute': 'x-blockdev-create', 'arguments': {'job_id': 'job0', 'options': {'driver': 'ssh', 'location': {'path': '/this/is/not/an/existing/path', 'host-key-check': {'mode': 'none'}, 'server': {'host': '127.0.0.1', 'port': '22'}}, 'size': 4194304}}}
++{'execute': 'x-blockdev-create', 'arguments': {'job_id': 'job0', 'options': {'driver': 'vdi', 'file': 'node0', 'size': 18446744073709551104L}}}
 +{u'return': {}}
-+Job failed: failed to open remote file '/this/is/not/an/existing/path': Failed opening remote file (libssh2 error code: -31)
++Job failed: Unsupported VDI image size (size is 0xfffffffffffffe00, max supported is 0x1fffff8000000)
 +{'execute': 'job-dismiss', 'arguments': {'id': 'job0'}}
 +{u'return': {}}
 +
-+{'execute': 'x-blockdev-create', 'arguments': {'job_id': 'job0', 'options': {'driver': 'ssh', 'location': {'path': 'TEST_DIR/t.img', 'host-key-check': {'mode': 'none'}, 'user': 'invalid user', 'server': {'host': '127.0.0.1', 'port': '22'}}, 'size': 4194304}}}
++{'execute': 'x-blockdev-create', 'arguments': {'job_id': 'job0', 'options': {'driver': 'vdi', 'file': 'node0', 'size': 9223372036854775808L}}}
 +{u'return': {}}
-+Job failed: failed to authenticate using publickey authentication and the identities held by your ssh-agent
++Job failed: Unsupported VDI image size (size is 0x8000000000000000, max supported is 0x1fffff8000000)
++{'execute': 'job-dismiss', 'arguments': {'id': 'job0'}}
++{u'return': {}}
++
++{'execute': 'x-blockdev-create', 'arguments': {'job_id': 'job0', 'options': {'driver': 'vdi', 'file': 'node0', 'size': 562949819203585}}}
++{u'return': {}}
++Job failed: Unsupported VDI image size (size is 0x1fffff8000001, max supported is 0x1fffff8000000)
 +{'execute': 'job-dismiss', 'arguments': {'id': 'job0'}}
 +{u'return': {}}
  
 -*** done
 diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
-index be157e7679..8a84bf057d 100644
+index a1d04ce367..4182bccccc 100644
 --- a/tests/qemu-iotests/group
 +++ b/tests/qemu-iotests/group
-@@ -205,11 +205,11 @@
- 204 rw auto quick
- 205 rw auto quick
- 206 rw auto
--# TODO The following commented out tests need to be reworked to work
--# with the x-blockdev-create job
--#207 rw auto
-+207 rw auto
+@@ -209,9 +209,9 @@
  208 rw auto quick
  209 rw auto quick
-+# TODO The following commented out tests need to be reworked to work
-+# with the x-blockdev-create job
- #210 rw auto
- #211 rw auto quick
+ 210 rw auto
++211 rw auto quick
+ # TODO The following commented out tests need to be reworked to work
+ # with the x-blockdev-create job
+-#211 rw auto quick
  #212 rw auto quick
-diff --git a/tests/qemu-iotests/iotests.py b/tests/qemu-iotests/iotests.py
-index f0f4ef32f0..e945caa6bb 100644
---- a/tests/qemu-iotests/iotests.py
-+++ b/tests/qemu-iotests/iotests.py
-@@ -109,9 +109,11 @@ def qemu_img_pipe(*args):
-         sys.stderr.write('qemu-img received signal %i: %s\n' % (-exitcode, ' '.join(qemu_img_args + list(args))))
-     return subp.communicate()[0]
- 
--def img_info_log(filename):
-+def img_info_log(filename, filter_path=None):
-     output = qemu_img_pipe('info', '-f', imgfmt, filename)
--    log(filter_img_info(output, filename))
-+    if not filter_path:
-+        filter_path = filename
-+    log(filter_img_info(output, filter_path))
- 
- def qemu_io(*args):
-     '''Run qemu-io and return the stdout data'''
-@@ -301,6 +303,13 @@ def file_path(*names):
- 
-     return paths[0] if len(paths) == 1 else paths
- 
-+def remote_filename(path):
-+    if imgproto == 'file':
-+        return imgproto
-+    elif imgproto == 'ssh':
-+        return "ssh://127.0.0.1%s" % (path)
-+    else:
-+        raise Exception("Protocol %s not supported" % (imgproto))
- 
- class VM(qtest.QEMUQtestMachine):
-     '''A QEMU VM'''
-@@ -595,6 +604,16 @@ def verify_image_format(supported_fmts=[], unsupported_fmts=[]):
-     if not_sup or (imgfmt in unsupported_fmts):
-         notrun('not suitable for this image format: %s' % imgfmt)
- 
-+def verify_protocol(supported=[], unsupported=[]):
-+    assert not (supported and unsupported)
-+
-+    if 'generic' in supported:
-+        return
-+
-+    not_sup = supported and (imgproto not in supported)
-+    if not_sup or (imgproto in unsupported):
-+        notrun('not suitable for this protocol: %s' % imgproto)
-+
- def verify_platform(supported_oses=['linux']):
-     if True not in [sys.platform.startswith(x) for x in supported_oses]:
-         notrun('not suitable for this OS: %s' % sys.platform)
+ #213 rw auto quick
+ 214 rw auto
 -- 
 2.13.6
