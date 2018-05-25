@@ -1,27 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40092)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40707)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fMDLo-0000ou-Cw
-	for qemu-devel@nongnu.org; Fri, 25 May 2018 10:05:49 -0400
+	(envelope-from <paolo.bonzini@gmail.com>) id 1fMDMj-0001R7-Si
+	for qemu-devel@nongnu.org; Fri, 25 May 2018 10:06:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fMDLj-0001ie-GP
-	for qemu-devel@nongnu.org; Fri, 25 May 2018 10:05:48 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:48598 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1fMDLj-0001iJ-CL
-	for qemu-devel@nongnu.org; Fri, 25 May 2018 10:05:43 -0400
-References: <1527186303-192100-1-git-send-email-mst@redhat.com>
-	<1527186303-192100-3-git-send-email-mst@redhat.com>
-	<ac1f972f-2769-9945-868d-e80a01842f4f@redhat.com>
-	<20180525151148-mutt-send-email-mst@kernel.org>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <7cae1897-5383-1b2f-d2af-1156a344aba1@redhat.com>
-Date: Fri, 25 May 2018 16:05:37 +0200
+	(envelope-from <paolo.bonzini@gmail.com>) id 1fMDMe-0002JH-Uc
+	for qemu-devel@nongnu.org; Fri, 25 May 2018 10:06:45 -0400
+Received: from mail-wm0-x244.google.com ([2a00:1450:400c:c09::244]:35953)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
+	id 1fMDMe-0002Ir-LP
+	for qemu-devel@nongnu.org; Fri, 25 May 2018 10:06:40 -0400
+Received: by mail-wm0-x244.google.com with SMTP id n10-v6so14926665wmc.1
+	for <qemu-devel@nongnu.org>; Fri, 25 May 2018 07:06:40 -0700 (PDT)
+Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
+References: <20180423162523.6392-1-f4bug@amsat.org>
+	<20180423162523.6392-2-f4bug@amsat.org>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <9b685c79-fefb-e73f-f0ed-ee9c0c97ca11@redhat.com>
+Date: Fri, 25 May 2018 16:06:35 +0200
 MIME-Version: 1.0
-In-Reply-To: <20180525151148-mutt-send-email-mst@kernel.org>
+In-Reply-To: <20180423162523.6392-2-f4bug@amsat.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v4 2/3] libqtest: fail if child coredumps
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v3 1/2] bswap.h: Fix ldl_he_p() signedness
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,63 +32,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, David Gibson <david@gibson.dropbear.id.au>, Peter Maydell <peter.maydell@linaro.org>
+Cc: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
 
-On 25.05.2018 14:15, Michael S. Tsirkin wrote:
-> On Fri, May 25, 2018 at 08:10:48AM +0200, Thomas Huth wrote:
->> On 24.05.2018 20:25, Michael S. Tsirkin wrote:
->>> Right now tests report OK status if QEMU crashes during cleanup.
->>> Let's catch that case and fail the test.
->>>
->>> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
->>> ---
->>>  tests/libqtest.c | 9 ++++++++-
->>>  1 file changed, 8 insertions(+), 1 deletion(-)
->>>
->>> diff --git a/tests/libqtest.c b/tests/libqtest.c
->>> index 43fb97e..f869854 100644
->>> --- a/tests/libqtest.c
->>> +++ b/tests/libqtest.c
->>> @@ -103,8 +103,15 @@ static int socket_accept(int sock)
->>>  static void kill_qemu(QTestState *s)
->>>  {
->>>      if (s->qemu_pid != -1) {
->>> +        int wstatus = 0;
->>> +        pid_t pid;
->>> +
->>>          kill(s->qemu_pid, SIGTERM);
->>> -        waitpid(s->qemu_pid, NULL, 0);
->>> +        pid = waitpid(s->qemu_pid, &wstatus, 0);
->>> +
->>> +        if (pid == s->qemu_pid && WIFSIGNALED(wstatus)) {
->>> +            assert(!WCOREDUMP(wstatus));
->>
->> Another ugliness that I just discovered: kill_qemu is also called from
->> the SIGABRT handler. So if a qtest assert() triggers an abort(), the
->> abort handler runs kill_qemu which now could trigger another assert()
->> and thus abort().
+On 23/04/2018 18:25, Philippe Mathieu-Daudé wrote:
+> As per the "Load and Store APIs" documentation (docs/devel/loads-stores.rst),
+> "No signed load operations are provided."
+> Update lduw_he_p() to return as unsigned.
 > 
-> But only the first one will cause a coredump.
-> 
->> It's likely not a real problem since the abort handler
->> has been installed with SA_RESETHAND, but it's still quite confusing code.
->>
->> Please let's clean up this ugliness properly: I think kill_qemu should
->> *only* be used by the abort handler, and then kill QEMU with SIGKILL for
->> good, to make sure that there are no stuck QEMU processes hanging around
->> anymore.
->>
->> qtest_quit() should simply try to quit QEMU via QMP instead, and then
->> check for WIFEXITED(wstatus) && !WEXITSTATUS(wstatus) instead of using
->> the kill_qemu() function.
->>
->>  Thomas
-> 
-> I think I'll drop the second patch for now. failing test on coredump
-> is clearly correct. The rest can wait until someone has the energy
-> to look into all the intricacies of signal handling.
+> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
-Ok, sounds like a plan.
+This is ldl_he_p, not lduw_he_p.
 
-Acked-by: Thomas Huth <thuth@redhat.com>
+However, this patch should not be necessary; using uint16_t is needed
+for shorts because they implicitly extend to int, so a "short -0x1234"
+becomes 0xffff1234 when assigned to uint32_t.  Instead, an int can be
+assigned to a uint32_t (which is the type of fdt32_to_cpu's argument)
+with no change in value.
+
+Paolo
+
+> ---
+>  include/qemu/bswap.h | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+> 
+> diff --git a/include/qemu/bswap.h b/include/qemu/bswap.h
+> index 3f28f661b1..613978f838 100644
+> --- a/include/qemu/bswap.h
+> +++ b/include/qemu/bswap.h
+> @@ -330,9 +330,9 @@ static inline void stw_he_p(void *ptr, uint16_t v)
+>      memcpy(ptr, &v, sizeof(v));
+>  }
+>  
+> -static inline int ldl_he_p(const void *ptr)
+> +static inline uint32_t ldl_he_p(const void *ptr)
+>  {
+> -    int32_t r;
+> +    uint32_t r;
+>      memcpy(&r, ptr, sizeof(r));
+>      return r;
+>  }
+> 
