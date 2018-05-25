@@ -1,23 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37045)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38441)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fM7kJ-00080f-Rm
-	for qemu-devel@nongnu.org; Fri, 25 May 2018 04:06:47 -0400
+	(envelope-from <laurent@vivier.eu>) id 1fM7vd-0001kO-CA
+	for qemu-devel@nongnu.org; Fri, 25 May 2018 04:18:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fM7kF-0003Ak-2n
-	for qemu-devel@nongnu.org; Fri, 25 May 2018 04:06:43 -0400
-Date: Fri, 25 May 2018 10:06:32 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20180525080632.GB5562@localhost.localdomain>
-References: <20180518132114.4070-1-kwolf@redhat.com>
-	<20180518132114.4070-32-kwolf@redhat.com>
-	<8af81ec5-9a7b-e787-25cd-61deec9a40dc@redhat.com>
-	<20180524083020.GD4008@localhost.localdomain>
-	<1f9b1685-1d1c-b1d4-0408-d11a12f2a199@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1f9b1685-1d1c-b1d4-0408-d11a12f2a199@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2 31/40] job: Add job_is_ready()
+	(envelope-from <laurent@vivier.eu>) id 1fM7vZ-0008Gc-IE
+	for qemu-devel@nongnu.org; Fri, 25 May 2018 04:18:25 -0400
+Received: from mout.kundenserver.de ([217.72.192.75]:52041)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1fM7vZ-0008Fa-9S
+	for qemu-devel@nongnu.org; Fri, 25 May 2018 04:18:21 -0400
+From: Laurent Vivier <laurent@vivier.eu>
+Date: Fri, 25 May 2018 10:17:50 +0200
+Message-Id: <20180525081754.29506-10-laurent@vivier.eu>
+In-Reply-To: <20180525081754.29506-1-laurent@vivier.eu>
+References: <20180525081754.29506-1-laurent@vivier.eu>
+Subject: [Qemu-devel] [PULL 09/13] linux-user: move ppc socket.h definitions
+ to ppc/sockbits.h
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,74 +24,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>
-Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, jcody@redhat.com, armbru@redhat.com, mreitz@redhat.com
+To: qemu-devel@nongnu.org
+Cc: Riku Voipio <riku.voipio@iki.fi>, Laurent Vivier <laurent@vivier.eu>
 
-Am 24.05.2018 um 19:25 hat John Snow geschrieben:
-> >>> diff --git a/job.c b/job.c
-> >>> index af31de4669..66ee26f2a0 100644
-> >>> --- a/job.c
-> >>> +++ b/job.c
-> >>> @@ -199,6 +199,28 @@ bool job_is_cancelled(Job *job)
-> >>>      return job->cancelled;
-> >>>  }
-> >>>  
-> >>> +bool job_is_ready(Job *job)
-> >>> +{
-> >>> +    switch (job->status) {
-> >>> +    case JOB_STATUS_UNDEFINED:
-> >>> +    case JOB_STATUS_CREATED:
-> >>> +    case JOB_STATUS_RUNNING:
-> >>> +    case JOB_STATUS_PAUSED:
-> >>> +    case JOB_STATUS_WAITING:
-> >>> +    case JOB_STATUS_PENDING:
-> >>> +    case JOB_STATUS_ABORTING:
-> >>> +    case JOB_STATUS_CONCLUDED:
-> >>> +    case JOB_STATUS_NULL:
-> >>> +        return false;
-> >>> +    case JOB_STATUS_READY:
-> >>> +    case JOB_STATUS_STANDBY:
-> >>> +        return true;
-> >>> +    default:
-> >>> +        g_assert_not_reached();
-> >>> +    }
-> >>> +    return false;
-> >>> +}
-> >>> +
-> >>
-> >> What's the benefit to a switch statement with a default clause here,
-> >> over the shorter:
-> >>
-> >> if (job->status == READY || job->status == STANDBY) {
-> >>   return true;
-> >> }
-> >> return false;
-> >>
-> >> (Yes, I realize you already merged this code, but I'm still curious and
-> >> I need to read the series anyway to see what's changed...)
-> > 
-> > That it's easy to copy and paste from job_is_completed()? :-P
-> > 
-> 
-> Haha! Sure!
-> 
-> > I guess you could argue that the switch ensures that we don't forget to
-> > explicitly handle every state if we ever add a new one, but the real
-> > reason is more like, job_is_completed() was already there and I didn't
-> > see a reason to do something different here.
-> > 
-> 
-> I think the "default" case removes that benefit somewhat; it's nicer
-> when the compiler yelps at you for forgetting. The cases that might
-> cause an assertion could be harder to hit.
+Change conditional #ifdef part by #undef of the symbols
+redefined for PPC relative to generic/socket.h
 
-Good point. I'm not sure which compilers would actually warn here, while
-asserting makes sure to crash some tests, but in this context I think we
-could actually have both: All enum values that are handled return inside
-the switch statement. So if we move the g_assert_not_reached() just
-after the switch block, we should get both the compiler warning and the
-crash.
+Signed-off-by: Laurent Vivier <laurent@vivier.eu>
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+Message-Id: <20180519092956.15134-6-laurent@vivier.eu>
+---
+ linux-user/generic/sockbits.h |  9 ---------
+ linux-user/ppc/sockbits.h     | 25 +++++++++++++++++++++++++
+ 2 files changed, 25 insertions(+), 9 deletions(-)
 
-Would you like to send a patch?
-
-Kevin
+diff --git a/linux-user/generic/sockbits.h b/linux-user/generic/sockbits.h
+index 093faf0a48..99505f1f85 100644
+--- a/linux-user/generic/sockbits.h
++++ b/linux-user/generic/sockbits.h
+@@ -30,21 +30,12 @@
+ #define TARGET_SO_LINGER       13
+ #define TARGET_SO_BSDCOMPAT    14
+ /* To add :#define TARGET_SO_REUSEPORT 15 */
+-#if defined(TARGET_PPC)
+-#define TARGET_SO_RCVLOWAT     16
+-#define TARGET_SO_SNDLOWAT     17
+-#define TARGET_SO_RCVTIMEO     18
+-#define TARGET_SO_SNDTIMEO     19
+-#define TARGET_SO_PASSCRED     20
+-#define TARGET_SO_PEERCRED     21
+-#else
+ #define TARGET_SO_PASSCRED     16
+ #define TARGET_SO_PEERCRED     17
+ #define TARGET_SO_RCVLOWAT     18
+ #define TARGET_SO_SNDLOWAT     19
+ #define TARGET_SO_RCVTIMEO     20
+ #define TARGET_SO_SNDTIMEO     21
+-#endif
+ 
+ /* Security levels - as per NRL IPv6 - don't actually do anything */
+ #define TARGET_SO_SECURITY_AUTHENTICATION              22
+diff --git a/linux-user/ppc/sockbits.h b/linux-user/ppc/sockbits.h
+index 0e4c8f012d..ee453347a3 100644
+--- a/linux-user/ppc/sockbits.h
++++ b/linux-user/ppc/sockbits.h
+@@ -1 +1,26 @@
++/*
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License version 2 as
++ * published by the Free Software Foundation, or (at your option) any
++ * later version. See the COPYING file in the top-level directory.
++ */
++
++#ifndef PPC_SOCKBITS_H
++#define PPC_SOCKBITS_H
++
+ #include "../generic/sockbits.h"
++
++#undef  TARGET_SO_RCVLOWAT
++#define TARGET_SO_RCVLOWAT     16
++#undef  TARGET_SO_SNDLOWAT
++#define TARGET_SO_SNDLOWAT     17
++#undef  TARGET_SO_RCVTIMEO
++#define TARGET_SO_RCVTIMEO     18
++#undef  TARGET_SO_SNDTIMEO
++#define TARGET_SO_SNDTIMEO     19
++#undef  TARGET_SO_PASSCRED
++#define TARGET_SO_PASSCRED     20
++#undef  TARGET_SO_PEERCRED
++#define TARGET_SO_PEERCRED     21
++
++#endif
+-- 
+2.14.3
