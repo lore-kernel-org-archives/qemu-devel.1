@@ -1,28 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45478)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45514)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fMDeJ-0005kA-Od
-	for qemu-devel@nongnu.org; Fri, 25 May 2018 10:24:57 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1fMDeL-0005lv-LV
+	for qemu-devel@nongnu.org; Fri, 25 May 2018 10:24:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fMDeH-0003tD-7U
-	for qemu-devel@nongnu.org; Fri, 25 May 2018 10:24:55 -0400
-Received: from mail-wr0-x243.google.com ([2a00:1450:400c:c0c::243]:38830)
+	(envelope-from <alex.bennee@linaro.org>) id 1fMDeK-0003vc-QT
+	for qemu-devel@nongnu.org; Fri, 25 May 2018 10:24:57 -0400
+Received: from mail-wr0-x243.google.com ([2a00:1450:400c:c0c::243]:40873)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1fMDeG-0003sf-UT
-	for qemu-devel@nongnu.org; Fri, 25 May 2018 10:24:53 -0400
-Received: by mail-wr0-x243.google.com with SMTP id 94-v6so9575830wrf.5
-	for <qemu-devel@nongnu.org>; Fri, 25 May 2018 07:24:52 -0700 (PDT)
+	id 1fMDeK-0003vB-K7
+	for qemu-devel@nongnu.org; Fri, 25 May 2018 10:24:56 -0400
+Received: by mail-wr0-x243.google.com with SMTP id l41-v6so9590976wre.7
+	for <qemu-devel@nongnu.org>; Fri, 25 May 2018 07:24:56 -0700 (PDT)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Fri, 25 May 2018 15:19:09 +0100
-Message-Id: <20180525141915.6497-4-alex.bennee@linaro.org>
+Date: Fri, 25 May 2018 15:19:10 +0100
+Message-Id: <20180525141915.6497-5-alex.bennee@linaro.org>
 In-Reply-To: <20180525141915.6497-1-alex.bennee@linaro.org>
 References: <20180525133851.27161-1-alex.bennee@linaro.org>
 	<20180525141915.6497-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v5 43/49] docker: move debian-powerpc-cross to
- sid based build
+Subject: [Qemu-devel] [PATCH v5 44/49] tests/tcg: enable building for PowerPC
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,164 +33,66 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: cota@braap.org, famz@redhat.com, berrange@redhat.com, f4bug@amsat.org, richard.henderson@linaro.org, balrogg@gmail.com, aurelien@aurel32.net, agraf@suse.de
 Cc: qemu-devel@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 
-The original Jessie based cross builder hasn't worked for a while. The
-state of the libraries is still perilous for cross-building QEMU but
-we can use it for building TCG tests.
+Now we have restored debian-image-powerpc-cross using Debian SID
+compilers we can build for 32 bit powerpc. Although PPC32 supports a
+range of pages sizes currently only 4k works so the others are
+commented out for now.
 
-The debian-apt-fake.sh script can also be dropped as it is no longer
-used.
+We can also merge the ppc64 support under the base architecture
+directory to avoid too much proliferation of directories.
 
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
----
- tests/docker/Makefile.include                 |  4 +-
- tests/docker/dockerfiles/debian-apt-fake.sh   | 46 -------------------
- .../dockerfiles/debian-powerpc-cross.docker   | 39 +++-------------
- tests/docker/dockerfiles/debian8.docker       |  3 --
- 4 files changed, 7 insertions(+), 85 deletions(-)
- delete mode 100755 tests/docker/dockerfiles/debian-apt-fake.sh
 
-diff --git a/tests/docker/Makefile.include b/tests/docker/Makefile.include
-index 36779645d7..d59314ee65 100644
---- a/tests/docker/Makefile.include
-+++ b/tests/docker/Makefile.include
-@@ -46,8 +46,6 @@ docker-image-%: $(DOCKER_FILES_DIR)/%.docker
- 		$(if $(EXECUTABLE),--include-executable=$(EXECUTABLE)),\
- 		"BUILD","$*")
- 
--docker-image-debian-powerpc-cross: EXTRA_FILES:=$(SRC_PATH)/tests/docker/dockerfiles/debian-apt-fake.sh
--
- # Enforce dependencies for composite images
- docker-image-debian: docker-image-debian9
- docker-image-debian8-mxe: docker-image-debian8
-@@ -57,7 +55,6 @@ docker-image-debian-armhf-cross: docker-image-debian9
- docker-image-debian-arm64-cross: docker-image-debian9
- docker-image-debian-mips-cross: docker-image-debian9
- docker-image-debian-mips64el-cross: docker-image-debian9
--docker-image-debian-powerpc-cross: docker-image-debian8
- docker-image-debian-ppc64el-cross: docker-image-debian9
- docker-image-debian-s390x-cross: docker-image-debian9
- docker-image-debian-win32-cross: docker-image-debian8-mxe
-@@ -69,6 +66,7 @@ docker-image-debian-sh4-cross: docker-image-debian-sid
- docker-image-debian-sparc64-cross: docker-image-debian-sid
- docker-image-debian-mips64-cross: docker-image-debian-sid
- docker-image-debian-riscv64-cross: docker-image-debian-sid
-+docker-image-debian-powerpc-cross: docker-image-debian-sid
- docker-image-travis: NOUSER=1
- 
- # Expand all the pre-requistes for each docker image and test combination
-diff --git a/tests/docker/dockerfiles/debian-apt-fake.sh b/tests/docker/dockerfiles/debian-apt-fake.sh
-deleted file mode 100755
-index 2ec0fdf47a..0000000000
---- a/tests/docker/dockerfiles/debian-apt-fake.sh
+---
+v5
+  - new for v5
+---
+ tests/tcg/ppc/Makefile.include     |  7 +++++++
+ tests/tcg/ppc/Makefile.target      | 12 ++++++++++++
+ tests/tcg/ppc64le/Makefile.include |  2 --
+ 3 files changed, 19 insertions(+), 2 deletions(-)
+ create mode 100644 tests/tcg/ppc/Makefile.include
+ create mode 100644 tests/tcg/ppc/Makefile.target
+ delete mode 100644 tests/tcg/ppc64le/Makefile.include
+
+diff --git a/tests/tcg/ppc/Makefile.include b/tests/tcg/ppc/Makefile.include
+new file mode 100644
+index 0000000000..b062c30dd3
+--- /dev/null
++++ b/tests/tcg/ppc/Makefile.include
+@@ -0,0 +1,7 @@
++ifeq ($(TARGET_NAME),ppc)
++DOCKER_IMAGE=debian-powerpc-cross
++DOCKER_CROSS_COMPILER=powerpc-linux-gnu-gcc
++else ifeq ($(TARGET_NAME),ppc64le)
++DOCKER_IMAGE=debian-ppc64el-cross
++DOCKER_CROSS_COMPILER=powerpc64le-linux-gnu-gcc
++endif
+diff --git a/tests/tcg/ppc/Makefile.target b/tests/tcg/ppc/Makefile.target
+new file mode 100644
+index 0000000000..f5e08c7376
+--- /dev/null
++++ b/tests/tcg/ppc/Makefile.target
+@@ -0,0 +1,12 @@
++# -*- Mode: makefile -*-
++#
++# PPC - included from tests/tcg/Makefile
++#
++
++ifneq (,$(findstring 64,$(TARGET_NAME)))
++# On PPC64 Linux can be configured with 4k (default) or 64k pages (currently broken)
++EXTRA_RUNS+=run-test-mmap-4096 #run-test-mmap-65536
++else
++# On PPC32 Linux supports 4K/16K/64K/256K (but currently only 4k works)
++EXTRA_RUNS+=run-test-mmap-4096 #run-test-mmap-16384 run-test-mmap-65536 run-test-mmap-262144
++endif
+diff --git a/tests/tcg/ppc64le/Makefile.include b/tests/tcg/ppc64le/Makefile.include
+deleted file mode 100644
+index d71cfc9aa7..0000000000
+--- a/tests/tcg/ppc64le/Makefile.include
 +++ /dev/null
-@@ -1,46 +0,0 @@
--#! /bin/sh
--#
--# Generate fake debian package to resolve unimportant unmet dependencies held
--# by upstream multiarch broken packages.
--#
--# Copyright (c) 2017 Philippe Mathieu-Daudé <f4bug@amsat.org>
--#
--# This work is licensed under the terms of the GNU GPL, version 2
--# or (at your option) any later version. See the COPYING file in
--# the top-level directory.
--
--test $1 = "install" && shift 1
--
--fake_install()
--{
--    echo "Generating fake $2 $1 $3 ..."
--    (cd /var/cache/apt/archives
--        (cat << 'EOF'
--Section: misc
--Priority: optional
--Standards-Version: 3.9.2
--
--Package: NAME
--Version: VERSION
--Maintainer: qemu-devel@nongnu.org
--Architecture: any
--Multi-Arch: same
--Description: fake NAME
--EOF
--        ) | sed s/NAME/$2/g | sed s/VERSION/$3/g > $2.control
--        equivs-build -a $1 $2.control 1>/dev/null 2>/dev/null
--        dpkg -i --force-overwrite $2_$3_$1.deb
--    )
--}
--
--try_install()
--{
--    name=$(echo $1|sed "s/\(.*\):\(.*\)=\(.*\)/\1/")
--    arch=$(echo $1|sed "s/\(.*\):\(.*\)=\(.*\)/\2/")
--    vers=$(echo $1|sed "s/\(.*\):\(.*\)=\(.*\)/\3/")
--    apt-get install -q -yy $1 || fake_install $arch $name $vers
--}
--
--for package in $*; do
--    try_install $package
--done
-diff --git a/tests/docker/dockerfiles/debian-powerpc-cross.docker b/tests/docker/dockerfiles/debian-powerpc-cross.docker
-index a5dd46b4ac..5e62ca0df1 100644
---- a/tests/docker/dockerfiles/debian-powerpc-cross.docker
-+++ b/tests/docker/dockerfiles/debian-powerpc-cross.docker
-@@ -1,40 +1,13 @@
- #
- # Docker powerpc cross-compiler target
- #
--# This docker target builds on the debian Jessie base image.
-+# This docker target builds on the debian sid base image which
-+# contains cross compilers for Debian "ports" targets. The original
-+# Jessie based no longer builds.
- #
--FROM qemu:debian8
--MAINTAINER Philippe Mathieu-Daudé <f4bug@amsat.org>
-+FROM qemu:debian-sid
- 
--# Add the foreign architecture we want and install dependencies
--RUN dpkg --add-architecture powerpc
--RUN apt-get update
- RUN DEBIAN_FRONTEND=noninteractive eatmydata \
-     apt-get install -y --no-install-recommends \
--        crossbuild-essential-powerpc
--
--# <kludge> to fix "following packages have unmet dependencies" ...
--ADD debian-apt-fake.sh /usr/local/bin/apt-fake
--RUN apt-get install -y --no-install-recommends \
--        equivs \
--        pkg-config
--RUN apt-fake install \
--        pkg-config:powerpc=0.28-1.1-fake && \
--    ln -s pkg-config /usr/bin/powerpc-linux-gnu-pkg-config
--ENV PKG_CONFIG_PATH /usr/lib/powerpc-linux-gnu/pkgconfig
--# </kludge>
--
--# Specify the cross prefix for this image (see tests/docker/common.rc)
--ENV QEMU_CONFIGURE_OPTS --cross-prefix=powerpc-linux-gnu-
--
--RUN DEBIAN_FRONTEND=noninteractive eatmydata \
--    apt-get build-dep -yy -a powerpc qemu
--RUN DEBIAN_FRONTEND=noninteractive \
--    apt-get install -y --no-install-recommends \
--        glusterfs-common:powerpc \
--        libbz2-dev:powerpc \
--        liblzo2-dev:powerpc \
--        libncursesw5-dev:powerpc \
--        libnfs-dev:powerpc \
--        librdmacm-dev:powerpc \
--        libsnappy-dev:powerpc
-+        gcc-powerpc-linux-gnu \
-+        libc6-dev-powerpc-cross || { echo "Failed to build - see debian-sid.docker notes"; exit 1; }
-diff --git a/tests/docker/dockerfiles/debian8.docker b/tests/docker/dockerfiles/debian8.docker
-index 1bcf2e3d2f..52945631cd 100644
---- a/tests/docker/dockerfiles/debian8.docker
-+++ b/tests/docker/dockerfiles/debian8.docker
-@@ -32,6 +32,3 @@ RUN DEBIAN_FRONTEND=noninteractive eatmydata \
-         pkg-config \
-         python-minimal
- 
--# Setup Emdebian [emdebian-archive-keyring]
--RUN echo "deb http://emdebian.org/tools/debian/ jessie main" > /etc/apt/sources.list.d/emdebian.list && \
--    curl http://emdebian.org/tools/debian/emdebian-toolchain-archive.key | apt-key add -
+@@ -1,2 +0,0 @@
+-DOCKER_IMAGE=debian-ppc64el-cross
+-DOCKER_CROSS_COMPILER=powerpc64le-linux-gnu-gcc
 -- 
 2.17.0
