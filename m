@@ -1,28 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39146)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58426)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <whois.zihan.yang@gmail.com>) id 1fLzB8-0002l9-Bg
-	for qemu-devel@nongnu.org; Thu, 24 May 2018 18:57:51 -0400
+	(envelope-from <crosa@redhat.com>) id 1fM14b-0005p8-O1
+	for qemu-devel@nongnu.org; Thu, 24 May 2018 20:59:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <whois.zihan.yang@gmail.com>) id 1fLzB7-0004Wt-5v
-	for qemu-devel@nongnu.org; Thu, 24 May 2018 18:57:50 -0400
-Received: from mail-wm0-x22c.google.com ([2a00:1450:400c:c09::22c]:52134)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <whois.zihan.yang@gmail.com>)
-	id 1fLzB6-0004Wf-Uj
-	for qemu-devel@nongnu.org; Thu, 24 May 2018 18:57:49 -0400
-Received: by mail-wm0-x22c.google.com with SMTP id j4-v6so9430032wme.1
-	for <qemu-devel@nongnu.org>; Thu, 24 May 2018 15:57:48 -0700 (PDT)
-MIME-Version: 1.0
-In-Reply-To: <7bc63c59-de50-dbeb-dee8-bca3e6dd12cd@gmail.com>
-References: <09ACC28F0266D94FB9D1BC3F193A6478014E3D1B@MX303CL02.corp.emc.com>
-	<7bc63c59-de50-dbeb-dee8-bca3e6dd12cd@gmail.com>
-From: Zihan Yang <whois.zihan.yang@gmail.com>
-Date: Fri, 25 May 2018 06:57:46 +0800
-Message-ID: <CAKwiv-iEcONujdm_DjOM0at=UFBuNsXOktZ1AKa1f=ewCtb60Q@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] QEMU: Multiple PCI domains for x86 PCI Express
- Machine (Q35)
+	(envelope-from <crosa@redhat.com>) id 1fM14X-0005Ck-Uu
+	for qemu-devel@nongnu.org; Thu, 24 May 2018 20:59:13 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:47948 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <crosa@redhat.com>) id 1fM14X-0005CY-Pv
+	for qemu-devel@nongnu.org; Thu, 24 May 2018 20:59:09 -0400
+From: Cleber Rosa <crosa@redhat.com>
+Date: Thu, 24 May 2018 20:58:34 -0400
+Message-Id: <20180525005839.11556-1-crosa@redhat.com>
+Subject: [Qemu-devel] [PATCH 0/5] Acceptance/functional tests
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,93 +21,91 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, qemu-devel@nongnu.org
-Cc: Aaron.Wei@dell.com, "Fu, Bryan" <Bryan.Fu@dell.com>, "Xia, Robert" <Robert.Xia@dell.com>, "Zhou,
-	Zhenzan" <Zhenzan.Zhou@dell.com>
+To: qemu-devel@nongnu.org
+Cc: Eduardo Habkost <ehabkost@redhat.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Stefan Hajnoczi <stefanha@redhat.com>, Fam Zheng <famz@redhat.com>, Amador Pahim <amador@pahim.org>
 
-2018-05-24 19:54 GMT+08:00 Marcel Apfelbaum <marcel.apfelbaum@gmail.com>:
-> Hi Aaron
->
-> On 05/24/2018 12:31 PM, Wei, Aaron wrote:
->>
->>
->> Hi,  Marcel
->>
->> It's my pleasure to write to you on behalf of a team who is developing t=
-he
->> Intel VMD virtualization base on QEMU in Dell EMC.
->>
->> From https://www.outreachy.org. we find that you are working on the
->> Multiple PCI domain feature which we think may be  very helpful to our
->> current work.
->>
->
-> We are glad you are considering using the project.
-> The project got delayed for next "Outreachy/GSOC" round, however Zihan Ya=
-ng
-> <whois.zihan.yang@gmail.com>,
-> a PhD student, graciously offered to try it in his private time.
+TL;DR
+=====
 
-Hi Marcel
+Another version, with a minimalist approach, to the acceptance tests
+infrastructure for QEMU, based on the Avocado Testing Framework.
 
-Thank you for CCing and mentioning me in the email. I'm really glad to know
-people are interested in the project. It is really a joy to contribute
-to it. By the
-way, I'm currently a master student but that doesn't matter here.
+Background
+==========
 
->> We=E2=80=99ll be grateful if you can share some information about,
->>
->> 1.What=E2=80=99s the present developing status?
->>
->
-> An early RFC (not a working version) was posted here:
-> https://lists.gnu.org/archive/html/qemu-devel/2018-05/msg04664.html
-> The mail thread includes an interesting discussion on issues and constrai=
-ns.
->
->> 2.When would it possibly be ready? Or when could we get it from QEMU rep=
-o?
->>
->
-> Since is currently developed as a side project we don't have a clear
-> timeline,
-> you are welcome to contribute with ideas, reviews, tests and patches :) .
-> Any help is appreciated.
+The previous version, still considered an RFC, was sent to the list by
+Eduardo[1] was based on the work held in Amador's branch[2].  After
+reviewing in under a different light, including the experiences
+done and reported by Philippe[3].
 
-Hi Aaron
+Differences from previous versions
+==================================
 
-Thanks for your interest, I wish I could finish it as soon as
-possible, but I'm afraid
-I can't give any guarantee right now. As Marcel said, we don't have a
-clear timeline
-yet. The official project lasts 12 weeks, and I plan to finish it
-before September.
-The pace might be faster after June when all the exams are finished.
+The main difference is that this series include only the minimal
+changes deemed necessary to have a starting point.  I like to think
+that it's better connected to the QEMU community and project needs,
+and will hopefully allow for a more organic growth.
 
-About the project itself, we actually just started yet. You might want
-to look at the
-initial patch set I submitted a few days ago, as posted by Marcel in
-the last email.
-These patches are just POC, asking for reviews and comments. The AML part i=
-n
-QEMU and the firmware part are not implemented yet. I get many good reviews
-from Marcel and other members, and am preparing for a v2 patch.
+Since this version has less features than the previous versions,
+provided it's accepted, these are the next probable development tasks:
 
-Actually, even if I finish all the work, there still might be some
-time before the
-patches are available in the upstream because there will be reviews
-and comments,
-and they are likely to go through many versions before they are merged.
+ * Provide a simple variants mechanism to allow the same tests to be
+   run under different targets, machine models and devices (present on
+   the previous versions as a "YAML to Mux" file with architecture
+   definitions)
+ * Implement QEMUMachine migration support (present on the previous
+   version in the "avocado_qemu.test._VM" class)
+ * Implement Guest OS image selection and download (mostly an Avocado
+   feature, paired with a parameter convention and cloud-init support
+   code)
+ * Implement interactive support for Guest OS sessions (present on
+   the previous versions, supported by the aexpect Python module)
 
->> We appreciate and  look forward to your reply.
->>
->
-> I hope I helped.
+Even though this version shares very little (if any) code with the
+previous versions, the following is a list of noteworthy changes:
 
-I hope I helped too :)
-Feel free to comment/review/email/contribute if you have any questions abou=
-t
-this project.
+ * Tests directory is now "tests/acceptance" (was "tests/avocado")
+ * Base test class is now "avocado_qemu.Test" (was
+   "avocado_qemu.test.QemuTest")
+ * Base test class is now hosted in "avocado_qemu/__init__.py" (was
+   "avocado_qemu/test.py")
+ * Direct use of "qemu.QEMUMachine", that is, the
+   avocado_qemu.test._VM class is gone
+ * avocado_qemu.Test won't search for QEMU binaries on $PATH.  To use
+   QEMU binary on a custom system location it's necessary to use the
+   "qemu_bin" parameter
+ * Example test in README.rst is distributed as a real test
+   ("test_version.py")
+ * A new "Linux boot console" test, loosely modeled after Phillipe's
+   use case
 
-Thanks
-Zihan
+Commit summary
+==============
+
+Cleber Rosa (5):
+  Add functional/acceptance tests infrastructure
+  scripts/qemu.py: allow adding to the list of extra arguments
+  Acceptance tests: add quick VNC tests
+  scripts/qemu.py: introduce set_console() method
+  Acceptance tests: add Linux kernel boot and console checking test
+
+ scripts/qemu.py                             | 103 +++++++++++++++-
+ scripts/test_qemu.py                        | 176 +++++++++++++++++++++++++++
+ tests/acceptance/README.rst                 | 141 +++++++++++++++++++++
+ tests/acceptance/avocado_qemu/__init__.py   |  45 +++++++
+ tests/acceptance/test_boot_linux_console.py |  37 ++++++
+ tests/acceptance/test_version.py            |  13 ++
+ tests/acceptance/test_vnc.py                |  50 ++++++++
+ 7 files changed, 564 insertions(+), 1 deletion(-)
+ create mode 100644 scripts/test_qemu.py
+ create mode 100644 tests/acceptance/README.rst
+ create mode 100644 tests/acceptance/avocado_qemu/__init__.py
+ create mode 100644 tests/acceptance/test_boot_linux_console.py
+ create mode 100644 tests/acceptance/test_version.py
+ create mode 100644 tests/acceptance/test_vnc.py
+
+---
+
+[1] https://lists.gnu.org/archive/html/qemu-devel/2018-04/msg03443.html
+[2] https://github.com/apahim/qemu/commits/avocado_qemu
+[3] https://lists.gnu.org/archive/html/qemu-devel/2018-04/msg03076.html
