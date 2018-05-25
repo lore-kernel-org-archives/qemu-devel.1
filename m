@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45548)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45544)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fMDeO-0005oQ-6h
-	for qemu-devel@nongnu.org; Fri, 25 May 2018 10:25:01 -0400
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fMDeJ-0003uM-8Y
+	(envelope-from <alex.bennee@linaro.org>) id 1fMDeN-0005o0-Oc
 	for qemu-devel@nongnu.org; Fri, 25 May 2018 10:25:00 -0400
-Received: from mail-wm0-x241.google.com ([2a00:1450:400c:c09::241]:55897)
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <alex.bennee@linaro.org>) id 1fMDeM-0003x9-NT
+	for qemu-devel@nongnu.org; Fri, 25 May 2018 10:24:59 -0400
+Received: from mail-wr0-x236.google.com ([2a00:1450:400c:c0c::236]:33363)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1fMDeJ-0003u0-21
-	for qemu-devel@nongnu.org; Fri, 25 May 2018 10:24:55 -0400
-Received: by mail-wm0-x241.google.com with SMTP id a8-v6so14895615wmg.5
-	for <qemu-devel@nongnu.org>; Fri, 25 May 2018 07:24:54 -0700 (PDT)
+	id 1fMDeM-0003wP-Gw
+	for qemu-devel@nongnu.org; Fri, 25 May 2018 10:24:58 -0400
+Received: by mail-wr0-x236.google.com with SMTP id a15-v6so9587462wrm.0
+	for <qemu-devel@nongnu.org>; Fri, 25 May 2018 07:24:58 -0700 (PDT)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Fri, 25 May 2018 15:19:14 +0100
-Message-Id: <20180525141915.6497-9-alex.bennee@linaro.org>
+Date: Fri, 25 May 2018 15:19:13 +0100
+Message-Id: <20180525141915.6497-8-alex.bennee@linaro.org>
 In-Reply-To: <20180525141915.6497-1-alex.bennee@linaro.org>
 References: <20180525133851.27161-1-alex.bennee@linaro.org>
 	<20180525141915.6497-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v5 48/49] tests/tcg: override runners for
- broken tests
+Subject: [Qemu-devel] [PATCH v5 47/49] tests/Makefile.include: add
+ [build|clean|check]-tcg targets
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,55 +32,74 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: cota@braap.org, famz@redhat.com, berrange@redhat.com, f4bug@amsat.org, richard.henderson@linaro.org, balrogg@gmail.com, aurelien@aurel32.net, agraf@suse.de
-Cc: qemu-devel@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Yongbok Kim <yongbok.kim@mips.com>
+Cc: qemu-devel@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 
-To get a clean run of check-tcg these tests are currently skipped:
-
-  - hello-mips for mips
-  - linux-test for sparc
+This will ensure all linux-user targets build their guest test
+programs and ensure check-tcg will run the respective tests.
 
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Tested-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
-v4
-  - document broken tests in commit
-  - temporarily demote fcvt while fixes percolate upstream
-v5
-  - reinstate fcvt
-  - remove test-mmap overrides (done with EXTRA_RUNS now)
+v2
+  - use -include instead of complex macro stuff
+  - also include TARGET_BASE_ARCH/Makefile
+v3
+  - add build-tcg, make check-tcg actually run tests
 ---
- tests/tcg/mips/Makefile.target    | 4 ++++
- tests/tcg/sparc64/Makefile.target | 7 ++++++-
- 2 files changed, 10 insertions(+), 1 deletion(-)
+ tests/Makefile.include | 26 +++++++++++++++++++++++++-
+ 1 file changed, 25 insertions(+), 1 deletion(-)
 
-diff --git a/tests/tcg/mips/Makefile.target b/tests/tcg/mips/Makefile.target
-index 71f0c2dd53..3db4eaf131 100644
---- a/tests/tcg/mips/Makefile.target
-+++ b/tests/tcg/mips/Makefile.target
-@@ -17,3 +17,7 @@ hello-mips: LDFLAGS+=-nostdlib
+diff --git a/tests/Makefile.include b/tests/Makefile.include
+index 3d2f0458ab..310ccefdd9 100644
+--- a/tests/Makefile.include
++++ b/tests/Makefile.include
+@@ -10,6 +10,7 @@ check-help:
+ 	@echo " $(MAKE) check-speed          Run qobject speed tests"
+ 	@echo " $(MAKE) check-qapi-schema    Run QAPI schema tests"
+ 	@echo " $(MAKE) check-block          Run block tests"
++	@echo " $(MAKE) check-tcg            Run TCG tests"
+ 	@echo " $(MAKE) check-report.html    Generates an HTML test report"
+ 	@echo " $(MAKE) check-clean          Clean the tests"
+ 	@echo
+@@ -916,6 +917,30 @@ check-report.xml: $(patsubst %,check-report-qtest-%.xml, $(QTEST_TARGETS)) check
+ check-report.html: check-report.xml
+ 	$(call quiet-command,gtester-report $< > $@,"GEN","$@")
  
- # For MIPS32 and 64 we have a bunch of extra tests in sub-directories
- # however they are intended for system tests.
++# Per guest TCG tests
 +
-+run-hello-mips: hello-mips
-+	$(call quiet-command, /bin/true, "BROKEN TEST", "$< SKIPPED on $(TARGET_NAME)")
++LINUX_USER_TARGETS=$(filter %-linux-user,$(TARGET_LIST))
++BUILD_TCG_TARGET_RULES=$(patsubst %,build-tcg-tests-%, $(LINUX_USER_TARGETS))
++CLEAN_TCG_TARGET_RULES=$(patsubst %,clean-tcg-tests-%, $(LINUX_USER_TARGETS))
++RUN_TCG_TARGET_RULES=$(patsubst %,run-tcg-tests-%, $(LINUX_USER_TARGETS))
 +
-diff --git a/tests/tcg/sparc64/Makefile.target b/tests/tcg/sparc64/Makefile.target
-index 408dace783..7237779b26 100644
---- a/tests/tcg/sparc64/Makefile.target
-+++ b/tests/tcg/sparc64/Makefile.target
-@@ -1,6 +1,11 @@
- # -*- Mode: makefile -*-
- #
--# sparc specific tweaks
-+# sparc specific tweaks and masking out broken tests
++build-tcg-tests-%:
++	$(call quiet-command,$(MAKE) $(SUBDIR_MAKEFLAGS) -C $* V="$(V)" TARGET_DIR="$*/" guest-tests,)
 +
-+# different from the other hangs
-+# /home/alex/lsrc/qemu/qemu.git/tests/tcg/multiarch/linux-test.c:264: Value too large for defined data type (ret=-1, errno=92/Value too large for defined data type)
-+run-linux-test: linux-test
-+	$(call quiet-command, /bin/true, "BROKEN TEST", "$< SKIPPED on $(TARGET_NAME)")
++run-tcg-tests-%: build-tcg-tests-%
++	$(call quiet-command,$(MAKE) $(SUBDIR_MAKEFLAGS) -C $* V="$(V)" TARGET_DIR="$*/" run-guest-tests,)
++
++clean-tcg-tests-%:
++	$(call quiet-command,$(MAKE) $(SUBDIR_MAKEFLAGS) -C $* V="$(V)" TARGET_DIR="$*/" clean-guest-tests,)
++
++.PHONY: build-tcg
++build-tcg: $(BUILD_TCG_TARGET_RULES)
++
++.PHONY: check-tcg
++check-tcg: $(RUN_TCG_TARGET_RULES)
++
++.PHONY: clean-tcg
++clean-tcg: $(CLEAN_TCG_TARGET_RULES)
  
- # On Sparc64 Linux support 8k pages
- EXTRA_RUNS+=run-test-mmap-8192
+ # Other tests
+ 
+@@ -958,7 +983,6 @@ check-speed: $(patsubst %,check-%, $(check-speed-y))
+ check-block: $(patsubst %,check-%, $(check-block-y))
+ check: check-qapi-schema check-unit check-qtest check-decodetree
+ check-clean:
+-	$(MAKE) -C tests/tcg clean
+ 	rm -rf $(check-unit-y) tests/*.o $(QEMU_IOTESTS_HELPERS-y)
+ 	rm -rf $(sort $(foreach target,$(SYSEMU_TARGET_LIST), $(check-qtest-$(target)-y)) $(check-qtest-generic-y))
+ 	rm -f tests/test-qapi-gen-timestamp
 -- 
 2.17.0
