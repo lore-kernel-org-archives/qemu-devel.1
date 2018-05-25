@@ -1,24 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60412)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:32792)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <crosa@redhat.com>) id 1fM1J1-0003If-0R
-	for qemu-devel@nongnu.org; Thu, 24 May 2018 21:14:08 -0400
+	(envelope-from <bounces@canonical.com>) id 1fM1PV-0004Xj-Ih
+	for qemu-devel@nongnu.org; Thu, 24 May 2018 21:20:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <crosa@redhat.com>) id 1fM1Ix-0001js-52
-	for qemu-devel@nongnu.org; Thu, 24 May 2018 21:14:06 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:40816 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <crosa@redhat.com>) id 1fM1Iw-0001ja-Vg
-	for qemu-devel@nongnu.org; Thu, 24 May 2018 21:14:03 -0400
-From: Cleber Rosa <crosa@redhat.com>
-References: <20180525005839.11556-1-crosa@redhat.com>
-Message-ID: <aca03cd7-b386-6eeb-72e7-c1603e354f11@redhat.com>
-Date: Thu, 24 May 2018 21:14:01 -0400
+	(envelope-from <bounces@canonical.com>) id 1fM1PR-0004Tz-Ib
+	for qemu-devel@nongnu.org; Thu, 24 May 2018 21:20:49 -0400
+Received: from indium.canonical.com ([91.189.90.7]:56700)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1fM1PR-0004Tg-Be
+	for qemu-devel@nongnu.org; Thu, 24 May 2018 21:20:45 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1fM1PP-0006K9-KE
+	for <qemu-devel@nongnu.org>; Fri, 25 May 2018 01:20:43 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 86B892E88D2
+	for <qemu-devel@nongnu.org>; Fri, 25 May 2018 01:20:43 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20180525005839.11556-1-crosa@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 0/5] Acceptance/functional tests
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Fri, 25 May 2018 01:08:39 -0000
+From: John Snow <1769189@bugs.launchpad.net>
+Reply-To: Bug 1769189 <1769189@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <152544791493.32626.6219738999075353422.malonedeb@gac.canonical.com>
+Message-Id: <152721051931.31371.17334189714928431984.malone@soybean.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1769189] Re: Issue with qemu 2.12.0 + SATA
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,102 +37,89 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Amador Pahim <amador@pahim.org>, Fam Zheng <famz@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+
+I tried bisecting as well, and I wound up at:
+
+1a423896 -- five out of five boot attempts succeeded.
+d759c951 -- five out of five boot attempts failed.
+
+
+d759c951f3287fad04210a52f2dc93f94cf58c7f is the first bad commit
+commit d759c951f3287fad04210a52f2dc93f94cf58c7f
+Author: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+Date:   Tue Feb 27 12:52:48 2018 +0300
+
+    replay: push replay_mutex_lock up the call tree
 
 
 
-On 05/24/2018 08:58 PM, Cleber Rosa wrote:
-> TL;DR
-> =====
-> 
-> Another version, with a minimalist approach, to the acceptance tests
-> infrastructure for QEMU, based on the Avocado Testing Framework.
-> 
-> Background
-> ==========
-> 
-> The previous version, still considered an RFC, was sent to the list by
-> Eduardo[1] was based on the work held in Amador's branch[2].  After
-> reviewing in under a different light, including the experiences
-> done and reported by Philippe[3].
-> 
+My methodology was to boot QEMU like this:
 
-(major sigh for killing a line, writing a non-sense sentence)
+./x86_64-softmmu/qemu-system-x86_64 -m 4096 -cpu host -M q35 -enable-kvm
+-smp 4 -drive id=3Dsda,if=3Dnone,file=3D/home/bos/jhuston/windows_10.qcow
+-device ide-hd,drive=3Dsda -qmp tcp::4444,server,nowait
 
-... it was clear to me that a different approach would be better.
+and run it three times with -snapshot and see if it hung during boot; if
+it did, I marked the commit bad. If it did not, I booted and attempted
+to log in and run CrystalDiskMark. If it froze before I even launched
+CDM, I marked it bad.
 
-- Cleber.
+Interestingly enough, on a subsequent (presumably bad) commit (6dc0f529)
+which hangs fairly reliably on bootup (66%) I can occasionally get into
+Windows 10 and run CDM -- and that unfortunately does not seem to
+trigger the error again, so CDM doesn't look like a reliable way to
+trigger the hangs.
 
-> Differences from previous versions
-> ==================================
-> 
-> The main difference is that this series include only the minimal
-> changes deemed necessary to have a starting point.  I like to think
-> that it's better connected to the QEMU community and project needs,
-> and will hopefully allow for a more organic growth.
-> 
-> Since this version has less features than the previous versions,
-> provided it's accepted, these are the next probable development tasks:
-> 
->  * Provide a simple variants mechanism to allow the same tests to be
->    run under different targets, machine models and devices (present on
->    the previous versions as a "YAML to Mux" file with architecture
->    definitions)
->  * Implement QEMUMachine migration support (present on the previous
->    version in the "avocado_qemu.test._VM" class)
->  * Implement Guest OS image selection and download (mostly an Avocado
->    feature, paired with a parameter convention and cloud-init support
->    code)
->  * Implement interactive support for Guest OS sessions (present on
->    the previous versions, supported by the aexpect Python module)
-> 
-> Even though this version shares very little (if any) code with the
-> previous versions, the following is a list of noteworthy changes:
-> 
->  * Tests directory is now "tests/acceptance" (was "tests/avocado")
->  * Base test class is now "avocado_qemu.Test" (was
->    "avocado_qemu.test.QemuTest")
->  * Base test class is now hosted in "avocado_qemu/__init__.py" (was
->    "avocado_qemu/test.py")
->  * Direct use of "qemu.QEMUMachine", that is, the
->    avocado_qemu.test._VM class is gone
->  * avocado_qemu.Test won't search for QEMU binaries on $PATH.  To use
->    QEMU binary on a custom system location it's necessary to use the
->    "qemu_bin" parameter
->  * Example test in README.rst is distributed as a real test
->    ("test_version.py")
->  * A new "Linux boot console" test, loosely modeled after Phillipe's
->    use case
-> 
-> Commit summary
-> ==============
-> 
-> Cleber Rosa (5):
->   Add functional/acceptance tests infrastructure
->   scripts/qemu.py: allow adding to the list of extra arguments
->   Acceptance tests: add quick VNC tests
->   scripts/qemu.py: introduce set_console() method
->   Acceptance tests: add Linux kernel boot and console checking test
-> 
->  scripts/qemu.py                             | 103 +++++++++++++++-
->  scripts/test_qemu.py                        | 176 +++++++++++++++++++++++++++
->  tests/acceptance/README.rst                 | 141 +++++++++++++++++++++
->  tests/acceptance/avocado_qemu/__init__.py   |  45 +++++++
->  tests/acceptance/test_boot_linux_console.py |  37 ++++++
->  tests/acceptance/test_version.py            |  13 ++
->  tests/acceptance/test_vnc.py                |  50 ++++++++
->  7 files changed, 564 insertions(+), 1 deletion(-)
->  create mode 100644 scripts/test_qemu.py
->  create mode 100644 tests/acceptance/README.rst
->  create mode 100644 tests/acceptance/avocado_qemu/__init__.py
->  create mode 100644 tests/acceptance/test_boot_linux_console.py
->  create mode 100644 tests/acceptance/test_version.py
->  create mode 100644 tests/acceptance/test_vnc.py
-> 
-> ---
-> 
-> [1] https://lists.gnu.org/archive/html/qemu-devel/2018-04/msg03443.html
-> [2] https://github.com/apahim/qemu/commits/avocado_qemu
-> [3] https://lists.gnu.org/archive/html/qemu-devel/2018-04/msg03076.html
-> 
-> 
+
+
+Anyway, d759c951 definitely appears to change the odds of AHCI locking up d=
+uring boot for me, and I suppose it might have something to do with how it =
+is changing the BQL acquisition/release in main-loop.c, but I am not sure w=
+hy/what yet.
+
+Before this patch, we only lock the iothread and re-lock it if there was
+a timeout, and after this patch we *always* lock and unlock the
+iothread. This is probably just exposing some latent bug in the AHCI
+emulator that has always existed, but now the odds of seeing it are much
+higher.
+
+I'll have to dig as to what the race is -- I'm not sure just yet.
+
+
+If those of you who are seeing this bug too could confirm for me that d759c=
+951 appears to be the guilty party, that probably wouldn't hurt.
+
+Thanks!
+--js
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1769189
+
+Title:
+  Issue with qemu 2.12.0 + SATA
+
+Status in QEMU:
+  New
+
+Bug description:
+  [EDIT: I first thought that OVMF was the issue, but it turns out to be
+  SATA]
+
+  I had a Windows 10 VM running perfectly fine with a SATA drive, since
+  I upgraded to qemu 2.12, the guests hangs for a couple of minutes,
+  works for a few seconds, and hangs again, etc. By "hang" I mean it
+  doesn't freeze, but it looks like it's waiting on IO or something, I
+  can move the mouse but everything needing disk access is unresponsive.
+
+  What doesn't work: qemu 2.12 with SATA
+  What works: using VirIO-SCSI with qemu 2.12 or downgrading qemu to 2.11.1=
+ and keep using SATA.
+
+  Platform is arch linux 4.16.7 on skylake and Haswell, I have attached
+  the vm xml file.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1769189/+subscriptions
