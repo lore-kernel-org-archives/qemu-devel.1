@@ -1,17 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52598)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39684)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1fMMYP-0006R6-0j
-	for qemu-devel@nongnu.org; Fri, 25 May 2018 19:55:26 -0400
+	(envelope-from <no-reply@patchew.org>) id 1fMMo0-0001v6-H8
+	for qemu-devel@nongnu.org; Fri, 25 May 2018 20:11:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1fMMYL-00082z-Nl
-	for qemu-devel@nongnu.org; Fri, 25 May 2018 19:55:25 -0400
-From: John Snow <jsnow@redhat.com>
-Date: Fri, 25 May 2018 19:55:05 -0400
-Message-Id: <20180525235509.11282-13-jsnow@redhat.com>
+	(envelope-from <no-reply@patchew.org>) id 1fMMnx-0000Pe-AZ
+	for qemu-devel@nongnu.org; Fri, 25 May 2018 20:11:32 -0400
+Resent-Message-Id: <E1fMMnx-0000Pe-AZ@eggs.gnu.org>
 In-Reply-To: <20180525235509.11282-1-jsnow@redhat.com>
-References: <20180525235509.11282-1-jsnow@redhat.com>
-Subject: [Qemu-devel] [PATCH 12/16] ahci: make mem_read_32 traces more
- descriptive
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <152729347760.240.279100994027559097@d39dc562802a>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Fri, 25 May 2018 17:11:18 -0700 (PDT)
+Subject: Re: [Qemu-devel] [PATCH 00/16] AHCI: tracing improvements
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,59 +23,88 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: John Snow <jsnow@redhat.com>
+To: jsnow@redhat.com
+Cc: famz@redhat.com, qemu-devel@nongnu.org, qemu-block@nongnu.org
 
-Signed-off-by: John Snow <jsnow@redhat.com>
----
- hw/ide/ahci.c       | 7 +++++--
- hw/ide/trace-events | 3 +++
- 2 files changed, 8 insertions(+), 2 deletions(-)
-
-diff --git a/hw/ide/ahci.c b/hw/ide/ahci.c
-index 4bcb613bf9..ea68950952 100644
---- a/hw/ide/ahci.c
-+++ b/hw/ide/ahci.c
-@@ -46,7 +46,6 @@ static bool ahci_map_fis_address(AHCIDevice *ad);
- static void ahci_unmap_clb_address(AHCIDevice *ad);
- static void ahci_unmap_fis_address(AHCIDevice *ad);
- 
--__attribute__((__unused__)) /* TODO */
- static const char *AHCIHostReg_lookup[AHCI_HOST_REG__COUNT] = {
-     [AHCI_HOST_REG_CAP]        = "CAP",
-     [AHCI_HOST_REG_CTL]        = "GHC",
-@@ -402,13 +401,17 @@ static uint64_t ahci_mem_read_32(void *opaque, hwaddr addr)
-             val = s->control_regs.version;
-             break;
-         default:
--            break;
-+            trace_ahci_mem_read_32_host_unimpl(s, AHCIHostReg_lookup[regnum],
-+                                               addr);
-         }
-+        trace_ahci_mem_read_32_host(s, AHCIHostReg_lookup[regnum], addr, val);
-     } else if ((addr >= AHCI_PORT_REGS_START_ADDR) &&
-                (addr < (AHCI_PORT_REGS_START_ADDR +
-                 (s->ports * AHCI_PORT_ADDR_OFFSET_LEN)))) {
-         val = ahci_port_read(s, (addr - AHCI_PORT_REGS_START_ADDR) >> 7,
-                              addr & AHCI_PORT_ADDR_OFFSET_MASK);
-+    } else {
-+        trace_ahci_mem_read_32_default(s, addr, val);
-     }
- 
-     trace_ahci_mem_read_32(s, addr, val);
-diff --git a/hw/ide/trace-events b/hw/ide/trace-events
-index 458e4a3e80..5bd8b2b1df 100644
---- a/hw/ide/trace-events
-+++ b/hw/ide/trace-events
-@@ -72,6 +72,9 @@ ahci_trigger_irq(void *s, int port, const char *name, uint32_t val, uint32_t old
- ahci_port_write(void *s, int port, const char *reg, int offset, uint32_t val) "ahci(%p)[%d]: port write [reg:%s] @ 0x%x: 0x%08x"
- ahci_port_write_unimpl(void *s, int port, const char *reg, int offset, uint32_t val) "ahci(%p)[%d]: unimplemented port write [reg:%s] @ 0x%x: 0x%08x"
- ahci_mem_read_32(void *s, uint64_t addr, uint32_t val) "ahci(%p): mem read @ 0x%"PRIx64": 0x%08x"
-+ahci_mem_read_32_default(void *s, uint64_t addr, uint32_t val) "ahci(%p): mem read @ 0x%"PRIx64": 0x%08x"
-+ahci_mem_read_32_host(void *s, const char *reg, uint64_t addr, uint32_t val) "ahci(%p): mem read [reg:%s] @ 0x%"PRIx64": 0x%08x"
-+ahci_mem_read_32_host_unimpl(void *s, const char *reg, uint64_t addr) "ahci(%p): unimplemented mem read [reg:%s] @ 0x%"PRIx64
- ahci_mem_read(void *s, unsigned size, uint64_t addr, uint64_t val) "ahci(%p): read%u @ 0x%"PRIx64": 0x%016"PRIx64
- ahci_mem_write(void *s, unsigned size, uint64_t addr, uint64_t val) "ahci(%p): write%u @ 0x%"PRIx64": 0x%016"PRIx64
- ahci_mem_write_unknown(void *s, unsigned size, uint64_t addr, uint64_t val) "ahci(%p): write%u to unknown register 0x%"PRIx64": 0x%016"PRIx64
--- 
-2.14.3
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
+c3NhZ2UtaWQ6IDIwMTgwNTI1MjM1NTA5LjExMjgyLTEtanNub3dAcmVkaGF0LmNvbQpTdWJqZWN0
+OiBbUWVtdS1kZXZlbF0gW1BBVENIIDAwLzE2XSBBSENJOiB0cmFjaW5nIGltcHJvdmVtZW50cwoK
+PT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFzaAoKQkFTRT1iYXNlCm49MQp0b3Rh
+bD0kKGdpdCBsb2cgLS1vbmVsaW5lICRCQVNFLi4gfCB3YyAtbCkKZmFpbGVkPTAKCmdpdCBjb25m
+aWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxpbWl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVu
+YW1lcyBUcnVlCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLmFsZ29yaXRobSBoaXN0b2dyYW0KCmNv
+bW1pdHM9IiQoZ2l0IGxvZyAtLWZvcm1hdD0lSCAtLXJldmVyc2UgJEJBU0UuLikiCmZvciBjIGlu
+ICRjb21taXRzOyBkbwogICAgZWNobyAiQ2hlY2tpbmcgUEFUQ0ggJG4vJHRvdGFsOiAkKGdpdCBs
+b2cgLW4gMSAtLWZvcm1hdD0lcyAkYykuLi4iCiAgICBpZiAhIGdpdCBzaG93ICRjIC0tZm9ybWF0
+PWVtYWlsIHwgLi9zY3JpcHRzL2NoZWNrcGF0Y2gucGwgLS1tYWlsYmFjayAtOyB0aGVuCiAgICAg
+ICAgZmFpbGVkPTEKICAgICAgICBlY2hvCiAgICBmaQogICAgbj0kKChuKzEpKQpkb25lCgpleGl0
+ICRmYWlsZWQKPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KClVwZGF0aW5nIDNjOGNmNWE5YzIxZmY4
+NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMzODQKRnJvbSBodHRwczovL2dpdGh1Yi5jb20vcGF0Y2hl
+dy1wcm9qZWN0L3FlbXUKIHQgW3RhZyB1cGRhdGVdICAgICAgICAgICAgcGF0Y2hldy8xNTI3MDM0
+NTE3LTc4NTEtMS1naXQtc2VuZC1lbWFpbC1tamNAc2lmaXZlLmNvbSAtPiBwYXRjaGV3LzE1Mjcw
+MzQ1MTctNzg1MS0xLWdpdC1zZW5kLWVtYWlsLW1qY0BzaWZpdmUuY29tCiB0IFt0YWcgdXBkYXRl
+XSAgICAgICAgICAgIHBhdGNoZXcvMTUyNzI2Njc5My0zMDEzNjEtMS1naXQtc2VuZC1lbWFpbC1t
+c3RAcmVkaGF0LmNvbSAtPiBwYXRjaGV3LzE1MjcyNjY3OTMtMzAxMzYxLTEtZ2l0LXNlbmQtZW1h
+aWwtbXN0QHJlZGhhdC5jb20KICogW25ldyB0YWddICAgICAgICAgICAgICAgcGF0Y2hldy8yMDE4
+MDUyNTIzNTUwOS4xMTI4Mi0xLWpzbm93QHJlZGhhdC5jb20gLT4gcGF0Y2hldy8yMDE4MDUyNTIz
+NTUwOS4xMTI4Mi0xLWpzbm93QHJlZGhhdC5jb20KU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0
+ZXN0Jwo2ZTllYWMyNWI2IGFoY2k6IG1ha2UgYWhjaV9tZW1fd3JpdGUgdHJhY2VzIG1vcmUgZGVz
+Y3JpcHRpdmUKMGU5MTc4YThhMyBhaGNpOiBkZWxldGUgb2xkIGhvc3QgcmVnaXN0ZXIgYWRkcmVz
+cyBkZWZpbml0aW9ucwozNTY0YzJhNTQ4IGFoY2k6IGFkanVzdCBhaGNpX21lbV93cml0ZSB0byB3
+b3JrIG9uIHJlZ2lzdGVycwpjYzYyYTE5MmNmIGFoY2k6IGZpeCBzcGFjaW5nIGRhbWFnZSBvbiBh
+aGNpX21lbV93cml0ZQpiOTJjY2M0ZGMwIGFoY2k6IG1ha2UgbWVtX3JlYWRfMzIgdHJhY2VzIG1v
+cmUgZGVzY3JpcHRpdmUKYzcwZWU5ODVlNCBhaGNpOiBtb2RpZnkgYWhjaV9tZW1fcmVhZF8zMiB0
+byB3b3JrIG9uIHJlZ2lzdGVyIG51bWJlcnMKMGM1MDNmZDA2NCBhaGNpOiBmaXggaG9zdCByZWdp
+c3RlciBtYXggYWRkcmVzcwozMjk2Y2NjMDYyIGFoY2k6IGFkZCBob3N0IHJlZ2lzdGVyIGVudW1l
+cmF0aW9uCjY5YmFmNzhlODUgYWhjaTogZGVsZXRlIG9sZCBwb3J0IHJlZ2lzdGVyIGFkZHJlc3Mg
+ZGVmaW5pdGlvbnMKMDU5Y2E1YTE3NiBhaGNpOiBtYWtlIHBvcnQgd3JpdGUgdHJhY2VzIG1vcmUg
+ZGVzY3JpcHRpdmUKNTkwN2UyODY5MCBhaGNpOiBtb2RpZnkgYWhjaV9wb3J0X3dyaXRlIHRvIHVz
+ZSByZWdpc3RlciBudW1iZXJzCmNjNjU3OGJmZTIgYWhjaTogY29tYmluZSBpZGVudGljYWwgY2xh
+dXNlcyBpbiBwb3J0IHdyaXRlCmJkN2JiNTBjYTYgYWhjaTogZml4IHNwYWNpbmcgZGFtYWdlIG9u
+IGFoY2lfcG9ydF93cml0ZQo0ZjZlMzM3YTRmIGFoY2k6IG1ha2UgcG9ydCByZWFkIHRyYWNlcyBt
+b3JlIGRlc2NyaXB0aXZlCmM2Mjk5OTgyNjggYWhjaTogbW9kaWZ5IGFoY2lfcG9ydF9yZWFkIHRv
+IHVzZSByZWdpc3RlciBudW1iZXJzCmYwMWU3MjliZTEgYWhjaTogYWRkIHBvcnQgcmVnaXN0ZXIg
+ZW51bWVyYXRpb24KCj09PSBPVVRQVVQgQkVHSU4gPT09CkNoZWNraW5nIFBBVENIIDEvMTY6IGFo
+Y2k6IGFkZCBwb3J0IHJlZ2lzdGVyIGVudW1lcmF0aW9uLi4uCldBUk5JTkc6IGxpbmUgb3ZlciA4
+MCBjaGFyYWN0ZXJzCiM3MTogRklMRTogaHcvaWRlL2FoY2lfaW50ZXJuYWwuaDo5NDoKKyAgICBB
+SENJX1BPUlRfUkVHX1NDUl9OT1RJRiAgID0gMTUsIC8qIFB4U05URjogU0FUQSBwaHkgcmVnaXN0
+ZXI6IFNOb3RpZmljYXRpb24gKi8KCnRvdGFsOiAwIGVycm9ycywgMSB3YXJuaW5ncywgNzIgbGlu
+ZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcu
+ICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0g
+dG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgpDaGVja2lu
+ZyBQQVRDSCAyLzE2OiBhaGNpOiBtb2RpZnkgYWhjaV9wb3J0X3JlYWQgdG8gdXNlIHJlZ2lzdGVy
+IG51bWJlcnMuLi4KQ2hlY2tpbmcgUEFUQ0ggMy8xNjogYWhjaTogbWFrZSBwb3J0IHJlYWQgdHJh
+Y2VzIG1vcmUgZGVzY3JpcHRpdmUuLi4KQ2hlY2tpbmcgUEFUQ0ggNC8xNjogYWhjaTogZml4IHNw
+YWNpbmcgZGFtYWdlIG9uIGFoY2lfcG9ydF93cml0ZS4uLgpFUlJPUjogc3BhY2VzIHJlcXVpcmVk
+IGFyb3VuZCB0aGF0ICd8JyAoY3R4OlZ4VikKIzgzOiBGSUxFOiBody9pZGUvYWhjaS5jOjMxNjoK
+KyAgICAgICAgICAgICh2YWwgJiB+KFBPUlRfQ01EX1JPX01BU0t8UE9SVF9DTURfSUNDX01BU0sp
+KTsKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBeCgp0b3RhbDogMSBlcnJv
+cnMsIDAgd2FybmluZ3MsIDE1NiBsaW5lcyBjaGVja2VkCgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBw
+cm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNl
+IHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0gg
+aW4gTUFJTlRBSU5FUlMuCgpDaGVja2luZyBQQVRDSCA1LzE2OiBhaGNpOiBjb21iaW5lIGlkZW50
+aWNhbCBjbGF1c2VzIGluIHBvcnQgd3JpdGUuLi4KQ2hlY2tpbmcgUEFUQ0ggNi8xNjogYWhjaTog
+bW9kaWZ5IGFoY2lfcG9ydF93cml0ZSB0byB1c2UgcmVnaXN0ZXIgbnVtYmVycy4uLgpDaGVja2lu
+ZyBQQVRDSCA3LzE2OiBhaGNpOiBtYWtlIHBvcnQgd3JpdGUgdHJhY2VzIG1vcmUgZGVzY3JpcHRp
+dmUuLi4KQ2hlY2tpbmcgUEFUQ0ggOC8xNjogYWhjaTogZGVsZXRlIG9sZCBwb3J0IHJlZ2lzdGVy
+IGFkZHJlc3MgZGVmaW5pdGlvbnMuLi4KQ2hlY2tpbmcgUEFUQ0ggOS8xNjogYWhjaTogYWRkIGhv
+c3QgcmVnaXN0ZXIgZW51bWVyYXRpb24uLi4KQ2hlY2tpbmcgUEFUQ0ggMTAvMTY6IGFoY2k6IGZp
+eCBob3N0IHJlZ2lzdGVyIG1heCBhZGRyZXNzLi4uCkNoZWNraW5nIFBBVENIIDExLzE2OiBhaGNp
+OiBtb2RpZnkgYWhjaV9tZW1fcmVhZF8zMiB0byB3b3JrIG9uIHJlZ2lzdGVyIG51bWJlcnMuLi4K
+Q2hlY2tpbmcgUEFUQ0ggMTIvMTY6IGFoY2k6IG1ha2UgbWVtX3JlYWRfMzIgdHJhY2VzIG1vcmUg
+ZGVzY3JpcHRpdmUuLi4KQ2hlY2tpbmcgUEFUQ0ggMTMvMTY6IGFoY2k6IGZpeCBzcGFjaW5nIGRh
+bWFnZSBvbiBhaGNpX21lbV93cml0ZS4uLgpDaGVja2luZyBQQVRDSCAxNC8xNjogYWhjaTogYWRq
+dXN0IGFoY2lfbWVtX3dyaXRlIHRvIHdvcmsgb24gcmVnaXN0ZXJzLi4uCkNoZWNraW5nIFBBVENI
+IDE1LzE2OiBhaGNpOiBkZWxldGUgb2xkIGhvc3QgcmVnaXN0ZXIgYWRkcmVzcyBkZWZpbml0aW9u
+cy4uLgpDaGVja2luZyBQQVRDSCAxNi8xNjogYWhjaTogbWFrZSBhaGNpX21lbV93cml0ZSB0cmFj
+ZXMgbW9yZSBkZXNjcmlwdGl2ZS4uLgpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwoj
+MTg6IEZJTEU6IGh3L2lkZS9haGNpLmM6NDkzOgorICAgICAgICAgICAgdHJhY2VfYWhjaV9tZW1f
+d3JpdGVfaG9zdF91bmltcGwocywgc2l6ZSwgQUhDSUhvc3RSZWdfbG9va3VwW3JlZ251bV0sCgp0
+b3RhbDogMCBlcnJvcnMsIDEgd2FybmluZ3MsIDI5IGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2gg
+aGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9y
+cwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUK
+Q0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1h
+bmQgZXhpdGVkIHdpdGggY29kZTogMQoKCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxs
+eSBieSBQYXRjaGV3IFtodHRwOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVk
+YmFjayB0byBwYXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
