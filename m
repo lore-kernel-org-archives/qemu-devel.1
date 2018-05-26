@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35842)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38198)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <keno@juliacomputing.com>) id 1fMRgi-0006Tz-T2
-	for qemu-devel@nongnu.org; Sat, 26 May 2018 01:24:21 -0400
+	(envelope-from <no-reply@patchew.org>) id 1fMRuR-0007EQ-7t
+	for qemu-devel@nongnu.org; Sat, 26 May 2018 01:38:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <keno@juliacomputing.com>) id 1fMRgf-0004ez-Rr
-	for qemu-devel@nongnu.org; Sat, 26 May 2018 01:24:20 -0400
-Received: from mail-qk0-x235.google.com ([2607:f8b0:400d:c09::235]:45077)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <keno@juliacomputing.com>)
-	id 1fMRgf-0004ed-Nk
-	for qemu-devel@nongnu.org; Sat, 26 May 2018 01:24:17 -0400
-Received: by mail-qk0-x235.google.com with SMTP id c198-v6so5676628qkg.12
-	for <qemu-devel@nongnu.org>; Fri, 25 May 2018 22:24:17 -0700 (PDT)
-From: keno@juliacomputing.com
-Date: Sat, 26 May 2018 01:23:15 -0400
-Message-Id: <f7e1cd54774642aec19dd2c547a5e560050ab9cd.1527310210.git.keno@alumni.harvard.edu>
+	(envelope-from <no-reply@patchew.org>) id 1fMRuM-0005Sp-Ra
+	for qemu-devel@nongnu.org; Sat, 26 May 2018 01:38:31 -0400
+Resent-Message-Id: <E1fMRuM-0005Sp-Ra@eggs.gnu.org>
+Received: from sender-of-o51.zoho.com ([135.84.80.216]:21048)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1fMRuM-0005RW-JH
+	for qemu-devel@nongnu.org; Sat, 26 May 2018 01:38:26 -0400
 In-Reply-To: <cover.1527310210.git.keno@alumni.harvard.edu>
-References: <cover.1527310210.git.keno@alumni.harvard.edu>
-In-Reply-To: <cover.1527310210.git.keno@alumni.harvard.edu>
-References: <cover.1527310210.git.keno@alumni.harvard.edu>
-Subject: [Qemu-devel] [PATCH 13/13] 9p: darwin: configure: Allow VirtFS on
- Darwin
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <152731306595.240.14971294304014284230@d39dc562802a>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Fri, 25 May 2018 22:37:46 -0700 (PDT)
+Subject: Re: [Qemu-devel] [PATCH 00/13] 9p: Add support for Darwin
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,75 +28,130 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Keno Fischer <keno@alumni.harvard.edu>, groug@kaod.org, Keno Fischer <keno@juliacomputing.com>
+To: keno@juliacomputing.com
+Cc: famz@redhat.com, qemu-devel@nongnu.org, keno@alumni.harvard.edu, groug@kaod.org
 
-From: Keno Fischer <keno@alumni.harvard.edu>
-
-Signed-off-by: Keno Fischer <keno@juliacomputing.com>
----
- Makefile.objs |  1 +
- configure     | 23 +++++++++++++++--------
- 2 files changed, 16 insertions(+), 8 deletions(-)
-
-diff --git a/Makefile.objs b/Makefile.objs
-index c6c3554..a2245c9 100644
---- a/Makefile.objs
-+++ b/Makefile.objs
-@@ -104,6 +104,7 @@ common-obj-$(CONFIG_WIN32) += os-win32.o
- common-obj-$(CONFIG_POSIX) += os-posix.o
- 
- common-obj-$(CONFIG_LINUX) += fsdev/
-+common-obj-$(CONFIG_DARWIN) += fsdev/
- 
- common-obj-y += migration/
- 
-diff --git a/configure b/configure
-index a8498ab..eb7328c 100755
---- a/configure
-+++ b/configure
-@@ -5535,16 +5535,27 @@ if test "$want_tools" = "yes" ; then
-   fi
- fi
- if test "$softmmu" = yes ; then
--  if test "$linux" = yes; then
--    if test "$virtfs" != no && test "$cap" = yes && test "$attr" = yes ; then
-+  if test "$virtfs" != no; then
-+    if test "$linux" = yes; then
-+      if test "$cap" = yes && test "$attr" = yes ; then
-+        virtfs=yes
-+        tools="$tools fsdev/virtfs-proxy-helper\$(EXESUF)"
-+      else
-+        if test "$virtfs" = yes; then
-+          error_exit "VirtFS requires libcap devel and libattr devel under Linux"
-+        fi
-+        virtfs=no
-+      fi
-+    elif test "$darwin" = yes; then
-       virtfs=yes
--      tools="$tools fsdev/virtfs-proxy-helper\$(EXESUF)"
-     else
-       if test "$virtfs" = yes; then
--        error_exit "VirtFS requires libcap devel and libattr devel"
-+        error_exit "VirtFS is supported only on Linux and Darwin"
-       fi
-       virtfs=no
-     fi
-+  fi
-+  if test "$linux" = yes; then
-     if test "$mpath" != no && test "$mpathpersist" = yes ; then
-       mpath=yes
-     else
-@@ -5555,10 +5566,6 @@ if test "$softmmu" = yes ; then
-     fi
-     tools="$tools scsi/qemu-pr-helper\$(EXESUF)"
-   else
--    if test "$virtfs" = yes; then
--      error_exit "VirtFS is supported only on Linux"
--    fi
--    virtfs=no
-     if test "$mpath" = yes; then
-       error_exit "Multipath is supported only on Linux"
-     fi
--- 
-2.8.1
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
+c3NhZ2UtaWQ6IGNvdmVyLjE1MjczMTAyMTAuZ2l0Lmtlbm9AYWx1bW5pLmhhcnZhcmQuZWR1ClN1
+YmplY3Q6IFtRZW11LWRldmVsXSBbUEFUQ0ggMDAvMTNdIDlwOiBBZGQgc3VwcG9ydCBmb3IgRGFy
+d2luCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCgpCQVNFPWJhc2UKbj0x
+CnRvdGFsPSQoZ2l0IGxvZyAtLW9uZWxpbmUgJEJBU0UuLiB8IHdjIC1sKQpmYWlsZWQ9MAoKZ2l0
+IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlm
+Zi5yZW5hbWVzIFRydWUKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYuYWxnb3JpdGhtIGhpc3RvZ3Jh
+bQoKY29tbWl0cz0iJChnaXQgbG9nIC0tZm9ybWF0PSVIIC0tcmV2ZXJzZSAkQkFTRS4uKSIKZm9y
+IGMgaW4gJGNvbW1pdHM7IGRvCiAgICBlY2hvICJDaGVja2luZyBQQVRDSCAkbi8kdG90YWw6ICQo
+Z2l0IGxvZyAtbiAxIC0tZm9ybWF0PSVzICRjKS4uLiIKICAgIGlmICEgZ2l0IHNob3cgJGMgLS1m
+b3JtYXQ9ZW1haWwgfCAuL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIC07IHRoZW4K
+ICAgICAgICBmYWlsZWQ9MQogICAgICAgIGVjaG8KICAgIGZpCiAgICBuPSQoKG4rMSkpCmRvbmUK
+CmV4aXQgJGZhaWxlZAo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTlj
+MjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApGcm9tIGh0dHBzOi8vZ2l0aHViLmNvbS9w
+YXRjaGV3LXByb2plY3QvcWVtdQogdCBbdGFnIHVwZGF0ZV0gICAgICAgICAgICBwYXRjaGV3LzE1
+MjcyNjY3OTMtMzAxMzYxLTEtZ2l0LXNlbmQtZW1haWwtbXN0QHJlZGhhdC5jb20gLT4gcGF0Y2hl
+dy8xNTI3MjY2NzkzLTMwMTM2MS0xLWdpdC1zZW5kLWVtYWlsLW1zdEByZWRoYXQuY29tCiAqIFtu
+ZXcgdGFnXSAgICAgICAgICAgICAgIHBhdGNoZXcvY292ZXIuMTUyNzMxMDIxMC5naXQua2Vub0Bh
+bHVtbmkuaGFydmFyZC5lZHUgLT4gcGF0Y2hldy9jb3Zlci4xNTI3MzEwMjEwLmdpdC5rZW5vQGFs
+dW1uaS5oYXJ2YXJkLmVkdQpTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCmQ1MDI2YjI0
+ODAgOXA6IGRhcndpbjogY29uZmlndXJlOiBBbGxvdyBWaXJ0RlMgb24gRGFyd2luCmUzNzVmZTlk
+N2EgOXA6IGRhcndpbjogUHJvdmlkZSBhIGZhbGxiYWNrIGltcGxlbWVudGF0aW9uIGZvciB1dGlt
+ZW5zYXQKN2UwYjJlZTc1OSA5cDogZGFyd2luOiBNYXJrIG1rbm9kIGFzIHVuc3VwcG9ydGVkCmU3
+OGQ2NTYwNTcgOXA6IGRhcndpbjogKnhhdHRyX25vZm9sbG93IGltcGxlbWVudGF0aW9ucwpkZmY5
+NDQxN2M1IDlwOiBkYXJ3aW46IFByb3ZpZGUgYSBjb21wYXRpYmlsaXR5IGRlZmluaXRpb24gZm9y
+IFhBVFRSX1NJWkVfTUFYCjI2MzBhMmY0ZWEgOXA6IGRhcndpbjogSWdub3JlIE9fe05PQVRJTUUs
+IERJUkVDVH0KNzI3N2ZkZDI2MyA5cDogZGFyd2luOiBQcm9wZXJseSB0cmFuc2xhdGUgQVRfUkVN
+T1ZFRElSIGZsYWcKMWVlMTQzNTM2MCA5cDogZGFyd2luOiBBZGRyZXNzIG1pbm9yIGRpZmZlcmVu
+Y2VzCmEwM2QwNWQzNWEgOXA6IGRhcndpbjogSGFuZGxlIHN0cnVjdCBkaXJlbnQgZGlmZmVyZW5j
+ZXMKMTYwY2VmYzU4OSA5cDogZGFyd2luOiBIYW5kbGUgc3RydWN0IHN0YXQoZnMpIGRpZmZlcmVu
+Y2VzCmY5MjA2MTdkYzAgOXA6IE1vdmUgYSBjb3VwbGUgeGF0dHIgZnVuY3Rpb25zIHRvIDlwLXV0
+aWwKM2I0MTMwYzBiNiA5cDogQXZvaWQgd2FybmluZyBpZiBGU19JT0NfR0VUVkVSU0lPTiBpcyBu
+b3QgZGVmaW5lZAo0NmNmNWM1YzRkIDlwOiBsaW51eDogRml4IGEgY291cGxlIExpbnV4IGFzc3Vt
+cHRpb25zCgo9PT0gT1VUUFVUIEJFR0lOID09PQpDaGVja2luZyBQQVRDSCAxLzEzOiA5cDogbGlu
+dXg6IEZpeCBhIGNvdXBsZSBMaW51eCBhc3N1bXB0aW9ucy4uLgpDaGVja2luZyBQQVRDSCAyLzEz
+OiA5cDogQXZvaWQgd2FybmluZyBpZiBGU19JT0NfR0VUVkVSU0lPTiBpcyBub3QgZGVmaW5lZC4u
+LgpDaGVja2luZyBQQVRDSCAzLzEzOiA5cDogTW92ZSBhIGNvdXBsZSB4YXR0ciBmdW5jdGlvbnMg
+dG8gOXAtdXRpbC4uLgpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwojMjY6IEZJTEU6
+IGh3LzlwZnMvOXAtbG9jYWwuYzo3Nzk6CisgICAgICAgIGlmIChmZ2V0eGF0dHJfZm9sbG93KGZk
+LCAidXNlci52aXJ0ZnMudWlkIiwgJnRtcF91aWQsIHNpemVvZih1aWRfdCkpID4gMCkgewoKV0FS
+TklORzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzMwOiBGSUxFOiBody85cGZzLzlwLWxvY2Fs
+LmM6NzgyOgorICAgICAgICBpZiAoZmdldHhhdHRyX2ZvbGxvdyhmZCwgInVzZXIudmlydGZzLmdp
+ZCIsICZ0bXBfZ2lkLCBzaXplb2YoZ2lkX3QpKSA+IDApCgpXQVJOSU5HOiBsaW5lIG92ZXIgODAg
+Y2hhcmFjdGVycwojMzU6IEZJTEU6IGh3LzlwZnMvOXAtbG9jYWwuYzo3ODY6CisgICAgICAgIGlm
+IChmZ2V0eGF0dHJfZm9sbG93KGZkLCAidXNlci52aXJ0ZnMubW9kZSIsICZ0bXBfbW9kZSwgc2l6
+ZW9mKG1vZGVfdCkpID4gMCkKCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiM0MDog
+RklMRTogaHcvOXBmcy85cC1sb2NhbC5jOjc5MDoKKyAgICAgICAgaWYgKGZnZXR4YXR0cl9mb2xs
+b3coZmQsICJ1c2VyLnZpcnRmcy5yZGV2IiwgJnRtcF9kZXYsIHNpemVvZihkZXZfdCkpID4gMCkK
+CnRvdGFsOiAwIGVycm9ycywgNCB3YXJuaW5ncywgMTI5IGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0
+Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVy
+cm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBz
+ZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KQ2hlY2tpbmcgUEFUQ0ggNC8xMzogOXA6IGRh
+cndpbjogSGFuZGxlIHN0cnVjdCBzdGF0KGZzKSBkaWZmZXJlbmNlcy4uLgpDaGVja2luZyBQQVRD
+SCA1LzEzOiA5cDogZGFyd2luOiBIYW5kbGUgc3RydWN0IGRpcmVudCBkaWZmZXJlbmNlcy4uLgpF
+UlJPUjogZG8gbm90IHVzZSBDOTkgLy8gY29tbWVudHMKIzQ2OiBGSUxFOiBody85cGZzLzlwLmM6
+MTk2MDoKKyAgICAgICAgLy8gRGFyd2luIGhhcyBkX3NlZWtvZmYsIHdoaWNoIGFwcGVhcnMgdG8g
+ZnVuY3Rpb24KCkVSUk9SOiBkbyBub3QgdXNlIEM5OSAvLyBjb21tZW50cwojNDc6IEZJTEU6IGh3
+LzlwZnMvOXAuYzoxOTYxOgorICAgICAgICAvLyBhbmFsb2dvdXNseSB0byBkX29mZi4gSG93ZXZl
+ciwgaXQgZG9lcyBub3QgYXBwZWFyCgpFUlJPUjogZG8gbm90IHVzZSBDOTkgLy8gY29tbWVudHMK
+IzQ4OiBGSUxFOiBody85cGZzLzlwLmM6MTk2MjoKKyAgICAgICAgLy8gdG8gYmUgc3VwcG9ydGVk
+IG9uIGFsbCBmaWxlIHN5c3RlbXMsIHNvIHVzZQoKRVJST1I6IGRvIG5vdCB1c2UgQzk5IC8vIGNv
+bW1lbnRzCiM0OTogRklMRTogaHcvOXBmcy85cC5jOjE5NjM6CisgICAgICAgIC8vIHRlbGxkaXIg
+Zm9yIGNvcnJlY3RuZXNzLgoKdG90YWw6IDQgZXJyb3JzLCAwIHdhcm5pbmdzLCA1MCBsaW5lcyBj
+aGVja2VkCgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElm
+IGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0
+aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgpDaGVja2luZyBQ
+QVRDSCA2LzEzOiA5cDogZGFyd2luOiBBZGRyZXNzIG1pbm9yIGRpZmZlcmVuY2VzLi4uCkNoZWNr
+aW5nIFBBVENIIDcvMTM6IDlwOiBkYXJ3aW46IFByb3Blcmx5IHRyYW5zbGF0ZSBBVF9SRU1PVkVE
+SVIgZmxhZy4uLgpDaGVja2luZyBQQVRDSCA4LzEzOiA5cDogZGFyd2luOiBJZ25vcmUgT197Tk9B
+VElNRSwgRElSRUNUfS4uLgpDaGVja2luZyBQQVRDSCA5LzEzOiA5cDogZGFyd2luOiBQcm92aWRl
+IGEgY29tcGF0aWJpbGl0eSBkZWZpbml0aW9uIGZvciBYQVRUUl9TSVpFX01BWC4uLgpDaGVja2lu
+ZyBQQVRDSCAxMC8xMzogOXA6IGRhcndpbjogKnhhdHRyX25vZm9sbG93IGltcGxlbWVudGF0aW9u
+cy4uLgpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwojMjA6IEZJTEU6IGh3LzlwZnMv
+OXAtdXRpbC5jOjIyOgorICAgIGludCBmZCA9IG9wZW5hdF9maWxlKGRpcmZkLCBmaWxlbmFtZSwg
+T19SRE9OTFkgfCBPX1BBVEhfOVBfVVRJTCB8IE9fTk9GT0xMT1csIDApOwoKRVJST1I6IGJyYWNl
+cyB7fSBhcmUgbmVjZXNzYXJ5IGZvciBhbGwgYXJtcyBvZiB0aGlzIHN0YXRlbWVudAojMjE6IEZJ
+TEU6IGh3LzlwZnMvOXAtdXRpbC5jOjIzOgorICAgIGlmIChmZCA9PSAtMSkKWy4uLl0KCldBUk5J
+Tkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiM1MTogRklMRTogaHcvOXBmcy85cC11dGlsLmM6
+NTI6CisgICAgaW50IGZkID0gb3BlbmF0X2ZpbGUoZGlyZmQsIGZpbGVuYW1lLCBPX1JET05MWSB8
+IE9fUEFUSF85UF9VVElMIHwgT19OT0ZPTExPVywgMCk7CgpFUlJPUjogYnJhY2VzIHt9IGFyZSBu
+ZWNlc3NhcnkgZm9yIGFsbCBhcm1zIG9mIHRoaXMgc3RhdGVtZW50CiM1MjogRklMRTogaHcvOXBm
+cy85cC11dGlsLmM6NTM6CisgICAgaWYgKGZkID09IC0xKQpbLi4uXQoKRVJST1I6IGJyYWNlcyB7
+fSBhcmUgbmVjZXNzYXJ5IGZvciBhbGwgYXJtcyBvZiB0aGlzIHN0YXRlbWVudAojNzM6IEZJTEU6
+IGh3LzlwZnMvOXAtdXRpbC5jOjczOgorICAgIGlmIChmZCA9PSAtMSkKWy4uLl0KCkVSUk9SOiBi
+cmFjZXMge30gYXJlIG5lY2Vzc2FyeSBmb3IgYWxsIGFybXMgb2YgdGhpcyBzdGF0ZW1lbnQKIzk1
+OiBGSUxFOiBody85cGZzLzlwLXV0aWwuYzo5NDoKKyAgICBpZiAoZmQgPT0gLTEpClsuLi5dCgp0
+b3RhbDogNCBlcnJvcnMsIDIgd2FybmluZ3MsIDk0IGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2gg
+aGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9y
+cwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUK
+Q0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCkNoZWNraW5nIFBBVENIIDExLzEzOiA5cDogZGFy
+d2luOiBNYXJrIG1rbm9kIGFzIHVuc3VwcG9ydGVkLi4uCkNoZWNraW5nIFBBVENIIDEyLzEzOiA5
+cDogZGFyd2luOiBQcm92aWRlIGEgZmFsbGJhY2sgaW1wbGVtZW50YXRpb24gZm9yIHV0aW1lbnNh
+dC4uLgpXQVJOSU5HOiBhcmNoaXRlY3R1cmUgc3BlY2lmaWMgZGVmaW5lcyBzaG91bGQgYmUgYXZv
+aWRlZAojMzQ6IEZJTEU6IGh3LzlwZnMvOXAtdXRpbC5jOjEwODoKKyNpZm5kZWYgX19oYXNfYnVp
+bHRpbgoKV0FSTklORzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzM4OiBGSUxFOiBody85cGZz
+LzlwLXV0aWwuYzoxMTI6CitpbnQgdXRpbWVuc2F0X25vZm9sbG93KGludCBkaXJmZCwgY29uc3Qg
+Y2hhciAqZmlsZW5hbWUsIGNvbnN0IHN0cnVjdCB0aW1lc3BlYyB0aW1lc1syXSkKCldBUk5JTkc6
+IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiM0MTogRklMRTogaHcvOXBmcy85cC11dGlsLmM6MTE1
+OgorI2lmIGRlZmluZWQoX19NQUNfMTBfMTMpIC8qIENoZWNrIHdoZXRoZXIgd2UgaGF2ZSBhbiBT
+REsgdmVyc2lvbiB0aGF0IGRlZmluZXMgdXRpbWVuc2F0ICovCgpXQVJOSU5HOiBhcmNoaXRlY3R1
+cmUgc3BlY2lmaWMgZGVmaW5lcyBzaG91bGQgYmUgYXZvaWRlZAojNDE6IEZJTEU6IGh3LzlwZnMv
+OXAtdXRpbC5jOjExNToKKyNpZiBkZWZpbmVkKF9fTUFDXzEwXzEzKSAvKiBDaGVjayB3aGV0aGVy
+IHdlIGhhdmUgYW4gU0RLIHZlcnNpb24gdGhhdCBkZWZpbmVzIHV0aW1lbnNhdCAqLwoKV0FSTklO
+RzogYXJjaGl0ZWN0dXJlIHNwZWNpZmljIGRlZmluZXMgc2hvdWxkIGJlIGF2b2lkZWQKIzQyOiBG
+SUxFOiBody85cGZzLzlwLXV0aWwuYzoxMTY6CisjaWYgX19NQUNfT1NfWF9WRVJTSU9OX01JTl9S
+RVFVSVJFRCA+PSBfX01BQ18xMF8xMwoKRVJST1I6IHRoYXQgb3BlbiBicmFjZSB7IHNob3VsZCBi
+ZSBvbiB0aGUgcHJldmlvdXMgbGluZQojNDk6IEZJTEU6IGh3LzlwZnMvOXAtdXRpbC5jOjEyMzoK
+KyAgICBpZiAoVVRJTUVOU0FUX0FWQUlMQUJMRSkKKyAgICB7CgpFUlJPUjogZG8gbm90IHVzZSBD
+OTkgLy8gY29tbWVudHMKIzU0OiBGSUxFOiBody85cGZzLzlwLXV0aWwuYzoxMjg6CisgICAgLy8g
+dXRpbWVuc2F0IG5vdCBhdmFpbGFibGUuIFVzZSBmdXRpbWVzLgoKRVJST1I6IGJyYWNlcyB7fSBh
+cmUgbmVjZXNzYXJ5IGZvciBhbGwgYXJtcyBvZiB0aGlzIHN0YXRlbWVudAojNTY6IEZJTEU6IGh3
+LzlwZnMvOXAtdXRpbC5jOjEzMDoKKyAgICBpZiAoZmQgPT0gLTEpClsuLi5dCgpXQVJOSU5HOiBs
+aW5lIG92ZXIgODAgY2hhcmFjdGVycwojOTI6IEZJTEU6IGh3LzlwZnMvOXAtdXRpbC5oOjc1Ogor
+aW50IHV0aW1lbnNhdF9ub2ZvbGxvdyhpbnQgZGlyZmQsIGNvbnN0IGNoYXIgKmZpbGVuYW1lLCBj
+b25zdCBzdHJ1Y3QgdGltZXNwZWMgdGltZXNbMl0pOwoKdG90YWw6IDMgZXJyb3JzLCA2IHdhcm5p
+bmdzLCA3NCBsaW5lcyBjaGVja2VkCgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxl
+YXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyBy
+ZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5F
+UlMuCgpDaGVja2luZyBQQVRDSCAxMy8xMzogOXA6IGRhcndpbjogY29uZmlndXJlOiBBbGxvdyBW
+aXJ0RlMgb24gRGFyd2luLi4uCj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRl
+ZCB3aXRoIGNvZGU6IDEKCgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0
+Y2hldyBbaHR0cDovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8g
+cGF0Y2hldy1kZXZlbEByZWRoYXQuY29t
