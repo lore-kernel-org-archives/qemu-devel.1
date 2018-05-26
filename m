@@ -1,33 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35058)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35623)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fMRcJ-0004jy-2a
-	for qemu-devel@nongnu.org; Sat, 26 May 2018 01:19:47 -0400
+	(envelope-from <keno@juliacomputing.com>) id 1fMRft-0005up-Tq
+	for qemu-devel@nongnu.org; Sat, 26 May 2018 01:23:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fMRcF-0001y9-Tg
-	for qemu-devel@nongnu.org; Sat, 26 May 2018 01:19:47 -0400
-Received: from mail-qk0-x244.google.com ([2607:f8b0:400d:c09::244]:40237)
+	(envelope-from <keno@juliacomputing.com>) id 1fMRfq-0003xf-P2
+	for qemu-devel@nongnu.org; Sat, 26 May 2018 01:23:29 -0400
+Received: from mail-qt0-x236.google.com ([2607:f8b0:400d:c0d::236]:43433)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fMRcF-0001xv-P2
-	for qemu-devel@nongnu.org; Sat, 26 May 2018 01:19:43 -0400
-Received: by mail-qk0-x244.google.com with SMTP id r66-v6so5678082qkr.7
-	for <qemu-devel@nongnu.org>; Fri, 25 May 2018 22:19:43 -0700 (PDT)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20180115143500.22631-1-f4bug@amsat.org>
-	<20180115143500.22631-3-f4bug@amsat.org> <876080oiky.fsf@linaro.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <a88ad136-02b4-0997-696c-cde307b6983f@amsat.org>
-Date: Sat, 26 May 2018 02:19:40 -0300
-MIME-Version: 1.0
-In-Reply-To: <876080oiky.fsf@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v2 2/8] docker: do not display deprecated
- images in 'make docker' help
+	(Exim 4.71) (envelope-from <keno@juliacomputing.com>)
+	id 1fMRfq-0003xC-JU
+	for qemu-devel@nongnu.org; Sat, 26 May 2018 01:23:26 -0400
+Received: by mail-qt0-x236.google.com with SMTP id f13-v6so9169932qtp.10
+	for <qemu-devel@nongnu.org>; Fri, 25 May 2018 22:23:26 -0700 (PDT)
+From: keno@juliacomputing.com
+Date: Sat, 26 May 2018 01:23:02 -0400
+Message-Id: <cover.1527310210.git.keno@alumni.harvard.edu>
+Subject: [Qemu-devel] [PATCH 00/13] 9p: Add support for Darwin
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,53 +24,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
-Cc: Fam Zheng <famz@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: Keno Fischer <keno@alumni.harvard.edu>, groug@kaod.org
 
-Hi Alex,
+From: Keno Fischer <keno@alumni.harvard.edu>
 
-On 01/17/2018 08:01 AM, Alex Bennée wrote:
-> 
-> Philippe Mathieu-Daudé <f4bug@amsat.org> writes:
-> 
->> the 'debian' base image is deprecated since 3e11974988d8
->>
->> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-> 
-> Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
+Hi Greg,
 
-Can you also queue this patch?
+this series adds support for building the 9p code on Mac OS X.
+It seems to work decently well (tested by booting up a linux
+guest and building a copy of qemu on a 9p mount in the guest),
+but there are probably corner cases I got wrong (particular
+in the xattr support). Is there a stress test you recommend
+running for those corner cases?
 
-> 
->> ---
->>  tests/docker/Makefile.include | 5 +++--
->>  1 file changed, 3 insertions(+), 2 deletions(-)
->>
->> diff --git a/tests/docker/Makefile.include b/tests/docker/Makefile.include
->> index ef95703cef..d5cf896966 100644
->> --- a/tests/docker/Makefile.include
->> +++ b/tests/docker/Makefile.include
->> @@ -4,7 +4,8 @@
->>
->>  DOCKER_SUFFIX := .docker
->>  DOCKER_FILES_DIR := $(SRC_PATH)/tests/docker/dockerfiles
->> -DOCKER_IMAGES := $(sort $(notdir $(basename $(wildcard $(DOCKER_FILES_DIR)/*.docker))))
->> +DOCKER_DEPRECATED_IMAGES := debian
->> +DOCKER_IMAGES := $(filter-out $(DOCKER_DEPRECATED_IMAGES),$(sort $(notdir $(basename $(wildcard $(DOCKER_FILES_DIR)/*.docker)))))
->>  DOCKER_TARGETS := $(patsubst %,docker-image-%,$(DOCKER_IMAGES))
->>  # Use a global constant ccache directory to speed up repetitive builds
->>  DOCKER_CCACHE_DIR := $$HOME/.cache/qemu-docker-ccache
->> @@ -63,7 +64,7 @@ docker-image-debian-win64-cross: docker-image-debian8-mxe
->>  docker-image-travis: NOUSER=1
->>
->>  # Expand all the pre-requistes for each docker image and test combination
->> -$(foreach i,$(DOCKER_IMAGES), \
->> +$(foreach i,$(DOCKER_IMAGES) $(DOCKER_DEPRECATED_IMAGES), \
->>  	$(foreach t,$(DOCKER_TESTS) $(DOCKER_TOOLS), \
->>  		$(eval .PHONY: docker-$t@$i) \
->>  		$(eval docker-$t@$i: docker-image-$i docker-run-$t@$i) \
-> 
-> 
-> --
-> Alex Bennée
-> 
+I've split the commits rather finely to hopefully ease review,
+of each individual concern I ran into while porting. Happy to
+merge commits back together if you would prefer.
+
+Lastly, I should remark that I'm not super familiar with the qemu
+code base, so please let me know if there's a better place for
+some of the code (particularly some of the compatibility code).
+
+Keno Fischer (13):
+  9p: linux: Fix a couple Linux assumptions
+  9p: Avoid warning if FS_IOC_GETVERSION is not defined
+  9p: Move a couple xattr functions to 9p-util
+  9p: darwin: Handle struct stat(fs) differences
+  9p: darwin: Handle struct dirent differences
+  9p: darwin: Address minor differences
+  9p: darwin: Properly translate AT_REMOVEDIR flag
+  9p: darwin: Ignore O_{NOATIME, DIRECT}
+  9p: darwin: Provide a compatibility definition for XATTR_SIZE_MAX
+  9p: darwin: *xattr_nofollow implementations
+  9p: darwin: Mark mknod as unsupported
+  9p: darwin: Provide a fallback implementation for utimensat
+  9p: darwin: configure: Allow VirtFS on Darwin
+
+ Makefile.objs        |   1 +
+ configure            |  23 ++++++----
+ fsdev/file-op-9p.h   |   6 +++
+ hw/9pfs/9p-local.c   |  84 +++++++++++++++++++++++-------------
+ hw/9pfs/9p-proxy.c   |  17 ++++++--
+ hw/9pfs/9p-synth.c   |   6 +++
+ hw/9pfs/9p-util.c    | 120 ++++++++++++++++++++++++++++++++++++++++++++++++++-
+ hw/9pfs/9p-util.h    |  13 ++++++
+ hw/9pfs/9p-xattr.c   |  33 --------------
+ hw/9pfs/9p.c         |  79 +++++++++++++++++++++++++--------
+ include/qemu/xattr.h |   4 +-
+ 11 files changed, 293 insertions(+), 93 deletions(-)
+
+-- 
+2.8.1
