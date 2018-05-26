@@ -1,33 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56548)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58610)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fMQrY-00058F-6e
-	for qemu-devel@nongnu.org; Sat, 26 May 2018 00:31:29 -0400
+	id 1fMR4J-00078C-C2
+	for qemu-devel@nongnu.org; Sat, 26 May 2018 00:44:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fMQrV-000334-26
-	for qemu-devel@nongnu.org; Sat, 26 May 2018 00:31:28 -0400
-Received: from mail-qk0-x234.google.com ([2607:f8b0:400d:c09::234]:41015)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fMQrU-00032a-U5
-	for qemu-devel@nongnu.org; Sat, 26 May 2018 00:31:24 -0400
-Received: by mail-qk0-x234.google.com with SMTP id d125-v6so5622892qkb.8
-	for <qemu-devel@nongnu.org>; Fri, 25 May 2018 21:31:24 -0700 (PDT)
+	id 1fMR4I-00019h-CE
+	for qemu-devel@nongnu.org; Sat, 26 May 2018 00:44:39 -0400
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
-References: <1527266793-301361-1-git-send-email-mst@redhat.com>
-	<1527266793-301361-17-git-send-email-mst@redhat.com>
+References: <20180525235509.11282-1-jsnow@redhat.com>
+	<20180525235509.11282-4-jsnow@redhat.com>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <b6e690f9-9b39-8edb-f73b-f850a00afc0c@amsat.org>
-Date: Sat, 26 May 2018 01:31:20 -0300
+Message-ID: <91fa0944-d11d-894f-a1aa-03b1fd186f1a@amsat.org>
+Date: Sat, 26 May 2018 01:44:28 -0300
 MIME-Version: 1.0
-In-Reply-To: <1527266793-301361-17-git-send-email-mst@redhat.com>
+In-Reply-To: <20180525235509.11282-4-jsnow@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v2 16/20] colo: use local path for local
- headers
+Subject: Re: [Qemu-devel] [PATCH 03/16] ahci: make port read traces more
+ descriptive
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,63 +29,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, Jason Wang <jasowang@redhat.com>, Li Zhijian <lizhijian@cn.fujitsu.com>, Zhang Chen <zhangckid@gmail.com>
+To: John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
 
-On 05/25/2018 01:48 PM, Michael S. Tsirkin wrote:
-> When pulling in headers that are in the same directory as C file (as
-> opposed to one in include/), we should use its relative path, without a
-> directory.
+Hi John,
+
+On 05/25/2018 08:54 PM, John Snow wrote:
+> A trace is added to let us watch unimplemented registers specifically,
+> as these are more likely to cause us trouble. Otherwise, the port read
+> traces now tell us what register is getting hit, which is nicer.
 > 
-> Reviewed-by: Zhang Chen <zhangckid@gmail.com>
-> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Tested-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-
+> Signed-off-by: John Snow <jsnow@redhat.com>
 > ---
->  net/colo-compare.c    | 2 +-
->  net/colo.c            | 2 +-
->  net/filter-rewriter.c | 2 +-
->  3 files changed, 3 insertions(+), 3 deletions(-)
+>  hw/ide/ahci.c       | 5 +++--
+>  hw/ide/trace-events | 3 ++-
+>  2 files changed, 5 insertions(+), 3 deletions(-)
 > 
-> diff --git a/net/colo-compare.c b/net/colo-compare.c
-> index 23b2d2c..c3a2be4 100644
-> --- a/net/colo-compare.c
-> +++ b/net/colo-compare.c
-> @@ -25,7 +25,7 @@
->  #include "net/queue.h"
->  #include "chardev/char-fe.h"
->  #include "qemu/sockets.h"
-> -#include "net/colo.h"
-> +#include "colo.h"
->  #include "sysemu/iothread.h"
+> diff --git a/hw/ide/ahci.c b/hw/ide/ahci.c
+> index 5187bf34ad..57c80a2fe9 100644
+> --- a/hw/ide/ahci.c
+> +++ b/hw/ide/ahci.c
+> @@ -46,7 +46,6 @@ static bool ahci_map_fis_address(AHCIDevice *ad);
+>  static void ahci_unmap_clb_address(AHCIDevice *ad);
+>  static void ahci_unmap_fis_address(AHCIDevice *ad);
 >  
->  #define TYPE_COLO_COMPARE "colo-compare"
-> diff --git a/net/colo.c b/net/colo.c
-> index 8426265..6dda4ed 100644
-> --- a/net/colo.c
-> +++ b/net/colo.c
-> @@ -14,7 +14,7 @@
+> -__attribute__((__unused__)) /* TODO */
+>  static const char *AHCIPortReg_lookup[AHCI_PORT_REG__COUNT] = {
+>      [AHCI_PORT_REG_LST_ADDR]    = "PxCLB",
+>      [AHCI_PORT_REG_LST_ADDR_HI] = "PxCLBU",
+> @@ -149,10 +148,12 @@ static uint32_t ahci_port_read(AHCIState *s, int port, int offset)
+>          val = pr->cmd_issue;
+>          break;
+>      default:
+> +        trace_ahci_port_read_unimpl(s, port, AHCIPortReg_lookup[regnum],
+> +                                    offset);
+
+I personally prefer qemu_log_mask(LOG_UNIMP) here.
+
+Rational is when trying firmware, one might want to know which
+unimplemented features access the firmware, without having to dig into
+trace events, and the "-d unimp" command line option just works.
+
+(same apply for the write() function later in this series).
+
+>          val = 0;
+>      }
 >  
->  #include "qemu/osdep.h"
->  #include "trace.h"
-> -#include "net/colo.h"
-> +#include "colo.h"
+> -    trace_ahci_port_read(s, port, offset, val);
+> +    trace_ahci_port_read(s, port, AHCIPortReg_lookup[regnum], offset, val);
+>      return val;
+>  }
 >  
->  uint32_t connection_key_hash(const void *opaque)
->  {
-> diff --git a/net/filter-rewriter.c b/net/filter-rewriter.c
-> index 62dad2d..f584e4e 100644
-> --- a/net/filter-rewriter.c
-> +++ b/net/filter-rewriter.c
-> @@ -11,7 +11,7 @@
+> diff --git a/hw/ide/trace-events b/hw/ide/trace-events
+> index 5c0e59ec42..ffde28615f 100644
+> --- a/hw/ide/trace-events
+> +++ b/hw/ide/trace-events
+> @@ -63,7 +63,8 @@ ide_atapi_cmd_read_dma_cb_aio(void *s, int lba, int n) "IDEState: %p; aio read:
+>  ide_atapi_cmd_packet(void *s, uint16_t limit, const char *packet) "IDEState: %p; limit=0x%x packet: %s"
 >  
->  #include "qemu/osdep.h"
->  #include "trace.h"
-> -#include "net/colo.h"
-> +#include "colo.h"
->  #include "net/filter.h"
->  #include "net/net.h"
->  #include "qemu-common.h"
+>  # hw/ide/ahci.c
+> -ahci_port_read(void *s, int port, int offset, uint32_t ret) "ahci(%p)[%d]: port read @ 0x%x: 0x%08x"
+> +ahci_port_read(void *s, int port, const char *reg, int offset, uint32_t ret) "ahci(%p)[%d]: port read [reg:%s] @ 0x%x: 0x%08x"
+> +ahci_port_read_unimpl(void *s, int port, const char *reg, int offset) "ahci(%p)[%d]: unimplemented port read [reg:%s] @ 0x%x"
+>  ahci_irq_raise(void *s) "ahci(%p): raise irq"
+>  ahci_irq_lower(void *s) "ahci(%p): lower irq"
+>  ahci_check_irq(void *s, uint32_t old, uint32_t new) "ahci(%p): check irq 0x%08x --> 0x%08x"
 > 
