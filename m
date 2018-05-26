@@ -1,25 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38198)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39566)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1fMRuR-0007EQ-7t
-	for qemu-devel@nongnu.org; Sat, 26 May 2018 01:38:32 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fMS5U-0000Wj-VJ
+	for qemu-devel@nongnu.org; Sat, 26 May 2018 01:49:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1fMRuM-0005Sp-Ra
-	for qemu-devel@nongnu.org; Sat, 26 May 2018 01:38:31 -0400
-Resent-Message-Id: <E1fMRuM-0005Sp-Ra@eggs.gnu.org>
-Received: from sender-of-o51.zoho.com ([135.84.80.216]:21048)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1fMRuM-0005RW-JH
-	for qemu-devel@nongnu.org; Sat, 26 May 2018 01:38:26 -0400
-In-Reply-To: <cover.1527310210.git.keno@alumni.harvard.edu>
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <152731306595.240.14971294304014284230@d39dc562802a>
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fMS5R-0004dY-RI
+	for qemu-devel@nongnu.org; Sat, 26 May 2018 01:49:57 -0400
+Received: from mail-qt0-x22f.google.com ([2607:f8b0:400d:c0d::22f]:42821)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fMS5R-0004dR-J7
+	for qemu-devel@nongnu.org; Sat, 26 May 2018 01:49:53 -0400
+Received: by mail-qt0-x22f.google.com with SMTP id c2-v6so9214227qtn.9
+	for <qemu-devel@nongnu.org>; Fri, 25 May 2018 22:49:53 -0700 (PDT)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20180525133851.27161-1-alex.bennee@linaro.org>
+	<20180525141910.6384-1-alex.bennee@linaro.org>
+	<20180525141910.6384-6-alex.bennee@linaro.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <f8e25536-a5e2-1177-eb63-0b07d23a515c@amsat.org>
+Date: Sat, 26 May 2018 02:49:41 -0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Fri, 25 May 2018 22:37:46 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PATCH 00/13] 9p: Add support for Darwin
+In-Reply-To: <20180525141910.6384-6-alex.bennee@linaro.org>
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature";
+	boundary="BjLx36g9W2ZGU8GfuypYw37ONJUhIcwR8"
+Subject: Re: [Qemu-devel] [PATCH v5 35/49] tests/tcg: enable building for
+ Alpha
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,130 +37,264 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: keno@juliacomputing.com
-Cc: famz@redhat.com, qemu-devel@nongnu.org, keno@alumni.harvard.edu, groug@kaod.org
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, cota@braap.org, famz@redhat.com, berrange@redhat.com, richard.henderson@linaro.org, balrogg@gmail.com, aurelien@aurel32.net, agraf@suse.de, Samuel Thibault <samuel.thibault@ens-lyon.org>
+Cc: qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
-c3NhZ2UtaWQ6IGNvdmVyLjE1MjczMTAyMTAuZ2l0Lmtlbm9AYWx1bW5pLmhhcnZhcmQuZWR1ClN1
-YmplY3Q6IFtRZW11LWRldmVsXSBbUEFUQ0ggMDAvMTNdIDlwOiBBZGQgc3VwcG9ydCBmb3IgRGFy
-d2luCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCgpCQVNFPWJhc2UKbj0x
-CnRvdGFsPSQoZ2l0IGxvZyAtLW9uZWxpbmUgJEJBU0UuLiB8IHdjIC1sKQpmYWlsZWQ9MAoKZ2l0
-IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlm
-Zi5yZW5hbWVzIFRydWUKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYuYWxnb3JpdGhtIGhpc3RvZ3Jh
-bQoKY29tbWl0cz0iJChnaXQgbG9nIC0tZm9ybWF0PSVIIC0tcmV2ZXJzZSAkQkFTRS4uKSIKZm9y
-IGMgaW4gJGNvbW1pdHM7IGRvCiAgICBlY2hvICJDaGVja2luZyBQQVRDSCAkbi8kdG90YWw6ICQo
-Z2l0IGxvZyAtbiAxIC0tZm9ybWF0PSVzICRjKS4uLiIKICAgIGlmICEgZ2l0IHNob3cgJGMgLS1m
-b3JtYXQ9ZW1haWwgfCAuL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIC07IHRoZW4K
-ICAgICAgICBmYWlsZWQ9MQogICAgICAgIGVjaG8KICAgIGZpCiAgICBuPSQoKG4rMSkpCmRvbmUK
-CmV4aXQgJGZhaWxlZAo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTlj
-MjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApGcm9tIGh0dHBzOi8vZ2l0aHViLmNvbS9w
-YXRjaGV3LXByb2plY3QvcWVtdQogdCBbdGFnIHVwZGF0ZV0gICAgICAgICAgICBwYXRjaGV3LzE1
-MjcyNjY3OTMtMzAxMzYxLTEtZ2l0LXNlbmQtZW1haWwtbXN0QHJlZGhhdC5jb20gLT4gcGF0Y2hl
-dy8xNTI3MjY2NzkzLTMwMTM2MS0xLWdpdC1zZW5kLWVtYWlsLW1zdEByZWRoYXQuY29tCiAqIFtu
-ZXcgdGFnXSAgICAgICAgICAgICAgIHBhdGNoZXcvY292ZXIuMTUyNzMxMDIxMC5naXQua2Vub0Bh
-bHVtbmkuaGFydmFyZC5lZHUgLT4gcGF0Y2hldy9jb3Zlci4xNTI3MzEwMjEwLmdpdC5rZW5vQGFs
-dW1uaS5oYXJ2YXJkLmVkdQpTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCmQ1MDI2YjI0
-ODAgOXA6IGRhcndpbjogY29uZmlndXJlOiBBbGxvdyBWaXJ0RlMgb24gRGFyd2luCmUzNzVmZTlk
-N2EgOXA6IGRhcndpbjogUHJvdmlkZSBhIGZhbGxiYWNrIGltcGxlbWVudGF0aW9uIGZvciB1dGlt
-ZW5zYXQKN2UwYjJlZTc1OSA5cDogZGFyd2luOiBNYXJrIG1rbm9kIGFzIHVuc3VwcG9ydGVkCmU3
-OGQ2NTYwNTcgOXA6IGRhcndpbjogKnhhdHRyX25vZm9sbG93IGltcGxlbWVudGF0aW9ucwpkZmY5
-NDQxN2M1IDlwOiBkYXJ3aW46IFByb3ZpZGUgYSBjb21wYXRpYmlsaXR5IGRlZmluaXRpb24gZm9y
-IFhBVFRSX1NJWkVfTUFYCjI2MzBhMmY0ZWEgOXA6IGRhcndpbjogSWdub3JlIE9fe05PQVRJTUUs
-IERJUkVDVH0KNzI3N2ZkZDI2MyA5cDogZGFyd2luOiBQcm9wZXJseSB0cmFuc2xhdGUgQVRfUkVN
-T1ZFRElSIGZsYWcKMWVlMTQzNTM2MCA5cDogZGFyd2luOiBBZGRyZXNzIG1pbm9yIGRpZmZlcmVu
-Y2VzCmEwM2QwNWQzNWEgOXA6IGRhcndpbjogSGFuZGxlIHN0cnVjdCBkaXJlbnQgZGlmZmVyZW5j
-ZXMKMTYwY2VmYzU4OSA5cDogZGFyd2luOiBIYW5kbGUgc3RydWN0IHN0YXQoZnMpIGRpZmZlcmVu
-Y2VzCmY5MjA2MTdkYzAgOXA6IE1vdmUgYSBjb3VwbGUgeGF0dHIgZnVuY3Rpb25zIHRvIDlwLXV0
-aWwKM2I0MTMwYzBiNiA5cDogQXZvaWQgd2FybmluZyBpZiBGU19JT0NfR0VUVkVSU0lPTiBpcyBu
-b3QgZGVmaW5lZAo0NmNmNWM1YzRkIDlwOiBsaW51eDogRml4IGEgY291cGxlIExpbnV4IGFzc3Vt
-cHRpb25zCgo9PT0gT1VUUFVUIEJFR0lOID09PQpDaGVja2luZyBQQVRDSCAxLzEzOiA5cDogbGlu
-dXg6IEZpeCBhIGNvdXBsZSBMaW51eCBhc3N1bXB0aW9ucy4uLgpDaGVja2luZyBQQVRDSCAyLzEz
-OiA5cDogQXZvaWQgd2FybmluZyBpZiBGU19JT0NfR0VUVkVSU0lPTiBpcyBub3QgZGVmaW5lZC4u
-LgpDaGVja2luZyBQQVRDSCAzLzEzOiA5cDogTW92ZSBhIGNvdXBsZSB4YXR0ciBmdW5jdGlvbnMg
-dG8gOXAtdXRpbC4uLgpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwojMjY6IEZJTEU6
-IGh3LzlwZnMvOXAtbG9jYWwuYzo3Nzk6CisgICAgICAgIGlmIChmZ2V0eGF0dHJfZm9sbG93KGZk
-LCAidXNlci52aXJ0ZnMudWlkIiwgJnRtcF91aWQsIHNpemVvZih1aWRfdCkpID4gMCkgewoKV0FS
-TklORzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzMwOiBGSUxFOiBody85cGZzLzlwLWxvY2Fs
-LmM6NzgyOgorICAgICAgICBpZiAoZmdldHhhdHRyX2ZvbGxvdyhmZCwgInVzZXIudmlydGZzLmdp
-ZCIsICZ0bXBfZ2lkLCBzaXplb2YoZ2lkX3QpKSA+IDApCgpXQVJOSU5HOiBsaW5lIG92ZXIgODAg
-Y2hhcmFjdGVycwojMzU6IEZJTEU6IGh3LzlwZnMvOXAtbG9jYWwuYzo3ODY6CisgICAgICAgIGlm
-IChmZ2V0eGF0dHJfZm9sbG93KGZkLCAidXNlci52aXJ0ZnMubW9kZSIsICZ0bXBfbW9kZSwgc2l6
-ZW9mKG1vZGVfdCkpID4gMCkKCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiM0MDog
-RklMRTogaHcvOXBmcy85cC1sb2NhbC5jOjc5MDoKKyAgICAgICAgaWYgKGZnZXR4YXR0cl9mb2xs
-b3coZmQsICJ1c2VyLnZpcnRmcy5yZGV2IiwgJnRtcF9kZXYsIHNpemVvZihkZXZfdCkpID4gMCkK
-CnRvdGFsOiAwIGVycm9ycywgNCB3YXJuaW5ncywgMTI5IGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0
-Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVy
-cm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBz
-ZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KQ2hlY2tpbmcgUEFUQ0ggNC8xMzogOXA6IGRh
-cndpbjogSGFuZGxlIHN0cnVjdCBzdGF0KGZzKSBkaWZmZXJlbmNlcy4uLgpDaGVja2luZyBQQVRD
-SCA1LzEzOiA5cDogZGFyd2luOiBIYW5kbGUgc3RydWN0IGRpcmVudCBkaWZmZXJlbmNlcy4uLgpF
-UlJPUjogZG8gbm90IHVzZSBDOTkgLy8gY29tbWVudHMKIzQ2OiBGSUxFOiBody85cGZzLzlwLmM6
-MTk2MDoKKyAgICAgICAgLy8gRGFyd2luIGhhcyBkX3NlZWtvZmYsIHdoaWNoIGFwcGVhcnMgdG8g
-ZnVuY3Rpb24KCkVSUk9SOiBkbyBub3QgdXNlIEM5OSAvLyBjb21tZW50cwojNDc6IEZJTEU6IGh3
-LzlwZnMvOXAuYzoxOTYxOgorICAgICAgICAvLyBhbmFsb2dvdXNseSB0byBkX29mZi4gSG93ZXZl
-ciwgaXQgZG9lcyBub3QgYXBwZWFyCgpFUlJPUjogZG8gbm90IHVzZSBDOTkgLy8gY29tbWVudHMK
-IzQ4OiBGSUxFOiBody85cGZzLzlwLmM6MTk2MjoKKyAgICAgICAgLy8gdG8gYmUgc3VwcG9ydGVk
-IG9uIGFsbCBmaWxlIHN5c3RlbXMsIHNvIHVzZQoKRVJST1I6IGRvIG5vdCB1c2UgQzk5IC8vIGNv
-bW1lbnRzCiM0OTogRklMRTogaHcvOXBmcy85cC5jOjE5NjM6CisgICAgICAgIC8vIHRlbGxkaXIg
-Zm9yIGNvcnJlY3RuZXNzLgoKdG90YWw6IDQgZXJyb3JzLCAwIHdhcm5pbmdzLCA1MCBsaW5lcyBj
-aGVja2VkCgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElm
-IGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0
-aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgpDaGVja2luZyBQ
-QVRDSCA2LzEzOiA5cDogZGFyd2luOiBBZGRyZXNzIG1pbm9yIGRpZmZlcmVuY2VzLi4uCkNoZWNr
-aW5nIFBBVENIIDcvMTM6IDlwOiBkYXJ3aW46IFByb3Blcmx5IHRyYW5zbGF0ZSBBVF9SRU1PVkVE
-SVIgZmxhZy4uLgpDaGVja2luZyBQQVRDSCA4LzEzOiA5cDogZGFyd2luOiBJZ25vcmUgT197Tk9B
-VElNRSwgRElSRUNUfS4uLgpDaGVja2luZyBQQVRDSCA5LzEzOiA5cDogZGFyd2luOiBQcm92aWRl
-IGEgY29tcGF0aWJpbGl0eSBkZWZpbml0aW9uIGZvciBYQVRUUl9TSVpFX01BWC4uLgpDaGVja2lu
-ZyBQQVRDSCAxMC8xMzogOXA6IGRhcndpbjogKnhhdHRyX25vZm9sbG93IGltcGxlbWVudGF0aW9u
-cy4uLgpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwojMjA6IEZJTEU6IGh3LzlwZnMv
-OXAtdXRpbC5jOjIyOgorICAgIGludCBmZCA9IG9wZW5hdF9maWxlKGRpcmZkLCBmaWxlbmFtZSwg
-T19SRE9OTFkgfCBPX1BBVEhfOVBfVVRJTCB8IE9fTk9GT0xMT1csIDApOwoKRVJST1I6IGJyYWNl
-cyB7fSBhcmUgbmVjZXNzYXJ5IGZvciBhbGwgYXJtcyBvZiB0aGlzIHN0YXRlbWVudAojMjE6IEZJ
-TEU6IGh3LzlwZnMvOXAtdXRpbC5jOjIzOgorICAgIGlmIChmZCA9PSAtMSkKWy4uLl0KCldBUk5J
-Tkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiM1MTogRklMRTogaHcvOXBmcy85cC11dGlsLmM6
-NTI6CisgICAgaW50IGZkID0gb3BlbmF0X2ZpbGUoZGlyZmQsIGZpbGVuYW1lLCBPX1JET05MWSB8
-IE9fUEFUSF85UF9VVElMIHwgT19OT0ZPTExPVywgMCk7CgpFUlJPUjogYnJhY2VzIHt9IGFyZSBu
-ZWNlc3NhcnkgZm9yIGFsbCBhcm1zIG9mIHRoaXMgc3RhdGVtZW50CiM1MjogRklMRTogaHcvOXBm
-cy85cC11dGlsLmM6NTM6CisgICAgaWYgKGZkID09IC0xKQpbLi4uXQoKRVJST1I6IGJyYWNlcyB7
-fSBhcmUgbmVjZXNzYXJ5IGZvciBhbGwgYXJtcyBvZiB0aGlzIHN0YXRlbWVudAojNzM6IEZJTEU6
-IGh3LzlwZnMvOXAtdXRpbC5jOjczOgorICAgIGlmIChmZCA9PSAtMSkKWy4uLl0KCkVSUk9SOiBi
-cmFjZXMge30gYXJlIG5lY2Vzc2FyeSBmb3IgYWxsIGFybXMgb2YgdGhpcyBzdGF0ZW1lbnQKIzk1
-OiBGSUxFOiBody85cGZzLzlwLXV0aWwuYzo5NDoKKyAgICBpZiAoZmQgPT0gLTEpClsuLi5dCgp0
-b3RhbDogNCBlcnJvcnMsIDIgd2FybmluZ3MsIDk0IGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2gg
-aGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9y
-cwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUK
-Q0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCkNoZWNraW5nIFBBVENIIDExLzEzOiA5cDogZGFy
-d2luOiBNYXJrIG1rbm9kIGFzIHVuc3VwcG9ydGVkLi4uCkNoZWNraW5nIFBBVENIIDEyLzEzOiA5
-cDogZGFyd2luOiBQcm92aWRlIGEgZmFsbGJhY2sgaW1wbGVtZW50YXRpb24gZm9yIHV0aW1lbnNh
-dC4uLgpXQVJOSU5HOiBhcmNoaXRlY3R1cmUgc3BlY2lmaWMgZGVmaW5lcyBzaG91bGQgYmUgYXZv
-aWRlZAojMzQ6IEZJTEU6IGh3LzlwZnMvOXAtdXRpbC5jOjEwODoKKyNpZm5kZWYgX19oYXNfYnVp
-bHRpbgoKV0FSTklORzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzM4OiBGSUxFOiBody85cGZz
-LzlwLXV0aWwuYzoxMTI6CitpbnQgdXRpbWVuc2F0X25vZm9sbG93KGludCBkaXJmZCwgY29uc3Qg
-Y2hhciAqZmlsZW5hbWUsIGNvbnN0IHN0cnVjdCB0aW1lc3BlYyB0aW1lc1syXSkKCldBUk5JTkc6
-IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiM0MTogRklMRTogaHcvOXBmcy85cC11dGlsLmM6MTE1
-OgorI2lmIGRlZmluZWQoX19NQUNfMTBfMTMpIC8qIENoZWNrIHdoZXRoZXIgd2UgaGF2ZSBhbiBT
-REsgdmVyc2lvbiB0aGF0IGRlZmluZXMgdXRpbWVuc2F0ICovCgpXQVJOSU5HOiBhcmNoaXRlY3R1
-cmUgc3BlY2lmaWMgZGVmaW5lcyBzaG91bGQgYmUgYXZvaWRlZAojNDE6IEZJTEU6IGh3LzlwZnMv
-OXAtdXRpbC5jOjExNToKKyNpZiBkZWZpbmVkKF9fTUFDXzEwXzEzKSAvKiBDaGVjayB3aGV0aGVy
-IHdlIGhhdmUgYW4gU0RLIHZlcnNpb24gdGhhdCBkZWZpbmVzIHV0aW1lbnNhdCAqLwoKV0FSTklO
-RzogYXJjaGl0ZWN0dXJlIHNwZWNpZmljIGRlZmluZXMgc2hvdWxkIGJlIGF2b2lkZWQKIzQyOiBG
-SUxFOiBody85cGZzLzlwLXV0aWwuYzoxMTY6CisjaWYgX19NQUNfT1NfWF9WRVJTSU9OX01JTl9S
-RVFVSVJFRCA+PSBfX01BQ18xMF8xMwoKRVJST1I6IHRoYXQgb3BlbiBicmFjZSB7IHNob3VsZCBi
-ZSBvbiB0aGUgcHJldmlvdXMgbGluZQojNDk6IEZJTEU6IGh3LzlwZnMvOXAtdXRpbC5jOjEyMzoK
-KyAgICBpZiAoVVRJTUVOU0FUX0FWQUlMQUJMRSkKKyAgICB7CgpFUlJPUjogZG8gbm90IHVzZSBD
-OTkgLy8gY29tbWVudHMKIzU0OiBGSUxFOiBody85cGZzLzlwLXV0aWwuYzoxMjg6CisgICAgLy8g
-dXRpbWVuc2F0IG5vdCBhdmFpbGFibGUuIFVzZSBmdXRpbWVzLgoKRVJST1I6IGJyYWNlcyB7fSBh
-cmUgbmVjZXNzYXJ5IGZvciBhbGwgYXJtcyBvZiB0aGlzIHN0YXRlbWVudAojNTY6IEZJTEU6IGh3
-LzlwZnMvOXAtdXRpbC5jOjEzMDoKKyAgICBpZiAoZmQgPT0gLTEpClsuLi5dCgpXQVJOSU5HOiBs
-aW5lIG92ZXIgODAgY2hhcmFjdGVycwojOTI6IEZJTEU6IGh3LzlwZnMvOXAtdXRpbC5oOjc1Ogor
-aW50IHV0aW1lbnNhdF9ub2ZvbGxvdyhpbnQgZGlyZmQsIGNvbnN0IGNoYXIgKmZpbGVuYW1lLCBj
-b25zdCBzdHJ1Y3QgdGltZXNwZWMgdGltZXNbMl0pOwoKdG90YWw6IDMgZXJyb3JzLCA2IHdhcm5p
-bmdzLCA3NCBsaW5lcyBjaGVja2VkCgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxl
-YXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyBy
-ZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5F
-UlMuCgpDaGVja2luZyBQQVRDSCAxMy8xMzogOXA6IGRhcndpbjogY29uZmlndXJlOiBBbGxvdyBW
-aXJ0RlMgb24gRGFyd2luLi4uCj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRl
-ZCB3aXRoIGNvZGU6IDEKCgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0
-Y2hldyBbaHR0cDovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8g
-cGF0Y2hldy1kZXZlbEByZWRoYXQuY29t
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--BjLx36g9W2ZGU8GfuypYw37ONJUhIcwR8
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, cota@braap.org,
+ famz@redhat.com, berrange@redhat.com, richard.henderson@linaro.org,
+ balrogg@gmail.com, aurelien@aurel32.net, agraf@suse.de,
+ Samuel Thibault <samuel.thibault@ens-lyon.org>
+Cc: qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>
+Message-ID: <f8e25536-a5e2-1177-eb63-0b07d23a515c@amsat.org>
+Subject: Re: [PATCH v5 35/49] tests/tcg: enable building for Alpha
+References: <20180525133851.27161-1-alex.bennee@linaro.org>
+ <20180525141910.6384-1-alex.bennee@linaro.org>
+ <20180525141910.6384-6-alex.bennee@linaro.org>
+In-Reply-To: <20180525141910.6384-6-alex.bennee@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+(Cc'ing Samuel who replied in a previous thread)
+
+Hi Alex,
+
+On 05/25/2018 11:19 AM, Alex Benn=C3=A9e wrote:
+> We can't use our normal Debian based compilers as Alpha isn't an
+> officially supported architecture. However it is available as a port
+> and fortunately cross compilers for all these targets are included in
+> Debian Sid, the perpetual rolling/unstable/testing version of Debian.
+>=20
+> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+> Tested-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+
+These tags are only for the Alpha part, maybe I wasn't clear enough in
+my previous review:
+https://lists.gnu.org/archive/html/qemu-devel/2018-05/msg04443.html
+
+> ---
+> v5
+>   - drop the unused debian-cross-build docker image
+>   - add note to debian-sid docker image
+>   - echo reference to notes on build failure
+>   - include EXTRA_RUNS for mmap tests
+> ---
+>  tests/docker/Makefile.include                 |  1 +
+>  .../dockerfiles/debian-alpha-cross.docker     | 12 +++++++
+>  tests/docker/dockerfiles/debian-sid.docker    | 32 +++++++++++++++++++=
+
+>  tests/tcg/alpha/Makefile.include              |  2 ++
+>  tests/tcg/alpha/Makefile.target               |  6 ++++
+>  5 files changed, 53 insertions(+)
+>  create mode 100644 tests/docker/dockerfiles/debian-alpha-cross.docker
+>  create mode 100644 tests/docker/dockerfiles/debian-sid.docker
+>  create mode 100644 tests/tcg/alpha/Makefile.include
+>  create mode 100644 tests/tcg/alpha/Makefile.target
+>=20
+> diff --git a/tests/docker/Makefile.include b/tests/docker/Makefile.incl=
+ude
+> index b56386f49e..5dc49c6a54 100644
+> --- a/tests/docker/Makefile.include
+> +++ b/tests/docker/Makefile.include
+> @@ -62,6 +62,7 @@ docker-image-debian-ppc64el-cross: docker-image-debia=
+n9
+>  docker-image-debian-s390x-cross: docker-image-debian9
+>  docker-image-debian-win32-cross: docker-image-debian8-mxe
+>  docker-image-debian-win64-cross: docker-image-debian8-mxe
+> +docker-image-debian-alpha-cross: docker-image-debian-sid
+>  docker-image-travis: NOUSER=3D1
+> =20
+>  # Expand all the pre-requistes for each docker image and test combinat=
+ion
+> diff --git a/tests/docker/dockerfiles/debian-alpha-cross.docker b/tests=
+/docker/dockerfiles/debian-alpha-cross.docker
+> new file mode 100644
+> index 0000000000..29a25d0dfd
+> --- /dev/null
+> +++ b/tests/docker/dockerfiles/debian-alpha-cross.docker
+> @@ -0,0 +1,12 @@
+> +#
+> +# Docker cross-compiler target
+> +#
+> +# This docker target builds on the debian sid base image which
+> +# contains cross compilers for Debian "ports" targets.
+> +#
+> +FROM qemu:debian-sid
+> +
+> +RUN DEBIAN_FRONTEND=3Dnoninteractive eatmydata \
+> +    apt-get install -y --no-install-recommends \
+> +        gcc-alpha-linux-gnu \
+> +        libc6.1-dev-alpha-cross || { echo "Failed to build - see debia=
+n-sid.docker notes"; exit 1; }
+> diff --git a/tests/docker/dockerfiles/debian-sid.docker b/tests/docker/=
+dockerfiles/debian-sid.docker
+> new file mode 100644
+> index 0000000000..9a3d168705
+> --- /dev/null
+> +++ b/tests/docker/dockerfiles/debian-sid.docker
+> @@ -0,0 +1,32 @@
+> +#
+> +# Debian Sid Base
+> +#
+> +# A number of our guests exist as ports only. We can either use the
+> +# ports repo or get everything from Sid. However Sid is a rolling
+> +# distro which may be broken at any particular time. If you are
+> +# unlucky and try and build your images while gcc is in the process of=
+
+> +# being uploaded this can fail. Your only recourse is to try again in
+> +# a few hours when the repos have re-synced. Once built however you
+> +# won't be affected by repo changes unless the docker recipies are
+> +# updated and trigger a re-build.
+
+OK, the comment is explaining well.
+
+> +#
+> +
+> +FROM debian:sid-slim
+> +
+> +# Duplicate deb line as deb-src
+> +RUN cat /etc/apt/sources.list | sed "s/^deb\ /deb-src /" >> /etc/apt/s=
+ources.list
+> +
+> +# Install common build utilities
+> +RUN apt update
+> +RUN DEBIAN_FRONTEND=3Dnoninteractive apt install -yy eatmydata
+> +RUN DEBIAN_FRONTEND=3Dnoninteractive eatmydata \
+> +    apt install -y --no-install-recommends \
+> +        bison \
+> +        build-essential \
+> +        ca-certificates \
+> +        flex \
+> +        git \
+> +        pkg-config \
+> +        psmisc \
+> +        python \
+> +        texinfo || { echo "Failed to build - see debian-sid.docker not=
+es"; exit 1; }
+
+Output is:
+
+I have a very low success rate at building Sid-based images.
+Recently trying your debian-powerpc-cross:
+
+[...]
+Need to get 21.8 MB of archives.
+After this operation, 72.0 MB of additional disk space will be used.
+Get:1 http://deb.debian.org/debian sid/main amd64
+binutils-powerpc-linux-gnu amd64 2.30-15 [2411 kB]
+Err:2 http://deb.debian.org/debian sid/main amd64
+gcc-7-powerpc-linux-gnu-base amd64 7.3.0-15cross1
+  404  Not Found
+Err:3 http://deb.debian.org/debian sid/main amd64
+cpp-7-powerpc-linux-gnu amd64 7.3.0-15cross1
+  404  Not Found
+Get:4 http://deb.debian.org/debian sid/main amd64 cpp-powerpc-linux-gnu
+amd64 4:7.3.0-3 [16.0 kB]
+Get:5 http://deb.debian.org/debian sid/main amd64 gcc-7-cross-base-ports
+all 7.3.0-15cross1 [182 kB]
+Get:6 http://deb.debian.org/debian sid/main amd64 gcc-8-cross-base-ports
+all 8-20180402-1cross2 [179 kB]
+Get:7 http://deb.debian.org/debian sid/main amd64 libc6-powerpc-cross
+all 2.27-3cross2 [1373 kB]
+[...]
+E: Failed to fetch
+http://deb.debian.org/debian/pool/main/g/gcc-7-cross-ports/gcc-7-powerpc-=
+linux-gnu_7.3.0-15cross1_amd64.deb
+ 404  Not Found
+E: Unable to fetch some archives, maybe run apt-get update or try with
+--fix-missing?
+Failed to build - see debian-sid.docker notes
+The command '/bin/sh -c DEBIAN_FRONTEND=3Dnoninteractive eatmydata
+apt-get install -y --no-install-recommends         gcc-powerpc-linux-gnu
+        libc6-dev-powerpc-cross || { echo "Failed to build - see
+debian-sid.docker notes"; exit 1; }' returned a non-zero code: 1
+Traceback (most recent call last):
+  File "./tests/docker/docker.py", line 456, in <module>
+    sys.exit(main())
+  File "./tests/docker/docker.py", line 453, in main
+    return args.cmdobj.run(args, argv)
+  File "./tests/docker/docker.py", line 326, in run
+    extra_files_cksum=3Dcksum)
+  File "./tests/docker/docker.py", line 209, in build_image
+    quiet=3Dquiet)
+  File "./tests/docker/docker.py", line 147, in _do_check
+    return subprocess.check_call(self._command + cmd, **kwargs)
+  File "/usr/lib/python2.7/subprocess.py", line 190, in check_call
+    raise CalledProcessError(retcode, cmd)
+subprocess.CalledProcessError: Command '['docker', 'build', '-t',
+'qemu:debian-powerpc-cross', '-f',
+'/tmp/docker_buildQI1jpf/tmpf8x3A7.docker', '/tmp/docker_buildQI1jpf']'
+returned non-zero exit status 1
+make: *** [tests/docker/Makefile.include:39:
+docker-image-debian-powerpc-cross] Error 1
+~/source/qemu ((0340bb063f...))$
+
+Due to the ugly output, I didn't notice the "see debian-sid.docker
+notes" at first.
+
+I'm not sure using apt repository snapshot resolve everything.
+
+Assuming I'm located in an area where Debian mirrors are very
+unreliable, and most of QEMU developers are in area with strong
+connectivity, I won't object more on this patch. My network issues
+shouldn't be a blocker for the community.
+
+I'll see if I can arrange Dockerfiles to optionally use snapshots.
+
+So finally, you are welcome to keep my R-b and T-b tags :)
+
+Regards,
+
+Phil.
+
+> diff --git a/tests/tcg/alpha/Makefile.include b/tests/tcg/alpha/Makefil=
+e.include
+> new file mode 100644
+> index 0000000000..c7dc48eadb
+> --- /dev/null
+> +++ b/tests/tcg/alpha/Makefile.include
+> @@ -0,0 +1,2 @@
+> +DOCKER_IMAGE=3Ddebian-alpha-cross
+> +DOCKER_CROSS_COMPILER=3Dalpha-linux-gnu-gcc
+> diff --git a/tests/tcg/alpha/Makefile.target b/tests/tcg/alpha/Makefile=
+=2Etarget
+> new file mode 100644
+> index 0000000000..bedf1b6444
+> --- /dev/null
+> +++ b/tests/tcg/alpha/Makefile.target
+> @@ -0,0 +1,6 @@
+> +# -*- Mode: makefile -*-
+> +#
+> +# Alpha specific tweaks
+> +
+> +# On Alpha Linux only supports 8k pages
+> +EXTRA_RUNS+=3Drun-test-mmap-8192
+>=20
+
+
+--BjLx36g9W2ZGU8GfuypYw37ONJUhIcwR8
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCgAdFiEE+qvnXhKRciHc/Wuy4+MsLN6twN4FAlsI9XoACgkQ4+MsLN6t
+wN4+yg//Z7VOCYzh5SO+oiMl9AJYiHOeZFegcvxAEh5GmC7Q0mx0qxnvy9SInSxW
+uDTI78a6RgjPXDEtpLZy9Ul17E9h05Hoghf188/5UKysd+/DjN+bdH/YDEcSnmqa
+MBMnPXnrMBM6MgZxWh6egs2cTFUDCslymkFLuQp9Lqehq0xpOoO1krwQJG3L1eEv
+de8bs5jy/nF0yduG/bESkhIb4+Eb2lF37wBlaUR6+pcl/zJXrK4dp8ZvJKgeThXs
+kUY7M4xN2cCTlR+CemVVrbGJrCnvm+vqrdS3RiBq+BmNmx6uONeT0x+fAT/t0x3j
+J/vUf+qtCEPM8peLzjBfK4ejUXnPj8d/UY5j7Ubdcy4SMFNyjpHxnZTt1p32zooL
+G9fxcWUecy0g3FFSAZqyORCxZeE/h7njSV/Qst6oB0g6VOLQLpXReRaPvwq9G4I6
+TArlOFKOnB9+5Bh/VMkR33D4k4Y79T1TWHf2uZyjI45ORf8NihZRZFGKXA9ttQv5
+rNlsHfjYAIldQeyUZ0bqZPgkU2upoP05lVWv3ncqHuBt6xAekVg16jdIv/jKc3Iu
+BfwMbIAI426o/NHzezXaKQelB/eTmA4KaJWrWkNVrathpKjjBdWuPPSsqkN1NAMx
+4zVnGaDaHmMIni5fxgWNeU2UeZq9xwd6sHTBvIMsc6KesvI5kAo=
+=4lGv
+-----END PGP SIGNATURE-----
+
+--BjLx36g9W2ZGU8GfuypYw37ONJUhIcwR8--
