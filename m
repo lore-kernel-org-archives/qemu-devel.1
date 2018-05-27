@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57790)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57807)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fMwQe-00006F-7z
-	for qemu-devel@nongnu.org; Sun, 27 May 2018 10:13:51 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1fMwQh-00009n-5E
+	for qemu-devel@nongnu.org; Sun, 27 May 2018 10:13:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fMwQc-0004QK-JW
-	for qemu-devel@nongnu.org; Sun, 27 May 2018 10:13:48 -0400
-Received: from mail-pl0-x242.google.com ([2607:f8b0:400e:c01::242]:36504)
+	(envelope-from <richard.henderson@linaro.org>) id 1fMwQe-0004Qc-0v
+	for qemu-devel@nongnu.org; Sun, 27 May 2018 10:13:51 -0400
+Received: from mail-pl0-x22d.google.com ([2607:f8b0:400e:c01::22d]:38768)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1fMwQc-0004Q8-Ae
-	for qemu-devel@nongnu.org; Sun, 27 May 2018 10:13:46 -0400
-Received: by mail-pl0-x242.google.com with SMTP id v24-v6so5734906plo.3
-	for <qemu-devel@nongnu.org>; Sun, 27 May 2018 07:13:46 -0700 (PDT)
+	id 1fMwQd-0004QS-Rj
+	for qemu-devel@nongnu.org; Sun, 27 May 2018 10:13:47 -0400
+Received: by mail-pl0-x22d.google.com with SMTP id c11-v6so5733076plr.5
+	for <qemu-devel@nongnu.org>; Sun, 27 May 2018 07:13:47 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Sun, 27 May 2018 09:13:15 -0500
-Message-Id: <20180527141324.11937-12-richard.henderson@linaro.org>
+Date: Sun, 27 May 2018 09:13:16 -0500
+Message-Id: <20180527141324.11937-13-richard.henderson@linaro.org>
 In-Reply-To: <20180527141324.11937-1-richard.henderson@linaro.org>
 References: <20180527141324.11937-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH 11/20] target/openrisc: Reduce tlb to a single
- dimension
+Subject: [Qemu-devel] [PATCH 12/20] target/openrisc: Fix tlb flushing in
+ mtspr
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,212 +30,77 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Stafford Horne <shorne@gmail.com>
 
-While we had defines for *_WAY, we didn't define more than 1.
-Reduce the complexity by eliminating this unused dimension.
+The previous code was confused, avoiding the flush of the old entry
+if the new entry is invalid.  We need to flush the old page if the
+old entry is valid and the new page if the new entry is valid.
+
+This bug was masked by over-flushing elsewhere.
 
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/openrisc/cpu.h        |  6 ++----
- target/openrisc/machine.c    |  6 ++----
- target/openrisc/mmu.c        | 30 ++++++++++++++++--------------
- target/openrisc/sys_helper.c | 20 ++++++++++----------
- 4 files changed, 30 insertions(+), 32 deletions(-)
+ target/openrisc/sys_helper.c | 21 +++++++++++++++------
+ 1 file changed, 15 insertions(+), 6 deletions(-)
 
-diff --git a/target/openrisc/cpu.h b/target/openrisc/cpu.h
-index 13107058cb..947ca00d8d 100644
---- a/target/openrisc/cpu.h
-+++ b/target/openrisc/cpu.h
-@@ -222,10 +222,8 @@ enum {
- 
- /* TLB size */
- enum {
--    DTLB_WAYS = 1,
-     DTLB_SIZE = 64,
-     DTLB_MASK = (DTLB_SIZE-1),
--    ITLB_WAYS = 1,
-     ITLB_SIZE = 64,
-     ITLB_MASK = (ITLB_SIZE-1),
- };
-@@ -256,8 +254,8 @@ typedef struct OpenRISCTLBEntry {
- 
- #ifndef CONFIG_USER_ONLY
- typedef struct CPUOpenRISCTLBContext {
--    OpenRISCTLBEntry itlb[ITLB_WAYS][ITLB_SIZE];
--    OpenRISCTLBEntry dtlb[DTLB_WAYS][DTLB_SIZE];
-+    OpenRISCTLBEntry itlb[ITLB_SIZE];
-+    OpenRISCTLBEntry dtlb[DTLB_SIZE];
- 
-     int (*cpu_openrisc_map_address_code)(struct OpenRISCCPU *cpu,
-                                          hwaddr *physical,
-diff --git a/target/openrisc/machine.c b/target/openrisc/machine.c
-index 73e0abcfd7..b795b56dc6 100644
---- a/target/openrisc/machine.c
-+++ b/target/openrisc/machine.c
-@@ -42,11 +42,9 @@ static const VMStateDescription vmstate_cpu_tlb = {
-     .minimum_version_id = 1,
-     .minimum_version_id_old = 1,
-     .fields = (VMStateField[]) {
--        VMSTATE_STRUCT_2DARRAY(itlb, CPUOpenRISCTLBContext,
--                             ITLB_WAYS, ITLB_SIZE, 0,
-+        VMSTATE_STRUCT_ARRAY(itlb, CPUOpenRISCTLBContext, ITLB_SIZE, 0,
-                              vmstate_tlb_entry, OpenRISCTLBEntry),
--        VMSTATE_STRUCT_2DARRAY(dtlb, CPUOpenRISCTLBContext,
--                             DTLB_WAYS, DTLB_SIZE, 0,
-+        VMSTATE_STRUCT_ARRAY(dtlb, CPUOpenRISCTLBContext, DTLB_SIZE, 0,
-                              vmstate_tlb_entry, OpenRISCTLBEntry),
-         VMSTATE_END_OF_LIST()
-     }
-diff --git a/target/openrisc/mmu.c b/target/openrisc/mmu.c
-index 9b4b5cf04f..23edd8c78c 100644
---- a/target/openrisc/mmu.c
-+++ b/target/openrisc/mmu.c
-@@ -43,19 +43,21 @@ static int get_phys_code(OpenRISCCPU *cpu, hwaddr *physical, int *prot,
-     int vpn = address >> TARGET_PAGE_BITS;
-     int idx = vpn & ITLB_MASK;
-     int right = 0;
-+    uint32_t mr = cpu->env.tlb.itlb[idx].mr;
-+    uint32_t tr = cpu->env.tlb.itlb[idx].tr;
- 
--    if ((cpu->env.tlb.itlb[0][idx].mr >> TARGET_PAGE_BITS) != vpn) {
-+    if ((mr >> TARGET_PAGE_BITS) != vpn) {
-         return TLBRET_NOMATCH;
-     }
--    if (!(cpu->env.tlb.itlb[0][idx].mr & 1)) {
-+    if (!(mr & 1)) {
-         return TLBRET_INVALID;
-     }
-     if (supervisor) {
--        if (cpu->env.tlb.itlb[0][idx].tr & SXE) {
-+        if (tr & SXE) {
-             right |= PAGE_EXEC;
-         }
-     } else {
--        if (cpu->env.tlb.itlb[0][idx].tr & UXE) {
-+        if (tr & UXE) {
-             right |= PAGE_EXEC;
-         }
-     }
-@@ -63,8 +65,7 @@ static int get_phys_code(OpenRISCCPU *cpu, hwaddr *physical, int *prot,
-         return TLBRET_BADADDR;
-     }
- 
--    *physical = (cpu->env.tlb.itlb[0][idx].tr & TARGET_PAGE_MASK) |
--                (address & (TARGET_PAGE_SIZE-1));
-+    *physical = (tr & TARGET_PAGE_MASK) | (address & (TARGET_PAGE_SIZE-1));
-     *prot = right;
-     return TLBRET_MATCH;
- }
-@@ -75,25 +76,27 @@ static int get_phys_data(OpenRISCCPU *cpu, hwaddr *physical, int *prot,
-     int vpn = address >> TARGET_PAGE_BITS;
-     int idx = vpn & DTLB_MASK;
-     int right = 0;
-+    uint32_t mr = cpu->env.tlb.dtlb[idx].mr;
-+    uint32_t tr = cpu->env.tlb.dtlb[idx].tr;
- 
--    if ((cpu->env.tlb.dtlb[0][idx].mr >> TARGET_PAGE_BITS) != vpn) {
-+    if ((mr >> TARGET_PAGE_BITS) != vpn) {
-         return TLBRET_NOMATCH;
-     }
--    if (!(cpu->env.tlb.dtlb[0][idx].mr & 1)) {
-+    if (!(mr & 1)) {
-         return TLBRET_INVALID;
-     }
-     if (supervisor) {
--        if (cpu->env.tlb.dtlb[0][idx].tr & SRE) {
-+        if (tr & SRE) {
-             right |= PAGE_READ;
-         }
--        if (cpu->env.tlb.dtlb[0][idx].tr & SWE) {
-+        if (tr & SWE) {
-             right |= PAGE_WRITE;
-         }
-     } else {
--        if (cpu->env.tlb.dtlb[0][idx].tr & URE) {
-+        if (tr & URE) {
-             right |= PAGE_READ;
-         }
--        if (cpu->env.tlb.dtlb[0][idx].tr & UWE) {
-+        if (tr & UWE) {
-             right |= PAGE_WRITE;
-         }
-     }
-@@ -105,8 +108,7 @@ static int get_phys_data(OpenRISCCPU *cpu, hwaddr *physical, int *prot,
-         return TLBRET_BADADDR;
-     }
- 
--    *physical = (cpu->env.tlb.dtlb[0][idx].tr & TARGET_PAGE_MASK) |
--                (address & (TARGET_PAGE_SIZE-1));
-+    *physical = (tr & TARGET_PAGE_MASK) | (address & (TARGET_PAGE_SIZE-1));
-     *prot = right;
-     return TLBRET_MATCH;
- }
 diff --git a/target/openrisc/sys_helper.c b/target/openrisc/sys_helper.c
-index a1285894ad..8ad7a7d898 100644
+index 8ad7a7d898..e00aaa332e 100644
 --- a/target/openrisc/sys_helper.c
 +++ b/target/openrisc/sys_helper.c
-@@ -85,14 +85,14 @@ void HELPER(mtspr)(CPUOpenRISCState *env, target_ulong spr, target_ulong rb)
+@@ -32,6 +32,7 @@ void HELPER(mtspr)(CPUOpenRISCState *env, target_ulong spr, target_ulong rb)
+ #ifndef CONFIG_USER_ONLY
+     OpenRISCCPU *cpu = openrisc_env_get_cpu(env);
+     CPUState *cs = CPU(cpu);
++    target_ulong mr;
+     int idx;
+ 
+     switch (spr) {
+@@ -84,12 +85,15 @@ void HELPER(mtspr)(CPUOpenRISCState *env, target_ulong spr, target_ulong rb)
+ 
      case TO_SPR(1, 512) ... TO_SPR(1, 512+DTLB_SIZE-1): /* DTLBW0MR 0-127 */
          idx = spr - TO_SPR(1, 512);
-         if (!(rb & 1)) {
--            tlb_flush_page(cs, env->tlb.dtlb[0][idx].mr & TARGET_PAGE_MASK);
-+            tlb_flush_page(cs, env->tlb.dtlb[idx].mr & TARGET_PAGE_MASK);
+-        if (!(rb & 1)) {
+-            tlb_flush_page(cs, env->tlb.dtlb[idx].mr & TARGET_PAGE_MASK);
++        mr = env->tlb.dtlb[idx].mr;
++        if (mr & 1) {
++            tlb_flush_page(cs, mr & TARGET_PAGE_MASK);
++        }
++        if (rb & 1) {
++            tlb_flush_page(cs, rb & TARGET_PAGE_MASK);
          }
--        env->tlb.dtlb[0][idx].mr = rb;
-+        env->tlb.dtlb[idx].mr = rb;
+         env->tlb.dtlb[idx].mr = rb;
          break;
- 
+-
      case TO_SPR(1, 640) ... TO_SPR(1, 640+DTLB_SIZE-1): /* DTLBW0TR 0-127 */
          idx = spr - TO_SPR(1, 640);
--        env->tlb.dtlb[0][idx].tr = rb;
-+        env->tlb.dtlb[idx].tr = rb;
+         env->tlb.dtlb[idx].tr = rb;
+@@ -101,14 +105,18 @@ void HELPER(mtspr)(CPUOpenRISCState *env, target_ulong spr, target_ulong rb)
+     case TO_SPR(1, 1280) ... TO_SPR(1, 1407): /* DTLBW3MR 0-127 */
+     case TO_SPR(1, 1408) ... TO_SPR(1, 1535): /* DTLBW3TR 0-127 */
          break;
-     case TO_SPR(1, 768) ... TO_SPR(1, 895):   /* DTLBW1MR 0-127 */
-     case TO_SPR(1, 896) ... TO_SPR(1, 1023):  /* DTLBW1TR 0-127 */
-@@ -104,14 +104,14 @@ void HELPER(mtspr)(CPUOpenRISCState *env, target_ulong spr, target_ulong rb)
++
      case TO_SPR(2, 512) ... TO_SPR(2, 512+ITLB_SIZE-1):   /* ITLBW0MR 0-127 */
          idx = spr - TO_SPR(2, 512);
-         if (!(rb & 1)) {
--            tlb_flush_page(cs, env->tlb.itlb[0][idx].mr & TARGET_PAGE_MASK);
-+            tlb_flush_page(cs, env->tlb.itlb[idx].mr & TARGET_PAGE_MASK);
+-        if (!(rb & 1)) {
+-            tlb_flush_page(cs, env->tlb.itlb[idx].mr & TARGET_PAGE_MASK);
++        mr = env->tlb.itlb[idx].mr;
++        if (mr & 1) {
++            tlb_flush_page(cs, mr & TARGET_PAGE_MASK);
++        }
++        if (rb & 1) {
++            tlb_flush_page(cs, rb & TARGET_PAGE_MASK);
          }
--        env->tlb.itlb[0][idx].mr = rb;
-+        env->tlb.itlb[idx].mr = rb;
+         env->tlb.itlb[idx].mr = rb;
          break;
- 
+-
      case TO_SPR(2, 640) ... TO_SPR(2, 640+ITLB_SIZE-1): /* ITLBW0TR 0-127 */
          idx = spr - TO_SPR(2, 640);
--        env->tlb.itlb[0][idx].tr = rb;
-+        env->tlb.itlb[idx].tr = rb;
+         env->tlb.itlb[idx].tr = rb;
+@@ -120,6 +128,7 @@ void HELPER(mtspr)(CPUOpenRISCState *env, target_ulong spr, target_ulong rb)
+     case TO_SPR(2, 1280) ... TO_SPR(2, 1407): /* ITLBW3MR 0-127 */
+     case TO_SPR(2, 1408) ... TO_SPR(2, 1535): /* ITLBW3TR 0-127 */
          break;
-     case TO_SPR(2, 768) ... TO_SPR(2, 895):   /* ITLBW1MR 0-127 */
-     case TO_SPR(2, 896) ... TO_SPR(2, 1023):  /* ITLBW1TR 0-127 */
-@@ -243,11 +243,11 @@ target_ulong HELPER(mfspr)(CPUOpenRISCState *env, target_ulong rd,
- 
-     case TO_SPR(1, 512) ... TO_SPR(1, 512+DTLB_SIZE-1): /* DTLBW0MR 0-127 */
-         idx = spr - TO_SPR(1, 512);
--        return env->tlb.dtlb[0][idx].mr;
-+        return env->tlb.dtlb[idx].mr;
- 
-     case TO_SPR(1, 640) ... TO_SPR(1, 640+DTLB_SIZE-1): /* DTLBW0TR 0-127 */
-         idx = spr - TO_SPR(1, 640);
--        return env->tlb.dtlb[0][idx].tr;
-+        return env->tlb.dtlb[idx].tr;
- 
-     case TO_SPR(1, 768) ... TO_SPR(1, 895):   /* DTLBW1MR 0-127 */
-     case TO_SPR(1, 896) ... TO_SPR(1, 1023):  /* DTLBW1TR 0-127 */
-@@ -259,11 +259,11 @@ target_ulong HELPER(mfspr)(CPUOpenRISCState *env, target_ulong rd,
- 
-     case TO_SPR(2, 512) ... TO_SPR(2, 512+ITLB_SIZE-1): /* ITLBW0MR 0-127 */
-         idx = spr - TO_SPR(2, 512);
--        return env->tlb.itlb[0][idx].mr;
-+        return env->tlb.itlb[idx].mr;
- 
-     case TO_SPR(2, 640) ... TO_SPR(2, 640+ITLB_SIZE-1): /* ITLBW0TR 0-127 */
-         idx = spr - TO_SPR(2, 640);
--        return env->tlb.itlb[0][idx].tr;
-+        return env->tlb.itlb[idx].tr;
- 
-     case TO_SPR(2, 768) ... TO_SPR(2, 895):   /* ITLBW1MR 0-127 */
-     case TO_SPR(2, 896) ... TO_SPR(2, 1023):  /* ITLBW1TR 0-127 */
++
+     case TO_SPR(5, 1):  /* MACLO */
+         env->mac = deposit64(env->mac, 0, 32, rb);
+         break;
 -- 
 2.17.0
