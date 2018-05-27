@@ -1,23 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57949)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:32825)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fMwQu-0000N3-M7
-	for qemu-devel@nongnu.org; Sun, 27 May 2018 10:14:12 -0400
+	(envelope-from <no-reply@patchew.org>) id 1fMwks-0005f4-UK
+	for qemu-devel@nongnu.org; Sun, 27 May 2018 10:34:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fMwQq-0004VT-3C
-	for qemu-devel@nongnu.org; Sun, 27 May 2018 10:14:04 -0400
-Received: from mail-pl0-x243.google.com ([2607:f8b0:400e:c01::243]:39840)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1fMwQp-0004Uc-OB
-	for qemu-devel@nongnu.org; Sun, 27 May 2018 10:14:00 -0400
-Received: by mail-pl0-x243.google.com with SMTP id f1-v6so5284989plt.6
-	for <qemu-devel@nongnu.org>; Sun, 27 May 2018 07:13:59 -0700 (PDT)
-From: Richard Henderson <richard.henderson@linaro.org>
-Date: Sun, 27 May 2018 09:13:23 -0500
-Message-Id: <20180527141324.11937-20-richard.henderson@linaro.org>
+	(envelope-from <no-reply@patchew.org>) id 1fMwko-0007hm-MU
+	for qemu-devel@nongnu.org; Sun, 27 May 2018 10:34:42 -0400
+Resent-Message-Id: <E1fMwko-0007hm-MU@eggs.gnu.org>
+Received: from sender-of-o51.zoho.com ([135.84.80.216]:21060)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1fMwko-0007hO-Dy
+	for qemu-devel@nongnu.org; Sun, 27 May 2018 10:34:38 -0400
 In-Reply-To: <20180527141324.11937-1-richard.henderson@linaro.org>
-References: <20180527141324.11937-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH 19/20] target/openrisc: Add print_insn_or1k
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <152743164288.267.1638048643214421551@d39dc562802a>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Sun, 27 May 2018 07:34:03 -0700 (PDT)
+Subject: Re: [Qemu-devel] [PATCH 00/20] target/openrisc improvements
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,1023 +28,178 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Stafford Horne <shorne@gmail.com>
+To: richard.henderson@linaro.org
+Cc: famz@redhat.com, qemu-devel@nongnu.org, shorne@gmail.com
 
-Rather than emit disassembly while translating, reuse the
-generated decoder to build a separate disassembler.
-
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
----
- target/openrisc/cpu.h         |   1 +
- target/openrisc/cpu.c         |   6 ++
- target/openrisc/disas.c       | 171 ++++++++++++++++++++++++++++++++++
- target/openrisc/translate.c   | 114 -----------------------
- target/openrisc/Makefile.objs |   3 +-
- 5 files changed, 180 insertions(+), 115 deletions(-)
- create mode 100644 target/openrisc/disas.c
-
-diff --git a/target/openrisc/cpu.h b/target/openrisc/cpu.h
-index 1efffa5269..f1b31bc24a 100644
---- a/target/openrisc/cpu.h
-+++ b/target/openrisc/cpu.h
-@@ -348,6 +348,7 @@ void openrisc_translate_init(void);
- int openrisc_cpu_handle_mmu_fault(CPUState *cpu, vaddr address, int size,
-                                   int rw, int mmu_idx);
- int cpu_openrisc_signal_handler(int host_signum, void *pinfo, void *puc);
-+int print_insn_or1k(bfd_vma addr, disassemble_info *info);
- 
- #define cpu_list cpu_openrisc_list
- #define cpu_signal_handler cpu_openrisc_signal_handler
-diff --git a/target/openrisc/cpu.c b/target/openrisc/cpu.c
-index 75c83d15d1..d1ef4c737c 100644
---- a/target/openrisc/cpu.c
-+++ b/target/openrisc/cpu.c
-@@ -36,6 +36,11 @@ static bool openrisc_cpu_has_work(CPUState *cs)
-                                     CPU_INTERRUPT_TIMER);
- }
- 
-+static void openrisc_disas_set_info(CPUState *cpu, disassemble_info *info)
-+{
-+    info->print_insn = print_insn_or1k;
-+}
-+
- /* CPUClass::reset() */
- static void openrisc_cpu_reset(CPUState *s)
- {
-@@ -151,6 +156,7 @@ static void openrisc_cpu_class_init(ObjectClass *oc, void *data)
- #endif
-     cc->gdb_num_core_regs = 32 + 3;
-     cc->tcg_initialize = openrisc_translate_init;
-+    cc->disas_set_info = openrisc_disas_set_info;
- }
- 
- /* Sort alphabetically by type name, except for "any". */
-diff --git a/target/openrisc/disas.c b/target/openrisc/disas.c
-new file mode 100644
-index 0000000000..db0caa1805
---- /dev/null
-+++ b/target/openrisc/disas.c
-@@ -0,0 +1,171 @@
-+/*
-+ * OpenRISC disassembler
-+ *
-+ * Copyright (c) 2018 Richard Henderson <rth@twiddle.net>
-+ *
-+ * This program is free software: you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License as published by
-+ * the Free Software Foundation, either version 2 of the License, or
-+ * (at your option) any later version.
-+ *
-+ * This program is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ * GNU General Public License for more details.
-+ *
-+ * You should have received a copy of the GNU General Public License
-+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "qemu-common.h"
-+#include "disas/bfd.h"
-+#include "qemu/bitops.h"
-+#include "cpu.h"
-+
-+typedef disassemble_info DisasContext;
-+
-+/* Include the auto-generated decoder.  */
-+#include "decode.inc.c"
-+
-+#define output(mnemonic, format, ...) \
-+    info->fprintf_func(info->stream, "%-9s " format, \
-+                       mnemonic, ##__VA_ARGS__)
-+
-+int print_insn_or1k(bfd_vma addr, disassemble_info *info)
-+{
-+    bfd_byte buffer[4];
-+    uint32_t insn;
-+    int status;
-+
-+    status = info->read_memory_func(addr, buffer, 4, info);
-+    if (status != 0)
-+      {
-+        info->memory_error_func(status, addr, info);
-+        return -1;
-+      }
-+    insn = bfd_getb32(buffer);
-+
-+    if (!decode(info, insn)) {
-+        output(".long", "%#08x", insn);
-+    }
-+    return 4;
-+}
-+
-+#define INSN(opcode, format, ...) \
-+static bool trans_l_##opcode(disassemble_info *info,    \
-+    arg_l_##opcode *a, uint32_t insn)                   \
-+{                                                       \
-+    output("l." #opcode, format, ##__VA_ARGS__);        \
-+    return true;                                        \
-+}
-+
-+INSN(add,    "r%d, r%d, r%d", a->d, a->a, a->b)
-+INSN(addc,   "r%d, r%d, r%d", a->d, a->a, a->b)
-+INSN(sub,    "r%d, r%d, r%d", a->d, a->a, a->b)
-+INSN(and,    "r%d, r%d, r%d", a->d, a->a, a->b)
-+INSN(or,     "r%d, r%d, r%d", a->d, a->a, a->b)
-+INSN(xor,    "r%d, r%d, r%d", a->d, a->a, a->b)
-+INSN(sll,    "r%d, r%d, r%d", a->d, a->a, a->b)
-+INSN(srl,    "r%d, r%d, r%d", a->d, a->a, a->b)
-+INSN(sra,    "r%d, r%d, r%d", a->d, a->a, a->b)
-+INSN(ror,    "r%d, r%d, r%d", a->d, a->a, a->b)
-+INSN(exths,  "r%d, r%d", a->d, a->a)
-+INSN(extbs,  "r%d, r%d", a->d, a->a)
-+INSN(exthz,  "r%d, r%d", a->d, a->a)
-+INSN(extbz,  "r%d, r%d", a->d, a->a)
-+INSN(cmov,   "r%d, r%d, r%d", a->d, a->a, a->b)
-+INSN(ff1,    "r%d, r%d", a->d, a->a)
-+INSN(fl1,    "r%d, r%d", a->d, a->a)
-+INSN(mul,    "r%d, r%d, r%d", a->d, a->a, a->b)
-+INSN(mulu,   "r%d, r%d, r%d", a->d, a->a, a->b)
-+INSN(div,    "r%d, r%d, r%d", a->d, a->a, a->b)
-+INSN(divu,   "r%d, r%d, r%d", a->d, a->a, a->b)
-+INSN(muld,   "r%d, r%d", a->a, a->b)
-+INSN(muldu,  "r%d, r%d", a->a, a->b)
-+INSN(j,      "%d", a->n)
-+INSN(jal,    "%d", a->n)
-+INSN(bf,     "%d", a->n)
-+INSN(bnf,    "%d", a->n)
-+INSN(jr,     "r%d", a->b)
-+INSN(jalr,   "r%d", a->b)
-+INSN(lwa,    "r%d, %d(r%d)", a->d, a->i, a->a)
-+INSN(lwz,    "r%d, %d(r%d)", a->d, a->i, a->a)
-+INSN(lws,    "r%d, %d(r%d)", a->d, a->i, a->a)
-+INSN(lbz,    "r%d, %d(r%d)", a->d, a->i, a->a)
-+INSN(lbs,    "r%d, %d(r%d)", a->d, a->i, a->a)
-+INSN(lhz,    "r%d, %d(r%d)", a->d, a->i, a->a)
-+INSN(lhs,    "r%d, %d(r%d)", a->d, a->i, a->a)
-+INSN(swa,    "%d(r%d), r%d", a->i, a->a, a->b)
-+INSN(sw,     "%d(r%d), r%d", a->i, a->a, a->b)
-+INSN(sb,     "%d(r%d), r%d", a->i, a->a, a->b)
-+INSN(sh,     "%d(r%d), r%d", a->i, a->a, a->b)
-+INSN(nop,    "")
-+INSN(addi,   "r%d, r%d, %d", a->d, a->a, a->i)
-+INSN(addic,  "r%d, r%d, %d", a->d, a->a, a->i)
-+INSN(muli,   "r%d, r%d, %d", a->d, a->a, a->i)
-+INSN(maci,   "r%d, %d", a->a, a->i)
-+INSN(andi,   "r%d, r%d, %d", a->d, a->a, a->k)
-+INSN(ori,    "r%d, r%d, %d", a->d, a->a, a->k)
-+INSN(xori,   "r%d, r%d, %d", a->d, a->a, a->i)
-+INSN(mfspr,  "r%d, r%d, %d", a->d, a->a, a->k)
-+INSN(mtspr,  "r%d, r%d, %d", a->a, a->b, a->k)
-+INSN(mac,    "r%d, r%d", a->a, a->b)
-+INSN(msb,    "r%d, r%d", a->a, a->b)
-+INSN(macu,   "r%d, r%d", a->a, a->b)
-+INSN(msbu,   "r%d, r%d", a->a, a->b)
-+INSN(slli,   "r%d, r%d, %d", a->d, a->a, a->l)
-+INSN(srli,   "r%d, r%d, %d", a->d, a->a, a->l)
-+INSN(srai,   "r%d, r%d, %d", a->d, a->a, a->l)
-+INSN(rori,   "r%d, r%d, %d", a->d, a->a, a->l)
-+INSN(movhi,  "r%d, %d", a->d, a->k)
-+INSN(macrc,  "r%d", a->d)
-+INSN(sfeq,   "r%d, r%d", a->a, a->b)
-+INSN(sfne,   "r%d, r%d", a->a, a->b)
-+INSN(sfgtu,  "r%d, r%d", a->a, a->b)
-+INSN(sfgeu,  "r%d, r%d", a->a, a->b)
-+INSN(sfltu,  "r%d, r%d", a->a, a->b)
-+INSN(sfleu,  "r%d, r%d", a->a, a->b)
-+INSN(sfgts,  "r%d, r%d", a->a, a->b)
-+INSN(sfges,  "r%d, r%d", a->a, a->b)
-+INSN(sflts,  "r%d, r%d", a->a, a->b)
-+INSN(sfles,  "r%d, r%d", a->a, a->b)
-+INSN(sfeqi,  "r%d, %d", a->a, a->i)
-+INSN(sfnei,  "r%d, %d", a->a, a->i)
-+INSN(sfgtui, "r%d, %d", a->a, a->i)
-+INSN(sfgeui, "r%d, %d", a->a, a->i)
-+INSN(sfltui, "r%d, %d", a->a, a->i)
-+INSN(sfleui, "r%d, %d", a->a, a->i)
-+INSN(sfgtsi, "r%d, %d", a->a, a->i)
-+INSN(sfgesi, "r%d, %d", a->a, a->i)
-+INSN(sfltsi, "r%d, %d", a->a, a->i)
-+INSN(sflesi, "r%d, %d", a->a, a->i)
-+INSN(sys,    "%d", a->k)
-+INSN(trap,   "%d", a->k)
-+INSN(msync,  "")
-+INSN(psync,  "")
-+INSN(csync,  "")
-+INSN(rfe,    "")
-+
-+#define FP_INSN(opcode, suffix, format, ...) \
-+static bool trans_lf_##opcode##_##suffix(disassemble_info *info, \
-+    arg_lf_##opcode##_##suffix *a, uint32_t insn)                \
-+{                                                                \
-+    output("lf." #opcode "." #suffix, format, ##__VA_ARGS__);    \
-+    return true;                                                 \
-+}
-+
-+FP_INSN(add,s,  "r%d, r%d, r%d", a->d, a->a, a->b)
-+FP_INSN(sub,s,  "r%d, r%d, r%d", a->d, a->a, a->b)
-+FP_INSN(mul,s,  "r%d, r%d, r%d", a->d, a->a, a->b)
-+FP_INSN(div,s,  "r%d, r%d, r%d", a->d, a->a, a->b)
-+FP_INSN(rem,s,  "r%d, r%d, r%d", a->d, a->a, a->b)
-+FP_INSN(itof,s, "r%d, r%d", a->d, a->a)
-+FP_INSN(ftoi,s, "r%d, r%d", a->d, a->a)
-+FP_INSN(madd,s, "r%d, r%d, r%d", a->d, a->a, a->b)
-+FP_INSN(sfeq,s, "r%d, r%d", a->a, a->b)
-+FP_INSN(sfne,s, "r%d, r%d", a->a, a->b)
-+FP_INSN(sfgt,s, "r%d, r%d", a->a, a->b)
-+FP_INSN(sfge,s, "r%d, r%d", a->a, a->b)
-+FP_INSN(sflt,s, "r%d, r%d", a->a, a->b)
-+FP_INSN(sfle,s, "r%d, r%d", a->a, a->b)
-diff --git a/target/openrisc/translate.c b/target/openrisc/translate.c
-index 59e2df01cf..fe9fa8d030 100644
---- a/target/openrisc/translate.c
-+++ b/target/openrisc/translate.c
-@@ -36,10 +36,6 @@
- #include "trace-tcg.h"
- #include "exec/log.h"
- 
--#define LOG_DIS(str, ...) \
--    qemu_log_mask(CPU_LOG_TB_IN_ASM, "%08x: " str, dc->base.pc_next,    \
--                  ## __VA_ARGS__)
--
- /* is_jmp field values */
- #define DISAS_EXIT    DISAS_TARGET_0  /* force exit to main loop */
- #define DISAS_JUMP    DISAS_TARGET_1  /* exit via jmp_pc/jmp_pc_imm */
-@@ -440,7 +436,6 @@ static void gen_msbu(DisasContext *dc, TCGv srca, TCGv srcb)
- 
- static bool trans_l_add(DisasContext *dc, arg_dab *a, uint32_t insn)
- {
--    LOG_DIS("l.add r%d, r%d, r%d\n", a->d, a->a, a->b);
-     check_r0_write(a->d);
-     gen_add(dc, cpu_R[a->d], cpu_R[a->a], cpu_R[a->b]);
-     return true;
-@@ -448,7 +443,6 @@ static bool trans_l_add(DisasContext *dc, arg_dab *a, uint32_t insn)
- 
- static bool trans_l_addc(DisasContext *dc, arg_dab *a, uint32_t insn)
- {
--    LOG_DIS("l.addc r%d, r%d, r%d\n", a->d, a->a, a->b);
-     check_r0_write(a->d);
-     gen_addc(dc, cpu_R[a->d], cpu_R[a->a], cpu_R[a->b]);
-     return true;
-@@ -456,7 +450,6 @@ static bool trans_l_addc(DisasContext *dc, arg_dab *a, uint32_t insn)
- 
- static bool trans_l_sub(DisasContext *dc, arg_dab *a, uint32_t insn)
- {
--    LOG_DIS("l.sub r%d, r%d, r%d\n", a->d, a->a, a->b);
-     check_r0_write(a->d);
-     gen_sub(dc, cpu_R[a->d], cpu_R[a->a], cpu_R[a->b]);
-     return true;
-@@ -464,7 +457,6 @@ static bool trans_l_sub(DisasContext *dc, arg_dab *a, uint32_t insn)
- 
- static bool trans_l_and(DisasContext *dc, arg_dab *a, uint32_t insn)
- {
--    LOG_DIS("l.and r%d, r%d, r%d\n", a->d, a->a, a->b);
-     check_r0_write(a->d);
-     tcg_gen_and_tl(cpu_R[a->d], cpu_R[a->a], cpu_R[a->b]);
-     return true;
-@@ -472,7 +464,6 @@ static bool trans_l_and(DisasContext *dc, arg_dab *a, uint32_t insn)
- 
- static bool trans_l_or(DisasContext *dc, arg_dab *a, uint32_t insn)
- {
--    LOG_DIS("l.or r%d, r%d, r%d\n", a->d, a->a, a->b);
-     check_r0_write(a->d);
-     tcg_gen_or_tl(cpu_R[a->d], cpu_R[a->a], cpu_R[a->b]);
-     return true;
-@@ -480,7 +471,6 @@ static bool trans_l_or(DisasContext *dc, arg_dab *a, uint32_t insn)
- 
- static bool trans_l_xor(DisasContext *dc, arg_dab *a, uint32_t insn)
- {
--    LOG_DIS("l.xor r%d, r%d, r%d\n", a->d, a->a, a->b);
-     check_r0_write(a->d);
-     tcg_gen_xor_tl(cpu_R[a->d], cpu_R[a->a], cpu_R[a->b]);
-     return true;
-@@ -488,7 +478,6 @@ static bool trans_l_xor(DisasContext *dc, arg_dab *a, uint32_t insn)
- 
- static bool trans_l_sll(DisasContext *dc, arg_dab *a, uint32_t insn)
- {
--    LOG_DIS("l.sll r%d, r%d, r%d\n", a->d, a->a, a->b);
-     check_r0_write(a->d);
-     tcg_gen_shl_tl(cpu_R[a->d], cpu_R[a->a], cpu_R[a->b]);
-     return true;
-@@ -496,7 +485,6 @@ static bool trans_l_sll(DisasContext *dc, arg_dab *a, uint32_t insn)
- 
- static bool trans_l_srl(DisasContext *dc, arg_dab *a, uint32_t insn)
- {
--    LOG_DIS("l.srl r%d, r%d, r%d\n", a->d, a->a, a->b);
-     check_r0_write(a->d);
-     tcg_gen_shr_tl(cpu_R[a->d], cpu_R[a->a], cpu_R[a->b]);
-     return true;
-@@ -504,7 +492,6 @@ static bool trans_l_srl(DisasContext *dc, arg_dab *a, uint32_t insn)
- 
- static bool trans_l_sra(DisasContext *dc, arg_dab *a, uint32_t insn)
- {
--    LOG_DIS("l.sra r%d, r%d, r%d\n", a->d, a->a, a->b);
-     check_r0_write(a->d);
-     tcg_gen_sar_tl(cpu_R[a->d], cpu_R[a->a], cpu_R[a->b]);
-     return true;
-@@ -512,7 +499,6 @@ static bool trans_l_sra(DisasContext *dc, arg_dab *a, uint32_t insn)
- 
- static bool trans_l_ror(DisasContext *dc, arg_dab *a, uint32_t insn)
- {
--    LOG_DIS("l.ror r%d, r%d, r%d\n", a->d, a->a, a->b);
-     check_r0_write(a->d);
-     tcg_gen_rotr_tl(cpu_R[a->d], cpu_R[a->a], cpu_R[a->b]);
-     return true;
-@@ -520,7 +506,6 @@ static bool trans_l_ror(DisasContext *dc, arg_dab *a, uint32_t insn)
- 
- static bool trans_l_exths(DisasContext *dc, arg_da *a, uint32_t insn)
- {
--    LOG_DIS("l.exths r%d, r%d\n", a->d, a->a);
-     check_r0_write(a->d);
-     tcg_gen_ext16s_tl(cpu_R[a->d], cpu_R[a->a]);
-     return true;
-@@ -528,7 +513,6 @@ static bool trans_l_exths(DisasContext *dc, arg_da *a, uint32_t insn)
- 
- static bool trans_l_extbs(DisasContext *dc, arg_da *a, uint32_t insn)
- {
--    LOG_DIS("l.extbs r%d, r%d\n", a->d, a->a);
-     check_r0_write(a->d);
-     tcg_gen_ext8s_tl(cpu_R[a->d], cpu_R[a->a]);
-     return true;
-@@ -536,7 +520,6 @@ static bool trans_l_extbs(DisasContext *dc, arg_da *a, uint32_t insn)
- 
- static bool trans_l_exthz(DisasContext *dc, arg_da *a, uint32_t insn)
- {
--    LOG_DIS("l.exthz r%d, r%d\n", a->d, a->a);
-     check_r0_write(a->d);
-     tcg_gen_ext16u_tl(cpu_R[a->d], cpu_R[a->a]);
-     return true;
-@@ -544,7 +527,6 @@ static bool trans_l_exthz(DisasContext *dc, arg_da *a, uint32_t insn)
- 
- static bool trans_l_extbz(DisasContext *dc, arg_da *a, uint32_t insn)
- {
--    LOG_DIS("l.extbz r%d, r%d\n", a->d, a->a);
-     check_r0_write(a->d);
-     tcg_gen_ext8u_tl(cpu_R[a->d], cpu_R[a->a]);
-     return true;
-@@ -553,7 +535,6 @@ static bool trans_l_extbz(DisasContext *dc, arg_da *a, uint32_t insn)
- static bool trans_l_cmov(DisasContext *dc, arg_dab *a, uint32_t insn)
- {
-     TCGv zero;
--    LOG_DIS("l.cmov r%d, r%d, r%d\n", a->d, a->a, a->b);
- 
-     check_r0_write(a->d);
-     zero = tcg_const_tl(0);
-@@ -565,8 +546,6 @@ static bool trans_l_cmov(DisasContext *dc, arg_dab *a, uint32_t insn)
- 
- static bool trans_l_ff1(DisasContext *dc, arg_da *a, uint32_t insn)
- {
--    LOG_DIS("l.ff1 r%d, r%d\n", a->d, a->a);
--
-     check_r0_write(a->d);
-     tcg_gen_ctzi_tl(cpu_R[a->d], cpu_R[a->a], -1);
-     tcg_gen_addi_tl(cpu_R[a->d], cpu_R[a->d], 1);
-@@ -575,8 +554,6 @@ static bool trans_l_ff1(DisasContext *dc, arg_da *a, uint32_t insn)
- 
- static bool trans_l_fl1(DisasContext *dc, arg_da *a, uint32_t insn)
- {
--    LOG_DIS("l.fl1 r%d, r%d\n", a->d, a->a);
--
-     check_r0_write(a->d);
-     tcg_gen_clzi_tl(cpu_R[a->d], cpu_R[a->a], TARGET_LONG_BITS);
-     tcg_gen_subfi_tl(cpu_R[a->d], TARGET_LONG_BITS, cpu_R[a->d]);
-@@ -585,8 +562,6 @@ static bool trans_l_fl1(DisasContext *dc, arg_da *a, uint32_t insn)
- 
- static bool trans_l_mul(DisasContext *dc, arg_dab *a, uint32_t insn)
- {
--    LOG_DIS("l.mul r%d, r%d, r%d\n", a->d, a->a, a->b);
--
-     check_r0_write(a->d);
-     gen_mul(dc, cpu_R[a->d], cpu_R[a->a], cpu_R[a->b]);
-     return true;
-@@ -594,8 +569,6 @@ static bool trans_l_mul(DisasContext *dc, arg_dab *a, uint32_t insn)
- 
- static bool trans_l_mulu(DisasContext *dc, arg_dab *a, uint32_t insn)
- {
--    LOG_DIS("l.mulu r%d, r%d, r%d\n", a->d, a->a, a->b);
--
-     check_r0_write(a->d);
-     gen_mulu(dc, cpu_R[a->d], cpu_R[a->a], cpu_R[a->b]);
-     return true;
-@@ -603,8 +576,6 @@ static bool trans_l_mulu(DisasContext *dc, arg_dab *a, uint32_t insn)
- 
- static bool trans_l_div(DisasContext *dc, arg_dab *a, uint32_t insn)
- {
--    LOG_DIS("l.div r%d, r%d, r%d\n", a->d, a->a, a->b);
--
-     check_r0_write(a->d);
-     gen_div(dc, cpu_R[a->d], cpu_R[a->a], cpu_R[a->b]);
-     return true;
-@@ -612,8 +583,6 @@ static bool trans_l_div(DisasContext *dc, arg_dab *a, uint32_t insn)
- 
- static bool trans_l_divu(DisasContext *dc, arg_dab *a, uint32_t insn)
- {
--    LOG_DIS("l.divu r%d, r%d, r%d\n", a->d, a->a, a->b);
--
-     check_r0_write(a->d);
-     gen_divu(dc, cpu_R[a->d], cpu_R[a->a], cpu_R[a->b]);
-     return true;
-@@ -621,14 +590,12 @@ static bool trans_l_divu(DisasContext *dc, arg_dab *a, uint32_t insn)
- 
- static bool trans_l_muld(DisasContext *dc, arg_ab *a, uint32_t insn)
- {
--    LOG_DIS("l.muld r%d, r%d\n", a->a, a->b);
-     gen_muld(dc, cpu_R[a->a], cpu_R[a->b]);
-     return true;
- }
- 
- static bool trans_l_muldu(DisasContext *dc, arg_ab *a, uint32_t insn)
- {
--    LOG_DIS("l.muldu r%d, r%d\n", a->a, a->b);
-     gen_muldu(dc, cpu_R[a->a], cpu_R[a->b]);
-     return true;
- }
-@@ -637,7 +604,6 @@ static bool trans_l_j(DisasContext *dc, arg_l_j *a, uint32_t insn)
- {
-     target_ulong tmp_pc = dc->base.pc_next + a->n * 4;
- 
--    LOG_DIS("l.j %d\n", a->n);
-     tcg_gen_movi_tl(jmp_pc, tmp_pc);
-     dc->jmp_pc_imm = tmp_pc;
-     dc->delayed_branch = 2;
-@@ -649,7 +615,6 @@ static bool trans_l_jal(DisasContext *dc, arg_l_jal *a, uint32_t insn)
-     target_ulong tmp_pc = dc->base.pc_next + a->n * 4;
-     target_ulong ret_pc = dc->base.pc_next + 8;
- 
--    LOG_DIS("l.jal %d\n", a->n);
-     tcg_gen_movi_tl(cpu_R[9], ret_pc);
-     /* Optimize jal being used to load the PC for PIC.  */
-     if (tmp_pc != ret_pc) {
-@@ -677,21 +642,18 @@ static void do_bf(DisasContext *dc, arg_l_bf *a, TCGCond cond)
- 
- static bool trans_l_bf(DisasContext *dc, arg_l_bf *a, uint32_t insn)
- {
--    LOG_DIS("l.bf %d\n", a->n);
-     do_bf(dc, a, TCG_COND_NE);
-     return true;
- }
- 
- static bool trans_l_bnf(DisasContext *dc, arg_l_bf *a, uint32_t insn)
- {
--    LOG_DIS("l.bnf %d\n", a->n);
-     do_bf(dc, a, TCG_COND_EQ);
-     return true;
- }
- 
- static bool trans_l_jr(DisasContext *dc, arg_l_jr *a, uint32_t insn)
- {
--    LOG_DIS("l.jr r%d\n", a->b);
-     tcg_gen_mov_tl(jmp_pc, cpu_R[a->b]);
-     dc->delayed_branch = 2;
-     return true;
-@@ -699,7 +661,6 @@ static bool trans_l_jr(DisasContext *dc, arg_l_jr *a, uint32_t insn)
- 
- static bool trans_l_jalr(DisasContext *dc, arg_l_jalr *a, uint32_t insn)
- {
--    LOG_DIS("l.jalr r%d\n", a->b);
-     tcg_gen_mov_tl(jmp_pc, cpu_R[a->b]);
-     tcg_gen_movi_tl(cpu_R[9], dc->base.pc_next + 8);
-     dc->delayed_branch = 2;
-@@ -710,8 +671,6 @@ static bool trans_l_lwa(DisasContext *dc, arg_load *a, uint32_t insn)
- {
-     TCGv ea;
- 
--    LOG_DIS("l.lwa r%d, r%d, %d\n", a->d, a->a, a->i);
--
-     check_r0_write(a->d);
-     ea = tcg_temp_new();
-     tcg_gen_addi_tl(ea, cpu_R[a->a], a->i);
-@@ -735,42 +694,36 @@ static void do_load(DisasContext *dc, arg_load *a, TCGMemOp mop)
- 
- static bool trans_l_lwz(DisasContext *dc, arg_load *a, uint32_t insn)
- {
--    LOG_DIS("l.lwz r%d, r%d, %d\n", a->d, a->a, a->i);
-     do_load(dc, a, MO_TEUL);
-     return true;
- }
- 
- static bool trans_l_lws(DisasContext *dc, arg_load *a, uint32_t insn)
- {
--    LOG_DIS("l.lws r%d, r%d, %d\n", a->d, a->a, a->i);
-     do_load(dc, a, MO_TESL);
-     return true;
- }
- 
- static bool trans_l_lbz(DisasContext *dc, arg_load *a, uint32_t insn)
- {
--    LOG_DIS("l.lbz r%d, r%d, %d\n", a->d, a->a, a->i);
-     do_load(dc, a, MO_UB);
-     return true;
- }
- 
- static bool trans_l_lbs(DisasContext *dc, arg_load *a, uint32_t insn)
- {
--    LOG_DIS("l.lbs r%d, r%d, %d\n", a->d, a->a, a->i);
-     do_load(dc, a, MO_SB);
-     return true;
- }
- 
- static bool trans_l_lhz(DisasContext *dc, arg_load *a, uint32_t insn)
- {
--    LOG_DIS("l.lhz r%d, r%d, %d\n", a->d, a->a, a->i);
-     do_load(dc, a, MO_TEUW);
-     return true;
- }
- 
- static bool trans_l_lhs(DisasContext *dc, arg_load *a, uint32_t insn)
- {
--    LOG_DIS("l.lhs r%d, r%d, %d\n", a->d, a->a, a->i);
-     do_load(dc, a, MO_TESW);
-     return true;
- }
-@@ -780,8 +733,6 @@ static bool trans_l_swa(DisasContext *dc, arg_store *a, uint32_t insn)
-     TCGv ea, val;
-     TCGLabel *lab_fail, *lab_done;
- 
--    LOG_DIS("l.swa r%d, r%d, %d\n", a->a, a->b, a->i);
--
-     ea = tcg_temp_new();
-     tcg_gen_addi_tl(ea, cpu_R[a->a], a->i);
- 
-@@ -822,28 +773,24 @@ static void do_store(DisasContext *dc, arg_store *a, TCGMemOp mop)
- 
- static bool trans_l_sw(DisasContext *dc, arg_store *a, uint32_t insn)
- {
--    LOG_DIS("l.sw r%d, r%d, %d\n", a->a, a->b, a->i);
-     do_store(dc, a, MO_TEUL);
-     return true;
- }
- 
- static bool trans_l_sb(DisasContext *dc, arg_store *a, uint32_t insn)
- {
--    LOG_DIS("l.sb r%d, r%d, %d\n", a->a, a->b, a->i);
-     do_store(dc, a, MO_UB);
-     return true;
- }
- 
- static bool trans_l_sh(DisasContext *dc, arg_store *a, uint32_t insn)
- {
--    LOG_DIS("l.sh r%d, r%d, %d\n", a->a, a->b, a->i);
-     do_store(dc, a, MO_TEUW);
-     return true;
- }
- 
- static bool trans_l_nop(DisasContext *dc, arg_l_nop *a, uint32_t insn)
- {
--    LOG_DIS("l.nop %d\n", a->k);
-     return true;
- }
- 
-@@ -851,7 +798,6 @@ static bool trans_l_addi(DisasContext *dc, arg_rri *a, uint32_t insn)
- {
-     TCGv t0;
- 
--    LOG_DIS("l.addi r%d, r%d, %d\n", a->d, a->a, a->i);
-     check_r0_write(a->d);
-     t0 = tcg_const_tl(a->i);
-     gen_add(dc, cpu_R[a->d], cpu_R[a->a], t0);
-@@ -863,7 +809,6 @@ static bool trans_l_addic(DisasContext *dc, arg_rri *a, uint32_t insn)
- {
-     TCGv t0;
- 
--    LOG_DIS("l.addic r%d, r%d, %d\n", a->d, a->a, a->i);
-     check_r0_write(a->d);
-     t0 = tcg_const_tl(a->i);
-     gen_addc(dc, cpu_R[a->d], cpu_R[a->a], t0);
-@@ -875,7 +820,6 @@ static bool trans_l_muli(DisasContext *dc, arg_rri *a, uint32_t insn)
- {
-     TCGv t0;
- 
--    LOG_DIS("l.muli r%d, r%d, %d\n", a->d, a->a, a->i);
-     check_r0_write(a->d);
-     t0 = tcg_const_tl(a->i);
-     gen_mul(dc, cpu_R[a->d], cpu_R[a->a], t0);
-@@ -887,7 +831,6 @@ static bool trans_l_maci(DisasContext *dc, arg_l_maci *a, uint32_t insn)
- {
-     TCGv t0;
- 
--    LOG_DIS("l.maci r%d, %d\n", a->a, a->i);
-     t0 = tcg_const_tl(a->i);
-     gen_mac(dc, cpu_R[a->a], t0);
-     tcg_temp_free(t0);
-@@ -896,7 +839,6 @@ static bool trans_l_maci(DisasContext *dc, arg_l_maci *a, uint32_t insn)
- 
- static bool trans_l_andi(DisasContext *dc, arg_rrk *a, uint32_t insn)
- {
--    LOG_DIS("l.andi r%d, r%d, %d\n", a->d, a->a, a->k);
-     check_r0_write(a->d);
-     tcg_gen_andi_tl(cpu_R[a->d], cpu_R[a->a], a->k);
-     return true;
-@@ -904,7 +846,6 @@ static bool trans_l_andi(DisasContext *dc, arg_rrk *a, uint32_t insn)
- 
- static bool trans_l_ori(DisasContext *dc, arg_rrk *a, uint32_t insn)
- {
--    LOG_DIS("l.ori r%d, r%d, %d\n", a->d, a->a, a->k);
-     check_r0_write(a->d);
-     tcg_gen_ori_tl(cpu_R[a->d], cpu_R[a->a], a->k);
-     return true;
-@@ -912,7 +853,6 @@ static bool trans_l_ori(DisasContext *dc, arg_rrk *a, uint32_t insn)
- 
- static bool trans_l_xori(DisasContext *dc, arg_rri *a, uint32_t insn)
- {
--    LOG_DIS("l.xori r%d, r%d, %d\n", a->d, a->a, a->i);
-     check_r0_write(a->d);
-     tcg_gen_xori_tl(cpu_R[a->d], cpu_R[a->a], a->i);
-     return true;
-@@ -920,7 +860,6 @@ static bool trans_l_xori(DisasContext *dc, arg_rri *a, uint32_t insn)
- 
- static bool trans_l_mfspr(DisasContext *dc, arg_l_mfspr *a, uint32_t insn)
- {
--    LOG_DIS("l.mfspr r%d, r%d, %d\n", a->d, a->a, a->k);
-     check_r0_write(a->d);
- 
-     if (is_user(dc)) {
-@@ -936,8 +875,6 @@ static bool trans_l_mfspr(DisasContext *dc, arg_l_mfspr *a, uint32_t insn)
- 
- static bool trans_l_mtspr(DisasContext *dc, arg_l_mtspr *a, uint32_t insn)
- {
--    LOG_DIS("l.mtspr r%d, r%d, %d\n", a->a, a->b, a->k);
--
-     if (is_user(dc)) {
-         gen_illegal_exception(dc);
-     } else {
-@@ -973,35 +910,30 @@ static bool trans_l_mtspr(DisasContext *dc, arg_l_mtspr *a, uint32_t insn)
- 
- static bool trans_l_mac(DisasContext *dc, arg_ab *a, uint32_t insn)
- {
--    LOG_DIS("l.mac r%d, r%d\n", a->a, a->b);
-     gen_mac(dc, cpu_R[a->a], cpu_R[a->b]);
-     return true;
- }
- 
- static bool trans_l_msb(DisasContext *dc, arg_ab *a, uint32_t insn)
- {
--    LOG_DIS("l.msb r%d, r%d\n", a->a, a->b);
-     gen_msb(dc, cpu_R[a->a], cpu_R[a->b]);
-     return true;
- }
- 
- static bool trans_l_macu(DisasContext *dc, arg_ab *a, uint32_t insn)
- {
--    LOG_DIS("l.mac r%d, r%d\n", a->a, a->b);
-     gen_macu(dc, cpu_R[a->a], cpu_R[a->b]);
-     return true;
- }
- 
- static bool trans_l_msbu(DisasContext *dc, arg_ab *a, uint32_t insn)
- {
--    LOG_DIS("l.msb r%d, r%d\n", a->a, a->b);
-     gen_msbu(dc, cpu_R[a->a], cpu_R[a->b]);
-     return true;
- }
- 
- static bool trans_l_slli(DisasContext *dc, arg_dal *a, uint32_t insn)
- {
--    LOG_DIS("l.slli r%d, r%d, %d\n", a->d, a->a, a->l);
-     check_r0_write(a->d);
-     tcg_gen_shli_tl(cpu_R[a->d], cpu_R[a->a], a->l & (TARGET_LONG_BITS - 1));
-     return true;
-@@ -1009,7 +941,6 @@ static bool trans_l_slli(DisasContext *dc, arg_dal *a, uint32_t insn)
- 
- static bool trans_l_srli(DisasContext *dc, arg_dal *a, uint32_t insn)
- {
--    LOG_DIS("l.srli r%d, r%d, %d\n", a->d, a->a, a->l);
-     check_r0_write(a->d);
-     tcg_gen_shri_tl(cpu_R[a->d], cpu_R[a->a], a->l & (TARGET_LONG_BITS - 1));
-     return true;
-@@ -1017,7 +948,6 @@ static bool trans_l_srli(DisasContext *dc, arg_dal *a, uint32_t insn)
- 
- static bool trans_l_srai(DisasContext *dc, arg_dal *a, uint32_t insn)
- {
--    LOG_DIS("l.srai r%d, r%d, %d\n", a->d, a->a, a->l);
-     check_r0_write(a->d);
-     tcg_gen_sari_tl(cpu_R[a->d], cpu_R[a->a], a->l & (TARGET_LONG_BITS - 1));
-     return true;
-@@ -1025,7 +955,6 @@ static bool trans_l_srai(DisasContext *dc, arg_dal *a, uint32_t insn)
- 
- static bool trans_l_rori(DisasContext *dc, arg_dal *a, uint32_t insn)
- {
--    LOG_DIS("l.rori r%d, r%d, %d\n", a->d, a->a, a->l);
-     check_r0_write(a->d);
-     tcg_gen_rotri_tl(cpu_R[a->d], cpu_R[a->a], a->l & (TARGET_LONG_BITS - 1));
-     return true;
-@@ -1033,7 +962,6 @@ static bool trans_l_rori(DisasContext *dc, arg_dal *a, uint32_t insn)
- 
- static bool trans_l_movhi(DisasContext *dc, arg_l_movhi *a, uint32_t insn)
- {
--    LOG_DIS("l.movhi r%d, %d\n", a->d, a->k);
-     check_r0_write(a->d);
-     tcg_gen_movi_tl(cpu_R[a->d], a->k << 16);
-     return true;
-@@ -1041,7 +969,6 @@ static bool trans_l_movhi(DisasContext *dc, arg_l_movhi *a, uint32_t insn)
- 
- static bool trans_l_macrc(DisasContext *dc, arg_l_macrc *a, uint32_t insn)
- {
--    LOG_DIS("l.macrc r%d\n", a->d);
-     check_r0_write(a->d);
-     tcg_gen_trunc_i64_tl(cpu_R[a->d], cpu_mac);
-     tcg_gen_movi_i64(cpu_mac, 0);
-@@ -1050,147 +977,126 @@ static bool trans_l_macrc(DisasContext *dc, arg_l_macrc *a, uint32_t insn)
- 
- static bool trans_l_sfeq(DisasContext *dc, arg_ab *a, TCGCond cond)
- {
--    LOG_DIS("l.sfeq r%d, r%d\n", a->a, a->b);
-     tcg_gen_setcond_tl(TCG_COND_EQ, cpu_sr_f, cpu_R[a->a], cpu_R[a->b]);
-     return true;
- }
- 
- static bool trans_l_sfne(DisasContext *dc, arg_ab *a, TCGCond cond)
- {
--    LOG_DIS("l.sfne r%d, r%d\n", a->a, a->b);
-     tcg_gen_setcond_tl(TCG_COND_NE, cpu_sr_f, cpu_R[a->a], cpu_R[a->b]);
-     return true;
- }
- 
- static bool trans_l_sfgtu(DisasContext *dc, arg_ab *a, TCGCond cond)
- {
--    LOG_DIS("l.sfgtu r%d, r%d\n", a->a, a->b);
-     tcg_gen_setcond_tl(TCG_COND_GTU, cpu_sr_f, cpu_R[a->a], cpu_R[a->b]);
-     return true;
- }
- 
- static bool trans_l_sfgeu(DisasContext *dc, arg_ab *a, TCGCond cond)
- {
--    LOG_DIS("l.sfgeu r%d, r%d\n", a->a, a->b);
-     tcg_gen_setcond_tl(TCG_COND_GEU, cpu_sr_f, cpu_R[a->a], cpu_R[a->b]);
-     return true;
- }
- 
- static bool trans_l_sfltu(DisasContext *dc, arg_ab *a, TCGCond cond)
- {
--    LOG_DIS("l.sfltu r%d, r%d\n", a->a, a->b);
-     tcg_gen_setcond_tl(TCG_COND_LTU, cpu_sr_f, cpu_R[a->a], cpu_R[a->b]);
-     return true;
- }
- 
- static bool trans_l_sfleu(DisasContext *dc, arg_ab *a, TCGCond cond)
- {
--    LOG_DIS("l.sfleu r%d, r%d\n", a->a, a->b);
-     tcg_gen_setcond_tl(TCG_COND_LEU, cpu_sr_f, cpu_R[a->a], cpu_R[a->b]);
-     return true;
- }
- 
- static bool trans_l_sfgts(DisasContext *dc, arg_ab *a, TCGCond cond)
- {
--    LOG_DIS("l.sfgts r%d, r%d\n", a->a, a->b);
-     tcg_gen_setcond_tl(TCG_COND_GT, cpu_sr_f, cpu_R[a->a], cpu_R[a->b]);
-     return true;
- }
- 
- static bool trans_l_sfges(DisasContext *dc, arg_ab *a, TCGCond cond)
- {
--    LOG_DIS("l.sfges r%d, r%d\n", a->a, a->b);
-     tcg_gen_setcond_tl(TCG_COND_GE, cpu_sr_f, cpu_R[a->a], cpu_R[a->b]);
-     return true;
- }
- 
- static bool trans_l_sflts(DisasContext *dc, arg_ab *a, TCGCond cond)
- {
--    LOG_DIS("l.sflts r%d, r%d\n", a->a, a->b);
-     tcg_gen_setcond_tl(TCG_COND_LT, cpu_sr_f, cpu_R[a->a], cpu_R[a->b]);
-     return true;
- }
- 
- static bool trans_l_sfles(DisasContext *dc, arg_ab *a, TCGCond cond)
- {
--    LOG_DIS("l.sfles r%d, r%d\n", a->a, a->b);
-     tcg_gen_setcond_tl(TCG_COND_LE, cpu_sr_f, cpu_R[a->a], cpu_R[a->b]);
-     return true;
- }
- 
- static bool trans_l_sfeqi(DisasContext *dc, arg_ai *a, TCGCond cond)
- {
--    LOG_DIS("l.sfeqi r%d, %d\n", a->a, a->i);
-     tcg_gen_setcondi_tl(TCG_COND_EQ, cpu_sr_f, cpu_R[a->a], a->i);
-     return true;
- }
- 
- static bool trans_l_sfnei(DisasContext *dc, arg_ai *a, TCGCond cond)
- {
--    LOG_DIS("l.sfnei r%d, %d\n", a->a, a->i);
-     tcg_gen_setcondi_tl(TCG_COND_NE, cpu_sr_f, cpu_R[a->a], a->i);
-     return true;
- }
- 
- static bool trans_l_sfgtui(DisasContext *dc, arg_ai *a, TCGCond cond)
- {
--    LOG_DIS("l.sfgtui r%d, %d\n", a->a, a->i);
-     tcg_gen_setcondi_tl(TCG_COND_GTU, cpu_sr_f, cpu_R[a->a], a->i);
-     return true;
- }
- 
- static bool trans_l_sfgeui(DisasContext *dc, arg_ai *a, TCGCond cond)
- {
--    LOG_DIS("l.sfgeui r%d, %d\n", a->a, a->i);
-     tcg_gen_setcondi_tl(TCG_COND_GEU, cpu_sr_f, cpu_R[a->a], a->i);
-     return true;
- }
- 
- static bool trans_l_sfltui(DisasContext *dc, arg_ai *a, TCGCond cond)
- {
--    LOG_DIS("l.sfltui r%d, %d\n", a->a, a->i);
-     tcg_gen_setcondi_tl(TCG_COND_LTU, cpu_sr_f, cpu_R[a->a], a->i);
-     return true;
- }
- 
- static bool trans_l_sfleui(DisasContext *dc, arg_ai *a, TCGCond cond)
- {
--    LOG_DIS("l.sfleui r%d, %d\n", a->a, a->i);
-     tcg_gen_setcondi_tl(TCG_COND_LEU, cpu_sr_f, cpu_R[a->a], a->i);
-     return true;
- }
- 
- static bool trans_l_sfgtsi(DisasContext *dc, arg_ai *a, TCGCond cond)
- {
--    LOG_DIS("l.sfgtsi r%d, %d\n", a->a, a->i);
-     tcg_gen_setcondi_tl(TCG_COND_GT, cpu_sr_f, cpu_R[a->a], a->i);
-     return true;
- }
- 
- static bool trans_l_sfgesi(DisasContext *dc, arg_ai *a, TCGCond cond)
- {
--    LOG_DIS("l.sfgesi r%d, %d\n", a->a, a->i);
-     tcg_gen_setcondi_tl(TCG_COND_GE, cpu_sr_f, cpu_R[a->a], a->i);
-     return true;
- }
- 
- static bool trans_l_sfltsi(DisasContext *dc, arg_ai *a, TCGCond cond)
- {
--    LOG_DIS("l.sfltsi r%d, %d\n", a->a, a->i);
-     tcg_gen_setcondi_tl(TCG_COND_LT, cpu_sr_f, cpu_R[a->a], a->i);
-     return true;
- }
- 
- static bool trans_l_sflesi(DisasContext *dc, arg_ai *a, TCGCond cond)
- {
--    LOG_DIS("l.sflesi r%d, %d\n", a->a, a->i);
-     tcg_gen_setcondi_tl(TCG_COND_LE, cpu_sr_f, cpu_R[a->a], a->i);
-     return true;
- }
- 
- static bool trans_l_sys(DisasContext *dc, arg_l_sys *a, uint32_t insn)
- {
--    LOG_DIS("l.sys %d\n", a->k);
-     tcg_gen_movi_tl(cpu_pc, dc->base.pc_next);
-     gen_exception(dc, EXCP_SYSCALL);
-     dc->base.is_jmp = DISAS_NORETURN;
-@@ -1199,7 +1105,6 @@ static bool trans_l_sys(DisasContext *dc, arg_l_sys *a, uint32_t insn)
- 
- static bool trans_l_trap(DisasContext *dc, arg_l_trap *a, uint32_t insn)
- {
--    LOG_DIS("l.trap %d\n", a->k);
-     tcg_gen_movi_tl(cpu_pc, dc->base.pc_next);
-     gen_exception(dc, EXCP_TRAP);
-     dc->base.is_jmp = DISAS_NORETURN;
-@@ -1208,27 +1113,22 @@ static bool trans_l_trap(DisasContext *dc, arg_l_trap *a, uint32_t insn)
- 
- static bool trans_l_msync(DisasContext *dc, arg_l_msync *a, uint32_t insn)
- {
--    LOG_DIS("l.msync\n");
-     tcg_gen_mb(TCG_MO_ALL);
-     return true;
- }
- 
- static bool trans_l_psync(DisasContext *dc, arg_l_psync *a, uint32_t insn)
- {
--    LOG_DIS("l.psync\n");
-     return true;
- }
- 
- static bool trans_l_csync(DisasContext *dc, arg_l_csync *a, uint32_t insn)
- {
--    LOG_DIS("l.csync\n");
-     return true;
- }
- 
- static bool trans_l_rfe(DisasContext *dc, arg_l_rfe *a, uint32_t insn)
- {
--    LOG_DIS("l.rfe\n");
--
-     if (is_user(dc)) {
-         gen_illegal_exception(dc);
-     } else {
-@@ -1271,56 +1171,48 @@ static void do_fpcmp(DisasContext *dc, arg_ab *a,
- 
- static bool trans_lf_add_s(DisasContext *dc, arg_dab *a, uint32_t insn)
- {
--    LOG_DIS("lf.add.s r%d, r%d, r%d\n", a->d, a->a, a->b);
-     do_fp3(dc, a, gen_helper_float_add_s);
-     return true;
- }
- 
- static bool trans_lf_sub_s(DisasContext *dc, arg_dab *a, uint32_t insn)
- {
--    LOG_DIS("lf.sub.s r%d, r%d, r%d\n", a->d, a->a, a->b);
-     do_fp3(dc, a, gen_helper_float_sub_s);
-     return true;
- }
- 
- static bool trans_lf_mul_s(DisasContext *dc, arg_dab *a, uint32_t insn)
- {
--    LOG_DIS("lf.mul.s r%d, r%d, r%d\n", a->d, a->a, a->b);
-     do_fp3(dc, a, gen_helper_float_mul_s);
-     return true;
- }
- 
- static bool trans_lf_div_s(DisasContext *dc, arg_dab *a, uint32_t insn)
- {
--    LOG_DIS("lf.div.s r%d, r%d, r%d\n", a->d, a->a, a->b);
-     do_fp3(dc, a, gen_helper_float_div_s);
-     return true;
- }
- 
- static bool trans_lf_rem_s(DisasContext *dc, arg_dab *a, uint32_t insn)
- {
--    LOG_DIS("lf.rem.s r%d, r%d, r%d\n", a->d, a->a, a->b);
-     do_fp3(dc, a, gen_helper_float_rem_s);
-     return true;
- }
- 
- static bool trans_lf_itof_s(DisasContext *dc, arg_da *a, uint32_t insn)
- {
--    LOG_DIS("lf.itof.s r%d, r%d\n", a->d, a->a);
-     do_fp2(dc, a, gen_helper_itofs);
-     return true;
- }
- 
- static bool trans_lf_ftoi_s(DisasContext *dc, arg_da *a, uint32_t insn)
- {
--    LOG_DIS("lf.ftoi.s r%d, r%d\n", a->d, a->a);
-     do_fp2(dc, a, gen_helper_ftois);
-     return true;
- }
- 
- static bool trans_lf_madd_s(DisasContext *dc, arg_dab *a, uint32_t insn)
- {
--    LOG_DIS("lf.madd.s r%d, r%d, r%d\n", a->d, a->a, a->b);
-     check_r0_write(a->d);
-     gen_helper_float_madd_s(cpu_R[a->d], cpu_env, cpu_R[a->d],
-                             cpu_R[a->a], cpu_R[a->b]);
-@@ -1330,42 +1222,36 @@ static bool trans_lf_madd_s(DisasContext *dc, arg_dab *a, uint32_t insn)
- 
- static bool trans_lf_sfeq_s(DisasContext *dc, arg_ab *a, uint32_t insn)
- {
--    LOG_DIS("lf.sfeq.s r%d, r%d\n", a->a, a->b);
-     do_fpcmp(dc, a, gen_helper_float_eq_s, false, false);
-     return true;
- }
- 
- static bool trans_lf_sfne_s(DisasContext *dc, arg_ab *a, uint32_t insn)
- {
--    LOG_DIS("lf.sfne.s r%d, r%d\n", a->a, a->b);
-     do_fpcmp(dc, a, gen_helper_float_eq_s, true, false);
-     return true;
- }
- 
- static bool trans_lf_sfgt_s(DisasContext *dc, arg_ab *a, uint32_t insn)
- {
--    LOG_DIS("lf.sfgt.s r%d, r%d\n", a->a, a->b);
-     do_fpcmp(dc, a, gen_helper_float_lt_s, false, true);
-     return true;
- }
- 
- static bool trans_lf_sfge_s(DisasContext *dc, arg_ab *a, uint32_t insn)
- {
--    LOG_DIS("lf.sfge.s r%d, r%d\n", a->a, a->b);
-     do_fpcmp(dc, a, gen_helper_float_le_s, false, true);
-     return true;
- }
- 
- static bool trans_lf_sflt_s(DisasContext *dc, arg_ab *a, uint32_t insn)
- {
--    LOG_DIS("lf.sflt.s r%d, r%d\n", a->a, a->b);
-     do_fpcmp(dc, a, gen_helper_float_lt_s, false, false);
-     return true;
- }
- 
- static bool trans_lf_sfle_s(DisasContext *dc, arg_ab *a, uint32_t insn)
- {
--    LOG_DIS("lf.sfle.s r%d, r%d\n", a->a, a->b);
-     do_fpcmp(dc, a, gen_helper_float_le_s, false, false);
-     return true;
- }
-diff --git a/target/openrisc/Makefile.objs b/target/openrisc/Makefile.objs
-index 957ce02199..b5432f4684 100644
---- a/target/openrisc/Makefile.objs
-+++ b/target/openrisc/Makefile.objs
-@@ -1,5 +1,5 @@
- obj-$(CONFIG_SOFTMMU) += machine.o
--obj-y += cpu.o exception.o interrupt.o mmu.o translate.o
-+obj-y += cpu.o exception.o interrupt.o mmu.o translate.o disas.o
- obj-y += exception_helper.o fpu_helper.o \
-          interrupt_helper.o sys_helper.o
- obj-y += gdbstub.o
-@@ -12,3 +12,4 @@ target/openrisc/decode.inc.c: \
- 	  $(PYTHON) $(DECODETREE) -o $@ $<, "GEN", $(TARGET_DIR)$@)
- 
- target/openrisc/translate.o: target/openrisc/decode.inc.c
-+target/openrisc/disas.o: target/openrisc/decode.inc.c
--- 
-2.17.0
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
+c3NhZ2UtaWQ6IDIwMTgwNTI3MTQxMzI0LjExOTM3LTEtcmljaGFyZC5oZW5kZXJzb25AbGluYXJv
+Lm9yZwpTdWJqZWN0OiBbUWVtdS1kZXZlbF0gW1BBVENIIDAwLzIwXSB0YXJnZXQvb3BlbnJpc2Mg
+aW1wcm92ZW1lbnRzCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCgpCQVNF
+PWJhc2UKbj0xCnRvdGFsPSQoZ2l0IGxvZyAtLW9uZWxpbmUgJEJBU0UuLiB8IHdjIC1sKQpmYWls
+ZWQ9MAoKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0t
+bG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYuYWxnb3JpdGht
+IGhpc3RvZ3JhbQoKY29tbWl0cz0iJChnaXQgbG9nIC0tZm9ybWF0PSVIIC0tcmV2ZXJzZSAkQkFT
+RS4uKSIKZm9yIGMgaW4gJGNvbW1pdHM7IGRvCiAgICBlY2hvICJDaGVja2luZyBQQVRDSCAkbi8k
+dG90YWw6ICQoZ2l0IGxvZyAtbiAxIC0tZm9ybWF0PSVzICRjKS4uLiIKICAgIGlmICEgZ2l0IHNo
+b3cgJGMgLS1mb3JtYXQ9ZW1haWwgfCAuL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNr
+IC07IHRoZW4KICAgICAgICBmYWlsZWQ9MQogICAgICAgIGVjaG8KICAgIGZpCiAgICBuPSQoKG4r
+MSkpCmRvbmUKCmV4aXQgJGZhaWxlZAo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKVXBkYXRpbmcg
+M2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApGcm9tIGh0dHBzOi8vZ2l0
+aHViLmNvbS9wYXRjaGV3LXByb2plY3QvcWVtdQogdCBbdGFnIHVwZGF0ZV0gICAgICAgICAgICBw
+YXRjaGV3LzIwMTgwNTI1MDE1MDQyLjMxNzc4LTEtcGV0ZXJ4QHJlZGhhdC5jb20gLT4gcGF0Y2hl
+dy8yMDE4MDUyNTAxNTA0Mi4zMTc3OC0xLXBldGVyeEByZWRoYXQuY29tCiB0IFt0YWcgdXBkYXRl
+XSAgICAgICAgICAgIHBhdGNoZXcvMjAxODA1MjUwNDUzNDQuMjgzNDctMS1rcmF4ZWxAcmVkaGF0
+LmNvbSAtPiBwYXRjaGV3LzIwMTgwNTI1MDQ1MzQ0LjI4MzQ3LTEta3JheGVsQHJlZGhhdC5jb20K
+IHQgW3RhZyB1cGRhdGVdICAgICAgICAgICAgcGF0Y2hldy8yMDE4MDUyNTE1MzYwOS4xMzE4Ny0x
+LW1hcmNhbmRyZS5sdXJlYXVAcmVkaGF0LmNvbSAtPiBwYXRjaGV3LzIwMTgwNTI1MTUzNjA5LjEz
+MTg3LTEtbWFyY2FuZHJlLmx1cmVhdUByZWRoYXQuY29tCiAqIFtuZXcgdGFnXSAgICAgICAgICAg
+ICAgIHBhdGNoZXcvMjAxODA1MjcxNDEzMjQuMTE5MzctMS1yaWNoYXJkLmhlbmRlcnNvbkBsaW5h
+cm8ub3JnIC0+IHBhdGNoZXcvMjAxODA1MjcxNDEzMjQuMTE5MzctMS1yaWNoYXJkLmhlbmRlcnNv
+bkBsaW5hcm8ub3JnClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKYjlkZjBmZGJiZSB0
+YXJnZXQvb3IxazogQWRkIHN1cHBvcnQgaW4gc2NyaXB0cy9xZW11LWJpbmZtdC1jb25mLnNoCmMx
+N2Y3ZjQ4YTAgdGFyZ2V0L29wZW5yaXNjOiBBZGQgcHJpbnRfaW5zbl9vcjFrCjI3NzJhYjBjOGEg
+dGFyZ2V0L29wZW5yaXNjOiBSZW9yZyB0bGIgbG9va3VwCjM1Mzk5ODcyNDMgdGFyZ2V0L29wZW5y
+aXNjOiBJbmNyZWFzZSB0aGUgVExCIHNpemUKMTM0NDZiOWE4OCB0YXJnZXQvb3BlbnJpc2M6IExv
+ZyBpbnRlcnJ1cHRzCjc2MjI5OWY2YWMgdGFyZ2V0L29wZW5yaXNjOiBTdHViIG91dCBoYW5kbGVf
+bW11X2ZhdWx0IGZvciBzb2Z0bW11CmUwYjU3MjVjNjAgdGFyZ2V0L29wZW5yaXNjOiBVc2UgaWRl
+bnRpY2FsIHNpemVzIGZvciBJVExCIGFuZCBEVExCCmEzNjNiYTk2ZjEgdGFyZ2V0L29wZW5yaXNj
+OiBGaXggY3B1X21tdV9pbmRleApiNmVjMWYwMjdjIHRhcmdldC9vcGVucmlzYzogRml4IHRsYiBm
+bHVzaGluZyBpbiBtdHNwcgpiMGE1ODlmNzk3IHRhcmdldC9vcGVucmlzYzogUmVkdWNlIHRsYiB0
+byBhIHNpbmdsZSBkaW1lbnNpb24KOWUxNjdhM2IyZSB0YXJnZXQvb3BlbnJpc2M6IE1lcmdlIG1t
+dV9oZWxwZXIuYyBpbnRvIG1tdS5jCjE1NDg0ZjQ0MjkgdGFyZ2V0L29wZW5yaXNjOiBSZW1vdmUg
+aW5kaXJlY3QgZnVuY3Rpb24gY2FsbHMgZm9yIG1tdQo0NjAyNTNhNGYzIHRhcmdldC9vcGVucmlz
+YzogTWVyZ2UgdGxiIGFsbG9jYXRpb24gaW50byBDUFVPcGVuUklTQ1N0YXRlCjQwZDFhMmExMmEg
+dGFyZ2V0L29wZW5yaXNjOiBGb3JtIHRoZSBzcHIgaW5kZXggZnJvbSB0Y2cKNTMzOGIxZjY3ZSB0
+YXJnZXQvb3BlbnJpc2M6IEV4aXQgdGhlIFRCIGFmdGVyIGwubXRzcHIKYzJkNmI3NjllNSB0YXJn
+ZXQvb3BlbnJpc2M6IFNwbGl0IG91dCBpc191c2VyCjliYmIxM2EwMDggdGFyZ2V0L29wZW5yaXNj
+OiBMaW5rIG1vcmUgdHJhbnNsYXRpb24gYmxvY2tzCjY3MTRkMTZmMmEgdGFyZ2V0L29wZW5yaXNj
+OiBGaXggc2luZ2xlc3RlcF9lbmFibGVkCmM0ZDJhOWI3MGIgdGFyZ2V0L29wZW5yaXNjOiBVc2Ug
+ZXhpdF90YiBpbnN0ZWFkIG9mIENQVV9JTlRFUlJVUFRfRVhJVFRCCjJlYjg2ODBhMTEgdGFyZ2V0
+L29wZW5yaXNjOiBSZW1vdmUgRElTQVNfSlVNUCAmIERJU0FTX1RCX0pVTVAKCj09PSBPVVRQVVQg
+QkVHSU4gPT09CkNoZWNraW5nIFBBVENIIDEvMjA6IHRhcmdldC9vcGVucmlzYzogUmVtb3ZlIERJ
+U0FTX0pVTVAgJiBESVNBU19UQl9KVU1QLi4uCkNoZWNraW5nIFBBVENIIDIvMjA6IHRhcmdldC9v
+cGVucmlzYzogVXNlIGV4aXRfdGIgaW5zdGVhZCBvZiBDUFVfSU5URVJSVVBUX0VYSVRUQi4uLgpD
+aGVja2luZyBQQVRDSCAzLzIwOiB0YXJnZXQvb3BlbnJpc2M6IEZpeCBzaW5nbGVzdGVwX2VuYWJs
+ZWQuLi4KQ2hlY2tpbmcgUEFUQ0ggNC8yMDogdGFyZ2V0L29wZW5yaXNjOiBMaW5rIG1vcmUgdHJh
+bnNsYXRpb24gYmxvY2tzLi4uCkVSUk9SOiBzcGFjZSBwcm9oaWJpdGVkIGJldHdlZW4gZnVuY3Rp
+b24gbmFtZSBhbmQgb3BlbiBwYXJlbnRoZXNpcyAnKCcKIzEzODogRklMRTogdGFyZ2V0L29wZW5y
+aXNjL3RyYW5zbGF0ZS5jOjE0NTM6CisgICAgICAgICAgICAgICAgdGNnX2dlbl9sb29rdXBfYW5k
+X2dvdG9fcHRyICgpOwoKRVJST1I6IHNwYWNlIHByb2hpYml0ZWQgYmV0d2VlbiBmdW5jdGlvbiBu
+YW1lIGFuZCBvcGVuIHBhcmVudGhlc2lzICcoJwojMTU1OiBGSUxFOiB0YXJnZXQvb3BlbnJpc2Mv
+dHJhbnNsYXRlLmM6MTQ2OToKKyAgICAgICAgICAgIHRjZ19nZW5fbG9va3VwX2FuZF9nb3RvX3B0
+ciAoKTsKCnRvdGFsOiAyIGVycm9ycywgMCB3YXJuaW5ncywgMTQzIGxpbmVzIGNoZWNrZWQKCllv
+dXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRo
+ZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFp
+bmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCkNoZWNraW5nIFBBVENIIDUvMjA6
+IHRhcmdldC9vcGVucmlzYzogU3BsaXQgb3V0IGlzX3VzZXIuLi4KQ2hlY2tpbmcgUEFUQ0ggNi8y
+MDogdGFyZ2V0L29wZW5yaXNjOiBFeGl0IHRoZSBUQiBhZnRlciBsLm10c3ByLi4uCkNoZWNraW5n
+IFBBVENIIDcvMjA6IHRhcmdldC9vcGVucmlzYzogRm9ybSB0aGUgc3ByIGluZGV4IGZyb20gdGNn
+Li4uCkNoZWNraW5nIFBBVENIIDgvMjA6IHRhcmdldC9vcGVucmlzYzogTWVyZ2UgdGxiIGFsbG9j
+YXRpb24gaW50byBDUFVPcGVuUklTQ1N0YXRlLi4uCkNoZWNraW5nIFBBVENIIDkvMjA6IHRhcmdl
+dC9vcGVucmlzYzogUmVtb3ZlIGluZGlyZWN0IGZ1bmN0aW9uIGNhbGxzIGZvciBtbXUuLi4KQ2hl
+Y2tpbmcgUEFUQ0ggMTAvMjA6IHRhcmdldC9vcGVucmlzYzogTWVyZ2UgbW11X2hlbHBlci5jIGlu
+dG8gbW11LmMuLi4KV0FSTklORzogYWRkZWQsIG1vdmVkIG9yIGRlbGV0ZWQgZmlsZShzKSwgZG9l
+cyBNQUlOVEFJTkVSUyBuZWVkIHVwZGF0aW5nPwojNDU6IApkZWxldGVkIGZpbGUgbW9kZSAxMDA2
+NDQKCnRvdGFsOiAwIGVycm9ycywgMSB3YXJuaW5ncywgMjMgbGluZXMgY2hlY2tlZAoKWW91ciBw
+YXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2Ug
+ZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIs
+IHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgpDaGVja2luZyBQQVRDSCAxMS8yMDogdGFy
+Z2V0L29wZW5yaXNjOiBSZWR1Y2UgdGxiIHRvIGEgc2luZ2xlIGRpbWVuc2lvbi4uLgpFUlJPUjog
+c3BhY2VzIHJlcXVpcmVkIGFyb3VuZCB0aGF0ICctJyAoY3R4OlZ4VikKIzkyOiBGSUxFOiB0YXJn
+ZXQvb3BlbnJpc2MvbW11LmM6Njg6CisgICAgKnBoeXNpY2FsID0gKHRyICYgVEFSR0VUX1BBR0Vf
+TUFTSykgfCAoYWRkcmVzcyAmIChUQVJHRVRfUEFHRV9TSVpFLTEpKTsKICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBe
+CgpFUlJPUjogc3BhY2VzIHJlcXVpcmVkIGFyb3VuZCB0aGF0ICctJyAoY3R4OlZ4VikKIzEzNjog
+RklMRTogdGFyZ2V0L29wZW5yaXNjL21tdS5jOjExMToKKyAgICAqcGh5c2ljYWwgPSAodHIgJiBU
+QVJHRVRfUEFHRV9NQVNLKSB8IChhZGRyZXNzICYgKFRBUkdFVF9QQUdFX1NJWkUtMSkpOwogICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgIF4KCnRvdGFsOiAyIGVycm9ycywgMCB3YXJuaW5ncywgMTY5IGxpbmVzIGNoZWNr
+ZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55
+IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBt
+YWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCkNoZWNraW5nIFBBVENI
+IDEyLzIwOiB0YXJnZXQvb3BlbnJpc2M6IEZpeCB0bGIgZmx1c2hpbmcgaW4gbXRzcHIuLi4KQ2hl
+Y2tpbmcgUEFUQ0ggMTMvMjA6IHRhcmdldC9vcGVucmlzYzogRml4IGNwdV9tbXVfaW5kZXguLi4K
+Q2hlY2tpbmcgUEFUQ0ggMTQvMjA6IHRhcmdldC9vcGVucmlzYzogVXNlIGlkZW50aWNhbCBzaXpl
+cyBmb3IgSVRMQiBhbmQgRFRMQi4uLgpDaGVja2luZyBQQVRDSCAxNS8yMDogdGFyZ2V0L29wZW5y
+aXNjOiBTdHViIG91dCBoYW5kbGVfbW11X2ZhdWx0IGZvciBzb2Z0bW11Li4uCkVSUk9SOiBzcGFj
+ZSBwcm9oaWJpdGVkIGJldHdlZW4gZnVuY3Rpb24gbmFtZSBhbmQgb3BlbiBwYXJlbnRoZXNpcyAn
+KCcKIzU3OiBGSUxFOiB0YXJnZXQvb3BlbnJpc2MvbW11LmM6MTg4OgorICAgIGdfYXNzZXJ0X25v
+dF9yZWFjaGVkICgpOwoKdG90YWw6IDEgZXJyb3JzLCAwIHdhcm5pbmdzLCA0NyBsaW5lcyBjaGVj
+a2VkCgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFu
+eSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUg
+bWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgpDaGVja2luZyBQQVRD
+SCAxNi8yMDogdGFyZ2V0L29wZW5yaXNjOiBMb2cgaW50ZXJydXB0cy4uLgpDaGVja2luZyBQQVRD
+SCAxNy8yMDogdGFyZ2V0L29wZW5yaXNjOiBJbmNyZWFzZSB0aGUgVExCIHNpemUuLi4KQ2hlY2tp
+bmcgUEFUQ0ggMTgvMjA6IHRhcmdldC9vcGVucmlzYzogUmVvcmcgdGxiIGxvb2t1cC4uLgpDaGVj
+a2luZyBQQVRDSCAxOS8yMDogdGFyZ2V0L29wZW5yaXNjOiBBZGQgcHJpbnRfaW5zbl9vcjFrLi4u
+CldBUk5JTkc6IGFkZGVkLCBtb3ZlZCBvciBkZWxldGVkIGZpbGUocyksIGRvZXMgTUFJTlRBSU5F
+UlMgbmVlZCB1cGRhdGluZz8KIzY1OiAKbmV3IGZpbGUgbW9kZSAxMDA2NDQKCkVSUk9SOiBNYWNy
+b3Mgd2l0aCBjb21wbGV4IHZhbHVlcyBzaG91bGQgYmUgZW5jbG9zZWQgaW4gcGFyZW50aGVzaXMK
+IzEwMDogRklMRTogdGFyZ2V0L29wZW5yaXNjL2Rpc2FzLmM6MzE6CisjZGVmaW5lIG91dHB1dCht
+bmVtb25pYywgZm9ybWF0LCAuLi4pIFwKKyAgICBpbmZvLT5mcHJpbnRmX2Z1bmMoaW5mby0+c3Ry
+ZWFtLCAiJS05cyAiIGZvcm1hdCwgXAorICAgICAgICAgICAgICAgICAgICAgICBtbmVtb25pYywg
+IyNfX1ZBX0FSR1NfXykKCkVSUk9SOiB0aGF0IG9wZW4gYnJhY2UgeyBzaG91bGQgYmUgb24gdGhl
+IHByZXZpb3VzIGxpbmUKIzExMTogRklMRTogdGFyZ2V0L29wZW5yaXNjL2Rpc2FzLmM6NDI6Cisg
+ICAgaWYgKHN0YXR1cyAhPSAwKQorICAgICAgewoKRVJST1I6IHNwYWNlcyByZXF1aXJlZCBhcm91
+bmQgdGhhdCAnKicgKGN0eDpXeFYpCiMxMjY6IEZJTEU6IHRhcmdldC9vcGVucmlzYy9kaXNhcy5j
+OjU3OgorICAgIGFyZ19sXyMjb3Bjb2RlICphLCB1aW50MzJfdCBpbnNuKSAgICAgICAgICAgICAg
+ICAgICBcCiAgICAgICAgICAgICAgICAgICAgXgoKRVJST1I6IHNwYWNlcyByZXF1aXJlZCBhcm91
+bmQgdGhhdCAnKicgKGN0eDpXeFYpCiMyMjE6IEZJTEU6IHRhcmdldC9vcGVucmlzYy9kaXNhcy5j
+OjE1MjoKKyAgICBhcmdfbGZfIyNvcGNvZGUjI18jI3N1ZmZpeCAqYSwgdWludDMyX3QgaW5zbikg
+ICAgICAgICAgICAgICAgXAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIF4KCkVSUk9S
+OiBzcGFjZSByZXF1aXJlZCBhZnRlciB0aGF0ICcsJyAoY3R4OlZ4VikKIzIyNzogRklMRTogdGFy
+Z2V0L29wZW5yaXNjL2Rpc2FzLmM6MTU4OgorRlBfSU5TTihhZGQscywgICJyJWQsIHIlZCwgciVk
+IiwgYS0+ZCwgYS0+YSwgYS0+YikKICAgICAgICAgICAgXgoKRVJST1I6IHNwYWNlIHJlcXVpcmVk
+IGFmdGVyIHRoYXQgJywnIChjdHg6VnhWKQojMjI4OiBGSUxFOiB0YXJnZXQvb3BlbnJpc2MvZGlz
+YXMuYzoxNTk6CitGUF9JTlNOKHN1YixzLCAgInIlZCwgciVkLCByJWQiLCBhLT5kLCBhLT5hLCBh
+LT5iKQogICAgICAgICAgICBeCgpFUlJPUjogc3BhY2UgcmVxdWlyZWQgYWZ0ZXIgdGhhdCAnLCcg
+KGN0eDpWeFYpCiMyMjk6IEZJTEU6IHRhcmdldC9vcGVucmlzYy9kaXNhcy5jOjE2MDoKK0ZQX0lO
+U04obXVsLHMsICAiciVkLCByJWQsIHIlZCIsIGEtPmQsIGEtPmEsIGEtPmIpCiAgICAgICAgICAg
+IF4KCkVSUk9SOiBzcGFjZSByZXF1aXJlZCBhZnRlciB0aGF0ICcsJyAoY3R4OlZ4VikKIzIzMDog
+RklMRTogdGFyZ2V0L29wZW5yaXNjL2Rpc2FzLmM6MTYxOgorRlBfSU5TTihkaXYscywgICJyJWQs
+IHIlZCwgciVkIiwgYS0+ZCwgYS0+YSwgYS0+YikKICAgICAgICAgICAgXgoKRVJST1I6IHNwYWNl
+IHJlcXVpcmVkIGFmdGVyIHRoYXQgJywnIChjdHg6VnhWKQojMjMxOiBGSUxFOiB0YXJnZXQvb3Bl
+bnJpc2MvZGlzYXMuYzoxNjI6CitGUF9JTlNOKHJlbSxzLCAgInIlZCwgciVkLCByJWQiLCBhLT5k
+LCBhLT5hLCBhLT5iKQogICAgICAgICAgICBeCgpFUlJPUjogc3BhY2UgcmVxdWlyZWQgYWZ0ZXIg
+dGhhdCAnLCcgKGN0eDpWeFYpCiMyMzI6IEZJTEU6IHRhcmdldC9vcGVucmlzYy9kaXNhcy5jOjE2
+MzoKK0ZQX0lOU04oaXRvZixzLCAiciVkLCByJWQiLCBhLT5kLCBhLT5hKQogICAgICAgICAgICAg
+XgoKRVJST1I6IHNwYWNlIHJlcXVpcmVkIGFmdGVyIHRoYXQgJywnIChjdHg6VnhWKQojMjMzOiBG
+SUxFOiB0YXJnZXQvb3BlbnJpc2MvZGlzYXMuYzoxNjQ6CitGUF9JTlNOKGZ0b2kscywgInIlZCwg
+ciVkIiwgYS0+ZCwgYS0+YSkKICAgICAgICAgICAgIF4KCkVSUk9SOiBzcGFjZSByZXF1aXJlZCBh
+ZnRlciB0aGF0ICcsJyAoY3R4OlZ4VikKIzIzNDogRklMRTogdGFyZ2V0L29wZW5yaXNjL2Rpc2Fz
+LmM6MTY1OgorRlBfSU5TTihtYWRkLHMsICJyJWQsIHIlZCwgciVkIiwgYS0+ZCwgYS0+YSwgYS0+
+YikKICAgICAgICAgICAgIF4KCkVSUk9SOiBzcGFjZSByZXF1aXJlZCBhZnRlciB0aGF0ICcsJyAo
+Y3R4OlZ4VikKIzIzNTogRklMRTogdGFyZ2V0L29wZW5yaXNjL2Rpc2FzLmM6MTY2OgorRlBfSU5T
+TihzZmVxLHMsICJyJWQsIHIlZCIsIGEtPmEsIGEtPmIpCiAgICAgICAgICAgICBeCgpFUlJPUjog
+c3BhY2UgcmVxdWlyZWQgYWZ0ZXIgdGhhdCAnLCcgKGN0eDpWeFYpCiMyMzY6IEZJTEU6IHRhcmdl
+dC9vcGVucmlzYy9kaXNhcy5jOjE2NzoKK0ZQX0lOU04oc2ZuZSxzLCAiciVkLCByJWQiLCBhLT5h
+LCBhLT5iKQogICAgICAgICAgICAgXgoKRVJST1I6IHNwYWNlIHJlcXVpcmVkIGFmdGVyIHRoYXQg
+JywnIChjdHg6VnhWKQojMjM3OiBGSUxFOiB0YXJnZXQvb3BlbnJpc2MvZGlzYXMuYzoxNjg6CitG
+UF9JTlNOKHNmZ3QscywgInIlZCwgciVkIiwgYS0+YSwgYS0+YikKICAgICAgICAgICAgIF4KCkVS
+Uk9SOiBzcGFjZSByZXF1aXJlZCBhZnRlciB0aGF0ICcsJyAoY3R4OlZ4VikKIzIzODogRklMRTog
+dGFyZ2V0L29wZW5yaXNjL2Rpc2FzLmM6MTY5OgorRlBfSU5TTihzZmdlLHMsICJyJWQsIHIlZCIs
+IGEtPmEsIGEtPmIpCiAgICAgICAgICAgICBeCgpFUlJPUjogc3BhY2UgcmVxdWlyZWQgYWZ0ZXIg
+dGhhdCAnLCcgKGN0eDpWeFYpCiMyMzk6IEZJTEU6IHRhcmdldC9vcGVucmlzYy9kaXNhcy5jOjE3
+MDoKK0ZQX0lOU04oc2ZsdCxzLCAiciVkLCByJWQiLCBhLT5hLCBhLT5iKQogICAgICAgICAgICAg
+XgoKRVJST1I6IHNwYWNlIHJlcXVpcmVkIGFmdGVyIHRoYXQgJywnIChjdHg6VnhWKQojMjQwOiBG
+SUxFOiB0YXJnZXQvb3BlbnJpc2MvZGlzYXMuYzoxNzE6CitGUF9JTlNOKHNmbGUscywgInIlZCwg
+ciVkIiwgYS0+YSwgYS0+YikKICAgICAgICAgICAgIF4KCnRvdGFsOiAxOCBlcnJvcnMsIDEgd2Fy
+bmluZ3MsIDkyNCBsaW5lcyBjaGVja2VkCgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVtcywg
+cGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZl
+cyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRB
+SU5FUlMuCgpDaGVja2luZyBQQVRDSCAyMC8yMDogdGFyZ2V0L29yMWs6IEFkZCBzdXBwb3J0IGlu
+IHNjcmlwdHMvcWVtdS1iaW5mbXQtY29uZi5zaC4uLgpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hh
+cmFjdGVycwojMzE6IEZJTEU6IHNjcmlwdHMvcWVtdS1iaW5mbXQtY29uZi5zaDoxMjc6CitvcjFr
+X21hZ2ljPSdceDdmRUxGXHgwMVx4MDJceDAxXHgwMFx4MDBceDAwXHgwMFx4MDBceDAwXHgwMFx4
+MDBceDAwXHgwMFx4MDJceDAwXHg1YycKCkVSUk9SOiBsaW5lIG92ZXIgOTAgY2hhcmFjdGVycwoj
+MzI6IEZJTEU6IHNjcmlwdHMvcWVtdS1iaW5mbXQtY29uZi5zaDoxMjg6CitvcjFrX21hc2s9J1x4
+ZmZceGZmXHhmZlx4ZmZceGZmXHhmZlx4ZmZceDAwXHhmZlx4ZmZceGZmXHhmZlx4ZmZceGZmXHhm
+Zlx4ZmZceGZmXHhmZVx4ZmZceGZmJwoKdG90YWw6IDEgZXJyb3JzLCAxIHdhcm5pbmdzLCAyMyBs
+aW5lcyBjaGVja2VkCgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmll
+dy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhl
+bSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgo9PT0g
+T1VUUFVUIEVORCA9PT0KClRlc3QgY29tbWFuZCBleGl0ZWQgd2l0aCBjb2RlOiAxCgoKLS0tCkVt
+YWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHA6Ly9wYXRjaGV3Lm9y
+Zy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAcmVkaGF0LmNv
+bQ==
