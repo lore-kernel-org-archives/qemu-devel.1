@@ -1,24 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57673)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57661)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fMwQP-0008PS-Ko
+	(envelope-from <richard.henderson@linaro.org>) id 1fMwQP-0008PQ-3x
 	for qemu-devel@nongnu.org; Sun, 27 May 2018 10:13:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fMwQO-0004Mq-MQ
+	(envelope-from <richard.henderson@linaro.org>) id 1fMwQL-0004M5-SI
 	for qemu-devel@nongnu.org; Sun, 27 May 2018 10:13:33 -0400
-Received: from mail-pl0-x243.google.com ([2607:f8b0:400e:c01::243]:33576)
+Received: from mail-pl0-x243.google.com ([2607:f8b0:400e:c01::243]:46532)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1fMwQO-0004Mm-GJ
-	for qemu-devel@nongnu.org; Sun, 27 May 2018 10:13:32 -0400
-Received: by mail-pl0-x243.google.com with SMTP id n10-v6so5737119plp.0
-	for <qemu-devel@nongnu.org>; Sun, 27 May 2018 07:13:32 -0700 (PDT)
+	id 1fMwQL-0004Lt-MH
+	for qemu-devel@nongnu.org; Sun, 27 May 2018 10:13:29 -0400
+Received: by mail-pl0-x243.google.com with SMTP id 30-v6so5726731pld.13
+	for <qemu-devel@nongnu.org>; Sun, 27 May 2018 07:13:29 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Sun, 27 May 2018 09:13:06 -0500
-Message-Id: <20180527141324.11937-3-richard.henderson@linaro.org>
-In-Reply-To: <20180527141324.11937-1-richard.henderson@linaro.org>
-References: <20180527141324.11937-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH 02/20] target/openrisc: Use exit_tb instead of
- CPU_INTERRUPT_EXITTB
+Date: Sun, 27 May 2018 09:13:04 -0500
+Message-Id: <20180527141324.11937-1-richard.henderson@linaro.org>
+Subject: [Qemu-devel] [PATCH 00/20] target/openrisc improvements
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,67 +27,74 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Stafford Horne <shorne@gmail.com>
 
-No need to use the interrupt mechanisms when we can
-simply exit the tb directly.
+This is almost a grab-bag of little improvements to the port.
 
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
----
- target/openrisc/interrupt_helper.c | 3 +--
- target/openrisc/translate.c        | 6 +++---
- 2 files changed, 4 insertions(+), 5 deletions(-)
+patches 1-3:
+  Fix singlestepping for gdbstub.  This has apparently never
+  worked, as the first commit has the same bug of not advancing
+  the pc when stepping.
 
-diff --git a/target/openrisc/interrupt_helper.c b/target/openrisc/interrupt_helper.c
-index 56620e0571..b865738f8b 100644
---- a/target/openrisc/interrupt_helper.c
-+++ b/target/openrisc/interrupt_helper.c
-@@ -26,7 +26,6 @@
- void HELPER(rfe)(CPUOpenRISCState *env)
- {
-     OpenRISCCPU *cpu = openrisc_env_get_cpu(env);
--    CPUState *cs = CPU(cpu);
- #ifndef CONFIG_USER_ONLY
-     int need_flush_tlb = (cpu->env.sr & (SR_SM | SR_IME | SR_DME)) ^
-                          (cpu->env.esr & (SR_SM | SR_IME | SR_DME));
-@@ -53,8 +52,8 @@ void HELPER(rfe)(CPUOpenRISCState *env)
-     }
- 
-     if (need_flush_tlb) {
-+        CPUState *cs = CPU(cpu);
-         tlb_flush(cs);
-     }
- #endif
--    cs->interrupt_request |= CPU_INTERRUPT_EXITTB;
- }
-diff --git a/target/openrisc/translate.c b/target/openrisc/translate.c
-index f4f2f37e28..dae673afa4 100644
---- a/target/openrisc/translate.c
-+++ b/target/openrisc/translate.c
-@@ -41,6 +41,7 @@
-                   ## __VA_ARGS__)
- 
- /* is_jmp field values */
-+#define DISAS_EXIT    DISAS_TARGET_0  /* force exit to main loop */
- #define DISAS_UPDATE  DISAS_TARGET_1 /* cpu state was modified dynamically */
- 
- typedef struct DisasContext {
-@@ -1233,7 +1234,7 @@ static bool trans_l_rfe(DisasContext *dc, arg_l_rfe *a, uint32_t insn)
-         gen_illegal_exception(dc);
-     } else {
-         gen_helper_rfe(cpu_env);
--        dc->base.is_jmp = DISAS_UPDATE;
-+        dc->base.is_jmp = DISAS_EXIT;
-     }
- #endif
-     return true;
-@@ -1467,8 +1468,7 @@ static void openrisc_tr_tb_stop(DisasContextBase *dcbase, CPUState *cs)
-         case DISAS_NORETURN:
-             break;
-         case DISAS_UPDATE:
--            /* indicate that the hash table must be used
--               to find the next TB */
-+        case DISAS_EXIT:
-             tcg_gen_exit_tb(0);
-             break;
-         default:
+patches 4-5:
+  Exit the TB after l.mtspr insns.  In particular, storing to
+  SR changes exception state so we want to return to the main
+  loop to recognize any pending interrupts immediately.
+
+patches 6-19:
+  Reorganize TLB handling.  There is a fundamental bug that is
+  fixed in patch 13.  However the bug has been hidden by extra
+  TLB flushing elsewhere in the port.  I remove some unnecessary
+  indirection that the port inherited from somewhere -- probably
+  the MIPS port.  Finally, I present the QEMU TLB a unified view
+  of the OpenRISC split I/D TLB.
+
+patch 20:
+  Split out disassembly from translation.
+
+patch 21:
+  Add qemu-or1k to qemu-binfmt-conf.sh.
+
+
+r~
+
+
+Richard Henderson (20):
+  target/openrisc: Remove DISAS_JUMP & DISAS_TB_JUMP
+  target/openrisc: Use exit_tb instead of CPU_INTERRUPT_EXITTB
+  target/openrisc: Fix singlestep_enabled
+  target/openrisc: Link more translation blocks
+  target/openrisc: Split out is_user
+  target/openrisc: Exit the TB after l.mtspr
+  target/openrisc: Form the spr index from tcg
+  target/openrisc: Merge tlb allocation into CPUOpenRISCState
+  target/openrisc: Remove indirect function calls for mmu
+  target/openrisc: Merge mmu_helper.c into mmu.c
+  target/openrisc: Reduce tlb to a single dimension
+  target/openrisc: Fix tlb flushing in mtspr
+  target/openrisc: Fix cpu_mmu_index
+  target/openrisc: Use identical sizes for ITLB and DTLB
+  target/openrisc: Stub out handle_mmu_fault for softmmu
+  target/openrisc: Log interrupts
+  target/openrisc: Increase the TLB size
+  target/openrisc: Reorg tlb lookup
+  target/openrisc: Add print_insn_or1k
+  target/or1k: Add support in scripts/qemu-binfmt-conf.sh
+
+ target/openrisc/cpu.h              |  61 +++---
+ target/openrisc/helper.h           |   4 +-
+ target/openrisc/cpu.c              |  16 +-
+ target/openrisc/disas.c            | 171 +++++++++++++++++
+ target/openrisc/interrupt.c        |  36 ++--
+ target/openrisc/interrupt_helper.c |  35 +---
+ target/openrisc/machine.c          |  39 +---
+ target/openrisc/mmu.c              | 275 ++++++++++----------------
+ target/openrisc/mmu_helper.c       |  40 ----
+ target/openrisc/sys_helper.c       |  85 ++++----
+ target/openrisc/translate.c        | 298 ++++++++++-------------------
+ scripts/qemu-binfmt-conf.sh        |  10 +-
+ target/openrisc/Makefile.objs      |   5 +-
+ 13 files changed, 492 insertions(+), 583 deletions(-)
+ create mode 100644 target/openrisc/disas.c
+ delete mode 100644 target/openrisc/mmu_helper.c
+
 -- 
 2.17.0
