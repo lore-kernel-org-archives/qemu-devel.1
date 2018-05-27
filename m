@@ -1,23 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57711)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57702)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fMwQU-0008QE-8f
-	for qemu-devel@nongnu.org; Sun, 27 May 2018 10:13:39 -0400
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fMwQT-0004Nr-AA
+	(envelope-from <richard.henderson@linaro.org>) id 1fMwQT-0008Q3-AW
 	for qemu-devel@nongnu.org; Sun, 27 May 2018 10:13:38 -0400
-Received: from mail-pl0-x243.google.com ([2607:f8b0:400e:c01::243]:34533)
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <richard.henderson@linaro.org>) id 1fMwQS-0004NX-3p
+	for qemu-devel@nongnu.org; Sun, 27 May 2018 10:13:37 -0400
+Received: from mail-pl0-x22e.google.com ([2607:f8b0:400e:c01::22e]:36874)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1fMwQT-0004Nk-4I
-	for qemu-devel@nongnu.org; Sun, 27 May 2018 10:13:37 -0400
-Received: by mail-pl0-x243.google.com with SMTP id ay10-v6so5747298plb.1
-	for <qemu-devel@nongnu.org>; Sun, 27 May 2018 07:13:37 -0700 (PDT)
+	id 1fMwQR-0004NQ-SW
+	for qemu-devel@nongnu.org; Sun, 27 May 2018 10:13:36 -0400
+Received: by mail-pl0-x22e.google.com with SMTP id w19-v6so5735806plq.4
+	for <qemu-devel@nongnu.org>; Sun, 27 May 2018 07:13:35 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Sun, 27 May 2018 09:13:09 -0500
-Message-Id: <20180527141324.11937-6-richard.henderson@linaro.org>
+Date: Sun, 27 May 2018 09:13:08 -0500
+Message-Id: <20180527141324.11937-5-richard.henderson@linaro.org>
 In-Reply-To: <20180527141324.11937-1-richard.henderson@linaro.org>
 References: <20180527141324.11937-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH 05/20] target/openrisc: Split out is_user
+Subject: [Qemu-devel] [PATCH 04/20] target/openrisc: Link more translation
+ blocks
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,89 +30,168 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Stafford Horne <shorne@gmail.com>
 
-This allows us to limit the amount of ifdefs and isolate
-the test for usermode.
+Track direct jumps via dc->jmp_pc_imm.  Use that in
+preference to jmp_pc when possible.  Emit goto_tb in
+that case, and lookup_and_goto_tb otherwise.
 
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/openrisc/translate.c | 27 ++++++++++++---------------
- 1 file changed, 12 insertions(+), 15 deletions(-)
+ target/openrisc/translate.c | 82 +++++++++++++++++++++----------------
+ 1 file changed, 46 insertions(+), 36 deletions(-)
 
 diff --git a/target/openrisc/translate.c b/target/openrisc/translate.c
-index a8afb9a562..61e6deef69 100644
+index e566be6d3c..a8afb9a562 100644
 --- a/target/openrisc/translate.c
 +++ b/target/openrisc/translate.c
-@@ -54,6 +54,15 @@ typedef struct DisasContext {
-     target_ulong jmp_pc_imm;
+@@ -42,13 +42,16 @@
+ 
+ /* is_jmp field values */
+ #define DISAS_EXIT    DISAS_TARGET_0  /* force exit to main loop */
+-#define DISAS_UPDATE  DISAS_TARGET_1 /* cpu state was modified dynamically */
++#define DISAS_JUMP    DISAS_TARGET_1  /* exit via jmp_pc/jmp_pc_imm */
+ 
+ typedef struct DisasContext {
+     DisasContextBase base;
+     uint32_t mem_idx;
+     uint32_t tb_flags;
+     uint32_t delayed_branch;
++
++    /* If not -1, jmp_pc contains this value and so is a direct jump.  */
++    target_ulong jmp_pc_imm;
  } DisasContext;
  
-+static inline bool is_user(DisasContext *dc)
-+{
-+#ifdef CONFIG_USER_ONLY
-+    return true;
-+#else
-+    return dc->mem_idx == MMU_USER_IDX;
-+#endif
-+}
-+
  /* Include the auto-generated decoder.  */
- #include "decode.inc.c"
+@@ -164,34 +167,6 @@ static void check_ov64s(DisasContext *dc)
+         }                               \
+     } while (0)
  
-@@ -914,17 +923,13 @@ static bool trans_l_mfspr(DisasContext *dc, arg_l_mfspr *a, uint32_t insn)
-     LOG_DIS("l.mfspr r%d, r%d, %d\n", a->d, a->a, a->k);
-     check_r0_write(a->d);
- 
--#ifdef CONFIG_USER_ONLY
--    gen_illegal_exception(dc);
+-static inline bool use_goto_tb(DisasContext *dc, target_ulong dest)
+-{
+-    if (unlikely(dc->base.singlestep_enabled)) {
+-        return false;
+-    }
+-
+-#ifndef CONFIG_USER_ONLY
+-    return (dc->base.tb->pc & TARGET_PAGE_MASK) == (dest & TARGET_PAGE_MASK);
 -#else
--    if (dc->mem_idx == MMU_USER_IDX) {
-+    if (is_user(dc)) {
-         gen_illegal_exception(dc);
-     } else {
-         TCGv_i32 ti = tcg_const_i32(a->k);
-         gen_helper_mfspr(cpu_R[a->d], cpu_env, cpu_R[a->d], cpu_R[a->a], ti);
-         tcg_temp_free_i32(ti);
-     }
+-    return true;
 -#endif
-     return true;
- }
- 
-@@ -932,17 +937,13 @@ static bool trans_l_mtspr(DisasContext *dc, arg_l_mtspr *a, uint32_t insn)
+-}
+-
+-static void gen_goto_tb(DisasContext *dc, int n, target_ulong dest)
+-{
+-    if (use_goto_tb(dc, dest)) {
+-        tcg_gen_movi_tl(cpu_pc, dest);
+-        tcg_gen_goto_tb(n);
+-        tcg_gen_exit_tb((uintptr_t)dc->base.tb + n);
+-    } else {
+-        tcg_gen_movi_tl(cpu_pc, dest);
+-        if (dc->base.singlestep_enabled) {
+-            gen_exception(dc, EXCP_DEBUG);
+-        }
+-        tcg_gen_exit_tb(0);
+-    }
+-}
+-
+ static void gen_ove_cy(DisasContext *dc)
  {
-     LOG_DIS("l.mtspr r%d, r%d, %d\n", a->a, a->b, a->k);
+     if (dc->tb_flags & SR_OVE) {
+@@ -655,6 +630,7 @@ static bool trans_l_j(DisasContext *dc, arg_l_j *a, uint32_t insn)
  
--#ifdef CONFIG_USER_ONLY
--    gen_illegal_exception(dc);
--#else
--    if (dc->mem_idx == MMU_USER_IDX) {
-+    if (is_user(dc)) {
-         gen_illegal_exception(dc);
-     } else {
-         TCGv_i32 ti = tcg_const_i32(a->k);
-         gen_helper_mtspr(cpu_env, cpu_R[a->a], cpu_R[a->b], ti);
-         tcg_temp_free_i32(ti);
-     }
--#endif
+     LOG_DIS("l.j %d\n", a->n);
+     tcg_gen_movi_tl(jmp_pc, tmp_pc);
++    dc->jmp_pc_imm = tmp_pc;
+     dc->delayed_branch = 2;
      return true;
  }
- 
-@@ -1204,16 +1205,12 @@ static bool trans_l_rfe(DisasContext *dc, arg_l_rfe *a, uint32_t insn)
+@@ -669,6 +645,7 @@ static bool trans_l_jal(DisasContext *dc, arg_l_jal *a, uint32_t insn)
+     /* Optimize jal being used to load the PC for PIC.  */
+     if (tmp_pc != ret_pc) {
+         tcg_gen_movi_tl(jmp_pc, tmp_pc);
++        dc->jmp_pc_imm = tmp_pc;
+         dc->delayed_branch = 2;
+     }
+     return true;
+@@ -1381,6 +1358,8 @@ static void openrisc_tr_init_disas_context(DisasContextBase *dcb, CPUState *cs)
+     dc->mem_idx = cpu_mmu_index(env, false);
+     dc->tb_flags = dc->base.tb->flags;
+     dc->delayed_branch = (dc->tb_flags & TB_FLAGS_DFLAG) != 0;
++    dc->jmp_pc_imm = -1;
++
+     bound = -(dc->base.pc_first | TARGET_PAGE_MASK) / 4;
+     dc->base.max_insns = MIN(dc->base.max_insns, bound);
+ }
+@@ -1437,10 +1416,7 @@ static void openrisc_tr_translate_insn(DisasContextBase *dcbase, CPUState *cs)
+     if (dc->delayed_branch) {
+         dc->delayed_branch--;
+         if (!dc->delayed_branch) {
+-            tcg_gen_mov_tl(cpu_pc, jmp_pc);
+-            tcg_gen_discard_tl(jmp_pc);
+-            dc->base.is_jmp = DISAS_UPDATE;
+-            return;
++            dc->base.is_jmp = DISAS_JUMP;
+         }
+     }
+ }
+@@ -1448,22 +1424,56 @@ static void openrisc_tr_translate_insn(DisasContextBase *dcbase, CPUState *cs)
+ static void openrisc_tr_tb_stop(DisasContextBase *dcbase, CPUState *cs)
  {
-     LOG_DIS("l.rfe\n");
+     DisasContext *dc = container_of(dcbase, DisasContext, base);
++    target_ulong jmp_dest;
  
--#ifdef CONFIG_USER_ONLY
--    gen_illegal_exception(dc);
--#else
--    if (dc->mem_idx == MMU_USER_IDX) {
-+    if (is_user(dc)) {
-         gen_illegal_exception(dc);
-     } else {
-         gen_helper_rfe(cpu_env);
-         dc->base.is_jmp = DISAS_EXIT;
+     /* If we have already exited the TB, nothing following has effect.  */
+     if (dc->base.is_jmp == DISAS_NORETURN) {
+         return;
      }
--#endif
-     return true;
- }
  
++    /* Adjust the delayed branch state for the next TB.  */
+     if ((dc->tb_flags & TB_FLAGS_DFLAG ? 1 : 0) != (dc->delayed_branch != 0)) {
+         tcg_gen_movi_i32(cpu_dflag, dc->delayed_branch != 0);
+     }
+ 
+-    tcg_gen_movi_tl(cpu_ppc, dc->base.pc_next - 4);
++    /* For DISAS_TOO_MANY, jump to the next insn.  */
++    jmp_dest = dc->base.pc_next;
++    tcg_gen_movi_tl(cpu_ppc, jmp_dest - 4);
++
+     switch (dc->base.is_jmp) {
++    case DISAS_JUMP:
++        jmp_dest = dc->jmp_pc_imm;
++        if (jmp_dest == -1) {
++            /* The jump destination is indirect/computed; use jmp_pc.  */
++            tcg_gen_mov_tl(cpu_pc, jmp_pc);
++            tcg_gen_discard_tl(jmp_pc);
++            if (unlikely(dc->base.singlestep_enabled)) {
++                gen_exception(dc, EXCP_DEBUG);
++            } else {
++                tcg_gen_lookup_and_goto_ptr ();
++            }
++            break;
++        }
++        /* The jump destination is direct; use jmp_pc_imm.
++           However, we will have stored into jmp_pc as well;
++           we know now that it wasn't needed.  */
++        tcg_gen_discard_tl(jmp_pc);
++        /* fallthru */
++
+     case DISAS_TOO_MANY:
+-        gen_goto_tb(dc, 0, dc->base.pc_next);
++        if (unlikely(dc->base.singlestep_enabled)) {
++            tcg_gen_movi_tl(cpu_pc, jmp_dest);
++            gen_exception(dc, EXCP_DEBUG);
++        } else if ((dc->base.pc_first ^ jmp_dest) & TARGET_PAGE_MASK) {
++            tcg_gen_movi_tl(cpu_pc, jmp_dest);
++            tcg_gen_lookup_and_goto_ptr ();
++        } else {
++            tcg_gen_goto_tb(0);
++            tcg_gen_movi_tl(cpu_pc, jmp_dest);
++            tcg_gen_exit_tb((uintptr_t)dc->base.tb + 0);
++        }
+         break;
+-    case DISAS_UPDATE:
++
+     case DISAS_EXIT:
+         if (unlikely(dc->base.singlestep_enabled)) {
+             gen_exception(dc, EXCP_DEBUG);
 -- 
 2.17.0
