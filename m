@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55734)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38854)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <drjones@redhat.com>) id 1fNLXY-0003sM-FG
-	for qemu-devel@nongnu.org; Mon, 28 May 2018 13:02:37 -0400
+	(envelope-from <smcpolin@smcpolin-M01.vmware.com>)
+	id 1fNMYC-0004Jv-J3
+	for qemu-devel@nongnu.org; Mon, 28 May 2018 14:07:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <drjones@redhat.com>) id 1fNLXX-0006TZ-Ih
-	for qemu-devel@nongnu.org; Mon, 28 May 2018 13:02:36 -0400
-Date: Mon, 28 May 2018 19:02:26 +0200
-From: Andrew Jones <drjones@redhat.com>
-Message-ID: <20180528170226.3ynif3r34yejf7tp@kamzik.brq.redhat.com>
-References: <20180516152026.2920-1-shameerali.kolothum.thodi@huawei.com>
-	<20180516152026.2920-6-shameerali.kolothum.thodi@huawei.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180516152026.2920-6-shameerali.kolothum.thodi@huawei.com>
-Subject: Re: [Qemu-devel] [RFC v2 5/6] hw/arm: ACPI SRAT changes to
- accommodate non-contiguous mem
+	(envelope-from <smcpolin@smcpolin-M01.vmware.com>)
+	id 1fNMY8-0004wP-0k
+	for qemu-devel@nongnu.org; Mon, 28 May 2018 14:07:20 -0400
+Received: from [69.196.150.84] (port=47521 helo=smcpolin-M01.vmware.com)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <smcpolin@smcpolin-M01.vmware.com>)
+	id 1fNMY7-0004wD-Rp
+	for qemu-devel@nongnu.org; Mon, 28 May 2018 14:07:15 -0400
+From: Steve Mcpolin <smcpolin@vmware.com>
+Date: Mon, 28 May 2018 12:59:39 -0400
+Message-Id: <20180528180714.A8DCABD6612@smcpolin-M01.vmware.com>
+Subject: [Qemu-devel] [PATCH v2] linux-user: Remove extra mapping
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,73 +24,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
-Cc: qemu-devel@nongnu.org, qemu-arm@nongnu.org, peter.maydell@linaro.org, jonathan.cameron@huawei.com, linuxarm@huawei.com, eric.auger@redhat.com, alex.williamson@redhat.com, zhaoshenglong@huawei.com, imammedo@redhat.com
+To: qemu-devel@nongnu.org
+Cc: qemu-trivial@nongnu.org, riku.voipio@iki.fi, laurent@vivier.eu, smcpolin@vmware.com
 
-On Wed, May 16, 2018 at 04:20:25PM +0100, Shameer Kolothum wrote:
-> This is in preparation for the next patch where initial ram is split
-> into a non-pluggable chunk and a pc-dimm modeled mem if  the vaild
-> iova regions are non-contiguous.
-> 
-> Signed-off-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
-> ---
->  hw/arm/virt-acpi-build.c | 24 ++++++++++++++++++++----
->  1 file changed, 20 insertions(+), 4 deletions(-)
-> 
-> diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
-> index c7c6a57..8d17b40 100644
-> --- a/hw/arm/virt-acpi-build.c
-> +++ b/hw/arm/virt-acpi-build.c
-> @@ -488,7 +488,7 @@ build_srat(GArray *table_data, BIOSLinker *linker, VirtMachineState *vms)
->      AcpiSratProcessorGiccAffinity *core;
->      AcpiSratMemoryAffinity *numamem;
->      int i, srat_start;
-> -    uint64_t mem_base;
-> +    uint64_t mem_base, mem_sz, mem_len;
->      MachineClass *mc = MACHINE_GET_CLASS(vms);
->      const CPUArchIdList *cpu_list = mc->possible_cpu_arch_ids(MACHINE(vms));
->  
-> @@ -505,12 +505,28 @@ build_srat(GArray *table_data, BIOSLinker *linker, VirtMachineState *vms)
->          core->flags = cpu_to_le32(1);
->      }
->  
-> -    mem_base = vms->memmap[VIRT_MEM].base;
-> +    mem_base = vms->bootinfo.loader_start;
-> +    mem_sz = vms->bootinfo.loader_start;
+When a guest mmap()'d a file, a transient MAP_ANONYMOUS mapping was
+created, which required the kernel to reserve this memory, then
+subsequently released by applying a mapping with just the requested
+flags and fd.
+This transient mapping causes spurious failures when the available
+memory is smaller than the mapping.  This patch avoids this transient
+mapping.
 
-mem_sz = vms->bootinfo.ram_size;
+Signed-off-by: Steve Mcpolin <smcpolin@vmware.com>
+---
+ linux-user/mmap.c | 31 +++++++++++++++++++------------
+ 1 file changed, 19 insertions(+), 12 deletions(-)
 
-Assuming the DT generator was correct, meaning bootinfo.ram_size will
-be the size of the non-pluggable dimm.
-
-
->      for (i = 0; i < nb_numa_nodes; ++i) {
->          numamem = acpi_data_push(table_data, sizeof(*numamem));
-> -        build_srat_memory(numamem, mem_base, numa_info[i].node_mem, i,
-> +        mem_len = MIN(numa_info[i].node_mem, mem_sz);
-> +        build_srat_memory(numamem, mem_base, mem_len, i,
->                            MEM_AFFINITY_ENABLED);
-> -        mem_base += numa_info[i].node_mem;
-> +        mem_base += mem_len;
-> +        mem_sz -= mem_len;
-> +        if (!mem_sz) {
-> +            break;
-> +        }
-> +    }
-> +
-> +    /* Create table for initial pc-dimm ram, if any */
-> +    if (vms->bootinfo.dimm_mem) {
-> +        numamem = acpi_data_push(table_data, sizeof(*numamem));
-> +        build_srat_memory(numamem, vms->bootinfo.dimm_mem->base,
-> +                          vms->bootinfo.dimm_mem->size,
-> +                          vms->bootinfo.dimm_mem->node,
-> +                          MEM_AFFINITY_ENABLED);
-> +
->      }
->  
->      build_header(linker, table_data, (void *)(table_data->data + srat_start),
-> -- 
-> 2.7.4
-> 
-> 
-> 
+diff --git a/linux-user/mmap.c b/linux-user/mmap.c
+index 9168a20..b33adf2 100644
+--- a/linux-user/mmap.c
++++ b/linux-user/mmap.c
+@@ -453,21 +453,28 @@ abi_long target_mmap(abi_ulong start, abi_ulong len, int prot,
+         /* Note: we prefer to control the mapping address. It is
+            especially important if qemu_host_page_size >
+            qemu_real_host_page_size */
+-        p = mmap(g2h(start), host_len, prot,
+-                 flags | MAP_FIXED | MAP_ANONYMOUS, -1, 0);
+-        if (p == MAP_FAILED)
+-            goto fail;
+-        /* update start so that it points to the file position at 'offset' */
+-        host_start = (unsigned long)p;
+-        if (!(flags & MAP_ANONYMOUS)) {
+-            p = mmap(g2h(start), len, prot,
++        if (flags & MAP_ANONYMOUS) {
++            offset = 0;
++            host_offset = 0;
++            fd = -1;
++        }
++        p = mmap(g2h(start), len, prot,
+                      flags | MAP_FIXED, fd, host_offset);
+-            if (p == MAP_FAILED) {
+-                munmap(g2h(start), host_len);
+-                goto fail;
++        host_start = (uintptr_t)p;
++        if (p != MAP_FAILED && host_len > REAL_HOST_PAGE_ALIGN(len)) {
++            void *q;
++            q = mmap(g2h(start + len), host_len - REAL_HOST_PAGE_ALIGN(len),
++                     prot, MAP_FIXED | MAP_ANONYMOUS, -1, 0);
++            if (q == MAP_FAILED) {
++                p = MAP_FAILED;
+             }
+-            host_start += offset - host_offset;
+         }
++        if (p == MAP_FAILED) {
++            munmap(g2h(start), host_len);
++            goto fail;
++        }
++        host_start += offset - host_offset;
++        /* update start so that it points to the file position at 'offset' */
+         start = h2g(host_start);
+     } else {
+         if (start & ~TARGET_PAGE_MASK) {
+-- 
+2.7.4
