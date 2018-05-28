@@ -1,28 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57755)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57906)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1fNJv7-0000L9-2g
-	for qemu-devel@nongnu.org; Mon, 28 May 2018 11:18:50 -0400
+	(envelope-from <armbru@redhat.com>) id 1fNJvW-0000VP-5q
+	for qemu-devel@nongnu.org; Mon, 28 May 2018 11:19:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1fNJv4-0007ZR-BU
-	for qemu-devel@nongnu.org; Mon, 28 May 2018 11:18:49 -0400
-Received: from 1.mo173.mail-out.ovh.net ([178.33.111.180]:52198)
+	(envelope-from <armbru@redhat.com>) id 1fNJvT-0007vy-Ey
+	for qemu-devel@nongnu.org; Mon, 28 May 2018 11:19:14 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:58322 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1fNJv4-0007YO-2V
-	for qemu-devel@nongnu.org; Mon, 28 May 2018 11:18:46 -0400
-Received: from player690.ha.ovh.net (unknown [10.109.108.4])
-	by mo173.mail-out.ovh.net (Postfix) with ESMTP id 2958DC15EB
-	for <qemu-devel@nongnu.org>; Mon, 28 May 2018 17:18:43 +0200 (CEST)
-Date: Mon, 28 May 2018 17:18:33 +0200
-From: Greg Kurz <groug@kaod.org>
-Message-ID: <20180528171833.40499816@bahia.lan>
-In-Reply-To: <20180518164405.11804-5-clg@kaod.org>
-References: <20180518164405.11804-1-clg@kaod.org>
-	<20180518164405.11804-5-clg@kaod.org>
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fNJvT-0007vE-94
+	for qemu-devel@nongnu.org; Mon, 28 May 2018 11:19:11 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.4])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 769D7818BAF6
+	for <qemu-devel@nongnu.org>; Mon, 28 May 2018 15:19:10 +0000 (UTC)
+From: Markus Armbruster <armbru@redhat.com>
+References: <20180524043952.11245-1-peterx@redhat.com>
+	<20180524043952.11245-5-peterx@redhat.com>
+	<87sh6h77d0.fsf@dusky.pond.sub.org> <20180528070621.GE2584@xz-mi>
+Date: Mon, 28 May 2018 17:19:08 +0200
+In-Reply-To: <20180528070621.GE2584@xz-mi> (Peter Xu's message of "Mon, 28 May
+	2018 15:06:21 +0800")
+Message-ID: <877ennn6z7.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 4/4] spapr: introduce a new IRQ backend
- using fixed IRQ number ranges
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v7 4/4] monitor: add lock to protect
+ mon_fdsets
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,421 +35,407 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?B?Q8OpZHJpYw==?= Le Goater <clg@kaod.org>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, David Gibson <david@gibson.dropbear.id.au>, Alexey Kardashevskiy <aik@ozlabs.ru>
+To: Peter Xu <peterx@redhat.com>
+Cc: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>, "Dr .
+	David Alan Gilbert" <dgilbert@redhat.com>
 
-On Fri, 18 May 2018 18:44:05 +0200
-C=C3=A9dric Le Goater <clg@kaod.org> wrote:
+Peter Xu <peterx@redhat.com> writes:
 
-> The proposed layout of the IRQ number space is organized as follow :
->=20
->    RANGES             DEVICES
->=20
->    0x0000 - 0x0FFF    Reserved for future use (IPI =3D 2)
->    0x1000 - 0x1000    1 EPOW
->    0x1001 - 0x1001    1 HOTPLUG
->    0x1002 - 0x10FF    unused
->    0x1100 - 0x11FF    256 VIO devices    (1 IRQ each)
->    0x1200 - 0x1283    32 PCI LSI devices (4 IRQs each)
->    0x1284 - 0x13FF    unused
->    0x1400 - 0x17FF    PCI MSI device 1   (1024 IRQs each)
->    0x1800 - 0x1BFF    PCI MSI device 1
+> On Thu, May 24, 2018 at 11:03:55AM +0200, Markus Armbruster wrote:
+>> Peter Xu <peterx@redhat.com> writes:
+>> 
+>> > Similar to previous patch, but introduce a new global big lock for
+>> > mon_fdsets.  Take it where needed.
+>> 
+>> The previous patch is "monitor: more comments on lock-free
+>> fleids/funcs".  Sure you mean that one?
+>
+> No... I'll remove that sentence directly:
+>
+>   "Introduce a new global big lock for mon_fdsets.  Take it where needed."
 
-device 2 and...
+Works for me.
 
->    0x1c00 - 0x1FFF    PCI MSI device 2
+>> > The monitor_fdset_get_fd() handling is a bit tricky: now we need to call
+>> > qemu_mutex_unlock() which might pollute errno, so we need to make sure
+>> > the correct errno be passed up to the callers.  To make things simpler,
+>> > we let monitor_fdset_get_fd() return the -errno directly when error
+>> > happens, then in qemu_open() we translate it back into errno.
+>> 
+>> Suggest s/translate/move/.
+>
+> Okay.
+>
+>> >
+>> > Signed-off-by: Peter Xu <peterx@redhat.com>
+>> > ---
+>> >  monitor.c    | 70 +++++++++++++++++++++++++++++++++++++++++-----------
+>> >  util/osdep.c |  3 ++-
+>> >  2 files changed, 58 insertions(+), 15 deletions(-)
+>> >
+>> > diff --git a/monitor.c b/monitor.c
+>> > index f01589f945..6266ff65c4 100644
+>> > --- a/monitor.c
+>> > +++ b/monitor.c
+>> > @@ -271,6 +271,9 @@ typedef struct QMPRequest QMPRequest;
+>> >  /* Protects mon_list, monitor_event_state.  */
+>> 
+>> Not this patch's problem: there is no monitor_event_state.  Screwed up
+>> in commit d622cb5879c.  I guess it's monitor_qapi_event_state.
+>
+> I'll append another patch to do that, and move these fields together.
+>
+>> 
+>> >  static QemuMutex monitor_lock;
+>> >  
+>> > +/* Protects mon_fdsets */
+>> > +static QemuMutex mon_fdsets_lock;
+>> > +
+>> >  static QTAILQ_HEAD(mon_list, Monitor) mon_list;
+>> >  static QLIST_HEAD(mon_fdsets, MonFdset) mon_fdsets;
+>> >  static int mon_refcount;
+>> 
+>> Suggest to move mon_fdsets next to the lock protecting it.
+>
+> Will do.
+>
+>> 
+>> > @@ -287,6 +290,16 @@ static QEMUClockType event_clock_type = QEMU_CLOCK_REALTIME;
+>> >  static void monitor_command_cb(void *opaque, const char *cmdline,
+>> >                                 void *readline_opaque);
+>> >  
+>> > +/*
+>> > + * This lock can be used very early, even during param parsing.
+>> 
+>> Do you mean CLI parsing?
+>
+> Yes, will s/param/CLI/.
+>
+>> 
+>> > + * Meanwhile it can also be used even at the end of main.  Let's keep
+>> > + * it initialized for the whole lifecycle of QEMU.
+>> > + */
+>> 
+>> Awkward question, since our main() is such a tangled mess, but here goes
+>> anyway...  The existing place to initialize monitor.c's globals is
+>> monitor_init_globals().  But that one runs too late, I guess:
+>> parse_add_fd() runs earlier, and calls monitor_fdset_add_fd().  Unclean
+>> even without this lock; no module should be used before its
+>> initialization function runs.  Sure we can't run monitor_init_globals()
+>> sufficiently early?
+>
+> Please see the comment for monitor_init_globals():
+>
+>     /*
+>      * Note: qtest_enabled() (which is used in monitor_qapi_event_init())
+>      * depends on configure_accelerator() above.
+>      */
+>     monitor_init_globals();
+>
+> So I guess it won't work to directly move it earlier.  The init
+> dependency of QEMU is really complicated.  I'll be fine now that we
+> mark totally independent init functions (like this one, which is a
+> mutex init only) as constructor, then we can save some time on
+> ordering issue.
 
-device 3 ?
+Let me rephrase.  There's a preexisting issue: main() calls monitor.c
+functions before calling its initialization function
+monitor_init_globals().  This needs to be cleaned up.  Would you be
+willing to do it?
 
->=20
->    0x2000    ....     not allocated. Need to increase NR_IRQS
->=20
+Possible solutions:
 
-What's NR_IRQS ? What's the goal to have several 1k ranges ?
-So that each one may be affected to a single device ?
+* Perhaps we can move monitor_init_globals() up and/or the code calling
+  into monitor.c early down sufficiently.
 
-> The MSI range is a bit more complex to handle as the IRQS are dynamically
-> allocated by the guest OS. In consequence, we use a bitmap allocator
-> under the machine for these.
->=20
-> The XICS IRQ number space is increased to 4K, which gives three MSI
-> ranges of 1K for the PHBs. The XICS source IRQ numbers still have the
-> 4K offset.
->=20
+* Calculate event_clock_type on each use instead of ahead of time.  It's
+  qtest_enabled ? QEMU_CLOCK_VIRTUAL : QEMU_CLOCK_REALTIME, and neither
+  of its users needs to be fast.  Then move monitor_init_globals before
+  the code calling into monitor.c.
 
-Why ?
+I'm not opposed to use of constructors for self-contained initialization
+(no calls to other modules).  But I don't like initialization spread
+over multiple functions.
 
-> Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
-> ---
->  include/hw/ppc/spapr.h     |   2 +
->  include/hw/ppc/spapr_irq.h |  12 +++
->  hw/ppc/spapr.c             |  22 +++++
->  hw/ppc/spapr_irq.c         | 220 +++++++++++++++++++++++++++++++++++++++=
-+++++-
->  4 files changed, 255 insertions(+), 1 deletion(-)
->=20
-> diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
-> index 4eb212b16a51..fcc1b1c1451d 100644
-> --- a/include/hw/ppc/spapr.h
-> +++ b/include/hw/ppc/spapr.h
-> @@ -165,6 +165,8 @@ struct sPAPRMachineState {
->      char *kvm_type;
->      MemoryHotplugState hotplug_memory;
-> =20
-> +    int32_t nr_irqs;
-> +    unsigned long *irq_map;
->      const char *icp_type;
-> =20
->      bool cmd_line_caps[SPAPR_CAP_NUM];
-> diff --git a/include/hw/ppc/spapr_irq.h b/include/hw/ppc/spapr_irq.h
-> index caf4c33d4cec..d1af4c4d11ba 100644
-> --- a/include/hw/ppc/spapr_irq.h
-> +++ b/include/hw/ppc/spapr_irq.h
-> @@ -22,8 +22,16 @@
->  #define SPAPR_IRQ_PCI_MSI    0x1400  /* 1K IRQs per device covered by
->                                        * a bitmap allocator */
-> =20
-> +typedef struct sPAPRPIrqRange {
-> +    const char   *name;
-> +    uint32_t     offset;
-> +    uint32_t     width;
-> +    uint32_t     max_index;
-> +} sPAPRPIrqRange;
-> +
->  typedef struct sPAPRIrq {
->      uint32_t    nr_irqs;
-> +    const sPAPRPIrqRange *ranges;
-> =20
->      void (*init)(sPAPRMachineState *spapr, Error **errp);
->      int (*alloc)(sPAPRMachineState *spapr, uint32_t range, uint32_t inde=
-x,
-> @@ -35,6 +43,10 @@ typedef struct sPAPRIrq {
->  } sPAPRIrq;
-> =20
->  extern sPAPRIrq spapr_irq_default;
-> +extern sPAPRIrq spapr_irq_2_12;
-> +
-> +const sPAPRPIrqRange *spapr_irq_get_range(sPAPRMachineState *spapr,
-> +                                          uint32_t offset);
-> =20
->  int spapr_irq_alloc(sPAPRMachineState *spapr, uint32_t range, uint32_t i=
-ndex,
->                      Error **errp);
-> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> index 09f095d73eae..f2ebd6f20414 100644
-> --- a/hw/ppc/spapr.c
-> +++ b/hw/ppc/spapr.c
-> @@ -1848,6 +1848,24 @@ static const VMStateDescription vmstate_spapr_patb=
-_entry =3D {
->      },
->  };
-> =20
-> +static bool spapr_irq_map_needed(void *opaque)
-> +{
-> +    sPAPRMachineState *spapr =3D opaque;
-> +
-> +    return spapr->irq_map && !bitmap_empty(spapr->irq_map, spapr->nr_irq=
-s);
-> +}
-> +
-> +static const VMStateDescription vmstate_spapr_irq_map =3D {
-> +    .name =3D "spapr_irq_map",
-> +    .version_id =3D 1,
-> +    .minimum_version_id =3D 1,
-> +    .needed =3D spapr_irq_map_needed,
-> +    .fields =3D (VMStateField[]) {
-> +        VMSTATE_BITMAP(irq_map, sPAPRMachineState, 0, nr_irqs),
-> +        VMSTATE_END_OF_LIST()
-> +    },
-> +};
-> +
->  static const VMStateDescription vmstate_spapr =3D {
->      .name =3D "spapr",
->      .version_id =3D 3,
-> @@ -1875,6 +1893,7 @@ static const VMStateDescription vmstate_spapr =3D {
->          &vmstate_spapr_cap_cfpc,
->          &vmstate_spapr_cap_sbbc,
->          &vmstate_spapr_cap_ibs,
-> +        &vmstate_spapr_irq_map,
->          NULL
+>> > +static void __attribute__((constructor)) mon_fdsets_lock_init(void)
+>> > +{
+>> > +    qemu_mutex_init(&mon_fdsets_lock);
+>> > +}
+>> > +
+>> >  /**
+>> >   * Is @mon a QMP monitor?
+>> >   */
+>> > @@ -2316,9 +2329,11 @@ static void monitor_fdsets_cleanup(void)
+>> >      MonFdset *mon_fdset;
+>> >      MonFdset *mon_fdset_next;
+>> >  
+>> > +    qemu_mutex_lock(&mon_fdsets_lock);
+>> >      QLIST_FOREACH_SAFE(mon_fdset, &mon_fdsets, next, mon_fdset_next) {
+>> >          monitor_fdset_cleanup(mon_fdset);
+>> >      }
+>> > +    qemu_mutex_unlock(&mon_fdsets_lock);
+>> >  }
+>> >  
+>> >  AddfdInfo *qmp_add_fd(bool has_fdset_id, int64_t fdset_id, bool has_opaque,
+>> > @@ -2353,6 +2368,7 @@ void qmp_remove_fd(int64_t fdset_id, bool has_fd, int64_t fd, Error **errp)
+>> >      MonFdsetFd *mon_fdset_fd;
+>> >      char fd_str[60];
+>> >  
+>> > +    qemu_mutex_lock(&mon_fdsets_lock);
+>> >      QLIST_FOREACH(mon_fdset, &mon_fdsets, next) {
+>> >          if (mon_fdset->id != fdset_id) {
+>> >              continue;
+>> > @@ -2372,10 +2388,12 @@ void qmp_remove_fd(int64_t fdset_id, bool has_fd, int64_t fd, Error **errp)
+>> >              goto error;
+>> >          }
+>> >          monitor_fdset_cleanup(mon_fdset);
+>> > +        qemu_mutex_unlock(&mon_fdsets_lock);
+>> >          return;
+>> >      }
+>> >  
+>> >  error:
+>> > +    qemu_mutex_unlock(&mon_fdsets_lock);
+>> >      if (has_fd) {
+>> >          snprintf(fd_str, sizeof(fd_str), "fdset-id:%" PRId64 ", fd:%" PRId64,
+>> >                   fdset_id, fd);
+>> > @@ -2391,6 +2409,7 @@ FdsetInfoList *qmp_query_fdsets(Error **errp)
+>> >      MonFdsetFd *mon_fdset_fd;
+>> >      FdsetInfoList *fdset_list = NULL;
+>> >  
+>> > +    qemu_mutex_lock(&mon_fdsets_lock);
+>> >      QLIST_FOREACH(mon_fdset, &mon_fdsets, next) {
+>> >          FdsetInfoList *fdset_info = g_malloc0(sizeof(*fdset_info));
+>> >          FdsetFdInfoList *fdsetfd_list = NULL;
+>> > @@ -2420,6 +2439,7 @@ FdsetInfoList *qmp_query_fdsets(Error **errp)
+>> >          fdset_info->next = fdset_list;
+>> >          fdset_list = fdset_info;
+>> >      }
+>> > +    qemu_mutex_unlock(&mon_fdsets_lock);
+>> >  
+>> >      return fdset_list;
+>> >  }
+>> > @@ -2432,6 +2452,7 @@ AddfdInfo *monitor_fdset_add_fd(int fd, bool has_fdset_id, int64_t fdset_id,
+>> >      MonFdsetFd *mon_fdset_fd;
+>> >      AddfdInfo *fdinfo;
+>> >  
+>> > +    qemu_mutex_lock(&mon_fdsets_lock);
+>> >      if (has_fdset_id) {
+>> >          QLIST_FOREACH(mon_fdset, &mon_fdsets, next) {
+>> >              /* Break if match found or match impossible due to ordering by ID */
+>> > @@ -2452,6 +2473,7 @@ AddfdInfo *monitor_fdset_add_fd(int fd, bool has_fdset_id, int64_t fdset_id,
+>> >              if (fdset_id < 0) {
+>> >                  error_setg(errp, QERR_INVALID_PARAMETER_VALUE, "fdset-id",
+>> >                             "a non-negative value");
+>> > +                qemu_mutex_unlock(&mon_fdsets_lock);
+>> >                  return NULL;
+>> >              }
+>> >              /* Use specified fdset ID */
+>> > @@ -2502,16 +2524,21 @@ AddfdInfo *monitor_fdset_add_fd(int fd, bool has_fdset_id, int64_t fdset_id,
+>> >      fdinfo->fdset_id = mon_fdset->id;
+>> >      fdinfo->fd = mon_fdset_fd->fd;
+>> >  
+>> > +    qemu_mutex_unlock(&mon_fdsets_lock);
+>> >      return fdinfo;
+>> >  }
+>> >  
+>> >  int monitor_fdset_get_fd(int64_t fdset_id, int flags)
+>> >  {
+>> > -#ifndef _WIN32
+>> > +#ifdef _WIN32
+>> > +    return -ENOENT;
+>> 
+>> ENOENT feels odd, but I guess makes some sense since there is no way to
+>> add entries.
+>> 
+>> > +#else
+>> >      MonFdset *mon_fdset;
+>> >      MonFdsetFd *mon_fdset_fd;
+>> >      int mon_fd_flags;
+>> > +    int ret = -ENOENT;
+>> >  
+>> > +    qemu_mutex_lock(&mon_fdsets_lock);
+>> >      QLIST_FOREACH(mon_fdset, &mon_fdsets, next) {
+>> >          if (mon_fdset->id != fdset_id) {
+>> >              continue;
+>> > @@ -2519,49 +2546,60 @@ int monitor_fdset_get_fd(int64_t fdset_id, int flags)
+>> >          QLIST_FOREACH(mon_fdset_fd, &mon_fdset->fds, next) {
+>> >              mon_fd_flags = fcntl(mon_fdset_fd->fd, F_GETFL);
+>> >              if (mon_fd_flags == -1) {
+>> > -                return -1;
+>> > +                ret = -errno;
+>> > +                goto out;
+>> >              }
+>> >  
+>> >              if ((flags & O_ACCMODE) == (mon_fd_flags & O_ACCMODE)) {
+>> > -                return mon_fdset_fd->fd;
+>> > +                ret = mon_fdset_fd->fd;
+>> > +                goto out;
+>> >              }
+>> >          }
+>> > -        errno = EACCES;
+>> > -        return -1;
+>> > +        ret = -EACCES;
+>> > +        break;
+>> >      }
+>> 
+>> I still think
+>> 
+>>            ret = -EACCES;
+>>            goto out;
+>>        }
+>>        ret = -ENOENT;
+>> 
+>>    out:
+>> 
+>> would be clearer.
+>
+> I'll take your advice.
+>
+>> 
+>> > +out:
+>> > +    qemu_mutex_unlock(&mon_fdsets_lock);
+>> > +    return ret;
+>> >  #endif
+>> > -
+>> > -    errno = ENOENT;
+>> > -    return -1;
+>> >  }
+>> >  
+>> >  int monitor_fdset_dup_fd_add(int64_t fdset_id, int dup_fd)
+>> >  {
+>> >      MonFdset *mon_fdset;
+>> >      MonFdsetFd *mon_fdset_fd_dup;
+>> > +    int ret = -1;
+>> >  
+>> > +    qemu_mutex_lock(&mon_fdsets_lock);
+>> >      QLIST_FOREACH(mon_fdset, &mon_fdsets, next) {
+>> >          if (mon_fdset->id != fdset_id) {
+>> >              continue;
+>> >          }
+>> >          QLIST_FOREACH(mon_fdset_fd_dup, &mon_fdset->dup_fds, next) {
+>> >              if (mon_fdset_fd_dup->fd == dup_fd) {
+>> > -                return -1;
+>> > +                ret = -1;
+>> 
+>> Dead assignment.  Alternatively,
+>> 
+>> > +                goto out;
+>> >              }
+>> >          }
+>> >          mon_fdset_fd_dup = g_malloc0(sizeof(*mon_fdset_fd_dup));
+>> >          mon_fdset_fd_dup->fd = dup_fd;
+>> >          QLIST_INSERT_HEAD(&mon_fdset->dup_fds, mon_fdset_fd_dup, next);
+>> > -        return 0;
+>> > +        ret = 0;
+>> > +        break;
+>> >      }
+>> 
+>> ... add
+>> 
+>>        ret = -1;
+>> 
+>> here, and drop the initializer.  Your choice.
+>
+> The variable "ret" brought some trouble, so I decided to remove it
+> directly. :)
+>
+> @@ -2538,20 +2569,25 @@ int monitor_fdset_dup_fd_add(int64_t fdset_id, int dup_fd)
+>      MonFdset *mon_fdset;
+>      MonFdsetFd *mon_fdset_fd_dup;
+>
+> +    qemu_mutex_lock(&mon_fdsets_lock);
+>      QLIST_FOREACH(mon_fdset, &mon_fdsets, next) {
+>          if (mon_fdset->id != fdset_id) {
+>              continue;
+>          }
+>          QLIST_FOREACH(mon_fdset_fd_dup, &mon_fdset->dup_fds, next) {
+>              if (mon_fdset_fd_dup->fd == dup_fd) {
+> -                return -1;
+> +                goto err;
+>              }
+>          }
+>          mon_fdset_fd_dup = g_malloc0(sizeof(*mon_fdset_fd_dup));
+>          mon_fdset_fd_dup->fd = dup_fd;
+>          QLIST_INSERT_HEAD(&mon_fdset->dup_fds, mon_fdset_fd_dup, next);
+> +        qemu_mutex_unlock(&mon_fdsets_lock);
+>          return 0;
 >      }
->  };
-> @@ -3916,7 +3935,10 @@ static void spapr_machine_2_12_instance_options(Ma=
-chineState *machine)
-> =20
->  static void spapr_machine_2_12_class_options(MachineClass *mc)
->  {
-> +    sPAPRMachineClass *smc =3D SPAPR_MACHINE_CLASS(mc);
 > +
->      spapr_machine_2_13_class_options(mc);
-> +    smc->irq =3D &spapr_irq_2_12;
->      SET_MACHINE_COMPAT(mc, SPAPR_COMPAT_2_12);
+> +err:
+> +    qemu_mutex_unlock(&mon_fdsets_lock);
+>      return -1;
 >  }
-> =20
-> diff --git a/hw/ppc/spapr_irq.c b/hw/ppc/spapr_irq.c
-> index ff6cb1aafd25..bfffb1467336 100644
-> --- a/hw/ppc/spapr_irq.c
-> +++ b/hw/ppc/spapr_irq.c
-> @@ -192,7 +192,7 @@ static qemu_irq spapr_qirq_2_12(sPAPRMachineState *sp=
-apr, int irq)
->      return NULL;
+
+Works for me.
+
+>> 
+>> > -    return -1;
+>> > +
+>> > +out:
+>> > +    qemu_mutex_unlock(&mon_fdsets_lock);
+>> > +    return ret;
+>> >  }
+>> >  
+>> >  static int monitor_fdset_dup_fd_find_remove(int dup_fd, bool remove)
+>> >  {
+>> >      MonFdset *mon_fdset;
+>> >      MonFdsetFd *mon_fdset_fd_dup;
+>> > +    int ret = -1;
+>> >  
+>> > +    qemu_mutex_lock(&mon_fdsets_lock);
+>> >      QLIST_FOREACH(mon_fdset, &mon_fdsets, next) {
+>> >          QLIST_FOREACH(mon_fdset_fd_dup, &mon_fdset->dup_fds, next) {
+>> >              if (mon_fdset_fd_dup->fd == dup_fd) {
+>> > @@ -2570,14 +2608,18 @@ static int monitor_fdset_dup_fd_find_remove(int dup_fd, bool remove)
+>> >                      if (QLIST_EMPTY(&mon_fdset->dup_fds)) {
+>> >                          monitor_fdset_cleanup(mon_fdset);
+>> >                      }
+>> > -                    return -1;
+>> > +                    ret = -1;
+>> > +                    goto out;
+>> >                  } else {
+>> > -                    return mon_fdset->id;
+>> > +                    ret = mon_fdset->id;
+>> > +                    goto out;
+>> >                  }
+>> >              }
+>> >          }
+>> >      }
+>> > -    return -1;
+>> > +out:
+>> > +    qemu_mutex_unlock(&mon_fdsets_lock);
+>> > +    return ret;
+>> >  }
+>> 
+>> Likewise.
+>
+> I'll do similar thing to drop "ret":
+>
+> @@ -2560,6 +2596,7 @@ static int monitor_fdset_dup_fd_find_remove(int dup_fd, bool remove)
+>      MonFdset *mon_fdset;
+>      MonFdsetFd *mon_fdset_fd_dup;
+>
+> +    qemu_mutex_lock(&mon_fdsets_lock);
+>      QLIST_FOREACH(mon_fdset, &mon_fdsets, next) {
+>          QLIST_FOREACH(mon_fdset_fd_dup, &mon_fdset->dup_fds, next) {
+>              if (mon_fdset_fd_dup->fd == dup_fd) {
+> @@ -2568,13 +2605,17 @@ static int monitor_fdset_dup_fd_find_remove(int dup_fd, bool remove)
+>                      if (QLIST_EMPTY(&mon_fdset->dup_fds)) {
+>                          monitor_fdset_cleanup(mon_fdset);
+>                      }
+> -                    return -1;
+> +                    goto err;
+>                  } else {
+> +                    qemu_mutex_unlock(&mon_fdsets_lock);
+>                      return mon_fdset->id;
+>                  }
+>              }
+>          }
+>      }
+> +
+> +err:
+> +    qemu_mutex_unlock(&mon_fdsets_lock);
+>      return -1;
 >  }
-> =20
-> -sPAPRIrq spapr_irq_default =3D {
-> +sPAPRIrq spapr_irq_2_12 =3D {
->      .nr_irqs     =3D XICS_IRQS_SPAPR,
->      .init        =3D spapr_irq_init_2_12,
->      .alloc       =3D spapr_irq_alloc_2_12,
-> @@ -201,6 +201,224 @@ sPAPRIrq spapr_irq_default =3D {
->      .qirq        =3D spapr_qirq_2_12,
->  };
-> =20
-> +/*
-> + * IRQ range helpers for new IRQ backends
-> + */
-> +const sPAPRPIrqRange *spapr_irq_get_range(sPAPRMachineState *spapr,
-> +                                          uint32_t offset)
-> +{
-> +    sPAPRMachineClass *smc =3D SPAPR_MACHINE_GET_CLASS(spapr);
-> +    const sPAPRPIrqRange *range =3D smc->irq->ranges;
-> +
-> +    if (range) {
-> +        while (range->name && range->offset !=3D offset) {
-> +            range++;
-> +        }
-> +
-> +        if (!range->name) {
-> +            return NULL;
-> +        }
-> +    }
-> +
-> +    return range;
-> +}
-> +
-> +static int spapr_irq_get_base(sPAPRMachineState *spapr, uint32_t offset,
-> +                              uint32_t index, Error **errp)
-> +{
-> +    const sPAPRPIrqRange *range =3D spapr_irq_get_range(spapr, offset);
-> +
-> +    if (!range) {
-> +        error_setg(errp, "Invalid IRQ range %x", offset);
-> +        return -1;
-> +    }
-> +
-> +    if (index > range->max_index) {
-> +        error_setg(errp, "Index %d too big for IRQ range %s", index,
-> +                   range->name);
-> +        return -1;
-> +    }
-> +
-> +    return range->offset + index * range->width;
-> +}
-> +
-> +static int spapr_irq_range_alloc(sPAPRMachineState *spapr,
-> +                                 uint32_t range, uint32_t index, Error *=
-*errp)
-> +{
-> +    return spapr_irq_get_base(spapr, range, index, errp);
-> +}
-> +
-> +static int spapr_irq_range_alloc_msi(sPAPRMachineState *spapr, uint32_t =
-range,
-> +                                     uint32_t index, int num, bool align,
-> +                                     Error **errp)
-> +{
-> +    int msi_base =3D spapr_irq_get_base(spapr, SPAPR_IRQ_PCI_MSI, index,=
- errp);
-> +    int irq;
-> +
-> +    /*
-> +     * The 'align_mask' parameter of bitmap_find_next_zero_area()
-> +     * should be one less than a power of 2; 0 means no
-> +     * alignment. Adapt the 'align' value of the former allocator
-> +     * to fit the requirements of bitmap_find_next_zero_area()
-> +     */
-> +    align -=3D 1;
-> +
-> +    irq =3D bitmap_find_next_zero_area(spapr->irq_map, spapr->nr_irqs,
-> +                                     msi_base, num, align);
-> +    if (irq =3D=3D spapr->nr_irqs) {
-> +        error_setg(errp, "can't find a free MSI %d-IRQ block", num);
-> +        return -1;
-> +    }
-> +
-> +    bitmap_set(spapr->irq_map, irq, num);
-> +    return irq;
-> +}
-> +
-> +static void spapr_irq_range_free_msi(sPAPRMachineState *spapr, int irq, =
-int num)
-> +{
-> +    bitmap_clear(spapr->irq_map, irq, num);
-> +}
-> +
-> +/*
-> + * New XICS IRQ backend
-> + *
-> + * using the IRQ ranges and device indexes
-> + */
-> +static void spapr_irq_init_2_13(sPAPRMachineState *spapr, Error **errp)
 
-FYI, next QEMU version will likely be 3.0:
-
-https://lists.gnu.org/archive/html/qemu-devel/2018-05/msg04879.html
-
-Also, it is useful to add version information to the name in case of
-existing machine types. I guess _default or _new is a better choice
-here.
-
-> +{
-> +    MachineState *machine =3D MACHINE(spapr);
-> +    sPAPRMachineClass *smc =3D SPAPR_MACHINE_GET_CLASS(machine);
-> +
-> +    spapr_irq_init_2_12(spapr, errp);
-
-Hmm... it's a bit confusing. I'd rather have each init function to call a
-common helper.
-
-> +
-> +    /*
-> +     * Initialize the MSI IRQ allocator. The full XICS IRQ number
-> +     * space is covered even though the bottow IRQ numbers below the
-> +     * XICS source number offset (4K) are unused and that only MSI IRQ
-> +     * numbers can be allocated. We does waste some bytes but it makes
-> +     * things easier. We will optimize later.
-> +     */
-> +    spapr->nr_irqs  =3D smc->irq->nr_irqs + spapr->ics->offset;
-> +    spapr->irq_map  =3D bitmap_new(spapr->nr_irqs);
-> +}
-> +
-> +static int spapr_irq_alloc_2_13(sPAPRMachineState *spapr,
-> +                                uint32_t range, uint32_t index, Error **=
-errp)
-> +{
-> +    ICSState *ics =3D spapr->ics;
-> +    bool lsi =3D (range =3D=3D SPAPR_IRQ_PCI_LSI);
-> +    int irq =3D spapr_irq_range_alloc(spapr, range, index, errp);
-> +
-> +    if (irq < 0) {
-> +        return irq;
-> +    }
-> +
-> +    /* Update the IRQState in the XICS source */
-> +    ics_set_irq_type(ics, irq - ics->offset, lsi);
-> +
-> +    return irq;
-> +}
-> +
-> +static int spapr_irq_alloc_block_2_13(sPAPRMachineState *spapr, uint32_t=
- range,
-> +                                      uint32_t index, int num, bool alig=
-n,
-> +                                      Error **errp)
-> +{
-> +    ICSState *ics =3D spapr->ics;
-> +    bool lsi =3D (range =3D=3D SPAPR_IRQ_PCI_LSI);
-> +    int irq;
-> +    int i;
-> +
-> +    if (range =3D=3D SPAPR_IRQ_PCI_MSI) {
-> +        irq =3D spapr_irq_range_alloc_msi(spapr, range, index, num, alig=
-n, errp);
-> +    } else {
-> +        /* TODO: check IRQ range width vs. required block size */
-> +        irq =3D spapr_irq_range_alloc(spapr, range, index, errp);
-> +    }
-> +
-> +    if (irq < 0) {
-> +        return irq;
-> +    }
-> +
-> +    /* Update the IRQState in the XICS source */
-> +    for (i =3D irq; i < irq + num; ++i) {
-> +        ics_set_irq_type(ics, i - ics->offset, lsi);
-> +    }
-> +
-> +    return irq;
-> +}
-> +
-> +static void spapr_irq_free_2_13(sPAPRMachineState *spapr, int irq, int n=
-um,
-> +                                Error **errp)
-> +{
-> +    ICSState *ics =3D spapr->ics;
-> +    int msi_base =3D spapr_irq_get_base(spapr, SPAPR_IRQ_PCI_MSI, 0, NUL=
-L);
-> +    int i;
-> +
-> +    /* Any IRQ below MSI base should not be freed */
-> +    if (irq < msi_base) {
-> +        error_setg(errp, "IRQs %x-%x can not be freed", irq, irq + num);
-> +        return;
-> +    }
-> +
-> +    spapr_irq_range_free_msi(spapr, irq, num);
-> +
-> +    /* Clear out the IRQState from the XICS source */
-> +    for (i =3D irq; i < irq + num; ++i) {
-> +        if (ics_valid_irq(ics, i)) {
-> +            uint32_t srcno =3D i - ics->offset;
-> +            memset(&ics->irqs[srcno], 0, sizeof(ICSIRQState));
-> +        }
-> +    }
-> +}
-> +
-> +static qemu_irq spapr_qirq_2_13(sPAPRMachineState *spapr, int irq)
-> +{
-> +    return spapr_qirq_2_12(spapr, irq);
-> +}
-> +
-> +/*
-> + *   RANGES             DEVICES
-> + *
-> + *   0x0000 - 0x0FFF    Reserved (IPI =3D 2)
-> + *
-> + *   0x1000 - 0x1000    1 EPOW
-> + *   0x1001 - 0x1001    1 HOTPLUG
-> + *   0x1002 - 0x10FF    unused
-> + *   0x1100 - 0x11FF    256 VIO devices    (1 IRQ each)
-> + *   0x1200 - 0x1283    32 PCI LSI devices (4 IRQs each)
-> + *   0x1284 - 0x13FF    unused
-> + *   0x1400 - 0x17FF    PCI MSI device 1   (1024 IRQs each)
-> + *   0x1800 - 0x1BFF    PCI MSI device 1
-> + *   0x1c00 - 0x1FFF    PCI MSI device 2
-> + *   0x2000    ....     not allocated. Need to increase NR_IRQS
-> + */
-> +static const sPAPRPIrqRange spapr_irq_ranges_2_13[] =3D {
-> +    /* "IPI" Not used */
-> +    { "EPOW",       SPAPR_IRQ_EPOW,       1,               0      },
-> +    { "HOTPLUG",    SPAPR_IRQ_HOTPLUG,    1,               0      },
-> +    { "VIO",        SPAPR_IRQ_VIO,        1,               0xFF   },
-> +    { "PCI LSI",    SPAPR_IRQ_PCI_LSI,    PCI_NUM_PINS,    0x1F   },
-> +    { "PCI MSI",    SPAPR_IRQ_PCI_MSI,    0x400,           0x1F   },
-> +    { NULL,         0,                    0,               0      },
-> +};
-> +
-> +/*
-> + * Increase the XICS IRQ number space to 4K. It gives us 3 possible
-> + * MSI ranges for the PHBs. The XICS Source IRQ numbers still have the
-> + * 4K offset.
-> + */
-> +#define SPAPR_NR_IRQS_2_13    0x1000
-> +
-> +sPAPRIrq spapr_irq_default =3D {
-> +    .nr_irqs     =3D SPAPR_NR_IRQS_2_13,
-
-Since there's only one user for this define, why not open-coding the value
-here ?
-
-> +    .init        =3D spapr_irq_init_2_13,
-> +    .ranges      =3D spapr_irq_ranges_2_13,
-> +    .alloc       =3D spapr_irq_alloc_2_13,
-> +    .alloc_block =3D spapr_irq_alloc_block_2_13,
-> +    .free        =3D spapr_irq_free_2_13,
-> +    .qirq        =3D spapr_qirq_2_13,
-> +};
-> +
->  int spapr_irq_alloc(sPAPRMachineState *spapr, uint32_t range, uint32_t i=
-ndex,
->                      Error **errp)
->  {
+Also works for me.
