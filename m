@@ -1,15 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59199)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60964)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <joel.stan@gmail.com>) id 1fNJyq-0002hC-Cw
-	for qemu-devel@nongnu.org; Mon, 28 May 2018 11:22:41 -0400
+	(envelope-from <clg@kaod.org>) id 1fNK22-0004aO-7D
+	for qemu-devel@nongnu.org; Mon, 28 May 2018 11:26:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <joel.stan@gmail.com>) id 1fNJyn-000260-Qb
-	for qemu-devel@nongnu.org; Mon, 28 May 2018 11:22:40 -0400
-Sender: "joel.stan@gmail.com" <joel.stan@gmail.com>
-From: Joel Stanley <joel@jms.id.au>
-Date: Tue, 29 May 2018 00:52:25 +0930
-Message-Id: <20180528152225.7108-1-joel@jms.id.au>
-Subject: [Qemu-devel] [PATCH v2] aspeed_scu: Implement RNG register
+	(envelope-from <clg@kaod.org>) id 1fNK1z-0004Q0-HY
+	for qemu-devel@nongnu.org; Mon, 28 May 2018 11:25:58 -0400
+Received: from 19.mo1.mail-out.ovh.net ([178.32.97.206]:42922)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1fNK1z-0004Oh-5s
+	for qemu-devel@nongnu.org; Mon, 28 May 2018 11:25:55 -0400
+Received: from player771.ha.ovh.net (unknown [10.109.122.50])
+	by mo1.mail-out.ovh.net (Postfix) with ESMTP id 1F6B4FF4D0
+	for <qemu-devel@nongnu.org>; Mon, 28 May 2018 17:25:52 +0200 (CEST)
+References: <20180426150901.30278-1-peter.maydell@linaro.org>
+	<03045d77-94bd-3686-2f80-00abf55b4373@kaod.org>
+From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Message-ID: <1e5bc1f2-6b8d-b193-fd4a-eb3ab7d68bfe@kaod.org>
+Date: Mon, 28 May 2018 17:25:44 +0200
+MIME-Version: 1.0
+In-Reply-To: <03045d77-94bd-3686-2f80-00abf55b4373@kaod.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [RFC PATCH] mmio-exec: Make device return
+ MemoryRegion rather than host pointer
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -18,64 +32,351 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, qemu-arm@nongnu.org
-Cc: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>, Andrew Jeffery <andrew@aj.id.au>
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
+Cc: patches@linaro.org, Paolo Bonzini <pbonzini@redhat.com>, Francisco Iglesias <frasse.iglesias@gmail.com>, KONRAD Frederic <frederic.konrad@adacore.com>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, "Emilio G. Cota" <cota@braap.org>
 
-The ASPEED SoCs contain a single register that returns random data when
-read. This models that register so that guests can use it.
+On 05/28/2018 07:22 AM, C=C3=A9dric Le Goater wrote:
+> On 04/26/2018 05:09 PM, Peter Maydell wrote:
+>> Our current interface for allowing a device to support execution from
+>> MMIO regions has the device return a pointer into host memory
+>> containing the contents to be used for execution.  Unfortunately the
+>> obvious implementation this encourages (and which our only in-tree
+>> user uses) is to have a single buffer which is reused for each new
+>> request_ptr call.  This doesn't work, because RCU means that removal
+>> of the old RAMBlock based on the host pointer may be deferred until a
+>> point after a new RAMBlock with the same pointer has been added to
+>> the list.  The RAMBlock APIs assume that the host-pointer to ram_addr
+>> mapping is unique, and mmio-exec is breaking that assumption.
+>=20
+> yes. I have run into the same problem while implementing mmio-exec=20
+> for the aspeed fmc controllers.=20
+>=20
+> The FW (U-boot) in some configuration does a CRC calculation which=20
+> jumps from one code section to another. This trashes the MMIO cache=20
+> a very large number of times and the RAM block list can contain up=20
+> to 40 occurrences of the same cache ... it is nearly impossible not=20
+> to hit the bug you describe.
 
-The random number data register has a corresponding control register,
-data returns a different number regardless of the state of the enabled
-bit, so the model follows this behaviour.
+For the records, there are more than 31000 request/invalidate calls.
+=20
+> This patch fixes the issue=20
 
-Signed-off-by: Joel Stanley <joel@jms.id.au>
----
-v2:
- - Remove call to qcrypto_random_init as this is done in main()
----
- hw/misc/aspeed_scu.c | 16 ++++++++++++++++
- 1 file changed, 16 insertions(+)
+There is still an issue (or a limitation) with the patch. It is not
+possible to reload the cache when a load is performed on the MMIO=20
+region from which QEMU is exec'ing. This breaks the TCG flow it seems.=20
 
-diff --git a/hw/misc/aspeed_scu.c b/hw/misc/aspeed_scu.c
-index 5e6d5744eeca..29e58527793b 100644
---- a/hw/misc/aspeed_scu.c
-+++ b/hw/misc/aspeed_scu.c
-@@ -16,6 +16,7 @@
- #include "qapi/visitor.h"
- #include "qemu/bitops.h"
- #include "qemu/log.h"
-+#include "crypto/random.h"
- #include "trace.h"
- 
- #define TO_REG(offset) ((offset) >> 2)
-@@ -154,6 +155,18 @@ static const uint32_t ast2500_a1_resets[ASPEED_SCU_NR_REGS] = {
-      [BMC_DEV_ID]      = 0x00002402U
- };
- 
-+static uint32_t aspeed_scu_get_random(void)
-+{
-+    Error *err = NULL;
-+    uint32_t num;
-+
-+    if (qcrypto_random_bytes((uint8_t *)&num, sizeof(num), &err)) {
-+        error_report_err(err);
-+    }
-+
-+    return num;
-+}
-+
- static uint64_t aspeed_scu_read(void *opaque, hwaddr offset, unsigned size)
- {
-     AspeedSCUState *s = ASPEED_SCU(opaque);
-@@ -167,6 +180,9 @@ static uint64_t aspeed_scu_read(void *opaque, hwaddr offset, unsigned size)
-     }
- 
-     switch (reg) {
-+    case RNG_DATA:
-+        s->regs[RNG_DATA] = aspeed_scu_get_random();
-+        break;
-     case WAKEUP_EN:
-         qemu_log_mask(LOG_GUEST_ERROR,
-                       "%s: Read of write-only offset 0x%" HWADDR_PRIx "\n",
--- 
-2.17.0
+> but maybe an another approach could be to introduce a cache allocator >=
+ which would make sure that host-pointers are unique ?
+
+but freeing these cache lines is a problem. Same as of today ...=20
+Hmm, really a complex problem.=20
+
+Thanks,
+
+C.
+
+>> Instead, change the API so that the device is responsible for
+>> allocating a new RAM MemoryRegion and populating it.  The
+>> MemoryRegion will be g_free()d when the region is eventually
+>> invalidated or otherwise unneeded.
+>>
+>> HACKS:
+>>  * Note that in order for the refcounting to work correctly without
+>>    having to manufacture a device purely to be the owner of the
+>>    MemoryRegion, we must pass OBJECT(newmr) as the owner (so the MR is
+>>    its own owner!) and NULL as the name (or the property created on th=
+e
+>>    owner causes the refcount to go negative during finalization)...
+>>
+>> QUESTIONS:
+>>  * do we really need to postpone things from
+>>    memory_region_invalidate_mmio_ptr() to
+>>    memory_region_do_invalidate_mmio_ptr(), given that the deletion of
+>>    the memory region and ramblock is RCU-deferred anyway?
+>>  * should we add the subregion at elevated prio so it definitely hits
+>>    first?  I've left it the way the existing code does for the
+>>    moment...
+>>  * is there any way to avoid the weird self-owning MemoryRegion
+>>    and corresponding need to pass a NULL name pointer?
+>>
+>> NOTES:
+>>  * This change means that hw/misc/mmio_interface.c is no longer
+>>    used; if this gets beyond RFC stage then another patch to
+>>    delete it can follow.
+>>  * The "request_mmio_exec mustn't fail after it has called
+>>    memory_region_mmio_ptr_alloc()" requirement is a bit ugly, but
+>>    could probably be removed.
+>>
+>> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+>> ---
+>> This is decidedly RFC, but it is sufficient to get the xilinx-spips
+>> mmio-execution test case to run without crashing. Mostly looking for
+>> feedback on whether this is the right general direction or a load
+>> of rubbish :-)
+>>
+>>  include/exec/memory.h | 44 ++++++++++++++++++++----
+>>  hw/ssi/xilinx_spips.c | 22 ++++++++----
+>>  memory.c              | 78 ++++++++++++++++++++++++++++--------------=
+-
+>>  3 files changed, 105 insertions(+), 39 deletions(-)
+>>
+>> diff --git a/include/exec/memory.h b/include/exec/memory.h
+>> index 31eae0a640..e55e06a166 100644
+>> --- a/include/exec/memory.h
+>> +++ b/include/exec/memory.h
+>> @@ -139,14 +139,32 @@ struct MemoryRegionOps {
+>>                                      unsigned size,
+>>                                      MemTxAttrs attrs);
+>>      /* Instruction execution pre-callback:
+>> -     * @addr is the address of the access relative to the @mr.
+>> -     * @size is the size of the area returned by the callback.
+>> -     * @offset is the location of the pointer inside @mr.
+>> +     * @opaque is the opaque pointer for the MemoryRegion.
+>> +     * @alloc_token is a token to pass to memory_region_mmio_ptr_allo=
+c()
+>> +     * @offset contains the address of the access relative to the @mr=
+.
+>>       *
+>> -     * Returns a pointer to a location which contains guest code.
+>> +     * The request_mmio_exec callback must:
+>> +     *  - adjust the offset downwards as desired and determine the si=
+ze
+>> +     *    of the region it wants to provide cached guest code for.
+>> +     *    This must start on a guest page boundary and be a multiple
+>> +     *    of a guest page in size.
+>> +     *  - call memory_region_mmio_ptr_alloc(@alloc_token, size)
+>> +     *  - fill in the contents of the RAM
+>> +     * Ownership of @newmr remains with the caller; it will be
+>> +     * automatically freed when no longer in use.
+>> +     *
+>> +     * If the callback cannot satisfy the request then it should
+>> +     * return false. Otherwise it must
+>> +     *  - update @offset to the offset of the memory within the Memor=
+yRegion
+>> +     *    this is a callback for (ie the possibly rounded down value)
+>> +     *  - return true
+>> +     * Note that if you return false then execution of the guest is g=
+oing
+>> +     * to go wrong, either by QEMU delivering a bus abort exception t=
+o the
+>> +     * guest, or by simply exiting as unable to handle the situation,=
+ in
+>> +     * the same way that it would if you did not provide a request_mm=
+io_exec
+>> +     * callback at all.
+>>       */
+>> -    void *(*request_ptr)(void *opaque, hwaddr addr, unsigned *size,
+>> -                         unsigned *offset);
+>> +    bool (*request_mmio_exec)(void *opaque, void *alloc_token, hwaddr=
+ *offset);
+>> =20
+>>      enum device_endian endianness;
+>>      /* Guest-visible constraints: */
+>> @@ -1569,6 +1587,20 @@ bool memory_region_request_mmio_ptr(MemoryRegio=
+n *mr, hwaddr addr);
+>>  void memory_region_invalidate_mmio_ptr(MemoryRegion *mr, hwaddr offse=
+t,
+>>                                         unsigned size);
+>> =20
+>> +/**
+>> + * memory_region_mmio_ptr_alloc: allocate memory from request_mmio_ex=
+ec callback
+>> + *
+>> + * This function should be called only from a MemoryRegion's request_=
+mmio_exec
+>> + * callback function, in order to allocate the memory that should be =
+filled
+>> + * with the cached contents to be executed.
+>> + * Note that once the request_mmio_exec callback calls this function =
+it is
+>> + * committed to handling the request, and may not return false.
+>> + *
+>> + * @alloc_token: the argument passed into the request_mmio_exec callb=
+ack
+>> + * @size: size in bytes to allocate
+>> + */
+>> +void *memory_region_mmio_ptr_alloc(void *alloc_token, uint64_t size);
+>> +
+>>  /**
+>>   * memory_region_dispatch_read: perform a read directly to the specif=
+ied
+>>   * MemoryRegion.
+>> diff --git a/hw/ssi/xilinx_spips.c b/hw/ssi/xilinx_spips.c
+>> index 03f5faee4b..8bb049f797 100644
+>> --- a/hw/ssi/xilinx_spips.c
+>> +++ b/hw/ssi/xilinx_spips.c
+>> @@ -1202,21 +1202,29 @@ static void lqspi_load_cache(void *opaque, hwa=
+ddr addr)
+>>      }
+>>  }
+>> =20
+>> -static void *lqspi_request_mmio_ptr(void *opaque, hwaddr addr, unsign=
+ed *size,
+>> -                                    unsigned *offset)
+>> +static bool lqspi_request_mmio_exec(void *opaque, void *alloc_token,
+>> +                                    hwaddr *offset)
+>>  {
+>>      XilinxQSPIPS *q =3D opaque;
+>>      hwaddr offset_within_the_region;
+>> +    void *hostptr;
+>> =20
+>>      if (!q->mmio_execution_enabled) {
+>> -        return NULL;
+>> +        return false;
+>>      }
+>> =20
+>> -    offset_within_the_region =3D addr & ~(LQSPI_CACHE_SIZE - 1);
+>> +    /* This could perhaps be cleverer and avoid the memcpy by
+>> +     * caching directly into the allocated area.
+>> +     */
+>> +    offset_within_the_region =3D *offset & ~(LQSPI_CACHE_SIZE - 1);
+>>      lqspi_load_cache(opaque, offset_within_the_region);
+>> -    *size =3D LQSPI_CACHE_SIZE;
+>> +
+>> +    hostptr =3D memory_region_mmio_ptr_alloc(alloc_token, LQSPI_CACHE=
+_SIZE);
+>> +
+>> +    memcpy(hostptr, q->lqspi_buf, LQSPI_CACHE_SIZE);
+>> +
+>>      *offset =3D offset_within_the_region;
+>> -    return q->lqspi_buf;
+>> +    return true;
+>>  }
+>> =20
+>>  static uint64_t
+>> @@ -1240,7 +1248,7 @@ lqspi_read(void *opaque, hwaddr addr, unsigned i=
+nt size)
+>> =20
+>>  static const MemoryRegionOps lqspi_ops =3D {
+>>      .read =3D lqspi_read,
+>> -    .request_ptr =3D lqspi_request_mmio_ptr,
+>> +    .request_mmio_exec =3D lqspi_request_mmio_exec,
+>>      .endianness =3D DEVICE_NATIVE_ENDIAN,
+>>      .valid =3D {
+>>          .min_access_size =3D 1,
+>> diff --git a/memory.c b/memory.c
+>> index e70b64b8b9..71dec85156 100644
+>> --- a/memory.c
+>> +++ b/memory.c
+>> @@ -2653,41 +2653,74 @@ void memory_listener_unregister(MemoryListener=
+ *listener)
+>> =20
+>>  bool memory_region_request_mmio_ptr(MemoryRegion *mr, hwaddr addr)
+>>  {
+>> -    void *host;
+>> -    unsigned size =3D 0;
+>> -    unsigned offset =3D 0;
+>> -    Object *new_interface;
+>> +    MemoryRegion *newmr;
+>> +    hwaddr offset;
+>> =20
+>> -    if (!mr || !mr->ops->request_ptr) {
+>> +    if (!mr || !mr->ops->request_mmio_exec) {
+>>          return false;
+>>      }
+>> =20
+>>      /*
+>> -     * Avoid an update if the request_ptr call
+>> -     * memory_region_invalidate_mmio_ptr which seems to be likely whe=
+n we use
+>> -     * a cache.
+>> +     * Avoid an update if the request_mmio_exec hook calls
+>> +     * memory_region_invalidate_mmio_ptr, which it will do if the
+>> +     * device can only handle one outstanding MMIO exec region at onc=
+e.
+>>       */
+>>      memory_region_transaction_begin();
+>> =20
+>> -    host =3D mr->ops->request_ptr(mr->opaque, addr - mr->addr, &size,=
+ &offset);
+>> -
+>> -    if (!host || !size) {
+>> +    newmr =3D g_new0(MemoryRegion, 1);
+>> +    offset =3D addr - mr->addr;
+>> +    if (!mr->ops->request_mmio_exec(mr->opaque, newmr, &offset)) {
+>>          memory_region_transaction_commit();
+>> +        g_free(newmr);
+>>          return false;
+>>      }
+>> =20
+>> -    new_interface =3D object_new("mmio_interface");
+>> -    qdev_prop_set_uint64(DEVICE(new_interface), "start", offset);
+>> -    qdev_prop_set_uint64(DEVICE(new_interface), "end", offset + size =
+- 1);
+>> -    qdev_prop_set_bit(DEVICE(new_interface), "ro", true);
+>> -    qdev_prop_set_ptr(DEVICE(new_interface), "host_ptr", host);
+>> -    qdev_prop_set_ptr(DEVICE(new_interface), "subregion", mr);
+>> -    object_property_set_bool(OBJECT(new_interface), true, "realized",=
+ NULL);
+>> +    /* These requirements are because currently TCG needs a page size=
+d
+>> +     * area to execute from.
+>> +     */
+>> +    assert((offset & ~TARGET_PAGE_MASK) =3D=3D 0);
+>> +    assert((memory_region_size(newmr) & ~TARGET_PAGE_MASK) =3D=3D 0);
+>> =20
+>> +
+>> +    memory_region_add_subregion(mr, offset, newmr);
+>>      memory_region_transaction_commit();
+>> +
+>> +    /* Arrange that we automatically free this MemoryRegion when
+>> +     * its refcount goes to zero, which (once we've unrefed it here)
+>> +     * will happen when it is removed from the subregion.
+>> +     */
+>> +    OBJECT(newmr)->free =3D g_free;
+>> +    object_unref(OBJECT(newmr));
+>>      return true;
+>>  }
+>> =20
+>> +void *memory_region_mmio_ptr_alloc(void *alloc_token, uint64_t size)
+>> +{
+>> +    /* Allocate and return memory for an mmio_ptr request. This
+>> +     * is a function intended to be called from a memory region's
+>> +     * request_mmio_exec function, and the opaque pointer is the
+>> +     * newmr MemoryRegion allocated in memory_region_request_mmio_ptr=
+().
+>> +     */
+>> +    MemoryRegion *newmr =3D alloc_token;
+>> +    Error *err =3D NULL;
+>> +
+>> +    /* Note that in order for the refcounting to work correctly
+>> +     * without having to manufacture a device purely to be the
+>> +     * owner of the MemoryRegion, we must pass OBJECT(newmr) as
+>> +     * the owner (so the MR is its own owner!) and NULL as the name
+>> +     * (or the property created on the owner causes the refcount
+>> +     * to go negative during finalization)...
+>> +     */
+>> +    memory_region_init_ram_nomigrate(newmr, OBJECT(newmr), NULL,
+>> +                                     size, &err);
+>> +    if (err) {
+>> +        error_free(err);
+>> +        return NULL;
+>> +    }
+>> +
+>> +    return memory_region_get_ram_ptr(newmr);
+>> +}
+>> +
+>>  typedef struct MMIOPtrInvalidate {
+>>      MemoryRegion *mr;
+>>      hwaddr offset;
+>> @@ -2714,15 +2747,8 @@ static void memory_region_do_invalidate_mmio_pt=
+r(CPUState *cpu,
+>>      cpu_physical_memory_test_and_clear_dirty(offset, size, 1);
+>> =20
+>>      if (section.mr !=3D mr) {
+>> -        /* memory_region_find add a ref on section.mr */
+>> +        memory_region_del_subregion(mr, section.mr);
+>>          memory_region_unref(section.mr);
+>> -        if (MMIO_INTERFACE(section.mr->owner)) {
+>> -            /* We found the interface just drop it. */
+>> -            object_property_set_bool(section.mr->owner, false, "reali=
+zed",
+>> -                                     NULL);
+>> -            object_unref(section.mr->owner);
+>> -            object_unparent(section.mr->owner);
+>> -        }
+>>      }
+>> =20
+>>      qemu_mutex_unlock_iothread();
+>>
+>=20
