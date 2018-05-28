@@ -1,32 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53436)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60753)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fNQaH-00086y-T1
-	for qemu-devel@nongnu.org; Mon, 28 May 2018 18:25:46 -0400
+	id 1fNRY4-0006ia-GZ
+	for qemu-devel@nongnu.org; Mon, 28 May 2018 19:27:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fNQaE-0006Y9-PY
-	for qemu-devel@nongnu.org; Mon, 28 May 2018 18:25:45 -0400
-Received: from mail-qt0-x243.google.com ([2607:f8b0:400d:c0d::243]:36291)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fNQaE-0006Xc-L1
-	for qemu-devel@nongnu.org; Mon, 28 May 2018 18:25:42 -0400
-Received: by mail-qt0-x243.google.com with SMTP id q6-v6so16442140qtn.3
-	for <qemu-devel@nongnu.org>; Mon, 28 May 2018 15:25:42 -0700 (PDT)
+	id 1fNRY1-0000Nc-8S
+	for qemu-devel@nongnu.org; Mon, 28 May 2018 19:27:32 -0400
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
-References: <20180528194812.31216-1-laurent@vivier.eu>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <8eb9adce-2888-2557-c66a-fa88ba907a2c@amsat.org>
-Date: Mon, 28 May 2018 19:25:38 -0300
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Date: Mon, 28 May 2018 20:26:58 -0300
+Message-Id: <20180528232719.4721-1-f4bug@amsat.org>
 MIME-Version: 1.0
-In-Reply-To: <20180528194812.31216-1-laurent@vivier.eu>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH] linux-user: SPARC "rd %tick" can be used
- by user application
+Subject: [Qemu-devel] [PATCH v4 00/21] Includes cleanup
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,47 +24,176 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laurent Vivier <laurent@vivier.eu>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-devel@nongnu.org
-Cc: Riku Voipio <riku.voipio@iki.fi>, Artyom Tarasenko <atar4qemu@gmail.com>
+To: Thomas Huth <thuth@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, qemu-trivial@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>
 
-On 05/28/2018 04:48 PM, Laurent Vivier wrote:
-> we have the same problem decribed in 7d6b1daedd
-> ("linux-user, ppc: mftbl can be used by user application")
-> for ppc in the case of sparc.
-> 
-> When we use an application trying to resolve a name, it hangs in
-> 
->     0x00000000ff5dd40c:  rd  %tick, %o5
->     0x00000000ff5dd410:  srlx  %o5, 0x20, %o4
->     0x00000000ff5dd414:  btst  %o5, %g4
->     0x00000000ff5dd418:  be  %icc, 0xff5dd40c
-> 
-> because %tick is staying at 0.
-> 
-> As QEMU_CLOCK_VIRTUAL is not available in linux-user mode,
-> simply use cpu_get_host_ticks() instead.
-> 
-> Signed-off-by: Laurent Vivier <laurent@vivier.eu>
+Hi,
 
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+I split the previous series "Use the BYTE-based definitions when useful",
+this is the first generic part, only headers cleanup, which is big enough.
 
-> ---
->  target/sparc/helper.c | 4 +++-
->  1 file changed, 3 insertions(+), 1 deletion(-)
-> 
-> diff --git a/target/sparc/helper.c b/target/sparc/helper.c
-> index 1d854890b4..46232788c8 100644
-> --- a/target/sparc/helper.c
-> +++ b/target/sparc/helper.c
-> @@ -67,7 +67,9 @@ uint64_t helper_tick_get_count(CPUSPARCState *env, void *opaque, int mem_idx)
->  
->      return cpu_tick_get_count(timer);
->  #else
-> -    return 0;
-> +    /* In user-mode, QEMU_CLOCK_VIRTUAL doesn't exist.
-> +       Just pass through the host cpu clock ticks.  */
-> +    return cpu_get_host_ticks();
->  #endif
->  }
->  
-> 
+Many patches, but "12 insertions(+), 145 deletions(-)" \o/
+
+v3 was:
+http://lists.nongnu.org/archive/html/qemu-devel/2018-04/msg02049.html
+
+Philippe Mathieu-Daudé (21):
+  vfio: Include "exec/address-spaces.h" directly in the source file
+  accel: Do not include "exec/address-spaces.h" if it is not necessary
+  target: Do not include "exec/address-spaces.h" if it is not necessary
+  memory: Do not include "exec/ioport.h" if it is not necessary
+  target/i386: Do not include "exec/ioport.h" if it is not necessary
+  target/xtensa: Include "qemu/timer.h" to use NANOSECONDS_PER_SECOND
+  target/ppc: Include "exec/exec-all.h" which provides tlb_flush()
+  target/hppa: Include "qemu/log.h" to use qemu_log()
+  target: Do not include "exec/exec-all.h" if it is not necessary
+  hw: Do not include "exec/ioport.h" if it is not necessary
+  hw: Do not include "exec/address-spaces.h" if it is not necessary
+  hw: Do not include "sysemu/block-backend.h" if it is not necessary
+  hw: Do not include "sysemu/blockdev.h" if it is not necessary
+  hw: Do not include "sysemu/blockdev.h" if it is not necessary
+  hw/block/nvme: Include "qemu/cutils.h" directly in the source file
+  hw/misc/mips_itu: Cleanup includes
+  hw/misc/sga: Use the correct ISA include
+  hw/hppa: Remove unused include
+  hw/i386/pc: Remove unused include
+  hw/ide: Remove unused include
+  hw: Clean "hw/devices.h" includes
+
+ bsd-user/qemu.h                          | 1 -
+ hw/block/nvme.h                          | 1 -
+ hw/hppa/hppa_sys.h                       | 1 -
+ include/hw/arm/allwinner-a10.h           | 1 -
+ include/hw/arm/bcm2835_peripherals.h     | 1 -
+ include/hw/devices.h                     | 7 ++-----
+ include/hw/display/bcm2835_fb.h          | 1 -
+ include/hw/dma/bcm2835_dma.h             | 1 -
+ include/hw/misc/bcm2835_mbox.h           | 1 -
+ include/hw/misc/bcm2835_property.h       | 1 -
+ include/hw/misc/mips_itu.h               | 2 ++
+ include/hw/sh4/sh_intc.h                 | 1 -
+ include/hw/vfio/vfio-common.h            | 1 -
+ include/hw/virtio/virtio-access.h        | 1 -
+ target/arm/arm_ldst.h                    | 1 -
+ target/ppc/helper_regs.h                 | 1 +
+ accel/tcg/cpu-exec.c                     | 1 -
+ hw/acpi/pcihp.c                          | 1 -
+ hw/acpi/piix4.c                          | 1 -
+ hw/arm/aspeed.c                          | 1 -
+ hw/arm/bcm2836.c                         | 1 -
+ hw/arm/collie.c                          | 1 -
+ hw/arm/gumstix.c                         | 1 -
+ hw/arm/mainstone.c                       | 1 -
+ hw/arm/nseries.c                         | 1 -
+ hw/arm/omap1.c                           | 2 --
+ hw/arm/omap2.c                           | 2 --
+ hw/arm/omap_sx1.c                        | 1 -
+ hw/arm/pxa2xx.c                          | 1 -
+ hw/arm/spitz.c                           | 1 -
+ hw/arm/versatilepb.c                     | 1 -
+ hw/arm/vexpress.c                        | 1 -
+ hw/arm/virt.c                            | 1 -
+ hw/arm/xilinx_zynq.c                     | 1 -
+ hw/arm/xlnx-zcu102.c                     | 1 -
+ hw/arm/z2.c                              | 1 -
+ hw/block/dataplane/virtio-blk.c          | 1 -
+ hw/block/m25p80.c                        | 1 -
+ hw/block/nvme.c                          | 1 +
+ hw/block/onenand.c                       | 2 --
+ hw/block/pflash_cfi01.c                  | 1 -
+ hw/block/pflash_cfi02.c                  | 1 -
+ hw/block/virtio-blk.c                    | 1 -
+ hw/char/mcf_uart.c                       | 1 -
+ hw/char/serial.c                         | 1 -
+ hw/char/sh_serial.c                      | 1 -
+ hw/core/loader-fit.c                     | 1 -
+ hw/core/platform-bus.c                   | 1 -
+ hw/core/qdev-properties.c                | 1 -
+ hw/cris/axis_dev88.c                     | 1 -
+ hw/display/sm501.c                       | 1 -
+ hw/display/tc6393xb.c                    | 1 -
+ hw/i386/kvmvapic.c                       | 1 -
+ hw/i386/pc.c                             | 1 -
+ hw/i386/xen/xen-mapcache.c               | 1 -
+ hw/ide/core.c                            | 1 -
+ hw/ide/pci.c                             | 1 -
+ hw/ide/via.c                             | 1 -
+ hw/isa/isa-superio.c                     | 1 -
+ hw/lm32/lm32_boards.c                    | 1 -
+ hw/lm32/milkymist.c                      | 1 -
+ hw/m68k/mcf5206.c                        | 1 -
+ hw/m68k/mcf_intc.c                       | 1 -
+ hw/microblaze/petalogix_ml605_mmu.c      | 1 -
+ hw/microblaze/petalogix_s3adsp1800_mmu.c | 1 -
+ hw/mips/mips_malta.c                     | 1 -
+ hw/mips/mips_r4k.c                       | 1 -
+ hw/misc/arm_integrator_debug.c           | 1 -
+ hw/misc/mips_itu.c                       | 5 +----
+ hw/misc/sga.c                            | 2 +-
+ hw/net/mcf_fec.c                         | 1 -
+ hw/net/ne2000-isa.c                      | 1 -
+ hw/pci-host/versatile.c                  | 1 -
+ hw/ppc/ppc405_boards.c                   | 1 -
+ hw/ppc/sam460ex.c                        | 1 -
+ hw/ppc/spapr.c                           | 1 -
+ hw/ppc/virtex_ml507.c                    | 2 --
+ hw/riscv/riscv_htif.c                    | 1 -
+ hw/s390x/virtio-ccw.c                    | 2 --
+ hw/scsi/mptsas.c                         | 1 -
+ hw/scsi/scsi-generic.c                   | 1 -
+ hw/sd/pl181.c                            | 1 -
+ hw/sd/sdhci.c                            | 2 --
+ hw/sd/ssi-sd.c                           | 1 -
+ hw/sh4/r2d.c                             | 1 -
+ hw/sh4/sh7750.c                          | 1 -
+ hw/timer/sh_timer.c                      | 1 -
+ hw/usb/dev-storage.c                     | 1 -
+ hw/vfio/ccw.c                            | 1 +
+ hw/vfio/platform.c                       | 1 +
+ hw/virtio/virtio-pci.c                   | 1 -
+ hw/xen/xen_devconfig.c                   | 1 -
+ hw/xtensa/xtfpga.c                       | 1 -
+ memory.c                                 | 1 -
+ monitor.c                                | 1 -
+ target/arm/arm-powerctl.c                | 1 -
+ target/arm/crypto_helper.c               | 1 -
+ target/arm/iwmmxt_helper.c               | 1 -
+ target/arm/neon_helper.c                 | 1 -
+ target/arm/psci.c                        | 1 -
+ target/arm/vec_helper.c                  | 1 -
+ target/cris/cpu.c                        | 1 -
+ target/hppa/helper.c                     | 1 -
+ target/hppa/int_helper.c                 | 2 +-
+ target/i386/hax-all.c                    | 2 --
+ target/i386/hax-mem.c                    | 1 -
+ target/i386/hax-windows.c                | 1 -
+ target/i386/hvf/hvf.c                    | 2 --
+ target/i386/hvf/x86_task.c               | 3 ---
+ target/i386/kvm.c                        | 1 -
+ target/i386/whpx-all.c                   | 1 -
+ target/lm32/cpu.c                        | 1 -
+ target/m68k/cpu.c                        | 1 -
+ target/moxie/cpu.c                       | 1 -
+ target/moxie/mmu.c                       | 1 -
+ target/openrisc/cpu.c                    | 1 -
+ target/ppc/int_helper.c                  | 1 -
+ target/s390x/cpu.c                       | 1 -
+ target/s390x/diag.c                      | 1 -
+ target/s390x/helper.c                    | 1 -
+ target/s390x/kvm.c                       | 1 -
+ target/s390x/mem_helper.c                | 1 -
+ target/s390x/misc_helper.c               | 1 -
+ target/sparc/mmu_helper.c                | 1 -
+ target/tilegx/cpu.c                      | 1 -
+ target/xtensa/core-dc232b.c              | 2 +-
+ target/xtensa/core-dc233c.c              | 1 -
+ target/xtensa/core-de212.c               | 1 -
+ target/xtensa/core-fsf.c                 | 1 -
+ target/xtensa/core-sample_controller.c   | 1 -
+ target/xtensa/cpu.c                      | 1 -
+ tcg/tcg-op-vec.c                         | 1 -
+ target/xtensa/import_core.sh             | 1 -
+ 133 files changed, 12 insertions(+), 145 deletions(-)
+
+-- 
+2.17.0
