@@ -1,33 +1,37 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56918)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57463)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1fNEKl-00007W-4x
-	for qemu-devel@nongnu.org; Mon, 28 May 2018 05:20:56 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1fNEOW-0002XK-Hl
+	for qemu-devel@nongnu.org; Mon, 28 May 2018 05:24:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1fNEKg-0008TC-4J
-	for qemu-devel@nongnu.org; Mon, 28 May 2018 05:20:55 -0400
-Received: from 8.mo4.mail-out.ovh.net ([188.165.33.112]:53387)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1fNEKf-0008Ri-TO
-	for qemu-devel@nongnu.org; Mon, 28 May 2018 05:20:50 -0400
-Received: from player787.ha.ovh.net (unknown [10.109.120.21])
-	by mo4.mail-out.ovh.net (Postfix) with ESMTP id 3A82916C946
-	for <qemu-devel@nongnu.org>; Mon, 28 May 2018 11:20:47 +0200 (CEST)
-References: <20180518164405.11804-1-clg@kaod.org>
-	<20180518164405.11804-2-clg@kaod.org>
-	<20180525160249.7cb0a5bc@bahia.lan>
-	<82ee8b24-91d7-9396-82b7-be37200cfacd@redhat.com>
-	<a567d42f-af8e-01da-5e0b-9b6f41c150cf@kaod.org>
-	<8d7552ef-a0b2-621e-8d56-edb128874a6e@redhat.com>
-From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <a51f298d-d199-ca41-7059-f00a3538ba61@kaod.org>
-Date: Mon, 28 May 2018 11:20:36 +0200
+	(envelope-from <pbonzini@redhat.com>) id 1fNEOR-0001th-H0
+	for qemu-devel@nongnu.org; Mon, 28 May 2018 05:24:48 -0400
+Received: from mail-wr0-f195.google.com ([209.85.128.195]:41092)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1fNEOR-0001t6-AL
+	for qemu-devel@nongnu.org; Mon, 28 May 2018 05:24:43 -0400
+Received: by mail-wr0-f195.google.com with SMTP id u12-v6so19118025wrn.8
+	for <qemu-devel@nongnu.org>; Mon, 28 May 2018 02:24:43 -0700 (PDT)
+References: <CAFEAcA-hha7jMSfPTdNEVKhuJr4nwAx4wKmEk5E9+j-JS4U14w@mail.gmail.com>
+	<20180430103312.GH3249@redhat.com>
+	<20180430132107.0a37704d.cohuck@redhat.com>
+	<ac216b06-9469-addd-b5a1-3a3a89fd0782@redhat.com>
+	<20180502093326.2fbec55f.cohuck@redhat.com>
+	<CAG7hfcKo62hpq-qkVE8_+pR1R6uQKcG_FuNuNo1yGqGV-6oazQ@mail.gmail.com>
+	<20180502075904.GF3308@redhat.com>
+	<CAG7hfcKEiNfLR0xW6b2FPFAN1L4xs81ozPXZAZAs=+Wzs6Q2Vw@mail.gmail.com>
+	<de11d2a4-3bd0-42e3-5bff-79c160e9c5df@redhat.com>
+	<CAG7hfc+rXFSHE7P4dA-2YhSnW1fXmsaK4zT6n9yCf+a_ALxm1A@mail.gmail.com>
+	<20180502091039.GK3308@redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <17473814-91c4-6816-621c-1762473dc88e@redhat.com>
+Date: Mon, 28 May 2018 11:24:39 +0200
 MIME-Version: 1.0
-In-Reply-To: <8d7552ef-a0b2-621e-8d56-edb128874a6e@redhat.com>
+In-Reply-To: <20180502091039.GK3308@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH 1/4] spapr: remove irq_hint
- parameter from spapr_irq_alloc()
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] release retrospective, next release timing,
+ numbering
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,77 +40,24 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, Greg Kurz <groug@kaod.org>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
+To: "=?UTF-8?Q?Daniel_P._Berrang=c3=a9?=" <berrange@redhat.com>, Liviu Ionescu <ilg@livius.net>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>, Cornelia Huck <cohuck@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>
 
-On 05/28/2018 09:18 AM, Thomas Huth wrote:
-> On 28.05.2018 09:06, C=C3=A9dric Le Goater wrote:
->> On 05/28/2018 08:17 AM, Thomas Huth wrote:
->>> On 25.05.2018 16:02, Greg Kurz wrote:
->>>> On Fri, 18 May 2018 18:44:02 +0200
->>>> C=C3=A9dric Le Goater <clg@kaod.org> wrote:
->>>>
->>>>> This IRQ number hint can possibly be used by the VIO devices if the
->>>>> "irq" property is defined on the command line but it seems it is ne=
-ver
->>>>> the case. It is not used in libvirt for instance. So, let's remove =
-it
->>>>> to simplify future changes.
->>>>>
->>>>
->>>> Setting an irq manually looks a bit anachronistic. I doubt anyone wo=
-uld
->>>> do that nowadays, and the patch does a nice cleanup. So this looks l=
-ike
->>>> a good idea.
->>> [...]
->>>>> diff --git a/hw/ppc/spapr_vio.c b/hw/ppc/spapr_vio.c
->>>>> index 472dd6f33a96..cc064f64fccf 100644
->>>>> --- a/hw/ppc/spapr_vio.c
->>>>> +++ b/hw/ppc/spapr_vio.c
->>>>> @@ -455,7 +455,7 @@ static void spapr_vio_busdev_realize(DeviceStat=
-e *qdev, Error **errp)
->>>>>          dev->qdev.id =3D id;
->>>>>      }
->>>>> =20
->>>>> -    dev->irq =3D spapr_irq_alloc(spapr, dev->irq, false, &local_er=
-r);
->>>>> +    dev->irq =3D spapr_irq_alloc(spapr, false, &local_err);
->>>>
->>>> Silently breaking "irq" like this looks wrong. I'd rather officially=
- remove
->>>> it first (ie, kill spapr_vio_props, -5 lines in spapr_vio.c).
->>>>
->>>> Of course, this raises the question of interface deprecation, and it=
- should
->>>> theoretically follow the process described at:
->>>>
->>>> https://wiki.qemu.org/Features/LegacyRemoval#Rules_for_removing_an_i=
-nterface
->>>>
->>>> Cc'ing Thomas, our Chief Deprecation Officer, for insights :)
->>>
->>> The property is a public interface. Just because it's not used by
->>> libvirt does not mean that nobody is using it. So yes, please follow =
-the
->>> rules and mark it as deprecated first for two release, before you rea=
-lly
->>> remove it.
+On 02/05/2018 11:10, Daniel P. Berrangé wrote:
+>> it would allow to postpone incompatible removals to relatively seldom
+>> major releases, add new features during more often minor releases, and
+>> fix bugs during regular patch releases.
 >>
->> This "irq" property is a problem to introduce a new static layout of I=
-RQ=20
->> numbers. It is in complete opposition.=20
->>
->> Can we keep it as it is for old pseries machine (settable) and ignore =
-it=20
->> for newer ? Would that be fine ?
->=20
-> I think that would be fine, too. You likely need to keep the settable
-> IRQs around for the old machines anyway, to make sure that migration of
-> the old machine types still works, right?
+>> major releases can be scheduled every 1-2 years, for example, minor
+>> releases every 3-6 months, and patch releases when needed.
+> No, we do not want to extend the deprecation period further just so that
+> we can adopt semver.  We explicitly chose "2 releases", so that every
+> deprecation warning has the same lifetime - we don't want some deprecations
+> to be 4 months long, while other deprecation warnings are 1+1/2 years long.
 
-Yes, that is the goal of patch 3. It introduces a common sPAPR IRQ fronte=
-nd,
-the first backend being the current one.
+In practice it's already "at least" 2 releases, if only because
+sometimes 1) people forget, or 2) they are busy with more important
+things, or 3) we want to provide a good replacement and it turns out to
+be harder than 2 releases.
 
-C.
+Paolo
