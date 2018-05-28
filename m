@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34680)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35322)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1fNCN5-0005ft-BE
-	for qemu-devel@nongnu.org; Mon, 28 May 2018 03:15:12 -0400
+	(envelope-from <thuth@redhat.com>) id 1fNCQi-0008M2-H4
+	for qemu-devel@nongnu.org; Mon, 28 May 2018 03:18:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1fNCN4-0008GH-0T
-	for qemu-devel@nongnu.org; Mon, 28 May 2018 03:15:11 -0400
-Received: from mail.ispras.ru ([83.149.199.45]:46994)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1fNCN3-0008FE-JV
-	for qemu-devel@nongnu.org; Mon, 28 May 2018 03:15:09 -0400
-From: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
-Date: Mon, 28 May 2018 10:15:09 +0300
-Message-ID: <20180528071509.9424.95871.stgit@pasha-VirtualBox>
-In-Reply-To: <20180528071332.9424.27343.stgit@pasha-VirtualBox>
-References: <20180528071332.9424.27343.stgit@pasha-VirtualBox>
+	(envelope-from <thuth@redhat.com>) id 1fNCQf-0002rI-7V
+	for qemu-devel@nongnu.org; Mon, 28 May 2018 03:18:56 -0400
+References: <20180518164405.11804-1-clg@kaod.org>
+	<20180518164405.11804-2-clg@kaod.org>
+	<20180525160249.7cb0a5bc@bahia.lan>
+	<82ee8b24-91d7-9396-82b7-be37200cfacd@redhat.com>
+	<a567d42f-af8e-01da-5e0b-9b6f41c150cf@kaod.org>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <8d7552ef-a0b2-621e-8d56-edb128874a6e@redhat.com>
+Date: Mon, 28 May 2018 09:18:49 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] [PATCH v4 17/19] gdbstub: add reverse continue support
- in replay mode
+In-Reply-To: <a567d42f-af8e-01da-5e0b-9b6f41c150cf@kaod.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH 1/4] spapr: remove irq_hint
+ parameter from spapr_irq_alloc()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,197 +28,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, peter.maydell@linaro.org, war2jordan@live.com, crosthwaite.peter@gmail.com, boost.lists@gmail.com, quintela@redhat.com, ciro.santilli@gmail.com, jasowang@redhat.com, mst@redhat.com, zuban32s@gmail.com, armbru@redhat.com, maria.klimushenkova@ispras.ru, dovgaluk@ispras.ru, kraxel@redhat.com, pavel.dovgaluk@ispras.ru, thomas.dullien@googlemail.com, pbonzini@redhat.com, mreitz@redhat.com, alex.bennee@linaro.org, dgilbert@redhat.com, rth@twiddle.net
+To: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>, Greg Kurz <groug@kaod.org>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
 
-This patch adds support of the reverse continue operation for gdbstub.
-Reverse continue finds the last breakpoint that would happen in normal
-execution from the beginning to the current moment.
-Implementation of the reverse continue replays the execution twice:
-to find the breakpoints that were hit and to seek to the last breakpoint.
-Reverse continue loads the previous snapshot and tries to find the breakpoint
-since that moment. If there are no such breakpoints, it proceeds to
-the earlier snapshot, and so on. When no breakpoints or watchpoints were
-hit at all, execution stops at the beginning of the replay log.
+On 28.05.2018 09:06, C=C3=A9dric Le Goater wrote:
+> On 05/28/2018 08:17 AM, Thomas Huth wrote:
+>> On 25.05.2018 16:02, Greg Kurz wrote:
+>>> On Fri, 18 May 2018 18:44:02 +0200
+>>> C=C3=A9dric Le Goater <clg@kaod.org> wrote:
+>>>
+>>>> This IRQ number hint can possibly be used by the VIO devices if the
+>>>> "irq" property is defined on the command line but it seems it is nev=
+er
+>>>> the case. It is not used in libvirt for instance. So, let's remove i=
+t
+>>>> to simplify future changes.
+>>>>
+>>>
+>>> Setting an irq manually looks a bit anachronistic. I doubt anyone wou=
+ld
+>>> do that nowadays, and the patch does a nice cleanup. So this looks li=
+ke
+>>> a good idea.
+>> [...]
+>>>> diff --git a/hw/ppc/spapr_vio.c b/hw/ppc/spapr_vio.c
+>>>> index 472dd6f33a96..cc064f64fccf 100644
+>>>> --- a/hw/ppc/spapr_vio.c
+>>>> +++ b/hw/ppc/spapr_vio.c
+>>>> @@ -455,7 +455,7 @@ static void spapr_vio_busdev_realize(DeviceState=
+ *qdev, Error **errp)
+>>>>          dev->qdev.id =3D id;
+>>>>      }
+>>>> =20
+>>>> -    dev->irq =3D spapr_irq_alloc(spapr, dev->irq, false, &local_err=
+);
+>>>> +    dev->irq =3D spapr_irq_alloc(spapr, false, &local_err);
+>>>
+>>> Silently breaking "irq" like this looks wrong. I'd rather officially =
+remove
+>>> it first (ie, kill spapr_vio_props, -5 lines in spapr_vio.c).
+>>>
+>>> Of course, this raises the question of interface deprecation, and it =
+should
+>>> theoretically follow the process described at:
+>>>
+>>> https://wiki.qemu.org/Features/LegacyRemoval#Rules_for_removing_an_in=
+terface
+>>>
+>>> Cc'ing Thomas, our Chief Deprecation Officer, for insights :)
+>>
+>> The property is a public interface. Just because it's not used by
+>> libvirt does not mean that nobody is using it. So yes, please follow t=
+he
+>> rules and mark it as deprecated first for two release, before you real=
+ly
+>> remove it.
+>=20
+> This "irq" property is a problem to introduce a new static layout of IR=
+Q=20
+> numbers. It is in complete opposition.=20
+>=20
+> Can we keep it as it is for old pseries machine (settable) and ignore i=
+t=20
+> for newer ? Would that be fine ?
 
-Signed-off-by: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
----
- cpus.c                    |    3 ++
- exec.c                    |    1 +
- gdbstub.c                 |   10 ++++++-
- include/sysemu/replay.h   |    6 ++++
- replay/replay-debugging.c |   69 +++++++++++++++++++++++++++++++++++++++++++++
- stubs/replay.c            |    5 +++
- 6 files changed, 93 insertions(+), 1 deletion(-)
+I think that would be fine, too. You likely need to keep the settable
+IRQs around for the old machines anyway, to make sure that migration of
+the old machine types still works, right?
 
-diff --git a/cpus.c b/cpus.c
-index 01016af..21bd26f 100644
---- a/cpus.c
-+++ b/cpus.c
-@@ -1048,6 +1048,9 @@ static void cpu_handle_guest_debug(CPUState *cpu)
-         cpu->stopped = true;
-     } else {
-         if (!cpu->singlestep_enabled) {
-+            /* Report about the breakpoint and
-+               make a single step to skip it */
-+            replay_breakpoint();
-             cpu_single_step(cpu, SSTEP_ENABLE);
-         } else {
-             cpu_single_step(cpu, 0);
-diff --git a/exec.c b/exec.c
-index fd037f8..947207c 100644
---- a/exec.c
-+++ b/exec.c
-@@ -2584,6 +2584,7 @@ static void check_watchpoint(int offset, int len, MemTxAttrs attrs, int flags)
-             if (replay_running_debug()) {
-                 /* Don't process the watchpoints when we are
-                    in a reverse debugging operation. */
-+                replay_breakpoint();
-                 return;
-             }
-             if (flags == BP_MEM_READ) {
-diff --git a/gdbstub.c b/gdbstub.c
-index 12aac79..7771fc1 100644
---- a/gdbstub.c
-+++ b/gdbstub.c
-@@ -1111,6 +1111,14 @@ static int gdb_handle_packet(GDBState *s, const char *line_buf)
-                     put_packet(s, "E14");
-                     break;
-                 }
-+            case 'c':
-+                if (replay_reverse_continue()) {
-+                    gdb_continue(s);
-+                    return RS_IDLE;
-+                } else {
-+                    put_packet(s, "E14");
-+                    break;
-+                }
-             default:
-                 goto unknown_command;
-             }
-@@ -1381,7 +1389,7 @@ static int gdb_handle_packet(GDBState *s, const char *line_buf)
-                 pstrcat(buf, sizeof(buf), ";qXfer:features:read+");
-             }
-             if (replay_mode == REPLAY_MODE_PLAY) {
--                pstrcat(buf, sizeof(buf), ";ReverseStep+");
-+                pstrcat(buf, sizeof(buf), ";ReverseStep+;ReverseContinue+");
-             }
-             put_packet(s, buf);
-             break;
-diff --git a/include/sysemu/replay.h b/include/sysemu/replay.h
-index 611eabb..a3113c1 100644
---- a/include/sysemu/replay.h
-+++ b/include/sysemu/replay.h
-@@ -78,9 +78,15 @@ void replay_break(int64_t step, QEMUTimerCB callback, void *opaque);
-     Used by gdbstub for backwards debugging.
-     Returns true on success. */
- bool replay_reverse_step(void);
-+/*! Start searching the last breakpoint/watchpoint.
-+    Used by gdbstub for backwards debugging.
-+    Returns true if the process successfully started. */
-+bool replay_reverse_continue(void);
- /*! Returns true if replay module is processing
-     reverse_continue or reverse_step request */
- bool replay_running_debug(void);
-+/*! Called in reverse debugging mode to collect breakpoint information */
-+void replay_breakpoint(void);
- 
- /* Processing the instructions */
- 
-diff --git a/replay/replay-debugging.c b/replay/replay-debugging.c
-index 388cf12..edab98e 100644
---- a/replay/replay-debugging.c
-+++ b/replay/replay-debugging.c
-@@ -22,6 +22,8 @@
- #include "migration/snapshot.h"
- 
- static bool replay_is_debugging;
-+static int64_t replay_last_breakpoint;
-+static int64_t replay_last_snapshot;
- 
- bool replay_running_debug(void)
- {
-@@ -216,3 +218,70 @@ bool replay_reverse_step(void)
- 
-     return false;
- }
-+
-+static void replay_continue_end(void)
-+{
-+    replay_is_debugging = false;
-+    vm_stop(RUN_STATE_DEBUG);
-+    replay_break(-1LL, NULL, NULL);
-+}
-+
-+static void replay_continue_stop(void *opaque)
-+{
-+    Error *err = NULL;
-+    if (replay_last_breakpoint != -1LL) {
-+        replay_seek(replay_last_breakpoint, &err, replay_stop_vm_debug);
-+        if (err) {
-+            error_free(err);
-+            replay_continue_end();
-+        }
-+        return;
-+    }
-+    /* No breakpoints since the last snapshot.
-+       Find previous snapshot and try again. */
-+    if (replay_last_snapshot != 0) {
-+        replay_seek(replay_last_snapshot - 1, &err, replay_continue_stop);
-+        if (err) {
-+            error_free(err);
-+            replay_continue_end();
-+        }
-+        replay_last_snapshot = replay_get_current_step();
-+        return;
-+    } else {
-+        /* Seek to the very first step */
-+        replay_seek(0, &err, replay_stop_vm_debug);
-+        if (err) {
-+            error_free(err);
-+            replay_continue_end();
-+        }
-+        return;
-+    }
-+    replay_continue_end();
-+}
-+
-+bool replay_reverse_continue(void)
-+{
-+    Error *err = NULL;
-+
-+    assert(replay_mode == REPLAY_MODE_PLAY);
-+
-+    if (replay_get_current_step() != 0) {
-+        replay_seek(replay_get_current_step() - 1, &err, replay_continue_stop);
-+        if (err) {
-+            error_free(err);
-+            return false;
-+        }
-+        replay_last_breakpoint = -1LL;
-+        replay_is_debugging = true;
-+        replay_last_snapshot = replay_get_current_step();
-+        return true;
-+    }
-+
-+    return false;
-+}
-+
-+void replay_breakpoint(void)
-+{
-+    assert(replay_mode == REPLAY_MODE_PLAY);
-+    replay_last_breakpoint = replay_get_current_step();
-+}
-diff --git a/stubs/replay.c b/stubs/replay.c
-index b0fba0e..781974e 100644
---- a/stubs/replay.c
-+++ b/stubs/replay.c
-@@ -85,3 +85,8 @@ bool replay_reverse_step(void)
- {
-     return false;
- }
-+
-+bool replay_reverse_continue(void)
-+{
-+    return false;
-+}
+ Thomas
