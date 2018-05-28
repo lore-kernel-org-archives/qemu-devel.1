@@ -1,21 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46931)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48480)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fNFlY-0002vD-FH
-	for qemu-devel@nongnu.org; Mon, 28 May 2018 06:52:41 -0400
+	(envelope-from <lersek@redhat.com>) id 1fNFvG-00051U-JE
+	for qemu-devel@nongnu.org; Mon, 28 May 2018 07:02:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fNFlX-0003DN-Gh
-	for qemu-devel@nongnu.org; Mon, 28 May 2018 06:52:40 -0400
-Date: Mon, 28 May 2018 12:52:32 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20180528105232.GD4580@localhost.localdomain>
-References: <20180425183223.580566-1-eblake@redhat.com>
-	<20180425183223.580566-3-eblake@redhat.com>
+	(envelope-from <lersek@redhat.com>) id 1fNFvD-00007o-FR
+	for qemu-devel@nongnu.org; Mon, 28 May 2018 07:02:42 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:49250 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1fNFvD-000075-BI
+	for qemu-devel@nongnu.org; Mon, 28 May 2018 07:02:39 -0400
+From: Laszlo Ersek <lersek@redhat.com>
+References: <1526801333-30613-1-git-send-email-whois.zihan.yang@gmail.com>
+	<1526801333-30613-4-git-send-email-whois.zihan.yang@gmail.com>
+	<ef3fc85d-7726-c888-e8ca-9dfae1b908d3@gmail.com>
+	<17a3765f-b835-2d45-e8b9-ffd4aff909f9@redhat.com>
+	<cbdfe0d6-f071-3560-009d-3bbdde12b33c@gmail.com>
+	<f71a8c61-a0d7-6ebc-62ad-3dab8b9f8e5a@redhat.com>
+	<dd40007d-b63b-d965-505f-11ff0748e54f@redhat.com>
+	<20180523023944-mutt-send-email-mst@kernel.org>
+	<e027866e-9740-0866-f1c4-45b8181a6f71@redhat.com>
+Message-ID: <94894098-a8a7-b7d3-9936-003a68fb68a0@redhat.com>
+Date: Mon, 28 May 2018 13:02:35 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180425183223.580566-3-eblake@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 2/8] qcow: Switch get_cluster_offset to be
- byte-based
+In-Reply-To: <e027866e-9740-0866-f1c4-45b8181a6f71@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [RFC 3/3] acpi-build: allocate mcfg for multiple
+ host bridges
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,87 +36,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: qemu-devel@nongnu.org, "open list:qcow" <qemu-block@nongnu.org>, Max Reitz <mreitz@redhat.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Zihan Yang <whois.zihan.yang@gmail.com>, qemu-devel@nongnu.org, Igor Mammedov <imammedo@redhat.com>, Alex Williamson <alex.williamson@redhat.com>, Eric Auger <eauger@redhat.com>, Drew Jones <drjones@redhat.com>, Wei Huang <wei@redhat.com>
 
-Am 25.04.2018 um 20:32 hat Eric Blake geschrieben:
-> We are gradually moving away from sector-based interfaces, towards
-> byte-based.  Make the change for the internal helper function
-> get_cluster_offset(), by changing n_start and n_end to by byte
-> offsets rather than sector indices within the cluster being
-> allocated.
+On 05/23/18 09:32, Laszlo Ersek wrote:
+> On 05/23/18 01:40, Michael S. Tsirkin wrote:
+>> On Wed, May 23, 2018 at 12:42:09AM +0200, Laszlo Ersek wrote:
+>>> Hold on,
+>>>
+>>> On 05/22/18 21:51, Laszlo Ersek wrote:
+>>>
+>>>> It had taken years until the edk2 core gained a universal
+>>>> PciHostBridgeDxe driver with a well-defined platform customization
+>>>> interface, and that interface doesn't support multiple domains /
+>>>> segments.
+>>>
+>>> after doing a bit more research: I was wrong about this. What I
+>>> remembered was not the current state. Edk2 does seem to support multiple
+>>> domains, with different segment numbers, ECAM base addresses, and bus
+>>> number ranges. If we figure out a placement strategy or an easy to
+>>> consume representation of these data for the firmware, it might be
+>>> possible for OVMF to hook them into the edk2 core (although not in the
+>>> earliest firmware phases, such as SEC and PEI).
+>>>
+>>> In retrospect, I'm honestly surprised that so much multi-segment support
+>>> has been upstreamed to the edk2 core. Sorry about the FUD. (My general
+>>> points remain valid, for the record... But perhaps they no longer matter
+>>> for this discussion.)
+>>>
+>>> (I meant to send this message soon after
+>>> <http://mid.mail-archive.com/fc603491-7c41-e862-a583-2bae6f165b5a@redhat.com>,
+>>> but my internet connection had to die right then.)
+>>>
+>>> Thanks
+>>> Laszlo
+>>
+>> Is there support for any hardware which we could emulate?
 > 
-> A later patch will then switch the qcow driver as a whole over
-> to byte-based operation.
-> 
-> Signed-off-by: Eric Blake <eblake@redhat.com>
-> ---
->  block/qcow.c | 28 ++++++++++++++--------------
->  1 file changed, 14 insertions(+), 14 deletions(-)
-> 
-> diff --git a/block/qcow.c b/block/qcow.c
-> index dd042b8ddbe..32730a8dd91 100644
-> --- a/block/qcow.c
-> +++ b/block/qcow.c
-> @@ -345,8 +345,8 @@ static int qcow_reopen_prepare(BDRVReopenState *state,
->   *
->   * 0 to not allocate.
->   *
-> - * 1 to allocate a normal cluster (for sector indexes 'n_start' to
-> - * 'n_end')
-> + * 1 to allocate a normal cluster (for byte offsets 'n_start' to
-> + * 'n_end' within the cluster)
->   *
->   * 2 to allocate a compressed cluster of size
->   * 'compressed_size'. 'compressed_size' must be > 0 and <
-> @@ -442,7 +442,7 @@ static int get_cluster_offset(BlockDriverState *bs,
->          BLKDBG_EVENT(bs->file, BLKDBG_CLUSTER_ALLOC);
->          /* allocate a new cluster */
->          if ((cluster_offset & QCOW_OFLAG_COMPRESSED) &&
-> -            (n_end - n_start) < s->cluster_sectors) {
-> +            (n_end - n_start) < s->cluster_size) {
->              /* if the cluster is already compressed, we must
->                 decompress it in the case it is not completely
->                 overwritten */
-> @@ -480,16 +480,15 @@ static int get_cluster_offset(BlockDriverState *bs,
->                  /* if encrypted, we must initialize the cluster
->                     content which won't be written */
->                  if (bs->encrypted &&
-> -                    (n_end - n_start) < s->cluster_sectors) {
-> -                    uint64_t start_sect;
-> +                    (n_end - n_start) < s->cluster_size) {
-> +                    uint64_t start_offset;
->                      assert(s->crypto);
-> -                    start_sect = (offset & ~(s->cluster_size - 1)) >> 9;
-> -                    for(i = 0; i < s->cluster_sectors; i++) {
-> +                    start_offset = offset & ~(s->cluster_size - 1);
-> +                    for (i = 0; i < s->cluster_size; i += BDRV_SECTOR_SIZE) {
->                          if (i < n_start || i >= n_end) {
-> -                            memset(s->cluster_data, 0x00, 512);
-> +                            memset(s->cluster_data, 0x00, BDRV_SECTOR_SIZE);
->                              if (qcrypto_block_encrypt(s->crypto,
-> -                                                      (start_sect + i) *
-> -                                                      BDRV_SECTOR_SIZE,
-> +                                                      start_offset + i,
->                                                        s->cluster_data,
->                                                        BDRV_SECTOR_SIZE,
->                                                        NULL) < 0) {
+> I don't see any actual hw support in the edk2 project, but I'll ask.
 
-This code is still working in blocks of BDRV_SECTOR_SIZE here - which
-you do need to keep at least partially because that's the block size
-that qcrypto_block_encrypt() works with. qcrypto_block_qcow_encrypt()
-even asserts it.
+I got an answer in the negative.
 
-However, this means that even though n_start and n_end are byte-based
-now, the code only works correctly with encrypted images if they are
-multiples of BDRV_SECTOR_SIZE. This is currently true and we could
-assert it, but it would kind of defeat the purpose of the patch.
-
-I suppose you could make unaligned n_start/n_end work if you round down
-n_start and round up n_end to the next sector boundary for the
-comparison with i. For unaligned requests, we would then write a bit
-more than is actually necessary, but I think that's okay because we're
-initialising a previously unallocated cluster, so we don't overwrite
-valid data.
-
-Kevin
+Thanks
+Laszlo
