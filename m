@@ -1,33 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34905)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39246)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1fNGxl-0003uL-5o
-	for qemu-devel@nongnu.org; Mon, 28 May 2018 08:09:22 -0400
+	(envelope-from <groug@kaod.org>) id 1fNHJO-0006w6-9w
+	for qemu-devel@nongnu.org; Mon, 28 May 2018 08:31:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1fNGxi-0006Pa-07
-	for qemu-devel@nongnu.org; Mon, 28 May 2018 08:09:21 -0400
-Received: from 1.mo68.mail-out.ovh.net ([46.105.41.146]:39856)
+	(envelope-from <groug@kaod.org>) id 1fNHJL-0008LV-6C
+	for qemu-devel@nongnu.org; Mon, 28 May 2018 08:31:42 -0400
+Received: from 20.mo1.mail-out.ovh.net ([188.165.45.168]:35404)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1fNGxh-0006Ok-QI
-	for qemu-devel@nongnu.org; Mon, 28 May 2018 08:09:17 -0400
-Received: from player791.ha.ovh.net (unknown [10.109.105.95])
-	by mo68.mail-out.ovh.net (Postfix) with ESMTP id 7248CE1053
-	for <qemu-devel@nongnu.org>; Mon, 28 May 2018 14:09:13 +0200 (CEST)
-Date: Mon, 28 May 2018 14:09:04 +0200
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1fNHJK-0008KW-Ut
+	for qemu-devel@nongnu.org; Mon, 28 May 2018 08:31:39 -0400
+Received: from player763.ha.ovh.net (unknown [10.109.105.80])
+	by mo1.mail-out.ovh.net (Postfix) with ESMTP id C7837FF17B
+	for <qemu-devel@nongnu.org>; Mon, 28 May 2018 14:31:36 +0200 (CEST)
+Date: Mon, 28 May 2018 14:31:32 +0200
 From: Greg Kurz <groug@kaod.org>
-Message-ID: <20180528140904.7f673c63@bahia.lan>
-In-Reply-To: <a51f298d-d199-ca41-7059-f00a3538ba61@kaod.org>
-References: <20180518164405.11804-1-clg@kaod.org>
-	<20180518164405.11804-2-clg@kaod.org>
-	<20180525160249.7cb0a5bc@bahia.lan>
-	<82ee8b24-91d7-9396-82b7-be37200cfacd@redhat.com>
-	<a567d42f-af8e-01da-5e0b-9b6f41c150cf@kaod.org>
-	<8d7552ef-a0b2-621e-8d56-edb128874a6e@redhat.com>
-	<a51f298d-d199-ca41-7059-f00a3538ba61@kaod.org>
+Message-ID: <20180528143132.6733e0db@bahia.lan>
+In-Reply-To: <b8019eac434b2e61813a2061090d85401c6c44c4.1527310210.git.keno@alumni.harvard.edu>
+References: <cover.1527310210.git.keno@alumni.harvard.edu>
+	<b8019eac434b2e61813a2061090d85401c6c44c4.1527310210.git.keno@alumni.harvard.edu>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH 1/4] spapr: remove irq_hint
- parameter from spapr_irq_alloc()
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 01/13] 9p: linux: Fix a couple Linux
+ assumptions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,85 +31,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?B?Q8OpZHJpYw==?= Le Goater <clg@kaod.org>
-Cc: Thomas Huth <thuth@redhat.com>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
+To: keno@juliacomputing.com
+Cc: qemu-devel@nongnu.org, Keno Fischer <keno@alumni.harvard.edu>
 
-On Mon, 28 May 2018 11:20:36 +0200
-C=C3=A9dric Le Goater <clg@kaod.org> wrote:
+On Sat, 26 May 2018 01:23:03 -0400
+keno@juliacomputing.com wrote:
 
-> On 05/28/2018 09:18 AM, Thomas Huth wrote:
-> > On 28.05.2018 09:06, C=C3=A9dric Le Goater wrote: =20
-> >> On 05/28/2018 08:17 AM, Thomas Huth wrote: =20
-> >>> On 25.05.2018 16:02, Greg Kurz wrote: =20
-> >>>> On Fri, 18 May 2018 18:44:02 +0200
-> >>>> C=C3=A9dric Le Goater <clg@kaod.org> wrote:
-> >>>> =20
-> >>>>> This IRQ number hint can possibly be used by the VIO devices if the
-> >>>>> "irq" property is defined on the command line but it seems it is ne=
-ver
-> >>>>> the case. It is not used in libvirt for instance. So, let's remove =
-it
-> >>>>> to simplify future changes.
-> >>>>> =20
-> >>>>
-> >>>> Setting an irq manually looks a bit anachronistic. I doubt anyone wo=
-uld
-> >>>> do that nowadays, and the patch does a nice cleanup. So this looks l=
-ike
-> >>>> a good idea. =20
-> >>> [...] =20
-> >>>>> diff --git a/hw/ppc/spapr_vio.c b/hw/ppc/spapr_vio.c
-> >>>>> index 472dd6f33a96..cc064f64fccf 100644
-> >>>>> --- a/hw/ppc/spapr_vio.c
-> >>>>> +++ b/hw/ppc/spapr_vio.c
-> >>>>> @@ -455,7 +455,7 @@ static void spapr_vio_busdev_realize(DeviceStat=
-e *qdev, Error **errp)
-> >>>>>          dev->qdev.id =3D id;
-> >>>>>      }
-> >>>>> =20
-> >>>>> -    dev->irq =3D spapr_irq_alloc(spapr, dev->irq, false, &local_er=
-r);
-> >>>>> +    dev->irq =3D spapr_irq_alloc(spapr, false, &local_err); =20
-> >>>>
-> >>>> Silently breaking "irq" like this looks wrong. I'd rather officially=
- remove
-> >>>> it first (ie, kill spapr_vio_props, -5 lines in spapr_vio.c).
-> >>>>
-> >>>> Of course, this raises the question of interface deprecation, and it=
- should
-> >>>> theoretically follow the process described at:
-> >>>>
-> >>>> https://wiki.qemu.org/Features/LegacyRemoval#Rules_for_removing_an_i=
-nterface
-> >>>>
-> >>>> Cc'ing Thomas, our Chief Deprecation Officer, for insights :) =20
-> >>>
-> >>> The property is a public interface. Just because it's not used by
-> >>> libvirt does not mean that nobody is using it. So yes, please follow =
-the
-> >>> rules and mark it as deprecated first for two release, before you rea=
-lly
-> >>> remove it. =20
-> >>
-> >> This "irq" property is a problem to introduce a new static layout of I=
-RQ=20
-> >> numbers. It is in complete opposition.=20
-> >>
-> >> Can we keep it as it is for old pseries machine (settable) and ignore =
-it=20
-> >> for newer ? Would that be fine ? =20
-> >=20
-> > I think that would be fine, too. You likely need to keep the settable
-> > IRQs around for the old machines anyway, to make sure that migration of
-> > the old machine types still works, right? =20
->=20
-> Yes, that is the goal of patch 3. It introduces a common sPAPR IRQ fronte=
-nd,
-> the first backend being the current one.
->=20
+> From: Keno Fischer <keno@alumni.harvard.edu>
+> 
+>  - Guard two Linux only headers.
+>  - Define `ENOATTR` only if not only defined
+>    (it's defined in system headers on Darwin).
+> 
+> Signed-off-by: Keno Fischer <keno@juliacomputing.com>
+> ---
+>  fsdev/file-op-9p.h   | 2 ++
+>  hw/9pfs/9p-local.c   | 2 ++
+>  include/qemu/xattr.h | 4 +++-
 
-If we keep "irq" but we ignore it with newer machine types, we should at
-least print a warning then IMHO.
+Irrespectively of the discussion on checking this in configure, 
+there's another user of <sys/vfs.h> in fsdev/virtfs-proxy-helper.c.
+I see in patch 13 that the helper won't be built on Darwin, but
+this could change, and anyway, I'd like the handling of <sys/vfs.h>
+to stay consistent across the VirtFS code.
 
-> C.
->=20
+>  3 files changed, 7 insertions(+), 1 deletion(-)
+> 
+> diff --git a/fsdev/file-op-9p.h b/fsdev/file-op-9p.h
+> index 3fa062b..a13e729 100644
+> --- a/fsdev/file-op-9p.h
+> +++ b/fsdev/file-op-9p.h
+> @@ -16,7 +16,9 @@
+>  
+>  #include <dirent.h>
+>  #include <utime.h>
+> +#ifdef CONFIG_LINUX
+>  #include <sys/vfs.h>
+> +#endif
+>  #include "qemu-fsdev-throttle.h"
+>  
+>  #define SM_LOCAL_MODE_BITS    0600
+> diff --git a/hw/9pfs/9p-local.c b/hw/9pfs/9p-local.c
+> index b37b1db..f6c7526 100644
+> --- a/hw/9pfs/9p-local.c
+> +++ b/hw/9pfs/9p-local.c
+> @@ -27,10 +27,12 @@
+>  #include "qemu/error-report.h"
+>  #include "qemu/option.h"
+>  #include <libgen.h>
+> +#ifdef CONFIG_LINUX
+>  #include <linux/fs.h>
+>  #ifdef CONFIG_LINUX_MAGIC_H
+>  #include <linux/magic.h>
+>  #endif
+> +#endif
+>  #include <sys/ioctl.h>
+>  
+>  #ifndef XFS_SUPER_MAGIC
+> diff --git a/include/qemu/xattr.h b/include/qemu/xattr.h
+> index a83fe8e..f1d0f7b 100644
+> --- a/include/qemu/xattr.h
+> +++ b/include/qemu/xattr.h
+> @@ -22,7 +22,9 @@
+>  #ifdef CONFIG_LIBATTR
+>  #  include <attr/xattr.h>
+>  #else
+> -#  define ENOATTR ENODATA
+> +#  if !defined(ENOATTR)
+> +#    define ENOATTR ENODATA
+> +#  endif
+>  #  include <sys/xattr.h>
+>  #endif
+>  
