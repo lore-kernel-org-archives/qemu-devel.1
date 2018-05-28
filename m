@@ -1,30 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36112)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38314)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fNIWt-0007Zw-FV
-	for qemu-devel@nongnu.org; Mon, 28 May 2018 09:50:18 -0400
+	(envelope-from <groug@kaod.org>) id 1fNIZo-0008Vt-Fk
+	for qemu-devel@nongnu.org; Mon, 28 May 2018 09:52:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fNIWf-000151-8F
-	for qemu-devel@nongnu.org; Mon, 28 May 2018 09:49:43 -0400
-Received: from mail-oi0-x22b.google.com ([2607:f8b0:4003:c06::22b]:33809)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fNIWe-000133-HV
-	for qemu-devel@nongnu.org; Mon, 28 May 2018 09:49:28 -0400
-Received: by mail-oi0-x22b.google.com with SMTP id l1-v6so10402070oii.1
-	for <qemu-devel@nongnu.org>; Mon, 28 May 2018 06:49:28 -0700 (PDT)
+	(envelope-from <groug@kaod.org>) id 1fNIZh-0003FA-44
+	for qemu-devel@nongnu.org; Mon, 28 May 2018 09:52:44 -0400
+Received: from 2.mo177.mail-out.ovh.net ([178.33.109.80]:42309)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1fNIZg-0003E4-TT
+	for qemu-devel@nongnu.org; Mon, 28 May 2018 09:52:37 -0400
+Received: from player716.ha.ovh.net (unknown [10.109.108.117])
+	by mo177.mail-out.ovh.net (Postfix) with ESMTP id 45896B01CF
+	for <qemu-devel@nongnu.org>; Mon, 28 May 2018 15:52:33 +0200 (CEST)
+Date: Mon, 28 May 2018 15:52:28 +0200
+From: Greg Kurz <groug@kaod.org>
+Message-ID: <20180528155228.3294c7f3@bahia.lan>
+In-Reply-To: <a6ce15881bf120c8df68acfff6f2bd9c0745007b.1527310210.git.keno@alumni.harvard.edu>
+References: <cover.1527310210.git.keno@alumni.harvard.edu>
+	<a6ce15881bf120c8df68acfff6f2bd9c0745007b.1527310210.git.keno@alumni.harvard.edu>
 MIME-Version: 1.0
-In-Reply-To: <w51vab8qhqu.fsf@maestria.local.igalia.com>
-References: <20180515154033.19899-1-kwolf@redhat.com>
-	<20180515154033.19899-21-kwolf@redhat.com>
-	<CAFEAcA-FhMC0LqkYcRh3fV864wNSAJnHbT3657Y55MN9=RO72Q@mail.gmail.com>
-	<20180528083855.GB4580@localhost.localdomain>
-	<w51vab8qhqu.fsf@maestria.local.igalia.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 28 May 2018 14:49:07 +0100
-Message-ID: <CAFEAcA9ose2=2t+ehCt5yPqoBDhm6NRG9AicsO9X-PD8KxObGA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL 20/37] qcow2: Give the refcount cache the
- minimum possible size by default
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 02/13] 9p: Avoid warning if
+ FS_IOC_GETVERSION is not defined
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,34 +31,96 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alberto Garcia <berto@igalia.com>
-Cc: Kevin Wolf <kwolf@redhat.com>, Qemu-block <qemu-block@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
+To: keno@juliacomputing.com
+Cc: qemu-devel@nongnu.org, Keno Fischer <keno@alumni.harvard.edu>
 
-On 28 May 2018 at 09:58, Alberto Garcia <berto@igalia.com> wrote:
-> On Mon 28 May 2018 10:38:55 AM CEST, Kevin Wolf wrote:
->>> > +        if (!refcount_cache_size_set) {
->>> > +            *refcount_cache_size = MIN_REFCOUNT_CACHE_SIZE * s->cluster_size;
->>>
->>> ...but in the else clause down here, we don't have the cast, and
->>> Coverity complains that we evaluate a 32-bit result and then put it
->>> in a 64-bit variable. Should this have the (uint64_t) cast as well ?
->
-> I suppose that's not because we put a 32-bit result in a 64-bit
-> variable, but because it could theoretically overflow (if
-> s->cluster_size > INT32_MAX / 4).
+On Sat, 26 May 2018 01:23:04 -0400
+keno@juliacomputing.com wrote:
 
-Well, coverity warns because it's one of those things that
-could be correct code, or could be the author tripping over
-one of C's less-than-obvious traps. 32x32->32 multiplies are
-just as susceptible to overflow, but the heuristic Coverity
-uses is "calculated a 32-bit multiply result and put it in
-a 64-bit variable", on the assumption that the type of the
-destination implies that whatever you're calculating could
-well be that big, and "truncate the result of my multiply
-even though it would fit in the destination" is a bit
-unexpected. Coverity's wrong quite a bit on this one, naturally,
-but it's usually easier to shut it up on the wrong guesses
-for the benefit of the times when it turns out to be right.
+> From: Keno Fischer <keno@alumni.harvard.edu>
+> 
+> Signed-off-by: Keno Fischer <keno@juliacomputing.com>
+> ---
+>  hw/9pfs/9p-local.c | 39 +++++++++++++++++++--------------------
+>  1 file changed, 19 insertions(+), 20 deletions(-)
+> 
+> diff --git a/hw/9pfs/9p-local.c b/hw/9pfs/9p-local.c
+> index f6c7526..7592f8d 100644
+> --- a/hw/9pfs/9p-local.c
+> +++ b/hw/9pfs/9p-local.c
+> @@ -1375,10 +1375,10 @@ static int local_unlinkat(FsContext *ctx, V9fsPath *dir,
+>      return ret;
+>  }
+>  
+> +#ifdef FS_IOC_GETVERSION
+>  static int local_ioc_getversion(FsContext *ctx, V9fsPath *path,
+>                                  mode_t st_mode, uint64_t *st_gen)
+>  {
+> -#ifdef FS_IOC_GETVERSION
+>      int err;
+>      V9fsFidOpenState fid_open;
+>  
+> @@ -1397,15 +1397,11 @@ static int local_ioc_getversion(FsContext *ctx, V9fsPath *path,
+>      err = ioctl(fid_open.fd, FS_IOC_GETVERSION, st_gen);
+>      local_close(ctx, &fid_open);
+>      return err;
+> -#else
+> -    errno = ENOTTY;
+> -    return -1;
+> -#endif
+>  }
+> +#endif
+>  
+>  static int local_init(FsContext *ctx, Error **errp)
+>  {
+> -    struct statfs stbuf;
+>      LocalData *data = g_malloc(sizeof(*data));
+>  
+>      data->mountfd = open(ctx->fs_root, O_DIRECTORY | O_RDONLY);
+> @@ -1415,20 +1411,23 @@ static int local_init(FsContext *ctx, Error **errp)
+>      }
+>  
+>  #ifdef FS_IOC_GETVERSION
+> -    /*
+> -     * use ioc_getversion only if the ioctl is definied
+> -     */
+> -    if (fstatfs(data->mountfd, &stbuf) < 0) {
+> -        close_preserve_errno(data->mountfd);
 
-thanks
--- PMM
+Hmm... I now realize that this path doesn't set errp, which means that
+we could possibly fail the device realization without reporting any
+error to the caller. Could you please fix this in a preparatory patch ?
+
+> -        goto err;
+> -    }
+> -    switch (stbuf.f_type) {
+> -    case EXT2_SUPER_MAGIC:
+> -    case BTRFS_SUPER_MAGIC:
+> -    case REISERFS_SUPER_MAGIC:
+> -    case XFS_SUPER_MAGIC:
+> -        ctx->exops.get_st_gen = local_ioc_getversion;
+> -        break;
+> +    {
+> +        struct statfs stbuf;
+> +        /*
+> +        * use ioc_getversion only if the ioctl is definied
+> +        */
+> +        if (fstatfs(data->mountfd, &stbuf) < 0) {
+> +            close_preserve_errno(data->mountfd);
+> +            goto err;
+> +        }
+> +        switch (stbuf.f_type) {
+> +        case EXT2_SUPER_MAGIC:
+> +        case BTRFS_SUPER_MAGIC:
+> +        case REISERFS_SUPER_MAGIC:
+> +        case XFS_SUPER_MAGIC:
+> +            ctx->exops.get_st_gen = local_ioc_getversion;
+> +            break;
+> +        }
+
+Please move this to a separate local_ioc_getversion_init() function, that would
+be empty if FS_IOC_GETVERSION is not defined.
+
+>      }
+>  #endif
+>  
