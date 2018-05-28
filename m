@@ -1,27 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52809)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54252)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1fNO3Z-0005BB-D8
-	for qemu-devel@nongnu.org; Mon, 28 May 2018 15:43:50 -0400
+	(envelope-from <laurent@vivier.eu>) id 1fNO8Z-0007Lg-LP
+	for qemu-devel@nongnu.org; Mon, 28 May 2018 15:49:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1fNO3V-0002tW-Ey
-	for qemu-devel@nongnu.org; Mon, 28 May 2018 15:43:49 -0400
-Received: from 16.mo4.mail-out.ovh.net ([188.165.55.104]:50715)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1fNO3V-0002s4-8k
-	for qemu-devel@nongnu.org; Mon, 28 May 2018 15:43:45 -0400
-Received: from player158.ha.ovh.net (unknown [10.109.105.25])
-	by mo4.mail-out.ovh.net (Postfix) with ESMTP id 646FA17A3D8
-	for <qemu-devel@nongnu.org>; Mon, 28 May 2018 21:43:43 +0200 (CEST)
-Date: Mon, 28 May 2018 21:43:33 +0200
-From: Greg Kurz <groug@kaod.org>
-Message-ID: <20180528214333.5f3b2f8f@bahia.lan>
-In-Reply-To: <1527531079-32717-1-git-send-email-thuth@redhat.com>
-References: <1527531079-32717-1-git-send-email-thuth@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH] target/ppc: Use proper logging
- function for possible guest errors
+	(envelope-from <laurent@vivier.eu>) id 1fNO8W-0006QB-HC
+	for qemu-devel@nongnu.org; Mon, 28 May 2018 15:48:59 -0400
+Received: from mout.kundenserver.de ([217.72.192.75]:51535)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1fNO8W-0006Oo-7Y
+	for qemu-devel@nongnu.org; Mon, 28 May 2018 15:48:56 -0400
+From: Laurent Vivier <laurent@vivier.eu>
+Date: Mon, 28 May 2018 21:48:12 +0200
+Message-Id: <20180528194812.31216-1-laurent@vivier.eu>
+Subject: [Qemu-devel] [PATCH] linux-user: SPARC "rd %tick" can be used by
+ user application
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,92 +22,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: David Gibson <david@gibson.dropbear.id.au>, qemu-ppc@nongnu.org, qemu-trivial@nongnu.org, Alistair Francis <alistair.francis@xilinx.com>, qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>
+To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-devel@nongnu.org
+Cc: Artyom Tarasenko <atar4qemu@gmail.com>, Riku Voipio <riku.voipio@iki.fi>, Laurent Vivier <laurent@vivier.eu>
 
-On Mon, 28 May 2018 20:11:19 +0200
-Thomas Huth <thuth@redhat.com> wrote:
+we have the same problem decribed in 7d6b1daedd
+("linux-user, ppc: mftbl can be used by user application")
+for ppc in the case of sparc.
 
-> fprintf() and qemu_log_separate() are frowned upon these days for printing
-> logging information in QEMU. Accessing the wrong SPRs indicates wrong guest
-> behaviour in most cases, and we've got a proper way to log such situations,
-> which is the qemu_log_mask(LOG_GUEST_ERROR, ...) function. So use this
-> function now for logging the bad SPR accesses instead.
-> 
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
-> ---
+When we use an application trying to resolve a name, it hangs in
 
-Reviewed-by: Greg Kurz <groug@kaod.org>
+    0x00000000ff5dd40c:  rd  %tick, %o5
+    0x00000000ff5dd410:  srlx  %o5, 0x20, %o4
+    0x00000000ff5dd414:  btst  %o5, %g4
+    0x00000000ff5dd418:  be  %icc, 0xff5dd40c
 
->  target/ppc/translate.c | 37 ++++++++++++-------------------------
->  1 file changed, 12 insertions(+), 25 deletions(-)
-> 
-> diff --git a/target/ppc/translate.c b/target/ppc/translate.c
-> index e30d99f..0806ee0 100644
-> --- a/target/ppc/translate.c
-> +++ b/target/ppc/translate.c
-> @@ -3933,13 +3933,9 @@ static inline void gen_op_mfspr(DisasContext *ctx)
->               * allowing userland application to read the PVR
->               */
->              if (sprn != SPR_PVR) {
-> -                fprintf(stderr, "Trying to read privileged spr %d (0x%03x) at "
-> -                        TARGET_FMT_lx "\n", sprn, sprn, ctx->base.pc_next - 4);
-> -                if (qemu_log_separate()) {
-> -                    qemu_log("Trying to read privileged spr %d (0x%03x) at "
-> -                             TARGET_FMT_lx "\n", sprn, sprn,
-> -                             ctx->base.pc_next - 4);
-> -                }
-> +                qemu_log_mask(LOG_GUEST_ERROR, "Trying to read privileged spr "
-> +                              "%d (0x%03x) at " TARGET_FMT_lx "\n", sprn, sprn,
-> +                              ctx->base.pc_next - 4);
->              }
->              gen_priv_exception(ctx, POWERPC_EXCP_PRIV_REG);
->          }
-> @@ -3951,12 +3947,9 @@ static inline void gen_op_mfspr(DisasContext *ctx)
->              return;
->          }
->          /* Not defined */
-> -        fprintf(stderr, "Trying to read invalid spr %d (0x%03x) at "
-> -                TARGET_FMT_lx "\n", sprn, sprn, ctx->base.pc_next - 4);
-> -        if (qemu_log_separate()) {
-> -            qemu_log("Trying to read invalid spr %d (0x%03x) at "
-> -                     TARGET_FMT_lx "\n", sprn, sprn, ctx->base.pc_next - 4);
-> -        }
-> +        qemu_log_mask(LOG_GUEST_ERROR,
-> +                      "Trying to read invalid spr %d (0x%03x) at "
-> +                      TARGET_FMT_lx "\n", sprn, sprn, ctx->base.pc_next - 4);
->  
->          /* The behaviour depends on MSR:PR and SPR# bit 0x10,
->           * it can generate a priv, a hv emu or a no-op
-> @@ -4097,12 +4090,9 @@ static void gen_mtspr(DisasContext *ctx)
->              (*write_cb)(ctx, sprn, rS(ctx->opcode));
->          } else {
->              /* Privilege exception */
-> -            fprintf(stderr, "Trying to write privileged spr %d (0x%03x) at "
-> -                    TARGET_FMT_lx "\n", sprn, sprn, ctx->base.pc_next - 4);
-> -            if (qemu_log_separate()) {
-> -                qemu_log("Trying to write privileged spr %d (0x%03x) at "
-> -                         TARGET_FMT_lx "\n", sprn, sprn, ctx->base.pc_next - 4);
-> -            }
-> +            qemu_log_mask(LOG_GUEST_ERROR, "Trying to write privileged spr "
-> +                          "%d (0x%03x) at " TARGET_FMT_lx "\n", sprn, sprn,
-> +                          ctx->base.pc_next - 4);
->              gen_priv_exception(ctx, POWERPC_EXCP_PRIV_REG);
->          }
->      } else {
-> @@ -4114,12 +4104,9 @@ static void gen_mtspr(DisasContext *ctx)
->          }
->  
->          /* Not defined */
-> -        if (qemu_log_separate()) {
-> -            qemu_log("Trying to write invalid spr %d (0x%03x) at "
-> -                     TARGET_FMT_lx "\n", sprn, sprn, ctx->base.pc_next - 4);
-> -        }
-> -        fprintf(stderr, "Trying to write invalid spr %d (0x%03x) at "
-> -                TARGET_FMT_lx "\n", sprn, sprn, ctx->base.pc_next - 4);
-> +        qemu_log_mask(LOG_GUEST_ERROR,
-> +                      "Trying to write invalid spr %d (0x%03x) at "
-> +                      TARGET_FMT_lx "\n", sprn, sprn, ctx->base.pc_next - 4);
->  
->  
->          /* The behaviour depends on MSR:PR and SPR# bit 0x10,
+because %tick is staying at 0.
+
+As QEMU_CLOCK_VIRTUAL is not available in linux-user mode,
+simply use cpu_get_host_ticks() instead.
+
+Signed-off-by: Laurent Vivier <laurent@vivier.eu>
+---
+ target/sparc/helper.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/target/sparc/helper.c b/target/sparc/helper.c
+index 1d854890b4..46232788c8 100644
+--- a/target/sparc/helper.c
++++ b/target/sparc/helper.c
+@@ -67,7 +67,9 @@ uint64_t helper_tick_get_count(CPUSPARCState *env, void *opaque, int mem_idx)
+ 
+     return cpu_tick_get_count(timer);
+ #else
+-    return 0;
++    /* In user-mode, QEMU_CLOCK_VIRTUAL doesn't exist.
++       Just pass through the host cpu clock ticks.  */
++    return cpu_get_host_ticks();
+ #endif
+ }
+ 
+-- 
+2.14.3
