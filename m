@@ -1,30 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54280)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54276)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1fNJek-0005Vr-2Y
-	for qemu-devel@nongnu.org; Mon, 28 May 2018 11:01:54 -0400
+	(envelope-from <berto@igalia.com>) id 1fNJej-0005Vq-UL
+	for qemu-devel@nongnu.org; Mon, 28 May 2018 11:01:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1fNJeg-0007zA-Tc
+	(envelope-from <berto@igalia.com>) id 1fNJef-0007x6-98
 	for qemu-devel@nongnu.org; Mon, 28 May 2018 11:01:54 -0400
-Received: from 18.mo4.mail-out.ovh.net ([188.165.54.143]:54838)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1fNJeg-0007vn-JN
-	for qemu-devel@nongnu.org; Mon, 28 May 2018 11:01:50 -0400
-Received: from player796.ha.ovh.net (unknown [10.109.105.25])
-	by mo4.mail-out.ovh.net (Postfix) with ESMTP id EB4D9174A91
-	for <qemu-devel@nongnu.org>; Mon, 28 May 2018 16:57:43 +0200 (CEST)
-References: <20180528124621.22977-1-joel@jms.id.au>
-	<9959794d-6d3b-b797-bfc8-b548d54378ad@kaod.org>
-	<CACPK8Xe5+-zVfoS-g2Te7YOuT5emT-i=JsNDrF52WLVzLERQcw@mail.gmail.com>
-	<CACPK8Xc1xwKBoYYQW0Uzd4keBjspw3uasdTx5OyikaxPmZacgw@mail.gmail.com>
-From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <d390376b-1c0d-9fa1-d58e-fbecf127c5a7@kaod.org>
-Date: Mon, 28 May 2018 16:57:34 +0200
-MIME-Version: 1.0
-In-Reply-To: <CACPK8Xc1xwKBoYYQW0Uzd4keBjspw3uasdTx5OyikaxPmZacgw@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] aspeed_scu: Implement RNG register
+From: Alberto Garcia <berto@igalia.com>
+Date: Mon, 28 May 2018 17:01:28 +0200
+Message-Id: <20180528150128.31500-1-berto@igalia.com>
+Subject: [Qemu-devel] [PATCH] qcow2: Fix Coverity warning when calculating
+ the refcount cache size
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,79 +18,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Joel Stanley <joel@jms.id.au>
-Cc: qemu-devel@nongnu.org, qemu-arm@nongnu.org, Andrew Jeffery <andrew@aj.id.au>
+To: qemu-devel@nongnu.org
+Cc: Alberto Garcia <berto@igalia.com>, qemu-block@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Kevin Wolf <kwolf@redhat.com>
 
-On 05/28/2018 04:29 PM, Joel Stanley wrote:
-> On 28 May 2018 at 23:33, Joel Stanley <joel@jms.id.au> wrote:
->> On 28 May 2018 at 23:17, C=C3=A9dric Le Goater <clg@kaod.org> wrote:
->>> Hello Joel,
->>>
->>> On 05/28/2018 02:46 PM, Joel Stanley wrote:
->>>> The ASPEED SoCs contain a single register that returns random data w=
-hen
->>>> read. This models that register so that guests can use it.
->>>>
->>>> Signed-off-by: Joel Stanley <joel@jms.id.au>
->>>> ---
->>>>  hw/misc/aspeed_scu.c | 19 +++++++++++++++++++
->>>>  1 file changed, 19 insertions(+)
->>>>
->>>> diff --git a/hw/misc/aspeed_scu.c b/hw/misc/aspeed_scu.c
->>>> index 5e6d5744eeca..8fa0cecf0fa1 100644
->>>> --- a/hw/misc/aspeed_scu.c
->>>> +++ b/hw/misc/aspeed_scu.c
->>>> @@ -16,6 +16,7 @@
->>>>  #include "qapi/visitor.h"
->>>>  #include "qemu/bitops.h"
->>>>  #include "qemu/log.h"
->>>> +#include "crypto/random.h"
->>>>  #include "trace.h"
->>>>
->>>>  #define TO_REG(offset) ((offset) >> 2)
->>>> @@ -154,6 +155,18 @@ static const uint32_t ast2500_a1_resets[ASPEED_=
-SCU_NR_REGS] =3D {
->>>>       [BMC_DEV_ID]      =3D 0x00002402U
->>>>  };
->>>>
->>>> +static uint32_t aspeed_scu_get_random(void)
->>>> +{
->>>> +    Error *err =3D NULL;
->>>> +    uint32_t num;
->>>> +
->>>> +    if (qcrypto_random_bytes((uint8_t *)&num, sizeof(num), &err)) {
->>>> +        error_report_err(err);
->>>> +    }
->>>> +
->>>> +    return num;
->>>> +}
->>>> +
->>>>  static uint64_t aspeed_scu_read(void *opaque, hwaddr offset, unsign=
-ed size)
->>>>  {
->>>>      AspeedSCUState *s =3D ASPEED_SCU(opaque);
->>>> @@ -167,6 +180,9 @@ static uint64_t aspeed_scu_read(void *opaque, hw=
-addr offset, unsigned size)
->>>>      }
->>>>
->>>>      switch (reg) {
->>>> +    case RNG_DATA:
->>>> +        return aspeed_scu_get_random();
->>>
->>> may be we could test bit 1 of RNG_CTRL to check if it is enabled or n=
-ot.
->>
->> The RNG is enabled by default, and I didn't find any software that
->> disables it, but it can't hurt to have that check.
->=20
-> I did some testing on hardware, and the rng still outputs a different
-> number each time I ask for one regardless of the state of the enabled
-> bit.
->=20
-> How should we model that?
->=20
+MIN_REFCOUNT_CACHE_SIZE is 4 and the cluster size is guaranteed to be
+at most 2MB, so the minimum refcount cache size (in bytes) is always
+going to fit in a 32-bit integer.
 
-I confirm that the HW doesn't really care about the enabled bit.
-Let's ignore it then ?
+Coverity doesn't know that, and since we're storing the result in a
+uint64_t (*refcount_cache_size) it thinks that we need the 64 bits and
+that we probably want to do a 64-bit multiplication to prevent the
+result from being truncated.
 
-C.=20
+This is a false positive in this case, but it's a fair warning.
+We could do a 64-bit multiplication to get rid of it, but since we
+know that a 32-bit variable is enough to store this value let's simply
+reuse min_refcount_cache, make it a normal int and stop doing casts.
+
+Signed-off-by: Alberto Garcia <berto@igalia.com>
+Reported-by: Peter Maydell <peter.maydell@linaro.org>
+---
+ block/qcow2.c | 5 ++---
+ 1 file changed, 2 insertions(+), 3 deletions(-)
+
+diff --git a/block/qcow2.c b/block/qcow2.c
+index 6d532470a8..a007dc4246 100644
+--- a/block/qcow2.c
++++ b/block/qcow2.c
+@@ -768,6 +768,7 @@ static void read_cache_sizes(BlockDriverState *bs, QemuOpts *opts,
+     BDRVQcow2State *s = bs->opaque;
+     uint64_t combined_cache_size;
+     bool l2_cache_size_set, refcount_cache_size_set, combined_cache_size_set;
++    int min_refcount_cache = MIN_REFCOUNT_CACHE_SIZE * s->cluster_size;
+ 
+     combined_cache_size_set = qemu_opt_get(opts, QCOW2_OPT_CACHE_SIZE);
+     l2_cache_size_set = qemu_opt_get(opts, QCOW2_OPT_L2_CACHE_SIZE);
+@@ -804,8 +805,6 @@ static void read_cache_sizes(BlockDriverState *bs, QemuOpts *opts,
+         } else {
+             uint64_t virtual_disk_size = bs->total_sectors * BDRV_SECTOR_SIZE;
+             uint64_t max_l2_cache = virtual_disk_size / (s->cluster_size / 8);
+-            uint64_t min_refcount_cache =
+-                (uint64_t) MIN_REFCOUNT_CACHE_SIZE * s->cluster_size;
+ 
+             /* Assign as much memory as possible to the L2 cache, and
+              * use the remainder for the refcount cache */
+@@ -825,7 +824,7 @@ static void read_cache_sizes(BlockDriverState *bs, QemuOpts *opts,
+                                  * s->cluster_size);
+         }
+         if (!refcount_cache_size_set) {
+-            *refcount_cache_size = MIN_REFCOUNT_CACHE_SIZE * s->cluster_size;
++            *refcount_cache_size = min_refcount_cache;
+         }
+     }
+ 
+-- 
+2.11.0
