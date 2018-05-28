@@ -1,29 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59242)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43973)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <changpeng.liu@intel.com>) id 1fN5X9-0007YH-AF
-	for qemu-devel@nongnu.org; Sun, 27 May 2018 19:57:08 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fN6u4-0007wx-GQ
+	for qemu-devel@nongnu.org; Sun, 27 May 2018 21:24:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <changpeng.liu@intel.com>) id 1fN5X4-0006bB-S6
-	for qemu-devel@nongnu.org; Sun, 27 May 2018 19:57:07 -0400
-Received: from mga17.intel.com ([192.55.52.151]:16663)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <changpeng.liu@intel.com>)
-	id 1fN5X4-0006ZJ-JN
-	for qemu-devel@nongnu.org; Sun, 27 May 2018 19:57:02 -0400
-From: "Liu, Changpeng" <changpeng.liu@intel.com>
-Date: Sun, 27 May 2018 23:56:53 +0000
-Message-ID: <FF7FC980937D6342B9D289F5F3C7C2625B6D3733@SHSMSX103.ccr.corp.intel.com>
-References: <1526682016-17336-1-git-send-email-changpeng.liu@intel.com>
-	<20180522131120.GM21655@stefanha-x1.localdomain>
-	<FF7FC980937D6342B9D289F5F3C7C2625B65CBBD@SHSMSX103.ccr.corp.intel.com>
-	<20180525101932.GE14757@stefanha-x1.localdomain>
-In-Reply-To: <20180525101932.GE14757@stefanha-x1.localdomain>
-Content-Language: en-US
-Content-Type: text/plain; charset="Windows-1252"
-Content-Transfer-Encoding: quoted-printable
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fN6u1-00008e-Bd
+	for qemu-devel@nongnu.org; Sun, 27 May 2018 21:24:52 -0400
+Received: from mail-qt0-x22a.google.com ([2607:f8b0:400d:c0d::22a]:33722)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fN6u1-00008U-5m
+	for qemu-devel@nongnu.org; Sun, 27 May 2018 21:24:49 -0400
+Received: by mail-qt0-x22a.google.com with SMTP id e8-v6so13228116qth.0
+	for <qemu-devel@nongnu.org>; Sun, 27 May 2018 18:24:49 -0700 (PDT)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20180527141324.11937-1-richard.henderson@linaro.org>
+	<20180527141324.11937-17-richard.henderson@linaro.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <32c7d281-7129-06a1-2dee-8f025d3a8d8b@amsat.org>
+Date: Sun, 27 May 2018 22:24:44 -0300
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH] vhost-blk: turn on pre-defined RO feature
- bit
+In-Reply-To: <20180527141324.11937-17-richard.henderson@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH 16/20] target/openrisc: Log interrupts
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,50 +35,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@redhat.com>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "mst@redhat.com" <mst@redhat.com>
+To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
+Cc: Stafford Horne <shorne@gmail.com>
 
+On 05/27/2018 11:13 AM, Richard Henderson wrote:
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
-> -----Original Message-----
-> From: Stefan Hajnoczi [mailto:stefanha@redhat.com]
-> Sent: Friday, May 25, 2018 6:20 PM
-> To: Liu, Changpeng <changpeng.liu@intel.com>
-> Cc: qemu-devel@nongnu.org; mst@redhat.com
-> Subject: Re: [PATCH] vhost-blk: turn on pre-defined RO feature bit
->=20
-> On Tue, May 22, 2018 at 02:39:28PM +0000, Liu, Changpeng wrote:
-> >
-> >
-> > > -----Original Message-----
-> > > From: Stefan Hajnoczi [mailto:stefanha@redhat.com]
-> > > Sent: Tuesday, May 22, 2018 6:11 AM
-> > > To: Liu, Changpeng <changpeng.liu@intel.com>
-> > > Cc: qemu-devel@nongnu.org; mst@redhat.com
-> > > Subject: Re: [PATCH] vhost-blk: turn on pre-defined RO feature bit
-> > >
-> > > On Sat, May 19, 2018 at 06:20:16AM +0800, Changpeng Liu wrote:
-> > > > Read only feature shouldn't be negotiable, because if the
-> > > > backend device reported Read only feature supported, QEMU
-> > > > host driver shouldn't change backend's RO attribute.
-> > >
-> > > I don't understand this patch.
-> > >
-> > > Does it make *all* virtio-blk devices read-only?
-> > If the slave target reported RO feature, the disk in OS should be RO, c=
-urrently
-> > users should specify in QEMU command to enable RO.
-> > >
-> > > Or is the idea that the vhost-user slave has to clear the read-only b=
-it
-> > > if it is a writable device?
-> > Exactly.
->=20
-> Thanks for explaining!
->=20
-> Please implement the read-only bit in contrib/vhost-user-blk we it can
-> be tested.
-Sounds good, will add the test together.
->=20
-> Thanks,
-> Stefan
+> ---
+>  target/openrisc/interrupt.c | 30 +++++++++++++++++++++++++-----
+>  1 file changed, 25 insertions(+), 5 deletions(-)
+> 
+> diff --git a/target/openrisc/interrupt.c b/target/openrisc/interrupt.c
+> index e28042856a..138ad17f00 100644
+> --- a/target/openrisc/interrupt.c
+> +++ b/target/openrisc/interrupt.c
+> @@ -32,6 +32,7 @@ void openrisc_cpu_do_interrupt(CPUState *cs)
+>  #ifndef CONFIG_USER_ONLY
+>      OpenRISCCPU *cpu = OPENRISC_CPU(cs);
+>      CPUOpenRISCState *env = &cpu->env;
+> +    int exception = cs->exception_index;
+>  
+>      env->epcr = env->pc;
+>      if (env->dflag) {
+> @@ -41,12 +42,12 @@ void openrisc_cpu_do_interrupt(CPUState *cs)
+>      } else {
+>          env->sr &= ~SR_DSX;
+>      }
+> -    if (cs->exception_index == EXCP_SYSCALL) {
+> +    if (exception == EXCP_SYSCALL) {
+>          env->epcr += 4;
+>      }
+>      /* When we have an illegal instruction the error effective address
+>         shall be set to the illegal instruction address.  */
+> -    if (cs->exception_index == EXCP_ILLEGAL) {
+> +    if (exception == EXCP_ILLEGAL) {
+>          env->eear = env->pc;
+>      }
+>  
+> @@ -60,8 +61,27 @@ void openrisc_cpu_do_interrupt(CPUState *cs)
+>      env->pmr &= ~PMR_SME;
+>      env->lock_addr = -1;
+>  
+> -    if (cs->exception_index > 0 && cs->exception_index < EXCP_NR) {
+> -        hwaddr vect_pc = cs->exception_index << 8;
+> +    if (exception > 0 && exception < EXCP_NR) {
+> +        static const char * const int_name[EXCP_NR] = {
+> +            [EXCP_RESET]    = "RESET",
+> +            [EXCP_BUSERR]   = "BUSERR (bus error)",
+> +            [EXCP_DPF]      = "DFP (data protection fault)",
+> +            [EXCP_IPF]      = "IPF (code protection fault)",
+> +            [EXCP_TICK]     = "TICK (timer interrupt)",
+> +            [EXCP_ALIGN]    = "ALIGN",
+> +            [EXCP_ILLEGAL]  = "ILLEGAL",
+> +            [EXCP_INT]      = "INT (device interrupt)",
+> +            [EXCP_DTLBMISS] = "DTLBMISS (data tlb miss)",
+> +            [EXCP_ITLBMISS] = "ITLBMISS (code tlb miss)",
+> +            [EXCP_RANGE]    = "RANGE",
+> +            [EXCP_SYSCALL]  = "SYSCALL",
+> +            [EXCP_FPE]      = "FPE",
+> +            [EXCP_TRAP]     = "TRAP",
+> +        };
+> +
+> +        qemu_log_mask(CPU_LOG_INT, "INT: %s\n", int_name[exception]);
+> +
+> +        hwaddr vect_pc = exception << 8;
+>          if (env->cpucfgr & CPUCFGR_EVBARP) {
+>              vect_pc |= env->evbar;
+>          }
+> @@ -70,7 +90,7 @@ void openrisc_cpu_do_interrupt(CPUState *cs)
+>          }
+>          env->pc = vect_pc;
+>      } else {
+> -        cpu_abort(cs, "Unhandled exception 0x%x\n", cs->exception_index);
+> +        cpu_abort(cs, "Unhandled exception 0x%x\n", exception);
+>      }
+>  #endif
+>  
+> 
