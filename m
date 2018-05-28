@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35322)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35515)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fNCQi-0008M2-H4
-	for qemu-devel@nongnu.org; Mon, 28 May 2018 03:18:57 -0400
+	(envelope-from <peterx@redhat.com>) id 1fNCRs-00015J-Qh
+	for qemu-devel@nongnu.org; Mon, 28 May 2018 03:20:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fNCQf-0002rI-7V
-	for qemu-devel@nongnu.org; Mon, 28 May 2018 03:18:56 -0400
-References: <20180518164405.11804-1-clg@kaod.org>
-	<20180518164405.11804-2-clg@kaod.org>
-	<20180525160249.7cb0a5bc@bahia.lan>
-	<82ee8b24-91d7-9396-82b7-be37200cfacd@redhat.com>
-	<a567d42f-af8e-01da-5e0b-9b6f41c150cf@kaod.org>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <8d7552ef-a0b2-621e-8d56-edb128874a6e@redhat.com>
-Date: Mon, 28 May 2018 09:18:49 +0200
-MIME-Version: 1.0
-In-Reply-To: <a567d42f-af8e-01da-5e0b-9b6f41c150cf@kaod.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH 1/4] spapr: remove irq_hint
- parameter from spapr_irq_alloc()
+	(envelope-from <peterx@redhat.com>) id 1fNCRr-0003Xm-LD
+	for qemu-devel@nongnu.org; Mon, 28 May 2018 03:20:08 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:40646 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1fNCRr-0003Xc-Fh
+	for qemu-devel@nongnu.org; Mon, 28 May 2018 03:20:07 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.4])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 23D5F400EB89
+	for <qemu-devel@nongnu.org>; Mon, 28 May 2018 07:20:07 +0000 (UTC)
+From: Peter Xu <peterx@redhat.com>
+Date: Mon, 28 May 2018 15:19:54 +0800
+Message-Id: <20180528071958.17053-2-peterx@redhat.com>
+In-Reply-To: <20180528071958.17053-1-peterx@redhat.com>
+References: <20180528071958.17053-1-peterx@redhat.com>
+Subject: [Qemu-devel] [PATCH v8 1/5] monitor: rename out_lock to mon_lock
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,72 +29,168 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>, Greg Kurz <groug@kaod.org>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
+To: qemu-devel@nongnu.org
+Cc: Eric Blake <eblake@redhat.com>, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, Markus Armbruster <armbru@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, peterx@redhat.com
 
-On 28.05.2018 09:06, C=C3=A9dric Le Goater wrote:
-> On 05/28/2018 08:17 AM, Thomas Huth wrote:
->> On 25.05.2018 16:02, Greg Kurz wrote:
->>> On Fri, 18 May 2018 18:44:02 +0200
->>> C=C3=A9dric Le Goater <clg@kaod.org> wrote:
->>>
->>>> This IRQ number hint can possibly be used by the VIO devices if the
->>>> "irq" property is defined on the command line but it seems it is nev=
-er
->>>> the case. It is not used in libvirt for instance. So, let's remove i=
-t
->>>> to simplify future changes.
->>>>
->>>
->>> Setting an irq manually looks a bit anachronistic. I doubt anyone wou=
-ld
->>> do that nowadays, and the patch does a nice cleanup. So this looks li=
-ke
->>> a good idea.
->> [...]
->>>> diff --git a/hw/ppc/spapr_vio.c b/hw/ppc/spapr_vio.c
->>>> index 472dd6f33a96..cc064f64fccf 100644
->>>> --- a/hw/ppc/spapr_vio.c
->>>> +++ b/hw/ppc/spapr_vio.c
->>>> @@ -455,7 +455,7 @@ static void spapr_vio_busdev_realize(DeviceState=
- *qdev, Error **errp)
->>>>          dev->qdev.id =3D id;
->>>>      }
->>>> =20
->>>> -    dev->irq =3D spapr_irq_alloc(spapr, dev->irq, false, &local_err=
-);
->>>> +    dev->irq =3D spapr_irq_alloc(spapr, false, &local_err);
->>>
->>> Silently breaking "irq" like this looks wrong. I'd rather officially =
-remove
->>> it first (ie, kill spapr_vio_props, -5 lines in spapr_vio.c).
->>>
->>> Of course, this raises the question of interface deprecation, and it =
-should
->>> theoretically follow the process described at:
->>>
->>> https://wiki.qemu.org/Features/LegacyRemoval#Rules_for_removing_an_in=
-terface
->>>
->>> Cc'ing Thomas, our Chief Deprecation Officer, for insights :)
->>
->> The property is a public interface. Just because it's not used by
->> libvirt does not mean that nobody is using it. So yes, please follow t=
-he
->> rules and mark it as deprecated first for two release, before you real=
-ly
->> remove it.
->=20
-> This "irq" property is a problem to introduce a new static layout of IR=
-Q=20
-> numbers. It is in complete opposition.=20
->=20
-> Can we keep it as it is for old pseries machine (settable) and ignore i=
-t=20
-> for newer ? Would that be fine ?
+The out_lock is protecting a few Monitor fields.  In the future the
+monitor code will start to run in multiple threads.  We are going to
+turn it into a bigger lock to protect not only the out buffer but also
+most of the rest.
 
-I think that would be fine, too. You likely need to keep the settable
-IRQs around for the old machines anyway, to make sure that migration of
-the old machine types still works, right?
+Since at it, rearrange the Monitor struct a bit.
 
- Thomas
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+Signed-off-by: Peter Xu <peterx@redhat.com>
+---
+ monitor.c | 53 +++++++++++++++++++++++++++++------------------------
+ 1 file changed, 29 insertions(+), 24 deletions(-)
+
+diff --git a/monitor.c b/monitor.c
+index 46814af533..14c681dc8a 100644
+--- a/monitor.c
++++ b/monitor.c
+@@ -207,15 +207,6 @@ struct Monitor {
+     int suspend_cnt;            /* Needs to be accessed atomically */
+     bool skip_flush;
+     bool use_io_thr;
+-
+-    /* We can't access guest memory when holding the lock */
+-    QemuMutex out_lock;
+-    QString *outbuf;
+-    guint out_watch;
+-
+-    /* Read under either BQL or out_lock, written with BQL+out_lock.  */
+-    int mux_out;
+-
+     ReadLineState *rs;
+     MonitorQMP qmp;
+     gchar *mon_cpu_path;
+@@ -224,6 +215,20 @@ struct Monitor {
+     mon_cmd_t *cmd_table;
+     QLIST_HEAD(,mon_fd_t) fds;
+     QTAILQ_ENTRY(Monitor) entry;
++
++    /*
++     * The per-monitor lock. We can't access guest memory when holding
++     * the lock.
++     */
++    QemuMutex mon_lock;
++
++    /*
++     * Fields that are protected by the per-monitor lock.
++     */
++    QString *outbuf;
++    guint out_watch;
++    /* Read under either BQL or mon_lock, written with BQL+mon_lock.  */
++    int mux_out;
+ };
+ 
+ /* Let's add monitor global variables to this struct. */
+@@ -366,14 +371,14 @@ static gboolean monitor_unblocked(GIOChannel *chan, GIOCondition cond,
+ {
+     Monitor *mon = opaque;
+ 
+-    qemu_mutex_lock(&mon->out_lock);
++    qemu_mutex_lock(&mon->mon_lock);
+     mon->out_watch = 0;
+     monitor_flush_locked(mon);
+-    qemu_mutex_unlock(&mon->out_lock);
++    qemu_mutex_unlock(&mon->mon_lock);
+     return FALSE;
+ }
+ 
+-/* Called with mon->out_lock held.  */
++/* Called with mon->mon_lock held.  */
+ static void monitor_flush_locked(Monitor *mon)
+ {
+     int rc;
+@@ -411,9 +416,9 @@ static void monitor_flush_locked(Monitor *mon)
+ 
+ void monitor_flush(Monitor *mon)
+ {
+-    qemu_mutex_lock(&mon->out_lock);
++    qemu_mutex_lock(&mon->mon_lock);
+     monitor_flush_locked(mon);
+-    qemu_mutex_unlock(&mon->out_lock);
++    qemu_mutex_unlock(&mon->mon_lock);
+ }
+ 
+ /* flush at every end of line */
+@@ -421,7 +426,7 @@ static void monitor_puts(Monitor *mon, const char *str)
+ {
+     char c;
+ 
+-    qemu_mutex_lock(&mon->out_lock);
++    qemu_mutex_lock(&mon->mon_lock);
+     for(;;) {
+         c = *str++;
+         if (c == '\0')
+@@ -434,7 +439,7 @@ static void monitor_puts(Monitor *mon, const char *str)
+             monitor_flush_locked(mon);
+         }
+     }
+-    qemu_mutex_unlock(&mon->out_lock);
++    qemu_mutex_unlock(&mon->mon_lock);
+ }
+ 
+ void monitor_vprintf(Monitor *mon, const char *fmt, va_list ap)
+@@ -725,7 +730,7 @@ static void monitor_data_init(Monitor *mon, bool skip_flush,
+                               bool use_io_thr)
+ {
+     memset(mon, 0, sizeof(Monitor));
+-    qemu_mutex_init(&mon->out_lock);
++    qemu_mutex_init(&mon->mon_lock);
+     qemu_mutex_init(&mon->qmp.qmp_queue_lock);
+     mon->outbuf = qstring_new();
+     /* Use *mon_cmds by default. */
+@@ -745,7 +750,7 @@ static void monitor_data_destroy(Monitor *mon)
+     }
+     readline_free(mon->rs);
+     qobject_unref(mon->outbuf);
+-    qemu_mutex_destroy(&mon->out_lock);
++    qemu_mutex_destroy(&mon->mon_lock);
+     qemu_mutex_destroy(&mon->qmp.qmp_queue_lock);
+     monitor_qmp_cleanup_req_queue_locked(mon);
+     monitor_qmp_cleanup_resp_queue_locked(mon);
+@@ -777,13 +782,13 @@ char *qmp_human_monitor_command(const char *command_line, bool has_cpu_index,
+     handle_hmp_command(&hmp, command_line);
+     cur_mon = old_mon;
+ 
+-    qemu_mutex_lock(&hmp.out_lock);
++    qemu_mutex_lock(&hmp.mon_lock);
+     if (qstring_get_length(hmp.outbuf) > 0) {
+         output = g_strdup(qstring_get_str(hmp.outbuf));
+     } else {
+         output = g_strdup("");
+     }
+-    qemu_mutex_unlock(&hmp.out_lock);
++    qemu_mutex_unlock(&hmp.mon_lock);
+ 
+ out:
+     monitor_data_destroy(&hmp);
+@@ -4377,9 +4382,9 @@ static void monitor_event(void *opaque, int event)
+ 
+     switch (event) {
+     case CHR_EVENT_MUX_IN:
+-        qemu_mutex_lock(&mon->out_lock);
++        qemu_mutex_lock(&mon->mon_lock);
+         mon->mux_out = 0;
+-        qemu_mutex_unlock(&mon->out_lock);
++        qemu_mutex_unlock(&mon->mon_lock);
+         if (mon->reset_seen) {
+             readline_restart(mon->rs);
+             monitor_resume(mon);
+@@ -4399,9 +4404,9 @@ static void monitor_event(void *opaque, int event)
+         } else {
+             atomic_inc(&mon->suspend_cnt);
+         }
+-        qemu_mutex_lock(&mon->out_lock);
++        qemu_mutex_lock(&mon->mon_lock);
+         mon->mux_out = 1;
+-        qemu_mutex_unlock(&mon->out_lock);
++        qemu_mutex_unlock(&mon->mon_lock);
+         break;
+ 
+     case CHR_EVENT_OPENED:
+-- 
+2.17.0
