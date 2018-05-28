@@ -1,25 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48665)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52844)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fNKzy-0006UK-55
-	for qemu-devel@nongnu.org; Mon, 28 May 2018 12:27:55 -0400
+	(envelope-from <drjones@redhat.com>) id 1fNLIp-0001wT-Rn
+	for qemu-devel@nongnu.org; Mon, 28 May 2018 12:47:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fNKzu-0000xf-Uv
-	for qemu-devel@nongnu.org; Mon, 28 May 2018 12:27:54 -0400
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <1527496946-12036-1-git-send-email-zhaoshenglong@huawei.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <8b06a7d9-49d4-9d22-d357-5448fbaf7a56@amsat.org>
-Date: Mon, 28 May 2018 13:27:44 -0300
+	(envelope-from <drjones@redhat.com>) id 1fNLIo-0004ef-Vh
+	for qemu-devel@nongnu.org; Mon, 28 May 2018 12:47:23 -0400
+Date: Mon, 28 May 2018 18:47:12 +0200
+From: Andrew Jones <drjones@redhat.com>
+Message-ID: <20180528164712.y5rjhu7xixqkjgoe@kamzik.brq.redhat.com>
+References: <20180516152026.2920-1-shameerali.kolothum.thodi@huawei.com>
+	<20180516152026.2920-3-shameerali.kolothum.thodi@huawei.com>
 MIME-Version: 1.0
-In-Reply-To: <1527496946-12036-1-git-send-email-zhaoshenglong@huawei.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH] ARM: ACPI: Fix use-after-free
- due to memory realloc
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180516152026.2920-3-shameerali.kolothum.thodi@huawei.com>
+Subject: Re: [Qemu-devel] [RFC v2 2/6] hw/arm/virt: Enable dynamic
+ generation of guest RAM memory regions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,83 +24,112 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Shannon Zhao <zhaoshenglong@huawei.com>, qemu-arm@nongnu.org
-Cc: peter.maydell@linaro.org, shannon.zhaosl@gmail.com, qemu-devel@nongnu.org, eric.auger@redhat.com
+To: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
+Cc: qemu-devel@nongnu.org, qemu-arm@nongnu.org, peter.maydell@linaro.org, jonathan.cameron@huawei.com, linuxarm@huawei.com, eric.auger@redhat.com, alex.williamson@redhat.com, zhaoshenglong@huawei.com, imammedo@redhat.com
 
-On 05/28/2018 05:42 AM, Shannon Zhao wrote:
-> acpi_data_push uses g_array_set_size to resize the memory size. If there
-> is no enough contiguous memory, the address will be changed. So previous
-> pointer could not be used any more. It must update the pointer and use
-> the new one.
+On Wed, May 16, 2018 at 04:20:22PM +0100, Shameer Kolothum wrote:
+> Register ram_memory_region_init notifier to allocate memory region
+> from system memory.
 > 
-> Signed-off-by: Shannon Zhao <zhaoshenglong@huawei.com>
+> Signed-off-by: Zhu Yijun <zhuyijun@huawei.com>
+> Signed-off-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
 > ---
->  hw/arm/virt-acpi-build.c | 14 ++++++++++----
->  1 file changed, 10 insertions(+), 4 deletions(-)
+>  hw/arm/virt.c         | 28 ++++++++++++++++++++++------
+>  include/hw/arm/virt.h |  1 +
+>  2 files changed, 23 insertions(+), 6 deletions(-)
 > 
-> diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
-> index 92ceee9..30584ee 100644
-> --- a/hw/arm/virt-acpi-build.c
-> +++ b/hw/arm/virt-acpi-build.c
-> @@ -400,7 +400,7 @@ build_iort(GArray *table_data, BIOSLinker *linker, VirtMachineState *vms)
->      AcpiIortItsGroup *its;
->      AcpiIortTable *iort;
->      AcpiIortSmmu3 *smmu;
-> -    size_t node_size, iort_length, smmu_offset = 0;
-> +    size_t node_size, iort_node_offset, iort_length, smmu_offset = 0;
->      AcpiIortRC *rc;
+> diff --git a/hw/arm/virt.c b/hw/arm/virt.c
+> index 94dcb12..05fcb62 100644
+> --- a/hw/arm/virt.c
+> +++ b/hw/arm/virt.c
+> @@ -1171,6 +1171,19 @@ void virt_machine_done(Notifier *notifier, void *data)
+>      virt_build_smbios(vms);
+>  }
 >  
->      iort = acpi_data_push(table_data, sizeof(*iort));
-> @@ -414,6 +414,7 @@ build_iort(GArray *table_data, BIOSLinker *linker, VirtMachineState *vms)
->      iort_length = sizeof(*iort);
->      iort->node_count = cpu_to_le32(nb_nodes);
->      iort->node_offset = cpu_to_le32(sizeof(*iort));
-
-Eventually similar comment to explain why you also use another var:
-
-       /*
-        * Use a copy in case table_data->data moves during
-        * acpi_data_push operations.
-        */
-> +    iort_node_offset = iort->node_offset;
-
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-
+> +static void virt_ram_memory_region_init(Notifier *notifier, void *data)
+> +{
+> +    MemoryRegion *sysmem = get_system_memory();
+> +    MemoryRegion *ram = g_new(MemoryRegion, 1);
+> +    VirtMachineState *vms = container_of(notifier, VirtMachineState,
+> +                                         ram_memory_region_init);
+> +    MachineState *machine = MACHINE(vms);
+> +
+> +    memory_region_allocate_system_memory(ram, NULL, "mach-virt.ram",
+> +                                         machine->ram_size);
+> +    memory_region_add_subregion(sysmem, vms->memmap[VIRT_MEM].base, ram);
+> +}
+> +
+>  static uint64_t virt_cpu_mp_affinity(VirtMachineState *vms, int idx)
+>  {
+>      uint8_t clustersz = ARM_DEFAULT_CPUS_PER_CLUSTER;
+> @@ -1204,7 +1217,6 @@ static void machvirt_init(MachineState *machine)
+>      MemoryRegion *sysmem = get_system_memory();
+>      MemoryRegion *secure_sysmem = NULL;
+>      int n, virt_max_cpus;
+> -    MemoryRegion *ram = g_new(MemoryRegion, 1);
+>      bool firmware_loaded = bios_name || drive_get(IF_PFLASH, 0, 0);
 >  
->      /* ITS group node */
->      node_size =  sizeof(*its) + sizeof(uint32_t);
-> @@ -429,7 +430,7 @@ build_iort(GArray *table_data, BIOSLinker *linker, VirtMachineState *vms)
->          int irq =  vms->irqmap[VIRT_SMMU];
+>      /* We can probe only here because during property set
+> @@ -1361,10 +1373,6 @@ static void machvirt_init(MachineState *machine)
+>      fdt_add_timer_nodes(vms);
+>      fdt_add_cpu_nodes(vms);
 >  
->          /* SMMUv3 node */
-> -        smmu_offset = iort->node_offset + node_size;
-> +        smmu_offset = iort_node_offset + node_size;
->          node_size = sizeof(*smmu) + sizeof(*idmap);
->          iort_length += node_size;
->          smmu = acpi_data_push(table_data, node_size);
-> @@ -450,7 +451,7 @@ build_iort(GArray *table_data, BIOSLinker *linker, VirtMachineState *vms)
->          idmap->id_count = cpu_to_le32(0xFFFF);
->          idmap->output_base = 0;
->          /* output IORT node is the ITS group node (the first node) */
-> -        idmap->output_reference = cpu_to_le32(iort->node_offset);
-> +        idmap->output_reference = cpu_to_le32(iort_node_offset);
->      }
+> -    memory_region_allocate_system_memory(ram, NULL, "mach-virt.ram",
+> -                                         machine->ram_size);
+> -    memory_region_add_subregion(sysmem, vms->memmap[VIRT_MEM].base, ram);
+> -
+>      create_flash(vms, sysmem, secure_sysmem ? secure_sysmem : sysmem);
 >  
->      /* Root Complex Node */
-> @@ -479,9 +480,14 @@ build_iort(GArray *table_data, BIOSLinker *linker, VirtMachineState *vms)
->          idmap->output_reference = cpu_to_le32(smmu_offset);
->      } else {
->          /* output IORT node is the ITS group node (the first node) */
-> -        idmap->output_reference = cpu_to_le32(iort->node_offset);
-> +        idmap->output_reference = cpu_to_le32(iort_node_offset);
->      }
+>      create_gic(vms, pic);
+> @@ -1405,15 +1413,23 @@ static void machvirt_init(MachineState *machine)
+>      vms->bootinfo.loader_start = vms->memmap[VIRT_MEM].base;
+>      vms->bootinfo.get_dtb = machvirt_dtb;
+>      vms->bootinfo.firmware_loaded = firmware_loaded;
+> +
+> +    /* Register notifiers. They are executed in registration reverse order */
+>      arm_load_kernel(ARM_CPU(first_cpu), &vms->bootinfo);
 >  
+>      /*
+>       * arm_load_kernel machine init done notifier registration must
+>       * happen before the platform_bus_create call. In this latter,
+>       * another notifier is registered which adds platform bus nodes.
+> -     * Notifiers are executed in registration reverse order.
+>       */
+>      create_platform_bus(vms, pic);
+> +
 > +    /*
-> +     * Update the pointer address in case table_data->data moved during above
-> +     * acpi_data_push operations.
+> +     * Register memory region notifier last as this has to be executed
+> +     * first.
 > +     */
-> +    iort = (AcpiIortTable *)(table_data->data + iort_start);
->      iort->length = cpu_to_le32(iort_length);
+> +    vms->ram_memory_region_init.notify = virt_ram_memory_region_init;
+> +    qemu_add_machine_init_done_notifier(&vms->ram_memory_region_init);
+
+I realize we've been slow to get to this for reviewing, but a lot has
+changed here since this patch was written. virt now only has a single
+machine done notifier. On rebase we should attempt to integrate with
+that one rather than introduce a new one.
+
+Thanks,
+drew
+
+
+>  }
 >  
->      build_header(linker, table_data, (void *)(table_data->data + iort_start),
+>  static bool virt_get_secure(Object *obj, Error **errp)
+> diff --git a/include/hw/arm/virt.h b/include/hw/arm/virt.h
+> index ba0c1a4..fc24f3a 100644
+> --- a/include/hw/arm/virt.h
+> +++ b/include/hw/arm/virt.h
+> @@ -91,6 +91,7 @@ typedef struct {
+>  typedef struct {
+>      MachineState parent;
+>      Notifier machine_done;
+> +    Notifier ram_memory_region_init;
+>      FWCfgState *fw_cfg;
+>      bool secure;
+>      bool highmem;
+> -- 
+> 2.7.4
+> 
+> 
 > 
