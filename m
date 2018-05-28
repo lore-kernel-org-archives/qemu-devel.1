@@ -1,33 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56897)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56918)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fNEKh-000056-AU
-	for qemu-devel@nongnu.org; Mon, 28 May 2018 05:20:52 -0400
+	(envelope-from <clg@kaod.org>) id 1fNEKl-00007W-4x
+	for qemu-devel@nongnu.org; Mon, 28 May 2018 05:20:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fNEKc-0008Qc-9C
-	for qemu-devel@nongnu.org; Mon, 28 May 2018 05:20:51 -0400
-Received: from indium.canonical.com ([91.189.90.7]:58932)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1fNEKc-0008QB-0Y
-	for qemu-devel@nongnu.org; Mon, 28 May 2018 05:20:46 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1fNEKZ-0002rV-MI
-	for <qemu-devel@nongnu.org>; Mon, 28 May 2018 09:20:44 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 2C8232E88DD
-	for <qemu-devel@nongnu.org>; Mon, 28 May 2018 09:20:43 +0000 (UTC)
+	(envelope-from <clg@kaod.org>) id 1fNEKg-0008TC-4J
+	for qemu-devel@nongnu.org; Mon, 28 May 2018 05:20:55 -0400
+Received: from 8.mo4.mail-out.ovh.net ([188.165.33.112]:53387)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1fNEKf-0008Ri-TO
+	for qemu-devel@nongnu.org; Mon, 28 May 2018 05:20:50 -0400
+Received: from player787.ha.ovh.net (unknown [10.109.120.21])
+	by mo4.mail-out.ovh.net (Postfix) with ESMTP id 3A82916C946
+	for <qemu-devel@nongnu.org>; Mon, 28 May 2018 11:20:47 +0200 (CEST)
+References: <20180518164405.11804-1-clg@kaod.org>
+	<20180518164405.11804-2-clg@kaod.org>
+	<20180525160249.7cb0a5bc@bahia.lan>
+	<82ee8b24-91d7-9396-82b7-be37200cfacd@redhat.com>
+	<a567d42f-af8e-01da-5e0b-9b6f41c150cf@kaod.org>
+	<8d7552ef-a0b2-621e-8d56-edb128874a6e@redhat.com>
+From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Message-ID: <a51f298d-d199-ca41-7059-f00a3538ba61@kaod.org>
+Date: Mon, 28 May 2018 11:20:36 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <8d7552ef-a0b2-621e-8d56-edb128874a6e@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Date: Mon, 28 May 2018 09:12:21 -0000
-From: Satheesh Rajendran <sathnaga@linux.vnet.ibm.com>
-Reply-To: Bug 1773753 <1773753@bugs.launchpad.net>
-Sender: bounces@canonical.com
-Message-Id: <152749874146.3829.13327505377905335957.malonedeb@chaenomeles.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1773753] [NEW] virsh managed save fails with qemu
- version v2.12.0-813-g5a5c383b13-dirty on powerpc
+Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH 1/4] spapr: remove irq_hint
+ parameter from spapr_irq_alloc()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,170 +36,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Thomas Huth <thuth@redhat.com>, Greg Kurz <groug@kaod.org>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
 
-Public bug reported:
+On 05/28/2018 09:18 AM, Thomas Huth wrote:
+> On 28.05.2018 09:06, C=C3=A9dric Le Goater wrote:
+>> On 05/28/2018 08:17 AM, Thomas Huth wrote:
+>>> On 25.05.2018 16:02, Greg Kurz wrote:
+>>>> On Fri, 18 May 2018 18:44:02 +0200
+>>>> C=C3=A9dric Le Goater <clg@kaod.org> wrote:
+>>>>
+>>>>> This IRQ number hint can possibly be used by the VIO devices if the
+>>>>> "irq" property is defined on the command line but it seems it is ne=
+ver
+>>>>> the case. It is not used in libvirt for instance. So, let's remove =
+it
+>>>>> to simplify future changes.
+>>>>>
+>>>>
+>>>> Setting an irq manually looks a bit anachronistic. I doubt anyone wo=
+uld
+>>>> do that nowadays, and the patch does a nice cleanup. So this looks l=
+ike
+>>>> a good idea.
+>>> [...]
+>>>>> diff --git a/hw/ppc/spapr_vio.c b/hw/ppc/spapr_vio.c
+>>>>> index 472dd6f33a96..cc064f64fccf 100644
+>>>>> --- a/hw/ppc/spapr_vio.c
+>>>>> +++ b/hw/ppc/spapr_vio.c
+>>>>> @@ -455,7 +455,7 @@ static void spapr_vio_busdev_realize(DeviceStat=
+e *qdev, Error **errp)
+>>>>>          dev->qdev.id =3D id;
+>>>>>      }
+>>>>> =20
+>>>>> -    dev->irq =3D spapr_irq_alloc(spapr, dev->irq, false, &local_er=
+r);
+>>>>> +    dev->irq =3D spapr_irq_alloc(spapr, false, &local_err);
+>>>>
+>>>> Silently breaking "irq" like this looks wrong. I'd rather officially=
+ remove
+>>>> it first (ie, kill spapr_vio_props, -5 lines in spapr_vio.c).
+>>>>
+>>>> Of course, this raises the question of interface deprecation, and it=
+ should
+>>>> theoretically follow the process described at:
+>>>>
+>>>> https://wiki.qemu.org/Features/LegacyRemoval#Rules_for_removing_an_i=
+nterface
+>>>>
+>>>> Cc'ing Thomas, our Chief Deprecation Officer, for insights :)
+>>>
+>>> The property is a public interface. Just because it's not used by
+>>> libvirt does not mean that nobody is using it. So yes, please follow =
+the
+>>> rules and mark it as deprecated first for two release, before you rea=
+lly
+>>> remove it.
+>>
+>> This "irq" property is a problem to introduce a new static layout of I=
+RQ=20
+>> numbers. It is in complete opposition.=20
+>>
+>> Can we keep it as it is for old pseries machine (settable) and ignore =
+it=20
+>> for newer ? Would that be fine ?
+>=20
+> I think that would be fine, too. You likely need to keep the settable
+> IRQs around for the old machines anyway, to make sure that migration of
+> the old machine types still works, right?
 
-Host Env:
-IBM Power8 with Fedora28 base with compiled upstream kernel, qemu, libvirt.
+Yes, that is the goal of patch 3. It introduces a common sPAPR IRQ fronte=
+nd,
+the first backend being the current one.
 
-Host Kernel: 4.17.0-rc5-00069-g3acf4e395260
-
-qemu-kvm(5a5c383b1373aeb6c87a0d6060f6c3dc7c53082b):
-v2.12.0-813-g5a5c383b13-dirty
-
-libvirt(4804a4db33a37f828d033733bc47f6eff5d262c3):
-
-Guest Kernel: 4.17.0-rc7
-
-Steps to recreate:
-Define a guest attached with above setup and start.
-# virsh start avocado-vt-vm1
-
-guest console;...
-# uname -r
-4.17.0-rc7
-[root@atest-guest ~]# lscpu
-Architecture:        ppc64le
-Byte Order:          Little Endian
-CPU(s):              3
-On-line CPU(s) list: 0-2
-Thread(s) per core:  1
-Core(s) per socket:  1
-Socket(s):           3
-NUMA node(s):        1
-Model:               2.1 (pvr 004b 0201)
-Model name:          POWER8 (architected), altivec supported
-Hypervisor vendor:   KVM
-Virtualization type: para
-L1d cache:           64K
-L1i cache:           32K
-NUMA node0 CPU(s):   0-2
-
-
-# virsh managedsave avocado-vt-vm1 =
-
-
-Domain avocado-vt-vm1 state saved by libvirt
-
-# virsh list
- Id    Name                           State
-----------------------------------------------------
-
-# virsh start avocado-vt-vm1 ----Hangs forever and vm state goes to
-paused.
-
-
-# virsh list
- Id    Name                           State
-----------------------------------------------------
- 87    avocado-vt-vm1                 paused
-
-
-P:S:- with same above setup, just changing the qemu-kvm comes bydefault wit=
-h F28 works fine.
-
-/usr/bin/qemu-kvm --version
-QEMU emulator version 2.11.1(qemu-2.11.1-2.fc28)
-
-Summary: with above other setup.
-machine type pseries-2.12 and qemu-2.11.1-2.fc28 -Works fine.
-
-machine type pseries-2.12/pseries-2.13 and qemu
-5a5c383b1373aeb6c87a0d6060f6c3dc7c53082b - Does not work.
-
-** Affects: qemu
-     Importance: Undecided
-         Status: New
-
-** Attachment added: "vm xml"
-   https://bugs.launchpad.net/bugs/1773753/+attachment/5145459/+files/vm.xml
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1773753
-
-Title:
-  virsh managed save fails with qemu version
-  v2.12.0-813-g5a5c383b13-dirty on powerpc
-
-Status in QEMU:
-  New
-
-Bug description:
-  Host Env:
-  IBM Power8 with Fedora28 base with compiled upstream kernel, qemu, libvir=
-t.
-
-  Host Kernel: 4.17.0-rc5-00069-g3acf4e395260
-
-  qemu-kvm(5a5c383b1373aeb6c87a0d6060f6c3dc7c53082b):
-  v2.12.0-813-g5a5c383b13-dirty
-
-  libvirt(4804a4db33a37f828d033733bc47f6eff5d262c3):
-
-  Guest Kernel: 4.17.0-rc7
-
-  Steps to recreate:
-  Define a guest attached with above setup and start.
-  # virsh start avocado-vt-vm1
-
-  guest console;...
-  # uname -r
-  4.17.0-rc7
-  [root@atest-guest ~]# lscpu
-  Architecture:        ppc64le
-  Byte Order:          Little Endian
-  CPU(s):              3
-  On-line CPU(s) list: 0-2
-  Thread(s) per core:  1
-  Core(s) per socket:  1
-  Socket(s):           3
-  NUMA node(s):        1
-  Model:               2.1 (pvr 004b 0201)
-  Model name:          POWER8 (architected), altivec supported
-  Hypervisor vendor:   KVM
-  Virtualization type: para
-  L1d cache:           64K
-  L1i cache:           32K
-  NUMA node0 CPU(s):   0-2
-
-  =
-
-  # virsh managedsave avocado-vt-vm1 =
-
-
-  Domain avocado-vt-vm1 state saved by libvirt
-
-  # virsh list
-   Id    Name                           State
-  ----------------------------------------------------
-
-  # virsh start avocado-vt-vm1 ----Hangs forever and vm state goes to
-  paused.
-
-  =
-
-  # virsh list
-   Id    Name                           State
-  ----------------------------------------------------
-   87    avocado-vt-vm1                 paused
-
-  =
-
-  P:S:- with same above setup, just changing the qemu-kvm comes bydefault w=
-ith F28 works fine.
-
-  /usr/bin/qemu-kvm --version
-  QEMU emulator version 2.11.1(qemu-2.11.1-2.fc28)
-
-  Summary: with above other setup.
-  machine type pseries-2.12 and qemu-2.11.1-2.fc28 -Works fine.
-
-  machine type pseries-2.12/pseries-2.13 and qemu
-  5a5c383b1373aeb6c87a0d6060f6c3dc7c53082b - Does not work.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1773753/+subscriptions
+C.
