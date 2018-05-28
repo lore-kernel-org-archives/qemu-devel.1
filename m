@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:32915)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33037)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fNRYr-0007KQ-FX
-	for qemu-devel@nongnu.org; Mon, 28 May 2018 19:28:23 -0400
+	id 1fNRZ3-0007Wi-D5
+	for qemu-devel@nongnu.org; Mon, 28 May 2018 19:28:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fNRYp-0001E9-FW
-	for qemu-devel@nongnu.org; Mon, 28 May 2018 19:28:21 -0400
+	id 1fNRZ1-0001Sx-4A
+	for qemu-devel@nongnu.org; Mon, 28 May 2018 19:28:33 -0400
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Date: Mon, 28 May 2018 20:27:09 -0300
-Message-Id: <20180528232719.4721-12-f4bug@amsat.org>
+Date: Mon, 28 May 2018 20:27:10 -0300
+Message-Id: <20180528232719.4721-13-f4bug@amsat.org>
 In-Reply-To: <20180528232719.4721-1-f4bug@amsat.org>
 References: <20180528232719.4721-1-f4bug@amsat.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v4 11/21] hw: Do not include
- "exec/address-spaces.h" if it is not necessary
+Subject: [Qemu-devel] [PATCH v4 12/21] hw: Do not include
+ "sysemu/block-backend.h" if it is not necessary
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,381 +28,509 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Thomas Huth <thuth@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, qemu-trivial@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Alistair Francis <alistair@alistair23.me>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Thomas Huth <huth@tuxfamily.org>, Paul Burton <paul.burton@mips.com>, Jason Wang <jasowang@redhat.com>, Michael Clark <mjc@sifive.com>, Palmer Dabbelt <palmer@sifive.com>, Sagar Karandikar <sagark@eecs.berkeley.edu>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Aurelien Jarno <aurelien@aurel32.net>, Magnus Damm <magnus.damm@gmail.com>, Beniamino Galvani <b.galvani@gmail.com>, "open list:ARM" <qemu-arm@nongnu.org>, "open list:Block layer core" <qemu-block@nongnu.org>
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, qemu-trivial@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Andrzej Zaborowski <balrogg@gmail.com>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, Alistair Francis <alistair@alistair23.me>, Stefan Hajnoczi <stefanha@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, John Snow <jsnow@redhat.com>, Michael Walle <michael@walle.cc>, Aurelien Jarno <aurelien@aurel32.net>, Yongbok Kim <yongbok.kim@mips.com>, David Gibson <david@gibson.dropbear.id.au>, Alexander Graf <agraf@suse.de>, Cornelia Huck <cohuck@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Richard Henderson <rth@twiddle.net>, David Hildenbrand <david@redhat.com>, Fam Zheng <famz@redhat.com>, Magnus Damm <magnus.damm@gmail.com>, Stefano Stabellini <sstabellini@kernel.org>, Anthony Perard <anthony.perard@citrix.com>, Max Filippov <jcmvbkbc@gmail.com>, "open list:ARM" <qemu-arm@nongnu.org>, "open list:virtio-blk" <qemu-block@nongnu.org>, "open list:sPAPR" <qemu-ppc@nongnu.org>, "open list:virtio-ccw" <qemu-s390x@nongnu.org>, "open list:X86" <xen-devel@lists.xenproject.org>
 
-Code change produced with:
-    $ git grep '#include "exec/address-spaces.h"' hw include/hw | \
-      cut -d: -f-1 | \
-      xargs egrep -L "(get_system_|address_space_)" | \
-      xargs sed -i.bak '/#include "exec\/address-spaces.h"/d'
+Remove those unneeded includes to speed up the compilation
+process a little bit. (Continue 7eceff5b5a1fa cleanup)
 
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- include/hw/arm/allwinner-a10.h       | 1 -
- include/hw/arm/bcm2835_peripherals.h | 1 -
- include/hw/display/bcm2835_fb.h      | 1 -
- include/hw/dma/bcm2835_dma.h         | 1 -
- include/hw/misc/bcm2835_mbox.h       | 1 -
- include/hw/misc/bcm2835_property.h   | 1 -
- include/hw/sh4/sh_intc.h             | 1 -
- include/hw/virtio/virtio-access.h    | 1 -
- hw/arm/bcm2836.c                     | 1 -
- hw/arm/xlnx-zcu102.c                 | 1 -
- hw/block/onenand.c                   | 1 -
- hw/block/pflash_cfi01.c              | 1 -
- hw/block/pflash_cfi02.c              | 1 -
- hw/char/mcf_uart.c                   | 1 -
- hw/char/serial.c                     | 1 -
- hw/char/sh_serial.c                  | 1 -
- hw/core/loader-fit.c                 | 1 -
- hw/core/platform-bus.c               | 1 -
- hw/display/sm501.c                   | 1 -
- hw/m68k/mcf5206.c                    | 1 -
- hw/m68k/mcf_intc.c                   | 1 -
- hw/misc/arm_integrator_debug.c       | 1 -
- hw/net/mcf_fec.c                     | 1 -
- hw/net/ne2000-isa.c                  | 1 -
- hw/pci-host/versatile.c              | 1 -
- hw/riscv/riscv_htif.c                | 1 -
- hw/sh4/sh7750.c                      | 1 -
- hw/timer/sh_timer.c                  | 1 -
- 28 files changed, 28 deletions(-)
+ hw/arm/collie.c                          | 1 -
+ hw/arm/gumstix.c                         | 1 -
+ hw/arm/mainstone.c                       | 1 -
+ hw/arm/nseries.c                         | 1 -
+ hw/arm/omap1.c                           | 1 -
+ hw/arm/omap2.c                           | 1 -
+ hw/arm/omap_sx1.c                        | 1 -
+ hw/arm/pxa2xx.c                          | 1 -
+ hw/arm/spitz.c                           | 1 -
+ hw/arm/versatilepb.c                     | 1 -
+ hw/arm/vexpress.c                        | 1 -
+ hw/arm/virt.c                            | 1 -
+ hw/arm/xilinx_zynq.c                     | 1 -
+ hw/arm/z2.c                              | 1 -
+ hw/block/dataplane/virtio-blk.c          | 1 -
+ hw/block/virtio-blk.c                    | 1 -
+ hw/core/qdev-properties.c                | 1 -
+ hw/cris/axis_dev88.c                     | 1 -
+ hw/display/tc6393xb.c                    | 1 -
+ hw/ide/pci.c                             | 1 -
+ hw/ide/via.c                             | 1 -
+ hw/isa/isa-superio.c                     | 1 -
+ hw/lm32/lm32_boards.c                    | 1 -
+ hw/lm32/milkymist.c                      | 1 -
+ hw/microblaze/petalogix_ml605_mmu.c      | 1 -
+ hw/microblaze/petalogix_s3adsp1800_mmu.c | 1 -
+ hw/mips/mips_r4k.c                       | 1 -
+ hw/ppc/spapr.c                           | 1 -
+ hw/ppc/virtex_ml507.c                    | 2 --
+ hw/s390x/virtio-ccw.c                    | 1 -
+ hw/scsi/mptsas.c                         | 1 -
+ hw/sd/pl181.c                            | 1 -
+ hw/sd/sdhci.c                            | 1 -
+ hw/sd/ssi-sd.c                           | 1 -
+ hw/sh4/r2d.c                             | 1 -
+ hw/virtio/virtio-pci.c                   | 1 -
+ hw/xen/xen_devconfig.c                   | 1 -
+ hw/xtensa/xtfpga.c                       | 1 -
+ 38 files changed, 39 deletions(-)
 
-diff --git a/include/hw/arm/allwinner-a10.h b/include/hw/arm/allwinner-a10.h
-index 6b32a99e21..efb8fc8123 100644
---- a/include/hw/arm/allwinner-a10.h
-+++ b/include/hw/arm/allwinner-a10.h
-@@ -11,7 +11,6 @@
- #include "hw/ide/ahci.h"
+diff --git a/hw/arm/collie.c b/hw/arm/collie.c
+index f8c566e2e5..48b732c176 100644
+--- a/hw/arm/collie.c
++++ b/hw/arm/collie.c
+@@ -16,7 +16,6 @@
+ #include "strongarm.h"
+ #include "hw/arm/arm.h"
+ #include "hw/block/flash.h"
+-#include "sysemu/block-backend.h"
+ #include "exec/address-spaces.h"
+ #include "cpu.h"
  
- #include "sysemu/sysemu.h"
--#include "exec/address-spaces.h"
- 
- 
- #define AW_A10_PIC_REG_BASE     0x01c20400
-diff --git a/include/hw/arm/bcm2835_peripherals.h b/include/hw/arm/bcm2835_peripherals.h
-index 122b286de7..f5b193f670 100644
---- a/include/hw/arm/bcm2835_peripherals.h
-+++ b/include/hw/arm/bcm2835_peripherals.h
-@@ -12,7 +12,6 @@
- #define BCM2835_PERIPHERALS_H
- 
- #include "qemu-common.h"
--#include "exec/address-spaces.h"
- #include "hw/sysbus.h"
- #include "hw/char/bcm2835_aux.h"
- #include "hw/display/bcm2835_fb.h"
-diff --git a/include/hw/display/bcm2835_fb.h b/include/hw/display/bcm2835_fb.h
-index 9a12d7afa2..ae0a3807f2 100644
---- a/include/hw/display/bcm2835_fb.h
-+++ b/include/hw/display/bcm2835_fb.h
-@@ -12,7 +12,6 @@
- #define BCM2835_FB_H
- 
- #include "hw/sysbus.h"
--#include "exec/address-spaces.h"
- #include "ui/console.h"
- 
- #define TYPE_BCM2835_FB "bcm2835-fb"
-diff --git a/include/hw/dma/bcm2835_dma.h b/include/hw/dma/bcm2835_dma.h
-index 75312e2e17..60138f4d31 100644
---- a/include/hw/dma/bcm2835_dma.h
-+++ b/include/hw/dma/bcm2835_dma.h
-@@ -7,7 +7,6 @@
- #define BCM2835_DMA_H
- 
- #include "qemu-common.h"
--#include "exec/address-spaces.h"
- #include "hw/sysbus.h"
- 
- typedef struct {
-diff --git a/include/hw/misc/bcm2835_mbox.h b/include/hw/misc/bcm2835_mbox.h
-index f4e9ff9ef6..7e8f3ce86d 100644
---- a/include/hw/misc/bcm2835_mbox.h
-+++ b/include/hw/misc/bcm2835_mbox.h
-@@ -8,7 +8,6 @@
- 
- #include "bcm2835_mbox_defs.h"
- #include "hw/sysbus.h"
--#include "exec/address-spaces.h"
- 
- #define TYPE_BCM2835_MBOX "bcm2835-mbox"
- #define BCM2835_MBOX(obj) \
-diff --git a/include/hw/misc/bcm2835_property.h b/include/hw/misc/bcm2835_property.h
-index edcab603ce..11be0dbeac 100644
---- a/include/hw/misc/bcm2835_property.h
-+++ b/include/hw/misc/bcm2835_property.h
-@@ -7,7 +7,6 @@
- #define BCM2835_PROPERTY_H
- 
- #include "hw/sysbus.h"
--#include "exec/address-spaces.h"
- #include "net/net.h"
- #include "hw/display/bcm2835_fb.h"
- 
-diff --git a/include/hw/sh4/sh_intc.h b/include/hw/sh4/sh_intc.h
-index 7913bc48a2..fbcee94ed7 100644
---- a/include/hw/sh4/sh_intc.h
-+++ b/include/hw/sh4/sh_intc.h
-@@ -3,7 +3,6 @@
- 
- #include "qemu-common.h"
- #include "hw/irq.h"
--#include "exec/address-spaces.h"
- 
- typedef unsigned char intc_enum;
- 
-diff --git a/include/hw/virtio/virtio-access.h b/include/hw/virtio/virtio-access.h
-index 2e92074bd1..bdf58f3119 100644
---- a/include/hw/virtio/virtio-access.h
-+++ b/include/hw/virtio/virtio-access.h
-@@ -18,7 +18,6 @@
- 
- #include "hw/virtio/virtio.h"
- #include "hw/virtio/virtio-bus.h"
--#include "exec/address-spaces.h"
- 
- #if defined(TARGET_PPC64) || defined(TARGET_ARM)
- #define LEGACY_VIRTIO_IS_BIENDIAN 1
-diff --git a/hw/arm/bcm2836.c b/hw/arm/bcm2836.c
-index 3c4b44a53e..6805a7d7c8 100644
---- a/hw/arm/bcm2836.c
-+++ b/hw/arm/bcm2836.c
-@@ -15,7 +15,6 @@
- #include "hw/arm/bcm2836.h"
- #include "hw/arm/raspi_platform.h"
- #include "hw/sysbus.h"
--#include "exec/address-spaces.h"
- 
- /* Peripheral base address seen by the CPU */
- #define BCM2836_PERI_BASE       0x3F000000
-diff --git a/hw/arm/xlnx-zcu102.c b/hw/arm/xlnx-zcu102.c
-index b126cf148b..c70278c8c1 100644
---- a/hw/arm/xlnx-zcu102.c
-+++ b/hw/arm/xlnx-zcu102.c
-@@ -22,7 +22,6 @@
- #include "hw/arm/xlnx-zynqmp.h"
+diff --git a/hw/arm/gumstix.c b/hw/arm/gumstix.c
+index ea2a3c532d..56cb763c4e 100644
+--- a/hw/arm/gumstix.c
++++ b/hw/arm/gumstix.c
+@@ -42,7 +42,6 @@
+ #include "hw/block/flash.h"
+ #include "hw/devices.h"
  #include "hw/boards.h"
- #include "qemu/error-report.h"
--#include "exec/address-spaces.h"
- #include "qemu/log.h"
+-#include "sysemu/block-backend.h"
+ #include "exec/address-spaces.h"
  #include "sysemu/qtest.h"
- 
-diff --git a/hw/block/onenand.c b/hw/block/onenand.c
-index ed77f859e9..ab0c7ea1b3 100644
---- a/hw/block/onenand.c
-+++ b/hw/block/onenand.c
-@@ -27,7 +27,6 @@
- #include "sysemu/block-backend.h"
- #include "sysemu/blockdev.h"
- #include "exec/memory.h"
--#include "exec/address-spaces.h"
+ #include "cpu.h"
+diff --git a/hw/arm/mainstone.c b/hw/arm/mainstone.c
+index 4215c025fc..0beb5c426b 100644
+--- a/hw/arm/mainstone.c
++++ b/hw/arm/mainstone.c
+@@ -21,7 +21,6 @@
+ #include "hw/devices.h"
+ #include "hw/boards.h"
+ #include "hw/block/flash.h"
+-#include "sysemu/block-backend.h"
  #include "hw/sysbus.h"
- #include "qemu/error-report.h"
- 
-diff --git a/hw/block/pflash_cfi01.c b/hw/block/pflash_cfi01.c
-index 2e8284001d..e4b5b3c273 100644
---- a/hw/block/pflash_cfi01.c
-+++ b/hw/block/pflash_cfi01.c
-@@ -43,7 +43,6 @@
- #include "qapi/error.h"
- #include "qemu/timer.h"
- #include "qemu/bitops.h"
--#include "exec/address-spaces.h"
- #include "qemu/host-utils.h"
- #include "qemu/log.h"
- #include "hw/sysbus.h"
-diff --git a/hw/block/pflash_cfi02.c b/hw/block/pflash_cfi02.c
-index 75d1ae1026..a8b3f7f978 100644
---- a/hw/block/pflash_cfi02.c
-+++ b/hw/block/pflash_cfi02.c
-@@ -41,7 +41,6 @@
- #include "qapi/error.h"
- #include "qemu/timer.h"
- #include "sysemu/block-backend.h"
--#include "exec/address-spaces.h"
- #include "qemu/host-utils.h"
- #include "hw/sysbus.h"
- 
-diff --git a/hw/char/mcf_uart.c b/hw/char/mcf_uart.c
-index faae083e78..787f985db6 100644
---- a/hw/char/mcf_uart.c
-+++ b/hw/char/mcf_uart.c
-@@ -10,7 +10,6 @@
- #include "hw/sysbus.h"
- #include "hw/m68k/mcf.h"
- #include "chardev/char-fe.h"
--#include "exec/address-spaces.h"
- 
- typedef struct {
-     SysBusDevice parent_obj;
-diff --git a/hw/char/serial.c b/hw/char/serial.c
-index 2c080c9862..605b0d02f9 100644
---- a/hw/char/serial.c
-+++ b/hw/char/serial.c
-@@ -28,7 +28,6 @@
- #include "chardev/char-serial.h"
- #include "qapi/error.h"
- #include "qemu/timer.h"
--#include "exec/address-spaces.h"
- #include "qemu/error-report.h"
- 
- //#define DEBUG_SERIAL
-diff --git a/hw/char/sh_serial.c b/hw/char/sh_serial.c
-index 835b5378a0..373a40595f 100644
---- a/hw/char/sh_serial.c
-+++ b/hw/char/sh_serial.c
-@@ -28,7 +28,6 @@
+ #include "exec/address-spaces.h"
+ #include "sysemu/qtest.h"
+diff --git a/hw/arm/nseries.c b/hw/arm/nseries.c
+index 32687afced..906b7ca22d 100644
+--- a/hw/arm/nseries.c
++++ b/hw/arm/nseries.c
+@@ -35,7 +35,6 @@
  #include "hw/hw.h"
- #include "hw/sh4/sh.h"
- #include "chardev/char-fe.h"
--#include "exec/address-spaces.h"
+ #include "hw/bt.h"
+ #include "hw/loader.h"
+-#include "sysemu/block-backend.h"
+ #include "hw/sysbus.h"
+ #include "qemu/log.h"
+ #include "exec/address-spaces.h"
+diff --git a/hw/arm/omap1.c b/hw/arm/omap1.c
+index e54c1f8f99..854996c1ac 100644
+--- a/hw/arm/omap1.c
++++ b/hw/arm/omap1.c
+@@ -28,7 +28,6 @@
+ #include "hw/arm/omap.h"
+ #include "sysemu/sysemu.h"
+ #include "hw/arm/soc_dma.h"
+-#include "sysemu/block-backend.h"
+ #include "sysemu/blockdev.h"
+ #include "sysemu/qtest.h"
+ #include "qemu/range.h"
+diff --git a/hw/arm/omap2.c b/hw/arm/omap2.c
+index b8d0910a1f..cc4250b7da 100644
+--- a/hw/arm/omap2.c
++++ b/hw/arm/omap2.c
+@@ -23,7 +23,6 @@
  #include "qapi/error.h"
- 
- //#define DEBUG_SERIAL
-diff --git a/hw/core/loader-fit.c b/hw/core/loader-fit.c
-index 0c4a7207f4..6387854b54 100644
---- a/hw/core/loader-fit.c
-+++ b/hw/core/loader-fit.c
+ #include "qemu-common.h"
+ #include "cpu.h"
+-#include "sysemu/block-backend.h"
+ #include "sysemu/blockdev.h"
+ #include "sysemu/qtest.h"
+ #include "hw/boards.h"
+diff --git a/hw/arm/omap_sx1.c b/hw/arm/omap_sx1.c
+index eccc19c77b..84550f0236 100644
+--- a/hw/arm/omap_sx1.c
++++ b/hw/arm/omap_sx1.c
+@@ -33,7 +33,6 @@
+ #include "hw/boards.h"
+ #include "hw/arm/arm.h"
+ #include "hw/block/flash.h"
+-#include "sysemu/block-backend.h"
+ #include "sysemu/qtest.h"
+ #include "exec/address-spaces.h"
+ #include "cpu.h"
+diff --git a/hw/arm/pxa2xx.c b/hw/arm/pxa2xx.c
+index a2803fdee4..b67b0cefb6 100644
+--- a/hw/arm/pxa2xx.c
++++ b/hw/arm/pxa2xx.c
+@@ -19,7 +19,6 @@
+ #include "hw/i2c/i2c.h"
+ #include "hw/ssi/ssi.h"
+ #include "chardev/char-fe.h"
+-#include "sysemu/block-backend.h"
+ #include "sysemu/blockdev.h"
+ #include "sysemu/qtest.h"
+ #include "qemu/cutils.h"
+diff --git a/hw/arm/spitz.c b/hw/arm/spitz.c
+index e419e3c00e..3cc27a1e44 100644
+--- a/hw/arm/spitz.c
++++ b/hw/arm/spitz.c
+@@ -27,7 +27,6 @@
+ #include "hw/audio/wm8750.h"
+ #include "audio/audio.h"
+ #include "hw/boards.h"
+-#include "sysemu/block-backend.h"
+ #include "hw/sysbus.h"
+ #include "exec/address-spaces.h"
+ #include "cpu.h"
+diff --git a/hw/arm/versatilepb.c b/hw/arm/versatilepb.c
+index e01e3192ff..a5a06b6d40 100644
+--- a/hw/arm/versatilepb.c
++++ b/hw/arm/versatilepb.c
+@@ -19,7 +19,6 @@
+ #include "hw/pci/pci.h"
+ #include "hw/i2c/i2c.h"
+ #include "hw/boards.h"
+-#include "sysemu/block-backend.h"
+ #include "exec/address-spaces.h"
+ #include "hw/block/flash.h"
+ #include "qemu/error-report.h"
+diff --git a/hw/arm/vexpress.c b/hw/arm/vexpress.c
+index f1e33c8a36..5bfe2e4348 100644
+--- a/hw/arm/vexpress.c
++++ b/hw/arm/vexpress.c
+@@ -35,7 +35,6 @@
+ #include "hw/boards.h"
+ #include "hw/loader.h"
+ #include "exec/address-spaces.h"
+-#include "sysemu/block-backend.h"
+ #include "hw/block/flash.h"
+ #include "sysemu/device_tree.h"
+ #include "qemu/error-report.h"
+diff --git a/hw/arm/virt.c b/hw/arm/virt.c
+index a3a28e20e8..3aa19b2935 100644
+--- a/hw/arm/virt.c
++++ b/hw/arm/virt.c
+@@ -38,7 +38,6 @@
+ #include "hw/vfio/vfio-amd-xgbe.h"
+ #include "hw/devices.h"
+ #include "net/net.h"
+-#include "sysemu/block-backend.h"
+ #include "sysemu/device_tree.h"
+ #include "sysemu/numa.h"
+ #include "sysemu/sysemu.h"
+diff --git a/hw/arm/xilinx_zynq.c b/hw/arm/xilinx_zynq.c
+index 899a26326f..f1496d2927 100644
+--- a/hw/arm/xilinx_zynq.c
++++ b/hw/arm/xilinx_zynq.c
+@@ -26,7 +26,6 @@
+ #include "sysemu/sysemu.h"
+ #include "hw/boards.h"
+ #include "hw/block/flash.h"
+-#include "sysemu/block-backend.h"
+ #include "hw/loader.h"
+ #include "hw/misc/zynq-xadc.h"
+ #include "hw/ssi/ssi.h"
+diff --git a/hw/arm/z2.c b/hw/arm/z2.c
+index 730a5392e9..697a822f1e 100644
+--- a/hw/arm/z2.c
++++ b/hw/arm/z2.c
+@@ -21,7 +21,6 @@
+ #include "hw/boards.h"
+ #include "sysemu/sysemu.h"
+ #include "hw/block/flash.h"
+-#include "sysemu/block-backend.h"
+ #include "ui/console.h"
+ #include "hw/audio/wm8750.h"
+ #include "audio/audio.h"
+diff --git a/hw/block/dataplane/virtio-blk.c b/hw/block/dataplane/virtio-blk.c
+index 101f32cf66..d648aeb73b 100644
+--- a/hw/block/dataplane/virtio-blk.c
++++ b/hw/block/dataplane/virtio-blk.c
+@@ -19,7 +19,6 @@
+ #include "qemu/thread.h"
+ #include "qemu/error-report.h"
+ #include "hw/virtio/virtio-access.h"
+-#include "sysemu/block-backend.h"
+ #include "hw/virtio/virtio-blk.h"
+ #include "virtio-blk.h"
+ #include "block/aio.h"
+diff --git a/hw/block/virtio-blk.c b/hw/block/virtio-blk.c
+index b1532e4e91..50b5c869e3 100644
+--- a/hw/block/virtio-blk.c
++++ b/hw/block/virtio-blk.c
 @@ -18,7 +18,6 @@
+ #include "qemu/error-report.h"
+ #include "trace.h"
+ #include "hw/block/block.h"
+-#include "sysemu/block-backend.h"
+ #include "sysemu/blockdev.h"
+ #include "hw/virtio/virtio-blk.h"
+ #include "dataplane/virtio-blk.h"
+diff --git a/hw/core/qdev-properties.c b/hw/core/qdev-properties.c
+index 5bbc2d98b5..989778ab7f 100644
+--- a/hw/core/qdev-properties.c
++++ b/hw/core/qdev-properties.c
+@@ -5,7 +5,6 @@
+ #include "hw/pci/pci.h"
+ #include "qapi/qmp/qerror.h"
+ #include "qemu/error-report.h"
+-#include "sysemu/block-backend.h"
+ #include "hw/block/block.h"
+ #include "net/hub.h"
+ #include "qapi/visitor.h"
+diff --git a/hw/cris/axis_dev88.c b/hw/cris/axis_dev88.c
+index 409f3d581a..56ee398ee5 100644
+--- a/hw/cris/axis_dev88.c
++++ b/hw/cris/axis_dev88.c
+@@ -34,7 +34,6 @@
+ #include "hw/loader.h"
+ #include "elf.h"
+ #include "boot.h"
+-#include "sysemu/block-backend.h"
+ #include "exec/address-spaces.h"
+ #include "sysemu/qtest.h"
+ #include "sysemu/sysemu.h"
+diff --git a/hw/display/tc6393xb.c b/hw/display/tc6393xb.c
+index 464465b7c2..8392e59493 100644
+--- a/hw/display/tc6393xb.c
++++ b/hw/display/tc6393xb.c
+@@ -18,7 +18,6 @@
+ #include "hw/block/flash.h"
+ #include "ui/console.h"
+ #include "ui/pixel_ops.h"
+-#include "sysemu/block-backend.h"
+ #include "sysemu/blockdev.h"
+ 
+ #define IRQ_TC6393_NAND		0
+diff --git a/hw/ide/pci.c b/hw/ide/pci.c
+index 1ab0a892d0..fe1ceeb0cd 100644
+--- a/hw/ide/pci.c
++++ b/hw/ide/pci.c
+@@ -26,7 +26,6 @@
+ #include "hw/hw.h"
+ #include "hw/pci/pci.h"
+ #include "hw/isa/isa.h"
+-#include "sysemu/block-backend.h"
+ #include "sysemu/dma.h"
+ #include "qemu/error-report.h"
+ #include "hw/ide/pci.h"
+diff --git a/hw/ide/via.c b/hw/ide/via.c
+index 117ac4d95e..238f038d72 100644
+--- a/hw/ide/via.c
++++ b/hw/ide/via.c
+@@ -27,7 +27,6 @@
+ #include "hw/hw.h"
+ #include "hw/pci/pci.h"
+ #include "hw/isa/isa.h"
+-#include "sysemu/block-backend.h"
+ #include "sysemu/sysemu.h"
+ #include "sysemu/dma.h"
+ 
+diff --git a/hw/isa/isa-superio.c b/hw/isa/isa-superio.c
+index 76286c81a1..9359be7008 100644
+--- a/hw/isa/isa-superio.c
++++ b/hw/isa/isa-superio.c
+@@ -13,7 +13,6 @@
+ #include "qemu/error-report.h"
+ #include "qapi/error.h"
+ #include "sysemu/sysemu.h"
+-#include "sysemu/block-backend.h"
+ #include "sysemu/blockdev.h"
+ #include "chardev/char.h"
+ #include "hw/isa/superio.h"
+diff --git a/hw/lm32/lm32_boards.c b/hw/lm32/lm32_boards.c
+index 907e875d02..167058348e 100644
+--- a/hw/lm32/lm32_boards.c
++++ b/hw/lm32/lm32_boards.c
+@@ -27,7 +27,6 @@
+ #include "hw/devices.h"
+ #include "hw/boards.h"
+ #include "hw/loader.h"
+-#include "sysemu/block-backend.h"
+ #include "elf.h"
+ #include "lm32_hwsetup.h"
+ #include "lm32.h"
+diff --git a/hw/lm32/milkymist.c b/hw/lm32/milkymist.c
+index f9688e059e..c36bbc4ae2 100644
+--- a/hw/lm32/milkymist.c
++++ b/hw/lm32/milkymist.c
+@@ -30,7 +30,6 @@
+ #include "hw/boards.h"
+ #include "hw/loader.h"
+ #include "elf.h"
+-#include "sysemu/block-backend.h"
+ #include "milkymist-hw.h"
+ #include "lm32.h"
+ #include "exec/address-spaces.h"
+diff --git a/hw/microblaze/petalogix_ml605_mmu.c b/hw/microblaze/petalogix_ml605_mmu.c
+index cf6bf3f32a..6c4a544eac 100644
+--- a/hw/microblaze/petalogix_ml605_mmu.c
++++ b/hw/microblaze/petalogix_ml605_mmu.c
+@@ -36,7 +36,6 @@
+ #include "sysemu/sysemu.h"
+ #include "hw/devices.h"
+ #include "hw/boards.h"
+-#include "sysemu/block-backend.h"
+ #include "hw/char/serial.h"
+ #include "exec/address-spaces.h"
+ #include "hw/ssi/ssi.h"
+diff --git a/hw/microblaze/petalogix_s3adsp1800_mmu.c b/hw/microblaze/petalogix_s3adsp1800_mmu.c
+index 1186002a76..0da3e62102 100644
+--- a/hw/microblaze/petalogix_s3adsp1800_mmu.c
++++ b/hw/microblaze/petalogix_s3adsp1800_mmu.c
+@@ -34,7 +34,6 @@
+ #include "sysemu/sysemu.h"
+ #include "hw/devices.h"
+ #include "hw/boards.h"
+-#include "sysemu/block-backend.h"
+ #include "exec/address-spaces.h"
+ #include "hw/char/xilinx_uartlite.h"
+ 
+diff --git a/hw/mips/mips_r4k.c b/hw/mips/mips_r4k.c
+index e04b49d3c5..e5cf8ed1a3 100644
+--- a/hw/mips/mips_r4k.c
++++ b/hw/mips/mips_r4k.c
+@@ -30,7 +30,6 @@
+ #include "hw/timer/mc146818rtc.h"
+ #include "hw/input/i8042.h"
+ #include "hw/timer/i8254.h"
+-#include "sysemu/block-backend.h"
+ #include "exec/address-spaces.h"
+ #include "sysemu/qtest.h"
+ #include "qemu/error-report.h"
+diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+index ebf30dd60b..2e910428f3 100644
+--- a/hw/ppc/spapr.c
++++ b/hw/ppc/spapr.c
+@@ -35,7 +35,6 @@
+ #include "elf.h"
+ #include "net/net.h"
+ #include "sysemu/device_tree.h"
+-#include "sysemu/block-backend.h"
+ #include "sysemu/cpus.h"
+ #include "sysemu/hw_accel.h"
+ #include "kvm_ppc.h"
+diff --git a/hw/ppc/virtex_ml507.c b/hw/ppc/virtex_ml507.c
+index a80cbdd7ee..b4bb90d50b 100644
+--- a/hw/ppc/virtex_ml507.c
++++ b/hw/ppc/virtex_ml507.c
+@@ -44,8 +44,6 @@
+ #include "hw/ppc/ppc4xx.h"
+ #include "ppc405.h"
+ 
+-#include "sysemu/block-backend.h"
+-
+ #define EPAPR_MAGIC    (0x45504150)
+ #define FLASH_SIZE     (16 * 1024 * 1024)
+ 
+diff --git a/hw/s390x/virtio-ccw.c b/hw/s390x/virtio-ccw.c
+index 22df33b509..b68798ac52 100644
+--- a/hw/s390x/virtio-ccw.c
++++ b/hw/s390x/virtio-ccw.c
+@@ -13,7 +13,6 @@
+ #include "qemu/osdep.h"
+ #include "qapi/error.h"
+ #include "hw/hw.h"
+-#include "sysemu/block-backend.h"
+ #include "sysemu/blockdev.h"
+ #include "sysemu/sysemu.h"
+ #include "sysemu/kvm.h"
+diff --git a/hw/scsi/mptsas.c b/hw/scsi/mptsas.c
+index 3f061f3f68..4176e871e1 100644
+--- a/hw/scsi/mptsas.c
++++ b/hw/scsi/mptsas.c
+@@ -26,7 +26,6 @@
+ #include "hw/hw.h"
+ #include "hw/pci/pci.h"
+ #include "sysemu/dma.h"
+-#include "sysemu/block-backend.h"
+ #include "hw/pci/msi.h"
+ #include "qemu/iov.h"
+ #include "hw/scsi/scsi.h"
+diff --git a/hw/sd/pl181.c b/hw/sd/pl181.c
+index 3ba1f7dd23..1cc94dbfdf 100644
+--- a/hw/sd/pl181.c
++++ b/hw/sd/pl181.c
+@@ -8,7 +8,6 @@
   */
  
  #include "qemu/osdep.h"
--#include "exec/address-spaces.h"
- #include "exec/memory.h"
- #include "hw/loader.h"
- #include "hw/loader-fit.h"
-diff --git a/hw/core/platform-bus.c b/hw/core/platform-bus.c
-index 807cb5ccda..e473a44746 100644
---- a/hw/core/platform-bus.c
-+++ b/hw/core/platform-bus.c
-@@ -21,7 +21,6 @@
- 
- #include "qemu/osdep.h"
- #include "hw/platform-bus.h"
--#include "exec/address-spaces.h"
+-#include "sysemu/block-backend.h"
+ #include "sysemu/blockdev.h"
+ #include "hw/sysbus.h"
+ #include "hw/sd/sd.h"
+diff --git a/hw/sd/sdhci.c b/hw/sd/sdhci.c
+index 63c44a4ee8..b65403947b 100644
+--- a/hw/sd/sdhci.c
++++ b/hw/sd/sdhci.c
+@@ -26,7 +26,6 @@
  #include "qemu/error-report.h"
- #include "sysemu/sysemu.h"
- 
-diff --git a/hw/display/sm501.c b/hw/display/sm501.c
-index f4bb33c279..e47be99451 100644
---- a/hw/display/sm501.c
-+++ b/hw/display/sm501.c
-@@ -36,7 +36,6 @@
- #include "hw/pci/pci.h"
- #include "qemu/range.h"
- #include "ui/pixel_ops.h"
--#include "exec/address-spaces.h"
- 
- /*
-  * Status: 2010/05/07
-diff --git a/hw/m68k/mcf5206.c b/hw/m68k/mcf5206.c
-index 6ad1e4bd2d..7abd84ac47 100644
---- a/hw/m68k/mcf5206.c
-+++ b/hw/m68k/mcf5206.c
-@@ -14,7 +14,6 @@
- #include "qemu/timer.h"
- #include "hw/ptimer.h"
- #include "sysemu/sysemu.h"
--#include "exec/address-spaces.h"
- 
- /* General purpose timer module.  */
- typedef struct {
-diff --git a/hw/m68k/mcf_intc.c b/hw/m68k/mcf_intc.c
-index 8198afac1e..393ce284a2 100644
---- a/hw/m68k/mcf_intc.c
-+++ b/hw/m68k/mcf_intc.c
-@@ -11,7 +11,6 @@
- #include "hw/hw.h"
- #include "hw/sysbus.h"
- #include "hw/m68k/mcf.h"
--#include "exec/address-spaces.h"
- 
- #define TYPE_MCF_INTC "mcf-intc"
- #define MCF_INTC(obj) OBJECT_CHECK(mcf_intc_state, (obj), TYPE_MCF_INTC)
-diff --git a/hw/misc/arm_integrator_debug.c b/hw/misc/arm_integrator_debug.c
-index 8a5f29559d..533e6e3208 100644
---- a/hw/misc/arm_integrator_debug.c
-+++ b/hw/misc/arm_integrator_debug.c
-@@ -17,7 +17,6 @@
- #include "qemu/osdep.h"
- #include "hw/hw.h"
- #include "hw/sysbus.h"
--#include "exec/address-spaces.h"
- #include "hw/misc/arm_integrator_debug.h"
- #include "qemu/log.h"
- 
-diff --git a/hw/net/mcf_fec.c b/hw/net/mcf_fec.c
-index bfa6b4bcce..0091e4ecdd 100644
---- a/hw/net/mcf_fec.c
-+++ b/hw/net/mcf_fec.c
-@@ -14,7 +14,6 @@
- #include "hw/sysbus.h"
- /* For crc32 */
- #include <zlib.h>
--#include "exec/address-spaces.h"
- 
- //#define DEBUG_FEC 1
- 
-diff --git a/hw/net/ne2000-isa.c b/hw/net/ne2000-isa.c
-index 70e5c1d3d4..c7fdeb0f6c 100644
---- a/hw/net/ne2000-isa.c
-+++ b/hw/net/ne2000-isa.c
-@@ -27,7 +27,6 @@
- #include "hw/qdev.h"
- #include "ne2000.h"
- #include "sysemu/sysemu.h"
--#include "exec/address-spaces.h"
  #include "qapi/error.h"
- #include "qapi/visitor.h"
- 
-diff --git a/hw/pci-host/versatile.c b/hw/pci-host/versatile.c
-index d0b02bdc47..7b19078c80 100644
---- a/hw/pci-host/versatile.c
-+++ b/hw/pci-host/versatile.c
-@@ -12,7 +12,6 @@
- #include "hw/pci/pci.h"
- #include "hw/pci/pci_bus.h"
- #include "hw/pci/pci_host.h"
--#include "exec/address-spaces.h"
- #include "qemu/log.h"
- 
- /* Old and buggy versions of QEMU used the wrong mapping from
-diff --git a/hw/riscv/riscv_htif.c b/hw/riscv/riscv_htif.c
-index f73512941f..4f7b11dc37 100644
---- a/hw/riscv/riscv_htif.c
-+++ b/hw/riscv/riscv_htif.c
-@@ -29,7 +29,6 @@
- #include "chardev/char-fe.h"
- #include "hw/riscv/riscv_htif.h"
+ #include "hw/hw.h"
+-#include "sysemu/block-backend.h"
+ #include "sysemu/blockdev.h"
+ #include "sysemu/dma.h"
  #include "qemu/timer.h"
--#include "exec/address-spaces.h"
+diff --git a/hw/sd/ssi-sd.c b/hw/sd/ssi-sd.c
+index ae04b6641b..96542ecd62 100644
+--- a/hw/sd/ssi-sd.c
++++ b/hw/sd/ssi-sd.c
+@@ -11,7 +11,6 @@
+  */
+ 
+ #include "qemu/osdep.h"
+-#include "sysemu/block-backend.h"
+ #include "sysemu/blockdev.h"
+ #include "hw/ssi/ssi.h"
+ #include "hw/sd/sd.h"
+diff --git a/hw/sh4/r2d.c b/hw/sh4/r2d.c
+index 6b01d6eed8..8fe8766eb9 100644
+--- a/hw/sh4/r2d.c
++++ b/hw/sh4/r2d.c
+@@ -40,7 +40,6 @@
+ #include "hw/loader.h"
+ #include "hw/usb.h"
+ #include "hw/block/flash.h"
+-#include "sysemu/block-backend.h"
+ #include "exec/address-spaces.h"
+ 
+ #define FLASH_BASE 0x00000000
+diff --git a/hw/virtio/virtio-pci.c b/hw/virtio/virtio-pci.c
+index 5eb0c323ca..3a01fe90f0 100644
+--- a/hw/virtio/virtio-pci.c
++++ b/hw/virtio/virtio-pci.c
+@@ -32,7 +32,6 @@
+ #include "hw/pci/msix.h"
+ #include "hw/loader.h"
+ #include "sysemu/kvm.h"
+-#include "sysemu/block-backend.h"
+ #include "virtio-pci.h"
+ #include "qemu/range.h"
+ #include "hw/virtio/virtio-bus.h"
+diff --git a/hw/xen/xen_devconfig.c b/hw/xen/xen_devconfig.c
+index fac9d3fcdc..aebc19bd71 100644
+--- a/hw/xen/xen_devconfig.c
++++ b/hw/xen/xen_devconfig.c
+@@ -1,7 +1,6 @@
+ #include "qemu/osdep.h"
+ #include "hw/xen/xen_backend.h"
+ #include "qemu/option.h"
+-#include "sysemu/block-backend.h"
+ #include "sysemu/blockdev.h"
+ 
+ /* ------------------------------------------------------------- */
+diff --git a/hw/xtensa/xtfpga.c b/hw/xtensa/xtfpga.c
+index 63734c70ec..5dc13034f9 100644
+--- a/hw/xtensa/xtfpga.c
++++ b/hw/xtensa/xtfpga.c
+@@ -38,7 +38,6 @@
+ #include "net/net.h"
+ #include "hw/sysbus.h"
+ #include "hw/block/flash.h"
+-#include "sysemu/block-backend.h"
+ #include "chardev/char.h"
+ #include "sysemu/device_tree.h"
  #include "qemu/error-report.h"
- 
- #define RISCV_DEBUG_HTIF 0
-diff --git a/hw/sh4/sh7750.c b/hw/sh4/sh7750.c
-index 5a7d47d31e..2dc07a904b 100644
---- a/hw/sh4/sh7750.c
-+++ b/hw/sh4/sh7750.c
-@@ -31,7 +31,6 @@
- #include "hw/sh4/sh_intc.h"
- #include "cpu.h"
- #include "exec/exec-all.h"
--#include "exec/address-spaces.h"
- 
- #define NB_DEVICES 4
- 
-diff --git a/hw/timer/sh_timer.c b/hw/timer/sh_timer.c
-index 9afb2d048c..5f8736cf10 100644
---- a/hw/timer/sh_timer.c
-+++ b/hw/timer/sh_timer.c
-@@ -13,7 +13,6 @@
- #include "hw/sh4/sh.h"
- #include "qemu/timer.h"
- #include "qemu/main-loop.h"
--#include "exec/address-spaces.h"
- #include "hw/ptimer.h"
- 
- //#define DEBUG_TIMER
 -- 
 2.17.0
