@@ -1,24 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40276)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41422)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1fNIf8-0001ll-Hm
-	for qemu-devel@nongnu.org; Mon, 28 May 2018 09:58:15 -0400
+	(envelope-from <joel.stan@gmail.com>) id 1fNIke-0003uj-Lk
+	for qemu-devel@nongnu.org; Mon, 28 May 2018 10:03:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1fNIf7-0008CD-T0
-	for qemu-devel@nongnu.org; Mon, 28 May 2018 09:58:14 -0400
-From: Alberto Garcia <berto@igalia.com>
-In-Reply-To: <CAFEAcA9ose2=2t+ehCt5yPqoBDhm6NRG9AicsO9X-PD8KxObGA@mail.gmail.com>
-References: <20180515154033.19899-1-kwolf@redhat.com>
-	<20180515154033.19899-21-kwolf@redhat.com>
-	<CAFEAcA-FhMC0LqkYcRh3fV864wNSAJnHbT3657Y55MN9=RO72Q@mail.gmail.com>
-	<20180528083855.GB4580@localhost.localdomain>
-	<w51vab8qhqu.fsf@maestria.local.igalia.com>
-	<CAFEAcA9ose2=2t+ehCt5yPqoBDhm6NRG9AicsO9X-PD8KxObGA@mail.gmail.com>
-Date: Mon, 28 May 2018 15:58:03 +0200
-Message-ID: <w51sh6brifo.fsf@maestria.local.igalia.com>
+	(envelope-from <joel.stan@gmail.com>) id 1fNIkd-0004jg-I1
+	for qemu-devel@nongnu.org; Mon, 28 May 2018 10:03:56 -0400
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PULL 20/37] qcow2: Give the refcount cache the
- minimum possible size by default
+Sender: joel.stan@gmail.com
+In-Reply-To: <9959794d-6d3b-b797-bfc8-b548d54378ad@kaod.org>
+References: <20180528124621.22977-1-joel@jms.id.au>
+	<9959794d-6d3b-b797-bfc8-b548d54378ad@kaod.org>
+From: Joel Stanley <joel@jms.id.au>
+Date: Mon, 28 May 2018 23:33:34 +0930
+Message-ID: <CACPK8Xe5+-zVfoS-g2Te7YOuT5emT-i=JsNDrF52WLVzLERQcw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] aspeed_scu: Implement RNG register
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,35 +24,89 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Kevin Wolf <kwolf@redhat.com>, Qemu-block <qemu-block@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
+To: =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@kaod.org>
+Cc: qemu-devel@nongnu.org, qemu-arm@nongnu.org, Andrew Jeffery <andrew@aj.id.au>
 
-On Mon 28 May 2018 03:49:07 PM CEST, Peter Maydell wrote:
-> On 28 May 2018 at 09:58, Alberto Garcia <berto@igalia.com> wrote:
->> On Mon 28 May 2018 10:38:55 AM CEST, Kevin Wolf wrote:
->>>> > +        if (!refcount_cache_size_set) {
->>>> > +            *refcount_cache_size = MIN_REFCOUNT_CACHE_SIZE * s->cluster_size;
->>>>
->>>> ...but in the else clause down here, we don't have the cast, and
->>>> Coverity complains that we evaluate a 32-bit result and then put it
->>>> in a 64-bit variable. Should this have the (uint64_t) cast as well ?
->>
->> I suppose that's not because we put a 32-bit result in a 64-bit
->> variable, but because it could theoretically overflow (if
->> s->cluster_size > INT32_MAX / 4).
+On 28 May 2018 at 23:17, C=C3=A9dric Le Goater <clg@kaod.org> wrote:
+> Hello Joel,
 >
-> Well, coverity warns because it's one of those things that could be
-> correct code, or could be the author tripping over one of C's
-> less-than-obvious traps. 32x32->32 multiplies are just as susceptible
-> to overflow, but the heuristic Coverity uses is "calculated a 32-bit
-> multiply result and put it in a 64-bit variable", on the assumption
-> that the type of the destination implies that whatever you're
-> calculating could well be that big, and "truncate the result of my
-> multiply even though it would fit in the destination" is a bit
-> unexpected. Coverity's wrong quite a bit on this one, naturally, but
-> it's usually easier to shut it up on the wrong guesses for the benefit
-> of the times when it turns out to be right.
+> On 05/28/2018 02:46 PM, Joel Stanley wrote:
+>> The ASPEED SoCs contain a single register that returns random data when
+>> read. This models that register so that guests can use it.
+>>
+>> Signed-off-by: Joel Stanley <joel@jms.id.au>
+>> ---
+>>  hw/misc/aspeed_scu.c | 19 +++++++++++++++++++
+>>  1 file changed, 19 insertions(+)
+>>
+>> diff --git a/hw/misc/aspeed_scu.c b/hw/misc/aspeed_scu.c
+>> index 5e6d5744eeca..8fa0cecf0fa1 100644
+>> --- a/hw/misc/aspeed_scu.c
+>> +++ b/hw/misc/aspeed_scu.c
+>> @@ -16,6 +16,7 @@
+>>  #include "qapi/visitor.h"
+>>  #include "qemu/bitops.h"
+>>  #include "qemu/log.h"
+>> +#include "crypto/random.h"
+>>  #include "trace.h"
+>>
+>>  #define TO_REG(offset) ((offset) >> 2)
+>> @@ -154,6 +155,18 @@ static const uint32_t ast2500_a1_resets[ASPEED_SCU_=
+NR_REGS] =3D {
+>>       [BMC_DEV_ID]      =3D 0x00002402U
+>>  };
+>>
+>> +static uint32_t aspeed_scu_get_random(void)
+>> +{
+>> +    Error *err =3D NULL;
+>> +    uint32_t num;
+>> +
+>> +    if (qcrypto_random_bytes((uint8_t *)&num, sizeof(num), &err)) {
+>> +        error_report_err(err);
+>> +    }
+>> +
+>> +    return num;
+>> +}
+>> +
+>>  static uint64_t aspeed_scu_read(void *opaque, hwaddr offset, unsigned s=
+ize)
+>>  {
+>>      AspeedSCUState *s =3D ASPEED_SCU(opaque);
+>> @@ -167,6 +180,9 @@ static uint64_t aspeed_scu_read(void *opaque, hwaddr=
+ offset, unsigned size)
+>>      }
+>>
+>>      switch (reg) {
+>> +    case RNG_DATA:
+>> +        return aspeed_scu_get_random();
+>
+> may be we could test bit 1 of RNG_CTRL to check if it is enabled or not.
 
-Yes, it's a fair warning. I'll send a patch.
+The RNG is enabled by default, and I didn't find any software that
+disables it, but it can't hurt to have that check.
 
-Berto
+I'll send a v2 with that check.
+
+>
+>> +        break;
+>>      case WAKEUP_EN:
+>>          qemu_log_mask(LOG_GUEST_ERROR,
+>>                        "%s: Read of write-only offset 0x%" HWADDR_PRIx "=
+\n",
+>> @@ -287,6 +303,9 @@ static void aspeed_scu_realize(DeviceState *dev, Err=
+or **errp)
+>>                            TYPE_ASPEED_SCU, SCU_IO_REGION_SIZE);
+>>
+>>      sysbus_init_mmio(sbd, &s->iomem);
+>> +
+>> +    if (qcrypto_random_init(errp))
+>> +        return;
+>>  }
+>
+> Isn't this routine called from main() already ?
+
+It is indirectly called, yes. I'll remove this.
+
+Cheers,
+
+Joel
