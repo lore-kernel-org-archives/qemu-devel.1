@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34316)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34347)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1fNCLc-00048W-Im
-	for qemu-devel@nongnu.org; Mon, 28 May 2018 03:13:41 -0400
+	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1fNCLi-0004BA-1G
+	for qemu-devel@nongnu.org; Mon, 28 May 2018 03:13:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1fNCLb-0006uQ-CO
-	for qemu-devel@nongnu.org; Mon, 28 May 2018 03:13:40 -0400
-Received: from mail.ispras.ru ([83.149.199.45]:46630)
+	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1fNCLh-0006z2-3b
+	for qemu-devel@nongnu.org; Mon, 28 May 2018 03:13:45 -0400
+Received: from mail.ispras.ru ([83.149.199.45]:46654)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1fNCLb-0006tq-4T
-	for qemu-devel@nongnu.org; Mon, 28 May 2018 03:13:39 -0400
+	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1fNCLg-0006yH-Qh
+	for qemu-devel@nongnu.org; Mon, 28 May 2018 03:13:45 -0400
 From: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
-Date: Mon, 28 May 2018 10:13:39 +0300
-Message-ID: <20180528071339.9424.45328.stgit@pasha-VirtualBox>
+Date: Mon, 28 May 2018 10:13:45 +0300
+Message-ID: <20180528071344.9424.618.stgit@pasha-VirtualBox>
 In-Reply-To: <20180528071332.9424.27343.stgit@pasha-VirtualBox>
 References: <20180528071332.9424.27343.stgit@pasha-VirtualBox>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] [PATCH v4 01/19] block: implement bdrv_snapshot_goto
- for blkreplay
+Subject: [Qemu-devel] [PATCH v4 02/19] replay: disable default snapshot for
+ record/replay
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,39 +32,40 @@ Cc: kwolf@redhat.com, peter.maydell@linaro.org, war2jordan@live.com, crosthwaite
 
 From: Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>
 
-This patch enables making snapshots with blkreplay used in
-block devices.
-This function is required to make bdrv_snapshot_goto without
-calling .bdrv_open which is not implemented.
+This patch disables setting '-snapshot' option on by default
+in record/replay mode. This is needed for creating vmstates in record
+and replay modes.
 
 Signed-off-by: Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>
 ---
- block/blkreplay.c |    8 ++++++++
- 1 file changed, 8 insertions(+)
+ vl.c |   10 ++++++++--
+ 1 file changed, 8 insertions(+), 2 deletions(-)
 
-diff --git a/block/blkreplay.c b/block/blkreplay.c
-index b016dbe..72b3c7b 100755
---- a/block/blkreplay.c
-+++ b/block/blkreplay.c
-@@ -130,6 +130,12 @@ static int coroutine_fn blkreplay_co_flush(BlockDriverState *bs)
-     return ret;
- }
- 
-+static int blkreplay_snapshot_goto(BlockDriverState *bs,
-+                                   const char *snapshot_id)
-+{
-+    return bdrv_snapshot_goto(bs->file->bs, snapshot_id, NULL);
-+}
-+
- static BlockDriver bdrv_blkreplay = {
-     .format_name            = "blkreplay",
-     .instance_size          = 0,
-@@ -145,6 +151,8 @@ static BlockDriver bdrv_blkreplay = {
-     .bdrv_co_pwrite_zeroes  = blkreplay_co_pwrite_zeroes,
-     .bdrv_co_pdiscard       = blkreplay_co_pdiscard,
-     .bdrv_co_flush          = blkreplay_co_flush,
-+
-+    .bdrv_snapshot_goto     = blkreplay_snapshot_goto,
- };
- 
- static void bdrv_blkreplay_init(void)
+diff --git a/vl.c b/vl.c
+index 038d7f8..61f5a41 100644
+--- a/vl.c
++++ b/vl.c
+@@ -3187,7 +3187,13 @@ int main(int argc, char **argv, char **envp)
+                 drive_add(IF_PFLASH, -1, optarg, PFLASH_OPTS);
+                 break;
+             case QEMU_OPTION_snapshot:
+-                snapshot = 1;
++                {
++                    Error *blocker = NULL;
++                    snapshot = 1;
++                    error_setg(&blocker, QERR_REPLAY_NOT_SUPPORTED,
++                               "-snapshot");
++                    replay_add_blocker(blocker);
++                }
+                 break;
+             case QEMU_OPTION_numa:
+                 opts = qemu_opts_parse_noisily(qemu_find_opts("numa"),
+@@ -4476,7 +4482,7 @@ int main(int argc, char **argv, char **envp)
+         qapi_free_BlockdevOptions(bdo->bdo);
+         g_free(bdo);
+     }
+-    if (snapshot || replay_mode != REPLAY_MODE_NONE) {
++    if (snapshot) {
+         qemu_opts_foreach(qemu_find_opts("drive"), drive_enable_snapshot,
+                           NULL, NULL);
+     }
