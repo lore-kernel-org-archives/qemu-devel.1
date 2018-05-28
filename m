@@ -1,24 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50706)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50702)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fNJOf-0008O9-1L
-	for qemu-devel@nongnu.org; Mon, 28 May 2018 10:45:18 -0400
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fNJOZ-0005d9-V6
+	(envelope-from <armbru@redhat.com>) id 1fNJOe-0008O5-WC
 	for qemu-devel@nongnu.org; Mon, 28 May 2018 10:45:17 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:59660 helo=mx1.redhat.com)
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <armbru@redhat.com>) id 1fNJOa-0005dQ-1C
+	for qemu-devel@nongnu.org; Mon, 28 May 2018 10:45:17 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:52034 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fNJOZ-0005c1-Ql
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fNJOZ-0005c0-S9
 	for qemu-devel@nongnu.org; Mon, 28 May 2018 10:45:11 -0400
 From: Markus Armbruster <armbru@redhat.com>
-Date: Mon, 28 May 2018 16:45:08 +0200
-Message-Id: <20180528144509.15812-4-armbru@redhat.com>
-In-Reply-To: <20180528144509.15812-1-armbru@redhat.com>
-References: <20180528144509.15812-1-armbru@redhat.com>
+Date: Mon, 28 May 2018 16:45:05 +0200
+Message-Id: <20180528144509.15812-1-armbru@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v4 3/4] qdev: Simplify the
- SysBusDeviceClass::init path
+Subject: [Qemu-devel] [PATCH v4 0/4] qdev: remove DeviceClass::init/exit()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,74 +27,65 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: f4bug@amsat.org, ehabkost@redhat.com, peter.maydell@linaro.org, pbonzini@redhat.com, thuth@redhat.com
 
-From: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+This lovely series got stuck after v3, so I took the liberty to respin
+it.
 
-Instead of using
-  SysBusDeviceClass::realize
-   -> DeviceClass::realize
-       -> DeviceClass::init
-           -> sysbus_device_init
-              -> SysBusDeviceClass::init
+v4:
+* PATCH 1+2 unchanged
+* PATCH 3+4 reshuffled a bit, missing documentation updates supplied
 
-Simplify the path by directly calling SysBusDeviceClass::init
-in SysBusDeviceClass::realize:
 
-  SysBusDeviceClass::realize
-   -> SysBusDeviceClass::init
+Philippe's cover letter:
 
-Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-Message-Id: <20180419212727.26095-4-f4bug@amsat.org>
-Reviewed-by: Markus Armbruster <armbru@redhat.com>
-[Removal of DeviceClass::init() moved into next patch,
-sysbus_realize() tweaked for clarity]
-Signed-off-by: Markus Armbruster <armbru@redhat.com>
----
- hw/core/sysbus.c | 12 ++++++++----
- 1 file changed, 8 insertions(+), 4 deletions(-)
+Since v2:
+  - rebased for 2.13 (Markus)
+  - dropped 2 patches already merged (Gerd)
+  - start sentences with a capital letter and end with a full stop (Peter=
+)
 
-diff --git a/hw/core/sysbus.c b/hw/core/sysbus.c
-index 5d0887f499..ecfb0cfc0e 100644
---- a/hw/core/sysbus.c
-+++ b/hw/core/sysbus.c
-@@ -18,6 +18,7 @@
-  */
-=20
- #include "qemu/osdep.h"
-+#include "qapi/error.h"
- #include "hw/sysbus.h"
- #include "monitor/monitor.h"
- #include "exec/address-spaces.h"
-@@ -200,15 +201,18 @@ void sysbus_init_ioports(SysBusDevice *dev, uint32_=
-t ioport, uint32_t size)
-     }
- }
-=20
--static int sysbus_device_init(DeviceState *dev)
-+/* TODO remove once all sysbus devices have been converted to realize */
-+static void sysbus_realize(DeviceState *dev, Error **errp)
- {
-     SysBusDevice *sd =3D SYS_BUS_DEVICE(dev);
-     SysBusDeviceClass *sbc =3D SYS_BUS_DEVICE_GET_CLASS(sd);
-=20
-     if (!sbc->init) {
--        return 0;
-+        return;
-+    }
-+    if (sbc->init(sd) < 0) {
-+        error_setg(errp, "Device initialization failed");
-     }
--    return sbc->init(sd);
- }
-=20
- DeviceState *sysbus_create_varargs(const char *name,
-@@ -324,7 +328,7 @@ MemoryRegion *sysbus_address_space(SysBusDevice *dev)
- static void sysbus_device_class_init(ObjectClass *klass, void *data)
- {
-     DeviceClass *k =3D DEVICE_CLASS(klass);
--    k->init =3D sysbus_device_init;
-+    k->realize =3D sysbus_realize;
-     k->bus_type =3D TYPE_SYSTEM_BUS;
-     /*
-      * device_add plugs devices into a suitable bus.  For "real" buses,
+since v1:
+  - fix format string on 32-bit host (patchew)
+  - do not add smbus_eeprom_reset() (Eduardo)
+  - directly use DeviceClass::realize (Eduardo)
+  - squashed 2 patches (Eduardo)
+
+Hi,
+
+This series finalize the qdev QOMification.
+
+We first convert the I2CSlave/SMBusDevice,
+then the usb-ccid and virtio-ccw,
+and finally the SysBusDevice.
+
+At the end we removed *TWO* TODO :)
+
+    /* TODO remove, once users are converted to realize */
+    /* TODO remove, once users are converted to unrealize */
+
+Philippe Mathieu-Daud=C3=A9 (4):
+  hw/i2c/smbus: Use DeviceClass::realize instead of
+    SMBusDeviceClass::init
+  hw/i2c: Use DeviceClass::realize instead of I2CSlaveClass::init
+  qdev: Simplify the SysBusDeviceClass::init path
+  qdev: Remove DeviceClass::init() and ::exit()
+
+ hw/audio/wm8750.c       |  8 +++-----
+ hw/core/qdev.c          | 28 ----------------------------
+ hw/core/sysbus.c        | 12 ++++++++----
+ hw/display/ssd0303.c    |  9 ++++-----
+ hw/gpio/max7310.c       |  9 ++++-----
+ hw/i2c/core.c           | 13 -------------
+ hw/i2c/smbus.c          |  9 ---------
+ hw/i2c/smbus_eeprom.c   |  5 ++---
+ hw/input/lm832x.c       |  9 ++++-----
+ hw/misc/tmp105.c        |  7 +++----
+ hw/misc/tmp421.c        |  8 +++-----
+ hw/nvram/eeprom_at24c.c | 24 +++++++++++-------------
+ hw/timer/twl92230.c     | 11 ++++-------
+ include/hw/i2c/i2c.h    |  3 ---
+ include/hw/i2c/smbus.h  |  1 -
+ include/hw/qdev-core.h  | 20 ++++----------------
+ 16 files changed, 50 insertions(+), 126 deletions(-)
+
 --=20
 2.13.6
