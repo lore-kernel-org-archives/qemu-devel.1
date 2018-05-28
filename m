@@ -1,30 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60490)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60546)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fNEUC-00046z-BK
-	for qemu-devel@nongnu.org; Mon, 28 May 2018 05:30:41 -0400
+	(envelope-from <bounces@canonical.com>) id 1fNEUU-0004Du-Dh
+	for qemu-devel@nongnu.org; Mon, 28 May 2018 05:30:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fNEU8-0006hW-A9
-	for qemu-devel@nongnu.org; Mon, 28 May 2018 05:30:40 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:49646 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fNEU8-0006h9-1i
-	for qemu-devel@nongnu.org; Mon, 28 May 2018 05:30:36 -0400
-From: Markus Armbruster <armbru@redhat.com>
-References: <1502467522-32237-1-git-send-email-armbru@redhat.com>
-	<1502467522-32237-3-git-send-email-armbru@redhat.com>
-	<df0646df-6e46-4361-010d-aac529177b62@redhat.com>
-	<87shgusnp9.fsf@dusky.pond.sub.org>
-	<20180416162434.GB12819@redhat.com>
-Date: Mon, 28 May 2018 11:30:33 +0200
-In-Reply-To: <20180416162434.GB12819@redhat.com> ("Daniel P. =?utf-8?Q?Ber?=
-	=?utf-8?Q?rang=C3=A9=22's?=
-	message of "Mon, 16 Apr 2018 17:24:34 +0100")
-Message-ID: <87vab8nn46.fsf@dusky.pond.sub.org>
+	(envelope-from <bounces@canonical.com>) id 1fNEUQ-0006oB-Cf
+	for qemu-devel@nongnu.org; Mon, 28 May 2018 05:30:58 -0400
+Received: from indium.canonical.com ([91.189.90.7]:32824)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1fNEUQ-0006nK-6L
+	for qemu-devel@nongnu.org; Mon, 28 May 2018 05:30:54 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1fNEUN-0004Ms-LY
+	for <qemu-devel@nongnu.org>; Mon, 28 May 2018 09:30:51 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 6AD402E88D6
+	for <qemu-devel@nongnu.org>; Mon, 28 May 2018 09:30:51 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 2/2] vl: Partial support for non-scalar
- properties with -object
+Date: Mon, 28 May 2018 09:21:13 -0000
+From: Satheesh Rajendran <sathnaga@linux.vnet.ibm.com>
+Reply-To: Bug 1773753 <1773753@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <152749874146.3829.13327505377905335957.malonedeb@chaenomeles.canonical.com>
+Message-Id: <152749927347.31555.7294490783878403304.malone@soybean.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1773753] Re: virsh managed save fails with qemu
+ version v2.12.0-813-g5a5c383b13-dirty on powerpc
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,105 +37,101 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. =?utf-8?Q?Berrang=C3=A9?=" <berrange@redhat.com>
-Cc: kwolf@redhat.com, el13635@mail.ntua.gr, f4bug@amsat.org, qemu-devel@nongnu.org, pbonzini@redhat.com
+To: qemu-devel@nongnu.org
 
-Daniel P. Berrang=C3=A9 <berrange@redhat.com> writes:
+To recover from the failed state it requires below steps to be run.
 
-> On Mon, Aug 14, 2017 at 07:49:54AM +0200, Markus Armbruster wrote:
->> Eric Blake <eblake@redhat.com> writes:
->>=20
->> > On 08/11/2017 11:05 AM, Markus Armbruster wrote:
->> >> We've wanted -object to support non-scalar properties for a while.
->> >> Dan Berrange tried in "[PATCH v4 00/10]Provide a QOM-based
->> >> authorization API".  Review led to the conclusion that we need to
->> >> replace rather than add to QemuOpts.  Initial work towards that goal
->> >> has been merged to provide -blockdev (commit 8746709), but there's
->> >> substantial work left, mostly due to an bewildering array of
->> >> compatibility problems.
->> >>=20
->> >> Even if a full solution is still out of reach, we can have a partial
->> >> solution now: accept -object argument in JSON syntax.  This should
->> >> unblock development work that needs non-scalar properties with
->> >> -object.
->> >>=20
->> >> The implementation is similar to -blockdev, except we use the new
->> >> infrastructure only for the new JSON case, and stick to QemuOpts for
->> >> the existing KEY=3DVALUE,... case, to sidestep compatibility problems.
->> >>=20
->> >> If we did this for more options, we'd have to factor out common code.
->> >> But for one option, this will do.
->> >>=20
->> >> Signed-off-by: Markus Armbruster <armbru@redhat.com>
->> >> ---
->> >>  qapi-schema.json | 14 +++++++++++---
->> >>  vl.c             | 51 ++++++++++++++++++++++++++++++++++++++++++++++=
-+++++
->> >>  2 files changed, 62 insertions(+), 3 deletions(-)
->> >>=20
->> >>  static void object_create(bool (*type_predicate)(const char *))
->> >>  {
->> >> +    ObjectOptionsQueueEntry *e, *next;
->> >> +
->> >> +    QSIMPLEQ_FOREACH_SAFE(e, &oo_queue, entry, next) {
->> >> +        if (!type_predicate(e->oo->qom_type)) {
->> >> +            continue;
->> >> +        }
->> >> +
->> >> +        loc_push_restore(&e->loc);
->> >> +        qmp_object_add(e->oo->qom_type, e->oo->id,
->> >> +                       e->oo->has_props, e->oo->props, &error_fatal);
->> >> +        loc_pop(&e->loc);
->> >> +
->> >> +        QSIMPLEQ_REMOVE(&oo_queue, e, ObjectOptionsQueueEntry, entry=
-);
->> >> +        qapi_free_ObjectOptions(e->oo);
->> >> +    }
->> >> +
->> >>      if (qemu_opts_foreach(qemu_find_opts("object"),
->> >
->> > This handles all JSON forms prior to any QemuOpt forms (within the two
->> > priority levels), such that a command line using:
->> >
->> >  -object type,id=3D1,oldstyle... -object '{'id':2, 'type':..., newstyl=
-e...}'
->> >
->> > processes the arguments in a different order than
->> >
->> >  -object type,id=3D1,oldstyle... -object type,id=3D2,oldstyle
->> >
->> > But I don't see that as too bad (ideally, someone using the {} JSON
->> > style will use it consistently).
->>=20
->> Yes, that's another restriction: if you need your -object evaluated in a
->> certain order, you may have to stick to one of the two syntax variants.
->>=20
->> Aside: there are two sane evaluation orders: (1) strictly left to right,
->> and (2) order doesn't matter.  QEMU of course does (3) unpredicable for
->> humans without referring back to the source code.
->
-> IIUC, to "fix" the ordering problem we need to be able to consider the
-> ordering of all QEMU args, not just -object.=20=20
+# virsh destroy avocado-vt-vm1
+Domain avocado-vt-vm1 destroyed
 
-Yes.
+# virsh undefine --managed-save avocado-vt-vm1
+Domain avocado-vt-vm1 has been undefined
 
-> The horrible hack with the two stage setup of -object in vl.c is driven by
-> the fact that some objects are referenced by -device/-chardev args, while
-> objects are referencing -device/-chardev args etc. This is the big problem
-> to untangle, and understandable you don't want to tackle that for this
-> patch. Until we can figure out how to address the big problem, it would be
-> nice not to introduce yet another ordering though driven off usage of
-> json vs non-json syntax.
+-- =
 
-I proposed the patch as a quick hack to unblock development.  We then
-decided we had nothing worthwhile to unblock at the time.
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1773753
 
-You now want it as a stop gap so certain features don't have to wait
-until I crack the more general command line expressiveness problem.  I
-agree we should reconsider what warts and restrictions are acceptable
-for this different, more serious purpose.
+Title:
+  virsh managed save fails with qemu version
+  v2.12.0-813-g5a5c383b13-dirty on powerpc
 
-I doubt the reordering wart and its accompanying "don't mix dotted keys
-with JSON if you need evaluation in order" restriction is inacceptable.
-However, avoiding the reordering wart might be easier than debating it,
-so let me look into that first.
+Status in QEMU:
+  New
+
+Bug description:
+  Host Env:
+  IBM Power8 with Fedora28 base with compiled upstream kernel, qemu, libvir=
+t.
+
+  Host Kernel: 4.17.0-rc5-00069-g3acf4e395260
+
+  qemu-kvm(5a5c383b1373aeb6c87a0d6060f6c3dc7c53082b):
+  v2.12.0-813-g5a5c383b13-dirty
+
+  libvirt(4804a4db33a37f828d033733bc47f6eff5d262c3):
+
+  Guest Kernel: 4.17.0-rc7
+
+  Steps to recreate:
+  Define a guest attached with above setup and start.
+  # virsh start avocado-vt-vm1
+
+  guest console;...
+  # uname -r
+  4.17.0-rc7
+  [root@atest-guest ~]# lscpu
+  Architecture:        ppc64le
+  Byte Order:          Little Endian
+  CPU(s):              3
+  On-line CPU(s) list: 0-2
+  Thread(s) per core:  1
+  Core(s) per socket:  1
+  Socket(s):           3
+  NUMA node(s):        1
+  Model:               2.1 (pvr 004b 0201)
+  Model name:          POWER8 (architected), altivec supported
+  Hypervisor vendor:   KVM
+  Virtualization type: para
+  L1d cache:           64K
+  L1i cache:           32K
+  NUMA node0 CPU(s):   0-2
+
+  =
+
+  # virsh managedsave avocado-vt-vm1 =
+
+
+  Domain avocado-vt-vm1 state saved by libvirt
+
+  # virsh list
+   Id    Name                           State
+  ----------------------------------------------------
+
+  # virsh start avocado-vt-vm1 ----Hangs forever and vm state goes to
+  paused.
+
+  =
+
+  # virsh list
+   Id    Name                           State
+  ----------------------------------------------------
+   87    avocado-vt-vm1                 paused
+
+  =
+
+  P:S:- with same above setup, just changing the qemu-kvm comes bydefault w=
+ith F28 works fine.
+
+  /usr/bin/qemu-kvm --version
+  QEMU emulator version 2.11.1(qemu-2.11.1-2.fc28)
+
+  Summary: with above other setup.
+  machine type pseries-2.12 and qemu-2.11.1-2.fc28 -Works fine.
+
+  machine type pseries-2.12/pseries-2.13 and qemu
+  5a5c383b1373aeb6c87a0d6060f6c3dc7c53082b - Does not work.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1773753/+subscriptions
