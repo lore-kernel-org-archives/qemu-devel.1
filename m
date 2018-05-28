@@ -1,22 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47093)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50705)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <joel.stan@gmail.com>) id 1fNJ9Y-00056S-3d
-	for qemu-devel@nongnu.org; Mon, 28 May 2018 10:29:41 -0400
+	(envelope-from <armbru@redhat.com>) id 1fNJOf-0008O8-0x
+	for qemu-devel@nongnu.org; Mon, 28 May 2018 10:45:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <joel.stan@gmail.com>) id 1fNJ9X-0002J9-7p
-	for qemu-devel@nongnu.org; Mon, 28 May 2018 10:29:40 -0400
+	(envelope-from <armbru@redhat.com>) id 1fNJOa-0005dW-2A
+	for qemu-devel@nongnu.org; Mon, 28 May 2018 10:45:17 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:52352 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fNJOZ-0005c2-Qt
+	for qemu-devel@nongnu.org; Mon, 28 May 2018 10:45:11 -0400
+From: Markus Armbruster <armbru@redhat.com>
+Date: Mon, 28 May 2018 16:45:06 +0200
+Message-Id: <20180528144509.15812-2-armbru@redhat.com>
+In-Reply-To: <20180528144509.15812-1-armbru@redhat.com>
+References: <20180528144509.15812-1-armbru@redhat.com>
 MIME-Version: 1.0
-Sender: joel.stan@gmail.com
-In-Reply-To: <CACPK8Xe5+-zVfoS-g2Te7YOuT5emT-i=JsNDrF52WLVzLERQcw@mail.gmail.com>
-References: <20180528124621.22977-1-joel@jms.id.au>
-	<9959794d-6d3b-b797-bfc8-b548d54378ad@kaod.org>
-	<CACPK8Xe5+-zVfoS-g2Te7YOuT5emT-i=JsNDrF52WLVzLERQcw@mail.gmail.com>
-From: Joel Stanley <joel@jms.id.au>
-Date: Mon, 28 May 2018 23:59:17 +0930
-Message-ID: <CACPK8Xc1xwKBoYYQW0Uzd4keBjspw3uasdTx5OyikaxPmZacgw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] aspeed_scu: Implement RNG register
+Subject: [Qemu-devel] [PATCH v4 1/4] hw/i2c/smbus: Use DeviceClass::realize
+ instead of SMBusDeviceClass::init
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,70 +27,91 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@kaod.org>
-Cc: qemu-devel@nongnu.org, qemu-arm@nongnu.org, Andrew Jeffery <andrew@aj.id.au>
+To: qemu-devel@nongnu.org
+Cc: f4bug@amsat.org, ehabkost@redhat.com, peter.maydell@linaro.org, pbonzini@redhat.com, thuth@redhat.com
 
-On 28 May 2018 at 23:33, Joel Stanley <joel@jms.id.au> wrote:
-> On 28 May 2018 at 23:17, C=C3=A9dric Le Goater <clg@kaod.org> wrote:
->> Hello Joel,
->>
->> On 05/28/2018 02:46 PM, Joel Stanley wrote:
->>> The ASPEED SoCs contain a single register that returns random data when
->>> read. This models that register so that guests can use it.
->>>
->>> Signed-off-by: Joel Stanley <joel@jms.id.au>
->>> ---
->>>  hw/misc/aspeed_scu.c | 19 +++++++++++++++++++
->>>  1 file changed, 19 insertions(+)
->>>
->>> diff --git a/hw/misc/aspeed_scu.c b/hw/misc/aspeed_scu.c
->>> index 5e6d5744eeca..8fa0cecf0fa1 100644
->>> --- a/hw/misc/aspeed_scu.c
->>> +++ b/hw/misc/aspeed_scu.c
->>> @@ -16,6 +16,7 @@
->>>  #include "qapi/visitor.h"
->>>  #include "qemu/bitops.h"
->>>  #include "qemu/log.h"
->>> +#include "crypto/random.h"
->>>  #include "trace.h"
->>>
->>>  #define TO_REG(offset) ((offset) >> 2)
->>> @@ -154,6 +155,18 @@ static const uint32_t ast2500_a1_resets[ASPEED_SCU=
-_NR_REGS] =3D {
->>>       [BMC_DEV_ID]      =3D 0x00002402U
->>>  };
->>>
->>> +static uint32_t aspeed_scu_get_random(void)
->>> +{
->>> +    Error *err =3D NULL;
->>> +    uint32_t num;
->>> +
->>> +    if (qcrypto_random_bytes((uint8_t *)&num, sizeof(num), &err)) {
->>> +        error_report_err(err);
->>> +    }
->>> +
->>> +    return num;
->>> +}
->>> +
->>>  static uint64_t aspeed_scu_read(void *opaque, hwaddr offset, unsigned =
-size)
->>>  {
->>>      AspeedSCUState *s =3D ASPEED_SCU(opaque);
->>> @@ -167,6 +180,9 @@ static uint64_t aspeed_scu_read(void *opaque, hwadd=
-r offset, unsigned size)
->>>      }
->>>
->>>      switch (reg) {
->>> +    case RNG_DATA:
->>> +        return aspeed_scu_get_random();
->>
->> may be we could test bit 1 of RNG_CTRL to check if it is enabled or not.
->
-> The RNG is enabled by default, and I didn't find any software that
-> disables it, but it can't hurt to have that check.
+From: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 
-I did some testing on hardware, and the rng still outputs a different
-number each time I ask for one regardless of the state of the enabled
-bit.
+SMBusDeviceClass::init is no more used, remove it.
 
-How should we model that?
+Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+Message-Id: <20180419212727.26095-2-f4bug@amsat.org>
+Reviewed-by: Markus Armbruster <armbru@redhat.com>
+Signed-off-by: Markus Armbruster <armbru@redhat.com>
+---
+ hw/i2c/smbus.c         | 9 ---------
+ hw/i2c/smbus_eeprom.c  | 5 ++---
+ include/hw/i2c/smbus.h | 1 -
+ 3 files changed, 2 insertions(+), 13 deletions(-)
+
+diff --git a/hw/i2c/smbus.c b/hw/i2c/smbus.c
+index 2d1b79a689..587ce1ab7f 100644
+--- a/hw/i2c/smbus.c
++++ b/hw/i2c/smbus.c
+@@ -202,14 +202,6 @@ static int smbus_i2c_send(I2CSlave *s, uint8_t data)
+     return 0;
+ }
+=20
+-static int smbus_device_init(I2CSlave *i2c)
+-{
+-    SMBusDevice *dev =3D SMBUS_DEVICE(i2c);
+-    SMBusDeviceClass *sc =3D SMBUS_DEVICE_GET_CLASS(dev);
+-
+-    return sc->init(dev);
+-}
+-
+ /* Master device commands.  */
+ int smbus_quick_command(I2CBus *bus, uint8_t addr, int read)
+ {
+@@ -350,7 +342,6 @@ static void smbus_device_class_init(ObjectClass *klas=
+s, void *data)
+ {
+     I2CSlaveClass *sc =3D I2C_SLAVE_CLASS(klass);
+=20
+-    sc->init =3D smbus_device_init;
+     sc->event =3D smbus_i2c_event;
+     sc->recv =3D smbus_i2c_recv;
+     sc->send =3D smbus_i2c_send;
+diff --git a/hw/i2c/smbus_eeprom.c b/hw/i2c/smbus_eeprom.c
+index b13ec0fe7a..125c887d1f 100644
+--- a/hw/i2c/smbus_eeprom.c
++++ b/hw/i2c/smbus_eeprom.c
+@@ -97,12 +97,11 @@ static uint8_t eeprom_read_data(SMBusDevice *dev, uin=
+t8_t cmd, int n)
+     return eeprom_receive_byte(dev);
+ }
+=20
+-static int smbus_eeprom_initfn(SMBusDevice *dev)
++static void smbus_eeprom_realize(DeviceState *dev, Error **errp)
+ {
+     SMBusEEPROMDevice *eeprom =3D (SMBusEEPROMDevice *)dev;
+=20
+     eeprom->offset =3D 0;
+-    return 0;
+ }
+=20
+ static Property smbus_eeprom_properties[] =3D {
+@@ -115,7 +114,7 @@ static void smbus_eeprom_class_initfn(ObjectClass *kl=
+ass, void *data)
+     DeviceClass *dc =3D DEVICE_CLASS(klass);
+     SMBusDeviceClass *sc =3D SMBUS_DEVICE_CLASS(klass);
+=20
+-    sc->init =3D smbus_eeprom_initfn;
++    dc->realize =3D smbus_eeprom_realize;
+     sc->quick_cmd =3D eeprom_quick_cmd;
+     sc->send_byte =3D eeprom_send_byte;
+     sc->receive_byte =3D eeprom_receive_byte;
+diff --git a/include/hw/i2c/smbus.h b/include/hw/i2c/smbus.h
+index 544bbc1957..cfe3fa69f3 100644
+--- a/include/hw/i2c/smbus.h
++++ b/include/hw/i2c/smbus.h
+@@ -38,7 +38,6 @@
+ typedef struct SMBusDeviceClass
+ {
+     I2CSlaveClass parent_class;
+-    int (*init)(SMBusDevice *dev);
+     void (*quick_cmd)(SMBusDevice *dev, uint8_t read);
+     void (*send_byte)(SMBusDevice *dev, uint8_t val);
+     uint8_t (*receive_byte)(SMBusDevice *dev);
+--=20
+2.13.6
