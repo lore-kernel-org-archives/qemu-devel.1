@@ -1,29 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53744)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54306)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fNBO1-00082b-UA
-	for qemu-devel@nongnu.org; Mon, 28 May 2018 02:12:06 -0400
+	(envelope-from <thuth@redhat.com>) id 1fNBTf-0000m5-W8
+	for qemu-devel@nongnu.org; Mon, 28 May 2018 02:17:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fNBNw-0007TF-V2
-	for qemu-devel@nongnu.org; Mon, 28 May 2018 02:12:05 -0400
-Received: from mail-qt0-x242.google.com ([2607:f8b0:400d:c0d::242]:39213)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fNBNw-0007T0-Qb
-	for qemu-devel@nongnu.org; Mon, 28 May 2018 02:12:00 -0400
-Received: by mail-qt0-x242.google.com with SMTP id f1-v6so13711949qtj.6
-	for <qemu-devel@nongnu.org>; Sun, 27 May 2018 23:12:00 -0700 (PDT)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Date: Mon, 28 May 2018 03:11:54 -0300
-Message-Id: <20180528061154.25367-1-f4bug@amsat.org>
+	(envelope-from <thuth@redhat.com>) id 1fNBTc-0000bJ-Ql
+	for qemu-devel@nongnu.org; Mon, 28 May 2018 02:17:55 -0400
+References: <20180518164405.11804-1-clg@kaod.org>
+	<20180518164405.11804-2-clg@kaod.org>
+	<20180525160249.7cb0a5bc@bahia.lan>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <82ee8b24-91d7-9396-82b7-be37200cfacd@redhat.com>
+Date: Mon, 28 May 2018 08:17:47 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [RFC PATCH] hw/misc/unimp: Add
- create_unimplemented_subregion_device()
+In-Reply-To: <20180525160249.7cb0a5bc@bahia.lan>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 1/4] spapr: remove irq_hint parameter from
+ spapr_irq_alloc()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,99 +26,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, Richard Henderson <richard.henderson@linaro.org>
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Alexey Korolev <akorolex@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: Greg Kurz <groug@kaod.org>, =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, David Gibson <david@gibson.dropbear.id.au>, Alexey Kardashevskiy <aik@ozlabs.ru>
 
-The create_unimplemented_device() function is very useful to
-register unimplemented devices to the SysBus 'absolute' address.
+On 25.05.2018 16:02, Greg Kurz wrote:
+> On Fri, 18 May 2018 18:44:02 +0200
+> C=C3=A9dric Le Goater <clg@kaod.org> wrote:
+>=20
+>> This IRQ number hint can possibly be used by the VIO devices if the
+>> "irq" property is defined on the command line but it seems it is never
+>> the case. It is not used in libvirt for instance. So, let's remove it
+>> to simplify future changes.
+>>
+>=20
+> Setting an irq manually looks a bit anachronistic. I doubt anyone would
+> do that nowadays, and the patch does a nice cleanup. So this looks like
+> a good idea.
+[...]
+>> diff --git a/hw/ppc/spapr_vio.c b/hw/ppc/spapr_vio.c
+>> index 472dd6f33a96..cc064f64fccf 100644
+>> --- a/hw/ppc/spapr_vio.c
+>> +++ b/hw/ppc/spapr_vio.c
+>> @@ -455,7 +455,7 @@ static void spapr_vio_busdev_realize(DeviceState *=
+qdev, Error **errp)
+>>          dev->qdev.id =3D id;
+>>      }
+>> =20
+>> -    dev->irq =3D spapr_irq_alloc(spapr, dev->irq, false, &local_err);
+>> +    dev->irq =3D spapr_irq_alloc(spapr, false, &local_err);
+>=20
+> Silently breaking "irq" like this looks wrong. I'd rather officially re=
+move
+> it first (ie, kill spapr_vio_props, -5 lines in spapr_vio.c).
+>=20
+> Of course, this raises the question of interface deprecation, and it sh=
+ould
+> theoretically follow the process described at:
+>=20
+> https://wiki.qemu.org/Features/LegacyRemoval#Rules_for_removing_an_inte=
+rface
+>=20
+> Cc'ing Thomas, our Chief Deprecation Officer, for insights :)
 
-Some devices are modelled as container of memory subregions,
-the subregions being mmio-mapped relatively to the container
-base address.
+The property is a public interface. Just because it's not used by
+libvirt does not mean that nobody is using it. So yes, please follow the
+rules and mark it as deprecated first for two release, before you really
+remove it.
 
-With these container devices, the current create_unimplemented_device()
-does not work.
-Add a function to remove the current limitation, and allow
-containerized devices to use the helpful UnimplementedDevice.
-
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
----
-I don't like the function name much, I first tried with
-create_unimplemented_device_mr() :( Would it be cleaner renaming current
-create_unimplemented_device() -> create_unimplemented_sysbus_device()?
-
-Also, is this useful to have this code inlined?
----
- include/hw/misc/unimp.h | 42 +++++++++++++++++++++++++++++++++++------
- 1 file changed, 36 insertions(+), 6 deletions(-)
-
-diff --git a/include/hw/misc/unimp.h b/include/hw/misc/unimp.h
-index 2a291ca42d..7ae1ace885 100644
---- a/include/hw/misc/unimp.h
-+++ b/include/hw/misc/unimp.h
-@@ -23,9 +23,12 @@ typedef struct {
- } UnimplementedDeviceState;
- 
- /**
-- * create_unimplemented_device: create and map a dummy device
-+ * create_unimplemented_subregion_device: create and map a dummy device
-+ *
-+ * @mr: the #MemoryRegion to contain the new device.
-  * @name: name of the device for debug logging
-- * @base: base address of the device's MMIO region
-+ * @addr: base address of the device's MMIO region, or
-+ *        offset relative to @mr where the device is added.
-  * @size: size of the device's MMIO region
-  *
-  * This utility function creates and maps an instance of unimplemented-device,
-@@ -35,9 +38,10 @@ typedef struct {
-  * use it to cover a large region and then map other devices on top of it
-  * if necessary.
-  */
--static inline void create_unimplemented_device(const char *name,
--                                               hwaddr base,
--                                               hwaddr size)
-+static inline void create_unimplemented_subregion_device(MemoryRegion *mr,
-+                                                         const char *name,
-+                                                         hwaddr addr,
-+                                                         hwaddr size)
- {
-     DeviceState *dev = qdev_create(NULL, TYPE_UNIMPLEMENTED_DEVICE);
- 
-@@ -45,7 +49,33 @@ static inline void create_unimplemented_device(const char *name,
-     qdev_prop_set_uint64(dev, "size", size);
-     qdev_init_nofail(dev);
- 
--    sysbus_mmio_map_overlap(SYS_BUS_DEVICE(dev), 0, base, -1000);
-+    if (mr) {
-+        MemoryRegion *submr = sysbus_mmio_get_region(SYS_BUS_DEVICE(dev), 0);
-+        memory_region_add_subregion_overlap(mr, addr, submr, -1000);
-+    } else {
-+        sysbus_mmio_map_overlap(SYS_BUS_DEVICE(dev), 0, addr, -1000);
-+    }
-+}
-+
-+/**
-+ * create_unimplemented_device: create and map a dummy SysBus device
-+ *
-+ * @name: name of the device for debug logging
-+ * @base: base address of the device's MMIO region
-+ * @size: size of the device's MMIO region
-+ *
-+ * This utility function creates and maps an instance of unimplemented-device,
-+ * which is a dummy device which simply logs all guest accesses to
-+ * it via the qemu_log LOG_UNIMP debug log.
-+ * The device is mapped at priority -1000, which means that you can
-+ * use it to cover a large region and then map other devices on top of it
-+ * if necessary.
-+ */
-+static inline void create_unimplemented_device(const char *name,
-+                                               hwaddr base,
-+                                               hwaddr size)
-+{
-+    create_unimplemented_subregion_device(NULL, name, base, size);
- }
- 
- #endif
--- 
-2.17.0
+ Thomas
