@@ -1,23 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54306)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55902)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fNBTf-0000m5-W8
-	for qemu-devel@nongnu.org; Mon, 28 May 2018 02:17:57 -0400
+	(envelope-from <peterx@redhat.com>) id 1fNBeS-0002RD-SQ
+	for qemu-devel@nongnu.org; Mon, 28 May 2018 02:29:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fNBTc-0000bJ-Ql
-	for qemu-devel@nongnu.org; Mon, 28 May 2018 02:17:55 -0400
-References: <20180518164405.11804-1-clg@kaod.org>
-	<20180518164405.11804-2-clg@kaod.org>
-	<20180525160249.7cb0a5bc@bahia.lan>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <82ee8b24-91d7-9396-82b7-be37200cfacd@redhat.com>
-Date: Mon, 28 May 2018 08:17:47 +0200
+	(envelope-from <peterx@redhat.com>) id 1fNBeP-0008Av-Of
+	for qemu-devel@nongnu.org; Mon, 28 May 2018 02:29:04 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:44978 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1fNBeP-0008AX-Kg
+	for qemu-devel@nongnu.org; Mon, 28 May 2018 02:29:01 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.4])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 31ABA818BAF2
+	for <qemu-devel@nongnu.org>; Mon, 28 May 2018 06:29:00 +0000 (UTC)
+Date: Mon, 28 May 2018 14:28:54 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20180528062854.GC2584@xz-mi>
+References: <20180524043952.11245-1-peterx@redhat.com>
+	<20180524043952.11245-4-peterx@redhat.com>
+	<8736yh8mze.fsf@dusky.pond.sub.org> <20180524084844.GF12122@xz-mi>
+	<87bmd55mo4.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <20180525160249.7cb0a5bc@bahia.lan>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 1/4] spapr: remove irq_hint parameter from
- spapr_irq_alloc()
+Content-Disposition: inline
+In-Reply-To: <87bmd55mo4.fsf@dusky.pond.sub.org>
+Subject: Re: [Qemu-devel] [PATCH v7 3/4] monitor: more comments on lock-free
+ fleids/funcs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,51 +36,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>, =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, David Gibson <david@gibson.dropbear.id.au>, Alexey Kardashevskiy <aik@ozlabs.ru>
+To: Markus Armbruster <armbru@redhat.com>
+Cc: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
 
-On 25.05.2018 16:02, Greg Kurz wrote:
-> On Fri, 18 May 2018 18:44:02 +0200
-> C=C3=A9dric Le Goater <clg@kaod.org> wrote:
->=20
->> This IRQ number hint can possibly be used by the VIO devices if the
->> "irq" property is defined on the command line but it seems it is never
->> the case. It is not used in libvirt for instance. So, let's remove it
->> to simplify future changes.
->>
->=20
-> Setting an irq manually looks a bit anachronistic. I doubt anyone would
-> do that nowadays, and the patch does a nice cleanup. So this looks like
-> a good idea.
+On Thu, May 24, 2018 at 01:16:11PM +0200, Markus Armbruster wrote:
+> Peter Xu <peterx@redhat.com> writes:
+> 
+> > On Thu, May 24, 2018 at 10:41:09AM +0200, Markus Armbruster wrote:
+> >> Regarding the subject: what are "fleids"?
+> >
+> > Ouch. :( I meant the word "fields".
+> 
+> Can touch that up in my tree.
+
 [...]
->> diff --git a/hw/ppc/spapr_vio.c b/hw/ppc/spapr_vio.c
->> index 472dd6f33a96..cc064f64fccf 100644
->> --- a/hw/ppc/spapr_vio.c
->> +++ b/hw/ppc/spapr_vio.c
->> @@ -455,7 +455,7 @@ static void spapr_vio_busdev_realize(DeviceState *=
-qdev, Error **errp)
->>          dev->qdev.id =3D id;
->>      }
->> =20
->> -    dev->irq =3D spapr_irq_alloc(spapr, dev->irq, false, &local_err);
->> +    dev->irq =3D spapr_irq_alloc(spapr, false, &local_err);
->=20
-> Silently breaking "irq" like this looks wrong. I'd rather officially re=
-move
-> it first (ie, kill spapr_vio_props, -5 lines in spapr_vio.c).
->=20
-> Of course, this raises the question of interface deprecation, and it sh=
-ould
-> theoretically follow the process described at:
->=20
-> https://wiki.qemu.org/Features/LegacyRemoval#Rules_for_removing_an_inte=
-rface
->=20
-> Cc'ing Thomas, our Chief Deprecation Officer, for insights :)
 
-The property is a public interface. Just because it's not used by
-libvirt does not mean that nobody is using it. So yes, please follow the
-rules and mark it as deprecated first for two release, before you really
-remove it.
+> >> > +    /*
+> >> > +     * State used only in the thread "owning" the monitor.
+> >> > +     * If @use_io_thr, this is mon_global.mon_iothread.
+> >> > +     * Else, it's the main thread.
+> >> > +     * These members can be safely accessed without locks.
+> >> > +     */
+> >> >      ReadLineState *rs;
+> >> > +    // other members that aren't shared
+> >> 
+> >> Whoops, misunderstanding!  I meant this line as a placeholder, to
+> >> further illustrate my intent.  It should not be committed.  If we need a
+> >> comment here, it should use /* traditional comment syntax */.
+> >
+> > My fault.
+> >
+> > Please let me know if you want me to repost...  Thanks,
+> 
+> Can touch that up, too.  No respin needed unless something more complex
+> comes up.
 
- Thomas
+I'll modify these two parts in my next post.
+
+Regards,
+
+-- 
+Peter Xu
