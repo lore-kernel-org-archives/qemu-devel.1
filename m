@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33037)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33063)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fNRZ3-0007Wi-D5
-	for qemu-devel@nongnu.org; Mon, 28 May 2018 19:28:35 -0400
+	id 1fNRZ6-0007Zf-CO
+	for qemu-devel@nongnu.org; Mon, 28 May 2018 19:28:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fNRZ1-0001Sx-4A
-	for qemu-devel@nongnu.org; Mon, 28 May 2018 19:28:33 -0400
+	id 1fNRZ5-0001XG-AG
+	for qemu-devel@nongnu.org; Mon, 28 May 2018 19:28:36 -0400
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Date: Mon, 28 May 2018 20:27:10 -0300
-Message-Id: <20180528232719.4721-13-f4bug@amsat.org>
+Date: Mon, 28 May 2018 20:27:11 -0300
+Message-Id: <20180528232719.4721-14-f4bug@amsat.org>
 In-Reply-To: <20180528232719.4721-1-f4bug@amsat.org>
 References: <20180528232719.4721-1-f4bug@amsat.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v4 12/21] hw: Do not include
- "sysemu/block-backend.h" if it is not necessary
+Subject: [Qemu-devel] [PATCH v4 13/21] hw: Do not include
+ "sysemu/blockdev.h" if it is not necessary
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,509 +28,98 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Thomas Huth <thuth@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, qemu-trivial@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Andrzej Zaborowski <balrogg@gmail.com>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, Alistair Francis <alistair@alistair23.me>, Stefan Hajnoczi <stefanha@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, John Snow <jsnow@redhat.com>, Michael Walle <michael@walle.cc>, Aurelien Jarno <aurelien@aurel32.net>, Yongbok Kim <yongbok.kim@mips.com>, David Gibson <david@gibson.dropbear.id.au>, Alexander Graf <agraf@suse.de>, Cornelia Huck <cohuck@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Richard Henderson <rth@twiddle.net>, David Hildenbrand <david@redhat.com>, Fam Zheng <famz@redhat.com>, Magnus Damm <magnus.damm@gmail.com>, Stefano Stabellini <sstabellini@kernel.org>, Anthony Perard <anthony.perard@citrix.com>, Max Filippov <jcmvbkbc@gmail.com>, "open list:ARM" <qemu-arm@nongnu.org>, "open list:virtio-blk" <qemu-block@nongnu.org>, "open list:sPAPR" <qemu-ppc@nongnu.org>, "open list:virtio-ccw" <qemu-s390x@nongnu.org>, "open list:X86" <xen-devel@lists.xenproject.org>
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, qemu-trivial@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Aurelien Jarno <aurelien@aurel32.net>, Yongbok Kim <yongbok.kim@mips.com>, Alexander Graf <agraf@suse.de>, David Gibson <david@gibson.dropbear.id.au>, "open list:ARM" <qemu-arm@nongnu.org>, "open list:ppc4xx" <qemu-ppc@nongnu.org>
 
-Remove those unneeded includes to speed up the compilation
-process a little bit. (Continue 7eceff5b5a1fa cleanup)
+The header "hw/boards.h" already includes "sysemu/blockdev.h".
+
+Code change produced with:
+
+    $ git grep '#include "sysemu/blockdev.h"' hw | \
+      cut -d: -f-1 | \
+      xargs fgrep -l '#include "hw/boards.h"' | \
+      xargs sed -i.bak '/#include "sysemu\/blockdev.h"/d'
 
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- hw/arm/collie.c                          | 1 -
- hw/arm/gumstix.c                         | 1 -
- hw/arm/mainstone.c                       | 1 -
- hw/arm/nseries.c                         | 1 -
- hw/arm/omap1.c                           | 1 -
- hw/arm/omap2.c                           | 1 -
- hw/arm/omap_sx1.c                        | 1 -
- hw/arm/pxa2xx.c                          | 1 -
- hw/arm/spitz.c                           | 1 -
- hw/arm/versatilepb.c                     | 1 -
- hw/arm/vexpress.c                        | 1 -
- hw/arm/virt.c                            | 1 -
- hw/arm/xilinx_zynq.c                     | 1 -
- hw/arm/z2.c                              | 1 -
- hw/block/dataplane/virtio-blk.c          | 1 -
- hw/block/virtio-blk.c                    | 1 -
- hw/core/qdev-properties.c                | 1 -
- hw/cris/axis_dev88.c                     | 1 -
- hw/display/tc6393xb.c                    | 1 -
- hw/ide/pci.c                             | 1 -
- hw/ide/via.c                             | 1 -
- hw/isa/isa-superio.c                     | 1 -
- hw/lm32/lm32_boards.c                    | 1 -
- hw/lm32/milkymist.c                      | 1 -
- hw/microblaze/petalogix_ml605_mmu.c      | 1 -
- hw/microblaze/petalogix_s3adsp1800_mmu.c | 1 -
- hw/mips/mips_r4k.c                       | 1 -
- hw/ppc/spapr.c                           | 1 -
- hw/ppc/virtex_ml507.c                    | 2 --
- hw/s390x/virtio-ccw.c                    | 1 -
- hw/scsi/mptsas.c                         | 1 -
- hw/sd/pl181.c                            | 1 -
- hw/sd/sdhci.c                            | 1 -
- hw/sd/ssi-sd.c                           | 1 -
- hw/sh4/r2d.c                             | 1 -
- hw/virtio/virtio-pci.c                   | 1 -
- hw/xen/xen_devconfig.c                   | 1 -
- hw/xtensa/xtfpga.c                       | 1 -
- 38 files changed, 39 deletions(-)
+ hw/arm/aspeed.c        | 1 -
+ hw/arm/omap1.c         | 1 -
+ hw/arm/omap2.c         | 1 -
+ hw/mips/mips_malta.c   | 1 -
+ hw/ppc/ppc405_boards.c | 1 -
+ hw/ppc/sam460ex.c      | 1 -
+ 6 files changed, 6 deletions(-)
 
-diff --git a/hw/arm/collie.c b/hw/arm/collie.c
-index f8c566e2e5..48b732c176 100644
---- a/hw/arm/collie.c
-+++ b/hw/arm/collie.c
-@@ -16,7 +16,6 @@
- #include "strongarm.h"
- #include "hw/arm/arm.h"
- #include "hw/block/flash.h"
--#include "sysemu/block-backend.h"
- #include "exec/address-spaces.h"
- #include "cpu.h"
- 
-diff --git a/hw/arm/gumstix.c b/hw/arm/gumstix.c
-index ea2a3c532d..56cb763c4e 100644
---- a/hw/arm/gumstix.c
-+++ b/hw/arm/gumstix.c
-@@ -42,7 +42,6 @@
- #include "hw/block/flash.h"
- #include "hw/devices.h"
+diff --git a/hw/arm/aspeed.c b/hw/arm/aspeed.c
+index aecb3c1e75..a7110a712f 100644
+--- a/hw/arm/aspeed.c
++++ b/hw/arm/aspeed.c
+@@ -19,7 +19,6 @@
  #include "hw/boards.h"
--#include "sysemu/block-backend.h"
- #include "exec/address-spaces.h"
- #include "sysemu/qtest.h"
- #include "cpu.h"
-diff --git a/hw/arm/mainstone.c b/hw/arm/mainstone.c
-index 4215c025fc..0beb5c426b 100644
---- a/hw/arm/mainstone.c
-+++ b/hw/arm/mainstone.c
-@@ -21,7 +21,6 @@
- #include "hw/devices.h"
- #include "hw/boards.h"
- #include "hw/block/flash.h"
--#include "sysemu/block-backend.h"
- #include "hw/sysbus.h"
- #include "exec/address-spaces.h"
- #include "sysemu/qtest.h"
-diff --git a/hw/arm/nseries.c b/hw/arm/nseries.c
-index 32687afced..906b7ca22d 100644
---- a/hw/arm/nseries.c
-+++ b/hw/arm/nseries.c
-@@ -35,7 +35,6 @@
- #include "hw/hw.h"
- #include "hw/bt.h"
- #include "hw/loader.h"
--#include "sysemu/block-backend.h"
- #include "hw/sysbus.h"
  #include "qemu/log.h"
- #include "exec/address-spaces.h"
+ #include "sysemu/block-backend.h"
+-#include "sysemu/blockdev.h"
+ #include "hw/loader.h"
+ #include "qemu/error-report.h"
+ 
 diff --git a/hw/arm/omap1.c b/hw/arm/omap1.c
-index e54c1f8f99..854996c1ac 100644
+index 854996c1ac..9af04728e3 100644
 --- a/hw/arm/omap1.c
 +++ b/hw/arm/omap1.c
 @@ -28,7 +28,6 @@
  #include "hw/arm/omap.h"
  #include "sysemu/sysemu.h"
  #include "hw/arm/soc_dma.h"
--#include "sysemu/block-backend.h"
- #include "sysemu/blockdev.h"
+-#include "sysemu/blockdev.h"
  #include "sysemu/qtest.h"
  #include "qemu/range.h"
+ #include "hw/sysbus.h"
 diff --git a/hw/arm/omap2.c b/hw/arm/omap2.c
-index b8d0910a1f..cc4250b7da 100644
+index cc4250b7da..3c7d1364a9 100644
 --- a/hw/arm/omap2.c
 +++ b/hw/arm/omap2.c
 @@ -23,7 +23,6 @@
  #include "qapi/error.h"
  #include "qemu-common.h"
  #include "cpu.h"
--#include "sysemu/block-backend.h"
- #include "sysemu/blockdev.h"
+-#include "sysemu/blockdev.h"
  #include "sysemu/qtest.h"
  #include "hw/boards.h"
-diff --git a/hw/arm/omap_sx1.c b/hw/arm/omap_sx1.c
-index eccc19c77b..84550f0236 100644
---- a/hw/arm/omap_sx1.c
-+++ b/hw/arm/omap_sx1.c
-@@ -33,7 +33,6 @@
- #include "hw/boards.h"
- #include "hw/arm/arm.h"
- #include "hw/block/flash.h"
--#include "sysemu/block-backend.h"
- #include "sysemu/qtest.h"
- #include "exec/address-spaces.h"
- #include "cpu.h"
-diff --git a/hw/arm/pxa2xx.c b/hw/arm/pxa2xx.c
-index a2803fdee4..b67b0cefb6 100644
---- a/hw/arm/pxa2xx.c
-+++ b/hw/arm/pxa2xx.c
-@@ -19,7 +19,6 @@
- #include "hw/i2c/i2c.h"
- #include "hw/ssi/ssi.h"
- #include "chardev/char-fe.h"
--#include "sysemu/block-backend.h"
- #include "sysemu/blockdev.h"
- #include "sysemu/qtest.h"
- #include "qemu/cutils.h"
-diff --git a/hw/arm/spitz.c b/hw/arm/spitz.c
-index e419e3c00e..3cc27a1e44 100644
---- a/hw/arm/spitz.c
-+++ b/hw/arm/spitz.c
-@@ -27,7 +27,6 @@
- #include "hw/audio/wm8750.h"
- #include "audio/audio.h"
- #include "hw/boards.h"
--#include "sysemu/block-backend.h"
- #include "hw/sysbus.h"
- #include "exec/address-spaces.h"
- #include "cpu.h"
-diff --git a/hw/arm/versatilepb.c b/hw/arm/versatilepb.c
-index e01e3192ff..a5a06b6d40 100644
---- a/hw/arm/versatilepb.c
-+++ b/hw/arm/versatilepb.c
-@@ -19,7 +19,6 @@
- #include "hw/pci/pci.h"
- #include "hw/i2c/i2c.h"
- #include "hw/boards.h"
--#include "sysemu/block-backend.h"
- #include "exec/address-spaces.h"
- #include "hw/block/flash.h"
- #include "qemu/error-report.h"
-diff --git a/hw/arm/vexpress.c b/hw/arm/vexpress.c
-index f1e33c8a36..5bfe2e4348 100644
---- a/hw/arm/vexpress.c
-+++ b/hw/arm/vexpress.c
-@@ -35,7 +35,6 @@
- #include "hw/boards.h"
- #include "hw/loader.h"
- #include "exec/address-spaces.h"
--#include "sysemu/block-backend.h"
- #include "hw/block/flash.h"
- #include "sysemu/device_tree.h"
- #include "qemu/error-report.h"
-diff --git a/hw/arm/virt.c b/hw/arm/virt.c
-index a3a28e20e8..3aa19b2935 100644
---- a/hw/arm/virt.c
-+++ b/hw/arm/virt.c
-@@ -38,7 +38,6 @@
- #include "hw/vfio/vfio-amd-xgbe.h"
- #include "hw/devices.h"
- #include "net/net.h"
--#include "sysemu/block-backend.h"
- #include "sysemu/device_tree.h"
- #include "sysemu/numa.h"
- #include "sysemu/sysemu.h"
-diff --git a/hw/arm/xilinx_zynq.c b/hw/arm/xilinx_zynq.c
-index 899a26326f..f1496d2927 100644
---- a/hw/arm/xilinx_zynq.c
-+++ b/hw/arm/xilinx_zynq.c
-@@ -26,7 +26,6 @@
- #include "sysemu/sysemu.h"
- #include "hw/boards.h"
- #include "hw/block/flash.h"
--#include "sysemu/block-backend.h"
- #include "hw/loader.h"
- #include "hw/misc/zynq-xadc.h"
- #include "hw/ssi/ssi.h"
-diff --git a/hw/arm/z2.c b/hw/arm/z2.c
-index 730a5392e9..697a822f1e 100644
---- a/hw/arm/z2.c
-+++ b/hw/arm/z2.c
-@@ -21,7 +21,6 @@
- #include "hw/boards.h"
- #include "sysemu/sysemu.h"
- #include "hw/block/flash.h"
--#include "sysemu/block-backend.h"
- #include "ui/console.h"
- #include "hw/audio/wm8750.h"
- #include "audio/audio.h"
-diff --git a/hw/block/dataplane/virtio-blk.c b/hw/block/dataplane/virtio-blk.c
-index 101f32cf66..d648aeb73b 100644
---- a/hw/block/dataplane/virtio-blk.c
-+++ b/hw/block/dataplane/virtio-blk.c
-@@ -19,7 +19,6 @@
- #include "qemu/thread.h"
- #include "qemu/error-report.h"
- #include "hw/virtio/virtio-access.h"
--#include "sysemu/block-backend.h"
- #include "hw/virtio/virtio-blk.h"
- #include "virtio-blk.h"
- #include "block/aio.h"
-diff --git a/hw/block/virtio-blk.c b/hw/block/virtio-blk.c
-index b1532e4e91..50b5c869e3 100644
---- a/hw/block/virtio-blk.c
-+++ b/hw/block/virtio-blk.c
-@@ -18,7 +18,6 @@
- #include "qemu/error-report.h"
- #include "trace.h"
- #include "hw/block/block.h"
--#include "sysemu/block-backend.h"
- #include "sysemu/blockdev.h"
- #include "hw/virtio/virtio-blk.h"
- #include "dataplane/virtio-blk.h"
-diff --git a/hw/core/qdev-properties.c b/hw/core/qdev-properties.c
-index 5bbc2d98b5..989778ab7f 100644
---- a/hw/core/qdev-properties.c
-+++ b/hw/core/qdev-properties.c
-@@ -5,7 +5,6 @@
- #include "hw/pci/pci.h"
- #include "qapi/qmp/qerror.h"
- #include "qemu/error-report.h"
--#include "sysemu/block-backend.h"
- #include "hw/block/block.h"
- #include "net/hub.h"
- #include "qapi/visitor.h"
-diff --git a/hw/cris/axis_dev88.c b/hw/cris/axis_dev88.c
-index 409f3d581a..56ee398ee5 100644
---- a/hw/cris/axis_dev88.c
-+++ b/hw/cris/axis_dev88.c
-@@ -34,7 +34,6 @@
- #include "hw/loader.h"
- #include "elf.h"
- #include "boot.h"
--#include "sysemu/block-backend.h"
- #include "exec/address-spaces.h"
- #include "sysemu/qtest.h"
- #include "sysemu/sysemu.h"
-diff --git a/hw/display/tc6393xb.c b/hw/display/tc6393xb.c
-index 464465b7c2..8392e59493 100644
---- a/hw/display/tc6393xb.c
-+++ b/hw/display/tc6393xb.c
-@@ -18,7 +18,6 @@
- #include "hw/block/flash.h"
- #include "ui/console.h"
- #include "ui/pixel_ops.h"
--#include "sysemu/block-backend.h"
- #include "sysemu/blockdev.h"
- 
- #define IRQ_TC6393_NAND		0
-diff --git a/hw/ide/pci.c b/hw/ide/pci.c
-index 1ab0a892d0..fe1ceeb0cd 100644
---- a/hw/ide/pci.c
-+++ b/hw/ide/pci.c
-@@ -26,7 +26,6 @@
  #include "hw/hw.h"
- #include "hw/pci/pci.h"
- #include "hw/isa/isa.h"
--#include "sysemu/block-backend.h"
- #include "sysemu/dma.h"
- #include "qemu/error-report.h"
- #include "hw/ide/pci.h"
-diff --git a/hw/ide/via.c b/hw/ide/via.c
-index 117ac4d95e..238f038d72 100644
---- a/hw/ide/via.c
-+++ b/hw/ide/via.c
-@@ -27,7 +27,6 @@
- #include "hw/hw.h"
- #include "hw/pci/pci.h"
- #include "hw/isa/isa.h"
--#include "sysemu/block-backend.h"
- #include "sysemu/sysemu.h"
- #include "sysemu/dma.h"
- 
-diff --git a/hw/isa/isa-superio.c b/hw/isa/isa-superio.c
-index 76286c81a1..9359be7008 100644
---- a/hw/isa/isa-superio.c
-+++ b/hw/isa/isa-superio.c
-@@ -13,7 +13,6 @@
- #include "qemu/error-report.h"
- #include "qapi/error.h"
- #include "sysemu/sysemu.h"
--#include "sysemu/block-backend.h"
- #include "sysemu/blockdev.h"
- #include "chardev/char.h"
- #include "hw/isa/superio.h"
-diff --git a/hw/lm32/lm32_boards.c b/hw/lm32/lm32_boards.c
-index 907e875d02..167058348e 100644
---- a/hw/lm32/lm32_boards.c
-+++ b/hw/lm32/lm32_boards.c
-@@ -27,7 +27,6 @@
- #include "hw/devices.h"
- #include "hw/boards.h"
- #include "hw/loader.h"
--#include "sysemu/block-backend.h"
+diff --git a/hw/mips/mips_malta.c b/hw/mips/mips_malta.c
+index af70ecffc0..494f84e290 100644
+--- a/hw/mips/mips_malta.c
++++ b/hw/mips/mips_malta.c
+@@ -46,7 +46,6 @@
  #include "elf.h"
- #include "lm32_hwsetup.h"
- #include "lm32.h"
-diff --git a/hw/lm32/milkymist.c b/hw/lm32/milkymist.c
-index f9688e059e..c36bbc4ae2 100644
---- a/hw/lm32/milkymist.c
-+++ b/hw/lm32/milkymist.c
-@@ -30,7 +30,6 @@
- #include "hw/boards.h"
- #include "hw/loader.h"
- #include "elf.h"
--#include "sysemu/block-backend.h"
- #include "milkymist-hw.h"
- #include "lm32.h"
- #include "exec/address-spaces.h"
-diff --git a/hw/microblaze/petalogix_ml605_mmu.c b/hw/microblaze/petalogix_ml605_mmu.c
-index cf6bf3f32a..6c4a544eac 100644
---- a/hw/microblaze/petalogix_ml605_mmu.c
-+++ b/hw/microblaze/petalogix_ml605_mmu.c
-@@ -36,7 +36,6 @@
- #include "sysemu/sysemu.h"
- #include "hw/devices.h"
- #include "hw/boards.h"
--#include "sysemu/block-backend.h"
- #include "hw/char/serial.h"
- #include "exec/address-spaces.h"
- #include "hw/ssi/ssi.h"
-diff --git a/hw/microblaze/petalogix_s3adsp1800_mmu.c b/hw/microblaze/petalogix_s3adsp1800_mmu.c
-index 1186002a76..0da3e62102 100644
---- a/hw/microblaze/petalogix_s3adsp1800_mmu.c
-+++ b/hw/microblaze/petalogix_s3adsp1800_mmu.c
-@@ -34,7 +34,6 @@
- #include "sysemu/sysemu.h"
- #include "hw/devices.h"
- #include "hw/boards.h"
--#include "sysemu/block-backend.h"
- #include "exec/address-spaces.h"
- #include "hw/char/xilinx_uartlite.h"
- 
-diff --git a/hw/mips/mips_r4k.c b/hw/mips/mips_r4k.c
-index e04b49d3c5..e5cf8ed1a3 100644
---- a/hw/mips/mips_r4k.c
-+++ b/hw/mips/mips_r4k.c
-@@ -30,7 +30,6 @@
  #include "hw/timer/mc146818rtc.h"
- #include "hw/input/i8042.h"
  #include "hw/timer/i8254.h"
--#include "sysemu/block-backend.h"
+-#include "sysemu/blockdev.h"
  #include "exec/address-spaces.h"
- #include "sysemu/qtest.h"
+ #include "hw/sysbus.h"             /* SysBusDevice */
+ #include "qemu/host-utils.h"
+diff --git a/hw/ppc/ppc405_boards.c b/hw/ppc/ppc405_boards.c
+index 0b658931ee..d301067d3b 100644
+--- a/hw/ppc/ppc405_boards.c
++++ b/hw/ppc/ppc405_boards.c
+@@ -37,7 +37,6 @@
+ #include "qemu/log.h"
  #include "qemu/error-report.h"
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index ebf30dd60b..2e910428f3 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -35,7 +35,6 @@
- #include "elf.h"
- #include "net/net.h"
- #include "sysemu/device_tree.h"
--#include "sysemu/block-backend.h"
- #include "sysemu/cpus.h"
- #include "sysemu/hw_accel.h"
+ #include "hw/loader.h"
+-#include "sysemu/blockdev.h"
+ #include "exec/address-spaces.h"
+ 
+ #define BIOS_FILENAME "ppc405_rom.bin"
+diff --git a/hw/ppc/sam460ex.c b/hw/ppc/sam460ex.c
+index a48e6e6fce..3dd23de71f 100644
+--- a/hw/ppc/sam460ex.c
++++ b/hw/ppc/sam460ex.c
+@@ -17,7 +17,6 @@
+ #include "qemu/error-report.h"
+ #include "qapi/error.h"
+ #include "hw/hw.h"
+-#include "sysemu/blockdev.h"
+ #include "hw/boards.h"
+ #include "sysemu/kvm.h"
  #include "kvm_ppc.h"
-diff --git a/hw/ppc/virtex_ml507.c b/hw/ppc/virtex_ml507.c
-index a80cbdd7ee..b4bb90d50b 100644
---- a/hw/ppc/virtex_ml507.c
-+++ b/hw/ppc/virtex_ml507.c
-@@ -44,8 +44,6 @@
- #include "hw/ppc/ppc4xx.h"
- #include "ppc405.h"
- 
--#include "sysemu/block-backend.h"
--
- #define EPAPR_MAGIC    (0x45504150)
- #define FLASH_SIZE     (16 * 1024 * 1024)
- 
-diff --git a/hw/s390x/virtio-ccw.c b/hw/s390x/virtio-ccw.c
-index 22df33b509..b68798ac52 100644
---- a/hw/s390x/virtio-ccw.c
-+++ b/hw/s390x/virtio-ccw.c
-@@ -13,7 +13,6 @@
- #include "qemu/osdep.h"
- #include "qapi/error.h"
- #include "hw/hw.h"
--#include "sysemu/block-backend.h"
- #include "sysemu/blockdev.h"
- #include "sysemu/sysemu.h"
- #include "sysemu/kvm.h"
-diff --git a/hw/scsi/mptsas.c b/hw/scsi/mptsas.c
-index 3f061f3f68..4176e871e1 100644
---- a/hw/scsi/mptsas.c
-+++ b/hw/scsi/mptsas.c
-@@ -26,7 +26,6 @@
- #include "hw/hw.h"
- #include "hw/pci/pci.h"
- #include "sysemu/dma.h"
--#include "sysemu/block-backend.h"
- #include "hw/pci/msi.h"
- #include "qemu/iov.h"
- #include "hw/scsi/scsi.h"
-diff --git a/hw/sd/pl181.c b/hw/sd/pl181.c
-index 3ba1f7dd23..1cc94dbfdf 100644
---- a/hw/sd/pl181.c
-+++ b/hw/sd/pl181.c
-@@ -8,7 +8,6 @@
-  */
- 
- #include "qemu/osdep.h"
--#include "sysemu/block-backend.h"
- #include "sysemu/blockdev.h"
- #include "hw/sysbus.h"
- #include "hw/sd/sd.h"
-diff --git a/hw/sd/sdhci.c b/hw/sd/sdhci.c
-index 63c44a4ee8..b65403947b 100644
---- a/hw/sd/sdhci.c
-+++ b/hw/sd/sdhci.c
-@@ -26,7 +26,6 @@
- #include "qemu/error-report.h"
- #include "qapi/error.h"
- #include "hw/hw.h"
--#include "sysemu/block-backend.h"
- #include "sysemu/blockdev.h"
- #include "sysemu/dma.h"
- #include "qemu/timer.h"
-diff --git a/hw/sd/ssi-sd.c b/hw/sd/ssi-sd.c
-index ae04b6641b..96542ecd62 100644
---- a/hw/sd/ssi-sd.c
-+++ b/hw/sd/ssi-sd.c
-@@ -11,7 +11,6 @@
-  */
- 
- #include "qemu/osdep.h"
--#include "sysemu/block-backend.h"
- #include "sysemu/blockdev.h"
- #include "hw/ssi/ssi.h"
- #include "hw/sd/sd.h"
-diff --git a/hw/sh4/r2d.c b/hw/sh4/r2d.c
-index 6b01d6eed8..8fe8766eb9 100644
---- a/hw/sh4/r2d.c
-+++ b/hw/sh4/r2d.c
-@@ -40,7 +40,6 @@
- #include "hw/loader.h"
- #include "hw/usb.h"
- #include "hw/block/flash.h"
--#include "sysemu/block-backend.h"
- #include "exec/address-spaces.h"
- 
- #define FLASH_BASE 0x00000000
-diff --git a/hw/virtio/virtio-pci.c b/hw/virtio/virtio-pci.c
-index 5eb0c323ca..3a01fe90f0 100644
---- a/hw/virtio/virtio-pci.c
-+++ b/hw/virtio/virtio-pci.c
-@@ -32,7 +32,6 @@
- #include "hw/pci/msix.h"
- #include "hw/loader.h"
- #include "sysemu/kvm.h"
--#include "sysemu/block-backend.h"
- #include "virtio-pci.h"
- #include "qemu/range.h"
- #include "hw/virtio/virtio-bus.h"
-diff --git a/hw/xen/xen_devconfig.c b/hw/xen/xen_devconfig.c
-index fac9d3fcdc..aebc19bd71 100644
---- a/hw/xen/xen_devconfig.c
-+++ b/hw/xen/xen_devconfig.c
-@@ -1,7 +1,6 @@
- #include "qemu/osdep.h"
- #include "hw/xen/xen_backend.h"
- #include "qemu/option.h"
--#include "sysemu/block-backend.h"
- #include "sysemu/blockdev.h"
- 
- /* ------------------------------------------------------------- */
-diff --git a/hw/xtensa/xtfpga.c b/hw/xtensa/xtfpga.c
-index 63734c70ec..5dc13034f9 100644
---- a/hw/xtensa/xtfpga.c
-+++ b/hw/xtensa/xtfpga.c
-@@ -38,7 +38,6 @@
- #include "net/net.h"
- #include "hw/sysbus.h"
- #include "hw/block/flash.h"
--#include "sysemu/block-backend.h"
- #include "chardev/char.h"
- #include "sysemu/device_tree.h"
- #include "qemu/error-report.h"
 -- 
 2.17.0
