@@ -1,26 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44455)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47774)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1fNkpx-0003gX-2H
-	for qemu-devel@nongnu.org; Tue, 29 May 2018 16:03:19 -0400
+	(envelope-from <kwolf@redhat.com>) id 1fNl5e-00078m-Iw
+	for qemu-devel@nongnu.org; Tue, 29 May 2018 16:19:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1fNkpt-0002LY-Tr
-	for qemu-devel@nongnu.org; Tue, 29 May 2018 16:03:17 -0400
-Resent-Message-Id: <E1fNkpt-0002LY-Tr@eggs.gnu.org>
-Received: from sender-of-o51.zoho.com ([135.84.80.216]:21028)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1fNkpt-0002KQ-M2
-	for qemu-devel@nongnu.org; Tue, 29 May 2018 16:03:13 -0400
-In-Reply-To: <20180529194207.31503-1-laurent@vivier.eu>
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <152762416811.300.16097345348305857844@d39dc562802a>
+	(envelope-from <kwolf@redhat.com>) id 1fNl5d-0007XL-LC
+	for qemu-devel@nongnu.org; Tue, 29 May 2018 16:19:30 -0400
+Date: Tue, 29 May 2018 22:19:17 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20180529201917.GL4756@localhost.localdomain>
+References: <152750903916.663961.9369851345277129751.stgit@bahia.lan>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Tue, 29 May 2018 13:02:49 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PATCH 00/15] linux-user: move more definitions
- out of syscall_defs.h
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <152750903916.663961.9369851345277129751.stgit@bahia.lan>
+Subject: Re: [Qemu-devel] [PATCH v4] block: fix QEMU crash with scsi-hd and
+ drive_del
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,122 +23,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: laurent@vivier.eu
-Cc: famz@redhat.com, qemu-devel@nongnu.org, riku.voipio@iki.fi
+To: Greg Kurz <groug@kaod.org>
+Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, qemu-stable@nongnu.org, qemu-block@nongnu.org
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
-c3NhZ2UtaWQ6IDIwMTgwNTI5MTk0MjA3LjMxNTAzLTEtbGF1cmVudEB2aXZpZXIuZXUKU3ViamVj
-dDogW1FlbXUtZGV2ZWxdIFtQQVRDSCAwMC8xNV0gbGludXgtdXNlcjogbW92ZSBtb3JlIGRlZmlu
-aXRpb25zIG91dCBvZiBzeXNjYWxsX2RlZnMuaAoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQoj
-IS9iaW4vYmFzaAoKQkFTRT1iYXNlCm49MQp0b3RhbD0kKGdpdCBsb2cgLS1vbmVsaW5lICRCQVNF
-Li4gfCB3YyAtbCkKZmFpbGVkPTAKCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxpbWl0
-IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lcyBUcnVlCmdpdCBjb25maWcgLS1sb2Nh
-bCBkaWZmLmFsZ29yaXRobSBoaXN0b2dyYW0KCmNvbW1pdHM9IiQoZ2l0IGxvZyAtLWZvcm1hdD0l
-SCAtLXJldmVyc2UgJEJBU0UuLikiCmZvciBjIGluICRjb21taXRzOyBkbwogICAgZWNobyAiQ2hl
-Y2tpbmcgUEFUQ0ggJG4vJHRvdGFsOiAkKGdpdCBsb2cgLW4gMSAtLWZvcm1hdD0lcyAkYykuLi4i
-CiAgICBpZiAhIGdpdCBzaG93ICRjIC0tZm9ybWF0PWVtYWlsIHwgLi9zY3JpcHRzL2NoZWNrcGF0
-Y2gucGwgLS1tYWlsYmFjayAtOyB0aGVuCiAgICAgICAgZmFpbGVkPTEKICAgICAgICBlY2hvCiAg
-ICBmaQogICAgbj0kKChuKzEpKQpkb25lCgpleGl0ICRmYWlsZWQKPT09IFRFU1QgU0NSSVBUIEVO
-RCA9PT0KClVwZGF0aW5nIDNjOGNmNWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMzODQK
-RnJvbSBodHRwczovL2dpdGh1Yi5jb20vcGF0Y2hldy1wcm9qZWN0L3FlbXUKICogW25ldyB0YWdd
-ICAgICAgICAgICAgICAgcGF0Y2hldy8yMDE4MDUyOTE5NDIwNy4zMTUwMy0xLWxhdXJlbnRAdml2
-aWVyLmV1IC0+IHBhdGNoZXcvMjAxODA1MjkxOTQyMDcuMzE1MDMtMS1sYXVyZW50QHZpdmllci5l
-dQpTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCjc2NjRjM2IxMTcgbGludXgtdXNlcjog
-cmVtb3ZlIHVzZWxlc3MgI2lmCjZiZWQxODQ3NDggbGludXgtdXNlcjogbW92ZSBocHBhIHNpZ25h
-bCBkZWZpbml0aW9ucyB0byBocHBhL3RhcmdldF9zaWduYWwuaAplZDUxNWFiMGVjIGxpbnV4LXVz
-ZXI6IG1vdmUgYWxwaGEgc2lnbmFsIGRlZmluaXRpb25zIHRvIGFscGhhL3RhcmdldF9zaWduYWwu
-aAo3MGU5OWE2YTNmIGxpbnV4LXVzZXI6IG1vdmUgb3BlbnJpc2Mgc2lnbmFsIGRlZmluaXRpb25z
-IHRvIG9wZW5yaXNjL3RhcmdldF9zaWduYWwuaAo3YWRiY2IwZjdjIGxpbnV4LXVzZXI6IG1vdmUg
-bWlwcyBzaWduYWwgZGVmaW5pdGlvbnMgdG8gbWlwcy90YXJnZXRfc2lnbmFsLmgKMjk2MWYxMzUx
-ZiBsaW51eC11c2VyOiBtb3ZlIHNwYXJjIHNpZ25hbCBkZWZpbml0aW9ucyB0byBzcGFyYy90YXJn
-ZXRfc2lnbmFsLmgKMTljNDY3OGZkMyBsaW51eC11c2VyOiBtb3ZlIGdlbmVyaWMgc2lnbmFsIGRl
-ZmluaXRpb25zIHRvIGdlbmVyaWMvc2lnbmFsLmgKNjRkYWMyNzZhYyBsaW51eC11c2VyOiBtb3Zl
-IGdldF9zcF9mcm9tX2NwdXN0YXRlKCkgdG8gdGFyZ2V0X2NwdS5oCmJiYjg2NjIzNDcgbGludXgt
-dXNlcjogbW92ZSBzcGFyYy9zcGFyYzY0IGZjbnRsIGRlZmluaXRpb25zIHRvIHNwYXJjL3Rhcmdl
-dF9mY250bC5oCmQ2NDFkYTVkODMgbGludXgtdXNlcjogbW92ZSBwcGMgZmNudGwgZGVmaW5pdGlv
-bnMgdG8gcHBjL3RhcmdldF9mY250bC5oCmUwZDc0NWQ1M2QgbGludXgtdXNlcjogbW92ZSBtaXBz
-L21pcHM2NCBmY250bCBkZWZpbml0aW9ucyB0byBtaXBzL3RhcmdldF9mY250bC5oCjA1NjM2YzQy
-ZWUgbGludXgtdXNlcjogbW92ZSBhcm0vYWFyY2g2NC9tNjhrIGZjbnRsIGRlZmluaXRpb25zIHRv
-IFthcm18YWFyY2g2NHxtNjhrXS90YXJnZXRfZmNudGwuaAowOWMyMjE4YWMwIGxpbnV4LXVzZXI6
-IG1vdmUgaHBwYSBmY250bCBkZWZpbml0aW9ucyB0byBocHBhL3RhcmdldF9mY250bC5oCjU3ODUx
-MTU4YjcgbGludXgtdXNlcjogbW92ZSBhbHBoYSBmY250bCBkZWZpbml0aW9ucyB0byBhbHBoYS90
-YXJnZXRfZmNudGwuaAozOTExYWMxNzM1IGxpbnV4LXVzZXI6IG1vdmUgZ2VuZXJpYyBmY250bCBk
-ZWZpbml0aW9ucyB0byBnZW5lcmljL2ZjbnRsLmgKCj09PSBPVVRQVVQgQkVHSU4gPT09CkNoZWNr
-aW5nIFBBVENIIDEvMTU6IGxpbnV4LXVzZXI6IG1vdmUgZ2VuZXJpYyBmY250bCBkZWZpbml0aW9u
-cyB0byBnZW5lcmljL2ZjbnRsLmguLi4KV0FSTklORzogYWRkZWQsIG1vdmVkIG9yIGRlbGV0ZWQg
-ZmlsZShzKSwgZG9lcyBNQUlOVEFJTkVSUyBuZWVkIHVwZGF0aW5nPwojMTQ6IApuZXcgZmlsZSBt
-b2RlIDEwMDY0NAoKdG90YWw6IDAgZXJyb3JzLCAxIHdhcm5pbmdzLCA1MjggbGluZXMgY2hlY2tl
-ZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkg
-b2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1h
-aW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgpDaGVja2luZyBQQVRDSCAy
-LzE1OiBsaW51eC11c2VyOiBtb3ZlIGFscGhhIGZjbnRsIGRlZmluaXRpb25zIHRvIGFscGhhL3Rh
-cmdldF9mY250bC5oLi4uCkNoZWNraW5nIFBBVENIIDMvMTU6IGxpbnV4LXVzZXI6IG1vdmUgaHBw
-YSBmY250bCBkZWZpbml0aW9ucyB0byBocHBhL3RhcmdldF9mY250bC5oLi4uCkNoZWNraW5nIFBB
-VENIIDQvMTU6IGxpbnV4LXVzZXI6IG1vdmUgYXJtL2FhcmNoNjQvbTY4ayBmY250bCBkZWZpbml0
-aW9ucyB0byBbYXJtfGFhcmNoNjR8bTY4a10vdGFyZ2V0X2ZjbnRsLmguLi4KQ2hlY2tpbmcgUEFU
-Q0ggNS8xNTogbGludXgtdXNlcjogbW92ZSBtaXBzL21pcHM2NCBmY250bCBkZWZpbml0aW9ucyB0
-byBtaXBzL3RhcmdldF9mY250bC5oLi4uCkVSUk9SOiBzcGFjZSBwcm9oaWJpdGVkIGJldHdlZW4g
-ZnVuY3Rpb24gbmFtZSBhbmQgb3BlbiBwYXJlbnRoZXNpcyAnKCcKIzk4OiBGSUxFOiBsaW51eC11
-c2VyL3N5c2NhbGxfZGVmcy5oOjI0Mjk6CisjaWYgZGVmaW5lZCAoVEFSR0VUX1BQQykKCnRvdGFs
-OiAxIGVycm9ycywgMCB3YXJuaW5ncywgODcgbGluZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBoYXMg
-c3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFy
-ZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVD
-S1BBVENIIGluIE1BSU5UQUlORVJTLgoKQ2hlY2tpbmcgUEFUQ0ggNi8xNTogbGludXgtdXNlcjog
-bW92ZSBwcGMgZmNudGwgZGVmaW5pdGlvbnMgdG8gcHBjL3RhcmdldF9mY250bC5oLi4uCkVSUk9S
-OiBzcGFjZSBwcm9oaWJpdGVkIGJldHdlZW4gZnVuY3Rpb24gbmFtZSBhbmQgb3BlbiBwYXJlbnRo
-ZXNpcyAnKCcKIzQxOiBGSUxFOiBsaW51eC11c2VyL3N5c2NhbGxfZGVmcy5oOjI0Mjk6CisjaWYg
-ZGVmaW5lZCAoVEFSR0VUX1NQQVJDKQoKdG90YWw6IDEgZXJyb3JzLCAwIHdhcm5pbmdzLCAyNCBs
-aW5lcyBjaGVja2VkCgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmll
-dy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhl
-bSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgpDaGVj
-a2luZyBQQVRDSCA3LzE1OiBsaW51eC11c2VyOiBtb3ZlIHNwYXJjL3NwYXJjNjQgZmNudGwgZGVm
-aW5pdGlvbnMgdG8gc3BhcmMvdGFyZ2V0X2ZjbnRsLmguLi4KQ2hlY2tpbmcgUEFUQ0ggOC8xNTog
-bGludXgtdXNlcjogbW92ZSBnZXRfc3BfZnJvbV9jcHVzdGF0ZSgpIHRvIHRhcmdldF9jcHUuaC4u
-LgpDaGVja2luZyBQQVRDSCA5LzE1OiBsaW51eC11c2VyOiBtb3ZlIGdlbmVyaWMgc2lnbmFsIGRl
-ZmluaXRpb25zIHRvIGdlbmVyaWMvc2lnbmFsLmguLi4KV0FSTklORzogYWRkZWQsIG1vdmVkIG9y
-IGRlbGV0ZWQgZmlsZShzKSwgZG9lcyBNQUlOVEFJTkVSUyBuZWVkIHVwZGF0aW5nPwojNDk6IApu
-ZXcgZmlsZSBtb2RlIDEwMDY0NAoKdG90YWw6IDAgZXJyb3JzLCAxIHdhcm5pbmdzLCAyMTkgbGlu
-ZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcu
-ICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0g
-dG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgpDaGVja2lu
-ZyBQQVRDSCAxMC8xNTogbGludXgtdXNlcjogbW92ZSBzcGFyYyBzaWduYWwgZGVmaW5pdGlvbnMg
-dG8gc3BhcmMvdGFyZ2V0X3NpZ25hbC5oLi4uCkNoZWNraW5nIFBBVENIIDExLzE1OiBsaW51eC11
-c2VyOiBtb3ZlIG1pcHMgc2lnbmFsIGRlZmluaXRpb25zIHRvIG1pcHMvdGFyZ2V0X3NpZ25hbC5o
-Li4uCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiM0MDogRklMRTogbGludXgtdXNl
-ci9taXBzL3RhcmdldF9zaWduYWwuaDoyNDoKKyNkZWZpbmUgVEFSR0VUX1NJR0NMRCAgICAgICAg
-ICAgVEFSR0VUX1NJR0NITEQgIC8qIFNhbWUgYXMgVEFSR0VUX1NJR0NITEQgKFN5c3RlbSBWKS4g
-ICovCgpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwojNDM6IEZJTEU6IGxpbnV4LXVz
-ZXIvbWlwcy90YXJnZXRfc2lnbmFsLmg6Mjc6CisjZGVmaW5lIFRBUkdFVF9TSUdVUkcgICAgICAg
-ICAgIDIxICAgICAgLyogVXJnZW50IGNvbmRpdGlvbiBvbiBzb2NrZXQgKDQuMiBCU0QpLiAgKi8K
-CldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiM0NTogRklMRTogbGludXgtdXNlci9t
-aXBzL3RhcmdldF9zaWduYWwuaDoyOToKKyNkZWZpbmUgVEFSR0VUX1NJR1BPTEwgICAgICAgICAg
-VEFSR0VUX1NJR0lPICAgIC8qIFBvbGxhYmxlIGV2ZW50IG9jY3VycmVkIChTeXN0ZW0gVikuICAq
-LwoKV0FSTklORzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzU0OiBGSUxFOiBsaW51eC11c2Vy
-L21pcHMvdGFyZ2V0X3NpZ25hbC5oOjM4OgorI2RlZmluZSBUQVJHRVRfU0lHWEZTWiAgICAgICAg
-ICAzMSAgICAgIC8qIEZpbGUgc2l6ZSBsaW1pdCBleGNlZWRlZCAoNC4yIEJTRCkuICAqLwoKV0FS
-TklORzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzEwODogRklMRTogbGludXgtdXNlci9taXBz
-NjQvdGFyZ2V0X3NpZ25hbC5oOjI0OgorI2RlZmluZSBUQVJHRVRfU0lHQ0xEICAgICAgICAgICBU
-QVJHRVRfU0lHQ0hMRCAgLyogU2FtZSBhcyBUQVJHRVRfU0lHQ0hMRCAoU3lzdGVtIFYpLiAgKi8K
-CldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiMxMTE6IEZJTEU6IGxpbnV4LXVzZXIv
-bWlwczY0L3RhcmdldF9zaWduYWwuaDoyNzoKKyNkZWZpbmUgVEFSR0VUX1NJR1VSRyAgICAgICAg
-ICAgMjEgICAgICAvKiBVcmdlbnQgY29uZGl0aW9uIG9uIHNvY2tldCAoNC4yIEJTRCkuICAqLwoK
-V0FSTklORzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzExMzogRklMRTogbGludXgtdXNlci9t
-aXBzNjQvdGFyZ2V0X3NpZ25hbC5oOjI5OgorI2RlZmluZSBUQVJHRVRfU0lHUE9MTCAgICAgICAg
-ICBUQVJHRVRfU0lHSU8gICAgLyogUG9sbGFibGUgZXZlbnQgb2NjdXJyZWQgKFN5c3RlbSBWKS4g
-ICovCgpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwojMTIyOiBGSUxFOiBsaW51eC11
-c2VyL21pcHM2NC90YXJnZXRfc2lnbmFsLmg6Mzg6CisjZGVmaW5lIFRBUkdFVF9TSUdYRlNaICAg
-ICAgICAgIDMxICAgICAgLyogRmlsZSBzaXplIGxpbWl0IGV4Y2VlZGVkICg0LjIgQlNEKS4gICov
-Cgp0b3RhbDogMCBlcnJvcnMsIDggd2FybmluZ3MsIDE5MSBsaW5lcyBjaGVja2VkCgpZb3VyIHBh
-dGNoIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBl
-cnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwg
-c2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCkNoZWNraW5nIFBBVENIIDEyLzE1OiBsaW51
-eC11c2VyOiBtb3ZlIG9wZW5yaXNjIHNpZ25hbCBkZWZpbml0aW9ucyB0byBvcGVucmlzYy90YXJn
-ZXRfc2lnbmFsLmguLi4KQ2hlY2tpbmcgUEFUQ0ggMTMvMTU6IGxpbnV4LXVzZXI6IG1vdmUgYWxw
-aGEgc2lnbmFsIGRlZmluaXRpb25zIHRvIGFscGhhL3RhcmdldF9zaWduYWwuaC4uLgpDaGVja2lu
-ZyBQQVRDSCAxNC8xNTogbGludXgtdXNlcjogbW92ZSBocHBhIHNpZ25hbCBkZWZpbml0aW9ucyB0
-byBocHBhL3RhcmdldF9zaWduYWwuaC4uLgpDaGVja2luZyBQQVRDSCAxNS8xNTogbGludXgtdXNl
-cjogcmVtb3ZlIHVzZWxlc3MgI2lmLi4uCj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21tYW5k
-IGV4aXRlZCB3aXRoIGNvZGU6IDEKCgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkg
-YnkgUGF0Y2hldyBbaHR0cDovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJh
-Y2sgdG8gcGF0Y2hldy1kZXZlbEByZWRoYXQuY29t
+Am 28.05.2018 um 14:03 hat Greg Kurz geschrieben:
+> Removing a drive with drive_del while it is being used to run an I/O
+> intensive workload can cause QEMU to crash.
+> 
+> An AIO flush can yield at some point:
+> 
+> blk_aio_flush_entry()
+>  blk_co_flush(blk)
+>   bdrv_co_flush(blk->root->bs)
+>    ...
+>     qemu_coroutine_yield()
+> 
+> and let the HMP command to run, free blk->root and give control
+> back to the AIO flush:
+> 
+>     hmp_drive_del()
+>      blk_remove_bs()
+>       bdrv_root_unref_child(blk->root)
+>        child_bs = blk->root->bs
+>        bdrv_detach_child(blk->root)
+>         bdrv_replace_child(blk->root, NULL)
+>          blk->root->bs = NULL
+>         g_free(blk->root) <============== blk->root becomes stale
+>        bdrv_unref(child_bs)
+>         bdrv_delete(child_bs)
+>          bdrv_close()
+>           bdrv_drained_begin()
+>            bdrv_do_drained_begin()
+>             bdrv_drain_recurse()
+>              aio_poll()
+>               ...
+>               qemu_coroutine_switch()
+> 
+> and the AIO flush completion ends up dereferencing blk->root:
+> 
+>   blk_aio_complete()
+>    scsi_aio_complete()
+>     blk_get_aio_context(blk)
+>      bs = blk_bs(blk)
+>  ie, bs = blk->root ? blk->root->bs : NULL
+>             ^^^^^
+>             stale
+> 
+> The problem is that we should avoid making block driver graph
+> changes while we have in-flight requests. Let's drain all I/O
+> for this BB before calling bdrv_root_unref_child().
+> 
+> Signed-off-by: Greg Kurz <groug@kaod.org>
+
+Hmm... It sounded convincing, but 'make check-tests/test-replication'
+fails now. The good news is that with the drain fixes, for which I sent
+v2 today, it passes, so instead of staging it in my block branch, I'll
+put it at the end of my branch for the drain fixes.
+
+Might take a bit longer than planned until it's in master, sorry.
+
+Kevin
