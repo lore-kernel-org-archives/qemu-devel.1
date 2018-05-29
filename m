@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58548)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35459)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fNiKi-0005NB-F9
-	for qemu-devel@nongnu.org; Tue, 29 May 2018 13:22:54 -0400
+	(envelope-from <no-reply@patchew.org>) id 1fNigR-0003Io-Mg
+	for qemu-devel@nongnu.org; Tue, 29 May 2018 13:45:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fNiKg-0001zd-7n
-	for qemu-devel@nongnu.org; Tue, 29 May 2018 13:22:52 -0400
-From: Kevin Wolf <kwolf@redhat.com>
-Date: Tue, 29 May 2018 19:21:54 +0200
-Message-Id: <20180529172156.29311-19-kwolf@redhat.com>
+	(envelope-from <no-reply@patchew.org>) id 1fNigO-0002yv-Jk
+	for qemu-devel@nongnu.org; Tue, 29 May 2018 13:45:19 -0400
+Resent-Message-Id: <E1fNigO-0002yv-Jk@eggs.gnu.org>
 In-Reply-To: <20180529172156.29311-1-kwolf@redhat.com>
-References: <20180529172156.29311-1-kwolf@redhat.com>
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <152761590409.300.12807852942795857784@d39dc562802a>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v2 18/20] block: ignore_bds_parents parameter
- for drain functions
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Tue, 29 May 2018 10:45:05 -0700 (PDT)
+Subject: Re: [Qemu-devel] [PATCH v2 00/20] Drain fixes and cleanups, part 3
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,517 +23,116 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-block@nongnu.org
-Cc: kwolf@redhat.com, mreitz@redhat.com, pbonzini@redhat.com, famz@redhat.com, stefanha@redhat.com, eblake@redhat.com, qemu-devel@nongnu.org
+To: kwolf@redhat.com
+Cc: famz@redhat.com, qemu-block@nongnu.orgfamz@redhat.com, qemu-devel@nongnu.org, mreitz@redhat.com, stefanha@redhat.com, pbonzini@redhat.com
 
-In the future, bdrv_drained_all_begin/end() will drain all invidiual
-nodes separately rather than whole subtrees. This means that we don't
-want to propagate the drain to all parents any more: If the parent is a
-BDS, it will already be drained separately. Recursing to all parents is
-unnecessary work and would make it an O(n=C2=B2) operation.
-
-Prepare the drain function for the changed drain_all by adding an
-ignore_bds_parents parameter to the internal implementation that
-prevents the propagation of the drain to BDS parents. We still (have to)
-propagate it to non-BDS parents like BlockBackends or Jobs because those
-are not drained separately.
-
-Signed-off-by: Kevin Wolf <kwolf@redhat.com>
----
- include/block/block.h     | 16 ++++++---
- include/block/block_int.h |  6 ++++
- block.c                   | 11 +++---
- block/io.c                | 88 ++++++++++++++++++++++++++++-------------=
-------
- block/vvfat.c             |  1 +
- 5 files changed, 78 insertions(+), 44 deletions(-)
-
-diff --git a/include/block/block.h b/include/block/block.h
-index 6026c1385e..a678556608 100644
---- a/include/block/block.h
-+++ b/include/block/block.h
-@@ -555,7 +555,8 @@ void bdrv_io_unplug(BlockDriverState *bs);
-  * Begin a quiesced section of all users of @bs. This is part of
-  * bdrv_drained_begin.
-  */
--void bdrv_parent_drained_begin(BlockDriverState *bs, BdrvChild *ignore);
-+void bdrv_parent_drained_begin(BlockDriverState *bs, BdrvChild *ignore,
-+                               bool ignore_bds_parents);
-=20
- /**
-  * bdrv_parent_drained_end:
-@@ -563,18 +564,23 @@ void bdrv_parent_drained_begin(BlockDriverState *bs=
-, BdrvChild *ignore);
-  * End a quiesced section of all users of @bs. This is part of
-  * bdrv_drained_end.
-  */
--void bdrv_parent_drained_end(BlockDriverState *bs, BdrvChild *ignore);
-+void bdrv_parent_drained_end(BlockDriverState *bs, BdrvChild *ignore,
-+                             bool ignore_bds_parents);
-=20
- /**
-  * bdrv_drain_poll:
-  *
-  * Poll for pending requests in @bs, its parents (except for @ignore_par=
-ent),
-- * and if @recursive is true its children as well.
-+ * and if @recursive is true its children as well (used for subtree drai=
-n).
-+ *
-+ * If @ignore_bds_parents is true, parents that are BlockDriverStates mu=
-st
-+ * ignore the drain request because they will be drained separately (use=
-d for
-+ * drain_all).
-  *
-  * This is part of bdrv_drained_begin.
-  */
- bool bdrv_drain_poll(BlockDriverState *bs, bool recursive,
--                     BdrvChild *ignore_parent);
-+                     BdrvChild *ignore_parent, bool ignore_bds_parents);
-=20
- /**
-  * bdrv_drained_begin:
-@@ -595,7 +601,7 @@ void bdrv_drained_begin(BlockDriverState *bs);
-  * running requests to complete.
-  */
- void bdrv_do_drained_begin_quiesce(BlockDriverState *bs,
--                                   BdrvChild *parent);
-+                                   BdrvChild *parent, bool ignore_bds_pa=
-rents);
-=20
- /**
-  * Like bdrv_drained_begin, but recursively begins a quiesced section fo=
-r
-diff --git a/include/block/block_int.h b/include/block/block_int.h
-index feba86888e..edb16df015 100644
---- a/include/block/block_int.h
-+++ b/include/block/block_int.h
-@@ -545,6 +545,12 @@ struct BdrvChildRole {
-      * points to. */
-     bool stay_at_node;
-=20
-+    /* If true, the parent is a BlockDriverState and bdrv_next_all_state=
-s()
-+     * will return it. This information is used for drain_all, where eve=
-ry node
-+     * will be drained separately, so the drain only needs to be propaga=
-ted to
-+     * non-BDS parents. */
-+    bool parent_is_bds;
-+
-     void (*inherit_options)(int *child_flags, QDict *child_options,
-                             int parent_flags, QDict *parent_options);
-=20
-diff --git a/block.c b/block.c
-index 1405d1180b..ce6eb53ad9 100644
---- a/block.c
-+++ b/block.c
-@@ -817,13 +817,13 @@ static char *bdrv_child_get_parent_desc(BdrvChild *=
-c)
- static void bdrv_child_cb_drained_begin(BdrvChild *child)
- {
-     BlockDriverState *bs =3D child->opaque;
--    bdrv_do_drained_begin_quiesce(bs, NULL);
-+    bdrv_do_drained_begin_quiesce(bs, NULL, false);
- }
-=20
- static bool bdrv_child_cb_drained_poll(BdrvChild *child)
- {
-     BlockDriverState *bs =3D child->opaque;
--    return bdrv_drain_poll(bs, false, NULL);
-+    return bdrv_drain_poll(bs, false, NULL, false);
- }
-=20
- static void bdrv_child_cb_drained_end(BdrvChild *child)
-@@ -907,6 +907,7 @@ static void bdrv_inherited_options(int *child_flags, =
-QDict *child_options,
- }
-=20
- const BdrvChildRole child_file =3D {
-+    .parent_is_bds   =3D true,
-     .get_parent_desc =3D bdrv_child_get_parent_desc,
-     .inherit_options =3D bdrv_inherited_options,
-     .drained_begin   =3D bdrv_child_cb_drained_begin,
-@@ -932,6 +933,7 @@ static void bdrv_inherited_fmt_options(int *child_fla=
-gs, QDict *child_options,
- }
-=20
- const BdrvChildRole child_format =3D {
-+    .parent_is_bds   =3D true,
-     .get_parent_desc =3D bdrv_child_get_parent_desc,
-     .inherit_options =3D bdrv_inherited_fmt_options,
-     .drained_begin   =3D bdrv_child_cb_drained_begin,
-@@ -1050,6 +1052,7 @@ static int bdrv_backing_update_filename(BdrvChild *=
-c, BlockDriverState *base,
- }
-=20
- const BdrvChildRole child_backing =3D {
-+    .parent_is_bds   =3D true,
-     .get_parent_desc =3D bdrv_child_get_parent_desc,
-     .attach          =3D bdrv_backing_attach,
-     .detach          =3D bdrv_backing_detach,
-@@ -4945,7 +4948,7 @@ void bdrv_set_aio_context(BlockDriverState *bs, Aio=
-Context *new_context)
-     AioContext *ctx =3D bdrv_get_aio_context(bs);
-=20
-     aio_disable_external(ctx);
--    bdrv_parent_drained_begin(bs, NULL);
-+    bdrv_parent_drained_begin(bs, NULL, false);
-     bdrv_drain(bs); /* ensure there are no in-flight requests */
-=20
-     while (aio_poll(ctx, false)) {
-@@ -4959,7 +4962,7 @@ void bdrv_set_aio_context(BlockDriverState *bs, Aio=
-Context *new_context)
-      */
-     aio_context_acquire(new_context);
-     bdrv_attach_aio_context(bs, new_context);
--    bdrv_parent_drained_end(bs, NULL);
-+    bdrv_parent_drained_end(bs, NULL, false);
-     aio_enable_external(ctx);
-     aio_context_release(new_context);
- }
-diff --git a/block/io.c b/block/io.c
-index 2c06aaf6d8..d71e278289 100644
---- a/block/io.c
-+++ b/block/io.c
-@@ -41,12 +41,13 @@
- static int coroutine_fn bdrv_co_do_pwrite_zeroes(BlockDriverState *bs,
-     int64_t offset, int bytes, BdrvRequestFlags flags);
-=20
--void bdrv_parent_drained_begin(BlockDriverState *bs, BdrvChild *ignore)
-+void bdrv_parent_drained_begin(BlockDriverState *bs, BdrvChild *ignore,
-+                               bool ignore_bds_parents)
- {
-     BdrvChild *c, *next;
-=20
-     QLIST_FOREACH_SAFE(c, &bs->parents, next_parent, next) {
--        if (c =3D=3D ignore) {
-+        if (c =3D=3D ignore || (ignore_bds_parents && c->role->parent_is=
-_bds)) {
-             continue;
-         }
-         if (c->role->drained_begin) {
-@@ -55,12 +56,13 @@ void bdrv_parent_drained_begin(BlockDriverState *bs, =
-BdrvChild *ignore)
-     }
- }
-=20
--void bdrv_parent_drained_end(BlockDriverState *bs, BdrvChild *ignore)
-+void bdrv_parent_drained_end(BlockDriverState *bs, BdrvChild *ignore,
-+                             bool ignore_bds_parents)
- {
-     BdrvChild *c, *next;
-=20
-     QLIST_FOREACH_SAFE(c, &bs->parents, next_parent, next) {
--        if (c =3D=3D ignore) {
-+        if (c =3D=3D ignore || (ignore_bds_parents && c->role->parent_is=
-_bds)) {
-             continue;
-         }
-         if (c->role->drained_end) {
-@@ -69,13 +71,14 @@ void bdrv_parent_drained_end(BlockDriverState *bs, Bd=
-rvChild *ignore)
-     }
- }
-=20
--static bool bdrv_parent_drained_poll(BlockDriverState *bs, BdrvChild *ig=
-nore)
-+static bool bdrv_parent_drained_poll(BlockDriverState *bs, BdrvChild *ig=
-nore,
-+                                     bool ignore_bds_parents)
- {
-     BdrvChild *c, *next;
-     bool busy =3D false;
-=20
-     QLIST_FOREACH_SAFE(c, &bs->parents, next_parent, next) {
--        if (c =3D=3D ignore) {
-+        if (c =3D=3D ignore || (ignore_bds_parents && c->role->parent_is=
-_bds)) {
-             continue;
-         }
-         if (c->role->drained_poll) {
-@@ -167,6 +170,7 @@ typedef struct {
-     bool recursive;
-     bool poll;
-     BdrvChild *parent;
-+    bool ignore_bds_parents;
- } BdrvCoDrainData;
-=20
- static void coroutine_fn bdrv_drain_invoke_entry(void *opaque)
-@@ -220,11 +224,11 @@ static void bdrv_drain_invoke(BlockDriverState *bs,=
- bool begin)
-=20
- /* Returns true if BDRV_POLL_WHILE() should go into a blocking aio_poll(=
-) */
- bool bdrv_drain_poll(BlockDriverState *bs, bool recursive,
--                     BdrvChild *ignore_parent)
-+                     BdrvChild *ignore_parent, bool ignore_bds_parents)
- {
-     BdrvChild *child, *next;
-=20
--    if (bdrv_parent_drained_poll(bs, ignore_parent)) {
-+    if (bdrv_parent_drained_poll(bs, ignore_parent, ignore_bds_parents))=
- {
-         return true;
-     }
-=20
-@@ -233,8 +237,9 @@ bool bdrv_drain_poll(BlockDriverState *bs, bool recur=
-sive,
-     }
-=20
-     if (recursive) {
-+        assert(!ignore_bds_parents);
-         QLIST_FOREACH_SAFE(child, &bs->children, next, next) {
--            if (bdrv_drain_poll(child->bs, recursive, child)) {
-+            if (bdrv_drain_poll(child->bs, recursive, child, false)) {
-                 return true;
-             }
-         }
-@@ -250,13 +255,14 @@ static bool bdrv_drain_poll_top_level(BlockDriverSt=
-ate *bs, bool recursive,
-      * have executed. */
-     while (aio_poll(bs->aio_context, false));
-=20
--    return bdrv_drain_poll(bs, recursive, ignore_parent);
-+    return bdrv_drain_poll(bs, recursive, ignore_parent, false);
- }
-=20
- static void bdrv_do_drained_begin(BlockDriverState *bs, bool recursive,
--                                  BdrvChild *parent, bool poll);
-+                                  BdrvChild *parent, bool ignore_bds_par=
-ents,
-+                                  bool poll);
- static void bdrv_do_drained_end(BlockDriverState *bs, bool recursive,
--                                BdrvChild *parent);
-+                                BdrvChild *parent, bool ignore_bds_paren=
-ts);
-=20
- static void bdrv_co_drain_bh_cb(void *opaque)
- {
-@@ -267,9 +273,11 @@ static void bdrv_co_drain_bh_cb(void *opaque)
-     if (bs) {
-         bdrv_dec_in_flight(bs);
-         if (data->begin) {
--            bdrv_do_drained_begin(bs, data->recursive, data->parent, dat=
-a->poll);
-+            bdrv_do_drained_begin(bs, data->recursive, data->parent,
-+                                  data->ignore_bds_parents, data->poll);
-         } else {
--            bdrv_do_drained_end(bs, data->recursive, data->parent);
-+            bdrv_do_drained_end(bs, data->recursive, data->parent,
-+                                data->ignore_bds_parents);
-         }
-     } else {
-         assert(data->begin);
-@@ -282,7 +290,9 @@ static void bdrv_co_drain_bh_cb(void *opaque)
-=20
- static void coroutine_fn bdrv_co_yield_to_drain(BlockDriverState *bs,
-                                                 bool begin, bool recursi=
-ve,
--                                                BdrvChild *parent, bool =
-poll)
-+                                                BdrvChild *parent,
-+                                                bool ignore_bds_parents,
-+                                                bool poll)
- {
-     BdrvCoDrainData data;
-=20
-@@ -297,6 +307,7 @@ static void coroutine_fn bdrv_co_yield_to_drain(Block=
-DriverState *bs,
-         .begin =3D begin,
-         .recursive =3D recursive,
-         .parent =3D parent,
-+        .ignore_bds_parents =3D ignore_bds_parents,
-         .poll =3D poll,
-     };
-     if (bs) {
-@@ -312,7 +323,7 @@ static void coroutine_fn bdrv_co_yield_to_drain(Block=
-DriverState *bs,
- }
-=20
- void bdrv_do_drained_begin_quiesce(BlockDriverState *bs,
--                                   BdrvChild *parent)
-+                                   BdrvChild *parent, bool ignore_bds_pa=
-rents)
- {
-     assert(!qemu_in_coroutine());
-=20
-@@ -321,26 +332,30 @@ void bdrv_do_drained_begin_quiesce(BlockDriverState=
- *bs,
-         aio_disable_external(bdrv_get_aio_context(bs));
-     }
-=20
--    bdrv_parent_drained_begin(bs, parent);
-+    bdrv_parent_drained_begin(bs, parent, ignore_bds_parents);
-     bdrv_drain_invoke(bs, true);
- }
-=20
- static void bdrv_do_drained_begin(BlockDriverState *bs, bool recursive,
--                                  BdrvChild *parent, bool poll)
-+                                  BdrvChild *parent, bool ignore_bds_par=
-ents,
-+                                  bool poll)
- {
-     BdrvChild *child, *next;
-=20
-     if (qemu_in_coroutine()) {
--        bdrv_co_yield_to_drain(bs, true, recursive, parent, poll);
-+        bdrv_co_yield_to_drain(bs, true, recursive, parent, ignore_bds_p=
-arents,
-+                               poll);
-         return;
-     }
-=20
--    bdrv_do_drained_begin_quiesce(bs, parent);
-+    bdrv_do_drained_begin_quiesce(bs, parent, ignore_bds_parents);
-=20
-     if (recursive) {
-+        assert(!ignore_bds_parents);
-         bs->recursive_quiesce_counter++;
-         QLIST_FOREACH_SAFE(child, &bs->children, next, next) {
--            bdrv_do_drained_begin(child->bs, true, child, false);
-+            bdrv_do_drained_begin(child->bs, true, child, ignore_bds_par=
-ents,
-+                                  false);
-         }
-     }
-=20
-@@ -354,28 +369,30 @@ static void bdrv_do_drained_begin(BlockDriverState =
-*bs, bool recursive,
-      * nodes.
-      */
-     if (poll) {
-+        assert(!ignore_bds_parents);
-         BDRV_POLL_WHILE(bs, bdrv_drain_poll_top_level(bs, recursive, par=
-ent));
-     }
- }
-=20
- void bdrv_drained_begin(BlockDriverState *bs)
- {
--    bdrv_do_drained_begin(bs, false, NULL, true);
-+    bdrv_do_drained_begin(bs, false, NULL, false, true);
- }
-=20
- void bdrv_subtree_drained_begin(BlockDriverState *bs)
- {
--    bdrv_do_drained_begin(bs, true, NULL, true);
-+    bdrv_do_drained_begin(bs, true, NULL, false, true);
- }
-=20
--void bdrv_do_drained_end(BlockDriverState *bs, bool recursive,
--                         BdrvChild *parent)
-+static void bdrv_do_drained_end(BlockDriverState *bs, bool recursive,
-+                                BdrvChild *parent, bool ignore_bds_paren=
-ts)
- {
-     BdrvChild *child, *next;
-     int old_quiesce_counter;
-=20
-     if (qemu_in_coroutine()) {
--        bdrv_co_yield_to_drain(bs, false, recursive, parent, false);
-+        bdrv_co_yield_to_drain(bs, false, recursive, parent, ignore_bds_=
-parents,
-+                               false);
-         return;
-     }
-     assert(bs->quiesce_counter > 0);
-@@ -383,27 +400,28 @@ void bdrv_do_drained_end(BlockDriverState *bs, bool=
- recursive,
-=20
-     /* Re-enable things in child-to-parent order */
-     bdrv_drain_invoke(bs, false);
--    bdrv_parent_drained_end(bs, parent);
-+    bdrv_parent_drained_end(bs, parent, ignore_bds_parents);
-     if (old_quiesce_counter =3D=3D 1) {
-         aio_enable_external(bdrv_get_aio_context(bs));
-     }
-=20
-     if (recursive) {
-+        assert(!ignore_bds_parents);
-         bs->recursive_quiesce_counter--;
-         QLIST_FOREACH_SAFE(child, &bs->children, next, next) {
--            bdrv_do_drained_end(child->bs, true, child);
-+            bdrv_do_drained_end(child->bs, true, child, ignore_bds_paren=
-ts);
-         }
-     }
- }
-=20
- void bdrv_drained_end(BlockDriverState *bs)
- {
--    bdrv_do_drained_end(bs, false, NULL);
-+    bdrv_do_drained_end(bs, false, NULL, false);
- }
-=20
- void bdrv_subtree_drained_end(BlockDriverState *bs)
- {
--    bdrv_do_drained_end(bs, true, NULL);
-+    bdrv_do_drained_end(bs, true, NULL, false);
- }
-=20
- void bdrv_apply_subtree_drain(BdrvChild *child, BlockDriverState *new_pa=
-rent)
-@@ -411,7 +429,7 @@ void bdrv_apply_subtree_drain(BdrvChild *child, Block=
-DriverState *new_parent)
-     int i;
-=20
-     for (i =3D 0; i < new_parent->recursive_quiesce_counter; i++) {
--        bdrv_do_drained_begin(child->bs, true, child, true);
-+        bdrv_do_drained_begin(child->bs, true, child, false, true);
-     }
- }
-=20
-@@ -420,7 +438,7 @@ void bdrv_unapply_subtree_drain(BdrvChild *child, Blo=
-ckDriverState *old_parent)
-     int i;
-=20
-     for (i =3D 0; i < old_parent->recursive_quiesce_counter; i++) {
--        bdrv_do_drained_end(child->bs, true, child);
-+        bdrv_do_drained_end(child->bs, true, child, false);
-     }
- }
-=20
-@@ -472,7 +490,7 @@ void bdrv_drain_all_begin(void)
-     BdrvNextIterator it;
-=20
-     if (qemu_in_coroutine()) {
--        bdrv_co_yield_to_drain(NULL, true, false, NULL, true);
-+        bdrv_co_yield_to_drain(NULL, true, false, NULL, false, true);
-         return;
-     }
-=20
-@@ -486,7 +504,7 @@ void bdrv_drain_all_begin(void)
-         AioContext *aio_context =3D bdrv_get_aio_context(bs);
-=20
-         aio_context_acquire(aio_context);
--        bdrv_do_drained_begin(bs, true, NULL, true);
-+        bdrv_do_drained_begin(bs, true, NULL, false, true);
-         aio_context_release(aio_context);
-     }
-=20
-@@ -504,7 +522,7 @@ void bdrv_drain_all_end(void)
-         AioContext *aio_context =3D bdrv_get_aio_context(bs);
-=20
-         aio_context_acquire(aio_context);
--        bdrv_do_drained_end(bs, true, NULL);
-+        bdrv_do_drained_end(bs, true, NULL, false);
-         aio_context_release(aio_context);
-     }
- }
-diff --git a/block/vvfat.c b/block/vvfat.c
-index 662dca0114..384c954d70 100644
---- a/block/vvfat.c
-+++ b/block/vvfat.c
-@@ -3133,6 +3133,7 @@ static void vvfat_qcow_options(int *child_flags, QD=
-ict *child_options,
- }
-=20
- static const BdrvChildRole child_vvfat_qcow =3D {
-+    .parent_is_bds      =3D true,
-     .inherit_options    =3D vvfat_qcow_options,
- };
-=20
---=20
-2.13.6
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
+c3NhZ2UtaWQ6IDIwMTgwNTI5MTcyMTU2LjI5MzExLTEta3dvbGZAcmVkaGF0LmNvbQpTdWJqZWN0
+OiBbUWVtdS1kZXZlbF0gW1BBVENIIHYyIDAwLzIwXSBEcmFpbiBmaXhlcyBhbmQgY2xlYW51cHMs
+IHBhcnQgMwoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFzaAoKQkFTRT1iYXNl
+Cm49MQp0b3RhbD0kKGdpdCBsb2cgLS1vbmVsaW5lICRCQVNFLi4gfCB3YyAtbCkKZmFpbGVkPTAK
+CmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxpbWl0IDAKZ2l0IGNvbmZpZyAtLWxvY2Fs
+IGRpZmYucmVuYW1lcyBUcnVlCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLmFsZ29yaXRobSBoaXN0
+b2dyYW0KCmNvbW1pdHM9IiQoZ2l0IGxvZyAtLWZvcm1hdD0lSCAtLXJldmVyc2UgJEJBU0UuLiki
+CmZvciBjIGluICRjb21taXRzOyBkbwogICAgZWNobyAiQ2hlY2tpbmcgUEFUQ0ggJG4vJHRvdGFs
+OiAkKGdpdCBsb2cgLW4gMSAtLWZvcm1hdD0lcyAkYykuLi4iCiAgICBpZiAhIGdpdCBzaG93ICRj
+IC0tZm9ybWF0PWVtYWlsIHwgLi9zY3JpcHRzL2NoZWNrcGF0Y2gucGwgLS1tYWlsYmFjayAtOyB0
+aGVuCiAgICAgICAgZmFpbGVkPTEKICAgICAgICBlY2hvCiAgICBmaQogICAgbj0kKChuKzEpKQpk
+b25lCgpleGl0ICRmYWlsZWQKPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KClVwZGF0aW5nIDNjOGNm
+NWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMzODQKRnJvbSBodHRwczovL2dpdGh1Yi5j
+b20vcGF0Y2hldy1wcm9qZWN0L3FlbXUKICogW25ldyB0YWddICAgICAgICAgICAgICAgcGF0Y2hl
+dy8yMDE4MDUyOTE3MjE1Ni4yOTMxMS0xLWt3b2xmQHJlZGhhdC5jb20gLT4gcGF0Y2hldy8yMDE4
+MDUyOTE3MjE1Ni4yOTMxMS0xLWt3b2xmQHJlZGhhdC5jb20KU3dpdGNoZWQgdG8gYSBuZXcgYnJh
+bmNoICd0ZXN0JwplYWI1ZTgyODdmIHRlc3QtYmRydi1kcmFpbjogVGVzdCBncmFwaCBjaGFuZ2Vz
+IGluIGRyYWluX2FsbCBzZWN0aW9uCjMzMDBkOTRhOWIgYmxvY2s6IEFsbG93IGdyYXBoIGNoYW5n
+ZXMgaW4gYmRydl9kcmFpbl9hbGxfYmVnaW4vZW5kIHNlY3Rpb25zCjNhMzcwMTJlZTkgYmxvY2s6
+IGlnbm9yZV9iZHNfcGFyZW50cyBwYXJhbWV0ZXIgZm9yIGRyYWluIGZ1bmN0aW9ucwphMGNkOTky
+M2IyIGJsb2NrOiBNb3ZlIGJkcnZfZHJhaW5fYWxsX2JlZ2luKCkgb3V0IG9mIGNvcm91dGluZSBj
+b250ZXh0CjdkZjljYjI4NWYgYmxvY2s6IEFsbG93IEFJT19XQUlUX1dISUxFIHdpdGggTlVMTCBj
+dHgKZmE3ZDBhYzI1ZSB0ZXN0LWJkcnYtZHJhaW46IFRlc3QgdGhhdCBiZHJ2X2RyYWluX2ludm9r
+ZSgpIGRvZXNuJ3QgcG9sbAozYzk4MTgyYmE1IGJsb2NrOiBEZWZlciAuYmRydl9kcmFpbl9iZWdp
+biBjYWxsYmFjayB0byBwb2xsaW5nIHBoYXNlCjkyOGY2Zjg1YTQgdGVzdC1iZHJ2LWRyYWluOiBH
+cmFwaCBjaGFuZ2UgdGhyb3VnaCBwYXJlbnQgY2FsbGJhY2sKNzVlNThiZTNhYSBibG9jazogRG9u
+J3QgcG9sbCBpbiBwYXJlbnQgZHJhaW4gY2FsbGJhY2tzCjg0ZmVhMTQ0ODIgdGVzdC1iZHJ2LWRy
+YWluOiBUZXN0IG5vZGUgZGVsZXRpb24gaW4gc3VidHJlZSByZWN1cnNpb24KNmU0ZDljZGE3MCBi
+bG9jazogRHJhaW4gcmVjdXJzaXZlbHkgd2l0aCBhIHNpbmdsZSBCRFJWX1BPTExfV0hJTEUoKQo5
+NTMxYmEzMmI3IHRlc3QtYmRydi1kcmFpbjogQWRkIHRlc3QgZm9yIG5vZGUgZGVsZXRpb24KZjZm
+ZTE0YWJhZCBibG9jazogUmVtb3ZlIGJkcnZfZHJhaW5fcmVjdXJzZSgpCmFhN2FkZTc1Y2YgYmxv
+Y2s6IFJlYWxseSBwYXVzZSBibG9jayBqb2JzIG9uIGRyYWluCjAwZDUyYTI3YjYgYmxvY2s6IEF2
+b2lkIHVubmVjZXNzYXJ5IGFpb19wb2xsKCkgaW4gQUlPX1dBSVRfV0hJTEUoKQpjOTY0NTA4OTZh
+IHRlc3RzL3Rlc3QtYmRydi1kcmFpbjogYmRydl9kcmFpbl9hbGwoKSB3b3JrcyBpbiBjb3JvdXRp
+bmVzIG5vdwo5NTVjNTJhZTI5IGJsb2NrOiBEb24ndCBtYW51YWxseSBwb2xsIGluIGJkcnZfZHJh
+aW5fYWxsKCkKMDk3MTNjOWFjNyBibG9jazogUmVtb3ZlICdyZWN1cnNpdmUnIHBhcmFtZXRlciBm
+cm9tIGJkcnZfZHJhaW5faW52b2tlKCkKZTBjY2Q5YzhmMiBibG9jazogVXNlIGJkcnZfZG9fZHJh
+aW5fYmVnaW4vZW5kIGluIGJkcnZfZHJhaW5fYWxsKCkKOWUwZWE4ZWQwMCB0ZXN0LWJkcnYtZHJh
+aW46IGJkcnZfZHJhaW4oKSB3b3JrcyB3aXRoIGNyb3NzLUFpb0NvbnRleHQgZXZlbnRzCgo9PT0g
+T1VUUFVUIEJFR0lOID09PQpDaGVja2luZyBQQVRDSCAxLzIwOiB0ZXN0LWJkcnYtZHJhaW46IGJk
+cnZfZHJhaW4oKSB3b3JrcyB3aXRoIGNyb3NzLUFpb0NvbnRleHQgZXZlbnRzLi4uCkNoZWNraW5n
+IFBBVENIIDIvMjA6IGJsb2NrOiBVc2UgYmRydl9kb19kcmFpbl9iZWdpbi9lbmQgaW4gYmRydl9k
+cmFpbl9hbGwoKS4uLgpDaGVja2luZyBQQVRDSCAzLzIwOiBibG9jazogUmVtb3ZlICdyZWN1cnNp
+dmUnIHBhcmFtZXRlciBmcm9tIGJkcnZfZHJhaW5faW52b2tlKCkuLi4KQ2hlY2tpbmcgUEFUQ0gg
+NC8yMDogYmxvY2s6IERvbid0IG1hbnVhbGx5IHBvbGwgaW4gYmRydl9kcmFpbl9hbGwoKS4uLgpD
+aGVja2luZyBQQVRDSCA1LzIwOiB0ZXN0cy90ZXN0LWJkcnYtZHJhaW46IGJkcnZfZHJhaW5fYWxs
+KCkgd29ya3MgaW4gY29yb3V0aW5lcyBub3cuLi4KQ2hlY2tpbmcgUEFUQ0ggNi8yMDogYmxvY2s6
+IEF2b2lkIHVubmVjZXNzYXJ5IGFpb19wb2xsKCkgaW4gQUlPX1dBSVRfV0hJTEUoKS4uLgpFUlJP
+UjogdHJhaWxpbmcgc3RhdGVtZW50cyBzaG91bGQgYmUgb24gbmV4dCBsaW5lCiMzODogRklMRTog
+YmxvY2svaW8uYzoxOTA6CisgICAgd2hpbGUgKGFpb19wb2xsKGJzLT5haW9fY29udGV4dCwgZmFs
+c2UpKTsKCkVSUk9SOiBicmFjZXMge30gYXJlIG5lY2Vzc2FyeSBmb3IgYWxsIGFybXMgb2YgdGhp
+cyBzdGF0ZW1lbnQKIzM4OiBGSUxFOiBibG9jay9pby5jOjE5MDoKKyAgICB3aGlsZSAoYWlvX3Bv
+bGwoYnMtPmFpb19jb250ZXh0LCBmYWxzZSkpOwpbLi4uXQoKdG90YWw6IDIgZXJyb3JzLCAwIHdh
+cm5pbmdzLCA2MCBsaW5lcyBjaGVja2VkCgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVtcywg
+cGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZl
+cyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRB
+SU5FUlMuCgpDaGVja2luZyBQQVRDSCA3LzIwOiBibG9jazogUmVhbGx5IHBhdXNlIGJsb2NrIGpv
+YnMgb24gZHJhaW4uLi4KQ2hlY2tpbmcgUEFUQ0ggOC8yMDogYmxvY2s6IFJlbW92ZSBiZHJ2X2Ry
+YWluX3JlY3Vyc2UoKS4uLgpDaGVja2luZyBQQVRDSCA5LzIwOiB0ZXN0LWJkcnYtZHJhaW46IEFk
+ZCB0ZXN0IGZvciBub2RlIGRlbGV0aW9uLi4uCkNoZWNraW5nIFBBVENIIDEwLzIwOiBibG9jazog
+RHJhaW4gcmVjdXJzaXZlbHkgd2l0aCBhIHNpbmdsZSBCRFJWX1BPTExfV0hJTEUoKS4uLgpDaGVj
+a2luZyBQQVRDSCAxMS8yMDogdGVzdC1iZHJ2LWRyYWluOiBUZXN0IG5vZGUgZGVsZXRpb24gaW4g
+c3VidHJlZSByZWN1cnNpb24uLi4KV0FSTklORzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzg1
+OiBGSUxFOiB0ZXN0cy90ZXN0LWJkcnYtZHJhaW4uYzoxMDM0OgorICAgIGdfdGVzdF9hZGRfZnVu
+YygiL2JkcnYtZHJhaW4vZGV0YWNoL2RyYWluX3N1YnRyZWUiLCB0ZXN0X2RldGFjaF9ieV9kcmFp
+bl9zdWJ0cmVlKTsKCnRvdGFsOiAwIGVycm9ycywgMSB3YXJuaW5ncywgNjggbGluZXMgY2hlY2tl
+ZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkg
+b2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1h
+aW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgpDaGVja2luZyBQQVRDSCAx
+Mi8yMDogYmxvY2s6IERvbid0IHBvbGwgaW4gcGFyZW50IGRyYWluIGNhbGxiYWNrcy4uLgpDaGVj
+a2luZyBQQVRDSCAxMy8yMDogdGVzdC1iZHJ2LWRyYWluOiBHcmFwaCBjaGFuZ2UgdGhyb3VnaCBw
+YXJlbnQgY2FsbGJhY2suLi4KV0FSTklORzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzgxOiBG
+SUxFOiB0ZXN0cy90ZXN0LWJkcnYtZHJhaW4uYzoxMDQ5OgorICAgIGNoaWxkX2EgPSBiZHJ2X2F0
+dGFjaF9jaGlsZChwYXJlbnRfYiwgYSwgIlBCLUEiLCAmY2hpbGRfYmFja2luZywgJmVycm9yX2Fi
+b3J0KTsKCnRvdGFsOiAwIGVycm9ycywgMSB3YXJuaW5ncywgMTQyIGxpbmVzIGNoZWNrZWQKCllv
+dXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRo
+ZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFp
+bmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KQ2hlY2tpbmcgUEFUQ0ggMTQvMjA6
+IGJsb2NrOiBEZWZlciAuYmRydl9kcmFpbl9iZWdpbiBjYWxsYmFjayB0byBwb2xsaW5nIHBoYXNl
+Li4uCkNoZWNraW5nIFBBVENIIDE1LzIwOiB0ZXN0LWJkcnYtZHJhaW46IFRlc3QgdGhhdCBiZHJ2
+X2RyYWluX2ludm9rZSgpIGRvZXNuJ3QgcG9sbC4uLgpDaGVja2luZyBQQVRDSCAxNi8yMDogYmxv
+Y2s6IEFsbG93IEFJT19XQUlUX1dISUxFIHdpdGggTlVMTCBjdHguLi4KQ2hlY2tpbmcgUEFUQ0gg
+MTcvMjA6IGJsb2NrOiBNb3ZlIGJkcnZfZHJhaW5fYWxsX2JlZ2luKCkgb3V0IG9mIGNvcm91dGlu
+ZSBjb250ZXh0Li4uCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiMyNzogRklMRTog
+YmxvY2svaW8uYzoyNzA6CisgICAgICAgICAgICBiZHJ2X2RvX2RyYWluZWRfYmVnaW4oYnMsIGRh
+dGEtPnJlY3Vyc2l2ZSwgZGF0YS0+cGFyZW50LCBkYXRhLT5wb2xsKTsKCnRvdGFsOiAwIGVycm9y
+cywgMSB3YXJuaW5ncywgNDEgbGluZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUgcHJv
+YmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBw
+b3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGlu
+IE1BSU5UQUlORVJTLgpDaGVja2luZyBQQVRDSCAxOC8yMDogYmxvY2s6IGlnbm9yZV9iZHNfcGFy
+ZW50cyBwYXJhbWV0ZXIgZm9yIGRyYWluIGZ1bmN0aW9ucy4uLgpDaGVja2luZyBQQVRDSCAxOS8y
+MDogYmxvY2s6IEFsbG93IGdyYXBoIGNoYW5nZXMgaW4gYmRydl9kcmFpbl9hbGxfYmVnaW4vZW5k
+IHNlY3Rpb25zLi4uCkVSUk9SOiBkbyBub3QgaW5pdGlhbGlzZSBnbG9iYWxzIHRvIDAgb3IgTlVM
+TAojMTIzOiBGSUxFOiBibG9jay9pby5jOjQ3NzoKK3Vuc2lnbmVkIGludCBiZHJ2X2RyYWluX2Fs
+bF9jb3VudCA9IDA7CgpFUlJPUjogdHJhaWxpbmcgc3RhdGVtZW50cyBzaG91bGQgYmUgb24gbmV4
+dCBsaW5lCiMxMzI6IEZJTEU6IGJsb2NrL2lvLmM6NDg2OgorICAgIHdoaWxlIChhaW9fcG9sbChx
+ZW11X2dldF9haW9fY29udGV4dCgpLCBmYWxzZSkpOwoKRVJST1I6IGJyYWNlcyB7fSBhcmUgbmVj
+ZXNzYXJ5IGZvciBhbGwgYXJtcyBvZiB0aGlzIHN0YXRlbWVudAojMTMyOiBGSUxFOiBibG9jay9p
+by5jOjQ4NjoKKyAgICB3aGlsZSAoYWlvX3BvbGwocWVtdV9nZXRfYWlvX2NvbnRleHQoKSwgZmFs
+c2UpKTsKWy4uLl0KCnRvdGFsOiAzIGVycm9ycywgMCB3YXJuaW5ncywgMTkzIGxpbmVzIGNoZWNr
+ZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55
+IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBt
+YWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCkNoZWNraW5nIFBBVENI
+IDIwLzIwOiB0ZXN0LWJkcnYtZHJhaW46IFRlc3QgZ3JhcGggY2hhbmdlcyBpbiBkcmFpbl9hbGwg
+c2VjdGlvbi4uLgo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29tbWFuZCBleGl0ZWQgd2l0aCBj
+b2RlOiAxCgoKLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0
+dHA6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXct
+ZGV2ZWxAcmVkaGF0LmNvbQ==
