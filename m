@@ -1,20 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49371)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59130)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <changpeng.liu@intel.com>) id 1fNTE6-0002LW-Fd
-	for qemu-devel@nongnu.org; Mon, 28 May 2018 21:15:03 -0400
+	(envelope-from <bounces@canonical.com>) id 1fNUdl-0004bO-Q6
+	for qemu-devel@nongnu.org; Mon, 28 May 2018 22:45:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <changpeng.liu@intel.com>) id 1fNTE3-0007tr-AB
-	for qemu-devel@nongnu.org; Mon, 28 May 2018 21:15:02 -0400
-Received: from mga02.intel.com ([134.134.136.20]:50114)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <changpeng.liu@intel.com>)
-	id 1fNTE3-0007qS-0j
-	for qemu-devel@nongnu.org; Mon, 28 May 2018 21:14:59 -0400
-From: Changpeng Liu <changpeng.liu@intel.com>
-Date: Tue, 29 May 2018 09:24:35 +0800
-Message-Id: <1527557075-3411-1-git-send-email-changpeng.liu@intel.com>
-Subject: [Qemu-devel] [PATCH v2] vhost-blk: turn on pre-defined RO feature
- bit
+	(envelope-from <bounces@canonical.com>) id 1fNUdi-0002on-O1
+	for qemu-devel@nongnu.org; Mon, 28 May 2018 22:45:37 -0400
+Received: from indium.canonical.com ([91.189.90.7]:38570)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1fNUdi-0002oL-Gh
+	for qemu-devel@nongnu.org; Mon, 28 May 2018 22:45:34 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1fNUdg-00015O-WF
+	for <qemu-devel@nongnu.org>; Tue, 29 May 2018 02:45:33 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id F190E2E8033
+	for <qemu-devel@nongnu.org>; Tue, 29 May 2018 02:45:32 +0000 (UTC)
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 29 May 2018 02:39:35 -0000
+From: Satheesh Rajendran <sathnaga@linux.vnet.ibm.com>
+Reply-To: Bug 1773753 <1773753@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <152749874146.3829.13327505377905335957.malonedeb@chaenomeles.canonical.com>
+Message-Id: <152756157536.24590.16930336926696537574.launchpad@gac.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1773753] Re: virsh start after virsh managed save
+ hangs and vm goes to paused state with qemu version
+ v2.12.0-813-g5a5c383b13-dirty on powerpc
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,163 +39,106 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: mst@redhat.com, stefanha@redhat.com, changpeng.liu@intel.com
 
-Read only feature shouldn't be negotiable, because if the
-backend device reported Read only feature supported, QEMU
-host driver shouldn't change backend's RO attribute. While
-here, also enable the vhost-user-blk test utility to test
-RO feature.
+** Summary changed:
 
-Signed-off-by: Changpeng Liu <changpeng.liu@intel.com>
----
- contrib/vhost-user-blk/vhost-user-blk.c | 48 ++++++++++++++++++++++++---------
- hw/block/vhost-user-blk.c               |  5 +---
- include/hw/virtio/vhost-user-blk.h      |  1 -
- 3 files changed, 36 insertions(+), 18 deletions(-)
+- virsh managed save fails with qemu version v2.12.0-813-g5a5c383b13-dirty =
+on powerpc
++ virsh start after virsh managed save hangs and vm goes to paused state wi=
+th qemu version v2.12.0-813-g5a5c383b13-dirty on powerpc
 
-diff --git a/contrib/vhost-user-blk/vhost-user-blk.c b/contrib/vhost-user-blk/vhost-user-blk.c
-index 67dac81..f57df45 100644
---- a/contrib/vhost-user-blk/vhost-user-blk.c
-+++ b/contrib/vhost-user-blk/vhost-user-blk.c
-@@ -31,6 +31,7 @@ typedef struct VubDev {
-     VugDev parent;
-     int blk_fd;
-     struct virtio_blk_config blkcfg;
-+    bool enable_ro;
-     char *blk_name;
-     GMainLoop *loop;
- } VubDev;
-@@ -301,14 +302,27 @@ static void vub_queue_set_started(VuDev *vu_dev, int idx, bool started)
- static uint64_t
- vub_get_features(VuDev *dev)
- {
--    return 1ull << VIRTIO_BLK_F_SIZE_MAX |
--           1ull << VIRTIO_BLK_F_SEG_MAX |
--           1ull << VIRTIO_BLK_F_TOPOLOGY |
--           1ull << VIRTIO_BLK_F_BLK_SIZE |
--           1ull << VIRTIO_BLK_F_FLUSH |
--           1ull << VIRTIO_BLK_F_CONFIG_WCE |
--           1ull << VIRTIO_F_VERSION_1 |
--           1ull << VHOST_USER_F_PROTOCOL_FEATURES;
-+    uint64_t features;
-+    VugDev *gdev;
-+    VubDev *vdev_blk;
-+
-+    gdev = container_of(dev, VugDev, parent);
-+    vdev_blk = container_of(gdev, VubDev, parent);
-+
-+    features = 1ull << VIRTIO_BLK_F_SIZE_MAX |
-+               1ull << VIRTIO_BLK_F_SEG_MAX |
-+               1ull << VIRTIO_BLK_F_TOPOLOGY |
-+               1ull << VIRTIO_BLK_F_BLK_SIZE |
-+               1ull << VIRTIO_BLK_F_FLUSH |
-+               1ull << VIRTIO_BLK_F_CONFIG_WCE |
-+               1ull << VIRTIO_F_VERSION_1 |
-+               1ull << VHOST_USER_F_PROTOCOL_FEATURES;
-+
-+    if (vdev_blk->enable_ro) {
-+        features |= 1ull << VIRTIO_BLK_F_RO;
-+    }
-+
-+    return features;
- }
- 
- static int
-@@ -469,6 +483,7 @@ vub_new(char *blk_file)
-         vub_free(vdev_blk);
-         return NULL;
-     }
-+    vdev_blk->enable_ro = false;
-     vdev_blk->blkcfg.wce = 0;
-     vdev_blk->blk_name = blk_file;
- 
-@@ -483,10 +498,11 @@ int main(int argc, char **argv)
-     int opt;
-     char *unix_socket = NULL;
-     char *blk_file = NULL;
-+    bool enable_ro = false;
-     int lsock = -1, csock = -1;
-     VubDev *vdev_blk = NULL;
- 
--    while ((opt = getopt(argc, argv, "b:s:h")) != -1) {
-+    while ((opt = getopt(argc, argv, "b:rs:h")) != -1) {
-         switch (opt) {
-         case 'b':
-             blk_file = g_strdup(optarg);
-@@ -494,17 +510,20 @@ int main(int argc, char **argv)
-         case 's':
-             unix_socket = g_strdup(optarg);
-             break;
-+        case 'r':
-+            enable_ro = true;
-+            break;
-         case 'h':
-         default:
--            printf("Usage: %s [-b block device or file, -s UNIX domain socket]"
--                   " | [ -h ]\n", argv[0]);
-+            printf("Usage: %s [ -b block device or file, -s UNIX domain socket"
-+                   " | -r Enable read-only ] | [ -h ]\n", argv[0]);
-             return 0;
-         }
-     }
- 
-     if (!unix_socket || !blk_file) {
--        printf("Usage: %s [-b block device or file, -s UNIX domain socket] |"
--               " [ -h ]\n", argv[0]);
-+        printf("Usage: %s [ -b block device or file, -s UNIX domain socket"
-+               " | -r Enable read-only ] | [ -h ]\n", argv[0]);
-         return -1;
-     }
- 
-@@ -523,6 +542,9 @@ int main(int argc, char **argv)
-     if (!vdev_blk) {
-         goto err;
-     }
-+    if (enable_ro) {
-+        vdev_blk->enable_ro = true;
-+    }
- 
-     vug_init(&vdev_blk->parent, csock, vub_panic_cb, &vub_iface);
- 
-diff --git a/hw/block/vhost-user-blk.c b/hw/block/vhost-user-blk.c
-index 975eae6..e32e50c 100644
---- a/hw/block/vhost-user-blk.c
-+++ b/hw/block/vhost-user-blk.c
-@@ -203,13 +203,11 @@ static uint64_t vhost_user_blk_get_features(VirtIODevice *vdev,
-     virtio_add_feature(&features, VIRTIO_BLK_F_TOPOLOGY);
-     virtio_add_feature(&features, VIRTIO_BLK_F_BLK_SIZE);
-     virtio_add_feature(&features, VIRTIO_BLK_F_FLUSH);
-+    virtio_add_feature(&features, VIRTIO_BLK_F_RO);
- 
-     if (s->config_wce) {
-         virtio_add_feature(&features, VIRTIO_BLK_F_CONFIG_WCE);
-     }
--    if (s->config_ro) {
--        virtio_add_feature(&features, VIRTIO_BLK_F_RO);
--    }
-     if (s->num_queues > 1) {
-         virtio_add_feature(&features, VIRTIO_BLK_F_MQ);
-     }
-@@ -319,7 +317,6 @@ static Property vhost_user_blk_properties[] = {
-     DEFINE_PROP_UINT16("num-queues", VHostUserBlk, num_queues, 1),
-     DEFINE_PROP_UINT32("queue-size", VHostUserBlk, queue_size, 128),
-     DEFINE_PROP_BIT("config-wce", VHostUserBlk, config_wce, 0, true),
--    DEFINE_PROP_BIT("config-ro", VHostUserBlk, config_ro, 0, false),
-     DEFINE_PROP_END_OF_LIST(),
- };
- 
-diff --git a/include/hw/virtio/vhost-user-blk.h b/include/hw/virtio/vhost-user-blk.h
-index 5804cc9..8c7c79b 100644
---- a/include/hw/virtio/vhost-user-blk.h
-+++ b/include/hw/virtio/vhost-user-blk.h
-@@ -34,7 +34,6 @@ typedef struct VHostUserBlk {
-     uint16_t num_queues;
-     uint32_t queue_size;
-     uint32_t config_wce;
--    uint32_t config_ro;
-     struct vhost_dev dev;
- } VHostUserBlk;
- 
--- 
-1.9.3
+** Summary changed:
+
+- virsh start after virsh managed save hangs and vm goes to paused state wi=
+th qemu version v2.12.0-813-g5a5c383b13-dirty on powerpc
++ virsh start, after virsh managed save hangs and vm goes to paused state w=
+ith qemu version v2.12.0-813-g5a5c383b13-dirty on powerpc
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1773753
+
+Title:
+  virsh start, after virsh managed save hangs and vm goes to paused
+  state with qemu version v2.12.0-813-g5a5c383b13-dirty on powerpc
+
+Status in QEMU:
+  New
+
+Bug description:
+  Host Env:
+  IBM Power8 with Fedora28 base with compiled upstream kernel, qemu, libvir=
+t.
+
+  Host Kernel: 4.17.0-rc5-00069-g3acf4e395260
+
+  qemu-kvm(5a5c383b1373aeb6c87a0d6060f6c3dc7c53082b):
+  v2.12.0-813-g5a5c383b13-dirty
+
+  libvirt(4804a4db33a37f828d033733bc47f6eff5d262c3):
+
+  Guest Kernel: 4.17.0-rc7
+
+  Steps to recreate:
+  Define a guest attached with above setup and start.
+  # virsh start avocado-vt-vm1
+
+  guest console;...
+  # uname -r
+  4.17.0-rc7
+  [root@atest-guest ~]# lscpu
+  Architecture:        ppc64le
+  Byte Order:          Little Endian
+  CPU(s):              3
+  On-line CPU(s) list: 0-2
+  Thread(s) per core:  1
+  Core(s) per socket:  1
+  Socket(s):           3
+  NUMA node(s):        1
+  Model:               2.1 (pvr 004b 0201)
+  Model name:          POWER8 (architected), altivec supported
+  Hypervisor vendor:   KVM
+  Virtualization type: para
+  L1d cache:           64K
+  L1i cache:           32K
+  NUMA node0 CPU(s):   0-2
+
+  =
+
+  # virsh managedsave avocado-vt-vm1 =
+
+
+  Domain avocado-vt-vm1 state saved by libvirt
+
+  # virsh list
+   Id    Name                           State
+  ----------------------------------------------------
+
+  # virsh start avocado-vt-vm1 ----Hangs forever and vm state goes to
+  paused.
+
+  =
+
+  # virsh list
+   Id    Name                           State
+  ----------------------------------------------------
+   87    avocado-vt-vm1                 paused
+
+  =
+
+  P:S:- with same above setup, just changing the qemu-kvm comes bydefault w=
+ith F28 works fine.
+
+  /usr/bin/qemu-kvm --version
+  QEMU emulator version 2.11.1(qemu-2.11.1-2.fc28)
+
+  Summary: with above other setup.
+  machine type pseries-2.12 and qemu-2.11.1-2.fc28 -Works fine.
+
+  machine type pseries-2.12/pseries-2.13 and qemu
+  5a5c383b1373aeb6c87a0d6060f6c3dc7c53082b - Does not work.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1773753/+subscriptions
