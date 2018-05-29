@@ -1,18 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34845)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39004)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhaoshenglong@huawei.com>) id 1fNV0l-0007x5-Ez
-	for qemu-devel@nongnu.org; Mon, 28 May 2018 23:09:24 -0400
+	(envelope-from <famz@redhat.com>) id 1fNVOy-0002uz-UQ
+	for qemu-devel@nongnu.org; Mon, 28 May 2018 23:34:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zhaoshenglong@huawei.com>) id 1fNV0k-0007DU-Eu
-	for qemu-devel@nongnu.org; Mon, 28 May 2018 23:09:23 -0400
-From: Shannon Zhao <zhaoshenglong@huawei.com>
-Date: Tue, 29 May 2018 11:08:03 +0800
-Message-ID: <1527563283-13148-1-git-send-email-zhaoshenglong@huawei.com>
+	(envelope-from <famz@redhat.com>) id 1fNVOx-0006Wx-Fa
+	for qemu-devel@nongnu.org; Mon, 28 May 2018 23:34:24 -0400
+Date: Tue, 29 May 2018 11:34:11 +0800
+From: Fam Zheng <famz@redhat.com>
+Message-ID: <20180529033411.GB4599@lemon.usersys.redhat.com>
+References: <20180528033643.31380-1-famz@redhat.com>
+	<20180528033643.31380-5-famz@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v2] ARM: ACPI: Fix use-after-free due to memory
- realloc
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180528033643.31380-5-famz@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v6 04/10] qcow2: Implement copy offloading
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,89 +23,298 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-arm@nongnu.org
-Cc: peter.maydell@linaro.org, eric.auger@redhat.com, qemu-devel@nongnu.org, shannon.zhaosl@gmail.com, Shannon Zhao <zhaoshenglong@huawei.com>
+To: qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Ronnie Sahlberg <ronniesahlberg@gmail.com>, qemu-block@nongnu.org, Peter Lieven <pl@kamp.de>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, eblake@redhat.com
 
-acpi_data_push uses g_array_set_size to resize the memory size. If there
-is no enough contiguous memory, the address will be changed. So previous
-pointer could not be used any more. It must update the pointer and use
-the new one.
+On Mon, 05/28 11:36, Fam Zheng wrote:
+> The two callbacks are implemented quite similarly to the read/write
+> functions: bdrv_co_copy_range_from maps for read and calls into bs->file
+> or bs->backing depending on the allocation status; bdrv_co_copy_range_to
+> maps for write and calls into bs->file.
+> 
+> Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+> Signed-off-by: Fam Zheng <famz@redhat.com>
+> ---
+>  block/qcow2.c | 226 ++++++++++++++++++++++++++++++++++++++++++++++++++--------
+>  1 file changed, 196 insertions(+), 30 deletions(-)
+> 
+> diff --git a/block/qcow2.c b/block/qcow2.c
+> index 6d532470a8..e32a3c1518 100644
+> --- a/block/qcow2.c
+> +++ b/block/qcow2.c
+> @@ -1762,6 +1762,39 @@ static int coroutine_fn qcow2_co_block_status(BlockDriverState *bs,
+>      return status;
+>  }
+>  
+> +static coroutine_fn int qcow2_handle_l2meta(BlockDriverState *bs,
+> +                                            QCowL2Meta **pl2meta,
+> +                                            bool link_l2)
+> +{
+> +    int ret = 0;
+> +    QCowL2Meta *l2meta = *pl2meta;
+> +
+> +    while (l2meta != NULL) {
+> +        QCowL2Meta *next;
+> +
+> +        if (!ret && link_l2) {
+> +            ret = qcow2_alloc_cluster_link_l2(bs, l2meta);
+> +            if (ret) {
+> +                goto out;
+> +            }
+> +        }
+> +
+> +        /* Take the request off the list of running requests */
+> +        if (l2meta->nb_clusters != 0) {
+> +            QLIST_REMOVE(l2meta, next_in_flight);
+> +        }
+> +
+> +        qemu_co_queue_restart_all(&l2meta->dependent_requests);
+> +
+> +        next = l2meta->next;
+> +        g_free(l2meta);
+> +        l2meta = next;
+> +    }
+> +out:
+> +    *pl2meta = l2meta;
+> +    return ret;
+> +}
+> +
+>  static coroutine_fn int qcow2_co_preadv(BlockDriverState *bs, uint64_t offset,
+>                                          uint64_t bytes, QEMUIOVector *qiov,
+>                                          int flags)
+> @@ -2048,24 +2081,9 @@ static coroutine_fn int qcow2_co_pwritev(BlockDriverState *bs, uint64_t offset,
+>              }
+>          }
+>  
+> -        while (l2meta != NULL) {
+> -            QCowL2Meta *next;
+> -
+> -            ret = qcow2_alloc_cluster_link_l2(bs, l2meta);
+> -            if (ret < 0) {
+> -                goto fail;
+> -            }
+> -
+> -            /* Take the request off the list of running requests */
+> -            if (l2meta->nb_clusters != 0) {
+> -                QLIST_REMOVE(l2meta, next_in_flight);
+> -            }
+> -
+> -            qemu_co_queue_restart_all(&l2meta->dependent_requests);
+> -
+> -            next = l2meta->next;
+> -            g_free(l2meta);
+> -            l2meta = next;
+> +        ret = qcow2_handle_l2meta(bs, &l2meta, true);
+> +        if (ret) {
+> +            goto fail;
+>          }
+>  
+>          bytes -= cur_bytes;
+> @@ -2076,18 +2094,7 @@ static coroutine_fn int qcow2_co_pwritev(BlockDriverState *bs, uint64_t offset,
+>      ret = 0;
+>  
+>  fail:
+> -    while (l2meta != NULL) {
+> -        QCowL2Meta *next;
+> -
+> -        if (l2meta->nb_clusters != 0) {
+> -            QLIST_REMOVE(l2meta, next_in_flight);
+> -        }
+> -        qemu_co_queue_restart_all(&l2meta->dependent_requests);
+> -
+> -        next = l2meta->next;
+> -        g_free(l2meta);
+> -        l2meta = next;
+> -    }
+> +    qcow2_handle_l2meta(bs, &l2meta, false);
+>  
+>      qemu_co_mutex_unlock(&s->lock);
+>  
+> @@ -3274,6 +3281,163 @@ static coroutine_fn int qcow2_co_pdiscard(BlockDriverState *bs,
+>      return ret;
+>  }
+>  
+> +static int coroutine_fn
+> +qcow2_co_copy_range_from(BlockDriverState *bs,
+> +                         BdrvChild *src, uint64_t src_offset,
+> +                         BdrvChild *dst, uint64_t dst_offset,
+> +                         uint64_t bytes, BdrvRequestFlags flags)
+> +{
+> +    BDRVQcow2State *s = bs->opaque;
+> +    int ret;
+> +    unsigned int cur_bytes; /* number of bytes in current iteration */
+> +    BdrvChild *child = NULL;
+> +
+> +    assert(!bs->encrypted);
+> +    qemu_co_mutex_lock(&s->lock);
+> +
+> +    while (bytes != 0) {
 
-Reviewed-by: Eric Auger <eric.auger@redhat.com>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-Signed-off-by: Shannon Zhao <zhaoshenglong@huawei.com>
----
-V2: add comments for iort_node_offset and reviewed tags
----
- hw/arm/virt-acpi-build.c | 19 +++++++++++++++----
- 1 file changed, 15 insertions(+), 4 deletions(-)
+NACK.
 
-diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
-index 92ceee9..6209138 100644
---- a/hw/arm/virt-acpi-build.c
-+++ b/hw/arm/virt-acpi-build.c
-@@ -400,7 +400,7 @@ build_iort(GArray *table_data, BIOSLinker *linker, Vi=
-rtMachineState *vms)
-     AcpiIortItsGroup *its;
-     AcpiIortTable *iort;
-     AcpiIortSmmu3 *smmu;
--    size_t node_size, iort_length, smmu_offset =3D 0;
-+    size_t node_size, iort_node_offset, iort_length, smmu_offset =3D 0;
-     AcpiIortRC *rc;
-=20
-     iort =3D acpi_data_push(table_data, sizeof(*iort));
-@@ -415,6 +415,12 @@ build_iort(GArray *table_data, BIOSLinker *linker, V=
-irtMachineState *vms)
-     iort->node_count =3D cpu_to_le32(nb_nodes);
-     iort->node_offset =3D cpu_to_le32(sizeof(*iort));
-=20
-+    /*
-+     * Use a copy in case table_data->data moves duringa acpi_data_push
-+     * operations.
-+     */
-+    iort_node_offset =3D sizeof(*iort);
-+
-     /* ITS group node */
-     node_size =3D  sizeof(*its) + sizeof(uint32_t);
-     iort_length +=3D node_size;
-@@ -429,7 +435,7 @@ build_iort(GArray *table_data, BIOSLinker *linker, Vi=
-rtMachineState *vms)
-         int irq =3D  vms->irqmap[VIRT_SMMU];
-=20
-         /* SMMUv3 node */
--        smmu_offset =3D iort->node_offset + node_size;
-+        smmu_offset =3D iort_node_offset + node_size;
-         node_size =3D sizeof(*smmu) + sizeof(*idmap);
-         iort_length +=3D node_size;
-         smmu =3D acpi_data_push(table_data, node_size);
-@@ -450,7 +456,7 @@ build_iort(GArray *table_data, BIOSLinker *linker, Vi=
-rtMachineState *vms)
-         idmap->id_count =3D cpu_to_le32(0xFFFF);
-         idmap->output_base =3D 0;
-         /* output IORT node is the ITS group node (the first node) */
--        idmap->output_reference =3D cpu_to_le32(iort->node_offset);
-+        idmap->output_reference =3D cpu_to_le32(iort_node_offset);
-     }
-=20
-     /* Root Complex Node */
-@@ -479,9 +485,14 @@ build_iort(GArray *table_data, BIOSLinker *linker, V=
-irtMachineState *vms)
-         idmap->output_reference =3D cpu_to_le32(smmu_offset);
-     } else {
-         /* output IORT node is the ITS group node (the first node) */
--        idmap->output_reference =3D cpu_to_le32(iort->node_offset);
-+        idmap->output_reference =3D cpu_to_le32(iort_node_offset);
-     }
-=20
-+    /*
-+     * Update the pointer address in case table_data->data moves during =
-above
-+     * acpi_data_push operations.
-+     */
-+    iort =3D (AcpiIortTable *)(table_data->data + iort_start);
-     iort->length =3D cpu_to_le32(iort_length);
-=20
-     build_header(linker, table_data, (void *)(table_data->data + iort_st=
-art),
---=20
-2.0.4
+flags and dst_offset are calculated wrong in the loop body: bits in the flags
+are not reset when starting a new iteration; dst_offset is not incremented.
+
+These bugs are caught during testing the follow up drive-backup patches.
+
+Will send v7 to fix it.
+
+Fam
+
+> +        uint64_t copy_offset = 0;
+> +        /* prepare next request */
+> +        cur_bytes = MIN(bytes, INT_MAX);
+> +
+> +        ret = qcow2_get_cluster_offset(bs, src_offset, &cur_bytes, &copy_offset);
+> +        if (ret < 0) {
+> +            goto out;
+> +        }
+> +
+> +        switch (ret) {
+> +        case QCOW2_CLUSTER_UNALLOCATED:
+> +            if (bs->backing && bs->backing->bs) {
+> +                int64_t backing_length = bdrv_getlength(bs->backing->bs);
+> +                if (src_offset >= backing_length) {
+> +                    flags |= BDRV_REQ_ZERO_WRITE;
+> +                } else {
+> +                    child = bs->backing;
+> +                    cur_bytes = MIN(cur_bytes, backing_length - src_offset);
+> +                    copy_offset = src_offset;
+> +                }
+> +            } else {
+> +                flags |= BDRV_REQ_ZERO_WRITE;
+> +            }
+> +            break;
+> +
+> +        case QCOW2_CLUSTER_ZERO_PLAIN:
+> +        case QCOW2_CLUSTER_ZERO_ALLOC:
+> +            flags |= BDRV_REQ_ZERO_WRITE;
+> +            break;
+> +
+> +        case QCOW2_CLUSTER_COMPRESSED:
+> +            ret = -ENOTSUP;
+> +            goto out;
+> +            break;
+> +
+> +        case QCOW2_CLUSTER_NORMAL:
+> +            child = bs->file;
+> +            copy_offset += offset_into_cluster(s, src_offset);
+> +            if ((copy_offset & 511) != 0) {
+> +                ret = -EIO;
+> +                goto out;
+> +            }
+> +            break;
+> +
+> +        default:
+> +            abort();
+> +        }
+> +        qemu_co_mutex_unlock(&s->lock);
+> +        ret = bdrv_co_copy_range_from(child,
+> +                                      copy_offset,
+> +                                      dst, dst_offset,
+> +                                      cur_bytes, flags);
+> +        qemu_co_mutex_lock(&s->lock);
+> +        if (ret < 0) {
+> +            goto out;
+> +        }
+> +
+> +        bytes -= cur_bytes;
+> +        src_offset += cur_bytes;
+> +    }
+> +    ret = 0;
+> +
+> +out:
+> +    qemu_co_mutex_unlock(&s->lock);
+> +    return ret;
+> +}
+> +
+> +static int coroutine_fn
+> +qcow2_co_copy_range_to(BlockDriverState *bs,
+> +                       BdrvChild *src, uint64_t src_offset,
+> +                       BdrvChild *dst, uint64_t dst_offset,
+> +                       uint64_t bytes, BdrvRequestFlags flags)
+> +{
+> +    BDRVQcow2State *s = bs->opaque;
+> +    int offset_in_cluster;
+> +    int ret;
+> +    unsigned int cur_bytes; /* number of sectors in current iteration */
+> +    uint64_t cluster_offset;
+> +    uint8_t *cluster_data = NULL;
+> +    QCowL2Meta *l2meta = NULL;
+> +
+> +    assert(!bs->encrypted);
+> +    s->cluster_cache_offset = -1; /* disable compressed cache */
+> +
+> +    qemu_co_mutex_lock(&s->lock);
+> +
+> +    while (bytes != 0) {
+> +
+> +        l2meta = NULL;
+> +
+> +        offset_in_cluster = offset_into_cluster(s, dst_offset);
+> +        cur_bytes = MIN(bytes, INT_MAX);
+> +
+> +        /* TODO:
+> +         * If src->bs == dst->bs, we could simply copy by incrementing
+> +         * the refcnt, without copying user data.
+> +         * Or if src->bs == dst->bs->backing->bs, we could copy by discarding. */
+> +        ret = qcow2_alloc_cluster_offset(bs, dst_offset, &cur_bytes,
+> +                                         &cluster_offset, &l2meta);
+> +        if (ret < 0) {
+> +            goto fail;
+> +        }
+> +
+> +        assert((cluster_offset & 511) == 0);
+> +
+> +        ret = qcow2_pre_write_overlap_check(bs, 0,
+> +                cluster_offset + offset_in_cluster, cur_bytes);
+> +        if (ret < 0) {
+> +            goto fail;
+> +        }
+> +
+> +        qemu_co_mutex_unlock(&s->lock);
+> +        ret = bdrv_co_copy_range_to(src, src_offset,
+> +                                    bs->file,
+> +                                    cluster_offset + offset_in_cluster,
+> +                                    cur_bytes, flags);
+> +        qemu_co_mutex_lock(&s->lock);
+> +        if (ret < 0) {
+> +            goto fail;
+> +        }
+> +
+> +        ret = qcow2_handle_l2meta(bs, &l2meta, true);
+> +        if (ret) {
+> +            goto fail;
+> +        }
+> +
+> +        bytes -= cur_bytes;
+> +        dst_offset += cur_bytes;
+> +    }
+> +    ret = 0;
+> +
+> +fail:
+> +    qcow2_handle_l2meta(bs, &l2meta, false);
+> +
+> +    qemu_co_mutex_unlock(&s->lock);
+> +
+> +    qemu_vfree(cluster_data);
+> +    trace_qcow2_writev_done_req(qemu_coroutine_self(), ret);
+> +
+> +    return ret;
+> +}
+> +
+>  static int qcow2_truncate(BlockDriverState *bs, int64_t offset,
+>                            PreallocMode prealloc, Error **errp)
+>  {
+> @@ -4522,6 +4686,8 @@ BlockDriver bdrv_qcow2 = {
+>  
+>      .bdrv_co_pwrite_zeroes  = qcow2_co_pwrite_zeroes,
+>      .bdrv_co_pdiscard       = qcow2_co_pdiscard,
+> +    .bdrv_co_copy_range_from = qcow2_co_copy_range_from,
+> +    .bdrv_co_copy_range_to  = qcow2_co_copy_range_to,
+>      .bdrv_truncate          = qcow2_truncate,
+>      .bdrv_co_pwritev_compressed = qcow2_co_pwritev_compressed,
+>      .bdrv_make_empty        = qcow2_make_empty,
+> -- 
+> 2.14.3
+> 
