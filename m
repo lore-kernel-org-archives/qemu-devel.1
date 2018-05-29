@@ -1,24 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37302)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39366)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <edgar.iglesias@gmail.com>) id 1fNcDl-000223-Md
-	for qemu-devel@nongnu.org; Tue, 29 May 2018 06:51:20 -0400
+	(envelope-from <mreitz@redhat.com>) id 1fNcNp-0002Hq-5F
+	for qemu-devel@nongnu.org; Tue, 29 May 2018 07:01:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <edgar.iglesias@gmail.com>) id 1fNcDk-0004Qg-Uw
-	for qemu-devel@nongnu.org; Tue, 29 May 2018 06:51:17 -0400
-Received: from mail-wr0-x233.google.com ([2a00:1450:400c:c0c::233]:38921)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <edgar.iglesias@gmail.com>)
-	id 1fNcDk-0004Pu-PC
-	for qemu-devel@nongnu.org; Tue, 29 May 2018 06:51:16 -0400
-Received: by mail-wr0-x233.google.com with SMTP id w7-v6so12758932wrn.6
-	for <qemu-devel@nongnu.org>; Tue, 29 May 2018 03:51:16 -0700 (PDT)
-From: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
-Date: Tue, 29 May 2018 12:50:11 +0200
-Message-Id: <20180529105011.1914-39-edgar.iglesias@gmail.com>
-In-Reply-To: <20180529105011.1914-1-edgar.iglesias@gmail.com>
-References: <20180529105011.1914-1-edgar.iglesias@gmail.com>
-Subject: [Qemu-devel] [PULL v1 38/38] target-microblaze: Consolidate MMU
- enabled checks
+	(envelope-from <mreitz@redhat.com>) id 1fNcNo-0003J9-5u
+	for qemu-devel@nongnu.org; Tue, 29 May 2018 07:01:41 -0400
+References: <20180525163327.23097-1-kwolf@redhat.com>
+	<20180525163327.23097-4-kwolf@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <9a570754-d6a1-1d3a-b555-1833a7220860@redhat.com>
+Date: Tue, 29 May 2018 13:01:27 +0200
+MIME-Version: 1.0
+In-Reply-To: <20180525163327.23097-4-kwolf@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="lfHZ1ui0MWDTmnKEwi6rChj0RrjcJytOF"
+Subject: Re: [Qemu-devel] [PATCH 03/14] job: Add error message for failing
+ jobs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,64 +25,128 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, edgar.iglesias@xilinx.com
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+Cc: jsnow@redhat.com, eblake@redhat.com, pkrempa@redhat.com, qemu-devel@nongnu.org
 
-From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--lfHZ1ui0MWDTmnKEwi6rChj0RrjcJytOF
+From: Max Reitz <mreitz@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+Cc: jsnow@redhat.com, eblake@redhat.com, pkrempa@redhat.com,
+ qemu-devel@nongnu.org
+Message-ID: <9a570754-d6a1-1d3a-b555-1833a7220860@redhat.com>
+Subject: Re: [PATCH 03/14] job: Add error message for failing jobs
+References: <20180525163327.23097-1-kwolf@redhat.com>
+ <20180525163327.23097-4-kwolf@redhat.com>
+In-Reply-To: <20180525163327.23097-4-kwolf@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Consolidate MMU enabled checks to cpu_mmu_index().
-No functional changes.
+On 2018-05-25 18:33, Kevin Wolf wrote:
+> So far we relied on job->ret and strerror() to produce an error message=
 
-Suggested-by: Richard Henderson <richard.henderson@linaro.org>
-Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Signed-off-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
----
- target/microblaze/cpu.h    | 4 +++-
- target/microblaze/helper.c | 6 +++---
- 2 files changed, 6 insertions(+), 4 deletions(-)
+> for failed jobs. Not surprisingly, this tends to result in completely
+> useless messages.
+>=20
+> This adds a Job.error field that can contain an error string for a
+> failing job, and a parameter to job_completed() that sets the field. As=
 
-diff --git a/target/microblaze/cpu.h b/target/microblaze/cpu.h
-index c77ca2d8f9..3c4e0ba80a 100644
---- a/target/microblaze/cpu.h
-+++ b/target/microblaze/cpu.h
-@@ -360,8 +360,10 @@ int cpu_mb_signal_handler(int host_signum, void *pinfo,
- 
- static inline int cpu_mmu_index (CPUMBState *env, bool ifetch)
- {
-+    MicroBlazeCPU *cpu = mb_env_get_cpu(env);
-+
-     /* Are we in nommu mode?.  */
--    if (!(env->sregs[SR_MSR] & MSR_VM)) {
-+    if (!(env->sregs[SR_MSR] & MSR_VM) || !cpu->cfg.use_mmu) {
-         return MMU_NOMMU_IDX;
-     }
- 
-diff --git a/target/microblaze/helper.c b/target/microblaze/helper.c
-index 985bdae8d1..bc753793ec 100644
---- a/target/microblaze/helper.c
-+++ b/target/microblaze/helper.c
-@@ -58,8 +58,7 @@ int mb_cpu_handle_mmu_fault(CPUState *cs, vaddr address, int size, int rw,
-     int prot;
- 
-     /* Translate if the MMU is available and enabled.  */
--    if (cpu->cfg.use_mmu && (env->sregs[SR_MSR] & MSR_VM)
--        && mmu_idx != MMU_NOMMU_IDX) {
-+    if (mmu_idx != MMU_NOMMU_IDX) {
-         uint32_t vaddr, paddr;
-         struct microblaze_mmu_lookup lu;
- 
-@@ -270,9 +269,10 @@ hwaddr mb_cpu_get_phys_page_debug(CPUState *cs, vaddr addr)
-     CPUMBState *env = &cpu->env;
-     target_ulong vaddr, paddr = 0;
-     struct microblaze_mmu_lookup lu;
-+    int mmu_idx = cpu_mmu_index(env, false);
-     unsigned int hit;
- 
--    if (env->sregs[SR_MSR] & MSR_VM) {
-+    if (mmu_idx != MMU_NOMMU_IDX) {
-         hit = mmu_translate(&env->mmu, &lu, addr, 0, 0);
-         if (hit) {
-             vaddr = addr & TARGET_PAGE_MASK;
--- 
-2.14.1
+> a default, if NULL is passed, we continue to use strerror(job->ret).
+>=20
+> All existing callers are changed to pass NULL. They can be improved in
+> separate patches.
+>=20
+> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+> ---
+>  include/qemu/job.h |  7 ++++++-
+>  block/backup.c     |  2 +-
+>  block/commit.c     |  2 +-
+>  block/mirror.c     |  2 +-
+>  block/stream.c     |  2 +-
+>  job-qmp.c          |  9 ++-------
+>  job.c              | 15 +++++++++++++--
+>  7 files changed, 25 insertions(+), 14 deletions(-)
+
+There are some tests that call job_completed().  Those should be updated
+as well.
+
+> diff --git a/include/qemu/job.h b/include/qemu/job.h
+> index 8c8badf75e..b2e1dd00b9 100644
+> --- a/include/qemu/job.h
+> +++ b/include/qemu/job.h
+> @@ -124,6 +124,9 @@ typedef struct Job {
+>      /** Estimated progress_current value at the completion of the job =
+*/
+>      int64_t progress_total;
+> =20
+> +    /** Error string for a failed job (NULL if job->ret =3D=3D 0) */
+> +    char *error;
+> +
+
+I think we should bind this directly to job->ret, i.e. this is NULL if
+and only if job->ret =3D=3D 0.  (Just because more constraints tend to ma=
+ke
+things nicer.  And also because if you don't, then qmp_job_dismiss()
+cannot assume that job->error is set on error, which would be a change
+in behavior.)
+
+>      /** ret code passed to job_completed. */
+>      int ret;
+>=20
+[...]
+
+> diff --git a/job.c b/job.c
+> index f026661b0f..fc39eaaa5e 100644
+> --- a/job.c
+> +++ b/job.c
+
+job_prepare() (called by job_do_finalize() through job_txn_apply()) may
+set job->ret.  If it does set it to a negative value, job_do_finalize()
+will call job_completed_txn_abort(), which will eventually invoke
+job_finalize_single(), which then runs job_update_rc() on the job.  This
+is a bit too much code between setting job->ret and job->error for my
+taste, I'd rather set job->error much sooner (e.g. by calling
+job_update_rc() directly in job_prepare(), which I don't think would
+change anything).
+
+But if you think that this is just fine, then OK, because I don't think
+the user can do QMP queries in between (it would still break the iff
+relationship between job->ret and job->error, which I find desirable).
+
+[...]
+
+> @@ -661,6 +662,9 @@ static void job_update_rc(Job *job)
+>      }
+>      if (job->ret) {
+>          job_state_transition(job, JOB_STATUS_ABORTING);
+> +        if (!job->error) {
+> +            job->error =3D g_strdup(strerror(-job->ret));
+> +        }
+
+If we do use an iff relationship between job->ret and job->error, this
+should probably be inserted before job_state_transition().
+
+Max
+
+>      }
+>  }
+
+
+--lfHZ1ui0MWDTmnKEwi6rChj0RrjcJytOF
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlsNMwcACgkQ9AfbAGHV
+z0DHRgf/fAep11x+WsnJIkAjsGAvWeSkjDONX5dTvCeetaASss7WoQVs+u+mXrgK
+NSlW5eRTiFaMFahjDJ53n6cSsz4HrDud/HGGH1HBbSGQqZINBgnRUziEGh4o/oQ2
+awH5CV491RyR8nFfKs/Y+SFsdectMOXhcnnAcfi3zUQLFQpWEEn1KdeOvyPmvHGx
+IZj8A6TDzXNO2RtLrM85JAWIO2wgHW23pzRt0DEVcXqnQZ7kS/mifwgyHh7fkYkS
+7K/Q8xKwRkXVn27p6BbgtdBEwgv/6epw9Yyu6+YrHJv4dtU8mgtwLRVi+sKGpAKh
+V41prWaGF6lD+cZCG2JlfEEL5z4yRQ==
+=M9+T
+-----END PGP SIGNATURE-----
+
+--lfHZ1ui0MWDTmnKEwi6rChj0RrjcJytOF--
