@@ -1,35 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59130)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60107)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fNUdl-0004bO-Q6
-	for qemu-devel@nongnu.org; Mon, 28 May 2018 22:45:39 -0400
+	(envelope-from <linzhecheng@huawei.com>) id 1fNUl7-0005bw-Uo
+	for qemu-devel@nongnu.org; Mon, 28 May 2018 22:53:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fNUdi-0002on-O1
-	for qemu-devel@nongnu.org; Mon, 28 May 2018 22:45:37 -0400
-Received: from indium.canonical.com ([91.189.90.7]:38570)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1fNUdi-0002oL-Gh
-	for qemu-devel@nongnu.org; Mon, 28 May 2018 22:45:34 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1fNUdg-00015O-WF
-	for <qemu-devel@nongnu.org>; Tue, 29 May 2018 02:45:33 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id F190E2E8033
-	for <qemu-devel@nongnu.org>; Tue, 29 May 2018 02:45:32 +0000 (UTC)
+	(envelope-from <linzhecheng@huawei.com>) id 1fNUl3-0007qd-8a
+	for qemu-devel@nongnu.org; Mon, 28 May 2018 22:53:14 -0400
+Received: from szxga04-in.huawei.com ([45.249.212.190]:2622 helo=huawei.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <linzhecheng@huawei.com>)
+	id 1fNUl2-0007mM-Te
+	for qemu-devel@nongnu.org; Mon, 28 May 2018 22:53:09 -0400
+From: linzhecheng <linzhecheng@huawei.com>
+Date: Tue, 29 May 2018 10:52:40 +0800
+Message-ID: <20180529025240.520-1-linzhecheng@huawei.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 29 May 2018 02:39:35 -0000
-From: Satheesh Rajendran <sathnaga@linux.vnet.ibm.com>
-Reply-To: Bug 1773753 <1773753@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <152749874146.3829.13327505377905335957.malonedeb@chaenomeles.canonical.com>
-Message-Id: <152756157536.24590.16930336926696537574.launchpad@gac.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1773753] Re: virsh start after virsh managed save
- hangs and vm goes to paused state with qemu version
- v2.12.0-813-g5a5c383b13-dirty on powerpc
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH] socket: dont't free msgfds if error equals
+ EAGAIN
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,106 +26,24 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
+Cc: pbonzini@redhat.com, wangxinxin.wang@huawei.com, linzhecheng <linzhecheng@huawei.com>
 
-** Summary changed:
+Signed-off-by: linzhecheng <linzhecheng@huawei.com>
 
-- virsh managed save fails with qemu version v2.12.0-813-g5a5c383b13-dirty =
-on powerpc
-+ virsh start after virsh managed save hangs and vm goes to paused state wi=
-th qemu version v2.12.0-813-g5a5c383b13-dirty on powerpc
-
-** Summary changed:
-
-- virsh start after virsh managed save hangs and vm goes to paused state wi=
-th qemu version v2.12.0-813-g5a5c383b13-dirty on powerpc
-+ virsh start, after virsh managed save hangs and vm goes to paused state w=
-ith qemu version v2.12.0-813-g5a5c383b13-dirty on powerpc
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1773753
-
-Title:
-  virsh start, after virsh managed save hangs and vm goes to paused
-  state with qemu version v2.12.0-813-g5a5c383b13-dirty on powerpc
-
-Status in QEMU:
-  New
-
-Bug description:
-  Host Env:
-  IBM Power8 with Fedora28 base with compiled upstream kernel, qemu, libvir=
-t.
-
-  Host Kernel: 4.17.0-rc5-00069-g3acf4e395260
-
-  qemu-kvm(5a5c383b1373aeb6c87a0d6060f6c3dc7c53082b):
-  v2.12.0-813-g5a5c383b13-dirty
-
-  libvirt(4804a4db33a37f828d033733bc47f6eff5d262c3):
-
-  Guest Kernel: 4.17.0-rc7
-
-  Steps to recreate:
-  Define a guest attached with above setup and start.
-  # virsh start avocado-vt-vm1
-
-  guest console;...
-  # uname -r
-  4.17.0-rc7
-  [root@atest-guest ~]# lscpu
-  Architecture:        ppc64le
-  Byte Order:          Little Endian
-  CPU(s):              3
-  On-line CPU(s) list: 0-2
-  Thread(s) per core:  1
-  Core(s) per socket:  1
-  Socket(s):           3
-  NUMA node(s):        1
-  Model:               2.1 (pvr 004b 0201)
-  Model name:          POWER8 (architected), altivec supported
-  Hypervisor vendor:   KVM
-  Virtualization type: para
-  L1d cache:           64K
-  L1i cache:           32K
-  NUMA node0 CPU(s):   0-2
-
-  =
-
-  # virsh managedsave avocado-vt-vm1 =
-
-
-  Domain avocado-vt-vm1 state saved by libvirt
-
-  # virsh list
-   Id    Name                           State
-  ----------------------------------------------------
-
-  # virsh start avocado-vt-vm1 ----Hangs forever and vm state goes to
-  paused.
-
-  =
-
-  # virsh list
-   Id    Name                           State
-  ----------------------------------------------------
-   87    avocado-vt-vm1                 paused
-
-  =
-
-  P:S:- with same above setup, just changing the qemu-kvm comes bydefault w=
-ith F28 works fine.
-
-  /usr/bin/qemu-kvm --version
-  QEMU emulator version 2.11.1(qemu-2.11.1-2.fc28)
-
-  Summary: with above other setup.
-  machine type pseries-2.12 and qemu-2.11.1-2.fc28 -Works fine.
-
-  machine type pseries-2.12/pseries-2.13 and qemu
-  5a5c383b1373aeb6c87a0d6060f6c3dc7c53082b - Does not work.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1773753/+subscriptions
+diff --git a/chardev/char-socket.c b/chardev/char-socket.c
+index 159e69c3b1..17519ec589 100644
+--- a/chardev/char-socket.c
++++ b/chardev/char-socket.c
+@@ -134,8 +134,8 @@ static int tcp_chr_write(Chardev *chr, const uint8_t *buf, int len)
+                                         s->write_msgfds,
+                                         s->write_msgfds_num);
+ 
+-        /* free the written msgfds, no matter what */
+-        if (s->write_msgfds_num) {
++        /* free the written msgfds in any cases other than errno==EAGAIN */
++        if (EAGAIN != errno && s->write_msgfds_num) {
+             g_free(s->write_msgfds);
+             s->write_msgfds = 0;
+             s->write_msgfds_num = 0;
+-- 
+2.12.2.windows.2
