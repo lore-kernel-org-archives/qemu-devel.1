@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58151)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58178)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fNiKC-0004qi-Dt
-	for qemu-devel@nongnu.org; Tue, 29 May 2018 13:22:21 -0400
+	(envelope-from <kwolf@redhat.com>) id 1fNiKD-0004rr-Tt
+	for qemu-devel@nongnu.org; Tue, 29 May 2018 13:22:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fNiKB-0001i0-LQ
-	for qemu-devel@nongnu.org; Tue, 29 May 2018 13:22:20 -0400
+	(envelope-from <kwolf@redhat.com>) id 1fNiKC-0001ij-VG
+	for qemu-devel@nongnu.org; Tue, 29 May 2018 13:22:21 -0400
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Tue, 29 May 2018 19:21:41 +0200
-Message-Id: <20180529172156.29311-6-kwolf@redhat.com>
+Date: Tue, 29 May 2018 19:21:42 +0200
+Message-Id: <20180529172156.29311-7-kwolf@redhat.com>
 In-Reply-To: <20180529172156.29311-1-kwolf@redhat.com>
 References: <20180529172156.29311-1-kwolf@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 05/20] tests/test-bdrv-drain:
- bdrv_drain_all() works in coroutines now
+Subject: [Qemu-devel] [PATCH v2 06/20] block: Avoid unnecessary aio_poll()
+ in AIO_WAIT_WHILE()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,67 +23,97 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, mreitz@redhat.com, pbonzini@redhat.com, famz@redhat.com, stefanha@redhat.com, eblake@redhat.com, qemu-devel@nongnu.org
 
-Since we use bdrv_do_drained_begin/end() for bdrv_drain_all_begin/end(),
-coroutine context is automatically left with a BH, preventing the
-deadlocks that made bdrv_drain_all*() unsafe in coroutine context. Now
-that we even removed the old polling code as dead code, it's obvious
-that it's compatible now.
+Commit 91af091f923 added an additional aio_poll() to BDRV_POLL_WHILE()
+in order to make sure that all pending BHs are executed on drain. This
+was the wrong place to make the fix, as it is useless overhead for all
+other users of the macro and unnecessarily complicates the mechanism.
 
-Enable the coroutine test cases for bdrv_drain_all().
+This patch effectively reverts said commit (the context has changed a
+bit and the code has moved to AIO_WAIT_WHILE()) and instead polls in the
+loop condition for drain.
+
+The effect is probably hard to measure in any real-world use case
+because actual I/O will dominate, but if I run only the initialisation
+part of 'qemu-img convert' where it calls bdrv_block_status() for the
+whole image to find out how much data there is copy, this phase actually
+needs only roughly half the time after this patch.
 
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 ---
- tests/test-bdrv-drain.c | 16 ++++++++++++++--
- 1 file changed, 14 insertions(+), 2 deletions(-)
+ include/block/aio-wait.h | 22 ++++++++--------------
+ block/io.c               | 11 ++++++++++-
+ 2 files changed, 18 insertions(+), 15 deletions(-)
 
-diff --git a/tests/test-bdrv-drain.c b/tests/test-bdrv-drain.c
-index 4c3e93de0b..17127e63e4 100644
---- a/tests/test-bdrv-drain.c
-+++ b/tests/test-bdrv-drain.c
-@@ -233,6 +233,11 @@ static void test_drv_cb_drain_subtree(void)
-     test_drv_cb_common(BDRV_SUBTREE_DRAIN, true);
+diff --git a/include/block/aio-wait.h b/include/block/aio-wait.h
+index 8c90a2e66e..783d3678dd 100644
+--- a/include/block/aio-wait.h
++++ b/include/block/aio-wait.h
+@@ -73,29 +73,23 @@ typedef struct {
+  */
+ #define AIO_WAIT_WHILE(wait, ctx, cond) ({                         \
+     bool waited_ = false;                                          \
+-    bool busy_ = true;                                             \
+     AioWait *wait_ = (wait);                                       \
+     AioContext *ctx_ = (ctx);                                      \
+     if (in_aio_context_home_thread(ctx_)) {                        \
+-        while ((cond) || busy_) {                                  \
+-            busy_ = aio_poll(ctx_, (cond));                        \
+-            waited_ |= !!(cond) | busy_;                           \
++        while ((cond)) {                                           \
++            aio_poll(ctx_, true);                                  \
++            waited_ = true;                                        \
+         }                                                          \
+     } else {                                                       \
+         assert(qemu_get_current_aio_context() ==                   \
+                qemu_get_aio_context());                            \
+         /* Increment wait_->num_waiters before evaluating cond. */ \
+         atomic_inc(&wait_->num_waiters);                           \
+-        while (busy_) {                                            \
+-            if ((cond)) {                                          \
+-                waited_ = busy_ = true;                            \
+-                aio_context_release(ctx_);                         \
+-                aio_poll(qemu_get_aio_context(), true);            \
+-                aio_context_acquire(ctx_);                         \
+-            } else {                                               \
+-                busy_ = aio_poll(ctx_, false);                     \
+-                waited_ |= busy_;                                  \
+-            }                                                      \
++        while ((cond)) {                                           \
++            aio_context_release(ctx_);                             \
++            aio_poll(qemu_get_aio_context(), true);                \
++            aio_context_acquire(ctx_);                             \
++            waited_ = true;                                        \
+         }                                                          \
+         atomic_dec(&wait_->num_waiters);                           \
+     }                                                              \
+diff --git a/block/io.c b/block/io.c
+index 58f50ba253..aa973f1d4a 100644
+--- a/block/io.c
++++ b/block/io.c
+@@ -182,13 +182,22 @@ static void bdrv_drain_invoke(BlockDriverState *bs, bool begin)
+     BDRV_POLL_WHILE(bs, !data.done);
  }
  
-+static void test_drv_cb_co_drain_all(void)
++/* Returns true if BDRV_POLL_WHILE() should go into a blocking aio_poll() */
++static bool bdrv_drain_poll(BlockDriverState *bs)
 +{
-+    call_in_coroutine(test_drv_cb_drain_all);
++    /* Execute pending BHs first and check everything else only after the BHs
++     * have executed. */
++    while (aio_poll(bs->aio_context, false));
++    return atomic_read(&bs->in_flight);
 +}
 +
- static void test_drv_cb_co_drain(void)
+ static bool bdrv_drain_recurse(BlockDriverState *bs)
  {
-     call_in_coroutine(test_drv_cb_drain);
-@@ -289,6 +294,11 @@ static void test_quiesce_drain_subtree(void)
-     test_quiesce_common(BDRV_SUBTREE_DRAIN, true);
- }
+     BdrvChild *child, *tmp;
+     bool waited;
  
-+static void test_quiesce_co_drain_all(void)
-+{
-+    call_in_coroutine(test_quiesce_drain_all);
-+}
-+
- static void test_quiesce_co_drain(void)
- {
-     call_in_coroutine(test_quiesce_drain);
-@@ -800,7 +810,8 @@ int main(int argc, char **argv)
-     g_test_add_func("/bdrv-drain/driver-cb/drain_subtree",
-                     test_drv_cb_drain_subtree);
+     /* Wait for drained requests to finish */
+-    waited = BDRV_POLL_WHILE(bs, atomic_read(&bs->in_flight) > 0);
++    waited = BDRV_POLL_WHILE(bs, bdrv_drain_poll(bs));
  
--    // XXX bdrv_drain_all() doesn't work in coroutine context
-+    g_test_add_func("/bdrv-drain/driver-cb/co/drain_all",
-+                    test_drv_cb_co_drain_all);
-     g_test_add_func("/bdrv-drain/driver-cb/co/drain", test_drv_cb_co_drain);
-     g_test_add_func("/bdrv-drain/driver-cb/co/drain_subtree",
-                     test_drv_cb_co_drain_subtree);
-@@ -811,7 +822,8 @@ int main(int argc, char **argv)
-     g_test_add_func("/bdrv-drain/quiesce/drain_subtree",
-                     test_quiesce_drain_subtree);
- 
--    // XXX bdrv_drain_all() doesn't work in coroutine context
-+    g_test_add_func("/bdrv-drain/quiesce/co/drain_all",
-+                    test_quiesce_co_drain_all);
-     g_test_add_func("/bdrv-drain/quiesce/co/drain", test_quiesce_co_drain);
-     g_test_add_func("/bdrv-drain/quiesce/co/drain_subtree",
-                     test_quiesce_co_drain_subtree);
+     QLIST_FOREACH_SAFE(child, &bs->children, next, tmp) {
+         BlockDriverState *bs = child->bs;
 -- 
 2.13.6
