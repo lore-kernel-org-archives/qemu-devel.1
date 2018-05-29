@@ -1,25 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39939)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46132)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fNYMt-0007UZ-Ar
-	for qemu-devel@nongnu.org; Tue, 29 May 2018 02:44:28 -0400
+	(envelope-from <lersek@redhat.com>) id 1fNYv0-0003mV-4i
+	for qemu-devel@nongnu.org; Tue, 29 May 2018 03:19:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fNYMs-0007Kc-Ev
-	for qemu-devel@nongnu.org; Tue, 29 May 2018 02:44:27 -0400
-Date: Tue, 29 May 2018 08:44:15 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20180529064415.GA4756@localhost.localdomain>
-References: <20180518180440-mutt-send-email-mst@kernel.org>
-	<20180524113251.GB4660@redhat.com>
-	<d9bb2cb9-d9dc-8fe0-a767-10d9cbbab803@redhat.com>
-	<20180528183058.GG2209@redhat.com>
-	<20180528183833.GJ4580@localhost.localdomain>
-	<20180528212054.GH2209@redhat.com>
-	<20180528212510.GC4660@redhat.com>
+	(envelope-from <lersek@redhat.com>) id 1fNYuw-0007m7-TN
+	for qemu-devel@nongnu.org; Tue, 29 May 2018 03:19:42 -0400
+References: <1527568809-5640-1-git-send-email-walling@linux.ibm.com>
+From: Laszlo Ersek <lersek@redhat.com>
+Message-ID: <44b99710-5801-f880-0db6-d416177ef859@redhat.com>
+Date: Tue, 29 May 2018 09:19:36 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180528212510.GC4660@redhat.com>
-Subject: Re: [Qemu-devel] storing machine data in qcow images?
+In-Reply-To: <1527568809-5640-1-git-send-email-walling@linux.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] pc-bios/s390-ccw: define loadparm length
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,41 +23,113 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Richard W.M. Jones" <rjones@redhat.com>
-Cc: ehabkost@redhat.com, qemu-block@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, stefanha@redhat.com
+To: Collin Walling <walling@linux.ibm.com>, qemu-devel@nongnu.org, qemu-s390x@nongnu.org, cohuck@redhat.com
 
-Am 28.05.2018 um 23:25 hat Richard W.M. Jones geschrieben:
-> On Mon, May 28, 2018 at 10:20:54PM +0100, Richard W.M. Jones wrote:
-> > On Mon, May 28, 2018 at 08:38:33PM +0200, Kevin Wolf wrote:
-> > > Just accessing the image file within a tar archive is possible and we
-> > > could write a block driver for that (I actually think we should do
-> > > this), but it restricts you because certain operations like resizing
-> > > aren't really possible in tar. Unfortunately, resizing is a really
-> > > common operation for non-raw image formats.
-> > 
-> > We do this already in virt-v2v (using file.offset and file.size
-> > parameters in the raw driver).
-> > 
-> > For virt-v2v we only need to read the source so resizing isn't an
-> > issue.  For most of the cases we're talking about the downloaded image
-> > would also be a template / base image, so I suppose only reading would
-> > be required too.
-> > 
-> > I also wrote an nbdkit tar file driver (supports writes, but not
-> > resizing).
-> > https://manpages.debian.org/testing/nbdkit-plugin-perl/nbdkit-tar-plugin.1.en.html
+On 05/29/18 06:40, Collin Walling wrote:
+> Loadparm is defined by the s390 architecture to be 8 bytes
+> in length. Let's define this size in the s390-ccw bios.
 > 
-> I should add the other thorny issue with OVA files is that the
-> metadata contains a checksum (SHA1 or SHA256) of the disk images.  If
-> you modify the disk images in-place in the tar file then you need to
-> recalculate those.
+> Suggested-by: Laszlo Ersek <lersek@redhat.com>
+> Signed-off-by: Collin Walling <walling@linux.ibm.com>
+> ---
+>  pc-bios/s390-ccw/iplb.h | 4 +++-
+>  pc-bios/s390-ccw/main.c | 8 ++++----
+>  pc-bios/s390-ccw/sclp.c | 2 +-
+>  pc-bios/s390-ccw/sclp.h | 2 +-
+>  4 files changed, 9 insertions(+), 7 deletions(-)
+> 
+> diff --git a/pc-bios/s390-ccw/iplb.h b/pc-bios/s390-ccw/iplb.h
+> index ded20c8..772d5c5 100644
+> --- a/pc-bios/s390-ccw/iplb.h
+> +++ b/pc-bios/s390-ccw/iplb.h
+> @@ -12,6 +12,8 @@
+>  #ifndef IPLB_H
+>  #define IPLB_H
+>  
+> +#define LOADPARM_LEN    8
+> +
+>  struct IplBlockCcw {
+>      uint8_t  reserved0[85];
+>      uint8_t  ssid;
+> @@ -61,7 +63,7 @@ struct IplParameterBlock {
+>      uint8_t  pbt;
+>      uint8_t  flags;
+>      uint16_t reserved01;
+> -    uint8_t  loadparm[8];
+> +    uint8_t  loadparm[LOADPARM_LEN];
+>      union {
+>          IplBlockCcw ccw;
+>          IplBlockFcp fcp;
+> diff --git a/pc-bios/s390-ccw/main.c b/pc-bios/s390-ccw/main.c
+> index 26f9adf..544851d 100644
+> --- a/pc-bios/s390-ccw/main.c
+> +++ b/pc-bios/s390-ccw/main.c
+> @@ -15,7 +15,7 @@
+>  char stack[PAGE_SIZE * 8] __attribute__((__aligned__(PAGE_SIZE)));
+>  static SubChannelId blk_schid = { .one = 1 };
+>  IplParameterBlock iplb __attribute__((__aligned__(PAGE_SIZE)));
+> -static char loadparm_str[9] = { 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+> +static char loadparm_str[LOADPARM_LEN + 1] = { 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+>  QemuIplParameters qipl;
+>  
+>  #define LOADPARM_PROMPT "PROMPT  "
+> @@ -80,13 +80,13 @@ static bool find_dev(Schib *schib, int dev_no)
+>  
+>  static void menu_setup(void)
+>  {
+> -    if (memcmp(loadparm_str, LOADPARM_PROMPT, 8) == 0) {
+> +    if (memcmp(loadparm_str, LOADPARM_PROMPT, LOADPARM_LEN) == 0) {
+>          menu_set_parms(QIPL_FLAG_BM_OPTS_CMD, 0);
+>          return;
+>      }
+>  
+>      /* If loadparm was set to any other value, then do not enable menu */
+> -    if (memcmp(loadparm_str, LOADPARM_EMPTY, 8) != 0) {
+> +    if (memcmp(loadparm_str, LOADPARM_EMPTY, LOADPARM_LEN) != 0) {
+>          return;
+>      }
+>  
+> @@ -117,7 +117,7 @@ static void virtio_setup(void)
+>      enable_mss_facility();
+>  
+>      sclp_get_loadparm_ascii(loadparm_str);
+> -    memcpy(ldp + 10, loadparm_str, 8);
+> +    memcpy(ldp + 10, loadparm_str, LOADPARM_LEN);
+>      sclp_print(ldp);
+>  
+>      memcpy(&qipl, early_qipl, sizeof(QemuIplParameters));
+> diff --git a/pc-bios/s390-ccw/sclp.c b/pc-bios/s390-ccw/sclp.c
+> index 3836cb4..c0223fa 100644
+> --- a/pc-bios/s390-ccw/sclp.c
+> +++ b/pc-bios/s390-ccw/sclp.c
+> @@ -114,7 +114,7 @@ void sclp_get_loadparm_ascii(char *loadparm)
+>      memset((char *)_sccb, 0, sizeof(ReadInfo));
+>      sccb->h.length = sizeof(ReadInfo);
+>      if (!sclp_service_call(SCLP_CMDW_READ_SCP_INFO, sccb)) {
+> -        ebcdic_to_ascii((char *) sccb->loadparm, loadparm, 8);
+> +        ebcdic_to_ascii((char *) sccb->loadparm, loadparm, LOADPARM_LEN);
+>      }
+>  }
+>  
+> diff --git a/pc-bios/s390-ccw/sclp.h b/pc-bios/s390-ccw/sclp.h
+> index 0dd987f..8450161 100644
+> --- a/pc-bios/s390-ccw/sclp.h
+> +++ b/pc-bios/s390-ccw/sclp.h
+> @@ -56,7 +56,7 @@ typedef struct ReadInfo {
+>      uint16_t rnmax;
+>      uint8_t rnsize;
+>      uint8_t reserved[13];
+> -    uint8_t loadparm[8];
+> +    uint8_t loadparm[LOADPARM_LEN];
+>  } __attribute__((packed)) ReadInfo;
+>  
+>  typedef struct SCCB {
+> 
 
-All of this means that OVA isn't really well suited to be used as a
-native format for VM configuration + images. It's just for sharing
-read-only images that are converted into another native format before
-they are used.
+I didn't look for more possible occurrences, but the above look correct
+to me.
 
-Which is probably fair for the use case it was made for, but means that
-we need something else to solve our problem.
+Reviewed-by: Laszlo Ersek <lersek@redhat.com>
 
-Kevin
+Thanks
+Laszlo
