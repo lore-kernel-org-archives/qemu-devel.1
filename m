@@ -1,22 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47529)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48515)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1fNeQW-000074-HG
-	for qemu-devel@nongnu.org; Tue, 29 May 2018 09:12:37 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1fNeUT-0001sv-Ny
+	for qemu-devel@nongnu.org; Tue, 29 May 2018 09:16:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1fNeQV-0007DZ-H1
-	for qemu-devel@nongnu.org; Tue, 29 May 2018 09:12:36 -0400
-References: <20180525163327.23097-1-kwolf@redhat.com>
-	<20180525163327.23097-12-kwolf@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <ad8942cc-97e5-0e30-c84e-fe04064e96ce@redhat.com>
-Date: Tue, 29 May 2018 15:12:20 +0200
+	(envelope-from <ehabkost@redhat.com>) id 1fNeUP-0001Tw-GX
+	for qemu-devel@nongnu.org; Tue, 29 May 2018 09:16:41 -0400
+Date: Tue, 29 May 2018 10:16:21 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20180529131621.GX8988@localhost.localdomain>
+References: <20180518180440-mutt-send-email-mst@kernel.org>
+	<20180524113251.GB4660@redhat.com>
+	<d9bb2cb9-d9dc-8fe0-a767-10d9cbbab803@redhat.com>
+	<20180528183058.GG2209@redhat.com>
+	<20180528183833.GJ4580@localhost.localdomain>
+	<bbd19001-3e42-565b-bd48-c4370204c5ff@redhat.com>
+	<20180528190915.GK4580@localhost.localdomain>
+	<233d8d33-1865-9100-aa1e-07979473f495@redhat.com>
+	<20180529101428.GB4756@localhost.localdomain>
 MIME-Version: 1.0
-In-Reply-To: <20180525163327.23097-12-kwolf@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="UEX3NGIvNw8ZbcAqVIcCoCFn6xfUKLB0J"
-Subject: Re: [Qemu-devel] [PATCH 11/14] qemu-iotests: Rewrite 211 for
- blockdev-create job
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180529101428.GB4756@localhost.localdomain>
+Subject: Re: [Qemu-devel] storing machine data in qcow images?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,77 +30,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
-Cc: jsnow@redhat.com, eblake@redhat.com, pkrempa@redhat.com, qemu-devel@nongnu.org
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: Max Reitz <mreitz@redhat.com>, "Richard W.M. Jones" <rjones@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, stefanha@redhat.com, qemu-devel@nongnu.org, qemu-block@nongnu.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---UEX3NGIvNw8ZbcAqVIcCoCFn6xfUKLB0J
-From: Max Reitz <mreitz@redhat.com>
-To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
-Cc: jsnow@redhat.com, eblake@redhat.com, pkrempa@redhat.com,
- qemu-devel@nongnu.org
-Message-ID: <ad8942cc-97e5-0e30-c84e-fe04064e96ce@redhat.com>
-Subject: Re: [PATCH 11/14] qemu-iotests: Rewrite 211 for blockdev-create job
-References: <20180525163327.23097-1-kwolf@redhat.com>
- <20180525163327.23097-12-kwolf@redhat.com>
-In-Reply-To: <20180525163327.23097-12-kwolf@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On Tue, May 29, 2018 at 12:14:28PM +0200, Kevin Wolf wrote:
+> Am 29.05.2018 um 11:23 hat Max Reitz geschrieben:
+> > On 2018-05-28 21:09, Kevin Wolf wrote:
+> > > Am 28.05.2018 um 20:44 hat Max Reitz geschrieben:
+> > >> On 2018-05-28 20:38, Kevin Wolf wrote:
+> > >>> Am 28.05.2018 um 20:30 hat Richard W.M. Jones geschrieben:
+> > >>>> On Mon, May 28, 2018 at 08:10:32PM +0200, Max Reitz wrote:
+> > >>>>> As someone who is just naive and doesn't see the big picture, I don't
+> > >>>>> see what's wrong with using a tar file that contains the image and
+> > >>>>> additional data.
+> > >>>>
+> > >>>> FWIW an OVA file is exactly this: an uncompressed tar file containing
+> > >>>> disk image(s) and metadata.
+> > >>>
+> > >>> If we combine VM configuration and the disk image this way, I would
+> > >>> still want to directly use that combined thing without having to extract
+> > >>> its components first.
+> > >>>
+> > >>> Just accessing the image file within a tar archive is possible and we
+> > >>> could write a block driver for that (I actually think we should do
+> > >>> this), but it restricts you because certain operations like resizing
+> > >>> aren't really possible in tar. Unfortunately, resizing is a really
+> > >>> common operation for non-raw image formats.
+> > >>>
+> > >>> And if I think of a file format that can contain several different
+> > >>> things that can be individually resized etc., I end up with qcow2 in the
+> > >>> simple case or a full file system in the more complex case.
+> > >>
+> > >> Well, you end up with VMDK.
+> > > 
+> > > I don't think VMDK can save several different objects? It can have some
+> > > metadata in the descriptor, and it can spread the contents of a single
+> > > object across multiple files (with extents), but I don't think it has
+> > > something comparable to e.g. qcow2 snapshots, which are separate objects
+> > > with an individual size that can dynamically change.
+> > 
+> > Right, I tried to be funny and was over-simplifying in the process.
+> > 
+> > What I meant is: You end up with an image format that is spread on a
+> > filesystem, like VMDK is (usually).  Then you have some metadata
+> > descriptor file that describes the rest and multiple data object files.
+> > 
+> > (For completeness's sake: And you can use an external or an internal
+> > filesystem, that is, use multiple files (like VMDK) or have an internal
+> > filesystem (like tar, except tar doesn't allow fragmentation).)
+> 
+> Let's call the libvirt XML the image file and the qcow2 files its
+> data object files and we're done?
 
-On 2018-05-25 18:33, Kevin Wolf wrote:
-> This rewrites the test case 211 to work with the new x-blockdev-create
-> job rather than the old synchronous version of the command.
->=20
-> All of the test cases stay the same as before, but in order to be able
-> to implement proper job handling, the test case is rewritten in Python.=
-
->=20
-> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-> ---
->  tests/qemu-iotests/211     | 384 ++++++++++++++++++-------------------=
---------
->  tests/qemu-iotests/211.out | 123 ++++++++-------
->  tests/qemu-iotests/group   |   2 +-
->  3 files changed, 227 insertions(+), 282 deletions(-)
->=20
-> diff --git a/tests/qemu-iotests/211 b/tests/qemu-iotests/211
-> index 1edec26517..2fd89cfb32 100755
-> --- a/tests/qemu-iotests/211
-> +++ b/tests/qemu-iotests/211
-
-[...]
-> +    iotests.img_info_log(disk_path)
-> +    iotests.log(iotests.filter_testfiles(iotests.qemu_img_pipe(
-> +        'map', '--output=3Djson', disk_path)))
-
-The _filter_qemu_img_map wasn't there to filter the filename (it isn't
-present in the JSON output anyway, from what I can see), but to filter
-the offset.
-
-I don't think we really need to filter the offset here, though, because
-this test is for a single specific image format with very specific
-options, so it should be OK.
-
-(The only thing is that the filter_testfiles() call seems unnecessary.)
-
-Reviewed-by: Max Reitz <mreitz@redhat.com>
+libvirt XML doesn't seems to be a solution for the problem, but a
+separate VM specification file could work anyway.
 
 
---UEX3NGIvNw8ZbcAqVIcCoCFn6xfUKLB0J
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+> 
+> I'm afraid spreading things across multiple files doesn't meet the
+> requirements for the problem at hand, though...
 
------BEGIN PGP SIGNATURE-----
+Yeah, I wanted to make this an extension of qcow2, so people
+don't have Yet Another file format to choose from.  We could also
+let libvirt automatically write hints to disk images so things
+would Just Work if you copied a disk image from an existing VM.
 
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlsNUbQACgkQ9AfbAGHV
-z0B83wgAqTzebx7VGqTUG+9dxsXF6hCfRw8DLnvbRrs99zGp/gyCYhwORrgho37Z
-Xb/yeKWaiugpoh03OQA3ZVl2S3XPVoZDiHtSfq2dMdM2DQvHhFPVjXtj/CLb1XMo
-u6fwYphrO0rNR5tc/E+0tfSww+YNM9vuNx3o6hP9byMxHmlqbQCVAX/jvRv+oMHj
-IaIqdX3VlDiNIrCeDHndqj5XIORhVG/fHwFv2Pjf3OhVjBKtkHlYHSuKcWLRPIkL
-lCNzP9UYWSe4Woy/XRSLvefpq5WjUz97tyCqSwlRagXc8nM5lKYTWaPbguSwSw8A
-FAVHldL3u6U1r7n8j+v9xlmIX9xq+Q==
-=VMEb
------END PGP SIGNATURE-----
+But I'm not the one working on management layers or guest image
+tools, so I will just trust Richard's and Daniel's opinions on
+this.
 
---UEX3NGIvNw8ZbcAqVIcCoCFn6xfUKLB0J--
+-- 
+Eduardo
