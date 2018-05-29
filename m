@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36528)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36554)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1fNY7z-0001Im-D9
-	for qemu-devel@nongnu.org; Tue, 29 May 2018 02:29:04 -0400
+	(envelope-from <clg@kaod.org>) id 1fNY81-0001KG-9a
+	for qemu-devel@nongnu.org; Tue, 29 May 2018 02:29:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1fNY7w-0001Ty-AP
-	for qemu-devel@nongnu.org; Tue, 29 May 2018 02:29:03 -0400
-Received: from 5.mo7.mail-out.ovh.net ([178.32.120.239]:49813)
+	(envelope-from <clg@kaod.org>) id 1fNY7z-0001WE-FC
+	for qemu-devel@nongnu.org; Tue, 29 May 2018 02:29:05 -0400
+Received: from 7.mo177.mail-out.ovh.net ([46.105.61.149]:34645)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1fNY7w-0001SD-3S
-	for qemu-devel@nongnu.org; Tue, 29 May 2018 02:29:00 -0400
-Received: from player718.ha.ovh.net (unknown [10.109.108.4])
-	by mo7.mail-out.ovh.net (Postfix) with ESMTP id 2262BACACD
-	for <qemu-devel@nongnu.org>; Tue, 29 May 2018 08:28:57 +0200 (CEST)
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1fNY7z-0001N5-8E
+	for qemu-devel@nongnu.org; Tue, 29 May 2018 02:29:03 -0400
+Received: from player718.ha.ovh.net (unknown [10.109.120.93])
+	by mo177.mail-out.ovh.net (Postfix) with ESMTP id 0BCECB2528
+	for <qemu-devel@nongnu.org>; Tue, 29 May 2018 08:28:52 +0200 (CEST)
 From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
-Date: Tue, 29 May 2018 08:28:34 +0200
-Message-Id: <20180529062838.20556-3-clg@kaod.org>
+Date: Tue, 29 May 2018 08:28:33 +0200
+Message-Id: <20180529062838.20556-2-clg@kaod.org>
 In-Reply-To: <20180529062838.20556-1-clg@kaod.org>
 References: <20180529062838.20556-1-clg@kaod.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH 2/6] ftgmac100: add IEEE 802.1Q VLAN support
+Subject: [Qemu-devel] [PATCH 1/6] ftgmac100: compute maximum frame size
+ depending on the protocol
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,77 +33,130 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-arm@nongnu.org
 Cc: qemu-devel@nongnu.org, Jason Wang <jasowang@redhat.com>, Samuel Thibault <samuel.thibault@ens-lyon.org>, =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
 
-The ftgmac100 NIC supports VLAN tag insertion and the MAC engine also
-has a control to remove VLAN tags from received packets.
-
-The VLAN control bits and VLAN tag information are contained in the
-second word of the transmit and receive descriptors. The Insert VLAN
-bit and the VLAN Tag available bit are only valid in the first segment
-of the packet.
+The maximum frame size includes the CRC and depends if a VLAN tag is
+inserted or not. Adjust the frame size limit in the transmit handler
+using on the FTGMAC100State buffer size and in the receive handler use
+the packet protocol.
 
 Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
 ---
- hw/net/ftgmac100.c | 32 +++++++++++++++++++++++++++++++-
- 1 file changed, 31 insertions(+), 1 deletion(-)
+ include/hw/net/ftgmac100.h |  7 ++++++-
+ hw/net/ftgmac100.c         | 23 ++++++++++++-----------
+ 2 files changed, 18 insertions(+), 12 deletions(-)
 
+diff --git a/include/hw/net/ftgmac100.h b/include/hw/net/ftgmac100.h
+index d9bc589fbf72..94cfe0533297 100644
+--- a/include/hw/net/ftgmac100.h
++++ b/include/hw/net/ftgmac100.h
+@@ -16,6 +16,11 @@
+ #include "hw/sysbus.h"
+ #include "net/net.h"
+=20
++/*
++ * Max frame size for the receiving buffer
++ */
++#define FTGMAC100_MAX_FRAME_SIZE    9220
++
+ typedef struct FTGMAC100State {
+     /*< private >*/
+     SysBusDevice parent_obj;
+@@ -26,7 +31,7 @@ typedef struct FTGMAC100State {
+     qemu_irq irq;
+     MemoryRegion iomem;
+=20
+-    uint8_t *frame;
++    uint8_t frame[FTGMAC100_MAX_FRAME_SIZE];
+=20
+     uint32_t irq_state;
+     uint32_t isr;
 diff --git a/hw/net/ftgmac100.c b/hw/net/ftgmac100.c
-index 7598d08c9cb9..50af1222464a 100644
+index a6d27a7b01df..7598d08c9cb9 100644
 --- a/hw/net/ftgmac100.c
 +++ b/hw/net/ftgmac100.c
-@@ -443,6 +443,24 @@ static void ftgmac100_do_tx(FTGMAC100State *s, uint3=
-2_t tx_ring,
-             break;
+@@ -207,16 +207,18 @@ typedef struct {
+ /*
+  * Max frame size for the receiving buffer
+  */
+-#define FTGMAC100_MAX_FRAME_SIZE    10240
++#define FTGMAC100_MAX_FRAME_SIZE    9220
+=20
+ /* Limits depending on the type of the frame
+  *
+  *   9216 for Jumbo frames (+ 4 for VLAN)
+  *   1518 for other frames (+ 4 for VLAN)
+  */
+-static int ftgmac100_max_frame_size(FTGMAC100State *s)
++static int ftgmac100_max_frame_size(FTGMAC100State *s, uint16_t proto)
+ {
+-    return (s->maccr & FTGMAC100_MACCR_JUMBO_LF ? 9216 : 1518) + 4;
++    int max =3D (s->maccr & FTGMAC100_MACCR_JUMBO_LF ? 9216 : 1518);
++
++    return max + (proto =3D=3D ETH_P_VLAN ? 4 : 0);
+ }
+=20
+ static void ftgmac100_update_irq(FTGMAC100State *s)
+@@ -408,7 +410,6 @@ static void ftgmac100_do_tx(FTGMAC100State *s, uint32=
+_t tx_ring,
+     uint8_t *ptr =3D s->frame;
+     uint32_t addr =3D tx_descriptor;
+     uint32_t flags =3D 0;
+-    int max_frame_size =3D ftgmac100_max_frame_size(s);
+=20
+     while (1) {
+         FTGMAC100Desc bd;
+@@ -427,11 +428,12 @@ static void ftgmac100_do_tx(FTGMAC100State *s, uint=
+32_t tx_ring,
+             flags =3D bd.des1;
          }
 =20
-+        /* Check for VLAN */
-+        if (bd.des0 & FTGMAC100_TXDES0_FTS &&
-+            bd.des1 & FTGMAC100_TXDES1_INS_VLANTAG &&
-+            be16_to_cpu(PKT_GET_ETH_HDR(ptr)->h_proto) !=3D ETH_P_VLAN) =
-{
-+            if (frame_size + len + 4 > sizeof(s->frame)) {
-+                qemu_log_mask(LOG_GUEST_ERROR, "%s: frame too big : %d b=
-ytes\n",
-+                              __func__, len);
-+                s->isr |=3D FTGMAC100_INT_XPKT_LOST;
-+                len =3D  sizeof(s->frame) - frame_size - 4;
-+            }
-+            memmove(ptr + 16, ptr + 12, len - 12);
-+            ptr[12] =3D 0x81;
-+            ptr[13] =3D 0x00;
-+            ptr[14] =3D (uint8_t) bd.des1 >> 8;
-+            ptr[15] =3D (uint8_t) bd.des1;
-+            len +=3D 4;
-+        }
-+
-         ptr +=3D len;
-         frame_size +=3D len;
-         if (bd.des0 & FTGMAC100_TXDES0_LTS) {
-@@ -858,7 +876,19 @@ static ssize_t ftgmac100_receive(NetClientState *nc,=
- const uint8_t *buf,
-             buf_len +=3D size - 4;
+-        len =3D bd.des0 & 0x3FFF;
+-        if (frame_size + len > max_frame_size) {
++        len =3D FTGMAC100_TXDES0_TXBUF_SIZE(bd.des0);
++        if (frame_size + len > sizeof(s->frame)) {
+             qemu_log_mask(LOG_GUEST_ERROR, "%s: frame too big : %d bytes=
+\n",
+                           __func__, len);
+-            len =3D max_frame_size - frame_size;
++            s->isr |=3D FTGMAC100_INT_XPKT_LOST;
++            len =3D  sizeof(s->frame) - frame_size;
          }
-         buf_addr =3D bd.des3;
--        dma_memory_write(&address_space_memory, buf_addr, buf, buf_len);
-+        if (first && proto =3D=3D ETH_P_VLAN && buf_len >=3D 18) {
-+            bd.des1 =3D (buf[14] << 8) | buf[15] | FTGMAC100_RXDES1_VLAN=
-TAG_AVAIL;
-+            if (s->maccr & FTGMAC100_MACCR_RM_VLAN) {
-+                dma_memory_write(&address_space_memory, buf_addr, buf, 1=
-2);
-+                dma_memory_write(&address_space_memory, buf_addr + 12, b=
-uf + 16,
-+                                 buf_len - 16);
-+            } else {
-+                dma_memory_write(&address_space_memory, buf_addr, buf, b=
-uf_len);
-+            }
-+        } else {
-+            bd.des1 =3D 0;
-+            dma_memory_write(&address_space_memory, buf_addr, buf, buf_l=
-en);
-+        }
-         buf +=3D buf_len;
-         if (size < 4) {
-             dma_memory_write(&address_space_memory, buf_addr + buf_len,
+=20
+         if (dma_memory_read(&address_space_memory, bd.des3, ptr, len)) {
+@@ -788,7 +790,8 @@ static ssize_t ftgmac100_receive(NetClientState *nc, =
+const uint8_t *buf,
+     uint32_t buf_len;
+     size_t size =3D len;
+     uint32_t first =3D FTGMAC100_RXDES0_FRS;
+-    int max_frame_size =3D ftgmac100_max_frame_size(s);
++    uint16_t proto =3D be16_to_cpu(PKT_GET_ETH_HDR(buf)->h_proto);
++    int max_frame_size =3D ftgmac100_max_frame_size(s, proto);
+=20
+     if ((s->maccr & (FTGMAC100_MACCR_RXDMA_EN | FTGMAC100_MACCR_RXMAC_EN=
+))
+          !=3D (FTGMAC100_MACCR_RXDMA_EN | FTGMAC100_MACCR_RXMAC_EN)) {
+@@ -814,9 +817,9 @@ static ssize_t ftgmac100_receive(NetClientState *nc, =
+const uint8_t *buf,
+=20
+     /* Huge frames are truncated.  */
+     if (size > max_frame_size) {
+-        size =3D max_frame_size;
+         qemu_log_mask(LOG_GUEST_ERROR, "%s: frame too big : %zd bytes\n"=
+,
+                       __func__, size);
++        size =3D max_frame_size;
+         flags |=3D FTGMAC100_RXDES0_FTL;
+     }
+=20
+@@ -934,8 +937,6 @@ static void ftgmac100_realize(DeviceState *dev, Error=
+ **errp)
+                           object_get_typename(OBJECT(dev)), DEVICE(dev)-=
+>id,
+                           s);
+     qemu_format_nic_info_str(qemu_get_queue(s->nic), s->conf.macaddr.a);
+-
+-    s->frame =3D g_malloc(FTGMAC100_MAX_FRAME_SIZE);
+ }
+=20
+ static const VMStateDescription vmstate_ftgmac100 =3D {
 --=20
 2.13.6
