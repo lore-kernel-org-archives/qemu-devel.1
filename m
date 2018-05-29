@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33717)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33916)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jtomko@redhat.com>) id 1fNaBB-0001f9-Jn
-	for qemu-devel@nongnu.org; Tue, 29 May 2018 04:40:30 -0400
+	(envelope-from <arei.gonglei@huawei.com>) id 1fNaBz-0001zN-74
+	for qemu-devel@nongnu.org; Tue, 29 May 2018 04:41:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jtomko@redhat.com>) id 1fNaB8-0004Uo-HW
-	for qemu-devel@nongnu.org; Tue, 29 May 2018 04:40:29 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:49898 helo=mx1.redhat.com)
+	(envelope-from <arei.gonglei@huawei.com>) id 1fNaBw-00054Q-1B
+	for qemu-devel@nongnu.org; Tue, 29 May 2018 04:41:19 -0400
+Received: from szxga03-in.huawei.com ([45.249.212.189]:2271 helo=huawei.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jtomko@redhat.com>) id 1fNaB8-0004Tb-A9
-	for qemu-devel@nongnu.org; Tue, 29 May 2018 04:40:26 -0400
-Date: Tue, 29 May 2018 10:40:21 +0200
-From: =?iso-8859-1?B?SuFu?= Tomko <jtomko@redhat.com>
-Message-ID: <20180529084021.GC31560@dnr>
-References: <20180529073140.7392-1-zyimin@linux.ibm.com>
+	(Exim 4.71) (envelope-from <arei.gonglei@huawei.com>)
+	id 1fNaBv-00050u-MN
+	for qemu-devel@nongnu.org; Tue, 29 May 2018 04:41:15 -0400
+From: "Gonglei (Arei)" <arei.gonglei@huawei.com>
+Date: Tue, 29 May 2018 08:41:04 +0000
+Message-ID: <33183CC9F5247A488A2544077AF19020DA64285E@DGGEMA505-MBX.china.huawei.com>
+References: <D9DE8DBB19F2A24080482022C1DE758302C898BB@dggemm509-mbx.china.huawei.com>
+In-Reply-To: <D9DE8DBB19F2A24080482022C1DE758302C898BB@dggemm509-mbx.china.huawei.com>
+Content-Language: zh-CN
+Content-Type: text/plain; charset="gb2312"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="lCAWRPmW1mITcIfM"
-Content-Disposition: inline
-In-Reply-To: <20180529073140.7392-1-zyimin@linux.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH v3] sandbox: disable -sandbox if
- CONFIG_SECCOMP undefined
+Subject: Re: [Qemu-devel] [PATCH] socket: dont't free msgfds if error equals
+ EAGAIN
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,80 +29,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Yi Min Zhao <zyimin@linux.ibm.com>
-Cc: qemu-devel@nongnu.org, otubo@redhat.com, fiuczy@linux.ibm.com, borntraeger@de.ibm.com, jferlan@redhat.com, pbonzini@redhat.com
+To: linzhecheng <linzhecheng@huawei.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: "pbonzini@redhat.com" <pbonzini@redhat.com>, "wangxin (U)" <wangxinxin.wang@huawei.com>, "berrange@redhat.com" <berrange@redhat.com>, "peterx@redhat.com" <peterx@redhat.com>, "marcandre.lureau@redhat.com" <marcandre.lureau@redhat.com>, "eblake@redhat.com" <eblake@redhat.com>
 
-
---lCAWRPmW1mITcIfM
-Content-Type: text/plain; charset=iso-8859-1; format=flowed
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Tue, May 29, 2018 at 03:31:40PM +0800, Yi Min Zhao wrote:
->If CONFIG_SECCOMP is undefined, the option 'elevateprivileges' remains
->compiled. This would make libvirt set the corresponding capability and
->then trigger failure during guest startup. This patch moves the code
->regarding seccomp command line options to qemu-seccomp.c file and
->wraps qemu_opts_foreach finding sandbox option with CONFIG_SECCOMP.
->Because parse_sandbox() is moved into qemu-seccomp.c file, change
->seccomp_start() to static function.
->
->Signed-off-by: Yi Min Zhao <zyimin@linux.ibm.com>
->---
->1. Problem Description
->=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
->If QEMU is built without seccomp support, 'elevateprivileges' remains comp=
-iled.
->This option of sandbox is treated as an indication for seccomp blacklist s=
-upport
->in libvirt. This behavior is introduced by the libvirt commits 31ca6a5 and
->3527f9d. It would make libvirt build wrong QEMU cmdline, and then the guest
->startup would fail.
->
->2. Libvirt Log
->=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
->qemu-system-s390x: -sandbox on,obsolete=3Ddeny,elevateprivileges=3Ddeny,sp=
-awn=3Ddeny,\
->resourcecontrol=3Ddeny: seccomp support is disabled
->
->3. Fixup
->=3D=3D=3D=3D=3D=3D=3D=3D
->Move the code related ot sandbox to qemu-seccomp.c file and wrap them with
->CONFIG_SECCOMP. So compile the code related to sandbox only when
->CONFIG_SECCOMP is defined.
->---
-> include/sysemu/seccomp.h |   3 +-
-> qemu-seccomp.c           | 121 ++++++++++++++++++++++++++++++++++++++++++=
-++++-
-> vl.c                     | 118 +-----------------------------------------=
----
-> 3 files changed, 124 insertions(+), 118 deletions(-)
->
-
-Reviewed-by: J=E1n Tomko <jtomko@redhat.com>
-Tested-by: J=E1n Tomko <jtomko@redhat.com>
-
-Jano
-
---lCAWRPmW1mITcIfM
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: Digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEyAry0cRMFDoj9m/ZyvpdPXT/AmkFAlsNEekACgkQyvpdPXT/
-AmmaYRAA7X5Zp4DwArA9jm6pL3ebFtTXbZ/9EEG0S+b9Vjwq4FIOUMFQjZ0BMuLl
-+pQK/pwpxPR2WYrFaSBefEGh8VObaViOAGulj745LlCsuN7IBMDfjUXSQLoXt7k1
-GkZ5rty4H9saQeKkwX+SkZD4+m/cqFsy1mo1u1Mv6/aFOp6ghFbTpxmgUIJa87+Y
-gSftjNqlc7h4gwmrFOtWLfVPH4fPCjG/BexSEaVbnuVQ49lbwZZG30uLFHDYtsxb
-Hx87KL0THzNZbeLFsj22nS2r2Bw2xsBmzhcWI3jcBeKgk8zo3OghAHN09v082smr
-dkiHCT9FibrwvDyybBDW6qVgoVp8ZUvresFNqEAhazq3/6E924fxbtgB2LnY2QOB
-Cly4NtvL29ZiqpCb2gKAG3xozITxVCk9CEDupEZUmF23zMswnigQWAPQd4AxqGvU
-/84QP9hyBIAcyCujNrdyAdp3q6oEnbs1H4CTIClSfZGKpX3SDxEM1URb91Czvzmp
-bdXf+N1SC5jEfON9spWjkFxJOxyHmu+lJAuIIRQBhe+z9PR7IvnmR6ElVxo/eH+f
-ZG5t8hKM0bBefNZjUVBSRPlrMizBup9Lq6kFSG88ti7OsX1r+F8GHzfZmXRR2zvv
-nMmCAWuNf4mUwWxMRtMJTMlq90Z0XaoUKFbu0g79FdVDSqXrZnM=
-=2vCd
------END PGP SIGNATURE-----
-
---lCAWRPmW1mITcIfM--
+SGkgYWxsLA0KDQpUaGUgaXNzdWUgaXMgZWFzeSB0byByZXByb2R1Y2Ugd2hlbiB3ZSBjb25maXVn
+cmVkIG11bHRpLXF1ZXVlIGZ1bmN0aW9uIGZvciB2aG9zdC11c2VyIG5pY3MuDQoNClRoZSBtYWlu
+IGJhY2t0cmFjZSBpcyBhcyBmb2xsb3dzOg0KDQp2aG9zdF91c2VyX3dyaXRlICA9PT4gIDApICBz
+ZXRzIHMtPndyaXRlX21zZ2Zkc19udW0gdG8gOA0KCXFlbXVfY2hyX2ZlX3dyaXRlX2FsbA0KCQlx
+ZW11X2Nocl9mZV93cml0ZV9idWZmZXIgID09PiA0KSByZXdyaXRlIGJlY2F1c2UgKHJldCA8MCAm
+JiBlcnJubyBpcyBFQUdBSU4pDQoJCQl0Y3BfY2hyX3dyaXRlICA9PT4gMykgY2xlYXIgcmVzb3Vy
+Y2UgYWJvdXQgcy0+d3JpdGVfbXNnZmRzIGFuZCBzZXQgcy0+d3JpdGVfbXNnZmRzX251bSB0byAw
+DQoJCQkJaW9fY2hhbm5lbF9zZW5kX2Z1bGwgID09PiAgMikgZXJybm8gPSBFQUdBSU4gYW5kIHJl
+dHVybiAtMQ0KCQkJCQlxaW9fY2hhbm5lbF9zb2NrZXRfd3JpdGV2ICA9PT4gMSkgcmV0dXJucyBR
+SU9fQ0hBTk5FTF9FUlJfQkxPQ0sgd2hlbiByZXQgPDAgJiYgZXJybm8gPT0gRUFHQUlODQoNClRo
+ZW4gYXQgdGhlIGFib3ZlIHN0ZXAgNCkgbWF5IGNhdXNlIHVuZGVmaW5lZCBiZWhhdmlvcnMgb24g
+dGhlIHZob3N0LXVzZXIgc2VydmVyIHNpZGUgYmVjYXVzZSBudWxsIGNvbnRyb2wgbWVzc2FnZSBp
+cyBzZW50LiANCg0KU28sIHdlIHN1Ym1pdCBhIHBhdGNoIHRvIGZpeCBpdC4gV2hhdCdzIHlvdXIg
+b3Bpbmlvbj8NCg0KUmVnYXJkcywNCi1Hb25nbGVpDQoNCj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdl
+LS0tLS0NCj4gRnJvbTogbGluemhlY2hlbmcNCj4gU2VudDogVHVlc2RheSwgTWF5IDI5LCAyMDE4
+IDQ6MjAgUE0NCj4gVG86IHFlbXUtZGV2ZWxAbm9uZ251Lm9yZw0KPiBDYzogcGJvbnppbmlAcmVk
+aGF0LmNvbTsgd2FuZ3hpbiAoVSkgPHdhbmd4aW54aW4ud2FuZ0BodWF3ZWkuY29tPjsNCj4gYmVy
+cmFuZ2VAcmVkaGF0LmNvbTsgcGV0ZXJ4QHJlZGhhdC5jb207IG1hcmNhbmRyZS5sdXJlYXVAcmVk
+aGF0LmNvbTsNCj4gZWJsYWtlQHJlZGhhdC5jb207IEdvbmdsZWkgKEFyZWkpIDxhcmVpLmdvbmds
+ZWlAaHVhd2VpLmNvbT4NCj4gU3ViamVjdDogUkU6IFtQQVRDSF0gc29ja2V0OiBkb250J3QgZnJl
+ZSBtc2dmZHMgaWYgZXJyb3IgZXF1YWxzIEVBR0FJTg0KPiANCj4gQ0MnaW5nIERhbmllbCBQLiBC
+ZXJyYW5nqKYgLCBQZXRlciBYdSwgTWFyYy1BbmRyqKYgTHVyZWF1LCBFcmljIEJsYWtlLCBHb25n
+bGVpDQo+IA0KPiA+IC0tLS0t08q8/tStvP4tLS0tLQ0KPiA+ILeivP7IyzogbGluemhlY2hlbmcN
+Cj4gPiC3osvNyrG85DogMjAxOMTqNdTCMjnI1SAxMDo1Mw0KPiA+IMrVvP7IyzogcWVtdS1kZXZl
+bEBub25nbnUub3JnDQo+ID4gs63LzTogcGJvbnppbmlAcmVkaGF0LmNvbTsgd2FuZ3hpbiAoVSkN
+Cj4gPHdhbmd4aW54aW4ud2FuZ0BodWF3ZWkuY29tPjsNCj4gPiBsaW56aGVjaGVuZyA8bGluemhl
+Y2hlbmdAaHVhd2VpLmNvbT4NCj4gPiDW98ziOiBbUEFUQ0hdIHNvY2tldDogZG9udCd0IGZyZWUg
+bXNnZmRzIGlmIGVycm9yIGVxdWFscyBFQUdBSU4NCj4gPg0KPiA+IFNpZ25lZC1vZmYtYnk6IGxp
+bnpoZWNoZW5nIDxsaW56aGVjaGVuZ0BodWF3ZWkuY29tPg0KPiA+DQo+ID4gZGlmZiAtLWdpdCBh
+L2NoYXJkZXYvY2hhci1zb2NrZXQuYyBiL2NoYXJkZXYvY2hhci1zb2NrZXQuYyBpbmRleA0KPiA+
+IDE1OWU2OWMzYjEuLjE3NTE5ZWM1ODkgMTAwNjQ0DQo+ID4gLS0tIGEvY2hhcmRldi9jaGFyLXNv
+Y2tldC5jDQo+ID4gKysrIGIvY2hhcmRldi9jaGFyLXNvY2tldC5jDQo+ID4gQEAgLTEzNCw4ICsx
+MzQsOCBAQCBzdGF0aWMgaW50IHRjcF9jaHJfd3JpdGUoQ2hhcmRldiAqY2hyLCBjb25zdCB1aW50
+OF90DQo+ID4gKmJ1ZiwgaW50IGxlbikNCj4gPiAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgIHMtPndyaXRlX21zZ2ZkcywNCj4gPiAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgIHMtPndyaXRlX21zZ2Zkc19udW0pOw0KPiA+DQo+ID4gLSAgICAg
+ICAgLyogZnJlZSB0aGUgd3JpdHRlbiBtc2dmZHMsIG5vIG1hdHRlciB3aGF0ICovDQo+ID4gLSAg
+ICAgICAgaWYgKHMtPndyaXRlX21zZ2Zkc19udW0pIHsNCj4gPiArICAgICAgICAvKiBmcmVlIHRo
+ZSB3cml0dGVuIG1zZ2ZkcyBpbiBhbnkgY2FzZXMgb3RoZXIgdGhhbiBlcnJubz09RUFHQUlODQo+
+ICovDQo+ID4gKyAgICAgICAgaWYgKEVBR0FJTiAhPSBlcnJubyAmJiBzLT53cml0ZV9tc2dmZHNf
+bnVtKSB7DQo+ID4gICAgICAgICAgICAgIGdfZnJlZShzLT53cml0ZV9tc2dmZHMpOw0KPiA+ICAg
+ICAgICAgICAgICBzLT53cml0ZV9tc2dmZHMgPSAwOw0KPiA+ICAgICAgICAgICAgICBzLT53cml0
+ZV9tc2dmZHNfbnVtID0gMDsNCj4gPiAtLQ0KPiA+IDIuMTIuMi53aW5kb3dzLjINCj4gPg0KDQo=
