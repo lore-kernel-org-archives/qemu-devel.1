@@ -1,24 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37136)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37139)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <edgar.iglesias@gmail.com>) id 1fNcDZ-0001oW-At
+	(envelope-from <chen_han_xiao@126.com>) id 1fNcDZ-0001oc-DQ
 	for qemu-devel@nongnu.org; Tue, 29 May 2018 06:51:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <edgar.iglesias@gmail.com>) id 1fNcDY-0004GS-JL
+	(envelope-from <chen_han_xiao@126.com>) id 1fNcDU-0004Dx-IV
 	for qemu-devel@nongnu.org; Tue, 29 May 2018 06:51:05 -0400
-Received: from mail-wm0-x22c.google.com ([2a00:1450:400c:c09::22c]:39229)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <edgar.iglesias@gmail.com>)
-	id 1fNcDY-0004G3-DV
-	for qemu-devel@nongnu.org; Tue, 29 May 2018 06:51:04 -0400
-Received: by mail-wm0-x22c.google.com with SMTP id f8-v6so39343918wmc.4
-	for <qemu-devel@nongnu.org>; Tue, 29 May 2018 03:51:04 -0700 (PDT)
-From: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
-Date: Tue, 29 May 2018 12:50:03 +0200
-Message-Id: <20180529105011.1914-31-edgar.iglesias@gmail.com>
-In-Reply-To: <20180529105011.1914-1-edgar.iglesias@gmail.com>
-References: <20180529105011.1914-1-edgar.iglesias@gmail.com>
-Subject: [Qemu-devel] [PULL v1 30/38] target-microblaze: Allow address sizes
- between 32 and 64 bits
+Received: from m15-112.126.com ([220.181.15.112]:57068)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <chen_han_xiao@126.com>) id 1fNcDT-0004AX-LQ
+	for qemu-devel@nongnu.org; Tue, 29 May 2018 06:51:00 -0400
+From: Chen Hanxiao <chen_han_xiao@126.com>
+Date: Tue, 29 May 2018 18:50:36 +0800
+Message-Id: <20180529105036.13466-1-chen_han_xiao@126.com>
+Subject: [Qemu-devel] [PATCH resend v2] qga: unset frozen state if no mount
+ points are frozen
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,35 +22,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, edgar.iglesias@xilinx.com
+To: mdroth@linux.vnet.ibm.com
+Cc: qemu-devel@nongnu.org, Chen Hanxiao <chen_han_xiao@126.com>
 
-From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
+From: Chen Hanxiao <chenhanxiao@gmail.com>
 
-Allow address sizes between 32 and 64 bits.
+If we set mountpoints to qmp_guest_fsfreeze_freeze_list,
+we may got nothing to freeze as all mountpoints are
+not valid.
+So call ga_unset_frozen in this senario.
 
-Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Signed-off-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
+Also, if we return 0 frozen fs, there is no need to call
+guest-fsfreeze-thaw.
+
+Cc: Michael Roth <mdroth@linux.vnet.ibm.com>
+Signed-off-by: Chen Hanxiao <chenhanxiao@gmail.com>
+
 ---
- target/microblaze/cpu.c | 5 ++---
- 1 file changed, 2 insertions(+), 3 deletions(-)
+v2:
+  remove has_mountpoints special case
+  add qapi-schema.json section
 
-diff --git a/target/microblaze/cpu.c b/target/microblaze/cpu.c
-index 71fc8d09fe..9b546a2c18 100644
---- a/target/microblaze/cpu.c
-+++ b/target/microblaze/cpu.c
-@@ -155,9 +155,8 @@ static void mb_cpu_realizefn(DeviceState *dev, Error **errp)
-         return;
+ qga/commands-posix.c | 6 ++++++
+ qga/qapi-schema.json | 4 +++-
+ 2 files changed, 9 insertions(+), 1 deletion(-)
+
+diff --git a/qga/commands-posix.c b/qga/commands-posix.c
+index 0dc219dbcf..93bfc5b4ab 100644
+--- a/qga/commands-posix.c
++++ b/qga/commands-posix.c
+@@ -1274,6 +1274,12 @@ int64_t qmp_guest_fsfreeze_freeze_list(bool has_mountpoints,
      }
  
--    if (cpu->cfg.addr_size != 32) {
--        error_setg(errp, "addr-size %d is out of range. "
--                   "Only 32bit is supported.",
-+    if (cpu->cfg.addr_size < 32 || cpu->cfg.addr_size > 64) {
-+        error_setg(errp, "addr-size %d is out of range (32 - 64)",
-                    cpu->cfg.addr_size);
-         return;
-     }
+     free_fs_mount_list(&mounts);
++    /* We may not issue any FIFREEZE here.
++     * Just unset ga_state here and ready for the next call.
++     */
++    if (i == 0) {
++        ga_unset_frozen(ga_state);
++    }
+     return i;
+ 
+ error:
+diff --git a/qga/qapi-schema.json b/qga/qapi-schema.json
+index 17884c7c70..1045cef386 100644
+--- a/qga/qapi-schema.json
++++ b/qga/qapi-schema.json
+@@ -435,7 +435,9 @@
+ # for up to 10 seconds by VSS.
+ #
+ # Returns: Number of file systems currently frozen. On error, all filesystems
+-# will be thawed.
++# will be thawed. If no filesystems are frozen as a result of this call,
++# then @guest-fsfreeze-status will remain "thawed" and calling
++# @guest-fsfreeze-thaw is not necessary.
+ #
+ # Since: 0.15.0
+ ##
 -- 
-2.14.1
+2.14.3
