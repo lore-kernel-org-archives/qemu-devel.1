@@ -1,22 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44785)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45854)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1fNeHa-0005aN-UW
-	for qemu-devel@nongnu.org; Tue, 29 May 2018 09:03:24 -0400
+	(envelope-from <alex.williamson@redhat.com>) id 1fNeNC-0006ki-Ey
+	for qemu-devel@nongnu.org; Tue, 29 May 2018 09:09:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1fNeHV-0007ba-CF
-	for qemu-devel@nongnu.org; Tue, 29 May 2018 09:03:22 -0400
-References: <20180525163327.23097-1-kwolf@redhat.com>
-	<20180525163327.23097-11-kwolf@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <2b8a13e2-eb82-6e29-0cc5-04f1fac33327@redhat.com>
-Date: Tue, 29 May 2018 15:02:47 +0200
+	(envelope-from <alex.williamson@redhat.com>) id 1fNeN8-0004P6-Fk
+	for qemu-devel@nongnu.org; Tue, 29 May 2018 09:09:10 -0400
+Date: Tue, 29 May 2018 07:09:00 -0600
+From: Alex Williamson <alex.williamson@redhat.com>
+Message-ID: <20180529070900.29a95fb7@w520.home>
+In-Reply-To: <3602923c-42ad-750f-aced-ed758441d501@redhat.com>
+References: <20180528232719.4721-1-f4bug@amsat.org>
+	<20180528232719.4721-2-f4bug@amsat.org>
+	<20180528174805.7a56a4b8@w520.home>
+	<20180529030540-mutt-send-email-mst@kernel.org>
+	<ba9292ae-5bf3-54af-fefc-66336f83afd6@amsat.org>
+	<20180529115312.5fb8ad16.cohuck@redhat.com>
+	<3602923c-42ad-750f-aced-ed758441d501@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20180525163327.23097-11-kwolf@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="XUe733BUcxsycw8rF6phiUpFXJZpnVz88"
-Subject: Re: [Qemu-devel] [PATCH 10/14] qemu-iotests: Rewrite 210 for
- blockdev-create job
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v4 01/21] vfio: Include
+ "exec/address-spaces.h" directly in the source file
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,97 +29,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
-Cc: jsnow@redhat.com, eblake@redhat.com, pkrempa@redhat.com, qemu-devel@nongnu.org
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Cornelia Huck <cohuck@redhat.com>, Philippe =?UTF-8?B?TWF0aGlldS1EYXVk?= =?UTF-8?B?w6k=?= <f4bug@amsat.org>, "Michael S. Tsirkin" <mst@redhat.com>, Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, qemu-trivial@nongnu.org, "open list:S390" <qemu-s390x@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---XUe733BUcxsycw8rF6phiUpFXJZpnVz88
-From: Max Reitz <mreitz@redhat.com>
-To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
-Cc: jsnow@redhat.com, eblake@redhat.com, pkrempa@redhat.com,
- qemu-devel@nongnu.org
-Message-ID: <2b8a13e2-eb82-6e29-0cc5-04f1fac33327@redhat.com>
-Subject: Re: [PATCH 10/14] qemu-iotests: Rewrite 210 for blockdev-create job
-References: <20180525163327.23097-1-kwolf@redhat.com>
- <20180525163327.23097-11-kwolf@redhat.com>
-In-Reply-To: <20180525163327.23097-11-kwolf@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On Tue, 29 May 2018 12:45:28 +0200
+Paolo Bonzini <pbonzini@redhat.com> wrote:
 
-On 2018-05-25 18:33, Kevin Wolf wrote:
-> This rewrites the test case 210 to work with the new x-blockdev-create
-> job rather than the old synchronous version of the command.
+> On 29/05/2018 11:53, Cornelia Huck wrote:
+> > On Mon, 28 May 2018 21:36:31 -0300
+> > Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> wrote:
+> >  =20
+> >> On 05/28/2018 09:06 PM, Michael S. Tsirkin wrote: =20
+> >>> On Mon, May 28, 2018 at 05:48:05PM -0600, Alex Williamson wrote:   =20
+> >>>> On Mon, 28 May 2018 20:26:59 -0300
+> >>>> Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> wrote:
+> >>>>
+> >>>> -ENOCOMMITLOG   =20
+> >>
+> >> Oops sorry Alex, I meant to add some, but missed this while rebasing.
+> >> =20
+> >>>> Why?  Tangible benefit.  Looks like noise.  Thanks,
+> >>>>   =20
+> >>> I agree it should have a commit log, but .c files
+> >>> should be self-sufficient not rely on .h files
+> >>> pulling in headers for symbols the .h does not use
+> >>> itself.   =20
+> >>
+> >> I meant:
+> >>
+> >>   No declaration of "hw/vfio/vfio-common.h" directly requires to inclu=
+de
+> >>   the "exec/address-spaces.h" header.  To simplify dependencies and
+> >>   ease following cleanup of "exec/address-spaces.h", directly include
+> >>   it in the source file where the declaration are used.
+> >> =20
+> >>> This is better because it makes refactoring easier.
+> >>>    =20
+> >>>>> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+> >>>>> ---
+> >>>>>  include/hw/vfio/vfio-common.h | 1 -
+> >>>>>  hw/vfio/ccw.c                 | 1 +
+> >>>>>  hw/vfio/platform.c            | 1 +
+> >>>>>  3 files changed, 2 insertions(+), 1 deletion(-) =20
+> >=20
+> > With the description added:
+> >=20
+> > Acked-by: Cornelia Huck <cohuck@redhat.com>
+> >  =20
 >=20
-> All of the test cases stay the same as before, but in order to be able
-> to implement proper job handling, the test case is rewritten in Python.=
+> Alex, is the description okay with you too?
 
->=20
-> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-> ---
->  tests/qemu-iotests/210        | 393 ++++++++++++++++++----------------=
---------
->  tests/qemu-iotests/210.out    | 189 ++++++++++++++------
->  tests/qemu-iotests/group      |   2 +-
->  tests/qemu-iotests/iotests.py |  12 +-
->  4 files changed, 310 insertions(+), 286 deletions(-)
+Yes, if someone wants to roll this on on commit,
 
-Reviewed-by: Max Reitz <mreitz@redhat.com>
-
-> diff --git a/tests/qemu-iotests/210 b/tests/qemu-iotests/210
-> index e607c0d296..ff4fddea56 100755
-> --- a/tests/qemu-iotests/210
-> +++ b/tests/qemu-iotests/210
-
-[...]
-
-> +    #
-> +    # Invalid sizes
-> +    #
-> +
-> +    # TODO Negative image sizes aren't handled correctly, but this is =
-a problem
-> +    # with QAPI's implementation of the 'size' type and affects other =
-commands as
-> +    # well. Once this is fixed, we may want to add a test case here.
-> +
-> +    # 1. 2^64 - 512
-> +    # 2. 2^63 =3D 8 EB (qemu-img enforces image sizes less than this)
-> +    # 3. 2^63 - 512 (generally valid, but with the crypto header the f=
-ile will
-> +    #                exceed 63 bits)
-> +    iotests.log("=3D=3D=3D Invalid sizes =3D=3D=3D")
-> +    iotests.log("")
-> +
-> +    vm.launch()
-> +    for size in [ 18446744073709551104, 9223372036854775808, 922337203=
-6854775296 ]:
-
-Maybe this would be nice in patch 8 as well.
-
-Max
-
-> +        blockdev_create(vm, { 'driver': imgfmt,
-> +                              'file': 'node0',
-> +                              'key-secret': 'keysec0',
-> +                              'size': size })
-> +    vm.shutdown(
-
-
---XUe733BUcxsycw8rF6phiUpFXJZpnVz88
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlsNT3cACgkQ9AfbAGHV
-z0DVHAf+K6HbrgkMeK5mi7cAsNk4/obPLsE9FCWPs9IkKpRTcJ0/jxAZg2fkiymg
-VfqfaPJusShPzrVdFMnRa6LFBqE0K+5UxrVnmkLkFYROHrsaMQNe9wTSKh5XF5cE
-BFwDg9sRn2VozukYPNb48hDBGkyn3qdJFcHAWuAiX0ypzfuckOUxD2z1qpw5Fap8
-xXaQ/nJI/VS5IlT5kMbUDUNhT2sflTUTEhiZTW8or0pMau8WM+7JiDe+ySIodjHn
-SBxwdwV0yuqZLJIoWMgqNGJKeK3d886gqgtlc49CbHcYAR0km0u7VCIpKmyAohom
-RwFfuSjPKW3QMhPe1FqAkYn6fjaODQ==
-=t+9u
------END PGP SIGNATURE-----
-
---XUe733BUcxsycw8rF6phiUpFXJZpnVz88--
+Acked-by: Alex Williamson <alex.williamson@redhat.com>
