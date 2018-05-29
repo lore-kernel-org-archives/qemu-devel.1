@@ -1,30 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55734)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56726)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1fNiAb-0002G8-Kl
-	for qemu-devel@nongnu.org; Tue, 29 May 2018 13:12:26 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1fNiF1-0003QC-L9
+	for qemu-devel@nongnu.org; Tue, 29 May 2018 13:17:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1fNiAY-00075z-Ek
-	for qemu-devel@nongnu.org; Tue, 29 May 2018 13:12:25 -0400
-Received: from 8.mo69.mail-out.ovh.net ([46.105.56.233]:46416)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1fNiAY-0006zs-8f
-	for qemu-devel@nongnu.org; Tue, 29 May 2018 13:12:22 -0400
-Received: from player693.ha.ovh.net (unknown [10.109.105.34])
-	by mo69.mail-out.ovh.net (Postfix) with ESMTP id 30CB316301
-	for <qemu-devel@nongnu.org>; Tue, 29 May 2018 19:12:20 +0200 (CEST)
-References: <20180529062838.20556-1-clg@kaod.org>
-	<20180529062838.20556-6-clg@kaod.org>
-	<48fac48c-168d-70b6-5020-1faac584804e@amsat.org>
-From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <9849ec14-a8c6-99a6-ac64-5561dd7334fb@kaod.org>
-Date: Tue, 29 May 2018 19:12:12 +0200
+	(envelope-from <dgilbert@redhat.com>) id 1fNiF0-0005Uw-A3
+	for qemu-devel@nongnu.org; Tue, 29 May 2018 13:16:59 -0400
+Date: Tue, 29 May 2018 18:16:44 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20180529171643.GD2575@work-vm>
+References: <20180518132114.4070-1-kwolf@redhat.com>
+	<20180518184151.GA2479@work-vm>
+	<20180522110114.GC6233@localhost.localdomain>
+	<CAMxuvaxnRF4RJhjr3ZgM=w6EB=1vx_ZyE6BUdNnw=uUAu3bK7g@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <48fac48c-168d-70b6-5020-1faac584804e@amsat.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <CAMxuvaxnRF4RJhjr3ZgM=w6EB=1vx_ZyE6BUdNnw=uUAu3bK7g@mail.gmail.com>
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 5/6] slirp/ncsi: add a "Get Parameter"
- response
+Subject: Re: [Qemu-devel] [PATCH v2 00/40] Generic background jobs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,96 +26,90 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, qemu-arm@nongnu.org
-Cc: Samuel Thibault <samuel.thibault@ens-lyon.org>, Jason Wang <jasowang@redhat.com>, qemu-devel@nongnu.org
+To: =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block <qemu-block@nongnu.org>, qemu-devel <qemu-devel@nongnu.org>, John Snow <jsnow@redhat.com>, Jeff Cody <jcody@redhat.com>, "Armbruster, Markus" <armbru@redhat.com>, Max Reitz <mreitz@redhat.com>
 
-On 05/29/2018 03:11 PM, Philippe Mathieu-Daud=C3=A9 wrote:
-> Hi C=C3=A9dric,
+* Marc-Andr=E9 Lureau (marcandre.lureau@redhat.com) wrote:
+> Hi
 >=20
-> In title: "Get Parameters" (plural)
+> On Tue, May 22, 2018 at 1:01 PM, Kevin Wolf <kwolf@redhat.com> wrote:
+> > Am 18.05.2018 um 20:41 hat Dr. David Alan Gilbert geschrieben:
+> >> * Kevin Wolf (kwolf@redhat.com) wrote:
+> >> > Before we can make x-blockdev-create a background job, we need to
+> >> > generalise the job infrastructure so that it can be used without a=
+ny
+> >> > associated block node.
+> >>
+> >> Is there any relationship between what this does, and what
+> >> Marc-Andr=E9's 'monitor: add asynchronous command type' tries to do?
+> >> (See 20180326150916.9602-1-marcandre.lureau@redhat.com 26th March)
+> >
+> > Depends on who you ask. :-)
+> >
+> > In a way, yes. Marc-Andr=E9's async commands are for long-running
+> > operations and jobs are for long-running operations. However, they ar=
+e
+> > for a different kind of "long-running".
+> >
+> > Basically, Marc-Andr=E9's work is for commands that are generally qui=
+ck,
+> > but perform some blocking operation. Usually commands that are curren=
+tly
+> > implemented synchronously, but always bothered us because they block =
+the
+> > VM for a while. They take maybe a few seconds at most, but you really
+> > don't want them to block the guest even for short time.
+> >
+> > The important part here is you don't want to modify the operations wh=
+ile
+> > they're running, they just send their return value when they are done=
+.
+> > (In the latest version, Marc-Andr=E9 even made sure not to modify the=
+ wire
+> > protocol, so IIUC the commands aren't really async any more in the se=
+nse
+> > that you can have multiple commands running, but they are just
+> > non-blocking in the sense that the guest can keep running while they =
+are
+> > doing their work.)
+> >
+> > In comparison, jobs are typically really long running, like several
+> > minutes (like copying a whole disk image). Some of them can even run
+> > indefinitely (like mirroring) until you explicitly tell them to stop.
+> > You want to continue using the monitor while they are running, and to=
+ be
+> > able to manage them at runtime (pause/resume/set speed/cancel/...).
+> >
+> > So I think both address different problems.
 >=20
-> On 05/29/2018 03:28 AM, C=C3=A9dric Le Goater wrote:
->> This is a minimum response to exercise the kernel.
->=20
-> This type is mandatory in DMTF Standard v1.0.1 indeed (DSP0222).
->=20
->>
->> Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
->> ---
->>  slirp/ncsi.c | 23 ++++++++++++++++++++++-
->>  1 file changed, 22 insertions(+), 1 deletion(-)
->>
->> diff --git a/slirp/ncsi.c b/slirp/ncsi.c
->> index 02d0e9def3e8..f00253641ea4 100644
->> --- a/slirp/ncsi.c
->> +++ b/slirp/ncsi.c
->> @@ -35,6 +35,27 @@ static int ncsi_rsp_handler_gls(struct ncsi_rsp_pkt=
-_hdr *rnh)
->>      return 0;
->>  }
->> =20
->> +/* Get Parameter */
->=20
-> "Parameters"
->=20
->> +static int ncsi_rsp_handler_gp(struct ncsi_rsp_pkt_hdr *rnh)
->> +{
->> +    struct ncsi_rsp_gp_pkt *rsp =3D (struct ncsi_rsp_gp_pkt *) rnh;
->> +
->> +    rsp->mac_cnt =3D 0x0;
->=20
-> "MAC Address Count: The number of MAC addresses supported by the channe=
-l"
->=20
-> 0 means "no [MAC Address] filter [in use]"
->=20
->> +    rsp->mac_enable =3D 0x0;
->=20
-> "MAC Address Flags: all [MAC Address filters] disabled" ...
->=20
->> +
->> +    /* TODO: provide the guest configured MAC */
->> +    rsp->mac[0] =3D 0xaa;
->> +    rsp->mac[1] =3D 0xbb;
->> +    rsp->mac[2] =3D 0xcc;
->> +    rsp->mac[3] =3D 0xdd;
->> +    rsp->mac[4] =3D 0xee;
->> +    rsp->mac[5] =3D 0xff;
->=20
-> So there is no need to set this filter,
-> or you have to set:
->=20
->     rsp->mac_cnt =3D 1;
->     rsp->mac_enable =3D 1 << 0;
->=20
-> Also, you forgot to set:
->=20
->     rsp->vlan_cnt =3D 0;
->     rsp->vlan_enable =3D 0;
+> I agree with Kevin that both address different needs and complement
+> each other. Right now, QMP commands are handled synchronous, so they
+> block the main thread (or the "OOB" thread). I needed a simple way to
+> handle them asynchronously, *without* breaking or changing an existing
+> QMP command API. Job, on the other hand, provides a lot of facilities
+> that are unnecessary for most short living commands, while adding
+> complexity, at the protocol level (for instance, by using an extra
+> "job-id" space and not being tied to the qmp session). Depending on
+> the facilities Job provide, and the guarantee that must hold when
+> using it, it may make sense or help to transform an existing command
+> to an asynchronous version, but I doubt many of the existing commands
+> will need it. However, if there is a need to introduce job-like
+> facilities to QMP async (such as running concurrent commands, listing
+> running commands, being able to cancel them, being notified on
+> progression etc), then I think we should be careful to use Job. For
+> now, this is unneeded, as QMP async is internal to qemu, the client
+> can't run anything  to manage an ongoing async command, so I think
+> both are improvements and will coexist harmoniously.
 
+OK; it seems we are carving stuff up into a whole bunch of different
+categories based on their longevity and blockableness.
+(Normal, OOB, Async, Job)
 
-yes. I will clean up the handler.
+I do worry a bit that pretty much anything that's not 'instant' means
+it's waiting for something somewhere, and because you're waiting
+for something that means you've got to be able to fail or cancel
+it in case that thing never happens.
 
-Thanks,
-
-C.
-
->> +
->> +    /* more data follows */
->> +
->> +    return 0;
->> +}
->> +
->>  static const struct ncsi_rsp_handler {
->>          unsigned char   type;
->>          int             payload;
->> @@ -62,7 +83,7 @@ static const struct ncsi_rsp_handler {
->>          { NCSI_PKT_RSP_SNFC,    4, NULL },
->>          { NCSI_PKT_RSP_GVI,    40, NULL },
->>          { NCSI_PKT_RSP_GC,     32, ncsi_rsp_handler_gc },
->> -        { NCSI_PKT_RSP_GP,     -1, NULL },
->> +        { NCSI_PKT_RSP_GP,     40, ncsi_rsp_handler_gp },
->>          { NCSI_PKT_RSP_GCPS,  172, NULL },
->>          { NCSI_PKT_RSP_GNS,   172, NULL },
->>          { NCSI_PKT_RSP_GNPTS, 172, NULL },
->>
+Dave
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
