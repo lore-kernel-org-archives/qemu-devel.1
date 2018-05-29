@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47808)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47831)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <anton.nefedov@virtuozzo.com>) id 1fNhh1-0002Wc-Ua
-	for qemu-devel@nongnu.org; Tue, 29 May 2018 12:41:53 -0400
+	(envelope-from <anton.nefedov@virtuozzo.com>) id 1fNhh4-0002XJ-Qh
+	for qemu-devel@nongnu.org; Tue, 29 May 2018 12:41:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <anton.nefedov@virtuozzo.com>) id 1fNhgx-0003tF-FZ
-	for qemu-devel@nongnu.org; Tue, 29 May 2018 12:41:51 -0400
-Received: from mail-db5eur01on0139.outbound.protection.outlook.com
-	([104.47.2.139]:7424
+	(envelope-from <anton.nefedov@virtuozzo.com>) id 1fNhh0-0003vk-3G
+	for qemu-devel@nongnu.org; Tue, 29 May 2018 12:41:54 -0400
+Received: from mail-db5eur01on0116.outbound.protection.outlook.com
+	([104.47.2.116]:56524
 	helo=EUR01-DB5-obe.outbound.protection.outlook.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <anton.nefedov@virtuozzo.com>)
-	id 1fNhgx-0003qD-87
-	for qemu-devel@nongnu.org; Tue, 29 May 2018 12:41:47 -0400
+	id 1fNhgz-0003uE-MB
+	for qemu-devel@nongnu.org; Tue, 29 May 2018 12:41:50 -0400
 From: Anton Nefedov <anton.nefedov@virtuozzo.com>
-Date: Tue, 29 May 2018 19:41:31 +0300
-Message-Id: <1527612092-65980-2-git-send-email-anton.nefedov@virtuozzo.com>
+Date: Tue, 29 May 2018 19:41:32 +0300
+Message-Id: <1527612092-65980-3-git-send-email-anton.nefedov@virtuozzo.com>
 In-Reply-To: <1527612092-65980-1-git-send-email-anton.nefedov@virtuozzo.com>
 References: <1527612092-65980-1-git-send-email-anton.nefedov@virtuozzo.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v2 1/2] qapi: allow empty branches in flat
- unions
+Subject: [Qemu-devel] [PATCH v2 2/2] qapi: remove empty flat union branches
+ and types
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,152 +32,328 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: eblake@redhat.com, armbru@redhat.com, mdroth@linux.vnet.ibm.com, Anton Nefedov <anton.nefedov@virtuozzo.com>
 
-It often happens that just a few discriminator values imply extra data in
-a flat union. Existing checks did not make possible to leave other values
-uncovered. Such cases had to be worked around by either stating a dummy
-(empty) type or introducing another (subset) discriminator enumeration.
-
-Both options create redundant entities in qapi files for little profit.
-
-With this patch it is not necessary anymore to add designated union
-fields for every possible value of a discriminator enumeration.
+Flat unions may now have uncovered branches, so it is possible to get rid
+of empty types defined for that purpose only.
 
 Signed-off-by: Anton Nefedov <anton.nefedov@virtuozzo.com>
 ---
- docs/devel/qapi-code-gen.txt                        |  7 ++++---
- scripts/qapi/common.py                              | 11 ++++-------
- scripts/qapi/types.py                               |  4 +++-
- scripts/qapi/visit.py                               | 17 +++++++++++++----
- tests/qapi-schema/flat-union-incomplete-branch.err  |  1 -
- tests/qapi-schema/flat-union-incomplete-branch.exit |  2 +-
- tests/qapi-schema/flat-union-incomplete-branch.out  | 14 ++++++++++++++
- 7 files changed, 39 insertions(+), 17 deletions(-)
+ qapi/block-core.json | 55 ++++------------------------------------------------
+ qapi/crypto.json     | 13 +------------
+ qapi/misc.json       | 46 ++-----------------------------------------
+ qapi/net.json        | 12 ------------
+ qapi/ui.json         | 19 +-----------------
+ block/qcow2.c        |  1 -
+ cpus.c               |  2 --
+ 7 files changed, 8 insertions(+), 140 deletions(-)
 
-diff --git a/docs/devel/qapi-code-gen.txt b/docs/devel/qapi-code-gen.txt
-index b9b6eab..a3ea450 100644
---- a/docs/devel/qapi-code-gen.txt
-+++ b/docs/devel/qapi-code-gen.txt
-@@ -496,9 +496,10 @@ Resulting in these JSON objects:
+diff --git a/qapi/block-core.json b/qapi/block-core.json
+index ad66ad6..d0b95f0 100644
+--- a/qapi/block-core.json
++++ b/qapi/block-core.json
+@@ -52,8 +52,7 @@
+ { 'union': 'ImageInfoSpecificQCow2Encryption',
+   'base': 'ImageInfoSpecificQCow2EncryptionBase',
+   'discriminator': 'format',
+-  'data': { 'aes': 'QCryptoBlockInfoQCow',
+-            'luks': 'QCryptoBlockInfoLUKS' } }
++  'data': { 'luks': 'QCryptoBlockInfoLUKS' } }
  
- Notice that in a flat union, the discriminator name is controlled by
- the user, but because it must map to a base member with enum type, the
--code generator can ensure that branches exist for all values of the
--enum (although the order of the keys need not match the declaration of
--the enum).  In the resulting generated C data types, a flat union is
-+code generator ensures that branches match the existing values of the
-+enum. The order of the keys need not match the declaration of the enum.
-+The keys need not cover all possible enum values.
-+In the resulting generated C data types, a flat union is
- represented as a struct with the base members included directly, and
- then a union of structures for each branch of the struct.
+ ##
+ # @ImageInfoSpecificQCow2:
+@@ -2671,8 +2670,7 @@
+ { 'union': 'BlockdevQcow2Encryption',
+   'base': { 'format': 'BlockdevQcow2EncryptionFormat' },
+   'discriminator': 'format',
+-  'data': { 'aes': 'QCryptoBlockOptionsQCow',
+-            'luks': 'QCryptoBlockOptionsLUKS'} }
++  'data': { 'luks': 'QCryptoBlockOptionsLUKS'} }
  
-diff --git a/scripts/qapi/common.py b/scripts/qapi/common.py
-index a032cec..df6190a 100644
---- a/scripts/qapi/common.py
-+++ b/scripts/qapi/common.py
-@@ -782,13 +782,6 @@ def check_union(expr, info):
-                                    "enum '%s'"
-                                    % (key, enum_define['enum']))
+ ##
+ # @BlockdevOptionsQcow2:
+@@ -2769,16 +2767,6 @@
+             'hash': 'str' }}
  
--    # If discriminator is user-defined, ensure all values are covered
--    if enum_define:
--        for value in enum_define['data']:
--            if value not in members.keys():
--                raise QAPISemError(info, "Union '%s' data missing '%s' branch"
--                                   % (name, value))
+ ##
+-# @SshHostKeyDummy:
+-#
+-# For those union branches that don't need additional fields.
+-#
+-# Since: 2.12
+-##
+-{ 'struct': 'SshHostKeyDummy',
+-  'data': {} }
+-
+-##
+ # @SshHostKeyCheck:
+ #
+ # Since: 2.12
+@@ -2786,9 +2774,7 @@
+ { 'union': 'SshHostKeyCheck',
+   'base': { 'mode': 'SshHostKeyCheckMode' },
+   'discriminator': 'mode',
+-  'data': { 'none': 'SshHostKeyDummy',
+-            'hash': 'SshHostKeyHash',
+-            'known_hosts': 'SshHostKeyDummy' } }
++  'data': { 'hash': 'SshHostKeyHash' } }
+ 
+ ##
+ # @BlockdevOptionsSsh:
+@@ -3948,15 +3934,6 @@
+             '*force-size':          'bool' } }
+ 
+ ##
+-# @BlockdevCreateNotSupported:
+-#
+-# This is used for all drivers that don't support creating images.
+-#
+-# Since: 2.12
+-##
+-{ 'struct': 'BlockdevCreateNotSupported', 'data': {}}
+-
+-##
+ # @BlockdevCreateOptions:
+ #
+ # Options for creating an image format on a given node.
+@@ -3970,44 +3947,20 @@
+       'driver':         'BlockdevDriver' },
+   'discriminator': 'driver',
+   'data': {
+-      'blkdebug':       'BlockdevCreateNotSupported',
+-      'blkverify':      'BlockdevCreateNotSupported',
+-      'bochs':          'BlockdevCreateNotSupported',
+-      'cloop':          'BlockdevCreateNotSupported',
+-      'copy-on-read':   'BlockdevCreateNotSupported',
+-      'dmg':            'BlockdevCreateNotSupported',
+       'file':           'BlockdevCreateOptionsFile',
+-      'ftp':            'BlockdevCreateNotSupported',
+-      'ftps':           'BlockdevCreateNotSupported',
+       'gluster':        'BlockdevCreateOptionsGluster',
+-      'host_cdrom':     'BlockdevCreateNotSupported',
+-      'host_device':    'BlockdevCreateNotSupported',
+-      'http':           'BlockdevCreateNotSupported',
+-      'https':          'BlockdevCreateNotSupported',
+-      'iscsi':          'BlockdevCreateNotSupported',
+       'luks':           'BlockdevCreateOptionsLUKS',
+-      'nbd':            'BlockdevCreateNotSupported',
+       'nfs':            'BlockdevCreateOptionsNfs',
+-      'null-aio':       'BlockdevCreateNotSupported',
+-      'null-co':        'BlockdevCreateNotSupported',
+-      'nvme':           'BlockdevCreateNotSupported',
+       'parallels':      'BlockdevCreateOptionsParallels',
+       'qcow':           'BlockdevCreateOptionsQcow',
+       'qcow2':          'BlockdevCreateOptionsQcow2',
+       'qed':            'BlockdevCreateOptionsQed',
+-      'quorum':         'BlockdevCreateNotSupported',
+-      'raw':            'BlockdevCreateNotSupported',
+       'rbd':            'BlockdevCreateOptionsRbd',
+-      'replication':    'BlockdevCreateNotSupported',
+       'sheepdog':       'BlockdevCreateOptionsSheepdog',
+       'ssh':            'BlockdevCreateOptionsSsh',
+-      'throttle':       'BlockdevCreateNotSupported',
+       'vdi':            'BlockdevCreateOptionsVdi',
+       'vhdx':           'BlockdevCreateOptionsVhdx',
+-      'vmdk':           'BlockdevCreateNotSupported',
+-      'vpc':            'BlockdevCreateOptionsVpc',
+-      'vvfat':          'BlockdevCreateNotSupported',
+-      'vxhs':           'BlockdevCreateNotSupported'
++      'vpc':            'BlockdevCreateOptionsVpc'
+   } }
+ 
+ ##
+diff --git a/qapi/crypto.json b/qapi/crypto.json
+index 288bc05..a51b434 100644
+--- a/qapi/crypto.json
++++ b/qapi/crypto.json
+@@ -297,16 +297,6 @@
+            'uuid': 'str',
+            'slots': [ 'QCryptoBlockInfoLUKSSlot' ] }}
+ 
+-##
+-# @QCryptoBlockInfoQCow:
+-#
+-# Information about the QCow block encryption options
+-#
+-# Since: 2.7
+-##
+-{ 'struct': 'QCryptoBlockInfoQCow',
+-  'data': { }}
 -
  
- def check_alternate(expr, info):
-     name = expr['alternate']
-@@ -1644,6 +1637,10 @@ class QAPISchema(object):
-         if tag_name:
-             variants = [self._make_variant(key, value)
-                         for (key, value) in data.items()]
-+            # branches that are not explicitly covered get an empty type
-+            variants += [self._make_variant(key, 'q_empty')
-+                         for key in discriminator_find_enum_define(expr)['data']
-+                         if key not in data.keys()]
-             members = []
-         else:
-             variants = [self._make_simple_variant(key, value, info)
-diff --git a/scripts/qapi/types.py b/scripts/qapi/types.py
-index 64d9c0f..1fb2b6d 100644
---- a/scripts/qapi/types.py
-+++ b/scripts/qapi/types.py
-@@ -124,7 +124,9 @@ def gen_variants(variants):
- ''',
-                 c_name=c_name(variants.tag_member.name))
+ ##
+ # @QCryptoBlockInfo:
+@@ -318,5 +308,4 @@
+ { 'union': 'QCryptoBlockInfo',
+   'base': 'QCryptoBlockInfoBase',
+   'discriminator': 'format',
+-  'data': { 'qcow': 'QCryptoBlockInfoQCow',
+-            'luks': 'QCryptoBlockInfoLUKS' } }
++  'data': { 'luks': 'QCryptoBlockInfoLUKS' } }
+diff --git a/qapi/misc.json b/qapi/misc.json
+index 99bcaac..a46e55c 100644
+--- a/qapi/misc.json
++++ b/qapi/misc.json
+@@ -393,8 +393,7 @@
+             'mips': 'CpuInfoMIPS',
+             'tricore': 'CpuInfoTricore',
+             's390': 'CpuInfoS390',
+-            'riscv': 'CpuInfoRISCV',
+-            'other': 'CpuInfoOther' } }
++            'riscv': 'CpuInfoRISCV' } }
  
--    for var in variants.variants:
-+    # filter out the empty types
-+    for var in filter(lambda var: var.type.name != 'q_empty',
-+                      variants.variants):
-         ret += mcgen('''
-         %(c_type)s %(c_name)s;
- ''',
-diff --git a/scripts/qapi/visit.py b/scripts/qapi/visit.py
-index 5d72d89..96bd32c 100644
---- a/scripts/qapi/visit.py
-+++ b/scripts/qapi/visit.py
-@@ -81,14 +81,23 @@ void visit_type_%(c_name)s_members(Visitor *v, %(c_name)s *obj, Error **errp)
-                      c_name=c_name(variants.tag_member.name))
+ ##
+ # @CpuInfoX86:
+@@ -465,16 +464,6 @@
+ { 'struct': 'CpuInfoRISCV', 'data': { 'pc': 'int' } }
  
-         for var in variants.variants:
--            ret += mcgen('''
-+            case_str = c_enum_const(variants.tag_member.type.name,
-+                                    var.name,
-+                                    variants.tag_member.type.prefix)
-+            if var.type.name == 'q_empty':
-+                # valid variant and nothing to do
-+                ret += mcgen('''
-+    case %(case)s:
-+        break;
-+''',
-+                             case=case_str)
-+            else:
-+                ret += mcgen('''
-     case %(case)s:
-         visit_type_%(c_type)s_members(v, &obj->u.%(c_name)s, &err);
-         break;
- ''',
--                         case=c_enum_const(variants.tag_member.type.name,
--                                           var.name,
--                                           variants.tag_member.type.prefix),
-+                         case=case_str,
-                          c_type=var.type.c_name(), c_name=c_name(var.name))
+ ##
+-# @CpuInfoOther:
+-#
+-# No additional information is available about the virtual CPU
+-#
+-# Since: 2.6
+-#
+-##
+-{ 'struct': 'CpuInfoOther', 'data': { } }
+-
+-##
+ # @CpuS390State:
+ #
+ # An enumeration of cpu states that can be assumed by a virtual
+@@ -575,38 +564,7 @@
+                       'arch'         : 'CpuInfoArch',
+                       'target'       : 'SysEmuTarget' },
+   'discriminator' : 'target',
+-  'data'          : { 'aarch64'      : 'CpuInfoOther',
+-                      'alpha'        : 'CpuInfoOther',
+-                      'arm'          : 'CpuInfoOther',
+-                      'cris'         : 'CpuInfoOther',
+-                      'hppa'         : 'CpuInfoOther',
+-                      'i386'         : 'CpuInfoOther',
+-                      'lm32'         : 'CpuInfoOther',
+-                      'm68k'         : 'CpuInfoOther',
+-                      'microblaze'   : 'CpuInfoOther',
+-                      'microblazeel' : 'CpuInfoOther',
+-                      'mips'         : 'CpuInfoOther',
+-                      'mips64'       : 'CpuInfoOther',
+-                      'mips64el'     : 'CpuInfoOther',
+-                      'mipsel'       : 'CpuInfoOther',
+-                      'moxie'        : 'CpuInfoOther',
+-                      'nios2'        : 'CpuInfoOther',
+-                      'or1k'         : 'CpuInfoOther',
+-                      'ppc'          : 'CpuInfoOther',
+-                      'ppc64'        : 'CpuInfoOther',
+-                      'ppcemb'       : 'CpuInfoOther',
+-                      'riscv32'      : 'CpuInfoOther',
+-                      'riscv64'      : 'CpuInfoOther',
+-                      's390x'        : 'CpuInfoS390',
+-                      'sh4'          : 'CpuInfoOther',
+-                      'sh4eb'        : 'CpuInfoOther',
+-                      'sparc'        : 'CpuInfoOther',
+-                      'sparc64'      : 'CpuInfoOther',
+-                      'tricore'      : 'CpuInfoOther',
+-                      'unicore32'    : 'CpuInfoOther',
+-                      'x86_64'       : 'CpuInfoOther',
+-                      'xtensa'       : 'CpuInfoOther',
+-                      'xtensaeb'     : 'CpuInfoOther' } }
++  'data'          : { 's390x'        : 'CpuInfoS390' } }
  
-         ret += mcgen('''
-diff --git a/tests/qapi-schema/flat-union-incomplete-branch.err b/tests/qapi-schema/flat-union-incomplete-branch.err
-index e826bf0..e69de29 100644
---- a/tests/qapi-schema/flat-union-incomplete-branch.err
-+++ b/tests/qapi-schema/flat-union-incomplete-branch.err
-@@ -1 +0,0 @@
--tests/qapi-schema/flat-union-incomplete-branch.json:6: Union 'TestUnion' data missing 'value2' branch
-diff --git a/tests/qapi-schema/flat-union-incomplete-branch.exit b/tests/qapi-schema/flat-union-incomplete-branch.exit
-index d00491f..573541a 100644
---- a/tests/qapi-schema/flat-union-incomplete-branch.exit
-+++ b/tests/qapi-schema/flat-union-incomplete-branch.exit
-@@ -1 +1 @@
--1
-+0
-diff --git a/tests/qapi-schema/flat-union-incomplete-branch.out b/tests/qapi-schema/flat-union-incomplete-branch.out
-index e69de29..4e774bc 100644
---- a/tests/qapi-schema/flat-union-incomplete-branch.out
-+++ b/tests/qapi-schema/flat-union-incomplete-branch.out
-@@ -0,0 +1,14 @@
-+object q_empty
-+enum QType ['none', 'qnull', 'qnum', 'qstring', 'qdict', 'qlist', 'qbool']
-+    prefix QTYPE
-+module flat-union-incomplete-branch.json
-+enum TestEnum ['value1', 'value2']
-+object TestTypeA
-+    member string: str optional=False
-+object q_obj_TestUnion-base
-+    member type: TestEnum optional=False
-+object TestUnion
-+    base q_obj_TestUnion-base
-+    tag type
-+    case value1: TestTypeA
-+    case value2: q_empty
+ ##
+ # @query-cpus-fast:
+diff --git a/qapi/net.json b/qapi/net.json
+index 5c1dc48..3a43950 100644
+--- a/qapi/net.json
++++ b/qapi/net.json
+@@ -89,16 +89,6 @@
+ { 'command': 'netdev_del', 'data': {'id': 'str'} }
+ 
+ ##
+-# @NetdevNoneOptions:
+-#
+-# Use it alone to have zero network devices.
+-#
+-# Since: 1.2
+-##
+-{ 'struct': 'NetdevNoneOptions',
+-  'data': { } }
+-
+-##
+ # @NetLegacyNicOptions:
+ #
+ # Create a new Network Interface Card.
+@@ -473,7 +463,6 @@
+   'base': { 'id': 'str', 'type': 'NetClientDriver' },
+   'discriminator': 'type',
+   'data': {
+-    'none':     'NetdevNoneOptions',
+     'nic':      'NetLegacyNicOptions',
+     'user':     'NetdevUserOptions',
+     'tap':      'NetdevTapOptions',
+@@ -526,7 +515,6 @@
+   'base': { 'type': 'NetLegacyOptionsType' },
+   'discriminator': 'type',
+   'data': {
+-    'none':     'NetdevNoneOptions',
+     'nic':      'NetLegacyNicOptions',
+     'user':     'NetdevUserOptions',
+     'tap':      'NetdevTapOptions',
+diff --git a/qapi/ui.json b/qapi/ui.json
+index fc18a05..f48d2a0 100644
+--- a/qapi/ui.json
++++ b/qapi/ui.json
+@@ -996,17 +996,6 @@
+ 
+ 
+ ##
+-# @DisplayNoOpts:
+-#
+-# Empty struct for displays without config options.
+-#
+-# Since: 2.12
+-#
+-##
+-{ 'struct'  : 'DisplayNoOpts',
+-  'data'    : { } }
+-
+-##
+ # @DisplayGTK:
+ #
+ # GTK display options.
+@@ -1068,10 +1057,4 @@
+                 '*window-close'  : 'bool',
+                 '*gl'            : 'DisplayGLMode' },
+   'discriminator' : 'type',
+-  'data'    : { 'default'        : 'DisplayNoOpts',
+-                'none'           : 'DisplayNoOpts',
+-                'gtk'            : 'DisplayGTK',
+-                'sdl'            : 'DisplayNoOpts',
+-                'egl-headless'   : 'DisplayNoOpts',
+-                'curses'         : 'DisplayNoOpts',
+-                'cocoa'          : 'DisplayNoOpts' } }
++  'data'    : { 'gtk'            : 'DisplayGTK' } }
+diff --git a/block/qcow2.c b/block/qcow2.c
+index 6d53247..389d96d 100644
+--- a/block/qcow2.c
++++ b/block/qcow2.c
+@@ -4003,7 +4003,6 @@ static ImageInfoSpecific *qcow2_get_specific_info(BlockDriverState *bs)
+         switch (encrypt_info->format) {
+         case Q_CRYPTO_BLOCK_FORMAT_QCOW:
+             qencrypt->format = BLOCKDEV_QCOW2_ENCRYPTION_FORMAT_AES;
+-            qencrypt->u.aes = encrypt_info->u.qcow;
+             break;
+         case Q_CRYPTO_BLOCK_FORMAT_LUKS:
+             qencrypt->format = BLOCKDEV_QCOW2_ENCRYPTION_FORMAT_LUKS;
+diff --git a/cpus.c b/cpus.c
+index d1f1629..19c5d37 100644
+--- a/cpus.c
++++ b/cpus.c
+@@ -2273,8 +2273,6 @@ CpuInfoFastList *qmp_query_cpus_fast(Error **errp)
+         info->value->target = target;
+         if (target == SYS_EMU_TARGET_S390X) {
+             cpustate_to_cpuinfo_s390(&info->value->u.s390x, cpu);
+-        } else {
+-            /* do nothing for @CpuInfoOther */
+         }
+ 
+         if (!cur_item) {
 -- 
 2.7.4
