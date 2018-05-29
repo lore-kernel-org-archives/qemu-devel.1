@@ -1,16 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51846)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51865)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fNlP4-0003LV-87
+	(envelope-from <kwolf@redhat.com>) id 1fNlP4-0003ML-TT
 	for qemu-devel@nongnu.org; Tue, 29 May 2018 16:39:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fNlP3-0007yI-DY
+	(envelope-from <kwolf@redhat.com>) id 1fNlP4-0007yW-0d
 	for qemu-devel@nongnu.org; Tue, 29 May 2018 16:39:34 -0400
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Tue, 29 May 2018 22:39:00 +0200
-Message-Id: <20180529203910.7615-7-kwolf@redhat.com>
+Date: Tue, 29 May 2018 22:39:03 +0200
+Message-Id: <20180529203910.7615-10-kwolf@redhat.com>
 In-Reply-To: <20180529203910.7615-1-kwolf@redhat.com>
 References: <20180529203910.7615-1-kwolf@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 06/16] qemu-iotests: Add VM.qmp_log()
+Subject: [Qemu-devel] [PATCH v2 09/16] qemu-iotests: iotests.py helper for
+ non-file protocols
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,43 +23,48 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, mreitz@redhat.com, jcody@redhat.com, jsnow@redhat.com, eblake@redhat.com, pkrempa@redhat.com, qemu-devel@nongnu.org
 
-This adds a helper function that logs both the QMP request and the
-received response before returning it.
+This adds two helper functions that are useful for test cases that make
+use of a non-file protocol (specifically ssh).
 
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-Reviewed-by: Jeff Cody <jcody@redhat.com>
 ---
- tests/qemu-iotests/iotests.py | 11 +++++++++++
- 1 file changed, 11 insertions(+)
+ tests/qemu-iotests/iotests.py | 17 +++++++++++++++++
+ 1 file changed, 17 insertions(+)
 
 diff --git a/tests/qemu-iotests/iotests.py b/tests/qemu-iotests/iotests.py
-index 17aa7c88dc..2f54823db6 100644
+index 8b612cb891..bc8f404ac2 100644
 --- a/tests/qemu-iotests/iotests.py
 +++ b/tests/qemu-iotests/iotests.py
-@@ -206,6 +206,10 @@ def filter_qmp_event(event):
-         event['timestamp']['microseconds'] = 'USECS'
-     return event
+@@ -303,6 +303,13 @@ def file_path(*names):
  
-+def filter_testfiles(msg):
-+    prefix = os.path.join(test_dir, "%s-" % (os.getpid()))
-+    return msg.replace(prefix, 'TEST_DIR/PID-')
+     return paths[0] if len(paths) == 1 else paths
+ 
++def remote_filename(path):
++    if imgproto == 'file':
++        return path
++    elif imgproto == 'ssh':
++        return "ssh://127.0.0.1%s" % (path)
++    else:
++        raise Exception("Protocol %s not supported" % (imgproto))
+ 
+ class VM(qtest.QEMUQtestMachine):
+     '''A QEMU VM'''
+@@ -601,6 +608,16 @@ def verify_image_format(supported_fmts=[], unsupported_fmts=[]):
+     if not_sup or (imgfmt in unsupported_fmts):
+         notrun('not suitable for this image format: %s' % imgfmt)
+ 
++def verify_protocol(supported=[], unsupported=[]):
++    assert not (supported and unsupported)
 +
- def log(msg, filters=[]):
-     for flt in filters:
-         msg = flt(msg)
-@@ -389,6 +393,13 @@ class VM(qtest.QEMUQtestMachine):
-             result.append(filter_qmp_event(ev))
-         return result
- 
-+    def qmp_log(self, cmd, filters=[filter_testfiles], **kwargs):
-+        logmsg = "{'execute': '%s', 'arguments': %s}" % (cmd, kwargs)
-+        log(logmsg, filters)
-+        result = self.qmp(cmd, **kwargs)
-+        log(str(result), filters)
-+        return result
++    if 'generic' in supported:
++        return
 +
- 
- index_re = re.compile(r'([^\[]+)\[([^\]]+)\]')
- 
++    not_sup = supported and (imgproto not in supported)
++    if not_sup or (imgproto in unsupported):
++        notrun('not suitable for this protocol: %s' % imgproto)
++
+ def verify_platform(supported_oses=['linux']):
+     if True not in [sys.platform.startswith(x) for x in supported_oses]:
+         notrun('not suitable for this OS: %s' % sys.platform)
 -- 
 2.13.6
