@@ -1,31 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36473)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37559)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fNijj-0004RE-V9
-	for qemu-devel@nongnu.org; Tue, 29 May 2018 13:48:44 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1fNinL-0007Vb-Oi
+	for qemu-devel@nongnu.org; Tue, 29 May 2018 13:52:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fNijj-0005E6-6L
-	for qemu-devel@nongnu.org; Tue, 29 May 2018 13:48:44 -0400
-Received: from mail-qk0-x241.google.com ([2607:f8b0:400d:c09::241]:36198)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fNijj-0005Db-2E
-	for qemu-devel@nongnu.org; Tue, 29 May 2018 13:48:43 -0400
-Received: by mail-qk0-x241.google.com with SMTP id a195-v6so9610533qkg.3
-	for <qemu-devel@nongnu.org>; Tue, 29 May 2018 10:48:42 -0700 (PDT)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Date: Tue, 29 May 2018 14:48:21 -0300
-Message-Id: <20180529174821.19964-5-f4bug@amsat.org>
-In-Reply-To: <20180529174821.19964-1-f4bug@amsat.org>
-References: <20180529174821.19964-1-f4bug@amsat.org>
+	(envelope-from <ehabkost@redhat.com>) id 1fNinK-0007Zs-VL
+	for qemu-devel@nongnu.org; Tue, 29 May 2018 13:52:27 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:47746)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1fNinK-0007ZO-Nx
+	for qemu-devel@nongnu.org; Tue, 29 May 2018 13:52:26 -0400
+Date: Tue, 29 May 2018 14:52:13 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20180529175213.GH8988@localhost.localdomain>
+References: <20180525005839.11556-1-crosa@redhat.com>
+	<20180525005839.11556-4-crosa@redhat.com>
+	<20180525053718.GB28589@lemon.usersys.redhat.com>
+	<65f0262a-20ff-f243-7434-a48daf7e5225@redhat.com>
+	<20180529143257.GA8988@localhost.localdomain>
+	<1c9b3429-3e19-63f5-cbab-4d777c03cd8c@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH 4/4] device_tree: Replace
- error_setg(&error_fatal) by error_report() + exit()
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1c9b3429-3e19-63f5-cbab-4d777c03cd8c@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 3/5] Acceptance tests: add quick VNC tests
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,80 +31,97 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Alexander Graf <agraf@suse.de>
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
+To: Cleber Rosa <crosa@redhat.com>
+Cc: Fam Zheng <famz@redhat.com>, Amador Pahim <amador@pahim.org>, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>
 
-Use error_report() + exit() instead of error_setg(&error_fatal),
-as suggested by the "qapi/error.h" documentation:
+On Tue, May 29, 2018 at 10:59:37AM -0400, Cleber Rosa wrote:
+> 
+> 
+> On 05/29/2018 10:32 AM, Eduardo Habkost wrote:
+> > On Fri, May 25, 2018 at 12:27:46PM -0400, Cleber Rosa wrote:
+> >>
+> >>
+> >> On 05/25/2018 01:37 AM, Fam Zheng wrote:
+> >>> On Thu, 05/24 20:58, Cleber Rosa wrote:
+> >>>> This patch adds a few simple behavior tests for VNC.  These tests
+> >>>> introduce manipulation of the QEMUMachine arguments, by setting
+> >>>> the arguments, instead of adding to the existing ones.
+> >>>
+> >>> I'm confused by this. The code uses 'add_args', so it does add to the arguments,
+> >>> no?
+> >>>
+> >>
+> >> And you should be.  I changed the code to just add args, and forgot to
+> >> update the commit message.  If a better example comes up that requires
+> >> setting arguments, I'll get back to this.
+> >>
+> >>>>
+> >>>> Signed-off-by: Cleber Rosa <crosa@redhat.com>
+> >>>> ---
+> >>>>  tests/acceptance/test_vnc.py | 50 ++++++++++++++++++++++++++++++++++++
+> >>>>  1 file changed, 50 insertions(+)
+> >>>>  create mode 100644 tests/acceptance/test_vnc.py
+> >>>>
+> >>>> diff --git a/tests/acceptance/test_vnc.py b/tests/acceptance/test_vnc.py
+> >>>> new file mode 100644
+> >>>> index 0000000000..9d9a35cf55
+> >>>> --- /dev/null
+> >>>> +++ b/tests/acceptance/test_vnc.py
+> >>>> @@ -0,0 +1,50 @@
+> >>>
+> >>> Copyright header is missing here too.
+> >>>
+> >>
+> >> Indeed.
+> >>
+> >>> Fam
+> >>>
+> >>>> +from avocado_qemu import Test
+> >>>> +
+> >>>> +
+> >>>> +class Vnc(Test):
+> >>>
+> >>> Should VncTest be a better class name?
+> >>>
+> >>
+> >> I'm favoring simpler names.  If you think about the complete test names,
+> >> it's already too verbose IMO: "test_vnc.Vnc.test_no_vnc".
+> >>
+> >> That's actually an interesting point: how would you feel about dropping
+> >> the "test_" prefix from the file names?
+> > 
+> > I would like this.  The file is already inside a tests/acceptance
+> > directory.
+> > 
+> > About the class name, I would be less surprised when reading the
+> > code if it was called "VncTest", but I won't object to "Vnc" if
+> > you prefer it.
+> > 
+> 
+> We already gained one simplification by dropping the "test_" file
+> prefix, so I wouldn't mind adding the "Test" suffix to the test classes.
+> 
+> Now, before I do, consider that when reading the code you'll find:
+> 
+>    class Vnc(Test):
+>       ...
+> 
+> Which IMO makes it pretty clear that this is a test class.  And as you
+> said it yourself, those files are already in a tests/acceptance directory.
 
-   Please don't error_setg(&error_fatal, ...), use error_report() and
-   exit(), because that's more obvious.
+Yes, he context makes it clear it's a test class, but the pattern
+is still unusual because class names are normally meaningful when
+they are referenced elsewhere.  However, in this case it doesn't
+matter too much because there are no references to "Vnc" in the
+rest of the code.
 
-Suggested-by: Eric Blake <eblake@redhat.com>
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
----
- device_tree.c | 23 +++++++++++++----------
- 1 file changed, 13 insertions(+), 10 deletions(-)
 
-diff --git a/device_tree.c b/device_tree.c
-index 52c3358a55..3553819257 100644
---- a/device_tree.c
-+++ b/device_tree.c
-@@ -140,15 +140,16 @@ static void read_fstree(void *fdt, const char *dirname)
-     const char *parent_node;
- 
-     if (strstr(dirname, root_dir) != dirname) {
--        error_setg(&error_fatal, "%s: %s must be searched within %s",
--                   __func__, dirname, root_dir);
-+        error_report("%s: %s must be searched within %s",
-+                     __func__, dirname, root_dir);
-+        exit(1);
-     }
-     parent_node = &dirname[strlen(SYSFS_DT_BASEDIR)];
- 
-     d = opendir(dirname);
-     if (!d) {
--        error_setg(&error_fatal, "%s cannot open %s", __func__, dirname);
--        return;
-+        error_report("%s cannot open %s", __func__, dirname);
-+        exit(1);
-     }
- 
-     while ((de = readdir(d)) != NULL) {
-@@ -162,7 +163,8 @@ static void read_fstree(void *fdt, const char *dirname)
-         tmpnam = g_strdup_printf("%s/%s", dirname, de->d_name);
- 
-         if (lstat(tmpnam, &st) < 0) {
--            error_setg(&error_fatal, "%s cannot lstat %s", __func__, tmpnam);
-+            error_report("%s cannot lstat %s", __func__, tmpnam);
-+            exit(1);
-         }
- 
-         if (S_ISREG(st.st_mode)) {
-@@ -170,8 +172,9 @@ static void read_fstree(void *fdt, const char *dirname)
-             gsize len;
- 
-             if (!g_file_get_contents(tmpnam, &val, &len, NULL)) {
--                error_setg(&error_fatal, "%s not able to extract info from %s",
--                           __func__, tmpnam);
-+                error_report("%s not able to extract info from %s",
-+                             __func__, tmpnam);
-+                exit(1);
-             }
- 
-             if (strlen(parent_node) > 0) {
-@@ -206,9 +209,9 @@ void *load_device_tree_from_sysfs(void)
-     host_fdt = create_device_tree(&host_fdt_size);
-     read_fstree(host_fdt, SYSFS_DT_BASEDIR);
-     if (fdt_check_header(host_fdt)) {
--        error_setg(&error_fatal,
--                   "%s host device tree extracted into memory is invalid",
--                   __func__);
-+        error_report("%s host device tree extracted into memory is invalid",
-+                     __func__);
-+        exit(1);
-     }
-     return host_fdt;
- }
+> 
+> So back to you (for the last time, I promise): would you like me to add
+> the Test suffix to all test classes?
+
+It's up to you.  I'd add them, but I won't complain too loudly if
+you prefer to not add it.  :)
+
 -- 
-2.17.0
+Eduardo
