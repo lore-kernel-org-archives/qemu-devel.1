@@ -1,27 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48515)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49408)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1fNeUT-0001sv-Ny
-	for qemu-devel@nongnu.org; Tue, 29 May 2018 09:16:43 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1fNeXc-0002uC-QW
+	for qemu-devel@nongnu.org; Tue, 29 May 2018 09:20:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1fNeUP-0001Tw-GX
-	for qemu-devel@nongnu.org; Tue, 29 May 2018 09:16:41 -0400
-Date: Tue, 29 May 2018 10:16:21 -0300
+	(envelope-from <ehabkost@redhat.com>) id 1fNeXZ-00048Q-In
+	for qemu-devel@nongnu.org; Tue, 29 May 2018 09:19:56 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:10876)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1fNeXZ-00047K-A5
+	for qemu-devel@nongnu.org; Tue, 29 May 2018 09:19:53 -0400
+Date: Tue, 29 May 2018 10:19:50 -0300
 From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20180529131621.GX8988@localhost.localdomain>
-References: <20180518180440-mutt-send-email-mst@kernel.org>
-	<20180524113251.GB4660@redhat.com>
-	<d9bb2cb9-d9dc-8fe0-a767-10d9cbbab803@redhat.com>
-	<20180528183058.GG2209@redhat.com>
-	<20180528183833.GJ4580@localhost.localdomain>
-	<bbd19001-3e42-565b-bd48-c4370204c5ff@redhat.com>
-	<20180528190915.GK4580@localhost.localdomain>
-	<233d8d33-1865-9100-aa1e-07979473f495@redhat.com>
-	<20180529101428.GB4756@localhost.localdomain>
+Message-ID: <20180529131950.GY8988@localhost.localdomain>
+References: <20180525184219.14440-1-crosa@redhat.com>
+	<20180525184219.14440-5-crosa@redhat.com>
+	<8ce51f76-9a2d-4de3-c048-e0c27e16b09e@amsat.org>
+	<da53d1ab-69c1-dedd-9f1a-efd57b7766ea@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <20180529101428.GB4756@localhost.localdomain>
-Subject: Re: [Qemu-devel] storing machine data in qcow images?
+In-Reply-To: <da53d1ab-69c1-dedd-9f1a-efd57b7766ea@redhat.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 4/5] scripts/qemu.py: introduce
+ set_console() method
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,74 +31,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: Max Reitz <mreitz@redhat.com>, "Richard W.M. Jones" <rjones@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, stefanha@redhat.com, qemu-devel@nongnu.org, qemu-block@nongnu.org
+To: Cleber Rosa <crosa@redhat.com>
+Cc: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, Fam Zheng <famz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Amador Pahim <amador@pahim.org>
 
-On Tue, May 29, 2018 at 12:14:28PM +0200, Kevin Wolf wrote:
-> Am 29.05.2018 um 11:23 hat Max Reitz geschrieben:
-> > On 2018-05-28 21:09, Kevin Wolf wrote:
-> > > Am 28.05.2018 um 20:44 hat Max Reitz geschrieben:
-> > >> On 2018-05-28 20:38, Kevin Wolf wrote:
-> > >>> Am 28.05.2018 um 20:30 hat Richard W.M. Jones geschrieben:
-> > >>>> On Mon, May 28, 2018 at 08:10:32PM +0200, Max Reitz wrote:
-> > >>>>> As someone who is just naive and doesn't see the big picture, I don't
-> > >>>>> see what's wrong with using a tar file that contains the image and
-> > >>>>> additional data.
-> > >>>>
-> > >>>> FWIW an OVA file is exactly this: an uncompressed tar file containing
-> > >>>> disk image(s) and metadata.
-> > >>>
-> > >>> If we combine VM configuration and the disk image this way, I would
-> > >>> still want to directly use that combined thing without having to extract
-> > >>> its components first.
-> > >>>
-> > >>> Just accessing the image file within a tar archive is possible and we
-> > >>> could write a block driver for that (I actually think we should do
-> > >>> this), but it restricts you because certain operations like resizing
-> > >>> aren't really possible in tar. Unfortunately, resizing is a really
-> > >>> common operation for non-raw image formats.
-> > >>>
-> > >>> And if I think of a file format that can contain several different
-> > >>> things that can be individually resized etc., I end up with qcow2 in the
-> > >>> simple case or a full file system in the more complex case.
-> > >>
-> > >> Well, you end up with VMDK.
-> > > 
-> > > I don't think VMDK can save several different objects? It can have some
-> > > metadata in the descriptor, and it can spread the contents of a single
-> > > object across multiple files (with extents), but I don't think it has
-> > > something comparable to e.g. qcow2 snapshots, which are separate objects
-> > > with an individual size that can dynamically change.
-> > 
-> > Right, I tried to be funny and was over-simplifying in the process.
-> > 
-> > What I meant is: You end up with an image format that is spread on a
-> > filesystem, like VMDK is (usually).  Then you have some metadata
-> > descriptor file that describes the rest and multiple data object files.
-> > 
-> > (For completeness's sake: And you can use an external or an internal
-> > filesystem, that is, use multiple files (like VMDK) or have an internal
-> > filesystem (like tar, except tar doesn't allow fragmentation).)
-> 
-> Let's call the libvirt XML the image file and the qcow2 files its
-> data object files and we're done?
+On Tue, May 29, 2018 at 09:01:42AM -0400, Cleber Rosa wrote:
+> On 05/26/2018 12:54 AM, Philippe Mathieu-Daud=E9 wrote:
+> > Hi Cleber,
+> >=20
+> > On 05/25/2018 03:42 PM, Cleber Rosa wrote:
+> >> The set_console() method is intended to ease higher level use cases
+> >> that require a console device.
+> >>
+> >> The amount of intelligence is limited on purpose, requiring either t=
+he
+> >> device type explicitly, or the existence of a machine (pattern)
+> >> definition.
+> >>
+> >> Because of the console device type selection criteria (by machine
+> >> type), users should also be able to define that.  It'll then be used
+> >> for both '-machine' and for the console device type selection.
+> >>
+> >> Users of the set_console() method will certainly be interested in
+> >> accessing the console device, and for that a console_socket property
+> >> has been added.
+> >>
+> >> Signed-off-by: Cleber Rosa <crosa@redhat.com>
+> >> ---
+> >>  scripts/qemu.py      |  97 +++++++++++++++++++++-
+> >>  scripts/test_qemu.py | 186 ++++++++++++++++++++++++++++++++++++++++=
++++
+> >>  2 files changed, 282 insertions(+), 1 deletion(-)
+> >>  create mode 100644 scripts/test_qemu.py
+> >>
+> >> diff --git a/scripts/qemu.py b/scripts/qemu.py
+> >> index 7cd8193df8..f099ce7278 100644
+> >> --- a/scripts/qemu.py
+> >> +++ b/scripts/qemu.py
+> >> @@ -17,19 +17,41 @@ import logging
+> >>  import os
+> >>  import subprocess
+> >>  import qmp.qmp
+> >> +import re
+> >>  import shutil
+> >> +import socket
+> >>  import tempfile
+> >> =20
+> >> =20
+> >>  LOG =3D logging.getLogger(__name__)
+> >> =20
+> >> =20
+> >> +#: Maps machine types to the preferred console device types
+> >=20
+> > This could be QMP query-able...
+> >=20
+>=20
+> I'm not an expert here, but IIRC Eduardo thinks that the best solution
+> may be for these machine types to implement support for "-serial"
+> instead.  When all machines do that, then this "set_console()" would
+> default to adding a "-serial" argument if no device type is given.
 
-libvirt XML doesn't seems to be a solution for the problem, but a
-separate VM specification file could work anyway.
+Both 'query-machines' and '-serial' would be good solutions for
+this, IMO.  But I don't think this should block the inclusion of
+avocado_qemu.
 
+>=20
+> >> +CONSOLE_DEV_TYPES =3D {
+> >> +    r'^clipper$': 'isa-serial',
+> >> +    r'^malta': 'isa-serial',
+> >> +    r'^(pc.*|q35.*|isapc)$': 'isa-serial',
+> >> +    r'^(40p|powernv|prep)$': 'isa-serial',
+> >> +    r'^pseries.*': 'spapr-vty',
+> >> +    r'^s390-ccw-virtio.*': 'sclpconsole',
+> >> +    }
+> >> +
+> >> +
+[...]
 
-> 
-> I'm afraid spreading things across multiple files doesn't meet the
-> requirements for the problem at hand, though...
-
-Yeah, I wanted to make this an extension of qcow2, so people
-don't have Yet Another file format to choose from.  We could also
-let libvirt automatically write hints to disk images so things
-would Just Work if you copied a disk image from an existing VM.
-
-But I'm not the one working on management layers or guest image
-tools, so I will just trust Richard's and Daniel's opinions on
-this.
-
--- 
+--=20
 Eduardo
