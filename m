@@ -1,22 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35994)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37022)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1fNdjE-0002Dp-9j
-	for qemu-devel@nongnu.org; Tue, 29 May 2018 08:27:53 -0400
+	(envelope-from <mreitz@redhat.com>) id 1fNdmC-0003h1-IC
+	for qemu-devel@nongnu.org; Tue, 29 May 2018 08:30:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1fNdjC-0004P6-Vd
-	for qemu-devel@nongnu.org; Tue, 29 May 2018 08:27:52 -0400
-References: <20180525163327.23097-1-kwolf@redhat.com>
-	<20180525163327.23097-9-kwolf@redhat.com>
+	(envelope-from <mreitz@redhat.com>) id 1fNdmB-0005uF-Do
+	for qemu-devel@nongnu.org; Tue, 29 May 2018 08:30:56 -0400
+References: <20180518132114.4070-1-kwolf@redhat.com>
+	<20180518132114.4070-22-kwolf@redhat.com>
+	<26778cd3-3150-734b-d8c6-afa6e41f0215@redhat.com>
+	<20180524082412.GC4008@localhost.localdomain>
+	<1988292d-467a-9c63-e64d-035b0e93348a@redhat.com>
+	<20180525080035.GA5562@localhost.localdomain>
+	<20180529115907.GA1933@paraplu>
 From: Max Reitz <mreitz@redhat.com>
-Message-ID: <8b64d45f-0e9c-107f-a55a-bb3880c60eb6@redhat.com>
-Date: Tue, 29 May 2018 14:27:40 +0200
+Message-ID: <e380991d-dab8-1923-fb03-bab40e489f1f@redhat.com>
+Date: Tue, 29 May 2018 14:30:47 +0200
 MIME-Version: 1.0
-In-Reply-To: <20180525163327.23097-9-kwolf@redhat.com>
+In-Reply-To: <20180529115907.GA1933@paraplu>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="bNnxCJsA1yxG2zRyhXpi02Ei9IEN6uGG3"
-Subject: Re: [Qemu-devel] [PATCH 08/14] qemu-iotests: Rewrite 206 for
- blockdev-create job
+	boundary="999OCwumA6NH06fs8825xMybLGi9tz4hr"
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v2 21/40] job: Convert
+ block_job_cancel_async() to Job
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,232 +30,131 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
-Cc: jsnow@redhat.com, eblake@redhat.com, pkrempa@redhat.com, qemu-devel@nongnu.org
+To: Kashyap Chamarthy <kchamart@redhat.com>, Kevin Wolf <kwolf@redhat.com>
+Cc: John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org, armbru@redhat.com
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---bNnxCJsA1yxG2zRyhXpi02Ei9IEN6uGG3
+--999OCwumA6NH06fs8825xMybLGi9tz4hr
 From: Max Reitz <mreitz@redhat.com>
-To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
-Cc: jsnow@redhat.com, eblake@redhat.com, pkrempa@redhat.com,
- qemu-devel@nongnu.org
-Message-ID: <8b64d45f-0e9c-107f-a55a-bb3880c60eb6@redhat.com>
-Subject: Re: [PATCH 08/14] qemu-iotests: Rewrite 206 for blockdev-create job
-References: <20180525163327.23097-1-kwolf@redhat.com>
- <20180525163327.23097-9-kwolf@redhat.com>
-In-Reply-To: <20180525163327.23097-9-kwolf@redhat.com>
+To: Kashyap Chamarthy <kchamart@redhat.com>, Kevin Wolf <kwolf@redhat.com>
+Cc: John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org,
+ qemu-block@nongnu.org, armbru@redhat.com
+Message-ID: <e380991d-dab8-1923-fb03-bab40e489f1f@redhat.com>
+Subject: Re: [Qemu-block] [Qemu-devel] [PATCH v2 21/40] job: Convert
+ block_job_cancel_async() to Job
+References: <20180518132114.4070-1-kwolf@redhat.com>
+ <20180518132114.4070-22-kwolf@redhat.com>
+ <26778cd3-3150-734b-d8c6-afa6e41f0215@redhat.com>
+ <20180524082412.GC4008@localhost.localdomain>
+ <1988292d-467a-9c63-e64d-035b0e93348a@redhat.com>
+ <20180525080035.GA5562@localhost.localdomain> <20180529115907.GA1933@paraplu>
+In-Reply-To: <20180529115907.GA1933@paraplu>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On 2018-05-25 18:33, Kevin Wolf wrote:
-> This rewrites the test case 206 to work with the new x-blockdev-create
-> job rather than the old synchronous version of the command.
+On 2018-05-29 13:59, Kashyap Chamarthy wrote:
+> On Fri, May 25, 2018 at 10:00:35AM +0200, Kevin Wolf wrote:
+>> Am 24.05.2018 um 19:42 hat John Snow geschrieben:
 >=20
-> All of the test cases stay the same as before, but in order to be able
-> to implement proper job handling, the test case is rewritten in Python.=
-
+> [...]
 >=20
-> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-> ---
->  tests/qemu-iotests/206        | 705 +++++++++++++++++-----------------=
---------
->  tests/qemu-iotests/206.out    | 241 +++++++++------
->  tests/qemu-iotests/group      |   2 +-
->  tests/qemu-iotests/iotests.py |  15 +
->  4 files changed, 448 insertions(+), 515 deletions(-)
+> (Randomly chiming in for a small clarification.)
 >=20
-> diff --git a/tests/qemu-iotests/206 b/tests/qemu-iotests/206
-> index 0a18b2b19a..9a305302d1 100755
-> --- a/tests/qemu-iotests/206
-> +++ b/tests/qemu-iotests/206
+>>>>> or some other mechanism that accomplishes the same type of behavior=
+=2E It
+>>>>> would be nice if it did not have to be determined at job creation t=
+ime
+>>>>> but instead could be determined later.
+>>>>
+>>>> I agree. We already made sure that job-cancel really means cancel on=
+ the
+>>>> QAPI level, so we're free to do that. We just need to keep supportin=
+g
+>>>> block-job-cancel with the old semantics, so what I have is the easy
+>>>> conversion. We can change the internal implementation when we actual=
+ly
+>>>> implement the selection of a completion mode.
+>>>>
+>>>> Kevin
+>>>>
+>>>
+>>> We need this before 3.0 though, yeah? unless we make job-cancel
+>>> x-job-cancel or some other warning that the way it works might change=
+, yeah?
+>>>
+>>> Or do I misunderstand our leeway to change this at a later point in t=
+ime?
+>>>
+>>> (can job-cancel apply to block jobs created with the legacy
+>>> infrastructure? My reading was "yes.")
+>>
+>> It can, and it already has its final semantics, so nothing has to chan=
+ge
+>> before 3.0. job-cancel is equivalent to block-job-cancel with fixed
+>> force=3Dtrue. If you want the complete-by-cancel behaviour of mirror, =
+you
+>> have to use block-job-cancel for now, because job-cancel doesn't provi=
+de
+>> that functionality.
+>=20
+> I think by "complete-by-cancel" you are referring to this[*] magic
+> behaviour, mentioned in the last sentence here:
+>=20
+>     When you cancel an in-progress =E2=80=98mirror=E2=80=99 job before =
+the source and
+>     target are synchronized, block-job-cancel will emit the event
+>     BLOCK_JOB_CANCELLED. However, note that if you cancel a =E2=80=98mi=
+rror=E2=80=99 job
+>     after it has indicated (via the event BLOCK_JOB_READY) that the
+>     source and target have reached synchronization, then the event
+>     emitted by block-job-cancel changes to BLOCK_JOB_COMPLETED.
+>=20
+>=20
+> [*] https://git.qemu.org/?p=3Dqemu.git;a=3Dblob;f=3Ddocs/interop/live-b=
+lock-operations.rst#l515
+>=20
+>> So what we can change later is adding a way to initiate this secondary=
 
-[...]
+>> completion mode with a job-* command (probably with a new option for
+>> job-complete). But we wouldn't change the semantics of exisiting
+>> commands.
+>=20
+> Ah, so if I'm understanding it correctly, the existing subtle magic of
+> "complete-by-cancel" will be rectified by separting the two distinct
+> operations: 'job-cancel' and 'job-complete'.
 
-> +import iotests
-> +from iotests import imgfmt
-> +
-> +iotests.verify_image_format(supported_fmts=3D['qcow2'])
-> +
-> +def blockdev_create(vm, options):
-> +    result =3D vm.qmp_log('x-blockdev-create', job_id=3D'job0', option=
-s=3Doptions)
-> +
-> +    if 'return' in result:
-> +        assert result['return'] =3D=3D {}
-> +        vm.run_job('job0')
-> +    iotests.log("")
-> +
-> +with iotests.FilePath('t.qcow2') as disk_path, \
-> +     iotests.FilePath('t.qcow2.base') as backing_path, \
-> +     iotests.VM() as vm:
-> +
-> +    vm.add_object('secret,id=3Dkeysec0,data=3D"foo"')
+Not really, because we already had those two operations for block jobs.
+The thing is that block-job-complete (and thus job-complete) will pivot
+to the target disk, but block-job-cancel doesn't.
 
-I don't know how subprocess.Popen() works, but are you sure you aren't
-encrypting with '"foo"' now?  (i.e. literally that key, including quotes)=
+The special behavior is that you can use block-job-cancel after
+BLOCK_JOB_READY to complete the job, but not pivot to it.  I don't think
+we have a real plan on how to represent that with the generic job
+commands, we just know that we don't want to use job-cancel.
 
-
-> +
-> +    #
-> +    # Successful image creation (defaults)
-> +    #
-> +    iotests.log("=3D=3D=3D Successful image creation (defaults) =3D=3D=
-=3D")
-
-OK, the comment makes sense for visual separation.  But so would leaving
-three empty lines.  *cough*
-
-> +    iotests.log("")
-> +
-> +    size =3D 128 * 1024 * 1024
-> +
-> +    vm.launch()
-> +    blockdev_create(vm, { 'driver': 'file',
-> +                          'filename': disk_path,
-> +                          'size': 0 })
-> +
-> +    vm.qmp_log('blockdev-add', driver=3D'file', filename=3Ddisk_path,
-> +               node_name=3D'imgfile')
-> +
-> +    blockdev_create(vm, { 'driver': imgfmt,
-> +                          'file': 'imgfile',
-> +                          'size': size })
-> +    vm.shutdown()
-> +
-> +    iotests.img_info_log(disk_path)
-> +
-
-[...]
-
-> +    #
-> +    # Successful image creation (v2 non-default options)
-> +    #
-> +    iotests.log("=3D=3D=3D Successful image creation (v2 non-default o=
-ptions) =3D=3D=3D")
-> +    iotests.log("")
-> +
-> +    vm.launch()
-> +    blockdev_create(vm, { 'driver': 'file',
-> +                          'filename': disk_path,
-> +                          'size': 0 })
-> +
-> +    blockdev_create(vm, { 'driver': imgfmt,
-> +                          'file': {
-> +                              'driver': 'file',
-> +                              'filename': disk_path,
-> +                          },
-> +                          'size': size,
-> +                          'backing-file': backing_path,
-
-Change from the bash version: backing_path does not exist here.  Not
-sure if that was intentional.
-
-> +                          'backing-fmt': 'qcow2',
-> +                          'version': 'v2',
-> +                          'cluster-size': 512 })
-> +    vm.shutdown()
-> +
-> +    iotests.img_info_log(disk_path)
-
-[...]
-
-> +    #
-> +    # Invalid sizes
-> +    #
-> +    iotests.log("=3D=3D=3D Invalid sizes =3D=3D=3D")
-> +
-> +    # TODO Negative image sizes aren't handled correctly, but this is =
-a problem
-> +    # with QAPI's implementation of the 'size' type and affects other =
-commands
-> +    # as well. Once this is fixed, we may want to add a test case here=
-=2E
-> +    #
-> +    # 1. Misaligned image size
-> +    # 2. 2^64 - 512
-> +    # 3. 2^63 =3D 8 EB (qemu-img enforces image sizes less than this)
-> +    # 4. 2^63 - 512 (generally valid, but qcow2 can't handle images th=
-is size)
-> +
-> +    vm.add_blockdev('driver=3Dfile,filename=3D%s,node-name=3Dnode0' % =
-(disk_path))
-> +
-> +    vm.launch()
-> +    blockdev_create(vm, { 'driver': imgfmt,
-> +                          'file': 'node0',
-> +                          'size': 1234  })
-> +    blockdev_create(vm, { 'driver': imgfmt,
-> +                          'file': 'node0',
-> +                          'size': 18446744073709551104 })
-> +    blockdev_create(vm, { 'driver': imgfmt,
-> +                          'file': 'node0',
-> +                          'size': 9223372036854775808 })
-> +    blockdev_create(vm, { 'driver': imgfmt,
-> +                          'file': 'node0',
-> +                          'size': 9223372036854775296})
-
-Missing space before the closing fancy bracket, critical!
-
-[...]
-
-> diff --git a/tests/qemu-iotests/iotests.py b/tests/qemu-iotests/iotests=
-=2Epy
-> index 20ce5a0cf0..f0f4ef32f0 100644
-> --- a/tests/qemu-iotests/iotests.py
-> +++ b/tests/qemu-iotests/iotests.py
-> @@ -416,6 +416,21 @@ class VM(qtest.QEMUQtestMachine):
->          log(result)
->          return result
-> =20
-> +    def run_job(self, job):
-
-Is there any reason this function did not get its own patch?
-
-Also, this is a function specifically for jobs that need a manual
-dismiss but have auto-finalize.  That should be noted somewhere (ideally
-in the function's name, but spontaneously I don't know how).
-
-> +        while True:
-> +            for ev in self.get_qmp_events_filtered(wait=3DTrue):
-> +                if ev['event'] =3D=3D 'JOB_STATUS_CHANGE':
-> +                    if ev['data']['status'] =3D=3D 'aborting':
-> +                        result =3D self.qmp('query-jobs')
-> +                        for j in result['return']:
-> +                            log('Job failed: %s' % (j.get('error', Non=
-e)))
-
-I can understand that you didn't want to use just result['return'][0],
-but if you do iterate, you should probably emit the job ID as well.
+(Maybe we can add a flag to job-complete (which to me does not sound
+like a good idea), or you could set flags on jobs while they are
+running, so you can set a do-not-pivot flag on the mirror job before you
+complete it.)
 
 Max
 
-> +                    elif ev['data']['status'] =3D=3D 'concluded':
-> +                        self.qmp_log('job-dismiss', id=3Djob)
-> +                    elif ev['data']['status'] =3D=3D 'null':
-> +                        return
-> +                else:
-> +                    iotests.log(ev)
-> +
-> =20
->  index_re =3D re.compile(r'([^\[]+)\[([^\]]+)\]')
 
-
-
---bNnxCJsA1yxG2zRyhXpi02Ei9IEN6uGG3
+--999OCwumA6NH06fs8825xMybLGi9tz4hr
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlsNRzwACgkQ9AfbAGHV
-z0AYCAgAix9Fatau9RD7a8CcIdsgGpBo/lM+YttPZ0Jk5eq2xqOhliSsY3RCACJP
-ZeSIZLy8yfPZfQiBLC7Flmsxve2umef6+xCwqgtECs1+2lHB6/yTt6+e87zqYSfB
-tqDTHHplmQf73mB4h+wtlhWBb/46IwJW4GivT0s+t33hvmd/iXZ8k/ngM++XBHUl
-N872QlkaaQuIUZlR+cXbEz2x5/fZaSMp1QYINMrehapCSeE6UgaYM9/IPQeLZDky
-TOuA4By0+T+XPwber4MsQuNwWTM3V+UMmRcPGT3kSeyfHpTwRTxCcPXB+nS529k9
-MzomgdvXknOKKFm6UMd+cr3eLumL1A==
-=p23a
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlsNR/cACgkQ9AfbAGHV
+z0C21Af/enXMvuhj3BrWOOB3JVkTrBw5nRdpEAJ+Q4oLyVBPmrhk+h8Vj79tJnmJ
+wFxV1yFtEjcxJNLzObtk956hrnNrmbs+mLaSnE+LtIyEW6Ltlf+ytbneK9zc1zXg
+WMFPUlghiSJYnlUwNppasdEJrVIn07A0c979hKGsjmBWMHe2UY5XoA9OdIi9iZba
+sa4ExQ/1R7/wH6fLBE/Nvw6qUlIgkzEGLIGekIp9Dwmek+NzKoamATlWK0kl54dT
+uiN6H+Jf7i7EqbALL9WrRh2luvqEGs810Rdn33vmMmsvkr9LNRf41ggPdfd0xLbX
+qGOabDPWSpbQ6uf4MbKtBmW/39jiQQ==
+=f4fy
 -----END PGP SIGNATURE-----
 
---bNnxCJsA1yxG2zRyhXpi02Ei9IEN6uGG3--
+--999OCwumA6NH06fs8825xMybLGi9tz4hr--
