@@ -1,23 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56726)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58044)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1fNiF1-0003QC-L9
-	for qemu-devel@nongnu.org; Tue, 29 May 2018 13:17:00 -0400
+	(envelope-from <kwolf@redhat.com>) id 1fNiK5-0004ia-5Y
+	for qemu-devel@nongnu.org; Tue, 29 May 2018 13:22:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1fNiF0-0005Uw-A3
-	for qemu-devel@nongnu.org; Tue, 29 May 2018 13:16:59 -0400
-Date: Tue, 29 May 2018 18:16:44 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20180529171643.GD2575@work-vm>
-References: <20180518132114.4070-1-kwolf@redhat.com>
-	<20180518184151.GA2479@work-vm>
-	<20180522110114.GC6233@localhost.localdomain>
-	<CAMxuvaxnRF4RJhjr3ZgM=w6EB=1vx_ZyE6BUdNnw=uUAu3bK7g@mail.gmail.com>
+	(envelope-from <kwolf@redhat.com>) id 1fNiK3-0001dx-Ve
+	for qemu-devel@nongnu.org; Tue, 29 May 2018 13:22:13 -0400
+From: Kevin Wolf <kwolf@redhat.com>
+Date: Tue, 29 May 2018 19:21:36 +0200
+Message-Id: <20180529172156.29311-1-kwolf@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <CAMxuvaxnRF4RJhjr3ZgM=w6EB=1vx_ZyE6BUdNnw=uUAu3bK7g@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 00/40] Generic background jobs
+Subject: [Qemu-devel] [PATCH v2 00/20] Drain fixes and cleanups, part 3
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,90 +20,94 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block <qemu-block@nongnu.org>, qemu-devel <qemu-devel@nongnu.org>, John Snow <jsnow@redhat.com>, Jeff Cody <jcody@redhat.com>, "Armbruster, Markus" <armbru@redhat.com>, Max Reitz <mreitz@redhat.com>
+To: qemu-block@nongnu.org
+Cc: kwolf@redhat.com, mreitz@redhat.com, pbonzini@redhat.com, famz@redhat.com, stefanha@redhat.com, eblake@redhat.com, qemu-devel@nongnu.org
 
-* Marc-Andr=E9 Lureau (marcandre.lureau@redhat.com) wrote:
-> Hi
->=20
-> On Tue, May 22, 2018 at 1:01 PM, Kevin Wolf <kwolf@redhat.com> wrote:
-> > Am 18.05.2018 um 20:41 hat Dr. David Alan Gilbert geschrieben:
-> >> * Kevin Wolf (kwolf@redhat.com) wrote:
-> >> > Before we can make x-blockdev-create a background job, we need to
-> >> > generalise the job infrastructure so that it can be used without a=
-ny
-> >> > associated block node.
-> >>
-> >> Is there any relationship between what this does, and what
-> >> Marc-Andr=E9's 'monitor: add asynchronous command type' tries to do?
-> >> (See 20180326150916.9602-1-marcandre.lureau@redhat.com 26th March)
-> >
-> > Depends on who you ask. :-)
-> >
-> > In a way, yes. Marc-Andr=E9's async commands are for long-running
-> > operations and jobs are for long-running operations. However, they ar=
-e
-> > for a different kind of "long-running".
-> >
-> > Basically, Marc-Andr=E9's work is for commands that are generally qui=
-ck,
-> > but perform some blocking operation. Usually commands that are curren=
-tly
-> > implemented synchronously, but always bothered us because they block =
-the
-> > VM for a while. They take maybe a few seconds at most, but you really
-> > don't want them to block the guest even for short time.
-> >
-> > The important part here is you don't want to modify the operations wh=
-ile
-> > they're running, they just send their return value when they are done=
-.
-> > (In the latest version, Marc-Andr=E9 even made sure not to modify the=
- wire
-> > protocol, so IIUC the commands aren't really async any more in the se=
-nse
-> > that you can have multiple commands running, but they are just
-> > non-blocking in the sense that the guest can keep running while they =
-are
-> > doing their work.)
-> >
-> > In comparison, jobs are typically really long running, like several
-> > minutes (like copying a whole disk image). Some of them can even run
-> > indefinitely (like mirroring) until you explicitly tell them to stop.
-> > You want to continue using the monitor while they are running, and to=
- be
-> > able to manage them at runtime (pause/resume/set speed/cancel/...).
-> >
-> > So I think both address different problems.
->=20
-> I agree with Kevin that both address different needs and complement
-> each other. Right now, QMP commands are handled synchronous, so they
-> block the main thread (or the "OOB" thread). I needed a simple way to
-> handle them asynchronously, *without* breaking or changing an existing
-> QMP command API. Job, on the other hand, provides a lot of facilities
-> that are unnecessary for most short living commands, while adding
-> complexity, at the protocol level (for instance, by using an extra
-> "job-id" space and not being tied to the qmp session). Depending on
-> the facilities Job provide, and the guarantee that must hold when
-> using it, it may make sense or help to transform an existing command
-> to an asynchronous version, but I doubt many of the existing commands
-> will need it. However, if there is a need to introduce job-like
-> facilities to QMP async (such as running concurrent commands, listing
-> running commands, being able to cancel them, being notified on
-> progression etc), then I think we should be careful to use Job. For
-> now, this is unneeded, as QMP async is internal to qemu, the client
-> can't run anything  to manage an ongoing async command, so I think
-> both are improvements and will coexist harmoniously.
+This is the third and hopefully for now last part of my work to fix
+drain. The main goal of this series is to make drain robust against
+graph changes that happen in any callbacks of in-flight requests while
+we drain a block node.
 
-OK; it seems we are carving stuff up into a whole bunch of different
-categories based on their longevity and blockableness.
-(Normal, OOB, Async, Job)
+The individual patches describe the details, but the rough plan is to
+change all three drain types (single node, subtree and all) to work like
+this:
 
-I do worry a bit that pretty much anything that's not 'instant' means
-it's waiting for something somewhere, and because you're waiting
-for something that means you've got to be able to fail or cancel
-it in case that thing never happens.
+1. First call all the necessary callbacks to quiesce external sources
+   for new requests. This includes the block driver callbacks, the child
+   node callbacks and disabling external AioContext events. This is done
+   recursively.
 
-Dave
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+   Much of the trouble we had with drain resulted from the fact that the
+   graph changed while we were traversing the graph recursively. None of
+   the callbacks called in this phase may change the graph.
+
+2. Then do a single AIO_WAIT_WHILE() to drain the requests of all
+   affected nodes. The aio_poll() called by it is where graph changes
+   can happen and we need to be careful.
+
+   However, while evaluating the loop condition, the graph can't change,
+   so we can safely call all necessary callbacks, if needed recursively,
+   to determine whether there are still pending requests in any affected
+   nodes. We just need to make sure that we don't rely on the set of
+   nodes being the same between any two evaluation of the condition.
+
+There are a few more smaller, mostly self-contained changes needed
+before we're actually safe, but this is the main mechanism that will
+help you understand what we're working towards during the series.
+
+v2:
+
+- Rebased on top of current master (e.g. including Job infrastructure)
+
+- Avoid unnecessary parent callbacks for .drained_begin/poll/end:
+  * subtree drains: Don't propagate the drain to the parent that we came
+                    from recursively
+  * drain_all:      Don't propagate the drain to BDS parents (which are
+                    already separately drained), but only to non-BDS
+                    parents like BBs or Jobs
+
+- Separate bdrv_drain_poll_top_level() function instead of having a
+  top_level parameter for bdrv_drain_poll().
+
+- A few commit message and comment improvements
+
+
+Kevin Wolf (19):
+  test-bdrv-drain: bdrv_drain() works with cross-AioContext events
+  block: Use bdrv_do_drain_begin/end in bdrv_drain_all()
+  block: Remove 'recursive' parameter from bdrv_drain_invoke()
+  block: Don't manually poll in bdrv_drain_all()
+  tests/test-bdrv-drain: bdrv_drain_all() works in coroutines now
+  block: Avoid unnecessary aio_poll() in AIO_WAIT_WHILE()
+  block: Really pause block jobs on drain
+  block: Remove bdrv_drain_recurse()
+  block: Drain recursively with a single BDRV_POLL_WHILE()
+  test-bdrv-drain: Test node deletion in subtree recursion
+  block: Don't poll in parent drain callbacks
+  test-bdrv-drain: Graph change through parent callback
+  block: Defer .bdrv_drain_begin callback to polling phase
+  test-bdrv-drain: Test that bdrv_drain_invoke() doesn't poll
+  block: Allow AIO_WAIT_WHILE with NULL ctx
+  block: Move bdrv_drain_all_begin() out of coroutine context
+  block: ignore_bds_parents parameter for drain functions
+  block: Allow graph changes in bdrv_drain_all_begin/end sections
+  test-bdrv-drain: Test graph changes in drain_all section
+
+Max Reitz (1):
+  test-bdrv-drain: Add test for node deletion
+
+ include/block/aio-wait.h     |  25 +-
+ include/block/block.h        |  31 +-
+ include/block/block_int.h    |  14 +
+ include/block/blockjob_int.h |   8 +
+ block.c                      |  52 +++-
+ block/io.c                   | 332 ++++++++++++--------
+ block/mirror.c               |   8 +
+ block/vvfat.c                |   1 +
+ blockjob.c                   |  23 ++
+ tests/test-bdrv-drain.c      | 705 +++++++++++++++++++++++++++++++++++++=
+++++--
+ 10 files changed, 1032 insertions(+), 167 deletions(-)
+
+--=20
+2.13.6
