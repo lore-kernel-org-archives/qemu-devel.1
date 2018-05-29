@@ -1,33 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48409)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51806)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fNhix-0003nA-9F
-	for qemu-devel@nongnu.org; Tue, 29 May 2018 12:43:52 -0400
+	(envelope-from <clg@kaod.org>) id 1fNhv7-0007kE-BV
+	for qemu-devel@nongnu.org; Tue, 29 May 2018 12:56:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fNhis-0004u2-Ch
-	for qemu-devel@nongnu.org; Tue, 29 May 2018 12:43:51 -0400
-Received: from mail-qk0-x243.google.com ([2607:f8b0:400d:c09::243]:45855)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fNhis-0004tq-7y
-	for qemu-devel@nongnu.org; Tue, 29 May 2018 12:43:46 -0400
-Received: by mail-qk0-x243.google.com with SMTP id c198-v6so11994507qkg.12
-	for <qemu-devel@nongnu.org>; Tue, 29 May 2018 09:43:46 -0700 (PDT)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20180528061154.25367-1-f4bug@amsat.org>
-	<CAFEAcA_ob6mHqfAAM9iAMae5vfxaYhmcqkk-gJH+s1mHuvFp8g@mail.gmail.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <b658201f-146d-197e-3a61-36ba6a2d8aee@amsat.org>
-Date: Tue, 29 May 2018 13:43:41 -0300
+	(envelope-from <clg@kaod.org>) id 1fNhv3-0004no-FW
+	for qemu-devel@nongnu.org; Tue, 29 May 2018 12:56:25 -0400
+Received: from 3.mo178.mail-out.ovh.net ([46.105.44.197]:54878)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1fNhv3-0004nE-9U
+	for qemu-devel@nongnu.org; Tue, 29 May 2018 12:56:21 -0400
+Received: from player695.ha.ovh.net (unknown [10.109.105.29])
+	by mo178.mail-out.ovh.net (Postfix) with ESMTP id 3F48518336
+	for <qemu-devel@nongnu.org>; Tue, 29 May 2018 18:56:19 +0200 (CEST)
+References: <20180529062838.20556-1-clg@kaod.org>
+	<20180529062838.20556-3-clg@kaod.org>
+	<b0cb42ea-16f7-7806-814c-f472867e1a6a@amsat.org>
+From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Message-ID: <e21c77e5-c1de-eaf9-5357-1147f5d14ca0@kaod.org>
+Date: Tue, 29 May 2018 18:56:12 +0200
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA_ob6mHqfAAM9iAMae5vfxaYhmcqkk-gJH+s1mHuvFp8g@mail.gmail.com>
+In-Reply-To: <b0cb42ea-16f7-7806-814c-f472867e1a6a@amsat.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [RFC PATCH] hw/misc/unimp: Add
- create_unimplemented_subregion_device()
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH 2/6] ftgmac100: add IEEE 802.1Q
+ VLAN support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,50 +33,107 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Richard Henderson <richard.henderson@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, Alexey Korolev <akorolex@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, qemu-arm@nongnu.org
+Cc: Samuel Thibault <samuel.thibault@ens-lyon.org>, Jason Wang <jasowang@redhat.com>, qemu-devel@nongnu.org
 
-On 05/29/2018 12:08 PM, Peter Maydell wrote:
-> On 28 May 2018 at 07:11, Philippe Mathieu-Daudé <f4bug@amsat.org> wrote:
->> The create_unimplemented_device() function is very useful to
->> register unimplemented devices to the SysBus 'absolute' address.
+On 05/29/2018 03:34 PM, Philippe Mathieu-Daud=C3=A9 wrote:
+> Hi C=C3=A9dric,
+>=20
+> On 05/29/2018 03:28 AM, C=C3=A9dric Le Goater wrote:
+>> The ftgmac100 NIC supports VLAN tag insertion and the MAC engine also
+>> has a control to remove VLAN tags from received packets.
 >>
->> Some devices are modelled as container of memory subregions,
->> the subregions being mmio-mapped relatively to the container
->> base address.
+>> The VLAN control bits and VLAN tag information are contained in the
+>> second word of the transmit and receive descriptors. The Insert VLAN
+>> bit and the VLAN Tag available bit are only valid in the first segment
+>> of the packet.
 >>
->> With these container devices, the current create_unimplemented_device()
->> does not work.
->> Add a function to remove the current limitation, and allow
->> containerized devices to use the helpful UnimplementedDevice.
->>
->> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+>> Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
 >> ---
->> I don't like the function name much, I first tried with
->> create_unimplemented_device_mr() :( Would it be cleaner renaming current
->> create_unimplemented_device() -> create_unimplemented_sysbus_device()?
+>>  hw/net/ftgmac100.c | 32 +++++++++++++++++++++++++++++++-
+>>  1 file changed, 31 insertions(+), 1 deletion(-)
 >>
->> Also, is this useful to have this code inlined?
-> 
-> My experience has been that devices that want to map the
-> unimplemented device into some other container probably
-> also want to do in-place initialization rather than using
-> qdev_create() -- eg hw/arm/iotkit.c which directly creates
-> TYPE_UNIMPLEMENTED_DEVICEs which are embedded in its state
-> struct.
-> 
-> It was always the intention that you can create a
-> TYPE_UNIMPLEMENTED_DEVICE directly; create_unimplemented_device()
-> is just a convenience wrapper.
+>> diff --git a/hw/net/ftgmac100.c b/hw/net/ftgmac100.c
+>> index 7598d08c9cb9..50af1222464a 100644
+>> --- a/hw/net/ftgmac100.c
+>> +++ b/hw/net/ftgmac100.c
+>> @@ -443,6 +443,24 @@ static void ftgmac100_do_tx(FTGMAC100State *s, ui=
+nt32_t tx_ring,
+>>              break;
+>>          }
+>> =20
+>> +        /* Check for VLAN */
+>> +        if (bd.des0 & FTGMAC100_TXDES0_FTS &&
+>> +            bd.des1 & FTGMAC100_TXDES1_INS_VLANTAG &&
+>> +            be16_to_cpu(PKT_GET_ETH_HDR(ptr)->h_proto) !=3D ETH_P_VLA=
+N) {
+>> +            if (frame_size + len + 4 > sizeof(s->frame)) {
+>> +                qemu_log_mask(LOG_GUEST_ERROR, "%s: frame too big : %=
+d bytes\n",
+>> +                              __func__, len);
+>> +                s->isr |=3D FTGMAC100_INT_XPKT_LOST;
+>> +                len =3D  sizeof(s->frame) - frame_size - 4;
+>> +            }
+>> +            memmove(ptr + 16, ptr + 12, len - 12);
+>> +            ptr[12] =3D 0x81;
+>> +            ptr[13] =3D 0x00;
+>=20
+>                stw_be_p(ptr + 12, ETH_P_VLAN);
+>=20
+>> +            ptr[14] =3D (uint8_t) bd.des1 >> 8;
+>> +            ptr[15] =3D (uint8_t) bd.des1;
+>=20
+>                stw_be_p(ptr + 12, bd.des1);
 
-OK.
+ptr + 14
 
-> I'm not opposed to having another convenience wrapper here;
-> but I'm not sure this is the right API for one (ie if it
-> would be used in very many places).
+>> +            len +=3D 4;
+>> +        }
+>> +
+>>          ptr +=3D len;
+>>          frame_size +=3D len;
+>>          if (bd.des0 & FTGMAC100_TXDES0_LTS) {
+>> @@ -858,7 +876,19 @@ static ssize_t ftgmac100_receive(NetClientState *=
+nc, const uint8_t *buf,
+>>              buf_len +=3D size - 4;
+>>          }
+>>          buf_addr =3D bd.des3;
+>> -        dma_memory_write(&address_space_memory, buf_addr, buf, buf_le=
+n);
+>> +        if (first && proto =3D=3D ETH_P_VLAN && buf_len >=3D 18) {
+>> +            bd.des1 =3D (buf[14] << 8) | buf[15] | FTGMAC100_RXDES1_V=
+LANTAG_AVAIL;
+>=20
+>                bd.des1 =3D lduw_be_p(buf + 14) |
+> FTGMAC100_RXDES1_VLANTAG_AVAIL;
+>=20
+>> +            if (s->maccr & FTGMAC100_MACCR_RM_VLAN) {
+>> +                dma_memory_write(&address_space_memory, buf_addr, buf=
+, 12);
+>> +                dma_memory_write(&address_space_memory, buf_addr + 12=
+, buf + 16,
+>> +                                 buf_len - 16);
+>> +            } else {
+>> +                dma_memory_write(&address_space_memory, buf_addr, buf=
+, buf_len);
+>> +            }
+>> +        } else {
+>> +            bd.des1 =3D 0;
+>> +            dma_memory_write(&address_space_memory, buf_addr, buf, bu=
+f_len);
+>> +        }
+>>          buf +=3D buf_len;
+>>          if (size < 4) {
+>>              dma_memory_write(&address_space_memory, buf_addr + buf_le=
+n,
+>>
+>=20
+> With ldst API uses:
+> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+>=20
 
-Fair enough.
+Sure, I will fix these.
 
 Thanks,
 
-Phil.
+C.=20
