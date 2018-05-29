@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53530)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54354)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fNemI-0003Ti-Qj
-	for qemu-devel@nongnu.org; Tue, 29 May 2018 09:35:12 -0400
+	id 1fNeqn-0004Tb-8f
+	for qemu-devel@nongnu.org; Tue, 29 May 2018 09:39:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fNemF-0000AQ-O1
-	for qemu-devel@nongnu.org; Tue, 29 May 2018 09:35:06 -0400
+	id 1fNeqm-0005AU-G2
+	for qemu-devel@nongnu.org; Tue, 29 May 2018 09:39:45 -0400
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
-References: <20180529062838.20556-1-clg@kaod.org>
-	<20180529062838.20556-3-clg@kaod.org>
+References: <20180529041946.9481-1-joel@jms.id.au>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <b0cb42ea-16f7-7806-814c-f472867e1a6a@amsat.org>
-Date: Tue, 29 May 2018 10:34:57 -0300
+Message-ID: <c953d1dd-8e43-c781-9c4e-434ad1f9c084@amsat.org>
+Date: Tue, 29 May 2018 10:39:35 -0300
 MIME-Version: 1.0
-In-Reply-To: <20180529062838.20556-3-clg@kaod.org>
+In-Reply-To: <20180529041946.9481-1-joel@jms.id.au>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH 2/6] ftgmac100: add IEEE 802.1Q
- VLAN support
+Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH v3] aspeed_scu: Implement RNG
+ register
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,86 +28,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>, qemu-arm@nongnu.org
-Cc: Samuel Thibault <samuel.thibault@ens-lyon.org>, Jason Wang <jasowang@redhat.com>, qemu-devel@nongnu.org
+To: Joel Stanley <joel@jms.id.au>, qemu-devel@nongnu.org, qemu-arm@nongnu.org
+Cc: Andrew Jeffery <andrew@aj.id.au>, =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
 
-Hi Cédric,
-
-On 05/29/2018 03:28 AM, Cédric Le Goater wrote:
-> The ftgmac100 NIC supports VLAN tag insertion and the MAC engine also
-> has a control to remove VLAN tags from received packets.
+On 05/29/2018 01:19 AM, Joel Stanley wrote:
+> The ASPEED SoCs contain a single register that returns random data when
+> read. This models that register so that guests can use it.
 > 
-> The VLAN control bits and VLAN tag information are contained in the
-> second word of the transmit and receive descriptors. The Insert VLAN
-> bit and the VLAN Tag available bit are only valid in the first segment
-> of the packet.
+> The random number data register has a corresponding control register,
+> however it returns data regardless of the state of the enabled bit, so
+> the model follows this behaviour.
 > 
-> Signed-off-by: Cédric Le Goater <clg@kaod.org>
-> ---
->  hw/net/ftgmac100.c | 32 +++++++++++++++++++++++++++++++-
->  1 file changed, 31 insertions(+), 1 deletion(-)
-> 
-> diff --git a/hw/net/ftgmac100.c b/hw/net/ftgmac100.c
-> index 7598d08c9cb9..50af1222464a 100644
-> --- a/hw/net/ftgmac100.c
-> +++ b/hw/net/ftgmac100.c
-> @@ -443,6 +443,24 @@ static void ftgmac100_do_tx(FTGMAC100State *s, uint32_t tx_ring,
->              break;
->          }
->  
-> +        /* Check for VLAN */
-> +        if (bd.des0 & FTGMAC100_TXDES0_FTS &&
-> +            bd.des1 & FTGMAC100_TXDES1_INS_VLANTAG &&
-> +            be16_to_cpu(PKT_GET_ETH_HDR(ptr)->h_proto) != ETH_P_VLAN) {
-> +            if (frame_size + len + 4 > sizeof(s->frame)) {
-> +                qemu_log_mask(LOG_GUEST_ERROR, "%s: frame too big : %d bytes\n",
-> +                              __func__, len);
-> +                s->isr |= FTGMAC100_INT_XPKT_LOST;
-> +                len =  sizeof(s->frame) - frame_size - 4;
-> +            }
-> +            memmove(ptr + 16, ptr + 12, len - 12);
-> +            ptr[12] = 0x81;
-> +            ptr[13] = 0x00;
+> Reviewed-by: Cédric Le Goater <clg@kaod.org>
+> Signed-off-by: Joel Stanley <joel@jms.id.au>
 
-               stw_be_p(ptr + 12, ETH_P_VLAN);
-
-> +            ptr[14] = (uint8_t) bd.des1 >> 8;
-> +            ptr[15] = (uint8_t) bd.des1;
-
-               stw_be_p(ptr + 12, bd.des1);
-
-> +            len += 4;
-> +        }
-> +
->          ptr += len;
->          frame_size += len;
->          if (bd.des0 & FTGMAC100_TXDES0_LTS) {
-> @@ -858,7 +876,19 @@ static ssize_t ftgmac100_receive(NetClientState *nc, const uint8_t *buf,
->              buf_len += size - 4;
->          }
->          buf_addr = bd.des3;
-> -        dma_memory_write(&address_space_memory, buf_addr, buf, buf_len);
-> +        if (first && proto == ETH_P_VLAN && buf_len >= 18) {
-> +            bd.des1 = (buf[14] << 8) | buf[15] | FTGMAC100_RXDES1_VLANTAG_AVAIL;
-
-               bd.des1 = lduw_be_p(buf + 14) |
-FTGMAC100_RXDES1_VLANTAG_AVAIL;
-
-> +            if (s->maccr & FTGMAC100_MACCR_RM_VLAN) {
-> +                dma_memory_write(&address_space_memory, buf_addr, buf, 12);
-> +                dma_memory_write(&address_space_memory, buf_addr + 12, buf + 16,
-> +                                 buf_len - 16);
-> +            } else {
-> +                dma_memory_write(&address_space_memory, buf_addr, buf, buf_len);
-> +            }
-> +        } else {
-> +            bd.des1 = 0;
-> +            dma_memory_write(&address_space_memory, buf_addr, buf, buf_len);
-> +        }
->          buf += buf_len;
->          if (size < 4) {
->              dma_memory_write(&address_space_memory, buf_addr + buf_len,
-> 
-
-With ldst API uses:
 Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+
+> ---
+> v2:
+>  - Remove call to qcrypto_random_init as this is done in main()
+> v3:
+>  - Add Cédric's reviewed-by
+>  - Add a comment about why we don't check for the rng enable bit
+> ---
+>  hw/misc/aspeed_scu.c | 19 +++++++++++++++++++
+>  1 file changed, 19 insertions(+)
+> 
+> diff --git a/hw/misc/aspeed_scu.c b/hw/misc/aspeed_scu.c
+> index 5e6d5744eeca..96db052389cc 100644
+> --- a/hw/misc/aspeed_scu.c
+> +++ b/hw/misc/aspeed_scu.c
+> @@ -16,6 +16,7 @@
+>  #include "qapi/visitor.h"
+>  #include "qemu/bitops.h"
+>  #include "qemu/log.h"
+> +#include "crypto/random.h"
+>  #include "trace.h"
+>  
+>  #define TO_REG(offset) ((offset) >> 2)
+> @@ -154,6 +155,18 @@ static const uint32_t ast2500_a1_resets[ASPEED_SCU_NR_REGS] = {
+>       [BMC_DEV_ID]      = 0x00002402U
+>  };
+>  
+> +static uint32_t aspeed_scu_get_random(void)
+> +{
+> +    Error *err = NULL;
+> +    uint32_t num;
+> +
+> +    if (qcrypto_random_bytes((uint8_t *)&num, sizeof(num), &err)) {
+> +        error_report_err(err);
+> +    }
+> +
+> +    return num;
+> +}
+> +
+>  static uint64_t aspeed_scu_read(void *opaque, hwaddr offset, unsigned size)
+>  {
+>      AspeedSCUState *s = ASPEED_SCU(opaque);
+> @@ -167,6 +180,12 @@ static uint64_t aspeed_scu_read(void *opaque, hwaddr offset, unsigned size)
+>      }
+>  
+>      switch (reg) {
+> +    case RNG_DATA:
+> +        /* On hardware, RNG_DATA works regardless of
+> +         * the state of the enable bit in RNG_CTRL
+> +         */
+> +        s->regs[RNG_DATA] = aspeed_scu_get_random();
+> +        break;
+>      case WAKEUP_EN:
+>          qemu_log_mask(LOG_GUEST_ERROR,
+>                        "%s: Read of write-only offset 0x%" HWADDR_PRIx "\n",
+> 
