@@ -1,21 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39994)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40309)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1fNcQM-0004GP-Nv
-	for qemu-devel@nongnu.org; Tue, 29 May 2018 07:04:19 -0400
+	(envelope-from <edgari@xilinx.com>) id 1fNcRM-00059u-IN
+	for qemu-devel@nongnu.org; Tue, 29 May 2018 07:05:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1fNcQI-0005CF-55
-	for qemu-devel@nongnu.org; Tue, 29 May 2018 07:04:18 -0400
-Date: Tue, 29 May 2018 13:03:57 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20180529130357.405f501b.cohuck@redhat.com>
-In-Reply-To: <20180528232719.4721-15-f4bug@amsat.org>
-References: <20180528232719.4721-1-f4bug@amsat.org>
-	<20180528232719.4721-15-f4bug@amsat.org>
+	(envelope-from <edgari@xilinx.com>) id 1fNcRH-0006Kz-Mi
+	for qemu-devel@nongnu.org; Tue, 29 May 2018 07:05:20 -0400
+Date: Tue, 29 May 2018 13:04:55 +0200
+From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
+Message-ID: <20180529110455.n2hjf5stvwq5lrsh@toto>
+References: <20180503115620.10596-1-edgar.iglesias@gmail.com>
+	<20180503115620.10596-3-edgar.iglesias@gmail.com>
+	<c7409bf9-b336-8df2-bc2a-ace45077bcce@amsat.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v4 14/21] hw: Do not include
- "sysemu/blockdev.h" if it is not necessary
+In-Reply-To: <c7409bf9-b336-8df2-bc2a-ace45077bcce@amsat.org>
+Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH v1 2/2] xlnx-zynqmp: Swap
+ Cortex-R5 for Cortex-R5F
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,34 +26,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Philippe =?UTF-8?B?TWF0aGlldS1EYXVkw6k=?= <f4bug@amsat.org>
-Cc: Thomas Huth <thuth@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org, qemu-trivial@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Alistair Francis <alistair@alistair23.me>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Stefano Stabellini <sstabellini@kernel.org>, Anthony Perard <anthony.perard@citrix.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Alexander Graf <agraf@suse.de>, David Hildenbrand <david@redhat.com>, Fam Zheng <famz@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Markus Armbruster <armbru@redhat.com>, "open list:Block
-	layer core" <qemu-block@nongnu.org>, "open list:X86" <xen-devel@lists.xenproject.org>, "open list:virtio-ccw" <qemu-s390x@nongnu.org>
+To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>
+Cc: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, peter.maydell@linaro.org, qemu-devel@nongnu.org, sai.pavan.boddu@xilinx.com, frasse.iglesias@gmail.com, alistair@alistair23.me, frederic.konrad@adacore.com, qemu-arm@nongnu.org
 
-On Mon, 28 May 2018 20:27:12 -0300
-Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> wrote:
+On Thu, May 10, 2018 at 03:09:46PM -0300, Philippe Mathieu-Daud=E9 wrote:
+> Hi Edgar,
+>=20
+> On 05/03/2018 08:56 AM, Edgar E. Iglesias wrote:
+> > From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
+> >=20
+> > The ZynqMP has Cortex-R5Fs with the optional FPU enabled.
+>=20
+> What about updating the xlnx-zcu102 machine description too?
+>=20
+>   mc->desc =3D "Xilinx ZynqMP ZCU102 board with 4xA53s and 2xR5Fs ..."
 
-> Remove those unneeded includes to speed up the compilation
-> process a little bit.
->=20
-> Code change produced with:
->=20
->     $ git grep '#include "sysemu/blockdev.h"' | \
->       cut -d: -f-1 | \
->       xargs egrep -L "(BlockInterfaceType|DriveInfo|drive_get|blk_legacy_=
-dinfo|blockdev_mark_auto_del)" | \
->       xargs sed -i.bak '/#include "sysemu\/blockdev.h"/d'
->=20
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-> ---
->  hw/block/m25p80.c          | 1 -
->  hw/block/onenand.c         | 1 -
->  hw/i386/xen/xen-mapcache.c | 1 -
->  hw/s390x/virtio-ccw.c      | 1 -
->  hw/scsi/scsi-generic.c     | 1 -
->  hw/sd/sdhci.c              | 1 -
->  hw/usb/dev-storage.c       | 1 -
->  monitor.c                  | 1 -
->  8 files changed, 8 deletions(-)
+Yes, I've added the 'F' in v2 (I've kept the Rb and Tb lines).
+Will send v2 in a moment.
 
-Acked-by: Cornelia Huck <cohuck@redhat.com>
+Cheers,
+Edgar
+
+
+>=20
+> >=20
+> > Signed-off-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
+>=20
+> Reviewed-by: Philippe Mathieu-Daud=E9 <f4bug@amsat.org>
+> Tested-by: Philippe Mathieu-Daud=E9 <f4bug@amsat.org>
+>=20
+> I just noticed we can not get information for the R profile cores via
+> the monitor:
+>=20
+> (qemu) info cpus
+> * CPU #0: thread_id=3D19283
+>   CPU #1: thread_id=3D19284
+>   CPU #2: thread_id=3D19285
+>   CPU #3: thread_id=3D19286
+>=20
+> same with "info registers -a"
+>=20
+> > ---
+> >  hw/arm/xlnx-zynqmp.c | 2 +-
+> >  1 file changed, 1 insertion(+), 1 deletion(-)
+> >=20
+> > diff --git a/hw/arm/xlnx-zynqmp.c b/hw/arm/xlnx-zynqmp.c
+> > index 505253e0d2..efeb53c732 100644
+> > --- a/hw/arm/xlnx-zynqmp.c
+> > +++ b/hw/arm/xlnx-zynqmp.c
+> > @@ -116,7 +116,7 @@ static void xlnx_zynqmp_create_rpu(XlnxZynqMPState =
+*s, const char *boot_cpu,
+> >          char *name;
+> > =20
+> >          object_initialize(&s->rpu_cpu[i], sizeof(s->rpu_cpu[i]),
+> > -                          "cortex-r5-" TYPE_ARM_CPU);
+> > +                          "cortex-r5f-" TYPE_ARM_CPU);
+> >          object_property_add_child(OBJECT(s), "rpu-cpu[*]",
+> >                                    OBJECT(&s->rpu_cpu[i]), &error_abort=
+);
+> > =20
+> >=20
