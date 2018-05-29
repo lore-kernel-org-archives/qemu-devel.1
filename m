@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36788)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36803)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <edgar.iglesias@gmail.com>) id 1fNcCu-0001CJ-FY
-	for qemu-devel@nongnu.org; Tue, 29 May 2018 06:50:25 -0400
+	(envelope-from <edgar.iglesias@gmail.com>) id 1fNcCw-0001Ft-5W
+	for qemu-devel@nongnu.org; Tue, 29 May 2018 06:50:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <edgar.iglesias@gmail.com>) id 1fNcCt-0003nR-Nb
-	for qemu-devel@nongnu.org; Tue, 29 May 2018 06:50:24 -0400
-Received: from mail-wm0-x242.google.com ([2a00:1450:400c:c09::242]:55549)
+	(envelope-from <edgar.iglesias@gmail.com>) id 1fNcCv-0003oX-FT
+	for qemu-devel@nongnu.org; Tue, 29 May 2018 06:50:26 -0400
+Received: from mail-wr0-x22e.google.com ([2a00:1450:400c:c0c::22e]:34580)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <edgar.iglesias@gmail.com>)
-	id 1fNcCt-0003md-HR
-	for qemu-devel@nongnu.org; Tue, 29 May 2018 06:50:23 -0400
-Received: by mail-wm0-x242.google.com with SMTP id a8-v6so39176742wmg.5
-	for <qemu-devel@nongnu.org>; Tue, 29 May 2018 03:50:23 -0700 (PDT)
+	id 1fNcCv-0003o6-9V
+	for qemu-devel@nongnu.org; Tue, 29 May 2018 06:50:25 -0400
+Received: by mail-wr0-x22e.google.com with SMTP id j1-v6so24701615wrm.1
+	for <qemu-devel@nongnu.org>; Tue, 29 May 2018 03:50:25 -0700 (PDT)
 From: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
-Date: Tue, 29 May 2018 12:49:38 +0200
-Message-Id: <20180529105011.1914-6-edgar.iglesias@gmail.com>
+Date: Tue, 29 May 2018 12:49:39 +0200
+Message-Id: <20180529105011.1914-7-edgar.iglesias@gmail.com>
 In-Reply-To: <20180529105011.1914-1-edgar.iglesias@gmail.com>
 References: <20180529105011.1914-1-edgar.iglesias@gmail.com>
-Subject: [Qemu-devel] [PULL v1 05/38] target-microblaze: Correct special
- register array sizes
+Subject: [Qemu-devel] [PULL v1 06/38] target-microblaze: Correct the PVR
+ array size
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,52 +32,26 @@ Cc: peter.maydell@linaro.org, edgar.iglesias@xilinx.com
 
 From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
 
-Correct special register array sizes.
+Correct the PVR array size, there are 13 PVR registers.
 
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 Signed-off-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
 ---
- target/microblaze/cpu.h       | 4 ++--
- target/microblaze/translate.c | 5 ++---
- 2 files changed, 4 insertions(+), 5 deletions(-)
+ target/microblaze/cpu.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/target/microblaze/cpu.h b/target/microblaze/cpu.h
-index 5be71bc320..994496515f 100644
+index 994496515f..2304c24b7d 100644
 --- a/target/microblaze/cpu.h
 +++ b/target/microblaze/cpu.h
-@@ -242,8 +242,8 @@ struct CPUMBState {
-     uint32_t bimm;
+@@ -277,7 +277,7 @@ struct CPUMBState {
+     /* These fields are preserved on reset.  */
  
-     uint32_t imm;
--    uint32_t regs[33];
--    uint32_t sregs[24];
-+    uint32_t regs[32];
-+    uint32_t sregs[14];
-     float_status fp_status;
-     /* Stack protectors. Yes, it's a hw feature.  */
-     uint32_t slr, shr;
-diff --git a/target/microblaze/translate.c b/target/microblaze/translate.c
-index 46595e6336..9614f15d58 100644
---- a/target/microblaze/translate.c
-+++ b/target/microblaze/translate.c
-@@ -54,7 +54,7 @@
- 
- static TCGv env_debug;
- static TCGv cpu_R[32];
--static TCGv cpu_SR[18];
-+static TCGv cpu_SR[14];
- static TCGv env_imm;
- static TCGv env_btaken;
- static TCGv env_btarget;
-@@ -106,8 +106,7 @@ static const char *regnames[] =
- static const char *special_regnames[] =
- {
-     "rpc", "rmsr", "sr2", "sr3", "sr4", "sr5", "sr6", "sr7",
--    "sr8", "sr9", "sr10", "sr11", "sr12", "sr13", "sr14", "sr15",
--    "sr16", "sr17", "sr18"
-+    "sr8", "sr9", "sr10", "sr11", "sr12", "sr13"
+     struct {
+-        uint32_t regs[16];
++        uint32_t regs[13];
+     } pvr;
  };
  
- static inline void t_sync_flags(DisasContext *dc)
 -- 
 2.14.1
