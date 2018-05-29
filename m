@@ -1,17 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58178)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58198)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fNiKD-0004rr-Tt
-	for qemu-devel@nongnu.org; Tue, 29 May 2018 13:22:24 -0400
+	(envelope-from <kwolf@redhat.com>) id 1fNiKH-0004tj-7p
+	for qemu-devel@nongnu.org; Tue, 29 May 2018 13:22:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fNiKC-0001ij-VG
-	for qemu-devel@nongnu.org; Tue, 29 May 2018 13:22:21 -0400
+	(envelope-from <kwolf@redhat.com>) id 1fNiKG-0001kw-8f
+	for qemu-devel@nongnu.org; Tue, 29 May 2018 13:22:25 -0400
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Tue, 29 May 2018 19:21:42 +0200
-Message-Id: <20180529172156.29311-7-kwolf@redhat.com>
+Date: Tue, 29 May 2018 19:21:44 +0200
+Message-Id: <20180529172156.29311-9-kwolf@redhat.com>
 In-Reply-To: <20180529172156.29311-1-kwolf@redhat.com>
 References: <20180529172156.29311-1-kwolf@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 06/20] block: Avoid unnecessary aio_poll()
- in AIO_WAIT_WHILE()
+Subject: [Qemu-devel] [PATCH v2 08/20] block: Remove bdrv_drain_recurse()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,97 +22,76 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, mreitz@redhat.com, pbonzini@redhat.com, famz@redhat.com, stefanha@redhat.com, eblake@redhat.com, qemu-devel@nongnu.org
 
-Commit 91af091f923 added an additional aio_poll() to BDRV_POLL_WHILE()
-in order to make sure that all pending BHs are executed on drain. This
-was the wrong place to make the fix, as it is useless overhead for all
-other users of the macro and unnecessarily complicates the mechanism.
+For bdrv_drain(), recursively waiting for child node requests is
+pointless because we didn't quiesce their parents, so new requests could
+come in anyway. Letting the function work only on a single node makes it
+more consistent.
 
-This patch effectively reverts said commit (the context has changed a
-bit and the code has moved to AIO_WAIT_WHILE()) and instead polls in the
-loop condition for drain.
+For subtree drains and drain_all, we already have the recursion in
+bdrv_do_drained_begin(), so the extra recursion doesn't add anything
+either.
 
-The effect is probably hard to measure in any real-world use case
-because actual I/O will dominate, but if I run only the initialisation
-part of 'qemu-img convert' where it calls bdrv_block_status() for the
-whole image to find out how much data there is copy, this phase actually
-needs only roughly half the time after this patch.
+Remove the useless code.
 
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 ---
- include/block/aio-wait.h | 22 ++++++++--------------
- block/io.c               | 11 ++++++++++-
- 2 files changed, 18 insertions(+), 15 deletions(-)
+ block/io.c | 36 +++---------------------------------
+ 1 file changed, 3 insertions(+), 33 deletions(-)
 
-diff --git a/include/block/aio-wait.h b/include/block/aio-wait.h
-index 8c90a2e66e..783d3678dd 100644
---- a/include/block/aio-wait.h
-+++ b/include/block/aio-wait.h
-@@ -73,29 +73,23 @@ typedef struct {
-  */
- #define AIO_WAIT_WHILE(wait, ctx, cond) ({                         \
-     bool waited_ = false;                                          \
--    bool busy_ = true;                                             \
-     AioWait *wait_ = (wait);                                       \
-     AioContext *ctx_ = (ctx);                                      \
-     if (in_aio_context_home_thread(ctx_)) {                        \
--        while ((cond) || busy_) {                                  \
--            busy_ = aio_poll(ctx_, (cond));                        \
--            waited_ |= !!(cond) | busy_;                           \
-+        while ((cond)) {                                           \
-+            aio_poll(ctx_, true);                                  \
-+            waited_ = true;                                        \
-         }                                                          \
-     } else {                                                       \
-         assert(qemu_get_current_aio_context() ==                   \
-                qemu_get_aio_context());                            \
-         /* Increment wait_->num_waiters before evaluating cond. */ \
-         atomic_inc(&wait_->num_waiters);                           \
--        while (busy_) {                                            \
--            if ((cond)) {                                          \
--                waited_ = busy_ = true;                            \
--                aio_context_release(ctx_);                         \
--                aio_poll(qemu_get_aio_context(), true);            \
--                aio_context_acquire(ctx_);                         \
--            } else {                                               \
--                busy_ = aio_poll(ctx_, false);                     \
--                waited_ |= busy_;                                  \
--            }                                                      \
-+        while ((cond)) {                                           \
-+            aio_context_release(ctx_);                             \
-+            aio_poll(qemu_get_aio_context(), true);                \
-+            aio_context_acquire(ctx_);                             \
-+            waited_ = true;                                        \
-         }                                                          \
-         atomic_dec(&wait_->num_waiters);                           \
-     }                                                              \
 diff --git a/block/io.c b/block/io.c
-index 58f50ba253..aa973f1d4a 100644
+index b76ef92009..8303aebb58 100644
 --- a/block/io.c
 +++ b/block/io.c
-@@ -182,13 +182,22 @@ static void bdrv_drain_invoke(BlockDriverState *bs, bool begin)
-     BDRV_POLL_WHILE(bs, !data.done);
+@@ -219,38 +219,6 @@ static bool bdrv_drain_poll_top_level(BlockDriverState *bs,
+     return bdrv_drain_poll(bs, ignore_parent);
  }
  
-+/* Returns true if BDRV_POLL_WHILE() should go into a blocking aio_poll() */
-+static bool bdrv_drain_poll(BlockDriverState *bs)
-+{
-+    /* Execute pending BHs first and check everything else only after the BHs
-+     * have executed. */
-+    while (aio_poll(bs->aio_context, false));
-+    return atomic_read(&bs->in_flight);
-+}
+-static bool bdrv_drain_recurse(BlockDriverState *bs, BdrvChild *parent)
+-{
+-    BdrvChild *child, *tmp;
+-    bool waited;
+-
+-    /* Wait for drained requests to finish */
+-    waited = BDRV_POLL_WHILE(bs, bdrv_drain_poll_top_level(bs, parent));
+-
+-    QLIST_FOREACH_SAFE(child, &bs->children, next, tmp) {
+-        BlockDriverState *bs = child->bs;
+-        bool in_main_loop =
+-            qemu_get_current_aio_context() == qemu_get_aio_context();
+-        assert(bs->refcnt > 0);
+-        if (in_main_loop) {
+-            /* In case the recursive bdrv_drain_recurse processes a
+-             * block_job_defer_to_main_loop BH and modifies the graph,
+-             * let's hold a reference to bs until we are done.
+-             *
+-             * IOThread doesn't have such a BH, and it is not safe to call
+-             * bdrv_unref without BQL, so skip doing it there.
+-             */
+-            bdrv_ref(bs);
+-        }
+-        waited |= bdrv_drain_recurse(bs, child);
+-        if (in_main_loop) {
+-            bdrv_unref(bs);
+-        }
+-    }
+-
+-    return waited;
+-}
+-
+ static void bdrv_do_drained_begin(BlockDriverState *bs, bool recursive,
+                                   BdrvChild *parent);
+ static void bdrv_do_drained_end(BlockDriverState *bs, bool recursive,
+@@ -318,7 +286,9 @@ void bdrv_do_drained_begin(BlockDriverState *bs, bool recursive,
+ 
+     bdrv_parent_drained_begin(bs, parent);
+     bdrv_drain_invoke(bs, true);
+-    bdrv_drain_recurse(bs, parent);
 +
- static bool bdrv_drain_recurse(BlockDriverState *bs)
- {
-     BdrvChild *child, *tmp;
-     bool waited;
++    /* Wait for drained requests to finish */
++    BDRV_POLL_WHILE(bs, bdrv_drain_poll_top_level(bs, parent));
  
-     /* Wait for drained requests to finish */
--    waited = BDRV_POLL_WHILE(bs, atomic_read(&bs->in_flight) > 0);
-+    waited = BDRV_POLL_WHILE(bs, bdrv_drain_poll(bs));
- 
-     QLIST_FOREACH_SAFE(child, &bs->children, next, tmp) {
-         BlockDriverState *bs = child->bs;
+     if (recursive) {
+         bs->recursive_quiesce_counter++;
 -- 
 2.13.6
