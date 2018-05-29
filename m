@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58730)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58744)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1fNXe7-0004EG-0G
-	for qemu-devel@nongnu.org; Tue, 29 May 2018 01:58:12 -0400
+	(envelope-from <peterx@redhat.com>) id 1fNXeA-0004Fj-F7
+	for qemu-devel@nongnu.org; Tue, 29 May 2018 01:58:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1fNXe5-0001CA-Uc
-	for qemu-devel@nongnu.org; Tue, 29 May 2018 01:58:11 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:45780 helo=mx1.redhat.com)
+	(envelope-from <peterx@redhat.com>) id 1fNXe9-0001EM-Dn
+	for qemu-devel@nongnu.org; Tue, 29 May 2018 01:58:14 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:51268 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1fNXe5-0001Bj-Ok
-	for qemu-devel@nongnu.org; Tue, 29 May 2018 01:58:09 -0400
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1fNXe9-0001EC-7w
+	for qemu-devel@nongnu.org; Tue, 29 May 2018 01:58:13 -0400
 Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
 	[10.11.54.5])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 4691F4002248
-	for <qemu-devel@nongnu.org>; Tue, 29 May 2018 05:58:09 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id BE909818BAFE
+	for <qemu-devel@nongnu.org>; Tue, 29 May 2018 05:58:12 +0000 (UTC)
 From: Peter Xu <peterx@redhat.com>
-Date: Tue, 29 May 2018 13:57:49 +0800
-Message-Id: <20180529055755.12404-2-peterx@redhat.com>
+Date: Tue, 29 May 2018 13:57:50 +0800
+Message-Id: <20180529055755.12404-3-peterx@redhat.com>
 In-Reply-To: <20180529055755.12404-1-peterx@redhat.com>
 References: <20180529055755.12404-1-peterx@redhat.com>
-Subject: [Qemu-devel] [PATCH v9 1/7] monitor: rename out_lock to mon_lock
+Subject: [Qemu-devel] [PATCH v9 2/7] monitor: protect mon->fds with mon_lock
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,165 +32,117 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Eric Blake <eblake@redhat.com>, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, Markus Armbruster <armbru@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, peterx@redhat.com
 
-The out_lock is protecting a few Monitor fields.  In the future the
-monitor code will start to run in multiple threads.  We are going to
-turn it into a bigger lock to protect not only the out buffer but also
-most of the rest.
-
-Since at it, rearrange the Monitor struct a bit.
+mon->fds were protected by BQL.  Now protect it by mon_lock so that it
+can even be used in monitor iothread.
 
 Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+Reviewed-by: Markus Armbruster <armbru@redhat.com>
 Signed-off-by: Peter Xu <peterx@redhat.com>
 ---
- monitor.c | 53 +++++++++++++++++++++++++++++------------------------
- 1 file changed, 29 insertions(+), 24 deletions(-)
+ monitor.c | 22 ++++++++++++++++++----
+ 1 file changed, 18 insertions(+), 4 deletions(-)
 
 diff --git a/monitor.c b/monitor.c
-index 46814af533..14c681dc8a 100644
+index 14c681dc8a..d6c3c08932 100644
 --- a/monitor.c
 +++ b/monitor.c
-@@ -207,15 +207,6 @@ struct Monitor {
-     int suspend_cnt;            /* Needs to be accessed atomically */
-     bool skip_flush;
-     bool use_io_thr;
--
--    /* We can't access guest memory when holding the lock */
--    QemuMutex out_lock;
--    QString *outbuf;
--    guint out_watch;
--
--    /* Read under either BQL or out_lock, written with BQL+out_lock.  */
--    int mux_out;
--
-     ReadLineState *rs;
-     MonitorQMP qmp;
-     gchar *mon_cpu_path;
-@@ -224,6 +215,20 @@ struct Monitor {
+@@ -213,7 +213,6 @@ struct Monitor {
+     BlockCompletionFunc *password_completion_cb;
+     void *password_opaque;
      mon_cmd_t *cmd_table;
-     QLIST_HEAD(,mon_fd_t) fds;
+-    QLIST_HEAD(,mon_fd_t) fds;
      QTAILQ_ENTRY(Monitor) entry;
-+
-+    /*
-+     * The per-monitor lock. We can't access guest memory when holding
-+     * the lock.
-+     */
-+    QemuMutex mon_lock;
-+
-+    /*
-+     * Fields that are protected by the per-monitor lock.
-+     */
-+    QString *outbuf;
-+    guint out_watch;
-+    /* Read under either BQL or mon_lock, written with BQL+mon_lock.  */
-+    int mux_out;
- };
  
- /* Let's add monitor global variables to this struct. */
-@@ -366,14 +371,14 @@ static gboolean monitor_unblocked(GIOChannel *chan, GIOCondition cond,
+     /*
+@@ -225,6 +224,7 @@ struct Monitor {
+     /*
+      * Fields that are protected by the per-monitor lock.
+      */
++    QLIST_HEAD(, mon_fd_t) fds;
+     QString *outbuf;
+     guint out_watch;
+     /* Read under either BQL or mon_lock, written with BQL+mon_lock.  */
+@@ -2189,7 +2189,7 @@ static void hmp_acl_remove(Monitor *mon, const QDict *qdict)
+ void qmp_getfd(const char *fdname, Error **errp)
  {
-     Monitor *mon = opaque;
+     mon_fd_t *monfd;
+-    int fd;
++    int fd, tmp_fd;
  
--    qemu_mutex_lock(&mon->out_lock);
-+    qemu_mutex_lock(&mon->mon_lock);
-     mon->out_watch = 0;
-     monitor_flush_locked(mon);
--    qemu_mutex_unlock(&mon->out_lock);
-+    qemu_mutex_unlock(&mon->mon_lock);
-     return FALSE;
- }
+     fd = qemu_chr_fe_get_msgfd(&cur_mon->chr);
+     if (fd == -1) {
+@@ -2204,13 +2204,17 @@ void qmp_getfd(const char *fdname, Error **errp)
+         return;
+     }
  
--/* Called with mon->out_lock held.  */
-+/* Called with mon->mon_lock held.  */
- static void monitor_flush_locked(Monitor *mon)
- {
-     int rc;
-@@ -411,9 +416,9 @@ static void monitor_flush_locked(Monitor *mon)
- 
- void monitor_flush(Monitor *mon)
- {
--    qemu_mutex_lock(&mon->out_lock);
-+    qemu_mutex_lock(&mon->mon_lock);
-     monitor_flush_locked(mon);
--    qemu_mutex_unlock(&mon->out_lock);
-+    qemu_mutex_unlock(&mon->mon_lock);
- }
- 
- /* flush at every end of line */
-@@ -421,7 +426,7 @@ static void monitor_puts(Monitor *mon, const char *str)
- {
-     char c;
- 
--    qemu_mutex_lock(&mon->out_lock);
-+    qemu_mutex_lock(&mon->mon_lock);
-     for(;;) {
-         c = *str++;
-         if (c == '\0')
-@@ -434,7 +439,7 @@ static void monitor_puts(Monitor *mon, const char *str)
-             monitor_flush_locked(mon);
++    qemu_mutex_lock(&cur_mon->mon_lock);
+     QLIST_FOREACH(monfd, &cur_mon->fds, next) {
+         if (strcmp(monfd->name, fdname) != 0) {
+             continue;
          }
+ 
+-        close(monfd->fd);
++        tmp_fd = monfd->fd;
+         monfd->fd = fd;
++        qemu_mutex_unlock(&cur_mon->mon_lock);
++        /* Make sure close() is out of critical section */
++        close(tmp_fd);
+         return;
      }
--    qemu_mutex_unlock(&mon->out_lock);
-+    qemu_mutex_unlock(&mon->mon_lock);
+ 
+@@ -2219,24 +2223,31 @@ void qmp_getfd(const char *fdname, Error **errp)
+     monfd->fd = fd;
+ 
+     QLIST_INSERT_HEAD(&cur_mon->fds, monfd, next);
++    qemu_mutex_unlock(&cur_mon->mon_lock);
  }
  
- void monitor_vprintf(Monitor *mon, const char *fmt, va_list ap)
-@@ -725,7 +730,7 @@ static void monitor_data_init(Monitor *mon, bool skip_flush,
-                               bool use_io_thr)
+ void qmp_closefd(const char *fdname, Error **errp)
  {
-     memset(mon, 0, sizeof(Monitor));
--    qemu_mutex_init(&mon->out_lock);
-+    qemu_mutex_init(&mon->mon_lock);
-     qemu_mutex_init(&mon->qmp.qmp_queue_lock);
-     mon->outbuf = qstring_new();
-     /* Use *mon_cmds by default. */
-@@ -745,7 +750,7 @@ static void monitor_data_destroy(Monitor *mon)
-     }
-     readline_free(mon->rs);
-     qobject_unref(mon->outbuf);
--    qemu_mutex_destroy(&mon->out_lock);
-+    qemu_mutex_destroy(&mon->mon_lock);
-     qemu_mutex_destroy(&mon->qmp.qmp_queue_lock);
-     monitor_qmp_cleanup_req_queue_locked(mon);
-     monitor_qmp_cleanup_resp_queue_locked(mon);
-@@ -777,13 +782,13 @@ char *qmp_human_monitor_command(const char *command_line, bool has_cpu_index,
-     handle_hmp_command(&hmp, command_line);
-     cur_mon = old_mon;
+     mon_fd_t *monfd;
++    int tmp_fd;
  
--    qemu_mutex_lock(&hmp.out_lock);
-+    qemu_mutex_lock(&hmp.mon_lock);
-     if (qstring_get_length(hmp.outbuf) > 0) {
-         output = g_strdup(qstring_get_str(hmp.outbuf));
-     } else {
-         output = g_strdup("");
-     }
--    qemu_mutex_unlock(&hmp.out_lock);
-+    qemu_mutex_unlock(&hmp.mon_lock);
- 
- out:
-     monitor_data_destroy(&hmp);
-@@ -4377,9 +4382,9 @@ static void monitor_event(void *opaque, int event)
- 
-     switch (event) {
-     case CHR_EVENT_MUX_IN:
--        qemu_mutex_lock(&mon->out_lock);
-+        qemu_mutex_lock(&mon->mon_lock);
-         mon->mux_out = 0;
--        qemu_mutex_unlock(&mon->out_lock);
-+        qemu_mutex_unlock(&mon->mon_lock);
-         if (mon->reset_seen) {
-             readline_restart(mon->rs);
-             monitor_resume(mon);
-@@ -4399,9 +4404,9 @@ static void monitor_event(void *opaque, int event)
-         } else {
-             atomic_inc(&mon->suspend_cnt);
++    qemu_mutex_lock(&cur_mon->mon_lock);
+     QLIST_FOREACH(monfd, &cur_mon->fds, next) {
+         if (strcmp(monfd->name, fdname) != 0) {
+             continue;
          }
--        qemu_mutex_lock(&mon->out_lock);
-+        qemu_mutex_lock(&mon->mon_lock);
-         mon->mux_out = 1;
--        qemu_mutex_unlock(&mon->out_lock);
-+        qemu_mutex_unlock(&mon->mon_lock);
-         break;
  
-     case CHR_EVENT_OPENED:
+         QLIST_REMOVE(monfd, next);
+-        close(monfd->fd);
++        tmp_fd = monfd->fd;
+         g_free(monfd->name);
+         g_free(monfd);
++        qemu_mutex_unlock(&cur_mon->mon_lock);
++        /* Make sure close() is out of critical section */
++        close(tmp_fd);
+         return;
+     }
+ 
++    qemu_mutex_unlock(&cur_mon->mon_lock);
+     error_setg(errp, QERR_FD_NOT_FOUND, fdname);
+ }
+ 
+@@ -2244,6 +2255,7 @@ int monitor_get_fd(Monitor *mon, const char *fdname, Error **errp)
+ {
+     mon_fd_t *monfd;
+ 
++    qemu_mutex_lock(&mon->mon_lock);
+     QLIST_FOREACH(monfd, &mon->fds, next) {
+         int fd;
+ 
+@@ -2257,10 +2269,12 @@ int monitor_get_fd(Monitor *mon, const char *fdname, Error **errp)
+         QLIST_REMOVE(monfd, next);
+         g_free(monfd->name);
+         g_free(monfd);
++        qemu_mutex_unlock(&mon->mon_lock);
+ 
+         return fd;
+     }
+ 
++    qemu_mutex_unlock(&mon->mon_lock);
+     error_setg(errp, "File descriptor named '%s' has not been found", fdname);
+     return -1;
+ }
 -- 
 2.17.0
