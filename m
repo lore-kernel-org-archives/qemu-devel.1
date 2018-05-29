@@ -1,30 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37471)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40503)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fNfgb-0004JX-Nm
-	for qemu-devel@nongnu.org; Tue, 29 May 2018 10:33:19 -0400
+	(envelope-from <jcody@redhat.com>) id 1fNfr3-0000e5-QL
+	for qemu-devel@nongnu.org; Tue, 29 May 2018 10:44:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fNfgX-0007vp-HW
-	for qemu-devel@nongnu.org; Tue, 29 May 2018 10:33:17 -0400
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20170724182751.18261-1-f4bug@amsat.org>
-	<20170724182751.18261-22-f4bug@amsat.org>
-	<CAFEAcA_PRH_BuUOTtC=cvRFT7Gtiwt50T6C3avm+Sy13aDS4tg@mail.gmail.com>
-	<ae090923-3523-3e56-fbc1-65b270680939@amsat.org>
-	<e0d37c83-537a-5288-b033-e5be3b8858ca@redhat.com>
-	<c1078250-30a0-0d4c-d830-88591fb6ba43@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <713f16f9-3faa-7644-38c6-0797252d5922@amsat.org>
-Date: Tue, 29 May 2018 11:33:07 -0300
+	(envelope-from <jcody@redhat.com>) id 1fNfqz-0003iu-Ds
+	for qemu-devel@nongnu.org; Tue, 29 May 2018 10:44:05 -0400
+Date: Tue, 29 May 2018 10:43:53 -0400
+From: Jeff Cody <jcody@redhat.com>
+Message-ID: <20180529144353.GF6999@localhost.localdomain>
+References: <20180525163327.23097-1-kwolf@redhat.com>
+	<20180525163327.23097-4-kwolf@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <c1078250-30a0-0d4c-d830-88591fb6ba43@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH for 2.10 21/35] arm/sysbus-fdt: fix null
- pointer dereference
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180525163327.23097-4-kwolf@redhat.com>
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 03/14] job: Add error message
+ for failing jobs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,54 +24,210 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, mreitz@redhat.com
 
-Hi Eric,
-
-On 07/24/2017 06:57 PM, Eric Blake wrote:
-> On 07/24/2017 04:52 PM, Eric Blake wrote:
->> On 07/24/2017 04:48 PM, Philippe Mathieu-Daudé wrote:
->>> On 07/24/2017 06:09 PM, Peter Maydell wrote:
->>>> On 24 July 2017 at 19:27, Philippe Mathieu-Daudé <f4bug@amsat.org> wrote:
->>>>> Use error_report() + exit() instead of error_setg(&error_fatal).
->>>>>
->>>>> hw/arm/sysbus-fdt.c:322:9: warning: Array access (from variable
->>>>> 'node_path') results in a null pointer dereference
->>>>>      if (node_path[1]) {
->>>>>          ^~~~~~~~~~~~
->>>>
->>>> I don't understand what this warning is trying to say.
->>>> We can't get to this point with a NULL node_path,
->>>> because of the previous conditional, which is using
->>>> error_setg(&error_fatal).
->>>
->>> Ok I see, Clang is unaware than error_setg(&error_fatal) is a noreturn.
->>
->> Indeed, and that's because error_setg(&error_fatal) is not in preferred
->> form.
->>
->>>
->>> Patch dropped.
->>
->> That's a shame.  Rather, we should patch this file (and others) to avoid
->> all the inconsistent uses of error_setg(&error_*), to comply with the
->> error.h documentation.
-
-I started to port/clean this up.
-To avoid future inconsistencies, do you think we should/can enforce this
-check in checkpatch (which is stricter than human review)?
-Is the "Qemu error function tests" section a good place to put this check?
-
+On Fri, May 25, 2018 at 06:33:16PM +0200, Kevin Wolf wrote:
+> So far we relied on job->ret and strerror() to produce an error message
+> for failed jobs. Not surprisingly, this tends to result in completely
+> useless messages.
 > 
-> In other words, switching to the preferred spelling in the following files:
-> device_tree.c
-> hw/arm/sysbus-fdt.c
-> hw/block/fdc.c
-> hw/ppc/spapr_drc.c
+> This adds a Job.error field that can contain an error string for a
+> failing job, and a parameter to job_completed() that sets the field. As
+> a default, if NULL is passed, we continue to use strerror(job->ret).
 > 
-> is desirable, and has the added benefit of also silencing a Coverity
-> false positive.  But it should be done in terms of switching to the
-> preferred spelling, as it touches more instances than just the one that
-> shuts up Coverity.
+> All existing callers are changed to pass NULL. They can be improved in
+> separate patches.
+> 
+> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+> ---
+>  include/qemu/job.h |  7 ++++++-
+>  block/backup.c     |  2 +-
+>  block/commit.c     |  2 +-
+>  block/mirror.c     |  2 +-
+>  block/stream.c     |  2 +-
+>  job-qmp.c          |  9 ++-------
+>  job.c              | 15 +++++++++++++--
+>  7 files changed, 25 insertions(+), 14 deletions(-)
+> 
+> diff --git a/include/qemu/job.h b/include/qemu/job.h
+> index 8c8badf75e..b2e1dd00b9 100644
+> --- a/include/qemu/job.h
+> +++ b/include/qemu/job.h
+> @@ -124,6 +124,9 @@ typedef struct Job {
+>      /** Estimated progress_current value at the completion of the job */
+>      int64_t progress_total;
+>  
+> +    /** Error string for a failed job (NULL if job->ret == 0) */
+> +    char *error;
+> +
+>      /** ret code passed to job_completed. */
+>      int ret;
+>  
+> @@ -466,13 +469,15 @@ void job_transition_to_ready(Job *job);
+>  /**
+>   * @job: The job being completed.
+>   * @ret: The status code.
+> + * @error: The error message for a failing job (only with @ret < 0). If @ret is
+> + *         negative, but NULL is given for @error, strerror() is used.
+>   *
+>   * Marks @job as completed. If @ret is non-zero, the job transaction it is part
+>   * of is aborted. If @ret is zero, the job moves into the WAITING state. If it
+>   * is the last job to complete in its transaction, all jobs in the transaction
+>   * move from WAITING to PENDING.
+>   */
+> -void job_completed(Job *job, int ret);
+> +void job_completed(Job *job, int ret, Error *error);
+>  
+>  /** Asynchronously complete the specified @job. */
+>  void job_complete(Job *job, Error **errp);
+> diff --git a/block/backup.c b/block/backup.c
+> index 4e228e959b..5661435675 100644
+> --- a/block/backup.c
+> +++ b/block/backup.c
+> @@ -321,7 +321,7 @@ static void backup_complete(Job *job, void *opaque)
+>  {
+>      BackupCompleteData *data = opaque;
+>  
+> -    job_completed(job, data->ret);
+> +    job_completed(job, data->ret, NULL);
+>      g_free(data);
+>  }
+>  
+> diff --git a/block/commit.c b/block/commit.c
+> index 620666161b..e1814d9693 100644
+> --- a/block/commit.c
+> +++ b/block/commit.c
+> @@ -117,7 +117,7 @@ static void commit_complete(Job *job, void *opaque)
+>       * bdrv_set_backing_hd() to fail. */
+>      block_job_remove_all_bdrv(bjob);
+>  
+> -    job_completed(job, ret);
+> +    job_completed(job, ret, NULL);
+>      g_free(data);
+>  
+>      /* If bdrv_drop_intermediate() didn't already do that, remove the commit
+> diff --git a/block/mirror.c b/block/mirror.c
+> index dcb66ec3be..435268bbbf 100644
+> --- a/block/mirror.c
+> +++ b/block/mirror.c
+> @@ -581,7 +581,7 @@ static void mirror_exit(Job *job, void *opaque)
+>      blk_set_perm(bjob->blk, 0, BLK_PERM_ALL, &error_abort);
+>      blk_insert_bs(bjob->blk, mirror_top_bs, &error_abort);
+>  
+> -    job_completed(job, data->ret);
+> +    job_completed(job, data->ret, NULL);
+>  
+>      g_free(data);
+>      bdrv_drained_end(src);
+> diff --git a/block/stream.c b/block/stream.c
+> index a5d6e0cf8a..9264b68a1e 100644
+> --- a/block/stream.c
+> +++ b/block/stream.c
+> @@ -93,7 +93,7 @@ out:
+>      }
+>  
+>      g_free(s->backing_file_str);
+> -    job_completed(job, data->ret);
+> +    job_completed(job, data->ret, NULL);
+>      g_free(data);
+>  }
+>  
+> diff --git a/job-qmp.c b/job-qmp.c
+> index 7f38f63336..410775df61 100644
+> --- a/job-qmp.c
+> +++ b/job-qmp.c
+> @@ -136,14 +136,9 @@ void qmp_job_dismiss(const char *id, Error **errp)
+>  static JobInfo *job_query_single(Job *job, Error **errp)
+>  {
+>      JobInfo *info;
+> -    const char *errmsg = NULL;
+>  
+>      assert(!job_is_internal(job));
+>  
+> -    if (job->ret < 0) {
+> -        errmsg = strerror(-job->ret);
+> -    }
+> -
+>      info = g_new(JobInfo, 1);
+>      *info = (JobInfo) {
+>          .id                 = g_strdup(job->id),
+> @@ -151,8 +146,8 @@ static JobInfo *job_query_single(Job *job, Error **errp)
+>          .status             = job->status,
+>          .current_progress   = job->progress_current,
+>          .total_progress     = job->progress_total,
+> -        .has_error          = !!errmsg,
+> -        .error              = g_strdup(errmsg),
+> +        .has_error          = !!job->error,
+> +        .error              = g_strdup(job->error),
+>      };
+>  
+>      return info;
+> diff --git a/job.c b/job.c
+> index f026661b0f..fc39eaaa5e 100644
+> --- a/job.c
+> +++ b/job.c
+> @@ -369,6 +369,7 @@ void job_unref(Job *job)
+>  
+>          QLIST_REMOVE(job, job_list);
+>  
+> +        g_free(job->error);
+>          g_free(job->id);
+>          g_free(job);
+>      }
+> @@ -661,6 +662,9 @@ static void job_update_rc(Job *job)
+>      }
+>      if (job->ret) {
+>          job_state_transition(job, JOB_STATUS_ABORTING);
+> +        if (!job->error) {
+> +            job->error = g_strdup(strerror(-job->ret));
+> +        }
+>      }
+>  }
+>  
+> @@ -855,10 +859,17 @@ static void job_completed_txn_success(Job *job)
+>      }
+>  }
+>  
+> -void job_completed(Job *job, int ret)
+> +void job_completed(Job *job, int ret, Error *error)
+>  {
+>      assert(job && job->txn && !job_is_completed(job));
+> +
+>      job->ret = ret;
+> +    if (error) {
+> +        assert(job->ret < 0);
+
+The assert here implies that only job->ret values < 0 are valid for error.
+Elsewhere, we just check for non-zero values for error (for example, [1]).
+Maybe we should relax this to just assert(job->ret) here?
+
+> +        job->error = g_strdup(error_get_pretty(error));
+> +        error_free(error);
+> +    }
+> +
+>      job_update_rc(job);
+>      trace_job_completed(job, ret, job->ret);
+
+[1]
+
+>      if (job->ret) {
+          job_completed_txn_abort(job);
+      } else {
+          job_completed_txn_success(job);
+      }
+
+
+> @@ -876,7 +887,7 @@ void job_cancel(Job *job, bool force)
+>      }
+>      job_cancel_async(job, force);
+>      if (!job_started(job)) {
+> -        job_completed(job, -ECANCELED);
+> +        job_completed(job, -ECANCELED, NULL);
+>      } else if (job->deferred_to_main_loop) {
+>          job_completed_txn_abort(job);
+>      } else {
+> -- 
+> 2.13.6
+> 
 > 
