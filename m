@@ -1,21 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55634)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55875)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1fNgWy-0003j9-CD
-	for qemu-devel@nongnu.org; Tue, 29 May 2018 11:27:25 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1fNgXC-0003w4-RD
+	for qemu-devel@nongnu.org; Tue, 29 May 2018 11:27:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1fNgWw-000279-Rt
-	for qemu-devel@nongnu.org; Tue, 29 May 2018 11:27:24 -0400
-Date: Tue, 29 May 2018 11:27:14 -0400
-From: Jeff Cody <jcody@redhat.com>
-Message-ID: <20180529152714.GG6999@localhost.localdomain>
-References: <20180525163327.23097-1-kwolf@redhat.com>
-	<20180525163327.23097-5-kwolf@redhat.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1fNgXB-0002Jp-Sd
+	for qemu-devel@nongnu.org; Tue, 29 May 2018 11:27:38 -0400
+Received: from mail-oi0-x244.google.com ([2607:f8b0:4003:c06::244]:43883)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1fNgXB-0002Jf-Nj
+	for qemu-devel@nongnu.org; Tue, 29 May 2018 11:27:37 -0400
+Received: by mail-oi0-x244.google.com with SMTP id t133-v6so9811462oif.10
+	for <qemu-devel@nongnu.org>; Tue, 29 May 2018 08:27:37 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180525163327.23097-5-kwolf@redhat.com>
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 04/14] block/create: Make
- x-blockdev-create a job
+In-Reply-To: <20180515171446.10834-1-peter.maydell@linaro.org>
+References: <20180515171446.10834-1-peter.maydell@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 29 May 2018 16:27:16 +0100
+Message-ID: <CAFEAcA9TGnyeH8=f0xJ3sD9TtXQs_NbiJWBp9h6zsAz-UEOLrw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH] hw/arm/mps2-tz: Put ethernet
+ controller behind PPC
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,199 +29,109 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, mreitz@redhat.com
+To: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
+Cc: "patches@linaro.org" <patches@linaro.org>
 
-On Fri, May 25, 2018 at 06:33:17PM +0200, Kevin Wolf wrote:
-> This changes the x-blockdev-create QMP command so that it doesn't block
-> the monitor and the main loop any more, but starts a background job that
-> performs the image creation.
-> 
+Ping for review?
 
-This comes down to "user error", but now that the monitor and main loop are
-not blocked (which is good), should we try at all to catch/prevent a
-blockdev-add that is issued before a blockdev-create completion?
+thanks
+-- PMM
 
-> The basic job as implemented here is all that is necessary to make image
-> creation asynchronous and to provide a QMP interface that can be marked
-> stable, but it still lacks a few features that jobs usually provide: The
-> job will ignore pause commands and it doesn't publish progress yet (so
-> both current-progress and total-progress stay at 0). These features can
-> be added later without breaking compatibility.
-> 
-> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+
+On 15 May 2018 at 18:14, Peter Maydell <peter.maydell@linaro.org> wrote:
+> The ethernet controller in the AN505 MPC FPGA image is behind
+> the same AHB Peripheral Protection Controller that handles
+> the graphics and GPIOs. (In the documentation this is clear
+> in the block diagram but the ethernet controller was omitted
+> from the table listing devices connected to the PPC.)
+> The ethernet sits behind AHB PPCEXP0 interface 5. We had
+> incorrectly claimed that this was a "gpio4", but there are
+> only 4 GPIOs in this image.
+>
+> Correct the QEMU model to match the hardware.
+>
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 > ---
->  qapi/block-core.json     | 14 +++++++----
->  qapi/job.json            |  4 +++-
->  block/create.c           | 61 ++++++++++++++++++++++++++++++++----------------
->  tests/qemu-iotests/group | 14 ++++++-----
->  4 files changed, 61 insertions(+), 32 deletions(-)
-> 
-> diff --git a/qapi/block-core.json b/qapi/block-core.json
-> index 7dfa77a05c..1ed3a82373 100644
-> --- a/qapi/block-core.json
-> +++ b/qapi/block-core.json
-> @@ -4013,14 +4013,18 @@
->  ##
->  # @x-blockdev-create:
->  #
-> -# Create an image format on a given node.
-> -# TODO Replace with something asynchronous (block job?)
-> +# Starts a job to create an image format on a given node. The job is
-> +# automatically finalized, but a manual job-dismiss is required.
->  #
-> -# Since: 2.12
-> +# @job-id:          Identifier for the newly created job.
-> +#
-> +# @options:         Options for the image creation.
-> +#
-> +# Since: 3.0
->  ##
->  { 'command': 'x-blockdev-create',
-> -  'data': 'BlockdevCreateOptions',
-> -  'boxed': true }
-> +  'data': { 'job-id': 'str',
-> +            'options': 'BlockdevCreateOptions' } }
->  
->  ##
->  # @blockdev-open-tray:
-> diff --git a/qapi/job.json b/qapi/job.json
-> index 970124de76..69c1970a58 100644
-> --- a/qapi/job.json
-> +++ b/qapi/job.json
-> @@ -17,10 +17,12 @@
->  #
->  # @backup: drive backup job type, see "drive-backup"
->  #
-> +# @create: image creation job type, see "x-blockdev-create" (since 3.0)
-> +#
->  # Since: 1.7
->  ##
->  { 'enum': 'JobType',
-> -  'data': ['commit', 'stream', 'mirror', 'backup'] }
-> +  'data': ['commit', 'stream', 'mirror', 'backup', 'create'] }
->  
->  ##
->  # @JobStatus:
-> diff --git a/block/create.c b/block/create.c
-> index 8bd8a03719..87fdab3b72 100644
-> --- a/block/create.c
-> +++ b/block/create.c
-> @@ -24,28 +24,49 @@
->  
->  #include "qemu/osdep.h"
->  #include "block/block_int.h"
-> +#include "qemu/job.h"
->  #include "qapi/qapi-commands-block-core.h"
-> +#include "qapi/qapi-visit-block-core.h"
-> +#include "qapi/clone-visitor.h"
->  #include "qapi/error.h"
->  
-> -typedef struct BlockdevCreateCo {
-> +typedef struct BlockdevCreateJob {
-> +    Job common;
->      BlockDriver *drv;
->      BlockdevCreateOptions *opts;
->      int ret;
-> -    Error **errp;
-> -} BlockdevCreateCo;
-> +    Error *err;
-> +} BlockdevCreateJob;
->  
-> -static void coroutine_fn bdrv_co_create_co_entry(void *opaque)
-> +static void blockdev_create_complete(Job *job, void *opaque)
->  {
-> -    BlockdevCreateCo *cco = opaque;
-> -    cco->ret = cco->drv->bdrv_co_create(cco->opts, cco->errp);
-> +    BlockdevCreateJob *s = container_of(job, BlockdevCreateJob, common);
-> +
-> +    job_completed(job, s->ret, s->err);
+> A minor nit that I didn't notice when I was modelling this.
+>
+> NB: I think the PSRAM is also supposed to be behind this
+> interface of the PPC, but we definitely can't model that
+> because our PPC implementation won't work for executing
+> code from RAM that sits behind it.
+>
+>  hw/arm/mps2-tz.c | 32 +++++++++++++++++++++++---------
+>  1 file changed, 23 insertions(+), 9 deletions(-)
+>
+> diff --git a/hw/arm/mps2-tz.c b/hw/arm/mps2-tz.c
+> index 8dc8bfd4ab..c5ef95e4cc 100644
+> --- a/hw/arm/mps2-tz.c
+> +++ b/hw/arm/mps2-tz.c
+> @@ -74,12 +74,13 @@ typedef struct {
+>      UnimplementedDeviceState spi[5];
+>      UnimplementedDeviceState i2c[4];
+>      UnimplementedDeviceState i2s_audio;
+> -    UnimplementedDeviceState gpio[5];
+> +    UnimplementedDeviceState gpio[4];
+>      UnimplementedDeviceState dma[4];
+>      UnimplementedDeviceState gfx;
+>      CMSDKAPBUART uart[5];
+>      SplitIRQ sec_resp_splitter;
+>      qemu_or_irq uart_irq_orgate;
+> +    DeviceState *lan9118;
+>  } MPS2TZMachineState;
+>
+>  #define TYPE_MPS2TZ_MACHINE "mps2tz"
+> @@ -224,6 +225,26 @@ static MemoryRegion *make_fpgaio(MPS2TZMachineState *mms, void *opaque,
+>      return sysbus_mmio_get_region(SYS_BUS_DEVICE(fpgaio), 0);
 >  }
->  
-> -void qmp_x_blockdev_create(BlockdevCreateOptions *options, Error **errp)
-> +static void coroutine_fn blockdev_create_run(void *opaque)
->  {
-> +    BlockdevCreateJob *s = opaque;
+>
+> +static MemoryRegion *make_eth_dev(MPS2TZMachineState *mms, void *opaque,
+> +                                  const char *name, hwaddr size)
+> +{
+> +    SysBusDevice *s;
+> +    DeviceState *iotkitdev = DEVICE(&mms->iotkit);
+> +    NICInfo *nd = &nd_table[0];
 > +
-> +    s->ret = s->drv->bdrv_co_create(s->opts, &s->err);
+> +    /* In hardware this is a LAN9220; the LAN9118 is software compatible
+> +     * except that it doesn't support the checksum-offload feature.
+> +     */
+> +    qemu_check_nic_model(nd, "lan9118");
+> +    mms->lan9118 = qdev_create(NULL, "lan9118");
+> +    qdev_set_nic_properties(mms->lan9118, nd);
+> +    qdev_init_nofail(mms->lan9118);
 > +
-> +    qapi_free_BlockdevCreateOptions(s->opts);
-> +    job_defer_to_main_loop(&s->common, blockdev_create_complete, NULL);
+> +    s = SYS_BUS_DEVICE(mms->lan9118);
+> +    sysbus_connect_irq(s, 0, qdev_get_gpio_in_named(iotkitdev, "EXP_IRQ", 16));
+> +    return sysbus_mmio_get_region(s, 0);
 > +}
 > +
-> +static const JobDriver blockdev_create_job_driver = {
-> +    .instance_size = sizeof(BlockdevCreateJob),
-> +    .job_type      = JOB_TYPE_CREATE,
-> +    .start         = blockdev_create_run,
-> +};
-> +
-> +void qmp_x_blockdev_create(const char *job_id, BlockdevCreateOptions *options,
-> +                           Error **errp)
-> +{
-> +    BlockdevCreateJob *s;
->      const char *fmt = BlockdevDriver_str(options->driver);
->      BlockDriver *drv = bdrv_find_format(fmt);
-> -    Coroutine *co;
-> -    BlockdevCreateCo cco;
->  
->      /* If the driver is in the schema, we know that it exists. But it may not
->       * be whitelisted. */
-> @@ -61,16 +82,16 @@ void qmp_x_blockdev_create(BlockdevCreateOptions *options, Error **errp)
->          return;
+>  static void mps2tz_common_init(MachineState *machine)
+>  {
+>      MPS2TZMachineState *mms = MPS2TZ_MACHINE(machine);
+> @@ -363,7 +384,7 @@ static void mps2tz_common_init(MachineState *machine)
+>                  { "gpio1", make_unimp_dev, &mms->gpio[1], 0x40101000, 0x1000 },
+>                  { "gpio2", make_unimp_dev, &mms->gpio[2], 0x40102000, 0x1000 },
+>                  { "gpio3", make_unimp_dev, &mms->gpio[3], 0x40103000, 0x1000 },
+> -                { "gpio4", make_unimp_dev, &mms->gpio[4], 0x40104000, 0x1000 },
+> +                { "eth", make_eth_dev, NULL, 0x42000000, 0x100000 },
+>              },
+>          }, {
+>              .name = "ahb_ppcexp1",
+> @@ -447,13 +468,6 @@ static void mps2tz_common_init(MachineState *machine)
+>                                                       "cfg_sec_resp", 0));
 >      }
->  
-> -    cco = (BlockdevCreateCo) {
-> -        .drv = drv,
-> -        .opts = options,
-> -        .ret = -EINPROGRESS,
-> -        .errp = errp,
-> -    };
+>
+> -    /* In hardware this is a LAN9220; the LAN9118 is software compatible
+> -     * except that it doesn't support the checksum-offload feature.
+> -     * The ethernet controller is not behind a PPC.
+> -     */
+> -    lan9118_init(&nd_table[0], 0x42000000,
+> -                 qdev_get_gpio_in_named(iotkitdev, "EXP_IRQ", 16));
 > -
-> -    co = qemu_coroutine_create(bdrv_co_create_co_entry, &cco);
-> -    qemu_coroutine_enter(co);
-> -    while (cco.ret == -EINPROGRESS) {
-> -        aio_poll(qemu_get_aio_context(), true);
-> +    /* Create the block job */
-> +    s = job_create(job_id, &blockdev_create_job_driver, NULL,
-> +                   qemu_get_aio_context(), JOB_DEFAULT | JOB_MANUAL_DISMISS,
-> +                   NULL, NULL, errp);
-> +    if (!s) {
-> +        return;
->      }
-> +
-> +    s->drv = drv,
-> +    s->opts = QAPI_CLONE(BlockdevCreateOptions, options),
-> +
-> +    job_start(&s->common);
->  }
-> diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
-> index 93f93d71ba..22b0082db3 100644
-> --- a/tests/qemu-iotests/group
-> +++ b/tests/qemu-iotests/group
-> @@ -204,14 +204,16 @@
->  203 rw auto migration
->  204 rw auto quick
->  205 rw auto quick
-> -206 rw auto
-> -207 rw auto
-> +# TODO The following commented out tests need to be reworked to work
-> +# with the x-blockdev-create job
-> +#206 rw auto
-> +#207 rw auto
->  208 rw auto quick
->  209 rw auto quick
-> -210 rw auto
-> -211 rw auto quick
-> -212 rw auto quick
-> -213 rw auto quick
-> +#210 rw auto
-> +#211 rw auto quick
-> +#212 rw auto quick
-> +#213 rw auto quick
->  214 rw auto
->  215 rw auto quick
->  216 rw auto quick
-> -- 
-> 2.13.6
-> 
-> 
+>      create_unimplemented_device("FPGA NS PC", 0x48007000, 0x1000);
+>
+>      armv7m_load_kernel(ARM_CPU(first_cpu), machine->kernel_filename, 0x400000);
+> --
+> 2.17.0
+>
+>
