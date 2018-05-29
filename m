@@ -1,21 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51122)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51188)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1fNeep-0007cF-Co
-	for qemu-devel@nongnu.org; Tue, 29 May 2018 09:27:24 -0400
+	(envelope-from <mreitz@redhat.com>) id 1fNef0-0007nF-8Q
+	for qemu-devel@nongnu.org; Tue, 29 May 2018 09:27:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1fNeem-0001HF-7l
-	for qemu-devel@nongnu.org; Tue, 29 May 2018 09:27:23 -0400
-Date: Tue, 29 May 2018 15:27:14 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20180529152714.232f952c@redhat.com>
-In-Reply-To: <20180517081527.14410-2-david@redhat.com>
-References: <20180517081527.14410-1-david@redhat.com>
-	<20180517081527.14410-2-david@redhat.com>
+	(envelope-from <mreitz@redhat.com>) id 1fNeez-0001RR-Ar
+	for qemu-devel@nongnu.org; Tue, 29 May 2018 09:27:34 -0400
+References: <20180525163327.23097-1-kwolf@redhat.com>
+	<20180525163327.23097-14-kwolf@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <274aac5e-04e0-675f-0c3d-c72a63858e5d@redhat.com>
+Date: Tue, 29 May 2018 15:27:24 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v4 01/14] memory-device: drop assert
- related to align and start of address space
+In-Reply-To: <20180525163327.23097-14-kwolf@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="HSXbNSfE04pklgQEhgsyOds3J4g8gxsVy"
+Subject: Re: [Qemu-devel] [PATCH 13/14] qemu-iotests: Rewrite 213 for
+ blockdev-create job
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,48 +25,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-s390x@nongnu.org, "Michael S . Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Markus Armbruster <armbru@redhat.com>, qemu-ppc@nongnu.org, Pankaj Gupta <pagupta@redhat.com>, Alexander Graf <agraf@suse.de>, Cornelia Huck <cohuck@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Luiz Capitulino <lcapitulino@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+Cc: jsnow@redhat.com, eblake@redhat.com, pkrempa@redhat.com, qemu-devel@nongnu.org
 
-On Thu, 17 May 2018 10:15:14 +0200
-David Hildenbrand <david@redhat.com> wrote:
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--HSXbNSfE04pklgQEhgsyOds3J4g8gxsVy
+From: Max Reitz <mreitz@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+Cc: jsnow@redhat.com, eblake@redhat.com, pkrempa@redhat.com,
+ qemu-devel@nongnu.org
+Message-ID: <274aac5e-04e0-675f-0c3d-c72a63858e5d@redhat.com>
+Subject: Re: [PATCH 13/14] qemu-iotests: Rewrite 213 for blockdev-create job
+References: <20180525163327.23097-1-kwolf@redhat.com>
+ <20180525163327.23097-14-kwolf@redhat.com>
+In-Reply-To: <20180525163327.23097-14-kwolf@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-> The start of the address space does not have to be aligned for the
-> search. Handle this case explicitly when starting the search for a new
-> address.
-That's true,
-but commit message doesn't explain why address_space_start
-should be allowed to be non aligned.
+On 2018-05-25 18:33, Kevin Wolf wrote:
+> This rewrites the test case 213 to work with the new x-blockdev-create
+> job rather than the old synchronous version of the command.
+>=20
+> All of the test cases stay the same as before, but in order to be able
+> to implement proper job handling, the test case is rewritten in Python.=
 
-At least with this assert we would notice early that
-board allocating misaligned address space.
-I'd keep the assert unless there is a good reason to drop it.
-
-
-> 
-> Signed-off-by: David Hildenbrand <david@redhat.com>
+>=20
+> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 > ---
->  hw/mem/memory-device.c | 3 +--
->  1 file changed, 1 insertion(+), 2 deletions(-)
-> 
-> diff --git a/hw/mem/memory-device.c b/hw/mem/memory-device.c
-> index 3e04f3954e..361d38bfc5 100644
-> --- a/hw/mem/memory-device.c
-> +++ b/hw/mem/memory-device.c
-> @@ -116,7 +116,6 @@ uint64_t memory_device_get_free_addr(MachineState *ms, const uint64_t *hint,
->      address_space_start = ms->device_memory->base;
->      address_space_end = address_space_start +
->                          memory_region_size(&ms->device_memory->mr);
-> -    g_assert(QEMU_ALIGN_UP(address_space_start, align) == address_space_start);
->      g_assert(address_space_end >= address_space_start);
->  
->      memory_device_check_addable(ms, size, errp);
-> @@ -149,7 +148,7 @@ uint64_t memory_device_get_free_addr(MachineState *ms, const uint64_t *hint,
->              return 0;
->          }
->      } else {
-> -        new_addr = address_space_start;
-> +        new_addr = QEMU_ALIGN_UP(address_space_start, align);
->      }
->  
->      /* find address range that will fit new memory device */
+>  tests/qemu-iotests/213     | 520 +++++++++++++++++--------------------=
+--------
+>  tests/qemu-iotests/213.out | 198 ++++++++++-------
+>  tests/qemu-iotests/group   |   4 +-
+>  3 files changed, 314 insertions(+), 408 deletions(-)
+>=20
+> diff --git a/tests/qemu-iotests/213 b/tests/qemu-iotests/213
+> index 3a00a0f6d6..fe4017edc7 100755
+> --- a/tests/qemu-iotests/213
+> +++ b/tests/qemu-iotests/213
+
+[...]
+
+> +import iotests
+> +from iotests import imgfmt
+> +
+> +iotests.verify_image_format(supported_fmts=3D['vhdx'])
+> +iotests.verify_protocol(supported=3D['file'])
+> +
+> +def blockdev_create(vm, options):
+> +    result =3D vm.qmp_log('x-blockdev-create', job_id=3D'job0', option=
+s=3Doptions)
+> +
+> +    if 'return' in result:
+> +        assert result['return'] =3D=3D {}
+> +        vm.run_job('job0')
+> +    iotests.log("")
+> +
+> +with iotests.FilePath('t.vdi') as disk_path, \
+
+Now you've just given up? :-)
+
+Again, with that fixed:
+
+Reviewed-by: Max Reitz <mreitz@redhat.com>
+
+
+--HSXbNSfE04pklgQEhgsyOds3J4g8gxsVy
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlsNVTwACgkQ9AfbAGHV
+z0BXrgf/RQ9zx2jGh263z86d7iLY+c/zFXfRpefbA/oB1g5sKSWM5hFmCVHTT+95
+WoSRqlnq7TtlNWCzJZ4unv94ZD/NUEuck1dkznbA4l8MA9drprNpqUnG2bh4tw2p
+jFahQk7AnMXO/J4krMPQtdqUECHn+XDOjHujf9JkVWHy3R1p02seggi14heC+HAJ
+wpZj/3eDWhfTovh9UfAM8duBQBKqMkETpTTArIYPQwbzE0qtzI/ZO/HE7twPSjAE
+3z3Eb6472D7pw9uPbMVYMElCHRULY287tv0YhuvTW6y63dIGkztmh64E0AH4jo2M
+qkzK9Z5D8LSxpn1mhIy3XyW2YgEbBA==
+=vEMs
+-----END PGP SIGNATURE-----
+
+--HSXbNSfE04pklgQEhgsyOds3J4g8gxsVy--
