@@ -1,21 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38113)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41346)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1fNkVv-0004MG-A0
-	for qemu-devel@nongnu.org; Tue, 29 May 2018 15:42:38 -0400
+	(envelope-from <eric.auger@redhat.com>) id 1fNkgR-0004gl-GY
+	for qemu-devel@nongnu.org; Tue, 29 May 2018 15:53:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1fNkVt-0000YU-MR
-	for qemu-devel@nongnu.org; Tue, 29 May 2018 15:42:35 -0400
-Received: from mout.kundenserver.de ([212.227.126.131]:49607)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1fNkVt-0000Xs-9C
-	for qemu-devel@nongnu.org; Tue, 29 May 2018 15:42:33 -0400
-From: Laurent Vivier <laurent@vivier.eu>
-Date: Tue, 29 May 2018 21:42:03 +0200
-Message-Id: <20180529194207.31503-12-laurent@vivier.eu>
-In-Reply-To: <20180529194207.31503-1-laurent@vivier.eu>
-References: <20180529194207.31503-1-laurent@vivier.eu>
-Subject: [Qemu-devel] [PATCH 11/15] linux-user: move mips signal definitions
- to mips/target_signal.h
+	(envelope-from <eric.auger@redhat.com>) id 1fNkgQ-0008Ir-Cj
+	for qemu-devel@nongnu.org; Tue, 29 May 2018 15:53:27 -0400
+References: <1527563283-13148-1-git-send-email-zhaoshenglong@huawei.com>
+	<CAFEAcA-LoTOnTnSYBpzuyUDFZBsVBaB2qjvzAP_94rou8ob6Tg@mail.gmail.com>
+	<65E224A1-C972-4C38-BD6E-41C59191D999@163.com>
+From: Auger Eric <eric.auger@redhat.com>
+Message-ID: <383b0c0b-4406-869c-5493-df2f48896113@redhat.com>
+Date: Tue, 29 May 2018 21:53:16 +0200
+MIME-Version: 1.0
+In-Reply-To: <65E224A1-C972-4C38-BD6E-41C59191D999@163.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2] ARM: ACPI: Fix use-after-free due to
+ memory realloc
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,226 +25,158 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Laurent Vivier <laurent@vivier.eu>, Riku Voipio <riku.voipio@iki.fi>
+To: Shannon Zhao <zhaosl1988@163.com>, Peter Maydell <peter.maydell@linaro.org>
+Cc: Shannon Zhao <zhaoshenglong@huawei.com>, qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, Shannon Zhao <shannon.zhaosl@gmail.com>
 
-No code change.
+Hi Shannon,
 
-Signed-off-by: Laurent Vivier <laurent@vivier.eu>
----
- linux-user/mips/target_signal.h   | 50 ++++++++++++++++++++++++++++++++++
- linux-user/mips64/target_signal.h | 49 ++++++++++++++++++++++++++++++++++
- linux-user/syscall_defs.h         | 56 +--------------------------------------
- 3 files changed, 100 insertions(+), 55 deletions(-)
+On 05/29/2018 04:09 PM, Shannon Zhao wrote:
+>=20
+>=20
+>> =E5=9C=A8 2018=E5=B9=B45=E6=9C=8829=E6=97=A5=EF=BC=8C21:53=EF=BC=8CPet=
+er Maydell <peter.maydell@linaro.org> =E5=86=99=E9=81=93=EF=BC=9A
+>>
+>>> On 29 May 2018 at 04:08, Shannon Zhao <zhaoshenglong@huawei.com> wrot=
+e:
+>>> acpi_data_push uses g_array_set_size to resize the memory size. If th=
+ere
+>>> is no enough contiguous memory, the address will be changed. So previ=
+ous
+>>> pointer could not be used any more. It must update the pointer and us=
+e
+>>> the new one.
+>>>
+>>> Reviewed-by: Eric Auger <eric.auger@redhat.com>
+>>> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+>>> Signed-off-by: Shannon Zhao <zhaoshenglong@huawei.com>
+>>> ---
+>>> V2: add comments for iort_node_offset and reviewed tags
+>>> ---
+>>> hw/arm/virt-acpi-build.c | 19 +++++++++++++++----
+>>> 1 file changed, 15 insertions(+), 4 deletions(-)
+>>>
+>>> diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
+>>> index 92ceee9..6209138 100644
+>>> --- a/hw/arm/virt-acpi-build.c
+>>> +++ b/hw/arm/virt-acpi-build.c
+>>> @@ -400,7 +400,7 @@ build_iort(GArray *table_data, BIOSLinker *linker=
+, VirtMachineState *vms)
+>>>     AcpiIortItsGroup *its;
+>>>     AcpiIortTable *iort;
+>>>     AcpiIortSmmu3 *smmu;
+>>> -    size_t node_size, iort_length, smmu_offset =3D 0;
+>>> +    size_t node_size, iort_node_offset, iort_length, smmu_offset =3D=
+ 0;
+>>>     AcpiIortRC *rc;
+>>>
+>>>     iort =3D acpi_data_push(table_data, sizeof(*iort));
+>>> @@ -415,6 +415,12 @@ build_iort(GArray *table_data, BIOSLinker *linke=
+r, VirtMachineState *vms)
+>>>     iort->node_count =3D cpu_to_le32(nb_nodes);
+>>>     iort->node_offset =3D cpu_to_le32(sizeof(*iort));
+>>>
+>>> +    /*
+>>> +     * Use a copy in case table_data->data moves duringa acpi_data_p=
+ush
+>>> +     * operations.
+>>> +     */
+>>> +    iort_node_offset =3D sizeof(*iort);
+>>> +
+>>>     /* ITS group node */
+>>>     node_size =3D  sizeof(*its) + sizeof(uint32_t);
+>>>     iort_length +=3D node_size;
+>>> @@ -429,7 +435,7 @@ build_iort(GArray *table_data, BIOSLinker *linker=
+, VirtMachineState *vms)
+>>>         int irq =3D  vms->irqmap[VIRT_SMMU];
+>>>
+>>>         /* SMMUv3 node */
+>>> -        smmu_offset =3D iort->node_offset + node_size;
+>>> +        smmu_offset =3D iort_node_offset + node_size;
+>>
+>> In the old code, we used iort->node_offset directly as a CPU
+>> endianness order bitmap, which is initialized above using
+>>    iort->node_offset =3D cpu_to_le32(sizeof(*iort));
+>> In this version, we use iort_node_offset, which is
+>> initialized using
+>>    iort_node_offset =3D sizeof(*iort);
+>>
+>> So we've lost an endianness conversion on big-endian systems.
+>> Which is correct, the old code or the new?
+> I think it=E2=80=99s the new one. I found this bug later and wanted to =
+send another patch to fix it. But to address Philippe=E2=80=99s comment I=
+ folder them together.
+Shouldn't we have
+iort_node_offset =3D iort->node_offset;
+iort->node_offset =3D cpu_to_le32(iort_node_offset);
+instead?
 
-diff --git a/linux-user/mips/target_signal.h b/linux-user/mips/target_signal.h
-index 5f68bd7634..66e1ad44a6 100644
---- a/linux-user/mips/target_signal.h
-+++ b/linux-user/mips/target_signal.h
-@@ -1,6 +1,47 @@
- #ifndef MIPS_TARGET_SIGNAL_H
- #define MIPS_TARGET_SIGNAL_H
- 
-+#define TARGET_SIGHUP            1      /* Hangup (POSIX).  */
-+#define TARGET_SIGINT            2      /* Interrupt (ANSI).  */
-+#define TARGET_SIGQUIT           3      /* Quit (POSIX).  */
-+#define TARGET_SIGILL            4      /* Illegal instruction (ANSI).  */
-+#define TARGET_SIGTRAP           5      /* Trace trap (POSIX).  */
-+#define TARGET_SIGIOT            6      /* IOT trap (4.2 BSD).  */
-+#define TARGET_SIGABRT           TARGET_SIGIOT  /* Abort (ANSI).  */
-+#define TARGET_SIGEMT            7
-+#define TARGET_SIGSTKFLT         7 /* XXX: incorrect */
-+#define TARGET_SIGFPE            8      /* Floating-point exception (ANSI).  */
-+#define TARGET_SIGKILL           9      /* Kill, unblockable (POSIX).  */
-+#define TARGET_SIGBUS           10      /* BUS error (4.2 BSD).  */
-+#define TARGET_SIGSEGV          11      /* Segmentation violation (ANSI).  */
-+#define TARGET_SIGSYS           12
-+#define TARGET_SIGPIPE          13      /* Broken pipe (POSIX).  */
-+#define TARGET_SIGALRM          14      /* Alarm clock (POSIX).  */
-+#define TARGET_SIGTERM          15      /* Termination (ANSI).  */
-+#define TARGET_SIGUSR1          16      /* User-defined signal 1 (POSIX).  */
-+#define TARGET_SIGUSR2          17      /* User-defined signal 2 (POSIX).  */
-+#define TARGET_SIGCHLD          18      /* Child status has changed (POSIX).  */
-+#define TARGET_SIGCLD           TARGET_SIGCHLD  /* Same as TARGET_SIGCHLD (System V).  */
-+#define TARGET_SIGPWR           19      /* Power failure restart (System V).  */
-+#define TARGET_SIGWINCH 20      /* Window size change (4.3 BSD, Sun).  */
-+#define TARGET_SIGURG           21      /* Urgent condition on socket (4.2 BSD).  */
-+#define TARGET_SIGIO            22      /* I/O now possible (4.2 BSD).  */
-+#define TARGET_SIGPOLL          TARGET_SIGIO    /* Pollable event occurred (System V).  */
-+#define TARGET_SIGSTOP          23      /* Stop, unblockable (POSIX).  */
-+#define TARGET_SIGTSTP          24      /* Keyboard stop (POSIX).  */
-+#define TARGET_SIGCONT          25      /* Continue (POSIX).  */
-+#define TARGET_SIGTTIN          26      /* Background read from tty (POSIX).  */
-+#define TARGET_SIGTTOU          27      /* Background write to tty (POSIX).  */
-+#define TARGET_SIGVTALRM        28      /* Virtual alarm clock (4.2 BSD).  */
-+#define TARGET_SIGPROF          29      /* Profiling alarm clock (4.2 BSD).  */
-+#define TARGET_SIGXCPU          30      /* CPU limit exceeded (4.2 BSD).  */
-+#define TARGET_SIGXFSZ          31      /* File size limit exceeded (4.2 BSD).  */
-+#define TARGET_SIGRTMIN         32
-+
-+#define TARGET_SIG_BLOCK        1       /* for blocking signals */
-+#define TARGET_SIG_UNBLOCK      2       /* for unblocking signals */
-+#define TARGET_SIG_SETMASK      3       /* for setting the signal mask */
-+
- /* this struct defines a stack used during syscall handling */
- 
- typedef struct target_sigaltstack {
-@@ -16,6 +57,15 @@ typedef struct target_sigaltstack {
- #define TARGET_SS_ONSTACK     1
- #define TARGET_SS_DISABLE     2
- 
-+#define TARGET_SA_NOCLDSTOP     0x00000001
-+#define TARGET_SA_NOCLDWAIT     0x00010000
-+#define TARGET_SA_SIGINFO       0x00000008
-+#define TARGET_SA_ONSTACK       0x08000000
-+#define TARGET_SA_NODEFER       0x40000000
-+#define TARGET_SA_RESTART       0x10000000
-+#define TARGET_SA_RESETHAND     0x80000000
-+#define TARGET_SA_RESTORER      0x04000000      /* Only for O32 */
-+
- #define TARGET_MINSIGSTKSZ    2048
- #define TARGET_SIGSTKSZ       8192
- 
-diff --git a/linux-user/mips64/target_signal.h b/linux-user/mips64/target_signal.h
-index 7fe6b2f517..753e91fbd6 100644
---- a/linux-user/mips64/target_signal.h
-+++ b/linux-user/mips64/target_signal.h
-@@ -1,6 +1,47 @@
- #ifndef MIPS64_TARGET_SIGNAL_H
- #define MIPS64_TARGET_SIGNAL_H
- 
-+#define TARGET_SIGHUP            1      /* Hangup (POSIX).  */
-+#define TARGET_SIGINT            2      /* Interrupt (ANSI).  */
-+#define TARGET_SIGQUIT           3      /* Quit (POSIX).  */
-+#define TARGET_SIGILL            4      /* Illegal instruction (ANSI).  */
-+#define TARGET_SIGTRAP           5      /* Trace trap (POSIX).  */
-+#define TARGET_SIGIOT            6      /* IOT trap (4.2 BSD).  */
-+#define TARGET_SIGABRT           TARGET_SIGIOT  /* Abort (ANSI).  */
-+#define TARGET_SIGEMT            7
-+#define TARGET_SIGSTKFLT         7 /* XXX: incorrect */
-+#define TARGET_SIGFPE            8      /* Floating-point exception (ANSI).  */
-+#define TARGET_SIGKILL           9      /* Kill, unblockable (POSIX).  */
-+#define TARGET_SIGBUS           10      /* BUS error (4.2 BSD).  */
-+#define TARGET_SIGSEGV          11      /* Segmentation violation (ANSI).  */
-+#define TARGET_SIGSYS           12
-+#define TARGET_SIGPIPE          13      /* Broken pipe (POSIX).  */
-+#define TARGET_SIGALRM          14      /* Alarm clock (POSIX).  */
-+#define TARGET_SIGTERM          15      /* Termination (ANSI).  */
-+#define TARGET_SIGUSR1          16      /* User-defined signal 1 (POSIX).  */
-+#define TARGET_SIGUSR2          17      /* User-defined signal 2 (POSIX).  */
-+#define TARGET_SIGCHLD          18      /* Child status has changed (POSIX).  */
-+#define TARGET_SIGCLD           TARGET_SIGCHLD  /* Same as TARGET_SIGCHLD (System V).  */
-+#define TARGET_SIGPWR           19      /* Power failure restart (System V).  */
-+#define TARGET_SIGWINCH 20      /* Window size change (4.3 BSD, Sun).  */
-+#define TARGET_SIGURG           21      /* Urgent condition on socket (4.2 BSD).  */
-+#define TARGET_SIGIO            22      /* I/O now possible (4.2 BSD).  */
-+#define TARGET_SIGPOLL          TARGET_SIGIO    /* Pollable event occurred (System V).  */
-+#define TARGET_SIGSTOP          23      /* Stop, unblockable (POSIX).  */
-+#define TARGET_SIGTSTP          24      /* Keyboard stop (POSIX).  */
-+#define TARGET_SIGCONT          25      /* Continue (POSIX).  */
-+#define TARGET_SIGTTIN          26      /* Background read from tty (POSIX).  */
-+#define TARGET_SIGTTOU          27      /* Background write to tty (POSIX).  */
-+#define TARGET_SIGVTALRM        28      /* Virtual alarm clock (4.2 BSD).  */
-+#define TARGET_SIGPROF          29      /* Profiling alarm clock (4.2 BSD).  */
-+#define TARGET_SIGXCPU          30      /* CPU limit exceeded (4.2 BSD).  */
-+#define TARGET_SIGXFSZ          31      /* File size limit exceeded (4.2 BSD).  */
-+#define TARGET_SIGRTMIN         32
-+
-+#define TARGET_SIG_BLOCK        1       /* for blocking signals */
-+#define TARGET_SIG_UNBLOCK      2       /* for unblocking signals */
-+#define TARGET_SIG_SETMASK      3       /* for setting the signal mask */
-+
- /* this struct defines a stack used during syscall handling */
- 
- typedef struct target_sigaltstack {
-@@ -16,6 +57,14 @@ typedef struct target_sigaltstack {
- #define TARGET_SS_ONSTACK     1
- #define TARGET_SS_DISABLE     2
- 
-+#define TARGET_SA_NOCLDSTOP     0x00000001
-+#define TARGET_SA_NOCLDWAIT     0x00010000
-+#define TARGET_SA_SIGINFO       0x00000008
-+#define TARGET_SA_ONSTACK       0x08000000
-+#define TARGET_SA_NODEFER       0x40000000
-+#define TARGET_SA_RESTART       0x10000000
-+#define TARGET_SA_RESETHAND     0x80000000
-+
- #define TARGET_MINSIGSTKSZ    2048
- #define TARGET_SIGSTKSZ       8192
- 
-diff --git a/linux-user/syscall_defs.h b/linux-user/syscall_defs.h
-index 0034156c6b..21d3ef5559 100644
---- a/linux-user/syscall_defs.h
-+++ b/linux-user/syscall_defs.h
-@@ -426,18 +426,7 @@ int do_sigaction(int sig, const struct target_sigaction *act,
-     || defined(TARGET_TILEGX) || defined(TARGET_HPPA) || defined(TARGET_NIOS2) \
-     || defined(TARGET_RISCV) || defined(TARGET_XTENSA)
- 
--#if defined(TARGET_MIPS)
--#define TARGET_SA_NOCLDSTOP	0x00000001
--#define TARGET_SA_NOCLDWAIT	0x00010000
--#define TARGET_SA_SIGINFO	0x00000008
--#define TARGET_SA_ONSTACK	0x08000000
--#define TARGET_SA_NODEFER	0x40000000
--#define TARGET_SA_RESTART	0x10000000
--#define TARGET_SA_RESETHAND	0x80000000
--#if !defined(TARGET_ABI_MIPSN32) && !defined(TARGET_ABI_MIPSN64)
--#define TARGET_SA_RESTORER	0x04000000	/* Only for O32 */
--#endif
--#elif defined(TARGET_OPENRISC)
-+#if defined(TARGET_OPENRISC)
- #define TARGET_SA_NOCLDSTOP    0x00000001
- #define TARGET_SA_NOCLDWAIT    0x00000002
- #define TARGET_SA_SIGINFO      0x00000004
-@@ -508,49 +497,6 @@ int do_sigaction(int sig, const struct target_sigaction *act,
- #define TARGET_SIG_UNBLOCK       2
- #define TARGET_SIG_SETMASK       3
- 
--#elif defined(TARGET_MIPS)
--
--#define TARGET_SIGHUP		 1	/* Hangup (POSIX).  */
--#define TARGET_SIGINT		 2	/* Interrupt (ANSI).  */
--#define TARGET_SIGQUIT		 3	/* Quit (POSIX).  */
--#define TARGET_SIGILL		 4	/* Illegal instruction (ANSI).  */
--#define TARGET_SIGTRAP		 5	/* Trace trap (POSIX).  */
--#define TARGET_SIGIOT		 6	/* IOT trap (4.2 BSD).  */
--#define TARGET_SIGABRT		 TARGET_SIGIOT	/* Abort (ANSI).  */
--#define TARGET_SIGEMT		 7
--#define TARGET_SIGSTKFLT	 7 /* XXX: incorrect */
--#define TARGET_SIGFPE		 8	/* Floating-point exception (ANSI).  */
--#define TARGET_SIGKILL		 9	/* Kill, unblockable (POSIX).  */
--#define TARGET_SIGBUS		10	/* BUS error (4.2 BSD).  */
--#define TARGET_SIGSEGV		11	/* Segmentation violation (ANSI).  */
--#define TARGET_SIGSYS		12
--#define TARGET_SIGPIPE		13	/* Broken pipe (POSIX).  */
--#define TARGET_SIGALRM		14	/* Alarm clock (POSIX).  */
--#define TARGET_SIGTERM		15	/* Termination (ANSI).  */
--#define TARGET_SIGUSR1		16	/* User-defined signal 1 (POSIX).  */
--#define TARGET_SIGUSR2		17	/* User-defined signal 2 (POSIX).  */
--#define TARGET_SIGCHLD		18	/* Child status has changed (POSIX).  */
--#define TARGET_SIGCLD		TARGET_SIGCHLD	/* Same as TARGET_SIGCHLD (System V).  */
--#define TARGET_SIGPWR		19	/* Power failure restart (System V).  */
--#define TARGET_SIGWINCH	20	/* Window size change (4.3 BSD, Sun).  */
--#define TARGET_SIGURG		21	/* Urgent condition on socket (4.2 BSD).  */
--#define TARGET_SIGIO		22	/* I/O now possible (4.2 BSD).  */
--#define TARGET_SIGPOLL		TARGET_SIGIO	/* Pollable event occurred (System V).  */
--#define TARGET_SIGSTOP		23	/* Stop, unblockable (POSIX).  */
--#define TARGET_SIGTSTP		24	/* Keyboard stop (POSIX).  */
--#define TARGET_SIGCONT		25	/* Continue (POSIX).  */
--#define TARGET_SIGTTIN		26	/* Background read from tty (POSIX).  */
--#define TARGET_SIGTTOU		27	/* Background write to tty (POSIX).  */
--#define TARGET_SIGVTALRM	28	/* Virtual alarm clock (4.2 BSD).  */
--#define TARGET_SIGPROF		29	/* Profiling alarm clock (4.2 BSD).  */
--#define TARGET_SIGXCPU		30	/* CPU limit exceeded (4.2 BSD).  */
--#define TARGET_SIGXFSZ		31	/* File size limit exceeded (4.2 BSD).  */
--#define TARGET_SIGRTMIN         32
--
--#define TARGET_SIG_BLOCK	1	/* for blocking signals */
--#define TARGET_SIG_UNBLOCK	2	/* for unblocking signals */
--#define TARGET_SIG_SETMASK	3	/* for setting the signal mask */
--
- #elif defined(TARGET_HPPA)
- 
- #define TARGET_SIGHUP           1
--- 
-2.14.3
+Otherwise subsequent computations are done with the node_offset already
+converted to le32 whereas the cpu mode may be "be"?
+
+Shouldn't conversions to le32 being done at the last stage when
+populating the structs?
+
+May be worth splitting this into 2 patches then or at least mentioning
+this other fix in the commit message?
+
+Thanks
+
+Eric
+
+>=20
+>>
+>>>         node_size =3D sizeof(*smmu) + sizeof(*idmap);
+>>>         iort_length +=3D node_size;
+>>>         smmu =3D acpi_data_push(table_data, node_size);
+>>> @@ -450,7 +456,7 @@ build_iort(GArray *table_data, BIOSLinker *linker=
+, VirtMachineState *vms)
+>>>         idmap->id_count =3D cpu_to_le32(0xFFFF);
+>>>         idmap->output_base =3D 0;
+>>>         /* output IORT node is the ITS group node (the first node) */
+>>> -        idmap->output_reference =3D cpu_to_le32(iort->node_offset);
+>>> +        idmap->output_reference =3D cpu_to_le32(iort_node_offset);
+>>
+>> Here we're doing an endianness conversion on iort_node_offset.
+>>
+>> Overall something is weird here, even in the previous version:
+>> if we wrote iort->node_offset with cpu_to_le32(), that implies
+>> that it's little-endian; so why are we reading it with cpu_to_le32()
+>> here rather than le32_to_cpu() ?
+>> Both cpu_to_le32() and le32_to_cpu() are the same operation,
+>> mathematically, but we should use the version which indicates
+>> our intent, ie which of source and destination is the always-LE
+>> data, and which is the host-order data.
+>>
+>>>     }
+>>>
+>>>     /* Root Complex Node */
+>>> @@ -479,9 +485,14 @@ build_iort(GArray *table_data, BIOSLinker *linke=
+r, VirtMachineState *vms)
+>>>         idmap->output_reference =3D cpu_to_le32(smmu_offset);
+>>>     } else {
+>>>         /* output IORT node is the ITS group node (the first node) */
+>>> -        idmap->output_reference =3D cpu_to_le32(iort->node_offset);
+>>> +        idmap->output_reference =3D cpu_to_le32(iort_node_offset);
+>>>     }
+>>>
+>>> +    /*
+>>> +     * Update the pointer address in case table_data->data moves dur=
+ing above
+>>> +     * acpi_data_push operations.
+>>> +     */
+>>> +    iort =3D (AcpiIortTable *)(table_data->data + iort_start);
+>>>     iort->length =3D cpu_to_le32(iort_length);
+>>>
+>>>     build_header(linker, table_data, (void *)(table_data->data + iort=
+_start),
+>>
+>> This could just use 'iort' now, right?
+> Right, but for consistent as other places I think it=E2=80=99s fine to =
+remain unchanged.=20
+>>
+>>> --
+>>
+>> thanks
+>> -- PMM
+>=20
+>=20
