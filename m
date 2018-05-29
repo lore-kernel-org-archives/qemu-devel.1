@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34423)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34579)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fNfTe-0007z2-2r
-	for qemu-devel@nongnu.org; Tue, 29 May 2018 10:19:58 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1fNfUP-00004r-BO
+	for qemu-devel@nongnu.org; Tue, 29 May 2018 10:20:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fNfTZ-0006dq-Al
-	for qemu-devel@nongnu.org; Tue, 29 May 2018 10:19:54 -0400
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20170724182751.18261-1-f4bug@amsat.org>
-	<20170724182751.18261-32-f4bug@amsat.org>
-	<950e1d4b-3a65-6cf5-88a7-13a986f69e0f@vivier.eu>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <d5692df7-1647-81cb-9034-98e8a0e31f4c@amsat.org>
-Date: Tue, 29 May 2018 11:19:39 -0300
+	(envelope-from <peter.maydell@linaro.org>) id 1fNfUO-0006y1-JW
+	for qemu-devel@nongnu.org; Tue, 29 May 2018 10:20:41 -0400
+Received: from mail-oi0-x243.google.com ([2607:f8b0:4003:c06::243]:37978)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1fNfUO-0006xj-Ep
+	for qemu-devel@nongnu.org; Tue, 29 May 2018 10:20:40 -0400
+Received: by mail-oi0-x243.google.com with SMTP id d5-v6so10166522oib.5
+	for <qemu-devel@nongnu.org>; Tue, 29 May 2018 07:20:40 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <950e1d4b-3a65-6cf5-88a7-13a986f69e0f@vivier.eu>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH for 2.10 31/35] syscall: replace strcpy()
- by g_strlcpy()
+In-Reply-To: <1527247371-10592-2-git-send-email-zhaoshenglong@huawei.com>
+References: <1527247371-10592-1-git-send-email-zhaoshenglong@huawei.com>
+	<1527247371-10592-2-git-send-email-zhaoshenglong@huawei.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 29 May 2018 15:20:19 +0100
+Message-ID: <CAFEAcA-Um2dCAUJ2uxjZW6foBsrEYMnKNmFwex=kD63vLUJ2Ww@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH v4 1/2] arm_gicv3_kvm:
+ kvm_dist_get/put_priority: skip the registers banked by GICR_IPRIORITYR
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,47 +30,23 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laurent Vivier <laurent@vivier.eu>, Eric Blake <eblake@redhat.com>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, Riku Voipio <riku.voipio@iki.fi>
-Cc: qemu-devel@nongnu.org, qemu-trivial@nongnu.org
+To: Shannon Zhao <zhaoshenglong@huawei.com>
+Cc: qemu-arm <qemu-arm@nongnu.org>, Eric Auger <eric.auger@redhat.com>, qemu-stable <qemu-stable@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, Shannon Zhao <shannon.zhaosl@gmail.com>
 
-Hi Laurent,
+On 25 May 2018 at 12:22, Shannon Zhao <zhaoshenglong@huawei.com> wrote:
+> While for_each_dist_irq_reg loop starts from GIC_INTERNAL, it forgot to
+> offset the date array and index. This will overlap the GICR registers
+> value and leave the last GIC_INTERNAL irq's registers out of update.
+>
+> Fixes: 367b9f527becdd20ddf116e17a3c0c2bbc486920
+> Cc: qemu-stable@nongnu.org
+> Signed-off-by: Shannon Zhao <zhaoshenglong@huawei.com>
+> ---
+>  hw/intc/arm_gicv3_kvm.c | 18 ++++++++++++++++--
+>  1 file changed, 16 insertions(+), 2 deletions(-)
+>
 
-On 07/24/2017 04:28 PM, Laurent Vivier wrote:
-> Le 24/07/2017 à 20:27, Philippe Mathieu-Daudé a écrit :
->> linux-user/syscall.c:9860:17: warning: Call to function 'strcpy' is insecure as it does not provide bounding of the memory buffer. Replace unbounded copy functions with analogous functions that support length arguments such as 'strlcpy'. CWE-119
->>                 strcpy (buf->machine, cpu_to_uname_machine(cpu_env));
->>                 ^~~~~~
->>
->> Reported-by: Clang Static Analyzer
->> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
->> ---
->>  linux-user/syscall.c | 3 ++-
->>  1 file changed, 2 insertions(+), 1 deletion(-)
->>
->> diff --git a/linux-user/syscall.c b/linux-user/syscall.c
->> index 963b9c8f4b..847f729834 100644
->> --- a/linux-user/syscall.c
->> +++ b/linux-user/syscall.c
->> @@ -9853,7 +9853,8 @@ abi_long do_syscall(void *cpu_env, int num, abi_long arg1,
->>              if (!is_error(ret)) {
->>                  /* Overwrite the native machine name with whatever is being
->>                     emulated. */
->> -                strcpy (buf->machine, cpu_to_uname_machine(cpu_env));
->> +                g_strlcpy(buf->machine, cpu_to_uname_machine(cpu_env),
->> +                          sizeof(buf->machine));
->>                  /* Allow the user to override the reported release.  */
->>                  if (qemu_uname_release && *qemu_uname_release) {
->>                      g_strlcpy(buf->release, qemu_uname_release,
->>
-> 
-> We should not have a problem here as cpu_to_uname_machine() is "const
-> char *" and the string is defined inside QEMU (so it should fit into
-> machine[]).
-> 
-> Reviewed-by: Laurent Vivier <laurent@vivier.eu>
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 
-Do you mind queuing this patch in your linux-user tree?
-
-Thanks,
-
-Phil.
+thanks
+-- PMM
