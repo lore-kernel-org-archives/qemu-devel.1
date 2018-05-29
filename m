@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36617)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36605)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <crosa@redhat.com>) id 1fNkRP-0000aX-My
+	(envelope-from <crosa@redhat.com>) id 1fNkRP-0000aU-E5
 	for qemu-devel@nongnu.org; Tue, 29 May 2018 15:37:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <crosa@redhat.com>) id 1fNkRO-0006P5-Eg
+	(envelope-from <crosa@redhat.com>) id 1fNkRM-0006OZ-RL
 	for qemu-devel@nongnu.org; Tue, 29 May 2018 15:37:55 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:48660 helo=mx1.redhat.com)
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:42398 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <crosa@redhat.com>) id 1fNkRO-0006Oy-9l
-	for qemu-devel@nongnu.org; Tue, 29 May 2018 15:37:54 -0400
+	(Exim 4.71) (envelope-from <crosa@redhat.com>) id 1fNkRM-0006OQ-M3
+	for qemu-devel@nongnu.org; Tue, 29 May 2018 15:37:52 -0400
 From: Cleber Rosa <crosa@redhat.com>
-Date: Tue, 29 May 2018 15:37:29 -0400
-Message-Id: <20180529193730.9204-5-crosa@redhat.com>
+Date: Tue, 29 May 2018 15:37:26 -0400
+Message-Id: <20180529193730.9204-2-crosa@redhat.com>
 In-Reply-To: <20180529193730.9204-1-crosa@redhat.com>
 References: <20180529193730.9204-1-crosa@redhat.com>
-Subject: [Qemu-devel] [PATCH v3 4/5] scripts/qemu.py: introduce
- set_console() method
+Subject: [Qemu-devel] [PATCH v3 1/5] Add functional/acceptance tests
+ infrastructure
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,173 +27,293 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Eduardo Habkost <ehabkost@redhat.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Stefan Hajnoczi <stefanha@redhat.com>, Fam Zheng <famz@redhat.com>, Amador Pahim <amador@pahim.org>, Cleber Rosa <crosa@redhat.com>
 
-The set_console() method is intended to ease higher level use cases
-that require a console device.
+This patch adds the very minimum infrastructure necessary for writing
+and running functional/acceptance tests, including:
 
-The amount of intelligence is limited on purpose, requiring either the
-device type explicitly, or the existence of a machine (pattern)
-definition.
+ * Documentation
+ * The avocado_qemu.Test base test class
+ * One example tests (test_version.py)
 
-Because of the console device type selection criteria (by machine
-type), users should also be able to define that.  It'll then be used
-for both '-machine' and for the console device type selection.
-
-Users of the set_console() method will certainly be interested in
-accessing the console device, and for that a console_socket property
-has been added.
+Additional functionality is expected to be added along the tests that
+require them.
 
 Signed-off-by: Cleber Rosa <crosa@redhat.com>
 ---
- scripts/qemu.py | 97 ++++++++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 96 insertions(+), 1 deletion(-)
+ docs/devel/testing.rst                    | 153 ++++++++++++++++++++++
+ tests/acceptance/README.rst               |  10 ++
+ tests/acceptance/avocado_qemu/__init__.py |  54 ++++++++
+ tests/acceptance/version.py               |  24 ++++
+ 4 files changed, 241 insertions(+)
+ create mode 100644 tests/acceptance/README.rst
+ create mode 100644 tests/acceptance/avocado_qemu/__init__.py
+ create mode 100644 tests/acceptance/version.py
 
-diff --git a/scripts/qemu.py b/scripts/qemu.py
-index 7cd8193df8..f099ce7278 100644
---- a/scripts/qemu.py
-+++ b/scripts/qemu.py
-@@ -17,19 +17,41 @@ import logging
- import os
- import subprocess
- import qmp.qmp
-+import re
- import shutil
-+import socket
- import tempfile
+diff --git a/docs/devel/testing.rst b/docs/devel/testing.rst
+index 0ca1a2d4b5..5e090c87fb 100644
+--- a/docs/devel/testing.rst
++++ b/docs/devel/testing.rst
+@@ -484,3 +484,156 @@ supported. To start the fuzzer, run
  
- 
- LOG = logging.getLogger(__name__)
- 
- 
-+#: Maps machine types to the preferred console device types
-+CONSOLE_DEV_TYPES = {
-+    r'^clipper$': 'isa-serial',
-+    r'^malta': 'isa-serial',
-+    r'^(pc.*|q35.*|isapc)$': 'isa-serial',
-+    r'^(40p|powernv|prep)$': 'isa-serial',
-+    r'^pseries.*': 'spapr-vty',
-+    r'^s390-ccw-virtio.*': 'sclpconsole',
-+    }
+ Alternatively, some command different from "qemu-img info" can be tested, by
+ changing the ``-c`` option.
++
++Acceptance tests using the Avocado Framework
++============================================
++
++The ``tests/acceptance`` directory hosts functional tests, also known
++as acceptance level tests.  They're usually higher level, and may
++interact with external resources and with various guest operating
++systems.
++
++These tests are written using the Avocado Testing Framework (which must
++be installed separately) in conjunction with a the ``avocado_qemu.Test``
++class, implemented at ``tests/acceptance/avocado_qemu``.
++
++Installation
++------------
++
++To install Avocado and its dependencies, run:
++
++.. code::
++
++  pip install --user avocado-framework
++
++Alternatively, follow the instructions on this link:
++
++  http://avocado-framework.readthedocs.io/en/latest/GetStartedGuide.html#installing-avocado
++
++Overview
++--------
++
++This directory provides the ``avocado_qemu`` Python module, containing
++the ``avocado_qemu.Test`` class.  Here's a simple usage example:
++
++.. code::
++
++  from avocado_qemu import Test
 +
 +
- class QEMUMachineError(Exception):
-     """
-     Exception called when an error in QEMUMachine happens.
-     """
- 
- 
-+class QEMUMachineAddDeviceError(QEMUMachineError):
++  class Version(Test):
++      """
++      :avocado: enable
++      :avocado: tags=quick
++      """
++      def test_qmp_human_info_version(self):
++          self.vm.launch()
++          res = self.vm.command('human-monitor-command',
++                                command_line='info version')
++          self.assertRegexpMatches(res, r'^(\d+\.\d+\.\d)')
++
++To execute your test, run:
++
++.. code::
++
++  avocado run version.py
++
++To run all tests in the current directory, tagged in a particular way,
++run:
++
++.. code::
++
++  avocado run -t <TAG> .
++
++The ``avocado_qemu.Test`` base test class
++-----------------------------------------
++
++The ``avocado_qemu.Test`` class has a number of characteristics that
++are worth being mentioned right away.
++
++First of all, it attempts to give each test a ready to use QEMUMachine
++instance, available at ``self.vm``.  Because many tests will tweak the
++QEMU command line, launching the QEMUMachine (by using ``self.vm.launch()``)
++is left to the test writer.
++
++At test "tear down", ``avocado_qemu.Test`` handles the QEMUMachine
++shutdown.
++
++QEMUMachine
++~~~~~~~~~~~
++
++The QEMUMachine API should be somewhat familiar to QEMU hackers.  It's
++used in the Python iotests, device-crash-test and other Python scripts.
++
++QEMU binary selection
++~~~~~~~~~~~~~~~~~~~~~
++
++The QEMU binary used for the ``self.vm`` QEMUMachine instance will
++primarily depend on the value of the ``qemu_bin`` parameter.  If it's
++not explicitly set, its default value will be the result of a dynamic
++probe in the same source tree.  A suitable binary will be one that
++targets the architecture matching host machine.
++
++Based on this description, test writers will usually rely on one of
++the following approaches:
++
++1) Set ``qemu_bin``, and use the given binary
++
++2) Do not set ``qemu_bin``, and use a QEMU binary named like
++   "${arch}-softmmu/qemu-system-${arch}", either in the current
++   working directory, or in the current source tree.
++
++The resulting ``qemu_bin`` value will be preserved in the
++``avocado_qemu.Test`` as an attribute with the same name.
++
++Attribute reference
++-------------------
++
++Besides the attributes and methods that are part of the base
++``avocado.Test`` class, the following attributes are available on any
++``avocado_qemu.Test`` instance.
++
++vm
++~~
++
++A QEMUMachine instance, initially configured according to the given
++``qemu_bin`` parameter.
++
++qemu_bin
++~~~~~~~~
++
++The preserved value of the ``qemu_bin`` parameter or the result of the
++dynamic probe for a QEMU binary in the current working directory or
++source tree.
++
++Parameter reference
++-------------------
++
++To understand how Avocado parameters are accessed by tests, and how
++they can be passed to tests, please refer to::
++
++  http://avocado-framework.readthedocs.io/en/latest/WritingTests.html#accessing-test-parameters
++
++Parameter values can be easily seen in the log files, and will look
++like the following:
++
++.. code::
++
++  PARAMS (key=qemu_bin, path=*, default=x86_64-softmmu/qemu-system-x86_64) => 'x86_64-softmmu/qemu-system-x86_64
++
++qemu_bin
++~~~~~~~~
++
++The exact QEMU binary to be used on QEMUMachine.
++
++Uninstalling Avocado
++--------------------
++
++If you've followed the installation instructions above, you can easily
++uninstall Avocado.  Start by listing the packages you have installed::
++
++  pip list --user
++
++And remove any package you want with::
++
++  pip uninstall <package_name>
+diff --git a/tests/acceptance/README.rst b/tests/acceptance/README.rst
+new file mode 100644
+index 0000000000..89260faed6
+--- /dev/null
++++ b/tests/acceptance/README.rst
+@@ -0,0 +1,10 @@
++============================================
++Acceptance tests using the Avocado Framework
++============================================
++
++This directory contains functional tests, also known as acceptance
++level tests.  They're usually higher level, and may interact with
++external resources and with various guest operating systems.
++
++For more information, please refer to ``docs/devel/testing.rst``,
++section "Acceptance tests using the Avocado Framework".
+diff --git a/tests/acceptance/avocado_qemu/__init__.py b/tests/acceptance/avocado_qemu/__init__.py
+new file mode 100644
+index 0000000000..1e54fd5932
+--- /dev/null
++++ b/tests/acceptance/avocado_qemu/__init__.py
+@@ -0,0 +1,54 @@
++# Test class and utilities for functional tests
++#
++# Copyright (c) 2018 Red Hat, Inc.
++#
++# Author:
++#  Cleber Rosa <crosa@redhat.com>
++#
++# This work is licensed under the terms of the GNU GPL, version 2 or
++# later.  See the COPYING file in the top-level directory.
++
++import os
++import sys
++
++import avocado
++
++SRC_ROOT_DIR = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
++SRC_ROOT_DIR = os.path.abspath(os.path.dirname(SRC_ROOT_DIR))
++sys.path.append(os.path.join(SRC_ROOT_DIR, 'scripts'))
++
++from qemu import QEMUMachine
++
++def is_readable_executable_file(path):
++    return os.path.isfile(path) and os.access(path, os.R_OK | os.X_OK)
++
++
++def pick_default_qemu_bin():
 +    """
-+    Exception raised when a request to add a device can not be fulfilled
-+
-+    The failures are caused by limitations, lack of information or conflicting
-+    requests on the QEMUMachine methods.  This exception does not represent
-+    failures reported by the QEMU binary itself.
++    Picks the path of a QEMU binary, starting either in the current working
++    directory or in the source tree root directory.
 +    """
++    arch = os.uname()[4]
++    qemu_bin_relative_path = os.path.join("%s-softmmu" % arch,
++                                          "qemu-system-%s" % arch)
++    if is_readable_executable_file(qemu_bin_relative_path):
++        return qemu_bin_relative_path
 +
- class MonitorResponseError(qmp.qmp.QMPError):
-     '''
-     Represents erroneous QMP monitor reply
-@@ -91,6 +113,10 @@ class QEMUMachine(object):
-         self._test_dir = test_dir
-         self._temp_dir = None
-         self._launched = False
-+        self._machine = None
-+        self._console_device_type = None
-+        self._console_address = None
-+        self._console_socket = None
- 
-         # just in case logging wasn't configured by the main script:
-         logging.basicConfig()
-@@ -175,9 +201,19 @@ class QEMUMachine(object):
-                 self._monitor_address[1])
-         else:
-             moncdev = 'socket,id=mon,path=%s' % self._vm_monitor
--        return ['-chardev', moncdev,
-+        args = ['-chardev', moncdev,
-                 '-mon', 'chardev=mon,mode=control',
-                 '-display', 'none', '-vga', 'none']
-+        if self._machine is not None:
-+            args.extend(['-machine', self._machine])
-+        if self._console_device_type is not None:
-+            self._console_address = os.path.join(self._temp_dir,
-+                                                 self._name + "-console.sock")
-+            chardev = ('socket,id=console,path=%s,server,nowait' %
-+                       self._console_address)
-+            device = '%s,chardev=console' % self._console_device_type
-+            args.extend(['-chardev', chardev, '-device', device])
-+        return args
- 
-     def _pre_launch(self):
-         self._temp_dir = tempfile.mkdtemp(dir=self._test_dir)
-@@ -202,6 +238,10 @@ class QEMUMachine(object):
- 
-         self._qemu_log_path = None
- 
-+        if self._console_socket is not None:
-+            self._console_socket.close()
-+            self._console_socket = None
++    qemu_bin_from_src_dir_path = os.path.join(SRC_ROOT_DIR,
++                                              qemu_bin_relative_path)
++    if is_readable_executable_file(qemu_bin_from_src_dir_path):
++        return qemu_bin_from_src_dir_path
 +
-         if self._temp_dir is not None:
-             shutil.rmtree(self._temp_dir)
-             self._temp_dir = None
-@@ -365,3 +405,58 @@ class QEMUMachine(object):
-         Adds to the list of extra arguments to be given to the QEMU binary
-         '''
-         self._args.extend(args)
 +
-+    def set_machine(self, machine_type):
-+        '''
-+        Sets the machine type
++class Test(avocado.Test):
++    def setUp(self):
++        self.vm = None
++        self.qemu_bin = self.params.get('qemu_bin',
++                                        default=pick_default_qemu_bin())
++        if self.qemu_bin is None:
++            self.cancel("No QEMU binary defined or found in the source tree")
++        self.vm = QEMUMachine(self.qemu_bin)
 +
-+        If set, the machine type will be added to the base arguments
-+        of the resulting QEMU command line.
-+        '''
-+        self._machine = machine_type
++    def tearDown(self):
++        if self.vm is not None:
++            self.vm.shutdown()
+diff --git a/tests/acceptance/version.py b/tests/acceptance/version.py
+new file mode 100644
+index 0000000000..13b0a7440d
+--- /dev/null
++++ b/tests/acceptance/version.py
+@@ -0,0 +1,24 @@
++# Version check example test
++#
++# Copyright (c) 2018 Red Hat, Inc.
++#
++# Author:
++#  Cleber Rosa <crosa@redhat.com>
++#
++# This work is licensed under the terms of the GNU GPL, version 2 or
++# later.  See the COPYING file in the top-level directory.
 +
-+    def set_console(self, device_type=None):
-+        '''
-+        Sets the device type for a console device
 +
-+        If set, the console device and a backing character device will
-+        be added to the base arguments of the resulting QEMU command
-+        line.
++from avocado_qemu import Test
 +
-+        This is a convenience method that will either use the provided
-+        device type, of if not given, it will used the device type set
-+        on CONSOLE_DEV_TYPES.
 +
-+        The actual setting of command line arguments will be be done at
-+        machine launch time, as it depends on the temporary directory
-+        to be created.
-+
-+        @param device_type: the device type, such as "isa-serial"
-+        @raises: QEMUMachineAddDeviceError if the device type is not given
-+                 and can not be determined.
-+        '''
-+        if device_type is None:
-+            if self._machine is None:
-+                raise QEMUMachineAddDeviceError("Can not add a console device:"
-+                                                " QEMU instance without a "
-+                                                "defined machine type")
-+            for regex, device in CONSOLE_DEV_TYPES.items():
-+                if re.match(regex, self._machine):
-+                    device_type = device
-+                    break
-+            if device_type is None:
-+                raise QEMUMachineAddDeviceError("Can not add a console device:"
-+                                                " no matching console device "
-+                                                "type definition")
-+        self._console_device_type = device_type
-+
-+    @property
-+    def console_socket(self):
-+        """
-+        Returns a socket connected to the console
-+        """
-+        if self._console_socket is None:
-+            self._console_socket = socket.socket(socket.AF_UNIX,
-+                                                 socket.SOCK_STREAM)
-+            self._console_socket.connect(self._console_address)
-+        return self._console_socket
++class Version(Test):
++    """
++    :avocado: enable
++    :avocado: tags=quick
++    """
++    def test_qmp_human_info_version(self):
++        self.vm.launch()
++        res = self.vm.command('human-monitor-command',
++                              command_line='info version')
++        self.assertRegexpMatches(res, r'^(\d+\.\d+\.\d)')
 -- 
 2.17.0
