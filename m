@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35174)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37026)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1fOqvn-0001UW-CH
-	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 16:45:52 -0400
+	(envelope-from <no-reply@patchew.org>) id 1fOqzE-0002YW-GS
+	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 16:49:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1fOqvj-0003Bl-B2
-	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 16:45:51 -0400
-Received: from mout.kundenserver.de ([217.72.192.74]:43443)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1fOqvj-00035A-1H
-	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 16:45:47 -0400
-References: <20180531041822.5761-1-richard.henderson@linaro.org>
-	<20180531041822.5761-2-richard.henderson@linaro.org>
-From: Laurent Vivier <laurent@vivier.eu>
-Message-ID: <dbd7a0dd-a6db-e9ca-d9fd-7ae5e75efdb4@vivier.eu>
-Date: Fri, 1 Jun 2018 22:45:42 +0200
+	(envelope-from <no-reply@patchew.org>) id 1fOqzA-0002yJ-Jc
+	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 16:49:24 -0400
+Resent-Message-Id: <E1fOqzA-0002yJ-Jc@eggs.gnu.org>
+Received: from sender-of-o51.zoho.com ([135.84.80.216]:21030)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1fOqz9-0002rk-Uf
+	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 16:49:20 -0400
+In-Reply-To: <20180529203910.7615-1-kwolf@redhat.com>
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <152762766073.300.11428379997911683615@d39dc562802a>
 MIME-Version: 1.0
-In-Reply-To: <20180531041822.5761-2-richard.henderson@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 1/2] linux-user: Implement signals for
- openrisc
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Tue, 29 May 2018 14:01:01 -0700 (PDT)
+Subject: Re: [Qemu-devel] [PATCH v2 00/16] block: Make blockdev-create a job
+ and stable API
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,64 +29,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
-Cc: shorne@gmail.com
+To: kwolf@redhat.com
+Cc: famz@redhat.com, qemu-block@nongnu.org, pkrempa@redhat.com, jsnow@redhat.com, jcody@redhat.com, qemu-devel@nongnu.org, mreitz@redhat.com
 
-Le 31/05/2018 à 06:18, Richard Henderson a écrit :
-> All of the existing code was boilerplate from elsewhere,
-> and would crash the guest upon the first signal.
-> 
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-> ---
->  linux-user/openrisc/target_syscall.h |  23 +--
->  linux-user/openrisc/signal.c         | 210 +++++++++++----------------
->  linux-user/signal.c                  |   2 +-
->  target/openrisc/cpu.c                |   1 +
->  4 files changed, 87 insertions(+), 149 deletions(-)
-> 
-...
-> @@ -148,11 +102,8 @@ void setup_rt_frame(int sig, struct target_sigaction *ka,
->                      target_siginfo_t *info,
->                      target_sigset_t *set, CPUOpenRISCState *env)
->  {
-...
-> @@ -160,47 +111,32 @@ void setup_rt_frame(int sig, struct target_sigaction *ka,
->          goto give_sigsegv;
->      }
->  
-> -    info_addr = frame_addr + offsetof(struct target_rt_sigframe, info);
-> -    __put_user(info_addr, &frame->pinfo);
-> -    uc_addr = frame_addr + offsetof(struct target_rt_sigframe, uc);
-> -    __put_user(uc_addr, &frame->puc);
-> +    tswap_siginfo(&frame->info, info);
->  
-> -    if (ka->sa_flags & SA_SIGINFO) {
-> -        tswap_siginfo(&frame->info, info);
-> -    }
-
-Why do you remove the "ka->sa_flags & SA_SIGINFO"?
-
-> -    /*err |= __clear_user(&frame->uc, offsetof(ucontext_t, uc_mcontext));*/
->      __put_user(0, &frame->uc.tuc_flags);
->      __put_user(0, &frame->uc.tuc_link);
-> +
->      target_save_altstack(&frame->uc.tuc_stack, env);
-> -    setup_sigcontext(&frame->sc, env, set->sig[0]);
-> +    setup_sigcontext(&frame->uc.tuc_mcontext, env);
->  
-> -    /*err |= copy_to_user(frame->uc.tuc_sigmask, set, sizeof(*set));*/
-
-other targets have something like:
-
-    for (i = 0; i < TARGET_NSIG_WORDS; i++) {
-        __put_user(set->sig[i], &frame->uc.tuc_sigmask.sig[i]);
-    }
-
-to match kernel
-
-        err |= __copy_to_user(&frame->uc.uc_sigmask, set, sizeof(*set));
-
-Do we need it?
-
-Thanks,
-Laurent
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
+c3NhZ2UtaWQ6IDIwMTgwNTI5MjAzOTEwLjc2MTUtMS1rd29sZkByZWRoYXQuY29tClN1YmplY3Q6
+IFtRZW11LWRldmVsXSBbUEFUQ0ggdjIgMDAvMTZdIGJsb2NrOiBNYWtlIGJsb2NrZGV2LWNyZWF0
+ZSBhIGpvYiBhbmQgc3RhYmxlIEFQSQoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4v
+YmFzaAoKQkFTRT1iYXNlCm49MQp0b3RhbD0kKGdpdCBsb2cgLS1vbmVsaW5lICRCQVNFLi4gfCB3
+YyAtbCkKZmFpbGVkPTAKCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxpbWl0IDAKZ2l0
+IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lcyBUcnVlCmdpdCBjb25maWcgLS1sb2NhbCBkaWZm
+LmFsZ29yaXRobSBoaXN0b2dyYW0KCmNvbW1pdHM9IiQoZ2l0IGxvZyAtLWZvcm1hdD0lSCAtLXJl
+dmVyc2UgJEJBU0UuLikiCmZvciBjIGluICRjb21taXRzOyBkbwogICAgZWNobyAiQ2hlY2tpbmcg
+UEFUQ0ggJG4vJHRvdGFsOiAkKGdpdCBsb2cgLW4gMSAtLWZvcm1hdD0lcyAkYykuLi4iCiAgICBp
+ZiAhIGdpdCBzaG93ICRjIC0tZm9ybWF0PWVtYWlsIHwgLi9zY3JpcHRzL2NoZWNrcGF0Y2gucGwg
+LS1tYWlsYmFjayAtOyB0aGVuCiAgICAgICAgZmFpbGVkPTEKICAgICAgICBlY2hvCiAgICBmaQog
+ICAgbj0kKChuKzEpKQpkb25lCgpleGl0ICRmYWlsZWQKPT09IFRFU1QgU0NSSVBUIEVORCA9PT0K
+ClVwZGF0aW5nIDNjOGNmNWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMzODQKRnJvbSBo
+dHRwczovL2dpdGh1Yi5jb20vcGF0Y2hldy1wcm9qZWN0L3FlbXUKIHQgW3RhZyB1cGRhdGVdICAg
+ICAgICAgICAgcGF0Y2hldy8xNTI3NjEyMDkyLTY1OTgwLTEtZ2l0LXNlbmQtZW1haWwtYW50b24u
+bmVmZWRvdkB2aXJ0dW96em8uY29tIC0+IHBhdGNoZXcvMTUyNzYxMjA5Mi02NTk4MC0xLWdpdC1z
+ZW5kLWVtYWlsLWFudG9uLm5lZmVkb3ZAdmlydHVvenpvLmNvbQogKiBbbmV3IHRhZ10gICAgICAg
+ICAgICAgICBwYXRjaGV3LzIwMTgwNTI5MjAzOTEwLjc2MTUtMS1rd29sZkByZWRoYXQuY29tIC0+
+IHBhdGNoZXcvMjAxODA1MjkyMDM5MTAuNzYxNS0xLWt3b2xmQHJlZGhhdC5jb20KU3dpdGNoZWQg
+dG8gYSBuZXcgYnJhbmNoICd0ZXN0JwoxMjJkZTQ0MTZlIGJsb2NrL2NyZWF0ZTogTWFyayBibG9j
+a2Rldi1jcmVhdGUgc3RhYmxlCmEwODNlN2JlZWIgcWVtdS1pb3Rlc3RzOiBSZXdyaXRlIDIxMyBm
+b3IgYmxvY2tkZXYtY3JlYXRlIGpvYgpjOTQ3ZGZhNjlkIHFlbXUtaW90ZXN0czogUmV3cml0ZSAy
+MTIgZm9yIGJsb2NrZGV2LWNyZWF0ZSBqb2IKZGYzNzI0MWYyYSBxZW11LWlvdGVzdHM6IFJld3Jp
+dGUgMjExIGZvciBibG9ja2Rldi1jcmVhdGUgam9iCmIyNzc1YjlkYWYgcWVtdS1pb3Rlc3RzOiBS
+ZXdyaXRlIDIxMCBmb3IgYmxvY2tkZXYtY3JlYXRlIGpvYgpmNjBiZTg4MjA0IHFlbXUtaW90ZXN0
+czogUmV3cml0ZSAyMDcgZm9yIGJsb2NrZGV2LWNyZWF0ZSBqb2IKYmFmYzM0NzQ5NyBxZW11LWlv
+dGVzdHM6IFJld3JpdGUgMjA2IGZvciBibG9ja2Rldi1jcmVhdGUgam9iCjg2OGE5MDYxNzAgcWVt
+dS1pb3Rlc3RzOiBpb3Rlc3RzLnB5IGhlbHBlciBmb3Igbm9uLWZpbGUgcHJvdG9jb2xzCjMwYjJm
+ZTM5NjIgcWVtdS1pb3Rlc3RzOiBBZGQgVk0ucnVuX2pvYigpCmVlZTIxMDYyNTggcWVtdS1pb3Rl
+c3RzOiBBZGQgaW90ZXN0cy5pbWdfaW5mb19sb2coKQpiZGQwNzQzNzc3IHFlbXUtaW90ZXN0czog
+QWRkIFZNLnFtcF9sb2coKQpmMWNjNjJhNTE4IHFlbXUtaW90ZXN0czogQWRkIFZNLmdldF9xbXBf
+ZXZlbnRzX2ZpbHRlcmVkKCkKZjBjMGNlZWU5NyBibG9jay9jcmVhdGU6IE1ha2UgeC1ibG9ja2Rl
+di1jcmVhdGUgYSBqb2IKZDRkMGU0MTc0NyBqb2I6IEFkZCBlcnJvciBtZXNzYWdlIGZvciBmYWls
+aW5nIGpvYnMKNzYzODQxZjk0YiB2aGR4OiBGaXggdmhkeF9jb19jcmVhdGUoKSByZXR1cm4gdmFs
+dWUKYmQ2MGU3MWNlMSB2ZGk6IEZpeCB2ZGlfY29fZG9fY3JlYXRlKCkgcmV0dXJuIHZhbHVlCgo9
+PT0gT1VUUFVUIEJFR0lOID09PQpDaGVja2luZyBQQVRDSCAxLzE2OiB2ZGk6IEZpeCB2ZGlfY29f
+ZG9fY3JlYXRlKCkgcmV0dXJuIHZhbHVlLi4uCkNoZWNraW5nIFBBVENIIDIvMTY6IHZoZHg6IEZp
+eCB2aGR4X2NvX2NyZWF0ZSgpIHJldHVybiB2YWx1ZS4uLgpDaGVja2luZyBQQVRDSCAzLzE2OiBq
+b2I6IEFkZCBlcnJvciBtZXNzYWdlIGZvciBmYWlsaW5nIGpvYnMuLi4KQ2hlY2tpbmcgUEFUQ0gg
+NC8xNjogYmxvY2svY3JlYXRlOiBNYWtlIHgtYmxvY2tkZXYtY3JlYXRlIGEgam9iLi4uCkNoZWNr
+aW5nIFBBVENIIDUvMTY6IHFlbXUtaW90ZXN0czogQWRkIFZNLmdldF9xbXBfZXZlbnRzX2ZpbHRl
+cmVkKCkuLi4KQ2hlY2tpbmcgUEFUQ0ggNi8xNjogcWVtdS1pb3Rlc3RzOiBBZGQgVk0ucW1wX2xv
+ZygpLi4uCkNoZWNraW5nIFBBVENIIDcvMTY6IHFlbXUtaW90ZXN0czogQWRkIGlvdGVzdHMuaW1n
+X2luZm9fbG9nKCkuLi4KRVJST1I6IGxpbmUgb3ZlciA5MCBjaGFyYWN0ZXJzCiM0MjogRklMRTog
+dGVzdHMvcWVtdS1pb3Rlc3RzL2lvdGVzdHMucHk6MjI3OgorICAgICAgICBsaW5lID0gcmUuc3Vi
+KCd1dWlkOiBbLWEtZjAtOV0rJywgJ3V1aWQ6IFhYWFhYWFhYLVhYWFgtWFhYWC1YWFhYLVhYWFhY
+WFhYWFhYWCcsIGxpbmUpCgp0b3RhbDogMSBlcnJvcnMsIDAgd2FybmluZ3MsIDMwIGxpbmVzIGNo
+ZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYg
+YW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRo
+ZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCkNoZWNraW5nIFBB
+VENIIDgvMTY6IHFlbXUtaW90ZXN0czogQWRkIFZNLnJ1bl9qb2IoKS4uLgpDaGVja2luZyBQQVRD
+SCA5LzE2OiBxZW11LWlvdGVzdHM6IGlvdGVzdHMucHkgaGVscGVyIGZvciBub24tZmlsZSBwcm90
+b2NvbHMuLi4KQ2hlY2tpbmcgUEFUQ0ggMTAvMTY6IHFlbXUtaW90ZXN0czogUmV3cml0ZSAyMDYg
+Zm9yIGJsb2NrZGV2LWNyZWF0ZSBqb2IuLi4KQ2hlY2tpbmcgUEFUQ0ggMTEvMTY6IHFlbXUtaW90
+ZXN0czogUmV3cml0ZSAyMDcgZm9yIGJsb2NrZGV2LWNyZWF0ZSBqb2IuLi4KQ2hlY2tpbmcgUEFU
+Q0ggMTIvMTY6IHFlbXUtaW90ZXN0czogUmV3cml0ZSAyMTAgZm9yIGJsb2NrZGV2LWNyZWF0ZSBq
+b2IuLi4KQ2hlY2tpbmcgUEFUQ0ggMTMvMTY6IHFlbXUtaW90ZXN0czogUmV3cml0ZSAyMTEgZm9y
+IGJsb2NrZGV2LWNyZWF0ZSBqb2IuLi4KQ2hlY2tpbmcgUEFUQ0ggMTQvMTY6IHFlbXUtaW90ZXN0
+czogUmV3cml0ZSAyMTIgZm9yIGJsb2NrZGV2LWNyZWF0ZSBqb2IuLi4KQ2hlY2tpbmcgUEFUQ0gg
+MTUvMTY6IHFlbXUtaW90ZXN0czogUmV3cml0ZSAyMTMgZm9yIGJsb2NrZGV2LWNyZWF0ZSBqb2Iu
+Li4KQ2hlY2tpbmcgUEFUQ0ggMTYvMTY6IGJsb2NrL2NyZWF0ZTogTWFyayBibG9ja2Rldi1jcmVh
+dGUgc3RhYmxlLi4uCj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRo
+IGNvZGU6IDEKCgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBb
+aHR0cDovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hl
+dy1kZXZlbEByZWRoYXQuY29t
