@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45089)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45109)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1fNj9j-0008OZ-1b
-	for qemu-devel@nongnu.org; Tue, 29 May 2018 14:15:35 -0400
+	(envelope-from <kwolf@redhat.com>) id 1fNj9p-0008RY-FD
+	for qemu-devel@nongnu.org; Tue, 29 May 2018 14:15:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1fNj9i-0001q2-2V
-	for qemu-devel@nongnu.org; Tue, 29 May 2018 14:15:34 -0400
-Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:42252)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1fNj9h-0001nf-Rq
-	for qemu-devel@nongnu.org; Tue, 29 May 2018 14:15:34 -0400
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 29 May 2018 19:15:23 +0100
-Message-Id: <20180529181523.19185-1-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PATCH v2] ui/cocoa: Suppress
- NSFileHandlingPanelOKButton deprecation warning
+	(envelope-from <kwolf@redhat.com>) id 1fNj9m-0001r3-8w
+	for qemu-devel@nongnu.org; Tue, 29 May 2018 14:15:41 -0400
+Date: Tue, 29 May 2018 20:15:35 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20180529181535.GI4756@localhost.localdomain>
+References: <152750903916.663961.9369851345277129751.stgit@bahia.lan>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <152750903916.663961.9369851345277129751.stgit@bahia.lan>
+Subject: Re: [Qemu-devel] [PATCH v4] block: fix QEMU crash with scsi-hd and
+ drive_del
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,58 +23,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: patches@linaro.org, John Arbuckle <programmingkidx@gmail.com>
+To: Greg Kurz <groug@kaod.org>
+Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, qemu-stable@nongnu.org
 
-OSX 10.13 deprecates the NSFileHandlingPanelOKButton constant, and
-would rather you use NSModalResponseOK, which was introduced in OS 10.9.
-Use the recommended new constant name, with a backward compatibility
-define if we're building on an older OSX.
+Am 28.05.2018 um 14:03 hat Greg Kurz geschrieben:
+> Removing a drive with drive_del while it is being used to run an I/O
+> intensive workload can cause QEMU to crash.
+> 
+> An AIO flush can yield at some point:
+> 
+> blk_aio_flush_entry()
+>  blk_co_flush(blk)
+>   bdrv_co_flush(blk->root->bs)
+>    ...
+>     qemu_coroutine_yield()
+> 
+> and let the HMP command to run, free blk->root and give control
+> back to the AIO flush:
+> 
+>     hmp_drive_del()
+>      blk_remove_bs()
+>       bdrv_root_unref_child(blk->root)
+>        child_bs = blk->root->bs
+>        bdrv_detach_child(blk->root)
+>         bdrv_replace_child(blk->root, NULL)
+>          blk->root->bs = NULL
+>         g_free(blk->root) <============== blk->root becomes stale
+>        bdrv_unref(child_bs)
+>         bdrv_delete(child_bs)
+>          bdrv_close()
+>           bdrv_drained_begin()
+>            bdrv_do_drained_begin()
+>             bdrv_drain_recurse()
+>              aio_poll()
+>               ...
+>               qemu_coroutine_switch()
+> 
+> and the AIO flush completion ends up dereferencing blk->root:
+> 
+>   blk_aio_complete()
+>    scsi_aio_complete()
+>     blk_get_aio_context(blk)
+>      bs = blk_bs(blk)
+>  ie, bs = blk->root ? blk->root->bs : NULL
+>             ^^^^^
+>             stale
+> 
+> The problem is that we should avoid making block driver graph
+> changes while we have in-flight requests. Let's drain all I/O
+> for this BB before calling bdrv_root_unref_child().
+> 
+> Signed-off-by: Greg Kurz <groug@kaod.org>
 
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
----
-v1->v2: define MAC_OS_X_VERSION_10_9 if the system headers don't;
-fixes compilation on versions before 10.9.
----
- ui/cocoa.m | 12 +++++++++++-
- 1 file changed, 11 insertions(+), 1 deletion(-)
+Thanks, applied to the block branch.
 
-diff --git a/ui/cocoa.m b/ui/cocoa.m
-index 110b393e4e..2991ed4f19 100644
---- a/ui/cocoa.m
-+++ b/ui/cocoa.m
-@@ -44,6 +44,9 @@
- #ifndef MAC_OS_X_VERSION_10_6
- #define MAC_OS_X_VERSION_10_6 1060
- #endif
-+#ifndef MAC_OS_X_VERSION_10_9
-+#define MAC_OS_X_VERSION_10_9 1090
-+#endif
- #ifndef MAC_OS_X_VERSION_10_10
- #define MAC_OS_X_VERSION_10_10 101000
- #endif
-@@ -79,6 +82,13 @@
- #define NSWindowStyleMaskMiniaturizable NSMiniaturizableWindowMask
- #define NSWindowStyleMaskTitled         NSTitledWindowMask
- #endif
-+/* 10.13 deprecates NSFileHandlingPanelOKButton in favour of
-+ * NSModalResponseOK, which was introduced in 10.9. Define
-+ * it for older versions.
-+ */
-+#if MAC_OS_X_VERSION_MAX_ALLOWED < MAC_OS_X_VERSION_10_9
-+#define NSModalResponseOK NSFileHandlingPanelOKButton
-+#endif
- 
- //#define DEBUG
- 
-@@ -1218,7 +1228,7 @@ QemuCocoaView *cocoaView;
-     [openPanel setCanChooseFiles: YES];
-     [openPanel setAllowsMultipleSelection: NO];
-     [openPanel setAllowedFileTypes: supportedImageFileTypes];
--    if([openPanel runModal] == NSFileHandlingPanelOKButton) {
-+    if([openPanel runModal] == NSModalResponseOK) {
-         NSString * file = [[[openPanel URLs] objectAtIndex: 0] path];
-         if(file == nil) {
-             NSBeep();
--- 
-2.17.0
+Kevin
