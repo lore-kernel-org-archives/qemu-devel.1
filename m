@@ -1,30 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50563)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51122)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fNecg-00065K-0C
-	for qemu-devel@nongnu.org; Tue, 29 May 2018 09:25:15 -0400
+	(envelope-from <imammedo@redhat.com>) id 1fNeep-0007cF-Co
+	for qemu-devel@nongnu.org; Tue, 29 May 2018 09:27:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fNecc-00086f-RD
-	for qemu-devel@nongnu.org; Tue, 29 May 2018 09:25:09 -0400
-Received: from mail-wr0-x242.google.com ([2a00:1450:400c:c0c::242]:43035)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1fNecc-00085j-KR
-	for qemu-devel@nongnu.org; Tue, 29 May 2018 09:25:06 -0400
-Received: by mail-wr0-x242.google.com with SMTP id d2-v6so10048803wrm.10
-	for <qemu-devel@nongnu.org>; Tue, 29 May 2018 06:25:06 -0700 (PDT)
-References: <20180115143500.22631-1-f4bug@amsat.org>
-	<20180115143500.22631-2-f4bug@amsat.org>
-	<878tcwomfm.fsf@linaro.org>
-	<56ff485a-7f6e-353a-b232-f5370e851923@amsat.org>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <56ff485a-7f6e-353a-b232-f5370e851923@amsat.org>
-Date: Tue, 29 May 2018 14:25:03 +0100
-Message-ID: <87a7si1tn4.fsf@linaro.org>
+	(envelope-from <imammedo@redhat.com>) id 1fNeem-0001HF-7l
+	for qemu-devel@nongnu.org; Tue, 29 May 2018 09:27:23 -0400
+Date: Tue, 29 May 2018 15:27:14 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20180529152714.232f952c@redhat.com>
+In-Reply-To: <20180517081527.14410-2-david@redhat.com>
+References: <20180517081527.14410-1-david@redhat.com>
+	<20180517081527.14410-2-david@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 1/8] docker: sort images list displayed
- by 'make docker'
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v4 01/14] memory-device: drop assert
+ related to align and start of address space
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,58 +24,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Cc: Fam Zheng <famz@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
+To: David Hildenbrand <david@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-s390x@nongnu.org, "Michael S . Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Markus Armbruster <armbru@redhat.com>, qemu-ppc@nongnu.org, Pankaj Gupta <pagupta@redhat.com>, Alexander Graf <agraf@suse.de>, Cornelia Huck <cohuck@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Luiz Capitulino <lcapitulino@redhat.com>
+
+On Thu, 17 May 2018 10:15:14 +0200
+David Hildenbrand <david@redhat.com> wrote:
+
+> The start of the address space does not have to be aligned for the
+> search. Handle this case explicitly when starting the search for a new
+> address.
+That's true,
+but commit message doesn't explain why address_space_start
+should be allowed to be non aligned.
+
+At least with this assert we would notice early that
+board allocating misaligned address space.
+I'd keep the assert unless there is a good reason to drop it.
 
 
-Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> writes:
-
-> Hi Alex,
->
-> On 01/17/2018 06:37 AM, Alex Benn=C3=A9e wrote:
->>
->> Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> writes:
->>
->>> we can now directly see different version sort consecutively.
->>>
->>> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
->>
->> I of course meant:
->>
->> Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
->
-> Can you queue this patch please?
-
-queued - I send out a round-up series in a bit
->
->>
->>
->>> ---
->>>  tests/docker/Makefile.include | 2 +-
->>>  1 file changed, 1 insertion(+), 1 deletion(-)
->>>
->>> diff --git a/tests/docker/Makefile.include b/tests/docker/Makefile.incl=
-ude
->>> index de87341528..ef95703cef 100644
->>> --- a/tests/docker/Makefile.include
->>> +++ b/tests/docker/Makefile.include
->>> @@ -4,7 +4,7 @@
->>>
->>>  DOCKER_SUFFIX :=3D .docker
->>>  DOCKER_FILES_DIR :=3D $(SRC_PATH)/tests/docker/dockerfiles
->>> -DOCKER_IMAGES :=3D $(notdir $(basename $(wildcard $(DOCKER_FILES_DIR)/=
-*.docker)))
->>> +DOCKER_IMAGES :=3D $(sort $(notdir $(basename $(wildcard $(DOCKER_FILE=
-S_DIR)/*.docker))))
->>>  DOCKER_TARGETS :=3D $(patsubst %,docker-image-%,$(DOCKER_IMAGES))
->>>  # Use a global constant ccache directory to speed up repetitive builds
->>>  DOCKER_CCACHE_DIR :=3D $$HOME/.cache/qemu-docker-ccache
->>
->>
->> --
->> Alex Benn=C3=A9e
->>
-
-
---
-Alex Benn=C3=A9e
+> 
+> Signed-off-by: David Hildenbrand <david@redhat.com>
+> ---
+>  hw/mem/memory-device.c | 3 +--
+>  1 file changed, 1 insertion(+), 2 deletions(-)
+> 
+> diff --git a/hw/mem/memory-device.c b/hw/mem/memory-device.c
+> index 3e04f3954e..361d38bfc5 100644
+> --- a/hw/mem/memory-device.c
+> +++ b/hw/mem/memory-device.c
+> @@ -116,7 +116,6 @@ uint64_t memory_device_get_free_addr(MachineState *ms, const uint64_t *hint,
+>      address_space_start = ms->device_memory->base;
+>      address_space_end = address_space_start +
+>                          memory_region_size(&ms->device_memory->mr);
+> -    g_assert(QEMU_ALIGN_UP(address_space_start, align) == address_space_start);
+>      g_assert(address_space_end >= address_space_start);
+>  
+>      memory_device_check_addable(ms, size, errp);
+> @@ -149,7 +148,7 @@ uint64_t memory_device_get_free_addr(MachineState *ms, const uint64_t *hint,
+>              return 0;
+>          }
+>      } else {
+> -        new_addr = address_space_start;
+> +        new_addr = QEMU_ALIGN_UP(address_space_start, align);
+>      }
+>  
+>      /* find address range that will fit new memory device */
