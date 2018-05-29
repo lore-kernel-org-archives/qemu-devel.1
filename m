@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56325)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56607)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1fNo9A-0007uN-FS
-	for qemu-devel@nongnu.org; Tue, 29 May 2018 19:35:21 -0400
+	(envelope-from <alistair23@gmail.com>) id 1fNoCS-0000Bn-OP
+	for qemu-devel@nongnu.org; Tue, 29 May 2018 19:38:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1fNo99-0005xp-5X
-	for qemu-devel@nongnu.org; Tue, 29 May 2018 19:35:20 -0400
-Received: from mail-lf0-x241.google.com ([2a00:1450:4010:c07::241]:34996)
+	(envelope-from <alistair23@gmail.com>) id 1fNoCR-00018J-Ai
+	for qemu-devel@nongnu.org; Tue, 29 May 2018 19:38:44 -0400
+Received: from mail-lf0-x242.google.com ([2a00:1450:4010:c07::242]:44380)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alistair23@gmail.com>)
-	id 1fNo98-0005vi-Pd
-	for qemu-devel@nongnu.org; Tue, 29 May 2018 19:35:19 -0400
-Received: by mail-lf0-x241.google.com with SMTP id y72-v6so1358819lfd.2
-	for <qemu-devel@nongnu.org>; Tue, 29 May 2018 16:35:18 -0700 (PDT)
+	id 1fNoCQ-00017h-VX
+	for qemu-devel@nongnu.org; Tue, 29 May 2018 19:38:43 -0400
+Received: by mail-lf0-x242.google.com with SMTP id g25-v6so1368296lfb.11
+	for <qemu-devel@nongnu.org>; Tue, 29 May 2018 16:38:42 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <1527034517-7851-10-git-send-email-mjc@sifive.com>
+In-Reply-To: <1527034517-7851-13-git-send-email-mjc@sifive.com>
 References: <1527034517-7851-1-git-send-email-mjc@sifive.com>
-	<1527034517-7851-10-git-send-email-mjc@sifive.com>
+	<1527034517-7851-13-git-send-email-mjc@sifive.com>
 From: Alistair Francis <alistair23@gmail.com>
-Date: Tue, 29 May 2018 16:34:46 -0700
-Message-ID: <CAKmqyKNC6NWPKOuZWEFa1ZRb7AEs79gFZiPr1_PtoD1Xw3Yt1w@mail.gmail.com>
+Date: Tue, 29 May 2018 16:38:11 -0700
+Message-ID: <CAKmqyKN+K2iZcjJtEfVezemke55hGC80t7a6qchTAKD7keV-Zw@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v1 09/30] RISC-V: Implement atomic mip/sip
- CSR updates
+Subject: Re: [Qemu-devel] [PATCH v1 12/30] RISC-V: Mark mstatus.fs dirty
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,119 +30,181 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Michael Clark <mjc@sifive.com>
-Cc: "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Sagar Karandikar <sagark@eecs.berkeley.edu>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Palmer Dabbelt <palmer@sifive.com>, Alistair Francis <Alistair.Francis@wdc.com>, patches@groups.riscv.org
+Cc: "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Sagar Karandikar <sagark@eecs.berkeley.edu>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Palmer Dabbelt <palmer@sifive.com>, Richard Henderson <richard.henderson@linaro.org>, Alistair Francis <Alistair.Francis@wdc.com>, patches@groups.riscv.org
 
 On Tue, May 22, 2018 at 5:14 PM, Michael Clark <mjc@sifive.com> wrote:
-> Use the new CSR read/modify/write interface to implement
-> atomic updates to mip/sip.
+> From: Richard Henderson <richard.henderson@linaro.org>
+>
+> Modifed from Richard Henderson's patch [1] to integrate
+> with the new control and status register implementation.
+>
+> [1] https://lists.nongnu.org/archive/html/qemu-devel/2018-03/msg07034.html
+>
+> Note: the f* CSRs already mark mstatus.FS dirty using
+> env->mstatus |= mstatus.FS so the bug in the first
+> spin of this patch has been fixed in a prior commit.
 >
 > Cc: Sagar Karandikar <sagark@eecs.berkeley.edu>
 > Cc: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
 > Cc: Palmer Dabbelt <palmer@sifive.com>
 > Cc: Alistair Francis <Alistair.Francis@wdc.com>
+> Cc: Richard Henderson <richard.henderson@linaro.org>
 > Signed-off-by: Michael Clark <mjc@sifive.com>
+> Reviewed-by: Michael Clark <mjc@sifive.com>
 
-Acked-by: Alistair Francis <alistair.francis@wdc.com>
+It sounds like this should still have Richard's SOB line.
+
+Once that is fixed:
+
+Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 
 Alistair
 
-
+>
+> Co-authored-by: Richard Henderson <richard.henderson@linaro.org>
+> Co-authored-by: Michael Clark <mjc@sifive.com>
 > ---
->  target/riscv/csr.c | 56 +++++++++++++++++++++++++++---------------------------
->  1 file changed, 28 insertions(+), 28 deletions(-)
+>  target/riscv/csr.c       | 12 ------------
+>  target/riscv/translate.c | 40 +++++++++++++++++++++++++++++++++++++++-
+>  2 files changed, 39 insertions(+), 13 deletions(-)
 >
 > diff --git a/target/riscv/csr.c b/target/riscv/csr.c
-> index e08f3523d854..631a5ff9f7d8 100644
+> index 0e6c0c365154..b4452388ff02 100644
 > --- a/target/riscv/csr.c
 > +++ b/target/riscv/csr.c
-> @@ -493,25 +493,31 @@ static int write_mbadaddr(CPURISCVState *env, int csrno, target_ulong val)
->      return 0;
+> @@ -325,18 +325,6 @@ static int write_mstatus(CPURISCVState *env, int csrno, target_ulong val)
+>
+>      mstatus = (mstatus & ~mask) | (val & mask);
+>
+> -    /* Note: this is a workaround for an issue where mstatus.FS
+> -       does not report dirty after floating point operations
+> -       that modify floating point state. This workaround is
+> -       technically compliant with the RISC-V Privileged
+> -       specification as it is legal to return only off, or dirty.
+> -       at the expense of extra floating point save/restore. */
+> -
+> -    /* FP is always dirty or off */
+> -    if (mstatus & MSTATUS_FS) {
+> -        mstatus |= MSTATUS_FS;
+> -    }
+> -
+>      int dirty = ((mstatus & MSTATUS_FS) == MSTATUS_FS) |
+>                  ((mstatus & MSTATUS_XS) == MSTATUS_XS);
+>      mstatus = set_field(mstatus, MSTATUS_SD, dirty);
+> diff --git a/target/riscv/translate.c b/target/riscv/translate.c
+> index 466b9551cbd9..a980611eb611 100644
+> --- a/target/riscv/translate.c
+> +++ b/target/riscv/translate.c
+> @@ -651,6 +651,31 @@ static void gen_store(DisasContext *ctx, uint32_t opc, int rs1, int rs2,
+>      tcg_temp_free(dat);
 >  }
 >
-> -static int read_mip(CPURISCVState *env, int csrno, target_ulong *val)
-> -{
-> -    *val = atomic_read(&env->mip);
-> -    return 0;
-> -}
-> -
-> -static int write_mip(CPURISCVState *env, int csrno, target_ulong val)
-> +static int rmw_mip(CPURISCVState *env, int csrno, target_ulong *ret_value,
-> +                   target_ulong new_value, target_ulong write_mask)
->  {
->      RISCVCPU *cpu = riscv_env_get_cpu(env);
-> +    target_ulong mask = write_mask & delegable_ints;
-> +    uint32_t old_mip;
-> +
-> +    /* We can't allow the supervisor to control SEIP as this would allow the
-> +     * supervisor to clear a pending external interrupt which will result in
-> +     * lost a interrupt in the case a PLIC is attached. The SEIP bit must be
-> +     * hardware controlled when a PLIC is attached. This should be an option
-> +     * for CPUs with software-delegated Supervisor External Interrupts. */
-> +    mask &= ~MIP_SEIP;
-> +
-> +    if (mask) {
-> +        qemu_mutex_lock_iothread();
-> +        old_mip = riscv_cpu_update_mip(cpu, mask, (new_value & mask));
-> +        qemu_mutex_unlock_iothread();
-> +    } else {
-> +        old_mip = atomic_read(&env->mip);
+> +#ifndef CONFIG_USER_ONLY
+> +/* The states of mstatus_fs are:
+> + * 0 = disabled, 1 = initial, 2 = clean, 3 = dirty
+> + * We will have already diagnosed disabled state,
+> + * and need to turn initial/clean into dirty.
+> + */
+> +static void mark_fs_dirty(DisasContext *ctx)
+> +{
+> +    TCGv tmp;
+> +    if (ctx->mstatus_fs == MSTATUS_FS) {
+> +        return;
 > +    }
->
-> -    /*
-> -     * csrs, csrc on mip.SEIP is not decomposable into separate read and
-> -     * write steps, so a different implementation is needed
-> -     */
-> -
-> -    qemu_mutex_lock_iothread();
-> -    riscv_cpu_update_mip(cpu, MIP_SSIP | MIP_STIP,
-> -                         (val & (MIP_SSIP | MIP_STIP)));
-> -    qemu_mutex_unlock_iothread();
-> +    if (ret_value) {
-> +        *ret_value = old_mip;
-> +    }
->
->      return 0;
->  }
-> @@ -631,17 +637,11 @@ static int write_sbadaddr(CPURISCVState *env, int csrno, target_ulong val)
->      return 0;
->  }
->
-> -static int read_sip(CPURISCVState *env, int csrno, target_ulong *val)
-> -{
-> -    *val = atomic_read(&env->mip) & env->mideleg;
-> -    return 0;
-> -}
-> -
-> -static int write_sip(CPURISCVState *env, int csrno, target_ulong val)
-> +static int rmw_sip(CPURISCVState *env, int csrno, target_ulong *ret_value,
-> +                   target_ulong new_value, target_ulong write_mask)
+> +    /* Remember the state change for the rest of the TB.  */
+> +    ctx->mstatus_fs = MSTATUS_FS;
+> +
+> +    tmp = tcg_temp_new();
+> +    tcg_gen_ld_tl(tmp, cpu_env, offsetof(CPURISCVState, mstatus));
+> +    tcg_gen_ori_tl(tmp, tmp, MSTATUS_FS);
+> +    tcg_gen_st_tl(tmp, cpu_env, offsetof(CPURISCVState, mstatus));
+> +    tcg_temp_free(tmp);
+> +}
+> +#else
+> +static inline void mark_fs_dirty(DisasContext *ctx) { }
+> +#endif
+> +
+>  static void gen_fp_load(DisasContext *ctx, uint32_t opc, int rd,
+>          int rs1, target_long imm)
 >  {
-> -    target_ulong newval = (atomic_read(&env->mip) & ~env->mideleg)
-> -                          | (val & env->mideleg);
-> -    return write_mip(env, CSR_MIP, newval);
-> +    return rmw_mip(env, CSR_MSTATUS, ret_value, new_value,
-> +                   write_mask & env->mideleg);
+> @@ -679,6 +704,8 @@ static void gen_fp_load(DisasContext *ctx, uint32_t opc, int rd,
+>          break;
+>      }
+>      tcg_temp_free(t0);
+> +
+> +    mark_fs_dirty(ctx);
 >  }
 >
->  /* Supervisor Protection and Translation */
-> @@ -823,7 +823,7 @@ static const riscv_csr_operations csr_ops[0xfff] = {
->      [CSR_MEPC] =                { read_mepc,        write_mepc        },
->      [CSR_MCAUSE] =              { read_mcause,      write_mcause      },
->      [CSR_MBADADDR] =            { read_mbadaddr,    write_mbadaddr    },
-> -    [CSR_MIP] =                 { read_mip,         write_mip         },
-> +    [CSR_MIP] =                 { NULL,     NULL,     rmw_mip         },
+>  static void gen_fp_store(DisasContext *ctx, uint32_t opc, int rs1,
+> @@ -944,6 +971,7 @@ static void gen_fp_arith(DisasContext *ctx, uint32_t opc, int rd,
+>                           int rs1, int rs2, int rm)
+>  {
+>      TCGv t0 = NULL;
+> +    bool fp_output = true;
 >
->      /* Supervisor Trap Setup */
->      [CSR_SSTATUS] =             { read_sstatus,     write_sstatus     },
-> @@ -836,7 +836,7 @@ static const riscv_csr_operations csr_ops[0xfff] = {
->      [CSR_SEPC] =                { read_sepc,        write_sepc        },
->      [CSR_SCAUSE] =              { read_scause,      write_scause      },
->      [CSR_SBADADDR] =            { read_sbadaddr,    write_sbadaddr    },
-> -    [CSR_SIP] =                 { read_sip,         write_sip         },
-> +    [CSR_SIP] =                 { NULL,     NULL,     rmw_sip         },
+>      if (ctx->mstatus_fs == 0) {
+>          goto do_illegal;
+> @@ -1006,6 +1034,7 @@ static void gen_fp_arith(DisasContext *ctx, uint32_t opc, int rd,
+>          }
+>          gen_set_gpr(rd, t0);
+>          tcg_temp_free(t0);
+> +        fp_output = false;
+>          break;
 >
->      /* Supervisor Protection and Translation */
->      [CSR_SATP] =                { read_satp,        write_satp        },
+>      case OPC_RISC_FCVT_W_S:
+> @@ -1035,6 +1064,7 @@ static void gen_fp_arith(DisasContext *ctx, uint32_t opc, int rd,
+>          }
+>          gen_set_gpr(rd, t0);
+>          tcg_temp_free(t0);
+> +        fp_output = false;
+>          break;
+>
+>      case OPC_RISC_FCVT_S_W:
+> @@ -1085,6 +1115,7 @@ static void gen_fp_arith(DisasContext *ctx, uint32_t opc, int rd,
+>          }
+>          gen_set_gpr(rd, t0);
+>          tcg_temp_free(t0);
+> +        fp_output = false;
+>          break;
+>
+>      case OPC_RISC_FMV_S_X:
+> @@ -1177,6 +1208,7 @@ static void gen_fp_arith(DisasContext *ctx, uint32_t opc, int rd,
+>          }
+>          gen_set_gpr(rd, t0);
+>          tcg_temp_free(t0);
+> +        fp_output = false;
+>          break;
+>
+>      case OPC_RISC_FCVT_W_D:
+> @@ -1206,6 +1238,7 @@ static void gen_fp_arith(DisasContext *ctx, uint32_t opc, int rd,
+>          }
+>          gen_set_gpr(rd, t0);
+>          tcg_temp_free(t0);
+> +        fp_output = false;
+>          break;
+>
+>      case OPC_RISC_FCVT_D_W:
+> @@ -1253,6 +1286,7 @@ static void gen_fp_arith(DisasContext *ctx, uint32_t opc, int rd,
+>          default:
+>              goto do_illegal;
+>          }
+> +        fp_output = false;
+>          break;
+>
+>      case OPC_RISC_FMV_D_X:
+> @@ -1269,7 +1303,11 @@ static void gen_fp_arith(DisasContext *ctx, uint32_t opc, int rd,
+>              tcg_temp_free(t0);
+>          }
+>          gen_exception_illegal(ctx);
+> -        break;
+> +        return;
+> +    }
+> +
+> +    if (fp_output) {
+> +        mark_fs_dirty(ctx);
+>      }
+>  }
+>
 > --
 > 2.7.0
 >
