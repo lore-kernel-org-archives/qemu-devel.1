@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36923)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38220)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1fNmE2-0001Ec-Ks
-	for qemu-devel@nongnu.org; Tue, 29 May 2018 17:32:15 -0400
+	(envelope-from <groug@kaod.org>) id 1fNmN4-00030k-Su
+	for qemu-devel@nongnu.org; Tue, 29 May 2018 17:41:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1fNmDz-0000Eq-Ds
-	for qemu-devel@nongnu.org; Tue, 29 May 2018 17:32:14 -0400
-Received: from 6.mo177.mail-out.ovh.net ([46.105.51.249]:58267)
+	(envelope-from <groug@kaod.org>) id 1fNmN2-0007iX-AG
+	for qemu-devel@nongnu.org; Tue, 29 May 2018 17:41:34 -0400
+Received: from 4.mo178.mail-out.ovh.net ([46.105.49.171]:52282)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1fNmDz-0000DW-7N
-	for qemu-devel@nongnu.org; Tue, 29 May 2018 17:32:11 -0400
-Received: from player695.ha.ovh.net (unknown [10.109.120.42])
-	by mo177.mail-out.ovh.net (Postfix) with ESMTP id 60A92B346C
-	for <qemu-devel@nongnu.org>; Tue, 29 May 2018 23:32:09 +0200 (CEST)
-Date: Tue, 29 May 2018 23:32:05 +0200
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1fNmN2-0007em-3G
+	for qemu-devel@nongnu.org; Tue, 29 May 2018 17:41:32 -0400
+Received: from player735.ha.ovh.net (unknown [10.109.108.46])
+	by mo178.mail-out.ovh.net (Postfix) with ESMTP id 4F68E184FB
+	for <qemu-devel@nongnu.org>; Tue, 29 May 2018 23:41:30 +0200 (CEST)
+Date: Tue, 29 May 2018 23:41:22 +0200
 From: Greg Kurz <groug@kaod.org>
-Message-ID: <20180529233205.59770326@bahia.lan>
-In-Reply-To: <a648afd776c8eb50398524c6c8d53629f5141211.1527310210.git.keno@alumni.harvard.edu>
-References: <cover.1527310210.git.keno@alumni.harvard.edu>
-	<a648afd776c8eb50398524c6c8d53629f5141211.1527310210.git.keno@alumni.harvard.edu>
+Message-ID: <20180529234122.7cbebcc8@bahia.lan>
+In-Reply-To: <20180529201917.GL4756@localhost.localdomain>
+References: <152750903916.663961.9369851345277129751.stgit@bahia.lan>
+	<20180529201917.GL4756@localhost.localdomain>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 08/13] 9p: darwin: Ignore O_{NOATIME,
- DIRECT}
+Subject: Re: [Qemu-devel] [PATCH v4] block: fix QEMU crash with scsi-hd and
+ drive_del
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,85 +31,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: keno@juliacomputing.com
-Cc: qemu-devel@nongnu.org, Keno Fischer <keno@alumni.harvard.edu>
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, qemu-stable@nongnu.org, qemu-block@nongnu.org
 
-On Sat, 26 May 2018 01:23:10 -0400
-keno@juliacomputing.com wrote:
+On Tue, 29 May 2018 22:19:17 +0200
+Kevin Wolf <kwolf@redhat.com> wrote:
 
-> From: Keno Fischer <keno@alumni.harvard.edu>
+> Am 28.05.2018 um 14:03 hat Greg Kurz geschrieben:
+> > Removing a drive with drive_del while it is being used to run an I/O
+> > intensive workload can cause QEMU to crash.
+> > 
+> > An AIO flush can yield at some point:
+> > 
+> > blk_aio_flush_entry()
+> >  blk_co_flush(blk)
+> >   bdrv_co_flush(blk->root->bs)
+> >    ...
+> >     qemu_coroutine_yield()
+> > 
+> > and let the HMP command to run, free blk->root and give control
+> > back to the AIO flush:
+> > 
+> >     hmp_drive_del()
+> >      blk_remove_bs()
+> >       bdrv_root_unref_child(blk->root)
+> >        child_bs = blk->root->bs
+> >        bdrv_detach_child(blk->root)
+> >         bdrv_replace_child(blk->root, NULL)
+> >          blk->root->bs = NULL
+> >         g_free(blk->root) <============== blk->root becomes stale
+> >        bdrv_unref(child_bs)
+> >         bdrv_delete(child_bs)
+> >          bdrv_close()
+> >           bdrv_drained_begin()
+> >            bdrv_do_drained_begin()
+> >             bdrv_drain_recurse()
+> >              aio_poll()
+> >               ...
+> >               qemu_coroutine_switch()
+> > 
+> > and the AIO flush completion ends up dereferencing blk->root:
+> > 
+> >   blk_aio_complete()
+> >    scsi_aio_complete()
+> >     blk_get_aio_context(blk)
+> >      bs = blk_bs(blk)
+> >  ie, bs = blk->root ? blk->root->bs : NULL
+> >             ^^^^^
+> >             stale
+> > 
+> > The problem is that we should avoid making block driver graph
+> > changes while we have in-flight requests. Let's drain all I/O
+> > for this BB before calling bdrv_root_unref_child().
+> > 
+> > Signed-off-by: Greg Kurz <groug@kaod.org>  
 > 
-> Signed-off-by: Keno Fischer <keno@juliacomputing.com>
-> ---
->  hw/9pfs/9p.c | 37 +++++++++++++++++++++++--------------
->  1 file changed, 23 insertions(+), 14 deletions(-)
+> Hmm... It sounded convincing, but 'make check-tests/test-replication'
+> fails now. The good news is that with the drain fixes, for which I sent
+> v2 today, it passes, so instead of staging it in my block branch, I'll
+> put it at the end of my branch for the drain fixes.
 > 
-> diff --git a/hw/9pfs/9p.c b/hw/9pfs/9p.c
-> index 49654ae..f5f00aa 100644
-> --- a/hw/9pfs/9p.c
-> +++ b/hw/9pfs/9p.c
-> @@ -115,20 +115,27 @@ static int dotl_to_open_flags(int flags)
->      int oflags = flags & O_ACCMODE;
->  
->      DotlOpenflagMap dotl_oflag_map[] = {
-> -        { P9_DOTL_CREATE, O_CREAT },
-> -        { P9_DOTL_EXCL, O_EXCL },
-> -        { P9_DOTL_NOCTTY , O_NOCTTY },
-> -        { P9_DOTL_TRUNC, O_TRUNC },
-> -        { P9_DOTL_APPEND, O_APPEND },
-> -        { P9_DOTL_NONBLOCK, O_NONBLOCK } ,
-> -        { P9_DOTL_DSYNC, O_DSYNC },
-> -        { P9_DOTL_FASYNC, FASYNC },
-> -        { P9_DOTL_DIRECT, O_DIRECT },
-> -        { P9_DOTL_LARGEFILE, O_LARGEFILE },
-> -        { P9_DOTL_DIRECTORY, O_DIRECTORY },
-> -        { P9_DOTL_NOFOLLOW, O_NOFOLLOW },
-> -        { P9_DOTL_NOATIME, O_NOATIME },
-> -        { P9_DOTL_SYNC, O_SYNC },
-> +        {P9_DOTL_CREATE, O_CREAT},
-> +        {P9_DOTL_EXCL, O_EXCL},
-> +        {P9_DOTL_NOCTTY, O_NOCTTY},
-> +        {P9_DOTL_TRUNC, O_TRUNC},
-> +        {P9_DOTL_APPEND, O_APPEND},
-> +        {P9_DOTL_NONBLOCK, O_NONBLOCK},
-> +        {P9_DOTL_DSYNC, O_DSYNC},
-> +        {P9_DOTL_FASYNC, FASYNC},
+> Might take a bit longer than planned until it's in master, sorry.
+> 
+> Kevin
 
-Please don't kill the spaces.
+Works for me :)
 
-> +#ifndef CONFIG_DARWIN
-> +        {P9_DOTL_NOATIME, O_NOATIME},
-> +        /* On Darwin, we could map to F_NOCACHE, which is
-> +           similar, but doesn't quite have the same
-> +           semantics. However, we don't support O_DIRECT
+Thanks !
 
-But are these semantics worse than dumping the flag ?
-
-> +           even on linux at the moment, so we just ignore
-> +           it here. */
-
-Yeah, and I doubt we'll ever support it on linux either. But,
-anyway, why filter these out ? Do they cause a build break ?
-
-> +        {P9_DOTL_DIRECT, O_DIRECT},
-> +#endif
-> +        {P9_DOTL_LARGEFILE, O_LARGEFILE},
-> +        {P9_DOTL_DIRECTORY, O_DIRECTORY},
-> +        {P9_DOTL_NOFOLLOW, O_NOFOLLOW},
-> +        {P9_DOTL_SYNC, O_SYNC},
->      };
->  
->      for (i = 0; i < ARRAY_SIZE(dotl_oflag_map); i++) {
-> @@ -156,10 +163,12 @@ static int get_dotl_openflags(V9fsState *s, int oflags)
->       */
->      flags = dotl_to_open_flags(oflags);
->      flags &= ~(O_NOCTTY | O_ASYNC | O_CREAT);
-> +#ifndef CONFIG_DARWIN
->      /*
->       * Ignore direct disk access hint until the server supports it.
->       */
->      flags &= ~O_DIRECT;
-> +#endif
->      return flags;
->  }
->  
+--
+Greg
