@@ -1,20 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45109)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46815)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fNj9p-0008RY-FD
-	for qemu-devel@nongnu.org; Tue, 29 May 2018 14:15:42 -0400
+	(envelope-from <jcody@redhat.com>) id 1fNjHU-0002vm-3q
+	for qemu-devel@nongnu.org; Tue, 29 May 2018 14:23:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fNj9m-0001r3-8w
-	for qemu-devel@nongnu.org; Tue, 29 May 2018 14:15:41 -0400
-Date: Tue, 29 May 2018 20:15:35 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20180529181535.GI4756@localhost.localdomain>
-References: <152750903916.663961.9369851345277129751.stgit@bahia.lan>
+	(envelope-from <jcody@redhat.com>) id 1fNjHR-0005yH-1Y
+	for qemu-devel@nongnu.org; Tue, 29 May 2018 14:23:36 -0400
+Date: Tue, 29 May 2018 14:23:21 -0400
+From: Jeff Cody <jcody@redhat.com>
+Message-ID: <20180529182321.GI6999@localhost.localdomain>
+References: <20180525163327.23097-1-kwolf@redhat.com>
+	<20180525163327.23097-11-kwolf@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <152750903916.663961.9369851345277129751.stgit@bahia.lan>
-Subject: Re: [Qemu-devel] [PATCH v4] block: fix QEMU crash with scsi-hd and
- drive_del
+In-Reply-To: <20180525163327.23097-11-kwolf@redhat.com>
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 10/14] qemu-iotests: Rewrite
+ 210 for blockdev-create job
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,58 +24,733 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>
-Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, qemu-stable@nongnu.org
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, mreitz@redhat.com
 
-Am 28.05.2018 um 14:03 hat Greg Kurz geschrieben:
-> Removing a drive with drive_del while it is being used to run an I/O
-> intensive workload can cause QEMU to crash.
+On Fri, May 25, 2018 at 06:33:23PM +0200, Kevin Wolf wrote:
+> This rewrites the test case 210 to work with the new x-blockdev-create
+> job rather than the old synchronous version of the command.
 > 
-> An AIO flush can yield at some point:
+> All of the test cases stay the same as before, but in order to be able
+> to implement proper job handling, the test case is rewritten in Python.
 > 
-> blk_aio_flush_entry()
->  blk_co_flush(blk)
->   bdrv_co_flush(blk->root->bs)
->    ...
->     qemu_coroutine_yield()
-> 
-> and let the HMP command to run, free blk->root and give control
-> back to the AIO flush:
-> 
->     hmp_drive_del()
->      blk_remove_bs()
->       bdrv_root_unref_child(blk->root)
->        child_bs = blk->root->bs
->        bdrv_detach_child(blk->root)
->         bdrv_replace_child(blk->root, NULL)
->          blk->root->bs = NULL
->         g_free(blk->root) <============== blk->root becomes stale
->        bdrv_unref(child_bs)
->         bdrv_delete(child_bs)
->          bdrv_close()
->           bdrv_drained_begin()
->            bdrv_do_drained_begin()
->             bdrv_drain_recurse()
->              aio_poll()
->               ...
->               qemu_coroutine_switch()
-> 
-> and the AIO flush completion ends up dereferencing blk->root:
-> 
->   blk_aio_complete()
->    scsi_aio_complete()
->     blk_get_aio_context(blk)
->      bs = blk_bs(blk)
->  ie, bs = blk->root ? blk->root->bs : NULL
->             ^^^^^
->             stale
-> 
-> The problem is that we should avoid making block driver graph
-> changes while we have in-flight requests. Let's drain all I/O
-> for this BB before calling bdrv_root_unref_child().
-> 
-> Signed-off-by: Greg Kurz <groug@kaod.org>
+> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 
-Thanks, applied to the block branch.
+Reviewed-by: Jeff Cody <jcody@redhat.com>
 
-Kevin
+> ---
+>  tests/qemu-iotests/210        | 393 ++++++++++++++++++------------------------
+>  tests/qemu-iotests/210.out    | 189 ++++++++++++++------
+>  tests/qemu-iotests/group      |   2 +-
+>  tests/qemu-iotests/iotests.py |  12 +-
+>  4 files changed, 310 insertions(+), 286 deletions(-)
+> 
+> diff --git a/tests/qemu-iotests/210 b/tests/qemu-iotests/210
+> index e607c0d296..ff4fddea56 100755
+> --- a/tests/qemu-iotests/210
+> +++ b/tests/qemu-iotests/210
+> @@ -1,9 +1,11 @@
+> -#!/bin/bash
+> +#!/usr/bin/env python
+>  #
+>  # Test luks and file image creation
+>  #
+>  # Copyright (C) 2018 Red Hat, Inc.
+>  #
+> +# Creator/Owner: Kevin Wolf <kwolf@redhat.com>
+> +#
+>  # This program is free software; you can redistribute it and/or modify
+>  # it under the terms of the GNU General Public License as published by
+>  # the Free Software Foundation; either version 2 of the License, or
+> @@ -18,230 +20,165 @@
+>  # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+>  #
+>  
+> -# creator
+> -owner=kwolf@redhat.com
+> -
+> -seq=`basename $0`
+> -echo "QA output created by $seq"
+> -
+> -here=`pwd`
+> -status=1	# failure is the default!
+> -
+> -# get standard environment, filters and checks
+> -. ./common.rc
+> -. ./common.filter
+> -
+> -_supported_fmt luks
+> -_supported_proto file
+> -_supported_os Linux
+> -
+> -function do_run_qemu()
+> -{
+> -    echo Testing: "$@"
+> -    $QEMU -nographic -qmp stdio -serial none "$@"
+> -    echo
+> -}
+> -
+> -function run_qemu()
+> -{
+> -    do_run_qemu "$@" 2>&1 | _filter_testdir | _filter_qmp \
+> -                          | _filter_qemu | _filter_imgfmt \
+> -                          | _filter_actual_image_size
+> -}
+> -
+> -echo
+> -echo "=== Successful image creation (defaults) ==="
+> -echo
+> -
+> -size=$((128 * 1024 * 1024))
+> -
+> -run_qemu -object secret,id=keysec0,data="foo" <<EOF
+> -{ "execute": "qmp_capabilities" }
+> -{ "execute": "x-blockdev-create",
+> -  "arguments": {
+> -      "driver": "file",
+> -      "filename": "$TEST_IMG_FILE",
+> -      "size": 0
+> -  }
+> -}
+> -{ "execute": "blockdev-add",
+> -  "arguments": {
+> -      "driver": "file",
+> -      "node-name": "imgfile",
+> -      "filename": "$TEST_IMG_FILE"
+> -  }
+> -}
+> -{ "execute": "x-blockdev-create",
+> -  "arguments": {
+> -      "driver": "$IMGFMT",
+> -      "file": "imgfile",
+> -      "key-secret": "keysec0",
+> -      "size": $size,
+> -      "iter-time": 10
+> -  }
+> -}
+> -{ "execute": "quit" }
+> -EOF
+> -
+> -_img_info --format-specific | _filter_img_info --format-specific
+> -
+> -echo
+> -echo "=== Successful image creation (with non-default options) ==="
+> -echo
+> -
+> -# Choose a different size to show that we got a new image
+> -size=$((64 * 1024 * 1024))
+> -
+> -run_qemu -object secret,id=keysec0,data="foo" <<EOF
+> -{ "execute": "qmp_capabilities" }
+> -{ "execute": "x-blockdev-create",
+> -  "arguments": {
+> -      "driver": "file",
+> -      "filename": "$TEST_IMG_FILE",
+> -      "size": 0
+> -  }
+> -}
+> -{ "execute": "x-blockdev-create",
+> -  "arguments": {
+> -      "driver": "$IMGFMT",
+> -      "file": {
+> -          "driver": "file",
+> -          "filename": "$TEST_IMG_FILE"
+> -      },
+> -      "size": $size,
+> -      "key-secret": "keysec0",
+> -      "cipher-alg": "twofish-128",
+> -      "cipher-mode": "ctr",
+> -      "ivgen-alg": "plain64",
+> -      "ivgen-hash-alg": "md5",
+> -      "hash-alg": "sha1",
+> -      "iter-time": 10
+> -  }
+> -}
+> -{ "execute": "quit" }
+> -EOF
+> -
+> -_img_info --format-specific | _filter_img_info --format-specific
+> -
+> -echo
+> -echo "=== Invalid BlockdevRef ==="
+> -echo
+> -
+> -run_qemu <<EOF
+> -{ "execute": "qmp_capabilities" }
+> -{ "execute": "x-blockdev-create",
+> -  "arguments": {
+> -      "driver": "$IMGFMT",
+> -      "file": "this doesn't exist",
+> -      "size": $size
+> -  }
+> -}
+> -{ "execute": "quit" }
+> -EOF
+> -
+> -echo
+> -echo "=== Zero size ==="
+> -echo
+> -
+> -run_qemu -blockdev driver=file,filename="$TEST_IMG_FILE",node-name=node0 \
+> -         -object secret,id=keysec0,data="foo" <<EOF
+> -{ "execute": "qmp_capabilities" }
+> -{ "execute": "x-blockdev-create",
+> -  "arguments": {
+> -      "driver": "$IMGFMT",
+> -      "file": "node0",
+> -      "key-secret": "keysec0",
+> -      "size": 0,
+> -      "iter-time": 10
+> -  }
+> -}
+> -{ "execute": "quit" }
+> -EOF
+> -
+> -_img_info | _filter_img_info
+> -
+> -
+> -echo
+> -echo "=== Invalid sizes ==="
+> -echo
+> -
+> -# TODO Negative image sizes aren't handled correctly, but this is a problem
+> -# with QAPI's implementation of the 'size' type and affects other commands as
+> -# well. Once this is fixed, we may want to add a test case here.
+> -
+> -# 1. 2^64 - 512
+> -# 2. 2^63 = 8 EB (qemu-img enforces image sizes less than this)
+> -# 3. 2^63 - 512 (generally valid, but with the crypto header the file will
+> -#                exceed 63 bits)
+> -
+> -run_qemu -blockdev driver=file,filename="$TEST_IMG_FILE",node-name=node0 \
+> -         -object secret,id=keysec0,data="foo" <<EOF
+> -{ "execute": "qmp_capabilities" }
+> -{ "execute": "x-blockdev-create",
+> -  "arguments": {
+> -      "driver": "$IMGFMT",
+> -      "file": "node0",
+> -      "key-secret": "keysec0",
+> -      "size": 18446744073709551104
+> -  }
+> -}
+> -{ "execute": "x-blockdev-create",
+> -  "arguments": {
+> -      "driver": "$IMGFMT",
+> -      "file": "node0",
+> -      "key-secret": "keysec0",
+> -      "size": 9223372036854775808
+> -  }
+> -}
+> -{ "execute": "x-blockdev-create",
+> -  "arguments": {
+> -      "driver": "$IMGFMT",
+> -      "file": "node0",
+> -      "key-secret": "keysec0",
+> -      "size": 9223372036854775296
+> -  }
+> -}
+> -{ "execute": "quit" }
+> -EOF
+> -
+> -echo
+> -echo "=== Resize image with invalid sizes ==="
+> -echo
+> -
+> -run_qemu -blockdev driver=file,filename="$TEST_IMG_FILE",node-name=node0 \
+> -         -blockdev driver=luks,file=node0,key-secret=keysec0,node-name=node1 \
+> -         -object secret,id=keysec0,data="foo" <<EOF
+> -{ "execute": "qmp_capabilities" }
+> -{ "execute": "block_resize",
+> -  "arguments": {
+> -      "node-name": "node1",
+> -      "size": 9223372036854775296
+> -  }
+> -}
+> -{ "execute": "block_resize",
+> -  "arguments": {
+> -      "node-name": "node1",
+> -      "size": 9223372036854775808
+> -  }
+> -}
+> -{ "execute": "block_resize",
+> -  "arguments": {
+> -      "node-name": "node1",
+> -      "size": 18446744073709551104
+> -  }
+> -}
+> -{ "execute": "block_resize",
+> -  "arguments": {
+> -      "node-name": "node1",
+> -      "size": -9223372036854775808
+> -  }
+> -}
+> -{ "execute": "quit" }
+> -EOF
+> -
+> -_img_info | _filter_img_info
+> -
+> -# success, all done
+> -echo "*** done"
+> -rm -f $seq.full
+> -status=0
+> +import iotests
+> +from iotests import imgfmt
+> +
+> +iotests.verify_image_format(supported_fmts=['luks'])
+> +iotests.verify_protocol(supported=['file'])
+> +
+> +def blockdev_create(vm, options):
+> +    result = vm.qmp_log('x-blockdev-create', job_id='job0', options=options)
+> +
+> +    if 'return' in result:
+> +        assert result['return'] == {}
+> +        vm.run_job('job0')
+> +    iotests.log("")
+> +
+> +with iotests.FilePath('t.luks') as disk_path, \
+> +     iotests.VM() as vm:
+> +
+> +    vm.add_object('secret,id=keysec0,data=foo')
+> +
+> +    #
+> +    # Successful image creation (defaults)
+> +    #
+> +    iotests.log("=== Successful image creation (defaults) ===")
+> +    iotests.log("")
+> +
+> +    size = 128 * 1024 * 1024
+> +
+> +    vm.launch()
+> +    blockdev_create(vm, { 'driver': 'file',
+> +                          'filename': disk_path,
+> +                          'size': 0 })
+> +
+> +    vm.qmp_log('blockdev-add', driver='file', filename=disk_path,
+> +               node_name='imgfile')
+> +
+> +    blockdev_create(vm, { 'driver': imgfmt,
+> +                          'file': 'imgfile',
+> +                          'key-secret': 'keysec0',
+> +                          'size': size,
+> +                          'iter-time': 10 })
+> +    vm.shutdown()
+> +
+> +    # TODO Proper support for images to be used with imgopts and/or protocols
+> +    iotests.img_info_log(
+> +        'driver=luks,file.driver=file,file.filename=%s,key-secret=keysec0' % (disk_path),
+> +        filter_path=disk_path,
+> +        extra_args=['--object', 'secret,id=keysec0,data=foo'],
+> +        imgopts=True)
+> +
+> +    #
+> +    # Successful image creation (with non-default options)
+> +    #
+> +    iotests.log("=== Successful image creation (with non-default options) ===")
+> +    iotests.log("")
+> +
+> +    size = 64 * 1024 * 1024
+> +
+> +    vm.launch()
+> +    blockdev_create(vm, { 'driver': 'file',
+> +                          'filename': disk_path,
+> +                          'size': 0 })
+> +    blockdev_create(vm, { 'driver': imgfmt,
+> +                          'file': {
+> +                              'driver': 'file',
+> +                              'filename': disk_path,
+> +                          },
+> +                          'size': size,
+> +                          'key-secret': 'keysec0',
+> +                          'cipher-alg': 'twofish-128',
+> +                          'cipher-mode': 'ctr',
+> +                          'ivgen-alg': 'plain64',
+> +                          'ivgen-hash-alg': 'md5',
+> +                          'hash-alg': 'sha1',
+> +                          'iter-time': 10 })
+> +    vm.shutdown()
+> +
+> +    # TODO Proper support for images to be used with imgopts and/or protocols
+> +    iotests.img_info_log(
+> +        'driver=luks,file.driver=file,file.filename=%s,key-secret=keysec0' % (disk_path),
+> +        filter_path=disk_path,
+> +        extra_args=['--object', 'secret,id=keysec0,data=foo'],
+> +        imgopts=True)
+> +
+> +    #
+> +    # Invalid BlockdevRef
+> +    #
+> +    iotests.log("=== Invalid BlockdevRef ===")
+> +    iotests.log("")
+> +
+> +    size = 64 * 1024 * 1024
+> +
+> +    vm.launch()
+> +    blockdev_create(vm, { 'driver': imgfmt,
+> +                          'file': "this doesn't exist",
+> +                          'size': size })
+> +    vm.shutdown()
+> +
+> +    #
+> +    # Zero size
+> +    #
+> +    iotests.log("=== Zero size ===")
+> +    iotests.log("")
+> +
+> +    vm.add_blockdev('driver=file,filename=%s,node-name=node0' % (disk_path))
+> +    vm.launch()
+> +    blockdev_create(vm, { 'driver': imgfmt,
+> +                          'file': 'node0',
+> +                          'key-secret': 'keysec0',
+> +                          'size': 0,
+> +                          'iter-time': 10 })
+> +    vm.shutdown()
+> +
+> +    # TODO Proper support for images to be used with imgopts and/or protocols
+> +    iotests.img_info_log(
+> +        'driver=luks,file.driver=file,file.filename=%s,key-secret=keysec0' % (disk_path),
+> +        filter_path=disk_path,
+> +        extra_args=['--object', 'secret,id=keysec0,data=foo'],
+> +        imgopts=True)
+> +
+> +    #
+> +    # Invalid sizes
+> +    #
+> +
+> +    # TODO Negative image sizes aren't handled correctly, but this is a problem
+> +    # with QAPI's implementation of the 'size' type and affects other commands as
+> +    # well. Once this is fixed, we may want to add a test case here.
+> +
+> +    # 1. 2^64 - 512
+> +    # 2. 2^63 = 8 EB (qemu-img enforces image sizes less than this)
+> +    # 3. 2^63 - 512 (generally valid, but with the crypto header the file will
+> +    #                exceed 63 bits)
+> +    iotests.log("=== Invalid sizes ===")
+> +    iotests.log("")
+> +
+> +    vm.launch()
+> +    for size in [ 18446744073709551104, 9223372036854775808, 9223372036854775296 ]:
+> +        blockdev_create(vm, { 'driver': imgfmt,
+> +                              'file': 'node0',
+> +                              'key-secret': 'keysec0',
+> +                              'size': size })
+> +    vm.shutdown()
+> +
+> +    #
+> +    # Resize image with invalid sizes
+> +    #
+> +    iotests.log("=== Resize image with invalid sizes ===")
+> +    iotests.log("")
+> +
+> +    vm.add_blockdev('driver=luks,file=node0,key-secret=keysec0,node-name=node1')
+> +    vm.launch()
+> +    vm.qmp_log('block_resize', node_name='node1', size=9223372036854775296)
+> +    vm.qmp_log('block_resize', node_name='node1', size=9223372036854775808)
+> +    vm.qmp_log('block_resize', node_name='node1', size=18446744073709551104)
+> +    vm.qmp_log('block_resize', node_name='node1', size=-9223372036854775808)
+> +    vm.shutdown()
+> +
+> +    # TODO Proper support for images to be used with imgopts and/or protocols
+> +    iotests.img_info_log(
+> +        'driver=luks,file.driver=file,file.filename=%s,key-secret=keysec0' % (disk_path),
+> +        filter_path=disk_path,
+> +        extra_args=['--object', 'secret,id=keysec0,data=foo'],
+> +        imgopts=True)
+> diff --git a/tests/qemu-iotests/210.out b/tests/qemu-iotests/210.out
+> index 8198f8c829..116218ae4e 100644
+> --- a/tests/qemu-iotests/210.out
+> +++ b/tests/qemu-iotests/210.out
+> @@ -1,29 +1,31 @@
+> -QA output created by 210
+> -
+>  === Successful image creation (defaults) ===
+>  
+> -Testing: -object secret,id=keysec0,data=foo
+> -QMP_VERSION
+> -{"return": {}}
+> -{"return": {}}
+> -{"return": {}}
+> -{"return": {}}
+> -{"return": {}}
+> -{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
+> +{'execute': 'x-blockdev-create', 'arguments': {'job_id': 'job0', 'options': {'size': 0, 'driver': 'file', 'filename': 'TEST_DIR/t.luks'}}}
+> +{u'return': {}}
+> +{'execute': 'job-dismiss', 'arguments': {'id': 'job0'}}
+> +{u'return': {}}
+> +
+> +{'execute': 'blockdev-add', 'arguments': {'node_name': 'imgfile', 'driver': 'file', 'filename': 'TEST_DIR/t.luks'}}
+> +{u'return': {}}
+> +{'execute': 'x-blockdev-create', 'arguments': {'job_id': 'job0', 'options': {'key-secret': 'keysec0', 'iter-time': 10, 'driver': 'luks', 'file': 'imgfile', 'size': 134217728}}}
+> +{u'return': {}}
+> +{'execute': 'job-dismiss', 'arguments': {'id': 'job0'}}
+> +{u'return': {}}
+>  
+>  image: json:{"driver": "IMGFMT", "file": {"driver": "file", "filename": "TEST_DIR/t.IMGFMT"}, "key-secret": "keysec0"}
+>  file format: IMGFMT
+>  virtual size: 128M (134217728 bytes)
+> +encrypted: yes
+>  Format specific information:
+>      ivgen alg: plain64
+>      hash alg: sha256
+>      cipher alg: aes-256
+> -    uuid: 00000000-0000-0000-0000-000000000000
+> +    uuid: XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX
+>      cipher mode: xts
+>      slots:
+>          [0]:
+>              active: true
+> -            iters: 1024
+> +            iters: XXX
+>              key offset: 4096
+>              stripes: 4000
+>          [1]:
+> @@ -48,31 +50,34 @@ Format specific information:
+>              active: false
+>              key offset: 1810432
+>      payload offset: 2068480
+> -    master key iters: 1024
+> +    master key iters: XXX
+>  
+>  === Successful image creation (with non-default options) ===
+>  
+> -Testing: -object secret,id=keysec0,data=foo
+> -QMP_VERSION
+> -{"return": {}}
+> -{"return": {}}
+> -{"return": {}}
+> -{"return": {}}
+> -{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
+> +{'execute': 'x-blockdev-create', 'arguments': {'job_id': 'job0', 'options': {'size': 0, 'driver': 'file', 'filename': 'TEST_DIR/t.luks'}}}
+> +{u'return': {}}
+> +{'execute': 'job-dismiss', 'arguments': {'id': 'job0'}}
+> +{u'return': {}}
+> +
+> +{'execute': 'x-blockdev-create', 'arguments': {'job_id': 'job0', 'options': {'key-secret': 'keysec0', 'hash-alg': 'sha1', 'cipher-mode': 'ctr', 'cipher-alg': 'twofish-128', 'file': {'driver': 'file', 'filename': 'TEST_DIR/t.luks'}, 'iter-time': 10, 'ivgen-alg': 'plain64', 'ivgen-hash-alg': 'md5', 'driver': 'luks', 'size': 67108864}}}
+> +{u'return': {}}
+> +{'execute': 'job-dismiss', 'arguments': {'id': 'job0'}}
+> +{u'return': {}}
+>  
+>  image: json:{"driver": "IMGFMT", "file": {"driver": "file", "filename": "TEST_DIR/t.IMGFMT"}, "key-secret": "keysec0"}
+>  file format: IMGFMT
+>  virtual size: 64M (67108864 bytes)
+> +encrypted: yes
+>  Format specific information:
+>      ivgen alg: plain64
+>      hash alg: sha1
+>      cipher alg: twofish-128
+> -    uuid: 00000000-0000-0000-0000-000000000000
+> +    uuid: XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX
+>      cipher mode: ctr
+>      slots:
+>          [0]:
+>              active: true
+> -            iters: 1024
+> +            iters: XXX
+>              key offset: 4096
+>              stripes: 4000
+>          [1]:
+> @@ -97,56 +102,130 @@ Format specific information:
+>              active: false
+>              key offset: 462848
+>      payload offset: 528384
+> -    master key iters: 1024
+> +    master key iters: XXX
+>  
+>  === Invalid BlockdevRef ===
+>  
+> -Testing:
+> -QMP_VERSION
+> -{"return": {}}
+> -{"error": {"class": "GenericError", "desc": "Cannot find device=this doesn't exist nor node_name=this doesn't exist"}}
+> -{"return": {}}
+> -{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
+> -
+> +{'execute': 'x-blockdev-create', 'arguments': {'job_id': 'job0', 'options': {'driver': 'luks', 'file': "this doesn't exist", 'size': 67108864}}}
+> +{u'return': {}}
+> +Job failed: Cannot find device=this doesn't exist nor node_name=this doesn't exist
+> +{'execute': 'job-dismiss', 'arguments': {'id': 'job0'}}
+> +{u'return': {}}
+>  
+>  === Zero size ===
+>  
+> -Testing: -blockdev driver=file,filename=TEST_DIR/t.IMGFMT,node-name=node0 -object secret,id=keysec0,data=foo
+> -QMP_VERSION
+> -{"return": {}}
+> -{"return": {}}
+> -{"return": {}}
+> -{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
+> +{'execute': 'x-blockdev-create', 'arguments': {'job_id': 'job0', 'options': {'key-secret': 'keysec0', 'iter-time': 10, 'driver': 'luks', 'file': 'node0', 'size': 0}}}
+> +{u'return': {}}
+> +{'execute': 'job-dismiss', 'arguments': {'id': 'job0'}}
+> +{u'return': {}}
+>  
+>  image: json:{"driver": "IMGFMT", "file": {"driver": "file", "filename": "TEST_DIR/t.IMGFMT"}, "key-secret": "keysec0"}
+>  file format: IMGFMT
+>  virtual size: 0 (0 bytes)
+> +encrypted: yes
+> +Format specific information:
+> +    ivgen alg: plain64
+> +    hash alg: sha256
+> +    cipher alg: aes-256
+> +    uuid: XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX
+> +    cipher mode: xts
+> +    slots:
+> +        [0]:
+> +            active: true
+> +            iters: XXX
+> +            key offset: 4096
+> +            stripes: 4000
+> +        [1]:
+> +            active: false
+> +            key offset: 262144
+> +        [2]:
+> +            active: false
+> +            key offset: 520192
+> +        [3]:
+> +            active: false
+> +            key offset: 778240
+> +        [4]:
+> +            active: false
+> +            key offset: 1036288
+> +        [5]:
+> +            active: false
+> +            key offset: 1294336
+> +        [6]:
+> +            active: false
+> +            key offset: 1552384
+> +        [7]:
+> +            active: false
+> +            key offset: 1810432
+> +    payload offset: 2068480
+> +    master key iters: XXX
+>  
+>  === Invalid sizes ===
+>  
+> -Testing: -blockdev driver=file,filename=TEST_DIR/t.IMGFMT,node-name=node0 -object secret,id=keysec0,data=foo
+> -QMP_VERSION
+> -{"return": {}}
+> -{"error": {"class": "GenericError", "desc": "The requested file size is too large"}}
+> -{"error": {"class": "GenericError", "desc": "The requested file size is too large"}}
+> -{"error": {"class": "GenericError", "desc": "The requested file size is too large"}}
+> -{"return": {}}
+> -{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
+> +{'execute': 'x-blockdev-create', 'arguments': {'job_id': 'job0', 'options': {'key-secret': 'keysec0', 'driver': 'luks', 'file': 'node0', 'size': 18446744073709551104L}}}
+> +{u'return': {}}
+> +Job failed: The requested file size is too large
+> +{'execute': 'job-dismiss', 'arguments': {'id': 'job0'}}
+> +{u'return': {}}
+>  
+> +{'execute': 'x-blockdev-create', 'arguments': {'job_id': 'job0', 'options': {'key-secret': 'keysec0', 'driver': 'luks', 'file': 'node0', 'size': 9223372036854775808L}}}
+> +{u'return': {}}
+> +Job failed: The requested file size is too large
+> +{'execute': 'job-dismiss', 'arguments': {'id': 'job0'}}
+> +{u'return': {}}
+>  
+> -=== Resize image with invalid sizes ===
+> +{'execute': 'x-blockdev-create', 'arguments': {'job_id': 'job0', 'options': {'key-secret': 'keysec0', 'driver': 'luks', 'file': 'node0', 'size': 9223372036854775296}}}
+> +{u'return': {}}
+> +Job failed: The requested file size is too large
+> +{'execute': 'job-dismiss', 'arguments': {'id': 'job0'}}
+> +{u'return': {}}
+>  
+> -Testing: -blockdev driver=file,filename=TEST_DIR/t.IMGFMT,node-name=node0 -blockdev driver=IMGFMT,file=node0,key-secret=keysec0,node-name=node1 -object secret,id=keysec0,data=foo
+> -QMP_VERSION
+> -{"return": {}}
+> -{"error": {"class": "GenericError", "desc": "The requested file size is too large"}}
+> -{"error": {"class": "GenericError", "desc": "Invalid parameter type for 'size', expected: integer"}}
+> -{"error": {"class": "GenericError", "desc": "Invalid parameter type for 'size', expected: integer"}}
+> -{"error": {"class": "GenericError", "desc": "Parameter 'size' expects a >0 size"}}
+> -{"return": {}}
+> -{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
+> +=== Resize image with invalid sizes ===
+>  
+> +{'execute': 'block_resize', 'arguments': {'size': 9223372036854775296, 'node_name': 'node1'}}
+> +{u'error': {u'class': u'GenericError', u'desc': u'The requested file size is too large'}}
+> +{'execute': 'block_resize', 'arguments': {'size': 9223372036854775808L, 'node_name': 'node1'}}
+> +{u'error': {u'class': u'GenericError', u'desc': u"Invalid parameter type for 'size', expected: integer"}}
+> +{'execute': 'block_resize', 'arguments': {'size': 18446744073709551104L, 'node_name': 'node1'}}
+> +{u'error': {u'class': u'GenericError', u'desc': u"Invalid parameter type for 'size', expected: integer"}}
+> +{'execute': 'block_resize', 'arguments': {'size': -9223372036854775808, 'node_name': 'node1'}}
+> +{u'error': {u'class': u'GenericError', u'desc': u"Parameter 'size' expects a >0 size"}}
+>  image: json:{"driver": "IMGFMT", "file": {"driver": "file", "filename": "TEST_DIR/t.IMGFMT"}, "key-secret": "keysec0"}
+>  file format: IMGFMT
+>  virtual size: 0 (0 bytes)
+> -*** done
+> +encrypted: yes
+> +Format specific information:
+> +    ivgen alg: plain64
+> +    hash alg: sha256
+> +    cipher alg: aes-256
+> +    uuid: XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX
+> +    cipher mode: xts
+> +    slots:
+> +        [0]:
+> +            active: true
+> +            iters: XXX
+> +            key offset: 4096
+> +            stripes: 4000
+> +        [1]:
+> +            active: false
+> +            key offset: 262144
+> +        [2]:
+> +            active: false
+> +            key offset: 520192
+> +        [3]:
+> +            active: false
+> +            key offset: 778240
+> +        [4]:
+> +            active: false
+> +            key offset: 1036288
+> +        [5]:
+> +            active: false
+> +            key offset: 1294336
+> +        [6]:
+> +            active: false
+> +            key offset: 1552384
+> +        [7]:
+> +            active: false
+> +            key offset: 1810432
+> +    payload offset: 2068480
+> +    master key iters: XXX
+> +
+> diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
+> index 8a84bf057d..a1d04ce367 100644
+> --- a/tests/qemu-iotests/group
+> +++ b/tests/qemu-iotests/group
+> @@ -208,9 +208,9 @@
+>  207 rw auto
+>  208 rw auto quick
+>  209 rw auto quick
+> +210 rw auto
+>  # TODO The following commented out tests need to be reworked to work
+>  # with the x-blockdev-create job
+> -#210 rw auto
+>  #211 rw auto quick
+>  #212 rw auto quick
+>  #213 rw auto quick
+> diff --git a/tests/qemu-iotests/iotests.py b/tests/qemu-iotests/iotests.py
+> index e945caa6bb..6499a9e6fe 100644
+> --- a/tests/qemu-iotests/iotests.py
+> +++ b/tests/qemu-iotests/iotests.py
+> @@ -109,8 +109,16 @@ def qemu_img_pipe(*args):
+>          sys.stderr.write('qemu-img received signal %i: %s\n' % (-exitcode, ' '.join(qemu_img_args + list(args))))
+>      return subp.communicate()[0]
+>  
+> -def img_info_log(filename, filter_path=None):
+> -    output = qemu_img_pipe('info', '-f', imgfmt, filename)
+> +def img_info_log(filename, filter_path=None, imgopts=False, extra_args=[]):
+> +    args = [ 'info' ]
+> +    if imgopts:
+> +        args.append('--image-opts')
+> +    else:
+> +        args += [ '-f', imgfmt ]
+> +    args += extra_args
+> +    args.append(filename)
+> +
+> +    output = qemu_img_pipe(*args)
+>      if not filter_path:
+>          filter_path = filename
+>      log(filter_img_info(output, filter_path))
+> -- 
+> 2.13.6
+> 
+> 
