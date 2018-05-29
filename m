@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51779)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51849)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fNlP0-0003Ja-KW
-	for qemu-devel@nongnu.org; Tue, 29 May 2018 16:39:33 -0400
+	(envelope-from <kwolf@redhat.com>) id 1fNlP4-0003Lb-A4
+	for qemu-devel@nongnu.org; Tue, 29 May 2018 16:39:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fNlOy-0007uj-Kc
-	for qemu-devel@nongnu.org; Tue, 29 May 2018 16:39:30 -0400
+	(envelope-from <kwolf@redhat.com>) id 1fNlP3-0007yD-Bk
+	for qemu-devel@nongnu.org; Tue, 29 May 2018 16:39:34 -0400
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Tue, 29 May 2018 22:38:59 +0200
-Message-Id: <20180529203910.7615-6-kwolf@redhat.com>
+Date: Tue, 29 May 2018 22:39:01 +0200
+Message-Id: <20180529203910.7615-8-kwolf@redhat.com>
 In-Reply-To: <20180529203910.7615-1-kwolf@redhat.com>
 References: <20180529203910.7615-1-kwolf@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 05/16] qemu-iotests: Add
- VM.get_qmp_events_filtered()
+Subject: [Qemu-devel] [PATCH v2 07/16] qemu-iotests: Add
+ iotests.img_info_log()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,30 +23,50 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, mreitz@redhat.com, jcody@redhat.com, jsnow@redhat.com, eblake@redhat.com, pkrempa@redhat.com, qemu-devel@nongnu.org
 
-This adds a helper function that returns a list of QMP events that are
-already filtered through filter_qmp_event().
+This adds a filter function to postprocess 'qemu-img info' input
+(similar to what _img_info does), and an img_info_log() function that
+calls 'qemu-img info' and logs the filtered output.
 
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-Reviewed-by: Max Reitz <mreitz@redhat.com>
 ---
- tests/qemu-iotests/iotests.py | 5 +++++
- 1 file changed, 5 insertions(+)
+ tests/qemu-iotests/iotests.py | 18 ++++++++++++++++++
+ 1 file changed, 18 insertions(+)
 
 diff --git a/tests/qemu-iotests/iotests.py b/tests/qemu-iotests/iotests.py
-index 28159d837a..17aa7c88dc 100644
+index 2f54823db6..edcd2bb701 100644
 --- a/tests/qemu-iotests/iotests.py
 +++ b/tests/qemu-iotests/iotests.py
-@@ -383,6 +383,11 @@ class VM(qtest.QEMUQtestMachine):
-             output_list += [key + '=' + obj[key]]
-         return ','.join(output_list)
+@@ -109,6 +109,12 @@ def qemu_img_pipe(*args):
+         sys.stderr.write('qemu-img received signal %i: %s\n' % (-exitcode, ' '.join(qemu_img_args + list(args))))
+     return subp.communicate()[0]
  
-+    def get_qmp_events_filtered(self, wait=True):
-+        result = []
-+        for ev in self.get_qmp_events(wait=wait):
-+            result.append(filter_qmp_event(ev))
-+        return result
++def img_info_log(filename, filter_path=None):
++    output = qemu_img_pipe('info', '-f', imgfmt, filename)
++    if not filter_path:
++        filter_path = filename
++    log(filter_img_info(output, filter_path))
++
+ def qemu_io(*args):
+     '''Run qemu-io and return the stdout data'''
+     args = qemu_io_args + list(args)
+@@ -210,6 +216,18 @@ def filter_testfiles(msg):
+     prefix = os.path.join(test_dir, "%s-" % (os.getpid()))
+     return msg.replace(prefix, 'TEST_DIR/PID-')
  
- 
- index_re = re.compile(r'([^\[]+)\[([^\]]+)\]')
++def filter_img_info(output, filename):
++    lines = []
++    for line in output.split('\n'):
++        if 'disk size' in line or 'actual-size' in line:
++            continue
++        line = line.replace(filename, 'TEST_IMG') \
++                   .replace(imgfmt, 'IMGFMT')
++        line = re.sub('iters: [0-9]+', 'iters: XXX', line)
++        line = re.sub('uuid: [-a-f0-9]+', 'uuid: XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX', line)
++        lines.append(line)
++    return '\n'.join(lines)
++
+ def log(msg, filters=[]):
+     for flt in filters:
+         msg = flt(msg)
 -- 
 2.13.6
