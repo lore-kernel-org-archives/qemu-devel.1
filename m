@@ -1,20 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44181)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44293)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fNj6v-0006ML-Hc
-	for qemu-devel@nongnu.org; Tue, 29 May 2018 14:12:42 -0400
+	(envelope-from <programmingkidx@gmail.com>) id 1fNj7E-0006ac-83
+	for qemu-devel@nongnu.org; Tue, 29 May 2018 14:13:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fNj6u-0000LE-JU
-	for qemu-devel@nongnu.org; Tue, 29 May 2018 14:12:41 -0400
-Date: Tue, 29 May 2018 20:12:32 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20180529181232.GH4756@localhost.localdomain>
-References: <20180528150128.31500-1-berto@igalia.com>
-MIME-Version: 1.0
+	(envelope-from <programmingkidx@gmail.com>) id 1fNj7A-0000UM-QX
+	for qemu-devel@nongnu.org; Tue, 29 May 2018 14:13:00 -0400
+Received: from mail-io0-x241.google.com ([2607:f8b0:4001:c06::241]:36534)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <programmingkidx@gmail.com>)
+	id 1fNj7A-0000U7-LR
+	for qemu-devel@nongnu.org; Tue, 29 May 2018 14:12:56 -0400
+Received: by mail-io0-x241.google.com with SMTP id d73-v6so18696415iog.3
+	for <qemu-devel@nongnu.org>; Tue, 29 May 2018 11:12:56 -0700 (PDT)
 Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180528150128.31500-1-berto@igalia.com>
-Subject: Re: [Qemu-devel] [PATCH] qcow2: Fix Coverity warning when
- calculating the refcount cache size
+Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
+From: Programmingkid <programmingkidx@gmail.com>
+In-Reply-To: <CAFEAcA-E10Fp7MjgFpSoMTWyn5Wf0OTvSLWJC2LKnZJBT+-Gqw@mail.gmail.com>
+Date: Tue, 29 May 2018 14:12:54 -0400
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <57C40AB5-274A-4809-813E-7EA9AA28F07A@gmail.com>
+References: <20180529180813.2647-1-programmingkidx@gmail.com>
+	<CAFEAcA-E10Fp7MjgFpSoMTWyn5Wf0OTvSLWJC2LKnZJBT+-Gqw@mail.gmail.com>
+Subject: Re: [Qemu-devel] [PATCH] ui/cocoa.m: Suppress
+ NSFileHandlingPanelOKButton depreciation warning
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,27 +31,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alberto Garcia <berto@igalia.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, Peter Maydell <peter.maydell@linaro.org>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, "patches@linaro.org" <patches@linaro.org>
 
-Am 28.05.2018 um 17:01 hat Alberto Garcia geschrieben:
-> MIN_REFCOUNT_CACHE_SIZE is 4 and the cluster size is guaranteed to be
-> at most 2MB, so the minimum refcount cache size (in bytes) is always
-> going to fit in a 32-bit integer.
-> 
-> Coverity doesn't know that, and since we're storing the result in a
-> uint64_t (*refcount_cache_size) it thinks that we need the 64 bits and
-> that we probably want to do a 64-bit multiplication to prevent the
-> result from being truncated.
-> 
-> This is a false positive in this case, but it's a fair warning.
-> We could do a 64-bit multiplication to get rid of it, but since we
-> know that a 32-bit variable is enough to store this value let's simply
-> reuse min_refcount_cache, make it a normal int and stop doing casts.
-> 
-> Signed-off-by: Alberto Garcia <berto@igalia.com>
-> Reported-by: Peter Maydell <peter.maydell@linaro.org>
 
-Thanks, applied to the block branch.
+> On May 29, 2018, at 2:11 PM, Peter Maydell <peter.maydell@linaro.org> =
+wrote:
+>=20
+> On 29 May 2018 at 19:08, John Arbuckle <programmingkidx@gmail.com> =
+wrote:
+>> OSX 10.13 deprecates the NSFileHandlingPanelOKButton constant, and
+>> would rather you use NSModalResponseOK, which was introduced in OS =
+10.9.
+>> Use the recommended new constant name, with a backward compatibility
+>> define if we're building on an older OSX.
+>>=20
+>> Signed-off-by: John Arbuckle <programmingkidx@gmail.com>
+>> ---
+>> ui/cocoa.m | 9 ++++++++-
+>> 1 file changed, 8 insertions(+), 1 deletion(-)
+>>=20
+>> diff --git a/ui/cocoa.m b/ui/cocoa.m
+>> index 110b393..c9473f0 100644
+>> --- a/ui/cocoa.m
+>> +++ b/ui/cocoa.m
+>> @@ -79,6 +79,13 @@
+>> #define NSWindowStyleMaskMiniaturizable NSMiniaturizableWindowMask
+>> #define NSWindowStyleMaskTitled         NSTitledWindowMask
+>> #endif
+>> +/* 10.13 deprecates NSFileHandlingPanelOKButton in favor of
+>> + * NSModalResponseOK, which was introduced in 10.9. Define
+>> + * it for older versions.
+>> + */
+>> +#if !defined MAC_OS_X_VERSION_10_9 || MAC_OS_X_VERSION_MAX_ALLOWED < =
+MAC_OS_X_VERSION_10_9
+>> +#define NSModalResponseOK NSFileHandlingPanelOKButton
+>> +#endif
+>=20
+> We should just define MAC_OS_X_VERSION_10_9 if it's not
+> defined, the same way we do for the 10_5/10_6/10_10/10_12
+> constants. I'll respin my patch.
 
-Kevin
+Sounds like a good idea.=
