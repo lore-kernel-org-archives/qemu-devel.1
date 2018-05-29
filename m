@@ -1,24 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55782)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57535)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1fNey6-0006uV-VE
-	for qemu-devel@nongnu.org; Tue, 29 May 2018 09:47:19 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1fNf4g-0000yU-Is
+	for qemu-devel@nongnu.org; Tue, 29 May 2018 09:54:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1fNey6-0002fS-1O
-	for qemu-devel@nongnu.org; Tue, 29 May 2018 09:47:19 -0400
-References: <1526222114-5324-1-git-send-email-eric.auger@redhat.com>
-	<1526222114-5324-4-git-send-email-eric.auger@redhat.com>
-	<CAFEAcA8yo_NKY=mHNYFFTA1+eR-731ePUb5hDum0ubUM2XOxxg@mail.gmail.com>
-	<929ce9c7-afae-7978-ed35-3789fcbf026a@redhat.com>
-	<CAFEAcA-yWBexVnpd9_iicL0o8A3TNZ2ezAf8nrYJ_ZPmB+xocg@mail.gmail.com>
-From: Auger Eric <eric.auger@redhat.com>
-Message-ID: <33e5bb20-aa77-d9bb-9445-dbcc590962c1@redhat.com>
-Date: Tue, 29 May 2018 15:47:08 +0200
+	(envelope-from <peter.maydell@linaro.org>) id 1fNf4f-000832-Fy
+	for qemu-devel@nongnu.org; Tue, 29 May 2018 09:54:06 -0400
+Received: from mail-ot0-x242.google.com ([2607:f8b0:4003:c0f::242]:37745)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1fNf4f-00081y-1t
+	for qemu-devel@nongnu.org; Tue, 29 May 2018 09:54:05 -0400
+Received: by mail-ot0-x242.google.com with SMTP id 77-v6so17014592otd.4
+	for <qemu-devel@nongnu.org>; Tue, 29 May 2018 06:54:04 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA-yWBexVnpd9_iicL0o8A3TNZ2ezAf8nrYJ_ZPmB+xocg@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC v2 3/7] hw/intc/arm_gicv3: Introduce
- redist-region-count array property
+In-Reply-To: <1527563283-13148-1-git-send-email-zhaoshenglong@huawei.com>
+References: <1527563283-13148-1-git-send-email-zhaoshenglong@huawei.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 29 May 2018 14:53:43 +0100
+Message-ID: <CAFEAcA-LoTOnTnSYBpzuyUDFZBsVBaB2qjvzAP_94rou8ob6Tg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2] ARM: ACPI: Fix use-after-free due to
+ memory realloc
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,53 +30,118 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Wei Huang <wei@redhat.com>, Andrew Jones <drjones@redhat.com>, Marc Zyngier <marc.zyngier@arm.com>, Christoffer Dall <christoffer.dall@arm.com>, QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Shannon Zhao <zhaoshenglong@huawei.com>, Eric Auger <eric.auger.pro@gmail.com>
+To: Shannon Zhao <zhaoshenglong@huawei.com>
+Cc: qemu-arm <qemu-arm@nongnu.org>, Eric Auger <eric.auger@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Shannon Zhao <shannon.zhaosl@gmail.com>
 
-Hi Peter,
+On 29 May 2018 at 04:08, Shannon Zhao <zhaoshenglong@huawei.com> wrote:
+> acpi_data_push uses g_array_set_size to resize the memory size. If there
+> is no enough contiguous memory, the address will be changed. So previous
+> pointer could not be used any more. It must update the pointer and use
+> the new one.
+>
+> Reviewed-by: Eric Auger <eric.auger@redhat.com>
+> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+> Signed-off-by: Shannon Zhao <zhaoshenglong@huawei.com>
+> ---
+> V2: add comments for iort_node_offset and reviewed tags
+> ---
+>  hw/arm/virt-acpi-build.c | 19 +++++++++++++++----
+>  1 file changed, 15 insertions(+), 4 deletions(-)
+>
+> diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
+> index 92ceee9..6209138 100644
+> --- a/hw/arm/virt-acpi-build.c
+> +++ b/hw/arm/virt-acpi-build.c
+> @@ -400,7 +400,7 @@ build_iort(GArray *table_data, BIOSLinker *linker, Vi=
+rtMachineState *vms)
+>      AcpiIortItsGroup *its;
+>      AcpiIortTable *iort;
+>      AcpiIortSmmu3 *smmu;
+> -    size_t node_size, iort_length, smmu_offset =3D 0;
+> +    size_t node_size, iort_node_offset, iort_length, smmu_offset =3D 0;
+>      AcpiIortRC *rc;
+>
+>      iort =3D acpi_data_push(table_data, sizeof(*iort));
+> @@ -415,6 +415,12 @@ build_iort(GArray *table_data, BIOSLinker *linker, V=
+irtMachineState *vms)
+>      iort->node_count =3D cpu_to_le32(nb_nodes);
+>      iort->node_offset =3D cpu_to_le32(sizeof(*iort));
+>
+> +    /*
+> +     * Use a copy in case table_data->data moves duringa acpi_data_push
+> +     * operations.
+> +     */
+> +    iort_node_offset =3D sizeof(*iort);
+> +
+>      /* ITS group node */
+>      node_size =3D  sizeof(*its) + sizeof(uint32_t);
+>      iort_length +=3D node_size;
+> @@ -429,7 +435,7 @@ build_iort(GArray *table_data, BIOSLinker *linker, Vi=
+rtMachineState *vms)
+>          int irq =3D  vms->irqmap[VIRT_SMMU];
+>
+>          /* SMMUv3 node */
+> -        smmu_offset =3D iort->node_offset + node_size;
+> +        smmu_offset =3D iort_node_offset + node_size;
 
-On 05/29/2018 11:13 AM, Peter Maydell wrote:
-> On 29 May 2018 at 10:08, Auger Eric <eric.auger@redhat.com> wrote:
->> Hi Peter,
->> On 05/22/2018 02:27 PM, Peter Maydell wrote:
->>> On 13 May 2018 at 15:35, Eric Auger <eric.auger@redhat.com> wrote:
->>>> To prepare for multiple redistributor regions, we introduce
->>>> an array of uint32_t properties that stores the redistributor
->>>> count of each redistributor region.
->>>>
->>>> Non accelerated VGICv3 only supports a single redistributor region.
->>>> The capacity of all redist regions is checked against the number of
->>>> vcpus.
->>>>
->>>> Machvirt is updated to set the count to 123 vcpus for the unique
->>>> redistributor region we currently have.
-> 
->>>> +
->>>> +    if (type == 3) {
->>>> +        qdev_prop_set_uint32(gicdev, "len-redist-region-count", 1);
->>>> +        qdev_prop_set_uint32(gicdev , "redist-region-count[0]",
->>>> +                             vms->memmap[VIRT_GIC_REDIST].size / 0x20000);
->>>
->>> We used to create a region which had num_cpu redistributors in it;
->>> won't this cause us to create one which has as many redistributors
->>> as will fit in the space ?
->> Is that an issue? From a machine perspective the whole region is
->> reserved for rdist. dt and ACPI will expose this whole region and the
->> device will use a subset of it? I agree I need to document this change
->> in the commit message though.
-> 
-> It's a difference, and a guest-visible difference too. This
-> patchset is supposed to be introducing split-redistributor-regions,
-> not changing the behaviour of other configs. Also, I don't think
-> it makes sense to model a GIC with more redistributors than CPUs:
-> real hardware doesn't look like that AFAIK.
+In the old code, we used iort->node_offset directly as a CPU
+endianness order bitmap, which is initialized above using
+    iort->node_offset =3D cpu_to_le32(sizeof(*iort));
+In this version, we use iort_node_offset, which is
+initialized using
+    iort_node_offset =3D sizeof(*iort);
 
-OK I updated the series accordingly.
+So we've lost an endianness conversion on big-endian systems.
+Which is correct, the old code or the new?
 
-Thanks
+>          node_size =3D sizeof(*smmu) + sizeof(*idmap);
+>          iort_length +=3D node_size;
+>          smmu =3D acpi_data_push(table_data, node_size);
+> @@ -450,7 +456,7 @@ build_iort(GArray *table_data, BIOSLinker *linker, Vi=
+rtMachineState *vms)
+>          idmap->id_count =3D cpu_to_le32(0xFFFF);
+>          idmap->output_base =3D 0;
+>          /* output IORT node is the ITS group node (the first node) */
+> -        idmap->output_reference =3D cpu_to_le32(iort->node_offset);
+> +        idmap->output_reference =3D cpu_to_le32(iort_node_offset);
 
-Eric
-> 
-> thanks
-> -- PMM
-> 
+Here we're doing an endianness conversion on iort_node_offset.
+
+Overall something is weird here, even in the previous version:
+if we wrote iort->node_offset with cpu_to_le32(), that implies
+that it's little-endian; so why are we reading it with cpu_to_le32()
+here rather than le32_to_cpu() ?
+Both cpu_to_le32() and le32_to_cpu() are the same operation,
+mathematically, but we should use the version which indicates
+our intent, ie which of source and destination is the always-LE
+data, and which is the host-order data.
+
+>      }
+>
+>      /* Root Complex Node */
+> @@ -479,9 +485,14 @@ build_iort(GArray *table_data, BIOSLinker *linker, V=
+irtMachineState *vms)
+>          idmap->output_reference =3D cpu_to_le32(smmu_offset);
+>      } else {
+>          /* output IORT node is the ITS group node (the first node) */
+> -        idmap->output_reference =3D cpu_to_le32(iort->node_offset);
+> +        idmap->output_reference =3D cpu_to_le32(iort_node_offset);
+>      }
+>
+> +    /*
+> +     * Update the pointer address in case table_data->data moves during =
+above
+> +     * acpi_data_push operations.
+> +     */
+> +    iort =3D (AcpiIortTable *)(table_data->data + iort_start);
+>      iort->length =3D cpu_to_le32(iort_length);
+>
+>      build_header(linker, table_data, (void *)(table_data->data + iort_st=
+art),
+
+This could just use 'iort' now, right?
+
+> --
+
+thanks
+-- PMM
