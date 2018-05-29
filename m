@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54186)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55373)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fNgVk-0002vd-K9
-	for qemu-devel@nongnu.org; Tue, 29 May 2018 11:26:09 -0400
+	(envelope-from <eblake@redhat.com>) id 1fNgWo-0003ba-Eo
+	for qemu-devel@nongnu.org; Tue, 29 May 2018 11:27:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fNgVj-0000rJ-Q9
-	for qemu-devel@nongnu.org; Tue, 29 May 2018 11:26:08 -0400
-Received: from mail-oi0-x243.google.com ([2607:f8b0:4003:c06::243]:46332)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fNgVj-0000qI-Lj
-	for qemu-devel@nongnu.org; Tue, 29 May 2018 11:26:07 -0400
-Received: by mail-oi0-x243.google.com with SMTP id h79-v6so6913114oig.13
-	for <qemu-devel@nongnu.org>; Tue, 29 May 2018 08:26:07 -0700 (PDT)
+	(envelope-from <eblake@redhat.com>) id 1fNgWn-0001wl-EY
+	for qemu-devel@nongnu.org; Tue, 29 May 2018 11:27:14 -0400
+References: <20170724182751.18261-1-f4bug@amsat.org>
+	<20170724182751.18261-22-f4bug@amsat.org>
+	<CAFEAcA_PRH_BuUOTtC=cvRFT7Gtiwt50T6C3avm+Sy13aDS4tg@mail.gmail.com>
+	<ae090923-3523-3e56-fbc1-65b270680939@amsat.org>
+	<e0d37c83-537a-5288-b033-e5be3b8858ca@redhat.com>
+	<c1078250-30a0-0d4c-d830-88591fb6ba43@redhat.com>
+	<713f16f9-3faa-7644-38c6-0797252d5922@amsat.org>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <63a61375-ef2e-970c-7f43-6cfe1d7666b1@redhat.com>
+Date: Tue, 29 May 2018 10:27:03 -0500
 MIME-Version: 1.0
-In-Reply-To: <4f0eec20-64a6-fb8f-58ae-1fab9ef34f53@redhat.com>
-References: <20180426140253.3918-1-peter.maydell@linaro.org>
-	<4f0eec20-64a6-fb8f-58ae-1fab9ef34f53@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 29 May 2018 16:25:46 +0100
-Message-ID: <CAFEAcA86RRfz-YQivsPDRqAbZqOtdNpRnnBeKC24B5yYzY1=zg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH] vl.c: Don't zero-initialize statics for
- serial_hds
+In-Reply-To: <713f16f9-3faa-7644-38c6-0797252d5922@amsat.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH for 2.10 21/35] arm/sysbus-fdt: fix null
+ pointer dereference
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,51 +30,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, QEMU Trivial <qemu-trivial@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Cc: Peter Maydell <peter.maydell@linaro.org>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, Markus Armbruster <armbru@redhat.com>
 
-Ping for application via qemu-trivial?
+[adding Markus, as the error maintainer]
 
-thanks
--- PMM
+On 05/29/2018 09:33 AM, Philippe Mathieu-Daud=C3=A9 wrote:
 
-On 26 April 2018 at 15:19, Thomas Huth <thuth@redhat.com> wrote:
-> On 26.04.2018 16:02, Peter Maydell wrote:
->> checkpatch reminds us that statics shouldn't be zero-initialized:
->>
->> ERROR: do not initialise statics to 0 or NULL
->> #35: FILE: vl.c:157:
->> +static int num_serial_hds = 0;
->>
->> ERROR: do not initialise statics to 0 or NULL
->> #36: FILE: vl.c:158:
->> +static Chardev **serial_hds = NULL;
->>
->> I forgot to fix this in 6af2692e86f9fdfb3d; do so now.
->>
->> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
->> ---
->> I wouldn't bother with this except that I forgot to fold
->> it in when applying the serial-limits patchset.
->>
->>  vl.c | 4 ++--
->>  1 file changed, 2 insertions(+), 2 deletions(-)
->>
->> diff --git a/vl.c b/vl.c
->> index 616956adf1..6d8b869dad 100644
->> --- a/vl.c
->> +++ b/vl.c
->> @@ -154,8 +154,8 @@ QEMUClockType rtc_clock;
->>  int vga_interface_type = VGA_NONE;
->>  static DisplayOptions dpy;
->>  int no_frame;
->> -static int num_serial_hds = 0;
->> -static Chardev **serial_hds = NULL;
->> +static int num_serial_hds;
->> +static Chardev **serial_hds;
->>  Chardev *parallel_hds[MAX_PARALLEL_PORTS];
->>  Chardev *virtcon_hds[MAX_VIRTIO_CONSOLES];
->>  Chardev *sclp_hds[MAX_SCLP_CONSOLES];
->>
->
-> Reviewed-by: Thomas Huth <thuth@redhat.com>
+>>>> Ok I see, Clang is unaware than error_setg(&error_fatal) is a noretu=
+rn.
+>>>
+>>> Indeed, and that's because error_setg(&error_fatal) is not in preferr=
+ed
+>>> form.
+>>>
+>>>>
+>>>> Patch dropped.
+>>>
+>>> That's a shame.  Rather, we should patch this file (and others) to av=
+oid
+>>> all the inconsistent uses of error_setg(&error_*), to comply with the
+>>> error.h documentation.
+>=20
+> I started to port/clean this up.
+> To avoid future inconsistencies, do you think we should/can enforce thi=
+s
+> check in checkpatch (which is stricter than human review)?
+
+Sure, automating good code style is worthwhile.
+
+> Is the "Qemu error function tests" section a good place to put this che=
+ck?
+
+Probably works.  I'm not familiar enough with checkpatch as a whole to=20
+have any different suggestions off the top of my head (basically, any=20
+time I've touched that file, it's been grepping for something that is=20
+similar to what I want to be tweaking, rather than reading the whole thin=
+g).
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
