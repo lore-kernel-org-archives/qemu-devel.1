@@ -1,21 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36605)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36707)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <crosa@redhat.com>) id 1fNkRP-0000aU-E5
-	for qemu-devel@nongnu.org; Tue, 29 May 2018 15:37:57 -0400
+	(envelope-from <eric.auger@redhat.com>) id 1fNkRj-0000qP-N6
+	for qemu-devel@nongnu.org; Tue, 29 May 2018 15:38:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <crosa@redhat.com>) id 1fNkRM-0006OZ-RL
-	for qemu-devel@nongnu.org; Tue, 29 May 2018 15:37:55 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:42398 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <crosa@redhat.com>) id 1fNkRM-0006OQ-M3
-	for qemu-devel@nongnu.org; Tue, 29 May 2018 15:37:52 -0400
-From: Cleber Rosa <crosa@redhat.com>
-Date: Tue, 29 May 2018 15:37:26 -0400
-Message-Id: <20180529193730.9204-2-crosa@redhat.com>
-In-Reply-To: <20180529193730.9204-1-crosa@redhat.com>
-References: <20180529193730.9204-1-crosa@redhat.com>
-Subject: [Qemu-devel] [PATCH v3 1/5] Add functional/acceptance tests
- infrastructure
+	(envelope-from <eric.auger@redhat.com>) id 1fNkRi-0006VX-Gv
+	for qemu-devel@nongnu.org; Tue, 29 May 2018 15:38:15 -0400
+References: <20180529174821.19964-1-f4bug@amsat.org>
+From: Auger Eric <eric.auger@redhat.com>
+Message-ID: <b093773f-fe16-776f-f379-13ad776a954c@redhat.com>
+Date: Tue, 29 May 2018 21:38:01 +0200
+MIME-Version: 1.0
+In-Reply-To: <20180529174821.19964-1-f4bug@amsat.org>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 0/4] qapi/error: converts
+ error_setg(&error_fatal) to error_report() + exit()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,296 +23,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Eduardo Habkost <ehabkost@redhat.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Stefan Hajnoczi <stefanha@redhat.com>, Fam Zheng <famz@redhat.com>, Amador Pahim <amador@pahim.org>, Cleber Rosa <crosa@redhat.com>
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, qemu-block@nongnu.org, Peter Crosthwaite <crosthwaite.peter@gmail.com>, qemu-devel@nongnu.org, Alexander Graf <agraf@suse.de>, qemu-arm@nongnu.org, qemu-ppc@nongnu.org, Max Reitz <mreitz@redhat.com>, John Snow <jsnow@redhat.com>, David Gibson <david@gibson.dropbear.id.au>
 
-This patch adds the very minimum infrastructure necessary for writing
-and running functional/acceptance tests, including:
+Hi,
 
- * Documentation
- * The avocado_qemu.Test base test class
- * One example tests (test_version.py)
+On 05/29/2018 07:48 PM, Philippe Mathieu-Daud=C3=A9 wrote:
+> Hi,
+>=20
+> This series converts error_setg(&error_fatal) to error_report() + exit(=
+) as
+> suggested by the "qapi/error.h" documentation.
+>=20
+> This reduce Coverity and Clang static analyzer positive falses.
+>=20
+> See http://lists.nongnu.org/archive/html/qemu-devel/2017-07/msg07585.ht=
+ml:
+>=20
+>     On 07/24/2017 04:52 PM, Eric Blake wrote:
+>     That's a shame.  Rather, we should patch this file (and others) to =
+avoid
+>     all the inconsistent uses of error_setg(&error_*), to comply with t=
+he
+>     error.h documentation.
 
-Additional functionality is expected to be added along the tests that
-require them.
+Thanks for the fix.
 
-Signed-off-by: Cleber Rosa <crosa@redhat.com>
----
- docs/devel/testing.rst                    | 153 ++++++++++++++++++++++
- tests/acceptance/README.rst               |  10 ++
- tests/acceptance/avocado_qemu/__init__.py |  54 ++++++++
- tests/acceptance/version.py               |  24 ++++
- 4 files changed, 241 insertions(+)
- create mode 100644 tests/acceptance/README.rst
- create mode 100644 tests/acceptance/avocado_qemu/__init__.py
- create mode 100644 tests/acceptance/version.py
+For the series:
+Reviewed-by: Eric Auger <eric.auger@redhat.com>
 
-diff --git a/docs/devel/testing.rst b/docs/devel/testing.rst
-index 0ca1a2d4b5..5e090c87fb 100644
---- a/docs/devel/testing.rst
-+++ b/docs/devel/testing.rst
-@@ -484,3 +484,156 @@ supported. To start the fuzzer, run
- 
- Alternatively, some command different from "qemu-img info" can be tested, by
- changing the ``-c`` option.
-+
-+Acceptance tests using the Avocado Framework
-+============================================
-+
-+The ``tests/acceptance`` directory hosts functional tests, also known
-+as acceptance level tests.  They're usually higher level, and may
-+interact with external resources and with various guest operating
-+systems.
-+
-+These tests are written using the Avocado Testing Framework (which must
-+be installed separately) in conjunction with a the ``avocado_qemu.Test``
-+class, implemented at ``tests/acceptance/avocado_qemu``.
-+
-+Installation
-+------------
-+
-+To install Avocado and its dependencies, run:
-+
-+.. code::
-+
-+  pip install --user avocado-framework
-+
-+Alternatively, follow the instructions on this link:
-+
-+  http://avocado-framework.readthedocs.io/en/latest/GetStartedGuide.html#installing-avocado
-+
-+Overview
-+--------
-+
-+This directory provides the ``avocado_qemu`` Python module, containing
-+the ``avocado_qemu.Test`` class.  Here's a simple usage example:
-+
-+.. code::
-+
-+  from avocado_qemu import Test
-+
-+
-+  class Version(Test):
-+      """
-+      :avocado: enable
-+      :avocado: tags=quick
-+      """
-+      def test_qmp_human_info_version(self):
-+          self.vm.launch()
-+          res = self.vm.command('human-monitor-command',
-+                                command_line='info version')
-+          self.assertRegexpMatches(res, r'^(\d+\.\d+\.\d)')
-+
-+To execute your test, run:
-+
-+.. code::
-+
-+  avocado run version.py
-+
-+To run all tests in the current directory, tagged in a particular way,
-+run:
-+
-+.. code::
-+
-+  avocado run -t <TAG> .
-+
-+The ``avocado_qemu.Test`` base test class
-+-----------------------------------------
-+
-+The ``avocado_qemu.Test`` class has a number of characteristics that
-+are worth being mentioned right away.
-+
-+First of all, it attempts to give each test a ready to use QEMUMachine
-+instance, available at ``self.vm``.  Because many tests will tweak the
-+QEMU command line, launching the QEMUMachine (by using ``self.vm.launch()``)
-+is left to the test writer.
-+
-+At test "tear down", ``avocado_qemu.Test`` handles the QEMUMachine
-+shutdown.
-+
-+QEMUMachine
-+~~~~~~~~~~~
-+
-+The QEMUMachine API should be somewhat familiar to QEMU hackers.  It's
-+used in the Python iotests, device-crash-test and other Python scripts.
-+
-+QEMU binary selection
-+~~~~~~~~~~~~~~~~~~~~~
-+
-+The QEMU binary used for the ``self.vm`` QEMUMachine instance will
-+primarily depend on the value of the ``qemu_bin`` parameter.  If it's
-+not explicitly set, its default value will be the result of a dynamic
-+probe in the same source tree.  A suitable binary will be one that
-+targets the architecture matching host machine.
-+
-+Based on this description, test writers will usually rely on one of
-+the following approaches:
-+
-+1) Set ``qemu_bin``, and use the given binary
-+
-+2) Do not set ``qemu_bin``, and use a QEMU binary named like
-+   "${arch}-softmmu/qemu-system-${arch}", either in the current
-+   working directory, or in the current source tree.
-+
-+The resulting ``qemu_bin`` value will be preserved in the
-+``avocado_qemu.Test`` as an attribute with the same name.
-+
-+Attribute reference
-+-------------------
-+
-+Besides the attributes and methods that are part of the base
-+``avocado.Test`` class, the following attributes are available on any
-+``avocado_qemu.Test`` instance.
-+
-+vm
-+~~
-+
-+A QEMUMachine instance, initially configured according to the given
-+``qemu_bin`` parameter.
-+
-+qemu_bin
-+~~~~~~~~
-+
-+The preserved value of the ``qemu_bin`` parameter or the result of the
-+dynamic probe for a QEMU binary in the current working directory or
-+source tree.
-+
-+Parameter reference
-+-------------------
-+
-+To understand how Avocado parameters are accessed by tests, and how
-+they can be passed to tests, please refer to::
-+
-+  http://avocado-framework.readthedocs.io/en/latest/WritingTests.html#accessing-test-parameters
-+
-+Parameter values can be easily seen in the log files, and will look
-+like the following:
-+
-+.. code::
-+
-+  PARAMS (key=qemu_bin, path=*, default=x86_64-softmmu/qemu-system-x86_64) => 'x86_64-softmmu/qemu-system-x86_64
-+
-+qemu_bin
-+~~~~~~~~
-+
-+The exact QEMU binary to be used on QEMUMachine.
-+
-+Uninstalling Avocado
-+--------------------
-+
-+If you've followed the installation instructions above, you can easily
-+uninstall Avocado.  Start by listing the packages you have installed::
-+
-+  pip list --user
-+
-+And remove any package you want with::
-+
-+  pip uninstall <package_name>
-diff --git a/tests/acceptance/README.rst b/tests/acceptance/README.rst
-new file mode 100644
-index 0000000000..89260faed6
---- /dev/null
-+++ b/tests/acceptance/README.rst
-@@ -0,0 +1,10 @@
-+============================================
-+Acceptance tests using the Avocado Framework
-+============================================
-+
-+This directory contains functional tests, also known as acceptance
-+level tests.  They're usually higher level, and may interact with
-+external resources and with various guest operating systems.
-+
-+For more information, please refer to ``docs/devel/testing.rst``,
-+section "Acceptance tests using the Avocado Framework".
-diff --git a/tests/acceptance/avocado_qemu/__init__.py b/tests/acceptance/avocado_qemu/__init__.py
-new file mode 100644
-index 0000000000..1e54fd5932
---- /dev/null
-+++ b/tests/acceptance/avocado_qemu/__init__.py
-@@ -0,0 +1,54 @@
-+# Test class and utilities for functional tests
-+#
-+# Copyright (c) 2018 Red Hat, Inc.
-+#
-+# Author:
-+#  Cleber Rosa <crosa@redhat.com>
-+#
-+# This work is licensed under the terms of the GNU GPL, version 2 or
-+# later.  See the COPYING file in the top-level directory.
-+
-+import os
-+import sys
-+
-+import avocado
-+
-+SRC_ROOT_DIR = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
-+SRC_ROOT_DIR = os.path.abspath(os.path.dirname(SRC_ROOT_DIR))
-+sys.path.append(os.path.join(SRC_ROOT_DIR, 'scripts'))
-+
-+from qemu import QEMUMachine
-+
-+def is_readable_executable_file(path):
-+    return os.path.isfile(path) and os.access(path, os.R_OK | os.X_OK)
-+
-+
-+def pick_default_qemu_bin():
-+    """
-+    Picks the path of a QEMU binary, starting either in the current working
-+    directory or in the source tree root directory.
-+    """
-+    arch = os.uname()[4]
-+    qemu_bin_relative_path = os.path.join("%s-softmmu" % arch,
-+                                          "qemu-system-%s" % arch)
-+    if is_readable_executable_file(qemu_bin_relative_path):
-+        return qemu_bin_relative_path
-+
-+    qemu_bin_from_src_dir_path = os.path.join(SRC_ROOT_DIR,
-+                                              qemu_bin_relative_path)
-+    if is_readable_executable_file(qemu_bin_from_src_dir_path):
-+        return qemu_bin_from_src_dir_path
-+
-+
-+class Test(avocado.Test):
-+    def setUp(self):
-+        self.vm = None
-+        self.qemu_bin = self.params.get('qemu_bin',
-+                                        default=pick_default_qemu_bin())
-+        if self.qemu_bin is None:
-+            self.cancel("No QEMU binary defined or found in the source tree")
-+        self.vm = QEMUMachine(self.qemu_bin)
-+
-+    def tearDown(self):
-+        if self.vm is not None:
-+            self.vm.shutdown()
-diff --git a/tests/acceptance/version.py b/tests/acceptance/version.py
-new file mode 100644
-index 0000000000..13b0a7440d
---- /dev/null
-+++ b/tests/acceptance/version.py
-@@ -0,0 +1,24 @@
-+# Version check example test
-+#
-+# Copyright (c) 2018 Red Hat, Inc.
-+#
-+# Author:
-+#  Cleber Rosa <crosa@redhat.com>
-+#
-+# This work is licensed under the terms of the GNU GPL, version 2 or
-+# later.  See the COPYING file in the top-level directory.
-+
-+
-+from avocado_qemu import Test
-+
-+
-+class Version(Test):
-+    """
-+    :avocado: enable
-+    :avocado: tags=quick
-+    """
-+    def test_qmp_human_info_version(self):
-+        self.vm.launch()
-+        res = self.vm.command('human-monitor-command',
-+                              command_line='info version')
-+        self.assertRegexpMatches(res, r'^(\d+\.\d+\.\d)')
--- 
-2.17.0
+Thanks
+
+Eric
+
+>=20
+> Regards,
+>=20
+> Phil.
+>=20
+> Philippe Mathieu-Daud=C3=A9 (4):
+>   hw/block/fdc: Replace error_setg(&error_abort) by error_report() + ab=
+ort()
+>   hw/ppc/spapr_drc: Replace error_setg(&error_abort) by error_report() =
++
+>     abort()
+>   hw/arm/sysbus-fdt: Replace error_setg(&error_fatal) by error_report()
+>     + exit()
+>   device_tree: Replace error_setg(&error_fatal) by error_report() + exi=
+t()
+>=20
+>  device_tree.c       | 23 +++++++++++++----------
+>  hw/arm/sysbus-fdt.c | 45 ++++++++++++++++++++++++++-------------------
+>  hw/block/fdc.c      |  7 ++++---
+>  hw/ppc/spapr_drc.c  |  3 ++-
+>  4 files changed, 45 insertions(+), 33 deletions(-)
+>=20
