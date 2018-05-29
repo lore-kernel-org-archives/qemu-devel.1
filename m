@@ -1,23 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49466)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49881)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1fNb49-0000n5-6U
-	for qemu-devel@nongnu.org; Tue, 29 May 2018 05:37:18 -0400
+	(envelope-from <otubo@redhat.com>) id 1fNb6Z-0001VB-9H
+	for qemu-devel@nongnu.org; Tue, 29 May 2018 05:39:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1fNb45-0006B2-VK
-	for qemu-devel@nongnu.org; Tue, 29 May 2018 05:37:17 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:57584 helo=mx1.redhat.com)
+	(envelope-from <otubo@redhat.com>) id 1fNb6W-0007g8-3I
+	for qemu-devel@nongnu.org; Tue, 29 May 2018 05:39:47 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:33984 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1fNb45-0006Al-PI
-	for qemu-devel@nongnu.org; Tue, 29 May 2018 05:37:13 -0400
+	(Exim 4.71) (envelope-from <otubo@redhat.com>) id 1fNb6V-0007f2-SR
+	for qemu-devel@nongnu.org; Tue, 29 May 2018 05:39:44 -0400
+Date: Tue, 29 May 2018 11:39:40 +0200
+From: Eduardo Otubo <otubo@redhat.com>
+Message-ID: <20180529093940.GA19798@vader>
 References: <20180529073140.7392-1-zyimin@linux.ibm.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <c414c2a0-8591-3892-59d1-58c894f984fd@redhat.com>
-Date: Tue, 29 May 2018 11:37:07 +0200
 MIME-Version: 1.0
-In-Reply-To: <20180529073140.7392-1-zyimin@linux.ibm.com>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+In-Reply-To: <20180529073140.7392-1-zyimin@linux.ibm.com>
 Subject: Re: [Qemu-devel] [PATCH v3] sandbox: disable -sandbox if
  CONFIG_SECCOMP undefined
 List-Id: <qemu-devel.nongnu.org>
@@ -28,10 +27,10 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Yi Min Zhao <zyimin@linux.ibm.com>, qemu-devel@nongnu.org
-Cc: jtomko@redhat.com, jferlan@redhat.com, berrange@redhat.com, otubo@redhat.com, borntraeger@de.ibm.com, fiuczy@linux.ibm.com
+To: Yi Min Zhao <zyimin@linux.ibm.com>
+Cc: qemu-devel@nongnu.org, pbonzini@redhat.com, jtomko@redhat.com, jferlan@redhat.com, berrange@redhat.com, borntraeger@de.ibm.com, fiuczy@linux.ibm.com
 
-On 29/05/2018 09:31, Yi Min Zhao wrote:
+On 29/05/2018 - 15:31:40, Yi Min Zhao wrote:
 > If CONFIG_SECCOMP is undefined, the option 'elevateprivileges' remains
 > compiled. This would make libvirt set the corresponding capability and
 > then trigger failure during guest startup. This patch moves the code
@@ -41,37 +40,6 @@ On 29/05/2018 09:31, Yi Min Zhao wrote:
 > seccomp_start() to static function.
 > 
 > Signed-off-by: Yi Min Zhao <zyimin@linux.ibm.com>
-
-I had to squash this in:
-
-diff --git a/vl.c b/vl.c
-index 1140feb227..66c17ff8f8 100644
---- a/vl.c
-+++ b/vl.c
-@@ -3842,11 +3842,16 @@ int main(int argc, char **argv, char **envp)
-                 qtest_log = optarg;
-                 break;
-             case QEMU_OPTION_sandbox:
-+#ifndef CONFIG_SECCOMP
-                 opts = qemu_opts_parse_noisily(qemu_find_opts("sandbox"),
-                                                optarg, true);
-                 if (!opts) {
-                     exit(1);
-                 }
-+#else
-+                error_report("-sandbox support is not enabled in this QEMU binary");
-+                exit(1);
-+#endif
-                 break;
-             case QEMU_OPTION_add_fd:
- #ifndef _WIN32
-
-
-Otherwise "-sandbox" will crash with a NULL pointer dereference in a binary without
-seccomp support.  Otherwise looks great, thanks!
-
-Paolo
-
 > ---
 > 1. Problem Description
 > ======================
@@ -414,4 +382,7 @@ Paolo
 >  
 >      if (qemu_opts_foreach(qemu_find_opts("name"),
 >                            parse_name, NULL, NULL)) {
+> -- 
+> Yi Min
 > 
+Acked-by: Eduardo Otubo <otubo@redhat.com>
