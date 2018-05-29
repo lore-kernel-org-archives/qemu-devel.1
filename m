@@ -1,23 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44490)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57951)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhaoshenglong@huawei.com>) id 1fNpiP-0008BS-G9
-	for qemu-devel@nongnu.org; Tue, 29 May 2018 21:15:50 -0400
+	(envelope-from <evgreen@chromium.org>) id 1fNoIF-0002i8-N7
+	for qemu-devel@nongnu.org; Tue, 29 May 2018 19:44:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zhaoshenglong@huawei.com>) id 1fNpiO-0006kf-0b
-	for qemu-devel@nongnu.org; Tue, 29 May 2018 21:15:49 -0400
-Message-ID: <5B0DFB0C.3000002@huawei.com>
-Date: Wed, 30 May 2018 09:14:52 +0800
-From: Shannon Zhao <zhaoshenglong@huawei.com>
-MIME-Version: 1.0
-References: <1527563283-13148-1-git-send-email-zhaoshenglong@huawei.com>
-	<CAFEAcA-LoTOnTnSYBpzuyUDFZBsVBaB2qjvzAP_94rou8ob6Tg@mail.gmail.com>
-	<65E224A1-C972-4C38-BD6E-41C59191D999@163.com>
-	<383b0c0b-4406-869c-5493-df2f48896113@redhat.com>
-In-Reply-To: <383b0c0b-4406-869c-5493-df2f48896113@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2] ARM: ACPI: Fix use-after-free due to
- memory realloc
+	(envelope-from <evgreen@chromium.org>) id 1fNoIE-00066c-9f
+	for qemu-devel@nongnu.org; Tue, 29 May 2018 19:44:43 -0400
+Received: from mail-pg0-x242.google.com ([2607:f8b0:400e:c05::242]:37934)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <evgreen@chromium.org>)
+	id 1fNoIE-00065r-10
+	for qemu-devel@nongnu.org; Tue, 29 May 2018 19:44:42 -0400
+Received: by mail-pg0-x242.google.com with SMTP id c9-v6so4446080pgf.5
+	for <qemu-devel@nongnu.org>; Tue, 29 May 2018 16:44:41 -0700 (PDT)
+From: Evan Green <evgreen@chromium.org>
+Date: Tue, 29 May 2018 16:44:09 -0700
+Message-Id: <20180529234409.27023-1-evgreen@chromium.org>
+Subject: [Qemu-devel] [PATCH] Fix hang with -L and symlink loop
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,189 +24,223 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Auger Eric <eric.auger@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
-Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, Shannon Zhao <shannon.zhaosl@gmail.com>
+To: qemu-devel@nongnu.org
+Cc: Evan Green <evgreen@chromium.org>
 
+When using -L with Linux app emulation, there is an issue in
+init_paths where Qemu will get lost exploring a directory tree
+with a symlink loop in it. This causes Qemu to hang, and
+eventually consume all memory in the system.
 
+Qemu's code for pre-exploring the entire directory tree is both
+error-prone and slow. Instead, this changes uses faccessat, which
+both avoids the symlink loop (since the entire directory space isn't
+being explored up front), and likely speeds things up a bit.
 
-On 2018/5/30 3:53, Auger Eric wrote:
-> Hi Shannon,
->=20
-> On 05/29/2018 04:09 PM, Shannon Zhao wrote:
->>
->>
->>> =E5=9C=A8 2018=E5=B9=B45=E6=9C=8829=E6=97=A5=EF=BC=8C21:53=EF=BC=8CPe=
-ter Maydell <peter.maydell@linaro.org> =E5=86=99=E9=81=93=EF=BC=9A
->>>
->>>> On 29 May 2018 at 04:08, Shannon Zhao <zhaoshenglong@huawei.com> wro=
-te:
->>>> acpi_data_push uses g_array_set_size to resize the memory size. If t=
-here
->>>> is no enough contiguous memory, the address will be changed. So prev=
-ious
->>>> pointer could not be used any more. It must update the pointer and u=
-se
->>>> the new one.
->>>>
->>>> Reviewed-by: Eric Auger <eric.auger@redhat.com>
->>>> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
->>>> Signed-off-by: Shannon Zhao <zhaoshenglong@huawei.com>
->>>> ---
->>>> V2: add comments for iort_node_offset and reviewed tags
->>>> ---
->>>> hw/arm/virt-acpi-build.c | 19 +++++++++++++++----
->>>> 1 file changed, 15 insertions(+), 4 deletions(-)
->>>>
->>>> diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
->>>> index 92ceee9..6209138 100644
->>>> --- a/hw/arm/virt-acpi-build.c
->>>> +++ b/hw/arm/virt-acpi-build.c
->>>> @@ -400,7 +400,7 @@ build_iort(GArray *table_data, BIOSLinker *linke=
-r, VirtMachineState *vms)
->>>>     AcpiIortItsGroup *its;
->>>>     AcpiIortTable *iort;
->>>>     AcpiIortSmmu3 *smmu;
->>>> -    size_t node_size, iort_length, smmu_offset =3D 0;
->>>> +    size_t node_size, iort_node_offset, iort_length, smmu_offset =3D=
- 0;
->>>>     AcpiIortRC *rc;
->>>>
->>>>     iort =3D acpi_data_push(table_data, sizeof(*iort));
->>>> @@ -415,6 +415,12 @@ build_iort(GArray *table_data, BIOSLinker *link=
-er, VirtMachineState *vms)
->>>>     iort->node_count =3D cpu_to_le32(nb_nodes);
->>>>     iort->node_offset =3D cpu_to_le32(sizeof(*iort));
->>>>
->>>> +    /*
->>>> +     * Use a copy in case table_data->data moves duringa acpi_data_=
-push
->>>> +     * operations.
->>>> +     */
->>>> +    iort_node_offset =3D sizeof(*iort);
->>>> +
->>>>     /* ITS group node */
->>>>     node_size =3D  sizeof(*its) + sizeof(uint32_t);
->>>>     iort_length +=3D node_size;
->>>> @@ -429,7 +435,7 @@ build_iort(GArray *table_data, BIOSLinker *linke=
-r, VirtMachineState *vms)
->>>>         int irq =3D  vms->irqmap[VIRT_SMMU];
->>>>
->>>>         /* SMMUv3 node */
->>>> -        smmu_offset =3D iort->node_offset + node_size;
->>>> +        smmu_offset =3D iort_node_offset + node_size;
->>>
->>> In the old code, we used iort->node_offset directly as a CPU
->>> endianness order bitmap, which is initialized above using
->>>    iort->node_offset =3D cpu_to_le32(sizeof(*iort));
->>> In this version, we use iort_node_offset, which is
->>> initialized using
->>>    iort_node_offset =3D sizeof(*iort);
->>>
->>> So we've lost an endianness conversion on big-endian systems.
->>> Which is correct, the old code or the new?
->> I think it=E2=80=99s the new one. I found this bug later and wanted to=
- send another patch to fix it. But to address Philippe=E2=80=99s comment =
-I folder them together.
-> Shouldn't we have
-> iort_node_offset =3D iort->node_offset;
-> iort->node_offset =3D cpu_to_le32(iort_node_offset);
-> instead?
->=20
-Hi Eric,
-Have you read this patch and code carefully?
+Partial credit goes to Richard Henderson, as it was only after staring
+at his patch [1] that I wrote mine.
 
-I think you mean
-iort_node_offset =3D sizeof(*iort);
-iort->node_offset =3D cpu_to_le32(iort_node_offset);
+[1] https://patchwork.kernel.org/patch/9512083/
 
-Right? If so it's almost same with what I write. I just use sizeof twice.
+Signed-off-by: Evan Green <evgreen@chromium.org>
+---
 
-iort->node_offset =3D cpu_to_le32(sizeof(*iort));
-iort_node_offset =3D sizeof(*iort);
+Since the path() function returns a final path, I used a thread-local
+global to contain the glued-together path. From my examination of the
+callers of path(), this is sufficient. The thread-localness of it may
+not actually be necessary, but it seemed safer. I can remove the __thread
+attribute if desired.
+---
+ util/path.c | 159 ++++++++----------------------------------------------------
+ 1 file changed, 21 insertions(+), 138 deletions(-)
 
-> Otherwise subsequent computations are done with the node_offset already
-> converted to le32 whereas the cpu mode may be "be"?
->=20
-What I did here is to avoid the case you mentioned.
-The iort_node_offset is host order, right? And I use iort_node_offset
-instead of iort->node_offset for subsequent computations not the le32
-one. So smmu_offset =3D iort_node_offset + node_size; will get the right
-value as well as below ones.
-
-Thanks,
-
-> Shouldn't conversions to le32 being done at the last stage when
-> populating the structs?
->=20
-> May be worth splitting this into 2 patches then or at least mentioning
-> this other fix in the commit message?
->=20
-> Thanks
->=20
-> Eric
->=20
->>
->>>
->>>>         node_size =3D sizeof(*smmu) + sizeof(*idmap);
->>>>         iort_length +=3D node_size;
->>>>         smmu =3D acpi_data_push(table_data, node_size);
->>>> @@ -450,7 +456,7 @@ build_iort(GArray *table_data, BIOSLinker *linke=
-r, VirtMachineState *vms)
->>>>         idmap->id_count =3D cpu_to_le32(0xFFFF);
->>>>         idmap->output_base =3D 0;
->>>>         /* output IORT node is the ITS group node (the first node) *=
-/
->>>> -        idmap->output_reference =3D cpu_to_le32(iort->node_offset);
->>>> +        idmap->output_reference =3D cpu_to_le32(iort_node_offset);
->>>
->>> Here we're doing an endianness conversion on iort_node_offset.
->>>
->>> Overall something is weird here, even in the previous version:
->>> if we wrote iort->node_offset with cpu_to_le32(), that implies
->>> that it's little-endian; so why are we reading it with cpu_to_le32()
->>> here rather than le32_to_cpu() ?
->>> Both cpu_to_le32() and le32_to_cpu() are the same operation,
->>> mathematically, but we should use the version which indicates
->>> our intent, ie which of source and destination is the always-LE
->>> data, and which is the host-order data.
->>>
->>>>     }
->>>>
->>>>     /* Root Complex Node */
->>>> @@ -479,9 +485,14 @@ build_iort(GArray *table_data, BIOSLinker *link=
-er, VirtMachineState *vms)
->>>>         idmap->output_reference =3D cpu_to_le32(smmu_offset);
->>>>     } else {
->>>>         /* output IORT node is the ITS group node (the first node) *=
-/
->>>> -        idmap->output_reference =3D cpu_to_le32(iort->node_offset);
->>>> +        idmap->output_reference =3D cpu_to_le32(iort_node_offset);
->>>>     }
->>>>
->>>> +    /*
->>>> +     * Update the pointer address in case table_data->data moves du=
-ring above
->>>> +     * acpi_data_push operations.
->>>> +     */
->>>> +    iort =3D (AcpiIortTable *)(table_data->data + iort_start);
->>>>     iort->length =3D cpu_to_le32(iort_length);
->>>>
->>>>     build_header(linker, table_data, (void *)(table_data->data + ior=
-t_start),
->>>
->>> This could just use 'iort' now, right?
->> Right, but for consistent as other places I think it=E2=80=99s fine to=
- remain unchanged.=20
->>>
->>>> --
->>>
->>> thanks
->>> -- PMM
->>
->>
->=20
-> .
->=20
-
---=20
-Shannon
+diff --git a/util/path.c b/util/path.c
+index 7f9fc272fb..b9a0e8ef47 100644
+--- a/util/path.c
++++ b/util/path.c
+@@ -4,133 +4,13 @@
+    The assumption is that this area does not change.
+ */
+ #include "qemu/osdep.h"
+-#include <sys/param.h>
+-#include <dirent.h>
++#include <limits.h>
+ #include "qemu/cutils.h"
+ #include "qemu/path.h"
+ 
+-struct pathelem
+-{
+-    /* Name of this, eg. lib */
+-    char *name;
+-    /* Full path name, eg. /usr/gnemul/x86-linux/lib. */
+-    char *pathname;
+-    struct pathelem *parent;
+-    /* Children */
+-    unsigned int num_entries;
+-    struct pathelem *entries[0];
+-};
+-
+-static struct pathelem *base;
+-
+-/* First N chars of S1 match S2, and S2 is N chars long. */
+-static int strneq(const char *s1, unsigned int n, const char *s2)
+-{
+-    unsigned int i;
+-
+-    for (i = 0; i < n; i++)
+-        if (s1[i] != s2[i])
+-            return 0;
+-    return s2[i] == 0;
+-}
+-
+-static struct pathelem *add_entry(struct pathelem *root, const char *name,
+-                                  unsigned type);
+-
+-static struct pathelem *new_entry(const char *root,
+-                                  struct pathelem *parent,
+-                                  const char *name)
+-{
+-    struct pathelem *new = g_malloc(sizeof(*new));
+-    new->name = g_strdup(name);
+-    new->pathname = g_strdup_printf("%s/%s", root, name);
+-    new->num_entries = 0;
+-    return new;
+-}
+-
+-#define streq(a,b) (strcmp((a), (b)) == 0)
+-
+-/* Not all systems provide this feature */
+-#if defined(DT_DIR) && defined(DT_UNKNOWN) && defined(DT_LNK)
+-# define dirent_type(dirent) ((dirent)->d_type)
+-# define is_dir_maybe(type) \
+-    ((type) == DT_DIR || (type) == DT_UNKNOWN || (type) == DT_LNK)
+-#else
+-# define dirent_type(dirent) (1)
+-# define is_dir_maybe(type)  (type)
+-#endif
+-
+-static struct pathelem *add_dir_maybe(struct pathelem *path)
+-{
+-    DIR *dir;
+-
+-    if ((dir = opendir(path->pathname)) != NULL) {
+-        struct dirent *dirent;
+-
+-        while ((dirent = readdir(dir)) != NULL) {
+-            if (!streq(dirent->d_name,".") && !streq(dirent->d_name,"..")){
+-                path = add_entry(path, dirent->d_name, dirent_type(dirent));
+-            }
+-        }
+-        closedir(dir);
+-    }
+-    return path;
+-}
+-
+-static struct pathelem *add_entry(struct pathelem *root, const char *name,
+-                                  unsigned type)
+-{
+-    struct pathelem **e;
+-
+-    root->num_entries++;
+-
+-    root = g_realloc(root, sizeof(*root)
+-                   + sizeof(root->entries[0])*root->num_entries);
+-    e = &root->entries[root->num_entries-1];
+-
+-    *e = new_entry(root->pathname, root, name);
+-    if (is_dir_maybe(type)) {
+-        *e = add_dir_maybe(*e);
+-    }
+-
+-    return root;
+-}
+-
+-/* This needs to be done after tree is stabilized (ie. no more reallocs!). */
+-static void set_parents(struct pathelem *child, struct pathelem *parent)
+-{
+-    unsigned int i;
+-
+-    child->parent = parent;
+-    for (i = 0; i < child->num_entries; i++)
+-        set_parents(child->entries[i], child);
+-}
+-
+-/* FIXME: Doesn't handle DIR/.. where DIR is not in emulated dir. */
+-static const char *
+-follow_path(const struct pathelem *cursor, const char *name)
+-{
+-    unsigned int i, namelen;
+-
+-    name += strspn(name, "/");
+-    namelen = strcspn(name, "/");
+-
+-    if (namelen == 0)
+-        return cursor->pathname;
+-
+-    if (strneq(name, namelen, ".."))
+-        return follow_path(cursor->parent, name + namelen);
+-
+-    if (strneq(name, namelen, "."))
+-        return follow_path(cursor, name + namelen);
+-
+-    for (i = 0; i < cursor->num_entries; i++)
+-        if (strneq(name, namelen, cursor->entries[i]->name))
+-            return follow_path(cursor->entries[i], name + namelen);
+-
+-    /* Not found */
+-    return NULL;
+-}
++static const char *pathprefix;
++int pathprefixfd = -1;
++__thread char gluedpath[PATH_MAX];
+ 
+ void init_paths(const char *prefix)
+ {
+@@ -150,28 +30,31 @@ void init_paths(const char *prefix)
+         pstrcat(pref_buf, pref_buf_len, "/");
+         pstrcat(pref_buf, pref_buf_len, prefix);
+         free(cwd);
+-    } else
+-        pstrcpy(pref_buf, sizeof(pref_buf), prefix + 1);
+-
+-    base = new_entry("", NULL, pref_buf);
+-    base = add_dir_maybe(base);
+-    if (base->num_entries == 0) {
+-        g_free(base->pathname);
+-        g_free(base->name);
+-        g_free(base);
+-        base = NULL;
+-    } else {
+-        set_parents(base, base);
++        prefix = strdup(pref_buf);
++        if (!prefix) {
++            abort();
++        }
+     }
++
++    pathprefix = prefix;
++    pathprefixfd = open(pathprefix, O_RDONLY | O_DIRECTORY | O_CLOEXEC);
+ }
+ 
+ /* Look for path in emulation dir, otherwise return name. */
+ const char *path(const char *name)
+ {
++    const char *relname;
+     /* Only do absolute paths: quick and dirty, but should mostly be OK.
+        Could do relative by tracking cwd. */
+-    if (!base || !name || name[0] != '/')
++    if ((pathprefixfd < 0) || !name || name[0] != '/') {
+         return name;
++    }
++
++    relname = name + strspn(name, "/");
++    if (faccessat(pathprefixfd, relname, R_OK, AT_EACCESS) == 0) {
++        snprintf(gluedpath, sizeof(gluedpath), "%s%s", pathprefix, name);
++        return gluedpath;
++    }
+ 
+-    return follow_path(base, name) ?: name;
++    return name;
+ }
+-- 
+2.13.5
