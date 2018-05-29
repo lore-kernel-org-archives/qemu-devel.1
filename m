@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35432)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37394)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fNfZ0-0002D4-93
-	for qemu-devel@nongnu.org; Tue, 29 May 2018 10:25:27 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1fNfgU-0004GA-78
+	for qemu-devel@nongnu.org; Tue, 29 May 2018 10:33:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fNfYw-0000Z7-96
-	for qemu-devel@nongnu.org; Tue, 29 May 2018 10:25:26 -0400
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20170724182751.18261-1-f4bug@amsat.org>
-	<20170724182751.18261-27-f4bug@amsat.org>
-	<cc23ddee-ad10-74ef-874c-6ed1ef485d2e@vivier.eu>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <811e6e16-d9d7-3b96-7d43-f9d7b6ace063@amsat.org>
-Date: Tue, 29 May 2018 11:25:16 -0300
+	(envelope-from <ehabkost@redhat.com>) id 1fNfgO-0007li-Be
+	for qemu-devel@nongnu.org; Tue, 29 May 2018 10:33:10 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:29611)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1fNfgO-0007l6-5u
+	for qemu-devel@nongnu.org; Tue, 29 May 2018 10:33:04 -0400
+Date: Tue, 29 May 2018 11:32:57 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20180529143257.GA8988@localhost.localdomain>
+References: <20180525005839.11556-1-crosa@redhat.com>
+	<20180525005839.11556-4-crosa@redhat.com>
+	<20180525053718.GB28589@lemon.usersys.redhat.com>
+	<65f0262a-20ff-f243-7434-a48daf7e5225@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <cc23ddee-ad10-74ef-874c-6ed1ef485d2e@vivier.eu>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH for 2.10 26/35] linux-user: use is_error()
- to avoid warnings and make the code clearer
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <65f0262a-20ff-f243-7434-a48daf7e5225@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 3/5] Acceptance tests: add quick VNC tests
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,89 +29,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laurent Vivier <laurent@vivier.eu>, Eric Blake <eblake@redhat.com>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, Riku Voipio <riku.voipio@iki.fi>
-Cc: qemu-trivial@nongnu.org, qemu-devel@nongnu.org
+To: Cleber Rosa <crosa@redhat.com>
+Cc: Fam Zheng <famz@redhat.com>, Amador Pahim <amador@pahim.org>, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>
 
-Hi Laurent,
-
-On 07/24/2017 04:16 PM, Laurent Vivier wrote:
-> Le 24/07/2017 à 20:27, Philippe Mathieu-Daudé a écrit :
->> linux-user/flatload.c:740:9: warning: Loss of sign in implicit conversion
->>     if (res > (unsigned long)-4096)
->>         ^~~
->>
->> Reported-by: Clang Static Analyzer
->> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+On Fri, May 25, 2018 at 12:27:46PM -0400, Cleber Rosa wrote:
 > 
-> Reviewed-by: Laurent Vivier <laurent@vivier.eu>
 > 
->> ---
->>  linux-user/flatload.c | 15 +++++++++------
->>  1 file changed, 9 insertions(+), 6 deletions(-)
->>
->> diff --git a/linux-user/flatload.c b/linux-user/flatload.c
->> index a35a560904..10c529910f 100644
->> --- a/linux-user/flatload.c
->> +++ b/linux-user/flatload.c
->> @@ -224,8 +224,9 @@ static int decompress_exec(
->>  		ret = bprm->file->f_op->read(bprm->file, buf, LBUFSIZE, &fpos);
->>  		if (ret <= 0)
->>  			break;
->> -		if (ret >= (unsigned long) -4096)
->> +                if (is_error(ret)) {
->>  			break;
->> +                }
->>  		len -= ret;
->>  
->>  		strm.next_in = buf;
->> @@ -283,8 +284,7 @@ calc_reloc(abi_ulong r, struct lib_info *p, int curid, int internalp)
->>                      "in same module (%d != %d)\n",
->>                      (unsigned) r, curid, id);
->>              goto failed;
->> -        } else if ( ! p[id].loaded &&
->> -                    load_flat_shared_library(id, p) > (unsigned long) -4096) {
->> +        } else if (!p[id].loaded && is_error(load_flat_shared_library(id, p))) {
->>              fprintf(stderr, "BINFMT_FLAT: failed to load library %d\n", id);
->>              goto failed;
->>          }
->> @@ -523,9 +523,10 @@ static int load_flat_file(struct linux_binprm * bprm,
->>                  fpos = 0;
->>                  result = bprm->file->f_op->read(bprm->file,
->>                                  (char *) textpos, text_len, &fpos);
->> -                if (result < (unsigned long) -4096)
->> +                if (!is_error(result)) {
->>                          result = decompress_exec(bprm, text_len, (char *) datapos,
->>                                           data_len + (relocs * sizeof(unsigned long)), 0);
->> +                }
->>          }
->>          else
->>  #endif
->> @@ -693,8 +694,9 @@ static int load_flat_shared_library(int id, struct lib_info *libs)
->>  
->>  	res = prepare_binprm(&bprm);
->>  
->> -	if (res <= (unsigned long)-4096)
->> +        if (!is_error(res)) {
->>  		res = load_flat_file(&bprm, libs, id, NULL);
->> +        }
->>  	if (bprm.file) {
->>  		allow_write_access(bprm.file);
->>  		fput(bprm.file);
->> @@ -737,8 +739,9 @@ int load_flt_binary(struct linux_binprm *bprm, struct image_info *info)
->>  
->>  
->>      res = load_flat_file(bprm, libinfo, 0, &stack_len);
->> -    if (res > (unsigned long)-4096)
->> +    if (is_error(res)) {
->>              return res;
->> +    }
->>  
->>      /* Update data segment pointers for all libraries */
->>      for (i=0; i<MAX_SHARED_LIBS; i++) {
->>
+> On 05/25/2018 01:37 AM, Fam Zheng wrote:
+> > On Thu, 05/24 20:58, Cleber Rosa wrote:
+> >> This patch adds a few simple behavior tests for VNC.  These tests
+> >> introduce manipulation of the QEMUMachine arguments, by setting
+> >> the arguments, instead of adding to the existing ones.
+> > 
+> > I'm confused by this. The code uses 'add_args', so it does add to the arguments,
+> > no?
+> > 
+> 
+> And you should be.  I changed the code to just add args, and forgot to
+> update the commit message.  If a better example comes up that requires
+> setting arguments, I'll get back to this.
+> 
+> >>
+> >> Signed-off-by: Cleber Rosa <crosa@redhat.com>
+> >> ---
+> >>  tests/acceptance/test_vnc.py | 50 ++++++++++++++++++++++++++++++++++++
+> >>  1 file changed, 50 insertions(+)
+> >>  create mode 100644 tests/acceptance/test_vnc.py
+> >>
+> >> diff --git a/tests/acceptance/test_vnc.py b/tests/acceptance/test_vnc.py
+> >> new file mode 100644
+> >> index 0000000000..9d9a35cf55
+> >> --- /dev/null
+> >> +++ b/tests/acceptance/test_vnc.py
+> >> @@ -0,0 +1,50 @@
+> > 
+> > Copyright header is missing here too.
+> > 
+> 
+> Indeed.
+> 
+> > Fam
+> > 
+> >> +from avocado_qemu import Test
+> >> +
+> >> +
+> >> +class Vnc(Test):
+> > 
+> > Should VncTest be a better class name?
+> > 
+> 
+> I'm favoring simpler names.  If you think about the complete test names,
+> it's already too verbose IMO: "test_vnc.Vnc.test_no_vnc".
+> 
+> That's actually an interesting point: how would you feel about dropping
+> the "test_" prefix from the file names?
 
-Can you take this via your linux-user tree?
+I would like this.  The file is already inside a tests/acceptance
+directory.
 
-Thanks,
+About the class name, I would be less surprised when reading the
+code if it was called "VncTest", but I won't object to "Vnc" if
+you prefer it.
 
-Phil.
+-- 
+Eduardo
