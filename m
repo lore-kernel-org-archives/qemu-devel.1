@@ -1,28 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38220)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41845)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1fNmN4-00030k-Su
-	for qemu-devel@nongnu.org; Tue, 29 May 2018 17:41:35 -0400
+	(envelope-from <jusual@mail.ru>) id 1fNmjB-0007G4-N9
+	for qemu-devel@nongnu.org; Tue, 29 May 2018 18:04:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1fNmN2-0007iX-AG
-	for qemu-devel@nongnu.org; Tue, 29 May 2018 17:41:34 -0400
-Received: from 4.mo178.mail-out.ovh.net ([46.105.49.171]:52282)
+	(envelope-from <jusual@mail.ru>) id 1fNmj8-0007nI-KU
+	for qemu-devel@nongnu.org; Tue, 29 May 2018 18:04:25 -0400
+Received: from smtp18.mail.ru ([94.100.176.155]:38608)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1fNmN2-0007em-3G
-	for qemu-devel@nongnu.org; Tue, 29 May 2018 17:41:32 -0400
-Received: from player735.ha.ovh.net (unknown [10.109.108.46])
-	by mo178.mail-out.ovh.net (Postfix) with ESMTP id 4F68E184FB
-	for <qemu-devel@nongnu.org>; Tue, 29 May 2018 23:41:30 +0200 (CEST)
-Date: Tue, 29 May 2018 23:41:22 +0200
-From: Greg Kurz <groug@kaod.org>
-Message-ID: <20180529234122.7cbebcc8@bahia.lan>
-In-Reply-To: <20180529201917.GL4756@localhost.localdomain>
-References: <152750903916.663961.9369851345277129751.stgit@bahia.lan>
-	<20180529201917.GL4756@localhost.localdomain>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v4] block: fix QEMU crash with scsi-hd and
- drive_del
+	(Exim 4.71) (envelope-from <jusual@mail.ru>) id 1fNmj8-0007mM-8o
+	for qemu-devel@nongnu.org; Tue, 29 May 2018 18:04:22 -0400
+From: Julia Suvorova <jusual@mail.ru>
+Date: Wed, 30 May 2018 01:03:35 +0300
+Message-Id: <20180529220338.10879-1-jusual@mail.ru>
+Subject: [Qemu-devel] [RFC 0/3] nRF51 SoC: Add UART support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,73 +21,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, qemu-stable@nongnu.org, qemu-block@nongnu.org
+To: qemu-devel <qemu-devel@nongnu.org>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Stefan Hajnoczi <stefanha@gmail.com>, Joel Stanley <joel@jms.id.au>, Jim Mussared <jim@groklearning.com>, =?UTF-8?q?Steffen=20G=C3=B6rtz?= <mail@steffen-goertz.de>, Julia Suvorova <jusual@mail.ru>
 
-On Tue, 29 May 2018 22:19:17 +0200
-Kevin Wolf <kwolf@redhat.com> wrote:
+This series adds basic support for the nRF51 SoC UART, that used in
+BBC Micro:bit board, and QTest for it.
 
-> Am 28.05.2018 um 14:03 hat Greg Kurz geschrieben:
-> > Removing a drive with drive_del while it is being used to run an I/O
-> > intensive workload can cause QEMU to crash.
-> > 
-> > An AIO flush can yield at some point:
-> > 
-> > blk_aio_flush_entry()
-> >  blk_co_flush(blk)
-> >   bdrv_co_flush(blk->root->bs)
-> >    ...
-> >     qemu_coroutine_yield()
-> > 
-> > and let the HMP command to run, free blk->root and give control
-> > back to the AIO flush:
-> > 
-> >     hmp_drive_del()
-> >      blk_remove_bs()
-> >       bdrv_root_unref_child(blk->root)
-> >        child_bs = blk->root->bs
-> >        bdrv_detach_child(blk->root)
-> >         bdrv_replace_child(blk->root, NULL)
-> >          blk->root->bs = NULL
-> >         g_free(blk->root) <============== blk->root becomes stale
-> >        bdrv_unref(child_bs)
-> >         bdrv_delete(child_bs)
-> >          bdrv_close()
-> >           bdrv_drained_begin()
-> >            bdrv_do_drained_begin()
-> >             bdrv_drain_recurse()
-> >              aio_poll()
-> >               ...
-> >               qemu_coroutine_switch()
-> > 
-> > and the AIO flush completion ends up dereferencing blk->root:
-> > 
-> >   blk_aio_complete()
-> >    scsi_aio_complete()
-> >     blk_get_aio_context(blk)
-> >      bs = blk_bs(blk)
-> >  ie, bs = blk->root ? blk->root->bs : NULL
-> >             ^^^^^
-> >             stale
-> > 
-> > The problem is that we should avoid making block driver graph
-> > changes while we have in-flight requests. Let's drain all I/O
-> > for this BB before calling bdrv_root_unref_child().
-> > 
-> > Signed-off-by: Greg Kurz <groug@kaod.org>  
-> 
-> Hmm... It sounded convincing, but 'make check-tests/test-replication'
-> fails now. The good news is that with the drain fixes, for which I sent
-> v2 today, it passes, so instead of staging it in my block branch, I'll
-> put it at the end of my branch for the drain fixes.
-> 
-> Might take a bit longer than planned until it's in master, sorry.
-> 
-> Kevin
+Based-on: <20180503090532.3113-1-joel@jms.id.au>
 
-Works for me :)
+Julia Suvorova (3):
+  hw/arm/nrf51_soc: Fix compilation and memory regions
+  hw/char/nrf51_uart: Implement nRF51 SoC UART
+  tests/boot-serial-test: Add support for the microbit board
 
-Thanks !
+ hw/arm/nrf51_soc.c           |  19 ++-
+ hw/char/Makefile.objs        |   1 +
+ hw/char/nrf51_uart.c         | 232 +++++++++++++++++++++++++++++++++++
+ include/hw/arm/nrf51_soc.h   |   2 +
+ include/hw/char/nrf51_uart.h |  54 ++++++++
+ tests/boot-serial-test.c     |  11 ++
+ 6 files changed, 314 insertions(+), 5 deletions(-)
+ create mode 100644 hw/char/nrf51_uart.c
+ create mode 100644 include/hw/char/nrf51_uart.h
 
---
-Greg
+-- 
+2.17.0
