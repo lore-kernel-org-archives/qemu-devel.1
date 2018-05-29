@@ -1,36 +1,36 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54436)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56492)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zyimin@linux.ibm.com>) id 1fNbJr-0003yi-8b
-	for qemu-devel@nongnu.org; Tue, 29 May 2018 05:53:33 -0400
+	(envelope-from <zyimin@linux.ibm.com>) id 1fNbVc-0006fp-Jl
+	for qemu-devel@nongnu.org; Tue, 29 May 2018 06:05:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zyimin@linux.ibm.com>) id 1fNbJo-0000K8-3f
-	for qemu-devel@nongnu.org; Tue, 29 May 2018 05:53:31 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:34694)
+	(envelope-from <zyimin@linux.ibm.com>) id 1fNbVX-0006y3-Hs
+	for qemu-devel@nongnu.org; Tue, 29 May 2018 06:05:40 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:33156)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <zyimin@linux.ibm.com>)
-	id 1fNbJn-0000JO-PL
-	for qemu-devel@nongnu.org; Tue, 29 May 2018 05:53:28 -0400
-Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
+	id 1fNbVX-0006xa-3I
+	for qemu-devel@nongnu.org; Tue, 29 May 2018 06:05:35 -0400
+Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
 	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w4T9nEGK084643
-	for <qemu-devel@nongnu.org>; Tue, 29 May 2018 05:53:26 -0400
-Received: from e37.co.us.ibm.com (e37.co.us.ibm.com [32.97.110.158])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2j93dqk7n6-1
+	w4TA5Brj117188
+	for <qemu-devel@nongnu.org>; Tue, 29 May 2018 06:05:33 -0400
+Received: from e35.co.us.ibm.com (e35.co.us.ibm.com [32.97.110.153])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2j94swr0kf-1
 	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 29 May 2018 05:53:26 -0400
+	for <qemu-devel@nongnu.org>; Tue, 29 May 2018 06:05:33 -0400
 Received: from localhost
-	by e37.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	by e35.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
 	Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <zyimin@linux.ibm.com>;
-	Tue, 29 May 2018 03:53:25 -0600
+	Tue, 29 May 2018 04:05:32 -0600
 References: <20180529073140.7392-1-zyimin@linux.ibm.com>
-	<20180529093940.GA19798@vader>
+	<c414c2a0-8591-3892-59d1-58c894f984fd@redhat.com>
 From: Yi Min Zhao <zyimin@linux.ibm.com>
-Date: Tue, 29 May 2018 17:53:18 +0800
+Date: Tue, 29 May 2018 18:05:25 +0800
 MIME-Version: 1.0
-In-Reply-To: <20180529093940.GA19798@vader>
+In-Reply-To: <c414c2a0-8591-3892-59d1-58c894f984fd@redhat.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
-Message-Id: <b235d751-f222-af7b-b814-c499416f7706@linux.ibm.com>
+Message-Id: <80481571-a84c-0c62-43c6-69b87117f19a@linux.ibm.com>
 Content-Transfer-Encoding: quoted-printable
 Subject: Re: [Qemu-devel] [PATCH v3] sandbox: disable -sandbox if
  CONFIG_SECCOMP undefined
@@ -42,14 +42,14 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Otubo <otubo@redhat.com>
-Cc: fiuczy@linux.ibm.com, borntraeger@de.ibm.com, qemu-devel@nongnu.org, jtomko@redhat.com, jferlan@redhat.com, pbonzini@redhat.com
+To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
+Cc: otubo@redhat.com, fiuczy@linux.ibm.com, jtomko@redhat.com, borntraeger@de.ibm.com, jferlan@redhat.com
 
 
 
-=E5=9C=A8 2018/5/29 =E4=B8=8B=E5=8D=885:39, Eduardo Otubo =E5=86=99=E9=81=
+=E5=9C=A8 2018/5/29 =E4=B8=8B=E5=8D=885:37, Paolo Bonzini =E5=86=99=E9=81=
 =93:
-> On 29/05/2018 - 15:31:40, Yi Min Zhao wrote:
+> On 29/05/2018 09:31, Yi Min Zhao wrote:
 >> If CONFIG_SECCOMP is undefined, the option 'elevateprivileges' remains
 >> compiled. This would make libvirt set the corresponding capability and
 >> then trigger failure during guest startup. This patch moves the code
@@ -59,6 +59,40 @@ Cc: fiuczy@linux.ibm.com, borntraeger@de.ibm.com, qemu-devel@nongnu.org, jtomko@
 >> seccomp_start() to static function.
 >>
 >> Signed-off-by: Yi Min Zhao <zyimin@linux.ibm.com>
+> I had to squash this in:
+>
+> diff --git a/vl.c b/vl.c
+> index 1140feb227..66c17ff8f8 100644
+> --- a/vl.c
+> +++ b/vl.c
+> @@ -3842,11 +3842,16 @@ int main(int argc, char **argv, char **envp)
+>                   qtest_log =3D optarg;
+>                   break;
+>               case QEMU_OPTION_sandbox:
+> +#ifndef CONFIG_SECCOMP
+One question, I guess you want to use #ifdef ?
+>                   opts =3D qemu_opts_parse_noisily(qemu_find_opts("sand=
+box"),
+>                                                  optarg, true);
+>                   if (!opts) {
+>                       exit(1);
+>                   }
+> +#else
+> +                error_report("-sandbox support is not enabled in this =
+QEMU binary");
+> +                exit(1);
+> +#endif
+>                   break;
+>               case QEMU_OPTION_add_fd:
+>   #ifndef _WIN32
+>
+>
+> Otherwise "-sandbox" will crash with a NULL pointer dereference in a bi=
+nary without
+> seccomp support.  Otherwise looks great, thanks!
+>
+> Paolo
+>
 >> ---
 >> 1. Problem Description
 >> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
@@ -402,7 +436,7 @@ with
 >> @@ -4071,10 +3955,12 @@ int main(int argc, char **argv, char **envp)
 >>           exit(1);
 >>       }
->>   I
+>>  =20
 >> +#ifdef CONFIG_SECCOMP
 >>       if (qemu_opts_foreach(qemu_find_opts("sandbox"),
 >>                             parse_sandbox, NULL, NULL)) {
@@ -412,11 +446,6 @@ with
 >>  =20
 >>       if (qemu_opts_foreach(qemu_find_opts("name"),
 >>                             parse_name, NULL, NULL)) {
->> --=20
->> Yi Min
 >>
-> Acked-by: Eduardo Otubo <otubo@redhat.com>
 >
 >
-Thanks! I have included Paolo's squashing code. I'm not sure what I=20
-should do next, sending a new version?
