@@ -1,16 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59573)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59659)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1fNXh2-0006qV-Nd
-	for qemu-devel@nongnu.org; Tue, 29 May 2018 02:01:18 -0400
+	(envelope-from <famz@redhat.com>) id 1fNXhC-00070B-L0
+	for qemu-devel@nongnu.org; Tue, 29 May 2018 02:01:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1fNXgt-0003AH-HA
-	for qemu-devel@nongnu.org; Tue, 29 May 2018 02:01:12 -0400
+	(envelope-from <famz@redhat.com>) id 1fNXh6-0003KK-TS
+	for qemu-devel@nongnu.org; Tue, 29 May 2018 02:01:22 -0400
 From: Fam Zheng <famz@redhat.com>
-Date: Tue, 29 May 2018 13:59:58 +0800
-Message-Id: <20180529055959.32002-10-famz@redhat.com>
+Date: Tue, 29 May 2018 13:59:59 +0800
+Message-Id: <20180529055959.32002-11-famz@redhat.com>
 In-Reply-To: <20180529055959.32002-1-famz@redhat.com>
 References: <20180529055959.32002-1-famz@redhat.com>
-Subject: [Qemu-devel] [PATCH v7 09/10] block-backend: Add blk_co_copy_range
+Subject: [Qemu-devel] [PATCH v7 10/10] qemu-img: Convert with copy offloading
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,53 +22,128 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Paolo Bonzini <pbonzini@redhat.com>, Ronnie Sahlberg <ronniesahlberg@gmail.com>, qemu-block@nongnu.org, Peter Lieven <pl@kamp.de>, Fam Zheng <famz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, eblake@redhat.com
 
-It's a BlockBackend wrapper of the BDS interface.
+The new blk_co_copy_range interface offers a more efficient way in the
+case of network based storage. Make use of it to allow faster convert
+operation.
+
+Since copy offloading cannot do zero detection ('-S') and compression
+(-c), only try it when these options are not used.
 
 Signed-off-by: Fam Zheng <famz@redhat.com>
 Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 ---
- block/block-backend.c          | 18 ++++++++++++++++++
- include/sysemu/block-backend.h |  4 ++++
- 2 files changed, 22 insertions(+)
+ qemu-img.c | 50 ++++++++++++++++++++++++++++++++++++++++++++++++--
+ 1 file changed, 48 insertions(+), 2 deletions(-)
 
-diff --git a/block/block-backend.c b/block/block-backend.c
-index 89f47b00ea..d55c328736 100644
---- a/block/block-backend.c
-+++ b/block/block-backend.c
-@@ -2211,3 +2211,21 @@ void blk_unregister_buf(BlockBackend *blk, void *host)
- {
-     bdrv_unregister_buf(blk_bs(blk), host);
+diff --git a/qemu-img.c b/qemu-img.c
+index 976b437da0..75f1610aa0 100644
+--- a/qemu-img.c
++++ b/qemu-img.c
+@@ -1547,6 +1547,7 @@ typedef struct ImgConvertState {
+     bool compressed;
+     bool target_has_backing;
+     bool wr_in_order;
++    bool copy_range;
+     int min_sparse;
+     size_t cluster_sectors;
+     size_t buf_sectors;
+@@ -1740,6 +1741,37 @@ static int coroutine_fn convert_co_write(ImgConvertState *s, int64_t sector_num,
+     return 0;
  }
-+
-+int coroutine_fn blk_co_copy_range(BlockBackend *blk_in, int64_t off_in,
-+                                   BlockBackend *blk_out, int64_t off_out,
-+                                   int bytes, BdrvRequestFlags flags)
-+{
-+    int r;
-+    r = blk_check_byte_request(blk_in, off_in, bytes);
-+    if (r) {
-+        return r;
-+    }
-+    r = blk_check_byte_request(blk_out, off_out, bytes);
-+    if (r) {
-+        return r;
-+    }
-+    return bdrv_co_copy_range(blk_in->root, off_in,
-+                              blk_out->root, off_out,
-+                              bytes, flags);
-+}
-diff --git a/include/sysemu/block-backend.h b/include/sysemu/block-backend.h
-index 92ab624fac..8d03d493c2 100644
---- a/include/sysemu/block-backend.h
-+++ b/include/sysemu/block-backend.h
-@@ -232,4 +232,8 @@ void blk_set_force_allow_inactivate(BlockBackend *blk);
- void blk_register_buf(BlockBackend *blk, void *host, size_t size);
- void blk_unregister_buf(BlockBackend *blk, void *host);
  
-+int coroutine_fn blk_co_copy_range(BlockBackend *blk_in, int64_t off_in,
-+                                   BlockBackend *blk_out, int64_t off_out,
-+                                   int bytes, BdrvRequestFlags flags);
++static int coroutine_fn convert_co_copy_range(ImgConvertState *s, int64_t sector_num,
++                                              int nb_sectors)
++{
++    int n, ret;
 +
- #endif
++    while (nb_sectors > 0) {
++        BlockBackend *blk;
++        int src_cur;
++        int64_t bs_sectors, src_cur_offset;
++        int64_t offset;
++
++        convert_select_part(s, sector_num, &src_cur, &src_cur_offset);
++        offset = (sector_num - src_cur_offset) << BDRV_SECTOR_BITS;
++        blk = s->src[src_cur];
++        bs_sectors = s->src_sectors[src_cur];
++
++        n = MIN(nb_sectors, bs_sectors - (sector_num - src_cur_offset));
++
++        ret = blk_co_copy_range(blk, offset, s->target,
++                                sector_num << BDRV_SECTOR_BITS,
++                                n << BDRV_SECTOR_BITS, 0);
++        if (ret < 0) {
++            return ret;
++        }
++
++        sector_num += n;
++        nb_sectors -= n;
++    }
++    return 0;
++}
++
+ static void coroutine_fn convert_co_do_copy(void *opaque)
+ {
+     ImgConvertState *s = opaque;
+@@ -1762,6 +1794,7 @@ static void coroutine_fn convert_co_do_copy(void *opaque)
+         int n;
+         int64_t sector_num;
+         enum ImgConvertBlockStatus status;
++        bool copy_range;
+ 
+         qemu_co_mutex_lock(&s->lock);
+         if (s->ret != -EINPROGRESS || s->sector_num >= s->total_sectors) {
+@@ -1791,7 +1824,9 @@ static void coroutine_fn convert_co_do_copy(void *opaque)
+                                         s->allocated_sectors, 0);
+         }
+ 
+-        if (status == BLK_DATA) {
++retry:
++        copy_range = s->copy_range && s->status == BLK_DATA;
++        if (status == BLK_DATA && !copy_range) {
+             ret = convert_co_read(s, sector_num, n, buf);
+             if (ret < 0) {
+                 error_report("error while reading sector %" PRId64
+@@ -1813,7 +1848,15 @@ static void coroutine_fn convert_co_do_copy(void *opaque)
+         }
+ 
+         if (s->ret == -EINPROGRESS) {
+-            ret = convert_co_write(s, sector_num, n, buf, status);
++            if (copy_range) {
++                ret = convert_co_copy_range(s, sector_num, n);
++                if (ret) {
++                    s->copy_range = false;
++                    goto retry;
++                }
++            } else {
++                ret = convert_co_write(s, sector_num, n, buf, status);
++            }
+             if (ret < 0) {
+                 error_report("error while writing sector %" PRId64
+                              ": %s", sector_num, strerror(-ret));
+@@ -1936,6 +1979,7 @@ static int img_convert(int argc, char **argv)
+     ImgConvertState s = (ImgConvertState) {
+         /* Need at least 4k of zeros for sparse detection */
+         .min_sparse         = 8,
++        .copy_range         = true,
+         .buf_sectors        = IO_BUF_SIZE / BDRV_SECTOR_SIZE,
+         .wr_in_order        = true,
+         .num_coroutines     = 8,
+@@ -1976,6 +2020,7 @@ static int img_convert(int argc, char **argv)
+             break;
+         case 'c':
+             s.compressed = true;
++            s.copy_range = false;
+             break;
+         case 'o':
+             if (!is_valid_option_list(optarg)) {
+@@ -2017,6 +2062,7 @@ static int img_convert(int argc, char **argv)
+             }
+ 
+             s.min_sparse = sval / BDRV_SECTOR_SIZE;
++            s.copy_range = false;
+             break;
+         }
+         case 'p':
 -- 
 2.14.3
