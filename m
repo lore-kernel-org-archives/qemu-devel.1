@@ -1,29 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35180)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35634)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <crosa@redhat.com>) id 1fNkLV-0006e9-T4
-	for qemu-devel@nongnu.org; Tue, 29 May 2018 15:31:51 -0400
+	(envelope-from <eblake@redhat.com>) id 1fNkN8-0007Lz-2s
+	for qemu-devel@nongnu.org; Tue, 29 May 2018 15:33:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <crosa@redhat.com>) id 1fNkLR-0003h9-Vt
-	for qemu-devel@nongnu.org; Tue, 29 May 2018 15:31:49 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:49072 helo=mx1.redhat.com)
+	(envelope-from <eblake@redhat.com>) id 1fNkN4-0004fD-62
+	for qemu-devel@nongnu.org; Tue, 29 May 2018 15:33:30 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:42306 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <crosa@redhat.com>) id 1fNkLR-0003fu-Qd
-	for qemu-devel@nongnu.org; Tue, 29 May 2018 15:31:45 -0400
-References: <20180525005839.11556-1-crosa@redhat.com>
-	<20180525005839.11556-5-crosa@redhat.com>
-	<20180525054744.GC28589@lemon.usersys.redhat.com>
-	<5ebe0b6d-11b9-8c66-0e09-01706ebc57ca@redhat.com>
-	<20180529190659.GL8988@localhost.localdomain>
-From: Cleber Rosa <crosa@redhat.com>
-Message-ID: <42eb7e54-f171-78ff-011e-e1cef8256ab7@redhat.com>
-Date: Tue, 29 May 2018 15:31:44 -0400
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1fNkN4-0004ey-1K
+	for qemu-devel@nongnu.org; Tue, 29 May 2018 15:33:26 -0400
+References: <D9DE8DBB19F2A24080482022C1DE758302C89900@dggemm509-mbx.china.huawei.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <e4a72796-562e-adf8-21ba-7bed953126e8@redhat.com>
+Date: Tue, 29 May 2018 14:33:22 -0500
 MIME-Version: 1.0
-In-Reply-To: <20180529190659.GL8988@localhost.localdomain>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <D9DE8DBB19F2A24080482022C1DE758302C89900@dggemm509-mbx.china.huawei.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 4/5] scripts/qemu.py: introduce
- set_console() method
+Subject: Re: [Qemu-devel] [PATCH] socket: dont't free msgfds if error equals
+ EAGAIN
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,56 +28,20 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: qemu-devel@nongnu.org, Fam Zheng <famz@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Stefan Hajnoczi <stefanha@redhat.com>, Amador Pahim <amador@pahim.org>
+To: linzhecheng <linzhecheng@huawei.com>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@gmail.com>
+Cc: QEMU <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, "wangxin (U)" <wangxinxin.wang@huawei.com>, "Gonglei (Arei)" <arei.gonglei@huawei.com>, "peterx@redhat.com" <peterx@redhat.com>, "berrange@redhat.com" <berrange@redhat.com>
+
+On 05/29/2018 04:33 AM, linzhecheng wrote:
+> I think this patch doesn't fix my issue. For more details, please see Gonglei's reply.
+> https://lists.gnu.org/archive/html/qemu-devel/2018-05/msg06296.html
+
+Your mailer is not honoring threading (it failed to include 
+'In-Reply-To:' and 'References:' headers that refer to the message you 
+are replying to), and you are top-posting, both of which make it 
+difficult to follow your comments on a technical list.
 
 
-On 05/29/2018 03:06 PM, Eduardo Habkost wrote:
-> On Fri, May 25, 2018 at 12:57:54PM -0400, Cleber Rosa wrote:
->> On 05/25/2018 01:47 AM, Fam Zheng wrote:
-> [...]
->>>> +class QEMU(unittest.TestCase):
->>>
->>> 'QEMU' is too generic, what is the intended tests to do here? It seems to be
->>> more about exercising the set_console() method.
->>>
->>
->> Yes, but again, I'm favoring simpler names when the scope is supposed to
->> be limited.  The chances of a name clash here are close to none IMO.  I
->> don't think this class would be reused elsewhere, or a class with the
->> same name would be imported here.
->>
->>> Any test should be added to tests/, not scripts/.
->>>
->>
->> One of the reasons for this file to be in this patch was to generate
->> this exact discussion.  "qemu.py" itself is not a script, but a
->> module/library.  Still it lacks the structure to have accompanying tests.
->>
->> I was hoping to get away with these tests here, so that they wouldn't be
->> thrown away, until "qemu.py", "qmp/*.py" and others are given the status
->> and structure of Python modules.
->>
->> I can definitely move these to tests/, but how about its relation to the
->> other tests living there and its activation?  Should we recognize its
->> existence and add a check-* target?
-> 
-> "scripts/test_qemu.py" makes it look like a script that will test
-> QEMU.  While we don't rearrange the Python modules to follow a
-> more Pythonic structure, probably moving it to tests/ is the best
-> option we have.  Maybe tests/python?
-> 
-> Wherever we store the test code, running those tests on
-> "make check" is a good idea.
-> 
-> But I wouldn't like this to delay the inclusion of this series.
-> If rearranging the Python modules would make the job easier,
-> including the test code only later would be a reasonable option,
-> too.
-> 
-
-We already have a "probable next steps" planning (see PATCH 0), and we
-can include a "Python module reorganization" to it.  So, I'm dropping
-this test on v3 and we'll add it later, at a better location.
-
-- Cleber.
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
