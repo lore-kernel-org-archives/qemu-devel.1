@@ -1,19 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41552)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41583)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <edgar.iglesias@gmail.com>) id 1fNe1x-0005GK-U2
+	(envelope-from <edgar.iglesias@gmail.com>) id 1fNe1z-0005GT-1D
 	for qemu-devel@nongnu.org; Tue, 29 May 2018 08:47:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <edgar.iglesias@gmail.com>) id 1fNe1w-0007P7-D1
-	for qemu-devel@nongnu.org; Tue, 29 May 2018 08:47:13 -0400
+	(envelope-from <edgar.iglesias@gmail.com>) id 1fNe1y-0007Q9-6D
+	for qemu-devel@nongnu.org; Tue, 29 May 2018 08:47:15 -0400
 From: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
-Date: Tue, 29 May 2018 14:47:06 +0200
-Message-Id: <20180529124707.3025-2-edgar.iglesias@gmail.com>
+Date: Tue, 29 May 2018 14:47:07 +0200
+Message-Id: <20180529124707.3025-3-edgar.iglesias@gmail.com>
 In-Reply-To: <20180529124707.3025-1-edgar.iglesias@gmail.com>
 References: <20180529124707.3025-1-edgar.iglesias@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v2 1/2] target-arm: Add the Cortex-R5F
+Subject: [Qemu-devel] [PATCH v2 2/2] xlnx-zynqmp: Swap Cortex-R5 for
+ Cortex-R5F
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,7 +28,7 @@ Cc: qemu-arm@nongnu.org, peter.maydell@linaro.org, frederic.konrad@adacore.com, 
 
 From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
 
-Add the Cortex-R5F with the optional FPU enabled.
+The ZynqMP has Cortex-R5Fs with the optional FPU enabled.
 
 Reviewed-by: KONRAD Frederic <frederic.konrad@adacore.com>
 Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
@@ -35,35 +36,35 @@ Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 Tested-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 Signed-off-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
 ---
- target/arm/cpu.c | 9 +++++++++
- 1 file changed, 9 insertions(+)
+ hw/arm/xlnx-zcu102.c | 2 +-
+ hw/arm/xlnx-zynqmp.c | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/target/arm/cpu.c b/target/arm/cpu.c
-index 5d60893a07..8ab571e84a 100644
---- a/target/arm/cpu.c
-+++ b/target/arm/cpu.c
-@@ -1343,6 +1343,14 @@ static void cortex_r5_initfn(Object *obj)
-     define_arm_cp_regs(cpu, cortexr5_cp_reginfo);
- }
+diff --git a/hw/arm/xlnx-zcu102.c b/hw/arm/xlnx-zcu102.c
+index b126cf148b..51906a743f 100644
+--- a/hw/arm/xlnx-zcu102.c
++++ b/hw/arm/xlnx-zcu102.c
+@@ -266,7 +266,7 @@ static void xlnx_zcu102_machine_class_init(ObjectClass *oc, void *data)
+ {
+     MachineClass *mc = MACHINE_CLASS(oc);
  
-+static void cortex_r5f_initfn(Object *obj)
-+{
-+    ARMCPU *cpu = ARM_CPU(obj);
-+
-+    cortex_r5_initfn(obj);
-+    set_feature(&cpu->env, ARM_FEATURE_VFP3);
-+}
-+
- static const ARMCPRegInfo cortexa8_cp_reginfo[] = {
-     { .name = "L2LOCKDOWN", .cp = 15, .crn = 9, .crm = 0, .opc1 = 1, .opc2 = 0,
-       .access = PL1_RW, .type = ARM_CP_CONST, .resetvalue = 0 },
-@@ -1803,6 +1811,7 @@ static const ARMCPUInfo arm_cpus[] = {
-     { .name = "cortex-m33",  .initfn = cortex_m33_initfn,
-                              .class_init = arm_v7m_class_init },
-     { .name = "cortex-r5",   .initfn = cortex_r5_initfn },
-+    { .name = "cortex-r5f",  .initfn = cortex_r5f_initfn },
-     { .name = "cortex-a7",   .initfn = cortex_a7_initfn },
-     { .name = "cortex-a8",   .initfn = cortex_a8_initfn },
-     { .name = "cortex-a9",   .initfn = cortex_a9_initfn },
+-    mc->desc = "Xilinx ZynqMP ZCU102 board with 4xA53s and 2xR5s based on " \
++    mc->desc = "Xilinx ZynqMP ZCU102 board with 4xA53s and 2xR5Fs based on " \
+                "the value of smp";
+     mc->init = xlnx_zcu102_init;
+     mc->block_default_type = IF_IDE;
+diff --git a/hw/arm/xlnx-zynqmp.c b/hw/arm/xlnx-zynqmp.c
+index 2045b9d71e..29df35fb75 100644
+--- a/hw/arm/xlnx-zynqmp.c
++++ b/hw/arm/xlnx-zynqmp.c
+@@ -134,7 +134,7 @@ static void xlnx_zynqmp_create_rpu(XlnxZynqMPState *s, const char *boot_cpu,
+         char *name;
+ 
+         object_initialize(&s->rpu_cpu[i], sizeof(s->rpu_cpu[i]),
+-                          "cortex-r5-" TYPE_ARM_CPU);
++                          "cortex-r5f-" TYPE_ARM_CPU);
+         object_property_add_child(OBJECT(s), "rpu-cpu[*]",
+                                   OBJECT(&s->rpu_cpu[i]), &error_abort);
+ 
 -- 
 2.14.1
