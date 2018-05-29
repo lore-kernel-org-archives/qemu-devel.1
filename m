@@ -1,20 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46132)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46246)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1fNYv0-0003mV-4i
-	for qemu-devel@nongnu.org; Tue, 29 May 2018 03:19:43 -0400
+	(envelope-from <thuth@redhat.com>) id 1fNYvU-00042x-SJ
+	for qemu-devel@nongnu.org; Tue, 29 May 2018 03:20:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1fNYuw-0007m7-TN
-	for qemu-devel@nongnu.org; Tue, 29 May 2018 03:19:42 -0400
+	(envelope-from <thuth@redhat.com>) id 1fNYvR-00082v-ME
+	for qemu-devel@nongnu.org; Tue, 29 May 2018 03:20:12 -0400
 References: <1527568809-5640-1-git-send-email-walling@linux.ibm.com>
-From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <44b99710-5801-f880-0db6-d416177ef859@redhat.com>
-Date: Tue, 29 May 2018 09:19:36 +0200
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <ac7e988f-3644-47b7-16f8-ffaeca3fea1a@redhat.com>
+Date: Tue, 29 May 2018 09:20:06 +0200
 MIME-Version: 1.0
 In-Reply-To: <1527568809-5640-1-git-send-email-walling@linux.ibm.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] pc-bios/s390-ccw: define loadparm length
+Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH] pc-bios/s390-ccw: define
+ loadparm length
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,9 +24,9 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Collin Walling <walling@linux.ibm.com>, qemu-devel@nongnu.org, qemu-s390x@nongnu.org, cohuck@redhat.com
+To: Collin Walling <walling@linux.ibm.com>, qemu-devel@nongnu.org, qemu-s390x@nongnu.org, cohuck@redhat.com, lersek@redhat.com
 
-On 05/29/18 06:40, Collin Walling wrote:
+On 29.05.2018 06:40, Collin Walling wrote:
 > Loadparm is defined by the s390 architecture to be 8 bytes
 > in length. Let's define this size in the s390-ccw bios.
 > 
@@ -126,10 +127,4 @@ On 05/29/18 06:40, Collin Walling wrote:
 >  typedef struct SCCB {
 > 
 
-I didn't look for more possible occurrences, but the above look correct
-to me.
-
-Reviewed-by: Laszlo Ersek <lersek@redhat.com>
-
-Thanks
-Laszlo
+Reviewed-by: Thomas Huth <thuth@redhat.com>
