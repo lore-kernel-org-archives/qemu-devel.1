@@ -1,28 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43828)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44450)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fNSd2-0005a0-N3
-	for qemu-devel@nongnu.org; Mon, 28 May 2018 20:36:45 -0400
+	id 1fNSiR-0006hA-6I
+	for qemu-devel@nongnu.org; Mon, 28 May 2018 20:42:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fNSd1-0003hT-Rn
-	for qemu-devel@nongnu.org; Mon, 28 May 2018 20:36:44 -0400
+	id 1fNSiQ-0007Fr-9L
+	for qemu-devel@nongnu.org; Mon, 28 May 2018 20:42:19 -0400
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
 References: <20180528232719.4721-1-f4bug@amsat.org>
-	<20180528232719.4721-2-f4bug@amsat.org>
-	<20180528174805.7a56a4b8@w520.home>
-	<20180529030540-mutt-send-email-mst@kernel.org>
+	<20180528232719.4721-16-f4bug@amsat.org>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <ba9292ae-5bf3-54af-fefc-66336f83afd6@amsat.org>
-Date: Mon, 28 May 2018 21:36:31 -0300
+Message-ID: <a03e3c6d-52fc-b37c-c4f7-612c5af711a2@amsat.org>
+Date: Mon, 28 May 2018 21:42:05 -0300
 MIME-Version: 1.0
-In-Reply-To: <20180529030540-mutt-send-email-mst@kernel.org>
+In-Reply-To: <20180528232719.4721-16-f4bug@amsat.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v4 01/21] vfio: Include
- "exec/address-spaces.h" directly in the source file
+Subject: Re: [Qemu-devel] [PATCH v4 15/21] hw/block/nvme: Include
+ "qemu/cutils.h" directly in the source file
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,74 +29,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>, Alex Williamson <alex.williamson@redhat.com>
-Cc: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, qemu-trivial@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Cornelia Huck <cohuck@redhat.com>, "open list:S390" <qemu-s390x@nongnu.org>
+To: Thomas Huth <thuth@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-trivial@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Keith Busch <keith.busch@intel.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, "open list:nvme" <qemu-block@nongnu.org>
 
-On 05/28/2018 09:06 PM, Michael S. Tsirkin wrote:
-> On Mon, May 28, 2018 at 05:48:05PM -0600, Alex Williamson wrote:
->> On Mon, 28 May 2018 20:26:59 -0300
->> Philippe Mathieu-Daudé <f4bug@amsat.org> wrote:
->>
->> -ENOCOMMITLOG
+On 05/28/2018 08:27 PM, Philippe Mathieu-Daudé wrote:
 
-Oops sorry Alex, I meant to add some, but missed this while rebasing.
+I forgot to add this commit description:
 
->> Why?  Tangible benefit.  Looks like noise.  Thanks,
->>
-> I agree it should have a commit log, but .c files
-> should be self-sufficient not rely on .h files
-> pulling in headers for symbols the .h does not use
-> itself.
+  "block/nvme.h" does not require any declaration of "qemu/cutils.h".
+  Simplify dependencies by directly include it in the source file
+  where the declarations are used.
 
-I meant:
-
-  No declaration of "hw/vfio/vfio-common.h" directly requires to include
-  the "exec/address-spaces.h" header.  To simplify dependencies and
-  ease following cleanup of "exec/address-spaces.h", directly include
-  it in the source file where the declaration are used.
-
-> This is better because it makes refactoring easier.
+> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+> Reviewed-by: Thomas Huth <thuth@redhat.com>
+> ---
+>  hw/block/nvme.h | 1 -
+>  hw/block/nvme.c | 1 +
+>  2 files changed, 1 insertion(+), 1 deletion(-)
 > 
->>> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
->>> ---
->>>  include/hw/vfio/vfio-common.h | 1 -
->>>  hw/vfio/ccw.c                 | 1 +
->>>  hw/vfio/platform.c            | 1 +
->>>  3 files changed, 2 insertions(+), 1 deletion(-)
->>>
->>> diff --git a/include/hw/vfio/vfio-common.h b/include/hw/vfio/vfio-common.h
->>> index d9360148e6..8264a65fa5 100644
->>> --- a/include/hw/vfio/vfio-common.h
->>> +++ b/include/hw/vfio/vfio-common.h
->>> @@ -22,7 +22,6 @@
->>>  #define HW_VFIO_VFIO_COMMON_H
->>>  
->>>  #include "qemu-common.h"
->>> -#include "exec/address-spaces.h"
->>>  #include "exec/memory.h"
->>>  #include "qemu/queue.h"
->>>  #include "qemu/notify.h"
->>> diff --git a/hw/vfio/ccw.c b/hw/vfio/ccw.c
->>> index e67392c5f9..76e4e8c652 100644
->>> --- a/hw/vfio/ccw.c
->>> +++ b/hw/vfio/ccw.c
->>> @@ -22,6 +22,7 @@
->>>  #include "hw/vfio/vfio-common.h"
->>>  #include "hw/s390x/s390-ccw.h"
->>>  #include "hw/s390x/ccw-device.h"
->>> +#include "exec/address-spaces.h"
->>>  #include "qemu/error-report.h"
->>>  
->>>  #define TYPE_VFIO_CCW "vfio-ccw"
->>> diff --git a/hw/vfio/platform.c b/hw/vfio/platform.c
->>> index 5c921c27ba..57c4a0ee2b 100644
->>> --- a/hw/vfio/platform.c
->>> +++ b/hw/vfio/platform.c
->>> @@ -24,6 +24,7 @@
->>>  #include "qemu/range.h"
->>>  #include "sysemu/sysemu.h"
->>>  #include "exec/memory.h"
->>> +#include "exec/address-spaces.h"
->>>  #include "qemu/queue.h"
->>>  #include "hw/sysbus.h"
->>>  #include "trace.h"
+> diff --git a/hw/block/nvme.h b/hw/block/nvme.h
+> index 8f3981121d..cabcf20c32 100644
+> --- a/hw/block/nvme.h
+> +++ b/hw/block/nvme.h
+> @@ -1,6 +1,5 @@
+>  #ifndef HW_NVME_H
+>  #define HW_NVME_H
+> -#include "qemu/cutils.h"
+>  #include "block/nvme.h"
+>  
+>  typedef struct NvmeAsyncEvent {
+> diff --git a/hw/block/nvme.c b/hw/block/nvme.c
+> index 85d2406400..811084b6a7 100644
+> --- a/hw/block/nvme.c
+> +++ b/hw/block/nvme.c
+> @@ -35,6 +35,7 @@
+>  #include "sysemu/block-backend.h"
+>  
+>  #include "qemu/log.h"
+> +#include "qemu/cutils.h"
+>  #include "trace.h"
+>  #include "nvme.h"
+>  
+> 
