@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55561)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56325)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1fNo6f-0006sc-4H
-	for qemu-devel@nongnu.org; Tue, 29 May 2018 19:32:46 -0400
+	(envelope-from <alistair23@gmail.com>) id 1fNo9A-0007uN-FS
+	for qemu-devel@nongnu.org; Tue, 29 May 2018 19:35:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1fNo6d-0003ih-Sv
-	for qemu-devel@nongnu.org; Tue, 29 May 2018 19:32:45 -0400
-Received: from mail-lf0-x242.google.com ([2a00:1450:4010:c07::242]:40831)
+	(envelope-from <alistair23@gmail.com>) id 1fNo99-0005xp-5X
+	for qemu-devel@nongnu.org; Tue, 29 May 2018 19:35:20 -0400
+Received: from mail-lf0-x241.google.com ([2a00:1450:4010:c07::241]:34996)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alistair23@gmail.com>)
-	id 1fNo6d-0003hj-I9
-	for qemu-devel@nongnu.org; Tue, 29 May 2018 19:32:43 -0400
-Received: by mail-lf0-x242.google.com with SMTP id q11-v6so1349916lfc.7
-	for <qemu-devel@nongnu.org>; Tue, 29 May 2018 16:32:43 -0700 (PDT)
+	id 1fNo98-0005vi-Pd
+	for qemu-devel@nongnu.org; Tue, 29 May 2018 19:35:19 -0400
+Received: by mail-lf0-x241.google.com with SMTP id y72-v6so1358819lfd.2
+	for <qemu-devel@nongnu.org>; Tue, 29 May 2018 16:35:18 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <1527034517-7851-4-git-send-email-mjc@sifive.com>
+In-Reply-To: <1527034517-7851-10-git-send-email-mjc@sifive.com>
 References: <1527034517-7851-1-git-send-email-mjc@sifive.com>
-	<1527034517-7851-4-git-send-email-mjc@sifive.com>
+	<1527034517-7851-10-git-send-email-mjc@sifive.com>
 From: Alistair Francis <alistair23@gmail.com>
-Date: Tue, 29 May 2018 16:32:11 -0700
-Message-ID: <CAKmqyKPLde0_zt7qm0rVOFUBDBH3AvUf_oRgNafBkFy_ysgeUA@mail.gmail.com>
+Date: Tue, 29 May 2018 16:34:46 -0700
+Message-ID: <CAKmqyKNC6NWPKOuZWEFa1ZRb7AEs79gFZiPr1_PtoD1Xw3Yt1w@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v1 03/30] RISC-V: Use atomic_cmpxchg to
- update PLIC bitmaps
+Subject: Re: [Qemu-devel] [PATCH v1 09/30] RISC-V: Implement atomic mip/sip
+ CSR updates
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,133 +34,116 @@ To: Michael Clark <mjc@sifive.com>
 Cc: "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Sagar Karandikar <sagark@eecs.berkeley.edu>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Palmer Dabbelt <palmer@sifive.com>, Alistair Francis <Alistair.Francis@wdc.com>, patches@groups.riscv.org
 
 On Tue, May 22, 2018 at 5:14 PM, Michael Clark <mjc@sifive.com> wrote:
-> The PLIC previously used a mutex to protect against concurrent
-> access to the claimed and pending bitfields. Instead of using
-> a mutex, we update the bitfields using atomic_cmpxchg.
->
-> Rename sifive_plic_num_irqs_pending to sifive_plic_irqs_pending
-> and add an early out if any interrupts are pending as the
-> count of pending interrupts is not used.
+> Use the new CSR read/modify/write interface to implement
+> atomic updates to mip/sip.
 >
 > Cc: Sagar Karandikar <sagark@eecs.berkeley.edu>
 > Cc: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
 > Cc: Palmer Dabbelt <palmer@sifive.com>
 > Cc: Alistair Francis <Alistair.Francis@wdc.com>
 > Signed-off-by: Michael Clark <mjc@sifive.com>
-> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
-Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
+Acked-by: Alistair Francis <alistair.francis@wdc.com>
 
 Alistair
 
+
 > ---
->  hw/riscv/sifive_plic.c         | 49 +++++++++++++++++++-----------------------
->  include/hw/riscv/sifive_plic.h |  1 -
->  2 files changed, 22 insertions(+), 28 deletions(-)
+>  target/riscv/csr.c | 56 +++++++++++++++++++++++++++---------------------------
+>  1 file changed, 28 insertions(+), 28 deletions(-)
 >
-> diff --git a/hw/riscv/sifive_plic.c b/hw/riscv/sifive_plic.c
-> index 874de2ebaf77..1af23c76e603 100644
-> --- a/hw/riscv/sifive_plic.c
-> +++ b/hw/riscv/sifive_plic.c
-> @@ -81,36 +81,32 @@ static void sifive_plic_print_state(SiFivePLICState *plic)
->      }
+> diff --git a/target/riscv/csr.c b/target/riscv/csr.c
+> index e08f3523d854..631a5ff9f7d8 100644
+> --- a/target/riscv/csr.c
+> +++ b/target/riscv/csr.c
+> @@ -493,25 +493,31 @@ static int write_mbadaddr(CPURISCVState *env, int csrno, target_ulong val)
+>      return 0;
 >  }
 >
-> -static
-> -void sifive_plic_set_pending(SiFivePLICState *plic, int irq, bool pending)
-> +static uint32_t atomic_set_masked(uint32_t *a, uint32_t mask, uint32_t value)
+> -static int read_mip(CPURISCVState *env, int csrno, target_ulong *val)
+> -{
+> -    *val = atomic_read(&env->mip);
+> -    return 0;
+> -}
+> -
+> -static int write_mip(CPURISCVState *env, int csrno, target_ulong val)
+> +static int rmw_mip(CPURISCVState *env, int csrno, target_ulong *ret_value,
+> +                   target_ulong new_value, target_ulong write_mask)
 >  {
-> -    qemu_mutex_lock(&plic->lock);
-> -    uint32_t word = irq >> 5;
-> -    if (pending) {
-> -        plic->pending[word] |= (1 << (irq & 31));
-> -    } else {
-> -        plic->pending[word] &= ~(1 << (irq & 31));
-> -    }
-> -    qemu_mutex_unlock(&plic->lock);
-> +    uint32_t old, new, cmp = atomic_read(a);
+>      RISCVCPU *cpu = riscv_env_get_cpu(env);
+> +    target_ulong mask = write_mask & delegable_ints;
+> +    uint32_t old_mip;
 > +
-> +    do {
-> +        old = cmp;
-> +        new = (old & ~mask) | (value & mask);
-> +        cmp = atomic_cmpxchg(a, old, new);
-> +    } while (old != cmp);
+> +    /* We can't allow the supervisor to control SEIP as this would allow the
+> +     * supervisor to clear a pending external interrupt which will result in
+> +     * lost a interrupt in the case a PLIC is attached. The SEIP bit must be
+> +     * hardware controlled when a PLIC is attached. This should be an option
+> +     * for CPUs with software-delegated Supervisor External Interrupts. */
+> +    mask &= ~MIP_SEIP;
 > +
-> +    return old;
+> +    if (mask) {
+> +        qemu_mutex_lock_iothread();
+> +        old_mip = riscv_cpu_update_mip(cpu, mask, (new_value & mask));
+> +        qemu_mutex_unlock_iothread();
+> +    } else {
+> +        old_mip = atomic_read(&env->mip);
+> +    }
+>
+> -    /*
+> -     * csrs, csrc on mip.SEIP is not decomposable into separate read and
+> -     * write steps, so a different implementation is needed
+> -     */
+> -
+> -    qemu_mutex_lock_iothread();
+> -    riscv_cpu_update_mip(cpu, MIP_SSIP | MIP_STIP,
+> -                         (val & (MIP_SSIP | MIP_STIP)));
+> -    qemu_mutex_unlock_iothread();
+> +    if (ret_value) {
+> +        *ret_value = old_mip;
+> +    }
+>
+>      return 0;
+>  }
+> @@ -631,17 +637,11 @@ static int write_sbadaddr(CPURISCVState *env, int csrno, target_ulong val)
+>      return 0;
 >  }
 >
-> -static
-> -void sifive_plic_set_claimed(SiFivePLICState *plic, int irq, bool claimed)
-> +static void sifive_plic_set_pending(SiFivePLICState *plic, int irq, bool level)
+> -static int read_sip(CPURISCVState *env, int csrno, target_ulong *val)
+> -{
+> -    *val = atomic_read(&env->mip) & env->mideleg;
+> -    return 0;
+> -}
+> -
+> -static int write_sip(CPURISCVState *env, int csrno, target_ulong val)
+> +static int rmw_sip(CPURISCVState *env, int csrno, target_ulong *ret_value,
+> +                   target_ulong new_value, target_ulong write_mask)
 >  {
-> -    qemu_mutex_lock(&plic->lock);
-> -    uint32_t word = irq >> 5;
-> -    if (claimed) {
-> -        plic->claimed[word] |= (1 << (irq & 31));
-> -    } else {
-> -        plic->claimed[word] &= ~(1 << (irq & 31));
-> -    }
-> -    qemu_mutex_unlock(&plic->lock);
-> +    atomic_set_masked(&plic->pending[irq >> 5], 1 << (irq & 31), -!!level);
+> -    target_ulong newval = (atomic_read(&env->mip) & ~env->mideleg)
+> -                          | (val & env->mideleg);
+> -    return write_mip(env, CSR_MIP, newval);
+> +    return rmw_mip(env, CSR_MSTATUS, ret_value, new_value,
+> +                   write_mask & env->mideleg);
 >  }
 >
-> -static
-> -int sifive_plic_num_irqs_pending(SiFivePLICState *plic, uint32_t addrid)
-> +static void sifive_plic_set_claimed(SiFivePLICState *plic, int irq, bool level)
->  {
-> -    int i, j, count = 0;
-> +    atomic_set_masked(&plic->claimed[irq >> 5], 1 << (irq & 31), -!!level);
-> +}
-> +
-> +static int sifive_plic_irqs_pending(SiFivePLICState *plic, uint32_t addrid)
-> +{
-> +    int i, j;
->      for (i = 0; i < plic->bitfield_words; i++) {
->          uint32_t pending_enabled_not_claimed =
->              (plic->pending[i] & ~plic->claimed[i]) &
-> @@ -123,11 +119,11 @@ int sifive_plic_num_irqs_pending(SiFivePLICState *plic, uint32_t addrid)
->              uint32_t prio = plic->source_priority[irq];
->              int enabled = pending_enabled_not_claimed & (1 << j);
->              if (enabled && prio > plic->target_priority[addrid]) {
-> -                count++;
-> +                return 1;
->              }
->          }
->      }
-> -    return count;
-> +    return 0;
->  }
+>  /* Supervisor Protection and Translation */
+> @@ -823,7 +823,7 @@ static const riscv_csr_operations csr_ops[0xfff] = {
+>      [CSR_MEPC] =                { read_mepc,        write_mepc        },
+>      [CSR_MCAUSE] =              { read_mcause,      write_mcause      },
+>      [CSR_MBADADDR] =            { read_mbadaddr,    write_mbadaddr    },
+> -    [CSR_MIP] =                 { read_mip,         write_mip         },
+> +    [CSR_MIP] =                 { NULL,     NULL,     rmw_mip         },
 >
->  static void sifive_plic_update(SiFivePLICState *plic)
-> @@ -143,7 +139,7 @@ static void sifive_plic_update(SiFivePLICState *plic)
->          if (!env) {
->              continue;
->          }
-> -        int level = sifive_plic_num_irqs_pending(plic, addrid) > 0;
-> +        int level = sifive_plic_irqs_pending(plic, addrid);
->          switch (mode) {
->          case PLICMode_M:
->              riscv_set_local_interrupt(RISCV_CPU(cpu), MIP_MEIP, level);
-> @@ -440,7 +436,6 @@ static void sifive_plic_realize(DeviceState *dev, Error **errp)
->      memory_region_init_io(&plic->mmio, OBJECT(dev), &sifive_plic_ops, plic,
->                            TYPE_SIFIVE_PLIC, plic->aperture_size);
->      parse_hart_config(plic);
-> -    qemu_mutex_init(&plic->lock);
->      plic->bitfield_words = (plic->num_sources + 31) >> 5;
->      plic->source_priority = g_new0(uint32_t, plic->num_sources);
->      plic->target_priority = g_new(uint32_t, plic->num_addrs);
-> diff --git a/include/hw/riscv/sifive_plic.h b/include/hw/riscv/sifive_plic.h
-> index 11a5a98df1f9..ff09a288261e 100644
-> --- a/include/hw/riscv/sifive_plic.h
-> +++ b/include/hw/riscv/sifive_plic.h
-> @@ -55,7 +55,6 @@ typedef struct SiFivePLICState {
->      uint32_t *pending;
->      uint32_t *claimed;
->      uint32_t *enable;
-> -    QemuMutex lock;
->      qemu_irq *irqs;
+>      /* Supervisor Trap Setup */
+>      [CSR_SSTATUS] =             { read_sstatus,     write_sstatus     },
+> @@ -836,7 +836,7 @@ static const riscv_csr_operations csr_ops[0xfff] = {
+>      [CSR_SEPC] =                { read_sepc,        write_sepc        },
+>      [CSR_SCAUSE] =              { read_scause,      write_scause      },
+>      [CSR_SBADADDR] =            { read_sbadaddr,    write_sbadaddr    },
+> -    [CSR_SIP] =                 { read_sip,         write_sip         },
+> +    [CSR_SIP] =                 { NULL,     NULL,     rmw_sip         },
 >
->      /* config */
+>      /* Supervisor Protection and Translation */
+>      [CSR_SATP] =                { read_satp,        write_satp        },
 > --
 > 2.7.0
 >
