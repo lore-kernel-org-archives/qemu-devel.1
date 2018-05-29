@@ -1,30 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42403)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42820)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fNe69-0008LD-11
-	for qemu-devel@nongnu.org; Tue, 29 May 2018 08:51:34 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1fNe7d-0000yH-T6
+	for qemu-devel@nongnu.org; Tue, 29 May 2018 08:53:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fNe64-00016m-VD
-	for qemu-devel@nongnu.org; Tue, 29 May 2018 08:51:33 -0400
-Received: from mail-wm0-x22d.google.com ([2a00:1450:400c:c09::22d]:53345)
+	(envelope-from <peter.maydell@linaro.org>) id 1fNe7d-0001wz-2z
+	for qemu-devel@nongnu.org; Tue, 29 May 2018 08:53:05 -0400
+Received: from mail-ot0-x22e.google.com ([2607:f8b0:4003:c0f::22e]:46558)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1fNe64-00015n-L6
-	for qemu-devel@nongnu.org; Tue, 29 May 2018 08:51:28 -0400
-Received: by mail-wm0-x22d.google.com with SMTP id a67-v6so40075672wmf.3
-	for <qemu-devel@nongnu.org>; Tue, 29 May 2018 05:51:28 -0700 (PDT)
-References: <20180525133851.27161-1-alex.bennee@linaro.org>
-	<20180525141910.6384-1-alex.bennee@linaro.org>
-	<20180525141910.6384-6-alex.bennee@linaro.org>
-	<f8e25536-a5e2-1177-eb63-0b07d23a515c@amsat.org>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <f8e25536-a5e2-1177-eb63-0b07d23a515c@amsat.org>
-Date: Tue, 29 May 2018 13:51:26 +0100
-Message-ID: <87bmcy1v75.fsf@linaro.org>
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1fNe7c-0001wr-UG
+	for qemu-devel@nongnu.org; Tue, 29 May 2018 08:53:05 -0400
+Received: by mail-ot0-x22e.google.com with SMTP id t1-v6so16754341ott.13
+	for <qemu-devel@nongnu.org>; Tue, 29 May 2018 05:53:04 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v5 35/49] tests/tcg: enable building for
- Alpha
+In-Reply-To: <20180529105011.1914-1-edgar.iglesias@gmail.com>
+References: <20180529105011.1914-1-edgar.iglesias@gmail.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 29 May 2018 13:52:43 +0100
+Message-ID: <CAFEAcA8cg1z1v1sUcuZh2u7hkSAj3E_y+qJ2++J_tm_4Bbgvew@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL v1 00/38] Xilinx queue
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,231 +28,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Cc: cota@braap.org, famz@redhat.com, berrange@redhat.com, richard.henderson@linaro.org, balrogg@gmail.com, aurelien@aurel32.net, agraf@suse.de, Samuel Thibault <samuel.thibault@ens-lyon.org>, qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>
+To: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Edgar Iglesias <edgar.iglesias@xilinx.com>
 
+On 29 May 2018 at 11:49, Edgar E. Iglesias <edgar.iglesias@gmail.com> wrote:
+> From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
+>
+> The following changes since commit 5a5c383b1373aeb6c87a0d6060f6c3dc7c53082b:
+>
+>   Merge remote-tracking branch 'remotes/vivier2/tags/linux-user-for-2.13-pull-request' into staging (2018-05-25 10:04:36 +0100)
+>
+> are available in the git repository at:
+>
+>   git@github.com:edgarigl/qemu.git tags/edgar/xilinx-next-2018-05-29-v1.for-upstream
+>
+> for you to fetch changes up to d10367e035eab12c77b83b5985915ff7f003de1f:
+>
+>   target-microblaze: Consolidate MMU enabled checks (2018-05-29 09:35:15 +0200)
+>
+> ----------------------------------------------------------------
+> Tag edgar/xilinx-next-2018-05-29-v1.for-upstream
+>
 
-Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> writes:
+Applied, thanks.
 
-> (Cc'ing Samuel who replied in a previous thread)
->
-> Hi Alex,
->
-> On 05/25/2018 11:19 AM, Alex Benn=C3=A9e wrote:
->> We can't use our normal Debian based compilers as Alpha isn't an
->> officially supported architecture. However it is available as a port
->> and fortunately cross compilers for all these targets are included in
->> Debian Sid, the perpetual rolling/unstable/testing version of Debian.
->>
->> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
->> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
->> Tested-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
->
-> These tags are only for the Alpha part, maybe I wasn't clear enough in
-> my previous review:
-> https://lists.gnu.org/archive/html/qemu-devel/2018-05/msg04443.html
->
->> ---
->> v5
->>   - drop the unused debian-cross-build docker image
->>   - add note to debian-sid docker image
->>   - echo reference to notes on build failure
->>   - include EXTRA_RUNS for mmap tests
->> ---
->>  tests/docker/Makefile.include                 |  1 +
->>  .../dockerfiles/debian-alpha-cross.docker     | 12 +++++++
->>  tests/docker/dockerfiles/debian-sid.docker    | 32 +++++++++++++++++++
->>  tests/tcg/alpha/Makefile.include              |  2 ++
->>  tests/tcg/alpha/Makefile.target               |  6 ++++
->>  5 files changed, 53 insertions(+)
->>  create mode 100644 tests/docker/dockerfiles/debian-alpha-cross.docker
->>  create mode 100644 tests/docker/dockerfiles/debian-sid.docker
->>  create mode 100644 tests/tcg/alpha/Makefile.include
->>  create mode 100644 tests/tcg/alpha/Makefile.target
->>
->> diff --git a/tests/docker/Makefile.include b/tests/docker/Makefile.inclu=
-de
->> index b56386f49e..5dc49c6a54 100644
->> --- a/tests/docker/Makefile.include
->> +++ b/tests/docker/Makefile.include
->> @@ -62,6 +62,7 @@ docker-image-debian-ppc64el-cross: docker-image-debian9
->>  docker-image-debian-s390x-cross: docker-image-debian9
->>  docker-image-debian-win32-cross: docker-image-debian8-mxe
->>  docker-image-debian-win64-cross: docker-image-debian8-mxe
->> +docker-image-debian-alpha-cross: docker-image-debian-sid
->>  docker-image-travis: NOUSER=3D1
->>
->>  # Expand all the pre-requistes for each docker image and test combinati=
-on
->> diff --git a/tests/docker/dockerfiles/debian-alpha-cross.docker b/tests/=
-docker/dockerfiles/debian-alpha-cross.docker
->> new file mode 100644
->> index 0000000000..29a25d0dfd
->> --- /dev/null
->> +++ b/tests/docker/dockerfiles/debian-alpha-cross.docker
->> @@ -0,0 +1,12 @@
->> +#
->> +# Docker cross-compiler target
->> +#
->> +# This docker target builds on the debian sid base image which
->> +# contains cross compilers for Debian "ports" targets.
->> +#
->> +FROM qemu:debian-sid
->> +
->> +RUN DEBIAN_FRONTEND=3Dnoninteractive eatmydata \
->> +    apt-get install -y --no-install-recommends \
->> +        gcc-alpha-linux-gnu \
->> +        libc6.1-dev-alpha-cross || { echo "Failed to build - see debian=
--sid.docker notes"; exit 1; }
->> diff --git a/tests/docker/dockerfiles/debian-sid.docker b/tests/docker/d=
-ockerfiles/debian-sid.docker
->> new file mode 100644
->> index 0000000000..9a3d168705
->> --- /dev/null
->> +++ b/tests/docker/dockerfiles/debian-sid.docker
->> @@ -0,0 +1,32 @@
->> +#
->> +# Debian Sid Base
->> +#
->> +# A number of our guests exist as ports only. We can either use the
->> +# ports repo or get everything from Sid. However Sid is a rolling
->> +# distro which may be broken at any particular time. If you are
->> +# unlucky and try and build your images while gcc is in the process of
->> +# being uploaded this can fail. Your only recourse is to try again in
->> +# a few hours when the repos have re-synced. Once built however you
->> +# won't be affected by repo changes unless the docker recipies are
->> +# updated and trigger a re-build.
->
-> OK, the comment is explaining well.
->
->> +#
->> +
->> +FROM debian:sid-slim
->> +
->> +# Duplicate deb line as deb-src
->> +RUN cat /etc/apt/sources.list | sed "s/^deb\ /deb-src /" >> /etc/apt/so=
-urces.list
->> +
->> +# Install common build utilities
->> +RUN apt update
->> +RUN DEBIAN_FRONTEND=3Dnoninteractive apt install -yy eatmydata
->> +RUN DEBIAN_FRONTEND=3Dnoninteractive eatmydata \
->> +    apt install -y --no-install-recommends \
->> +        bison \
->> +        build-essential \
->> +        ca-certificates \
->> +        flex \
->> +        git \
->> +        pkg-config \
->> +        psmisc \
->> +        python \
->> +        texinfo || { echo "Failed to build - see debian-sid.docker note=
-s"; exit 1; }
->
-> Output is:
->
-> I have a very low success rate at building Sid-based images.
-> Recently trying your debian-powerpc-cross:
->
-> [...]
-> Need to get 21.8 MB of archives.
-> After this operation, 72.0 MB of additional disk space will be used.
-> Get:1 http://deb.debian.org/debian sid/main amd64
-> binutils-powerpc-linux-gnu amd64 2.30-15 [2411 kB]
-> Err:2 http://deb.debian.org/debian sid/main amd64
-> gcc-7-powerpc-linux-gnu-base amd64 7.3.0-15cross1
->   404  Not Found
-> Err:3 http://deb.debian.org/debian sid/main amd64
-> cpp-7-powerpc-linux-gnu amd64 7.3.0-15cross1
->   404  Not Found
-> Get:4 http://deb.debian.org/debian sid/main amd64 cpp-powerpc-linux-gnu
-> amd64 4:7.3.0-3 [16.0 kB]
-> Get:5 http://deb.debian.org/debian sid/main amd64 gcc-7-cross-base-ports
-> all 7.3.0-15cross1 [182 kB]
-> Get:6 http://deb.debian.org/debian sid/main amd64 gcc-8-cross-base-ports
-> all 8-20180402-1cross2 [179 kB]
-> Get:7 http://deb.debian.org/debian sid/main amd64 libc6-powerpc-cross
-> all 2.27-3cross2 [1373 kB]
-> [...]
-> E: Failed to fetch
-> http://deb.debian.org/debian/pool/main/g/gcc-7-cross-ports/gcc-7-powerpc-=
-linux-gnu_7.3.0-15cross1_amd64.deb
->  404  Not Found
-> E: Unable to fetch some archives, maybe run apt-get update or try with
-> --fix-missing?
-> Failed to build - see debian-sid.docker notes
-> The command '/bin/sh -c DEBIAN_FRONTEND=3Dnoninteractive eatmydata
-> apt-get install -y --no-install-recommends         gcc-powerpc-linux-gnu
->         libc6-dev-powerpc-cross || { echo "Failed to build - see
-> debian-sid.docker notes"; exit 1; }' returned a non-zero code: 1
-> Traceback (most recent call last):
->   File "./tests/docker/docker.py", line 456, in <module>
->     sys.exit(main())
->   File "./tests/docker/docker.py", line 453, in main
->     return args.cmdobj.run(args, argv)
->   File "./tests/docker/docker.py", line 326, in run
->     extra_files_cksum=3Dcksum)
->   File "./tests/docker/docker.py", line 209, in build_image
->     quiet=3Dquiet)
->   File "./tests/docker/docker.py", line 147, in _do_check
->     return subprocess.check_call(self._command + cmd, **kwargs)
->   File "/usr/lib/python2.7/subprocess.py", line 190, in check_call
->     raise CalledProcessError(retcode, cmd)
-> subprocess.CalledProcessError: Command '['docker', 'build', '-t',
-> 'qemu:debian-powerpc-cross', '-f',
-> '/tmp/docker_buildQI1jpf/tmpf8x3A7.docker', '/tmp/docker_buildQI1jpf']'
-> returned non-zero exit status 1
-> make: *** [tests/docker/Makefile.include:39:
-> docker-image-debian-powerpc-cross] Error 1
-> ~/source/qemu ((0340bb063f...))$
->
-> Due to the ugly output, I didn't notice the "see debian-sid.docker
-> notes" at first.
-
-What about running with NOCACHE=3D1, I suspect this is drift between when
-your debian-sid image was created and the follow-up. Really we could do
-with just forcing debian-sid to re-build whenever we build a sub-image.
-
->
-> I'm not sure using apt repository snapshot resolve everything.
->
-> Assuming I'm located in an area where Debian mirrors are very
-> unreliable, and most of QEMU developers are in area with strong
-> connectivity, I won't object more on this patch. My network issues
-> shouldn't be a blocker for the community.
->
-> I'll see if I can arrange Dockerfiles to optionally use snapshots.
->
-> So finally, you are welcome to keep my R-b and T-b tags :)
->
-> Regards,
->
-> Phil.
->
->> diff --git a/tests/tcg/alpha/Makefile.include b/tests/tcg/alpha/Makefile=
-.include
->> new file mode 100644
->> index 0000000000..c7dc48eadb
->> --- /dev/null
->> +++ b/tests/tcg/alpha/Makefile.include
->> @@ -0,0 +1,2 @@
->> +DOCKER_IMAGE=3Ddebian-alpha-cross
->> +DOCKER_CROSS_COMPILER=3Dalpha-linux-gnu-gcc
->> diff --git a/tests/tcg/alpha/Makefile.target b/tests/tcg/alpha/Makefile.=
-target
->> new file mode 100644
->> index 0000000000..bedf1b6444
->> --- /dev/null
->> +++ b/tests/tcg/alpha/Makefile.target
->> @@ -0,0 +1,6 @@
->> +# -*- Mode: makefile -*-
->> +#
->> +# Alpha specific tweaks
->> +
->> +# On Alpha Linux only supports 8k pages
->> +EXTRA_RUNS+=3Drun-test-mmap-8192
->>
-
-
---
-Alex Benn=C3=A9e
+-- PMM
