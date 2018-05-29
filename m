@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56607)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57120)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1fNoCS-0000Bn-OP
-	for qemu-devel@nongnu.org; Tue, 29 May 2018 19:38:46 -0400
+	(envelope-from <alistair23@gmail.com>) id 1fNoEi-0001Ch-2u
+	for qemu-devel@nongnu.org; Tue, 29 May 2018 19:41:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1fNoCR-00018J-Ai
-	for qemu-devel@nongnu.org; Tue, 29 May 2018 19:38:44 -0400
-Received: from mail-lf0-x242.google.com ([2a00:1450:4010:c07::242]:44380)
+	(envelope-from <alistair23@gmail.com>) id 1fNoEg-0003EZ-Vz
+	for qemu-devel@nongnu.org; Tue, 29 May 2018 19:41:04 -0400
+Received: from mail-lf0-x244.google.com ([2a00:1450:4010:c07::244]:37228)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alistair23@gmail.com>)
-	id 1fNoCQ-00017h-VX
-	for qemu-devel@nongnu.org; Tue, 29 May 2018 19:38:43 -0400
-Received: by mail-lf0-x242.google.com with SMTP id g25-v6so1368296lfb.11
-	for <qemu-devel@nongnu.org>; Tue, 29 May 2018 16:38:42 -0700 (PDT)
+	id 1fNoEg-0003Dg-OM
+	for qemu-devel@nongnu.org; Tue, 29 May 2018 19:41:02 -0400
+Received: by mail-lf0-x244.google.com with SMTP id r2-v6so1372901lff.4
+	for <qemu-devel@nongnu.org>; Tue, 29 May 2018 16:41:02 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <1527034517-7851-13-git-send-email-mjc@sifive.com>
+In-Reply-To: <1527034517-7851-12-git-send-email-mjc@sifive.com>
 References: <1527034517-7851-1-git-send-email-mjc@sifive.com>
-	<1527034517-7851-13-git-send-email-mjc@sifive.com>
+	<1527034517-7851-12-git-send-email-mjc@sifive.com>
 From: Alistair Francis <alistair23@gmail.com>
-Date: Tue, 29 May 2018 16:38:11 -0700
-Message-ID: <CAKmqyKN+K2iZcjJtEfVezemke55hGC80t7a6qchTAKD7keV-Zw@mail.gmail.com>
+Date: Tue, 29 May 2018 16:40:30 -0700
+Message-ID: <CAKmqyKODtmmgnL0UrejWPFU7onvr-YU3mGagJhZfX=OMK4VwuA@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v1 12/30] RISC-V: Mark mstatus.fs dirty
+Subject: Re: [Qemu-devel] [PATCH v1 11/30] RISC-V: Split out mstatus_fs from
+ tb_flags
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,15 +36,6 @@ Cc: "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Sagar Karandikar
 On Tue, May 22, 2018 at 5:14 PM, Michael Clark <mjc@sifive.com> wrote:
 > From: Richard Henderson <richard.henderson@linaro.org>
 >
-> Modifed from Richard Henderson's patch [1] to integrate
-> with the new control and status register implementation.
->
-> [1] https://lists.nongnu.org/archive/html/qemu-devel/2018-03/msg07034.html
->
-> Note: the f* CSRs already mark mstatus.FS dirty using
-> env->mstatus |= mstatus.FS so the bug in the first
-> spin of this patch has been fixed in a prior commit.
->
 > Cc: Sagar Karandikar <sagark@eecs.berkeley.edu>
 > Cc: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
 > Cc: Palmer Dabbelt <palmer@sifive.com>
@@ -52,157 +44,90 @@ On Tue, May 22, 2018 at 5:14 PM, Michael Clark <mjc@sifive.com> wrote:
 > Signed-off-by: Michael Clark <mjc@sifive.com>
 > Reviewed-by: Michael Clark <mjc@sifive.com>
 
-It sounds like this should still have Richard's SOB line.
-
-Once that is fixed:
+Shouldn't this also have Richard's SOB line?
 
 Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 
 Alistair
 
->
-> Co-authored-by: Richard Henderson <richard.henderson@linaro.org>
-> Co-authored-by: Michael Clark <mjc@sifive.com>
+
 > ---
->  target/riscv/csr.c       | 12 ------------
->  target/riscv/translate.c | 40 +++++++++++++++++++++++++++++++++++++++-
->  2 files changed, 39 insertions(+), 13 deletions(-)
+>  target/riscv/cpu.h       |  6 +++---
+>  target/riscv/translate.c | 10 +++++-----
+>  2 files changed, 8 insertions(+), 8 deletions(-)
 >
-> diff --git a/target/riscv/csr.c b/target/riscv/csr.c
-> index 0e6c0c365154..b4452388ff02 100644
-> --- a/target/riscv/csr.c
-> +++ b/target/riscv/csr.c
-> @@ -325,18 +325,6 @@ static int write_mstatus(CPURISCVState *env, int csrno, target_ulong val)
+> diff --git a/target/riscv/cpu.h b/target/riscv/cpu.h
+> index 3a3d91447736..242a8fcbe180 100644
+> --- a/target/riscv/cpu.h
+> +++ b/target/riscv/cpu.h
+> @@ -276,8 +276,8 @@ void QEMU_NORETURN do_raise_exception_err(CPURISCVState *env,
+>  target_ulong cpu_riscv_get_fflags(CPURISCVState *env);
+>  void cpu_riscv_set_fflags(CPURISCVState *env, target_ulong);
 >
->      mstatus = (mstatus & ~mask) | (val & mask);
+> -#define TB_FLAGS_MMU_MASK  3
+> -#define TB_FLAGS_FP_ENABLE MSTATUS_FS
+> +#define TB_FLAGS_MMU_MASK   3
+> +#define TB_FLAGS_MSTATUS_FS MSTATUS_FS
 >
-> -    /* Note: this is a workaround for an issue where mstatus.FS
-> -       does not report dirty after floating point operations
-> -       that modify floating point state. This workaround is
-> -       technically compliant with the RISC-V Privileged
-> -       specification as it is legal to return only off, or dirty.
-> -       at the expense of extra floating point save/restore. */
-> -
-> -    /* FP is always dirty or off */
-> -    if (mstatus & MSTATUS_FS) {
-> -        mstatus |= MSTATUS_FS;
-> -    }
-> -
->      int dirty = ((mstatus & MSTATUS_FS) == MSTATUS_FS) |
->                  ((mstatus & MSTATUS_XS) == MSTATUS_XS);
->      mstatus = set_field(mstatus, MSTATUS_SD, dirty);
+>  static inline void cpu_get_tb_cpu_state(CPURISCVState *env, target_ulong *pc,
+>                                          target_ulong *cs_base, uint32_t *flags)
+> @@ -285,7 +285,7 @@ static inline void cpu_get_tb_cpu_state(CPURISCVState *env, target_ulong *pc,
+>      *pc = env->pc;
+>      *cs_base = 0;
+>  #ifdef CONFIG_USER_ONLY
+> -    *flags = TB_FLAGS_FP_ENABLE;
+> +    *flags = TB_FLAGS_MSTATUS_FS;
+>  #else
+>      *flags = cpu_mmu_index(env, 0) | (env->mstatus & MSTATUS_FS);
+>  #endif
 > diff --git a/target/riscv/translate.c b/target/riscv/translate.c
-> index 466b9551cbd9..a980611eb611 100644
+> index ee2bbc55b051..466b9551cbd9 100644
 > --- a/target/riscv/translate.c
 > +++ b/target/riscv/translate.c
-> @@ -651,6 +651,31 @@ static void gen_store(DisasContext *ctx, uint32_t opc, int rs1, int rs2,
->      tcg_temp_free(dat);
->  }
->
-> +#ifndef CONFIG_USER_ONLY
-> +/* The states of mstatus_fs are:
-> + * 0 = disabled, 1 = initial, 2 = clean, 3 = dirty
-> + * We will have already diagnosed disabled state,
-> + * and need to turn initial/clean into dirty.
-> + */
-> +static void mark_fs_dirty(DisasContext *ctx)
-> +{
-> +    TCGv tmp;
-> +    if (ctx->mstatus_fs == MSTATUS_FS) {
-> +        return;
-> +    }
-> +    /* Remember the state change for the rest of the TB.  */
-> +    ctx->mstatus_fs = MSTATUS_FS;
-> +
-> +    tmp = tcg_temp_new();
-> +    tcg_gen_ld_tl(tmp, cpu_env, offsetof(CPURISCVState, mstatus));
-> +    tcg_gen_ori_tl(tmp, tmp, MSTATUS_FS);
-> +    tcg_gen_st_tl(tmp, cpu_env, offsetof(CPURISCVState, mstatus));
-> +    tcg_temp_free(tmp);
-> +}
-> +#else
-> +static inline void mark_fs_dirty(DisasContext *ctx) { }
-> +#endif
-> +
->  static void gen_fp_load(DisasContext *ctx, uint32_t opc, int rd,
->          int rs1, target_long imm)
+> @@ -44,7 +44,7 @@ typedef struct DisasContext {
+>      /* pc_succ_insn points to the instruction following base.pc_next */
+>      target_ulong pc_succ_insn;
+>      uint32_t opcode;
+> -    uint32_t flags;
+> +    uint32_t mstatus_fs;
+>      uint32_t mem_idx;
+>      /* Remember the rounding mode encoded in the previous fp instruction,
+>         which we have already installed into env->fp_status.  Or -1 for
+> @@ -656,7 +656,7 @@ static void gen_fp_load(DisasContext *ctx, uint32_t opc, int rd,
 >  {
-> @@ -679,6 +704,8 @@ static void gen_fp_load(DisasContext *ctx, uint32_t opc, int rd,
->          break;
->      }
->      tcg_temp_free(t0);
-> +
-> +    mark_fs_dirty(ctx);
->  }
+>      TCGv t0;
 >
->  static void gen_fp_store(DisasContext *ctx, uint32_t opc, int rs1,
-> @@ -944,6 +971,7 @@ static void gen_fp_arith(DisasContext *ctx, uint32_t opc, int rd,
->                           int rs1, int rs2, int rm)
+> -    if (!(ctx->flags & TB_FLAGS_FP_ENABLE)) {
+> +    if (ctx->mstatus_fs == 0) {
+>          gen_exception_illegal(ctx);
+>          return;
+>      }
+> @@ -686,7 +686,7 @@ static void gen_fp_store(DisasContext *ctx, uint32_t opc, int rs1,
+>  {
+>      TCGv t0;
+>
+> -    if (!(ctx->flags & TB_FLAGS_FP_ENABLE)) {
+> +    if (ctx->mstatus_fs == 0) {
+>          gen_exception_illegal(ctx);
+>          return;
+>      }
+> @@ -945,7 +945,7 @@ static void gen_fp_arith(DisasContext *ctx, uint32_t opc, int rd,
 >  {
 >      TCGv t0 = NULL;
-> +    bool fp_output = true;
 >
->      if (ctx->mstatus_fs == 0) {
+> -    if (!(ctx->flags & TB_FLAGS_FP_ENABLE)) {
+> +    if (ctx->mstatus_fs == 0) {
 >          goto do_illegal;
-> @@ -1006,6 +1034,7 @@ static void gen_fp_arith(DisasContext *ctx, uint32_t opc, int rd,
->          }
->          gen_set_gpr(rd, t0);
->          tcg_temp_free(t0);
-> +        fp_output = false;
->          break;
->
->      case OPC_RISC_FCVT_W_S:
-> @@ -1035,6 +1064,7 @@ static void gen_fp_arith(DisasContext *ctx, uint32_t opc, int rd,
->          }
->          gen_set_gpr(rd, t0);
->          tcg_temp_free(t0);
-> +        fp_output = false;
->          break;
->
->      case OPC_RISC_FCVT_S_W:
-> @@ -1085,6 +1115,7 @@ static void gen_fp_arith(DisasContext *ctx, uint32_t opc, int rd,
->          }
->          gen_set_gpr(rd, t0);
->          tcg_temp_free(t0);
-> +        fp_output = false;
->          break;
->
->      case OPC_RISC_FMV_S_X:
-> @@ -1177,6 +1208,7 @@ static void gen_fp_arith(DisasContext *ctx, uint32_t opc, int rd,
->          }
->          gen_set_gpr(rd, t0);
->          tcg_temp_free(t0);
-> +        fp_output = false;
->          break;
->
->      case OPC_RISC_FCVT_W_D:
-> @@ -1206,6 +1238,7 @@ static void gen_fp_arith(DisasContext *ctx, uint32_t opc, int rd,
->          }
->          gen_set_gpr(rd, t0);
->          tcg_temp_free(t0);
-> +        fp_output = false;
->          break;
->
->      case OPC_RISC_FCVT_D_W:
-> @@ -1253,6 +1286,7 @@ static void gen_fp_arith(DisasContext *ctx, uint32_t opc, int rd,
->          default:
->              goto do_illegal;
->          }
-> +        fp_output = false;
->          break;
->
->      case OPC_RISC_FMV_D_X:
-> @@ -1269,7 +1303,11 @@ static void gen_fp_arith(DisasContext *ctx, uint32_t opc, int rd,
->              tcg_temp_free(t0);
->          }
->          gen_exception_illegal(ctx);
-> -        break;
-> +        return;
-> +    }
-> +
-> +    if (fp_output) {
-> +        mark_fs_dirty(ctx);
 >      }
+>
+> @@ -1810,8 +1810,8 @@ static void riscv_tr_init_disas_context(DisasContextBase *dcbase, CPUState *cs)
+>      DisasContext *ctx = container_of(dcbase, DisasContext, base);
+>
+>      ctx->pc_succ_insn = ctx->base.pc_first;
+> -    ctx->flags = ctx->base.tb->flags;
+>      ctx->mem_idx = ctx->base.tb->flags & TB_FLAGS_MMU_MASK;
+> +    ctx->mstatus_fs = ctx->base.tb->flags & TB_FLAGS_MSTATUS_FS;
+>      ctx->frm = -1;  /* unknown rounding mode */
 >  }
 >
 > --
