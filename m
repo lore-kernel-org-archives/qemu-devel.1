@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58044)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58065)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fNiK5-0004ia-5Y
+	(envelope-from <kwolf@redhat.com>) id 1fNiK5-0004j0-Qg
 	for qemu-devel@nongnu.org; Tue, 29 May 2018 13:22:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fNiK3-0001dx-Ve
+	(envelope-from <kwolf@redhat.com>) id 1fNiK4-0001eb-QG
 	for qemu-devel@nongnu.org; Tue, 29 May 2018 13:22:13 -0400
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Tue, 29 May 2018 19:21:36 +0200
-Message-Id: <20180529172156.29311-1-kwolf@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v2 00/20] Drain fixes and cleanups, part 3
+Date: Tue, 29 May 2018 19:21:38 +0200
+Message-Id: <20180529172156.29311-3-kwolf@redhat.com>
+In-Reply-To: <20180529172156.29311-1-kwolf@redhat.com>
+References: <20180529172156.29311-1-kwolf@redhat.com>
+Subject: [Qemu-devel] [PATCH v2 02/20] block: Use bdrv_do_drain_begin/end in
+ bdrv_drain_all()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,91 +23,98 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, mreitz@redhat.com, pbonzini@redhat.com, famz@redhat.com, stefanha@redhat.com, eblake@redhat.com, qemu-devel@nongnu.org
 
-This is the third and hopefully for now last part of my work to fix
-drain. The main goal of this series is to make drain robust against
-graph changes that happen in any callbacks of in-flight requests while
-we drain a block node.
+bdrv_do_drain_begin/end() implement already everything that
+bdrv_drain_all_begin/end() need and currently still do manually: Disable
+external events, call parent drain callbacks, call block driver
+callbacks.
 
-The individual patches describe the details, but the rough plan is to
-change all three drain types (single node, subtree and all) to work like
-this:
+It also does two more things:
 
-1. First call all the necessary callbacks to quiesce external sources
-   for new requests. This includes the block driver callbacks, the child
-   node callbacks and disabling external AioContext events. This is done
-   recursively.
+The first is incrementing bs->quiesce_counter. bdrv_drain_all() already
+stood out in the test case by behaving different from the other drain
+variants. Adding this is not only safe, but in fact a bug fix.
 
-   Much of the trouble we had with drain resulted from the fact that the
-   graph changed while we were traversing the graph recursively. None of
-   the callbacks called in this phase may change the graph.
+The second is calling bdrv_drain_recurse(). We already do that later in
+the same function in a loop, so basically doing an early first iteration
+doesn't hurt.
 
-2. Then do a single AIO_WAIT_WHILE() to drain the requests of all
-   affected nodes. The aio_poll() called by it is where graph changes
-   can happen and we need to be careful.
+Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+---
+ block/io.c              | 10 ++--------
+ tests/test-bdrv-drain.c | 14 ++++----------
+ 2 files changed, 6 insertions(+), 18 deletions(-)
 
-   However, while evaluating the loop condition, the graph can't change,
-   so we can safely call all necessary callbacks, if needed recursively,
-   to determine whether there are still pending requests in any affected
-   nodes. We just need to make sure that we don't rely on the set of
-   nodes being the same between any two evaluation of the condition.
-
-There are a few more smaller, mostly self-contained changes needed
-before we're actually safe, but this is the main mechanism that will
-help you understand what we're working towards during the series.
-
-v2:
-
-- Rebased on top of current master (e.g. including Job infrastructure)
-
-- Avoid unnecessary parent callbacks for .drained_begin/poll/end:
-  * subtree drains: Don't propagate the drain to the parent that we came
-                    from recursively
-  * drain_all:      Don't propagate the drain to BDS parents (which are
-                    already separately drained), but only to non-BDS
-                    parents like BBs or Jobs
-
-- Separate bdrv_drain_poll_top_level() function instead of having a
-  top_level parameter for bdrv_drain_poll().
-
-- A few commit message and comment improvements
-
-
-Kevin Wolf (19):
-  test-bdrv-drain: bdrv_drain() works with cross-AioContext events
-  block: Use bdrv_do_drain_begin/end in bdrv_drain_all()
-  block: Remove 'recursive' parameter from bdrv_drain_invoke()
-  block: Don't manually poll in bdrv_drain_all()
-  tests/test-bdrv-drain: bdrv_drain_all() works in coroutines now
-  block: Avoid unnecessary aio_poll() in AIO_WAIT_WHILE()
-  block: Really pause block jobs on drain
-  block: Remove bdrv_drain_recurse()
-  block: Drain recursively with a single BDRV_POLL_WHILE()
-  test-bdrv-drain: Test node deletion in subtree recursion
-  block: Don't poll in parent drain callbacks
-  test-bdrv-drain: Graph change through parent callback
-  block: Defer .bdrv_drain_begin callback to polling phase
-  test-bdrv-drain: Test that bdrv_drain_invoke() doesn't poll
-  block: Allow AIO_WAIT_WHILE with NULL ctx
-  block: Move bdrv_drain_all_begin() out of coroutine context
-  block: ignore_bds_parents parameter for drain functions
-  block: Allow graph changes in bdrv_drain_all_begin/end sections
-  test-bdrv-drain: Test graph changes in drain_all section
-
-Max Reitz (1):
-  test-bdrv-drain: Add test for node deletion
-
- include/block/aio-wait.h     |  25 +-
- include/block/block.h        |  31 +-
- include/block/block_int.h    |  14 +
- include/block/blockjob_int.h |   8 +
- block.c                      |  52 +++-
- block/io.c                   | 332 ++++++++++++--------
- block/mirror.c               |   8 +
- block/vvfat.c                |   1 +
- blockjob.c                   |  23 ++
- tests/test-bdrv-drain.c      | 705 +++++++++++++++++++++++++++++++++++++=
-++++--
- 10 files changed, 1032 insertions(+), 167 deletions(-)
-
---=20
+diff --git a/block/io.c b/block/io.c
+index 1e4e2f40ea..73579b31cf 100644
+--- a/block/io.c
++++ b/block/io.c
+@@ -413,11 +413,8 @@ void bdrv_drain_all_begin(void)
+     for (bs = bdrv_first(&it); bs; bs = bdrv_next(&it)) {
+         AioContext *aio_context = bdrv_get_aio_context(bs);
+ 
+-        /* Stop things in parent-to-child order */
+         aio_context_acquire(aio_context);
+-        aio_disable_external(aio_context);
+-        bdrv_parent_drained_begin(bs, NULL);
+-        bdrv_drain_invoke(bs, true, true);
++        bdrv_do_drained_begin(bs, true, NULL);
+         aio_context_release(aio_context);
+ 
+         if (!g_slist_find(aio_ctxs, aio_context)) {
+@@ -458,11 +455,8 @@ void bdrv_drain_all_end(void)
+     for (bs = bdrv_first(&it); bs; bs = bdrv_next(&it)) {
+         AioContext *aio_context = bdrv_get_aio_context(bs);
+ 
+-        /* Re-enable things in child-to-parent order */
+         aio_context_acquire(aio_context);
+-        bdrv_drain_invoke(bs, false, true);
+-        bdrv_parent_drained_end(bs, NULL);
+-        aio_enable_external(aio_context);
++        bdrv_do_drained_end(bs, true, NULL);
+         aio_context_release(aio_context);
+     }
+ }
+diff --git a/tests/test-bdrv-drain.c b/tests/test-bdrv-drain.c
+index 1682e2b72d..4c3e93de0b 100644
+--- a/tests/test-bdrv-drain.c
++++ b/tests/test-bdrv-drain.c
+@@ -276,8 +276,7 @@ static void test_quiesce_common(enum drain_type drain_type, bool recursive)
+ 
+ static void test_quiesce_drain_all(void)
+ {
+-    // XXX drain_all doesn't quiesce
+-    //test_quiesce_common(BDRV_DRAIN_ALL, true);
++    test_quiesce_common(BDRV_DRAIN_ALL, true);
+ }
+ 
+ static void test_quiesce_drain(void)
+@@ -319,12 +318,7 @@ static void test_nested(void)
+ 
+     for (outer = 0; outer < DRAIN_TYPE_MAX; outer++) {
+         for (inner = 0; inner < DRAIN_TYPE_MAX; inner++) {
+-            /* XXX bdrv_drain_all() doesn't increase the quiesce_counter */
+-            int bs_quiesce      = (outer != BDRV_DRAIN_ALL) +
+-                                  (inner != BDRV_DRAIN_ALL);
+-            int backing_quiesce = (outer == BDRV_SUBTREE_DRAIN) +
+-                                  (inner == BDRV_SUBTREE_DRAIN);
+-            int backing_cb_cnt  = (outer != BDRV_DRAIN) +
++            int backing_quiesce = (outer != BDRV_DRAIN) +
+                                   (inner != BDRV_DRAIN);
+ 
+             g_assert_cmpint(bs->quiesce_counter, ==, 0);
+@@ -335,10 +329,10 @@ static void test_nested(void)
+             do_drain_begin(outer, bs);
+             do_drain_begin(inner, bs);
+ 
+-            g_assert_cmpint(bs->quiesce_counter, ==, bs_quiesce);
++            g_assert_cmpint(bs->quiesce_counter, ==, 2);
+             g_assert_cmpint(backing->quiesce_counter, ==, backing_quiesce);
+             g_assert_cmpint(s->drain_count, ==, 2);
+-            g_assert_cmpint(backing_s->drain_count, ==, backing_cb_cnt);
++            g_assert_cmpint(backing_s->drain_count, ==, backing_quiesce);
+ 
+             do_drain_end(inner, bs);
+             do_drain_end(outer, bs);
+-- 
 2.13.6
