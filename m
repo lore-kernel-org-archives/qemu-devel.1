@@ -1,27 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55373)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55634)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fNgWo-0003ba-Eo
-	for qemu-devel@nongnu.org; Tue, 29 May 2018 11:27:20 -0400
+	(envelope-from <jcody@redhat.com>) id 1fNgWy-0003j9-CD
+	for qemu-devel@nongnu.org; Tue, 29 May 2018 11:27:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fNgWn-0001wl-EY
-	for qemu-devel@nongnu.org; Tue, 29 May 2018 11:27:14 -0400
-References: <20170724182751.18261-1-f4bug@amsat.org>
-	<20170724182751.18261-22-f4bug@amsat.org>
-	<CAFEAcA_PRH_BuUOTtC=cvRFT7Gtiwt50T6C3avm+Sy13aDS4tg@mail.gmail.com>
-	<ae090923-3523-3e56-fbc1-65b270680939@amsat.org>
-	<e0d37c83-537a-5288-b033-e5be3b8858ca@redhat.com>
-	<c1078250-30a0-0d4c-d830-88591fb6ba43@redhat.com>
-	<713f16f9-3faa-7644-38c6-0797252d5922@amsat.org>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <63a61375-ef2e-970c-7f43-6cfe1d7666b1@redhat.com>
-Date: Tue, 29 May 2018 10:27:03 -0500
+	(envelope-from <jcody@redhat.com>) id 1fNgWw-000279-Rt
+	for qemu-devel@nongnu.org; Tue, 29 May 2018 11:27:24 -0400
+Date: Tue, 29 May 2018 11:27:14 -0400
+From: Jeff Cody <jcody@redhat.com>
+Message-ID: <20180529152714.GG6999@localhost.localdomain>
+References: <20180525163327.23097-1-kwolf@redhat.com>
+	<20180525163327.23097-5-kwolf@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <713f16f9-3faa-7644-38c6-0797252d5922@amsat.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH for 2.10 21/35] arm/sysbus-fdt: fix null
- pointer dereference
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180525163327.23097-5-kwolf@redhat.com>
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 04/14] block/create: Make
+ x-blockdev-create a job
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,45 +24,199 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Cc: Peter Maydell <peter.maydell@linaro.org>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, Markus Armbruster <armbru@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, mreitz@redhat.com
 
-[adding Markus, as the error maintainer]
+On Fri, May 25, 2018 at 06:33:17PM +0200, Kevin Wolf wrote:
+> This changes the x-blockdev-create QMP command so that it doesn't block
+> the monitor and the main loop any more, but starts a background job that
+> performs the image creation.
+> 
 
-On 05/29/2018 09:33 AM, Philippe Mathieu-Daud=C3=A9 wrote:
+This comes down to "user error", but now that the monitor and main loop are
+not blocked (which is good), should we try at all to catch/prevent a
+blockdev-add that is issued before a blockdev-create completion?
 
->>>> Ok I see, Clang is unaware than error_setg(&error_fatal) is a noretu=
-rn.
->>>
->>> Indeed, and that's because error_setg(&error_fatal) is not in preferr=
-ed
->>> form.
->>>
->>>>
->>>> Patch dropped.
->>>
->>> That's a shame.  Rather, we should patch this file (and others) to av=
-oid
->>> all the inconsistent uses of error_setg(&error_*), to comply with the
->>> error.h documentation.
->=20
-> I started to port/clean this up.
-> To avoid future inconsistencies, do you think we should/can enforce thi=
-s
-> check in checkpatch (which is stricter than human review)?
-
-Sure, automating good code style is worthwhile.
-
-> Is the "Qemu error function tests" section a good place to put this che=
-ck?
-
-Probably works.  I'm not familiar enough with checkpatch as a whole to=20
-have any different suggestions off the top of my head (basically, any=20
-time I've touched that file, it's been grepping for something that is=20
-similar to what I want to be tweaking, rather than reading the whole thin=
-g).
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+> The basic job as implemented here is all that is necessary to make image
+> creation asynchronous and to provide a QMP interface that can be marked
+> stable, but it still lacks a few features that jobs usually provide: The
+> job will ignore pause commands and it doesn't publish progress yet (so
+> both current-progress and total-progress stay at 0). These features can
+> be added later without breaking compatibility.
+> 
+> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+> ---
+>  qapi/block-core.json     | 14 +++++++----
+>  qapi/job.json            |  4 +++-
+>  block/create.c           | 61 ++++++++++++++++++++++++++++++++----------------
+>  tests/qemu-iotests/group | 14 ++++++-----
+>  4 files changed, 61 insertions(+), 32 deletions(-)
+> 
+> diff --git a/qapi/block-core.json b/qapi/block-core.json
+> index 7dfa77a05c..1ed3a82373 100644
+> --- a/qapi/block-core.json
+> +++ b/qapi/block-core.json
+> @@ -4013,14 +4013,18 @@
+>  ##
+>  # @x-blockdev-create:
+>  #
+> -# Create an image format on a given node.
+> -# TODO Replace with something asynchronous (block job?)
+> +# Starts a job to create an image format on a given node. The job is
+> +# automatically finalized, but a manual job-dismiss is required.
+>  #
+> -# Since: 2.12
+> +# @job-id:          Identifier for the newly created job.
+> +#
+> +# @options:         Options for the image creation.
+> +#
+> +# Since: 3.0
+>  ##
+>  { 'command': 'x-blockdev-create',
+> -  'data': 'BlockdevCreateOptions',
+> -  'boxed': true }
+> +  'data': { 'job-id': 'str',
+> +            'options': 'BlockdevCreateOptions' } }
+>  
+>  ##
+>  # @blockdev-open-tray:
+> diff --git a/qapi/job.json b/qapi/job.json
+> index 970124de76..69c1970a58 100644
+> --- a/qapi/job.json
+> +++ b/qapi/job.json
+> @@ -17,10 +17,12 @@
+>  #
+>  # @backup: drive backup job type, see "drive-backup"
+>  #
+> +# @create: image creation job type, see "x-blockdev-create" (since 3.0)
+> +#
+>  # Since: 1.7
+>  ##
+>  { 'enum': 'JobType',
+> -  'data': ['commit', 'stream', 'mirror', 'backup'] }
+> +  'data': ['commit', 'stream', 'mirror', 'backup', 'create'] }
+>  
+>  ##
+>  # @JobStatus:
+> diff --git a/block/create.c b/block/create.c
+> index 8bd8a03719..87fdab3b72 100644
+> --- a/block/create.c
+> +++ b/block/create.c
+> @@ -24,28 +24,49 @@
+>  
+>  #include "qemu/osdep.h"
+>  #include "block/block_int.h"
+> +#include "qemu/job.h"
+>  #include "qapi/qapi-commands-block-core.h"
+> +#include "qapi/qapi-visit-block-core.h"
+> +#include "qapi/clone-visitor.h"
+>  #include "qapi/error.h"
+>  
+> -typedef struct BlockdevCreateCo {
+> +typedef struct BlockdevCreateJob {
+> +    Job common;
+>      BlockDriver *drv;
+>      BlockdevCreateOptions *opts;
+>      int ret;
+> -    Error **errp;
+> -} BlockdevCreateCo;
+> +    Error *err;
+> +} BlockdevCreateJob;
+>  
+> -static void coroutine_fn bdrv_co_create_co_entry(void *opaque)
+> +static void blockdev_create_complete(Job *job, void *opaque)
+>  {
+> -    BlockdevCreateCo *cco = opaque;
+> -    cco->ret = cco->drv->bdrv_co_create(cco->opts, cco->errp);
+> +    BlockdevCreateJob *s = container_of(job, BlockdevCreateJob, common);
+> +
+> +    job_completed(job, s->ret, s->err);
+>  }
+>  
+> -void qmp_x_blockdev_create(BlockdevCreateOptions *options, Error **errp)
+> +static void coroutine_fn blockdev_create_run(void *opaque)
+>  {
+> +    BlockdevCreateJob *s = opaque;
+> +
+> +    s->ret = s->drv->bdrv_co_create(s->opts, &s->err);
+> +
+> +    qapi_free_BlockdevCreateOptions(s->opts);
+> +    job_defer_to_main_loop(&s->common, blockdev_create_complete, NULL);
+> +}
+> +
+> +static const JobDriver blockdev_create_job_driver = {
+> +    .instance_size = sizeof(BlockdevCreateJob),
+> +    .job_type      = JOB_TYPE_CREATE,
+> +    .start         = blockdev_create_run,
+> +};
+> +
+> +void qmp_x_blockdev_create(const char *job_id, BlockdevCreateOptions *options,
+> +                           Error **errp)
+> +{
+> +    BlockdevCreateJob *s;
+>      const char *fmt = BlockdevDriver_str(options->driver);
+>      BlockDriver *drv = bdrv_find_format(fmt);
+> -    Coroutine *co;
+> -    BlockdevCreateCo cco;
+>  
+>      /* If the driver is in the schema, we know that it exists. But it may not
+>       * be whitelisted. */
+> @@ -61,16 +82,16 @@ void qmp_x_blockdev_create(BlockdevCreateOptions *options, Error **errp)
+>          return;
+>      }
+>  
+> -    cco = (BlockdevCreateCo) {
+> -        .drv = drv,
+> -        .opts = options,
+> -        .ret = -EINPROGRESS,
+> -        .errp = errp,
+> -    };
+> -
+> -    co = qemu_coroutine_create(bdrv_co_create_co_entry, &cco);
+> -    qemu_coroutine_enter(co);
+> -    while (cco.ret == -EINPROGRESS) {
+> -        aio_poll(qemu_get_aio_context(), true);
+> +    /* Create the block job */
+> +    s = job_create(job_id, &blockdev_create_job_driver, NULL,
+> +                   qemu_get_aio_context(), JOB_DEFAULT | JOB_MANUAL_DISMISS,
+> +                   NULL, NULL, errp);
+> +    if (!s) {
+> +        return;
+>      }
+> +
+> +    s->drv = drv,
+> +    s->opts = QAPI_CLONE(BlockdevCreateOptions, options),
+> +
+> +    job_start(&s->common);
+>  }
+> diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
+> index 93f93d71ba..22b0082db3 100644
+> --- a/tests/qemu-iotests/group
+> +++ b/tests/qemu-iotests/group
+> @@ -204,14 +204,16 @@
+>  203 rw auto migration
+>  204 rw auto quick
+>  205 rw auto quick
+> -206 rw auto
+> -207 rw auto
+> +# TODO The following commented out tests need to be reworked to work
+> +# with the x-blockdev-create job
+> +#206 rw auto
+> +#207 rw auto
+>  208 rw auto quick
+>  209 rw auto quick
+> -210 rw auto
+> -211 rw auto quick
+> -212 rw auto quick
+> -213 rw auto quick
+> +#210 rw auto
+> +#211 rw auto quick
+> +#212 rw auto quick
+> +#213 rw auto quick
+>  214 rw auto
+>  215 rw auto quick
+>  216 rw auto quick
+> -- 
+> 2.13.6
+> 
+> 
