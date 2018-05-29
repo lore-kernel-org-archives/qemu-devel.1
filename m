@@ -1,20 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35459)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36323)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1fNigR-0003Io-Mg
-	for qemu-devel@nongnu.org; Tue, 29 May 2018 13:45:21 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fNijZ-0004Gg-DJ
+	for qemu-devel@nongnu.org; Tue, 29 May 2018 13:48:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1fNigO-0002yv-Jk
-	for qemu-devel@nongnu.org; Tue, 29 May 2018 13:45:19 -0400
-Resent-Message-Id: <E1fNigO-0002yv-Jk@eggs.gnu.org>
-In-Reply-To: <20180529172156.29311-1-kwolf@redhat.com>
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <152761590409.300.12807852942795857784@d39dc562802a>
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fNijW-00054r-By
+	for qemu-devel@nongnu.org; Tue, 29 May 2018 13:48:33 -0400
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Date: Tue, 29 May 2018 14:48:17 -0300
+Message-Id: <20180529174821.19964-1-f4bug@amsat.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Tue, 29 May 2018 10:45:05 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PATCH v2 00/20] Drain fixes and cleanups, part 3
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH 0/4] qapi/error: converts
+ error_setg(&error_fatal) to error_report() + exit()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,116 +25,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: kwolf@redhat.com
-Cc: famz@redhat.com, qemu-block@nongnu.orgfamz@redhat.com, qemu-devel@nongnu.org, mreitz@redhat.com, stefanha@redhat.com, pbonzini@redhat.com
+To: Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, qemu-block@nongnu.org, qemu-ppc@nongnu.org, qemu-arm@nongnu.org, John Snow <jsnow@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Alexander Graf <agraf@suse.de>
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
-c3NhZ2UtaWQ6IDIwMTgwNTI5MTcyMTU2LjI5MzExLTEta3dvbGZAcmVkaGF0LmNvbQpTdWJqZWN0
-OiBbUWVtdS1kZXZlbF0gW1BBVENIIHYyIDAwLzIwXSBEcmFpbiBmaXhlcyBhbmQgY2xlYW51cHMs
-IHBhcnQgMwoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFzaAoKQkFTRT1iYXNl
-Cm49MQp0b3RhbD0kKGdpdCBsb2cgLS1vbmVsaW5lICRCQVNFLi4gfCB3YyAtbCkKZmFpbGVkPTAK
-CmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxpbWl0IDAKZ2l0IGNvbmZpZyAtLWxvY2Fs
-IGRpZmYucmVuYW1lcyBUcnVlCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLmFsZ29yaXRobSBoaXN0
-b2dyYW0KCmNvbW1pdHM9IiQoZ2l0IGxvZyAtLWZvcm1hdD0lSCAtLXJldmVyc2UgJEJBU0UuLiki
-CmZvciBjIGluICRjb21taXRzOyBkbwogICAgZWNobyAiQ2hlY2tpbmcgUEFUQ0ggJG4vJHRvdGFs
-OiAkKGdpdCBsb2cgLW4gMSAtLWZvcm1hdD0lcyAkYykuLi4iCiAgICBpZiAhIGdpdCBzaG93ICRj
-IC0tZm9ybWF0PWVtYWlsIHwgLi9zY3JpcHRzL2NoZWNrcGF0Y2gucGwgLS1tYWlsYmFjayAtOyB0
-aGVuCiAgICAgICAgZmFpbGVkPTEKICAgICAgICBlY2hvCiAgICBmaQogICAgbj0kKChuKzEpKQpk
-b25lCgpleGl0ICRmYWlsZWQKPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KClVwZGF0aW5nIDNjOGNm
-NWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMzODQKRnJvbSBodHRwczovL2dpdGh1Yi5j
-b20vcGF0Y2hldy1wcm9qZWN0L3FlbXUKICogW25ldyB0YWddICAgICAgICAgICAgICAgcGF0Y2hl
-dy8yMDE4MDUyOTE3MjE1Ni4yOTMxMS0xLWt3b2xmQHJlZGhhdC5jb20gLT4gcGF0Y2hldy8yMDE4
-MDUyOTE3MjE1Ni4yOTMxMS0xLWt3b2xmQHJlZGhhdC5jb20KU3dpdGNoZWQgdG8gYSBuZXcgYnJh
-bmNoICd0ZXN0JwplYWI1ZTgyODdmIHRlc3QtYmRydi1kcmFpbjogVGVzdCBncmFwaCBjaGFuZ2Vz
-IGluIGRyYWluX2FsbCBzZWN0aW9uCjMzMDBkOTRhOWIgYmxvY2s6IEFsbG93IGdyYXBoIGNoYW5n
-ZXMgaW4gYmRydl9kcmFpbl9hbGxfYmVnaW4vZW5kIHNlY3Rpb25zCjNhMzcwMTJlZTkgYmxvY2s6
-IGlnbm9yZV9iZHNfcGFyZW50cyBwYXJhbWV0ZXIgZm9yIGRyYWluIGZ1bmN0aW9ucwphMGNkOTky
-M2IyIGJsb2NrOiBNb3ZlIGJkcnZfZHJhaW5fYWxsX2JlZ2luKCkgb3V0IG9mIGNvcm91dGluZSBj
-b250ZXh0CjdkZjljYjI4NWYgYmxvY2s6IEFsbG93IEFJT19XQUlUX1dISUxFIHdpdGggTlVMTCBj
-dHgKZmE3ZDBhYzI1ZSB0ZXN0LWJkcnYtZHJhaW46IFRlc3QgdGhhdCBiZHJ2X2RyYWluX2ludm9r
-ZSgpIGRvZXNuJ3QgcG9sbAozYzk4MTgyYmE1IGJsb2NrOiBEZWZlciAuYmRydl9kcmFpbl9iZWdp
-biBjYWxsYmFjayB0byBwb2xsaW5nIHBoYXNlCjkyOGY2Zjg1YTQgdGVzdC1iZHJ2LWRyYWluOiBH
-cmFwaCBjaGFuZ2UgdGhyb3VnaCBwYXJlbnQgY2FsbGJhY2sKNzVlNThiZTNhYSBibG9jazogRG9u
-J3QgcG9sbCBpbiBwYXJlbnQgZHJhaW4gY2FsbGJhY2tzCjg0ZmVhMTQ0ODIgdGVzdC1iZHJ2LWRy
-YWluOiBUZXN0IG5vZGUgZGVsZXRpb24gaW4gc3VidHJlZSByZWN1cnNpb24KNmU0ZDljZGE3MCBi
-bG9jazogRHJhaW4gcmVjdXJzaXZlbHkgd2l0aCBhIHNpbmdsZSBCRFJWX1BPTExfV0hJTEUoKQo5
-NTMxYmEzMmI3IHRlc3QtYmRydi1kcmFpbjogQWRkIHRlc3QgZm9yIG5vZGUgZGVsZXRpb24KZjZm
-ZTE0YWJhZCBibG9jazogUmVtb3ZlIGJkcnZfZHJhaW5fcmVjdXJzZSgpCmFhN2FkZTc1Y2YgYmxv
-Y2s6IFJlYWxseSBwYXVzZSBibG9jayBqb2JzIG9uIGRyYWluCjAwZDUyYTI3YjYgYmxvY2s6IEF2
-b2lkIHVubmVjZXNzYXJ5IGFpb19wb2xsKCkgaW4gQUlPX1dBSVRfV0hJTEUoKQpjOTY0NTA4OTZh
-IHRlc3RzL3Rlc3QtYmRydi1kcmFpbjogYmRydl9kcmFpbl9hbGwoKSB3b3JrcyBpbiBjb3JvdXRp
-bmVzIG5vdwo5NTVjNTJhZTI5IGJsb2NrOiBEb24ndCBtYW51YWxseSBwb2xsIGluIGJkcnZfZHJh
-aW5fYWxsKCkKMDk3MTNjOWFjNyBibG9jazogUmVtb3ZlICdyZWN1cnNpdmUnIHBhcmFtZXRlciBm
-cm9tIGJkcnZfZHJhaW5faW52b2tlKCkKZTBjY2Q5YzhmMiBibG9jazogVXNlIGJkcnZfZG9fZHJh
-aW5fYmVnaW4vZW5kIGluIGJkcnZfZHJhaW5fYWxsKCkKOWUwZWE4ZWQwMCB0ZXN0LWJkcnYtZHJh
-aW46IGJkcnZfZHJhaW4oKSB3b3JrcyB3aXRoIGNyb3NzLUFpb0NvbnRleHQgZXZlbnRzCgo9PT0g
-T1VUUFVUIEJFR0lOID09PQpDaGVja2luZyBQQVRDSCAxLzIwOiB0ZXN0LWJkcnYtZHJhaW46IGJk
-cnZfZHJhaW4oKSB3b3JrcyB3aXRoIGNyb3NzLUFpb0NvbnRleHQgZXZlbnRzLi4uCkNoZWNraW5n
-IFBBVENIIDIvMjA6IGJsb2NrOiBVc2UgYmRydl9kb19kcmFpbl9iZWdpbi9lbmQgaW4gYmRydl9k
-cmFpbl9hbGwoKS4uLgpDaGVja2luZyBQQVRDSCAzLzIwOiBibG9jazogUmVtb3ZlICdyZWN1cnNp
-dmUnIHBhcmFtZXRlciBmcm9tIGJkcnZfZHJhaW5faW52b2tlKCkuLi4KQ2hlY2tpbmcgUEFUQ0gg
-NC8yMDogYmxvY2s6IERvbid0IG1hbnVhbGx5IHBvbGwgaW4gYmRydl9kcmFpbl9hbGwoKS4uLgpD
-aGVja2luZyBQQVRDSCA1LzIwOiB0ZXN0cy90ZXN0LWJkcnYtZHJhaW46IGJkcnZfZHJhaW5fYWxs
-KCkgd29ya3MgaW4gY29yb3V0aW5lcyBub3cuLi4KQ2hlY2tpbmcgUEFUQ0ggNi8yMDogYmxvY2s6
-IEF2b2lkIHVubmVjZXNzYXJ5IGFpb19wb2xsKCkgaW4gQUlPX1dBSVRfV0hJTEUoKS4uLgpFUlJP
-UjogdHJhaWxpbmcgc3RhdGVtZW50cyBzaG91bGQgYmUgb24gbmV4dCBsaW5lCiMzODogRklMRTog
-YmxvY2svaW8uYzoxOTA6CisgICAgd2hpbGUgKGFpb19wb2xsKGJzLT5haW9fY29udGV4dCwgZmFs
-c2UpKTsKCkVSUk9SOiBicmFjZXMge30gYXJlIG5lY2Vzc2FyeSBmb3IgYWxsIGFybXMgb2YgdGhp
-cyBzdGF0ZW1lbnQKIzM4OiBGSUxFOiBibG9jay9pby5jOjE5MDoKKyAgICB3aGlsZSAoYWlvX3Bv
-bGwoYnMtPmFpb19jb250ZXh0LCBmYWxzZSkpOwpbLi4uXQoKdG90YWw6IDIgZXJyb3JzLCAwIHdh
-cm5pbmdzLCA2MCBsaW5lcyBjaGVja2VkCgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVtcywg
-cGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZl
-cyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRB
-SU5FUlMuCgpDaGVja2luZyBQQVRDSCA3LzIwOiBibG9jazogUmVhbGx5IHBhdXNlIGJsb2NrIGpv
-YnMgb24gZHJhaW4uLi4KQ2hlY2tpbmcgUEFUQ0ggOC8yMDogYmxvY2s6IFJlbW92ZSBiZHJ2X2Ry
-YWluX3JlY3Vyc2UoKS4uLgpDaGVja2luZyBQQVRDSCA5LzIwOiB0ZXN0LWJkcnYtZHJhaW46IEFk
-ZCB0ZXN0IGZvciBub2RlIGRlbGV0aW9uLi4uCkNoZWNraW5nIFBBVENIIDEwLzIwOiBibG9jazog
-RHJhaW4gcmVjdXJzaXZlbHkgd2l0aCBhIHNpbmdsZSBCRFJWX1BPTExfV0hJTEUoKS4uLgpDaGVj
-a2luZyBQQVRDSCAxMS8yMDogdGVzdC1iZHJ2LWRyYWluOiBUZXN0IG5vZGUgZGVsZXRpb24gaW4g
-c3VidHJlZSByZWN1cnNpb24uLi4KV0FSTklORzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzg1
-OiBGSUxFOiB0ZXN0cy90ZXN0LWJkcnYtZHJhaW4uYzoxMDM0OgorICAgIGdfdGVzdF9hZGRfZnVu
-YygiL2JkcnYtZHJhaW4vZGV0YWNoL2RyYWluX3N1YnRyZWUiLCB0ZXN0X2RldGFjaF9ieV9kcmFp
-bl9zdWJ0cmVlKTsKCnRvdGFsOiAwIGVycm9ycywgMSB3YXJuaW5ncywgNjggbGluZXMgY2hlY2tl
-ZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkg
-b2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1h
-aW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgpDaGVja2luZyBQQVRDSCAx
-Mi8yMDogYmxvY2s6IERvbid0IHBvbGwgaW4gcGFyZW50IGRyYWluIGNhbGxiYWNrcy4uLgpDaGVj
-a2luZyBQQVRDSCAxMy8yMDogdGVzdC1iZHJ2LWRyYWluOiBHcmFwaCBjaGFuZ2UgdGhyb3VnaCBw
-YXJlbnQgY2FsbGJhY2suLi4KV0FSTklORzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzgxOiBG
-SUxFOiB0ZXN0cy90ZXN0LWJkcnYtZHJhaW4uYzoxMDQ5OgorICAgIGNoaWxkX2EgPSBiZHJ2X2F0
-dGFjaF9jaGlsZChwYXJlbnRfYiwgYSwgIlBCLUEiLCAmY2hpbGRfYmFja2luZywgJmVycm9yX2Fi
-b3J0KTsKCnRvdGFsOiAwIGVycm9ycywgMSB3YXJuaW5ncywgMTQyIGxpbmVzIGNoZWNrZWQKCllv
-dXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRo
-ZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFp
-bmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KQ2hlY2tpbmcgUEFUQ0ggMTQvMjA6
-IGJsb2NrOiBEZWZlciAuYmRydl9kcmFpbl9iZWdpbiBjYWxsYmFjayB0byBwb2xsaW5nIHBoYXNl
-Li4uCkNoZWNraW5nIFBBVENIIDE1LzIwOiB0ZXN0LWJkcnYtZHJhaW46IFRlc3QgdGhhdCBiZHJ2
-X2RyYWluX2ludm9rZSgpIGRvZXNuJ3QgcG9sbC4uLgpDaGVja2luZyBQQVRDSCAxNi8yMDogYmxv
-Y2s6IEFsbG93IEFJT19XQUlUX1dISUxFIHdpdGggTlVMTCBjdHguLi4KQ2hlY2tpbmcgUEFUQ0gg
-MTcvMjA6IGJsb2NrOiBNb3ZlIGJkcnZfZHJhaW5fYWxsX2JlZ2luKCkgb3V0IG9mIGNvcm91dGlu
-ZSBjb250ZXh0Li4uCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiMyNzogRklMRTog
-YmxvY2svaW8uYzoyNzA6CisgICAgICAgICAgICBiZHJ2X2RvX2RyYWluZWRfYmVnaW4oYnMsIGRh
-dGEtPnJlY3Vyc2l2ZSwgZGF0YS0+cGFyZW50LCBkYXRhLT5wb2xsKTsKCnRvdGFsOiAwIGVycm9y
-cywgMSB3YXJuaW5ncywgNDEgbGluZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUgcHJv
-YmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBw
-b3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGlu
-IE1BSU5UQUlORVJTLgpDaGVja2luZyBQQVRDSCAxOC8yMDogYmxvY2s6IGlnbm9yZV9iZHNfcGFy
-ZW50cyBwYXJhbWV0ZXIgZm9yIGRyYWluIGZ1bmN0aW9ucy4uLgpDaGVja2luZyBQQVRDSCAxOS8y
-MDogYmxvY2s6IEFsbG93IGdyYXBoIGNoYW5nZXMgaW4gYmRydl9kcmFpbl9hbGxfYmVnaW4vZW5k
-IHNlY3Rpb25zLi4uCkVSUk9SOiBkbyBub3QgaW5pdGlhbGlzZSBnbG9iYWxzIHRvIDAgb3IgTlVM
-TAojMTIzOiBGSUxFOiBibG9jay9pby5jOjQ3NzoKK3Vuc2lnbmVkIGludCBiZHJ2X2RyYWluX2Fs
-bF9jb3VudCA9IDA7CgpFUlJPUjogdHJhaWxpbmcgc3RhdGVtZW50cyBzaG91bGQgYmUgb24gbmV4
-dCBsaW5lCiMxMzI6IEZJTEU6IGJsb2NrL2lvLmM6NDg2OgorICAgIHdoaWxlIChhaW9fcG9sbChx
-ZW11X2dldF9haW9fY29udGV4dCgpLCBmYWxzZSkpOwoKRVJST1I6IGJyYWNlcyB7fSBhcmUgbmVj
-ZXNzYXJ5IGZvciBhbGwgYXJtcyBvZiB0aGlzIHN0YXRlbWVudAojMTMyOiBGSUxFOiBibG9jay9p
-by5jOjQ4NjoKKyAgICB3aGlsZSAoYWlvX3BvbGwocWVtdV9nZXRfYWlvX2NvbnRleHQoKSwgZmFs
-c2UpKTsKWy4uLl0KCnRvdGFsOiAzIGVycm9ycywgMCB3YXJuaW5ncywgMTkzIGxpbmVzIGNoZWNr
-ZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55
-IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBt
-YWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCkNoZWNraW5nIFBBVENI
-IDIwLzIwOiB0ZXN0LWJkcnYtZHJhaW46IFRlc3QgZ3JhcGggY2hhbmdlcyBpbiBkcmFpbl9hbGwg
-c2VjdGlvbi4uLgo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29tbWFuZCBleGl0ZWQgd2l0aCBj
-b2RlOiAxCgoKLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0
-dHA6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXct
-ZGV2ZWxAcmVkaGF0LmNvbQ==
+Hi,
+
+This series converts error_setg(&error_fatal) to error_report() + exit() as
+suggested by the "qapi/error.h" documentation.
+
+This reduce Coverity and Clang static analyzer positive falses.
+
+See http://lists.nongnu.org/archive/html/qemu-devel/2017-07/msg07585.html:
+
+    On 07/24/2017 04:52 PM, Eric Blake wrote:
+    That's a shame.  Rather, we should patch this file (and others) to avoid
+    all the inconsistent uses of error_setg(&error_*), to comply with the
+    error.h documentation.
+
+Regards,
+
+Phil.
+
+Philippe Mathieu-Daudé (4):
+  hw/block/fdc: Replace error_setg(&error_abort) by error_report() + abort()
+  hw/ppc/spapr_drc: Replace error_setg(&error_abort) by error_report() +
+    abort()
+  hw/arm/sysbus-fdt: Replace error_setg(&error_fatal) by error_report()
+    + exit()
+  device_tree: Replace error_setg(&error_fatal) by error_report() + exit()
+
+ device_tree.c       | 23 +++++++++++++----------
+ hw/arm/sysbus-fdt.c | 45 ++++++++++++++++++++++++++-------------------
+ hw/block/fdc.c      |  7 ++++---
+ hw/ppc/spapr_drc.c  |  3 ++-
+ 4 files changed, 45 insertions(+), 33 deletions(-)
+
+-- 
+2.17.0
