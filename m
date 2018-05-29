@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50148)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51900)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1fNgPZ-0007fz-48
-	for qemu-devel@nongnu.org; Tue, 29 May 2018 11:19:46 -0400
+	(envelope-from <laurent@vivier.eu>) id 1fNgSQ-0000Nx-18
+	for qemu-devel@nongnu.org; Tue, 29 May 2018 11:22:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1fNgPY-0002Y0-0w
-	for qemu-devel@nongnu.org; Tue, 29 May 2018 11:19:45 -0400
+	(envelope-from <laurent@vivier.eu>) id 1fNgSM-0005nj-Oi
+	for qemu-devel@nongnu.org; Tue, 29 May 2018 11:22:42 -0400
 References: <20170724182751.18261-1-f4bug@amsat.org>
-	<20170724182751.18261-27-f4bug@amsat.org>
-	<cc23ddee-ad10-74ef-874c-6ed1ef485d2e@vivier.eu>
-	<811e6e16-d9d7-3b96-7d43-f9d7b6ace063@amsat.org>
+	<20170724182751.18261-32-f4bug@amsat.org>
+	<950e1d4b-3a65-6cf5-88a7-13a986f69e0f@vivier.eu>
+	<d5692df7-1647-81cb-9034-98e8a0e31f4c@amsat.org>
 From: Laurent Vivier <laurent@vivier.eu>
-Message-ID: <d93b02bd-6776-497a-2dc0-aed009be380b@vivier.eu>
-Date: Tue, 29 May 2018 17:19:29 +0200
+Message-ID: <8a77c1f2-a1c3-4c7c-7130-8a8644493e0c@vivier.eu>
+Date: Tue, 29 May 2018 17:22:21 +0200
 MIME-Version: 1.0
-In-Reply-To: <811e6e16-d9d7-3b96-7d43-f9d7b6ace063@amsat.org>
+In-Reply-To: <d5692df7-1647-81cb-9034-98e8a0e31f4c@amsat.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH for 2.10 26/35] linux-user: use is_error()
- to avoid warnings and make the code clearer
+Subject: Re: [Qemu-devel] [PATCH for 2.10 31/35] syscall: replace strcpy()
+ by g_strlcpy()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,93 +27,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Eric Blake <eblake@redhat.com>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, Riku Voipio <riku.voipio@linaro.org>
-Cc: qemu-trivial@nongnu.org, qemu-devel@nongnu.org
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Eric Blake <eblake@redhat.com>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, Riku Voipio <riku.voipio@iki.fi>
+Cc: qemu-devel@nongnu.org, qemu-trivial@nongnu.org
 
-Le 29/05/2018 à 16:25, Philippe Mathieu-Daudé a écrit :
+Le 29/05/2018 à 16:19, Philippe Mathieu-Daudé a écrit :
 > Hi Laurent,
-
-Hi Philippe,
-
-> On 07/24/2017 04:16 PM, Laurent Vivier wrote:
+> 
+> On 07/24/2017 04:28 PM, Laurent Vivier wrote:
 >> Le 24/07/2017 à 20:27, Philippe Mathieu-Daudé a écrit :
->>> linux-user/flatload.c:740:9: warning: Loss of sign in implicit conversion
->>>     if (res > (unsigned long)-4096)
->>>         ^~~
+>>> linux-user/syscall.c:9860:17: warning: Call to function 'strcpy' is insecure as it does not provide bounding of the memory buffer. Replace unbounded copy functions with analogous functions that support length arguments such as 'strlcpy'. CWE-119
+>>>                 strcpy (buf->machine, cpu_to_uname_machine(cpu_env));
+>>>                 ^~~~~~
 >>>
 >>> Reported-by: Clang Static Analyzer
 >>> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+>>> ---
+>>>  linux-user/syscall.c | 3 ++-
+>>>  1 file changed, 2 insertions(+), 1 deletion(-)
+>>>
+>>> diff --git a/linux-user/syscall.c b/linux-user/syscall.c
+>>> index 963b9c8f4b..847f729834 100644
+>>> --- a/linux-user/syscall.c
+>>> +++ b/linux-user/syscall.c
+>>> @@ -9853,7 +9853,8 @@ abi_long do_syscall(void *cpu_env, int num, abi_long arg1,
+>>>              if (!is_error(ret)) {
+>>>                  /* Overwrite the native machine name with whatever is being
+>>>                     emulated. */
+>>> -                strcpy (buf->machine, cpu_to_uname_machine(cpu_env));
+>>> +                g_strlcpy(buf->machine, cpu_to_uname_machine(cpu_env),
+>>> +                          sizeof(buf->machine));
+>>>                  /* Allow the user to override the reported release.  */
+>>>                  if (qemu_uname_release && *qemu_uname_release) {
+>>>                      g_strlcpy(buf->release, qemu_uname_release,
+>>>
+>>
+>> We should not have a problem here as cpu_to_uname_machine() is "const
+>> char *" and the string is defined inside QEMU (so it should fit into
+>> machine[]).
 >>
 >> Reviewed-by: Laurent Vivier <laurent@vivier.eu>
->>
->>> ---
->>>  linux-user/flatload.c | 15 +++++++++------
->>>  1 file changed, 9 insertions(+), 6 deletions(-)
->>>
->>> diff --git a/linux-user/flatload.c b/linux-user/flatload.c
->>> index a35a560904..10c529910f 100644
->>> --- a/linux-user/flatload.c
->>> +++ b/linux-user/flatload.c
->>> @@ -224,8 +224,9 @@ static int decompress_exec(
->>>  		ret = bprm->file->f_op->read(bprm->file, buf, LBUFSIZE, &fpos);
->>>  		if (ret <= 0)
->>>  			break;
->>> -		if (ret >= (unsigned long) -4096)
->>> +                if (is_error(ret)) {
->>>  			break;
->>> +                }
->>>  		len -= ret;
->>>  
->>>  		strm.next_in = buf;
->>> @@ -283,8 +284,7 @@ calc_reloc(abi_ulong r, struct lib_info *p, int curid, int internalp)
->>>                      "in same module (%d != %d)\n",
->>>                      (unsigned) r, curid, id);
->>>              goto failed;
->>> -        } else if ( ! p[id].loaded &&
->>> -                    load_flat_shared_library(id, p) > (unsigned long) -4096) {
->>> +        } else if (!p[id].loaded && is_error(load_flat_shared_library(id, p))) {
->>>              fprintf(stderr, "BINFMT_FLAT: failed to load library %d\n", id);
->>>              goto failed;
->>>          }
->>> @@ -523,9 +523,10 @@ static int load_flat_file(struct linux_binprm * bprm,
->>>                  fpos = 0;
->>>                  result = bprm->file->f_op->read(bprm->file,
->>>                                  (char *) textpos, text_len, &fpos);
->>> -                if (result < (unsigned long) -4096)
->>> +                if (!is_error(result)) {
->>>                          result = decompress_exec(bprm, text_len, (char *) datapos,
->>>                                           data_len + (relocs * sizeof(unsigned long)), 0);
->>> +                }
->>>          }
->>>          else
->>>  #endif
->>> @@ -693,8 +694,9 @@ static int load_flat_shared_library(int id, struct lib_info *libs)
->>>  
->>>  	res = prepare_binprm(&bprm);
->>>  
->>> -	if (res <= (unsigned long)-4096)
->>> +        if (!is_error(res)) {
->>>  		res = load_flat_file(&bprm, libs, id, NULL);
->>> +        }
->>>  	if (bprm.file) {
->>>  		allow_write_access(bprm.file);
->>>  		fput(bprm.file);
->>> @@ -737,8 +739,9 @@ int load_flt_binary(struct linux_binprm *bprm, struct image_info *info)
->>>  
->>>  
->>>      res = load_flat_file(bprm, libinfo, 0, &stack_len);
->>> -    if (res > (unsigned long)-4096)
->>> +    if (is_error(res)) {
->>>              return res;
->>> +    }
->>>  
->>>      /* Update data segment pointers for all libraries */
->>>      for (i=0; i<MAX_SHARED_LIBS; i++) {
->>>
 > 
-> Can you take this via your linux-user tree?
-> 
+> Do you mind queuing this patch in your linux-user tree?
 
-Applied, thanks.
+Applied, thanks
 
 Laurent
