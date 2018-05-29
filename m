@@ -1,20 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39004)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44370)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1fNVOy-0002uz-UQ
-	for qemu-devel@nongnu.org; Mon, 28 May 2018 23:34:26 -0400
+	(envelope-from <joel.stan@gmail.com>) id 1fNW77-0007Y6-DG
+	for qemu-devel@nongnu.org; Tue, 29 May 2018 00:20:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1fNVOx-0006Wx-Fa
-	for qemu-devel@nongnu.org; Mon, 28 May 2018 23:34:24 -0400
-Date: Tue, 29 May 2018 11:34:11 +0800
-From: Fam Zheng <famz@redhat.com>
-Message-ID: <20180529033411.GB4599@lemon.usersys.redhat.com>
-References: <20180528033643.31380-1-famz@redhat.com>
-	<20180528033643.31380-5-famz@redhat.com>
+	(envelope-from <joel.stan@gmail.com>) id 1fNW72-0000Fv-MP
+	for qemu-devel@nongnu.org; Tue, 29 May 2018 00:20:01 -0400
+Sender: "joel.stan@gmail.com" <joel.stan@gmail.com>
+From: Joel Stanley <joel@jms.id.au>
+Date: Tue, 29 May 2018 13:49:46 +0930
+Message-Id: <20180529041946.9481-1-joel@jms.id.au>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180528033643.31380-5-famz@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v6 04/10] qcow2: Implement copy offloading
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH v3] aspeed_scu: Implement RNG register
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,298 +21,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Ronnie Sahlberg <ronniesahlberg@gmail.com>, qemu-block@nongnu.org, Peter Lieven <pl@kamp.de>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, eblake@redhat.com
+To: qemu-devel@nongnu.org, qemu-arm@nongnu.org
+Cc: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>, Andrew Jeffery <andrew@aj.id.au>
 
-On Mon, 05/28 11:36, Fam Zheng wrote:
-> The two callbacks are implemented quite similarly to the read/write
-> functions: bdrv_co_copy_range_from maps for read and calls into bs->file
-> or bs->backing depending on the allocation status; bdrv_co_copy_range_to
-> maps for write and calls into bs->file.
-> 
-> Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
-> Signed-off-by: Fam Zheng <famz@redhat.com>
-> ---
->  block/qcow2.c | 226 ++++++++++++++++++++++++++++++++++++++++++++++++++--------
->  1 file changed, 196 insertions(+), 30 deletions(-)
-> 
-> diff --git a/block/qcow2.c b/block/qcow2.c
-> index 6d532470a8..e32a3c1518 100644
-> --- a/block/qcow2.c
-> +++ b/block/qcow2.c
-> @@ -1762,6 +1762,39 @@ static int coroutine_fn qcow2_co_block_status(BlockDriverState *bs,
->      return status;
->  }
->  
-> +static coroutine_fn int qcow2_handle_l2meta(BlockDriverState *bs,
-> +                                            QCowL2Meta **pl2meta,
-> +                                            bool link_l2)
-> +{
-> +    int ret = 0;
-> +    QCowL2Meta *l2meta = *pl2meta;
-> +
-> +    while (l2meta != NULL) {
-> +        QCowL2Meta *next;
-> +
-> +        if (!ret && link_l2) {
-> +            ret = qcow2_alloc_cluster_link_l2(bs, l2meta);
-> +            if (ret) {
-> +                goto out;
-> +            }
-> +        }
-> +
-> +        /* Take the request off the list of running requests */
-> +        if (l2meta->nb_clusters != 0) {
-> +            QLIST_REMOVE(l2meta, next_in_flight);
-> +        }
-> +
-> +        qemu_co_queue_restart_all(&l2meta->dependent_requests);
-> +
-> +        next = l2meta->next;
-> +        g_free(l2meta);
-> +        l2meta = next;
-> +    }
-> +out:
-> +    *pl2meta = l2meta;
-> +    return ret;
-> +}
-> +
->  static coroutine_fn int qcow2_co_preadv(BlockDriverState *bs, uint64_t offset,
->                                          uint64_t bytes, QEMUIOVector *qiov,
->                                          int flags)
-> @@ -2048,24 +2081,9 @@ static coroutine_fn int qcow2_co_pwritev(BlockDriverState *bs, uint64_t offset,
->              }
->          }
->  
-> -        while (l2meta != NULL) {
-> -            QCowL2Meta *next;
-> -
-> -            ret = qcow2_alloc_cluster_link_l2(bs, l2meta);
-> -            if (ret < 0) {
-> -                goto fail;
-> -            }
-> -
-> -            /* Take the request off the list of running requests */
-> -            if (l2meta->nb_clusters != 0) {
-> -                QLIST_REMOVE(l2meta, next_in_flight);
-> -            }
-> -
-> -            qemu_co_queue_restart_all(&l2meta->dependent_requests);
-> -
-> -            next = l2meta->next;
-> -            g_free(l2meta);
-> -            l2meta = next;
-> +        ret = qcow2_handle_l2meta(bs, &l2meta, true);
-> +        if (ret) {
-> +            goto fail;
->          }
->  
->          bytes -= cur_bytes;
-> @@ -2076,18 +2094,7 @@ static coroutine_fn int qcow2_co_pwritev(BlockDriverState *bs, uint64_t offset,
->      ret = 0;
->  
->  fail:
-> -    while (l2meta != NULL) {
-> -        QCowL2Meta *next;
-> -
-> -        if (l2meta->nb_clusters != 0) {
-> -            QLIST_REMOVE(l2meta, next_in_flight);
-> -        }
-> -        qemu_co_queue_restart_all(&l2meta->dependent_requests);
-> -
-> -        next = l2meta->next;
-> -        g_free(l2meta);
-> -        l2meta = next;
-> -    }
-> +    qcow2_handle_l2meta(bs, &l2meta, false);
->  
->      qemu_co_mutex_unlock(&s->lock);
->  
-> @@ -3274,6 +3281,163 @@ static coroutine_fn int qcow2_co_pdiscard(BlockDriverState *bs,
->      return ret;
->  }
->  
-> +static int coroutine_fn
-> +qcow2_co_copy_range_from(BlockDriverState *bs,
-> +                         BdrvChild *src, uint64_t src_offset,
-> +                         BdrvChild *dst, uint64_t dst_offset,
-> +                         uint64_t bytes, BdrvRequestFlags flags)
-> +{
-> +    BDRVQcow2State *s = bs->opaque;
-> +    int ret;
-> +    unsigned int cur_bytes; /* number of bytes in current iteration */
-> +    BdrvChild *child = NULL;
-> +
-> +    assert(!bs->encrypted);
-> +    qemu_co_mutex_lock(&s->lock);
-> +
-> +    while (bytes != 0) {
+The ASPEED SoCs contain a single register that returns random data when
+read. This models that register so that guests can use it.
 
-NACK.
+The random number data register has a corresponding control register,
+however it returns data regardless of the state of the enabled bit, so
+the model follows this behaviour.
 
-flags and dst_offset are calculated wrong in the loop body: bits in the flags
-are not reset when starting a new iteration; dst_offset is not incremented.
+Reviewed-by: Cédric Le Goater <clg@kaod.org>
+Signed-off-by: Joel Stanley <joel@jms.id.au>
+---
+v2:
+ - Remove call to qcrypto_random_init as this is done in main()
+v3:
+ - Add Cédric's reviewed-by
+ - Add a comment about why we don't check for the rng enable bit
+---
+ hw/misc/aspeed_scu.c | 19 +++++++++++++++++++
+ 1 file changed, 19 insertions(+)
 
-These bugs are caught during testing the follow up drive-backup patches.
-
-Will send v7 to fix it.
-
-Fam
-
-> +        uint64_t copy_offset = 0;
-> +        /* prepare next request */
-> +        cur_bytes = MIN(bytes, INT_MAX);
-> +
-> +        ret = qcow2_get_cluster_offset(bs, src_offset, &cur_bytes, &copy_offset);
-> +        if (ret < 0) {
-> +            goto out;
-> +        }
-> +
-> +        switch (ret) {
-> +        case QCOW2_CLUSTER_UNALLOCATED:
-> +            if (bs->backing && bs->backing->bs) {
-> +                int64_t backing_length = bdrv_getlength(bs->backing->bs);
-> +                if (src_offset >= backing_length) {
-> +                    flags |= BDRV_REQ_ZERO_WRITE;
-> +                } else {
-> +                    child = bs->backing;
-> +                    cur_bytes = MIN(cur_bytes, backing_length - src_offset);
-> +                    copy_offset = src_offset;
-> +                }
-> +            } else {
-> +                flags |= BDRV_REQ_ZERO_WRITE;
-> +            }
-> +            break;
-> +
-> +        case QCOW2_CLUSTER_ZERO_PLAIN:
-> +        case QCOW2_CLUSTER_ZERO_ALLOC:
-> +            flags |= BDRV_REQ_ZERO_WRITE;
-> +            break;
-> +
-> +        case QCOW2_CLUSTER_COMPRESSED:
-> +            ret = -ENOTSUP;
-> +            goto out;
-> +            break;
-> +
-> +        case QCOW2_CLUSTER_NORMAL:
-> +            child = bs->file;
-> +            copy_offset += offset_into_cluster(s, src_offset);
-> +            if ((copy_offset & 511) != 0) {
-> +                ret = -EIO;
-> +                goto out;
-> +            }
-> +            break;
-> +
-> +        default:
-> +            abort();
-> +        }
-> +        qemu_co_mutex_unlock(&s->lock);
-> +        ret = bdrv_co_copy_range_from(child,
-> +                                      copy_offset,
-> +                                      dst, dst_offset,
-> +                                      cur_bytes, flags);
-> +        qemu_co_mutex_lock(&s->lock);
-> +        if (ret < 0) {
-> +            goto out;
-> +        }
-> +
-> +        bytes -= cur_bytes;
-> +        src_offset += cur_bytes;
-> +    }
-> +    ret = 0;
-> +
-> +out:
-> +    qemu_co_mutex_unlock(&s->lock);
-> +    return ret;
-> +}
-> +
-> +static int coroutine_fn
-> +qcow2_co_copy_range_to(BlockDriverState *bs,
-> +                       BdrvChild *src, uint64_t src_offset,
-> +                       BdrvChild *dst, uint64_t dst_offset,
-> +                       uint64_t bytes, BdrvRequestFlags flags)
-> +{
-> +    BDRVQcow2State *s = bs->opaque;
-> +    int offset_in_cluster;
-> +    int ret;
-> +    unsigned int cur_bytes; /* number of sectors in current iteration */
-> +    uint64_t cluster_offset;
-> +    uint8_t *cluster_data = NULL;
-> +    QCowL2Meta *l2meta = NULL;
-> +
-> +    assert(!bs->encrypted);
-> +    s->cluster_cache_offset = -1; /* disable compressed cache */
-> +
-> +    qemu_co_mutex_lock(&s->lock);
-> +
-> +    while (bytes != 0) {
-> +
-> +        l2meta = NULL;
-> +
-> +        offset_in_cluster = offset_into_cluster(s, dst_offset);
-> +        cur_bytes = MIN(bytes, INT_MAX);
-> +
-> +        /* TODO:
-> +         * If src->bs == dst->bs, we could simply copy by incrementing
-> +         * the refcnt, without copying user data.
-> +         * Or if src->bs == dst->bs->backing->bs, we could copy by discarding. */
-> +        ret = qcow2_alloc_cluster_offset(bs, dst_offset, &cur_bytes,
-> +                                         &cluster_offset, &l2meta);
-> +        if (ret < 0) {
-> +            goto fail;
-> +        }
-> +
-> +        assert((cluster_offset & 511) == 0);
-> +
-> +        ret = qcow2_pre_write_overlap_check(bs, 0,
-> +                cluster_offset + offset_in_cluster, cur_bytes);
-> +        if (ret < 0) {
-> +            goto fail;
-> +        }
-> +
-> +        qemu_co_mutex_unlock(&s->lock);
-> +        ret = bdrv_co_copy_range_to(src, src_offset,
-> +                                    bs->file,
-> +                                    cluster_offset + offset_in_cluster,
-> +                                    cur_bytes, flags);
-> +        qemu_co_mutex_lock(&s->lock);
-> +        if (ret < 0) {
-> +            goto fail;
-> +        }
-> +
-> +        ret = qcow2_handle_l2meta(bs, &l2meta, true);
-> +        if (ret) {
-> +            goto fail;
-> +        }
-> +
-> +        bytes -= cur_bytes;
-> +        dst_offset += cur_bytes;
-> +    }
-> +    ret = 0;
-> +
-> +fail:
-> +    qcow2_handle_l2meta(bs, &l2meta, false);
-> +
-> +    qemu_co_mutex_unlock(&s->lock);
-> +
-> +    qemu_vfree(cluster_data);
-> +    trace_qcow2_writev_done_req(qemu_coroutine_self(), ret);
-> +
-> +    return ret;
-> +}
-> +
->  static int qcow2_truncate(BlockDriverState *bs, int64_t offset,
->                            PreallocMode prealloc, Error **errp)
->  {
-> @@ -4522,6 +4686,8 @@ BlockDriver bdrv_qcow2 = {
->  
->      .bdrv_co_pwrite_zeroes  = qcow2_co_pwrite_zeroes,
->      .bdrv_co_pdiscard       = qcow2_co_pdiscard,
-> +    .bdrv_co_copy_range_from = qcow2_co_copy_range_from,
-> +    .bdrv_co_copy_range_to  = qcow2_co_copy_range_to,
->      .bdrv_truncate          = qcow2_truncate,
->      .bdrv_co_pwritev_compressed = qcow2_co_pwritev_compressed,
->      .bdrv_make_empty        = qcow2_make_empty,
-> -- 
-> 2.14.3
-> 
+diff --git a/hw/misc/aspeed_scu.c b/hw/misc/aspeed_scu.c
+index 5e6d5744eeca..96db052389cc 100644
+--- a/hw/misc/aspeed_scu.c
++++ b/hw/misc/aspeed_scu.c
+@@ -16,6 +16,7 @@
+ #include "qapi/visitor.h"
+ #include "qemu/bitops.h"
+ #include "qemu/log.h"
++#include "crypto/random.h"
+ #include "trace.h"
+ 
+ #define TO_REG(offset) ((offset) >> 2)
+@@ -154,6 +155,18 @@ static const uint32_t ast2500_a1_resets[ASPEED_SCU_NR_REGS] = {
+      [BMC_DEV_ID]      = 0x00002402U
+ };
+ 
++static uint32_t aspeed_scu_get_random(void)
++{
++    Error *err = NULL;
++    uint32_t num;
++
++    if (qcrypto_random_bytes((uint8_t *)&num, sizeof(num), &err)) {
++        error_report_err(err);
++    }
++
++    return num;
++}
++
+ static uint64_t aspeed_scu_read(void *opaque, hwaddr offset, unsigned size)
+ {
+     AspeedSCUState *s = ASPEED_SCU(opaque);
+@@ -167,6 +180,12 @@ static uint64_t aspeed_scu_read(void *opaque, hwaddr offset, unsigned size)
+     }
+ 
+     switch (reg) {
++    case RNG_DATA:
++        /* On hardware, RNG_DATA works regardless of
++         * the state of the enable bit in RNG_CTRL
++         */
++        s->regs[RNG_DATA] = aspeed_scu_get_random();
++        break;
+     case WAKEUP_EN:
+         qemu_log_mask(LOG_GUEST_ERROR,
+                       "%s: Read of write-only offset 0x%" HWADDR_PRIx "\n",
+-- 
+2.17.0
