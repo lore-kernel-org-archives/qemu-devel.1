@@ -1,27 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59433)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36923)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1fNlsZ-0004YC-1x
-	for qemu-devel@nongnu.org; Tue, 29 May 2018 17:10:04 -0400
+	(envelope-from <groug@kaod.org>) id 1fNmE2-0001Ec-Ks
+	for qemu-devel@nongnu.org; Tue, 29 May 2018 17:32:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1fNlsU-0002mS-Ut
-	for qemu-devel@nongnu.org; Tue, 29 May 2018 17:10:03 -0400
-Received: from 7.mo177.mail-out.ovh.net ([46.105.61.149]:52790)
+	(envelope-from <groug@kaod.org>) id 1fNmDz-0000Eq-Ds
+	for qemu-devel@nongnu.org; Tue, 29 May 2018 17:32:14 -0400
+Received: from 6.mo177.mail-out.ovh.net ([46.105.51.249]:58267)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1fNlsU-0002kp-OA
-	for qemu-devel@nongnu.org; Tue, 29 May 2018 17:09:58 -0400
-Received: from player158.ha.ovh.net (unknown [10.109.108.117])
-	by mo177.mail-out.ovh.net (Postfix) with ESMTP id 7773DB3253
-	for <qemu-devel@nongnu.org>; Tue, 29 May 2018 23:09:55 +0200 (CEST)
-Date: Tue, 29 May 2018 23:09:51 +0200
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1fNmDz-0000DW-7N
+	for qemu-devel@nongnu.org; Tue, 29 May 2018 17:32:11 -0400
+Received: from player695.ha.ovh.net (unknown [10.109.120.42])
+	by mo177.mail-out.ovh.net (Postfix) with ESMTP id 60A92B346C
+	for <qemu-devel@nongnu.org>; Tue, 29 May 2018 23:32:09 +0200 (CEST)
+Date: Tue, 29 May 2018 23:32:05 +0200
 From: Greg Kurz <groug@kaod.org>
-Message-ID: <20180529230951.27a41574@bahia.lan>
-In-Reply-To: <17b8b06c00e359d1cb71b883371ad8c677a0e477.1527310210.git.keno@alumni.harvard.edu>
+Message-ID: <20180529233205.59770326@bahia.lan>
+In-Reply-To: <a648afd776c8eb50398524c6c8d53629f5141211.1527310210.git.keno@alumni.harvard.edu>
 References: <cover.1527310210.git.keno@alumni.harvard.edu>
-	<17b8b06c00e359d1cb71b883371ad8c677a0e477.1527310210.git.keno@alumni.harvard.edu>
+	<a648afd776c8eb50398524c6c8d53629f5141211.1527310210.git.keno@alumni.harvard.edu>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 06/13] 9p: darwin: Address minor differences
+Subject: Re: [Qemu-devel] [PATCH 08/13] 9p: darwin: Ignore O_{NOATIME,
+ DIRECT}
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,56 +34,82 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: keno@juliacomputing.com
 Cc: qemu-devel@nongnu.org, Keno Fischer <keno@alumni.harvard.edu>
 
-On Sat, 26 May 2018 01:23:08 -0400
+On Sat, 26 May 2018 01:23:10 -0400
 keno@juliacomputing.com wrote:
 
 > From: Keno Fischer <keno@alumni.harvard.edu>
 > 
-> - Darwin doesn't have strchrnul
-> - Comparisons of mode_t with -1 require an explicit cast, since mode_t
->   is unsigned on Darwin.
-> 
 > Signed-off-by: Keno Fischer <keno@juliacomputing.com>
 > ---
->  hw/9pfs/9p-local.c | 9 ++++++---
->  1 file changed, 6 insertions(+), 3 deletions(-)
+>  hw/9pfs/9p.c | 37 +++++++++++++++++++++++--------------
+>  1 file changed, 23 insertions(+), 14 deletions(-)
 > 
-> diff --git a/hw/9pfs/9p-local.c b/hw/9pfs/9p-local.c
-> index fd65d04..6e0b2e8 100644
-> --- a/hw/9pfs/9p-local.c
-> +++ b/hw/9pfs/9p-local.c
-> @@ -67,7 +67,10 @@ int local_open_nofollow(FsContext *fs_ctx, const char *path, int flags,
->          assert(*path != '/');
+> diff --git a/hw/9pfs/9p.c b/hw/9pfs/9p.c
+> index 49654ae..f5f00aa 100644
+> --- a/hw/9pfs/9p.c
+> +++ b/hw/9pfs/9p.c
+> @@ -115,20 +115,27 @@ static int dotl_to_open_flags(int flags)
+>      int oflags = flags & O_ACCMODE;
 >  
->          head = g_strdup(path);
-> -        c = strchrnul(path, '/');
-> +        /* equivalent to strchrnul(), but that is not available on Darwin */
+>      DotlOpenflagMap dotl_oflag_map[] = {
+> -        { P9_DOTL_CREATE, O_CREAT },
+> -        { P9_DOTL_EXCL, O_EXCL },
+> -        { P9_DOTL_NOCTTY , O_NOCTTY },
+> -        { P9_DOTL_TRUNC, O_TRUNC },
+> -        { P9_DOTL_APPEND, O_APPEND },
+> -        { P9_DOTL_NONBLOCK, O_NONBLOCK } ,
+> -        { P9_DOTL_DSYNC, O_DSYNC },
+> -        { P9_DOTL_FASYNC, FASYNC },
+> -        { P9_DOTL_DIRECT, O_DIRECT },
+> -        { P9_DOTL_LARGEFILE, O_LARGEFILE },
+> -        { P9_DOTL_DIRECTORY, O_DIRECTORY },
+> -        { P9_DOTL_NOFOLLOW, O_NOFOLLOW },
+> -        { P9_DOTL_NOATIME, O_NOATIME },
+> -        { P9_DOTL_SYNC, O_SYNC },
+> +        {P9_DOTL_CREATE, O_CREAT},
+> +        {P9_DOTL_EXCL, O_EXCL},
+> +        {P9_DOTL_NOCTTY, O_NOCTTY},
+> +        {P9_DOTL_TRUNC, O_TRUNC},
+> +        {P9_DOTL_APPEND, O_APPEND},
+> +        {P9_DOTL_NONBLOCK, O_NONBLOCK},
+> +        {P9_DOTL_DSYNC, O_DSYNC},
+> +        {P9_DOTL_FASYNC, FASYNC},
 
-Please make a qemu_strchrnul() helper with a separate implementation for Darwin
-then. I guess you can put it in this file since there aren't any other users in
-the QEMU code base.
+Please don't kill the spaces.
 
-> +        c = strchr(path, '/');
-> +        if (!c)
-> +            c = path + strlen(path);
->          if (*c) {
->              /* Intermediate path element */
->              head[c - path] = 0;
-> @@ -310,7 +313,7 @@ update_map_file:
->      if (credp->fc_gid != -1) {
->          gid = credp->fc_gid;
->      }
-> -    if (credp->fc_mode != -1) {
-> +    if (credp->fc_mode != (mode_t)-1) {
->          mode = credp->fc_mode;
->      }
->      if (credp->fc_rdev != -1) {
-> @@ -416,7 +419,7 @@ static int local_set_xattrat(int dirfd, const char *path, FsCred *credp)
->              return err;
->          }
->      }
-> -    if (credp->fc_mode != -1) {
-> +    if (credp->fc_mode != (mode_t)-1) {
->          uint32_t tmp_mode = cpu_to_le32(credp->fc_mode);
->          err = fsetxattrat_nofollow(dirfd, path, "user.virtfs.mode", &tmp_mode,
->                                     sizeof(mode_t), 0);
+> +#ifndef CONFIG_DARWIN
+> +        {P9_DOTL_NOATIME, O_NOATIME},
+> +        /* On Darwin, we could map to F_NOCACHE, which is
+> +           similar, but doesn't quite have the same
+> +           semantics. However, we don't support O_DIRECT
+
+But are these semantics worse than dumping the flag ?
+
+> +           even on linux at the moment, so we just ignore
+> +           it here. */
+
+Yeah, and I doubt we'll ever support it on linux either. But,
+anyway, why filter these out ? Do they cause a build break ?
+
+> +        {P9_DOTL_DIRECT, O_DIRECT},
+> +#endif
+> +        {P9_DOTL_LARGEFILE, O_LARGEFILE},
+> +        {P9_DOTL_DIRECTORY, O_DIRECTORY},
+> +        {P9_DOTL_NOFOLLOW, O_NOFOLLOW},
+> +        {P9_DOTL_SYNC, O_SYNC},
+>      };
+>  
+>      for (i = 0; i < ARRAY_SIZE(dotl_oflag_map); i++) {
+> @@ -156,10 +163,12 @@ static int get_dotl_openflags(V9fsState *s, int oflags)
+>       */
+>      flags = dotl_to_open_flags(oflags);
+>      flags &= ~(O_NOCTTY | O_ASYNC | O_CREAT);
+> +#ifndef CONFIG_DARWIN
+>      /*
+>       * Ignore direct disk access hint until the server supports it.
+>       */
+>      flags &= ~O_DIRECT;
+> +#endif
+>      return flags;
+>  }
+>  
