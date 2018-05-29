@@ -1,22 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41575)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41672)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fNkhH-0005N2-Dv
-	for qemu-devel@nongnu.org; Tue, 29 May 2018 15:54:20 -0400
+	(envelope-from <ross.zwisler@linux.intel.com>) id 1fNkhb-0005lX-V0
+	for qemu-devel@nongnu.org; Tue, 29 May 2018 15:54:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fNkhG-0000YT-7u
-	for qemu-devel@nongnu.org; Tue, 29 May 2018 15:54:19 -0400
-Date: Tue, 29 May 2018 21:54:10 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20180529195410.GK4756@localhost.localdomain>
-References: <20180525163327.23097-1-kwolf@redhat.com>
-	<20180525163327.23097-4-kwolf@redhat.com>
-	<20180529144353.GF6999@localhost.localdomain>
+	(envelope-from <ross.zwisler@linux.intel.com>) id 1fNkhY-0000yK-UY
+	for qemu-devel@nongnu.org; Tue, 29 May 2018 15:54:40 -0400
+Received: from mga09.intel.com ([134.134.136.24]:54792)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ross.zwisler@linux.intel.com>)
+	id 1fNkhY-0000xJ-LW
+	for qemu-devel@nongnu.org; Tue, 29 May 2018 15:54:36 -0400
+Date: Tue, 29 May 2018 13:54:33 -0600
+From: Ross Zwisler <ross.zwisler@linux.intel.com>
+Message-ID: <20180529195433.GA16151@linux.intel.com>
+References: <20180521163203.26590-1-ross.zwisler@linux.intel.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20180529144353.GF6999@localhost.localdomain>
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 03/14] job: Add error message
- for failing jobs
+In-Reply-To: <20180521163203.26590-1-ross.zwisler@linux.intel.com>
+Subject: Re: [Qemu-devel] [qemu PATCH v4 0/4] support NFIT platform
+ capabilities
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,190 +28,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jeff Cody <jcody@redhat.com>
-Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, mreitz@redhat.com
+To: Ross Zwisler <ross.zwisler@linux.intel.com>
+Cc: Igor Mammedov <imammedo@redhat.com>, qemu-devel@nongnu.org, Haozhong Zhang <haozhong.zhang@intel.com>, "Michael S . Tsirkin" <mst@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, linux-nvdimm <linux-nvdimm@lists.01.org>, "Elliott, Robert (Persistent Memory)" <elliott@hpe.com>
 
-Am 29.05.2018 um 16:43 hat Jeff Cody geschrieben:
-> On Fri, May 25, 2018 at 06:33:16PM +0200, Kevin Wolf wrote:
-> > So far we relied on job->ret and strerror() to produce an error message
-> > for failed jobs. Not surprisingly, this tends to result in completely
-> > useless messages.
-> > 
-> > This adds a Job.error field that can contain an error string for a
-> > failing job, and a parameter to job_completed() that sets the field. As
-> > a default, if NULL is passed, we continue to use strerror(job->ret).
-> > 
-> > All existing callers are changed to pass NULL. They can be improved in
-> > separate patches.
-> > 
-> > Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-> > ---
-> >  include/qemu/job.h |  7 ++++++-
-> >  block/backup.c     |  2 +-
-> >  block/commit.c     |  2 +-
-> >  block/mirror.c     |  2 +-
-> >  block/stream.c     |  2 +-
-> >  job-qmp.c          |  9 ++-------
-> >  job.c              | 15 +++++++++++++--
-> >  7 files changed, 25 insertions(+), 14 deletions(-)
-> > 
-> > diff --git a/include/qemu/job.h b/include/qemu/job.h
-> > index 8c8badf75e..b2e1dd00b9 100644
-> > --- a/include/qemu/job.h
-> > +++ b/include/qemu/job.h
-> > @@ -124,6 +124,9 @@ typedef struct Job {
-> >      /** Estimated progress_current value at the completion of the job */
-> >      int64_t progress_total;
-> >  
-> > +    /** Error string for a failed job (NULL if job->ret == 0) */
-> > +    char *error;
-> > +
-> >      /** ret code passed to job_completed. */
-> >      int ret;
-> >  
-> > @@ -466,13 +469,15 @@ void job_transition_to_ready(Job *job);
-> >  /**
-> >   * @job: The job being completed.
-> >   * @ret: The status code.
-> > + * @error: The error message for a failing job (only with @ret < 0). If @ret is
-> > + *         negative, but NULL is given for @error, strerror() is used.
-> >   *
-> >   * Marks @job as completed. If @ret is non-zero, the job transaction it is part
-> >   * of is aborted. If @ret is zero, the job moves into the WAITING state. If it
-> >   * is the last job to complete in its transaction, all jobs in the transaction
-> >   * move from WAITING to PENDING.
-> >   */
-> > -void job_completed(Job *job, int ret);
-> > +void job_completed(Job *job, int ret, Error *error);
-> >  
-> >  /** Asynchronously complete the specified @job. */
-> >  void job_complete(Job *job, Error **errp);
-> > diff --git a/block/backup.c b/block/backup.c
-> > index 4e228e959b..5661435675 100644
-> > --- a/block/backup.c
-> > +++ b/block/backup.c
-> > @@ -321,7 +321,7 @@ static void backup_complete(Job *job, void *opaque)
-> >  {
-> >      BackupCompleteData *data = opaque;
-> >  
-> > -    job_completed(job, data->ret);
-> > +    job_completed(job, data->ret, NULL);
-> >      g_free(data);
-> >  }
-> >  
-> > diff --git a/block/commit.c b/block/commit.c
-> > index 620666161b..e1814d9693 100644
-> > --- a/block/commit.c
-> > +++ b/block/commit.c
-> > @@ -117,7 +117,7 @@ static void commit_complete(Job *job, void *opaque)
-> >       * bdrv_set_backing_hd() to fail. */
-> >      block_job_remove_all_bdrv(bjob);
-> >  
-> > -    job_completed(job, ret);
-> > +    job_completed(job, ret, NULL);
-> >      g_free(data);
-> >  
-> >      /* If bdrv_drop_intermediate() didn't already do that, remove the commit
-> > diff --git a/block/mirror.c b/block/mirror.c
-> > index dcb66ec3be..435268bbbf 100644
-> > --- a/block/mirror.c
-> > +++ b/block/mirror.c
-> > @@ -581,7 +581,7 @@ static void mirror_exit(Job *job, void *opaque)
-> >      blk_set_perm(bjob->blk, 0, BLK_PERM_ALL, &error_abort);
-> >      blk_insert_bs(bjob->blk, mirror_top_bs, &error_abort);
-> >  
-> > -    job_completed(job, data->ret);
-> > +    job_completed(job, data->ret, NULL);
-> >  
-> >      g_free(data);
-> >      bdrv_drained_end(src);
-> > diff --git a/block/stream.c b/block/stream.c
-> > index a5d6e0cf8a..9264b68a1e 100644
-> > --- a/block/stream.c
-> > +++ b/block/stream.c
-> > @@ -93,7 +93,7 @@ out:
-> >      }
-> >  
-> >      g_free(s->backing_file_str);
-> > -    job_completed(job, data->ret);
-> > +    job_completed(job, data->ret, NULL);
-> >      g_free(data);
-> >  }
-> >  
-> > diff --git a/job-qmp.c b/job-qmp.c
-> > index 7f38f63336..410775df61 100644
-> > --- a/job-qmp.c
-> > +++ b/job-qmp.c
-> > @@ -136,14 +136,9 @@ void qmp_job_dismiss(const char *id, Error **errp)
-> >  static JobInfo *job_query_single(Job *job, Error **errp)
-> >  {
-> >      JobInfo *info;
-> > -    const char *errmsg = NULL;
-> >  
-> >      assert(!job_is_internal(job));
-> >  
-> > -    if (job->ret < 0) {
-> > -        errmsg = strerror(-job->ret);
-> > -    }
-> > -
-> >      info = g_new(JobInfo, 1);
-> >      *info = (JobInfo) {
-> >          .id                 = g_strdup(job->id),
-> > @@ -151,8 +146,8 @@ static JobInfo *job_query_single(Job *job, Error **errp)
-> >          .status             = job->status,
-> >          .current_progress   = job->progress_current,
-> >          .total_progress     = job->progress_total,
-> > -        .has_error          = !!errmsg,
-> > -        .error              = g_strdup(errmsg),
-> > +        .has_error          = !!job->error,
-> > +        .error              = g_strdup(job->error),
-> >      };
-> >  
-> >      return info;
-> > diff --git a/job.c b/job.c
-> > index f026661b0f..fc39eaaa5e 100644
-> > --- a/job.c
-> > +++ b/job.c
-> > @@ -369,6 +369,7 @@ void job_unref(Job *job)
-> >  
-> >          QLIST_REMOVE(job, job_list);
-> >  
-> > +        g_free(job->error);
-> >          g_free(job->id);
-> >          g_free(job);
-> >      }
-> > @@ -661,6 +662,9 @@ static void job_update_rc(Job *job)
-> >      }
-> >      if (job->ret) {
-> >          job_state_transition(job, JOB_STATUS_ABORTING);
-> > +        if (!job->error) {
-> > +            job->error = g_strdup(strerror(-job->ret));
-> > +        }
-> >      }
-> >  }
-> >  
-> > @@ -855,10 +859,17 @@ static void job_completed_txn_success(Job *job)
-> >      }
-> >  }
-> >  
-> > -void job_completed(Job *job, int ret)
-> > +void job_completed(Job *job, int ret, Error *error)
-> >  {
-> >      assert(job && job->txn && !job_is_completed(job));
-> > +
-> >      job->ret = ret;
-> > +    if (error) {
-> > +        assert(job->ret < 0);
+Ping on this series.  Rob, I think I've addressed all your feedback.  Can you
+please verify?
+
+Thanks,
+- Ross
+
+On Mon, May 21, 2018 at 10:31:59AM -0600, Ross Zwisler wrote:
+> Changes since v3:
+>  * Updated the text in docs/nvdimm.txt to make it clear that the value
+>    being passed in on the command line in an integer made up of various
+>    bit fields. (Rob Elliott)
+>  
+>  * Updated the "Highest Valid Capability" byte to be dynamic based on
+>    the highest valid bit in the user's input. (Rob Elliott)
 > 
-> The assert here implies that only job->ret values < 0 are valid for error.
-> Elsewhere, we just check for non-zero values for error (for example, [1]).
-> Maybe we should relax this to just assert(job->ret) here?
-
-A positive error is usually a bug. I wouldn't even be sure if it should
-be considered success (e.g. someone returned the result of bdrv_pwrite()
-like the two places fixed at the start of this series) or we forgot to
-negate errno.
-
-I think it's better to be strict and catch such bugs.
-
-Kevin
+> ---
+> 
+> The first 2 patches in this series clean up some things I noticed while
+> coding.
+> 
+> Patch 3 adds support for the new Platform Capabilities Structure, which
+> was added to the NFIT in ACPI 6.2 Errata A.  We add a machine command
+> line option "nvdimm-cap":
+> 
+>     -machine pc,accel=kvm,nvdimm,nvdimm-cap=2
+> 
+> which allows the user to pass in a value for this structure.  When such
+> a value is passed in we will generate the new NFIT subtable.
+> 
+> Patch 4 adds code to the "make check" self test infrastructure so that
+> we generate the new Platform Capabilities Structure, and adds it to the
+> expected NFIT output so that we test for it.
+> 
+> Ross Zwisler (4):
+>   nvdimm: fix typo in label-size definition
+>   tests/.gitignore: add entry for generated file
+>   nvdimm, acpi: support NFIT platform capabilities
+>   ACPI testing: test NFIT platform capabilities
+> 
+>  docs/nvdimm.txt                       |  27 ++++++++++++++++++++
+>  hw/acpi/nvdimm.c                      |  45 +++++++++++++++++++++++++++++++---
+>  hw/i386/pc.c                          |  31 +++++++++++++++++++++++
+>  hw/mem/nvdimm.c                       |   2 +-
+>  include/hw/i386/pc.h                  |   1 +
+>  include/hw/mem/nvdimm.h               |   7 +++++-
+>  tests/.gitignore                      |   1 +
+>  tests/acpi-test-data/pc/NFIT.dimmpxm  | Bin 224 -> 240 bytes
+>  tests/acpi-test-data/q35/NFIT.dimmpxm | Bin 224 -> 240 bytes
+>  tests/bios-tables-test.c              |   2 +-
+>  10 files changed, 109 insertions(+), 7 deletions(-)
+> 
+> -- 
+> 2.14.3
+> 
