@@ -1,20 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46255)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46270)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1fOAAE-0004jh-GD
-	for qemu-devel@nongnu.org; Wed, 30 May 2018 19:05:55 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1fOAAF-0004kv-Rv
+	for qemu-devel@nongnu.org; Wed, 30 May 2018 19:05:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1fOAAC-0000Bm-54
-	for qemu-devel@nongnu.org; Wed, 30 May 2018 19:05:54 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:46302)
+	(envelope-from <ehabkost@redhat.com>) id 1fOAAE-0000E8-Kc
+	for qemu-devel@nongnu.org; Wed, 30 May 2018 19:05:55 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:37034)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1fOAAB-0000BT-Uh
-	for qemu-devel@nongnu.org; Wed, 30 May 2018 19:05:52 -0400
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1fOAAE-0000Cc-Ca
+	for qemu-devel@nongnu.org; Wed, 30 May 2018 19:05:54 -0400
 From: Eduardo Habkost <ehabkost@redhat.com>
-Date: Wed, 30 May 2018 20:05:27 -0300
-Message-Id: <20180530230528.30166-12-ehabkost@redhat.com>
+Date: Wed, 30 May 2018 20:05:28 -0300
+Message-Id: <20180530230528.30166-13-ehabkost@redhat.com>
 In-Reply-To: <20180530230528.30166-1-ehabkost@redhat.com>
 References: <20180530230528.30166-1-ehabkost@redhat.com>
-Subject: [Qemu-devel] [PULL 11/12] qmp: add set-numa-node command
+Subject: [Qemu-devel] [PULL 12/12] tests: functional tests for QMP command
+ set-numa-node
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,93 +29,152 @@ Cc: Igor Mammedov <imammedo@redhat.com>
 
 From: Igor Mammedov <imammedo@redhat.com>
 
-Command is allowed to run only in preconfig stage and
-will allow to configure numa mapping for CPUs depending
-on possible CPUs layout (query-hotpluggable-cpus) for
-given machine instance.
-
-Example of configuration session:
-$QEMU -smp 2 --preconfig ...
-
-QMP:
--> {'execute': 'query-hotpluggable-cpus' }
-<- {'return': [
-       {'props': {'core-id': 0, 'thread-id': 0, 'socket-id': 1}, ... },
-       {'props': {'core-id': 0, 'thread-id': 0, 'socket-id': 0}, ... }
-   ]}
-
--> {'execute': 'set-numa-node', 'arguments': { 'type': 'node', 'nodeid': 0 } }
-<- {'return': {}}
--> {'execute': 'set-numa-node', 'arguments': { 'type': 'cpu',
-       'node-id': 0, 'core-id': 0, 'thread-id': 0, 'socket-id': 1, }
-   }
-<- {'return': {}}
-
--> {'execute': 'set-numa-node', 'arguments': { 'type': 'node', 'nodeid': 1 } }
--> {'execute': 'set-numa-node', 'arguments': { 'type': 'cpu',
-       'node-id': 1, 'core-id': 0, 'thread-id': 0, 'socket-id': 0 }
-   }
-<- {'return': {}}
-
--> {'execute': 'query-hotpluggable-cpus' }
-<- {'return': [
-       {'props': {'core-id': 0, 'thread-id': 0, 'node-id': 0, 'socket-id': 1}, ... },
-       {'props': {'core-id': 0, 'thread-id': 0, 'node-id': 1, 'socket-id': 0}, ... }
-   ]}
+ * start QEMU with 2 unmapped cpus,
+ * while in preconfig state
+    * add 2 numa nodes
+    * assign cpus to them
+ * exit preconfig and in running state check that cpus
+   are mapped correctly.
 
 Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-Message-Id: <1525423069-61903-11-git-send-email-imammedo@redhat.com>
-Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
-[ehabkost: Changed "since 2.13" to "since 3.0"]
+Message-Id: <1526556607-268163-1-git-send-email-imammedo@redhat.com>
 Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 ---
- qapi/misc.json | 14 ++++++++++++++
- numa.c         | 11 +++++++++++
- 2 files changed, 25 insertions(+)
+ tests/libqtest.h  |  9 +++++++
+ tests/libqtest.c  |  7 ++++++
+ tests/numa-test.c | 61 +++++++++++++++++++++++++++++++++++++++++++++++
+ tests/qmp-test.c  |  7 ------
+ 4 files changed, 77 insertions(+), 7 deletions(-)
 
-diff --git a/qapi/misc.json b/qapi/misc.json
-index b155db2642..02bb295c13 100644
---- a/qapi/misc.json
-+++ b/qapi/misc.json
-@@ -3510,3 +3510,17 @@
- ##
- { 'command': 'x-oob-test', 'data' : { 'lock': 'bool' },
-   'allow-oob': true }
+diff --git a/tests/libqtest.h b/tests/libqtest.h
+index cbe8df4473..ac52872cbe 100644
+--- a/tests/libqtest.h
++++ b/tests/libqtest.h
+@@ -972,4 +972,13 @@ void qtest_qmp_device_add(const char *driver, const char *id, const char *fmt,
+  */
+ void qtest_qmp_device_del(const char *id);
+ 
++/**
++ * qmp_rsp_is_err:
++ * @rsp: QMP response to check for error
++ *
++ * Test @rsp for error and discard @rsp.
++ * Returns 'true' if there is error in @rsp and 'false' otherwise.
++ */
++bool qmp_rsp_is_err(QDict *rsp);
 +
-+##
-+# @set-numa-node:
-+#
-+# Runtime equivalent of '-numa' CLI option, available at
-+# preconfigure stage to configure numa mapping before initializing
-+# machine.
-+#
-+# Since 3.0
-+##
-+{ 'command': 'set-numa-node', 'boxed': true,
-+  'data': 'NumaOptions',
-+  'allow-preconfig': true
+ #endif
+diff --git a/tests/libqtest.c b/tests/libqtest.c
+index 43fb97e035..e0ca19dbfe 100644
+--- a/tests/libqtest.c
++++ b/tests/libqtest.c
+@@ -1098,3 +1098,10 @@ void qtest_qmp_device_del(const char *id)
+     qobject_unref(response1);
+     qobject_unref(response2);
+ }
++
++bool qmp_rsp_is_err(QDict *rsp)
++{
++    QDict *error = qdict_get_qdict(rsp, "error");
++    qobject_unref(rsp);
++    return !!error;
 +}
-diff --git a/numa.c b/numa.c
-index 53bd65a05d..33572bfa74 100644
---- a/numa.c
-+++ b/numa.c
-@@ -444,6 +444,17 @@ void parse_numa_opts(MachineState *ms)
+diff --git a/tests/numa-test.c b/tests/numa-test.c
+index 169213fc1c..b7a6ef8815 100644
+--- a/tests/numa-test.c
++++ b/tests/numa-test.c
+@@ -260,6 +260,66 @@ static void aarch64_numa_cpu(const void *data)
+     g_free(cli);
+ }
+ 
++static void pc_dynamic_cpu_cfg(const void *data)
++{
++    QObject *e;
++    QDict *resp;
++    QList *cpus;
++    QTestState *qs;
++
++    qs = qtest_startf("%s %s", data ? (char *)data : "",
++                              "-nodefaults --preconfig -smp 2");
++
++    /* create 2 numa nodes */
++    g_assert(!qmp_rsp_is_err(qtest_qmp(qs, "{ 'execute': 'set-numa-node',"
++        " 'arguments': { 'type': 'node', 'nodeid': 0 } }")));
++    g_assert(!qmp_rsp_is_err(qtest_qmp(qs, "{ 'execute': 'set-numa-node',"
++        " 'arguments': { 'type': 'node', 'nodeid': 1 } }")));
++
++    /* map 2 cpus in non default reverse order
++     * i.e socket1->node0, socket0->node1
++     */
++    g_assert(!qmp_rsp_is_err(qtest_qmp(qs, "{ 'execute': 'set-numa-node',"
++        " 'arguments': { 'type': 'cpu', 'node-id': 0, 'socket-id': 1 } }")));
++    g_assert(!qmp_rsp_is_err(qtest_qmp(qs, "{ 'execute': 'set-numa-node',"
++        " 'arguments': { 'type': 'cpu', 'node-id': 1, 'socket-id': 0 } }")));
++
++    /* let machine initialization to complete and run */
++    g_assert(!qmp_rsp_is_err(qtest_qmp(qs, "{ 'execute': 'exit-preconfig' }")));
++    qtest_qmp_eventwait(qs, "RESUME");
++
++    /* check that CPUs are mapped as expected */
++    resp = qtest_qmp(qs, "{ 'execute': 'query-hotpluggable-cpus'}");
++    g_assert(qdict_haskey(resp, "return"));
++    cpus = qdict_get_qlist(resp, "return");
++    g_assert(cpus);
++    while ((e = qlist_pop(cpus))) {
++        const QDict *cpu, *props;
++        int64_t socket, node;
++
++        cpu = qobject_to(QDict, e);
++        g_assert(qdict_haskey(cpu, "props"));
++        props = qdict_get_qdict(cpu, "props");
++
++        g_assert(qdict_haskey(props, "node-id"));
++        node = qdict_get_int(props, "node-id");
++        g_assert(qdict_haskey(props, "socket-id"));
++        socket = qdict_get_int(props, "socket-id");
++
++        if (socket == 0) {
++            g_assert_cmpint(node, ==, 1);
++        } else if (socket == 1) {
++            g_assert_cmpint(node, ==, 0);
++        } else {
++            g_assert(false);
++        }
++        qobject_unref(e);
++    }
++    qobject_unref(resp);
++
++    qtest_quit(qs);
++}
++
+ int main(int argc, char **argv)
+ {
+     const char *args = NULL;
+@@ -278,6 +338,7 @@ int main(int argc, char **argv)
+ 
+     if (!strcmp(arch, "i386") || !strcmp(arch, "x86_64")) {
+         qtest_add_data_func("/numa/pc/cpu/explicit", args, pc_numa_cpu);
++        qtest_add_data_func("/numa/pc/dynamic/cpu", args, pc_dynamic_cpu_cfg);
+     }
+ 
+     if (!strcmp(arch, "ppc64")) {
+diff --git a/tests/qmp-test.c b/tests/qmp-test.c
+index 2ee441cdb3..a49cbc6fde 100644
+--- a/tests/qmp-test.c
++++ b/tests/qmp-test.c
+@@ -392,13 +392,6 @@ static void add_query_tests(QmpSchema *schema)
      }
  }
  
-+void qmp_set_numa_node(NumaOptions *cmd, Error **errp)
-+{
-+    if (!runstate_check(RUN_STATE_PRECONFIG)) {
-+        error_setg(errp, "The command is permitted only in '%s' state",
-+                   RunState_str(RUN_STATE_PRECONFIG));
-+         return;
-+    }
-+
-+    set_numa_options(MACHINE(qdev_get_machine()), cmd, errp);
-+}
-+
- void numa_cpu_pre_plug(const CPUArchId *slot, DeviceState *dev, Error **errp)
+-static bool qmp_rsp_is_err(QDict *rsp)
+-{
+-    QDict *error = qdict_get_qdict(rsp, "error");
+-    qobject_unref(rsp);
+-    return !!error;
+-}
+-
+ static void test_qmp_preconfig(void)
  {
-     int node_id = object_property_get_int(OBJECT(dev), "node-id", &error_abort);
+     QDict *rsp, *ret;
 -- 
 2.17.1
