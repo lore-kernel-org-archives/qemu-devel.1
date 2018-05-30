@@ -1,28 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58257)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58461)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1fNzyZ-0008U2-6l
-	for qemu-devel@nongnu.org; Wed, 30 May 2018 08:13:12 -0400
+	(envelope-from <imammedo@redhat.com>) id 1fNzzA-0000N1-2f
+	for qemu-devel@nongnu.org; Wed, 30 May 2018 08:13:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1fNzyV-0000kc-28
-	for qemu-devel@nongnu.org; Wed, 30 May 2018 08:13:11 -0400
-Received: from 6.mo3.mail-out.ovh.net ([188.165.43.173]:46508)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1fNzyU-0000kH-QI
-	for qemu-devel@nongnu.org; Wed, 30 May 2018 08:13:06 -0400
-Received: from player758.ha.ovh.net (unknown [10.109.120.91])
-	by mo3.mail-out.ovh.net (Postfix) with ESMTP id 35B7B1BA6E2
-	for <qemu-devel@nongnu.org>; Wed, 30 May 2018 14:13:05 +0200 (CEST)
-Date: Wed, 30 May 2018 14:13:01 +0200
-From: Greg Kurz <groug@kaod.org>
-Message-ID: <20180530141301.513496b2@bahia.lan>
-In-Reply-To: <981de427dbb657d58d08f216b40255b132cb1596.1527310210.git.keno@alumni.harvard.edu>
-References: <cover.1527310210.git.keno@alumni.harvard.edu>
-	<981de427dbb657d58d08f216b40255b132cb1596.1527310210.git.keno@alumni.harvard.edu>
+	(envelope-from <imammedo@redhat.com>) id 1fNzz8-000150-SE
+	for qemu-devel@nongnu.org; Wed, 30 May 2018 08:13:48 -0400
+Date: Wed, 30 May 2018 14:13:33 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20180530141333.39c030ed@redhat.com>
+In-Reply-To: <1527680741-2725-6-git-send-email-eric.auger@redhat.com>
+References: <1527680741-2725-1-git-send-email-eric.auger@redhat.com>
+	<1527680741-2725-6-git-send-email-eric.auger@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 10/13] 9p: darwin: *xattr_nofollow
- implementations
+Subject: Re: [Qemu-devel] [RFC v3 5/8] hw/arm/virt: GICv3 DT node with one
+ or two redistributor regions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,118 +24,120 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: keno@juliacomputing.com
-Cc: qemu-devel@nongnu.org, Keno Fischer <keno@alumni.harvard.edu>
+To: Eric Auger <eric.auger@redhat.com>
+Cc: eric.auger.pro@gmail.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org, peter.maydell@linaro.org, marc.zyngier@arm.com, wei@redhat.com, drjones@redhat.com, christoffer.dall@arm.com, zhaoshenglong@huawei.com
 
-On Sat, 26 May 2018 01:23:12 -0400
-keno@juliacomputing.com wrote:
+On Wed, 30 May 2018 13:45:38 +0200
+Eric Auger <eric.auger@redhat.com> wrote:
 
-> From: Keno Fischer <keno@alumni.harvard.edu>
+> This patch allows the creation of a GICv3 node with 1 or 2
+> redistributor regions depending on the number of smu_cpus.
+> The second redistributor region is located just after the
+> existing RAM region, at 256GB and contains up to up to 512 vcpus.
 > 
-> Signed-off-by: Keno Fischer <keno@juliacomputing.com>
+> Please refer to kernel documentation for further node details:
+> Documentation/devicetree/bindings/interrupt-controller/arm,gic-v3.txt
+> 
+> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+> 
 > ---
-
-As mentioned in patch 3, this should go to 9p-util-darwin.c
-
->  hw/9pfs/9p-util.c | 49 +++++++++++++++++++++++++++++++++++++++++++++----
->  1 file changed, 45 insertions(+), 4 deletions(-)
 > 
-> diff --git a/hw/9pfs/9p-util.c b/hw/9pfs/9p-util.c
-> index 8cf5554..98004ac 100644
-> --- a/hw/9pfs/9p-util.c
-> +++ b/hw/9pfs/9p-util.c
-> @@ -17,49 +17,90 @@
->  ssize_t fgetxattrat_nofollow(int dirfd, const char *filename, const char *name,
->                               void *value, size_t size)
->  {
-> -    char *proc_path = g_strdup_printf("/proc/self/fd/%d/%s", dirfd, filename);
->      int ret;
-> +#ifdef CONFIG_DARWIN
-> +    int fd = openat_file(dirfd, filename, O_RDONLY | O_PATH_9P_UTIL | O_NOFOLLOW, 0);
-> +    if (fd == -1)
-> +        return -1;
+> v2 -> v3:
+> - VIRT_GIC_REDIST2 is now 64MB large, ie. 512 redistributor capacity
+> - virt_gicv3_redist_region_count does not test kvm_irqchip_in_kernel
+>   anymore
+> ---
+>  hw/arm/virt.c         | 29 ++++++++++++++++++++++++-----
+>  include/hw/arm/virt.h | 14 ++++++++++++++
+>  2 files changed, 38 insertions(+), 5 deletions(-)
+> 
+> diff --git a/hw/arm/virt.c b/hw/arm/virt.c
+> index ed79460..3018ec2 100644
+> --- a/hw/arm/virt.c
+> +++ b/hw/arm/virt.c
+> @@ -149,6 +149,8 @@ static const MemMapEntry a15memmap[] = {
+>      [VIRT_PCIE_PIO] =           { 0x3eff0000, 0x00010000 },
+>      [VIRT_PCIE_ECAM] =          { 0x3f000000, 0x01000000 },
+>      [VIRT_MEM] =                { 0x40000000, RAMLIMIT_BYTES },
+> +    /* Additional 64 MB redist region (can contain up to 512 redistributors) */
+> +    [VIRT_GIC_REDIST2] =        { 0x4000000000ULL, 0x4000000ULL },
+could it be placed after VIRT_PCIE_MMIO_HIGH,
+so we would have some space here to increase RAM without
+creating the second RAM region upto 512GB boundary?
+
+>      /* Second PCIe window, 512GB wide at the 512GB boundary */
+>      [VIRT_PCIE_MMIO_HIGH] =   { 0x8000000000ULL, 0x8000000000ULL },
+>  };
+> @@ -402,13 +404,30 @@ static void fdt_add_gic_node(VirtMachineState *vms)
+>      qemu_fdt_setprop_cell(vms->fdt, "/intc", "#size-cells", 0x2);
+>      qemu_fdt_setprop(vms->fdt, "/intc", "ranges", NULL, 0);
+>      if (vms->gic_version == 3) {
+> +        int nb_redist_regions = virt_gicv3_redist_region_count(vms);
 > +
-> +    ret = fgetxattr(fd, name, value, size, 0, XATTR_NOFOLLOW);
-> +    close_preserve_errno(fd);
-> +#else
-> +    char *proc_path = g_strdup_printf("/proc/self/fd/%d/%s", dirfd, filename);
->  
->      ret = lgetxattr(proc_path, name, value, size);
->      g_free(proc_path);
-> +#endif
->      return ret;
->  }
->  
->  ssize_t fgetxattr_follow(int fd, const char *name,
->                           void *value, size_t size)
->  {
-> +#ifdef CONFIG_DARWIN
-> +    return fgetxattr(fd, name, value, size, 0, 0);
-> +#else
->      return fgetxattr(fd, name, value, size);
-> +#endif
->  }
->  
->  ssize_t flistxattrat_nofollow(int dirfd, const char *filename,
->                                char *list, size_t size)
->  {
-> -    char *proc_path = g_strdup_printf("/proc/self/fd/%d/%s", dirfd, filename);
->      int ret;
-> +#ifdef CONFIG_DARWIN
-> +    int fd = openat_file(dirfd, filename, O_RDONLY | O_PATH_9P_UTIL | O_NOFOLLOW, 0);
-> +    if (fd == -1)
-> +        return -1;
+>          qemu_fdt_setprop_string(vms->fdt, "/intc", "compatible",
+>                                  "arm,gic-v3");
+> -        qemu_fdt_setprop_sized_cells(vms->fdt, "/intc", "reg",
+> -                                     2, vms->memmap[VIRT_GIC_DIST].base,
+> -                                     2, vms->memmap[VIRT_GIC_DIST].size,
+> -                                     2, vms->memmap[VIRT_GIC_REDIST].base,
+> -                                     2, vms->memmap[VIRT_GIC_REDIST].size);
 > +
-> +    ret = flistxattr(fd, list, size, XATTR_NOFOLLOW);
-> +    close_preserve_errno(fd);
-> +#else
-> +    char *proc_path = g_strdup_printf("/proc/self/fd/%d/%s", dirfd, filename);
->  
->      ret = llistxattr(proc_path, list, size);
->      g_free(proc_path);
-> +#endif
->      return ret;
->  }
->  
->  ssize_t fremovexattrat_nofollow(int dirfd, const char *filename,
->                                  const char *name)
->  {
-> -    char *proc_path = g_strdup_printf("/proc/self/fd/%d/%s", dirfd, filename);
->      int ret;
-> +#ifdef CONFIG_DARWIN
-> +    int fd = openat_file(dirfd, filename, O_PATH_9P_UTIL | O_NOFOLLOW, 0);
-> +    if (fd == -1)
-> +        return -1;
+> +        qemu_fdt_setprop_cell(vms->fdt, "/intc",
+> +                              "#redistributor-regions", nb_redist_regions);
 > +
-> +    ret = fremovexattr(fd, name, XATTR_NOFOLLOW);
-> +    close_preserve_errno(fd);
-> +    return ret;
-> +#else
-> +    char *proc_path = g_strdup_printf("/proc/self/fd/%d/%s", dirfd, filename);
->  
->      ret = lremovexattr(proc_path, name);
->      g_free(proc_path);
->      return ret;
-> +#endif
->  }
->  
->  int fsetxattrat_nofollow(int dirfd, const char *filename, const char *name,
->                           void *value, size_t size, int flags)
->  {
-> -    char *proc_path = g_strdup_printf("/proc/self/fd/%d/%s", dirfd, filename);
->      int ret;
-> +#ifdef CONFIG_DARWIN
-> +    int fd = openat_file(dirfd, filename, O_PATH_9P_UTIL | O_NOFOLLOW, 0);
-> +    if (fd == -1)
-> +        return -1;
+> +        if (nb_redist_regions == 1) {
+> +            qemu_fdt_setprop_sized_cells(vms->fdt, "/intc", "reg",
+> +                                         2, vms->memmap[VIRT_GIC_DIST].base,
+> +                                         2, vms->memmap[VIRT_GIC_DIST].size,
+> +                                         2, vms->memmap[VIRT_GIC_REDIST].base,
+> +                                         2, vms->memmap[VIRT_GIC_REDIST].size);
+> +        } else {
+> +            qemu_fdt_setprop_sized_cells(vms->fdt, "/intc", "reg",
+> +                                         2, vms->memmap[VIRT_GIC_DIST].base,
+> +                                         2, vms->memmap[VIRT_GIC_DIST].size,
+> +                                         2, vms->memmap[VIRT_GIC_REDIST].base,
+> +                                         2, vms->memmap[VIRT_GIC_REDIST].size,
+> +                                         2, vms->memmap[VIRT_GIC_REDIST2].base,
+> +                                         2, vms->memmap[VIRT_GIC_REDIST2].size);
+> +        }
 > +
-> +    ret = fsetxattr(fd, name, value, size, 0, XATTR_NOFOLLOW);
-> +    close_preserve_errno(fd);
-> +#else
-> +    char *proc_path = g_strdup_printf("/proc/self/fd/%d/%s", dirfd, filename);
+>          if (vms->virt) {
+>              qemu_fdt_setprop_cells(vms->fdt, "/intc", "interrupts",
+>                                     GIC_FDT_IRQ_TYPE_PPI, ARCH_GICV3_MAINT_IRQ,
+> diff --git a/include/hw/arm/virt.h b/include/hw/arm/virt.h
+> index 4ac7ef6..308156f 100644
+> --- a/include/hw/arm/virt.h
+> +++ b/include/hw/arm/virt.h
+> @@ -35,6 +35,8 @@
+>  #include "qemu/notify.h"
+>  #include "hw/boards.h"
+>  #include "hw/arm/arm.h"
+> +#include "sysemu/kvm.h"
+> +#include "hw/intc/arm_gicv3_common.h"
 >  
->      ret = lsetxattr(proc_path, name, value, size, flags);
->      g_free(proc_path);
-> +#endif
->      return ret;
->  }
+>  #define NUM_GICV2M_SPIS       64
+>  #define NUM_VIRTIO_TRANSPORTS 32
+> @@ -60,6 +62,7 @@ enum {
+>      VIRT_GIC_V2M,
+>      VIRT_GIC_ITS,
+>      VIRT_GIC_REDIST,
+> +    VIRT_GIC_REDIST2,
+>      VIRT_SMMU,
+>      VIRT_UART,
+>      VIRT_MMIO,
+> @@ -130,4 +133,15 @@ typedef struct {
+>  
+>  void virt_acpi_setup(VirtMachineState *vms);
+>  
+> +/* Return the number of used redistributor regions  */
+> +static inline int virt_gicv3_redist_region_count(VirtMachineState *vms)
+> +{
+> +    uint32_t redist0_capacity =
+> +                vms->memmap[VIRT_GIC_REDIST].size / GICV3_REDIST_SIZE;
+> +
+> +    assert(vms->gic_version == 3);
+> +
+> +    return vms->smp_cpus > redist0_capacity ? 2 : 1;
+> +}
+> +
+>  #endif /* QEMU_ARM_VIRT_H */
