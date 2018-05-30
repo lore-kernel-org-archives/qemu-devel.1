@@ -1,32 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40308)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43137)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <crosa@redhat.com>) id 1fO9aZ-0006Rr-Qd
-	for qemu-devel@nongnu.org; Wed, 30 May 2018 18:29:05 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1fO9rY-0001Ly-Fa
+	for qemu-devel@nongnu.org; Wed, 30 May 2018 18:46:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <crosa@redhat.com>) id 1fO9aU-0007oX-Tk
-	for qemu-devel@nongnu.org; Wed, 30 May 2018 18:29:03 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:59242 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <crosa@redhat.com>) id 1fO9aU-0007np-PE
-	for qemu-devel@nongnu.org; Wed, 30 May 2018 18:28:58 -0400
-References: <20180529193730.9204-1-crosa@redhat.com>
-	<20180529193730.9204-4-crosa@redhat.com>
-	<20180530125705.GL14623@stefanha-x1.localdomain>
-	<20180530162949.GE7451@localhost.localdomain>
-	<47189c37-afec-6366-e9e4-cae5999d9eb2@redhat.com>
-	<20180530200032.GF7451@localhost.localdomain>
-	<8a92255d-51b7-89b0-59e5-2ac60cf026b1@redhat.com>
-	<20180530213122.GA3184@localhost.localdomain>
-From: Cleber Rosa <crosa@redhat.com>
-Message-ID: <c30346c8-ff03-79d4-be44-feec534d12bf@redhat.com>
-Date: Wed, 30 May 2018 18:28:49 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1fO9rU-0007nR-K3
+	for qemu-devel@nongnu.org; Wed, 30 May 2018 18:46:36 -0400
+Received: from mail-pf0-x241.google.com ([2607:f8b0:400e:c00::241]:36769)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1fO9rU-0007n5-3Y
+	for qemu-devel@nongnu.org; Wed, 30 May 2018 18:46:32 -0400
+Received: by mail-pf0-x241.google.com with SMTP id w129-v6so9743935pfd.3
+	for <qemu-devel@nongnu.org>; Wed, 30 May 2018 15:46:31 -0700 (PDT)
+References: <1526945967-9687-1-git-send-email-cota@braap.org>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <ff49bf54-3d5c-c2a4-95cd-3cb8c2efab51@linaro.org>
+Date: Wed, 30 May 2018 15:46:27 -0700
 MIME-Version: 1.0
-In-Reply-To: <20180530213122.GA3184@localhost.localdomain>
+In-Reply-To: <1526945967-9687-1-git-send-email-cota@braap.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3 3/5] Acceptance tests: add quick VNC
- tests
+Subject: Re: [Qemu-devel] [PATCH v3 00/17] tcg: tb_lock removal redux v3
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,60 +30,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: Amador Pahim <amador@pahim.org>, Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+To: "Emilio G. Cota" <cota@braap.org>, qemu-devel@nongnu.org
+Cc: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>
+
+On 05/21/2018 04:39 PM, Emilio G. Cota wrote:
+> v2: https://lists.nongnu.org/archive/html/qemu-devel/2018-04/msg00656.html
+> 
+> Changes since v2:
+> 
+> - rebase onto master, fixing conflicts
+> 
+> - add R-b's
+> 
+> - add a missing page_lock to page_collection_lock
+> 
+> - add a couple of missing assert_page_locked assertions
+> 
+> - add page_lock_pair, as suggested by Alex and Richard
+> 
+> - use a per-thread GHashTable to keep track of locked pages
+> 
+> - get rid of page_collection assertions, and just export
+>   assert_no_pages_locked() [Alex: I removed your R-b.]
+
+Thanks.  Queued to tcg-next.
 
 
-
-On 05/30/2018 05:31 PM, Eduardo Habkost wrote:
-> On Wed, May 30, 2018 at 05:03:56PM -0400, Cleber Rosa wrote:
->> On 05/30/2018 04:00 PM, Eduardo Habkost wrote:
-> [...]
->>       [...]   Now, in addition to this very personal, and thus
->> insignificant botheration, it restricts API design.  By signaling to
->> users that this is valid:
->>
->>   self.vm.add_args(...).launch(...).shutdown()
->>
->> We'd be restricted on the design of, say, migrate().  Even if it sounds
->> sensible to return a boolean indicating migration success, for
->> consistency, it'd require a "return self".
-> [...]
->>> I don't see why this would be an argument against making this
->>> possible:
->>>
->>>   self.vm.add_args('-nodefaults', '-S').launch()
->>
->> Right, it's *mostly* style.  But, it suggests that all methods work
->> similarly and thus restricts API design as mentioned before.
-> [...]
->>> They are more readable than the complex method chaining examples
->>> you have shown, but I don't see any argument against:
->>>
->>>   self.vm.add_args(...).launch()
->>
->> Right.  This one looks nice indeed.  *My* issues are related to
->> expectations (all methods support this?), consistency (all methods
->> should support this!) and the design limitations it brings.
->>
-> 
-> These are good points.
-> 
-> I believe it would be a reasonable convention to make methods
-> that change QEMU configuration return self (because they are
-> often called one after another), but other methods like launch()
-> migrate(), and shutdown() don't have to.
-> 
-> So this would work:
-> 
->   self.vm.add_args(...).add_drive(...).launch()
-> 
-> But this doesn't have to:
-> 
->   self.vm.add_args(...).launch().migrate().shutdown()
-> 
-
-Looks like a sane general rule.  Let's revisit this when new add_*()
-methods are added.
-
-- Cleber.
+r~
