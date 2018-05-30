@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60363)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:32935)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <arei.gonglei@huawei.com>) id 1fNx3M-0007Qd-GE
-	for qemu-devel@nongnu.org; Wed, 30 May 2018 05:05:57 -0400
+	(envelope-from <wei.w.wang@intel.com>) id 1fNx5t-0000Mv-5O
+	for qemu-devel@nongnu.org; Wed, 30 May 2018 05:08:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <arei.gonglei@huawei.com>) id 1fNx3I-0002Uz-HJ
-	for qemu-devel@nongnu.org; Wed, 30 May 2018 05:05:56 -0400
-Received: from szxga02-in.huawei.com ([45.249.212.188]:2327 helo=huawei.com)
+	(envelope-from <wei.w.wang@intel.com>) id 1fNx5q-0003Yg-01
+	for qemu-devel@nongnu.org; Wed, 30 May 2018 05:08:33 -0400
+Received: from mga09.intel.com ([134.134.136.24]:61512)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <arei.gonglei@huawei.com>)
-	id 1fNx3I-0002TB-1t
-	for qemu-devel@nongnu.org; Wed, 30 May 2018 05:05:52 -0400
-From: "Gonglei (Arei)" <arei.gonglei@huawei.com>
-Date: Wed, 30 May 2018 09:05:34 +0000
-Message-ID: <33183CC9F5247A488A2544077AF19020DA646AD6@DGGEMA505-MBX.china.huawei.com>
-References: <D9DE8DBB19F2A24080482022C1DE758302C89900@dggemm509-mbx.china.huawei.com>
-	<e4a72796-562e-adf8-21ba-7bed953126e8@redhat.com>
-In-Reply-To: <e4a72796-562e-adf8-21ba-7bed953126e8@redhat.com>
-Content-Language: zh-CN
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+	(Exim 4.71) (envelope-from <wei.w.wang@intel.com>)
+	id 1fNx5p-0003XN-MU
+	for qemu-devel@nongnu.org; Wed, 30 May 2018 05:08:29 -0400
+Message-ID: <5B0E6AE9.2030505@intel.com>
+Date: Wed, 30 May 2018 17:12:09 +0800
+From: Wei Wang <wei.w.wang@intel.com>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH] socket: dont't free msgfds if error equals
- EAGAIN
+References: <1524550428-27173-1-git-send-email-wei.w.wang@intel.com>
+	<1524550428-27173-5-git-send-email-wei.w.wang@intel.com>
+	<20180529181221-mutt-send-email-mst@kernel.org>
+In-Reply-To: <20180529181221-mutt-send-email-mst@kernel.org>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v7 4/5] virtio-balloon:
+ VIRTIO_BALLOON_F_FREE_PAGE_HINT
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,26 +30,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, linzhecheng <linzhecheng@huawei.com>, =?utf-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Cc: QEMU <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, "wangxin (U)" <wangxinxin.wang@huawei.com>, "peterx@redhat.com" <peterx@redhat.com>, "berrange@redhat.com" <berrange@redhat.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: qemu-devel@nongnu.org, virtio-dev@lists.oasis-open.org, quintela@redhat.com, dgilbert@redhat.com, pbonzini@redhat.com, liliang.opensource@gmail.com, yang.zhang.wz@gmail.com, quan.xu0@gmail.com, nilal@redhat.com, riel@redhat.com, zhang.zhanghailiang@huawei.com
 
-DQoNCj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJvbTogRXJpYyBCbGFrZSBbbWFp
-bHRvOmVibGFrZUByZWRoYXQuY29tXQ0KPiBTZW50OiBXZWRuZXNkYXksIE1heSAzMCwgMjAxOCAz
-OjMzIEFNDQo+IFRvOiBsaW56aGVjaGVuZyA8bGluemhlY2hlbmdAaHVhd2VpLmNvbT47IE1hcmMt
-QW5kcsOpIEx1cmVhdQ0KPiA8bWFyY2FuZHJlLmx1cmVhdUBnbWFpbC5jb20+DQo+IENjOiBRRU1V
-IDxxZW11LWRldmVsQG5vbmdudS5vcmc+OyBQYW9sbyBCb256aW5pIDxwYm9uemluaUByZWRoYXQu
-Y29tPjsNCj4gd2FuZ3hpbiAoVSkgPHdhbmd4aW54aW4ud2FuZ0BodWF3ZWkuY29tPjsgR29uZ2xl
-aSAoQXJlaSkNCj4gPGFyZWkuZ29uZ2xlaUBodWF3ZWkuY29tPjsgcGV0ZXJ4QHJlZGhhdC5jb207
-IGJlcnJhbmdlQHJlZGhhdC5jb20NCj4gU3ViamVjdDogUmU6IFtRZW11LWRldmVsXSBbUEFUQ0hd
-IHNvY2tldDogZG9udCd0IGZyZWUgbXNnZmRzIGlmIGVycm9yIGVxdWFscw0KPiBFQUdBSU4NCj4g
-DQo+IE9uIDA1LzI5LzIwMTggMDQ6MzMgQU0sIGxpbnpoZWNoZW5nIHdyb3RlOg0KPiA+IEkgdGhp
-bmsgdGhpcyBwYXRjaCBkb2Vzbid0IGZpeCBteSBpc3N1ZS4gRm9yIG1vcmUgZGV0YWlscywgcGxl
-YXNlIHNlZSBHb25nbGVpJ3MNCj4gcmVwbHkuDQo+ID4gaHR0cHM6Ly9saXN0cy5nbnUub3JnL2Fy
-Y2hpdmUvaHRtbC9xZW11LWRldmVsLzIwMTgtMDUvbXNnMDYyOTYuaHRtbA0KPiANCj4gWW91ciBt
-YWlsZXIgaXMgbm90IGhvbm9yaW5nIHRocmVhZGluZyAoaXQgZmFpbGVkIHRvIGluY2x1ZGUNCj4g
-J0luLVJlcGx5LVRvOicgYW5kICdSZWZlcmVuY2VzOicgaGVhZGVycyB0aGF0IHJlZmVyIHRvIHRo
-ZSBtZXNzYWdlIHlvdQ0KPiBhcmUgcmVwbHlpbmcgdG8pLCBhbmQgeW91IGFyZSB0b3AtcG9zdGlu
-ZywgYm90aCBvZiB3aGljaCBtYWtlIGl0DQo+IGRpZmZpY3VsdCB0byBmb2xsb3cgeW91ciBjb21t
-ZW50cyBvbiBhIHRlY2huaWNhbCBsaXN0Lg0KPiANCj4gDQpBZ3JlZS4NCg0KQFpoZWNoZW5nLCBw
-bHMgcmVzZW5kIGEgcGF0Y2ggd2l0aCBjb21taXQgbWVzc2FnZS4gQ2NpbmcgdGhlc2UgZ3V5cy4N
-Cg0KUmVnYXJkcywNCi1Hb25nbGVpDQo=
+On 05/29/2018 11:24 PM, Michael S. Tsirkin wrote:
+> On Tue, Apr 24, 2018 at 02:13:47PM +0800, Wei Wang wrote:
+>> +/*
+>> + * Balloon will report pages which were free at the time of this call. As the
+>> + * reporting happens asynchronously, dirty bit logging must be enabled before
+>> + * this call is made.
+>> + */
+>> +void balloon_free_page_start(void)
+>> +{
+>> +    balloon_free_page_start_fn(balloon_opaque);
+>> +}
+> Please create notifier support, not a single global.
+
+OK. The start is called at the end of bitmap_sync, and the stop is 
+called at the beginning of bitmap_sync. In this case, we will need to 
+add two migration states, MIGRATION_STATUS_BEFORE_BITMAP_SYNC and 
+MIGRATION_STATUS_AFTER_BITMAP_SYNC, right?
+
+
+>
+> +static void virtio_balloon_poll_free_page_hints(void *opaque)
+> +{
+> +    VirtQueueElement *elem;
+> +    VirtIOBalloon *dev = opaque;
+> +    VirtIODevice *vdev = VIRTIO_DEVICE(dev);
+> +    VirtQueue *vq = dev->free_page_vq;
+> +    uint32_t id;
+> +    size_t size;
+> +
+> +    while (1) {
+> +        qemu_mutex_lock(&dev->free_page_lock);
+> +        while (dev->block_iothread) {
+> +            qemu_cond_wait(&dev->free_page_cond, &dev->free_page_lock);
+> +        }
+> +
+> +        /*
+> +         * If the migration thread actively stops the reporting, exit
+> +         * immediately.
+> +         */
+> +        if (dev->free_page_report_status == FREE_PAGE_REPORT_S_STOP) {
+> Please refactor this : move loop body into a function so
+> you can do lock/unlock in a single place.
+
+Sounds good.
+
+>
+> +
+> +static bool virtio_balloon_free_page_support(void *opaque)
+> +{
+> +    VirtIOBalloon *s = opaque;
+> +    VirtIODevice *vdev = VIRTIO_DEVICE(s);
+> +
+> +    return virtio_vdev_has_feature(vdev, VIRTIO_BALLOON_F_FREE_PAGE_HINT);
+> or if poison is negotiated.
+
+Will make it
+return virtio_vdev_has_feature(vdev, VIRTIO_BALLOON_F_FREE_PAGE_HINT) && 
+!virtio_vdev_has_feature(vdev, VIRTIO_BALLOON_F_PAGE_POISON)
+
+
+Best,
+Wei
