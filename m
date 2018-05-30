@@ -1,25 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38854)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39138)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <shameerali.kolothum.thodi@huawei.com>)
-	id 1fO2Kg-00056Q-JH
-	for qemu-devel@nongnu.org; Wed, 30 May 2018 10:44:11 -0400
+	(envelope-from <stefanha@redhat.com>) id 1fO2LW-0005d4-Ma
+	for qemu-devel@nongnu.org; Wed, 30 May 2018 10:45:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <shameerali.kolothum.thodi@huawei.com>)
-	id 1fO2Kf-000891-CN
-	for qemu-devel@nongnu.org; Wed, 30 May 2018 10:44:10 -0400
-From: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
-Date: Wed, 30 May 2018 14:43:54 +0000
-Message-ID: <5FC3163CFD30C246ABAA99954A238FA8386F17BD@FRAEML521-MBX.china.huawei.com>
-References: <20180516152026.2920-1-shameerali.kolothum.thodi@huawei.com>
-	<20180516152026.2920-3-shameerali.kolothum.thodi@huawei.com>
-	<58fb3661-8c2a-7fef-aeaa-ab175ea5bdd9@redhat.com>
-In-Reply-To: <58fb3661-8c2a-7fef-aeaa-ab175ea5bdd9@redhat.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	(envelope-from <stefanha@redhat.com>) id 1fO2LV-00009s-P7
+	for qemu-devel@nongnu.org; Wed, 30 May 2018 10:45:02 -0400
+Date: Wed, 30 May 2018 15:44:50 +0100
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <20180530144450.GB5973@stefanha-x1.localdomain>
+References: <1514187226.13662.28.camel@intel.com>
+	<6e792b9f-2281-e8db-0410-c4c3468ffc90@redhat.com>
+	<20180508150309.GC4065@localhost.localdomain>
+	<20180509101618.GC19645@stefanha-x1.localdomain>
+	<d8a06161-d611-4f27-f4c8-f14370f191d4@redhat.com>
+	<20180510082659.GC1296@stefanha-x1.localdomain>
+	<20180511172531.GB5016@localhost.localdomain>
+	<20180514134846.GD5182@stefanha-x1.localdomain>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [RFC v2 2/6] hw/arm/virt: Enable dynamic
- generation of guest RAM memory regions
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="0eh6TmSyL6TZE2Uz"
+Content-Disposition: inline
+In-Reply-To: <20180514134846.GD5182@stefanha-x1.localdomain>
+Subject: Re: [Qemu-devel] [Qemu-block] Some question about savem/qcow2
+ incremental snapshot
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,133 +31,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Auger Eric <eric.auger@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>
-Cc: "drjones@redhat.com" <drjones@redhat.com>, "imammedo@redhat.com" <imammedo@redhat.com>, "peter.maydell@linaro.org" <peter.maydell@linaro.org>, "alex.williamson@redhat.com" <alex.williamson@redhat.com>, Zhaoshenglong <zhaoshenglong@huawei.com>, Jonathan Cameron <jonathan.cameron@huawei.com>, Linuxarm <linuxarm@huawei.com>
+To: Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, He Junyan <junyan.he@intel.com>
+Cc: Pankaj Gupta <pagupta@redhat.com>, qemu-devel@nongnu.org, qemu block <qemu-block@nongnu.org>
 
-Hi Eric.
 
-> -----Original Message-----
-> From: Auger Eric [mailto:eric.auger@redhat.com]
-> Sent: Monday, May 28, 2018 3:22 PM
-> To: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>;
-> qemu-devel@nongnu.org; qemu-arm@nongnu.org
-> Cc: drjones@redhat.com; imammedo@redhat.com; peter.maydell@linaro.org;
-> alex.williamson@redhat.com; Zhaoshenglong <zhaoshenglong@huawei.com>;
-> Jonathan Cameron <jonathan.cameron@huawei.com>; Linuxarm
-> <linuxarm@huawei.com>
-> Subject: Re: [RFC v2 2/6] hw/arm/virt: Enable dynamic generation of guest
-> RAM memory regions
->=20
-> Hi Shameer,
-> On 05/16/2018 05:20 PM, Shameer Kolothum wrote:
-> > Register ram_memory_region_init notifier to allocate memory region
-> > from system memory.
->=20
-> At this stage the commit message does not explain why you need a machine
-> init done notifier. Also the commit title does not summarize the actual
-> change.
-> Thanks
+--0eh6TmSyL6TZE2Uz
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Right. I will reword/rephrase the text.
+On Mon, May 14, 2018 at 02:48:47PM +0100, Stefan Hajnoczi wrote:
+> On Fri, May 11, 2018 at 07:25:31PM +0200, Kevin Wolf wrote:
+> > Am 10.05.2018 um 10:26 hat Stefan Hajnoczi geschrieben:
+> > > On Wed, May 09, 2018 at 07:54:31PM +0200, Max Reitz wrote:
+> > > > On 2018-05-09 12:16, Stefan Hajnoczi wrote:
+> > > > > On Tue, May 08, 2018 at 05:03:09PM +0200, Kevin Wolf wrote:
+> > > > >> Am 08.05.2018 um 16:41 hat Eric Blake geschrieben:
+> > > > >>> On 12/25/2017 01:33 AM, He Junyan wrote:
+> > > > >> I think it makes sense to invest some effort into such interface=
+s, but
+> > > > >> be prepared for a long journey.
+> > > > >=20
+> > > > > I like the suggestion but it needs to be followed up with a concr=
+ete
+> > > > > design that is feasible and fair for Junyan and others to impleme=
+nt.
+> > > > > Otherwise the "long journey" is really just a way of rejecting th=
+is
+> > > > > feature.
 
-Thanks,
-Shameer
+The discussion on NVDIMM via the block layer has runs its course.  It
+would be a big project and I don't think it's fair to ask Junyan to
+implement it.
 
-> Eric
-> >
-> > Signed-off-by: Zhu Yijun <zhuyijun@huawei.com>
-> > Signed-off-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
-> > ---
-> >  hw/arm/virt.c         | 28 ++++++++++++++++++++++------
-> >  include/hw/arm/virt.h |  1 +
-> >  2 files changed, 23 insertions(+), 6 deletions(-)
-> >
-> > diff --git a/hw/arm/virt.c b/hw/arm/virt.c
-> > index 94dcb12..05fcb62 100644
-> > --- a/hw/arm/virt.c
-> > +++ b/hw/arm/virt.c
-> > @@ -1171,6 +1171,19 @@ void virt_machine_done(Notifier *notifier, void
-> *data)
-> >      virt_build_smbios(vms);
-> >  }
-> >
-> > +static void virt_ram_memory_region_init(Notifier *notifier, void *data=
-)
-> > +{
-> > +    MemoryRegion *sysmem =3D get_system_memory();
-> > +    MemoryRegion *ram =3D g_new(MemoryRegion, 1);
-> > +    VirtMachineState *vms =3D container_of(notifier, VirtMachineState,
-> > +                                         ram_memory_region_init);
-> > +    MachineState *machine =3D MACHINE(vms);
-> > +
-> > +    memory_region_allocate_system_memory(ram, NULL, "mach-virt.ram",
-> > +                                         machine->ram_size);
-> > +    memory_region_add_subregion(sysmem, vms-
-> >memmap[VIRT_MEM].base, ram);
-> > +}
-> > +
-> >  static uint64_t virt_cpu_mp_affinity(VirtMachineState *vms, int idx)
-> >  {
-> >      uint8_t clustersz =3D ARM_DEFAULT_CPUS_PER_CLUSTER;
-> > @@ -1204,7 +1217,6 @@ static void machvirt_init(MachineState *machine)
-> >      MemoryRegion *sysmem =3D get_system_memory();
-> >      MemoryRegion *secure_sysmem =3D NULL;
-> >      int n, virt_max_cpus;
-> > -    MemoryRegion *ram =3D g_new(MemoryRegion, 1);
-> >      bool firmware_loaded =3D bios_name || drive_get(IF_PFLASH, 0, 0);
-> >
-> >      /* We can probe only here because during property set
-> > @@ -1361,10 +1373,6 @@ static void machvirt_init(MachineState *machine)
-> >      fdt_add_timer_nodes(vms);
-> >      fdt_add_cpu_nodes(vms);
-> >
-> > -    memory_region_allocate_system_memory(ram, NULL, "mach-virt.ram",
-> > -                                         machine->ram_size);
-> > -    memory_region_add_subregion(sysmem, vms-
-> >memmap[VIRT_MEM].base, ram);
-> > -
-> >      create_flash(vms, sysmem, secure_sysmem ? secure_sysmem : sysmem);
-> >
-> >      create_gic(vms, pic);
-> > @@ -1405,15 +1413,23 @@ static void machvirt_init(MachineState
-> *machine)
-> >      vms->bootinfo.loader_start =3D vms->memmap[VIRT_MEM].base;
-> >      vms->bootinfo.get_dtb =3D machvirt_dtb;
-> >      vms->bootinfo.firmware_loaded =3D firmware_loaded;
-> > +
-> > +    /* Register notifiers. They are executed in registration reverse o=
-rder */
-> >      arm_load_kernel(ARM_CPU(first_cpu), &vms->bootinfo);
-> >
-> >      /*
-> >       * arm_load_kernel machine init done notifier registration must
-> >       * happen before the platform_bus_create call. In this latter,
-> >       * another notifier is registered which adds platform bus nodes.
-> > -     * Notifiers are executed in registration reverse order.
-> >       */
-> >      create_platform_bus(vms, pic);
-> > +
-> > +    /*
-> > +     * Register memory region notifier last as this has to be executed
-> > +     * first.
-> > +     */
-> > +    vms->ram_memory_region_init.notify =3D virt_ram_memory_region_init=
-;
-> > +    qemu_add_machine_init_done_notifier(&vms-
-> >ram_memory_region_init);
-> >  }
-> >
-> >  static bool virt_get_secure(Object *obj, Error **errp)
-> > diff --git a/include/hw/arm/virt.h b/include/hw/arm/virt.h
-> > index ba0c1a4..fc24f3a 100644
-> > --- a/include/hw/arm/virt.h
-> > +++ b/include/hw/arm/virt.h
-> > @@ -91,6 +91,7 @@ typedef struct {
-> >  typedef struct {
-> >      MachineState parent;
-> >      Notifier machine_done;
-> > +    Notifier ram_memory_region_init;
-> >      FWCfgState *fw_cfg;
-> >      bool secure;
-> >      bool highmem;
-> >
+My understanding is this patch series doesn't modify the qcow2 on-disk
+file format.  Rather, it just uses existing qcow2 mechanisms and extends
+live migration to identify the NVDIMM state state region to share the
+clusters.
+
+Since this feature does not involve qcow2 format changes and is just an
+optimization (dirty blocks still need to be allocated), it can be
+removed from QEMU in the future if a better alternative becomes
+available.
+
+Junyan: Can you rebase the series and send a new revision?
+
+Kevin and Max: Does this sound alright?
+
+Stefan
+
+--0eh6TmSyL6TZE2Uz
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJbDrjiAAoJEJykq7OBq3PIy+sH/2ABa8CuOfmxHv9mH6os9SIU
+iBqQp4akv6cb7K8LZIgAp7G7CiBXgx1Kk/KJp0VeSoMDBobidd/V4kZnFDfVQLpA
+Ewg9ZOk1DeeHnlWclHFibqTNlxkU2S7eLJE1jK9E78XsobuqdIdc62AzZwfKXmDG
+60rycU96daybuc6+Nhk69DPB1seWFZ3UvAYqsWh9xZziEWf/Lt+SVrcRPoguS5zn
+523vd7zaO7oCWcPr6Jl9lvZ20ngECBQePpH06Tf6hC27Z/IqT/RspEhGpdakeq2k
+hAA5YJDUGzBG7McuY1qrbEXX6gHEr+o9bc8PFyKS05UJ5bp9+5xLg+8jc8evh8w=
+=dvOw
+-----END PGP SIGNATURE-----
+
+--0eh6TmSyL6TZE2Uz--
