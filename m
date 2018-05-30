@@ -1,26 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38175)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40249)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1fNxTV-0006YC-1E
-	for qemu-devel@nongnu.org; Wed, 30 May 2018 05:32:58 -0400
+	(envelope-from <jemmy858585@gmail.com>) id 1fNxe8-0000K5-NT
+	for qemu-devel@nongnu.org; Wed, 30 May 2018 05:43:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1fNxTU-0003je-4x
-	for qemu-devel@nongnu.org; Wed, 30 May 2018 05:32:57 -0400
-References: <20180528232719.4721-1-f4bug@amsat.org>
-	<20180528232719.4721-10-f4bug@amsat.org>
-	<20180529134053.1ea9f46d.cohuck@redhat.com>
-	<11289f38-6d0f-74c9-1719-83b2a3ed2d97@amsat.org>
-	<20180530074026-mutt-send-email-mst@kernel.org>
-	<CAAdtpL7sDOg2m+Ffsbc3f_Za6fr3in5ZfBJ2BAtGNJ1j4vbhJQ@mail.gmail.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <e1a5c08d-4b69-7590-0c48-1d459d2fbdab@redhat.com>
-Date: Wed, 30 May 2018 11:32:38 +0200
+	(envelope-from <jemmy858585@gmail.com>) id 1fNxe5-0006nM-Ld
+	for qemu-devel@nongnu.org; Wed, 30 May 2018 05:43:56 -0400
+Received: from mail-pl0-x22d.google.com ([2607:f8b0:400e:c01::22d]:40360)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <jemmy858585@gmail.com>)
+	id 1fNxe5-0006n8-FU
+	for qemu-devel@nongnu.org; Wed, 30 May 2018 05:43:53 -0400
+Received: by mail-pl0-x22d.google.com with SMTP id t12-v6so10758579plo.7
+	for <qemu-devel@nongnu.org>; Wed, 30 May 2018 02:43:53 -0700 (PDT)
+From: Lidong Chen <jemmy858585@gmail.com>
+Date: Wed, 30 May 2018 17:43:24 +0800
+Message-Id: <1527673416-31268-1-git-send-email-lidongchen@tencent.com>
 MIME-Version: 1.0
-In-Reply-To: <CAAdtpL7sDOg2m+Ffsbc3f_Za6fr3in5ZfBJ2BAtGNJ1j4vbhJQ@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v4 09/21] target: Do not include
- "exec/exec-all.h" if it is not necessary
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH v4 00/12] Enable postcopy RDMA live migration
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,50 +27,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Cornelia Huck <cohuck@redhat.com>, Thomas Huth <thuth@redhat.com>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, QEMU Trivial <qemu-trivial@nongnu.org>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Peter Maydell <peter.maydell@linaro.org>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, Michael Walle <michael@walle.cc>, Laurent Vivier <laurent@vivier.eu>, Anthony Green <green@moxielogic.com>, Stafford Horne <shorne@gmail.com>, David Gibson <david@gibson.dropbear.id.au>, Alexander Graf <agraf@suse.de>, David Hildenbrand <david@redhat.com>, Max Filippov <jcmvbkbc@gmail.com>, "open list:ARM" <qemu-arm@nongnu.org>, "open list:PowerPC" <qemu-ppc@nongnu.org>, "open list:S390" <qemu-s390x@nongnu.org>
+To: zhang.zhanghailiang@huawei.com, quintela@redhat.com, dgilbert@redhat.com, berrange@redhat.com, aviadye@mellanox.com, pbonzini@redhat.com
+Cc: qemu-devel@nongnu.org, adido@mellanox.com, Lidong Chen <lidongchen@tencent.com>
 
-On 30/05/2018 07:50, Philippe Mathieu-Daud=C3=A9 wrote:
->>> No, not all :/
->>> I started with "(cpu_loop_|tlb_|tb_)" then kept brutebuilding until n=
-o
->>> more errors appear. In 2 more steps I added "cpu_address_space_init|"
->>> then "|GETPC|singlestep|TranslationBlock". Quick and dirty enough for=
- my
->>> goal than trying to build a regex to explode function/struct names fr=
-om
->>> headers. This is a clever way to do it for long term command reuse ta=
-ken
->>> from commit messages...
->> Brutebuilding isn't a good way to find unused includes, some other hea=
-der
->> might pull in an include you are trying to remove for its own purposes=
-.
->> If you want to try brutebuilding you must also verify that's
->> not the case - e.g. look at the dependency file generated.
-> Hmm you mean the .d files in the build dir?
+The RDMA QIOChannel does not support bi-directional communication, so when RDMA 
+live migration with postcopy enabled, the source qemu return path get qemu file 
+error.
 
-You can also check which include files include this one.  In this case
-you can see that brute-building was more or less enough:
+These patches implement bi-directional communication for RDMA QIOChannel and 
+disable the RDMA WRITE during the postcopy phase.
 
-$ git grep -l exec-all -- '*.h'
-accel/tcg/translate-all.h
-include/exec/tb-lookup.h
-include/exec/translator.h
-linux-user/qemu.h
-target/ppc/helper_regs.h
+This patch just make postcopy works, and will improve performance later.
 
-Leaving aside linux-user/qemu.h, let's check which files include one of
-those headers, but they do not include exec/exec-all.h:
+[v4]
+ - not wait RDMA_CM_EVENT_DISCONNECTED event after rdma_disconnect
+ - implement io_set_aio_fd_handler function for RDMA QIOChannel (Juan Quintela)
+ - invoke qio_channel_yield only when qemu_in_coroutine() (Juan Quintela)
+ - create a dedicated thread to release rdma resource
+ - poll the cm event while wait RDMA work request completion
+ - implement the shutdown function for RDMA QIOChannel
 
-$ git grep -L exec-all \
-   $(git grep -lFf <(git grep -l exec-all -- '*.h' | \
-     grep -v qemu.h | sed 's,.*/,,'))
-linux-user/mmap.c
-target/arm/translate.h
-target/ppc/int_helper.c
-trace/control-target.c
+[v3]
+ - add a mutex in QEMUFile struct to avoid concurrent channel close (Daniel)
+ - destroy the mutex before free QEMUFile (David)
+ - use rdmain and rmdaout instead of rdma->return_path (Daniel)
 
-I'll send some patches shortly to fix up what's left.
+[v2]
+ - does not update bytes_xfer when disable RDMA WRITE (David)
+ - implement bi-directional communication for RDMA QIOChannel (Daniel)
 
-Paolo
+Lidong Chen (12):
+  migration: disable RDMA WRITE after postcopy started
+  migration: create a dedicated connection for rdma return path
+  migration: remove unnecessary variables len in QIOChannelRDMA
+  migration: avoid concurrent invoke channel_close by different threads
+  migration: implement bi-directional RDMA QIOChannel
+  migration: Stop rdma yielding during incoming postcopy
+  migration: not wait RDMA_CM_EVENT_DISCONNECTED event after
+    rdma_disconnect
+  migration: implement io_set_aio_fd_handler function for RDMA
+    QIOChannel
+  migration: invoke qio_channel_yield only when qemu_in_coroutine()
+  migration: create a dedicated thread to release rdma resource
+  migration: poll the cm event while wait RDMA work request completion
+  migration: implement the shutdown for RDMA QIOChannel
+
+ migration/colo.c              |   2 +
+ migration/migration.c         |   2 +
+ migration/postcopy-ram.c      |   2 +
+ migration/qemu-file-channel.c |  12 +-
+ migration/qemu-file.c         |  13 +-
+ migration/ram.c               |   4 +
+ migration/rdma.c              | 435 ++++++++++++++++++++++++++++++++++++------
+ migration/savevm.c            |   3 +
+ migration/trace-events        |   1 -
+ 9 files changed, 411 insertions(+), 63 deletions(-)
+
+-- 
+1.8.3.1
