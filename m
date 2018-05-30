@@ -1,21 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53670)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54877)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rkagan@virtuozzo.com>) id 1fO1SW-00012q-T8
-	for qemu-devel@nongnu.org; Wed, 30 May 2018 09:48:14 -0400
+	(envelope-from <cohuck@redhat.com>) id 1fO1Y3-00037D-Kp
+	for qemu-devel@nongnu.org; Wed, 30 May 2018 09:53:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rkagan@virtuozzo.com>) id 1fO1SS-0008LG-0S
-	for qemu-devel@nongnu.org; Wed, 30 May 2018 09:48:12 -0400
-Date: Wed, 30 May 2018 16:47:38 +0300
-From: Roman Kagan <rkagan@virtuozzo.com>
-Message-ID: <20180530134738.GB2448@rkaganb.sw.ru>
-References: <20180426161958.2872-1-rkagan@virtuozzo.com>
-	<14e14e4f-4d43-9c94-7dd6-c295a09b6432@redhat.com>
+	(envelope-from <cohuck@redhat.com>) id 1fO1Xz-0003NB-OA
+	for qemu-devel@nongnu.org; Wed, 30 May 2018 09:53:55 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:45228 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1fO1Xz-0003Mn-JW
+	for qemu-devel@nongnu.org; Wed, 30 May 2018 09:53:51 -0400
+Date: Wed, 30 May 2018 15:53:47 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20180530155347.167708cc.cohuck@redhat.com>
+In-Reply-To: <20180530063955.GA27442@xz-mi>
+References: <20180524044454.11792-1-peterx@redhat.com>
+	<20180524044454.11792-2-peterx@redhat.com>
+	<20180530074400-mutt-send-email-mst@kernel.org>
+	<20180530063955.GA27442@xz-mi>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <14e14e4f-4d43-9c94-7dd6-c295a09b6432@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 00/17] iotests: don't choke on disabled
- drivers
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v4 1/2] qemu-error: introduce
+ {error|warn}_report_once
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,90 +30,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>
-Cc: Kevin Wolf <kwolf@redhat.com>, Markus Armbruster <armbru@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
+To: Peter Xu <peterx@redhat.com>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, Markus Armbruster <armbru@redhat.com>, Jason Wang <jasowang@redhat.com>, qemu-devel@nongnu.org, Philippe =?UTF-8?B?TWF0aGlldS1EYXVkw6k=?= <f4bug@amsat.org>, Halil Pasic <pasic@linux.ibm.com>
 
-On Wed, May 30, 2018 at 02:35:34PM +0200, Max Reitz wrote:
-> On 2018-04-26 18:19, Roman Kagan wrote:
-> > Some iotests assume availability of certain block drivers, and fail if
-> > the driver is not supported by QEMU because it was disabled at configure
-> > time.
+On Wed, 30 May 2018 14:39:55 +0800
+Peter Xu <peterx@redhat.com> wrote:
+
+> On Wed, May 30, 2018 at 07:47:32AM +0300, Michael S. Tsirkin wrote:
+> > On Thu, May 24, 2018 at 12:44:53PM +0800, Peter Xu wrote:  
+> > > There are many error_report()s that can be used in frequently called
+> > > functions, especially on IO paths.  That can be unideal in that
+> > > malicious guest can try to trigger the error tons of time which might
+> > > use up the log space on the host (e.g., libvirt can capture the stderr
+> > > of QEMU and put it persistently onto disk).  
 > > 
-> > This series tries to address that, by making QEMU report the actual list
-> > of supported block drivers in response to "-drive format=?", and using
-> > this information to skip the parts of the io testsuite that can not be
-> > run in this configuration.
+> > I think the problem is real enough but I think the API
+> > isn't great as it stresses the mechanism. Which fundamentally does
+> > not matter - we can print once or 10 times, or whatever.
 > > 
-> > Roman Kagan (17):
-> >   block: iterate_format with account of whitelisting
-> >   iotests: iotests.py: prevent deadlock in subprocess
-> >   iotests: ask qemu for supported formats
-> >   iotest 030: skip quorum test setup/teardown too
-> >   iotest 030: require blkdebug
-> >   iotest 055: skip unsupported backup target formats
-> >   iotest 055: require blkdebug
-> >   iotest 056: skip testcases using blkdebug if disabled
-> >   iotest 071: notrun if blkdebug or blkverify is disabled
-> >   iotest 081: notrun if quorum is disabled
-> >   iotest 087: notrun if null-co is disabled
-> >   iotest 093: notrun if null-co or null-aio is disabled
-> >   iotest 099: notrun if blkdebug or blkverify is disabled
-> >   iotest 124: skip testcases using blkdebug if disabled
-> >   iotest 139: skip testcases using disabled drivers
-> >   iotest 147: notrun if nbd is disabled
-> >   iotest 184: notrun if null-co or throttle is disabled
+> > What happens here is a guest bug as opposed to hypervisor
+> > bug. So I think a better name would be guest_error.  
+> 
+> For me error_report_once() is okay since after all it's only a way to
+> dump something for the hypervisor management software (or the person
+> who manages the QEMU instance), and I don't have a strong opinion to
+> introduce a new guest_error() API.
+
+If we go with that suggestion, guest_{error,warn} should also prefix
+the message with "Guest:" or so. Otherwise, it does not offer that much
+more benefit.
+
+[And I think it should be a wrapper around the report_once
+infrastructure.]
+
+> 
 > > 
-> >  include/block/block.h         |  2 +-
-> >  block.c                       | 23 ++++++++++++++++++----
-> >  blockdev.c                    |  4 +++-
-> >  qemu-img.c                    |  2 +-
-> >  tests/qemu-iotests/030        |  7 +++++++
-> >  tests/qemu-iotests/055        | 13 ++++++++++++
-> >  tests/qemu-iotests/056        |  3 +++
-> >  tests/qemu-iotests/071        |  1 +
-> >  tests/qemu-iotests/081        |  1 +
-> >  tests/qemu-iotests/087        |  1 +
-> >  tests/qemu-iotests/093        |  1 +
-> >  tests/qemu-iotests/099        |  1 +
-> >  tests/qemu-iotests/124        |  5 +++++
-> >  tests/qemu-iotests/139        |  4 ++++
-> >  tests/qemu-iotests/147        |  1 +
-> >  tests/qemu-iotests/184        |  1 +
-> >  tests/qemu-iotests/common.rc  | 19 ++++++++++++++++++
-> >  tests/qemu-iotests/iotests.py | 46 ++++++++++++++++++++++++++++++++-----------
-> >  18 files changed, 117 insertions(+), 18 deletions(-)
+> > Internally we can still have something similar to this
+> > mechanism.
+> > 
+> > Another idea is to reset these guest error counters on guest reset.
+> > Device reset too? I'm not 100% sure as guest can trigger device resets.  
 > 
-> I'll stop reviewing this series for now, because there are more iotests
-> that use drivers outside of their format/protocol combination.
-> 
-> For instance:
-> 
-> $ grep -l null-co ??? | wc -l
-> 15
-> $ grep -l blkdebug ??? | wc -l
-> 30
-> $ (grep -l '"raw"' ???; grep -l "'raw'" ???) | wc -l
-> 22
-> 
-> As I've written in my reply to patch 8, I'm not sure whether it's the
-> right solution to check for the availability of these block drivers in
-> every single test that needs them.  It makes sense for quorum, because
-> quorum needs an external library for hashing, so it may not be trivial
-> to enable.  But it does not seem too useful for other formats that do
-> not have such a dependency (e.g. null-co, blkdebug, raw).
-> 
-> The thing is that it's OK to whitelist everything for testing, and then
-> disable some drivers when building a release.  I don't think one needs
-> to run the iotests with the release version if the whole difference is
-> whether some drivers have been disabled or not.
+> Yes maybe we can, but I don't know whether that's necessary.  If we
+> consider the possiblility of a malicious guest here, resetting the
+> counter after system reset might be dangerous too, since the guest can
+> still flush the host log by the sequence of system reset, trigger the
+> error, system reset, ...
 
-This patchset was created when we started to run (quick) iotests as a part
-of the package build, which looked like a decent alternative to building
-separate CI infrastructure.
+For device reset, we probably should not reset the counters for that
+reason. System reset is debatable (we might have another guest kernel
+or so running after a system reset, don't we?)
 
-If there's no general interest in running iotests against QEMU built in
-a release configuration with certain drivers blacklisted, I think we
-should be fine handling this locally.
-
-Thanks,
-Roman.
+I think the same applies for the vfio-ccw use case referenced in the
+other branch of this thread.
