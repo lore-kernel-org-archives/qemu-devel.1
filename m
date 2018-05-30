@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44042)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44363)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1fO0m6-0000vg-6h
-	for qemu-devel@nongnu.org; Wed, 30 May 2018 09:04:27 -0400
+	(envelope-from <eblake@redhat.com>) id 1fO0nM-0001kV-Rj
+	for qemu-devel@nongnu.org; Wed, 30 May 2018 09:05:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1fO0m0-0003df-AO
-	for qemu-devel@nongnu.org; Wed, 30 May 2018 09:04:22 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:51510 helo=mx1.redhat.com)
+	(envelope-from <eblake@redhat.com>) id 1fO0nI-0003OC-5C
+	for qemu-devel@nongnu.org; Wed, 30 May 2018 09:05:40 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:50078 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1fO0m0-0003bz-67
-	for qemu-devel@nongnu.org; Wed, 30 May 2018 09:04:16 -0400
-Date: Wed, 30 May 2018 21:04:12 +0800
-From: Fam Zheng <famz@redhat.com>
-Message-ID: <20180530130412.GA11841@lemon.usersys.redhat.com>
-References: <20180529193730.9204-1-crosa@redhat.com>
-	<20180529193730.9204-4-crosa@redhat.com>
-	<20180530125705.GL14623@stefanha-x1.localdomain>
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1fO0nI-0003Kv-0t
+	for qemu-devel@nongnu.org; Wed, 30 May 2018 09:05:36 -0400
+References: <20180530030109.22404-1-chen_han_xiao@126.com>
+	<38cf2387-bbac-e4e8-4c7f-d7ba9bdcd0e2@redhat.com>
+	<5e690898.591a.163afd447ec.Coremail.chen_han_xiao@126.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <9335469d-ee0f-e6ac-7570-0b5ccab1ca57@redhat.com>
+Date: Wed, 30 May 2018 08:05:34 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180530125705.GL14623@stefanha-x1.localdomain>
-Subject: Re: [Qemu-devel] [PATCH v3 3/5] Acceptance tests: add quick VNC
- tests
+In-Reply-To: <5e690898.591a.163afd447ec.Coremail.chen_han_xiao@126.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] qga: add mountpoint usage to
+ GuestFilesystemInfo
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,52 +30,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@redhat.com>
-Cc: Cleber Rosa <crosa@redhat.com>, qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>, Amador Pahim <amador@pahim.org>
+To: Chen Hanxiao <chen_han_xiao@126.com>
+Cc: qemu-devel@nongnu.org, Michael Roth <mdroth@linux.vnet.ibm.com>
 
-On Wed, 05/30 13:57, Stefan Hajnoczi wrote:
-> On Tue, May 29, 2018 at 03:37:28PM -0400, Cleber Rosa wrote:
-> > This patch adds a few simple behavior tests for VNC.
-> > 
-> > Signed-off-by: Cleber Rosa <crosa@redhat.com>
-> > ---
-> >  tests/acceptance/vnc.py | 60 +++++++++++++++++++++++++++++++++++++++++
-> >  1 file changed, 60 insertions(+)
-> >  create mode 100644 tests/acceptance/vnc.py
-> > 
-> > diff --git a/tests/acceptance/vnc.py b/tests/acceptance/vnc.py
-> > new file mode 100644
-> > index 0000000000..b1ef9d71b1
-> > --- /dev/null
-> > +++ b/tests/acceptance/vnc.py
-> > @@ -0,0 +1,60 @@
-> > +# Simple functional tests for VNC functionality
-> > +#
-> > +# Copyright (c) 2018 Red Hat, Inc.
-> > +#
-> > +# Author:
-> > +#  Cleber Rosa <crosa@redhat.com>
-> > +#
-> > +# This work is licensed under the terms of the GNU GPL, version 2 or
-> > +# later.  See the COPYING file in the top-level directory.
-> > +
-> > +from avocado_qemu import Test
-> > +
-> > +
-> > +class Vnc(Test):
-> > +    """
-> > +    :avocado: enable
-> > +    :avocado: tags=vnc,quick
-> > +    """
-> > +    def test_no_vnc(self):
-> > +        self.vm.add_args('-nodefaults', '-S')
-> > +        self.vm.launch()
+On 05/30/2018 01:55 AM, Chen Hanxiao wrote:
+
+>>> +    usage = u100 / nonroot_total + (u100 % nonroot_total != 0);
+>>
+>> Why integral instead of floating point?
 > 
-> If this pattern becomes very common maybe vm.launch() should become
-> vm.launch(*extra_args) to make this a one-liner:
-> 
->   self.vm.launch('-nodefaults', '-S')
+> I followed the style of df from coreutils.
+> As the percentage already multiplied by 100,
+> I think it has enough precision.
 
-+1. It will be a nice extension to the launch method.
+You're making an arbitrary policy decision.  Give the client a floating 
+point, and they can still truncate to print out a 2-digit percentage. 
+But give them a percentage, and for a 2T disk image, they are forced to 
+guess whether they are 20G high or low on usage, which starts to take a 
+non-trivial amount of time to copy that much data.  In other words, I 
+think an int is wrong for being too imprecise.
 
-Fam
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
