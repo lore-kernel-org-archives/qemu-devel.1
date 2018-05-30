@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34671)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34673)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1fNunY-0002HI-2e
+	(envelope-from <clg@kaod.org>) id 1fNunY-0002HW-8I
 	for qemu-devel@nongnu.org; Wed, 30 May 2018 02:41:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1fNunU-00017K-4T
+	(envelope-from <clg@kaod.org>) id 1fNunU-00017c-9c
 	for qemu-devel@nongnu.org; Wed, 30 May 2018 02:41:28 -0400
-Received: from 3.mo2.mail-out.ovh.net ([46.105.58.226]:40177)
+Received: from 20.mo6.mail-out.ovh.net ([178.32.124.17]:55529)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1fNunT-00013F-V5
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1fNunU-00015f-36
 	for qemu-devel@nongnu.org; Wed, 30 May 2018 02:41:24 -0400
-Received: from player159.ha.ovh.net (unknown [10.109.108.98])
-	by mo2.mail-out.ovh.net (Postfix) with ESMTP id 7A82613888F
-	for <qemu-devel@nongnu.org>; Wed, 30 May 2018 08:41:15 +0200 (CEST)
+Received: from player159.ha.ovh.net (unknown [10.109.108.49])
+	by mo6.mail-out.ovh.net (Postfix) with ESMTP id 96C7815DAE2
+	for <qemu-devel@nongnu.org>; Wed, 30 May 2018 08:41:22 +0200 (CEST)
 From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
-Date: Wed, 30 May 2018 08:40:43 +0200
-Message-Id: <20180530064049.27976-2-clg@kaod.org>
+Date: Wed, 30 May 2018 08:40:44 +0200
+Message-Id: <20180530064049.27976-3-clg@kaod.org>
 In-Reply-To: <20180530064049.27976-1-clg@kaod.org>
 References: <20180530064049.27976-1-clg@kaod.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v7 1/7] aspeed: remove
- ignore_memory_transaction_failures on all boards
+Subject: [Qemu-devel] [PATCH v7 2/7] aspeed: add support for the
+ witherspoon-bmc board
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,42 +33,108 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Peter Maydell <peter.maydell@linaro.org>
 Cc: qemu-arm@nongnu.org, qemu-devel@nongnu.org, Joel Stanley <joel@jms.id.au>, Andrew Jeffery <andrew@aj.id.au>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
 
+The Witherspoon boards are OpenPOWER system hosting POWER9 Processors.
+Add support for their BMC including a couple of I2C devices as found
+on real HW.
+
 Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+Reviewed-by: Andrew Jeffery <andrew@aj.id.au>
 ---
- hw/arm/aspeed.c | 3 ---
- 1 file changed, 3 deletions(-)
+ hw/arm/aspeed.c | 49 +++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 49 insertions(+)
 
 diff --git a/hw/arm/aspeed.c b/hw/arm/aspeed.c
-index aecb3c1e7578..133614a4384d 100644
+index 133614a4384d..96790af0cf50 100644
 --- a/hw/arm/aspeed.c
 +++ b/hw/arm/aspeed.c
-@@ -279,7 +279,6 @@ static void palmetto_bmc_class_init(ObjectClass *oc, =
-void *data)
-     mc->no_floppy =3D 1;
-     mc->no_cdrom =3D 1;
-     mc->no_parallel =3D 1;
--    mc->ignore_memory_transaction_failures =3D true;
+@@ -46,6 +46,7 @@ enum {
+     PALMETTO_BMC,
+     AST2500_EVB,
+     ROMULUS_BMC,
++    WITHERSPOON_BMC,
+ };
+=20
+ /* Palmetto hardware value: 0x120CE416 */
+@@ -83,8 +84,12 @@ enum {
+         SCU_AST2500_HW_STRAP_ACPI_ENABLE |                              =
+\
+         SCU_HW_STRAP_SPI_MODE(SCU_HW_STRAP_SPI_MASTER))
+=20
++/* Witherspoon hardware value: 0xF10AD216 (but use romulus definition) *=
+/
++#define WITHERSPOON_BMC_HW_STRAP1 ROMULUS_BMC_HW_STRAP1
++
+ static void palmetto_bmc_i2c_init(AspeedBoardState *bmc);
+ static void ast2500_evb_i2c_init(AspeedBoardState *bmc);
++static void witherspoon_bmc_i2c_init(AspeedBoardState *bmc);
+=20
+ static const AspeedBoardConfig aspeed_boards[] =3D {
+     [PALMETTO_BMC] =3D {
+@@ -110,6 +115,14 @@ static const AspeedBoardConfig aspeed_boards[] =3D {
+         .spi_model =3D "mx66l1g45g",
+         .num_cs    =3D 2,
+     },
++    [WITHERSPOON_BMC]  =3D {
++        .soc_name  =3D "ast2500-a1",
++        .hw_strap1 =3D WITHERSPOON_BMC_HW_STRAP1,
++        .fmc_model =3D "mx25l25635e",
++        .spi_model =3D "mx66l1g45g",
++        .num_cs    =3D 2,
++        .i2c_init  =3D witherspoon_bmc_i2c_init,
++    },
+ };
+=20
+ #define FIRMWARE_ADDR 0x0
+@@ -343,11 +356,47 @@ static const TypeInfo romulus_bmc_type =3D {
+     .class_init =3D romulus_bmc_class_init,
+ };
+=20
++static void witherspoon_bmc_i2c_init(AspeedBoardState *bmc)
++{
++    AspeedSoCState *soc =3D &bmc->soc;
++
++    i2c_create_slave(aspeed_i2c_get_bus(DEVICE(&soc->i2c), 4), "tmp423",=
+ 0x4c);
++    i2c_create_slave(aspeed_i2c_get_bus(DEVICE(&soc->i2c), 5), "tmp423",=
+ 0x4c);
++
++    /* The Witherspoon expects a TMP275 but a TMP105 is compatible */
++    i2c_create_slave(aspeed_i2c_get_bus(DEVICE(&soc->i2c), 9), "tmp105",=
+ 0x4a);
++}
++
++static void witherspoon_bmc_init(MachineState *machine)
++{
++    aspeed_board_init(machine, &aspeed_boards[WITHERSPOON_BMC]);
++}
++
++static void witherspoon_bmc_class_init(ObjectClass *oc, void *data)
++{
++    MachineClass *mc =3D MACHINE_CLASS(oc);
++
++    mc->desc =3D "OpenPOWER Witherspoon BMC (ARM1176)";
++    mc->init =3D witherspoon_bmc_init;
++    mc->max_cpus =3D 1;
++    mc->no_sdcard =3D 1;
++    mc->no_floppy =3D 1;
++    mc->no_cdrom =3D 1;
++    mc->no_parallel =3D 1;
++}
++
++static const TypeInfo witherspoon_bmc_type =3D {
++    .name =3D MACHINE_TYPE_NAME("witherspoon-bmc"),
++    .parent =3D TYPE_MACHINE,
++    .class_init =3D witherspoon_bmc_class_init,
++};
++
+ static void aspeed_machine_init(void)
+ {
+     type_register_static(&palmetto_bmc_type);
+     type_register_static(&ast2500_evb_type);
+     type_register_static(&romulus_bmc_type);
++    type_register_static(&witherspoon_bmc_type);
  }
 =20
- static const TypeInfo palmetto_bmc_type =3D {
-@@ -312,7 +311,6 @@ static void ast2500_evb_class_init(ObjectClass *oc, v=
-oid *data)
-     mc->no_floppy =3D 1;
-     mc->no_cdrom =3D 1;
-     mc->no_parallel =3D 1;
--    mc->ignore_memory_transaction_failures =3D true;
- }
-=20
- static const TypeInfo ast2500_evb_type =3D {
-@@ -337,7 +335,6 @@ static void romulus_bmc_class_init(ObjectClass *oc, v=
-oid *data)
-     mc->no_floppy =3D 1;
-     mc->no_cdrom =3D 1;
-     mc->no_parallel =3D 1;
--    mc->ignore_memory_transaction_failures =3D true;
- }
-=20
- static const TypeInfo romulus_bmc_type =3D {
+ type_init(aspeed_machine_init)
 --=20
 2.13.6
