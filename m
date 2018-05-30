@@ -1,21 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44651)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45055)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1fNsnv-0000bf-J5
-	for qemu-devel@nongnu.org; Wed, 30 May 2018 00:33:44 -0400
+	(envelope-from <jcody@redhat.com>) id 1fNspy-0001XR-9g
+	for qemu-devel@nongnu.org; Wed, 30 May 2018 00:35:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1fNsnu-0004ZP-Qa
-	for qemu-devel@nongnu.org; Wed, 30 May 2018 00:33:43 -0400
-Date: Wed, 30 May 2018 00:33:33 -0400
+	(envelope-from <jcody@redhat.com>) id 1fNspx-0005cB-EA
+	for qemu-devel@nongnu.org; Wed, 30 May 2018 00:35:50 -0400
+Date: Wed, 30 May 2018 00:35:41 -0400
 From: Jeff Cody <jcody@redhat.com>
-Message-ID: <20180530043333.GF9904@localhost.localdomain>
+Message-ID: <20180530043541.GG9904@localhost.localdomain>
 References: <20180529203910.7615-1-kwolf@redhat.com>
-	<20180529203910.7615-10-kwolf@redhat.com>
+	<20180529203910.7615-9-kwolf@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20180529203910.7615-10-kwolf@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2 09/16] qemu-iotests: iotests.py helper
- for non-file protocols
+In-Reply-To: <20180529203910.7615-9-kwolf@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2 08/16] qemu-iotests: Add VM.run_job()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,53 +26,49 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Kevin Wolf <kwolf@redhat.com>
 Cc: qemu-block@nongnu.org, mreitz@redhat.com, jsnow@redhat.com, eblake@redhat.com, pkrempa@redhat.com, qemu-devel@nongnu.org
 
-On Tue, May 29, 2018 at 10:39:03PM +0200, Kevin Wolf wrote:
-> This adds two helper functions that are useful for test cases that make
-> use of a non-file protocol (specifically ssh).
+On Tue, May 29, 2018 at 10:39:02PM +0200, Kevin Wolf wrote:
+> Add an iotests.py function that runs a job and only returns when it is
+> destroyed. An error is logged when the job failed and job-finalize and
+> job-dismiss commands are issued if necessary.
 > 
 > Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 
 Reviewed-by: Jeff Cody <jcody@redhat.com>
 
 > ---
->  tests/qemu-iotests/iotests.py | 17 +++++++++++++++++
->  1 file changed, 17 insertions(+)
+>  tests/qemu-iotests/iotests.py | 19 +++++++++++++++++++
+>  1 file changed, 19 insertions(+)
 > 
 > diff --git a/tests/qemu-iotests/iotests.py b/tests/qemu-iotests/iotests.py
-> index 8b612cb891..bc8f404ac2 100644
+> index edcd2bb701..8b612cb891 100644
 > --- a/tests/qemu-iotests/iotests.py
 > +++ b/tests/qemu-iotests/iotests.py
-> @@ -303,6 +303,13 @@ def file_path(*names):
+> @@ -418,6 +418,25 @@ class VM(qtest.QEMUQtestMachine):
+>          log(str(result), filters)
+>          return result
 >  
->      return paths[0] if len(paths) == 1 else paths
->  
-> +def remote_filename(path):
-> +    if imgproto == 'file':
-> +        return path
-> +    elif imgproto == 'ssh':
-> +        return "ssh://127.0.0.1%s" % (path)
-> +    else:
-> +        raise Exception("Protocol %s not supported" % (imgproto))
->  
->  class VM(qtest.QEMUQtestMachine):
->      '''A QEMU VM'''
-> @@ -601,6 +608,16 @@ def verify_image_format(supported_fmts=[], unsupported_fmts=[]):
->      if not_sup or (imgfmt in unsupported_fmts):
->          notrun('not suitable for this image format: %s' % imgfmt)
->  
-> +def verify_protocol(supported=[], unsupported=[]):
-> +    assert not (supported and unsupported)
+> +    def run_job(self, job, auto_finalize=True, auto_dismiss=False):
+> +        while True:
+> +            for ev in self.get_qmp_events_filtered(wait=True):
+> +                if ev['event'] == 'JOB_STATUS_CHANGE':
+> +                    status = ev['data']['status']
+> +                    if status == 'aborting':
+> +                        result = self.qmp('query-jobs')
+> +                        for j in result['return']:
+> +                            if j['id'] == job:
+> +                                log('Job failed: %s' % (j['error']))
+> +                    elif status == 'pending' and not auto_finalize:
+> +                        self.qmp_log('job-finalize', id=job)
+> +                    elif status == 'concluded' and not auto_dismiss:
+> +                        self.qmp_log('job-dismiss', id=job)
+> +                    elif status == 'null':
+> +                        return
+> +                else:
+> +                    iotests.log(ev)
 > +
-> +    if 'generic' in supported:
-> +        return
-> +
-> +    not_sup = supported and (imgproto not in supported)
-> +    if not_sup or (imgproto in unsupported):
-> +        notrun('not suitable for this protocol: %s' % imgproto)
-> +
->  def verify_platform(supported_oses=['linux']):
->      if True not in [sys.platform.startswith(x) for x in supported_oses]:
->          notrun('not suitable for this OS: %s' % sys.platform)
+>  
+>  index_re = re.compile(r'([^\[]+)\[([^\]]+)\]')
+>  
 > -- 
 > 2.13.6
 > 
