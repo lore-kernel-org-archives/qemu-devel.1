@@ -1,29 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58468)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59416)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fO3dI-0007Fe-9z
-	for qemu-devel@nongnu.org; Wed, 30 May 2018 12:07:29 -0400
+	(envelope-from <lersek@redhat.com>) id 1fO3gu-0001xr-Cs
+	for qemu-devel@nongnu.org; Wed, 30 May 2018 12:11:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fO3dH-0002pb-9x
-	for qemu-devel@nongnu.org; Wed, 30 May 2018 12:07:28 -0400
-Date: Wed, 30 May 2018 18:07:19 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20180530160719.GD4311@localhost.localdomain>
-References: <1514187226.13662.28.camel@intel.com>
-	<6e792b9f-2281-e8db-0410-c4c3468ffc90@redhat.com>
-	<20180508150309.GC4065@localhost.localdomain>
-	<20180509101618.GC19645@stefanha-x1.localdomain>
-	<d8a06161-d611-4f27-f4c8-f14370f191d4@redhat.com>
-	<20180510082659.GC1296@stefanha-x1.localdomain>
-	<20180511172531.GB5016@localhost.localdomain>
-	<20180514134846.GD5182@stefanha-x1.localdomain>
-	<20180530144450.GB5973@stefanha-x1.localdomain>
+	(envelope-from <lersek@redhat.com>) id 1fO3gs-0004d6-UG
+	for qemu-devel@nongnu.org; Wed, 30 May 2018 12:11:12 -0400
+References: <1527690380-9782-1-git-send-email-eric.auger@redhat.com>
+	<1527690380-9782-2-git-send-email-eric.auger@redhat.com>
+From: Laszlo Ersek <lersek@redhat.com>
+Message-ID: <f80946ef-0bf6-7e8b-e421-86dc3555fa80@redhat.com>
+Date: Wed, 30 May 2018 18:11:01 +0200
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="VS++wcV0S1rZb1Fb"
-Content-Disposition: inline
-In-Reply-To: <20180530144450.GB5973@stefanha-x1.localdomain>
-Subject: Re: [Qemu-devel] [Qemu-block] Some question about savem/qcow2
- incremental snapshot
+In-Reply-To: <1527690380-9782-2-git-send-email-eric.auger@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 1/2] hw/arm/virt: Add a new 256MB ECAM
+ region
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,94 +25,188 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@redhat.com>
-Cc: Max Reitz <mreitz@redhat.com>, He Junyan <junyan.he@intel.com>, Pankaj Gupta <pagupta@redhat.com>, qemu-devel@nongnu.org, qemu block <qemu-block@nongnu.org>
+To: Eric Auger <eric.auger@redhat.com>, eric.auger.pro@gmail.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org, peter.maydell@linaro.org
+Cc: drjones@redhat.com, wei@redhat.com, zhaoshenglong@huawei.com, ard.biesheuvel@linaro.org
 
+On 05/30/18 16:26, Eric Auger wrote:
+> This patch defines a new ECAM region located after the 256GB limit.
+> 
+> The virt machine state is augmented with a new highmem_ecam field
+> which guards the usage of this new ECAM region instead of the legacy
+> 16MB one. With the highmem ECAM region, up to 256 PCIe buses can be
+> used.
+> 
+> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+> 
+> ---
+> 
+> RFC -> PATCH:
+> - remove the newline at the end of acpi_dsdt_add_pci
+> - use vms->highmem_ecam to select the memmap id
+> ---
+>  hw/arm/virt-acpi-build.c | 21 +++++++++++++--------
+>  hw/arm/virt.c            | 12 ++++++++----
+>  include/hw/arm/virt.h    |  2 ++
+>  3 files changed, 23 insertions(+), 12 deletions(-)
+> 
+> diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
+> index 92ceee9..c0370b2 100644
+> --- a/hw/arm/virt-acpi-build.c
+> +++ b/hw/arm/virt-acpi-build.c
+> @@ -150,16 +150,17 @@ static void acpi_dsdt_add_virtio(Aml *scope,
+>  }
+>  
+>  static void acpi_dsdt_add_pci(Aml *scope, const MemMapEntry *memmap,
+> -                              uint32_t irq, bool use_highmem)
+> +                              uint32_t irq, bool use_highmem, bool highmem_ecam)
+>  {
+> +    int ecam_id = highmem_ecam ? VIRT_PCIE_ECAM_HIGH : VIRT_PCIE_ECAM;
+>      Aml *method, *crs, *ifctx, *UUID, *ifctx1, *elsectx, *buf;
+>      int i, bus_no;
+>      hwaddr base_mmio = memmap[VIRT_PCIE_MMIO].base;
+>      hwaddr size_mmio = memmap[VIRT_PCIE_MMIO].size;
+>      hwaddr base_pio = memmap[VIRT_PCIE_PIO].base;
+>      hwaddr size_pio = memmap[VIRT_PCIE_PIO].size;
+> -    hwaddr base_ecam = memmap[VIRT_PCIE_ECAM].base;
+> -    hwaddr size_ecam = memmap[VIRT_PCIE_ECAM].size;
+> +    hwaddr base_ecam = memmap[ecam_id].base;
+> +    hwaddr size_ecam = memmap[ecam_id].size;
+>      int nr_pcie_buses = size_ecam / PCIE_MMCFG_SIZE_MIN;
+>  
+>      Aml *dev = aml_device("%s", "PCI0");
+> @@ -173,7 +174,7 @@ static void acpi_dsdt_add_pci(Aml *scope, const MemMapEntry *memmap,
+>      aml_append(dev, aml_name_decl("_CCA", aml_int(1)));
+>  
+>      /* Declare the PCI Routing Table. */
+> -    Aml *rt_pkg = aml_package(nr_pcie_buses * PCI_NUM_PINS);
+> +    Aml *rt_pkg = aml_varpackage(nr_pcie_buses * PCI_NUM_PINS);
+>      for (bus_no = 0; bus_no < nr_pcie_buses; bus_no++) {
+>          for (i = 0; i < PCI_NUM_PINS; i++) {
+>              int gsi = (i + bus_no) % PCI_NUM_PINS;
+> @@ -316,7 +317,10 @@ static void acpi_dsdt_add_pci(Aml *scope, const MemMapEntry *memmap,
+>      Aml *dev_res0 = aml_device("%s", "RES0");
+>      aml_append(dev_res0, aml_name_decl("_HID", aml_string("PNP0C02")));
+>      crs = aml_resource_template();
+> -    aml_append(crs, aml_memory32_fixed(base_ecam, size_ecam, AML_READ_WRITE));
+> +    aml_append(crs,
+> +        aml_qword_memory(AML_POS_DECODE, AML_MIN_FIXED, AML_MAX_FIXED,
+> +                         AML_NON_CACHEABLE, AML_READ_WRITE, 0x0000, base_ecam,
+> +                         base_ecam + size_ecam - 1, 0x0000, size_ecam));
+>      aml_append(dev_res0, aml_name_decl("_CRS", crs));
+>      aml_append(dev, dev_res0);
+>      aml_append(scope, dev);
+> @@ -563,16 +567,17 @@ build_mcfg(GArray *table_data, BIOSLinker *linker, VirtMachineState *vms)
+>  {
+>      AcpiTableMcfg *mcfg;
+>      const MemMapEntry *memmap = vms->memmap;
+> +    int ecam_id = vms->highmem_ecam ? VIRT_PCIE_ECAM_HIGH : VIRT_PCIE_ECAM;
+>      int len = sizeof(*mcfg) + sizeof(mcfg->allocation[0]);
+>      int mcfg_start = table_data->len;
+>  
+>      mcfg = acpi_data_push(table_data, len);
+> -    mcfg->allocation[0].address = cpu_to_le64(memmap[VIRT_PCIE_ECAM].base);
+> +    mcfg->allocation[0].address = cpu_to_le64(memmap[ecam_id].base);
+>  
+>      /* Only a single allocation so no need to play with segments */
+>      mcfg->allocation[0].pci_segment = cpu_to_le16(0);
+>      mcfg->allocation[0].start_bus_number = 0;
+> -    mcfg->allocation[0].end_bus_number = (memmap[VIRT_PCIE_ECAM].size
+> +    mcfg->allocation[0].end_bus_number = (memmap[ecam_id].size
+>                                            / PCIE_MMCFG_SIZE_MIN) - 1;
+>  
+>      build_header(linker, table_data, (void *)(table_data->data + mcfg_start),
+> @@ -747,7 +752,7 @@ build_dsdt(GArray *table_data, BIOSLinker *linker, VirtMachineState *vms)
+>      acpi_dsdt_add_virtio(scope, &memmap[VIRT_MMIO],
+>                      (irqmap[VIRT_MMIO] + ARM_SPI_BASE), NUM_VIRTIO_TRANSPORTS);
+>      acpi_dsdt_add_pci(scope, memmap, (irqmap[VIRT_PCIE] + ARM_SPI_BASE),
+> -                      vms->highmem);
+> +                      vms->highmem, vms->highmem_ecam);
+>      acpi_dsdt_add_gpio(scope, &memmap[VIRT_GPIO],
+>                         (irqmap[VIRT_GPIO] + ARM_SPI_BASE));
+>      acpi_dsdt_add_power_button(scope);
+> diff --git a/hw/arm/virt.c b/hw/arm/virt.c
+> index a3a28e2..d4247d0 100644
+> --- a/hw/arm/virt.c
+> +++ b/hw/arm/virt.c
+> @@ -149,6 +149,7 @@ static const MemMapEntry a15memmap[] = {
+>      [VIRT_PCIE_PIO] =           { 0x3eff0000, 0x00010000 },
+>      [VIRT_PCIE_ECAM] =          { 0x3f000000, 0x01000000 },
+>      [VIRT_MEM] =                { 0x40000000, RAMLIMIT_BYTES },
+> +    [VIRT_PCIE_ECAM_HIGH] =     { 0x4010000000ULL, 0x10000000 },
+>      /* Second PCIe window, 512GB wide at the 512GB boundary */
+>      [VIRT_PCIE_MMIO_HIGH] =   { 0x8000000000ULL, 0x8000000000ULL },
+>  };
+> @@ -1001,10 +1002,9 @@ static void create_pcie(VirtMachineState *vms, qemu_irq *pic)
+>      hwaddr size_mmio_high = vms->memmap[VIRT_PCIE_MMIO_HIGH].size;
+>      hwaddr base_pio = vms->memmap[VIRT_PCIE_PIO].base;
+>      hwaddr size_pio = vms->memmap[VIRT_PCIE_PIO].size;
+> -    hwaddr base_ecam = vms->memmap[VIRT_PCIE_ECAM].base;
+> -    hwaddr size_ecam = vms->memmap[VIRT_PCIE_ECAM].size;
+> +    hwaddr base_ecam, size_ecam;
+>      hwaddr base = base_mmio;
+> -    int nr_pcie_buses = size_ecam / PCIE_MMCFG_SIZE_MIN;
+> +    int nr_pcie_buses;
+>      int irq = vms->irqmap[VIRT_PCIE];
+>      MemoryRegion *mmio_alias;
+>      MemoryRegion *mmio_reg;
+> @@ -1012,12 +1012,16 @@ static void create_pcie(VirtMachineState *vms, qemu_irq *pic)
+>      MemoryRegion *ecam_reg;
+>      DeviceState *dev;
+>      char *nodename;
+> -    int i;
+> +    int i, ecam_memmap_id;
+>      PCIHostState *pci;
+>  
+>      dev = qdev_create(NULL, TYPE_GPEX_HOST);
+>      qdev_init_nofail(dev);
+>  
+> +    ecam_memmap_id = vms->highmem_ecam ? VIRT_PCIE_ECAM_HIGH : VIRT_PCIE_ECAM;
+> +    base_ecam = vms->memmap[ecam_memmap_id].base;
+> +    size_ecam = vms->memmap[ecam_memmap_id].size;
+> +    nr_pcie_buses = size_ecam / PCIE_MMCFG_SIZE_MIN;
+>      /* Map only the first size_ecam bytes of ECAM space */
+>      ecam_alias = g_new0(MemoryRegion, 1);
+>      ecam_reg = sysbus_mmio_get_region(SYS_BUS_DEVICE(dev), 0);
+> diff --git a/include/hw/arm/virt.h b/include/hw/arm/virt.h
+> index 4ac7ef6..e9423a7 100644
+> --- a/include/hw/arm/virt.h
+> +++ b/include/hw/arm/virt.h
+> @@ -69,6 +69,7 @@ enum {
+>      VIRT_PCIE_MMIO,
+>      VIRT_PCIE_PIO,
+>      VIRT_PCIE_ECAM,
+> +    VIRT_PCIE_ECAM_HIGH,
+>      VIRT_PLATFORM_BUS,
+>      VIRT_PCIE_MMIO_HIGH,
+>      VIRT_GPIO,
+> @@ -103,6 +104,7 @@ typedef struct {
+>      FWCfgState *fw_cfg;
+>      bool secure;
+>      bool highmem;
+> +    bool highmem_ecam;
+>      bool its;
+>      bool virt;
+>      int32_t gic_version;
+> 
 
---VS++wcV0S1rZb1Fb
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+At this point, the order (and values) of the VIRT_* enum constants look
+mostly random :) , but I'm unaware of anything why that should be a problem.
 
-Am 30.05.2018 um 16:44 hat Stefan Hajnoczi geschrieben:
-> On Mon, May 14, 2018 at 02:48:47PM +0100, Stefan Hajnoczi wrote:
-> > On Fri, May 11, 2018 at 07:25:31PM +0200, Kevin Wolf wrote:
-> > > Am 10.05.2018 um 10:26 hat Stefan Hajnoczi geschrieben:
-> > > > On Wed, May 09, 2018 at 07:54:31PM +0200, Max Reitz wrote:
-> > > > > On 2018-05-09 12:16, Stefan Hajnoczi wrote:
-> > > > > > On Tue, May 08, 2018 at 05:03:09PM +0200, Kevin Wolf wrote:
-> > > > > >> Am 08.05.2018 um 16:41 hat Eric Blake geschrieben:
-> > > > > >>> On 12/25/2017 01:33 AM, He Junyan wrote:
-> > > > > >> I think it makes sense to invest some effort into such interfa=
-ces, but
-> > > > > >> be prepared for a long journey.
-> > > > > >=20
-> > > > > > I like the suggestion but it needs to be followed up with a con=
-crete
-> > > > > > design that is feasible and fair for Junyan and others to imple=
-ment.
-> > > > > > Otherwise the "long journey" is really just a way of rejecting =
-this
-> > > > > > feature.
->=20
-> The discussion on NVDIMM via the block layer has runs its course.  It
-> would be a big project and I don't think it's fair to ask Junyan to
-> implement it.
->=20
-> My understanding is this patch series doesn't modify the qcow2 on-disk
-> file format.  Rather, it just uses existing qcow2 mechanisms and extends
-> live migration to identify the NVDIMM state state region to share the
-> clusters.
->=20
-> Since this feature does not involve qcow2 format changes and is just an
-> optimization (dirty blocks still need to be allocated), it can be
-> removed from QEMU in the future if a better alternative becomes
-> available.
->=20
-> Junyan: Can you rebase the series and send a new revision?
->=20
-> Kevin and Max: Does this sound alright?
+I compared this against the RFC version; from my side:
 
-Do patches exist? I've never seen any, so I thought this was just the
-early design stage.
+Reviewed-by: Laszlo Ersek <lersek@redhat.com>
 
-I suspect that while it wouldn't change the qcow2 on-disk format in a
-way that the qcow2 spec would have to be change, it does need to change
-the VMState format that is stored as a blob within the qcow2 file.
-At least, you need to store which other snapshot it is based upon so
-that you can actually resume a VM from the incremental state.
+Can you please do the following additionally:
 
-Once you modify the VMState format/the migration stream, removing it
-=66rom QEMU again later means that you can't load your old snapshots any
-more. Doing that, even with the two-release deprecation period, would be
-quite nasty.
+- The aarch64 firmware packaged in Gerd's repo is built with the verbose
+  log enabled, as far as I can see. Can you please capture two boot logs
+  (from the serial console) until the guest kernel is reached, and send
+  them to me (off-list if you prefer)? The first log should have the new
+  feature disabled, the second one enabled; I'd like to compare them.
 
-But you're right, depending on how the feature is implemented, it might
-not be a thing that affects qcow2 much, but one that the migration
-maintainers need to have a look at. I kind of suspect that it would
-actually touch both parts to a degree that it would need approval from
-both sides.
+- (I think the same test is useful with the guest kernel dmesg as well,
+  passing ignore_loglevel, but I don't think my assistance in reviewing
+  that difference is necessary or helpful :) )
 
-Kevin
-
---VS++wcV0S1rZb1Fb
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIcBAEBAgAGBQJbDsw3AAoJEH8JsnLIjy/WKNMQAISgXP/stVQIS1U7HY9uUpG8
-RKbZwwV5BhUZ1TnQ6vfNSxY+WruOaZslr7nzYHoPdeZCbop/NSOasvlRi5WZcpBN
-tYeei+sdKx95CcthtcRxK0pbr/cJ/mw2xumzFzPpoJ4sUXuOUzUg6GuznhkUUYJE
-kAXq7xpHQs64tSvq0x4kr1CiQwQK/e40BtwLLZRw/otObRMVDhQBqAJQEs1Xi4kK
-gceaQZQKG6CwKZz7+KY/WE2YwaHe1YcZf4WFk+YSGW5aIbthgBIHAA0iQQEyQVM+
-73sgI3UYRNlEzOpU38Ta9uhtIhP802IOzgTlSBJBNOMBE/5oo2TiDVFZ8bFJLF4s
-Zj7zBPCe7MgcFlcO0/qIZdm5LEFdG3TyPdR9MOch+wMsEAQTmgJHGYSH8T6WVV3Z
-4+Bc7SvwFaaszdM1BvA6CU0aK04CI7PjUR1sZDCh4RP/8kt0RCgMG2hVRsyzrPUC
-LPJs5LuiZgzuIo2tMLjd3ZHCCwQ6fUiclj/u2BGYKD5EUHMCJj3I2jF0J2WbFTOk
-AWGsb9/4B1UWms7wPlGHZHYUdtqLHrpQLOAU7luEUjcTb71UHFLUNezQ/CmD/O3G
-vt/X6EcJ8GW94EJGNqX/aw11lTNx4KjvTN2kHTSt3lTgQ4OY0izkMJcMKRKIc0fU
-1QsEtTSLSJJjGcHdGgmv
-=C8FX
------END PGP SIGNATURE-----
-
---VS++wcV0S1rZb1Fb--
+Thanks!
+Laszlo
