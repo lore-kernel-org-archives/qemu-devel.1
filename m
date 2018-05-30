@@ -1,31 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57775)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58398)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fNrJE-000707-RG
-	for qemu-devel@nongnu.org; Tue, 29 May 2018 22:57:57 -0400
+	(envelope-from <chen_han_xiao@126.com>) id 1fNrMf-0008BO-N9
+	for qemu-devel@nongnu.org; Tue, 29 May 2018 23:01:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fNrJA-0003PU-17
-	for qemu-devel@nongnu.org; Tue, 29 May 2018 22:57:56 -0400
-Received: from mail-qk0-x244.google.com ([2607:f8b0:400d:c09::244]:43856)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fNrJ9-0003PD-Rv
-	for qemu-devel@nongnu.org; Tue, 29 May 2018 22:57:51 -0400
-Received: by mail-qk0-x244.google.com with SMTP id h19-v6so13242711qkj.10
-	for <qemu-devel@nongnu.org>; Tue, 29 May 2018 19:57:51 -0700 (PDT)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20180529220338.10879-1-jusual@mail.ru>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <97e86c94-b0f3-be30-627a-19a25783cba6@amsat.org>
-Date: Tue, 29 May 2018 23:57:47 -0300
-MIME-Version: 1.0
-In-Reply-To: <20180529220338.10879-1-jusual@mail.ru>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [RFC 0/3] nRF51 SoC: Add UART support
+	(envelope-from <chen_han_xiao@126.com>) id 1fNrMa-0005m8-Sa
+	for qemu-devel@nongnu.org; Tue, 29 May 2018 23:01:29 -0400
+Received: from m15-113.126.com ([220.181.15.113]:52691)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <chen_han_xiao@126.com>) id 1fNrMa-0005ix-3u
+	for qemu-devel@nongnu.org; Tue, 29 May 2018 23:01:24 -0400
+From: Chen Hanxiao <chen_han_xiao@126.com>
+Date: Wed, 30 May 2018 11:01:09 +0800
+Message-Id: <20180530030109.22404-1-chen_han_xiao@126.com>
+Subject: [Qemu-devel] [PATCH] qga: add mountpoint usage to
+ GuestFilesystemInfo
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,47 +22,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Julia Suvorova <jusual@mail.ru>, qemu-devel <qemu-devel@nongnu.org>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Jim Mussared <jim@groklearning.com>, =?UTF-8?Q?Steffen_G=c3=b6rtz?= <mail@steffen-goertz.de>, Stefan Hajnoczi <stefanha@gmail.com>, Joel Stanley <joel@jms.id.au>
+To: qemu-devel@nongnu.org
+Cc: Chen Hanxiao <chen_han_xiao@126.com>, Michael Roth <mdroth@linux.vnet.ibm.com>
 
-Hi Julia,
+From: Chen Hanxiao <chenhanxiao@gmail.com>
 
-On 05/29/2018 07:03 PM, Julia Suvorova via Qemu-devel wrote:
-> This series adds basic support for the nRF51 SoC UART, that used in
-> BBC Micro:bit board, and QTest for it.
-> 
-> Based-on: <20180503090532.3113-1-joel@jms.id.au>
-> 
-> Julia Suvorova (3):
->   hw/arm/nrf51_soc: Fix compilation and memory regions
+This patch adds support for getting the usage of mounted
+filesystem.
+It's very useful when we try to monitor guest's filesystem.
+Use df of coreutils for reference.
 
-Since Joel's series isn't merged, you can simply take his patches, fix
-them, and include them in your following series.  Usually you keep his
-Signed-off-by line, add a comment with your changes, then add your
-S-o-b, such:
+Cc: Michael Roth <mdroth@linux.vnet.ibm.com>
+Signed-off-by: Chen Hanxiao <chenhanxiao@gmail.com>
+---
+ qga/commands-posix.c | 17 +++++++++++++++++
+ qga/qapi-schema.json |  3 ++-
+ 2 files changed, 19 insertions(+), 1 deletion(-)
 
-    [PATCH ...] hw/arm: Add Nordic Semiconductor nRF51 SoC
-
-    The nRF51 is a Cortex-M0 microcontroller with an on-board radio module,
-    plus other common ARM SoC peripherals.
-
-    This defines a basic model of the CPU and memory, with no peripherals
-    implemented at this stage.
-
-    Signed-off-by: Joel Stanley <joel@jms.id.au>
-    [Julia: Fixed BBC Micro:bit board ROM/RAM size, added FICR defines]
-    Signed-off-by: Julia Suvorova <jusual@mail.ru>
-
->   hw/char/nrf51_uart: Implement nRF51 SoC UART
->   tests/boot-serial-test: Add support for the microbit board
-> 
->  hw/arm/nrf51_soc.c           |  19 ++-
->  hw/char/Makefile.objs        |   1 +
->  hw/char/nrf51_uart.c         | 232 +++++++++++++++++++++++++++++++++++
->  include/hw/arm/nrf51_soc.h   |   2 +
->  include/hw/char/nrf51_uart.h |  54 ++++++++
->  tests/boot-serial-test.c     |  11 ++
->  6 files changed, 314 insertions(+), 5 deletions(-)
->  create mode 100644 hw/char/nrf51_uart.c
->  create mode 100644 include/hw/char/nrf51_uart.h
-> 
+diff --git a/qga/commands-posix.c b/qga/commands-posix.c
+index 0dc219dbcf..0d93c47a5d 100644
+--- a/qga/commands-posix.c
++++ b/qga/commands-posix.c
+@@ -46,6 +46,7 @@ extern char **environ;
+ #include <arpa/inet.h>
+ #include <sys/socket.h>
+ #include <net/if.h>
++#include <sys/statvfs.h>
+ 
+ #ifdef FIFREEZE
+ #define CONFIG_FSFREEZE
+@@ -1072,6 +1073,9 @@ static GuestFilesystemInfo *build_guest_fsinfo(struct FsMount *mount,
+                                                Error **errp)
+ {
+     GuestFilesystemInfo *fs = g_malloc0(sizeof(*fs));
++    struct statvfs buf;
++    unsigned long u100, used, nonroot_total;
++    int usage;
+     char *devpath = g_strdup_printf("/sys/dev/block/%u:%u",
+                                     mount->devmajor, mount->devminor);
+ 
+@@ -1079,7 +1083,20 @@ static GuestFilesystemInfo *build_guest_fsinfo(struct FsMount *mount,
+     fs->type = g_strdup(mount->devtype);
+     build_guest_fsinfo_for_device(devpath, fs, errp);
+ 
++    if (statvfs(fs->mountpoint, &buf)) {
++        error_setg_errno(errp, errno, "Failed to get statvfs");
++        return NULL;
++    }
++
++    used = buf.f_blocks - buf.f_bfree;
++    u100 = 100 * used;
++    nonroot_total = used + buf.f_bavail;
++    usage = u100 / nonroot_total + (u100 % nonroot_total != 0);
++
++    fs->usage = usage;
++
+     g_free(devpath);
++
+     return fs;
+ }
+ 
+diff --git a/qga/qapi-schema.json b/qga/qapi-schema.json
+index 17884c7c70..22c22d8a62 100644
+--- a/qga/qapi-schema.json
++++ b/qga/qapi-schema.json
+@@ -846,13 +846,14 @@
+ # @name: disk name
+ # @mountpoint: mount point path
+ # @type: file system type string
++# @usage: file system usage
+ # @disk: an array of disk hardware information that the volume lies on,
+ #        which may be empty if the disk type is not supported
+ #
+ # Since: 2.2
+ ##
+ { 'struct': 'GuestFilesystemInfo',
+-  'data': {'name': 'str', 'mountpoint': 'str', 'type': 'str',
++  'data': {'name': 'str', 'mountpoint': 'str', 'type': 'str', 'usage': 'int',
+            'disk': ['GuestDiskAddress']} }
+ 
+ ##
+-- 
+2.17.0
