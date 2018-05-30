@@ -1,21 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48177)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48417)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fO2wK-0000Zw-IM
-	for qemu-devel@nongnu.org; Wed, 30 May 2018 11:23:10 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fO2wv-0000v4-4Y
+	for qemu-devel@nongnu.org; Wed, 30 May 2018 11:23:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fO2wJ-0004n0-ME
-	for qemu-devel@nongnu.org; Wed, 30 May 2018 11:23:04 -0400
-References: <20180530112424.204835-1-vsementsov@virtuozzo.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <e3b0f6f9-9a12-51ee-1566-f387f9c30239@redhat.com>
-Date: Wed, 30 May 2018 10:22:55 -0500
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fO2wq-00054O-6X
+	for qemu-devel@nongnu.org; Wed, 30 May 2018 11:23:41 -0400
+Received: from mail-qk0-x241.google.com ([2607:f8b0:400d:c09::241]:33621)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fO2wq-000548-1n
+	for qemu-devel@nongnu.org; Wed, 30 May 2018 11:23:36 -0400
+Received: by mail-qk0-x241.google.com with SMTP id h7-v6so7513466qkm.0
+	for <qemu-devel@nongnu.org>; Wed, 30 May 2018 08:23:35 -0700 (PDT)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20180530061035.22592-1-clg@kaod.org>
+	<20180530061035.22592-3-clg@kaod.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <10b667eb-ff35-c64a-a3b1-37d8cd2b845e@amsat.org>
+Date: Wed, 30 May 2018 12:23:31 -0300
 MIME-Version: 1.0
-In-Reply-To: <20180530112424.204835-1-vsementsov@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <20180530061035.22592-3-clg@kaod.org>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] migration/block-dirty-bitmap: fix
- dirty_bitmap_load
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v2 2/3] slirp/ncsi: add a "Get Parameters"
+ response
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,25 +36,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: dgilbert@redhat.com, quintela@redhat.com, famz@redhat.com, stefanha@redhat.com, den@openvz.org, jsnow@redhat.com, qemu-stable@nongnu.org
+To: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>, Samuel Thibault <samuel.thibault@ens-lyon.org>
+Cc: qemu-devel@nongnu.org
 
-On 05/30/2018 06:24 AM, Vladimir Sementsov-Ogievskiy wrote:
-> dirty_bitmap_load_header return code is obtained but not handled. Fix
-> this.
+On 05/30/2018 03:10 AM, Cédric Le Goater wrote:
+> Command 0x17 'Get Parameters' is used to get configuration parameter
+> values currently in effect on the controller and it is mandatory in
+> the NS-CI specification.
 > 
-> Bug was introduced in b35ebdf076d697bc
-> "migration: add postcopy migration of dirty bitmaps" with the whole
-> function.
+> Provide a minimum response to exercise the kernel.
 > 
-> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> Signed-off-by: Cédric Le Goater <clg@kaod.org>
+
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+
 > ---
->   migration/block-dirty-bitmap.c | 3 +++
->   1 file changed, 3 insertions(+)
-
-Reviewed-by: Eric Blake <eblake@redhat.com>
-
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+> 
+>  Changes since v1:
+> 
+>  - removed bogus MAC addr and initialized VLAN filters to zero.
+> 
+>  slirp/ncsi.c | 16 +++++++++++++++-
+>  1 file changed, 15 insertions(+), 1 deletion(-)
+> 
+> diff --git a/slirp/ncsi.c b/slirp/ncsi.c
+> index 02d0e9def3e8..7b3fff207ab3 100644
+> --- a/slirp/ncsi.c
+> +++ b/slirp/ncsi.c
+> @@ -35,6 +35,20 @@ static int ncsi_rsp_handler_gls(struct ncsi_rsp_pkt_hdr *rnh)
+>      return 0;
+>  }
+>  
+> +/* Get Parameters */
+> +static int ncsi_rsp_handler_gp(struct ncsi_rsp_pkt_hdr *rnh)
+> +{
+> +    struct ncsi_rsp_gp_pkt *rsp = (struct ncsi_rsp_gp_pkt *) rnh;
+> +
+> +    /* no MAC address filters or VLAN filters on the channel */
+> +    rsp->mac_cnt = 0;
+> +    rsp->mac_enable = 0;
+> +    rsp->vlan_cnt = 0;
+> +    rsp->vlan_enable = 0;
+> +
+> +    return 0;
+> +}
+> +
+>  static const struct ncsi_rsp_handler {
+>          unsigned char   type;
+>          int             payload;
+> @@ -62,7 +76,7 @@ static const struct ncsi_rsp_handler {
+>          { NCSI_PKT_RSP_SNFC,    4, NULL },
+>          { NCSI_PKT_RSP_GVI,    40, NULL },
+>          { NCSI_PKT_RSP_GC,     32, ncsi_rsp_handler_gc },
+> -        { NCSI_PKT_RSP_GP,     -1, NULL },
+> +        { NCSI_PKT_RSP_GP,     40, ncsi_rsp_handler_gp },
+>          { NCSI_PKT_RSP_GCPS,  172, NULL },
+>          { NCSI_PKT_RSP_GNS,   172, NULL },
+>          { NCSI_PKT_RSP_GNPTS, 172, NULL },
+> 
