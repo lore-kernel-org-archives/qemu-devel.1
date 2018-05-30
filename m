@@ -1,27 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44363)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44841)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fO0nM-0001kV-Rj
-	for qemu-devel@nongnu.org; Wed, 30 May 2018 09:05:41 -0400
+	(envelope-from <rkagan@virtuozzo.com>) id 1fO0pV-0002u3-2Z
+	for qemu-devel@nongnu.org; Wed, 30 May 2018 09:07:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fO0nI-0003OC-5C
-	for qemu-devel@nongnu.org; Wed, 30 May 2018 09:05:40 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:50078 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1fO0nI-0003Kv-0t
-	for qemu-devel@nongnu.org; Wed, 30 May 2018 09:05:36 -0400
-References: <20180530030109.22404-1-chen_han_xiao@126.com>
-	<38cf2387-bbac-e4e8-4c7f-d7ba9bdcd0e2@redhat.com>
-	<5e690898.591a.163afd447ec.Coremail.chen_han_xiao@126.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <9335469d-ee0f-e6ac-7570-0b5ccab1ca57@redhat.com>
-Date: Wed, 30 May 2018 08:05:34 -0500
+	(envelope-from <rkagan@virtuozzo.com>) id 1fO0pT-0002vd-WC
+	for qemu-devel@nongnu.org; Wed, 30 May 2018 09:07:53 -0400
+Date: Wed, 30 May 2018 16:07:25 +0300
+From: Roman Kagan <rkagan@virtuozzo.com>
+Message-ID: <20180530130725.GA2448@rkaganb.sw.ru>
+References: <20180426161958.2872-1-rkagan@virtuozzo.com>
+	<20180426161958.2872-4-rkagan@virtuozzo.com>
+	<f924aadb-35b1-ee72-1040-fdeee5baefaf@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <5e690898.591a.163afd447ec.Coremail.chen_han_xiao@126.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] qga: add mountpoint usage to
- GuestFilesystemInfo
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <f924aadb-35b1-ee72-1040-fdeee5baefaf@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 03/17] iotests: ask qemu for supported
+ formats
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,27 +25,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Chen Hanxiao <chen_han_xiao@126.com>
-Cc: qemu-devel@nongnu.org, Michael Roth <mdroth@linux.vnet.ibm.com>
+To: Max Reitz <mreitz@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, Markus Armbruster <armbru@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
 
-On 05/30/2018 01:55 AM, Chen Hanxiao wrote:
-
->>> +    usage = u100 / nonroot_total + (u100 % nonroot_total != 0);
->>
->> Why integral instead of floating point?
+On Wed, May 30, 2018 at 02:17:55PM +0200, Max Reitz wrote:
+> On 2018-04-26 18:19, Roman Kagan wrote:
+> > @@ -550,13 +561,26 @@ def verify_cache_mode(supported_cache_modes=[]):
+> >      if supported_cache_modes and (cachemode not in supported_cache_modes):
+> >          notrun('not suitable for this cache mode: %s' % cachemode)
+> >  
+> > +rw_formats = None
+> > +
+> > +def supports_format(format_name):
+> > +    format_message = qemu_pipe('-drive', 'format=?')
+> > +    global rw_formats
+> > +    if rw_formats is None:
+> > +        rw_formats = format_message.splitlines()[0].split(':')[1].split()
 > 
-> I followed the style of df from coreutils.
-> As the percentage already multiplied by 100,
-> I think it has enough precision.
+> Isn't it sufficient to call qemu_pipe() only if rw_formats is None?
 
-You're making an arbitrary policy decision.  Give the client a floating 
-point, and they can still truncate to print out a 2-digit percentage. 
-But give them a percentage, and for a 2T disk image, they are forced to 
-guess whether they are 20G high or low on usage, which starts to take a 
-non-trivial amount of time to copy that much data.  In other words, I 
-think an int is wrong for being too imprecise.
+Sure it is, and this was exactly my intention with this global, but I
+managed to forget moving the most relevant part under 'if' :$
 
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+Thanks for catching,
+Roman.
