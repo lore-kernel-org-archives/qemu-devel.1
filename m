@@ -1,24 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40481)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41456)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jemmy858585@gmail.com>) id 1fNxeZ-0000f5-U2
-	for qemu-devel@nongnu.org; Wed, 30 May 2018 05:44:25 -0400
+	(envelope-from <mreitz@redhat.com>) id 1fNxir-00041D-P8
+	for qemu-devel@nongnu.org; Wed, 30 May 2018 05:48:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jemmy858585@gmail.com>) id 1fNxeW-0006vm-P1
-	for qemu-devel@nongnu.org; Wed, 30 May 2018 05:44:23 -0400
-Received: from mail-pl0-x241.google.com ([2607:f8b0:400e:c01::241]:34650)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <jemmy858585@gmail.com>)
-	id 1fNxeW-0006va-H8
-	for qemu-devel@nongnu.org; Wed, 30 May 2018 05:44:20 -0400
-Received: by mail-pl0-x241.google.com with SMTP id ay10-v6so10767801plb.1
-	for <qemu-devel@nongnu.org>; Wed, 30 May 2018 02:44:20 -0700 (PDT)
-From: Lidong Chen <jemmy858585@gmail.com>
-Date: Wed, 30 May 2018 17:43:36 +0800
-Message-Id: <1527673416-31268-13-git-send-email-lidongchen@tencent.com>
-In-Reply-To: <1527673416-31268-1-git-send-email-lidongchen@tencent.com>
-References: <1527673416-31268-1-git-send-email-lidongchen@tencent.com>
-Subject: [Qemu-devel] [PATCH v4 12/12] migration: implement the shutdown for
- RDMA QIOChannel
+	(envelope-from <mreitz@redhat.com>) id 1fNxiq-0008FT-VS
+	for qemu-devel@nongnu.org; Wed, 30 May 2018 05:48:49 -0400
+References: <20180529203910.7615-1-kwolf@redhat.com>
+	<20180529203910.7615-4-kwolf@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <73859dcf-4a4e-894a-c261-68564fb3a26f@redhat.com>
+Date: Wed, 30 May 2018 11:48:34 +0200
+MIME-Version: 1.0
+In-Reply-To: <20180529203910.7615-4-kwolf@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="1nAwXmWHaL5ayb8TTlCNEnHiyCo8e5zi7"
+Subject: Re: [Qemu-devel] [PATCH v2 03/16] job: Add error message for
+ failing jobs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,118 +25,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: zhang.zhanghailiang@huawei.com, quintela@redhat.com, dgilbert@redhat.com, berrange@redhat.com, aviadye@mellanox.com, pbonzini@redhat.com
-Cc: qemu-devel@nongnu.org, adido@mellanox.com, Lidong Chen <lidongchen@tencent.com>
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+Cc: jcody@redhat.com, jsnow@redhat.com, eblake@redhat.com, pkrempa@redhat.com, qemu-devel@nongnu.org
 
-Because RDMA QIOChannel not implement shutdown function,
-If the to_dst_file was set error, the return path thread
-will wait forever. and the migration thread will wait
-return path thread exit.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--1nAwXmWHaL5ayb8TTlCNEnHiyCo8e5zi7
+From: Max Reitz <mreitz@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+Cc: jcody@redhat.com, jsnow@redhat.com, eblake@redhat.com,
+ pkrempa@redhat.com, qemu-devel@nongnu.org
+Message-ID: <73859dcf-4a4e-894a-c261-68564fb3a26f@redhat.com>
+Subject: Re: [PATCH v2 03/16] job: Add error message for failing jobs
+References: <20180529203910.7615-1-kwolf@redhat.com>
+ <20180529203910.7615-4-kwolf@redhat.com>
+In-Reply-To: <20180529203910.7615-4-kwolf@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-the backtrace of return path thread is:
+On 2018-05-29 22:38, Kevin Wolf wrote:
+> So far we relied on job->ret and strerror() to produce an error message=
 
-(gdb) bt
-    #0  0x00007f372a76bb0f in ppoll () from /lib64/libc.so.6
-    #1  0x000000000071dc24 in qemu_poll_ns (fds=0x7ef7091d0580, nfds=2, timeout=100000000)
-        at qemu-timer.c:325
-    #2  0x00000000006b2fba in qemu_rdma_wait_comp_channel (rdma=0xd424000)
-        at migration/rdma.c:1501
-    #3  0x00000000006b3191 in qemu_rdma_block_for_wrid (rdma=0xd424000, wrid_requested=4000,
-        byte_len=0x7ef7091d0640) at migration/rdma.c:1580
-    #4  0x00000000006b3638 in qemu_rdma_exchange_get_response (rdma=0xd424000,
-        head=0x7ef7091d0720, expecting=3, idx=0) at migration/rdma.c:1726
-    #5  0x00000000006b3ad6 in qemu_rdma_exchange_recv (rdma=0xd424000, head=0x7ef7091d0720,
-        expecting=3) at migration/rdma.c:1903
-    #6  0x00000000006b5d03 in qemu_rdma_get_buffer (opaque=0x6a57dc0, buf=0x5c80030 "", pos=8,
-        size=32768) at migration/rdma.c:2714
-    #7  0x00000000006a9635 in qemu_fill_buffer (f=0x5c80000) at migration/qemu-file.c:232
-    #8  0x00000000006a9ecd in qemu_peek_byte (f=0x5c80000, offset=0)
-        at migration/qemu-file.c:502
-    #9  0x00000000006a9f1f in qemu_get_byte (f=0x5c80000) at migration/qemu-file.c:515
-    #10 0x00000000006aa162 in qemu_get_be16 (f=0x5c80000) at migration/qemu-file.c:591
-    #11 0x00000000006a46d3 in source_return_path_thread (
-        opaque=0xd826a0 <current_migration.37100>) at migration/migration.c:1331
-    #12 0x00007f372aa49e25 in start_thread () from /lib64/libpthread.so.0
-    #13 0x00007f372a77635d in clone () from /lib64/libc.so.6
+> for failed jobs. Not surprisingly, this tends to result in completely
+> useless messages.
+>=20
+> This adds a Job.error field that can contain an error string for a
+> failing job, and a parameter to job_completed() that sets the field. As=
 
-the backtrace of migration thread is:
+> a default, if NULL is passed, we continue to use strerror(job->ret).
+>=20
+> All existing callers are changed to pass NULL. They can be improved in
+> separate patches.
+>=20
+> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+> ---
+>  include/qemu/job.h        |  7 ++++++-
+>  block/backup.c            |  2 +-
+>  block/commit.c            |  2 +-
+>  block/mirror.c            |  2 +-
+>  block/stream.c            |  2 +-
+>  job-qmp.c                 |  9 ++-------
+>  job.c                     | 16 ++++++++++++++--
+>  tests/test-bdrv-drain.c   |  2 +-
+>  tests/test-blockjob-txn.c |  2 +-
+>  tests/test-blockjob.c     |  2 +-
+>  10 files changed, 29 insertions(+), 17 deletions(-)
 
-(gdb) bt
-    #0  0x00007f372aa4af57 in pthread_join () from /lib64/libpthread.so.0
-    #1  0x00000000007d5711 in qemu_thread_join (thread=0xd826f8 <current_migration.37100+88>)
-        at util/qemu-thread-posix.c:504
-    #2  0x00000000006a4bc5 in await_return_path_close_on_source (
-        ms=0xd826a0 <current_migration.37100>) at migration/migration.c:1460
-    #3  0x00000000006a53e4 in migration_completion (s=0xd826a0 <current_migration.37100>,
-        current_active_state=4, old_vm_running=0x7ef7089cf976, start_time=0x7ef7089cf980)
-        at migration/migration.c:1695
-    #4  0x00000000006a5c54 in migration_thread (opaque=0xd826a0 <current_migration.37100>)
-        at migration/migration.c:1837
-    #5  0x00007f372aa49e25 in start_thread () from /lib64/libpthread.so.0
-    #6  0x00007f372a77635d in clone () from /lib64/libc.so.6
+Reviewed-by: Max Reitz <mreitz@redhat.com>
 
-Signed-off-by: Lidong Chen <lidongchen@tencent.com>
----
- migration/rdma.c | 40 ++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 40 insertions(+)
 
-diff --git a/migration/rdma.c b/migration/rdma.c
-index d611a06..0912b6a 100644
---- a/migration/rdma.c
-+++ b/migration/rdma.c
-@@ -3038,6 +3038,45 @@ static int qio_channel_rdma_close(QIOChannel *ioc,
-     return 0;
- }
- 
-+static int
-+qio_channel_rdma_shutdown(QIOChannel *ioc,
-+                            QIOChannelShutdown how,
-+                            Error **errp)
-+{
-+    QIOChannelRDMA *rioc = QIO_CHANNEL_RDMA(ioc);
-+    RDMAContext *rdmain, *rdmaout;
-+
-+    rcu_read_lock();
-+
-+    rdmain = atomic_rcu_read(&rioc->rdmain);
-+    rdmaout = atomic_rcu_read(&rioc->rdmain);
-+
-+    switch (how) {
-+    case QIO_CHANNEL_SHUTDOWN_READ:
-+        if (rdmain) {
-+            rdmain->error_state = -1;
-+        }
-+        break;
-+    case QIO_CHANNEL_SHUTDOWN_WRITE:
-+        if (rdmaout) {
-+            rdmaout->error_state = -1;
-+        }
-+        break;
-+    case QIO_CHANNEL_SHUTDOWN_BOTH:
-+    default:
-+        if (rdmain) {
-+            rdmain->error_state = -1;
-+        }
-+        if (rdmaout) {
-+            rdmaout->error_state = -1;
-+        }
-+        break;
-+    }
-+
-+    rcu_read_unlock();
-+    return 0;
-+}
-+
- /*
-  * Parameters:
-  *    @offset == 0 :
-@@ -3864,6 +3903,7 @@ static void qio_channel_rdma_class_init(ObjectClass *klass,
-     ioc_klass->io_close = qio_channel_rdma_close;
-     ioc_klass->io_create_watch = qio_channel_rdma_create_watch;
-     ioc_klass->io_set_aio_fd_handler = qio_channel_rdma_set_aio_fd_handler;
-+    ioc_klass->io_shutdown = qio_channel_rdma_shutdown;
- }
- 
- static const TypeInfo qio_channel_rdma_info = {
--- 
-1.8.3.1
+--1nAwXmWHaL5ayb8TTlCNEnHiyCo8e5zi7
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlsOc3IACgkQ9AfbAGHV
+z0CmhAf/eADp/k32oxXnqsQM7SzL04eJgDMXxTfLo1xK2X/sfSmIgBlv5Xz6GHSq
+iygu5gNB3h/sBhR7SVarGQUwjmW5FcU0kywdZeFLdjFqGFVbTVlnntHfaOD7lKHb
+V4RA6SkSnDr+kVZhPpKW3L0PPvh2+OIEdQx36i21mIbF0lW+hO3m9lRXvoc3dtP1
+Tp9E0UJ8+E11Rskg22AZ7/51VmsLab8XfqBiUb/FrE0mTQP2lVJy2rWyVctqWJjI
+DAY8V9i8Tz/i3be2+wGHq/Ghmg4YLexy3jXZVVMZnFjUP47DT3m21Vndkprz81uw
+Fw1mEZbXqOgTCkHZwhx/qrSzKCX3/Q==
+=gwc4
+-----END PGP SIGNATURE-----
+
+--1nAwXmWHaL5ayb8TTlCNEnHiyCo8e5zi7--
