@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40466)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40481)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jemmy858585@gmail.com>) id 1fNxeX-0000cD-36
-	for qemu-devel@nongnu.org; Wed, 30 May 2018 05:44:23 -0400
+	(envelope-from <jemmy858585@gmail.com>) id 1fNxeZ-0000f5-U2
+	for qemu-devel@nongnu.org; Wed, 30 May 2018 05:44:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jemmy858585@gmail.com>) id 1fNxeS-0006uP-Fh
-	for qemu-devel@nongnu.org; Wed, 30 May 2018 05:44:21 -0400
-Received: from mail-pf0-x243.google.com ([2607:f8b0:400e:c00::243]:41051)
+	(envelope-from <jemmy858585@gmail.com>) id 1fNxeW-0006vm-P1
+	for qemu-devel@nongnu.org; Wed, 30 May 2018 05:44:23 -0400
+Received: from mail-pl0-x241.google.com ([2607:f8b0:400e:c01::241]:34650)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <jemmy858585@gmail.com>)
-	id 1fNxeS-0006uD-A4
-	for qemu-devel@nongnu.org; Wed, 30 May 2018 05:44:16 -0400
-Received: by mail-pf0-x243.google.com with SMTP id v63-v6so8745120pfk.8
-	for <qemu-devel@nongnu.org>; Wed, 30 May 2018 02:44:16 -0700 (PDT)
+	id 1fNxeW-0006va-H8
+	for qemu-devel@nongnu.org; Wed, 30 May 2018 05:44:20 -0400
+Received: by mail-pl0-x241.google.com with SMTP id ay10-v6so10767801plb.1
+	for <qemu-devel@nongnu.org>; Wed, 30 May 2018 02:44:20 -0700 (PDT)
 From: Lidong Chen <jemmy858585@gmail.com>
-Date: Wed, 30 May 2018 17:43:34 +0800
-Message-Id: <1527673416-31268-11-git-send-email-lidongchen@tencent.com>
+Date: Wed, 30 May 2018 17:43:36 +0800
+Message-Id: <1527673416-31268-13-git-send-email-lidongchen@tencent.com>
 In-Reply-To: <1527673416-31268-1-git-send-email-lidongchen@tencent.com>
 References: <1527673416-31268-1-git-send-email-lidongchen@tencent.com>
-Subject: [Qemu-devel] [PATCH v4 10/12] migration: create a dedicated thread
- to release rdma resource
+Subject: [Qemu-devel] [PATCH v4 12/12] migration: implement the shutdown for
+ RDMA QIOChannel
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,72 +30,115 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: zhang.zhanghailiang@huawei.com, quintela@redhat.com, dgilbert@redhat.com, berrange@redhat.com, aviadye@mellanox.com, pbonzini@redhat.com
 Cc: qemu-devel@nongnu.org, adido@mellanox.com, Lidong Chen <lidongchen@tencent.com>
 
-ibv_dereg_mr wait for a long time for big memory size virtual server.
+Because RDMA QIOChannel not implement shutdown function,
+If the to_dst_file was set error, the return path thread
+will wait forever. and the migration thread will wait
+return path thread exit.
 
-The test result is:
-  10GB  326ms
-  20GB  699ms
-  30GB  1021ms
-  40GB  1387ms
-  50GB  1712ms
-  60GB  2034ms
-  70GB  2457ms
-  80GB  2807ms
-  90GB  3107ms
-  100GB 3474ms
-  110GB 3735ms
-  120GB 4064ms
-  130GB 4567ms
-  140GB 4886ms
+the backtrace of return path thread is:
 
-this will cause the guest os hang for a while when migration finished.
-So create a dedicated thread to release rdma resource.
+(gdb) bt
+    #0  0x00007f372a76bb0f in ppoll () from /lib64/libc.so.6
+    #1  0x000000000071dc24 in qemu_poll_ns (fds=0x7ef7091d0580, nfds=2, timeout=100000000)
+        at qemu-timer.c:325
+    #2  0x00000000006b2fba in qemu_rdma_wait_comp_channel (rdma=0xd424000)
+        at migration/rdma.c:1501
+    #3  0x00000000006b3191 in qemu_rdma_block_for_wrid (rdma=0xd424000, wrid_requested=4000,
+        byte_len=0x7ef7091d0640) at migration/rdma.c:1580
+    #4  0x00000000006b3638 in qemu_rdma_exchange_get_response (rdma=0xd424000,
+        head=0x7ef7091d0720, expecting=3, idx=0) at migration/rdma.c:1726
+    #5  0x00000000006b3ad6 in qemu_rdma_exchange_recv (rdma=0xd424000, head=0x7ef7091d0720,
+        expecting=3) at migration/rdma.c:1903
+    #6  0x00000000006b5d03 in qemu_rdma_get_buffer (opaque=0x6a57dc0, buf=0x5c80030 "", pos=8,
+        size=32768) at migration/rdma.c:2714
+    #7  0x00000000006a9635 in qemu_fill_buffer (f=0x5c80000) at migration/qemu-file.c:232
+    #8  0x00000000006a9ecd in qemu_peek_byte (f=0x5c80000, offset=0)
+        at migration/qemu-file.c:502
+    #9  0x00000000006a9f1f in qemu_get_byte (f=0x5c80000) at migration/qemu-file.c:515
+    #10 0x00000000006aa162 in qemu_get_be16 (f=0x5c80000) at migration/qemu-file.c:591
+    #11 0x00000000006a46d3 in source_return_path_thread (
+        opaque=0xd826a0 <current_migration.37100>) at migration/migration.c:1331
+    #12 0x00007f372aa49e25 in start_thread () from /lib64/libpthread.so.0
+    #13 0x00007f372a77635d in clone () from /lib64/libc.so.6
+
+the backtrace of migration thread is:
+
+(gdb) bt
+    #0  0x00007f372aa4af57 in pthread_join () from /lib64/libpthread.so.0
+    #1  0x00000000007d5711 in qemu_thread_join (thread=0xd826f8 <current_migration.37100+88>)
+        at util/qemu-thread-posix.c:504
+    #2  0x00000000006a4bc5 in await_return_path_close_on_source (
+        ms=0xd826a0 <current_migration.37100>) at migration/migration.c:1460
+    #3  0x00000000006a53e4 in migration_completion (s=0xd826a0 <current_migration.37100>,
+        current_active_state=4, old_vm_running=0x7ef7089cf976, start_time=0x7ef7089cf980)
+        at migration/migration.c:1695
+    #4  0x00000000006a5c54 in migration_thread (opaque=0xd826a0 <current_migration.37100>)
+        at migration/migration.c:1837
+    #5  0x00007f372aa49e25 in start_thread () from /lib64/libpthread.so.0
+    #6  0x00007f372a77635d in clone () from /lib64/libc.so.6
 
 Signed-off-by: Lidong Chen <lidongchen@tencent.com>
 ---
- migration/rdma.c | 21 +++++++++++++++++----
- 1 file changed, 17 insertions(+), 4 deletions(-)
+ migration/rdma.c | 40 ++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 40 insertions(+)
 
 diff --git a/migration/rdma.c b/migration/rdma.c
-index dfa4f77..1b9e261 100644
+index d611a06..0912b6a 100644
 --- a/migration/rdma.c
 +++ b/migration/rdma.c
-@@ -2979,12 +2979,12 @@ static void qio_channel_rdma_set_aio_fd_handler(QIOChannel *ioc,
-     }
- }
- 
--static int qio_channel_rdma_close(QIOChannel *ioc,
--                                  Error **errp)
-+static void *qio_channel_rdma_close_thread(void *arg)
- {
--    QIOChannelRDMA *rioc = QIO_CHANNEL_RDMA(ioc);
-+    QIOChannelRDMA *rioc = arg;
-     RDMAContext *rdmain, *rdmaout;
--    trace_qemu_rdma_close();
-+
-+    rcu_register_thread();
- 
-     rdmain = rioc->rdmain;
-     if (rdmain) {
-@@ -3009,6 +3009,19 @@ static int qio_channel_rdma_close(QIOChannel *ioc,
-     g_free(rdmain);
-     g_free(rdmaout);
- 
-+    rcu_unregister_thread();
-+    return NULL;
-+}
-+
-+static int qio_channel_rdma_close(QIOChannel *ioc,
-+                                  Error **errp)
-+{
-+    QemuThread t;
-+    QIOChannelRDMA *rioc = QIO_CHANNEL_RDMA(ioc);
-+    trace_qemu_rdma_close();
-+
-+    qemu_thread_create(&t, "rdma cleanup", qio_channel_rdma_close_thread,
-+                           rioc, QEMU_THREAD_DETACHED);
+@@ -3038,6 +3038,45 @@ static int qio_channel_rdma_close(QIOChannel *ioc,
      return 0;
  }
  
++static int
++qio_channel_rdma_shutdown(QIOChannel *ioc,
++                            QIOChannelShutdown how,
++                            Error **errp)
++{
++    QIOChannelRDMA *rioc = QIO_CHANNEL_RDMA(ioc);
++    RDMAContext *rdmain, *rdmaout;
++
++    rcu_read_lock();
++
++    rdmain = atomic_rcu_read(&rioc->rdmain);
++    rdmaout = atomic_rcu_read(&rioc->rdmain);
++
++    switch (how) {
++    case QIO_CHANNEL_SHUTDOWN_READ:
++        if (rdmain) {
++            rdmain->error_state = -1;
++        }
++        break;
++    case QIO_CHANNEL_SHUTDOWN_WRITE:
++        if (rdmaout) {
++            rdmaout->error_state = -1;
++        }
++        break;
++    case QIO_CHANNEL_SHUTDOWN_BOTH:
++    default:
++        if (rdmain) {
++            rdmain->error_state = -1;
++        }
++        if (rdmaout) {
++            rdmaout->error_state = -1;
++        }
++        break;
++    }
++
++    rcu_read_unlock();
++    return 0;
++}
++
+ /*
+  * Parameters:
+  *    @offset == 0 :
+@@ -3864,6 +3903,7 @@ static void qio_channel_rdma_class_init(ObjectClass *klass,
+     ioc_klass->io_close = qio_channel_rdma_close;
+     ioc_klass->io_create_watch = qio_channel_rdma_create_watch;
+     ioc_klass->io_set_aio_fd_handler = qio_channel_rdma_set_aio_fd_handler;
++    ioc_klass->io_shutdown = qio_channel_rdma_shutdown;
+ }
+ 
+ static const TypeInfo qio_channel_rdma_info = {
 -- 
 1.8.3.1
