@@ -1,21 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42412)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43575)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1fO0g7-00057A-PW
-	for qemu-devel@nongnu.org; Wed, 30 May 2018 08:58:13 -0400
+	(envelope-from <stefanha@redhat.com>) id 1fO0k7-0007vg-FN
+	for qemu-devel@nongnu.org; Wed, 30 May 2018 09:02:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1fO0g5-00079D-53
-	for qemu-devel@nongnu.org; Wed, 30 May 2018 08:58:11 -0400
-Date: Wed, 30 May 2018 14:58:05 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20180530145805.61c3ef26@redhat.com>
-In-Reply-To: <20180517081527.14410-3-david@redhat.com>
-References: <20180517081527.14410-1-david@redhat.com>
-	<20180517081527.14410-3-david@redhat.com>
+	(envelope-from <stefanha@redhat.com>) id 1fO0k2-0001El-1Q
+	for qemu-devel@nongnu.org; Wed, 30 May 2018 09:02:19 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:44310 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1fO0k1-0001EJ-T4
+	for qemu-devel@nongnu.org; Wed, 30 May 2018 09:02:13 -0400
+Date: Wed, 30 May 2018 13:54:39 +0100
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <20180530125439.GK14623@stefanha-x1.localdomain>
+References: <20180529193730.9204-1-crosa@redhat.com>
+	<20180529193730.9204-3-crosa@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v4 02/14] memory-device: introduce separate
- config option
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="mPOSj6iWmtyhwOMz"
+Content-Disposition: inline
+In-Reply-To: <20180529193730.9204-3-crosa@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v3 2/5] scripts/qemu.py: allow adding to
+ the list of extra arguments
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,103 +29,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-s390x@nongnu.org, "Michael S . Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Markus Armbruster <armbru@redhat.com>, qemu-ppc@nongnu.org, Pankaj Gupta <pagupta@redhat.com>, Alexander Graf <agraf@suse.de>, Cornelia Huck <cohuck@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Luiz Capitulino <lcapitulino@redhat.com>
+To: Cleber Rosa <crosa@redhat.com>
+Cc: qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>, Fam Zheng <famz@redhat.com>, Amador Pahim <amador@pahim.org>
 
-On Thu, 17 May 2018 10:15:15 +0200
-David Hildenbrand <david@redhat.com> wrote:
 
-> Some architectures might support memory devices, while they don't
-> support DIMM/NVDIMM. So let's
-> - Rename CONFIG_MEM_HOTPLUG to CONFIG_MEM_DEVICE
-> - Introduce CONFIG_DIMM and use it similarly to CONFIG NVDIMM
-> 
-> CONFIG_DIMM and CONFIG_NVDIMM require CONFIG_MEM_DEVICE.
-> 
-> Signed-off-by: David Hildenbrand <david@redhat.com>
-Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+--mPOSj6iWmtyhwOMz
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
+On Tue, May 29, 2018 at 03:37:27PM -0400, Cleber Rosa wrote:
+> Tests will often need to add extra arguments to QEMU command
+> line arguments.
+>=20
+> Signed-off-by: Cleber Rosa <crosa@redhat.com>
 > ---
->  default-configs/i386-softmmu.mak   | 3 ++-
->  default-configs/ppc64-softmmu.mak  | 3 ++-
->  default-configs/x86_64-softmmu.mak | 3 ++-
->  hw/Makefile.objs                   | 2 +-
->  hw/mem/Makefile.objs               | 4 ++--
->  qapi/misc.json                     | 2 +-
->  6 files changed, 10 insertions(+), 7 deletions(-)
-> 
-> diff --git a/default-configs/i386-softmmu.mak b/default-configs/i386-softmmu.mak
-> index 8c7d4a0fa0..4c1637338b 100644
-> --- a/default-configs/i386-softmmu.mak
-> +++ b/default-configs/i386-softmmu.mak
-> @@ -50,7 +50,8 @@ CONFIG_PCI_Q35=y
->  CONFIG_APIC=y
->  CONFIG_IOAPIC=y
->  CONFIG_PVPANIC=y
-> -CONFIG_MEM_HOTPLUG=y
-> +CONFIG_MEM_DEVICE=y
-> +CONFIG_DIMM=y
->  CONFIG_NVDIMM=y
->  CONFIG_ACPI_NVDIMM=y
->  CONFIG_PCIE_PORT=y
-> diff --git a/default-configs/ppc64-softmmu.mak b/default-configs/ppc64-softmmu.mak
-> index b94af6c7c6..f550573782 100644
-> --- a/default-configs/ppc64-softmmu.mak
-> +++ b/default-configs/ppc64-softmmu.mak
-> @@ -16,4 +16,5 @@ CONFIG_VIRTIO_VGA=y
->  CONFIG_XICS=$(CONFIG_PSERIES)
->  CONFIG_XICS_SPAPR=$(CONFIG_PSERIES)
->  CONFIG_XICS_KVM=$(call land,$(CONFIG_PSERIES),$(CONFIG_KVM))
-> -CONFIG_MEM_HOTPLUG=y
-> +CONFIG_MEM_DEVICE=y
-> +CONFIG_DIMM=y
-> diff --git a/default-configs/x86_64-softmmu.mak b/default-configs/x86_64-softmmu.mak
-> index 0390b4303c..7785351414 100644
-> --- a/default-configs/x86_64-softmmu.mak
-> +++ b/default-configs/x86_64-softmmu.mak
-> @@ -50,7 +50,8 @@ CONFIG_PCI_Q35=y
->  CONFIG_APIC=y
->  CONFIG_IOAPIC=y
->  CONFIG_PVPANIC=y
-> -CONFIG_MEM_HOTPLUG=y
-> +CONFIG_MEM_DEVICE=y
-> +CONFIG_DIMM=y
->  CONFIG_NVDIMM=y
->  CONFIG_ACPI_NVDIMM=y
->  CONFIG_PCIE_PORT=y
-> diff --git a/hw/Makefile.objs b/hw/Makefile.objs
-> index 6a0ffe0afd..127a60eca4 100644
-> --- a/hw/Makefile.objs
-> +++ b/hw/Makefile.objs
-> @@ -33,7 +33,7 @@ devices-dirs-$(CONFIG_SOFTMMU) += vfio/
->  devices-dirs-$(CONFIG_SOFTMMU) += virtio/
->  devices-dirs-$(CONFIG_SOFTMMU) += watchdog/
->  devices-dirs-$(CONFIG_SOFTMMU) += xen/
-> -devices-dirs-$(CONFIG_MEM_HOTPLUG) += mem/
-> +devices-dirs-$(CONFIG_MEM_DEVICE) += mem/
->  devices-dirs-$(CONFIG_SOFTMMU) += smbios/
->  devices-dirs-y += core/
->  common-obj-y += $(devices-dirs-y)
-> diff --git a/hw/mem/Makefile.objs b/hw/mem/Makefile.objs
-> index 10be4df2a2..3e2f7c5ca2 100644
-> --- a/hw/mem/Makefile.objs
-> +++ b/hw/mem/Makefile.objs
-> @@ -1,3 +1,3 @@
-> -common-obj-$(CONFIG_MEM_HOTPLUG) += pc-dimm.o
-> -common-obj-$(CONFIG_MEM_HOTPLUG) += memory-device.o
-> +common-obj-$(CONFIG_DIMM) += pc-dimm.o
-> +common-obj-$(CONFIG_MEM_DEVICE) += memory-device.o
->  common-obj-$(CONFIG_NVDIMM) += nvdimm.o
-> diff --git a/qapi/misc.json b/qapi/misc.json
-> index f5988cc0b5..4e6265cd2e 100644
-> --- a/qapi/misc.json
-> +++ b/qapi/misc.json
-> @@ -2060,7 +2060,7 @@
->  #
->  # @plugged-memory: size of memory that can be hot-unplugged. This field
->  #                  is omitted if target doesn't support memory hotplug
-> -#                  (i.e. CONFIG_MEM_HOTPLUG not defined on build time).
-> +#                  (i.e. CONFIG_MEM_DEVICE not defined at build time).
->  #
->  # Since: 2.11.0
->  ##
+>  scripts/qemu.py | 6 ++++++
+>  1 file changed, 6 insertions(+)
+
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+
+--mPOSj6iWmtyhwOMz
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJbDp8PAAoJEJykq7OBq3PIpBAIAKvtxjOoqG0gpS59jyvr2fIC
+x2qaa8O9xQkI7HSrZWIWGCHOb8/ikMjRC1NojA2cpAP2j5RRO+NfQmMhogwscwet
+HQJjnDcUFN/eHisKyr5A5xE4OENN/uY7VBUVhCDhDWQ3UZ1aWePMkWDoKBZqqzXb
+uvLHbhV1ftT989IJ1zty6sIoiXTxtz7cSQKWMCz3QPokM5GeRqQTV2F19YLxcdTt
+coWEmGaUTt2yVzw2+eyjmRkYu3/jOBFqh7k29JW7WsfBhbqyzbA33G6bFa3/pA0x
+9xucH4mR9bAuBr26Y1lqiQiwXVgi99piLp5D5hJisCqdqws7UQQa0HDpJyS72RI=
+=3v1I
+-----END PGP SIGNATURE-----
+
+--mPOSj6iWmtyhwOMz--
