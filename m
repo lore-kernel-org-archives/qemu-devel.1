@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37337)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37353)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fNywa-0008O3-7m
-	for qemu-devel@nongnu.org; Wed, 30 May 2018 07:07:05 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1fNywb-0008P1-FM
+	for qemu-devel@nongnu.org; Wed, 30 May 2018 07:07:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fNywY-0001yw-QM
-	for qemu-devel@nongnu.org; Wed, 30 May 2018 07:07:04 -0400
-Received: from mail-wm0-x230.google.com ([2a00:1450:400c:c09::230]:38090)
+	(envelope-from <alex.bennee@linaro.org>) id 1fNywa-0001zQ-17
+	for qemu-devel@nongnu.org; Wed, 30 May 2018 07:07:05 -0400
+Received: from mail-wr0-x234.google.com ([2a00:1450:400c:c0c::234]:41243)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1fNywY-0001yZ-JO
-	for qemu-devel@nongnu.org; Wed, 30 May 2018 07:07:02 -0400
-Received: by mail-wm0-x230.google.com with SMTP id m129-v6so46809751wmb.3
-	for <qemu-devel@nongnu.org>; Wed, 30 May 2018 04:07:02 -0700 (PDT)
+	id 1fNywZ-0001zB-OQ
+	for qemu-devel@nongnu.org; Wed, 30 May 2018 07:07:03 -0400
+Received: by mail-wr0-x234.google.com with SMTP id u12-v6so29062949wrn.8
+	for <qemu-devel@nongnu.org>; Wed, 30 May 2018 04:07:03 -0700 (PDT)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Wed, 30 May 2018 12:06:51 +0100
-Message-Id: <20180530110655.22022-5-alex.bennee@linaro.org>
+Date: Wed, 30 May 2018 12:06:52 +0100
+Message-Id: <20180530110655.22022-6-alex.bennee@linaro.org>
 In-Reply-To: <20180530110655.22022-1-alex.bennee@linaro.org>
 References: <20180530110655.22022-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v1 4/8] docker: update Travis docker image
+Subject: [Qemu-devel] [PATCH v1 5/8] .travis.yml: rationalise clang testing
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,41 +32,106 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: cota@braap.org, famz@redhat.com, berrange@redhat.com, f4bug@amsat.org, richard.henderson@linaro.org, balrogg@gmail.com, aurelien@aurel32.net, agraf@suse.de, pbonzini@redhat.com, stefanha@redhat.com, stefanb@linux.vnet.ibm.com, marcandre.lureau@redhat.com
 Cc: qemu-devel@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 
-This is still poorly documented by Travis but according to:
-
-  https://docs.travis-ci.com/user/common-build-problems/#Running-a-Container-Based-Docker-Image-Locally
-
-their reference images are now hosted on Docker Hub. So we update the
-FROM line to refer to the new default image. We also need a few
-additional tweaks:
-
-  - re-enable deb-src lines for our build-dep install
-  - add explicit PATH definition for tools
-  - force the build USER to be Travis
-  - add clang to FEATURES for our test-clang machinery
+As Travis includes Clang 5.0 in its own build environment there is no
+point manually building with older Clangs. We still need to test with
+the two pythons though so we leave them as system only builds. We also
+split the clang build into two as it often exceeds the 40 minute build
+time limit.
 
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 ---
- tests/docker/dockerfiles/travis.docker | 7 +++++--
- 1 file changed, 5 insertions(+), 2 deletions(-)
+ .travis.yml | 67 +++++------------------------------------------------
+ 1 file changed, 6 insertions(+), 61 deletions(-)
 
-diff --git a/tests/docker/dockerfiles/travis.docker b/tests/docker/dockerfiles/travis.docker
-index 605b6e429b..6e90f033d5 100644
---- a/tests/docker/dockerfiles/travis.docker
-+++ b/tests/docker/dockerfiles/travis.docker
-@@ -1,8 +1,11 @@
--FROM quay.io/travisci/travis-ruby
-+FROM travisci/ci-garnet:packer-1512502276-986baf0
- ENV DEBIAN_FRONTEND noninteractive
- ENV LANG en_US.UTF-8
- ENV LC_ALL en_US.UTF-8
-+RUN cat /etc/apt/sources.list | sed "s/# deb-src/deb-src/" >> /etc/apt/sources.list
- RUN apt-get update
- RUN apt-get -y build-dep qemu
- RUN apt-get -y install device-tree-compiler python2.7 python-yaml dh-autoreconf gdb strace lsof net-tools
--ENV FEATURES pyyaml
-+ENV PATH /usr/local/phantomjs/bin:/usr/local/phantomjs:/usr/local/neo4j-3.2.7/bin:/usr/local/maven-3.5.2/bin:/usr/local/cmake-3.9.2/bin:/usr/local/clang-5.0.0/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
-+ENV FEATURES clang pyyaml
-+USER travis
+diff --git a/.travis.yml b/.travis.yml
+index aa83e9aed7..85ee2a1edb 100644
+--- a/.travis.yml
++++ b/.travis.yml
+@@ -70,8 +70,10 @@ script:
+   - make ${MAKEFLAGS} && ${TEST_CMD}
+ matrix:
+   include:
+-    # Test with CLang for compile portability
+-    - env: CONFIG=""
++    # Test with Clang for compile portability (Travis uses clang-5.0)
++    - env: CONFIG="--disable-system"
++      compiler: clang
++    - env: CONFIG="--disable-user"
+       compiler: clang
+     # gprof/gcov are GCC features
+     - env: CONFIG="--enable-gprof --enable-gcov --disable-pie --disable-linux-user"
+@@ -95,70 +97,13 @@ matrix:
+     - env: CONFIG=""
+       os: osx
+       compiler: clang
+-    # Plain Trusty System Build
++    # Python builds
+     - env: CONFIG="--disable-linux-user"
+-      sudo: required
+-      addons:
+-      dist: trusty
+-      compiler: gcc
+-      before_install:
+-        - sudo apt-get update -qq
+-        - sudo apt-get build-dep -qq qemu
+-        - wget -O - http://people.linaro.org/~alex.bennee/qemu-submodule-git-seed.tar.xz | tar -xvJ
+-        - git submodule update --init --recursive
+-    # Plain Trusty Linux User Build
+-    - env: CONFIG="--disable-system"
+-      sudo: required
+-      addons:
+-      dist: trusty
+-      compiler: gcc
+-      before_install:
+-        - sudo apt-get update -qq
+-        - sudo apt-get build-dep -qq qemu
+-        - wget -O - http://people.linaro.org/~alex.bennee/qemu-submodule-git-seed.tar.xz | tar -xvJ
+-        - git submodule update --init --recursive
+-    # Trusty System build with latest stable clang & python 3.0
+-    - sudo: required
+-      addons:
+-      dist: trusty
+-      language: generic
+-      compiler: none
+       python:
+         - "3.0"
+-      env:
+-        - COMPILER_NAME=clang CXX=clang++-3.9 CC=clang-3.9
+-        - CONFIG="--disable-linux-user --cc=clang-3.9 --cxx=clang++-3.9 --python=/usr/bin/python3"
+-      before_install:
+-        - wget -nv -O - http://llvm.org/apt/llvm-snapshot.gpg.key | sudo apt-key add -
+-        - sudo apt-add-repository -y 'deb http://llvm.org/apt/trusty llvm-toolchain-trusty-3.9 main'
+-        - sudo apt-get update -qq
+-        - sudo apt-get install -qq -y clang-3.9
+-        - sudo apt-get build-dep -qq qemu
+-        - wget -O - http://people.linaro.org/~alex.bennee/qemu-submodule-git-seed.tar.xz | tar -xvJ
+-        - git submodule update --init --recursive
+-      before_script:
+-        - ./configure ${CONFIG} || cat config.log
+-    # Trusty Linux User build with latest stable clang & python 3.6
+-    - sudo: required
+-      addons:
+-      dist: trusty
+-      language: generic
+-      compiler: none
++    - env: CONFIG="--disable-linux-user"
+       python:
+         - "3.6"
+-      env:
+-        - COMPILER_NAME=clang CXX=clang++-3.9 CC=clang-3.9
+-        - CONFIG="--disable-system --cc=clang-3.9 --cxx=clang++-3.9 --python=/usr/bin/python3"
+-      before_install:
+-        - wget -nv -O - http://llvm.org/apt/llvm-snapshot.gpg.key | sudo apt-key add -
+-        - sudo apt-add-repository -y 'deb http://llvm.org/apt/trusty llvm-toolchain-trusty-3.9 main'
+-        - sudo apt-get update -qq
+-        - sudo apt-get install -qq -y clang-3.9
+-        - sudo apt-get build-dep -qq qemu
+-        - wget -O - http://people.linaro.org/~alex.bennee/qemu-submodule-git-seed.tar.xz | tar -xvJ
+-        - git submodule update --init --recursive
+-      before_script:
+-        - ./configure ${CONFIG} || cat config.log
+     # Using newer GCC with sanitizers
+     - addons:
+         apt:
 -- 
 2.17.0
