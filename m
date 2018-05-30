@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39385)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39539)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1fO2MI-0006FA-AX
-	for qemu-devel@nongnu.org; Wed, 30 May 2018 10:45:51 -0400
+	(envelope-from <shameerali.kolothum.thodi@huawei.com>)
+	id 1fO2Ml-0006UY-79
+	for qemu-devel@nongnu.org; Wed, 30 May 2018 10:46:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1fO2MH-0000tv-Bk
-	for qemu-devel@nongnu.org; Wed, 30 May 2018 10:45:50 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:56796 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1fO2MH-0000sM-6x
-	for qemu-devel@nongnu.org; Wed, 30 May 2018 10:45:49 -0400
-Date: Wed, 30 May 2018 15:45:44 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20180530144543.GE2410@work-vm>
-References: <1527673416-31268-1-git-send-email-lidongchen@tencent.com>
-	<1527673416-31268-5-git-send-email-lidongchen@tencent.com>
+	(envelope-from <shameerali.kolothum.thodi@huawei.com>)
+	id 1fO2Mj-00017q-Rp
+	for qemu-devel@nongnu.org; Wed, 30 May 2018 10:46:19 -0400
+From: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
+Date: Wed, 30 May 2018 14:46:00 +0000
+Message-ID: <5FC3163CFD30C246ABAA99954A238FA8386F17D9@FRAEML521-MBX.china.huawei.com>
+References: <20180516152026.2920-1-shameerali.kolothum.thodi@huawei.com>
+	<20180516152026.2920-4-shameerali.kolothum.thodi@huawei.com>
+	<1f8e3cd4-1e54-5350-3804-c77bbbfbd3e4@redhat.com>
+In-Reply-To: <1f8e3cd4-1e54-5350-3804-c77bbbfbd3e4@redhat.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1527673416-31268-5-git-send-email-lidongchen@tencent.com>
-Subject: Re: [Qemu-devel] [PATCH v4 04/12] migration: avoid concurrent
- invoke channel_close by different threads
+Subject: Re: [Qemu-devel] [RFC v2 3/6] hw/arm/virt: Add pc-dimm mem hotplug
+ framework
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,99 +28,219 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Lidong Chen <jemmy858585@gmail.com>
-Cc: zhang.zhanghailiang@huawei.com, quintela@redhat.com, berrange@redhat.com, aviadye@mellanox.com, pbonzini@redhat.com, qemu-devel@nongnu.org, adido@mellanox.com, Lidong Chen <lidongchen@tencent.com>
+To: Auger Eric <eric.auger@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>
+Cc: "drjones@redhat.com" <drjones@redhat.com>, "imammedo@redhat.com" <imammedo@redhat.com>, "peter.maydell@linaro.org" <peter.maydell@linaro.org>, "alex.williamson@redhat.com" <alex.williamson@redhat.com>, Zhaoshenglong <zhaoshenglong@huawei.com>, Jonathan Cameron <jonathan.cameron@huawei.com>, Linuxarm <linuxarm@huawei.com>
 
-* Lidong Chen (jemmy858585@gmail.com) wrote:
-> From: Lidong Chen <jemmy858585@gmail.com>
-> 
-> The channel_close maybe invoked by different threads. For example, source
-> qemu invokes qemu_fclose in main thread, migration thread and return path
-> thread. Destination qemu invokes qemu_fclose in main thread, listen thread
-> and COLO incoming thread.
-> 
-> Add a mutex in QEMUFile struct to avoid concurrent invoke channel_close.
-> 
-> Signed-off-by: Lidong Chen <lidongchen@tencent.com>
-> ---
->  migration/qemu-file.c | 5 +++++
->  1 file changed, 5 insertions(+)
-> 
-> diff --git a/migration/qemu-file.c b/migration/qemu-file.c
-> index 977b9ae..87d0f05 100644
-> --- a/migration/qemu-file.c
-> +++ b/migration/qemu-file.c
-> @@ -52,6 +52,7 @@ struct QEMUFile {
->      unsigned int iovcnt;
->  
->      int last_error;
-> +    QemuMutex lock;
+Hi Eric,
 
-That could do with a comment saying what you're protecting
+> -----Original Message-----
+> From: Auger Eric [mailto:eric.auger@redhat.com]
+> Sent: Monday, May 28, 2018 3:22 PM
+> To: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>;
+> qemu-devel@nongnu.org; qemu-arm@nongnu.org
+> Cc: drjones@redhat.com; imammedo@redhat.com; peter.maydell@linaro.org;
+> alex.williamson@redhat.com; Zhaoshenglong <zhaoshenglong@huawei.com>;
+> Jonathan Cameron <jonathan.cameron@huawei.com>; Linuxarm
+> <linuxarm@huawei.com>
+> Subject: Re: [RFC v2 3/6] hw/arm/virt: Add pc-dimm mem hotplug framework
+>=20
+> Hi Shameer,
+>=20
+> On 05/16/2018 05:20 PM, Shameer Kolothum wrote:
+> > This will be used in subsequent patches to model a chunk of
+> > memory as pc-dimm(cold plug) if the valid iova regions are
+> > non-contiguous. This is not yet a full hotplug support.
+> Please can you give more details about this restriction?
+> >
+> > Signed-off-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
+> > ---
+> >  default-configs/aarch64-softmmu.mak |  1 +
+> >  hw/arm/virt.c                       | 82
+> +++++++++++++++++++++++++++++++++++++
+> >  include/hw/arm/virt.h               |  2 +
+> >  3 files changed, 85 insertions(+)
+> >
+> > diff --git a/default-configs/aarch64-softmmu.mak b/default-configs/aarc=
+h64-
+> softmmu.mak
+> > index 9ddccf8..7a82ed8 100644
+> > --- a/default-configs/aarch64-softmmu.mak
+> > +++ b/default-configs/aarch64-softmmu.mak
+> > @@ -8,3 +8,4 @@ CONFIG_DDC=3Dy
+> >  CONFIG_DPCD=3Dy
+> >  CONFIG_XLNX_ZYNQMP=3Dy
+> >  CONFIG_XLNX_ZYNQMP_ARM=3Dy
+> > +CONFIG_MEM_HOTPLUG=3Dy
+> > diff --git a/hw/arm/virt.c b/hw/arm/virt.c
+> > index 05fcb62..be3ad14 100644
+> > --- a/hw/arm/virt.c
+> > +++ b/hw/arm/virt.c
+> > @@ -1552,9 +1552,82 @@ static const CPUArchIdList
+> *virt_possible_cpu_arch_ids(MachineState *ms)
+> >      return ms->possible_cpus;
+> >  }
+> >
+> > +static void virt_dimm_plug(HotplugHandler *hotplug_dev,
+> > +                         DeviceState *dev, Error **errp)
+> > +{
+> > +    VirtMachineState *vms =3D VIRT_MACHINE(hotplug_dev);
+> > +    PCDIMMDevice *dimm =3D PC_DIMM(dev);
+> > +    PCDIMMDeviceClass *ddc =3D PC_DIMM_GET_CLASS(dimm);
+> > +    MemoryRegion *mr;
+> > +    uint64_t align;
+> > +    Error *local_err =3D NULL;
+> > +
+> > +    mr =3D ddc->get_memory_region(dimm, &local_err);
+> > +    if (local_err) {
+> > +        goto out;
+> > +    }
+> > +
+> > +    align =3D memory_region_get_alignment(mr);
+> I see that on PC machine class they have an "enforce_aligned_dimm"
+> option. Also looks memory_region_get_alignment(mr) can return 0.
+>=20
+> if (memory_region_get_alignment(mr) && pcmc->enforce_aligned_dimm) {
 
->  };
->  
->  /*
-> @@ -96,6 +97,7 @@ QEMUFile *qemu_fopen_ops(void *opaque, const QEMUFileOps *ops)
->  
->      f = g_new0(QEMUFile, 1);
->  
-> +    qemu_mutex_init(&f->lock);
->      f->opaque = opaque;
->      f->ops = ops;
->      return f;
-> @@ -328,7 +330,9 @@ int qemu_fclose(QEMUFile *f)
->      ret = qemu_file_get_error(f);
->  
->      if (f->ops->close) {
-> +        qemu_mutex_lock(&f->lock);
->          int ret2 = f->ops->close(f->opaque);
-> +        qemu_mutex_unlock(&f->lock);
+Ok.
+=20
+>=20
+> > +    pc_dimm_memory_plug(dev, &vms->hotplug_memory, mr, align,
+> &local_err);
+> > +    if (local_err) {
+> > +        goto out;
+> > +    }
+> useless block and error_propagate does nothing if local_err is NULL so
+> we are fine.
 
-OK, and at least for the RDMA code, if it calls
-close a 2nd time, rioc->rdma is checked so it wont actually free stuff a
-2nd time.
+Ok. I will remove this from this patch.
 
->          if (ret >= 0) {
->              ret = ret2;
->          }
-> @@ -339,6 +343,7 @@ int qemu_fclose(QEMUFile *f)
->      if (f->last_error) {
->          ret = f->last_error;
->      }
-> +    qemu_mutex_destroy(&f->lock);
->      g_free(f);
+> > +
+> > +out:
+> > +    error_propagate(errp, local_err);
+> > +}
+> > +
+> > +static void virt_dimm_unplug(HotplugHandler *hotplug_dev,
+> > +                           DeviceState *dev, Error **errp)
+> > +{
+> > +    VirtMachineState *vms =3D VIRT_MACHINE(hotplug_dev);
+> > +    PCDIMMDevice *dimm =3D PC_DIMM(dev);
+> > +    PCDIMMDeviceClass *ddc =3D PC_DIMM_GET_CLASS(dimm);
+> > +    MemoryRegion *mr;
+> > +    Error *local_err =3D NULL;
+> > +
+> > +    mr =3D ddc->get_memory_region(dimm, &local_err);
+> don't you want to avoid executing the following if local_err?
 
-Hmm but that's not safe; if two things really do call qemu_fclose()
-on the same structure they race here and can end up destroying the lock
-twice, or doing f->lock  after the 1st one has already g_free(f).
+True.
 
+> > +    pc_dimm_memory_unplug(dev, &vms->hotplug_memory, mr);
+> needs a rebase on top of "pc-dimm: no need to pass the memory region"
+> in master pc_dimm_memory_unplug we now have
+>  MemoryRegion *mr =3D ddc->get_memory_region(dimm, &error_abort);
 
-So lets go back a step.
-I think:
-  a) There should always be a separate QEMUFile* for
-     to_src_file and from_src_file - I don't see where you open
-     the 2nd one; I don't see your implementation of
-     f->ops->get_return_path.
-  b) I *think* that while the different threads might all call
-     fclose(), I think there should only ever be one qemu_fclose
-     call for each direction on the QEMUFile.
+Right. I will follow that then.
 
-But now we have two problems:
-  If (a) is true then f->lock  is separate on each one so
-   doesn't really protect if the two directions are closed
-   at once. (Assuming (b) is true)
+> Thanks
+>=20
+> Eric
+> > +    object_unparent(OBJECT(dev));
+> > +
+> > +    error_propagate(errp, local_err);
+> > +}
+> > +
+> > +static void virt_machinedevice_plug_cb(HotplugHandler *hotplug_dev,
+> > +                                      DeviceState *dev, Error **errp)
+> > +{
+> > +    if (object_dynamic_cast(OBJECT(dev), TYPE_PC_DIMM)) {
+> > +        virt_dimm_plug(hotplug_dev, dev, errp);
+> > +    } else {
+> > +        error_setg(errp, "device plug request for not supported device=
+"
+> > +                   " type: %s", object_get_typename(OBJECT(dev)));
+> > +    }
+> > +}
+> > +
+> > +static void virt_machinedevice_unplug_cb(HotplugHandler *hotplug_dev,
+> > +                                        DeviceState *dev, Error **errp=
+)
+> > +{
+> > +    if (object_dynamic_cast(OBJECT(dev), TYPE_PC_DIMM)) {
+> > +        virt_dimm_unplug(hotplug_dev, dev, errp);
+> > +    } else {
+> > +        error_setg(errp, "device unplug for not supported device"
+> > +                   " type: %s", object_get_typename(OBJECT(dev)));
+> > +    }
+> > +}
+> > +
+> > +static HotplugHandler *virt_get_hotplug_handler(MachineState *machine,
+> > +                                             DeviceState *dev)
+> > +{
+> > +    if (object_dynamic_cast(OBJECT(dev), TYPE_PC_DIMM)) {
+> > +        return HOTPLUG_HANDLER(machine);
+> > +    }
+> > +    return NULL;
+> > +}
+> > +
+> >  static void virt_machine_class_init(ObjectClass *oc, void *data)
+> >  {
+> >      MachineClass *mc =3D MACHINE_CLASS(oc);
+> > +    HotplugHandlerClass *hc =3D HOTPLUG_HANDLER_CLASS(oc);
+> >
+> >      mc->init =3D machvirt_init;
+> >      /* Start max_cpus at the maximum QEMU supports. We'll further rest=
+rict
+> > @@ -1573,6 +1646,11 @@ static void virt_machine_class_init(ObjectClass
+> *oc, void *data)
+> >      mc->cpu_index_to_instance_props =3D virt_cpu_index_to_props;
+> >      mc->default_cpu_type =3D ARM_CPU_TYPE_NAME("cortex-a15");
+> >      mc->get_default_cpu_node_id =3D virt_get_default_cpu_node_id;
+> > +
+> > +    mc->get_hotplug_handler =3D virt_get_hotplug_handler;
+> This requires a rebase on top of Igor's  and David's series.
+>=20
+Sure.
 
-  If (a) is false and we actually share a single QEMUFile then
- that race at the end happens.
+Thanks,
+Shameer
 
-Dave
-
-
->      trace_qemu_file_fclose();
->      return ret;
-> -- 
-> 1.8.3.1
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> Thanks
+>=20
+> Eric
+> > +    hc->plug =3D virt_machinedevice_plug_cb;
+> > +    hc->unplug =3D virt_machinedevice_unplug_cb;
+> > +
+> >  }
+> >
+> >  static const TypeInfo virt_machine_info =3D {
+> > @@ -1582,6 +1660,10 @@ static const TypeInfo virt_machine_info =3D {
+> >      .instance_size =3D sizeof(VirtMachineState),
+> >      .class_size    =3D sizeof(VirtMachineClass),
+> >      .class_init    =3D virt_machine_class_init,
+> > +    .interfaces =3D (InterfaceInfo[]) {
+> > +         { TYPE_HOTPLUG_HANDLER },
+> > +         { }
+> > +    },
+> >  };
+> >
+> >  static void machvirt_machine_init(void)
+> > diff --git a/include/hw/arm/virt.h b/include/hw/arm/virt.h
+> > index fc24f3a..a39f29e 100644
+> > --- a/include/hw/arm/virt.h
+> > +++ b/include/hw/arm/virt.h
+> > @@ -35,6 +35,7 @@
+> >  #include "qemu/notify.h"
+> >  #include "hw/boards.h"
+> >  #include "hw/arm/arm.h"
+> > +#include "hw/mem/pc-dimm.h"
+> >
+> >  #define NUM_GICV2M_SPIS       64
+> >  #define NUM_VIRTIO_TRANSPORTS 32
+> > @@ -108,6 +109,7 @@ typedef struct {
+> >      uint32_t gic_phandle;
+> >      uint32_t msi_phandle;
+> >      int psci_conduit;
+> > +    MemoryHotplugState hotplug_memory;
+> >  } VirtMachineState;
+> >
+> >  #define TYPE_VIRT_MACHINE   MACHINE_TYPE_NAME("virt")
+> >
