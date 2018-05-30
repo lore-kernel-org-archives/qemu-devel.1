@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34514)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34492)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fNxE9-0002RW-FL
+	(envelope-from <thuth@redhat.com>) id 1fNxE8-0002RT-7R
 	for qemu-devel@nongnu.org; Wed, 30 May 2018 05:17:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fNxE7-00071Y-Of
-	for qemu-devel@nongnu.org; Wed, 30 May 2018 05:17:05 -0400
+	(envelope-from <thuth@redhat.com>) id 1fNxE6-000715-B9
+	for qemu-devel@nongnu.org; Wed, 30 May 2018 05:17:04 -0400
 From: Thomas Huth <thuth@redhat.com>
-Date: Wed, 30 May 2018 11:16:57 +0200
-Message-Id: <1527671818-23809-3-git-send-email-thuth@redhat.com>
+Date: Wed, 30 May 2018 11:16:56 +0200
+Message-Id: <1527671818-23809-2-git-send-email-thuth@redhat.com>
 In-Reply-To: <1527671818-23809-1-git-send-email-thuth@redhat.com>
 References: <1527671818-23809-1-git-send-email-thuth@redhat.com>
-Subject: [Qemu-devel] [PATCH 2/3] pc-bios/s390-ccw/net: Add support for
- pxelinux-style config files
+Subject: [Qemu-devel] [PATCH 1/3] pc-bios/s390-ccw/net: Update code for the
+ latest changes in SLOF
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,182 +23,201 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-s390x@nongnu.org, Viktor Mihajlovski <mihajlov@linux.vnet.ibm.com>
 Cc: Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cohuck@redhat.com>, qemu-devel@nongnu.org, Collin Walling <walling@linux.ibm.com>, Farhan Ali <alifm@linux.ibm.com>
 
-Since it is quite cumbersome to manually create a combined kernel with
-initrd image for network booting, we now support loading via pxelinux
-configuration files, too. In these files, the kernel, initrd and command
-line parameters can be specified seperately, and the firmware then takes
-care of glueing everything together in memory after the files have been
-downloaded. See this URL for details about the config file layout:
-https://www.syslinux.org/wiki/index.php?title=PXELINUX
-
-The user can either specify a config file directly as bootfile via DHCP
-(but in this case, the file has to start either with "default" or a "#"
-comment so we can distinguish it from binary kernels), or a folder (i.e.
-the bootfile name must end with "/") where the firmware should look for
-the typical pxelinux.cfg file names, e.g. based on MAC or IP address.
-We also support the pxelinux.cfg DHCP options 209 and 210 from RFC 5071.
+The ip_version information now has to be stored in the filename_ip_t
+structure, and there is now a common function called tftp_get_error_info()
+which can be used to get the error string for a TFTP error code.
+We can also get rid of some superfluous "(char *)" casts now.
 
 Signed-off-by: Thomas Huth <thuth@redhat.com>
 ---
- pc-bios/s390-ccw/netboot.mak |  7 ++--
- pc-bios/s390-ccw/netmain.c   | 79 +++++++++++++++++++++++++++++++++++++++++++-
- 2 files changed, 82 insertions(+), 4 deletions(-)
+ pc-bios/s390-ccw/netboot.mak |  2 +-
+ pc-bios/s390-ccw/netmain.c   | 85 +++++++++-----------------------------------
+ 2 files changed, 17 insertions(+), 70 deletions(-)
 
 diff --git a/pc-bios/s390-ccw/netboot.mak b/pc-bios/s390-ccw/netboot.mak
-index a73be36..8af0cfd 100644
+index 4f64128..a73be36 100644
 --- a/pc-bios/s390-ccw/netboot.mak
 +++ b/pc-bios/s390-ccw/netboot.mak
-@@ -25,8 +25,9 @@ CTYPE_OBJS = isdigit.o isxdigit.o toupper.o
- %.o : $(SLOF_DIR)/lib/libc/ctype/%.c
+@@ -34,7 +34,7 @@ STDLIB_OBJS = atoi.o atol.o strtoul.o strtol.o rand.o malloc.o free.o
+ %.o : $(SLOF_DIR)/lib/libc/stdlib/%.c
  	$(call quiet-command,$(CC) $(LIBC_CFLAGS) -c -o $@ $<,"CC","$(TARGET_DIR)$@")
  
--STRING_OBJS = strcat.o strchr.o strcmp.o strcpy.o strlen.o strncmp.o strncpy.o \
--	      strstr.o memset.o memcpy.o memmove.o memcmp.o
-+STRING_OBJS = strcat.o strchr.o strrchr.o strcpy.o strlen.o strncpy.o \
-+	      strcmp.o strncmp.o strcasecmp.o strncasecmp.o strstr.o \
-+	      memset.o memcpy.o memmove.o memcmp.o
- %.o : $(SLOF_DIR)/lib/libc/string/%.c
+-STDIO_OBJS = sprintf.o vfprintf.o vsnprintf.o vsprintf.o fprintf.o \
++STDIO_OBJS = sprintf.o snprintf.o vfprintf.o vsnprintf.o vsprintf.o fprintf.o \
+ 	     printf.o putc.o puts.o putchar.o stdchnls.o fileno.o
+ %.o : $(SLOF_DIR)/lib/libc/stdio/%.c
  	$(call quiet-command,$(CC) $(LIBC_CFLAGS) -c -o $@ $<,"CC","$(TARGET_DIR)$@")
- 
-@@ -50,7 +51,7 @@ libc.a: $(LIBCOBJS)
- # libnet files:
- 
- LIBNETOBJS := args.o dhcp.o dns.o icmpv6.o ipv6.o tcp.o udp.o bootp.o \
--	      dhcpv6.o ethernet.o ipv4.o ndp.o tftp.o
-+	      dhcpv6.o ethernet.o ipv4.o ndp.o tftp.o pxelinux.o
- LIBNETCFLAGS := $(QEMU_CFLAGS) -DDHCPARCH=0x1F $(LIBC_INC) $(LIBNET_INC)
- 
- %.o : $(SLOF_DIR)/lib/libnet/%.c
 diff --git a/pc-bios/s390-ccw/netmain.c b/pc-bios/s390-ccw/netmain.c
-index 7533cf7..e84bb2b 100644
+index 6000241..7533cf7 100644
 --- a/pc-bios/s390-ccw/netmain.c
 +++ b/pc-bios/s390-ccw/netmain.c
-@@ -30,6 +30,7 @@
- #include <ipv6.h>
- #include <dns.h>
- #include <time.h>
-+#include <pxelinux.h>
- 
- #include "s390-ccw.h"
- #include "virtio.h"
-@@ -41,12 +42,14 @@ extern char _start[];
- 
- #define KERNEL_ADDR             ((void *)0L)
- #define KERNEL_MAX_SIZE         ((long)_start)
-+#define ARCH_COMMAND_LINE_SIZE  896              /* Taken from Linux kernel */
- 
- char stack[PAGE_SIZE * 8] __attribute__((aligned(PAGE_SIZE)));
- IplParameterBlock iplb __attribute__((aligned(PAGE_SIZE)));
+@@ -47,7 +47,6 @@ IplParameterBlock iplb __attribute__((aligned(PAGE_SIZE)));
  static char cfgbuf[2048];
  
  static SubChannelId net_schid = { .one = 1 };
-+static uint8_t mac[6];
+-static int ip_version = 4;
  static uint64_t dest_timer;
  
  static uint64_t get_timer_ms(void)
-@@ -158,7 +161,6 @@ static int tftp_load(filename_ip_t *fnip, void *buffer, int len)
- 
- static int net_init(filename_ip_t *fn_ip)
- {
--    uint8_t mac[6];
+@@ -100,10 +99,10 @@ static int dhcp(struct filename_ip *fn_ip, int retries)
+             printf("\nGiving up after %d DHCP requests\n", retries);
+             return -1;
+         }
+-        ip_version = 4;
++        fn_ip->ip_version = 4;
+         rc = dhcpv4(NULL, fn_ip);
+         if (rc == -1) {
+-            ip_version = 6;
++            fn_ip->ip_version = 6;
+             set_ipv6_address(fn_ip->fd, 0);
+             rc = dhcpv6(NULL, fn_ip);
+             if (rc == 0) {
+@@ -137,8 +136,7 @@ static int tftp_load(filename_ip_t *fnip, void *buffer, int len)
+     tftp_err_t tftp_err;
      int rc;
  
-     memset(fn_ip, 0, sizeof(filename_ip_t));
-@@ -233,6 +235,66 @@ static void net_release(filename_ip_t *fn_ip)
- }
+-    rc = tftp(fnip, buffer, len, DEFAULT_TFTP_RETRIES, &tftp_err, 1, 1428,
+-              ip_version);
++    rc = tftp(fnip, buffer, len, DEFAULT_TFTP_RETRIES, &tftp_err);
  
- /**
-+ * Load a kernel with initrd (i.e. with the information that we've got from
-+ * a pxelinux.cfg config file)
-+ */
-+static int load_kernel_with_initrd(filename_ip_t *fn_ip,
-+                                   struct pl_cfg_entry *entry)
-+{
-+    int rc;
-+
-+    printf("Loading pxelinux.cfg entry '%s'\n", entry->label);
-+
-+    if (!entry->kernel) {
-+        printf("Kernel entry is missing!\n");
-+        return -1;
-+    }
-+
-+    strncpy(fn_ip->filename, entry->kernel, sizeof(fn_ip->filename));
-+    rc = tftp_load(fn_ip, KERNEL_ADDR, KERNEL_MAX_SIZE);
-+    if (rc < 0) {
-+        return rc;
-+    }
-+
-+    if (entry->initrd) {
-+        uint64_t iaddr = (rc + 0xfff) & ~0xfffUL;
-+
-+        strncpy(fn_ip->filename, entry->initrd, sizeof(fn_ip->filename));
-+        rc = tftp_load(fn_ip, (void *)iaddr, KERNEL_MAX_SIZE - iaddr);
-+        if (rc < 0) {
-+            return rc;
-+        }
-+        /* Patch location and size: */
-+        *(uint64_t *)0x10408 = iaddr;
-+        *(uint64_t *)0x10410 = rc;
-+        rc += iaddr;
-+    }
-+
-+    if (entry->append) {
-+        strncpy((char *)0x10480, entry->append, ARCH_COMMAND_LINE_SIZE);
-+    }
-+
-+    return rc;
-+}
-+
-+#define MAX_PXELINUX_ENTRIES 16
-+
-+static int net_try_pxelinux_cfg(filename_ip_t *fn_ip)
-+{
-+    struct pl_cfg_entry entries[MAX_PXELINUX_ENTRIES];
-+    int num_ent, def_ent = 0;
-+
-+    num_ent = pxelinux_load_parse_cfg(fn_ip, mac, NULL, DEFAULT_TFTP_RETRIES,
-+                                      cfgbuf, sizeof(cfgbuf),
-+                                      entries, MAX_PXELINUX_ENTRIES, &def_ent);
-+    if (num_ent > 0) {
-+        return load_kernel_with_initrd(fn_ip, &entries[def_ent]);
-+    }
-+
-+    return -1;
-+}
-+
-+/**
-  * Load via information from a .INS file (which can be found on CD-ROMs
-  * for example)
-  */
-@@ -301,6 +363,18 @@ static int net_try_direct_tftp_load(filename_ip_t *fn_ip)
-         if (!strncmp("* ", cfgbuf, 2)) {
-             return handle_ins_cfg(fn_ip, cfgbuf, rc);
-         }
-+        if (!strncasecmp("default", cfgbuf, 7) || !strncmp("# ", cfgbuf, 2)) {
-+            /* Looks like it is a pxelinux.cfg */
-+            struct pl_cfg_entry entries[MAX_PXELINUX_ENTRIES];
-+            int num_ent, def_ent = 0;
-+
-+            num_ent = pxelinux_parse_cfg(cfgbuf, sizeof(cfgbuf), entries,
-+                                         MAX_PXELINUX_ENTRIES, &def_ent);
-+            if (num_ent <= 0) {
-+                return -1;
-+            }
-+            return load_kernel_with_initrd(fn_ip, &entries[def_ent]);
-+        }
+     if (rc < 0) {
+         /* Make sure that error messages are put into a new line */
+@@ -149,61 +147,10 @@ static int tftp_load(filename_ip_t *fnip, void *buffer, int len)
+         printf("  TFTP: Received %s (%d KBytes)\n", fnip->filename, rc / 1024);
+     } else if (rc > 0) {
+         printf("  TFTP: Received %s (%d Bytes)\n", fnip->filename, rc);
+-    } else if (rc == -1) {
+-        puts("unknown TFTP error");
+-    } else if (rc == -2) {
+-        printf("TFTP buffer of %d bytes is too small for %s\n",
+-            len, fnip->filename);
+-    } else if (rc == -3) {
+-        printf("file not found: %s\n", fnip->filename);
+-    } else if (rc == -4) {
+-        puts("TFTP access violation");
+-    } else if (rc == -5) {
+-        puts("illegal TFTP operation");
+-    } else if (rc == -6) {
+-        puts("unknown TFTP transfer ID");
+-    } else if (rc == -7) {
+-        puts("no such TFTP user");
+-    } else if (rc == -8) {
+-        puts("TFTP blocksize negotiation failed");
+-    } else if (rc == -9) {
+-        puts("file exceeds maximum TFTP transfer size");
+-    } else if (rc <= -10 && rc >= -15) {
+-        const char *icmp_err_str;
+-        switch (rc) {
+-        case -ICMP_NET_UNREACHABLE - 10:
+-            icmp_err_str = "net unreachable";
+-            break;
+-        case -ICMP_HOST_UNREACHABLE - 10:
+-            icmp_err_str = "host unreachable";
+-            break;
+-        case -ICMP_PROTOCOL_UNREACHABLE - 10:
+-            icmp_err_str = "protocol unreachable";
+-            break;
+-        case -ICMP_PORT_UNREACHABLE - 10:
+-            icmp_err_str = "port unreachable";
+-            break;
+-        case -ICMP_FRAGMENTATION_NEEDED - 10:
+-            icmp_err_str = "fragmentation needed and DF set";
+-            break;
+-        case -ICMP_SOURCE_ROUTE_FAILED - 10:
+-            icmp_err_str = "source route failed";
+-            break;
+-        default:
+-            icmp_err_str = " UNKNOWN";
+-            break;
+-        }
+-        printf("ICMP ERROR \"%s\"\n", icmp_err_str);
+-    } else if (rc == -40) {
+-        printf("TFTP error occurred after %d bad packets received",
+-            tftp_err.bad_tftp_packets);
+-    } else if (rc == -41) {
+-        printf("TFTP error occurred after missing %d responses",
+-            tftp_err.no_packets);
+-    } else if (rc == -42) {
+-        printf("TFTP error missing block %d, expected block was %d",
+-            tftp_err.blocks_missed,
+-            tftp_err.blocks_received);
++    } else {
++        const char *errstr = NULL;
++        tftp_get_error_info(fnip, &tftp_err, rc, &errstr, NULL);
++        printf("TFTP error: %s\n", errstr ? errstr : "unknown error");
      }
  
-     /* Move kernel to right location */
-@@ -406,6 +480,9 @@ void main(void)
+     return rc;
+@@ -231,7 +178,7 @@ static int net_init(filename_ip_t *fn_ip)
+ 
+     rc = dhcp(fn_ip, DEFAULT_BOOT_RETRIES);
+     if (rc >= 0) {
+-        if (ip_version == 4) {
++        if (fn_ip->ip_version == 4) {
+             set_ipv4_address(fn_ip->own_ip);
+         }
+     } else {
+@@ -239,11 +186,11 @@ static int net_init(filename_ip_t *fn_ip)
+         return -101;
+     }
+ 
+-    if (ip_version == 4) {
++    if (fn_ip->ip_version == 4) {
+         printf("  Using IPv4 address: %d.%d.%d.%d\n",
+               (fn_ip->own_ip >> 24) & 0xFF, (fn_ip->own_ip >> 16) & 0xFF,
+               (fn_ip->own_ip >>  8) & 0xFF, fn_ip->own_ip & 0xFF);
+-    } else if (ip_version == 6) {
++    } else if (fn_ip->ip_version == 6) {
+         char ip6_str[40];
+         ipv6_to_str(fn_ip->own_ip6.addr, ip6_str);
+         printf("  Using IPv6 address: %s\n", ip6_str);
+@@ -261,17 +208,17 @@ static int net_init(filename_ip_t *fn_ip)
+     }
+ 
+     printf("  Using TFTP server: ");
+-    if (ip_version == 4) {
++    if (fn_ip->ip_version == 4) {
+         printf("%d.%d.%d.%d\n",
+                (fn_ip->server_ip >> 24) & 0xFF, (fn_ip->server_ip >> 16) & 0xFF,
+                (fn_ip->server_ip >>  8) & 0xFF, fn_ip->server_ip & 0xFF);
+-    } else if (ip_version == 6) {
++    } else if (fn_ip->ip_version == 6) {
+         char ip6_str[40];
+         ipv6_to_str(fn_ip->server_ip6.addr, ip6_str);
+         printf("%s\n", ip6_str);
+     }
+ 
+-    if (strlen((char *)fn_ip->filename) > 0) {
++    if (strlen(fn_ip->filename) > 0) {
+         printf("  Bootfile name: '%s'\n", fn_ip->filename);
+     }
+ 
+@@ -280,7 +227,7 @@ static int net_init(filename_ip_t *fn_ip)
+ 
+ static void net_release(filename_ip_t *fn_ip)
+ {
+-    if (ip_version == 4) {
++    if (fn_ip->ip_version == 4) {
+         dhcp_send_release(fn_ip->fd);
+     }
+ }
+@@ -322,7 +269,7 @@ static int handle_ins_cfg(filename_ip_t *fn_ip, char *cfg, int cfgsize)
+             return -1;
+         }
+         *ptr = 0;
+-        strncpy((char *)fn_ip->filename, insbuf, sizeof(fn_ip->filename));
++        strncpy(fn_ip->filename, insbuf, sizeof(fn_ip->filename));
+         destaddr = (char *)atol(ptr + 1);
+         rc = tftp_load(fn_ip, destaddr, (long)_start - (long)destaddr);
+         if (rc <= 0) {
+@@ -455,7 +402,7 @@ void main(void)
+         panic("Network initialization failed. Halting.\n");
+     }
+ 
+-    fnlen = strlen((char *)fn_ip.filename);
++    fnlen = strlen(fn_ip.filename);
      if (fnlen > 0 && fn_ip.filename[fnlen - 1] != '/') {
          rc = net_try_direct_tftp_load(&fn_ip);
      }
-+    if (rc <= 0) {
-+        rc = net_try_pxelinux_cfg(&fn_ip);
-+    }
- 
-     net_release(&fn_ip);
- 
 -- 
 1.8.3.1
