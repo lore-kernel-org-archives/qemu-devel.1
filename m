@@ -1,28 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39998)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41109)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1fO7Xv-0007zy-DJ
-	for qemu-devel@nongnu.org; Wed, 30 May 2018 16:18:27 -0400
+	(envelope-from <jsnow@redhat.com>) id 1fO7YS-0008Ti-Nb
+	for qemu-devel@nongnu.org; Wed, 30 May 2018 16:18:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1fO7H1-00066A-Qu
-	for qemu-devel@nongnu.org; Wed, 30 May 2018 16:00:47 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:50638)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1fO7H1-000659-IC
-	for qemu-devel@nongnu.org; Wed, 30 May 2018 16:00:43 -0400
-Date: Wed, 30 May 2018 17:00:32 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20180530200032.GF7451@localhost.localdomain>
-References: <20180529193730.9204-1-crosa@redhat.com>
-	<20180529193730.9204-4-crosa@redhat.com>
-	<20180530125705.GL14623@stefanha-x1.localdomain>
-	<20180530162949.GE7451@localhost.localdomain>
-	<47189c37-afec-6366-e9e4-cae5999d9eb2@redhat.com>
+	(envelope-from <jsnow@redhat.com>) id 1fO7YG-0002Bc-8a
+	for qemu-devel@nongnu.org; Wed, 30 May 2018 16:18:44 -0400
+References: <20180525235509.11282-1-jsnow@redhat.com>
+	<20180525235509.11282-4-jsnow@redhat.com>
+	<91fa0944-d11d-894f-a1aa-03b1fd186f1a@amsat.org>
+From: John Snow <jsnow@redhat.com>
+Message-ID: <acfc53d7-228f-2e95-5946-f7faf0c7f2e3@redhat.com>
+Date: Wed, 30 May 2018 16:17:48 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <47189c37-afec-6366-e9e4-cae5999d9eb2@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v3 3/5] Acceptance tests: add quick VNC
- tests
+In-Reply-To: <91fa0944-d11d-894f-a1aa-03b1fd186f1a@amsat.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 03/16] ahci: make port read traces more
+ descriptive
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,166 +26,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cleber Rosa <crosa@redhat.com>
-Cc: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>, Fam Zheng <famz@redhat.com>, Amador Pahim <amador@pahim.org>
-
-On Wed, May 30, 2018 at 02:00:48PM -0400, Cleber Rosa wrote:
-> 
-> 
-> On 05/30/2018 12:29 PM, Eduardo Habkost wrote:
-> > On Wed, May 30, 2018 at 01:57:05PM +0100, Stefan Hajnoczi wrote:
-> >> On Tue, May 29, 2018 at 03:37:28PM -0400, Cleber Rosa wrote:
-> >>> This patch adds a few simple behavior tests for VNC.
-> >>>
-> >>> Signed-off-by: Cleber Rosa <crosa@redhat.com>
-> >>> ---
-> >>>  tests/acceptance/vnc.py | 60 +++++++++++++++++++++++++++++++++++++++++
-> >>>  1 file changed, 60 insertions(+)
-> >>>  create mode 100644 tests/acceptance/vnc.py
-> >>>
-> >>> diff --git a/tests/acceptance/vnc.py b/tests/acceptance/vnc.py
-> >>> new file mode 100644
-> >>> index 0000000000..b1ef9d71b1
-> >>> --- /dev/null
-> >>> +++ b/tests/acceptance/vnc.py
-> >>> @@ -0,0 +1,60 @@
-> >>> +# Simple functional tests for VNC functionality
-> >>> +#
-> >>> +# Copyright (c) 2018 Red Hat, Inc.
-> >>> +#
-> >>> +# Author:
-> >>> +#  Cleber Rosa <crosa@redhat.com>
-> >>> +#
-> >>> +# This work is licensed under the terms of the GNU GPL, version 2 or
-> >>> +# later.  See the COPYING file in the top-level directory.
-> >>> +
-> >>> +from avocado_qemu import Test
-> >>> +
-> >>> +
-> >>> +class Vnc(Test):
-> >>> +    """
-> >>> +    :avocado: enable
-> >>> +    :avocado: tags=vnc,quick
-> >>> +    """
-> >>> +    def test_no_vnc(self):
-> >>> +        self.vm.add_args('-nodefaults', '-S')
-> >>> +        self.vm.launch()
-> >>
-> >> If this pattern becomes very common maybe vm.launch() should become
-> >> vm.launch(*extra_args) to make this a one-liner:
-> >>
-> >>   self.vm.launch('-nodefaults', '-S')
-> > 
-> > I think this was suggested in the past:
-> > 
-> >   self.vm.add_args(...).launch()
-> > 
-> > This style would be useful if we add other methods that change
-> > QEMU options in addition to raw add_args().  e.g.:
-> > 
-> >   self.vm.add_args(...).add_console(...).add_drive(...).launch()
-> > 
-> 
-> Yes, this is an old discussion indeed.  IMO, method chaining can look
-> attractive at first, but it will quickly bring a few new issues to be
-> dealt with.
-
-Which new issues?  I don't see any below.
-
-> 
-> For once, it brings the assumption that it can be done for all methods.
->  Using the previous example I'd expect to be able to do:
-> 
->    self.vm.add_args(...).launch(...).migrate(...).shutdown()
-> 
-> Which seems fine, but now the code is plagued with "return self" statements.
-
-Why the "return self" would be a problem?
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, qemu-block@nongnu.org
 
 
-> 
-> Then, code style and indentation questions will quickly arise.  Either this:
-> 
->    self.vm.add_args('-nodefaults', '-S').add_console('isa-serial') \
->           .add_drive(file='/path/to/file, format='raw').launch() \
->           .shutdown()
 
-Maybe it's a matter of personal taste, but I don't see a problem
-with this:
+On 05/26/2018 12:44 AM, Philippe Mathieu-Daud=C3=A9 wrote:
+> Hi John,
+>=20
+> On 05/25/2018 08:54 PM, John Snow wrote:
+>> A trace is added to let us watch unimplemented registers specifically,
+>> as these are more likely to cause us trouble. Otherwise, the port read
+>> traces now tell us what register is getting hit, which is nicer.
+>>
+>> Signed-off-by: John Snow <jsnow@redhat.com>
+>> ---
+>>  hw/ide/ahci.c       | 5 +++--
+>>  hw/ide/trace-events | 3 ++-
+>>  2 files changed, 5 insertions(+), 3 deletions(-)
+>>
+>> diff --git a/hw/ide/ahci.c b/hw/ide/ahci.c
+>> index 5187bf34ad..57c80a2fe9 100644
+>> --- a/hw/ide/ahci.c
+>> +++ b/hw/ide/ahci.c
+>> @@ -46,7 +46,6 @@ static bool ahci_map_fis_address(AHCIDevice *ad);
+>>  static void ahci_unmap_clb_address(AHCIDevice *ad);
+>>  static void ahci_unmap_fis_address(AHCIDevice *ad);
+>> =20
+>> -__attribute__((__unused__)) /* TODO */
+>>  static const char *AHCIPortReg_lookup[AHCI_PORT_REG__COUNT] =3D {
+>>      [AHCI_PORT_REG_LST_ADDR]    =3D "PxCLB",
+>>      [AHCI_PORT_REG_LST_ADDR_HI] =3D "PxCLBU",
+>> @@ -149,10 +148,12 @@ static uint32_t ahci_port_read(AHCIState *s, int=
+ port, int offset)
+>>          val =3D pr->cmd_issue;
+>>          break;
+>>      default:
+>> +        trace_ahci_port_read_unimpl(s, port, AHCIPortReg_lookup[regnu=
+m],
+>> +                                    offset);
+>=20
+> I personally prefer qemu_log_mask(LOG_UNIMP) here.
+>=20
+> Rational is when trying firmware, one might want to know which
+> unimplemented features access the firmware, without having to dig into
+> trace events, and the "-d unimp" command line option just works.
+>=20
 
-    self.vm.add_args('-nodefaults', '-S') \
-        .add_console('isa-serial') \
-        .add_drive(file='/path/to/file, format='raw') \
-        .launch() \
-        .shutdown()
+For reads, it's ambiguous. Some of the registers we've specifically not
+implemented because if they are unsupported they are supposed to return
+0, which we do here. The default behavior is generally correct.
 
-> 
-> Or this:
-> 
->    (self.vm.add_args('-nodefaults', '-S').add_console('isa-serial')
->            .add_drive(file='/path/to/file, format='raw').launch()
->            .shutdown())
+In this case, the trace really is just kind of an informative /
+debugging statement we probably aren't too interested in unless we're
+diagnosing some AHCI problem specifically -- and I don't want to turn on
+all unimp messages to see these.
 
-If you end up with very complex chains like above, you are still
-free to split it into multiple statements.
+> (same apply for the write() function later in this series).
+>=20
 
-I don't see why this would be an argument against making this
-possible:
+For writes it's actually definitely unhandled and I might actually
+prefer both the trace and the log -- if we support "-d unimp" on the
+command line to hunt for known stubs getting probed, this is certainly
+one of those places we want to know about.
 
-  self.vm.add_args('-nodefaults', '-S').launch()
-
-
-> 
-> Looks just as bad to me.  The non-method chaining syntax would look like:
-> 
->    self.vm.add_args('-nodefaults', '-S')
->    self.vm.add_console('isa-serial')
->    self.vm.add_drive(file='/path/to/file, format='raw')
->    self.vm.launch()
->    self.vm.shutdown()
-
-This is reasonable style if the .add_*() calls don't fit on a
-single line.
-
-
-> 
-> Or even:
-> 
->    with self.vm as vm:
->       vm.add_args('-nodefaults', '-S')
->       vm.add_console('isa-serial')
->       vm.add_drive(file='/path/to/file, format='raw')
->       vm.launch()
->    # shutdown() called on __exit__()
-
-I don't like the extra indentation level, but people are free to
-use this style.
-
-(BTW, I think avocado_qemu must call shutdown() automatically
-instead of requiring test code to do it manually.)
-
-
-> 
-> Which IMO, are superior in readability and clarity.  This is a matter of
-> choosing a style, so that we can expect (demand?) that tests follow it.
-
-They are more readable than the complex method chaining examples
-you have shown, but I don't see any argument against:
-
-  self.vm.add_args(...).launch()
-
-
-> 
-> I'm certainly less experienced with the project dynamics than most here,
-> so I'm strongly hoping for your input to quickly define the code style
-> to be used here.
-> 
-> Because of that, I'll skip changing anything here on v4.
-
-Agreed: I don't think any changes to the add_args() style need to
-be on v4.  I'd prefer to work to include avocado_qemu first, and
-later consider how we can improve the qemu.py and avocado_qemu.py
-APIs.
-
--- 
-Eduardo
+--js
