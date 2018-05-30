@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34720)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34753)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1fNunf-0002OU-SI
-	for qemu-devel@nongnu.org; Wed, 30 May 2018 02:41:36 -0400
+	(envelope-from <clg@kaod.org>) id 1fNunm-0002Uh-TJ
+	for qemu-devel@nongnu.org; Wed, 30 May 2018 02:41:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1fNunb-0001A9-Tc
-	for qemu-devel@nongnu.org; Wed, 30 May 2018 02:41:35 -0400
-Received: from 16.mo4.mail-out.ovh.net ([188.165.55.104]:45189)
+	(envelope-from <clg@kaod.org>) id 1fNuni-0001CJ-V2
+	for qemu-devel@nongnu.org; Wed, 30 May 2018 02:41:42 -0400
+Received: from 4.mo4.mail-out.ovh.net ([178.32.98.131]:41324)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1fNunb-00019j-NE
-	for qemu-devel@nongnu.org; Wed, 30 May 2018 02:41:31 -0400
-Received: from player159.ha.ovh.net (unknown [10.109.122.99])
-	by mo4.mail-out.ovh.net (Postfix) with ESMTP id 0181717A969
-	for <qemu-devel@nongnu.org>; Wed, 30 May 2018 08:41:29 +0200 (CEST)
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1fNuni-0001Bn-PL
+	for qemu-devel@nongnu.org; Wed, 30 May 2018 02:41:38 -0400
+Received: from player159.ha.ovh.net (unknown [10.109.108.94])
+	by mo4.mail-out.ovh.net (Postfix) with ESMTP id 237D017A9EE
+	for <qemu-devel@nongnu.org>; Wed, 30 May 2018 08:41:37 +0200 (CEST)
 From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
-Date: Wed, 30 May 2018 08:40:45 +0200
-Message-Id: <20180530064049.27976-4-clg@kaod.org>
+Date: Wed, 30 May 2018 08:40:46 +0200
+Message-Id: <20180530064049.27976-5-clg@kaod.org>
 In-Reply-To: <20180530064049.27976-1-clg@kaod.org>
 References: <20180530064049.27976-1-clg@kaod.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v7 3/7] aspeed: add an I2C RTC device to all
- machines
+Subject: [Qemu-devel] [PATCH v7 4/7] smbus: add a smbus_eeprom_init_one()
+ routine
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,83 +33,65 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Peter Maydell <peter.maydell@linaro.org>
 Cc: qemu-arm@nongnu.org, qemu-devel@nongnu.org, Joel Stanley <joel@jms.id.au>, Andrew Jeffery <andrew@aj.id.au>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
 
-The AST2500 EVB does not have an RTC but we can pretend that one is
-plugged on the I2C bus header.
-
-The romulus and witherspoon boards expects an Epson RX8900 I2C RTC but
-a ds1338 is good enough for the basic features we need.
+This is an helper routine to add a single EEPROM on an I2C bus. It can
+be directly used by smbus_eeprom_init() which adds a certain number of
+EEPROMs on mips and x86 machines.
 
 Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
-Reviewed-by: Andrew Jeffery <andrew@aj.id.au>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 ---
- hw/arm/aspeed.c | 19 +++++++++++++++++++
- 1 file changed, 19 insertions(+)
+ include/hw/i2c/smbus.h |  1 +
+ hw/i2c/smbus_eeprom.c  | 16 +++++++++++-----
+ 2 files changed, 12 insertions(+), 5 deletions(-)
 
-diff --git a/hw/arm/aspeed.c b/hw/arm/aspeed.c
-index 96790af0cf50..8efa783722c5 100644
---- a/hw/arm/aspeed.c
-+++ b/hw/arm/aspeed.c
-@@ -89,6 +89,7 @@ enum {
+diff --git a/include/hw/i2c/smbus.h b/include/hw/i2c/smbus.h
+index 544bbc19574f..666cdeb04c07 100644
+--- a/include/hw/i2c/smbus.h
++++ b/include/hw/i2c/smbus.h
+@@ -77,6 +77,7 @@ int smbus_read_block(I2CBus *bus, uint8_t addr, uint8_t=
+ command, uint8_t *data);
+ int smbus_write_block(I2CBus *bus, uint8_t addr, uint8_t command, uint8_=
+t *data,
+                       int len);
 =20
- static void palmetto_bmc_i2c_init(AspeedBoardState *bmc);
- static void ast2500_evb_i2c_init(AspeedBoardState *bmc);
-+static void romulus_bmc_i2c_init(AspeedBoardState *bmc);
- static void witherspoon_bmc_i2c_init(AspeedBoardState *bmc);
++void smbus_eeprom_init_one(I2CBus *smbus, uint8_t address, uint8_t *eepr=
+om_buf);
+ void smbus_eeprom_init(I2CBus *smbus, int nb_eeprom,
+                        const uint8_t *eeprom_spd, int size);
 =20
- static const AspeedBoardConfig aspeed_boards[] =3D {
-@@ -114,6 +115,7 @@ static const AspeedBoardConfig aspeed_boards[] =3D {
-         .fmc_model =3D "n25q256a",
-         .spi_model =3D "mx66l1g45g",
-         .num_cs    =3D 2,
-+        .i2c_init  =3D romulus_bmc_i2c_init,
-     },
-     [WITHERSPOON_BMC]  =3D {
-         .soc_name  =3D "ast2500-a1",
-@@ -306,6 +308,10 @@ static void ast2500_evb_i2c_init(AspeedBoardState *b=
-mc)
+diff --git a/hw/i2c/smbus_eeprom.c b/hw/i2c/smbus_eeprom.c
+index b13ec0fe7a2a..2d24a4cd59bf 100644
+--- a/hw/i2c/smbus_eeprom.c
++++ b/hw/i2c/smbus_eeprom.c
+@@ -140,6 +140,16 @@ static void smbus_eeprom_register_types(void)
 =20
-     /* The AST2500 EVB expects a LM75 but a TMP105 is compatible */
-     i2c_create_slave(aspeed_i2c_get_bus(DEVICE(&soc->i2c), 7), "tmp105",=
- 0x4d);
-+
-+    /* The AST2500 EVB does not have an RTC. Let's pretend that one is
-+     * plugged on the I2C bus header */
-+    i2c_create_slave(aspeed_i2c_get_bus(DEVICE(&soc->i2c), 11), "ds1338"=
-, 0x32);
- }
+ type_init(smbus_eeprom_register_types)
 =20
- static void ast2500_evb_init(MachineState *machine)
-@@ -332,6 +338,15 @@ static const TypeInfo ast2500_evb_type =3D {
-     .class_init =3D ast2500_evb_class_init,
- };
-=20
-+static void romulus_bmc_i2c_init(AspeedBoardState *bmc)
++void smbus_eeprom_init_one(I2CBus *smbus, uint8_t address, uint8_t *eepr=
+om_buf)
 +{
-+    AspeedSoCState *soc =3D &bmc->soc;
++    DeviceState *dev;
 +
-+    /* The romulus board expects Epson RX8900 I2C RTC but a ds1338 is
-+     * good enough */
-+    i2c_create_slave(aspeed_i2c_get_bus(DEVICE(&soc->i2c), 11), "ds1338"=
-, 0x32);
++    dev =3D qdev_create((BusState *) smbus, "smbus-eeprom");
++    qdev_prop_set_uint8(dev, "address", address);
++    qdev_prop_set_ptr(dev, "data", eeprom_buf);
++    qdev_init_nofail(dev);
 +}
 +
- static void romulus_bmc_init(MachineState *machine)
+ void smbus_eeprom_init(I2CBus *smbus, int nb_eeprom,
+                        const uint8_t *eeprom_spd, int eeprom_spd_size)
  {
-     aspeed_board_init(machine, &aspeed_boards[ROMULUS_BMC]);
-@@ -365,6 +380,10 @@ static void witherspoon_bmc_i2c_init(AspeedBoardStat=
-e *bmc)
+@@ -150,10 +160,6 @@ void smbus_eeprom_init(I2CBus *smbus, int nb_eeprom,
+     }
 =20
-     /* The Witherspoon expects a TMP275 but a TMP105 is compatible */
-     i2c_create_slave(aspeed_i2c_get_bus(DEVICE(&soc->i2c), 9), "tmp105",=
- 0x4a);
-+
-+    /* The witherspoon board expects Epson RX8900 I2C RTC but a ds1338 i=
-s
-+     * good enough */
-+    i2c_create_slave(aspeed_i2c_get_bus(DEVICE(&soc->i2c), 11), "ds1338"=
-, 0x32);
+     for (i =3D 0; i < nb_eeprom; i++) {
+-        DeviceState *eeprom;
+-        eeprom =3D qdev_create((BusState *)smbus, "smbus-eeprom");
+-        qdev_prop_set_uint8(eeprom, "address", 0x50 + i);
+-        qdev_prop_set_ptr(eeprom, "data", eeprom_buf + (i * 256));
+-        qdev_init_nofail(eeprom);
++        smbus_eeprom_init_one(smbus, 0x50 + i, eeprom_buf + (i * 256));
+     }
  }
-=20
- static void witherspoon_bmc_init(MachineState *machine)
 --=20
 2.13.6
