@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49417)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49441)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1fNzYY-00051r-8g
-	for qemu-devel@nongnu.org; Wed, 30 May 2018 07:46:19 -0400
+	(envelope-from <eric.auger@redhat.com>) id 1fNzYa-00053m-3s
+	for qemu-devel@nongnu.org; Wed, 30 May 2018 07:46:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1fNzYX-0005Oh-FI
-	for qemu-devel@nongnu.org; Wed, 30 May 2018 07:46:18 -0400
+	(envelope-from <eric.auger@redhat.com>) id 1fNzYZ-0005Pe-5L
+	for qemu-devel@nongnu.org; Wed, 30 May 2018 07:46:20 -0400
 From: Eric Auger <eric.auger@redhat.com>
-Date: Wed, 30 May 2018 13:45:40 +0200
-Message-Id: <1527680741-2725-8-git-send-email-eric.auger@redhat.com>
+Date: Wed, 30 May 2018 13:45:41 +0200
+Message-Id: <1527680741-2725-9-git-send-email-eric.auger@redhat.com>
 In-Reply-To: <1527680741-2725-1-git-send-email-eric.auger@redhat.com>
 References: <1527680741-2725-1-git-send-email-eric.auger@redhat.com>
-Subject: [Qemu-devel] [RFC v3 7/8] hw/arm/virt: Register two redistributor
- regions when necessary
+Subject: [Qemu-devel] [RFC v3 8/8] hw/arm/virt: Add virt-3.0 machine type
+ supporting up to 512 vcpus
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,83 +23,77 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: eric.auger.pro@gmail.com, eric.auger@redhat.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org, peter.maydell@linaro.org
 Cc: zhaoshenglong@huawei.com, christoffer.dall@arm.com, marc.zyngier@arm.com, drjones@redhat.com, wei@redhat.com
 
-With a VGICv3 KVM device, if the number of vcpus exceeds the
-capacity of the legacy redistributor region (123 redistributors),
-we now attempt to register a second redistributor region. Up to
-512 redistributors can fit in this latter on top of the 123 allowed
-by the legacy redistributor region.
+Add virt-3.0 machine type.
 
-Registering this second redistributor region is possible if the
-host kernel supports the following VGICv3 KVM device group/attribute:
-KVM_DEV_ARM_VGIC_GRP_ADDR/KVM_VGIC_V3_ADDR_TYPE_REDIST_REGION.
-
-In case the host kernel does not support the registration of several
-redistributor regions and the requested number of vcpus exceeds the
-capacity of the legacy redistributor region, the GICv3 device
-initialization fails with a proper error message and qemu exits.
-
-At the moment the max number of vcpus still is capped by the
-virt machine class max_cpus.
+This machine type allows up to 512 vcpus whereas for
+earlier machine types, max_cpus was set to 255 and
+any attempt to start the machine with vcpus > 255
+was rejected at vl.c/main level.
 
 Signed-off-by: Eric Auger <eric.auger@redhat.com>
-
 ---
-
-v2 -> v3:
-- remove spare space
----
- hw/arm/virt.c | 18 +++++++++++++++++-
- 1 file changed, 17 insertions(+), 1 deletion(-)
+ hw/arm/virt.c | 32 +++++++++++++++++++++++++-------
+ 1 file changed, 25 insertions(+), 7 deletions(-)
 
 diff --git a/hw/arm/virt.c b/hw/arm/virt.c
-index 3018ec2..c00f47d 100644
+index c00f47d..a9fc24b 100644
 --- a/hw/arm/virt.c
 +++ b/hw/arm/virt.c
-@@ -529,6 +529,7 @@ static void create_gic(VirtMachineState *vms, qemu_irq *pic)
-     SysBusDevice *gicbusdev;
-     const char *gictype;
-     int type = vms->gic_version, i;
-+    uint32_t nb_redist_regions = 0;
+@@ -1697,11 +1697,13 @@ static void virt_machine_class_init(ObjectClass *oc, void *data)
+     HotplugHandlerClass *hc = HOTPLUG_HANDLER_CLASS(oc);
  
-     gictype = (type == 3) ? gicv3_class_name() : gic_class_name();
- 
-@@ -548,14 +549,28 @@ static void create_gic(VirtMachineState *vms, qemu_irq *pic)
-                     vms->memmap[VIRT_GIC_REDIST].size / GICV3_REDIST_SIZE;
-         uint32_t redist0_count = MIN(smp_cpus, redist0_capacity);
- 
--        qdev_prop_set_uint32(gicdev, "len-redist-region-count", 1);
-+        nb_redist_regions = virt_gicv3_redist_region_count(vms);
-+
-+        qdev_prop_set_uint32(gicdev, "len-redist-region-count",
-+                             nb_redist_regions);
-         qdev_prop_set_uint32(gicdev, "redist-region-count[0]", redist0_count);
-+
-+        if (nb_redist_regions == 2) {
-+            uint32_t redist1_capacity =
-+                        vms->memmap[VIRT_GIC_REDIST2].size / GICV3_REDIST_SIZE;
-+
-+            qdev_prop_set_uint32(gicdev, "redist-region-count[1]",
-+                MIN(smp_cpus - redist0_count, redist1_capacity));
-+        }
-     }
-     qdev_init_nofail(gicdev);
-     gicbusdev = SYS_BUS_DEVICE(gicdev);
-     sysbus_mmio_map(gicbusdev, 0, vms->memmap[VIRT_GIC_DIST].base);
-     if (type == 3) {
-         sysbus_mmio_map(gicbusdev, 1, vms->memmap[VIRT_GIC_REDIST].base);
-+        if (nb_redist_regions == 2) {
-+            sysbus_mmio_map(gicbusdev, 2, vms->memmap[VIRT_GIC_REDIST2].base);
-+        }
-     } else {
-         sysbus_mmio_map(gicbusdev, 1, vms->memmap[VIRT_GIC_CPU].base);
-     }
-@@ -1351,6 +1366,7 @@ static void machvirt_init(MachineState *machine)
+     mc->init = machvirt_init;
+-    /* Start max_cpus at the maximum QEMU supports. We'll further restrict
+-     * it later in machvirt_init, where we have more information about the
+-     * configuration of the particular instance.
++    /* Start with max_cpus set to 512. This value is chosen since achievable
++     * in accelerated mode with GICv3 and recent host supporting up to 512 vcpus
++     * and multiple redistributor region registration.
++     * This value will be refined later on once we collect more information
++     * about the configuration of the particular instance.
       */
-     if (vms->gic_version == 3) {
-         virt_max_cpus = vms->memmap[VIRT_GIC_REDIST].size / GICV3_REDIST_SIZE;
-+        virt_max_cpus += vms->memmap[VIRT_GIC_REDIST2].size / GICV3_REDIST_SIZE;
-     } else {
-         virt_max_cpus = GIC_NCPU;
-     }
+-    mc->max_cpus = 255;
++    mc->max_cpus = 512;
+     machine_class_allow_dynamic_sysbus_dev(mc, TYPE_VFIO_CALXEDA_XGMAC);
+     machine_class_allow_dynamic_sysbus_dev(mc, TYPE_VFIO_AMD_XGBE);
+     mc->block_default_type = IF_VIRTIO;
+@@ -1737,7 +1739,7 @@ static void machvirt_machine_init(void)
+ }
+ type_init(machvirt_machine_init);
+ 
+-static void virt_2_12_instance_init(Object *obj)
++static void virt_3_0_instance_init(Object *obj)
+ {
+     VirtMachineState *vms = VIRT_MACHINE(obj);
+     VirtMachineClass *vmc = VIRT_MACHINE_GET_CLASS(vms);
+@@ -1805,10 +1807,26 @@ static void virt_2_12_instance_init(Object *obj)
+     vms->irqmap = a15irqmap;
+ }
+ 
+-static void virt_machine_2_12_options(MachineClass *mc)
++static void virt_machine_3_0_options(MachineClass *mc)
+ {
+ }
+-DEFINE_VIRT_MACHINE_AS_LATEST(2, 12)
++DEFINE_VIRT_MACHINE_AS_LATEST(3, 0)
++
++#define VIRT_COMPAT_2_12 \
++    HW_COMPAT_2_12
++
++static void virt_2_12_instance_init(Object *obj)
++{
++    virt_3_0_instance_init(obj);
++}
++
++static void virt_machine_2_12_options(MachineClass *mc)
++{
++    virt_machine_3_0_options(mc);
++    SET_MACHINE_COMPAT(mc, VIRT_COMPAT_2_12);
++    mc->max_cpus = 255;
++}
++DEFINE_VIRT_MACHINE(2, 12)
+ 
+ #define VIRT_COMPAT_2_11 \
+     HW_COMPAT_2_11
 -- 
 2.5.5
