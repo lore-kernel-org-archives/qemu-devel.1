@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49325)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49417)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1fNzYO-0004t8-8B
-	for qemu-devel@nongnu.org; Wed, 30 May 2018 07:46:09 -0400
+	(envelope-from <eric.auger@redhat.com>) id 1fNzYY-00051r-8g
+	for qemu-devel@nongnu.org; Wed, 30 May 2018 07:46:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1fNzYM-0005DL-32
-	for qemu-devel@nongnu.org; Wed, 30 May 2018 07:46:08 -0400
+	(envelope-from <eric.auger@redhat.com>) id 1fNzYX-0005Oh-FI
+	for qemu-devel@nongnu.org; Wed, 30 May 2018 07:46:18 -0400
 From: Eric Auger <eric.auger@redhat.com>
-Date: Wed, 30 May 2018 13:45:35 +0200
-Message-Id: <1527680741-2725-3-git-send-email-eric.auger@redhat.com>
+Date: Wed, 30 May 2018 13:45:40 +0200
+Message-Id: <1527680741-2725-8-git-send-email-eric.auger@redhat.com>
 In-Reply-To: <1527680741-2725-1-git-send-email-eric.auger@redhat.com>
 References: <1527680741-2725-1-git-send-email-eric.auger@redhat.com>
-Subject: [Qemu-devel] [RFC v3 2/8] target/arm: Allow KVM device address
- overwriting
+Subject: [Qemu-devel] [RFC v3 7/8] hw/arm/virt: Register two redistributor
+ regions when necessary
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,153 +23,83 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: eric.auger.pro@gmail.com, eric.auger@redhat.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org, peter.maydell@linaro.org
 Cc: zhaoshenglong@huawei.com, christoffer.dall@arm.com, marc.zyngier@arm.com, drjones@redhat.com, wei@redhat.com
 
-for KVM_VGIC_V3_ADDR_TYPE_REDIST_REGION attribute, the attribute
-data pointed to by kvm_device_attr.addr is a OR of the
-redistributor region address and other fields such as the index
-of the redistributor region and the number of redistributors the
-region can contain.
+With a VGICv3 KVM device, if the number of vcpus exceeds the
+capacity of the legacy redistributor region (123 redistributors),
+we now attempt to register a second redistributor region. Up to
+512 redistributors can fit in this latter on top of the 123 allowed
+by the legacy redistributor region.
 
-The existing machine init done notifier framework sets the address
-field to the actual address of the device and does not allow to OR
-this value with other fields.
+Registering this second redistributor region is possible if the
+host kernel supports the following VGICv3 KVM device group/attribute:
+KVM_DEV_ARM_VGIC_GRP_ADDR/KVM_VGIC_V3_ADDR_TYPE_REDIST_REGION.
 
-This patch extends the KVMDevice struct with a new kda_addr_ormask
-member. Its value is passed at registration time and OR'ed with the
-resolved address on kvm_arm_set_device_addr().
+In case the host kernel does not support the registration of several
+redistributor regions and the requested number of vcpus exceeds the
+capacity of the legacy redistributor region, the GICv3 device
+initialization fails with a proper error message and qemu exits.
+
+At the moment the max number of vcpus still is capped by the
+virt machine class max_cpus.
 
 Signed-off-by: Eric Auger <eric.auger@redhat.com>
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 
 ---
 
 v2 -> v3:
-- s/addr_fixup/add_ormask
-- Added Peter's R-b
+- remove spare space
 ---
- hw/intc/arm_gic_kvm.c       |  4 ++--
- hw/intc/arm_gicv3_its_kvm.c |  2 +-
- hw/intc/arm_gicv3_kvm.c     |  4 ++--
- target/arm/kvm.c            | 10 +++++++++-
- target/arm/kvm_arm.h        |  3 ++-
- 5 files changed, 16 insertions(+), 7 deletions(-)
+ hw/arm/virt.c | 18 +++++++++++++++++-
+ 1 file changed, 17 insertions(+), 1 deletion(-)
 
-diff --git a/hw/intc/arm_gic_kvm.c b/hw/intc/arm_gic_kvm.c
-index 6f467e6..eb9664e 100644
---- a/hw/intc/arm_gic_kvm.c
-+++ b/hw/intc/arm_gic_kvm.c
-@@ -558,7 +558,7 @@ static void kvm_arm_gic_realize(DeviceState *dev, Error **errp)
-                             | KVM_VGIC_V2_ADDR_TYPE_DIST,
-                             KVM_DEV_ARM_VGIC_GRP_ADDR,
-                             KVM_VGIC_V2_ADDR_TYPE_DIST,
--                            s->dev_fd);
-+                            s->dev_fd, 0);
-     /* CPU interface for current core. Unlike arm_gic, we don't
-      * provide the "interface for core #N" memory regions, because
-      * cores with a VGIC don't have those.
-@@ -568,7 +568,7 @@ static void kvm_arm_gic_realize(DeviceState *dev, Error **errp)
-                             | KVM_VGIC_V2_ADDR_TYPE_CPU,
-                             KVM_DEV_ARM_VGIC_GRP_ADDR,
-                             KVM_VGIC_V2_ADDR_TYPE_CPU,
--                            s->dev_fd);
-+                            s->dev_fd, 0);
+diff --git a/hw/arm/virt.c b/hw/arm/virt.c
+index 3018ec2..c00f47d 100644
+--- a/hw/arm/virt.c
++++ b/hw/arm/virt.c
+@@ -529,6 +529,7 @@ static void create_gic(VirtMachineState *vms, qemu_irq *pic)
+     SysBusDevice *gicbusdev;
+     const char *gictype;
+     int type = vms->gic_version, i;
++    uint32_t nb_redist_regions = 0;
  
-     if (kvm_has_gsi_routing()) {
-         /* set up irq routing */
-diff --git a/hw/intc/arm_gicv3_its_kvm.c b/hw/intc/arm_gicv3_its_kvm.c
-index eea6a73..271ebe4 100644
---- a/hw/intc/arm_gicv3_its_kvm.c
-+++ b/hw/intc/arm_gicv3_its_kvm.c
-@@ -103,7 +103,7 @@ static void kvm_arm_its_realize(DeviceState *dev, Error **errp)
+     gictype = (type == 3) ? gicv3_class_name() : gic_class_name();
  
-     /* register the base address */
-     kvm_arm_register_device(&s->iomem_its_cntrl, -1, KVM_DEV_ARM_VGIC_GRP_ADDR,
--                            KVM_VGIC_ITS_ADDR_TYPE, s->dev_fd);
-+                            KVM_VGIC_ITS_ADDR_TYPE, s->dev_fd, 0);
+@@ -548,14 +549,28 @@ static void create_gic(VirtMachineState *vms, qemu_irq *pic)
+                     vms->memmap[VIRT_GIC_REDIST].size / GICV3_REDIST_SIZE;
+         uint32_t redist0_count = MIN(smp_cpus, redist0_capacity);
  
-     gicv3_its_init_mmio(s, NULL);
- 
-diff --git a/hw/intc/arm_gicv3_kvm.c b/hw/intc/arm_gicv3_kvm.c
-index ec37177..93ac293 100644
---- a/hw/intc/arm_gicv3_kvm.c
-+++ b/hw/intc/arm_gicv3_kvm.c
-@@ -754,9 +754,9 @@ static void kvm_arm_gicv3_realize(DeviceState *dev, Error **errp)
-                       KVM_DEV_ARM_VGIC_CTRL_INIT, NULL, true, &error_abort);
- 
-     kvm_arm_register_device(&s->iomem_dist, -1, KVM_DEV_ARM_VGIC_GRP_ADDR,
--                            KVM_VGIC_V3_ADDR_TYPE_DIST, s->dev_fd);
-+                            KVM_VGIC_V3_ADDR_TYPE_DIST, s->dev_fd, 0);
-     kvm_arm_register_device(&s->iomem_redist, -1, KVM_DEV_ARM_VGIC_GRP_ADDR,
--                            KVM_VGIC_V3_ADDR_TYPE_REDIST, s->dev_fd);
-+                            KVM_VGIC_V3_ADDR_TYPE_REDIST, s->dev_fd, 0);
- 
-     if (kvm_has_gsi_routing()) {
-         /* set up irq routing */
-diff --git a/target/arm/kvm.c b/target/arm/kvm.c
-index 5141d0a..6a4324a 100644
---- a/target/arm/kvm.c
-+++ b/target/arm/kvm.c
-@@ -184,10 +184,15 @@ unsigned long kvm_arch_vcpu_id(CPUState *cpu)
-  * We use a MemoryListener to track mapping and unmapping of
-  * the regions during board creation, so the board models don't
-  * need to do anything special for the KVM case.
-+ *
-+ * Sometimes the address must be OR'ed with some other fields
-+ * (for example for KVM_VGIC_V3_ADDR_TYPE_REDIST_REGION).
-+ * @kda_addr_ormask aims at storing the value of those fields.
-  */
- typedef struct KVMDevice {
-     struct kvm_arm_device_addr kda;
-     struct kvm_device_attr kdattr;
-+    uint64_t kda_addr_ormask;
-     MemoryRegion *mr;
-     QSLIST_ENTRY(KVMDevice) entries;
-     int dev_fd;
-@@ -234,6 +239,8 @@ static void kvm_arm_set_device_addr(KVMDevice *kd)
-      */
-     if (kd->dev_fd >= 0) {
-         uint64_t addr = kd->kda.addr;
+-        qdev_prop_set_uint32(gicdev, "len-redist-region-count", 1);
++        nb_redist_regions = virt_gicv3_redist_region_count(vms);
 +
-+        addr |= kd->kda_addr_ormask;
-         attr->addr = (uintptr_t)&addr;
-         ret = kvm_device_ioctl(kd->dev_fd, KVM_SET_DEVICE_ATTR, attr);
++        qdev_prop_set_uint32(gicdev, "len-redist-region-count",
++                             nb_redist_regions);
+         qdev_prop_set_uint32(gicdev, "redist-region-count[0]", redist0_count);
++
++        if (nb_redist_regions == 2) {
++            uint32_t redist1_capacity =
++                        vms->memmap[VIRT_GIC_REDIST2].size / GICV3_REDIST_SIZE;
++
++            qdev_prop_set_uint32(gicdev, "redist-region-count[1]",
++                MIN(smp_cpus - redist0_count, redist1_capacity));
++        }
+     }
+     qdev_init_nofail(gicdev);
+     gicbusdev = SYS_BUS_DEVICE(gicdev);
+     sysbus_mmio_map(gicbusdev, 0, vms->memmap[VIRT_GIC_DIST].base);
+     if (type == 3) {
+         sysbus_mmio_map(gicbusdev, 1, vms->memmap[VIRT_GIC_REDIST].base);
++        if (nb_redist_regions == 2) {
++            sysbus_mmio_map(gicbusdev, 2, vms->memmap[VIRT_GIC_REDIST2].base);
++        }
      } else {
-@@ -266,7 +273,7 @@ static Notifier notify = {
- };
- 
- void kvm_arm_register_device(MemoryRegion *mr, uint64_t devid, uint64_t group,
--                             uint64_t attr, int dev_fd)
-+                             uint64_t attr, int dev_fd, uint64_t addr_ormask)
- {
-     KVMDevice *kd;
- 
-@@ -286,6 +293,7 @@ void kvm_arm_register_device(MemoryRegion *mr, uint64_t devid, uint64_t group,
-     kd->kdattr.group = group;
-     kd->kdattr.attr = attr;
-     kd->dev_fd = dev_fd;
-+    kd->kda_addr_ormask = addr_ormask;
-     QSLIST_INSERT_HEAD(&kvm_devices_head, kd, entries);
-     memory_region_ref(kd->mr);
- }
-diff --git a/target/arm/kvm_arm.h b/target/arm/kvm_arm.h
-index 1e23640..863f205 100644
---- a/target/arm/kvm_arm.h
-+++ b/target/arm/kvm_arm.h
-@@ -34,6 +34,7 @@ int kvm_arm_vcpu_init(CPUState *cs);
-  * @group: device control API group for setting addresses
-  * @attr: device control API address type
-  * @dev_fd: device control device file descriptor (or -1 if not supported)
-+ * @addr_ormask: value to be OR'ed with resolved address
-  *
-  * Remember the memory region @mr, and when it is mapped by the
-  * machine model, tell the kernel that base address using the
-@@ -45,7 +46,7 @@ int kvm_arm_vcpu_init(CPUState *cs);
-  * address at the point where machine init is complete.
-  */
- void kvm_arm_register_device(MemoryRegion *mr, uint64_t devid, uint64_t group,
--                             uint64_t attr, int dev_fd);
-+                             uint64_t attr, int dev_fd, uint64_t addr_ormask);
- 
- /**
-  * kvm_arm_init_cpreg_list:
+         sysbus_mmio_map(gicbusdev, 1, vms->memmap[VIRT_GIC_CPU].base);
+     }
+@@ -1351,6 +1366,7 @@ static void machvirt_init(MachineState *machine)
+      */
+     if (vms->gic_version == 3) {
+         virt_max_cpus = vms->memmap[VIRT_GIC_REDIST].size / GICV3_REDIST_SIZE;
++        virt_max_cpus += vms->memmap[VIRT_GIC_REDIST2].size / GICV3_REDIST_SIZE;
+     } else {
+         virt_max_cpus = GIC_NCPU;
+     }
 -- 
 2.5.5
