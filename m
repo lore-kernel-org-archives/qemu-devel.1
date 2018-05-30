@@ -1,22 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44841)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44946)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rkagan@virtuozzo.com>) id 1fO0pV-0002u3-2Z
-	for qemu-devel@nongnu.org; Wed, 30 May 2018 09:07:57 -0400
+	(envelope-from <imammedo@redhat.com>) id 1fO0py-0003FY-S4
+	for qemu-devel@nongnu.org; Wed, 30 May 2018 09:08:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rkagan@virtuozzo.com>) id 1fO0pT-0002vd-WC
-	for qemu-devel@nongnu.org; Wed, 30 May 2018 09:07:53 -0400
-Date: Wed, 30 May 2018 16:07:25 +0300
-From: Roman Kagan <rkagan@virtuozzo.com>
-Message-ID: <20180530130725.GA2448@rkaganb.sw.ru>
-References: <20180426161958.2872-1-rkagan@virtuozzo.com>
-	<20180426161958.2872-4-rkagan@virtuozzo.com>
-	<f924aadb-35b1-ee72-1040-fdeee5baefaf@redhat.com>
+	(envelope-from <imammedo@redhat.com>) id 1fO0pv-0000D9-7x
+	for qemu-devel@nongnu.org; Wed, 30 May 2018 09:08:22 -0400
+Date: Wed, 30 May 2018 15:08:06 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20180530150806.061c26b9@redhat.com>
+In-Reply-To: <20180517081527.14410-5-david@redhat.com>
+References: <20180517081527.14410-1-david@redhat.com>
+	<20180517081527.14410-5-david@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <f924aadb-35b1-ee72-1040-fdeee5baefaf@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 03/17] iotests: ask qemu for supported
- formats
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v4 04/14] pc: prepare for multi stage
+ hotplug handlers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,27 +24,108 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>
-Cc: Kevin Wolf <kwolf@redhat.com>, Markus Armbruster <armbru@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
+To: David Hildenbrand <david@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-s390x@nongnu.org, "Michael S . Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Markus Armbruster <armbru@redhat.com>, qemu-ppc@nongnu.org, Pankaj Gupta <pagupta@redhat.com>, Alexander Graf <agraf@suse.de>, Cornelia Huck <cohuck@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Luiz Capitulino <lcapitulino@redhat.com>
 
-On Wed, May 30, 2018 at 02:17:55PM +0200, Max Reitz wrote:
-> On 2018-04-26 18:19, Roman Kagan wrote:
-> > @@ -550,13 +561,26 @@ def verify_cache_mode(supported_cache_modes=[]):
-> >      if supported_cache_modes and (cachemode not in supported_cache_modes):
-> >          notrun('not suitable for this cache mode: %s' % cachemode)
-> >  
-> > +rw_formats = None
-> > +
-> > +def supports_format(format_name):
-> > +    format_message = qemu_pipe('-drive', 'format=?')
-> > +    global rw_formats
-> > +    if rw_formats is None:
-> > +        rw_formats = format_message.splitlines()[0].split(':')[1].split()
+On Thu, 17 May 2018 10:15:17 +0200
+David Hildenbrand <david@redhat.com> wrote:
+
+> For multi stage hotplug handlers, we'll have to do some error handling
+> in some hotplug functions, so let's use a local error variable (except
+> for unplug requests).
+I'd split out introducing local error into separate patch
+so patch would do a single thing.
+
+> Also, add code to pass control to the final stage hotplug handler at the
+> parent bus.
+But I don't agree with generic
+ "} else if (dev->parent_bus && dev->parent_bus->hotplug_handler) {"
+forwarding, it's done by 3/14 for generic case and in case of
+special device that needs bus handler called from machine one,
+I'd suggest to do forwarding explicitly for that device only
+like we do with acpi_dev.
+
+
+> Signed-off-by: David Hildenbrand <david@redhat.com>
+> ---
+>  hw/i386/pc.c | 39 +++++++++++++++++++++++++++++++--------
+>  1 file changed, 31 insertions(+), 8 deletions(-)
 > 
-> Isn't it sufficient to call qemu_pipe() only if rw_formats is None?
-
-Sure it is, and this was exactly my intention with this global, but I
-managed to forget moving the most relevant part under 'if' :$
-
-Thanks for catching,
-Roman.
+> diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+> index d768930d02..510076e156 100644
+> --- a/hw/i386/pc.c
+> +++ b/hw/i386/pc.c
+> @@ -2007,19 +2007,32 @@ static void pc_cpu_pre_plug(HotplugHandler *hotplug_dev,
+>  static void pc_machine_device_pre_plug_cb(HotplugHandler *hotplug_dev,
+>                                            DeviceState *dev, Error **errp)
+>  {
+> +    Error *local_err = NULL;
+> +
+> +    /* final stage hotplug handler */
+>      if (object_dynamic_cast(OBJECT(dev), TYPE_CPU)) {
+> -        pc_cpu_pre_plug(hotplug_dev, dev, errp);
+> +        pc_cpu_pre_plug(hotplug_dev, dev, &local_err);
+> +    } else if (dev->parent_bus && dev->parent_bus->hotplug_handler) {
+> +        hotplug_handler_pre_plug(dev->parent_bus->hotplug_handler, dev,
+> +                                 &local_err);
+>      }
+> +    error_propagate(errp, local_err);
+>  }
+>  
+>  static void pc_machine_device_plug_cb(HotplugHandler *hotplug_dev,
+>                                        DeviceState *dev, Error **errp)
+>  {
+> +    Error *local_err = NULL;
+> +
+> +    /* final stage hotplug handler */
+>      if (object_dynamic_cast(OBJECT(dev), TYPE_PC_DIMM)) {
+> -        pc_dimm_plug(hotplug_dev, dev, errp);
+> +        pc_dimm_plug(hotplug_dev, dev, &local_err);
+>      } else if (object_dynamic_cast(OBJECT(dev), TYPE_CPU)) {
+> -        pc_cpu_plug(hotplug_dev, dev, errp);
+> +        pc_cpu_plug(hotplug_dev, dev, &local_err);
+> +    } else if (dev->parent_bus && dev->parent_bus->hotplug_handler) {
+> +        hotplug_handler_plug(dev->parent_bus->hotplug_handler, dev, &local_err);
+>      }
+> +    error_propagate(errp, local_err);
+>  }
+>  
+>  static void pc_machine_device_unplug_request_cb(HotplugHandler *hotplug_dev,
+> @@ -2029,7 +2042,10 @@ static void pc_machine_device_unplug_request_cb(HotplugHandler *hotplug_dev,
+>          pc_dimm_unplug_request(hotplug_dev, dev, errp);
+>      } else if (object_dynamic_cast(OBJECT(dev), TYPE_CPU)) {
+>          pc_cpu_unplug_request_cb(hotplug_dev, dev, errp);
+> -    } else {
+> +    } else if (dev->parent_bus && dev->parent_bus->hotplug_handler) {
+> +        hotplug_handler_unplug_request(dev->parent_bus->hotplug_handler, dev,
+> +                                       errp);
+> +    } else if (!dev->parent_bus) {
+>          error_setg(errp, "acpi: device unplug request for not supported device"
+>                     " type: %s", object_get_typename(OBJECT(dev)));
+>      }
+> @@ -2038,14 +2054,21 @@ static void pc_machine_device_unplug_request_cb(HotplugHandler *hotplug_dev,
+>  static void pc_machine_device_unplug_cb(HotplugHandler *hotplug_dev,
+>                                          DeviceState *dev, Error **errp)
+>  {
+> +    Error *local_err = NULL;
+> +
+> +    /* final stage hotplug handler */
+>      if (object_dynamic_cast(OBJECT(dev), TYPE_PC_DIMM)) {
+> -        pc_dimm_unplug(hotplug_dev, dev, errp);
+> +        pc_dimm_unplug(hotplug_dev, dev, &local_err);
+>      } else if (object_dynamic_cast(OBJECT(dev), TYPE_CPU)) {
+> -        pc_cpu_unplug_cb(hotplug_dev, dev, errp);
+> -    } else {
+> -        error_setg(errp, "acpi: device unplug for not supported device"
+> +        pc_cpu_unplug_cb(hotplug_dev, dev, &local_err);
+> +    } else if (dev->parent_bus && dev->parent_bus->hotplug_handler) {
+> +        hotplug_handler_unplug(dev->parent_bus->hotplug_handler, dev,
+> +                               &local_err);
+> +    } else if (!dev->parent_bus) {
+> +        error_setg(&local_err, "acpi: device unplug for not supported device"
+>                     " type: %s", object_get_typename(OBJECT(dev)));
+>      }
+> +    error_propagate(errp, local_err);
+>  }
+>  
+>  static HotplugHandler *pc_get_hotpug_handler(MachineState *machine,
