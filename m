@@ -1,24 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33917)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34213)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1fNuku-0000b6-Te
-	for qemu-devel@nongnu.org; Wed, 30 May 2018 02:38:49 -0400
+	(envelope-from <peterx@redhat.com>) id 1fNumG-0001LT-BV
+	for qemu-devel@nongnu.org; Wed, 30 May 2018 02:40:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1fNukt-0008Rc-FL
-	for qemu-devel@nongnu.org; Wed, 30 May 2018 02:38:44 -0400
-References: <1527563283-13148-1-git-send-email-zhaoshenglong@huawei.com>
-	<CAFEAcA-LoTOnTnSYBpzuyUDFZBsVBaB2qjvzAP_94rou8ob6Tg@mail.gmail.com>
-	<65E224A1-C972-4C38-BD6E-41C59191D999@163.com>
-	<383b0c0b-4406-869c-5493-df2f48896113@redhat.com>
-	<5B0DFB0C.3000002@huawei.com>
-From: Auger Eric <eric.auger@redhat.com>
-Message-ID: <81226dc7-4b0a-bd1b-6910-0b9a94b0128f@redhat.com>
-Date: Wed, 30 May 2018 08:38:34 +0200
+	(envelope-from <peterx@redhat.com>) id 1fNumC-0000VW-Do
+	for qemu-devel@nongnu.org; Wed, 30 May 2018 02:40:08 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:58296 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1fNumC-0000VM-9I
+	for qemu-devel@nongnu.org; Wed, 30 May 2018 02:40:04 -0400
+Date: Wed, 30 May 2018 14:39:55 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20180530063955.GA27442@xz-mi>
+References: <20180524044454.11792-1-peterx@redhat.com>
+	<20180524044454.11792-2-peterx@redhat.com>
+	<20180530074400-mutt-send-email-mst@kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <5B0DFB0C.3000002@huawei.com>
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2] ARM: ACPI: Fix use-after-free due to
- memory realloc
+Content-Disposition: inline
+In-Reply-To: <20180530074400-mutt-send-email-mst@kernel.org>
+Subject: Re: [Qemu-devel] [PATCH v4 1/2] qemu-error: introduce
+ {error|warn}_report_once
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,205 +29,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Shannon Zhao <zhaoshenglong@huawei.com>, Peter Maydell <peter.maydell@linaro.org>
-Cc: Shannon Zhao <shannon.zhaosl@gmail.com>, qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: qemu-devel@nongnu.org, Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Jason Wang <jasowang@redhat.com>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>
 
-Hi Shannon,
+On Wed, May 30, 2018 at 07:47:32AM +0300, Michael S. Tsirkin wrote:
+> On Thu, May 24, 2018 at 12:44:53PM +0800, Peter Xu wrote:
+> > There are many error_report()s that can be used in frequently called
+> > functions, especially on IO paths.  That can be unideal in that
+> > malicious guest can try to trigger the error tons of time which might
+> > use up the log space on the host (e.g., libvirt can capture the stderr
+> > of QEMU and put it persistently onto disk).
+> 
+> I think the problem is real enough but I think the API
+> isn't great as it stresses the mechanism. Which fundamentally does
+> not matter - we can print once or 10 times, or whatever.
+> 
+> What happens here is a guest bug as opposed to hypervisor
+> bug. So I think a better name would be guest_error.
 
-On 05/30/2018 03:14 AM, Shannon Zhao wrote:
->=20
->=20
-> On 2018/5/30 3:53, Auger Eric wrote:
->> Hi Shannon,
->>
->> On 05/29/2018 04:09 PM, Shannon Zhao wrote:
->>>
->>>
->>>> =E5=9C=A8 2018=E5=B9=B45=E6=9C=8829=E6=97=A5=EF=BC=8C21:53=EF=BC=8CP=
-eter Maydell <peter.maydell@linaro.org> =E5=86=99=E9=81=93=EF=BC=9A
->>>>
->>>>> On 29 May 2018 at 04:08, Shannon Zhao <zhaoshenglong@huawei.com> wr=
-ote:
->>>>> acpi_data_push uses g_array_set_size to resize the memory size. If =
-there
->>>>> is no enough contiguous memory, the address will be changed. So pre=
-vious
->>>>> pointer could not be used any more. It must update the pointer and =
-use
->>>>> the new one.
->>>>>
->>>>> Reviewed-by: Eric Auger <eric.auger@redhat.com>
->>>>> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
->>>>> Signed-off-by: Shannon Zhao <zhaoshenglong@huawei.com>
->>>>> ---
->>>>> V2: add comments for iort_node_offset and reviewed tags
->>>>> ---
->>>>> hw/arm/virt-acpi-build.c | 19 +++++++++++++++----
->>>>> 1 file changed, 15 insertions(+), 4 deletions(-)
->>>>>
->>>>> diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
->>>>> index 92ceee9..6209138 100644
->>>>> --- a/hw/arm/virt-acpi-build.c
->>>>> +++ b/hw/arm/virt-acpi-build.c
->>>>> @@ -400,7 +400,7 @@ build_iort(GArray *table_data, BIOSLinker *link=
-er, VirtMachineState *vms)
->>>>>     AcpiIortItsGroup *its;
->>>>>     AcpiIortTable *iort;
->>>>>     AcpiIortSmmu3 *smmu;
->>>>> -    size_t node_size, iort_length, smmu_offset =3D 0;
->>>>> +    size_t node_size, iort_node_offset, iort_length, smmu_offset =3D=
- 0;
->>>>>     AcpiIortRC *rc;
->>>>>
->>>>>     iort =3D acpi_data_push(table_data, sizeof(*iort));
->>>>> @@ -415,6 +415,12 @@ build_iort(GArray *table_data, BIOSLinker *lin=
-ker, VirtMachineState *vms)
->>>>>     iort->node_count =3D cpu_to_le32(nb_nodes);
->>>>>     iort->node_offset =3D cpu_to_le32(sizeof(*iort));
->>>>>
->>>>> +    /*
->>>>> +     * Use a copy in case table_data->data moves duringa acpi_data=
-_push
-nit: duringa typo
->>>>> +     * operations.
->>>>> +     */
->>>>> +    iort_node_offset =3D sizeof(*iort);
->>>>> +
->>>>>     /* ITS group node */
->>>>>     node_size =3D  sizeof(*its) + sizeof(uint32_t);
->>>>>     iort_length +=3D node_size;
->>>>> @@ -429,7 +435,7 @@ build_iort(GArray *table_data, BIOSLinker *link=
-er, VirtMachineState *vms)
->>>>>         int irq =3D  vms->irqmap[VIRT_SMMU];
->>>>>
->>>>>         /* SMMUv3 node */
->>>>> -        smmu_offset =3D iort->node_offset + node_size;
->>>>> +        smmu_offset =3D iort_node_offset + node_size;
->>>>
->>>> In the old code, we used iort->node_offset directly as a CPU
->>>> endianness order bitmap, which is initialized above using
->>>>    iort->node_offset =3D cpu_to_le32(sizeof(*iort));
->>>> In this version, we use iort_node_offset, which is
->>>> initialized using
->>>>    iort_node_offset =3D sizeof(*iort);
->>>>
->>>> So we've lost an endianness conversion on big-endian systems.
->>>> Which is correct, the old code or the new?
->>> I think it=E2=80=99s the new one. I found this bug later and wanted t=
-o send another patch to fix it. But to address Philippe=E2=80=99s comment=
- I folder them together.
->> Shouldn't we have
->> iort_node_offset =3D iort->node_offset;
->> iort->node_offset =3D cpu_to_le32(iort_node_offset);
->> instead?
->>
-> Hi Eric,
-> Have you read this patch and code carefully?
-I checked against the v1 in my branch thinking you did not change
-anything besides the comment (your log history?).
+For me error_report_once() is okay since after all it's only a way to
+dump something for the hypervisor management software (or the person
+who manages the QEMU instance), and I don't have a strong opinion to
+introduce a new guest_error() API.
 
->=20
-> I think you mean
-> iort_node_offset =3D sizeof(*iort);
-Yes sorry wrong copy/paste
-> iort->node_offset =3D cpu_to_le32(iort_node_offset);
->=20
-> Right? If so it's almost same with what I write. I just use sizeof twic=
-e.
->=20
-> iort->node_offset =3D cpu_to_le32(sizeof(*iort));
-> iort_node_offset =3D sizeof(*iort);
->=20
->> Otherwise subsequent computations are done with the node_offset alread=
-y
->> converted to le32 whereas the cpu mode may be "be"?
->>
-> What I did here is to avoid the case you mentioned.
-> The iort_node_offset is host order, right? And I use iort_node_offset
-> instead of iort->node_offset for subsequent computations not the le32
-> one. So smmu_offset =3D iort_node_offset + node_size; will get the righ=
-t
-> value as well as below ones.
-OK checking again v2, this looks OK to me.
+> 
+> Internally we can still have something similar to this
+> mechanism.
+> 
+> Another idea is to reset these guest error counters on guest reset.
+> Device reset too? I'm not 100% sure as guest can trigger device resets.
 
-Thanks
+Yes maybe we can, but I don't know whether that's necessary.  If we
+consider the possiblility of a malicious guest here, resetting the
+counter after system reset might be dangerous too, since the guest can
+still flush the host log by the sequence of system reset, trigger the
+error, system reset, ...
 
-Eric
->=20
-> Thanks,
->=20
->> Shouldn't conversions to le32 being done at the last stage when
->> populating the structs?
->>
->> May be worth splitting this into 2 patches then or at least mentioning
->> this other fix in the commit message?
->>
->> Thanks
->>
->> Eric
->>
->>>
->>>>
->>>>>         node_size =3D sizeof(*smmu) + sizeof(*idmap);
->>>>>         iort_length +=3D node_size;
->>>>>         smmu =3D acpi_data_push(table_data, node_size);
->>>>> @@ -450,7 +456,7 @@ build_iort(GArray *table_data, BIOSLinker *link=
-er, VirtMachineState *vms)
->>>>>         idmap->id_count =3D cpu_to_le32(0xFFFF);
->>>>>         idmap->output_base =3D 0;
->>>>>         /* output IORT node is the ITS group node (the first node) =
-*/
->>>>> -        idmap->output_reference =3D cpu_to_le32(iort->node_offset)=
-;
->>>>> +        idmap->output_reference =3D cpu_to_le32(iort_node_offset);
->>>>
->>>> Here we're doing an endianness conversion on iort_node_offset.
->>>>
->>>> Overall something is weird here, even in the previous version:
->>>> if we wrote iort->node_offset with cpu_to_le32(), that implies
->>>> that it's little-endian; so why are we reading it with cpu_to_le32()
->>>> here rather than le32_to_cpu() ?
->>>> Both cpu_to_le32() and le32_to_cpu() are the same operation,
->>>> mathematically, but we should use the version which indicates
->>>> our intent, ie which of source and destination is the always-LE
->>>> data, and which is the host-order data.
->>>>
->>>>>     }
->>>>>
->>>>>     /* Root Complex Node */
->>>>> @@ -479,9 +485,14 @@ build_iort(GArray *table_data, BIOSLinker *lin=
-ker, VirtMachineState *vms)
->>>>>         idmap->output_reference =3D cpu_to_le32(smmu_offset);
->>>>>     } else {
->>>>>         /* output IORT node is the ITS group node (the first node) =
-*/
->>>>> -        idmap->output_reference =3D cpu_to_le32(iort->node_offset)=
-;
->>>>> +        idmap->output_reference =3D cpu_to_le32(iort_node_offset);
->>>>>     }
->>>>>
->>>>> +    /*
->>>>> +     * Update the pointer address in case table_data->data moves d=
-uring above
->>>>> +     * acpi_data_push operations.
->>>>> +     */
->>>>> +    iort =3D (AcpiIortTable *)(table_data->data + iort_start);
->>>>>     iort->length =3D cpu_to_le32(iort_length);
->>>>>
->>>>>     build_header(linker, table_data, (void *)(table_data->data + io=
-rt_start),
->>>>
->>>> This could just use 'iort' now, right?
->>> Right, but for consistent as other places I think it=E2=80=99s fine t=
-o remain unchanged.=20
->>>>
->>>>> --
->>>>
->>>> thanks
->>>> -- PMM
->>>
->>>
->>
->> .
->>
->=20
+Thanks,
+
+-- 
+Peter Xu
