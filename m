@@ -1,27 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57788)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58257)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1fNzwk-0007h9-Tv
-	for qemu-devel@nongnu.org; Wed, 30 May 2018 08:11:19 -0400
+	(envelope-from <groug@kaod.org>) id 1fNzyZ-0008U2-6l
+	for qemu-devel@nongnu.org; Wed, 30 May 2018 08:13:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1fNzwg-0000GN-Lb
-	for qemu-devel@nongnu.org; Wed, 30 May 2018 08:11:18 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:39186 helo=mx1.redhat.com)
+	(envelope-from <groug@kaod.org>) id 1fNzyV-0000kc-28
+	for qemu-devel@nongnu.org; Wed, 30 May 2018 08:13:11 -0400
+Received: from 6.mo3.mail-out.ovh.net ([188.165.43.173]:46508)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1fNzwg-0000GH-G1
-	for qemu-devel@nongnu.org; Wed, 30 May 2018 08:11:14 -0400
-Date: Wed, 30 May 2018 20:10:57 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20180530121057.GE27442@xz-mi>
-References: <20180521084249.10640-1-peterx@redhat.com>
-	<8ef2c984-7817-a54f-ebae-a1f14e453b6a@redhat.com>
-	<810f70e6-4ce7-2ad9-2f20-19fc6df57452@redhat.com>
-	<20180530080458.GB27442@xz-mi>
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1fNzyU-0000kH-QI
+	for qemu-devel@nongnu.org; Wed, 30 May 2018 08:13:06 -0400
+Received: from player758.ha.ovh.net (unknown [10.109.120.91])
+	by mo3.mail-out.ovh.net (Postfix) with ESMTP id 35B7B1BA6E2
+	for <qemu-devel@nongnu.org>; Wed, 30 May 2018 14:13:05 +0200 (CEST)
+Date: Wed, 30 May 2018 14:13:01 +0200
+From: Greg Kurz <groug@kaod.org>
+Message-ID: <20180530141301.513496b2@bahia.lan>
+In-Reply-To: <981de427dbb657d58d08f216b40255b132cb1596.1527310210.git.keno@alumni.harvard.edu>
+References: <cover.1527310210.git.keno@alumni.harvard.edu>
+	<981de427dbb657d58d08f216b40255b132cb1596.1527310210.git.keno@alumni.harvard.edu>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20180530080458.GB27442@xz-mi>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC] monitor: turn on Out-Of-Band by default again
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 10/13] 9p: darwin: *xattr_nofollow
+ implementations
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,76 +31,118 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>
-Cc: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Fam Zheng <famz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Eric Auger <eric.auger@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Markus Armbruster <armbru@redhat.com>
+To: keno@juliacomputing.com
+Cc: qemu-devel@nongnu.org, Keno Fischer <keno@alumni.harvard.edu>
 
-On Wed, May 30, 2018 at 04:04:58PM +0800, Peter Xu wrote:
-> On Tue, May 22, 2018 at 02:40:26PM -0400, John Snow wrote:
-> >=20
-> >=20
-> > On 05/21/2018 10:13 AM, Eric Blake wrote:
-> > > On 05/21/2018 03:42 AM, Peter Xu wrote:
-> > >> We turned Out-Of-Band feature of monitors off for 2.12 release.=C2=
-=A0 Now we
-> > >> try to turn that on again.
-> > >=20
-> > > "try to turn" sounds weak, like you aren't sure of this patch.=C2=A0=
- If you
-> > > aren't sure, then why should we feel safe in applying it?=C2=A0 Thi=
-s text is
-> > > going in the permanent git history, so sound bold, rather than hesi=
-tant!
-> > >=20
-> > > "We have resolved the issues from last time (commit 3fd2457d revert=
-ed by
-> > > commit a4f90923):
-> > > - issue 1 ...
-> > > - issue 2 ...
-> > > So now we are ready to enable advertisement of the feature by defau=
-lt"
-> > >=20
-> > > with better descriptions of the issues that you fixed (I can think =
-of at
-> > > least the fixes adding thread-safety to the current monitor, and fi=
-xing
-> > > early use of the monitor before qmp_capabilities completes; there m=
-ay
-> > > also be other issues that you want to call out).
-> > >=20
-> > >>
-> > >> Signed-off-by: Peter Xu <peterx@redhat.com>
-> > >> --=20
-> > >> Now OOB should be okay with all known tests (except iotest qcow2, =
-since
-> > >> it is still broken on master),
-> > >=20
-> > > Which tests are still failing for you?=C2=A0 Ideally, you can still
-> > > demonstrate that the tests not failing without this patch continue =
-to
-> > > pass with this patch, even if you call out the tests that have know=
-n
-> > > issues to still be resolved.
-> > >=20
-> >=20
-> > Probably 91 and 169. If any others fail that's news to me.
->=20
-> I just gave it a shot on my workstation too (./check -qcow2):
->=20
-> Not run: 045 059 064 070 075 076 077 078 081 083 084 088 092 093 094 10=
-1 106 109 113 116 119 123 128 131 135 136 146 148 149 160 162 171 173 175=
- 199 207 210 3
-> Failures: 087 188 189 198 206
-> Failed 5 of 167 tests
->=20
-> I'm testing against master, e609fa7.
+On Sat, 26 May 2018 01:23:12 -0400
+keno@juliacomputing.com wrote:
 
-Hmm... I ran again the same test and the same master commit but this
-time it passed all 167 tests on my laptop.  So I assume the previous 5
-failures are unreproducable at least every time (or there might be
-something wrong with my testbed).  I'll rerun some more times, and
-when I post the OOB patch I'll cover all correct qcow2 tests.
+> From: Keno Fischer <keno@alumni.harvard.edu>
+> 
+> Signed-off-by: Keno Fischer <keno@juliacomputing.com>
+> ---
 
-Regards,
+As mentioned in patch 3, this should go to 9p-util-darwin.c
 
---=20
-Peter Xu
+>  hw/9pfs/9p-util.c | 49 +++++++++++++++++++++++++++++++++++++++++++++----
+>  1 file changed, 45 insertions(+), 4 deletions(-)
+> 
+> diff --git a/hw/9pfs/9p-util.c b/hw/9pfs/9p-util.c
+> index 8cf5554..98004ac 100644
+> --- a/hw/9pfs/9p-util.c
+> +++ b/hw/9pfs/9p-util.c
+> @@ -17,49 +17,90 @@
+>  ssize_t fgetxattrat_nofollow(int dirfd, const char *filename, const char *name,
+>                               void *value, size_t size)
+>  {
+> -    char *proc_path = g_strdup_printf("/proc/self/fd/%d/%s", dirfd, filename);
+>      int ret;
+> +#ifdef CONFIG_DARWIN
+> +    int fd = openat_file(dirfd, filename, O_RDONLY | O_PATH_9P_UTIL | O_NOFOLLOW, 0);
+> +    if (fd == -1)
+> +        return -1;
+> +
+> +    ret = fgetxattr(fd, name, value, size, 0, XATTR_NOFOLLOW);
+> +    close_preserve_errno(fd);
+> +#else
+> +    char *proc_path = g_strdup_printf("/proc/self/fd/%d/%s", dirfd, filename);
+>  
+>      ret = lgetxattr(proc_path, name, value, size);
+>      g_free(proc_path);
+> +#endif
+>      return ret;
+>  }
+>  
+>  ssize_t fgetxattr_follow(int fd, const char *name,
+>                           void *value, size_t size)
+>  {
+> +#ifdef CONFIG_DARWIN
+> +    return fgetxattr(fd, name, value, size, 0, 0);
+> +#else
+>      return fgetxattr(fd, name, value, size);
+> +#endif
+>  }
+>  
+>  ssize_t flistxattrat_nofollow(int dirfd, const char *filename,
+>                                char *list, size_t size)
+>  {
+> -    char *proc_path = g_strdup_printf("/proc/self/fd/%d/%s", dirfd, filename);
+>      int ret;
+> +#ifdef CONFIG_DARWIN
+> +    int fd = openat_file(dirfd, filename, O_RDONLY | O_PATH_9P_UTIL | O_NOFOLLOW, 0);
+> +    if (fd == -1)
+> +        return -1;
+> +
+> +    ret = flistxattr(fd, list, size, XATTR_NOFOLLOW);
+> +    close_preserve_errno(fd);
+> +#else
+> +    char *proc_path = g_strdup_printf("/proc/self/fd/%d/%s", dirfd, filename);
+>  
+>      ret = llistxattr(proc_path, list, size);
+>      g_free(proc_path);
+> +#endif
+>      return ret;
+>  }
+>  
+>  ssize_t fremovexattrat_nofollow(int dirfd, const char *filename,
+>                                  const char *name)
+>  {
+> -    char *proc_path = g_strdup_printf("/proc/self/fd/%d/%s", dirfd, filename);
+>      int ret;
+> +#ifdef CONFIG_DARWIN
+> +    int fd = openat_file(dirfd, filename, O_PATH_9P_UTIL | O_NOFOLLOW, 0);
+> +    if (fd == -1)
+> +        return -1;
+> +
+> +    ret = fremovexattr(fd, name, XATTR_NOFOLLOW);
+> +    close_preserve_errno(fd);
+> +    return ret;
+> +#else
+> +    char *proc_path = g_strdup_printf("/proc/self/fd/%d/%s", dirfd, filename);
+>  
+>      ret = lremovexattr(proc_path, name);
+>      g_free(proc_path);
+>      return ret;
+> +#endif
+>  }
+>  
+>  int fsetxattrat_nofollow(int dirfd, const char *filename, const char *name,
+>                           void *value, size_t size, int flags)
+>  {
+> -    char *proc_path = g_strdup_printf("/proc/self/fd/%d/%s", dirfd, filename);
+>      int ret;
+> +#ifdef CONFIG_DARWIN
+> +    int fd = openat_file(dirfd, filename, O_PATH_9P_UTIL | O_NOFOLLOW, 0);
+> +    if (fd == -1)
+> +        return -1;
+> +
+> +    ret = fsetxattr(fd, name, value, size, 0, XATTR_NOFOLLOW);
+> +    close_preserve_errno(fd);
+> +#else
+> +    char *proc_path = g_strdup_printf("/proc/self/fd/%d/%s", dirfd, filename);
+>  
+>      ret = lsetxattr(proc_path, name, value, size, flags);
+>      g_free(proc_path);
+> +#endif
+>      return ret;
+>  }
