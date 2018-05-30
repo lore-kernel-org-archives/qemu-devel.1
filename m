@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38782)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38854)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <shameerali.kolothum.thodi@huawei.com>)
-	id 1fO2KZ-00051c-9X
-	for qemu-devel@nongnu.org; Wed, 30 May 2018 10:44:05 -0400
+	id 1fO2Kg-00056Q-JH
+	for qemu-devel@nongnu.org; Wed, 30 May 2018 10:44:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <shameerali.kolothum.thodi@huawei.com>)
-	id 1fO2KX-00084U-If
-	for qemu-devel@nongnu.org; Wed, 30 May 2018 10:44:03 -0400
+	id 1fO2Kf-000891-CN
+	for qemu-devel@nongnu.org; Wed, 30 May 2018 10:44:10 -0400
 From: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
-Date: Wed, 30 May 2018 14:43:40 +0000
-Message-ID: <5FC3163CFD30C246ABAA99954A238FA8386F17B0@FRAEML521-MBX.china.huawei.com>
+Date: Wed, 30 May 2018 14:43:54 +0000
+Message-ID: <5FC3163CFD30C246ABAA99954A238FA8386F17BD@FRAEML521-MBX.china.huawei.com>
 References: <20180516152026.2920-1-shameerali.kolothum.thodi@huawei.com>
-	<20180516152026.2920-2-shameerali.kolothum.thodi@huawei.com>
-	<216b4fba-c14a-fd9e-86ae-dda5a3d1cbcf@redhat.com>
-In-Reply-To: <216b4fba-c14a-fd9e-86ae-dda5a3d1cbcf@redhat.com>
+	<20180516152026.2920-3-shameerali.kolothum.thodi@huawei.com>
+	<58fb3661-8c2a-7fef-aeaa-ab175ea5bdd9@redhat.com>
+In-Reply-To: <58fb3661-8c2a-7fef-aeaa-ab175ea5bdd9@redhat.com>
 Content-Language: en-US
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [RFC v2 1/6] hw/vfio: Retrieve valid iova ranges
- from kernel
+Subject: Re: [Qemu-devel] [RFC v2 2/6] hw/arm/virt: Enable dynamic
+ generation of guest RAM memory regions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,307 +29,132 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Auger Eric <eric.auger@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>
-Cc: "peter.maydell@linaro.org" <peter.maydell@linaro.org>, "drjones@redhat.com" <drjones@redhat.com>, Jonathan Cameron <jonathan.cameron@huawei.com>, Linuxarm <linuxarm@huawei.com>, "alex.williamson@redhat.com" <alex.williamson@redhat.com>, Zhaoshenglong <zhaoshenglong@huawei.com>, "imammedo@redhat.com" <imammedo@redhat.com>
+Cc: "drjones@redhat.com" <drjones@redhat.com>, "imammedo@redhat.com" <imammedo@redhat.com>, "peter.maydell@linaro.org" <peter.maydell@linaro.org>, "alex.williamson@redhat.com" <alex.williamson@redhat.com>, Zhaoshenglong <zhaoshenglong@huawei.com>, Jonathan Cameron <jonathan.cameron@huawei.com>, Linuxarm <linuxarm@huawei.com>
 
-Hi Eric,
+Hi Eric.
 
 > -----Original Message-----
 > From: Auger Eric [mailto:eric.auger@redhat.com]
-> Sent: Monday, May 28, 2018 3:21 PM
+> Sent: Monday, May 28, 2018 3:22 PM
 > To: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>;
 > qemu-devel@nongnu.org; qemu-arm@nongnu.org
-> Cc: peter.maydell@linaro.org; drjones@redhat.com; Jonathan Cameron
-> <jonathan.cameron@huawei.com>; Linuxarm <linuxarm@huawei.com>;
+> Cc: drjones@redhat.com; imammedo@redhat.com; peter.maydell@linaro.org;
 > alex.williamson@redhat.com; Zhaoshenglong <zhaoshenglong@huawei.com>;
-> imammedo@redhat.com
-> Subject: Re: [Qemu-devel] [RFC v2 1/6] hw/vfio: Retrieve valid iova range=
-s
-> from kernel
+> Jonathan Cameron <jonathan.cameron@huawei.com>; Linuxarm
+> <linuxarm@huawei.com>
+> Subject: Re: [RFC v2 2/6] hw/arm/virt: Enable dynamic generation of guest
+> RAM memory regions
 >=20
 > Hi Shameer,
 > On 05/16/2018 05:20 PM, Shameer Kolothum wrote:
-> > This makes use of the newly introduced iova cap chains added
-> > to the  type1 VFIO_IOMMU_GET_INFO ioctl.
-> >
-> > The retrieved iova info is stored in a list for later use.
-> >
-> > Signed-off-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
-> > ---
-> >  hw/vfio/common.c              | 108
-> +++++++++++++++++++++++++++++++++++++++---
-> >  include/hw/vfio/vfio-common.h |   7 +++
-> >  linux-headers/linux/vfio.h    |  23 +++++++++
-> >  3 files changed, 132 insertions(+), 6 deletions(-)
-> >
-> > diff --git a/hw/vfio/common.c b/hw/vfio/common.c
-> > index 07ffa0b..94d7b24 100644
-> > --- a/hw/vfio/common.c
-> > +++ b/hw/vfio/common.c
-> > @@ -40,6 +40,8 @@ struct vfio_group_head vfio_group_list =3D
-> >      QLIST_HEAD_INITIALIZER(vfio_group_list);
-> >  struct vfio_as_head vfio_address_spaces =3D
-> >      QLIST_HEAD_INITIALIZER(vfio_address_spaces);
-> > +struct vfio_iova_head vfio_iova_regions =3D
-> > +    QLIST_HEAD_INITIALIZER(vfio_iova_regions);
-> >
-> >  #ifdef CONFIG_KVM
-> >  /*
-> > @@ -1030,6 +1032,85 @@ static void
-> vfio_put_address_space(VFIOAddressSpace *space)
-> >      }
-> >  }
-> >
-> > +static void vfio_iommu_get_iova_ranges(struct vfio_iommu_type1_info
-> *info)
-> > +{
-> > +    struct vfio_info_cap_header *hdr;
-> > +    struct vfio_iommu_type1_info_cap_iova_range *cap_iova;
-> > +    VFIOIovaRange *iova, *tmp, *prev =3D NULL;
-> nit: s/iova/iova_range?
-
-Ok.
-
-> > +    void *ptr =3D info;
-> > +    bool found =3D false;
-> > +    int i;
-> > +
-> > +    if (!(info->flags & VFIO_IOMMU_INFO_CAPS)) {
-> > +        return;
-> > +    }
-> > +
-> > +    for (hdr =3D ptr + info->cap_offset; hdr !=3D ptr; hdr =3D ptr + h=
-dr->next) {
-> > +        if (hdr->id =3D=3D VFIO_IOMMU_TYPE1_INFO_CAP_IOVA_RANGE) {
-> > +            found =3D true;
-> > +            break;
-> > +        }
-> > +    }
-> > +
-> > +    if (!found) {
-> > +        return;
-> > +    }
-> > +
-> > +    /* purge the current iova list, if any */
-> > +    QLIST_FOREACH_SAFE(iova, &vfio_iova_regions, next, tmp) {
-> > +        QLIST_REMOVE(iova, next);
-> > +        g_free(iova);
-> > +    }
-> > +
-> > +    cap_iova =3D container_of(hdr, struct
-> vfio_iommu_type1_info_cap_iova_range,
-> > +                            header);
-> > +
-> > +    /* populate the list */
-> > +    for (i =3D 0; i < cap_iova->nr_iovas; i++) {
-> > +        iova =3D g_malloc0(sizeof(*iova));
-> nit: g_new0 is preferred
-
-Sure.
-
-> > +        iova->start =3D cap_iova->iova_ranges[i].start;
-> > +        iova->end =3D cap_iova->iova_ranges[i].end;
-> > +
-> > +        if (prev) {
-> > +            QLIST_INSERT_AFTER(prev, iova, next);
-> > +        } else {
-> > +            QLIST_INSERT_HEAD(&vfio_iova_regions, iova, next);
-> > +        }
-> > +        prev =3D iova;
-> > +    }
-> > +
-> > +    return;
-> > +}
-> > +
-> > +static int vfio_get_iommu_info(VFIOContainer *container,
-> > +                         struct vfio_iommu_type1_info **info)
-> > +{
-> > +
-> > +    size_t argsz =3D sizeof(struct vfio_iommu_type1_info);
-> > +
-> > +
-> > +    *info =3D g_malloc0(argsz);
-> > +
-> > +retry:
-> > +    (*info)->argsz =3D argsz;
-> > +
-> > +    if (ioctl(container->fd, VFIO_IOMMU_GET_INFO, *info)) {
-> > +        g_free(*info);
-> > +        *info =3D NULL;
-> > +        return -errno;
-> > +    }
-> > +
-> > +    if (((*info)->argsz > argsz)) {
-> > +        argsz =3D (*info)->argsz;
-> > +        *info =3D g_realloc(*info, argsz);
-> > +        goto retry;
-> > +    }
-> > +
-> > +    vfio_iommu_get_iova_ranges(*info);
-> > +
-> > +    return 0;
-> > +}
-> > +
-> >  static int vfio_connect_container(VFIOGroup *group, AddressSpace *as,
-> >                                    Error **errp)
-> >  {
-> > @@ -1044,6 +1125,15 @@ static int vfio_connect_container(VFIOGroup
-> *group, AddressSpace *as,
-> >              group->container =3D container;
-> >              QLIST_INSERT_HEAD(&container->group_list, group, container=
-_next);
-> >              vfio_kvm_device_add_group(group);
-> > +
-> > +            /* New group might change the valid iovas. Get the updated=
- list */
-> > +            if ((container->iommu_type =3D=3D VFIO_TYPE1_IOMMU) ||
-> > +                (container->iommu_type =3D=3D VFIO_TYPE1v2_IOMMU)) {
-> > +                struct vfio_iommu_type1_info *info;
-> > +
-> > +                vfio_get_iommu_info(container, &info);
-> > +                g_free(info);
-> > +            }
-> >              return 0;
-> >          }
-> >      }
-> > @@ -1071,7 +1161,7 @@ static int vfio_connect_container(VFIOGroup
-> *group, AddressSpace *as,
-> >      if (ioctl(fd, VFIO_CHECK_EXTENSION, VFIO_TYPE1_IOMMU) ||
-> >          ioctl(fd, VFIO_CHECK_EXTENSION, VFIO_TYPE1v2_IOMMU)) {
-> >          bool v2 =3D !!ioctl(fd, VFIO_CHECK_EXTENSION, VFIO_TYPE1v2_IOM=
-MU);
-> > -        struct vfio_iommu_type1_info info;
-> > +        struct vfio_iommu_type1_info *info;
-> >
-> >          ret =3D ioctl(group->fd, VFIO_GROUP_SET_CONTAINER, &fd);
-> >          if (ret) {
-> > @@ -1095,14 +1185,14 @@ static int vfio_connect_container(VFIOGroup
-> *group, AddressSpace *as,
-> >           * existing Type1 IOMMUs generally support any IOVA we're
-> >           * going to actually try in practice.
-> >           */
-> > -        info.argsz =3D sizeof(info);
-> > -        ret =3D ioctl(fd, VFIO_IOMMU_GET_INFO, &info);
-> > +        ret =3D vfio_get_iommu_info(container, &info);
-> >          /* Ignore errors */
-> > -        if (ret || !(info.flags & VFIO_IOMMU_INFO_PGSIZES)) {
-> > +        if (ret || !(info->flags & VFIO_IOMMU_INFO_PGSIZES)) {
-> >              /* Assume 4k IOVA page size */
-> > -            info.iova_pgsizes =3D 4096;
-> > +            info->iova_pgsizes =3D 4096;
-> >          }
-> > -        vfio_host_win_add(container, 0, (hwaddr)-1, info.iova_pgsizes)=
-;
-> > +        vfio_host_win_add(container, 0, (hwaddr)-1, info->iova_pgsizes=
-);
-> > +        g_free(info);
-> >      } else if (ioctl(fd, VFIO_CHECK_EXTENSION, VFIO_SPAPR_TCE_IOMMU) |=
-|
-> >                 ioctl(fd, VFIO_CHECK_EXTENSION, VFIO_SPAPR_TCE_v2_IOMMU=
-)) {
-> >          struct vfio_iommu_spapr_tce_info info;
-> > @@ -1256,6 +1346,7 @@ static void vfio_disconnect_container(VFIOGroup
-> *group)
-> >      if (QLIST_EMPTY(&container->group_list)) {
-> >          VFIOAddressSpace *space =3D container->space;
-> >          VFIOGuestIOMMU *giommu, *tmp;
-> > +        VFIOIovaRange *iova, *next_iova;
-> not: I would prefer range naming
-
-Ok.
-=20
-> >
-> >          QLIST_REMOVE(container, next);
-> >
-> > @@ -1266,6 +1357,11 @@ static void vfio_disconnect_container(VFIOGroup
-> *group)
-> >              g_free(giommu);
-> >          }
-> >
-> > +        QLIST_FOREACH_SAFE(iova, &vfio_iova_regions, next, next_iova) =
-{
-> > +            QLIST_REMOVE(iova, next);
-> > +            g_free(iova);
-> > +        }
-> > +
-> >          trace_vfio_disconnect_container(container->fd);
-> >          close(container->fd);
-> >          g_free(container);
-> > diff --git a/include/hw/vfio/vfio-common.h b/include/hw/vfio/vfio-commo=
-n.h
-> > index d936014..874fe2c 100644
-> > --- a/include/hw/vfio/vfio-common.h
-> > +++ b/include/hw/vfio/vfio-common.h
-> > @@ -164,6 +164,12 @@ typedef struct VFIODisplay {
-> >      } dmabuf;
-> >  } VFIODisplay;
-> >
-> > +typedef struct VFIOIovaRange {
-> > +    uint64_t start;
-> > +    uint64_t end;
-> > +    QLIST_ENTRY(VFIOIovaRange) next;
-> > +} VFIOIovaRange;
-> > +
-> >  void vfio_put_base_device(VFIODevice *vbasedev);
-> >  void vfio_disable_irqindex(VFIODevice *vbasedev, int index);
-> >  void vfio_unmask_single_irqindex(VFIODevice *vbasedev, int index);
-> > @@ -187,6 +193,7 @@ int vfio_get_device(VFIOGroup *group, const char
-> *name,
-> >  extern const MemoryRegionOps vfio_region_ops;
-> >  extern QLIST_HEAD(vfio_group_head, VFIOGroup) vfio_group_list;
-> >  extern QLIST_HEAD(vfio_as_head, VFIOAddressSpace) vfio_address_spaces;
-> > +extern QLIST_HEAD(vfio_iova_head, VFIOIovaRange) vfio_iova_regions;
-> >
-> >  #ifdef CONFIG_LINUX
-> >  int vfio_get_region_info(VFIODevice *vbasedev, int index,
-> > diff --git a/linux-headers/linux/vfio.h b/linux-headers/linux/vfio.h
-> > index 3a0a305..117341d 100644
-> > --- a/linux-headers/linux/vfio.h
-> > +++ b/linux-headers/linux/vfio.h
-> > @@ -589,7 +589,30 @@ struct vfio_iommu_type1_info {
-> >  	__u32	argsz;
-> >  	__u32	flags;
-> >  #define VFIO_IOMMU_INFO_PGSIZES (1 << 0)	/* supported page sizes info =
-*/
-> > +#define VFIO_IOMMU_INFO_CAPS	(1 << 1)	/* Info supports caps */
-> >  	__u64	iova_pgsizes;		/* Bitmap of supported page sizes */
-> > +	__u32   cap_offset;	/* Offset within info struct of first cap */
-> > +};
-> > +
-> > +/*
-> > + * The IOVA capability allows to report the valid IOVA range(s)
-> > + * excluding any reserved regions associated with dev group. Any dma
-> > + * map attempt outside the valid iova range will return error.
-> > + *
-> > + * The structures below define version 1 of this capability.
-> > + */
-> > +#define VFIO_IOMMU_TYPE1_INFO_CAP_IOVA_RANGE  1
-> > +
-> > +struct vfio_iova_range {
-> > +	__u64	start;
-> > +	__u64	end;
-> > +};
-> > +
-> > +struct vfio_iommu_type1_info_cap_iova_range {
-> > +	struct vfio_info_cap_header header;
-> > +	__u32	nr_iovas;
-> > +	__u32	reserved;
-> > +	struct vfio_iova_range iova_ranges[];
-> >  };
-> >
-> >  #define VFIO_IOMMU_GET_INFO _IO(VFIO_TYPE, VFIO_BASE + 12)
-> >
-> You need to update the header in a separate patch using
-> scripts/update-linux-headers.sh
+> > Register ram_memory_region_init notifier to allocate memory region
+> > from system memory.
 >=20
-> Until the kernel series is not fully upstream you can just pickup the
-> VFIO related changes you are interested in (partial update) but when
-> this series becomes a patch, a full header update is generally used.
+> At this stage the commit message does not explain why you need a machine
+> init done notifier. Also the commit title does not summarize the actual
+> change.
+> Thanks
 
-Ok. I will take care of this in the next revision.
+Right. I will reword/rephrase the text.
 
 Thanks,
 Shameer
-=20
-> Thanks
->=20
+
 > Eric
+> >
+> > Signed-off-by: Zhu Yijun <zhuyijun@huawei.com>
+> > Signed-off-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
+> > ---
+> >  hw/arm/virt.c         | 28 ++++++++++++++++++++++------
+> >  include/hw/arm/virt.h |  1 +
+> >  2 files changed, 23 insertions(+), 6 deletions(-)
+> >
+> > diff --git a/hw/arm/virt.c b/hw/arm/virt.c
+> > index 94dcb12..05fcb62 100644
+> > --- a/hw/arm/virt.c
+> > +++ b/hw/arm/virt.c
+> > @@ -1171,6 +1171,19 @@ void virt_machine_done(Notifier *notifier, void
+> *data)
+> >      virt_build_smbios(vms);
+> >  }
+> >
+> > +static void virt_ram_memory_region_init(Notifier *notifier, void *data=
+)
+> > +{
+> > +    MemoryRegion *sysmem =3D get_system_memory();
+> > +    MemoryRegion *ram =3D g_new(MemoryRegion, 1);
+> > +    VirtMachineState *vms =3D container_of(notifier, VirtMachineState,
+> > +                                         ram_memory_region_init);
+> > +    MachineState *machine =3D MACHINE(vms);
+> > +
+> > +    memory_region_allocate_system_memory(ram, NULL, "mach-virt.ram",
+> > +                                         machine->ram_size);
+> > +    memory_region_add_subregion(sysmem, vms-
+> >memmap[VIRT_MEM].base, ram);
+> > +}
+> > +
+> >  static uint64_t virt_cpu_mp_affinity(VirtMachineState *vms, int idx)
+> >  {
+> >      uint8_t clustersz =3D ARM_DEFAULT_CPUS_PER_CLUSTER;
+> > @@ -1204,7 +1217,6 @@ static void machvirt_init(MachineState *machine)
+> >      MemoryRegion *sysmem =3D get_system_memory();
+> >      MemoryRegion *secure_sysmem =3D NULL;
+> >      int n, virt_max_cpus;
+> > -    MemoryRegion *ram =3D g_new(MemoryRegion, 1);
+> >      bool firmware_loaded =3D bios_name || drive_get(IF_PFLASH, 0, 0);
+> >
+> >      /* We can probe only here because during property set
+> > @@ -1361,10 +1373,6 @@ static void machvirt_init(MachineState *machine)
+> >      fdt_add_timer_nodes(vms);
+> >      fdt_add_cpu_nodes(vms);
+> >
+> > -    memory_region_allocate_system_memory(ram, NULL, "mach-virt.ram",
+> > -                                         machine->ram_size);
+> > -    memory_region_add_subregion(sysmem, vms-
+> >memmap[VIRT_MEM].base, ram);
+> > -
+> >      create_flash(vms, sysmem, secure_sysmem ? secure_sysmem : sysmem);
+> >
+> >      create_gic(vms, pic);
+> > @@ -1405,15 +1413,23 @@ static void machvirt_init(MachineState
+> *machine)
+> >      vms->bootinfo.loader_start =3D vms->memmap[VIRT_MEM].base;
+> >      vms->bootinfo.get_dtb =3D machvirt_dtb;
+> >      vms->bootinfo.firmware_loaded =3D firmware_loaded;
+> > +
+> > +    /* Register notifiers. They are executed in registration reverse o=
+rder */
+> >      arm_load_kernel(ARM_CPU(first_cpu), &vms->bootinfo);
+> >
+> >      /*
+> >       * arm_load_kernel machine init done notifier registration must
+> >       * happen before the platform_bus_create call. In this latter,
+> >       * another notifier is registered which adds platform bus nodes.
+> > -     * Notifiers are executed in registration reverse order.
+> >       */
+> >      create_platform_bus(vms, pic);
+> > +
+> > +    /*
+> > +     * Register memory region notifier last as this has to be executed
+> > +     * first.
+> > +     */
+> > +    vms->ram_memory_region_init.notify =3D virt_ram_memory_region_init=
+;
+> > +    qemu_add_machine_init_done_notifier(&vms-
+> >ram_memory_region_init);
+> >  }
+> >
+> >  static bool virt_get_secure(Object *obj, Error **errp)
+> > diff --git a/include/hw/arm/virt.h b/include/hw/arm/virt.h
+> > index ba0c1a4..fc24f3a 100644
+> > --- a/include/hw/arm/virt.h
+> > +++ b/include/hw/arm/virt.h
+> > @@ -91,6 +91,7 @@ typedef struct {
+> >  typedef struct {
+> >      MachineState parent;
+> >      Notifier machine_done;
+> > +    Notifier ram_memory_region_init;
+> >      FWCfgState *fw_cfg;
+> >      bool secure;
+> >      bool highmem;
+> >
