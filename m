@@ -1,21 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42026)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55079)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <crosa@redhat.com>) id 1fO634-0007LN-9v
-	for qemu-devel@nongnu.org; Wed, 30 May 2018 14:42:16 -0400
+	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1fO6tL-0004vO-Fq
+	for qemu-devel@nongnu.org; Wed, 30 May 2018 15:36:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <crosa@redhat.com>) id 1fO631-0004Au-H0
-	for qemu-devel@nongnu.org; Wed, 30 May 2018 14:42:14 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:56110 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <crosa@redhat.com>) id 1fO631-0004Ak-BW
-	for qemu-devel@nongnu.org; Wed, 30 May 2018 14:42:11 -0400
-From: Cleber Rosa <crosa@redhat.com>
-Date: Wed, 30 May 2018 14:41:52 -0400
-Message-Id: <20180530184156.15634-2-crosa@redhat.com>
-In-Reply-To: <20180530184156.15634-1-crosa@redhat.com>
-References: <20180530184156.15634-1-crosa@redhat.com>
-Subject: [Qemu-devel] [PATCH v4 1/5] Add functional/acceptance tests
- infrastructure
+	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1fO6tJ-0003wT-B8
+	for qemu-devel@nongnu.org; Wed, 30 May 2018 15:36:15 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:50434)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <stefanb@linux.vnet.ibm.com>)
+	id 1fO6tJ-0003w7-2u
+	for qemu-devel@nongnu.org; Wed, 30 May 2018 15:36:13 -0400
+Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w4UJYJQt057038
+	for <qemu-devel@nongnu.org>; Wed, 30 May 2018 15:36:12 -0400
+Received: from e36.co.us.ibm.com (e36.co.us.ibm.com [32.97.110.154])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2ja0r2mpm9-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Wed, 30 May 2018 15:36:12 -0400
+Received: from localhost
+	by e36.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <stefanb@linux.vnet.ibm.com>;
+	Wed, 30 May 2018 13:36:11 -0600
+From: Stefan Berger <stefanb@linux.vnet.ibm.com>
+Date: Wed, 30 May 2018 15:35:45 -0400
+In-Reply-To: <20180530193548.3846786-1-stefanb@linux.vnet.ibm.com>
+References: <20180530193548.3846786-1-stefanb@linux.vnet.ibm.com>
+Message-Id: <20180530193548.3846786-2-stefanb@linux.vnet.ibm.com>
+Subject: [Qemu-devel] [PATCH 1/4] test: Move reusable code from
+ tpm-crb-swtpm-test.c to tpm-util.c
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,334 +39,276 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Eduardo Habkost <ehabkost@redhat.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Stefan Hajnoczi <stefanha@redhat.com>, Fam Zheng <famz@redhat.com>, Amador Pahim <amador@pahim.org>, Cleber Rosa <crosa@redhat.com>
+Cc: marcandre.lureau@redhat.com, Stefan Berger <stefanb@linux.vnet.ibm.com>
 
-This patch adds the very minimum infrastructure necessary for writing
-and running functional/acceptance tests, including:
+Move code we can reuse from tpm-crb-swtpm-test.c into tpm-util.c
+and prefix functions with 'tpm_util_'.
 
- * Documentation
- * The avocado_qemu.Test base test class
- * One example tests (version.py)
+Remove some unnecessary #include's.
 
-Additional functionality is expected to be added along the tests that
-require them.
-
-Signed-off-by: Cleber Rosa <crosa@redhat.com>
+Signed-off-by: Stefan Berger <stefanb@linux.vnet.ibm.com>
 ---
- docs/devel/testing.rst                    | 192 ++++++++++++++++++++++
- tests/acceptance/README.rst               |  10 ++
- tests/acceptance/avocado_qemu/__init__.py |  54 ++++++
- tests/acceptance/version.py               |  24 +++
- 4 files changed, 280 insertions(+)
- create mode 100644 tests/acceptance/README.rst
- create mode 100644 tests/acceptance/avocado_qemu/__init__.py
- create mode 100644 tests/acceptance/version.py
+ tests/tpm-crb-swtpm-test.c | 100 +++------------------------------------------
+ tests/tpm-util.c           |  89 ++++++++++++++++++++++++++++++++++++++++
+ tests/tpm-util.h           |  10 +++++
+ 3 files changed, 104 insertions(+), 95 deletions(-)
 
-diff --git a/docs/devel/testing.rst b/docs/devel/testing.rst
-index 0ca1a2d4b5..6cc04c6d78 100644
---- a/docs/devel/testing.rst
-+++ b/docs/devel/testing.rst
-@@ -484,3 +484,195 @@ supported. To start the fuzzer, run
+diff --git a/tests/tpm-crb-swtpm-test.c b/tests/tpm-crb-swtpm-test.c
+index c2bde0cbaa..2a22b032ca 100644
+--- a/tests/tpm-crb-swtpm-test.c
++++ b/tests/tpm-crb-swtpm-test.c
+@@ -15,12 +15,8 @@
+ #include "qemu/osdep.h"
+ #include <glib/gstdio.h>
  
- Alternatively, some command different from "qemu-img info" can be tested, by
- changing the ``-c`` option.
-+
-+Acceptance tests using the Avocado Framework
-+============================================
-+
-+The ``tests/acceptance`` directory hosts functional tests, also known
-+as acceptance level tests.  They're usually higher level tests, and
-+may interact with external resources and with various guest operating
-+systems.
-+
-+These tests are written using the Avocado Testing Framework (which must
-+be installed separately) in conjunction with a the ``avocado_qemu.Test``
-+class, implemented at ``tests/acceptance/avocado_qemu``.
-+
-+Tests based on ``avocado_qemu.Test`` can easily:
-+
-+ * Customize the command line arguments given to the convenience
-+   ``self.vm`` attribute (a QEMUMachine instance)
-+
-+ * Interact with the QEMU monitor, send QMP commands and check
-+   their results
-+
-+ * Interact with the guest OS, using the convenience console device
-+   (which may be useful to assert the effectiveness and correctness of
-+   command line arguments or QMP commands)
-+
-+ * Interact with external data files that accompany the test itself
-+   (see ``self.get_data()``)
-+
-+ * Donwload (and cache) remote data files, such as firmware and kernel
-+   images
-+
-+ * Have access to a library of guest OS images (by means of the
-+   ``avocado.utils.vmimage`` library)
-+
-+ * Make use of various other test related utilities available at the
-+   test class itself and at the utility library:
-+
-+   - http://avocado-framework.readthedocs.io/en/latest/api/test/avocado.html#avocado.Test
-+   - http://avocado-framework.readthedocs.io/en/latest/api/utils/avocado.utils.html
-+
-+Installation
-+------------
-+
-+To install Avocado and its dependencies, run:
-+
-+.. code::
-+
-+  pip install --user avocado-framework
-+
-+Alternatively, follow the instructions on this link:
-+
-+  http://avocado-framework.readthedocs.io/en/latest/GetStartedGuide.html#installing-avocado
-+
-+Overview
-+--------
-+
-+This directory provides the ``avocado_qemu`` Python module, containing
-+the ``avocado_qemu.Test`` class.  Here's a simple usage example:
-+
-+.. code::
-+
-+  from avocado_qemu import Test
-+
-+
-+  class Version(Test):
-+      """
-+      :avocado: enable
-+      :avocado: tags=quick
-+      """
-+      def test_qmp_human_info_version(self):
-+          self.vm.launch()
-+          res = self.vm.command('human-monitor-command',
-+                                command_line='info version')
-+          self.assertRegexpMatches(res, r'^(\d+\.\d+\.\d)')
-+
-+To execute your test, run:
-+
-+.. code::
-+
-+  avocado run version.py
-+
-+Tests may be classified according to a convention by using docstring
-+directives such as ``:avocado: tags=TAG1,TAG2``.  To run all tests
-+in the current directory, tagged as "quick", run:
-+
-+.. code::
-+
-+  avocado run -t quick .
-+
-+The ``avocado_qemu.Test`` base test class
-+-----------------------------------------
-+
-+The ``avocado_qemu.Test`` class has a number of characteristics that
-+are worth being mentioned right away.
-+
-+First of all, it attempts to give each test a ready to use QEMUMachine
-+instance, available at ``self.vm``.  Because many tests will tweak the
-+QEMU command line, launching the QEMUMachine (by using ``self.vm.launch()``)
-+is left to the test writer.
-+
-+At test "tear down", ``avocado_qemu.Test`` handles the QEMUMachine
-+shutdown.
-+
-+QEMUMachine
-+~~~~~~~~~~~
-+
-+The QEMUMachine API is already widely used in the Python iotests,
-+device-crash-test and other Python scripts.  It's a wrapper around the
-+execution of a QEMU binary, giving its users:
-+
-+ * the ability to set command line arguments to be given to the QEMU
-+   binary
-+
-+ * a ready to use QMP connection and interface, which can be used to
-+   send commands and inspect its results, as well as asynchronous
-+   events
-+
-+ * convenience methods to set commonly used command line arguments in
-+   a more succinct and intuitive way
-+
-+QEMU binary selection
-+~~~~~~~~~~~~~~~~~~~~~
-+
-+The QEMU binary used for the ``self.vm`` QEMUMachine instance will
-+primarily depend on the value of the ``qemu_bin`` parameter.  If it's
-+not explicitly set, its default value will be the result of a dynamic
-+probe in the same source tree.  A suitable binary will be one that
-+targets the architecture matching host machine.
-+
-+Based on this description, test writers will usually rely on one of
-+the following approaches:
-+
-+1) Set ``qemu_bin``, and use the given binary
-+
-+2) Do not set ``qemu_bin``, and use a QEMU binary named like
-+   "${arch}-softmmu/qemu-system-${arch}", either in the current
-+   working directory, or in the current source tree.
-+
-+The resulting ``qemu_bin`` value will be preserved in the
-+``avocado_qemu.Test`` as an attribute with the same name.
-+
-+Attribute reference
-+-------------------
-+
-+Besides the attributes and methods that are part of the base
-+``avocado.Test`` class, the following attributes are available on any
-+``avocado_qemu.Test`` instance.
-+
-+vm
-+~~
-+
-+A QEMUMachine instance, initially configured according to the given
-+``qemu_bin`` parameter.
-+
-+qemu_bin
-+~~~~~~~~
-+
-+The preserved value of the ``qemu_bin`` parameter or the result of the
-+dynamic probe for a QEMU binary in the current working directory or
-+source tree.
-+
-+Parameter reference
-+-------------------
-+
-+To understand how Avocado parameters are accessed by tests, and how
-+they can be passed to tests, please refer to::
-+
-+  http://avocado-framework.readthedocs.io/en/latest/WritingTests.html#accessing-test-parameters
-+
-+Parameter values can be easily seen in the log files, and will look
-+like the following:
-+
-+.. code::
-+
-+  PARAMS (key=qemu_bin, path=*, default=x86_64-softmmu/qemu-system-x86_64) => 'x86_64-softmmu/qemu-system-x86_64
-+
-+qemu_bin
-+~~~~~~~~
-+
-+The exact QEMU binary to be used on QEMUMachine.
-+
-+Uninstalling Avocado
-+--------------------
-+
-+If you've followed the installation instructions above, you can easily
-+uninstall Avocado.  Start by listing the packages you have installed::
-+
-+  pip list --user
-+
-+And remove any package you want with::
-+
-+  pip uninstall <package_name>
-diff --git a/tests/acceptance/README.rst b/tests/acceptance/README.rst
-new file mode 100644
-index 0000000000..89260faed6
---- /dev/null
-+++ b/tests/acceptance/README.rst
-@@ -0,0 +1,10 @@
-+============================================
-+Acceptance tests using the Avocado Framework
-+============================================
-+
-+This directory contains functional tests, also known as acceptance
-+level tests.  They're usually higher level, and may interact with
-+external resources and with various guest operating systems.
-+
-+For more information, please refer to ``docs/devel/testing.rst``,
-+section "Acceptance tests using the Avocado Framework".
-diff --git a/tests/acceptance/avocado_qemu/__init__.py b/tests/acceptance/avocado_qemu/__init__.py
-new file mode 100644
-index 0000000000..1e54fd5932
---- /dev/null
-+++ b/tests/acceptance/avocado_qemu/__init__.py
-@@ -0,0 +1,54 @@
-+# Test class and utilities for functional tests
-+#
-+# Copyright (c) 2018 Red Hat, Inc.
-+#
-+# Author:
-+#  Cleber Rosa <crosa@redhat.com>
-+#
-+# This work is licensed under the terms of the GNU GPL, version 2 or
-+# later.  See the COPYING file in the top-level directory.
-+
-+import os
-+import sys
-+
-+import avocado
-+
-+SRC_ROOT_DIR = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
-+SRC_ROOT_DIR = os.path.abspath(os.path.dirname(SRC_ROOT_DIR))
-+sys.path.append(os.path.join(SRC_ROOT_DIR, 'scripts'))
-+
-+from qemu import QEMUMachine
-+
-+def is_readable_executable_file(path):
-+    return os.path.isfile(path) and os.access(path, os.R_OK | os.X_OK)
-+
-+
-+def pick_default_qemu_bin():
-+    """
-+    Picks the path of a QEMU binary, starting either in the current working
-+    directory or in the source tree root directory.
-+    """
-+    arch = os.uname()[4]
-+    qemu_bin_relative_path = os.path.join("%s-softmmu" % arch,
-+                                          "qemu-system-%s" % arch)
-+    if is_readable_executable_file(qemu_bin_relative_path):
-+        return qemu_bin_relative_path
-+
-+    qemu_bin_from_src_dir_path = os.path.join(SRC_ROOT_DIR,
-+                                              qemu_bin_relative_path)
-+    if is_readable_executable_file(qemu_bin_from_src_dir_path):
-+        return qemu_bin_from_src_dir_path
-+
-+
-+class Test(avocado.Test):
-+    def setUp(self):
-+        self.vm = None
-+        self.qemu_bin = self.params.get('qemu_bin',
-+                                        default=pick_default_qemu_bin())
-+        if self.qemu_bin is None:
-+            self.cancel("No QEMU binary defined or found in the source tree")
-+        self.vm = QEMUMachine(self.qemu_bin)
-+
-+    def tearDown(self):
-+        if self.vm is not None:
-+            self.vm.shutdown()
-diff --git a/tests/acceptance/version.py b/tests/acceptance/version.py
-new file mode 100644
-index 0000000000..13b0a7440d
---- /dev/null
-+++ b/tests/acceptance/version.py
-@@ -0,0 +1,24 @@
-+# Version check example test
-+#
-+# Copyright (c) 2018 Red Hat, Inc.
-+#
-+# Author:
-+#  Cleber Rosa <crosa@redhat.com>
-+#
-+# This work is licensed under the terms of the GNU GPL, version 2 or
-+# later.  See the COPYING file in the top-level directory.
-+
-+
-+from avocado_qemu import Test
-+
-+
-+class Version(Test):
-+    """
-+    :avocado: enable
-+    :avocado: tags=quick
-+    """
-+    def test_qmp_human_info_version(self):
-+        self.vm.launch()
-+        res = self.vm.command('human-monitor-command',
-+                              command_line='info version')
-+        self.assertRegexpMatches(res, r'^(\d+\.\d+\.\d)')
+-#include "hw/acpi/tpm.h"
+-#include "io/channel-socket.h"
+ #include "libqtest.h"
+ #include "tpm-util.h"
+-#include "sysemu/tpm.h"
+-#include "qapi/qmp/qdict.h"
+ 
+ typedef struct TestState {
+     char *src_tpm_path;
+@@ -28,93 +24,6 @@ typedef struct TestState {
+     char *uri;
+ } TestState;
+ 
+-bool got_stop;
+-
+-static void migrate(QTestState *who, const char *uri)
+-{
+-    QDict *rsp;
+-    gchar *cmd;
+-
+-    cmd = g_strdup_printf("{ 'execute': 'migrate',"
+-                          "'arguments': { 'uri': '%s' } }",
+-                          uri);
+-    rsp = qtest_qmp(who, cmd);
+-    g_free(cmd);
+-    g_assert(qdict_haskey(rsp, "return"));
+-    qobject_unref(rsp);
+-}
+-
+-/*
+- * Events can get in the way of responses we are actually waiting for.
+- */
+-static QDict *wait_command(QTestState *who, const char *command)
+-{
+-    const char *event_string;
+-    QDict *response;
+-
+-    response = qtest_qmp(who, command);
+-
+-    while (qdict_haskey(response, "event")) {
+-        /* OK, it was an event */
+-        event_string = qdict_get_str(response, "event");
+-        if (!strcmp(event_string, "STOP")) {
+-            got_stop = true;
+-        }
+-        qobject_unref(response);
+-        response = qtest_qmp_receive(who);
+-    }
+-    return response;
+-}
+-
+-static void wait_for_migration_complete(QTestState *who)
+-{
+-    while (true) {
+-        QDict *rsp, *rsp_return;
+-        bool completed;
+-        const char *status;
+-
+-        rsp = wait_command(who, "{ 'execute': 'query-migrate' }");
+-        rsp_return = qdict_get_qdict(rsp, "return");
+-        status = qdict_get_str(rsp_return, "status");
+-        completed = strcmp(status, "completed") == 0;
+-        g_assert_cmpstr(status, !=,  "failed");
+-        qobject_unref(rsp);
+-        if (completed) {
+-            return;
+-        }
+-        usleep(1000);
+-    }
+-}
+-
+-static void migration_start_qemu(QTestState **src_qemu, QTestState **dst_qemu,
+-                                 SocketAddress *src_tpm_addr,
+-                                 SocketAddress *dst_tpm_addr,
+-                                 const char *miguri)
+-{
+-    char *src_qemu_args, *dst_qemu_args;
+-
+-    src_qemu_args = g_strdup_printf(
+-        "-chardev socket,id=chr,path=%s "
+-        "-tpmdev emulator,id=dev,chardev=chr "
+-        "-device tpm-crb,tpmdev=dev ",
+-        src_tpm_addr->u.q_unix.path);
+-
+-    *src_qemu = qtest_init(src_qemu_args);
+-
+-    dst_qemu_args = g_strdup_printf(
+-        "-chardev socket,id=chr,path=%s "
+-        "-tpmdev emulator,id=dev,chardev=chr "
+-        "-device tpm-crb,tpmdev=dev "
+-        "-incoming %s",
+-        dst_tpm_addr->u.q_unix.path,
+-        miguri);
+-
+-    *dst_qemu = qtest_init(dst_qemu_args);
+-
+-    free(src_qemu_args);
+-    free(dst_qemu_args);
+-}
+-
+ static void tpm_crb_swtpm_test(const void *data)
+ {
+     char *args = NULL;
+@@ -183,8 +92,9 @@ static void tpm_crb_swtpm_migration_test(const void *data)
+         goto err_src_tpm_kill;
+     }
+ 
+-    migration_start_qemu(&src_qemu, &dst_qemu, src_tpm_addr, dst_tpm_addr,
+-                         ts->uri);
++    tpm_util_migration_start_qemu(&src_qemu, &dst_qemu,
++                                  src_tpm_addr, dst_tpm_addr,
++                                  ts->uri);
+ 
+     tpm_util_startup(src_qemu, tpm_util_crb_transfer);
+     tpm_util_pcrextend(src_qemu, tpm_util_crb_transfer);
+@@ -197,8 +107,8 @@ static void tpm_crb_swtpm_migration_test(const void *data)
+     tpm_util_pcrread(src_qemu, tpm_util_crb_transfer, tpm_pcrread_resp,
+                      sizeof(tpm_pcrread_resp));
+ 
+-    migrate(src_qemu, ts->uri);
+-    wait_for_migration_complete(src_qemu);
++    tpm_util_migrate(src_qemu, ts->uri);
++    tpm_util_wait_for_migration_complete(src_qemu);
+ 
+     tpm_util_pcrread(dst_qemu, tpm_util_crb_transfer, tpm_pcrread_resp,
+                      sizeof(tpm_pcrread_resp));
+diff --git a/tests/tpm-util.c b/tests/tpm-util.c
+index c9b3947c1c..e6e3b922fa 100644
+--- a/tests/tpm-util.c
++++ b/tests/tpm-util.c
+@@ -17,6 +17,9 @@
+ #include "hw/acpi/tpm.h"
+ #include "libqtest.h"
+ #include "tpm-util.h"
++#include "qapi/qmp/qdict.h"
++
++static bool got_stop;
+ 
+ void tpm_util_crb_transfer(QTestState *s,
+                            const unsigned char *req, size_t req_size,
+@@ -184,3 +187,89 @@ void tpm_util_swtpm_kill(GPid pid)
+ 
+     kill(pid, SIGKILL);
+ }
++
++void tpm_util_migrate(QTestState *who, const char *uri)
++{
++    QDict *rsp;
++    gchar *cmd;
++
++    cmd = g_strdup_printf("{ 'execute': 'migrate',"
++                          "'arguments': { 'uri': '%s' } }",
++                          uri);
++    rsp = qtest_qmp(who, cmd);
++    g_free(cmd);
++    g_assert(qdict_haskey(rsp, "return"));
++    qobject_unref(rsp);
++}
++
++/*
++ * Events can get in the way of responses we are actually waiting for.
++ */
++static QDict *tpm_util_wait_command(QTestState *who, const char *command)
++{
++    const char *event_string;
++    QDict *response;
++
++    response = qtest_qmp(who, command);
++
++    while (qdict_haskey(response, "event")) {
++        /* OK, it was an event */
++        event_string = qdict_get_str(response, "event");
++        if (!strcmp(event_string, "STOP")) {
++            got_stop = true;
++        }
++        qobject_unref(response);
++        response = qtest_qmp_receive(who);
++    }
++    return response;
++}
++
++void tpm_util_wait_for_migration_complete(QTestState *who)
++{
++    while (true) {
++        QDict *rsp, *rsp_return;
++        bool completed;
++        const char *status;
++
++        rsp = tpm_util_wait_command(who, "{ 'execute': 'query-migrate' }");
++        rsp_return = qdict_get_qdict(rsp, "return");
++        status = qdict_get_str(rsp_return, "status");
++        completed = strcmp(status, "completed") == 0;
++        g_assert_cmpstr(status, !=,  "failed");
++        qobject_unref(rsp);
++        if (completed) {
++            return;
++        }
++        usleep(1000);
++    }
++}
++
++void tpm_util_migration_start_qemu(QTestState **src_qemu,
++                                   QTestState **dst_qemu,
++                                   SocketAddress *src_tpm_addr,
++                                   SocketAddress *dst_tpm_addr,
++                                   const char *miguri)
++{
++    char *src_qemu_args, *dst_qemu_args;
++
++    src_qemu_args = g_strdup_printf(
++        "-chardev socket,id=chr,path=%s "
++        "-tpmdev emulator,id=dev,chardev=chr "
++        "-device tpm-crb,tpmdev=dev ",
++        src_tpm_addr->u.q_unix.path);
++
++    *src_qemu = qtest_init(src_qemu_args);
++
++    dst_qemu_args = g_strdup_printf(
++        "-chardev socket,id=chr,path=%s "
++        "-tpmdev emulator,id=dev,chardev=chr "
++        "-device tpm-crb,tpmdev=dev "
++        "-incoming %s",
++        dst_tpm_addr->u.q_unix.path,
++        miguri);
++
++    *dst_qemu = qtest_init(dst_qemu_args);
++
++    free(src_qemu_args);
++    free(dst_qemu_args);
++}
+diff --git a/tests/tpm-util.h b/tests/tpm-util.h
+index d155d99aea..b6253106d9 100644
+--- a/tests/tpm-util.h
++++ b/tests/tpm-util.h
+@@ -33,4 +33,14 @@ gboolean tpm_util_swtpm_start(const char *path, GPid *pid,
+                               SocketAddress **addr, GError **error);
+ void tpm_util_swtpm_kill(GPid pid);
+ 
++void tpm_util_migrate(QTestState *who, const char *uri);
++
++void tpm_util_migration_start_qemu(QTestState **src_qemu,
++                                   QTestState **dst_qemu,
++                                   SocketAddress *src_tpm_addr,
++                                   SocketAddress *dst_tpm_addr,
++                                   const char *miguri);
++
++void tpm_util_wait_for_migration_complete(QTestState *who);
++
+ #endif /* TESTS_TPM_UTIL_H */
 -- 
-2.17.0
+2.14.3
