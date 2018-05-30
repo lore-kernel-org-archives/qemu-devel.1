@@ -1,24 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33781)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33764)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fO5Q2-0002Bq-4X
-	for qemu-devel@nongnu.org; Wed, 30 May 2018 14:01:59 -0400
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fO5Q0-0004sM-Kl
+	(envelope-from <richard.henderson@linaro.org>) id 1fO5Q1-0002B9-J8
 	for qemu-devel@nongnu.org; Wed, 30 May 2018 14:01:54 -0400
-Received: from mail-pl0-x22c.google.com ([2607:f8b0:400e:c01::22c]:38157)
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <richard.henderson@linaro.org>) id 1fO5Px-0004on-LL
+	for qemu-devel@nongnu.org; Wed, 30 May 2018 14:01:53 -0400
+Received: from mail-pf0-x243.google.com ([2607:f8b0:400e:c00::243]:37307)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1fO5Q0-0004rA-2P
-	for qemu-devel@nongnu.org; Wed, 30 May 2018 14:01:52 -0400
-Received: by mail-pl0-x22c.google.com with SMTP id c11-v6so11554558plr.5
-	for <qemu-devel@nongnu.org>; Wed, 30 May 2018 11:01:51 -0700 (PDT)
+	id 1fO5Px-0004oC-E3
+	for qemu-devel@nongnu.org; Wed, 30 May 2018 14:01:49 -0400
+Received: by mail-pf0-x243.google.com with SMTP id e9-v6so9408629pfi.4
+	for <qemu-devel@nongnu.org>; Wed, 30 May 2018 11:01:49 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Wed, 30 May 2018 11:01:20 -0700
-Message-Id: <20180530180120.13355-19-richard.henderson@linaro.org>
+Date: Wed, 30 May 2018 11:01:18 -0700
+Message-Id: <20180530180120.13355-17-richard.henderson@linaro.org>
 In-Reply-To: <20180530180120.13355-1-richard.henderson@linaro.org>
 References: <20180530180120.13355-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH v3b 18/18] target/arm: Implement SVE Floating
- Point Arithmetic - Unpredicated Group
+Subject: [Qemu-devel] [PATCH v3b 16/18] target/arm: Implement FDUP/DUP
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,212 +31,73 @@ Cc: peter.maydell@linaro.org, qemu-arm@nongnu.org
 
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/arm/helper-sve.h    | 14 ++++++++
- target/arm/helper.h        | 19 +++++++++++
- target/arm/translate-sve.c | 42 +++++++++++++++++++++++
- target/arm/vec_helper.c    | 69 ++++++++++++++++++++++++++++++++++++++
- target/arm/sve.decode      | 10 ++++++
- 5 files changed, 154 insertions(+)
+ target/arm/translate-sve.c | 37 +++++++++++++++++++++++++++++++++++++
+ target/arm/sve.decode      |  8 ++++++++
+ 2 files changed, 45 insertions(+)
 
-diff --git a/target/arm/helper-sve.h b/target/arm/helper-sve.h
-index 97bfe0f47b..2e76084992 100644
---- a/target/arm/helper-sve.h
-+++ b/target/arm/helper-sve.h
-@@ -705,3 +705,17 @@ DEF_HELPER_FLAGS_4(sve_umini_b, TCG_CALL_NO_RWG, void, ptr, ptr, i64, i32)
- DEF_HELPER_FLAGS_4(sve_umini_h, TCG_CALL_NO_RWG, void, ptr, ptr, i64, i32)
- DEF_HELPER_FLAGS_4(sve_umini_s, TCG_CALL_NO_RWG, void, ptr, ptr, i64, i32)
- DEF_HELPER_FLAGS_4(sve_umini_d, TCG_CALL_NO_RWG, void, ptr, ptr, i64, i32)
-+
-+DEF_HELPER_FLAGS_5(gvec_recps_h, TCG_CALL_NO_RWG,
-+                   void, ptr, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_5(gvec_recps_s, TCG_CALL_NO_RWG,
-+                   void, ptr, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_5(gvec_recps_d, TCG_CALL_NO_RWG,
-+                   void, ptr, ptr, ptr, ptr, i32)
-+
-+DEF_HELPER_FLAGS_5(gvec_rsqrts_h, TCG_CALL_NO_RWG,
-+                   void, ptr, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_5(gvec_rsqrts_s, TCG_CALL_NO_RWG,
-+                   void, ptr, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_5(gvec_rsqrts_d, TCG_CALL_NO_RWG,
-+                   void, ptr, ptr, ptr, ptr, i32)
-diff --git a/target/arm/helper.h b/target/arm/helper.h
-index 0c6a144458..879a7229e9 100644
---- a/target/arm/helper.h
-+++ b/target/arm/helper.h
-@@ -601,6 +601,25 @@ DEF_HELPER_FLAGS_5(gvec_fcmlas_idx, TCG_CALL_NO_RWG,
- DEF_HELPER_FLAGS_5(gvec_fcmlad, TCG_CALL_NO_RWG,
-                    void, ptr, ptr, ptr, ptr, i32)
- 
-+DEF_HELPER_FLAGS_5(gvec_fadd_h, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_5(gvec_fadd_s, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_5(gvec_fadd_d, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, ptr, i32)
-+
-+DEF_HELPER_FLAGS_5(gvec_fsub_h, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_5(gvec_fsub_s, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_5(gvec_fsub_d, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, ptr, i32)
-+
-+DEF_HELPER_FLAGS_5(gvec_fmul_h, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_5(gvec_fmul_s, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_5(gvec_fmul_d, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, ptr, i32)
-+
-+DEF_HELPER_FLAGS_5(gvec_ftsmul_h, TCG_CALL_NO_RWG,
-+                   void, ptr, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_5(gvec_ftsmul_s, TCG_CALL_NO_RWG,
-+                   void, ptr, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_5(gvec_ftsmul_d, TCG_CALL_NO_RWG,
-+                   void, ptr, ptr, ptr, ptr, i32)
-+
- #ifdef TARGET_AARCH64
- #include "helper-a64.h"
- #include "helper-sve.h"
 diff --git a/target/arm/translate-sve.c b/target/arm/translate-sve.c
-index 78e74047c8..cea64dfc18 100644
+index 75eb36f110..e470f3b745 100644
 --- a/target/arm/translate-sve.c
 +++ b/target/arm/translate-sve.c
-@@ -3364,6 +3364,48 @@ DO_ZZI(UMIN, umin)
- 
- #undef DO_ZZI
+@@ -3183,6 +3183,43 @@ static bool trans_WHILE(DisasContext *s, arg_WHILE *a, uint32_t insn)
+     return true;
+ }
  
 +/*
-+ *** SVE Floating Point Arithmetic - Unpredicated Group
++ *** SVE Integer Wide Immediate - Unpredicated Group
 + */
 +
-+static bool do_zzz_fp(DisasContext *s, arg_rrr_esz *a,
-+                      gen_helper_gvec_3_ptr *fn)
++static bool trans_FDUP(DisasContext *s, arg_FDUP *a, uint32_t insn)
 +{
-+    if (fn == NULL) {
++    if (a->esz == 0) {
 +        return false;
 +    }
 +    if (sve_access_check(s)) {
 +        unsigned vsz = vec_full_reg_size(s);
-+        TCGv_ptr status = get_fpstatus_ptr(a->esz == MO_16);
-+        tcg_gen_gvec_3_ptr(vec_full_reg_offset(s, a->rd),
-+                           vec_full_reg_offset(s, a->rn),
-+                           vec_full_reg_offset(s, a->rm),
-+                           status, vsz, vsz, 0, fn);
-+        tcg_temp_free_ptr(status);
++        int dofs = vec_full_reg_offset(s, a->rd);
++        uint64_t imm;
++
++        /* Decode the VFP immediate.  */
++        imm = vfp_expand_imm(a->esz, a->imm);
++        imm = dup_const(a->esz, imm);
++
++        tcg_gen_gvec_dup64i(dofs, vsz, vsz, imm);
 +    }
 +    return true;
 +}
 +
++static bool trans_DUP_i(DisasContext *s, arg_DUP_i *a, uint32_t insn)
++{
++    if (a->esz == 0 && extract32(insn, 13, 1)) {
++        return false;
++    }
++    if (sve_access_check(s)) {
++        unsigned vsz = vec_full_reg_size(s);
++        int dofs = vec_full_reg_offset(s, a->rd);
 +
-+#define DO_FP3(NAME, name) \
-+static bool trans_##NAME(DisasContext *s, arg_rrr_esz *a, uint32_t insn) \
-+{                                                                   \
-+    static gen_helper_gvec_3_ptr * const fns[4] = {                 \
-+        NULL, gen_helper_gvec_##name##_h,                           \
-+        gen_helper_gvec_##name##_s, gen_helper_gvec_##name##_d      \
-+    };                                                              \
-+    return do_zzz_fp(s, a, fns[a->esz]);                            \
++        tcg_gen_gvec_dup64i(dofs, vsz, vsz, dup_const(a->esz, a->imm));
++    }
++    return true;
 +}
-+
-+DO_FP3(FADD_zzz, fadd)
-+DO_FP3(FSUB_zzz, fsub)
-+DO_FP3(FMUL_zzz, fmul)
-+DO_FP3(FTSMUL, ftsmul)
-+DO_FP3(FRECPS, recps)
-+DO_FP3(FRSQRTS, rsqrts)
-+
-+#undef DO_FP3
 +
  /*
   *** SVE Memory - 32-bit Gather and Unsized Contiguous Group
   */
-diff --git a/target/arm/vec_helper.c b/target/arm/vec_helper.c
-index ec705cfca5..4b5ec94698 100644
---- a/target/arm/vec_helper.c
-+++ b/target/arm/vec_helper.c
-@@ -427,3 +427,72 @@ void HELPER(gvec_fcmlad)(void *vd, void *vn, void *vm,
-     }
-     clear_tail(d, opr_sz, simd_maxsz(desc));
- }
-+
-+/* Floating-point trigonometric starting value.
-+ * See the ARM ARM pseudocode function FPTrigSMul.
-+ */
-+static float16 float16_ftsmul(float16 op1, uint16_t op2, float_status *stat)
-+{
-+    float16 result = float16_mul(op1, op1, stat);
-+    if (!float16_is_any_nan(result)) {
-+        result = float16_set_sign(result, op2 & 1);
-+    }
-+    return result;
-+}
-+
-+static float32 float32_ftsmul(float32 op1, uint32_t op2, float_status *stat)
-+{
-+    float32 result = float32_mul(op1, op1, stat);
-+    if (!float32_is_any_nan(result)) {
-+        result = float32_set_sign(result, op2 & 1);
-+    }
-+    return result;
-+}
-+
-+static float64 float64_ftsmul(float64 op1, uint64_t op2, float_status *stat)
-+{
-+    float64 result = float64_mul(op1, op1, stat);
-+    if (!float64_is_any_nan(result)) {
-+        result = float64_set_sign(result, op2 & 1);
-+    }
-+    return result;
-+}
-+
-+#define DO_3OP(NAME, FUNC, TYPE) \
-+void HELPER(NAME)(void *vd, void *vn, void *vm, void *stat, uint32_t desc) \
-+{                                                                          \
-+    intptr_t i, oprsz = simd_oprsz(desc);                                  \
-+    TYPE *d = vd, *n = vn, *m = vm;                                        \
-+    for (i = 0; i < oprsz / sizeof(TYPE); i++) {                           \
-+        d[i] = FUNC(n[i], m[i], stat);                                     \
-+    }                                                                      \
-+}
-+
-+DO_3OP(gvec_fadd_h, float16_add, float16)
-+DO_3OP(gvec_fadd_s, float32_add, float32)
-+DO_3OP(gvec_fadd_d, float64_add, float64)
-+
-+DO_3OP(gvec_fsub_h, float16_sub, float16)
-+DO_3OP(gvec_fsub_s, float32_sub, float32)
-+DO_3OP(gvec_fsub_d, float64_sub, float64)
-+
-+DO_3OP(gvec_fmul_h, float16_mul, float16)
-+DO_3OP(gvec_fmul_s, float32_mul, float32)
-+DO_3OP(gvec_fmul_d, float64_mul, float64)
-+
-+DO_3OP(gvec_ftsmul_h, float16_ftsmul, float16)
-+DO_3OP(gvec_ftsmul_s, float32_ftsmul, float32)
-+DO_3OP(gvec_ftsmul_d, float64_ftsmul, float64)
-+
-+#ifdef TARGET_AARCH64
-+
-+DO_3OP(gvec_recps_h, helper_recpsf_f16, float16)
-+DO_3OP(gvec_recps_s, helper_recpsf_f32, float32)
-+DO_3OP(gvec_recps_d, helper_recpsf_f64, float64)
-+
-+DO_3OP(gvec_rsqrts_h, helper_rsqrtsf_f16, float16)
-+DO_3OP(gvec_rsqrts_s, helper_rsqrtsf_f32, float32)
-+DO_3OP(gvec_rsqrts_d, helper_rsqrtsf_f64, float64)
-+
-+#endif
-+#undef DO_3OP
 diff --git a/target/arm/sve.decode b/target/arm/sve.decode
-index eee8726bdf..6f436f9096 100644
+index 4b718060a9..b8bd22aff7 100644
 --- a/target/arm/sve.decode
 +++ b/target/arm/sve.decode
-@@ -648,6 +648,16 @@ UMIN_zzi        00100101 .. 101 011 110 ........ .....          @rdn_i8u
- # SVE integer multiply immediate (unpredicated)
- MUL_zzi         00100101 .. 110 000 110 ........ .....          @rdn_i8s
+@@ -614,6 +614,14 @@ CTERM           00100101 1 sf:1 1 rm:5 001000 rn:5 ne:1 0000
+ # SVE integer compare scalar count and limit
+ WHILE           00100101 esz:2 1 rm:5 000 sf:1 u:1 1 rn:5 eq:1 rd:4
  
-+### SVE Floating Point Arithmetic - Unpredicated Group
++### SVE Integer Wide Immediate - Unpredicated Group
 +
-+# SVE floating-point arithmetic (unpredicated)
-+FADD_zzz        01100101 .. 0 ..... 000 000 ..... .....         @rd_rn_rm
-+FSUB_zzz        01100101 .. 0 ..... 000 001 ..... .....         @rd_rn_rm
-+FMUL_zzz        01100101 .. 0 ..... 000 010 ..... .....         @rd_rn_rm
-+FTSMUL          01100101 .. 0 ..... 000 011 ..... .....         @rd_rn_rm
-+FRECPS          01100101 .. 0 ..... 000 110 ..... .....         @rd_rn_rm
-+FRSQRTS         01100101 .. 0 ..... 000 111 ..... .....         @rd_rn_rm
++# SVE broadcast floating-point immediate (unpredicated)
++FDUP            00100101 esz:2 111 00 1110 imm:8 rd:5
++
++# SVE broadcast integer immediate (unpredicated)
++DUP_i           00100101 esz:2 111 00 011 . ........ rd:5       imm=%sh8_i8s
 +
  ### SVE Memory - 32-bit Gather and Unsized Contiguous Group
  
