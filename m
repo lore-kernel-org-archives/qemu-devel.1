@@ -1,25 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45001)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46576)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fO0qD-0003Py-GQ
-	for qemu-devel@nongnu.org; Wed, 30 May 2018 09:08:42 -0400
+	(envelope-from <imammedo@redhat.com>) id 1fO0tv-0005gP-Ps
+	for qemu-devel@nongnu.org; Wed, 30 May 2018 09:12:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fO0qC-0003h7-82
-	for qemu-devel@nongnu.org; Wed, 30 May 2018 09:08:37 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:44866 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1fO0qC-0003bw-3F
-	for qemu-devel@nongnu.org; Wed, 30 May 2018 09:08:36 -0400
-References: <20180530090121.28154-1-chen_han_xiao@126.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <a1533da5-308d-59c7-a0a4-863fb02d771b@redhat.com>
-Date: Wed, 30 May 2018 08:08:33 -0500
+	(envelope-from <imammedo@redhat.com>) id 1fO0ts-0006DT-BI
+	for qemu-devel@nongnu.org; Wed, 30 May 2018 09:12:27 -0400
+Date: Wed, 30 May 2018 15:12:12 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20180530151212.47455e78@redhat.com>
+In-Reply-To: <20180517081527.14410-6-david@redhat.com>
+References: <20180517081527.14410-1-david@redhat.com>
+	<20180517081527.14410-6-david@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20180530090121.28154-1-chen_han_xiao@126.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2] qga: add mountpoint usage to
- GuestFilesystemInfo
+Subject: Re: [Qemu-devel] [PATCH v4 05/14] pc: route all memory devices
+ through the machine hotplug handler
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,44 +24,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Chen Hanxiao <chen_han_xiao@126.com>, qemu-devel@nongnu.org
-Cc: Michael Roth <mdroth@linux.vnet.ibm.com>
+To: David Hildenbrand <david@redhat.com>
+Cc: qemu-devel@nongnu.org, Pankaj Gupta <pagupta@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Cornelia Huck <cohuck@redhat.com>, Markus Armbruster <armbru@redhat.com>, Alexander Graf <agraf@suse.de>, Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org, qemu-ppc@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Luiz Capitulino <lcapitulino@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Richard Henderson <rth@twiddle.net>
 
-On 05/30/2018 04:01 AM, Chen Hanxiao wrote:
-> From: Chen Hanxiao <chenhanxiao@gmail.com>
+On Thu, 17 May 2018 10:15:18 +0200
+David Hildenbrand <david@redhat.com> wrote:
+
+> Necessary to hotplug them cleanly later. We could drop the PC_DIMM
+> check, as PC_DIMM are just memory devices, but this approach is cleaner.
 > 
-> This patch adds support for getting the usage of mounted
-> filesystem.
-> It's very useful when we try to monitor guest's filesystem.
-> 
-> Cc: Michael Roth <mdroth@linux.vnet.ibm.com>
-> Signed-off-by: Chen Hanxiao <chenhanxiao@gmail.com>
+> Signed-off-by: David Hildenbrand <david@redhat.com>
 > ---
-> v2:
->     add description in qapi-schema and version numbers
-
-> +# @usage: file system usage, integer between 0 and 100 (since 3.0)
-
-I still find this as being too imprecise.  Don't throw away data learned 
-from the guest that the client might like to know.  Either provide a 
-floating point between 0 and 1, or provide the two actual statvfs() 
-numbers (used and total) directly and let the client perform the 
-division to learn the ratio.
-
->   # @disk: an array of disk hardware information that the volume lies on,
->   #        which may be empty if the disk type is not supported
->   #
->   # Since: 2.2
->   ##
->   { 'struct': 'GuestFilesystemInfo',
-> -  'data': {'name': 'str', 'mountpoint': 'str', 'type': 'str',
-> +  'data': {'name': 'str', 'mountpoint': 'str', 'type': 'str', 'usage': 'int',
->              'disk': ['GuestDiskAddress']} }
->   
->   ##
+>  hw/i386/pc.c | 2 ++
+>  1 file changed, 2 insertions(+)
 > 
+> diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+> index 510076e156..8bc41ef24b 100644
+> --- a/hw/i386/pc.c
+> +++ b/hw/i386/pc.c
+> @@ -74,6 +74,7 @@
+>  #include "hw/nmi.h"
+>  #include "hw/i386/intel_iommu.h"
+>  #include "hw/net/ne2000-isa.h"
+> +#include "hw/mem/memory-device.h"
+>  
+>  /* debug PC/ISA interrupts */
+>  //#define DEBUG_IRQ
+> @@ -2075,6 +2076,7 @@ static HotplugHandler *pc_get_hotpug_handler(MachineState *machine,
+>                                               DeviceState *dev)
+>  {
+>      if (object_dynamic_cast(OBJECT(dev), TYPE_PC_DIMM) ||
+> +        object_dynamic_cast(OBJECT(dev), TYPE_MEMORY_DEVICE) ||
+you probably could drop TYPE_PC_DIMM above, it's redundant since DIMM
+can be cast to TYPE_MEMORY_DEVICE
 
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+ditto for spapr
+
+>          object_dynamic_cast(OBJECT(dev), TYPE_CPU)) {
+>          return HOTPLUG_HANDLER(machine);
+>      }
