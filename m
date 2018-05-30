@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40248)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40271)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jemmy858585@gmail.com>) id 1fNxe8-0000K4-NO
-	for qemu-devel@nongnu.org; Wed, 30 May 2018 05:43:57 -0400
+	(envelope-from <jemmy858585@gmail.com>) id 1fNxeB-0000KS-FB
+	for qemu-devel@nongnu.org; Wed, 30 May 2018 05:44:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jemmy858585@gmail.com>) id 1fNxe7-0006ns-N5
-	for qemu-devel@nongnu.org; Wed, 30 May 2018 05:43:56 -0400
-Received: from mail-pg0-x233.google.com ([2607:f8b0:400e:c05::233]:33251)
+	(envelope-from <jemmy858585@gmail.com>) id 1fNxeA-0006oY-5r
+	for qemu-devel@nongnu.org; Wed, 30 May 2018 05:43:59 -0400
+Received: from mail-pf0-x242.google.com ([2607:f8b0:400e:c00::242]:42329)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <jemmy858585@gmail.com>)
-	id 1fNxe7-0006ne-H0
-	for qemu-devel@nongnu.org; Wed, 30 May 2018 05:43:55 -0400
-Received: by mail-pg0-x233.google.com with SMTP id e21-v6so7906523pgv.0
-	for <qemu-devel@nongnu.org>; Wed, 30 May 2018 02:43:55 -0700 (PDT)
+	id 1fNxe9-0006oM-U3
+	for qemu-devel@nongnu.org; Wed, 30 May 2018 05:43:58 -0400
+Received: by mail-pf0-x242.google.com with SMTP id p14-v6so8747363pfh.9
+	for <qemu-devel@nongnu.org>; Wed, 30 May 2018 02:43:57 -0700 (PDT)
 From: Lidong Chen <jemmy858585@gmail.com>
-Date: Wed, 30 May 2018 17:43:25 +0800
-Message-Id: <1527673416-31268-2-git-send-email-lidongchen@tencent.com>
+Date: Wed, 30 May 2018 17:43:26 +0800
+Message-Id: <1527673416-31268-3-git-send-email-lidongchen@tencent.com>
 In-Reply-To: <1527673416-31268-1-git-send-email-lidongchen@tencent.com>
 References: <1527673416-31268-1-git-send-email-lidongchen@tencent.com>
-Subject: [Qemu-devel] [PATCH v4 01/12] migration: disable RDMA WRITE after
- postcopy started
+Subject: [Qemu-devel] [PATCH v4 02/12] migration: create a dedicated
+ connection for rdma return path
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,72 +32,196 @@ Cc: qemu-devel@nongnu.org, adido@mellanox.com, Lidong Chen <jemmy858585@gmail.co
 
 From: Lidong Chen <jemmy858585@gmail.com>
 
-RDMA WRITE operations are performed with no notification to the destination
-qemu, then the destination qemu can not wakeup. This patch disable RDMA WRITE
-after postcopy started.
+If start a RDMA migration with postcopy enabled, the source qemu
+establish a dedicated connection for return path.
 
 Signed-off-by: Lidong Chen <lidongchen@tencent.com>
 Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 ---
- migration/qemu-file.c |  8 ++++++--
- migration/rdma.c      | 12 ++++++++++++
- 2 files changed, 18 insertions(+), 2 deletions(-)
+ migration/rdma.c | 94 ++++++++++++++++++++++++++++++++++++++++++++++++++++++--
+ 1 file changed, 91 insertions(+), 3 deletions(-)
 
-diff --git a/migration/qemu-file.c b/migration/qemu-file.c
-index 0463f4c..977b9ae 100644
---- a/migration/qemu-file.c
-+++ b/migration/qemu-file.c
-@@ -253,8 +253,12 @@ size_t ram_control_save_page(QEMUFile *f, ram_addr_t block_offset,
-     if (f->hooks && f->hooks->save_page) {
-         int ret = f->hooks->save_page(f, f->opaque, block_offset,
-                                       offset, size, bytes_sent);
--        f->bytes_xfer += size;
--        if (ret != RAM_SAVE_CONTROL_DELAYED) {
-+        if (ret != RAM_SAVE_CONTROL_NOT_SUPP) {
-+            f->bytes_xfer += size;
-+        }
-+
-+        if (ret != RAM_SAVE_CONTROL_DELAYED &&
-+            ret != RAM_SAVE_CONTROL_NOT_SUPP) {
-             if (bytes_sent && *bytes_sent > 0) {
-                 qemu_update_position(f, *bytes_sent);
-             } else if (ret < 0) {
 diff --git a/migration/rdma.c b/migration/rdma.c
-index 7d233b0..a0748f4 100644
+index a0748f4..ec4bbff 100644
 --- a/migration/rdma.c
 +++ b/migration/rdma.c
-@@ -2930,6 +2930,10 @@ static size_t qemu_rdma_save_page(QEMUFile *f, void *opaque,
+@@ -387,6 +387,10 @@ typedef struct RDMAContext {
+     uint64_t unregistrations[RDMA_SIGNALED_SEND_MAX];
  
-     CHECK_ERROR_STATE();
+     GHashTable *blockmap;
++
++    /* the RDMAContext for return path */
++    struct RDMAContext *return_path;
++    bool is_return_path;
+ } RDMAContext;
  
-+    if (migrate_get_current()->state == MIGRATION_STATUS_POSTCOPY_ACTIVE) {
-+        return RAM_SAVE_CONTROL_NOT_SUPP;
+ #define TYPE_QIO_CHANNEL_RDMA "qio-channel-rdma"
+@@ -2332,10 +2336,22 @@ static void qemu_rdma_cleanup(RDMAContext *rdma)
+         rdma_destroy_id(rdma->cm_id);
+         rdma->cm_id = NULL;
+     }
++
++    /* the destination side, listen_id and channel is shared */
+     if (rdma->listen_id) {
+-        rdma_destroy_id(rdma->listen_id);
++        if (!rdma->is_return_path) {
++            rdma_destroy_id(rdma->listen_id);
++        }
+         rdma->listen_id = NULL;
++
++        if (rdma->channel) {
++            if (!rdma->is_return_path) {
++                rdma_destroy_event_channel(rdma->channel);
++            }
++            rdma->channel = NULL;
++        }
+     }
++
+     if (rdma->channel) {
+         rdma_destroy_event_channel(rdma->channel);
+         rdma->channel = NULL;
+@@ -2564,6 +2580,25 @@ err_dest_init_create_listen_id:
+ 
+ }
+ 
++static void qemu_rdma_return_path_dest_init(RDMAContext *rdma_return_path,
++                                            RDMAContext *rdma)
++{
++    int idx;
++
++    for (idx = 0; idx < RDMA_WRID_MAX; idx++) {
++        rdma_return_path->wr_data[idx].control_len = 0;
++        rdma_return_path->wr_data[idx].control_curr = NULL;
 +    }
 +
-     qemu_fflush(f);
++    /*the CM channel and CM id is shared*/
++    rdma_return_path->channel = rdma->channel;
++    rdma_return_path->listen_id = rdma->listen_id;
++
++    rdma->return_path = rdma_return_path;
++    rdma_return_path->return_path = rdma;
++    rdma_return_path->is_return_path = true;
++}
++
+ static void *qemu_rdma_data_init(const char *host_port, Error **errp)
+ {
+     RDMAContext *rdma = NULL;
+@@ -3021,6 +3056,8 @@ err:
+     return ret;
+ }
  
-     if (size > 0) {
-@@ -3489,6 +3493,10 @@ static int qemu_rdma_registration_start(QEMUFile *f, void *opaque,
++static void rdma_accept_incoming_migration(void *opaque);
++
+ static int qemu_rdma_accept(RDMAContext *rdma)
+ {
+     RDMACapabilities cap;
+@@ -3115,7 +3152,14 @@ static int qemu_rdma_accept(RDMAContext *rdma)
+         }
+     }
  
-     CHECK_ERROR_STATE();
+-    qemu_set_fd_handler(rdma->channel->fd, NULL, NULL, NULL);
++    /* Accept the second connection request for return path */
++    if (migrate_postcopy() && !rdma->is_return_path) {
++        qemu_set_fd_handler(rdma->channel->fd, rdma_accept_incoming_migration,
++                            NULL,
++                            (void *)(intptr_t)rdma->return_path);
++    } else {
++        qemu_set_fd_handler(rdma->channel->fd, NULL, NULL, NULL);
++    }
  
-+    if (migrate_get_current()->state == MIGRATION_STATUS_POSTCOPY_ACTIVE) {
-+        return 0;
+     ret = rdma_accept(rdma->cm_id, &conn_param);
+     if (ret) {
+@@ -3700,6 +3744,10 @@ static void rdma_accept_incoming_migration(void *opaque)
+ 
+     trace_qemu_rdma_accept_incoming_migration_accepted();
+ 
++    if (rdma->is_return_path) {
++        return;
 +    }
 +
-     trace_qemu_rdma_registration_start(flags);
-     qemu_put_be64(f, RAM_SAVE_FLAG_HOOK);
-     qemu_fflush(f);
-@@ -3511,6 +3519,10 @@ static int qemu_rdma_registration_stop(QEMUFile *f, void *opaque,
+     f = qemu_fopen_rdma(rdma, "rb");
+     if (f == NULL) {
+         ERROR(errp, "could not qemu_fopen_rdma!");
+@@ -3714,7 +3762,7 @@ static void rdma_accept_incoming_migration(void *opaque)
+ void rdma_start_incoming_migration(const char *host_port, Error **errp)
+ {
+     int ret;
+-    RDMAContext *rdma;
++    RDMAContext *rdma, *rdma_return_path;
+     Error *local_err = NULL;
  
-     CHECK_ERROR_STATE();
+     trace_rdma_start_incoming_migration();
+@@ -3741,12 +3789,24 @@ void rdma_start_incoming_migration(const char *host_port, Error **errp)
  
-+    if (migrate_get_current()->state == MIGRATION_STATUS_POSTCOPY_ACTIVE) {
-+        return 0;
+     trace_rdma_start_incoming_migration_after_rdma_listen();
+ 
++    /* initialize the RDMAContext for return path */
++    if (migrate_postcopy()) {
++        rdma_return_path = qemu_rdma_data_init(host_port, &local_err);
++
++        if (rdma_return_path == NULL) {
++            goto err;
++        }
++
++        qemu_rdma_return_path_dest_init(rdma_return_path, rdma);
 +    }
 +
-     qemu_fflush(f);
-     ret = qemu_rdma_drain_cq(f, rdma);
+     qemu_set_fd_handler(rdma->channel->fd, rdma_accept_incoming_migration,
+                         NULL, (void *)(intptr_t)rdma);
+     return;
+ err:
+     error_propagate(errp, local_err);
+     g_free(rdma);
++    g_free(rdma_return_path);
+ }
  
+ void rdma_start_outgoing_migration(void *opaque,
+@@ -3754,6 +3814,7 @@ void rdma_start_outgoing_migration(void *opaque,
+ {
+     MigrationState *s = opaque;
+     RDMAContext *rdma = qemu_rdma_data_init(host_port, errp);
++    RDMAContext *rdma_return_path = NULL;
+     int ret = 0;
+ 
+     if (rdma == NULL) {
+@@ -3774,6 +3835,32 @@ void rdma_start_outgoing_migration(void *opaque,
+         goto err;
+     }
+ 
++    /* RDMA postcopy need a seprate queue pair for return path */
++    if (migrate_postcopy()) {
++        rdma_return_path = qemu_rdma_data_init(host_port, errp);
++
++        if (rdma_return_path == NULL) {
++            goto err;
++        }
++
++        ret = qemu_rdma_source_init(rdma_return_path,
++            s->enabled_capabilities[MIGRATION_CAPABILITY_RDMA_PIN_ALL], errp);
++
++        if (ret) {
++            goto err;
++        }
++
++        ret = qemu_rdma_connect(rdma_return_path, errp);
++
++        if (ret) {
++            goto err;
++        }
++
++        rdma->return_path = rdma_return_path;
++        rdma_return_path->return_path = rdma;
++        rdma_return_path->is_return_path = true;
++    }
++
+     trace_rdma_start_outgoing_migration_after_rdma_connect();
+ 
+     s->to_dst_file = qemu_fopen_rdma(rdma, "wb");
+@@ -3781,4 +3868,5 @@ void rdma_start_outgoing_migration(void *opaque,
+     return;
+ err:
+     g_free(rdma);
++    g_free(rdma_return_path);
+ }
 -- 
 1.8.3.1
