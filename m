@@ -1,21 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58332)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58468)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1fO3co-0006pv-TE
-	for qemu-devel@nongnu.org; Wed, 30 May 2018 12:06:59 -0400
+	(envelope-from <kwolf@redhat.com>) id 1fO3dI-0007Fe-9z
+	for qemu-devel@nongnu.org; Wed, 30 May 2018 12:07:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1fO3co-0002jA-0a
-	for qemu-devel@nongnu.org; Wed, 30 May 2018 12:06:58 -0400
-Date: Wed, 30 May 2018 17:06:47 +0100
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20180530160647.GD5973@stefanha-x1.localdomain>
-References: <20180529055959.32002-1-famz@redhat.com>
+	(envelope-from <kwolf@redhat.com>) id 1fO3dH-0002pb-9x
+	for qemu-devel@nongnu.org; Wed, 30 May 2018 12:07:28 -0400
+Date: Wed, 30 May 2018 18:07:19 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20180530160719.GD4311@localhost.localdomain>
+References: <1514187226.13662.28.camel@intel.com>
+	<6e792b9f-2281-e8db-0410-c4c3468ffc90@redhat.com>
+	<20180508150309.GC4065@localhost.localdomain>
+	<20180509101618.GC19645@stefanha-x1.localdomain>
+	<d8a06161-d611-4f27-f4c8-f14370f191d4@redhat.com>
+	<20180510082659.GC1296@stefanha-x1.localdomain>
+	<20180511172531.GB5016@localhost.localdomain>
+	<20180514134846.GD5182@stefanha-x1.localdomain>
+	<20180530144450.GB5973@stefanha-x1.localdomain>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="MAH+hnPXVZWQ5cD/"
+	protocol="application/pgp-signature"; boundary="VS++wcV0S1rZb1Fb"
 Content-Disposition: inline
-In-Reply-To: <20180529055959.32002-1-famz@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v7 00/10] qemu-img convert with copy
- offloading
+In-Reply-To: <20180530144450.GB5973@stefanha-x1.localdomain>
+Subject: Re: [Qemu-devel] [Qemu-block] Some question about savem/qcow2
+ incremental snapshot
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,74 +32,94 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Ronnie Sahlberg <ronniesahlberg@gmail.com>, qemu-block@nongnu.org, Peter Lieven <pl@kamp.de>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, eblake@redhat.com
+To: Stefan Hajnoczi <stefanha@redhat.com>
+Cc: Max Reitz <mreitz@redhat.com>, He Junyan <junyan.he@intel.com>, Pankaj Gupta <pagupta@redhat.com>, qemu-devel@nongnu.org, qemu block <qemu-block@nongnu.org>
 
 
---MAH+hnPXVZWQ5cD/
-Content-Type: text/plain; charset=utf-8
+--VS++wcV0S1rZb1Fb
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, May 29, 2018 at 01:59:49PM +0800, Fam Zheng wrote:
-> v7: Fix qcow2.
+Am 30.05.2018 um 16:44 hat Stefan Hajnoczi geschrieben:
+> On Mon, May 14, 2018 at 02:48:47PM +0100, Stefan Hajnoczi wrote:
+> > On Fri, May 11, 2018 at 07:25:31PM +0200, Kevin Wolf wrote:
+> > > Am 10.05.2018 um 10:26 hat Stefan Hajnoczi geschrieben:
+> > > > On Wed, May 09, 2018 at 07:54:31PM +0200, Max Reitz wrote:
+> > > > > On 2018-05-09 12:16, Stefan Hajnoczi wrote:
+> > > > > > On Tue, May 08, 2018 at 05:03:09PM +0200, Kevin Wolf wrote:
+> > > > > >> Am 08.05.2018 um 16:41 hat Eric Blake geschrieben:
+> > > > > >>> On 12/25/2017 01:33 AM, He Junyan wrote:
+> > > > > >> I think it makes sense to invest some effort into such interfa=
+ces, but
+> > > > > >> be prepared for a long journey.
+> > > > > >=20
+> > > > > > I like the suggestion but it needs to be followed up with a con=
+crete
+> > > > > > design that is feasible and fair for Junyan and others to imple=
+ment.
+> > > > > > Otherwise the "long journey" is really just a way of rejecting =
+this
+> > > > > > feature.
 >=20
-> v6: Pick up rev-by from Stefan and Eric.
->     Tweak patch 2 commit message.
+> The discussion on NVDIMM via the block layer has runs its course.  It
+> would be a big project and I don't think it's fair to ask Junyan to
+> implement it.
 >=20
-> v5: - Fix raw offset/bytes check for read. [Eric]
->     - Fix qcow2_handle_l2meta. [Stefan]
->     - Add coroutine_fn whereever appropriate. [Stefan]
+> My understanding is this patch series doesn't modify the qcow2 on-disk
+> file format.  Rather, it just uses existing qcow2 mechanisms and extends
+> live migration to identify the NVDIMM state state region to share the
+> clusters.
 >=20
-> v4: - Fix raw offset and size. [Eric]
->     - iscsi: Drop unnecessary return values and variables in favor of
->       constants. [Stefan]
->     - qcow2: Handle small backing case. [Stefan]
->     - file-posix: Translate ENOSYS to ENOTSUP. [Stefan]
->     - API documentation and commit message. [Stefan]
->     - Add rev-by to patches 3, 5 - 10. [Stefan, Eric]
+> Since this feature does not involve qcow2 format changes and is just an
+> optimization (dirty blocks still need to be allocated), it can be
+> removed from QEMU in the future if a better alternative becomes
+> available.
 >=20
-> This series introduces block layer API for copy offloading and makes use =
-of it
-> in qemu-img convert.
+> Junyan: Can you rebase the series and send a new revision?
 >=20
-> For now we implemented the operation in local file protocol with
-> copy_file_range(2).  Besides that it's possible to add similar to iscsi, =
-nfs
-> and potentially more.
->=20
-> As far as its usage goes, in addition to qemu-img convert, we can emulate
-> offloading in scsi-disk (handle EXTENDED COPY command), and use the API in
-> block jobs too.
+> Kevin and Max: Does this sound alright?
 
-Fails to compile on Fedora 28.
+Do patches exist? I've never seen any, so I thought this was just the
+early design stage.
 
-Oops, I guess my glibc is too new.  This type of bug doesn't happen very
-often :D :D :D.
+I suspect that while it wouldn't change the qcow2 on-disk format in a
+way that the qcow2 spec would have to be change, it does need to change
+the VMState format that is stored as a blob within the qcow2 file.
+At least, you need to store which other snapshot it is based upon so
+that you can actually resume a VM from the incremental state.
 
-block/file-posix.c:1452:14: error: static declaration of =E2=80=98copy_file=
-_range=E2=80=99 follows non-static declaration
- static off_t copy_file_range(int in_fd, off_t *in_off, int out_fd,
-              ^~~~~~~~~~~~~~~
-In file included from /home/stefanha/qemu/include/qemu/osdep.h:75,
-                 from block/file-posix.c:25:
-/usr/include/unistd.h:1107:9: note: previous declaration of =E2=80=98copy_f=
-ile_range=E2=80=99 was here
- ssize_t copy_file_range (int __infd, __off64_t *__pinoff,
-         ^~~~~~~~~~~~~~~
+Once you modify the VMState format/the migration stream, removing it
+=66rom QEMU again later means that you can't load your old snapshots any
+more. Doing that, even with the two-release deprecation period, would be
+quite nasty.
 
---MAH+hnPXVZWQ5cD/
+But you're right, depending on how the feature is implemented, it might
+not be a thing that affects qcow2 much, but one that the migration
+maintainers need to have a look at. I kind of suspect that it would
+actually touch both parts to a degree that it would need approval from
+both sides.
+
+Kevin
+
+--VS++wcV0S1rZb1Fb
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEcBAEBAgAGBQJbDswXAAoJEJykq7OBq3PIG70H/0rZKyzpx5yrKGHRiRnNFlzc
-8GdVPMAYjiCupplS73aCH6lwq2irMbvCMF56vkT/3ohXDTUh+O8zYgdffEcqHTkg
-YRp3MUTjqocTWn8+TRvjUl4yR0n0IxtLhMWg+AtwFNmTFunX6k6tpbkOo7j3Xj7U
-NMVPJjA6AwCFAR9q58doeN5ewihqeJboTqVeyDQjYOLTeafeWkgyZsuVAQWkIJun
-Ijkxlwzyi8NCNSz24XkUQMCFt23YySNtOp9YbBIrCxBge0Z10J3qJBqKsgYlRcjt
-IpPtcgzhNi6JpRNSJZsKFguxcIZfC/9jKtt5UK/ok2MRVqQISYSZ8PvyPNp8G9w=
-=3S7A
+iQIcBAEBAgAGBQJbDsw3AAoJEH8JsnLIjy/WKNMQAISgXP/stVQIS1U7HY9uUpG8
+RKbZwwV5BhUZ1TnQ6vfNSxY+WruOaZslr7nzYHoPdeZCbop/NSOasvlRi5WZcpBN
+tYeei+sdKx95CcthtcRxK0pbr/cJ/mw2xumzFzPpoJ4sUXuOUzUg6GuznhkUUYJE
+kAXq7xpHQs64tSvq0x4kr1CiQwQK/e40BtwLLZRw/otObRMVDhQBqAJQEs1Xi4kK
+gceaQZQKG6CwKZz7+KY/WE2YwaHe1YcZf4WFk+YSGW5aIbthgBIHAA0iQQEyQVM+
+73sgI3UYRNlEzOpU38Ta9uhtIhP802IOzgTlSBJBNOMBE/5oo2TiDVFZ8bFJLF4s
+Zj7zBPCe7MgcFlcO0/qIZdm5LEFdG3TyPdR9MOch+wMsEAQTmgJHGYSH8T6WVV3Z
+4+Bc7SvwFaaszdM1BvA6CU0aK04CI7PjUR1sZDCh4RP/8kt0RCgMG2hVRsyzrPUC
+LPJs5LuiZgzuIo2tMLjd3ZHCCwQ6fUiclj/u2BGYKD5EUHMCJj3I2jF0J2WbFTOk
+AWGsb9/4B1UWms7wPlGHZHYUdtqLHrpQLOAU7luEUjcTb71UHFLUNezQ/CmD/O3G
+vt/X6EcJ8GW94EJGNqX/aw11lTNx4KjvTN2kHTSt3lTgQ4OY0izkMJcMKRKIc0fU
+1QsEtTSLSJJjGcHdGgmv
+=C8FX
 -----END PGP SIGNATURE-----
 
---MAH+hnPXVZWQ5cD/--
+--VS++wcV0S1rZb1Fb--
