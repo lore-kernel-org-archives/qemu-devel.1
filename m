@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39539)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39746)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <shameerali.kolothum.thodi@huawei.com>)
-	id 1fO2Ml-0006UY-79
-	for qemu-devel@nongnu.org; Wed, 30 May 2018 10:46:20 -0400
+	id 1fO2NZ-00073B-9z
+	for qemu-devel@nongnu.org; Wed, 30 May 2018 10:47:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <shameerali.kolothum.thodi@huawei.com>)
-	id 1fO2Mj-00017q-Rp
-	for qemu-devel@nongnu.org; Wed, 30 May 2018 10:46:19 -0400
+	id 1fO2NX-0001WS-Oe
+	for qemu-devel@nongnu.org; Wed, 30 May 2018 10:47:09 -0400
 From: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
-Date: Wed, 30 May 2018 14:46:00 +0000
-Message-ID: <5FC3163CFD30C246ABAA99954A238FA8386F17D9@FRAEML521-MBX.china.huawei.com>
+Date: Wed, 30 May 2018 14:46:49 +0000
+Message-ID: <5FC3163CFD30C246ABAA99954A238FA8386F17E6@FRAEML521-MBX.china.huawei.com>
 References: <20180516152026.2920-1-shameerali.kolothum.thodi@huawei.com>
-	<20180516152026.2920-4-shameerali.kolothum.thodi@huawei.com>
-	<1f8e3cd4-1e54-5350-3804-c77bbbfbd3e4@redhat.com>
-In-Reply-To: <1f8e3cd4-1e54-5350-3804-c77bbbfbd3e4@redhat.com>
+	<20180516152026.2920-5-shameerali.kolothum.thodi@huawei.com>
+	<fb37761c-6e74-5aca-b258-8d8c060ca4dc@redhat.com>
+In-Reply-To: <fb37761c-6e74-5aca-b258-8d8c060ca4dc@redhat.com>
 Content-Language: en-US
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [RFC v2 3/6] hw/arm/virt: Add pc-dimm mem hotplug
- framework
+Subject: Re: [Qemu-devel] [RFC v2 4/6] hw/arm: Changes required to
+ accommodate non-contiguous DT mem nodes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,7 +29,7 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Auger Eric <eric.auger@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>
-Cc: "drjones@redhat.com" <drjones@redhat.com>, "imammedo@redhat.com" <imammedo@redhat.com>, "peter.maydell@linaro.org" <peter.maydell@linaro.org>, "alex.williamson@redhat.com" <alex.williamson@redhat.com>, Zhaoshenglong <zhaoshenglong@huawei.com>, Jonathan Cameron <jonathan.cameron@huawei.com>, Linuxarm <linuxarm@huawei.com>
+Cc: "peter.maydell@linaro.org" <peter.maydell@linaro.org>, "drjones@redhat.com" <drjones@redhat.com>, Jonathan Cameron <jonathan.cameron@huawei.com>, Linuxarm <linuxarm@huawei.com>, "alex.williamson@redhat.com" <alex.williamson@redhat.com>, Zhaoshenglong <zhaoshenglong@huawei.com>, "imammedo@redhat.com" <imammedo@redhat.com>
 
 Hi Eric,
 
@@ -38,167 +38,220 @@ Hi Eric,
 > Sent: Monday, May 28, 2018 3:22 PM
 > To: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>;
 > qemu-devel@nongnu.org; qemu-arm@nongnu.org
-> Cc: drjones@redhat.com; imammedo@redhat.com; peter.maydell@linaro.org;
+> Cc: peter.maydell@linaro.org; drjones@redhat.com; Jonathan Cameron
+> <jonathan.cameron@huawei.com>; Linuxarm <linuxarm@huawei.com>;
 > alex.williamson@redhat.com; Zhaoshenglong <zhaoshenglong@huawei.com>;
-> Jonathan Cameron <jonathan.cameron@huawei.com>; Linuxarm
-> <linuxarm@huawei.com>
-> Subject: Re: [RFC v2 3/6] hw/arm/virt: Add pc-dimm mem hotplug framework
+> imammedo@redhat.com
+> Subject: Re: [Qemu-devel] [RFC v2 4/6] hw/arm: Changes required to
+> accommodate non-contiguous DT mem nodes
 >=20
 > Hi Shameer,
 >=20
 > On 05/16/2018 05:20 PM, Shameer Kolothum wrote:
-> > This will be used in subsequent patches to model a chunk of
-> > memory as pc-dimm(cold plug) if the valid iova regions are
-> > non-contiguous. This is not yet a full hotplug support.
-> Please can you give more details about this restriction?
-> >
+> > This makes changes to the DT mem node creation such that its easier
+> > to add non-contiguous mem modeled as non-pluggable and a pc-dimm
+> > mem later.
+> See comments below. I think you should augment the description here with
+> what the patch exactly adds:
+> - a new helper function
+> - a new dimm node?
+>=20
+> and if possible split functional changes into separate patches?
+
+Agree. It is better to split this.
+
 > > Signed-off-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
 > > ---
-> >  default-configs/aarch64-softmmu.mak |  1 +
-> >  hw/arm/virt.c                       | 82
-> +++++++++++++++++++++++++++++++++++++
-> >  include/hw/arm/virt.h               |  2 +
-> >  3 files changed, 85 insertions(+)
+> >  hw/arm/boot.c        | 91 ++++++++++++++++++++++++++++++++++++--------=
+--
+> ------
+> >  include/hw/arm/arm.h | 12 +++++++
+> >  2 files changed, 75 insertions(+), 28 deletions(-)
 > >
-> > diff --git a/default-configs/aarch64-softmmu.mak b/default-configs/aarc=
-h64-
-> softmmu.mak
-> > index 9ddccf8..7a82ed8 100644
-> > --- a/default-configs/aarch64-softmmu.mak
-> > +++ b/default-configs/aarch64-softmmu.mak
-> > @@ -8,3 +8,4 @@ CONFIG_DDC=3Dy
-> >  CONFIG_DPCD=3Dy
-> >  CONFIG_XLNX_ZYNQMP=3Dy
-> >  CONFIG_XLNX_ZYNQMP_ARM=3Dy
-> > +CONFIG_MEM_HOTPLUG=3Dy
-> > diff --git a/hw/arm/virt.c b/hw/arm/virt.c
-> > index 05fcb62..be3ad14 100644
-> > --- a/hw/arm/virt.c
-> > +++ b/hw/arm/virt.c
-> > @@ -1552,9 +1552,82 @@ static const CPUArchIdList
-> *virt_possible_cpu_arch_ids(MachineState *ms)
-> >      return ms->possible_cpus;
+> > diff --git a/hw/arm/boot.c b/hw/arm/boot.c
+> > index 26184bc..73db0aa 100644
+> > --- a/hw/arm/boot.c
+> > +++ b/hw/arm/boot.c
+> > @@ -486,6 +486,27 @@ static void fdt_add_psci_node(void *fdt)
+> >      qemu_fdt_setprop_cell(fdt, "/psci", "migrate", migrate_fn);
 > >  }
 > >
-> > +static void virt_dimm_plug(HotplugHandler *hotplug_dev,
-> > +                         DeviceState *dev, Error **errp)
-> > +{
-> > +    VirtMachineState *vms =3D VIRT_MACHINE(hotplug_dev);
-> > +    PCDIMMDevice *dimm =3D PC_DIMM(dev);
-> > +    PCDIMMDeviceClass *ddc =3D PC_DIMM_GET_CLASS(dimm);
-> > +    MemoryRegion *mr;
-> > +    uint64_t align;
-> > +    Error *local_err =3D NULL;
-> > +
-> > +    mr =3D ddc->get_memory_region(dimm, &local_err);
-> > +    if (local_err) {
-> > +        goto out;
-> > +    }
-> > +
-> > +    align =3D memory_region_get_alignment(mr);
-> I see that on PC machine class they have an "enforce_aligned_dimm"
-> option. Also looks memory_region_get_alignment(mr) can return 0.
->=20
-> if (memory_region_get_alignment(mr) && pcmc->enforce_aligned_dimm) {
+> > +static char *create_memory_fdt(void *fdt, uint32_t acells, hwaddr
+> mem_base,
+> > +                                          uint32_t scells, hwaddr mem_=
+len)
+> Other dt node creation functions are named fdt_add_*_node
 
 Ok.
-=20
->=20
-> > +    pc_dimm_memory_plug(dev, &vms->hotplug_memory, mr, align,
-> &local_err);
-> > +    if (local_err) {
-> > +        goto out;
-> > +    }
-> useless block and error_propagate does nothing if local_err is NULL so
-> we are fine.
 
-Ok. I will remove this from this patch.
-
-> > +
-> > +out:
-> > +    error_propagate(errp, local_err);
-> > +}
-> > +
-> > +static void virt_dimm_unplug(HotplugHandler *hotplug_dev,
-> > +                           DeviceState *dev, Error **errp)
 > > +{
-> > +    VirtMachineState *vms =3D VIRT_MACHINE(hotplug_dev);
-> > +    PCDIMMDevice *dimm =3D PC_DIMM(dev);
-> > +    PCDIMMDeviceClass *ddc =3D PC_DIMM_GET_CLASS(dimm);
-> > +    MemoryRegion *mr;
-> > +    Error *local_err =3D NULL;
+> > +    char *nodename =3D NULL;
+> > +    int rc;
 > > +
-> > +    mr =3D ddc->get_memory_region(dimm, &local_err);
-> don't you want to avoid executing the following if local_err?
-
-True.
-
-> > +    pc_dimm_memory_unplug(dev, &vms->hotplug_memory, mr);
-> needs a rebase on top of "pc-dimm: no need to pass the memory region"
-> in master pc_dimm_memory_unplug we now have
->  MemoryRegion *mr =3D ddc->get_memory_region(dimm, &error_abort);
-
-Right. I will follow that then.
-
-> Thanks
->=20
-> Eric
-> > +    object_unparent(OBJECT(dev));
-> > +
-> > +    error_propagate(errp, local_err);
-> > +}
-> > +
-> > +static void virt_machinedevice_plug_cb(HotplugHandler *hotplug_dev,
-> > +                                      DeviceState *dev, Error **errp)
-> > +{
-> > +    if (object_dynamic_cast(OBJECT(dev), TYPE_PC_DIMM)) {
-> > +        virt_dimm_plug(hotplug_dev, dev, errp);
-> > +    } else {
-> > +        error_setg(errp, "device plug request for not supported device=
-"
-> > +                   " type: %s", object_get_typename(OBJECT(dev)));
+> > +    nodename =3D g_strdup_printf("/memory@%" PRIx64, mem_base);
+> > +    qemu_fdt_add_subnode(fdt, nodename);
+> > +    qemu_fdt_setprop_string(fdt, nodename, "device_type", "memory");
+> > +    rc =3D qemu_fdt_setprop_sized_cells(fdt, nodename, "reg", acells,
+> mem_base,
+> > +                                      scells, mem_len);
+> > +    if (rc < 0) {
+> > +        fprintf(stderr, "couldn't set %s/reg\n", nodename);
+> > +        g_free(nodename);
+> > +        return NULL;
 > > +    }
+> > +
+> > +    return nodename;
 > > +}
 > > +
-> > +static void virt_machinedevice_unplug_cb(HotplugHandler *hotplug_dev,
-> > +                                        DeviceState *dev, Error **errp=
-)
-> > +{
-> > +    if (object_dynamic_cast(OBJECT(dev), TYPE_PC_DIMM)) {
-> > +        virt_dimm_unplug(hotplug_dev, dev, errp);
-> > +    } else {
-> > +        error_setg(errp, "device unplug for not supported device"
-> > +                   " type: %s", object_get_typename(OBJECT(dev)));
-> > +    }
-> > +}
 > > +
-> > +static HotplugHandler *virt_get_hotplug_handler(MachineState *machine,
-> > +                                             DeviceState *dev)
-> > +{
-> > +    if (object_dynamic_cast(OBJECT(dev), TYPE_PC_DIMM)) {
-> > +        return HOTPLUG_HANDLER(machine);
-> > +    }
-> > +    return NULL;
-> > +}
-> > +
-> >  static void virt_machine_class_init(ObjectClass *oc, void *data)
-> >  {
-> >      MachineClass *mc =3D MACHINE_CLASS(oc);
-> > +    HotplugHandlerClass *hc =3D HOTPLUG_HANDLER_CLASS(oc);
+> >  /**
+> >   * load_dtb() - load a device tree binary image into memory
+> >   * @addr:       the address to load the image at
+> > @@ -567,50 +588,64 @@ static int load_dtb(hwaddr addr, const struct
+> arm_boot_info *binfo,
+> >          goto fail;
+> >      }
 > >
-> >      mc->init =3D machvirt_init;
-> >      /* Start max_cpus at the maximum QEMU supports. We'll further rest=
-rict
-> > @@ -1573,6 +1646,11 @@ static void virt_machine_class_init(ObjectClass
-> *oc, void *data)
-> >      mc->cpu_index_to_instance_props =3D virt_cpu_index_to_props;
-> >      mc->default_cpu_type =3D ARM_CPU_TYPE_NAME("cortex-a15");
-> >      mc->get_default_cpu_node_id =3D virt_get_default_cpu_node_id;
+> > +    /*
+> > +     * Turn the /memory node created before into a NOP node, then crea=
+te
+> > +     * /memory@addr nodes for all numa nodes respectively.
+> > +     */
+> > +    qemu_fdt_nop_node(fdt, "/memory");
+> I don't really understand why this gets moved outside of the if
+> (nb_numa_nodes > 0) { check. Also the comment above mention numa nodes
+> whereas it are not necessarily in the numa case anymore.
+
+Hmm..I think this is because virt.c has a create_fdt() where "/memory " sub=
+node
+is created. May be I can keep that and update with non-plug mem and create =
+a new
+"/memory @" for pc-dimm case. I will double check.
+
 > > +
-> > +    mc->get_hotplug_handler =3D virt_get_hotplug_handler;
-> This requires a rebase on top of Igor's  and David's series.
->=20
-Sure.
+> >      if (nb_numa_nodes > 0) {
+> > -        /*
+> > -         * Turn the /memory node created before into a NOP node, then =
+create
+> > -         * /memory@addr nodes for all numa nodes respectively.
+> > -         */
+> > -        qemu_fdt_nop_node(fdt, "/memory");
+> > +        hwaddr mem_sz;
+> > +
+> >          mem_base =3D binfo->loader_start;
+> > +        mem_sz =3D binfo->ram_size;
+> >          for (i =3D 0; i < nb_numa_nodes; i++) {
+> > -            mem_len =3D numa_info[i].node_mem;
+> > -            nodename =3D g_strdup_printf("/memory@%" PRIx64, mem_base)=
+;
+> > -            qemu_fdt_add_subnode(fdt, nodename);
+> > -            qemu_fdt_setprop_string(fdt, nodename, "device_type", "mem=
+ory");
+> > -            rc =3D qemu_fdt_setprop_sized_cells(fdt, nodename, "reg",
+> > -                                              acells, mem_base,
+> > +            mem_len =3D MIN(numa_info[i].node_mem, mem_sz);
+> I fail to understand how this change relates to the topic of this patch.
+> If this adds a consistency check, this may be put in another patch?
+
+Yes. It is not related to this patch per se. But without this and some of t=
+he=20
+related mem_len/ mem_sz  changes below it will end up creating more num
+of memory nodes as the numa mem info is populated much earlier than we
+modify the ram_size(non-plug) info. I can move this and your related commen=
+t
+for acpi patch (5/6) to a separate patch.
+
+> > +
+> > +            nodename =3D create_memory_fdt(fdt, acells, mem_base,
+> >                                                scells, mem_len);
+> You could simplify the review by just introducing the new dt node
+> creation function in a 1st patch and then introduce the changes to
+> support non contiguous DT mem nodes.
+
+Ok. I will split.
+
+> > -            if (rc < 0) {
+> > -                fprintf(stderr, "couldn't set %s/reg for node %d\n", n=
+odename,
+> > -                        i);
+> > +            if (!nodename) {
+> >                  goto fail;
+> >              }
+> >
+> >              qemu_fdt_setprop_cell(fdt, nodename, "numa-node-id", i);
+> > -            mem_base +=3D mem_len;
+> >              g_free(nodename);
+> > +            mem_base +=3D mem_len;
+> > +            mem_sz -=3D mem_len;
+> > +            if (!mem_sz) {
+> > +                break;
+> So what does it mean practically if we break here. Not all the num nodes
+> will function? Outputting a mesg for the end user may be useful.
+
+The break here means we have populated mem nodes for non-plug ram case
+and the remaining mem(if any) will be based on the pc-dimm case. Yes, it=20
+is possible that Guest kernel will report memory-less numa nodes. I will ad=
+d
+a msg here.
+
+> > +           }
+> >          }
+> > -    } else {
+> > -        Error *err =3D NULL;
+> >
+> > -        rc =3D fdt_path_offset(fdt, "/memory");
+> > -        if (rc < 0) {
+> > -            qemu_fdt_add_subnode(fdt, "/memory");
+> > -        }
+> > +        /* Create the node for initial pc-dimm ram, if any */
+> > +        if (binfo->dimm_mem) {
+> >
+> > -        if (!qemu_fdt_getprop(fdt, "/memory", "device_type", NULL, &er=
+r)) {
+> > -            qemu_fdt_setprop_string(fdt, "/memory", "device_type", "me=
+mory");
+> > +            nodename =3D create_memory_fdt(fdt, acells, binfo->dimm_me=
+m-
+> >base,
+> > +                                              scells, binfo->dimm_mem-=
+>size);
+> > +            if (!nodename) {
+> > +                goto fail;
+> > +            }
+> > +            qemu_fdt_setprop_cell(fdt, nodename, "numa-node-id",
+> > +                                                 binfo->dimm_mem->node=
+);
+> > +            g_free(nodename);
+> >          }
+> >
+> > -        rc =3D qemu_fdt_setprop_sized_cells(fdt, "/memory", "reg",
+> > -                                          acells, binfo->loader_start,
+> > -                                          scells, binfo->ram_size);
+> > -        if (rc < 0) {
+> > -            fprintf(stderr, "couldn't set /memory/reg\n");
+> > +    } else {
+> > +
+> > +        nodename =3D create_memory_fdt(fdt, acells, binfo->loader_star=
+t,
+> > +                                         scells, binfo->ram_size);
+> > +        if (!nodename) {
+> >              goto fail;
+> >          }
+> > +
+> > +        if (binfo->dimm_mem) {
+> > +            nodename =3D create_memory_fdt(fdt, acells, binfo->dimm_me=
+m-
+> >base,
+> > +                                              scells, binfo->dimm_mem-=
+>size);
+> > +            if (!nodename) {
+> > +                goto fail;
+> > +            }
+> > +            g_free(nodename);
+> > +        }
+> as this code gets duplicated, a helper function may be relevant?
+
+Ok.
 
 Thanks,
 Shameer
@@ -206,41 +259,38 @@ Shameer
 > Thanks
 >=20
 > Eric
-> > +    hc->plug =3D virt_machinedevice_plug_cb;
-> > +    hc->unplug =3D virt_machinedevice_unplug_cb;
-> > +
-> >  }
+> >      }
 > >
-> >  static const TypeInfo virt_machine_info =3D {
-> > @@ -1582,6 +1660,10 @@ static const TypeInfo virt_machine_info =3D {
-> >      .instance_size =3D sizeof(VirtMachineState),
-> >      .class_size    =3D sizeof(VirtMachineClass),
-> >      .class_init    =3D virt_machine_class_init,
-> > +    .interfaces =3D (InterfaceInfo[]) {
-> > +         { TYPE_HOTPLUG_HANDLER },
-> > +         { }
-> > +    },
+> >      rc =3D fdt_path_offset(fdt, "/chosen");
+> > diff --git a/include/hw/arm/arm.h b/include/hw/arm/arm.h
+> > index ce769bd..0ee3b4e 100644
+> > --- a/include/hw/arm/arm.h
+> > +++ b/include/hw/arm/arm.h
+> > @@ -48,6 +48,12 @@ typedef struct {
+> >      ARMCPU *cpu; /* handle to the first cpu object */
+> >  } ArmLoadKernelNotifier;
+> >
+> > +struct dimm_mem_info {
+> > +    int node;
+> > +    hwaddr base;
+> > +    hwaddr size;
+> > +};
+> > +
+> >  /* arm_boot.c */
+> >  struct arm_boot_info {
+> >      uint64_t ram_size;
+> > @@ -124,6 +130,12 @@ struct arm_boot_info {
+> >      bool secure_board_setup;
+> >
+> >      arm_endianness endianness;
+> > +
+> > +    /* This is used to model a pc-dimm based mem if the valid iova reg=
+ion
+> > +     * is non-contiguous.
+> > +     */
+> > +    struct dimm_mem_info *dimm_mem;
+> > +
 > >  };
 > >
-> >  static void machvirt_machine_init(void)
-> > diff --git a/include/hw/arm/virt.h b/include/hw/arm/virt.h
-> > index fc24f3a..a39f29e 100644
-> > --- a/include/hw/arm/virt.h
-> > +++ b/include/hw/arm/virt.h
-> > @@ -35,6 +35,7 @@
-> >  #include "qemu/notify.h"
-> >  #include "hw/boards.h"
-> >  #include "hw/arm/arm.h"
-> > +#include "hw/mem/pc-dimm.h"
-> >
-> >  #define NUM_GICV2M_SPIS       64
-> >  #define NUM_VIRTIO_TRANSPORTS 32
-> > @@ -108,6 +109,7 @@ typedef struct {
-> >      uint32_t gic_phandle;
-> >      uint32_t msi_phandle;
-> >      int psci_conduit;
-> > +    MemoryHotplugState hotplug_memory;
-> >  } VirtMachineState;
-> >
-> >  #define TYPE_VIRT_MACHINE   MACHINE_TYPE_NAME("virt")
+> >  /**
 > >
