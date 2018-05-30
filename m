@@ -1,24 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34639)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34671)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1fNunT-0002BK-95
-	for qemu-devel@nongnu.org; Wed, 30 May 2018 02:41:24 -0400
+	(envelope-from <clg@kaod.org>) id 1fNunY-0002HI-2e
+	for qemu-devel@nongnu.org; Wed, 30 May 2018 02:41:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1fNunP-00014M-Be
-	for qemu-devel@nongnu.org; Wed, 30 May 2018 02:41:23 -0400
-Received: from 10.mo173.mail-out.ovh.net ([46.105.74.148]:44308)
+	(envelope-from <clg@kaod.org>) id 1fNunU-00017K-4T
+	for qemu-devel@nongnu.org; Wed, 30 May 2018 02:41:28 -0400
+Received: from 3.mo2.mail-out.ovh.net ([46.105.58.226]:40177)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1fNunP-00011h-52
-	for qemu-devel@nongnu.org; Wed, 30 May 2018 02:41:19 -0400
-Received: from player159.ha.ovh.net (unknown [10.109.122.81])
-	by mo173.mail-out.ovh.net (Postfix) with ESMTP id 76091C1CE7
-	for <qemu-devel@nongnu.org>; Wed, 30 May 2018 08:41:08 +0200 (CEST)
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1fNunT-00013F-V5
+	for qemu-devel@nongnu.org; Wed, 30 May 2018 02:41:24 -0400
+Received: from player159.ha.ovh.net (unknown [10.109.108.98])
+	by mo2.mail-out.ovh.net (Postfix) with ESMTP id 7A82613888F
+	for <qemu-devel@nongnu.org>; Wed, 30 May 2018 08:41:15 +0200 (CEST)
 From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
-Date: Wed, 30 May 2018 08:40:42 +0200
-Message-Id: <20180530064049.27976-1-clg@kaod.org>
+Date: Wed, 30 May 2018 08:40:43 +0200
+Message-Id: <20180530064049.27976-2-clg@kaod.org>
+In-Reply-To: <20180530064049.27976-1-clg@kaod.org>
+References: <20180530064049.27976-1-clg@kaod.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v7 0/7] aspeed: add a witherspoon-bmc machine
+Subject: [Qemu-devel] [PATCH v7 1/7] aspeed: remove
+ ignore_memory_transaction_failures on all boards
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,49 +33,42 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Peter Maydell <peter.maydell@linaro.org>
 Cc: qemu-arm@nongnu.org, qemu-devel@nongnu.org, Joel Stanley <joel@jms.id.au>, Andrew Jeffery <andrew@aj.id.au>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
 
-Hello
+Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+---
+ hw/arm/aspeed.c | 3 ---
+ 1 file changed, 3 deletions(-)
 
-This series adds a new Aspeed machine to emulate the BMC of a
-Witherspoon system. It also extends the other Aspeed machines with I2C
-devices and adds a simple model for the pca9552 LED blinker present on
-the Witherspoon board.
-
-Thanks,
-
-C.
-
-Changes since v6:
-
- - removed code duplication in the pca9552 test
- - removed the ROM memory region catching invalid writes
-
-C=C3=A9dric Le Goater (7):
-  aspeed: remove ignore_memory_transaction_failures on all boards
-  aspeed: add support for the witherspoon-bmc board
-  aspeed: add an I2C RTC device to all machines
-  smbus: add a smbus_eeprom_init_one() routine
-  aspeed: Add EEPROM I2C devices
-  misc: add pca9552 LED blinker model
-  aspeed: add the pc9552 chips to the witherspoon machine
-
- default-configs/arm-softmmu.mak |   1 +
- include/hw/i2c/smbus.h          |   1 +
- include/hw/misc/pca9552.h       |  32 ++++++
- include/hw/misc/pca9552_regs.h  |  32 ++++++
- tests/libqos/i2c.h              |   2 +
- hw/arm/aspeed.c                 |  88 ++++++++++++++-
- hw/i2c/smbus_eeprom.c           |  16 ++-
- hw/misc/pca9552.c               | 240 ++++++++++++++++++++++++++++++++++=
-++++++
- tests/pca9552-test.c            | 116 +++++++++++++++++++
- tests/tmp105-test.c             |   2 -
- hw/misc/Makefile.objs           |   1 +
- tests/Makefile.include          |   2 +
- 12 files changed, 523 insertions(+), 10 deletions(-)
- create mode 100644 include/hw/misc/pca9552.h
- create mode 100644 include/hw/misc/pca9552_regs.h
- create mode 100644 hw/misc/pca9552.c
- create mode 100644 tests/pca9552-test.c
-
+diff --git a/hw/arm/aspeed.c b/hw/arm/aspeed.c
+index aecb3c1e7578..133614a4384d 100644
+--- a/hw/arm/aspeed.c
++++ b/hw/arm/aspeed.c
+@@ -279,7 +279,6 @@ static void palmetto_bmc_class_init(ObjectClass *oc, =
+void *data)
+     mc->no_floppy =3D 1;
+     mc->no_cdrom =3D 1;
+     mc->no_parallel =3D 1;
+-    mc->ignore_memory_transaction_failures =3D true;
+ }
+=20
+ static const TypeInfo palmetto_bmc_type =3D {
+@@ -312,7 +311,6 @@ static void ast2500_evb_class_init(ObjectClass *oc, v=
+oid *data)
+     mc->no_floppy =3D 1;
+     mc->no_cdrom =3D 1;
+     mc->no_parallel =3D 1;
+-    mc->ignore_memory_transaction_failures =3D true;
+ }
+=20
+ static const TypeInfo ast2500_evb_type =3D {
+@@ -337,7 +335,6 @@ static void romulus_bmc_class_init(ObjectClass *oc, v=
+oid *data)
+     mc->no_floppy =3D 1;
+     mc->no_cdrom =3D 1;
+     mc->no_parallel =3D 1;
+-    mc->ignore_memory_transaction_failures =3D true;
+ }
+=20
+ static const TypeInfo romulus_bmc_type =3D {
 --=20
 2.13.6
