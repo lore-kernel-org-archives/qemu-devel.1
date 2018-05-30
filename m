@@ -1,32 +1,38 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53722)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55192)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fO4sX-0001ii-Rv
-	for qemu-devel@nongnu.org; Wed, 30 May 2018 13:27:18 -0400
+	(envelope-from <alifm@linux.ibm.com>) id 1fO4xf-0003On-UZ
+	for qemu-devel@nongnu.org; Wed, 30 May 2018 13:32:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fO4sT-00065H-SJ
-	for qemu-devel@nongnu.org; Wed, 30 May 2018 13:27:17 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:53974 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1fO4sT-00064j-NB
-	for qemu-devel@nongnu.org; Wed, 30 May 2018 13:27:13 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.3])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id D2D6040BC049
-	for <qemu-devel@nongnu.org>; Wed, 30 May 2018 17:27:12 +0000 (UTC)
-References: <1527693912-32378-1-git-send-email-thuth@redhat.com>
-	<af34cabc-9980-3f8c-c6c6-bb834c802235@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <3171722d-aad9-39ad-7b24-6f80decf2747@redhat.com>
-Date: Wed, 30 May 2018 19:27:10 +0200
+	(envelope-from <alifm@linux.ibm.com>) id 1fO4xb-0005r4-Ut
+	for qemu-devel@nongnu.org; Wed, 30 May 2018 13:32:35 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:56332
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <alifm@linux.ibm.com>) id 1fO4xb-0005os-OV
+	for qemu-devel@nongnu.org; Wed, 30 May 2018 13:32:31 -0400
+Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w4UHOjEA057602
+	for <qemu-devel@nongnu.org>; Wed, 30 May 2018 13:32:29 -0400
+Received: from e34.co.us.ibm.com (e34.co.us.ibm.com [32.97.110.152])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2j9xjd6k24-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Wed, 30 May 2018 13:32:29 -0400
+Received: from localhost
+	by e34.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <alifm@linux.ibm.com>;
+	Wed, 30 May 2018 11:32:28 -0600
+References: <1527568809-5640-1-git-send-email-walling@linux.ibm.com>
+From: Farhan Ali <alifm@linux.ibm.com>
+Date: Wed, 30 May 2018 13:31:08 -0400
 MIME-Version: 1.0
-In-Reply-To: <af34cabc-9980-3f8c-c6c6-bb834c802235@redhat.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <1527568809-5640-1-git-send-email-walling@linux.ibm.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [qemu-web PATCH v2] Add a blog post about the new
- -nic parameter
+Content-Transfer-Encoding: 7bit
+Message-Id: <13532906-180e-a47f-52ed-37981b8076bf@linux.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH] pc-bios/s390-ccw: define loadparm length
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,32 +41,21 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Jason Wang <jasowang@redhat.com>
+To: Collin Walling <walling@linux.ibm.com>, qemu-devel@nongnu.org, qemu-s390x@nongnu.org, cohuck@redhat.com, lersek@redhat.com
 
-On 30.05.2018 17:57, Eric Blake wrote:
-> On 05/30/2018 10:25 AM, Thomas Huth wrote:
->> QEMU v2.12 features a new, useful parameter called "-nic". Let's
->> throw some light on this new parameter with a new blog post.
->>
->> Signed-off-by: Thomas Huth <thuth@redhat.com>
->> ---
->=20
->> =C2=A0screenshots/2018-05-30-qemu-cli-net.png=C2=A0=C2=A0=C2=A0 | Bin =
-0 -> 24020 bytes
->> =C2=A0screenshots/2018-05-30-qemu-cli-netdev.png | Bin 0 -> 13553 byte=
-s
->=20
-> While binaries are necessary for use from within the blog, do you also
-> have source files that can be opened under gimp or other software for
-> easily tweaking the images?
 
-I've created them with LibreOffice for my presentation at FOSDEM 2018
-... I don't think we really want to check in .odp file into the
-repository, do we? It's also just some text and boxes, you can easily
-re-create that within minutes if it's ever necessary.
 
-Anyway, thanks for all the other corrections! ... I'll fix it up
-tomorrow and push the article.
+On 05/29/2018 12:40 AM, Collin Walling wrote:
+> Loadparm is defined by the s390 architecture to be 8 bytes
+> in length. Let's define this size in the s390-ccw bios.
+> 
+> Suggested-by: Laszlo Ersek<lersek@redhat.com>
+> Signed-off-by: Collin Walling<walling@linux.ibm.com>
+> ---
+>   pc-bios/s390-ccw/iplb.h | 4 +++-
+>   pc-bios/s390-ccw/main.c | 8 ++++----
+>   pc-bios/s390-ccw/sclp.c | 2 +-
+>   pc-bios/s390-ccw/sclp.h | 2 +-
+>   4 files changed, 9 insertions(+), 7 deletions(-)
 
- Thomas
+Reviewed-by: Farhan Ali <alifm@linux.ibm.com>
