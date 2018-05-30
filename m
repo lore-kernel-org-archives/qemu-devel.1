@@ -1,15 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41668)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49223)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1fNzDU-0000T3-NK
-	for qemu-devel@nongnu.org; Wed, 30 May 2018 07:24:33 -0400
+	(envelope-from <eric.auger@redhat.com>) id 1fNzYH-0004m5-NJ
+	for qemu-devel@nongnu.org; Wed, 30 May 2018 07:46:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1fNzDQ-0001xv-K0
-	for qemu-devel@nongnu.org; Wed, 30 May 2018 07:24:32 -0400
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Wed, 30 May 2018 14:24:24 +0300
-Message-Id: <20180530112424.204835-1-vsementsov@virtuozzo.com>
-Subject: [Qemu-devel] [PATCH] migration/block-dirty-bitmap: fix
- dirty_bitmap_load
+	(envelope-from <eric.auger@redhat.com>) id 1fNzYG-00059f-Ti
+	for qemu-devel@nongnu.org; Wed, 30 May 2018 07:46:01 -0400
+From: Eric Auger <eric.auger@redhat.com>
+Date: Wed, 30 May 2018 13:45:34 +0200
+Message-Id: <1527680741-2725-2-git-send-email-eric.auger@redhat.com>
+In-Reply-To: <1527680741-2725-1-git-send-email-eric.auger@redhat.com>
+References: <1527680741-2725-1-git-send-email-eric.auger@redhat.com>
+Subject: [Qemu-devel] [RFC v3 1/8] linux-headers: Partial update for KVM/ARM
+ multiple redistributor region registration
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -18,34 +20,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: dgilbert@redhat.com, quintela@redhat.com, famz@redhat.com, stefanha@redhat.com, vsementsov@virtuozzo.com, den@openvz.org, jsnow@redhat.com, qemu-stable@nongnu.org, eblake@redhat.com
+To: eric.auger.pro@gmail.com, eric.auger@redhat.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org, peter.maydell@linaro.org
+Cc: zhaoshenglong@huawei.com, christoffer.dall@arm.com, marc.zyngier@arm.com, drjones@redhat.com, wei@redhat.com
 
-dirty_bitmap_load_header return code is obtained but not handled. Fix
-this.
+This updates KVM/ARM headers against
+https://github.com/eauger/linux/tree/v4.17-rc2-rdist-regions-v6
 
-Bug was introduced in b35ebdf076d697bc
-"migration: add postcopy migration of dirty bitmaps" with the whole
-function.
-
-Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Signed-off-by: Eric Auger <eric.auger@redhat.com>
 ---
- migration/block-dirty-bitmap.c | 3 +++
- 1 file changed, 3 insertions(+)
+ linux-headers/asm-arm/kvm.h   | 1 +
+ linux-headers/asm-arm64/kvm.h | 1 +
+ 2 files changed, 2 insertions(+)
 
-diff --git a/migration/block-dirty-bitmap.c b/migration/block-dirty-bitmap.c
-index 8819aabe3a..2c541c985d 100644
---- a/migration/block-dirty-bitmap.c
-+++ b/migration/block-dirty-bitmap.c
-@@ -672,6 +672,9 @@ static int dirty_bitmap_load(QEMUFile *f, void *opaque, int version_id)
+diff --git a/linux-headers/asm-arm/kvm.h b/linux-headers/asm-arm/kvm.h
+index 4392955..81ae4e5 100644
+--- a/linux-headers/asm-arm/kvm.h
++++ b/linux-headers/asm-arm/kvm.h
+@@ -91,6 +91,7 @@ struct kvm_regs {
+ #define KVM_VGIC_V3_ADDR_TYPE_DIST	2
+ #define KVM_VGIC_V3_ADDR_TYPE_REDIST	3
+ #define KVM_VGIC_ITS_ADDR_TYPE		4
++#define KVM_VGIC_V3_ADDR_TYPE_REDIST_REGION	5
  
-     do {
-         ret = dirty_bitmap_load_header(f, &s);
-+        if (ret < 0) {
-+            return ret;
-+        }
+ #define KVM_VGIC_V3_DIST_SIZE		SZ_64K
+ #define KVM_VGIC_V3_REDIST_SIZE		(2 * SZ_64K)
+diff --git a/linux-headers/asm-arm64/kvm.h b/linux-headers/asm-arm64/kvm.h
+index 4e80651..d41f39a 100644
+--- a/linux-headers/asm-arm64/kvm.h
++++ b/linux-headers/asm-arm64/kvm.h
+@@ -91,6 +91,7 @@ struct kvm_regs {
+ #define KVM_VGIC_V3_ADDR_TYPE_DIST	2
+ #define KVM_VGIC_V3_ADDR_TYPE_REDIST	3
+ #define KVM_VGIC_ITS_ADDR_TYPE		4
++#define KVM_VGIC_V3_ADDR_TYPE_REDIST_REGION	5
  
-         if (s.flags & DIRTY_BITMAP_MIG_FLAG_START) {
-             ret = dirty_bitmap_load_start(f, &s);
+ #define KVM_VGIC_V3_DIST_SIZE		SZ_64K
+ #define KVM_VGIC_V3_REDIST_SIZE		(2 * SZ_64K)
 -- 
-2.11.1
+2.5.5
