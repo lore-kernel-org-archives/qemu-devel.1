@@ -1,26 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57207)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58265)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1fNuK7-0007G6-8K
-	for qemu-devel@nongnu.org; Wed, 30 May 2018 02:11:04 -0400
+	(envelope-from <kraxel@redhat.com>) id 1fNuPZ-0001dz-LU
+	for qemu-devel@nongnu.org; Wed, 30 May 2018 02:16:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1fNuK2-00068n-9t
-	for qemu-devel@nongnu.org; Wed, 30 May 2018 02:11:01 -0400
-Received: from 3.mo173.mail-out.ovh.net ([46.105.34.1]:41297)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1fNuK2-000683-40
-	for qemu-devel@nongnu.org; Wed, 30 May 2018 02:10:58 -0400
-Received: from player168.ha.ovh.net (unknown [10.109.122.102])
-	by mo173.mail-out.ovh.net (Postfix) with ESMTP id 5864CC0DC2
-	for <qemu-devel@nongnu.org>; Wed, 30 May 2018 08:10:56 +0200 (CEST)
-From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
-Date: Wed, 30 May 2018 08:10:35 +0200
-Message-Id: <20180530061035.22592-4-clg@kaod.org>
-In-Reply-To: <20180530061035.22592-1-clg@kaod.org>
-References: <20180530061035.22592-1-clg@kaod.org>
+	(envelope-from <kraxel@redhat.com>) id 1fNuPW-0000le-Gi
+	for qemu-devel@nongnu.org; Wed, 30 May 2018 02:16:41 -0400
+Date: Wed, 30 May 2018 08:16:33 +0200
+From: Gerd Hoffmann <kraxel@redhat.com>
+Message-ID: <20180530061633.iltyrqvyctpipxmt@sirius.home.kraxel.org>
+References: <20170724182751.18261-1-f4bug@amsat.org>
+	<20170724182751.18261-16-f4bug@amsat.org>
+	<4f76d9d2-5c4b-a6ef-e050-9d9a1f31be85@amsat.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <4f76d9d2-5c4b-a6ef-e050-9d9a1f31be85@amsat.org>
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v2 3/3] slirp/ncsi: add checksum support
+Subject: Re: [Qemu-devel] [PATCH for 2.10 15/35] usb: correctly handle Zero
+ Length Packets
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,104 +26,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Samuel Thibault <samuel.thibault@ens-lyon.org>
-Cc: qemu-devel@nongnu.org, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
+To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Cc: Eric Blake <eblake@redhat.com>, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org, qemu-trivial@nongnu.org
 
-The checksum field of a NC-SI packet contains a value that may be
-included in each command and response. The verification is optional
-but the Linux driver does so when a non-zero value is provided. Let's
-extend the model to compute the checksum value and exercise a little
-more the Linux driver.
+On Tue, May 29, 2018 at 11:22:46AM -0300, Philippe Mathieu-Daud=C3=A9 wro=
+te:
+> On 07/24/2017 03:27 PM, Philippe Mathieu-Daud=C3=A9 wrote:
+> > USB Specification Revision 2.0, =C2=A75.5.3:
+> >   The Data stage of a control transfer from an endpoint to the host i=
+s complete when the endpoint does one of the following:
+> >   =E2=80=A2 Has transferred exactly the amount of data specified duri=
+ng the Setup stage
+> >   =E2=80=A2 Transfers a packet with a payload size less than wMaxPack=
+etSize or transfers a zero-length packet"
+> >=20
+> > hw/usb/redirect.c:802:9: warning: Declared variable-length array (VLA=
+) has zero size
+> >         uint8_t buf[size];
+> >         ^~~~~~~~~~~ ~~~~
+> >=20
+> > Reported-by: Clang Static Analyzer
+> > Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+> > ---
+> >  hw/usb/redirect.c | 2 +-
+> >  1 file changed, 1 insertion(+), 1 deletion(-)
+> >=20
+> > diff --git a/hw/usb/redirect.c b/hw/usb/redirect.c
+> > index 5e42730449..5b7073d2cd 100644
+> > --- a/hw/usb/redirect.c
+> > +++ b/hw/usb/redirect.c
+> > @@ -795,7 +795,7 @@ static void usbredir_handle_bulk_data(USBRedirDev=
+ice *dev, USBPacket *p,
+> >             usbredirparser_peer_has_cap(dev->parser,
+> >                                         usb_redir_cap_32bits_bulk_len=
+gth));
+> > =20
+> > -    if (ep & USB_DIR_IN) {
+> > +    if (ep & USB_DIR_IN || size =3D=3D 0) {
+> >          usbredirparser_send_bulk_packet(dev->parser, p->id,
+> >                                          &bulk_packet, NULL, 0);
+> >      } else {
+> >=20
+>=20
+> Ping?
 
-See section "8.2.2.3 - 2's Complement Checksum Compensation" in the
-Network Controller Sideband Interface (NC-SI) Specification for more
-details.
+Whoops, pretty old one.  Don't have this in my qemu-devel archive any
+more.  Can you rebase + resend?
 
-Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
----
-
- Changes since v1:
-
- - updated Copyright
- - used uint16_t instead of chars to compute the checksum
-=20
- slirp/ncsi.c | 33 ++++++++++++++++++++++++++++-----
- 1 file changed, 28 insertions(+), 5 deletions(-)
-
-diff --git a/slirp/ncsi.c b/slirp/ncsi.c
-index 7b3fff207ab3..7116034afc20 100644
---- a/slirp/ncsi.c
-+++ b/slirp/ncsi.c
-@@ -1,7 +1,7 @@
- /*
-  * NC-SI (Network Controller Sideband Interface) "echo" model
-  *
-- * Copyright (C) 2016 IBM Corp.
-+ * Copyright (C) 2016-2018 IBM Corp.
-  *
-  * This code is licensed under the GPL version 2 or later. See the
-  * COPYING file in the top-level directory.
-@@ -11,6 +11,23 @@
-=20
- #include "ncsi-pkt.h"
-=20
-+static uint32_t ncsi_calculate_checksum(uint16_t *data, int len)
-+{
-+    uint32_t checksum =3D 0;
-+    int i;
-+
-+    /*
-+     * 32-bit unsigned sum of the NC-SI packet header and NC-SI packet
-+     * payload interpreted as a series of 16-bit unsigned integer values=
-.
-+     */
-+    for (i =3D 0; i < len; i++) {
-+        checksum +=3D htons(data[i]);
-+    }
-+
-+    checksum =3D (~checksum + 1);
-+    return checksum;
-+}
-+
- /* Get Capabilities */
- static int ncsi_rsp_handler_gc(struct ncsi_rsp_pkt_hdr *rnh)
- {
-@@ -101,6 +118,9 @@ void ncsi_input(Slirp *slirp, const uint8_t *pkt, int=
- pkt_len)
-         (ncsi_reply + ETH_HLEN);
-     const struct ncsi_rsp_handler *handler =3D NULL;
-     int i;
-+    int ncsi_rsp_len =3D sizeof(*nh);
-+    uint32_t checksum;
-+    uint32_t *pchecksum;
-=20
-     memset(ncsi_reply, 0, sizeof(ncsi_reply));
-=20
-@@ -130,15 +150,18 @@ void ncsi_input(Slirp *slirp, const uint8_t *pkt, i=
-nt pkt_len)
-             /* TODO: handle errors */
-             handler->handler(rnh);
-         }
-+        ncsi_rsp_len +=3D handler->payload;
-     } else {
-         rnh->common.length =3D 0;
-         rnh->code          =3D htons(NCSI_PKT_RSP_C_UNAVAILABLE);
-         rnh->reason        =3D htons(NCSI_PKT_RSP_R_UNKNOWN);
-     }
-=20
--    /* TODO: add a checksum at the end of the frame but the specs
--     * allows it to be zero */
-+    /* Add the optional checksum at the end of the frame. */
-+    checksum =3D ncsi_calculate_checksum((uint16_t *) rnh, ncsi_rsp_len)=
-;
-+    pchecksum =3D (uint32_t *)((void *) rnh + ncsi_rsp_len);
-+    *pchecksum =3D htonl(checksum);
-+    ncsi_rsp_len +=3D 4;
-=20
--    slirp_output(slirp->opaque, ncsi_reply, ETH_HLEN + sizeof(*nh) +
--                 (handler ? handler->payload : 0) + 4);
-+    slirp_output(slirp->opaque, ncsi_reply, ETH_HLEN + ncsi_rsp_len);
- }
---=20
-2.13.6
+thanks,
+  Gerd
