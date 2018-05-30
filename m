@@ -1,18 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39478)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40139)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhaoshenglong@huawei.com>) id 1fNvCM-0003EM-5g
-	for qemu-devel@nongnu.org; Wed, 30 May 2018 03:07:07 -0400
+	(envelope-from <aik@ozlabs.ru>) id 1fNvHH-0004fU-I8
+	for qemu-devel@nongnu.org; Wed, 30 May 2018 03:12:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zhaoshenglong@huawei.com>) id 1fNvCL-0007Y9-3P
-	for qemu-devel@nongnu.org; Wed, 30 May 2018 03:07:06 -0400
-From: Shannon Zhao <zhaoshenglong@huawei.com>
-Date: Wed, 30 May 2018 15:05:51 +0800
-Message-ID: <1527663951-14552-1-git-send-email-zhaoshenglong@huawei.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v3] ARM: ACPI: Fix use-after-free due to memory
- realloc
+	(envelope-from <aik@ozlabs.ru>) id 1fNvHB-0002Ib-6G
+	for qemu-devel@nongnu.org; Wed, 30 May 2018 03:12:11 -0400
+Received: from [107.173.13.209] (port=48339 helo=ozlabs.ru)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <aik@ozlabs.ru>) id 1fNvHA-0002IL-UM
+	for qemu-devel@nongnu.org; Wed, 30 May 2018 03:12:05 -0400
+From: Alexey Kardashevskiy <aik@ozlabs.ru>
+Date: Wed, 30 May 2018 17:11:29 +1000
+Message-Id: <20180530071129.9013-1-aik@ozlabs.ru>
+Subject: [Qemu-devel] [PATCH qemu v3] qom: Document
+ qom/device-list-properties implementation specific
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,92 +22,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-arm@nongnu.org
-Cc: peter.maydell@linaro.org, eric.auger@redhat.com, f4bug@amsat.org, qemu-devel@nongnu.org, shannon.zhaosl@gmail.com, Shannon Zhao <zhaoshenglong@huawei.com>
+To: qemu-devel@nongnu.org
+Cc: Alexey Kardashevskiy <aik@ozlabs.ru>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-acpi_data_push uses g_array_set_size to resize the memory size. If there
-is no enough contiguous memory, the address will be changed. So previous
-pointer could not be used any more. It must update the pointer and use
-the new one.
+The recently introduced qom-list-properties QMP command raised
+a question what properties it (and its cousin - device-list-properties)
+can possibly print - only those defined by DeviceClass::props
+or dynamically created in TypeInfo::instance_init() so properties created
+elsewhere won't show up and this behaviour might confuse the user.
 
-Also, previous codes wrongly use le32 conversion of iort->node_offset
-for subsequent computations that will result incorrect value if host is
-not litlle endian. So use the non-converted one instead.
+For example, PIIX4 does that from piix4_pm_realize() via
+  piix4_pm_add_propeties():
 
-Signed-off-by: Shannon Zhao <zhaoshenglong@huawei.com>
+object_property_add_uint8_ptr(OBJECT(s), ACPI_PM_PROP_ACPI_ENABLE_CMD,
+                              &acpi_enable_cmd, NULL);
+
+This adds a note to the command descriptions about the limitation.
+
+Reviewed-by: Markus Armbruster <armbru@redhat.com>
+Acked-by: Paolo Bonzini <pbonzini@redhat.com>
+Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
 ---
-V3: Fix typo and add some words in commit message to explain another bug
+Changes:
+v3:
+* adjusted commit log with Markus suggestion
+* added a-by/r-by
 ---
- hw/arm/virt-acpi-build.c | 20 +++++++++++++++-----
- 1 file changed, 15 insertions(+), 5 deletions(-)
+ qapi/misc.json | 8 ++++++++
+ 1 file changed, 8 insertions(+)
 
-diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
-index 92ceee9..74f5744 100644
---- a/hw/arm/virt-acpi-build.c
-+++ b/hw/arm/virt-acpi-build.c
-@@ -400,7 +400,7 @@ build_iort(GArray *table_data, BIOSLinker *linker, Vi=
-rtMachineState *vms)
-     AcpiIortItsGroup *its;
-     AcpiIortTable *iort;
-     AcpiIortSmmu3 *smmu;
--    size_t node_size, iort_length, smmu_offset =3D 0;
-+    size_t node_size, iort_node_offset, iort_length, smmu_offset =3D 0;
-     AcpiIortRC *rc;
-=20
-     iort =3D acpi_data_push(table_data, sizeof(*iort));
-@@ -413,7 +413,12 @@ build_iort(GArray *table_data, BIOSLinker *linker, V=
-irtMachineState *vms)
-=20
-     iort_length =3D sizeof(*iort);
-     iort->node_count =3D cpu_to_le32(nb_nodes);
--    iort->node_offset =3D cpu_to_le32(sizeof(*iort));
-+    /*
-+     * Use a copy in case table_data->data moves during acpi_data_push
-+     * operations.
-+     */
-+    iort_node_offset =3D sizeof(*iort);
-+    iort->node_offset =3D cpu_to_le32(iort_node_offset);
-=20
-     /* ITS group node */
-     node_size =3D  sizeof(*its) + sizeof(uint32_t);
-@@ -429,7 +434,7 @@ build_iort(GArray *table_data, BIOSLinker *linker, Vi=
-rtMachineState *vms)
-         int irq =3D  vms->irqmap[VIRT_SMMU];
-=20
-         /* SMMUv3 node */
--        smmu_offset =3D iort->node_offset + node_size;
-+        smmu_offset =3D iort_node_offset + node_size;
-         node_size =3D sizeof(*smmu) + sizeof(*idmap);
-         iort_length +=3D node_size;
-         smmu =3D acpi_data_push(table_data, node_size);
-@@ -450,7 +455,7 @@ build_iort(GArray *table_data, BIOSLinker *linker, Vi=
-rtMachineState *vms)
-         idmap->id_count =3D cpu_to_le32(0xFFFF);
-         idmap->output_base =3D 0;
-         /* output IORT node is the ITS group node (the first node) */
--        idmap->output_reference =3D cpu_to_le32(iort->node_offset);
-+        idmap->output_reference =3D cpu_to_le32(iort_node_offset);
-     }
-=20
-     /* Root Complex Node */
-@@ -479,9 +484,14 @@ build_iort(GArray *table_data, BIOSLinker *linker, V=
-irtMachineState *vms)
-         idmap->output_reference =3D cpu_to_le32(smmu_offset);
-     } else {
-         /* output IORT node is the ITS group node (the first node) */
--        idmap->output_reference =3D cpu_to_le32(iort->node_offset);
-+        idmap->output_reference =3D cpu_to_le32(iort_node_offset);
-     }
-=20
-+    /*
-+     * Update the pointer address in case table_data->data moves during =
-above
-+     * acpi_data_push operations.
-+     */
-+    iort =3D (AcpiIortTable *)(table_data->data + iort_start);
-     iort->length =3D cpu_to_le32(iort_length);
-=20
-     build_header(linker, table_data, (void *)(table_data->data + iort_st=
-art),
---=20
-2.0.4
+diff --git a/qapi/misc.json b/qapi/misc.json
+index 99bcaac..bbf9ef8 100644
+--- a/qapi/misc.json
++++ b/qapi/misc.json
+@@ -1529,6 +1529,10 @@
+ #
+ # Returns: a list of ObjectPropertyInfo describing a devices properties
+ #
++# Note: objects can create properties at runtime, for example to describe
++# links between different devices and/or objects. These properties
++# are not included in the output of this command.
++#
+ # Since: 1.2
+ ##
+ { 'command': 'device-list-properties',
+@@ -1542,6 +1546,10 @@
+ #
+ # @typename: the type name of an object
+ #
++# Note: objects can create properties at runtime, for example to describe
++# links between different devices and/or objects. These properties
++# are not included in the output of this command.
++#
+ # Returns: a list of ObjectPropertyInfo describing object properties
+ #
+ # Since: 2.12
+-- 
+2.11.0
