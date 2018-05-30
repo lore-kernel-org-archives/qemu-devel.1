@@ -1,34 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51420)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49492)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fO4hc-0008He-Un
-	for qemu-devel@nongnu.org; Wed, 30 May 2018 13:16:02 -0400
+	(envelope-from <jsnow@redhat.com>) id 1fO826-0001Gl-2k
+	for qemu-devel@nongnu.org; Wed, 30 May 2018 16:49:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fO4ha-0007ch-Ac
-	for qemu-devel@nongnu.org; Wed, 30 May 2018 13:16:00 -0400
-Received: from indium.canonical.com ([91.189.90.7]:52122)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1fO4ha-0007a8-3x
-	for qemu-devel@nongnu.org; Wed, 30 May 2018 13:15:58 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1fO4hY-0006RH-5q
-	for <qemu-devel@nongnu.org>; Wed, 30 May 2018 17:15:56 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 1AC982E88E0
-	for <qemu-devel@nongnu.org>; Wed, 30 May 2018 17:15:56 +0000 (UTC)
+	(envelope-from <jsnow@redhat.com>) id 1fO7pc-0004S2-JP
+	for qemu-devel@nongnu.org; Wed, 30 May 2018 16:36:45 -0400
+References: <20180518132114.4070-1-kwolf@redhat.com>
+	<20180518132114.4070-22-kwolf@redhat.com>
+	<26778cd3-3150-734b-d8c6-afa6e41f0215@redhat.com>
+	<20180524082412.GC4008@localhost.localdomain>
+	<1988292d-467a-9c63-e64d-035b0e93348a@redhat.com>
+	<20180525080035.GA5562@localhost.localdomain>
+	<20180529115907.GA1933@paraplu>
+	<e380991d-dab8-1923-fb03-bab40e489f1f@redhat.com>
+From: John Snow <jsnow@redhat.com>
+Message-ID: <86c49bf8-58c2-6b05-34ac-7479f123089d@redhat.com>
+Date: Wed, 30 May 2018 16:33:40 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <e380991d-dab8-1923-fb03-bab40e489f1f@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Date: Wed, 30 May 2018 17:02:56 -0000
-From: Andreas Hasenack <andreas@canonical.com>
-Reply-To: Bug 685096 <685096@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20101204070046.21747.93608.malonedeb@gandwana.canonical.com>
-Message-Id: <152769977677.3642.17722088404563199427.malone@chaenomeles.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 685096] Re: USB Passthrough not working for
- Windows 7 guest
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v2 21/40] job: Convert
+ block_job_cancel_async() to Job
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,53 +31,108 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Max Reitz <mreitz@redhat.com>, Kashyap Chamarthy <kchamart@redhat.com>, Kevin Wolf <kwolf@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, armbru@redhat.com
 
-Doing the same for the debian task, which doesn't have an upstream bug
-anyway.
 
-** Changed in: qemu (Debian)
-       Status: New =3D> Incomplete
 
--- =
+On 05/29/2018 08:30 AM, Max Reitz wrote:
+> On 2018-05-29 13:59, Kashyap Chamarthy wrote:
+>> On Fri, May 25, 2018 at 10:00:35AM +0200, Kevin Wolf wrote:
+>>> Am 24.05.2018 um 19:42 hat John Snow geschrieben:
+>>
+>> [...]
+>>
+>> (Randomly chiming in for a small clarification.)
+>>
+>>>>>> or some other mechanism that accomplishes the same type of behavio=
+r. It
+>>>>>> would be nice if it did not have to be determined at job creation =
+time
+>>>>>> but instead could be determined later.
+>>>>>
+>>>>> I agree. We already made sure that job-cancel really means cancel o=
+n the
+>>>>> QAPI level, so we're free to do that. We just need to keep supporti=
+ng
+>>>>> block-job-cancel with the old semantics, so what I have is the easy
+>>>>> conversion. We can change the internal implementation when we actua=
+lly
+>>>>> implement the selection of a completion mode.
+>>>>>
+>>>>> Kevin
+>>>>>
+>>>>
+>>>> We need this before 3.0 though, yeah? unless we make job-cancel
+>>>> x-job-cancel or some other warning that the way it works might chang=
+e, yeah?
+>>>>
+>>>> Or do I misunderstand our leeway to change this at a later point in =
+time?
+>>>>
+>>>> (can job-cancel apply to block jobs created with the legacy
+>>>> infrastructure? My reading was "yes.")
+>>>
+>>> It can, and it already has its final semantics, so nothing has to cha=
+nge
+>>> before 3.0. job-cancel is equivalent to block-job-cancel with fixed
+>>> force=3Dtrue. If you want the complete-by-cancel behaviour of mirror,=
+ you
+>>> have to use block-job-cancel for now, because job-cancel doesn't prov=
+ide
+>>> that functionality.
+>>
+>> I think by "complete-by-cancel" you are referring to this[*] magic
+>> behaviour, mentioned in the last sentence here:
+>>
+>>     When you cancel an in-progress =E2=80=98mirror=E2=80=99 job before=
+ the source and
+>>     target are synchronized, block-job-cancel will emit the event
+>>     BLOCK_JOB_CANCELLED. However, note that if you cancel a =E2=80=98m=
+irror=E2=80=99 job
+>>     after it has indicated (via the event BLOCK_JOB_READY) that the
+>>     source and target have reached synchronization, then the event
+>>     emitted by block-job-cancel changes to BLOCK_JOB_COMPLETED.
+>>
+>>
+>> [*] https://git.qemu.org/?p=3Dqemu.git;a=3Dblob;f=3Ddocs/interop/live-=
+block-operations.rst#l515
+>>
+>>> So what we can change later is adding a way to initiate this secondar=
+y
+>>> completion mode with a job-* command (probably with a new option for
+>>> job-complete). But we wouldn't change the semantics of exisiting
+>>> commands.
+>>
+>> Ah, so if I'm understanding it correctly, the existing subtle magic of
+>> "complete-by-cancel" will be rectified by separting the two distinct
+>> operations: 'job-cancel' and 'job-complete'.
+>=20
+> Not really, because we already had those two operations for block jobs.
+> The thing is that block-job-complete (and thus job-complete) will pivot
+> to the target disk, but block-job-cancel doesn't.
+>=20
+> The special behavior is that you can use block-job-cancel after
+> BLOCK_JOB_READY to complete the job, but not pivot to it.  I don't thin=
+k
+> we have a real plan on how to represent that with the generic job
+> commands, we just know that we don't want to use job-cancel.
+>=20
+> (Maybe we can add a flag to job-complete (which to me does not sound
+> like a good idea), or you could set flags on jobs while they are
+> running, so you can set a do-not-pivot flag on the mirror job before yo=
+u
+> complete it.)
+>=20
+> Max
+>=20
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/685096
+Adding the completion-mode as a "setting" to the job has always been my
+favorite way. Whether you set this setting at creation time or later
+during runtime is not important.
 
-Title:
-  USB Passthrough not working for Windows 7 guest
+When we issue job-complete, the job knows based on its own settings the
+way it should do so, if there are multiple possibilities.
 
-Status in QEMU:
-  Won't Fix
-Status in qemu package in Ubuntu:
-  Incomplete
-Status in qemu package in Debian:
-  Incomplete
-
-Bug description:
-  USB Passthrough from host to guest is not working for a 32-bit Windows
-  7 guest, while it works perfectly for a 32-bit Windows XP guest.
-
-  The device appears in the device manager of Windows 7, but with "Error
-  code 10: device cannot start". I have tried this with numerous USB
-  thumbdrives and a USB wireless NIC, all with the same result. The
-  device name and functionality is recognized, so at least some USB
-  negotiation is taking place.
-
-  I am trying this with the latest git-pull of QEMU-KVM.
-
-  The command line to launch qemu-kvm for win7 is:
-  sudo /home/user/local_install/bin/qemu-system-x86_64 -cpu core2duo -m 102=
-4 -smp 2 -vga std -hda ./disk_images/win7.qcow -vnc :1 -boot c -usb -usbdev=
-ice tablet -usbdevice host:0781:5150
-
-  The command line to launch qemu-kvm for winxp is:
-  sudo /home/user/local_install/bin/qemu-system-x86_64 -cpu core2duo -m 102=
-4 -smp 2 -usb -vga std -hda ./winxpsp3.qcow -vnc :0 -boot c -usbdevice tabl=
-et -usbdevice host:0781:5150
-
-  Any help is appreciated.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/685096/+subscriptions
+I only mentioned it as a flag to complete ... err, just in case it was
+easier that way somehow. *shrug*.
