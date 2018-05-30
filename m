@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33782)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33758)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fO5Q2-0002Bs-4l
-	for qemu-devel@nongnu.org; Wed, 30 May 2018 14:01:55 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1fO5Q1-0002Ap-7F
+	for qemu-devel@nongnu.org; Wed, 30 May 2018 14:01:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fO5Pz-0004qx-E1
-	for qemu-devel@nongnu.org; Wed, 30 May 2018 14:01:54 -0400
-Received: from mail-pg0-x229.google.com ([2607:f8b0:400e:c05::229]:35959)
+	(envelope-from <richard.henderson@linaro.org>) id 1fO5Pw-0004o3-O0
+	for qemu-devel@nongnu.org; Wed, 30 May 2018 14:01:53 -0400
+Received: from mail-pf0-x22a.google.com ([2607:f8b0:400e:c00::22a]:44035)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1fO5Pz-0004qQ-6Z
-	for qemu-devel@nongnu.org; Wed, 30 May 2018 14:01:51 -0400
-Received: by mail-pg0-x229.google.com with SMTP id m5-v6so4115976pgd.3
-	for <qemu-devel@nongnu.org>; Wed, 30 May 2018 11:01:50 -0700 (PDT)
+	id 1fO5Pw-0004nJ-Gh
+	for qemu-devel@nongnu.org; Wed, 30 May 2018 14:01:48 -0400
+Received: by mail-pf0-x22a.google.com with SMTP id q22-v6so9403936pff.11
+	for <qemu-devel@nongnu.org>; Wed, 30 May 2018 11:01:48 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Wed, 30 May 2018 11:01:19 -0700
-Message-Id: <20180530180120.13355-18-richard.henderson@linaro.org>
+Date: Wed, 30 May 2018 11:01:17 -0700
+Message-Id: <20180530180120.13355-16-richard.henderson@linaro.org>
 In-Reply-To: <20180530180120.13355-1-richard.henderson@linaro.org>
 References: <20180530180120.13355-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH v3b 17/18] target/arm: Implement SVE Integer
- Wide Immediate - Unpredicated Group
+Subject: [Qemu-devel] [PATCH v3b 15/18] target/arm: Implement SVE Integer
+ Compare - Scalars Group
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,313 +32,189 @@ Cc: peter.maydell@linaro.org, qemu-arm@nongnu.org
 
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/arm/helper-sve.h    |  25 +++++++
- target/arm/sve_helper.c    |  41 +++++++++++
- target/arm/translate-sve.c | 144 +++++++++++++++++++++++++++++++++++++
- target/arm/sve.decode      |  26 +++++++
- 4 files changed, 236 insertions(+)
+ target/arm/helper-sve.h    |   2 +
+ target/arm/sve_helper.c    |  31 +++++++++++
+ target/arm/translate-sve.c | 102 +++++++++++++++++++++++++++++++++++++
+ target/arm/sve.decode      |   8 +++
+ 4 files changed, 143 insertions(+)
 
 diff --git a/target/arm/helper-sve.h b/target/arm/helper-sve.h
-index 1863106d0f..97bfe0f47b 100644
+index dd4f8f754d..1863106d0f 100644
 --- a/target/arm/helper-sve.h
 +++ b/target/arm/helper-sve.h
-@@ -680,3 +680,28 @@ DEF_HELPER_FLAGS_4(sve_brkns, TCG_CALL_NO_RWG, i32, ptr, ptr, ptr, i32)
- DEF_HELPER_FLAGS_3(sve_cntp, TCG_CALL_NO_RWG, i64, ptr, ptr, i32)
+@@ -678,3 +678,5 @@ DEF_HELPER_FLAGS_4(sve_brkn, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
+ DEF_HELPER_FLAGS_4(sve_brkns, TCG_CALL_NO_RWG, i32, ptr, ptr, ptr, i32)
  
- DEF_HELPER_FLAGS_3(sve_while, TCG_CALL_NO_RWG, i32, ptr, i32, i32)
+ DEF_HELPER_FLAGS_3(sve_cntp, TCG_CALL_NO_RWG, i64, ptr, ptr, i32)
 +
-+DEF_HELPER_FLAGS_4(sve_subri_b, TCG_CALL_NO_RWG, void, ptr, ptr, i64, i32)
-+DEF_HELPER_FLAGS_4(sve_subri_h, TCG_CALL_NO_RWG, void, ptr, ptr, i64, i32)
-+DEF_HELPER_FLAGS_4(sve_subri_s, TCG_CALL_NO_RWG, void, ptr, ptr, i64, i32)
-+DEF_HELPER_FLAGS_4(sve_subri_d, TCG_CALL_NO_RWG, void, ptr, ptr, i64, i32)
-+
-+DEF_HELPER_FLAGS_4(sve_smaxi_b, TCG_CALL_NO_RWG, void, ptr, ptr, i64, i32)
-+DEF_HELPER_FLAGS_4(sve_smaxi_h, TCG_CALL_NO_RWG, void, ptr, ptr, i64, i32)
-+DEF_HELPER_FLAGS_4(sve_smaxi_s, TCG_CALL_NO_RWG, void, ptr, ptr, i64, i32)
-+DEF_HELPER_FLAGS_4(sve_smaxi_d, TCG_CALL_NO_RWG, void, ptr, ptr, i64, i32)
-+
-+DEF_HELPER_FLAGS_4(sve_smini_b, TCG_CALL_NO_RWG, void, ptr, ptr, i64, i32)
-+DEF_HELPER_FLAGS_4(sve_smini_h, TCG_CALL_NO_RWG, void, ptr, ptr, i64, i32)
-+DEF_HELPER_FLAGS_4(sve_smini_s, TCG_CALL_NO_RWG, void, ptr, ptr, i64, i32)
-+DEF_HELPER_FLAGS_4(sve_smini_d, TCG_CALL_NO_RWG, void, ptr, ptr, i64, i32)
-+
-+DEF_HELPER_FLAGS_4(sve_umaxi_b, TCG_CALL_NO_RWG, void, ptr, ptr, i64, i32)
-+DEF_HELPER_FLAGS_4(sve_umaxi_h, TCG_CALL_NO_RWG, void, ptr, ptr, i64, i32)
-+DEF_HELPER_FLAGS_4(sve_umaxi_s, TCG_CALL_NO_RWG, void, ptr, ptr, i64, i32)
-+DEF_HELPER_FLAGS_4(sve_umaxi_d, TCG_CALL_NO_RWG, void, ptr, ptr, i64, i32)
-+
-+DEF_HELPER_FLAGS_4(sve_umini_b, TCG_CALL_NO_RWG, void, ptr, ptr, i64, i32)
-+DEF_HELPER_FLAGS_4(sve_umini_h, TCG_CALL_NO_RWG, void, ptr, ptr, i64, i32)
-+DEF_HELPER_FLAGS_4(sve_umini_s, TCG_CALL_NO_RWG, void, ptr, ptr, i64, i32)
-+DEF_HELPER_FLAGS_4(sve_umini_d, TCG_CALL_NO_RWG, void, ptr, ptr, i64, i32)
++DEF_HELPER_FLAGS_3(sve_while, TCG_CALL_NO_RWG, i32, ptr, i32, i32)
 diff --git a/target/arm/sve_helper.c b/target/arm/sve_helper.c
-index a65a06cc9e..ade954bfae 100644
+index 8d1631ea3c..a65a06cc9e 100644
 --- a/target/arm/sve_helper.c
 +++ b/target/arm/sve_helper.c
-@@ -804,6 +804,46 @@ DO_VPZ_D(sve_uminv_d, uint64_t, uint64_t, -1, DO_MIN)
- #undef DO_VPZ
- #undef DO_VPZ_D
- 
-+/* Two vector operand, one scalar operand, unpredicated.  */
-+#define DO_ZZI(NAME, TYPE, OP)                                       \
-+void HELPER(NAME)(void *vd, void *vn, uint64_t s64, uint32_t desc)   \
-+{                                                                    \
-+    intptr_t i, opr_sz = simd_oprsz(desc) / sizeof(TYPE);            \
-+    TYPE s = s64, *d = vd, *n = vn;                                  \
-+    for (i = 0; i < opr_sz; ++i) {                                   \
-+        d[i] = OP(n[i], s);                                          \
-+    }                                                                \
+@@ -2736,3 +2736,34 @@ uint64_t HELPER(sve_cntp)(void *vn, void *vg, uint32_t pred_desc)
+     }
+     return sum;
+ }
++
++uint32_t HELPER(sve_while)(void *vd, uint32_t count, uint32_t pred_desc)
++{
++    uintptr_t oprsz = extract32(pred_desc, 0, SIMD_OPRSZ_BITS) + 2;
++    intptr_t esz = extract32(pred_desc, SIMD_DATA_SHIFT, 2);
++    uint64_t esz_mask = pred_esz_masks[esz];
++    ARMPredicateReg *d = vd;
++    uint32_t flags;
++    intptr_t i;
++
++    /* Begin with a zero predicate register.  */
++    flags = do_zero(d, oprsz);
++    if (count == 0) {
++        return flags;
++    }
++
++    /* Scale from predicate element count to bits.  */
++    count <<= esz;
++    /* Bound to the bits in the predicate.  */
++    count = MIN(count, oprsz * 8);
++
++    /* Set all of the requested bits.  */
++    for (i = 0; i < count / 64; ++i) {
++        d->p[i] = esz_mask;
++    }
++    if (count & 63) {
++        d->p[i] = ~(-1ull << (count & 63)) & esz_mask;
++    }
++
++    return predtest_ones(d, oprsz, esz_mask);
 +}
-+
-+#define DO_SUBR(X, Y)   (Y - X)
-+
-+DO_ZZI(sve_subri_b, uint8_t, DO_SUBR)
-+DO_ZZI(sve_subri_h, uint16_t, DO_SUBR)
-+DO_ZZI(sve_subri_s, uint32_t, DO_SUBR)
-+DO_ZZI(sve_subri_d, uint64_t, DO_SUBR)
-+
-+DO_ZZI(sve_smaxi_b, int8_t, DO_MAX)
-+DO_ZZI(sve_smaxi_h, int16_t, DO_MAX)
-+DO_ZZI(sve_smaxi_s, int32_t, DO_MAX)
-+DO_ZZI(sve_smaxi_d, int64_t, DO_MAX)
-+
-+DO_ZZI(sve_smini_b, int8_t, DO_MIN)
-+DO_ZZI(sve_smini_h, int16_t, DO_MIN)
-+DO_ZZI(sve_smini_s, int32_t, DO_MIN)
-+DO_ZZI(sve_smini_d, int64_t, DO_MIN)
-+
-+DO_ZZI(sve_umaxi_b, uint8_t, DO_MAX)
-+DO_ZZI(sve_umaxi_h, uint16_t, DO_MAX)
-+DO_ZZI(sve_umaxi_s, uint32_t, DO_MAX)
-+DO_ZZI(sve_umaxi_d, uint64_t, DO_MAX)
-+
-+DO_ZZI(sve_umini_b, uint8_t, DO_MIN)
-+DO_ZZI(sve_umini_h, uint16_t, DO_MIN)
-+DO_ZZI(sve_umini_s, uint32_t, DO_MIN)
-+DO_ZZI(sve_umini_d, uint64_t, DO_MIN)
-+
-+#undef DO_ZZI
-+
- #undef DO_AND
- #undef DO_ORR
- #undef DO_EOR
-@@ -818,6 +858,7 @@ DO_VPZ_D(sve_uminv_d, uint64_t, uint64_t, -1, DO_MIN)
- #undef DO_ASR
- #undef DO_LSR
- #undef DO_LSL
-+#undef DO_SUBR
- 
- /* Similar to the ARM LastActiveElement pseudocode function, except the
-    result is multiplied by the element size.  This includes the not found
 diff --git a/target/arm/translate-sve.c b/target/arm/translate-sve.c
-index e470f3b745..78e74047c8 100644
+index e4815e4912..75eb36f110 100644
 --- a/target/arm/translate-sve.c
 +++ b/target/arm/translate-sve.c
-@@ -77,6 +77,11 @@ static inline int expand_imm_sh8s(int x)
-     return (int8_t)x << (x & 0x100 ? 8 : 0);
- }
- 
-+static inline int expand_imm_sh8u(int x)
-+{
-+    return (uint8_t)x << (x & 0x100 ? 8 : 0);
-+}
-+
- /*
-  * Include the generated decoder.
-  */
-@@ -3220,6 +3225,145 @@ static bool trans_DUP_i(DisasContext *s, arg_DUP_i *a, uint32_t insn)
+@@ -3081,6 +3081,108 @@ static bool trans_SINCDECP_z(DisasContext *s, arg_incdec2_pred *a,
      return true;
  }
  
-+static bool trans_ADD_zzi(DisasContext *s, arg_rri_esz *a, uint32_t insn)
++/*
++ *** SVE Integer Compare Scalars Group
++ */
++
++static bool trans_CTERM(DisasContext *s, arg_CTERM *a, uint32_t insn)
 +{
-+    if (a->esz == 0 && extract32(insn, 13, 1)) {
-+        return false;
++    if (!sve_access_check(s)) {
++        return true;
 +    }
-+    if (sve_access_check(s)) {
-+        unsigned vsz = vec_full_reg_size(s);
-+        tcg_gen_gvec_addi(a->esz, vec_full_reg_offset(s, a->rd),
-+                          vec_full_reg_offset(s, a->rn), a->imm, vsz, vsz);
-+    }
++
++    TCGCond cond = (a->ne ? TCG_COND_NE : TCG_COND_EQ);
++    TCGv_i64 rn = read_cpu_reg(s, a->rn, a->sf);
++    TCGv_i64 rm = read_cpu_reg(s, a->rm, a->sf);
++    TCGv_i64 cmp = tcg_temp_new_i64();
++
++    tcg_gen_setcond_i64(cond, cmp, rn, rm);
++    tcg_gen_extrl_i64_i32(cpu_NF, cmp);
++    tcg_temp_free_i64(cmp);
++
++    /* VF = !NF & !CF.  */
++    tcg_gen_xori_i32(cpu_VF, cpu_NF, 1);
++    tcg_gen_andc_i32(cpu_VF, cpu_VF, cpu_CF);
++
++    /* Both NF and VF actually look at bit 31.  */
++    tcg_gen_neg_i32(cpu_NF, cpu_NF);
++    tcg_gen_neg_i32(cpu_VF, cpu_VF);
 +    return true;
 +}
 +
-+static bool trans_SUB_zzi(DisasContext *s, arg_rri_esz *a, uint32_t insn)
++static bool trans_WHILE(DisasContext *s, arg_WHILE *a, uint32_t insn)
 +{
-+    a->imm = -a->imm;
-+    return trans_ADD_zzi(s, a, insn);
-+}
-+
-+static bool trans_SUBR_zzi(DisasContext *s, arg_rri_esz *a, uint32_t insn)
-+{
-+    static const GVecGen2s op[4] = {
-+        { .fni8 = tcg_gen_vec_sub8_i64,
-+          .fniv = tcg_gen_sub_vec,
-+          .fno = gen_helper_sve_subri_b,
-+          .opc = INDEX_op_sub_vec,
-+          .vece = MO_8,
-+          .scalar_first = true },
-+        { .fni8 = tcg_gen_vec_sub16_i64,
-+          .fniv = tcg_gen_sub_vec,
-+          .fno = gen_helper_sve_subri_h,
-+          .opc = INDEX_op_sub_vec,
-+          .vece = MO_16,
-+          .scalar_first = true },
-+        { .fni4 = tcg_gen_sub_i32,
-+          .fniv = tcg_gen_sub_vec,
-+          .fno = gen_helper_sve_subri_s,
-+          .opc = INDEX_op_sub_vec,
-+          .vece = MO_32,
-+          .scalar_first = true },
-+        { .fni8 = tcg_gen_sub_i64,
-+          .fniv = tcg_gen_sub_vec,
-+          .fno = gen_helper_sve_subri_d,
-+          .opc = INDEX_op_sub_vec,
-+          .prefer_i64 = TCG_TARGET_REG_BITS == 64,
-+          .vece = MO_64,
-+          .scalar_first = true }
-+    };
-+
-+    if (a->esz == 0 && extract32(insn, 13, 1)) {
-+        return false;
++    if (!sve_access_check(s)) {
++        return true;
 +    }
-+    if (sve_access_check(s)) {
-+        unsigned vsz = vec_full_reg_size(s);
-+        TCGv_i64 c = tcg_const_i64(a->imm);
-+        tcg_gen_gvec_2s(vec_full_reg_offset(s, a->rd),
-+                        vec_full_reg_offset(s, a->rn),
-+                        vsz, vsz, c, &op[a->esz]);
-+        tcg_temp_free_i64(c);
++
++    TCGv_i64 op0 = read_cpu_reg(s, a->rn, 1);
++    TCGv_i64 op1 = read_cpu_reg(s, a->rm, 1);
++    TCGv_i64 t0 = tcg_temp_new_i64();
++    TCGv_i64 t1 = tcg_temp_new_i64();
++    TCGv_i32 t2, t3;
++    TCGv_ptr ptr;
++    unsigned desc, vsz = vec_full_reg_size(s);
++    TCGCond cond;
++
++    if (!a->sf) {
++        if (a->u) {
++            tcg_gen_ext32u_i64(op0, op0);
++            tcg_gen_ext32u_i64(op1, op1);
++        } else {
++            tcg_gen_ext32s_i64(op0, op0);
++            tcg_gen_ext32s_i64(op1, op1);
++        }
 +    }
++
++    /* For the helper, compress the different conditions into a computation
++     * of how many iterations for which the condition is true.
++     *
++     * This is slightly complicated by 0 <= UINT64_MAX, which is nominally
++     * 2**64 iterations, overflowing to 0.  Of course, predicate registers
++     * aren't that large, so any value >= predicate size is sufficient.
++     */
++    tcg_gen_sub_i64(t0, op1, op0);
++
++    /* t0 = MIN(op1 - op0, vsz).  */
++    if (a->eq) {
++        /* Equality means one more iteration.  */
++        tcg_gen_movi_i64(t1, vsz - 1);
++        tcg_gen_movcond_i64(TCG_COND_LTU, t0, t0, t1, t0, t1);
++        tcg_gen_addi_i64(t0, t0, 1);
++    } else {
++        tcg_gen_movi_i64(t1, vsz);
++        tcg_gen_movcond_i64(TCG_COND_LTU, t0, t0, t1, t0, t1);
++    }
++
++    /* t0 = (condition true ? t0 : 0).  */
++    cond = (a->u
++            ? (a->eq ? TCG_COND_LEU : TCG_COND_LTU)
++            : (a->eq ? TCG_COND_LE : TCG_COND_LT));
++    tcg_gen_movi_i64(t1, 0);
++    tcg_gen_movcond_i64(cond, t0, op0, op1, t0, t1);
++
++    t2 = tcg_temp_new_i32();
++    tcg_gen_extrl_i64_i32(t2, t0);
++    tcg_temp_free_i64(t0);
++    tcg_temp_free_i64(t1);
++
++    desc = (vsz / 8) - 2;
++    desc = deposit32(desc, SIMD_DATA_SHIFT, 2, a->esz);
++    t3 = tcg_const_i32(desc);
++
++    ptr = tcg_temp_new_ptr();
++    tcg_gen_addi_ptr(ptr, cpu_env, pred_full_reg_offset(s, a->rd));
++
++    gen_helper_sve_while(t2, ptr, t2, t3);
++    do_pred_flags(t2);
++
++    tcg_temp_free_ptr(ptr);
++    tcg_temp_free_i32(t2);
++    tcg_temp_free_i32(t3);
 +    return true;
 +}
-+
-+static bool trans_MUL_zzi(DisasContext *s, arg_rri_esz *a, uint32_t insn)
-+{
-+    if (sve_access_check(s)) {
-+        unsigned vsz = vec_full_reg_size(s);
-+        tcg_gen_gvec_muli(a->esz, vec_full_reg_offset(s, a->rd),
-+                          vec_full_reg_offset(s, a->rn), a->imm, vsz, vsz);
-+    }
-+    return true;
-+}
-+
-+static bool do_zzi_sat(DisasContext *s, arg_rri_esz *a, uint32_t insn,
-+                       bool u, bool d)
-+{
-+    if (a->esz == 0 && extract32(insn, 13, 1)) {
-+        return false;
-+    }
-+    if (sve_access_check(s)) {
-+        TCGv_i64 val = tcg_const_i64(a->imm);
-+        do_sat_addsub_vec(s, a->esz, a->rd, a->rn, val, u, d);
-+        tcg_temp_free_i64(val);
-+    }
-+    return true;
-+}
-+
-+static bool trans_SQADD_zzi(DisasContext *s, arg_rri_esz *a, uint32_t insn)
-+{
-+    return do_zzi_sat(s, a, insn, false, false);
-+}
-+
-+static bool trans_UQADD_zzi(DisasContext *s, arg_rri_esz *a, uint32_t insn)
-+{
-+    return do_zzi_sat(s, a, insn, true, false);
-+}
-+
-+static bool trans_SQSUB_zzi(DisasContext *s, arg_rri_esz *a, uint32_t insn)
-+{
-+    return do_zzi_sat(s, a, insn, false, true);
-+}
-+
-+static bool trans_UQSUB_zzi(DisasContext *s, arg_rri_esz *a, uint32_t insn)
-+{
-+    return do_zzi_sat(s, a, insn, true, true);
-+}
-+
-+static bool do_zzi_ool(DisasContext *s, arg_rri_esz *a, gen_helper_gvec_2i *fn)
-+{
-+    if (sve_access_check(s)) {
-+        unsigned vsz = vec_full_reg_size(s);
-+        TCGv_i64 c = tcg_const_i64(a->imm);
-+
-+        tcg_gen_gvec_2i_ool(vec_full_reg_offset(s, a->rd),
-+                            vec_full_reg_offset(s, a->rn),
-+                            c, vsz, vsz, 0, fn);
-+        tcg_temp_free_i64(c);
-+    }
-+    return true;
-+}
-+
-+#define DO_ZZI(NAME, name) \
-+static bool trans_##NAME##_zzi(DisasContext *s, arg_rri_esz *a,         \
-+                               uint32_t insn)                           \
-+{                                                                       \
-+    static gen_helper_gvec_2i * const fns[4] = {                        \
-+        gen_helper_sve_##name##i_b, gen_helper_sve_##name##i_h,         \
-+        gen_helper_sve_##name##i_s, gen_helper_sve_##name##i_d,         \
-+    };                                                                  \
-+    return do_zzi_ool(s, a, fns[a->esz]);                               \
-+}
-+
-+DO_ZZI(SMAX, smax)
-+DO_ZZI(UMAX, umax)
-+DO_ZZI(SMIN, smin)
-+DO_ZZI(UMIN, umin)
-+
-+#undef DO_ZZI
 +
  /*
   *** SVE Memory - 32-bit Gather and Unsized Contiguous Group
   */
 diff --git a/target/arm/sve.decode b/target/arm/sve.decode
-index b8bd22aff7..eee8726bdf 100644
+index 62d51c252b..4b718060a9 100644
 --- a/target/arm/sve.decode
 +++ b/target/arm/sve.decode
-@@ -42,6 +42,8 @@
+@@ -606,6 +606,14 @@ SINCDECP_r_64   00100101 .. 1010 d:1 u:1 10001 10 .... .....    @incdec_pred
+ # SVE saturating inc/dec vector by predicate count
+ SINCDECP_z      00100101 .. 1010 d:1 u:1 10000 00 .... .....    @incdec2_pred
  
- # Signed 8-bit immediate, optionally shifted left by 8.
- %sh8_i8s        5:9 !function=expand_imm_sh8s
-+# Unsigned 8-bit immediate, optionally shifted left by 8.
-+%sh8_i8u        5:9 !function=expand_imm_sh8u
- 
- # Either a copy of rd (at bit 0), or a different source
- # as propagated via the MOVPRFX instruction.
-@@ -95,6 +97,12 @@
- @pd_pn_pm       ........ esz:2 .. rm:4 ....... rn:4 . rd:4      &rrr_esz
- @rdn_rm         ........ esz:2 ...... ...... rm:5 rd:5 \
-                 &rrr_esz rn=%reg_movprfx
-+@rdn_sh_i8u     ........ esz:2 ...... ...... ..... rd:5 \
-+                &rri_esz rn=%reg_movprfx imm=%sh8_i8u
-+@rdn_i8u        ........ esz:2 ...... ... imm:8 rd:5 \
-+                &rri_esz rn=%reg_movprfx
-+@rdn_i8s        ........ esz:2 ...... ... imm:s8 rd:5 \
-+                &rri_esz rn=%reg_movprfx
- 
- # Three operand with "memory" size, aka immediate left shift
- @rd_rn_msz_rm   ........ ... rm:5 .... imm:2 rn:5 rd:5          &rrri
-@@ -622,6 +630,24 @@ FDUP            00100101 esz:2 111 00 1110 imm:8 rd:5
- # SVE broadcast integer immediate (unpredicated)
- DUP_i           00100101 esz:2 111 00 011 . ........ rd:5       imm=%sh8_i8s
- 
-+# SVE integer add/subtract immediate (unpredicated)
-+ADD_zzi         00100101 .. 100 000 11 . ........ .....         @rdn_sh_i8u
-+SUB_zzi         00100101 .. 100 001 11 . ........ .....         @rdn_sh_i8u
-+SUBR_zzi        00100101 .. 100 011 11 . ........ .....         @rdn_sh_i8u
-+SQADD_zzi       00100101 .. 100 100 11 . ........ .....         @rdn_sh_i8u
-+UQADD_zzi       00100101 .. 100 101 11 . ........ .....         @rdn_sh_i8u
-+SQSUB_zzi       00100101 .. 100 110 11 . ........ .....         @rdn_sh_i8u
-+UQSUB_zzi       00100101 .. 100 111 11 . ........ .....         @rdn_sh_i8u
++### SVE Integer Compare - Scalars Group
 +
-+# SVE integer min/max immediate (unpredicated)
-+SMAX_zzi        00100101 .. 101 000 110 ........ .....          @rdn_i8s
-+UMAX_zzi        00100101 .. 101 001 110 ........ .....          @rdn_i8u
-+SMIN_zzi        00100101 .. 101 010 110 ........ .....          @rdn_i8s
-+UMIN_zzi        00100101 .. 101 011 110 ........ .....          @rdn_i8u
++# SVE conditionally terminate scalars
++CTERM           00100101 1 sf:1 1 rm:5 001000 rn:5 ne:1 0000
 +
-+# SVE integer multiply immediate (unpredicated)
-+MUL_zzi         00100101 .. 110 000 110 ........ .....          @rdn_i8s
++# SVE integer compare scalar count and limit
++WHILE           00100101 esz:2 1 rm:5 000 sf:1 u:1 1 rn:5 eq:1 rd:4
 +
  ### SVE Memory - 32-bit Gather and Unsized Contiguous Group
  
