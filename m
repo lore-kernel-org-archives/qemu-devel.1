@@ -1,21 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52801)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54803)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <joel.stan@gmail.com>) id 1fNtm3-0002qA-RS
-	for qemu-devel@nongnu.org; Wed, 30 May 2018 01:35:52 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fNu0R-0004cx-SP
+	for qemu-devel@nongnu.org; Wed, 30 May 2018 01:50:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <joel.stan@gmail.com>) id 1fNtm2-0001aE-PT
-	for qemu-devel@nongnu.org; Wed, 30 May 2018 01:35:51 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fNu0Q-0007U4-Ud
+	for qemu-devel@nongnu.org; Wed, 30 May 2018 01:50:43 -0400
 MIME-Version: 1.0
-Sender: joel.stan@gmail.com
-In-Reply-To: <20180529062838.20556-1-clg@kaod.org>
-References: <20180529062838.20556-1-clg@kaod.org>
-From: Joel Stanley <joel@jms.id.au>
-Date: Wed, 30 May 2018 15:05:26 +0930
-Message-ID: <CACPK8Xe9a5q5tvFJ=Q0ArkDnf1-e=cW+bVY6a-peD7hpyLn_jw@mail.gmail.com>
+Sender: philippe.mathieu.daude@gmail.com
+In-Reply-To: <20180530074026-mutt-send-email-mst@kernel.org>
+References: <20180528232719.4721-1-f4bug@amsat.org>
+	<20180528232719.4721-10-f4bug@amsat.org>
+	<20180529134053.1ea9f46d.cohuck@redhat.com>
+	<11289f38-6d0f-74c9-1719-83b2a3ed2d97@amsat.org>
+	<20180530074026-mutt-send-email-mst@kernel.org>
+From: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+Date: Wed, 30 May 2018 02:50:41 -0300
+Message-ID: <CAAdtpL7sDOg2m+Ffsbc3f_Za6fr3in5ZfBJ2BAtGNJ1j4vbhJQ@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 0/6] ftgmac100 and NC-SI enhancements for
- the Aspeed SoC
+Subject: Re: [Qemu-devel] [PATCH v4 09/21] target: Do not include
+ "exec/exec-all.h" if it is not necessary
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,85 +30,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@kaod.org>
-Cc: qemu-arm <qemu-arm@nongnu.org>, Samuel Thibault <samuel.thibault@ens-lyon.org>, Jason Wang <jasowang@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Cornelia Huck <cohuck@redhat.com>, Thomas Huth <thuth@redhat.com>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, QEMU Trivial <qemu-trivial@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Peter Maydell <peter.maydell@linaro.org>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, Michael Walle <michael@walle.cc>, Laurent Vivier <laurent@vivier.eu>, Anthony Green <green@moxielogic.com>, Stafford Horne <shorne@gmail.com>, David Gibson <david@gibson.dropbear.id.au>, Alexander Graf <agraf@suse.de>, David Hildenbrand <david@redhat.com>, Max Filippov <jcmvbkbc@gmail.com>, "open list:ARM" <qemu-arm@nongnu.org>, "open list:PowerPC" <qemu-ppc@nongnu.org>, "open list:S390" <qemu-s390x@nongnu.org>
 
-On 29 May 2018 at 15:58, C=C3=A9dric Le Goater <clg@kaod.org> wrote:
-> Hello,
+On Wed, May 30, 2018 at 1:42 AM, Michael S. Tsirkin <mst@redhat.com> wrote:
+> On Wed, May 30, 2018 at 12:12:55AM -0300, Philippe Mathieu-Daud=C3=A9 wro=
+te:
+>> Hi Cornelia,
+>>
+>> On 05/29/2018 08:40 AM, Cornelia Huck wrote:
+>> > On Mon, 28 May 2018 20:27:07 -0300
+>> > Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> wrote:
+>> >
+>> >> Code change produced with:
+>> >>     $ git grep '#include "exec/exec-all.h"' | \
+>> >>       cut -d: -f-1 | \
+>> >>       xargs egrep -L "(cpu_address_space_init|cpu_loop_|tlb_|tb_|GETP=
+C|singlestep|TranslationBlock)" | \
+>> >
+>> > Hm, does this expression catch all files that need to include
+>> > exec-all.h? The resulting patch seems fine, though.
+>>
+>> No, not all :/
+>> I started with "(cpu_loop_|tlb_|tb_)" then kept brutebuilding until no
+>> more errors appear. In 2 more steps I added "cpu_address_space_init|"
+>> then "|GETPC|singlestep|TranslationBlock". Quick and dirty enough for my
+>> goal than trying to build a regex to explode function/struct names from
+>> headers. This is a clever way to do it for long term command reuse taken
+>> from commit messages...
 >
-> Here is a couple of enhancements and fixes for the ftgmac100 NIC used
-> on the Aspeed SoC. It includes VLAN and multicast support.
+> Brutebuilding isn't a good way to find unused includes, some other header
+> might pull in an include you are trying to remove for its own purposes.
+> If you want to try brutebuilding you must also verify that's
+> not the case - e.g. look at the dependency file generated.
+
+Hmm you mean the .d files in the build dir?
+
+i.e.
+$ find lm32-softmmu -name \*.d -exec fgrep -L exec-all.h {} \; | sed
+-e 's/.*-softmmu\/\(.*\)d$/\1c/'
+dump.c
+numa.c
+tcg/tcg-common.c
+tcg/optimize.c
+tcg/tcg-op-gvec.c
+tcg/tcg-op-vec.c
+accel/tcg/tcg-runtime-gvec.c
+accel/tcg/tcg-all.c
+accel/accel.c
+accel/stubs/whpx-stub.c
+accel/stubs/hvf-stub.c
+accel/stubs/kvm-stub.c
+accel/stubs/hax-stub.c
+hw/lm32/milkymist.c
+hw/lm32/lm32_boards.c
+hw/core/generic-loader.c
+...
+
+Then look why each .c included it?
+
 >
-> Following is an assorted set of changes for the NC-SI backend also
-> used on the Aspeed SoC when soldered on OpenPOWER boards. These fix a
-> few problems found when running OpenBMC on aspeed QEMU machines.
->
-> Thanks,
->
-> C=C3=A9dric.
->
-> C=C3=A9dric Le Goater (6):
->   ftgmac100: compute maximum frame size depending on the protocol
->   ftgmac100: add IEEE 802.1Q VLAN support
->   net/ftgmac100: fix multicast hash routine
->   slirp/ncsi: fix "Get Version ID" payload length
->   slirp/ncsi: add a "Get Parameter" response
->   slirp/ncsi: add checksum support
-
-I tested these with -M palmetto-bmc and linux-next as the guest, and
-networking appeared to work fine. For the series:
-
-Tested-by: Joel Stanley <joel@jms.id.au>
-
-One question I had. I get these messages on boot:
-
-[    1.184472] ftgmac100 1e660000.ethernet: Read MAC address
-52:54:00:12:34:56 from chip
-[    1.184751] ftgmac100 1e660000.ethernet: Using NCSI interface
-[    1.197107] ftgmac100 1e660000.ethernet eth0: irq 19, mapped at b30b8905
-[    1.904237] ftgmac100 1e660000.ethernet eth0: NCSI: Handler for
-packet type 0x82 returned -19
-[    1.905682] ftgmac100 1e660000.ethernet eth0: NCSI: Handler for
-packet type 0x82 returned -19
-[    1.905943] ftgmac100 1e660000.ethernet eth0: NCSI: Handler for
-packet type 0x82 returned -19
-[    1.906182] ftgmac100 1e660000.ethernet eth0: NCSI: Handler for
-packet type 0x82 returned -19
-[    1.906415] ftgmac100 1e660000.ethernet eth0: NCSI: Handler for
-packet type 0x82 returned -19
-[    1.906643] ftgmac100 1e660000.ethernet eth0: NCSI: Handler for
-packet type 0x82 returned -19
-[    1.906873] ftgmac100 1e660000.ethernet eth0: NCSI: Handler for
-packet type 0x82 returned -19
-[    1.907103] ftgmac100 1e660000.ethernet eth0: NCSI: Handler for
-packet type 0x82 returned -19
-[    2.024094] ftgmac100 1e660000.ethernet eth0: NCSI: configuring channel =
-0
-[    2.025428] ftgmac100 1e660000.ethernet eth0: NCSI: channel 0 config don=
-e
-[    2.025544] ftgmac100 1e660000.ethernet eth0: NCSI: No more
-channels to process
-[    2.025608] ftgmac100 1e660000.ethernet eth0: NCSI interface up
-
-
-Comparing to hardware, I see:
-
-[    4.071159] ftgmac100 1e660000.ethernet: Read MAC address
-98:be:94:83:00:ad from chip
-[    4.079024] ftgmac100 1e660000.ethernet: Using NCSI interface
-[    4.085976] ftgmac100 1e660000.ethernet eth0: irq 19, mapped at a0963000
-[   40.670099] ftgmac100 1e660000.ethernet eth0: NCSI: Handler for
-packet type 0x82 returned -19
-[   43.852036] ftgmac100 1e660000.ethernet eth0: NCSI: configuring channel =
-1
-[   43.877060] ftgmac100 1e660000.ethernet eth0: NCSI: channel 1 config don=
-e
-[   43.877093] ftgmac100 1e660000.ethernet eth0: NCSI: No more
-channels to process
-[   43.877112] ftgmac100 1e660000.ethernet eth0: NCSI interface up
-
-Is it expected that we get multiple ENODEVs for packet type 0x82 in qemu?
-
-Cheers,
-
-Joel
+>> >>       xargs sed -i.bak '/#include "exec\/exec-all.h"/d'
+>> >>
+>> >> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
