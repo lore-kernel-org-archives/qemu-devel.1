@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36327)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39147)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1fO3z7-000731-IT
-	for qemu-devel@nongnu.org; Wed, 30 May 2018 12:30:02 -0400
+	(envelope-from <no-reply@patchew.org>) id 1fO42w-0000EH-Rd
+	for qemu-devel@nongnu.org; Wed, 30 May 2018 12:34:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1fO3z2-0006za-Lb
-	for qemu-devel@nongnu.org; Wed, 30 May 2018 12:30:01 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:37648)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1fO3z2-0006z6-El
-	for qemu-devel@nongnu.org; Wed, 30 May 2018 12:29:56 -0400
-Date: Wed, 30 May 2018 13:29:49 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20180530162949.GE7451@localhost.localdomain>
-References: <20180529193730.9204-1-crosa@redhat.com>
-	<20180529193730.9204-4-crosa@redhat.com>
-	<20180530125705.GL14623@stefanha-x1.localdomain>
+	(envelope-from <no-reply@patchew.org>) id 1fO42s-0000ok-Dv
+	for qemu-devel@nongnu.org; Wed, 30 May 2018 12:33:58 -0400
+Resent-Message-Id: <E1fO42s-0000ok-Dv@eggs.gnu.org>
+Received: from sender-of-o51.zoho.com ([135.84.80.216]:21071)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1fO42s-0000oN-62
+	for qemu-devel@nongnu.org; Wed, 30 May 2018 12:33:54 -0400
+In-Reply-To: <20180530155647.14090-1-kwolf@redhat.com>
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <152769711347.303.8243565851256943281@d39dc562802a>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180530125705.GL14623@stefanha-x1.localdomain>
-Subject: Re: [Qemu-devel] [PATCH v3 3/5] Acceptance tests: add quick VNC
- tests
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Wed, 30 May 2018 09:18:34 -0700 (PDT)
+Subject: Re: [Qemu-devel] [PULL 00/17] Block layer patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,60 +28,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@redhat.com>
-Cc: Cleber Rosa <crosa@redhat.com>, qemu-devel@nongnu.org, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>, Fam Zheng <famz@redhat.com>, Amador Pahim <amador@pahim.org>
+To: kwolf@redhat.com
+Cc: famz@redhat.com, qemu-block@nongnu.org, qemu-devel@nongnu.org
 
-On Wed, May 30, 2018 at 01:57:05PM +0100, Stefan Hajnoczi wrote:
-> On Tue, May 29, 2018 at 03:37:28PM -0400, Cleber Rosa wrote:
-> > This patch adds a few simple behavior tests for VNC.
-> > 
-> > Signed-off-by: Cleber Rosa <crosa@redhat.com>
-> > ---
-> >  tests/acceptance/vnc.py | 60 +++++++++++++++++++++++++++++++++++++++++
-> >  1 file changed, 60 insertions(+)
-> >  create mode 100644 tests/acceptance/vnc.py
-> > 
-> > diff --git a/tests/acceptance/vnc.py b/tests/acceptance/vnc.py
-> > new file mode 100644
-> > index 0000000000..b1ef9d71b1
-> > --- /dev/null
-> > +++ b/tests/acceptance/vnc.py
-> > @@ -0,0 +1,60 @@
-> > +# Simple functional tests for VNC functionality
-> > +#
-> > +# Copyright (c) 2018 Red Hat, Inc.
-> > +#
-> > +# Author:
-> > +#  Cleber Rosa <crosa@redhat.com>
-> > +#
-> > +# This work is licensed under the terms of the GNU GPL, version 2 or
-> > +# later.  See the COPYING file in the top-level directory.
-> > +
-> > +from avocado_qemu import Test
-> > +
-> > +
-> > +class Vnc(Test):
-> > +    """
-> > +    :avocado: enable
-> > +    :avocado: tags=vnc,quick
-> > +    """
-> > +    def test_no_vnc(self):
-> > +        self.vm.add_args('-nodefaults', '-S')
-> > +        self.vm.launch()
-> 
-> If this pattern becomes very common maybe vm.launch() should become
-> vm.launch(*extra_args) to make this a one-liner:
-> 
->   self.vm.launch('-nodefaults', '-S')
-
-I think this was suggested in the past:
-
-  self.vm.add_args(...).launch()
-
-This style would be useful if we add other methods that change
-QEMU options in addition to raw add_args().  e.g.:
-
-  self.vm.add_args(...).add_console(...).add_drive(...).launch()
-
--- 
-Eduardo
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
+c3NhZ2UtaWQ6IDIwMTgwNTMwMTU1NjQ3LjE0MDkwLTEta3dvbGZAcmVkaGF0LmNvbQpTdWJqZWN0
+OiBbUWVtdS1kZXZlbF0gW1BVTEwgMDAvMTddIEJsb2NrIGxheWVyIHBhdGNoZXMKCj09PSBURVNU
+IFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKCkJBU0U9YmFzZQpuPTEKdG90YWw9JChnaXQg
+bG9nIC0tb25lbGluZSAkQkFTRS4uIHwgd2MgLWwpCmZhaWxlZD0wCgpnaXQgY29uZmlnIC0tbG9j
+YWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1
+ZQpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5hbGdvcml0aG0gaGlzdG9ncmFtCgpjb21taXRzPSIk
+KGdpdCBsb2cgLS1mb3JtYXQ9JUggLS1yZXZlcnNlICRCQVNFLi4pIgpmb3IgYyBpbiAkY29tbWl0
+czsgZG8KICAgIGVjaG8gIkNoZWNraW5nIFBBVENIICRuLyR0b3RhbDogJChnaXQgbG9nIC1uIDEg
+LS1mb3JtYXQ9JXMgJGMpLi4uIgogICAgaWYgISBnaXQgc2hvdyAkYyAtLWZvcm1hdD1lbWFpbCB8
+IC4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgLTsgdGhlbgogICAgICAgIGZhaWxl
+ZD0xCiAgICAgICAgZWNobwogICAgZmkKICAgIG49JCgobisxKSkKZG9uZQoKZXhpdCAkZmFpbGVk
+Cj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQx
+ZGVmN2Y0NGJkODg4NzEzMzg0CkZyb20gaHR0cHM6Ly9naXRodWIuY29tL3BhdGNoZXctcHJvamVj
+dC9xZW11CiB0IFt0YWcgdXBkYXRlXSAgICAgICAgICAgIHBhdGNoZXcvMjAxODA1MzAwNjEwMzUu
+MjI1OTItMS1jbGdAa2FvZC5vcmcgLT4gcGF0Y2hldy8yMDE4MDUzMDA2MTAzNS4yMjU5Mi0xLWNs
+Z0BrYW9kLm9yZwogdCBbdGFnIHVwZGF0ZV0gICAgICAgICAgICBwYXRjaGV3LzIwMTgwNTMwMTEy
+NDI0LjIwNDgzNS0xLXZzZW1lbnRzb3ZAdmlydHVvenpvLmNvbSAtPiBwYXRjaGV3LzIwMTgwNTMw
+MTEyNDI0LjIwNDgzNS0xLXZzZW1lbnRzb3ZAdmlydHVvenpvLmNvbQogKiBbbmV3IHRhZ10gICAg
+ICAgICAgICAgICBwYXRjaGV3LzIwMTgwNTMwMTU1NjQ3LjE0MDkwLTEta3dvbGZAcmVkaGF0LmNv
+bSAtPiBwYXRjaGV3LzIwMTgwNTMwMTU1NjQ3LjE0MDkwLTEta3dvbGZAcmVkaGF0LmNvbQpTd2l0
+Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCjg4ZTA1ODk0MmEgYmxvY2svY3JlYXRlOiBNYXJr
+IGJsb2NrZGV2LWNyZWF0ZSBzdGFibGUKMTM5ZWM1ZWQ5NiBxZW11LWlvdGVzdHM6IFJld3JpdGUg
+MjEzIGZvciBibG9ja2Rldi1jcmVhdGUgam9iCmQ2MmUwYmEwOGQgcWVtdS1pb3Rlc3RzOiBSZXdy
+aXRlIDIxMiBmb3IgYmxvY2tkZXYtY3JlYXRlIGpvYgo3MGRlMmNhZmFmIHFlbXUtaW90ZXN0czog
+UmV3cml0ZSAyMTEgZm9yIGJsb2NrZGV2LWNyZWF0ZSBqb2IKNGQ1NGNhZGM1NSBxZW11LWlvdGVz
+dHM6IFJld3JpdGUgMjEwIGZvciBibG9ja2Rldi1jcmVhdGUgam9iCjUzZDliYzViY2MgcWVtdS1p
+b3Rlc3RzOiBSZXdyaXRlIDIwNyBmb3IgYmxvY2tkZXYtY3JlYXRlIGpvYgpiNjNkMmU2YjVkIHFl
+bXUtaW90ZXN0czogUmV3cml0ZSAyMDYgZm9yIGJsb2NrZGV2LWNyZWF0ZSBqb2IKYzIzZjZlNWNh
+MyBxZW11LWlvdGVzdHM6IGlvdGVzdHMucHkgaGVscGVyIGZvciBub24tZmlsZSBwcm90b2NvbHMK
+MjhjNDM0NDg4NyBxZW11LWlvdGVzdHM6IEFkZCBWTS5ydW5fam9iKCkKZDc1M2FjZDBjMyBxZW11
+LWlvdGVzdHM6IEFkZCBpb3Rlc3RzLmltZ19pbmZvX2xvZygpCjVlZWM3MjQ0NWUgcWVtdS1pb3Rl
+c3RzOiBBZGQgVk0ucW1wX2xvZygpCjkzODRkZDJiZTggcWVtdS1pb3Rlc3RzOiBBZGQgVk0uZ2V0
+X3FtcF9ldmVudHNfZmlsdGVyZWQoKQpiNDJmNWY3ZGQ0IGJsb2NrL2NyZWF0ZTogTWFrZSB4LWJs
+b2NrZGV2LWNyZWF0ZSBhIGpvYgo0Y2JmMDFlODQyIGpvYjogQWRkIGVycm9yIG1lc3NhZ2UgZm9y
+IGZhaWxpbmcgam9icwo1Mzk5YmNlYjJjIHZoZHg6IEZpeCB2aGR4X2NvX2NyZWF0ZSgpIHJldHVy
+biB2YWx1ZQplN2UyNmMwOGU3IHZkaTogRml4IHZkaV9jb19kb19jcmVhdGUoKSByZXR1cm4gdmFs
+dWUKYjQxMmY3NTdiYyBxY293MjogRml4IENvdmVyaXR5IHdhcm5pbmcgd2hlbiBjYWxjdWxhdGlu
+ZyB0aGUgcmVmY291bnQgY2FjaGUgc2l6ZQoKPT09IE9VVFBVVCBCRUdJTiA9PT0KQ2hlY2tpbmcg
+UEFUQ0ggMS8xNzogcWNvdzI6IEZpeCBDb3Zlcml0eSB3YXJuaW5nIHdoZW4gY2FsY3VsYXRpbmcg
+dGhlIHJlZmNvdW50IGNhY2hlIHNpemUuLi4KQ2hlY2tpbmcgUEFUQ0ggMi8xNzogdmRpOiBGaXgg
+dmRpX2NvX2RvX2NyZWF0ZSgpIHJldHVybiB2YWx1ZS4uLgpDaGVja2luZyBQQVRDSCAzLzE3OiB2
+aGR4OiBGaXggdmhkeF9jb19jcmVhdGUoKSByZXR1cm4gdmFsdWUuLi4KQ2hlY2tpbmcgUEFUQ0gg
+NC8xNzogam9iOiBBZGQgZXJyb3IgbWVzc2FnZSBmb3IgZmFpbGluZyBqb2JzLi4uCkNoZWNraW5n
+IFBBVENIIDUvMTc6IGJsb2NrL2NyZWF0ZTogTWFrZSB4LWJsb2NrZGV2LWNyZWF0ZSBhIGpvYi4u
+LgpDaGVja2luZyBQQVRDSCA2LzE3OiBxZW11LWlvdGVzdHM6IEFkZCBWTS5nZXRfcW1wX2V2ZW50
+c19maWx0ZXJlZCgpLi4uCkNoZWNraW5nIFBBVENIIDcvMTc6IHFlbXUtaW90ZXN0czogQWRkIFZN
+LnFtcF9sb2coKS4uLgpDaGVja2luZyBQQVRDSCA4LzE3OiBxZW11LWlvdGVzdHM6IEFkZCBpb3Rl
+c3RzLmltZ19pbmZvX2xvZygpLi4uCkVSUk9SOiBsaW5lIG92ZXIgOTAgY2hhcmFjdGVycwojNDQ6
+IEZJTEU6IHRlc3RzL3FlbXUtaW90ZXN0cy9pb3Rlc3RzLnB5OjIyNzoKKyAgICAgICAgbGluZSA9
+IHJlLnN1YigndXVpZDogWy1hLWYwLTldKycsICd1dWlkOiBYWFhYWFhYWC1YWFhYLVhYWFgtWFhY
+WC1YWFhYWFhYWFhYWFgnLCBsaW5lKQoKdG90YWw6IDEgZXJyb3JzLCAwIHdhcm5pbmdzLCAzMCBs
+aW5lcyBjaGVja2VkCgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmll
+dy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhl
+bSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgpDaGVj
+a2luZyBQQVRDSCA5LzE3OiBxZW11LWlvdGVzdHM6IEFkZCBWTS5ydW5fam9iKCkuLi4KQ2hlY2tp
+bmcgUEFUQ0ggMTAvMTc6IHFlbXUtaW90ZXN0czogaW90ZXN0cy5weSBoZWxwZXIgZm9yIG5vbi1m
+aWxlIHByb3RvY29scy4uLgpDaGVja2luZyBQQVRDSCAxMS8xNzogcWVtdS1pb3Rlc3RzOiBSZXdy
+aXRlIDIwNiBmb3IgYmxvY2tkZXYtY3JlYXRlIGpvYi4uLgpDaGVja2luZyBQQVRDSCAxMi8xNzog
+cWVtdS1pb3Rlc3RzOiBSZXdyaXRlIDIwNyBmb3IgYmxvY2tkZXYtY3JlYXRlIGpvYi4uLgpDaGVj
+a2luZyBQQVRDSCAxMy8xNzogcWVtdS1pb3Rlc3RzOiBSZXdyaXRlIDIxMCBmb3IgYmxvY2tkZXYt
+Y3JlYXRlIGpvYi4uLgpDaGVja2luZyBQQVRDSCAxNC8xNzogcWVtdS1pb3Rlc3RzOiBSZXdyaXRl
+IDIxMSBmb3IgYmxvY2tkZXYtY3JlYXRlIGpvYi4uLgpDaGVja2luZyBQQVRDSCAxNS8xNzogcWVt
+dS1pb3Rlc3RzOiBSZXdyaXRlIDIxMiBmb3IgYmxvY2tkZXYtY3JlYXRlIGpvYi4uLgpDaGVja2lu
+ZyBQQVRDSCAxNi8xNzogcWVtdS1pb3Rlc3RzOiBSZXdyaXRlIDIxMyBmb3IgYmxvY2tkZXYtY3Jl
+YXRlIGpvYi4uLgpDaGVja2luZyBQQVRDSCAxNy8xNzogYmxvY2svY3JlYXRlOiBNYXJrIGJsb2Nr
+ZGV2LWNyZWF0ZSBzdGFibGUuLi4KPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhp
+dGVkIHdpdGggY29kZTogMQoKCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQ
+YXRjaGV3IFtodHRwOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0
+byBwYXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
