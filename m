@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33345)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33224)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fO5Pm-0001vZ-7v
-	for qemu-devel@nongnu.org; Wed, 30 May 2018 14:01:40 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1fO5Ph-0001qo-G6
+	for qemu-devel@nongnu.org; Wed, 30 May 2018 14:01:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fO5Pl-0004Z7-0i
-	for qemu-devel@nongnu.org; Wed, 30 May 2018 14:01:38 -0400
-Received: from mail-pl0-x241.google.com ([2607:f8b0:400e:c01::241]:36265)
+	(envelope-from <richard.henderson@linaro.org>) id 1fO5Pf-0004SD-4p
+	for qemu-devel@nongnu.org; Wed, 30 May 2018 14:01:33 -0400
+Received: from mail-pf0-x236.google.com ([2607:f8b0:400e:c00::236]:37246)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1fO5Pk-0004YN-QU
-	for qemu-devel@nongnu.org; Wed, 30 May 2018 14:01:36 -0400
-Received: by mail-pl0-x241.google.com with SMTP id v24-v6so11553241plo.3
-	for <qemu-devel@nongnu.org>; Wed, 30 May 2018 11:01:36 -0700 (PDT)
+	id 1fO5Pe-0004Qr-Tl
+	for qemu-devel@nongnu.org; Wed, 30 May 2018 14:01:31 -0400
+Received: by mail-pf0-x236.google.com with SMTP id e9-v6so9408226pfi.4
+	for <qemu-devel@nongnu.org>; Wed, 30 May 2018 11:01:30 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Wed, 30 May 2018 11:01:10 -0700
-Message-Id: <20180530180120.13355-9-richard.henderson@linaro.org>
+Date: Wed, 30 May 2018 11:01:06 -0700
+Message-Id: <20180530180120.13355-5-richard.henderson@linaro.org>
 In-Reply-To: <20180530180120.13355-1-richard.henderson@linaro.org>
 References: <20180530180120.13355-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH v3b 08/18] target/arm: Implement SVE reverse
- within elements
+Subject: [Qemu-devel] [PATCH v3b 04/18] target/arm: Implement SVE Permute -
+ Interleaving Group
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,168 +30,224 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: peter.maydell@linaro.org, qemu-arm@nongnu.org
 
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/arm/helper-sve.h    | 14 +++++++++++++
- target/arm/sve_helper.c    | 41 +++++++++++++++++++++++++++++++-------
- target/arm/translate-sve.c | 38 +++++++++++++++++++++++++++++++++++
- target/arm/sve.decode      |  7 +++++++
- 4 files changed, 93 insertions(+), 7 deletions(-)
+ target/arm/helper-sve.h    | 15 ++++++++
+ target/arm/sve_helper.c    | 72 ++++++++++++++++++++++++++++++++++++
+ target/arm/translate-sve.c | 75 ++++++++++++++++++++++++++++++++++++++
+ target/arm/sve.decode      | 10 +++++
+ 4 files changed, 172 insertions(+)
 
 diff --git a/target/arm/helper-sve.h b/target/arm/helper-sve.h
-index a58fb4ba01..3b7c54905d 100644
+index ff958fcebd..bab20345c6 100644
 --- a/target/arm/helper-sve.h
 +++ b/target/arm/helper-sve.h
-@@ -465,6 +465,20 @@ DEF_HELPER_FLAGS_4(sve_compact_d, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
+@@ -445,6 +445,21 @@ DEF_HELPER_FLAGS_4(sve_trn_p, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
+ DEF_HELPER_FLAGS_3(sve_rev_p, TCG_CALL_NO_RWG, void, ptr, ptr, i32)
+ DEF_HELPER_FLAGS_3(sve_punpk_p, TCG_CALL_NO_RWG, void, ptr, ptr, i32)
  
- DEF_HELPER_FLAGS_2(sve_last_active_element, TCG_CALL_NO_RWG, s32, ptr, i32)
- 
-+DEF_HELPER_FLAGS_4(sve_revb_h, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_4(sve_revb_s, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_4(sve_revb_d, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
++DEF_HELPER_FLAGS_4(sve_zip_b, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
++DEF_HELPER_FLAGS_4(sve_zip_h, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
++DEF_HELPER_FLAGS_4(sve_zip_s, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
++DEF_HELPER_FLAGS_4(sve_zip_d, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
 +
-+DEF_HELPER_FLAGS_4(sve_revh_s, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_4(sve_revh_d, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
++DEF_HELPER_FLAGS_4(sve_uzp_b, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
++DEF_HELPER_FLAGS_4(sve_uzp_h, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
++DEF_HELPER_FLAGS_4(sve_uzp_s, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
++DEF_HELPER_FLAGS_4(sve_uzp_d, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
 +
-+DEF_HELPER_FLAGS_4(sve_revw_d, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
-+
-+DEF_HELPER_FLAGS_4(sve_rbit_b, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_4(sve_rbit_h, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_4(sve_rbit_s, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_4(sve_rbit_d, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
++DEF_HELPER_FLAGS_4(sve_trn_b, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
++DEF_HELPER_FLAGS_4(sve_trn_h, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
++DEF_HELPER_FLAGS_4(sve_trn_s, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
++DEF_HELPER_FLAGS_4(sve_trn_d, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
 +
  DEF_HELPER_FLAGS_5(sve_and_pppp, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, ptr, i32)
  DEF_HELPER_FLAGS_5(sve_bic_pppp, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, ptr, i32)
  DEF_HELPER_FLAGS_5(sve_eor_pppp, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, ptr, i32)
 diff --git a/target/arm/sve_helper.c b/target/arm/sve_helper.c
-index 941a098234..f8579a25e3 100644
+index f4d49d4aff..f114e9ab63 100644
 --- a/target/arm/sve_helper.c
 +++ b/target/arm/sve_helper.c
-@@ -238,6 +238,26 @@ static inline uint64_t expand_pred_s(uint8_t byte)
-     return word[byte & 0x11];
- }
- 
-+/* Swap 16-bit words within a 32-bit word.  */
-+static inline uint32_t hswap32(uint32_t h)
-+{
-+    return rol32(h, 16);
-+}
-+
-+/* Swap 16-bit words within a 64-bit word.  */
-+static inline uint64_t hswap64(uint64_t h)
-+{
-+    uint64_t m = 0x0000ffff0000ffffull;
-+    h = rol64(h, 32);
-+    return ((h & m) << 16) | ((h >> 16) & m);
-+}
-+
-+/* Swap 32-bit words within a 64-bit word.  */
-+static inline uint64_t wswap64(uint64_t h)
-+{
-+    return rol64(h, 32);
-+}
-+
- #define LOGICAL_PPPP(NAME, FUNC) \
- void HELPER(NAME)(void *vd, void *vn, void *vm, void *vg, uint32_t desc)  \
- {                                                                         \
-@@ -616,6 +636,20 @@ DO_ZPZ(sve_neg_h, uint16_t, H1_2, DO_NEG)
- DO_ZPZ(sve_neg_s, uint32_t, H1_4, DO_NEG)
- DO_ZPZ_D(sve_neg_d, uint64_t, DO_NEG)
- 
-+DO_ZPZ(sve_revb_h, uint16_t, H1_2, bswap16)
-+DO_ZPZ(sve_revb_s, uint32_t, H1_4, bswap32)
-+DO_ZPZ_D(sve_revb_d, uint64_t, bswap64)
-+
-+DO_ZPZ(sve_revh_s, uint32_t, H1_4, hswap32)
-+DO_ZPZ_D(sve_revh_d, uint64_t, hswap64)
-+
-+DO_ZPZ_D(sve_revw_d, uint64_t, wswap64)
-+
-+DO_ZPZ(sve_rbit_b, uint8_t, H1, revbit8)
-+DO_ZPZ(sve_rbit_h, uint16_t, H1_2, revbit16)
-+DO_ZPZ(sve_rbit_s, uint32_t, H1_4, revbit32)
-+DO_ZPZ_D(sve_rbit_d, uint64_t, revbit64)
-+
- /* Three-operand expander, unpredicated, in which the third operand is "wide".
-  */
- #define DO_ZZW(NAME, TYPE, TYPEW, H, OP)                       \
-@@ -1587,13 +1621,6 @@ void HELPER(sve_rev_b)(void *vd, void *vn, uint32_t desc)
+@@ -1964,3 +1964,75 @@ void HELPER(sve_punpk_p)(void *vd, void *vn, uint32_t pred_desc)
+         }
      }
  }
- 
--static inline uint64_t hswap64(uint64_t h)
--{
--    uint64_t m = 0x0000ffff0000ffffull;
--    h = rol64(h, 32);
--    return ((h & m) << 16) | ((h >> 16) & m);
--}
--
- void HELPER(sve_rev_h)(void *vd, void *vn, uint32_t desc)
- {
-     intptr_t i, j, opr_sz = simd_oprsz(desc);
++
++#define DO_ZIP(NAME, TYPE, H) \
++void HELPER(NAME)(void *vd, void *vn, void *vm, uint32_t desc)       \
++{                                                                    \
++    intptr_t oprsz = simd_oprsz(desc);                               \
++    intptr_t i, oprsz_2 = oprsz / 2;                                 \
++    ARMVectorReg tmp_n, tmp_m;                                       \
++    /* We produce output faster than we consume input.               \
++       Therefore we must be mindful of possible overlap.  */         \
++    if (unlikely((vn - vd) < (uintptr_t)oprsz)) {                    \
++        vn = memcpy(&tmp_n, vn, oprsz_2);                            \
++    }                                                                \
++    if (unlikely((vm - vd) < (uintptr_t)oprsz)) {                    \
++        vm = memcpy(&tmp_m, vm, oprsz_2);                            \
++    }                                                                \
++    for (i = 0; i < oprsz_2; i += sizeof(TYPE)) {                    \
++        *(TYPE *)(vd + H(2 * i + 0)) = *(TYPE *)(vn + H(i));         \
++        *(TYPE *)(vd + H(2 * i + sizeof(TYPE))) = *(TYPE *)(vm + H(i)); \
++    }                                                                \
++}
++
++DO_ZIP(sve_zip_b, uint8_t, H1)
++DO_ZIP(sve_zip_h, uint16_t, H1_2)
++DO_ZIP(sve_zip_s, uint32_t, H1_4)
++DO_ZIP(sve_zip_d, uint64_t, )
++
++#define DO_UZP(NAME, TYPE, H) \
++void HELPER(NAME)(void *vd, void *vn, void *vm, uint32_t desc)         \
++{                                                                      \
++    intptr_t oprsz = simd_oprsz(desc);                                 \
++    intptr_t oprsz_2 = oprsz / 2;                                      \
++    intptr_t odd_ofs = simd_data(desc);                                \
++    intptr_t i;                                                        \
++    ARMVectorReg tmp_m;                                                \
++    if (unlikely((vm - vd) < (uintptr_t)oprsz)) {                      \
++        vm = memcpy(&tmp_m, vm, oprsz);                                \
++    }                                                                  \
++    for (i = 0; i < oprsz_2; i += sizeof(TYPE)) {                      \
++        *(TYPE *)(vd + H(i)) = *(TYPE *)(vn + H(2 * i + odd_ofs));     \
++    }                                                                  \
++    for (i = 0; i < oprsz_2; i += sizeof(TYPE)) {                      \
++        *(TYPE *)(vd + H(oprsz_2 + i)) = *(TYPE *)(vm + H(2 * i + odd_ofs)); \
++    }                                                                  \
++}
++
++DO_UZP(sve_uzp_b, uint8_t, H1)
++DO_UZP(sve_uzp_h, uint16_t, H1_2)
++DO_UZP(sve_uzp_s, uint32_t, H1_4)
++DO_UZP(sve_uzp_d, uint64_t, )
++
++#define DO_TRN(NAME, TYPE, H) \
++void HELPER(NAME)(void *vd, void *vn, void *vm, uint32_t desc)         \
++{                                                                      \
++    intptr_t oprsz = simd_oprsz(desc);                                 \
++    intptr_t odd_ofs = simd_data(desc);                                \
++    intptr_t i;                                                        \
++    for (i = 0; i < oprsz; i += 2 * sizeof(TYPE)) {                    \
++        TYPE ae = *(TYPE *)(vn + H(i + odd_ofs));                      \
++        TYPE be = *(TYPE *)(vm + H(i + odd_ofs));                      \
++        *(TYPE *)(vd + H(i + 0)) = ae;                                 \
++        *(TYPE *)(vd + H(i + sizeof(TYPE))) = be;                      \
++    }                                                                  \
++}
++
++DO_TRN(sve_trn_b, uint8_t, H1)
++DO_TRN(sve_trn_h, uint16_t, H1_2)
++DO_TRN(sve_trn_s, uint32_t, H1_4)
++DO_TRN(sve_trn_d, uint64_t, )
++
++#undef DO_ZIP
++#undef DO_UZP
++#undef DO_TRN
 diff --git a/target/arm/translate-sve.c b/target/arm/translate-sve.c
-index a6f85de358..90561a8b50 100644
+index 0160d06915..21319518d7 100644
 --- a/target/arm/translate-sve.c
 +++ b/target/arm/translate-sve.c
-@@ -2633,6 +2633,44 @@ static bool trans_CPY_m_v(DisasContext *s, arg_rpr_esz *a, uint32_t insn)
-     return true;
+@@ -2209,6 +2209,81 @@ static bool trans_PUNPKHI(DisasContext *s, arg_PUNPKHI *a, uint32_t insn)
+     return do_perm_pred2(s, a, 1, gen_helper_sve_punpk_p);
  }
  
-+static bool trans_REVB(DisasContext *s, arg_rpr_esz *a, uint32_t insn)
++/*
++ *** SVE Permute - Interleaving Group
++ */
++
++static bool do_zip(DisasContext *s, arg_rrr_esz *a, bool high)
 +{
 +    static gen_helper_gvec_3 * const fns[4] = {
-+        NULL,
-+        gen_helper_sve_revb_h,
-+        gen_helper_sve_revb_s,
-+        gen_helper_sve_revb_d,
++        gen_helper_sve_zip_b, gen_helper_sve_zip_h,
++        gen_helper_sve_zip_s, gen_helper_sve_zip_d,
 +    };
-+    return do_zpz_ool(s, a, fns[a->esz]);
++
++    if (sve_access_check(s)) {
++        unsigned vsz = vec_full_reg_size(s);
++        unsigned high_ofs = high ? vsz / 2 : 0;
++        tcg_gen_gvec_3_ool(vec_full_reg_offset(s, a->rd),
++                           vec_full_reg_offset(s, a->rn) + high_ofs,
++                           vec_full_reg_offset(s, a->rm) + high_ofs,
++                           vsz, vsz, 0, fns[a->esz]);
++    }
++    return true;
 +}
 +
-+static bool trans_REVH(DisasContext *s, arg_rpr_esz *a, uint32_t insn)
++static bool do_zzz_data_ool(DisasContext *s, arg_rrr_esz *a, int data,
++                            gen_helper_gvec_3 *fn)
 +{
-+    static gen_helper_gvec_3 * const fns[4] = {
-+        NULL,
-+        NULL,
-+        gen_helper_sve_revh_s,
-+        gen_helper_sve_revh_d,
-+    };
-+    return do_zpz_ool(s, a, fns[a->esz]);
++    if (sve_access_check(s)) {
++        unsigned vsz = vec_full_reg_size(s);
++        tcg_gen_gvec_3_ool(vec_full_reg_offset(s, a->rd),
++                           vec_full_reg_offset(s, a->rn),
++                           vec_full_reg_offset(s, a->rm),
++                           vsz, vsz, data, fn);
++    }
++    return true;
 +}
 +
-+static bool trans_REVW(DisasContext *s, arg_rpr_esz *a, uint32_t insn)
++static bool trans_ZIP1_z(DisasContext *s, arg_rrr_esz *a, uint32_t insn)
 +{
-+    return do_zpz_ool(s, a, a->esz == 3 ? gen_helper_sve_revw_d : NULL);
++    return do_zip(s, a, false);
 +}
 +
-+static bool trans_RBIT(DisasContext *s, arg_rpr_esz *a, uint32_t insn)
++static bool trans_ZIP2_z(DisasContext *s, arg_rrr_esz *a, uint32_t insn)
 +{
-+    static gen_helper_gvec_3 * const fns[4] = {
-+        gen_helper_sve_rbit_b,
-+        gen_helper_sve_rbit_h,
-+        gen_helper_sve_rbit_s,
-+        gen_helper_sve_rbit_d,
-+    };
-+    return do_zpz_ool(s, a, fns[a->esz]);
++    return do_zip(s, a, true);
++}
++
++static gen_helper_gvec_3 * const uzp_fns[4] = {
++    gen_helper_sve_uzp_b, gen_helper_sve_uzp_h,
++    gen_helper_sve_uzp_s, gen_helper_sve_uzp_d,
++};
++
++static bool trans_UZP1_z(DisasContext *s, arg_rrr_esz *a, uint32_t insn)
++{
++    return do_zzz_data_ool(s, a, 0, uzp_fns[a->esz]);
++}
++
++static bool trans_UZP2_z(DisasContext *s, arg_rrr_esz *a, uint32_t insn)
++{
++    return do_zzz_data_ool(s, a, 1 << a->esz, uzp_fns[a->esz]);
++}
++
++static gen_helper_gvec_3 * const trn_fns[4] = {
++    gen_helper_sve_trn_b, gen_helper_sve_trn_h,
++    gen_helper_sve_trn_s, gen_helper_sve_trn_d,
++};
++
++static bool trans_TRN1_z(DisasContext *s, arg_rrr_esz *a, uint32_t insn)
++{
++    return do_zzz_data_ool(s, a, 0, trn_fns[a->esz]);
++}
++
++static bool trans_TRN2_z(DisasContext *s, arg_rrr_esz *a, uint32_t insn)
++{
++    return do_zzz_data_ool(s, a, 1 << a->esz, trn_fns[a->esz]);
 +}
 +
  /*
   *** SVE Memory - 32-bit Gather and Unsized Contiguous Group
   */
 diff --git a/target/arm/sve.decode b/target/arm/sve.decode
-index 519139f684..95eb4968a9 100644
+index 26fe1608c4..df2b94dc0a 100644
 --- a/target/arm/sve.decode
 +++ b/target/arm/sve.decode
-@@ -456,6 +456,13 @@ CPY_m_v         00000101 .. 100000 100 ... ..... .....          @rd_pg_rn
- # SVE copy element from general register to vector (predicated)
- CPY_m_r         00000101 .. 101000 101 ... ..... .....          @rd_pg_rn
+@@ -414,6 +414,16 @@ REV_p           00000101 .. 11 0100 010 000 0 .... 0 ....       @pd_pn
+ PUNPKLO         00000101 00 11 0000 010 000 0 .... 0 ....       @pd_pn_e0
+ PUNPKHI         00000101 00 11 0001 010 000 0 .... 0 ....       @pd_pn_e0
  
-+# SVE reverse within elements
-+# Note esz >= operation size
-+REVB            00000101 .. 1001 00 100 ... ..... .....         @rd_pg_rn
-+REVH            00000101 .. 1001 01 100 ... ..... .....         @rd_pg_rn
-+REVW            00000101 .. 1001 10 100 ... ..... .....         @rd_pg_rn
-+RBIT            00000101 .. 1001 11 100 ... ..... .....         @rd_pg_rn
++### SVE Permute - Interleaving Group
++
++# SVE permute vector elements
++ZIP1_z          00000101 .. 1 ..... 011 000 ..... .....         @rd_rn_rm
++ZIP2_z          00000101 .. 1 ..... 011 001 ..... .....         @rd_rn_rm
++UZP1_z          00000101 .. 1 ..... 011 010 ..... .....         @rd_rn_rm
++UZP2_z          00000101 .. 1 ..... 011 011 ..... .....         @rd_rn_rm
++TRN1_z          00000101 .. 1 ..... 011 100 ..... .....         @rd_rn_rm
++TRN2_z          00000101 .. 1 ..... 011 101 ..... .....         @rd_rn_rm
 +
  ### SVE Predicate Logical Operations Group
  
