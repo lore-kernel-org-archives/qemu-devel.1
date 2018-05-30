@@ -1,23 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58265)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58435)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1fNuPZ-0001dz-LU
-	for qemu-devel@nongnu.org; Wed, 30 May 2018 02:16:42 -0400
+	(envelope-from <clg@kaod.org>) id 1fNuQI-0001zm-60
+	for qemu-devel@nongnu.org; Wed, 30 May 2018 02:17:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1fNuPW-0000le-Gi
-	for qemu-devel@nongnu.org; Wed, 30 May 2018 02:16:41 -0400
-Date: Wed, 30 May 2018 08:16:33 +0200
-From: Gerd Hoffmann <kraxel@redhat.com>
-Message-ID: <20180530061633.iltyrqvyctpipxmt@sirius.home.kraxel.org>
-References: <20170724182751.18261-1-f4bug@amsat.org>
-	<20170724182751.18261-16-f4bug@amsat.org>
-	<4f76d9d2-5c4b-a6ef-e050-9d9a1f31be85@amsat.org>
+	(envelope-from <clg@kaod.org>) id 1fNuQF-00019W-1Z
+	for qemu-devel@nongnu.org; Wed, 30 May 2018 02:17:26 -0400
+Received: from 3.mo1.mail-out.ovh.net ([46.105.60.232]:56177)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1fNuQE-00017L-R7
+	for qemu-devel@nongnu.org; Wed, 30 May 2018 02:17:22 -0400
+Received: from player718.ha.ovh.net (unknown [10.109.122.61])
+	by mo1.mail-out.ovh.net (Postfix) with ESMTP id 5913AFFF22
+	for <qemu-devel@nongnu.org>; Wed, 30 May 2018 08:17:21 +0200 (CEST)
+From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
+Date: Wed, 30 May 2018 08:17:07 +0200
+Message-Id: <20180530061711.23673-1-clg@kaod.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <4f76d9d2-5c4b-a6ef-e050-9d9a1f31be85@amsat.org>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH for 2.10 15/35] usb: correctly handle Zero
- Length Packets
+Subject: [Qemu-devel] [PATCH v2 0/4] net: ftgmac100 enhancements
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,52 +27,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Cc: Eric Blake <eblake@redhat.com>, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org, qemu-trivial@nongnu.org
+To: Jason Wang <jasowang@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-arm@nongnu.org, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
 
-On Tue, May 29, 2018 at 11:22:46AM -0300, Philippe Mathieu-Daud=C3=A9 wro=
-te:
-> On 07/24/2017 03:27 PM, Philippe Mathieu-Daud=C3=A9 wrote:
-> > USB Specification Revision 2.0, =C2=A75.5.3:
-> >   The Data stage of a control transfer from an endpoint to the host i=
-s complete when the endpoint does one of the following:
-> >   =E2=80=A2 Has transferred exactly the amount of data specified duri=
-ng the Setup stage
-> >   =E2=80=A2 Transfers a packet with a payload size less than wMaxPack=
-etSize or transfers a zero-length packet"
-> >=20
-> > hw/usb/redirect.c:802:9: warning: Declared variable-length array (VLA=
-) has zero size
-> >         uint8_t buf[size];
-> >         ^~~~~~~~~~~ ~~~~
-> >=20
-> > Reported-by: Clang Static Analyzer
-> > Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-> > ---
-> >  hw/usb/redirect.c | 2 +-
-> >  1 file changed, 1 insertion(+), 1 deletion(-)
-> >=20
-> > diff --git a/hw/usb/redirect.c b/hw/usb/redirect.c
-> > index 5e42730449..5b7073d2cd 100644
-> > --- a/hw/usb/redirect.c
-> > +++ b/hw/usb/redirect.c
-> > @@ -795,7 +795,7 @@ static void usbredir_handle_bulk_data(USBRedirDev=
-ice *dev, USBPacket *p,
-> >             usbredirparser_peer_has_cap(dev->parser,
-> >                                         usb_redir_cap_32bits_bulk_len=
-gth));
-> > =20
-> > -    if (ep & USB_DIR_IN) {
-> > +    if (ep & USB_DIR_IN || size =3D=3D 0) {
-> >          usbredirparser_send_bulk_packet(dev->parser, p->id,
-> >                                          &bulk_packet, NULL, 0);
-> >      } else {
-> >=20
->=20
-> Ping?
+Hello,
 
-Whoops, pretty old one.  Don't have this in my qemu-devel archive any
-more.  Can you rebase + resend?
+Here is a couple of enhancements and fixes for the ftgmac100 NIC used
+on the Aspeed SoC. It includes VLAN and multicast support.
 
-thanks,
-  Gerd
+Thanks,
+
+C=C3=A9dric.
+
+C=C3=A9dric Le Goater (4):
+  ftgmac100: compute maximum frame size depending on the protocol
+  ftgmac100: add IEEE 802.1Q VLAN support
+  ftgmac100: fix multicast hash routine
+  ftgmac100: remove check on runt messages
+
+ include/hw/net/ftgmac100.h |  7 ++++-
+ hw/net/ftgmac100.c         | 64 +++++++++++++++++++++++++++++++---------=
+------
+ 2 files changed, 50 insertions(+), 21 deletions(-)
+
+--=20
+2.13.6
