@@ -1,26 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35265)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42050)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1fNrpB-000733-43
-	for qemu-devel@nongnu.org; Tue, 29 May 2018 23:30:58 -0400
+	(envelope-from <jcody@redhat.com>) id 1fNsWR-00045j-1f
+	for qemu-devel@nongnu.org; Wed, 30 May 2018 00:15:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1fNrp7-0003p2-Sx
-	for qemu-devel@nongnu.org; Tue, 29 May 2018 23:30:57 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:46564 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1fNrp7-0003ok-N9
-	for qemu-devel@nongnu.org; Tue, 29 May 2018 23:30:53 -0400
-Date: Wed, 30 May 2018 11:30:45 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20180530033045.GC25245@xz-mi>
-References: <20180524044454.11792-1-peterx@redhat.com>
-	<20180524044454.11792-2-peterx@redhat.com>
-	<20180529113000.1ee70ef4.cohuck@redhat.com>
+	(envelope-from <jcody@redhat.com>) id 1fNsWP-0007Dc-ET
+	for qemu-devel@nongnu.org; Wed, 30 May 2018 00:15:39 -0400
+Date: Wed, 30 May 2018 00:15:27 -0400
+From: Jeff Cody <jcody@redhat.com>
+Message-ID: <20180530041527.GB9904@localhost.localdomain>
+References: <20180529203910.7615-1-kwolf@redhat.com>
+	<20180529203910.7615-4-kwolf@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20180529113000.1ee70ef4.cohuck@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v4 1/2] qemu-error: introduce
- {error|warn}_report_once
+In-Reply-To: <20180529203910.7615-4-kwolf@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2 03/16] job: Add error message for
+ failing jobs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,145 +24,259 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>
-Cc: qemu-devel@nongnu.org, "Michael S . Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, Markus Armbruster <armbru@redhat.com>, Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Halil Pasic <pasic@linux.ibm.com>
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: qemu-block@nongnu.org, mreitz@redhat.com, jsnow@redhat.com, eblake@redhat.com, pkrempa@redhat.com, qemu-devel@nongnu.org
 
-On Tue, May 29, 2018 at 11:30:00AM +0200, Cornelia Huck wrote:
-> On Thu, 24 May 2018 12:44:53 +0800
-> Peter Xu <peterx@redhat.com> wrote:
+On Tue, May 29, 2018 at 10:38:57PM +0200, Kevin Wolf wrote:
+> So far we relied on job->ret and strerror() to produce an error message
+> for failed jobs. Not surprisingly, this tends to result in completely
+> useless messages.
 > 
-> > There are many error_report()s that can be used in frequently called
-> > functions, especially on IO paths.  That can be unideal in that
-> > malicious guest can try to trigger the error tons of time which might
-> > use up the log space on the host (e.g., libvirt can capture the stderr
-> > of QEMU and put it persistently onto disk).  In VT-d emulation code, we
-> > have trace_vtd_error() tracer.  AFAIU all those places can be replaced
-> > by something like error_report() but trace points are mostly used to
-> > avoid the DDOS attack that mentioned above.  However using trace points
-> > mean that errors are not dumped if trace not enabled.
-> > 
-> > It's not a big deal in most modern server managements since we have
-> > things like logrotate to maintain the logs and make sure the quota is
-> > expected.  However it'll still be nice that we just provide another way
-> > to restrict message generations.  In most cases, this kind of
-> > error_report()s will only provide valid information on the first message
-> > sent, and all the rest of similar messages will be mostly talking about
-> > the same thing.  This patch introduces *_report_once() helpers to allow
-> > a message to be dumped only once during one QEMU process's life cycle.
-> > It will make sure: (1) it's on by deffault, so we can even get something
-> > without turning the trace on and reproducing, and (2) it won't be
-> > affected by DDOS attack.
+> This adds a Job.error field that can contain an error string for a
+> failing job, and a parameter to job_completed() that sets the field. As
+> a default, if NULL is passed, we continue to use strerror(job->ret).
 > 
-> This is good for something (sub-)system wide, where it is enough to
-> alert the user once; but we may want to print something e.g. once per
-> the device where it happens (see v3 of "vfio-ccw: add force unlimited
-> prefetch property" for an example).
-
-I'm glad that we start to have more users of it, no matter which
-implementation we'll choose.  At least it means it makes some sense to
-have such a thing.
-
-For me this patch works nicely enough.  Of course there can be
-per-device errors, but AFAICT mostly we don't have any error at
-all... and my debugging experience is that when multiple error happens
-on different devices simutaneously, they'll very possible that it's
-caused by the same problem (again, errors are rare after all), or, the
-rest of the problems are caused by the first error only (so the first
-error might cause a collapse of the rest).  That's why I wanted to
-always debug with the first error I encounter, because that's mostly
-always the root cause. In that sense, current patch works nicely for
-me (note that we can have device ID embeded in the error message with
-this one).
-
-At the same time, I think this patch should be easier to use of course
-- no extra variables to define, and very self contained. So I would
-slightly prefer current patch.
-
-However I'm also fine with the approach proposed in the vfio-ccw patch
-too.  Though if so I would possibly drop the 2nd patch too since if
-with the vfio-ccw patch I'll need to introduce one bool for every
-trace_vtd_err() place... then I'd not bother with it any more but
-instead live with that trace_*(). ;) Or I can define one per-IOMMU
-error boolean and pass it in for each of the error_report_once(), but
-it seems a bit awkward too.
-
+> All existing callers are changed to pass NULL. They can be improved in
+> separate patches.
 > 
-> > 
-> > To implement it, I stole the printk_once() macro from Linux.
+> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+> ---
+>  include/qemu/job.h        |  7 ++++++-
+>  block/backup.c            |  2 +-
+>  block/commit.c            |  2 +-
+>  block/mirror.c            |  2 +-
+>  block/stream.c            |  2 +-
+>  job-qmp.c                 |  9 ++-------
+>  job.c                     | 16 ++++++++++++++--
+>  tests/test-bdrv-drain.c   |  2 +-
+>  tests/test-blockjob-txn.c |  2 +-
+>  tests/test-blockjob.c     |  2 +-
+>  10 files changed, 29 insertions(+), 17 deletions(-)
 > 
-> Would something akin to printk_ratelimited() also make sense to avoid
-> log flooding?
+> diff --git a/include/qemu/job.h b/include/qemu/job.h
+> index 8c8badf75e..1d820530fa 100644
+> --- a/include/qemu/job.h
+> +++ b/include/qemu/job.h
+> @@ -124,6 +124,9 @@ typedef struct Job {
+>      /** Estimated progress_current value at the completion of the job */
+>      int64_t progress_total;
+>  
+> +    /** Error string for a failed job (NULL if, and only if, job->ret == 0) */
+> +    char *error;
+> +
+>      /** ret code passed to job_completed. */
+>      int ret;
+>  
+> @@ -466,13 +469,15 @@ void job_transition_to_ready(Job *job);
+>  /**
+>   * @job: The job being completed.
+>   * @ret: The status code.
+> + * @error: The error message for a failing job (only with @ret < 0). If @ret is
+> + *         negative, but NULL is given for @error, strerror() is used.
+>   *
+>   * Marks @job as completed. If @ret is non-zero, the job transaction it is part
+>   * of is aborted. If @ret is zero, the job moves into the WAITING state. If it
+>   * is the last job to complete in its transaction, all jobs in the transaction
+>   * move from WAITING to PENDING.
+>   */
+> -void job_completed(Job *job, int ret);
+> +void job_completed(Job *job, int ret, Error *error);
+>  
+>  /** Asynchronously complete the specified @job. */
+>  void job_complete(Job *job, Error **errp);
+> diff --git a/block/backup.c b/block/backup.c
+> index 4e228e959b..5661435675 100644
+> --- a/block/backup.c
+> +++ b/block/backup.c
+> @@ -321,7 +321,7 @@ static void backup_complete(Job *job, void *opaque)
+>  {
+>      BackupCompleteData *data = opaque;
+>  
+> -    job_completed(job, data->ret);
+> +    job_completed(job, data->ret, NULL);
+>      g_free(data);
+>  }
+>  
+> diff --git a/block/commit.c b/block/commit.c
+> index 620666161b..e1814d9693 100644
+> --- a/block/commit.c
+> +++ b/block/commit.c
+> @@ -117,7 +117,7 @@ static void commit_complete(Job *job, void *opaque)
+>       * bdrv_set_backing_hd() to fail. */
+>      block_job_remove_all_bdrv(bjob);
+>  
+> -    job_completed(job, ret);
+> +    job_completed(job, ret, NULL);
+>      g_free(data);
+>  
+>      /* If bdrv_drop_intermediate() didn't already do that, remove the commit
+> diff --git a/block/mirror.c b/block/mirror.c
+> index dcb66ec3be..435268bbbf 100644
+> --- a/block/mirror.c
+> +++ b/block/mirror.c
+> @@ -581,7 +581,7 @@ static void mirror_exit(Job *job, void *opaque)
+>      blk_set_perm(bjob->blk, 0, BLK_PERM_ALL, &error_abort);
+>      blk_insert_bs(bjob->blk, mirror_top_bs, &error_abort);
+>  
+> -    job_completed(job, data->ret);
+> +    job_completed(job, data->ret, NULL);
+>  
+>      g_free(data);
+>      bdrv_drained_end(src);
+> diff --git a/block/stream.c b/block/stream.c
+> index a5d6e0cf8a..9264b68a1e 100644
+> --- a/block/stream.c
+> +++ b/block/stream.c
+> @@ -93,7 +93,7 @@ out:
+>      }
+>  
+>      g_free(s->backing_file_str);
+> -    job_completed(job, data->ret);
+> +    job_completed(job, data->ret, NULL);
+>      g_free(data);
+>  }
+>  
+> diff --git a/job-qmp.c b/job-qmp.c
+> index 7f38f63336..410775df61 100644
+> --- a/job-qmp.c
+> +++ b/job-qmp.c
+> @@ -136,14 +136,9 @@ void qmp_job_dismiss(const char *id, Error **errp)
+>  static JobInfo *job_query_single(Job *job, Error **errp)
+>  {
+>      JobInfo *info;
+> -    const char *errmsg = NULL;
+>  
+>      assert(!job_is_internal(job));
+>  
+> -    if (job->ret < 0) {
+> -        errmsg = strerror(-job->ret);
+> -    }
+> -
+>      info = g_new(JobInfo, 1);
+>      *info = (JobInfo) {
+>          .id                 = g_strdup(job->id),
+> @@ -151,8 +146,8 @@ static JobInfo *job_query_single(Job *job, Error **errp)
+>          .status             = job->status,
+>          .current_progress   = job->progress_current,
+>          .total_progress     = job->progress_total,
+> -        .has_error          = !!errmsg,
+> -        .error              = g_strdup(errmsg),
+> +        .has_error          = !!job->error,
+> +        .error              = g_strdup(job->error),
+>      };
+>  
+>      return info;
+> diff --git a/job.c b/job.c
+> index f026661b0f..84e140238b 100644
+> --- a/job.c
+> +++ b/job.c
+> @@ -369,6 +369,7 @@ void job_unref(Job *job)
+>  
+>          QLIST_REMOVE(job, job_list);
+>  
+> +        g_free(job->error);
+>          g_free(job->id);
+>          g_free(job);
+>      }
+> @@ -660,6 +661,9 @@ static void job_update_rc(Job *job)
+>          job->ret = -ECANCELED;
+>      }
+>      if (job->ret) {
+> +        if (!job->error) {
+> +            job->error = g_strdup(strerror(-job->ret));
+> +        }
+>          job_state_transition(job, JOB_STATUS_ABORTING);
+>      }
+>  }
+> @@ -782,6 +786,7 @@ static int job_prepare(Job *job)
+>  {
+>      if (job->ret == 0 && job->driver->prepare) {
+>          job->ret = job->driver->prepare(job);
+> +        job_update_rc(job);
+>      }
+>      return job->ret;
+>  }
+> @@ -855,10 +860,17 @@ static void job_completed_txn_success(Job *job)
+>      }
+>  }
+>  
+> -void job_completed(Job *job, int ret)
+> +void job_completed(Job *job, int ret, Error *error)
+>  {
+>      assert(job && job->txn && !job_is_completed(job));
 
-Yes it will.  IMHO we can have that too as follow up if we want, and
-it does not conflict with this print_once().  I'd say currently this
-error_report_once() is good enough for me, especially lightweighted.
-I suspect we'll need more lines to implement a ratelimited version.
+Is it worth it to add '&& job->ret <=0' to the compound assert above?  As
+you said, job->ret being positive is most likely a bug (we treat it like an
+error return, and abort on it, though).  With the patch as-is, we will only
+catch that when 'error' is set... although, I guess maybe that is by design,
+since currently nothing sets 'error', we avoid any potential false-positive
+asserts.
 
+Either way:
+
+Reviewed-by: Jeff Cody <jcody@redhat.com>
+
+
+
+> +
+>      job->ret = ret;
+> +    if (error) {
+> +        assert(job->ret < 0);
+> +        job->error = g_strdup(error_get_pretty(error));
+> +        error_free(error);
+> +    }
+> +
+>      job_update_rc(job);
+>      trace_job_completed(job, ret, job->ret);
+>      if (job->ret) {
+> @@ -876,7 +888,7 @@ void job_cancel(Job *job, bool force)
+>      }
+>      job_cancel_async(job, force);
+>      if (!job_started(job)) {
+> -        job_completed(job, -ECANCELED);
+> +        job_completed(job, -ECANCELED, NULL);
+>      } else if (job->deferred_to_main_loop) {
+>          job_completed_txn_abort(job);
+>      } else {
+> diff --git a/tests/test-bdrv-drain.c b/tests/test-bdrv-drain.c
+> index 2cba63b881..a11c4cfbf2 100644
+> --- a/tests/test-bdrv-drain.c
+> +++ b/tests/test-bdrv-drain.c
+> @@ -498,7 +498,7 @@ typedef struct TestBlockJob {
+>  
+>  static void test_job_completed(Job *job, void *opaque)
+>  {
+> -    job_completed(job, 0);
+> +    job_completed(job, 0, NULL);
+>  }
+>  
+>  static void coroutine_fn test_job_start(void *opaque)
+> diff --git a/tests/test-blockjob-txn.c b/tests/test-blockjob-txn.c
+> index fce836639a..58d9b87fb2 100644
+> --- a/tests/test-blockjob-txn.c
+> +++ b/tests/test-blockjob-txn.c
+> @@ -34,7 +34,7 @@ static void test_block_job_complete(Job *job, void *opaque)
+>          rc = -ECANCELED;
+>      }
+>  
+> -    job_completed(job, rc);
+> +    job_completed(job, rc, NULL);
+>      bdrv_unref(bs);
+>  }
+>  
+> diff --git a/tests/test-blockjob.c b/tests/test-blockjob.c
+> index e408d52351..cb42f06e61 100644
+> --- a/tests/test-blockjob.c
+> +++ b/tests/test-blockjob.c
+> @@ -167,7 +167,7 @@ static void cancel_job_completed(Job *job, void *opaque)
+>  {
+>      CancelJob *s = opaque;
+>      s->completed = true;
+> -    job_completed(job, 0);
+> +    job_completed(job, 0, NULL);
+>  }
+>  
+>  static void cancel_job_complete(Job *job, Error **errp)
+> -- 
+> 2.13.6
 > 
-> > 
-> > CC: Eric Blake <eblake@redhat.com>
-> > CC: Markus Armbruster <armbru@redhat.com>
-> > Signed-off-by: Peter Xu <peterx@redhat.com>
-> > ---
-> >  include/qemu/error-report.h | 32 ++++++++++++++++++++++++++++++++
-> >  1 file changed, 32 insertions(+)
-> > 
-> > diff --git a/include/qemu/error-report.h b/include/qemu/error-report.h
-> > index e1c8ae1a52..c7ec54cb97 100644
-> > --- a/include/qemu/error-report.h
-> > +++ b/include/qemu/error-report.h
-> > @@ -44,6 +44,38 @@ void error_report(const char *fmt, ...) GCC_FMT_ATTR(1, 2);
-> >  void warn_report(const char *fmt, ...) GCC_FMT_ATTR(1, 2);
-> >  void info_report(const char *fmt, ...) GCC_FMT_ATTR(1, 2);
-> >  
-> > +/*
-> > + * Similar to error_report(), but it only prints the message once.  It
-> > + * returns true when it prints the first time, otherwise false.
-> > + */
-> > +#define error_report_once(fmt, ...)             \
-> > +    ({                                          \
-> > +        static bool print_once_;               \
-> > +        bool ret_print_once_ = !print_once_;  \
-> > +                                                \
-> > +        if (!print_once_) {                    \
-> > +            print_once_ = true;                \
-> > +            error_report(fmt, ##__VA_ARGS__);   \
-> > +        }                                       \
-> > +        unlikely(ret_print_once_);             \
-> > +    })
-> > +
-> > +/*
-> > + * Similar to warn_report(), but it only prints the message once.  It
-> > + * returns true when it prints the first time, otherwise false.
-> > + */
-> > +#define warn_report_once(fmt, ...)              \
-> > +    ({                                          \
-> > +        static bool print_once_;               \
-> > +        bool ret_print_once_ = !print_once_;  \
-> > +                                                \
-> > +        if (!print_once_) {                    \
-> > +            print_once_ = true;                \
-> > +            warn_report(fmt, ##__VA_ARGS__);   \
-> > +        }                                       \
-> > +        unlikely(ret_print_once_);             \
-> > +    })
-> > +
-> >  const char *error_get_progname(void);
-> >  extern bool enable_timestamp_msg;
-> >  
-> 
-> The patch mentioned above implements printing a warning once via a
-> passed-in variable (in that case, a per-device property). That looks
-> like a superset of what this patch provides.
-> 
-> Would such a functionality be useful for other callers as well? If so,
-> we should probably implement it in the common error handling functions.
-> [I'm currently planning to queue the vfio-ccw patch as-is; we can
-> switch to a common interface later if it makes sense.]
-
-Yeah; I left my thoughts above.  I'll be happy with either way.
-
-Thanks,
-
--- 
-Peter Xu
