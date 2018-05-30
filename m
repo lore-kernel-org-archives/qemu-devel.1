@@ -1,16 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55773)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55836)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fO3Ta-0007zk-3Z
-	for qemu-devel@nongnu.org; Wed, 30 May 2018 11:57:34 -0400
+	(envelope-from <eblake@redhat.com>) id 1fO3Tn-00088y-Rp
+	for qemu-devel@nongnu.org; Wed, 30 May 2018 11:57:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fO3TU-00072E-OW
-	for qemu-devel@nongnu.org; Wed, 30 May 2018 11:57:26 -0400
-From: Kevin Wolf <kwolf@redhat.com>
-Date: Wed, 30 May 2018 17:56:47 +0200
-Message-Id: <20180530155647.14090-18-kwolf@redhat.com>
-In-Reply-To: <20180530155647.14090-1-kwolf@redhat.com>
-References: <20180530155647.14090-1-kwolf@redhat.com>
-Subject: [Qemu-devel] [PULL 17/17] block/create: Mark blockdev-create stable
+	(envelope-from <eblake@redhat.com>) id 1fO3Tk-0007CZ-P5
+	for qemu-devel@nongnu.org; Wed, 30 May 2018 11:57:39 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:50260 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1fO3Tk-0007CK-JU
+	for qemu-devel@nongnu.org; Wed, 30 May 2018 11:57:36 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.4])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 20D20BB424
+	for <qemu-devel@nongnu.org>; Wed, 30 May 2018 15:57:36 +0000 (UTC)
+References: <1527693912-32378-1-git-send-email-thuth@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <af34cabc-9980-3f8c-c6c6-bb834c802235@redhat.com>
+Date: Wed, 30 May 2018 10:57:35 -0500
+MIME-Version: 1.0
+In-Reply-To: <1527693912-32378-1-git-send-email-thuth@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [qemu-web PATCH v2] Add a blog post about the new
+ -nic parameter
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -19,957 +34,179 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-block@nongnu.org
-Cc: kwolf@redhat.com, qemu-devel@nongnu.org
+To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Jason Wang <jasowang@redhat.com>
 
-We're ready to declare the blockdev-create job stable. This renames the
-corresponding QMP command from x-blockdev-create to blockdev-create.
+On 05/30/2018 10:25 AM, Thomas Huth wrote:
+> QEMU v2.12 features a new, useful parameter called "-nic". Let's
+> throw some light on this new parameter with a new blog post.
+> 
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> ---
 
-Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-Reviewed-by: Max Reitz <mreitz@redhat.com>
-Reviewed-by: Jeff Cody <jcody@redhat.com>
----
- qapi/block-core.json       |  4 ++--
- qapi/job.json              |  2 +-
- block/create.c             |  4 ++--
- tests/qemu-iotests/206     |  2 +-
- tests/qemu-iotests/206.out | 54 +++++++++++++++++++++++-----------------------
- tests/qemu-iotests/207     |  2 +-
- tests/qemu-iotests/207.out | 18 ++++++++--------
- tests/qemu-iotests/210     |  2 +-
- tests/qemu-iotests/210.out | 18 ++++++++--------
- tests/qemu-iotests/211     |  2 +-
- tests/qemu-iotests/211.out | 24 ++++++++++-----------
- tests/qemu-iotests/212     |  2 +-
- tests/qemu-iotests/212.out | 42 ++++++++++++++++++------------------
- tests/qemu-iotests/213     |  2 +-
- tests/qemu-iotests/213.out | 44 ++++++++++++++++++-------------------
- 15 files changed, 111 insertions(+), 111 deletions(-)
+>  screenshots/2018-05-30-qemu-cli-net.png    | Bin 0 -> 24020 bytes
+>  screenshots/2018-05-30-qemu-cli-netdev.png | Bin 0 -> 13553 bytes
 
-diff --git a/qapi/block-core.json b/qapi/block-core.json
-index eb98596614..4b1de474a9 100644
---- a/qapi/block-core.json
-+++ b/qapi/block-core.json
-@@ -4011,7 +4011,7 @@
-   } }
- 
- ##
--# @x-blockdev-create:
-+# @blockdev-create:
- #
- # Starts a job to create an image format on a given node. The job is
- # automatically finalized, but a manual job-dismiss is required.
-@@ -4022,7 +4022,7 @@
- #
- # Since: 3.0
- ##
--{ 'command': 'x-blockdev-create',
-+{ 'command': 'blockdev-create',
-   'data': { 'job-id': 'str',
-             'options': 'BlockdevCreateOptions' } }
- 
-diff --git a/qapi/job.json b/qapi/job.json
-index 69c1970a58..17d10037c4 100644
---- a/qapi/job.json
-+++ b/qapi/job.json
-@@ -17,7 +17,7 @@
- #
- # @backup: drive backup job type, see "drive-backup"
- #
--# @create: image creation job type, see "x-blockdev-create" (since 3.0)
-+# @create: image creation job type, see "blockdev-create" (since 3.0)
- #
- # Since: 1.7
- ##
-diff --git a/block/create.c b/block/create.c
-index 1a263e4b13..915cd41bcc 100644
---- a/block/create.c
-+++ b/block/create.c
-@@ -63,8 +63,8 @@ static const JobDriver blockdev_create_job_driver = {
-     .start         = blockdev_create_run,
- };
- 
--void qmp_x_blockdev_create(const char *job_id, BlockdevCreateOptions *options,
--                           Error **errp)
-+void qmp_blockdev_create(const char *job_id, BlockdevCreateOptions *options,
-+                         Error **errp)
- {
-     BlockdevCreateJob *s;
-     const char *fmt = BlockdevDriver_str(options->driver);
-diff --git a/tests/qemu-iotests/206 b/tests/qemu-iotests/206
-index b8cf2e7dca..128c334c7c 100755
---- a/tests/qemu-iotests/206
-+++ b/tests/qemu-iotests/206
-@@ -26,7 +26,7 @@ from iotests import imgfmt
- iotests.verify_image_format(supported_fmts=['qcow2'])
- 
- def blockdev_create(vm, options):
--    result = vm.qmp_log('x-blockdev-create', job_id='job0', options=options)
-+    result = vm.qmp_log('blockdev-create', job_id='job0', options=options)
- 
-     if 'return' in result:
-         assert result['return'] == {}
-diff --git a/tests/qemu-iotests/206.out b/tests/qemu-iotests/206.out
-index 34451a3fc6..789eebe57b 100644
---- a/tests/qemu-iotests/206.out
-+++ b/tests/qemu-iotests/206.out
-@@ -1,13 +1,13 @@
- === Successful image creation (defaults) ===
- 
--{'execute': 'x-blockdev-create', 'arguments': {'job_id': 'job0', 'options': {'size': 0, 'driver': 'file', 'filename': 'TEST_DIR/PID-t.qcow2'}}}
-+{'execute': 'blockdev-create', 'arguments': {'job_id': 'job0', 'options': {'size': 0, 'driver': 'file', 'filename': 'TEST_DIR/PID-t.qcow2'}}}
- {u'return': {}}
- {'execute': 'job-dismiss', 'arguments': {'id': 'job0'}}
- {u'return': {}}
- 
- {'execute': 'blockdev-add', 'arguments': {'node_name': 'imgfile', 'driver': 'file', 'filename': 'TEST_DIR/PID-t.qcow2'}}
- {u'return': {}}
--{'execute': 'x-blockdev-create', 'arguments': {'job_id': 'job0', 'options': {'driver': 'qcow2', 'file': 'imgfile', 'size': 134217728}}}
-+{'execute': 'blockdev-create', 'arguments': {'job_id': 'job0', 'options': {'driver': 'qcow2', 'file': 'imgfile', 'size': 134217728}}}
- {u'return': {}}
- {'execute': 'job-dismiss', 'arguments': {'id': 'job0'}}
- {u'return': {}}
-@@ -24,12 +24,12 @@ Format specific information:
- 
- === Successful image creation (inline blockdev-add, explicit defaults) ===
- 
--{'execute': 'x-blockdev-create', 'arguments': {'job_id': 'job0', 'options': {'nocow': False, 'preallocation': 'off', 'size': 0, 'driver': 'file', 'filename': 'TEST_DIR/PID-t.qcow2'}}}
-+{'execute': 'blockdev-create', 'arguments': {'job_id': 'job0', 'options': {'nocow': False, 'preallocation': 'off', 'size': 0, 'driver': 'file', 'filename': 'TEST_DIR/PID-t.qcow2'}}}
- {u'return': {}}
- {'execute': 'job-dismiss', 'arguments': {'id': 'job0'}}
- {u'return': {}}
- 
--{'execute': 'x-blockdev-create', 'arguments': {'job_id': 'job0', 'options': {'cluster-size': 65536, 'refcount-bits': 16, 'version': 'v3', 'preallocation': 'off', 'file': {'driver': 'file', 'filename': 'TEST_DIR/PID-t.qcow2'}, 'lazy-refcounts': False, 'driver': 'qcow2', 'size': 67108864}}}
-+{'execute': 'blockdev-create', 'arguments': {'job_id': 'job0', 'options': {'cluster-size': 65536, 'refcount-bits': 16, 'version': 'v3', 'preallocation': 'off', 'file': {'driver': 'file', 'filename': 'TEST_DIR/PID-t.qcow2'}, 'lazy-refcounts': False, 'driver': 'qcow2', 'size': 67108864}}}
- {u'return': {}}
- {'execute': 'job-dismiss', 'arguments': {'id': 'job0'}}
- {u'return': {}}
-@@ -46,12 +46,12 @@ Format specific information:
- 
- === Successful image creation (v3 non-default options) ===
- 
--{'execute': 'x-blockdev-create', 'arguments': {'job_id': 'job0', 'options': {'nocow': True, 'preallocation': 'falloc', 'size': 0, 'driver': 'file', 'filename': 'TEST_DIR/PID-t.qcow2'}}}
-+{'execute': 'blockdev-create', 'arguments': {'job_id': 'job0', 'options': {'nocow': True, 'preallocation': 'falloc', 'size': 0, 'driver': 'file', 'filename': 'TEST_DIR/PID-t.qcow2'}}}
- {u'return': {}}
- {'execute': 'job-dismiss', 'arguments': {'id': 'job0'}}
- {u'return': {}}
- 
--{'execute': 'x-blockdev-create', 'arguments': {'job_id': 'job0', 'options': {'cluster-size': 2097152, 'refcount-bits': 1, 'version': 'v3', 'preallocation': 'metadata', 'file': {'driver': 'file', 'filename': 'TEST_DIR/PID-t.qcow2'}, 'lazy-refcounts': True, 'driver': 'qcow2', 'size': 33554432}}}
-+{'execute': 'blockdev-create', 'arguments': {'job_id': 'job0', 'options': {'cluster-size': 2097152, 'refcount-bits': 1, 'version': 'v3', 'preallocation': 'metadata', 'file': {'driver': 'file', 'filename': 'TEST_DIR/PID-t.qcow2'}, 'lazy-refcounts': True, 'driver': 'qcow2', 'size': 33554432}}}
- {u'return': {}}
- {'execute': 'job-dismiss', 'arguments': {'id': 'job0'}}
- {u'return': {}}
-@@ -68,12 +68,12 @@ Format specific information:
- 
- === Successful image creation (v2 non-default options) ===
- 
--{'execute': 'x-blockdev-create', 'arguments': {'job_id': 'job0', 'options': {'size': 0, 'driver': 'file', 'filename': 'TEST_DIR/PID-t.qcow2'}}}
-+{'execute': 'blockdev-create', 'arguments': {'job_id': 'job0', 'options': {'size': 0, 'driver': 'file', 'filename': 'TEST_DIR/PID-t.qcow2'}}}
- {u'return': {}}
- {'execute': 'job-dismiss', 'arguments': {'id': 'job0'}}
- {u'return': {}}
- 
--{'execute': 'x-blockdev-create', 'arguments': {'job_id': 'job0', 'options': {'cluster-size': 512, 'backing-fmt': 'qcow2', 'driver': 'qcow2', 'version': 'v2', 'file': {'driver': 'file', 'filename': 'TEST_DIR/PID-t.qcow2'}, 'backing-file': 'TEST_DIR/PID-t.qcow2.base', 'size': 33554432}}}
-+{'execute': 'blockdev-create', 'arguments': {'job_id': 'job0', 'options': {'cluster-size': 512, 'backing-fmt': 'qcow2', 'driver': 'qcow2', 'version': 'v2', 'file': {'driver': 'file', 'filename': 'TEST_DIR/PID-t.qcow2'}, 'backing-file': 'TEST_DIR/PID-t.qcow2.base', 'size': 33554432}}}
- {u'return': {}}
- {'execute': 'job-dismiss', 'arguments': {'id': 'job0'}}
- {u'return': {}}
-@@ -90,7 +90,7 @@ Format specific information:
- 
- === Successful image creation (encrypted) ===
- 
--{'execute': 'x-blockdev-create', 'arguments': {'job_id': 'job0', 'options': {'encrypt': {'key-secret': 'keysec0', 'iter-time': 10, 'cipher-mode': 'ctr', 'ivgen-hash-alg': 'md5', 'cipher-alg': 'twofish-128', 'format': 'luks', 'ivgen-alg': 'plain64', 'hash-alg': 'sha1'}, 'driver': 'qcow2', 'file': {'driver': 'file', 'filename': 'TEST_DIR/PID-t.qcow2'}, 'size': 33554432}}}
-+{'execute': 'blockdev-create', 'arguments': {'job_id': 'job0', 'options': {'encrypt': {'key-secret': 'keysec0', 'iter-time': 10, 'cipher-mode': 'ctr', 'ivgen-hash-alg': 'md5', 'cipher-alg': 'twofish-128', 'format': 'luks', 'ivgen-alg': 'plain64', 'hash-alg': 'sha1'}, 'driver': 'qcow2', 'file': {'driver': 'file', 'filename': 'TEST_DIR/PID-t.qcow2'}, 'size': 33554432}}}
- {u'return': {}}
- {'execute': 'job-dismiss', 'arguments': {'id': 'job0'}}
- {u'return': {}}
-@@ -144,111 +144,111 @@ Format specific information:
- 
- === Invalid BlockdevRef ===
- 
--{'execute': 'x-blockdev-create', 'arguments': {'job_id': 'job0', 'options': {'driver': 'qcow2', 'file': "this doesn't exist", 'size': 33554432}}}
-+{'execute': 'blockdev-create', 'arguments': {'job_id': 'job0', 'options': {'driver': 'qcow2', 'file': "this doesn't exist", 'size': 33554432}}}
- {u'return': {}}
- Job failed: Cannot find device=this doesn't exist nor node_name=this doesn't exist
- {'execute': 'job-dismiss', 'arguments': {'id': 'job0'}}
- {u'return': {}}
- 
- === Invalid sizes ===
--{'execute': 'x-blockdev-create', 'arguments': {'job_id': 'job0', 'options': {'driver': 'qcow2', 'file': 'node0', 'size': 1234}}}
-+{'execute': 'blockdev-create', 'arguments': {'job_id': 'job0', 'options': {'driver': 'qcow2', 'file': 'node0', 'size': 1234}}}
- {u'return': {}}
- Job failed: Image size must be a multiple of 512 bytes
- {'execute': 'job-dismiss', 'arguments': {'id': 'job0'}}
- {u'return': {}}
- 
--{'execute': 'x-blockdev-create', 'arguments': {'job_id': 'job0', 'options': {'driver': 'qcow2', 'file': 'node0', 'size': 18446744073709551104L}}}
-+{'execute': 'blockdev-create', 'arguments': {'job_id': 'job0', 'options': {'driver': 'qcow2', 'file': 'node0', 'size': 18446744073709551104L}}}
- {u'return': {}}
- Job failed: Could not resize image: Image size cannot be negative
- {'execute': 'job-dismiss', 'arguments': {'id': 'job0'}}
- {u'return': {}}
- 
--{'execute': 'x-blockdev-create', 'arguments': {'job_id': 'job0', 'options': {'driver': 'qcow2', 'file': 'node0', 'size': 9223372036854775808L}}}
-+{'execute': 'blockdev-create', 'arguments': {'job_id': 'job0', 'options': {'driver': 'qcow2', 'file': 'node0', 'size': 9223372036854775808L}}}
- {u'return': {}}
- Job failed: Could not resize image: Image size cannot be negative
- {'execute': 'job-dismiss', 'arguments': {'id': 'job0'}}
- {u'return': {}}
- 
--{'execute': 'x-blockdev-create', 'arguments': {'job_id': 'job0', 'options': {'driver': 'qcow2', 'file': 'node0', 'size': 9223372036854775296}}}
-+{'execute': 'blockdev-create', 'arguments': {'job_id': 'job0', 'options': {'driver': 'qcow2', 'file': 'node0', 'size': 9223372036854775296}}}
- {u'return': {}}
- Job failed: Could not resize image: Failed to grow the L1 table: File too large
- {'execute': 'job-dismiss', 'arguments': {'id': 'job0'}}
- {u'return': {}}
- 
- === Invalid version ===
--{'execute': 'x-blockdev-create', 'arguments': {'job_id': 'job0', 'options': {'version': 'v1', 'driver': 'qcow2', 'file': 'node0', 'size': 67108864}}}
-+{'execute': 'blockdev-create', 'arguments': {'job_id': 'job0', 'options': {'version': 'v1', 'driver': 'qcow2', 'file': 'node0', 'size': 67108864}}}
- {u'error': {u'class': u'GenericError', u'desc': u"Invalid parameter 'v1'"}}
- 
--{'execute': 'x-blockdev-create', 'arguments': {'job_id': 'job0', 'options': {'lazy-refcounts': True, 'version': 'v2', 'driver': 'qcow2', 'file': 'node0', 'size': 67108864}}}
-+{'execute': 'blockdev-create', 'arguments': {'job_id': 'job0', 'options': {'lazy-refcounts': True, 'version': 'v2', 'driver': 'qcow2', 'file': 'node0', 'size': 67108864}}}
- {u'return': {}}
- Job failed: Lazy refcounts only supported with compatibility level 1.1 and above (use version=v3 or greater)
- {'execute': 'job-dismiss', 'arguments': {'id': 'job0'}}
- {u'return': {}}
- 
--{'execute': 'x-blockdev-create', 'arguments': {'job_id': 'job0', 'options': {'refcount-bits': 8, 'version': 'v2', 'driver': 'qcow2', 'file': 'node0', 'size': 67108864}}}
-+{'execute': 'blockdev-create', 'arguments': {'job_id': 'job0', 'options': {'refcount-bits': 8, 'version': 'v2', 'driver': 'qcow2', 'file': 'node0', 'size': 67108864}}}
- {u'return': {}}
- Job failed: Different refcount widths than 16 bits require compatibility level 1.1 or above (use version=v3 or greater)
- {'execute': 'job-dismiss', 'arguments': {'id': 'job0'}}
- {u'return': {}}
- 
- === Invalid backing file options ===
--{'execute': 'x-blockdev-create', 'arguments': {'job_id': 'job0', 'options': {'preallocation': 'full', 'driver': 'qcow2', 'backing-file': '/dev/null', 'file': 'node0', 'size': 67108864}}}
-+{'execute': 'blockdev-create', 'arguments': {'job_id': 'job0', 'options': {'preallocation': 'full', 'driver': 'qcow2', 'backing-file': '/dev/null', 'file': 'node0', 'size': 67108864}}}
- {u'return': {}}
- Job failed: Backing file and preallocation cannot be used at the same time
- {'execute': 'job-dismiss', 'arguments': {'id': 'job0'}}
- {u'return': {}}
- 
--{'execute': 'x-blockdev-create', 'arguments': {'job_id': 'job0', 'options': {'backing-fmt': 'qcow2', 'driver': 'qcow2', 'file': 'node0', 'size': 67108864}}}
-+{'execute': 'blockdev-create', 'arguments': {'job_id': 'job0', 'options': {'backing-fmt': 'qcow2', 'driver': 'qcow2', 'file': 'node0', 'size': 67108864}}}
- {u'return': {}}
- Job failed: Backing format cannot be used without backing file
- {'execute': 'job-dismiss', 'arguments': {'id': 'job0'}}
- {u'return': {}}
- 
- === Invalid cluster size ===
--{'execute': 'x-blockdev-create', 'arguments': {'job_id': 'job0', 'options': {'cluster-size': 1234, 'driver': 'qcow2', 'file': 'node0', 'size': 67108864}}}
-+{'execute': 'blockdev-create', 'arguments': {'job_id': 'job0', 'options': {'cluster-size': 1234, 'driver': 'qcow2', 'file': 'node0', 'size': 67108864}}}
- {u'return': {}}
- Job failed: Cluster size must be a power of two between 512 and 2048k
- {'execute': 'job-dismiss', 'arguments': {'id': 'job0'}}
- {u'return': {}}
- 
--{'execute': 'x-blockdev-create', 'arguments': {'job_id': 'job0', 'options': {'cluster-size': 128, 'driver': 'qcow2', 'file': 'node0', 'size': 67108864}}}
-+{'execute': 'blockdev-create', 'arguments': {'job_id': 'job0', 'options': {'cluster-size': 128, 'driver': 'qcow2', 'file': 'node0', 'size': 67108864}}}
- {u'return': {}}
- Job failed: Cluster size must be a power of two between 512 and 2048k
- {'execute': 'job-dismiss', 'arguments': {'id': 'job0'}}
- {u'return': {}}
- 
--{'execute': 'x-blockdev-create', 'arguments': {'job_id': 'job0', 'options': {'cluster-size': 4194304, 'driver': 'qcow2', 'file': 'node0', 'size': 67108864}}}
-+{'execute': 'blockdev-create', 'arguments': {'job_id': 'job0', 'options': {'cluster-size': 4194304, 'driver': 'qcow2', 'file': 'node0', 'size': 67108864}}}
- {u'return': {}}
- Job failed: Cluster size must be a power of two between 512 and 2048k
- {'execute': 'job-dismiss', 'arguments': {'id': 'job0'}}
- {u'return': {}}
- 
--{'execute': 'x-blockdev-create', 'arguments': {'job_id': 'job0', 'options': {'cluster-size': 0, 'driver': 'qcow2', 'file': 'node0', 'size': 67108864}}}
-+{'execute': 'blockdev-create', 'arguments': {'job_id': 'job0', 'options': {'cluster-size': 0, 'driver': 'qcow2', 'file': 'node0', 'size': 67108864}}}
- {u'return': {}}
- Job failed: Cluster size must be a power of two between 512 and 2048k
- {'execute': 'job-dismiss', 'arguments': {'id': 'job0'}}
- {u'return': {}}
- 
--{'execute': 'x-blockdev-create', 'arguments': {'job_id': 'job0', 'options': {'cluster-size': 512, 'driver': 'qcow2', 'file': 'node0', 'size': 281474976710656}}}
-+{'execute': 'blockdev-create', 'arguments': {'job_id': 'job0', 'options': {'cluster-size': 512, 'driver': 'qcow2', 'file': 'node0', 'size': 281474976710656}}}
- {u'return': {}}
- Job failed: Could not resize image: Failed to grow the L1 table: File too large
- {'execute': 'job-dismiss', 'arguments': {'id': 'job0'}}
- {u'return': {}}
- 
- === Invalid refcount width ===
--{'execute': 'x-blockdev-create', 'arguments': {'job_id': 'job0', 'options': {'refcount-bits': 128, 'driver': 'qcow2', 'file': 'node0', 'size': 67108864}}}
-+{'execute': 'blockdev-create', 'arguments': {'job_id': 'job0', 'options': {'refcount-bits': 128, 'driver': 'qcow2', 'file': 'node0', 'size': 67108864}}}
- {u'return': {}}
- Job failed: Refcount width must be a power of two and may not exceed 64 bits
- {'execute': 'job-dismiss', 'arguments': {'id': 'job0'}}
- {u'return': {}}
- 
--{'execute': 'x-blockdev-create', 'arguments': {'job_id': 'job0', 'options': {'refcount-bits': 0, 'driver': 'qcow2', 'file': 'node0', 'size': 67108864}}}
-+{'execute': 'blockdev-create', 'arguments': {'job_id': 'job0', 'options': {'refcount-bits': 0, 'driver': 'qcow2', 'file': 'node0', 'size': 67108864}}}
- {u'return': {}}
- Job failed: Refcount width must be a power of two and may not exceed 64 bits
- {'execute': 'job-dismiss', 'arguments': {'id': 'job0'}}
- {u'return': {}}
- 
--{'execute': 'x-blockdev-create', 'arguments': {'job_id': 'job0', 'options': {'refcount-bits': 7, 'driver': 'qcow2', 'file': 'node0', 'size': 67108864}}}
-+{'execute': 'blockdev-create', 'arguments': {'job_id': 'job0', 'options': {'refcount-bits': 7, 'driver': 'qcow2', 'file': 'node0', 'size': 67108864}}}
- {u'return': {}}
- Job failed: Refcount width must be a power of two and may not exceed 64 bits
- {'execute': 'job-dismiss', 'arguments': {'id': 'job0'}}
-diff --git a/tests/qemu-iotests/207 b/tests/qemu-iotests/207
-index b595c925a5..444ae233ae 100755
---- a/tests/qemu-iotests/207
-+++ b/tests/qemu-iotests/207
-@@ -31,7 +31,7 @@ def filter_hash(msg):
-     return re.sub("'hash': '[0-9a-f]+'", "'hash': HASH", msg)
- 
- def blockdev_create(vm, options):
--    result = vm.qmp_log('x-blockdev-create', job_id='job0', options=options,
-+    result = vm.qmp_log('blockdev-create', job_id='job0', options=options,
-                         filters=[iotests.filter_testfiles, filter_hash])
- 
-     if 'return' in result:
-diff --git a/tests/qemu-iotests/207.out b/tests/qemu-iotests/207.out
-index 5eee17bdb9..078b7e63cb 100644
---- a/tests/qemu-iotests/207.out
-+++ b/tests/qemu-iotests/207.out
-@@ -1,6 +1,6 @@
- === Successful image creation (defaults) ===
- 
--{'execute': 'x-blockdev-create', 'arguments': {'job_id': 'job0', 'options': {'driver': 'ssh', 'location': {'path': 'TEST_DIR/PID-t.img', 'server': {'host': '127.0.0.1', 'port': '22'}}, 'size': 4194304}}}
-+{'execute': 'blockdev-create', 'arguments': {'job_id': 'job0', 'options': {'driver': 'ssh', 'location': {'path': 'TEST_DIR/PID-t.img', 'server': {'host': '127.0.0.1', 'port': '22'}}, 'size': 4194304}}}
- {u'return': {}}
- {'execute': 'job-dismiss', 'arguments': {'id': 'job0'}}
- {u'return': {}}
-@@ -16,7 +16,7 @@ virtual size: 4.0M (4194304 bytes)
- 
- === Test host-key-check options ===
- 
--{'execute': 'x-blockdev-create', 'arguments': {'job_id': 'job0', 'options': {'driver': 'ssh', 'location': {'path': 'TEST_DIR/PID-t.img', 'host-key-check': {'mode': 'none'}, 'server': {'host': '127.0.0.1', 'port': '22'}}, 'size': 8388608}}}
-+{'execute': 'blockdev-create', 'arguments': {'job_id': 'job0', 'options': {'driver': 'ssh', 'location': {'path': 'TEST_DIR/PID-t.img', 'host-key-check': {'mode': 'none'}, 'server': {'host': '127.0.0.1', 'port': '22'}}, 'size': 8388608}}}
- {u'return': {}}
- {'execute': 'job-dismiss', 'arguments': {'id': 'job0'}}
- {u'return': {}}
-@@ -25,7 +25,7 @@ image: json:{"driver": "IMGFMT", "file": {"server.host": "127.0.0.1", "server.po
- file format: IMGFMT
- virtual size: 8.0M (8388608 bytes)
- 
--{'execute': 'x-blockdev-create', 'arguments': {'job_id': 'job0', 'options': {'driver': 'ssh', 'location': {'path': 'TEST_DIR/PID-t.img', 'host-key-check': {'mode': 'known_hosts'}, 'server': {'host': '127.0.0.1', 'port': '22'}}, 'size': 4194304}}}
-+{'execute': 'blockdev-create', 'arguments': {'job_id': 'job0', 'options': {'driver': 'ssh', 'location': {'path': 'TEST_DIR/PID-t.img', 'host-key-check': {'mode': 'known_hosts'}, 'server': {'host': '127.0.0.1', 'port': '22'}}, 'size': 4194304}}}
- {u'return': {}}
- {'execute': 'job-dismiss', 'arguments': {'id': 'job0'}}
- {u'return': {}}
-@@ -34,13 +34,13 @@ image: json:{"driver": "IMGFMT", "file": {"server.host": "127.0.0.1", "server.po
- file format: IMGFMT
- virtual size: 4.0M (4194304 bytes)
- 
--{'execute': 'x-blockdev-create', 'arguments': {'job_id': 'job0', 'options': {'driver': 'ssh', 'location': {'path': 'TEST_DIR/PID-t.img', 'host-key-check': {'hash': 'wrong', 'type': 'md5', 'mode': 'hash'}, 'server': {'host': '127.0.0.1', 'port': '22'}}, 'size': 2097152}}}
-+{'execute': 'blockdev-create', 'arguments': {'job_id': 'job0', 'options': {'driver': 'ssh', 'location': {'path': 'TEST_DIR/PID-t.img', 'host-key-check': {'hash': 'wrong', 'type': 'md5', 'mode': 'hash'}, 'server': {'host': '127.0.0.1', 'port': '22'}}, 'size': 2097152}}}
- {u'return': {}}
- Job failed: remote host key does not match host_key_check 'wrong'
- {'execute': 'job-dismiss', 'arguments': {'id': 'job0'}}
- {u'return': {}}
- 
--{'execute': 'x-blockdev-create', 'arguments': {'job_id': 'job0', 'options': {'driver': 'ssh', 'location': {'path': 'TEST_DIR/PID-t.img', 'host-key-check': {'hash': HASH, 'type': 'md5', 'mode': 'hash'}, 'server': {'host': '127.0.0.1', 'port': '22'}}, 'size': 8388608}}}
-+{'execute': 'blockdev-create', 'arguments': {'job_id': 'job0', 'options': {'driver': 'ssh', 'location': {'path': 'TEST_DIR/PID-t.img', 'host-key-check': {'hash': HASH, 'type': 'md5', 'mode': 'hash'}, 'server': {'host': '127.0.0.1', 'port': '22'}}, 'size': 8388608}}}
- {u'return': {}}
- {'execute': 'job-dismiss', 'arguments': {'id': 'job0'}}
- {u'return': {}}
-@@ -49,13 +49,13 @@ image: json:{"driver": "IMGFMT", "file": {"server.host": "127.0.0.1", "server.po
- file format: IMGFMT
- virtual size: 8.0M (8388608 bytes)
- 
--{'execute': 'x-blockdev-create', 'arguments': {'job_id': 'job0', 'options': {'driver': 'ssh', 'location': {'path': 'TEST_DIR/PID-t.img', 'host-key-check': {'hash': 'wrong', 'type': 'sha1', 'mode': 'hash'}, 'server': {'host': '127.0.0.1', 'port': '22'}}, 'size': 2097152}}}
-+{'execute': 'blockdev-create', 'arguments': {'job_id': 'job0', 'options': {'driver': 'ssh', 'location': {'path': 'TEST_DIR/PID-t.img', 'host-key-check': {'hash': 'wrong', 'type': 'sha1', 'mode': 'hash'}, 'server': {'host': '127.0.0.1', 'port': '22'}}, 'size': 2097152}}}
- {u'return': {}}
- Job failed: remote host key does not match host_key_check 'wrong'
- {'execute': 'job-dismiss', 'arguments': {'id': 'job0'}}
- {u'return': {}}
- 
--{'execute': 'x-blockdev-create', 'arguments': {'job_id': 'job0', 'options': {'driver': 'ssh', 'location': {'path': 'TEST_DIR/PID-t.img', 'host-key-check': {'hash': HASH, 'type': 'sha1', 'mode': 'hash'}, 'server': {'host': '127.0.0.1', 'port': '22'}}, 'size': 4194304}}}
-+{'execute': 'blockdev-create', 'arguments': {'job_id': 'job0', 'options': {'driver': 'ssh', 'location': {'path': 'TEST_DIR/PID-t.img', 'host-key-check': {'hash': HASH, 'type': 'sha1', 'mode': 'hash'}, 'server': {'host': '127.0.0.1', 'port': '22'}}, 'size': 4194304}}}
- {u'return': {}}
- {'execute': 'job-dismiss', 'arguments': {'id': 'job0'}}
- {u'return': {}}
-@@ -66,13 +66,13 @@ virtual size: 4.0M (4194304 bytes)
- 
- === Invalid path and user ===
- 
--{'execute': 'x-blockdev-create', 'arguments': {'job_id': 'job0', 'options': {'driver': 'ssh', 'location': {'path': '/this/is/not/an/existing/path', 'host-key-check': {'mode': 'none'}, 'server': {'host': '127.0.0.1', 'port': '22'}}, 'size': 4194304}}}
-+{'execute': 'blockdev-create', 'arguments': {'job_id': 'job0', 'options': {'driver': 'ssh', 'location': {'path': '/this/is/not/an/existing/path', 'host-key-check': {'mode': 'none'}, 'server': {'host': '127.0.0.1', 'port': '22'}}, 'size': 4194304}}}
- {u'return': {}}
- Job failed: failed to open remote file '/this/is/not/an/existing/path': Failed opening remote file (libssh2 error code: -31)
- {'execute': 'job-dismiss', 'arguments': {'id': 'job0'}}
- {u'return': {}}
- 
--{'execute': 'x-blockdev-create', 'arguments': {'job_id': 'job0', 'options': {'driver': 'ssh', 'location': {'path': 'TEST_DIR/PID-t.img', 'host-key-check': {'mode': 'none'}, 'user': 'invalid user', 'server': {'host': '127.0.0.1', 'port': '22'}}, 'size': 4194304}}}
-+{'execute': 'blockdev-create', 'arguments': {'job_id': 'job0', 'options': {'driver': 'ssh', 'location': {'path': 'TEST_DIR/PID-t.img', 'host-key-check': {'mode': 'none'}, 'user': 'invalid user', 'server': {'host': '127.0.0.1', 'port': '22'}}, 'size': 4194304}}}
- {u'return': {}}
- Job failed: failed to authenticate using publickey authentication and the identities held by your ssh-agent
- {'execute': 'job-dismiss', 'arguments': {'id': 'job0'}}
-diff --git a/tests/qemu-iotests/210 b/tests/qemu-iotests/210
-index ff4fddea56..d142841e2b 100755
---- a/tests/qemu-iotests/210
-+++ b/tests/qemu-iotests/210
-@@ -27,7 +27,7 @@ iotests.verify_image_format(supported_fmts=['luks'])
- iotests.verify_protocol(supported=['file'])
- 
- def blockdev_create(vm, options):
--    result = vm.qmp_log('x-blockdev-create', job_id='job0', options=options)
-+    result = vm.qmp_log('blockdev-create', job_id='job0', options=options)
- 
-     if 'return' in result:
-         assert result['return'] == {}
-diff --git a/tests/qemu-iotests/210.out b/tests/qemu-iotests/210.out
-index 0e6e5c07be..078ba544a1 100644
---- a/tests/qemu-iotests/210.out
-+++ b/tests/qemu-iotests/210.out
-@@ -1,13 +1,13 @@
- === Successful image creation (defaults) ===
- 
--{'execute': 'x-blockdev-create', 'arguments': {'job_id': 'job0', 'options': {'size': 0, 'driver': 'file', 'filename': 'TEST_DIR/PID-t.luks'}}}
-+{'execute': 'blockdev-create', 'arguments': {'job_id': 'job0', 'options': {'size': 0, 'driver': 'file', 'filename': 'TEST_DIR/PID-t.luks'}}}
- {u'return': {}}
- {'execute': 'job-dismiss', 'arguments': {'id': 'job0'}}
- {u'return': {}}
- 
- {'execute': 'blockdev-add', 'arguments': {'node_name': 'imgfile', 'driver': 'file', 'filename': 'TEST_DIR/PID-t.luks'}}
- {u'return': {}}
--{'execute': 'x-blockdev-create', 'arguments': {'job_id': 'job0', 'options': {'key-secret': 'keysec0', 'iter-time': 10, 'driver': 'luks', 'file': 'imgfile', 'size': 134217728}}}
-+{'execute': 'blockdev-create', 'arguments': {'job_id': 'job0', 'options': {'key-secret': 'keysec0', 'iter-time': 10, 'driver': 'luks', 'file': 'imgfile', 'size': 134217728}}}
- {u'return': {}}
- {'execute': 'job-dismiss', 'arguments': {'id': 'job0'}}
- {u'return': {}}
-@@ -54,12 +54,12 @@ Format specific information:
- 
- === Successful image creation (with non-default options) ===
- 
--{'execute': 'x-blockdev-create', 'arguments': {'job_id': 'job0', 'options': {'size': 0, 'driver': 'file', 'filename': 'TEST_DIR/PID-t.luks'}}}
-+{'execute': 'blockdev-create', 'arguments': {'job_id': 'job0', 'options': {'size': 0, 'driver': 'file', 'filename': 'TEST_DIR/PID-t.luks'}}}
- {u'return': {}}
- {'execute': 'job-dismiss', 'arguments': {'id': 'job0'}}
- {u'return': {}}
- 
--{'execute': 'x-blockdev-create', 'arguments': {'job_id': 'job0', 'options': {'key-secret': 'keysec0', 'hash-alg': 'sha1', 'cipher-mode': 'ctr', 'cipher-alg': 'twofish-128', 'file': {'driver': 'file', 'filename': 'TEST_DIR/PID-t.luks'}, 'iter-time': 10, 'ivgen-alg': 'plain64', 'ivgen-hash-alg': 'md5', 'driver': 'luks', 'size': 67108864}}}
-+{'execute': 'blockdev-create', 'arguments': {'job_id': 'job0', 'options': {'key-secret': 'keysec0', 'hash-alg': 'sha1', 'cipher-mode': 'ctr', 'cipher-alg': 'twofish-128', 'file': {'driver': 'file', 'filename': 'TEST_DIR/PID-t.luks'}, 'iter-time': 10, 'ivgen-alg': 'plain64', 'ivgen-hash-alg': 'md5', 'driver': 'luks', 'size': 67108864}}}
- {u'return': {}}
- {'execute': 'job-dismiss', 'arguments': {'id': 'job0'}}
- {u'return': {}}
-@@ -106,7 +106,7 @@ Format specific information:
- 
- === Invalid BlockdevRef ===
- 
--{'execute': 'x-blockdev-create', 'arguments': {'job_id': 'job0', 'options': {'driver': 'luks', 'file': "this doesn't exist", 'size': 67108864}}}
-+{'execute': 'blockdev-create', 'arguments': {'job_id': 'job0', 'options': {'driver': 'luks', 'file': "this doesn't exist", 'size': 67108864}}}
- {u'return': {}}
- Job failed: Cannot find device=this doesn't exist nor node_name=this doesn't exist
- {'execute': 'job-dismiss', 'arguments': {'id': 'job0'}}
-@@ -114,7 +114,7 @@ Job failed: Cannot find device=this doesn't exist nor node_name=this doesn't exi
- 
- === Zero size ===
- 
--{'execute': 'x-blockdev-create', 'arguments': {'job_id': 'job0', 'options': {'key-secret': 'keysec0', 'iter-time': 10, 'driver': 'luks', 'file': 'node0', 'size': 0}}}
-+{'execute': 'blockdev-create', 'arguments': {'job_id': 'job0', 'options': {'key-secret': 'keysec0', 'iter-time': 10, 'driver': 'luks', 'file': 'node0', 'size': 0}}}
- {u'return': {}}
- {'execute': 'job-dismiss', 'arguments': {'id': 'job0'}}
- {u'return': {}}
-@@ -161,19 +161,19 @@ Format specific information:
- 
- === Invalid sizes ===
- 
--{'execute': 'x-blockdev-create', 'arguments': {'job_id': 'job0', 'options': {'key-secret': 'keysec0', 'driver': 'luks', 'file': 'node0', 'size': 18446744073709551104L}}}
-+{'execute': 'blockdev-create', 'arguments': {'job_id': 'job0', 'options': {'key-secret': 'keysec0', 'driver': 'luks', 'file': 'node0', 'size': 18446744073709551104L}}}
- {u'return': {}}
- Job failed: The requested file size is too large
- {'execute': 'job-dismiss', 'arguments': {'id': 'job0'}}
- {u'return': {}}
- 
--{'execute': 'x-blockdev-create', 'arguments': {'job_id': 'job0', 'options': {'key-secret': 'keysec0', 'driver': 'luks', 'file': 'node0', 'size': 9223372036854775808L}}}
-+{'execute': 'blockdev-create', 'arguments': {'job_id': 'job0', 'options': {'key-secret': 'keysec0', 'driver': 'luks', 'file': 'node0', 'size': 9223372036854775808L}}}
- {u'return': {}}
- Job failed: The requested file size is too large
- {'execute': 'job-dismiss', 'arguments': {'id': 'job0'}}
- {u'return': {}}
- 
--{'execute': 'x-blockdev-create', 'arguments': {'job_id': 'job0', 'options': {'key-secret': 'keysec0', 'driver': 'luks', 'file': 'node0', 'size': 9223372036854775296}}}
-+{'execute': 'blockdev-create', 'arguments': {'job_id': 'job0', 'options': {'key-secret': 'keysec0', 'driver': 'luks', 'file': 'node0', 'size': 9223372036854775296}}}
- {u'return': {}}
- Job failed: The requested file size is too large
- {'execute': 'job-dismiss', 'arguments': {'id': 'job0'}}
-diff --git a/tests/qemu-iotests/211 b/tests/qemu-iotests/211
-index b45f886d23..7b7985db6c 100755
---- a/tests/qemu-iotests/211
-+++ b/tests/qemu-iotests/211
-@@ -27,7 +27,7 @@ iotests.verify_image_format(supported_fmts=['vdi'])
- iotests.verify_protocol(supported=['file'])
- 
- def blockdev_create(vm, options):
--    result = vm.qmp_log('x-blockdev-create', job_id='job0', options=options)
-+    result = vm.qmp_log('blockdev-create', job_id='job0', options=options)
- 
-     if 'return' in result:
-         assert result['return'] == {}
-diff --git a/tests/qemu-iotests/211.out b/tests/qemu-iotests/211.out
-index 2bf1c4a920..6feaea3978 100644
---- a/tests/qemu-iotests/211.out
-+++ b/tests/qemu-iotests/211.out
-@@ -1,13 +1,13 @@
- === Successful image creation (defaults) ===
- 
--{'execute': 'x-blockdev-create', 'arguments': {'job_id': 'job0', 'options': {'size': 0, 'driver': 'file', 'filename': 'TEST_DIR/PID-t.vdi'}}}
-+{'execute': 'blockdev-create', 'arguments': {'job_id': 'job0', 'options': {'size': 0, 'driver': 'file', 'filename': 'TEST_DIR/PID-t.vdi'}}}
- {u'return': {}}
- {'execute': 'job-dismiss', 'arguments': {'id': 'job0'}}
- {u'return': {}}
- 
- {'execute': 'blockdev-add', 'arguments': {'node_name': 'imgfile', 'driver': 'file', 'filename': 'TEST_DIR/PID-t.vdi'}}
- {u'return': {}}
--{'execute': 'x-blockdev-create', 'arguments': {'job_id': 'job0', 'options': {'driver': 'vdi', 'file': 'imgfile', 'size': 134217728}}}
-+{'execute': 'blockdev-create', 'arguments': {'job_id': 'job0', 'options': {'driver': 'vdi', 'file': 'imgfile', 'size': 134217728}}}
- {u'return': {}}
- {'execute': 'job-dismiss', 'arguments': {'id': 'job0'}}
- {u'return': {}}
-@@ -21,12 +21,12 @@ cluster_size: 1048576
- 
- === Successful image creation (explicit defaults) ===
- 
--{'execute': 'x-blockdev-create', 'arguments': {'job_id': 'job0', 'options': {'size': 0, 'driver': 'file', 'filename': 'TEST_DIR/PID-t.vdi'}}}
-+{'execute': 'blockdev-create', 'arguments': {'job_id': 'job0', 'options': {'size': 0, 'driver': 'file', 'filename': 'TEST_DIR/PID-t.vdi'}}}
- {u'return': {}}
- {'execute': 'job-dismiss', 'arguments': {'id': 'job0'}}
- {u'return': {}}
- 
--{'execute': 'x-blockdev-create', 'arguments': {'job_id': 'job0', 'options': {'preallocation': 'off', 'driver': 'vdi', 'file': {'driver': 'file', 'filename': 'TEST_DIR/PID-t.vdi'}, 'size': 67108864}}}
-+{'execute': 'blockdev-create', 'arguments': {'job_id': 'job0', 'options': {'preallocation': 'off', 'driver': 'vdi', 'file': {'driver': 'file', 'filename': 'TEST_DIR/PID-t.vdi'}, 'size': 67108864}}}
- {u'return': {}}
- {'execute': 'job-dismiss', 'arguments': {'id': 'job0'}}
- {u'return': {}}
-@@ -40,12 +40,12 @@ cluster_size: 1048576
- 
- === Successful image creation (with non-default options) ===
- 
--{'execute': 'x-blockdev-create', 'arguments': {'job_id': 'job0', 'options': {'size': 0, 'driver': 'file', 'filename': 'TEST_DIR/PID-t.vdi'}}}
-+{'execute': 'blockdev-create', 'arguments': {'job_id': 'job0', 'options': {'size': 0, 'driver': 'file', 'filename': 'TEST_DIR/PID-t.vdi'}}}
- {u'return': {}}
- {'execute': 'job-dismiss', 'arguments': {'id': 'job0'}}
- {u'return': {}}
- 
--{'execute': 'x-blockdev-create', 'arguments': {'job_id': 'job0', 'options': {'preallocation': 'metadata', 'driver': 'vdi', 'file': {'driver': 'file', 'filename': 'TEST_DIR/PID-t.vdi'}, 'size': 33554432}}}
-+{'execute': 'blockdev-create', 'arguments': {'job_id': 'job0', 'options': {'preallocation': 'metadata', 'driver': 'vdi', 'file': {'driver': 'file', 'filename': 'TEST_DIR/PID-t.vdi'}, 'size': 33554432}}}
- {u'return': {}}
- {'execute': 'job-dismiss', 'arguments': {'id': 'job0'}}
- {u'return': {}}
-@@ -60,7 +60,7 @@ cluster_size: 1048576
- 
- === Invalid BlockdevRef ===
- 
--{'execute': 'x-blockdev-create', 'arguments': {'job_id': 'job0', 'options': {'driver': 'vdi', 'file': "this doesn't exist", 'size': 33554432}}}
-+{'execute': 'blockdev-create', 'arguments': {'job_id': 'job0', 'options': {'driver': 'vdi', 'file': "this doesn't exist", 'size': 33554432}}}
- {u'return': {}}
- Job failed: Cannot find device=this doesn't exist nor node_name=this doesn't exist
- {'execute': 'job-dismiss', 'arguments': {'id': 'job0'}}
-@@ -68,7 +68,7 @@ Job failed: Cannot find device=this doesn't exist nor node_name=this doesn't exi
- 
- === Zero size ===
- 
--{'execute': 'x-blockdev-create', 'arguments': {'job_id': 'job0', 'options': {'driver': 'vdi', 'file': 'node0', 'size': 0}}}
-+{'execute': 'blockdev-create', 'arguments': {'job_id': 'job0', 'options': {'driver': 'vdi', 'file': 'node0', 'size': 0}}}
- {u'return': {}}
- {'execute': 'job-dismiss', 'arguments': {'id': 'job0'}}
- {u'return': {}}
-@@ -80,7 +80,7 @@ cluster_size: 1048576
- 
- === Maximum size ===
- 
--{'execute': 'x-blockdev-create', 'arguments': {'job_id': 'job0', 'options': {'driver': 'vdi', 'file': 'node0', 'size': 562949819203584}}}
-+{'execute': 'blockdev-create', 'arguments': {'job_id': 'job0', 'options': {'driver': 'vdi', 'file': 'node0', 'size': 562949819203584}}}
- {u'return': {}}
- {'execute': 'job-dismiss', 'arguments': {'id': 'job0'}}
- {u'return': {}}
-@@ -92,19 +92,19 @@ cluster_size: 1048576
- 
- === Invalid sizes ===
- 
--{'execute': 'x-blockdev-create', 'arguments': {'job_id': 'job0', 'options': {'driver': 'vdi', 'file': 'node0', 'size': 18446744073709551104L}}}
-+{'execute': 'blockdev-create', 'arguments': {'job_id': 'job0', 'options': {'driver': 'vdi', 'file': 'node0', 'size': 18446744073709551104L}}}
- {u'return': {}}
- Job failed: Unsupported VDI image size (size is 0xfffffffffffffe00, max supported is 0x1fffff8000000)
- {'execute': 'job-dismiss', 'arguments': {'id': 'job0'}}
- {u'return': {}}
- 
--{'execute': 'x-blockdev-create', 'arguments': {'job_id': 'job0', 'options': {'driver': 'vdi', 'file': 'node0', 'size': 9223372036854775808L}}}
-+{'execute': 'blockdev-create', 'arguments': {'job_id': 'job0', 'options': {'driver': 'vdi', 'file': 'node0', 'size': 9223372036854775808L}}}
- {u'return': {}}
- Job failed: Unsupported VDI image size (size is 0x8000000000000000, max supported is 0x1fffff8000000)
- {'execute': 'job-dismiss', 'arguments': {'id': 'job0'}}
- {u'return': {}}
- 
--{'execute': 'x-blockdev-create', 'arguments': {'job_id': 'job0', 'options': {'driver': 'vdi', 'file': 'node0', 'size': 562949819203585}}}
-+{'execute': 'blockdev-create', 'arguments': {'job_id': 'job0', 'options': {'driver': 'vdi', 'file': 'node0', 'size': 562949819203585}}}
- {u'return': {}}
- Job failed: Unsupported VDI image size (size is 0x1fffff8000001, max supported is 0x1fffff8000000)
- {'execute': 'job-dismiss', 'arguments': {'id': 'job0'}}
-diff --git a/tests/qemu-iotests/212 b/tests/qemu-iotests/212
-index 03cf41d133..95c8810d83 100755
---- a/tests/qemu-iotests/212
-+++ b/tests/qemu-iotests/212
-@@ -27,7 +27,7 @@ iotests.verify_image_format(supported_fmts=['parallels'])
- iotests.verify_protocol(supported=['file'])
- 
- def blockdev_create(vm, options):
--    result = vm.qmp_log('x-blockdev-create', job_id='job0', options=options)
-+    result = vm.qmp_log('blockdev-create', job_id='job0', options=options)
- 
-     if 'return' in result:
-         assert result['return'] == {}
-diff --git a/tests/qemu-iotests/212.out b/tests/qemu-iotests/212.out
-index 780bc30112..9150da7a2c 100644
---- a/tests/qemu-iotests/212.out
-+++ b/tests/qemu-iotests/212.out
-@@ -1,13 +1,13 @@
- === Successful image creation (defaults) ===
- 
--{'execute': 'x-blockdev-create', 'arguments': {'job_id': 'job0', 'options': {'size': 0, 'driver': 'file', 'filename': 'TEST_DIR/PID-t.parallels'}}}
-+{'execute': 'blockdev-create', 'arguments': {'job_id': 'job0', 'options': {'size': 0, 'driver': 'file', 'filename': 'TEST_DIR/PID-t.parallels'}}}
- {u'return': {}}
- {'execute': 'job-dismiss', 'arguments': {'id': 'job0'}}
- {u'return': {}}
- 
- {'execute': 'blockdev-add', 'arguments': {'node_name': 'imgfile', 'driver': 'file', 'filename': 'TEST_DIR/PID-t.parallels'}}
- {u'return': {}}
--{'execute': 'x-blockdev-create', 'arguments': {'job_id': 'job0', 'options': {'driver': 'parallels', 'file': 'imgfile', 'size': 134217728}}}
-+{'execute': 'blockdev-create', 'arguments': {'job_id': 'job0', 'options': {'driver': 'parallels', 'file': 'imgfile', 'size': 134217728}}}
- {u'return': {}}
- {'execute': 'job-dismiss', 'arguments': {'id': 'job0'}}
- {u'return': {}}
-@@ -18,12 +18,12 @@ virtual size: 128M (134217728 bytes)
- 
- === Successful image creation (explicit defaults) ===
- 
--{'execute': 'x-blockdev-create', 'arguments': {'job_id': 'job0', 'options': {'size': 0, 'driver': 'file', 'filename': 'TEST_DIR/PID-t.parallels'}}}
-+{'execute': 'blockdev-create', 'arguments': {'job_id': 'job0', 'options': {'size': 0, 'driver': 'file', 'filename': 'TEST_DIR/PID-t.parallels'}}}
- {u'return': {}}
- {'execute': 'job-dismiss', 'arguments': {'id': 'job0'}}
- {u'return': {}}
- 
--{'execute': 'x-blockdev-create', 'arguments': {'job_id': 'job0', 'options': {'cluster-size': 1048576, 'driver': 'parallels', 'file': {'driver': 'file', 'filename': 'TEST_DIR/PID-t.parallels'}, 'size': 67108864}}}
-+{'execute': 'blockdev-create', 'arguments': {'job_id': 'job0', 'options': {'cluster-size': 1048576, 'driver': 'parallels', 'file': {'driver': 'file', 'filename': 'TEST_DIR/PID-t.parallels'}, 'size': 67108864}}}
- {u'return': {}}
- {'execute': 'job-dismiss', 'arguments': {'id': 'job0'}}
- {u'return': {}}
-@@ -34,12 +34,12 @@ virtual size: 64M (67108864 bytes)
- 
- === Successful image creation (with non-default options) ===
- 
--{'execute': 'x-blockdev-create', 'arguments': {'job_id': 'job0', 'options': {'size': 0, 'driver': 'file', 'filename': 'TEST_DIR/PID-t.parallels'}}}
-+{'execute': 'blockdev-create', 'arguments': {'job_id': 'job0', 'options': {'size': 0, 'driver': 'file', 'filename': 'TEST_DIR/PID-t.parallels'}}}
- {u'return': {}}
- {'execute': 'job-dismiss', 'arguments': {'id': 'job0'}}
- {u'return': {}}
- 
--{'execute': 'x-blockdev-create', 'arguments': {'job_id': 'job0', 'options': {'cluster-size': 65536, 'driver': 'parallels', 'file': {'driver': 'file', 'filename': 'TEST_DIR/PID-t.parallels'}, 'size': 33554432}}}
-+{'execute': 'blockdev-create', 'arguments': {'job_id': 'job0', 'options': {'cluster-size': 65536, 'driver': 'parallels', 'file': {'driver': 'file', 'filename': 'TEST_DIR/PID-t.parallels'}, 'size': 33554432}}}
- {u'return': {}}
- {'execute': 'job-dismiss', 'arguments': {'id': 'job0'}}
- {u'return': {}}
-@@ -50,7 +50,7 @@ virtual size: 32M (33554432 bytes)
- 
- === Invalid BlockdevRef ===
- 
--{'execute': 'x-blockdev-create', 'arguments': {'job_id': 'job0', 'options': {'driver': 'parallels', 'file': "this doesn't exist", 'size': 33554432}}}
-+{'execute': 'blockdev-create', 'arguments': {'job_id': 'job0', 'options': {'driver': 'parallels', 'file': "this doesn't exist", 'size': 33554432}}}
- {u'return': {}}
- Job failed: Cannot find device=this doesn't exist nor node_name=this doesn't exist
- {'execute': 'job-dismiss', 'arguments': {'id': 'job0'}}
-@@ -58,7 +58,7 @@ Job failed: Cannot find device=this doesn't exist nor node_name=this doesn't exi
- 
- === Zero size ===
- 
--{'execute': 'x-blockdev-create', 'arguments': {'job_id': 'job0', 'options': {'driver': 'parallels', 'file': 'node0', 'size': 0}}}
-+{'execute': 'blockdev-create', 'arguments': {'job_id': 'job0', 'options': {'driver': 'parallels', 'file': 'node0', 'size': 0}}}
- {u'return': {}}
- {'execute': 'job-dismiss', 'arguments': {'id': 'job0'}}
- {u'return': {}}
-@@ -69,7 +69,7 @@ virtual size: 0 (0 bytes)
- 
- === Maximum size ===
- 
--{'execute': 'x-blockdev-create', 'arguments': {'job_id': 'job0', 'options': {'driver': 'parallels', 'file': 'node0', 'size': 4503599627369984}}}
-+{'execute': 'blockdev-create', 'arguments': {'job_id': 'job0', 'options': {'driver': 'parallels', 'file': 'node0', 'size': 4503599627369984}}}
- {u'return': {}}
- {'execute': 'job-dismiss', 'arguments': {'id': 'job0'}}
- {u'return': {}}
-@@ -80,31 +80,31 @@ virtual size: 4096T (4503599627369984 bytes)
- 
- === Invalid sizes ===
- 
--{'execute': 'x-blockdev-create', 'arguments': {'job_id': 'job0', 'options': {'driver': 'parallels', 'file': 'node0', 'size': 1234}}}
-+{'execute': 'blockdev-create', 'arguments': {'job_id': 'job0', 'options': {'driver': 'parallels', 'file': 'node0', 'size': 1234}}}
- {u'return': {}}
- Job failed: Image size must be a multiple of 512 bytes
- {'execute': 'job-dismiss', 'arguments': {'id': 'job0'}}
- {u'return': {}}
- 
--{'execute': 'x-blockdev-create', 'arguments': {'job_id': 'job0', 'options': {'driver': 'parallels', 'file': 'node0', 'size': 18446744073709551104L}}}
-+{'execute': 'blockdev-create', 'arguments': {'job_id': 'job0', 'options': {'driver': 'parallels', 'file': 'node0', 'size': 18446744073709551104L}}}
- {u'return': {}}
- Job failed: Image size is too large for this cluster size
- {'execute': 'job-dismiss', 'arguments': {'id': 'job0'}}
- {u'return': {}}
- 
--{'execute': 'x-blockdev-create', 'arguments': {'job_id': 'job0', 'options': {'driver': 'parallels', 'file': 'node0', 'size': 9223372036854775808L}}}
-+{'execute': 'blockdev-create', 'arguments': {'job_id': 'job0', 'options': {'driver': 'parallels', 'file': 'node0', 'size': 9223372036854775808L}}}
- {u'return': {}}
- Job failed: Image size is too large for this cluster size
- {'execute': 'job-dismiss', 'arguments': {'id': 'job0'}}
- {u'return': {}}
- 
--{'execute': 'x-blockdev-create', 'arguments': {'job_id': 'job0', 'options': {'driver': 'parallels', 'file': 'node0', 'size': 9223372036854775296}}}
-+{'execute': 'blockdev-create', 'arguments': {'job_id': 'job0', 'options': {'driver': 'parallels', 'file': 'node0', 'size': 9223372036854775296}}}
- {u'return': {}}
- Job failed: Image size is too large for this cluster size
- {'execute': 'job-dismiss', 'arguments': {'id': 'job0'}}
- {u'return': {}}
- 
--{'execute': 'x-blockdev-create', 'arguments': {'job_id': 'job0', 'options': {'driver': 'parallels', 'file': 'node0', 'size': 4503599627370497}}}
-+{'execute': 'blockdev-create', 'arguments': {'job_id': 'job0', 'options': {'driver': 'parallels', 'file': 'node0', 'size': 4503599627370497}}}
- {u'return': {}}
- Job failed: Image size is too large for this cluster size
- {'execute': 'job-dismiss', 'arguments': {'id': 'job0'}}
-@@ -112,43 +112,43 @@ Job failed: Image size is too large for this cluster size
- 
- === Invalid cluster size ===
- 
--{'execute': 'x-blockdev-create', 'arguments': {'job_id': 'job0', 'options': {'cluster-size': 1234, 'driver': 'parallels', 'file': 'node0', 'size': 67108864}}}
-+{'execute': 'blockdev-create', 'arguments': {'job_id': 'job0', 'options': {'cluster-size': 1234, 'driver': 'parallels', 'file': 'node0', 'size': 67108864}}}
- {u'return': {}}
- Job failed: Cluster size must be a multiple of 512 bytes
- {'execute': 'job-dismiss', 'arguments': {'id': 'job0'}}
- {u'return': {}}
- 
--{'execute': 'x-blockdev-create', 'arguments': {'job_id': 'job0', 'options': {'cluster-size': 128, 'driver': 'parallels', 'file': 'node0', 'size': 67108864}}}
-+{'execute': 'blockdev-create', 'arguments': {'job_id': 'job0', 'options': {'cluster-size': 128, 'driver': 'parallels', 'file': 'node0', 'size': 67108864}}}
- {u'return': {}}
- Job failed: Cluster size must be a multiple of 512 bytes
- {'execute': 'job-dismiss', 'arguments': {'id': 'job0'}}
- {u'return': {}}
- 
--{'execute': 'x-blockdev-create', 'arguments': {'job_id': 'job0', 'options': {'cluster-size': 4294967296, 'driver': 'parallels', 'file': 'node0', 'size': 67108864}}}
-+{'execute': 'blockdev-create', 'arguments': {'job_id': 'job0', 'options': {'cluster-size': 4294967296, 'driver': 'parallels', 'file': 'node0', 'size': 67108864}}}
- {u'return': {}}
- Job failed: Cluster size is too large
- {'execute': 'job-dismiss', 'arguments': {'id': 'job0'}}
- {u'return': {}}
- 
--{'execute': 'x-blockdev-create', 'arguments': {'job_id': 'job0', 'options': {'cluster-size': 9223372036854775808L, 'driver': 'parallels', 'file': 'node0', 'size': 67108864}}}
-+{'execute': 'blockdev-create', 'arguments': {'job_id': 'job0', 'options': {'cluster-size': 9223372036854775808L, 'driver': 'parallels', 'file': 'node0', 'size': 67108864}}}
- {u'return': {}}
- Job failed: Cluster size is too large
- {'execute': 'job-dismiss', 'arguments': {'id': 'job0'}}
- {u'return': {}}
- 
--{'execute': 'x-blockdev-create', 'arguments': {'job_id': 'job0', 'options': {'cluster-size': 18446744073709551104L, 'driver': 'parallels', 'file': 'node0', 'size': 67108864}}}
-+{'execute': 'blockdev-create', 'arguments': {'job_id': 'job0', 'options': {'cluster-size': 18446744073709551104L, 'driver': 'parallels', 'file': 'node0', 'size': 67108864}}}
- {u'return': {}}
- Job failed: Cluster size is too large
- {'execute': 'job-dismiss', 'arguments': {'id': 'job0'}}
- {u'return': {}}
- 
--{'execute': 'x-blockdev-create', 'arguments': {'job_id': 'job0', 'options': {'cluster-size': 0, 'driver': 'parallels', 'file': 'node0', 'size': 67108864}}}
-+{'execute': 'blockdev-create', 'arguments': {'job_id': 'job0', 'options': {'cluster-size': 0, 'driver': 'parallels', 'file': 'node0', 'size': 67108864}}}
- {u'return': {}}
- Job failed: Image size is too large for this cluster size
- {'execute': 'job-dismiss', 'arguments': {'id': 'job0'}}
- {u'return': {}}
- 
--{'execute': 'x-blockdev-create', 'arguments': {'job_id': 'job0', 'options': {'cluster-size': 512, 'driver': 'parallels', 'file': 'node0', 'size': 281474976710656}}}
-+{'execute': 'blockdev-create', 'arguments': {'job_id': 'job0', 'options': {'cluster-size': 512, 'driver': 'parallels', 'file': 'node0', 'size': 281474976710656}}}
- {u'return': {}}
- Job failed: Image size is too large for this cluster size
- {'execute': 'job-dismiss', 'arguments': {'id': 'job0'}}
-diff --git a/tests/qemu-iotests/213 b/tests/qemu-iotests/213
-index 29d25bcee1..4054439e3c 100755
---- a/tests/qemu-iotests/213
-+++ b/tests/qemu-iotests/213
-@@ -27,7 +27,7 @@ iotests.verify_image_format(supported_fmts=['vhdx'])
- iotests.verify_protocol(supported=['file'])
- 
- def blockdev_create(vm, options):
--    result = vm.qmp_log('x-blockdev-create', job_id='job0', options=options)
-+    result = vm.qmp_log('blockdev-create', job_id='job0', options=options)
- 
-     if 'return' in result:
-         assert result['return'] == {}
-diff --git a/tests/qemu-iotests/213.out b/tests/qemu-iotests/213.out
-index f18a39a4b3..e1dcd47201 100644
---- a/tests/qemu-iotests/213.out
-+++ b/tests/qemu-iotests/213.out
-@@ -1,13 +1,13 @@
- === Successful image creation (defaults) ===
- 
--{'execute': 'x-blockdev-create', 'arguments': {'job_id': 'job0', 'options': {'size': 0, 'driver': 'file', 'filename': 'TEST_DIR/PID-t.vhdx'}}}
-+{'execute': 'blockdev-create', 'arguments': {'job_id': 'job0', 'options': {'size': 0, 'driver': 'file', 'filename': 'TEST_DIR/PID-t.vhdx'}}}
- {u'return': {}}
- {'execute': 'job-dismiss', 'arguments': {'id': 'job0'}}
- {u'return': {}}
- 
- {'execute': 'blockdev-add', 'arguments': {'node_name': 'imgfile', 'driver': 'file', 'filename': 'TEST_DIR/PID-t.vhdx'}}
- {u'return': {}}
--{'execute': 'x-blockdev-create', 'arguments': {'job_id': 'job0', 'options': {'driver': 'vhdx', 'file': 'imgfile', 'size': 134217728}}}
-+{'execute': 'blockdev-create', 'arguments': {'job_id': 'job0', 'options': {'driver': 'vhdx', 'file': 'imgfile', 'size': 134217728}}}
- {u'return': {}}
- {'execute': 'job-dismiss', 'arguments': {'id': 'job0'}}
- {u'return': {}}
-@@ -19,12 +19,12 @@ cluster_size: 8388608
- 
- === Successful image creation (explicit defaults) ===
- 
--{'execute': 'x-blockdev-create', 'arguments': {'job_id': 'job0', 'options': {'size': 0, 'driver': 'file', 'filename': 'TEST_DIR/PID-t.vhdx'}}}
-+{'execute': 'blockdev-create', 'arguments': {'job_id': 'job0', 'options': {'size': 0, 'driver': 'file', 'filename': 'TEST_DIR/PID-t.vhdx'}}}
- {u'return': {}}
- {'execute': 'job-dismiss', 'arguments': {'id': 'job0'}}
- {u'return': {}}
- 
--{'execute': 'x-blockdev-create', 'arguments': {'job_id': 'job0', 'options': {'block-size': 8388608, 'driver': 'vhdx', 'subformat': 'dynamic', 'log-size': 1048576, 'file': {'driver': 'file', 'filename': 'TEST_DIR/PID-t.vhdx'}, 'block-state-zero': True, 'size': 67108864}}}
-+{'execute': 'blockdev-create', 'arguments': {'job_id': 'job0', 'options': {'block-size': 8388608, 'driver': 'vhdx', 'subformat': 'dynamic', 'log-size': 1048576, 'file': {'driver': 'file', 'filename': 'TEST_DIR/PID-t.vhdx'}, 'block-state-zero': True, 'size': 67108864}}}
- {u'return': {}}
- {'execute': 'job-dismiss', 'arguments': {'id': 'job0'}}
- {u'return': {}}
-@@ -36,12 +36,12 @@ cluster_size: 8388608
- 
- === Successful image creation (with non-default options) ===
- 
--{'execute': 'x-blockdev-create', 'arguments': {'job_id': 'job0', 'options': {'size': 0, 'driver': 'file', 'filename': 'TEST_DIR/PID-t.vhdx'}}}
-+{'execute': 'blockdev-create', 'arguments': {'job_id': 'job0', 'options': {'size': 0, 'driver': 'file', 'filename': 'TEST_DIR/PID-t.vhdx'}}}
- {u'return': {}}
- {'execute': 'job-dismiss', 'arguments': {'id': 'job0'}}
- {u'return': {}}
- 
--{'execute': 'x-blockdev-create', 'arguments': {'job_id': 'job0', 'options': {'block-size': 268435456, 'driver': 'vhdx', 'subformat': 'fixed', 'log-size': 8388608, 'file': {'driver': 'file', 'filename': 'TEST_DIR/PID-t.vhdx'}, 'block-state-zero': False, 'size': 33554432}}}
-+{'execute': 'blockdev-create', 'arguments': {'job_id': 'job0', 'options': {'block-size': 268435456, 'driver': 'vhdx', 'subformat': 'fixed', 'log-size': 8388608, 'file': {'driver': 'file', 'filename': 'TEST_DIR/PID-t.vhdx'}, 'block-state-zero': False, 'size': 33554432}}}
- {u'return': {}}
- {'execute': 'job-dismiss', 'arguments': {'id': 'job0'}}
- {u'return': {}}
-@@ -53,7 +53,7 @@ cluster_size: 268435456
- 
- === Invalid BlockdevRef ===
- 
--{'execute': 'x-blockdev-create', 'arguments': {'job_id': 'job0', 'options': {'driver': 'vhdx', 'file': "this doesn't exist", 'size': 33554432}}}
-+{'execute': 'blockdev-create', 'arguments': {'job_id': 'job0', 'options': {'driver': 'vhdx', 'file': "this doesn't exist", 'size': 33554432}}}
- {u'return': {}}
- Job failed: Cannot find device=this doesn't exist nor node_name=this doesn't exist
- {'execute': 'job-dismiss', 'arguments': {'id': 'job0'}}
-@@ -61,7 +61,7 @@ Job failed: Cannot find device=this doesn't exist nor node_name=this doesn't exi
- 
- === Zero size ===
- 
--{'execute': 'x-blockdev-create', 'arguments': {'job_id': 'job0', 'options': {'driver': 'vhdx', 'file': 'node0', 'size': 0}}}
-+{'execute': 'blockdev-create', 'arguments': {'job_id': 'job0', 'options': {'driver': 'vhdx', 'file': 'node0', 'size': 0}}}
- {u'return': {}}
- {'execute': 'job-dismiss', 'arguments': {'id': 'job0'}}
- {u'return': {}}
-@@ -73,7 +73,7 @@ cluster_size: 8388608
- 
- === Maximum size ===
- 
--{'execute': 'x-blockdev-create', 'arguments': {'job_id': 'job0', 'options': {'driver': 'vhdx', 'file': 'node0', 'size': 70368744177664}}}
-+{'execute': 'blockdev-create', 'arguments': {'job_id': 'job0', 'options': {'driver': 'vhdx', 'file': 'node0', 'size': 70368744177664}}}
- {u'return': {}}
- {'execute': 'job-dismiss', 'arguments': {'id': 'job0'}}
- {u'return': {}}
-@@ -85,25 +85,25 @@ cluster_size: 67108864
- 
- === Invalid sizes ===
- 
--{'execute': 'x-blockdev-create', 'arguments': {'job_id': 'job0', 'options': {'driver': 'vhdx', 'file': 'node0', 'size': 18446744073709551104L}}}
-+{'execute': 'blockdev-create', 'arguments': {'job_id': 'job0', 'options': {'driver': 'vhdx', 'file': 'node0', 'size': 18446744073709551104L}}}
- {u'return': {}}
- Job failed: Image size too large; max of 64TB
- {'execute': 'job-dismiss', 'arguments': {'id': 'job0'}}
- {u'return': {}}
- 
--{'execute': 'x-blockdev-create', 'arguments': {'job_id': 'job0', 'options': {'driver': 'vhdx', 'file': 'node0', 'size': 9223372036854775808L}}}
-+{'execute': 'blockdev-create', 'arguments': {'job_id': 'job0', 'options': {'driver': 'vhdx', 'file': 'node0', 'size': 9223372036854775808L}}}
- {u'return': {}}
- Job failed: Image size too large; max of 64TB
- {'execute': 'job-dismiss', 'arguments': {'id': 'job0'}}
- {u'return': {}}
- 
--{'execute': 'x-blockdev-create', 'arguments': {'job_id': 'job0', 'options': {'driver': 'vhdx', 'file': 'node0', 'size': 9223372036854775296}}}
-+{'execute': 'blockdev-create', 'arguments': {'job_id': 'job0', 'options': {'driver': 'vhdx', 'file': 'node0', 'size': 9223372036854775296}}}
- {u'return': {}}
- Job failed: Image size too large; max of 64TB
- {'execute': 'job-dismiss', 'arguments': {'id': 'job0'}}
- {u'return': {}}
- 
--{'execute': 'x-blockdev-create', 'arguments': {'job_id': 'job0', 'options': {'driver': 'vhdx', 'file': 'node0', 'size': 70368744177665}}}
-+{'execute': 'blockdev-create', 'arguments': {'job_id': 'job0', 'options': {'driver': 'vhdx', 'file': 'node0', 'size': 70368744177665}}}
- {u'return': {}}
- Job failed: Image size too large; max of 64TB
- {'execute': 'job-dismiss', 'arguments': {'id': 'job0'}}
-@@ -111,31 +111,31 @@ Job failed: Image size too large; max of 64TB
- 
- === Invalid block size ===
- 
--{'execute': 'x-blockdev-create', 'arguments': {'job_id': 'job0', 'options': {'driver': 'vhdx', 'block-size': 1234567, 'file': 'node0', 'size': 67108864}}}
-+{'execute': 'blockdev-create', 'arguments': {'job_id': 'job0', 'options': {'driver': 'vhdx', 'block-size': 1234567, 'file': 'node0', 'size': 67108864}}}
- {u'return': {}}
- Job failed: Block size must be a multiple of 1 MB
- {'execute': 'job-dismiss', 'arguments': {'id': 'job0'}}
- {u'return': {}}
- 
--{'execute': 'x-blockdev-create', 'arguments': {'job_id': 'job0', 'options': {'driver': 'vhdx', 'block-size': 128, 'file': 'node0', 'size': 67108864}}}
-+{'execute': 'blockdev-create', 'arguments': {'job_id': 'job0', 'options': {'driver': 'vhdx', 'block-size': 128, 'file': 'node0', 'size': 67108864}}}
- {u'return': {}}
- Job failed: Block size must be a multiple of 1 MB
- {'execute': 'job-dismiss', 'arguments': {'id': 'job0'}}
- {u'return': {}}
- 
--{'execute': 'x-blockdev-create', 'arguments': {'job_id': 'job0', 'options': {'driver': 'vhdx', 'block-size': 3145728, 'file': 'node0', 'size': 67108864}}}
-+{'execute': 'blockdev-create', 'arguments': {'job_id': 'job0', 'options': {'driver': 'vhdx', 'block-size': 3145728, 'file': 'node0', 'size': 67108864}}}
- {u'return': {}}
- Job failed: Block size must be a power of two
- {'execute': 'job-dismiss', 'arguments': {'id': 'job0'}}
- {u'return': {}}
- 
--{'execute': 'x-blockdev-create', 'arguments': {'job_id': 'job0', 'options': {'driver': 'vhdx', 'block-size': 536870912, 'file': 'node0', 'size': 67108864}}}
-+{'execute': 'blockdev-create', 'arguments': {'job_id': 'job0', 'options': {'driver': 'vhdx', 'block-size': 536870912, 'file': 'node0', 'size': 67108864}}}
- {u'return': {}}
- Job failed: Block size must not exceed 268435456
- {'execute': 'job-dismiss', 'arguments': {'id': 'job0'}}
- {u'return': {}}
- 
--{'execute': 'x-blockdev-create', 'arguments': {'job_id': 'job0', 'options': {'driver': 'vhdx', 'block-size': 0, 'file': 'node0', 'size': 67108864}}}
-+{'execute': 'blockdev-create', 'arguments': {'job_id': 'job0', 'options': {'driver': 'vhdx', 'block-size': 0, 'file': 'node0', 'size': 67108864}}}
- {u'return': {}}
- Job failed: Block size must be a multiple of 1 MB
- {'execute': 'job-dismiss', 'arguments': {'id': 'job0'}}
-@@ -143,25 +143,25 @@ Job failed: Block size must be a multiple of 1 MB
- 
- === Invalid log size ===
- 
--{'execute': 'x-blockdev-create', 'arguments': {'job_id': 'job0', 'options': {'log-size': 1234567, 'driver': 'vhdx', 'file': 'node0', 'size': 67108864}}}
-+{'execute': 'blockdev-create', 'arguments': {'job_id': 'job0', 'options': {'log-size': 1234567, 'driver': 'vhdx', 'file': 'node0', 'size': 67108864}}}
- {u'return': {}}
- Job failed: Log size must be a multiple of 1 MB
- {'execute': 'job-dismiss', 'arguments': {'id': 'job0'}}
- {u'return': {}}
- 
--{'execute': 'x-blockdev-create', 'arguments': {'job_id': 'job0', 'options': {'log-size': 128, 'driver': 'vhdx', 'file': 'node0', 'size': 67108864}}}
-+{'execute': 'blockdev-create', 'arguments': {'job_id': 'job0', 'options': {'log-size': 128, 'driver': 'vhdx', 'file': 'node0', 'size': 67108864}}}
- {u'return': {}}
- Job failed: Log size must be a multiple of 1 MB
- {'execute': 'job-dismiss', 'arguments': {'id': 'job0'}}
- {u'return': {}}
- 
--{'execute': 'x-blockdev-create', 'arguments': {'job_id': 'job0', 'options': {'log-size': 4294967296, 'driver': 'vhdx', 'file': 'node0', 'size': 67108864}}}
-+{'execute': 'blockdev-create', 'arguments': {'job_id': 'job0', 'options': {'log-size': 4294967296, 'driver': 'vhdx', 'file': 'node0', 'size': 67108864}}}
- {u'return': {}}
- Job failed: Log size must be smaller than 4 GB
- {'execute': 'job-dismiss', 'arguments': {'id': 'job0'}}
- {u'return': {}}
- 
--{'execute': 'x-blockdev-create', 'arguments': {'job_id': 'job0', 'options': {'log-size': 0, 'driver': 'vhdx', 'file': 'node0', 'size': 67108864}}}
-+{'execute': 'blockdev-create', 'arguments': {'job_id': 'job0', 'options': {'log-size': 0, 'driver': 'vhdx', 'file': 'node0', 'size': 67108864}}}
- {u'return': {}}
- Job failed: Log size must be a multiple of 1 MB
- {'execute': 'job-dismiss', 'arguments': {'id': 'job0'}}
+While binaries are necessary for use from within the blog, do you also 
+have source files that can be opened under gimp or other software for 
+easily tweaking the images?
+
+> +
+> +Based on this, it is already possible to define the most obvious difference
+> +between `-net`, `-netdev` and `-nic`: The `-net` option can create _either_
+> +a front-end or a back-end (and also does other things); `-netdev` can only
+> +create a back-end; while a single occurrence of `-nic` will create _both_ a
+> +front-end and a back-end. But for the non-obvious differences, we also need
+> +to have a detailed look at the `-net` and `-netdev` option first ...
+
+s/option/options/
+
+> +
+> +The legacy -net option
+> +----------------------
+> +
+> +QEMU's initial way of configuring the network for the guest was the `-net`
+> +option. The emulated NIC hardware can be chosen with the
+> +`-net nic,model=xyz,...` parameter, and the host back-end with the
+> +`-net <backend>,...` parameter (e.g. `-net user` for the SLIRP back-end).
+> +However, the emulated NIC and the host back-end are not directly connected
+> +here, but via an emulated hub (called "vlan" in older versions of QEMU), so
+
+Does it help to be a bit more verbose in the parenthetical:
+
+(called "vlan" in older versions of QEMU, although it has no relation to 
+VLAN in IEEE 802.1Q)
+
+> +if you start QEMU with `-net nic,model=e1000 -net user -net nic,model=virtio
+> +-net tap` for example, you get a setup where all the front-ends and back-ends
+> +are connected together via a hub:
+> +
+> +![Networking with -net](/screenshots/2018-05-30-qemu-cli-net.png)
+> +
+> +That means the e1000 NIC also gets the network traffic from the virtio-net
+> +NIC and both host back-ends... this is probably not what the users expected;
+> +it's more likely that they wanted two separate networks in the guest, one
+> +for each NIC.
+> +Because `-net` always connects its NIC to a hub, you would have to tell
+
+Do you need a blank line to force a paragraph break?
+
+> +QEMU to use _two separate hubs_, using the "vlan" parameter. For example
+> +`-net nic,model=e1000,vlan=0 -net user,vlan=0 -net nic,model=virtio,vlan=1
+> +-net tap,vlan=1` moves the virtio-net NIC and the "tap" back-end to a second
+> +hub (with ID #1).
+> +
+> +Please note that the "vlan" parameter will be dropped in QEMU v3.0 since the term
+> +was rather [confusing](https://bugs.launchpad.net/qemu/+bug/658904) (it's not
+> +related to IEEE 802.1Q for example) and caused a lot of misconfigurations in
+> +the past. Additional hubs can still be instantiated with `-netdev` (or `-nic`)
+> +and the special "hubport" back-end. The `-net` option itself will still stay
+> +around since it is still useful if you only want to use one front-end and
+> +one back-end together, or if you want to tunnel the traffic of multiple
+> +NICs through one back-end only (something like `-net nic,model=e1000
+> +-net nic,model=virtio -net l2tpv3,...` for example).
+
+Oh, so you did expand on the "vlan" term being confusing.
+
+> +
+> +
+> +The modern -netdev option
+> +-------------------------
+> +
+> +Beside the confusing "vlan" parameter of the `-net` option, there is one more
+> +major drawback with `-net`: The emulated hub between the NIC and the
+> +back-end gets in the way when the NIC front-end has to work closely together
+> +with the host back-end. For example, vhost acceleration can not be enabled
+
+s/can not/cannot/
+
+> +if you create a virtio-net device with `-net nic,model=virtio`.
+> +
+> +To configure a network connection where the emulated NIC is directly connected
+> +to a host network back-end, without a hub in between, you should use the
+> +`-netdev` option for the back-end, together with `-device` for the front-end.
+> +Assuming that you want to configure the same devices as in the `-net` example
+> +above, you could use `-netdev user,id=n1 -device e1000,netdev=n1 -netdev
+> +tap,id=n2 -device virtio-net,netdev=n2` for example. This will give you
+> +straight 1:1 connections between the NICs and the host back-ends:
+> +
+> +![Networking with -netdev](/screenshots/2018-05-30-qemu-cli-netdev.png)
+> +
+> +Note that you can also still connect the devices to a hub with the special
+> +`-netdev hubport` back-end, but in most of the normal use cases, the use
+> +of a hub is not required anymore.
+> +
+> +Now while `-netdev` together with `-device` provide a very flexible and
+> +extensive way to configure a network connection, there are still two
+> +drawbacks with this option pair which prevented us from deprecating the
+> +legacy `-net` option completely:
+> +
+> +1. The `-device` option can only be used for pluggable NICs. Boards
+> +(e.g. embedded boards) which feature an on-board NIC can not be configured
+> +with `-device` yet, so `-net nic,netdev=<id>` must be used here instead.
+> +
+> +2. In some cases, the `-net` option is easier to use (less to type).
+> +For example, assuming you want to set up a "tap" network connection and
+> +you've got the default scripts /etc/qemu-ifup and -down already in place,
+
+s/you've got the/your/
+s/already/are already/
+
+> +it's enough to type `-net nic -net tap` to start your guest. To do the
+> +same with `-netdev`, you always got to specify an ID here, too, for
+
+s/got/have/
+
+> +example like this: `-netdev tap,id=n1 -device e1000,netdev=n1`.
+> +
+> +The new -nic option
+> +-------------------
+> +
+> +Looking at the disadvantages listed above, it should be clear that there
+> +is a need for a convenience option that is
+> +
+> + * easier to use (i.e. less to type) than `-netdev <backend>,id=<id>
+> +  -device <dev>,netdev=<id>`
+
+a convenience option that:
+
+* is easier...
+
+> + * can be used to configure on-board / non-pluggable NICs, too
+> + * does not place a hub between the NIC and the host back-end.
+> +
+> +This is where the new `-nic` option kicks in: This option can be used
+
+s/This option/this option/
+
+> +to configure both the guest's NIC hardware and the host back-end in
+> +one go. For example, instead of `-netdev tap,id=n1 -device e1000,netdev=n1`
+> +you can simply type `-nic tap,model=e1000`. If you don't care about the
+> +exact NIC model type, you can even omit the `model=...` parameter and type
+> +`-nic tap`. This is even shorter and more convenient than the previous
+> +shortest way of typing `-net nic -net tap`. To get a list of NIC models
+> +that you can use with this option, you can simply run QEMU with
+> +`-nic model=help`.
+> +
+> +Beside being easier to use, the `-nic` option can be used to configure
+> +on-board NICs, too (just like the `-net` option). For machines that have
+> +on-board NICs, the first `-nic` option configures the first on-board NIC,
+> +the second `-nic` option configures the second on-board NIC, and so forth.
+> +
+> +Conclusion
+> +----------
+> +
+> + * The new `-nic` option gives you an easy and quick way to configure
+> +   the networking of your guest.
+> + * For more detailed configuration, e.g. when you need to tweak the details
+> +   of the emulated NIC hardware, you can use `-device` together with `-netdev`.
+> + * The `-net` option should rather be avoided these days unless you really
+
+s/rather //
+
+> +   want to configure a set-up with a hub between the front-ends and back-ends.
+> +
 -- 
-2.13.6
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
