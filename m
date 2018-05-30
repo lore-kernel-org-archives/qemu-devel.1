@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60939)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:32787)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1fO073-000577-LM
-	for qemu-devel@nongnu.org; Wed, 30 May 2018 08:21:59 -0400
+	(envelope-from <mreitz@redhat.com>) id 1fO07O-0005LQ-I0
+	for qemu-devel@nongnu.org; Wed, 30 May 2018 08:22:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1fO072-0004zB-Af
-	for qemu-devel@nongnu.org; Wed, 30 May 2018 08:21:57 -0400
-References: <1527680741-2725-1-git-send-email-eric.auger@redhat.com>
-	<1527680741-2725-6-git-send-email-eric.auger@redhat.com>
-	<20180530141333.39c030ed@redhat.com>
-From: Auger Eric <eric.auger@redhat.com>
-Message-ID: <5f697ff8-4bf1-0718-f970-70a5ec7afcc6@redhat.com>
-Date: Wed, 30 May 2018 14:21:46 +0200
+	(envelope-from <mreitz@redhat.com>) id 1fO07N-00054Y-Pd
+	for qemu-devel@nongnu.org; Wed, 30 May 2018 08:22:18 -0400
+References: <20180426161958.2872-1-rkagan@virtuozzo.com>
+	<20180426161958.2872-7-rkagan@virtuozzo.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <ee5f042f-955d-7b71-28a8-4aa44aaa8127@redhat.com>
+Date: Wed, 30 May 2018 14:22:09 +0200
 MIME-Version: 1.0
-In-Reply-To: <20180530141333.39c030ed@redhat.com>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC v3 5/8] hw/arm/virt: GICv3 DT node with one
- or two redistributor regions
+In-Reply-To: <20180426161958.2872-7-rkagan@virtuozzo.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="BhZVhf3XUimZwxzA8s9wX2wEVfdp4aH5K"
+Subject: Re: [Qemu-devel] [PATCH 06/17] iotest 055: skip unsupported backup
+ target formats
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,142 +25,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: eric.auger.pro@gmail.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org, peter.maydell@linaro.org, marc.zyngier@arm.com, wei@redhat.com, drjones@redhat.com, christoffer.dall@arm.com, zhaoshenglong@huawei.com
+To: Roman Kagan <rkagan@virtuozzo.com>, Kevin Wolf <kwolf@redhat.com>, Markus Armbruster <armbru@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
 
-Hi Igor,
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--BhZVhf3XUimZwxzA8s9wX2wEVfdp4aH5K
+From: Max Reitz <mreitz@redhat.com>
+To: Roman Kagan <rkagan@virtuozzo.com>, Kevin Wolf <kwolf@redhat.com>,
+ Markus Armbruster <armbru@redhat.com>, qemu-block@nongnu.org,
+ qemu-devel@nongnu.org
+Message-ID: <ee5f042f-955d-7b71-28a8-4aa44aaa8127@redhat.com>
+Subject: Re: [PATCH 06/17] iotest 055: skip unsupported backup target formats
+References: <20180426161958.2872-1-rkagan@virtuozzo.com>
+ <20180426161958.2872-7-rkagan@virtuozzo.com>
+In-Reply-To: <20180426161958.2872-7-rkagan@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-On 05/30/2018 02:13 PM, Igor Mammedov wrote:
-> On Wed, 30 May 2018 13:45:38 +0200
-> Eric Auger <eric.auger@redhat.com> wrote:
-> 
->> This patch allows the creation of a GICv3 node with 1 or 2
->> redistributor regions depending on the number of smu_cpus.
->> The second redistributor region is located just after the
->> existing RAM region, at 256GB and contains up to up to 512 vcpus.
->>
->> Please refer to kernel documentation for further node details:
->> Documentation/devicetree/bindings/interrupt-controller/arm,gic-v3.txt
->>
->> Signed-off-by: Eric Auger <eric.auger@redhat.com>
->>
->> ---
->>
->> v2 -> v3:
->> - VIRT_GIC_REDIST2 is now 64MB large, ie. 512 redistributor capacity
->> - virt_gicv3_redist_region_count does not test kvm_irqchip_in_kernel
->>   anymore
->> ---
->>  hw/arm/virt.c         | 29 ++++++++++++++++++++++++-----
->>  include/hw/arm/virt.h | 14 ++++++++++++++
->>  2 files changed, 38 insertions(+), 5 deletions(-)
->>
->> diff --git a/hw/arm/virt.c b/hw/arm/virt.c
->> index ed79460..3018ec2 100644
->> --- a/hw/arm/virt.c
->> +++ b/hw/arm/virt.c
->> @@ -149,6 +149,8 @@ static const MemMapEntry a15memmap[] = {
->>      [VIRT_PCIE_PIO] =           { 0x3eff0000, 0x00010000 },
->>      [VIRT_PCIE_ECAM] =          { 0x3f000000, 0x01000000 },
->>      [VIRT_MEM] =                { 0x40000000, RAMLIMIT_BYTES },
->> +    /* Additional 64 MB redist region (can contain up to 512 redistributors) */
->> +    [VIRT_GIC_REDIST2] =        { 0x4000000000ULL, 0x4000000ULL },
-> could it be placed after VIRT_PCIE_MMIO_HIGH,
-> so we would have some space here to increase RAM without
-> creating the second RAM region upto 512GB boundary?
+On 2018-04-26 18:19, Roman Kagan wrote:
+> Signed-off-by: Roman Kagan <rkagan@virtuozzo.com>
+> ---
+>  tests/qemu-iotests/055 | 12 ++++++++++++
+>  1 file changed, 12 insertions(+)
 
-Personally I don't have any objection but see my reply to Shannon's
-similar query in
-http://lists.gnu.org/archive/html/qemu-arm/2018-03/msg00465.html
-
-* If we need to provide more RAM to VMs in the future then we need to:
- *  * allocate a second bank of RAM starting at 2TB and working up
- *  * fix the DT and ACPI table generation code in QEMU to correctly
- *    report two split lumps of RAM to the guest
- *  * fix KVM in the host kernel to allow guests with >40 bit address spaces
- * (We don't want to fill all the way up to 512GB with RAM because
- * we might want it for non-RAM purposes later.
-
-Thanks
-
-Eric
+Reviewed-by: Max Reitz <mreitz@redhat.com>
 
 
-> 
->>      /* Second PCIe window, 512GB wide at the 512GB boundary */
->>      [VIRT_PCIE_MMIO_HIGH] =   { 0x8000000000ULL, 0x8000000000ULL },
->>  };
->> @@ -402,13 +404,30 @@ static void fdt_add_gic_node(VirtMachineState *vms)
->>      qemu_fdt_setprop_cell(vms->fdt, "/intc", "#size-cells", 0x2);
->>      qemu_fdt_setprop(vms->fdt, "/intc", "ranges", NULL, 0);
->>      if (vms->gic_version == 3) {
->> +        int nb_redist_regions = virt_gicv3_redist_region_count(vms);
->> +
->>          qemu_fdt_setprop_string(vms->fdt, "/intc", "compatible",
->>                                  "arm,gic-v3");
->> -        qemu_fdt_setprop_sized_cells(vms->fdt, "/intc", "reg",
->> -                                     2, vms->memmap[VIRT_GIC_DIST].base,
->> -                                     2, vms->memmap[VIRT_GIC_DIST].size,
->> -                                     2, vms->memmap[VIRT_GIC_REDIST].base,
->> -                                     2, vms->memmap[VIRT_GIC_REDIST].size);
->> +
->> +        qemu_fdt_setprop_cell(vms->fdt, "/intc",
->> +                              "#redistributor-regions", nb_redist_regions);
->> +
->> +        if (nb_redist_regions == 1) {
->> +            qemu_fdt_setprop_sized_cells(vms->fdt, "/intc", "reg",
->> +                                         2, vms->memmap[VIRT_GIC_DIST].base,
->> +                                         2, vms->memmap[VIRT_GIC_DIST].size,
->> +                                         2, vms->memmap[VIRT_GIC_REDIST].base,
->> +                                         2, vms->memmap[VIRT_GIC_REDIST].size);
->> +        } else {
->> +            qemu_fdt_setprop_sized_cells(vms->fdt, "/intc", "reg",
->> +                                         2, vms->memmap[VIRT_GIC_DIST].base,
->> +                                         2, vms->memmap[VIRT_GIC_DIST].size,
->> +                                         2, vms->memmap[VIRT_GIC_REDIST].base,
->> +                                         2, vms->memmap[VIRT_GIC_REDIST].size,
->> +                                         2, vms->memmap[VIRT_GIC_REDIST2].base,
->> +                                         2, vms->memmap[VIRT_GIC_REDIST2].size);
->> +        }
->> +
->>          if (vms->virt) {
->>              qemu_fdt_setprop_cells(vms->fdt, "/intc", "interrupts",
->>                                     GIC_FDT_IRQ_TYPE_PPI, ARCH_GICV3_MAINT_IRQ,
->> diff --git a/include/hw/arm/virt.h b/include/hw/arm/virt.h
->> index 4ac7ef6..308156f 100644
->> --- a/include/hw/arm/virt.h
->> +++ b/include/hw/arm/virt.h
->> @@ -35,6 +35,8 @@
->>  #include "qemu/notify.h"
->>  #include "hw/boards.h"
->>  #include "hw/arm/arm.h"
->> +#include "sysemu/kvm.h"
->> +#include "hw/intc/arm_gicv3_common.h"
->>  
->>  #define NUM_GICV2M_SPIS       64
->>  #define NUM_VIRTIO_TRANSPORTS 32
->> @@ -60,6 +62,7 @@ enum {
->>      VIRT_GIC_V2M,
->>      VIRT_GIC_ITS,
->>      VIRT_GIC_REDIST,
->> +    VIRT_GIC_REDIST2,
->>      VIRT_SMMU,
->>      VIRT_UART,
->>      VIRT_MMIO,
->> @@ -130,4 +133,15 @@ typedef struct {
->>  
->>  void virt_acpi_setup(VirtMachineState *vms);
->>  
->> +/* Return the number of used redistributor regions  */
->> +static inline int virt_gicv3_redist_region_count(VirtMachineState *vms)
->> +{
->> +    uint32_t redist0_capacity =
->> +                vms->memmap[VIRT_GIC_REDIST].size / GICV3_REDIST_SIZE;
->> +
->> +    assert(vms->gic_version == 3);
->> +
->> +    return vms->smp_cpus > redist0_capacity ? 2 : 1;
->> +}
->> +
->>  #endif /* QEMU_ARM_VIRT_H */
-> 
+--BhZVhf3XUimZwxzA8s9wX2wEVfdp4aH5K
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlsOl3EACgkQ9AfbAGHV
+z0D6lwgAvEQdS56mWTdL6FcniJn3+aEbrdi7R3NoikIyEdH76h2LvNVx/B3zzKAV
+eGA5C442w1IFEPGXBE5QiSiLD6YRwb8R7200c0ZEgo5xtM7A+OYXB9xL8llt1yzq
+t1osD1upb+kzj6c1YC+VW6zuCcdRuATNg2DTBV7onGLJZURMGuYgeV7CX1asDbg/
+RVIBXO3JrwZJDhXDH4dtYwMGrL5L3Fw55XcHe7NKGB4q2VlBw0JiJOaAeeg9B55s
+J6YWfs8GaqB500PPW65seCoqji6jSHidmthyVOwVhivrbXxqaw6Ly6/LDYelLq1D
+pOToQzShaGKFodUY6CKamtqVPIVa5A==
+=c/Ah
+-----END PGP SIGNATURE-----
+
+--BhZVhf3XUimZwxzA8s9wX2wEVfdp4aH5K--
