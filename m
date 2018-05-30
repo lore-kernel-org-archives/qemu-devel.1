@@ -1,17 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49441)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56247)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1fNzYa-00053m-3s
-	for qemu-devel@nongnu.org; Wed, 30 May 2018 07:46:21 -0400
+	(envelope-from <mreitz@redhat.com>) id 1fNzpZ-0005VL-Vk
+	for qemu-devel@nongnu.org; Wed, 30 May 2018 08:03:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1fNzYZ-0005Pe-5L
-	for qemu-devel@nongnu.org; Wed, 30 May 2018 07:46:20 -0400
-From: Eric Auger <eric.auger@redhat.com>
-Date: Wed, 30 May 2018 13:45:41 +0200
-Message-Id: <1527680741-2725-9-git-send-email-eric.auger@redhat.com>
-In-Reply-To: <1527680741-2725-1-git-send-email-eric.auger@redhat.com>
-References: <1527680741-2725-1-git-send-email-eric.auger@redhat.com>
-Subject: [Qemu-devel] [RFC v3 8/8] hw/arm/virt: Add virt-3.0 machine type
- supporting up to 512 vcpus
+	(envelope-from <mreitz@redhat.com>) id 1fNzpZ-00062r-68
+	for qemu-devel@nongnu.org; Wed, 30 May 2018 08:03:53 -0400
+References: <20180426161958.2872-1-rkagan@virtuozzo.com>
+	<20180426161958.2872-2-rkagan@virtuozzo.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <a06c8a4a-9de1-cee9-f083-40e1e506d041@redhat.com>
+Date: Wed, 30 May 2018 14:03:36 +0200
+MIME-Version: 1.0
+In-Reply-To: <20180426161958.2872-2-rkagan@virtuozzo.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="l4Eq2G1D6uQpDXHNZzja3ZZT4FUxd63wJ"
+Subject: Re: [Qemu-devel] [PATCH 01/17] block: iterate_format with account
+ of whitelisting
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,80 +25,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: eric.auger.pro@gmail.com, eric.auger@redhat.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org, peter.maydell@linaro.org
-Cc: zhaoshenglong@huawei.com, christoffer.dall@arm.com, marc.zyngier@arm.com, drjones@redhat.com, wei@redhat.com
+To: Roman Kagan <rkagan@virtuozzo.com>, Kevin Wolf <kwolf@redhat.com>, Markus Armbruster <armbru@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
 
-Add virt-3.0 machine type.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--l4Eq2G1D6uQpDXHNZzja3ZZT4FUxd63wJ
+From: Max Reitz <mreitz@redhat.com>
+To: Roman Kagan <rkagan@virtuozzo.com>, Kevin Wolf <kwolf@redhat.com>,
+ Markus Armbruster <armbru@redhat.com>, qemu-block@nongnu.org,
+ qemu-devel@nongnu.org
+Message-ID: <a06c8a4a-9de1-cee9-f083-40e1e506d041@redhat.com>
+Subject: Re: [PATCH 01/17] block: iterate_format with account of whitelisting
+References: <20180426161958.2872-1-rkagan@virtuozzo.com>
+ <20180426161958.2872-2-rkagan@virtuozzo.com>
+In-Reply-To: <20180426161958.2872-2-rkagan@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-This machine type allows up to 512 vcpus whereas for
-earlier machine types, max_cpus was set to 255 and
-any attempt to start the machine with vcpus > 255
-was rejected at vl.c/main level.
+On 2018-04-26 18:19, Roman Kagan wrote:
+> bdrv_iterate_format (which is currently only used for printing out the
+> formats supported by the block layer) doesn't take format whitelisting
+> into account.
+>=20
+> As a result, QEMU lies when asked for the list of block drivers it
+> supports with "-drive format=3D?": some of the formats there may be
+> recognized by qemu-* tools but unusable in qemu proper.
+>=20
+> To avoid that, exclude formats that are not whitelisted from
+> enumeration, if whitelisting is in use.  Since we have separate
+> whitelists for r/w and r/o, take this as a parameter to
+> bdrv_iterate_format, and print two lists of supported formats (r/w and
+> r/o) in main qemu.
+>=20
+> Signed-off-by: Roman Kagan <rkagan@virtuozzo.com>
+> ---
+>  include/block/block.h |  2 +-
+>  block.c               | 23 +++++++++++++++++++----
+>  blockdev.c            |  4 +++-
+>  qemu-img.c            |  2 +-
+>  4 files changed, 24 insertions(+), 7 deletions(-)
 
-Signed-off-by: Eric Auger <eric.auger@redhat.com>
----
- hw/arm/virt.c | 32 +++++++++++++++++++++++++-------
- 1 file changed, 25 insertions(+), 7 deletions(-)
+Reviewed-by: Max Reitz <mreitz@redhat.com>
 
-diff --git a/hw/arm/virt.c b/hw/arm/virt.c
-index c00f47d..a9fc24b 100644
---- a/hw/arm/virt.c
-+++ b/hw/arm/virt.c
-@@ -1697,11 +1697,13 @@ static void virt_machine_class_init(ObjectClass *oc, void *data)
-     HotplugHandlerClass *hc = HOTPLUG_HANDLER_CLASS(oc);
- 
-     mc->init = machvirt_init;
--    /* Start max_cpus at the maximum QEMU supports. We'll further restrict
--     * it later in machvirt_init, where we have more information about the
--     * configuration of the particular instance.
-+    /* Start with max_cpus set to 512. This value is chosen since achievable
-+     * in accelerated mode with GICv3 and recent host supporting up to 512 vcpus
-+     * and multiple redistributor region registration.
-+     * This value will be refined later on once we collect more information
-+     * about the configuration of the particular instance.
-      */
--    mc->max_cpus = 255;
-+    mc->max_cpus = 512;
-     machine_class_allow_dynamic_sysbus_dev(mc, TYPE_VFIO_CALXEDA_XGMAC);
-     machine_class_allow_dynamic_sysbus_dev(mc, TYPE_VFIO_AMD_XGBE);
-     mc->block_default_type = IF_VIRTIO;
-@@ -1737,7 +1739,7 @@ static void machvirt_machine_init(void)
- }
- type_init(machvirt_machine_init);
- 
--static void virt_2_12_instance_init(Object *obj)
-+static void virt_3_0_instance_init(Object *obj)
- {
-     VirtMachineState *vms = VIRT_MACHINE(obj);
-     VirtMachineClass *vmc = VIRT_MACHINE_GET_CLASS(vms);
-@@ -1805,10 +1807,26 @@ static void virt_2_12_instance_init(Object *obj)
-     vms->irqmap = a15irqmap;
- }
- 
--static void virt_machine_2_12_options(MachineClass *mc)
-+static void virt_machine_3_0_options(MachineClass *mc)
- {
- }
--DEFINE_VIRT_MACHINE_AS_LATEST(2, 12)
-+DEFINE_VIRT_MACHINE_AS_LATEST(3, 0)
-+
-+#define VIRT_COMPAT_2_12 \
-+    HW_COMPAT_2_12
-+
-+static void virt_2_12_instance_init(Object *obj)
-+{
-+    virt_3_0_instance_init(obj);
-+}
-+
-+static void virt_machine_2_12_options(MachineClass *mc)
-+{
-+    virt_machine_3_0_options(mc);
-+    SET_MACHINE_COMPAT(mc, VIRT_COMPAT_2_12);
-+    mc->max_cpus = 255;
-+}
-+DEFINE_VIRT_MACHINE(2, 12)
- 
- #define VIRT_COMPAT_2_11 \
-     HW_COMPAT_2_11
--- 
-2.5.5
+
+--l4Eq2G1D6uQpDXHNZzja3ZZT4FUxd63wJ
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlsOkxkACgkQ9AfbAGHV
+z0CAQgf+OO0I7BHez3wuWu+7wc845t+iAy9nzTONbvbq33tMmto5uz79HqrV0jEi
+4lxAoFCP+lCRS7v3U42IZkJyveecQYu4G7Yt+t59UAQmrNLV+rC5ea1a8K1P5brg
+bm5OT6De08jU+en1JPyLyrm1Ux3o3SEi0JcG0bvygiKePBdWjBCcKRaKwWBPBzUl
+/181J5BhIqdwoY/Xm1Q3XZ2u7EEM5YwVs5mzetlr+OfyY4IKEbGORhfSBpfPBYNC
+l9B4tPKSX69ipDF6Q3lLkxJ4rxWkzr3N1eF+Oci6+04SgLWxXkm//nrZLqGCYwSd
+F47D11bTTId8WuCtQRjCUQNwAVKmEA==
+=3RXj
+-----END PGP SIGNATURE-----
+
+--l4Eq2G1D6uQpDXHNZzja3ZZT4FUxd63wJ--
