@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33295)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33431)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fO5Pk-0001tm-CC
-	for qemu-devel@nongnu.org; Wed, 30 May 2018 14:01:43 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1fO5Pp-0001xd-9D
+	for qemu-devel@nongnu.org; Wed, 30 May 2018 14:01:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fO5Ph-0004Vi-NN
-	for qemu-devel@nongnu.org; Wed, 30 May 2018 14:01:36 -0400
-Received: from mail-pl0-x229.google.com ([2607:f8b0:400e:c01::229]:33979)
+	(envelope-from <richard.henderson@linaro.org>) id 1fO5Pn-0004cJ-FE
+	for qemu-devel@nongnu.org; Wed, 30 May 2018 14:01:41 -0400
+Received: from mail-pl0-x236.google.com ([2607:f8b0:400e:c01::236]:44389)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1fO5Ph-0004Uv-Cb
-	for qemu-devel@nongnu.org; Wed, 30 May 2018 14:01:33 -0400
-Received: by mail-pl0-x229.google.com with SMTP id ay10-v6so11557962plb.1
-	for <qemu-devel@nongnu.org>; Wed, 30 May 2018 11:01:33 -0700 (PDT)
+	id 1fO5Pn-0004bT-6i
+	for qemu-devel@nongnu.org; Wed, 30 May 2018 14:01:39 -0400
+Received: by mail-pl0-x236.google.com with SMTP id z9-v6so8206977plk.11
+	for <qemu-devel@nongnu.org>; Wed, 30 May 2018 11:01:39 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Wed, 30 May 2018 11:01:08 -0700
-Message-Id: <20180530180120.13355-7-richard.henderson@linaro.org>
+Date: Wed, 30 May 2018 11:01:11 -0700
+Message-Id: <20180530180120.13355-10-richard.henderson@linaro.org>
 In-Reply-To: <20180530180120.13355-1-richard.henderson@linaro.org>
 References: <20180530180120.13355-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH v3b 06/18] target/arm: Implement SVE
- conditionally broadcast/extract element
+Subject: [Qemu-devel] [PATCH v3b 09/18] target/arm: Implement SVE vector
+ splice (predicated)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,400 +32,104 @@ Cc: peter.maydell@linaro.org, qemu-arm@nongnu.org
 
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/arm/helper-sve.h    |   2 +
- target/arm/sve_helper.c    |  11 ++
- target/arm/translate-sve.c | 318 +++++++++++++++++++++++++++++++++++++
- target/arm/sve.decode      |  20 +++
- 4 files changed, 351 insertions(+)
+ target/arm/helper-sve.h    |  2 ++
+ target/arm/sve_helper.c    | 37 +++++++++++++++++++++++++++++++++++++
+ target/arm/translate-sve.c | 13 +++++++++++++
+ target/arm/sve.decode      |  3 +++
+ 4 files changed, 55 insertions(+)
 
 diff --git a/target/arm/helper-sve.h b/target/arm/helper-sve.h
-index d977aea00d..a58fb4ba01 100644
+index 3b7c54905d..c3f8a2b502 100644
 --- a/target/arm/helper-sve.h
 +++ b/target/arm/helper-sve.h
-@@ -463,6 +463,8 @@ DEF_HELPER_FLAGS_4(sve_trn_d, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
- DEF_HELPER_FLAGS_4(sve_compact_s, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
- DEF_HELPER_FLAGS_4(sve_compact_d, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
+@@ -479,6 +479,8 @@ DEF_HELPER_FLAGS_4(sve_rbit_h, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
+ DEF_HELPER_FLAGS_4(sve_rbit_s, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
+ DEF_HELPER_FLAGS_4(sve_rbit_d, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
  
-+DEF_HELPER_FLAGS_2(sve_last_active_element, TCG_CALL_NO_RWG, s32, ptr, i32)
++DEF_HELPER_FLAGS_5(sve_splice, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, ptr, i32)
 +
  DEF_HELPER_FLAGS_5(sve_and_pppp, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, ptr, i32)
  DEF_HELPER_FLAGS_5(sve_bic_pppp, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, ptr, i32)
  DEF_HELPER_FLAGS_5(sve_eor_pppp, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, ptr, i32)
 diff --git a/target/arm/sve_helper.c b/target/arm/sve_helper.c
-index ed3c6d4ca9..941a098234 100644
+index f8579a25e3..f6d4b2139a 100644
 --- a/target/arm/sve_helper.c
 +++ b/target/arm/sve_helper.c
-@@ -2070,3 +2070,14 @@ void HELPER(sve_compact_d)(void *vd, void *vn, void *vg, uint32_t desc)
-         d[j] = 0;
-     }
+@@ -2108,3 +2108,40 @@ int32_t HELPER(sve_last_active_element)(void *vg, uint32_t pred_desc)
+ 
+     return last_active_element(vg, DIV_ROUND_UP(oprsz, 8), esz);
  }
 +
-+/* Similar to the ARM LastActiveElement pseudocode function, except the
-+   result is multiplied by the element size.  This includes the not found
-+   indication; e.g. not found for esz=3 is -8.  */
-+int32_t HELPER(sve_last_active_element)(void *vg, uint32_t pred_desc)
++void HELPER(sve_splice)(void *vd, void *vn, void *vm, void *vg, uint32_t desc)
 +{
-+    intptr_t oprsz = extract32(pred_desc, 0, SIMD_OPRSZ_BITS) + 2;
-+    intptr_t esz = extract32(pred_desc, SIMD_DATA_SHIFT, 2);
++    intptr_t opr_sz = simd_oprsz(desc) / 8;
++    int esz = simd_data(desc);
++    uint64_t pg, first_g, last_g, len, mask = pred_esz_masks[esz];
++    intptr_t i, first_i, last_i;
++    ARMVectorReg tmp;
 +
-+    return last_active_element(vg, DIV_ROUND_UP(oprsz, 8), esz);
++    first_i = last_i = 0;
++    first_g = last_g = 0;
++
++    /* Find the extent of the active elements within VG.  */
++    for (i = QEMU_ALIGN_UP(opr_sz, 8) - 8; i >= 0; i -= 8) {
++        pg = *(uint64_t *)(vg + i) & mask;
++        if (pg) {
++            if (last_g == 0) {
++                last_g = pg;
++                last_i = i;
++            }
++            first_g = pg;
++            first_i = i;
++        }
++    }
++
++    len = 0;
++    if (first_g != 0) {
++        first_i = first_i * 8 + ctz64(first_g);
++        last_i = last_i * 8 + 63 - clz64(last_g);
++        len = last_i - first_i + (1 << esz);
++        if (vd == vm) {
++            vm = memcpy(&tmp, vm, opr_sz * 8);
++        }
++        swap_memmove(vd, vn + first_i, len);
++    }
++    swap_memmove(vd + len, vm, opr_sz * 8 - len);
 +}
 diff --git a/target/arm/translate-sve.c b/target/arm/translate-sve.c
-index ed0f48a927..edcef277f8 100644
+index 90561a8b50..cf3624b439 100644
 --- a/target/arm/translate-sve.c
 +++ b/target/arm/translate-sve.c
-@@ -2296,6 +2296,324 @@ static bool trans_COMPACT(DisasContext *s, arg_rpr_esz *a, uint32_t insn)
+@@ -2671,6 +2671,19 @@ static bool trans_RBIT(DisasContext *s, arg_rpr_esz *a, uint32_t insn)
      return do_zpz_ool(s, a, fns[a->esz]);
  }
  
-+/* Call the helper that computes the ARM LastActiveElement pseudocode
-+   function, scaled by the element size.  This includes the not found
-+   indication; e.g. not found for esz=3 is -8.  */
-+static void find_last_active(DisasContext *s, TCGv_i32 ret, int esz, int pg)
-+{
-+    /* Predicate sizes may be smaller and cannot use simd_desc.  We cannot
-+       round up, as we do elsewhere, because we need the exact size.  */
-+    TCGv_ptr t_p = tcg_temp_new_ptr();
-+    TCGv_i32 t_desc;
-+    unsigned vsz = pred_full_reg_size(s);
-+    unsigned desc;
-+
-+    desc = vsz - 2;
-+    desc = deposit32(desc, SIMD_DATA_SHIFT, 2, esz);
-+
-+    tcg_gen_addi_ptr(t_p, cpu_env, pred_full_reg_offset(s, pg));
-+    t_desc = tcg_const_i32(desc);
-+
-+    gen_helper_sve_last_active_element(ret, t_p, t_desc);
-+
-+    tcg_temp_free_i32(t_desc);
-+    tcg_temp_free_ptr(t_p);
-+}
-+
-+/* Increment LAST to the offset of the next element in the vector,
-+   wrapping around to 0.  */
-+static void incr_last_active(DisasContext *s, TCGv_i32 last, int esz)
-+{
-+    unsigned vsz = vec_full_reg_size(s);
-+
-+    tcg_gen_addi_i32(last, last, 1 << esz);
-+    if (is_power_of_2(vsz)) {
-+        tcg_gen_andi_i32(last, last, vsz - 1);
-+    } else {
-+        TCGv_i32 max = tcg_const_i32(vsz);
-+        TCGv_i32 zero = tcg_const_i32(0);
-+        tcg_gen_movcond_i32(TCG_COND_GEU, last, last, max, zero, last);
-+        tcg_temp_free_i32(max);
-+        tcg_temp_free_i32(zero);
-+    }
-+}
-+
-+/* If LAST < 0, set LAST to the offset of the last element in the vector.  */
-+static void wrap_last_active(DisasContext *s, TCGv_i32 last, int esz)
-+{
-+    unsigned vsz = vec_full_reg_size(s);
-+
-+    if (is_power_of_2(vsz)) {
-+        tcg_gen_andi_i32(last, last, vsz - 1);
-+    } else {
-+        TCGv_i32 max = tcg_const_i32(vsz - (1 << esz));
-+        TCGv_i32 zero = tcg_const_i32(0);
-+        tcg_gen_movcond_i32(TCG_COND_LT, last, last, zero, max, last);
-+        tcg_temp_free_i32(max);
-+        tcg_temp_free_i32(zero);
-+    }
-+}
-+
-+/* Load an unsigned element of ESZ from BASE+OFS.  */
-+static TCGv_i64 load_esz(TCGv_ptr base, int ofs, int esz)
-+{
-+    TCGv_i64 r = tcg_temp_new_i64();
-+
-+    switch (esz) {
-+    case 0:
-+        tcg_gen_ld8u_i64(r, base, ofs);
-+        break;
-+    case 1:
-+        tcg_gen_ld16u_i64(r, base, ofs);
-+        break;
-+    case 2:
-+        tcg_gen_ld32u_i64(r, base, ofs);
-+        break;
-+    case 3:
-+        tcg_gen_ld_i64(r, base, ofs);
-+        break;
-+    default:
-+        g_assert_not_reached();
-+    }
-+    return r;
-+}
-+
-+/* Load an unsigned element of ESZ from RM[LAST].  */
-+static TCGv_i64 load_last_active(DisasContext *s, TCGv_i32 last,
-+                                 int rm, int esz)
-+{
-+    TCGv_ptr p = tcg_temp_new_ptr();
-+    TCGv_i64 r;
-+
-+    /* Convert offset into vector into offset into ENV.
-+       The final adjustment for the vector register base
-+       is added via constant offset to the load.  */
-+#ifdef HOST_WORDS_BIGENDIAN
-+    /* Adjust for element ordering.  See vec_reg_offset.  */
-+    if (esz < 3) {
-+        tcg_gen_xori_i32(last, last, 8 - (1 << esz));
-+    }
-+#endif
-+    tcg_gen_ext_i32_ptr(p, last);
-+    tcg_gen_add_ptr(p, p, cpu_env);
-+
-+    r = load_esz(p, vec_full_reg_offset(s, rm), esz);
-+    tcg_temp_free_ptr(p);
-+
-+    return r;
-+}
-+
-+/* Compute CLAST for a Zreg.  */
-+static bool do_clast_vector(DisasContext *s, arg_rprr_esz *a, bool before)
-+{
-+    if (!sve_access_check(s)) {
-+        return true;
-+    }
-+
-+    TCGv_i32 last = tcg_temp_local_new_i32();
-+    TCGLabel *over = gen_new_label();
-+    TCGv_i64 ele;
-+    unsigned vsz, esz = a->esz;
-+
-+    find_last_active(s, last, esz, a->pg);
-+
-+    /* There is of course no movcond for a 2048-bit vector,
-+       so we must branch over the actual store.  */
-+    tcg_gen_brcondi_i32(TCG_COND_LT, last, 0, over);
-+
-+    if (!before) {
-+        incr_last_active(s, last, esz);
-+    }
-+
-+    ele = load_last_active(s, last, a->rm, esz);
-+    tcg_temp_free_i32(last);
-+
-+    vsz = vec_full_reg_size(s);
-+    tcg_gen_gvec_dup_i64(esz, vec_full_reg_offset(s, a->rd), vsz, vsz, ele);
-+    tcg_temp_free_i64(ele);
-+
-+    /* If this insn used MOVPRFX, we may need a second move.  */
-+    if (a->rd != a->rn) {
-+        TCGLabel *done = gen_new_label();
-+        tcg_gen_br(done);
-+
-+        gen_set_label(over);
-+        do_mov_z(s, a->rd, a->rn);
-+
-+        gen_set_label(done);
-+    } else {
-+        gen_set_label(over);
-+    }
-+    return true;
-+}
-+
-+static bool trans_CLASTA_z(DisasContext *s, arg_rprr_esz *a, uint32_t insn)
-+{
-+    return do_clast_vector(s, a, false);
-+}
-+
-+static bool trans_CLASTB_z(DisasContext *s, arg_rprr_esz *a, uint32_t insn)
-+{
-+    return do_clast_vector(s, a, true);
-+}
-+
-+/* Compute CLAST for a scalar.  */
-+static void do_clast_scalar(DisasContext *s, int esz, int pg, int rm,
-+                            bool before, TCGv_i64 reg_val)
-+{
-+    TCGv_i32 last = tcg_temp_new_i32();
-+    TCGv_i64 ele, cmp, zero;
-+
-+    find_last_active(s, last, esz, pg);
-+
-+    /* Extend the original value of last prior to incrementing.  */
-+    cmp = tcg_temp_new_i64();
-+    tcg_gen_ext_i32_i64(cmp, last);
-+
-+    if (!before) {
-+        incr_last_active(s, last, esz);
-+    }
-+
-+    /* The conceit here is that while last < 0 indicates not found, after
-+       adjusting for cpu_env->vfp.zregs[rm], it is still a valid address
-+       from which we can load garbage.  We then discard the garbage with
-+       a conditional move.  */
-+    ele = load_last_active(s, last, rm, esz);
-+    tcg_temp_free_i32(last);
-+
-+    zero = tcg_const_i64(0);
-+    tcg_gen_movcond_i64(TCG_COND_GE, reg_val, cmp, zero, ele, reg_val);
-+
-+    tcg_temp_free_i64(zero);
-+    tcg_temp_free_i64(cmp);
-+    tcg_temp_free_i64(ele);
-+}
-+
-+/* Compute CLAST for a Vreg.  */
-+static bool do_clast_fp(DisasContext *s, arg_rpr_esz *a, bool before)
++static bool trans_SPLICE(DisasContext *s, arg_rprr_esz *a, uint32_t insn)
 +{
 +    if (sve_access_check(s)) {
-+        int esz = a->esz;
-+        int ofs = vec_reg_offset(s, a->rd, 0, esz);
-+        TCGv_i64 reg = load_esz(cpu_env, ofs, esz);
-+
-+        do_clast_scalar(s, esz, a->pg, a->rn, before, reg);
-+        write_fp_dreg(s, a->rd, reg);
-+        tcg_temp_free_i64(reg);
++        unsigned vsz = vec_full_reg_size(s);
++        tcg_gen_gvec_4_ool(vec_full_reg_offset(s, a->rd),
++                           vec_full_reg_offset(s, a->rn),
++                           vec_full_reg_offset(s, a->rm),
++                           pred_full_reg_offset(s, a->pg),
++                           vsz, vsz, a->esz, gen_helper_sve_splice);
 +    }
 +    return true;
-+}
-+
-+static bool trans_CLASTA_v(DisasContext *s, arg_rpr_esz *a, uint32_t insn)
-+{
-+    return do_clast_fp(s, a, false);
-+}
-+
-+static bool trans_CLASTB_v(DisasContext *s, arg_rpr_esz *a, uint32_t insn)
-+{
-+    return do_clast_fp(s, a, true);
-+}
-+
-+/* Compute CLAST for a Xreg.  */
-+static bool do_clast_general(DisasContext *s, arg_rpr_esz *a, bool before)
-+{
-+    if (!sve_access_check(s)) {
-+        return true;
-+    }
-+
-+    TCGv_i64 reg = cpu_reg(s, a->rd);
-+
-+    switch (a->esz) {
-+    case 0:
-+        tcg_gen_ext8u_i64(reg, reg);
-+        break;
-+    case 1:
-+        tcg_gen_ext16u_i64(reg, reg);
-+        break;
-+    case 2:
-+        tcg_gen_ext32u_i64(reg, reg);
-+        break;
-+    case 3:
-+        break;
-+    default:
-+        g_assert_not_reached();
-+    }
-+
-+    do_clast_scalar(s, a->esz, a->pg, a->rn, before, cpu_reg(s, a->rd));
-+    return true;
-+}
-+
-+static bool trans_CLASTA_r(DisasContext *s, arg_rpr_esz *a, uint32_t insn)
-+{
-+    return do_clast_general(s, a, false);
-+}
-+
-+static bool trans_CLASTB_r(DisasContext *s, arg_rpr_esz *a, uint32_t insn)
-+{
-+    return do_clast_general(s, a, true);
-+}
-+
-+/* Compute LAST for a scalar.  */
-+static TCGv_i64 do_last_scalar(DisasContext *s, int esz,
-+                               int pg, int rm, bool before)
-+{
-+    TCGv_i32 last = tcg_temp_new_i32();
-+    TCGv_i64 ret;
-+
-+    find_last_active(s, last, esz, pg);
-+    if (before) {
-+        wrap_last_active(s, last, esz);
-+    } else {
-+        incr_last_active(s, last, esz);
-+    }
-+
-+    ret = load_last_active(s, last, rm, esz);
-+    tcg_temp_free_i32(last);
-+    return ret;
-+}
-+
-+/* Compute LAST for a Vreg.  */
-+static bool do_last_fp(DisasContext *s, arg_rpr_esz *a, bool before)
-+{
-+    if (sve_access_check(s)) {
-+        TCGv_i64 val = do_last_scalar(s, a->esz, a->pg, a->rn, before);
-+        write_fp_dreg(s, a->rd, val);
-+        tcg_temp_free_i64(val);
-+    }
-+    return true;
-+}
-+
-+static bool trans_LASTA_v(DisasContext *s, arg_rpr_esz *a, uint32_t insn)
-+{
-+    return do_last_fp(s, a, false);
-+}
-+
-+static bool trans_LASTB_v(DisasContext *s, arg_rpr_esz *a, uint32_t insn)
-+{
-+    return do_last_fp(s, a, true);
-+}
-+
-+/* Compute LAST for a Xreg.  */
-+static bool do_last_general(DisasContext *s, arg_rpr_esz *a, bool before)
-+{
-+    if (sve_access_check(s)) {
-+        TCGv_i64 val = do_last_scalar(s, a->esz, a->pg, a->rn, before);
-+        tcg_gen_mov_i64(cpu_reg(s, a->rd), val);
-+        tcg_temp_free_i64(val);
-+    }
-+    return true;
-+}
-+
-+static bool trans_LASTA_r(DisasContext *s, arg_rpr_esz *a, uint32_t insn)
-+{
-+    return do_last_general(s, a, false);
-+}
-+
-+static bool trans_LASTB_r(DisasContext *s, arg_rpr_esz *a, uint32_t insn)
-+{
-+    return do_last_general(s, a, true);
 +}
 +
  /*
   *** SVE Memory - 32-bit Gather and Unsized Contiguous Group
   */
 diff --git a/target/arm/sve.decode b/target/arm/sve.decode
-index 9da6566d32..1226867f69 100644
+index 95eb4968a9..a9fa631252 100644
 --- a/target/arm/sve.decode
 +++ b/target/arm/sve.decode
-@@ -430,6 +430,26 @@ TRN2_z          00000101 .. 1 ..... 011 101 ..... .....         @rd_rn_rm
- # Note esz >= 2
- COMPACT         00000101 .. 100001 100 ... ..... .....          @rd_pg_rn
+@@ -463,6 +463,9 @@ REVH            00000101 .. 1001 01 100 ... ..... .....         @rd_pg_rn
+ REVW            00000101 .. 1001 10 100 ... ..... .....         @rd_pg_rn
+ RBIT            00000101 .. 1001 11 100 ... ..... .....         @rd_pg_rn
  
-+# SVE conditionally broadcast element to vector
-+CLASTA_z        00000101 .. 10100 0 100 ... ..... .....         @rdn_pg_rm
-+CLASTB_z        00000101 .. 10100 1 100 ... ..... .....         @rdn_pg_rm
-+
-+# SVE conditionally copy element to SIMD&FP scalar
-+CLASTA_v        00000101 .. 10101 0 100 ... ..... .....         @rd_pg_rn
-+CLASTB_v        00000101 .. 10101 1 100 ... ..... .....         @rd_pg_rn
-+
-+# SVE conditionally copy element to general register
-+CLASTA_r        00000101 .. 11000 0 101 ... ..... .....         @rd_pg_rn
-+CLASTB_r        00000101 .. 11000 1 101 ... ..... .....         @rd_pg_rn
-+
-+# SVE copy element to SIMD&FP scalar register
-+LASTA_v         00000101 .. 10001 0 100 ... ..... .....         @rd_pg_rn
-+LASTB_v         00000101 .. 10001 1 100 ... ..... .....         @rd_pg_rn
-+
-+# SVE copy element to general register
-+LASTA_r         00000101 .. 10000 0 101 ... ..... .....         @rd_pg_rn
-+LASTB_r         00000101 .. 10000 1 101 ... ..... .....         @rd_pg_rn
++# SVE vector splice (predicated)
++SPLICE          00000101 .. 101 100 100 ... ..... .....         @rdn_pg_rm
 +
  ### SVE Predicate Logical Operations Group
  
