@@ -1,22 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34627)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37171)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1fOvAU-0005NQ-Vr
-	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 21:17:19 -0400
+	(envelope-from <no-reply@patchew.org>) id 1fOvET-0006Kp-LY
+	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 21:21:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1fOvAU-0006Mq-7G
-	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 21:17:18 -0400
-References: <20180417153945.20737-1-pbonzini@redhat.com>
-	<20180417153945.20737-7-pbonzini@redhat.com>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <c07b6574-b20b-28db-157d-15d882cd072c@redhat.com>
-Date: Fri, 1 Jun 2018 21:17:12 -0400
+	(envelope-from <no-reply@patchew.org>) id 1fOvEQ-0003rC-H3
+	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 21:21:25 -0400
+Resent-Message-Id: <E1fOvEQ-0003rC-H3@eggs.gnu.org>
+Received: from sender-of-o51.zoho.com ([135.84.80.216]:21073)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1fOvEQ-0003pu-BS
+	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 21:21:22 -0400
+In-Reply-To: <152768551387.13955.7085403440722380428.stgit@pasha-ThinkPad-T60>
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <152768721896.303.17095517854312599022@d39dc562802a>
 MIME-Version: 1.0
-In-Reply-To: <20180417153945.20737-7-pbonzini@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 6/6] ide: introduce
- ide_transfer_start_norecurse
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Wed, 30 May 2018 06:33:39 -0700 (PDT)
+Subject: Re: [Qemu-devel] [RFC PATCH v1 0/2] QEMU binary instrumentation
+ prototype
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,20 +29,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org
+To: pavel.dovgaluk@gmail.com
+Cc: famz@redhat.com, qemu-devel@nongnu.org
 
-
-
-On 04/17/2018 11:39 AM, Paolo Bonzini wrote:
-> For the case where the end_transfer_func is also the caller of
-> ide_transfer_start, the mutual recursion can lead to unlimited
-> stack usage.  Introduce a new version that can be used to change
-> tail recursion into a loop, and use it in trace_ide_atapi_cmd_reply_end.
-
-probably you mean ide_atapi_cmd_reply_end
-
-> 
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-
-Reviewed-by: John Snow <jsnow@redhat.com>
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
+c3NhZ2UtaWQ6IDE1Mjc2ODU1MTM4Ny4xMzk1NS43MDg1NDAzNDQwNzIyMzgwNDI4LnN0Z2l0QHBh
+c2hhLVRoaW5rUGFkLVQ2MApTdWJqZWN0OiBbUWVtdS1kZXZlbF0gW1JGQyBQQVRDSCB2MSAwLzJd
+IFFFTVUgYmluYXJ5IGluc3RydW1lbnRhdGlvbiBwcm90b3R5cGUKCj09PSBURVNUIFNDUklQVCBC
+RUdJTiA9PT0KIyEvYmluL2Jhc2gKCkJBU0U9YmFzZQpuPTEKdG90YWw9JChnaXQgbG9nIC0tb25l
+bGluZSAkQkFTRS4uIHwgd2MgLWwpCmZhaWxlZD0wCgpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5y
+ZW5hbWVsaW1pdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQpnaXQgY29u
+ZmlnIC0tbG9jYWwgZGlmZi5hbGdvcml0aG0gaGlzdG9ncmFtCgpjb21taXRzPSIkKGdpdCBsb2cg
+LS1mb3JtYXQ9JUggLS1yZXZlcnNlICRCQVNFLi4pIgpmb3IgYyBpbiAkY29tbWl0czsgZG8KICAg
+IGVjaG8gIkNoZWNraW5nIFBBVENIICRuLyR0b3RhbDogJChnaXQgbG9nIC1uIDEgLS1mb3JtYXQ9
+JXMgJGMpLi4uIgogICAgaWYgISBnaXQgc2hvdyAkYyAtLWZvcm1hdD1lbWFpbCB8IC4vc2NyaXB0
+cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgLTsgdGhlbgogICAgICAgIGZhaWxlZD0xCiAgICAg
+ICAgZWNobwogICAgZmkKICAgIG49JCgobisxKSkKZG9uZQoKZXhpdCAkZmFpbGVkCj09PSBURVNU
+IFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQxZGVmN2Y0NGJk
+ODg4NzEzMzg0CkZyb20gaHR0cHM6Ly9naXRodWIuY29tL3BhdGNoZXctcHJvamVjdC9xZW11CiAq
+IFtuZXcgdGFnXSAgICAgICAgICAgICAgIHBhdGNoZXcvMTUyNzY4NTUxMzg3LjEzOTU1LjcwODU0
+MDM0NDA3MjIzODA0Mjguc3RnaXRAcGFzaGEtVGhpbmtQYWQtVDYwIC0+IHBhdGNoZXcvMTUyNzY4
+NTUxMzg3LjEzOTU1LjcwODU0MDM0NDA3MjIzODA0Mjguc3RnaXRAcGFzaGEtVGhpbmtQYWQtVDYw
+CiB0IFt0YWcgdXBkYXRlXSAgICAgICAgICAgIHBhdGNoZXcvMjAxODA1MTcwODE1MjcuMTQ0MTAt
+MS1kYXZpZEByZWRoYXQuY29tIC0+IHBhdGNoZXcvMjAxODA1MTcwODE1MjcuMTQ0MTAtMS1kYXZp
+ZEByZWRoYXQuY29tCiB0IFt0YWcgdXBkYXRlXSAgICAgICAgICAgIHBhdGNoZXcvMjAxODA1Mjkx
+OTM3MzAuOTIwNC0xLWNyb3NhQHJlZGhhdC5jb20gLT4gcGF0Y2hldy8yMDE4MDUyOTE5MzczMC45
+MjA0LTEtY3Jvc2FAcmVkaGF0LmNvbQpTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCjky
+NTIxMzBkZTMgdGNnOiBhZGQgaW5zdHJ1bWVudGluZyBtb2R1bGUKZjg0NWZiZDdhZiB0Y2c6IGFk
+ZCBoZWFkZXJzIGZvciBub24tdGFyZ2V0IGhlbHBlcnMKCj09PSBPVVRQVVQgQkVHSU4gPT09CkNo
+ZWNraW5nIFBBVENIIDEvMjogdGNnOiBhZGQgaGVhZGVycyBmb3Igbm9uLXRhcmdldCBoZWxwZXJz
+Li4uCldBUk5JTkc6IGFkZGVkLCBtb3ZlZCBvciBkZWxldGVkIGZpbGUocyksIGRvZXMgTUFJTlRB
+SU5FUlMgbmVlZCB1cGRhdGluZz8KIzEzOiAKbmV3IGZpbGUgbW9kZSAxMDA2NDQKCkVSUk9SOiBk
+byBub3QgdXNlIEM5OSAvLyBjb21tZW50cwojNzA6IEZJTEU6IGluY2x1ZGUvZXhlYy9oZWxwZXIt
+cmVnaXN0ZXIuaDo1MzoKKyNlbmRpZiAvLyBIRUxQRVJfUkVHSVNURVJfSAoKdG90YWw6IDEgZXJy
+b3JzLCAxIHdhcm5pbmdzLCA4MCBsaW5lcyBjaGVja2VkCgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBw
+cm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNl
+IHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0gg
+aW4gTUFJTlRBSU5FUlMuCgpDaGVja2luZyBQQVRDSCAyLzI6IHRjZzogYWRkIGluc3RydW1lbnRp
+bmcgbW9kdWxlLi4uCldBUk5JTkc6IGFkZGVkLCBtb3ZlZCBvciBkZWxldGVkIGZpbGUocyksIGRv
+ZXMgTUFJTlRBSU5FUlMgbmVlZCB1cGRhdGluZz8KIzI1OiAKbmV3IGZpbGUgbW9kZSAxMDA2NDQK
+CkVSUk9SOiBkbyBub3QgdXNlIEM5OSAvLyBjb21tZW50cwojNTk6IEZJTEU6IGFjY2VsL3RjZy9p
+bnN0cnVtZW50L2luc3RydW1lbnQuYzoxNjoKKy8vI2RlZmluZSBRSV9BTEwKCkVSUk9SOiBkbyBu
+b3QgdXNlIEM5OSAvLyBjb21tZW50cwojNzI6IEZJTEU6IGFjY2VsL3RjZy9pbnN0cnVtZW50L2lu
+c3RydW1lbnQuYzoyOToKKyAgICAvLyBpbnQgODBoIGlzIHByb2Nlc3NlZCBieSBleGNlcHRpb24g
+aGFuZGxlcnMKCkVSUk9SOiB0cmFpbGluZyB3aGl0ZXNwYWNlCiM4NzogRklMRTogYWNjZWwvdGNn
+L2luc3RydW1lbnQvaW5zdHJ1bWVudC5jOjQ0OgorI2VuZGlmICAgICQKCkVSUk9SOiBzcGFjZXMg
+cmVxdWlyZWQgYXJvdW5kIHRoYXQgJz0nIChjdHg6VnhXKQojOTU6IEZJTEU6IGFjY2VsL3RjZy9p
+bnN0cnVtZW50L2luc3RydW1lbnQuYzo1MjoKKyAgICBUQ0d2X3B0ciB0X2NwdT0gdGNnX2NvbnN0
+X3B0cihjcHUpOwogICAgICAgICAgICAgICAgICAgXgoKRVJST1I6ICIoZm9vKikiIHNob3VsZCBi
+ZSAiKGZvbyAqKSIKIzExMTogRklMRTogYWNjZWwvdGNnL2luc3RydW1lbnQvaW5zdHJ1bWVudC5j
+OjY4OgorICAgIENQVUFyY2hTdGF0ZSAqZW52ID0gKChDUFVTdGF0ZSopY3B1KS0+ZW52X3B0cjsK
+CkVSUk9SOiBkbyBub3QgdXNlIEM5OSAvLyBjb21tZW50cwojMTQyOiBGSUxFOiBhY2NlbC90Y2cv
+aW5zdHJ1bWVudC9pbnN0cnVtZW50Lmg6MTE6CisjZW5kaWYgLy8gSU5TVFJVTUVOVF9ICgp0b3Rh
+bDogNiBlcnJvcnMsIDEgd2FybmluZ3MsIDEzMyBsaW5lcyBjaGVja2VkCgpZb3VyIHBhdGNoIGhh
+cyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMK
+YXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNI
+RUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29tbWFu
+ZCBleGl0ZWQgd2l0aCBjb2RlOiAxCgoKLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5
+IGJ5IFBhdGNoZXcgW2h0dHA6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRi
+YWNrIHRvIHBhdGNoZXctZGV2ZWxAcmVkaGF0LmNvbQ==
