@@ -1,23 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41109)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42705)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1fO7YS-0008Ti-Nb
-	for qemu-devel@nongnu.org; Wed, 30 May 2018 16:18:48 -0400
+	(envelope-from <jsnow@redhat.com>) id 1fO7d5-0002vG-Au
+	for qemu-devel@nongnu.org; Wed, 30 May 2018 16:23:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1fO7YG-0002Bc-8a
-	for qemu-devel@nongnu.org; Wed, 30 May 2018 16:18:44 -0400
-References: <20180525235509.11282-1-jsnow@redhat.com>
-	<20180525235509.11282-4-jsnow@redhat.com>
-	<91fa0944-d11d-894f-a1aa-03b1fd186f1a@amsat.org>
+	(envelope-from <jsnow@redhat.com>) id 1fO7d4-0005MI-Fs
+	for qemu-devel@nongnu.org; Wed, 30 May 2018 16:23:31 -0400
+References: <20180529174821.19964-1-f4bug@amsat.org>
+	<20180529174821.19964-2-f4bug@amsat.org>
 From: John Snow <jsnow@redhat.com>
-Message-ID: <acfc53d7-228f-2e95-5946-f7faf0c7f2e3@redhat.com>
-Date: Wed, 30 May 2018 16:17:48 -0400
+Message-ID: <fba4c1c5-a479-60c6-31e3-99affcacd5b7@redhat.com>
+Date: Wed, 30 May 2018 16:23:19 -0400
 MIME-Version: 1.0
-In-Reply-To: <91fa0944-d11d-894f-a1aa-03b1fd186f1a@amsat.org>
+In-Reply-To: <20180529174821.19964-2-f4bug@amsat.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 03/16] ahci: make port read traces more
- descriptive
+Subject: Re: [Qemu-devel] [PATCH 1/4] hw/block/fdc: Replace
+ error_setg(&error_abort) by error_report() + abort()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,67 +25,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-block@nongnu.org, qemu-devel@nongnu.org
 
 
 
-On 05/26/2018 12:44 AM, Philippe Mathieu-Daud=C3=A9 wrote:
-> Hi John,
+On 05/29/2018 01:48 PM, Philippe Mathieu-Daud=C3=A9 wrote:
+> Use error_report() + abort() instead of error_setg(&error_abort),
+> as suggested by the "qapi/error.h" documentation:
 >=20
-> On 05/25/2018 08:54 PM, John Snow wrote:
->> A trace is added to let us watch unimplemented registers specifically,
->> as these are more likely to cause us trouble. Otherwise, the port read
->> traces now tell us what register is getting hit, which is nicer.
->>
->> Signed-off-by: John Snow <jsnow@redhat.com>
->> ---
->>  hw/ide/ahci.c       | 5 +++--
->>  hw/ide/trace-events | 3 ++-
->>  2 files changed, 5 insertions(+), 3 deletions(-)
->>
->> diff --git a/hw/ide/ahci.c b/hw/ide/ahci.c
->> index 5187bf34ad..57c80a2fe9 100644
->> --- a/hw/ide/ahci.c
->> +++ b/hw/ide/ahci.c
->> @@ -46,7 +46,6 @@ static bool ahci_map_fis_address(AHCIDevice *ad);
->>  static void ahci_unmap_clb_address(AHCIDevice *ad);
->>  static void ahci_unmap_fis_address(AHCIDevice *ad);
->> =20
->> -__attribute__((__unused__)) /* TODO */
->>  static const char *AHCIPortReg_lookup[AHCI_PORT_REG__COUNT] =3D {
->>      [AHCI_PORT_REG_LST_ADDR]    =3D "PxCLB",
->>      [AHCI_PORT_REG_LST_ADDR_HI] =3D "PxCLBU",
->> @@ -149,10 +148,12 @@ static uint32_t ahci_port_read(AHCIState *s, int=
- port, int offset)
->>          val =3D pr->cmd_issue;
->>          break;
->>      default:
->> +        trace_ahci_port_read_unimpl(s, port, AHCIPortReg_lookup[regnu=
-m],
->> +                                    offset);
->=20
-> I personally prefer qemu_log_mask(LOG_UNIMP) here.
->=20
-> Rational is when trying firmware, one might want to know which
-> unimplemented features access the firmware, without having to dig into
-> trace events, and the "-d unimp" command line option just works.
+>     Please don't error_setg(&error_fatal, ...), use error_report() and
+>     exit(), because that's more obvious.
+>     Likewise, don't error_setg(&error_abort, ...), use assert().
 >=20
 
-For reads, it's ambiguous. Some of the registers we've specifically not
-implemented because if they are unsupported they are supposed to return
-0, which we do here. The default behavior is generally correct.
+Didn't realize this was bad form (Why do we have it?)
 
-In this case, the trace really is just kind of an informative /
-debugging statement we probably aren't too interested in unless we're
-diagnosing some AHCI problem specifically -- and I don't want to turn on
-all unimp messages to see these.
-
-> (same apply for the write() function later in this series).
+> Use abort() instead of the suggested assert() because the error message
+> already got displayed.
 >=20
 
-For writes it's actually definitely unhandled and I might actually
-prefer both the trace and the log -- if we support "-d unimp" on the
-command line to hunt for known stubs getting probed, this is certainly
-one of those places we want to know about.
+Update the suggestion?
 
---js
+> Suggested-by: Eric Blake <eblake@redhat.com>
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+
+Reviewed-by: John Snow <jsnow@redhat.com>
+Acked-by: John Snow <jsnow@redhat.com>
