@@ -1,16 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55527)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55484)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fO3TD-0007df-6p
-	for qemu-devel@nongnu.org; Wed, 30 May 2018 11:57:04 -0400
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1fO3TA-0006sk-Nx
+	(envelope-from <kwolf@redhat.com>) id 1fO3T9-0007ZX-Ug
 	for qemu-devel@nongnu.org; Wed, 30 May 2018 11:57:03 -0400
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <kwolf@redhat.com>) id 1fO3T8-0006rg-Sl
+	for qemu-devel@nongnu.org; Wed, 30 May 2018 11:57:00 -0400
 From: Kevin Wolf <kwolf@redhat.com>
-Date: Wed, 30 May 2018 17:56:38 +0200
-Message-Id: <20180530155647.14090-9-kwolf@redhat.com>
+Date: Wed, 30 May 2018 17:56:35 +0200
+Message-Id: <20180530155647.14090-6-kwolf@redhat.com>
 In-Reply-To: <20180530155647.14090-1-kwolf@redhat.com>
 References: <20180530155647.14090-1-kwolf@redhat.com>
-Subject: [Qemu-devel] [PULL 08/17] qemu-iotests: Add iotests.img_info_log()
+Subject: [Qemu-devel] [PULL 05/17] block/create: Make x-blockdev-create a job
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,52 +22,202 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: kwolf@redhat.com, qemu-devel@nongnu.org
 
-This adds a filter function to postprocess 'qemu-img info' input
-(similar to what _img_info does), and an img_info_log() function that
-calls 'qemu-img info' and logs the filtered output.
+This changes the x-blockdev-create QMP command so that it doesn't block
+the monitor and the main loop any more, but starts a background job that
+performs the image creation.
+
+The basic job as implemented here is all that is necessary to make image
+creation asynchronous and to provide a QMP interface that can be marked
+stable, but it still lacks a few features that jobs usually provide: The
+job will ignore pause commands and it doesn't publish more than very
+basic progress yet (total-progress is 1 and current-progress advances
+from 0 to 1 when the driver callbacks returns). These features can be
+added later without breaking compatibility.
 
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 Reviewed-by: Max Reitz <mreitz@redhat.com>
 Reviewed-by: Jeff Cody <jcody@redhat.com>
 ---
- tests/qemu-iotests/iotests.py | 18 ++++++++++++++++++
- 1 file changed, 18 insertions(+)
+ qapi/block-core.json     | 14 ++++++----
+ qapi/job.json            |  4 ++-
+ block/create.c           | 67 +++++++++++++++++++++++++++++++++---------------
+ tests/qemu-iotests/group | 14 +++++-----
+ 4 files changed, 66 insertions(+), 33 deletions(-)
 
-diff --git a/tests/qemu-iotests/iotests.py b/tests/qemu-iotests/iotests.py
-index 2f54823db6..edcd2bb701 100644
---- a/tests/qemu-iotests/iotests.py
-+++ b/tests/qemu-iotests/iotests.py
-@@ -109,6 +109,12 @@ def qemu_img_pipe(*args):
-         sys.stderr.write('qemu-img received signal %i: %s\n' % (-exitcode, ' '.join(qemu_img_args + list(args))))
-     return subp.communicate()[0]
+diff --git a/qapi/block-core.json b/qapi/block-core.json
+index ad66ad6f80..eb98596614 100644
+--- a/qapi/block-core.json
++++ b/qapi/block-core.json
+@@ -4013,14 +4013,18 @@
+ ##
+ # @x-blockdev-create:
+ #
+-# Create an image format on a given node.
+-# TODO Replace with something asynchronous (block job?)
++# Starts a job to create an image format on a given node. The job is
++# automatically finalized, but a manual job-dismiss is required.
+ #
+-# Since: 2.12
++# @job-id:          Identifier for the newly created job.
++#
++# @options:         Options for the image creation.
++#
++# Since: 3.0
+ ##
+ { 'command': 'x-blockdev-create',
+-  'data': 'BlockdevCreateOptions',
+-  'boxed': true }
++  'data': { 'job-id': 'str',
++            'options': 'BlockdevCreateOptions' } }
  
-+def img_info_log(filename, filter_path=None):
-+    output = qemu_img_pipe('info', '-f', imgfmt, filename)
-+    if not filter_path:
-+        filter_path = filename
-+    log(filter_img_info(output, filter_path))
-+
- def qemu_io(*args):
-     '''Run qemu-io and return the stdout data'''
-     args = qemu_io_args + list(args)
-@@ -210,6 +216,18 @@ def filter_testfiles(msg):
-     prefix = os.path.join(test_dir, "%s-" % (os.getpid()))
-     return msg.replace(prefix, 'TEST_DIR/PID-')
+ ##
+ # @blockdev-open-tray:
+diff --git a/qapi/job.json b/qapi/job.json
+index 970124de76..69c1970a58 100644
+--- a/qapi/job.json
++++ b/qapi/job.json
+@@ -17,10 +17,12 @@
+ #
+ # @backup: drive backup job type, see "drive-backup"
+ #
++# @create: image creation job type, see "x-blockdev-create" (since 3.0)
++#
+ # Since: 1.7
+ ##
+ { 'enum': 'JobType',
+-  'data': ['commit', 'stream', 'mirror', 'backup'] }
++  'data': ['commit', 'stream', 'mirror', 'backup', 'create'] }
  
-+def filter_img_info(output, filename):
-+    lines = []
-+    for line in output.split('\n'):
-+        if 'disk size' in line or 'actual-size' in line:
-+            continue
-+        line = line.replace(filename, 'TEST_IMG') \
-+                   .replace(imgfmt, 'IMGFMT')
-+        line = re.sub('iters: [0-9]+', 'iters: XXX', line)
-+        line = re.sub('uuid: [-a-f0-9]+', 'uuid: XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX', line)
-+        lines.append(line)
-+    return '\n'.join(lines)
+ ##
+ # @JobStatus:
+diff --git a/block/create.c b/block/create.c
+index 8bd8a03719..1a263e4b13 100644
+--- a/block/create.c
++++ b/block/create.c
+@@ -24,28 +24,51 @@
+ 
+ #include "qemu/osdep.h"
+ #include "block/block_int.h"
++#include "qemu/job.h"
+ #include "qapi/qapi-commands-block-core.h"
++#include "qapi/qapi-visit-block-core.h"
++#include "qapi/clone-visitor.h"
+ #include "qapi/error.h"
+ 
+-typedef struct BlockdevCreateCo {
++typedef struct BlockdevCreateJob {
++    Job common;
+     BlockDriver *drv;
+     BlockdevCreateOptions *opts;
+     int ret;
+-    Error **errp;
+-} BlockdevCreateCo;
++    Error *err;
++} BlockdevCreateJob;
+ 
+-static void coroutine_fn bdrv_co_create_co_entry(void *opaque)
++static void blockdev_create_complete(Job *job, void *opaque)
+ {
+-    BlockdevCreateCo *cco = opaque;
+-    cco->ret = cco->drv->bdrv_co_create(cco->opts, cco->errp);
++    BlockdevCreateJob *s = container_of(job, BlockdevCreateJob, common);
 +
- def log(msg, filters=[]):
-     for flt in filters:
-         msg = flt(msg)
++    job_completed(job, s->ret, s->err);
+ }
+ 
+-void qmp_x_blockdev_create(BlockdevCreateOptions *options, Error **errp)
++static void coroutine_fn blockdev_create_run(void *opaque)
+ {
++    BlockdevCreateJob *s = opaque;
++
++    job_progress_set_remaining(&s->common, 1);
++    s->ret = s->drv->bdrv_co_create(s->opts, &s->err);
++    job_progress_update(&s->common, 1);
++
++    qapi_free_BlockdevCreateOptions(s->opts);
++    job_defer_to_main_loop(&s->common, blockdev_create_complete, NULL);
++}
++
++static const JobDriver blockdev_create_job_driver = {
++    .instance_size = sizeof(BlockdevCreateJob),
++    .job_type      = JOB_TYPE_CREATE,
++    .start         = blockdev_create_run,
++};
++
++void qmp_x_blockdev_create(const char *job_id, BlockdevCreateOptions *options,
++                           Error **errp)
++{
++    BlockdevCreateJob *s;
+     const char *fmt = BlockdevDriver_str(options->driver);
+     BlockDriver *drv = bdrv_find_format(fmt);
+-    Coroutine *co;
+-    BlockdevCreateCo cco;
+ 
+     /* If the driver is in the schema, we know that it exists. But it may not
+      * be whitelisted. */
+@@ -55,22 +78,24 @@ void qmp_x_blockdev_create(BlockdevCreateOptions *options, Error **errp)
+         return;
+     }
+ 
+-    /* Call callback if it exists */
++    /* Error out if the driver doesn't support .bdrv_co_create */
+     if (!drv->bdrv_co_create) {
+         error_setg(errp, "Driver does not support blockdev-create");
+         return;
+     }
+ 
+-    cco = (BlockdevCreateCo) {
+-        .drv = drv,
+-        .opts = options,
+-        .ret = -EINPROGRESS,
+-        .errp = errp,
+-    };
+-
+-    co = qemu_coroutine_create(bdrv_co_create_co_entry, &cco);
+-    qemu_coroutine_enter(co);
+-    while (cco.ret == -EINPROGRESS) {
+-        aio_poll(qemu_get_aio_context(), true);
++    /* Create the block job */
++    /* TODO Running in the main context. Block drivers need to error out or add
++     * locking when they use a BDS in a different AioContext. */
++    s = job_create(job_id, &blockdev_create_job_driver, NULL,
++                   qemu_get_aio_context(), JOB_DEFAULT | JOB_MANUAL_DISMISS,
++                   NULL, NULL, errp);
++    if (!s) {
++        return;
+     }
++
++    s->drv = drv,
++    s->opts = QAPI_CLONE(BlockdevCreateOptions, options),
++
++    job_start(&s->common);
+ }
+diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
+index 93f93d71ba..22b0082db3 100644
+--- a/tests/qemu-iotests/group
++++ b/tests/qemu-iotests/group
+@@ -204,14 +204,16 @@
+ 203 rw auto migration
+ 204 rw auto quick
+ 205 rw auto quick
+-206 rw auto
+-207 rw auto
++# TODO The following commented out tests need to be reworked to work
++# with the x-blockdev-create job
++#206 rw auto
++#207 rw auto
+ 208 rw auto quick
+ 209 rw auto quick
+-210 rw auto
+-211 rw auto quick
+-212 rw auto quick
+-213 rw auto quick
++#210 rw auto
++#211 rw auto quick
++#212 rw auto quick
++#213 rw auto quick
+ 214 rw auto
+ 215 rw auto quick
+ 216 rw auto quick
 -- 
 2.13.6
