@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40380)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40408)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jemmy858585@gmail.com>) id 1fNxeN-0000Us-1K
-	for qemu-devel@nongnu.org; Wed, 30 May 2018 05:44:14 -0400
+	(envelope-from <jemmy858585@gmail.com>) id 1fNxeQ-0000Xb-82
+	for qemu-devel@nongnu.org; Wed, 30 May 2018 05:44:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jemmy858585@gmail.com>) id 1fNxeL-0006sG-Ql
-	for qemu-devel@nongnu.org; Wed, 30 May 2018 05:44:11 -0400
-Received: from mail-pf0-x232.google.com ([2607:f8b0:400e:c00::232]:35408)
+	(envelope-from <jemmy858585@gmail.com>) id 1fNxeO-0006sp-6F
+	for qemu-devel@nongnu.org; Wed, 30 May 2018 05:44:14 -0400
+Received: from mail-pg0-x230.google.com ([2607:f8b0:400e:c05::230]:44726)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <jemmy858585@gmail.com>)
-	id 1fNxeL-0006rv-J0
-	for qemu-devel@nongnu.org; Wed, 30 May 2018 05:44:09 -0400
-Received: by mail-pf0-x232.google.com with SMTP id x9-v6so8752037pfm.2
-	for <qemu-devel@nongnu.org>; Wed, 30 May 2018 02:44:09 -0700 (PDT)
+	id 1fNxeO-0006sh-0O
+	for qemu-devel@nongnu.org; Wed, 30 May 2018 05:44:12 -0400
+Received: by mail-pg0-x230.google.com with SMTP id p21-v6so7899040pgd.11
+	for <qemu-devel@nongnu.org>; Wed, 30 May 2018 02:44:11 -0700 (PDT)
 From: Lidong Chen <jemmy858585@gmail.com>
-Date: Wed, 30 May 2018 17:43:31 +0800
-Message-Id: <1527673416-31268-8-git-send-email-lidongchen@tencent.com>
+Date: Wed, 30 May 2018 17:43:32 +0800
+Message-Id: <1527673416-31268-9-git-send-email-lidongchen@tencent.com>
 In-Reply-To: <1527673416-31268-1-git-send-email-lidongchen@tencent.com>
 References: <1527673416-31268-1-git-send-email-lidongchen@tencent.com>
-Subject: [Qemu-devel] [PATCH v4 07/12] migration: not wait
- RDMA_CM_EVENT_DISCONNECTED event after rdma_disconnect
+Subject: [Qemu-devel] [PATCH v4 08/12] migration: implement
+ io_set_aio_fd_handler function for RDMA QIOChannel
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,90 +32,71 @@ Cc: qemu-devel@nongnu.org, adido@mellanox.com, Lidong Chen <jemmy858585@gmail.co
 
 From: Lidong Chen <jemmy858585@gmail.com>
 
-When cancel migration during RDMA precopy, the source qemu main thread hangs sometime.
+if qio_channel_rdma_readv return QIO_CHANNEL_ERR_BLOCK, the destination qemu
+crash.
 
 The backtrace is:
-    (gdb) bt
-    #0  0x00007f249eabd43d in write () from /lib64/libpthread.so.0
-    #1  0x00007f24a1ce98e4 in rdma_get_cm_event (channel=0x4675d10, event=0x7ffe2f643dd0) at src/cma.c:2189
-    #2  0x00000000007b6166 in qemu_rdma_cleanup (rdma=0x6784000) at migration/rdma.c:2296
-    #3  0x00000000007b7cae in qio_channel_rdma_close (ioc=0x3bfcc30, errp=0x0) at migration/rdma.c:2999
-    #4  0x00000000008db60e in qio_channel_close (ioc=0x3bfcc30, errp=0x0) at io/channel.c:273
-    #5  0x00000000007a8765 in channel_close (opaque=0x3bfcc30) at migration/qemu-file-channel.c:98
-    #6  0x00000000007a71f9 in qemu_fclose (f=0x527c000) at migration/qemu-file.c:334
-    #7  0x0000000000795b96 in migrate_fd_cleanup (opaque=0x3b46280) at migration/migration.c:1162
-    #8  0x000000000093a71b in aio_bh_call (bh=0x3db7a20) at util/async.c:90
-    #9  0x000000000093a7b2 in aio_bh_poll (ctx=0x3b121c0) at util/async.c:118
-    #10 0x000000000093f2ad in aio_dispatch (ctx=0x3b121c0) at util/aio-posix.c:436
-    #11 0x000000000093ab41 in aio_ctx_dispatch (source=0x3b121c0, callback=0x0, user_data=0x0)
-        at util/async.c:261
-    #12 0x00007f249f73c7aa in g_main_context_dispatch () from /lib64/libglib-2.0.so.0
-    #13 0x000000000093dc5e in glib_pollfds_poll () at util/main-loop.c:215
-    #14 0x000000000093dd4e in os_host_main_loop_wait (timeout=28000000) at util/main-loop.c:263
-    #15 0x000000000093de05 in main_loop_wait (nonblocking=0) at util/main-loop.c:522
-    #16 0x00000000005bc6a5 in main_loop () at vl.c:1944
-    #17 0x00000000005c39b5 in main (argc=56, argv=0x7ffe2f6443f8, envp=0x3ad0030) at vl.c:4752
+(gdb) bt
+    #0  0x0000000000000000 in ?? ()
+    #1  0x00000000008db50e in qio_channel_set_aio_fd_handler (ioc=0x38111e0, ctx=0x3726080,
+        io_read=0x8db841 <qio_channel_restart_read>, io_write=0x0, opaque=0x38111e0) at io/channel.c:
+    #2  0x00000000008db952 in qio_channel_set_aio_fd_handlers (ioc=0x38111e0) at io/channel.c:438
+    #3  0x00000000008dbab4 in qio_channel_yield (ioc=0x38111e0, condition=G_IO_IN) at io/channel.c:47
+    #4  0x00000000007a870b in channel_get_buffer (opaque=0x38111e0, buf=0x440c038 "", pos=0, size=327
+        at migration/qemu-file-channel.c:83
+    #5  0x00000000007a70f6 in qemu_fill_buffer (f=0x440c000) at migration/qemu-file.c:299
+    #6  0x00000000007a79d0 in qemu_peek_byte (f=0x440c000, offset=0) at migration/qemu-file.c:562
+    #7  0x00000000007a7a22 in qemu_get_byte (f=0x440c000) at migration/qemu-file.c:575
+    #8  0x00000000007a7c78 in qemu_get_be32 (f=0x440c000) at migration/qemu-file.c:655
+    #9  0x00000000007a0508 in qemu_loadvm_state (f=0x440c000) at migration/savevm.c:2126
+    #10 0x0000000000794141 in process_incoming_migration_co (opaque=0x0) at migration/migration.c:366
+    #11 0x000000000095c598 in coroutine_trampoline (i0=84033984, i1=0) at util/coroutine-ucontext.c:1
+    #12 0x00007f9c0db56d40 in ?? () from /lib64/libc.so.6
+    #13 0x00007f96fe858760 in ?? ()
+    #14 0x0000000000000000 in ?? ()
 
-It does not get the RDMA_CM_EVENT_DISCONNECTED event after rdma_disconnect sometime.
-
-According to IB Spec once active side send DREQ message, it should wait for DREP message
-and only once it arrived it should trigger a DISCONNECT event. DREP message can be dropped
-due to network issues.
-For that case the spec defines a DREP_timeout state in the CM state machine, if the DREP is
-dropped we should get a timeout and a TIMEWAIT_EXIT event will be trigger.
-Unfortunately the current kernel CM implementation doesn't include the DREP_timeout state
-and in above scenario we will not get DISCONNECT or TIMEWAIT_EXIT events.
-
-So it should not invoke rdma_get_cm_event which may hang forever, and the event channel
-is also destroyed in qemu_rdma_cleanup.
+RDMA QIOChannel not implement io_set_aio_fd_handler. so
+qio_channel_set_aio_fd_handler will access NULL pointer.
 
 Signed-off-by: Lidong Chen <lidongchen@tencent.com>
+Reviewed-by: Juan Quintela <quintela@redhat.com>
 ---
- migration/rdma.c       | 12 ++----------
- migration/trace-events |  1 -
- 2 files changed, 2 insertions(+), 11 deletions(-)
+ migration/rdma.c | 16 ++++++++++++++++
+ 1 file changed, 16 insertions(+)
 
 diff --git a/migration/rdma.c b/migration/rdma.c
-index 0dd4033..92e4d30 100644
+index 92e4d30..dfa4f77 100644
 --- a/migration/rdma.c
 +++ b/migration/rdma.c
-@@ -2275,8 +2275,7 @@ static int qemu_rdma_write(QEMUFile *f, RDMAContext *rdma,
+@@ -2963,6 +2963,21 @@ static GSource *qio_channel_rdma_create_watch(QIOChannel *ioc,
+     return source;
+ }
  
- static void qemu_rdma_cleanup(RDMAContext *rdma)
- {
--    struct rdma_cm_event *cm_event;
--    int ret, idx;
-+    int idx;
++static void qio_channel_rdma_set_aio_fd_handler(QIOChannel *ioc,
++                                                  AioContext *ctx,
++                                                  IOHandler *io_read,
++                                                  IOHandler *io_write,
++                                                  void *opaque)
++{
++    QIOChannelRDMA *rioc = QIO_CHANNEL_RDMA(ioc);
++    if (io_read) {
++        aio_set_fd_handler(ctx, rioc->rdmain->comp_channel->fd,
++                           false, io_read, io_write, NULL, opaque);
++    } else {
++        aio_set_fd_handler(ctx, rioc->rdmaout->comp_channel->fd,
++                           false, io_read, io_write, NULL, opaque);
++    }
++}
  
-     if (rdma->cm_id && rdma->connected) {
-         if ((rdma->error_state ||
-@@ -2290,14 +2289,7 @@ static void qemu_rdma_cleanup(RDMAContext *rdma)
-             qemu_rdma_post_send_control(rdma, NULL, &head);
-         }
+ static int qio_channel_rdma_close(QIOChannel *ioc,
+                                   Error **errp)
+@@ -3822,6 +3837,7 @@ static void qio_channel_rdma_class_init(ObjectClass *klass,
+     ioc_klass->io_set_blocking = qio_channel_rdma_set_blocking;
+     ioc_klass->io_close = qio_channel_rdma_close;
+     ioc_klass->io_create_watch = qio_channel_rdma_create_watch;
++    ioc_klass->io_set_aio_fd_handler = qio_channel_rdma_set_aio_fd_handler;
+ }
  
--        ret = rdma_disconnect(rdma->cm_id);
--        if (!ret) {
--            trace_qemu_rdma_cleanup_waiting_for_disconnect();
--            ret = rdma_get_cm_event(rdma->channel, &cm_event);
--            if (!ret) {
--                rdma_ack_cm_event(cm_event);
--            }
--        }
-+        rdma_disconnect(rdma->cm_id);
-         trace_qemu_rdma_cleanup_disconnect();
-         rdma->connected = false;
-     }
-diff --git a/migration/trace-events b/migration/trace-events
-index 3c798dd..4a768ea 100644
---- a/migration/trace-events
-+++ b/migration/trace-events
-@@ -146,7 +146,6 @@ qemu_rdma_accept_pin_state(bool pin) "%d"
- qemu_rdma_accept_pin_verbsc(void *verbs) "Verbs context after listen: %p"
- qemu_rdma_block_for_wrid_miss(const char *wcompstr, int wcomp, const char *gcompstr, uint64_t req) "A Wanted wrid %s (%d) but got %s (%" PRIu64 ")"
- qemu_rdma_cleanup_disconnect(void) ""
--qemu_rdma_cleanup_waiting_for_disconnect(void) ""
- qemu_rdma_close(void) ""
- qemu_rdma_connect_pin_all_requested(void) ""
- qemu_rdma_connect_pin_all_outcome(bool pin) "%d"
+ static const TypeInfo qio_channel_rdma_info = {
 -- 
 1.8.3.1
