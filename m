@@ -1,18 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42030)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42047)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <crosa@redhat.com>) id 1fO634-0007LP-CC
-	for qemu-devel@nongnu.org; Wed, 30 May 2018 14:42:15 -0400
+	(envelope-from <crosa@redhat.com>) id 1fO634-0007LX-Vc
+	for qemu-devel@nongnu.org; Wed, 30 May 2018 14:42:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <crosa@redhat.com>) id 1fO631-0004Ag-2M
+	(envelope-from <crosa@redhat.com>) id 1fO633-0004CH-EY
 	for qemu-devel@nongnu.org; Wed, 30 May 2018 14:42:14 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:53622 helo=mx1.redhat.com)
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:55792 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <crosa@redhat.com>) id 1fO630-0004A8-S6
-	for qemu-devel@nongnu.org; Wed, 30 May 2018 14:42:10 -0400
+	(Exim 4.71) (envelope-from <crosa@redhat.com>) id 1fO633-0004C2-9p
+	for qemu-devel@nongnu.org; Wed, 30 May 2018 14:42:13 -0400
 From: Cleber Rosa <crosa@redhat.com>
-Date: Wed, 30 May 2018 14:41:51 -0400
-Message-Id: <20180530184156.15634-1-crosa@redhat.com>
-Subject: [Qemu-devel] [PATCH v4 0/5] Acceptance/functional tests
+Date: Wed, 30 May 2018 14:41:55 -0400
+Message-Id: <20180530184156.15634-5-crosa@redhat.com>
+In-Reply-To: <20180530184156.15634-1-crosa@redhat.com>
+References: <20180530184156.15634-1-crosa@redhat.com>
+Subject: [Qemu-devel] [PATCH v4 4/5] scripts/qemu.py: introduce
+ set_console() method
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,125 +25,175 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Eduardo Habkost <ehabkost@redhat.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Stefan Hajnoczi <stefanha@redhat.com>, Fam Zheng <famz@redhat.com>, Amador Pahim <amador@pahim.org>
+Cc: Eduardo Habkost <ehabkost@redhat.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Stefan Hajnoczi <stefanha@redhat.com>, Fam Zheng <famz@redhat.com>, Amador Pahim <amador@pahim.org>, Cleber Rosa <crosa@redhat.com>
 
-TL;DR
-=====
+The set_console() method is intended to ease higher level use cases
+that require a console device.
 
-Another version, with a minimalist approach, of the acceptance tests
-infrastructure for QEMU, based on the Avocado Testing Framework.
+The amount of intelligence is limited on purpose, requiring either the
+device type explicitly, or the existence of a machine (pattern)
+definition.
 
-Background
-==========
+Because of the console device type selection criteria (by machine
+type), users should also be able to define that.  It'll then be used
+for both '-machine' and for the console device type selection.
 
-The previous version, still considered an RFC, sent to the list by
-Eduardo[1] was based on the work held in Amador's branch[2].  After
-reviewing it under a different light, including the experiences
-done and reported by Philippe[3], it was clear to me that a different
-approach would be better.
+Users of the set_console() method will certainly be interested in
+accessing the console device, and for that a console_socket property
+has been added.
 
-Differences from previous versions
-==================================
-
-The main difference is that this series include only the minimal
-changes deemed necessary to have a starting point.  I like to think
-that it's better connected to the QEMU community and project needs,
-and will hopefully allow for a more organic growth.
-
-Since this version has less features than the previous versions,
-provided it's accepted, these are the next probable development tasks:
-
- * Provide a simple variants mechanism to allow the same tests to be
-   run under different targets, machine models and devices (present on
-   the previous versions as a "YAML to Mux" file with architecture
-   definitions)
- * Implement QEMUMachine migration support (present on the previous
-   version in the "avocado_qemu.test._VM" class)
- * Implement Guest OS image selection and download (mostly an Avocado
-   feature, paired with a parameter convention and cloud-init support
-   code)
- * Implement interactive support for Guest OS sessions (present on
-   the previous versions, supported by the aexpect Python module)
- * Move the Python modules that are used on tests to a more proper
-   "module" organization.  This should allow for a proper place
-   to hold tests for the Python modules themselves.
-
-Even though this version shares very little (if any) code with the
-previous versions, the following is a list of noteworthy changes:
-
- * Tests directory is now "tests/acceptance" (was "tests/avocado")
- * Base test class is now "avocado_qemu.Test" (was
-   "avocado_qemu.test.QemuTest")
- * Base test class is now hosted in "avocado_qemu/__init__.py" (was
-   "avocado_qemu/test.py")
- * Direct use of "qemu.QEMUMachine", that is, the
-   avocado_qemu.test._VM class is gone
- * avocado_qemu.Test won't search for QEMU binaries on $PATH.  To use
-   QEMU binary on a custom system location it's necessary to use the
-   "qemu_bin" parameter
- * Example test in README.rst is distributed as a real test
-   ("test_version.py")
- * A new "Linux boot console" test, loosely modeled after Phillipe's
-   use case
-
-Changes
-=======
-
->From v3:
---------
-
- * Gave more information on the meaning/intended use of acceptance
-   tests
- * Added a clearer example on running tests with tags
- * Added more information on what a QEMUMachine is
-
->From v2
--------
-
- * Renamed acceptance test files, dropping "test_" prefix.
- * Dropped "scripts/test_qemu.py" until we have a proper Python module
-   location on which to put their own tests.
-
->From v1
--------
-
- * Moved documentation to docs/devel/testing.rst
- * Changed code markers from "::" to ".. code::" in the documentation
-   for consistency
- * Added copyright notices
- * Removed useless "qemu_bin=None" attribution on avocado_qemu.Test.setUp()
- * Removed reference about setting arguments, instead of appending them,
-   on "Acceptance tests: add quick VNC tests" commit message
- * Fixed typo (s/inteligence/intelligence/) on "scripts/qemu.py:
-   introduce set_console() method" commit message
- * Removed useless "return" in add_args()
-
-Commit summary
-==============
-
-Cleber Rosa (5):
-  Add functional/acceptance tests infrastructure
-  scripts/qemu.py: allow adding to the list of extra arguments
-  Acceptance tests: add quick VNC tests
-  scripts/qemu.py: introduce set_console() method
-  Acceptance tests: add Linux kernel boot and console checking test
-
- docs/devel/testing.rst                    | 192 +++++++++++++++++++++++++++++
- scripts/qemu.py                           | 103 +++++++++++++++-
- tests/acceptance/README.rst               |  10 ++
- tests/acceptance/avocado_qemu/__init__.py |  54 ++++++++
- tests/acceptance/boot_linux_console.py    |  47 +++++++
- tests/acceptance/version.py               |  24 ++++
- tests/acceptance/vnc.py                   |  60 +++++++++
- 7 files changed, 489 insertions(+), 1 deletion(-)
- create mode 100644 tests/acceptance/README.rst
- create mode 100644 tests/acceptance/avocado_qemu/__init__.py
- create mode 100644 tests/acceptance/boot_linux_console.py
- create mode 100644 tests/acceptance/version.py
- create mode 100644 tests/acceptance/vnc.py
-
+Signed-off-by: Cleber Rosa <crosa@redhat.com>
 ---
+ scripts/qemu.py | 97 ++++++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 96 insertions(+), 1 deletion(-)
 
-[1] https://lists.gnu.org/archive/html/qemu-devel/2018-04/msg03443.html
-[2] https://github.com/apahim/qemu/commits/avocado_qemu
-[3] https://lists.gnu.org/archive/html/qemu-devel/2018-04/msg03076.html
+diff --git a/scripts/qemu.py b/scripts/qemu.py
+index 7cd8193df8..f099ce7278 100644
+--- a/scripts/qemu.py
++++ b/scripts/qemu.py
+@@ -17,19 +17,41 @@ import logging
+ import os
+ import subprocess
+ import qmp.qmp
++import re
+ import shutil
++import socket
+ import tempfile
+ 
+ 
+ LOG = logging.getLogger(__name__)
+ 
+ 
++#: Maps machine types to the preferred console device types
++CONSOLE_DEV_TYPES = {
++    r'^clipper$': 'isa-serial',
++    r'^malta': 'isa-serial',
++    r'^(pc.*|q35.*|isapc)$': 'isa-serial',
++    r'^(40p|powernv|prep)$': 'isa-serial',
++    r'^pseries.*': 'spapr-vty',
++    r'^s390-ccw-virtio.*': 'sclpconsole',
++    }
++
++
+ class QEMUMachineError(Exception):
+     """
+     Exception called when an error in QEMUMachine happens.
+     """
+ 
+ 
++class QEMUMachineAddDeviceError(QEMUMachineError):
++    """
++    Exception raised when a request to add a device can not be fulfilled
++
++    The failures are caused by limitations, lack of information or conflicting
++    requests on the QEMUMachine methods.  This exception does not represent
++    failures reported by the QEMU binary itself.
++    """
++
+ class MonitorResponseError(qmp.qmp.QMPError):
+     '''
+     Represents erroneous QMP monitor reply
+@@ -91,6 +113,10 @@ class QEMUMachine(object):
+         self._test_dir = test_dir
+         self._temp_dir = None
+         self._launched = False
++        self._machine = None
++        self._console_device_type = None
++        self._console_address = None
++        self._console_socket = None
+ 
+         # just in case logging wasn't configured by the main script:
+         logging.basicConfig()
+@@ -175,9 +201,19 @@ class QEMUMachine(object):
+                 self._monitor_address[1])
+         else:
+             moncdev = 'socket,id=mon,path=%s' % self._vm_monitor
+-        return ['-chardev', moncdev,
++        args = ['-chardev', moncdev,
+                 '-mon', 'chardev=mon,mode=control',
+                 '-display', 'none', '-vga', 'none']
++        if self._machine is not None:
++            args.extend(['-machine', self._machine])
++        if self._console_device_type is not None:
++            self._console_address = os.path.join(self._temp_dir,
++                                                 self._name + "-console.sock")
++            chardev = ('socket,id=console,path=%s,server,nowait' %
++                       self._console_address)
++            device = '%s,chardev=console' % self._console_device_type
++            args.extend(['-chardev', chardev, '-device', device])
++        return args
+ 
+     def _pre_launch(self):
+         self._temp_dir = tempfile.mkdtemp(dir=self._test_dir)
+@@ -202,6 +238,10 @@ class QEMUMachine(object):
+ 
+         self._qemu_log_path = None
+ 
++        if self._console_socket is not None:
++            self._console_socket.close()
++            self._console_socket = None
++
+         if self._temp_dir is not None:
+             shutil.rmtree(self._temp_dir)
+             self._temp_dir = None
+@@ -365,3 +405,58 @@ class QEMUMachine(object):
+         Adds to the list of extra arguments to be given to the QEMU binary
+         '''
+         self._args.extend(args)
++
++    def set_machine(self, machine_type):
++        '''
++        Sets the machine type
++
++        If set, the machine type will be added to the base arguments
++        of the resulting QEMU command line.
++        '''
++        self._machine = machine_type
++
++    def set_console(self, device_type=None):
++        '''
++        Sets the device type for a console device
++
++        If set, the console device and a backing character device will
++        be added to the base arguments of the resulting QEMU command
++        line.
++
++        This is a convenience method that will either use the provided
++        device type, of if not given, it will used the device type set
++        on CONSOLE_DEV_TYPES.
++
++        The actual setting of command line arguments will be be done at
++        machine launch time, as it depends on the temporary directory
++        to be created.
++
++        @param device_type: the device type, such as "isa-serial"
++        @raises: QEMUMachineAddDeviceError if the device type is not given
++                 and can not be determined.
++        '''
++        if device_type is None:
++            if self._machine is None:
++                raise QEMUMachineAddDeviceError("Can not add a console device:"
++                                                " QEMU instance without a "
++                                                "defined machine type")
++            for regex, device in CONSOLE_DEV_TYPES.items():
++                if re.match(regex, self._machine):
++                    device_type = device
++                    break
++            if device_type is None:
++                raise QEMUMachineAddDeviceError("Can not add a console device:"
++                                                " no matching console device "
++                                                "type definition")
++        self._console_device_type = device_type
++
++    @property
++    def console_socket(self):
++        """
++        Returns a socket connected to the console
++        """
++        if self._console_socket is None:
++            self._console_socket = socket.socket(socket.AF_UNIX,
++                                                 socket.SOCK_STREAM)
++            self._console_socket.connect(self._console_address)
++        return self._console_socket
+-- 
+2.17.0
