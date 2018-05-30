@@ -1,17 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34522)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38175)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fNxE9-0002Re-VI
-	for qemu-devel@nongnu.org; Wed, 30 May 2018 05:17:08 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1fNxTV-0006YC-1E
+	for qemu-devel@nongnu.org; Wed, 30 May 2018 05:32:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fNxE9-00072M-2r
-	for qemu-devel@nongnu.org; Wed, 30 May 2018 05:17:05 -0400
-From: Thomas Huth <thuth@redhat.com>
-Date: Wed, 30 May 2018 11:16:58 +0200
-Message-Id: <1527671818-23809-4-git-send-email-thuth@redhat.com>
-In-Reply-To: <1527671818-23809-1-git-send-email-thuth@redhat.com>
-References: <1527671818-23809-1-git-send-email-thuth@redhat.com>
-Subject: [Qemu-devel] [PATCH 3/3] pc-bios/s390-ccw/net: Try to load
- pxelinux.cfg file accoring to the UUID
+	(envelope-from <pbonzini@redhat.com>) id 1fNxTU-0003je-4x
+	for qemu-devel@nongnu.org; Wed, 30 May 2018 05:32:57 -0400
+References: <20180528232719.4721-1-f4bug@amsat.org>
+	<20180528232719.4721-10-f4bug@amsat.org>
+	<20180529134053.1ea9f46d.cohuck@redhat.com>
+	<11289f38-6d0f-74c9-1719-83b2a3ed2d97@amsat.org>
+	<20180530074026-mutt-send-email-mst@kernel.org>
+	<CAAdtpL7sDOg2m+Ffsbc3f_Za6fr3in5ZfBJ2BAtGNJ1j4vbhJQ@mail.gmail.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <e1a5c08d-4b69-7590-0c48-1d459d2fbdab@redhat.com>
+Date: Wed, 30 May 2018 11:32:38 +0200
+MIME-Version: 1.0
+In-Reply-To: <CAAdtpL7sDOg2m+Ffsbc3f_Za6fr3in5ZfBJ2BAtGNJ1j4vbhJQ@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v4 09/21] target: Do not include
+ "exec/exec-all.h" if it is not necessary
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,81 +29,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-s390x@nongnu.org, Viktor Mihajlovski <mihajlov@linux.vnet.ibm.com>
-Cc: Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cohuck@redhat.com>, qemu-devel@nongnu.org, Collin Walling <walling@linux.ibm.com>, Farhan Ali <alifm@linux.ibm.com>
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Cornelia Huck <cohuck@redhat.com>, Thomas Huth <thuth@redhat.com>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, QEMU Trivial <qemu-trivial@nongnu.org>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Peter Maydell <peter.maydell@linaro.org>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, Michael Walle <michael@walle.cc>, Laurent Vivier <laurent@vivier.eu>, Anthony Green <green@moxielogic.com>, Stafford Horne <shorne@gmail.com>, David Gibson <david@gibson.dropbear.id.au>, Alexander Graf <agraf@suse.de>, David Hildenbrand <david@redhat.com>, Max Filippov <jcmvbkbc@gmail.com>, "open list:ARM" <qemu-arm@nongnu.org>, "open list:PowerPC" <qemu-ppc@nongnu.org>, "open list:S390" <qemu-s390x@nongnu.org>
 
-With the STSI instruction, we can get the UUID of the current VM instance,
-so we can support loading pxelinux config files via UUID in the file name,
-too.
+On 30/05/2018 07:50, Philippe Mathieu-Daud=C3=A9 wrote:
+>>> No, not all :/
+>>> I started with "(cpu_loop_|tlb_|tb_)" then kept brutebuilding until n=
+o
+>>> more errors appear. In 2 more steps I added "cpu_address_space_init|"
+>>> then "|GETPC|singlestep|TranslationBlock". Quick and dirty enough for=
+ my
+>>> goal than trying to build a regex to explode function/struct names fr=
+om
+>>> headers. This is a clever way to do it for long term command reuse ta=
+ken
+>>> from commit messages...
+>> Brutebuilding isn't a good way to find unused includes, some other hea=
+der
+>> might pull in an include you are trying to remove for its own purposes=
+.
+>> If you want to try brutebuilding you must also verify that's
+>> not the case - e.g. look at the dependency file generated.
+> Hmm you mean the .d files in the build dir?
 
-Signed-off-by: Thomas Huth <thuth@redhat.com>
----
- pc-bios/s390-ccw/netmain.c | 46 +++++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 45 insertions(+), 1 deletion(-)
+You can also check which include files include this one.  In this case
+you can see that brute-building was more or less enough:
 
-diff --git a/pc-bios/s390-ccw/netmain.c b/pc-bios/s390-ccw/netmain.c
-index e84bb2b..7ece302 100644
---- a/pc-bios/s390-ccw/netmain.c
-+++ b/pc-bios/s390-ccw/netmain.c
-@@ -235,6 +235,49 @@ static void net_release(filename_ip_t *fn_ip)
- }
- 
- /**
-+ * Retrieve the Universally Unique Identifier of the VM.
-+ * @return UUID string, or NULL in case of errors
-+ */
-+static const char *get_uuid(void)
-+{
-+    register int r0 asm("0");
-+    register int r1 asm("1");
-+    uint8_t *mem, *buf, uuid[16];
-+    int i, chk = 0;
-+    static char uuid_str[37];
-+
-+    mem = malloc(2 * PAGE_SIZE);
-+    if (!mem) {
-+        puts("Out of memory ... can not get UUID.");
-+        return NULL;
-+    }
-+    buf = (uint8_t *)(((uint64_t)mem + PAGE_SIZE - 1) & ~(PAGE_SIZE - 1));
-+    memset(buf, 0, PAGE_SIZE);
-+
-+    /* Get SYSIB 3.2.2 */
-+    r0 = (3 << 28) | 2;
-+    r1 = 2;
-+    asm volatile(" stsi 0(%2)\n" : : "d" (r0), "d" (r1), "a" (buf)
-+                 : "cc", "memory");
-+
-+    for (i = 0; i < 16; i++) {
-+        uuid[i] = buf[8 * 4 + 12 * 4 + i];
-+        chk |= uuid[i];
-+    }
-+    free(mem);
-+    if (!chk) {
-+        return NULL;
-+    }
-+
-+    sprintf(uuid_str, "%02x%02x%02x%02x-%02x%02x-%02x%02x-%02x%02x-"
-+            "%02x%02x%02x%02x%02x%02x", uuid[0], uuid[1], uuid[2], uuid[3],
-+            uuid[4], uuid[5], uuid[6], uuid[7], uuid[8], uuid[9], uuid[10],
-+            uuid[11], uuid[12], uuid[13], uuid[14], uuid[15]);
-+
-+    return uuid_str;
-+}
-+
-+/**
-  * Load a kernel with initrd (i.e. with the information that we've got from
-  * a pxelinux.cfg config file)
-  */
-@@ -284,7 +327,8 @@ static int net_try_pxelinux_cfg(filename_ip_t *fn_ip)
-     struct pl_cfg_entry entries[MAX_PXELINUX_ENTRIES];
-     int num_ent, def_ent = 0;
- 
--    num_ent = pxelinux_load_parse_cfg(fn_ip, mac, NULL, DEFAULT_TFTP_RETRIES,
-+    num_ent = pxelinux_load_parse_cfg(fn_ip, mac, get_uuid(),
-+                                      DEFAULT_TFTP_RETRIES,
-                                       cfgbuf, sizeof(cfgbuf),
-                                       entries, MAX_PXELINUX_ENTRIES, &def_ent);
-     if (num_ent > 0) {
--- 
-1.8.3.1
+$ git grep -l exec-all -- '*.h'
+accel/tcg/translate-all.h
+include/exec/tb-lookup.h
+include/exec/translator.h
+linux-user/qemu.h
+target/ppc/helper_regs.h
+
+Leaving aside linux-user/qemu.h, let's check which files include one of
+those headers, but they do not include exec/exec-all.h:
+
+$ git grep -L exec-all \
+   $(git grep -lFf <(git grep -l exec-all -- '*.h' | \
+     grep -v qemu.h | sed 's,.*/,,'))
+linux-user/mmap.c
+target/arm/translate.h
+target/ppc/int_helper.c
+trace/control-target.c
+
+I'll send some patches shortly to fix up what's left.
+
+Paolo
