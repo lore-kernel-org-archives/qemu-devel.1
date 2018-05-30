@@ -1,32 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36181)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36327)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1fO3yu-0006rx-82
-	for qemu-devel@nongnu.org; Wed, 30 May 2018 12:29:49 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1fO3z7-000731-IT
+	for qemu-devel@nongnu.org; Wed, 30 May 2018 12:30:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1fO3ys-0006dv-Ie
-	for qemu-devel@nongnu.org; Wed, 30 May 2018 12:29:48 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:50302 helo=mx1.redhat.com)
+	(envelope-from <ehabkost@redhat.com>) id 1fO3z2-0006za-Lb
+	for qemu-devel@nongnu.org; Wed, 30 May 2018 12:30:01 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:37648)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1fO3ys-0006cz-DU
-	for qemu-devel@nongnu.org; Wed, 30 May 2018 12:29:46 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.5])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id EA7AB40073B1
-	for <qemu-devel@nongnu.org>; Wed, 30 May 2018 16:29:45 +0000 (UTC)
-Date: Wed, 30 May 2018 17:29:40 +0100
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20180530162940.GF5973@stefanha-x1.localdomain>
-References: <20180529055755.12404-1-peterx@redhat.com>
-	<20180529055755.12404-5-peterx@redhat.com>
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1fO3z2-0006z6-El
+	for qemu-devel@nongnu.org; Wed, 30 May 2018 12:29:56 -0400
+Date: Wed, 30 May 2018 13:29:49 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20180530162949.GE7451@localhost.localdomain>
+References: <20180529193730.9204-1-crosa@redhat.com>
+	<20180529193730.9204-4-crosa@redhat.com>
+	<20180530125705.GL14623@stefanha-x1.localdomain>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="+jhVVhN62yS6hEJ8"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20180529055755.12404-5-peterx@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v9 4/7] monitor: fix comment for
- monitor_lock
+In-Reply-To: <20180530125705.GL14623@stefanha-x1.localdomain>
+Subject: Re: [Qemu-devel] [PATCH v3 3/5] Acceptance tests: add quick VNC
+ tests
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,39 +29,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: qemu-devel@nongnu.org, Eric Blake <eblake@redhat.com>, =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>, Markus Armbruster <armbru@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+To: Stefan Hajnoczi <stefanha@redhat.com>
+Cc: Cleber Rosa <crosa@redhat.com>, qemu-devel@nongnu.org, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>, Fam Zheng <famz@redhat.com>, Amador Pahim <amador@pahim.org>
 
+On Wed, May 30, 2018 at 01:57:05PM +0100, Stefan Hajnoczi wrote:
+> On Tue, May 29, 2018 at 03:37:28PM -0400, Cleber Rosa wrote:
+> > This patch adds a few simple behavior tests for VNC.
+> > 
+> > Signed-off-by: Cleber Rosa <crosa@redhat.com>
+> > ---
+> >  tests/acceptance/vnc.py | 60 +++++++++++++++++++++++++++++++++++++++++
+> >  1 file changed, 60 insertions(+)
+> >  create mode 100644 tests/acceptance/vnc.py
+> > 
+> > diff --git a/tests/acceptance/vnc.py b/tests/acceptance/vnc.py
+> > new file mode 100644
+> > index 0000000000..b1ef9d71b1
+> > --- /dev/null
+> > +++ b/tests/acceptance/vnc.py
+> > @@ -0,0 +1,60 @@
+> > +# Simple functional tests for VNC functionality
+> > +#
+> > +# Copyright (c) 2018 Red Hat, Inc.
+> > +#
+> > +# Author:
+> > +#  Cleber Rosa <crosa@redhat.com>
+> > +#
+> > +# This work is licensed under the terms of the GNU GPL, version 2 or
+> > +# later.  See the COPYING file in the top-level directory.
+> > +
+> > +from avocado_qemu import Test
+> > +
+> > +
+> > +class Vnc(Test):
+> > +    """
+> > +    :avocado: enable
+> > +    :avocado: tags=vnc,quick
+> > +    """
+> > +    def test_no_vnc(self):
+> > +        self.vm.add_args('-nodefaults', '-S')
+> > +        self.vm.launch()
+> 
+> If this pattern becomes very common maybe vm.launch() should become
+> vm.launch(*extra_args) to make this a one-liner:
+> 
+>   self.vm.launch('-nodefaults', '-S')
 
---+jhVVhN62yS6hEJ8
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+I think this was suggested in the past:
 
-On Tue, May 29, 2018 at 01:57:52PM +0800, Peter Xu wrote:
-> Fix typo in d622cb5879c.  Meanwhile move these variables close to each
-> other.  monitor_qapi_event_state can be declared static, add that.
->=20
-> Reported-by: Markus Armbruster <armbru@redhat.com>
-> Signed-off-by: Peter Xu <peterx@redhat.com>
-> ---
->  monitor.c | 7 +++----
->  1 file changed, 3 insertions(+), 4 deletions(-)
+  self.vm.add_args(...).launch()
 
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+This style would be useful if we add other methods that change
+QEMU options in addition to raw add_args().  e.g.:
 
---+jhVVhN62yS6hEJ8
-Content-Type: application/pgp-signature; name="signature.asc"
+  self.vm.add_args(...).add_console(...).add_drive(...).launch()
 
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJbDtF0AAoJEJykq7OBq3PIGhUH/3lH9/2rgjz72KAczSSiraO9
-2hw2OJ72uklS9TeauLbBY4KCvEpccP5crQLmhppUUn9Jq67yzeUubzbN7elZzJge
-F3gFIKrJbGXZy+kqlRZNhg9BqAYvRVybbhgsInNxpQk0vl+2tm1hbdPQ5IVSFUnx
-2qmt5qzw0z9I7bgnFh4rakqT25fSPpGibdb1DSt+s9UHl+mwMgb6ImuqXbO0F3/0
-OjyBJvuZbuAHQZk4vbmLpg61QnsW0p1tggE7p1o1cVbq2rhj6nDhVYoHaMoJsypz
-pDu/qH+FdMsVYUyas/dmz8L/0omKPI4hW34RPOaSDk3yxafH6X9QKJWe0LvWZt0=
-=kHM5
------END PGP SIGNATURE-----
-
---+jhVVhN62yS6hEJ8--
+-- 
+Eduardo
