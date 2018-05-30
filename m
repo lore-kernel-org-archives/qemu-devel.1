@@ -1,19 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41491)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42813)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aik@ozlabs.ru>) id 1fNvNT-0006Sg-1t
-	for qemu-devel@nongnu.org; Wed, 30 May 2018 03:18:35 -0400
+	(envelope-from <chen_han_xiao@126.com>) id 1fNvUU-0000nA-UF
+	for qemu-devel@nongnu.org; Wed, 30 May 2018 03:25:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aik@ozlabs.ru>) id 1fNvNP-0005Vz-VZ
-	for qemu-devel@nongnu.org; Wed, 30 May 2018 03:18:35 -0400
-Received: from [107.173.13.209] (port=51950 helo=ozlabs.ru)
+	(envelope-from <chen_han_xiao@126.com>) id 1fNvUQ-00006d-0J
+	for qemu-devel@nongnu.org; Wed, 30 May 2018 03:25:50 -0400
+Received: from m15-8.126.com ([220.181.15.8]:32552)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aik@ozlabs.ru>) id 1fNvNP-0005Vu-OA
-	for qemu-devel@nongnu.org; Wed, 30 May 2018 03:18:31 -0400
-From: Alexey Kardashevskiy <aik@ozlabs.ru>
-Date: Wed, 30 May 2018 17:17:55 +1000
-Message-Id: <20180530071757.9112-1-aik@ozlabs.ru>
-Subject: [Qemu-devel] [PATCH qemu v3 0/2] memory/hmp: Print owners/parents
- in "info mtree"
+	(envelope-from <chen_han_xiao@126.com>) id 1fNvUP-000063-Ba
+	for qemu-devel@nongnu.org; Wed, 30 May 2018 03:25:45 -0400
+Date: Wed, 30 May 2018 14:55:14 +0800 (CST)
+From: "Chen Hanxiao" <chen_han_xiao@126.com>
+In-Reply-To: <38cf2387-bbac-e4e8-4c7f-d7ba9bdcd0e2@redhat.com>
+References: <20180530030109.22404-1-chen_han_xiao@126.com>
+	<38cf2387-bbac-e4e8-4c7f-d7ba9bdcd0e2@redhat.com>
+Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset=GBK
+MIME-Version: 1.0
+Message-ID: <5e690898.591a.163afd447ec.Coremail.chen_han_xiao@126.com>
+Subject: Re: [Qemu-devel] [PATCH] qga: add mountpoint usage to
+ GuestFilesystemInfo
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,28 +28,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Alexey Kardashevskiy <aik@ozlabs.ru>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: Eric Blake <eblake@redhat.com>
+Cc: qemu-devel@nongnu.org, Michael Roth <mdroth@linux.vnet.ibm.com>
 
-This is a debug extension to "into mtree" to print a memory region owner/parent.
-
-This is based on sha1
-e609fa7 Peter Maydell "Merge remote-tracking branch 'remotes/edgar/tags/edgar/xilinx-next-2018-05-29-v1.for-upstream' into staging".
-
-Please comment. Thanks.
-
-
-
-Alexey Kardashevskiy (2):
-  object: Handle objects with no parents
-  memory/hmp: Print owners/parents in "info mtree"
-
- include/exec/memory.h |  2 +-
- memory.c              | 68 +++++++++++++++++++++++++++++++++++++++++++--------
- monitor.c             |  4 ++-
- qom/object.c          | 10 ++++++--
- hmp-commands-info.hx  |  7 +++---
- 5 files changed, 74 insertions(+), 17 deletions(-)
-
--- 
-2.11.0
+CgpBdCAyMDE4LTA1LTMwIDExOjE5OjI3LCAiRXJpYyBCbGFrZSIgPGVibGFrZUByZWRoYXQuY29t
+PiB3cm90ZToKPk9uIDA1LzI5LzIwMTggMTA6MDEgUE0sIENoZW4gSGFueGlhbyB3cm90ZToKPj4g
+RnJvbTogQ2hlbiBIYW54aWFvIDxjaGVuaGFueGlhb0BnbWFpbC5jb20+Cj4+IAo+PiBUaGlzIHBh
+dGNoIGFkZHMgc3VwcG9ydCBmb3IgZ2V0dGluZyB0aGUgdXNhZ2Ugb2YgbW91bnRlZAo+PiBmaWxl
+c3lzdGVtLgo+PiBJdCdzIHZlcnkgdXNlZnVsIHdoZW4gd2UgdHJ5IHRvIG1vbml0b3IgZ3Vlc3Qn
+cyBmaWxlc3lzdGVtLgo+PiBVc2UgZGYgb2YgY29yZXV0aWxzIGZvciByZWZlcmVuY2UuCj4+IAo+
+PiBDYzogTWljaGFlbCBSb3RoIDxtZHJvdGhAbGludXgudm5ldC5pYm0uY29tPgo+PiBTaWduZWQt
+b2ZmLWJ5OiBDaGVuIEhhbnhpYW8gPGNoZW5oYW54aWFvQGdtYWlsLmNvbT4KPj4gLS0tCj4KPj4g
+QEAgLTEwNzIsNiArMTA3Myw5IEBAIHN0YXRpYyBHdWVzdEZpbGVzeXN0ZW1JbmZvICpidWlsZF9n
+dWVzdF9mc2luZm8oc3RydWN0IEZzTW91bnQgKm1vdW50LAo+PiAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgRXJyb3IgKiplcnJwKQo+PiAgIHsKPj4gICAg
+ICAgR3Vlc3RGaWxlc3lzdGVtSW5mbyAqZnMgPSBnX21hbGxvYzAoc2l6ZW9mKCpmcykpOwo+PiAr
+ICAgIHN0cnVjdCBzdGF0dmZzIGJ1ZjsKPj4gKyAgICB1bnNpZ25lZCBsb25nIHUxMDAsIHVzZWQs
+IG5vbnJvb3RfdG90YWw7Cj4+ICsgICAgaW50IHVzYWdlOwo+PiAgICAgICBjaGFyICpkZXZwYXRo
+ID0gZ19zdHJkdXBfcHJpbnRmKCIvc3lzL2Rldi9ibG9jay8ldToldSIsCj4+ICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgbW91bnQtPmRldm1ham9yLCBtb3VudC0+ZGV2bWlu
+b3IpOwo+PiAgIAo+PiBAQCAtMTA3OSw3ICsxMDgzLDIwIEBAIHN0YXRpYyBHdWVzdEZpbGVzeXN0
+ZW1JbmZvICpidWlsZF9ndWVzdF9mc2luZm8oc3RydWN0IEZzTW91bnQgKm1vdW50LAo+PiAgICAg
+ICBmcy0+dHlwZSA9IGdfc3RyZHVwKG1vdW50LT5kZXZ0eXBlKTsKPj4gICAgICAgYnVpbGRfZ3Vl
+c3RfZnNpbmZvX2Zvcl9kZXZpY2UoZGV2cGF0aCwgZnMsIGVycnApOwo+PiAgIAo+PiArICAgIGlm
+IChzdGF0dmZzKGZzLT5tb3VudHBvaW50LCAmYnVmKSkgewo+PiArICAgICAgICBlcnJvcl9zZXRn
+X2Vycm5vKGVycnAsIGVycm5vLCAiRmFpbGVkIHRvIGdldCBzdGF0dmZzIik7Cj4+ICsgICAgICAg
+IHJldHVybiBOVUxMOwo+PiArICAgIH0KPj4gKwo+PiArICAgIHVzZWQgPSBidWYuZl9ibG9ja3Mg
+LSBidWYuZl9iZnJlZTsKPj4gKyAgICB1MTAwID0gMTAwICogdXNlZDsKPj4gKyAgICBub25yb290
+X3RvdGFsID0gdXNlZCArIGJ1Zi5mX2JhdmFpbDsKPj4gKyAgICB1c2FnZSA9IHUxMDAgLyBub25y
+b290X3RvdGFsICsgKHUxMDAgJSBub25yb290X3RvdGFsICE9IDApOwo+Cj5XaHkgaW50ZWdyYWwg
+aW5zdGVhZCBvZiBmbG9hdGluZyBwb2ludD8KCkkgZm9sbG93ZWQgdGhlIHN0eWxlIG9mIGRmIGZy
+b20gY29yZXV0aWxzLgpBcyB0aGUgcGVyY2VudGFnZSBhbHJlYWR5IG11bHRpcGxpZWQgYnkgMTAw
+LApJIHRoaW5rIGl0IGhhcyBlbm91Z2ggcHJlY2lzaW9uLgoKPgo+PiArKysgYi9xZ2EvcWFwaS1z
+Y2hlbWEuanNvbgo+PiBAQCAtODQ2LDEzICs4NDYsMTQgQEAKPj4gICAjIEBuYW1lOiBkaXNrIG5h
+bWUKPj4gICAjIEBtb3VudHBvaW50OiBtb3VudCBwb2ludCBwYXRoCj4+ICAgIyBAdHlwZTogZmls
+ZSBzeXN0ZW0gdHlwZSBzdHJpbmcKPj4gKyMgQHVzYWdlOiBmaWxlIHN5c3RlbSB1c2FnZQo+Cj5O
+ZWVkcyBtb3JlIGRldGFpbHMuICBBcyB3cml0dGVuLCBpdCBpcyBhbiBpbnRlZ2VyIGJldHdlZW4g
+MCBhbmQgMTAwOyBidXQgCj5pZiB5b3UgdXNlIGZsb2F0aW5nIHBvaW50LCBhIGJldHRlciBkZXNj
+cmlwdGlvbiB3b3VsZCBiZSBhIGZyYWN0aW9uIAo+YmV0d2VlbiAwIGFuZCAxLgoKV2lsbCBiZSB1
+cGRhdGVkIGluIHRoZSBmb2xsb3dpbmcgcGF0Y2guCgpSZWdhcmRzLAotIENoZW4KCj4KPj4gICAj
+IEBkaXNrOiBhbiBhcnJheSBvZiBkaXNrIGhhcmR3YXJlIGluZm9ybWF0aW9uIHRoYXQgdGhlIHZv
+bHVtZSBsaWVzIG9uLAo+PiAgICMgICAgICAgIHdoaWNoIG1heSBiZSBlbXB0eSBpZiB0aGUgZGlz
+ayB0eXBlIGlzIG5vdCBzdXBwb3J0ZWQKPj4gICAjCj4+ICAgIyBTaW5jZTogMi4yCj4+ICAgIyMK
+Pj4gICB7ICdzdHJ1Y3QnOiAnR3Vlc3RGaWxlc3lzdGVtSW5mbycsCj4+IC0gICdkYXRhJzogeydu
+YW1lJzogJ3N0cicsICdtb3VudHBvaW50JzogJ3N0cicsICd0eXBlJzogJ3N0cicsCj4+ICsgICdk
+YXRhJzogeyduYW1lJzogJ3N0cicsICdtb3VudHBvaW50JzogJ3N0cicsICd0eXBlJzogJ3N0cics
+ICd1c2FnZSc6ICdpbnQnLAo+PiAgICAgICAgICAgICAgJ2Rpc2snOiBbJ0d1ZXN0RGlza0FkZHJl
+c3MnXX0gfQo+PiAgIAo+PiAgICMjCj4+IAo+Cj4tLSAKPkVyaWMgQmxha2UsIFByaW5jaXBhbCBT
+b2Z0d2FyZSBFbmdpbmVlcgo+UmVkIEhhdCwgSW5jLiAgICAgICAgICAgKzEtOTE5LTMwMS0zMjY2
+Cj5WaXJ0dWFsaXphdGlvbjogIHFlbXUub3JnIHwgbGlidmlydC5vcmcK
