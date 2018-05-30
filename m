@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40315)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40350)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jemmy858585@gmail.com>) id 1fNxeH-0000Q0-NL
-	for qemu-devel@nongnu.org; Wed, 30 May 2018 05:44:06 -0400
+	(envelope-from <jemmy858585@gmail.com>) id 1fNxeK-0000SW-Ae
+	for qemu-devel@nongnu.org; Wed, 30 May 2018 05:44:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jemmy858585@gmail.com>) id 1fNxeE-0006ps-K6
-	for qemu-devel@nongnu.org; Wed, 30 May 2018 05:44:05 -0400
-Received: from mail-pf0-x22a.google.com ([2607:f8b0:400e:c00::22a]:42774)
+	(envelope-from <jemmy858585@gmail.com>) id 1fNxeJ-0006rI-F7
+	for qemu-devel@nongnu.org; Wed, 30 May 2018 05:44:08 -0400
+Received: from mail-pg0-x244.google.com ([2607:f8b0:400e:c05::244]:33344)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <jemmy858585@gmail.com>)
-	id 1fNxeE-0006pg-EP
-	for qemu-devel@nongnu.org; Wed, 30 May 2018 05:44:02 -0400
-Received: by mail-pf0-x22a.google.com with SMTP id p14-v6so8747481pfh.9
-	for <qemu-devel@nongnu.org>; Wed, 30 May 2018 02:44:02 -0700 (PDT)
+	id 1fNxeJ-0006rA-9j
+	for qemu-devel@nongnu.org; Wed, 30 May 2018 05:44:07 -0400
+Received: by mail-pg0-x244.google.com with SMTP id e21-v6so7906761pgv.0
+	for <qemu-devel@nongnu.org>; Wed, 30 May 2018 02:44:07 -0700 (PDT)
 From: Lidong Chen <jemmy858585@gmail.com>
-Date: Wed, 30 May 2018 17:43:28 +0800
-Message-Id: <1527673416-31268-5-git-send-email-lidongchen@tencent.com>
+Date: Wed, 30 May 2018 17:43:30 +0800
+Message-Id: <1527673416-31268-7-git-send-email-lidongchen@tencent.com>
 In-Reply-To: <1527673416-31268-1-git-send-email-lidongchen@tencent.com>
 References: <1527673416-31268-1-git-send-email-lidongchen@tencent.com>
-Subject: [Qemu-devel] [PATCH v4 04/12] migration: avoid concurrent invoke
- channel_close by different threads
+Subject: [Qemu-devel] [PATCH v4 06/12] migration: Stop rdma yielding during
+ incoming postcopy
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,55 +32,34 @@ Cc: qemu-devel@nongnu.org, adido@mellanox.com, Lidong Chen <jemmy858585@gmail.co
 
 From: Lidong Chen <jemmy858585@gmail.com>
 
-The channel_close maybe invoked by different threads. For example, source
-qemu invokes qemu_fclose in main thread, migration thread and return path
-thread. Destination qemu invokes qemu_fclose in main thread, listen thread
-and COLO incoming thread.
-
-Add a mutex in QEMUFile struct to avoid concurrent invoke channel_close.
+During incoming postcopy, the destination qemu will invoke
+qemu_rdma_wait_comp_channel in a seprate thread. So does not use rdma
+yield, and poll the completion channel fd instead.
 
 Signed-off-by: Lidong Chen <lidongchen@tencent.com>
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 ---
- migration/qemu-file.c | 5 +++++
- 1 file changed, 5 insertions(+)
+ migration/rdma.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-diff --git a/migration/qemu-file.c b/migration/qemu-file.c
-index 977b9ae..87d0f05 100644
---- a/migration/qemu-file.c
-+++ b/migration/qemu-file.c
-@@ -52,6 +52,7 @@ struct QEMUFile {
-     unsigned int iovcnt;
- 
-     int last_error;
-+    QemuMutex lock;
- };
- 
- /*
-@@ -96,6 +97,7 @@ QEMUFile *qemu_fopen_ops(void *opaque, const QEMUFileOps *ops)
- 
-     f = g_new0(QEMUFile, 1);
- 
-+    qemu_mutex_init(&f->lock);
-     f->opaque = opaque;
-     f->ops = ops;
-     return f;
-@@ -328,7 +330,9 @@ int qemu_fclose(QEMUFile *f)
-     ret = qemu_file_get_error(f);
- 
-     if (f->ops->close) {
-+        qemu_mutex_lock(&f->lock);
-         int ret2 = f->ops->close(f->opaque);
-+        qemu_mutex_unlock(&f->lock);
-         if (ret >= 0) {
-             ret = ret2;
-         }
-@@ -339,6 +343,7 @@ int qemu_fclose(QEMUFile *f)
-     if (f->last_error) {
-         ret = f->last_error;
-     }
-+    qemu_mutex_destroy(&f->lock);
-     g_free(f);
-     trace_qemu_file_fclose();
-     return ret;
+diff --git a/migration/rdma.c b/migration/rdma.c
+index 45f01e6..0dd4033 100644
+--- a/migration/rdma.c
++++ b/migration/rdma.c
+@@ -1493,11 +1493,13 @@ static int qemu_rdma_wait_comp_channel(RDMAContext *rdma)
+      * Coroutine doesn't start until migration_fd_process_incoming()
+      * so don't yield unless we know we're running inside of a coroutine.
+      */
+-    if (rdma->migration_started_on_destination) {
++    if (rdma->migration_started_on_destination &&
++        migration_incoming_get_current()->state == MIGRATION_STATUS_ACTIVE) {
+         yield_until_fd_readable(rdma->comp_channel->fd);
+     } else {
+         /* This is the source side, we're in a separate thread
+          * or destination prior to migration_fd_process_incoming()
++         * after postcopy, the destination also in a seprate thread.
+          * we can't yield; so we have to poll the fd.
+          * But we need to be able to handle 'cancel' or an error
+          * without hanging forever.
 -- 
 1.8.3.1
