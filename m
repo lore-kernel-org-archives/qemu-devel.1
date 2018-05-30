@@ -1,23 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54906)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55461)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1fO1YA-0003BW-9f
-	for qemu-devel@nongnu.org; Wed, 30 May 2018 09:54:08 -0400
+	(envelope-from <bounces@canonical.com>) id 1fO1aa-0004rz-1p
+	for qemu-devel@nongnu.org; Wed, 30 May 2018 09:56:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1fO1Y8-0003Qu-Mj
-	for qemu-devel@nongnu.org; Wed, 30 May 2018 09:54:02 -0400
-References: <20180426161958.2872-1-rkagan@virtuozzo.com>
-	<14e14e4f-4d43-9c94-7dd6-c295a09b6432@redhat.com>
-	<20180530134738.GB2448@rkaganb.sw.ru>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <d97043ad-8b03-681e-ff59-917e6cf3cef1@redhat.com>
-Date: Wed, 30 May 2018 15:53:52 +0200
+	(envelope-from <bounces@canonical.com>) id 1fO1aW-0004ZG-5J
+	for qemu-devel@nongnu.org; Wed, 30 May 2018 09:56:32 -0400
+Received: from indium.canonical.com ([91.189.90.7]:50190)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1fO1aV-0004Yu-VD
+	for qemu-devel@nongnu.org; Wed, 30 May 2018 09:56:28 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1fO1aU-0005BZ-Bg
+	for <qemu-devel@nongnu.org>; Wed, 30 May 2018 13:56:26 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 571842E80C3
+	for <qemu-devel@nongnu.org>; Wed, 30 May 2018 13:56:26 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20180530134738.GB2448@rkaganb.sw.ru>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="j7T6U4CabFYanT41Iu3GHUC8lpXcacJ1O"
-Subject: Re: [Qemu-devel] [PATCH 00/17] iotests: don't choke on disabled
- drivers
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Wed, 30 May 2018 13:36:57 -0000
+From: =?utf-8?b?7oO/IENocmlzdGlhbiBFaHJoYXJkdCDug78=?=
+	<1077116@bugs.launchpad.net>
+Reply-To: Bug 1077116 <1077116@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20121109183454.27088.83319.malonedeb@gac.canonical.com>
+Message-Id: <152768741790.31866.10545842618044617453.malone@soybean.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1077116] Re: automoc4 segfaults when building in
+ an armhf pbuilder on an amd64 host
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,153 +38,94 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Roman Kagan <rkagan@virtuozzo.com>, Kevin Wolf <kwolf@redhat.com>, Markus Armbruster <armbru@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---j7T6U4CabFYanT41Iu3GHUC8lpXcacJ1O
-From: Max Reitz <mreitz@redhat.com>
-To: Roman Kagan <rkagan@virtuozzo.com>, Kevin Wolf <kwolf@redhat.com>,
- Markus Armbruster <armbru@redhat.com>, qemu-block@nongnu.org,
- qemu-devel@nongnu.org
-Message-ID: <d97043ad-8b03-681e-ff59-917e6cf3cef1@redhat.com>
-Subject: Re: [PATCH 00/17] iotests: don't choke on disabled drivers
-References: <20180426161958.2872-1-rkagan@virtuozzo.com>
- <14e14e4f-4d43-9c94-7dd6-c295a09b6432@redhat.com>
- <20180530134738.GB2448@rkaganb.sw.ru>
-In-Reply-To: <20180530134738.GB2448@rkaganb.sw.ru>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+We have had a few more issues around armhf qemu-static that mostly resolved=
+ in Artful (qemu 2.10) and finally one that was good in Bionic (qemu 2.11).
+This also included some updates to other components but should be good now.
 
-On 2018-05-30 15:47, Roman Kagan wrote:
-> On Wed, May 30, 2018 at 02:35:34PM +0200, Max Reitz wrote:
->> On 2018-04-26 18:19, Roman Kagan wrote:
->>> Some iotests assume availability of certain block drivers, and fail i=
-f
->>> the driver is not supported by QEMU because it was disabled at config=
-ure
->>> time.
->>>
->>> This series tries to address that, by making QEMU report the actual l=
-ist
->>> of supported block drivers in response to "-drive format=3D?", and us=
-ing
->>> this information to skip the parts of the io testsuite that can not b=
-e
->>> run in this configuration.
->>>
->>> Roman Kagan (17):
->>>   block: iterate_format with account of whitelisting
->>>   iotests: iotests.py: prevent deadlock in subprocess
->>>   iotests: ask qemu for supported formats
->>>   iotest 030: skip quorum test setup/teardown too
->>>   iotest 030: require blkdebug
->>>   iotest 055: skip unsupported backup target formats
->>>   iotest 055: require blkdebug
->>>   iotest 056: skip testcases using blkdebug if disabled
->>>   iotest 071: notrun if blkdebug or blkverify is disabled
->>>   iotest 081: notrun if quorum is disabled
->>>   iotest 087: notrun if null-co is disabled
->>>   iotest 093: notrun if null-co or null-aio is disabled
->>>   iotest 099: notrun if blkdebug or blkverify is disabled
->>>   iotest 124: skip testcases using blkdebug if disabled
->>>   iotest 139: skip testcases using disabled drivers
->>>   iotest 147: notrun if nbd is disabled
->>>   iotest 184: notrun if null-co or throttle is disabled
->>>
->>>  include/block/block.h         |  2 +-
->>>  block.c                       | 23 ++++++++++++++++++----
->>>  blockdev.c                    |  4 +++-
->>>  qemu-img.c                    |  2 +-
->>>  tests/qemu-iotests/030        |  7 +++++++
->>>  tests/qemu-iotests/055        | 13 ++++++++++++
->>>  tests/qemu-iotests/056        |  3 +++
->>>  tests/qemu-iotests/071        |  1 +
->>>  tests/qemu-iotests/081        |  1 +
->>>  tests/qemu-iotests/087        |  1 +
->>>  tests/qemu-iotests/093        |  1 +
->>>  tests/qemu-iotests/099        |  1 +
->>>  tests/qemu-iotests/124        |  5 +++++
->>>  tests/qemu-iotests/139        |  4 ++++
->>>  tests/qemu-iotests/147        |  1 +
->>>  tests/qemu-iotests/184        |  1 +
->>>  tests/qemu-iotests/common.rc  | 19 ++++++++++++++++++
->>>  tests/qemu-iotests/iotests.py | 46 ++++++++++++++++++++++++++++++++-=
-----------
->>>  18 files changed, 117 insertions(+), 18 deletions(-)
->>
->> I'll stop reviewing this series for now, because there are more iotest=
-s
->> that use drivers outside of their format/protocol combination.
->>
->> For instance:
->>
->> $ grep -l null-co ??? | wc -l
->> 15
->> $ grep -l blkdebug ??? | wc -l
->> 30
->> $ (grep -l '"raw"' ???; grep -l "'raw'" ???) | wc -l
->> 22
->>
->> As I've written in my reply to patch 8, I'm not sure whether it's the
->> right solution to check for the availability of these block drivers in=
+If the issue here really still applies to a newer version please reopen
+and state an updated test and version that it ran on.
 
->> every single test that needs them.  It makes sense for quorum, because=
+** Changed in: qemu (Ubuntu)
+       Status: Confirmed =3D> Fix Released
 
->> quorum needs an external library for hashing, so it may not be trivial=
+-- =
 
->> to enable.  But it does not seem too useful for other formats that do
->> not have such a dependency (e.g. null-co, blkdebug, raw).
->>
->> The thing is that it's OK to whitelist everything for testing, and the=
-n
->> disable some drivers when building a release.  I don't think one needs=
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1077116
 
->> to run the iotests with the release version if the whole difference is=
+Title:
+  automoc4 segfaults when building in an armhf pbuilder on an amd64 host
 
->> whether some drivers have been disabled or not.
->=20
-> This patchset was created when we started to run (quick) iotests as a p=
-art
-> of the package build, which looked like a decent alternative to buildin=
-g
-> separate CI infrastructure.
->=20
-> If there's no general interest in running iotests against QEMU built in=
+Status in QEMU:
+  Fix Released
+Status in qemu package in Ubuntu:
+  Fix Released
 
-> a release configuration with certain drivers blacklisted, I think we
-> should be fine handling this locally.
+Bug description:
+  When trying to build kde4libs in an armhf pbuilder created with the
+  pbuilder-scripts running on an amd64 host automoc4 recieves a
+  segmentation fault and I can't get any useful information out of it:
 
-It's not like the majority of drivers uses blkdebug, but still, it seems
-at least suboptimal to run the tests if you then disable a big chunk of
-them because some drivers were not whitelisted.
+  root@yofel-thinkpad:/tmp/kde4libs-4.9.3/build/kdeui# /usr/bin/automoc4 kd=
+eui_automoc.cpp ../../kdeui/ . moc-qt4 cmake
+  unable to dump 00102c00
+  Segmentation fault (core dumped)
+  root@yofel-thinkpad:/tmp/kde4libs-4.9.3/build/kdeui# gdb /usr/bin/automoc=
+4 qemu_automoc4_20121108-211818_15839.core  =
 
-If you're OK with a local solution...  OK, but naively I'd think that
-it'd be better to just build two versions for packaging: One that's
-actually going to be packaged, and one that's used for testing.  (Though
-I don't know how well that fits into your process.)
-
-In any case, I'm not fully opposed to this series, but it would need to
-be complete and make every test require every block driver that is not
-part of its protocol/format combination.
-
-Max
+  GNU gdb (GDB) 7.5-ubuntu
+  Copyright (C) 2012 Free Software Foundation, Inc.
+  License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.h=
+tml>
+  This is free software: you are free to change and redistribute it.
+  There is NO WARRANTY, to the extent permitted by law.  Type "show copying"
+  and "show warranty" for details.
+  This GDB was configured as "arm-linux-gnueabihf".
+  For bug reporting instructions, please see:
+  <http://www.gnu.org/software/gdb/bugs/>...
+  Reading symbols from /usr/bin/automoc4...done.
+  BFD: Warning: /tmp/kde4libs-4.9.3/build/kdeui/qemu_automoc4_20121108-2118=
+18_15839.core is truncated: expected core file size >=3D 5150720, found: 97=
+4848.
+  [New LWP 15839]
+  [New LWP 15866]
+  Cannot access memory at address 0xf67fe954
+  Cannot access memory at address 0xf67fe950
+  (gdb) bt
+  #0  0xf6630306 in ?? ()
+  #1  0xf6415ff8 in ?? ()
+  #2  0xf6415ff8 in ?? ()
+  Backtrace stopped: previous frame identical to this frame (corrupt stack?)
+  (gdb) =
 
 
---j7T6U4CabFYanT41Iu3GHUC8lpXcacJ1O
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+  automoc4 runs fine when building on a nexus7 so this sounds like an issue=
+ in qemu.
+  Tested in quantal and raring.
 
------BEGIN PGP SIGNATURE-----
+  ProblemType: Bug
+  DistroRelease: Ubuntu 13.04
+  Package: qemu-user-static 1.2.0-2012.09-0ubuntu1
+  Uname: Linux 3.6.2-030602-generic x86_64
+  NonfreeKernelModules: nvidia
+  ApportVersion: 2.6.2-0ubuntu3
+  Architecture: amd64
+  Date: Fri Nov  9 19:29:28 2012
+  EcryptfsInUse: Yes
+  InstallationDate: Installed on 2011-10-08 (398 days ago)
+  InstallationMedia: Kubuntu 11.10 "Oneiric Ocelot" - Beta amd64 (20111007)
+  MarkForUpload: True
+  ProcEnviron:
+   SHELL=3D/bin/bash
+   TERM=3Dxterm
+   PATH=3D(custom, user)
+   LANG=3Den_US.UTF-8
+   LANGUAGE=3Den_US.UTF-8
+  SourcePackage: qemu-linaro
+  UpgradeStatus: No upgrade log present (probably fresh install)
 
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlsOrPAACgkQ9AfbAGHV
-z0DVKAf/RDcFhhCvej61h4ndG+ybXyWidMU0XknBIYDtvMtvg+6vx9fUAhaB3T4l
-sqijAuRmWtdH/XrXrbOmkOWvCsctIMvX3YfPfpn9IiVEenMEicYfD/pEYgIjOU2/
-sWSmtR+n+ZcCdhozy9pyVvrWTXeHS+IQ33w9XLJk/MqHo08J4KmEO1WyZDqe++SE
-wZRrvh1YFZwf5lWYrrZIu94mlqwOr5wVHrURbde/+pGZqvcu/lQ6AK/BtzyBwxBO
-iTfV4iSetXhbLsbYMohRUfrXiehy5b/CfrVxkIlN88UNalYtnafHzgftvjSvtj32
-wxTIYfEVR7D3puK1UAkj0vcbGWzO1A==
-=QWb7
------END PGP SIGNATURE-----
-
---j7T6U4CabFYanT41Iu3GHUC8lpXcacJ1O--
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1077116/+subscriptions
