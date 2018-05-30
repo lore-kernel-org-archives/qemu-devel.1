@@ -1,22 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41456)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43853)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1fNxir-00041D-P8
-	for qemu-devel@nongnu.org; Wed, 30 May 2018 05:48:50 -0400
+	(envelope-from <mreitz@redhat.com>) id 1fNxqz-0001P6-1o
+	for qemu-devel@nongnu.org; Wed, 30 May 2018 05:57:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1fNxiq-0008FT-VS
-	for qemu-devel@nongnu.org; Wed, 30 May 2018 05:48:49 -0400
+	(envelope-from <mreitz@redhat.com>) id 1fNxqy-0002gc-BU
+	for qemu-devel@nongnu.org; Wed, 30 May 2018 05:57:13 -0400
 References: <20180529203910.7615-1-kwolf@redhat.com>
-	<20180529203910.7615-4-kwolf@redhat.com>
+	<20180529203910.7615-7-kwolf@redhat.com>
 From: Max Reitz <mreitz@redhat.com>
-Message-ID: <73859dcf-4a4e-894a-c261-68564fb3a26f@redhat.com>
-Date: Wed, 30 May 2018 11:48:34 +0200
+Message-ID: <d2d98db9-972c-8cb5-7bc3-38701bb9a7b0@redhat.com>
+Date: Wed, 30 May 2018 11:57:02 +0200
 MIME-Version: 1.0
-In-Reply-To: <20180529203910.7615-4-kwolf@redhat.com>
+In-Reply-To: <20180529203910.7615-7-kwolf@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="1nAwXmWHaL5ayb8TTlCNEnHiyCo8e5zi7"
-Subject: Re: [Qemu-devel] [PATCH v2 03/16] job: Add error message for
- failing jobs
+	boundary="aRax7GPEmqvVnYfVehyZ5r4BIFKj7Awov"
+Subject: Re: [Qemu-devel] [PATCH v2 06/16] qemu-iotests: Add VM.qmp_log()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,65 +28,47 @@ To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
 Cc: jcody@redhat.com, jsnow@redhat.com, eblake@redhat.com, pkrempa@redhat.com, qemu-devel@nongnu.org
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---1nAwXmWHaL5ayb8TTlCNEnHiyCo8e5zi7
+--aRax7GPEmqvVnYfVehyZ5r4BIFKj7Awov
 From: Max Reitz <mreitz@redhat.com>
 To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
 Cc: jcody@redhat.com, jsnow@redhat.com, eblake@redhat.com,
  pkrempa@redhat.com, qemu-devel@nongnu.org
-Message-ID: <73859dcf-4a4e-894a-c261-68564fb3a26f@redhat.com>
-Subject: Re: [PATCH v2 03/16] job: Add error message for failing jobs
+Message-ID: <d2d98db9-972c-8cb5-7bc3-38701bb9a7b0@redhat.com>
+Subject: Re: [PATCH v2 06/16] qemu-iotests: Add VM.qmp_log()
 References: <20180529203910.7615-1-kwolf@redhat.com>
- <20180529203910.7615-4-kwolf@redhat.com>
-In-Reply-To: <20180529203910.7615-4-kwolf@redhat.com>
+ <20180529203910.7615-7-kwolf@redhat.com>
+In-Reply-To: <20180529203910.7615-7-kwolf@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On 2018-05-29 22:38, Kevin Wolf wrote:
-> So far we relied on job->ret and strerror() to produce an error message=
-
-> for failed jobs. Not surprisingly, this tends to result in completely
-> useless messages.
->=20
-> This adds a Job.error field that can contain an error string for a
-> failing job, and a parameter to job_completed() that sets the field. As=
-
-> a default, if NULL is passed, we continue to use strerror(job->ret).
->=20
-> All existing callers are changed to pass NULL. They can be improved in
-> separate patches.
+On 2018-05-29 22:39, Kevin Wolf wrote:
+> This adds a helper function that logs both the QMP request and the
+> received response before returning it.
 >=20
 > Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+> Reviewed-by: Jeff Cody <jcody@redhat.com>
 > ---
->  include/qemu/job.h        |  7 ++++++-
->  block/backup.c            |  2 +-
->  block/commit.c            |  2 +-
->  block/mirror.c            |  2 +-
->  block/stream.c            |  2 +-
->  job-qmp.c                 |  9 ++-------
->  job.c                     | 16 ++++++++++++++--
->  tests/test-bdrv-drain.c   |  2 +-
->  tests/test-blockjob-txn.c |  2 +-
->  tests/test-blockjob.c     |  2 +-
->  10 files changed, 29 insertions(+), 17 deletions(-)
+>  tests/qemu-iotests/iotests.py | 11 +++++++++++
+>  1 file changed, 11 insertions(+)
 
 Reviewed-by: Max Reitz <mreitz@redhat.com>
 
 
---1nAwXmWHaL5ayb8TTlCNEnHiyCo8e5zi7
+--aRax7GPEmqvVnYfVehyZ5r4BIFKj7Awov
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlsOc3IACgkQ9AfbAGHV
-z0CmhAf/eADp/k32oxXnqsQM7SzL04eJgDMXxTfLo1xK2X/sfSmIgBlv5Xz6GHSq
-iygu5gNB3h/sBhR7SVarGQUwjmW5FcU0kywdZeFLdjFqGFVbTVlnntHfaOD7lKHb
-V4RA6SkSnDr+kVZhPpKW3L0PPvh2+OIEdQx36i21mIbF0lW+hO3m9lRXvoc3dtP1
-Tp9E0UJ8+E11Rskg22AZ7/51VmsLab8XfqBiUb/FrE0mTQP2lVJy2rWyVctqWJjI
-DAY8V9i8Tz/i3be2+wGHq/Ghmg4YLexy3jXZVVMZnFjUP47DT3m21Vndkprz81uw
-Fw1mEZbXqOgTCkHZwhx/qrSzKCX3/Q==
-=gwc4
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlsOdW4ACgkQ9AfbAGHV
+z0AUKQf8DQyQpp62e6529lWqp2zohL8ZhBYNT/llnK5Ko5XfUZaVLMtyjbDKMady
+hly35ew8Ax80OZKNGSXxGGiq5O7i2545NH+t0+tPKGmBJYBKsMf65MJ7a9szxuE/
+YJDlvStnOBBIK9yl42fFiuH4luqxcGOtibez5UDgysOycIa8LC9uKz9iugVuaBrS
+UJKilVYXbOBvC2O73F6y0Q59A4tjGNjrw07zZe4YK+TTMBz9TqHIQhB8gT6E5e+r
+ki0CI4PbVdS//GwbB5L344iQXBCKmtA4pTGIFen6cmqvIncy/COMaH7PT9dCJhXF
+YANaRDXCSnCHdYQW81935r2kWgewlA==
+=NLdp
 -----END PGP SIGNATURE-----
 
---1nAwXmWHaL5ayb8TTlCNEnHiyCo8e5zi7--
+--aRax7GPEmqvVnYfVehyZ5r4BIFKj7Awov--
