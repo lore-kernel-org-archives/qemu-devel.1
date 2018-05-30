@@ -1,28 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39138)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39385)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1fO2LW-0005d4-Ma
-	for qemu-devel@nongnu.org; Wed, 30 May 2018 10:45:03 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1fO2MI-0006FA-AX
+	for qemu-devel@nongnu.org; Wed, 30 May 2018 10:45:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1fO2LV-00009s-P7
-	for qemu-devel@nongnu.org; Wed, 30 May 2018 10:45:02 -0400
-Date: Wed, 30 May 2018 15:44:50 +0100
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20180530144450.GB5973@stefanha-x1.localdomain>
-References: <1514187226.13662.28.camel@intel.com>
-	<6e792b9f-2281-e8db-0410-c4c3468ffc90@redhat.com>
-	<20180508150309.GC4065@localhost.localdomain>
-	<20180509101618.GC19645@stefanha-x1.localdomain>
-	<d8a06161-d611-4f27-f4c8-f14370f191d4@redhat.com>
-	<20180510082659.GC1296@stefanha-x1.localdomain>
-	<20180511172531.GB5016@localhost.localdomain>
-	<20180514134846.GD5182@stefanha-x1.localdomain>
+	(envelope-from <dgilbert@redhat.com>) id 1fO2MH-0000tv-Bk
+	for qemu-devel@nongnu.org; Wed, 30 May 2018 10:45:50 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:56796 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1fO2MH-0000sM-6x
+	for qemu-devel@nongnu.org; Wed, 30 May 2018 10:45:49 -0400
+Date: Wed, 30 May 2018 15:45:44 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20180530144543.GE2410@work-vm>
+References: <1527673416-31268-1-git-send-email-lidongchen@tencent.com>
+	<1527673416-31268-5-git-send-email-lidongchen@tencent.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="0eh6TmSyL6TZE2Uz"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20180514134846.GD5182@stefanha-x1.localdomain>
-Subject: Re: [Qemu-devel] [Qemu-block] Some question about savem/qcow2
- incremental snapshot
+In-Reply-To: <1527673416-31268-5-git-send-email-lidongchen@tencent.com>
+Subject: Re: [Qemu-devel] [PATCH v4 04/12] migration: avoid concurrent
+ invoke channel_close by different threads
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,67 +28,99 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, He Junyan <junyan.he@intel.com>
-Cc: Pankaj Gupta <pagupta@redhat.com>, qemu-devel@nongnu.org, qemu block <qemu-block@nongnu.org>
+To: Lidong Chen <jemmy858585@gmail.com>
+Cc: zhang.zhanghailiang@huawei.com, quintela@redhat.com, berrange@redhat.com, aviadye@mellanox.com, pbonzini@redhat.com, qemu-devel@nongnu.org, adido@mellanox.com, Lidong Chen <lidongchen@tencent.com>
+
+* Lidong Chen (jemmy858585@gmail.com) wrote:
+> From: Lidong Chen <jemmy858585@gmail.com>
+> 
+> The channel_close maybe invoked by different threads. For example, source
+> qemu invokes qemu_fclose in main thread, migration thread and return path
+> thread. Destination qemu invokes qemu_fclose in main thread, listen thread
+> and COLO incoming thread.
+> 
+> Add a mutex in QEMUFile struct to avoid concurrent invoke channel_close.
+> 
+> Signed-off-by: Lidong Chen <lidongchen@tencent.com>
+> ---
+>  migration/qemu-file.c | 5 +++++
+>  1 file changed, 5 insertions(+)
+> 
+> diff --git a/migration/qemu-file.c b/migration/qemu-file.c
+> index 977b9ae..87d0f05 100644
+> --- a/migration/qemu-file.c
+> +++ b/migration/qemu-file.c
+> @@ -52,6 +52,7 @@ struct QEMUFile {
+>      unsigned int iovcnt;
+>  
+>      int last_error;
+> +    QemuMutex lock;
+
+That could do with a comment saying what you're protecting
+
+>  };
+>  
+>  /*
+> @@ -96,6 +97,7 @@ QEMUFile *qemu_fopen_ops(void *opaque, const QEMUFileOps *ops)
+>  
+>      f = g_new0(QEMUFile, 1);
+>  
+> +    qemu_mutex_init(&f->lock);
+>      f->opaque = opaque;
+>      f->ops = ops;
+>      return f;
+> @@ -328,7 +330,9 @@ int qemu_fclose(QEMUFile *f)
+>      ret = qemu_file_get_error(f);
+>  
+>      if (f->ops->close) {
+> +        qemu_mutex_lock(&f->lock);
+>          int ret2 = f->ops->close(f->opaque);
+> +        qemu_mutex_unlock(&f->lock);
+
+OK, and at least for the RDMA code, if it calls
+close a 2nd time, rioc->rdma is checked so it wont actually free stuff a
+2nd time.
+
+>          if (ret >= 0) {
+>              ret = ret2;
+>          }
+> @@ -339,6 +343,7 @@ int qemu_fclose(QEMUFile *f)
+>      if (f->last_error) {
+>          ret = f->last_error;
+>      }
+> +    qemu_mutex_destroy(&f->lock);
+>      g_free(f);
+
+Hmm but that's not safe; if two things really do call qemu_fclose()
+on the same structure they race here and can end up destroying the lock
+twice, or doing f->lock  after the 1st one has already g_free(f).
 
 
---0eh6TmSyL6TZE2Uz
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+So lets go back a step.
+I think:
+  a) There should always be a separate QEMUFile* for
+     to_src_file and from_src_file - I don't see where you open
+     the 2nd one; I don't see your implementation of
+     f->ops->get_return_path.
+  b) I *think* that while the different threads might all call
+     fclose(), I think there should only ever be one qemu_fclose
+     call for each direction on the QEMUFile.
 
-On Mon, May 14, 2018 at 02:48:47PM +0100, Stefan Hajnoczi wrote:
-> On Fri, May 11, 2018 at 07:25:31PM +0200, Kevin Wolf wrote:
-> > Am 10.05.2018 um 10:26 hat Stefan Hajnoczi geschrieben:
-> > > On Wed, May 09, 2018 at 07:54:31PM +0200, Max Reitz wrote:
-> > > > On 2018-05-09 12:16, Stefan Hajnoczi wrote:
-> > > > > On Tue, May 08, 2018 at 05:03:09PM +0200, Kevin Wolf wrote:
-> > > > >> Am 08.05.2018 um 16:41 hat Eric Blake geschrieben:
-> > > > >>> On 12/25/2017 01:33 AM, He Junyan wrote:
-> > > > >> I think it makes sense to invest some effort into such interface=
-s, but
-> > > > >> be prepared for a long journey.
-> > > > >=20
-> > > > > I like the suggestion but it needs to be followed up with a concr=
-ete
-> > > > > design that is feasible and fair for Junyan and others to impleme=
-nt.
-> > > > > Otherwise the "long journey" is really just a way of rejecting th=
-is
-> > > > > feature.
+But now we have two problems:
+  If (a) is true then f->lock  is separate on each one so
+   doesn't really protect if the two directions are closed
+   at once. (Assuming (b) is true)
 
-The discussion on NVDIMM via the block layer has runs its course.  It
-would be a big project and I don't think it's fair to ask Junyan to
-implement it.
+  If (a) is false and we actually share a single QEMUFile then
+ that race at the end happens.
 
-My understanding is this patch series doesn't modify the qcow2 on-disk
-file format.  Rather, it just uses existing qcow2 mechanisms and extends
-live migration to identify the NVDIMM state state region to share the
-clusters.
+Dave
 
-Since this feature does not involve qcow2 format changes and is just an
-optimization (dirty blocks still need to be allocated), it can be
-removed from QEMU in the future if a better alternative becomes
-available.
 
-Junyan: Can you rebase the series and send a new revision?
-
-Kevin and Max: Does this sound alright?
-
-Stefan
-
---0eh6TmSyL6TZE2Uz
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJbDrjiAAoJEJykq7OBq3PIy+sH/2ABa8CuOfmxHv9mH6os9SIU
-iBqQp4akv6cb7K8LZIgAp7G7CiBXgx1Kk/KJp0VeSoMDBobidd/V4kZnFDfVQLpA
-Ewg9ZOk1DeeHnlWclHFibqTNlxkU2S7eLJE1jK9E78XsobuqdIdc62AzZwfKXmDG
-60rycU96daybuc6+Nhk69DPB1seWFZ3UvAYqsWh9xZziEWf/Lt+SVrcRPoguS5zn
-523vd7zaO7oCWcPr6Jl9lvZ20ngECBQePpH06Tf6hC27Z/IqT/RspEhGpdakeq2k
-hAA5YJDUGzBG7McuY1qrbEXX6gHEr+o9bc8PFyKS05UJ5bp9+5xLg+8jc8evh8w=
-=dvOw
------END PGP SIGNATURE-----
-
---0eh6TmSyL6TZE2Uz--
+>      trace_qemu_file_fclose();
+>      return ret;
+> -- 
+> 1.8.3.1
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
