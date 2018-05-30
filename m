@@ -1,15 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38356)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38782)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <joel.stan@gmail.com>) id 1fO2JB-0004Fc-1K
-	for qemu-devel@nongnu.org; Wed, 30 May 2018 10:42:38 -0400
+	(envelope-from <shameerali.kolothum.thodi@huawei.com>)
+	id 1fO2KZ-00051c-9X
+	for qemu-devel@nongnu.org; Wed, 30 May 2018 10:44:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <joel.stan@gmail.com>) id 1fO2JA-0007bP-0L
-	for qemu-devel@nongnu.org; Wed, 30 May 2018 10:42:37 -0400
-Sender: "joel.stan@gmail.com" <joel.stan@gmail.com>
-From: Joel Stanley <joel@jms.id.au>
-Date: Thu, 31 May 2018 00:12:17 +0930
-Message-Id: <20180530144217.8959-1-joel@jms.id.au>
-Subject: [Qemu-devel] [PATCH] target/ppc: Allow privileged access to SPR_PCR
+	(envelope-from <shameerali.kolothum.thodi@huawei.com>)
+	id 1fO2KX-00084U-If
+	for qemu-devel@nongnu.org; Wed, 30 May 2018 10:44:03 -0400
+From: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
+Date: Wed, 30 May 2018 14:43:40 +0000
+Message-ID: <5FC3163CFD30C246ABAA99954A238FA8386F17B0@FRAEML521-MBX.china.huawei.com>
+References: <20180516152026.2920-1-shameerali.kolothum.thodi@huawei.com>
+	<20180516152026.2920-2-shameerali.kolothum.thodi@huawei.com>
+	<216b4fba-c14a-fd9e-86ae-dda5a3d1cbcf@redhat.com>
+In-Reply-To: <216b4fba-c14a-fd9e-86ae-dda5a3d1cbcf@redhat.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+Subject: Re: [Qemu-devel] [RFC v2 1/6] hw/vfio: Retrieve valid iova ranges
+ from kernel
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -18,104 +28,308 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>, Alexander Graf <agraf@suse.de>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
-Cc: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>, Benjamin Herrenschmidt <benh@kernel.crashing.org>, Michael Ellerman <mpe@ellerman.id.au>, Michael Neuling <mikey@neuling.org>
+To: Auger Eric <eric.auger@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>
+Cc: "peter.maydell@linaro.org" <peter.maydell@linaro.org>, "drjones@redhat.com" <drjones@redhat.com>, Jonathan Cameron <jonathan.cameron@huawei.com>, Linuxarm <linuxarm@huawei.com>, "alex.williamson@redhat.com" <alex.williamson@redhat.com>, Zhaoshenglong <zhaoshenglong@huawei.com>, "imammedo@redhat.com" <imammedo@redhat.com>
 
-The powerpc Linux kernel[1] and skiboot firmware[2] recently gained changes
-that cause the Processor Compatibility Register (PCR) SPR to be cleared.
+Hi Eric,
 
-These changes cause Linux to fail to boot on the Qemu powernv machine
-with an error:
+> -----Original Message-----
+> From: Auger Eric [mailto:eric.auger@redhat.com]
+> Sent: Monday, May 28, 2018 3:21 PM
+> To: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>;
+> qemu-devel@nongnu.org; qemu-arm@nongnu.org
+> Cc: peter.maydell@linaro.org; drjones@redhat.com; Jonathan Cameron
+> <jonathan.cameron@huawei.com>; Linuxarm <linuxarm@huawei.com>;
+> alex.williamson@redhat.com; Zhaoshenglong <zhaoshenglong@huawei.com>;
+> imammedo@redhat.com
+> Subject: Re: [Qemu-devel] [RFC v2 1/6] hw/vfio: Retrieve valid iova range=
+s
+> from kernel
+>=20
+> Hi Shameer,
+> On 05/16/2018 05:20 PM, Shameer Kolothum wrote:
+> > This makes use of the newly introduced iova cap chains added
+> > to the  type1 VFIO_IOMMU_GET_INFO ioctl.
+> >
+> > The retrieved iova info is stored in a list for later use.
+> >
+> > Signed-off-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
+> > ---
+> >  hw/vfio/common.c              | 108
+> +++++++++++++++++++++++++++++++++++++++---
+> >  include/hw/vfio/vfio-common.h |   7 +++
+> >  linux-headers/linux/vfio.h    |  23 +++++++++
+> >  3 files changed, 132 insertions(+), 6 deletions(-)
+> >
+> > diff --git a/hw/vfio/common.c b/hw/vfio/common.c
+> > index 07ffa0b..94d7b24 100644
+> > --- a/hw/vfio/common.c
+> > +++ b/hw/vfio/common.c
+> > @@ -40,6 +40,8 @@ struct vfio_group_head vfio_group_list =3D
+> >      QLIST_HEAD_INITIALIZER(vfio_group_list);
+> >  struct vfio_as_head vfio_address_spaces =3D
+> >      QLIST_HEAD_INITIALIZER(vfio_address_spaces);
+> > +struct vfio_iova_head vfio_iova_regions =3D
+> > +    QLIST_HEAD_INITIALIZER(vfio_iova_regions);
+> >
+> >  #ifdef CONFIG_KVM
+> >  /*
+> > @@ -1030,6 +1032,85 @@ static void
+> vfio_put_address_space(VFIOAddressSpace *space)
+> >      }
+> >  }
+> >
+> > +static void vfio_iommu_get_iova_ranges(struct vfio_iommu_type1_info
+> *info)
+> > +{
+> > +    struct vfio_info_cap_header *hdr;
+> > +    struct vfio_iommu_type1_info_cap_iova_range *cap_iova;
+> > +    VFIOIovaRange *iova, *tmp, *prev =3D NULL;
+> nit: s/iova/iova_range?
 
- Trying to write privileged spr 338 (0x152) at 0000000030017f0c
+Ok.
 
-With this patch Qemu makes this register available as a hypervisor
-privileged register.
+> > +    void *ptr =3D info;
+> > +    bool found =3D false;
+> > +    int i;
+> > +
+> > +    if (!(info->flags & VFIO_IOMMU_INFO_CAPS)) {
+> > +        return;
+> > +    }
+> > +
+> > +    for (hdr =3D ptr + info->cap_offset; hdr !=3D ptr; hdr =3D ptr + h=
+dr->next) {
+> > +        if (hdr->id =3D=3D VFIO_IOMMU_TYPE1_INFO_CAP_IOVA_RANGE) {
+> > +            found =3D true;
+> > +            break;
+> > +        }
+> > +    }
+> > +
+> > +    if (!found) {
+> > +        return;
+> > +    }
+> > +
+> > +    /* purge the current iova list, if any */
+> > +    QLIST_FOREACH_SAFE(iova, &vfio_iova_regions, next, tmp) {
+> > +        QLIST_REMOVE(iova, next);
+> > +        g_free(iova);
+> > +    }
+> > +
+> > +    cap_iova =3D container_of(hdr, struct
+> vfio_iommu_type1_info_cap_iova_range,
+> > +                            header);
+> > +
+> > +    /* populate the list */
+> > +    for (i =3D 0; i < cap_iova->nr_iovas; i++) {
+> > +        iova =3D g_malloc0(sizeof(*iova));
+> nit: g_new0 is preferred
 
-Note that bits set in this register disable features of the processor.
-Currently the only register state that is supported is when the register
-is zeroed (enable all features). This is sufficient for guests to
-once again boot.
+Sure.
 
-[1] https://lkml.kernel.org/r/20180518013742.24095-1-mikey@neuling.org
-[2] https://patchwork.ozlabs.org/patch/915932/
+> > +        iova->start =3D cap_iova->iova_ranges[i].start;
+> > +        iova->end =3D cap_iova->iova_ranges[i].end;
+> > +
+> > +        if (prev) {
+> > +            QLIST_INSERT_AFTER(prev, iova, next);
+> > +        } else {
+> > +            QLIST_INSERT_HEAD(&vfio_iova_regions, iova, next);
+> > +        }
+> > +        prev =3D iova;
+> > +    }
+> > +
+> > +    return;
+> > +}
+> > +
+> > +static int vfio_get_iommu_info(VFIOContainer *container,
+> > +                         struct vfio_iommu_type1_info **info)
+> > +{
+> > +
+> > +    size_t argsz =3D sizeof(struct vfio_iommu_type1_info);
+> > +
+> > +
+> > +    *info =3D g_malloc0(argsz);
+> > +
+> > +retry:
+> > +    (*info)->argsz =3D argsz;
+> > +
+> > +    if (ioctl(container->fd, VFIO_IOMMU_GET_INFO, *info)) {
+> > +        g_free(*info);
+> > +        *info =3D NULL;
+> > +        return -errno;
+> > +    }
+> > +
+> > +    if (((*info)->argsz > argsz)) {
+> > +        argsz =3D (*info)->argsz;
+> > +        *info =3D g_realloc(*info, argsz);
+> > +        goto retry;
+> > +    }
+> > +
+> > +    vfio_iommu_get_iova_ranges(*info);
+> > +
+> > +    return 0;
+> > +}
+> > +
+> >  static int vfio_connect_container(VFIOGroup *group, AddressSpace *as,
+> >                                    Error **errp)
+> >  {
+> > @@ -1044,6 +1125,15 @@ static int vfio_connect_container(VFIOGroup
+> *group, AddressSpace *as,
+> >              group->container =3D container;
+> >              QLIST_INSERT_HEAD(&container->group_list, group, container=
+_next);
+> >              vfio_kvm_device_add_group(group);
+> > +
+> > +            /* New group might change the valid iovas. Get the updated=
+ list */
+> > +            if ((container->iommu_type =3D=3D VFIO_TYPE1_IOMMU) ||
+> > +                (container->iommu_type =3D=3D VFIO_TYPE1v2_IOMMU)) {
+> > +                struct vfio_iommu_type1_info *info;
+> > +
+> > +                vfio_get_iommu_info(container, &info);
+> > +                g_free(info);
+> > +            }
+> >              return 0;
+> >          }
+> >      }
+> > @@ -1071,7 +1161,7 @@ static int vfio_connect_container(VFIOGroup
+> *group, AddressSpace *as,
+> >      if (ioctl(fd, VFIO_CHECK_EXTENSION, VFIO_TYPE1_IOMMU) ||
+> >          ioctl(fd, VFIO_CHECK_EXTENSION, VFIO_TYPE1v2_IOMMU)) {
+> >          bool v2 =3D !!ioctl(fd, VFIO_CHECK_EXTENSION, VFIO_TYPE1v2_IOM=
+MU);
+> > -        struct vfio_iommu_type1_info info;
+> > +        struct vfio_iommu_type1_info *info;
+> >
+> >          ret =3D ioctl(group->fd, VFIO_GROUP_SET_CONTAINER, &fd);
+> >          if (ret) {
+> > @@ -1095,14 +1185,14 @@ static int vfio_connect_container(VFIOGroup
+> *group, AddressSpace *as,
+> >           * existing Type1 IOMMUs generally support any IOVA we're
+> >           * going to actually try in practice.
+> >           */
+> > -        info.argsz =3D sizeof(info);
+> > -        ret =3D ioctl(fd, VFIO_IOMMU_GET_INFO, &info);
+> > +        ret =3D vfio_get_iommu_info(container, &info);
+> >          /* Ignore errors */
+> > -        if (ret || !(info.flags & VFIO_IOMMU_INFO_PGSIZES)) {
+> > +        if (ret || !(info->flags & VFIO_IOMMU_INFO_PGSIZES)) {
+> >              /* Assume 4k IOVA page size */
+> > -            info.iova_pgsizes =3D 4096;
+> > +            info->iova_pgsizes =3D 4096;
+> >          }
+> > -        vfio_host_win_add(container, 0, (hwaddr)-1, info.iova_pgsizes)=
+;
+> > +        vfio_host_win_add(container, 0, (hwaddr)-1, info->iova_pgsizes=
+);
+> > +        g_free(info);
+> >      } else if (ioctl(fd, VFIO_CHECK_EXTENSION, VFIO_SPAPR_TCE_IOMMU) |=
+|
+> >                 ioctl(fd, VFIO_CHECK_EXTENSION, VFIO_SPAPR_TCE_v2_IOMMU=
+)) {
+> >          struct vfio_iommu_spapr_tce_info info;
+> > @@ -1256,6 +1346,7 @@ static void vfio_disconnect_container(VFIOGroup
+> *group)
+> >      if (QLIST_EMPTY(&container->group_list)) {
+> >          VFIOAddressSpace *space =3D container->space;
+> >          VFIOGuestIOMMU *giommu, *tmp;
+> > +        VFIOIovaRange *iova, *next_iova;
+> not: I would prefer range naming
 
-Signed-off-by: Joel Stanley <joel@jms.id.au>
----
- target/ppc/helper.h             |  1 +
- target/ppc/misc_helper.c        | 10 ++++++++++
- target/ppc/translate_init.inc.c |  9 +++++++--
- 3 files changed, 18 insertions(+), 2 deletions(-)
+Ok.
+=20
+> >
+> >          QLIST_REMOVE(container, next);
+> >
+> > @@ -1266,6 +1357,11 @@ static void vfio_disconnect_container(VFIOGroup
+> *group)
+> >              g_free(giommu);
+> >          }
+> >
+> > +        QLIST_FOREACH_SAFE(iova, &vfio_iova_regions, next, next_iova) =
+{
+> > +            QLIST_REMOVE(iova, next);
+> > +            g_free(iova);
+> > +        }
+> > +
+> >          trace_vfio_disconnect_container(container->fd);
+> >          close(container->fd);
+> >          g_free(container);
+> > diff --git a/include/hw/vfio/vfio-common.h b/include/hw/vfio/vfio-commo=
+n.h
+> > index d936014..874fe2c 100644
+> > --- a/include/hw/vfio/vfio-common.h
+> > +++ b/include/hw/vfio/vfio-common.h
+> > @@ -164,6 +164,12 @@ typedef struct VFIODisplay {
+> >      } dmabuf;
+> >  } VFIODisplay;
+> >
+> > +typedef struct VFIOIovaRange {
+> > +    uint64_t start;
+> > +    uint64_t end;
+> > +    QLIST_ENTRY(VFIOIovaRange) next;
+> > +} VFIOIovaRange;
+> > +
+> >  void vfio_put_base_device(VFIODevice *vbasedev);
+> >  void vfio_disable_irqindex(VFIODevice *vbasedev, int index);
+> >  void vfio_unmask_single_irqindex(VFIODevice *vbasedev, int index);
+> > @@ -187,6 +193,7 @@ int vfio_get_device(VFIOGroup *group, const char
+> *name,
+> >  extern const MemoryRegionOps vfio_region_ops;
+> >  extern QLIST_HEAD(vfio_group_head, VFIOGroup) vfio_group_list;
+> >  extern QLIST_HEAD(vfio_as_head, VFIOAddressSpace) vfio_address_spaces;
+> > +extern QLIST_HEAD(vfio_iova_head, VFIOIovaRange) vfio_iova_regions;
+> >
+> >  #ifdef CONFIG_LINUX
+> >  int vfio_get_region_info(VFIODevice *vbasedev, int index,
+> > diff --git a/linux-headers/linux/vfio.h b/linux-headers/linux/vfio.h
+> > index 3a0a305..117341d 100644
+> > --- a/linux-headers/linux/vfio.h
+> > +++ b/linux-headers/linux/vfio.h
+> > @@ -589,7 +589,30 @@ struct vfio_iommu_type1_info {
+> >  	__u32	argsz;
+> >  	__u32	flags;
+> >  #define VFIO_IOMMU_INFO_PGSIZES (1 << 0)	/* supported page sizes info =
+*/
+> > +#define VFIO_IOMMU_INFO_CAPS	(1 << 1)	/* Info supports caps */
+> >  	__u64	iova_pgsizes;		/* Bitmap of supported page sizes */
+> > +	__u32   cap_offset;	/* Offset within info struct of first cap */
+> > +};
+> > +
+> > +/*
+> > + * The IOVA capability allows to report the valid IOVA range(s)
+> > + * excluding any reserved regions associated with dev group. Any dma
+> > + * map attempt outside the valid iova range will return error.
+> > + *
+> > + * The structures below define version 1 of this capability.
+> > + */
+> > +#define VFIO_IOMMU_TYPE1_INFO_CAP_IOVA_RANGE  1
+> > +
+> > +struct vfio_iova_range {
+> > +	__u64	start;
+> > +	__u64	end;
+> > +};
+> > +
+> > +struct vfio_iommu_type1_info_cap_iova_range {
+> > +	struct vfio_info_cap_header header;
+> > +	__u32	nr_iovas;
+> > +	__u32	reserved;
+> > +	struct vfio_iova_range iova_ranges[];
+> >  };
+> >
+> >  #define VFIO_IOMMU_GET_INFO _IO(VFIO_TYPE, VFIO_BASE + 12)
+> >
+> You need to update the header in a separate patch using
+> scripts/update-linux-headers.sh
+>=20
+> Until the kernel series is not fully upstream you can just pickup the
+> VFIO related changes you are interested in (partial update) but when
+> this series becomes a patch, a full header update is generally used.
 
-diff --git a/target/ppc/helper.h b/target/ppc/helper.h
-index 19453c68138a..d751f0e21909 100644
---- a/target/ppc/helper.h
-+++ b/target/ppc/helper.h
-@@ -17,6 +17,7 @@ DEF_HELPER_2(pminsn, void, env, i32)
- DEF_HELPER_1(rfid, void, env)
- DEF_HELPER_1(hrfid, void, env)
- DEF_HELPER_2(store_lpcr, void, env, tl)
-+DEF_HELPER_2(store_pcr, void, env, tl)
- #endif
- DEF_HELPER_1(check_tlb_flush_local, void, env)
- DEF_HELPER_1(check_tlb_flush_global, void, env)
-diff --git a/target/ppc/misc_helper.c b/target/ppc/misc_helper.c
-index 8c8cba5cc6f1..40c39d08ad14 100644
---- a/target/ppc/misc_helper.c
-+++ b/target/ppc/misc_helper.c
-@@ -20,6 +20,7 @@
- #include "cpu.h"
- #include "exec/exec-all.h"
- #include "exec/helper-proto.h"
-+#include "qemu/error-report.h"
- 
- #include "helper_regs.h"
- 
-@@ -186,6 +187,15 @@ void ppc_store_msr(CPUPPCState *env, target_ulong value)
-     hreg_store_msr(env, value, 0);
- }
- 
-+void helper_store_pcr(CPUPPCState *env, target_ulong value)
-+{
-+    if (value != 0) {
-+        error_report("Unimplemented PCR value 0x"TARGET_FMT_lx, value);
-+        return;
-+    }
-+    env->spr[SPR_PCR] = value;
-+}
-+
- /* This code is lifted from MacOnLinux. It is called whenever
-  * THRM1,2 or 3 is read an fixes up the values in such a way
-  * that will make MacOS not hang. These registers exist on some
-diff --git a/target/ppc/translate_init.inc.c b/target/ppc/translate_init.inc.c
-index ab782cb32aaa..bebe6ec5333c 100644
---- a/target/ppc/translate_init.inc.c
-+++ b/target/ppc/translate_init.inc.c
-@@ -456,6 +456,10 @@ static void spr_write_hid0_601(DisasContext *ctx, int sprn, int gprn)
-     /* Must stop the translation as endianness may have changed */
-     gen_stop_exception(ctx);
- }
-+static void spr_write_pcr(DisasContext *ctx, int sprn, int gprn)
-+{
-+    gen_helper_store_pcr(cpu_env, cpu_gpr[gprn]);
-+}
- #endif
- 
- /* Unified bats */
-@@ -7957,11 +7961,12 @@ static void gen_spr_power6_common(CPUPPCState *env)
- #endif
-     /*
-      * Register PCR to report POWERPC_EXCP_PRIV_REG instead of
--     * POWERPC_EXCP_INVAL_SPR.
-+     * POWERPC_EXCP_INVAL_SPR in userspace. Permit hypervisor access.
-      */
--    spr_register(env, SPR_PCR, "PCR",
-+    spr_register_hv(env, SPR_PCR, "PCR",
-                  SPR_NOACCESS, SPR_NOACCESS,
-                  SPR_NOACCESS, SPR_NOACCESS,
-+                 &spr_read_generic, &spr_write_pcr,
-                  0x00000000);
- }
- 
--- 
-2.17.0
+Ok. I will take care of this in the next revision.
+
+Thanks,
+Shameer
+=20
+> Thanks
+>=20
+> Eric
