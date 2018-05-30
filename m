@@ -1,20 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45055)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45701)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1fNspy-0001XR-9g
-	for qemu-devel@nongnu.org; Wed, 30 May 2018 00:35:51 -0400
+	(envelope-from <mst@redhat.com>) id 1fNsw8-0002ZB-O4
+	for qemu-devel@nongnu.org; Wed, 30 May 2018 00:42:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1fNspx-0005cB-EA
-	for qemu-devel@nongnu.org; Wed, 30 May 2018 00:35:50 -0400
-Date: Wed, 30 May 2018 00:35:41 -0400
-From: Jeff Cody <jcody@redhat.com>
-Message-ID: <20180530043541.GG9904@localhost.localdomain>
-References: <20180529203910.7615-1-kwolf@redhat.com>
-	<20180529203910.7615-9-kwolf@redhat.com>
+	(envelope-from <mst@redhat.com>) id 1fNsw7-0007Kb-Sw
+	for qemu-devel@nongnu.org; Wed, 30 May 2018 00:42:12 -0400
+Date: Wed, 30 May 2018 07:42:01 +0300
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20180530074026-mutt-send-email-mst@kernel.org>
+References: <20180528232719.4721-1-f4bug@amsat.org>
+	<20180528232719.4721-10-f4bug@amsat.org>
+	<20180529134053.1ea9f46d.cohuck@redhat.com>
+	<11289f38-6d0f-74c9-1719-83b2a3ed2d97@amsat.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <20180529203910.7615-9-kwolf@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2 08/16] qemu-iotests: Add VM.run_job()
+In-Reply-To: <11289f38-6d0f-74c9-1719-83b2a3ed2d97@amsat.org>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v4 09/21] target: Do not include
+ "exec/exec-all.h" if it is not necessary
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,52 +27,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: qemu-block@nongnu.org, mreitz@redhat.com, jsnow@redhat.com, eblake@redhat.com, pkrempa@redhat.com, qemu-devel@nongnu.org
+To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>
+Cc: Cornelia Huck <cohuck@redhat.com>, Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, qemu-trivial@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, Peter Maydell <peter.maydell@linaro.org>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, Michael Walle <michael@walle.cc>, Laurent Vivier <laurent@vivier.eu>, Anthony Green <green@moxielogic.com>, Stafford Horne <shorne@gmail.com>, David Gibson <david@gibson.dropbear.id.au>, Alexander Graf <agraf@suse.de>, David Hildenbrand <david@redhat.com>, Max Filippov <jcmvbkbc@gmail.com>, "open list:ARM" <qemu-arm@nongnu.org>, "open list:PowerPC" <qemu-ppc@nongnu.org>, "open list:S390" <qemu-s390x@nongnu.org>
 
-On Tue, May 29, 2018 at 10:39:02PM +0200, Kevin Wolf wrote:
-> Add an iotests.py function that runs a job and only returns when it is
-> destroyed. An error is logged when the job failed and job-finalize and
-> job-dismiss commands are issued if necessary.
-> 
-> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+On Wed, May 30, 2018 at 12:12:55AM -0300, Philippe Mathieu-Daud=E9 wrote:
+> Hi Cornelia,
+>=20
+> On 05/29/2018 08:40 AM, Cornelia Huck wrote:
+> > On Mon, 28 May 2018 20:27:07 -0300
+> > Philippe Mathieu-Daud=E9 <f4bug@amsat.org> wrote:
+> >=20
+> >> Code change produced with:
+> >>     $ git grep '#include "exec/exec-all.h"' | \
+> >>       cut -d: -f-1 | \
+> >>       xargs egrep -L "(cpu_address_space_init|cpu_loop_|tlb_|tb_|GET=
+PC|singlestep|TranslationBlock)" | \
+> >=20
+> > Hm, does this expression catch all files that need to include
+> > exec-all.h? The resulting patch seems fine, though.
+>=20
+> No, not all :/
+> I started with "(cpu_loop_|tlb_|tb_)" then kept brutebuilding until no
+> more errors appear. In 2 more steps I added "cpu_address_space_init|"
+> then "|GETPC|singlestep|TranslationBlock". Quick and dirty enough for m=
+y
+> goal than trying to build a regex to explode function/struct names from
+> headers. This is a clever way to do it for long term command reuse take=
+n
+> from commit messages...
 
-Reviewed-by: Jeff Cody <jcody@redhat.com>
+Brutebuilding isn't a good way to find unused includes, some other header
+might pull in an include you are trying to remove for its own purposes.
+If you want to try brutebuilding you must also verify that's
+not the case - e.g. look at the dependency file generated.
 
-> ---
->  tests/qemu-iotests/iotests.py | 19 +++++++++++++++++++
->  1 file changed, 19 insertions(+)
-> 
-> diff --git a/tests/qemu-iotests/iotests.py b/tests/qemu-iotests/iotests.py
-> index edcd2bb701..8b612cb891 100644
-> --- a/tests/qemu-iotests/iotests.py
-> +++ b/tests/qemu-iotests/iotests.py
-> @@ -418,6 +418,25 @@ class VM(qtest.QEMUQtestMachine):
->          log(str(result), filters)
->          return result
->  
-> +    def run_job(self, job, auto_finalize=True, auto_dismiss=False):
-> +        while True:
-> +            for ev in self.get_qmp_events_filtered(wait=True):
-> +                if ev['event'] == 'JOB_STATUS_CHANGE':
-> +                    status = ev['data']['status']
-> +                    if status == 'aborting':
-> +                        result = self.qmp('query-jobs')
-> +                        for j in result['return']:
-> +                            if j['id'] == job:
-> +                                log('Job failed: %s' % (j['error']))
-> +                    elif status == 'pending' and not auto_finalize:
-> +                        self.qmp_log('job-finalize', id=job)
-> +                    elif status == 'concluded' and not auto_dismiss:
-> +                        self.qmp_log('job-dismiss', id=job)
-> +                    elif status == 'null':
-> +                        return
-> +                else:
-> +                    iotests.log(ev)
-> +
->  
->  index_re = re.compile(r'([^\[]+)\[([^\]]+)\]')
->  
-> -- 
-> 2.13.6
-> 
+> >>       xargs sed -i.bak '/#include "exec\/exec-all.h"/d'
+> >>
+> >> Signed-off-by: Philippe Mathieu-Daud=E9 <f4bug@amsat.org>
