@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58485)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58550)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1fNuQS-00024E-76
-	for qemu-devel@nongnu.org; Wed, 30 May 2018 02:17:37 -0400
+	(envelope-from <clg@kaod.org>) id 1fNuQa-0002Bi-Gj
+	for qemu-devel@nongnu.org; Wed, 30 May 2018 02:17:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1fNuQP-0001E8-0Z
-	for qemu-devel@nongnu.org; Wed, 30 May 2018 02:17:36 -0400
-Received: from 3.mo178.mail-out.ovh.net ([46.105.44.197]:50687)
+	(envelope-from <clg@kaod.org>) id 1fNuQX-0001Gz-BX
+	for qemu-devel@nongnu.org; Wed, 30 May 2018 02:17:44 -0400
+Received: from 4.mo5.mail-out.ovh.net ([178.33.111.247]:53049)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1fNuQO-0001Dm-Qn
-	for qemu-devel@nongnu.org; Wed, 30 May 2018 02:17:32 -0400
-Received: from player718.ha.ovh.net (unknown [10.109.120.47])
-	by mo178.mail-out.ovh.net (Postfix) with ESMTP id A706415CA5
-	for <qemu-devel@nongnu.org>; Wed, 30 May 2018 08:17:31 +0200 (CEST)
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1fNuQX-0001GT-43
+	for qemu-devel@nongnu.org; Wed, 30 May 2018 02:17:41 -0400
+Received: from player718.ha.ovh.net (unknown [10.109.122.69])
+	by mo5.mail-out.ovh.net (Postfix) with ESMTP id 4FCC91B7DAC
+	for <qemu-devel@nongnu.org>; Wed, 30 May 2018 08:17:37 +0200 (CEST)
 From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
-Date: Wed, 30 May 2018 08:17:09 +0200
-Message-Id: <20180530061711.23673-3-clg@kaod.org>
+Date: Wed, 30 May 2018 08:17:10 +0200
+Message-Id: <20180530061711.23673-4-clg@kaod.org>
 In-Reply-To: <20180530061711.23673-1-clg@kaod.org>
 References: <20180530061711.23673-1-clg@kaod.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v2 2/4] ftgmac100: add IEEE 802.1Q VLAN support
+Subject: [Qemu-devel] [PATCH v2 3/4] ftgmac100: fix multicast hash routine
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,82 +32,29 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Jason Wang <jasowang@redhat.com>
 Cc: qemu-devel@nongnu.org, qemu-arm@nongnu.org, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
 
-The ftgmac100 NIC supports VLAN tag insertion and the MAC engine also
-has a control to remove VLAN tags from received packets.
-
-The VLAN control bits and VLAN tag information are contained in the
-second word of the transmit and receive descriptors. The Insert VLAN
-bit and the VLAN Tag available bit are only valid in the first segment
-of the packet.
+Based on the multicast hash calculation of the FTGMAC100 Linux driver.
 
 Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
 Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 ---
-
- Changes since v1:
-
- - replaced byte shifting by store/load helpers
-=20
- hw/net/ftgmac100.c | 31 ++++++++++++++++++++++++++++++-
- 1 file changed, 30 insertions(+), 1 deletion(-)
+ hw/net/ftgmac100.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/hw/net/ftgmac100.c b/hw/net/ftgmac100.c
-index 425ac36cff87..abf80655f28f 100644
+index abf80655f28f..8a7f274dc118 100644
 --- a/hw/net/ftgmac100.c
 +++ b/hw/net/ftgmac100.c
-@@ -443,6 +443,22 @@ static void ftgmac100_do_tx(FTGMAC100State *s, uint3=
-2_t tx_ring,
-             break;
-         }
+@@ -776,8 +776,8 @@ static int ftgmac100_filter(FTGMAC100State *s, const =
+uint8_t *buf, size_t len)
+                 return 0;
+             }
 =20
-+        /* Check for VLAN */
-+        if (bd.des0 & FTGMAC100_TXDES0_FTS &&
-+            bd.des1 & FTGMAC100_TXDES1_INS_VLANTAG &&
-+            be16_to_cpu(PKT_GET_ETH_HDR(ptr)->h_proto) !=3D ETH_P_VLAN) =
-{
-+            if (frame_size + len + 4 > sizeof(s->frame)) {
-+                qemu_log_mask(LOG_GUEST_ERROR, "%s: frame too big : %d b=
-ytes\n",
-+                              __func__, len);
-+                s->isr |=3D FTGMAC100_INT_XPKT_LOST;
-+                len =3D  sizeof(s->frame) - frame_size - 4;
-+            }
-+            memmove(ptr + 16, ptr + 12, len - 12);
-+            stw_be_p(ptr + 12, ETH_P_VLAN);
-+            stw_be_p(ptr + 14, bd.des1);
-+            len +=3D 4;
-+        }
-+
-         ptr +=3D len;
-         frame_size +=3D len;
-         if (bd.des0 & FTGMAC100_TXDES0_LTS) {
-@@ -864,7 +880,20 @@ static ssize_t ftgmac100_receive(NetClientState *nc,=
- const uint8_t *buf,
-             buf_len +=3D size - 4;
-         }
-         buf_addr =3D bd.des3;
--        dma_memory_write(&address_space_memory, buf_addr, buf, buf_len);
-+        if (first && proto =3D=3D ETH_P_VLAN && buf_len >=3D 18) {
-+            bd.des1 =3D lduw_be_p(buf + 14) | FTGMAC100_RXDES1_VLANTAG_A=
-VAIL;
-+
-+            if (s->maccr & FTGMAC100_MACCR_RM_VLAN) {
-+                dma_memory_write(&address_space_memory, buf_addr, buf, 1=
-2);
-+                dma_memory_write(&address_space_memory, buf_addr + 12, b=
-uf + 16,
-+                                 buf_len - 16);
-+            } else {
-+                dma_memory_write(&address_space_memory, buf_addr, buf, b=
-uf_len);
-+            }
-+        } else {
-+            bd.des1 =3D 0;
-+            dma_memory_write(&address_space_memory, buf_addr, buf, buf_l=
-en);
-+        }
-         buf +=3D buf_len;
-         if (size < 4) {
-             dma_memory_write(&address_space_memory, buf_addr + buf_len,
+-            /* TODO: this does not seem to work for ftgmac100 */
+-            mcast_idx =3D net_crc32(buf, ETH_ALEN) >> 26;
++            mcast_idx =3D net_crc32_le(buf, ETH_ALEN);
++            mcast_idx =3D (~(mcast_idx >> 2)) & 0x3f;
+             if (!(s->math[mcast_idx / 32] & (1 << (mcast_idx % 32)))) {
+                 return 0;
+             }
 --=20
 2.13.6
