@@ -1,32 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57674)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60552)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fO57U-0006jZ-UW
-	for qemu-devel@nongnu.org; Wed, 30 May 2018 13:42:45 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1fO5Nc-0000gT-JV
+	for qemu-devel@nongnu.org; Wed, 30 May 2018 13:59:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fO57R-0001Ph-On
-	for qemu-devel@nongnu.org; Wed, 30 May 2018 13:42:45 -0400
-Received: from mail-qk0-x243.google.com ([2607:f8b0:400d:c09::243]:33756)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fO57R-0001PP-JF
-	for qemu-devel@nongnu.org; Wed, 30 May 2018 13:42:41 -0400
-Received: by mail-qk0-x243.google.com with SMTP id h7-v6so7892770qkm.0
-	for <qemu-devel@nongnu.org>; Wed, 30 May 2018 10:42:41 -0700 (PDT)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20180530162349.31100-1-pbonzini@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <213a7a34-4982-f076-f0a9-716cd8babea3@amsat.org>
-Date: Wed, 30 May 2018 14:42:37 -0300
+	(envelope-from <dgilbert@redhat.com>) id 1fO5NZ-0002f0-J3
+	for qemu-devel@nongnu.org; Wed, 30 May 2018 13:59:24 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:52686 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1fO5NZ-0002eh-DG
+	for qemu-devel@nongnu.org; Wed, 30 May 2018 13:59:21 -0400
+Date: Wed, 30 May 2018 18:59:16 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20180530175916.GH2410@work-vm>
+References: <1527673416-31268-1-git-send-email-lidongchen@tencent.com>
+	<1527673416-31268-13-git-send-email-lidongchen@tencent.com>
 MIME-Version: 1.0
-In-Reply-To: <20180530162349.31100-1-pbonzini@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH] qom: support orphan objects in
- object_get_canonical_path
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1527673416-31268-13-git-send-email-lidongchen@tencent.com>
+Subject: Re: [Qemu-devel] [PATCH v4 12/12] migration: implement the shutdown
+ for RDMA QIOChannel
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,77 +28,129 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
-Cc: aik@ozlabs.ru
+To: Lidong Chen <jemmy858585@gmail.com>
+Cc: zhang.zhanghailiang@huawei.com, quintela@redhat.com, berrange@redhat.com, aviadye@mellanox.com, pbonzini@redhat.com, qemu-devel@nongnu.org, adido@mellanox.com, Lidong Chen <lidongchen@tencent.com>
 
-On 05/30/2018 01:23 PM, Paolo Bonzini wrote:
-> Mostly a rewrite, in order to keep the loop simple.
-
-Thus easier to review using "git difftool -y -x sdiff" (or whichever
-tool you prefer, such meld).  "git format-patch" doesn't provide a way
-to generate side-by-side diffs applicable.
-
+* Lidong Chen (jemmy858585@gmail.com) wrote:
+> Because RDMA QIOChannel not implement shutdown function,
+> If the to_dst_file was set error, the return path thread
+> will wait forever. and the migration thread will wait
+> return path thread exit.
 > 
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> the backtrace of return path thread is:
+> 
+> (gdb) bt
+>     #0  0x00007f372a76bb0f in ppoll () from /lib64/libc.so.6
+>     #1  0x000000000071dc24 in qemu_poll_ns (fds=0x7ef7091d0580, nfds=2, timeout=100000000)
+>         at qemu-timer.c:325
+>     #2  0x00000000006b2fba in qemu_rdma_wait_comp_channel (rdma=0xd424000)
+>         at migration/rdma.c:1501
+>     #3  0x00000000006b3191 in qemu_rdma_block_for_wrid (rdma=0xd424000, wrid_requested=4000,
+>         byte_len=0x7ef7091d0640) at migration/rdma.c:1580
+>     #4  0x00000000006b3638 in qemu_rdma_exchange_get_response (rdma=0xd424000,
+>         head=0x7ef7091d0720, expecting=3, idx=0) at migration/rdma.c:1726
+>     #5  0x00000000006b3ad6 in qemu_rdma_exchange_recv (rdma=0xd424000, head=0x7ef7091d0720,
+>         expecting=3) at migration/rdma.c:1903
+>     #6  0x00000000006b5d03 in qemu_rdma_get_buffer (opaque=0x6a57dc0, buf=0x5c80030 "", pos=8,
+>         size=32768) at migration/rdma.c:2714
+>     #7  0x00000000006a9635 in qemu_fill_buffer (f=0x5c80000) at migration/qemu-file.c:232
+>     #8  0x00000000006a9ecd in qemu_peek_byte (f=0x5c80000, offset=0)
+>         at migration/qemu-file.c:502
+>     #9  0x00000000006a9f1f in qemu_get_byte (f=0x5c80000) at migration/qemu-file.c:515
+>     #10 0x00000000006aa162 in qemu_get_be16 (f=0x5c80000) at migration/qemu-file.c:591
+>     #11 0x00000000006a46d3 in source_return_path_thread (
+>         opaque=0xd826a0 <current_migration.37100>) at migration/migration.c:1331
+>     #12 0x00007f372aa49e25 in start_thread () from /lib64/libpthread.so.0
+>     #13 0x00007f372a77635d in clone () from /lib64/libc.so.6
+> 
+> the backtrace of migration thread is:
+> 
+> (gdb) bt
+>     #0  0x00007f372aa4af57 in pthread_join () from /lib64/libpthread.so.0
+>     #1  0x00000000007d5711 in qemu_thread_join (thread=0xd826f8 <current_migration.37100+88>)
+>         at util/qemu-thread-posix.c:504
+>     #2  0x00000000006a4bc5 in await_return_path_close_on_source (
+>         ms=0xd826a0 <current_migration.37100>) at migration/migration.c:1460
+>     #3  0x00000000006a53e4 in migration_completion (s=0xd826a0 <current_migration.37100>,
+>         current_active_state=4, old_vm_running=0x7ef7089cf976, start_time=0x7ef7089cf980)
+>         at migration/migration.c:1695
+>     #4  0x00000000006a5c54 in migration_thread (opaque=0xd826a0 <current_migration.37100>)
+>         at migration/migration.c:1837
+>     #5  0x00007f372aa49e25 in start_thread () from /lib64/libpthread.so.0
+>     #6  0x00007f372a77635d in clone () from /lib64/libc.so.6
+> 
+> Signed-off-by: Lidong Chen <lidongchen@tencent.com>
+
+Yeh OK, this should help;  so:
+
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+
+I wonder if there are any places we can get stuck in rdma calls though where this isn't enough?
+
 > ---
->  qom/object.c | 29 ++++++++++++++++-------------
->  1 file changed, 16 insertions(+), 13 deletions(-)
+>  migration/rdma.c | 40 ++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 40 insertions(+)
 > 
-> diff --git a/qom/object.c b/qom/object.c
-> index 0fc972030e..4f30431ae3 100644
-> --- a/qom/object.c
-> +++ b/qom/object.c
-> @@ -1669,25 +1669,28 @@ gchar *object_get_canonical_path(Object *obj)
->      Object *root = object_get_root();
->      char *newpath, *path = NULL;
->  
-> -    while (obj != root) {
-> +    if (obj == root) {
-> +        return g_strdup("/");
-> +    }
-> +
-> +    do {
->          char *component = object_get_canonical_path_component(obj);
->  
-> -        if (path) {
-> -            newpath = g_strdup_printf("%s/%s", component, path);
-> -            g_free(component);
-> +        if (!component) {
-> +            /* A canonical path must be complete, so discard what was
-> +             * collected so far.
-> +             */
->              g_free(path);
-> -            path = newpath;
-> -        } else {
-> -            path = component;
-> +            return NULL;
-
-This function now matches his documentation!
-
->          }
->  
-> -        obj = obj->parent;
-> -    }
-> -
-> -    newpath = g_strdup_printf("/%s", path ? path : "");
-> -    g_free(path);
-> +        newpath = g_strdup_printf("/%s%s", component, path ? path : "");
-> +        g_free(path);
-> +        g_free(component);
-> +        path = newpath;
-
-Easier to read in 2 lines:
-
-           obj = obj->parent;
-       } while (obj != root);
-
-> +    } while ((obj = obj->parent) != root);
->  
-> -    return newpath;
-> +    return path;
+> diff --git a/migration/rdma.c b/migration/rdma.c
+> index d611a06..0912b6a 100644
+> --- a/migration/rdma.c
+> +++ b/migration/rdma.c
+> @@ -3038,6 +3038,45 @@ static int qio_channel_rdma_close(QIOChannel *ioc,
+>      return 0;
 >  }
 >  
->  Object *object_resolve_path_component(Object *parent, const gchar *part)
+> +static int
+> +qio_channel_rdma_shutdown(QIOChannel *ioc,
+> +                            QIOChannelShutdown how,
+> +                            Error **errp)
+> +{
+> +    QIOChannelRDMA *rioc = QIO_CHANNEL_RDMA(ioc);
+> +    RDMAContext *rdmain, *rdmaout;
+> +
+> +    rcu_read_lock();
+> +
+> +    rdmain = atomic_rcu_read(&rioc->rdmain);
+> +    rdmaout = atomic_rcu_read(&rioc->rdmain);
+> +
+> +    switch (how) {
+> +    case QIO_CHANNEL_SHUTDOWN_READ:
+> +        if (rdmain) {
+> +            rdmain->error_state = -1;
+> +        }
+> +        break;
+> +    case QIO_CHANNEL_SHUTDOWN_WRITE:
+> +        if (rdmaout) {
+> +            rdmaout->error_state = -1;
+> +        }
+> +        break;
+> +    case QIO_CHANNEL_SHUTDOWN_BOTH:
+> +    default:
+> +        if (rdmain) {
+> +            rdmain->error_state = -1;
+> +        }
+> +        if (rdmaout) {
+> +            rdmaout->error_state = -1;
+> +        }
+> +        break;
+> +    }
+> +
+> +    rcu_read_unlock();
+> +    return 0;
+> +}
+> +
+>  /*
+>   * Parameters:
+>   *    @offset == 0 :
+> @@ -3864,6 +3903,7 @@ static void qio_channel_rdma_class_init(ObjectClass *klass,
+>      ioc_klass->io_close = qio_channel_rdma_close;
+>      ioc_klass->io_create_watch = qio_channel_rdma_create_watch;
+>      ioc_klass->io_set_aio_fd_handler = qio_channel_rdma_set_aio_fd_handler;
+> +    ioc_klass->io_shutdown = qio_channel_rdma_shutdown;
+>  }
+>  
+>  static const TypeInfo qio_channel_rdma_info = {
+> -- 
+> 1.8.3.1
 > 
-
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
