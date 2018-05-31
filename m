@@ -1,28 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49359)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49712)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <keno@juliacomputing.com>) id 1fOQPH-0000zs-SW
-	for qemu-devel@nongnu.org; Thu, 31 May 2018 12:26:32 -0400
+	(envelope-from <keno@juliacomputing.com>) id 1fOQR0-0001ve-4L
+	for qemu-devel@nongnu.org; Thu, 31 May 2018 12:28:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <keno@juliacomputing.com>) id 1fOQPH-0005DG-4H
-	for qemu-devel@nongnu.org; Thu, 31 May 2018 12:26:31 -0400
-Received: from mail-pg0-x22d.google.com ([2607:f8b0:400e:c05::22d]:37501)
+	(envelope-from <keno@juliacomputing.com>) id 1fOQQz-0006T5-7r
+	for qemu-devel@nongnu.org; Thu, 31 May 2018 12:28:18 -0400
+Received: from mail-pl0-x230.google.com ([2607:f8b0:400e:c01::230]:33341)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <keno@juliacomputing.com>)
-	id 1fOQPG-0005CS-UX
-	for qemu-devel@nongnu.org; Thu, 31 May 2018 12:26:31 -0400
-Received: by mail-pg0-x22d.google.com with SMTP id a13-v6so9942609pgu.4
-	for <qemu-devel@nongnu.org>; Thu, 31 May 2018 09:26:30 -0700 (PDT)
+	id 1fOQQz-0006Sp-2K
+	for qemu-devel@nongnu.org; Thu, 31 May 2018 12:28:17 -0400
+Received: by mail-pl0-x230.google.com with SMTP id n10-v6so13537820plp.0
+	for <qemu-devel@nongnu.org>; Thu, 31 May 2018 09:28:16 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20180529224311.79e0c201@bahia.lan>
+In-Reply-To: <20180529230951.27a41574@bahia.lan>
 References: <cover.1527310210.git.keno@alumni.harvard.edu>
-	<cd4661a5e122b1dcd848ff5cdf202e728a0359a8.1527310210.git.keno@alumni.harvard.edu>
-	<20180529224311.79e0c201@bahia.lan>
+	<17b8b06c00e359d1cb71b883371ad8c677a0e477.1527310210.git.keno@alumni.harvard.edu>
+	<20180529230951.27a41574@bahia.lan>
 From: Keno Fischer <keno@juliacomputing.com>
-Date: Thu, 31 May 2018 12:25:49 -0400
-Message-ID: <CABV8kRz7GiQS3HFxoBJoTfz_TCdwHUX+14ZgaL=m=fVu86OR4g@mail.gmail.com>
+Date: Thu, 31 May 2018 12:27:35 -0400
+Message-ID: <CABV8kRydQ1wiRm9T-wet64i3n7KpqA7pCJrbZMWFfVz1WRQupw@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH 07/13] 9p: darwin: Properly translate
- AT_REMOVEDIR flag
+Subject: Re: [Qemu-devel] [PATCH 06/13] 9p: darwin: Address minor differences
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,15 +33,19 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Greg Kurz <groug@kaod.org>
 Cc: QEMU Developers <qemu-devel@nongnu.org>, Keno Fischer <keno@alumni.harvard.edu>
 
->> +        errno = EINVAL;
->> +        return -1;
+>> --- a/hw/9pfs/9p-local.c
+>> +++ b/hw/9pfs/9p-local.c
+>> @@ -67,7 +67,10 @@ int local_open_nofollow(FsContext *fs_ctx, const char *path, int flags,
+>>          assert(*path != '/');
+>>
+>>          head = g_strdup(path);
+>> -        c = strchrnul(path, '/');
+>> +        /* equivalent to strchrnul(), but that is not available on Darwin */
 >
-> ... I'm more concerned about this new error path. How can this happen ?
->
+> Please make a qemu_strchrnul() helper with a separate implementation for Darwin
+> then. I guess you can put it in this file since there aren't any other users in
+> the QEMU code base.
 
-As far as I can tell, the flags come from the client without any
-intermediate error
-checking. Since the Darwin constants do not match the Linux constants (which
-have the same numerical values as the 9p constants), we need to perform this
-checking/translation somewhere to ensure correct behavior.
-Is there a more appropriate place to put this check?
+There actually are, but they also use this pattern. Could you
+suggest the best place to put this utility? I can submit a patch
+to switch all instances of this pattern over.
