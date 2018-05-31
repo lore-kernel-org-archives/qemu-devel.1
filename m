@@ -1,21 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38017)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38120)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhaoshenglong@huawei.com>) id 1fOIaj-0000WU-Bj
-	for qemu-devel@nongnu.org; Thu, 31 May 2018 04:05:50 -0400
+	(envelope-from <bounces@canonical.com>) id 1fOIaw-0000dB-1n
+	for qemu-devel@nongnu.org; Thu, 31 May 2018 04:06:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zhaoshenglong@huawei.com>) id 1fOIai-0002Hx-Au
-	for qemu-devel@nongnu.org; Thu, 31 May 2018 04:05:49 -0400
-Message-ID: <5B0FAC9E.6090306@huawei.com>
-Date: Thu, 31 May 2018 16:04:46 +0800
-From: Shannon Zhao <zhaoshenglong@huawei.com>
+	(envelope-from <bounces@canonical.com>) id 1fOIas-0002NE-22
+	for qemu-devel@nongnu.org; Thu, 31 May 2018 04:06:02 -0400
+Received: from indium.canonical.com ([91.189.90.7]:59502)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1fOIar-0002Mb-SM
+	for qemu-devel@nongnu.org; Thu, 31 May 2018 04:05:57 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1fOIaq-0006ay-Pn
+	for <qemu-devel@nongnu.org>; Thu, 31 May 2018 08:05:56 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id BA05E2E80C7
+	for <qemu-devel@nongnu.org>; Thu, 31 May 2018 08:05:56 +0000 (UTC)
 MIME-Version: 1.0
-References: <1527750994-14360-1-git-send-email-zhaoshenglong@huawei.com>
-	<84171c12-e281-8de5-ec3d-ac0aaf3c3dbb@redhat.com>
-In-Reply-To: <84171c12-e281-8de5-ec3d-ac0aaf3c3dbb@redhat.com>
-Content-Type: text/plain; charset="windows-1252"
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] KVM: GIC: Fix memory leak due to calling
- kvm_init_irq_routing twice
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Thu, 31 May 2018 07:44:45 -0000
+From: timsoft <tim@tree-of-life.co.uk>
+Reply-To: Bug 1404278 <1404278@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20141219153639.25009.84583.malonedeb@wampee.canonical.com>
+Message-Id: <152775268558.31866.5690330576248667738.malone@soybean.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1404278] Re: tap connections not working on
+ windows host
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,74 +37,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Auger Eric <eric.auger@redhat.com>, qemu-arm@nongnu.org
-Cc: peter.maydell@linaro.org, shannon.zhaosl@gmail.com, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
 
+it is working now. using the following config.
+"c:\program files\qemu\qemu-system-i386.exe" -cpu qemu32 -m 3G -drive file=
+=3D"c:\\data\\images\\slack14.2_32bit_base.qcow2",format=3Dqcow2 -cdrom "c:=
+\\data\\images\\slackware-14.2-install-dvd.iso" -boot c -net nic,macaddr=3D=
+02:00:00:11:11:14,model=3Di82551 -net tap,ifname=3Dtap0 -k en-gb -display v=
+nc=3D:2 -monitor telnet:localhost:7101,server,nowait,nodelay
+which I took from a linux qemu vm of mine, and just modified the bridge to =
+point to tap (it didn't like -net bridge,br=3Dbr0 (where br0 was my windows=
+ bridge - I guess there is no bridge helper on windows qemu - so I changed =
+it to -net tap,ifname=3Dtap0 (which was already configured as part of the b=
+ridge)
+I was able to ping the lan and also the wan (internet) so it looks ok now. =
+This time i did specify a different virtual net card which may have made a =
+difference, but if it works, that is the main thing.
 
+** Changed in: qemu
+       Status: Incomplete =3D> Fix Released
 
-On 2018/5/31 15:54, Auger Eric wrote:
-> Hi Shannon,
-> 
-> On 05/31/2018 09:16 AM, Shannon Zhao wrote:
->> kvm_irqchip_create called by kvm_init will call kvm_init_irq_routing to
->> initialize global capability variables. If we call kvm_init_irq_routing in
->> GIC realize function, previous allocated memory will leak.
->>
->> Fix this by deleting the unnecessary call.
->>
->> Signed-off-by: Shannon Zhao <zhaoshenglong@huawei.com>
-> openpic_kvm seems to suffer the same leak. Don't you want to fix it as
-> well?
-> 
-I have a look at below patch of openpic_kvm which says on ppc it doesn't
-call kvm_irqchip_create. So no such issue for it.
+-- =
 
-commit d85937e683f6ff4d68293cb24c780fb1f6820d2c
-Author: Scott Wood <scottwood@freescale.com>
-Date:   Wed Jun 12 15:32:51 2013 -0500
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1404278
 
-    kvm/openpic: in-kernel mpic support
+Title:
+  tap connections not working on windows host
 
-> Reviewed-by: Eric Auger <eric.auger@redhat.com>
-> 
-Thanks.
+Status in QEMU:
+  Fix Released
 
-> Thanks
-> 
-> Eric
->> ---
->>  hw/intc/arm_gic_kvm.c   | 1 -
->>  hw/intc/arm_gicv3_kvm.c | 1 -
->>  2 files changed, 2 deletions(-)
->>
->> diff --git a/hw/intc/arm_gic_kvm.c b/hw/intc/arm_gic_kvm.c
->> index 6f467e6..204369d 100644
->> --- a/hw/intc/arm_gic_kvm.c
->> +++ b/hw/intc/arm_gic_kvm.c
->> @@ -572,7 +572,6 @@ static void kvm_arm_gic_realize(DeviceState *dev, Error **errp)
->>  
->>      if (kvm_has_gsi_routing()) {
->>          /* set up irq routing */
->> -        kvm_init_irq_routing(kvm_state);
->>          for (i = 0; i < s->num_irq - GIC_INTERNAL; ++i) {
->>              kvm_irqchip_add_irq_route(kvm_state, i, 0, i);
->>          }
->> diff --git a/hw/intc/arm_gicv3_kvm.c b/hw/intc/arm_gicv3_kvm.c
->> index 001d82b..aa4c7c5 100644
->> --- a/hw/intc/arm_gicv3_kvm.c
->> +++ b/hw/intc/arm_gicv3_kvm.c
->> @@ -813,7 +813,6 @@ static void kvm_arm_gicv3_realize(DeviceState *dev, Error **errp)
->>  
->>      if (kvm_has_gsi_routing()) {
->>          /* set up irq routing */
->> -        kvm_init_irq_routing(kvm_state);
->>          for (i = 0; i < s->num_irq - GIC_INTERNAL; ++i) {
->>              kvm_irqchip_add_irq_route(kvm_state, i, 0, i);
->>          }
->>
-> 
-> .
-> 
+Bug description:
+  using latest qemu 2.2.0 64bit for windows host (installed from
+  qemu-w64-setup-20141210.exe obtained from http://qemu.weilnetz.de/w64/
+  ),OpenVPN 2.6.3-I601 64bit tap adapter named tap01 and calling qemu
+  using the following.
 
--- 
-Shannon
+  qemu-system-x86_64.exe -m 512 -net nic -net tap,ifname=3Dtap01 -hda
+  "c:\\data\\images\\test.img"
+
+  where the image contains a slackware 14.0 64bit install.
+  The tap is bridged with the real network adapter and the bridge is given =
+an ip of 10.1.1.41 (which works as the ip for the windows host). The tap ad=
+apter (in network connections) shows connected when the qemu vm is running.=
+ inside the vm, the network is given an ip of 10.1.1.143 (the netmask and d=
+efault gateway are the same for the virtual and real pc).
+  fault.
+  The vm cannot see the rest of the local network or visa-versa. This used =
+to work in early (0.9 32bit) versions of qemu.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1404278/+subscriptions
