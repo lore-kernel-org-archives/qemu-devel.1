@@ -1,36 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45655)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46934)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <evgreen@chromium.org>) id 1fOUPk-0001yb-4A
-	for qemu-devel@nongnu.org; Thu, 31 May 2018 16:43:17 -0400
+	(envelope-from <eblake@redhat.com>) id 1fOUXK-0003NK-Df
+	for qemu-devel@nongnu.org; Thu, 31 May 2018 16:51:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <evgreen@chromium.org>) id 1fOUPg-00036L-Vl
-	for qemu-devel@nongnu.org; Thu, 31 May 2018 16:43:16 -0400
-Received: from mail-ot0-x242.google.com ([2607:f8b0:4003:c0f::242]:45240)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <evgreen@chromium.org>)
-	id 1fOUPg-00035o-QQ
-	for qemu-devel@nongnu.org; Thu, 31 May 2018 16:43:12 -0400
-Received: by mail-ot0-x242.google.com with SMTP id 15-v6so26796894otn.12
-	for <qemu-devel@nongnu.org>; Thu, 31 May 2018 13:43:12 -0700 (PDT)
-Received: from mail-ot0-f171.google.com (mail-ot0-f171.google.com.
-	[74.125.82.171]) by smtp.gmail.com with ESMTPSA id
-	x4-v6sm26434422otx.54.2018.05.31.13.43.09 for <qemu-devel@nongnu.org>
-	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Thu, 31 May 2018 13:43:10 -0700 (PDT)
-Received: by mail-ot0-f171.google.com with SMTP id t1-v6so26798119ott.13
-	for <qemu-devel@nongnu.org>; Thu, 31 May 2018 13:43:09 -0700 (PDT)
-MIME-Version: 1.0
-References: <20180529234409.27023-1-evgreen@chromium.org>
-	<a436fff7-76a3-976b-a5bc-492d1cf054fa@linaro.org>
-	<CAFEAcA9mrAVLS-VEyqmdEzAm3jT5PqFrP=cGzbhbeMn-qwsowg@mail.gmail.com>
-	<17f64b86-5237-b7c6-c5bb-e46cea636968@linaro.org>
-	<CAFEAcA_u=-DvEvvZP3_UJ_rdS7AQ71GQG3uWY0OkoyJJOTC4cg@mail.gmail.com>
-In-Reply-To: <CAFEAcA_u=-DvEvvZP3_UJ_rdS7AQ71GQG3uWY0OkoyJJOTC4cg@mail.gmail.com>
-From: Evan Green <evgreen@chromium.org>
-Date: Thu, 31 May 2018 13:42:28 -0700
-Message-ID: <CAE=gft7Yu4mGm8jF+Dx9LxhPcQr7GsfbX2QeZs0aNy_dfURwuw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH] Fix hang with -L and symlink loop
+	(envelope-from <eblake@redhat.com>) id 1fOUXJ-0001cV-GL
+	for qemu-devel@nongnu.org; Thu, 31 May 2018 16:51:06 -0400
+From: Eric Blake <eblake@redhat.com>
+Date: Thu, 31 May 2018 15:50:38 -0500
+Message-Id: <20180531205046.153256-1-eblake@redhat.com>
+Subject: [Qemu-devel] [PATCH v2 0/8] block: more byte-based cleanups:
+ vectored I/O
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,61 +18,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: peter.maydell@linaro.org
-Cc: richard.henderson@linaro.org, qemu-devel@nongnu.org, Laurent@vivier.eu, riku.voipio@iki.fi
+To: qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, kwolf@redhat.com, mreitz@redhat.com, den@openvz.com, stefanha@redhat.com, wencongyang2@huawei.com, xiechanglong.d@gmail.com, jcody@redhat.com
 
-On Thu, May 31, 2018 at 9:44 AM Peter Maydell <peter.maydell@linaro.org> wrote:
->
-> On 31 May 2018 at 17:32, Richard Henderson <richard.henderson@linaro.org> wrote:
-> > On 05/31/2018 08:26 AM, Peter Maydell wrote:
-> >> On 30 May 2018 at 21:50, Richard Henderson <richard.henderson@linaro.org> wrote:
-> >>> On 05/29/2018 04:44 PM, Evan Green wrote:
-> >>>> When using -L with Linux app emulation, there is an issue in
-> >>>> init_paths where Qemu will get lost exploring a directory tree
-> >>>> with a symlink loop in it. This causes Qemu to hang, and
-> >>>> eventually consume all memory in the system.
-> >>>>
-> >>>> Qemu's code for pre-exploring the entire directory tree is both
-> >>>> error-prone and slow. Instead, this changes uses faccessat, which
-> >>>> both avoids the symlink loop (since the entire directory space isn't
-> >>>> being explored up front), and likely speeds things up a bit.
-> >>>>
-> >>>> Partial credit goes to Richard Henderson, as it was only after staring
-> >>>> at his patch [1] that I wrote mine.
-> >>>>
-> >>>> [1] https://patchwork.kernel.org/patch/9512083/
-> >>>>
-> >>>> Signed-off-by: Evan Green <evgreen@chromium.org>
-> >>>> ---
-> >>>
-> >>> I like this as an improvement on the current situation.
-> >>> Perhaps folks do like this a bit better than my more invasive patch.
-> >>
-> >> It seems to me to have the same problem as your patch does,
-> >> which is that we now have a file descriptor which belongs
-> >> not to the guest but to QEMU, but we make no effort to
-> >> hide it from the guest, and so for instance code like that
-> >> xinetd "close every fd above 2" loop will break us.
-> >
-> > Yes.  I've thought about doing more explicit managing of guest fd's, but it's a
-> > big job to re-organize that.
->
-> I think my current opinion is that it's probably OK to have the
-> "our internal fd is visible to the guest" problem for the case
-> where the user specifies -L, at least for now. We're probably
-> causing more problems by not allowing -L to point at trees with
-> symlinks than by misbehaving if the application closes it.
-> We should just leave ourselves a suitable TODO note or something.
->
-> As I say, I prefer your patch to this one overall, if you
-> wanted to address the minor issues from the last round of
-> review and respin it.
->
+My quest continues.  I spent some time pruning sector-based usage
+out of qcow as far as possible (and was dismayed at how long it
+took to prove no iotests regressions); so for the other drivers, I
+did the bare minimum to get rid of an interface, but will leave it
+to those file owners if they want to get rid of further pointless
+sector manipulations in their files.
 
-That sounds good to me. Richard, would you mind CCing me on your next
-spin of the patch? I'm not on the main list.
-Thanks,
--Evan
+In v2:
+- throughout: add collected R-b tags
+- patch 2: add assert [Kevin]
+- patch 3-4: improve readability [Kevin]
+- patch 8: retitle to fix typo [Kashyap]
 
-> thanks
-> -- PMM
+001/8:[----] [--] 'parallels: Switch to byte-based calls'
+002/8:[0005] [FC] 'qcow: Switch get_cluster_offset to be byte-based'
+003/8:[0017] [FC] 'qcow: Switch qcow_co_readv to byte-based calls'
+004/8:[0016] [FC] 'qcow: Switch qcow_co_writev to byte-based calls'
+005/8:[0008] [FC] 'qcow: Switch to a byte-based driver'
+006/8:[----] [--] 'replication: Switch to byte-based calls'
+007/8:[----] [--] 'vhdx: Switch to byte-based calls'
+008/8:[down] 'block: Remove unused sector-based vectored I/O'
+
+Eric Blake (8):
+  parallels: Switch to byte-based calls
+  qcow: Switch get_cluster_offset to be byte-based
+  qcow: Switch qcow_co_readv to byte-based calls
+  qcow: Switch qcow_co_writev to byte-based calls
+  qcow: Switch to a byte-based driver
+  replication: Switch to byte-based calls
+  vhdx: Switch to byte-based calls
+  block: Remove unused sector-based vectored I/O
+
+ include/block/block.h |   4 --
+ block/io.c            |  36 --------------
+ block/parallels.c     |  16 ++++---
+ block/qcow.c          | 130 +++++++++++++++++++++++++-------------------------
+ block/replication.c   |  14 +++---
+ block/vhdx.c          |  12 ++---
+ 6 files changed, 90 insertions(+), 122 deletions(-)
+
+-- 
+2.14.3
