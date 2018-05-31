@@ -1,27 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42036)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42266)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1fOLCP-0003eM-OG
-	for qemu-devel@nongnu.org; Thu, 31 May 2018 06:52:54 -0400
+	(envelope-from <marcandre.lureau@gmail.com>) id 1fOLDI-00042i-3K
+	for qemu-devel@nongnu.org; Thu, 31 May 2018 06:53:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1fOLCL-0008Di-6a
-	for qemu-devel@nongnu.org; Thu, 31 May 2018 06:52:53 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:41566 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1fOLCL-0008DY-0V
-	for qemu-devel@nongnu.org; Thu, 31 May 2018 06:52:49 -0400
-Date: Thu, 31 May 2018 11:52:44 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20180531105243.GB2755@work-vm>
-References: <1527673416-31268-1-git-send-email-lidongchen@tencent.com>
-	<1527673416-31268-5-git-send-email-lidongchen@tencent.com>
-	<20180530144543.GE2410@work-vm>
-	<CAOGPPbf9kZOPdotsX7ynUE8XfeVq=vgPJX0AbVUAB4et4T1KKQ@mail.gmail.com>
+	(envelope-from <marcandre.lureau@gmail.com>) id 1fOLDG-0000p2-Lu
+	for qemu-devel@nongnu.org; Thu, 31 May 2018 06:53:48 -0400
+Received: from mail-wm0-x243.google.com ([2a00:1450:400c:c09::243]:40184)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
+	id 1fOLDG-0000o7-A7
+	for qemu-devel@nongnu.org; Thu, 31 May 2018 06:53:46 -0400
+Received: by mail-wm0-x243.google.com with SMTP id x2-v6so45738647wmh.5
+	for <qemu-devel@nongnu.org>; Thu, 31 May 2018 03:53:46 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAOGPPbf9kZOPdotsX7ynUE8XfeVq=vgPJX0AbVUAB4et4T1KKQ@mail.gmail.com>
-Subject: Re: [Qemu-devel] [PATCH v4 04/12] migration: avoid concurrent
- invoke channel_close by different threads
+In-Reply-To: <20180530193548.3846786-2-stefanb@linux.vnet.ibm.com>
+References: <20180530193548.3846786-1-stefanb@linux.vnet.ibm.com>
+	<20180530193548.3846786-2-stefanb@linux.vnet.ibm.com>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Thu, 31 May 2018 12:53:44 +0200
+Message-ID: <CAJ+F1CLoaSNknMv0Sp=bUQPzVexcFUJzmWxOAgDNyJceipDBRw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 1/4] test: Move reusable code from
+ tpm-crb-swtpm-test.c to tpm-util.c
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,126 +31,298 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: 858585 jemmy <jemmy858585@gmail.com>
-Cc: zhang.zhanghailiang@huawei.com, Juan Quintela <quintela@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>, Aviad Yehezkel <aviadye@mellanox.com>, Paolo Bonzini <pbonzini@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, Adi Dotan <adido@mellanox.com>, Lidong Chen <lidongchen@tencent.com>
+To: Stefan Berger <stefanb@linux.vnet.ibm.com>
+Cc: QEMU <qemu-devel@nongnu.org>
 
-* 858585 jemmy (jemmy858585@gmail.com) wrote:
-> On Wed, May 30, 2018 at 10:45 PM, Dr. David Alan Gilbert
-> <dgilbert@redhat.com> wrote:
-> > * Lidong Chen (jemmy858585@gmail.com) wrote:
-> >> From: Lidong Chen <jemmy858585@gmail.com>
-> >>
-> >> The channel_close maybe invoked by different threads. For example, source
-> >> qemu invokes qemu_fclose in main thread, migration thread and return path
-> >> thread. Destination qemu invokes qemu_fclose in main thread, listen thread
-> >> and COLO incoming thread.
-> >>
-> >> Add a mutex in QEMUFile struct to avoid concurrent invoke channel_close.
-> >>
-> >> Signed-off-by: Lidong Chen <lidongchen@tencent.com>
-> >> ---
-> >>  migration/qemu-file.c | 5 +++++
-> >>  1 file changed, 5 insertions(+)
-> >>
-> >> diff --git a/migration/qemu-file.c b/migration/qemu-file.c
-> >> index 977b9ae..87d0f05 100644
-> >> --- a/migration/qemu-file.c
-> >> +++ b/migration/qemu-file.c
-> >> @@ -52,6 +52,7 @@ struct QEMUFile {
-> >>      unsigned int iovcnt;
-> >>
-> >>      int last_error;
-> >> +    QemuMutex lock;
-> >
-> > That could do with a comment saying what you're protecting
-> >
-> >>  };
-> >>
-> >>  /*
-> >> @@ -96,6 +97,7 @@ QEMUFile *qemu_fopen_ops(void *opaque, const QEMUFileOps *ops)
-> >>
-> >>      f = g_new0(QEMUFile, 1);
-> >>
-> >> +    qemu_mutex_init(&f->lock);
-> >>      f->opaque = opaque;
-> >>      f->ops = ops;
-> >>      return f;
-> >> @@ -328,7 +330,9 @@ int qemu_fclose(QEMUFile *f)
-> >>      ret = qemu_file_get_error(f);
-> >>
-> >>      if (f->ops->close) {
-> >> +        qemu_mutex_lock(&f->lock);
-> >>          int ret2 = f->ops->close(f->opaque);
-> >> +        qemu_mutex_unlock(&f->lock);
-> >
-> > OK, and at least for the RDMA code, if it calls
-> > close a 2nd time, rioc->rdma is checked so it wont actually free stuff a
-> > 2nd time.
-> >
-> >>          if (ret >= 0) {
-> >>              ret = ret2;
-> >>          }
-> >> @@ -339,6 +343,7 @@ int qemu_fclose(QEMUFile *f)
-> >>      if (f->last_error) {
-> >>          ret = f->last_error;
-> >>      }
-> >> +    qemu_mutex_destroy(&f->lock);
-> >>      g_free(f);
-> >
-> > Hmm but that's not safe; if two things really do call qemu_fclose()
-> > on the same structure they race here and can end up destroying the lock
-> > twice, or doing f->lock  after the 1st one has already g_free(f).
-> 
-> >
-> >
-> > So lets go back a step.
-> > I think:
-> >   a) There should always be a separate QEMUFile* for
-> >      to_src_file and from_src_file - I don't see where you open
-> >      the 2nd one; I don't see your implementation of
-> >      f->ops->get_return_path.
-> 
-> yes, current qemu version use a separate QEMUFile* for to_src_file and
-> from_src_file.
-> and the two QEMUFile point to one QIOChannelRDMA.
-> 
-> the f->ops->get_return_path is implemented by channel_output_ops or
-> channel_input_ops.
+On Wed, May 30, 2018 at 9:35 PM, Stefan Berger
+<stefanb@linux.vnet.ibm.com> wrote:
+> Move code we can reuse from tpm-crb-swtpm-test.c into tpm-util.c
+> and prefix functions with 'tpm_util_'.
+>
+> Remove some unnecessary #include's.
+>
+> Signed-off-by: Stefan Berger <stefanb@linux.vnet.ibm.com>
 
-Ah OK, yes that makes sense.
+Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
-> >   b) I *think* that while the different threads might all call
-> >      fclose(), I think there should only ever be one qemu_fclose
-> >      call for each direction on the QEMUFile.
-> >
-> > But now we have two problems:
-> >   If (a) is true then f->lock  is separate on each one so
-> >    doesn't really protect if the two directions are closed
-> >    at once. (Assuming (b) is true)
-> 
-> yes, you are right.  so I should add a QemuMutex in QIOChannel structure, not
-> QEMUFile structure. and qemu_mutex_destroy the QemuMutex in
-> qio_channel_finalize.
+> ---
+>  tests/tpm-crb-swtpm-test.c | 100 +++------------------------------------=
+------
+>  tests/tpm-util.c           |  89 +++++++++++++++++++++++++++++++++++++++=
++
+>  tests/tpm-util.h           |  10 +++++
+>  3 files changed, 104 insertions(+), 95 deletions(-)
+>
+> diff --git a/tests/tpm-crb-swtpm-test.c b/tests/tpm-crb-swtpm-test.c
+> index c2bde0cbaa..2a22b032ca 100644
+> --- a/tests/tpm-crb-swtpm-test.c
+> +++ b/tests/tpm-crb-swtpm-test.c
+> @@ -15,12 +15,8 @@
+>  #include "qemu/osdep.h"
+>  #include <glib/gstdio.h>
+>
+> -#include "hw/acpi/tpm.h"
+> -#include "io/channel-socket.h"
+>  #include "libqtest.h"
+>  #include "tpm-util.h"
+> -#include "sysemu/tpm.h"
+> -#include "qapi/qmp/qdict.h"
+>
+>  typedef struct TestState {
+>      char *src_tpm_path;
+> @@ -28,93 +24,6 @@ typedef struct TestState {
+>      char *uri;
+>  } TestState;
+>
+> -bool got_stop;
+> -
+> -static void migrate(QTestState *who, const char *uri)
+> -{
+> -    QDict *rsp;
+> -    gchar *cmd;
+> -
+> -    cmd =3D g_strdup_printf("{ 'execute': 'migrate',"
+> -                          "'arguments': { 'uri': '%s' } }",
+> -                          uri);
+> -    rsp =3D qtest_qmp(who, cmd);
+> -    g_free(cmd);
+> -    g_assert(qdict_haskey(rsp, "return"));
+> -    qobject_unref(rsp);
+> -}
+> -
+> -/*
+> - * Events can get in the way of responses we are actually waiting for.
+> - */
+> -static QDict *wait_command(QTestState *who, const char *command)
+> -{
+> -    const char *event_string;
+> -    QDict *response;
+> -
+> -    response =3D qtest_qmp(who, command);
+> -
+> -    while (qdict_haskey(response, "event")) {
+> -        /* OK, it was an event */
+> -        event_string =3D qdict_get_str(response, "event");
+> -        if (!strcmp(event_string, "STOP")) {
+> -            got_stop =3D true;
+> -        }
+> -        qobject_unref(response);
+> -        response =3D qtest_qmp_receive(who);
+> -    }
+> -    return response;
+> -}
+> -
+> -static void wait_for_migration_complete(QTestState *who)
+> -{
+> -    while (true) {
+> -        QDict *rsp, *rsp_return;
+> -        bool completed;
+> -        const char *status;
+> -
+> -        rsp =3D wait_command(who, "{ 'execute': 'query-migrate' }");
+> -        rsp_return =3D qdict_get_qdict(rsp, "return");
+> -        status =3D qdict_get_str(rsp_return, "status");
+> -        completed =3D strcmp(status, "completed") =3D=3D 0;
+> -        g_assert_cmpstr(status, !=3D,  "failed");
+> -        qobject_unref(rsp);
+> -        if (completed) {
+> -            return;
+> -        }
+> -        usleep(1000);
+> -    }
+> -}
+> -
+> -static void migration_start_qemu(QTestState **src_qemu, QTestState **dst=
+_qemu,
+> -                                 SocketAddress *src_tpm_addr,
+> -                                 SocketAddress *dst_tpm_addr,
+> -                                 const char *miguri)
+> -{
+> -    char *src_qemu_args, *dst_qemu_args;
+> -
+> -    src_qemu_args =3D g_strdup_printf(
+> -        "-chardev socket,id=3Dchr,path=3D%s "
+> -        "-tpmdev emulator,id=3Ddev,chardev=3Dchr "
+> -        "-device tpm-crb,tpmdev=3Ddev ",
+> -        src_tpm_addr->u.q_unix.path);
+> -
+> -    *src_qemu =3D qtest_init(src_qemu_args);
+> -
+> -    dst_qemu_args =3D g_strdup_printf(
+> -        "-chardev socket,id=3Dchr,path=3D%s "
+> -        "-tpmdev emulator,id=3Ddev,chardev=3Dchr "
+> -        "-device tpm-crb,tpmdev=3Ddev "
+> -        "-incoming %s",
+> -        dst_tpm_addr->u.q_unix.path,
+> -        miguri);
+> -
+> -    *dst_qemu =3D qtest_init(dst_qemu_args);
+> -
+> -    free(src_qemu_args);
+> -    free(dst_qemu_args);
+> -}
+> -
+>  static void tpm_crb_swtpm_test(const void *data)
+>  {
+>      char *args =3D NULL;
+> @@ -183,8 +92,9 @@ static void tpm_crb_swtpm_migration_test(const void *d=
+ata)
+>          goto err_src_tpm_kill;
+>      }
+>
+> -    migration_start_qemu(&src_qemu, &dst_qemu, src_tpm_addr, dst_tpm_add=
+r,
+> -                         ts->uri);
+> +    tpm_util_migration_start_qemu(&src_qemu, &dst_qemu,
+> +                                  src_tpm_addr, dst_tpm_addr,
+> +                                  ts->uri);
+>
+>      tpm_util_startup(src_qemu, tpm_util_crb_transfer);
+>      tpm_util_pcrextend(src_qemu, tpm_util_crb_transfer);
+> @@ -197,8 +107,8 @@ static void tpm_crb_swtpm_migration_test(const void *=
+data)
+>      tpm_util_pcrread(src_qemu, tpm_util_crb_transfer, tpm_pcrread_resp,
+>                       sizeof(tpm_pcrread_resp));
+>
+> -    migrate(src_qemu, ts->uri);
+> -    wait_for_migration_complete(src_qemu);
+> +    tpm_util_migrate(src_qemu, ts->uri);
+> +    tpm_util_wait_for_migration_complete(src_qemu);
+>
+>      tpm_util_pcrread(dst_qemu, tpm_util_crb_transfer, tpm_pcrread_resp,
+>                       sizeof(tpm_pcrread_resp));
+> diff --git a/tests/tpm-util.c b/tests/tpm-util.c
+> index c9b3947c1c..e6e3b922fa 100644
+> --- a/tests/tpm-util.c
+> +++ b/tests/tpm-util.c
+> @@ -17,6 +17,9 @@
+>  #include "hw/acpi/tpm.h"
+>  #include "libqtest.h"
+>  #include "tpm-util.h"
+> +#include "qapi/qmp/qdict.h"
+> +
+> +static bool got_stop;
+>
+>  void tpm_util_crb_transfer(QTestState *s,
+>                             const unsigned char *req, size_t req_size,
+> @@ -184,3 +187,89 @@ void tpm_util_swtpm_kill(GPid pid)
+>
+>      kill(pid, SIGKILL);
+>  }
+> +
+> +void tpm_util_migrate(QTestState *who, const char *uri)
+> +{
+> +    QDict *rsp;
+> +    gchar *cmd;
+> +
+> +    cmd =3D g_strdup_printf("{ 'execute': 'migrate',"
+> +                          "'arguments': { 'uri': '%s' } }",
+> +                          uri);
+> +    rsp =3D qtest_qmp(who, cmd);
+> +    g_free(cmd);
+> +    g_assert(qdict_haskey(rsp, "return"));
+> +    qobject_unref(rsp);
+> +}
+> +
+> +/*
+> + * Events can get in the way of responses we are actually waiting for.
+> + */
+> +static QDict *tpm_util_wait_command(QTestState *who, const char *command=
+)
+> +{
+> +    const char *event_string;
+> +    QDict *response;
+> +
+> +    response =3D qtest_qmp(who, command);
+> +
+> +    while (qdict_haskey(response, "event")) {
+> +        /* OK, it was an event */
+> +        event_string =3D qdict_get_str(response, "event");
+> +        if (!strcmp(event_string, "STOP")) {
+> +            got_stop =3D true;
+> +        }
+> +        qobject_unref(response);
+> +        response =3D qtest_qmp_receive(who);
+> +    }
+> +    return response;
+> +}
+> +
+> +void tpm_util_wait_for_migration_complete(QTestState *who)
+> +{
+> +    while (true) {
+> +        QDict *rsp, *rsp_return;
+> +        bool completed;
+> +        const char *status;
+> +
+> +        rsp =3D tpm_util_wait_command(who, "{ 'execute': 'query-migrate'=
+ }");
+> +        rsp_return =3D qdict_get_qdict(rsp, "return");
+> +        status =3D qdict_get_str(rsp_return, "status");
+> +        completed =3D strcmp(status, "completed") =3D=3D 0;
+> +        g_assert_cmpstr(status, !=3D,  "failed");
+> +        qobject_unref(rsp);
+> +        if (completed) {
+> +            return;
+> +        }
+> +        usleep(1000);
+> +    }
+> +}
+> +
+> +void tpm_util_migration_start_qemu(QTestState **src_qemu,
+> +                                   QTestState **dst_qemu,
+> +                                   SocketAddress *src_tpm_addr,
+> +                                   SocketAddress *dst_tpm_addr,
+> +                                   const char *miguri)
+> +{
+> +    char *src_qemu_args, *dst_qemu_args;
+> +
+> +    src_qemu_args =3D g_strdup_printf(
+> +        "-chardev socket,id=3Dchr,path=3D%s "
+> +        "-tpmdev emulator,id=3Ddev,chardev=3Dchr "
+> +        "-device tpm-crb,tpmdev=3Ddev ",
+> +        src_tpm_addr->u.q_unix.path);
+> +
+> +    *src_qemu =3D qtest_init(src_qemu_args);
+> +
+> +    dst_qemu_args =3D g_strdup_printf(
+> +        "-chardev socket,id=3Dchr,path=3D%s "
+> +        "-tpmdev emulator,id=3Ddev,chardev=3Dchr "
+> +        "-device tpm-crb,tpmdev=3Ddev "
+> +        "-incoming %s",
+> +        dst_tpm_addr->u.q_unix.path,
+> +        miguri);
+> +
+> +    *dst_qemu =3D qtest_init(dst_qemu_args);
+> +
+> +    free(src_qemu_args);
+> +    free(dst_qemu_args);
+> +}
+> diff --git a/tests/tpm-util.h b/tests/tpm-util.h
+> index d155d99aea..b6253106d9 100644
+> --- a/tests/tpm-util.h
+> +++ b/tests/tpm-util.h
+> @@ -33,4 +33,14 @@ gboolean tpm_util_swtpm_start(const char *path, GPid *=
+pid,
+>                                SocketAddress **addr, GError **error);
+>  void tpm_util_swtpm_kill(GPid pid);
+>
+> +void tpm_util_migrate(QTestState *who, const char *uri);
+> +
+> +void tpm_util_migration_start_qemu(QTestState **src_qemu,
+> +                                   QTestState **dst_qemu,
+> +                                   SocketAddress *src_tpm_addr,
+> +                                   SocketAddress *dst_tpm_addr,
+> +                                   const char *miguri);
+> +
+> +void tpm_util_wait_for_migration_complete(QTestState *who);
+> +
+>  #endif /* TESTS_TPM_UTIL_H */
+> --
+> 2.14.3
+>
+>
 
-OK, that sounds better.
 
-Dave
 
-> Thank you.
-> 
-> >
-> >   If (a) is false and we actually share a single QEMUFile then
-> >  that race at the end happens.
-> >
-> > Dave
-> >
-> >
-> >>      trace_qemu_file_fclose();
-> >>      return ret;
-> >> --
-> >> 1.8.3.1
-> >>
-> > --
-> > Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+--=20
+Marc-Andr=C3=A9 Lureau
