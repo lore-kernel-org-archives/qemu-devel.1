@@ -1,20 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58652)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59386)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1fONiz-0003Iw-9K
-	for qemu-devel@nongnu.org; Thu, 31 May 2018 09:34:42 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1fONlj-0004Az-42
+	for qemu-devel@nongnu.org; Thu, 31 May 2018 09:37:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1fONiy-0003L7-ET
-	for qemu-devel@nongnu.org; Thu, 31 May 2018 09:34:41 -0400
-Date: Thu, 31 May 2018 14:34:32 +0100
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20180531133432.GB799@stefanha-x1.localdomain>
-References: <20180530194238.22774-1-stefanha@redhat.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1fONlh-0004zM-Vr
+	for qemu-devel@nongnu.org; Thu, 31 May 2018 09:37:31 -0400
+Received: from mail-ot0-x241.google.com ([2607:f8b0:4003:c0f::241]:33304)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1fONlh-0004yp-LE
+	for qemu-devel@nongnu.org; Thu, 31 May 2018 09:37:29 -0400
+Received: by mail-ot0-x241.google.com with SMTP id h6-v6so6237258otj.0
+	for <qemu-devel@nongnu.org>; Thu, 31 May 2018 06:37:29 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="aM3YZ0Iwxop3KEKx"
-Content-Disposition: inline
-In-Reply-To: <20180530194238.22774-1-stefanha@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] main-loop: drop spin_counter
+In-Reply-To: <CAFEAcA8XkCAK1GKHXKEBgxrVW75E9i3cDFw0iF68V7y7x8h-0A@mail.gmail.com>
+References: <20180521140402.23318-1-peter.maydell@linaro.org>
+	<87a9fff7-0a53-6b52-eb2c-e721556cf87b@redhat.com>
+	<CAFEAcA8XkCAK1GKHXKEBgxrVW75E9i3cDFw0iF68V7y7x8h-0A@mail.gmail.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 31 May 2018 14:37:08 +0100
+Message-ID: <CAFEAcA8vFEX0oMJcU112MMGyMue6k7BCmBD-L30b920RXqnLHA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH 00/27] iommu: support txattrs,
+ support TCG execution, implement TZ MPC
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,55 +31,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, Richard Henderson <rth@twiddle.net>, =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>, "patches@linaro.org" <patches@linaro.org>
 
+On 31 May 2018 at 10:54, Peter Maydell <peter.maydell@linaro.org> wrote:
+> On 30 May 2018 at 17:58, Paolo Bonzini <pbonzini@redhat.com> wrote:
+>> Go ahead and apply it through the ARM tree.  Thanks!
+>
+> It needs a v2 (there are some patches that need fixing),
+> and some of the tail end of the patchset hasn't been reviewed,
+> and I'm not sure if we have consensus on the IOMMU API changes
+> completely yet. But if you're happy we're going in the right
+> direction I can apply 1-13 via target-arm.next (that's the
+> "plumb TxAttrs through various functions" patches). That will
+> reduce the size of the patchset and make conflicts less likely.
 
---aM3YZ0Iwxop3KEKx
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+I'm putting patches 1-13 (initial plumbing) and 22 (adding
+VMSTATE_BOOL_SUB_ARRAY) into target-arm.next.
 
-On Wed, May 30, 2018 at 08:42:38PM +0100, Stefan Hajnoczi wrote:
-> Commit d759c951f3287fad04210a52f2dc93f94cf58c7f ("replay: push
-> replay_mutex_lock up the call tree") removed the !timeout lock
-> optimization in the main loop.
->=20
-> The idea of the optimization was to avoid ping-pongs between threads by
-> keeping the Big QEMU Lock held across non-blocking (!timeout) main loop
-> iterations.
->=20
-> A warning is printed when the main loop spins without releasing BQL for
-> long periods of time.  These warnings were supposed to aid debugging but
-> in practice they just alarm users.  They are considered noise because
-> the cause of spinning is not shown and is hard to find.
->=20
-> Now that the lock optimization has been removed, there is no danger of
-> hogging the BQL.  Drop the spin counter and the infamous warning.
->=20
-> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
-> ---
->  util/main-loop.c                 | 25 -------------------------
->  tests/qemu-iotests/common.filter |  1 -
->  2 files changed, 26 deletions(-)
+The rest will need a respin to fix minor nits and some
+conflicts with things that are now in master.
 
-Thanks, applied to my block tree:
-https://github.com/stefanha/qemu/commits/block
-
-Stefan
-
---aM3YZ0Iwxop3KEKx
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJbD/noAAoJEJykq7OBq3PIzRYIALK6s1lfSmm7yIdzsasp7X9u
-CI8fy6vEn4X3WDSdOet50M9q4boMPIgwZgWYn4rnX2ZMqGJlVP7veNXo21khanm9
-1wUaD4C2LE2fjhSyC1HhJj3f9fwzVjE4iVnpFMndGfeWetpyzaVFn+h0t9UkrIKg
-j8dtzIHTuelYDqNavPySqfJfec+Z3yXlo0mpEbb9FJoaM8E2Obd5FNlIj5mrEhLp
-s5/NYdz9t+k4EMZf33rw/8GYo2PHGITJzbEOciQYyA4UIE4s8KO/5VY6Wgc6H8gk
-uyeBb2Xrj9yEIjW7doyQ/EZdyMYhTda6U7v5p14cSXIFe13M+quWyVkgo0+VrB4=
-=yscf
------END PGP SIGNATURE-----
-
---aM3YZ0Iwxop3KEKx--
+thanks
+-- PMM
