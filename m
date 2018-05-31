@@ -1,27 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36389)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38926)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fOKqs-0006m1-Es
-	for qemu-devel@nongnu.org; Thu, 31 May 2018 06:30:40 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1fOL2y-0000bF-92
+	for qemu-devel@nongnu.org; Thu, 31 May 2018 06:43:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fOKqr-0003jb-G5
-	for qemu-devel@nongnu.org; Thu, 31 May 2018 06:30:38 -0400
-Received: from mail-ot0-x243.google.com ([2607:f8b0:4003:c0f::243]:39832)
+	(envelope-from <alex.bennee@linaro.org>) id 1fOL2t-0000UA-S9
+	for qemu-devel@nongnu.org; Thu, 31 May 2018 06:43:08 -0400
+Received: from mail-wm0-x232.google.com ([2a00:1450:400c:c09::232]:34334)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fOKqr-0003i0-9c
-	for qemu-devel@nongnu.org; Thu, 31 May 2018 06:30:37 -0400
-Received: by mail-ot0-x243.google.com with SMTP id l12-v6so24728559oth.6
-	for <qemu-devel@nongnu.org>; Thu, 31 May 2018 03:30:37 -0700 (PDT)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1fOL2t-0000TT-9j
+	for qemu-devel@nongnu.org; Thu, 31 May 2018 06:43:03 -0400
+Received: by mail-wm0-x232.google.com with SMTP id q4-v6so2327063wmq.1
+	for <qemu-devel@nongnu.org>; Thu, 31 May 2018 03:43:02 -0700 (PDT)
+References: <1526945967-9687-1-git-send-email-cota@braap.org>
+	<1526945967-9687-3-git-send-email-cota@braap.org>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <1526945967-9687-3-git-send-email-cota@braap.org>
+Date: Thu, 31 May 2018 11:43:00 +0100
+Message-ID: <87603414y3.fsf@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <20180529220338.10879-2-jusual@mail.ru>
-References: <20180529220338.10879-1-jusual@mail.ru>
-	<20180529220338.10879-2-jusual@mail.ru>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 31 May 2018 11:30:16 +0100
-Message-ID: <CAFEAcA-vWHUnpqkPY07398t9==eiCPyQBvKLHG=XR9xU2ust7g@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [RFC 1/3] hw/arm/nrf51_soc: Fix compilation and
- memory regions
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v3 02/17] qht: return existing entry when
+ qht_insert fails
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,75 +31,199 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Julia Suvorova <jusual@mail.ru>
-Cc: qemu-devel <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@gmail.com>, Joel Stanley <joel@jms.id.au>, Jim Mussared <jim@groklearning.com>, =?UTF-8?Q?Steffen_G=C3=B6rtz?= <mail@steffen-goertz.de>
+To: "Emilio G. Cota" <cota@braap.org>
+Cc: qemu-devel@nongnu.org, Richard Henderson <richard.henderson@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>
 
-On 29 May 2018 at 23:03, Julia Suvorova <jusual@mail.ru> wrote:
-> nRF51 SoC implementation is intended for the BBC Micro:bit board,
-> which has 256 KB flash and 16 KB RAM.
-> Added FICR defines.
+
+Emilio G. Cota <cota@braap.org> writes:
+
+> The meaning of "existing" is now changed to "matches in hash and
+> ht->cmp result". This is saner than just checking the pointer value.
 >
-> Signed-off-by: Julia Suvorova <jusual@mail.ru>
+> Suggested-by: Richard Henderson <richard.henderson@linaro.org>
+> Reviewed-by:  Richard Henderson <richard.henderson@linaro.org>
+> Signed-off-by: Emilio G. Cota <cota@braap.org>
+
+Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+
 > ---
->  hw/arm/nrf51_soc.c         | 12 +++++++-----
->  include/hw/arm/nrf51_soc.h |  1 +
->  2 files changed, 8 insertions(+), 5 deletions(-)
+>  include/qemu/qht.h        |  7 +++++--
+>  accel/tcg/translate-all.c |  2 +-
+>  tests/qht-bench.c         |  4 ++--
+>  tests/test-qht.c          |  8 +++++++-
+>  util/qht.c                | 27 +++++++++++++++++----------
+>  5 files changed, 32 insertions(+), 16 deletions(-)
 >
-> diff --git a/hw/arm/nrf51_soc.c b/hw/arm/nrf51_soc.c
-> index e59ba7079f..6fe06dcfd2 100644
-> --- a/hw/arm/nrf51_soc.c
-> +++ b/hw/arm/nrf51_soc.c
-> @@ -26,15 +26,17 @@
->  #define IOMEM_SIZE      0x20000000
+> diff --git a/include/qemu/qht.h b/include/qemu/qht.h
+> index 5f03a0f..1fb9116 100644
+> --- a/include/qemu/qht.h
+> +++ b/include/qemu/qht.h
+> @@ -70,6 +70,7 @@ void qht_destroy(struct qht *ht);
+>   * @ht: QHT to insert to
+>   * @p: pointer to be inserted
+>   * @hash: hash corresponding to @p
+> + * @existing: address where the pointer to an existing entry can be copi=
+ed to
+>   *
+>   * Attempting to insert a NULL @p is a bug.
+>   * Inserting the same pointer @p with different @hash values is a bug.
+> @@ -78,9 +79,11 @@ void qht_destroy(struct qht *ht);
+>   * inserted into the hash table.
+>   *
+>   * Returns true on success.
+> - * Returns false if the @p-@hash pair already exists in the hash table.
+> + * Returns false if there is an existing entry in the table that is equi=
+valent
+> + * (i.e. ht->cmp matches and the hash is the same) to @p-@h. If @existing
+> + * is !NULL, a pointer to this existing entry is copied to it.
+>   */
+> -bool qht_insert(struct qht *ht, void *p, uint32_t hash);
+> +bool qht_insert(struct qht *ht, void *p, uint32_t hash, void **existing);
 >
->  #define FLASH_BASE      0x00000000
-> -#define FLASH_SIZE      (144 * 1024)
-> +#define FLASH_SIZE      (256 * 1024)
-> +
-> +#define FICR_BASE       0x10000000
-> +#define FICR_SIZE       0x100
+>  /**
+>   * qht_lookup_custom - Look up a pointer using a custom comparison funct=
+ion.
+> diff --git a/accel/tcg/translate-all.c b/accel/tcg/translate-all.c
+> index 5b7b91d..8080eb7 100644
+> --- a/accel/tcg/translate-all.c
+> +++ b/accel/tcg/translate-all.c
+> @@ -1242,7 +1242,7 @@ static void tb_link_page(TranslationBlock *tb, tb_p=
+age_addr_t phys_pc,
+>      /* add in the hash table */
+>      h =3D tb_hash_func(phys_pc, tb->pc, tb->flags, tb->cflags & CF_HASH_=
+MASK,
+>                       tb->trace_vcpu_dstate);
+> -    qht_insert(&tb_ctx.htable, tb, h);
+> +    qht_insert(&tb_ctx.htable, tb, h, NULL);
 >
->  #define SRAM_BASE       0x20000000
-> -#define SRAM_SIZE       (6 * 1024)
-> +#define SRAM_SIZE       (16 * 1024)
+>  #ifdef CONFIG_USER_ONLY
+>      if (DEBUG_TB_CHECK_GATE) {
+> diff --git a/tests/qht-bench.c b/tests/qht-bench.c
+> index c94ac25..f492b3a 100644
+> --- a/tests/qht-bench.c
+> +++ b/tests/qht-bench.c
+> @@ -163,7 +163,7 @@ static void do_rw(struct thread_info *info)
+>              bool written =3D false;
 >
->  static void nrf51_soc_realize(DeviceState *dev_soc, Error **errp)
->  {
->      NRF51State *s = NRF51_SOC(dev_soc);
-> -    DeviceState *nvic;
->      Error *err = NULL;
+>              if (qht_lookup(&ht, p, hash) =3D=3D NULL) {
+> -                written =3D qht_insert(&ht, p, hash);
+> +                written =3D qht_insert(&ht, p, hash, NULL);
+>              }
+>              if (written) {
+>                  stats->in++;
+> @@ -322,7 +322,7 @@ static void htable_init(void)
+>              r =3D xorshift64star(r);
+>              p =3D &keys[r & (init_range - 1)];
+>              hash =3D h(*p);
+> -            if (qht_insert(&ht, p, hash)) {
+> +            if (qht_insert(&ht, p, hash, NULL)) {
+>                  break;
+>              }
+>              retries++;
+> diff --git a/tests/test-qht.c b/tests/test-qht.c
+> index b069881..dda6a06 100644
+> --- a/tests/test-qht.c
+> +++ b/tests/test-qht.c
+> @@ -27,11 +27,17 @@ static void insert(int a, int b)
 >
->      /* IO space */
-> @@ -69,8 +71,8 @@ static void nrf51_soc_realize(DeviceState *dev_soc, Error **errp)
->      memory_region_add_subregion(system_memory, SRAM_BASE, sram);
+>      for (i =3D a; i < b; i++) {
+>          uint32_t hash;
+> +        void *existing;
+> +        bool inserted;
 >
->      /* TODO: implement a cortex m0 and update this */
-> -    nvic = armv7m_init(get_system_memory(), FLASH_SIZE, 96,
-> -            s->kernel_filename, ARM_CPU_TYPE_NAME("cortex-m3"));
-> +    s->nvic = armv7m_init(get_system_memory(), FLASH_SIZE, 96,
-> +               s->kernel_filename, ARM_CPU_TYPE_NAME("cortex-m3"));
+>          arr[i] =3D i;
+>          hash =3D i;
+>
+> -        qht_insert(&ht, &arr[i], hash);
+> +        inserted =3D qht_insert(&ht, &arr[i], hash, NULL);
+> +        g_assert_true(inserted);
+> +        inserted =3D qht_insert(&ht, &arr[i], hash, &existing);
+> +        g_assert_false(inserted);
+> +        g_assert_true(existing =3D=3D &arr[i]);
+>      }
 >  }
 >
->  static Property nrf51_soc_properties[] = {
-> diff --git a/include/hw/arm/nrf51_soc.h b/include/hw/arm/nrf51_soc.h
-> index 5431d200f8..a6bbe9f108 100644
-> --- a/include/hw/arm/nrf51_soc.h
-> +++ b/include/hw/arm/nrf51_soc.h
-> @@ -23,6 +23,7 @@ typedef struct NRF51State {
+> diff --git a/util/qht.c b/util/qht.c
+> index 8610ce3..9d030e7 100644
+> --- a/util/qht.c
+> +++ b/util/qht.c
+> @@ -511,9 +511,9 @@ void *qht_lookup(struct qht *ht, const void *userp, u=
+int32_t hash)
+>  }
 >
->      /*< public >*/
->      char *kernel_filename;
-> +    DeviceState *nvic;
+>  /* call with head->lock held */
+> -static bool qht_insert__locked(struct qht *ht, struct qht_map *map,
+> -                               struct qht_bucket *head, void *p, uint32_=
+t hash,
+> -                               bool *needs_resize)
+> +static void *qht_insert__locked(struct qht *ht, struct qht_map *map,
+> +                                struct qht_bucket *head, void *p, uint32=
+_t hash,
+> +                                bool *needs_resize)
+>  {
+>      struct qht_bucket *b =3D head;
+>      struct qht_bucket *prev =3D NULL;
+> @@ -523,8 +523,9 @@ static bool qht_insert__locked(struct qht *ht, struct=
+ qht_map *map,
+>      do {
+>          for (i =3D 0; i < QHT_BUCKET_ENTRIES; i++) {
+>              if (b->pointers[i]) {
+> -                if (unlikely(b->pointers[i] =3D=3D p)) {
+> -                    return false;
+> +                if (unlikely(b->hashes[i] =3D=3D hash &&
+> +                             ht->cmp(b->pointers[i], p))) {
+> +                    return b->pointers[i];
+>                  }
+>              } else {
+>                  goto found;
+> @@ -553,7 +554,7 @@ static bool qht_insert__locked(struct qht *ht, struct=
+ qht_map *map,
+>      atomic_set(&b->hashes[i], hash);
+>      atomic_set(&b->pointers[i], p);
+>      seqlock_write_end(&head->sequence);
+> -    return true;
+> +    return NULL;
+>  }
 >
->      MemoryRegion iomem;
->  } NRF51State;
+>  static __attribute__((noinline)) void qht_grow_maybe(struct qht *ht)
+> @@ -577,25 +578,31 @@ static __attribute__((noinline)) void qht_grow_mayb=
+e(struct qht *ht)
+>      qemu_mutex_unlock(&ht->lock);
+>  }
+>
+> -bool qht_insert(struct qht *ht, void *p, uint32_t hash)
+> +bool qht_insert(struct qht *ht, void *p, uint32_t hash, void **existing)
+>  {
+>      struct qht_bucket *b;
+>      struct qht_map *map;
+>      bool needs_resize =3D false;
+> -    bool ret;
+> +    void *prev;
+>
+>      /* NULL pointers are not supported */
+>      qht_debug_assert(p);
+>
+>      b =3D qht_bucket_lock__no_stale(ht, hash, &map);
+> -    ret =3D qht_insert__locked(ht, map, b, p, hash, &needs_resize);
+> +    prev =3D qht_insert__locked(ht, map, b, p, hash, &needs_resize);
+>      qht_bucket_debug__locked(b);
+>      qemu_spin_unlock(&b->lock);
+>
+>      if (unlikely(needs_resize) && ht->mode & QHT_MODE_AUTO_RESIZE) {
+>          qht_grow_maybe(ht);
+>      }
+> -    return ret;
+> +    if (likely(prev =3D=3D NULL)) {
+> +        return true;
+> +    }
+> +    if (existing) {
+> +        *existing =3D prev;
+> +    }
+> +    return false;
+>  }
+>
+>  static inline bool qht_entry_is_last(struct qht_bucket *b, int pos)
 
-The better approach here (which I think I suggested in review
-of Joel's patches) is to have the armv7m object embedded in the
-NRF51State. Then you can initialize and realize it in-place,
-and the board code calls armv7m_load_kernel() rather than
-having to pass the kernel filename to the SoC. (Nothing then
-needs to call armv7m_init() at all.)
 
-thanks
--- PMM
+--
+Alex Benn=C3=A9e
