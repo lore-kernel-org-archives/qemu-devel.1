@@ -1,29 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37522)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38568)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1fORaT-0001Oo-9m
-	for qemu-devel@nongnu.org; Thu, 31 May 2018 13:42:13 -0400
+	(envelope-from <bounces@canonical.com>) id 1fOReb-0004lc-0j
+	for qemu-devel@nongnu.org; Thu, 31 May 2018 13:46:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1fORaR-0005TN-VU
-	for qemu-devel@nongnu.org; Thu, 31 May 2018 13:42:09 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:42116 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1fORaR-0005Rn-QD
-	for qemu-devel@nongnu.org; Thu, 31 May 2018 13:42:07 -0400
-Date: Thu, 31 May 2018 20:42:05 +0300
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20180531203837-mutt-send-email-mst@kernel.org>
-References: <1524550428-27173-1-git-send-email-wei.w.wang@intel.com>
-	<1524550428-27173-5-git-send-email-wei.w.wang@intel.com>
-	<20180529181221-mutt-send-email-mst@kernel.org>
-	<5B0E6AE9.2030505@intel.com>
-	<20180530154325-mutt-send-email-mst@kernel.org>
-	<5B0F5D74.603@intel.com>
+	(envelope-from <bounces@canonical.com>) id 1fOReX-0001Il-36
+	for qemu-devel@nongnu.org; Thu, 31 May 2018 13:46:25 -0400
+Received: from indium.canonical.com ([91.189.90.7]:35220)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1fOReW-0001HO-SF
+	for qemu-devel@nongnu.org; Thu, 31 May 2018 13:46:20 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1fOReT-0006hU-TD
+	for <qemu-devel@nongnu.org>; Thu, 31 May 2018 17:46:18 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 02B052E88E3
+	for <qemu-devel@nongnu.org>; Thu, 31 May 2018 17:46:17 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <5B0F5D74.603@intel.com>
-Subject: Re: [Qemu-devel] [PATCH v7 4/5] virtio-balloon:
- VIRTIO_BALLOON_F_FREE_PAGE_HINT
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Thu, 31 May 2018 17:36:37 -0000
+From: John Snow <1766904@bugs.launchpad.net>
+Reply-To: Bug 1766904 <1766904@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <152466858890.21548.13995835103547275465.malonedeb@soybean.canonical.com>
+Message-Id: <152778819769.24984.3431884000084086032.malone@gac.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1766904] Re: Creating high hdd load (with
+ constant fsyncs) on a SATA disk leads to freezes and errors in guest dmesg
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,86 +37,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Wei Wang <wei.w.wang@intel.com>
-Cc: qemu-devel@nongnu.org, virtio-dev@lists.oasis-open.org, quintela@redhat.com, dgilbert@redhat.com, pbonzini@redhat.com, liliang.opensource@gmail.com, yang.zhang.wz@gmail.com, quan.xu0@gmail.com, nilal@redhat.com, riel@redhat.com, zhang.zhanghailiang@huawei.com
+To: qemu-devel@nongnu.org
 
-On Thu, May 31, 2018 at 10:27:00AM +0800, Wei Wang wrote:
-> On 05/30/2018 08:47 PM, Michael S. Tsirkin wrote:
-> > On Wed, May 30, 2018 at 05:12:09PM +0800, Wei Wang wrote:
-> > > On 05/29/2018 11:24 PM, Michael S. Tsirkin wrote:
-> > > > On Tue, Apr 24, 2018 at 02:13:47PM +0800, Wei Wang wrote:
-> > > > > +/*
-> > > > > + * Balloon will report pages which were free at the time of this call. As the
-> > > > > + * reporting happens asynchronously, dirty bit logging must be enabled before
-> > > > > + * this call is made.
-> > > > > + */
-> > > > > +void balloon_free_page_start(void)
-> > > > > +{
-> > > > > +    balloon_free_page_start_fn(balloon_opaque);
-> > > > > +}
-> > > > Please create notifier support, not a single global.
-> > > OK. The start is called at the end of bitmap_sync, and the stop is called at
-> > > the beginning of bitmap_sync. In this case, we will need to add two
-> > > migration states, MIGRATION_STATUS_BEFORE_BITMAP_SYNC and
-> > > MIGRATION_STATUS_AFTER_BITMAP_SYNC, right?
-> > If that's the way you do it, you need to ask migration guys, not me.
-> 
-> Yeah, I know.. thanks for the virtio part.
-> 
-> > > > +
-> > > > +static bool virtio_balloon_free_page_support(void *opaque)
-> > > > +{
-> > > > +    VirtIOBalloon *s = opaque;
-> > > > +    VirtIODevice *vdev = VIRTIO_DEVICE(s);
-> > > > +
-> > > > +    return virtio_vdev_has_feature(vdev, VIRTIO_BALLOON_F_FREE_PAGE_HINT);
-> > > > or if poison is negotiated.
-> > > Will make it
-> > > return virtio_vdev_has_feature(vdev, VIRTIO_BALLOON_F_FREE_PAGE_HINT) &&
-> > > !virtio_vdev_has_feature(vdev, VIRTIO_BALLOON_F_PAGE_POISON)
-> > 
-> > I mean the reverse:
-> > 	virtio_vdev_has_feature(vdev, VIRTIO_BALLOON_F_FREE_PAGE_HINT) ||
-> > 	virtio_vdev_has_feature(vdev, VIRTIO_BALLOON_F_PAGE_POISON)
-> > 
-> > 
-> > If poison has been negotiated you must migrate the
-> > guest supplied value even if you don't use it for hints.
-> 
-> 
-> Just a little confused with the logic. Writing it that way means that we are
-> taking this possibility "virtio_vdev_has_feature(vdev,
-> VIRTIO_BALLOON_F_FREE_PAGE_HINT)=fasle, virtio_vdev_has_feature(vdev,
-> VIRTIO_BALLOON_F_PAGE_POISON)=true" into account, and let the support
-> function return true when F_FREE_PAGE_HINT isn't supported.
+Jake, can you try the fix I posted in
+https://bugs.launchpad.net/qemu/+bug/1769189 ? I'm not actually
+confident it's the same bug, but it might be worth a shot. It fixes a
+bug that was made more prominent inbetween 2.11 and 2.12, so it fits the
+timeline presented here.
 
-All I am saying is that in this configuration, you must migrate
-the poison value programmed by guest even if you do not
-yet use it without VIRTIO_BALLOON_F_FREE_PAGE_HINT.
+-- =
 
-Right now you have
-a section:
-+    .needed = virtio_balloon_free_page_support,
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1766904
 
-which includes the poison value.
+Title:
+  Creating high hdd load (with constant fsyncs) on a SATA disk leads to
+  freezes and errors in guest dmesg
 
-So if guest migrates after writing the poison value,
-it's lost. Not nice.
+Status in QEMU:
+  New
 
-> If guest doesn't support F_FREE_PAGE_HINT, it doesn't support the free page
-> reporting (even the free page vq). I'm not sure why we tell the migration
-> thread that the free page reporting feature is supported via this support
-> function. If the support function simply returns false when F_FREE_PAGE_HINT
-> isn't negotiated, the legacy migration already migrates the poisoned pages
-> (not skipped, but may be compressed).
-> 
-> I think it would be better to simply use the original "return
-> virtio_vdev_has_feature(vdev, VIRTIO_BALLOON_F_FREE_PAGE_HINT)" here.
+Bug description:
+  After upgrading from qemu 2.10.0+dfsg-2 to 2.12~rc3+dfsg-2 (on debian
+  sid host), centos 7 guest started to show freezes and ata errors in
+  dmesg during hdd workloads with writing many small files and repeated
+  fsyncs.
 
+  Host kernel 4.15.0-3-amd64.
+  Guest kernel 3.10.0-693.21.1.el7.x86_64 (slightly older guest kernel was =
+tested too with same result).
 
-So maybe you should put the poison value in a separate section then.
+  Script that reproduces the bug (first run usualy goes smooth, second
+  and later runs result in dmesg errors and freezes):
 
+  http://paste.debian.net/hidden/472fb220/
 
-> 
-> Best,
-> Wei
+  Sample of error messages in guest dmesg:
+
+  http://paste.debian.net/hidden/8219e234/
+
+  This vm is launchd using virsh start. VM launch command (from logfile
+  in /var/log/libvirt/qemu/):
+
+  http://paste.debian.net/plainh/5604126f
+
+  A workaround that I am using right now: I have detached this SATA
+  storage and reattached the same .qcow2 file as SCSI - this has fixed
+  the issue for me.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1766904/+subscriptions
