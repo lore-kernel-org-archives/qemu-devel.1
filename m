@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46846)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47803)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1fOOmc-0006yD-U3
-	for qemu-devel@nongnu.org; Thu, 31 May 2018 10:42:32 -0400
+	(envelope-from <eblake@redhat.com>) id 1fOOpA-0000gj-PS
+	for qemu-devel@nongnu.org; Thu, 31 May 2018 10:45:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1fOOmb-00030o-KX
-	for qemu-devel@nongnu.org; Thu, 31 May 2018 10:42:30 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:57238 helo=mx1.redhat.com)
+	(envelope-from <eblake@redhat.com>) id 1fOOp7-0004ib-NJ
+	for qemu-devel@nongnu.org; Thu, 31 May 2018 10:45:08 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:57540 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1fOOmb-00030e-Dz
-	for qemu-devel@nongnu.org; Thu, 31 May 2018 10:42:29 -0400
-Date: Thu, 31 May 2018 15:42:19 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20180531144217.GE2755@work-vm>
-References: <1525918138-6189-1-git-send-email-junyan.he@gmx.com>
-	<20180531131858.GL27838@stefanha-x1.localdomain>
-	<HK2PR06MB05315C48C2D953449EC5A0A7EB630@HK2PR06MB0531.apcprd06.prod.outlook.com>
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1fOOp7-0004iE-J5
+	for qemu-devel@nongnu.org; Thu, 31 May 2018 10:45:05 -0400
+References: <20180531051641.8473-1-peterx@redhat.com>
+	<20180531051641.8473-4-peterx@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <2ed65040-ddce-653e-c7c5-1d0b02c91e08@redhat.com>
+Date: Thu, 31 May 2018 09:44:46 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <HK2PR06MB05315C48C2D953449EC5A0A7EB630@HK2PR06MB0531.apcprd06.prod.outlook.com>
-Subject: Re: [Qemu-devel] [PATCH V5 0/9] nvdimm: guarantee persistence of
- QEMU writes to persistent memory
+In-Reply-To: <20180531051641.8473-4-peterx@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [RFC v2 3/4] monitor: remove "x-oob",
+ turn oob on by default
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,168 +29,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Junyan He <junyan.he@gmx.com>
-Cc: Stefan Hajnoczi <stefanha@gmail.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Haozhong Zhang <haozhong.zhang@intel.com>, "xiaoguangrong.eric@gmail.com" <xiaoguangrong.eric@gmail.com>, "crosthwaite.peter@gmail.com" <crosthwaite.peter@gmail.com>, "mst@redhat.com" <mst@redhat.com>, "ehabkost@redhat.com" <ehabkost@redhat.com>, "quintela@redhat.com" <quintela@redhat.com>, Junyan He <junyan.he@intel.com>, "stefanha@redhat.com" <stefanha@redhat.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "imammedo@redhat.com" <imammedo@redhat.com>, "rth@twiddle.net" <rth@twiddle.net>
+To: Peter Xu <peterx@redhat.com>, qemu-devel@nongnu.org
+Cc: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Fam Zheng <famz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Eric Auger <eric.auger@redhat.com>, John Snow <jsnow@redhat.com>, Markus Armbruster <armbru@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
 
-* Junyan He (junyan.he@gmx.com) wrote:
-> > Also, there was a discussion about leaving the code unchanged but adding
-> > an nvdimm_flush() call at the very end of migration.  I think someone
-> > benchmarked it but can't find the email.  Please post a link or
-> > summarize the results, because that approach would be much less
-> > invasive.  Thanks!
+On 05/31/2018 12:16 AM, Peter Xu wrote:
+> There was a regression reported by Eric Auger before with OOB:
 > 
+>    http://lists.gnu.org/archive/html/qemu-devel/2018-03/msg06231.html
 > 
-> And previous comments:
-> 
-> 
-> > > > 2. The migration/ram code is invasive.  Is it really necessary to
-> > > >    persist data each time pages are loaded from a migration stream?  It
-> > > >    seems simpler to migrate as normal and call pmem_persist() just once
-> > > >    after RAM has been migrated but before the migration completes.
-> > >
-> > > The concern is about the overhead of cache flush.
-> > >
-> > > In this patch series, if possible, QEMU will use pmem_mem{set,cpy}_nodrain
-> > > APIs to copy NVDIMM blocks. Those APIs use movnt (if it's available) and
-> > > can avoid the subsequent cache flush.
-> > >
-> > > Anyway, I'll make some microbenchmark to check which one will be better.
-> 
-> > The problem is not just the overhead; the problem is the code
-> > complexity; this series makes all the paths through the migration code
-> > more complex in places we wouldn't expect to change.
-> 
-> I already use the migration info tool and list the result in the Mail just after this patch set sent:
-> 
-> Disable all haozhong's pmem_drain and  pmem_memset_nodrain  kind function call
-> and make the cleanup function do the flush job like this:
-> 
-> static int ram_load_cleanup(void *opaque)
-> {
->     RAMBlock *rb;
->     RAMBLOCK_FOREACH(rb) {
->         if (ramblock_is_pmem(rb)) {
->             pmem_persist(rb->host, rb->used_length);
->          }
->     }
-> 
->     xbzrle_load_cleanup();
->     compress_threads_load_cleanup();
-> 
->     RAMBLOCK_FOREACH(rb) {
->         g_free(rb->receivedmap);
->         rb->receivedmap = NULL;
->     }
->     return 0;
-> }
-> 
-> 
-> The migrate info result is:
-> 
-> Haozhong's Manner
-> 
-> (qemu) migrate -d tcp:localhost:4444
-> (qemu) info migrate
-> globals:
-> store-global-state: on
-> only-migratable: off
-> send-configuration: on
-> send-section-footer: on
-> capabilities: xbzrle: off rdma-pin-all: off auto-converge: off zero-blocks: off compress: off events: off postcopy-ram: off x-colo: off release-ram: off block: off return-path: off pause-before-switchover: off x-multifd: off dirty-bitmaps: off postcopy-blocktime: off
-> Migration status: completed
-> total time: 333668 milliseconds
-> downtime: 17 milliseconds
-> setup: 50 milliseconds
-> transferred ram: 10938039 kbytes
-> throughput: 268.55 mbps
-> remaining ram: 0 kbytes
-> total ram: 11027272 kbytes
-> duplicate: 35533 pages
-> skipped: 0 pages
-> normal: 2729095 pages
-> normal bytes: 10916380 kbytes
-> dirty sync count: 4
-> page size: 4 kbytes
-> (qemu)
-> 
-> 
-> flush before complete
-> 
-> QEMU 2.12.50 monitor - type 'help' for more information
-> (qemu) migrate -d tcp:localhost:4444
-> (qemu) info migrate
-> globals:
-> store-global-state: on
-> only-migratable: off
-> send-configuration: on
-> send-section-footer: on
-> capabilities: xbzrle: off rdma-pin-all: off auto-converge: off zero-blocks: off compress: off events: off postcopy-ram: off x-colo: off release-ram: off block: off return-path: off pause-before-switchover: off x-multifd: off dirty-bitmaps: off postcopy-blocktime: off
-> Migration status: completed
-> total time: 334836 milliseconds
-> downtime: 17 milliseconds
-> setup: 49 milliseconds
-> transferred ram: 10978886 kbytes
-> throughput: 268.62 mbps
-> remaining ram: 0 kbytes
-> total ram: 11027272 kbytes
-> duplicate: 23149 pages
-> skipped: 0 pages
-> normal: 2739314 pages
-> normal bytes: 10957256 kbytes
-> dirty sync count: 4
-> page size: 4 kbytes
-> (qemu)
-> 
-> 
-> So Haozhong's manner seems to be a little faster and I choose to keep that.
-> 
-> If you want to choose this manner, the code will be clean and no need for
-> 
-> >   typedef struct {
-> >       void (*memset)(void *s, int c, size_t n);
-> >       void (*memcpy)(void *dest, const void *src, size_t n);
-> >   } MemoryOperations;
-> 
-> 
-> performance is close, and I am a little new in Qemu:), so both options are OK for me,
-> 
-> Which one do you prefer to?
+> The fix is 951702f39c ("monitor: bind dispatch bh to iohandler context",
+> 2018-04-10), which is in master already.
 
-The one with the least impact;  the migration code is getting more and
-more complex, so having to do the 'if (is_pmem)' check everywhere isn't
-nice,  passing an 'ops' pointer in is better.  However if you can do the
-'flush before complete' instead then the amount of code change is a LOT
-smaller.
-The only other question is whether from your pmem view, the
-flush-before-complete causes any problems;  in the worst case, how long
-could the flush take?
+s/, which is in master already//
 
-Dave
+(when reading the git log, it can be assumed that any commit id 
+referenced is already in master)
 
-> ________________________________
-> From: Stefan Hajnoczi <stefanha@gmail.com>
-> Sent: Thursday, May 31, 2018 1:18:58 PM
-> To: junyan.he@gmx.com
-> Cc: qemu-devel@nongnu.org; Haozhong Zhang; xiaoguangrong.eric@gmail.com; crosthwaite.peter@gmail.com; mst@redhat.com; dgilbert@redhat.com; ehabkost@redhat.com; quintela@redhat.com; Junyan He; stefanha@redhat.com; pbonzini@redhat.com; imammedo@redhat.com; rth@twiddle.net
-> Subject: Re: [Qemu-devel] [PATCH V5 0/9] nvdimm: guarantee persistence of QEMU writes to persistent memory
 > 
-> David Gilbert previously suggested a memory access interface.  I guess
-> it would look something like this:
+> For the bug, we turned Out-Of-Band feature of monitors off for 2.12
+> release.  Now we turn that on again after the 2.12 release.
 > 
->   typedef struct {
->       void (*memset)(void *s, int c, size_t n);
->       void (*memcpy)(void *dest, const void *src, size_t n);
->   } MemoryOperations;
+> This patch partly reverts be933ffc23 (monitor: new parameter "x-oob"),
+> meanwhile turn it on again by default for non-MUX QMPs.
 > 
-> That way code doesn't need if (pmem) A else B.  It can just do
-> mem_ops->foo().  Have you looked into this idea?
+> Signed-off-by: Peter Xu <peterx@redhat.com>
+> ---
+>   include/monitor/monitor.h |  1 -
+>   monitor.c                 | 17 +----------------
+>   tests/qmp-test.c          |  2 +-
+>   vl.c                      |  5 -----
+>   4 files changed, 2 insertions(+), 23 deletions(-)
 > 
-> Also, there was a discussion about leaving the code unchanged but adding
-> an nvdimm_flush() call at the very end of migration.  I think someone
-> benchmarked it but can't find the email.  Please post a link or
-> summarize the results, because that approach would be much less
-> invasive.  Thanks!
-> 
-> Stefan
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
