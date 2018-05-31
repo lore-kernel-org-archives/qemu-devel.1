@@ -1,28 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56981)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57553)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1fOKFY-0004nm-AO
-	for qemu-devel@nongnu.org; Thu, 31 May 2018 05:52:05 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1fOKIE-0005wv-84
+	for qemu-devel@nongnu.org; Thu, 31 May 2018 05:54:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1fOKFX-000567-J5
-	for qemu-devel@nongnu.org; Thu, 31 May 2018 05:52:04 -0400
-Received: from mail-wr0-x243.google.com ([2a00:1450:400c:c0c::243]:33491)
+	(envelope-from <peter.maydell@linaro.org>) id 1fOKID-0006xN-ID
+	for qemu-devel@nongnu.org; Thu, 31 May 2018 05:54:50 -0400
+Received: from mail-oi0-x244.google.com ([2607:f8b0:4003:c06::244]:39989)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
-	id 1fOKFX-00055Y-CO
-	for qemu-devel@nongnu.org; Thu, 31 May 2018 05:52:03 -0400
-Received: by mail-wr0-x243.google.com with SMTP id k16-v6so5116754wro.0
-	for <qemu-devel@nongnu.org>; Thu, 31 May 2018 02:52:03 -0700 (PDT)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1fOKID-0006x2-BA
+	for qemu-devel@nongnu.org; Thu, 31 May 2018 05:54:49 -0400
+Received: by mail-oi0-x244.google.com with SMTP id f79-v6so5036203oib.7
+	for <qemu-devel@nongnu.org>; Thu, 31 May 2018 02:54:49 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20180531074601.10647-4-slp@redhat.com>
-References: <20180531074601.10647-1-slp@redhat.com>
-	<20180531074601.10647-4-slp@redhat.com>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Thu, 31 May 2018 11:52:01 +0200
-Message-ID: <CAJ+F1CKfpATgpFpHa85Esvv9k_T3FG_pY4rsz_C5a20CWfUgiQ@mail.gmail.com>
+In-Reply-To: <87a9fff7-0a53-6b52-eb2c-e721556cf87b@redhat.com>
+References: <20180521140402.23318-1-peter.maydell@linaro.org>
+	<87a9fff7-0a53-6b52-eb2c-e721556cf87b@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 31 May 2018 10:54:28 +0100
+Message-ID: <CAFEAcA8XkCAK1GKHXKEBgxrVW75E9i3cDFw0iF68V7y7x8h-0A@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 3/3] hw/char/serial: Don't retry on
- serial_xmit if errno == EPIPE
+Subject: Re: [Qemu-devel] [PATCH 00/27] iommu: support txattrs,
+ support TCG execution, implement TZ MPC
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,48 +30,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Sergio Lopez <slp@redhat.com>
-Cc: "Daniel P. Berrange" <berrange@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, QEMU <qemu-devel@nongnu.org>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, Richard Henderson <rth@twiddle.net>, =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>, "patches@linaro.org" <patches@linaro.org>
 
-Hi
-
-On Thu, May 31, 2018 at 9:46 AM, Sergio Lopez <slp@redhat.com> wrote:
-> If writing to the frontend channel failed with EPIPE, don't set up a
-> retry. EPIPE is not a recoverable error, so trying again is a waste of CP=
-U
-> cycles.
+On 30 May 2018 at 17:58, Paolo Bonzini <pbonzini@redhat.com> wrote:
+> On 21/05/2018 16:03, Peter Maydell wrote:
+>> This patchset is a rather large one, but the first half is all
+>> fairly simple plumbing. It does four things:
+>>  * support IOMMUs that are aware of memory transaction attributes and
+>>    may generate different translations for different attributes
+>>  * support TCG execution out of memory which is behind an IOMMU
+>>  * implement the Arm TrustZone Memory Protection Controller
+>>    (which needs both the above features in the IOMMU core code)
+>>  * use the MPC in the mps2-an505 board
 >
-> If the vCPU writing to the serial device and emulator thread are pinned
-> to the same pCPU, it can also compromise the stability of the Guest OS,
-> as both threads will be competing for pCPU's time, with the vCPU
-> actively polling the serial device and barely giving time to the
-> emulator thread to make actual progress.
-> ---
->  hw/char/serial.c | 1 +
->  1 file changed, 1 insertion(+)
->
-> diff --git a/hw/char/serial.c b/hw/char/serial.c
-> index 2c080c9..f26e86b 100644
-> --- a/hw/char/serial.c
-> +++ b/hw/char/serial.c
-> @@ -262,6 +262,7 @@ static void serial_xmit(SerialState *s)
->              /* in loopback mode, say that we just received a char */
->              serial_receive1(s, &s->tsr, 1);
->          } else if (qemu_chr_fe_write(&s->chr, &s->tsr, 1) !=3D 1 &&
-> +                   errno !=3D EPIPE &&
->                     s->tsr_retry < MAX_XMIT_RETRY) {
+> Go ahead and apply it through the ARM tree.  Thanks!
 
-Instead of adding explicit handling of EPIPE, shouldn't the code be
-rewritten to treat -1 return && errno !=3D EAGAIN as fatal?
+It needs a v2 (there are some patches that need fixing),
+and some of the tail end of the patchset hasn't been reviewed,
+and I'm not sure if we have consensus on the IOMMU API changes
+completely yet. But if you're happy we're going in the right
+direction I can apply 1-13 via target-arm.next (that's the
+"plumb TxAttrs through various functions" patches). That will
+reduce the size of the patchset and make conflicts less likely.
 
->              assert(s->watch_tag =3D=3D 0);
->              s->watch_tag =3D
-> --
-> 1.8.3.1
->
->
-
-
-
---=20
-Marc-Andr=C3=A9 Lureau
+thanks
+-- PMM
