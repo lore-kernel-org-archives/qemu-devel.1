@@ -1,26 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42781)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43234)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1fOWaX-0004m7-Rw
-	for qemu-devel@nongnu.org; Thu, 31 May 2018 19:02:35 -0400
+	(envelope-from <keno@juliacomputing.com>) id 1fOWej-0006AO-7b
+	for qemu-devel@nongnu.org; Thu, 31 May 2018 19:06:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1fOWaU-0003RX-Pr
-	for qemu-devel@nongnu.org; Thu, 31 May 2018 19:02:33 -0400
-Resent-Message-Id: <E1fOWaU-0003RX-Pr@eggs.gnu.org>
-Received: from sender-of-o51.zoho.com ([135.84.80.216]:21125)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1fOWaU-0003RD-HE
-	for qemu-devel@nongnu.org; Thu, 31 May 2018 19:02:30 -0400
-In-Reply-To: <20180531224911.23725-1-richard.henderson@linaro.org>
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <152780770593.339.5642926988111336660@d39dc562802a>
+	(envelope-from <keno@juliacomputing.com>) id 1fOWei-00064z-Ft
+	for qemu-devel@nongnu.org; Thu, 31 May 2018 19:06:53 -0400
+Received: from mail-pg0-x234.google.com ([2607:f8b0:400e:c05::234]:45991)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <keno@juliacomputing.com>)
+	id 1fOWei-00064V-8f
+	for qemu-devel@nongnu.org; Thu, 31 May 2018 19:06:52 -0400
+Received: by mail-pg0-x234.google.com with SMTP id z1-v6so3437408pgv.12
+	for <qemu-devel@nongnu.org>; Thu, 31 May 2018 16:06:52 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Thu, 31 May 2018 16:01:46 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PATCH v5 0/6] linux-user: Reorg interp_prefix
- handling
+In-Reply-To: <CABV8kRwaVq1HRUh2aeObXOoC_UOinpkb0xKBQkBLqLMYz=omNQ@mail.gmail.com>
+References: <cover.1527310210.git.keno@alumni.harvard.edu>
+	<e47c58ca95c93503a9d85dc6d749acf9fe9c6e76.1527310210.git.keno@alumni.harvard.edu>
+	<20180530142026.7c59d967@bahia.lan>
+	<CABV8kRzAJxeEB4rb4R0o7Fx_uBqf82tDDWC_6o0Xht3-F63AOA@mail.gmail.com>
+	<20180531215624.2c7b7083@bahia.lan>
+	<CABV8kRwaVq1HRUh2aeObXOoC_UOinpkb0xKBQkBLqLMYz=omNQ@mail.gmail.com>
+From: Keno Fischer <keno@juliacomputing.com>
+Date: Thu, 31 May 2018 19:06:10 -0400
+Message-ID: <CABV8kRzLmfAiODxXNvYAxno1442_JS3DLBK3nADg05-p=_WjdA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH 11/13] 9p: darwin: Mark mknod as unsupported
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,76 +33,24 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: richard.henderson@linaro.org
-Cc: famz@redhat.com, qemu-devel@nongnu.org, peter.maydell@linaro.org, laurent@vivier.eu, evgreen@chromium.org
+To: Greg Kurz <groug@kaod.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Keno Fischer <keno@alumni.harvard.edu>
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
-c3NhZ2UtaWQ6IDIwMTgwNTMxMjI0OTExLjIzNzI1LTEtcmljaGFyZC5oZW5kZXJzb25AbGluYXJv
-Lm9yZwpTdWJqZWN0OiBbUWVtdS1kZXZlbF0gW1BBVENIIHY1IDAvNl0gbGludXgtdXNlcjogUmVv
-cmcgaW50ZXJwX3ByZWZpeCBoYW5kbGluZwoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9i
-aW4vYmFzaAoKQkFTRT1iYXNlCm49MQp0b3RhbD0kKGdpdCBsb2cgLS1vbmVsaW5lICRCQVNFLi4g
-fCB3YyAtbCkKZmFpbGVkPTAKCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxpbWl0IDAK
-Z2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lcyBUcnVlCmdpdCBjb25maWcgLS1sb2NhbCBk
-aWZmLmFsZ29yaXRobSBoaXN0b2dyYW0KCmNvbW1pdHM9IiQoZ2l0IGxvZyAtLWZvcm1hdD0lSCAt
-LXJldmVyc2UgJEJBU0UuLikiCmZvciBjIGluICRjb21taXRzOyBkbwogICAgZWNobyAiQ2hlY2tp
-bmcgUEFUQ0ggJG4vJHRvdGFsOiAkKGdpdCBsb2cgLW4gMSAtLWZvcm1hdD0lcyAkYykuLi4iCiAg
-ICBpZiAhIGdpdCBzaG93ICRjIC0tZm9ybWF0PWVtYWlsIHwgLi9zY3JpcHRzL2NoZWNrcGF0Y2gu
-cGwgLS1tYWlsYmFjayAtOyB0aGVuCiAgICAgICAgZmFpbGVkPTEKICAgICAgICBlY2hvCiAgICBm
-aQogICAgbj0kKChuKzEpKQpkb25lCgpleGl0ICRmYWlsZWQKPT09IFRFU1QgU0NSSVBUIEVORCA9
-PT0KClVwZGF0aW5nIDNjOGNmNWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMzODQKRnJv
-bSBodHRwczovL2dpdGh1Yi5jb20vcGF0Y2hldy1wcm9qZWN0L3FlbXUKICogW25ldyB0YWddICAg
-ICAgICAgICAgICAgcGF0Y2hldy8yMDE4MDUzMTIyNDkxMS4yMzcyNS0xLXJpY2hhcmQuaGVuZGVy
-c29uQGxpbmFyby5vcmcgLT4gcGF0Y2hldy8yMDE4MDUzMTIyNDkxMS4yMzcyNS0xLXJpY2hhcmQu
-aGVuZGVyc29uQGxpbmFyby5vcmcKU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0JwoyNzU1
-ZmExOTg2IGxpbnV4LXVzZXI6IFVzZSAqYXQgZnVuY3Rpb25zIHRvIGltcGxlbWVudCBpbnRlcnBf
-cHJlZml4CjhhZjVmNzU0ODkgbGludXgtdXNlcjogQ2hlY2sgaXNfaG9zdGZkIGluIG1tYXAgc3lz
-Y2FsbHMKODMzNzRjNTMyYSBsaW51eC11c2VyOiBDaGVjayBjb250YWluc19ob3N0ZmQgaW4gc2Vs
-ZWN0IHN5c2NhbGxzCjQxYjgwZWMxNDQgbGludXgtdXNlcjogQ2hlY2sgaXNfaG9zdGZkIGluIGRv
-X3N5c2NhbGwKZmIzYWEzYTBkOCBsaW51eC11c2VyOiBBZGQgaG9zdF9mZHMgYW5kIG1hbmlwdWxh
-dG9ycwoxMTU2Nzg5MWM1IGdkYnN0dWI6IFJldHVybiB0aGUgZmQgZnJvbSBnZGJzZXJ2ZXJfc3Rh
-cnQKCj09PSBPVVRQVVQgQkVHSU4gPT09CkNoZWNraW5nIFBBVENIIDEvNjogZ2Ric3R1YjogUmV0
-dXJuIHRoZSBmZCBmcm9tIGdkYnNlcnZlcl9zdGFydC4uLgpDaGVja2luZyBQQVRDSCAyLzY6IGxp
-bnV4LXVzZXI6IEFkZCBob3N0X2ZkcyBhbmQgbWFuaXB1bGF0b3JzLi4uCkNoZWNraW5nIFBBVENI
-IDMvNjogbGludXgtdXNlcjogQ2hlY2sgaXNfaG9zdGZkIGluIGRvX3N5c2NhbGwuLi4KQ2hlY2tp
-bmcgUEFUQ0ggNC82OiBsaW51eC11c2VyOiBDaGVjayBjb250YWluc19ob3N0ZmQgaW4gc2VsZWN0
-IHN5c2NhbGxzLi4uCkNoZWNraW5nIFBBVENIIDUvNjogbGludXgtdXNlcjogQ2hlY2sgaXNfaG9z
-dGZkIGluIG1tYXAgc3lzY2FsbHMuLi4KQ2hlY2tpbmcgUEFUQ0ggNi82OiBsaW51eC11c2VyOiBV
-c2UgKmF0IGZ1bmN0aW9ucyB0byBpbXBsZW1lbnQgaW50ZXJwX3ByZWZpeC4uLgpFUlJPUjogZG8g
-bm90IHVzZSBhc3NpZ25tZW50IGluIGlmIGNvbmRpdGlvbgojMjAwOiBGSUxFOiBsaW51eC11c2Vy
-L3N5c2NhbGwuYzo4NTQxOgorICAgICAgICAgICAgaWYgKCEoZm4gPSBsb2NrX3VzZXJfc3RyaW5n
-KGFyZzIpKSkgewoKRVJST1I6IGRvIG5vdCB1c2UgYXNzaWdubWVudCBpbiBpZiBjb25kaXRpb24K
-IzIxODogRklMRTogbGludXgtdXNlci9zeXNjYWxsLmM6ODU2MjoKKyAgICAgICAgaWYgKCEoZm4g
-PSBsb2NrX3VzZXJfc3RyaW5nKGFyZzEpKSkgewoKRVJST1I6IGRvIG5vdCB1c2UgYXNzaWdubWVu
-dCBpbiBpZiBjb25kaXRpb24KIzIzNjogRklMRTogbGludXgtdXNlci9zeXNjYWxsLmM6ODU3NzoK
-KyAgICAgICAgaWYgKCEoZm4gPSBsb2NrX3VzZXJfc3RyaW5nKGFyZzIpKSkgewoKRVJST1I6IGRv
-IG5vdCB1c2UgYXNzaWdubWVudCBpbiBpZiBjb25kaXRpb24KIzI1NDogRklMRTogbGludXgtdXNl
-ci9zeXNjYWxsLmM6ODczNToKKyAgICAgICAgICAgIGlmICghKGZuID0gbG9ja191c2VyX3N0cmlu
-ZyhhcmcxKSkpIHsKCkVSUk9SOiBkbyBub3QgdXNlIGFzc2lnbm1lbnQgaW4gaWYgY29uZGl0aW9u
-CiMzMzM6IEZJTEU6IGxpbnV4LXVzZXIvc3lzY2FsbC5jOjk3Njk6CisgICAgICAgIGlmICghKGZu
-ID0gbG9ja191c2VyX3N0cmluZyhhcmcxKSkpIHsKCkVSUk9SOiBkbyBub3QgdXNlIGFzc2lnbm1l
-bnQgaW4gaWYgY29uZGl0aW9uCiMzNDk6IEZJTEU6IGxpbnV4LXVzZXIvc3lzY2FsbC5jOjk4MDk6
-CisgICAgICAgIGlmICghKGZuID0gbG9ja191c2VyX3N0cmluZyhhcmcxKSkpIHsKCkVSUk9SOiBk
-byBub3QgdXNlIGFzc2lnbm1lbnQgaW4gaWYgY29uZGl0aW9uCiMzNjU6IEZJTEU6IGxpbnV4LXVz
-ZXIvc3lzY2FsbC5jOjEwMDk5OgorICAgICAgICBpZiAoIShmbiA9IGxvY2tfdXNlcl9zdHJpbmco
-YXJnMSkpKSB7CgpFUlJPUjogZG8gbm90IHVzZSBhc3NpZ25tZW50IGluIGlmIGNvbmRpdGlvbgoj
-MzgwOiBGSUxFOiBsaW51eC11c2VyL3N5c2NhbGwuYzoxMDExMToKKyAgICAgICAgaWYgKCEoZm4g
-PSBsb2NrX3VzZXJfc3RyaW5nKGFyZzEpKSkgewoKRVJST1I6IGRvIG5vdCB1c2UgYXNzaWdubWVu
-dCBpbiBpZiBjb25kaXRpb24KIzM5ODogRklMRTogbGludXgtdXNlci9zeXNjYWxsLmM6MTEzMDM6
-CisgICAgICAgIGlmICghKGZuID0gbG9ja191c2VyX3N0cmluZyhhcmcxKSkpIHsKCkVSUk9SOiBk
-byBub3QgdXNlIGFzc2lnbm1lbnQgaW4gaWYgY29uZGl0aW9uCiM0MTU6IEZJTEU6IGxpbnV4LXVz
-ZXIvc3lzY2FsbC5jOjExMzE3OgorICAgICAgICBpZiAoIShmbiA9IGxvY2tfdXNlcl9zdHJpbmco
-YXJnMSkpKSB7CgpFUlJPUjogZG8gbm90IHVzZSBhc3NpZ25tZW50IGluIGlmIGNvbmRpdGlvbgoj
-NDMzOiBGSUxFOiBsaW51eC11c2VyL3N5c2NhbGwuYzoxMTM0OToKKyAgICAgICAgaWYgKCEoZm4g
-PSBsb2NrX3VzZXJfc3RyaW5nKGFyZzIpKSkgewoKRVJST1I6IGRvIG5vdCB1c2UgYXNzaWdubWVu
-dCBpbiBpZiBjb25kaXRpb24KIzQ1MjogRklMRTogbGludXgtdXNlci9zeXNjYWxsLmM6MTIzOTQ6
-CisgICAgICAgICAgICAgICAgaWYgKCEoZm4gPSBsb2NrX3VzZXJfc3RyaW5nKGFyZzIpKSkgewoK
-RVJST1I6IGRvIG5vdCB1c2UgYXNzaWdubWVudCBpbiBpZiBjb25kaXRpb24KIzQ3MjogRklMRTog
-bGludXgtdXNlci9zeXNjYWxsLmM6MTI0MzM6CisgICAgICAgIGlmICghKGZuID0gbG9ja191c2Vy
-X3N0cmluZyhhcmcyKSkpIHsKCnRvdGFsOiAxMyBlcnJvcnMsIDAgd2FybmluZ3MsIDQyMyBsaW5l
-cyBjaGVja2VkCgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4g
-IElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0
-byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgo9PT0gT1VU
-UFVUIEVORCA9PT0KClRlc3QgY29tbWFuZCBleGl0ZWQgd2l0aCBjb2RlOiAxCgoKLS0tCkVtYWls
-IGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHA6Ly9wYXRjaGV3Lm9yZy9d
-LgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAcmVkaGF0LmNvbQ==
+On Thu, May 31, 2018 at 6:56 PM, Keno Fischer <keno@juliacomputing.com> wrote:
+>>> My concern was that allowing this would cause unexpected
+>>> behavior, since the device numbers will differ between OS X
+>>> and Linux. Though maybe this isn't the place to worry about
+>>> that.
+>>
+>> The numbers may differ indeed but we don't really care since the
+>> server never opens device files. This is just a directory entry.
+>
+> Ok, let me try to implement it. However, I don't think it is possible
+> to implement mknodat (or at least I can't think of how) on Darwin
+> directly. I could use regular mknod, but presumably, this is used
+> to avoid a race condition between creating the device and setting
+> the permissions. Can you think of a good way to resolve that?
+
+Would it work to fchdir in to the directory and use a cwd-relative
+mknod, then fchdir back? Or do we need to maintain the cwd
+while in this code?
