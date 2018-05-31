@@ -1,22 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41595)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42106)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1fOIw3-0007DE-IW
-	for qemu-devel@nongnu.org; Thu, 31 May 2018 04:27:52 -0400
+	(envelope-from <peterx@redhat.com>) id 1fOIzG-0008LN-2K
+	for qemu-devel@nongnu.org; Thu, 31 May 2018 04:31:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1fOIw2-00065J-JW
-	for qemu-devel@nongnu.org; Thu, 31 May 2018 04:27:51 -0400
-References: <1527750994-14360-1-git-send-email-zhaoshenglong@huawei.com>
-	<84171c12-e281-8de5-ec3d-ac0aaf3c3dbb@redhat.com>
-	<5B0FAC9E.6090306@huawei.com>
-From: Auger Eric <eric.auger@redhat.com>
-Message-ID: <a61f1fe2-a53a-f57a-34d9-1d1da907e635@redhat.com>
-Date: Thu, 31 May 2018 10:27:43 +0200
+	(envelope-from <peterx@redhat.com>) id 1fOIzC-0007iI-V0
+	for qemu-devel@nongnu.org; Thu, 31 May 2018 04:31:10 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:54116 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1fOIzC-0007iC-Q4
+	for qemu-devel@nongnu.org; Thu, 31 May 2018 04:31:06 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.4])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 4CAE376F91
+	for <qemu-devel@nongnu.org>; Thu, 31 May 2018 08:31:06 +0000 (UTC)
+Date: Thu, 31 May 2018 16:30:55 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20180531083055.GB14867@xz-mi>
+References: <20180529055755.12404-1-peterx@redhat.com>
+	<20180529055755.12404-6-peterx@redhat.com>
+	<20180530163552.GG5973@stefanha-x1.localdomain>
+	<20180531041147.GK27442@xz-mi>
+	<20180531082324.GB26429@stefanha-x1.localdomain>
 MIME-Version: 1.0
-In-Reply-To: <5B0FAC9E.6090306@huawei.com>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] KVM: GIC: Fix memory leak due to calling
- kvm_init_irq_routing twice
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20180531082324.GB26429@stefanha-x1.localdomain>
+Subject: Re: [Qemu-devel] [PATCH v9 5/7] monitor: remove event_clock_type
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,79 +36,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Shannon Zhao <zhaoshenglong@huawei.com>, qemu-arm@nongnu.org
-Cc: peter.maydell@linaro.org, qemu-devel@nongnu.org, shannon.zhaosl@gmail.com
+To: Stefan Hajnoczi <stefanha@redhat.com>
+Cc: qemu-devel@nongnu.org, Eric Blake <eblake@redhat.com>, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>, Markus Armbruster <armbru@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
 
-Hi Shannon,
+On Thu, May 31, 2018 at 09:23:24AM +0100, Stefan Hajnoczi wrote:
+> On Thu, May 31, 2018 at 12:11:47PM +0800, Peter Xu wrote:
+> > On Wed, May 30, 2018 at 05:35:52PM +0100, Stefan Hajnoczi wrote:
+> > > On Tue, May 29, 2018 at 01:57:53PM +0800, Peter Xu wrote:
+> > > > Instead, use a dynamic function to detect which clock we'll use.  The
+> > > > problem is that the old code will let monitor initialization depends on
+> > > > qtest_enabled().  After this change, we don't have such a dependency any
+> > > > more.
+> > > 
+> > > There is a hidden dependency:
+> > > 
+> > >   monitor_get_clock() returns the wrong value before main() has
+> > >   processed command-line arguments.
+> > 
+> > To be more explicit:
+> > 
+> >     monitor_get_clock() returns the wrong value before accelerator is
+> >     correctly setup (in configure_accelerator()).
+> > 
+> > Since the only thing that matters here is whether we're using the
+> > qtest accelerator.
+> > 
+> > > 
+> > > Where is the guarantee that monitor_get_clock() is never called too
+> > > early?
+> > 
+> > You are right, there is no guarantee except from programming POV.
+> > It's only used in:
+> > 
+> >   monitor_qapi_event_queue
+> >   monitor_qapi_event_handler
+> > 
+> > These two functions will never be called until accelerator is setup.
+> > 
+> > > 
+> > > At the least, monitor_get_clock() should call abort(3) if invoked too
+> > > early.  Even better would be an interface that cannot be used
+> > > incorrectly.
+> > 
+> > Maybe then I should export the accel_initialised variable in
+> > configure_accelerator() and then I assert with that.  But that'll
+> > further expand the series a bit.
+> > 
+> > Or, I can also mention above in the commit message to explain that a
+> > bit.
+> 
+> Documentation is okay, but please do it in the code, not the commit
+> message.  That way anyone looking at monitor_get_clock() will be aware
+> of the constraint.
 
-On 05/31/2018 10:04 AM, Shannon Zhao wrote:
-> 
-> 
-> On 2018/5/31 15:54, Auger Eric wrote:
->> Hi Shannon,
->>
->> On 05/31/2018 09:16 AM, Shannon Zhao wrote:
->>> kvm_irqchip_create called by kvm_init will call kvm_init_irq_routing to
->>> initialize global capability variables. If we call kvm_init_irq_routing in
->>> GIC realize function, previous allocated memory will leak.
->>>
->>> Fix this by deleting the unnecessary call.
->>>
->>> Signed-off-by: Shannon Zhao <zhaoshenglong@huawei.com>
->> openpic_kvm seems to suffer the same leak. Don't you want to fix it as
->> well?
->>
-> I have a look at below patch of openpic_kvm which says on ppc it doesn't
-> call kvm_irqchip_create. So no such issue for it.
-> 
-> commit d85937e683f6ff4d68293cb24c780fb1f6820d2c
-> Author: Scott Wood <scottwood@freescale.com>
-> Date:   Wed Jun 12 15:32:51 2013 -0500
-> 
->     kvm/openpic: in-kernel mpic support
+Sure.
 
-Ah OK. Thanks for the pointer.
-
-Eric
-> 
->> Reviewed-by: Eric Auger <eric.auger@redhat.com>
->>
-> Thanks.
-> 
->> Thanks
->>
->> Eric
->>> ---
->>>  hw/intc/arm_gic_kvm.c   | 1 -
->>>  hw/intc/arm_gicv3_kvm.c | 1 -
->>>  2 files changed, 2 deletions(-)
->>>
->>> diff --git a/hw/intc/arm_gic_kvm.c b/hw/intc/arm_gic_kvm.c
->>> index 6f467e6..204369d 100644
->>> --- a/hw/intc/arm_gic_kvm.c
->>> +++ b/hw/intc/arm_gic_kvm.c
->>> @@ -572,7 +572,6 @@ static void kvm_arm_gic_realize(DeviceState *dev, Error **errp)
->>>  
->>>      if (kvm_has_gsi_routing()) {
->>>          /* set up irq routing */
->>> -        kvm_init_irq_routing(kvm_state);
->>>          for (i = 0; i < s->num_irq - GIC_INTERNAL; ++i) {
->>>              kvm_irqchip_add_irq_route(kvm_state, i, 0, i);
->>>          }
->>> diff --git a/hw/intc/arm_gicv3_kvm.c b/hw/intc/arm_gicv3_kvm.c
->>> index 001d82b..aa4c7c5 100644
->>> --- a/hw/intc/arm_gicv3_kvm.c
->>> +++ b/hw/intc/arm_gicv3_kvm.c
->>> @@ -813,7 +813,6 @@ static void kvm_arm_gicv3_realize(DeviceState *dev, Error **errp)
->>>  
->>>      if (kvm_has_gsi_routing()) {
->>>          /* set up irq routing */
->>> -        kvm_init_irq_routing(kvm_state);
->>>          for (i = 0; i < s->num_irq - GIC_INTERNAL; ++i) {
->>>              kvm_irqchip_add_irq_route(kvm_state, i, 0, i);
->>>          }
->>>
->>
->> .
->>
-> 
+-- 
+Peter Xu
