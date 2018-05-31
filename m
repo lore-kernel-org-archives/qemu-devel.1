@@ -1,21 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46578)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47933)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1fOQFf-0003NX-Kd
-	for qemu-devel@nongnu.org; Thu, 31 May 2018 12:16:37 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fOQJa-0005cb-8H
+	for qemu-devel@nongnu.org; Thu, 31 May 2018 12:20:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1fOQFe-0004DO-G1
-	for qemu-devel@nongnu.org; Thu, 31 May 2018 12:16:35 -0400
-References: <20180531004323.4611-1-jsnow@redhat.com>
-	<20180531004323.4611-3-jsnow@redhat.com>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <c45fbf71-447b-8903-2f8a-cf0535c7f892@redhat.com>
-Date: Thu, 31 May 2018 12:16:26 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fOQJX-00080I-1v
+	for qemu-devel@nongnu.org; Thu, 31 May 2018 12:20:38 -0400
+Received: from mail-qt0-x22f.google.com ([2607:f8b0:400d:c0d::22f]:40403)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fOQJW-0007zm-Tk
+	for qemu-devel@nongnu.org; Thu, 31 May 2018 12:20:34 -0400
+Received: by mail-qt0-x22f.google.com with SMTP id h2-v6so28537399qtp.7
+	for <qemu-devel@nongnu.org>; Thu, 31 May 2018 09:20:34 -0700 (PDT)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20180530110655.22022-1-alex.bennee@linaro.org>
+	<20180530110655.22022-5-alex.bennee@linaro.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <b69677f3-f87f-14f5-06c3-4ad68a68a191@amsat.org>
+Date: Thu, 31 May 2018 13:19:21 -0300
 MIME-Version: 1.0
-In-Reply-To: <20180531004323.4611-3-jsnow@redhat.com>
+In-Reply-To: <20180530110655.22022-5-alex.bennee@linaro.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 2/3] ahci: fix PxCI register race
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v1 4/8] docker: update Travis docker image
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,71 +35,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: qemu-stable <qemu-stable@nongnu.org>
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, cota@braap.org, famz@redhat.com, berrange@redhat.com, richard.henderson@linaro.org, balrogg@gmail.com, aurelien@aurel32.net, agraf@suse.de, pbonzini@redhat.com, stefanha@redhat.com, stefanb@linux.vnet.ibm.com, marcandre.lureau@redhat.com
+Cc: qemu-devel@nongnu.org
 
->From comments on the cover letter, I am adding:
+Hi Alex,
 
-Fixes: https://bugs.launchpad.net/qemu/+bug/1769189
+On 05/30/2018 08:06 AM, Alex Bennée wrote:
+> This is still poorly documented by Travis but according to:
+> 
+>   https://docs.travis-ci.com/user/common-build-problems/#Running-a-Container-Based-Docker-Image-Locally
+> 
+> their reference images are now hosted on Docker Hub. So we update the
+> FROM line to refer to the new default image. We also need a few
+> additional tweaks:
+> 
+>   - re-enable deb-src lines for our build-dep install
+>   - add explicit PATH definition for tools
 
-On 05/30/2018 08:43 PM, John Snow wrote:
-> AHCI presently signals completion prior to the PxCI register being
-> cleared to indicate completion. If a guest driver attempts to issue
-> a new command in its IRQ handler, it might be surprised to learn there
-> is still a command pending.
->=20
-> In the case of Windows 10's boot driver, it will actually poll the IRQ
-> register hoping to find out when the command is done running -- which
-> will never happen, as there isn't a command running.
->=20
-> Fix this: clear PxCI in ahci_cmd_done and not in the asynchronous BH.
-> Because it now runs synchronously, we don't need to check if the comman=
-d
-> is actually done by spying on the ATA registers. We know it's done.
->=20
-> Signed-off-by: John Snow <jsnow@redhat.com>
+I don't understand how this is related to QEMU testing, isn't it rather
+some Travis-ci bug? We don't need to use PhantomJS / Neo4j / Maven.
 
-and:
-
-CC: qemu-stable <qemu-stable@nongnu.org>
-Reported-by: Fran=C3=A7ois Guerraz <kubrick@fgv6.net>
-Tested-by: Bruce Rogers <brogers@suse.com>
-
-(Stable note: only patch #2 here is strictly required.)
-
+>   - force the build USER to be Travis
+>   - add clang to FEATURES for our test-clang machinery
+> 
+> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 > ---
->  hw/ide/ahci.c | 13 ++++++-------
->  1 file changed, 6 insertions(+), 7 deletions(-)
->=20
-> diff --git a/hw/ide/ahci.c b/hw/ide/ahci.c
-> index b7a6f68790..a9558e45e7 100644
-> --- a/hw/ide/ahci.c
-> +++ b/hw/ide/ahci.c
-> @@ -532,13 +532,6 @@ static void ahci_check_cmd_bh(void *opaque)
->      qemu_bh_delete(ad->check_bh);
->      ad->check_bh =3D NULL;
-> =20
-> -    if ((ad->busy_slot !=3D -1) &&
-> -        !(ad->port.ifs[0].status & (BUSY_STAT|DRQ_STAT))) {
-> -        /* no longer busy */
-> -        ad->port_regs.cmd_issue &=3D ~(1 << ad->busy_slot);
-> -        ad->busy_slot =3D -1;
-> -    }
-> -
->      check_cmd(ad->hba, ad->port_no);
->  }
-> =20
-> @@ -1425,6 +1418,12 @@ static void ahci_cmd_done(IDEDMA *dma)
-> =20
->      trace_ahci_cmd_done(ad->hba, ad->port_no);
-> =20
-> +    /* no longer busy */
-> +    if (ad->busy_slot !=3D -1) {
-> +        ad->port_regs.cmd_issue &=3D ~(1 << ad->busy_slot);
-> +        ad->busy_slot =3D -1;
-> +    }
-> +
->      /* update d2h status */
->      ahci_write_fis_d2h(ad);
-> =20
->=20
+>  tests/docker/dockerfiles/travis.docker | 7 +++++--
+>  1 file changed, 5 insertions(+), 2 deletions(-)
+> 
+> diff --git a/tests/docker/dockerfiles/travis.docker b/tests/docker/dockerfiles/travis.docker
+> index 605b6e429b..6e90f033d5 100644
+> --- a/tests/docker/dockerfiles/travis.docker
+> +++ b/tests/docker/dockerfiles/travis.docker
+> @@ -1,8 +1,11 @@
+> -FROM quay.io/travisci/travis-ruby
+> +FROM travisci/ci-garnet:packer-1512502276-986baf0
+>  ENV DEBIAN_FRONTEND noninteractive
+>  ENV LANG en_US.UTF-8
+>  ENV LC_ALL en_US.UTF-8
+> +RUN cat /etc/apt/sources.list | sed "s/# deb-src/deb-src/" >> /etc/apt/sources.list
+>  RUN apt-get update
+>  RUN apt-get -y build-dep qemu
+>  RUN apt-get -y install device-tree-compiler python2.7 python-yaml dh-autoreconf gdb strace lsof net-tools
+> -ENV FEATURES pyyaml
+> +ENV PATH /usr/local/phantomjs/bin:/usr/local/phantomjs:/usr/local/neo4j-3.2.7/bin:/usr/local/maven-3.5.2/bin:/usr/local/cmake-3.9.2/bin:/usr/local/clang-5.0.0/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+> +ENV FEATURES clang pyyaml
+> +USER travis
+> 
