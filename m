@@ -1,34 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35743)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39693)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fOMFH-0003Yw-Ue
-	for qemu-devel@nongnu.org; Thu, 31 May 2018 07:59:56 -0400
+	(envelope-from <groug@kaod.org>) id 1fOMSW-0006qP-Hq
+	for qemu-devel@nongnu.org; Thu, 31 May 2018 08:13:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fOMFH-0004hT-4u
-	for qemu-devel@nongnu.org; Thu, 31 May 2018 07:59:56 -0400
-Received: from mail-oi0-x242.google.com ([2607:f8b0:4003:c06::242]:36221)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fOMFG-0004h0-VR
-	for qemu-devel@nongnu.org; Thu, 31 May 2018 07:59:55 -0400
-Received: by mail-oi0-x242.google.com with SMTP id 14-v6so11239512oie.3
-	for <qemu-devel@nongnu.org>; Thu, 31 May 2018 04:59:54 -0700 (PDT)
+	(envelope-from <groug@kaod.org>) id 1fOMST-00017G-9p
+	for qemu-devel@nongnu.org; Thu, 31 May 2018 08:13:36 -0400
+Received: from 1.mo1.mail-out.ovh.net ([178.32.127.22]:46967)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1fOMST-00015J-3T
+	for qemu-devel@nongnu.org; Thu, 31 May 2018 08:13:33 -0400
+Received: from player758.ha.ovh.net (unknown [10.109.120.64])
+	by mo1.mail-out.ovh.net (Postfix) with ESMTP id D5FD310124F
+	for <qemu-devel@nongnu.org>; Thu, 31 May 2018 14:13:30 +0200 (CEST)
+Date: Thu, 31 May 2018 14:13:20 +0200
+From: Greg Kurz <groug@kaod.org>
+Message-ID: <20180531141320.017133fd@bahia.lan>
+In-Reply-To: <CACPK8XfpZZ0+bZg0Udt30FLHECS7k+QkjVp3E+duSJ_TGxWqTA@mail.gmail.com>
+References: <20180530144217.8959-1-joel@jms.id.au>
+	<1a47f19a-1791-da8a-d9ad-abe4c1e8e1ce@kaod.org>
+	<20180531132733.5e3eca33@bahia.lan>
+	<CACPK8XfpZZ0+bZg0Udt30FLHECS7k+QkjVp3E+duSJ_TGxWqTA@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <35601960-682e-9ccc-c724-2c6504e8cc2c@redhat.com>
-References: <20180521140402.23318-1-peter.maydell@linaro.org>
-	<20180521140402.23318-24-peter.maydell@linaro.org>
-	<c049f864-304d-f8ee-4b2f-1476a602be30@redhat.com>
-	<CAFEAcA_ErfYKnVrp=Dv9mNg55Y+=fFmg4eEMddGdMxUGVb9ztA@mail.gmail.com>
-	<530bef1b-a143-1566-3089-32629ab250b8@redhat.com>
-	<CAFEAcA94JAccGhbhSrBkTHUV+dLR-EvYQW_nuB9FodtLTDQPZw@mail.gmail.com>
-	<c7e4c537-2174-005b-fa15-0e8286e540ad@redhat.com>
-	<CAFEAcA8p=PzfMbzbE6zQ-mAhP-vgvDRvPTjharRD76BFLyS_fA@mail.gmail.com>
-	<35601960-682e-9ccc-c724-2c6504e8cc2c@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 31 May 2018 12:59:33 +0100
-Message-ID: <CAFEAcA_8cPWHUQaBFE4hO=YKCTHUpNyBk=LUt11EePvU417j_Q@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH 23/27] hw/core/or-irq: Support more than 16
- inputs to an OR gate
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH] target/ppc: Allow privileged
+ access to SPR_PCR
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,32 +33,118 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: qemu-arm <qemu-arm@nongnu.org>, =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, "patches@linaro.org" <patches@linaro.org>, Richard Henderson <rth@twiddle.net>
+To: Joel Stanley <joel@jms.id.au>
+Cc: Michael Neuling <mikey@neuling.org>, Michael Ellerman <mpe@ellerman.id.au>, QEMU Developers <qemu-devel@nongnu.org>, qemu-ppc@nongnu.org, =?UTF-8?B?Q8OpZHJpYw==?= Le Goater <clg@kaod.org>, David Gibson <david@gibson.dropbear.id.au>
 
-On 31 May 2018 at 12:50, Paolo Bonzini <pbonzini@redhat.com> wrote:
-> On 31/05/2018 12:50, Peter Maydell wrote:
->> No, calling qemu_set_irq in postload is a bug. (You don't know
->> which order the state of the source and destination devices is
->> restored, so asserting a signal in postload would have different
->> effects depending on whether the destination had already had
->> its state restored or not.)
->
-> Hmm, I suppose the x86 world is a bit more "hierarchical" and you cannot
-> create a qemu_irq loop - and creating the sink always before the source
-> ensures that migration works fine with post_load.  I'm pretty sure that
-> there are devices that do that
+On Thu, 31 May 2018 21:28:08 +0930
+Joel Stanley <joel@jms.id.au> wrote:
 
-If there are then they are broken, because that's not how
-qemu_irqs work... (Similarly, you can't assert an irq
-in a reset method, because of ordering problems.)
+> On 31 May 2018 at 20:57, Greg Kurz <groug@kaod.org> wrote:
+> > On Thu, 31 May 2018 09:38:10 +0200
+> > C=C3=A9dric Le Goater <clg@kaod.org> wrote:
+> > =20
+> >> On 05/30/2018 04:42 PM, Joel Stanley wrote: =20
+> >> > The powerpc Linux kernel[1] and skiboot firmware[2] recently gained =
+changes
+> >> > that cause the Processor Compatibility Register (PCR) SPR to be clea=
+red.
+> >> >
+> >> > These changes cause Linux to fail to boot on the Qemu powernv machine
+> >> > with an error:
+> >> >
+> >> >  Trying to write privileged spr 338 (0x152) at 0000000030017f0c
+> >> >
+> >> > With this patch Qemu makes this register available as a hypervisor
+> >> > privileged register.
+> >> >
+> >> > Note that bits set in this register disable features of the processo=
+r.
+> >> > Currently the only register state that is supported is when the regi=
+ster
+> >> > is zeroed (enable all features). This is sufficient for guests to
+> >> > once again boot.
+> >> >
+> >> > [1] https://lkml.kernel.org/r/20180518013742.24095-1-mikey@neuling.o=
+rg
+> >> > [2] https://patchwork.ozlabs.org/patch/915932/
+> >> >
+> >> > Signed-off-by: Joel Stanley <joel@jms.id.au>
+> >> > ---
+> >> >  target/ppc/helper.h             |  1 +
+> >> >  target/ppc/misc_helper.c        | 10 ++++++++++
+> >> >  target/ppc/translate_init.inc.c |  9 +++++++--
+> >> >  3 files changed, 18 insertions(+), 2 deletions(-)
+> >> >
+> >> > diff --git a/target/ppc/helper.h b/target/ppc/helper.h
+> >> > index 19453c68138a..d751f0e21909 100644
+> >> > --- a/target/ppc/helper.h
+> >> > +++ b/target/ppc/helper.h
+> >> > @@ -17,6 +17,7 @@ DEF_HELPER_2(pminsn, void, env, i32)
+> >> >  DEF_HELPER_1(rfid, void, env)
+> >> >  DEF_HELPER_1(hrfid, void, env)
+> >> >  DEF_HELPER_2(store_lpcr, void, env, tl)
+> >> > +DEF_HELPER_2(store_pcr, void, env, tl)
+> >> >  #endif
+> >> >  DEF_HELPER_1(check_tlb_flush_local, void, env)
+> >> >  DEF_HELPER_1(check_tlb_flush_global, void, env)
+> >> > diff --git a/target/ppc/misc_helper.c b/target/ppc/misc_helper.c
+> >> > index 8c8cba5cc6f1..40c39d08ad14 100644
+> >> > --- a/target/ppc/misc_helper.c
+> >> > +++ b/target/ppc/misc_helper.c
+> >> > @@ -20,6 +20,7 @@
+> >> >  #include "cpu.h"
+> >> >  #include "exec/exec-all.h"
+> >> >  #include "exec/helper-proto.h"
+> >> > +#include "qemu/error-report.h"
+> >> >
+> >> >  #include "helper_regs.h"
+> >> >
+> >> > @@ -186,6 +187,15 @@ void ppc_store_msr(CPUPPCState *env, target_ulo=
+ng value)
+> >> >      hreg_store_msr(env, value, 0);
+> >> >  }
+> >> >
+> >> > +void helper_store_pcr(CPUPPCState *env, target_ulong value)
+> >> > +{
+> >> > +    if (value !=3D 0) {
+> >> > +        error_report("Unimplemented PCR value 0x"TARGET_FMT_lx, val=
+ue);
+> >> > +        return;
+> >> > +    }
+> >> > +    env->spr[SPR_PCR] =3D value; =20
+> >>
+> >> shouldn't we use pcc->pcr_mask ? and check pcc->pcr_supported also ?
+> >> =20
+> >
+> > pcc->pcr_mask and ppc->pcr_supported only make sense for pseries machine
+> > types (ie, when the spapr machine code call ppc_*_compat() functions).
+> >
+> > The case here is different: we're running a fully emulated pnv machine,
+> > ie, PCR can only be set by mtspr() called within the pnv guest. But TCG
+> > doesn't implement the compatibility mode logic, ie, the CPU always run
+> > in "raw" mode, ie, we only support PCR =3D=3D 0, actually. =20
+>=20
+> Okay, thanks for clarifying. Cedric suggested offline that I could
+> change "Unimplemented..." to "Invalid...". Are there any other changes
+> you would like?
+>=20
 
->, and an interesting case (for the sake of
-> this thread) is the IOMMU, which prompted the introduction of
-> MigrationPriority.  Thanks for the lesson! :)
+No that's fine with me.
 
-This sounds like a workaround for a bug in the device implementation.
-Devices shouldn't care about which order they're restored in.
+> > So, this patch looks good for me. I'm just not sure about what is
+> > causing the build break with patchew though... =20
+>=20
+> I can't reproduce the failure here either.
+>=20
 
-thanks
--- PMM
+Same here... :-\
+
+> Cheers,
+>=20
+> Joel
+>=20
+
+Cheers,
+
+--
+Greg
