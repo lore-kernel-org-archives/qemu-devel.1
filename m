@@ -1,19 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41458)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41766)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <chen_han_xiao@126.com>) id 1fODC3-0008SF-Ew
-	for qemu-devel@nongnu.org; Wed, 30 May 2018 22:20:00 -0400
+	(envelope-from <wei.w.wang@intel.com>) id 1fODFH-0000oh-Dn
+	for qemu-devel@nongnu.org; Wed, 30 May 2018 22:23:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <chen_han_xiao@126.com>) id 1fODC0-0003jw-8L
-	for qemu-devel@nongnu.org; Wed, 30 May 2018 22:19:59 -0400
-Received: from m15-111.126.com ([220.181.15.111]:54021)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <chen_han_xiao@126.com>) id 1fODBz-0003Xk-EP
-	for qemu-devel@nongnu.org; Wed, 30 May 2018 22:19:56 -0400
-From: Chen Hanxiao <chen_han_xiao@126.com>
-Date: Thu, 31 May 2018 10:19:24 +0800
-Message-Id: <20180531021924.4836-1-chen_han_xiao@126.com>
-Subject: [Qemu-devel] [PATCH v3] qga: add mountpoint usage to
- GuestFilesystemInfo
+	(envelope-from <wei.w.wang@intel.com>) id 1fODFE-0005Am-9m
+	for qemu-devel@nongnu.org; Wed, 30 May 2018 22:23:19 -0400
+Received: from mga14.intel.com ([192.55.52.115]:14154)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <wei.w.wang@intel.com>)
+	id 1fODFE-0005AR-1L
+	for qemu-devel@nongnu.org; Wed, 30 May 2018 22:23:16 -0400
+Message-ID: <5B0F5D74.603@intel.com>
+Date: Thu, 31 May 2018 10:27:00 +0800
+From: Wei Wang <wei.w.wang@intel.com>
+MIME-Version: 1.0
+References: <1524550428-27173-1-git-send-email-wei.w.wang@intel.com>
+	<1524550428-27173-5-git-send-email-wei.w.wang@intel.com>
+	<20180529181221-mutt-send-email-mst@kernel.org>
+	<5B0E6AE9.2030505@intel.com>
+	<20180530154325-mutt-send-email-mst@kernel.org>
+In-Reply-To: <20180530154325-mutt-send-email-mst@kernel.org>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v7 4/5] virtio-balloon:
+ VIRTIO_BALLOON_F_FREE_PAGE_HINT
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,90 +32,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Chen Hanxiao <chen_han_xiao@126.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, Eric Blake <eblake@redhat.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: qemu-devel@nongnu.org, virtio-dev@lists.oasis-open.org, quintela@redhat.com, dgilbert@redhat.com, pbonzini@redhat.com, liliang.opensource@gmail.com, yang.zhang.wz@gmail.com, quan.xu0@gmail.com, nilal@redhat.com, riel@redhat.com, zhang.zhanghailiang@huawei.com
 
-From: Chen Hanxiao <chenhanxiao@gmail.com>
+On 05/30/2018 08:47 PM, Michael S. Tsirkin wrote:
+> On Wed, May 30, 2018 at 05:12:09PM +0800, Wei Wang wrote:
+>> On 05/29/2018 11:24 PM, Michael S. Tsirkin wrote:
+>>> On Tue, Apr 24, 2018 at 02:13:47PM +0800, Wei Wang wrote:
+>>>> +/*
+>>>> + * Balloon will report pages which were free at the time of this call. As the
+>>>> + * reporting happens asynchronously, dirty bit logging must be enabled before
+>>>> + * this call is made.
+>>>> + */
+>>>> +void balloon_free_page_start(void)
+>>>> +{
+>>>> +    balloon_free_page_start_fn(balloon_opaque);
+>>>> +}
+>>> Please create notifier support, not a single global.
+>> OK. The start is called at the end of bitmap_sync, and the stop is called at
+>> the beginning of bitmap_sync. In this case, we will need to add two
+>> migration states, MIGRATION_STATUS_BEFORE_BITMAP_SYNC and
+>> MIGRATION_STATUS_AFTER_BITMAP_SYNC, right?
+> If that's the way you do it, you need to ask migration guys, not me.
 
-This patch adds support for getting the usage of mounted
-filesystem.
-It's very useful when we try to monitor guest's filesystem.
+Yeah, I know.. thanks for the virtio part.
 
-Cc: Michael Roth <mdroth@linux.vnet.ibm.com>
-Cc: Eric Blake <eblake@redhat.com>
+>>> +
+>>> +static bool virtio_balloon_free_page_support(void *opaque)
+>>> +{
+>>> +    VirtIOBalloon *s = opaque;
+>>> +    VirtIODevice *vdev = VIRTIO_DEVICE(s);
+>>> +
+>>> +    return virtio_vdev_has_feature(vdev, VIRTIO_BALLOON_F_FREE_PAGE_HINT);
+>>> or if poison is negotiated.
+>> Will make it
+>> return virtio_vdev_has_feature(vdev, VIRTIO_BALLOON_F_FREE_PAGE_HINT) &&
+>> !virtio_vdev_has_feature(vdev, VIRTIO_BALLOON_F_PAGE_POISON)
+>
+> I mean the reverse:
+> 	virtio_vdev_has_feature(vdev, VIRTIO_BALLOON_F_FREE_PAGE_HINT) ||
+> 	virtio_vdev_has_feature(vdev, VIRTIO_BALLOON_F_PAGE_POISON)
+>
+>
+> If poison has been negotiated you must migrate the
+> guest supplied value even if you don't use it for hints.
 
-Signed-off-by: Chen Hanxiao <chenhanxiao@gmail.com>
----
-v2:
-   add description in qapi-schema and version numbers
-v3:
-   use float for usage to get more precision.
 
- qga/commands-posix.c | 16 ++++++++++++++++
- qga/qapi-schema.json |  3 ++-
- 2 files changed, 18 insertions(+), 1 deletion(-)
+Just a little confused with the logic. Writing it that way means that we 
+are taking this possibility "virtio_vdev_has_feature(vdev, 
+VIRTIO_BALLOON_F_FREE_PAGE_HINT)=fasle, virtio_vdev_has_feature(vdev, 
+VIRTIO_BALLOON_F_PAGE_POISON)=true" into account, and let the support 
+function return true when F_FREE_PAGE_HINT isn't supported.
 
-diff --git a/qga/commands-posix.c b/qga/commands-posix.c
-index 0dc219dbcf..7601978a11 100644
---- a/qga/commands-posix.c
-+++ b/qga/commands-posix.c
-@@ -46,6 +46,7 @@ extern char **environ;
- #include <arpa/inet.h>
- #include <sys/socket.h>
- #include <net/if.h>
-+#include <sys/statvfs.h>
- 
- #ifdef FIFREEZE
- #define CONFIG_FSFREEZE
-@@ -1072,6 +1073,9 @@ static GuestFilesystemInfo *build_guest_fsinfo(struct FsMount *mount,
-                                                Error **errp)
- {
-     GuestFilesystemInfo *fs = g_malloc0(sizeof(*fs));
-+    struct statvfs buf;
-+    unsigned long used, nonroot_total;
-+    double usage;
-     char *devpath = g_strdup_printf("/sys/dev/block/%u:%u",
-                                     mount->devmajor, mount->devminor);
- 
-@@ -1079,7 +1083,19 @@ static GuestFilesystemInfo *build_guest_fsinfo(struct FsMount *mount,
-     fs->type = g_strdup(mount->devtype);
-     build_guest_fsinfo_for_device(devpath, fs, errp);
- 
-+    if (statvfs(fs->mountpoint, &buf)) {
-+        error_setg_errno(errp, errno, "Failed to get statvfs");
-+        return NULL;
-+    }
-+
-+    used = buf.f_blocks - buf.f_bfree;
-+    nonroot_total = used + buf.f_bavail;
-+    usage = (double) used / nonroot_total;
-+
-+    fs->usage = usage;
-+
-     g_free(devpath);
-+
-     return fs;
- }
- 
-diff --git a/qga/qapi-schema.json b/qga/qapi-schema.json
-index 17884c7c70..68b9f60824 100644
---- a/qga/qapi-schema.json
-+++ b/qga/qapi-schema.json
-@@ -846,13 +846,14 @@
- # @name: disk name
- # @mountpoint: mount point path
- # @type: file system type string
-+# @usage: file system usage, fraction between 0 and 1 (since 3.0)
- # @disk: an array of disk hardware information that the volume lies on,
- #        which may be empty if the disk type is not supported
- #
- # Since: 2.2
- ##
- { 'struct': 'GuestFilesystemInfo',
--  'data': {'name': 'str', 'mountpoint': 'str', 'type': 'str',
-+  'data': {'name': 'str', 'mountpoint': 'str', 'type': 'str', 'usage': 'number',
-            'disk': ['GuestDiskAddress']} }
- 
- ##
--- 
-2.17.0
+If guest doesn't support F_FREE_PAGE_HINT, it doesn't support the free 
+page reporting (even the free page vq). I'm not sure why we tell the 
+migration thread that the free page reporting feature is supported via 
+this support function. If the support function simply returns false when 
+F_FREE_PAGE_HINT isn't negotiated, the legacy migration already migrates 
+the poisoned pages (not skipped, but may be compressed).
+
+I think it would be better to simply use the original "return 
+virtio_vdev_has_feature(vdev, VIRTIO_BALLOON_F_FREE_PAGE_HINT)" here.
+
+
+Best,
+Wei
