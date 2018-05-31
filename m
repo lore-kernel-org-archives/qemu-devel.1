@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44177)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44513)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1fOUJ9-0008BV-JR
-	for qemu-devel@nongnu.org; Thu, 31 May 2018 16:36:28 -0400
+	(envelope-from <alindsay@codeaurora.org>) id 1fOULz-0000R2-Tx
+	for qemu-devel@nongnu.org; Thu, 31 May 2018 16:39:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1fOUJ5-0005fm-Lr
-	for qemu-devel@nongnu.org; Thu, 31 May 2018 16:36:27 -0400
-Resent-Message-Id: <E1fOUJ5-0005fm-Lr@eggs.gnu.org>
-Received: from sender-of-o51.zoho.com ([135.84.80.216]:21038)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1fOUJ5-0005eO-GL
-	for qemu-devel@nongnu.org; Thu, 31 May 2018 16:36:23 -0400
-In-Reply-To: <20180531203110.17203-1-samuel.thibault@ens-lyon.org>
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <152779894864.336.6264019338287925015@d39dc562802a>
+	(envelope-from <alindsay@codeaurora.org>) id 1fOULy-0007s2-Ep
+	for qemu-devel@nongnu.org; Thu, 31 May 2018 16:39:23 -0400
+Date: Thu, 31 May 2018 16:39:06 -0400
+From: Aaron Lindsay <alindsay@codeaurora.org>
+Message-ID: <20180531203906.GA12424@codeaurora.org>
+References: <1521232280-13089-1-git-send-email-alindsay@codeaurora.org>
+	<1521232280-13089-16-git-send-email-alindsay@codeaurora.org>
+	<CAFEAcA9bYdwByseqCMKSVtWV59mNruT3jJfWWLju1koCnwSb=Q@mail.gmail.com>
+	<20180417142318.GO24561@codeaurora.org>
+	<CAFEAcA8RwC7DSbo+mMqYUS6tL5UwfQGMa_r5AnAkJqm7v63HWw@mail.gmail.com>
+	<20180517193104.GB4771@codeaurora.org>
+	<CAFEAcA-+sO3oUqfQXHcHRBu2i-WFzvFKObcBz26qeLS_0+3s2Q@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Thu, 31 May 2018 13:35:49 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PATCHv2] slirp: Fix spurious error report when
- sending directly
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAFEAcA-+sO3oUqfQXHcHRBu2i-WFzvFKObcBz26qeLS_0+3s2Q@mail.gmail.com>
+Subject: Re: [Qemu-devel] [PATCH v3 15/22] target/arm: Add ARM_FEATURE_V7VE
+ for v7 Virtualization Extensions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,47 +29,114 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: samuel.thibault@ens-lyon.org
-Cc: famz@redhat.com, qemu-devel@nongnu.org, f4bug@amsat.org, stefanha@redhat.com, jan.kiszka@siemens.com
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-arm <qemu-arm@nongnu.org>, Alistair Francis <alistair.francis@xilinx.com>, Wei Huang <wei@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>, Michael Spradling <mspradli@codeaurora.org>, Digant Desai <digantd@codeaurora.org>
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
-c3NhZ2UtaWQ6IDIwMTgwNTMxMjAzMTEwLjE3MjAzLTEtc2FtdWVsLnRoaWJhdWx0QGVucy1seW9u
-Lm9yZwpTdWJqZWN0OiBbUWVtdS1kZXZlbF0gW1BBVENIdjJdIHNsaXJwOiBGaXggc3B1cmlvdXMg
-ZXJyb3IgcmVwb3J0IHdoZW4gc2VuZGluZyBkaXJlY3RseQoKPT09IFRFU1QgU0NSSVBUIEJFR0lO
-ID09PQojIS9iaW4vYmFzaAoKQkFTRT1iYXNlCm49MQp0b3RhbD0kKGdpdCBsb2cgLS1vbmVsaW5l
-ICRCQVNFLi4gfCB3YyAtbCkKZmFpbGVkPTAKCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFt
-ZWxpbWl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lcyBUcnVlCmdpdCBjb25maWcg
-LS1sb2NhbCBkaWZmLmFsZ29yaXRobSBoaXN0b2dyYW0KCmNvbW1pdHM9IiQoZ2l0IGxvZyAtLWZv
-cm1hdD0lSCAtLXJldmVyc2UgJEJBU0UuLikiCmZvciBjIGluICRjb21taXRzOyBkbwogICAgZWNo
-byAiQ2hlY2tpbmcgUEFUQ0ggJG4vJHRvdGFsOiAkKGdpdCBsb2cgLW4gMSAtLWZvcm1hdD0lcyAk
-YykuLi4iCiAgICBpZiAhIGdpdCBzaG93ICRjIC0tZm9ybWF0PWVtYWlsIHwgLi9zY3JpcHRzL2No
-ZWNrcGF0Y2gucGwgLS1tYWlsYmFjayAtOyB0aGVuCiAgICAgICAgZmFpbGVkPTEKICAgICAgICBl
-Y2hvCiAgICBmaQogICAgbj0kKChuKzEpKQpkb25lCgpleGl0ICRmYWlsZWQKPT09IFRFU1QgU0NS
-SVBUIEVORCA9PT0KClVwZGF0aW5nIDNjOGNmNWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3
-MTMzODQKRnJvbSBodHRwczovL2dpdGh1Yi5jb20vcGF0Y2hldy1wcm9qZWN0L3FlbXUKICogW25l
-dyB0YWddICAgICAgICAgICAgICAgcGF0Y2hldy8yMDE4MDUzMTIwMzExMC4xNzIwMy0xLXNhbXVl
-bC50aGliYXVsdEBlbnMtbHlvbi5vcmcgLT4gcGF0Y2hldy8yMDE4MDUzMTIwMzExMC4xNzIwMy0x
-LXNhbXVlbC50aGliYXVsdEBlbnMtbHlvbi5vcmcKU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0
-ZXN0Jwo2ZjRjY2VhYjQwIHNsaXJwOiBGaXggc3B1cmlvdXMgZXJyb3IgcmVwb3J0IHdoZW4gc2Vu
-ZGluZyBkaXJlY3RseQoKPT09IE9VVFBVVCBCRUdJTiA9PT0KQ2hlY2tpbmcgUEFUQ0ggMS8xOiBz
-bGlycDogRml4IHNwdXJpb3VzIGVycm9yIHJlcG9ydCB3aGVuIHNlbmRpbmcgZGlyZWN0bHkuLi4K
-RVJST1I6IGNvZGUgaW5kZW50IHNob3VsZCBuZXZlciB1c2UgdGFicwojMjE6IEZJTEU6IHNsaXJw
-L3NvY2tldC5jOjM0MzoKK15JaW50IG47JAoKRVJST1I6IGNvZGUgaW5kZW50IHNob3VsZCBuZXZl
-ciB1c2UgdGFicwojMzA6IEZJTEU6IHNsaXJwL3NvY2tldC5jOjM2MjoKK15JXklpbnQgbGVuID0g
-KHNiLT5zYl9kYXRhICsgc2ItPnNiX2RhdGFsZW4pIC0gc2ItPnNiX3JwdHI7JAoKRVJST1I6IGNv
-ZGUgaW5kZW50IHNob3VsZCBuZXZlciB1c2UgdGFicwojMzk6IEZJTEU6IHNsaXJwL3NvY2tldC5j
-OjM3ODoKK15JXklpZiAobiAhPSBsZW4pIHskCgpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFj
-dGVycwojNDA6IEZJTEU6IHNsaXJwL3NvY2tldC5jOjM3OToKKwkJCURFQlVHX0VSUk9SKChkZmQs
-ICJEaWRuJ3Qgc2VuZCBhbGwgZGF0YSB1cmdlbnRseSBYWFhYWFxuIikpOwoKRVJST1I6IGNvZGUg
-aW5kZW50IHNob3VsZCBuZXZlciB1c2UgdGFicwojNDA6IEZJTEU6IHNsaXJwL3NvY2tldC5jOjM3
-OToKK15JXkleSURFQlVHX0VSUk9SKChkZmQsICJEaWRuJ3Qgc2VuZCBhbGwgZGF0YSB1cmdlbnRs
-eSBYWFhYWFxuIikpOyQKCkVSUk9SOiBjb2RlIGluZGVudCBzaG91bGQgbmV2ZXIgdXNlIHRhYnMK
-IzQxOiBGSUxFOiBzbGlycC9zb2NrZXQuYzozODA6CiteSV5JfSQKCnRvdGFsOiA1IGVycm9ycywg
-MSB3YXJuaW5ncywgMzQgbGluZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxl
-bXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3Np
-dGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1B
-SU5UQUlORVJTLgoKPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGgg
-Y29kZTogMQoKCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFto
-dHRwOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3
-LWRldmVsQHJlZGhhdC5jb20=
+On May 31 15:18, Peter Maydell wrote:
+> On 17 May 2018 at 20:31, Aaron Lindsay <alindsay@codeaurora.org> wrote:
+> > On Apr 17 16:00, Peter Maydell wrote:
+> >> So, the underlying issue here is that there's a QEMU specific
+> >> fudge going on. Architecturally, if the CPU implements the
+> >> Virtualization Extensions, then:
+> >>  * it has Hyp mode
+> >>  * it must also implement the Security Extensions
+> >>  * on reset it starts in the Secure world
+> >>  * it has LPAE
+> >>  * it has some stuff that is not inherently tied to having EL2,
+> >>    like the SDIV and UDIV instructions, and the presence of
+> >>    PMOVSSET
+> >>
+> >> In an ideal world, we'd just have a feature flag that turned
+> >> all that on. Unfortunately, a combination of backwards compatibility
+> >> issues, the order in which various features were implemented
+> >> in QEMU, and the fact that KVM can't emulate a guest CPU with
+> >> the Security Extensions means that we want to be able to model
+> >> variants of some CPUs that don't really exist in real hardware:
+> >> Cortex-A15 and -A7 which only implement EL0/EL1 but still have
+> >> all the v7VE features that you can see from those ELs. But we
+> >> didn't really properly lay out guidelines for how the feature
+> >> bits should work in this case, with the result that we have
+> >> a bunch of local hacks (for instance get_S1prot() has a check
+> >> on the LPAE feature bit, since in practice that bit is set in
+> >> exactly the CPUs that have v7VE; and the UDIV/SDIV insns have
+> >> their own feature bits.)
+> >>
+> >> So we should probably sort out this mess first, either by:
+> >>
+> >> (a) state that we use ARM_FEATURE_LPAE for all checks for
+> >> features that are architecturally v7VE but which we want to
+> >> exist even on our v7VE-no-Hyp-no-Secure oddballs
+> >> (b) define an ARM_FEATURE_V7VE for them
+> >> (c) define separate feature bits for them individually
+> >
+> > From what I can tell, using ARM_FEATURE_LPAE to represent all the
+> > almost-v7ve misfits won't work well because ARM_FEATURE_ARM_DIV may be
+> > supported on some platforms for which ARM_FEATURE_LPAE is not (Cortex
+> > R5), and ARM_FEATURE_ARM_DIV is read from ID_ISAR0 in
+> > kvm_arm_get_host_cpu_features() (and may be set/not set independently of
+> > ARM_FEATURE_LPAE). It appears there is a need to independently
+> > distinguish between them.
+> 
+> We need (and already have) a separate feature bit for ARM_DIV
+> exactly because it's present on some CPUs which don't have V7VE;
+> so we don't want to roll that back into a V7VE feature bit.
+> 
+> > The same reasoning also seems to rule out
+> > option (b) "one ARM_FEATURE_V7VE to rule them all", leaving me with
+> > option (c).
+> >
+> > It almost seems silly to create ARM_FEATURE_PMOVSSET, but I'm not sure
+> > what else makes sense to do here. Am I missing something (I'm almost
+> > hoping I am)?
+> 
+> Sorry, I forgot I hadn't replied to this email yet. Let's do this:
+
+No problem at all - to be fair, my responses have been a bit sporadic,
+too. I'm working on putting your suggestions into patch form, with one
+clarification below. I also believe I owe you a response on another
+thread or two before I push out the next version of this patchset.
+
+> 
+>  * define a new ARM_FEATURE_V7VE:
+> 
+>   ARM_FEATURE_V7VE, /* v7 Virtualization Extensions (non-EL2 parts) */
+> 
+> In arm_cpu_realizefn:
+> 
+>  * change the existing "FEATURE_V8 implies V7/ARM_DIV/LPAE" to
+>    "FEATURE_V8 implies V7VE"
+>  * below that put
+> 
+>    if (arm_feature(env, ARM_FEATURE_V7VE) {
+>        /* v7 Virtualization Extensions. In real hardware this implies
+>         * EL2 and also the presence of the Security Extensions.
+>         * For QEMU, for backwards-compatibility we implement some
+>         * CPUs or CPU configs which have no actual EL2 or EL3 but do
+>         * include the various other features that V7VE implies.
+>         * Presence of EL2 itself is ARM_FEATURE_EL2, and of the
+>         * Security Extensions is ARM_FEATURE_EL3.
+>         */
+>        set_feature(env, ARM_FEATURE_ARM_DIV);
+
+Is it safe to assume from your comment above regarding keeping ARM_DIV
+separate from V7VE that the inclusion of it here is an oversight and
+that only LPAE and V7 should be set if V7VE is? (and that V8 should
+now directly imply both V7VE and ARM_DIV?)
+
+>        set_feature(env, ARM_FEATURE_LPAE);
+>        set_feature(env, ARM_FEATURE_V7);
+>    }
+>
+>  * in kvm_arm_get_host_cpu_features() in kvm32.c add
+>    set_feature(&features, ARM_FEATURE_V7VE);
+>    where we currently set V7, LPAE, etc.
+>    (by definition a host CPU which supports KVM has v7VE.)
+
+Thanks!
+
+-Aaron
+
+-- 
+Qualcomm Datacenter Technologies as an affiliate of Qualcomm Technologies, Inc.
+Qualcomm Technologies, Inc. is a member of the
+Code Aurora Forum, a Linux Foundation Collaborative Project.
