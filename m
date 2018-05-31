@@ -1,31 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45090)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45148)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1fOQBC-0008BX-Gz
-	for qemu-devel@nongnu.org; Thu, 31 May 2018 12:11:59 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fOQBe-0008WN-MD
+	for qemu-devel@nongnu.org; Thu, 31 May 2018 12:12:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1fOQB9-00010i-AB
-	for qemu-devel@nongnu.org; Thu, 31 May 2018 12:11:58 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:54944 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1fOQB9-0000zx-4H
-	for qemu-devel@nongnu.org; Thu, 31 May 2018 12:11:55 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.4])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id B7B827D83A
-	for <qemu-devel@nongnu.org>; Thu, 31 May 2018 16:11:53 +0000 (UTC)
-Date: Thu, 31 May 2018 17:11:50 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20180531161150.GF2755@work-vm>
-References: <20180523111817.1463-1-quintela@redhat.com>
-	<20180523111817.1463-4-quintela@redhat.com>
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fOQBb-0001Dg-E2
+	for qemu-devel@nongnu.org; Thu, 31 May 2018 12:12:26 -0400
+Received: from mail-qk0-x243.google.com ([2607:f8b0:400d:c09::243]:41813)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fOQBb-0001DP-9G
+	for qemu-devel@nongnu.org; Thu, 31 May 2018 12:12:23 -0400
+Received: by mail-qk0-x243.google.com with SMTP id w23-v6so2319749qkb.8
+	for <qemu-devel@nongnu.org>; Thu, 31 May 2018 09:12:23 -0700 (PDT)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20180530110655.22022-1-alex.bennee@linaro.org>
+	<20180530110655.22022-7-alex.bennee@linaro.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <ab8c1af7-69ae-023a-26e9-bb231362a0de@amsat.org>
+Date: Thu, 31 May 2018 13:12:16 -0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180523111817.1463-4-quintela@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v13 03/12] migration: Add multifd traces
- for start/end thread
+In-Reply-To: <20180530110655.22022-7-alex.bennee@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v1 6/8] .travis.yml: make current setup
+ explicit
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,119 +36,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Juan Quintela <quintela@redhat.com>
-Cc: qemu-devel@nongnu.org, lvivier@redhat.com, peterx@redhat.com
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, cota@braap.org, famz@redhat.com, berrange@redhat.com, richard.henderson@linaro.org, balrogg@gmail.com, aurelien@aurel32.net, agraf@suse.de, pbonzini@redhat.com, stefanha@redhat.com, stefanb@linux.vnet.ibm.com, marcandre.lureau@redhat.com
+Cc: qemu-devel@nongnu.org
 
-* Juan Quintela (quintela@redhat.com) wrote:
-> We want to know how many pages/packets each channel has sent.  Add
-> counters for those.
+On 05/30/2018 08:06 AM, Alex Bennée wrote:
+> Add some commentary and make the selection of Container based Trusty
+> build explicit. We will need to add VM builds later when using docker.
 > 
-> Signed-off-by: Juan Quintela <quintela@redhat.com>
+> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Tested-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
-> --
-> sort trace-events (dave)
 > ---
->  migration/ram.c        | 22 ++++++++++++++++++++++
->  migration/trace-events |  4 ++++
->  2 files changed, 26 insertions(+)
+>  .travis.yml | 4 ++++
+>  1 file changed, 4 insertions(+)
 > 
-> diff --git a/migration/ram.c b/migration/ram.c
-> index 54350db8b0..ab715cc148 100644
-> --- a/migration/ram.c
-> +++ b/migration/ram.c
-> @@ -563,6 +563,11 @@ typedef struct {
->      uint32_t flags;
->      /* global number of generated multifd packets */
->      uint32_t seq;
-> +    /* thread local variables */
-> +    /* packets sent through this channel */
-> +    uint32_t num_packets;
-> +    /* pages sent through this channel */
-> +    uint32_t num_pages;
->  }  MultiFDSendParams;
->  
->  typedef struct {
-> @@ -593,6 +598,11 @@ typedef struct {
->      uint32_t flags;
->      /* global number of generated multifd packets */
->      uint32_t seq;
-> +    /* thread local variables */
-> +    /* packets sent through this channel */
-> +    uint32_t num_packets;
-> +    /* pages sent through this channel */
-> +    uint32_t num_pages;
->  } MultiFDRecvParams;
->  
->  static int multifd_send_initial_packet(MultiFDSendParams *p, Error **errp)
-> @@ -849,9 +859,13 @@ static void *multifd_send_thread(void *opaque)
->      MultiFDSendParams *p = opaque;
->      Error *local_err = NULL;
->  
-> +    trace_multifd_send_thread_start(p->id);
-> +
->      if (multifd_send_initial_packet(p, &local_err) < 0) {
->          goto out;
->      }
-> +    /* initial packet */
-> +    p->num_packets = 1;
->  
->      while (true) {
->          qemu_mutex_lock(&p->mutex);
-> @@ -873,6 +887,8 @@ out:
->      p->running = false;
->      qemu_mutex_unlock(&p->mutex);
->  
-> +    trace_multifd_send_thread_end(p->id, p->num_packets, p->num_pages);
-> +
->      return NULL;
->  }
->  
-> @@ -1000,6 +1016,8 @@ static void *multifd_recv_thread(void *opaque)
->      Error *local_err = NULL;
->      int ret;
->  
-> +    trace_multifd_recv_thread_start(p->id);
-> +
->      while (true) {
->          qemu_mutex_lock(&p->mutex);
->          if (false)  {
-> @@ -1022,6 +1040,8 @@ static void *multifd_recv_thread(void *opaque)
->      p->running = false;
->      qemu_mutex_unlock(&p->mutex);
->  
-> +    trace_multifd_recv_thread_end(p->id, p->num_packets, p->num_pages);
-> +
->      return NULL;
->  }
->  
-> @@ -1087,6 +1107,8 @@ void multifd_recv_new_channel(QIOChannel *ioc)
->      }
->      p->c = ioc;
->      object_ref(OBJECT(ioc));
-> +    /* initial packet */
-> +    p->num_packets = 1;
->  
->      p->running = true;
->      qemu_thread_create(&p->thread, p->name, multifd_recv_thread, p,
-> diff --git a/migration/trace-events b/migration/trace-events
-> index 3c798ddd11..3c7a9a8332 100644
-> --- a/migration/trace-events
-> +++ b/migration/trace-events
-> @@ -76,6 +76,10 @@ get_queued_page_not_dirty(const char *block_name, uint64_t tmp_offset, unsigned
->  migration_bitmap_sync_start(void) ""
->  migration_bitmap_sync_end(uint64_t dirty_pages) "dirty_pages %" PRIu64
->  migration_throttle(void) ""
-> +multifd_recv_thread_end(uint8_t id, uint32_t packets, uint32_t pages) "channel %d packets %d pages %d"
-> +multifd_recv_thread_start(uint8_t id) "%d"
-> +multifd_send_thread_end(uint8_t id, uint32_t packets, uint32_t pages) "channel %d packets %d pages %d"
-> +multifd_send_thread_start(uint8_t id) "%d"
->  ram_discard_range(const char *rbname, uint64_t start, size_t len) "%s: start: %" PRIx64 " %zx"
->  ram_load_loop(const char *rbname, uint64_t addr, int flags, void *host) "%s: addr: 0x%" PRIx64 " flags: 0x%x host: %p"
->  ram_load_postcopy_loop(uint64_t addr, int flags) "@%" PRIx64 " %x"
-> -- 
-> 2.17.0
+> diff --git a/.travis.yml b/.travis.yml
+> index 85ee2a1edb..e99af6f357 100644
+> --- a/.travis.yml
+> +++ b/.travis.yml
+> @@ -1,4 +1,8 @@
+> +# The current Travis default is a container based 14.04 Trust on EC2
+> +# Additional builds with specific requirements for a full VM need to
+> +# be added as additional matrix: entries later on
+>  sudo: false
+> +dist: trusty
+>  language: c
+>  python:
+>    - "2.6"
 > 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
