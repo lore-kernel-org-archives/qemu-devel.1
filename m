@@ -1,19 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43230)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44177)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1fOUEW-0006kw-KT
-	for qemu-devel@nongnu.org; Thu, 31 May 2018 16:31:42 -0400
+	(envelope-from <no-reply@patchew.org>) id 1fOUJ9-0008BV-JR
+	for qemu-devel@nongnu.org; Thu, 31 May 2018 16:36:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <samuel.thibault@ens-lyon.org>) id 1fOUEK-00020U-LR
-	for qemu-devel@nongnu.org; Thu, 31 May 2018 16:31:40 -0400
-Received: from hera.aquilenet.fr ([2a0c:e300::1]:50852)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <samuel.thibault@ens-lyon.org>)
-	id 1fOUEK-0001zB-Cs
-	for qemu-devel@nongnu.org; Thu, 31 May 2018 16:31:28 -0400
-From: Samuel Thibault <samuel.thibault@ens-lyon.org>
-Date: Thu, 31 May 2018 22:31:10 +0200
-Message-Id: <20180531203110.17203-1-samuel.thibault@ens-lyon.org>
-Subject: [Qemu-devel] [PATCHv2] slirp: Fix spurious error report when
+	(envelope-from <no-reply@patchew.org>) id 1fOUJ5-0005fm-Lr
+	for qemu-devel@nongnu.org; Thu, 31 May 2018 16:36:27 -0400
+Resent-Message-Id: <E1fOUJ5-0005fm-Lr@eggs.gnu.org>
+Received: from sender-of-o51.zoho.com ([135.84.80.216]:21038)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1fOUJ5-0005eO-GL
+	for qemu-devel@nongnu.org; Thu, 31 May 2018 16:36:23 -0400
+In-Reply-To: <20180531203110.17203-1-samuel.thibault@ens-lyon.org>
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <152779894864.336.6264019338287925015@d39dc562802a>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Thu, 31 May 2018 13:35:49 -0700 (PDT)
+Subject: Re: [Qemu-devel] [PATCHv2] slirp: Fix spurious error report when
  sending directly
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -23,61 +29,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Samuel Thibault <samuel.thibault@ens-lyon.org>, stefanha@redhat.com, jan.kiszka@siemens.com, f4bug@amsat.org
+To: samuel.thibault@ens-lyon.org
+Cc: famz@redhat.com, qemu-devel@nongnu.org, f4bug@amsat.org, stefanha@redhat.com, jan.kiszka@siemens.com
 
-Move check to where it actually is useful, and reduce scope of 'len'
-variable along the way.
-
-Signed-off-by: Samuel Thibault <samuel.thibault@ens-lyon.org>
----
-
-Difference from v1:
-- move check instead of initializing len.
-
- slirp/socket.c | 14 +++++++-------
- 1 file changed, 7 insertions(+), 7 deletions(-)
-
-diff --git a/slirp/socket.c b/slirp/socket.c
-index e2a71c9b04..08fe98907d 100644
---- a/slirp/socket.c
-+++ b/slirp/socket.c
-@@ -340,7 +340,7 @@ sosendoob(struct socket *so)
- 	struct sbuf *sb = &so->so_rcv;
- 	char buff[2048]; /* XXX Shouldn't be sending more oob data than this */
- 
--	int n, len;
-+	int n;
- 
- 	DEBUG_CALL("sosendoob");
- 	DEBUG_ARG("so = %p", so);
-@@ -359,7 +359,7 @@ sosendoob(struct socket *so)
- 		 * send it all
- 		 */
- 		uint32_t urgc = so->so_urgc;
--		len = (sb->sb_data + sb->sb_datalen) - sb->sb_rptr;
-+		int len = (sb->sb_data + sb->sb_datalen) - sb->sb_rptr;
- 		if (len > urgc) {
- 			len = urgc;
- 		}
-@@ -374,13 +374,13 @@ sosendoob(struct socket *so)
- 			len += n;
- 		}
- 		n = slirp_send(so, buff, len, (MSG_OOB)); /* |MSG_DONTWAIT)); */
--	}
--
- #ifdef DEBUG
--	if (n != len) {
--		DEBUG_ERROR((dfd, "Didn't send all data urgently XXXXX\n"));
--	}
-+		if (n != len) {
-+			DEBUG_ERROR((dfd, "Didn't send all data urgently XXXXX\n"));
-+		}
- #endif
-+	}
-+
- 	if (n < 0) {
- 		return n;
- 	}
--- 
-2.17.0
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
+c3NhZ2UtaWQ6IDIwMTgwNTMxMjAzMTEwLjE3MjAzLTEtc2FtdWVsLnRoaWJhdWx0QGVucy1seW9u
+Lm9yZwpTdWJqZWN0OiBbUWVtdS1kZXZlbF0gW1BBVENIdjJdIHNsaXJwOiBGaXggc3B1cmlvdXMg
+ZXJyb3IgcmVwb3J0IHdoZW4gc2VuZGluZyBkaXJlY3RseQoKPT09IFRFU1QgU0NSSVBUIEJFR0lO
+ID09PQojIS9iaW4vYmFzaAoKQkFTRT1iYXNlCm49MQp0b3RhbD0kKGdpdCBsb2cgLS1vbmVsaW5l
+ICRCQVNFLi4gfCB3YyAtbCkKZmFpbGVkPTAKCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFt
+ZWxpbWl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lcyBUcnVlCmdpdCBjb25maWcg
+LS1sb2NhbCBkaWZmLmFsZ29yaXRobSBoaXN0b2dyYW0KCmNvbW1pdHM9IiQoZ2l0IGxvZyAtLWZv
+cm1hdD0lSCAtLXJldmVyc2UgJEJBU0UuLikiCmZvciBjIGluICRjb21taXRzOyBkbwogICAgZWNo
+byAiQ2hlY2tpbmcgUEFUQ0ggJG4vJHRvdGFsOiAkKGdpdCBsb2cgLW4gMSAtLWZvcm1hdD0lcyAk
+YykuLi4iCiAgICBpZiAhIGdpdCBzaG93ICRjIC0tZm9ybWF0PWVtYWlsIHwgLi9zY3JpcHRzL2No
+ZWNrcGF0Y2gucGwgLS1tYWlsYmFjayAtOyB0aGVuCiAgICAgICAgZmFpbGVkPTEKICAgICAgICBl
+Y2hvCiAgICBmaQogICAgbj0kKChuKzEpKQpkb25lCgpleGl0ICRmYWlsZWQKPT09IFRFU1QgU0NS
+SVBUIEVORCA9PT0KClVwZGF0aW5nIDNjOGNmNWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3
+MTMzODQKRnJvbSBodHRwczovL2dpdGh1Yi5jb20vcGF0Y2hldy1wcm9qZWN0L3FlbXUKICogW25l
+dyB0YWddICAgICAgICAgICAgICAgcGF0Y2hldy8yMDE4MDUzMTIwMzExMC4xNzIwMy0xLXNhbXVl
+bC50aGliYXVsdEBlbnMtbHlvbi5vcmcgLT4gcGF0Y2hldy8yMDE4MDUzMTIwMzExMC4xNzIwMy0x
+LXNhbXVlbC50aGliYXVsdEBlbnMtbHlvbi5vcmcKU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0
+ZXN0Jwo2ZjRjY2VhYjQwIHNsaXJwOiBGaXggc3B1cmlvdXMgZXJyb3IgcmVwb3J0IHdoZW4gc2Vu
+ZGluZyBkaXJlY3RseQoKPT09IE9VVFBVVCBCRUdJTiA9PT0KQ2hlY2tpbmcgUEFUQ0ggMS8xOiBz
+bGlycDogRml4IHNwdXJpb3VzIGVycm9yIHJlcG9ydCB3aGVuIHNlbmRpbmcgZGlyZWN0bHkuLi4K
+RVJST1I6IGNvZGUgaW5kZW50IHNob3VsZCBuZXZlciB1c2UgdGFicwojMjE6IEZJTEU6IHNsaXJw
+L3NvY2tldC5jOjM0MzoKK15JaW50IG47JAoKRVJST1I6IGNvZGUgaW5kZW50IHNob3VsZCBuZXZl
+ciB1c2UgdGFicwojMzA6IEZJTEU6IHNsaXJwL3NvY2tldC5jOjM2MjoKK15JXklpbnQgbGVuID0g
+KHNiLT5zYl9kYXRhICsgc2ItPnNiX2RhdGFsZW4pIC0gc2ItPnNiX3JwdHI7JAoKRVJST1I6IGNv
+ZGUgaW5kZW50IHNob3VsZCBuZXZlciB1c2UgdGFicwojMzk6IEZJTEU6IHNsaXJwL3NvY2tldC5j
+OjM3ODoKK15JXklpZiAobiAhPSBsZW4pIHskCgpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFj
+dGVycwojNDA6IEZJTEU6IHNsaXJwL3NvY2tldC5jOjM3OToKKwkJCURFQlVHX0VSUk9SKChkZmQs
+ICJEaWRuJ3Qgc2VuZCBhbGwgZGF0YSB1cmdlbnRseSBYWFhYWFxuIikpOwoKRVJST1I6IGNvZGUg
+aW5kZW50IHNob3VsZCBuZXZlciB1c2UgdGFicwojNDA6IEZJTEU6IHNsaXJwL3NvY2tldC5jOjM3
+OToKK15JXkleSURFQlVHX0VSUk9SKChkZmQsICJEaWRuJ3Qgc2VuZCBhbGwgZGF0YSB1cmdlbnRs
+eSBYWFhYWFxuIikpOyQKCkVSUk9SOiBjb2RlIGluZGVudCBzaG91bGQgbmV2ZXIgdXNlIHRhYnMK
+IzQxOiBGSUxFOiBzbGlycC9zb2NrZXQuYzozODA6CiteSV5JfSQKCnRvdGFsOiA1IGVycm9ycywg
+MSB3YXJuaW5ncywgMzQgbGluZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxl
+bXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3Np
+dGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1B
+SU5UQUlORVJTLgoKPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGgg
+Y29kZTogMQoKCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFto
+dHRwOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3
+LWRldmVsQHJlZGhhdC5jb20=
