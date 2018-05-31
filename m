@@ -1,20 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56553)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59253)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1fOVJO-0003pD-Gh
-	for qemu-devel@nongnu.org; Thu, 31 May 2018 17:40:47 -0400
+	(envelope-from <ross.zwisler@linux.intel.com>) id 1fOVfh-0006SL-El
+	for qemu-devel@nongnu.org; Thu, 31 May 2018 18:03:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1fOVJN-00089I-KN
-	for qemu-devel@nongnu.org; Thu, 31 May 2018 17:40:46 -0400
-Date: Thu, 31 May 2018 17:40:38 -0400
-From: Jeff Cody <jcody@redhat.com>
-Message-ID: <20180531214038.GD11303@localhost.localdomain>
-References: <20180531212435.165261-1-eblake@redhat.com>
+	(envelope-from <ross.zwisler@linux.intel.com>) id 1fOVfe-0007xl-Ba
+	for qemu-devel@nongnu.org; Thu, 31 May 2018 18:03:49 -0400
+Received: from mga12.intel.com ([192.55.52.136]:27411)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ross.zwisler@linux.intel.com>)
+	id 1fOVfe-0007w5-31
+	for qemu-devel@nongnu.org; Thu, 31 May 2018 18:03:46 -0400
+Date: Thu, 31 May 2018 16:03:42 -0600
+From: Ross Zwisler <ross.zwisler@linux.intel.com>
+Message-ID: <20180531220342.GH28256@linux.intel.com>
+References: <20180521163203.26590-1-ross.zwisler@linux.intel.com>
+	<20180525205051-mutt-send-email-mst@kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20180531212435.165261-1-eblake@redhat.com>
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH] block: Ignore generated job
- QAPI files
+In-Reply-To: <20180525205051-mutt-send-email-mst@kernel.org>
+Subject: Re: [Qemu-devel] [qemu PATCH v4 0/4] support NFIT platform
+ capabilities
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,58 +29,19 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: qemu-devel@nongnu.org, kwolf@redhat.com, qemu-block@nongnu.org, mreitz@redhat.com
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Ross Zwisler <ross.zwisler@linux.intel.com>, Igor Mammedov <imammedo@redhat.com>, qemu-devel@nongnu.org, Haozhong Zhang <haozhong.zhang@intel.com>, Stefan Hajnoczi <stefanha@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, linux-nvdimm <linux-nvdimm@lists.01.org>, "Elliott, Robert (Persistent Memory)" <elliott@hpe.com>
 
-On Thu, May 31, 2018 at 04:24:35PM -0500, Eric Blake wrote:
-> Commit bf42508f introduced new generated files; make sure they
-> don't get accidentally committed from an in-tree build.
+On Fri, May 25, 2018 at 08:51:22PM +0300, Michael S. Tsirkin wrote:
+> On Mon, May 21, 2018 at 10:31:59AM -0600, Ross Zwisler wrote:
+> > Changes since v3:
+> >  * Updated the text in docs/nvdimm.txt to make it clear that the value
+> >    being passed in on the command line in an integer made up of various
+> >    bit fields. (Rob Elliott)
+> >  
+> >  * Updated the "Highest Valid Capability" byte to be dynamic based on
+> >    the highest valid bit in the user's input. (Rob Elliott)
 > 
-> Signed-off-by: Eric Blake <eblake@redhat.com>
+> Igor could you review pls? I think your comments have been addressed.
 
-Reviewed-by: Jeff Cody <jcody@redhat.com>
-
-> ---
->  .gitignore | 4 ++++
->  1 file changed, 4 insertions(+)
-> 
-> diff --git a/.gitignore b/.gitignore
-> index 81e1f2fb0f1..9da3b3e6267 100644
-> --- a/.gitignore
-> +++ b/.gitignore
-> @@ -36,6 +36,7 @@
->  /qapi/qapi-commands-common.[ch]
->  /qapi/qapi-commands-crypto.[ch]
->  /qapi/qapi-commands-introspect.[ch]
-> +/qapi/qapi-commands-job.[ch]
->  /qapi/qapi-commands-migration.[ch]
->  /qapi/qapi-commands-misc.[ch]
->  /qapi/qapi-commands-net.[ch]
-> @@ -53,6 +54,7 @@
->  /qapi/qapi-events-common.[ch]
->  /qapi/qapi-events-crypto.[ch]
->  /qapi/qapi-events-introspect.[ch]
-> +/qapi/qapi-events-job.[ch]
->  /qapi/qapi-events-migration.[ch]
->  /qapi/qapi-events-misc.[ch]
->  /qapi/qapi-events-net.[ch]
-> @@ -71,6 +73,7 @@
->  /qapi/qapi-types-common.[ch]
->  /qapi/qapi-types-crypto.[ch]
->  /qapi/qapi-types-introspect.[ch]
-> +/qapi/qapi-types-job.[ch]
->  /qapi/qapi-types-migration.[ch]
->  /qapi/qapi-types-misc.[ch]
->  /qapi/qapi-types-net.[ch]
-> @@ -88,6 +91,7 @@
->  /qapi/qapi-visit-common.[ch]
->  /qapi/qapi-visit-crypto.[ch]
->  /qapi/qapi-visit-introspect.[ch]
-> +/qapi/qapi-visit-job.[ch]
->  /qapi/qapi-visit-migration.[ch]
->  /qapi/qapi-visit-misc.[ch]
->  /qapi/qapi-visit-net.[ch]
-> -- 
-> 2.14.3
-> 
-> 
+Ping?  Igor, can you pick this up?
