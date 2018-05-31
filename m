@@ -1,31 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58657)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58693)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1fOR8c-0003hc-H1
-	for qemu-devel@nongnu.org; Thu, 31 May 2018 13:13:23 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1fOR8g-0003o0-I4
+	for qemu-devel@nongnu.org; Thu, 31 May 2018 13:13:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1fOR8b-0000Ga-9W
-	for qemu-devel@nongnu.org; Thu, 31 May 2018 13:13:22 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:45840 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1fOR8b-0000GI-4Z
-	for qemu-devel@nongnu.org; Thu, 31 May 2018 13:13:21 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.4])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id C7D9E76F91
-	for <qemu-devel@nongnu.org>; Thu, 31 May 2018 17:13:20 +0000 (UTC)
-Received: from donizetti.redhat.com (ovpn-117-47.ams2.redhat.com
-	[10.36.117.47])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 576932026DEF
-	for <qemu-devel@nongnu.org>; Thu, 31 May 2018 17:13:20 +0000 (UTC)
+	(envelope-from <pbonzini@redhat.com>) id 1fOR8d-0000Ia-Eb
+	for qemu-devel@nongnu.org; Thu, 31 May 2018 13:13:26 -0400
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Thu, 31 May 2018 19:12:28 +0200
-Message-Id: <20180531171253.21012-29-pbonzini@redhat.com>
+Date: Thu, 31 May 2018 19:12:30 +0200
+Message-Id: <20180531171253.21012-31-pbonzini@redhat.com>
 In-Reply-To: <20180531171253.21012-1-pbonzini@redhat.com>
 References: <20180531171253.21012-1-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PULL 28/53] memory: get rid of
- memory_region_init_reservation
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL 30/53] hw/isa/superio: Fix inconsistent use of
+ Chardev->be
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,110 +24,50 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-stable@nongnu.org
 
-The function has been deprecated for 2.5 years, and there are just a handful
-of users.  Convert them to memory_region_init_io with NULL callbacks,
-and while at it pass the right device as the owner.
+From: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 
+4c3119a6e3e and cd9526ab7c0 introduced an incorrect and inconsistent
+use of Chardev->be. Also, this CharBackend member is private and is
+not supposed to be accessible.
+
+Fix it by removing the inconsistent check.
+
+Cc: qemu-stable@nongnu.org
+Reported-by: Marc-Andr=C3=83=C2=A9 Lureau <marcandre.lureau@redhat.com>
+Signed-off-by: Philippe Mathieu-Daud=C3=83=C2=A9 <f4bug@amsat.org>
+Message-Id: <20180515152500.19460-2-f4bug@amsat.org>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 ---
- docs/devel/memory.txt |  5 ++---
- hw/i386/kvm/i8254.c   |  2 +-
- hw/i386/kvm/i8259.c   |  4 ++--
- hw/i386/kvm/ioapic.c  |  2 +-
- include/exec/memory.h | 23 -----------------------
- 5 files changed, 6 insertions(+), 30 deletions(-)
+ hw/isa/isa-superio.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/docs/devel/memory.txt b/docs/devel/memory.txt
-index 8ed810f8b9..c1dee1252c 100644
---- a/docs/devel/memory.txt
-+++ b/docs/devel/memory.txt
-@@ -77,9 +77,8 @@ MemoryRegion):
- - reservation region: a reservation region is primarily for debugging.
-   It claims I/O space that is not supposed to be handled by QEMU itself.
-   The typical use is to track parts of the address space which will be
--  handled by the host kernel when KVM is enabled.
--  You initialize these with memory_region_init_reservation(), or by
--  passing a NULL callback parameter to memory_region_init_io().
-+  handled by the host kernel when KVM is enabled.  You initialize these
-+  by passing a NULL callback parameter to memory_region_init_io().
- 
- It is valid to add subregions to a region which is not a pure container
- (that is, to an MMIO, RAM or ROM region). This means that the region
-diff --git a/hw/i386/kvm/i8254.c b/hw/i386/kvm/i8254.c
-index 13f20f47d9..d4d4a859f0 100644
---- a/hw/i386/kvm/i8254.c
-+++ b/hw/i386/kvm/i8254.c
-@@ -293,7 +293,7 @@ static void kvm_pit_realizefn(DeviceState *dev, Error **errp)
-         return;
-     }
- 
--    memory_region_init_reservation(&pit->ioports, NULL, "kvm-pit", 4);
-+    memory_region_init_io(&pit->ioports, OBJECT(dev), NULL, NULL, "kvm-pit", 4);
- 
-     qdev_init_gpio_in(dev, kvm_pit_irq_control, 1);
- 
-diff --git a/hw/i386/kvm/i8259.c b/hw/i386/kvm/i8259.c
-index 05394cdb7b..83b6bfec77 100644
---- a/hw/i386/kvm/i8259.c
-+++ b/hw/i386/kvm/i8259.c
-@@ -121,8 +121,8 @@ static void kvm_pic_realize(DeviceState *dev, Error **errp)
-     PICCommonState *s = PIC_COMMON(dev);
-     KVMPICClass *kpc = KVM_PIC_GET_CLASS(dev);
- 
--    memory_region_init_reservation(&s->base_io, NULL, "kvm-pic", 2);
--    memory_region_init_reservation(&s->elcr_io, NULL, "kvm-elcr", 1);
-+    memory_region_init_io(&s->base_io, OBJECT(dev), NULL, NULL, "kvm-pic", 2);
-+    memory_region_init_io(&s->elcr_io, OBJECT(dev), NULL, NULL, "kvm-elcr", 1);
- 
-     kpc->parent_realize(dev, errp);
- }
-diff --git a/hw/i386/kvm/ioapic.c b/hw/i386/kvm/ioapic.c
-index 98ca480792..646f6245ee 100644
---- a/hw/i386/kvm/ioapic.c
-+++ b/hw/i386/kvm/ioapic.c
-@@ -142,7 +142,7 @@ static void kvm_ioapic_realize(DeviceState *dev, Error **errp)
- {
-     IOAPICCommonState *s = IOAPIC_COMMON(dev);
- 
--    memory_region_init_reservation(&s->io_memory, NULL, "kvm-ioapic", 0x1000);
-+    memory_region_init_io(&s->io_memory, OBJECT(dev), NULL, NULL, "kvm-ioapic", 0x1000);
-     /*
-      * KVM ioapic only supports 0x11 now. This will only be used when
-      * we want to dump ioapic version.
-diff --git a/include/exec/memory.h b/include/exec/memory.h
-index 4fa1227f13..a116d936fc 100644
---- a/include/exec/memory.h
-+++ b/include/exec/memory.h
-@@ -675,29 +675,6 @@ void memory_region_init_rom_device_nomigrate(MemoryRegion *mr,
-                                              uint64_t size,
-                                              Error **errp);
- 
--/**
-- * memory_region_init_reservation: Initialize a memory region that reserves
-- *                                 I/O space.
-- *
-- * A reservation region primarily serves debugging purposes.  It claims I/O
-- * space that is not supposed to be handled by QEMU itself.  Any access via
-- * the memory API will cause an abort().
-- * This function is deprecated. Use memory_region_init_io() with NULL
-- * callbacks instead.
-- *
-- * @mr: the #MemoryRegion to be initialized
-- * @owner: the object that tracks the region's reference count
-- * @name: used for debugging; not visible to the user or ABI
-- * @size: size of the region.
-- */
--static inline void memory_region_init_reservation(MemoryRegion *mr,
--                                    Object *owner,
--                                    const char *name,
--                                    uint64_t size)
--{
--    memory_region_init_io(mr, owner, NULL, mr, name, size);
--}
--
- /**
-  * memory_region_init_iommu: Initialize a memory region of a custom type
-  * that translates addresses
--- 
+diff --git a/hw/isa/isa-superio.c b/hw/isa/isa-superio.c
+index 9359be7008..8bc2f69eaa 100644
+--- a/hw/isa/isa-superio.c
++++ b/hw/isa/isa-superio.c
+@@ -42,7 +42,7 @@ static void isa_superio_realize(DeviceState *dev, Error=
+ **errp)
+         if (!k->parallel.is_enabled || k->parallel.is_enabled(sio, i)) {
+             /* FIXME use a qdev chardev prop instead of parallel_hds[] *=
+/
+             chr =3D parallel_hds[i];
+-            if (chr =3D=3D NULL || chr->be) {
++            if (chr =3D=3D NULL) {
+                 name =3D g_strdup_printf("discarding-parallel%d", i);
+                 chr =3D qemu_chr_new(name, "null");
+             } else {
+@@ -82,7 +82,7 @@ static void isa_superio_realize(DeviceState *dev, Error=
+ **errp)
+         if (!k->serial.is_enabled || k->serial.is_enabled(sio, i)) {
+             /* FIXME use a qdev chardev prop instead of serial_hd() */
+             chr =3D serial_hd(i);
+-            if (chr =3D=3D NULL || chr->be) {
++            if (chr =3D=3D NULL) {
+                 name =3D g_strdup_printf("discarding-serial%d", i);
+                 chr =3D qemu_chr_new(name, "null");
+             } else {
+--=20
 2.17.0
