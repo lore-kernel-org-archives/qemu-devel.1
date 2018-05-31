@@ -1,26 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45336)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45355)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1fOLMa-0001sw-Eu
-	for qemu-devel@nongnu.org; Thu, 31 May 2018 07:03:25 -0400
+	(envelope-from <slp@redhat.com>) id 1fOLMe-0001wt-FJ
+	for qemu-devel@nongnu.org; Thu, 31 May 2018 07:03:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1fOLMW-0000sc-Dd
-	for qemu-devel@nongnu.org; Thu, 31 May 2018 07:03:24 -0400
-Received: from mail-wm0-x234.google.com ([2a00:1450:400c:c09::234]:39071)
+	(envelope-from <slp@redhat.com>) id 1fOLMa-0000wr-Hf
+	for qemu-devel@nongnu.org; Thu, 31 May 2018 07:03:28 -0400
+Received: from mail-wm0-f67.google.com ([74.125.82.67]:52171)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1fOLMW-0000rM-5c
-	for qemu-devel@nongnu.org; Thu, 31 May 2018 07:03:20 -0400
-Received: by mail-wm0-x234.google.com with SMTP id f8-v6so53343952wmc.4
-	for <qemu-devel@nongnu.org>; Thu, 31 May 2018 04:03:20 -0700 (PDT)
-Date: Thu, 31 May 2018 12:03:17 +0100
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20180531110317.GG27838@stefanha-x1.localdomain>
-References: <20180515091356.24106-1-peterx@redhat.com>
+	(Exim 4.71) (envelope-from <slp@redhat.com>) id 1fOLMa-0000vz-Bb
+	for qemu-devel@nongnu.org; Thu, 31 May 2018 07:03:24 -0400
+Received: by mail-wm0-f67.google.com with SMTP id r15-v6so25604209wmc.1
+	for <qemu-devel@nongnu.org>; Thu, 31 May 2018 04:03:24 -0700 (PDT)
+Date: Thu, 31 May 2018 13:03:21 +0200
+From: Sergio Lopez <slp@redhat.com>
+Message-ID: <20180531110321.ltm3ti6onab2w3vg@dritchie>
+References: <20180531074601.10647-1-slp@redhat.com>
+	<20180531074601.10647-4-slp@redhat.com>
+	<CAJ+F1CKfpATgpFpHa85Esvv9k_T3FG_pY4rsz_C5a20CWfUgiQ@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="EDJsL2R9iCFAt7IV"
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <20180515091356.24106-1-peterx@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH RFC] qemu-error: introduce error_report_once
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAJ+F1CKfpATgpFpHa85Esvv9k_T3FG_pY4rsz_C5a20CWfUgiQ@mail.gmail.com>
+Subject: Re: [Qemu-devel] [PATCH 3/3] hw/char/serial: Don't retry on
+ serial_xmit if errno == EPIPE
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,41 +32,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>
+To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@gmail.com>
+Cc: "Daniel P. Berrange" <berrange@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, QEMU <qemu-devel@nongnu.org>
 
+On Thu, May 31, 2018 at 11:52:01AM +0200, Marc-André Lureau wrote:
+> On Thu, May 31, 2018 at 9:46 AM, Sergio Lopez <slp@redhat.com> wrote:
+> > If writing to the frontend channel failed with EPIPE, don't set up a
+> > retry. EPIPE is not a recoverable error, so trying again is a waste of CPU
+> > cycles.
+> >
+> > If the vCPU writing to the serial device and emulator thread are pinned
+> > to the same pCPU, it can also compromise the stability of the Guest OS,
+> > as both threads will be competing for pCPU's time, with the vCPU
+> > actively polling the serial device and barely giving time to the
+> > emulator thread to make actual progress.
+> > ---
+> >  hw/char/serial.c | 1 +
+> >  1 file changed, 1 insertion(+)
+> >
+> > diff --git a/hw/char/serial.c b/hw/char/serial.c
+> > index 2c080c9..f26e86b 100644
+> > --- a/hw/char/serial.c
+> > +++ b/hw/char/serial.c
+> > @@ -262,6 +262,7 @@ static void serial_xmit(SerialState *s)
+> >              /* in loopback mode, say that we just received a char */
+> >              serial_receive1(s, &s->tsr, 1);
+> >          } else if (qemu_chr_fe_write(&s->chr, &s->tsr, 1) != 1 &&
+> > +                   errno != EPIPE &&
+> >                     s->tsr_retry < MAX_XMIT_RETRY) {
+> 
+> Instead of adding explicit handling of EPIPE, shouldn't the code be
+> rewritten to treat -1 return && errno != EAGAIN as fatal?
 
---EDJsL2R9iCFAt7IV
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+What kind of action should it trigger if treating errno != EAGAIN as fatal?
 
-On Tue, May 15, 2018 at 05:13:56PM +0800, Peter Xu wrote:
-> I stole the printk_once() macro.
->=20
-> I always wanted to be able to print some error directly if there is a
-> buffer to dump, however we can't use error_report() really quite often
-> when there can be any DDOS attack.  To avoid that, we can introduce a
-> print-once function for it.
+If you meant something like calling 'abort()', I think that, while this
+could be considered as the "correct" behavior, it's a bit unpractical
+for the users. The most common situation for this to happen is
+restarting virtlogd while having the console/serial redirected to it.
+The VM will stop writing to the serial device, but otherwise the Guest
+OS can probably keep working without any issues.
 
-I like the idea.  It solves the problem of guest-triggerable error
-messages that we should know about for troubleshooting but can't due to
-DoS.
-
-Stefan
-
---EDJsL2R9iCFAt7IV
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJbD9Z1AAoJEJykq7OBq3PIdswIAKARIctPLsphyrSXRSAzSC+V
-uFN2KOmoM2+aQra0jGZKyQi1im5APcY1XiEKwoSRzxYzOVeH3a1/VN3Dy54/89tZ
-uF2oxkPVc6PuT1fOIRjHFH9LyGQ77lO7/5pZD0n5srl11wAuwSaql0RHChZlWwR6
-0skfyBIRDa/n0dEmNl3jZKIIzttGi4mT6BzCGIj8KfwDmw8zwwKuZpTNIpbaoqHq
-1uG32LKfmvetht6Xb9XOQ6M1KUoqYV1zbgBocf4YquQQhb7VR46pH35wPAL1cdma
-kvNxeiVf2XggbSUNL0SAYCdLtRhNy6ax5Mc0Pdeq6reO38M31chuonhu2wIrIow=
-=Ccr0
------END PGP SIGNATURE-----
-
---EDJsL2R9iCFAt7IV--
+Sergio.
