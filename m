@@ -1,28 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33853)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34026)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1fOM5u-0007at-Jc
-	for qemu-devel@nongnu.org; Thu, 31 May 2018 07:50:15 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1fOM6U-0007ve-9K
+	for qemu-devel@nongnu.org; Thu, 31 May 2018 07:50:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1fOM5t-0006L7-AG
-	for qemu-devel@nongnu.org; Thu, 31 May 2018 07:50:14 -0400
-References: <20180521140402.23318-1-peter.maydell@linaro.org>
-	<20180521140402.23318-24-peter.maydell@linaro.org>
-	<c049f864-304d-f8ee-4b2f-1476a602be30@redhat.com>
-	<CAFEAcA_ErfYKnVrp=Dv9mNg55Y+=fFmg4eEMddGdMxUGVb9ztA@mail.gmail.com>
-	<530bef1b-a143-1566-3089-32629ab250b8@redhat.com>
-	<CAFEAcA94JAccGhbhSrBkTHUV+dLR-EvYQW_nuB9FodtLTDQPZw@mail.gmail.com>
-	<c7e4c537-2174-005b-fa15-0e8286e540ad@redhat.com>
-	<CAFEAcA8p=PzfMbzbE6zQ-mAhP-vgvDRvPTjharRD76BFLyS_fA@mail.gmail.com>
+	(envelope-from <pbonzini@redhat.com>) id 1fOM6P-00070x-DC
+	for qemu-devel@nongnu.org; Thu, 31 May 2018 07:50:50 -0400
+References: <20180517081527.14410-1-david@redhat.com>
+	<451cd080-12ab-42bd-0150-e1dbf0abd859@redhat.com>
+	<bfeacd03-2d57-1bc2-bff1-543b7ea1d66d@redhat.com>
+	<20180531134701.6530d1f8@redhat.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <35601960-682e-9ccc-c724-2c6504e8cc2c@redhat.com>
-Date: Thu, 31 May 2018 13:50:03 +0200
+Message-ID: <bb0d2f34-8d75-da3c-90a4-616945627214@redhat.com>
+Date: Thu, 31 May 2018 13:50:40 +0200
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA8p=PzfMbzbE6zQ-mAhP-vgvDRvPTjharRD76BFLyS_fA@mail.gmail.com>
+In-Reply-To: <20180531134701.6530d1f8@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 23/27] hw/core/or-irq: Support more than 16
- inputs to an OR gate
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH v4 00/14] MemoryDevice: use
+ multi stage hotplug handlers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,48 +27,95 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: qemu-arm <qemu-arm@nongnu.org>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, "patches@linaro.org" <patches@linaro.org>, Richard Henderson <rth@twiddle.net>
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org, Pankaj Gupta <pagupta@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Richard Henderson <rth@twiddle.net>, Cornelia Huck <cohuck@redhat.com>, Alexander Graf <agraf@suse.de>, Markus Armbruster <armbru@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org, qemu-ppc@nongnu.org, Marcel Apfelbaum <marcel@redhat.com>, Luiz Capitulino <lcapitulino@redhat.com>, David Gibson <david@gibson.dropbear.id.au>
 
-On 31/05/2018 12:50, Peter Maydell wrote:
-> On 31 May 2018 at 11:21, Paolo Bonzini <pbonzini@redhat.com> wrote:
->> On 30/05/2018 19:35, Peter Maydell wrote:
->>> On 30 May 2018 at 17:59, Paolo Bonzini <pbonzini@redhat.com> wrote:
->>>> On 21/05/2018 17:02, Peter Maydell wrote:
->>>>> On 21 May 2018 at 15:34, Paolo Bonzini <pbonzini@redhat.com> wrote:
->>>>>> Why do the levels have to be migrated at all?  It should be enough=
- if
->>>>>> the IRQ level is either migrated manually, or restored (e.g. in
->>>>>> post_save callbacks) through other data that is migrated.
->>>>> This is standard behaviour for devices: they track their
->>>>> inbound irq/gpio lines, and then that becomes internal state for
->>>>> them that must be migrated.
+On 31/05/2018 13:47, Igor Mammedov wrote:
+> On Wed, 30 May 2018 16:03:29 +0200
+> Paolo Bonzini <pbonzini@redhat.com> wrote:
+> 
+>> On 25/05/2018 14:43, David Hildenbrand wrote:
+>>> On 17.05.2018 10:15, David Hildenbrand wrote:  
+>>>> We can have devices that need certain other resources that are e.g.
+>>>> system resources managed by the machine. We need a clean way to assign
+>>>> these resources (without violating layers as brought up by Igor).
 >>>>
->>>> But or_irq's input are another device's outbound lines, so tracking =
-them
->>>> should not be necessary.  The other device would do it for or_irq.
+>>>> One example is virtio-mem/virtio-pmem. Both device types need to be
+>>>> assigned some region in guest physical address space. This device memory
+>>>> belongs to the machine and is managed by it. However, virito devices are
+>>>> hotplugged using the hotplug handler their proxy device implements. So we
+>>>> could trigger e.g. a PCI hotplug handler for virtio-pci or a CSS/CCW
+>>>> hotplug handler for virtio-ccw. But definetly not the machine.
+>>>>
+>>>> Now, we can route other devices through the machine hotplug handler, to
+>>>> properly assign/unassign resources - like a portion in guest physical
+>>>> address space.
+>>>>
+>>>> v3 -> v4:
+>>>> - Removed the s390x bits, will send that out separately (was just a proof
+>>>>   that it works just fine with s390x)
+>>>> - Fixed a typo and reworded a comment
+>>>>
+>>>> v2 -> v3:
+>>>> - Added "memory-device: introduce separate config option"
+>>>> - Dropped "parent_bus" check from hotplug handler lookup functions
+>>>> - "Handly" -> "Handle" in patch description.
+>>>>
+>>>> v1 -> v2:
+>>>> - Use multi stage hotplug handler instead of resource handler
+>>>> - MemoryDevices only compiled if necessary (CONFIG_MEM_HOTPLUG)
+>>>> - Prepare PC/SPAPR machines properly for multi stage hotplug handlers
+>>>> - Route SPAPR unplug code via the hotunplug handler
+>>>> - Directly include s390x support. But there are no usable memory devices
+>>>>   yet (well, only my virtio-mem prototype)
+>>>> - Included "memory-device: drop assert related to align and start of address
+>>>>   space"
+>>>>
+>>>> David Hildenbrand (13):
+>>>>   memory-device: drop assert related to align and start of address space
+>>>>   memory-device: introduce separate config option
+>>>>   pc: prepare for multi stage hotplug handlers
+>>>>   pc: route all memory devices through the machine hotplug handler
+>>>>   spapr: prepare for multi stage hotplug handlers
+>>>>   spapr: route all memory devices through the machine hotplug handler
+>>>>   spapr: handle pc-dimm unplug via hotplug handler chain
+>>>>   spapr: handle cpu core unplug via hotplug handler chain
+>>>>   memory-device: new functions to handle plug/unplug
+>>>>   pc-dimm: implement new memory device functions
+>>>>   memory-device: factor out pre-plug into hotplug handler
+>>>>   memory-device: factor out unplug into hotplug handler
+>>>>   memory-device: factor out plug into hotplug handler
+>>>>
+>>>> Igor Mammedov (1):
+>>>>   qdev: let machine hotplug handler to override bus hotplug handler
+>>>>
+>>>>  default-configs/i386-softmmu.mak   |   3 +-
+>>>>  default-configs/ppc64-softmmu.mak  |   3 +-
+>>>>  default-configs/x86_64-softmmu.mak |   3 +-
+>>>>  hw/Makefile.objs                   |   2 +-
+>>>>  hw/core/qdev.c                     |   6 +-
+>>>>  hw/i386/pc.c                       | 102 ++++++++++++++++++++++-------
+>>>>  hw/mem/Makefile.objs               |   4 +-
+>>>>  hw/mem/memory-device.c             | 129 +++++++++++++++++++++++--------------
+>>>>  hw/mem/pc-dimm.c                   |  48 ++++++--------
+>>>>  hw/mem/trace-events                |   4 +-
+>>>>  hw/ppc/spapr.c                     | 129 +++++++++++++++++++++++++++++++------
+>>>>  include/hw/mem/memory-device.h     |  21 ++++--
+>>>>  include/hw/mem/pc-dimm.h           |   3 +-
+>>>>  include/hw/qdev-core.h             |  11 ++++
+>>>>  qapi/misc.json                     |   2 +-
+>>>>  15 files changed, 330 insertions(+), 140 deletions(-)
+>>>>  
 >>>
->>> There's no mechanism in qemu_irq for the destination end to ask
->>> the source end about its current value. The information flow
->>> is strictly one-way.
+>>> As there was no negative feedback so far, I will go ahead and assume
+>>> that this approach is the right thing to do.  
 >>
->> On postload, the source must call qemu_set_irq and that will cause an
->> update of the or_irq, won't it?
->=20
-> No, calling qemu_set_irq in postload is a bug. (You don't know
-> which order the state of the source and destination devices is
-> restored, so asserting a signal in postload would have different
-> effects depending on whether the destination had already had
-> its state restored or not.)
+>> Ok, I'll queue this.
+> I think it's a bit premature.
+> Series would need a respin and it should also include
+> for completness at leas one actual user (virtio-mem) to see
+> how new interfaces/wrappers would be used and if they actually needed.
 
-Hmm, I suppose the x86 world is a bit more "hierarchical" and you cannot
-create a qemu_irq loop - and creating the sink always before the source
-ensures that migration works fine with post_load.  I'm pretty sure that
-there are devices that do that, and an interesting case (for the sake of
-this thread) is the IOMMU, which prompted the introduction of
-MigrationPriority.  Thanks for the lesson! :)
-
-Maybe we should add your text to docs/devel/migration.rst, under "Device
-ordering", because it explicitly mentions interrupt controllers.
+Yeah, I noticed that a respin was needed after sending this.  Thanks,
 
 Paolo
