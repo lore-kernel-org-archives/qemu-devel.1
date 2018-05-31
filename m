@@ -1,26 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45432)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48804)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1fOJIX-0005qI-Mi
-	for qemu-devel@nongnu.org; Thu, 31 May 2018 04:51:06 -0400
+	(envelope-from <lersek@redhat.com>) id 1fOJcl-0001lT-NN
+	for qemu-devel@nongnu.org; Thu, 31 May 2018 05:12:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1fOJIU-0003DC-KM
-	for qemu-devel@nongnu.org; Thu, 31 May 2018 04:51:05 -0400
-Received: from mail-wm0-x244.google.com ([2a00:1450:400c:c09::244]:40616)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1fOJIU-0003CR-CL
-	for qemu-devel@nongnu.org; Thu, 31 May 2018 04:51:02 -0400
-Received: by mail-wm0-x244.google.com with SMTP id x2-v6so45092717wmh.5
-	for <qemu-devel@nongnu.org>; Thu, 31 May 2018 01:51:02 -0700 (PDT)
-Date: Thu, 31 May 2018 09:50:57 +0100
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20180531085057.GG26429@stefanha-x1.localdomain>
-References: <CAJGDS+HNBG6PSvG7Cc7bN4rMadgm5W+1aQUAeizN9CGjSOCP5w@mail.gmail.com>
+	(envelope-from <lersek@redhat.com>) id 1fOJch-00083T-Gx
+	for qemu-devel@nongnu.org; Thu, 31 May 2018 05:11:59 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:47906 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1fOJch-00082t-AI
+	for qemu-devel@nongnu.org; Thu, 31 May 2018 05:11:55 -0400
+References: <20180323122520.11270-1-kraxel@redhat.com>
+	<43fc23c1-d72f-748a-5b9d-a816466d7406@redhat.com>
+	<20180425140749.6x3w4h4i2n6uaq7o@sirius.home.kraxel.org>
+	<1ed94b1c-b416-eebe-9cf3-91943a0e6c5a@redhat.com>
+	<20180531084347.xb2r5aolkis2nmqg@sirius.home.kraxel.org>
+From: Laszlo Ersek <lersek@redhat.com>
+Message-ID: <4b65af58-8451-a365-6c81-52c49e42b6ff@redhat.com>
+Date: Thu, 31 May 2018 11:11:51 +0200
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="7lMq7vMTJT4tNk0a"
-Content-Disposition: inline
-In-Reply-To: <CAJGDS+HNBG6PSvG7Cc7bN4rMadgm5W+1aQUAeizN9CGjSOCP5w@mail.gmail.com>
-Subject: Re: [Qemu-devel] Recording I/O activity after KVM does a VMEXIT
+In-Reply-To: <20180531084347.xb2r5aolkis2nmqg@sirius.home.kraxel.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 0/7] ramfb: simple boot framebuffer,
+ no legacy vga
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,52 +32,87 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Arnabjyoti Kalita <akalita@cs.stonybrook.edu>
-Cc: qemu-devel@nongnu.org, Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>
+To: Gerd Hoffmann <kraxel@redhat.com>
+Cc: qemu-devel@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>, Alex Williamson <alex.williamson@redhat.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>
 
+On 05/31/18 10:43, Gerd Hoffmann wrote:
+>   Hi,
+> 
+> Resuming an old discussion ...
+> 
+>>> From
+>>> the guests point of view there is no difference between
+>>>
+>>>   (a) qemu -device virtio-ramfb, and
+>>>   (b) qemu -device virtio-gpu-pci -device ramfb-testdev
+>>>
+>>> On the host side the difference is that (a) is a single QemuConsole
+>>> which shows virtio-gpu-pci once activated and ramfb otherwise, and
+>>> (b) is two QemuConsoles, so you can see both virtio-gpu-pci and ramfb
+>>> side-by-side, for debugging purposes.
+>>
+>> Exactly this "multiple frontends, single backend" connection is the
+>> problem. In UEFI, it is possible to establish a priority order between
+>> drivers that are all capable of binding the same controller ("handle"),
+>> but especially with ramfb + another (PCI) video frontend, it's the
+>> "handles" that are different. The "priority mechanism" would have no
+>> idea that the drivers cannot peacefully coexist, i.e. it's clueless
+>> about the (host side only) competition.
+> 
+> Well, virtio-vga and qxl-vga are very simliar.  They both are two-in-one
+> devices, with legacy vga frontend and native (qxl/virtio) frontend
+> sharing a single backend.  When the guest initialized the native
+> frontend the backend switches over from vga to native.
 
---7lMq7vMTJT4tNk0a
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+True -- the difference is however, that the firmware doesn't even try to
+drive the native QXL frontend; it's clueless about it.
 
-On Wed, May 30, 2018 at 11:19:13PM -0400, Arnabjyoti Kalita wrote:
-> I am trying to implement a 'minimal' record-replay mechanism for KVM, whi=
-ch
-> is similar to the one existing for TCG via -icount. I am trying to record
-> I/O events only (specifically disk and network events) when KVM does a
-> VMEXIT. This has led me to the function kvm_cpu_exec where I can clearly
-> see the different ways of handling all of the possible VMExit cases (like
-> PIO, MMIO etc.). To record network packets, I am working with the e1000
-> hardware device.
->=20
-> Can I make sure that all of the network I/O, atleast for the e1000 device
-> happens through the KVM_EXIT_MMIO case and subsequent use of the
-> address_space_rw() function ? Do I also need to look at other functions as
-> well ? Also for recording disk activity, can I make sure that looking out
-> for the KVM_EXIT_MMIO and/or KVM_EXIT_PIO cases in the vmexit mechanism,
-> will be enough ?
->=20
-> Let me know if there are other details that I need to take care of. I am
-> using QEMU 2.11 on a x86-64 CPU and the guest runs a Linux Kernel 4.4 with
-> Ubuntu 16.04.
+IOW, in the (QXL, VGA) two-in-one device, the firmware only sees VGA,
+because the firmware entirely (globally) ignores the QXL frontend; it
+has no driver for native QXL.
 
-I have CCed Pavel Dovgalyuk, the record/replay maintainer.
+We couldn't do that for virtio-gpu (we really wanted to drive it for
+aarch64's sake), so the (virtio-gpu, VGA) two-in-one device required
+special hacks, to prevent double-binding.
 
-Stefan
+[snip]
 
---7lMq7vMTJT4tNk0a
-Content-Type: application/pgp-signature; name="signature.asc"
+>> I could imagine an OvmfPkg-specific PCI capability that said, "all PCI
+>> drivers in OvmfPkg that could otherwise drive this device, ignore it --
+>> another (platform) driver in OvmfPkg will pick it up instead".
+> 
+> pci capability for ramfb could be useful (also for linux).  I'll keep it
+> in mind for now.
 
------BEGIN PGP SIGNATURE-----
+Please do. :)
 
-iQEcBAEBAgAGBQJbD7dxAAoJEJykq7OBq3PIWwMIAJKVqxgYV8jMLTOfy4CaRv3a
-UyQd/cckjM/C6+mv2Vt1AUyRPVv3z6x+FJ9wVYFZMi7nnYa6GF53cdt0c+VkP8Kn
-2YTDgqcGHgbI7PJMeAWlf5UndViynYzdTv+q6eO+5ZqpdrV0iAf0Nvu0YSbPWEdi
-Lk3dGHBWnuCPovjZ2kBINz43gNrETT2v6JVUItZAoMGw71K2iH8zfNFGCx2kq2Xf
-+xgTyhFGXdOQVt549nGMWgGaPNdLK3VnLmcIN0iPVOzImAByM+hw9w8lpmCciN6x
-0Xlx6S+pRCPqNWjwKTiSHeUPwU3+c03+j9qmxs8DgU6rZ8/Vdt2L3LgPT9Lc1G0=
-=Uex+
------END PGP SIGNATURE-----
+When you brought up the PCI capability last time in this thread (and I
+liked it), I realized that scanning for this new (likely "vendor")
+capability would require me to code up the *third* PCI caplist scanning
+loop in OVMF.
 
---7lMq7vMTJT4tNk0a--
+(Until that point we had implemented two such scans, one in the
+virtio-1.0 driver, because virtio-1.0 uses vendor capabilities
+liberally, and the other one in PciHotPlugInitDxe, which looks for the
+PCI resource reservation hints on bridges, for hotplug purposes.)
+
+After I had added the 2nd such scan (in PciHotPlugInitDxe), Jordan
+suggested that we should rather use some helper library to save us the
+manual fiddling with the capability headers and contents.
+
+So, when you brought up PCI capabilities the last time in this thread,
+the foreseeable "third scan" got stuck in my mind, and it ultimtely
+spurred me to write that helper library, originally suggested by Jordan.
+It's been upstream for a week now, and both Virtio10Dxe and
+PciHotPlugInitDxe have been converted to use it (commit range
+4b8552d794e7..5685a243b6f8). (Thank you Ard again for the review.)
+
+If you add the above-suggested
+
+  "hands off for platform drivers' sake"
+
+capability in QEMU, I think we'll be able to locate and parse it cleanly
+in the OVMF PCI drivers that need to honor it.
+
+Thanks!
+Laszlo
