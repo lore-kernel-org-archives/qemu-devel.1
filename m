@@ -1,28 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41666)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41763)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1fOOUv-0000tV-Sc
-	for qemu-devel@nongnu.org; Thu, 31 May 2018 10:24:15 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1fOOUz-0000yS-Ow
+	for qemu-devel@nongnu.org; Thu, 31 May 2018 10:24:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1fOOUt-0006WP-Bd
-	for qemu-devel@nongnu.org; Thu, 31 May 2018 10:24:13 -0400
-Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:42282)
+	(envelope-from <pm215@archaic.org.uk>) id 1fOOUy-0006bo-QU
+	for qemu-devel@nongnu.org; Thu, 31 May 2018 10:24:17 -0400
+Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:42296)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1fOOUs-0006Oj-Vv
-	for qemu-devel@nongnu.org; Thu, 31 May 2018 10:24:11 -0400
+	id 1fOOUy-0006b8-Ij
+	for qemu-devel@nongnu.org; Thu, 31 May 2018 10:24:16 -0400
 Received: from pm215 by orth.archaic.org.uk with local (Exim 4.89)
-	(envelope-from <pm215@archaic.org.uk>) id 1fOOUk-0002pt-Gb
-	for qemu-devel@nongnu.org; Thu, 31 May 2018 15:24:02 +0100
+	(envelope-from <pm215@archaic.org.uk>) id 1fOOUx-0002yp-LJ
+	for qemu-devel@nongnu.org; Thu, 31 May 2018 15:24:15 +0100
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 31 May 2018 15:23:37 +0100
-Message-Id: <20180531142357.904-6-peter.maydell@linaro.org>
+Date: Thu, 31 May 2018 15:23:56 +0100
+Message-Id: <20180531142357.904-25-peter.maydell@linaro.org>
 In-Reply-To: <20180531142357.904-1-peter.maydell@linaro.org>
 References: <20180531142357.904-1-peter.maydell@linaro.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 05/25] tcg: Fix helper function vs host abi for
- float16
+Subject: [Qemu-devel] [PULL 24/25] ARM: ACPI: Fix use-after-free due to
+ memory realloc
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,382 +30,85 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-From: Richard Henderson <richard.henderson@linaro.org>
+From: Shannon Zhao <zhaoshenglong@huawei.com>
 
-Depending on the host abi, float16, aka uint16_t, values are
-passed and returned either zero-extended in the host register
-or with garbage at the top of the host register.
+acpi_data_push uses g_array_set_size to resize the memory size. If there
+is no enough contiguous memory, the address will be changed. So previous
+pointer could not be used any more. It must update the pointer and use
+the new one.
 
-The tcg code generator has so far been assuming garbage, as that
-matches the x86 abi, but this is incorrect for other host abis.
-Further, target/arm has so far been assuming zero-extended results,
-so that it may store the 16-bit value into a 32-bit slot with the
-high 16-bits already clear.
+Also, previous codes wrongly use le32 conversion of iort->node_offset
+for subsequent computations that will result incorrect value if host is
+not litlle endian. So use the non-converted one instead.
 
-Rectify both problems by mapping "f16" in the helper definition
-to uint32_t instead of (a typedef for) uint16_t.  This forces
-the host compiler to assume garbage in the upper 16 bits on input
-and to zero-extend the result on output.
-
-Cc: qemu-stable@nongnu.org
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Tested-by: Laurent Desnogues <laurent.desnogues@gmail.com>
-Message-id: 20180522175629.24932-1-richard.henderson@linaro.org
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+Signed-off-by: Shannon Zhao <zhaoshenglong@huawei.com>
+Reviewed-by: Eric Auger <eric.auger@redhat.com>
+Message-id: 1527663951-14552-1-git-send-email-zhaoshenglong@huawei.com
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- include/exec/helper-head.h |  2 +-
- target/arm/helper-a64.c    | 35 +++++++++--------
- target/arm/helper.c        | 80 +++++++++++++++++++-------------------
- 3 files changed, 59 insertions(+), 58 deletions(-)
+ hw/arm/virt-acpi-build.c | 20 +++++++++++++++-----
+ 1 file changed, 15 insertions(+), 5 deletions(-)
 
-diff --git a/include/exec/helper-head.h b/include/exec/helper-head.h
-index 15b6a68de3..276dd5afce 100644
---- a/include/exec/helper-head.h
-+++ b/include/exec/helper-head.h
-@@ -39,7 +39,7 @@
- #define dh_ctype_int int
- #define dh_ctype_i64 uint64_t
- #define dh_ctype_s64 int64_t
--#define dh_ctype_f16 float16
-+#define dh_ctype_f16 uint32_t
- #define dh_ctype_f32 float32
- #define dh_ctype_f64 float64
- #define dh_ctype_ptr void *
-diff --git a/target/arm/helper-a64.c b/target/arm/helper-a64.c
-index c4d2a04827..7f6ad3000b 100644
---- a/target/arm/helper-a64.c
-+++ b/target/arm/helper-a64.c
-@@ -85,12 +85,12 @@ static inline uint32_t float_rel_to_flags(int res)
-     return flags;
- }
+diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
+index 92ceee9c0f..74f5744e87 100644
+--- a/hw/arm/virt-acpi-build.c
++++ b/hw/arm/virt-acpi-build.c
+@@ -400,7 +400,7 @@ build_iort(GArray *table_data, BIOSLinker *linker, VirtMachineState *vms)
+     AcpiIortItsGroup *its;
+     AcpiIortTable *iort;
+     AcpiIortSmmu3 *smmu;
+-    size_t node_size, iort_length, smmu_offset = 0;
++    size_t node_size, iort_node_offset, iort_length, smmu_offset = 0;
+     AcpiIortRC *rc;
  
--uint64_t HELPER(vfp_cmph_a64)(float16 x, float16 y, void *fp_status)
-+uint64_t HELPER(vfp_cmph_a64)(uint32_t x, uint32_t y, void *fp_status)
- {
-     return float_rel_to_flags(float16_compare_quiet(x, y, fp_status));
- }
+     iort = acpi_data_push(table_data, sizeof(*iort));
+@@ -413,7 +413,12 @@ build_iort(GArray *table_data, BIOSLinker *linker, VirtMachineState *vms)
  
--uint64_t HELPER(vfp_cmpeh_a64)(float16 x, float16 y, void *fp_status)
-+uint64_t HELPER(vfp_cmpeh_a64)(uint32_t x, uint32_t y, void *fp_status)
- {
-     return float_rel_to_flags(float16_compare(x, y, fp_status));
- }
-@@ -214,7 +214,7 @@ uint64_t HELPER(neon_cgt_f64)(float64 a, float64 b, void *fpstp)
- #define float64_three make_float64(0x4008000000000000ULL)
- #define float64_one_point_five make_float64(0x3FF8000000000000ULL)
+     iort_length = sizeof(*iort);
+     iort->node_count = cpu_to_le32(nb_nodes);
+-    iort->node_offset = cpu_to_le32(sizeof(*iort));
++    /*
++     * Use a copy in case table_data->data moves during acpi_data_push
++     * operations.
++     */
++    iort_node_offset = sizeof(*iort);
++    iort->node_offset = cpu_to_le32(iort_node_offset);
  
--float16 HELPER(recpsf_f16)(float16 a, float16 b, void *fpstp)
-+uint32_t HELPER(recpsf_f16)(uint32_t a, uint32_t b, void *fpstp)
- {
-     float_status *fpst = fpstp;
+     /* ITS group node */
+     node_size =  sizeof(*its) + sizeof(uint32_t);
+@@ -429,7 +434,7 @@ build_iort(GArray *table_data, BIOSLinker *linker, VirtMachineState *vms)
+         int irq =  vms->irqmap[VIRT_SMMU];
  
-@@ -259,7 +259,7 @@ float64 HELPER(recpsf_f64)(float64 a, float64 b, void *fpstp)
-     return float64_muladd(a, b, float64_two, 0, fpst);
- }
- 
--float16 HELPER(rsqrtsf_f16)(float16 a, float16 b, void *fpstp)
-+uint32_t HELPER(rsqrtsf_f16)(uint32_t a, uint32_t b, void *fpstp)
- {
-     float_status *fpst = fpstp;
- 
-@@ -366,7 +366,7 @@ uint64_t HELPER(neon_addlp_u16)(uint64_t a)
- }
- 
- /* Floating-point reciprocal exponent - see FPRecpX in ARM ARM */
--float16 HELPER(frecpx_f16)(float16 a, void *fpstp)
-+uint32_t HELPER(frecpx_f16)(uint32_t a, void *fpstp)
- {
-     float_status *fpst = fpstp;
-     uint16_t val16, sbit;
-@@ -701,7 +701,7 @@ void HELPER(casp_be_parallel)(CPUARMState *env, uint32_t rs, uint64_t addr,
- #define ADVSIMD_HELPER(name, suffix) HELPER(glue(glue(advsimd_, name), suffix))
- 
- #define ADVSIMD_HALFOP(name) \
--float16 ADVSIMD_HELPER(name, h)(float16 a, float16 b, void *fpstp) \
-+uint32_t ADVSIMD_HELPER(name, h)(uint32_t a, uint32_t b, void *fpstp) \
- { \
-     float_status *fpst = fpstp; \
-     return float16_ ## name(a, b, fpst);    \
-@@ -761,7 +761,8 @@ ADVSIMD_HALFOP(mulx)
- ADVSIMD_TWOHALFOP(mulx)
- 
- /* fused multiply-accumulate */
--float16 HELPER(advsimd_muladdh)(float16 a, float16 b, float16 c, void *fpstp)
-+uint32_t HELPER(advsimd_muladdh)(uint32_t a, uint32_t b, uint32_t c,
-+                                 void *fpstp)
- {
-     float_status *fpst = fpstp;
-     return float16_muladd(a, b, c, 0, fpst);
-@@ -792,14 +793,14 @@ uint32_t HELPER(advsimd_muladd2h)(uint32_t two_a, uint32_t two_b,
- 
- #define ADVSIMD_CMPRES(test) (test) ? 0xffff : 0
- 
--uint32_t HELPER(advsimd_ceq_f16)(float16 a, float16 b, void *fpstp)
-+uint32_t HELPER(advsimd_ceq_f16)(uint32_t a, uint32_t b, void *fpstp)
- {
-     float_status *fpst = fpstp;
-     int compare = float16_compare_quiet(a, b, fpst);
-     return ADVSIMD_CMPRES(compare == float_relation_equal);
- }
- 
--uint32_t HELPER(advsimd_cge_f16)(float16 a, float16 b, void *fpstp)
-+uint32_t HELPER(advsimd_cge_f16)(uint32_t a, uint32_t b, void *fpstp)
- {
-     float_status *fpst = fpstp;
-     int compare = float16_compare(a, b, fpst);
-@@ -807,14 +808,14 @@ uint32_t HELPER(advsimd_cge_f16)(float16 a, float16 b, void *fpstp)
-                           compare == float_relation_equal);
- }
- 
--uint32_t HELPER(advsimd_cgt_f16)(float16 a, float16 b, void *fpstp)
-+uint32_t HELPER(advsimd_cgt_f16)(uint32_t a, uint32_t b, void *fpstp)
- {
-     float_status *fpst = fpstp;
-     int compare = float16_compare(a, b, fpst);
-     return ADVSIMD_CMPRES(compare == float_relation_greater);
- }
- 
--uint32_t HELPER(advsimd_acge_f16)(float16 a, float16 b, void *fpstp)
-+uint32_t HELPER(advsimd_acge_f16)(uint32_t a, uint32_t b, void *fpstp)
- {
-     float_status *fpst = fpstp;
-     float16 f0 = float16_abs(a);
-@@ -824,7 +825,7 @@ uint32_t HELPER(advsimd_acge_f16)(float16 a, float16 b, void *fpstp)
-                           compare == float_relation_equal);
- }
- 
--uint32_t HELPER(advsimd_acgt_f16)(float16 a, float16 b, void *fpstp)
-+uint32_t HELPER(advsimd_acgt_f16)(uint32_t a, uint32_t b, void *fpstp)
- {
-     float_status *fpst = fpstp;
-     float16 f0 = float16_abs(a);
-@@ -834,12 +835,12 @@ uint32_t HELPER(advsimd_acgt_f16)(float16 a, float16 b, void *fpstp)
- }
- 
- /* round to integral */
--float16 HELPER(advsimd_rinth_exact)(float16 x, void *fp_status)
-+uint32_t HELPER(advsimd_rinth_exact)(uint32_t x, void *fp_status)
- {
-     return float16_round_to_int(x, fp_status);
- }
- 
--float16 HELPER(advsimd_rinth)(float16 x, void *fp_status)
-+uint32_t HELPER(advsimd_rinth)(uint32_t x, void *fp_status)
- {
-     int old_flags = get_float_exception_flags(fp_status), new_flags;
-     float16 ret;
-@@ -863,7 +864,7 @@ float16 HELPER(advsimd_rinth)(float16 x, void *fp_status)
-  * setting the mode appropriately before calling the helper.
-  */
- 
--uint32_t HELPER(advsimd_f16tosinth)(float16 a, void *fpstp)
-+uint32_t HELPER(advsimd_f16tosinth)(uint32_t a, void *fpstp)
- {
-     float_status *fpst = fpstp;
- 
-@@ -875,7 +876,7 @@ uint32_t HELPER(advsimd_f16tosinth)(float16 a, void *fpstp)
-     return float16_to_int16(a, fpst);
- }
- 
--uint32_t HELPER(advsimd_f16touinth)(float16 a, void *fpstp)
-+uint32_t HELPER(advsimd_f16touinth)(uint32_t a, void *fpstp)
- {
-     float_status *fpst = fpstp;
- 
-@@ -891,7 +892,7 @@ uint32_t HELPER(advsimd_f16touinth)(float16 a, void *fpstp)
-  * Square Root and Reciprocal square root
-  */
- 
--float16 HELPER(sqrt_f16)(float16 a, void *fpstp)
-+uint32_t HELPER(sqrt_f16)(uint32_t a, void *fpstp)
- {
-     float_status *s = fpstp;
- 
-diff --git a/target/arm/helper.c b/target/arm/helper.c
-index c0f739972e..a4bfac3932 100644
---- a/target/arm/helper.c
-+++ b/target/arm/helper.c
-@@ -11344,35 +11344,35 @@ DO_VFP_cmp(d, float64)
- 
- /* Integer to float and float to integer conversions */
- 
--#define CONV_ITOF(name, fsz, sign) \
--    float##fsz HELPER(name)(uint32_t x, void *fpstp) \
--{ \
--    float_status *fpst = fpstp; \
--    return sign##int32_to_##float##fsz((sign##int32_t)x, fpst); \
-+#define CONV_ITOF(name, ftype, fsz, sign)                           \
-+ftype HELPER(name)(uint32_t x, void *fpstp)                         \
-+{                                                                   \
-+    float_status *fpst = fpstp;                                     \
-+    return sign##int32_to_##float##fsz((sign##int32_t)x, fpst);     \
- }
- 
--#define CONV_FTOI(name, fsz, sign, round) \
--uint32_t HELPER(name)(float##fsz x, void *fpstp) \
--{ \
--    float_status *fpst = fpstp; \
--    if (float##fsz##_is_any_nan(x)) { \
--        float_raise(float_flag_invalid, fpst); \
--        return 0; \
--    } \
--    return float##fsz##_to_##sign##int32##round(x, fpst); \
-+#define CONV_FTOI(name, ftype, fsz, sign, round)                \
-+uint32_t HELPER(name)(ftype x, void *fpstp)                     \
-+{                                                               \
-+    float_status *fpst = fpstp;                                 \
-+    if (float##fsz##_is_any_nan(x)) {                           \
-+        float_raise(float_flag_invalid, fpst);                  \
-+        return 0;                                               \
-+    }                                                           \
-+    return float##fsz##_to_##sign##int32##round(x, fpst);       \
- }
- 
--#define FLOAT_CONVS(name, p, fsz, sign) \
--CONV_ITOF(vfp_##name##to##p, fsz, sign) \
--CONV_FTOI(vfp_to##name##p, fsz, sign, ) \
--CONV_FTOI(vfp_to##name##z##p, fsz, sign, _round_to_zero)
-+#define FLOAT_CONVS(name, p, ftype, fsz, sign)            \
-+    CONV_ITOF(vfp_##name##to##p, ftype, fsz, sign)        \
-+    CONV_FTOI(vfp_to##name##p, ftype, fsz, sign, )        \
-+    CONV_FTOI(vfp_to##name##z##p, ftype, fsz, sign, _round_to_zero)
- 
--FLOAT_CONVS(si, h, 16, )
--FLOAT_CONVS(si, s, 32, )
--FLOAT_CONVS(si, d, 64, )
--FLOAT_CONVS(ui, h, 16, u)
--FLOAT_CONVS(ui, s, 32, u)
--FLOAT_CONVS(ui, d, 64, u)
-+FLOAT_CONVS(si, h, uint32_t, 16, )
-+FLOAT_CONVS(si, s, float32, 32, )
-+FLOAT_CONVS(si, d, float64, 64, )
-+FLOAT_CONVS(ui, h, uint32_t, 16, u)
-+FLOAT_CONVS(ui, s, float32, 32, u)
-+FLOAT_CONVS(ui, d, float64, 64, u)
- 
- #undef CONV_ITOF
- #undef CONV_FTOI
-@@ -11465,22 +11465,22 @@ static float16 do_postscale_fp16(float64 f, int shift, float_status *fpst)
-     return float64_to_float16(float64_scalbn(f, -shift, fpst), true, fpst);
- }
- 
--float16 HELPER(vfp_sltoh)(uint32_t x, uint32_t shift, void *fpst)
-+uint32_t HELPER(vfp_sltoh)(uint32_t x, uint32_t shift, void *fpst)
- {
-     return do_postscale_fp16(int32_to_float64(x, fpst), shift, fpst);
- }
- 
--float16 HELPER(vfp_ultoh)(uint32_t x, uint32_t shift, void *fpst)
-+uint32_t HELPER(vfp_ultoh)(uint32_t x, uint32_t shift, void *fpst)
- {
-     return do_postscale_fp16(uint32_to_float64(x, fpst), shift, fpst);
- }
- 
--float16 HELPER(vfp_sqtoh)(uint64_t x, uint32_t shift, void *fpst)
-+uint32_t HELPER(vfp_sqtoh)(uint64_t x, uint32_t shift, void *fpst)
- {
-     return do_postscale_fp16(int64_to_float64(x, fpst), shift, fpst);
- }
- 
--float16 HELPER(vfp_uqtoh)(uint64_t x, uint32_t shift, void *fpst)
-+uint32_t HELPER(vfp_uqtoh)(uint64_t x, uint32_t shift, void *fpst)
- {
-     return do_postscale_fp16(uint64_to_float64(x, fpst), shift, fpst);
- }
-@@ -11504,32 +11504,32 @@ static float64 do_prescale_fp16(float16 f, int shift, float_status *fpst)
+         /* SMMUv3 node */
+-        smmu_offset = iort->node_offset + node_size;
++        smmu_offset = iort_node_offset + node_size;
+         node_size = sizeof(*smmu) + sizeof(*idmap);
+         iort_length += node_size;
+         smmu = acpi_data_push(table_data, node_size);
+@@ -450,7 +455,7 @@ build_iort(GArray *table_data, BIOSLinker *linker, VirtMachineState *vms)
+         idmap->id_count = cpu_to_le32(0xFFFF);
+         idmap->output_base = 0;
+         /* output IORT node is the ITS group node (the first node) */
+-        idmap->output_reference = cpu_to_le32(iort->node_offset);
++        idmap->output_reference = cpu_to_le32(iort_node_offset);
      }
- }
  
--uint32_t HELPER(vfp_toshh)(float16 x, uint32_t shift, void *fpst)
-+uint32_t HELPER(vfp_toshh)(uint32_t x, uint32_t shift, void *fpst)
- {
-     return float64_to_int16(do_prescale_fp16(x, shift, fpst), fpst);
- }
+     /* Root Complex Node */
+@@ -479,9 +484,14 @@ build_iort(GArray *table_data, BIOSLinker *linker, VirtMachineState *vms)
+         idmap->output_reference = cpu_to_le32(smmu_offset);
+     } else {
+         /* output IORT node is the ITS group node (the first node) */
+-        idmap->output_reference = cpu_to_le32(iort->node_offset);
++        idmap->output_reference = cpu_to_le32(iort_node_offset);
+     }
  
--uint32_t HELPER(vfp_touhh)(float16 x, uint32_t shift, void *fpst)
-+uint32_t HELPER(vfp_touhh)(uint32_t x, uint32_t shift, void *fpst)
- {
-     return float64_to_uint16(do_prescale_fp16(x, shift, fpst), fpst);
- }
++    /*
++     * Update the pointer address in case table_data->data moves during above
++     * acpi_data_push operations.
++     */
++    iort = (AcpiIortTable *)(table_data->data + iort_start);
+     iort->length = cpu_to_le32(iort_length);
  
--uint32_t HELPER(vfp_toslh)(float16 x, uint32_t shift, void *fpst)
-+uint32_t HELPER(vfp_toslh)(uint32_t x, uint32_t shift, void *fpst)
- {
-     return float64_to_int32(do_prescale_fp16(x, shift, fpst), fpst);
- }
- 
--uint32_t HELPER(vfp_toulh)(float16 x, uint32_t shift, void *fpst)
-+uint32_t HELPER(vfp_toulh)(uint32_t x, uint32_t shift, void *fpst)
- {
-     return float64_to_uint32(do_prescale_fp16(x, shift, fpst), fpst);
- }
- 
--uint64_t HELPER(vfp_tosqh)(float16 x, uint32_t shift, void *fpst)
-+uint64_t HELPER(vfp_tosqh)(uint32_t x, uint32_t shift, void *fpst)
- {
-     return float64_to_int64(do_prescale_fp16(x, shift, fpst), fpst);
- }
- 
--uint64_t HELPER(vfp_touqh)(float16 x, uint32_t shift, void *fpst)
-+uint64_t HELPER(vfp_touqh)(uint32_t x, uint32_t shift, void *fpst)
- {
-     return float64_to_uint64(do_prescale_fp16(x, shift, fpst), fpst);
- }
-@@ -11565,7 +11565,7 @@ uint32_t HELPER(set_neon_rmode)(uint32_t rmode, CPUARMState *env)
- }
- 
- /* Half precision conversions.  */
--float32 HELPER(vfp_fcvt_f16_to_f32)(float16 a, void *fpstp, uint32_t ahp_mode)
-+float32 HELPER(vfp_fcvt_f16_to_f32)(uint32_t a, void *fpstp, uint32_t ahp_mode)
- {
-     /* Squash FZ16 to 0 for the duration of conversion.  In this case,
-      * it would affect flushing input denormals.
-@@ -11578,7 +11578,7 @@ float32 HELPER(vfp_fcvt_f16_to_f32)(float16 a, void *fpstp, uint32_t ahp_mode)
-     return r;
- }
- 
--float16 HELPER(vfp_fcvt_f32_to_f16)(float32 a, void *fpstp, uint32_t ahp_mode)
-+uint32_t HELPER(vfp_fcvt_f32_to_f16)(float32 a, void *fpstp, uint32_t ahp_mode)
- {
-     /* Squash FZ16 to 0 for the duration of conversion.  In this case,
-      * it would affect flushing output denormals.
-@@ -11591,7 +11591,7 @@ float16 HELPER(vfp_fcvt_f32_to_f16)(float32 a, void *fpstp, uint32_t ahp_mode)
-     return r;
- }
- 
--float64 HELPER(vfp_fcvt_f16_to_f64)(float16 a, void *fpstp, uint32_t ahp_mode)
-+float64 HELPER(vfp_fcvt_f16_to_f64)(uint32_t a, void *fpstp, uint32_t ahp_mode)
- {
-     /* Squash FZ16 to 0 for the duration of conversion.  In this case,
-      * it would affect flushing input denormals.
-@@ -11604,7 +11604,7 @@ float64 HELPER(vfp_fcvt_f16_to_f64)(float16 a, void *fpstp, uint32_t ahp_mode)
-     return r;
- }
- 
--float16 HELPER(vfp_fcvt_f64_to_f16)(float64 a, void *fpstp, uint32_t ahp_mode)
-+uint32_t HELPER(vfp_fcvt_f64_to_f16)(float64 a, void *fpstp, uint32_t ahp_mode)
- {
-     /* Squash FZ16 to 0 for the duration of conversion.  In this case,
-      * it would affect flushing output denormals.
-@@ -11742,7 +11742,7 @@ static bool round_to_inf(float_status *fpst, bool sign_bit)
-     g_assert_not_reached();
- }
- 
--float16 HELPER(recpe_f16)(float16 input, void *fpstp)
-+uint32_t HELPER(recpe_f16)(uint32_t input, void *fpstp)
- {
-     float_status *fpst = fpstp;
-     float16 f16 = float16_squash_input_denormal(input, fpst);
-@@ -11937,7 +11937,7 @@ static uint64_t recip_sqrt_estimate(int *exp , int exp_off, uint64_t frac)
-     return extract64(estimate, 0, 8) << 44;
- }
- 
--float16 HELPER(rsqrte_f16)(float16 input, void *fpstp)
-+uint32_t HELPER(rsqrte_f16)(uint32_t input, void *fpstp)
- {
-     float_status *s = fpstp;
-     float16 f16 = float16_squash_input_denormal(input, s);
+     build_header(linker, table_data, (void *)(table_data->data + iort_start),
 -- 
 2.17.1
