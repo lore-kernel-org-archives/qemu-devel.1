@@ -1,35 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59479)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59492)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1fORBZ-0006QX-67
+	(envelope-from <pbonzini@redhat.com>) id 1fORBa-0006Rm-4M
 	for qemu-devel@nongnu.org; Thu, 31 May 2018 13:16:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1fORBW-0004Bo-QL
-	for qemu-devel@nongnu.org; Thu, 31 May 2018 13:16:25 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:57516 helo=mx1.redhat.com)
+	(envelope-from <pbonzini@redhat.com>) id 1fORBY-0004F0-Be
+	for qemu-devel@nongnu.org; Thu, 31 May 2018 13:16:26 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:57518 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1fORBW-0004AX-K7
-	for qemu-devel@nongnu.org; Thu, 31 May 2018 13:16:22 -0400
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1fORBY-0004EC-6V
+	for qemu-devel@nongnu.org; Thu, 31 May 2018 13:16:24 -0400
 Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
 	[10.11.54.5])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 550D27D83A
-	for <qemu-devel@nongnu.org>; Thu, 31 May 2018 17:16:22 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id CF1E77D83A
+	for <qemu-devel@nongnu.org>; Thu, 31 May 2018 17:16:23 +0000 (UTC)
 Received: from donizetti.redhat.com (ovpn-117-47.ams2.redhat.com
 	[10.36.117.47])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id D43F163F34
-	for <qemu-devel@nongnu.org>; Thu, 31 May 2018 17:16:21 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 5BED563F50
+	for <qemu-devel@nongnu.org>; Thu, 31 May 2018 17:16:23 +0000 (UTC)
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Thu, 31 May 2018 19:16:04 +0200
-Message-Id: <20180531171606.21604-13-pbonzini@redhat.com>
+Date: Thu, 31 May 2018 19:16:06 +0200
+Message-Id: <20180531171606.21604-15-pbonzini@redhat.com>
 In-Reply-To: <20180531171606.21604-1-pbonzini@redhat.com>
 References: <20180531171253.21012-1-pbonzini@redhat.com>
 	<20180531171606.21604-1-pbonzini@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 51/53] qdev: Remove DeviceClass::init() and
- ::exit()
+Subject: [Qemu-devel] [PULL 53/53] memory: Make operations using
+ MemoryRegionIoeventfd struct pass by pointer.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -40,142 +37,126 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-From: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+From: Tristan Burgess <tburgessdev@gmail.com>
 
-Since no devices use it, we can safely remove it.
+This changes the functions memory_region_ioeventfd_equal, memory_region_ioeventfd_before, and their callers,
+to pass the MemoryRegionIoeventfd struct via pointer, instead of directly passing the struct. This saves on stack space
+and is considered safe practice.
 
-Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-Message-Id: <20180419212727.26095-5-f4bug@amsat.org>
-Reviewed-by: Markus Armbruster <armbru@redhat.com>
-[Removal of DeviceClass::init() moved from previous patch, missing
-documentation updates supplied]
-Signed-off-by: Markus Armbruster <armbru@redhat.com>
-Message-Id: <20180528144509.15812-5-armbru@redhat.com>
+Signed-off-by: Tristan Burgess <tburgessdev@gmail.com>
+Message-Id: <20180529030445.177867-1-tburgessdev@gmail.com>
+Fixes: Launchpad bug 1720969
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- hw/core/qdev.c         | 28 ----------------------------
- include/hw/qdev-core.h | 20 ++++----------------
- 2 files changed, 4 insertions(+), 44 deletions(-)
+ memory.c | 44 ++++++++++++++++++++++----------------------
+ 1 file changed, 22 insertions(+), 22 deletions(-)
 
-diff --git a/hw/core/qdev.c b/hw/core/qdev.c
-index f6f92473b8..ffec461791 100644
---- a/hw/core/qdev.c
-+++ b/hw/core/qdev.c
-@@ -208,32 +208,6 @@ void device_listener_unregister(DeviceListener *list=
-ener)
-     QTAILQ_REMOVE(&device_listeners, listener, link);
- }
-=20
--static void device_realize(DeviceState *dev, Error **errp)
--{
--    DeviceClass *dc =3D DEVICE_GET_CLASS(dev);
--
--    if (dc->init) {
--        int rc =3D dc->init(dev);
--        if (rc < 0) {
--            error_setg(errp, "Device initialization failed.");
--            return;
--        }
--    }
--}
--
--static void device_unrealize(DeviceState *dev, Error **errp)
--{
--    DeviceClass *dc =3D DEVICE_GET_CLASS(dev);
--
--    if (dc->exit) {
--        int rc =3D dc->exit(dev);
--        if (rc < 0) {
--            error_setg(errp, "Device exit failed.");
--            return;
--        }
--    }
--}
--
- void qdev_set_legacy_instance_id(DeviceState *dev, int alias_id,
-                                  int required_for_version)
+diff --git a/memory.c b/memory.c
+index e4f484b73e..af88b12bab 100644
+--- a/memory.c
++++ b/memory.c
+@@ -172,38 +172,38 @@ struct MemoryRegionIoeventfd {
+     EventNotifier *e;
+ };
+ 
+-static bool memory_region_ioeventfd_before(MemoryRegionIoeventfd a,
+-                                           MemoryRegionIoeventfd b)
++static bool memory_region_ioeventfd_before(MemoryRegionIoeventfd *a,
++                                           MemoryRegionIoeventfd *b)
  {
-@@ -1065,8 +1039,6 @@ static void device_class_init(ObjectClass *class, v=
-oid *data)
-     DeviceClass *dc =3D DEVICE_CLASS(class);
-=20
-     class->unparent =3D device_unparent;
--    dc->realize =3D device_realize;
--    dc->unrealize =3D device_unrealize;
-=20
-     /* by default all devices were considered as hotpluggable,
-      * so with intent to check it in generic qdev_unplug() /
-diff --git a/include/hw/qdev-core.h b/include/hw/qdev-core.h
-index 9453588160..f1fd0f8736 100644
---- a/include/hw/qdev-core.h
-+++ b/include/hw/qdev-core.h
-@@ -29,8 +29,6 @@ typedef enum DeviceCategory {
-     DEVICE_CATEGORY_MAX
- } DeviceCategory;
-=20
--typedef int (*qdev_initfn)(DeviceState *dev);
--typedef int (*qdev_event)(DeviceState *dev);
- typedef void (*DeviceRealize)(DeviceState *dev, Error **errp);
- typedef void (*DeviceUnrealize)(DeviceState *dev, Error **errp);
- typedef void (*DeviceReset)(DeviceState *dev);
-@@ -43,13 +41,9 @@ struct VMStateDescription;
-  * DeviceClass:
-  * @props: Properties accessing state fields.
-  * @realize: Callback function invoked when the #DeviceState:realized
-- * property is changed to %true. The default invokes @init if not %NULL.
-+ * property is changed to %true.
-  * @unrealize: Callback function invoked when the #DeviceState:realized
-  * property is changed to %false.
-- * @init: Callback function invoked when the #DeviceState::realized prop=
-erty
-- * is changed to %true. Deprecated, new types inheriting directly from
-- * TYPE_DEVICE should use @realize instead, new leaf types should consul=
-t
-- * their respective parent type.
-  * @hotpluggable: indicates if #DeviceClass is hotpluggable, available
-  * as readonly "hotpluggable" property of #DeviceState instance
-  *
-@@ -73,19 +67,15 @@ struct VMStateDescription;
-  * object_initialize() in their own #TypeInfo.instance_init and forward =
-the
-  * realization events appropriately.
-  *
-- * The @init callback is considered private to a particular bus implemen=
-tation
-- * (immediate abstract child types of TYPE_DEVICE). Derived leaf types s=
-et an
-- * "init" callback on their parent class instead.
-- *
-  * Any type may override the @realize and/or @unrealize callbacks but ne=
-eds
-  * to call the parent type's implementation if keeping their functionali=
-ty
-  * is desired. Refer to QOM documentation for further discussion and exa=
-mples.
-  *
-  * <note>
-  *   <para>
-- * If a type derived directly from TYPE_DEVICE implements @realize, it d=
-oes
-- * not need to implement @init and therefore does not need to store and =
-call
-- * #DeviceClass' default @realize callback.
-+ * Since TYPE_DEVICE doesn't implement @realize and @unrealize, types
-+ * derived directly from it need not call their parent's @realize and
-+ * @unrealize.
-  * For other types consult the documentation and implementation of the
-  * respective parent types.
-  *   </para>
-@@ -124,8 +114,6 @@ typedef struct DeviceClass {
-     const struct VMStateDescription *vmsd;
-=20
-     /* Private to qdev / bus.  */
--    qdev_initfn init; /* TODO remove, once users are converted to realiz=
-e */
--    qdev_event exit; /* TODO remove, once users are converted to unreali=
-ze */
-     const char *bus_type;
- } DeviceClass;
-=20
---=20
+-    if (int128_lt(a.addr.start, b.addr.start)) {
++    if (int128_lt(a->addr.start, b->addr.start)) {
+         return true;
+-    } else if (int128_gt(a.addr.start, b.addr.start)) {
++    } else if (int128_gt(a->addr.start, b->addr.start)) {
+         return false;
+-    } else if (int128_lt(a.addr.size, b.addr.size)) {
++    } else if (int128_lt(a->addr.size, b->addr.size)) {
+         return true;
+-    } else if (int128_gt(a.addr.size, b.addr.size)) {
++    } else if (int128_gt(a->addr.size, b->addr.size)) {
+         return false;
+-    } else if (a.match_data < b.match_data) {
++    } else if (a->match_data < b->match_data) {
+         return true;
+-    } else  if (a.match_data > b.match_data) {
++    } else  if (a->match_data > b->match_data) {
+         return false;
+-    } else if (a.match_data) {
+-        if (a.data < b.data) {
++    } else if (a->match_data) {
++        if (a->data < b->data) {
+             return true;
+-        } else if (a.data > b.data) {
++        } else if (a->data > b->data) {
+             return false;
+         }
+     }
+-    if (a.e < b.e) {
++    if (a->e < b->e) {
+         return true;
+-    } else if (a.e > b.e) {
++    } else if (a->e > b->e) {
+         return false;
+     }
+     return false;
+ }
+ 
+-static bool memory_region_ioeventfd_equal(MemoryRegionIoeventfd a,
+-                                          MemoryRegionIoeventfd b)
++static bool memory_region_ioeventfd_equal(MemoryRegionIoeventfd *a,
++                                          MemoryRegionIoeventfd *b)
+ {
+     return !memory_region_ioeventfd_before(a, b)
+         && !memory_region_ioeventfd_before(b, a);
+@@ -788,8 +788,8 @@ static void address_space_add_del_ioeventfds(AddressSpace *as,
+     while (iold < fds_old_nb || inew < fds_new_nb) {
+         if (iold < fds_old_nb
+             && (inew == fds_new_nb
+-                || memory_region_ioeventfd_before(fds_old[iold],
+-                                                  fds_new[inew]))) {
++                || memory_region_ioeventfd_before(&fds_old[iold],
++                                                  &fds_new[inew]))) {
+             fd = &fds_old[iold];
+             section = (MemoryRegionSection) {
+                 .fv = address_space_to_flatview(as),
+@@ -801,8 +801,8 @@ static void address_space_add_del_ioeventfds(AddressSpace *as,
+             ++iold;
+         } else if (inew < fds_new_nb
+                    && (iold == fds_old_nb
+-                       || memory_region_ioeventfd_before(fds_new[inew],
+-                                                         fds_old[iold]))) {
++                       || memory_region_ioeventfd_before(&fds_new[inew],
++                                                         &fds_old[iold]))) {
+             fd = &fds_new[inew];
+             section = (MemoryRegionSection) {
+                 .fv = address_space_to_flatview(as),
+@@ -1440,7 +1440,7 @@ static bool memory_region_dispatch_write_eventfds(MemoryRegion *mr,
+         ioeventfd.match_data = mr->ioeventfds[i].match_data;
+         ioeventfd.e = mr->ioeventfds[i].e;
+ 
+-        if (memory_region_ioeventfd_equal(ioeventfd, mr->ioeventfds[i])) {
++        if (memory_region_ioeventfd_equal(&ioeventfd, &mr->ioeventfds[i])) {
+             event_notifier_set(ioeventfd.e);
+             return true;
+         }
+@@ -2210,7 +2210,7 @@ void memory_region_add_eventfd(MemoryRegion *mr,
+     }
+     memory_region_transaction_begin();
+     for (i = 0; i < mr->ioeventfd_nb; ++i) {
+-        if (memory_region_ioeventfd_before(mrfd, mr->ioeventfds[i])) {
++        if (memory_region_ioeventfd_before(&mrfd, &mr->ioeventfds[i])) {
+             break;
+         }
+     }
+@@ -2245,7 +2245,7 @@ void memory_region_del_eventfd(MemoryRegion *mr,
+     }
+     memory_region_transaction_begin();
+     for (i = 0; i < mr->ioeventfd_nb; ++i) {
+-        if (memory_region_ioeventfd_equal(mrfd, mr->ioeventfds[i])) {
++        if (memory_region_ioeventfd_equal(&mrfd, &mr->ioeventfds[i])) {
+             break;
+         }
+     }
+-- 
 2.17.0
