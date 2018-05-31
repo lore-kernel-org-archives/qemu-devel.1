@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38120)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38121)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fOIaw-0000dB-1n
+	(envelope-from <bounces@canonical.com>) id 1fOIaw-0000dC-2J
 	for qemu-devel@nongnu.org; Thu, 31 May 2018 04:06:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fOIas-0002NE-22
+	(envelope-from <bounces@canonical.com>) id 1fOIas-0002O9-DQ
 	for qemu-devel@nongnu.org; Thu, 31 May 2018 04:06:02 -0400
-Received: from indium.canonical.com ([91.189.90.7]:59502)
+Received: from indium.canonical.com ([91.189.90.7]:59530)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1fOIar-0002Mb-SM
-	for qemu-devel@nongnu.org; Thu, 31 May 2018 04:05:57 -0400
+	id 1fOIas-0002Mt-6n
+	for qemu-devel@nongnu.org; Thu, 31 May 2018 04:05:58 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1fOIaq-0006ay-Pn
-	for <qemu-devel@nongnu.org>; Thu, 31 May 2018 08:05:56 +0000
+	id 1fOIar-0006ay-CJ
+	for <qemu-devel@nongnu.org>; Thu, 31 May 2018 08:05:57 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id BA05E2E80C7
-	for <qemu-devel@nongnu.org>; Thu, 31 May 2018 08:05:56 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id 574A02E80C8
+	for <qemu-devel@nongnu.org>; Thu, 31 May 2018 08:05:57 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Thu, 31 May 2018 07:44:45 -0000
+Date: Thu, 31 May 2018 07:49:50 -0000
 From: timsoft <tim@tree-of-life.co.uk>
 Reply-To: Bug 1404278 <1404278@bugs.launchpad.net>
 Sender: bounces@canonical.com
 References: <20141219153639.25009.84583.malonedeb@wampee.canonical.com>
-Message-Id: <152775268558.31866.5690330576248667738.malone@soybean.canonical.com>
+Message-Id: <152775299021.31371.17614060673038113361.malone@soybean.canonical.com>
 Errors-To: bounces@canonical.com
 Subject: [Qemu-devel] [Bug 1404278] Re: tap connections not working on
  windows host
@@ -39,23 +39,8 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-it is working now. using the following config.
-"c:\program files\qemu\qemu-system-i386.exe" -cpu qemu32 -m 3G -drive file=
-=3D"c:\\data\\images\\slack14.2_32bit_base.qcow2",format=3Dqcow2 -cdrom "c:=
-\\data\\images\\slackware-14.2-install-dvd.iso" -boot c -net nic,macaddr=3D=
-02:00:00:11:11:14,model=3Di82551 -net tap,ifname=3Dtap0 -k en-gb -display v=
-nc=3D:2 -monitor telnet:localhost:7101,server,nowait,nodelay
-which I took from a linux qemu vm of mine, and just modified the bridge to =
-point to tap (it didn't like -net bridge,br=3Dbr0 (where br0 was my windows=
- bridge - I guess there is no bridge helper on windows qemu - so I changed =
-it to -net tap,ifname=3Dtap0 (which was already configured as part of the b=
-ridge)
-I was able to ping the lan and also the wan (internet) so it looks ok now. =
-This time i did specify a different virtual net card which may have made a =
-difference, but if it works, that is the main thing.
-
-** Changed in: qemu
-       Status: Incomplete =3D> Fix Released
+addition to previous comment. it works with qemu-w64-setup-20180519.exe
+I haven't tested it with in between versions of qemu.
 
 -- =
 
