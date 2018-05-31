@@ -1,22 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57243)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58437)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sstabellini@kernel.org>) id 1fOSw1-0007UU-Qg
-	for qemu-devel@nongnu.org; Thu, 31 May 2018 15:08:31 -0400
+	(envelope-from <bounces@canonical.com>) id 1fOT3J-0001wr-9w
+	for qemu-devel@nongnu.org; Thu, 31 May 2018 15:16:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sstabellini@kernel.org>) id 1fOSw0-0006Q0-0P
-	for qemu-devel@nongnu.org; Thu, 31 May 2018 15:08:29 -0400
-Received: from mail.kernel.org ([198.145.29.99]:39700)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <sstabellini@kernel.org>)
-	id 1fOSvz-0006Os-NO
-	for qemu-devel@nongnu.org; Thu, 31 May 2018 15:08:27 -0400
-From: Stefano Stabellini <sstabellini@kernel.org>
-Date: Thu, 31 May 2018 12:08:23 -0700
-Message-Id: <1527793703-13095-3-git-send-email-sstabellini@kernel.org>
-In-Reply-To: <alpine.DEB.2.10.1805311206230.23991@sstabellini-ThinkPad-X260>
-References: <alpine.DEB.2.10.1805311206230.23991@sstabellini-ThinkPad-X260>
-Subject: [Qemu-devel] [PULL 3/3] xen-hvm: stop faking I/O to access PCI
- config space
+	(envelope-from <bounces@canonical.com>) id 1fOT3G-0003D9-5O
+	for qemu-devel@nongnu.org; Thu, 31 May 2018 15:16:01 -0400
+Received: from indium.canonical.com ([91.189.90.7]:40332)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1fOT3F-0003CD-V9
+	for qemu-devel@nongnu.org; Thu, 31 May 2018 15:15:58 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1fOT3D-0006h8-KQ
+	for <qemu-devel@nongnu.org>; Thu, 31 May 2018 19:15:55 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 98B1D2E88D7
+	for <qemu-devel@nongnu.org>; Thu, 31 May 2018 19:15:55 +0000 (UTC)
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Thu, 31 May 2018 19:01:08 -0000
+From: John Snow <1766904@bugs.launchpad.net>
+Reply-To: Bug 1766904 <1766904@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <152466858890.21548.13995835103547275465.malonedeb@soybean.canonical.com>
+Message-Id: <152779326806.3829.17986353330557339751.malone@chaenomeles.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1766904] Re: Creating high hdd load (with
+ constant fsyncs) on a SATA disk leads to freezes and errors in guest dmesg
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,207 +37,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: peter.maydell@linaro.org, stefanha@gmail.com
-Cc: sstabellini@kernel.org, stefanha@redhat.com, anthony.perard@citrix.com, xen-devel@lists.xenproject.org, qemu-devel@nongnu.org, Paul Durrant <paul.durrant@citrix.com>
+To: qemu-devel@nongnu.org
 
-From: Paul Durrant <paul.durrant@citrix.com>
+*** This bug is a duplicate of bug 1769189 ***
+    https://bugs.launchpad.net/bugs/1769189
 
-This patch removes the current hackery where IOREQ_TYPE_PCI_CONFIG
-requests are handled by faking PIO to 0xcf8 and 0xcfc and replaces it
-with direct calls to pci_host_config_read/write_common().
-Doing so necessitates mapping BDFs to PCIDevices but maintaining a simple
-QLIST in xen_device_realize/unrealize() will suffice.
+Great, thank you so much for helping!
 
-NOTE: whilst config space accesses are currently limited to
-      PCI_CONFIG_SPACE_SIZE, this patch paves the way to increasing the
-      limit to PCIE_CONFIG_SPACE_SIZE when Xen gains the ability to
-      emulate MCFG table accesses.
+** This bug has been marked a duplicate of bug 1769189
+   Issue with qemu 2.12.0 + SATA
 
-Signed-off-by: Paul Durrant <paul.durrant@citrix.com>
-Reviewed-by: Anthony PERARD <anthony.perard@citrix.com>
-Signed-off-by: Stefano Stabellini <sstabellini@kernel.org>
----
- hw/i386/xen/trace-events |   2 +
- hw/i386/xen/xen-hvm.c    | 102 +++++++++++++++++++++++++++++++++++++----------
- 2 files changed, 84 insertions(+), 20 deletions(-)
+-- =
 
-diff --git a/hw/i386/xen/trace-events b/hw/i386/xen/trace-events
-index 38616b6..8a9077c 100644
---- a/hw/i386/xen/trace-events
-+++ b/hw/i386/xen/trace-events
-@@ -16,6 +16,8 @@ cpu_ioreq_pio_read_reg(void *req, uint64_t data, uint64_t addr, uint32_t size) "
- cpu_ioreq_pio_write_reg(void *req, uint64_t data, uint64_t addr, uint32_t size) "I/O=%p pio write reg data=0x%"PRIx64" port=0x%"PRIx64" size=%d"
- cpu_ioreq_move(void *req, uint32_t dir, uint32_t df, uint32_t data_is_ptr, uint64_t addr, uint64_t data, uint32_t count, uint32_t size) "I/O=%p copy dir=%d df=%d ptr=%d port=0x%"PRIx64" data=0x%"PRIx64" count=%d size=%d"
- xen_map_resource_ioreq(uint32_t id, void *addr) "id: %u addr: %p"
-+cpu_ioreq_config_read(void *req, uint32_t sbdf, uint32_t reg, uint32_t size, uint32_t data) "I/O=%p sbdf=0x%x reg=%u size=%u data=0x%x"
-+cpu_ioreq_config_write(void *req, uint32_t sbdf, uint32_t reg, uint32_t size, uint32_t data) "I/O=%p sbdf=0x%x reg=%u size=%u data=0x%x"
- 
- # xen-mapcache.c
- xen_map_cache(uint64_t phys_addr) "want 0x%"PRIx64
-diff --git a/hw/i386/xen/xen-hvm.c b/hw/i386/xen/xen-hvm.c
-index 54f99ab..935a367 100644
---- a/hw/i386/xen/xen-hvm.c
-+++ b/hw/i386/xen/xen-hvm.c
-@@ -12,6 +12,7 @@
- 
- #include "cpu.h"
- #include "hw/pci/pci.h"
-+#include "hw/pci/pci_host.h"
- #include "hw/i386/pc.h"
- #include "hw/i386/apic-msidef.h"
- #include "hw/xen/xen_common.h"
-@@ -88,6 +89,12 @@ typedef struct XenPhysmap {
- 
- static QLIST_HEAD(, XenPhysmap) xen_physmap;
- 
-+typedef struct XenPciDevice {
-+    PCIDevice *pci_dev;
-+    uint32_t sbdf;
-+    QLIST_ENTRY(XenPciDevice) entry;
-+} XenPciDevice;
-+
- typedef struct XenIOState {
-     ioservid_t ioservid;
-     shared_iopage_t *shared_page;
-@@ -108,6 +115,7 @@ typedef struct XenIOState {
-     struct xs_handle *xenstore;
-     MemoryListener memory_listener;
-     MemoryListener io_listener;
-+    QLIST_HEAD(, XenPciDevice) dev_list;
-     DeviceListener device_listener;
-     hwaddr free_phys_offset;
-     const XenPhysmap *log_for_dirtybit;
-@@ -568,6 +576,12 @@ static void xen_device_realize(DeviceListener *listener,
- 
-     if (object_dynamic_cast(OBJECT(dev), TYPE_PCI_DEVICE)) {
-         PCIDevice *pci_dev = PCI_DEVICE(dev);
-+        XenPciDevice *xendev = g_new(XenPciDevice, 1);
-+
-+        xendev->pci_dev = pci_dev;
-+        xendev->sbdf = PCI_BUILD_BDF(pci_dev_bus_num(pci_dev),
-+                                     pci_dev->devfn);
-+        QLIST_INSERT_HEAD(&state->dev_list, xendev, entry);
- 
-         xen_map_pcidev(xen_domid, state->ioservid, pci_dev);
-     }
-@@ -580,8 +594,17 @@ static void xen_device_unrealize(DeviceListener *listener,
- 
-     if (object_dynamic_cast(OBJECT(dev), TYPE_PCI_DEVICE)) {
-         PCIDevice *pci_dev = PCI_DEVICE(dev);
-+        XenPciDevice *xendev, *next;
- 
-         xen_unmap_pcidev(xen_domid, state->ioservid, pci_dev);
-+
-+        QLIST_FOREACH_SAFE(xendev, &state->dev_list, entry, next) {
-+            if (xendev->pci_dev == pci_dev) {
-+                QLIST_REMOVE(xendev, entry);
-+                g_free(xendev);
-+                break;
-+            }
-+        }
-     }
- }
- 
-@@ -902,6 +925,62 @@ static void cpu_ioreq_move(ioreq_t *req)
-     }
- }
- 
-+static void cpu_ioreq_config(XenIOState *state, ioreq_t *req)
-+{
-+    uint32_t sbdf = req->addr >> 32;
-+    uint32_t reg = req->addr;
-+    XenPciDevice *xendev;
-+
-+    if (req->size != sizeof(uint8_t) && req->size != sizeof(uint16_t) &&
-+        req->size != sizeof(uint32_t)) {
-+        hw_error("PCI config access: bad size (%u)", req->size);
-+    }
-+
-+    if (req->count != 1) {
-+        hw_error("PCI config access: bad count (%u)", req->count);
-+    }
-+
-+    QLIST_FOREACH(xendev, &state->dev_list, entry) {
-+        if (xendev->sbdf != sbdf) {
-+            continue;
-+        }
-+
-+        if (!req->data_is_ptr) {
-+            if (req->dir == IOREQ_READ) {
-+                req->data = pci_host_config_read_common(
-+                    xendev->pci_dev, reg, PCI_CONFIG_SPACE_SIZE,
-+                    req->size);
-+                trace_cpu_ioreq_config_read(req, xendev->sbdf, reg,
-+                                            req->size, req->data);
-+            } else if (req->dir == IOREQ_WRITE) {
-+                trace_cpu_ioreq_config_write(req, xendev->sbdf, reg,
-+                                             req->size, req->data);
-+                pci_host_config_write_common(
-+                    xendev->pci_dev, reg, PCI_CONFIG_SPACE_SIZE,
-+                    req->data, req->size);
-+            }
-+        } else {
-+            uint32_t tmp;
-+
-+            if (req->dir == IOREQ_READ) {
-+                tmp = pci_host_config_read_common(
-+                    xendev->pci_dev, reg, PCI_CONFIG_SPACE_SIZE,
-+                    req->size);
-+                trace_cpu_ioreq_config_read(req, xendev->sbdf, reg,
-+                                            req->size, tmp);
-+                write_phys_req_item(req->data, req, 0, &tmp);
-+            } else if (req->dir == IOREQ_WRITE) {
-+                read_phys_req_item(req->data, req, 0, &tmp);
-+                trace_cpu_ioreq_config_write(req, xendev->sbdf, reg,
-+                                             req->size, tmp);
-+                pci_host_config_write_common(
-+                    xendev->pci_dev, reg, PCI_CONFIG_SPACE_SIZE,
-+                    tmp, req->size);
-+            }
-+        }
-+    }
-+}
-+
- static void regs_to_cpu(vmware_regs_t *vmport_regs, ioreq_t *req)
- {
-     X86CPU *cpu;
-@@ -974,27 +1053,9 @@ static void handle_ioreq(XenIOState *state, ioreq_t *req)
-         case IOREQ_TYPE_INVALIDATE:
-             xen_invalidate_map_cache();
-             break;
--        case IOREQ_TYPE_PCI_CONFIG: {
--            uint32_t sbdf = req->addr >> 32;
--            uint32_t val;
--
--            /* Fake a write to port 0xCF8 so that
--             * the config space access will target the
--             * correct device model.
--             */
--            val = (1u << 31) |
--                  ((req->addr & 0x0f00) << 16) |
--                  ((sbdf & 0xffff) << 8) |
--                  (req->addr & 0xfc);
--            do_outp(0xcf8, 4, val);
--
--            /* Now issue the config space access via
--             * port 0xCFC
--             */
--            req->addr = 0xcfc | (req->addr & 0x03);
--            cpu_ioreq_pio(req);
-+        case IOREQ_TYPE_PCI_CONFIG:
-+            cpu_ioreq_config(state, req);
-             break;
--        }
-         default:
-             hw_error("Invalid ioreq type 0x%x\n", req->type);
-     }
-@@ -1415,6 +1476,7 @@ void xen_hvm_init(PCMachineState *pcms, MemoryRegion **ram_memory)
-     memory_listener_register(&state->io_listener, &address_space_io);
- 
-     state->device_listener = xen_device_listener;
-+    QLIST_INIT(&state->dev_list);
-     device_listener_register(&state->device_listener);
- 
-     /* Initialize backend core & drivers */
--- 
-1.9.1
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1766904
+
+Title:
+  Creating high hdd load (with constant fsyncs) on a SATA disk leads to
+  freezes and errors in guest dmesg
+
+Status in QEMU:
+  New
+
+Bug description:
+  After upgrading from qemu 2.10.0+dfsg-2 to 2.12~rc3+dfsg-2 (on debian
+  sid host), centos 7 guest started to show freezes and ata errors in
+  dmesg during hdd workloads with writing many small files and repeated
+  fsyncs.
+
+  Host kernel 4.15.0-3-amd64.
+  Guest kernel 3.10.0-693.21.1.el7.x86_64 (slightly older guest kernel was =
+tested too with same result).
+
+  Script that reproduces the bug (first run usualy goes smooth, second
+  and later runs result in dmesg errors and freezes):
+
+  http://paste.debian.net/hidden/472fb220/
+
+  Sample of error messages in guest dmesg:
+
+  http://paste.debian.net/hidden/8219e234/
+
+  This vm is launchd using virsh start. VM launch command (from logfile
+  in /var/log/libvirt/qemu/):
+
+  http://paste.debian.net/plainh/5604126f
+
+  A workaround that I am using right now: I have detached this SATA
+  storage and reattached the same .qcow2 file as SCSI - this has fixed
+  the issue for me.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1766904/+subscriptions
