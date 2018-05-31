@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44244)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45782)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1fOMnu-00044q-IS
-	for qemu-devel@nongnu.org; Thu, 31 May 2018 08:35:43 -0400
+	(envelope-from <dovgaluk@ispras.ru>) id 1fOMwg-0006YP-4L
+	for qemu-devel@nongnu.org; Thu, 31 May 2018 08:44:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1fOMnp-0002v6-LW
-	for qemu-devel@nongnu.org; Thu, 31 May 2018 08:35:42 -0400
-Received: from mail-wr0-x22b.google.com ([2a00:1450:400c:c0c::22b]:35682)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1fOMnp-0002uC-DN
-	for qemu-devel@nongnu.org; Thu, 31 May 2018 08:35:37 -0400
-Received: by mail-wr0-x22b.google.com with SMTP id i14-v6so32841948wre.2
-	for <qemu-devel@nongnu.org>; Thu, 31 May 2018 05:35:37 -0700 (PDT)
-Date: Thu, 31 May 2018 13:35:34 +0100
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20180531123534.GH27838@stefanha-x1.localdomain>
-References: <1525918138-6189-1-git-send-email-junyan.he@gmx.com>
-	<1525918138-6189-3-git-send-email-junyan.he@gmx.com>
+	(envelope-from <dovgaluk@ispras.ru>) id 1fOMwd-0001HG-2a
+	for qemu-devel@nongnu.org; Thu, 31 May 2018 08:44:46 -0400
+Received: from mail.ispras.ru ([83.149.199.45]:34716)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <dovgaluk@ispras.ru>) id 1fOMwc-0001E7-Q1
+	for qemu-devel@nongnu.org; Thu, 31 May 2018 08:44:42 -0400
+From: "Pavel Dovgalyuk" <dovgaluk@ispras.ru>
+References: <CAJGDS+HNBG6PSvG7Cc7bN4rMadgm5W+1aQUAeizN9CGjSOCP5w@mail.gmail.com>
+	<20180531085057.GG26429@stefanha-x1.localdomain>
+In-Reply-To: <20180531085057.GG26429@stefanha-x1.localdomain>
+Date: Thu, 31 May 2018 15:44:43 +0300
+Message-ID: <001801d3f8dd$2629a280$727ce780$@ru>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="mhjHhnbe5PrRcwjY"
-Content-Disposition: inline
-In-Reply-To: <1525918138-6189-3-git-send-email-junyan.he@gmx.com>
-Subject: Re: [Qemu-devel] [PATCH 2/9 V5] hostmem-file: add the 'pmem' option
+Content-Type: text/plain;
+	charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Content-Language: ru
+Subject: Re: [Qemu-devel] Recording I/O activity after KVM does a VMEXIT
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,45 +29,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: junyan.he@gmx.com
-Cc: qemu-devel@nongnu.org, Haozhong Zhang <haozhong.zhang@intel.com>, xiaoguangrong.eric@gmail.com, crosthwaite.peter@gmail.com, mst@redhat.com, dgilbert@redhat.com, ehabkost@redhat.com, quintela@redhat.com, Junyan He <junyan.he@intel.com>, stefanha@redhat.com, pbonzini@redhat.com, imammedo@redhat.com, rth@twiddle.net
+To: 'Stefan Hajnoczi' <stefanha@gmail.com>, 'Arnabjyoti Kalita' <akalita@cs.stonybrook.edu>
+Cc: qemu-devel@nongnu.org, 'Pavel Dovgalyuk' <pavel.dovgaluk@ispras.ru>
 
+> From: Stefan Hajnoczi [mailto:stefanha@gmail.com]
+> On Wed, May 30, 2018 at 11:19:13PM -0400, Arnabjyoti Kalita wrote:
+> > I am trying to implement a 'minimal' record-replay mechanism for KVM, which
+> > is similar to the one existing for TCG via -icount. I am trying to record
+> > I/O events only (specifically disk and network events) when KVM does a
+> > VMEXIT. This has led me to the function kvm_cpu_exec where I can clearly
+> > see the different ways of handling all of the possible VMExit cases (like
+> > PIO, MMIO etc.). To record network packets, I am working with the e1000
+> > hardware device.
+> >
+> > Can I make sure that all of the network I/O, atleast for the e1000 device
+> > happens through the KVM_EXIT_MMIO case and subsequent use of the
+> > address_space_rw() function ? Do I also need to look at other functions as
+> > well ? Also for recording disk activity, can I make sure that looking out
+> > for the KVM_EXIT_MMIO and/or KVM_EXIT_PIO cases in the vmexit mechanism,
+> > will be enough ?
+> >
+> > Let me know if there are other details that I need to take care of. I am
+> > using QEMU 2.11 on a x86-64 CPU and the guest runs a Linux Kernel 4.4 with
+> > Ubuntu 16.04.
 
---mhjHhnbe5PrRcwjY
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+The main icount-based record/replay advantage is that we don't record
+any CPU IO. We record only VM IO (e.g., by using the network filter).
 
-On Thu, May 10, 2018 at 10:08:51AM +0800, junyan.he@gmx.com wrote:
-> diff --git a/exec.c b/exec.c
-> index fa33c29..dedeb4d 100644
-> --- a/exec.c
-> +++ b/exec.c
-> @@ -52,6 +52,9 @@
->  #include <linux/falloc.h>
->  #endif
-> =20
-> +/* RAM is backed by the persistent memory. */
-> +#define RAM_PMEM       (1 << 3)
+Disk devices may transfer data to CPU using DMA, therefore intercepting
+only VMExit cases will not be enough.
 
-Please define this next to the other RAM_* flags.
-
-Besides that:
-
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
-
---mhjHhnbe5PrRcwjY
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJbD+wWAAoJEJykq7OBq3PInLwH/1TIy91skNi3pugCrclrI1ed
-pdcx44839g5RHP0wpZw4kNPv4tJRCMO15cqmd3y33hckbyBSHEIZn+7pua5UIGOF
-1n+b864oEJWMo6eST35AwGeUKqiCENbcfvfnzuz8wC5uXn6jsgI9aYm/qaWGado8
-02FCG7bTOjzeOB23jf/PsJGWdiNLKfxJY4xJ6ysoMWa+Ks4oT/IReilysk1ZZVxd
-7gn0i97097eUzE4enlcyy6xEVZsVh5myRPvmj7BMA/ITas9d08ubLHUf1plJQnWD
-QRkEQgb/Ko0PQlItrnq+d3wKMBX1A7WpsBFd/eUiBv9cGOAjC7l5l5Ne8kIoMKQ=
-=sbT1
------END PGP SIGNATURE-----
-
---mhjHhnbe5PrRcwjY--
+Pavel Dovgalyuk
