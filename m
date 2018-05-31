@@ -1,17 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47000)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46997)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fOUXO-0003PH-4o
+	(envelope-from <eblake@redhat.com>) id 1fOUXO-0003PE-47
 	for qemu-devel@nongnu.org; Thu, 31 May 2018 16:51:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fOUXL-0001fQ-2h
+	(envelope-from <eblake@redhat.com>) id 1fOUXL-0001gJ-Qx
 	for qemu-devel@nongnu.org; Thu, 31 May 2018 16:51:10 -0400
 From: Eric Blake <eblake@redhat.com>
-Date: Thu, 31 May 2018 15:50:42 -0500
-Message-Id: <20180531205046.153256-5-eblake@redhat.com>
+Date: Thu, 31 May 2018 15:50:43 -0500
+Message-Id: <20180531205046.153256-6-eblake@redhat.com>
 In-Reply-To: <20180531205046.153256-1-eblake@redhat.com>
 References: <20180531205046.153256-1-eblake@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 4/8] qcow: Switch qcow_co_writev to
- byte-based calls
+Subject: [Qemu-devel] [PATCH v2 5/8] qcow: Switch to a byte-based driver
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,104 +23,117 @@ To: qemu-devel@nongnu.org
 Cc: qemu-block@nongnu.org, kwolf@redhat.com, mreitz@redhat.com
 
 We are gradually moving away from sector-based interfaces, towards
-byte-based.  Make the change for the internals of the qcow
-driver write function, by iterating over offset/bytes instead of
-sector_num/nb_sectors, and with a rename of index_in_cluster and
-repurposing of n to track bytes instead of sectors.
-
-A later patch will then switch the qcow driver as a whole over
-to byte-based operation.
+byte-based.  The qcow driver is now ready to fully utilize the
+byte-based callback interface, as long as we override the default
+alignment to still be 512 (needed at least for asserts present
+because of encryption, but easier to do everywhere than to audit
+which sub-sector requests are handled correctly, especially since
+we no longer recommend qcow for new disk images).
 
 Signed-off-by: Eric Blake <eblake@redhat.com>
 
 ---
-v2: prefer 64-bit * over 23-bit <<, rename variable for legibility [Kevin]
+v2: minor rebase to changes earlier in series
 ---
- block/qcow.c | 36 +++++++++++++++++-------------------
- 1 file changed, 17 insertions(+), 19 deletions(-)
+ block/qcow.c | 35 ++++++++++++++++++++---------------
+ 1 file changed, 20 insertions(+), 15 deletions(-)
 
 diff --git a/block/qcow.c b/block/qcow.c
-index b90915218ff..44adeba276c 100644
+index 44adeba276c..55720b006ef 100644
 --- a/block/qcow.c
 +++ b/block/qcow.c
-@@ -723,13 +723,15 @@ static coroutine_fn int qcow_co_writev(BlockDriverState *bs, int64_t sector_num,
-                                        int flags)
+@@ -69,7 +69,6 @@ typedef struct QCowHeader {
+ typedef struct BDRVQcowState {
+     int cluster_bits;
+     int cluster_size;
+-    int cluster_sectors;
+     int l2_bits;
+     int l2_size;
+     unsigned int l1_size;
+@@ -235,7 +234,6 @@ static int qcow_open(BlockDriverState *bs, QDict *options, int flags,
+     }
+     s->cluster_bits = header.cluster_bits;
+     s->cluster_size = 1 << s->cluster_bits;
+-    s->cluster_sectors = 1 << (s->cluster_bits - 9);
+     s->l2_bits = header.l2_bits;
+     s->l2_size = 1 << s->l2_bits;
+     bs->total_sectors = header.size / 512;
+@@ -613,8 +611,18 @@ static int decompress_cluster(BlockDriverState *bs, uint64_t cluster_offset)
+     return 0;
+ }
+
+-static coroutine_fn int qcow_co_readv(BlockDriverState *bs, int64_t sector_num,
+-                         int nb_sectors, QEMUIOVector *qiov)
++static void qcow_refresh_limits(BlockDriverState *bs, Error **errp)
++{
++    /* At least encrypted images require 512-byte alignment. Apply the
++     * limit universally, rather than just on encrypted images, as
++     * it's easier to let the block layer handle rounding than to
++     * audit this code further. */
++    bs->bl.request_alignment = BDRV_SECTOR_SIZE;
++}
++
++static coroutine_fn int qcow_co_preadv(BlockDriverState *bs, uint64_t offset,
++                                       uint64_t bytes, QEMUIOVector *qiov,
++                                       int flags)
  {
      BDRVQcowState *s = bs->opaque;
--    int index_in_cluster;
-+    int offset_in_cluster;
-     uint64_t cluster_offset;
-     int ret = 0, n;
-     struct iovec hd_iov;
+     int offset_in_cluster;
+@@ -624,9 +632,8 @@ static coroutine_fn int qcow_co_readv(BlockDriverState *bs, int64_t sector_num,
      QEMUIOVector hd_qiov;
      uint8_t *buf;
      void *orig_buf;
-+    int64_t offset = sector_num * BDRV_SECTOR_SIZE;
-+    int64_t bytes = nb_sectors * BDRV_SECTOR_SIZE;
+-    int64_t offset = sector_num * BDRV_SECTOR_SIZE;
+-    int64_t bytes = nb_sectors * BDRV_SECTOR_SIZE;
+
++    assert(!flags);
+     if (qiov->niov > 1) {
+         buf = orig_buf = qemu_try_blockalign(bs, qiov->size);
+         if (buf == NULL) {
+@@ -718,9 +725,9 @@ static coroutine_fn int qcow_co_readv(BlockDriverState *bs, int64_t sector_num,
+     return ret;
+ }
+
+-static coroutine_fn int qcow_co_writev(BlockDriverState *bs, int64_t sector_num,
+-                                       int nb_sectors, QEMUIOVector *qiov,
+-                                       int flags)
++static coroutine_fn int qcow_co_pwritev(BlockDriverState *bs, uint64_t offset,
++                                        uint64_t bytes, QEMUIOVector *qiov,
++                                        int flags)
+ {
+     BDRVQcowState *s = bs->opaque;
+     int offset_in_cluster;
+@@ -730,8 +737,6 @@ static coroutine_fn int qcow_co_writev(BlockDriverState *bs, int64_t sector_num,
+     QEMUIOVector hd_qiov;
+     uint8_t *buf;
+     void *orig_buf;
+-    int64_t offset = sector_num * BDRV_SECTOR_SIZE;
+-    int64_t bytes = nb_sectors * BDRV_SECTOR_SIZE;
 
      assert(!flags);
      s->cluster_cache_offset = -1; /* disable compressed cache */
-@@ -749,16 +751,14 @@ static coroutine_fn int qcow_co_writev(BlockDriverState *bs, int64_t sector_num,
+@@ -1108,8 +1113,7 @@ qcow_co_pwritev_compressed(BlockDriverState *bs, uint64_t offset,
 
-     qemu_co_mutex_lock(&s->lock);
-
--    while (nb_sectors != 0) {
--
--        index_in_cluster = sector_num & (s->cluster_sectors - 1);
--        n = s->cluster_sectors - index_in_cluster;
--        if (n > nb_sectors) {
--            n = nb_sectors;
-+    while (bytes != 0) {
-+        offset_in_cluster = offset & (s->cluster_size - 1);
-+        n = s->cluster_size - offset_in_cluster;
-+        if (n > bytes) {
-+            n = bytes;
-         }
--        ret = get_cluster_offset(bs, sector_num << 9, 1, 0,
--                                 index_in_cluster << 9,
--                                 (index_in_cluster + n) << 9, &cluster_offset);
-+        ret = get_cluster_offset(bs, offset, 1, 0, offset_in_cluster,
-+                                 offset_in_cluster + n, &cluster_offset);
+     if (ret != Z_STREAM_END || out_len >= s->cluster_size) {
+         /* could not compress: write normal cluster */
+-        ret = qcow_co_writev(bs, offset >> BDRV_SECTOR_BITS,
+-                             bytes >> BDRV_SECTOR_BITS, qiov, 0);
++        ret = qcow_co_pwritev(bs, offset, bytes, qiov, 0);
          if (ret < 0) {
-             break;
+             goto fail;
          }
-@@ -768,30 +768,28 @@ static coroutine_fn int qcow_co_writev(BlockDriverState *bs, int64_t sector_num,
-         }
-         if (bs->encrypted) {
-             assert(s->crypto);
--            if (qcrypto_block_encrypt(s->crypto, sector_num * BDRV_SECTOR_SIZE,
--                                      buf, n * BDRV_SECTOR_SIZE, NULL) < 0) {
-+            if (qcrypto_block_encrypt(s->crypto, offset, buf, n, NULL) < 0) {
-                 ret = -EIO;
-                 break;
-             }
-         }
+@@ -1194,9 +1198,10 @@ static BlockDriver bdrv_qcow = {
+     .bdrv_co_create_opts    = qcow_co_create_opts,
+     .bdrv_has_zero_init     = bdrv_has_zero_init_1,
+     .supports_backing       = true,
++    .bdrv_refresh_limits    = qcow_refresh_limits,
 
-         hd_iov.iov_base = (void *)buf;
--        hd_iov.iov_len = n * 512;
-+        hd_iov.iov_len = n;
-         qemu_iovec_init_external(&hd_qiov, &hd_iov, 1);
-         qemu_co_mutex_unlock(&s->lock);
-         BLKDBG_EVENT(bs->file, BLKDBG_WRITE_AIO);
--        ret = bdrv_co_writev(bs->file,
--                             (cluster_offset >> 9) + index_in_cluster,
--                             n, &hd_qiov);
-+        ret = bdrv_co_pwritev(bs->file, cluster_offset + offset_in_cluster,
-+                              n, &hd_qiov, 0);
-         qemu_co_mutex_lock(&s->lock);
-         if (ret < 0) {
-             break;
-         }
-         ret = 0;
+-    .bdrv_co_readv          = qcow_co_readv,
+-    .bdrv_co_writev         = qcow_co_writev,
++    .bdrv_co_preadv         = qcow_co_preadv,
++    .bdrv_co_pwritev        = qcow_co_pwritev,
+     .bdrv_co_block_status   = qcow_co_block_status,
 
--        nb_sectors -= n;
--        sector_num += n;
--        buf += n * 512;
-+        bytes -= n;
-+        offset += n;
-+        buf += n;
-     }
-     qemu_co_mutex_unlock(&s->lock);
-
+     .bdrv_make_empty        = qcow_make_empty,
 -- 
 2.14.3
