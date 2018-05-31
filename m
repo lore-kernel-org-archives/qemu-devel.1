@@ -1,17 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46946)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46933)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fOUXK-0003NN-NK
-	for qemu-devel@nongnu.org; Thu, 31 May 2018 16:51:10 -0400
+	(envelope-from <eblake@redhat.com>) id 1fOUXK-0003NJ-Da
+	for qemu-devel@nongnu.org; Thu, 31 May 2018 16:51:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fOUXJ-0001dF-PD
+	(envelope-from <eblake@redhat.com>) id 1fOUXJ-0001cZ-GN
 	for qemu-devel@nongnu.org; Thu, 31 May 2018 16:51:06 -0400
 From: Eric Blake <eblake@redhat.com>
-Date: Thu, 31 May 2018 15:50:40 -0500
-Message-Id: <20180531205046.153256-3-eblake@redhat.com>
+Date: Thu, 31 May 2018 15:50:39 -0500
+Message-Id: <20180531205046.153256-2-eblake@redhat.com>
 In-Reply-To: <20180531205046.153256-1-eblake@redhat.com>
 References: <20180531205046.153256-1-eblake@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 2/8] qcow: Switch get_cluster_offset to be
- byte-based
+Subject: [Qemu-devel] [PATCH v2 1/8] parallels: Switch to byte-based calls
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,102 +20,75 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, kwolf@redhat.com, mreitz@redhat.com
+Cc: qemu-block@nongnu.org, kwolf@redhat.com, mreitz@redhat.com, Stefan Hajnoczi <stefanha@redhat.com>, "Denis V. Lunev" <den@openvz.org>
 
 We are gradually moving away from sector-based interfaces, towards
-byte-based.  Make the change for the internal helper function
-get_cluster_offset(), by changing n_start and n_end to by byte
-offsets rather than sector indices within the cluster being
-allocated.  However, assert that these values are still
-sector-aligned (at least qcrypto_block_encrypt() still wants that).
-For now we get that alignment for free because we still use
-sector-based driver callbacks.
+byte-based.  Make the change for the last few sector-based calls
+into the block layer from the parallels driver.
 
-A later patch will then switch the qcow driver as a whole over
-to byte-based operation; but will still leave things at sector
-alignments as it is not worth auditing the qcow image format
-to worry about sub-sector requests.
+Ideally, the parallels driver should switch to doing everything
+byte-based, but that's a more invasive change that requires a
+bit more auditing.
 
 Signed-off-by: Eric Blake <eblake@redhat.com>
-
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+Reviewed-by: Denis V. Lunev <den@openvz.org>
 ---
-v2: assert sector alignment [Max]
----
- block/qcow.c | 29 +++++++++++++++--------------
- 1 file changed, 15 insertions(+), 14 deletions(-)
+ block/parallels.c | 16 ++++++++++------
+ 1 file changed, 10 insertions(+), 6 deletions(-)
 
-diff --git a/block/qcow.c b/block/qcow.c
-index 3ba2ca25ea5..42d1bbb7643 100644
---- a/block/qcow.c
-+++ b/block/qcow.c
-@@ -345,8 +345,8 @@ static int qcow_reopen_prepare(BDRVReopenState *state,
-  *
-  * 0 to not allocate.
-  *
-- * 1 to allocate a normal cluster (for sector indexes 'n_start' to
-- * 'n_end')
-+ * 1 to allocate a normal cluster (for sector-aligned byte offsets 'n_start'
-+ * to 'n_end' within the cluster)
-  *
-  * 2 to allocate a compressed cluster of size
-  * 'compressed_size'. 'compressed_size' must be > 0 and <
-@@ -440,9 +440,10 @@ static int get_cluster_offset(BlockDriverState *bs,
-         if (!allocate)
-             return 0;
-         BLKDBG_EVENT(bs->file, BLKDBG_CLUSTER_ALLOC);
-+        assert(QEMU_IS_ALIGNED(n_start | n_end, BDRV_SECTOR_SIZE));
-         /* allocate a new cluster */
-         if ((cluster_offset & QCOW_OFLAG_COMPRESSED) &&
--            (n_end - n_start) < s->cluster_sectors) {
-+            (n_end - n_start) < s->cluster_size) {
-             /* if the cluster is already compressed, we must
-                decompress it in the case it is not completely
-                overwritten */
-@@ -480,16 +481,15 @@ static int get_cluster_offset(BlockDriverState *bs,
-                 /* if encrypted, we must initialize the cluster
-                    content which won't be written */
-                 if (bs->encrypted &&
--                    (n_end - n_start) < s->cluster_sectors) {
--                    uint64_t start_sect;
-+                    (n_end - n_start) < s->cluster_size) {
-+                    uint64_t start_offset;
-                     assert(s->crypto);
--                    start_sect = (offset & ~(s->cluster_size - 1)) >> 9;
--                    for(i = 0; i < s->cluster_sectors; i++) {
-+                    start_offset = offset & ~(s->cluster_size - 1);
-+                    for (i = 0; i < s->cluster_size; i += BDRV_SECTOR_SIZE) {
-                         if (i < n_start || i >= n_end) {
--                            memset(s->cluster_data, 0x00, 512);
-+                            memset(s->cluster_data, 0x00, BDRV_SECTOR_SIZE);
-                             if (qcrypto_block_encrypt(s->crypto,
--                                                      (start_sect + i) *
--                                                      BDRV_SECTOR_SIZE,
-+                                                      start_offset + i,
-                                                       s->cluster_data,
-                                                       BDRV_SECTOR_SIZE,
-                                                       NULL) < 0) {
-@@ -497,8 +497,9 @@ static int get_cluster_offset(BlockDriverState *bs,
-                             }
-                             BLKDBG_EVENT(bs->file, BLKDBG_WRITE_AIO);
-                             ret = bdrv_pwrite(bs->file,
--                                              cluster_offset + i * 512,
--                                              s->cluster_data, 512);
-+                                              cluster_offset + i,
-+                                              s->cluster_data,
-+                                              BDRV_SECTOR_SIZE);
-                             if (ret < 0) {
-                                 return ret;
-                             }
-@@ -758,8 +759,8 @@ static coroutine_fn int qcow_co_writev(BlockDriverState *bs, int64_t sector_num,
-             n = nb_sectors;
+diff --git a/block/parallels.c b/block/parallels.c
+index 6e9c37f44e1..a761c896d35 100644
+--- a/block/parallels.c
++++ b/block/parallels.c
+@@ -226,14 +226,15 @@ static int64_t allocate_clusters(BlockDriverState *bs, int64_t sector_num,
+         };
+         qemu_iovec_init_external(&qiov, &iov, 1);
+
+-        ret = bdrv_co_readv(bs->backing, idx * s->tracks, nb_cow_sectors,
+-                            &qiov);
++        ret = bdrv_co_preadv(bs->backing, idx * s->tracks * BDRV_SECTOR_SIZE,
++                             nb_cow_bytes, &qiov, 0);
+         if (ret < 0) {
+             qemu_vfree(iov.iov_base);
+             return ret;
          }
-         ret = get_cluster_offset(bs, sector_num << 9, 1, 0,
--                                 index_in_cluster,
--                                 index_in_cluster + n, &cluster_offset);
-+                                 index_in_cluster << 9,
-+                                 (index_in_cluster + n) << 9, &cluster_offset);
+
+-        ret = bdrv_co_writev(bs->file, s->data_end, nb_cow_sectors, &qiov);
++        ret = bdrv_co_pwritev(bs->file, s->data_end * BDRV_SECTOR_SIZE,
++                              nb_cow_bytes, &qiov, 0);
+         qemu_vfree(iov.iov_base);
+         if (ret < 0) {
+             return ret;
+@@ -339,7 +340,8 @@ static coroutine_fn int parallels_co_writev(BlockDriverState *bs,
+         qemu_iovec_reset(&hd_qiov);
+         qemu_iovec_concat(&hd_qiov, qiov, bytes_done, nbytes);
+
+-        ret = bdrv_co_writev(bs->file, position, n, &hd_qiov);
++        ret = bdrv_co_pwritev(bs->file, position * BDRV_SECTOR_SIZE, nbytes,
++                              &hd_qiov, 0);
          if (ret < 0) {
              break;
          }
+@@ -378,7 +380,8 @@ static coroutine_fn int parallels_co_readv(BlockDriverState *bs,
+
+         if (position < 0) {
+             if (bs->backing) {
+-                ret = bdrv_co_readv(bs->backing, sector_num, n, &hd_qiov);
++                ret = bdrv_co_preadv(bs->backing, sector_num * BDRV_SECTOR_SIZE,
++                                     nbytes, &hd_qiov, 0);
+                 if (ret < 0) {
+                     break;
+                 }
+@@ -386,7 +389,8 @@ static coroutine_fn int parallels_co_readv(BlockDriverState *bs,
+                 qemu_iovec_memset(&hd_qiov, 0, 0, nbytes);
+             }
+         } else {
+-            ret = bdrv_co_readv(bs->file, position, n, &hd_qiov);
++            ret = bdrv_co_preadv(bs->file, position * BDRV_SECTOR_SIZE, nbytes,
++                                 &hd_qiov, 0);
+             if (ret < 0) {
+                 break;
+             }
 -- 
 2.14.3
