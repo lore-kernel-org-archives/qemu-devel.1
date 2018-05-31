@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34663)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34665)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fOMAl-0000r3-LC
+	(envelope-from <bounces@canonical.com>) id 1fOMAl-0000r4-M5
 	for qemu-devel@nongnu.org; Thu, 31 May 2018 07:55:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fOMAh-0001WE-IU
+	(envelope-from <bounces@canonical.com>) id 1fOMAg-0001Vq-QC
 	for qemu-devel@nongnu.org; Thu, 31 May 2018 07:55:15 -0400
-Received: from indium.canonical.com ([91.189.90.7]:43360)
+Received: from indium.canonical.com ([91.189.90.7]:43344)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1fOMAh-0001Vm-Be
-	for qemu-devel@nongnu.org; Thu, 31 May 2018 07:55:11 -0400
+	id 1fOMAg-0001VZ-JQ
+	for qemu-devel@nongnu.org; Thu, 31 May 2018 07:55:10 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1fOMAg-0007DS-EP
-	for <qemu-devel@nongnu.org>; Thu, 31 May 2018 11:55:10 +0000
+	id 1fOMAf-0007Cn-HB
+	for <qemu-devel@nongnu.org>; Thu, 31 May 2018 11:55:09 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 6903E2E80C7
-	for <qemu-devel@nongnu.org>; Thu, 31 May 2018 11:55:10 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id 69A412E80CB
+	for <qemu-devel@nongnu.org>; Thu, 31 May 2018 11:55:09 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Thu, 31 May 2018 11:42:00 -0000
+Date: Thu, 31 May 2018 11:41:26 -0000
 From: Thomas Huth <1404278@bugs.launchpad.net>
 Reply-To: Bug 1404278 <1404278@bugs.launchpad.net>
 Sender: bounces@canonical.com
 References: <20141219153639.25009.84583.malonedeb@wampee.canonical.com>
-Message-Id: <152776692053.25531.17130728354786705336.malone@wampee.canonical.com>
+Message-Id: <152776688692.32216.984227923309659607.malone@soybean.canonical.com>
 Errors-To: bounces@canonical.com
 Subject: [Qemu-devel] [Bug 1404278] Re: tap connections not working on
  windows host
@@ -39,7 +39,7 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-... ah, well, never mind, just saw that you already closed it :-)
+ok, thanks for checking! So I'm closing this ticket now...
 
 -- =
 
