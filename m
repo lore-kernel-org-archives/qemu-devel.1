@@ -1,27 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51606)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52412)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <keno@juliacomputing.com>) id 1fOQb1-00053y-M6
-	for qemu-devel@nongnu.org; Thu, 31 May 2018 12:38:40 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1fOQgJ-0006G3-I2
+	for qemu-devel@nongnu.org; Thu, 31 May 2018 12:44:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <keno@juliacomputing.com>) id 1fOQb0-0005dB-PO
-	for qemu-devel@nongnu.org; Thu, 31 May 2018 12:38:39 -0400
-Received: from mail-pl0-x231.google.com ([2607:f8b0:400e:c01::231]:33366)
+	(envelope-from <peter.maydell@linaro.org>) id 1fOQgI-0001aT-Ie
+	for qemu-devel@nongnu.org; Thu, 31 May 2018 12:44:07 -0400
+Received: from mail-ot0-x244.google.com ([2607:f8b0:4003:c0f::244]:42582)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <keno@juliacomputing.com>)
-	id 1fOQb0-0005cb-JK
-	for qemu-devel@nongnu.org; Thu, 31 May 2018 12:38:38 -0400
-Received: by mail-pl0-x231.google.com with SMTP id n10-v6so13553801plp.0
-	for <qemu-devel@nongnu.org>; Thu, 31 May 2018 09:38:38 -0700 (PDT)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1fOQgI-0001aD-Cj
+	for qemu-devel@nongnu.org; Thu, 31 May 2018 12:44:06 -0400
+Received: by mail-ot0-x244.google.com with SMTP id l13-v6so26022682otk.9
+	for <qemu-devel@nongnu.org>; Thu, 31 May 2018 09:44:06 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20180530142026.7c59d967@bahia.lan>
-References: <cover.1527310210.git.keno@alumni.harvard.edu>
-	<e47c58ca95c93503a9d85dc6d749acf9fe9c6e76.1527310210.git.keno@alumni.harvard.edu>
-	<20180530142026.7c59d967@bahia.lan>
-From: Keno Fischer <keno@juliacomputing.com>
-Date: Thu, 31 May 2018 12:37:56 -0400
-Message-ID: <CABV8kRzAJxeEB4rb4R0o7Fx_uBqf82tDDWC_6o0Xht3-F63AOA@mail.gmail.com>
+In-Reply-To: <17f64b86-5237-b7c6-c5bb-e46cea636968@linaro.org>
+References: <20180529234409.27023-1-evgreen@chromium.org>
+	<a436fff7-76a3-976b-a5bc-492d1cf054fa@linaro.org>
+	<CAFEAcA9mrAVLS-VEyqmdEzAm3jT5PqFrP=cGzbhbeMn-qwsowg@mail.gmail.com>
+	<17f64b86-5237-b7c6-c5bb-e46cea636968@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 31 May 2018 17:43:45 +0100
+Message-ID: <CAFEAcA_u=-DvEvvZP3_UJ_rdS7AQ71GQG3uWY0OkoyJJOTC4cg@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH 11/13] 9p: darwin: Mark mknod as unsupported
+Subject: Re: [Qemu-devel] [PATCH] Fix hang with -L and symlink loop
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,16 +31,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Keno Fischer <keno@alumni.harvard.edu>
+To: Richard Henderson <richard.henderson@linaro.org>
+Cc: Evan Green <evgreen@chromium.org>, QEMU Developers <qemu-devel@nongnu.org>, Laurent Vivier <Laurent@vivier.eu>, Riku Voipio <riku.voipio@iki.fi>
 
->> +#ifdef CONFIG_DARWIN
->> +    /* Darwin doesn't have mknodat and it's unlikely to work anyway,
+On 31 May 2018 at 17:32, Richard Henderson <richard.henderson@linaro.org> wrote:
+> On 05/31/2018 08:26 AM, Peter Maydell wrote:
+>> On 30 May 2018 at 21:50, Richard Henderson <richard.henderson@linaro.org> wrote:
+>>> On 05/29/2018 04:44 PM, Evan Green wrote:
+>>>> When using -L with Linux app emulation, there is an issue in
+>>>> init_paths where Qemu will get lost exploring a directory tree
+>>>> with a symlink loop in it. This causes Qemu to hang, and
+>>>> eventually consume all memory in the system.
+>>>>
+>>>> Qemu's code for pre-exploring the entire directory tree is both
+>>>> error-prone and slow. Instead, this changes uses faccessat, which
+>>>> both avoids the symlink loop (since the entire directory space isn't
+>>>> being explored up front), and likely speeds things up a bit.
+>>>>
+>>>> Partial credit goes to Richard Henderson, as it was only after staring
+>>>> at his patch [1] that I wrote mine.
+>>>>
+>>>> [1] https://patchwork.kernel.org/patch/9512083/
+>>>>
+>>>> Signed-off-by: Evan Green <evgreen@chromium.org>
+>>>> ---
+>>>
+>>> I like this as an improvement on the current situation.
+>>> Perhaps folks do like this a bit better than my more invasive patch.
+>>
+>> It seems to me to have the same problem as your patch does,
+>> which is that we now have a file descriptor which belongs
+>> not to the guest but to QEMU, but we make no effort to
+>> hide it from the guest, and so for instance code like that
+>> xinetd "close every fd above 2" loop will break us.
 >
-> What's unlikely to work ?
->
+> Yes.  I've thought about doing more explicit managing of guest fd's, but it's a
+> big job to re-organize that.
 
-My concern was that allowing this would cause unexpected
-behavior, since the device numbers will differ between OS X
-and Linux. Though maybe this isn't the place to worry about
-that.
+I think my current opinion is that it's probably OK to have the
+"our internal fd is visible to the guest" problem for the case
+where the user specifies -L, at least for now. We're probably
+causing more problems by not allowing -L to point at trees with
+symlinks than by misbehaving if the application closes it.
+We should just leave ourselves a suitable TODO note or something.
+
+As I say, I prefer your patch to this one overall, if you
+wanted to address the minor issues from the last round of
+review and respin it.
+
+thanks
+-- PMM
