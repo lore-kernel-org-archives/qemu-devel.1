@@ -1,30 +1,36 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33925)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34446)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1fORLJ-00068P-3A
-	for qemu-devel@nongnu.org; Thu, 31 May 2018 13:26:30 -0400
+	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1fORNj-00084U-77
+	for qemu-devel@nongnu.org; Thu, 31 May 2018 13:29:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1fORLF-0006zs-Tg
-	for qemu-devel@nongnu.org; Thu, 31 May 2018 13:26:29 -0400
-Received: from 13.mo6.mail-out.ovh.net ([188.165.56.124]:39163)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1fORLF-0006x2-Md
-	for qemu-devel@nongnu.org; Thu, 31 May 2018 13:26:25 -0400
-Received: from player732.ha.ovh.net (unknown [10.109.105.89])
-	by mo6.mail-out.ovh.net (Postfix) with ESMTP id AB13A15E782
-	for <qemu-devel@nongnu.org>; Thu, 31 May 2018 19:26:23 +0200 (CEST)
-Date: Thu, 31 May 2018 19:26:19 +0200
-From: Greg Kurz <groug@kaod.org>
-Message-ID: <20180531192619.62550340@bahia.lan>
-In-Reply-To: <CABV8kRzhiVy9ix67OfPcSZ-SNa6Zh6j5uZ05-yhKW_=Ujyd1HQ@mail.gmail.com>
-References: <cover.1527310210.git.keno@alumni.harvard.edu>
-	<033ba6f2e3f0daccb31e1930a1c65cf7a18ae66c.1527310210.git.keno@alumni.harvard.edu>
-	<20180529203426.3aa6305a@bahia.lan>
-	<CABV8kRzhiVy9ix67OfPcSZ-SNa6Zh6j5uZ05-yhKW_=Ujyd1HQ@mail.gmail.com>
+	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1fORNf-0000j7-6a
+	for qemu-devel@nongnu.org; Thu, 31 May 2018 13:28:59 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:60430)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <stefanb@linux.vnet.ibm.com>)
+	id 1fORNe-0000hz-Ui
+	for qemu-devel@nongnu.org; Thu, 31 May 2018 13:28:55 -0400
+Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w4VHSdrX088511
+	for <qemu-devel@nongnu.org>; Thu, 31 May 2018 13:28:53 -0400
+Received: from e16.ny.us.ibm.com (e16.ny.us.ibm.com [129.33.205.206])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2jakr54kjm-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Thu, 31 May 2018 13:28:53 -0400
+Received: from localhost
+	by e16.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <stefanb@linux.vnet.ibm.com>;
+	Thu, 31 May 2018 13:28:51 -0400
+From: Stefan Berger <stefanb@linux.vnet.ibm.com>
+Date: Thu, 31 May 2018 13:28:49 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 03/13] 9p: Move a couple xattr functions to
- 9p-util
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-MW
+Message-Id: <10f6e1a1-ad16-9877-4b71-14b9cc46a58f@linux.vnet.ibm.com>
+Content-Transfer-Encoding: base64
+Subject: [Qemu-devel] [PATCH] tests: fix tpm-crb tpm-tis tests race
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,55 +39,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Keno Fischer <keno@juliacomputing.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Keno Fischer <keno@alumni.harvard.edu>
+To: qemu-stable@nongnu.org, Michael Roth <mdroth@linux.vnet.ibm.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>
 
-On Thu, 31 May 2018 12:14:30 -0400
-Keno Fischer <keno@juliacomputing.com> wrote:
-
-> > I'm ok with this move, but if the functions need to have distinct
-> > implementations, and they really do according to patch 10, then
-> > I'd rather have distinct files and rely on conditional building in
-> > the makefile. Maybe rename the current file to 9p-util-linux.c
-> > and introduce a 9p-util-darwin.c later.  
-> 
-> Sounds good, I will make this change.
-> 
-> >> Additionally, introduce a _follow version of fgetxattr and use it.
-> >> On darwin, fgetxattr has a more general interface, so we'll need to factor
-> >> it out anyway.
-> >>  
-> >
-> > No need for the _follow version in this case.  
-> 
-> I'm not entirely sure what you're proposing. On darwin `fgetxattr`
-> takes two extra
-> arguments,
-
-Oops you're right... so we indeed need to handle this conflicting APIs,
-but fgetxattr_follow() is inapropriate, because fgetxattr() has nothing
-to follow since it already has an fd... The same goes with Darwin's
-version actually. The "nofollow" thingy only makes sense for those calls
-that have a dirfd and pathname argument.
-
-The OSX manpage for fgetxattr() seem to mention the XATTR_NOFOLLOW flag
-for getxattr() only.
-
-https://www.unix.com/man-page/osx/2/fgetxattr/
-
-XATTR_NOFOLLOW  do not follow symbolic links.  getxattr() normally returns
-		information from the target of path if it is a symbolic link.
-		With this option, getxattr() will return extended attribute
-		data from the symbolic link instead.
-
-> so I believe it needs to be factored out nevertheless. Are you just
-> proposing doing that later in the patch series?
-
-Maybe introduce a qemu_fgetxattr() API in 9p-utils.h ? In a separate patch, or
-maybe in patch 10.
-
-#ifdef CONFIG_DARWIN
-#define qemu_fgetxattr(...) fgetxattr(__VA_ARGS__, 0, 0)
-#else
-#define qemu_fgetxattr fgetxattr
-#endif
+UGxlYXNlIGFwcGx5IHRoZSBmb2xsb3dpbmcgY29tbWl0IHRvIFFFTVUgMi4xMjoNCg0KDQpj
+b21taXQgNzY0N2Q1YzZiNWUzYjNmMzZhNmUwNDQxYzgxYWUzZmU3OTdlYjIzMw0KQXV0aG9y
+OiBNYXJjLUFuZHLDqSBMdXJlYXUgPG1hcmNhbmRyZS5sdXJlYXVAcmVkaGF0LmNvbT4NCkRh
+dGU6wqDCoCBUdWUgTWF5IDggMTE6Mjk6MzUgMjAxOCAtMDQwMA0KDQogwqDCoMKgIHRlc3Rz
+OiBmaXggdHBtLWNyYiB0cG0tdGlzIHRlc3RzIHJhY2UNCg0KIMKgwqDCoCBObyBuZWVkIHRv
+IGNsb3NlIHRoZSBUUE0gZGF0YSBzb2NrZXQgb24gdGhlIGVtdWxhdG9yIGVuZCwgcWVtdSB3
+aWxsDQogwqDCoMKgIGNsb3NlIGl0IGFmdGVyIGEgU0hVVERPV04uIFRoaXMgYXZvaWRzIGEg
+cmFjZSBiZXR3ZWVuIGNsb3NlKCkgYW5kDQogwqDCoMKgIHJlYWQoKSBpbiB0aGUgVFBNIGRh
+dGEgdGhyZWFkLg0KDQogwqDCoMKgIFJlcG9ydGVkLWJ5OiBQZXRlciBNYXlkZWxsIDxwZXRl
+ci5tYXlkZWxsQGxpbmFyby5vcmc+DQogwqDCoMKgIFNpZ25lZC1vZmYtYnk6IE1hcmMtQW5k
+csOpIEx1cmVhdSA8bWFyY2FuZHJlLmx1cmVhdUByZWRoYXQuY29tPg0KIMKgwqDCoCBTaWdu
+ZWQtb2ZmLWJ5OiBTdGVmYW4gQmVyZ2VyIDxzdGVmYW5iQGxpbnV4LnZuZXQuaWJtLmNvbT4N
+CiDCoMKgwqAgUmV2aWV3ZWQtYnk6IERhbmllbCBQLiBCZXJyYW5nw6kgPGJlcnJhbmdlQHJl
+ZGhhdC5jb20+DQogwqDCoMKgIFNpZ25lZC1vZmYtYnk6IE1pY2hhZWwgVG9rYXJldiA8bWp0
+QHRscy5tc2sucnU+DQoNCmRpZmYgLS1naXQgYS90ZXN0cy90cG0tZW11LmMgYi90ZXN0cy90
+cG0tZW11LmMNCmluZGV4IDRkYWRhNzY4MzQuLjhjMmJkNTNjYWQgMTAwNjQ0DQotLS0gYS90
+ZXN0cy90cG0tZW11LmMNCisrKyBiL3Rlc3RzL3RwbS1lbXUuYw0KQEAgLTEyNSw3ICsxMjUs
+NyBAQCB2b2lkICp0cG1fZW11X2N0cmxfdGhyZWFkKHZvaWQgKmRhdGEpDQogwqDCoMKgwqDC
+oMKgwqDCoCBjYXNlIENNRF9TSFVURE9XTjogew0KIMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
+oCBwdG1fcmVzIHJlcyA9IDA7DQogwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIHFpb19jaGFu
+bmVsX3dyaXRlKGlvYywgKGNoYXIgKikmcmVzLCBzaXplb2YocmVzKSwgDQomZXJyb3JfYWJv
+cnQpOw0KLcKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgcWlvX2NoYW5uZWxfY2xvc2Uocy0+dHBt
+X2lvYywgJmVycm9yX2Fib3J0KTsNCivCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIC8qIHRoZSB0
+cG0gZGF0YSB0aHJlYWQgaXMgZXhwZWN0ZWQgdG8gZmluaXNoIG5vdyAqLw0KIMKgwqDCoMKg
+wqDCoMKgwqDCoMKgwqDCoCBnX3RocmVhZF9qb2luKHMtPmVtdV90cG1fdGhyZWFkKTsNCiDC
+oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgYnJlYWs7DQogwqDCoMKgwqDCoMKgwqDCoCB9DQoN
+Cg==
