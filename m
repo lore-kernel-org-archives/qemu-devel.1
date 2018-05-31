@@ -1,33 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45061)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45090)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fOQB0-00085X-Tt
-	for qemu-devel@nongnu.org; Thu, 31 May 2018 12:11:47 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1fOQBC-0008BX-Gz
+	for qemu-devel@nongnu.org; Thu, 31 May 2018 12:11:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fOQAx-0000vy-N3
-	for qemu-devel@nongnu.org; Thu, 31 May 2018 12:11:46 -0400
-Received: from mail-qt0-x243.google.com ([2607:f8b0:400d:c0d::243]:33019)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fOQAx-0000vs-Ii
-	for qemu-devel@nongnu.org; Thu, 31 May 2018 12:11:43 -0400
-Received: by mail-qt0-x243.google.com with SMTP id e8-v6so28530473qth.0
-	for <qemu-devel@nongnu.org>; Thu, 31 May 2018 09:11:43 -0700 (PDT)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20180530110655.22022-1-alex.bennee@linaro.org>
-	<20180530110655.22022-8-alex.bennee@linaro.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <be606542-a4e9-514d-23c6-4439fd52005e@amsat.org>
-Date: Thu, 31 May 2018 13:11:35 -0300
+	(envelope-from <dgilbert@redhat.com>) id 1fOQB9-00010i-AB
+	for qemu-devel@nongnu.org; Thu, 31 May 2018 12:11:58 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:54944 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1fOQB9-0000zx-4H
+	for qemu-devel@nongnu.org; Thu, 31 May 2018 12:11:55 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.4])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id B7B827D83A
+	for <qemu-devel@nongnu.org>; Thu, 31 May 2018 16:11:53 +0000 (UTC)
+Date: Thu, 31 May 2018 17:11:50 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20180531161150.GF2755@work-vm>
+References: <20180523111817.1463-1-quintela@redhat.com>
+	<20180523111817.1463-4-quintela@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20180530110655.22022-8-alex.bennee@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v1 7/8] .travis.yml: update GCC sanitizer
- build to GCC 7
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180523111817.1463-4-quintela@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v13 03/12] migration: Add multifd traces
+ for start/end thread
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,52 +34,119 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, cota@braap.org, famz@redhat.com, berrange@redhat.com, richard.henderson@linaro.org, balrogg@gmail.com, aurelien@aurel32.net, agraf@suse.de, pbonzini@redhat.com, stefanha@redhat.com, stefanb@linux.vnet.ibm.com, marcandre.lureau@redhat.com
-Cc: qemu-devel@nongnu.org
+To: Juan Quintela <quintela@redhat.com>
+Cc: qemu-devel@nongnu.org, lvivier@redhat.com, peterx@redhat.com
 
-On 05/30/2018 08:06 AM, Alex Bennée wrote:
-> GCC has moved on and so should we. We also enable apt update to ensure
-> we get the latest build from the toolchain PPA.
+* Juan Quintela (quintela@redhat.com) wrote:
+> We want to know how many pages/packets each channel has sent.  Add
+> counters for those.
 > 
-> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+> Signed-off-by: Juan Quintela <quintela@redhat.com>
 
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Tested-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 
+> --
+> sort trace-events (dave)
 > ---
->  .travis.yml | 9 +++++----
->  1 file changed, 5 insertions(+), 4 deletions(-)
+>  migration/ram.c        | 22 ++++++++++++++++++++++
+>  migration/trace-events |  4 ++++
+>  2 files changed, 26 insertions(+)
 > 
-> diff --git a/.travis.yml b/.travis.yml
-> index e99af6f357..ecc4367036 100644
-> --- a/.travis.yml
-> +++ b/.travis.yml
-> @@ -111,13 +111,14 @@ matrix:
->      # Using newer GCC with sanitizers
->      - addons:
->          apt:
-> +          update: true
->            sources:
->              # PPAs for newer toolchains
->              - ubuntu-toolchain-r-test
->            packages:
->              # Extra toolchains
-> -            - gcc-5
-> -            - g++-5
-> +            - gcc-7
-> +            - g++-7
->              # Build dependencies
->              - libaio-dev
->              - libattr1-dev
-> @@ -146,8 +147,8 @@ matrix:
->        language: generic
->        compiler: none
->        env:
-> -        - COMPILER_NAME=gcc CXX=g++-5 CC=gcc-5
-> -        - CONFIG="--cc=gcc-5 --cxx=g++-5 --disable-pie --disable-linux-user"
-> +        - COMPILER_NAME=gcc CXX=g++-7 CC=gcc-7
-> +        - CONFIG="--cc=gcc-7 --cxx=g++-7 --disable-pie --disable-linux-user"
->          - TEST_CMD=""
->        before_script:
->          - ./configure ${CONFIG} --extra-cflags="-g3 -O0 -fsanitize=thread -fuse-ld=gold" || cat config.log
+> diff --git a/migration/ram.c b/migration/ram.c
+> index 54350db8b0..ab715cc148 100644
+> --- a/migration/ram.c
+> +++ b/migration/ram.c
+> @@ -563,6 +563,11 @@ typedef struct {
+>      uint32_t flags;
+>      /* global number of generated multifd packets */
+>      uint32_t seq;
+> +    /* thread local variables */
+> +    /* packets sent through this channel */
+> +    uint32_t num_packets;
+> +    /* pages sent through this channel */
+> +    uint32_t num_pages;
+>  }  MultiFDSendParams;
+>  
+>  typedef struct {
+> @@ -593,6 +598,11 @@ typedef struct {
+>      uint32_t flags;
+>      /* global number of generated multifd packets */
+>      uint32_t seq;
+> +    /* thread local variables */
+> +    /* packets sent through this channel */
+> +    uint32_t num_packets;
+> +    /* pages sent through this channel */
+> +    uint32_t num_pages;
+>  } MultiFDRecvParams;
+>  
+>  static int multifd_send_initial_packet(MultiFDSendParams *p, Error **errp)
+> @@ -849,9 +859,13 @@ static void *multifd_send_thread(void *opaque)
+>      MultiFDSendParams *p = opaque;
+>      Error *local_err = NULL;
+>  
+> +    trace_multifd_send_thread_start(p->id);
+> +
+>      if (multifd_send_initial_packet(p, &local_err) < 0) {
+>          goto out;
+>      }
+> +    /* initial packet */
+> +    p->num_packets = 1;
+>  
+>      while (true) {
+>          qemu_mutex_lock(&p->mutex);
+> @@ -873,6 +887,8 @@ out:
+>      p->running = false;
+>      qemu_mutex_unlock(&p->mutex);
+>  
+> +    trace_multifd_send_thread_end(p->id, p->num_packets, p->num_pages);
+> +
+>      return NULL;
+>  }
+>  
+> @@ -1000,6 +1016,8 @@ static void *multifd_recv_thread(void *opaque)
+>      Error *local_err = NULL;
+>      int ret;
+>  
+> +    trace_multifd_recv_thread_start(p->id);
+> +
+>      while (true) {
+>          qemu_mutex_lock(&p->mutex);
+>          if (false)  {
+> @@ -1022,6 +1040,8 @@ static void *multifd_recv_thread(void *opaque)
+>      p->running = false;
+>      qemu_mutex_unlock(&p->mutex);
+>  
+> +    trace_multifd_recv_thread_end(p->id, p->num_packets, p->num_pages);
+> +
+>      return NULL;
+>  }
+>  
+> @@ -1087,6 +1107,8 @@ void multifd_recv_new_channel(QIOChannel *ioc)
+>      }
+>      p->c = ioc;
+>      object_ref(OBJECT(ioc));
+> +    /* initial packet */
+> +    p->num_packets = 1;
+>  
+>      p->running = true;
+>      qemu_thread_create(&p->thread, p->name, multifd_recv_thread, p,
+> diff --git a/migration/trace-events b/migration/trace-events
+> index 3c798ddd11..3c7a9a8332 100644
+> --- a/migration/trace-events
+> +++ b/migration/trace-events
+> @@ -76,6 +76,10 @@ get_queued_page_not_dirty(const char *block_name, uint64_t tmp_offset, unsigned
+>  migration_bitmap_sync_start(void) ""
+>  migration_bitmap_sync_end(uint64_t dirty_pages) "dirty_pages %" PRIu64
+>  migration_throttle(void) ""
+> +multifd_recv_thread_end(uint8_t id, uint32_t packets, uint32_t pages) "channel %d packets %d pages %d"
+> +multifd_recv_thread_start(uint8_t id) "%d"
+> +multifd_send_thread_end(uint8_t id, uint32_t packets, uint32_t pages) "channel %d packets %d pages %d"
+> +multifd_send_thread_start(uint8_t id) "%d"
+>  ram_discard_range(const char *rbname, uint64_t start, size_t len) "%s: start: %" PRIx64 " %zx"
+>  ram_load_loop(const char *rbname, uint64_t addr, int flags, void *host) "%s: addr: 0x%" PRIx64 " flags: 0x%x host: %p"
+>  ram_load_postcopy_loop(uint64_t addr, int flags) "@%" PRIx64 " %x"
+> -- 
+> 2.17.0
 > 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
