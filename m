@@ -1,28 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52412)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57276)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fOQgJ-0006G3-I2
-	for qemu-devel@nongnu.org; Thu, 31 May 2018 12:44:08 -0400
+	(envelope-from <bounces@canonical.com>) id 1fOR2G-0001tv-TC
+	for qemu-devel@nongnu.org; Thu, 31 May 2018 13:06:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fOQgI-0001aT-Ie
-	for qemu-devel@nongnu.org; Thu, 31 May 2018 12:44:07 -0400
-Received: from mail-ot0-x244.google.com ([2607:f8b0:4003:c0f::244]:42582)
+	(envelope-from <bounces@canonical.com>) id 1fOR2B-0003KF-VY
+	for qemu-devel@nongnu.org; Thu, 31 May 2018 13:06:48 -0400
+Received: from indium.canonical.com ([91.189.90.7]:47134)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fOQgI-0001aD-Cj
-	for qemu-devel@nongnu.org; Thu, 31 May 2018 12:44:06 -0400
-Received: by mail-ot0-x244.google.com with SMTP id l13-v6so26022682otk.9
-	for <qemu-devel@nongnu.org>; Thu, 31 May 2018 09:44:06 -0700 (PDT)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1fOR2B-0003JN-Np
+	for qemu-devel@nongnu.org; Thu, 31 May 2018 13:06:43 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1fOR29-0006Mj-93
+	for <qemu-devel@nongnu.org>; Thu, 31 May 2018 17:06:41 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id EF6F22E88FB
+	for <qemu-devel@nongnu.org>; Thu, 31 May 2018 17:06:39 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <17f64b86-5237-b7c6-c5bb-e46cea636968@linaro.org>
-References: <20180529234409.27023-1-evgreen@chromium.org>
-	<a436fff7-76a3-976b-a5bc-492d1cf054fa@linaro.org>
-	<CAFEAcA9mrAVLS-VEyqmdEzAm3jT5PqFrP=cGzbhbeMn-qwsowg@mail.gmail.com>
-	<17f64b86-5237-b7c6-c5bb-e46cea636968@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 31 May 2018 17:43:45 +0100
-Message-ID: <CAFEAcA_u=-DvEvvZP3_UJ_rdS7AQ71GQG3uWY0OkoyJJOTC4cg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH] Fix hang with -L and symlink loop
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Thu, 31 May 2018 16:52:51 -0000
+From: Jake <1766904@bugs.launchpad.net>
+Reply-To: Bug 1766904 <1766904@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <152466858890.21548.13995835103547275465.malonedeb@soybean.canonical.com>
+Message-Id: <152778557183.24789.16219201515868464291.malone@gac.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1766904] Re: Creating high hdd load (with
+ constant fsyncs) on a SATA disk leads to freezes and errors in guest dmesg
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,53 +37,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>
-Cc: Evan Green <evgreen@chromium.org>, QEMU Developers <qemu-devel@nongnu.org>, Laurent Vivier <Laurent@vivier.eu>, Riku Voipio <riku.voipio@iki.fi>
+To: qemu-devel@nongnu.org
 
-On 31 May 2018 at 17:32, Richard Henderson <richard.henderson@linaro.org> wrote:
-> On 05/31/2018 08:26 AM, Peter Maydell wrote:
->> On 30 May 2018 at 21:50, Richard Henderson <richard.henderson@linaro.org> wrote:
->>> On 05/29/2018 04:44 PM, Evan Green wrote:
->>>> When using -L with Linux app emulation, there is an issue in
->>>> init_paths where Qemu will get lost exploring a directory tree
->>>> with a symlink loop in it. This causes Qemu to hang, and
->>>> eventually consume all memory in the system.
->>>>
->>>> Qemu's code for pre-exploring the entire directory tree is both
->>>> error-prone and slow. Instead, this changes uses faccessat, which
->>>> both avoids the symlink loop (since the entire directory space isn't
->>>> being explored up front), and likely speeds things up a bit.
->>>>
->>>> Partial credit goes to Richard Henderson, as it was only after staring
->>>> at his patch [1] that I wrote mine.
->>>>
->>>> [1] https://patchwork.kernel.org/patch/9512083/
->>>>
->>>> Signed-off-by: Evan Green <evgreen@chromium.org>
->>>> ---
->>>
->>> I like this as an improvement on the current situation.
->>> Perhaps folks do like this a bit better than my more invasive patch.
->>
->> It seems to me to have the same problem as your patch does,
->> which is that we now have a file descriptor which belongs
->> not to the guest but to QEMU, but we make no effort to
->> hide it from the guest, and so for instance code like that
->> xinetd "close every fd above 2" loop will break us.
->
-> Yes.  I've thought about doing more explicit managing of guest fd's, but it's a
-> big job to re-organize that.
+It's still possible to reproduce this issue with qemu-master
+(a3ac12fba028df90f7b3dbec924995c126c41022).
 
-I think my current opinion is that it's probably OK to have the
-"our internal fd is visible to the guest" problem for the case
-where the user specifies -L, at least for now. We're probably
-causing more problems by not allowing -L to point at trees with
-symlinks than by misbehaving if the application closes it.
-We should just leave ourselves a suitable TODO note or something.
+-- =
 
-As I say, I prefer your patch to this one overall, if you
-wanted to address the minor issues from the last round of
-review and respin it.
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1766904
 
-thanks
--- PMM
+Title:
+  Creating high hdd load (with constant fsyncs) on a SATA disk leads to
+  freezes and errors in guest dmesg
+
+Status in QEMU:
+  New
+
+Bug description:
+  After upgrading from qemu 2.10.0+dfsg-2 to 2.12~rc3+dfsg-2 (on debian
+  sid host), centos 7 guest started to show freezes and ata errors in
+  dmesg during hdd workloads with writing many small files and repeated
+  fsyncs.
+
+  Host kernel 4.15.0-3-amd64.
+  Guest kernel 3.10.0-693.21.1.el7.x86_64 (slightly older guest kernel was =
+tested too with same result).
+
+  Script that reproduces the bug (first run usualy goes smooth, second
+  and later runs result in dmesg errors and freezes):
+
+  http://paste.debian.net/hidden/472fb220/
+
+  Sample of error messages in guest dmesg:
+
+  http://paste.debian.net/hidden/8219e234/
+
+  This vm is launchd using virsh start. VM launch command (from logfile
+  in /var/log/libvirt/qemu/):
+
+  http://paste.debian.net/plainh/5604126f
+
+  A workaround that I am using right now: I have detached this SATA
+  storage and reattached the same .qcow2 file as SCSI - this has fixed
+  the issue for me.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1766904/+subscriptions
