@@ -1,24 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34026)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34663)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1fOM6U-0007ve-9K
-	for qemu-devel@nongnu.org; Thu, 31 May 2018 07:50:51 -0400
+	(envelope-from <bounces@canonical.com>) id 1fOMAl-0000r3-LC
+	for qemu-devel@nongnu.org; Thu, 31 May 2018 07:55:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1fOM6P-00070x-DC
-	for qemu-devel@nongnu.org; Thu, 31 May 2018 07:50:50 -0400
-References: <20180517081527.14410-1-david@redhat.com>
-	<451cd080-12ab-42bd-0150-e1dbf0abd859@redhat.com>
-	<bfeacd03-2d57-1bc2-bff1-543b7ea1d66d@redhat.com>
-	<20180531134701.6530d1f8@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <bb0d2f34-8d75-da3c-90a4-616945627214@redhat.com>
-Date: Thu, 31 May 2018 13:50:40 +0200
+	(envelope-from <bounces@canonical.com>) id 1fOMAh-0001WE-IU
+	for qemu-devel@nongnu.org; Thu, 31 May 2018 07:55:15 -0400
+Received: from indium.canonical.com ([91.189.90.7]:43360)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1fOMAh-0001Vm-Be
+	for qemu-devel@nongnu.org; Thu, 31 May 2018 07:55:11 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1fOMAg-0007DS-EP
+	for <qemu-devel@nongnu.org>; Thu, 31 May 2018 11:55:10 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 6903E2E80C7
+	for <qemu-devel@nongnu.org>; Thu, 31 May 2018 11:55:10 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20180531134701.6530d1f8@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH v4 00/14] MemoryDevice: use
- multi stage hotplug handlers
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Thu, 31 May 2018 11:42:00 -0000
+From: Thomas Huth <1404278@bugs.launchpad.net>
+Reply-To: Bug 1404278 <1404278@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20141219153639.25009.84583.malonedeb@wampee.canonical.com>
+Message-Id: <152776692053.25531.17130728354786705336.malone@wampee.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1404278] Re: tap connections not working on
+ windows host
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,95 +37,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org, Pankaj Gupta <pagupta@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Richard Henderson <rth@twiddle.net>, Cornelia Huck <cohuck@redhat.com>, Alexander Graf <agraf@suse.de>, Markus Armbruster <armbru@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org, qemu-ppc@nongnu.org, Marcel Apfelbaum <marcel@redhat.com>, Luiz Capitulino <lcapitulino@redhat.com>, David Gibson <david@gibson.dropbear.id.au>
+To: qemu-devel@nongnu.org
 
-On 31/05/2018 13:47, Igor Mammedov wrote:
-> On Wed, 30 May 2018 16:03:29 +0200
-> Paolo Bonzini <pbonzini@redhat.com> wrote:
-> 
->> On 25/05/2018 14:43, David Hildenbrand wrote:
->>> On 17.05.2018 10:15, David Hildenbrand wrote:  
->>>> We can have devices that need certain other resources that are e.g.
->>>> system resources managed by the machine. We need a clean way to assign
->>>> these resources (without violating layers as brought up by Igor).
->>>>
->>>> One example is virtio-mem/virtio-pmem. Both device types need to be
->>>> assigned some region in guest physical address space. This device memory
->>>> belongs to the machine and is managed by it. However, virito devices are
->>>> hotplugged using the hotplug handler their proxy device implements. So we
->>>> could trigger e.g. a PCI hotplug handler for virtio-pci or a CSS/CCW
->>>> hotplug handler for virtio-ccw. But definetly not the machine.
->>>>
->>>> Now, we can route other devices through the machine hotplug handler, to
->>>> properly assign/unassign resources - like a portion in guest physical
->>>> address space.
->>>>
->>>> v3 -> v4:
->>>> - Removed the s390x bits, will send that out separately (was just a proof
->>>>   that it works just fine with s390x)
->>>> - Fixed a typo and reworded a comment
->>>>
->>>> v2 -> v3:
->>>> - Added "memory-device: introduce separate config option"
->>>> - Dropped "parent_bus" check from hotplug handler lookup functions
->>>> - "Handly" -> "Handle" in patch description.
->>>>
->>>> v1 -> v2:
->>>> - Use multi stage hotplug handler instead of resource handler
->>>> - MemoryDevices only compiled if necessary (CONFIG_MEM_HOTPLUG)
->>>> - Prepare PC/SPAPR machines properly for multi stage hotplug handlers
->>>> - Route SPAPR unplug code via the hotunplug handler
->>>> - Directly include s390x support. But there are no usable memory devices
->>>>   yet (well, only my virtio-mem prototype)
->>>> - Included "memory-device: drop assert related to align and start of address
->>>>   space"
->>>>
->>>> David Hildenbrand (13):
->>>>   memory-device: drop assert related to align and start of address space
->>>>   memory-device: introduce separate config option
->>>>   pc: prepare for multi stage hotplug handlers
->>>>   pc: route all memory devices through the machine hotplug handler
->>>>   spapr: prepare for multi stage hotplug handlers
->>>>   spapr: route all memory devices through the machine hotplug handler
->>>>   spapr: handle pc-dimm unplug via hotplug handler chain
->>>>   spapr: handle cpu core unplug via hotplug handler chain
->>>>   memory-device: new functions to handle plug/unplug
->>>>   pc-dimm: implement new memory device functions
->>>>   memory-device: factor out pre-plug into hotplug handler
->>>>   memory-device: factor out unplug into hotplug handler
->>>>   memory-device: factor out plug into hotplug handler
->>>>
->>>> Igor Mammedov (1):
->>>>   qdev: let machine hotplug handler to override bus hotplug handler
->>>>
->>>>  default-configs/i386-softmmu.mak   |   3 +-
->>>>  default-configs/ppc64-softmmu.mak  |   3 +-
->>>>  default-configs/x86_64-softmmu.mak |   3 +-
->>>>  hw/Makefile.objs                   |   2 +-
->>>>  hw/core/qdev.c                     |   6 +-
->>>>  hw/i386/pc.c                       | 102 ++++++++++++++++++++++-------
->>>>  hw/mem/Makefile.objs               |   4 +-
->>>>  hw/mem/memory-device.c             | 129 +++++++++++++++++++++++--------------
->>>>  hw/mem/pc-dimm.c                   |  48 ++++++--------
->>>>  hw/mem/trace-events                |   4 +-
->>>>  hw/ppc/spapr.c                     | 129 +++++++++++++++++++++++++++++++------
->>>>  include/hw/mem/memory-device.h     |  21 ++++--
->>>>  include/hw/mem/pc-dimm.h           |   3 +-
->>>>  include/hw/qdev-core.h             |  11 ++++
->>>>  qapi/misc.json                     |   2 +-
->>>>  15 files changed, 330 insertions(+), 140 deletions(-)
->>>>  
->>>
->>> As there was no negative feedback so far, I will go ahead and assume
->>> that this approach is the right thing to do.  
->>
->> Ok, I'll queue this.
-> I think it's a bit premature.
-> Series would need a respin and it should also include
-> for completness at leas one actual user (virtio-mem) to see
-> how new interfaces/wrappers would be used and if they actually needed.
+... ah, well, never mind, just saw that you already closed it :-)
 
-Yeah, I noticed that a respin was needed after sending this.  Thanks,
+-- =
 
-Paolo
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1404278
+
+Title:
+  tap connections not working on windows host
+
+Status in QEMU:
+  Fix Released
+
+Bug description:
+  using latest qemu 2.2.0 64bit for windows host (installed from
+  qemu-w64-setup-20141210.exe obtained from http://qemu.weilnetz.de/w64/
+  ),OpenVPN 2.6.3-I601 64bit tap adapter named tap01 and calling qemu
+  using the following.
+
+  qemu-system-x86_64.exe -m 512 -net nic -net tap,ifname=3Dtap01 -hda
+  "c:\\data\\images\\test.img"
+
+  where the image contains a slackware 14.0 64bit install.
+  The tap is bridged with the real network adapter and the bridge is given =
+an ip of 10.1.1.41 (which works as the ip for the windows host). The tap ad=
+apter (in network connections) shows connected when the qemu vm is running.=
+ inside the vm, the network is given an ip of 10.1.1.143 (the netmask and d=
+efault gateway are the same for the virtual and real pc).
+  fault.
+  The vm cannot see the rest of the local network or visa-versa. This used =
+to work in early (0.9 32bit) versions of qemu.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1404278/+subscriptions
