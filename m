@@ -1,15 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46934)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46946)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fOUXK-0003NK-Df
-	for qemu-devel@nongnu.org; Thu, 31 May 2018 16:51:07 -0400
+	(envelope-from <eblake@redhat.com>) id 1fOUXK-0003NN-NK
+	for qemu-devel@nongnu.org; Thu, 31 May 2018 16:51:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fOUXJ-0001cV-GL
+	(envelope-from <eblake@redhat.com>) id 1fOUXJ-0001dF-PD
 	for qemu-devel@nongnu.org; Thu, 31 May 2018 16:51:06 -0400
 From: Eric Blake <eblake@redhat.com>
-Date: Thu, 31 May 2018 15:50:38 -0500
-Message-Id: <20180531205046.153256-1-eblake@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 0/8] block: more byte-based cleanups:
- vectored I/O
+Date: Thu, 31 May 2018 15:50:40 -0500
+Message-Id: <20180531205046.153256-3-eblake@redhat.com>
+In-Reply-To: <20180531205046.153256-1-eblake@redhat.com>
+References: <20180531205046.153256-1-eblake@redhat.com>
+Subject: [Qemu-devel] [PATCH v2 2/8] qcow: Switch get_cluster_offset to be
+ byte-based
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -19,47 +21,102 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, kwolf@redhat.com, mreitz@redhat.com, den@openvz.com, stefanha@redhat.com, wencongyang2@huawei.com, xiechanglong.d@gmail.com, jcody@redhat.com
+Cc: qemu-block@nongnu.org, kwolf@redhat.com, mreitz@redhat.com
 
-My quest continues.  I spent some time pruning sector-based usage
-out of qcow as far as possible (and was dismayed at how long it
-took to prove no iotests regressions); so for the other drivers, I
-did the bare minimum to get rid of an interface, but will leave it
-to those file owners if they want to get rid of further pointless
-sector manipulations in their files.
+We are gradually moving away from sector-based interfaces, towards
+byte-based.  Make the change for the internal helper function
+get_cluster_offset(), by changing n_start and n_end to by byte
+offsets rather than sector indices within the cluster being
+allocated.  However, assert that these values are still
+sector-aligned (at least qcrypto_block_encrypt() still wants that).
+For now we get that alignment for free because we still use
+sector-based driver callbacks.
 
-In v2:
-- throughout: add collected R-b tags
-- patch 2: add assert [Kevin]
-- patch 3-4: improve readability [Kevin]
-- patch 8: retitle to fix typo [Kashyap]
+A later patch will then switch the qcow driver as a whole over
+to byte-based operation; but will still leave things at sector
+alignments as it is not worth auditing the qcow image format
+to worry about sub-sector requests.
 
-001/8:[----] [--] 'parallels: Switch to byte-based calls'
-002/8:[0005] [FC] 'qcow: Switch get_cluster_offset to be byte-based'
-003/8:[0017] [FC] 'qcow: Switch qcow_co_readv to byte-based calls'
-004/8:[0016] [FC] 'qcow: Switch qcow_co_writev to byte-based calls'
-005/8:[0008] [FC] 'qcow: Switch to a byte-based driver'
-006/8:[----] [--] 'replication: Switch to byte-based calls'
-007/8:[----] [--] 'vhdx: Switch to byte-based calls'
-008/8:[down] 'block: Remove unused sector-based vectored I/O'
+Signed-off-by: Eric Blake <eblake@redhat.com>
 
-Eric Blake (8):
-  parallels: Switch to byte-based calls
-  qcow: Switch get_cluster_offset to be byte-based
-  qcow: Switch qcow_co_readv to byte-based calls
-  qcow: Switch qcow_co_writev to byte-based calls
-  qcow: Switch to a byte-based driver
-  replication: Switch to byte-based calls
-  vhdx: Switch to byte-based calls
-  block: Remove unused sector-based vectored I/O
+---
+v2: assert sector alignment [Max]
+---
+ block/qcow.c | 29 +++++++++++++++--------------
+ 1 file changed, 15 insertions(+), 14 deletions(-)
 
- include/block/block.h |   4 --
- block/io.c            |  36 --------------
- block/parallels.c     |  16 ++++---
- block/qcow.c          | 130 +++++++++++++++++++++++++-------------------------
- block/replication.c   |  14 +++---
- block/vhdx.c          |  12 ++---
- 6 files changed, 90 insertions(+), 122 deletions(-)
-
+diff --git a/block/qcow.c b/block/qcow.c
+index 3ba2ca25ea5..42d1bbb7643 100644
+--- a/block/qcow.c
++++ b/block/qcow.c
+@@ -345,8 +345,8 @@ static int qcow_reopen_prepare(BDRVReopenState *state,
+  *
+  * 0 to not allocate.
+  *
+- * 1 to allocate a normal cluster (for sector indexes 'n_start' to
+- * 'n_end')
++ * 1 to allocate a normal cluster (for sector-aligned byte offsets 'n_start'
++ * to 'n_end' within the cluster)
+  *
+  * 2 to allocate a compressed cluster of size
+  * 'compressed_size'. 'compressed_size' must be > 0 and <
+@@ -440,9 +440,10 @@ static int get_cluster_offset(BlockDriverState *bs,
+         if (!allocate)
+             return 0;
+         BLKDBG_EVENT(bs->file, BLKDBG_CLUSTER_ALLOC);
++        assert(QEMU_IS_ALIGNED(n_start | n_end, BDRV_SECTOR_SIZE));
+         /* allocate a new cluster */
+         if ((cluster_offset & QCOW_OFLAG_COMPRESSED) &&
+-            (n_end - n_start) < s->cluster_sectors) {
++            (n_end - n_start) < s->cluster_size) {
+             /* if the cluster is already compressed, we must
+                decompress it in the case it is not completely
+                overwritten */
+@@ -480,16 +481,15 @@ static int get_cluster_offset(BlockDriverState *bs,
+                 /* if encrypted, we must initialize the cluster
+                    content which won't be written */
+                 if (bs->encrypted &&
+-                    (n_end - n_start) < s->cluster_sectors) {
+-                    uint64_t start_sect;
++                    (n_end - n_start) < s->cluster_size) {
++                    uint64_t start_offset;
+                     assert(s->crypto);
+-                    start_sect = (offset & ~(s->cluster_size - 1)) >> 9;
+-                    for(i = 0; i < s->cluster_sectors; i++) {
++                    start_offset = offset & ~(s->cluster_size - 1);
++                    for (i = 0; i < s->cluster_size; i += BDRV_SECTOR_SIZE) {
+                         if (i < n_start || i >= n_end) {
+-                            memset(s->cluster_data, 0x00, 512);
++                            memset(s->cluster_data, 0x00, BDRV_SECTOR_SIZE);
+                             if (qcrypto_block_encrypt(s->crypto,
+-                                                      (start_sect + i) *
+-                                                      BDRV_SECTOR_SIZE,
++                                                      start_offset + i,
+                                                       s->cluster_data,
+                                                       BDRV_SECTOR_SIZE,
+                                                       NULL) < 0) {
+@@ -497,8 +497,9 @@ static int get_cluster_offset(BlockDriverState *bs,
+                             }
+                             BLKDBG_EVENT(bs->file, BLKDBG_WRITE_AIO);
+                             ret = bdrv_pwrite(bs->file,
+-                                              cluster_offset + i * 512,
+-                                              s->cluster_data, 512);
++                                              cluster_offset + i,
++                                              s->cluster_data,
++                                              BDRV_SECTOR_SIZE);
+                             if (ret < 0) {
+                                 return ret;
+                             }
+@@ -758,8 +759,8 @@ static coroutine_fn int qcow_co_writev(BlockDriverState *bs, int64_t sector_num,
+             n = nb_sectors;
+         }
+         ret = get_cluster_offset(bs, sector_num << 9, 1, 0,
+-                                 index_in_cluster,
+-                                 index_in_cluster + n, &cluster_offset);
++                                 index_in_cluster << 9,
++                                 (index_in_cluster + n) << 9, &cluster_offset);
+         if (ret < 0) {
+             break;
+         }
 -- 
 2.14.3
