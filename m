@@ -1,23 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39312)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40504)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1fOOKY-0006TG-8f
-	for qemu-devel@nongnu.org; Thu, 31 May 2018 10:13:31 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1fOOQ9-0007je-Gq
+	for qemu-devel@nongnu.org; Thu, 31 May 2018 10:19:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1fOOKT-0006A8-5o
-	for qemu-devel@nongnu.org; Thu, 31 May 2018 10:13:30 -0400
-Date: Thu, 31 May 2018 16:13:10 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20180531161310.52ea9507@redhat.com>
-In-Reply-To: <5dcb16e5-b9b9-d07d-dfe3-98724e911f83@redhat.com>
-References: <20180517081527.14410-1-david@redhat.com>
-	<20180517081527.14410-5-david@redhat.com>
-	<20180530150806.061c26b9@redhat.com>
-	<5dcb16e5-b9b9-d07d-dfe3-98724e911f83@redhat.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1fOOQ8-0002pn-Cr
+	for qemu-devel@nongnu.org; Thu, 31 May 2018 10:19:17 -0400
+Received: from mail-oi0-x243.google.com ([2607:f8b0:4003:c06::243]:34069)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1fOOQ8-0002pM-6z
+	for qemu-devel@nongnu.org; Thu, 31 May 2018 10:19:16 -0400
+Received: by mail-oi0-x243.google.com with SMTP id i205-v6so5081763oib.1
+	for <qemu-devel@nongnu.org>; Thu, 31 May 2018 07:19:16 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v4 04/14] pc: prepare for multi stage
- hotplug handlers
+In-Reply-To: <20180517193104.GB4771@codeaurora.org>
+References: <1521232280-13089-1-git-send-email-alindsay@codeaurora.org>
+	<1521232280-13089-16-git-send-email-alindsay@codeaurora.org>
+	<CAFEAcA9bYdwByseqCMKSVtWV59mNruT3jJfWWLju1koCnwSb=Q@mail.gmail.com>
+	<20180417142318.GO24561@codeaurora.org>
+	<CAFEAcA8RwC7DSbo+mMqYUS6tL5UwfQGMa_r5AnAkJqm7v63HWw@mail.gmail.com>
+	<20180517193104.GB4771@codeaurora.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 31 May 2018 15:18:54 +0100
+Message-ID: <CAFEAcA-+sO3oUqfQXHcHRBu2i-WFzvFKObcBz26qeLS_0+3s2Q@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v3 15/22] target/arm: Add ARM_FEATURE_V7VE
+ for v7 Virtualization Extensions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,139 +34,98 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-s390x@nongnu.org, "Michael S . Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Markus Armbruster <armbru@redhat.com>, qemu-ppc@nongnu.org, Pankaj Gupta <pagupta@redhat.com>, Alexander Graf <agraf@suse.de>, Cornelia Huck <cohuck@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Luiz Capitulino <lcapitulino@redhat.com>
+To: Aaron Lindsay <alindsay@codeaurora.org>
+Cc: qemu-arm <qemu-arm@nongnu.org>, Alistair Francis <alistair.francis@xilinx.com>, Wei Huang <wei@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>, Michael Spradling <mspradli@codeaurora.org>, Digant Desai <digantd@codeaurora.org>
 
-On Wed, 30 May 2018 16:13:32 +0200
-David Hildenbrand <david@redhat.com> wrote:
+On 17 May 2018 at 20:31, Aaron Lindsay <alindsay@codeaurora.org> wrote:
+> On Apr 17 16:00, Peter Maydell wrote:
+>> So, the underlying issue here is that there's a QEMU specific
+>> fudge going on. Architecturally, if the CPU implements the
+>> Virtualization Extensions, then:
+>>  * it has Hyp mode
+>>  * it must also implement the Security Extensions
+>>  * on reset it starts in the Secure world
+>>  * it has LPAE
+>>  * it has some stuff that is not inherently tied to having EL2,
+>>    like the SDIV and UDIV instructions, and the presence of
+>>    PMOVSSET
+>>
+>> In an ideal world, we'd just have a feature flag that turned
+>> all that on. Unfortunately, a combination of backwards compatibility
+>> issues, the order in which various features were implemented
+>> in QEMU, and the fact that KVM can't emulate a guest CPU with
+>> the Security Extensions means that we want to be able to model
+>> variants of some CPUs that don't really exist in real hardware:
+>> Cortex-A15 and -A7 which only implement EL0/EL1 but still have
+>> all the v7VE features that you can see from those ELs. But we
+>> didn't really properly lay out guidelines for how the feature
+>> bits should work in this case, with the result that we have
+>> a bunch of local hacks (for instance get_S1prot() has a check
+>> on the LPAE feature bit, since in practice that bit is set in
+>> exactly the CPUs that have v7VE; and the UDIV/SDIV insns have
+>> their own feature bits.)
+>>
+>> So we should probably sort out this mess first, either by:
+>>
+>> (a) state that we use ARM_FEATURE_LPAE for all checks for
+>> features that are architecturally v7VE but which we want to
+>> exist even on our v7VE-no-Hyp-no-Secure oddballs
+>> (b) define an ARM_FEATURE_V7VE for them
+>> (c) define separate feature bits for them individually
+>
+> From what I can tell, using ARM_FEATURE_LPAE to represent all the
+> almost-v7ve misfits won't work well because ARM_FEATURE_ARM_DIV may be
+> supported on some platforms for which ARM_FEATURE_LPAE is not (Cortex
+> R5), and ARM_FEATURE_ARM_DIV is read from ID_ISAR0 in
+> kvm_arm_get_host_cpu_features() (and may be set/not set independently of
+> ARM_FEATURE_LPAE). It appears there is a need to independently
+> distinguish between them.
 
-> On 30.05.2018 15:08, Igor Mammedov wrote:
-> > On Thu, 17 May 2018 10:15:17 +0200
-> > David Hildenbrand <david@redhat.com> wrote:
-> >   
-> >> For multi stage hotplug handlers, we'll have to do some error handling
-> >> in some hotplug functions, so let's use a local error variable (except
-> >> for unplug requests).  
-> > I'd split out introducing local error into separate patch
-> > so patch would do a single thing.
-> >   
-> >> Also, add code to pass control to the final stage hotplug handler at the
-> >> parent bus.  
-> > But I don't agree with generic
-> >  "} else if ("dev->parent_bus && dev->parent_bus->hotplug_handler) {"
-> > forwarding, it's done by 3/14 for generic case and in case of
-> > special device that needs bus handler called from machine one,
-> > I'd suggest to do forwarding explicitly for that device only
-> > like we do with acpi_dev.  
-> 
-> I decided to do it that way because it is generic and results in nicer
-> recovery handling (e.g. in case pc_dimm plug fails, we can simply
-> rollback all (for now MemoryDevice) previous plug operations).
-rollback should be managed by the caller of pc_dimm plug
-directly, so it's not relevant here.
+We need (and already have) a separate feature bit for ARM_DIV
+exactly because it's present on some CPUs which don't have V7VE;
+so we don't want to roll that back into a V7VE feature bit.
 
-> IMHO, the resulting code is easier to read.
-> 
-> From this handling it is clear that
-> "if we reach the hotplug handler, and it is not some special device
-> plugged by the machine (CPU, PC_DIMM), pass it on to the actual hotplug
-> handler if any exists"
-I strongly disagree with that it's easier to deal with.
-You are basically duplicating already generalized code
-from qdev_get_hotplug_handler() back into boards.
+> The same reasoning also seems to rule out
+> option (b) "one ARM_FEATURE_V7VE to rule them all", leaving me with
+> option (c).
+>
+> It almost seems silly to create ARM_FEATURE_PMOVSSET, but I'm not sure
+> what else makes sense to do here. Am I missing something (I'm almost
+> hoping I am)?
 
-If a device doesn't have to be handled by machine handler,
-than qdev_get_hotplug_handler() must return its bus handler
-if any directly. So branch in question that your are copying
-is a dead one, pls drop it.
+Sorry, I forgot I hadn't replied to this email yet. Let's do this:
 
+ * define a new ARM_FEATURE_V7VE:
 
-> 
-> > 
-> >   
-> >> Signed-off-by: David Hildenbrand <david@redhat.com>
-> >> ---
-> >>  hw/i386/pc.c | 39 +++++++++++++++++++++++++++++++--------
-> >>  1 file changed, 31 insertions(+), 8 deletions(-)
-> >>
-> >> diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-> >> index d768930d02..510076e156 100644
-> >> --- a/hw/i386/pc.c
-> >> +++ b/hw/i386/pc.c
-> >> @@ -2007,19 +2007,32 @@ static void pc_cpu_pre_plug(HotplugHandler *hotplug_dev,
-> >>  static void pc_machine_device_pre_plug_cb(HotplugHandler *hotplug_dev,
-> >>                                            DeviceState *dev, Error **errp)
-> >>  {
-> >> +    Error *local_err = NULL;
-> >> +
-> >> +    /* final stage hotplug handler */
-> >>      if (object_dynamic_cast(OBJECT(dev), TYPE_CPU)) {
-> >> -        pc_cpu_pre_plug(hotplug_dev, dev, errp);
-> >> +        pc_cpu_pre_plug(hotplug_dev, dev, &local_err);
-> >> +    } else if (dev->parent_bus && dev->parent_bus->hotplug_handler) {
-> >> +        hotplug_handler_pre_plug(dev->parent_bus->hotplug_handler, dev,
-> >> +                                 &local_err);
-> >>      }
-> >> +    error_propagate(errp, local_err);
-> >>  }
-> >>  
-> >>  static void pc_machine_device_plug_cb(HotplugHandler *hotplug_dev,
-> >>                                        DeviceState *dev, Error **errp)
-> >>  {
-> >> +    Error *local_err = NULL;
-> >> +
-> >> +    /* final stage hotplug handler */
-> >>      if (object_dynamic_cast(OBJECT(dev), TYPE_PC_DIMM)) {
-> >> -        pc_dimm_plug(hotplug_dev, dev, errp);
-> >> +        pc_dimm_plug(hotplug_dev, dev, &local_err);
-> >>      } else if (object_dynamic_cast(OBJECT(dev), TYPE_CPU)) {
-> >> -        pc_cpu_plug(hotplug_dev, dev, errp);
-> >> +        pc_cpu_plug(hotplug_dev, dev, &local_err);
-> >> +    } else if (dev->parent_bus && dev->parent_bus->hotplug_handler) {
-> >> +        hotplug_handler_plug(dev->parent_bus->hotplug_handler, dev, &local_err);
-> >>      }
-> >> +    error_propagate(errp, local_err);
-> >>  }
-> >>  
-> >>  static void pc_machine_device_unplug_request_cb(HotplugHandler *hotplug_dev,
-> >> @@ -2029,7 +2042,10 @@ static void pc_machine_device_unplug_request_cb(HotplugHandler *hotplug_dev,
-> >>          pc_dimm_unplug_request(hotplug_dev, dev, errp);
-> >>      } else if (object_dynamic_cast(OBJECT(dev), TYPE_CPU)) {
-> >>          pc_cpu_unplug_request_cb(hotplug_dev, dev, errp);
-> >> -    } else {
-> >> +    } else if (dev->parent_bus && dev->parent_bus->hotplug_handler) {
-> >> +        hotplug_handler_unplug_request(dev->parent_bus->hotplug_handler, dev,
-> >> +                                       errp);
-> >> +    } else if (!dev->parent_bus) {
-> >>          error_setg(errp, "acpi: device unplug request for not supported device"
-> >>                     " type: %s", object_get_typename(OBJECT(dev)));
-> >>      }
-> >> @@ -2038,14 +2054,21 @@ static void pc_machine_device_unplug_request_cb(HotplugHandler *hotplug_dev,
-> >>  static void pc_machine_device_unplug_cb(HotplugHandler *hotplug_dev,
-> >>                                          DeviceState *dev, Error **errp)
-> >>  {
-> >> +    Error *local_err = NULL;
-> >> +
-> >> +    /* final stage hotplug handler */
-> >>      if (object_dynamic_cast(OBJECT(dev), TYPE_PC_DIMM)) {
-> >> -        pc_dimm_unplug(hotplug_dev, dev, errp);
-> >> +        pc_dimm_unplug(hotplug_dev, dev, &local_err);
-> >>      } else if (object_dynamic_cast(OBJECT(dev), TYPE_CPU)) {
-> >> -        pc_cpu_unplug_cb(hotplug_dev, dev, errp);
-> >> -    } else {
-> >> -        error_setg(errp, "acpi: device unplug for not supported device"
-> >> +        pc_cpu_unplug_cb(hotplug_dev, dev, &local_err);
-> >> +    } else if (dev->parent_bus && dev->parent_bus->hotplug_handler) {
-> >> +        hotplug_handler_unplug(dev->parent_bus->hotplug_handler, dev,
-> >> +                               &local_err);
-> >> +    } else if (!dev->parent_bus) {
-> >> +        error_setg(&local_err, "acpi: device unplug for not supported device"
-> >>                     " type: %s", object_get_typename(OBJECT(dev)));
-> >>      }
-> >> +    error_propagate(errp, local_err);
-> >>  }
-> >>  
-> >>  static HotplugHandler *pc_get_hotpug_handler(MachineState *machine,  
-> >   
-> 
-> 
+  ARM_FEATURE_V7VE, /* v7 Virtualization Extensions (non-EL2 parts) */
+
+In arm_cpu_realizefn:
+
+ * change the existing "FEATURE_V8 implies V7/ARM_DIV/LPAE" to
+   "FEATURE_V8 implies V7VE"
+ * below that put
+
+   if (arm_feature(env, ARM_FEATURE_V7VE) {
+       /* v7 Virtualization Extensions. In real hardware this implies
+        * EL2 and also the presence of the Security Extensions.
+        * For QEMU, for backwards-compatibility we implement some
+        * CPUs or CPU configs which have no actual EL2 or EL3 but do
+        * include the various other features that V7VE implies.
+        * Presence of EL2 itself is ARM_FEATURE_EL2, and of the
+        * Security Extensions is ARM_FEATURE_EL3.
+        */
+       set_feature(env, ARM_FEATURE_ARM_DIV);
+       set_feature(env, ARM_FEATURE_LPAE);
+       set_feature(env, ARM_FEATURE_V7);
+   }
+
+ * in kvm_arm_get_host_cpu_features() in kvm32.c add
+   set_feature(&features, ARM_FEATURE_V7VE);
+   where we currently set V7, LPAE, etc.
+   (by definition a host CPU which supports KVM has v7VE.)
+
+ * perhaps some followon patches that correct checks that were
+   testing something else and can now use the new V7VE feature bit.
+
+thanks
+-- PMM
