@@ -1,28 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48105)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48439)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <keno@juliacomputing.com>) id 1fOQK6-0005v9-QT
-	for qemu-devel@nongnu.org; Thu, 31 May 2018 12:21:11 -0400
+	(envelope-from <jcody@redhat.com>) id 1fOQLC-0006fW-Cb
+	for qemu-devel@nongnu.org; Thu, 31 May 2018 12:22:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <keno@juliacomputing.com>) id 1fOQK6-0000Ca-1m
-	for qemu-devel@nongnu.org; Thu, 31 May 2018 12:21:10 -0400
-Received: from mail-pl0-x232.google.com ([2607:f8b0:400e:c01::232]:45250)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <keno@juliacomputing.com>)
-	id 1fOQK5-0000Ak-Rt
-	for qemu-devel@nongnu.org; Thu, 31 May 2018 12:21:09 -0400
-Received: by mail-pl0-x232.google.com with SMTP id c23-v6so2224833plz.12
-	for <qemu-devel@nongnu.org>; Thu, 31 May 2018 09:21:09 -0700 (PDT)
+	(envelope-from <jcody@redhat.com>) id 1fOQLB-0001OZ-DF
+	for qemu-devel@nongnu.org; Thu, 31 May 2018 12:22:18 -0400
+Date: Thu, 31 May 2018 12:22:08 -0400
+From: Jeff Cody <jcody@redhat.com>
+Message-ID: <20180531162208.GB11303@localhost.localdomain>
+References: <20180531004323.4611-1-jsnow@redhat.com>
+	<20180531004323.4611-3-jsnow@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20180529222558.59230642@bahia.lan>
-References: <cover.1527310210.git.keno@alumni.harvard.edu>
-	<6205f39b495ee7356478cc53faf5e32289f57182.1527310210.git.keno@alumni.harvard.edu>
-	<20180529222558.59230642@bahia.lan>
-From: Keno Fischer <keno@juliacomputing.com>
-Date: Thu, 31 May 2018 12:20:28 -0400
-Message-ID: <CABV8kRwhz_WhkjZzqQXXTTwRL_sLNftHAnw9LjMCbkZMLiU4Tg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH 05/13] 9p: darwin: Handle struct dirent
- differences
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180531004323.4611-3-jsnow@redhat.com>
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 2/3] ahci: fix PxCI register
+ race
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,40 +24,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Keno Fischer <keno@alumni.harvard.edu>
+To: John Snow <jsnow@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org
 
->> diff --git a/hw/9pfs/9p-synth.c b/hw/9pfs/9p-synth.c
->> index eb68b42..3c0a6d8 100644
->> --- a/hw/9pfs/9p-synth.c
->> +++ b/hw/9pfs/9p-synth.c
->> @@ -221,7 +221,11 @@ static void synth_direntry(V9fsSynthNode *node,
->>  {
->>      strcpy(entry->d_name, node->name);
->>      entry->d_ino = node->attr->inode;
->> +#ifdef CONFIG_DARWIN
->> +    entry->d_seekoff = off + 1;
->
-> Hmm... what's that for ? No users in the patchset and the comment
-> below seem to indicate this wouldn't be trusted anyway.
+On Wed, May 30, 2018 at 08:43:22PM -0400, John Snow wrote:
+> AHCI presently signals completion prior to the PxCI register being
+> cleared to indicate completion. If a guest driver attempts to issue
+> a new command in its IRQ handler, it might be surprised to learn there
+> is still a command pending.
+> 
+> In the case of Windows 10's boot driver, it will actually poll the IRQ
+> register hoping to find out when the command is done running -- which
+> will never happen, as there isn't a command running.
+> 
+> Fix this: clear PxCI in ahci_cmd_done and not in the asynchronous BH.
+> Because it now runs synchronously, we don't need to check if the command
+> is actually done by spying on the ATA registers. We know it's done.
+> 
+> Signed-off-by: John Snow <jsnow@redhat.com>
+> ---
+>  hw/ide/ahci.c | 13 ++++++-------
+>  1 file changed, 6 insertions(+), 7 deletions(-)
+> 
+> diff --git a/hw/ide/ahci.c b/hw/ide/ahci.c
+> index b7a6f68790..a9558e45e7 100644
+> --- a/hw/ide/ahci.c
+> +++ b/hw/ide/ahci.c
+> @@ -532,13 +532,6 @@ static void ahci_check_cmd_bh(void *opaque)
+>      qemu_bh_delete(ad->check_bh);
+>      ad->check_bh = NULL;
+>  
+> -    if ((ad->busy_slot != -1) &&
+> -        !(ad->port.ifs[0].status & (BUSY_STAT|DRQ_STAT))) {
+> -        /* no longer busy */
+> -        ad->port_regs.cmd_issue &= ~(1 << ad->busy_slot);
+> -        ad->busy_slot = -1;
+> -    }
+> -
+>      check_cmd(ad->hba, ad->port_no);
+>  }
+>  
+> @@ -1425,6 +1418,12 @@ static void ahci_cmd_done(IDEDMA *dma)
+>  
+>      trace_ahci_cmd_done(ad->hba, ad->port_no);
+>  
+> +    /* no longer busy */
+> +    if (ad->busy_slot != -1) {
+> +        ad->port_regs.cmd_issue &= ~(1 << ad->busy_slot);
+> +        ad->busy_slot = -1;
+> +    }
+> +
+>      /* update d2h status */
+>      ahci_write_fis_d2h(ad);
+>  
+> -- 
+> 2.14.3
+> 
+> 
 
-d_off isn't available on Darwin, so an appropriate ifdef
-is required here anyway. I figured if the offset is available
-anyway, I might as well set it, but I can drop
-this code path if you would prefer.
-
->> +        off_t off = v9fs_co_telldir(pdu, fidp);
->
-> Please declare local variables at the beginning of the function. Also,
-> v9fs_co_telldir() can fail. This requires proper error handling.
-
-Will do.
-
->> +#else
->> +        off_t off = dent->d_off;
->> +#endif
->
-> Please make this a helper and call it in v9fs_do_readdir_with_stat() as well.
->
-
-Will do.
+Reviewed-by: Jeff Cody <jcody@redhat.com>
