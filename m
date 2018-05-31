@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33359)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33594)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jemmy858585@gmail.com>) id 1fOI82-0007nc-G0
-	for qemu-devel@nongnu.org; Thu, 31 May 2018 03:36:12 -0400
+	(envelope-from <clg@kaod.org>) id 1fOIAQ-0008TL-L0
+	for qemu-devel@nongnu.org; Thu, 31 May 2018 03:38:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jemmy858585@gmail.com>) id 1fOI81-0002j6-G7
-	for qemu-devel@nongnu.org; Thu, 31 May 2018 03:36:10 -0400
-Received: from mail-it0-x234.google.com ([2607:f8b0:4001:c0b::234]:34155)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <jemmy858585@gmail.com>)
-	id 1fOI81-0002is-Am
-	for qemu-devel@nongnu.org; Thu, 31 May 2018 03:36:09 -0400
-Received: by mail-it0-x234.google.com with SMTP id y127-v6so218310itd.1
-	for <qemu-devel@nongnu.org>; Thu, 31 May 2018 00:36:09 -0700 (PDT)
+	(envelope-from <clg@kaod.org>) id 1fOIAN-0003YK-HZ
+	for qemu-devel@nongnu.org; Thu, 31 May 2018 03:38:38 -0400
+Received: from 7.mo68.mail-out.ovh.net ([46.105.63.230]:54293)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1fOIAN-0003Tf-Bg
+	for qemu-devel@nongnu.org; Thu, 31 May 2018 03:38:35 -0400
+Received: from player688.ha.ovh.net (unknown [10.109.108.93])
+	by mo68.mail-out.ovh.net (Postfix) with ESMTP id 22972E560E
+	for <qemu-devel@nongnu.org>; Thu, 31 May 2018 09:38:23 +0200 (CEST)
+References: <20180530144217.8959-1-joel@jms.id.au>
+From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Message-ID: <1a47f19a-1791-da8a-d9ad-abe4c1e8e1ce@kaod.org>
+Date: Thu, 31 May 2018 09:38:10 +0200
 MIME-Version: 1.0
-In-Reply-To: <20180530173325.GG2410@work-vm>
-References: <1527673416-31268-1-git-send-email-lidongchen@tencent.com>
-	<1527673416-31268-12-git-send-email-lidongchen@tencent.com>
-	<20180530173325.GG2410@work-vm>
-From: 858585 jemmy <jemmy858585@gmail.com>
-Date: Thu, 31 May 2018 15:36:08 +0800
-Message-ID: <CAOGPPbe=8AOX0S8vBAOmkV_vnb4A0EV_amUif8Qig0PuJQCwFg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v4 11/12] migration: poll the cm event
- while wait RDMA work request completion
+In-Reply-To: <20180530144217.8959-1-joel@jms.id.au>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] target/ppc: Allow privileged access to
+ SPR_PCR
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,109 +31,109 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Aviad Yehezkel <aviadye@mellanox.com>
-Cc: zhang.zhanghailiang@huawei.com, Juan Quintela <quintela@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, Adi Dotan <adido@mellanox.com>, Lidong Chen <lidongchen@tencent.com>
+To: Joel Stanley <joel@jms.id.au>, David Gibson <david@gibson.dropbear.id.au>, Alexander Graf <agraf@suse.de>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+Cc: Benjamin Herrenschmidt <benh@kernel.crashing.org>, Michael Ellerman <mpe@ellerman.id.au>, Michael Neuling <mikey@neuling.org>
 
-On Thu, May 31, 2018 at 1:33 AM, Dr. David Alan Gilbert
-<dgilbert@redhat.com> wrote:
-> * Lidong Chen (jemmy858585@gmail.com) wrote:
->> If the peer qemu is crashed, the qemu_rdma_wait_comp_channel function
->> maybe loop forever. so we should also poll the cm event fd, and when
->> receive any cm event, we consider some error happened.
->>
->> Signed-off-by: Lidong Chen <lidongchen@tencent.com>
->
-> I don't understand enough about the way the infiniband fd's work to
-> fully review this; so I'd appreciate if some one who does could
-> comment/add their review.
+On 05/30/2018 04:42 PM, Joel Stanley wrote:
+> The powerpc Linux kernel[1] and skiboot firmware[2] recently gained changes
+> that cause the Processor Compatibility Register (PCR) SPR to be cleared.
+> 
+> These changes cause Linux to fail to boot on the Qemu powernv machine
+> with an error:
+> 
+>  Trying to write privileged spr 338 (0x152) at 0000000030017f0c
+> 
+> With this patch Qemu makes this register available as a hypervisor
+> privileged register.
+> 
+> Note that bits set in this register disable features of the processor.
+> Currently the only register state that is supported is when the register
+> is zeroed (enable all features). This is sufficient for guests to
+> once again boot.
+> 
+> [1] https://lkml.kernel.org/r/20180518013742.24095-1-mikey@neuling.org
+> [2] https://patchwork.ozlabs.org/patch/915932/
+> 
+> Signed-off-by: Joel Stanley <joel@jms.id.au>
+> ---
+>  target/ppc/helper.h             |  1 +
+>  target/ppc/misc_helper.c        | 10 ++++++++++
+>  target/ppc/translate_init.inc.c |  9 +++++++--
+>  3 files changed, 18 insertions(+), 2 deletions(-)
+> 
+> diff --git a/target/ppc/helper.h b/target/ppc/helper.h
+> index 19453c68138a..d751f0e21909 100644
+> --- a/target/ppc/helper.h
+> +++ b/target/ppc/helper.h
+> @@ -17,6 +17,7 @@ DEF_HELPER_2(pminsn, void, env, i32)
+>  DEF_HELPER_1(rfid, void, env)
+>  DEF_HELPER_1(hrfid, void, env)
+>  DEF_HELPER_2(store_lpcr, void, env, tl)
+> +DEF_HELPER_2(store_pcr, void, env, tl)
+>  #endif
+>  DEF_HELPER_1(check_tlb_flush_local, void, env)
+>  DEF_HELPER_1(check_tlb_flush_global, void, env)
+> diff --git a/target/ppc/misc_helper.c b/target/ppc/misc_helper.c
+> index 8c8cba5cc6f1..40c39d08ad14 100644
+> --- a/target/ppc/misc_helper.c
+> +++ b/target/ppc/misc_helper.c
+> @@ -20,6 +20,7 @@
+>  #include "cpu.h"
+>  #include "exec/exec-all.h"
+>  #include "exec/helper-proto.h"
+> +#include "qemu/error-report.h"
+>  
+>  #include "helper_regs.h"
+>  
+> @@ -186,6 +187,15 @@ void ppc_store_msr(CPUPPCState *env, target_ulong value)
+>      hreg_store_msr(env, value, 0);
+>  }
+>  
+> +void helper_store_pcr(CPUPPCState *env, target_ulong value)
+> +{
+> +    if (value != 0) {
+> +        error_report("Unimplemented PCR value 0x"TARGET_FMT_lx, value);
+> +        return;
+> +    }
+> +    env->spr[SPR_PCR] = value;
 
-Hi Avaid:
-    we need your help. I also not find any document about the cq
-channel event fd and
-cm channel event f.
-    Should we set the events to G_IO_IN | G_IO_HUP | G_IO_ERR? or
-G_IO_IN is enough?
-    pfds[0].events = G_IO_IN | G_IO_HUP | G_IO_ERR;
-    pfds[1].events = G_IO_IN | G_IO_HUP | G_IO_ERR;
-    Thanks.
+shouldn't we use pcc->pcr_mask ? and check pcc->pcr_supported also ? 
 
->
->> ---
->>  migration/rdma.c | 35 ++++++++++++++++++++++++-----------
->>  1 file changed, 24 insertions(+), 11 deletions(-)
->>
->> diff --git a/migration/rdma.c b/migration/rdma.c
->> index 1b9e261..d611a06 100644
->> --- a/migration/rdma.c
->> +++ b/migration/rdma.c
->> @@ -1489,6 +1489,9 @@ static uint64_t qemu_rdma_poll(RDMAContext *rdma, uint64_t *wr_id_out,
->>   */
->>  static int qemu_rdma_wait_comp_channel(RDMAContext *rdma)
->>  {
->> +    struct rdma_cm_event *cm_event;
->> +    int ret = -1;
->> +
->>      /*
->>       * Coroutine doesn't start until migration_fd_process_incoming()
->>       * so don't yield unless we know we're running inside of a coroutine.
->> @@ -1504,25 +1507,35 @@ static int qemu_rdma_wait_comp_channel(RDMAContext *rdma)
->>           * But we need to be able to handle 'cancel' or an error
->>           * without hanging forever.
->>           */
->> -        while (!rdma->error_state  && !rdma->received_error) {
->> -            GPollFD pfds[1];
->> +        while (!rdma->error_state && !rdma->received_error) {
->> +            GPollFD pfds[2];
->>              pfds[0].fd = rdma->comp_channel->fd;
->>              pfds[0].events = G_IO_IN | G_IO_HUP | G_IO_ERR;
->> +            pfds[0].revents = 0;
->> +
->> +            pfds[1].fd = rdma->channel->fd;
->> +            pfds[1].events = G_IO_IN | G_IO_HUP | G_IO_ERR;
->> +            pfds[1].revents = 0;
->> +
->>              /* 0.1s timeout, should be fine for a 'cancel' */
->> -            switch (qemu_poll_ns(pfds, 1, 100 * 1000 * 1000)) {
->> -            case 1: /* fd active */
->> -                return 0;
->> +            qemu_poll_ns(pfds, 2, 100 * 1000 * 1000);
->
-> Shouldn't we still check the return value of this; if it's negative
-> something has gone wrong.
+C.
 
-I will fix this.
-Thanks.
-
->
-> Dave
->
->> -            case 0: /* Timeout, go around again */
->> -                break;
->> +            if (pfds[1].revents) {
->> +                ret = rdma_get_cm_event(rdma->channel, &cm_event);
->> +                if (!ret) {
->> +                    rdma_ack_cm_event(cm_event);
->> +                }
->> +                error_report("receive cm event while wait comp channel,"
->> +                             "cm event is %d", cm_event->event);
->>
->> -            default: /* Error of some type -
->> -                      * I don't trust errno from qemu_poll_ns
->> -                     */
->> -                error_report("%s: poll failed", __func__);
->> +                /* consider any rdma communication event as an error */
->>                  return -EPIPE;
->>              }
->>
->> +            if (pfds[0].revents) {
->> +                return 0;
->> +            }
->> +
->>              if (migrate_get_current()->state == MIGRATION_STATUS_CANCELLING) {
->>                  /* Bail out and let the cancellation happen */
->>                  return -EPIPE;
->> --
->> 1.8.3.1
->>
-> --
-> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> +}
+> +
+>  /* This code is lifted from MacOnLinux. It is called whenever
+>   * THRM1,2 or 3 is read an fixes up the values in such a way
+>   * that will make MacOS not hang. These registers exist on some
+> diff --git a/target/ppc/translate_init.inc.c b/target/ppc/translate_init.inc.c
+> index ab782cb32aaa..bebe6ec5333c 100644
+> --- a/target/ppc/translate_init.inc.c
+> +++ b/target/ppc/translate_init.inc.c
+> @@ -456,6 +456,10 @@ static void spr_write_hid0_601(DisasContext *ctx, int sprn, int gprn)
+>      /* Must stop the translation as endianness may have changed */
+>      gen_stop_exception(ctx);
+>  }
+> +static void spr_write_pcr(DisasContext *ctx, int sprn, int gprn)
+> +{
+> +    gen_helper_store_pcr(cpu_env, cpu_gpr[gprn]);
+> +}
+>  #endif
+>  
+>  /* Unified bats */
+> @@ -7957,11 +7961,12 @@ static void gen_spr_power6_common(CPUPPCState *env)
+>  #endif
+>      /*
+>       * Register PCR to report POWERPC_EXCP_PRIV_REG instead of
+> -     * POWERPC_EXCP_INVAL_SPR.
+> +     * POWERPC_EXCP_INVAL_SPR in userspace. Permit hypervisor access.
+>       */
+> -    spr_register(env, SPR_PCR, "PCR",
+> +    spr_register_hv(env, SPR_PCR, "PCR",
+>                   SPR_NOACCESS, SPR_NOACCESS,
+>                   SPR_NOACCESS, SPR_NOACCESS,
+> +                 &spr_read_generic, &spr_write_pcr,
+>                   0x00000000);
+>  }
+>  
+> 
