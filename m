@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57553)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59241)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fOKIE-0005wv-84
-	for qemu-devel@nongnu.org; Thu, 31 May 2018 05:54:51 -0400
+	(envelope-from <stefanha@redhat.com>) id 1fOKNd-0007Oj-36
+	for qemu-devel@nongnu.org; Thu, 31 May 2018 06:00:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fOKID-0006xN-ID
-	for qemu-devel@nongnu.org; Thu, 31 May 2018 05:54:50 -0400
-Received: from mail-oi0-x244.google.com ([2607:f8b0:4003:c06::244]:39989)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fOKID-0006x2-BA
-	for qemu-devel@nongnu.org; Thu, 31 May 2018 05:54:49 -0400
-Received: by mail-oi0-x244.google.com with SMTP id f79-v6so5036203oib.7
-	for <qemu-devel@nongnu.org>; Thu, 31 May 2018 02:54:49 -0700 (PDT)
+	(envelope-from <stefanha@redhat.com>) id 1fOKNY-0003Le-Rr
+	for qemu-devel@nongnu.org; Thu, 31 May 2018 06:00:25 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:39412 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1fOKNY-0003Kp-2o
+	for qemu-devel@nongnu.org; Thu, 31 May 2018 06:00:20 -0400
+Date: Thu, 31 May 2018 11:00:17 +0100
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <20180531100017.GA27838@stefanha-x1.localdomain>
+References: <1527557075-3411-1-git-send-email-changpeng.liu@intel.com>
 MIME-Version: 1.0
-In-Reply-To: <87a9fff7-0a53-6b52-eb2c-e721556cf87b@redhat.com>
-References: <20180521140402.23318-1-peter.maydell@linaro.org>
-	<87a9fff7-0a53-6b52-eb2c-e721556cf87b@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 31 May 2018 10:54:28 +0100
-Message-ID: <CAFEAcA8XkCAK1GKHXKEBgxrVW75E9i3cDFw0iF68V7y7x8h-0A@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH 00/27] iommu: support txattrs,
- support TCG execution, implement TZ MPC
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="k1lZvvs/B4yU6o8G"
+Content-Disposition: inline
+In-Reply-To: <1527557075-3411-1-git-send-email-changpeng.liu@intel.com>
+Subject: Re: [Qemu-devel] [PATCH v2] vhost-blk: turn on pre-defined RO
+ feature bit
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,29 +28,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, Richard Henderson <rth@twiddle.net>, =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>, "patches@linaro.org" <patches@linaro.org>
+To: Changpeng Liu <changpeng.liu@intel.com>
+Cc: qemu-devel@nongnu.org, mst@redhat.com
 
-On 30 May 2018 at 17:58, Paolo Bonzini <pbonzini@redhat.com> wrote:
-> On 21/05/2018 16:03, Peter Maydell wrote:
->> This patchset is a rather large one, but the first half is all
->> fairly simple plumbing. It does four things:
->>  * support IOMMUs that are aware of memory transaction attributes and
->>    may generate different translations for different attributes
->>  * support TCG execution out of memory which is behind an IOMMU
->>  * implement the Arm TrustZone Memory Protection Controller
->>    (which needs both the above features in the IOMMU core code)
->>  * use the MPC in the mps2-an505 board
->
-> Go ahead and apply it through the ARM tree.  Thanks!
 
-It needs a v2 (there are some patches that need fixing),
-and some of the tail end of the patchset hasn't been reviewed,
-and I'm not sure if we have consensus on the IOMMU API changes
-completely yet. But if you're happy we're going in the right
-direction I can apply 1-13 via target-arm.next (that's the
-"plumb TxAttrs through various functions" patches). That will
-reduce the size of the patchset and make conflicts less likely.
+--k1lZvvs/B4yU6o8G
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-thanks
--- PMM
+On Tue, May 29, 2018 at 09:24:35AM +0800, Changpeng Liu wrote:
+> Read only feature shouldn't be negotiable, because if the
+> backend device reported Read only feature supported, QEMU
+> host driver shouldn't change backend's RO attribute. While
+> here, also enable the vhost-user-blk test utility to test
+> RO feature.
+>=20
+> Signed-off-by: Changpeng Liu <changpeng.liu@intel.com>
+> ---
+>  contrib/vhost-user-blk/vhost-user-blk.c | 48 ++++++++++++++++++++++++---=
+------
+>  hw/block/vhost-user-blk.c               |  5 +---
+>  include/hw/virtio/vhost-user-blk.h      |  1 -
+>  3 files changed, 36 insertions(+), 18 deletions(-)
+
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+
+--k1lZvvs/B4yU6o8G
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJbD8exAAoJEJykq7OBq3PIKwIIALHGYNHVRB2sMgHp3j3Rgna7
+2DjFcn2RxjeA2friAWVwny8355lNSX0NqWAgHf3sp03e0pyo6ilf4UakhyYhUCq6
+not/BKZjDEGGr1RmMw5gYrp7Kkl6/Jvg/Asdu+GfdAJDpzRBbA2fnAfZZUBvhXQg
+6Xy3BVFinYD/AOByo9qB49OOWFbNYwEJ8+6N7/wygcp334ResH6LSZryuPKC1neD
+pj4MSmffH7xwf6P9XWQFKtRFUC32sNcKvwHkKXJ7W02ZhcGMPm+XRBEWQ4Ev8wK2
+vKmkhDtKwnZ9rZsqHrNL5oBer7rhTffYZWb7XJ31oMMycXoh8m2YfVYMwlsa24c=
+=sXW1
+-----END PGP SIGNATURE-----
+
+--k1lZvvs/B4yU6o8G--
