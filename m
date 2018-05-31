@@ -1,28 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41446)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43230)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fOU0w-00047D-Nv
-	for qemu-devel@nongnu.org; Thu, 31 May 2018 16:17:39 -0400
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1fOUEW-0006kw-KT
+	for qemu-devel@nongnu.org; Thu, 31 May 2018 16:31:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fOU0s-0000J3-4p
-	for qemu-devel@nongnu.org; Thu, 31 May 2018 16:17:38 -0400
-Received: from mail-wm0-x243.google.com ([2a00:1450:400c:c09::243]:51781)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1fOU0r-0000IT-VB
-	for qemu-devel@nongnu.org; Thu, 31 May 2018 16:17:34 -0400
-Received: by mail-wm0-x243.google.com with SMTP id r15-v6so28488974wmc.1
-	for <qemu-devel@nongnu.org>; Thu, 31 May 2018 13:17:33 -0700 (PDT)
-References: <20180116134217.8725-1-berrange@redhat.com>
-	<20180116134217.8725-14-berrange@redhat.com>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <20180116134217.8725-14-berrange@redhat.com>
-Date: Thu, 31 May 2018 21:17:30 +0100
-Message-ID: <871sdr1sx1.fsf@linaro.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v5 13/14] travis: improve python version
- test coverage
+	(envelope-from <samuel.thibault@ens-lyon.org>) id 1fOUEK-00020U-LR
+	for qemu-devel@nongnu.org; Thu, 31 May 2018 16:31:40 -0400
+Received: from hera.aquilenet.fr ([2a0c:e300::1]:50852)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <samuel.thibault@ens-lyon.org>)
+	id 1fOUEK-0001zB-Cs
+	for qemu-devel@nongnu.org; Thu, 31 May 2018 16:31:28 -0400
+From: Samuel Thibault <samuel.thibault@ens-lyon.org>
+Date: Thu, 31 May 2018 22:31:10 +0200
+Message-Id: <20180531203110.17203-1-samuel.thibault@ens-lyon.org>
+Subject: [Qemu-devel] [PATCHv2] slirp: Fix spurious error report when
+ sending directly
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,95 +23,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>
-Cc: qemu-devel@nongnu.org, Fam Zheng <famz@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Eric Blake <eblake@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: Samuel Thibault <samuel.thibault@ens-lyon.org>, stefanha@redhat.com, jan.kiszka@siemens.com, f4bug@amsat.org
 
+Move check to where it actually is useful, and reduce scope of 'len'
+variable along the way.
 
-Daniel P. Berrange <berrange@redhat.com> writes:
+Signed-off-by: Samuel Thibault <samuel.thibault@ens-lyon.org>
+---
 
-> Currently travis declares ancient python 2.4 is desired. Update that to
-> 2.6 which is the oldest version any targetted distros still needs. If we
-> just list a python 3 version at the top level this will double the
-> number of travis jobs we run which is unreasonable.
->
-> So arbitrarily pick the clang test matrix entries to build with python
-> 3.0 and 3.6, to extend coverage of python versions, without increasing
-> job count or build time.
+Difference from v1:
+- move check instead of initializing len.
 
-I'm sorry I didn't get to this when you posted it. However I'd like to
-know what the minimum build configuration we can get which will still
-ensure that the python is exercised? Would a
-TARGET_LIST=3D"x86-64-softmmu" be good enough?
+ slirp/socket.c | 14 +++++++-------
+ 1 file changed, 7 insertions(+), 7 deletions(-)
 
->
-> Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
-> ---
->  .travis.yml | 14 +++++++++-----
->  1 file changed, 9 insertions(+), 5 deletions(-)
->
-> diff --git a/.travis.yml b/.travis.yml
-> index f583839755..708c886017 100644
-> --- a/.travis.yml
-> +++ b/.travis.yml
-> @@ -1,7 +1,7 @@
->  sudo: false
->  language: c
->  python:
-> -  - "2.4"
-> +  - "2.6"
->  compiler:
->    - gcc
->  cache: ccache
-> @@ -115,15 +115,17 @@ matrix:
->          - sudo apt-get build-dep -qq qemu
->          - wget -O - http://people.linaro.org/~alex.bennee/qemu-submodule=
--git-seed.tar.xz | tar -xvJ
->          - git submodule update --init --recursive
-> -    # Trusty System build with latest stable clang
-> +    # Trusty System build with latest stable clang & python 3.0
->      - sudo: required
->        addons:
->        dist: trusty
->        language: generic
->        compiler: none
-> +      python:
-> +        - "3.0"
->        env:
->          - COMPILER_NAME=3Dclang CXX=3Dclang++-3.9 CC=3Dclang-3.9
-> -        - CONFIG=3D"--disable-linux-user --cc=3Dclang-3.9 --cxx=3Dclang+=
-+-3.9"
-> +        - CONFIG=3D"--disable-linux-user --cc=3Dclang-3.9 --cxx=3Dclang+=
-+-3.9 --python=3D/usr/bin/python3"
->        before_install:
->          - wget -nv -O - http://llvm.org/apt/llvm-snapshot.gpg.key | sudo=
- apt-key add -
->          - sudo apt-add-repository -y 'deb http://llvm.org/apt/trusty llv=
-m-toolchain-trusty-3.9 main'
-> @@ -134,15 +136,17 @@ matrix:
->          - git submodule update --init --recursive
->        before_script:
->          - ./configure ${CONFIG} || cat config.log
-> -    # Trusty Linux User build with latest stable clang
-> +    # Trusty Linux User build with latest stable clang & python 3.6
->      - sudo: required
->        addons:
->        dist: trusty
->        language: generic
->        compiler: none
-> +      python:
-> +        - "3.6"
->        env:
->          - COMPILER_NAME=3Dclang CXX=3Dclang++-3.9 CC=3Dclang-3.9
-> -        - CONFIG=3D"--disable-system --cc=3Dclang-3.9 --cxx=3Dclang++-3.=
-9"
-> +        - CONFIG=3D"--disable-system --cc=3Dclang-3.9 --cxx=3Dclang++-3.=
-9 --python=3D/usr/bin/python3"
->        before_install:
->          - wget -nv -O - http://llvm.org/apt/llvm-snapshot.gpg.key | sudo=
- apt-key add -
->          - sudo apt-add-repository -y 'deb http://llvm.org/apt/trusty llv=
-m-toolchain-trusty-3.9 main'
-
-
---
-Alex Benn=C3=A9e
+diff --git a/slirp/socket.c b/slirp/socket.c
+index e2a71c9b04..08fe98907d 100644
+--- a/slirp/socket.c
++++ b/slirp/socket.c
+@@ -340,7 +340,7 @@ sosendoob(struct socket *so)
+ 	struct sbuf *sb = &so->so_rcv;
+ 	char buff[2048]; /* XXX Shouldn't be sending more oob data than this */
+ 
+-	int n, len;
++	int n;
+ 
+ 	DEBUG_CALL("sosendoob");
+ 	DEBUG_ARG("so = %p", so);
+@@ -359,7 +359,7 @@ sosendoob(struct socket *so)
+ 		 * send it all
+ 		 */
+ 		uint32_t urgc = so->so_urgc;
+-		len = (sb->sb_data + sb->sb_datalen) - sb->sb_rptr;
++		int len = (sb->sb_data + sb->sb_datalen) - sb->sb_rptr;
+ 		if (len > urgc) {
+ 			len = urgc;
+ 		}
+@@ -374,13 +374,13 @@ sosendoob(struct socket *so)
+ 			len += n;
+ 		}
+ 		n = slirp_send(so, buff, len, (MSG_OOB)); /* |MSG_DONTWAIT)); */
+-	}
+-
+ #ifdef DEBUG
+-	if (n != len) {
+-		DEBUG_ERROR((dfd, "Didn't send all data urgently XXXXX\n"));
+-	}
++		if (n != len) {
++			DEBUG_ERROR((dfd, "Didn't send all data urgently XXXXX\n"));
++		}
+ #endif
++	}
++
+ 	if (n < 0) {
+ 		return n;
+ 	}
+-- 
+2.17.0
