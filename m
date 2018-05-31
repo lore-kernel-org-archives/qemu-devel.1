@@ -1,28 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46266)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46578)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <keno@juliacomputing.com>) id 1fOQEL-0002Gn-9G
-	for qemu-devel@nongnu.org; Thu, 31 May 2018 12:15:14 -0400
+	(envelope-from <jsnow@redhat.com>) id 1fOQFf-0003NX-Kd
+	for qemu-devel@nongnu.org; Thu, 31 May 2018 12:16:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <keno@juliacomputing.com>) id 1fOQEK-00033V-H2
-	for qemu-devel@nongnu.org; Thu, 31 May 2018 12:15:13 -0400
-Received: from mail-pl0-x242.google.com ([2607:f8b0:400e:c01::242]:38850)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <keno@juliacomputing.com>)
-	id 1fOQEK-00031Y-8s
-	for qemu-devel@nongnu.org; Thu, 31 May 2018 12:15:12 -0400
-Received: by mail-pl0-x242.google.com with SMTP id c11-v6so13520425plr.5
-	for <qemu-devel@nongnu.org>; Thu, 31 May 2018 09:15:11 -0700 (PDT)
+	(envelope-from <jsnow@redhat.com>) id 1fOQFe-0004DO-G1
+	for qemu-devel@nongnu.org; Thu, 31 May 2018 12:16:35 -0400
+References: <20180531004323.4611-1-jsnow@redhat.com>
+	<20180531004323.4611-3-jsnow@redhat.com>
+From: John Snow <jsnow@redhat.com>
+Message-ID: <c45fbf71-447b-8903-2f8a-cf0535c7f892@redhat.com>
+Date: Thu, 31 May 2018 12:16:26 -0400
 MIME-Version: 1.0
-In-Reply-To: <20180529203426.3aa6305a@bahia.lan>
-References: <cover.1527310210.git.keno@alumni.harvard.edu>
-	<033ba6f2e3f0daccb31e1930a1c65cf7a18ae66c.1527310210.git.keno@alumni.harvard.edu>
-	<20180529203426.3aa6305a@bahia.lan>
-From: Keno Fischer <keno@juliacomputing.com>
-Date: Thu, 31 May 2018 12:14:30 -0400
-Message-ID: <CABV8kRzhiVy9ix67OfPcSZ-SNa6Zh6j5uZ05-yhKW_=Ujyd1HQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH 03/13] 9p: Move a couple xattr functions to
- 9p-util
+In-Reply-To: <20180531004323.4611-3-jsnow@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 2/3] ahci: fix PxCI register race
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,25 +24,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Keno Fischer <keno@alumni.harvard.edu>
+To: qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: qemu-stable <qemu-stable@nongnu.org>
 
-> I'm ok with this move, but if the functions need to have distinct
-> implementations, and they really do according to patch 10, then
-> I'd rather have distinct files and rely on conditional building in
-> the makefile. Maybe rename the current file to 9p-util-linux.c
-> and introduce a 9p-util-darwin.c later.
+>From comments on the cover letter, I am adding:
 
-Sounds good, I will make this change.
+Fixes: https://bugs.launchpad.net/qemu/+bug/1769189
 
->> Additionally, introduce a _follow version of fgetxattr and use it.
->> On darwin, fgetxattr has a more general interface, so we'll need to factor
->> it out anyway.
->>
->
-> No need for the _follow version in this case.
+On 05/30/2018 08:43 PM, John Snow wrote:
+> AHCI presently signals completion prior to the PxCI register being
+> cleared to indicate completion. If a guest driver attempts to issue
+> a new command in its IRQ handler, it might be surprised to learn there
+> is still a command pending.
+>=20
+> In the case of Windows 10's boot driver, it will actually poll the IRQ
+> register hoping to find out when the command is done running -- which
+> will never happen, as there isn't a command running.
+>=20
+> Fix this: clear PxCI in ahci_cmd_done and not in the asynchronous BH.
+> Because it now runs synchronously, we don't need to check if the comman=
+d
+> is actually done by spying on the ATA registers. We know it's done.
+>=20
+> Signed-off-by: John Snow <jsnow@redhat.com>
 
-I'm not entirely sure what you're proposing. On darwin `fgetxattr`
-takes two extra
-arguments, so I believe it needs to be factored out nevertheless. Are you just
-proposing doing that later in the patch series?
+and:
+
+CC: qemu-stable <qemu-stable@nongnu.org>
+Reported-by: Fran=C3=A7ois Guerraz <kubrick@fgv6.net>
+Tested-by: Bruce Rogers <brogers@suse.com>
+
+(Stable note: only patch #2 here is strictly required.)
+
+> ---
+>  hw/ide/ahci.c | 13 ++++++-------
+>  1 file changed, 6 insertions(+), 7 deletions(-)
+>=20
+> diff --git a/hw/ide/ahci.c b/hw/ide/ahci.c
+> index b7a6f68790..a9558e45e7 100644
+> --- a/hw/ide/ahci.c
+> +++ b/hw/ide/ahci.c
+> @@ -532,13 +532,6 @@ static void ahci_check_cmd_bh(void *opaque)
+>      qemu_bh_delete(ad->check_bh);
+>      ad->check_bh =3D NULL;
+> =20
+> -    if ((ad->busy_slot !=3D -1) &&
+> -        !(ad->port.ifs[0].status & (BUSY_STAT|DRQ_STAT))) {
+> -        /* no longer busy */
+> -        ad->port_regs.cmd_issue &=3D ~(1 << ad->busy_slot);
+> -        ad->busy_slot =3D -1;
+> -    }
+> -
+>      check_cmd(ad->hba, ad->port_no);
+>  }
+> =20
+> @@ -1425,6 +1418,12 @@ static void ahci_cmd_done(IDEDMA *dma)
+> =20
+>      trace_ahci_cmd_done(ad->hba, ad->port_no);
+> =20
+> +    /* no longer busy */
+> +    if (ad->busy_slot !=3D -1) {
+> +        ad->port_regs.cmd_issue &=3D ~(1 << ad->busy_slot);
+> +        ad->busy_slot =3D -1;
+> +    }
+> +
+>      /* update d2h status */
+>      ahci_write_fis_d2h(ad);
+> =20
+>=20
