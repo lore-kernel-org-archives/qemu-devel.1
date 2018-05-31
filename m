@@ -1,34 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55439)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56982)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fOSkc-0004p9-7V
-	for qemu-devel@nongnu.org; Thu, 31 May 2018 14:56:43 -0400
+	(envelope-from <eblake@redhat.com>) id 1fOSuq-0006wa-5o
+	for qemu-devel@nongnu.org; Thu, 31 May 2018 15:07:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fOSkX-0004l3-BD
-	for qemu-devel@nongnu.org; Thu, 31 May 2018 14:56:42 -0400
-Received: from indium.canonical.com ([91.189.90.7]:34104)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1fOSkX-0004jf-4f
-	for qemu-devel@nongnu.org; Thu, 31 May 2018 14:56:37 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1fOSkU-0002Ll-G0
-	for <qemu-devel@nongnu.org>; Thu, 31 May 2018 18:56:34 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id C48A92E8958
-	for <qemu-devel@nongnu.org>; Thu, 31 May 2018 18:56:24 +0000 (UTC)
+	(envelope-from <eblake@redhat.com>) id 1fOSum-0005Z4-6p
+	for qemu-devel@nongnu.org; Thu, 31 May 2018 15:07:16 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:36908 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1fOSum-0005TV-2Y
+	for qemu-devel@nongnu.org; Thu, 31 May 2018 15:07:12 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.6])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 33E2E406F619
+	for <qemu-devel@nongnu.org>; Thu, 31 May 2018 19:07:04 +0000 (UTC)
+References: <20180531171253.21012-1-pbonzini@redhat.com>
+	<20180531171606.21604-1-pbonzini@redhat.com>
+	<20180531171606.21604-2-pbonzini@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <08772d2d-436f-2388-0eb0-09b4479e9a47@redhat.com>
+Date: Thu, 31 May 2018 14:07:02 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Thu, 31 May 2018 18:44:24 -0000
-From: Jake <1766904@bugs.launchpad.net>
-Reply-To: Bug 1766904 <1766904@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <152466858890.21548.13995835103547275465.malonedeb@soybean.canonical.com>
-Message-Id: <152779226420.25770.17349119833096457758.malone@wampee.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1766904] Re: Creating high hdd load (with
- constant fsyncs) on a SATA disk leads to freezes and errors in guest dmesg
+In-Reply-To: <20180531171606.21604-2-pbonzini@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PULL 40/53] docs/interop: add "firmware.json"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,52 +35,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
+Cc: "Daniel P. Berrange" <berrange@redhat.com>, David Gibson <dgibson@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Kashyap Chamarthy <kchamart@redhat.com>, Markus Armbruster <armbru@redhat.com>, Thomas Huth <thuth@redhat.com>
 
-@John Snow Thanks! After applying that patch, I couldn't reproduce this
-anymore. At least for me it seems that these two issues refer to the
-same bug.
+On 05/31/2018 12:15 PM, Paolo Bonzini wrote:
+> From: Laszlo Ersek <lersek@redhat.com>
+> 
+> Add a schema that describes the different uses and properties of virtual
+> machine firmware.
+> 
+> Each firmware executable installed on a host system should come with at
+> least one JSON file that conforms to this schema. Each file informs the
+> management applications about
+> - the firmware's properties and one possible use case / feature set,
+> - configuration bits that are required to run the firmware binary.
+> 
+> In addition, define rules for management apps for picking the highest
+> priority firmware JSON file when multiple such files match the search
+> criteria.
+> 
+> Cc: "Daniel P. Berrange" <berrange@redhat.com>
+> Cc: David Gibson <dgibson@redhat.com>
+> Cc: Eric Blake <eblake@redhat.com>
+> Cc: Gerd Hoffmann <kraxel@redhat.com>
+> Cc: Kashyap Chamarthy <kchamart@redhat.com>
+> Cc: Markus Armbruster <armbru@redhat.com>
+> Cc: Paolo Bonzini <pbonzini@redhat.com>
+> Cc: Thomas Huth <thuth@redhat.com>
+> Reviewed-by: Gerd Hoffmann <kraxel@redhat.com>
+> Signed-off-by: Laszlo Ersek <lersek@redhat.com>
+> Message-Id: <20180509152608.9343-1-lersek@redhat.com>
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 
--- =
+Not Laszlo's fault, and not the only such patch that needs it, but
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1766904
+> ---
+>   docs/interop/firmware.json | 540 +++++++++++++++++++++++++++++++++++++
+>   1 file changed, 540 insertions(+)
+>   create mode 100644 docs/interop/firmware.json
+> 
+> diff --git a/docs/interop/firmware.json b/docs/interop/firmware.json
 
-Title:
-  Creating high hdd load (with constant fsyncs) on a SATA disk leads to
-  freezes and errors in guest dmesg
+> +#
+> +# Since: 2.13
 
-Status in QEMU:
-  New
+s/2.13/3.0/g in the interface files to match Peter's recent commits.
 
-Bug description:
-  After upgrading from qemu 2.10.0+dfsg-2 to 2.12~rc3+dfsg-2 (on debian
-  sid host), centos 7 guest started to show freezes and ata errors in
-  dmesg during hdd workloads with writing many small files and repeated
-  fsyncs.
-
-  Host kernel 4.15.0-3-amd64.
-  Guest kernel 3.10.0-693.21.1.el7.x86_64 (slightly older guest kernel was =
-tested too with same result).
-
-  Script that reproduces the bug (first run usualy goes smooth, second
-  and later runs result in dmesg errors and freezes):
-
-  http://paste.debian.net/hidden/472fb220/
-
-  Sample of error messages in guest dmesg:
-
-  http://paste.debian.net/hidden/8219e234/
-
-  This vm is launchd using virsh start. VM launch command (from logfile
-  in /var/log/libvirt/qemu/):
-
-  http://paste.debian.net/plainh/5604126f
-
-  A workaround that I am using right now: I have detached this SATA
-  storage and reattached the same .qcow2 file as SCSI - this has fixed
-  the issue for me.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1766904/+subscriptions
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
