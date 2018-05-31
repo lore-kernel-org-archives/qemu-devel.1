@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45546)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46831)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <junyan.he@gmx.com>) id 1fOOhH-0002eX-5u
-	for qemu-devel@nongnu.org; Thu, 31 May 2018 10:37:01 -0400
+	(envelope-from <eblake@redhat.com>) id 1fOOmb-0006wt-Dx
+	for qemu-devel@nongnu.org; Thu, 31 May 2018 10:42:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <junyan.he@gmx.com>) id 1fOOhC-0007Ck-3p
-	for qemu-devel@nongnu.org; Thu, 31 May 2018 10:36:59 -0400
-Received: from mout.gmx.net ([212.227.17.21]:50295)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <junyan.he@gmx.com>) id 1fOOhB-0007BR-B2
-	for qemu-devel@nongnu.org; Thu, 31 May 2018 10:36:54 -0400
-From: Junyan He <junyan.he@gmx.com>
-Sender: Junyan He <junyan.he@hotmail.com>
-Date: Thu, 31 May 2018 14:36:16 +0000
-Message-ID: <HK2PR06MB05315C48C2D953449EC5A0A7EB630@HK2PR06MB0531.apcprd06.prod.outlook.com>
-References: <1525918138-6189-1-git-send-email-junyan.he@gmx.com>,
-	<20180531131858.GL27838@stefanha-x1.localdomain>
-In-Reply-To: <20180531131858.GL27838@stefanha-x1.localdomain>
-Content-Language: en-US
+	(envelope-from <eblake@redhat.com>) id 1fOOmY-0002zA-A9
+	for qemu-devel@nongnu.org; Thu, 31 May 2018 10:42:29 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:57232 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1fOOmY-0002y5-5Q
+	for qemu-devel@nongnu.org; Thu, 31 May 2018 10:42:26 -0400
+References: <20180531051641.8473-1-peterx@redhat.com>
+	<20180531051641.8473-3-peterx@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <ecd9d666-8973-3f09-0ab9-eea9655e5919@redhat.com>
+Date: Thu, 31 May 2018 09:42:23 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH V5 0/9] nvdimm: guarantee persistence of
- QEMU writes to persistent memory
+In-Reply-To: <20180531051641.8473-3-peterx@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [RFC v2 2/4] tests: iotests: don't compare
+ SHUTDOWN event
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,172 +29,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@gmail.com>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Haozhong Zhang <haozhong.zhang@intel.com>, "xiaoguangrong.eric@gmail.com" <xiaoguangrong.eric@gmail.com>, "crosthwaite.peter@gmail.com" <crosthwaite.peter@gmail.com>, "mst@redhat.com" <mst@redhat.com>, "dgilbert@redhat.com" <dgilbert@redhat.com>, "ehabkost@redhat.com" <ehabkost@redhat.com>, "quintela@redhat.com" <quintela@redhat.com>, Junyan He <junyan.he@intel.com>, "stefanha@redhat.com" <stefanha@redhat.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "imammedo@redhat.com" <imammedo@redhat.com>, "rth@twiddle.net" <rth@twiddle.net>
+To: Peter Xu <peterx@redhat.com>, qemu-devel@nongnu.org
+Cc: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Fam Zheng <famz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Eric Auger <eric.auger@redhat.com>, John Snow <jsnow@redhat.com>, Markus Armbruster <armbru@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
 
-> Also, there was a discussion about leaving the code unchanged but adding
-> an nvdimm_flush() call at the very end of migration.  I think someone
-> benchmarked it but can't find the email.  Please post a link or
-> summarize the results, because that approach would be much less
-> invasive.  Thanks!
+On 05/31/2018 12:16 AM, Peter Xu wrote:
+> This event is not really necessary.  After OOB series it might affect
+> the timing of the script so this event may or may not be there comparing
+> to the old *.out results.  Let's just filter it out.
 
+This is worrying. Are you stating that the SHUTDOWN event can occur in a 
+different order than it used to, or is it even worse that the SHUTDOWN 
+event disappears altogether?  If enabling OOB makes the SHUTDOWN event 
+sometimes disappear, that's a regression that we should fix.  If it just 
+makes things occur in a different order, we need an explanation why that 
+is okay.
 
-And previous comments:
+> 
+> Since some of the scripts are using qmp-pretty, we need some trick in
+> the filtering script to make sure sed works for multiple lines to
+> explicitly mask out this event.
+> 
+> CC: John Snow <jsnow@redhat.com>
+> CC: Max Reitz <mreitz@redhat.com>
+> CC: Kevin Wolf <kwolf@redhat.com>
+> Signed-off-by: Peter Xu <peterx@redhat.com>
+> ---
 
+> +++ b/tests/qemu-iotests/067.out
+> @@ -70,6 +70,7 @@ Testing: -drive file=TEST_DIR/t.IMGFMT,format=IMGFMT,if=none,id=disk -device vir
+>       }
+>   }
+>   
+> +
+>   === -drive/device_add and device_del ===
 
-> > > 2. The migration/ram code is invasive.  Is it really necessary to
-> > >    persist data each time pages are loaded from a migration stream?  =
-It
-> > >    seems simpler to migrate as normal and call pmem_persist() just on=
-ce
-> > >    after RAM has been migrated but before the migration completes.
-> >
-> > The concern is about the overhead of cache flush.
-> >
-> > In this patch series, if possible, QEMU will use pmem_mem{set,cpy}_nodr=
-ain
-> > APIs to copy NVDIMM blocks. Those APIs use movnt (if it's available) an=
-d
-> > can avoid the subsequent cache flush.
-> >
-> > Anyway, I'll make some microbenchmark to check which one will be better=
-.
+Why is this blank line being added (multiple times in this file)?  Is 
+there something about the new filter that isn't quite stripping all the 
+newlines when encountering the SHUTDOWN event in pretty form?
 
-> The problem is not just the overhead; the problem is the code
-> complexity; this series makes all the paths through the migration code
-> more complex in places we wouldn't expect to change.
+Aha - it's because test 067 is already doing a very similar filtering of 
+events.  Can we reduce the code duplication by promoting 
+_filter_qmp_events from there into common.filter (as a separate patch)?
 
-I already use the migration info tool and list the result in the Mail just =
-after this patch set sent:
+> +++ b/tests/qemu-iotests/common.filter
+> @@ -88,7 +88,10 @@ _filter_qmp()
+>       sed -e 's#\("\(micro\)\?seconds": \)[0-9]\+#\1 TIMESTAMP#g' \
+>           -e 's#^{"QMP":.*}$#QMP_VERSION#' \
+>           -e '/^    "QMP": {\s*$/, /^    }\s*$/ c\' \
+> -        -e '    QMP_VERSION'
+> +        -e '    QMP_VERSION' | \
+> +    tr '\n' '\r' | \
+> +    sed -e 's/{\s*"timestamp":\s*{\s*"seconds":\s*TIMESTAMP,\s*"microseconds":\s*TIMESTAMP\s*},\s*"event":\s*"SHUTDOWN",\s*"data":\s*{\s*"guest":\s*false\s*}\s*}\s//' | \
 
-Disable all haozhong's pmem_drain and  pmem_memset_nodrain  kind function c=
-all
-and make the cleanup function do the flush job like this:
+Really long line. This should do the same:
 
-static int ram_load_cleanup(void *opaque)
+sed -e 's/\r{\(\r[^}]\|[^\r]\)*SHUTDOWN\(\r[^}]\|[^\r]\)*\r}//'
+
+where the \(\r[^}]\|[^\r]\)* subpattern picks up all line breaks that do 
+not end the current top-level {}, as well as any non-line breaks.
+
+In fact, if you like my suggestion about promoting the filter from 67 
+into common.filter, we have two use cases: filter a single 
+pretty-printed filter, and filter ANY pretty-printed filter.  Maybe we 
+do that as follows:
+
+# $1 is a regex of event names to filter; leave empty to filter all
+_filter_qmp_events()
 {
-    RAMBlock *rb;
-    RAMBLOCK_FOREACH(rb) {
-        if (ramblock_is_pmem(rb)) {
-            pmem_persist(rb->host, rb->used_length);
-         }
-    }
-
-    xbzrle_load_cleanup();
-    compress_threads_load_cleanup();
-
-    RAMBLOCK_FOREACH(rb) {
-        g_free(rb->receivedmap);
-        rb->receivedmap =3D NULL;
-    }
-    return 0;
+     fluff='\(\r[^}]\|[^\r]\)*'
+     tr \\n \\r | \
+     sed -e "s/$fluff"'"event": "'"$1$fluff\\r}//" \
+   | tr \\r \\n
 }
 
+at which point '_filter_qmp_events SHUTDOWN' works in this patch, and 
+'_filter_qmp_events' works for 067.  [Untested, but hopefully that gives 
+you some ideas to play with]
 
-The migrate info result is:
-
-Haozhong's Manner
-
-(qemu) migrate -d tcp:localhost:4444
-(qemu) info migrate
-globals:
-store-global-state: on
-only-migratable: off
-send-configuration: on
-send-section-footer: on
-capabilities: xbzrle: off rdma-pin-all: off auto-converge: off zero-blocks:=
- off compress: off events: off postcopy-ram: off x-colo: off release-ram: o=
-ff block: off return-path: off pause-before-switchover: off x-multifd: off =
-dirty-bitmaps: off postcopy-blocktime: off
-Migration status: completed
-total time: 333668 milliseconds
-downtime: 17 milliseconds
-setup: 50 milliseconds
-transferred ram: 10938039 kbytes
-throughput: 268.55 mbps
-remaining ram: 0 kbytes
-total ram: 11027272 kbytes
-duplicate: 35533 pages
-skipped: 0 pages
-normal: 2729095 pages
-normal bytes: 10916380 kbytes
-dirty sync count: 4
-page size: 4 kbytes
-(qemu)
-
-
-flush before complete
-
-QEMU 2.12.50 monitor - type 'help' for more information
-(qemu) migrate -d tcp:localhost:4444
-(qemu) info migrate
-globals:
-store-global-state: on
-only-migratable: off
-send-configuration: on
-send-section-footer: on
-capabilities: xbzrle: off rdma-pin-all: off auto-converge: off zero-blocks:=
- off compress: off events: off postcopy-ram: off x-colo: off release-ram: o=
-ff block: off return-path: off pause-before-switchover: off x-multifd: off =
-dirty-bitmaps: off postcopy-blocktime: off
-Migration status: completed
-total time: 334836 milliseconds
-downtime: 17 milliseconds
-setup: 49 milliseconds
-transferred ram: 10978886 kbytes
-throughput: 268.62 mbps
-remaining ram: 0 kbytes
-total ram: 11027272 kbytes
-duplicate: 23149 pages
-skipped: 0 pages
-normal: 2739314 pages
-normal bytes: 10957256 kbytes
-dirty sync count: 4
-page size: 4 kbytes
-(qemu)
-
-
-So Haozhong's manner seems to be a little faster and I choose to keep that.
-
-If you want to choose this manner, the code will be clean and no need for
-
->   typedef struct {
->       void (*memset)(void *s, int c, size_t n);
->       void (*memcpy)(void *dest, const void *src, size_t n);
->   } MemoryOperations;
-
-
-performance is close, and I am a little new in Qemu:), so both options are =
-OK for me,
-
-Which one do you prefer to?
-
-________________________________
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Sent: Thursday, May 31, 2018 1:18:58 PM
-To: junyan.he@gmx.com
-Cc: qemu-devel@nongnu.org; Haozhong Zhang; xiaoguangrong.eric@gmail.com; cr=
-osthwaite.peter@gmail.com; mst@redhat.com; dgilbert@redhat.com; ehabkost@re=
-dhat.com; quintela@redhat.com; Junyan He; stefanha@redhat.com; pbonzini@red=
-hat.com; imammedo@redhat.com; rth@twiddle.net
-Subject: Re: [Qemu-devel] [PATCH V5 0/9] nvdimm: guarantee persistence of Q=
-EMU writes to persistent memory
-
-David Gilbert previously suggested a memory access interface.  I guess
-it would look something like this:
-
-  typedef struct {
-      void (*memset)(void *s, int c, size_t n);
-      void (*memcpy)(void *dest, const void *src, size_t n);
-  } MemoryOperations;
-
-That way code doesn't need if (pmem) A else B.  It can just do
-mem_ops->foo().  Have you looked into this idea?
-
-Also, there was a discussion about leaving the code unchanged but adding
-an nvdimm_flush() call at the very end of migration.  I think someone
-benchmarked it but can't find the email.  Please post a link or
-summarize the results, because that approach would be much less
-invasive.  Thanks!
-
-Stefan
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
