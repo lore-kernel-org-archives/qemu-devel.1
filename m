@@ -1,16 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59174)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59175)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1fOBgf-0005H0-IE
+	(envelope-from <jsnow@redhat.com>) id 1fOBgf-0005H1-Il
 	for qemu-devel@nongnu.org; Wed, 30 May 2018 20:43:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1fOBge-0006uP-Sa
+	(envelope-from <jsnow@redhat.com>) id 1fOBge-0006uK-Ps
 	for qemu-devel@nongnu.org; Wed, 30 May 2018 20:43:29 -0400
 From: John Snow <jsnow@redhat.com>
-Date: Wed, 30 May 2018 20:43:22 -0400
-Message-Id: <20180531004323.4611-3-jsnow@redhat.com>
-In-Reply-To: <20180531004323.4611-1-jsnow@redhat.com>
-References: <20180531004323.4611-1-jsnow@redhat.com>
-Subject: [Qemu-devel] [PATCH 2/3] ahci: fix PxCI register race
+Date: Wed, 30 May 2018 20:43:20 -0400
+Message-Id: <20180531004323.4611-1-jsnow@redhat.com>
+Subject: [Qemu-devel] [PATCH 0/3] ahci: fix completion race condition
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,54 +20,25 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org, qemu-block@nongnu.org
 Cc: John Snow <jsnow@redhat.com>
 
-AHCI presently signals completion prior to the PxCI register being
-cleared to indicate completion. If a guest driver attempts to issue
-a new command in its IRQ handler, it might be surprised to learn there
-is still a command pending.
+Commit d759c951f changed the main thread lock release/reacquisition,
+and in so doing apparently jostled loose a race condition in the AHCI
+code.
 
-In the case of Windows 10's boot driver, it will actually poll the IRQ
-register hoping to find out when the command is done running -- which
-will never happen, as there isn't a command running.
+Patch 2 should be sufficient to fix this, and patches 1 and 3 are just
+little trivial fixes.
 
-Fix this: clear PxCI in ahci_cmd_done and not in the asynchronous BH.
-Because it now runs synchronously, we don't need to check if the command
-is actually done by spying on the ATA registers. We know it's done.
+This might be sufficient to fix the bug as reported at
+https://bugs.launchpad.net/qemu/+bug/1769189
+but the nature of the timing changes make it difficult to confirm,
+so I am posting this patchset for the reporters to help test.
 
-Signed-off-by: John Snow <jsnow@redhat.com>
----
- hw/ide/ahci.c | 13 ++++++-------
- 1 file changed, 6 insertions(+), 7 deletions(-)
+John Snow (3):
+  ahci: trim signatures on raise/lower
+  ahci: fix PxCI register race
+  ahci: don't schedule unnecessary BH
 
-diff --git a/hw/ide/ahci.c b/hw/ide/ahci.c
-index b7a6f68790..a9558e45e7 100644
---- a/hw/ide/ahci.c
-+++ b/hw/ide/ahci.c
-@@ -532,13 +532,6 @@ static void ahci_check_cmd_bh(void *opaque)
-     qemu_bh_delete(ad->check_bh);
-     ad->check_bh = NULL;
- 
--    if ((ad->busy_slot != -1) &&
--        !(ad->port.ifs[0].status & (BUSY_STAT|DRQ_STAT))) {
--        /* no longer busy */
--        ad->port_regs.cmd_issue &= ~(1 << ad->busy_slot);
--        ad->busy_slot = -1;
--    }
--
-     check_cmd(ad->hba, ad->port_no);
- }
- 
-@@ -1425,6 +1418,12 @@ static void ahci_cmd_done(IDEDMA *dma)
- 
-     trace_ahci_cmd_done(ad->hba, ad->port_no);
- 
-+    /* no longer busy */
-+    if (ad->busy_slot != -1) {
-+        ad->port_regs.cmd_issue &= ~(1 << ad->busy_slot);
-+        ad->busy_slot = -1;
-+    }
-+
-     /* update d2h status */
-     ahci_write_fis_d2h(ad);
- 
+ hw/ide/ahci.c | 24 +++++++++++-------------
+ 1 file changed, 11 insertions(+), 13 deletions(-)
+
 -- 
 2.14.3
