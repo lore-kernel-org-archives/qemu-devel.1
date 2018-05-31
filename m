@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41613)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41544)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1fOOUu-0000rk-EB
-	for qemu-devel@nongnu.org; Thu, 31 May 2018 10:24:13 -0400
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1fOOUt-0006W1-2U
+	(envelope-from <pm215@archaic.org.uk>) id 1fOOUs-0000q1-E5
 	for qemu-devel@nongnu.org; Thu, 31 May 2018 10:24:12 -0400
-Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:42288)
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <pm215@archaic.org.uk>) id 1fOOUr-0006TY-AO
+	for qemu-devel@nongnu.org; Thu, 31 May 2018 10:24:10 -0400
+Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:42284)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1fOOUs-0006Uu-RI
-	for qemu-devel@nongnu.org; Thu, 31 May 2018 10:24:11 -0400
+	id 1fOOUr-0006SF-39
+	for qemu-devel@nongnu.org; Thu, 31 May 2018 10:24:09 -0400
 Received: from pm215 by orth.archaic.org.uk with local (Exim 4.89)
-	(envelope-from <pm215@archaic.org.uk>) id 1fOOUr-0002uX-S1
-	for qemu-devel@nongnu.org; Thu, 31 May 2018 15:24:09 +0100
+	(envelope-from <pm215@archaic.org.uk>) id 1fOOUp-0002tF-Ou
+	for qemu-devel@nongnu.org; Thu, 31 May 2018 15:24:07 +0100
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 31 May 2018 15:23:48 +0100
-Message-Id: <20180531142357.904-17-peter.maydell@linaro.org>
+Date: Thu, 31 May 2018 15:23:45 +0100
+Message-Id: <20180531142357.904-14-peter.maydell@linaro.org>
 In-Reply-To: <20180531142357.904-1-peter.maydell@linaro.org>
 References: <20180531142357.904-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 16/25] Make memory_region_access_valid() take a
+Subject: [Qemu-devel] [PULL 13/25] Make address_space_map() take a
  MemTxAttrs argument
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -34,102 +34,88 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 
 As part of plumbing MemTxAttrs down to the IOMMU translate method,
-add MemTxAttrs as an argument to memory_region_access_valid().
+add MemTxAttrs as an argument to address_space_map().
 Its callers either have an attrs value to hand, or don't care
 and can use MEMTXATTRS_UNSPECIFIED.
-
-The callsite in flatview_access_valid() is part of a recursive
-loop flatview_access_valid() -> memory_region_access_valid() ->
- subpage_accepts() -> flatview_access_valid(); we make it pass
-MEMTXATTRS_UNSPECIFIED for now, until the next several commits
-have plumbed an attrs parameter through the rest of the loop
-and we can add an attrs parameter to flatview_access_valid().
 
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Message-id: 20180521140402.23318-8-peter.maydell@linaro.org
+Message-id: 20180521140402.23318-5-peter.maydell@linaro.org
 ---
- include/exec/memory-internal.h | 3 ++-
- exec.c                         | 4 +++-
- hw/s390x/s390-pci-inst.c       | 3 ++-
- memory.c                       | 7 ++++---
- 4 files changed, 11 insertions(+), 6 deletions(-)
+ include/exec/memory.h   | 3 ++-
+ include/sysemu/dma.h    | 3 ++-
+ exec.c                  | 6 ++++--
+ target/ppc/mmu-hash64.c | 3 ++-
+ 4 files changed, 10 insertions(+), 5 deletions(-)
 
-diff --git a/include/exec/memory-internal.h b/include/exec/memory-internal.h
-index 58399b9318..56c25c0ef7 100644
---- a/include/exec/memory-internal.h
-+++ b/include/exec/memory-internal.h
-@@ -37,7 +37,8 @@ void flatview_unref(FlatView *view);
- extern const MemoryRegionOps unassigned_mem_ops;
+diff --git a/include/exec/memory.h b/include/exec/memory.h
+index b95ceb272b..d594639d7c 100644
+--- a/include/exec/memory.h
++++ b/include/exec/memory.h
+@@ -1952,9 +1952,10 @@ bool address_space_access_valid(AddressSpace *as, hwaddr addr, int len, bool is_
+  * @addr: address within that address space
+  * @plen: pointer to length of buffer; updated on return
+  * @is_write: indicates the transfer direction
++ * @attrs: memory attributes
+  */
+ void *address_space_map(AddressSpace *as, hwaddr addr,
+-                        hwaddr *plen, bool is_write);
++                        hwaddr *plen, bool is_write, MemTxAttrs attrs);
  
- bool memory_region_access_valid(MemoryRegion *mr, hwaddr addr,
--                                unsigned size, bool is_write);
-+                                unsigned size, bool is_write,
-+                                MemTxAttrs attrs);
+ /* address_space_unmap: Unmaps a memory region previously mapped by address_space_map()
+  *
+diff --git a/include/sysemu/dma.h b/include/sysemu/dma.h
+index c228c66513..0d73902634 100644
+--- a/include/sysemu/dma.h
++++ b/include/sysemu/dma.h
+@@ -132,7 +132,8 @@ static inline void *dma_memory_map(AddressSpace *as,
+     hwaddr xlen = *len;
+     void *p;
  
- void flatview_add_to_dispatch(FlatView *fv, MemoryRegionSection *section);
- AddressSpaceDispatch *address_space_dispatch_new(FlatView *fv);
+-    p = address_space_map(as, addr, &xlen, dir == DMA_DIRECTION_FROM_DEVICE);
++    p = address_space_map(as, addr, &xlen, dir == DMA_DIRECTION_FROM_DEVICE,
++                          MEMTXATTRS_UNSPECIFIED);
+     *len = xlen;
+     return p;
+ }
 diff --git a/exec.c b/exec.c
-index 718b33921b..6cf97b5d28 100644
+index d314c7cc39..1dc81cfe4a 100644
 --- a/exec.c
 +++ b/exec.c
-@@ -3468,7 +3468,9 @@ static bool flatview_access_valid(FlatView *fv, hwaddr addr, int len,
-         mr = flatview_translate(fv, addr, &xlat, &l, is_write);
-         if (!memory_access_is_direct(mr, is_write)) {
-             l = memory_access_size(mr, l, addr);
--            if (!memory_region_access_valid(mr, xlat, l, is_write)) {
-+            /* When our callers all have attrs we'll pass them through here */
-+            if (!memory_region_access_valid(mr, xlat, l, is_write,
-+                                            MEMTXATTRS_UNSPECIFIED)) {
-                 return false;
-             }
-         }
-diff --git a/hw/s390x/s390-pci-inst.c b/hw/s390x/s390-pci-inst.c
-index 02a815fd31..d1a5f79678 100644
---- a/hw/s390x/s390-pci-inst.c
-+++ b/hw/s390x/s390-pci-inst.c
-@@ -762,7 +762,8 @@ int pcistb_service_call(S390CPU *cpu, uint8_t r1, uint8_t r3, uint64_t gaddr,
-     mr = s390_get_subregion(mr, offset, len);
-     offset -= mr->addr;
+@@ -3529,7 +3529,8 @@ flatview_extend_translation(FlatView *fv, hwaddr addr,
+ void *address_space_map(AddressSpace *as,
+                         hwaddr addr,
+                         hwaddr *plen,
+-                        bool is_write)
++                        bool is_write,
++                        MemTxAttrs attrs)
+ {
+     hwaddr len = *plen;
+     hwaddr l, xlat;
+@@ -3616,7 +3617,8 @@ void *cpu_physical_memory_map(hwaddr addr,
+                               hwaddr *plen,
+                               int is_write)
+ {
+-    return address_space_map(&address_space_memory, addr, plen, is_write);
++    return address_space_map(&address_space_memory, addr, plen, is_write,
++                             MEMTXATTRS_UNSPECIFIED);
+ }
  
--    if (!memory_region_access_valid(mr, offset, len, true)) {
-+    if (!memory_region_access_valid(mr, offset, len, true,
-+                                    MEMTXATTRS_UNSPECIFIED)) {
-         s390_program_interrupt(env, PGM_OPERAND, 6, ra);
-         return 0;
+ void cpu_physical_memory_unmap(void *buffer, hwaddr len,
+diff --git a/target/ppc/mmu-hash64.c b/target/ppc/mmu-hash64.c
+index a1db20e3a8..aa200cba4c 100644
+--- a/target/ppc/mmu-hash64.c
++++ b/target/ppc/mmu-hash64.c
+@@ -431,7 +431,8 @@ const ppc_hash_pte64_t *ppc_hash64_map_hptes(PowerPCCPU *cpu,
+         return NULL;
      }
-diff --git a/memory.c b/memory.c
-index fc7f9b782b..279f7c9b4a 100644
---- a/memory.c
-+++ b/memory.c
-@@ -1347,7 +1347,8 @@ static const MemoryRegionOps ram_device_mem_ops = {
- bool memory_region_access_valid(MemoryRegion *mr,
-                                 hwaddr addr,
-                                 unsigned size,
--                                bool is_write)
-+                                bool is_write,
-+                                MemTxAttrs attrs)
- {
-     int access_size_min, access_size_max;
-     int access_size, i;
-@@ -1416,7 +1417,7 @@ MemTxResult memory_region_dispatch_read(MemoryRegion *mr,
- {
-     MemTxResult r;
  
--    if (!memory_region_access_valid(mr, addr, size, false)) {
-+    if (!memory_region_access_valid(mr, addr, size, false, attrs)) {
-         *pval = unassigned_mem_read(mr, addr, size);
-         return MEMTX_DECODE_ERROR;
-     }
-@@ -1458,7 +1459,7 @@ MemTxResult memory_region_dispatch_write(MemoryRegion *mr,
-                                          unsigned size,
-                                          MemTxAttrs attrs)
- {
--    if (!memory_region_access_valid(mr, addr, size, true)) {
-+    if (!memory_region_access_valid(mr, addr, size, true, attrs)) {
-         unassigned_mem_write(mr, addr, data, size);
-         return MEMTX_DECODE_ERROR;
+-    hptes = address_space_map(CPU(cpu)->as, base + pte_offset, &plen, false);
++    hptes = address_space_map(CPU(cpu)->as, base + pte_offset, &plen, false,
++                              MEMTXATTRS_UNSPECIFIED);
+     if (plen < (n * HASH_PTE_SIZE_64)) {
+         hw_error("%s: Unable to map all requested HPTEs\n", __func__);
      }
 -- 
 2.17.1
