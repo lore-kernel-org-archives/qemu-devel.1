@@ -1,30 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56688)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56780)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jemmy858585@gmail.com>) id 1fOLk5-0000Mv-0v
-	for qemu-devel@nongnu.org; Thu, 31 May 2018 07:27:42 -0400
+	(envelope-from <groug@kaod.org>) id 1fOLkM-0000Ta-TF
+	for qemu-devel@nongnu.org; Thu, 31 May 2018 07:28:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jemmy858585@gmail.com>) id 1fOLk3-0004uW-T2
-	for qemu-devel@nongnu.org; Thu, 31 May 2018 07:27:41 -0400
-Received: from mail-it0-x244.google.com ([2607:f8b0:4001:c0b::244]:33699)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <jemmy858585@gmail.com>)
-	id 1fOLk3-0004tg-M9
-	for qemu-devel@nongnu.org; Thu, 31 May 2018 07:27:39 -0400
-Received: by mail-it0-x244.google.com with SMTP id k17-v6so1945476ita.0
-	for <qemu-devel@nongnu.org>; Thu, 31 May 2018 04:27:39 -0700 (PDT)
+	(envelope-from <groug@kaod.org>) id 1fOLkJ-00056S-Nj
+	for qemu-devel@nongnu.org; Thu, 31 May 2018 07:27:58 -0400
+Received: from 2.mo4.mail-out.ovh.net ([46.105.72.36]:39086)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1fOLkJ-0004zD-F4
+	for qemu-devel@nongnu.org; Thu, 31 May 2018 07:27:55 -0400
+Received: from player692.ha.ovh.net (unknown [10.109.122.84])
+	by mo4.mail-out.ovh.net (Postfix) with ESMTP id B3B5A17C210
+	for <qemu-devel@nongnu.org>; Thu, 31 May 2018 13:27:44 +0200 (CEST)
+Date: Thu, 31 May 2018 13:27:33 +0200
+From: Greg Kurz <groug@kaod.org>
+Message-ID: <20180531132733.5e3eca33@bahia.lan>
+In-Reply-To: <1a47f19a-1791-da8a-d9ad-abe4c1e8e1ce@kaod.org>
+References: <20180530144217.8959-1-joel@jms.id.au>
+	<1a47f19a-1791-da8a-d9ad-abe4c1e8e1ce@kaod.org>
 MIME-Version: 1.0
-In-Reply-To: <20180531105540.GC2755@work-vm>
-References: <1527673416-31268-1-git-send-email-lidongchen@tencent.com>
-	<1527673416-31268-11-git-send-email-lidongchen@tencent.com>
-	<20180530165038.GF2410@work-vm>
-	<CAOGPPbfES1YDge-jUOkF0EvporeJvz=hu1qrtyXiiVE-8=ArnQ@mail.gmail.com>
-	<20180531105540.GC2755@work-vm>
-From: 858585 jemmy <jemmy858585@gmail.com>
-Date: Thu, 31 May 2018 19:27:38 +0800
-Message-ID: <CAOGPPbebuwS95hJC4Yy-7ONNYgFbGvDJeRgGMk0V=OL2nFARmA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v4 10/12] migration: create a dedicated
- thread to release rdma resource
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH] target/ppc: Allow privileged
+ access to SPR_PCR
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,143 +31,131 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: zhang.zhanghailiang@huawei.com, Juan Quintela <quintela@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>, Aviad Yehezkel <aviadye@mellanox.com>, Paolo Bonzini <pbonzini@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, Adi Dotan <adido@mellanox.com>, Lidong Chen <lidongchen@tencent.com>
+To: =?UTF-8?B?Q8OpZHJpYw==?= Le Goater <clg@kaod.org>
+Cc: Joel Stanley <joel@jms.id.au>, David Gibson <david@gibson.dropbear.id.au>, Alexander Graf <agraf@suse.de>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Michael Neuling <mikey@neuling.org>, Michael Ellerman <mpe@ellerman.id.au>
 
-On Thu, May 31, 2018 at 6:55 PM, Dr. David Alan Gilbert
-<dgilbert@redhat.com> wrote:
-> * 858585 jemmy (jemmy858585@gmail.com) wrote:
->> On Thu, May 31, 2018 at 12:50 AM, Dr. David Alan Gilbert
->> <dgilbert@redhat.com> wrote:
->> > * Lidong Chen (jemmy858585@gmail.com) wrote:
->> >> ibv_dereg_mr wait for a long time for big memory size virtual server.
->> >>
->> >> The test result is:
->> >>   10GB  326ms
->> >>   20GB  699ms
->> >>   30GB  1021ms
->> >>   40GB  1387ms
->> >>   50GB  1712ms
->> >>   60GB  2034ms
->> >>   70GB  2457ms
->> >>   80GB  2807ms
->> >>   90GB  3107ms
->> >>   100GB 3474ms
->> >>   110GB 3735ms
->> >>   120GB 4064ms
->> >>   130GB 4567ms
->> >>   140GB 4886ms
->> >>
->> >> this will cause the guest os hang for a while when migration finished.
->> >> So create a dedicated thread to release rdma resource.
->> >>
->> >> Signed-off-by: Lidong Chen <lidongchen@tencent.com>
->> >> ---
->> >>  migration/rdma.c | 21 +++++++++++++++++----
->> >>  1 file changed, 17 insertions(+), 4 deletions(-)
->> >>
->> >> diff --git a/migration/rdma.c b/migration/rdma.c
->> >> index dfa4f77..1b9e261 100644
->> >> --- a/migration/rdma.c
->> >> +++ b/migration/rdma.c
->> >> @@ -2979,12 +2979,12 @@ static void qio_channel_rdma_set_aio_fd_handler(QIOChannel *ioc,
->> >>      }
->> >>  }
->> >>
->> >> -static int qio_channel_rdma_close(QIOChannel *ioc,
->> >> -                                  Error **errp)
->> >> +static void *qio_channel_rdma_close_thread(void *arg)
->> >>  {
->> >> -    QIOChannelRDMA *rioc = QIO_CHANNEL_RDMA(ioc);
->> >> +    QIOChannelRDMA *rioc = arg;
->> >>      RDMAContext *rdmain, *rdmaout;
->> >> -    trace_qemu_rdma_close();
->> >> +
->> >> +    rcu_register_thread();
->> >>
->> >>      rdmain = rioc->rdmain;
->> >>      if (rdmain) {
->> >> @@ -3009,6 +3009,19 @@ static int qio_channel_rdma_close(QIOChannel *ioc,
->> >>      g_free(rdmain);
->> >>      g_free(rdmaout);
->> >>
->> >> +    rcu_unregister_thread();
->> >> +    return NULL;
->> >> +}
->> >> +
->> >> +static int qio_channel_rdma_close(QIOChannel *ioc,
->> >> +                                  Error **errp)
->> >> +{
->> >> +    QemuThread t;
->> >> +    QIOChannelRDMA *rioc = QIO_CHANNEL_RDMA(ioc);
->> >> +    trace_qemu_rdma_close();
->> >> +
->> >> +    qemu_thread_create(&t, "rdma cleanup", qio_channel_rdma_close_thread,
->> >> +                           rioc, QEMU_THREAD_DETACHED);
->> >
->> > I don't think this can be this simple; consider the lock in patch 4;
->> > now that lock means qui_channel_rdma_close() can't be called in
->> > parallel; but with this change it means:
->> >
->> >
->> >      f->lock
->> >        qemu_thread_create  (1)
->> >     !f->lock
->> >      f->lock
->> >        qemu_thread_create
->> >     !f->lock
->> >
->> > so we don't really protect the thing you were trying to lock
->>
->> yes, I should not use rioc as the thread arg.
->>
->> static int qio_channel_rdma_close(QIOChannel *ioc,
->>                                   Error **errp)
->> {
->>     QemuThread t;
->>     RDMAContext *rdma[2];
->>     QIOChannelRDMA *rioc = QIO_CHANNEL_RDMA(ioc);
->>
->>     trace_qemu_rdma_close();
->>     if (rioc->rdmain || rioc->rdmaout) {
->>         rdma[0] =  rioc->rdmain;
->>         rdma[1] =  rioc->rdmaout;
->>         qemu_thread_create(&t, "rdma cleanup", qio_channel_rdma_close_thread,
->>                            rdma, QEMU_THREAD_DETACHED);
->>         rioc->rdmain = NULL;
->>         rioc->rdmaout = NULL;
->
-> Is it safe to close both directions at once?
-> For example, if you get the close from the return path thread, might the
-> main thread be still using it's QEMUFile in the opposite direction;
-> it'll call close a little bit later?
+On Thu, 31 May 2018 09:38:10 +0200
+C=C3=A9dric Le Goater <clg@kaod.org> wrote:
 
-I use rcu to protect this.  qio_channel_rdma_close_thread call synchronize_rcu,
-it will wait until all other thread not access rdmain and rdmaout.
+> On 05/30/2018 04:42 PM, Joel Stanley wrote:
+> > The powerpc Linux kernel[1] and skiboot firmware[2] recently gained cha=
+nges
+> > that cause the Processor Compatibility Register (PCR) SPR to be cleared.
+> >=20
+> > These changes cause Linux to fail to boot on the Qemu powernv machine
+> > with an error:
+> >=20
+> >  Trying to write privileged spr 338 (0x152) at 0000000030017f0c
+> >=20
+> > With this patch Qemu makes this register available as a hypervisor
+> > privileged register.
+> >=20
+> > Note that bits set in this register disable features of the processor.
+> > Currently the only register state that is supported is when the register
+> > is zeroed (enable all features). This is sufficient for guests to
+> > once again boot.
+> >=20
+> > [1] https://lkml.kernel.org/r/20180518013742.24095-1-mikey@neuling.org
+> > [2] https://patchwork.ozlabs.org/patch/915932/
+> >=20
+> > Signed-off-by: Joel Stanley <joel@jms.id.au>
+> > ---
+> >  target/ppc/helper.h             |  1 +
+> >  target/ppc/misc_helper.c        | 10 ++++++++++
+> >  target/ppc/translate_init.inc.c |  9 +++++++--
+> >  3 files changed, 18 insertions(+), 2 deletions(-)
+> >=20
+> > diff --git a/target/ppc/helper.h b/target/ppc/helper.h
+> > index 19453c68138a..d751f0e21909 100644
+> > --- a/target/ppc/helper.h
+> > +++ b/target/ppc/helper.h
+> > @@ -17,6 +17,7 @@ DEF_HELPER_2(pminsn, void, env, i32)
+> >  DEF_HELPER_1(rfid, void, env)
+> >  DEF_HELPER_1(hrfid, void, env)
+> >  DEF_HELPER_2(store_lpcr, void, env, tl)
+> > +DEF_HELPER_2(store_pcr, void, env, tl)
+> >  #endif
+> >  DEF_HELPER_1(check_tlb_flush_local, void, env)
+> >  DEF_HELPER_1(check_tlb_flush_global, void, env)
+> > diff --git a/target/ppc/misc_helper.c b/target/ppc/misc_helper.c
+> > index 8c8cba5cc6f1..40c39d08ad14 100644
+> > --- a/target/ppc/misc_helper.c
+> > +++ b/target/ppc/misc_helper.c
+> > @@ -20,6 +20,7 @@
+> >  #include "cpu.h"
+> >  #include "exec/exec-all.h"
+> >  #include "exec/helper-proto.h"
+> > +#include "qemu/error-report.h"
+> > =20
+> >  #include "helper_regs.h"
+> > =20
+> > @@ -186,6 +187,15 @@ void ppc_store_msr(CPUPPCState *env, target_ulong =
+value)
+> >      hreg_store_msr(env, value, 0);
+> >  }
+> > =20
+> > +void helper_store_pcr(CPUPPCState *env, target_ulong value)
+> > +{
+> > +    if (value !=3D 0) {
+> > +        error_report("Unimplemented PCR value 0x"TARGET_FMT_lx, value);
+> > +        return;
+> > +    }
+> > +    env->spr[SPR_PCR] =3D value; =20
+>=20
+> shouldn't we use pcc->pcr_mask ? and check pcc->pcr_supported also ?=20
+>=20
 
-And if the return patch close the qemu file, the migration thread qemu
-file will be set error soon
-because the QIOChannel is closed. QIOChannelSocket also work this way.
+pcc->pcr_mask and ppc->pcr_supported only make sense for pseries machine
+types (ie, when the spapr machine code call ppc_*_compat() functions).
 
+The case here is different: we're running a fully emulated pnv machine,
+ie, PCR can only be set by mtspr() called within the pnv guest. But TCG
+doesn't implement the compatibility mode logic, ie, the CPU always run
+in "raw" mode, ie, we only support PCR =3D=3D 0, actually.
 
+So, this patch looks good for me. I'm just not sure about what is
+causing the build break with patchew though...
 
->
-> Dave
->
->>     }
->>     return 0;
->> }
->>
->> >
->> > Dave
->> >
->> >>      return 0;
->> >>  }
->> >>
->> >> --
->> >> 1.8.3.1
->> >>
->> > --
->> > Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
-> --
-> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> C.
+>=20
+> > +}
+> > +
+> >  /* This code is lifted from MacOnLinux. It is called whenever
+> >   * THRM1,2 or 3 is read an fixes up the values in such a way
+> >   * that will make MacOS not hang. These registers exist on some
+> > diff --git a/target/ppc/translate_init.inc.c b/target/ppc/translate_ini=
+t.inc.c
+> > index ab782cb32aaa..bebe6ec5333c 100644
+> > --- a/target/ppc/translate_init.inc.c
+> > +++ b/target/ppc/translate_init.inc.c
+> > @@ -456,6 +456,10 @@ static void spr_write_hid0_601(DisasContext *ctx, =
+int sprn, int gprn)
+> >      /* Must stop the translation as endianness may have changed */
+> >      gen_stop_exception(ctx);
+> >  }
+> > +static void spr_write_pcr(DisasContext *ctx, int sprn, int gprn)
+> > +{
+> > +    gen_helper_store_pcr(cpu_env, cpu_gpr[gprn]);
+> > +}
+> >  #endif
+> > =20
+> >  /* Unified bats */
+> > @@ -7957,11 +7961,12 @@ static void gen_spr_power6_common(CPUPPCState *=
+env)
+> >  #endif
+> >      /*
+> >       * Register PCR to report POWERPC_EXCP_PRIV_REG instead of
+> > -     * POWERPC_EXCP_INVAL_SPR.
+> > +     * POWERPC_EXCP_INVAL_SPR in userspace. Permit hypervisor access.
+> >       */
+> > -    spr_register(env, SPR_PCR, "PCR",
+> > +    spr_register_hv(env, SPR_PCR, "PCR",
+> >                   SPR_NOACCESS, SPR_NOACCESS,
+> >                   SPR_NOACCESS, SPR_NOACCESS,
+> > +                 &spr_read_generic, &spr_write_pcr,
+> >                   0x00000000);
+> >  }
+> > =20
+> >  =20
+>=20
+>=20
