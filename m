@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33949)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41181)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1fOPfV-0001B9-Jz
-	for qemu-devel@nongnu.org; Thu, 31 May 2018 11:39:15 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1fOQ0J-000133-Tj
+	for qemu-devel@nongnu.org; Thu, 31 May 2018 12:00:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1fOPfS-0001Wv-F2
-	for qemu-devel@nongnu.org; Thu, 31 May 2018 11:39:13 -0400
-Resent-Message-Id: <E1fOPfS-0001Wv-F2@eggs.gnu.org>
-Received: from sender-of-o51.zoho.com ([135.84.80.216]:21128)
+	(envelope-from <pm215@archaic.org.uk>) id 1fOQ0I-0000j7-Ol
+	for qemu-devel@nongnu.org; Thu, 31 May 2018 12:00:43 -0400
+Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:42298)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1fOPfS-0001Vp-6n
-	for qemu-devel@nongnu.org; Thu, 31 May 2018 11:39:10 -0400
-In-Reply-To: <20180531142357.904-1-peter.maydell@linaro.org>
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <152778111551.330.6863141728602752353@d39dc562802a>
+	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
+	id 1fOQ0I-0000hF-GH
+	for qemu-devel@nongnu.org; Thu, 31 May 2018 12:00:42 -0400
+Received: from pm215 by orth.archaic.org.uk with local (Exim 4.89)
+	(envelope-from <pm215@archaic.org.uk>) id 1fOQ0G-00034F-Ow
+	for qemu-devel@nongnu.org; Thu, 31 May 2018 17:00:40 +0100
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 31 May 2018 17:00:39 +0100
+Message-Id: <20180531160039.29304-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Thu, 31 May 2018 08:38:36 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PULL 00/25] target-arm queue
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PULL 00/25] target-arm queue
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,115 +28,122 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: peter.maydell@linaro.org
-Cc: famz@redhat.com, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
-c3NhZ2UtaWQ6IDIwMTgwNTMxMTQyMzU3LjkwNC0xLXBldGVyLm1heWRlbGxAbGluYXJvLm9yZwpT
-dWJqZWN0OiBbUWVtdS1kZXZlbF0gW1BVTEwgMDAvMjVdIHRhcmdldC1hcm0gcXVldWUKCj09PSBU
-RVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKCkJBU0U9YmFzZQpuPTEKdG90YWw9JChn
-aXQgbG9nIC0tb25lbGluZSAkQkFTRS4uIHwgd2MgLWwpCmZhaWxlZD0wCgpnaXQgY29uZmlnIC0t
-bG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMg
-VHJ1ZQpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5hbGdvcml0aG0gaGlzdG9ncmFtCgpjb21taXRz
-PSIkKGdpdCBsb2cgLS1mb3JtYXQ9JUggLS1yZXZlcnNlICRCQVNFLi4pIgpmb3IgYyBpbiAkY29t
-bWl0czsgZG8KICAgIGVjaG8gIkNoZWNraW5nIFBBVENIICRuLyR0b3RhbDogJChnaXQgbG9nIC1u
-IDEgLS1mb3JtYXQ9JXMgJGMpLi4uIgogICAgaWYgISBnaXQgc2hvdyAkYyAtLWZvcm1hdD1lbWFp
-bCB8IC4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgLTsgdGhlbgogICAgICAgIGZh
-aWxlZD0xCiAgICAgICAgZWNobwogICAgZmkKICAgIG49JCgobisxKSkKZG9uZQoKZXhpdCAkZmFp
-bGVkCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZmODc4MjE2
-NGQxZGVmN2Y0NGJkODg4NzEzMzg0CkZyb20gaHR0cHM6Ly9naXRodWIuY29tL3BhdGNoZXctcHJv
-amVjdC9xZW11CiAgIGZlODE3YThhMGQuLmEzYWMxMmZiYTAgIG1hc3RlciAgICAgLT4gbWFzdGVy
-CiB0IFt0YWcgdXBkYXRlXSAgICAgICAgICAgIHBhdGNoZXcvMTUyNzczNjU1Ny0xMTA4NC0xLWdp
-dC1zZW5kLWVtYWlsLXpoYW9zaGVuZ2xvbmdAaHVhd2VpLmNvbSAtPiBwYXRjaGV3LzE1Mjc3MzY1
-NTctMTEwODQtMS1naXQtc2VuZC1lbWFpbC16aGFvc2hlbmdsb25nQGh1YXdlaS5jb20KICogW25l
-dyB0YWddICAgICAgICAgICAgICAgcGF0Y2hldy8yMDE4MDUzMTE0MjM1Ny45MDQtMS1wZXRlci5t
-YXlkZWxsQGxpbmFyby5vcmcgLT4gcGF0Y2hldy8yMDE4MDUzMTE0MjM1Ny45MDQtMS1wZXRlci5t
-YXlkZWxsQGxpbmFyby5vcmcKU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0JwphNDg3YmJh
-MDkyIEtWTTogR0lDOiBGaXggbWVtb3J5IGxlYWsgZHVlIHRvIGNhbGxpbmcga3ZtX2luaXRfaXJx
-X3JvdXRpbmcgdHdpY2UKNWEzYmY1MDQzZSBBUk06IEFDUEk6IEZpeCB1c2UtYWZ0ZXItZnJlZSBk
-dWUgdG8gbWVtb3J5IHJlYWxsb2MKNjc2ZTI4YmRmNSB2bXN0YXRlLmg6IFByb3ZpZGUgVk1TVEFU
-RV9CT09MX1NVQl9BUlJBWQpkN2FhZTBlZTYxIE1ha2UgYWRkcmVzc19zcGFjZV90cmFuc2xhdGVf
-aW9tbXUgdGFrZSBhIE1lbVR4QXR0cnMgYXJndW1lbnQKMTJiYjVmNjUzZCBNYWtlIGZsYXR2aWV3
-X2RvX3RyYW5zbGF0ZSgpIHRha2UgYSBNZW1UeEF0dHJzIGFyZ3VtZW50CjhhNmUxNDQ5NmQgTWFr
-ZSBhZGRyZXNzX3NwYWNlX2dldF9pb3RsYl9lbnRyeSgpIHRha2UgYSBNZW1UeEF0dHJzIGFyZ3Vt
-ZW50CjljYWM1ODIxNDMgTWFrZSBmbGF0dmlld190cmFuc2xhdGUoKSB0YWtlIGEgTWVtVHhBdHRy
-cyBhcmd1bWVudAo1NWRiMDJhY2E2IE1ha2UgZmxhdHZpZXdfYWNjZXNzX3ZhbGlkKCkgdGFrZSBh
-IE1lbVR4QXR0cnMgYXJndW1lbnQKZjg3Zjg5NzA4NiBNYWtlIE1lbW9yeVJlZ2lvbiB2YWxpZC5h
-Y2NlcHRzIGNhbGxiYWNrIHRha2UgYSBNZW1UeEF0dHJzIGFyZ3VtZW50CjlhYTUzYWEwZDQgTWFr
-ZSBtZW1vcnlfcmVnaW9uX2FjY2Vzc192YWxpZCgpIHRha2UgYSBNZW1UeEF0dHJzIGFyZ3VtZW50
-CjdiNDE4YmI2Y2YgTWFrZSBmbGF0dmlld19leHRlbmRfdHJhbnNsYXRpb24oKSB0YWtlIGEgTWVt
-VHhBdHRycyBhcmd1bWVudAozNzdmMTMxMjlkIE1ha2UgYWRkcmVzc19zcGFjZV9hY2Nlc3NfdmFs
-aWQoKSB0YWtlIGEgTWVtVHhBdHRycyBhcmd1bWVudAowNjQ5OTc3ZWEwIE1ha2UgYWRkcmVzc19z
-cGFjZV9tYXAoKSB0YWtlIGEgTWVtVHhBdHRycyBhcmd1bWVudAphYTJmNDlhYmYxIE1ha2UgYWRk
-cmVzc19zcGFjZV90cmFuc2xhdGV7LCBfY2FjaGVkfSgpIHRha2UgYSBNZW1UeEF0dHJzIGFyZ3Vt
-ZW50CjEwNWJmMzc4NDYgTWFrZSB0Yl9pbnZhbGlkYXRlX3BoeXNfYWRkcigpIHRha2UgYSBNZW1U
-eEF0dHJzIGFyZ3VtZW50CjczYjY5Y2YwY2QgbWVtb3J5Lmg6IEltcHJvdmUgSU9NTVUgcmVsYXRl
-ZCBkb2N1bWVudGF0aW9uCjAwMzFmZGFhNDcgQ29ycmVjdCBDUEFDUiByZXNldCB2YWx1ZSBmb3Ig
-djcgY29yZXMKMDkyNmM4MmFjYiB4bG54LXpkbWE6IENvcnJlY3QgbWVtIGxlYWtzIGFuZCBtZW1z
-ZXQgdG8gemVybyBvbiBkZXNjIHVuYWxpZ25lZCBlcnJvcnMKNDgzNzRjYTA2NSBhcm06IGZpeCBt
-YWxsb2MgdHlwZSBtaXNtYXRjaAo0MjdhMmRhMDc4IGFybTogZml4IHFlbXUgY3Jhc2ggb24gc3Rh
-cnR1cCB3aXRoIC1iaW9zIG9wdGlvbgpmZTVlN2ZlOTI3IHRjZzogRml4IGhlbHBlciBmdW5jdGlv
-biB2cyBob3N0IGFiaSBmb3IgZmxvYXQxNgo3MjZlNTA4OTM3IGFybV9naWN2M19rdm06IGluY3Jl
-YXNlIGNscm9mZnNldCBhY2NvcmRpbmdseQpiNmZiMTYzOTFkIGh3L2ludGMvYXJtX2dpY3YzOiBG
-aXggQVB4UjxuPiByZWdpc3RlciBkaXNwYXRjaGluZwo0MjBkODdiZjM0IE1BSU5UQUlORVJTOiBB
-ZGQgZW50cmllcyBmb3IgbmV3ZXIgTVBTMiBib2FyZHMgYW5kIGRldmljZXMKMTAxODk4NzU3ZiB0
-YXJnZXQvYXJtOiBIb25vdXIgRlBDUi5GWiBpbiBGUkVDUFgKCj09PSBPVVRQVVQgQkVHSU4gPT09
-CkNoZWNraW5nIFBBVENIIDEvMjU6IHRhcmdldC9hcm06IEhvbm91ciBGUENSLkZaIGluIEZSRUNQ
-WC4uLgpDaGVja2luZyBQQVRDSCAyLzI1OiBNQUlOVEFJTkVSUzogQWRkIGVudHJpZXMgZm9yIG5l
-d2VyIE1QUzIgYm9hcmRzIGFuZCBkZXZpY2VzLi4uCkNoZWNraW5nIFBBVENIIDMvMjU6IGh3L2lu
-dGMvYXJtX2dpY3YzOiBGaXggQVB4UjxuPiByZWdpc3RlciBkaXNwYXRjaGluZy4uLgpDaGVja2lu
-ZyBQQVRDSCA0LzI1OiBhcm1fZ2ljdjNfa3ZtOiBpbmNyZWFzZSBjbHJvZmZzZXQgYWNjb3JkaW5n
-bHkuLi4KQ2hlY2tpbmcgUEFUQ0ggNS8yNTogdGNnOiBGaXggaGVscGVyIGZ1bmN0aW9uIHZzIGhv
-c3QgYWJpIGZvciBmbG9hdDE2Li4uCkVSUk9SOiBzcGFjZSBwcm9oaWJpdGVkIGJlZm9yZSB0aGF0
-IGNsb3NlIHBhcmVudGhlc2lzICcpJwojMjQyOiBGSUxFOiB0YXJnZXQvYXJtL2hlbHBlci5jOjEx
-MzY3OgorICAgIENPTlZfRlRPSSh2ZnBfdG8jI25hbWUjI3AsIGZ0eXBlLCBmc3osIHNpZ24sICkg
-ICAgICAgIFwKCkVSUk9SOiBzcGFjZSBwcm9oaWJpdGVkIGJlZm9yZSB0aGF0IGNsb3NlIHBhcmVu
-dGhlc2lzICcpJwojMjUxOiBGSUxFOiB0YXJnZXQvYXJtL2hlbHBlci5jOjExMzcwOgorRkxPQVRf
-Q09OVlMoc2ksIGgsIHVpbnQzMl90LCAxNiwgKQoKRVJST1I6IHNwYWNlIHByb2hpYml0ZWQgYmVm
-b3JlIHRoYXQgY2xvc2UgcGFyZW50aGVzaXMgJyknCiMyNTI6IEZJTEU6IHRhcmdldC9hcm0vaGVs
-cGVyLmM6MTEzNzE6CitGTE9BVF9DT05WUyhzaSwgcywgZmxvYXQzMiwgMzIsICkKCkVSUk9SOiBz
-cGFjZSBwcm9oaWJpdGVkIGJlZm9yZSB0aGF0IGNsb3NlIHBhcmVudGhlc2lzICcpJwojMjUzOiBG
-SUxFOiB0YXJnZXQvYXJtL2hlbHBlci5jOjExMzcyOgorRkxPQVRfQ09OVlMoc2ksIGQsIGZsb2F0
-NjQsIDY0LCApCgp0b3RhbDogNCBlcnJvcnMsIDAgd2FybmluZ3MsIDMxMiBsaW5lcyBjaGVja2Vk
-CgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBv
-ZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFp
-bnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgpDaGVja2luZyBQQVRDSCA2
-LzI1OiBhcm06IGZpeCBxZW11IGNyYXNoIG9uIHN0YXJ0dXAgd2l0aCAtYmlvcyBvcHRpb24uLi4K
-Q2hlY2tpbmcgUEFUQ0ggNy8yNTogYXJtOiBmaXggbWFsbG9jIHR5cGUgbWlzbWF0Y2guLi4KQ2hl
-Y2tpbmcgUEFUQ0ggOC8yNTogeGxueC16ZG1hOiBDb3JyZWN0IG1lbSBsZWFrcyBhbmQgbWVtc2V0
-IHRvIHplcm8gb24gZGVzYyB1bmFsaWduZWQgZXJyb3JzLi4uCkNoZWNraW5nIFBBVENIIDkvMjU6
-IENvcnJlY3QgQ1BBQ1IgcmVzZXQgdmFsdWUgZm9yIHY3IGNvcmVzLi4uCkNoZWNraW5nIFBBVENI
-IDEwLzI1OiBtZW1vcnkuaDogSW1wcm92ZSBJT01NVSByZWxhdGVkIGRvY3VtZW50YXRpb24uLi4K
-Q2hlY2tpbmcgUEFUQ0ggMTEvMjU6IE1ha2UgdGJfaW52YWxpZGF0ZV9waHlzX2FkZHIoKSB0YWtl
-IGEgTWVtVHhBdHRycyBhcmd1bWVudC4uLgpDaGVja2luZyBQQVRDSCAxMi8yNTogTWFrZSBhZGRy
-ZXNzX3NwYWNlX3RyYW5zbGF0ZXssIF9jYWNoZWR9KCkgdGFrZSBhIE1lbVR4QXR0cnMgYXJndW1l
-bnQuLi4KQ2hlY2tpbmcgUEFUQ0ggMTMvMjU6IE1ha2UgYWRkcmVzc19zcGFjZV9tYXAoKSB0YWtl
-IGEgTWVtVHhBdHRycyBhcmd1bWVudC4uLgpDaGVja2luZyBQQVRDSCAxNC8yNTogTWFrZSBhZGRy
-ZXNzX3NwYWNlX2FjY2Vzc192YWxpZCgpIHRha2UgYSBNZW1UeEF0dHJzIGFyZ3VtZW50Li4uCkNo
-ZWNraW5nIFBBVENIIDE1LzI1OiBNYWtlIGZsYXR2aWV3X2V4dGVuZF90cmFuc2xhdGlvbigpIHRh
-a2UgYSBNZW1UeEF0dHJzIGFyZ3VtZW50Li4uCkNoZWNraW5nIFBBVENIIDE2LzI1OiBNYWtlIG1l
-bW9yeV9yZWdpb25fYWNjZXNzX3ZhbGlkKCkgdGFrZSBhIE1lbVR4QXR0cnMgYXJndW1lbnQuLi4K
-Q2hlY2tpbmcgUEFUQ0ggMTcvMjU6IE1ha2UgTWVtb3J5UmVnaW9uIHZhbGlkLmFjY2VwdHMgY2Fs
-bGJhY2sgdGFrZSBhIE1lbVR4QXR0cnMgYXJndW1lbnQuLi4KQ2hlY2tpbmcgUEFUQ0ggMTgvMjU6
-IE1ha2UgZmxhdHZpZXdfYWNjZXNzX3ZhbGlkKCkgdGFrZSBhIE1lbVR4QXR0cnMgYXJndW1lbnQu
-Li4KQ2hlY2tpbmcgUEFUQ0ggMTkvMjU6IE1ha2UgZmxhdHZpZXdfdHJhbnNsYXRlKCkgdGFrZSBh
-IE1lbVR4QXR0cnMgYXJndW1lbnQuLi4KQ2hlY2tpbmcgUEFUQ0ggMjAvMjU6IE1ha2UgYWRkcmVz
-c19zcGFjZV9nZXRfaW90bGJfZW50cnkoKSB0YWtlIGEgTWVtVHhBdHRycyBhcmd1bWVudC4uLgpD
-aGVja2luZyBQQVRDSCAyMS8yNTogTWFrZSBmbGF0dmlld19kb190cmFuc2xhdGUoKSB0YWtlIGEg
-TWVtVHhBdHRycyBhcmd1bWVudC4uLgpDaGVja2luZyBQQVRDSCAyMi8yNTogTWFrZSBhZGRyZXNz
-X3NwYWNlX3RyYW5zbGF0ZV9pb21tdSB0YWtlIGEgTWVtVHhBdHRycyBhcmd1bWVudC4uLgpXQVJO
-SU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwojMzU6IEZJTEU6IGV4ZWMuYzo0OTI6CisgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBBZGRy
-ZXNzU3BhY2UgKip0YXJnZXRfYXMsCgp0b3RhbDogMCBlcnJvcnMsIDEgd2FybmluZ3MsIDMyIGxp
-bmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3
-LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVt
-IHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KQ2hlY2tp
-bmcgUEFUQ0ggMjMvMjU6IHZtc3RhdGUuaDogUHJvdmlkZSBWTVNUQVRFX0JPT0xfU1VCX0FSUkFZ
-Li4uCkNoZWNraW5nIFBBVENIIDI0LzI1OiBBUk06IEFDUEk6IEZpeCB1c2UtYWZ0ZXItZnJlZSBk
-dWUgdG8gbWVtb3J5IHJlYWxsb2MuLi4KQ2hlY2tpbmcgUEFUQ0ggMjUvMjU6IEtWTTogR0lDOiBG
-aXggbWVtb3J5IGxlYWsgZHVlIHRvIGNhbGxpbmcga3ZtX2luaXRfaXJxX3JvdXRpbmcgdHdpY2Uu
-Li4KPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoK
-Ci0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwOi8vcGF0
-Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJl
-ZGhhdC5jb20=
+target-arm queue. This has the "plumb txattrs through various
+bits of exec.c" patches, and a collection of bug fixes from
+various people.
+
+v2: fix compile error on arm hosts...
+
+thanks
+-- PMM
+
+
+The following changes since commit a3ac12fba028df90f7b3dbec924995c126c41022:
+
+  Merge remote-tracking branch 'remotes/ehabkost/tags/numa-next-pull-request' into staging (2018-05-31 11:12:36 +0100)
+
+are available in the Git repository at:
+
+  git://git.linaro.org/people/pmaydell/qemu-arm.git tags/pull-target-arm-20180531-1
+
+for you to fetch changes up to 2f15b79280cf71b7991dfd3f0312a1797630e376:
+
+  KVM: GIC: Fix memory leak due to calling kvm_init_irq_routing twice (2018-05-31 16:32:35 +0100)
+
+----------------------------------------------------------------
+target-arm queue:
+ * target/arm: Honour FPCR.FZ in FRECPX
+ * MAINTAINERS: Add entries for newer MPS2 boards and devices
+ * hw/intc/arm_gicv3: Fix APxR<n> register dispatching
+ * arm_gicv3_kvm: fix bug in writing zero bits back to the in-kernel
+   GIC state
+ * tcg: Fix helper function vs host abi for float16
+ * arm: fix qemu crash on startup with -bios option
+ * arm: fix malloc type mismatch
+ * xlnx-zdma: Correct mem leaks and memset to zero on desc unaligned errors
+ * Correct CPACR reset value for v7 cores
+ * memory.h: Improve IOMMU related documentation
+ * exec: Plumb transaction attributes through various functions in
+   preparation for allowing IOMMUs to see them
+ * vmstate.h: Provide VMSTATE_BOOL_SUB_ARRAY
+ * ARM: ACPI: Fix use-after-free due to memory realloc
+ * KVM: GIC: Fix memory leak due to calling kvm_init_irq_routing twice
+
+----------------------------------------------------------------
+Francisco Iglesias (1):
+      xlnx-zdma: Correct mem leaks and memset to zero on desc unaligned errors
+
+Igor Mammedov (1):
+      arm: fix qemu crash on startup with -bios option
+
+Jan Kiszka (1):
+      hw/intc/arm_gicv3: Fix APxR<n> register dispatching
+
+Paolo Bonzini (1):
+      arm: fix malloc type mismatch
+
+Peter Maydell (17):
+      target/arm: Honour FPCR.FZ in FRECPX
+      MAINTAINERS: Add entries for newer MPS2 boards and devices
+      Correct CPACR reset value for v7 cores
+      memory.h: Improve IOMMU related documentation
+      Make tb_invalidate_phys_addr() take a MemTxAttrs argument
+      Make address_space_translate{, _cached}() take a MemTxAttrs argument
+      Make address_space_map() take a MemTxAttrs argument
+      Make address_space_access_valid() take a MemTxAttrs argument
+      Make flatview_extend_translation() take a MemTxAttrs argument
+      Make memory_region_access_valid() take a MemTxAttrs argument
+      Make MemoryRegion valid.accepts callback take a MemTxAttrs argument
+      Make flatview_access_valid() take a MemTxAttrs argument
+      Make flatview_translate() take a MemTxAttrs argument
+      Make address_space_get_iotlb_entry() take a MemTxAttrs argument
+      Make flatview_do_translate() take a MemTxAttrs argument
+      Make address_space_translate_iommu take a MemTxAttrs argument
+      vmstate.h: Provide VMSTATE_BOOL_SUB_ARRAY
+
+Richard Henderson (1):
+      tcg: Fix helper function vs host abi for float16
+
+Shannon Zhao (3):
+      arm_gicv3_kvm: increase clroffset accordingly
+      ARM: ACPI: Fix use-after-free due to memory realloc
+      KVM: GIC: Fix memory leak due to calling kvm_init_irq_routing twice
+
+ include/exec/exec-all.h        |   5 +-
+ include/exec/helper-head.h     |   2 +-
+ include/exec/memory-internal.h |   3 +-
+ include/exec/memory.h          | 128 +++++++++++++++++++++++++++++++++++------
+ include/migration/vmstate.h    |   3 +
+ include/sysemu/dma.h           |   6 +-
+ accel/tcg/translate-all.c      |   4 +-
+ exec.c                         |  95 ++++++++++++++++++------------
+ hw/arm/boot.c                  |  18 +++---
+ hw/arm/virt-acpi-build.c       |  20 +++++--
+ hw/dma/xlnx-zdma.c             |  10 +++-
+ hw/hppa/dino.c                 |   3 +-
+ hw/intc/arm_gic_kvm.c          |   1 -
+ hw/intc/arm_gicv3_cpuif.c      |  12 ++--
+ hw/intc/arm_gicv3_kvm.c        |   2 +-
+ hw/nvram/fw_cfg.c              |  12 ++--
+ hw/s390x/s390-pci-inst.c       |   3 +-
+ hw/scsi/esp.c                  |   3 +-
+ hw/vfio/common.c               |   3 +-
+ hw/virtio/vhost.c              |   3 +-
+ hw/xen/xen_pt_msi.c            |   3 +-
+ memory.c                       |  12 ++--
+ memory_ldst.inc.c              |  18 +++---
+ target/arm/gdbstub.c           |   3 +-
+ target/arm/helper-a64.c        |  41 +++++++------
+ target/arm/helper.c            |  90 ++++++++++++++++-------------
+ target/arm/kvm.c               |   3 +-
+ target/ppc/mmu-hash64.c        |   3 +-
+ target/riscv/helper.c          |   2 +-
+ target/s390x/diag.c            |   6 +-
+ target/s390x/excp_helper.c     |   3 +-
+ target/s390x/mmu_helper.c      |   3 +-
+ target/s390x/sigp.c            |   3 +-
+ target/xtensa/op_helper.c      |   3 +-
+ MAINTAINERS                    |   9 ++-
+ 35 files changed, 355 insertions(+), 183 deletions(-)
