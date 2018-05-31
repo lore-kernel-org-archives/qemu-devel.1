@@ -1,20 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38175)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38488)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1fOWMA-0004Rc-EP
-	for qemu-devel@nongnu.org; Thu, 31 May 2018 18:47:43 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1fOWNi-00056J-EY
+	for qemu-devel@nongnu.org; Thu, 31 May 2018 18:49:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1fOWM7-00087o-6s
-	for qemu-devel@nongnu.org; Thu, 31 May 2018 18:47:42 -0400
-Resent-Message-Id: <E1fOWM7-00087o-6s@eggs.gnu.org>
-In-Reply-To: <20180531222835.16558-1-jsnow@redhat.com>
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <152780684818.339.1959711568134867768@d39dc562802a>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Thu, 31 May 2018 15:47:29 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PATCH v2 00/16] AHCI: tracing improvements
+	(envelope-from <richard.henderson@linaro.org>) id 1fOWNg-0000k1-9P
+	for qemu-devel@nongnu.org; Thu, 31 May 2018 18:49:18 -0400
+Received: from mail-pg0-x22a.google.com ([2607:f8b0:400e:c05::22a]:38598)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1fOWNg-0000jV-3I
+	for qemu-devel@nongnu.org; Thu, 31 May 2018 18:49:16 -0400
+Received: by mail-pg0-x22a.google.com with SMTP id c9-v6so7528196pgf.5
+	for <qemu-devel@nongnu.org>; Thu, 31 May 2018 15:49:15 -0700 (PDT)
+From: Richard Henderson <richard.henderson@linaro.org>
+Date: Thu, 31 May 2018 15:49:06 -0700
+Message-Id: <20180531224911.23725-2-richard.henderson@linaro.org>
+In-Reply-To: <20180531224911.23725-1-richard.henderson@linaro.org>
+References: <20180531224911.23725-1-richard.henderson@linaro.org>
+Subject: [Qemu-devel] [PATCH 1/6] gdbstub: Return the fd from gdbserver_start
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,85 +26,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: jsnow@redhat.com
-Cc: famz@redhat.com, qemu-devel@nongnu.org, qemu-block@nongnu.org, f4bug@amsat.org
+To: qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org, laurent@vivier.eu, evgreen@chromium.org
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
-c3NhZ2UtaWQ6IDIwMTgwNTMxMjIyODM1LjE2NTU4LTEtanNub3dAcmVkaGF0LmNvbQpTdWJqZWN0
-OiBbUWVtdS1kZXZlbF0gW1BBVENIIHYyIDAwLzE2XSBBSENJOiB0cmFjaW5nIGltcHJvdmVtZW50
-cwoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFzaAoKQkFTRT1iYXNlCm49MQp0
-b3RhbD0kKGdpdCBsb2cgLS1vbmVsaW5lICRCQVNFLi4gfCB3YyAtbCkKZmFpbGVkPTAKCmdpdCBj
-b25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxpbWl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYu
-cmVuYW1lcyBUcnVlCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLmFsZ29yaXRobSBoaXN0b2dyYW0K
-CmNvbW1pdHM9IiQoZ2l0IGxvZyAtLWZvcm1hdD0lSCAtLXJldmVyc2UgJEJBU0UuLikiCmZvciBj
-IGluICRjb21taXRzOyBkbwogICAgZWNobyAiQ2hlY2tpbmcgUEFUQ0ggJG4vJHRvdGFsOiAkKGdp
-dCBsb2cgLW4gMSAtLWZvcm1hdD0lcyAkYykuLi4iCiAgICBpZiAhIGdpdCBzaG93ICRjIC0tZm9y
-bWF0PWVtYWlsIHwgLi9zY3JpcHRzL2NoZWNrcGF0Y2gucGwgLS1tYWlsYmFjayAtOyB0aGVuCiAg
-ICAgICAgZmFpbGVkPTEKICAgICAgICBlY2hvCiAgICBmaQogICAgbj0kKChuKzEpKQpkb25lCgpl
-eGl0ICRmYWlsZWQKPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KClVwZGF0aW5nIDNjOGNmNWE5YzIx
-ZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMzODQKRnJvbSBodHRwczovL2dpdGh1Yi5jb20vcGF0
-Y2hldy1wcm9qZWN0L3FlbXUKIHQgW3RhZyB1cGRhdGVdICAgICAgICAgICAgcGF0Y2hldy8yMDE4
-MDUzMTIxMjQzNS4xNjUyNjEtMS1lYmxha2VAcmVkaGF0LmNvbSAtPiBwYXRjaGV3LzIwMTgwNTMx
-MjEyNDM1LjE2NTI2MS0xLWVibGFrZUByZWRoYXQuY29tCiAqIFtuZXcgdGFnXSAgICAgICAgICAg
-ICAgIHBhdGNoZXcvMjAxODA1MzEyMjI4MzUuMTY1NTgtMS1qc25vd0ByZWRoYXQuY29tIC0+IHBh
-dGNoZXcvMjAxODA1MzEyMjI4MzUuMTY1NTgtMS1qc25vd0ByZWRoYXQuY29tClN3aXRjaGVkIHRv
-IGEgbmV3IGJyYW5jaCAndGVzdCcKOTkzMjQ4MmFmMiBhaGNpOiBtYWtlIGFoY2lfbWVtX3dyaXRl
-IHRyYWNlcyBtb3JlIGRlc2NyaXB0aXZlCmM4OWY0MDc2YmQgYWhjaTogZGVsZXRlIG9sZCBob3N0
-IHJlZ2lzdGVyIGFkZHJlc3MgZGVmaW5pdGlvbnMKNzBmMTFiNGQ5NSBhaGNpOiBhZGp1c3QgYWhj
-aV9tZW1fd3JpdGUgdG8gd29yayBvbiByZWdpc3RlcnMKYzEzZGNlNzk3MyBhaGNpOiBmaXggc3Bh
-Y2luZyBkYW1hZ2Ugb24gYWhjaV9tZW1fd3JpdGUKZmFiNTMwNzk2OCBhaGNpOiBtYWtlIG1lbV9y
-ZWFkXzMyIHRyYWNlcyBtb3JlIGRlc2NyaXB0aXZlCmFjZTFiNGZmYWMgYWhjaTogbW9kaWZ5IGFo
-Y2lfbWVtX3JlYWRfMzIgdG8gd29yayBvbiByZWdpc3RlciBudW1iZXJzCjMwMjFhODJkMzEgYWhj
-aTogZml4IGhvc3QgcmVnaXN0ZXIgbWF4IGFkZHJlc3MKM2M0ODA4YTI1NyBhaGNpOiBhZGQgaG9z
-dCByZWdpc3RlciBlbnVtZXJhdGlvbgpmNTc3NTg4NjliIGFoY2k6IGRlbGV0ZSBvbGQgcG9ydCBy
-ZWdpc3RlciBhZGRyZXNzIGRlZmluaXRpb25zCjUyZDA0ZDliMmMgYWhjaTogbWFrZSBwb3J0IHdy
-aXRlIHRyYWNlcyBtb3JlIGRlc2NyaXB0aXZlCjA4ZjQzNWZhZDMgYWhjaTogbW9kaWZ5IGFoY2lf
-cG9ydF93cml0ZSB0byB1c2UgcmVnaXN0ZXIgbnVtYmVycwo2MzRjNzlkNDZiIGFoY2k6IGNvbWJp
-bmUgaWRlbnRpY2FsIGNsYXVzZXMgaW4gcG9ydCB3cml0ZQo1MGIxNjJhZTYwIGFoY2k6IGZpeCBz
-cGFjaW5nIGRhbWFnZSBvbiBhaGNpX3BvcnRfd3JpdGUKNTg5NWVjOGYyOCBhaGNpOiBtYWtlIHBv
-cnQgcmVhZCB0cmFjZXMgbW9yZSBkZXNjcmlwdGl2ZQo2OGZkMDUxYTlhIGFoY2k6IG1vZGlmeSBh
-aGNpX3BvcnRfcmVhZCB0byB1c2UgcmVnaXN0ZXIgbnVtYmVycwowNDc4MDg4NTg1IGFoY2k6IGFk
-ZCBwb3J0IHJlZ2lzdGVyIGVudW1lcmF0aW9uCgo9PT0gT1VUUFVUIEJFR0lOID09PQpDaGVja2lu
-ZyBQQVRDSCAxLzE2OiBhaGNpOiBhZGQgcG9ydCByZWdpc3RlciBlbnVtZXJhdGlvbi4uLgpXQVJO
-SU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwojNzE6IEZJTEU6IGh3L2lkZS9haGNpX2ludGVy
-bmFsLmg6OTQ6CisgICAgQUhDSV9QT1JUX1JFR19TQ1JfTk9USUYgICA9IDE1LCAvKiBQeFNOVEY6
-IFNBVEEgcGh5IHJlZ2lzdGVyOiBTTm90aWZpY2F0aW9uICovCgp0b3RhbDogMCBlcnJvcnMsIDEg
-d2FybmluZ3MsIDcyIGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1z
-LCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRp
-dmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlO
-VEFJTkVSUy4KQ2hlY2tpbmcgUEFUQ0ggMi8xNjogYWhjaTogbW9kaWZ5IGFoY2lfcG9ydF9yZWFk
-IHRvIHVzZSByZWdpc3RlciBudW1iZXJzLi4uCkNoZWNraW5nIFBBVENIIDMvMTY6IGFoY2k6IG1h
-a2UgcG9ydCByZWFkIHRyYWNlcyBtb3JlIGRlc2NyaXB0aXZlLi4uCkNoZWNraW5nIFBBVENIIDQv
-MTY6IGFoY2k6IGZpeCBzcGFjaW5nIGRhbWFnZSBvbiBhaGNpX3BvcnRfd3JpdGUuLi4KRVJST1I6
-IHNwYWNlcyByZXF1aXJlZCBhcm91bmQgdGhhdCAnfCcgKGN0eDpWeFYpCiM4MzogRklMRTogaHcv
-aWRlL2FoY2kuYzozMTY6CisgICAgICAgICAgICAodmFsICYgfihQT1JUX0NNRF9ST19NQVNLfFBP
-UlRfQ01EX0lDQ19NQVNLKSk7CiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-XgoKdG90YWw6IDEgZXJyb3JzLCAwIHdhcm5pbmdzLCAxNTYgbGluZXMgY2hlY2tlZAoKWW91ciBw
-YXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2Ug
-ZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIs
-IHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKQ2hlY2tpbmcgUEFUQ0ggNS8xNjogYWhj
-aTogY29tYmluZSBpZGVudGljYWwgY2xhdXNlcyBpbiBwb3J0IHdyaXRlLi4uCkNoZWNraW5nIFBB
-VENIIDYvMTY6IGFoY2k6IG1vZGlmeSBhaGNpX3BvcnRfd3JpdGUgdG8gdXNlIHJlZ2lzdGVyIG51
-bWJlcnMuLi4KQ2hlY2tpbmcgUEFUQ0ggNy8xNjogYWhjaTogbWFrZSBwb3J0IHdyaXRlIHRyYWNl
-cyBtb3JlIGRlc2NyaXB0aXZlLi4uCkNoZWNraW5nIFBBVENIIDgvMTY6IGFoY2k6IGRlbGV0ZSBv
-bGQgcG9ydCByZWdpc3RlciBhZGRyZXNzIGRlZmluaXRpb25zLi4uCkNoZWNraW5nIFBBVENIIDkv
-MTY6IGFoY2k6IGFkZCBob3N0IHJlZ2lzdGVyIGVudW1lcmF0aW9uLi4uCkNoZWNraW5nIFBBVENI
-IDEwLzE2OiBhaGNpOiBmaXggaG9zdCByZWdpc3RlciBtYXggYWRkcmVzcy4uLgpDaGVja2luZyBQ
-QVRDSCAxMS8xNjogYWhjaTogbW9kaWZ5IGFoY2lfbWVtX3JlYWRfMzIgdG8gd29yayBvbiByZWdp
-c3RlciBudW1iZXJzLi4uCkNoZWNraW5nIFBBVENIIDEyLzE2OiBhaGNpOiBtYWtlIG1lbV9yZWFk
-XzMyIHRyYWNlcyBtb3JlIGRlc2NyaXB0aXZlLi4uCkNoZWNraW5nIFBBVENIIDEzLzE2OiBhaGNp
-OiBmaXggc3BhY2luZyBkYW1hZ2Ugb24gYWhjaV9tZW1fd3JpdGUuLi4KQ2hlY2tpbmcgUEFUQ0gg
-MTQvMTY6IGFoY2k6IGFkanVzdCBhaGNpX21lbV93cml0ZSB0byB3b3JrIG9uIHJlZ2lzdGVycy4u
-LgpDaGVja2luZyBQQVRDSCAxNS8xNjogYWhjaTogZGVsZXRlIG9sZCBob3N0IHJlZ2lzdGVyIGFk
-ZHJlc3MgZGVmaW5pdGlvbnMuLi4KQ2hlY2tpbmcgUEFUQ0ggMTYvMTY6IGFoY2k6IG1ha2UgYWhj
-aV9tZW1fd3JpdGUgdHJhY2VzIG1vcmUgZGVzY3JpcHRpdmUuLi4KV0FSTklORzogbGluZSBvdmVy
-IDgwIGNoYXJhY3RlcnMKIzE4OiBGSUxFOiBody9pZGUvYWhjaS5jOjQ5NzoKKyAgICAgICAgICAg
-IHFlbXVfbG9nX21hc2soTE9HX1VOSU1QLCAiQXR0ZW1wdGVkIHdyaXRlIHRvIHVuaW1wbGVtZW50
-ZWQgcmVnaXN0ZXI6IgoKdG90YWw6IDAgZXJyb3JzLCAxIHdhcm5pbmdzLCAzNSBsaW5lcyBjaGVj
-a2VkCgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFu
-eSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUg
-bWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCj09PSBPVVRQVVQgRU5E
-ID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgotLS0KRW1haWwgZ2VuZXJh
-dGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cDovL3BhdGNoZXcub3JnL10uClBsZWFz
-ZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEByZWRoYXQuY29t
+This will allow us to protect gdbserver_fd from the guest.
+
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+---
+ gdbstub.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/gdbstub.c b/gdbstub.c
+index 6081e719c5..057d0d65c5 100644
+--- a/gdbstub.c
++++ b/gdbstub.c
+@@ -1890,15 +1890,16 @@ static int gdbserver_open(int port)
+ int gdbserver_start(int port)
+ {
+     gdbserver_fd = gdbserver_open(port);
+-    if (gdbserver_fd < 0)
++    if (gdbserver_fd < 0) {
+         return -1;
++    }
+     /* accept connections */
+     if (!gdb_accept()) {
+         close(gdbserver_fd);
+         gdbserver_fd = -1;
+         return -1;
+     }
+-    return 0;
++    return gdbserver_fd;
+ }
+ 
+ /* Disable gdb stub for child processes.  */
+-- 
+2.17.0
