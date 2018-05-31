@@ -1,21 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52552)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52560)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ari@tuxera.com>) id 1fOUxE-0004q0-Uz
+	(envelope-from <ari@tuxera.com>) id 1fOUxF-0004qX-7X
 	for qemu-devel@nongnu.org; Thu, 31 May 2018 17:17:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ari@tuxera.com>) id 1fOUxE-0008D3-1N
-	for qemu-devel@nongnu.org; Thu, 31 May 2018 17:17:52 -0400
+	(envelope-from <ari@tuxera.com>) id 1fOUxD-0008Cw-VA
+	for qemu-devel@nongnu.org; Thu, 31 May 2018 17:17:53 -0400
 From: Ari Sundholm <ari@tuxera.com>
-Date: Fri, 1 Jun 2018 00:17:22 +0300
-Message-ID: <1527801443-30620-4-git-send-email-ari@tuxera.com>
-In-Reply-To: <1527801443-30620-3-git-send-email-ari@tuxera.com>
+Date: Fri, 1 Jun 2018 00:17:20 +0300
+Message-ID: <1527801443-30620-2-git-send-email-ari@tuxera.com>
+In-Reply-To: <1527801443-30620-1-git-send-email-ari@tuxera.com>
 References: <1527801443-30620-1-git-send-email-ari@tuxera.com>
-	<1527801443-30620-2-git-send-email-ari@tuxera.com>
-	<1527801443-30620-3-git-send-email-ari@tuxera.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH 4/5] block/blklogwrites: Use block limits from
- the backend block configuration
+Subject: [Qemu-devel] [PATCH 2/5] block: Add a mechanism for passing a block
+ driver a block configuration
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,56 +25,144 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: qemu-devel@nongnu.org, Ari Sundholm <ari@tuxera.com>
 
-This is to ensure that writes are aligned properly for logging writes
-to the virtual block device. This is important because the
-dm-log-writes log format has a granularity of one sector for both the
-offset and the size of each write. By using the logical sector size
-for alignment, the log records the writes more faithfully for those
-devices that have a non-512 logical sector size.
+A block driver may need to know about the block configuration, most
+critically the sector sizes, of a block backend for alignment purposes
+or for some other reason. It doesn't seem like qemu has an existing
+mechanism for a block backend to convey the required information to
+the relevant block driver when it is being realized.
 
-Note that even with this patch, blklogwrites still uses
-BDRV_SECTOR_SIZE for logging. This will change in a subsequent patch
-which will introduce support for non-512 sector sizes.
+The need for this mechanism rises from the fact that a drive may not
+have a backend at the time it is created, as devices are created after
+drives during qemu startup. Therefore, a driver requiring information
+about the block configuration can get this information when a backend
+is created for it at the earliest. The most natural place for this to
+take place seems to be in the realization functions of the various
+block device drivers, such as scsi-hd. The interface proposed here
+allows the block driver to receive information about the block
+configuration and the associated backend through a new callback.
 
 Signed-off-by: Ari Sundholm <ari@tuxera.com>
 ---
- block/blklogwrites.c | 17 +++++++++++++++++
- 1 file changed, 17 insertions(+)
+ block/io.c                | 19 +++++++++++++++++++
+ hw/block/block.c          | 11 ++++++++++-
+ include/block/block.h     | 10 ++++++++++
+ include/block/block_int.h |  9 +++++++++
+ include/hw/block/block.h  |  1 +
+ 5 files changed, 49 insertions(+), 1 deletion(-)
 
-diff --git a/block/blklogwrites.c b/block/blklogwrites.c
-index 78835bf..6cdad2c 100644
---- a/block/blklogwrites.c
-+++ b/block/blklogwrites.c
-@@ -229,6 +229,22 @@ static void blk_log_writes_refresh_limits(BlockDriverState *bs, Error **errp)
+diff --git a/block/io.c b/block/io.c
+index ca96b48..b806c91 100644
+--- a/block/io.c
++++ b/block/io.c
+@@ -2835,3 +2835,22 @@ void bdrv_unregister_buf(BlockDriverState *bs, void *host)
+         bdrv_unregister_buf(child->bs, host);
+     }
+ }
++
++void bdrv_apply_blkconf(BlockDriverState *bs, BlockConf *conf)
++{
++    BlockDriver *drv = bs->drv;
++
++    if (!drv)
++        return;
++
++    if (drv->bdrv_apply_blkconf) {
++        drv->bdrv_apply_blkconf(bs, conf);
++        return;
++    }
++
++    if (bs->file && bs->file->bs)
++        bdrv_apply_blkconf(bs->file->bs, conf);
++
++    if (bs->drv->supports_backing && backing_bs(bs))
++        bdrv_apply_blkconf(backing_bs(bs), conf);
++}
+diff --git a/hw/block/block.c b/hw/block/block.c
+index b91e2b6..a2d33df 100644
+--- a/hw/block/block.c
++++ b/hw/block/block.c
+@@ -38,7 +38,7 @@ void blkconf_blocksizes(BlockConf *conf)
+     /* fill in detected values if they are not defined via qemu command line */
+     if (!conf->physical_block_size) {
+         if (!backend_ret) {
+-           conf->physical_block_size = blocksizes.phys;
++            conf->physical_block_size = blocksizes.phys;
+         } else {
+             conf->physical_block_size = BDRV_SECTOR_SIZE;
+         }
+@@ -52,6 +52,15 @@ void blkconf_blocksizes(BlockConf *conf)
      }
  }
  
-+static void blk_log_writes_apply_blkconf(BlockDriverState *bs, BlockConf *conf)
++void blkconf_apply_to_blkdrv(BlockConf *conf)
 +{
-+    assert(bs && conf && conf->blk);
++    BlockBackend *blk = conf->blk;
++    BlockDriverState *bs = blk_bs(blk);
 +
-+    bs->bl.request_alignment = conf->logical_block_size;
-+    if (conf->discard_granularity != (uint32_t)-1)
-+        bs->bl.pdiscard_alignment = conf->discard_granularity;
-+
-+    if (bs->bl.pdiscard_alignment &&
-+            bs->bl.pdiscard_alignment < bs->bl.request_alignment)
-+        bs->bl.pdiscard_alignment = bs->bl.request_alignment;
-+    if (bs->bl.pwrite_zeroes_alignment &&
-+            bs->bl.pwrite_zeroes_alignment < bs->bl.request_alignment)
-+        bs->bl.pwrite_zeroes_alignment = bs->bl.request_alignment;
++    if (bs)
++        bdrv_apply_blkconf(bs, conf);
 +}
 +
- static int coroutine_fn
- blk_log_writes_co_preadv(BlockDriverState *bs, uint64_t offset, uint64_t bytes,
-                          QEMUIOVector *qiov, int flags)
-@@ -424,6 +440,7 @@ static BlockDriver bdrv_blk_log_writes = {
-     .bdrv_refresh_filename  = blk_log_writes_refresh_filename,
-     .bdrv_child_perm        = blk_log_writes_child_perm,
-     .bdrv_refresh_limits    = blk_log_writes_refresh_limits,
-+    .bdrv_apply_blkconf     = blk_log_writes_apply_blkconf,
+ bool blkconf_apply_backend_options(BlockConf *conf, bool readonly,
+                                    bool resizable, Error **errp)
+ {
+diff --git a/include/block/block.h b/include/block/block.h
+index fb7d379..57a8b65 100644
+--- a/include/block/block.h
++++ b/include/block/block.h
+@@ -10,6 +10,7 @@
+ #include "block/dirty-bitmap.h"
+ #include "block/blockjob.h"
+ #include "qemu/hbitmap.h"
++#include "hw/block/block.h"
  
-     .bdrv_co_preadv         = blk_log_writes_co_preadv,
-     .bdrv_co_pwritev        = blk_log_writes_co_pwritev,
+ /* block.c */
+ typedef struct BlockDriver BlockDriver;
+@@ -618,4 +619,13 @@ bool bdrv_can_store_new_dirty_bitmap(BlockDriverState *bs, const char *name,
+  */
+ void bdrv_register_buf(BlockDriverState *bs, void *host, size_t size);
+ void bdrv_unregister_buf(BlockDriverState *bs, void *host);
++
++/**
++ * bdrv_apply_blkconf:
++ *
++ * Recursively finds the highest-level block drivers among the files and
++ * backing files that accept a block configuration and applies the given block
++ * configuration to them.
++ */
++void bdrv_apply_blkconf(BlockDriverState *bs, BlockConf *conf);
+ #endif
+diff --git a/include/block/block_int.h b/include/block/block_int.h
+index 6c0927b..1d99a0d 100644
+--- a/include/block/block_int.h
++++ b/include/block/block_int.h
+@@ -433,6 +433,15 @@ struct BlockDriver {
+     void (*bdrv_abort_perm_update)(BlockDriverState *bs);
+ 
+     /**
++     * Called to inform the driver of the block configuration of the virtual
++     * block device.
++     *
++     * This function is called by a block device realization function if the
++     * device wants to inform the block driver of its block configuration.
++     */
++    void (*bdrv_apply_blkconf)(BlockDriverState *bs, BlockConf *conf);
++
++    /**
+      * Returns in @nperm and @nshared the permissions that the driver for @bs
+      * needs on its child @c, based on the cumulative permissions requested by
+      * the parents in @parent_perm and @parent_shared.
+diff --git a/include/hw/block/block.h b/include/hw/block/block.h
+index d4f4dff..2861995 100644
+--- a/include/hw/block/block.h
++++ b/include/hw/block/block.h
+@@ -77,6 +77,7 @@ bool blkconf_geometry(BlockConf *conf, int *trans,
+                       unsigned cyls_max, unsigned heads_max, unsigned secs_max,
+                       Error **errp);
+ void blkconf_blocksizes(BlockConf *conf);
++void blkconf_apply_to_blkdrv(BlockConf *conf);
+ bool blkconf_apply_backend_options(BlockConf *conf, bool readonly,
+                                    bool resizable, Error **errp);
+ 
 -- 
 2.7.4
