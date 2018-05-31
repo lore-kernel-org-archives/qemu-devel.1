@@ -1,23 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38492)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38487)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fOWNi-00056K-O0
+	(envelope-from <richard.henderson@linaro.org>) id 1fOWNi-00056I-E6
 	for qemu-devel@nongnu.org; Thu, 31 May 2018 18:49:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fOWNh-0000lA-O2
+	(envelope-from <richard.henderson@linaro.org>) id 1fOWNf-0000jP-A1
 	for qemu-devel@nongnu.org; Thu, 31 May 2018 18:49:18 -0400
-Received: from mail-pf0-x243.google.com ([2607:f8b0:400e:c00::243]:37862)
+Received: from mail-pf0-x241.google.com ([2607:f8b0:400e:c00::241]:32867)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1fOWNh-0000ke-Hp
-	for qemu-devel@nongnu.org; Thu, 31 May 2018 18:49:17 -0400
-Received: by mail-pf0-x243.google.com with SMTP id e9-v6so11490070pfi.4
-	for <qemu-devel@nongnu.org>; Thu, 31 May 2018 15:49:17 -0700 (PDT)
+	id 1fOWNf-0000iX-3h
+	for qemu-devel@nongnu.org; Thu, 31 May 2018 18:49:15 -0400
+Received: by mail-pf0-x241.google.com with SMTP id a20-v6so11499441pfo.0
+	for <qemu-devel@nongnu.org>; Thu, 31 May 2018 15:49:14 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Thu, 31 May 2018 15:49:07 -0700
-Message-Id: <20180531224911.23725-3-richard.henderson@linaro.org>
-In-Reply-To: <20180531224911.23725-1-richard.henderson@linaro.org>
-References: <20180531224911.23725-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH 2/6] linux-user: Add host_fds and manipulators
+Date: Thu, 31 May 2018 15:49:05 -0700
+Message-Id: <20180531224911.23725-1-richard.henderson@linaro.org>
+Subject: [Qemu-devel] [PATCH v5 0/6] linux-user: Reorg interp_prefix handling
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,112 +27,40 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: peter.maydell@linaro.org, laurent@vivier.eu, evgreen@chromium.org
 
-This allows emulation of guest syscalls to reject
-manipulations to fds used by the host.
+Changes since v4 (2018-01-28)
+  * Protect host fds from guest manipulation.
+  * Rename the interp_dirfd macro to TRY_INTERP_FD
+  * Add TRY_INTERP_PATH for acct, statfs, inotify_add_watch
 
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
----
- linux-user/qemu.h | 30 ++++++++++++++++++++++++++++++
- linux-user/main.c | 27 ++++++++++++++++++++++++++-
- 2 files changed, 56 insertions(+), 1 deletion(-)
+Changes since v3 (2017-12-29)
+  * Use DO/WHILE as the control construct; wrap it in a macro.
+  * Introduce linux_user_path to handle the cases *at syscalls
+    do not cover.
 
-diff --git a/linux-user/qemu.h b/linux-user/qemu.h
-index c55c8e294b..33dafbe0e4 100644
---- a/linux-user/qemu.h
-+++ b/linux-user/qemu.h
-@@ -155,6 +155,36 @@ void task_settid(TaskState *);
- void stop_all_tasks(void);
- extern const char *qemu_uname_release;
- extern unsigned long mmap_min_addr;
-+extern fd_set host_fds;
-+
-+/**
-+ * is_hostfd:
-+ * @fd: file descriptor to check
-+ *
-+ * Return true if @fd is being used by the host and therefore any
-+ * guest system call referencing @fd should return EBADF.
-+ */
-+static inline bool is_hostfd(int fd)
-+{
-+    return fd >= 0 && fd < FD_SETSIZE && FD_ISSET(fd, &host_fds);
-+}
-+
-+/**
-+ * contains_hostfd:
-+ * @fds: fd_set of descriptors to check
-+ *
-+ * Return true if any descriptor in @fds are being used by the host
-+ * and therefore the guest system call should return EBADF.
-+ */
-+bool contains_hostfd(const fd_set *fds);
-+
-+/**
-+ * add_hostfd:
-+ * @fd: file descriptor to reserve
-+ *
-+ * Add @fd to the set of file descriptors to reserve for the host.
-+ */
-+void add_hostfd(int fd);
- 
- /* ??? See if we can avoid exposing so much of the loader internals.  */
- 
-diff --git a/linux-user/main.c b/linux-user/main.c
-index 78d6d3e7eb..ee3f323c08 100644
---- a/linux-user/main.c
-+++ b/linux-user/main.c
-@@ -49,6 +49,7 @@ static const char *cpu_type;
- unsigned long mmap_min_addr;
- unsigned long guest_base;
- int have_guest_base;
-+fd_set host_fds;
- 
- /*
-  * When running 32-on-64 we should make sure we can fit all of the possible
-@@ -112,6 +113,23 @@ int cpu_get_pic_interrupt(CPUX86State *env)
- }
- #endif
- 
-+bool contains_hostfd(const fd_set *fds)
-+{
-+    int i;
-+    for (i = 0; i < ARRAY_SIZE(__FDS_BITS(fds)); ++i) {
-+        if (__FDS_BITS(fds)[i] & __FDS_BITS(&host_fds)[i]) {
-+            return true;
-+        }
-+    }
-+    return true;
-+}
-+
-+void add_hostfd(int fd)
-+{
-+    g_assert(fd >= 0 && fd < FD_SETSIZE);
-+    FD_SET(fd, &host_fds);
-+}
-+
- /***********************************************************/
- /* Helper routines for implementing atomic operations.  */
- 
-@@ -805,12 +823,19 @@ int main(int argc, char **argv, char **envp)
- 
-     target_cpu_copy_regs(env, regs);
- 
-+    /* Prevent the guest from closing the log file.  */
-+    if (qemu_logfile && qemu_logfile != stderr) {
-+        add_hostfd(fileno(qemu_logfile));
-+    }
-+
-     if (gdbstub_port) {
--        if (gdbserver_start(gdbstub_port) < 0) {
-+        int fd = gdbserver_start(gdbstub_port);
-+        if (fd < 0) {
-             fprintf(stderr, "qemu: could not open gdbserver on port %d\n",
-                     gdbstub_port);
-             exit(EXIT_FAILURE);
-         }
-+        add_hostfd(fd);
-         gdb_handlesig(cpu, 0);
-     }
-     cpu_loop(env);
+Changes since v2 (2017-12-04)
+  * Use IF as the control construct instead of SWITCH.
+
+Changes since v1 (2016-11-??)
+  * Require interp_dirfd set before trying the *at path.
+
+
+r~
+
+
+Richard Henderson (6):
+  gdbstub: Return the fd from gdbserver_start
+  linux-user: Add host_fds and manipulators
+  linux-user: Check is_hostfd in do_syscall
+  linux-user: Check contains_hostfd in select syscalls
+  linux-user: Check is_hostfd in mmap syscalls
+  linux-user: Use *at functions to implement interp_prefix
+
+ linux-user/qemu.h    |  67 ++++++
+ gdbstub.c            |   5 +-
+ linux-user/elfload.c |   5 +-
+ linux-user/main.c    |  53 ++++-
+ linux-user/syscall.c | 485 ++++++++++++++++++++++++++++++++++++-------
+ 5 files changed, 532 insertions(+), 83 deletions(-)
+
 -- 
 2.17.0
