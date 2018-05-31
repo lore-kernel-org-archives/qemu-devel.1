@@ -1,20 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58754)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58776)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1fOR8k-0003sL-A0
-	for qemu-devel@nongnu.org; Thu, 31 May 2018 13:13:31 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1fOR8l-0003tp-Gx
+	for qemu-devel@nongnu.org; Thu, 31 May 2018 13:13:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1fOR8j-0000Oy-0q
-	for qemu-devel@nongnu.org; Thu, 31 May 2018 13:13:30 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:45860 helo=mx1.redhat.com)
+	(envelope-from <pbonzini@redhat.com>) id 1fOR8k-0000Qg-Ki
+	for qemu-devel@nongnu.org; Thu, 31 May 2018 13:13:31 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:45866 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1fOR8i-0000OS-RA
-	for qemu-devel@nongnu.org; Thu, 31 May 2018 13:13:28 -0400
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1fOR8k-0000Q8-FX
+	for qemu-devel@nongnu.org; Thu, 31 May 2018 13:13:30 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.4])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 268C076F91
+	for <qemu-devel@nongnu.org>; Thu, 31 May 2018 17:13:30 +0000 (UTC)
+Received: from donizetti.redhat.com (ovpn-117-47.ams2.redhat.com
+	[10.36.117.47])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id A4F9B2026DEF
+	for <qemu-devel@nongnu.org>; Thu, 31 May 2018 17:13:29 +0000 (UTC)
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Thu, 31 May 2018 19:12:35 +0200
-Message-Id: <20180531171253.21012-36-pbonzini@redhat.com>
+Date: Thu, 31 May 2018 19:12:37 +0200
+Message-Id: <20180531171253.21012-38-pbonzini@redhat.com>
 In-Reply-To: <20180531171253.21012-1-pbonzini@redhat.com>
 References: <20180531171253.21012-1-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PULL 35/53] WHPX: fix some compiler warnings
+Subject: [Qemu-devel] [PULL 37/53] tcg: remove softfloat from --disable-tcg
+ builds
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,168 +35,28 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Lucian Petrut <lpetrut@cloudbasesolutions.com>, Alessandro Pilotti <apilotti@cloudbasesolutions.com>, Justin Terry <juterry@microsoft.com>
 
-From: Lucian Petrut <lpetrut@cloudbasesolutions.com>
+Even though the presence of softfloat does not cause --disable-tcg builds to fail,
+it is the single largest .o file in them.  Remove it, since TCG is the only client.
 
-This patch fixes a few compiler warnings, especially in case of
-x86 targets, where the number of registers was not properly handled
-and could cause an overflow.
-
-Signed-off-by: Alessandro Pilotti <apilotti@cloudbasesolutions.com>
-Signed-off-by: Justin Terry (VM) <juterry@microsoft.com>
-Signed-off-by: Lucian Petrut <lpetrut@cloudbasesolutions.com>
-Message-Id: <1526405722-10887-3-git-send-email-lpetrut@cloudbasesolutions.com>
+Acked-by: Richard Henderson <richard.henderson@linaro.org>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- target/i386/whpx-all.c | 49 ++++++++++++++++++++++++++++++------------
- 1 file changed, 35 insertions(+), 14 deletions(-)
+ Makefile.target | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/target/i386/whpx-all.c b/target/i386/whpx-all.c
-index 32695d47f9..6b42096698 100644
---- a/target/i386/whpx-all.c
-+++ b/target/i386/whpx-all.c
-@@ -223,24 +223,31 @@ static void whpx_set_registers(CPUState *cpu)
-     struct whpx_vcpu *vcpu = get_whpx_vcpu(cpu);
-     struct CPUX86State *env = (CPUArchState *)(cpu->env_ptr);
-     X86CPU *x86_cpu = X86_CPU(cpu);
--    struct whpx_register_set vcxt = {0};
-+    struct whpx_register_set vcxt;
-     HRESULT hr;
--    int idx = 0;
-+    int idx;
-+    int idx_next;
-     int i;
-     int v86, r86;
- 
-     assert(cpu_is_stopped(cpu) || qemu_cpu_is_self(cpu));
- 
-+    memset(&vcxt, 0, sizeof(struct whpx_register_set));
-+
-     v86 = (env->eflags & VM_MASK);
-     r86 = !(env->cr[0] & CR0_PE_MASK);
- 
-     vcpu->tpr = cpu_get_apic_tpr(x86_cpu->apic_state);
-     vcpu->apic_base = cpu_get_apic_base(x86_cpu->apic_state);
- 
-+    idx = 0;
-+
-     /* Indexes for first 16 registers match between HV and QEMU definitions */
--    for (idx = 0; idx < CPU_NB_REGS64; idx += 1) {
--        vcxt.values[idx].Reg64 = env->regs[idx];
-+    idx_next = 16;
-+    for (idx = 0; idx < CPU_NB_REGS; idx += 1) {
-+        vcxt.values[idx].Reg64 = (uint64_t)env->regs[idx];
-     }
-+    idx = idx_next;
- 
-     /* Same goes for RIP and RFLAGS */
-     assert(whpx_register_names[idx] == WHvX64RegisterRip);
-@@ -287,10 +294,12 @@ static void whpx_set_registers(CPUState *cpu)
- 
-     /* 16 XMM registers */
-     assert(whpx_register_names[idx] == WHvX64RegisterXmm0);
--    for (i = 0; i < 16; i += 1, idx += 1) {
-+    idx_next = idx + 16;
-+    for (i = 0; i < sizeof(env->xmm_regs) / sizeof(ZMMReg); i += 1, idx += 1) {
-         vcxt.values[idx].Reg128.Low64 = env->xmm_regs[i].ZMM_Q(0);
-         vcxt.values[idx].Reg128.High64 = env->xmm_regs[i].ZMM_Q(1);
-     }
-+    idx = idx_next;
- 
-     /* 8 FP registers */
-     assert(whpx_register_names[idx] == WHvX64RegisterFpMmx0);
-@@ -381,7 +390,8 @@ static void whpx_get_registers(CPUState *cpu)
-     struct whpx_register_set vcxt;
-     uint64_t tpr, apic_base;
-     HRESULT hr;
--    int idx = 0;
-+    int idx;
-+    int idx_next;
-     int i;
- 
-     assert(cpu_is_stopped(cpu) || qemu_cpu_is_self(cpu));
-@@ -396,10 +406,14 @@ static void whpx_get_registers(CPUState *cpu)
-                      hr);
-     }
- 
-+    idx = 0;
-+
-     /* Indexes for first 16 registers match between HV and QEMU definitions */
--    for (idx = 0; idx < CPU_NB_REGS64; idx += 1) {
-+    idx_next = 16;
-+    for (idx = 0; idx < CPU_NB_REGS; idx += 1) {
-         env->regs[idx] = vcxt.values[idx].Reg64;
-     }
-+    idx = idx_next;
- 
-     /* Same goes for RIP and RFLAGS */
-     assert(whpx_register_names[idx] == WHvX64RegisterRip);
-@@ -446,10 +460,12 @@ static void whpx_get_registers(CPUState *cpu)
- 
-     /* 16 XMM registers */
-     assert(whpx_register_names[idx] == WHvX64RegisterXmm0);
--    for (i = 0; i < 16; i += 1, idx += 1) {
-+    idx_next = idx + 16;
-+    for (i = 0; i < sizeof(env->xmm_regs) / sizeof(ZMMReg); i += 1, idx += 1) {
-         env->xmm_regs[i].ZMM_Q(0) = vcxt.values[idx].Reg128.Low64;
-         env->xmm_regs[i].ZMM_Q(1) = vcxt.values[idx].Reg128.High64;
-     }
-+    idx = idx_next;
- 
-     /* 8 FP registers */
-     assert(whpx_register_names[idx] == WHvX64RegisterFpMmx0);
-@@ -698,11 +714,14 @@ static void whpx_vcpu_pre_run(CPUState *cpu)
-     X86CPU *x86_cpu = X86_CPU(cpu);
-     int irq;
-     uint8_t tpr;
--    WHV_X64_PENDING_INTERRUPTION_REGISTER new_int = {0};
-+    WHV_X64_PENDING_INTERRUPTION_REGISTER new_int;
-     UINT32 reg_count = 0;
--    WHV_REGISTER_VALUE reg_values[3] = {0};
-+    WHV_REGISTER_VALUE reg_values[3];
-     WHV_REGISTER_NAME reg_names[3];
- 
-+    memset(&new_int, 0, sizeof(new_int));
-+    memset(reg_values, 0, sizeof(reg_values));
-+
-     qemu_mutex_lock_iothread();
- 
-     /* Inject NMI */
-@@ -925,11 +944,13 @@ static int whpx_vcpu_run(CPUState *cpu)
-             break;
- 
-         case WHvRunVpExitReasonX64Cpuid: {
--            WHV_REGISTER_VALUE reg_values[5] = {0};
-+            WHV_REGISTER_VALUE reg_values[5];
-             WHV_REGISTER_NAME reg_names[5];
-             UINT32 reg_count = 5;
-             UINT64 rip, rax, rcx, rdx, rbx;
- 
-+            memset(reg_values, 0, sizeof(reg_values));
-+
-             rip = vcpu->exit_ctx.VpContext.Rip +
-                   vcpu->exit_ctx.VpContext.InstructionLength;
-             switch (vcpu->exit_ctx.CpuidAccess.Rax) {
-@@ -1200,7 +1221,7 @@ static void whpx_update_mapping(hwaddr start_pa, ram_addr_t size,
-         error_report("WHPX: Failed to %s GPA range '%s' PA:%p, Size:%p bytes,"
-                      " Host:%p, hr=%08lx",
-                      (add ? "MAP" : "UNMAP"), name,
--                     (void *)start_pa, (void *)size, host_va, hr);
-+                     (void *)(uintptr_t)start_pa, (void *)size, host_va, hr);
-     }
- }
- 
-@@ -1231,8 +1252,8 @@ static void whpx_process_section(MemoryRegionSection *section, int add)
-     host_va = (uintptr_t)memory_region_get_ram_ptr(mr)
-             + section->offset_within_region + delta;
- 
--    whpx_update_mapping(start_pa, size, (void *)host_va, add,
--                       memory_region_is_rom(mr), mr->name);
-+    whpx_update_mapping(start_pa, size, (void *)(uintptr_t)host_va, add,
-+                        memory_region_is_rom(mr), mr->name);
- }
- 
- static void whpx_region_add(MemoryListener *listener,
+diff --git a/Makefile.target b/Makefile.target
+index d0ec77a307..dad2cf8778 100644
+--- a/Makefile.target
++++ b/Makefile.target
+@@ -97,7 +97,7 @@ obj-$(CONFIG_TCG) += tcg/tcg.o tcg/tcg-op.o tcg/tcg-op-vec.o tcg/tcg-op-gvec.o
+ obj-$(CONFIG_TCG) += tcg/tcg-common.o tcg/optimize.o
+ obj-$(CONFIG_TCG_INTERPRETER) += tcg/tci.o
+ obj-$(CONFIG_TCG_INTERPRETER) += disas/tci.o
+-obj-y += fpu/softfloat.o
++obj-$(CONFIG_TCG) += fpu/softfloat.o
+ obj-y += target/$(TARGET_BASE_ARCH)/
+ obj-y += disas.o
+ obj-$(call notempty,$(TARGET_XML_FILES)) += gdbstub-xml.o
 -- 
 2.17.0
