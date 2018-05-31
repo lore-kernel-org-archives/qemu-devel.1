@@ -1,32 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37107)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37774)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fOTdV-0003Cm-Pp
-	for qemu-devel@nongnu.org; Thu, 31 May 2018 15:53:26 -0400
+	(envelope-from <groug@kaod.org>) id 1fOTgX-0005Nu-6i
+	for qemu-devel@nongnu.org; Thu, 31 May 2018 15:56:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fOTdR-0007j0-N2
-	for qemu-devel@nongnu.org; Thu, 31 May 2018 15:53:25 -0400
-Received: from mail-qt0-x241.google.com ([2607:f8b0:400d:c0d::241]:37541)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fOTdR-0007iZ-Gm
-	for qemu-devel@nongnu.org; Thu, 31 May 2018 15:53:21 -0400
-Received: by mail-qt0-x241.google.com with SMTP id q13-v6so29358678qtp.4
-	for <qemu-devel@nongnu.org>; Thu, 31 May 2018 12:53:21 -0700 (PDT)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20180531192419.4592-1-samuel.thibault@ens-lyon.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <784d48eb-5dc1-7bde-e32f-e3c27b6b65a1@amsat.org>
-Date: Thu, 31 May 2018 16:53:17 -0300
+	(envelope-from <groug@kaod.org>) id 1fOTgT-0001kp-BG
+	for qemu-devel@nongnu.org; Thu, 31 May 2018 15:56:33 -0400
+Received: from 14.mo3.mail-out.ovh.net ([188.165.43.98]:46150)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1fOTgT-0001k9-4C
+	for qemu-devel@nongnu.org; Thu, 31 May 2018 15:56:29 -0400
+Received: from player774.ha.ovh.net (unknown [10.109.105.123])
+	by mo3.mail-out.ovh.net (Postfix) with ESMTP id 82E1B1BA4B5
+	for <qemu-devel@nongnu.org>; Thu, 31 May 2018 21:56:27 +0200 (CEST)
+Date: Thu, 31 May 2018 21:56:24 +0200
+From: Greg Kurz <groug@kaod.org>
+Message-ID: <20180531215624.2c7b7083@bahia.lan>
+In-Reply-To: <CABV8kRzAJxeEB4rb4R0o7Fx_uBqf82tDDWC_6o0Xht3-F63AOA@mail.gmail.com>
+References: <cover.1527310210.git.keno@alumni.harvard.edu>
+	<e47c58ca95c93503a9d85dc6d749acf9fe9c6e76.1527310210.git.keno@alumni.harvard.edu>
+	<20180530142026.7c59d967@bahia.lan>
+	<CABV8kRzAJxeEB4rb4R0o7Fx_uBqf82tDDWC_6o0Xht3-F63AOA@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20180531192419.4592-1-samuel.thibault@ens-lyon.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] slirp: Fix spurious error report when
- sending directly
+Subject: Re: [Qemu-devel] [PATCH 11/13] 9p: darwin: Mark mknod as unsupported
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,45 +32,22 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Samuel Thibault <samuel.thibault@ens-lyon.org>, qemu-devel@nongnu.org
-Cc: stefanha@redhat.com, jan.kiszka@siemens.com
+To: Keno Fischer <keno@juliacomputing.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Keno Fischer <keno@alumni.harvard.edu>
 
-Hi Samuel,
+On Thu, 31 May 2018 12:37:56 -0400
+Keno Fischer <keno@juliacomputing.com> wrote:
 
-On 05/31/2018 04:24 PM, Samuel Thibault wrote:
-> When DEBUG is enabled, len needs to be updated.
+> >> +#ifdef CONFIG_DARWIN
+> >> +    /* Darwin doesn't have mknodat and it's unlikely to work anyway,  
+> >
+> > What's unlikely to work ?
+> >  
 > 
-> Signed-off-by: Samuel Thibault <samuel.thibault@ens-lyon.org>
-> ---
->  slirp/socket.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/slirp/socket.c b/slirp/socket.c
-> index e2a71c9b04..3182477ff5 100644
-> --- a/slirp/socket.c
-> +++ b/slirp/socket.c
-> @@ -351,7 +351,7 @@ sosendoob(struct socket *so)
->  
->  	if (sb->sb_rptr < sb->sb_wptr) {
->  		/* We can send it directly */
-> -		n = slirp_send(so, sb->sb_rptr, so->so_urgc, (MSG_OOB)); /* |MSG_DONTWAIT)); */
-> +		len = n = slirp_send(so, sb->sb_rptr, so->so_urgc, (MSG_OOB)); /* |MSG_DONTWAIT)); */
->  	} else {
->  		/*
->  		 * Since there's no sendv or sendtov like writev,
-> 
+> My concern was that allowing this would cause unexpected
+> behavior, since the device numbers will differ between OS X
+> and Linux. Though maybe this isn't the place to worry about
+> that.
 
-Isn't it cleaner to move the DEBUG code in the else { }?
-
-        if (sb->sb_rptr < sb->sb_wptr) {
-            /* We can send it directly */
-            n = slirp_send(...
-        } else {
-            ...
-            n = slirp_send(...
-    #ifdef DEBUG
-            if (n != len) {
-                DEBUG_ERROR("Didn't send all data urgently ...
-            }
-    #endif
-        }
+The numbers may differ indeed but we don't really care since the
+server never opens device files. This is just a directory entry.
