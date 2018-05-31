@@ -1,30 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46517)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56688)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1fOLQo-0004e5-3R
-	for qemu-devel@nongnu.org; Thu, 31 May 2018 07:07:47 -0400
+	(envelope-from <jemmy858585@gmail.com>) id 1fOLk5-0000Mv-0v
+	for qemu-devel@nongnu.org; Thu, 31 May 2018 07:27:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1fOLQn-0004Ft-6d
-	for qemu-devel@nongnu.org; Thu, 31 May 2018 07:07:46 -0400
-Received: from mail-wm0-x242.google.com ([2a00:1450:400c:c09::242]:53175)
+	(envelope-from <jemmy858585@gmail.com>) id 1fOLk3-0004uW-T2
+	for qemu-devel@nongnu.org; Thu, 31 May 2018 07:27:41 -0400
+Received: from mail-it0-x244.google.com ([2607:f8b0:4001:c0b::244]:33699)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
-	id 1fOLQm-0004FF-Vm
-	for qemu-devel@nongnu.org; Thu, 31 May 2018 07:07:45 -0400
-Received: by mail-wm0-x242.google.com with SMTP id 18-v6so47734142wml.2
-	for <qemu-devel@nongnu.org>; Thu, 31 May 2018 04:07:44 -0700 (PDT)
+	(Exim 4.71) (envelope-from <jemmy858585@gmail.com>)
+	id 1fOLk3-0004tg-M9
+	for qemu-devel@nongnu.org; Thu, 31 May 2018 07:27:39 -0400
+Received: by mail-it0-x244.google.com with SMTP id k17-v6so1945476ita.0
+	for <qemu-devel@nongnu.org>; Thu, 31 May 2018 04:27:39 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20180531110321.ltm3ti6onab2w3vg@dritchie>
-References: <20180531074601.10647-1-slp@redhat.com>
-	<20180531074601.10647-4-slp@redhat.com>
-	<CAJ+F1CKfpATgpFpHa85Esvv9k_T3FG_pY4rsz_C5a20CWfUgiQ@mail.gmail.com>
-	<20180531110321.ltm3ti6onab2w3vg@dritchie>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Thu, 31 May 2018 13:07:43 +0200
-Message-ID: <CAJ+F1CJx4mekhsK1y_AQOYy12ETdL-BqB+iA9NUfQE5STGxXiw@mail.gmail.com>
+In-Reply-To: <20180531105540.GC2755@work-vm>
+References: <1527673416-31268-1-git-send-email-lidongchen@tencent.com>
+	<1527673416-31268-11-git-send-email-lidongchen@tencent.com>
+	<20180530165038.GF2410@work-vm>
+	<CAOGPPbfES1YDge-jUOkF0EvporeJvz=hu1qrtyXiiVE-8=ArnQ@mail.gmail.com>
+	<20180531105540.GC2755@work-vm>
+From: 858585 jemmy <jemmy858585@gmail.com>
+Date: Thu, 31 May 2018 19:27:38 +0800
+Message-ID: <CAOGPPbebuwS95hJC4Yy-7ONNYgFbGvDJeRgGMk0V=OL2nFARmA@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 3/3] hw/char/serial: Don't retry on
- serial_xmit if errno == EPIPE
+Subject: Re: [Qemu-devel] [PATCH v4 10/12] migration: create a dedicated
+ thread to release rdma resource
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,62 +33,143 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Sergio Lopez <slp@redhat.com>
-Cc: "Daniel P. Berrange" <berrange@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, QEMU <qemu-devel@nongnu.org>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: zhang.zhanghailiang@huawei.com, Juan Quintela <quintela@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>, Aviad Yehezkel <aviadye@mellanox.com>, Paolo Bonzini <pbonzini@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, Adi Dotan <adido@mellanox.com>, Lidong Chen <lidongchen@tencent.com>
 
-Hi
-
-On Thu, May 31, 2018 at 1:03 PM, Sergio Lopez <slp@redhat.com> wrote:
-> On Thu, May 31, 2018 at 11:52:01AM +0200, Marc-Andr=C3=A9 Lureau wrote:
->> On Thu, May 31, 2018 at 9:46 AM, Sergio Lopez <slp@redhat.com> wrote:
->> > If writing to the frontend channel failed with EPIPE, don't set up a
->> > retry. EPIPE is not a recoverable error, so trying again is a waste of=
- CPU
->> > cycles.
+On Thu, May 31, 2018 at 6:55 PM, Dr. David Alan Gilbert
+<dgilbert@redhat.com> wrote:
+> * 858585 jemmy (jemmy858585@gmail.com) wrote:
+>> On Thu, May 31, 2018 at 12:50 AM, Dr. David Alan Gilbert
+>> <dgilbert@redhat.com> wrote:
+>> > * Lidong Chen (jemmy858585@gmail.com) wrote:
+>> >> ibv_dereg_mr wait for a long time for big memory size virtual server.
+>> >>
+>> >> The test result is:
+>> >>   10GB  326ms
+>> >>   20GB  699ms
+>> >>   30GB  1021ms
+>> >>   40GB  1387ms
+>> >>   50GB  1712ms
+>> >>   60GB  2034ms
+>> >>   70GB  2457ms
+>> >>   80GB  2807ms
+>> >>   90GB  3107ms
+>> >>   100GB 3474ms
+>> >>   110GB 3735ms
+>> >>   120GB 4064ms
+>> >>   130GB 4567ms
+>> >>   140GB 4886ms
+>> >>
+>> >> this will cause the guest os hang for a while when migration finished.
+>> >> So create a dedicated thread to release rdma resource.
+>> >>
+>> >> Signed-off-by: Lidong Chen <lidongchen@tencent.com>
+>> >> ---
+>> >>  migration/rdma.c | 21 +++++++++++++++++----
+>> >>  1 file changed, 17 insertions(+), 4 deletions(-)
+>> >>
+>> >> diff --git a/migration/rdma.c b/migration/rdma.c
+>> >> index dfa4f77..1b9e261 100644
+>> >> --- a/migration/rdma.c
+>> >> +++ b/migration/rdma.c
+>> >> @@ -2979,12 +2979,12 @@ static void qio_channel_rdma_set_aio_fd_handler(QIOChannel *ioc,
+>> >>      }
+>> >>  }
+>> >>
+>> >> -static int qio_channel_rdma_close(QIOChannel *ioc,
+>> >> -                                  Error **errp)
+>> >> +static void *qio_channel_rdma_close_thread(void *arg)
+>> >>  {
+>> >> -    QIOChannelRDMA *rioc = QIO_CHANNEL_RDMA(ioc);
+>> >> +    QIOChannelRDMA *rioc = arg;
+>> >>      RDMAContext *rdmain, *rdmaout;
+>> >> -    trace_qemu_rdma_close();
+>> >> +
+>> >> +    rcu_register_thread();
+>> >>
+>> >>      rdmain = rioc->rdmain;
+>> >>      if (rdmain) {
+>> >> @@ -3009,6 +3009,19 @@ static int qio_channel_rdma_close(QIOChannel *ioc,
+>> >>      g_free(rdmain);
+>> >>      g_free(rdmaout);
+>> >>
+>> >> +    rcu_unregister_thread();
+>> >> +    return NULL;
+>> >> +}
+>> >> +
+>> >> +static int qio_channel_rdma_close(QIOChannel *ioc,
+>> >> +                                  Error **errp)
+>> >> +{
+>> >> +    QemuThread t;
+>> >> +    QIOChannelRDMA *rioc = QIO_CHANNEL_RDMA(ioc);
+>> >> +    trace_qemu_rdma_close();
+>> >> +
+>> >> +    qemu_thread_create(&t, "rdma cleanup", qio_channel_rdma_close_thread,
+>> >> +                           rioc, QEMU_THREAD_DETACHED);
 >> >
->> > If the vCPU writing to the serial device and emulator thread are pinne=
-d
->> > to the same pCPU, it can also compromise the stability of the Guest OS=
-,
->> > as both threads will be competing for pCPU's time, with the vCPU
->> > actively polling the serial device and barely giving time to the
->> > emulator thread to make actual progress.
->> > ---
->> >  hw/char/serial.c | 1 +
->> >  1 file changed, 1 insertion(+)
+>> > I don't think this can be this simple; consider the lock in patch 4;
+>> > now that lock means qui_channel_rdma_close() can't be called in
+>> > parallel; but with this change it means:
 >> >
->> > diff --git a/hw/char/serial.c b/hw/char/serial.c
->> > index 2c080c9..f26e86b 100644
->> > --- a/hw/char/serial.c
->> > +++ b/hw/char/serial.c
->> > @@ -262,6 +262,7 @@ static void serial_xmit(SerialState *s)
->> >              /* in loopback mode, say that we just received a char */
->> >              serial_receive1(s, &s->tsr, 1);
->> >          } else if (qemu_chr_fe_write(&s->chr, &s->tsr, 1) !=3D 1 &&
->> > +                   errno !=3D EPIPE &&
->> >                     s->tsr_retry < MAX_XMIT_RETRY) {
+>> >
+>> >      f->lock
+>> >        qemu_thread_create  (1)
+>> >     !f->lock
+>> >      f->lock
+>> >        qemu_thread_create
+>> >     !f->lock
+>> >
+>> > so we don't really protect the thing you were trying to lock
 >>
->> Instead of adding explicit handling of EPIPE, shouldn't the code be
->> rewritten to treat -1 return && errno !=3D EAGAIN as fatal?
+>> yes, I should not use rioc as the thread arg.
+>>
+>> static int qio_channel_rdma_close(QIOChannel *ioc,
+>>                                   Error **errp)
+>> {
+>>     QemuThread t;
+>>     RDMAContext *rdma[2];
+>>     QIOChannelRDMA *rioc = QIO_CHANNEL_RDMA(ioc);
+>>
+>>     trace_qemu_rdma_close();
+>>     if (rioc->rdmain || rioc->rdmaout) {
+>>         rdma[0] =  rioc->rdmain;
+>>         rdma[1] =  rioc->rdmaout;
+>>         qemu_thread_create(&t, "rdma cleanup", qio_channel_rdma_close_thread,
+>>                            rdma, QEMU_THREAD_DETACHED);
+>>         rioc->rdmain = NULL;
+>>         rioc->rdmaout = NULL;
 >
-> What kind of action should it trigger if treating errno !=3D EAGAIN as fa=
-tal?
+> Is it safe to close both directions at once?
+> For example, if you get the close from the return path thread, might the
+> main thread be still using it's QEMUFile in the opposite direction;
+> it'll call close a little bit later?
 
-"fatal" was perhaps the wrong word. I mean that we don't go into the
-retry loop and treat the chardev as disconnected (without explicit
-handling of EPIPE).
+I use rcu to protect this.  qio_channel_rdma_close_thread call synchronize_rcu,
+it will wait until all other thread not access rdmain and rdmaout.
+
+And if the return patch close the qemu file, the migration thread qemu
+file will be set error soon
+because the QIOChannel is closed. QIOChannelSocket also work this way.
+
+
 
 >
-> If you meant something like calling 'abort()', I think that, while this
-> could be considered as the "correct" behavior, it's a bit unpractical
-> for the users. The most common situation for this to happen is
-> restarting virtlogd while having the console/serial redirected to it.
-> The VM will stop writing to the serial device, but otherwise the Guest
-> OS can probably keep working without any issues.
+> Dave
 >
-> Sergio.
-
-
-
---=20
-Marc-Andr=C3=A9 Lureau
+>>     }
+>>     return 0;
+>> }
+>>
+>> >
+>> > Dave
+>> >
+>> >>      return 0;
+>> >>  }
+>> >>
+>> >> --
+>> >> 1.8.3.1
+>> >>
+>> > --
+>> > Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> --
+> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
