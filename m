@@ -1,30 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40190)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40923)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1fOL8S-0001yn-Hr
-	for qemu-devel@nongnu.org; Thu, 31 May 2018 06:48:49 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1fOLA8-0002sk-Ow
+	for qemu-devel@nongnu.org; Thu, 31 May 2018 06:50:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1fOL8R-0004ek-BQ
-	for qemu-devel@nongnu.org; Thu, 31 May 2018 06:48:48 -0400
-Date: Thu, 31 May 2018 11:48:38 +0100
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20180531104838.GC27838@stefanha-x1.localdomain>
-References: <1514187226.13662.28.camel@intel.com>
-	<6e792b9f-2281-e8db-0410-c4c3468ffc90@redhat.com>
-	<20180508150309.GC4065@localhost.localdomain>
-	<20180509101618.GC19645@stefanha-x1.localdomain>
-	<d8a06161-d611-4f27-f4c8-f14370f191d4@redhat.com>
-	<20180510082659.GC1296@stefanha-x1.localdomain>
-	<20180511172531.GB5016@localhost.localdomain>
-	<20180514134846.GD5182@stefanha-x1.localdomain>
-	<20180530144450.GB5973@stefanha-x1.localdomain>
-	<20180530160719.GD4311@localhost.localdomain>
+	(envelope-from <peter.maydell@linaro.org>) id 1fOLA7-0006E2-Ed
+	for qemu-devel@nongnu.org; Thu, 31 May 2018 06:50:32 -0400
+Received: from mail-oi0-x243.google.com ([2607:f8b0:4003:c06::243]:37573)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1fOLA7-0006DH-5y
+	for qemu-devel@nongnu.org; Thu, 31 May 2018 06:50:31 -0400
+Received: by mail-oi0-x243.google.com with SMTP id l22-v6so11375148oib.4
+	for <qemu-devel@nongnu.org>; Thu, 31 May 2018 03:50:31 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="yVhtmJPUSI46BTXb"
-Content-Disposition: inline
-In-Reply-To: <20180530160719.GD4311@localhost.localdomain>
-Subject: Re: [Qemu-devel] [Qemu-block] Some question about savem/qcow2
- incremental snapshot
+In-Reply-To: <c7e4c537-2174-005b-fa15-0e8286e540ad@redhat.com>
+References: <20180521140402.23318-1-peter.maydell@linaro.org>
+	<20180521140402.23318-24-peter.maydell@linaro.org>
+	<c049f864-304d-f8ee-4b2f-1476a602be30@redhat.com>
+	<CAFEAcA_ErfYKnVrp=Dv9mNg55Y+=fFmg4eEMddGdMxUGVb9ztA@mail.gmail.com>
+	<530bef1b-a143-1566-3089-32629ab250b8@redhat.com>
+	<CAFEAcA94JAccGhbhSrBkTHUV+dLR-EvYQW_nuB9FodtLTDQPZw@mail.gmail.com>
+	<c7e4c537-2174-005b-fa15-0e8286e540ad@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 31 May 2018 11:50:10 +0100
+Message-ID: <CAFEAcA8p=PzfMbzbE6zQ-mAhP-vgvDRvPTjharRD76BFLyS_fA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH 23/27] hw/core/or-irq: Support more than 16
+ inputs to an OR gate
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,119 +35,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: Max Reitz <mreitz@redhat.com>, He Junyan <junyan.he@intel.com>, Pankaj Gupta <pagupta@redhat.com>, qemu-devel@nongnu.org, qemu block <qemu-block@nongnu.org>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-arm <qemu-arm@nongnu.org>, =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, "patches@linaro.org" <patches@linaro.org>, Richard Henderson <rth@twiddle.net>
 
+On 31 May 2018 at 11:21, Paolo Bonzini <pbonzini@redhat.com> wrote:
+> On 30/05/2018 19:35, Peter Maydell wrote:
+>> On 30 May 2018 at 17:59, Paolo Bonzini <pbonzini@redhat.com> wrote:
+>>> On 21/05/2018 17:02, Peter Maydell wrote:
+>>>> On 21 May 2018 at 15:34, Paolo Bonzini <pbonzini@redhat.com> wrote:
+>>>>> Why do the levels have to be migrated at all?  It should be enough if
+>>>>> the IRQ level is either migrated manually, or restored (e.g. in
+>>>>> post_save callbacks) through other data that is migrated.
+>>>> This is standard behaviour for devices: they track their
+>>>> inbound irq/gpio lines, and then that becomes internal state for
+>>>> them that must be migrated.
+>>>
+>>> But or_irq's input are another device's outbound lines, so tracking them
+>>> should not be necessary.  The other device would do it for or_irq.
+>>
+>> There's no mechanism in qemu_irq for the destination end to ask
+>> the source end about its current value. The information flow
+>> is strictly one-way.
+>
+> On postload, the source must call qemu_set_irq and that will cause an
+> update of the or_irq, won't it?
 
---yVhtmJPUSI46BTXb
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+No, calling qemu_set_irq in postload is a bug. (You don't know
+which order the state of the source and destination devices is
+restored, so asserting a signal in postload would have different
+effects depending on whether the destination had already had
+its state restored or not.) The system design relies on each
+device keeping track of (and migrating) the state of the input
+lines it cares about.
 
-On Wed, May 30, 2018 at 06:07:19PM +0200, Kevin Wolf wrote:
-> Am 30.05.2018 um 16:44 hat Stefan Hajnoczi geschrieben:
-> > On Mon, May 14, 2018 at 02:48:47PM +0100, Stefan Hajnoczi wrote:
-> > > On Fri, May 11, 2018 at 07:25:31PM +0200, Kevin Wolf wrote:
-> > > > Am 10.05.2018 um 10:26 hat Stefan Hajnoczi geschrieben:
-> > > > > On Wed, May 09, 2018 at 07:54:31PM +0200, Max Reitz wrote:
-> > > > > > On 2018-05-09 12:16, Stefan Hajnoczi wrote:
-> > > > > > > On Tue, May 08, 2018 at 05:03:09PM +0200, Kevin Wolf wrote:
-> > > > > > >> Am 08.05.2018 um 16:41 hat Eric Blake geschrieben:
-> > > > > > >>> On 12/25/2017 01:33 AM, He Junyan wrote:
-> > > > > > >> I think it makes sense to invest some effort into such inter=
-faces, but
-> > > > > > >> be prepared for a long journey.
-> > > > > > >=20
-> > > > > > > I like the suggestion but it needs to be followed up with a c=
-oncrete
-> > > > > > > design that is feasible and fair for Junyan and others to imp=
-lement.
-> > > > > > > Otherwise the "long journey" is really just a way of rejectin=
-g this
-> > > > > > > feature.
-> >=20
-> > The discussion on NVDIMM via the block layer has runs its course.  It
-> > would be a big project and I don't think it's fair to ask Junyan to
-> > implement it.
-> >=20
-> > My understanding is this patch series doesn't modify the qcow2 on-disk
-> > file format.  Rather, it just uses existing qcow2 mechanisms and extends
-> > live migration to identify the NVDIMM state state region to share the
-> > clusters.
-> >=20
-> > Since this feature does not involve qcow2 format changes and is just an
-> > optimization (dirty blocks still need to be allocated), it can be
-> > removed from QEMU in the future if a better alternative becomes
-> > available.
-> >=20
-> > Junyan: Can you rebase the series and send a new revision?
-> >=20
-> > Kevin and Max: Does this sound alright?
->=20
-> Do patches exist? I've never seen any, so I thought this was just the
-> early design stage.
-
-Sorry for the confusion, the earlier patch series was here:
-
-  https://lists.nongnu.org/archive/html/qemu-devel/2018-03/msg04530.html
-
-> I suspect that while it wouldn't change the qcow2 on-disk format in a
-> way that the qcow2 spec would have to be change, it does need to change
-> the VMState format that is stored as a blob within the qcow2 file.
-> At least, you need to store which other snapshot it is based upon so
-> that you can actually resume a VM from the incremental state.
->=20
-> Once you modify the VMState format/the migration stream, removing it
-> from QEMU again later means that you can't load your old snapshots any
-> more. Doing that, even with the two-release deprecation period, would be
-> quite nasty.
->=20
-> But you're right, depending on how the feature is implemented, it might
-> not be a thing that affects qcow2 much, but one that the migration
-> maintainers need to have a look at. I kind of suspect that it would
-> actually touch both parts to a degree that it would need approval from
-> both sides.
-
-VMState wire format changes are minimal.  The only issue is that the
-previous snapshot's nvdimm vmstate can start at an arbitrary offset in
-the qcow2 cluster.  We can find a solution to the misalignment problem
-(I think Junyan's patch series adds padding).
-
-The approach references existing clusters in the previous snapshot's
-vmstate area and only allocates new clusters for dirty NVDIMM regions.
-In the non-qcow2 case we fall back to writing the entire NVDIMM
-contents.
-
-So instead of:
-
-  write(qcow2_bs, all_vmstate_data); /* duplicates nvdimm contents :( */
-
-do:
-
-  write(bs, vmstate_data_upto_nvdimm);
-  if (is_qcow2(bs)) {
-      snapshot_clone_vmstate_range(bs, previous_snapshot,
-                                   offset_to_nvdimm_vmstate);
-      overwrite_nvdimm_dirty_blocks(bs, nvdimm);
-  } else {
-      write(bs, nvdimm_vmstate_data);
-  }
-  write(bs, vmstate_data_after_nvdimm);
-
-Stefan
-
---yVhtmJPUSI46BTXb
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJbD9MGAAoJEJykq7OBq3PI4J4IALTMv71zMrVFXmnv15BOOERz
-Lnau2dSUYRf9pvG1gX1Qr4+i5MoXdunD1iPuVgl8zjegmd9xieuflpNgz+WD1t2Z
-xVrBeHByhMDQg3kxI0S3mvZ20J1m6UqTckKIAvW/bIQsspxVO9JinkH5tb7GyWNk
-8z5llMtpym2MC7UBNgFyHiX+sQfu8tF4IgzwjJqJxWd8H0ZWhpV3HwfkeuOO91FM
-cy8DtpZDjRq9KigSSJb/mYYPN6Uua3EZYZBwC8v1GtiB9puiEXJxVaTw5PEn6Ma7
-SCgsEAjsUIwLaSX9qOK7EvA4SxqU6d/IUPNstb6L3z3JwEmofmBKzPVNmLVvdAc=
-=e/4G
------END PGP SIGNATURE-----
-
---yVhtmJPUSI46BTXb--
+thanks
+-- PMM
