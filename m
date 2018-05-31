@@ -1,21 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44814)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45336)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1fOLL5-000192-BP
-	for qemu-devel@nongnu.org; Thu, 31 May 2018 07:01:52 -0400
+	(envelope-from <stefanha@gmail.com>) id 1fOLMa-0001sw-Eu
+	for qemu-devel@nongnu.org; Thu, 31 May 2018 07:03:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1fOLL4-0008Bm-Ez
-	for qemu-devel@nongnu.org; Thu, 31 May 2018 07:01:51 -0400
-References: <1527736557-11084-1-git-send-email-zhaoshenglong@huawei.com>
-	<1527736557-11084-2-git-send-email-zhaoshenglong@huawei.com>
-From: Auger Eric <eric.auger@redhat.com>
-Message-ID: <e7bb1cbd-7fad-5bd2-641c-885f0f473680@redhat.com>
-Date: Thu, 31 May 2018 13:01:42 +0200
+	(envelope-from <stefanha@gmail.com>) id 1fOLMW-0000sc-Dd
+	for qemu-devel@nongnu.org; Thu, 31 May 2018 07:03:24 -0400
+Received: from mail-wm0-x234.google.com ([2a00:1450:400c:c09::234]:39071)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1fOLMW-0000rM-5c
+	for qemu-devel@nongnu.org; Thu, 31 May 2018 07:03:20 -0400
+Received: by mail-wm0-x234.google.com with SMTP id f8-v6so53343952wmc.4
+	for <qemu-devel@nongnu.org>; Thu, 31 May 2018 04:03:20 -0700 (PDT)
+Date: Thu, 31 May 2018 12:03:17 +0100
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20180531110317.GG27838@stefanha-x1.localdomain>
+References: <20180515091356.24106-1-peterx@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <1527736557-11084-2-git-send-email-zhaoshenglong@huawei.com>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v5 1/2] arm_gicv3_kvm:
- kvm_dist_get/put_priority: skip the registers banked by GICR_IPRIORITYR
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="EDJsL2R9iCFAt7IV"
+Content-Disposition: inline
+In-Reply-To: <20180515091356.24106-1-peterx@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH RFC] qemu-error: introduce error_report_once
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,63 +29,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Shannon Zhao <zhaoshenglong@huawei.com>, qemu-arm@nongnu.org
-Cc: peter.maydell@linaro.org, qemu-devel@nongnu.org, shannon.zhaosl@gmail.com, qemu-stable@nongnu.org
+To: Peter Xu <peterx@redhat.com>
+Cc: qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>
 
-Hi,
 
-On 05/31/2018 05:15 AM, Shannon Zhao wrote:
-> While for_each_dist_irq_reg loop starts from GIC_INTERNAL, it forgot to
-> offset the date array and index. This will overlap the GICR registers
-> value and leave the last GIC_INTERNAL irq's registers out of update.
-> 
-> Fixes: 367b9f527becdd20ddf116e17a3c0c2bbc486920
-> Cc: qemu-stable@nongnu.org
-> Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
-Reviewed-by: Eric Auger <eric.auger@redhat.com>
+--EDJsL2R9iCFAt7IV
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Thanks
+On Tue, May 15, 2018 at 05:13:56PM +0800, Peter Xu wrote:
+> I stole the printk_once() macro.
+>=20
+> I always wanted to be able to print some error directly if there is a
+> buffer to dump, however we can't use error_report() really quite often
+> when there can be any DDOS attack.  To avoid that, we can introduce a
+> print-once function for it.
 
-Eric
-> Signed-off-by: Shannon Zhao <zhaoshenglong@huawei.com>
-> ---
->  hw/intc/arm_gicv3_kvm.c | 18 ++++++++++++++++--
->  1 file changed, 16 insertions(+), 2 deletions(-)
-> 
-> diff --git a/hw/intc/arm_gicv3_kvm.c b/hw/intc/arm_gicv3_kvm.c
-> index 3536795..147e691 100644
-> --- a/hw/intc/arm_gicv3_kvm.c
-> +++ b/hw/intc/arm_gicv3_kvm.c
-> @@ -135,7 +135,14 @@ static void kvm_dist_get_priority(GICv3State *s, uint32_t offset, uint8_t *bmp)
->      uint32_t reg, *field;
->      int irq;
->  
-> -    field = (uint32_t *)bmp;
-> +    /* For the KVM GICv3, affinity routing is always enabled, and the first 8
-> +     * GICD_IPRIORITYR<n> registers are always RAZ/WI. The corresponding
-> +     * functionality is replaced by GICR_IPRIORITYR<n>. It doesn't need to
-> +     * sync them. So it needs to skip the field of GIC_INTERNAL irqs in bmp and
-> +     * offset.
-> +     */
-> +    field = (uint32_t *)(bmp + GIC_INTERNAL);
-> +    offset += (GIC_INTERNAL * 8) / 8;
->      for_each_dist_irq_reg(irq, s->num_irq, 8) {
->          kvm_gicd_access(s, offset, &reg, false);
->          *field = reg;
-> @@ -149,7 +156,14 @@ static void kvm_dist_put_priority(GICv3State *s, uint32_t offset, uint8_t *bmp)
->      uint32_t reg, *field;
->      int irq;
->  
-> -    field = (uint32_t *)bmp;
-> +    /* For the KVM GICv3, affinity routing is always enabled, and the first 8
-> +     * GICD_IPRIORITYR<n> registers are always RAZ/WI. The corresponding
-> +     * functionality is replaced by GICR_IPRIORITYR<n>. It doesn't need to
-> +     * sync them. So it needs to skip the field of GIC_INTERNAL irqs in bmp and
-> +     * offset.
-> +     */
-> +    field = (uint32_t *)(bmp + GIC_INTERNAL);
-> +    offset += (GIC_INTERNAL * 8) / 8;
->      for_each_dist_irq_reg(irq, s->num_irq, 8) {
->          reg = *field;
->          kvm_gicd_access(s, offset, &reg, true);
-> 
+I like the idea.  It solves the problem of guest-triggerable error
+messages that we should know about for troubleshooting but can't due to
+DoS.
+
+Stefan
+
+--EDJsL2R9iCFAt7IV
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJbD9Z1AAoJEJykq7OBq3PIdswIAKARIctPLsphyrSXRSAzSC+V
+uFN2KOmoM2+aQra0jGZKyQi1im5APcY1XiEKwoSRzxYzOVeH3a1/VN3Dy54/89tZ
+uF2oxkPVc6PuT1fOIRjHFH9LyGQ77lO7/5pZD0n5srl11wAuwSaql0RHChZlWwR6
+0skfyBIRDa/n0dEmNl3jZKIIzttGi4mT6BzCGIj8KfwDmw8zwwKuZpTNIpbaoqHq
+1uG32LKfmvetht6Xb9XOQ6M1KUoqYV1zbgBocf4YquQQhb7VR46pH35wPAL1cdma
+kvNxeiVf2XggbSUNL0SAYCdLtRhNy6ax5Mc0Pdeq6reO38M31chuonhu2wIrIow=
+=Ccr0
+-----END PGP SIGNATURE-----
+
+--EDJsL2R9iCFAt7IV--
