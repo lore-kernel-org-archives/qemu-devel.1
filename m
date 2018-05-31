@@ -1,28 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56780)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57954)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1fOLkM-0000Ta-TF
-	for qemu-devel@nongnu.org; Thu, 31 May 2018 07:28:00 -0400
+	(envelope-from <eric.auger@redhat.com>) id 1fOLpH-0002XX-4t
+	for qemu-devel@nongnu.org; Thu, 31 May 2018 07:33:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1fOLkJ-00056S-Nj
-	for qemu-devel@nongnu.org; Thu, 31 May 2018 07:27:58 -0400
-Received: from 2.mo4.mail-out.ovh.net ([46.105.72.36]:39086)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1fOLkJ-0004zD-F4
-	for qemu-devel@nongnu.org; Thu, 31 May 2018 07:27:55 -0400
-Received: from player692.ha.ovh.net (unknown [10.109.122.84])
-	by mo4.mail-out.ovh.net (Postfix) with ESMTP id B3B5A17C210
-	for <qemu-devel@nongnu.org>; Thu, 31 May 2018 13:27:44 +0200 (CEST)
-Date: Thu, 31 May 2018 13:27:33 +0200
-From: Greg Kurz <groug@kaod.org>
-Message-ID: <20180531132733.5e3eca33@bahia.lan>
-In-Reply-To: <1a47f19a-1791-da8a-d9ad-abe4c1e8e1ce@kaod.org>
-References: <20180530144217.8959-1-joel@jms.id.au>
-	<1a47f19a-1791-da8a-d9ad-abe4c1e8e1ce@kaod.org>
+	(envelope-from <eric.auger@redhat.com>) id 1fOLpF-0000HK-Hr
+	for qemu-devel@nongnu.org; Thu, 31 May 2018 07:33:03 -0400
+References: <1527736557-11084-1-git-send-email-zhaoshenglong@huawei.com>
+	<1527736557-11084-3-git-send-email-zhaoshenglong@huawei.com>
+From: Auger Eric <eric.auger@redhat.com>
+Message-ID: <590c8365-3a31-88b7-2cfb-23f9ecfa5916@redhat.com>
+Date: Thu, 31 May 2018 13:32:52 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH] target/ppc: Allow privileged
- access to SPR_PCR
+In-Reply-To: <1527736557-11084-3-git-send-email-zhaoshenglong@huawei.com>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v5 2/2] arm_gicv3_kvm: kvm_dist_get/put:
+ skip the registers banked by GICR
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,131 +24,231 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?B?Q8OpZHJpYw==?= Le Goater <clg@kaod.org>
-Cc: Joel Stanley <joel@jms.id.au>, David Gibson <david@gibson.dropbear.id.au>, Alexander Graf <agraf@suse.de>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Michael Neuling <mikey@neuling.org>, Michael Ellerman <mpe@ellerman.id.au>
+To: Shannon Zhao <zhaoshenglong@huawei.com>, qemu-arm@nongnu.org
+Cc: peter.maydell@linaro.org, qemu-stable@nongnu.org, qemu-devel@nongnu.org, shannon.zhaosl@gmail.com
 
-On Thu, 31 May 2018 09:38:10 +0200
-C=C3=A9dric Le Goater <clg@kaod.org> wrote:
+Hi,
 
-> On 05/30/2018 04:42 PM, Joel Stanley wrote:
-> > The powerpc Linux kernel[1] and skiboot firmware[2] recently gained cha=
-nges
-> > that cause the Processor Compatibility Register (PCR) SPR to be cleared.
-> >=20
-> > These changes cause Linux to fail to boot on the Qemu powernv machine
-> > with an error:
-> >=20
-> >  Trying to write privileged spr 338 (0x152) at 0000000030017f0c
-> >=20
-> > With this patch Qemu makes this register available as a hypervisor
-> > privileged register.
-> >=20
-> > Note that bits set in this register disable features of the processor.
-> > Currently the only register state that is supported is when the register
-> > is zeroed (enable all features). This is sufficient for guests to
-> > once again boot.
-> >=20
-> > [1] https://lkml.kernel.org/r/20180518013742.24095-1-mikey@neuling.org
-> > [2] https://patchwork.ozlabs.org/patch/915932/
-> >=20
-> > Signed-off-by: Joel Stanley <joel@jms.id.au>
-> > ---
-> >  target/ppc/helper.h             |  1 +
-> >  target/ppc/misc_helper.c        | 10 ++++++++++
-> >  target/ppc/translate_init.inc.c |  9 +++++++--
-> >  3 files changed, 18 insertions(+), 2 deletions(-)
-> >=20
-> > diff --git a/target/ppc/helper.h b/target/ppc/helper.h
-> > index 19453c68138a..d751f0e21909 100644
-> > --- a/target/ppc/helper.h
-> > +++ b/target/ppc/helper.h
-> > @@ -17,6 +17,7 @@ DEF_HELPER_2(pminsn, void, env, i32)
-> >  DEF_HELPER_1(rfid, void, env)
-> >  DEF_HELPER_1(hrfid, void, env)
-> >  DEF_HELPER_2(store_lpcr, void, env, tl)
-> > +DEF_HELPER_2(store_pcr, void, env, tl)
-> >  #endif
-> >  DEF_HELPER_1(check_tlb_flush_local, void, env)
-> >  DEF_HELPER_1(check_tlb_flush_global, void, env)
-> > diff --git a/target/ppc/misc_helper.c b/target/ppc/misc_helper.c
-> > index 8c8cba5cc6f1..40c39d08ad14 100644
-> > --- a/target/ppc/misc_helper.c
-> > +++ b/target/ppc/misc_helper.c
-> > @@ -20,6 +20,7 @@
-> >  #include "cpu.h"
-> >  #include "exec/exec-all.h"
-> >  #include "exec/helper-proto.h"
-> > +#include "qemu/error-report.h"
-> > =20
-> >  #include "helper_regs.h"
-> > =20
-> > @@ -186,6 +187,15 @@ void ppc_store_msr(CPUPPCState *env, target_ulong =
-value)
-> >      hreg_store_msr(env, value, 0);
-> >  }
-> > =20
-> > +void helper_store_pcr(CPUPPCState *env, target_ulong value)
-> > +{
-> > +    if (value !=3D 0) {
-> > +        error_report("Unimplemented PCR value 0x"TARGET_FMT_lx, value);
-> > +        return;
-> > +    }
-> > +    env->spr[SPR_PCR] =3D value; =20
->=20
-> shouldn't we use pcc->pcr_mask ? and check pcc->pcr_supported also ?=20
->=20
+On 05/31/2018 05:15 AM, Shannon Zhao wrote:
+> While we skip the GIC_INTERNAL irqs, we don't change the register offset
+> accordingly. This will overlap the GICR registers value and leave the
+> last GIC_INTERNAL irq's registers out of update.
+> 
+> Fix this by skipping the registers banked by GICR.
+> 
+> Also for migration compatibility if the migration source (old version
+> qemu) doesn't send gicd_no_migration_shift_bug = 1 to destination, then
+> we shift the data of PPI to get the right data for SPI.
+> 
+> Fixes: 367b9f527becdd20ddf116e17a3c0c2bbc486920
+> Cc: qemu-stable@nongnu.org
+> Signed-off-by: Shannon Zhao <zhaoshenglong@huawei.com>
 
-pcc->pcr_mask and ppc->pcr_supported only make sense for pseries machine
-types (ie, when the spapr machine code call ppc_*_compat() functions).
+> ---
+>  hw/intc/arm_gicv3_common.c         | 79 ++++++++++++++++++++++++++++++++++++++
+>  hw/intc/arm_gicv3_kvm.c            | 38 ++++++++++++++++++
+>  include/hw/intc/arm_gicv3_common.h |  1 +
+>  3 files changed, 118 insertions(+)
+> 
+> diff --git a/hw/intc/arm_gicv3_common.c b/hw/intc/arm_gicv3_common.c
+> index 7b54d52..68211a2 100644
+> --- a/hw/intc/arm_gicv3_common.c
+> +++ b/hw/intc/arm_gicv3_common.c
+> @@ -27,6 +27,7 @@
+>  #include "hw/intc/arm_gicv3_common.h"
+>  #include "gicv3_internal.h"
+>  #include "hw/arm/linux-boot-if.h"
+> +#include "sysemu/kvm.h"
+>  
+>  static int gicv3_pre_save(void *opaque)
+>  {
+> @@ -141,6 +142,79 @@ static const VMStateDescription vmstate_gicv3_cpu = {
+>      }
+>  };
+>  
+> +static int gicv3_gicd_no_migration_shift_bug_pre_load(void *opaque)
+> +{
+> +    GICv3State *cs = opaque;
+> +
+> +   /*
+> +    * The gicd_no_migration_shift_bug flag is used for migration compatibilty
+nit: compatibility
+> +    * for old version QEMU which may have the GICD bmp shift bug under KVM mode.
+> +    * Strictly, what we want to know is whether the migration source is using
+> +    * KVM. Since we don't have any way to determine that, we look at whether the
+> +    * destination is using KVM; this is close enough because for the older QEMU
+> +    * versions with this bug KVM -> TCG migration didn't work anyway. If the
+> +    * source is a newer QEMU without this bug it will transmit the migration
+> +    * subsection which sets the flag to true; otherwise it will remain set to
+> +    * the value we select here.
+> +    */
+> +    if (kvm_enabled()) {
+> +        cs->gicd_no_migration_shift_bug = false;
+> +    }
+> +
+> +    return 0;
+> +}
+> +
+> +static int gicv3_gicd_no_migration_shift_bug_post_load(void *opaque,
+> +                                                       int version_id)
+> +{
+> +    GICv3State *cs = opaque;
+> +
+> +    if (cs->gicd_no_migration_shift_bug) {
+> +        return 0;
+> +    }
+> +
+> +    /* Older versions of QEMU had a bug in the handling of state save/restore
+> +     * to the KVM GICv3: they got the offset in the bitmap arrays wrong,
+> +     * so that instead of the data for external interrupts 32 and up
+> +     * starting at bit position 32 in the bitmap, it started at bit
+> +     * position 64. If we're receiving data from a QEMU with that bug,
+> +     * we must move the data down into the right place.
+> +     */
+> +    memmove(cs->group, (uint8_t *)cs->group + GIC_INTERNAL / 8,
+> +            sizeof(cs->group) - GIC_INTERNAL / 8);
+> +    memmove(cs->grpmod, (uint8_t *)cs->grpmod + GIC_INTERNAL / 8,
+> +            sizeof(cs->grpmod) - GIC_INTERNAL / 8);
+> +    memmove(cs->enabled, (uint8_t *)cs->enabled + GIC_INTERNAL / 8,
+> +            sizeof(cs->enabled) - GIC_INTERNAL / 8);
+> +    memmove(cs->pending, (uint8_t *)cs->pending + GIC_INTERNAL / 8,
+> +            sizeof(cs->pending) - GIC_INTERNAL / 8);
+> +    memmove(cs->active, (uint8_t *)cs->active + GIC_INTERNAL / 8,
+> +            sizeof(cs->active) - GIC_INTERNAL / 8);
+> +    memmove(cs->edge_trigger, (uint8_t *)cs->edge_trigger + GIC_INTERNAL / 8,
+> +            sizeof(cs->edge_trigger) - GIC_INTERNAL / 8);
+> +
+> +    /*
+> +     * While this new version QEMU doesn't have this kind of bug as we fix it,
+> +     * so it's need to set the flag to true to indicate that and it's neccessary
+nit: it needs, necessary
+> +     * for next migration to work from this new version QEMU.
+> +     */
+> +    cs->gicd_no_migration_shift_bug = true;
+> +
+> +    return 0;
+> +}
+> +
+> +const VMStateDescription vmstate_gicv3_gicd_no_migration_shift_bug = {
+> +    .name = "arm_gicv3/gicd_no_migration_shift_bug",
+> +    .version_id = 1,
+> +    .minimum_version_id = 1,
+> +    .pre_load = gicv3_gicd_no_migration_shift_bug_pre_load,
+> +    .post_load = gicv3_gicd_no_migration_shift_bug_post_load,
+> +    .fields = (VMStateField[]) {
+> +        VMSTATE_BOOL(gicd_no_migration_shift_bug, GICv3State),
+> +        VMSTATE_END_OF_LIST()
+> +    }
+> +};
+> +
+>  static const VMStateDescription vmstate_gicv3 = {
+>      .name = "arm_gicv3",
+>      .version_id = 1,
+> @@ -165,6 +239,10 @@ static const VMStateDescription vmstate_gicv3 = {
+>          VMSTATE_STRUCT_VARRAY_POINTER_UINT32(cpu, GICv3State, num_cpu,
+>                                               vmstate_gicv3_cpu, GICv3CPUState),
+>          VMSTATE_END_OF_LIST()
+> +    },
+> +    .subsections = (const VMStateDescription * []) {
+> +        &vmstate_gicv3_gicd_no_migration_shift_bug,
+> +        NULL
+>      }
+>  };
+>  
+> @@ -364,6 +442,7 @@ static void arm_gicv3_common_reset(DeviceState *dev)
+>              gicv3_gicd_group_set(s, i);
+>          }
+>      }
+> +    s->gicd_no_migration_shift_bug = true;
+>  }
+>  
+>  static void arm_gic_common_linux_init(ARMLinuxBootIf *obj,
+> diff --git a/hw/intc/arm_gicv3_kvm.c b/hw/intc/arm_gicv3_kvm.c
+> index 147e691..001d82b 100644
+> --- a/hw/intc/arm_gicv3_kvm.c
+> +++ b/hw/intc/arm_gicv3_kvm.c
+> @@ -178,6 +178,14 @@ static void kvm_dist_get_edge_trigger(GICv3State *s, uint32_t offset,
+>      uint32_t reg;
+>      int irq;
+>  
+> +    /* For the KVM GICv3, affinity routing is always enabled, and the first 2
+> +     * GICD_ICFGR<n> registers are always RAZ/WI. The corresponding
+> +     * functionality is replaced by GICR_ICFGR<n>. It doesn't need to sync
+> +     * them. So it should increase the offset to skip GIC_INTERNAL irqs.
+> +     * This matches the for_each_dist_irq_reg() macro which also skips the
+> +     * first GIC_INTERNAL irqs.
+> +     */
+> +    offset += (GIC_INTERNAL * 2) / 8;
+>      for_each_dist_irq_reg(irq, s->num_irq, 2) {
+>          kvm_gicd_access(s, offset, &reg, false);
+>          reg = half_unshuffle32(reg >> 1);
+> @@ -195,6 +203,14 @@ static void kvm_dist_put_edge_trigger(GICv3State *s, uint32_t offset,
+>      uint32_t reg;
+>      int irq;
+>  
+> +    /* For the KVM GICv3, affinity routing is always enabled, and the first 2
+> +     * GICD_ICFGR<n> registers are always RAZ/WI. The corresponding
+> +     * functionality is replaced by GICR_ICFGR<n>. It doesn't need to sync
+> +     * them. So it should increase the offset to skip GIC_INTERNAL irqs.
+> +     * This matches the for_each_dist_irq_reg() macro which also skips the
+> +     * first GIC_INTERNAL irqs.
+> +     */
+> +    offset += (GIC_INTERNAL * 2) / 8;
+>      for_each_dist_irq_reg(irq, s->num_irq, 2) {
+>          reg = *gic_bmp_ptr32(bmp, irq);
+>          if (irq % 32 != 0) {
+> @@ -236,6 +252,15 @@ static void kvm_dist_getbmp(GICv3State *s, uint32_t offset, uint32_t *bmp)
+>      uint32_t reg;
+>      int irq;
+>  
+> +    /* For the KVM GICv3, affinity routing is always enabled, and the
+> +     * GICD_IGROUPR0/GICD_IGRPMODR0/GICD_ISENABLER0/GICD_ISPENDR0/
+> +     * GICD_ISACTIVER0 registers are always RAZ/WI. The corresponding
+> +     * functionality is replaced by the GICR registers. It doesn't need to sync
+> +     * them. So it should increase the offset to skip GIC_INTERNAL irqs.
+> +     * This matches the for_each_dist_irq_reg() macro which also skips the
+> +     * first GIC_INTERNAL irqs.
+> +     */
+> +    offset += (GIC_INTERNAL * 1) / 8;
+>      for_each_dist_irq_reg(irq, s->num_irq, 1) {
+>          kvm_gicd_access(s, offset, &reg, false);
+>          *gic_bmp_ptr32(bmp, irq) = reg;
+> @@ -249,6 +274,19 @@ static void kvm_dist_putbmp(GICv3State *s, uint32_t offset,
+>      uint32_t reg;
+>      int irq;
+>  
+> +    /* For the KVM GICv3, affinity routing is always enabled, and the
+> +     * GICD_IGROUPR0/GICD_IGRPMODR0/GICD_ISENABLER0/GICD_ISPENDR0/
+> +     * GICD_ISACTIVER0 registers are always RAZ/WI. The corresponding
+> +     * functionality is replaced by the GICR registers. It doesn't need to sync
+> +     * them. So it should increase the offset to skip GIC_INTERNAL irqs.
+> +     * This matches the for_each_dist_irq_reg() macro which also skips the
+> +     * first GIC_INTERNAL irqs.
+> +     */
+> +    offset += (GIC_INTERNAL * 1) / 8;
+> +    if (clroffset != 0) {
+> +        clroffset += (1 * sizeof(uint32_t));
+> +    }
+> +
+>      for_each_dist_irq_reg(irq, s->num_irq, 1) {
+>          /* If this bitmap is a set/clear register pair, first write to the
+>           * clear-reg to clear all bits before using the set-reg to write
+> diff --git a/include/hw/intc/arm_gicv3_common.h b/include/hw/intc/arm_gicv3_common.h
+> index bccdfe1..d75b49d 100644
+> --- a/include/hw/intc/arm_gicv3_common.h
+> +++ b/include/hw/intc/arm_gicv3_common.h
+> @@ -217,6 +217,7 @@ struct GICv3State {
+>      uint32_t revision;
+>      bool security_extn;
+>      bool irq_reset_nonsecure;
+> +    bool gicd_no_migration_shift_bug;
+>  
+>      int dev_fd; /* kvm device fd if backed by kvm vgic support */
+>      Error *migration_blocker;
+> 
 
-The case here is different: we're running a fully emulated pnv machine,
-ie, PCR can only be set by mtspr() called within the pnv guest. But TCG
-doesn't implement the compatibility mode logic, ie, the CPU always run
-in "raw" mode, ie, we only support PCR =3D=3D 0, actually.
+Reviewed-by: Eric Auger <eric.auger@redhat.com>
 
-So, this patch looks good for me. I'm just not sure about what is
-causing the build break with patchew though...
+Thanks
 
-> C.
->=20
-> > +}
-> > +
-> >  /* This code is lifted from MacOnLinux. It is called whenever
-> >   * THRM1,2 or 3 is read an fixes up the values in such a way
-> >   * that will make MacOS not hang. These registers exist on some
-> > diff --git a/target/ppc/translate_init.inc.c b/target/ppc/translate_ini=
-t.inc.c
-> > index ab782cb32aaa..bebe6ec5333c 100644
-> > --- a/target/ppc/translate_init.inc.c
-> > +++ b/target/ppc/translate_init.inc.c
-> > @@ -456,6 +456,10 @@ static void spr_write_hid0_601(DisasContext *ctx, =
-int sprn, int gprn)
-> >      /* Must stop the translation as endianness may have changed */
-> >      gen_stop_exception(ctx);
-> >  }
-> > +static void spr_write_pcr(DisasContext *ctx, int sprn, int gprn)
-> > +{
-> > +    gen_helper_store_pcr(cpu_env, cpu_gpr[gprn]);
-> > +}
-> >  #endif
-> > =20
-> >  /* Unified bats */
-> > @@ -7957,11 +7961,12 @@ static void gen_spr_power6_common(CPUPPCState *=
-env)
-> >  #endif
-> >      /*
-> >       * Register PCR to report POWERPC_EXCP_PRIV_REG instead of
-> > -     * POWERPC_EXCP_INVAL_SPR.
-> > +     * POWERPC_EXCP_INVAL_SPR in userspace. Permit hypervisor access.
-> >       */
-> > -    spr_register(env, SPR_PCR, "PCR",
-> > +    spr_register_hv(env, SPR_PCR, "PCR",
-> >                   SPR_NOACCESS, SPR_NOACCESS,
-> >                   SPR_NOACCESS, SPR_NOACCESS,
-> > +                 &spr_read_generic, &spr_write_pcr,
-> >                   0x00000000);
-> >  }
-> > =20
-> >  =20
->=20
->=20
+Eric
