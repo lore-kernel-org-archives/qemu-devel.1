@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35059)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35231)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1fOTRF-0006JQ-TZ
-	for qemu-devel@nongnu.org; Thu, 31 May 2018 15:40:47 -0400
+	(envelope-from <eblake@redhat.com>) id 1fOTSc-0006vu-AK
+	for qemu-devel@nongnu.org; Thu, 31 May 2018 15:42:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1fOTRB-0005Aa-K2
-	for qemu-devel@nongnu.org; Thu, 31 May 2018 15:40:45 -0400
-Resent-Message-Id: <E1fOTRB-0005Aa-K2@eggs.gnu.org>
-Received: from sender-of-o51.zoho.com ([135.84.80.216]:21146)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1fOTRB-00058p-A3
-	for qemu-devel@nongnu.org; Thu, 31 May 2018 15:40:41 -0400
-In-Reply-To: <20180531192237.3994-1-samuel.thibault@ens-lyon.org>
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <152779560735.336.2516541604569112564@d39dc562802a>
+	(envelope-from <eblake@redhat.com>) id 1fOTSY-0006FF-8z
+	for qemu-devel@nongnu.org; Thu, 31 May 2018 15:42:10 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:45776 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1fOTSY-0006EY-4J
+	for qemu-devel@nongnu.org; Thu, 31 May 2018 15:42:06 -0400
+References: <20180531192237.3994-1-samuel.thibault@ens-lyon.org>
+	<20180531192237.3994-2-samuel.thibault@ens-lyon.org>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <fa8b7009-5bb1-fe4e-71eb-f9a7652973c3@redhat.com>
+Date: Thu, 31 May 2018 14:42:01 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Thu, 31 May 2018 12:40:08 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PULL 0/9] slirp updates
+In-Reply-To: <20180531192237.3994-2-samuel.thibault@ens-lyon.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PULL 1/9] slirp: Add domainname option to slirp's
+ DHCP server
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,65 +29,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: samuel.thibault@ens-lyon.org
-Cc: famz@redhat.com, qemu-devel@nongnu.org, stefanha@redhat.com, jan.kiszka@siemens.com
+To: Samuel Thibault <samuel.thibault@ens-lyon.org>, qemu-devel@nongnu.org
+Cc: jan.kiszka@siemens.com, Benjamin Drung <benjamin.drung@profitbricks.com>, stefanha@redhat.com
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
-c3NhZ2UtaWQ6IDIwMTgwNTMxMTkyMjM3LjM5OTQtMS1zYW11ZWwudGhpYmF1bHRAZW5zLWx5b24u
-b3JnClN1YmplY3Q6IFtRZW11LWRldmVsXSBbUFVMTCAwLzldIHNsaXJwIHVwZGF0ZXMKCj09PSBU
-RVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKCkJBU0U9YmFzZQpuPTEKdG90YWw9JChn
-aXQgbG9nIC0tb25lbGluZSAkQkFTRS4uIHwgd2MgLWwpCmZhaWxlZD0wCgpnaXQgY29uZmlnIC0t
-bG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMg
-VHJ1ZQpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5hbGdvcml0aG0gaGlzdG9ncmFtCgpjb21taXRz
-PSIkKGdpdCBsb2cgLS1mb3JtYXQ9JUggLS1yZXZlcnNlICRCQVNFLi4pIgpmb3IgYyBpbiAkY29t
-bWl0czsgZG8KICAgIGVjaG8gIkNoZWNraW5nIFBBVENIICRuLyR0b3RhbDogJChnaXQgbG9nIC1u
-IDEgLS1mb3JtYXQ9JXMgJGMpLi4uIgogICAgaWYgISBnaXQgc2hvdyAkYyAtLWZvcm1hdD1lbWFp
-bCB8IC4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgLTsgdGhlbgogICAgICAgIGZh
-aWxlZD0xCiAgICAgICAgZWNobwogICAgZmkKICAgIG49JCgobisxKSkKZG9uZQoKZXhpdCAkZmFp
-bGVkCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZmODc4MjE2
-NGQxZGVmN2Y0NGJkODg4NzEzMzg0CkZyb20gaHR0cHM6Ly9naXRodWIuY29tL3BhdGNoZXctcHJv
-amVjdC9xZW11CiAqIFtuZXcgdGFnXSAgICAgICAgICAgICAgIHBhdGNoZXcvMjAxODA1MzExOTIy
-MzcuMzk5NC0xLXNhbXVlbC50aGliYXVsdEBlbnMtbHlvbi5vcmcgLT4gcGF0Y2hldy8yMDE4MDUz
-MTE5MjIzNy4zOTk0LTEtc2FtdWVsLnRoaWJhdWx0QGVucy1seW9uLm9yZwpTd2l0Y2hlZCB0byBh
-IG5ldyBicmFuY2ggJ3Rlc3QnCjEwMGM3MDM1MDMgc2xpcnAvbmNzaTogYWRkIGNoZWNrc3VtIHN1
-cHBvcnQKNDFkYmE2NGRiYiBzbGlycC9uY3NpOiBhZGQgYSAiR2V0IFBhcmFtZXRlcnMiIHJlc3Bv
-bnNlCmIwZWVmMjllMWQgc2xpcnAvbmNzaTogZml4ICJHZXQgVmVyc2lvbiBJRCIgcGF5bG9hZCBs
-ZW5ndGgKOTcwNGFmMWM4YyBzbGlycDogU2VuZCB3aW5kb3cgdXBkYXRlcyB0byBndWVzdCBhZnRl
-ciB3aW5kb3cgd2FzIGNsb3NlZAowODI5YjI5ZGQxIG5ldC9zbGlycDogQ29udmVydCBhdG9pIHRv
-IHFlbXVfc3RydG9pIHRvIGFsbG93IGVycm9yIGNoZWNraW5nCmIyNWFiZDExNjMgc2xpcnAvZGVi
-dWc6IFByaW50IElQIGFkZHJlc3NlcyBpbiBodW1hbiByZWFkYWJsZSBmb3JtCmIzMzNlMzM1NTMg
-c2xpcnA6IGRpc2FibGUgTmFnbGUgaW4gaW5nb2luZyBjb25uZWN0aW9ucwpiNTUyM2I4NGEzIHNs
-aXJwOiBkaXNhYmxlIE5hZ2xlIGluIG91dGdvaW5nIGNvbm5lY3Rpb25zCjllY2FkODg4Mjggc2xp
-cnA6IEFkZCBkb21haW5uYW1lIG9wdGlvbiB0byBzbGlycCdzIERIQ1Agc2VydmVyCgo9PT0gT1VU
-UFVUIEJFR0lOID09PQpDaGVja2luZyBQQVRDSCAxLzk6IHNsaXJwOiBBZGQgZG9tYWlubmFtZSBv
-cHRpb24gdG8gc2xpcnAncyBESENQIHNlcnZlci4uLgpDaGVja2luZyBQQVRDSCAyLzk6IHNsaXJw
-OiBkaXNhYmxlIE5hZ2xlIGluIG91dGdvaW5nIGNvbm5lY3Rpb25zLi4uCkNoZWNraW5nIFBBVENI
-IDMvOTogc2xpcnA6IGRpc2FibGUgTmFnbGUgaW4gaW5nb2luZyBjb25uZWN0aW9ucy4uLgpFUlJP
-UjogY29kZSBpbmRlbnQgc2hvdWxkIG5ldmVyIHVzZSB0YWJzCiMyNDogRklMRTogc2xpcnAvc29j
-a2V0LmM6NzU3OgorXklvcHQgPSAxOyQKCkVSUk9SOiBjb2RlIGluZGVudCBzaG91bGQgbmV2ZXIg
-dXNlIHRhYnMKIzI1OiBGSUxFOiBzbGlycC9zb2NrZXQuYzo3NTg6CiteSXFlbXVfc2V0c29ja29w
-dChzLCBJUFBST1RPX1RDUCwgVENQX05PREVMQVksICZvcHQsIHNpemVvZihpbnQpKTskCgp0b3Rh
-bDogMiBlcnJvcnMsIDAgd2FybmluZ3MsIDggbGluZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBoYXMg
-c3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFy
-ZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVD
-S1BBVENIIGluIE1BSU5UQUlORVJTLgoKQ2hlY2tpbmcgUEFUQ0ggNC85OiBzbGlycC9kZWJ1Zzog
-UHJpbnQgSVAgYWRkcmVzc2VzIGluIGh1bWFuIHJlYWRhYmxlIGZvcm0uLi4KRVJST1I6IGNvZGUg
-aW5kZW50IHNob3VsZCBuZXZlciB1c2UgdGFicwojNDE6IEZJTEU6IHNsaXJwL3NvY2tldC5jOjcw
-NDoKK15JREVCVUdfQVJHKCJoYWRkciA9ICVzIiwgaW5ldF9udG9hKChzdHJ1Y3QgaW5fYWRkcil7
-LnNfYWRkciA9IGhhZGRyfSkpOyQKCkVSUk9SOiBjb2RlIGluZGVudCBzaG91bGQgbmV2ZXIgdXNl
-IHRhYnMKIzQ0OiBGSUxFOiBzbGlycC9zb2NrZXQuYzo3MDY6CiteSURFQlVHX0FSRygibGFkZHIg
-PSAlcyIsIGluZXRfbnRvYSgoc3RydWN0IGluX2FkZHIpey5zX2FkZHIgPSBsYWRkcn0pKTskCgp0
-b3RhbDogMiBlcnJvcnMsIDAgd2FybmluZ3MsIDI3IGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2gg
-aGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9y
-cwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUK
-Q0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCkNoZWNraW5nIFBBVENIIDUvOTogbmV0L3NsaXJw
-OiBDb252ZXJ0IGF0b2kgdG8gcWVtdV9zdHJ0b2kgdG8gYWxsb3cgZXJyb3IgY2hlY2tpbmcuLi4K
-Q2hlY2tpbmcgUEFUQ0ggNi85OiBzbGlycDogU2VuZCB3aW5kb3cgdXBkYXRlcyB0byBndWVzdCBh
-ZnRlciB3aW5kb3cgd2FzIGNsb3NlZC4uLgpDaGVja2luZyBQQVRDSCA3Lzk6IHNsaXJwL25jc2k6
-IGZpeCAiR2V0IFZlcnNpb24gSUQiIHBheWxvYWQgbGVuZ3RoLi4uCkNoZWNraW5nIFBBVENIIDgv
-OTogc2xpcnAvbmNzaTogYWRkIGEgIkdldCBQYXJhbWV0ZXJzIiByZXNwb25zZS4uLgpDaGVja2lu
-ZyBQQVRDSCA5Lzk6IHNsaXJwL25jc2k6IGFkZCBjaGVja3N1bSBzdXBwb3J0Li4uCj09PSBPVVRQ
-VVQgRU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgotLS0KRW1haWwg
-Z2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cDovL3BhdGNoZXcub3JnL10u
-ClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEByZWRoYXQuY29t
+On 05/31/2018 02:22 PM, Samuel Thibault wrote:
+> From: Benjamin Drung <benjamin.drung@profitbricks.com>
+> 
+> This patch will allow the user to include the domainname option in
+> replies from the built-in DHCP server.
+> 
+> Signed-off-by: Benjamin Drung <benjamin.drung@profitbricks.com>
+> Signed-off-by: Samuel Thibault <samuel.thibault@ens-lyon.org>
+> ---
+>   net/slirp.c      | 12 +++++++++---
+>   qapi/net.json    |  4 ++++
+>   qemu-options.hx  |  7 +++++--
+>   slirp/bootp.c    |  8 ++++++++
+>   slirp/libslirp.h |  2 +-
+>   slirp/slirp.c    |  4 +++-
+>   slirp/slirp.h    |  1 +
+>   7 files changed, 31 insertions(+), 7 deletions(-)
+
+> +++ b/qapi/net.json
+> @@ -160,6 +160,9 @@
+>   # @dnssearch: list of DNS suffixes to search, passed as DHCP option
+>   #             to the guest
+>   #
+> +# @domainname: guest-visible domain name of the virtual nameserver
+> +#              (since 2.12)
+
+This missed 2.12; we'll need a followup patch that updates it to 3.0.
+
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
