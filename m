@@ -1,25 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42819)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45177)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1fOOZf-00050g-2x
-	for qemu-devel@nongnu.org; Thu, 31 May 2018 10:29:08 -0400
+	(envelope-from <shannon.zhaosl@gmail.com>) id 1fOOgb-00028H-PZ
+	for qemu-devel@nongnu.org; Thu, 31 May 2018 10:36:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1fOOZa-0001SR-38
-	for qemu-devel@nongnu.org; Thu, 31 May 2018 10:29:07 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:38726 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1fOOZZ-0001S5-Ub
-	for qemu-devel@nongnu.org; Thu, 31 May 2018 10:29:02 -0400
-Date: Thu, 31 May 2018 15:28:56 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20180531142856.GA2936@work-vm>
-References: <1525918138-6189-1-git-send-email-junyan.he@gmx.com>
-	<20180531131858.GL27838@stefanha-x1.localdomain>
+	(envelope-from <shannon.zhaosl@gmail.com>) id 1fOOga-0006gC-JX
+	for qemu-devel@nongnu.org; Thu, 31 May 2018 10:36:17 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180531131858.GL27838@stefanha-x1.localdomain>
-Subject: Re: [Qemu-devel] [PATCH V5 0/9] nvdimm: guarantee persistence of
- QEMU writes to persistent memory
+In-Reply-To: <CAFEAcA-qWkhueUUnZ1RmhRuhHLstGpwmameHgsOM7UautJVxpw@mail.gmail.com>
+References: <1527736557-11084-1-git-send-email-zhaoshenglong@huawei.com>
+	<1527736557-11084-3-git-send-email-zhaoshenglong@huawei.com>
+	<CAFEAcA-qWkhueUUnZ1RmhRuhHLstGpwmameHgsOM7UautJVxpw@mail.gmail.com>
+From: Shannon Zhao <shannon.zhaosl@gmail.com>
+Date: Thu, 31 May 2018 22:36:08 +0800
+Message-ID: <CAOMwq8-H+iZ1L996G4jdky__zstwFo6x0qTucqLRstuXhs1CEA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v5 2/2] arm_gicv3_kvm: kvm_dist_get/put:
+ skip the registers banked by GICR
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,34 +24,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@gmail.com>
-Cc: junyan.he@gmx.com, qemu-devel@nongnu.org, Haozhong Zhang <haozhong.zhang@intel.com>, xiaoguangrong.eric@gmail.com, crosthwaite.peter@gmail.com, mst@redhat.com, ehabkost@redhat.com, quintela@redhat.com, Junyan He <junyan.he@intel.com>, stefanha@redhat.com, pbonzini@redhat.com, imammedo@redhat.com, rth@twiddle.net
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Shannon Zhao <zhaoshenglong@huawei.com>, qemu-arm <qemu-arm@nongnu.org>, Eric Auger <eric.auger@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, qemu-stable <qemu-stable@nongnu.org>
 
-* Stefan Hajnoczi (stefanha@gmail.com) wrote:
-> David Gilbert previously suggested a memory access interface.  I guess
-> it would look something like this:
-> 
->   typedef struct {
->       void (*memset)(void *s, int c, size_t n);
->       void (*memcpy)(void *dest, const void *src, size_t n);
->   } MemoryOperations;
-> 
-> That way code doesn't need if (pmem) A else B.  It can just do
-> mem_ops->foo().  Have you looked into this idea?
+2018-05-31 21:50 GMT+08:00 Peter Maydell <peter.maydell@linaro.org>:
 
-Yep, it really needs to be less invasive in the migration code;
-I think a set of ops like that would make it much less painful.
+> On 31 May 2018 at 04:15, Shannon Zhao <zhaoshenglong@huawei.com> wrote:
+> > While we skip the GIC_INTERNAL irqs, we don't change the register offset
+> > accordingly. This will overlap the GICR registers value and leave the
+> > last GIC_INTERNAL irq's registers out of update.
+> >
+> > Fix this by skipping the registers banked by GICR.
+> >
+> > Also for migration compatibility if the migration source (old version
+> > qemu) doesn't send gicd_no_migration_shift_bug = 1 to destination, then
+> > we shift the data of PPI to get the right data for SPI.
+> >
+> > Fixes: 367b9f527becdd20ddf116e17a3c0c2bbc486920
+> > Cc: qemu-stable@nongnu.org
+> > Signed-off-by: Shannon Zhao <zhaoshenglong@huawei.com>
+>
+> > +    /*
+> > +     * While this new version QEMU doesn't have this kind of bug as we
+> fix it,
+> > +     * so it's need to set the flag to true to indicate that and it's
+> neccessary
+> > +     * for next migration to work from this new version QEMU.
+> > +     */
+> > +    cs->gicd_no_migration_shift_bug = true;
+>
+> Nice catch; I would have forgotten that we needed to do this...
+>
+>
+> >
+> > +    /* For the KVM GICv3, affinity routing is always enabled, and the
+> > +     * GICD_IGROUPR0/GICD_IGRPMODR0/GICD_ISENABLER0/GICD_ISPENDR0/
+> > +     * GICD_ISACTIVER0 registers are always RAZ/WI. The corresponding
+> > +     * functionality is replaced by the GICR registers. It doesn't need
+> to sync
+> > +     * them. So it should increase the offset to skip GIC_INTERNAL irqs.
+> > +     * This matches the for_each_dist_irq_reg() macro which also skips
+> the
+> > +     * first GIC_INTERNAL irqs.
+> > +     */
+> > +    offset += (GIC_INTERNAL * 1) / 8;
+> > +    if (clroffset != 0) {
+> > +        clroffset += (1 * sizeof(uint32_t));
+> > +    }
+> > +
+>
+> Shouldn't we be adding the same thing to clroffset that we add to offset ?
+>
+> Yeah, right. It should like this
 
-> Also, there was a discussion about leaving the code unchanged but adding
-> an nvdimm_flush() call at the very end of migration.  I think someone
-> benchmarked it but can't find the email.  Please post a link or
-> summarize the results, because that approach would be much less
-> invasive.  Thanks!
+  clroffset += (GIC_INTERNAL * 1) / 8;
 
-Dave
+I don't remember why I didn't write this way. Anyway, Could you please fix
+this when you apply this patch or I send a new version?
 
-> Stefan
-
-
+Thanks,
 --
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+Shannon
