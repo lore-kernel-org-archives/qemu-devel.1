@@ -1,24 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38948)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39017)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1fOmtj-0002Xx-Lz
-	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 12:27:28 -0400
+	(envelope-from <mst@redhat.com>) id 1fOmto-0002dZ-8L
+	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 12:27:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1fOmth-0007XD-LE
-	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 12:27:26 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:59606 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1fOmth-0007Vy-Gn
-	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 12:27:25 -0400
-Date: Fri, 1 Jun 2018 19:27:24 +0300
+	(envelope-from <mst@redhat.com>) id 1fOmtl-0007aZ-4l
+	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 12:27:32 -0400
+Date: Fri, 1 Jun 2018 19:27:19 +0300
 From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20180601162620.32362-27-mst@redhat.com>
+Message-ID: <20180601162620.32362-24-mst@redhat.com>
 References: <20180601162620.32362-1-mst@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 In-Reply-To: <20180601162620.32362-1-mst@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 26/31] ui: use local path for local headers
+Subject: [Qemu-devel] [PULL 23/31] migration: use local path for local
+ headers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,71 +24,81 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Gerd Hoffmann <kraxel@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Juan Quintela <quintela@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Fam Zheng <famz@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-block@nongnu.org
 
 When pulling in headers that are in the same directory as the C file (as
 opposed to one in include/), we should use its relative path, without a
 directory.
 
 Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+Reviewed-by: Juan Quintela <quintela@redhat.com>
 ---
- ui/gtk.c          | 2 +-
- ui/input-keymap.c | 2 +-
- ui/input-legacy.c | 2 +-
- ui/spice-input.c  | 2 +-
- 4 files changed, 4 insertions(+), 4 deletions(-)
+ migration/block-dirty-bitmap.c | 2 +-
+ migration/page_cache.c         | 2 +-
+ migration/ram.c                | 4 ++--
+ migration/vmstate.c            | 2 +-
+ 4 files changed, 5 insertions(+), 5 deletions(-)
 
-diff --git a/ui/gtk.c b/ui/gtk.c
-index dbce970dc4..903f136b8f 100644
---- a/ui/gtk.c
-+++ b/ui/gtk.c
+diff --git a/migration/block-dirty-bitmap.c b/migration/block-dirty-bitmap.c
+index 8819aabe3a..eeccaff34b 100644
+--- a/migration/block-dirty-bitmap.c
++++ b/migration/block-dirty-bitmap.c
 @@ -66,7 +66,7 @@
- #define VC_SCALE_STEP   0.25
-=20
- #ifdef GDK_WINDOWING_X11
--#include "ui/x_keymap.h"
-+#include "x_keymap.h"
-=20
- /* Gtk2 compat */
- #ifndef GDK_IS_X11_DISPLAY
-diff --git a/ui/input-keymap.c b/ui/input-keymap.c
-index 3d4e66bab5..87cc301b7a 100644
---- a/ui/input-keymap.c
-+++ b/ui/input-keymap.c
-@@ -1,6 +1,6 @@
- #include "qemu/osdep.h"
- #include "sysemu/sysemu.h"
--#include "ui/keymaps.h"
-+#include "keymaps.h"
- #include "ui/input.h"
-=20
- #include "standard-headers/linux/input.h"
-diff --git a/ui/input-legacy.c b/ui/input-legacy.c
-index e5d4db1d97..549654e26a 100644
---- a/ui/input-legacy.c
-+++ b/ui/input-legacy.c
-@@ -26,7 +26,7 @@
- #include "qapi/qapi-commands-ui.h"
- #include "sysemu/sysemu.h"
- #include "ui/console.h"
--#include "ui/keymaps.h"
-+#include "keymaps.h"
- #include "ui/input.h"
-=20
- struct QEMUPutMouseEntry {
-diff --git a/ui/spice-input.c b/ui/spice-input.c
-index 3d41aa1831..a426c03b5e 100644
---- a/ui/spice-input.c
-+++ b/ui/spice-input.c
-@@ -23,7 +23,7 @@
+ #include "qemu/error-report.h"
+ #include "migration/misc.h"
+ #include "migration/migration.h"
+-#include "migration/qemu-file.h"
++#include "qemu-file.h"
+ #include "migration/vmstate.h"
+ #include "migration/register.h"
+ #include "qemu/hbitmap.h"
+diff --git a/migration/page_cache.c b/migration/page_cache.c
+index 96268c3aea..acc252b100 100644
+--- a/migration/page_cache.c
++++ b/migration/page_cache.c
+@@ -18,7 +18,7 @@
+ #include "qapi/error.h"
  #include "qemu-common.h"
- #include "ui/qemu-spice.h"
- #include "ui/console.h"
--#include "ui/keymaps.h"
-+#include "keymaps.h"
- #include "ui/input.h"
-=20
- /* keyboard bits */
---=20
+ #include "qemu/host-utils.h"
+-#include "migration/page_cache.h"
++#include "page_cache.h"
+ 
+ #ifdef DEBUG_CACHE
+ #define DPRINTF(fmt, ...) \
+diff --git a/migration/ram.c b/migration/ram.c
+index 5bcbf7a9f9..e7d6cf6492 100644
+--- a/migration/ram.c
++++ b/migration/ram.c
+@@ -41,7 +41,7 @@
+ #include "migration/misc.h"
+ #include "qemu-file.h"
+ #include "postcopy-ram.h"
+-#include "migration/page_cache.h"
++#include "page_cache.h"
+ #include "qemu/error-report.h"
+ #include "qapi/error.h"
+ #include "qapi/qapi-events-migration.h"
+@@ -51,7 +51,7 @@
+ #include "exec/target_page.h"
+ #include "qemu/rcu_queue.h"
+ #include "migration/colo.h"
+-#include "migration/block.h"
++#include "block.h"
+ #include "sysemu/sysemu.h"
+ #include "qemu/uuid.h"
+ #include "savevm.h"
+diff --git a/migration/vmstate.c b/migration/vmstate.c
+index 0b3282c9df..0a096360e2 100644
+--- a/migration/vmstate.c
++++ b/migration/vmstate.c
+@@ -14,7 +14,7 @@
+ #include "qemu-common.h"
+ #include "migration.h"
+ #include "migration/vmstate.h"
+-#include "migration/savevm.h"
++#include "savevm.h"
+ #include "qemu-file.h"
+ #include "qemu/bitops.h"
+ #include "qemu/error-report.h"
+-- 
 MST
