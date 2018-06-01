@@ -1,24 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58121)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58650)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fOmEh-0007P1-81
-	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 11:45:04 -0400
+	(envelope-from <eblake@redhat.com>) id 1fOmGk-0008Fz-Ad
+	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 11:47:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fOmEg-0000JU-9j
-	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 11:45:03 -0400
-References: <1527801443-30620-1-git-send-email-ari@tuxera.com>
-	<e890432c-cfb4-d933-c1a8-d571ac5687e8@redhat.com>
-	<8ccfcf94-2282-b56b-4b79-41c05551d26d@tuxera.com>
-	<582811be-f110-9045-1fb8-9bf186d6dd7b@redhat.com>
-	<e6bbc05d-eaf1-dffc-6f62-c8a5005189e2@tuxera.com>
+	(envelope-from <eblake@redhat.com>) id 1fOmGh-0001Ix-6P
+	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 11:47:10 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:58114 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1fOmGh-0001Ir-1q
+	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 11:47:07 -0400
+References: <20180601152746.17169-1-chen_han_xiao@126.com>
+	<20180601152746.17169-2-chen_han_xiao@126.com>
 From: Eric Blake <eblake@redhat.com>
-Message-ID: <6055b0e1-d073-e504-dd9f-1cf8e161ded0@redhat.com>
-Date: Fri, 1 Jun 2018 10:44:55 -0500
+Message-ID: <170dbd1b-19ad-5e8c-5f8d-2a32ebb47525@redhat.com>
+Date: Fri, 1 Jun 2018 10:47:04 -0500
 MIME-Version: 1.0
-In-Reply-To: <e6bbc05d-eaf1-dffc-6f62-c8a5005189e2@tuxera.com>
+In-Reply-To: <20180601152746.17169-2-chen_han_xiao@126.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 1/5] block: Add blklogwrites
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v5 1/2] qga: add mountpoint usage to
+ GuestFilesystemInfo
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,29 +29,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Ari Sundholm <ari@tuxera.com>, qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, Aapo Vienamo <aapo@tuxera.com>, Kevin Wolf <kwolf@redhat.com>
+To: Chen Hanxiao <chen_han_xiao@126.com>, qemu-devel@nongnu.org
+Cc: Michael Roth <mdroth@linux.vnet.ibm.com>, "=?UTF-8?Q?Daniel_P_._Berrang=c3=a9?=" <berrange@redhat.com>
 
-On 06/01/2018 10:15 AM, Ari Sundholm wrote:
-> Thank you.
-> 
-> I'll try to get a new, more proper version of the patchset out for 
-> review/comments next week. Sorry for the sloppiness in this first version!
+On 06/01/2018 10:27 AM, Chen Hanxiao wrote:
+> From: Chen Hanxiao <chenhanxiao@gmail.com>
+>=20
+> This patch adds support for getting the usage of mounted
+> filesystem.
+> The usage of fs stored as used_bytes and total_bytes.
+> It's very useful when we try to monitor guest's filesystem.
+>=20
+> Cc: Michael Roth <mdroth@linux.vnet.ibm.com>
+> Cc: Eric Blake <eblake@redhat.com>
+> Cc: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+> Signed-off-by: Chen Hanxiao <chenhanxiao@gmail.com>
+>=20
 
-Looking forward to it, even if, as Stefan pointed out, we can already do 
-everything by use of the existing quorum driver and a custom NBD server.
+> +++ b/qga/qapi-schema.json
+> @@ -840,12 +840,24 @@
+>              'bus-type': 'GuestDiskBusType',
+>              'bus': 'int', 'target': 'int', 'unit': 'int'} }
+>  =20
+> +##
+> +# @GuestFsUsage:
+> +#
+> +# @used-bytes:  file system used bytes
+> +# @total-bytes: file system total bytes for nonroot user
+> +#
+> +# Since: 3.0
+> +##
+> +{ 'struct': 'GuestFsUsage',
+> +  'data': {'used-bytes': 'uint64', 'total-bytes': 'uint64'} }
 
-And don't worry about the patch not being perfect the first time - 
-that's just a typical part of the review process.  Although unintended 
-on my end, I know that my reviews can be perceived as coming across 
-rather negatively, especially when I don't always remember to also 
-express my appreciation for the efforts you've already put into writing 
-a patch.  The community is always better when we remember to treat 
-newcomers (and long-time contributors) nicely, regardless of the outcome 
-of the patch review process; and the reason we review things is so that 
-however sloppy a first draft was, the final product is a lot better!
+That seems like pointless nesting on the wire, unless we have plans of=20
+reusing this type in other API calls.  Is it any easier...
 
--- 
+> +
+>   ##
+>   # @GuestFilesystemInfo:
+>   #
+>   # @name: disk name
+>   # @mountpoint: mount point path
+>   # @type: file system type string
+> +# @usage: file system usage struct (since 3.0)
+>   # @disk: an array of disk hardware information that the volume lies o=
+n,
+>   #        which may be empty if the disk type is not supported
+>   #
+> @@ -853,7 +865,7 @@
+>   ##
+>   { 'struct': 'GuestFilesystemInfo',
+>     'data': {'name': 'str', 'mountpoint': 'str', 'type': 'str',
+> -           'disk': ['GuestDiskAddress']} }
+> +           '*usage': 'GuestFsUsage', 'disk': ['GuestDiskAddress']} }
+
+...to just inline '*used-bytes' and '*total-bytes' here?
+
+--=20
 Eric Blake, Principal Software Engineer
 Red Hat, Inc.           +1-919-301-3266
 Virtualization:  qemu.org | libvirt.org
