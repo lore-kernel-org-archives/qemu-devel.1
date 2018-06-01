@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33275)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33282)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <keno@juliacomputing.com>) id 1fOYqs-0002wc-DH
+	(envelope-from <keno@juliacomputing.com>) id 1fOYqs-0002wm-Mq
 	for qemu-devel@nongnu.org; Thu, 31 May 2018 21:27:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <keno@juliacomputing.com>) id 1fOYqn-0002oi-LQ
+	(envelope-from <keno@juliacomputing.com>) id 1fOYqo-0002qE-T6
 	for qemu-devel@nongnu.org; Thu, 31 May 2018 21:27:34 -0400
-Received: from mail-qt0-x241.google.com ([2607:f8b0:400d:c0d::241]:40623)
+Received: from mail-qt0-x243.google.com ([2607:f8b0:400d:c0d::243]:37548)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <keno@juliacomputing.com>)
-	id 1fOYqn-0002oF-Fg
-	for qemu-devel@nongnu.org; Thu, 31 May 2018 21:27:29 -0400
-Received: by mail-qt0-x241.google.com with SMTP id h2-v6so30291358qtp.7
-	for <qemu-devel@nongnu.org>; Thu, 31 May 2018 18:27:29 -0700 (PDT)
+	id 1fOYqo-0002pr-OE
+	for qemu-devel@nongnu.org; Thu, 31 May 2018 21:27:30 -0400
+Received: by mail-qt0-x243.google.com with SMTP id q13-v6so30303423qtp.4
+	for <qemu-devel@nongnu.org>; Thu, 31 May 2018 18:27:30 -0700 (PDT)
 From: Keno Fischer <keno@juliacomputing.com>
-Date: Thu, 31 May 2018 21:25:56 -0400
-Message-Id: <1f6bc60305b8c1cd00f5e2a361a05d7b4bc56338.1527814874.git.keno@juliacomputing.com>
+Date: Thu, 31 May 2018 21:25:57 -0400
+Message-Id: <62bbed45cc9c775ba23cd5572e8cf2d77d769dfb.1527814874.git.keno@juliacomputing.com>
 In-Reply-To: <cover.1527814874.git.keno@juliacomputing.com>
 References: <cover.1527814874.git.keno@juliacomputing.com>
 In-Reply-To: <cover.1527814874.git.keno@juliacomputing.com>
 References: <cover.1527814874.git.keno@juliacomputing.com>
-Subject: [Qemu-devel] [PATCH v2 01/20] cutils: Provide strchrnul
+Subject: [Qemu-devel] [PATCH v2 02/20] 9p: proxy: Fix size passed to
+ `connect`
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,140 +32,40 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Keno Fischer <keno@juliacomputing.com>, groug@kaod.org
 
-strchrnul is a GNU extension and thus unavailable on a number of targets.
-In the review for a commit removing strchrnul from 9p, I was asked to
-create a qemu_strchrnul helper to factor out this functionality.
-Do so, and use it in a number of other places in the code base that inlined
-the replacement pattern in a place where strchrnul could be used.
+The size to pass to the `connect` call is the size of the entire
+`struct sockaddr_un`. Passing anything shorter than this causes errors
+on darwin.
 
 Signed-off-by: Keno Fischer <keno@juliacomputing.com>
 ---
 
 Changes since v1: New patch
 
- hw/9pfs/9p-local.c    |  2 +-
- include/qemu/cutils.h |  1 +
- monitor.c             |  8 ++------
- util/cutils.c         | 13 +++++++++++++
- util/qemu-option.c    |  6 +-----
- util/uri.c            |  6 ++----
- 6 files changed, 20 insertions(+), 16 deletions(-)
+ hw/9pfs/9p-proxy.c | 5 ++---
+ 1 file changed, 2 insertions(+), 3 deletions(-)
 
-diff --git a/hw/9pfs/9p-local.c b/hw/9pfs/9p-local.c
-index b37b1db..bcf2798 100644
---- a/hw/9pfs/9p-local.c
-+++ b/hw/9pfs/9p-local.c
-@@ -65,7 +65,7 @@ int local_open_nofollow(FsContext *fs_ctx, const char *path, int flags,
-         assert(*path != '/');
+diff --git a/hw/9pfs/9p-proxy.c b/hw/9pfs/9p-proxy.c
+index e2e0329..47a94e0 100644
+--- a/hw/9pfs/9p-proxy.c
++++ b/hw/9pfs/9p-proxy.c
+@@ -1088,7 +1088,7 @@ static int proxy_ioc_getversion(FsContext *fs_ctx, V9fsPath *path,
  
-         head = g_strdup(path);
--        c = strchrnul(path, '/');
-+        c = qemu_strchrnul(path, '/');
-         if (*c) {
-             /* Intermediate path element */
-             head[c - path] = 0;
-diff --git a/include/qemu/cutils.h b/include/qemu/cutils.h
-index a663340..bc40c30 100644
---- a/include/qemu/cutils.h
-+++ b/include/qemu/cutils.h
-@@ -122,6 +122,7 @@ int qemu_strnlen(const char *s, int max_len);
-  * Returns: the pointer originally in @input.
-  */
- char *qemu_strsep(char **input, const char *delim);
-+const char *qemu_strchrnul(const char *s, int c);
- time_t mktimegm(struct tm *tm);
- int qemu_fdatasync(int fd);
- int fcntl_setfl(int fd, int flag);
-diff --git a/monitor.c b/monitor.c
-index 922cfc0..e1f01c4 100644
---- a/monitor.c
-+++ b/monitor.c
-@@ -798,9 +798,7 @@ static int compare_cmd(const char *name, const char *list)
-     p = list;
-     for(;;) {
-         pstart = p;
--        p = strchr(p, '|');
--        if (!p)
--            p = pstart + strlen(pstart);
-+        p = qemu_strchrnul(p, '|');
-         if ((p - pstart) == len && !memcmp(pstart, name, len))
-             return 1;
-         if (*p == '\0')
-@@ -3401,9 +3399,7 @@ static void cmd_completion(Monitor *mon, const char *name, const char *list)
-     p = list;
-     for(;;) {
-         pstart = p;
--        p = strchr(p, '|');
--        if (!p)
--            p = pstart + strlen(pstart);
-+        p = qemu_strchrnul(p, '|');
-         len = p - pstart;
-         if (len > sizeof(cmd) - 2)
-             len = sizeof(cmd) - 2;
-diff --git a/util/cutils.c b/util/cutils.c
-index 0de69e6..6e078b0 100644
---- a/util/cutils.c
-+++ b/util/cutils.c
-@@ -545,6 +545,19 @@ int qemu_strtou64(const char *nptr, const char **endptr, int base,
- }
+ static int connect_namedsocket(const char *path, Error **errp)
+ {
+-    int sockfd, size;
++    int sockfd;
+     struct sockaddr_un helper;
  
- /**
-+ * Searches for the first occurrence of 'c' in 's', and returns a pointer
-+ * to the trailing null byte if none was found.
-+ */
-+const char *qemu_strchrnul(const char *s, int c)
-+{
-+    const char *e = strchr(s, c);
-+    if (!e) {
-+        e = s + strlen(s);
-+    }
-+    return e;
-+}
-+
-+/**
-  * parse_uint:
-  *
-  * @s: String to parse
-diff --git a/util/qemu-option.c b/util/qemu-option.c
-index 58d1c23..54eca12 100644
---- a/util/qemu-option.c
-+++ b/util/qemu-option.c
-@@ -77,11 +77,7 @@ const char *get_opt_value(const char *p, char **value)
- 
-     *value = NULL;
-     while (1) {
--        offset = strchr(p, ',');
--        if (!offset) {
--            offset = p + strlen(p);
--        }
--
-+        offset = qemu_strchrnul(p, ',');
-         length = offset - p;
-         if (*offset != '\0' && *(offset + 1) == ',') {
-             length++;
-diff --git a/util/uri.c b/util/uri.c
-index 8624a7a..8bdef84 100644
---- a/util/uri.c
-+++ b/util/uri.c
-@@ -52,6 +52,7 @@
-  */
- 
- #include "qemu/osdep.h"
-+#include "qemu/cutils.h"
- 
- #include "qemu/uri.h"
- 
-@@ -2266,10 +2267,7 @@ struct QueryParams *query_params_parse(const char *query)
-         /* Find the next separator, or end of the string. */
-         end = strchr(query, '&');
-         if (!end) {
--            end = strchr(query, ';');
--        }
--        if (!end) {
--            end = query + strlen(query);
-+            end = qemu_strchrnul(query, ';');
-         }
- 
-         /* Find the first '=' character between here and end. */
+     if (strlen(path) >= sizeof(helper.sun_path)) {
+@@ -1102,8 +1102,7 @@ static int connect_namedsocket(const char *path, Error **errp)
+     }
+     strcpy(helper.sun_path, path);
+     helper.sun_family = AF_UNIX;
+-    size = strlen(helper.sun_path) + sizeof(helper.sun_family);
+-    if (connect(sockfd, (struct sockaddr *)&helper, size) < 0) {
++    if (connect(sockfd, (struct sockaddr *)&helper, sizeof(helper)) < 0) {
+         error_setg_errno(errp, errno, "failed to connect to '%s'", path);
+         close(sockfd);
+         return -1;
 -- 
 2.8.1
