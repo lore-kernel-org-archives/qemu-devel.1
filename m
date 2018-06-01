@@ -1,27 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60705)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33417)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1fOitR-0006Jd-RC
-	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 08:10:54 -0400
+	(envelope-from <imammedo@redhat.com>) id 1fOiwR-0007V0-Qm
+	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 08:14:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1fOitN-0007Rx-O3
-	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 08:10:53 -0400
-Received: from mail-wm0-x22c.google.com ([2a00:1450:400c:c09::22c]:53359)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1fOitN-0007RQ-GQ
-	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 08:10:49 -0400
-Received: by mail-wm0-x22c.google.com with SMTP id a67-v6so2609738wmf.3
-	for <qemu-devel@nongnu.org>; Fri, 01 Jun 2018 05:10:49 -0700 (PDT)
-Date: Fri, 1 Jun 2018 13:10:46 +0100
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20180601121046.GM8687@stefanha-x1.localdomain>
-References: <2ab117c8.29cbc.163a6407028.Coremail.lichunguang@hust.edu.cn>
+	(envelope-from <imammedo@redhat.com>) id 1fOiwN-0001KB-NK
+	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 08:13:59 -0400
+Date: Fri, 1 Jun 2018 14:13:41 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20180601141341.2d0f7ee0@redhat.com>
+In-Reply-To: <451cd080-12ab-42bd-0150-e1dbf0abd859@redhat.com>
+References: <20180517081527.14410-1-david@redhat.com>
+	<451cd080-12ab-42bd-0150-e1dbf0abd859@redhat.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="FxlYARId5dseejUu"
-Content-Disposition: inline
-In-Reply-To: <2ab117c8.29cbc.163a6407028.Coremail.lichunguang@hust.edu.cn>
-Subject: Re: [Qemu-devel] VM I/O performance drops dramatically during
- storage migration with drive-mirror
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH v4 00/14] MemoryDevice: use
+ multi stage hotplug handlers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,97 +24,113 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Chunguang Li <lichunguang@hust.edu.cn>
-Cc: qemu-devel@nongnu.org
+To: David Hildenbrand <david@redhat.com>
+Cc: qemu-devel@nongnu.org, Pankaj Gupta <pagupta@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Richard Henderson <rth@twiddle.net>, Cornelia Huck <cohuck@redhat.com>, Alexander Graf <agraf@suse.de>, Markus Armbruster <armbru@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org, qemu-ppc@nongnu.org, Marcel Apfelbaum <marcel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Luiz Capitulino <lcapitulino@redhat.com>, David Gibson <david@gibson.dropbear.id.au>
 
+On Fri, 25 May 2018 14:43:39 +0200
+David Hildenbrand <david@redhat.com> wrote:
 
---FxlYARId5dseejUu
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+> On 17.05.2018 10:15, David Hildenbrand wrote:
+> > We can have devices that need certain other resources that are e.g.
+> > system resources managed by the machine. We need a clean way to assign
+> > these resources (without violating layers as brought up by Igor).
+> > 
+> > One example is virtio-mem/virtio-pmem. Both device types need to be
+> > assigned some region in guest physical address space. This device memory
+> > belongs to the machine and is managed by it. However, virito devices are
+> > hotplugged using the hotplug handler their proxy device implements. So we
+> > could trigger e.g. a PCI hotplug handler for virtio-pci or a CSS/CCW
+> > hotplug handler for virtio-ccw. But definetly not the machine.
+> > 
+> > Now, we can route other devices through the machine hotplug handler, to
+> > properly assign/unassign resources - like a portion in guest physical
+> > address space.
 
-On Mon, May 28, 2018 at 06:17:10PM +0800, Chunguang Li wrote:
-> Hi, everyone.
->=20
->=20
->=20
->=20
-> Recently I am doing some tests on the VM storage+memory migration with KV=
-M/QEMU/libvirt. I use the following migrate command through virsh: "virsh m=
-igrate --live --copy-storage-all --verbose vm1 qemu+ssh://192.168.1.91/syst=
-em tcp://192.168.1.91". I have checked the libvirt debug output, and make s=
-ure that the drive-mirror + NBD migration method is used.
->=20
-> Inside the VM, I use an I/O benchmark (Iometer) to generate an oltp workl=
-oad. I record the I/O performance (IOPS) before/during/after migration. Whe=
-n the migration begins, the IOPS dropped by 30%-40%. This is reasonable, be=
-cause the migration I/O competes with the workload I/O. However, during alm=
-ost the last period of migration (which is 66s in my case), the IOPS droppe=
-d dramatically, from about 170 to less than 10. I also show the figure of t=
-his experiment in the attachment of this email.
->=20
->=20
->=20
->=20
-> I want to figure out what results in this period with very low IOPS. Firs=
-t, I added some printf()s in the QEMU code, and knew that, this period occu=
-rs just before the memory migration phase. (BTW, the memory migration is ve=
-ry fast, which is just about 5s.) So I think this period should be the last=
- phase of the "drive-mirror" process of QEMU. So then I tried to read the c=
-ode of "drive-mirror" in QEMU, but failed to understand it very well.
->=20
->=20
->=20
->=20
-> Does anybody know what may lead to this period with very low IOPS? Thank =
-you very much.=20
+To sum up review:
+Some comments apply to several patches even though I commented only once.
 
-IOPS dropped from 170 to less than 10.  That could be because QEMU or
-the storage device is slow at completing requests due to the other
-activity (drive-mirror).  But it could also be because the guest simply
-isn't submitting many I/O requests!
+I'd suggest to restructure and split series into several:
+  * unplug cleanups 08/14 & co
+  * generic _preplug refactoring so we won't have to go back to that question again
+  * extending memory_device interface 11/14 + actual user for the sake of which
+    interface is actually extended (virtio-mem)
 
-So I think the first step is to determine how much I/O the guest is
-submitting.  There are several ways of doing this.  You can enable the
-virtio_blk_handle_write and virtio_blk_handle_read trace events if you
-are using virtio-blk (see docs/devel/tracing.txt).  Or you could use
-iostat(1) inside the guest to observe the number of completed requests +
-queue size.
+Also more descriptive commit messages describing why change is done,
+current ones look like "Lets do something for some vague reason" to
+unaware reviewers, having virtio-mem along with new extensions to
+memory_device would be useful here as it could have cross reference
+to parts that would need it.
 
-If the guest is not submitting the expected number of requests then
-you'll need to investigate why Iometer is starved.
+Try to keep patches smaller and doing one thing, we can always squash
+them later if it would be better.
 
-> Some details of this experiment:
-> The VM disk image file is 30GB (format =3D raw,cache=3Dnone,aio=3Dnative)=
-, and Iometer operates on an 10GB file inside the VM. The oltp workload con=
-sists of 33% writes and 67% reads (8KB request size, all random). The VM me=
-mory size is 4GB, most of which should be zero pages, so the memory migrati=
-on is very fast.
->=20
->=20
->=20
->=20
-> --
-> Chunguang Li, Ph.D. Candidate
-> Wuhan National Laboratory for Optoelectronics (WNLO)
-> Huazhong University of Science & Technology (HUST)
-> Wuhan, Hubei Prov., China
->=20
+I'm sorry if some comments were a bit too much or insisting on things
+but I'm trying to keep hotplug infrastructure simple so that later
+when someone else comes with related patches, I could easily read it
+without studying it from ground up.
 
+PS:
+(I'm not a fan of idea to marry virtio device with its own bus plug logic
+into bus-less machine hotplug, but I don't have a better suggestion or
+time to explore alternatives, so lets do it but keep things manageable)
 
-
---FxlYARId5dseejUu
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJbETfGAAoJEJykq7OBq3PIS1UH/1gyvCN03uo1zWnwyvABP0xb
-AAX+ukx938Mk02M/1Zcg3chWPwb3st9lGQLHrDQnp9DAqcq9fGlukbGpXRTyEydZ
-j1Yw5qfTz4oUt1b2C23WhzDPQnnaWuDb3UoPx4IZSv9V8bzVSB7HTrBPGXn2XN/p
-ZNkpPOV2yq3P0GMZNpRYZcFzMpK083yHT6ILsduGeJd7l84eLALh+TjtBqYZRQ22
-+dPVC32j3Xcbb+CJh5pG/3LrRGf9X6zl4AxBpOPn2lAjsVVXRxb+t+R2gpOAwI9E
-qDcYPpBoKNR0pRwoH6UwfQKbC1MSBLo7x6Vwdi8DzLsyqPhLgPaiIcrBEiV74RI=
-=Jkp6
------END PGP SIGNATURE-----
-
---FxlYARId5dseejUu--
+> > 
+> > v3 -> v4:
+> > - Removed the s390x bits, will send that out separately (was just a proof
+> >   that it works just fine with s390x)
+> > - Fixed a typo and reworded a comment
+> > 
+> > v2 -> v3:
+> > - Added "memory-device: introduce separate config option"
+> > - Dropped "parent_bus" check from hotplug handler lookup functions
+> > - "Handly" -> "Handle" in patch description.
+> > 
+> > v1 -> v2:
+> > - Use multi stage hotplug handler instead of resource handler
+> > - MemoryDevices only compiled if necessary (CONFIG_MEM_HOTPLUG)
+> > - Prepare PC/SPAPR machines properly for multi stage hotplug handlers
+> > - Route SPAPR unplug code via the hotunplug handler
+> > - Directly include s390x support. But there are no usable memory devices
+> >   yet (well, only my virtio-mem prototype)
+> > - Included "memory-device: drop assert related to align and start of address
+> >   space"
+> > 
+> > David Hildenbrand (13):
+> >   memory-device: drop assert related to align and start of address space
+> >   memory-device: introduce separate config option
+> >   pc: prepare for multi stage hotplug handlers
+> >   pc: route all memory devices through the machine hotplug handler
+> >   spapr: prepare for multi stage hotplug handlers
+> >   spapr: route all memory devices through the machine hotplug handler
+> >   spapr: handle pc-dimm unplug via hotplug handler chain
+> >   spapr: handle cpu core unplug via hotplug handler chain
+> >   memory-device: new functions to handle plug/unplug
+> >   pc-dimm: implement new memory device functions
+> >   memory-device: factor out pre-plug into hotplug handler
+> >   memory-device: factor out unplug into hotplug handler
+> >   memory-device: factor out plug into hotplug handler
+> > 
+> > Igor Mammedov (1):
+> >   qdev: let machine hotplug handler to override bus hotplug handler
+> > 
+> >  default-configs/i386-softmmu.mak   |   3 +-
+> >  default-configs/ppc64-softmmu.mak  |   3 +-
+> >  default-configs/x86_64-softmmu.mak |   3 +-
+> >  hw/Makefile.objs                   |   2 +-
+> >  hw/core/qdev.c                     |   6 +-
+> >  hw/i386/pc.c                       | 102 ++++++++++++++++++++++-------
+> >  hw/mem/Makefile.objs               |   4 +-
+> >  hw/mem/memory-device.c             | 129 +++++++++++++++++++++++--------------
+> >  hw/mem/pc-dimm.c                   |  48 ++++++--------
+> >  hw/mem/trace-events                |   4 +-
+> >  hw/ppc/spapr.c                     | 129 +++++++++++++++++++++++++++++++------
+> >  include/hw/mem/memory-device.h     |  21 ++++--
+> >  include/hw/mem/pc-dimm.h           |   3 +-
+> >  include/hw/qdev-core.h             |  11 ++++
+> >  qapi/misc.json                     |   2 +-
+> >  15 files changed, 330 insertions(+), 140 deletions(-)
+> >   
+> 
+> As there was no negative feedback so far, I will go ahead and assume
+> that this approach is the right thing to do.
+> 
