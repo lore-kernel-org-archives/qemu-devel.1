@@ -1,26 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35716)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35788)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1fOgtS-0006Zp-Ut
-	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 06:02:48 -0400
+	(envelope-from <groug@kaod.org>) id 1fOgtv-0006lu-SK
+	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 06:03:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1fOgtO-000270-VB
-	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 06:02:47 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:41806 helo=mx1.redhat.com)
+	(envelope-from <groug@kaod.org>) id 1fOgtr-0002Ma-Qk
+	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 06:03:15 -0400
+Received: from 9.mo69.mail-out.ovh.net ([46.105.56.78]:37053)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1fOgtO-00026e-Pk
-	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 06:02:42 -0400
-Date: Fri, 1 Jun 2018 18:02:34 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20180601100234.GJ14867@xz-mi>
-References: <1524550428-27173-1-git-send-email-wei.w.wang@intel.com>
-	<20180601045824.GH14867@xz-mi> <20180601050709.GI14867@xz-mi>
-	<5B10F5E9.8070702@intel.com>
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1fOgtr-0002Lt-G1
+	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 06:03:11 -0400
+Received: from player699.ha.ovh.net (unknown [10.109.120.110])
+	by mo69.mail-out.ovh.net (Postfix) with ESMTP id E68EB17AE2
+	for <qemu-devel@nongnu.org>; Fri,  1 Jun 2018 12:03:09 +0200 (CEST)
+Date: Fri, 1 Jun 2018 12:03:07 +0200
+From: Greg Kurz <groug@kaod.org>
+Message-ID: <20180601120307.57b17b4b@bahia.lan>
+In-Reply-To: <d15d9bc9680d7769ebf5eb0c79cc8f59829ddaab.1527814874.git.keno@juliacomputing.com>
+References: <cover.1527814874.git.keno@juliacomputing.com>
+	<d15d9bc9680d7769ebf5eb0c79cc8f59829ddaab.1527814874.git.keno@juliacomputing.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <5B10F5E9.8070702@intel.com>
-Subject: Re: [Qemu-devel] [PATCH v7 0/5] virtio-balloon: free page hint
- reporting support
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 07/20] 9p: Move a couple xattr functions
+ to 9p-util
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,101 +31,145 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Wei Wang <wei.w.wang@intel.com>
-Cc: qemu-devel@nongnu.org, virtio-dev@lists.oasis-open.org, mst@redhat.com, quintela@redhat.com, dgilbert@redhat.com, yang.zhang.wz@gmail.com, quan.xu0@gmail.com, liliang.opensource@gmail.com, pbonzini@redhat.com, nilal@redhat.com
+To: Keno Fischer <keno@juliacomputing.com>
+Cc: qemu-devel@nongnu.org
 
-On Fri, Jun 01, 2018 at 03:29:45PM +0800, Wei Wang wrote:
-> On 06/01/2018 01:07 PM, Peter Xu wrote:
-> > On Fri, Jun 01, 2018 at 12:58:24PM +0800, Peter Xu wrote:
-> > > On Tue, Apr 24, 2018 at 02:13:43PM +0800, Wei Wang wrote:
-> > > > This is the deivce part implementation to add a new feature,
-> > > > VIRTIO_BALLOON_F_FREE_PAGE_HINT to the virtio-balloon device. The device
-> > > > receives the guest free page hints from the driver and clears the
-> > > > corresponding bits in the dirty bitmap, so that those free pages are
-> > > > not transferred by the migration thread to the destination.
-> > > > 
-> > > > - Test Environment
-> > > >      Host: Intel(R) Xeon(R) CPU E5-2699 v4 @ 2.20GHz
-> > > >      Guest: 8G RAM, 4 vCPU
-> > > >      Migration setup: migrate_set_speed 100G, migrate_set_downtime 2 second
-> > > > 
-> > > > - Test Results
-> > > >      - Idle Guest Live Migration Time (results are averaged over 10 runs):
-> > > >          - Optimization v.s. Legacy = 271ms vs 1769ms --> ~86% reduction
-> > > >      - Guest with Linux Compilation Workload (make bzImage -j4):
-> > > >          - Live Migration Time (average)
-> > > >            Optimization v.s. Legacy = 1265ms v.s. 2634ms --> ~51% reduction
-> > > >          - Linux Compilation Time
-> > > >            Optimization v.s. Legacy = 4min56s v.s. 5min3s
-> > > >            --> no obvious difference
-> > > > 
-> > > > - Source Code
-> > > >      - QEMU:  https://github.com/wei-w-wang/qemu-free-page-lm.git
-> > > >      - Linux: https://github.com/wei-w-wang/linux-free-page-lm.git
-> > > Hi, Wei,
-> > > 
-> > > I have a very high-level question to the series.
-> > > 
-> > > IIUC the core idea for this series is that we can avoid sending some
-> > > of the pages if we know that we don't need to send them.  I think this
-> > > is based on the fact that on the destination side all the pages are by
-> > > default zero after they are malloced.  While before this series, IIUC
-> > > any migration will send every single page to destination, no matter
-> > > whether it's zeroed or not.  So I'm uncertain about whether this will
-> > > affect the received bitmap on the destination side.  Say, before this
-> > > series, the received bitmap will directly cover the whole RAM bitmap
-> > > after migration is finished, now it's won't.  Will there be any side
-> > > effect?  I don't see obvious issue now, but just raise this question
-> > > up.
-> > > 
-> > > Meanwhile, this reminds me about a more funny idea: whether we can
-> > > just avoid sending the zero pages directly from QEMU's perspective.
-> > > In other words, can we just do nothing if save_zero_page() detected
-> > > that the page is zero (I guess the is_zero_range() can be fast too,
-> > > but I don't know exactly how fast it is)?  And how that would be
-> > > differed from this page hinting way in either performance and other
-> > > aspects.
-> > I noticed a problem (after I wrote the above paragraph 5 minutes
-> > ago...): when a page was valid and sent to the destination (with
-> > non-zero data), however after a while that page was zeroed.  Then if
-> > we don't send zero pages at all, we won't send the page after it's
-> > zeroed.  Then on the destination side we'll have a stale non-zero
-> > page.  Is my understanding correct?  Will that be a problem to this
-> > series too where a valid page can be possibly freed and hinted?
+On Thu, 31 May 2018 21:26:02 -0400
+Keno Fischer <keno@juliacomputing.com> wrote:
+
+> These functions will need custom implementations on Darwin. Since the
+> implementation is very similar among all of them, and 9p-util already
+> has the _nofollow version of fgetxattrat, let's move them all there.
 > 
-> I think that won't be an issue either for zero page optimization or this
-> free page optimization.
+> Signed-off-by: Keno Fischer <keno@juliacomputing.com>
+> ---
 > 
-> For the zero page optimization, QEMU always sends compressed 0s to the
-> destination. The zero page is detected at the time QEMU checks it (before
-> sending the page). if it is a 0 page, QEMU compresses all 0s (actually just
-> a flag) and send it.
 
-what I meant is, can we just do not even send that ZERO flag at all? :)
+This cleanup makes sense irrespective of the rest of the series.
 
+Applied to 9p-next.
+
+Thanks!
+
+> Changes since v1:
+>  * fgetxattr_follow is dropped in favor of a different approach
+>    later in the series.
 > 
-> For the free page optimization, we skip free pages (could be thought of as 0
-> pages in this context). The zero pages are detected at the time guest
-> reports it QEMU. The page won't be reported if it is non-zero (i.e. used).
-
-Sorry I must have not explained myself well.  Let's assume the page
-hint is used.  I meant this:
-
-- start precopy, page P is non-zero (let's say, page has content P1,
-  which is non-zero)
-- we send page P with content P1 on src, then latest destination cache
-  of page P is P1
-- page P is freed by the guest, then it becomes zero, dirty bitmap of
-  P is set since it's changed (from P1 to zeroed page)
-- page P is provided as hint that we can skip it since it's zeroed,
-  then the dirty bit of P is cleared
-- ... (page P is never used until migration completes)
-
-After migration completes, page P should be an zeroed page on the
-source, while IIUC on the destination side it's still with stale data
-P1.  Did I miss anything important?
-
-Thanks,
-
--- 
-Peter Xu
+>  hw/9pfs/9p-util.c  | 33 +++++++++++++++++++++++++++++++++
+>  hw/9pfs/9p-util.h  |  4 ++++
+>  hw/9pfs/9p-xattr.c | 33 ---------------------------------
+>  3 files changed, 37 insertions(+), 33 deletions(-)
+> 
+> diff --git a/hw/9pfs/9p-util.c b/hw/9pfs/9p-util.c
+> index f709c27..614b7fc 100644
+> --- a/hw/9pfs/9p-util.c
+> +++ b/hw/9pfs/9p-util.c
+> @@ -24,3 +24,36 @@ ssize_t fgetxattrat_nofollow(int dirfd, const char *filename, const char *name,
+>      g_free(proc_path);
+>      return ret;
+>  }
+> +
+> +ssize_t flistxattrat_nofollow(int dirfd, const char *filename,
+> +                              char *list, size_t size)
+> +{
+> +    char *proc_path = g_strdup_printf("/proc/self/fd/%d/%s", dirfd, filename);
+> +    int ret;
+> +
+> +    ret = llistxattr(proc_path, list, size);
+> +    g_free(proc_path);
+> +    return ret;
+> +}
+> +
+> +ssize_t fremovexattrat_nofollow(int dirfd, const char *filename,
+> +                                const char *name)
+> +{
+> +    char *proc_path = g_strdup_printf("/proc/self/fd/%d/%s", dirfd, filename);
+> +    int ret;
+> +
+> +    ret = lremovexattr(proc_path, name);
+> +    g_free(proc_path);
+> +    return ret;
+> +}
+> +
+> +int fsetxattrat_nofollow(int dirfd, const char *filename, const char *name,
+> +                         void *value, size_t size, int flags)
+> +{
+> +    char *proc_path = g_strdup_printf("/proc/self/fd/%d/%s", dirfd, filename);
+> +    int ret;
+> +
+> +    ret = lsetxattr(proc_path, name, value, size, flags);
+> +    g_free(proc_path);
+> +    return ret;
+> +}
+> diff --git a/hw/9pfs/9p-util.h b/hw/9pfs/9p-util.h
+> index dc0d2e2..79ed6b2 100644
+> --- a/hw/9pfs/9p-util.h
+> +++ b/hw/9pfs/9p-util.h
+> @@ -60,5 +60,9 @@ ssize_t fgetxattrat_nofollow(int dirfd, const char *path, const char *name,
+>                               void *value, size_t size);
+>  int fsetxattrat_nofollow(int dirfd, const char *path, const char *name,
+>                           void *value, size_t size, int flags);
+> +ssize_t flistxattrat_nofollow(int dirfd, const char *filename,
+> +                              char *list, size_t size);
+> +ssize_t fremovexattrat_nofollow(int dirfd, const char *filename,
+> +                                const char *name);
+>  
+>  #endif
+> diff --git a/hw/9pfs/9p-xattr.c b/hw/9pfs/9p-xattr.c
+> index d05c1a1..c696d8f 100644
+> --- a/hw/9pfs/9p-xattr.c
+> +++ b/hw/9pfs/9p-xattr.c
+> @@ -60,17 +60,6 @@ ssize_t pt_listxattr(FsContext *ctx, const char *path,
+>      return name_size;
+>  }
+>  
+> -static ssize_t flistxattrat_nofollow(int dirfd, const char *filename,
+> -                                     char *list, size_t size)
+> -{
+> -    char *proc_path = g_strdup_printf("/proc/self/fd/%d/%s", dirfd, filename);
+> -    int ret;
+> -
+> -    ret = llistxattr(proc_path, list, size);
+> -    g_free(proc_path);
+> -    return ret;
+> -}
+> -
+>  /*
+>   * Get the list and pass to each layer to find out whether
+>   * to send the data or not
+> @@ -196,17 +185,6 @@ ssize_t pt_getxattr(FsContext *ctx, const char *path, const char *name,
+>      return local_getxattr_nofollow(ctx, path, name, value, size);
+>  }
+>  
+> -int fsetxattrat_nofollow(int dirfd, const char *filename, const char *name,
+> -                         void *value, size_t size, int flags)
+> -{
+> -    char *proc_path = g_strdup_printf("/proc/self/fd/%d/%s", dirfd, filename);
+> -    int ret;
+> -
+> -    ret = lsetxattr(proc_path, name, value, size, flags);
+> -    g_free(proc_path);
+> -    return ret;
+> -}
+> -
+>  ssize_t local_setxattr_nofollow(FsContext *ctx, const char *path,
+>                                  const char *name, void *value, size_t size,
+>                                  int flags)
+> @@ -235,17 +213,6 @@ int pt_setxattr(FsContext *ctx, const char *path, const char *name, void *value,
+>      return local_setxattr_nofollow(ctx, path, name, value, size, flags);
+>  }
+>  
+> -static ssize_t fremovexattrat_nofollow(int dirfd, const char *filename,
+> -                                       const char *name)
+> -{
+> -    char *proc_path = g_strdup_printf("/proc/self/fd/%d/%s", dirfd, filename);
+> -    int ret;
+> -
+> -    ret = lremovexattr(proc_path, name);
+> -    g_free(proc_path);
+> -    return ret;
+> -}
+> -
+>  ssize_t local_removexattr_nofollow(FsContext *ctx, const char *path,
+>                                     const char *name)
+>  {
