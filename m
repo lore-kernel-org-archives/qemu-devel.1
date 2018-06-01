@@ -1,21 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40558)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41291)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <junyan.he@gmx.com>) id 1fOf9j-0000wJ-Bj
-	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 04:11:28 -0400
+	(envelope-from <groug@kaod.org>) id 1fOfDq-0004SU-Fp
+	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 04:15:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <junyan.he@gmx.com>) id 1fOf9e-0000v2-Gl
-	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 04:11:27 -0400
-Received: from mga07.intel.com ([134.134.136.100]:20652)
+	(envelope-from <groug@kaod.org>) id 1fOfDn-0005aN-9C
+	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 04:15:42 -0400
+Received: from 4.mo6.mail-out.ovh.net ([87.98.184.159]:51363)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <junyan.he@gmx.com>) id 1fOf9e-0000u7-6p
-	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 04:11:22 -0400
-From: junyan.he@gmx.com
-Date: Fri,  1 Jun 2018 16:10:29 +0800
-Message-Id: <1527840629-18648-8-git-send-email-junyan.he@gmx.com>
-In-Reply-To: <1527840629-18648-1-git-send-email-junyan.he@gmx.com>
-References: <1527840629-18648-1-git-send-email-junyan.he@gmx.com>
-Subject: [Qemu-devel] [PATCH V6 7/7] migration/ram: ensure write persistence
- on loading all data to PMEM.
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1fOfDm-0005XB-Uf
+	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 04:15:39 -0400
+Received: from player739.ha.ovh.net (unknown [10.109.122.51])
+	by mo6.mail-out.ovh.net (Postfix) with ESMTP id 2DE07160B20
+	for <qemu-devel@nongnu.org>; Fri,  1 Jun 2018 10:15:36 +0200 (CEST)
+Date: Fri, 1 Jun 2018 10:15:31 +0200
+From: Greg Kurz <groug@kaod.org>
+Message-ID: <20180601101531.4f3dd234@bahia.lan>
+In-Reply-To: <1f6bc60305b8c1cd00f5e2a361a05d7b4bc56338.1527814874.git.keno@juliacomputing.com>
+References: <cover.1527814874.git.keno@juliacomputing.com>
+	<1f6bc60305b8c1cd00f5e2a361a05d7b4bc56338.1527814874.git.keno@juliacomputing.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 01/20] cutils: Provide strchrnul
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,72 +30,162 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: ehabkost@redhat.com, imammedo@redhat.com, pbonzini@redhat.com, crosthwaite.peter@gmail.com, rth@twiddle.net, xiaoguangrong.eric@gmail.com, mst@redhat.com, quintela@redhat.com, dgilbert@redhat.com, stefanha@redhat.com, Junyan He <junyan.he@intel.com>
+To: Keno Fischer <keno@juliacomputing.com>
+Cc: qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>, "Dr. David
+	Alan Gilbert" <dgilbert@redhat.com>
 
-From: Junyan He <junyan.he@intel.com>
+On Thu, 31 May 2018 21:25:56 -0400
+Keno Fischer <keno@juliacomputing.com> wrote:
 
-Because we need to make sure the pmem kind memory data is synced
-after migration, we choose to call pmem_persist() when the migration
-finish. This will make sure the data of pmem is safe and will not
-lose if power is off.
+> strchrnul is a GNU extension and thus unavailable on a number of targets.
+> In the review for a commit removing strchrnul from 9p, I was asked to
+> create a qemu_strchrnul helper to factor out this functionality.
+> Do so, and use it in a number of other places in the code base that inlined
+> the replacement pattern in a place where strchrnul could be used.
+> 
+> Signed-off-by: Keno Fischer <keno@juliacomputing.com>
+> ---
+> 
 
-Signed-off-by: Junyan He <junyan.he@intel.com>
----
- include/qemu/pmem.h | 1 +
- migration/ram.c     | 8 ++++++++
- stubs/pmem.c        | 4 ++++
- 3 files changed, 13 insertions(+)
+And possibly we could detect in configure if the host has strchrnul() and
+use it, but this optimization can be done later.
 
-diff --git a/include/qemu/pmem.h b/include/qemu/pmem.h
-index 00d6680..b1e1b5c 100644
---- a/include/qemu/pmem.h
-+++ b/include/qemu/pmem.h
-@@ -17,6 +17,7 @@
- #else  /* !CONFIG_LIBPMEM */
- 
- void *pmem_memcpy_persist(void *pmemdest, const void *src, size_t len);
-+void *pmem_persist(const void *addr, size_t len);
- 
- #endif /* CONFIG_LIBPMEM */
- 
-diff --git a/migration/ram.c b/migration/ram.c
-index aa0c6f0..09525b2 100644
---- a/migration/ram.c
-+++ b/migration/ram.c
-@@ -33,6 +33,7 @@
- #include "qemu/bitops.h"
- #include "qemu/bitmap.h"
- #include "qemu/main-loop.h"
-+#include "qemu/pmem.h"
- #include "xbzrle.h"
- #include "ram.h"
- #include "migration.h"
-@@ -3046,6 +3047,13 @@ static int ram_load_setup(QEMUFile *f, void *opaque)
- static int ram_load_cleanup(void *opaque)
- {
-     RAMBlock *rb;
-+
-+    RAMBLOCK_FOREACH(rb) {
-+        if (ramblock_is_pmem(rb)) {
-+            pmem_persist(rb->host, rb->used_length);
-+         }
-+    }
-+
-     xbzrle_load_cleanup();
-     compress_threads_load_cleanup();
- 
-diff --git a/stubs/pmem.c b/stubs/pmem.c
-index b4ec72d..c5bc6d6 100644
---- a/stubs/pmem.c
-+++ b/stubs/pmem.c
-@@ -17,3 +17,7 @@ void *pmem_memcpy_persist(void *pmemdest, const void *src, size_t len)
- {
-     return memcpy(pmemdest, src, len);
- }
-+
-+void *pmem_persist(const void *addr, size_t len)
-+{
-+}
--- 
-2.7.4
+I haven't checked if there could be other candidates in the current code
+base though. Also, this patch touches some other subsystems, so I'm Cc'ing
+to the other maintainers as reported by ./scripts/get_maintainer.pl:
+
+Greg Kurz <groug@kaod.org> (supporter:virtio-9p)
+Markus Armbruster <armbru@redhat.com> (supporter:QMP)
+"Dr. David Alan Gilbert" <dgilbert@redhat.com> (maintainer:Human Monitor (HMP))
+qemu-devel@nongnu.org (open list:All patches CC here)
+
+Anyway,
+
+Acked-by: Greg Kurz <groug@kaod.org>
+
+> Changes since v1: New patch
+> 
+>  hw/9pfs/9p-local.c    |  2 +-
+>  include/qemu/cutils.h |  1 +
+>  monitor.c             |  8 ++------
+>  util/cutils.c         | 13 +++++++++++++
+>  util/qemu-option.c    |  6 +-----
+>  util/uri.c            |  6 ++----
+>  6 files changed, 20 insertions(+), 16 deletions(-)
+> 
+> diff --git a/hw/9pfs/9p-local.c b/hw/9pfs/9p-local.c
+> index b37b1db..bcf2798 100644
+> --- a/hw/9pfs/9p-local.c
+> +++ b/hw/9pfs/9p-local.c
+> @@ -65,7 +65,7 @@ int local_open_nofollow(FsContext *fs_ctx, const char *path, int flags,
+>          assert(*path != '/');
+>  
+>          head = g_strdup(path);
+> -        c = strchrnul(path, '/');
+> +        c = qemu_strchrnul(path, '/');
+>          if (*c) {
+>              /* Intermediate path element */
+>              head[c - path] = 0;
+> diff --git a/include/qemu/cutils.h b/include/qemu/cutils.h
+> index a663340..bc40c30 100644
+> --- a/include/qemu/cutils.h
+> +++ b/include/qemu/cutils.h
+> @@ -122,6 +122,7 @@ int qemu_strnlen(const char *s, int max_len);
+>   * Returns: the pointer originally in @input.
+>   */
+>  char *qemu_strsep(char **input, const char *delim);
+> +const char *qemu_strchrnul(const char *s, int c);
+>  time_t mktimegm(struct tm *tm);
+>  int qemu_fdatasync(int fd);
+>  int fcntl_setfl(int fd, int flag);
+> diff --git a/monitor.c b/monitor.c
+> index 922cfc0..e1f01c4 100644
+> --- a/monitor.c
+> +++ b/monitor.c
+> @@ -798,9 +798,7 @@ static int compare_cmd(const char *name, const char *list)
+>      p = list;
+>      for(;;) {
+>          pstart = p;
+> -        p = strchr(p, '|');
+> -        if (!p)
+> -            p = pstart + strlen(pstart);
+> +        p = qemu_strchrnul(p, '|');
+>          if ((p - pstart) == len && !memcmp(pstart, name, len))
+>              return 1;
+>          if (*p == '\0')
+> @@ -3401,9 +3399,7 @@ static void cmd_completion(Monitor *mon, const char *name, const char *list)
+>      p = list;
+>      for(;;) {
+>          pstart = p;
+> -        p = strchr(p, '|');
+> -        if (!p)
+> -            p = pstart + strlen(pstart);
+> +        p = qemu_strchrnul(p, '|');
+>          len = p - pstart;
+>          if (len > sizeof(cmd) - 2)
+>              len = sizeof(cmd) - 2;
+> diff --git a/util/cutils.c b/util/cutils.c
+> index 0de69e6..6e078b0 100644
+> --- a/util/cutils.c
+> +++ b/util/cutils.c
+> @@ -545,6 +545,19 @@ int qemu_strtou64(const char *nptr, const char **endptr, int base,
+>  }
+>  
+>  /**
+> + * Searches for the first occurrence of 'c' in 's', and returns a pointer
+> + * to the trailing null byte if none was found.
+> + */
+> +const char *qemu_strchrnul(const char *s, int c)
+> +{
+> +    const char *e = strchr(s, c);
+> +    if (!e) {
+> +        e = s + strlen(s);
+> +    }
+> +    return e;
+> +}
+> +
+> +/**
+>   * parse_uint:
+>   *
+>   * @s: String to parse
+> diff --git a/util/qemu-option.c b/util/qemu-option.c
+> index 58d1c23..54eca12 100644
+> --- a/util/qemu-option.c
+> +++ b/util/qemu-option.c
+> @@ -77,11 +77,7 @@ const char *get_opt_value(const char *p, char **value)
+>  
+>      *value = NULL;
+>      while (1) {
+> -        offset = strchr(p, ',');
+> -        if (!offset) {
+> -            offset = p + strlen(p);
+> -        }
+> -
+> +        offset = qemu_strchrnul(p, ',');
+>          length = offset - p;
+>          if (*offset != '\0' && *(offset + 1) == ',') {
+>              length++;
+> diff --git a/util/uri.c b/util/uri.c
+> index 8624a7a..8bdef84 100644
+> --- a/util/uri.c
+> +++ b/util/uri.c
+> @@ -52,6 +52,7 @@
+>   */
+>  
+>  #include "qemu/osdep.h"
+> +#include "qemu/cutils.h"
+>  
+>  #include "qemu/uri.h"
+>  
+> @@ -2266,10 +2267,7 @@ struct QueryParams *query_params_parse(const char *query)
+>          /* Find the next separator, or end of the string. */
+>          end = strchr(query, '&');
+>          if (!end) {
+> -            end = strchr(query, ';');
+> -        }
+> -        if (!end) {
+> -            end = query + strlen(query);
+> +            end = qemu_strchrnul(query, ';');
+>          }
+>  
+>          /* Find the first '=' character between here and end. */
