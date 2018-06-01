@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48554)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49050)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1fOi1e-0002vH-Ln
-	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 07:15:19 -0400
+	(envelope-from <imammedo@redhat.com>) id 1fOi3m-00041N-Cv
+	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 07:17:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1fOi1d-0003dN-Ai
-	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 07:15:18 -0400
-References: <20180501165750.19242-1-mreitz@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <6e9ba185-ca93-cfdc-cf7a-518c431ffd91@redhat.com>
-Date: Fri, 1 Jun 2018 13:15:04 +0200
+	(envelope-from <imammedo@redhat.com>) id 1fOi3l-0004jz-2C
+	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 07:17:30 -0400
+Date: Fri, 1 Jun 2018 13:17:24 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20180601131724.6e17a249@redhat.com>
+In-Reply-To: <20180517081527.14410-13-david@redhat.com>
+References: <20180517081527.14410-1-david@redhat.com>
+	<20180517081527.14410-13-david@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20180501165750.19242-1-mreitz@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="pE3ExPeXjl77vtmszvvjLl9e8jwGbn6xh"
-Subject: Re: [Qemu-devel] [PATCH 0/2] qemu-img: Special post-backing convert
- handle
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v4 12/14] memory-device: factor out
+ pre-plug into hotplug handler
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,106 +24,203 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>
+To: David Hildenbrand <david@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-s390x@nongnu.org, "Michael S . Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Markus Armbruster <armbru@redhat.com>, qemu-ppc@nongnu.org, Pankaj Gupta <pagupta@redhat.com>, Alexander Graf <agraf@suse.de>, Cornelia Huck <cohuck@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Luiz Capitulino <lcapitulino@redhat.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---pE3ExPeXjl77vtmszvvjLl9e8jwGbn6xh
-From: Max Reitz <mreitz@redhat.com>
-To: qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>
-Message-ID: <6e9ba185-ca93-cfdc-cf7a-518c431ffd91@redhat.com>
-Subject: Re: [PATCH 0/2] qemu-img: Special post-backing convert handle
-References: <20180501165750.19242-1-mreitz@redhat.com>
-In-Reply-To: <20180501165750.19242-1-mreitz@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On Thu, 17 May 2018 10:15:25 +0200
+David Hildenbrand <david@redhat.com> wrote:
 
-On 2018-05-01 18:57, Max Reitz wrote:
-> This is the issue:
->=20
-> $ qemu-img create -f qcow2 base.qcow2 512M
-> Formatting 'base.qcow2', fmt=3Dqcow2 size=3D536870912 cluster_size=3D65=
-536 lazy_refcounts=3Doff refcount_bits=3D16
-> $ qemu-img create -f qcow2 -b base.qcow2 source.qcow2 1G
-> Formatting 'source.qcow2', fmt=3Dqcow2 size=3D1073741824 backing_file=3D=
-base.qcow2 cluster_size=3D65536 lazy_refcounts=3Doff refcount_bits=3D16
-> $ qemu-img convert -O qcow2 -B base.qcow2 -o compat=3D0.10 \
->     source.qcow2 target.qcow2
-> $ qemu-img info target.qcow2
-> image: target.qcow2
-> file format: qcow2
-> virtual size: 1.0G (1073741824 bytes)
-> disk size: 512M    <-------------------- this here
-> cluster_size: 65536
-> backing file: base.qcow2
-> Format specific information:
->     compat: 0.10
->     refcount bits: 16
-> $ qemu-img map target.qcow2
-> Offset          Length          Mapped to       File
-> 0x20000000      0x20000000      0x50000         target.qcow2
->=20
-> So qemu-img convert sees that source.qcow2 contains only zeroes past th=
-e
-> end of base.qcow2 -- but that is not the backing file, so it will
-> explicitly write zeroes to target.qcow2.  But that file is compat=3D0.1=
-0,
-> so it does not support efficient zero writes and will actually fill tha=
-t
-> area with real zeroes.  Hence the mapping, hence the disk size.
->=20
-> However, we don't need to write zeroes to an image when it is
-> initialized to zeroes -- which the current qemu-img code says doesn't
-> happen for target images with backing files.  But it does happen when
-> the target backing file is shorter than the target image, then the area=
+> Let's move all pre-plug checks we can do without the device being
+> realized into the applicable hotplug handler for pc and spapr.
+> 
+> Signed-off-by: David Hildenbrand <david@redhat.com>
+> ---
+>  hw/i386/pc.c                   | 11 +++++++
+>  hw/mem/memory-device.c         | 72 +++++++++++++++++++-----------------------
+>  hw/ppc/spapr.c                 | 11 +++++++
+>  include/hw/mem/memory-device.h |  2 ++
+>  4 files changed, 57 insertions(+), 39 deletions(-)
+> 
+> diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+> index 8bc41ef24b..61f1537e14 100644
+> --- a/hw/i386/pc.c
+> +++ b/hw/i386/pc.c
+> @@ -2010,6 +2010,16 @@ static void pc_machine_device_pre_plug_cb(HotplugHandler *hotplug_dev,
+>  {
+>      Error *local_err = NULL;
+>  
+> +    /* first stage hotplug handler */
+> +    if (object_dynamic_cast(OBJECT(dev), TYPE_MEMORY_DEVICE)) {
+> +        memory_device_pre_plug(MACHINE(hotplug_dev), MEMORY_DEVICE(dev),
+> +                               &local_err);
+> +    }
+> +
+> +    if (local_err) {
+> +        goto out;
+> +    }
+> +
+>      /* final stage hotplug handler */
+>      if (object_dynamic_cast(OBJECT(dev), TYPE_CPU)) {
+>          pc_cpu_pre_plug(hotplug_dev, dev, &local_err);
+> @@ -2017,6 +2027,7 @@ static void pc_machine_device_pre_plug_cb(HotplugHandler *hotplug_dev,
+>          hotplug_handler_pre_plug(dev->parent_bus->hotplug_handler, dev,
+>                                   &local_err);
+>      }
+> +out:
+>      error_propagate(errp, local_err);
+>  }
+>  
+> diff --git a/hw/mem/memory-device.c b/hw/mem/memory-device.c
+> index 361d38bfc5..d22c91993f 100644
+> --- a/hw/mem/memory-device.c
+> +++ b/hw/mem/memory-device.c
+> @@ -68,58 +68,26 @@ static int memory_device_used_region_size(Object *obj, void *opaque)
+>      return 0;
+>  }
+>  
+> -static void memory_device_check_addable(MachineState *ms, uint64_t size,
+> -                                        Error **errp)
+> -{
+> -    uint64_t used_region_size = 0;
+> -
+> -    /* we will need a new memory slot for kvm and vhost */
+> -    if (kvm_enabled() && !kvm_has_free_slot(ms)) {
+> -        error_setg(errp, "hypervisor has no free memory slots left");
+> -        return;
+> -    }
+> -    if (!vhost_has_free_slot()) {
+> -        error_setg(errp, "a used vhost backend has no free memory slots left");
+> -        return;
+> -    }
+> -
+> -    /* will we exceed the total amount of memory specified */
+> -    memory_device_used_region_size(OBJECT(ms), &used_region_size);
+> -    if (used_region_size + size > ms->maxram_size - ms->ram_size) {
+> -        error_setg(errp, "not enough space, currently 0x%" PRIx64
+> -                   " in use of total hot pluggable 0x" RAM_ADDR_FMT,
+> -                   used_region_size, ms->maxram_size - ms->ram_size);
+> -        return;
+> -    }
+> -
+> -}
+> -
+>  uint64_t memory_device_get_free_addr(MachineState *ms, const uint64_t *hint,
+>                                       uint64_t align, uint64_t size,
+>                                       Error **errp)
+>  {
+>      uint64_t address_space_start, address_space_end;
+> +    uint64_t used_region_size = 0;
+>      GSList *list = NULL, *item;
+>      uint64_t new_addr = 0;
+>  
+> -    if (!ms->device_memory) {
+> -        error_setg(errp, "memory devices (e.g. for memory hotplug) are not "
+> -                         "supported by the machine");
+> -        return 0;
+> -    }
+> -
+> -    if (!memory_region_size(&ms->device_memory->mr)) {
+> -        error_setg(errp, "memory devices (e.g. for memory hotplug) are not "
+> -                         "enabled, please specify the maxmem option");
+> -        return 0;
+> -    }
+>      address_space_start = ms->device_memory->base;
+>      address_space_end = address_space_start +
+>                          memory_region_size(&ms->device_memory->mr);
+>      g_assert(address_space_end >= address_space_start);
+>  
+> -    memory_device_check_addable(ms, size, errp);
+> -    if (*errp) {
+> +    /* will we exceed the total amount of memory specified */
+> +    memory_device_used_region_size(OBJECT(ms), &used_region_size);
+> +    if (used_region_size + size > ms->maxram_size - ms->ram_size) {
+> +        error_setg(errp, "not enough space, currently 0x%" PRIx64
+> +                   " in use of total hot pluggable 0x" RAM_ADDR_FMT,
+> +                   used_region_size, ms->maxram_size - ms->ram_size);
+>          return 0;
+>      }
+>  
+> @@ -242,6 +210,32 @@ uint64_t get_plugged_memory_size(void)
+>      return size;
+>  }
+>  
+> +void memory_device_pre_plug(MachineState *ms, const MemoryDeviceState *md,
+> +                            Error **errp)
+> +{
+> +    if (!ms->device_memory) {
+> +        error_setg(errp, "memory devices (e.g. for memory hotplug) are not "
+> +                         "supported by the machine");
+> +        return;
+> +    }
+> +
+> +    if (!memory_region_size(&ms->device_memory->mr)) {
+> +        error_setg(errp, "memory devices (e.g. for memory hotplug) are not "
+> +                         "enabled, please specify the maxmem option");
+> +        return;
+> +    }
+> +
+> +    /* we will need a new memory slot for kvm and vhost */
+> +    if (kvm_enabled() && !kvm_has_free_slot(ms)) {
+> +        error_setg(errp, "hypervisor has no free memory slots left");
+> +        return;
+> +    }
+> +    if (!vhost_has_free_slot()) {
+> +        error_setg(errp, "a used vhost backend has no free memory slots left");
+> +        return;
+> +    }
+thanks for extracting preparations steps into the right callback.
 
-> past the end of the backing file may indeed read as zeroes and we don't=
+on top of this _preplug() handler should also set being plugged
+device properties if they weren't set by user.
+ memory_device_get_free_addr() should be here to.
 
-> need to write anything there.
->=20
-> So the first patch in this series makes qemu-img convert detect that
-> case and handle zeroes past the end of the backing file as "fall back t=
-o
-> the backing file" (because that means zeroes, at least if unallocated
-> areas read as zeroes (which I presume they have to for formats
-> supporting backing files, but better be safe than sorry)), and the
-> second adds an iotest.
->=20
->=20
-> Buglink: https://bugzilla.redhat.com/show_bug.cgi?id=3D1527898
->=20
->=20
-> Max Reitz (2):
->   qemu-img: Special post-backing convert handling
->   iotests: Test post-backing convert target behavior
->=20
->  qemu-img.c                 | 26 +++++++++++++++++++++++++-
->  tests/qemu-iotests/122     | 42 ++++++++++++++++++++++++++++++++++++++=
-++++
->  tests/qemu-iotests/122.out | 18 ++++++++++++++++++
->  3 files changed, 85 insertions(+), 1 deletion(-)
+general rule for _preplug() would be to check and prepare device
+for being plugged but not touch anything beside the device (it's _plug handler job)
 
-Applied to my block branch.
-
-Max
-
-
---pE3ExPeXjl77vtmszvvjLl9e8jwGbn6xh
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlsRKrgACgkQ9AfbAGHV
-z0AyowgAkpuVGchaCWY76ZPlWivSFts40Q6KEbIOlzRZ3vlmpd30b6QrynltQqA0
-b3C1j+smZb2jwkZen2iECjpIrGO8cw0fFHHQuIJMDwNEJ+PNe2XzXD4l7JZQ9oyn
-Ik1+wanZpTsbavcU2/Nc475ieCTgrtdwampQOxNZN//8GreOxrvSNaJCLW4rxkdu
-gd3BwawLnQu+tYJDoOyKsYXkmz7q44K416al+esPLcBo8hoR4Rd0KDpWURx0wdOH
-dS4GYTDf9Kulzw07QcrBb9CD2nfus9IVDTb7xEBLWBatvSoPjmUeen5W7kWitUiQ
-JoHtPjhfiifrmAdEhKbrqmsHiQSZCQ==
-=FkKC
------END PGP SIGNATURE-----
-
---pE3ExPeXjl77vtmszvvjLl9e8jwGbn6xh--
+> +}
+> +
+>  void memory_device_plug_region(MachineState *ms, MemoryRegion *mr,
+>                                 uint64_t addr)
+>  {
+> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> index 13d153b5a6..562712def2 100644
+> --- a/hw/ppc/spapr.c
+> +++ b/hw/ppc/spapr.c
+> @@ -3676,6 +3676,16 @@ static void spapr_machine_device_pre_plug(HotplugHandler *hotplug_dev,
+>  {
+>      Error *local_err = NULL;
+>  
+> +    /* first stage hotplug handler */
+> +    if (object_dynamic_cast(OBJECT(dev), TYPE_MEMORY_DEVICE)) {
+> +        memory_device_pre_plug(MACHINE(hotplug_dev), MEMORY_DEVICE(dev),
+> +                               &local_err);
+> +    }
+> +
+> +    if (local_err) {
+> +        goto out;
+> +    }
+> +
+>      /* final stage hotplug handler */
+>      if (object_dynamic_cast(OBJECT(dev), TYPE_PC_DIMM)) {
+>          spapr_memory_pre_plug(hotplug_dev, dev, &local_err);
+> @@ -3685,6 +3695,7 @@ static void spapr_machine_device_pre_plug(HotplugHandler *hotplug_dev,
+>          hotplug_handler_pre_plug(dev->parent_bus->hotplug_handler, dev,
+>                                   &local_err);
+>      }
+> +out:
+>      error_propagate(errp, local_err);
+>  }
+>  
+> diff --git a/include/hw/mem/memory-device.h b/include/hw/mem/memory-device.h
+> index 62d906be50..3a4e9edc92 100644
+> --- a/include/hw/mem/memory-device.h
+> +++ b/include/hw/mem/memory-device.h
+> @@ -51,6 +51,8 @@ typedef struct MemoryDeviceClass {
+>  
+>  MemoryDeviceInfoList *qmp_memory_device_list(void);
+>  uint64_t get_plugged_memory_size(void);
+> +void memory_device_pre_plug(MachineState *ms, const MemoryDeviceState *md,
+> +                            Error **errp);
+>  uint64_t memory_device_get_free_addr(MachineState *ms, const uint64_t *hint,
+>                                       uint64_t align, uint64_t size,
+>                                       Error **errp);
