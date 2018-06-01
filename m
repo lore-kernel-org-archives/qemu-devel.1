@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33454)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33455)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <keno@juliacomputing.com>) id 1fOYrE-0003FE-DF
-	for qemu-devel@nongnu.org; Thu, 31 May 2018 21:27:57 -0400
+	(envelope-from <keno@juliacomputing.com>) id 1fOYrE-0003FF-DR
+	for qemu-devel@nongnu.org; Thu, 31 May 2018 21:27:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <keno@juliacomputing.com>) id 1fOYr9-0003F4-T9
+	(envelope-from <keno@juliacomputing.com>) id 1fOYrB-0003HU-Oe
 	for qemu-devel@nongnu.org; Thu, 31 May 2018 21:27:56 -0400
-Received: from mail-qt0-x243.google.com ([2607:f8b0:400d:c0d::243]:46056)
+Received: from mail-qt0-x244.google.com ([2607:f8b0:400d:c0d::244]:33784)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <keno@juliacomputing.com>)
-	id 1fOYr9-0003Ec-Nj
-	for qemu-devel@nongnu.org; Thu, 31 May 2018 21:27:51 -0400
-Received: by mail-qt0-x243.google.com with SMTP id i18-v6so19638014qtp.12
-	for <qemu-devel@nongnu.org>; Thu, 31 May 2018 18:27:51 -0700 (PDT)
+	id 1fOYrB-0003Gf-IS
+	for qemu-devel@nongnu.org; Thu, 31 May 2018 21:27:53 -0400
+Received: by mail-qt0-x244.google.com with SMTP id e8-v6so30315652qth.0
+	for <qemu-devel@nongnu.org>; Thu, 31 May 2018 18:27:53 -0700 (PDT)
 From: Keno Fischer <keno@juliacomputing.com>
-Date: Thu, 31 May 2018 21:26:11 -0400
-Message-Id: <66d4d3eb6fe9c098b77a6790f015912cd35d86b0.1527814874.git.keno@juliacomputing.com>
+Date: Thu, 31 May 2018 21:26:12 -0400
+Message-Id: <b5c27c58c250088ef6d09bd9321e96d423df02d7.1527814874.git.keno@juliacomputing.com>
 In-Reply-To: <cover.1527814874.git.keno@juliacomputing.com>
 References: <cover.1527814874.git.keno@juliacomputing.com>
 In-Reply-To: <cover.1527814874.git.keno@juliacomputing.com>
 References: <cover.1527814874.git.keno@juliacomputing.com>
-Subject: [Qemu-devel] [PATCH v2 16/20] 9p: darwin: Compatibility for
- f/l*xattr
+Subject: [Qemu-devel] [PATCH v2 17/20] 9p: darwin: Provide a fallback
+ implementation for utimensat
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,145 +32,218 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Keno Fischer <keno@juliacomputing.com>, groug@kaod.org
 
-On darwin `fgetxattr` takes two extra optional arguments,
-and the l* variants are not defined (in favor of an extra
-flag to the regular variants.
+This function is new in Mac OS 10.13. Provide a fallback implementation
+when building against older SDKs. The complication in the definition comes
+having to separately handle the used SDK version and the target OS version.
+
+- If the SDK version is too low (__MAC_10_13 not defined), utimensat is not
+  defined in the header, so we must not try to use it (doing so would error).
+- Otherwise, if the targetted OS version is at least 10.13, we know this
+  function is available, so we can unconditionally call it.
+- Lastly, we check for the availability of the __builtin_available macro to
+  potentially insert a dynamic check for this OS version. However, __builtin_available
+  is only available with sufficiently recent versions of clang and while all
+  Apple clang versions that ship with Xcode versions that support the 10.13
+  SDK support with builtin, we want to allow building with compilers other
+  than Apple clang that may not support this builtin.
 
 Signed-off-by: Keno Fischer <keno@juliacomputing.com>
 ---
 
-Changes from v1: New patch, qemu_fgetxattr had previously been
- moved to 9p-util as fgetxattr_follow. The remaining functions
- are required by the proxy-helper.
+Changes from v1:
+ * Correct calculation of tv_usec
+ * Support UTIME_NOW/UTIME/OMIT
+ * Now covers fsdev/virtfs-proxy-helper.c
 
- Makefile                    |  6 ++++++
- fsdev/virtfs-proxy-helper.c |  9 +++++----
- hw/9pfs/9p-local.c          | 12 ++++++++----
- hw/9pfs/9p-util.h           | 17 +++++++++++++++++
- 4 files changed, 36 insertions(+), 8 deletions(-)
+ fsdev/virtfs-proxy-helper.c |  3 +-
+ hw/9pfs/9p-local.c          |  2 +-
+ hw/9pfs/9p-util-darwin.c    | 96 +++++++++++++++++++++++++++++++++++++++++++++
+ hw/9pfs/9p-util-linux.c     |  6 +++
+ hw/9pfs/9p-util.h           |  8 ++++
+ hw/9pfs/9p.c                |  1 +
+ 6 files changed, 113 insertions(+), 3 deletions(-)
 
-diff --git a/Makefile b/Makefile
-index 6d588d1..dac6efd 100644
---- a/Makefile
-+++ b/Makefile
-@@ -544,7 +544,13 @@ qemu-bridge-helper$(EXESUF): qemu-bridge-helper.o $(COMMON_LDADDS)
- qemu-keymap$(EXESUF): qemu-keymap.o ui/input-keymap.o $(COMMON_LDADDS)
- 
- fsdev/virtfs-proxy-helper$(EXESUF): fsdev/virtfs-proxy-helper.o fsdev/9p-marshal.o fsdev/9p-iov-marshal.o $(COMMON_LDADDS)
-+ifdef CONFIG_DARWIN
-+fsdev/virtfs-proxy-helper$(EXESUF): hw/9pfs/9p-util-darwin.o
-+endif
-+ifdef CONFIG_LINUX
-+fsdev/virtfs-proxy-helper$(EXESUF): hw/9pfs/9p-util-linux.o
- fsdev/virtfs-proxy-helper$(EXESUF): LIBS += -lcap
-+endif
- 
- scsi/qemu-pr-helper$(EXESUF): scsi/qemu-pr-helper.o scsi/utils.o $(crypto-obj-y) $(io-obj-y) $(qom-obj-y) $(COMMON_LDADDS)
- ifdef CONFIG_MPATH
 diff --git a/fsdev/virtfs-proxy-helper.c b/fsdev/virtfs-proxy-helper.c
-index 3bc1269..a26f8b8 100644
+index a26f8b8..d8dd3f5 100644
 --- a/fsdev/virtfs-proxy-helper.c
 +++ b/fsdev/virtfs-proxy-helper.c
-@@ -28,6 +28,7 @@
- #include "qemu/statfs.h"
- #include "9p-iov-marshal.h"
- #include "hw/9pfs/9p-proxy.h"
-+#include "hw/9pfs/9p-util.h"
- #include "fsdev/9p-iov-marshal.h"
- 
- #define PROGNAME "virtfs-proxy-helper"
-@@ -459,7 +460,7 @@ static int do_getxattr(int type, struct iovec *iovec, struct iovec *out_iovec)
-         v9fs_string_init(&name);
-         retval = proxy_unmarshal(iovec, offset, "s", &name);
-         if (retval > 0) {
--            retval = lgetxattr(path.data, name.data, xattr.data, size);
-+            retval = qemu_lgetxattr(path.data, name.data, xattr.data, size);
-             if (retval < 0) {
-                 retval = -errno;
-             } else {
-@@ -469,7 +470,7 @@ static int do_getxattr(int type, struct iovec *iovec, struct iovec *out_iovec)
-         v9fs_string_free(&name);
-         break;
-     case T_LLISTXATTR:
--        retval = llistxattr(path.data, xattr.data, size);
-+        retval = qemu_llistxattr(path.data, xattr.data, size);
-         if (retval < 0) {
-             retval = -errno;
-         } else {
-@@ -1000,7 +1001,7 @@ static int process_requests(int sock)
-             retval = proxy_unmarshal(&in_iovec, PROXY_HDR_SZ, "sssdd", &path,
-                                      &name, &value, &size, &flags);
+@@ -957,8 +957,7 @@ static int process_requests(int sock)
+                                      &spec[0].tv_sec, &spec[0].tv_nsec,
+                                      &spec[1].tv_sec, &spec[1].tv_nsec);
              if (retval > 0) {
--                retval = lsetxattr(path.data,
-+                retval = qemu_lsetxattr(path.data,
-                                    name.data, value.data, size, flags);
-                 if (retval < 0) {
-                     retval = -errno;
-@@ -1016,7 +1017,7 @@ static int process_requests(int sock)
-             retval = proxy_unmarshal(&in_iovec,
-                                      PROXY_HDR_SZ, "ss", &path, &name);
-             if (retval > 0) {
--                retval = lremovexattr(path.data, name.data);
-+                retval = qemu_lremovexattr(path.data, name.data);
+-                retval = utimensat(AT_FDCWD, path.data, spec,
+-                                   AT_SYMLINK_NOFOLLOW);
++                retval = utimensat_nofollow(AT_FDCWD, path.data, spec);
                  if (retval < 0) {
                      retval = -errno;
                  }
 diff --git a/hw/9pfs/9p-local.c b/hw/9pfs/9p-local.c
-index 1f0b1b0..7830526 100644
+index 7830526..47e8580 100644
 --- a/hw/9pfs/9p-local.c
 +++ b/hw/9pfs/9p-local.c
-@@ -776,16 +776,20 @@ static int local_fstat(FsContext *fs_ctx, int fid_type,
-         mode_t tmp_mode;
-         dev_t tmp_dev;
+@@ -1071,7 +1071,7 @@ static int local_utimensat(FsContext *s, V9fsPath *fs_path,
+         goto out;
+     }
  
--        if (fgetxattr(fd, "user.virtfs.uid", &tmp_uid, sizeof(uid_t)) > 0) {
-+        if (qemu_fgetxattr(fd, "user.virtfs.uid",
-+                           &tmp_uid, sizeof(uid_t)) > 0) {
-             stbuf->st_uid = le32_to_cpu(tmp_uid);
-         }
--        if (fgetxattr(fd, "user.virtfs.gid", &tmp_gid, sizeof(gid_t)) > 0) {
-+        if (qemu_fgetxattr(fd, "user.virtfs.gid",
-+                           &tmp_gid, sizeof(gid_t)) > 0) {
-             stbuf->st_gid = le32_to_cpu(tmp_gid);
-         }
--        if (fgetxattr(fd, "user.virtfs.mode", &tmp_mode, sizeof(mode_t)) > 0) {
-+        if (qemu_fgetxattr(fd, "user.virtfs.mode",
-+                           &tmp_mode, sizeof(mode_t)) > 0) {
-             stbuf->st_mode = le32_to_cpu(tmp_mode);
-         }
--        if (fgetxattr(fd, "user.virtfs.rdev", &tmp_dev, sizeof(dev_t)) > 0) {
-+        if (qemu_fgetxattr(fd, "user.virtfs.rdev",
-+                           &tmp_dev, sizeof(dev_t)) > 0) {
-             stbuf->st_rdev = le64_to_cpu(tmp_dev);
-         }
-     } else if (fs_ctx->export_flags & V9FS_SM_MAPPED_FILE) {
+-    ret = utimensat(dirfd, name, buf, AT_SYMLINK_NOFOLLOW);
++    ret = utimensat_nofollow(dirfd, name, buf);
+     close_preserve_errno(dirfd);
+ out:
+     g_free(dirpath);
+diff --git a/hw/9pfs/9p-util-darwin.c b/hw/9pfs/9p-util-darwin.c
+index cdb4c9e..ac414bc 100644
+--- a/hw/9pfs/9p-util-darwin.c
++++ b/hw/9pfs/9p-util-darwin.c
+@@ -62,3 +62,99 @@ int fsetxattrat_nofollow(int dirfd, const char *filename, const char *name,
+     close_preserve_errno(fd);
+     return ret;
+ }
++
++#ifndef __has_builtin
++#define __has_builtin(x) 0
++#endif
++
++static int update_times_from_stat(int fd, struct timespec times[2],
++                                  int update0, int update1)
++{
++    struct stat buf;
++    int ret = fstat(fd, &buf);
++    if (ret == -1) {
++        return ret;
++    }
++    if (update0) {
++        times[0] = buf.st_atimespec;
++    }
++    if (update1) {
++        times[1] = buf.st_mtimespec;
++    }
++    return 0;
++}
++
++int utimensat_nofollow(int dirfd, const char *filename,
++                       const struct timespec times_in[2])
++{
++    int ret, fd;
++    int special0, special1;
++    struct timeval futimes_buf[2];
++    struct timespec times[2];
++    memcpy(times, times_in, 2 * sizeof(struct timespec));
++
++/* Check whether we have an SDK version that defines utimensat */
++#if defined(__MAC_10_13)
++# if __MAC_OS_X_VERSION_MIN_REQUIRED >= __MAC_10_13
++#  define UTIMENSAT_AVAILABLE 1
++# elif __has_builtin(__builtin_available)
++#  define UTIMENSAT_AVAILABLE __builtin_available(macos 10.13, *)
++# else
++#  define UTIMENSAT_AVAILABLE 0
++# endif
++    if (UTIMENSAT_AVAILABLE) {
++        return utimensat(dirfd, filename, times, AT_SYMLINK_NOFOLLOW);
++    }
++#endif
++
++    /* utimensat not available. Use futimes. */
++    fd = openat_file(dirfd, filename, O_PATH_9P_UTIL | O_NOFOLLOW, 0);
++    if (fd == -1) {
++        return -1;
++    }
++
++    special0 = times[0].tv_nsec == UTIME_OMIT;
++    special1 = times[1].tv_nsec == UTIME_OMIT;
++    if (special0 || special1) {
++        /* If both are set, nothing to do */
++        if (special0 && special1) {
++            ret = 0;
++            goto done;
++        }
++
++        ret = update_times_from_stat(fd, times, special0, special1);
++        if (ret < 0) {
++            goto done;
++        }
++    }
++
++    special0 = times[0].tv_nsec == UTIME_NOW;
++    special1 = times[1].tv_nsec == UTIME_NOW;
++    if (special0 || special1) {
++        ret = futimes(fd, NULL);
++        if (ret < 0) {
++            goto done;
++        }
++
++        /* If both are set, we are done */
++        if (special0 && special1) {
++            ret = 0;
++            goto done;
++        }
++
++        ret = update_times_from_stat(fd, times, special0, special1);
++        if (ret < 0) {
++            goto done;
++        }
++    }
++
++    futimes_buf[0].tv_sec = times[0].tv_sec;
++    futimes_buf[0].tv_usec = times[0].tv_nsec / 1000;
++    futimes_buf[1].tv_sec = times[1].tv_sec;
++    futimes_buf[1].tv_usec = times[1].tv_nsec / 1000;
++    ret = futimes(fd, futimes_buf);
++
++done:
++    close_preserve_errno(fd);
++    return ret;
++}
+diff --git a/hw/9pfs/9p-util-linux.c b/hw/9pfs/9p-util-linux.c
+index defa3a4..3902378 100644
+--- a/hw/9pfs/9p-util-linux.c
++++ b/hw/9pfs/9p-util-linux.c
+@@ -57,3 +57,9 @@ int fsetxattrat_nofollow(int dirfd, const char *filename, const char *name,
+     g_free(proc_path);
+     return ret;
+ }
++
++int utimensat_nofollow(int dirfd, const char *filename,
++                       const struct timespec times[2])
++{
++    return utimensat(dirfd, filename, times, AT_SYMLINK_NOFOLLOW);
++}
 diff --git a/hw/9pfs/9p-util.h b/hw/9pfs/9p-util.h
-index 79ed6b2..50a03c7 100644
+index 50a03c7..b1dc08a 100644
 --- a/hw/9pfs/9p-util.h
 +++ b/hw/9pfs/9p-util.h
-@@ -19,6 +19,23 @@
- #define O_PATH_9P_UTIL 0
+@@ -36,6 +36,12 @@ static inline int qemu_lsetxattr(const char *path, const char *name,
+ #define qemu_lsetxattr lsetxattr
  #endif
  
-+#ifdef CONFIG_DARWIN
-+#define qemu_fgetxattr(...) fgetxattr(__VA_ARGS__, 0, 0)
-+#define qemu_lgetxattr(...) getxattr(__VA_ARGS__, 0, XATTR_NOFOLLOW)
-+#define qemu_llistxattr(...) listxattr(__VA_ARGS__, XATTR_NOFOLLOW)
-+#define qemu_lremovexattr(...) removexattr(__VA_ARGS__, XATTR_NOFOLLOW)
-+static inline int qemu_lsetxattr(const char *path, const char *name,
-+                                 const void *value, size_t size, int flags) {
-+    return setxattr(path, name, value, size, 0, flags | XATTR_NOFOLLOW);
-+}
-+#else
-+#define qemu_fgetxattr fgetxattr
-+#define qemu_lgetxattr lgetxattr
-+#define qemu_llistxattr llistxattr
-+#define qemu_lremovexattr lremovexattr
-+#define qemu_lsetxattr lsetxattr
++/* Compatibility with old SDK Versions for Darwin */
++#if defined(CONFIG_DARWIN) && !defined(UTIME_NOW)
++#define UTIME_NOW -1
++#define UTIME_OMIT -2
 +#endif
 +
  static inline void close_preserve_errno(int fd)
  {
      int serrno = errno;
+@@ -81,5 +87,7 @@ ssize_t flistxattrat_nofollow(int dirfd, const char *filename,
+                               char *list, size_t size);
+ ssize_t fremovexattrat_nofollow(int dirfd, const char *filename,
+                                 const char *name);
++int utimensat_nofollow(int dirfd, const char *filename,
++                       const struct timespec times[2]);
+ 
+ #endif
+diff --git a/hw/9pfs/9p.c b/hw/9pfs/9p.c
+index 24802b9..71b2dc9 100644
+--- a/hw/9pfs/9p.c
++++ b/hw/9pfs/9p.c
+@@ -21,6 +21,7 @@
+ #include "virtio-9p.h"
+ #include "fsdev/qemu-fsdev.h"
+ #include "9p-xattr.h"
++#include "9p-util.h"
+ #include "coth.h"
+ #include "trace.h"
+ #include "migration/blocker.h"
 -- 
 2.8.1
