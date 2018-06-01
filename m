@@ -1,28 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44981)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45148)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1fOhfk-00035E-N4
-	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 06:52:41 -0400
+	(envelope-from <imammedo@redhat.com>) id 1fOhgq-0003bf-Hz
+	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 06:53:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1fOhfh-0000vd-Jz
-	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 06:52:40 -0400
-From: Alberto Garcia <berto@igalia.com>
-In-Reply-To: <20180503122241.GA6140@localhost.localdomain>
-References: <w517ep7gpsz.fsf@maestria.local.igalia.com>
-	<ee24e79d-b37e-ac8f-c349-b0fa637ba2a6@redhat.com>
-	<w51bmegjzp4.fsf@maestria.local.igalia.com>
-	<216e7398-0bc3-4822-d4b0-e0267c714abb@redhat.com>
-	<w5136zjsar5.fsf@maestria.local.igalia.com>
-	<bc26c382-458f-5a86-de59-3945397fbcac@redhat.com>
-	<w51wowvqu65.fsf@maestria.local.igalia.com>
-	<b3ec832d-202b-db93-a163-3d63a4d36326@redhat.com>
-	<w51h8nqcijb.fsf@maestria.local.igalia.com>
-	<aab201a7-ef3f-8152-cc37-85ae7e106a5e@redhat.com>
-	<20180503122241.GA6140@localhost.localdomain>
-Date: Fri, 01 Jun 2018 12:51:59 +0200
-Message-ID: <w51zi0e6apc.fsf@maestria.local.igalia.com>
+	(envelope-from <imammedo@redhat.com>) id 1fOhgn-0001Ig-F7
+	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 06:53:48 -0400
+Date: Fri, 1 Jun 2018 12:53:32 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20180601125332.0bcd6b8b@redhat.com>
+In-Reply-To: <20180517081527.14410-9-david@redhat.com>
+References: <20180517081527.14410-1-david@redhat.com>
+	<20180517081527.14410-9-david@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [RFC] Intermediate block mirroring
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v4 08/14] spapr: handle pc-dimm unplug via
+ hotplug handler chain
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,67 +24,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, Eric Blake <eblake@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
+To: David Hildenbrand <david@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-s390x@nongnu.org, "Michael S . Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Markus Armbruster <armbru@redhat.com>, qemu-ppc@nongnu.org, Pankaj Gupta <pagupta@redhat.com>, Alexander Graf <agraf@suse.de>, Cornelia Huck <cohuck@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Luiz Capitulino <lcapitulino@redhat.com>
 
-On Thu 03 May 2018 02:22:41 PM CEST, Kevin Wolf wrote:
->> > Were the (more or less) exact requirements of QMP blockdev-reopen
->> > discussed? How is it different from qemu-io's "reopen" command?
->> > What are the options that you can and can not change?
->> 
->> I can't quite remember, I'm afraid.  I think it was supposed to be
->> pretty much qemu-io's reopen (so just bdrv_reopen()).  I suppose you
->> cannot change the driver (obviously) or probably the node name, because
->> either would result in the node being replaced by a completely new one.
->> 
->> Other than that, it probably depends on what the block driver supports,
->> but ideally you should be able to change everything.
->
-> Honestly the design of bdrv_reopen() is quite broken because of the
-> way it tries to maintain old options if they aren't specified, and
-> guesses what you might mean when you add flags to the mix. The exact
-> semantics are quite complicated and I'd rather avoid them in a stable
-> API.
->
-> A clean QMP command would probably apply the same defaults as
-> blockdev-add, so you just get to specify the full options again.
+On Thu, 17 May 2018 10:15:21 +0200
+David Hildenbrand <david@redhat.com> wrote:
 
-I have a prototype of this working and almost ready to be published, but
-there's a tricky thing with this part:
+> Let's handle it via hotplug_handler_unplug(). E.g. necessary to hotplug/
+> unplug memory devices (which a pc-dimm is) later.
+> 
+> Signed-off-by: David Hildenbrand <david@redhat.com>
+> ---
+>  hw/ppc/spapr.c | 23 +++++++++++++++++++----
+>  1 file changed, 19 insertions(+), 4 deletions(-)
+> 
+> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> index 2f315f963b..286c38c842 100644
+> --- a/hw/ppc/spapr.c
+> +++ b/hw/ppc/spapr.c
+> @@ -3291,7 +3291,8 @@ static sPAPRDIMMState *spapr_recover_pending_dimm_state(sPAPRMachineState *ms,
+>  /* Callback to be called during DRC release. */
+>  void spapr_lmb_release(DeviceState *dev)
+>  {
+> -    sPAPRMachineState *spapr = SPAPR_MACHINE(qdev_get_hotplug_handler(dev));
+> +    HotplugHandler *hotplug_ctrl = qdev_get_hotplug_handler(dev);
+> +    sPAPRMachineState *spapr = SPAPR_MACHINE(hotplug_ctrl);
+>      sPAPRDIMMState *ds = spapr_pending_dimm_unplugs_find(spapr, PC_DIMM(dev));
+>  
+>      /* This information will get lost if a migration occurs
+> @@ -3309,9 +3310,21 @@ void spapr_lmb_release(DeviceState *dev)
+>  
+>      /*
+>       * Now that all the LMBs have been removed by the guest, call the
+> -     * pc-dimm unplug handler to cleanup up the pc-dimm device.
+> +     * unplug handler chain. This can never fail.
+>       */
+> -    pc_dimm_memory_unplug(dev, MACHINE(spapr));
+> +    hotplug_ctrl = qdev_get_hotplug_handler(dev);
+> +    hotplug_handler_unplug(hotplug_ctrl, dev, &error_abort);
+> +}
+> +
+> +static void spapr_memory_unplug(HotplugHandler *hotplug_dev, DeviceState *dev,
+> +                                Error **errp)
+> +{
+> +    sPAPRMachineState *spapr = SPAPR_MACHINE(hotplug_dev);
+> +    sPAPRDIMMState *ds = spapr_pending_dimm_unplugs_find(spapr, PC_DIMM(dev));
 
-If we want blockdev-reopen to apply the defaults for all options except
-from the ones expliclity specified by the user, then it means that we
-need to check not just the options that are present, but also the ones
-that are omitted.
+> +    g_assert(ds);
+> +    g_assert(!ds->nr_lmbs);
+Theses 2 lines seems to unrelated to patch topic,
+could you drop it?
 
-For example:
+if these values should be checked, it would be better to audit 'ds' use
+across spapr.c and file separate patch  separately from this series.
 
-   { "execute": "blockdev-add",
-     "arguments": { "driver": "null-aio",
-                    "node-name": "root",
-                    "size": 1024 }
-
-This adds a null-aio block device with the "size" option set to 1024
-(the default is 1 << 30).
-
-null_reopen_prepare() allows reopening that block device, but it does
-not allow changing any of its options. Attempting to change the value of
-"size" is detected by the loop that checks unhandled options at the end
-of bdrv_reopen_prepare() and returns "Cannot change the option 'size'".
-
-So far, so good. We have this generic check for all options that works
-with all drivers, so as long as we only specify options that we know
-that can be changed, everything is fine.
-
-However if we want blockdev-reopen to apply the default values for all
-omitted options, then omitting "size" would be equivalent to setting it
-to its default value (1 << 30). And if "size" cannot be changed then
-QEMU should complain unless we explicitly set "size" to 1024 again on
-reopen.
-
-This complicates things a bit, because we would go from "the options
-that can't be changed are the ones that are not handled by each driver's
-_prepare() function" to "options that are absent can also produce an
-error".
-
-Berto
+> +    pc_dimm_memory_unplug(dev, MACHINE(hotplug_dev));
+>      object_unparent(OBJECT(dev));
+>      spapr_pending_dimm_unplugs_remove(spapr, ds);
+>  }
+> @@ -3608,7 +3621,9 @@ static void spapr_machine_device_unplug(HotplugHandler *hotplug_dev,
+>      Error *local_err = NULL;
+>  
+>      /* final stage hotplug handler */
+> -    if (dev->parent_bus && dev->parent_bus->hotplug_handler) {
+> +    if (object_dynamic_cast(OBJECT(dev), TYPE_PC_DIMM)) {
+> +        spapr_memory_unplug(hotplug_dev, dev, &local_err);
+> +    } else if (dev->parent_bus && dev->parent_bus->hotplug_handler) {
+>          hotplug_handler_unplug(dev->parent_bus->hotplug_handler, dev,
+>                                 &local_err);
+>      }
+otherwise, ignoring dev->parent_bus parts, patch looks reasonable
