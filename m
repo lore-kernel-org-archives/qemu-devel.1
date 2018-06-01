@@ -1,23 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57503)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57504)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fOeWs-0005a5-Mt
+	(envelope-from <richard.henderson@linaro.org>) id 1fOeWs-0005a6-N0
 	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 03:31:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fOeWo-0000U0-Vz
+	(envelope-from <richard.henderson@linaro.org>) id 1fOeWq-0000VF-CA
 	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 03:31:18 -0400
-Received: from mail-pg0-x242.google.com ([2607:f8b0:400e:c05::242]:35167)
+Received: from mail-pg0-x241.google.com ([2607:f8b0:400e:c05::241]:44909)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1fOeWo-0000TL-PE
-	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 03:31:14 -0400
-Received: by mail-pg0-x242.google.com with SMTP id 15-v6so10552596pge.2
-	for <qemu-devel@nongnu.org>; Fri, 01 Jun 2018 00:31:14 -0700 (PDT)
+	id 1fOeWq-0000Um-6D
+	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 03:31:16 -0400
+Received: by mail-pg0-x241.google.com with SMTP id p21-v6so10876647pgd.11
+	for <qemu-devel@nongnu.org>; Fri, 01 Jun 2018 00:31:16 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Fri,  1 Jun 2018 00:30:31 -0700
-Message-Id: <20180601073050.8054-15-richard.henderson@linaro.org>
+Date: Fri,  1 Jun 2018 00:30:32 -0700
+Message-Id: <20180601073050.8054-16-richard.henderson@linaro.org>
 In-Reply-To: <20180601073050.8054-1-richard.henderson@linaro.org>
 References: <20180601073050.8054-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH 14/33] linux-user: Split out open_to_handle_at
+Subject: [Qemu-devel] [PATCH 15/33] linux-user: Split out creat, fork, waitid,
+ waitpid
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,128 +30,166 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: laurent@vivier.eu
 
-At the same time, merge do_open_to_handle_at into the new function.
-
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- linux-user/syscall.c | 84 ++++++++++++++++++++++----------------------
- 1 file changed, 42 insertions(+), 42 deletions(-)
+ linux-user/syscall.c | 108 +++++++++++++++++++++++++++----------------
+ 1 file changed, 69 insertions(+), 39 deletions(-)
 
 diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-index 4afc22c20c..48bb1c0231 100644
+index 48bb1c0231..e208f8647a 100644
 --- a/linux-user/syscall.c
 +++ b/linux-user/syscall.c
-@@ -7369,39 +7369,6 @@ static int do_futex(target_ulong uaddr, int op, int val, target_ulong timeout,
-         return -TARGET_ENOSYS;
-     }
- }
--#if defined(TARGET_NR_open_by_handle_at) && defined(CONFIG_OPEN_BY_HANDLE)
--static abi_long do_open_by_handle_at(abi_long mount_fd, abi_long handle,
--                                     abi_long flags)
--{
--    struct file_handle *target_fh;
--    struct file_handle *fh;
--    unsigned int size, total_size;
--    abi_long ret;
--
--    if (get_user_s32(size, handle)) {
--        return -TARGET_EFAULT;
--    }
--
--    total_size = sizeof(struct file_handle) + size;
--    target_fh = lock_user(VERIFY_READ, handle, total_size, 1);
--    if (!target_fh) {
--        return -TARGET_EFAULT;
--    }
--
--    fh = g_memdup(target_fh, total_size);
--    fh->handle_bytes = size;
--    fh->handle_type = tswap32(target_fh->handle_type);
--
--    ret = get_errno(open_by_handle_at(mount_fd, fh,
--                    target_to_host_bitmask(flags, fcntl_flags_tbl)));
--
--    g_free(fh);
--
--    unlock_user(target_fh, handle, total_size);
--
--    return ret;
--}
--#endif
- 
- #if defined(TARGET_NR_signalfd) || defined(TARGET_NR_signalfd4)
- 
-@@ -8187,6 +8154,45 @@ IMPL(openat)
-     return ret;
+@@ -7908,6 +7908,22 @@ IMPL(close)
+     return get_errno(close(arg1));
  }
  
-+#if defined(TARGET_NR_open_by_handle_at) && defined(CONFIG_OPEN_BY_HANDLE)
-+IMPL(open_by_handle_at)
++#ifdef TARGET_NR_creat
++IMPL(creat)
 +{
-+    abi_long mount_fd = arg1;
-+    abi_long handle = arg2;
-+    abi_long flags = arg3;
-+    struct file_handle *target_fh;
-+    struct file_handle *fh;
-+    unsigned int size, total_size;
++    char *p = lock_user_string(arg1);
 +    abi_long ret;
 +
-+    if (is_hostfd(mount_fd)) {
-+        return -TARGET_EBADF;
-+    }
-+    if (get_user_s32(size, handle)) {
++    if (!p) {
 +        return -TARGET_EFAULT;
 +    }
-+
-+    total_size = sizeof(struct file_handle) + size;
-+    target_fh = lock_user(VERIFY_READ, handle, total_size, 1);
-+    if (!target_fh) {
-+        return -TARGET_EFAULT;
-+    }
-+
-+    fh = g_memdup(target_fh, total_size);
-+    fh->handle_bytes = size;
-+    fh->handle_type = tswap32(target_fh->handle_type);
-+
-+    ret = get_errno(open_by_handle_at(mount_fd, fh,
-+                    target_to_host_bitmask(flags, fcntl_flags_tbl)));
-+
-+    g_free(fh);
-+    unlock_user(target_fh, handle, total_size);
-+
++    ret = get_errno(creat(p, arg2));
 +    fd_trans_unregister(ret);
++    unlock_user(p, arg1, 0);
 +    return ret;
 +}
 +#endif
 +
- IMPL(read)
+ IMPL(execve)
+ {
+     abi_ulong *guest_ptrs;
+@@ -8055,6 +8071,13 @@ IMPL(exit)
+     g_assert_not_reached();
+ }
+ 
++#ifdef TARGET_NR_fork
++IMPL(fork)
++{
++    return get_errno(do_fork(cpu_env, TARGET_SIGCHLD, 0, 0, 0, 0));
++}
++#endif
++
+ #if defined(TARGET_NR_name_to_handle_at) && defined(CONFIG_OPEN_BY_HANDLE)
+ IMPL(name_to_handle_at)
+ {
+@@ -8216,6 +8239,40 @@ IMPL(read)
+     return ret;
+ }
+ 
++#ifdef TARGET_NR_waitid
++IMPL(waitid)
++{
++    siginfo_t info;
++    abi_long ret;
++
++    info.si_pid = 0;
++    ret = get_errno(safe_waitid(arg1, arg2, &info, arg4, NULL));
++    if (!is_error(ret) && arg3 && info.si_pid != 0) {
++        target_siginfo_t *p
++            = lock_user(VERIFY_WRITE, arg3, sizeof(target_siginfo_t), 0);
++        if (!p) {
++            return -TARGET_EFAULT;
++        }
++        host_to_target_siginfo(p, &info);
++        unlock_user(p, arg3, sizeof(target_siginfo_t));
++    }
++    return ret;
++}
++#endif
++
++#ifdef TARGET_NR_waitpid
++IMPL(waitpid)
++{
++    int status;
++    abi_long ret = get_errno(safe_wait4(arg1, &status, arg3, 0));
++    if (!is_error(ret) && arg2 && ret &&
++        put_user_s32(host_to_target_waitstatus(status), arg2)) {
++        return -TARGET_EFAULT;
++    }
++    return ret;
++}
++#endif
++
+ IMPL(write)
  {
      abi_long ret;
-@@ -8252,15 +8258,6 @@ IMPL(everything_else)
+@@ -8258,45 +8315,6 @@ IMPL(everything_else)
      char *fn;
  
      switch(num) {
--#if defined(TARGET_NR_open_by_handle_at) && defined(CONFIG_OPEN_BY_HANDLE)
--    case TARGET_NR_open_by_handle_at:
--        if (is_hostfd(arg1)) {
--            return -TARGET_EBADF;
+-#ifdef TARGET_NR_fork
+-    case TARGET_NR_fork:
+-        return get_errno(do_fork(cpu_env, TARGET_SIGCHLD, 0, 0, 0, 0));
+-#endif
+-#ifdef TARGET_NR_waitpid
+-    case TARGET_NR_waitpid:
+-        {
+-            int status;
+-            ret = get_errno(safe_wait4(arg1, &status, arg3, 0));
+-            if (!is_error(ret) && arg2 && ret
+-                && put_user_s32(host_to_target_waitstatus(status), arg2))
+-                return -TARGET_EFAULT;
 -        }
--        ret = do_open_by_handle_at(arg1, arg2, arg3);
--        fd_trans_unregister(ret);
 -        return ret;
 -#endif
- #ifdef TARGET_NR_fork
-     case TARGET_NR_fork:
-         return get_errno(do_fork(cpu_env, TARGET_SIGCHLD, 0, 0, 0, 0));
-@@ -12944,6 +12941,9 @@ static impl_fn * const syscall_table[] = {
-     [TARGET_NR_open] = impl_open,
- #endif
-     [TARGET_NR_openat] = impl_openat,
-+#if defined(TARGET_NR_open_by_handle_at) && defined(CONFIG_OPEN_BY_HANDLE)
-+    [TARGET_NR_open_by_handle_at] = impl_open_by_handle_at,
+-#ifdef TARGET_NR_waitid
+-    case TARGET_NR_waitid:
+-        {
+-            siginfo_t info;
+-            info.si_pid = 0;
+-            ret = get_errno(safe_waitid(arg1, arg2, &info, arg4, NULL));
+-            if (!is_error(ret) && arg3 && info.si_pid != 0) {
+-                if (!(p = lock_user(VERIFY_WRITE, arg3, sizeof(target_siginfo_t), 0)))
+-                    return -TARGET_EFAULT;
+-                host_to_target_siginfo(p, &info);
+-                unlock_user(p, arg3, sizeof(target_siginfo_t));
+-            }
+-        }
+-        return ret;
+-#endif
+-#ifdef TARGET_NR_creat /* not on alpha */
+-    case TARGET_NR_creat:
+-        if (!(p = lock_user_string(arg1)))
+-            return -TARGET_EFAULT;
+-        ret = get_errno(creat(p, arg2));
+-        fd_trans_unregister(ret);
+-        unlock_user(p, arg1, 0);
+-        return ret;
+-#endif
+ #ifdef TARGET_NR_link
+     case TARGET_NR_link:
+         {
+@@ -12932,8 +12950,14 @@ IMPL(everything_else)
+ static impl_fn * const syscall_table[] = {
+     [TARGET_NR_brk] = impl_brk,
+     [TARGET_NR_close] = impl_close,
++#ifdef TARGET_NR_creat
++    [TARGET_NR_creat] = impl_creat,
 +#endif
+     [TARGET_NR_execve] = impl_execve,
+     [TARGET_NR_exit] = impl_exit,
++#ifdef TARGET_NR_fork
++    [TARGET_NR_fork] = impl_fork,
++#endif
+ #if defined(TARGET_NR_name_to_handle_at) && defined(CONFIG_OPEN_BY_HANDLE)
+     [TARGET_NR_name_to_handle_at] = impl_name_to_handle_at,
+ #endif
+@@ -12945,6 +12969,12 @@ static impl_fn * const syscall_table[] = {
+     [TARGET_NR_open_by_handle_at] = impl_open_by_handle_at,
+ #endif
      [TARGET_NR_read] = impl_read,
++#ifdef TARGET_NR_waitid
++    [TARGET_NR_waitid] = impl_waitid,
++#endif
++#ifdef TARGET_NR_waitpid
++    [TARGET_NR_waitpid] = impl_waitpid,
++#endif
      [TARGET_NR_write] = impl_write,
  };
+ 
 -- 
 2.17.0
