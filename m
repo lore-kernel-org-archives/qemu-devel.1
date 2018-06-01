@@ -1,16 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55600)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55640)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1fOgL7-00068p-56
-	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 05:27:18 -0400
+	(envelope-from <famz@redhat.com>) id 1fOgLE-0006Ex-0Q
+	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 05:27:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1fOgL5-0007TL-U9
-	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 05:27:17 -0400
+	(envelope-from <famz@redhat.com>) id 1fOgLA-0007Vy-22
+	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 05:27:24 -0400
 From: Fam Zheng <famz@redhat.com>
-Date: Fri,  1 Jun 2018 17:26:40 +0800
-Message-Id: <20180601092648.24614-3-famz@redhat.com>
+Date: Fri,  1 Jun 2018 17:26:41 +0800
+Message-Id: <20180601092648.24614-4-famz@redhat.com>
 In-Reply-To: <20180601092648.24614-1-famz@redhat.com>
 References: <20180601092648.24614-1-famz@redhat.com>
-Subject: [Qemu-devel] [PATCH v9 02/10] raw: Check byte range uniformly
+Subject: [Qemu-devel] [PATCH v9 03/10] raw: Implement copy offloading
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,142 +22,63 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Paolo Bonzini <pbonzini@redhat.com>, Ronnie Sahlberg <ronniesahlberg@gmail.com>, qemu-block@nongnu.org, Peter Lieven <pl@kamp.de>, Fam Zheng <famz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, eblake@redhat.com
 
-We don't verify the request range against s->size in the I/O callbacks
-except for raw_co_pwritev. This is inconsistent (especially for
-raw_co_pwrite_zeroes and raw_co_pdiscard), so fix them, in the meanwhile
-make the helper reusable by the coming new callbacks.
+Just pass down to ->file.
 
-Note that in most cases the block layer already verifies the request
-byte range against our reported image length, before invoking the driver
-callbacks.  The exception is during image creating, after
-blk_set_allow_write_beyond_eof(blk, true) is called. But in that case,
-the requests are not directly from the user or guest. So there is no
-visible behavior change in adding the check code.
-
-The int64_t -> uint64_t inconsistency, as shown by the type casting, is
-pre-existing due to the interface.
-
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
 Signed-off-by: Fam Zheng <famz@redhat.com>
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 ---
- block/raw-format.c | 64 ++++++++++++++++++++++++++++------------------
- 1 file changed, 39 insertions(+), 25 deletions(-)
+ block/raw-format.c | 32 ++++++++++++++++++++++++++++++++
+ 1 file changed, 32 insertions(+)
 
 diff --git a/block/raw-format.c b/block/raw-format.c
-index fe33693a2d..b69a0674b3 100644
+index b69a0674b3..f2e468df6f 100644
 --- a/block/raw-format.c
 +++ b/block/raw-format.c
-@@ -167,16 +167,37 @@ static void raw_reopen_abort(BDRVReopenState *state)
-     state->opaque = NULL;
+@@ -497,6 +497,36 @@ static int raw_probe_geometry(BlockDriverState *bs, HDGeometry *geo)
+     return bdrv_probe_geometry(bs->file->bs, geo);
  }
  
-+/* Check and adjust the offset, against 'offset' and 'size' options. */
-+static inline int raw_adjust_offset(BlockDriverState *bs, uint64_t *offset,
-+                                    uint64_t bytes, bool is_write)
++static int coroutine_fn raw_co_copy_range_from(BlockDriverState *bs,
++                                               BdrvChild *src, uint64_t src_offset,
++                                               BdrvChild *dst, uint64_t dst_offset,
++                                               uint64_t bytes, BdrvRequestFlags flags)
 +{
-+    BDRVRawState *s = bs->opaque;
++    int ret;
 +
-+    if (s->has_size && (*offset > s->size || bytes > (s->size - *offset))) {
-+        /* There's not enough space for the write, or the read request is
-+         * out-of-range. Don't read/write anything to prevent leaking out of
-+         * the size specified in options. */
-+        return is_write ? -ENOSPC : -EINVAL;;
++    ret = raw_adjust_offset(bs, &src_offset, bytes, false);
++    if (ret) {
++        return ret;
 +    }
-+
-+    if (*offset > INT64_MAX - s->offset) {
-+        return -EINVAL;
-+    }
-+    *offset += s->offset;
-+
-+    return 0;
++    return bdrv_co_copy_range_from(bs->file, src_offset, dst, dst_offset,
++                                   bytes, flags);
 +}
 +
- static int coroutine_fn raw_co_preadv(BlockDriverState *bs, uint64_t offset,
-                                       uint64_t bytes, QEMUIOVector *qiov,
-                                       int flags)
- {
--    BDRVRawState *s = bs->opaque;
++static int coroutine_fn raw_co_copy_range_to(BlockDriverState *bs,
++                                             BdrvChild *src, uint64_t src_offset,
++                                             BdrvChild *dst, uint64_t dst_offset,
++                                             uint64_t bytes, BdrvRequestFlags flags)
++{
 +    int ret;
- 
--    if (offset > UINT64_MAX - s->offset) {
--        return -EINVAL;
-+    ret = raw_adjust_offset(bs, &offset, bytes, false);
++
++    ret = raw_adjust_offset(bs, &dst_offset, bytes, true);
 +    if (ret) {
 +        return ret;
-     }
--    offset += s->offset;
- 
-     BLKDBG_EVENT(bs->file, BLKDBG_READ_AIO);
-     return bdrv_co_preadv(bs->file, offset, bytes, qiov, flags);
-@@ -186,23 +207,11 @@ static int coroutine_fn raw_co_pwritev(BlockDriverState *bs, uint64_t offset,
-                                        uint64_t bytes, QEMUIOVector *qiov,
-                                        int flags)
- {
--    BDRVRawState *s = bs->opaque;
-     void *buf = NULL;
-     BlockDriver *drv;
-     QEMUIOVector local_qiov;
-     int ret;
- 
--    if (s->has_size && (offset > s->size || bytes > (s->size - offset))) {
--        /* There's not enough space for the data. Don't write anything and just
--         * fail to prevent leaking out of the size specified in options. */
--        return -ENOSPC;
--    }
--
--    if (offset > UINT64_MAX - s->offset) {
--        ret = -EINVAL;
--        goto fail;
--    }
--
-     if (bs->probed && offset < BLOCK_PROBE_BUF_SIZE && bytes) {
-         /* Handling partial writes would be a pain - so we just
-          * require that guests have 512-byte request alignment if
-@@ -237,7 +246,10 @@ static int coroutine_fn raw_co_pwritev(BlockDriverState *bs, uint64_t offset,
-         qiov = &local_qiov;
-     }
- 
--    offset += s->offset;
-+    ret = raw_adjust_offset(bs, &offset, bytes, true);
-+    if (ret) {
-+        goto fail;
 +    }
- 
-     BLKDBG_EVENT(bs->file, BLKDBG_WRITE_AIO);
-     ret = bdrv_co_pwritev(bs->file, offset, bytes, qiov, flags);
-@@ -267,22 +279,24 @@ static int coroutine_fn raw_co_pwrite_zeroes(BlockDriverState *bs,
-                                              int64_t offset, int bytes,
-                                              BdrvRequestFlags flags)
- {
--    BDRVRawState *s = bs->opaque;
--    if (offset > UINT64_MAX - s->offset) {
--        return -EINVAL;
-+    int ret;
++    return bdrv_co_copy_range_to(src, src_offset, bs->file, dst_offset, bytes,
++                                 flags);
++}
 +
-+    ret = raw_adjust_offset(bs, (uint64_t *)&offset, bytes, true);
-+    if (ret) {
-+        return ret;
-     }
--    offset += s->offset;
-     return bdrv_co_pwrite_zeroes(bs->file, offset, bytes, flags);
- }
- 
- static int coroutine_fn raw_co_pdiscard(BlockDriverState *bs,
-                                         int64_t offset, int bytes)
- {
--    BDRVRawState *s = bs->opaque;
--    if (offset > UINT64_MAX - s->offset) {
--        return -EINVAL;
-+    int ret;
-+
-+    ret = raw_adjust_offset(bs, (uint64_t *)&offset, bytes, true);
-+    if (ret) {
-+        return ret;
-     }
--    offset += s->offset;
-     return bdrv_co_pdiscard(bs->file->bs, offset, bytes);
- }
- 
+ BlockDriver bdrv_raw = {
+     .format_name          = "raw",
+     .instance_size        = sizeof(BDRVRawState),
+@@ -513,6 +543,8 @@ BlockDriver bdrv_raw = {
+     .bdrv_co_pwrite_zeroes = &raw_co_pwrite_zeroes,
+     .bdrv_co_pdiscard     = &raw_co_pdiscard,
+     .bdrv_co_block_status = &raw_co_block_status,
++    .bdrv_co_copy_range_from = &raw_co_copy_range_from,
++    .bdrv_co_copy_range_to  = &raw_co_copy_range_to,
+     .bdrv_truncate        = &raw_truncate,
+     .bdrv_getlength       = &raw_getlength,
+     .has_variable_length  = true,
 -- 
 2.17.0
