@@ -1,20 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39017)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39016)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1fOmto-0002dZ-8L
+	(envelope-from <mst@redhat.com>) id 1fOmto-0002dX-87
 	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 12:27:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1fOmtl-0007aZ-4l
+	(envelope-from <mst@redhat.com>) id 1fOmtl-0007al-6Z
 	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 12:27:32 -0400
-Date: Fri, 1 Jun 2018 19:27:19 +0300
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:59610 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1fOmtl-0007aI-1K
+	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 12:27:29 -0400
+Date: Fri, 1 Jun 2018 19:27:28 +0300
 From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20180601162620.32362-24-mst@redhat.com>
+Message-ID: <20180601162620.32362-31-mst@redhat.com>
 References: <20180601162620.32362-1-mst@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 In-Reply-To: <20180601162620.32362-1-mst@redhat.com>
-Subject: [Qemu-devel] [PULL 23/31] migration: use local path for local
- headers
+Subject: [Qemu-devel] [PULL 30/31] ACPI testing: test NFIT platform
+ capabilities
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,81 +28,52 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Juan Quintela <quintela@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Fam Zheng <famz@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-block@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>, Ross Zwisler <ross.zwisler@linux.intel.com>, Igor Mammedov <imammedo@redhat.com>
 
-When pulling in headers that are in the same directory as the C file (as
-opposed to one in include/), we should use its relative path, without a
-directory.
+From: Ross Zwisler <ross.zwisler@linux.intel.com>
 
+Add testing for the newly added NFIT Platform Capabilities Structure.
+
+Signed-off-by: Ross Zwisler <ross.zwisler@linux.intel.com>
+Suggested-by: Igor Mammedov <imammedo@redhat.com>
+Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-Reviewed-by: Juan Quintela <quintela@redhat.com>
 ---
- migration/block-dirty-bitmap.c | 2 +-
- migration/page_cache.c         | 2 +-
- migration/ram.c                | 4 ++--
- migration/vmstate.c            | 2 +-
- 4 files changed, 5 insertions(+), 5 deletions(-)
+ tests/bios-tables-test.c              |   2 +-
+ tests/acpi-test-data/pc/NFIT.dimmpxm  | Bin 224 -> 240 bytes
+ tests/acpi-test-data/q35/NFIT.dimmpxm | Bin 224 -> 240 bytes
+ 3 files changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/migration/block-dirty-bitmap.c b/migration/block-dirty-bitmap.c
-index 8819aabe3a..eeccaff34b 100644
---- a/migration/block-dirty-bitmap.c
-+++ b/migration/block-dirty-bitmap.c
-@@ -66,7 +66,7 @@
- #include "qemu/error-report.h"
- #include "migration/misc.h"
- #include "migration/migration.h"
--#include "migration/qemu-file.h"
-+#include "qemu-file.h"
- #include "migration/vmstate.h"
- #include "migration/register.h"
- #include "qemu/hbitmap.h"
-diff --git a/migration/page_cache.c b/migration/page_cache.c
-index 96268c3aea..acc252b100 100644
---- a/migration/page_cache.c
-+++ b/migration/page_cache.c
-@@ -18,7 +18,7 @@
- #include "qapi/error.h"
- #include "qemu-common.h"
- #include "qemu/host-utils.h"
--#include "migration/page_cache.h"
-+#include "page_cache.h"
- 
- #ifdef DEBUG_CACHE
- #define DPRINTF(fmt, ...) \
-diff --git a/migration/ram.c b/migration/ram.c
-index 5bcbf7a9f9..e7d6cf6492 100644
---- a/migration/ram.c
-+++ b/migration/ram.c
-@@ -41,7 +41,7 @@
- #include "migration/misc.h"
- #include "qemu-file.h"
- #include "postcopy-ram.h"
--#include "migration/page_cache.h"
-+#include "page_cache.h"
- #include "qemu/error-report.h"
- #include "qapi/error.h"
- #include "qapi/qapi-events-migration.h"
-@@ -51,7 +51,7 @@
- #include "exec/target_page.h"
- #include "qemu/rcu_queue.h"
- #include "migration/colo.h"
--#include "migration/block.h"
-+#include "block.h"
- #include "sysemu/sysemu.h"
- #include "qemu/uuid.h"
- #include "savevm.h"
-diff --git a/migration/vmstate.c b/migration/vmstate.c
-index 0b3282c9df..0a096360e2 100644
---- a/migration/vmstate.c
-+++ b/migration/vmstate.c
-@@ -14,7 +14,7 @@
- #include "qemu-common.h"
- #include "migration.h"
- #include "migration/vmstate.h"
--#include "migration/savevm.h"
-+#include "savevm.h"
- #include "qemu-file.h"
- #include "qemu/bitops.h"
- #include "qemu/error-report.h"
+diff --git a/tests/bios-tables-test.c b/tests/bios-tables-test.c
+index bf3e193ae9..256d463cb8 100644
+--- a/tests/bios-tables-test.c
++++ b/tests/bios-tables-test.c
+@@ -830,7 +830,7 @@ static void test_acpi_tcg_dimm_pxm(const char *machine)
+     memset(&data, 0, sizeof(data));
+     data.machine = machine;
+     data.variant = ".dimmpxm";
+-    test_acpi_one(" -machine nvdimm=on"
++    test_acpi_one(" -machine nvdimm=on,nvdimm-cap=3"
+                   " -smp 4,sockets=4"
+                   " -m 128M,slots=3,maxmem=1G"
+                   " -numa node,mem=32M,nodeid=0"
+diff --git a/tests/acpi-test-data/pc/NFIT.dimmpxm b/tests/acpi-test-data/pc/NFIT.dimmpxm
+index 2bfc6c51f31c25a052803c494c933d4948fc0106..598d331b751cd3cb2137d431c1f34bb8957a0d31 100644
+GIT binary patch
+delta 35
+lcmaFB_<@nj&&@OB0|NsCqsm0CYXa;H0t}2m9y1Vw005dH1-}3Q
+
+delta 18
+Zcmeys_<)hi&&@OB0RsaAqyI#%YXCU~1+M@A
+
+diff --git a/tests/acpi-test-data/q35/NFIT.dimmpxm b/tests/acpi-test-data/q35/NFIT.dimmpxm
+index 2bfc6c51f31c25a052803c494c933d4948fc0106..598d331b751cd3cb2137d431c1f34bb8957a0d31 100644
+GIT binary patch
+delta 35
+lcmaFB_<@nj&&@OB0|NsCqsm0CYXa;H0t}2m9y1Vw005dH1-}3Q
+
+delta 18
+Zcmeys_<)hi&&@OB0RsaAqyI#%YXCU~1+M@A
+
 -- 
 MST
