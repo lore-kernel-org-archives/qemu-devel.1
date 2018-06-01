@@ -1,25 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38864)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39156)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fOkqX-0001rU-0j
-	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 10:16:02 -0400
+	(envelope-from <gengdongjiu@huawei.com>) id 1fOkr7-0002KR-Il
+	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 10:16:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fOkqS-0004R9-QA
-	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 10:16:01 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:46552 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1fOkqS-0004Qe-KH
-	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 10:15:56 -0400
-References: <cover.1527814874.git.keno@juliacomputing.com>
-	<1f6bc60305b8c1cd00f5e2a361a05d7b4bc56338.1527814874.git.keno@juliacomputing.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <09d916f2-491c-fb8b-c42e-34814eaaf447@redhat.com>
-Date: Fri, 1 Jun 2018 09:15:55 -0500
+	(envelope-from <gengdongjiu@huawei.com>) id 1fOkr6-00055z-DC
+	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 10:16:37 -0400
+From: gengdongjiu <gengdongjiu@huawei.com>
+Date: Fri, 1 Jun 2018 14:16:08 +0000
+Message-ID: <0184EA26B2509940AA629AE1405DD7F201CAF085@DGGEMA503-MBX.china.huawei.com>
+Content-Language: zh-CN
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-In-Reply-To: <1f6bc60305b8c1cd00f5e2a361a05d7b4bc56338.1527814874.git.keno@juliacomputing.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 01/20] cutils: Provide strchrnul
+Subject: Re: [Qemu-devel] [PATCH RESEND v1 0/3] add support for VCPU event
+ states
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,43 +22,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Keno Fischer <keno@juliacomputing.com>, qemu-devel@nongnu.org
-Cc: groug@kaod.org
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "famz@redhat.com" <famz@redhat.com>, "james.morse@arm.com" <james.morse@arm.com>, "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>, Linuxarm <linuxarm@huawei.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-On 05/31/2018 08:25 PM, Keno Fischer wrote:
-> strchrnul is a GNU extension and thus unavailable on a number of targets.
-> In the review for a commit removing strchrnul from 9p, I was asked to
-> create a qemu_strchrnul helper to factor out this functionality.
-> Do so, and use it in a number of other places in the code base that inlined
-> the replacement pattern in a place where strchrnul could be used.
-> 
-> Signed-off-by: Keno Fischer <keno@juliacomputing.com>
-> ---
-> 
-
-> +++ b/util/cutils.c
-> @@ -545,6 +545,19 @@ int qemu_strtou64(const char *nptr, const char **endptr, int base,
->   }
->   
->   /**
-> + * Searches for the first occurrence of 'c' in 's', and returns a pointer
-> + * to the trailing null byte if none was found.
-> + */
-> +const char *qemu_strchrnul(const char *s, int c)
-> +{
-> +    const char *e = strchr(s, c);
-> +    if (!e) {
-> +        e = s + strlen(s);
-> +    }
-> +    return e;
-> +}
-
-This is twice as slow on glibc systems when the pointer to NUL is 
-returned (because it has to traverse the string twice); it's better to 
-have a configure check for whether strchrnul exists, and if so, use that 
-directly.
-
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+SGkgUGV0ZXIsDQoNCj4gDQo+IE9uIDEgSnVuZSAyMDE4IGF0IDE0OjE3LCBnZW5nZG9uZ2ppdSA8
+Z2VuZ2RvbmdqaXVAaHVhd2VpLmNvbT4gd3JvdGU6DQo+ID4gSGkgUGV0ZXIsDQo+ID4+IFRoaXMg
+c2VyaWVzIGZhaWxlZCBidWlsZCB0ZXN0IG9uIHMzOTB4IGhvc3QuIFBsZWFzZSBmaW5kIHRoZSBk
+ZXRhaWxzIGJlbG93Lg0KPiANCj4gPj4gL3Zhci90bXAvcGF0Y2hldy10ZXN0ZXItdG1wLWh3c24z
+d3NsL3NyYy9ody9kaXNwbGF5L3ZpcnRpby1ncHUtM2QuYzogSW4gZnVuY3Rpb24g4oCYdmlyZ2xf
+Y21kX2dldF9jYXBzZXRfaW5mb+KAmToNCj4gPj4gL3Zhci90bXAvcGF0Y2hldy10ZXN0ZXItdG1w
+LWh3c24zd3NsL3NyYy9ody9kaXNwbGF5L3ZpcnRpby1ncHUtM2QuYzozDQo+ID4+IDY2OjI2OiBl
+cnJvcjog4oCYVklSVElPX0dQVV9DQVBTRVRfVklSR0wy4oCZIHVuZGVjbGFyZWQgKGZpcnN0IHVz
+ZSBpbiB0aGlzIGZ1bmN0aW9uKTsgZGlkIHlvdSBtZWFuIOKAmFZJUlRJT19HUFVfQ0FQU0VUX1ZJ
+UkdM4oCZPw0KPiA+PiAgICAgICAgICByZXNwLmNhcHNldF9pZCA9IFZJUlRJT19HUFVfQ0FQU0VU
+X1ZJUkdMMjsNCj4gPj4gICAgICAgICAgICAgICAgICAgICAgICAgICBefn5+fn5+fn5+fn5+fn5+
+fn5+fn5+fn4NCj4gPj4gICAgICAgICAgICAgICAgICAgICAgICAgICBWSVJUSU9fR1BVX0NBUFNF
+VF9WSVJHTA0KPiA+PiAvdmFyL3RtcC9wYXRjaGV3LXRlc3Rlci10bXAtaHdzbjN3c2wvc3JjL2h3
+L2Rpc3BsYXkvdmlydGlvLWdwdS0zZC5jOjMNCj4gPj4gNjY6MjY6IG5vdGU6IGVhY2ggdW5kZWNs
+YXJlZCBpZGVudGlmaWVyIGlzIHJlcG9ydGVkIG9ubHkgb25jZSBmb3INCj4gPj4gZWFjaCBmdW5j
+dGlvbiBpdCBhcHBlYXJzIGluDQo+ID4+IC92YXIvdG1wL3BhdGNoZXctdGVzdGVyLXRtcC1od3Nu
+M3dzbC9zcmMvaHcvZGlzcGxheS92aXJ0aW8tZ3B1LTNkLmM6IEluIGZ1bmN0aW9uIOKAmHZpcnRp
+b19ncHVfdmlyZ2xfZ2V0X251bV9jYXBzZXRz4oCZOg0KPiA+PiAvdmFyL3RtcC9wYXRjaGV3LXRl
+c3Rlci10bXAtaHdzbjN3c2wvc3JjL2h3L2Rpc3BsYXkvdmlydGlvLWdwdS0zZC5jOjYNCj4gPj4g
+NDY6MzI6IGVycm9yOiDigJhWSVJUSU9fR1BVX0NBUFNFVF9WSVJHTDLigJkgdW5kZWNsYXJlZCAo
+Zmlyc3QgdXNlIGluIHRoaXMgZnVuY3Rpb24pOyBkaWQgeW91IG1lYW4g4oCYVklSVElPX0dQVV9D
+QVBTRVRfVklSR0zigJk/DQo+IA0KPiA+IFRoaXMgYnVpbGQgZmFpbHVyZSBpcyBkdWUgdG8ga2Vy
+bmVsIG1pc3NpbmcgdGhlIGRlZmluaXRpb24gb2YNCj4gPiAiVklSVElPX0dQVV9DQVBTRVRfVklS
+R0wyIiwgSSBzeW5jIHRoZSBtYWlubGluZSBrZXJuZWwgdHJlZSBoZWFkZXIgZmlsZSB0byB0aGUg
+bWFpbmxpbmUgUUVNVSB1c2luZyB0aGUgc2NyaXB0c1sxXSwgU28gaGFwcGVuIHRoaXMNCj4gZmFp
+bHVyZSwgSXQgZG9lcyBub3QgcmVsYXRlZCB3aXRoIG15c2VsZiBwYXRjaCwgc28gY2FuIEkgZGlz
+Y2FyZCB0aGUgcGF0Y2ggWzFdIG9yIGFkZCB0aGUg4oCYVklSVElPX0dQVV9DQVBTRVRfVklSR0wy
+4oCZIGRlZmluaXRpb24gdG8NCj4gbWFpbmxpbmUga2VybmVsIHRyZWU/DQo+IA0KPiBUaGlzIGlz
+IGEga25vd24gaXNzdWUgd2l0aCB0aGUga2VybmVsIGhlYWRlcnMgKGhvcGVmdWxseSBzb21lYm9k
+eSB3aWxsIGZpeCB0aGVtKS4gVGhlcmUgYXJlIHNldmVyYWwgbml0cyBhbmQgYWxzbyBidWdzIGlu
+IHRoZSB1cGRhdGUtaGVhZGVycw0KPiBzY3JpcHQgdGhhdCBJIHNlbnQgYSBwYXRjaHNldCB0byBm
+aXggcmVjZW50bHk6DQo+ICBodHRwczovL2xpc3RzLmdudS5vcmcvYXJjaGl2ZS9odG1sL3FlbXUt
+ZGV2ZWwvMjAxOC0wNS9tc2cwNTgwMy5odG1sDQo+IA0KPiBZb3Ugc2hvdWxkIHdhaXQgZm9yIHRo
+YXQgdG8gZ2V0IGludG8gbWFzdGVyIChpdCBpcyBpbiBQYW9sbydzIG1vc3QgcmVjZW50IHBhdGNo
+c2V0IGJ1dCB0aGF0IGhhcyBhbiBpc3N1ZSB3aXRoIGEgZGlmZmVyZW50IHBhdGNoLCBzbyBpcyB3
+YWl0aW5nIG9uDQo+IFBhb2xvIHRvIGRvIGEgcmVzcGluKS4gVGhlbiB5b3UgY2FuIGJhc2Ugb24g
+dGhhdC4gQXQgdGhhdCBwb2ludCBhIHNpbXBsZSBzY3JpcHQgdXBkYXRlIHNob3VsZCB3b3JrIGZp
+bmUgKGlmIHlvdSBuZWVkIGFueXRoaW5nIGluIHJjNyB0aGF0DQo+IHdhc24ndCBpbiByYzYpLg0K
+DQpPaywgZ290IGl0LiBUaGFua3MgYSBsb3QgZm9yIHRoZSBleHBsYW5hdGlvbiwgSSB3aWxsIHdh
+aXQgZm9yIHlvdXIgcGF0Y2hbMV0gbWVyZ2UgaW50byBtYXN0ZXIgYW5kIGJhc2VkIG9uIGl0LiAN
+Cg0KWzFdIGh0dHBzOi8vbGlzdHMuZ251Lm9yZy9hcmNoaXZlL2h0bWwvcWVtdS1kZXZlbC8yMDE4
+LTA1L21zZzA1ODAzLmh0bWwNCg0KPiANCj4gdGhhbmtzDQo+IC0tIFBNTQ0K
