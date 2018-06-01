@@ -1,23 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50211)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50368)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1fOlba-0000Kc-1m
-	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 11:04:39 -0400
+	(envelope-from <eblake@redhat.com>) id 1fOlcj-00012k-Jv
+	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 11:05:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1fOlbZ-0006sJ-4m
-	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 11:04:38 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:57724 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1fOlbZ-0006rt-0J
-	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 11:04:37 -0400
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Date: Fri,  1 Jun 2018 16:04:28 +0100
-Message-Id: <20180601150428.30896-2-stefanha@redhat.com>
-In-Reply-To: <20180601150428.30896-1-stefanha@redhat.com>
-References: <20180601150428.30896-1-stefanha@redhat.com>
+	(envelope-from <eblake@redhat.com>) id 1fOlci-0008FR-FU
+	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 11:05:49 -0400
+References: <1527801443-30620-1-git-send-email-ari@tuxera.com>
+	<e890432c-cfb4-d933-c1a8-d571ac5687e8@redhat.com>
+	<8ccfcf94-2282-b56b-4b79-41c05551d26d@tuxera.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <582811be-f110-9045-1fb8-9bf186d6dd7b@redhat.com>
+Date: Fri, 1 Jun 2018 10:05:40 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+In-Reply-To: <8ccfcf94-2282-b56b-4b79-41c05551d26d@tuxera.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 1/1] trace: Sort trace-events-subdirs
+Subject: Re: [Qemu-devel] [PATCH 1/5] block: Add blklogwrites
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,132 +25,87 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Stefan Hajnoczi <stefanha@redhat.com>
+To: Ari Sundholm <ari@tuxera.com>, qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org, Aapo Vienamo <aapo@tuxera.com>, Kevin Wolf <kwolf@redhat.com>
 
-From: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-
-Having these entries sorted helps to add new ones.
-
-Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-Message-id: 20180528054055.21153-1-f4bug@amsat.org
-Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
----
- Makefile.objs | 82 +++++++++++++++++++++++++--------------------------
- 1 file changed, 41 insertions(+), 41 deletions(-)
-
-diff --git a/Makefile.objs b/Makefile.objs
-index c6c3554203..2c8cb72407 100644
---- a/Makefile.objs
-+++ b/Makefile.objs
-@@ -196,66 +196,66 @@ vhost-user-blk-obj-y =3D contrib/vhost-user-blk/
+On 06/01/2018 08:31 AM, Ari Sundholm wrote:
+>>> +++ b/block/blklogwrites.c
+>>> @@ -0,0 +1,441 @@
+>>> +/*
+>>> + * Write logging blk driver based on blkverify and blkdebug.
+>>> + *
+>>> + * Copyright (c) 2017 Tuomas Tynkkynen <tuomas@tuxera.com>
+>>> + * Copyright (c) 2018 Aapo Vienamo <aapo@tuxera.com>
+>>> + * Copyright (c) 2018 Ari Sundholm <ari@tuxera.com>
+>>> + *
+>>> + * This work is licensed under the terms of the GNU GPL, version 2=20
+>>> or later.
+>>> + * See the COPYING file in the top-level directory.
+>>> + */
+>>> +
+>>> +#include "qemu/osdep.h"
+>>> +#include "qapi/error.h"
+>>> +#include "qemu/sockets.h" /* for EINPROGRESS on Windows */
+>>> +#include "block/block_int.h"
+>>> +#include "qapi/qmp/qdict.h"
+>>> +#include "qapi/qmp/qstring.h"
+>>> +#include "qemu/cutils.h"
+>>> +#include "qemu/option.h"
+>>> +
+>>> +/* Disk format stuff - taken from Linux drivers/md/dm-log-writes.c *=
+/
+>>
+>> Your copyright claims GPLv2+; but drivers/md/dm-log-writes.c states=20
+>> only "* This file is released under the GPL." - I guess that means=20
+>> you're okay (parts of Linux are GPLv2-only, which we can't copy into a=
 =20
- ######################################################################
- trace-events-subdirs =3D
--trace-events-subdirs +=3D util
--trace-events-subdirs +=3D crypto
--trace-events-subdirs +=3D io
--trace-events-subdirs +=3D migration
-+trace-events-subdirs +=3D accel/kvm
-+trace-events-subdirs +=3D accel/tcg
-+trace-events-subdirs +=3D audio
- trace-events-subdirs +=3D block
- trace-events-subdirs +=3D chardev
-+trace-events-subdirs +=3D crypto
-+trace-events-subdirs +=3D hw/9pfs
-+trace-events-subdirs +=3D hw/acpi
-+trace-events-subdirs +=3D hw/alpha
-+trace-events-subdirs +=3D hw/arm
-+trace-events-subdirs +=3D hw/audio
- trace-events-subdirs +=3D hw/block
- trace-events-subdirs +=3D hw/block/dataplane
- trace-events-subdirs +=3D hw/char
--trace-events-subdirs +=3D hw/intc
--trace-events-subdirs +=3D hw/net
--trace-events-subdirs +=3D hw/rdma
--trace-events-subdirs +=3D hw/rdma/vmw
--trace-events-subdirs +=3D hw/virtio
--trace-events-subdirs +=3D hw/audio
--trace-events-subdirs +=3D hw/misc
--trace-events-subdirs +=3D hw/misc/macio
--trace-events-subdirs +=3D hw/usb
--trace-events-subdirs +=3D hw/scsi
--trace-events-subdirs +=3D hw/nvram
- trace-events-subdirs +=3D hw/display
--trace-events-subdirs +=3D hw/input
--trace-events-subdirs +=3D hw/timer
- trace-events-subdirs +=3D hw/dma
--trace-events-subdirs +=3D hw/sparc
--trace-events-subdirs +=3D hw/sparc64
--trace-events-subdirs +=3D hw/sd
--trace-events-subdirs +=3D hw/isa
--trace-events-subdirs +=3D hw/mem
-+trace-events-subdirs +=3D hw/hppa
- trace-events-subdirs +=3D hw/i386
- trace-events-subdirs +=3D hw/i386/xen
--trace-events-subdirs +=3D hw/9pfs
--trace-events-subdirs +=3D hw/ppc
-+trace-events-subdirs +=3D hw/ide
-+trace-events-subdirs +=3D hw/input
-+trace-events-subdirs +=3D hw/intc
-+trace-events-subdirs +=3D hw/isa
-+trace-events-subdirs +=3D hw/mem
-+trace-events-subdirs +=3D hw/misc
-+trace-events-subdirs +=3D hw/misc/macio
-+trace-events-subdirs +=3D hw/net
-+trace-events-subdirs +=3D hw/nvram
- trace-events-subdirs +=3D hw/pci
- trace-events-subdirs +=3D hw/pci-host
-+trace-events-subdirs +=3D hw/ppc
-+trace-events-subdirs +=3D hw/rdma
-+trace-events-subdirs +=3D hw/rdma/vmw
- trace-events-subdirs +=3D hw/s390x
-+trace-events-subdirs +=3D hw/scsi
-+trace-events-subdirs +=3D hw/sd
-+trace-events-subdirs +=3D hw/sparc
-+trace-events-subdirs +=3D hw/sparc64
-+trace-events-subdirs +=3D hw/timer
-+trace-events-subdirs +=3D hw/tpm
-+trace-events-subdirs +=3D hw/usb
- trace-events-subdirs +=3D hw/vfio
--trace-events-subdirs +=3D hw/acpi
--trace-events-subdirs +=3D hw/arm
--trace-events-subdirs +=3D hw/alpha
--trace-events-subdirs +=3D hw/hppa
-+trace-events-subdirs +=3D hw/virtio
- trace-events-subdirs +=3D hw/xen
--trace-events-subdirs +=3D hw/ide
--trace-events-subdirs +=3D hw/tpm
--trace-events-subdirs +=3D ui
--trace-events-subdirs +=3D audio
-+trace-events-subdirs +=3D io
-+trace-events-subdirs +=3D linux-user
-+trace-events-subdirs +=3D migration
-+trace-events-subdirs +=3D nbd
- trace-events-subdirs +=3D net
-+trace-events-subdirs +=3D qapi
-+trace-events-subdirs +=3D qom
-+trace-events-subdirs +=3D scsi
- trace-events-subdirs +=3D target/arm
- trace-events-subdirs +=3D target/i386
- trace-events-subdirs +=3D target/mips
--trace-events-subdirs +=3D target/sparc
--trace-events-subdirs +=3D target/s390x
- trace-events-subdirs +=3D target/ppc
--trace-events-subdirs +=3D qom
--trace-events-subdirs +=3D linux-user
--trace-events-subdirs +=3D qapi
--trace-events-subdirs +=3D accel/tcg
--trace-events-subdirs +=3D accel/kvm
--trace-events-subdirs +=3D nbd
--trace-events-subdirs +=3D scsi
-+trace-events-subdirs +=3D target/s390x
-+trace-events-subdirs +=3D target/sparc
-+trace-events-subdirs +=3D ui
-+trace-events-subdirs +=3D util
+>> GPLv2+ file).
+>>
+>=20
+> I consulted legal counsel on this part, and it is our opinion that the=20
+> constants and structs taken from the Linux kernel are insignificant and=
 =20
- trace-events-files =3D $(SRC_PATH)/trace-events $(trace-events-subdirs:%=
-=3D$(SRC_PATH)/%/trace-events)
+> required for compatibility, so it should be OK to license the file as=20
+> GPLv2+ in any case. Just to confirm, do you see this differently?
+
+I'm not a lawyer, but I don't see any problem for the code you copied=20
+from that particular file (that is, any source file that says just "GPL"=20
+can be interpreted as "GPLv1+", which is therefore okay to copy into a=20
+"GPLv2+" file).  I was more pointing out that in general, any time you=20
+copy code but use a different license, you DO have to perform due=20
+diligence to ensure you aren't treading on dangerous ground.  And the=20
+fact that you consulted legal counsel is a good thing.  If it were a=20
+more controversial claim (copying from a "GPLv2-only" file on the ground=20
+that the copied portion is part of an essential interface and therefore=20
+not bound by GPLv2-only and therefore okay for inclusion in GPLv2+, then=20
+I'd have mentioned the legal counsel's advice as part of the commit=20
+message; but in this case I don't think that's necessary.  Also, we DO=20
+have files in qemu that are GPLv2-only - we don't like adding more when=20
+not necessary, but when copying from a GPLv2-only source, it is=20
+certainly a justifiable action (rather than worrying about whether=20
+licensing your file as GPLv2+ is violating the intent of the copied=20
+portions in your file) - but again, I don't see that as something needed=20
+for this patch, given that your source file did not state GPLv2-only.
+
+>> Do we still want to support yet another legacy syntax addition?=C2=A0 =
+I'd=20
+>> rather just require the user to pass in a valid --blockdev=20
+>> specification (which implies that you MUST support a QMP description),=
 =20
+>> and skip the legacy syntax altogether.
+>>
+>=20
+> I believe this was inherited from blkverify, which was used as a basis.=
+=20
+> I will have to do some research into how to do this properly for this=20
+> kind of a driver which requires multiple filenames. Any pointers would=20
+> be appreciated.
+>
+
+Look at qapi/block-core.json BlockdevOptionsBlkverify for how to declare=20
+the QMP type.  Kevin may also have some hints.
+
 --=20
-2.17.0
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
