@@ -1,21 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57242)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57244)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fOeWY-0005Mx-Ji
-	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 03:30:59 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1fOeWY-0005N0-LX
+	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 03:31:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fOeWU-00009E-Mq
+	(envelope-from <richard.henderson@linaro.org>) id 1fOeWV-0000AK-VC
 	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 03:30:58 -0400
-Received: from mail-pl0-x241.google.com ([2607:f8b0:400e:c01::241]:37394)
+Received: from mail-pl0-x243.google.com ([2607:f8b0:400e:c01::243]:39304)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1fOeWU-00008l-FB
-	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 03:30:54 -0400
-Received: by mail-pl0-x241.google.com with SMTP id 31-v6so4887009plc.4
-	for <qemu-devel@nongnu.org>; Fri, 01 Jun 2018 00:30:54 -0700 (PDT)
+	id 1fOeWV-00009i-PN
+	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 03:30:55 -0400
+Received: by mail-pl0-x243.google.com with SMTP id f1-v6so14382499plt.6
+	for <qemu-devel@nongnu.org>; Fri, 01 Jun 2018 00:30:55 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Fri,  1 Jun 2018 00:30:17 -0700
-Message-Id: <20180601073050.8054-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH 00/33] linux-user: Begin splitting do_syscall
+Date: Fri,  1 Jun 2018 00:30:18 -0700
+Message-Id: <20180601073050.8054-2-richard.henderson@linaro.org>
+In-Reply-To: <20180601073050.8054-1-richard.henderson@linaro.org>
+References: <20180601073050.8054-1-richard.henderson@linaro.org>
+Subject: [Qemu-devel] [PATCH 01/33] linux-user: Split out do_syscall1
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,55 +29,133 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: laurent@vivier.eu
 
-This function is, as I think everyone will agree, way too large.
-This is about a third of the complete change, but I thought I'd
-get some feedback on the method and form before I go any farther.
+There was supposed to be a single point of return for do_syscall
+so that tracing works properly.  However, there are a few bugs
+in that area.  It is significantly simpler to simply split out
+an inner function to enforce this.
 
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+---
+ linux-user/syscall.c | 89 +++++++++++++++++++++++++++-----------------
+ 1 file changed, 54 insertions(+), 35 deletions(-)
 
-r~
-
-
-Richard Henderson (33):
-  linux-user: Split out do_syscall1
-  linux-user: Relax single exit from "break"
-  linux-user: Propagate goto ebadf to return
-  linux-user: Propagate goto efault to return
-  linux-user: Propagate goto unimplemented_nowarn to return
-  linux-user: Split out goto unimplemented to do_unimplemented
-  linux-user: Propagate goto fail to return
-  linux-user: Make syscall number unsigned
-  linux-user: Set up infrastructure for table-izing syscalls
-  linux-user: Split out brk, close, exit, read, write
-  linux-user: Split out execve
-  linux-user: Split out open, openat
-  linux-user: Split out name_to_handle_at
-  linux-user: Split out open_to_handle_at
-  linux-user: Split out creat, fork, waitid, waitpid
-  linux-user: Split out link, linkat
-  linux-user: Split out unlink, unlinkat
-  linux-user: Split out chdir, mknod, mknodat, time, chmod
-  linux-user: Remove all unimplemented entries
-  linux-user: Split out getpid, getxpid, lseek
-  linux-user: Split out mount, umount
-  linux-user: Split out alarm, pause, stime, utime, utimes
-  linux-user: Split out access, faccessat, futimesat, kill, nice, sync,
-    syncfs
-  linux-user: Split out rename, renameat, renameat2
-  linux-user: Split out dup, mkdir, mkdirat, rmdir
-  linux-user: Split out acct, pipe, pipe2, times, umount2
-  linux-user: Split out ioctl
-  linux-user: Split out chroot, dup2, dup3, fcntl, setpgid, umask
-  linux-user: Split out getpgrp, getppid, setsid
-  linux-user: Split out rt_sigaction, sigaction
-  linux-user: Split out rt_sigprocmask, sgetmask, sigprocmask, ssetmask
-  linux-user: Split out rt_sigpending, rt_sigsuspend, sigpending,
-    sigsuspend
-  linux-user: Split out rt_sigqueueinfo, rt_sigtimedwait,
-    rt_tgsigqueueinfo
-
- linux-user/qemu.h    |    2 +-
- linux-user/syscall.c | 4651 ++++++++++++++++++++++--------------------
- 2 files changed, 2394 insertions(+), 2259 deletions(-)
-
+diff --git a/linux-user/syscall.c b/linux-user/syscall.c
+index b75dd9a5bc..ebaefebcc2 100644
+--- a/linux-user/syscall.c
++++ b/linux-user/syscall.c
+@@ -7962,13 +7962,15 @@ static int host_to_target_cpu_mask(const unsigned long *host_mask,
+     return 0;
+ }
+ 
+-/* do_syscall() should always have a single exit point at the end so
+-   that actions, such as logging of syscall results, can be performed.
+-   All errnos that do_syscall() returns must be -TARGET_<errcode>. */
+-abi_long do_syscall(void *cpu_env, int num, abi_long arg1,
+-                    abi_long arg2, abi_long arg3, abi_long arg4,
+-                    abi_long arg5, abi_long arg6, abi_long arg7,
+-                    abi_long arg8)
++/* This is an internal helper for do_syscall so that it is easier
++ * to have a single return point, so that actions, such as logging
++ * of syscall results, can be performed.
++ * All errnos that do_syscall() returns must be -TARGET_<errcode>.
++ */
++static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
++                            abi_long arg2, abi_long arg3, abi_long arg4,
++                            abi_long arg5, abi_long arg6, abi_long arg7,
++                            abi_long arg8)
+ {
+     CPUState *cpu = ENV_GET_CPU(cpu_env);
+     abi_long ret;
+@@ -7977,28 +7979,6 @@ abi_long do_syscall(void *cpu_env, int num, abi_long arg1,
+     void *p;
+     char *fn;
+ 
+-#if defined(DEBUG_ERESTARTSYS)
+-    /* Debug-only code for exercising the syscall-restart code paths
+-     * in the per-architecture cpu main loops: restart every syscall
+-     * the guest makes once before letting it through.
+-     */
+-    {
+-        static int flag;
+-
+-        flag = !flag;
+-        if (flag) {
+-            return -TARGET_ERESTARTSYS;
+-        }
+-    }
+-#endif
+-
+-#ifdef DEBUG
+-    gemu_log("syscall %d", num);
+-#endif
+-    trace_guest_user_syscall(cpu, num, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8);
+-    if(do_strace)
+-        print_syscall(num, arg1, arg2, arg3, arg4, arg5, arg6);
+-
+     switch(num) {
+     case TARGET_NR_exit:
+         /* In old applications this may be used to implement _exit(2).
+@@ -13101,12 +13081,6 @@ abi_long do_syscall(void *cpu_env, int num, abi_long arg1,
+         break;
+     }
+ fail:
+-#ifdef DEBUG
+-    gemu_log(" = " TARGET_ABI_FMT_ld "\n", ret);
+-#endif
+-    if(do_strace)
+-        print_syscall_ret(num, ret);
+-    trace_guest_user_syscall_ret(cpu, num, ret);
+     return ret;
+ efault:
+     ret = -TARGET_EFAULT;
+@@ -13115,3 +13089,48 @@ ebadf:
+     ret = -TARGET_EBADF;
+     goto fail;
+ }
++
++abi_long do_syscall(void *cpu_env, int num, abi_long arg1,
++                    abi_long arg2, abi_long arg3, abi_long arg4,
++                    abi_long arg5, abi_long arg6, abi_long arg7,
++                    abi_long arg8)
++{
++    CPUState *cpu = ENV_GET_CPU(cpu_env);
++    abi_long ret;
++
++#if defined(DEBUG_ERESTARTSYS)
++    /* Debug-only code for exercising the syscall-restart code paths
++     * in the per-architecture cpu main loops: restart every syscall
++     * the guest makes once before letting it through.
++     */
++    {
++        static bool flag;
++        flag = !flag;
++        if (flag) {
++            return -TARGET_ERESTARTSYS;
++        }
++    }
++#endif
++#ifdef DEBUG
++    gemu_log("syscall %d", num);
++#endif
++
++    trace_guest_user_syscall(cpu, num, arg1, arg2, arg3, arg4,
++                             arg5, arg6, arg7, arg8);
++
++    if (unlikely(do_strace)) {
++        print_syscall(num, arg1, arg2, arg3, arg4, arg5, arg6);
++        ret = do_syscall1(cpu_env, num, arg1, arg2, arg3, arg4,
++                          arg5, arg6, arg7, arg8);
++        print_syscall_ret(num, ret);
++    } else {
++        ret = do_syscall1(cpu_env, num, arg1, arg2, arg3, arg4,
++                          arg5, arg6, arg7, arg8);
++    }
++
++#ifdef DEBUG
++    gemu_log(" = " TARGET_ABI_FMT_ld "\n", ret);
++#endif
++    trace_guest_user_syscall_ret(cpu, num, ret);
++    return ret;
++}
 -- 
 2.17.0
