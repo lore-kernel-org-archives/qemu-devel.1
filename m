@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33403)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33456)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <keno@juliacomputing.com>) id 1fOYr6-00037F-8B
-	for qemu-devel@nongnu.org; Thu, 31 May 2018 21:27:49 -0400
+	(envelope-from <keno@juliacomputing.com>) id 1fOYrE-0003FG-Dt
+	for qemu-devel@nongnu.org; Thu, 31 May 2018 21:27:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <keno@juliacomputing.com>) id 1fOYr5-00039i-D3
-	for qemu-devel@nongnu.org; Thu, 31 May 2018 21:27:48 -0400
-Received: from mail-qt0-x241.google.com ([2607:f8b0:400d:c0d::241]:44371)
+	(envelope-from <keno@juliacomputing.com>) id 1fOYrD-0003Iz-3N
+	for qemu-devel@nongnu.org; Thu, 31 May 2018 21:27:56 -0400
+Received: from mail-qt0-x241.google.com ([2607:f8b0:400d:c0d::241]:40627)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <keno@juliacomputing.com>)
-	id 1fOYr5-00039J-7z
-	for qemu-devel@nongnu.org; Thu, 31 May 2018 21:27:47 -0400
-Received: by mail-qt0-x241.google.com with SMTP id d3-v6so30268765qtp.11
-	for <qemu-devel@nongnu.org>; Thu, 31 May 2018 18:27:47 -0700 (PDT)
+	id 1fOYrC-0003IZ-VC
+	for qemu-devel@nongnu.org; Thu, 31 May 2018 21:27:55 -0400
+Received: by mail-qt0-x241.google.com with SMTP id h2-v6so30292303qtp.7
+	for <qemu-devel@nongnu.org>; Thu, 31 May 2018 18:27:54 -0700 (PDT)
 From: Keno Fischer <keno@juliacomputing.com>
-Date: Thu, 31 May 2018 21:26:08 -0400
-Message-Id: <c9b7340ea409bbf69051f895c9eb19b61e41e96c.1527814874.git.keno@juliacomputing.com>
+Date: Thu, 31 May 2018 21:26:13 -0400
+Message-Id: <35ccf95a6898df4e6b5d6f2a61e5612410cc3699.1527814874.git.keno@juliacomputing.com>
 In-Reply-To: <cover.1527814874.git.keno@juliacomputing.com>
 References: <cover.1527814874.git.keno@juliacomputing.com>
 In-Reply-To: <cover.1527814874.git.keno@juliacomputing.com>
 References: <cover.1527814874.git.keno@juliacomputing.com>
-Subject: [Qemu-devel] [PATCH v2 13/20] 9p: darwin: Ignore O_{NOATIME, DIRECT}
+Subject: [Qemu-devel] [PATCH v2 18/20] 9p: darwin: Implement compatibility
+ for mknodat
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,56 +32,111 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Keno Fischer <keno@juliacomputing.com>, groug@kaod.org
 
-Darwin doesn't have either of these flags. Darwin does have
-F_NOCACHE, which is similar to O_DIRECT, but has different
-enough semantics that other projects don't generally map
-them automatically. In any case, we don't support O_DIRECT
-on Linux at the moment either.
+Darwin does not support mknodat. However, to avoid race conditions
+with later setting the permissions, we must avoid using mknod on
+the full path instead. We could try to fchdir, but that would cause
+problems if multiple threads try to call mknodat at the same time.
+However, luckily there is a solution: Darwin as an (unexposed in the
+C library) system call that sets the cwd for the current thread only.
+This should suffice to use mknod safely.
 
 Signed-off-by: Keno Fischer <keno@juliacomputing.com>
 ---
 
-Changes from v1: Undo accidental formatting change
+Changes from v1: New patch. The previous series marked mknodat unsupported.
 
- hw/9pfs/9p.c | 11 ++++++++++-
- 1 file changed, 10 insertions(+), 1 deletion(-)
+ hw/9pfs/9p-local.c       |  5 +++--
+ hw/9pfs/9p-util-darwin.c | 25 +++++++++++++++++++++++++
+ hw/9pfs/9p-util-linux.c  |  5 +++++
+ hw/9pfs/9p-util.h        |  2 ++
+ 4 files changed, 35 insertions(+), 2 deletions(-)
 
-diff --git a/hw/9pfs/9p.c b/hw/9pfs/9p.c
-index 9751246..70cfab9 100644
---- a/hw/9pfs/9p.c
-+++ b/hw/9pfs/9p.c
-@@ -123,11 +123,18 @@ static int dotl_to_open_flags(int flags)
-         { P9_DOTL_NONBLOCK, O_NONBLOCK } ,
-         { P9_DOTL_DSYNC, O_DSYNC },
-         { P9_DOTL_FASYNC, FASYNC },
-+#ifndef CONFIG_DARWIN
-+        { P9_DOTL_NOATIME, O_NOATIME },
-+        /* On Darwin, we could map to F_NOCACHE, which is
-+           similar, but doesn't quite have the same
-+           semantics. However, we don't support O_DIRECT
-+           even on linux at the moment, so we just ignore
-+           it here. */
-         { P9_DOTL_DIRECT, O_DIRECT },
-+#endif
-         { P9_DOTL_LARGEFILE, O_LARGEFILE },
-         { P9_DOTL_DIRECTORY, O_DIRECTORY },
-         { P9_DOTL_NOFOLLOW, O_NOFOLLOW },
--        { P9_DOTL_NOATIME, O_NOATIME },
-         { P9_DOTL_SYNC, O_SYNC },
-     };
+diff --git a/hw/9pfs/9p-local.c b/hw/9pfs/9p-local.c
+index 47e8580..c7a2b08 100644
+--- a/hw/9pfs/9p-local.c
++++ b/hw/9pfs/9p-local.c
+@@ -668,7 +668,7 @@ static int local_mknod(FsContext *fs_ctx, V9fsPath *dir_path,
  
-@@ -156,10 +163,12 @@ static int get_dotl_openflags(V9fsState *s, int oflags)
-      */
-     flags = dotl_to_open_flags(oflags);
-     flags &= ~(O_NOCTTY | O_ASYNC | O_CREAT);
-+#ifndef CONFIG_DARWIN
-     /*
-      * Ignore direct disk access hint until the server supports it.
-      */
-     flags &= ~O_DIRECT;
-+#endif
-     return flags;
+     if (fs_ctx->export_flags & V9FS_SM_MAPPED ||
+         fs_ctx->export_flags & V9FS_SM_MAPPED_FILE) {
+-        err = mknodat(dirfd, name, fs_ctx->fmode | S_IFREG, 0);
++        err = qemu_mknodat(dirfd, name, fs_ctx->fmode | S_IFREG, 0);
+         if (err == -1) {
+             goto out;
+         }
+@@ -683,7 +683,7 @@ static int local_mknod(FsContext *fs_ctx, V9fsPath *dir_path,
+         }
+     } else if (fs_ctx->export_flags & V9FS_SM_PASSTHROUGH ||
+                fs_ctx->export_flags & V9FS_SM_NONE) {
+-        err = mknodat(dirfd, name, credp->fc_mode, credp->fc_rdev);
++        err = qemu_mknodat(dirfd, name, credp->fc_mode, credp->fc_rdev);
+         if (err == -1) {
+             goto out;
+         }
+@@ -696,6 +696,7 @@ static int local_mknod(FsContext *fs_ctx, V9fsPath *dir_path,
+ 
+ err_end:
+     unlinkat_preserve_errno(dirfd, name, 0);
++
+ out:
+     close_preserve_errno(dirfd);
+     return err;
+diff --git a/hw/9pfs/9p-util-darwin.c b/hw/9pfs/9p-util-darwin.c
+index ac414bc..49fe7d3 100644
+--- a/hw/9pfs/9p-util-darwin.c
++++ b/hw/9pfs/9p-util-darwin.c
+@@ -158,3 +158,28 @@ done:
+     close_preserve_errno(fd);
+     return ret;
  }
++
++#ifndef SYS___pthread_fchdir
++# define SYS___pthread_fchdir 349
++#endif
++
++static int fchdir_thread_local(int fd)
++{
++    return syscall(SYS___pthread_fchdir, fd);
++}
++
++int qemu_mknodat(int dirfd, const char *filename, mode_t mode, dev_t dev)
++{
++    int preserved_errno, err;
++    if (fchdir_thread_local(dirfd) < 0) {
++        return -1;
++    }
++    err = mknod(filename, mode, dev);
++    preserved_errno = errno;
++    /* Stop using the thread-local cwd */
++    fchdir_thread_local(-1);
++    if (err < 0) {
++        errno = preserved_errno;
++    }
++    return err;
++}
+diff --git a/hw/9pfs/9p-util-linux.c b/hw/9pfs/9p-util-linux.c
+index 3902378..06399c5 100644
+--- a/hw/9pfs/9p-util-linux.c
++++ b/hw/9pfs/9p-util-linux.c
+@@ -63,3 +63,8 @@ int utimensat_nofollow(int dirfd, const char *filename,
+ {
+     return utimensat(dirfd, filename, times, AT_SYMLINK_NOFOLLOW);
+ }
++
++int qemu_mknodat(int dirfd, const char *filename, mode_t mode, dev_t dev)
++{
++    return mknodat(dirfd, filename, mode, dev);
++}
+diff --git a/hw/9pfs/9p-util.h b/hw/9pfs/9p-util.h
+index b1dc08a..127564d 100644
+--- a/hw/9pfs/9p-util.h
++++ b/hw/9pfs/9p-util.h
+@@ -90,4 +90,6 @@ ssize_t fremovexattrat_nofollow(int dirfd, const char *filename,
+ int utimensat_nofollow(int dirfd, const char *filename,
+                        const struct timespec times[2]);
  
++int qemu_mknodat(int dirfd, const char *filename, mode_t mode, dev_t dev);
++
+ #endif
 -- 
 2.8.1
