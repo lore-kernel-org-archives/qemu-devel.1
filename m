@@ -1,16 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41450)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46542)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1fOl0Q-00075K-F8
-	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 10:26:15 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1fOlHD-0001nZ-Sk
+	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 10:43:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1fOl0P-0005nt-HB
-	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 10:26:14 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1fOlHC-0005Q7-Ua
+	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 10:43:35 -0400
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri,  1 Jun 2018 15:12:19 +0100
-Message-Id: <20180601141223.26630-3-peter.maydell@linaro.org>
-In-Reply-To: <20180601141223.26630-1-peter.maydell@linaro.org>
-References: <20180601141223.26630-1-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PATCH 2/6] hw/m68k/mcf5206: Convert away from old_mmio
+Date: Fri,  1 Jun 2018 15:43:27 +0100
+Message-Id: <20180601144328.23817-2-peter.maydell@linaro.org>
+In-Reply-To: <20180601144328.23817-1-peter.maydell@linaro.org>
+References: <20180601144328.23817-1-peter.maydell@linaro.org>
+Subject: [Qemu-devel] [PATCH 1/2] stellaris: Stop using armv7m_init()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -19,76 +19,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: patches@linaro.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Thomas Huth <huth@tuxfamily.org>, Aurelien Jarno <aurelien@aurel32.net>, qemu-block@nongnu.org, Yongbok Kim <yongbok.kim@mips.com>
+To: qemu-arm@nongnu.org, qemu-devel@nongnu.org
+Cc: patches@linaro.org, Julia Suvorova <jusual@mail.ru>, Stefan Hajnoczi <stefanha@redhat.com>, Joel Stanley <joel@jms.id.au>, Jim Mussared <jim@groklearning.com>, =?UTF-8?q?Steffen=20G=C3=B6rtz?= <mail@steffen-goertz.de>
 
-Convert the mcf5206 device away from using the old_mmio field
-of MemoryRegionOps. This device is used by the an5206 board.
+The stellaris board is still using the legacy armv7m_init() function,
+which predates conversion of the ARMv7M into a proper QOM container
+object. Make the board code directly create the ARMv7M object instead.
 
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- hw/m68k/mcf5206.c | 48 +++++++++++++++++++++++++++++++++++------------
- 1 file changed, 36 insertions(+), 12 deletions(-)
+ hw/arm/stellaris.c | 12 ++++++++++--
+ 1 file changed, 10 insertions(+), 2 deletions(-)
 
-diff --git a/hw/m68k/mcf5206.c b/hw/m68k/mcf5206.c
-index 6ad1e4bd2d..0962911837 100644
---- a/hw/m68k/mcf5206.c
-+++ b/hw/m68k/mcf5206.c
-@@ -513,19 +513,43 @@ static void m5206_mbar_writel(void *opaque, hwaddr offset,
-     m5206_mbar_write(s, offset, value, 4);
+diff --git a/hw/arm/stellaris.c b/hw/arm/stellaris.c
+index e886f54976..1b2c383e9f 100644
+--- a/hw/arm/stellaris.c
++++ b/hw/arm/stellaris.c
+@@ -20,6 +20,7 @@
+ #include "qemu/log.h"
+ #include "exec/address-spaces.h"
+ #include "sysemu/sysemu.h"
++#include "hw/arm/armv7m.h"
+ #include "hw/char/pl011.h"
+ #include "hw/misc/unimp.h"
+ #include "cpu.h"
+@@ -1297,8 +1298,13 @@ static void stellaris_init(MachineState *ms, stellaris_board_info *board)
+                            &error_fatal);
+     memory_region_add_subregion(system_memory, 0x20000000, sram);
+ 
+-    nvic = armv7m_init(system_memory, flash_size, NUM_IRQ_LINES,
+-                       ms->kernel_filename, ms->cpu_type);
++    nvic = qdev_create(NULL, TYPE_ARMV7M);
++    qdev_prop_set_uint32(nvic, "num-irq", NUM_IRQ_LINES);
++    qdev_prop_set_string(nvic, "cpu-type", ms->cpu_type);
++    object_property_set_link(OBJECT(nvic), OBJECT(get_system_memory()),
++                                     "memory", &error_abort);
++    /* This will exit with an error if the user passed us a bad cpu_type */
++    qdev_init_nofail(nvic);
+ 
+     qdev_connect_gpio_out_named(nvic, "SYSRESETREQ", 0,
+                                 qemu_allocate_irq(&do_sys_reset, NULL, 0));
+@@ -1430,6 +1436,8 @@ static void stellaris_init(MachineState *ms, stellaris_board_info *board)
+     create_unimplemented_device("analogue-comparator", 0x4003c000, 0x1000);
+     create_unimplemented_device("hibernation", 0x400fc000, 0x1000);
+     create_unimplemented_device("flash-control", 0x400fd000, 0x1000);
++
++    armv7m_load_kernel(ARM_CPU(first_cpu), ms->kernel_filename, flash_size);
  }
  
-+static uint64_t m5206_mbar_readfn(void *opaque, hwaddr addr, unsigned size)
-+{
-+    switch (size) {
-+    case 1:
-+        return m5206_mbar_readb(opaque, addr);
-+    case 2:
-+        return m5206_mbar_readw(opaque, addr);
-+    case 4:
-+        return m5206_mbar_readl(opaque, addr);
-+    default:
-+        g_assert_not_reached();
-+    }
-+}
-+
-+static void m5206_mbar_writefn(void *opaque, hwaddr addr,
-+                               uint64_t value, unsigned size)
-+{
-+    switch (size) {
-+    case 1:
-+        m5206_mbar_writeb(opaque, addr, value);
-+        break;
-+    case 2:
-+        m5206_mbar_writew(opaque, addr, value);
-+        break;
-+    case 4:
-+        m5206_mbar_writel(opaque, addr, value);
-+        break;
-+    default:
-+        g_assert_not_reached();
-+    }
-+}
-+
- static const MemoryRegionOps m5206_mbar_ops = {
--    .old_mmio = {
--        .read = {
--            m5206_mbar_readb,
--            m5206_mbar_readw,
--            m5206_mbar_readl,
--        },
--        .write = {
--            m5206_mbar_writeb,
--            m5206_mbar_writew,
--            m5206_mbar_writel,
--        },
--    },
-+    .read = m5206_mbar_readfn,
-+    .write = m5206_mbar_writefn,
-+    .valid.min_access_size = 1,
-+    .valid.max_access_size = 4,
-     .endianness = DEVICE_NATIVE_ENDIAN,
- };
- 
+ /* FIXME: Figure out how to generate these from stellaris_boards.  */
 -- 
 2.17.1
