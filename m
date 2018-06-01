@@ -1,28 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39435)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40980)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1fOjLO-0004cF-TC
-	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 08:39:47 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fOjNw-0005lM-7u
+	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 08:42:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1fOjLL-0004xe-QN
-	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 08:39:46 -0400
-Received: from mail-wr0-x244.google.com ([2a00:1450:400c:c0c::244]:46140)
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fOjNi-0007UL-Bw
+	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 08:42:23 -0400
+Received: from mail-qt0-x241.google.com ([2607:f8b0:400d:c0d::241]:45376)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1fOjLL-0004wu-Hb
-	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 08:39:43 -0400
-Received: by mail-wr0-x244.google.com with SMTP id v13-v6so24527766wrp.13
-	for <qemu-devel@nongnu.org>; Fri, 01 Jun 2018 05:39:43 -0700 (PDT)
-Date: Fri, 1 Jun 2018 13:39:40 +0100
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20180601123940.GQ8687@stefanha-x1.localdomain>
-References: <20180521084249.10640-1-peterx@redhat.com>
-	<8ef2c984-7817-a54f-ebae-a1f14e453b6a@redhat.com>
-	<20180522033954.GC17282@xz-mi> <87y3g9a5th.fsf@dusky.pond.sub.org>
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fOjNh-0007TP-Cv
+	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 08:42:09 -0400
+Received: by mail-qt0-x241.google.com with SMTP id i18-v6so21277446qtp.12
+	for <qemu-devel@nongnu.org>; Fri, 01 Jun 2018 05:42:09 -0700 (PDT)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20180531224911.23725-1-richard.henderson@linaro.org>
+	<20180531224911.23725-2-richard.henderson@linaro.org>
+	<b5e492dc-da36-dbb4-5cc4-32d2d78050cd@amsat.org>
+	<b072270a-28c1-6fb5-0b91-87a35ddfc952@linaro.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <5b4dad39-27b7-e13e-6a64-90b725a99296@amsat.org>
+Date: Fri, 1 Jun 2018 09:42:04 -0300
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="/YnR2r17TIEndSCI"
-Content-Disposition: inline
-In-Reply-To: <87y3g9a5th.fsf@dusky.pond.sub.org>
-Subject: Re: [Qemu-devel] [RFC] monitor: turn on Out-Of-Band by default again
+In-Reply-To: <b072270a-28c1-6fb5-0b91-87a35ddfc952@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH 1/6] gdbstub: Return the fd from
+ gdbserver_start
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,75 +38,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: Peter Xu <peterx@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Fam Zheng <famz@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Eric Auger <eric.auger@redhat.com>, =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>
+To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org, laurent@vivier.eu, evgreen@chromium.org
 
+On 05/31/2018 09:16 PM, Richard Henderson wrote:
+> On 05/31/2018 04:15 PM, Philippe Mathieu-Daudé wrote:
+>> Hi Richard,
+>>
+>> On 05/31/2018 07:49 PM, Richard Henderson wrote:
+>>> This will allow us to protect gdbserver_fd from the guest.
+>>>
+>>> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+>>> ---
+>>>  gdbstub.c | 5 +++--
+>>>  1 file changed, 3 insertions(+), 2 deletions(-)
+>>>
+>>> diff --git a/gdbstub.c b/gdbstub.c
+>>> index 6081e719c5..057d0d65c5 100644
+>>> --- a/gdbstub.c
+>>> +++ b/gdbstub.c
+>>> @@ -1890,15 +1890,16 @@ static int gdbserver_open(int port)
+>>>  int gdbserver_start(int port)
+>>>  {
+>>>      gdbserver_fd = gdbserver_open(port);
+>>> -    if (gdbserver_fd < 0)
+>>> +    if (gdbserver_fd < 0) {
+>>>          return -1;
+>>> +    }
+>>>      /* accept connections */
+>>>      if (!gdb_accept()) {
+>>>          close(gdbserver_fd);
+>>>          gdbserver_fd = -1;
+>>>          return -1;
+>>>      }
+>>> -    return 0;
+>>> +    return gdbserver_fd;
+>>
+>> I agree with your change, but what about !CONFIG_USER_ONLY?
+> 
+> It's still a non-negative number, so the success value is still the same.
 
---/YnR2r17TIEndSCI
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Good point.
 
-On Thu, May 24, 2018 at 09:08:58AM +0200, Markus Armbruster wrote:
-> Peter Xu <peterx@redhat.com> writes:
->=20
-> > On Mon, May 21, 2018 at 09:13:06AM -0500, Eric Blake wrote:
-> >> On 05/21/2018 03:42 AM, Peter Xu wrote:
-> >> > We turned Out-Of-Band feature of monitors off for 2.12 release.  Now=
- we
-> >> > try to turn that on again.
-> >>=20
-> >> "try to turn" sounds weak, like you aren't sure of this patch.  If you
-> >> aren't sure, then why should we feel safe in applying it?  This text is
-> >> going in the permanent git history, so sound bold, rather than hesitan=
-t!
-> >
-> > Yeah I am not really strong at turn that on by default, that's why I
-> > marked the patch as RFC.  I wanted to hear from your opinions.  For
-> > now IMHO even with x-oob, postcopy can start to work with network
-> > recovery, then the requirement from my part is done.  However I'm
-> > thinking maybe we should still turn that on for all the people.  One
-> > reason is that we already have the QMP capability negotiation so it
-> > seems redundant (as you mentioned before), meanwhile exposing it to
-> > broader users can let broader users to leverage this new bits directly
-> > (meanwhile easier to expose potential issues for OOB too).
-> >
-> > Meanwhile I'm not confident too on that there can be other test cases
-> > that has not yet been run with Out-Of-Band, so even if we solved all
-> > existing problems I can't be sure that no further test will broke.
-> > However I don't see it a problem for merging, since AFAIU I can't
-> > really know what will break again (if there is) unless we apply that
-> > to master again... :)
->=20
-> The time to switch it on is now.  I don't think we can find remaining
-> issues (if any) unless we do.
->=20
-> The time for doubts is the day before rc0 ;)
-
-I agree with Markus, let's enable OOB by default now.
-
-The path to OOB has been long.  It's an invasive monitor change that
-solves the postcopy recovery problem.  There have been lots of
-complications but Peter has resolved them.
-
-I personally don't think OOB is suitable for much else beyond postcopy
-recovery (real-time code is a pain to write!), but we should switch to
-this new code path and make sure it's solid for QEMU 3.0.
-
-Stefan
-
---/YnR2r17TIEndSCI
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJbET6MAAoJEJykq7OBq3PI4EMIAMYWNy70E6yDKY++tYLc36LM
-7vwAD1u/UdUa3XiOYqlVdlTB6DmAdLdqfS9tRlBz/sKGEGDBW6sGPSfZ8Y/rG07v
-Hw/jATRnqQvHb9niLHJdI/LfVdQ2BE9REMdrbyih8/b41N0pJWdS2E7FgGr7nNcE
-GIQYHZznDJRh/Zta8HyvETgyPtWLiWS8lWcue/VhyMVTv1Cb7iBcas4//fbNtan8
-IUUKl2Px9HQEluFp/TRih5EcIQuHI3RPOFfSGHPWsMD05c8os4G/TLC0iTG1yeS3
-G1p3zfmI5wdXZH3ibzgj6XERFrz95s8nxIdvKNMkJcEe2M45egDKaeFvXGxpZD8=
-=TtI4
------END PGP SIGNATURE-----
-
---/YnR2r17TIEndSCI--
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
