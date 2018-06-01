@@ -1,26 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50177)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50195)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fOne3-00060E-PZ
-	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 13:15:20 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1fOne9-00065D-B1
+	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 13:15:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fOne0-0002CE-Eg
-	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 13:15:19 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:60898 helo=mx1.redhat.com)
+	(envelope-from <pbonzini@redhat.com>) id 1fOne8-0002Nx-Ac
+	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 13:15:25 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:33178 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1fOne0-0002Aw-9j
-	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 13:15:16 -0400
-References: <20180601165750.25420-1-chen_han_xiao@126.com>
-	<20180601165750.25420-3-chen_han_xiao@126.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <9e9ef45c-25e4-6518-d353-5834cea0eef6@redhat.com>
-Date: Fri, 1 Jun 2018 12:15:14 -0500
-MIME-Version: 1.0
-In-Reply-To: <20180601165750.25420-3-chen_han_xiao@126.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v5.1 2/2] qga-win: add driver path usage to
- GuestFilesystemInfo
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1fOne8-0002NO-3P
+	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 13:15:24 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.6])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id BBF5F401EF1D
+	for <qemu-devel@nongnu.org>; Fri,  1 Jun 2018 17:15:23 +0000 (UTC)
+Received: from donizetti.redhat.com (ovpn-117-107.ams2.redhat.com
+	[10.36.117.107])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 4AAC9217B400
+	for <qemu-devel@nongnu.org>; Fri,  1 Jun 2018 17:15:23 +0000 (UTC)
+From: Paolo Bonzini <pbonzini@redhat.com>
+Date: Fri,  1 Jun 2018 19:15:19 +0200
+Message-Id: <20180601171521.1770-2-pbonzini@redhat.com>
+In-Reply-To: <20180601171521.1770-1-pbonzini@redhat.com>
+References: <20180601171521.1770-1-pbonzini@redhat.com>
+Subject: [Qemu-devel] [PULL 10/56] bsd-user: include "exec/exec-all.h" which
+ provides mmap_lock/unlock"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,55 +34,24 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Chen Hanxiao <chen_han_xiao@126.com>, qemu-devel@nongnu.org
-Cc: Michael Roth <mdroth@linux.vnet.ibm.com>
+To: qemu-devel@nongnu.org
 
-On 06/01/2018 11:57 AM, Chen Hanxiao wrote:
-> From: Chen Hanxiao <chenhanxiao@gmail.com>
-> 
-> This patch adds support for getting the usage of
-> windows driver path.
-> The usage of fs stored as used_bytes and total_bytes.
-> 
-> Cc: Michael Roth <mdroth@linux.vnet.ibm.com>
-> Signed-off-by: Chen Hanxiao <chenhanxiao@gmail.com>
-> ---
-> v2:
->    unpack usage as used-bytes and total-bytes
-> 
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+---
+ bsd-user/mmap.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-> @@ -699,10 +700,21 @@ static GuestFilesystemInfo *build_guest_fsinfo(char *guid, Error **errp)
->       fs_name[sizeof(fs_name) - 1] = 0;
->       fs = g_malloc(sizeof(*fs));
->       fs->name = g_strdup(guid);
-> +    fs->has_total_bytes = false;
-> +    fs->has_used_bytes = false;
-
-Dead assignments.
-
->       if (len == 0) {
->           fs->mountpoint = g_strdup("System Reserved");
->       } else {
->           fs->mountpoint = g_strndup(mnt_point, len);
-> +        if (GetDiskFreeSpaceEx(fs->mountpoint,
-> +                               (PULARGE_INTEGER) & i64FreeBytesToCaller,
-> +                               (PULARGE_INTEGER) & i64TotalBytes,
-> +                               (PULARGE_INTEGER) & i64FreeBytes)) {
-> +            fs->used_bytes = i64TotalBytes - i64FreeBytes;
-> +            fs->total_bytes = i64TotalBytes;
-> +            fs->has_total_bytes = true;
-> +            fs->has_used_bytes = true;
-> +        }
-
-I'm less familiar with Windows API, so I won't give this R-b. But now 
-that I read this patch, I do have a question: since both statvfs() and 
-GetDiskFreeSpaceEx() give you free bytes rather than used bytes, and you 
-had to perform a subtraction to report 'used-bytes' over QGA, would it 
-make any more sense to instead report 'free-bytes' over QGA for less 
-subtraction work on your end and so that the QGA interface is more 
-similar to existing interfaces?
-
+diff --git a/bsd-user/mmap.c b/bsd-user/mmap.c
+index 20cd29d145..17f4cd80aa 100644
+--- a/bsd-user/mmap.c
++++ b/bsd-user/mmap.c
+@@ -21,6 +21,7 @@
+ #include "qemu.h"
+ #include "qemu-common.h"
+ #include "bsd-mman.h"
++#include "exec/exec-all.h"
+ 
+ //#define DEBUG_MMAP
+ 
 -- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+2.17.0
