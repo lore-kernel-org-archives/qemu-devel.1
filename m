@@ -1,20 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40465)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40503)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <junyan.he@gmx.com>) id 1fOf9Q-0000eV-UZ
-	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 04:11:10 -0400
+	(envelope-from <junyan.he@gmx.com>) id 1fOf9Y-0000ke-0C
+	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 04:11:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <junyan.he@gmx.com>) id 1fOf9M-0000YP-Pk
-	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 04:11:08 -0400
-Received: from mga18.intel.com ([134.134.136.126]:62486)
+	(envelope-from <junyan.he@gmx.com>) id 1fOf9S-0000hO-UW
+	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 04:11:15 -0400
+Received: from mga05.intel.com ([192.55.52.43]:28960)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <junyan.he@gmx.com>) id 1fOf9M-0000XH-Gq
-	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 04:11:04 -0400
+	(Exim 4.71) (envelope-from <junyan.he@gmx.com>) id 1fOf9S-0000fl-LD
+	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 04:11:10 -0400
 From: junyan.he@gmx.com
-Date: Fri,  1 Jun 2018 16:10:26 +0800
-Message-Id: <1527840629-18648-5-git-send-email-junyan.he@gmx.com>
+Date: Fri,  1 Jun 2018 16:10:27 +0800
+Message-Id: <1527840629-18648-6-git-send-email-junyan.he@gmx.com>
 In-Reply-To: <1527840629-18648-1-git-send-email-junyan.he@gmx.com>
 References: <1527840629-18648-1-git-send-email-junyan.he@gmx.com>
-Subject: [Qemu-devel] [PATCH V6 4/7] configure: add libpmem support
+Subject: [Qemu-devel] [PATCH V6 5/7] mem/nvdimm: ensure write persistence to
+ PMEM in label emulation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,100 +29,116 @@ Cc: ehabkost@redhat.com, imammedo@redhat.com, pbonzini@redhat.com, crosthwaite.p
 
 From: Junyan He <junyan.he@intel.com>
 
-Add a pair of configure options --{enable,disable}-libpmem to control
-whether QEMU is compiled with PMDK libpmem [1].
+Guest writes to vNVDIMM labels are intercepted and performed on the
+backend by QEMU. When the backend is a real persistent memort, QEMU
+needs to take proper operations to ensure its write persistence on the
+persistent memory. Otherwise, a host power failure may result in the
+loss of guest label configurations.
 
-QEMU may write to the host persistent memory (e.g. in vNVDIMM label
-emulation and live migration), so it must take the proper operations
-to ensure the persistence of its own writes. Depending on the CPU
-models and available instructions, the optimal operation can vary [2].
-PMDK libpmem have already implemented those operations on multiple CPU
-models (x86 and ARM) and the logic to select the optimal ones, so QEMU
-can just use libpmem rather than re-implement them.
-
-[1] PMDK (formerly known as NMVL), https://github.com/pmem/pmdk/
-[2] https://github.com/pmem/pmdk/blob/38bfa652721a37fd94c0130ce0e3f5d8baa3ed40/src/libpmem/pmem.c#L33
-
-Signed-off-by: Junyan He <junyan.he@intel.com>
 Signed-off-by: Haozhong Zhang <haozhong.zhang@intel.com>
 ---
- configure | 29 +++++++++++++++++++++++++++++
- 1 file changed, 29 insertions(+)
+ hw/mem/nvdimm.c     |  9 ++++++++-
+ include/qemu/pmem.h | 23 +++++++++++++++++++++++
+ stubs/Makefile.objs |  1 +
+ stubs/pmem.c        | 19 +++++++++++++++++++
+ 4 files changed, 51 insertions(+), 1 deletion(-)
+ create mode 100644 include/qemu/pmem.h
+ create mode 100644 stubs/pmem.c
 
-diff --git a/configure b/configure
-index a6a4616..f44d669 100755
---- a/configure
-+++ b/configure
-@@ -456,6 +456,7 @@ jemalloc="no"
- replication="yes"
- vxhs=""
- libxml2=""
-+libpmem=""
+diff --git a/hw/mem/nvdimm.c b/hw/mem/nvdimm.c
+index 4087aca..03b478e 100644
+--- a/hw/mem/nvdimm.c
++++ b/hw/mem/nvdimm.c
+@@ -23,6 +23,7 @@
+  */
  
- supported_cpu="no"
- supported_os="no"
-@@ -1381,6 +1382,10 @@ for opt do
-   ;;
-   --disable-git-update) git_update=no
-   ;;
-+  --enable-libpmem) libpmem=yes
-+  ;;
-+  --disable-libpmem) libpmem=no
-+  ;;
-   *)
-       echo "ERROR: unknown option $opt"
-       echo "Try '$0 --help' for more information"
-@@ -1638,6 +1643,7 @@ disabled with --disable-FEATURE, default is enabled if available:
-   crypto-afalg    Linux AF_ALG crypto backend driver
-   vhost-user      vhost-user support
-   capstone        capstone disassembler support
-+  libpmem         libpmem support
+ #include "qemu/osdep.h"
++#include "qemu/pmem.h"
+ #include "qapi/error.h"
+ #include "qapi/visitor.h"
+ #include "hw/mem/nvdimm.h"
+@@ -155,11 +156,17 @@ static void nvdimm_write_label_data(NVDIMMDevice *nvdimm, const void *buf,
+ {
+     MemoryRegion *mr;
+     PCDIMMDevice *dimm = PC_DIMM(nvdimm);
++    bool is_pmem = object_property_get_bool(OBJECT(dimm->hostmem),
++                                            "pmem", NULL);
+     uint64_t backend_offset;
  
- NOTE: The object files are built at the place where configure is launched
- EOF
-@@ -5445,6 +5451,24 @@ EOF
- fi
+     nvdimm_validate_rw_label_data(nvdimm, size, offset);
  
- ##########################################
-+# check for libpmem
+-    memcpy(nvdimm->label_data + offset, buf, size);
++    if (!is_pmem) {
++        memcpy(nvdimm->label_data + offset, buf, size);
++    } else {
++        pmem_memcpy_persist(nvdimm->label_data + offset, buf, size);
++    }
+ 
+     mr = host_memory_backend_get_memory(dimm->hostmem, &error_abort);
+     backend_offset = memory_region_size(mr) - nvdimm->label_size + offset;
+diff --git a/include/qemu/pmem.h b/include/qemu/pmem.h
+new file mode 100644
+index 0000000..00d6680
+--- /dev/null
++++ b/include/qemu/pmem.h
+@@ -0,0 +1,23 @@
++/*
++ * QEMU header file for libpmem.
++ *
++ * Copyright (c) 2018 Intel Corporation.
++ *
++ * Author: Haozhong Zhang <address@hidden>
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or later.
++ * See the COPYING file in the top-level directory.
++ */
 +
-+if test "$libpmem" != "no"; then
-+	if $pkg_config --exists "libpmem"; then
-+		libpmem="yes"
-+		libpmem_libs=$($pkg_config --libs libpmem)
-+		libpmem_cflags=$($pkg_config --cflags libpmem)
-+		libs_softmmu="$libs_softmmu $libpmem_libs"
-+		QEMU_CFLAGS="$QEMU_CFLAGS $libpmem_cflags"
-+	else
-+		if test "$libpmem" = "yes" ; then
-+			feature_not_found "libpmem" "Install nvml or pmdk"
-+		fi
-+		libpmem="no"
-+	fi
-+fi
++#ifndef QEMU_PMEM_H
++#define QEMU_PMEM_H
 +
-+##########################################
- # End of CC checks
- # After here, no more $cc or $ld runs
- 
-@@ -5907,6 +5931,7 @@ echo "avx2 optimization $avx2_opt"
- echo "replication support $replication"
- echo "VxHS block device $vxhs"
- echo "capstone          $capstone"
-+echo "libpmem support   $libpmem"
- 
- if test "$sdl_too_old" = "yes"; then
- echo "-> Your SDL version is too old - please upgrade to have SDL support"
-@@ -6651,6 +6676,10 @@ if test "$vxhs" = "yes" ; then
-   echo "VXHS_LIBS=$vxhs_libs" >> $config_host_mak
- fi
- 
-+if test "$libpmem" = "yes" ; then
-+  echo "CONFIG_LIBPMEM=y" >> $config_host_mak
-+fi
++#ifdef CONFIG_LIBPMEM
++#include <libpmem.h>
++#else  /* !CONFIG_LIBPMEM */
 +
- if test "$tcg_interpreter" = "yes"; then
-   QEMU_INCLUDES="-iquote \$(SRC_PATH)/tcg/tci $QEMU_INCLUDES"
- elif test "$ARCH" = "sparc64" ; then
++void *pmem_memcpy_persist(void *pmemdest, const void *src, size_t len);
++
++#endif /* CONFIG_LIBPMEM */
++
++#endif /* !QEMU_PMEM_H */
+diff --git a/stubs/Makefile.objs b/stubs/Makefile.objs
+index 53d3f32..be9a042 100644
+--- a/stubs/Makefile.objs
++++ b/stubs/Makefile.objs
+@@ -43,3 +43,4 @@ stub-obj-y += xen-common.o
+ stub-obj-y += xen-hvm.o
+ stub-obj-y += pci-host-piix.o
+ stub-obj-y += ram-block.o
++stub-obj-$(call lnot,$(CONFIG_LIBPMEM)) += pmem.o
+\ No newline at end of file
+diff --git a/stubs/pmem.c b/stubs/pmem.c
+new file mode 100644
+index 0000000..b4ec72d
+--- /dev/null
++++ b/stubs/pmem.c
+@@ -0,0 +1,19 @@
++/*
++ * Stubs for libpmem.
++ *
++ * Copyright (c) 2018 Intel Corporation.
++ *
++ * Author: Haozhong Zhang <address@hidden>
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or later.
++ * See the COPYING file in the top-level directory.
++ */
++
++#include <string.h>
++
++#include "qemu/pmem.h"
++
++void *pmem_memcpy_persist(void *pmemdest, const void *src, size_t len)
++{
++    return memcpy(pmemdest, src, len);
++}
 -- 
 2.7.4
