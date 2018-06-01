@@ -1,20 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38540)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38565)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1fOmt9-00021l-4Y
-	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 12:26:54 -0400
+	(envelope-from <mst@redhat.com>) id 1fOmtE-00025u-8o
+	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 12:26:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1fOmt6-00076k-T1
-	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 12:26:51 -0400
-Date: Fri, 1 Jun 2018 19:26:41 +0300
+	(envelope-from <mst@redhat.com>) id 1fOmtC-00079W-S8
+	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 12:26:56 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:59522 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1fOmtC-000794-Gy
+	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 12:26:54 -0400
+Date: Fri, 1 Jun 2018 19:26:43 +0300
 From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20180601162620.32362-4-mst@redhat.com>
+Message-ID: <20180601162620.32362-6-mst@redhat.com>
 References: <20180601162620.32362-1-mst@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 In-Reply-To: <20180601162620.32362-1-mst@redhat.com>
-Subject: [Qemu-devel] [PULL 03/31] vhost-user: introduce shared vhost-user
- state
+Subject: [Qemu-devel] [PULL 05/31] libvhost-user: support host notifier
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,547 +27,226 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Tiwei Bie <tiwei.bie@intel.com>, Gonglei <arei.gonglei@huawei.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Fam Zheng <famz@redhat.com>, Jason Wang <jasowang@redhat.com>, qemu-block@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>, Tiwei Bie <tiwei.bie@intel.com>, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Maxime Coquelin <maxime.coquelin@redhat.com>, Yongji Xie <xieyongji@baidu.com>, Peter Xu <peterx@redhat.com>
 
 From: Tiwei Bie <tiwei.bie@intel.com>
 
-When multi queue is enabled e.g. for a virtio-net device,
-each queue pair will have a vhost_dev, and the only thing
-shared between vhost devs currently is the chardev. This
-patch introduces a vhost-user state structure which will
-be shared by all vhost devs of the same virtio device.
+This patch introduces the host notifier support in
+libvhost-user. A new API is added to support setting
+host notifier for each queue.
 
 Signed-off-by: Tiwei Bie <tiwei.bie@intel.com>
-Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
 Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
 ---
- include/hw/virtio/vhost-user-blk.h  |  2 ++
- include/hw/virtio/vhost-user-scsi.h |  2 ++
- include/hw/virtio/vhost-user.h      | 20 +++++++++++++
- backends/cryptodev-vhost-user.c     | 20 ++++++++++++-
- hw/block/vhost-user-blk.c           | 22 ++++++++++++++-
- hw/scsi/vhost-user-scsi.c           | 20 ++++++++++++-
- hw/virtio/vhost-stub.c              | 10 +++++++
- hw/virtio/vhost-user.c              | 31 ++++++++++++++------
- net/vhost-user.c                    | 44 +++++++++++++++++++++++------
- hw/virtio/Makefile.objs             |  2 +-
- 10 files changed, 152 insertions(+), 21 deletions(-)
- create mode 100644 include/hw/virtio/vhost-user.h
+ contrib/libvhost-user/libvhost-user.h | 32 +++++++++++
+ contrib/libvhost-user/libvhost-user.c | 81 ++++++++++++++++++++++++---
+ 2 files changed, 105 insertions(+), 8 deletions(-)
 
-diff --git a/include/hw/virtio/vhost-user-blk.h b/include/hw/virtio/vhost-user-blk.h
-index 5804cc904a..f1258ae545 100644
---- a/include/hw/virtio/vhost-user-blk.h
-+++ b/include/hw/virtio/vhost-user-blk.h
-@@ -21,6 +21,7 @@
- #include "hw/block/block.h"
- #include "chardev/char-fe.h"
- #include "hw/virtio/vhost.h"
-+#include "hw/virtio/vhost-user.h"
+diff --git a/contrib/libvhost-user/libvhost-user.h b/contrib/libvhost-user/libvhost-user.h
+index b27075ea3b..4aa55b4d2d 100644
+--- a/contrib/libvhost-user/libvhost-user.h
++++ b/contrib/libvhost-user/libvhost-user.h
+@@ -51,6 +51,8 @@ enum VhostUserProtocolFeature {
+     VHOST_USER_PROTOCOL_F_CRYPTO_SESSION = 7,
+     VHOST_USER_PROTOCOL_F_PAGEFAULT = 8,
+     VHOST_USER_PROTOCOL_F_CONFIG = 9,
++    VHOST_USER_PROTOCOL_F_SLAVE_SEND_FD = 10,
++    VHOST_USER_PROTOCOL_F_HOST_NOTIFIER = 11,
  
- #define TYPE_VHOST_USER_BLK "vhost-user-blk"
- #define VHOST_USER_BLK(obj) \
-@@ -36,6 +37,7 @@ typedef struct VHostUserBlk {
-     uint32_t config_wce;
-     uint32_t config_ro;
-     struct vhost_dev dev;
-+    VhostUserState *vhost_user;
- } VHostUserBlk;
+     VHOST_USER_PROTOCOL_F_MAX
+ };
+@@ -92,6 +94,14 @@ typedef enum VhostUserRequest {
+     VHOST_USER_MAX
+ } VhostUserRequest;
  
- #endif
-diff --git a/include/hw/virtio/vhost-user-scsi.h b/include/hw/virtio/vhost-user-scsi.h
-index 01861f78d0..3ec34ae867 100644
---- a/include/hw/virtio/vhost-user-scsi.h
-+++ b/include/hw/virtio/vhost-user-scsi.h
-@@ -21,6 +21,7 @@
- #include "hw/qdev.h"
- #include "hw/virtio/virtio-scsi.h"
- #include "hw/virtio/vhost.h"
-+#include "hw/virtio/vhost-user.h"
- #include "hw/virtio/vhost-scsi-common.h"
++typedef enum VhostUserSlaveRequest {
++    VHOST_USER_SLAVE_NONE = 0,
++    VHOST_USER_SLAVE_IOTLB_MSG = 1,
++    VHOST_USER_SLAVE_CONFIG_CHANGE_MSG = 2,
++    VHOST_USER_SLAVE_VRING_HOST_NOTIFIER_MSG = 3,
++    VHOST_USER_SLAVE_MAX
++}  VhostUserSlaveRequest;
++
+ typedef struct VhostUserMemoryRegion {
+     uint64_t guest_phys_addr;
+     uint64_t memory_size;
+@@ -122,6 +132,12 @@ static VhostUserConfig c __attribute__ ((unused));
+                                    + sizeof(c.size) \
+                                    + sizeof(c.flags))
  
- #define TYPE_VHOST_USER_SCSI "vhost-user-scsi"
-@@ -30,6 +31,7 @@
- typedef struct VHostUserSCSI {
-     VHostSCSICommon parent_obj;
-     uint64_t host_features;
-+    VhostUserState *vhost_user;
- } VHostUserSCSI;
++typedef struct VhostUserVringArea {
++    uint64_t u64;
++    uint64_t size;
++    uint64_t offset;
++} VhostUserVringArea;
++
+ #if defined(_WIN32)
+ # define VU_PACKED __attribute__((gcc_struct, packed))
+ #else
+@@ -133,6 +149,7 @@ typedef struct VhostUserMsg {
  
- #endif /* VHOST_USER_SCSI_H */
-diff --git a/include/hw/virtio/vhost-user.h b/include/hw/virtio/vhost-user.h
-new file mode 100644
-index 0000000000..eb8bc0d90d
---- /dev/null
-+++ b/include/hw/virtio/vhost-user.h
-@@ -0,0 +1,20 @@
-+/*
-+ * Copyright (c) 2017-2018 Intel Corporation
+ #define VHOST_USER_VERSION_MASK     (0x3)
+ #define VHOST_USER_REPLY_MASK       (0x1 << 2)
++#define VHOST_USER_NEED_REPLY_MASK  (0x1 << 3)
+     uint32_t flags;
+     uint32_t size; /* the following payload size */
+ 
+@@ -145,6 +162,7 @@ typedef struct VhostUserMsg {
+         VhostUserMemory memory;
+         VhostUserLog log;
+         VhostUserConfig config;
++        VhostUserVringArea area;
+     } payload;
+ 
+     int fds[VHOST_MEMORY_MAX_NREGIONS];
+@@ -368,6 +386,20 @@ VuVirtq *vu_get_queue(VuDev *dev, int qidx);
+ void vu_set_queue_handler(VuDev *dev, VuVirtq *vq,
+                           vu_queue_handler_cb handler);
+ 
++/**
++ * vu_set_queue_host_notifier:
++ * @dev: a VuDev context
++ * @vq: a VuVirtq queue
++ * @fd: a file descriptor
++ * @size: host page size
++ * @offset: notifier offset in @fd file
 + *
-+ * This work is licensed under the terms of the GNU GPL, version 2.
-+ * See the COPYING file in the top-level directory.
++ * Set queue's host notifier. This function may be called several
++ * times for the same queue. If called with -1 @fd, the notifier
++ * is removed.
 + */
-+
-+#ifndef HW_VIRTIO_VHOST_USER_H
-+#define HW_VIRTIO_VHOST_USER_H
-+
-+#include "chardev/char-fe.h"
-+
-+typedef struct VhostUserState {
-+    CharBackend *chr;
-+} VhostUserState;
-+
-+VhostUserState *vhost_user_init(void);
-+void vhost_user_cleanup(VhostUserState *user);
-+
-+#endif
-diff --git a/backends/cryptodev-vhost-user.c b/backends/cryptodev-vhost-user.c
-index 862d4f2580..d52daccfcd 100644
---- a/backends/cryptodev-vhost-user.c
-+++ b/backends/cryptodev-vhost-user.c
-@@ -26,6 +26,7 @@
- #include "qapi/error.h"
- #include "qapi/qmp/qerror.h"
- #include "qemu/error-report.h"
-+#include "hw/virtio/vhost-user.h"
- #include "standard-headers/linux/virtio_crypto.h"
- #include "sysemu/cryptodev-vhost.h"
- #include "chardev/char-fe.h"
-@@ -46,6 +47,7 @@
- typedef struct CryptoDevBackendVhostUser {
-     CryptoDevBackend parent_obj;
++bool vu_set_queue_host_notifier(VuDev *dev, VuVirtq *vq, int fd,
++                                int size, int offset);
  
-+    VhostUserState *vhost_user;
-     CharBackend chr;
-     char *chr_name;
-     bool opened;
-@@ -102,7 +104,7 @@ cryptodev_vhost_user_start(int queues,
-             continue;
-         }
- 
--        options.opaque = &s->chr;
-+        options.opaque = s->vhost_user;
-         options.backend_type = VHOST_BACKEND_TYPE_USER;
-         options.cc = b->conf.peers.ccs[i];
-         s->vhost_crypto[i] = cryptodev_vhost_init(&options);
-@@ -185,6 +187,7 @@ static void cryptodev_vhost_user_init(
-     size_t i;
-     Error *local_err = NULL;
-     Chardev *chr;
-+    VhostUserState *user;
-     CryptoDevBackendClient *cc;
-     CryptoDevBackendVhostUser *s =
-                       CRYPTODEV_BACKEND_VHOST_USER(backend);
-@@ -215,6 +218,15 @@ static void cryptodev_vhost_user_init(
-         }
+ /**
+  * vu_queue_set_notification:
+diff --git a/contrib/libvhost-user/libvhost-user.c b/contrib/libvhost-user/libvhost-user.c
+index 54e643d871..a6b46cdc03 100644
+--- a/contrib/libvhost-user/libvhost-user.c
++++ b/contrib/libvhost-user/libvhost-user.c
+@@ -314,11 +314,6 @@ vu_message_write(VuDev *dev, int conn_fd, VhostUserMsg *vmsg)
+         msg.msg_controllen = 0;
      }
  
-+    user = vhost_user_init();
-+    if (!user) {
-+        error_setg(errp, "Failed to init vhost_user");
-+        return;
-+    }
-+
-+    user->chr = &s->chr;
-+    s->vhost_user = user;
-+
-     qemu_chr_fe_set_handlers(&s->chr, NULL, NULL,
-                      cryptodev_vhost_user_event, NULL, s, NULL, true);
- 
-@@ -299,6 +311,12 @@ static void cryptodev_vhost_user_cleanup(
-             backend->conf.peers.ccs[i] = NULL;
-         }
-     }
-+
-+    if (s->vhost_user) {
-+        vhost_user_cleanup(s->vhost_user);
-+        g_free(s->vhost_user);
-+        s->vhost_user = NULL;
-+    }
- }
- 
- static void cryptodev_vhost_user_set_chardev(Object *obj,
-diff --git a/hw/block/vhost-user-blk.c b/hw/block/vhost-user-blk.c
-index 975eae6211..7c3fa8bb1c 100644
---- a/hw/block/vhost-user-blk.c
-+++ b/hw/block/vhost-user-blk.c
-@@ -226,6 +226,7 @@ static void vhost_user_blk_device_realize(DeviceState *dev, Error **errp)
- {
-     VirtIODevice *vdev = VIRTIO_DEVICE(dev);
-     VHostUserBlk *s = VHOST_USER_BLK(vdev);
-+    VhostUserState *user;
-     int i, ret;
- 
-     if (!s->chardev.chr) {
-@@ -243,6 +244,15 @@ static void vhost_user_blk_device_realize(DeviceState *dev, Error **errp)
-         return;
-     }
- 
-+    user = vhost_user_init();
-+    if (!user) {
-+        error_setg(errp, "vhost-user-blk: failed to init vhost_user");
-+        return;
-+    }
-+
-+    user->chr = &s->chardev;
-+    s->vhost_user = user;
-+
-     virtio_init(vdev, "virtio-blk", VIRTIO_ID_BLOCK,
-                 sizeof(struct virtio_blk_config));
- 
-@@ -258,7 +268,7 @@ static void vhost_user_blk_device_realize(DeviceState *dev, Error **errp)
- 
-     vhost_dev_set_config_notifier(&s->dev, &blk_ops);
- 
--    ret = vhost_dev_init(&s->dev, &s->chardev, VHOST_BACKEND_TYPE_USER, 0);
-+    ret = vhost_dev_init(&s->dev, s->vhost_user, VHOST_BACKEND_TYPE_USER, 0);
-     if (ret < 0) {
-         error_setg(errp, "vhost-user-blk: vhost initialization failed: %s",
-                    strerror(-ret));
-@@ -283,6 +293,10 @@ vhost_err:
- virtio_err:
-     g_free(s->dev.vqs);
-     virtio_cleanup(vdev);
-+
-+    vhost_user_cleanup(user);
-+    g_free(user);
-+    s->vhost_user = NULL;
- }
- 
- static void vhost_user_blk_device_unrealize(DeviceState *dev, Error **errp)
-@@ -294,6 +308,12 @@ static void vhost_user_blk_device_unrealize(DeviceState *dev, Error **errp)
-     vhost_dev_cleanup(&s->dev);
-     g_free(s->dev.vqs);
-     virtio_cleanup(vdev);
-+
-+    if (s->vhost_user) {
-+        vhost_user_cleanup(s->vhost_user);
-+        g_free(s->vhost_user);
-+        s->vhost_user = NULL;
-+    }
- }
- 
- static void vhost_user_blk_instance_init(Object *obj)
-diff --git a/hw/scsi/vhost-user-scsi.c b/hw/scsi/vhost-user-scsi.c
-index 9389ed48e0..9355cfdf07 100644
---- a/hw/scsi/vhost-user-scsi.c
-+++ b/hw/scsi/vhost-user-scsi.c
-@@ -69,6 +69,7 @@ static void vhost_user_scsi_realize(DeviceState *dev, Error **errp)
-     VirtIOSCSICommon *vs = VIRTIO_SCSI_COMMON(dev);
-     VHostUserSCSI *s = VHOST_USER_SCSI(dev);
-     VHostSCSICommon *vsc = VHOST_SCSI_COMMON(s);
-+    VhostUserState *user;
-     Error *err = NULL;
-     int ret;
- 
-@@ -85,19 +86,30 @@ static void vhost_user_scsi_realize(DeviceState *dev, Error **errp)
-         return;
-     }
- 
-+    user = vhost_user_init();
-+    if (!user) {
-+        error_setg(errp, "vhost-user-scsi: failed to init vhost_user");
-+        return;
-+    }
-+    user->chr = &vs->conf.chardev;
-+
-     vsc->dev.nvqs = 2 + vs->conf.num_queues;
-     vsc->dev.vqs = g_new(struct vhost_virtqueue, vsc->dev.nvqs);
-     vsc->dev.vq_index = 0;
-     vsc->dev.backend_features = 0;
- 
--    ret = vhost_dev_init(&vsc->dev, (void *)&vs->conf.chardev,
-+    ret = vhost_dev_init(&vsc->dev, user,
-                          VHOST_BACKEND_TYPE_USER, 0);
-     if (ret < 0) {
-         error_setg(errp, "vhost-user-scsi: vhost initialization failed: %s",
-                    strerror(-ret));
-+        vhost_user_cleanup(user);
-+        g_free(user);
-         return;
-     }
- 
-+    s->vhost_user = user;
-+
-     /* Channel and lun both are 0 for bootable vhost-user-scsi disk */
-     vsc->channel = 0;
-     vsc->lun = 0;
-@@ -117,6 +129,12 @@ static void vhost_user_scsi_unrealize(DeviceState *dev, Error **errp)
-     g_free(vsc->dev.vqs);
- 
-     virtio_scsi_common_unrealize(dev, errp);
-+
-+    if (s->vhost_user) {
-+        vhost_user_cleanup(s->vhost_user);
-+        g_free(s->vhost_user);
-+        s->vhost_user = NULL;
-+    }
- }
- 
- static uint64_t vhost_user_scsi_get_features(VirtIODevice *vdev,
-diff --git a/hw/virtio/vhost-stub.c b/hw/virtio/vhost-stub.c
-index 2d76cdebdc..049089b5e2 100644
---- a/hw/virtio/vhost-stub.c
-+++ b/hw/virtio/vhost-stub.c
-@@ -1,7 +1,17 @@
- #include "qemu/osdep.h"
- #include "hw/virtio/vhost.h"
-+#include "hw/virtio/vhost-user.h"
- 
- bool vhost_has_free_slot(void)
- {
+-    /* Set the version in the flags when sending the reply */
+-    vmsg->flags &= ~VHOST_USER_VERSION_MASK;
+-    vmsg->flags |= VHOST_USER_VERSION;
+-    vmsg->flags |= VHOST_USER_REPLY_MASK;
+-
+     do {
+         rc = sendmsg(conn_fd, &msg, 0);
+     } while (rc < 0 && (errno == EINTR || errno == EAGAIN));
+@@ -341,6 +336,39 @@ vu_message_write(VuDev *dev, int conn_fd, VhostUserMsg *vmsg)
      return true;
  }
-+
-+VhostUserState *vhost_user_init(void)
+ 
++static bool
++vu_send_reply(VuDev *dev, int conn_fd, VhostUserMsg *vmsg)
 +{
-+    return NULL;
++    /* Set the version in the flags when sending the reply */
++    vmsg->flags &= ~VHOST_USER_VERSION_MASK;
++    vmsg->flags |= VHOST_USER_VERSION;
++    vmsg->flags |= VHOST_USER_REPLY_MASK;
++
++    return vu_message_write(dev, conn_fd, vmsg);
 +}
 +
-+void vhost_user_cleanup(VhostUserState *user)
++static bool
++vu_process_message_reply(VuDev *dev, const VhostUserMsg *vmsg)
 +{
-+}
-diff --git a/hw/virtio/vhost-user.c b/hw/virtio/vhost-user.c
-index 75a3faef2a..70b9610c87 100644
---- a/hw/virtio/vhost-user.c
-+++ b/hw/virtio/vhost-user.c
-@@ -11,6 +11,7 @@
- #include "qemu/osdep.h"
- #include "qapi/error.h"
- #include "hw/virtio/vhost.h"
-+#include "hw/virtio/vhost-user.h"
- #include "hw/virtio/vhost-backend.h"
- #include "hw/virtio/virtio-net.h"
- #include "chardev/char-fe.h"
-@@ -175,7 +176,8 @@ static VhostUserMsg m __attribute__ ((unused));
- 
- struct vhost_user {
-     struct vhost_dev *dev;
--    CharBackend *chr;
-+    /* Shared between vhost devs of the same virtio device */
-+    VhostUserState *user;
-     int slave_fd;
-     NotifierWithReturn postcopy_notifier;
-     struct PostCopyFD  postcopy_fd;
-@@ -201,7 +203,7 @@ static bool ioeventfd_enabled(void)
- static int vhost_user_read(struct vhost_dev *dev, VhostUserMsg *msg)
- {
-     struct vhost_user *u = dev->opaque;
--    CharBackend *chr = u->chr;
-+    CharBackend *chr = u->user->chr;
-     uint8_t *p = (uint8_t *) msg;
-     int r, size = VHOST_USER_HDR_SIZE;
- 
-@@ -287,7 +289,7 @@ static int vhost_user_write(struct vhost_dev *dev, VhostUserMsg *msg,
-                             int *fds, int fd_num)
- {
-     struct vhost_user *u = dev->opaque;
--    CharBackend *chr = u->chr;
-+    CharBackend *chr = u->user->chr;
-     int ret, size = VHOST_USER_HDR_SIZE + msg->hdr.size;
- 
-     /*
-@@ -1090,7 +1092,7 @@ static int vhost_user_postcopy_waker(struct PostCopyFD *pcfd, RAMBlock *rb,
- static int vhost_user_postcopy_advise(struct vhost_dev *dev, Error **errp)
- {
-     struct vhost_user *u = dev->opaque;
--    CharBackend *chr = u->chr;
-+    CharBackend *chr = u->user->chr;
-     int ufd;
-     VhostUserMsg msg = {
-         .hdr.request = VHOST_USER_POSTCOPY_ADVISE,
-@@ -1228,7 +1230,7 @@ static int vhost_user_postcopy_notifier(NotifierWithReturn *notifier,
-     return 0;
- }
- 
--static int vhost_user_init(struct vhost_dev *dev, void *opaque)
-+static int vhost_user_backend_init(struct vhost_dev *dev, void *opaque)
- {
-     uint64_t features, protocol_features;
-     struct vhost_user *u;
-@@ -1237,7 +1239,7 @@ static int vhost_user_init(struct vhost_dev *dev, void *opaque)
-     assert(dev->vhost_ops->backend_type == VHOST_BACKEND_TYPE_USER);
- 
-     u = g_new0(struct vhost_user, 1);
--    u->chr = opaque;
-+    u->user = opaque;
-     u->slave_fd = -1;
-     u->dev = dev;
-     dev->opaque = u;
-@@ -1313,7 +1315,7 @@ static int vhost_user_init(struct vhost_dev *dev, void *opaque)
-     return 0;
- }
- 
--static int vhost_user_cleanup(struct vhost_dev *dev)
-+static int vhost_user_backend_cleanup(struct vhost_dev *dev)
- {
-     struct vhost_user *u;
- 
-@@ -1637,10 +1639,21 @@ static bool vhost_user_mem_section_filter(struct vhost_dev *dev,
-     return result;
- }
- 
-+VhostUserState *vhost_user_init(void)
-+{
-+    VhostUserState *user = g_new0(struct VhostUserState, 1);
++    VhostUserMsg msg_reply;
 +
-+    return user;
-+}
-+
-+void vhost_user_cleanup(VhostUserState *user)
-+{
-+}
-+
- const VhostOps user_ops = {
-         .backend_type = VHOST_BACKEND_TYPE_USER,
--        .vhost_backend_init = vhost_user_init,
--        .vhost_backend_cleanup = vhost_user_cleanup,
-+        .vhost_backend_init = vhost_user_backend_init,
-+        .vhost_backend_cleanup = vhost_user_backend_cleanup,
-         .vhost_backend_memslots_limit = vhost_user_memslots_limit,
-         .vhost_set_log_base = vhost_user_set_log_base,
-         .vhost_set_mem_table = vhost_user_set_mem_table,
-diff --git a/net/vhost-user.c b/net/vhost-user.c
-index fa28aad12d..608b837175 100644
---- a/net/vhost-user.c
-+++ b/net/vhost-user.c
-@@ -12,6 +12,7 @@
- #include "clients.h"
- #include "net/vhost_net.h"
- #include "net/vhost-user.h"
-+#include "hw/virtio/vhost-user.h"
- #include "chardev/char-fe.h"
- #include "qapi/error.h"
- #include "qapi/qapi-commands-net.h"
-@@ -23,6 +24,7 @@
- typedef struct NetVhostUserState {
-     NetClientState nc;
-     CharBackend chr; /* only queue index 0 */
-+    VhostUserState *vhost_user;
-     VHostNetState *vhost_net;
-     guint watch;
-     uint64_t acked_features;
-@@ -64,7 +66,8 @@ static void vhost_user_stop(int queues, NetClientState *ncs[])
-     }
- }
- 
--static int vhost_user_start(int queues, NetClientState *ncs[], CharBackend *be)
-+static int vhost_user_start(int queues, NetClientState *ncs[],
-+                            VhostUserState *be)
- {
-     VhostNetOptions options;
-     struct vhost_net *net = NULL;
-@@ -144,7 +147,7 @@ static ssize_t vhost_user_receive(NetClientState *nc, const uint8_t *buf,
-     return size;
- }
- 
--static void vhost_user_cleanup(NetClientState *nc)
-+static void net_vhost_user_cleanup(NetClientState *nc)
- {
-     NetVhostUserState *s = DO_UPCAST(NetVhostUserState, nc, nc);
- 
-@@ -159,6 +162,11 @@ static void vhost_user_cleanup(NetClientState *nc)
-             s->watch = 0;
-         }
-         qemu_chr_fe_deinit(&s->chr, true);
-+        if (s->vhost_user) {
-+            vhost_user_cleanup(s->vhost_user);
-+            g_free(s->vhost_user);
-+            s->vhost_user = NULL;
-+        }
-     }
- 
-     qemu_purge_queued_packets(nc);
-@@ -182,7 +190,7 @@ static NetClientInfo net_vhost_user_info = {
-         .type = NET_CLIENT_DRIVER_VHOST_USER,
-         .size = sizeof(NetVhostUserState),
-         .receive = vhost_user_receive,
--        .cleanup = vhost_user_cleanup,
-+        .cleanup = net_vhost_user_cleanup,
-         .has_vnet_hdr = vhost_user_has_vnet_hdr,
-         .has_ufo = vhost_user_has_ufo,
- };
-@@ -244,7 +252,7 @@ static void net_vhost_user_event(void *opaque, int event)
-     trace_vhost_user_event(chr->label, event);
-     switch (event) {
-     case CHR_EVENT_OPENED:
--        if (vhost_user_start(queues, ncs, &s->chr) < 0) {
-+        if (vhost_user_start(queues, ncs, s->vhost_user) < 0) {
-             qemu_chr_fe_disconnect(&s->chr);
-             return;
-         }
-@@ -283,12 +291,19 @@ static int net_vhost_user_init(NetClientState *peer, const char *device,
- {
-     Error *err = NULL;
-     NetClientState *nc, *nc0 = NULL;
--    NetVhostUserState *s;
-+    VhostUserState *user = NULL;
-+    NetVhostUserState *s = NULL;
-     int i;
- 
-     assert(name);
-     assert(queues > 0);
- 
-+    user = vhost_user_init();
-+    if (!user) {
-+        error_report("failed to init vhost_user");
-+        goto err;
++    if ((vmsg->flags & VHOST_USER_NEED_REPLY_MASK) == 0) {
++        return true;
 +    }
 +
-     for (i = 0; i < queues; i++) {
-         nc = qemu_new_net_client(&net_vhost_user_info, peer, device, name);
-         snprintf(nc->info_str, sizeof(nc->info_str), "vhost-user%d to %s",
-@@ -299,17 +314,19 @@ static int net_vhost_user_init(NetClientState *peer, const char *device,
-             s = DO_UPCAST(NetVhostUserState, nc, nc);
-             if (!qemu_chr_fe_init(&s->chr, chr, &err)) {
-                 error_report_err(err);
--                return -1;
-+                goto err;
-             }
-+            user->chr = &s->chr;
-         }
--
-+        s = DO_UPCAST(NetVhostUserState, nc, nc);
-+        s->vhost_user = user;
-     }
- 
-     s = DO_UPCAST(NetVhostUserState, nc, nc0);
-     do {
-         if (qemu_chr_fe_wait_connected(&s->chr, &err) < 0) {
-             error_report_err(err);
--            return -1;
-+            goto err;
-         }
-         qemu_chr_fe_set_handlers(&s->chr, NULL, NULL,
-                                  net_vhost_user_event, NULL, nc0->name, NULL,
-@@ -319,6 +336,17 @@ static int net_vhost_user_init(NetClientState *peer, const char *device,
-     assert(s->vhost_net);
- 
-     return 0;
-+
-+err:
-+    if (user) {
-+        vhost_user_cleanup(user);
-+        g_free(user);
-+        if (s) {
-+            s->vhost_user = NULL;
-+        }
++    if (!vu_message_read(dev, dev->slave_fd, &msg_reply)) {
++        return false;
 +    }
 +
-+    return -1;
++    if (msg_reply.request != vmsg->request) {
++        DPRINT("Received unexpected msg type. Expected %d received %d",
++               vmsg->request, msg_reply.request);
++        return false;
++    }
++
++    return msg_reply.payload.u64 == 0;
++}
++
+ /* Kick the log_call_fd if required. */
+ static void
+ vu_log_kick(VuDev *dev)
+@@ -536,7 +564,7 @@ vu_set_mem_table_exec_postcopy(VuDev *dev, VhostUserMsg *vmsg)
+ 
+     /* Send the message back to qemu with the addresses filled in */
+     vmsg->fd_num = 0;
+-    if (!vu_message_write(dev, dev->sock, vmsg)) {
++    if (!vu_send_reply(dev, dev->sock, vmsg)) {
+         vu_panic(dev, "failed to respond to set-mem-table for postcopy");
+         return false;
+     }
+@@ -916,6 +944,41 @@ void vu_set_queue_handler(VuDev *dev, VuVirtq *vq,
+     }
  }
  
- static Chardev *net_vhost_claim_chardev(
-diff --git a/hw/virtio/Makefile.objs b/hw/virtio/Makefile.objs
-index 765d363c1f..030969e28c 100644
---- a/hw/virtio/Makefile.objs
-+++ b/hw/virtio/Makefile.objs
-@@ -11,5 +11,5 @@ obj-y += virtio-crypto.o
- obj-$(CONFIG_VIRTIO_PCI) += virtio-crypto-pci.o
- endif
++bool vu_set_queue_host_notifier(VuDev *dev, VuVirtq *vq, int fd,
++                                int size, int offset)
++{
++    int qidx = vq - dev->vq;
++    int fd_num = 0;
++    VhostUserMsg vmsg = {
++        .request = VHOST_USER_SLAVE_VRING_HOST_NOTIFIER_MSG,
++        .flags = VHOST_USER_VERSION | VHOST_USER_NEED_REPLY_MASK,
++        .size = sizeof(vmsg.payload.area),
++        .payload.area = {
++            .u64 = qidx & VHOST_USER_VRING_IDX_MASK,
++            .size = size,
++            .offset = offset,
++        },
++    };
++
++    if (fd == -1) {
++        vmsg.payload.area.u64 |= VHOST_USER_VRING_NOFD_MASK;
++    } else {
++        vmsg.fds[fd_num++] = fd;
++    }
++
++    vmsg.fd_num = fd_num;
++
++    if ((dev->protocol_features & VHOST_USER_PROTOCOL_F_SLAVE_SEND_FD) == 0) {
++        return false;
++    }
++
++    if (!vu_message_write(dev, dev->slave_fd, &vmsg)) {
++        return false;
++    }
++
++    return vu_process_message_reply(dev, &vmsg);
++}
++
+ static bool
+ vu_set_vring_call_exec(VuDev *dev, VhostUserMsg *vmsg)
+ {
+@@ -968,7 +1031,9 @@ static bool
+ vu_get_protocol_features_exec(VuDev *dev, VhostUserMsg *vmsg)
+ {
+     uint64_t features = 1ULL << VHOST_USER_PROTOCOL_F_LOG_SHMFD |
+-                        1ULL << VHOST_USER_PROTOCOL_F_SLAVE_REQ;
++                        1ULL << VHOST_USER_PROTOCOL_F_SLAVE_REQ |
++                        1ULL << VHOST_USER_PROTOCOL_F_HOST_NOTIFIER |
++                        1ULL << VHOST_USER_PROTOCOL_F_SLAVE_SEND_FD;
  
--common-obj-$(call lnot,$(CONFIG_LINUX)) += vhost-stub.o
-+common-obj-$(call lnot,$(call land,$(CONFIG_VIRTIO),$(CONFIG_LINUX))) += vhost-stub.o
- common-obj-$(CONFIG_ALL) += vhost-stub.o
+     if (have_userfault()) {
+         features |= 1ULL << VHOST_USER_PROTOCOL_F_PAGEFAULT;
+@@ -1252,7 +1317,7 @@ vu_dispatch(VuDev *dev)
+         goto end;
+     }
+ 
+-    if (!vu_message_write(dev, dev->sock, &vmsg)) {
++    if (!vu_send_reply(dev, dev->sock, &vmsg)) {
+         goto end;
+     }
+ 
 -- 
 MST
