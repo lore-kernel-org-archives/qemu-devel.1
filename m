@@ -1,30 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39255)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39269)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1fOmuV-0003Gz-3H
+	(envelope-from <marcandre.lureau@redhat.com>) id 1fOmuW-0003IL-J0
 	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 12:28:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1fOmuT-0007sX-EP
-	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 12:28:15 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:50246 helo=mx1.redhat.com)
+	(envelope-from <marcandre.lureau@redhat.com>) id 1fOmuU-0007tF-UW
+	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 12:28:16 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:59636 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1fOmuT-0007sC-8z
-	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 12:28:13 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.6])
+	id 1fOmuU-0007t3-Ou
+	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 12:28:14 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.5])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id DB65B40137F6
-	for <qemu-devel@nongnu.org>; Fri,  1 Jun 2018 16:28:12 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 5D7C18A3B7
+	for <qemu-devel@nongnu.org>; Fri,  1 Jun 2018 16:28:14 +0000 (UTC)
 From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Fri,  1 Jun 2018 18:27:45 +0200
-Message-Id: <20180601162749.27406-9-marcandre.lureau@redhat.com>
+Date: Fri,  1 Jun 2018 18:27:46 +0200
+Message-Id: <20180601162749.27406-10-marcandre.lureau@redhat.com>
 In-Reply-To: <20180601162749.27406-1-marcandre.lureau@redhat.com>
 References: <20180601162749.27406-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [RFC v2 08/12] contrib: add vhost-user-input
+Subject: [Qemu-devel] [RFC v2 09/12] Add vhost-input-pci
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,461 +36,287 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Gerd Hoffmann <kraxel@redhat.com>, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
-Add a vhost-user input backend example, based on virtio-input-host
-device. It takes an evdev path as argument, and can be associated with a
-vhost-user-backend object, ex:
+Use a vhost-user input backend. Usage:
 
--object vhost-user-backend,id=3Dvuid,cmd=3D"vhost-user-input /dev/input/e=
-vent0"
+-object vhost-user-backend,id=3Dvuid -device vhost-input-pci,vhost-user=3D=
+vuid
 
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 ---
- contrib/libvhost-user/libvhost-user.h  |   1 +
- contrib/vhost-user-input/main.c        | 358 +++++++++++++++++++++++++
- Makefile                               |   3 +
- Makefile.objs                          |   1 +
- configure                              |   1 +
- contrib/vhost-user-input/Makefile.objs |   1 +
- 6 files changed, 365 insertions(+)
- create mode 100644 contrib/vhost-user-input/main.c
- create mode 100644 contrib/vhost-user-input/Makefile.objs
+ hw/virtio/virtio-pci.h           |  10 +++
+ include/hw/virtio/virtio-input.h |  14 ++++
+ hw/input/vhost-user-input.c      | 124 +++++++++++++++++++++++++++++++
+ hw/virtio/virtio-pci.c           |  20 +++++
+ MAINTAINERS                      |   1 +
+ hw/input/Makefile.objs           |   1 +
+ 6 files changed, 170 insertions(+)
+ create mode 100644 hw/input/vhost-user-input.c
 
-diff --git a/contrib/libvhost-user/libvhost-user.h b/contrib/libvhost-use=
-r/libvhost-user.h
-index b27075ea3b..d6badc8653 100644
---- a/contrib/libvhost-user/libvhost-user.h
-+++ b/contrib/libvhost-user/libvhost-user.h
-@@ -89,6 +89,7 @@ typedef enum VhostUserRequest {
-     VHOST_USER_POSTCOPY_ADVISE  =3D 28,
-     VHOST_USER_POSTCOPY_LISTEN  =3D 29,
-     VHOST_USER_POSTCOPY_END     =3D 30,
-+    VHOST_USER_INPUT_GET_CONFIG,
-     VHOST_USER_MAX
- } VhostUserRequest;
+diff --git a/hw/virtio/virtio-pci.h b/hw/virtio/virtio-pci.h
+index 813082b0d7..c7e28e1b9c 100644
+--- a/hw/virtio/virtio-pci.h
++++ b/hw/virtio/virtio-pci.h
+@@ -54,6 +54,7 @@ typedef struct VirtIORngPCI VirtIORngPCI;
+ typedef struct VirtIOInputPCI VirtIOInputPCI;
+ typedef struct VirtIOInputHIDPCI VirtIOInputHIDPCI;
+ typedef struct VirtIOInputHostPCI VirtIOInputHostPCI;
++typedef struct VHostUserInputPCI VHostUserInputPCI;
+ typedef struct VirtIOGPUPCI VirtIOGPUPCI;
+ typedef struct VHostVSockPCI VHostVSockPCI;
+ typedef struct VirtIOCryptoPCI VirtIOCryptoPCI;
+@@ -376,6 +377,15 @@ struct VirtIOInputHostPCI {
 =20
-diff --git a/contrib/vhost-user-input/main.c b/contrib/vhost-user-input/m=
-ain.c
+ #endif
+=20
++#define TYPE_VHOST_USER_INPUT_PCI "vhost-user-input-pci"
++#define VHOST_USER_INPUT_PCI(obj)                                    \
++    OBJECT_CHECK(VHostUserInputPCI, (obj), TYPE_VHOST_USER_INPUT_PCI)
++
++struct VHostUserInputPCI {
++    VirtIOPCIProxy parent_obj;
++    VHostUserInput vhi;
++};
++
+ /*
+  * virtio-gpu-pci: This extends VirtioPCIProxy.
+  */
+diff --git a/include/hw/virtio/virtio-input.h b/include/hw/virtio/virtio-=
+input.h
+index 054c38836f..4fca03e796 100644
+--- a/include/hw/virtio/virtio-input.h
++++ b/include/hw/virtio/virtio-input.h
+@@ -2,6 +2,7 @@
+ #define QEMU_VIRTIO_INPUT_H
+=20
+ #include "ui/input.h"
++#include "sysemu/vhost-user-backend.h"
+=20
+ /* ----------------------------------------------------------------- */
+ /* virtio input protocol                                             */
+@@ -42,11 +43,18 @@ typedef struct virtio_input_event virtio_input_event;
+ #define VIRTIO_INPUT_HOST_GET_PARENT_CLASS(obj) \
+         OBJECT_GET_PARENT_CLASS(obj, TYPE_VIRTIO_INPUT_HOST)
+=20
++#define TYPE_VHOST_USER_INPUT   "vhost-user-input"
++#define VHOST_USER_INPUT(obj)                              \
++    OBJECT_CHECK(VHostUserInput, (obj), TYPE_VHOST_USER_INPUT)
++#define VHOST_USER_INPUT_GET_PARENT_CLASS(obj)             \
++    OBJECT_GET_PARENT_CLASS(obj, TYPE_VHOST_USER_INPUT)
++
+ typedef struct VirtIOInput VirtIOInput;
+ typedef struct VirtIOInputClass VirtIOInputClass;
+ typedef struct VirtIOInputConfig VirtIOInputConfig;
+ typedef struct VirtIOInputHID VirtIOInputHID;
+ typedef struct VirtIOInputHost VirtIOInputHost;
++typedef struct VHostUserInput VHostUserInput;
+=20
+ struct VirtIOInputConfig {
+     virtio_input_config               config;
+@@ -98,6 +106,12 @@ struct VirtIOInputHost {
+     int                               fd;
+ };
+=20
++struct VHostUserInput {
++    VirtIOInput                       parent_obj;
++
++    VhostUserBackend                  *vhost;
++};
++
+ void virtio_input_send(VirtIOInput *vinput, virtio_input_event *event);
+ void virtio_input_init_config(VirtIOInput *vinput,
+                               virtio_input_config *config);
+diff --git a/hw/input/vhost-user-input.c b/hw/input/vhost-user-input.c
 new file mode 100644
-index 0000000000..b2c2184446
+index 0000000000..b293020d08
 --- /dev/null
-+++ b/contrib/vhost-user-input/main.c
-@@ -0,0 +1,358 @@
-+#include <glib.h>
-+#include <linux/input.h>
++++ b/hw/input/vhost-user-input.c
+@@ -0,0 +1,124 @@
++/*
++ * This work is licensed under the terms of the GNU GPL, version 2 or
++ * (at your option) any later version.  See the COPYING file in the
++ * top-level directory.
++ */
 +
 +#include "qemu/osdep.h"
-+#include "qemu/iov.h"
-+#include "qemu/bswap.h"
-+#include "contrib/libvhost-user/libvhost-user.h"
-+#include "contrib/libvhost-user/libvhost-user-glib.h"
-+#include "standard-headers/linux/virtio_input.h"
++#include "qapi/error.h"
++#include "qemu-common.h"
++#include "qemu/sockets.h"
 +
-+typedef struct virtio_input_event virtio_input_event;
-+typedef struct virtio_input_config virtio_input_config;
++#include "hw/qdev.h"
++#include "hw/virtio/virtio.h"
++#include "hw/virtio/virtio-input.h"
 +
-+typedef struct VuInput {
-+    VugDev dev;
-+    GSource *evsrc;
-+    int evdevfd;
-+    GArray *config;
-+    virtio_input_event *queue;
-+    uint32_t qindex, qsize;
-+} VuInput;
++#include <sys/ioctl.h>
++#include "standard-headers/linux/input.h"
 +
-+static void vi_input_send(VuInput *vi, struct virtio_input_event *event)
-+{
-+    VuDev *dev =3D &vi->dev.parent;
-+    VuVirtq *vq =3D vu_get_queue(dev, 0);
-+    VuVirtqElement *elem;
-+    unsigned have, need;
-+    int i, len;
++/* ----------------------------------------------------------------- */
 +
-+    /* queue up events ... */
-+    if (vi->qindex =3D=3D vi->qsize) {
-+        vi->qsize++;
-+        vi->queue =3D realloc(vi->queue, vi->qsize *
-+                                sizeof(virtio_input_event));
-+    }
-+    vi->queue[vi->qindex++] =3D *event;
-+
-+    /* ... until we see a report sync ... */
-+    if (event->type !=3D htole16(EV_SYN) ||
-+        event->code !=3D htole16(SYN_REPORT)) {
-+        return;
-+    }
-+
-+    /* ... then check available space ... */
-+    need =3D sizeof(virtio_input_event) * vi->qindex;
-+    vu_queue_get_avail_bytes(dev, vq, &have, NULL, need, 0);
-+    if (have < need) {
-+        vi->qindex =3D 0;
-+        g_warning("ENOSPC in vq, dropping events");
-+        return;
-+    }
-+
-+    /* ... and finally pass them to the guest */
-+    for (i =3D 0; i < vi->qindex; i++) {
-+        elem =3D vu_queue_pop(dev, vq, sizeof(VuVirtqElement));
-+        if (!elem) {
-+            /* should not happen, we've checked for space beforehand */
-+            g_warning("%s: Huh?  No vq elem available ...\n", __func__);
-+            return;
-+        }
-+        len =3D iov_from_buf(elem->in_sg, elem->in_num,
-+                           0, vi->queue + i, sizeof(virtio_input_event))=
-;
-+        vu_queue_push(dev, vq, elem, len);
-+        g_free(elem);
-+    }
-+    vu_queue_notify(&vi->dev.parent, vq);
-+    vi->qindex =3D 0;
-+}
-+
-+static void
-+vi_evdev_watch(VuDev *dev, int condition, void *data)
-+{
-+    VuInput *vi =3D data;
-+    int fd =3D vi->evdevfd;
-+
-+    g_debug("Got evdev condition %x", condition);
-+
-+    struct virtio_input_event virtio;
-+    struct input_event evdev;
-+    int rc;
-+
-+    for (;;) {
-+        rc =3D read(fd, &evdev, sizeof(evdev));
-+        if (rc !=3D sizeof(evdev)) {
-+            break;
-+        }
-+
-+        g_debug("input %d %d %d", evdev.type, evdev.code, evdev.value);
-+
-+        virtio.type  =3D htole16(evdev.type);
-+        virtio.code  =3D htole16(evdev.code);
-+        virtio.value =3D htole32(evdev.value);
-+        vi_input_send(vi, &virtio);
-+    }
-+}
-+
-+
-+static void vi_handle_status(VuInput *vi, virtio_input_event *event)
-+{
-+    struct input_event evdev;
-+    int rc;
-+
-+    if (gettimeofday(&evdev.time, NULL)) {
-+        perror("vi_handle_status: gettimeofday");
-+        return;
-+    }
-+
-+    evdev.type =3D le16toh(event->type);
-+    evdev.code =3D le16toh(event->code);
-+    evdev.value =3D le32toh(event->value);
-+
-+    rc =3D write(vi->evdevfd, &evdev, sizeof(evdev));
-+    if (rc =3D=3D -1) {
-+        perror("vi_host_handle_status: write");
-+    }
-+}
-+
-+static void vi_handle_sts(VuDev *dev, int qidx)
-+{
-+    VuInput *vi =3D container_of(dev, VuInput, dev.parent);
-+    VuVirtq *vq =3D vu_get_queue(dev, qidx);
-+    virtio_input_event event;
-+    VuVirtqElement *elem;
-+    int len;
-+
-+    g_debug("%s", __func__);
-+
-+    for (;;) {
-+        elem =3D vu_queue_pop(dev, vq, sizeof(VuVirtqElement));
-+        if (!elem) {
-+            break;
-+        }
-+
-+        memset(&event, 0, sizeof(event));
-+        len =3D iov_to_buf(elem->out_sg, elem->out_num,
-+                         0, &event, sizeof(event));
-+        vi_handle_status(vi, &event);
-+        vu_queue_push(dev, vq, elem, len);
-+        g_free(elem);
-+    }
-+
-+    vu_queue_notify(&vi->dev.parent, vq);
-+}
-+
-+static void
-+vi_panic(VuDev *dev, const char *msg)
-+{
-+    g_critical("%s\n", msg);
-+    exit(1);
-+}
-+
-+static void
-+vi_queue_set_started(VuDev *dev, int qidx, bool started)
-+{
-+    VuInput *vi =3D container_of(dev, VuInput, dev.parent);
-+    VuVirtq *vq =3D vu_get_queue(dev, qidx);
-+
-+    g_debug("queue started %d:%d", qidx, started);
-+
-+    if (qidx =3D=3D 0) {
-+        if (started && !vi->evsrc) {
-+            vi->evsrc =3D vug_source_new(&vi->dev, vi->evdevfd,
-+                                       G_IO_IN, vi_evdev_watch, vi);
-+        } else if (!started) {
-+            g_source_destroy(vi->evsrc);
-+            vi->evsrc =3D NULL;
-+        }
-+    } else {
-+        vu_set_queue_handler(dev, vq, started ? vi_handle_sts : NULL);
-+    }
-+}
-+
-+static int
-+vi_process_msg(VuDev *dev, VhostUserMsg *vmsg, int *do_reply)
-+{
-+    VuInput *vi =3D container_of(dev, VuInput, dev.parent);
-+
-+    switch (vmsg->request) {
-+    case VHOST_USER_INPUT_GET_CONFIG:
-+        vmsg->size =3D vi->config->len * sizeof(virtio_input_config);
-+        vmsg->data =3D g_memdup(vi->config->data, vmsg->size);
-+        *do_reply =3D true;
-+        return 1;
-+    default:
-+        return 0;
-+    }
-+}
-+
-+static const VuDevIface vuiface =3D {
-+    .queue_set_started =3D vi_queue_set_started,
-+    .process_msg =3D vi_process_msg,
++static struct virtio_input_config vhost_input_config[] =3D {
++    { /* empty list */ },
 +};
 +
-+static void
-+vi_bits_config(VuInput *vi, int type, int count)
++static void vhost_input_realize(DeviceState *dev, Error **errp)
 +{
-+    virtio_input_config bits;
-+    int rc, i, size =3D 0;
++    VHostUserInput *vhi =3D VHOST_USER_INPUT(dev);
++    VirtIOInput *vinput =3D VIRTIO_INPUT(dev);
++    VirtIODevice *vdev =3D VIRTIO_DEVICE(dev);
++    virtio_input_config *config;
++    int i, ret;
 +
-+    memset(&bits, 0, sizeof(bits));
-+    rc =3D ioctl(vi->evdevfd, EVIOCGBIT(type, count / 8), bits.u.bitmap)=
-;
-+    if (rc < 0) {
++    if (!vhi->vhost) {
++        error_setg(errp, "'vhost-user' property is required");
 +        return;
 +    }
 +
-+    for (i =3D 0; i < count / 8; i++) {
-+        if (bits.u.bitmap[i]) {
-+            size =3D i + 1;
-+        }
-+    }
-+    if (size =3D=3D 0) {
++    if (vhost_user_backend_dev_init(vhi->vhost, vdev, 2, errp) =3D=3D -1=
+) {
 +        return;
 +    }
 +
-+    bits.select =3D VIRTIO_INPUT_CFG_EV_BITS;
-+    bits.subsel =3D type;
-+    bits.size   =3D size;
-+    g_array_append_val(vi->config, bits);
++    ret =3D vhost_user_input_get_config(&vhi->vhost->dev, &config);
++    if (ret < 0) {
++        error_setg(errp, "failed to get input config");
++        return;
++    }
++    for (i =3D 0; i < ret; i++) {
++        virtio_input_add_config(vinput, &config[i]);
++    }
++    g_free(config);
 +}
 +
-+static int unix_sock_new(char *path)
++static void vhost_input_change_active(VirtIOInput *vinput)
 +{
-+    int sock;
-+    struct sockaddr_un un;
-+    size_t len;
++    VHostUserInput *vhi =3D VHOST_USER_INPUT(vinput);
 +
-+    sock =3D socket(AF_UNIX, SOCK_STREAM, 0);
-+    if (sock <=3D 0) {
-+        perror("socket");
-+        return -1;
++    if (!vhi->vhost) {
++        return;
 +    }
 +
-+    un.sun_family =3D AF_UNIX;
-+    snprintf(un.sun_path, sizeof(un.sun_path), "%s", path);
-+    len =3D sizeof(un.sun_family) + strlen(un.sun_path);
-+
-+    unlink(path);
-+    if (bind(sock, (struct sockaddr *)&un, len) < 0) {
-+        perror("bind");
-+        goto fail;
++    if (vinput->active) {
++        vhost_user_backend_start(vhi->vhost);
++    } else {
++        vhost_user_backend_stop(vhi->vhost);
 +    }
-+
-+    if (listen(sock, 1) < 0) {
-+        perror("listen");
-+        goto fail;
-+    }
-+
-+    return sock;
-+
-+fail:
-+    close(sock);
-+
-+    return -1;
 +}
 +
-+char **fname;
-+char *socket_path;
-+bool nograb;
-+
-+static GOptionEntry entries[] =3D {
-+    { "no-grab", 'n', 0, G_OPTION_ARG_NONE, &nograb,
-+      "Don't grab device", "" },
-+    { "socket-path", 's', 0, G_OPTION_ARG_FILENAME, &socket_path,
-+      "Use UNIX socket path", "" },
-+    { G_OPTION_REMAINING, '\0', 0, G_OPTION_ARG_FILENAME_ARRAY, &fname,
-+      "EVDEV filename", "" },
-+    { NULL, }
++static const VMStateDescription vmstate_vhost_input =3D {
++    .name =3D "vhost-user-input",
++    .unmigratable =3D 1,
 +};
 +
-+int
-+main(int argc, char *argv[])
++static void vhost_input_class_init(ObjectClass *klass, void *data)
 +{
-+    GMainLoop *loop =3D NULL;
-+    VuInput vi =3D { 0, };
-+    int rc, ver, fd;
-+    virtio_input_config id;
-+    struct input_id ids;
-+    GError *error =3D NULL;
-+    GOptionContext *context;
++    VirtIOInputClass *vic =3D VIRTIO_INPUT_CLASS(klass);
++    DeviceClass *dc =3D DEVICE_CLASS(klass);
 +
-+    context =3D g_option_context_new("EVDEV - vhost-user-input sample");
-+    g_option_context_add_main_entries(context, entries, NULL);
-+    if (!g_option_context_parse(context, &argc, &argv, &error)) {
-+        g_printerr("Option parsing failed: %s\n", error->message);
-+        exit(1);
-+    }
-+    if (!fname || !fname[0] || fname[1]) {
-+        g_printerr("Please specify a single EVDEV filename\n");
-+        exit(1);
-+    }
-+
-+    vi.evdevfd =3D open(fname[0], O_RDWR);
-+    if (vi.evdevfd < 0) {
-+        g_printerr("Failed to open evdev: %s\n", g_strerror(errno));
-+        exit(1);
-+    }
-+
-+    rc =3D ioctl(vi.evdevfd, EVIOCGVERSION, &ver);
-+    if (rc < 0) {
-+        g_printerr("%s: is not an evdev device\n", argv[1]);
-+        exit(1);
-+    }
-+
-+    if (!nograb) {
-+        rc =3D ioctl(vi.evdevfd, EVIOCGRAB, 1);
-+        if (rc < 0) {
-+            g_printerr("Failed to grab device\n");
-+            exit(1);
-+        }
-+    }
-+
-+    vi.config =3D g_array_new(false, false, sizeof(virtio_input_config))=
-;
-+    memset(&id, 0, sizeof(id));
-+    ioctl(vi.evdevfd, EVIOCGNAME(sizeof(id.u.string) - 1), id.u.string);
-+    id.select =3D VIRTIO_INPUT_CFG_ID_NAME;
-+    id.size =3D strlen(id.u.string);
-+    g_array_append_val(vi.config, id);
-+
-+    if (ioctl(vi.evdevfd, EVIOCGID, &ids) =3D=3D 0) {
-+        memset(&id, 0, sizeof(id));
-+        id.select =3D VIRTIO_INPUT_CFG_ID_DEVIDS;
-+        id.size =3D sizeof(struct virtio_input_devids);
-+        id.u.ids.bustype =3D cpu_to_le16(ids.bustype);
-+        id.u.ids.vendor  =3D cpu_to_le16(ids.vendor);
-+        id.u.ids.product =3D cpu_to_le16(ids.product);
-+        id.u.ids.version =3D cpu_to_le16(ids.version);
-+        g_array_append_val(vi.config, id);
-+    }
-+
-+    vi_bits_config(&vi, EV_KEY, KEY_CNT);
-+    vi_bits_config(&vi, EV_REL, REL_CNT);
-+    vi_bits_config(&vi, EV_ABS, ABS_CNT);
-+    vi_bits_config(&vi, EV_MSC, MSC_CNT);
-+    vi_bits_config(&vi, EV_SW,  SW_CNT);
-+    g_debug("config length: %u", vi.config->len);
-+
-+    if (socket_path) {
-+        int lsock =3D unix_sock_new(socket_path);
-+        fd =3D accept(lsock, NULL, NULL);
-+        close(lsock);
-+    } else {
-+        fd =3D 3;
-+    }
-+    if (fd =3D=3D -1) {
-+        g_printerr("Invalid socket");
-+        exit(1);
-+    }
-+    vug_init(&vi.dev, fd, vi_panic, &vuiface);
-+
-+    loop =3D g_main_loop_new(NULL, FALSE);
-+    g_main_loop_run(loop);
-+    g_main_loop_unref(loop);
-+
-+    vug_deinit(&vi.dev);
-+
-+    return 0;
++    dc->vmsd           =3D &vmstate_vhost_input;
++    vic->realize       =3D vhost_input_realize;
++    vic->change_active =3D vhost_input_change_active;
 +}
-diff --git a/Makefile b/Makefile
-index 6d588d1f71..d1222da359 100644
---- a/Makefile
-+++ b/Makefile
-@@ -420,6 +420,7 @@ dummy :=3D $(call unnest-vars,, \
-                 libvhost-user-obj-y \
-                 vhost-user-scsi-obj-y \
-                 vhost-user-blk-obj-y \
-+                vhost-user-input-obj-y \
-                 qga-vss-dll-obj-y \
-                 block-obj-y \
-                 block-obj-m \
-@@ -719,6 +720,8 @@ vhost-user-scsi$(EXESUF): $(vhost-user-scsi-obj-y) li=
-bvhost-user.a
- 	$(call LINK, $^)
- vhost-user-blk$(EXESUF): $(vhost-user-blk-obj-y) libvhost-user.a
- 	$(call LINK, $^)
-+vhost-user-input$(EXESUF): $(vhost-user-input-obj-y) libvhost-user.a lib=
-qemuutil.a
-+	$(call LINK, $^)
++
++static void vhost_input_is_busy(const Object *obj, const char *name,
++                                Object *val, Error **errp)
++{
++    VHostUserInput *vhi =3D VHOST_USER_INPUT(obj);
++
++    if (vhi->vhost) {
++        error_setg(errp, "can't use already busy vhost-user");
++    } else {
++        qdev_prop_allow_set_link_before_realize(obj, name, val, errp);
++    }
++}
++
++static void vhost_input_init(Object *obj)
++{
++    VHostUserInput *vhi =3D VHOST_USER_INPUT(obj);
++    VirtIOInput *vinput =3D VIRTIO_INPUT(obj);
++
++    virtio_input_init_config(vinput, vhost_input_config);
++
++    object_property_add_link(obj, "vhost-user", TYPE_VHOST_USER_BACKEND,
++                             (Object **)&vhi->vhost,
++                             vhost_input_is_busy,
++                             OBJ_PROP_LINK_UNREF_ON_RELEASE,
++                             &error_abort);
++}
++
++static const TypeInfo vhost_input_info =3D {
++    .name          =3D TYPE_VHOST_USER_INPUT,
++    .parent        =3D TYPE_VIRTIO_INPUT,
++    .instance_size =3D sizeof(VHostUserInput),
++    .instance_init =3D vhost_input_init,
++    .class_init    =3D vhost_input_class_init,
++};
++
++/* ----------------------------------------------------------------- */
++
++static void vhost_input_register_types(void)
++{
++    type_register_static(&vhost_input_info);
++}
++
++type_init(vhost_input_register_types)
+diff --git a/hw/virtio/virtio-pci.c b/hw/virtio/virtio-pci.c
+index 5eb0c323ca..ecec2e713c 100644
+--- a/hw/virtio/virtio-pci.c
++++ b/hw/virtio/virtio-pci.c
+@@ -2646,6 +2646,25 @@ static const TypeInfo virtio_host_pci_info =3D {
+ };
+ #endif
 =20
- module_block.h: $(SRC_PATH)/scripts/modules/module_block.py config-host.=
-mak
- 	$(call quiet-command,$(PYTHON) $< $@ \
-diff --git a/Makefile.objs b/Makefile.objs
-index c6c3554203..c20f8d35d7 100644
---- a/Makefile.objs
-+++ b/Makefile.objs
-@@ -193,6 +193,7 @@ vhost-user-scsi.o-cflags :=3D $(LIBISCSI_CFLAGS)
- vhost-user-scsi.o-libs :=3D $(LIBISCSI_LIBS)
- vhost-user-scsi-obj-y =3D contrib/vhost-user-scsi/
- vhost-user-blk-obj-y =3D contrib/vhost-user-blk/
-+vhost-user-input-obj-y =3D contrib/vhost-user-input/
++static void vhost_input_pci_initfn(Object *obj)
++{
++    VHostUserInputPCI *dev =3D VHOST_USER_INPUT_PCI(obj);
++
++    virtio_instance_init_common(obj, &dev->vhi, sizeof(dev->vhi),
++                                TYPE_VHOST_USER_INPUT);
++
++    object_property_add_alias(obj, "vhost-user",
++                              OBJECT(&dev->vhi), "vhost-user",
++                              &error_abort);
++}
++
++static const TypeInfo vhost_input_pci_info =3D {
++    .name          =3D TYPE_VHOST_USER_INPUT_PCI,
++    .parent        =3D TYPE_VIRTIO_INPUT_PCI,
++    .instance_size =3D sizeof(VHostUserInputPCI),
++    .instance_init =3D vhost_input_pci_initfn,
++};
++
+ /* virtio-pci-bus */
 =20
- ######################################################################
- trace-events-subdirs =3D
-diff --git a/configure b/configure
-index a6a4616c3e..1d1caea9e7 100755
---- a/configure
-+++ b/configure
-@@ -5532,6 +5532,7 @@ if test "$want_tools" =3D "yes" ; then
-   fi
-   if [ "$ivshmem" =3D "yes" ]; then
-     tools=3D"ivshmem-client\$(EXESUF) ivshmem-server\$(EXESUF) $tools"
-+    tools=3D"vhost-user-input\$(EXESUF) $tools"
-   fi
- fi
- if test "$softmmu" =3D yes ; then
-diff --git a/contrib/vhost-user-input/Makefile.objs b/contrib/vhost-user-=
-input/Makefile.objs
-new file mode 100644
-index 0000000000..b1fad90d51
---- /dev/null
-+++ b/contrib/vhost-user-input/Makefile.objs
-@@ -0,0 +1 @@
-+vhost-user-input-obj-y =3D main.o
+ static void virtio_pci_bus_new(VirtioBusState *bus, size_t bus_size,
+@@ -2702,6 +2721,7 @@ static void virtio_pci_register_types(void)
+ #ifdef CONFIG_LINUX
+     type_register_static(&virtio_host_pci_info);
+ #endif
++    type_register_static(&vhost_input_pci_info);
+     type_register_static(&virtio_pci_bus_info);
+     type_register_static(&virtio_pci_info);
+ #ifdef CONFIG_VIRTFS
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 41cd3736a9..67c0197570 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -1202,6 +1202,7 @@ L: qemu-s390x@nongnu.org
+ virtio-input
+ M: Gerd Hoffmann <kraxel@redhat.com>
+ S: Maintained
++F: hw/input/vhost-user-input.c
+ F: hw/input/virtio-input*.c
+ F: include/hw/virtio/virtio-input.h
+=20
+diff --git a/hw/input/Makefile.objs b/hw/input/Makefile.objs
+index 77e53e6883..f787df3aa5 100644
+--- a/hw/input/Makefile.objs
++++ b/hw/input/Makefile.objs
+@@ -12,6 +12,7 @@ common-obj-$(CONFIG_VIRTIO) +=3D virtio-input-hid.o
+ ifeq ($(CONFIG_LINUX),y)
+ common-obj-$(CONFIG_VIRTIO) +=3D virtio-input-host.o
+ endif
++common-obj-$(CONFIG_VIRTIO) +=3D vhost-user-input.o
+=20
+ obj-$(CONFIG_MILKYMIST) +=3D milkymist-softusb.o
+ obj-$(CONFIG_PXA2XX) +=3D pxa2xx_keypad.o
 --=20
 2.17.1.906.g10fd178552
