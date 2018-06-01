@@ -1,27 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53802)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54495)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fOk46-0007vl-96
-	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 09:25:59 -0400
+	(envelope-from <mreitz@redhat.com>) id 1fOk74-0000PP-Ns
+	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 09:29:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fOk45-0005NI-7A
-	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 09:25:58 -0400
-Received: from mail-ot0-x241.google.com ([2607:f8b0:4003:c0f::241]:41133)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fOk45-0005Mv-16
-	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 09:25:57 -0400
-Received: by mail-ot0-x241.google.com with SMTP id t1-v6so29250010oth.8
-	for <qemu-devel@nongnu.org>; Fri, 01 Jun 2018 06:25:56 -0700 (PDT)
+	(envelope-from <mreitz@redhat.com>) id 1fOk71-0007A9-J2
+	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 09:29:02 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:40772 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1fOk71-00079b-CP
+	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 09:28:59 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.6])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id AC68D68817
+	for <qemu-devel@nongnu.org>; Fri,  1 Jun 2018 13:28:58 +0000 (UTC)
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <d714d8ac-6642-f2f3-ad9c-ac7e3bdf30e0@redhat.com>
+Date: Fri, 1 Jun 2018 15:28:56 +0200
 MIME-Version: 1.0
-In-Reply-To: <0184EA26B2509940AA629AE1405DD7F201CAECD7@DGGEMA503-MBX.china.huawei.com>
-References: <0184EA26B2509940AA629AE1405DD7F201CAECD7@DGGEMA503-MBX.china.huawei.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 1 Jun 2018 14:25:35 +0100
-Message-ID: <CAFEAcA9y_A5x-ELXbOGFp34FGKBED0v568tD8=corZn9cjJGzA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH RESEND v1 0/3] add support for VCPU event
- states
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="3bqRGkCYAu6DhbWw8Au5foL3PKan97ORx"
+Subject: [Qemu-devel] Preconfig state reachable without --preconfig given
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,50 +31,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: gengdongjiu <gengdongjiu@huawei.com>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "famz@redhat.com" <famz@redhat.com>, "james.morse@arm.com" <james.morse@arm.com>, "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>, Linuxarm <linuxarm@huawei.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: Igor Mammedov <imammedo@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 
-On 1 June 2018 at 14:17, gengdongjiu <gengdongjiu@huawei.com> wrote:
-> Hi Peter,
->> This series failed build test on s390x host. Please find the details bel=
-ow.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--3bqRGkCYAu6DhbWw8Au5foL3PKan97ORx
+From: Max Reitz <mreitz@redhat.com>
+To: Igor Mammedov <imammedo@redhat.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: "Daniel P. Berrange" <berrange@redhat.com>
+Message-ID: <d714d8ac-6642-f2f3-ad9c-ac7e3bdf30e0@redhat.com>
+Subject: Preconfig state reachable without --preconfig given
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
->> /var/tmp/patchew-tester-tmp-hwsn3wsl/src/hw/display/virtio-gpu-3d.c: In =
-function =E2=80=98virgl_cmd_get_capset_info=E2=80=99:
->> /var/tmp/patchew-tester-tmp-hwsn3wsl/src/hw/display/virtio-gpu-3d.c:366:=
-26: error: =E2=80=98VIRTIO_GPU_CAPSET_VIRGL2=E2=80=99 undeclared (first
->> use in this function); did you mean =E2=80=98VIRTIO_GPU_CAPSET_VIRGL=E2=
-=80=99?
->>          resp.capset_id =3D VIRTIO_GPU_CAPSET_VIRGL2;
->>                           ^~~~~~~~~~~~~~~~~~~~~~~~
->>                           VIRTIO_GPU_CAPSET_VIRGL
->> /var/tmp/patchew-tester-tmp-hwsn3wsl/src/hw/display/virtio-gpu-3d.c:366:=
-26: note: each undeclared identifier is reported only once for
->> each function it appears in
->> /var/tmp/patchew-tester-tmp-hwsn3wsl/src/hw/display/virtio-gpu-3d.c: In =
-function =E2=80=98virtio_gpu_virgl_get_num_capsets=E2=80=99:
->> /var/tmp/patchew-tester-tmp-hwsn3wsl/src/hw/display/virtio-gpu-3d.c:646:=
-32: error: =E2=80=98VIRTIO_GPU_CAPSET_VIRGL2=E2=80=99 undeclared (first
->> use in this function); did you mean =E2=80=98VIRTIO_GPU_CAPSET_VIRGL=E2=
-=80=99?
+Hi,
 
-> This build failure is due to kernel missing the definition of "VIRTIO_GPU=
-_CAPSET_VIRGL2", I sync the mainline kernel tree header file to the mainlin=
-e QEMU using the scripts[1],
-> So happen this failure, It does not related with myself patch, so can I d=
-iscard the patch [1] or add the =E2=80=98VIRTIO_GPU_CAPSET_VIRGL2=E2=80=99 =
-definition to mainline kernel tree?
+The @preconfig RunState documentation states:
 
-This is a known issue with the kernel headers (hopefully somebody
-will fix them). There are several nits and also bugs in the
-update-headers script that I sent a patchset to fix recently:
- https://lists.gnu.org/archive/html/qemu-devel/2018-05/msg05803.html
+> The state is reachable only if the --preconfig CLI option is used.
 
-You should wait for that to get into master (it is in Paolo's
-most recent patchset but that has an issue with a different
-patch, so is waiting on Paolo to do a respin). Then you can
-base on that. At that point a simple script update should
-work fine (if you need anything in rc7 that wasn't in rc6).
+However, this is not true:
 
-thanks
--- PMM
+$ echo | x86_64-softmmu/qemu-system-x86_64 -monitor stdio
+QEMU 2.12.50 monitor - type 'help' for more information
+(qemu)
+HMP not available in preconfig state, use QMP instead
+
+On IRC, Daniel proposed doing the runstate transition immediately after
+the command line has been read and no --preconfig option has been found.
+ Doing that indeed fixes the issue for me (but I don't know whether
+that's the best solution).
+
+Max
+
+
+--3bqRGkCYAu6DhbWw8Au5foL3PKan97ORx
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlsRShgACgkQ9AfbAGHV
+z0DjKQgAw9Jxl/254UhcisX6BfP4QILBSusjnrzpLJuHr/aY9SeNex/cjqOP9uNi
+vHFI6YVIsAoD+ZD2tBHYiORlp1wvRdvx+MN5fdnJxBgQ7n7LPE0GTpyPhHbkp2oG
+T8B6tvVUaqSNMdlWVRbtZ5s2LOedmvBy/QrttYBpemhbChorj9WJDwYQy/WPauTZ
+8eNVN0WDSk/b7PbIO6UZH/dOBPB+VdsqetDVXeW+QF9t7iG8VaOIgBRt4XKY4OVv
+RIKl3W9NSaEk+8akk+Rj9ooXSIH5YiN4RtLcVRhuK3bK42ErfEBjWjifv0xZmKT1
+4YDur/zin/uzNSvAzeFW1ucceq3GOw==
+=kx35
+-----END PGP SIGNATURE-----
+
+--3bqRGkCYAu6DhbWw8Au5foL3PKan97ORx--
