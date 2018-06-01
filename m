@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57618)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57660)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fOeX3-0005mz-5m
-	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 03:31:30 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1fOeX7-0005pr-3W
+	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 03:31:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fOeX1-0000hS-QX
-	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 03:31:29 -0400
-Received: from mail-pf0-x244.google.com ([2607:f8b0:400e:c00::244]:35085)
+	(envelope-from <richard.henderson@linaro.org>) id 1fOeX6-0000lk-0N
+	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 03:31:33 -0400
+Received: from mail-pf0-x229.google.com ([2607:f8b0:400e:c00::229]:39793)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1fOeX1-0000gr-Iu
-	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 03:31:27 -0400
-Received: by mail-pf0-x244.google.com with SMTP id x9-v6so12086382pfm.2
-	for <qemu-devel@nongnu.org>; Fri, 01 Jun 2018 00:31:27 -0700 (PDT)
+	id 1fOeX5-0000kx-P3
+	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 03:31:31 -0400
+Received: by mail-pf0-x229.google.com with SMTP id r11-v6so4527377pfl.6
+	for <qemu-devel@nongnu.org>; Fri, 01 Jun 2018 00:31:31 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Fri,  1 Jun 2018 00:30:40 -0700
-Message-Id: <20180601073050.8054-24-richard.henderson@linaro.org>
+Date: Fri,  1 Jun 2018 00:30:43 -0700
+Message-Id: <20180601073050.8054-27-richard.henderson@linaro.org>
 In-Reply-To: <20180601073050.8054-1-richard.henderson@linaro.org>
 References: <20180601073050.8054-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH 23/33] linux-user: Split out access, faccessat,
- futimesat, kill, nice, sync, syncfs
+Subject: [Qemu-devel] [PATCH 26/33] linux-user: Split out acct, pipe, pipe2,
+ times, umount2
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,277 +32,198 @@ Cc: laurent@vivier.eu
 
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- linux-user/syscall.c | 179 +++++++++++++++++++++++++++----------------
- 1 file changed, 113 insertions(+), 66 deletions(-)
+ linux-user/syscall.c | 127 +++++++++++++++++++++++++++----------------
+ 1 file changed, 80 insertions(+), 47 deletions(-)
 
 diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-index b3838c5161..2a172e24eb 100644
+index 36092d753d..bde1f9872f 100644
 --- a/linux-user/syscall.c
 +++ b/linux-user/syscall.c
-@@ -7894,6 +7894,24 @@ IMPL(enosys)
-     return do_unimplemented(num);
+@@ -7912,6 +7912,24 @@ IMPL(access)
  }
+ #endif
  
-+#ifdef TARGET_NR_access
-+IMPL(access)
++IMPL(acct)
 +{
-+    char *fn = lock_user_string(arg1);
-+    abi_long ret;
++    if (arg1 == 0) {
++        return get_errno(acct(NULL));
++    } else {
++        char *fn = lock_user_string(arg1);
++        abi_long ret;
 +
-+    if (!fn) {
-+        return -TARGET_EFAULT;
++        if (!fn) {
++            return -TARGET_EFAULT;
++        }
++        TRY_INTERP_PATH(ret, fn, acct(fn));
++        ret = get_errno(ret);
++        unlock_user(fn, arg1, 0);
++        return ret;
 +    }
-+    TRY_INTERP_FD(ret, fn,
-+                  faccessat(interp_dirfd, fn + 1, arg2, 0),
-+                  access(fn, arg2));
-+    ret = get_errno(ret);
-+    unlock_user(fn, arg1, 0);
-+    return ret;
 +}
-+#endif
 +
  #ifdef TARGET_NR_alarm
  IMPL(alarm)
  {
-@@ -8106,6 +8124,28 @@ IMPL(exit)
-     g_assert_not_reached();
- }
- 
-+#ifdef TARGET_NR_faccessat
-+IMPL(faccessat)
-+{
-+    char *fn;
-+    abi_long ret;
-+
-+    if (is_hostfd(arg1)) {
-+        return -TARGET_EBADF;
-+    }
-+    fn = lock_user_string(arg2);
-+    if (!fn) {
-+        return -TARGET_EFAULT;
-+    }
-+    TRY_INTERP_FD(ret, fn,
-+                  faccessat(interp_dirfd, fn + 1, arg3, 0),
-+                  faccessat(arg1, fn, arg3, 0));
-+    ret = get_errno(ret);
-+    unlock_user(fn, arg2, 0);
-+    return ret;
-+}
-+#endif
-+
- #ifdef TARGET_NR_fork
- IMPL(fork)
- {
-@@ -8113,6 +8153,37 @@ IMPL(fork)
+@@ -8529,6 +8547,21 @@ IMPL(pause)
  }
  #endif
  
-+#ifdef TARGET_NR_futimesat
-+IMPL(futimesat)
++#ifdef TARGET_NR_pipe
++IMPL(pipe)
 +{
-+    struct timeval tv[2], *tvp = NULL;
-+    char *fn;
-+    abi_long ret;
++    return do_pipe(cpu_env, arg1, 0, 0);
++}
++#endif
 +
-+    if (is_hostfd(arg1)) {
-+        return -TARGET_EBADF;
-+    }
-+    if (arg3) {
-+        if (copy_from_user_timeval(&tv[0], arg3) ||
-+            copy_from_user_timeval(&tv[1],
-+                                   arg3 + sizeof(struct target_timeval))) {
++#ifdef TARGET_NR_pipe2
++IMPL(pipe2)
++{
++    return do_pipe(cpu_env, arg1,
++                   target_to_host_bitmask(arg2, fcntl_flags_tbl), 1);
++}
++#endif
++
+ IMPL(read)
+ {
+     abi_long ret;
+@@ -8657,6 +8690,27 @@ IMPL(time)
+ }
+ #endif
+ 
++IMPL(times)
++{
++    struct tms tms;
++    abi_long ret = get_errno(times(&tms));
++    if (arg1) {
++        struct target_tms *tmsp
++            = lock_user(VERIFY_WRITE, arg1, sizeof(struct target_tms), 0);
++        if (!tmsp) {
 +            return -TARGET_EFAULT;
 +        }
-+        tvp = tv;
++        tmsp->tms_utime = tswapal(host_to_target_clock_t(tms.tms_utime));
++        tmsp->tms_stime = tswapal(host_to_target_clock_t(tms.tms_stime));
++        tmsp->tms_cutime = tswapal(host_to_target_clock_t(tms.tms_cutime));
++        tmsp->tms_cstime = tswapal(host_to_target_clock_t(tms.tms_cstime));
 +    }
-+    fn = lock_user_string(arg2);
-+    if (!fn) {
++    if (!is_error(ret)) {
++        ret = host_to_target_clock_t(ret);
++    }
++    return ret;
++}
++
+ #ifdef TARGET_NR_umount
+ IMPL(umount)
+ {
+@@ -8672,6 +8726,21 @@ IMPL(umount)
+ }
+ #endif
+ 
++#ifdef TARGET_NR_umount2
++IMPL(umount2)
++{
++    char *p = lock_user_string(arg1);
++    abi_long ret;
++
++    if (!p) {
 +        return -TARGET_EFAULT;
 +    }
-+    TRY_INTERP_FD(ret, fn,
-+                  futimesat(interp_dirfd, fn + 1, tvp),
-+                  futimesat(arg1, fn, tvp));
-+    ret = get_errno(ret);
-+    unlock_user(fn, arg2, 0);
++    ret = get_errno(umount2(p, arg2));
++    unlock_user(p, arg1, 0);
 +    return ret;
 +}
 +#endif
 +
- #ifdef TARGET_NR_getpid
- IMPL(getpid)
+ #ifdef TARGET_NR_unlink
+ IMPL(unlink)
  {
-@@ -8128,6 +8199,11 @@ IMPL(getxpid)
- }
- #endif
- 
-+IMPL(kill)
-+{
-+    return get_errno(safe_kill(arg1, target_to_host_signal(arg2)));
-+}
-+
- #ifdef TARGET_NR_link
- IMPL(link)
- {
-@@ -8309,6 +8385,13 @@ IMPL(name_to_handle_at)
- }
- #endif
- 
-+#ifdef TARGET_NR_nice
-+IMPL(nice)
-+{
-+    return get_errno(nice(arg1));
-+}
-+#endif
-+
- #ifdef TARGET_NR_open
- IMPL(open)
- {
-@@ -8432,6 +8515,19 @@ IMPL(stime)
- }
- #endif
- 
-+IMPL(sync)
-+{
-+    sync();
-+    return 0;
-+}
-+
-+#if defined(TARGET_NR_syncfs) && defined(CONFIG_SYNCFS)
-+IMPL(syncfs)
-+{
-+    return get_errno(syncfs(arg1));
-+}
-+#endif
-+
- #ifdef TARGET_NR_time
- IMPL(time)
- {
-@@ -8618,72 +8714,6 @@ IMPL(everything_else)
+@@ -8831,53 +8900,6 @@ IMPL(everything_else)
      char *fn;
  
      switch(num) {
--#if defined(TARGET_NR_futimesat)
--    case TARGET_NR_futimesat:
--        if (is_hostfd(arg1)) {
--            return -TARGET_EBADF;
--        } else {
--            struct timeval *tvp, tv[2];
--            if (arg3) {
--                if (copy_from_user_timeval(&tv[0], arg3)
--                    || copy_from_user_timeval(&tv[1],
--                                              arg3 + sizeof(struct target_timeval)))
+-#ifdef TARGET_NR_pipe
+-    case TARGET_NR_pipe:
+-        return do_pipe(cpu_env, arg1, 0, 0);
+-#endif
+-#ifdef TARGET_NR_pipe2
+-    case TARGET_NR_pipe2:
+-        return do_pipe(cpu_env, arg1,
+-                       target_to_host_bitmask(arg2, fcntl_flags_tbl), 1);
+-#endif
+-    case TARGET_NR_times:
+-        {
+-            struct target_tms *tmsp;
+-            struct tms tms;
+-            ret = get_errno(times(&tms));
+-            if (arg1) {
+-                tmsp = lock_user(VERIFY_WRITE, arg1, sizeof(struct target_tms), 0);
+-                if (!tmsp)
 -                    return -TARGET_EFAULT;
--                tvp = tv;
--            } else {
--                tvp = NULL;
+-                tmsp->tms_utime = tswapal(host_to_target_clock_t(tms.tms_utime));
+-                tmsp->tms_stime = tswapal(host_to_target_clock_t(tms.tms_stime));
+-                tmsp->tms_cutime = tswapal(host_to_target_clock_t(tms.tms_cutime));
+-                tmsp->tms_cstime = tswapal(host_to_target_clock_t(tms.tms_cstime));
 -            }
--            if (!(fn = lock_user_string(arg2))) {
+-            if (!is_error(ret))
+-                ret = host_to_target_clock_t(ret);
+-        }
+-        return ret;
+-    case TARGET_NR_acct:
+-        if (arg1 == 0) {
+-            ret = get_errno(acct(NULL));
+-        } else {
+-            if (!(fn = lock_user_string(arg1))) {
 -                return -TARGET_EFAULT;
 -            }
--            TRY_INTERP_FD(ret, fn,
--                          futimesat(interp_dirfd, fn + 1, tvp),
--                          futimesat(arg1, fn, tvp));
+-            TRY_INTERP_PATH(ret, fn, acct(fn));
 -            ret = get_errno(ret);
--            unlock_user(fn, arg2, 0);
+-            unlock_user(fn, arg1, 0);
 -        }
 -        return ret;
--#endif
--#ifdef TARGET_NR_access
--    case TARGET_NR_access:
--        if (!(fn = lock_user_string(arg1))) {
+-#ifdef TARGET_NR_umount2
+-    case TARGET_NR_umount2:
+-        if (!(p = lock_user_string(arg1)))
 -            return -TARGET_EFAULT;
--        }
--        TRY_INTERP_FD(ret, fn,
--                      faccessat(interp_dirfd, fn + 1, arg2, 0),
--                      access(fn, arg2));
--        ret = get_errno(ret);
--        unlock_user(fn, arg1, 0);
+-        ret = get_errno(umount2(p, arg2));
+-        unlock_user(p, arg1, 0);
 -        return ret;
 -#endif
--#if defined(TARGET_NR_faccessat) && defined(__NR_faccessat)
--    case TARGET_NR_faccessat:
--        if (is_hostfd(arg1)) {
--            return -TARGET_EBADF;
--        }
--        if (!(fn = lock_user_string(arg2))) {
--            return -TARGET_EFAULT;
--        }
--        TRY_INTERP_FD(ret, fn,
--                      faccessat(interp_dirfd, fn + 1, arg3, 0),
--                      faccessat(arg1, fn, arg3, 0));
--        ret = get_errno(ret);
--        unlock_user(fn, arg2, 0);
--        return ret;
--#endif
--#ifdef TARGET_NR_nice /* not on alpha */
--    case TARGET_NR_nice:
--        return get_errno(nice(arg1));
--#endif
--    case TARGET_NR_sync:
--        sync();
--        return 0;
--#if defined(TARGET_NR_syncfs) && defined(CONFIG_SYNCFS)
--    case TARGET_NR_syncfs:
--        return get_errno(syncfs(arg1));
--#endif
--    case TARGET_NR_kill:
--        return get_errno(safe_kill(arg1, target_to_host_signal(arg2)));
- #ifdef TARGET_NR_rename
-     case TARGET_NR_rename:
-         {
-@@ -12873,6 +12903,9 @@ IMPL(everything_else)
- }
- 
- static impl_fn * const syscall_table[] = {
-+#ifdef TARGET_NR_access
-+    [TARGET_NR_access] = impl_access,
-+#endif
+     case TARGET_NR_ioctl:
+         return do_ioctl(arg1, arg2, arg3);
+ #ifdef TARGET_NR_fcntl
+@@ -12937,6 +12959,7 @@ static impl_fn * const syscall_table[] = {
+ #ifdef TARGET_NR_access
+     [TARGET_NR_access] = impl_access,
+ #endif
++    [TARGET_NR_acct] = impl_acct,
  #ifdef TARGET_NR_alarm
      [TARGET_NR_alarm] = impl_alarm,
  #endif
-@@ -12887,15 +12920,22 @@ static impl_fn * const syscall_table[] = {
+@@ -13003,6 +13026,12 @@ static impl_fn * const syscall_table[] = {
  #endif
-     [TARGET_NR_execve] = impl_execve,
-     [TARGET_NR_exit] = impl_exit,
-+#ifdef TARGET_NR_faccessat
-+    [TARGET_NR_faccessat] = impl_faccessat,
+ #ifdef TARGET_NR_pause
+     [TARGET_NR_pause] = impl_pause,
 +#endif
- #ifdef TARGET_NR_fork
-     [TARGET_NR_fork] = impl_fork,
- #endif
-+#ifdef TARGET_NR_futimesat
-+    [TARGET_NR_futimesat] = impl_futimesat,
++#ifdef TARGET_NR_pipe
++    [TARGET_NR_pipe] = impl_pipe,
 +#endif
- #ifdef TARGET_NR_getpid
-     [TARGET_NR_getpid] = impl_getpid,
++#ifdef TARGET_NR_pipe2
++    [TARGET_NR_pipe2] = impl_pipe2,
  #endif
- #if defined(TARGET_NR_getxpid) && defined(TARGET_ALPHA)
-     [TARGET_NR_getxpid] = impl_getxpid,
- #endif
-+    [TARGET_NR_kill] = impl_kill,
- #ifdef TARGET_NR_link
-     [TARGET_NR_link] = impl_link,
- #endif
-@@ -12913,6 +12953,9 @@ static impl_fn * const syscall_table[] = {
- #if defined(TARGET_NR_name_to_handle_at) && defined(CONFIG_OPEN_BY_HANDLE)
-     [TARGET_NR_name_to_handle_at] = impl_name_to_handle_at,
- #endif
-+#ifdef TARGET_NR_nice
-+    [TARGET_NR_nice] = impl_nice,
-+#endif
- #ifdef TARGET_NR_open
-     [TARGET_NR_open] = impl_open,
- #endif
-@@ -12926,6 +12969,10 @@ static impl_fn * const syscall_table[] = {
      [TARGET_NR_read] = impl_read,
- #ifdef TARGET_NR_stime
-     [TARGET_NR_stime] = impl_stime,
-+#endif
-+    [TARGET_NR_sync] = impl_sync,
-+#if defined(TARGET_NR_syncfs) && defined(CONFIG_SYNCFS)
-+    [TARGET_NR_syncfs] = impl_syncfs,
- #endif
+ #ifdef TARGET_NR_rename
+@@ -13027,9 +13056,13 @@ static impl_fn * const syscall_table[] = {
  #ifdef TARGET_NR_time
      [TARGET_NR_time] = impl_time,
+ #endif
++    [TARGET_NR_times] = impl_times,
+ #ifdef TARGET_NR_umount
+     [TARGET_NR_umount] = impl_umount,
+ #endif
++#ifdef TARGET_NR_umount2
++    [TARGET_NR_umount2] = impl_umount2,
++#endif
+ #ifdef TARGET_NR_unlink
+     [TARGET_NR_unlink] = impl_unlink,
+ #endif
 -- 
 2.17.0
