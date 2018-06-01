@@ -1,30 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42599)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43964)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fOn8s-0006t8-GN
-	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 12:43:07 -0400
+	(envelope-from <bounces@canonical.com>) id 1fOnGB-0004OQ-At
+	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 12:50:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fOn8n-0008V9-Jm
-	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 12:43:06 -0400
-Received: from mail-pf0-x243.google.com ([2607:f8b0:400e:c00::243]:43753)
+	(envelope-from <bounces@canonical.com>) id 1fOnG7-0004ff-DA
+	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 12:50:39 -0400
+Received: from indium.canonical.com ([91.189.90.7]:56972)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1fOn8n-0008UV-5J
-	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 12:43:01 -0400
-Received: by mail-pf0-x243.google.com with SMTP id j20-v6so12761107pff.10
-	for <qemu-devel@nongnu.org>; Fri, 01 Jun 2018 09:43:01 -0700 (PDT)
-References: <20180531224911.23725-1-richard.henderson@linaro.org>
-	<20180531224911.23725-2-richard.henderson@linaro.org>
-	<CAFEAcA-EVGk=E=0z=DJyv0eCCvstV_jV3uoxAztvmhY4p76AzQ@mail.gmail.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <0a70b602-2fd9-9276-5cb1-25d45358304d@linaro.org>
-Date: Fri, 1 Jun 2018 09:42:57 -0700
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1fOnG6-0004eg-UB
+	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 12:50:35 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1fOnG5-0002iW-G1
+	for <qemu-devel@nongnu.org>; Fri, 01 Jun 2018 16:50:33 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 590512E80C7
+	for <qemu-devel@nongnu.org>; Fri,  1 Jun 2018 16:50:33 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA-EVGk=E=0z=DJyv0eCCvstV_jV3uoxAztvmhY4p76AzQ@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 1/6] gdbstub: Return the fd from
- gdbserver_start
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Fri, 01 Jun 2018 16:41:57 -0000
+From: Andreas Gustafsson <gson@gson.org>
+Reply-To: Bug 1774677 <1774677@bugs.launchpad.net>
+Sender: bounces@canonical.com
+Message-Id: <152787131775.31828.3557775502793493947.malonedeb@soybean.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1774677] [NEW] -icount increases boot time by >10x
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,16 +35,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Laurent Vivier <laurent@vivier.eu>, Evan Green <evgreen@chromium.org>
+To: qemu-devel@nongnu.org
 
-On 06/01/2018 01:59 AM, Peter Maydell wrote:
-> On 31 May 2018 at 23:49, Richard Henderson <richard.henderson@linaro.org> wrote:
->> This will allow us to protect gdbserver_fd from the guest.
-> 
-> Ha, I hadn't realised we already had an internal-to-QEMU filedescriptor :-)
+Public bug reported:
 
-Two, in fact, if you count qemu_logfile.  ;-)
+When I specify the -icount option, some guest operations such as booting
+a Linux kernel take more than 10 times longer than otherwise.  For
+example, the following will boot Aboriginal Linux to the login prompt
+about 6 seconds on my system (using TCG, not KVM):
 
+wget http://landley.net/aboriginal/downloads/old/binaries/1.4.5/system-imag=
+e-i686.tar.gz
+gunzip <system-image-i686.tar.gz | tar xfv -
+cd system-image-i686
+sh run-emulator.sh
 
-r~
+If I replace the last line with
+
+QEMU_EXTRA=3D"-icount shift=3Dauto" sh run-emulator.sh
+
+booting to the login prompt takes about 1 minute 20 seconds.
+
+I have tried different values for "shift" other than the "auto" used
+above, but have not been able to find one that gives reasonable
+performance.  Specifying "sleep=3Doff" also did not help.
+
+During the slow boots, qemu appears to spend most of its time sleeping,
+not using the host CPU.
+
+I see this with multiple versions of qemu, including current git sources
+(c181ddaa176856b3cd2dfd12bbcf25fa9c884a97), and on multiple host OSes,
+including Debian 9 on x86_64.
+
+** Affects: qemu
+     Importance: Undecided
+         Status: New
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1774677
+
+Title:
+  -icount increases boot time by >10x
+
+Status in QEMU:
+  New
+
+Bug description:
+  When I specify the -icount option, some guest operations such as
+  booting a Linux kernel take more than 10 times longer than otherwise.
+  For example, the following will boot Aboriginal Linux to the login
+  prompt about 6 seconds on my system (using TCG, not KVM):
+
+  wget http://landley.net/aboriginal/downloads/old/binaries/1.4.5/system-im=
+age-i686.tar.gz
+  gunzip <system-image-i686.tar.gz | tar xfv -
+  cd system-image-i686
+  sh run-emulator.sh
+
+  If I replace the last line with
+
+  QEMU_EXTRA=3D"-icount shift=3Dauto" sh run-emulator.sh
+
+  booting to the login prompt takes about 1 minute 20 seconds.
+
+  I have tried different values for "shift" other than the "auto" used
+  above, but have not been able to find one that gives reasonable
+  performance.  Specifying "sleep=3Doff" also did not help.
+
+  During the slow boots, qemu appears to spend most of its time
+  sleeping, not using the host CPU.
+
+  I see this with multiple versions of qemu, including current git
+  sources (c181ddaa176856b3cd2dfd12bbcf25fa9c884a97), and on multiple
+  host OSes, including Debian 9 on x86_64.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1774677/+subscriptions
