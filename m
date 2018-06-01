@@ -1,16 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47517)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55049)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1fOda8-0007F5-8r
-	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 02:30:37 -0400
+	(envelope-from <wei.w.wang@intel.com>) id 1fOeKE-0002hL-6t
+	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 03:18:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1fOda5-0006Wm-2f
-	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 02:30:36 -0400
-From: Fam Zheng <famz@redhat.com>
-Date: Fri,  1 Jun 2018 14:28:49 +0800
-Message-Id: <20180601062849.28641-12-famz@redhat.com>
-In-Reply-To: <20180601062849.28641-1-famz@redhat.com>
-References: <20180601062849.28641-1-famz@redhat.com>
-Subject: [Qemu-devel] [PATCH v8 11/11] qemu-img: Convert with copy offloading
+	(envelope-from <wei.w.wang@intel.com>) id 1fOeK9-0002pf-Nj
+	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 03:18:14 -0400
+Received: from mga11.intel.com ([192.55.52.93]:52924)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <wei.w.wang@intel.com>)
+	id 1fOeK9-0002oH-Dv
+	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 03:18:09 -0400
+Message-ID: <5B10F412.8050900@intel.com>
+Date: Fri, 01 Jun 2018 15:21:54 +0800
+From: Wei Wang <wei.w.wang@intel.com>
+MIME-Version: 1.0
+References: <1524550428-27173-1-git-send-email-wei.w.wang@intel.com>
+	<20180601045824.GH14867@xz-mi>
+In-Reply-To: <20180601045824.GH14867@xz-mi>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v7 0/5] virtio-balloon: free page hint
+ reporting support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -19,131 +29,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Ronnie Sahlberg <ronniesahlberg@gmail.com>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Fam Zheng <famz@redhat.com>, Peter Lieven <pl@kamp.de>, Max Reitz <mreitz@redhat.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Stefan Hajnoczi <stefanha@redhat.com>, eblake@redhat.com
+To: Peter Xu <peterx@redhat.com>
+Cc: qemu-devel@nongnu.org, virtio-dev@lists.oasis-open.org, mst@redhat.com, quintela@redhat.com, dgilbert@redhat.com, yang.zhang.wz@gmail.com, quan.xu0@gmail.com, liliang.opensource@gmail.com, pbonzini@redhat.com, nilal@redhat.com
 
-The new blk_co_copy_range interface offers a more efficient way in the
-case of network based storage. Make use of it to allow faster convert
-operation.
+On 06/01/2018 12:58 PM, Peter Xu wrote:
+> On Tue, Apr 24, 2018 at 02:13:43PM +0800, Wei Wang wrote:
+>> This is the deivce part implementation to add a new feature,
+>> VIRTIO_BALLOON_F_FREE_PAGE_HINT to the virtio-balloon device. The device
+>> receives the guest free page hints from the driver and clears the
+>> corresponding bits in the dirty bitmap, so that those free pages are
+>> not transferred by the migration thread to the destination.
+>>
+>> - Test Environment
+>>      Host: Intel(R) Xeon(R) CPU E5-2699 v4 @ 2.20GHz
+>>      Guest: 8G RAM, 4 vCPU
+>>      Migration setup: migrate_set_speed 100G, migrate_set_downtime 2 second
+>>
+>> - Test Results
+>>      - Idle Guest Live Migration Time (results are averaged over 10 runs):
+>>          - Optimization v.s. Legacy = 271ms vs 1769ms --> ~86% reduction
+>>      - Guest with Linux Compilation Workload (make bzImage -j4):
+>>          - Live Migration Time (average)
+>>            Optimization v.s. Legacy = 1265ms v.s. 2634ms --> ~51% reduction
+>>          - Linux Compilation Time
+>>            Optimization v.s. Legacy = 4min56s v.s. 5min3s
+>>            --> no obvious difference
+>>
+>> - Source Code
+>>      - QEMU:  https://github.com/wei-w-wang/qemu-free-page-lm.git
+>>      - Linux: https://github.com/wei-w-wang/linux-free-page-lm.git
+> Hi, Wei,
+>
+> I have a very high-level question to the series.
 
-Since copy offloading cannot do zero detection ('-S') and compression
-(-c), only try it when these options are not used.
+Hi Peter,
 
-Signed-off-by: Fam Zheng <famz@redhat.com>
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
----
- qemu-img.c | 50 ++++++++++++++++++++++++++++++++++++++++++++++++--
- 1 file changed, 48 insertions(+), 2 deletions(-)
+Thanks for joining the discussion :)
 
-diff --git a/qemu-img.c b/qemu-img.c
-index 976b437da0..75f1610aa0 100644
---- a/qemu-img.c
-+++ b/qemu-img.c
-@@ -1547,6 +1547,7 @@ typedef struct ImgConvertState {
-     bool compressed;
-     bool target_has_backing;
-     bool wr_in_order;
-+    bool copy_range;
-     int min_sparse;
-     size_t cluster_sectors;
-     size_t buf_sectors;
-@@ -1740,6 +1741,37 @@ static int coroutine_fn convert_co_write(ImgConvertState *s, int64_t sector_num,
-     return 0;
- }
- 
-+static int coroutine_fn convert_co_copy_range(ImgConvertState *s, int64_t sector_num,
-+                                              int nb_sectors)
-+{
-+    int n, ret;
-+
-+    while (nb_sectors > 0) {
-+        BlockBackend *blk;
-+        int src_cur;
-+        int64_t bs_sectors, src_cur_offset;
-+        int64_t offset;
-+
-+        convert_select_part(s, sector_num, &src_cur, &src_cur_offset);
-+        offset = (sector_num - src_cur_offset) << BDRV_SECTOR_BITS;
-+        blk = s->src[src_cur];
-+        bs_sectors = s->src_sectors[src_cur];
-+
-+        n = MIN(nb_sectors, bs_sectors - (sector_num - src_cur_offset));
-+
-+        ret = blk_co_copy_range(blk, offset, s->target,
-+                                sector_num << BDRV_SECTOR_BITS,
-+                                n << BDRV_SECTOR_BITS, 0);
-+        if (ret < 0) {
-+            return ret;
-+        }
-+
-+        sector_num += n;
-+        nb_sectors -= n;
-+    }
-+    return 0;
-+}
-+
- static void coroutine_fn convert_co_do_copy(void *opaque)
- {
-     ImgConvertState *s = opaque;
-@@ -1762,6 +1794,7 @@ static void coroutine_fn convert_co_do_copy(void *opaque)
-         int n;
-         int64_t sector_num;
-         enum ImgConvertBlockStatus status;
-+        bool copy_range;
- 
-         qemu_co_mutex_lock(&s->lock);
-         if (s->ret != -EINPROGRESS || s->sector_num >= s->total_sectors) {
-@@ -1791,7 +1824,9 @@ static void coroutine_fn convert_co_do_copy(void *opaque)
-                                         s->allocated_sectors, 0);
-         }
- 
--        if (status == BLK_DATA) {
-+retry:
-+        copy_range = s->copy_range && s->status == BLK_DATA;
-+        if (status == BLK_DATA && !copy_range) {
-             ret = convert_co_read(s, sector_num, n, buf);
-             if (ret < 0) {
-                 error_report("error while reading sector %" PRId64
-@@ -1813,7 +1848,15 @@ static void coroutine_fn convert_co_do_copy(void *opaque)
-         }
- 
-         if (s->ret == -EINPROGRESS) {
--            ret = convert_co_write(s, sector_num, n, buf, status);
-+            if (copy_range) {
-+                ret = convert_co_copy_range(s, sector_num, n);
-+                if (ret) {
-+                    s->copy_range = false;
-+                    goto retry;
-+                }
-+            } else {
-+                ret = convert_co_write(s, sector_num, n, buf, status);
-+            }
-             if (ret < 0) {
-                 error_report("error while writing sector %" PRId64
-                              ": %s", sector_num, strerror(-ret));
-@@ -1936,6 +1979,7 @@ static int img_convert(int argc, char **argv)
-     ImgConvertState s = (ImgConvertState) {
-         /* Need at least 4k of zeros for sparse detection */
-         .min_sparse         = 8,
-+        .copy_range         = true,
-         .buf_sectors        = IO_BUF_SIZE / BDRV_SECTOR_SIZE,
-         .wr_in_order        = true,
-         .num_coroutines     = 8,
-@@ -1976,6 +2020,7 @@ static int img_convert(int argc, char **argv)
-             break;
-         case 'c':
-             s.compressed = true;
-+            s.copy_range = false;
-             break;
-         case 'o':
-             if (!is_valid_option_list(optarg)) {
-@@ -2017,6 +2062,7 @@ static int img_convert(int argc, char **argv)
-             }
- 
-             s.min_sparse = sval / BDRV_SECTOR_SIZE;
-+            s.copy_range = false;
-             break;
-         }
-         case 'p':
--- 
-2.17.0
+>
+> IIUC the core idea for this series is that we can avoid sending some
+> of the pages if we know that we don't need to send them.  I think this
+> is based on the fact that on the destination side all the pages are by
+> default zero after they are malloced.  While before this series, IIUC
+> any migration will send every single page to destination, no matter
+> whether it's zeroed or not.  So I'm uncertain about whether this will
+> affect the received bitmap on the destination side.  Say, before this
+> series, the received bitmap will directly cover the whole RAM bitmap
+> after migration is finished, now it's won't.  Will there be any side
+> effect?  I don't see obvious issue now, but just raise this question
+> up.
+
+This feature currently only supports pre-copy (I think the received 
+bitmap is something matters to post copy only).
+That's why we have
+rs->free_page_support = ..&& !migrate_postcopy();
+
+> Meanwhile, this reminds me about a more funny idea: whether we can
+> just avoid sending the zero pages directly from QEMU's perspective.
+> In other words, can we just do nothing if save_zero_page() detected
+> that the page is zero (I guess the is_zero_range() can be fast too,
+> but I don't know exactly how fast it is)?  And how that would be
+> differed from this page hinting way in either performance and other
+> aspects.
+
+I guess you referred to the zero page optimization. I think the major 
+overhead comes to the zero page checking - lots of memory accesses, 
+which also waste memory bandwidth. Please see the results attached in 
+the cover letter. The legacy case already includes the zero page 
+optimization.
+
+Best,
+Wei
