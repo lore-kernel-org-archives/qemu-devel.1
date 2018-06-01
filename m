@@ -1,28 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56109)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56469)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alindsay@codeaurora.org>) id 1fOm4Z-0001EK-Cy
-	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 11:34:36 -0400
+	(envelope-from <jusual@mail.ru>) id 1fOm6f-0002J1-I3
+	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 11:36:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alindsay@codeaurora.org>) id 1fOm4Y-000169-G3
-	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 11:34:35 -0400
-Date: Fri, 1 Jun 2018 11:34:23 -0400
-From: Aaron Lindsay <alindsay@codeaurora.org>
-Message-ID: <20180601153423.GB12424@codeaurora.org>
-References: <1521232280-13089-1-git-send-email-alindsay@codeaurora.org>
-	<1521232280-13089-16-git-send-email-alindsay@codeaurora.org>
-	<CAFEAcA9bYdwByseqCMKSVtWV59mNruT3jJfWWLju1koCnwSb=Q@mail.gmail.com>
-	<20180417142318.GO24561@codeaurora.org>
-	<CAFEAcA8RwC7DSbo+mMqYUS6tL5UwfQGMa_r5AnAkJqm7v63HWw@mail.gmail.com>
-	<20180517193104.GB4771@codeaurora.org>
-	<CAFEAcA-+sO3oUqfQXHcHRBu2i-WFzvFKObcBz26qeLS_0+3s2Q@mail.gmail.com>
-	<20180531203906.GA12424@codeaurora.org>
-	<CAFEAcA_2z-2utCiPQM0DtZGXgiE2qbVsB=Nn81j9DP7Z8keRqw@mail.gmail.com>
+	(envelope-from <jusual@mail.ru>) id 1fOm6b-0002IY-KZ
+	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 11:36:45 -0400
+Received: from smtp38.i.mail.ru ([94.100.177.98]:46768)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jusual@mail.ru>) id 1fOm6b-0002Gq-8U
+	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 11:36:41 -0400
+References: <20180529220338.10879-1-jusual@mail.ru>
+	<20180529220338.10879-3-jusual@mail.ru>
+	<CALHRZuqSYfTjXJKD=y4Ew9CUvUyhM-biG8Q7Bhs+0r0kYo_sQA@mail.gmail.com>
+	<CAJSP0QU3h_k28ZouCaJ7eAmLXKOEwEUDYBn2enqaD29U96EuWw@mail.gmail.com>
+	<CAJSP0QV_wOv1bV-yB49T7YJA_kjRJb25NkTbt+y2uwzgk_ayGg@mail.gmail.com>
+From: Julia Suvorova <jusual@mail.ru>
+Message-ID: <e74133a7-d5d3-f683-cf4b-f1478eaf6cc9@mail.ru>
+Date: Fri, 1 Jun 2018 18:36:37 +0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAFEAcA_2z-2utCiPQM0DtZGXgiE2qbVsB=Nn81j9DP7Z8keRqw@mail.gmail.com>
-Subject: Re: [Qemu-devel] [PATCH v3 15/22] target/arm: Add ARM_FEATURE_V7VE
- for v7 Virtualization Extensions
+In-Reply-To: <CAJSP0QV_wOv1bV-yB49T7YJA_kjRJb25NkTbt+y2uwzgk_ayGg@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [RFC 2/3] hw/char/nrf51_uart: Implement nRF51 SoC
+ UART
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,56 +32,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: qemu-arm <qemu-arm@nongnu.org>, Alistair Francis <alistair.francis@xilinx.com>, Wei Huang <wei@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>, Michael Spradling <mspradli@codeaurora.org>, Digant Desai <digantd@codeaurora.org>
+To: Stefan Hajnoczi <stefanha@gmail.com>, sundeep subbaraya <sundeep.lkml@gmail.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>, Jim Mussared <jim@groklearning.com>, =?UTF-8?Q?Steffen_G=c3=b6rtz?= <mail@steffen-goertz.de>, Joel Stanley <joel@jms.id.au>
 
-On Jun 01 09:57, Peter Maydell wrote:
-> On 31 May 2018 at 21:39, Aaron Lindsay <alindsay@codeaurora.org> wrote:
-> > On May 31 15:18, Peter Maydell wrote:
-> >>    if (arm_feature(env, ARM_FEATURE_V7VE) {
-> >>        /* v7 Virtualization Extensions. In real hardware this implies
-> >>         * EL2 and also the presence of the Security Extensions.
-> >>         * For QEMU, for backwards-compatibility we implement some
-> >>         * CPUs or CPU configs which have no actual EL2 or EL3 but do
-> >>         * include the various other features that V7VE implies.
-> >>         * Presence of EL2 itself is ARM_FEATURE_EL2, and of the
-> >>         * Security Extensions is ARM_FEATURE_EL3.
-> >>         */
-> >>        set_feature(env, ARM_FEATURE_ARM_DIV);
-> >
-> > Is it safe to assume from your comment above regarding keeping ARM_DIV
-> > separate from V7VE that the inclusion of it here is an oversight and
-> > that only LPAE and V7 should be set if V7VE is? (and that V8 should
-> > now directly imply both V7VE and ARM_DIV?)
+On 01.06.2018 13:44, Stefan Hajnoczi wrote:
+> On Fri, Jun 1, 2018 at 11:41 AM, Stefan Hajnoczi <stefanha@gmail.com> wrote:
+>> On Thu, May 31, 2018 at 2:58 PM, sundeep subbaraya
+>> <sundeep.lkml@gmail.com> wrote:
+>>> On Wed, May 30, 2018 at 3:33 AM, Julia Suvorova via Qemu-devel
+>>> <qemu-devel@nongnu.org> wrote:
+>>>> +static uint64_t uart_read(void *opaque, hwaddr addr, unsigned int size)
+>>>> +{
+>>>> +    Nrf51UART *s = NRF51_UART(opaque);
+>>>> +    uint64_t r;
+>>>> +
+>>>> +    switch (addr) {
+>>>> +    case A_RXD:
+>>>> +        r = s->rx_fifo[s->rx_fifo_pos];
+>>>> +        if (s->rx_fifo_len > 0) {
+>>>> +            s->rx_fifo_pos = (s->rx_fifo_pos + 1) % UART_FIFO_LENGTH;
+>>>> +            s->rx_fifo_len--;
+>>>> +            qemu_chr_fe_accept_input(&s->chr);
+>>>> +        }
+>>>> +        break;
+>>>> +
+>>>> +    case A_INTENSET:
+>>>> +    case A_INTENCLR:
+>>>> +    case A_INTEN:
+>>>> +        r = s->reg[A_INTEN];
+>>>> +        break;
+>>>> +    default:
+>>>> +        r = s->reg[addr];
+>>>
+>>> You can use R_* macros for registers and access regs[ ] with addr/4 as index.
+>>> It is better than using big regs[ ] array out of which most of
+>>> locations go unused.
+>>
+>> Good point.  The bug is more severe than an inefficiency.
+>> s->reg[addr] allows out-of-bounds accesses.  This is a security bug.
+>>
+>> The memory region is 0x1000 *bytes* long, but the array has 0x1000
+>> 32-bit *elements*.  A read from address 0xfffc results in a memory
+>> load from s->reg + 0xfffc * sizeof(s->reg[0]).  That's beyond the end
+>> of the array!
 > 
-> No; V7VE always implies ARM_DIV. (ARM_DIV doesn't imply V7VE,
-> though, which is why it is a separate feature bit.)
+> Sorry, I was wrong.  The array is large enough after all.  It's just
+> an inefficiency, but still worth fixing.  Similar issues could lead to
+> out-of-bound accesses.
 
-Okay, then I'm confused about some of the preexisting logic in
-kvm_arm_get_host_cpu_features. The preexisting code in that function
-sets ARM_DIV and THUMB_DIV based on the appropriate bits in ID_ISAR0. If
-we already knew that
->    (by definition a host CPU which supports KVM has v7VE.)
-and that all V7VE CPUs have ARM_DIV, why did the code there bother
-checking ID_ISAR0 to begin with?
+Even if I change the reg array to work with the R_* macros, it will
+still be inefficient, since registers are not sequentially located.
+I can define the registers in the Nrf51UART structure separately, but
+this will increase the code size. Is there a proper way?
 
-> switch (extract32(id_isar0, 24, 4)) {
-> case 1:
->     set_feature(&features, ARM_FEATURE_THUMB_DIV);
->     break;
-> case 2:
->     set_feature(&features, ARM_FEATURE_ARM_DIV);
->     set_feature(&features, ARM_FEATURE_THUMB_DIV);
->     break;
-> default:
->     break;
-> }
-
-Should this switch/case be removed entirely?
-
--Aaron
-
--- 
-Qualcomm Datacenter Technologies as an affiliate of Qualcomm Technologies, Inc.
-Qualcomm Technologies, Inc. is a member of the
-Code Aurora Forum, a Linux Foundation Collaborative Project.
+Best regards, Julia Suvorova.
