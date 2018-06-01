@@ -1,26 +1,40 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51403)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52855)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fOqLD-00027L-9T
-	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 16:08:04 -0400
+	(envelope-from <alifm@linux.ibm.com>) id 1fOqTJ-0003lm-E2
+	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 16:16:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fOqLC-0005uw-6X
-	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 16:08:03 -0400
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20180427102033.20232-1-kraxel@redhat.com>
-	<20180427102033.20232-3-kraxel@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <f3e852e7-7439-d230-f2bb-3f044e93a64d@amsat.org>
-Date: Fri, 1 Jun 2018 17:07:50 -0300
+	(envelope-from <alifm@linux.ibm.com>) id 1fOqTE-0005Ry-4t
+	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 16:16:25 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:51144
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <alifm@linux.ibm.com>) id 1fOqTD-0005Of-TZ
+	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 16:16:20 -0400
+Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w51KEpil011902
+	for <qemu-devel@nongnu.org>; Fri, 1 Jun 2018 16:16:19 -0400
+Received: from e14.ny.us.ibm.com (e14.ny.us.ibm.com [129.33.205.204])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2jbbqh31gr-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Fri, 01 Jun 2018 16:16:18 -0400
+Received: from localhost
+	by e14.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <alifm@linux.ibm.com>;
+	Fri, 1 Jun 2018 16:16:18 -0400
+References: <1527671818-23809-1-git-send-email-thuth@redhat.com>
+	<1527671818-23809-4-git-send-email-thuth@redhat.com>
+From: Farhan Ali <alifm@linux.ibm.com>
+Date: Fri, 1 Jun 2018 16:16:14 -0400
 MIME-Version: 1.0
-In-Reply-To: <20180427102033.20232-3-kraxel@redhat.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <1527671818-23809-4-git-send-email-thuth@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PULL 2/3] Fix libusb-1.0.22 deprecated
- libusb_set_debug with libusb_set_option
+Message-Id: <7b423e5f-2825-9a7c-8d3f-468559ec4954@linux.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH 3/3] pc-bios/s390-ccw/net: Try to load
+ pxelinux.cfg file accoring to the UUID
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,57 +43,8 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Gerd Hoffmann <kraxel@redhat.com>, John Thomson <git@johnthomson.fastmail.com.au>, qemu-stable <qemu-stable@nongnu.org>
+To: Thomas Huth <thuth@redhat.com>, qemu-s390x@nongnu.org, Viktor Mihajlovski <mihajlov@linux.vnet.ibm.com>
+Cc: Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cohuck@redhat.com>, qemu-devel@nongnu.org, Collin Walling <walling@linux.ibm.com>
 
-Cc'ing qemu-stable since I can not build it without this patch
-cherry-picked.
 
-On 04/27/2018 07:20 AM, Gerd Hoffmann wrote:
-> From: John Thomson <git@johnthomson.fastmail.com.au>
-> 
-> libusb-1.0.22 marked libusb_set_debug deprecated
-> it is replaced with
-> libusb_set_option(libusb_context, LIBUSB_OPTION_LOG_LEVEL, libusb_log_level);
-> 
-> details here: https://github.com/libusb/libusb/commit/539f22e2fd916558d11ab9a66f10f461c5593168
-> 
-> Warning here:
-> 
->   CC      hw/usb/host-libusb.o
-> /builds/xen/src/qemu-xen/hw/usb/host-libusb.c: In function 'usb_host_init':
-> /builds/xen/src/qemu-xen/hw/usb/host-libusb.c:250:5: error: 'libusb_set_debug' is deprecated: Use libusb_set_option instead [-Werror=deprecated-declarations]
->      libusb_set_debug(ctx, loglevel);
->      ^~~~~~~~~~~~~~~~
-> In file included from /builds/xen/src/qemu-xen/hw/usb/host-libusb.c:40:0:
-> /usr/include/libusb-1.0/libusb.h:1300:18: note: declared here
->  void LIBUSB_CALL libusb_set_debug(libusb_context *ctx, int level);
->                   ^~~~~~~~~~~~~~~~
-> cc1: all warnings being treated as errors
-> make: *** [/builds/xen/src/qemu-xen/rules.mak:66: hw/usb/host-libusb.o] Error 1
-> make: Leaving directory '/builds/xen/src/xen/tools/qemu-xen-build'
-> 
-> Signed-off-by: John Thomson <git@johnthomson.fastmail.com.au>
-> Message-id: 20180405132046.4968-1-git@johnthomson.fastmail.com.au
-> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
-> ---
->  hw/usb/host-libusb.c | 4 ++++
->  1 file changed, 4 insertions(+)
-> 
-> diff --git a/hw/usb/host-libusb.c b/hw/usb/host-libusb.c
-> index 1b0be071cc..dc0a8fe295 100644
-> --- a/hw/usb/host-libusb.c
-> +++ b/hw/usb/host-libusb.c
-> @@ -247,7 +247,11 @@ static int usb_host_init(void)
->      if (rc != 0) {
->          return -1;
->      }
-> +#if LIBUSB_API_VERSION >= 0x01000106
-> +    libusb_set_option(ctx, LIBUSB_OPTION_LOG_LEVEL, loglevel);
-> +#else
->      libusb_set_debug(ctx, loglevel);
-> +#endif
->  #ifdef CONFIG_WIN32
->      /* FIXME: add support for Windows. */
->  #else
-> 
+Reviewed-by: Farhan Ali <alifm@linux.ibm.com>
