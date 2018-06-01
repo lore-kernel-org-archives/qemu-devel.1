@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47190)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48056)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1fOfi4-0002re-Gk
-	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 04:47:00 -0400
+	(envelope-from <no-reply@patchew.org>) id 1fOfm8-0004iH-Il
+	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 04:51:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1fOfi0-0004tD-O8
-	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 04:46:55 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:47090 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1fOfi0-0004sX-HU
-	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 04:46:52 -0400
-Date: Fri, 1 Jun 2018 09:46:48 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20180601084647.GA2531@work-vm>
-References: <cover.1527814874.git.keno@juliacomputing.com>
-	<1f6bc60305b8c1cd00f5e2a361a05d7b4bc56338.1527814874.git.keno@juliacomputing.com>
-	<20180601101531.4f3dd234@bahia.lan>
+	(envelope-from <no-reply@patchew.org>) id 1fOfm5-0000EI-EY
+	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 04:51:08 -0400
+Resent-Message-Id: <E1fOfm5-0000EI-EY@eggs.gnu.org>
+Received: from sender-of-o51.zoho.com ([135.84.80.216]:21138)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1fOfm5-0000Cx-3A
+	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 04:51:05 -0400
+In-Reply-To: <20180601073050.8054-1-richard.henderson@linaro.org>
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <152784032077.348.549827671913855834@d39dc562802a>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180601101531.4f3dd234@bahia.lan>
-Subject: Re: [Qemu-devel] [PATCH v2 01/20] cutils: Provide strchrnul
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Fri, 1 Jun 2018 01:05:21 -0700 (PDT)
+Subject: Re: [Qemu-devel] [PATCH 00/33] linux-user: Begin splitting
+ do_syscall
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,174 +29,155 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>
-Cc: Keno Fischer <keno@juliacomputing.com>, qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>
+To: richard.henderson@linaro.org
+Cc: famz@redhat.com, qemu-devel@nongnu.org, laurent@vivier.eu
 
-* Greg Kurz (groug@kaod.org) wrote:
-> On Thu, 31 May 2018 21:25:56 -0400
-> Keno Fischer <keno@juliacomputing.com> wrote:
-> 
-> > strchrnul is a GNU extension and thus unavailable on a number of targets.
-> > In the review for a commit removing strchrnul from 9p, I was asked to
-> > create a qemu_strchrnul helper to factor out this functionality.
-> > Do so, and use it in a number of other places in the code base that inlined
-> > the replacement pattern in a place where strchrnul could be used.
-> > 
-> > Signed-off-by: Keno Fischer <keno@juliacomputing.com>
-> > ---
-> > 
-> 
-> And possibly we could detect in configure if the host has strchrnul() and
-> use it, but this optimization can be done later.
-> 
-> I haven't checked if there could be other candidates in the current code
-> base though. Also, this patch touches some other subsystems, so I'm Cc'ing
-> to the other maintainers as reported by ./scripts/get_maintainer.pl:
-
-That looks fine from my point of view;  I can see you could probably
-also use it in the code at the start of the while loop in hmp_sendkey:
-
-    while (1) {
-        separator = strchr(keys, '-');
-        keyname_len = separator ? separator - keys : strlen(keys);
-
-Dave
-
-> Greg Kurz <groug@kaod.org> (supporter:virtio-9p)
-> Markus Armbruster <armbru@redhat.com> (supporter:QMP)
-> "Dr. David Alan Gilbert" <dgilbert@redhat.com> (maintainer:Human Monitor (HMP))
-> qemu-devel@nongnu.org (open list:All patches CC here)
-> 
-> Anyway,
-> 
-> Acked-by: Greg Kurz <groug@kaod.org>
-> 
-> > Changes since v1: New patch
-> > 
-> >  hw/9pfs/9p-local.c    |  2 +-
-> >  include/qemu/cutils.h |  1 +
-> >  monitor.c             |  8 ++------
-> >  util/cutils.c         | 13 +++++++++++++
-> >  util/qemu-option.c    |  6 +-----
-> >  util/uri.c            |  6 ++----
-> >  6 files changed, 20 insertions(+), 16 deletions(-)
-> > 
-> > diff --git a/hw/9pfs/9p-local.c b/hw/9pfs/9p-local.c
-> > index b37b1db..bcf2798 100644
-> > --- a/hw/9pfs/9p-local.c
-> > +++ b/hw/9pfs/9p-local.c
-> > @@ -65,7 +65,7 @@ int local_open_nofollow(FsContext *fs_ctx, const char *path, int flags,
-> >          assert(*path != '/');
-> >  
-> >          head = g_strdup(path);
-> > -        c = strchrnul(path, '/');
-> > +        c = qemu_strchrnul(path, '/');
-> >          if (*c) {
-> >              /* Intermediate path element */
-> >              head[c - path] = 0;
-> > diff --git a/include/qemu/cutils.h b/include/qemu/cutils.h
-> > index a663340..bc40c30 100644
-> > --- a/include/qemu/cutils.h
-> > +++ b/include/qemu/cutils.h
-> > @@ -122,6 +122,7 @@ int qemu_strnlen(const char *s, int max_len);
-> >   * Returns: the pointer originally in @input.
-> >   */
-> >  char *qemu_strsep(char **input, const char *delim);
-> > +const char *qemu_strchrnul(const char *s, int c);
-> >  time_t mktimegm(struct tm *tm);
-> >  int qemu_fdatasync(int fd);
-> >  int fcntl_setfl(int fd, int flag);
-> > diff --git a/monitor.c b/monitor.c
-> > index 922cfc0..e1f01c4 100644
-> > --- a/monitor.c
-> > +++ b/monitor.c
-> > @@ -798,9 +798,7 @@ static int compare_cmd(const char *name, const char *list)
-> >      p = list;
-> >      for(;;) {
-> >          pstart = p;
-> > -        p = strchr(p, '|');
-> > -        if (!p)
-> > -            p = pstart + strlen(pstart);
-> > +        p = qemu_strchrnul(p, '|');
-> >          if ((p - pstart) == len && !memcmp(pstart, name, len))
-> >              return 1;
-> >          if (*p == '\0')
-> > @@ -3401,9 +3399,7 @@ static void cmd_completion(Monitor *mon, const char *name, const char *list)
-> >      p = list;
-> >      for(;;) {
-> >          pstart = p;
-> > -        p = strchr(p, '|');
-> > -        if (!p)
-> > -            p = pstart + strlen(pstart);
-> > +        p = qemu_strchrnul(p, '|');
-> >          len = p - pstart;
-> >          if (len > sizeof(cmd) - 2)
-> >              len = sizeof(cmd) - 2;
-> > diff --git a/util/cutils.c b/util/cutils.c
-> > index 0de69e6..6e078b0 100644
-> > --- a/util/cutils.c
-> > +++ b/util/cutils.c
-> > @@ -545,6 +545,19 @@ int qemu_strtou64(const char *nptr, const char **endptr, int base,
-> >  }
-> >  
-> >  /**
-> > + * Searches for the first occurrence of 'c' in 's', and returns a pointer
-> > + * to the trailing null byte if none was found.
-> > + */
-> > +const char *qemu_strchrnul(const char *s, int c)
-> > +{
-> > +    const char *e = strchr(s, c);
-> > +    if (!e) {
-> > +        e = s + strlen(s);
-> > +    }
-> > +    return e;
-> > +}
-> > +
-> > +/**
-> >   * parse_uint:
-> >   *
-> >   * @s: String to parse
-> > diff --git a/util/qemu-option.c b/util/qemu-option.c
-> > index 58d1c23..54eca12 100644
-> > --- a/util/qemu-option.c
-> > +++ b/util/qemu-option.c
-> > @@ -77,11 +77,7 @@ const char *get_opt_value(const char *p, char **value)
-> >  
-> >      *value = NULL;
-> >      while (1) {
-> > -        offset = strchr(p, ',');
-> > -        if (!offset) {
-> > -            offset = p + strlen(p);
-> > -        }
-> > -
-> > +        offset = qemu_strchrnul(p, ',');
-> >          length = offset - p;
-> >          if (*offset != '\0' && *(offset + 1) == ',') {
-> >              length++;
-> > diff --git a/util/uri.c b/util/uri.c
-> > index 8624a7a..8bdef84 100644
-> > --- a/util/uri.c
-> > +++ b/util/uri.c
-> > @@ -52,6 +52,7 @@
-> >   */
-> >  
-> >  #include "qemu/osdep.h"
-> > +#include "qemu/cutils.h"
-> >  
-> >  #include "qemu/uri.h"
-> >  
-> > @@ -2266,10 +2267,7 @@ struct QueryParams *query_params_parse(const char *query)
-> >          /* Find the next separator, or end of the string. */
-> >          end = strchr(query, '&');
-> >          if (!end) {
-> > -            end = strchr(query, ';');
-> > -        }
-> > -        if (!end) {
-> > -            end = query + strlen(query);
-> > +            end = qemu_strchrnul(query, ';');
-> >          }
-> >  
-> >          /* Find the first '=' character between here and end. */
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
+c3NhZ2UtaWQ6IDIwMTgwNjAxMDczMDUwLjgwNTQtMS1yaWNoYXJkLmhlbmRlcnNvbkBsaW5hcm8u
+b3JnClN1YmplY3Q6IFtRZW11LWRldmVsXSBbUEFUQ0ggMDAvMzNdIGxpbnV4LXVzZXI6IEJlZ2lu
+IHNwbGl0dGluZyBkb19zeXNjYWxsCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9i
+YXNoCgpCQVNFPWJhc2UKbj0xCnRvdGFsPSQoZ2l0IGxvZyAtLW9uZWxpbmUgJEJBU0UuLiB8IHdj
+IC1sKQpmYWlsZWQ9MAoKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQg
+Y29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYu
+YWxnb3JpdGhtIGhpc3RvZ3JhbQoKY29tbWl0cz0iJChnaXQgbG9nIC0tZm9ybWF0PSVIIC0tcmV2
+ZXJzZSAkQkFTRS4uKSIKZm9yIGMgaW4gJGNvbW1pdHM7IGRvCiAgICBlY2hvICJDaGVja2luZyBQ
+QVRDSCAkbi8kdG90YWw6ICQoZ2l0IGxvZyAtbiAxIC0tZm9ybWF0PSVzICRjKS4uLiIKICAgIGlm
+ICEgZ2l0IHNob3cgJGMgLS1mb3JtYXQ9ZW1haWwgfCAuL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAt
+LW1haWxiYWNrIC07IHRoZW4KICAgICAgICBmYWlsZWQ9MQogICAgICAgIGVjaG8KICAgIGZpCiAg
+ICBuPSQoKG4rMSkpCmRvbmUKCmV4aXQgJGZhaWxlZAo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoK
+VXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApGcm9tIGh0
+dHBzOi8vZ2l0aHViLmNvbS9wYXRjaGV3LXByb2plY3QvcWVtdQogKiBbbmV3IHRhZ10gICAgICAg
+ICAgICAgICBwYXRjaGV3LzIwMTgwNjAxMDczMDUwLjgwNTQtMS1yaWNoYXJkLmhlbmRlcnNvbkBs
+aW5hcm8ub3JnIC0+IHBhdGNoZXcvMjAxODA2MDEwNzMwNTAuODA1NC0xLXJpY2hhcmQuaGVuZGVy
+c29uQGxpbmFyby5vcmcKU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0Jwo3NDdmOThjZGE0
+IGxpbnV4LXVzZXI6IFNwbGl0IG91dCBydF9zaWdxdWV1ZWluZm8sIHJ0X3NpZ3RpbWVkd2FpdCwg
+cnRfdGdzaWdxdWV1ZWluZm8KOGM1OTUwM2ZkOSBsaW51eC11c2VyOiBTcGxpdCBvdXQgcnRfc2ln
+cGVuZGluZywgcnRfc2lnc3VzcGVuZCwgc2lncGVuZGluZywgc2lnc3VzcGVuZAozYTU3Y2MzMzRm
+IGxpbnV4LXVzZXI6IFNwbGl0IG91dCBydF9zaWdwcm9jbWFzaywgc2dldG1hc2ssIHNpZ3Byb2Nt
+YXNrLCBzc2V0bWFzawo4MWJkOGU5NGRkIGxpbnV4LXVzZXI6IFNwbGl0IG91dCBydF9zaWdhY3Rp
+b24sIHNpZ2FjdGlvbgowZmMxMDMxY2E2IGxpbnV4LXVzZXI6IFNwbGl0IG91dCBnZXRwZ3JwLCBn
+ZXRwcGlkLCBzZXRzaWQKNzZiNmFiNjFlNCBsaW51eC11c2VyOiBTcGxpdCBvdXQgY2hyb290LCBk
+dXAyLCBkdXAzLCBmY250bCwgc2V0cGdpZCwgdW1hc2sKODE4ODQzZDkyMSBsaW51eC11c2VyOiBT
+cGxpdCBvdXQgaW9jdGwKZDNhOWZhNzZmNCBsaW51eC11c2VyOiBTcGxpdCBvdXQgYWNjdCwgcGlw
+ZSwgcGlwZTIsIHRpbWVzLCB1bW91bnQyCjczNzc1NzcwYTUgbGludXgtdXNlcjogU3BsaXQgb3V0
+IGR1cCwgbWtkaXIsIG1rZGlyYXQsIHJtZGlyCjhkNmZmODMyZDcgbGludXgtdXNlcjogU3BsaXQg
+b3V0IHJlbmFtZSwgcmVuYW1lYXQsIHJlbmFtZWF0MgpkZWQ5NzQxNGJmIGxpbnV4LXVzZXI6IFNw
+bGl0IG91dCBhY2Nlc3MsIGZhY2Nlc3NhdCwgZnV0aW1lc2F0LCBraWxsLCBuaWNlLCBzeW5jLCBz
+eW5jZnMKZjJhYzI3MTVhMCBsaW51eC11c2VyOiBTcGxpdCBvdXQgYWxhcm0sIHBhdXNlLCBzdGlt
+ZSwgdXRpbWUsIHV0aW1lcwpmZDIzOWYwMThmIGxpbnV4LXVzZXI6IFNwbGl0IG91dCBtb3VudCwg
+dW1vdW50CjdmOGQwOGIwZGYgbGludXgtdXNlcjogU3BsaXQgb3V0IGdldHBpZCwgZ2V0eHBpZCwg
+bHNlZWsKMDAzM2ZjZTEwNyBsaW51eC11c2VyOiBSZW1vdmUgYWxsIHVuaW1wbGVtZW50ZWQgZW50
+cmllcwoxZDA5M2Q2OTY2IGxpbnV4LXVzZXI6IFNwbGl0IG91dCBjaGRpciwgbWtub2QsIG1rbm9k
+YXQsIHRpbWUsIGNobW9kCmQwYmM4YzY5YWYgbGludXgtdXNlcjogU3BsaXQgb3V0IHVubGluaywg
+dW5saW5rYXQKZWUxODA0MDg4YyBsaW51eC11c2VyOiBTcGxpdCBvdXQgbGluaywgbGlua2F0Cjdk
+YTFhN2QyZWMgbGludXgtdXNlcjogU3BsaXQgb3V0IGNyZWF0LCBmb3JrLCB3YWl0aWQsIHdhaXRw
+aWQKNmM5ZGI4YWVlMiBsaW51eC11c2VyOiBTcGxpdCBvdXQgb3Blbl90b19oYW5kbGVfYXQKOGU4
+YzU5Y2QyNyBsaW51eC11c2VyOiBTcGxpdCBvdXQgbmFtZV90b19oYW5kbGVfYXQKNGVkN2M1NjUx
+NiBsaW51eC11c2VyOiBTcGxpdCBvdXQgb3Blbiwgb3BlbmF0CmRiZjg1ZmRkZjcgbGludXgtdXNl
+cjogU3BsaXQgb3V0IGV4ZWN2ZQpkNDY1NGE2ZWY3IGxpbnV4LXVzZXI6IFNwbGl0IG91dCBicmss
+IGNsb3NlLCBleGl0LCByZWFkLCB3cml0ZQo0MDQzMTgwMTZkIGxpbnV4LXVzZXI6IFNldCB1cCBp
+bmZyYXN0cnVjdHVyZSBmb3IgdGFibGUtaXppbmcgc3lzY2FsbHMKYTdiM2FjMDQwNyBsaW51eC11
+c2VyOiBNYWtlIHN5c2NhbGwgbnVtYmVyIHVuc2lnbmVkCjYwODZmMzMzOWIgbGludXgtdXNlcjog
+UHJvcGFnYXRlIGdvdG8gZmFpbCB0byByZXR1cm4KMTk2OWFlMDhkMyBsaW51eC11c2VyOiBTcGxp
+dCBvdXQgZ290byB1bmltcGxlbWVudGVkIHRvIGRvX3VuaW1wbGVtZW50ZWQKZjMyMTNlMzhmZiBs
+aW51eC11c2VyOiBQcm9wYWdhdGUgZ290byB1bmltcGxlbWVudGVkX25vd2FybiB0byByZXR1cm4K
+NGUyMDUwOWY1NiBsaW51eC11c2VyOiBQcm9wYWdhdGUgZ290byBlZmF1bHQgdG8gcmV0dXJuCmRk
+YTgzZTAxZjggbGludXgtdXNlcjogUHJvcGFnYXRlIGdvdG8gZWJhZGYgdG8gcmV0dXJuCmZkZGZl
+MmViNTcgbGludXgtdXNlcjogUmVsYXggc2luZ2xlIGV4aXQgZnJvbSAiYnJlYWsiCmJhYzMwOWIy
+OTMgbGludXgtdXNlcjogU3BsaXQgb3V0IGRvX3N5c2NhbGwxCgo9PT0gT1VUUFVUIEJFR0lOID09
+PQpDaGVja2luZyBQQVRDSCAxLzMzOiBsaW51eC11c2VyOiBTcGxpdCBvdXQgZG9fc3lzY2FsbDEu
+Li4KQ2hlY2tpbmcgUEFUQ0ggMi8zMzogbGludXgtdXNlcjogUmVsYXggc2luZ2xlIGV4aXQgZnJv
+bSAiYnJlYWsiLi4uCkVSUk9SOiBjb2RlIGluZGVudCBzaG91bGQgbmV2ZXIgdXNlIHRhYnMKIzE5
+Mjk6IEZJTEU6IGxpbnV4LXVzZXIvc3lzY2FsbC5jOjExMTUwOgorXklyZXR1cm4gcmV0OyQKCkVS
+Uk9SOiBjb2RlIGluZGVudCBzaG91bGQgbmV2ZXIgdXNlIHRhYnMKIzE5Mzg6IEZJTEU6IGxpbnV4
+LXVzZXIvc3lzY2FsbC5jOjExMTU5OgorXklyZXR1cm4gcmV0OyQKCkVSUk9SOiBjb2RlIGluZGVu
+dCBzaG91bGQgbmV2ZXIgdXNlIHRhYnMKIzE5NDc6IEZJTEU6IGxpbnV4LXVzZXIvc3lzY2FsbC5j
+OjExMTY2OgorXklyZXR1cm4gdGFyZ2V0X2Z0cnVuY2F0ZTY0KGNwdV9lbnYsIGFyZzEsIGFyZzIs
+IGFyZzMsIGFyZzQpOyQKCkVSUk9SOiBjb2RlIGluZGVudCBzaG91bGQgbmV2ZXIgdXNlIHRhYnMK
+IzI0MTE6IEZJTEU6IGxpbnV4LXVzZXIvc3lzY2FsbC5jOjExODYyOgorXklyZXR1cm4gcmV0OyQK
+CkVSUk9SOiBjb2RlIGluZGVudCBzaG91bGQgbmV2ZXIgdXNlIHRhYnMKIzI2ODM6IEZJTEU6IGxp
+bnV4LXVzZXIvc3lzY2FsbC5jOjEyMjE2OgorXklyZXR1cm4gcmV0OyQKCnRvdGFsOiA1IGVycm9y
+cywgMCB3YXJuaW5ncywgMjg1MyBsaW5lcyBjaGVja2VkCgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBw
+cm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNl
+IHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0gg
+aW4gTUFJTlRBSU5FUlMuCgpDaGVja2luZyBQQVRDSCAzLzMzOiBsaW51eC11c2VyOiBQcm9wYWdh
+dGUgZ290byBlYmFkZiB0byByZXR1cm4uLi4KQ2hlY2tpbmcgUEFUQ0ggNC8zMzogbGludXgtdXNl
+cjogUHJvcGFnYXRlIGdvdG8gZWZhdWx0IHRvIHJldHVybi4uLgpFUlJPUjogc3VzcGVjdCBjb2Rl
+IGluZGVudCBmb3IgY29uZGl0aW9uYWwgc3RhdGVtZW50cyAoMTEsIDE0KQojNjQyOiBGSUxFOiBs
+aW51eC11c2VyL3N5c2NhbGwuYzo5NTUzOgogICAgICAgICAgICBpZiAoIXApIHsKKyAgICAgICAg
+ICAgICAgcmV0dXJuIC1UQVJHRVRfRUZBVUxUOwoKdG90YWw6IDEgZXJyb3JzLCAwIHdhcm5pbmdz
+LCAxMjExIGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVh
+c2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJl
+cG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVS
+Uy4KCkNoZWNraW5nIFBBVENIIDUvMzM6IGxpbnV4LXVzZXI6IFByb3BhZ2F0ZSBnb3RvIHVuaW1w
+bGVtZW50ZWRfbm93YXJuIHRvIHJldHVybi4uLgpDaGVja2luZyBQQVRDSCA2LzMzOiBsaW51eC11
+c2VyOiBTcGxpdCBvdXQgZ290byB1bmltcGxlbWVudGVkIHRvIGRvX3VuaW1wbGVtZW50ZWQuLi4K
+Q2hlY2tpbmcgUEFUQ0ggNy8zMzogbGludXgtdXNlcjogUHJvcGFnYXRlIGdvdG8gZmFpbCB0byBy
+ZXR1cm4uLi4KQ2hlY2tpbmcgUEFUQ0ggOC8zMzogbGludXgtdXNlcjogTWFrZSBzeXNjYWxsIG51
+bWJlciB1bnNpZ25lZC4uLgpDaGVja2luZyBQQVRDSCA5LzMzOiBsaW51eC11c2VyOiBTZXQgdXAg
+aW5mcmFzdHJ1Y3R1cmUgZm9yIHRhYmxlLWl6aW5nIHN5c2NhbGxzLi4uCkNoZWNraW5nIFBBVENI
+IDEwLzMzOiBsaW51eC11c2VyOiBTcGxpdCBvdXQgYnJrLCBjbG9zZSwgZXhpdCwgcmVhZCwgd3Jp
+dGUuLi4KQ2hlY2tpbmcgUEFUQ0ggMTEvMzM6IGxpbnV4LXVzZXI6IFNwbGl0IG91dCBleGVjdmUu
+Li4KQ2hlY2tpbmcgUEFUQ0ggMTIvMzM6IGxpbnV4LXVzZXI6IFNwbGl0IG91dCBvcGVuLCBvcGVu
+YXQuLi4KQ2hlY2tpbmcgUEFUQ0ggMTMvMzM6IGxpbnV4LXVzZXI6IFNwbGl0IG91dCBuYW1lX3Rv
+X2hhbmRsZV9hdC4uLgpDaGVja2luZyBQQVRDSCAxNC8zMzogbGludXgtdXNlcjogU3BsaXQgb3V0
+IG9wZW5fdG9faGFuZGxlX2F0Li4uCkNoZWNraW5nIFBBVENIIDE1LzMzOiBsaW51eC11c2VyOiBT
+cGxpdCBvdXQgY3JlYXQsIGZvcmssIHdhaXRpZCwgd2FpdHBpZC4uLgpDaGVja2luZyBQQVRDSCAx
+Ni8zMzogbGludXgtdXNlcjogU3BsaXQgb3V0IGxpbmssIGxpbmthdC4uLgpDaGVja2luZyBQQVRD
+SCAxNy8zMzogbGludXgtdXNlcjogU3BsaXQgb3V0IHVubGluaywgdW5saW5rYXQuLi4KQ2hlY2tp
+bmcgUEFUQ0ggMTgvMzM6IGxpbnV4LXVzZXI6IFNwbGl0IG91dCBjaGRpciwgbWtub2QsIG1rbm9k
+YXQsIHRpbWUsIGNobW9kLi4uCkNoZWNraW5nIFBBVENIIDE5LzMzOiBsaW51eC11c2VyOiBSZW1v
+dmUgYWxsIHVuaW1wbGVtZW50ZWQgZW50cmllcy4uLgpDaGVja2luZyBQQVRDSCAyMC8zMzogbGlu
+dXgtdXNlcjogU3BsaXQgb3V0IGdldHBpZCwgZ2V0eHBpZCwgbHNlZWsuLi4KQ2hlY2tpbmcgUEFU
+Q0ggMjEvMzM6IGxpbnV4LXVzZXI6IFNwbGl0IG91dCBtb3VudCwgdW1vdW50Li4uCkNoZWNraW5n
+IFBBVENIIDIyLzMzOiBsaW51eC11c2VyOiBTcGxpdCBvdXQgYWxhcm0sIHBhdXNlLCBzdGltZSwg
+dXRpbWUsIHV0aW1lcy4uLgpDaGVja2luZyBQQVRDSCAyMy8zMzogbGludXgtdXNlcjogU3BsaXQg
+b3V0IGFjY2VzcywgZmFjY2Vzc2F0LCBmdXRpbWVzYXQsIGtpbGwsIG5pY2UsIHN5bmMsIHN5bmNm
+cy4uLgpDaGVja2luZyBQQVRDSCAyNC8zMzogbGludXgtdXNlcjogU3BsaXQgb3V0IHJlbmFtZSwg
+cmVuYW1lYXQsIHJlbmFtZWF0Mi4uLgpDaGVja2luZyBQQVRDSCAyNS8zMzogbGludXgtdXNlcjog
+U3BsaXQgb3V0IGR1cCwgbWtkaXIsIG1rZGlyYXQsIHJtZGlyLi4uCkNoZWNraW5nIFBBVENIIDI2
+LzMzOiBsaW51eC11c2VyOiBTcGxpdCBvdXQgYWNjdCwgcGlwZSwgcGlwZTIsIHRpbWVzLCB1bW91
+bnQyLi4uCkNoZWNraW5nIFBBVENIIDI3LzMzOiBsaW51eC11c2VyOiBTcGxpdCBvdXQgaW9jdGwu
+Li4KQ2hlY2tpbmcgUEFUQ0ggMjgvMzM6IGxpbnV4LXVzZXI6IFNwbGl0IG91dCBjaHJvb3QsIGR1
+cDIsIGR1cDMsIGZjbnRsLCBzZXRwZ2lkLCB1bWFzay4uLgpDaGVja2luZyBQQVRDSCAyOS8zMzog
+bGludXgtdXNlcjogU3BsaXQgb3V0IGdldHBncnAsIGdldHBwaWQsIHNldHNpZC4uLgpDaGVja2lu
+ZyBQQVRDSCAzMC8zMzogbGludXgtdXNlcjogU3BsaXQgb3V0IHJ0X3NpZ2FjdGlvbiwgc2lnYWN0
+aW9uLi4uCkVSUk9SOiBjb2RlIGluZGVudCBzaG91bGQgbmV2ZXIgdXNlIHRhYnMKIzEzNDogRklM
+RTogbGludXgtdXNlci9zeXNjYWxsLmM6ODg1MjoKK15JYWN0Ll9zYV9oYW5kbGVyID0gb2xkX2Fj
+dC0+X3NhX2hhbmRsZXI7JAoKRVJST1I6IGNvZGUgaW5kZW50IHNob3VsZCBuZXZlciB1c2UgdGFi
+cwojMTM1OiBGSUxFOiBsaW51eC11c2VyL3N5c2NhbGwuYzo4ODUzOgorXkl0YXJnZXRfc2lnaW5p
+dHNldCgmYWN0LnNhX21hc2ssIG9sZF9hY3QtPnNhX21hc2suc2lnWzBdKTskCgpFUlJPUjogY29k
+ZSBpbmRlbnQgc2hvdWxkIG5ldmVyIHVzZSB0YWJzCiMxMzY6IEZJTEU6IGxpbnV4LXVzZXIvc3lz
+Y2FsbC5jOjg4NTQ6CiteSWFjdC5zYV9mbGFncyA9IG9sZF9hY3QtPnNhX2ZsYWdzOyQKCkVSUk9S
+OiBjb2RlIGluZGVudCBzaG91bGQgbmV2ZXIgdXNlIHRhYnMKIzEzNzogRklMRTogbGludXgtdXNl
+ci9zeXNjYWxsLmM6ODg1NToKK15JdW5sb2NrX3VzZXJfc3RydWN0KG9sZF9hY3QsIGFyZzIsIDAp
+OyQKCkVSUk9SOiBjb2RlIGluZGVudCBzaG91bGQgbmV2ZXIgdXNlIHRhYnMKIzEzODogRklMRTog
+bGludXgtdXNlci9zeXNjYWxsLmM6ODg1NjoKK15JcGFjdCA9ICZhY3Q7JAoKRVJST1I6IGNvZGUg
+aW5kZW50IHNob3VsZCBuZXZlciB1c2UgdGFicwojMTQ1OiBGSUxFOiBsaW51eC11c2VyL3N5c2Nh
+bGwuYzo4ODYzOgorXklvbGRfYWN0LT5fc2FfaGFuZGxlciA9IG9hY3QuX3NhX2hhbmRsZXI7JAoK
+RVJST1I6IGNvZGUgaW5kZW50IHNob3VsZCBuZXZlciB1c2UgdGFicwojMTQ2OiBGSUxFOiBsaW51
+eC11c2VyL3N5c2NhbGwuYzo4ODY0OgorXklvbGRfYWN0LT5zYV9mbGFncyA9IG9hY3Quc2FfZmxh
+Z3M7JAoKRVJST1I6IGNvZGUgaW5kZW50IHNob3VsZCBuZXZlciB1c2UgdGFicwojMTQ3OiBGSUxF
+OiBsaW51eC11c2VyL3N5c2NhbGwuYzo4ODY1OgorXklvbGRfYWN0LT5zYV9tYXNrLnNpZ1swXSA9
+IG9hY3Quc2FfbWFzay5zaWdbMF07JAoKRVJST1I6IGNvZGUgaW5kZW50IHNob3VsZCBuZXZlciB1
+c2UgdGFicwojMTQ4OiBGSUxFOiBsaW51eC11c2VyL3N5c2NhbGwuYzo4ODY2OgorXklvbGRfYWN0
+LT5zYV9tYXNrLnNpZ1sxXSA9IDA7JAoKRVJST1I6IGNvZGUgaW5kZW50IHNob3VsZCBuZXZlciB1
+c2UgdGFicwojMTQ5OiBGSUxFOiBsaW51eC11c2VyL3N5c2NhbGwuYzo4ODY3OgorXklvbGRfYWN0
+LT5zYV9tYXNrLnNpZ1syXSA9IDA7JAoKRVJST1I6IGNvZGUgaW5kZW50IHNob3VsZCBuZXZlciB1
+c2UgdGFicwojMTUwOiBGSUxFOiBsaW51eC11c2VyL3N5c2NhbGwuYzo4ODY4OgorXklvbGRfYWN0
+LT5zYV9tYXNrLnNpZ1szXSA9IDA7JAoKRVJST1I6IGNvZGUgaW5kZW50IHNob3VsZCBuZXZlciB1
+c2UgdGFicwojMTUxOiBGSUxFOiBsaW51eC11c2VyL3N5c2NhbGwuYzo4ODY5OgorXkl1bmxvY2tf
+dXNlcl9zdHJ1Y3Qob2xkX2FjdCwgYXJnMywgMSk7JAoKdG90YWw6IDEyIGVycm9ycywgMCB3YXJu
+aW5ncywgMzUxIGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBw
+bGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVz
+IHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJ
+TkVSUy4KCkNoZWNraW5nIFBBVENIIDMxLzMzOiBsaW51eC11c2VyOiBTcGxpdCBvdXQgcnRfc2ln
+cHJvY21hc2ssIHNnZXRtYXNrLCBzaWdwcm9jbWFzaywgc3NldG1hc2suLi4KQ2hlY2tpbmcgUEFU
+Q0ggMzIvMzM6IGxpbnV4LXVzZXI6IFNwbGl0IG91dCBydF9zaWdwZW5kaW5nLCBydF9zaWdzdXNw
+ZW5kLCBzaWdwZW5kaW5nLCBzaWdzdXNwZW5kLi4uCkNoZWNraW5nIFBBVENIIDMzLzMzOiBsaW51
+eC11c2VyOiBTcGxpdCBvdXQgcnRfc2lncXVldWVpbmZvLCBydF9zaWd0aW1lZHdhaXQsIHJ0X3Rn
+c2lncXVldWVpbmZvLi4uCj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3
+aXRoIGNvZGU6IDEKCgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hl
+dyBbaHR0cDovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0
+Y2hldy1kZXZlbEByZWRoYXQuY29t
