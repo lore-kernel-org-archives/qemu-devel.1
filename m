@@ -1,23 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54392)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54827)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1fOiYk-0005sM-5g
-	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 07:49:31 -0400
+	(envelope-from <berrange@redhat.com>) id 1fOiZl-0006VD-WF
+	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 07:50:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1fOiYf-0002my-82
-	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 07:49:30 -0400
-Date: Fri, 1 Jun 2018 12:49:22 +0100
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20180601114922.GK8687@stefanha-x1.localdomain>
-References: <42ec7519-653d-09e2-abc6-78f04733ca47@linux.ibm.com>
-	<20180524140453.GB28984@stefanha-x1.localdomain>
-	<a30a4e06-4028-4cad-ebae-e7bd3be7359a@linux.ibm.com>
+	(envelope-from <berrange@redhat.com>) id 1fOiZl-0004DR-0U
+	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 07:50:34 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:49788 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1fOiZk-0004Cc-RD
+	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 07:50:32 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.5])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 4EDE6859A9
+	for <qemu-devel@nongnu.org>; Fri,  1 Jun 2018 11:50:32 +0000 (UTC)
+Date: Fri, 1 Jun 2018 12:50:21 +0100
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Message-ID: <20180601115021.GS3458@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <20180531074601.10647-1-slp@redhat.com>
+	<20180531074601.10647-2-slp@redhat.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="qDymnuGqqhW10CwH"
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <a30a4e06-4028-4cad-ebae-e7bd3be7359a@linux.ibm.com>
-Subject: Re: [Qemu-devel] [Qemu-block] Problem with data miscompare using
- scsi-hd, cache=none and io=threads
+In-Reply-To: <20180531074601.10647-2-slp@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 1/3] io: Implement QIO_CHANNEL_ERR_BROKEN
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,66 +34,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Daniel Henrique Barboza <danielhb@linux.ibm.com>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Fam Zheng <famz@redhat.com>
+To: Sergio Lopez <slp@redhat.com>
+Cc: pbonzini@redhat.com, marcandre.lureau@redhat.com, mst@redhat.com, qemu-devel@nongnu.org
 
+On Thu, May 31, 2018 at 09:45:59AM +0200, Sergio Lopez wrote:
+> QIO_CHANNEL_ERR_BROKEN is used to identify a potentially unrecoverable
+> error in the channel, like EPIPE.
+> ---
+>  include/io/channel.h | 1 +
+>  io/channel-file.c    | 3 +++
+>  2 files changed, 4 insertions(+)
+> 
+> diff --git a/include/io/channel.h b/include/io/channel.h
+> index e8cdadb..bbe45f6 100644
+> --- a/include/io/channel.h
+> +++ b/include/io/channel.h
+> @@ -38,6 +38,7 @@ typedef struct QIOChannel QIOChannel;
+>  typedef struct QIOChannelClass QIOChannelClass;
+>  
+>  #define QIO_CHANNEL_ERR_BLOCK -2
+> +#define QIO_CHANNEL_ERR_BROKEN -3
+>  
+>  typedef enum QIOChannelFeature QIOChannelFeature;
+>  
+> diff --git a/io/channel-file.c b/io/channel-file.c
+> index db948ab..a990f67 100644
+> --- a/io/channel-file.c
+> +++ b/io/channel-file.c
+> @@ -124,6 +124,9 @@ static ssize_t qio_channel_file_writev(QIOChannel *ioc,
+>          if (errno == EAGAIN) {
+>              return QIO_CHANNEL_ERR_BLOCK;
+>          }
+> +        if (errno == EPIPE) {
+> +            return QIO_CHANNEL_ERR_BROKEN;
+> +        }
+>          if (errno == EINTR) {
+>              goto retry;
+>          }
 
---qDymnuGqqhW10CwH
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+I don't see a compelling reason to add this.  EAGAIN needs special
+handling because we do not wish to set the "Error **errp" object.
+EPIPE can be just handled by callers in the same way as any other
+errno value, by closing the connection.
 
-On Thu, May 24, 2018 at 06:30:10PM -0300, Daniel Henrique Barboza wrote:
->=20
->=20
-> On 05/24/2018 11:04 AM, Stefan Hajnoczi wrote:
-> > On Tue, May 15, 2018 at 06:25:46PM -0300, Daniel Henrique Barboza wrote:
-> > > This means that the test executed a write at=A0 LBA 0x94fa and, after
-> > > confirming that the write was completed, issue 2 reads in the same LB=
-A to
-> > > assert the written contents and found out a mismatch.
-> > Have you confirmed this pattern at various levels in the stack:
-> > 1. Application inside the guest (strace)
-> > 2. Guest kernel block layer (blktrace)
-> > 3. QEMU (strace)
-> > 4. Host kernel block layer (blktrace)
->=20
-> Tested (3). In this case the bug stop reproducing. Not sure if there is
-> anything related with strace adding a delay back and forth the
-> preadv/pwritev calls, but the act of attaching strace to the QEMU
-> process changed the behavior.
->=20
-> Haven't tried the other 3 scenarios. (2) and (4) are definitely worth try=
-ing
-> it
-> out, specially (4).
-
-Yes, host blktrace is probably the most important piece of evidence.
-
-> > The key thing is that the write completes before the 2 reads are
-> > submitted.
-> >=20
-> > Have you tried running the test on bare metal?
->=20
-> Yes. The stress test does not reproduce the miscompare issue when
-> running on bare metal.
-
-Great.
-
-Stefan
-
---qDymnuGqqhW10CwH
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJbETLCAAoJEJykq7OBq3PIqOUH/iGyBE8Ue8g5WWPmaRYbL17K
-6dT4pS4BLkjN66h/5ssCfCI8NzfUDmLXT6hz7HypvpgHvi4vEwXQ5+J+Db1k4McM
-XRdpb8zylDYLDrEh/sef6pVaVGrhGKBZq12UtDMioem1gSOAZeHg3er2RwhWyqbU
-bvhcj6A8EOgPiLlNMWZ5MXPmsRjRtP/ZNYzmHno9GWfbm7SZd5bHqn/XOG50mx4j
-U45JtNgBBjVDGM6Gy788es8A5BOQ2dGSZAMHmqkatFCjEADC3TvbIMhumnCQX3bd
-2/+zniZtkr+gp9joNcDdYq7tCn7wVPgobPdeSSJ8fCnmVmIQ+tmmRduXMa+QJF8=
-=0CYs
------END PGP SIGNATURE-----
-
---qDymnuGqqhW10CwH--
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
