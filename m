@@ -1,33 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50004)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51019)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fOfva-0007rR-6s
-	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 05:00:55 -0400
+	(envelope-from <xuyandong2@huawei.com>) id 1fOfz0-0001zF-Hv
+	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 05:04:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fOfvV-0008CY-Bw
-	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 05:00:54 -0400
-Received: from indium.canonical.com ([91.189.90.7]:34768)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1fOfvV-0008C0-4f
-	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 05:00:49 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1fOfvU-0007d3-1l
-	for <qemu-devel@nongnu.org>; Fri, 01 Jun 2018 09:00:48 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 0A5742E80C8
-	for <qemu-devel@nongnu.org>; Fri,  1 Jun 2018 09:00:48 +0000 (UTC)
-MIME-Version: 1.0
+	(envelope-from <xuyandong2@huawei.com>) id 1fOfyv-00021x-KL
+	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 05:04:26 -0400
+Received: from [45.249.212.255] (port=35836 helo=huawei.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <xuyandong2@huawei.com>)
+	id 1fOfyv-0001x3-7x
+	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 05:04:21 -0400
+From: xuyandong <xuyandong2@huawei.com>
+Date: Fri, 1 Jun 2018 08:17:12 +0000
+Message-ID: <7CECC2DFC21538489F72729DF5EFB4D9C1486C@DGGEMM501-MBX.china.huawei.com>
+Content-Language: zh-CN
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 01 Jun 2018 08:45:36 -0000
-From: Satheesh Rajendran <sathnaga@linux.vnet.ibm.com>
-Reply-To: Bug 1774605 <1774605@bugs.launchpad.net>
-Sender: bounces@canonical.com
-Message-Id: <152784273656.31479.153660947051184788.malonedeb@soybean.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1774605] [NEW] PowerPC guest does not emulate L2
- and L3 cache for KVM vCPUs
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+Subject: [Qemu-devel] An emulation failure occurs,
+ if I hotplug vcpus immediately after the VM start
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,117 +27,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: "pbonzini@redhat.com" <pbonzini@redhat.com>
+Cc: Zhanghailiang <zhang.zhanghailiang@huawei.com>, "wangxin (U)" <wangxinxin.wang@huawei.com>, "Gonglei (Arei)" <arei.gonglei@huawei.com>, lidonglin <lidonglin@huawei.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 
-Public bug reported:
-
-PowerPC KVM guest does not emulate L2 and L2 caches for vCPU, it would
-be good to have them enabled if not any known issues/limitation already
-with PowerPC.
-
-Host Env:
-kernel: 4.17.0-rc7-00045-g0512e0134582
-qemu: v2.12.0-923-gc181ddaa17-dirty
-#libvirtd -V
-libvirtd (libvirt) 4.4.0
-
-
-Guest Kernel:
-# uname -a
-Linux atest-guest 4.17.0-rc7-00045-g0512e0134582 #9 SMP Fri Jun 1 02:55:50 =
-EDT 2018 ppc64le ppc64le ppc64le GNU/Linux
-
-Guest:
-# lscpu
-Architecture:        ppc64le
-Byte Order:          Little Endian
-CPU(s):              16
-On-line CPU(s) list: 0-15
-Thread(s) per core:  8
-Core(s) per socket:  2
-Socket(s):           1
-NUMA node(s):        1
-Model:               2.1 (pvr 004b 0201)
-Model name:          POWER8 (architected), altivec supported
-Hypervisor vendor:   KVM
-Virtualization type: para
-L1d cache:           64K
-L1i cache:           32K
-NUMA node0 CPU(s):   0-15
-
-
-background: x86 enabling cpu L2 cache bydefault and L3 cache on demand for =
-kvm guest
-and claims performance improvement as vcpus can be =
-
-benefited with lesser `vmexits due to guest send IPIs.` with L3 cache enabl=
-ed, below was patch for same.
-
-https://git.qemu.org/?p=3Dqemu.git;a=3Dcommit;h=3D14c985cffa6cb177fc01a163d=
-8bcf227c104718c
-
-** Affects: qemu
-     Importance: Undecided
-         Status: New
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1774605
-
-Title:
-  PowerPC guest does not emulate L2 and L3 cache for KVM vCPUs
-
-Status in QEMU:
-  New
-
-Bug description:
-  PowerPC KVM guest does not emulate L2 and L2 caches for vCPU, it would
-  be good to have them enabled if not any known issues/limitation
-  already with PowerPC.
-
-  Host Env:
-  kernel: 4.17.0-rc7-00045-g0512e0134582
-  qemu: v2.12.0-923-gc181ddaa17-dirty
-  #libvirtd -V
-  libvirtd (libvirt) 4.4.0
-
-  =
-
-  Guest Kernel:
-  # uname -a
-  Linux atest-guest 4.17.0-rc7-00045-g0512e0134582 #9 SMP Fri Jun 1 02:55:5=
-0 EDT 2018 ppc64le ppc64le ppc64le GNU/Linux
-
-  Guest:
-  # lscpu
-  Architecture:        ppc64le
-  Byte Order:          Little Endian
-  CPU(s):              16
-  On-line CPU(s) list: 0-15
-  Thread(s) per core:  8
-  Core(s) per socket:  2
-  Socket(s):           1
-  NUMA node(s):        1
-  Model:               2.1 (pvr 004b 0201)
-  Model name:          POWER8 (architected), altivec supported
-  Hypervisor vendor:   KVM
-  Virtualization type: para
-  L1d cache:           64K
-  L1i cache:           32K
-  NUMA node0 CPU(s):   0-15
-
-
-  background: x86 enabling cpu L2 cache bydefault and L3 cache on demand fo=
-r kvm guest
-  and claims performance improvement as vcpus can be =
-
-  benefited with lesser `vmexits due to guest send IPIs.` with L3 cache ena=
-bled, below was patch for same.
-
-  https://git.qemu.org/?p=3Dqemu.git;a=3Dcommit;h=3D14c985cffa6cb177fc01a16=
-3d8bcf227c104718c
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1774605/+subscriptions
+SGkgdGhlcmUsDQoNCkkgYW0gZG9pbmcgc29tZSB0ZXN0IG9uIHFlbXUgdmNwdSBob3RwbHVnIGFu
+ZCBJIHJ1biBpbnRvIHNvbWUgdHJvdWJsZS4NCkFuIGVtdWxhdGlvbiBmYWlsdXJlIG9jY3VycyBh
+bmQgcWVtdSBwcmludHMgdGhlIGZvbGxvd2luZyBtc2c6DQoNCktWTSBpbnRlcm5hbCBlcnJvci4g
+U3ViZXJyb3I6IDENCmVtdWxhdGlvbiBmYWlsdXJlDQpFQVg9MDAwMDAwMDAgRUJYPTAwMDAwMDAw
+IEVDWD0wMDAwMDAwMCBFRFg9MDAwMDA2MDANCkVTST0wMDAwMDAwMCBFREk9MDAwMDAwMDAgRUJQ
+PTAwMDAwMDAwIEVTUD0wMDAwZmZmOA0KRUlQPTAwMDBmZjUzIEVGTD0wMDAxMDA4MiBbLS1TLS0t
+LV0gQ1BMPTAgSUk9MCBBMjA9MSBTTU09MCBITFQ9MA0KRVMgPTAwMDAgMDAwMDAwMDAgMDAwMGZm
+ZmYgMDAwMDkzMDANCkNTID1mMDAwIDAwMGYwMDAwIDAwMDBmZmZmIDAwMDA5YjAwDQpTUyA9MDAw
+MCAwMDAwMDAwMCAwMDAwZmZmZiAwMDAwOTMwMA0KRFMgPTAwMDAgMDAwMDAwMDAgMDAwMGZmZmYg
+MDAwMDkzMDANCkZTID0wMDAwIDAwMDAwMDAwIDAwMDBmZmZmIDAwMDA5MzAwDQpHUyA9MDAwMCAw
+MDAwMDAwMCAwMDAwZmZmZiAwMDAwOTMwMA0KTERUPTAwMDAgMDAwMDAwMDAgMDAwMGZmZmYgMDAw
+MDgyMDANClRSID0wMDAwIDAwMDAwMDAwIDAwMDBmZmZmIDAwMDA4YjAwaWYNCkdEVD0gICAgIDAw
+MDAwMDAwIDAwMDBmZmZmDQpJRFQ9ICAgICAwMDAwMDAwMCAwMDAwZmZmZg0KQ1IwPTYwMDAwMDEw
+IENSMj0wMDAwMDAwMCBDUjM9MDAwMDAwMDAgQ1I0PTAwMDAwMDAwDQpEUjA9MDAwMDAwMDAwMDAw
+MDAwMCBEUjE9MDAwMDAwMDAwMDAwMDAwMCBEUjI9MDAwMDAwMDAwMDAwMDAwMCBEUjM9MDAwMDAw
+MDAwMDAwMDAwMA0KRFI2PTAwMDAwMDAwZmZmZjBmZjAgRFI3PTAwMDAwMDAwMDAwMDA0MDANCkVG
+RVI9MDAwMDAwMDAwMDAwMDAwMA0KQ29kZT0zMSBkMiBlYiAwNCA2NiA4MyBjYSBmZiA2NiA4OSBk
+MCA2NiA1YiA2NiBjMyA2NiA4OSBkMCA2NiBjMyA8Y2Y+IDY2IDY4IDIxIDhhIDAwIDAwIGU5IDA4
+IGQ3IDY2IDU2IDY2IDUzIDY2IDgzIGVjIDBjIDY2IDg5IGMzIDY2IGU4IGNlIDdiIGZmIGZmIDY2
+IDg5IGM2DQoNCkkgbm90aWNlIHRoYXQgZ3Vlc3QgaXMgc3RpbGwgcnVubmluZyBTZWFiQklPUyBp
+biByZWFsIG1vZGUgd2hlbiB0aGUgdmNwdSBoYXMganVzdCBiZWVuIHBsdWdlZC4NClRoaXMgZW11
+bGF0aW9uIGZhaWx1cmUgY2FuIGJlIHN0ZWFkbHkgcmVwcm9kdWNlZCBpZiBJIGFtIGRvaW5nIHZj
+cHUgaG90cGx1ZyBkdXJpbmcgVk0gbGF1bmNoIHByb2Nlc3MuDQpBZnRlciBzb21lIGRpZ2dpbmcs
+IEkgZmluZCB0aGlzIEtWTSBpbnRlcm5hbCBlcnJvciBzaG93cyB1cCBiZWNhdXNlIEtWTSBjYW5u
+b3QgZW11bGF0ZSBzb21lIE1NSU8gKGdwYSAweGZmZjUzICkuDQoNClNvIEkgYW0gY29uZnVzZWQs
+DQooMSkgZG9lcyBxZW11IHN1cHBvcnQgdmNwdSBob3RwbHVnIGV2ZW4gaWYgZ3Vlc3QgaXMgcnVu
+bmluZyBzZWFiaW9zID8NCigyKSB0aGUgZ3BhICgweGZmZjUzKSBpcyBhbiBhZGRyZXNzIG9mIEJJ
+T1MgUk9NIHNlY3Rpb24sIHdoeSBkb2VzIGt2bSBjb25maXJtIGl0IGFzIGEgbW1pbyBhZGRyZXNz
+IGluY29ycmVjdGx5Pw0K
