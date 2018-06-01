@@ -1,20 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55160)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55640)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1fOkAC-0001Nu-HR
-	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 09:32:22 -0400
+	(envelope-from <famz@redhat.com>) id 1fOkC2-0002QY-Qp
+	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 09:34:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1fOkAB-00016F-Fn
-	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 09:32:16 -0400
-Date: Fri, 1 Jun 2018 14:32:02 +0100
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20180601133202.GS8687@stefanha-x1.localdomain>
-References: <1527801443-30620-1-git-send-email-ari@tuxera.com>
+	(envelope-from <famz@redhat.com>) id 1fOkC2-0002ST-0I
+	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 09:34:10 -0400
+Date: Fri, 1 Jun 2018 21:33:59 +0800
+From: Fam Zheng <famz@redhat.com>
+Message-ID: <20180601133359.GA24752@lemon.usersys.redhat.com>
+References: <20180601091835.21620-1-famz@redhat.com>
+	<20180601124345.GC3458@redhat.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="FYef6pHvFBuPZp1D"
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <1527801443-30620-1-git-send-email-ari@tuxera.com>
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 1/5] block: Add blklogwrites
+In-Reply-To: <20180601124345.GC3458@redhat.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] file-posix: Consolidate the locking error
+ message
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,64 +25,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Ari Sundholm <ari@tuxera.com>
-Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, Aapo Vienamo <aapo@tuxera.com>
+To: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>
+Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
 
-
---FYef6pHvFBuPZp1D
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Fri, Jun 01, 2018 at 12:17:19AM +0300, Ari Sundholm wrote:
-> From: Aapo Vienamo <aapo@tuxera.com>
-
-Thanks for the patch!
-
-> Implements a block device write logging system, similar to Linux kernel
-> device mapper dm-log-writes. The write operations that are performed
-> on a block device are logged to a file or another block device. The
-> write log format is identical to the dm-log-writes format. Currently,
-> log markers are not supported.
+On Fri, 06/01 13:43, Daniel P. Berrang=E9 wrote:
+> On Fri, Jun 01, 2018 at 05:18:35PM +0800, Fam Zheng wrote:
+> > When hot-plugging a block device fails due to image locking errors,
+> > users won't see the helpful 'Is another process using the image?'
+> > message in QMP because currently the error hint is not carried over
+> > there.
+> >=20
+> > Even though extending QMP to include hint is a conceivably easy task,
+> > Libvirt will need some change to consume that data.
+> >=20
+> > Before that is fully sorted out, let's just do the easy fix by joinin=
+g
+> > the two lines.
 >=20
-> This functionality can be used for fail-safe and fs consistency
-> testing. By implementing it in qemu, tests utilizing write logs can be
-> be used to test non-Linux drivers and older kernels.
+> There are many places in QEMU which uses error hints and these are all
+> invisible to libvirt. Arbitrarily picking one hint to remove, while
+> leaving everything else unfixed is not a very satisfactory approach.
+>=20
+> If QEMU passes the hint in QMP, it is trivial for libvirt to be changed
+> to append the hint when reporting its own error message, so can we just
+> focus on fixing the root cause instead of special casing file-posix.c
 
-This patch doesn't implement the same semantics as dm-log-writes, where
-only completed writes are logged to make fs consistency testing easier.
-If you intend to use it for this purpose, shouldn't it act the same way
-as dm-log-writes?
+The plan was to work on the QMP change in parallel, while this simple pat=
+ch can
+mitigate the confusion caused by the relatively vague message (the text i=
+tself
+is going a bit on the cryptic side for people who don't know QEMU interna=
+ls).
 
-> The implementation is based on the blkverify and blkdebug block drivers.
-
-This functionality overlaps with existing block drivers.  In the
-long-term people want to observe I/O requests in various ways beyond
-what the dm-log-writes offers.  Therefore I'd like to suggest a
-different approach that extends the quorum driver instead:
-
-Add a read-pattern=3Dfirst parameter to the block/quorum.c driver so it
-only reads from the first child.  QEMU can be launched with quorum and
-NBD so that writes and flushes are mirrored to the external NBD server.
-
-Any file format or online analysis can be implemented in the NBD server.
-There are a number of NBD plugins here:
-https://github.com/libguestfs/nbdkit
-
-I think sending the writes and flushes over NBD is more flexible.
-
---FYef6pHvFBuPZp1D
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJbEUrSAAoJEJykq7OBq3PIgWYH/1bUCJNUj2FVQ0Cx6cB2WMGq
-Rabq9KteE4aHGnPknQ5EBO9m2+xkRrG9ITyYWGlm2vQ+umlDr2Sjav9Q/QC/+STq
-UB1PjprO58Gt8rqNhCeamvFnLDxNmRihYqB3A4arKZvRmI+9nHzBmNITEa0ynU9O
-oKMleu/uwCKO88RHVDAo/iHPSS2xjT1GI2E2b8xYIQeqq5QVIDq6qANlY4hzRRpk
-LEuQaCmFZhyOsvIGA1vUiDjg/lOlfrf2QPlOPq97qjqHE5XGrWUj/u9w++td7gym
-DYEHnaHWyK8PxRxUBZR1RoT4bPc5EYMJvvYhRhqgwyfkyE1itiH/+eAbEnjzNG4=
-=81D3
------END PGP SIGNATURE-----
-
---FYef6pHvFBuPZp1D--
+Fam
