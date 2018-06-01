@@ -1,24 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34352)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35694)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1fOkbk-0003Sg-D9
-	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 10:00:45 -0400
+	(envelope-from <gengdongjiu@huawei.com>) id 1fOkfQ-0005Fw-Pz
+	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 10:04:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1fOkbi-0007zt-T4
-	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 10:00:44 -0400
-Date: Fri, 1 Jun 2018 15:00:32 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20180601140032.GH3458@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <20180601091835.21620-1-famz@redhat.com>
-	<20180601124345.GC3458@redhat.com>
-	<20180601133359.GA24752@lemon.usersys.redhat.com>
+	(envelope-from <gengdongjiu@huawei.com>) id 1fOkfP-00027w-OV
+	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 10:04:32 -0400
+From: gengdongjiu <gengdongjiu@huawei.com>
+Date: Fri, 1 Jun 2018 13:17:03 +0000
+Message-ID: <0184EA26B2509940AA629AE1405DD7F201CAECD7@DGGEMA503-MBX.china.huawei.com>
+Content-Language: zh-CN
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20180601133359.GA24752@lemon.usersys.redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] file-posix: Consolidate the locking error
- message
+Subject: Re: [Qemu-devel] [PATCH RESEND v1 0/3] add support for VCPU event
+ states
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,124 +22,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>
-Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>, armbru@redhat.com
+To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: "famz@redhat.com" <famz@redhat.com>, "peter.maydell@linaro.org" <peter.maydell@linaro.org>, "james.morse@arm.com" <james.morse@arm.com>, "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>, Linuxarm <linuxarm@huawei.com>
 
-On Fri, Jun 01, 2018 at 09:33:59PM +0800, Fam Zheng wrote:
-> On Fri, 06/01 13:43, Daniel P. Berrang=C3=A9 wrote:
-> > On Fri, Jun 01, 2018 at 05:18:35PM +0800, Fam Zheng wrote:
-> > > When hot-plugging a block device fails due to image locking errors,
-> > > users won't see the helpful 'Is another process using the image?'
-> > > message in QMP because currently the error hint is not carried over
-> > > there.
-> > >=20
-> > > Even though extending QMP to include hint is a conceivably easy tas=
-k,
-> > > Libvirt will need some change to consume that data.
-> > >=20
-> > > Before that is fully sorted out, let's just do the easy fix by join=
-ing
-> > > the two lines.
-> >=20
-> > There are many places in QEMU which uses error hints and these are al=
-l
-> > invisible to libvirt. Arbitrarily picking one hint to remove, while
-> > leaving everything else unfixed is not a very satisfactory approach.
-> >=20
-> > If QEMU passes the hint in QMP, it is trivial for libvirt to be chang=
-ed
-> > to append the hint when reporting its own error message, so can we ju=
-st
-> > focus on fixing the root cause instead of special casing file-posix.c
->=20
-> The plan was to work on the QMP change in parallel, while this simple p=
-atch can
-> mitigate the confusion caused by the relatively vague message (the text=
- itself
-> is going a bit on the cryptic side for people who don't know QEMU inter=
-nals).
-
-I still don't think that it makes sense to remove the use of hints in the
-block layer.
-
-If we don't care about improved error messages for existing libvirt
-versions, we can just add a 'hint' field in QMP and let new libvirt
-use that:
-
-diff --git a/qapi/qmp-dispatch.c b/qapi/qmp-dispatch.c
-index 935f9e159c..82eb823f1f 100644
---- a/qapi/qmp-dispatch.c
-+++ b/qapi/qmp-dispatch.c
-@@ -132,9 +132,15 @@ static QObject *do_qmp_dispatch(QmpCommandList *cmds=
-, QObject *request,
-=20
- QObject *qmp_build_error_object(Error *err)
- {
--    return qobject_from_jsonf("{ 'class': %s, 'desc': %s }",
--                              QapiErrorClass_str(error_get_class(err)),
--                              error_get_pretty(err));
-+    const char *hint =3D error_get_hint(err);
-+    if (hint)
-+        return qobject_from_jsonf("{ 'class': %s, 'desc': %s, 'hint': %s=
- }",
-+                                  QapiErrorClass_str(error_get_class(err=
-)),
-+                                  error_get_pretty(err), hint);
-+    else
-+        return qobject_from_jsonf("{ 'class': %s, 'desc': %s }",
-+                                  QapiErrorClass_str(error_get_class(err=
-)),
-+                                  error_get_pretty(err));
- }
-=20
- /*
-
-
-there's no error_get_hint method right now, but its impl is essentially
-the same as error_get_pretty.
-
-
-If, however, we want to get better error messages for existing libvirt,
-then, we should do:
-
-diff --git a/qapi/qmp-dispatch.c b/qapi/qmp-dispatch.c
-index 935f9e159c..bf6f92375a 100644
---- a/qapi/qmp-dispatch.c
-+++ b/qapi/qmp-dispatch.c
-@@ -132,9 +132,18 @@ static QObject *do_qmp_dispatch(QmpCommandList *cmds=
-, QObject *request,
-=20
- QObject *qmp_build_error_object(Error *err)
- {
--    return qobject_from_jsonf("{ 'class': %s, 'desc': %s }",
--                              QapiErrorClass_str(error_get_class(err)),
--                              error_get_pretty(err));
-+    const char *hint =3D error_get_hint(err);
-+    const char *msg;
-+    if (hint) {
-+        msg =3D g_strdup_printf("%s: %s", error_get_pretty(), hint);
-+    } else {
-+        msg =3D g_strdup(error_get_pretty());
-+    }
-+    QObject *ret =3D qobject_from_jsonf("{ 'class': %s, 'desc': %s }",
-+                                      QapiErrorClass_str(error_get_class=
-(err)),
-+                                      msg);
-+    g_free(msg);
-+    return ret;
- }
-=20
- /*
-
-Personally I'd just go for the first case and only care about new libvirt=
-s.
-
-Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
-ge :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.c=
-om :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
-ge :|
+SGkgUGV0ZXIsDQogIA0KPiBIaSwNCj4gDQo+IFRoaXMgc2VyaWVzIGZhaWxlZCBidWlsZCB0ZXN0
+IG9uIHMzOTB4IGhvc3QuIFBsZWFzZSBmaW5kIHRoZSBkZXRhaWxzIGJlbG93Lg0KPiANClsuLi5d
+DQoNCj4gbWFrZVsxXTogKioqIFdhaXRpbmcgZm9yIHVuZmluaXNoZWQgam9icy4uLi4NCj4gICBD
+QyAgICAgIGFhcmNoNjQtc29mdG1tdS9ody9kaXNwbGF5L3ZnYS5vDQo+ICAgQ0MgICAgICBhYXJj
+aDY0LXNvZnRtbXUvaHcvZGlzcGxheS92aXJ0aW8tZ3B1Lm8NCj4gbWFrZTogKioqIFtNYWtlZmls
+ZTo0ODI6IHN1YmRpci1hcm0tc29mdG1tdV0gRXJyb3IgMg0KPiAgIENDICAgICAgYWFyY2g2NC1z
+b2Z0bW11L2h3L2Rpc3BsYXkvdmlydGlvLWdwdS0zZC5vDQo+ICAgQ0MgICAgICBhYXJjaDY0LXNv
+ZnRtbXUvaHcvZGlzcGxheS92aXJ0aW8tZ3B1LXBjaS5vDQo+ICAgQ0MgICAgICBhYXJjaDY0LXNv
+ZnRtbXUvaHcvZGlzcGxheS9kcGNkLm8NCj4gICBDQyAgICAgIGFhcmNoNjQtc29mdG1tdS9ody9k
+aXNwbGF5L3hsbnhfZHAubw0KPiAvdmFyL3RtcC9wYXRjaGV3LXRlc3Rlci10bXAtaHdzbjN3c2wv
+c3JjL2h3L2Rpc3BsYXkvdmlydGlvLWdwdS0zZC5jOiBJbiBmdW5jdGlvbiDigJh2aXJnbF9jbWRf
+Z2V0X2NhcHNldF9pbmZv4oCZOg0KPiAvdmFyL3RtcC9wYXRjaGV3LXRlc3Rlci10bXAtaHdzbjN3
+c2wvc3JjL2h3L2Rpc3BsYXkvdmlydGlvLWdwdS0zZC5jOjM2NjoyNjogZXJyb3I6IOKAmFZJUlRJ
+T19HUFVfQ0FQU0VUX1ZJUkdMMuKAmSB1bmRlY2xhcmVkIChmaXJzdA0KPiB1c2UgaW4gdGhpcyBm
+dW5jdGlvbik7IGRpZCB5b3UgbWVhbiDigJhWSVJUSU9fR1BVX0NBUFNFVF9WSVJHTOKAmT8NCj4g
+ICAgICAgICAgcmVzcC5jYXBzZXRfaWQgPSBWSVJUSU9fR1BVX0NBUFNFVF9WSVJHTDI7DQo+ICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgXn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+DQo+ICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgVklSVElPX0dQVV9DQVBTRVRfVklSR0wNCj4gL3Zhci90bXAv
+cGF0Y2hldy10ZXN0ZXItdG1wLWh3c24zd3NsL3NyYy9ody9kaXNwbGF5L3ZpcnRpby1ncHUtM2Qu
+YzozNjY6MjY6IG5vdGU6IGVhY2ggdW5kZWNsYXJlZCBpZGVudGlmaWVyIGlzIHJlcG9ydGVkIG9u
+bHkgb25jZSBmb3INCj4gZWFjaCBmdW5jdGlvbiBpdCBhcHBlYXJzIGluDQo+IC92YXIvdG1wL3Bh
+dGNoZXctdGVzdGVyLXRtcC1od3NuM3dzbC9zcmMvaHcvZGlzcGxheS92aXJ0aW8tZ3B1LTNkLmM6
+IEluIGZ1bmN0aW9uIOKAmHZpcnRpb19ncHVfdmlyZ2xfZ2V0X251bV9jYXBzZXRz4oCZOg0KPiAv
+dmFyL3RtcC9wYXRjaGV3LXRlc3Rlci10bXAtaHdzbjN3c2wvc3JjL2h3L2Rpc3BsYXkvdmlydGlv
+LWdwdS0zZC5jOjY0NjozMjogZXJyb3I6IOKAmFZJUlRJT19HUFVfQ0FQU0VUX1ZJUkdMMuKAmSB1
+bmRlY2xhcmVkIChmaXJzdA0KPiB1c2UgaW4gdGhpcyBmdW5jdGlvbik7IGRpZCB5b3UgbWVhbiDi
+gJhWSVJUSU9fR1BVX0NBUFNFVF9WSVJHTOKAmT8NCg0KVGhpcyBidWlsZCBmYWlsdXJlIGlzIGR1
+ZSB0byBrZXJuZWwgbWlzc2luZyB0aGUgZGVmaW5pdGlvbiBvZiAiVklSVElPX0dQVV9DQVBTRVRf
+VklSR0wyIiwgSSBzeW5jIHRoZSBtYWlubGluZSBrZXJuZWwgdHJlZSBoZWFkZXIgZmlsZSB0byB0
+aGUgbWFpbmxpbmUgUUVNVSB1c2luZyB0aGUgc2NyaXB0c1sxXSwNClNvIGhhcHBlbiB0aGlzIGZh
+aWx1cmUsIEl0IGRvZXMgbm90IHJlbGF0ZWQgd2l0aCBteXNlbGYgcGF0Y2gsIHNvIGNhbiBJIGRp
+c2NhcmQgdGhlIHBhdGNoIFsxXSBvciBhZGQgdGhlIOKAmFZJUlRJT19HUFVfQ0FQU0VUX1ZJUkdM
+MuKAmSBkZWZpbml0aW9uIHRvIG1haW5saW5lIGtlcm5lbCB0cmVlPw0KDQpbMV0gaHR0cHM6Ly9s
+aXN0cy5nbnUub3JnL2FyY2hpdmUvaHRtbC9xZW11LWRldmVsLzIwMTgtMDUvbXNnMDY5NzMuaHRt
+bA0KDQo+ICAgICAgdmlyZ2xfcmVuZGVyZXJfZ2V0X2NhcF9zZXQoVklSVElPX0dQVV9DQVBTRVRf
+VklSR0wyLA0KPiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIF5+fn5+fn5+fn5+fn5+
+fn5+fn5+fn5+fg0KPiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIFZJUlRJT19HUFVf
+Q0FQU0VUX1ZJUkdMDQo+IG1ha2VbMV06ICoqKiBbL3Zhci90bXAvcGF0Y2hldy10ZXN0ZXItdG1w
+LWh3c24zd3NsL3NyYy9ydWxlcy5tYWs6NjY6IGh3L2Rpc3BsYXkvdmlydGlvLWdwdS0zZC5vXSBF
+cnJvciAxDQo+IG1ha2VbMV06ICoqKiBXYWl0aW5nIGZvciB1bmZpbmlzaGVkIGpvYnMuLi4uDQo+
+IG1ha2U6ICoqKiBbTWFrZWZpbGU6NDgyOiBzdWJkaXItYWFyY2g2NC1zb2Z0bW11XSBFcnJvciAy
+DQo+ID09PSBPVVRQVVQgRU5EID09PQ0KPiANCj4gVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNv
+ZGU6IDINCj4gDQo+IA0KPiAtLS0NCj4gRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkg
+UGF0Y2hldyBbaHR0cDovL3BhdGNoZXcub3JnL10uDQo+IFBsZWFzZSBzZW5kIHlvdXIgZmVlZGJh
+Y2sgdG8gcGF0Y2hldy1kZXZlbEByZWRoYXQuY29tDQo=
