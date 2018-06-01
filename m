@@ -1,23 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33518)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34858)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1fOgiN-0002sK-Pb
-	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 05:51:21 -0400
+	(envelope-from <groug@kaod.org>) id 1fOgoI-0004nO-NA
+	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 05:57:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1fOgiM-0002LV-Do
-	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 05:51:19 -0400
-Date: Fri, 1 Jun 2018 17:51:05 +0800
-From: Fam Zheng <famz@redhat.com>
-Message-ID: <20180601095105.GC21919@lemon.usersys.redhat.com>
-References: <20180601062849.28641-1-famz@redhat.com>
-	<152783551554.348.11775495549488216762@d39dc562802a>
-	<20180601093709.GD8687@stefanha-x1.localdomain>
+	(envelope-from <groug@kaod.org>) id 1fOgoD-0006Jp-OH
+	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 05:57:26 -0400
+Received: from 10.mo178.mail-out.ovh.net ([46.105.76.150]:42100)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1fOgoD-0006Iz-HT
+	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 05:57:21 -0400
+Received: from player157.ha.ovh.net (unknown [10.109.108.46])
+	by mo178.mail-out.ovh.net (Postfix) with ESMTP id 46CFE164F2
+	for <qemu-devel@nongnu.org>; Fri,  1 Jun 2018 11:57:18 +0200 (CEST)
+Date: Fri, 1 Jun 2018 11:57:14 +0200
+From: Greg Kurz <groug@kaod.org>
+Message-ID: <20180601115714.0d831f92@bahia.lan>
+In-Reply-To: <0758699faca2ee5526d2b64e0a5fdda7e7845cbc.1527814874.git.keno@juliacomputing.com>
+References: <cover.1527814874.git.keno@juliacomputing.com>
+	<0758699faca2ee5526d2b64e0a5fdda7e7845cbc.1527814874.git.keno@juliacomputing.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20180601093709.GD8687@stefanha-x1.localdomain>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v8 00/11] qemu-img convert with copy
- offloading
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 06/20] 9p: Avoid warning if
+ FS_IOC_GETVERSION is not defined
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,25 +31,115 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@redhat.com>
-Cc: qemu-devel@nongnu.org, kwolf@redhat.com, qemu-block@nongnu.org, pl@kamp.de, f4bug@amsat.org, mreitz@redhat.com, ronniesahlberg@gmail.com, pbonzini@redhat.com, alex.bennee@linaro.org
+To: Keno Fischer <keno@juliacomputing.com>
+Cc: qemu-devel@nongnu.org
 
-On Fri, 06/01 10:37, Stefan Hajnoczi wrote:
-> On Thu, May 31, 2018 at 11:45:17PM -0700, no-reply@patchew.org wrote:
-> > /var/tmp/patchew-tester-tmp-2l7s8dte/src/block/iscsi.c: In function =E2=
-=80=98iscsi_populate_target_desc=E2=80=99:
-> > /var/tmp/patchew-tester-tmp-2l7s8dte/src/block/iscsi.c:2242:15: error=
-: =E2=80=98IDENT_DESCR_TGT_DESCR=E2=80=99 undeclared (first use in this f=
-unction); did you mean =E2=80=98IDENT_DESCR_TGT_DESCR_SIZE=E2=80=99?
-> >      desc[0] =3D IDENT_DESCR_TGT_DESCR;
-> >                ^~~~~~~~~~~~~~~~~~~~~
-> >                IDENT_DESCR_TGT_DESCR_SIZE
-> > /var/tmp/patchew-tester-tmp-2l7s8dte/src/block/iscsi.c:2242:15: note:=
- each undeclared identifier is reported only once for each function it ap=
-pears in
->=20
-> Fam, is this failure expected?
+On Thu, 31 May 2018 21:26:01 -0400
+Keno Fischer <keno@juliacomputing.com> wrote:
 
-Nope. See my other reply (v9 posted).
+> Both `stbuf` and `local_ioc_getversion` where unused when
+> FS_IOC_GETVERSION was not defined, causing a compiler warning.
+> 
+> Reorgnaize the code to avoid this warning.
+> 
+> Signed-off-by: Keno Fischer <keno@juliacomputing.com>
+> ---
+> 
+> Changes since v1:
+>  * As request in review, logic is factored into a
+>    local_ioc_getversion_init function.
+> 
+>  hw/9pfs/9p-local.c | 43 +++++++++++++++++++++++++------------------
+>  1 file changed, 25 insertions(+), 18 deletions(-)
+> 
+> diff --git a/hw/9pfs/9p-local.c b/hw/9pfs/9p-local.c
+> index 576c8e3..6222891 100644
+> --- a/hw/9pfs/9p-local.c
+> +++ b/hw/9pfs/9p-local.c
+> @@ -1375,10 +1375,10 @@ static int local_unlinkat(FsContext *ctx, V9fsPath *dir,
+>      return ret;
+>  }
+>  
+> +#ifdef FS_IOC_GETVERSION
+>  static int local_ioc_getversion(FsContext *ctx, V9fsPath *path,
+>                                  mode_t st_mode, uint64_t *st_gen)
+>  {
+> -#ifdef FS_IOC_GETVERSION
+>      int err;
+>      V9fsFidOpenState fid_open;
+>  
+> @@ -1397,32 +1397,19 @@ static int local_ioc_getversion(FsContext *ctx, V9fsPath *path,
+>      err = ioctl(fid_open.fd, FS_IOC_GETVERSION, st_gen);
+>      local_close(ctx, &fid_open);
+>      return err;
+> -#else
+> -    errno = ENOTTY;
+> -    return -1;
+> -#endif
+>  }
+> +#endif
+>  
+> -static int local_init(FsContext *ctx, Error **errp)
+> +static int local_ioc_getversion_init(FsContext *ctx, LocalData *data)
+>  {
+> +#ifdef FS_IOC_GETVERSION
+>      struct statfs stbuf;
+> -    LocalData *data = g_malloc(sizeof(*data));
+>  
+> -    data->mountfd = open(ctx->fs_root, O_DIRECTORY | O_RDONLY);
+> -    if (data->mountfd == -1) {
+> -        error_setg_errno(errp, errno, "failed to open '%s'", ctx->fs_root);
+> -        goto err;
+> -    }
+> -
+> -#ifdef FS_IOC_GETVERSION
+>      /*
+>       * use ioc_getversion only if the ioctl is definied
+>       */
+>      if (fstatfs(data->mountfd, &stbuf) < 0) {
+> -        close_preserve_errno(data->mountfd);
+> -        error_setg_errno(errp, errno,
+> -            "failed to stat file system at '%s'", ctx->fs_root);
+> -        goto err;
 
-Fam
+Hmm, I'd prefer to keep the error_setg_errno() with fstatfs(), ie,
+add an errp argument to this function.
+
+> +        return -1;
+>      }
+>      switch (stbuf.f_type) {
+>      case EXT2_SUPER_MAGIC:
+> @@ -1433,6 +1420,26 @@ static int local_init(FsContext *ctx, Error **errp)
+>          break;
+>      }
+>  #endif
+> +    return 0;
+> +}
+> +
+> +static int local_init(FsContext *ctx, Error **errp)
+> +{
+> +    LocalData *data = g_malloc(sizeof(*data));
+> +
+> +    data->mountfd = open(ctx->fs_root, O_DIRECTORY | O_RDONLY);
+> +    if (data->mountfd == -1) {
+> +        error_setg_errno(errp, errno, "failed to open '%s'", ctx->fs_root);
+> +        goto err;
+> +    }
+> +
+> +    if (local_ioc_getversion_init(ctx, data) < 0) {
+> +        close_preserve_errno(data->mountfd);
+
+And this could even be a plain close()
+
+> +        error_setg_errno(errp, errno,
+> +            "failed initialize ioc_getversion for file system at '%s'",
+
+True, but I think "failed to stat file system" is more meaningful,
+especially with the errno.
+
+> +            ctx->fs_root);
+> +        goto err;
+> +    }
+>  
+>      if (ctx->export_flags & V9FS_SM_PASSTHROUGH) {
+>          ctx->xops = passthrough_xattr_ops;
