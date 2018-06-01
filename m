@@ -1,25 +1,47 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54570)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55404)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1fOasz-0008Np-HD
-	for qemu-devel@nongnu.org; Thu, 31 May 2018 23:37:54 -0400
+	(envelope-from <jl4312@columbia.edu>) id 1fOb22-0001FD-Qk
+	for qemu-devel@nongnu.org; Thu, 31 May 2018 23:47:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1fOasw-0001fI-E9
-	for qemu-devel@nongnu.org; Thu, 31 May 2018 23:37:53 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:38442 helo=mx1.redhat.com)
+	(envelope-from <jl4312@columbia.edu>) id 1fOb1x-0005o6-ME
+	for qemu-devel@nongnu.org; Thu, 31 May 2018 23:47:14 -0400
+Received: from outprodmail01.cc.columbia.edu ([128.59.72.39]:46262)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1fOasw-0001aI-9t
-	for qemu-devel@nongnu.org; Thu, 31 May 2018 23:37:50 -0400
-Date: Fri, 1 Jun 2018 11:37:39 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20180601033739.GF14867@xz-mi>
-References: <1524550428-27173-1-git-send-email-wei.w.wang@intel.com>
-	<1524550428-27173-3-git-send-email-wei.w.wang@intel.com>
+	(Exim 4.71) (envelope-from <jl4312@columbia.edu>) id 1fOb1x-0005W7-I8
+	for qemu-devel@nongnu.org; Thu, 31 May 2018 23:47:09 -0400
+Received: from hazelnut (hazelnut.cc.columbia.edu [128.59.213.250])
+	by outprodmail01.cc.columbia.edu (8.14.4/8.14.4) with ESMTP id
+	w513i8YN013272
+	for <qemu-devel@nongnu.org>; Thu, 31 May 2018 23:47:03 -0400
+Received: from hazelnut (localhost.localdomain [127.0.0.1])
+	by hazelnut (Postfix) with ESMTP id 908DF88
+	for <qemu-devel@nongnu.org>; Thu, 31 May 2018 23:47:03 -0400 (EDT)
+Received: from sendprodmail02.cc.columbia.edu (sendprodmail02.cc.columbia.edu
+	[128.59.72.14]) by hazelnut (Postfix) with ESMTP id 1E8138F
+	for <qemu-devel@nongnu.org>; Thu, 31 May 2018 23:47:02 -0400 (EDT)
+Received: from mail-wr0-f199.google.com (mail-wr0-f199.google.com
+	[209.85.128.199])
+	by sendprodmail02.cc.columbia.edu (8.14.4/8.14.4) with ESMTP id
+	w513l1Ss064699
+	(version=TLSv1/SSLv3 cipher=AES128-GCM-SHA256 bits=128 verify=NOT)
+	for <qemu-devel@nongnu.org>; Thu, 31 May 2018 23:47:01 -0400
+Received: by mail-wr0-f199.google.com with SMTP id l6-v6so17952724wrn.17
+	for <qemu-devel@nongnu.org>; Thu, 31 May 2018 20:47:01 -0700 (PDT)
+Received: from mail-wr0-f180.google.com (mail-wr0-f180.google.com.
+	[209.85.128.180]) by smtp.gmail.com with ESMTPSA id
+	f11-v6sm13196345ede.45.2018.05.31.20.46.59
+	for <qemu-devel@nongnu.org>
+	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+	Thu, 31 May 2018 20:46:59 -0700 (PDT)
+Received: by mail-wr0-f180.google.com with SMTP id j1-v6so34894993wrm.1
+	for <qemu-devel@nongnu.org>; Thu, 31 May 2018 20:46:59 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <1524550428-27173-3-git-send-email-wei.w.wang@intel.com>
-Subject: Re: [Qemu-devel] [PATCH v7 2/5] migration: use bitmap_mutex in
- migration_bitmap_clear_dirty
+From: Jintack Lim <jintack@cs.columbia.edu>
+Date: Thu, 31 May 2018 23:46:58 -0400
+Message-ID: <CAHyh4xhckUtH=gfa5K+KVehz27hVznUg7UX-Ca-AcjCvtiAhHg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: [Qemu-devel] vIOMMU Posted-interrupt implementation - atomic
+ operation?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,58 +50,17 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Wei Wang <wei.w.wang@intel.com>
-Cc: qemu-devel@nongnu.org, virtio-dev@lists.oasis-open.org, mst@redhat.com, quintela@redhat.com, dgilbert@redhat.com, yang.zhang.wz@gmail.com, quan.xu0@gmail.com, liliang.opensource@gmail.com, pbonzini@redhat.com, nilal@redhat.com
+To: QEMU Devel Mailing List <qemu-devel@nongnu.org>
+Cc: Peter Xu <peterx@redhat.com>
 
-On Tue, Apr 24, 2018 at 02:13:45PM +0800, Wei Wang wrote:
-> The bitmap mutex is used to synchronize threads to update the dirty
-> bitmap and the migration_dirty_pages counter. This patch makes
-> migration_bitmap_clear_dirty update the bitmap and counter under the
-> mutex.
-> 
-> Signed-off-by: Wei Wang <wei.w.wang@intel.com>
-> CC: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> CC: Juan Quintela <quintela@redhat.com>
-> CC: Michael S. Tsirkin <mst@redhat.com>
-> ---
->  migration/ram.c | 3 +++
->  1 file changed, 3 insertions(+)
-> 
-> diff --git a/migration/ram.c b/migration/ram.c
-> index 0e90efa..9a72b1a 100644
-> --- a/migration/ram.c
-> +++ b/migration/ram.c
-> @@ -795,11 +795,14 @@ static inline bool migration_bitmap_clear_dirty(RAMState *rs,
->  {
->      bool ret;
->  
-> +    qemu_mutex_lock(&rs->bitmap_mutex);
->      ret = test_and_clear_bit(page, rb->bmap);
->  
->      if (ret) {
->          rs->migration_dirty_pages--;
->      }
-> +    qemu_mutex_unlock(&rs->bitmap_mutex);
-> +
->      return ret;
->  }
->  
-> -- 
-> 1.8.3.1
-> 
-> 
+Hi,
 
-Do we need the lock after all?
+I'm implementing Posted-interrupt functionality in vIOMMU. According
+to Vt-d spec 5.2.3, IOMMU performs a coherent atomic read-modify-write
+operation of the posted-interrupt descriptor. I wonder how can we
+achieve this considering the guest can modify the same
+posted-interrupt descriptor anytime. Is there any existing mechanism
+that I can use in QEMU?
 
-I see that we introduced this lock due to device hotplug at dd63169766
-("migration: extend migration_bitmap", 2015-07-07), however now we
-actually don't allow that to happen any more after commit b06424de62
-("migration: Disable hotplug/unplug during migration", 2017-04-21).
-I'm not sure whether it means that the lock is not needed now.
-
-If so, this patch seems to be unecessary.
-
-Regards,
-
--- 
-Peter Xu
+Thanks,
+Jintack
