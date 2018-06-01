@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51495)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52277)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1fOXVV-0008Kk-13
-	for qemu-devel@nongnu.org; Thu, 31 May 2018 20:01:26 -0400
+	(envelope-from <jsnow@redhat.com>) id 1fOXcr-0001KZ-N7
+	for qemu-devel@nongnu.org; Thu, 31 May 2018 20:09:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1fOXVT-0000kV-Ul
-	for qemu-devel@nongnu.org; Thu, 31 May 2018 20:01:25 -0400
-References: <20180531222835.16558-1-jsnow@redhat.com>
+	(envelope-from <jsnow@redhat.com>) id 1fOXcq-0007jK-Lp
+	for qemu-devel@nongnu.org; Thu, 31 May 2018 20:09:01 -0400
+References: <1524822046-22779-1-git-send-email-thuth@redhat.com>
 From: John Snow <jsnow@redhat.com>
-Message-ID: <9165e456-b62b-4cfd-afc5-8520d1de0f07@redhat.com>
-Date: Thu, 31 May 2018 20:01:17 -0400
+Message-ID: <4eae64a0-6f03-48c0-0c36-cb4d879169a7@redhat.com>
+Date: Thu, 31 May 2018 20:08:53 -0400
 MIME-Version: 1.0
-In-Reply-To: <20180531222835.16558-1-jsnow@redhat.com>
+In-Reply-To: <1524822046-22779-1-git-send-email-thuth@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 00/16] AHCI: tracing improvements
+Subject: Re: [Qemu-devel] [PATCH v3 0/4] Add new CD-ROM related qtests
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,46 +23,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: f4bug@amsat.org
+To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org
 
 
 
-On 05/31/2018 06:28 PM, John Snow wrote:
-> This set just adds register names so that the read/write traces make
-> more sense on their own without having to memorize register offsets.
-> It also splits read/write traces into supported/unsupported subsets,
-> so you can just monitor for things that QEMU is likely doing wrong.
+On 04/27/2018 05:40 AM, Thomas Huth wrote:
+> With one of my clean-up patches (see commit 1454509726719e0933c800), I
+> recently accidentially broke the "-cdrom" parameter (more precisely
+> "-drive if=scsi") on a couple of boards, since there was no error
+> detected during the "make check" regression testing. This is clearly an
+> indication that we are lacking tests in this area.
+> So this small patch series now introduces some tests for CD-ROM drives:
+> The first two patches introduce the possibility to check that booting
+> from CD-ROM drives still works fine for x86 and s390x, and the third
+> patch adds a test that certain machines can at least still be started
+> with the "-cdrom" parameter (i.e. that test would have catched the
+> mistake that I did with my SCSI cleanup patch).
+> 
+> v3:
+>  - Rebased to current master branch
+>  - Add a final patch that adds an entry to the MAINTAINERS file
 > 
 > v2:
->  - Added qemu_log_mask(LOG_UNIMP, ...) statements in addition to traces
->    for writes to unknown/unsupported registers. (Philippe)
+>  - Use g_spawn_sync() instead of execlp() to run genisoimage
+>  - The "-cdrom" parameter test is now run on all architectures (with
+>    machine "none" for the machines that are not explicitly checked)
+>  - Some rewordings and improved comments here and there
 > 
-> John Snow (16):
->   ahci: add port register enumeration
->   ahci: modify ahci_port_read to use register numbers
->   ahci: make port read traces more descriptive
->   ahci: fix spacing damage on ahci_port_write
->   ahci: combine identical clauses in port write
->   ahci: modify ahci_port_write to use register numbers
->   ahci: make port write traces more descriptive
->   ahci: delete old port register address definitions
->   ahci: add host register enumeration
->   ahci: fix host register max address
->   ahci: modify ahci_mem_read_32 to work on register numbers
->   ahci: make mem_read_32 traces more descriptive
->   ahci: fix spacing damage on ahci_mem_write
->   ahci: adjust ahci_mem_write to work on registers
->   ahci: delete old host register address definitions
->   ahci: make ahci_mem_write traces more descriptive
+> Thomas Huth (4):
+>   tests/boot-sector: Add magic bytes to s390x boot code header
+>   tests/cdrom-test: Test booting from CD-ROM ISO image file
+>   tests/cdrom-test: Test that -cdrom parameter is working
+>   MAINTAINERS: Add the cdrom-test to John's section
 > 
->  hw/ide/ahci.c          | 314 ++++++++++++++++++++++++++++++-------------------
->  hw/ide/ahci_internal.h |  63 ++++++----
->  hw/ide/trace-events    |  13 +-
->  3 files changed, 241 insertions(+), 149 deletions(-)
+>  MAINTAINERS            |   1 +
+>  tests/Makefile.include |   2 +
+>  tests/boot-sector.c    |   9 +-
+>  tests/cdrom-test.c     | 222 +++++++++++++++++++++++++++++++++++++++++++++++++
+>  4 files changed, 231 insertions(+), 3 deletions(-)
+>  create mode 100644 tests/cdrom-test.c
 > 
 
-Touched up the format strings, and
+*coughs*
 
 Thanks, applied to my IDE tree:
 
