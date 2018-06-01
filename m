@@ -1,25 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60918)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33309)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fOmUV-0003nJ-2w
-	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 12:01:23 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1fOmX7-0005jZ-Qc
+	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 12:04:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fOmUQ-0008HW-UG
-	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 12:01:23 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:49688 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1fOmUQ-0008H4-Pv
-	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 12:01:18 -0400
-References: <20180601153922.11590-1-ricardo.perez_blanco@nokia.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <e31963b7-b5c2-2cd4-92e6-7fc0ddbb881f@redhat.com>
-Date: Fri, 1 Jun 2018 11:01:17 -0500
-MIME-Version: 1.0
-In-Reply-To: <20180601153922.11590-1-ricardo.perez_blanco@nokia.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2] Show values and description when using
- "qom-list"
+	(envelope-from <pm215@archaic.org.uk>) id 1fOmX6-0002IE-Kd
+	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 12:04:05 -0400
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri,  1 Jun 2018 17:03:55 +0100
+Message-Id: <20180601160355.15393-1-peter.maydell@linaro.org>
+Subject: [Qemu-devel] [PATCH] arm: Don't crash if user tries to use a
+ Cortex-M CPU without an NVIC
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,36 +18,102 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Ricardo Perez Blanco <ricardo.perez_blanco@nokia.com>
-Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Markus Armbruster <armbru@redhat.com>, =?UTF-8?Q?Andreas_F=c3=a4rber?= <afaerber@suse.de>, "open list:All patches CC here" <qemu-devel@nongnu.org>
+To: qemu-arm@nongnu.org, qemu-devel@nongnu.org
+Cc: patches@linaro.org
 
-On 06/01/2018 10:39 AM, Ricardo Perez Blanco wrote:
-> For debugging purposes it is very useful to:
->   - See the description of the field. This information is already filled
->     in but not shown in "qom-list" command.
->   - Display value of the field.
-> 
-> Signed-off-by: Ricardo Perez Blanco <ricardo.perez_blanco@nokia.com>
-> ---
+The Cortex-M CPU and its NVIC are two intimately intertwined parts of
+the same hardware; it is not possible to use one without the other.
+Unfortunately a lot of our board models don't do any sanity checking
+on the CPU type the user asks for, so a command line like
+    qemu-system-arm -M versatilepb -cpu cortex-m3
+will create an M3 without an NVIC, and coredump immediately.
+In the other direction, trying a non-M-profile CPU in an M-profile
+board won't blow up, but doesn't do anything useful either:
+    qemu-system-arm -M lm3s6965evb -cpu arm926
 
-> +++ b/qapi/misc.json
-> @@ -1328,10 +1328,12 @@
->   #
->   # @description: if specified, the description of the property.
->   #
-> -# Since: 1.2
-> +# @value: if specified, the value of the property.
-> +#
-> +# Since: 2.13
+Add some checking in the NVIC and CPU realize functions that the
+user isn't trying to use an NVIC without an M-profile CPU or
+an M-profile CPU without an NVIC, so we can produce a helpful
+error message rather than a core dump.
 
-Not quite. The struct was first introduced in 1.2, and only 'value' was 
-added in 3.0 (since we've renamed 2.13 into 3.0).  It should look like:
+Fixes: https://bugs.launchpad.net/qemu/+bug/1766896
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+---
+ hw/arm/armv7m.c       |  7 ++++++-
+ hw/intc/armv7m_nvic.c |  6 +++++-
+ target/arm/cpu.c      | 18 ++++++++++++++++++
+ 3 files changed, 29 insertions(+), 2 deletions(-)
 
-# @value: if specified, the value of the property (since 3.0)
-#
-# Since: 1.2
-
+diff --git a/hw/arm/armv7m.c b/hw/arm/armv7m.c
+index a4ab7d2069..9e00d4037c 100644
+--- a/hw/arm/armv7m.c
++++ b/hw/arm/armv7m.c
+@@ -178,6 +178,12 @@ static void armv7m_realize(DeviceState *dev, Error **errp)
+             return;
+         }
+     }
++
++    /* Tell the CPU where the NVIC is; it will fail realize if it doesn't
++     * have one.
++     */
++    s->cpu->env.nvic = &s->nvic;
++
+     object_property_set_bool(OBJECT(s->cpu), true, "realized", &err);
+     if (err != NULL) {
+         error_propagate(errp, err);
+@@ -202,7 +208,6 @@ static void armv7m_realize(DeviceState *dev, Error **errp)
+     sbd = SYS_BUS_DEVICE(&s->nvic);
+     sysbus_connect_irq(sbd, 0,
+                        qdev_get_gpio_in(DEVICE(s->cpu), ARM_CPU_IRQ));
+-    s->cpu->env.nvic = &s->nvic;
+ 
+     memory_region_add_subregion(&s->container, 0xe000e000,
+                                 sysbus_mmio_get_region(sbd, 0));
+diff --git a/hw/intc/armv7m_nvic.c b/hw/intc/armv7m_nvic.c
+index c51151fa8a..661be8878a 100644
+--- a/hw/intc/armv7m_nvic.c
++++ b/hw/intc/armv7m_nvic.c
+@@ -2183,7 +2183,11 @@ static void armv7m_nvic_realize(DeviceState *dev, Error **errp)
+     int regionlen;
+ 
+     s->cpu = ARM_CPU(qemu_get_cpu(0));
+-    assert(s->cpu);
++
++    if (!s->cpu || !arm_feature(&s->cpu->env, ARM_FEATURE_M)) {
++        error_setg(errp, "The NVIC can only be used with a Cortex-M CPU");
++        return;
++    }
+ 
+     if (s->num_irq > NVIC_MAX_IRQ) {
+         error_setg(errp, "num-irq %d exceeds NVIC maximum", s->num_irq);
+diff --git a/target/arm/cpu.c b/target/arm/cpu.c
+index 5d60893a07..eda1ce14fc 100644
+--- a/target/arm/cpu.c
++++ b/target/arm/cpu.c
+@@ -767,6 +767,24 @@ static void arm_cpu_realizefn(DeviceState *dev, Error **errp)
+         return;
+     }
+ 
++#ifndef CONFIG_USER_ONLY
++    /* The NVIC and M-profile CPU are two halves of a single piece of
++     * hardware; trying to use one without the other is a command line
++     * error and will result in segfaults if not caught here.
++     */
++    if (arm_feature(env, ARM_FEATURE_M)) {
++        if (!env->nvic) {
++            error_setg(errp, "This board cannot be used with Cortex-M CPUs");
++            return;
++        }
++    } else {
++        if (env->nvic) {
++            error_setg(errp, "This board can only be used with Cortex-M CPUs");
++            return;
++        }
++    }
++#endif
++
+     cpu_exec_realizefn(cs, &local_err);
+     if (local_err != NULL) {
+         error_propagate(errp, local_err);
 -- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+2.17.1
