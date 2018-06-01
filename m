@@ -1,34 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47145)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49339)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fOnQF-0004T5-68
-	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 13:01:04 -0400
+	(envelope-from <eblake@redhat.com>) id 1fOnas-0003JM-7b
+	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 13:12:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fOnQC-0004Au-3L
-	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 13:01:03 -0400
-Received: from indium.canonical.com ([91.189.90.7]:60090)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1fOnQB-0004A7-TJ
-	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 13:01:00 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1fOnQ9-00047t-Lm
-	for <qemu-devel@nongnu.org>; Fri, 01 Jun 2018 17:00:57 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 98BD72E88E8
-	for <qemu-devel@nongnu.org>; Fri,  1 Jun 2018 17:00:56 +0000 (UTC)
+	(envelope-from <eblake@redhat.com>) id 1fOnao-0005vK-VI
+	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 13:12:02 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:51372 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1fOnao-0005uT-Nm
+	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 13:11:58 -0400
+References: <20180601165750.25420-1-chen_han_xiao@126.com>
+	<20180601165750.25420-2-chen_han_xiao@126.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <478a831b-bf3d-8bcf-92d2-bc710f2d6bc2@redhat.com>
+Date: Fri, 1 Jun 2018 12:11:57 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <20180601165750.25420-2-chen_han_xiao@126.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Date: Fri, 01 Jun 2018 16:50:50 -0000
-From: M0Rf30 <morfeo89@hotmail.it>
-Reply-To: Bug 1772075 <1772075@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <152666493053.16686.5820944431341933507.malonedeb@wampee.canonical.com>
-Message-Id: <152787185014.24285.13473160274053406564.malone@gac.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1772075] Re: Segmentation fault on aarch64 vm at
- powerdown
+Subject: Re: [Qemu-devel] [PATCH v5.1 1/2] qga: add mountpoint usage info to
+ GuestFilesystemInfo
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,58 +29,104 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Chen Hanxiao <chen_han_xiao@126.com>, qemu-devel@nongnu.org
+Cc: Michael Roth <mdroth@linux.vnet.ibm.com>, "=?UTF-8?Q?Daniel_P_._Berrang=c3=a9?=" <berrange@redhat.com>
 
-QEMU_EFI.fd:
-http://snapshots.linaro.org/components/kernel/leg-virt-tianocore-edk2-upstr=
-eam/latest/QEMU-AARCH64/RELEASE_GCC5/QEMU_EFI.fd
+On 06/01/2018 11:57 AM, Chen Hanxiao wrote:
+> From: Chen Hanxiao <chenhanxiao@gmail.com>
+>=20
+> This patch adds support for getting the usage of mounted
+> filesystem.
+> The usage of fs stored as used_bytes and total_bytes.
+> It's very useful when we try to monitor guest's filesystem.
+>=20
+> Cc: Michael Roth <mdroth@linux.vnet.ibm.com>
+> Cc: Eric Blake <eblake@redhat.com>
+> Cc: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+> Signed-off-by: Chen Hanxiao <chenhanxiao@gmail.com>
+> ---
+> +++ b/qga/commands-posix.c
+> @@ -46,6 +46,7 @@ extern char **environ;
+>   #include <arpa/inet.h>
+>   #include <sys/socket.h>
+>   #include <net/if.h>
+> +#include <sys/statvfs.h>
+>  =20
+>   #ifdef FIFREEZE
+>   #define CONFIG_FSFREEZE
+> @@ -1072,6 +1073,8 @@ static GuestFilesystemInfo *build_guest_fsinfo(st=
+ruct FsMount *mount,
+>                                                  Error **errp)
+>   {
+>       GuestFilesystemInfo *fs =3D g_malloc0(sizeof(*fs));
 
-sd-image:
-generated as this says:
-https://archlinuxarm.org/platforms/armv8/broadcom/raspberry-pi-3
-(same error also with latest raspbian image)
+Because this is 0-initialized,
 
-kernel image:
-https://github.com/M0Rf30/qemu-kernels-rpi-arch-arm/tree/master/rpi3
+> +    struct statvfs buf;
+> +    unsigned long used, nonroot_total, fr_size;
+>       char *devpath =3D g_strdup_printf("/sys/dev/block/%u:%u",
+>                                       mount->devmajor, mount->devminor)=
+;
+>  =20
+> @@ -1079,7 +1082,22 @@ static GuestFilesystemInfo *build_guest_fsinfo(s=
+truct FsMount *mount,
+>       fs->type =3D g_strdup(mount->devtype);
+>       build_guest_fsinfo_for_device(devpath, fs, errp);
+>  =20
+> +    if (statvfs(fs->mountpoint, &buf)) {
+> +        fs->has_total_bytes =3D false;
+> +        fs->has_used_bytes =3D false;
 
-initrd image:
-is indifferent. in cmdline is used the initrd from arch boot partition
+this branch is dead assignments.  You could simplify to just 'if=20
+(statvfs(...) =3D=3D 0)' with no 'else' branch needed.
 
-on releases previous to 2.12 this error is not present
+> +    } else {
+> +        fr_size =3D buf.f_frsize;
+> +        used =3D buf.f_blocks - buf.f_bfree;
+> +        nonroot_total =3D used + buf.f_bavail;
+> +        fs->used_bytes =3D used * fr_size;
+> +        fs->total_bytes =3D nonroot_total * fr_size;
+> +
+> +        fs->has_total_bytes =3D true;
+> +        fs->has_used_bytes =3D true;
+> +    }
+> +
+>       g_free(devpath);
+> +
+>       return fs;
+>   }
+>  =20
+> diff --git a/qga/qapi-schema.json b/qga/qapi-schema.json
+> index 17884c7c70..56ce2d08e2 100644
+> --- a/qga/qapi-schema.json
+> +++ b/qga/qapi-schema.json
+> @@ -846,6 +846,8 @@
+>   # @name: disk name
+>   # @mountpoint: mount point path
+>   # @type: file system type string
+> +# @used-bytes: file system used bytes (since 3.0)
+> +# @total-bytes: nonroot file system total bytes (since 3.0)
 
--- =
+s/nonroot/non-root/
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1772075
+>   # @disk: an array of disk hardware information that the volume lies o=
+n,
+>   #        which may be empty if the disk type is not supported
+>   #
+> @@ -853,6 +855,7 @@
+>   ##
+>   { 'struct': 'GuestFilesystemInfo',
+>     'data': {'name': 'str', 'mountpoint': 'str', 'type': 'str',
+> +           '*used-bytes': 'uint64', '*total-bytes': 'uint64',
+>              'disk': ['GuestDiskAddress']} }
+>  =20
+>   ##
+>=20
 
-Title:
-  Segmentation fault on aarch64 vm at powerdown
+Both those changes are minor, so at this point, I'm comfortable with:
+Reviewed-by: Eric Blake <eblake@redhat.com>
 
-Status in QEMU:
-  New
-
-Bug description:
-  OS Arch Linux
-  x86_64
-  qemu version: 2.12
-
-  cmdline:
-  qemu-system-aarch64 -nographic -cpu cortex-a57 -m 2048 -M virt,gic_versio=
-n=3D3 -machine virtualization=3Dtrue -bios /usr/share/ovmf/AARCH64/QEMU_EFI=
-.fd -drive file=3Dfat:rw:/opt/simonpiemu/kernels/rpi-3,if=3Dnone,format=3Dr=
-aw,cache=3Dnone,id=3Dhd0 -device virtio-blk-device,drive=3Dhd0 -drive file=
-=3D/home/morfeo/.simonpi/sd-arch-rpi-3-qemu.img,if=3Dnone,format=3Draw,cach=
-e=3Dnone,id=3Dhd1 -device virtio-blk-device,drive=3Dhd1 -kernel /opt/simonp=
-iemu/kernels/rpi-3/Image -append "root=3D/dev/vda2 fstab=3Dno rootfstype=3D=
-ext4 rw console=3DttyAMA0" -initrd /home/morfeo/.simonpi/rpi-3/boot/initram=
-fs-linux.img -device virtio-net-device,mac=3D52:54:26:11:72:9b,netdev=3Dnet=
-0 -netdev tap,id=3Dnet0,ifname=3Drasp-tap0,script=3Dno,downscript=3Dno
-
-  error:
-
-  qemu-system-aarch64: /build/qemu/src/qemu-2.12.0/block.c:3375:
-  bdrv_close_all: Assertion `QTAILQ_EMPTY(&all_bdrv_states)' failed.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1772075/+subscriptions
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
