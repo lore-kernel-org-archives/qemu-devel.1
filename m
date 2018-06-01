@@ -1,14 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47022)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47064)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1fOdYm-00062o-Ee
-	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 02:29:13 -0400
+	(envelope-from <famz@redhat.com>) id 1fOdYp-00065K-UW
+	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 02:29:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1fOdYl-0004tz-HU
-	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 02:29:12 -0400
+	(envelope-from <famz@redhat.com>) id 1fOdYp-0004z3-2N
+	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 02:29:15 -0400
 From: Fam Zheng <famz@redhat.com>
-Date: Fri,  1 Jun 2018 14:28:38 +0800
-Message-Id: <20180601062849.28641-1-famz@redhat.com>
-Subject: [Qemu-devel] [PATCH v8 00/11] qemu-img convert with copy offloading
+Date: Fri,  1 Jun 2018 14:28:39 +0800
+Message-Id: <20180601062849.28641-2-famz@redhat.com>
+In-Reply-To: <20180601062849.28641-1-famz@redhat.com>
+References: <20180601062849.28641-1-famz@redhat.com>
+Subject: [Qemu-devel] [PATCH v8 01/11] docker: Update fedora image to 28
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,67 +22,20 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Paolo Bonzini <pbonzini@redhat.com>, Ronnie Sahlberg <ronniesahlberg@gmail.com>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Fam Zheng <famz@redhat.com>, Peter Lieven <pl@kamp.de>, Max Reitz <mreitz@redhat.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Stefan Hajnoczi <stefanha@redhat.com>, eblake@redhat.com
 
-v8: Fix compiling against new glibc and libiscsi on Fedora 28 where v7 had
-    conflict definitions. [Stefan, myself]
-    - Add HAVE_COPY_FILE_RANGE in configure.
-    - Drop IDENT_DESCR_TGT_DESCR from scsi constants header.
+Signed-off-by: Fam Zheng <famz@redhat.com>
+---
+ tests/docker/dockerfiles/fedora.docker | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-v7: Fix qcow2.
-
-v6: Pick up rev-by from Stefan and Eric.
-    Tweak patch 2 commit message.
-
-v5: - Fix raw offset/bytes check for read. [Eric]
-    - Fix qcow2_handle_l2meta. [Stefan]
-    - Add coroutine_fn whereever appropriate. [Stefan]
-
-v4: - Fix raw offset and size. [Eric]
-    - iscsi: Drop unnecessary return values and variables in favor of
-      constants. [Stefan]
-    - qcow2: Handle small backing case. [Stefan]
-    - file-posix: Translate ENOSYS to ENOTSUP. [Stefan]
-    - API documentation and commit message. [Stefan]
-    - Add rev-by to patches 3, 5 - 10. [Stefan, Eric]
-
-This series introduces block layer API for copy offloading and makes use of it
-in qemu-img convert.
-
-For now we implemented the operation in local file protocol with
-copy_file_range(2).  Besides that it's possible to add similar to iscsi, nfs
-and potentially more.
-
-As far as its usage goes, in addition to qemu-img convert, we can emulate
-offloading in scsi-disk (handle EXTENDED COPY command), and use the API in
-block jobs too.
-
-Fam Zheng (11):
-  docker: Update fedora image to 28
-  block: Introduce API for copy offloading
-  raw: Check byte range uniformly
-  raw: Implement copy offloading
-  qcow2: Implement copy offloading
-  file-posix: Implement bdrv_co_copy_range
-  iscsi: Query and save device designator when opening
-  iscsi: Create and use iscsi_co_wait_for_task
-  iscsi: Implement copy offloading
-  block-backend: Add blk_co_copy_range
-  qemu-img: Convert with copy offloading
-
- block/block-backend.c                  |  18 ++
- block/file-posix.c                     |  98 +++++++-
- block/io.c                             |  97 ++++++++
- block/iscsi.c                          | 314 ++++++++++++++++++++++---
- block/qcow2.c                          | 229 +++++++++++++++---
- block/raw-format.c                     |  96 ++++++--
- configure                              |  17 ++
- include/block/block.h                  |  32 +++
- include/block/block_int.h              |  38 +++
- include/block/raw-aio.h                |  10 +-
- include/scsi/constants.h               |   4 +
- include/sysemu/block-backend.h         |   4 +
- qemu-img.c                             |  50 +++-
- tests/docker/dockerfiles/fedora.docker |   2 +-
- 14 files changed, 909 insertions(+), 100 deletions(-)
-
+diff --git a/tests/docker/dockerfiles/fedora.docker b/tests/docker/dockerfiles/fedora.docker
+index b706f42405..65d7761cf5 100644
+--- a/tests/docker/dockerfiles/fedora.docker
++++ b/tests/docker/dockerfiles/fedora.docker
+@@ -1,4 +1,4 @@
+-FROM fedora:27
++FROM fedora:28
+ ENV PACKAGES \
+     ccache gettext git tar PyYAML sparse flex bison python3 bzip2 hostname \
+     gcc gcc-c++ llvm clang make perl which bc findutils glib2-devel \
 -- 
 2.17.0
