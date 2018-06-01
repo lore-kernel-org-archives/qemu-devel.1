@@ -1,16 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37630)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38864)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1fOknB-0007Tg-SR
-	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 10:12:34 -0400
+	(envelope-from <eblake@redhat.com>) id 1fOkqX-0001rU-0j
+	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 10:16:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1fOknA-0000mu-V0
-	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 10:12:33 -0400
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri,  1 Jun 2018 15:12:18 +0100
-Message-Id: <20180601141223.26630-2-peter.maydell@linaro.org>
-In-Reply-To: <20180601141223.26630-1-peter.maydell@linaro.org>
-References: <20180601141223.26630-1-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PATCH 1/6] hw/sh/sh7750: Convert away from old_mmio
+	(envelope-from <eblake@redhat.com>) id 1fOkqS-0004R9-QA
+	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 10:16:01 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:46552 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1fOkqS-0004Qe-KH
+	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 10:15:56 -0400
+References: <cover.1527814874.git.keno@juliacomputing.com>
+	<1f6bc60305b8c1cd00f5e2a361a05d7b4bc56338.1527814874.git.keno@juliacomputing.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <09d916f2-491c-fb8b-c42e-34814eaaf447@redhat.com>
+Date: Fri, 1 Jun 2018 09:15:55 -0500
+MIME-Version: 1.0
+In-Reply-To: <1f6bc60305b8c1cd00f5e2a361a05d7b4bc56338.1527814874.git.keno@juliacomputing.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 01/20] cutils: Provide strchrnul
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -19,72 +28,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: patches@linaro.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Thomas Huth <huth@tuxfamily.org>, Aurelien Jarno <aurelien@aurel32.net>, qemu-block@nongnu.org, Yongbok Kim <yongbok.kim@mips.com>
+To: Keno Fischer <keno@juliacomputing.com>, qemu-devel@nongnu.org
+Cc: groug@kaod.org
 
-Convert the sh7750 device away from using the old_mmio field
-of MemoryRegionOps. This device is used by the sh4 r2d board.
+On 05/31/2018 08:25 PM, Keno Fischer wrote:
+> strchrnul is a GNU extension and thus unavailable on a number of targets.
+> In the review for a commit removing strchrnul from 9p, I was asked to
+> create a qemu_strchrnul helper to factor out this functionality.
+> Do so, and use it in a number of other places in the code base that inlined
+> the replacement pattern in a place where strchrnul could be used.
+> 
+> Signed-off-by: Keno Fischer <keno@juliacomputing.com>
+> ---
+> 
 
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
----
- hw/sh4/sh7750.c | 44 ++++++++++++++++++++++++++++++++++++--------
- 1 file changed, 36 insertions(+), 8 deletions(-)
+> +++ b/util/cutils.c
+> @@ -545,6 +545,19 @@ int qemu_strtou64(const char *nptr, const char **endptr, int base,
+>   }
+>   
+>   /**
+> + * Searches for the first occurrence of 'c' in 's', and returns a pointer
+> + * to the trailing null byte if none was found.
+> + */
+> +const char *qemu_strchrnul(const char *s, int c)
+> +{
+> +    const char *e = strchr(s, c);
+> +    if (!e) {
+> +        e = s + strlen(s);
+> +    }
+> +    return e;
+> +}
 
-diff --git a/hw/sh4/sh7750.c b/hw/sh4/sh7750.c
-index 5a7d47d31e..b932f33409 100644
---- a/hw/sh4/sh7750.c
-+++ b/hw/sh4/sh7750.c
-@@ -451,15 +451,43 @@ static void sh7750_mem_writel(void *opaque, hwaddr addr,
-     }
- }
- 
-+static uint64_t sh7750_mem_readfn(void *opaque, hwaddr addr, unsigned size)
-+{
-+    switch (size) {
-+    case 1:
-+        return sh7750_mem_readb(opaque, addr);
-+    case 2:
-+        return sh7750_mem_readw(opaque, addr);
-+    case 4:
-+        return sh7750_mem_readl(opaque, addr);
-+    default:
-+        g_assert_not_reached();
-+    }
-+}
-+
-+static void sh7750_mem_writefn(void *opaque, hwaddr addr,
-+                               uint64_t value, unsigned size)
-+{
-+    switch (size) {
-+    case 1:
-+        sh7750_mem_writeb(opaque, addr, value);
-+        break;
-+    case 2:
-+        sh7750_mem_writew(opaque, addr, value);
-+        break;
-+    case 4:
-+        sh7750_mem_writel(opaque, addr, value);
-+        break;
-+    default:
-+        g_assert_not_reached();
-+    }
-+}
-+
- static const MemoryRegionOps sh7750_mem_ops = {
--    .old_mmio = {
--        .read = {sh7750_mem_readb,
--                 sh7750_mem_readw,
--                 sh7750_mem_readl },
--        .write = {sh7750_mem_writeb,
--                  sh7750_mem_writew,
--                  sh7750_mem_writel },
--    },
-+    .read = sh7750_mem_readfn,
-+    .write = sh7750_mem_writefn,
-+    .valid.min_access_size = 1,
-+    .valid.max_access_size = 4,
-     .endianness = DEVICE_NATIVE_ENDIAN,
- };
- 
+This is twice as slow on glibc systems when the pointer to NUL is 
+returned (because it has to traverse the string twice); it's better to 
+have a configure check for whether strchrnul exists, and if so, use that 
+directly.
+
 -- 
-2.17.1
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
