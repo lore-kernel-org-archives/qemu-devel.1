@@ -1,21 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41311)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43866)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1fOZfc-0005Ce-I6
-	for qemu-devel@nongnu.org; Thu, 31 May 2018 22:20:02 -0400
+	(envelope-from <famz@redhat.com>) id 1fOZv9-0007D1-6V
+	for qemu-devel@nongnu.org; Thu, 31 May 2018 22:36:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1fOZfb-0000NR-C1
-	for qemu-devel@nongnu.org; Thu, 31 May 2018 22:20:00 -0400
-Date: Thu, 31 May 2018 22:19:49 -0400
-From: Jeff Cody <jcody@redhat.com>
-Message-ID: <20180601021949.GE11303@localhost.localdomain>
-References: <20180531205046.153256-1-eblake@redhat.com>
-	<20180531205046.153256-2-eblake@redhat.com>
+	(envelope-from <famz@redhat.com>) id 1fOZv8-0007Bo-8S
+	for qemu-devel@nongnu.org; Thu, 31 May 2018 22:36:03 -0400
+Date: Fri, 1 Jun 2018 10:35:42 +0800
+From: Fam Zheng <famz@redhat.com>
+Message-ID: <20180601023542.GD12136@lemon.usersys.redhat.com>
+References: <20180529055959.32002-1-famz@redhat.com>
+	<20180530160647.GD5973@stefanha-x1.localdomain>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20180531205046.153256-2-eblake@redhat.com>
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v2 1/8] parallels: Switch to
- byte-based calls
+In-Reply-To: <20180530160647.GD5973@stefanha-x1.localdomain>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v7 00/10] qemu-img convert with copy
+ offloading
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,82 +25,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: qemu-devel@nongnu.org, kwolf@redhat.com, "Denis V. Lunev" <den@openvz.org>, Stefan Hajnoczi <stefanha@redhat.com>, qemu-block@nongnu.org, mreitz@redhat.com
+To: Stefan Hajnoczi <stefanha@redhat.com>
+Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Ronnie Sahlberg <ronniesahlberg@gmail.com>, qemu-block@nongnu.org, Peter Lieven <pl@kamp.de>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, eblake@redhat.com
 
-On Thu, May 31, 2018 at 03:50:39PM -0500, Eric Blake wrote:
-> We are gradually moving away from sector-based interfaces, towards
-> byte-based.  Make the change for the last few sector-based calls
-> into the block layer from the parallels driver.
-> 
-> Ideally, the parallels driver should switch to doing everything
-> byte-based, but that's a more invasive change that requires a
-> bit more auditing.
-> 
-> Signed-off-by: Eric Blake <eblake@redhat.com>
-> Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
-> Reviewed-by: Denis V. Lunev <den@openvz.org>
+On Wed, 05/30 17:06, Stefan Hajnoczi wrote:
+> On Tue, May 29, 2018 at 01:59:49PM +0800, Fam Zheng wrote:
+> > v7: Fix qcow2.
+> >=20
+> > v6: Pick up rev-by from Stefan and Eric.
+> >     Tweak patch 2 commit message.
+> >=20
+> > v5: - Fix raw offset/bytes check for read. [Eric]
+> >     - Fix qcow2_handle_l2meta. [Stefan]
+> >     - Add coroutine_fn whereever appropriate. [Stefan]
+> >=20
+> > v4: - Fix raw offset and size. [Eric]
+> >     - iscsi: Drop unnecessary return values and variables in favor of
+> >       constants. [Stefan]
+> >     - qcow2: Handle small backing case. [Stefan]
+> >     - file-posix: Translate ENOSYS to ENOTSUP. [Stefan]
+> >     - API documentation and commit message. [Stefan]
+> >     - Add rev-by to patches 3, 5 - 10. [Stefan, Eric]
+> >=20
+> > This series introduces block layer API for copy offloading and makes =
+use of it
+> > in qemu-img convert.
+> >=20
+> > For now we implemented the operation in local file protocol with
+> > copy_file_range(2).  Besides that it's possible to add similar to isc=
+si, nfs
+> > and potentially more.
+> >=20
+> > As far as its usage goes, in addition to qemu-img convert, we can emu=
+late
+> > offloading in scsi-disk (handle EXTENDED COPY command), and use the A=
+PI in
+> > block jobs too.
+>=20
+> Fails to compile on Fedora 28.
+>=20
+> Oops, I guess my glibc is too new.  This type of bug doesn't happen ver=
+y
+> often :D :D :D.
+>=20
+> block/file-posix.c:1452:14: error: static declaration of =E2=80=98copy_=
+file_range=E2=80=99 follows non-static declaration
+>  static off_t copy_file_range(int in_fd, off_t *in_off, int out_fd,
+>               ^~~~~~~~~~~~~~~
+> In file included from /home/stefanha/qemu/include/qemu/osdep.h:75,
+>                  from block/file-posix.c:25:
+> /usr/include/unistd.h:1107:9: note: previous declaration of =E2=80=98co=
+py_file_range=E2=80=99 was here
+>  ssize_t copy_file_range (int __infd, __off64_t *__pinoff,
+>          ^~~~~~~~~~~~~~~
 
-Reviewed-by: Jeff Cody <jcody@redhat.com>
+It means it's time to update our Fedora docker image! Will fix this by ad=
+ding a
+configure test.
 
-> ---
->  block/parallels.c | 16 ++++++++++------
->  1 file changed, 10 insertions(+), 6 deletions(-)
-> 
-> diff --git a/block/parallels.c b/block/parallels.c
-> index 6e9c37f44e1..a761c896d35 100644
-> --- a/block/parallels.c
-> +++ b/block/parallels.c
-> @@ -226,14 +226,15 @@ static int64_t allocate_clusters(BlockDriverState *bs, int64_t sector_num,
->          };
->          qemu_iovec_init_external(&qiov, &iov, 1);
-> 
-> -        ret = bdrv_co_readv(bs->backing, idx * s->tracks, nb_cow_sectors,
-> -                            &qiov);
-> +        ret = bdrv_co_preadv(bs->backing, idx * s->tracks * BDRV_SECTOR_SIZE,
-> +                             nb_cow_bytes, &qiov, 0);
->          if (ret < 0) {
->              qemu_vfree(iov.iov_base);
->              return ret;
->          }
-> 
-> -        ret = bdrv_co_writev(bs->file, s->data_end, nb_cow_sectors, &qiov);
-> +        ret = bdrv_co_pwritev(bs->file, s->data_end * BDRV_SECTOR_SIZE,
-> +                              nb_cow_bytes, &qiov, 0);
->          qemu_vfree(iov.iov_base);
->          if (ret < 0) {
->              return ret;
-> @@ -339,7 +340,8 @@ static coroutine_fn int parallels_co_writev(BlockDriverState *bs,
->          qemu_iovec_reset(&hd_qiov);
->          qemu_iovec_concat(&hd_qiov, qiov, bytes_done, nbytes);
-> 
-> -        ret = bdrv_co_writev(bs->file, position, n, &hd_qiov);
-> +        ret = bdrv_co_pwritev(bs->file, position * BDRV_SECTOR_SIZE, nbytes,
-> +                              &hd_qiov, 0);
->          if (ret < 0) {
->              break;
->          }
-> @@ -378,7 +380,8 @@ static coroutine_fn int parallels_co_readv(BlockDriverState *bs,
-> 
->          if (position < 0) {
->              if (bs->backing) {
-> -                ret = bdrv_co_readv(bs->backing, sector_num, n, &hd_qiov);
-> +                ret = bdrv_co_preadv(bs->backing, sector_num * BDRV_SECTOR_SIZE,
-> +                                     nbytes, &hd_qiov, 0);
->                  if (ret < 0) {
->                      break;
->                  }
-> @@ -386,7 +389,8 @@ static coroutine_fn int parallels_co_readv(BlockDriverState *bs,
->                  qemu_iovec_memset(&hd_qiov, 0, 0, nbytes);
->              }
->          } else {
-> -            ret = bdrv_co_readv(bs->file, position, n, &hd_qiov);
-> +            ret = bdrv_co_preadv(bs->file, position * BDRV_SECTOR_SIZE, nbytes,
-> +                                 &hd_qiov, 0);
->              if (ret < 0) {
->                  break;
->              }
-> -- 
-> 2.14.3
-> 
-> 
+Fam
