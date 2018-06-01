@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36389)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36636)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1fOj91-0004l0-Tn
-	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 08:27:00 -0400
+	(envelope-from <wei.w.wang@intel.com>) id 1fOjAA-0005Tn-Nn
+	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 08:28:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1fOj8y-00045B-Lq
-	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 08:26:59 -0400
-Received: from mail-wr0-x22e.google.com ([2a00:1450:400c:c0c::22e]:37973)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1fOj8y-00044U-EF
-	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 08:26:56 -0400
-Received: by mail-wr0-x22e.google.com with SMTP id 94-v6so36145598wrf.5
-	for <qemu-devel@nongnu.org>; Fri, 01 Jun 2018 05:26:56 -0700 (PDT)
-Date: Fri, 1 Jun 2018 13:26:53 +0100
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20180601122653.GO8687@stefanha-x1.localdomain>
-References: <CA+6CiVCSPCQ-3iBa=ivJtqsbsV2G9MxTndDFXkMBk2AgWHxPOA@mail.gmail.com>
+	(envelope-from <wei.w.wang@intel.com>) id 1fOjA7-0004jp-Cu
+	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 08:28:10 -0400
+Received: from mga06.intel.com ([134.134.136.31]:43226)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <wei.w.wang@intel.com>)
+	id 1fOjA7-0004in-05
+	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 08:28:07 -0400
+Message-ID: <5B113CB8.40607@intel.com>
+Date: Fri, 01 Jun 2018 20:31:52 +0800
+From: Wei Wang <wei.w.wang@intel.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="lCFQJunhLz1tFGpX"
-Content-Disposition: inline
-In-Reply-To: <CA+6CiVCSPCQ-3iBa=ivJtqsbsV2G9MxTndDFXkMBk2AgWHxPOA@mail.gmail.com>
-Subject: Re: [Qemu-devel] Live viewing qemu running image
+References: <1524550428-27173-1-git-send-email-wei.w.wang@intel.com>
+	<20180601045824.GH14867@xz-mi> <20180601050709.GI14867@xz-mi>
+	<5B10F5E9.8070702@intel.com> <20180601100234.GJ14867@xz-mi>
+In-Reply-To: <20180601100234.GJ14867@xz-mi>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v7 0/5] virtio-balloon: free page hint
+ reporting support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,54 +30,110 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Olga Levy <olgalevy91@gmail.com>
-Cc: qemu-devel@nongnu.org
+To: Peter Xu <peterx@redhat.com>
+Cc: qemu-devel@nongnu.org, virtio-dev@lists.oasis-open.org, mst@redhat.com, quintela@redhat.com, dgilbert@redhat.com, yang.zhang.wz@gmail.com, quan.xu0@gmail.com, liliang.opensource@gmail.com, pbonzini@redhat.com, nilal@redhat.com
 
+On 06/01/2018 06:02 PM, Peter Xu wrote:
+> On Fri, Jun 01, 2018 at 03:29:45PM +0800, Wei Wang wrote:
+>> On 06/01/2018 01:07 PM, Peter Xu wrote:
+>>> On Fri, Jun 01, 2018 at 12:58:24PM +0800, Peter Xu wrote:
+>>>> On Tue, Apr 24, 2018 at 02:13:43PM +0800, Wei Wang wrote:
+>>>>> This is the deivce part implementation to add a new feature,
+>>>>> VIRTIO_BALLOON_F_FREE_PAGE_HINT to the virtio-balloon device. The device
+>>>>> receives the guest free page hints from the driver and clears the
+>>>>> corresponding bits in the dirty bitmap, so that those free pages are
+>>>>> not transferred by the migration thread to the destination.
+>>>>>
+>>>>> - Test Environment
+>>>>>       Host: Intel(R) Xeon(R) CPU E5-2699 v4 @ 2.20GHz
+>>>>>       Guest: 8G RAM, 4 vCPU
+>>>>>       Migration setup: migrate_set_speed 100G, migrate_set_downtime 2 second
+>>>>>
+>>>>> - Test Results
+>>>>>       - Idle Guest Live Migration Time (results are averaged over 10 runs):
+>>>>>           - Optimization v.s. Legacy = 271ms vs 1769ms --> ~86% reduction
+>>>>>       - Guest with Linux Compilation Workload (make bzImage -j4):
+>>>>>           - Live Migration Time (average)
+>>>>>             Optimization v.s. Legacy = 1265ms v.s. 2634ms --> ~51% reduction
+>>>>>           - Linux Compilation Time
+>>>>>             Optimization v.s. Legacy = 4min56s v.s. 5min3s
+>>>>>             --> no obvious difference
+>>>>>
+>>>>> - Source Code
+>>>>>       - QEMU:  https://github.com/wei-w-wang/qemu-free-page-lm.git
+>>>>>       - Linux: https://github.com/wei-w-wang/linux-free-page-lm.git
+>>>> Hi, Wei,
+>>>>
+>>>> I have a very high-level question to the series.
+>>>>
+>>>> IIUC the core idea for this series is that we can avoid sending some
+>>>> of the pages if we know that we don't need to send them.  I think this
+>>>> is based on the fact that on the destination side all the pages are by
+>>>> default zero after they are malloced.  While before this series, IIUC
+>>>> any migration will send every single page to destination, no matter
+>>>> whether it's zeroed or not.  So I'm uncertain about whether this will
+>>>> affect the received bitmap on the destination side.  Say, before this
+>>>> series, the received bitmap will directly cover the whole RAM bitmap
+>>>> after migration is finished, now it's won't.  Will there be any side
+>>>> effect?  I don't see obvious issue now, but just raise this question
+>>>> up.
+>>>>
+>>>> Meanwhile, this reminds me about a more funny idea: whether we can
+>>>> just avoid sending the zero pages directly from QEMU's perspective.
+>>>> In other words, can we just do nothing if save_zero_page() detected
+>>>> that the page is zero (I guess the is_zero_range() can be fast too,
+>>>> but I don't know exactly how fast it is)?  And how that would be
+>>>> differed from this page hinting way in either performance and other
+>>>> aspects.
+>>> I noticed a problem (after I wrote the above paragraph 5 minutes
+>>> ago...): when a page was valid and sent to the destination (with
+>>> non-zero data), however after a while that page was zeroed.  Then if
+>>> we don't send zero pages at all, we won't send the page after it's
+>>> zeroed.  Then on the destination side we'll have a stale non-zero
+>>> page.  Is my understanding correct?  Will that be a problem to this
+>>> series too where a valid page can be possibly freed and hinted?
+>> I think that won't be an issue either for zero page optimization or this
+>> free page optimization.
+>>
+>> For the zero page optimization, QEMU always sends compressed 0s to the
+>> destination. The zero page is detected at the time QEMU checks it (before
+>> sending the page). if it is a 0 page, QEMU compresses all 0s (actually just
+>> a flag) and send it.
+> what I meant is, can we just do not even send that ZERO flag at all? :)
 
---lCFQJunhLz1tFGpX
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+I think you just figured out that zero pages and free pages are not 
+completely the same case. So I guess this question is done :)
+Please let me know if not.
 
-On Tue, May 29, 2018 at 03:33:40PM +0300, Olga Levy wrote:
-> Hi,
->=20
-> Nice to meet you. I'm a new security engineer and working on a prototype
-> using QEMU.
->=20
-> What I need is to collect running image internal data (like running
-> processes, netstat, files modification, etc.) but without running any
-> process inside. I mean, doing it from "outside" (I need Qemu support).
->=20
-> For example,
->=20
-> How can I live view FS of a running image?
+>
+>> For the free page optimization, we skip free pages (could be thought of as 0
+>> pages in this context). The zero pages are detected at the time guest
+>> reports it QEMU. The page won't be reported if it is non-zero (i.e. used).
+> Sorry I must have not explained myself well.  Let's assume the page
+> hint is used.  I meant this:
+>
+> - start precopy, page P is non-zero (let's say, page has content P1,
+>    which is non-zero)
+> - we send page P with content P1 on src, then latest destination cache
+>    of page P is P1
+> - page P is freed by the guest, then it becomes zero, dirty bitmap of
+>    P is set since it's changed (from P1 to zeroed page)
 
-You might be interested in http://libvmi.com/ and
-https://github.com/KVM-VMI.
+The page doesn't become 0 itself when it stays on the free page list. 
+Probably the above referred to this:
+#1 memset(pageP, 0, PAGE_SIZE);
+#2 kfree(pageP);
 
-In general these mechanisms are problematic because they go against the
-philosophy that the guest is a black box.  They are invasive, difficult
-to maintain, and reduce performance.
+#1 causes the page to be tracked in the bitmap, and #2 may cause the 
+page to be cleared from the bitmap. This is no different than the 
+general case, a page is used, written to any value, and then freed.
+Essentially, this leads to the question asked in another thread: does 
+the data in free pages matter?
 
-But if they are useful to enough people, then eventually they will
-mature and be integrated into QEMU/KVM after enough effort is invested
-into them.
+As far as I know, Linux treats values in free pages as garbage. People 
+don't rely on values from free pages. It is similar as the case when we 
+use an uninitialized variable, the compiler pops out a warning (not a 
+correct behavior).
 
-Stefan
-
---lCFQJunhLz1tFGpX
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJbETuNAAoJEJykq7OBq3PImnwIAL69zFm63lnJhjnQQtxH3VJW
-3qAGBC7/6ALpqkZqFcHaMllsQsxnP9OB3Drn+JgRlyM49t0FIgFc7BZmy1Txs9wf
-jPwW45uGWrTtzTayiZWVtiE+CSTLR/k8d47S9ekaF7oASwxtrjq+9giav3/qzHLT
-P6X0cpBT7n4fycs24u6ToZB02fo15ZSF9TtHn8NjXekxgLJLJd7Uz3zyJ/atz/vM
-8mJVQO2CUR6O6l0Pnz7xprZQWT2D9Ca2lq7qnubSElRk/nRIy0TccmeVkrkhtPEG
-bf+vPw9SuJ69Td1cdS+CRSmvNBGeqBAG2LfCK73ikyNkL6cDt8KoueJ7UII3xss=
-=Fe9h
------END PGP SIGNATURE-----
-
---lCFQJunhLz1tFGpX--
+Best,
+Wei
