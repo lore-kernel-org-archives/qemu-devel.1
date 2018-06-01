@@ -1,16 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55875)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56602)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1fOgLu-0006un-AU
-	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 05:28:07 -0400
+	(envelope-from <stefanha@redhat.com>) id 1fOgPQ-0001Zk-IQ
+	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 05:31:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1fOgLt-0007wD-BI
-	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 05:28:06 -0400
-From: Fam Zheng <famz@redhat.com>
-Date: Fri,  1 Jun 2018 17:26:48 +0800
-Message-Id: <20180601092648.24614-11-famz@redhat.com>
-In-Reply-To: <20180601092648.24614-1-famz@redhat.com>
-References: <20180601092648.24614-1-famz@redhat.com>
-Subject: [Qemu-devel] [PATCH v9 10/10] qemu-img: Convert with copy offloading
+	(envelope-from <stefanha@redhat.com>) id 1fOgPP-00023L-SV
+	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 05:31:44 -0400
+Date: Fri, 1 Jun 2018 10:31:37 +0100
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <20180601093137.GB8687@stefanha-x1.localdomain>
+References: <20180601062849.28641-1-famz@redhat.com>
+	<20180601062849.28641-2-famz@redhat.com>
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="pvezYHf7grwyp3Bc"
+Content-Disposition: inline
+In-Reply-To: <20180601062849.28641-2-famz@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v8 01/11] docker: Update fedora image to 28
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -19,131 +24,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Ronnie Sahlberg <ronniesahlberg@gmail.com>, qemu-block@nongnu.org, Peter Lieven <pl@kamp.de>, Fam Zheng <famz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, eblake@redhat.com
+To: Fam Zheng <famz@redhat.com>
+Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Ronnie Sahlberg <ronniesahlberg@gmail.com>, Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>, qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Peter Lieven <pl@kamp.de>, Max Reitz <mreitz@redhat.com>, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>, eblake@redhat.com
 
-The new blk_co_copy_range interface offers a more efficient way in the
-case of network based storage. Make use of it to allow faster convert
-operation.
 
-Since copy offloading cannot do zero detection ('-S') and compression
-(-c), only try it when these options are not used.
+--pvezYHf7grwyp3Bc
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-Signed-off-by: Fam Zheng <famz@redhat.com>
+On Fri, Jun 01, 2018 at 02:28:39PM +0800, Fam Zheng wrote:
+> Signed-off-by: Fam Zheng <famz@redhat.com>
+> ---
+>  tests/docker/dockerfiles/fedora.docker | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+
+Seems reasonable, Fedora is a cutting-edge distro.  Unlike stable
+distros like CentOS and Debian where we actually want the oldest
+supported release, we want the latest release for Fedora.
+
 Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
----
- qemu-img.c | 50 ++++++++++++++++++++++++++++++++++++++++++++++++--
- 1 file changed, 48 insertions(+), 2 deletions(-)
 
-diff --git a/qemu-img.c b/qemu-img.c
-index 976b437da0..75f1610aa0 100644
---- a/qemu-img.c
-+++ b/qemu-img.c
-@@ -1547,6 +1547,7 @@ typedef struct ImgConvertState {
-     bool compressed;
-     bool target_has_backing;
-     bool wr_in_order;
-+    bool copy_range;
-     int min_sparse;
-     size_t cluster_sectors;
-     size_t buf_sectors;
-@@ -1740,6 +1741,37 @@ static int coroutine_fn convert_co_write(ImgConvertState *s, int64_t sector_num,
-     return 0;
- }
- 
-+static int coroutine_fn convert_co_copy_range(ImgConvertState *s, int64_t sector_num,
-+                                              int nb_sectors)
-+{
-+    int n, ret;
-+
-+    while (nb_sectors > 0) {
-+        BlockBackend *blk;
-+        int src_cur;
-+        int64_t bs_sectors, src_cur_offset;
-+        int64_t offset;
-+
-+        convert_select_part(s, sector_num, &src_cur, &src_cur_offset);
-+        offset = (sector_num - src_cur_offset) << BDRV_SECTOR_BITS;
-+        blk = s->src[src_cur];
-+        bs_sectors = s->src_sectors[src_cur];
-+
-+        n = MIN(nb_sectors, bs_sectors - (sector_num - src_cur_offset));
-+
-+        ret = blk_co_copy_range(blk, offset, s->target,
-+                                sector_num << BDRV_SECTOR_BITS,
-+                                n << BDRV_SECTOR_BITS, 0);
-+        if (ret < 0) {
-+            return ret;
-+        }
-+
-+        sector_num += n;
-+        nb_sectors -= n;
-+    }
-+    return 0;
-+}
-+
- static void coroutine_fn convert_co_do_copy(void *opaque)
- {
-     ImgConvertState *s = opaque;
-@@ -1762,6 +1794,7 @@ static void coroutine_fn convert_co_do_copy(void *opaque)
-         int n;
-         int64_t sector_num;
-         enum ImgConvertBlockStatus status;
-+        bool copy_range;
- 
-         qemu_co_mutex_lock(&s->lock);
-         if (s->ret != -EINPROGRESS || s->sector_num >= s->total_sectors) {
-@@ -1791,7 +1824,9 @@ static void coroutine_fn convert_co_do_copy(void *opaque)
-                                         s->allocated_sectors, 0);
-         }
- 
--        if (status == BLK_DATA) {
-+retry:
-+        copy_range = s->copy_range && s->status == BLK_DATA;
-+        if (status == BLK_DATA && !copy_range) {
-             ret = convert_co_read(s, sector_num, n, buf);
-             if (ret < 0) {
-                 error_report("error while reading sector %" PRId64
-@@ -1813,7 +1848,15 @@ static void coroutine_fn convert_co_do_copy(void *opaque)
-         }
- 
-         if (s->ret == -EINPROGRESS) {
--            ret = convert_co_write(s, sector_num, n, buf, status);
-+            if (copy_range) {
-+                ret = convert_co_copy_range(s, sector_num, n);
-+                if (ret) {
-+                    s->copy_range = false;
-+                    goto retry;
-+                }
-+            } else {
-+                ret = convert_co_write(s, sector_num, n, buf, status);
-+            }
-             if (ret < 0) {
-                 error_report("error while writing sector %" PRId64
-                              ": %s", sector_num, strerror(-ret));
-@@ -1936,6 +1979,7 @@ static int img_convert(int argc, char **argv)
-     ImgConvertState s = (ImgConvertState) {
-         /* Need at least 4k of zeros for sparse detection */
-         .min_sparse         = 8,
-+        .copy_range         = true,
-         .buf_sectors        = IO_BUF_SIZE / BDRV_SECTOR_SIZE,
-         .wr_in_order        = true,
-         .num_coroutines     = 8,
-@@ -1976,6 +2020,7 @@ static int img_convert(int argc, char **argv)
-             break;
-         case 'c':
-             s.compressed = true;
-+            s.copy_range = false;
-             break;
-         case 'o':
-             if (!is_valid_option_list(optarg)) {
-@@ -2017,6 +2062,7 @@ static int img_convert(int argc, char **argv)
-             }
- 
-             s.min_sparse = sval / BDRV_SECTOR_SIZE;
-+            s.copy_range = false;
-             break;
-         }
-         case 'p':
--- 
-2.17.0
+--pvezYHf7grwyp3Bc
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJbERJ5AAoJEJykq7OBq3PI0yMH/AhnVqZO8px8U5SX6Ph1h00r
+ji/1QcISzvntN7FgHfbSuh+obOAi8Q2WM4RZtLyw8qKxvSDopeaSZV/IjaxktJL5
+LjBRTTrHOq2JIDbh1edDA1fqpy/AHOqmx2olhadX4o213sxyUseFZX7wLfZN+r1n
+/IgyXM9zqQbEoINA6zMer8Bnw4l6hK7H0EKrQcS6OkzF9sO5FdUfpR0Hpp8jkKRp
+pt41IH0tQdiDyIQkXyvTAUFkmaV4Y4qJHaPs1VdSYzbkYsBqQEkBQNNLq23qJ2Ac
+/ClUEpg/udc3mUj5GNjGNiy/WLCdZdn3qiQx5X2E6ax01W7mVDA2lZIWGhvF2ew=
+=sFZ7
+-----END PGP SIGNATURE-----
+
+--pvezYHf7grwyp3Bc--
