@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59370)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60457)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <chen_han_xiao@126.com>) id 1fOmML-0000nq-JC
-	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 11:52:58 -0400
+	(envelope-from <mst@redhat.com>) id 1fOmRd-0001pT-H1
+	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 11:58:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <chen_han_xiao@126.com>) id 1fOmMI-0004E8-Ei
-	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 11:52:57 -0400
-Received: from m15-10.126.com ([220.181.15.10]:39626)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <chen_han_xiao@126.com>) id 1fOmMH-0004CO-C7
-	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 11:52:54 -0400
-Date: Fri, 1 Jun 2018 23:21:14 +0800 (CST)
-From: "Chen Hanxiao" <chen_han_xiao@126.com>
-In-Reply-To: <20180601121956.GW3458@redhat.com>
-References: <20180601061121.13161-1-chen_han_xiao@126.com>
-	<20180601121956.GW3458@redhat.com>
-Content-Transfer-Encoding: base64
-Content-Type: text/plain; charset=GBK
+	(envelope-from <mst@redhat.com>) id 1fOmRa-0006UM-Ey
+	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 11:58:25 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:59186 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1fOmRa-0006U7-9r
+	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 11:58:22 -0400
+Date: Fri, 1 Jun 2018 18:58:20 +0300
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20180601184855-mutt-send-email-mst@kernel.org>
+References: <40602400-cae4-e175-e7ce-10ac70ba52f5@riseup.net>
+	<20180601113444.GG8687@stefanha-x1.localdomain>
+	<b25b3adb-bacc-bef1-7d18-c71a4933abc1@riseup.net>
 MIME-Version: 1.0
-Message-ID: <2399fcde.9565.163bbf041b1.Coremail.chen_han_xiao@126.com>
-Subject: Re: [Qemu-devel] [PATCH v4] qga: add mountpoint usage to
- GuestFilesystemInfo
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <b25b3adb-bacc-bef1-7d18-c71a4933abc1@riseup.net>
+Subject: Re: [Qemu-devel] Virtio-net drivers immune to Nethammer?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,50 +28,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?GBK?Q?Daniel_P=2E_Berrang=A8=A6?= <berrange@redhat.com>
-Cc: qemu-devel@nongnu.org, Michael Roth <mdroth@linux.vnet.ibm.com>
+To: procmem <procmem@riseup.net>
+Cc: Stefan Hajnoczi <stefanha@gmail.com>, qemu-devel@nongnu.org, whonix-devel@whonix.org, jasowang@redhat.com
 
-CgoKQXQgMjAxOC0wNi0wMSAyMDoxOTo1NiwgIkRhbmllbCBQLiBCZXJyYW5nqKYiIDxiZXJyYW5n
-ZUByZWRoYXQuY29tPiB3cm90ZToKPk9uIEZyaSwgSnVuIDAxLCAyMDE4IGF0IDAyOjExOjIxUE0g
-KzA4MDAsIENoZW4gSGFueGlhbyB3cm90ZToKPj4gRnJvbTogQ2hlbiBIYW54aWFvIDxjaGVuaGFu
-eGlhb0BnbWFpbC5jb20+Cj4+IAo+PiBUaGlzIHBhdGNoIGFkZHMgc3VwcG9ydCBmb3IgZ2V0dGlu
-ZyB0aGUgdXNhZ2Ugb2YgbW91bnRlZAo+PiBmaWxlc3lzdGVtLgo+PiBJdCdzIHZlcnkgdXNlZnVs
-IHdoZW4gd2UgdHJ5IHRvIG1vbml0b3IgZ3Vlc3QncyBmaWxlc3lzdGVtLgo+PiAKPj4gQ2M6IE1p
-Y2hhZWwgUm90aCA8bWRyb3RoQGxpbnV4LnZuZXQuaWJtLmNvbT4KPj4gQ2M6IEVyaWMgQmxha2Ug
-PGVibGFrZUByZWRoYXQuY29tPgo+PiBTaWduZWQtb2ZmLWJ5OiBDaGVuIEhhbnhpYW8gPGNoZW5o
-YW54aWFvQGdtYWlsLmNvbT4KPj4gCj4+IC0tLQo+PiB2MjoKPj4gICAgYWRkIGRlc2NyaXB0aW9u
-IGluIHFhcGktc2NoZW1hIGFuZCB2ZXJzaW9uIG51bWJlcnMKPj4gdjM6Cj4+ICAgIHVzZSBmbG9h
-dCBmb3IgdXNhZ2UgdG8gZ2V0IG1vcmUgcHJlY2lzaW9uLgo+PiB2NDoKPj4gICAgbWFrZSB1c2Fn
-ZSBhcyBhIGJlc3QtZWZmb3J0IHF1ZXJ5IGFuZCBtYXJrIGl0IGFzIG9wdGlvbmFsLgo+PiAKPj4g
-IHFnYS9jb21tYW5kcy1wb3NpeC5jIHwgMTcgKysrKysrKysrKysrKysrKysKPj4gIHFnYS9xYXBp
-LXNjaGVtYS5qc29uIHwgIDMgKystCj4+ICAyIGZpbGVzIGNoYW5nZWQsIDE5IGluc2VydGlvbnMo
-KyksIDEgZGVsZXRpb24oLSkKPj4gCj4+IGRpZmYgLS1naXQgYS9xZ2EvY29tbWFuZHMtcG9zaXgu
-YyBiL3FnYS9jb21tYW5kcy1wb3NpeC5jCj4+IGluZGV4IDBkYzIxOWRiY2YuLjRmYWNjNzY5NTMg
-MTAwNjQ0Cj4+IC0tLSBhL3FnYS9jb21tYW5kcy1wb3NpeC5jCj4+ICsrKyBiL3FnYS9jb21tYW5k
-cy1wb3NpeC5jCj4+IEBAIC00Niw2ICs0Niw3IEBAIGV4dGVybiBjaGFyICoqZW52aXJvbjsKPj4g
-ICNpbmNsdWRlIDxhcnBhL2luZXQuaD4KPj4gICNpbmNsdWRlIDxzeXMvc29ja2V0Lmg+Cj4+ICAj
-aW5jbHVkZSA8bmV0L2lmLmg+Cj4+ICsjaW5jbHVkZSA8c3lzL3N0YXR2ZnMuaD4KPj4gIAo+PiAg
-I2lmZGVmIEZJRlJFRVpFCj4+ICAjZGVmaW5lIENPTkZJR19GU0ZSRUVaRQo+PiBAQCAtMTA3Miw2
-ICsxMDczLDkgQEAgc3RhdGljIEd1ZXN0RmlsZXN5c3RlbUluZm8gKmJ1aWxkX2d1ZXN0X2ZzaW5m
-byhzdHJ1Y3QgRnNNb3VudCAqbW91bnQsCj4+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgIEVycm9yICoqZXJycCkKPj4gIHsKPj4gICAgICBHdWVzdEZpbGVz
-eXN0ZW1JbmZvICpmcyA9IGdfbWFsbG9jMChzaXplb2YoKmZzKSk7Cj4+ICsgICAgc3RydWN0IHN0
-YXR2ZnMgYnVmOwo+PiArICAgIHVuc2lnbmVkIGxvbmcgdXNlZCwgbm9ucm9vdF90b3RhbDsKPj4g
-KyAgICBkb3VibGUgdXNhZ2U7Cj4+ICAgICAgY2hhciAqZGV2cGF0aCA9IGdfc3RyZHVwX3ByaW50
-ZigiL3N5cy9kZXYvYmxvY2svJXU6JXUiLAo+PiAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgbW91bnQtPmRldm1ham9yLCBtb3VudC0+ZGV2bWlub3IpOwo+PiAgCj4+IEBAIC0x
-MDc5LDcgKzEwODMsMjAgQEAgc3RhdGljIEd1ZXN0RmlsZXN5c3RlbUluZm8gKmJ1aWxkX2d1ZXN0
-X2ZzaW5mbyhzdHJ1Y3QgRnNNb3VudCAqbW91bnQsCj4+ICAgICAgZnMtPnR5cGUgPSBnX3N0cmR1
-cChtb3VudC0+ZGV2dHlwZSk7Cj4+ICAgICAgYnVpbGRfZ3Vlc3RfZnNpbmZvX2Zvcl9kZXZpY2Uo
-ZGV2cGF0aCwgZnMsIGVycnApOwo+PiAgCj4+ICsgICAgaWYgKHN0YXR2ZnMoZnMtPm1vdW50cG9p
-bnQsICZidWYpKSB7Cj4+ICsgICAgICAgIGZzLT5oYXNfdXNhZ2UgPSBmYWxzZTsKPj4gKyAgICAg
-ICAgZnMtPnVzYWdlID0gLTE7Cj4+ICsgICAgfSBlbHNlIHsKPj4gKyAgICAgICAgdXNlZCA9IGJ1
-Zi5mX2Jsb2NrcyAtIGJ1Zi5mX2JmcmVlOwo+PiArICAgICAgICBub25yb290X3RvdGFsID0gdXNl
-ZCArIGJ1Zi5mX2JhdmFpbDsKPj4gKyAgICAgICAgdXNhZ2UgPSAoZG91YmxlKSB1c2VkIC8gbm9u
-cm9vdF90b3RhbDsKPgo+V2h5IGNhbGN1bGF0ZSB0aGUgdXNhZ2UgaGVyZSA/ICBJTUhPIGl0IHdv
-dWxkIG1ha2UgdGhlIGNvbW1hbmQgbW9yZSB1c2VmdWwKPmlmIHdlIGp1c3QgcmVwb3J0ZWQgdHdv
-IHNlcGFyYXRlICJ1c2VkX2J5dGVzIiBhbmQgInRvdGFsX2J5dGVzIiB2YWx1ZXMuIFRoZQo+YXBw
-IGNhbiBjb252ZXJ0IHRvIGEgcGVyY2VudGFnZSB1dGlsaXphdGlvbiB2YWx1ZSBpZiB0aGV5IHNv
-IGRlc2lyZSwgd2hpbGUKPm90aGVyIGFwcHMgY2FuIG5vdyBnZXQgdGhlIHJhdyB2YWx1ZXMKClRo
-YW5rcyBmb3IgeW91ciBhZHZpY2UuCldpbGwgYmUgZml4ZWQgaW4gdjUuCkFsc28gYWRkaW5nIHN1
-cHBvcnQgZm9yIHFnYS13aW4uCgpSZWdhcmRzLAotIENoZW4K
+On Fri, Jun 01, 2018 at 01:15:44PM +0000, procmem wrote:
+> 
+> 
+> Stefan Hajnoczi:
+> > On Mon, May 21, 2018 at 11:24:43PM +0000, procmem wrote:
+> >> Hi I'm a privacy distro maintainer investigating the implications of the
+> >> newly published nethammer attack [0] on KVM guests particularly the
+> >> virtio-net drivers. The summary of the paper is that rowhammer can be
+> >> remotely triggered by feeding susceptible* network driver crafted
+> >> traffic. This attack can do all kinds of nasty things such as modifying
+> >> SSL certs on the victim system.
+> >>
+> >> * Susceptible drivers are those relying on Intel CAT, uncached memory or
+> >> the clflush instruction.
+> >>
+> >> My question is, do virtio-net drivers do any of these things?
+> > I have CCed Michael Tsirkin and Jason Wang, the virtio maintainers.
+> > 
+> >> ***
+> >>
+> >> [0] https://arxiv.org/abs/1805.04956
+> >>
+> >>
+> >>
+> 
+> Thanks :) I thought my message was forgotten
+
+
+I don't think virtio is using either of these.
+
+Linux does support CAT AFAIK but it has nothing to do with virtio.
+
+-- 
+MST
