@@ -1,17 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35224)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41311)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhaoshenglong@huawei.com>) id 1fOZ0I-0001pl-7R
-	for qemu-devel@nongnu.org; Thu, 31 May 2018 21:37:19 -0400
+	(envelope-from <jcody@redhat.com>) id 1fOZfc-0005Ce-I6
+	for qemu-devel@nongnu.org; Thu, 31 May 2018 22:20:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zhaoshenglong@huawei.com>) id 1fOZ0G-0006Ec-OL
-	for qemu-devel@nongnu.org; Thu, 31 May 2018 21:37:18 -0400
-From: Shannon Zhao <zhaoshenglong@huawei.com>
-Date: Fri, 1 Jun 2018 09:36:27 +0800
-Message-ID: <1527816987-16108-1-git-send-email-zhaoshenglong@huawei.com>
+	(envelope-from <jcody@redhat.com>) id 1fOZfb-0000NR-C1
+	for qemu-devel@nongnu.org; Thu, 31 May 2018 22:20:00 -0400
+Date: Thu, 31 May 2018 22:19:49 -0400
+From: Jeff Cody <jcody@redhat.com>
+Message-ID: <20180601021949.GE11303@localhost.localdomain>
+References: <20180531205046.153256-1-eblake@redhat.com>
+	<20180531205046.153256-2-eblake@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v6] arm_gicv3_kvm: kvm_dist_get/put: skip the
- registers banked by GICR
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180531205046.153256-2-eblake@redhat.com>
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v2 1/8] parallels: Switch to
+ byte-based calls
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,224 +24,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-arm@nongnu.org
-Cc: peter.maydell@linaro.org, eric.auger@redhat.com, qemu-devel@nongnu.org, shannon.zhaosl@gmail.com, Shannon Zhao <zhaoshenglong@huawei.com>, qemu-stable@nongnu.org
+To: Eric Blake <eblake@redhat.com>
+Cc: qemu-devel@nongnu.org, kwolf@redhat.com, "Denis V. Lunev" <den@openvz.org>, Stefan Hajnoczi <stefanha@redhat.com>, qemu-block@nongnu.org, mreitz@redhat.com
 
-While we skip the GIC_INTERNAL irqs, we don't change the register offset
-accordingly. This will overlap the GICR registers value and leave the
-last GIC_INTERNAL irq's registers out of update.
+On Thu, May 31, 2018 at 03:50:39PM -0500, Eric Blake wrote:
+> We are gradually moving away from sector-based interfaces, towards
+> byte-based.  Make the change for the last few sector-based calls
+> into the block layer from the parallels driver.
+> 
+> Ideally, the parallels driver should switch to doing everything
+> byte-based, but that's a more invasive change that requires a
+> bit more auditing.
+> 
+> Signed-off-by: Eric Blake <eblake@redhat.com>
+> Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+> Reviewed-by: Denis V. Lunev <den@openvz.org>
 
-Fix this by skipping the registers banked by GICR.
+Reviewed-by: Jeff Cody <jcody@redhat.com>
 
-Also for migration compatibility if the migration source (old version
-qemu) doesn't send gicd_no_migration_shift_bug = 1 to destination, then
-we shift the data of PPI to get the right data for SPI.
-
-Fixes: 367b9f527becdd20ddf116e17a3c0c2bbc486920
-Cc: qemu-stable@nongnu.org
-Reviewed-by: Eric Auger <eric.auger@redhat.com>
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
-Signed-off-by: Shannon Zhao <zhaoshenglong@huawei.com>
----
-V6: Fix typos and keep same with offset for clroffset 
----
- hw/intc/arm_gicv3_common.c         | 79 ++++++++++++++++++++++++++++++++++++++
- hw/intc/arm_gicv3_kvm.c            | 38 ++++++++++++++++++
- include/hw/intc/arm_gicv3_common.h |  1 +
- 3 files changed, 118 insertions(+)
-
-diff --git a/hw/intc/arm_gicv3_common.c b/hw/intc/arm_gicv3_common.c
-index 7b54d52..864b7c6 100644
---- a/hw/intc/arm_gicv3_common.c
-+++ b/hw/intc/arm_gicv3_common.c
-@@ -27,6 +27,7 @@
- #include "hw/intc/arm_gicv3_common.h"
- #include "gicv3_internal.h"
- #include "hw/arm/linux-boot-if.h"
-+#include "sysemu/kvm.h"
- 
- static int gicv3_pre_save(void *opaque)
- {
-@@ -141,6 +142,79 @@ static const VMStateDescription vmstate_gicv3_cpu = {
-     }
- };
- 
-+static int gicv3_gicd_no_migration_shift_bug_pre_load(void *opaque)
-+{
-+    GICv3State *cs = opaque;
-+
-+   /*
-+    * The gicd_no_migration_shift_bug flag is used for migration compatibility
-+    * for old version QEMU which may have the GICD bmp shift bug under KVM mode.
-+    * Strictly, what we want to know is whether the migration source is using
-+    * KVM. Since we don't have any way to determine that, we look at whether the
-+    * destination is using KVM; this is close enough because for the older QEMU
-+    * versions with this bug KVM -> TCG migration didn't work anyway. If the
-+    * source is a newer QEMU without this bug it will transmit the migration
-+    * subsection which sets the flag to true; otherwise it will remain set to
-+    * the value we select here.
-+    */
-+    if (kvm_enabled()) {
-+        cs->gicd_no_migration_shift_bug = false;
-+    }
-+
-+    return 0;
-+}
-+
-+static int gicv3_gicd_no_migration_shift_bug_post_load(void *opaque,
-+                                                       int version_id)
-+{
-+    GICv3State *cs = opaque;
-+
-+    if (cs->gicd_no_migration_shift_bug) {
-+        return 0;
-+    }
-+
-+    /* Older versions of QEMU had a bug in the handling of state save/restore
-+     * to the KVM GICv3: they got the offset in the bitmap arrays wrong,
-+     * so that instead of the data for external interrupts 32 and up
-+     * starting at bit position 32 in the bitmap, it started at bit
-+     * position 64. If we're receiving data from a QEMU with that bug,
-+     * we must move the data down into the right place.
-+     */
-+    memmove(cs->group, (uint8_t *)cs->group + GIC_INTERNAL / 8,
-+            sizeof(cs->group) - GIC_INTERNAL / 8);
-+    memmove(cs->grpmod, (uint8_t *)cs->grpmod + GIC_INTERNAL / 8,
-+            sizeof(cs->grpmod) - GIC_INTERNAL / 8);
-+    memmove(cs->enabled, (uint8_t *)cs->enabled + GIC_INTERNAL / 8,
-+            sizeof(cs->enabled) - GIC_INTERNAL / 8);
-+    memmove(cs->pending, (uint8_t *)cs->pending + GIC_INTERNAL / 8,
-+            sizeof(cs->pending) - GIC_INTERNAL / 8);
-+    memmove(cs->active, (uint8_t *)cs->active + GIC_INTERNAL / 8,
-+            sizeof(cs->active) - GIC_INTERNAL / 8);
-+    memmove(cs->edge_trigger, (uint8_t *)cs->edge_trigger + GIC_INTERNAL / 8,
-+            sizeof(cs->edge_trigger) - GIC_INTERNAL / 8);
-+
-+    /*
-+     * While this new version QEMU doesn't have this kind of bug as we fix it,
-+     * so it needs to set the flag to true to indicate that and it's necessary
-+     * for next migration to work from this new version QEMU.
-+     */
-+    cs->gicd_no_migration_shift_bug = true;
-+
-+    return 0;
-+}
-+
-+const VMStateDescription vmstate_gicv3_gicd_no_migration_shift_bug = {
-+    .name = "arm_gicv3/gicd_no_migration_shift_bug",
-+    .version_id = 1,
-+    .minimum_version_id = 1,
-+    .pre_load = gicv3_gicd_no_migration_shift_bug_pre_load,
-+    .post_load = gicv3_gicd_no_migration_shift_bug_post_load,
-+    .fields = (VMStateField[]) {
-+        VMSTATE_BOOL(gicd_no_migration_shift_bug, GICv3State),
-+        VMSTATE_END_OF_LIST()
-+    }
-+};
-+
- static const VMStateDescription vmstate_gicv3 = {
-     .name = "arm_gicv3",
-     .version_id = 1,
-@@ -165,6 +239,10 @@ static const VMStateDescription vmstate_gicv3 = {
-         VMSTATE_STRUCT_VARRAY_POINTER_UINT32(cpu, GICv3State, num_cpu,
-                                              vmstate_gicv3_cpu, GICv3CPUState),
-         VMSTATE_END_OF_LIST()
-+    },
-+    .subsections = (const VMStateDescription * []) {
-+        &vmstate_gicv3_gicd_no_migration_shift_bug,
-+        NULL
-     }
- };
- 
-@@ -364,6 +442,7 @@ static void arm_gicv3_common_reset(DeviceState *dev)
-             gicv3_gicd_group_set(s, i);
-         }
-     }
-+    s->gicd_no_migration_shift_bug = true;
- }
- 
- static void arm_gic_common_linux_init(ARMLinuxBootIf *obj,
-diff --git a/hw/intc/arm_gicv3_kvm.c b/hw/intc/arm_gicv3_kvm.c
-index 147e691..bc6fa41 100644
---- a/hw/intc/arm_gicv3_kvm.c
-+++ b/hw/intc/arm_gicv3_kvm.c
-@@ -178,6 +178,14 @@ static void kvm_dist_get_edge_trigger(GICv3State *s, uint32_t offset,
-     uint32_t reg;
-     int irq;
- 
-+    /* For the KVM GICv3, affinity routing is always enabled, and the first 2
-+     * GICD_ICFGR<n> registers are always RAZ/WI. The corresponding
-+     * functionality is replaced by GICR_ICFGR<n>. It doesn't need to sync
-+     * them. So it should increase the offset to skip GIC_INTERNAL irqs.
-+     * This matches the for_each_dist_irq_reg() macro which also skips the
-+     * first GIC_INTERNAL irqs.
-+     */
-+    offset += (GIC_INTERNAL * 2) / 8;
-     for_each_dist_irq_reg(irq, s->num_irq, 2) {
-         kvm_gicd_access(s, offset, &reg, false);
-         reg = half_unshuffle32(reg >> 1);
-@@ -195,6 +203,14 @@ static void kvm_dist_put_edge_trigger(GICv3State *s, uint32_t offset,
-     uint32_t reg;
-     int irq;
- 
-+    /* For the KVM GICv3, affinity routing is always enabled, and the first 2
-+     * GICD_ICFGR<n> registers are always RAZ/WI. The corresponding
-+     * functionality is replaced by GICR_ICFGR<n>. It doesn't need to sync
-+     * them. So it should increase the offset to skip GIC_INTERNAL irqs.
-+     * This matches the for_each_dist_irq_reg() macro which also skips the
-+     * first GIC_INTERNAL irqs.
-+     */
-+    offset += (GIC_INTERNAL * 2) / 8;
-     for_each_dist_irq_reg(irq, s->num_irq, 2) {
-         reg = *gic_bmp_ptr32(bmp, irq);
-         if (irq % 32 != 0) {
-@@ -236,6 +252,15 @@ static void kvm_dist_getbmp(GICv3State *s, uint32_t offset, uint32_t *bmp)
-     uint32_t reg;
-     int irq;
- 
-+    /* For the KVM GICv3, affinity routing is always enabled, and the
-+     * GICD_IGROUPR0/GICD_IGRPMODR0/GICD_ISENABLER0/GICD_ISPENDR0/
-+     * GICD_ISACTIVER0 registers are always RAZ/WI. The corresponding
-+     * functionality is replaced by the GICR registers. It doesn't need to sync
-+     * them. So it should increase the offset to skip GIC_INTERNAL irqs.
-+     * This matches the for_each_dist_irq_reg() macro which also skips the
-+     * first GIC_INTERNAL irqs.
-+     */
-+    offset += (GIC_INTERNAL * 1) / 8;
-     for_each_dist_irq_reg(irq, s->num_irq, 1) {
-         kvm_gicd_access(s, offset, &reg, false);
-         *gic_bmp_ptr32(bmp, irq) = reg;
-@@ -249,6 +274,19 @@ static void kvm_dist_putbmp(GICv3State *s, uint32_t offset,
-     uint32_t reg;
-     int irq;
- 
-+    /* For the KVM GICv3, affinity routing is always enabled, and the
-+     * GICD_IGROUPR0/GICD_IGRPMODR0/GICD_ISENABLER0/GICD_ISPENDR0/
-+     * GICD_ISACTIVER0 registers are always RAZ/WI. The corresponding
-+     * functionality is replaced by the GICR registers. It doesn't need to sync
-+     * them. So it should increase the offset and clroffset to skip GIC_INTERNAL
-+     * irqs. This matches the for_each_dist_irq_reg() macro which also skips the
-+     * first GIC_INTERNAL irqs.
-+     */
-+    offset += (GIC_INTERNAL * 1) / 8;
-+    if (clroffset != 0) {
-+        clroffset += (GIC_INTERNAL * 1) / 8;
-+    }
-+
-     for_each_dist_irq_reg(irq, s->num_irq, 1) {
-         /* If this bitmap is a set/clear register pair, first write to the
-          * clear-reg to clear all bits before using the set-reg to write
-diff --git a/include/hw/intc/arm_gicv3_common.h b/include/hw/intc/arm_gicv3_common.h
-index bccdfe1..d75b49d 100644
---- a/include/hw/intc/arm_gicv3_common.h
-+++ b/include/hw/intc/arm_gicv3_common.h
-@@ -217,6 +217,7 @@ struct GICv3State {
-     uint32_t revision;
-     bool security_extn;
-     bool irq_reset_nonsecure;
-+    bool gicd_no_migration_shift_bug;
- 
-     int dev_fd; /* kvm device fd if backed by kvm vgic support */
-     Error *migration_blocker;
--- 
-2.0.4
+> ---
+>  block/parallels.c | 16 ++++++++++------
+>  1 file changed, 10 insertions(+), 6 deletions(-)
+> 
+> diff --git a/block/parallels.c b/block/parallels.c
+> index 6e9c37f44e1..a761c896d35 100644
+> --- a/block/parallels.c
+> +++ b/block/parallels.c
+> @@ -226,14 +226,15 @@ static int64_t allocate_clusters(BlockDriverState *bs, int64_t sector_num,
+>          };
+>          qemu_iovec_init_external(&qiov, &iov, 1);
+> 
+> -        ret = bdrv_co_readv(bs->backing, idx * s->tracks, nb_cow_sectors,
+> -                            &qiov);
+> +        ret = bdrv_co_preadv(bs->backing, idx * s->tracks * BDRV_SECTOR_SIZE,
+> +                             nb_cow_bytes, &qiov, 0);
+>          if (ret < 0) {
+>              qemu_vfree(iov.iov_base);
+>              return ret;
+>          }
+> 
+> -        ret = bdrv_co_writev(bs->file, s->data_end, nb_cow_sectors, &qiov);
+> +        ret = bdrv_co_pwritev(bs->file, s->data_end * BDRV_SECTOR_SIZE,
+> +                              nb_cow_bytes, &qiov, 0);
+>          qemu_vfree(iov.iov_base);
+>          if (ret < 0) {
+>              return ret;
+> @@ -339,7 +340,8 @@ static coroutine_fn int parallels_co_writev(BlockDriverState *bs,
+>          qemu_iovec_reset(&hd_qiov);
+>          qemu_iovec_concat(&hd_qiov, qiov, bytes_done, nbytes);
+> 
+> -        ret = bdrv_co_writev(bs->file, position, n, &hd_qiov);
+> +        ret = bdrv_co_pwritev(bs->file, position * BDRV_SECTOR_SIZE, nbytes,
+> +                              &hd_qiov, 0);
+>          if (ret < 0) {
+>              break;
+>          }
+> @@ -378,7 +380,8 @@ static coroutine_fn int parallels_co_readv(BlockDriverState *bs,
+> 
+>          if (position < 0) {
+>              if (bs->backing) {
+> -                ret = bdrv_co_readv(bs->backing, sector_num, n, &hd_qiov);
+> +                ret = bdrv_co_preadv(bs->backing, sector_num * BDRV_SECTOR_SIZE,
+> +                                     nbytes, &hd_qiov, 0);
+>                  if (ret < 0) {
+>                      break;
+>                  }
+> @@ -386,7 +389,8 @@ static coroutine_fn int parallels_co_readv(BlockDriverState *bs,
+>                  qemu_iovec_memset(&hd_qiov, 0, 0, nbytes);
+>              }
+>          } else {
+> -            ret = bdrv_co_readv(bs->file, position, n, &hd_qiov);
+> +            ret = bdrv_co_preadv(bs->file, position * BDRV_SECTOR_SIZE, nbytes,
+> +                                 &hd_qiov, 0);
+>              if (ret < 0) {
+>                  break;
+>              }
+> -- 
+> 2.14.3
+> 
+> 
