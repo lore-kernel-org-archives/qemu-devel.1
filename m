@@ -1,27 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34233)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34290)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1fOizH-0008VX-Q9
-	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 08:16:57 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1fOizW-0000A8-MR
+	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 08:17:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1fOizE-00044J-FH
-	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 08:16:55 -0400
-Received: from 17.mo1.mail-out.ovh.net ([87.98.179.142]:35409)
+	(envelope-from <pbonzini@redhat.com>) id 1fOizT-0004EX-2p
+	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 08:17:10 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:42888 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1fOizE-0003xE-8O
-	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 08:16:52 -0400
-Received: from player699.ha.ovh.net (unknown [10.109.122.50])
-	by mo1.mail-out.ovh.net (Postfix) with ESMTP id 4094E1019F6
-	for <qemu-devel@nongnu.org>; Fri,  1 Jun 2018 14:16:41 +0200 (CEST)
-Date: Fri, 1 Jun 2018 14:16:23 +0200
-From: Greg Kurz <groug@kaod.org>
-Message-ID: <20180601141623.78682c23@bahia.lan>
-In-Reply-To: <20180531130429.24911-1-joel@jms.id.au>
-References: <20180531130429.24911-1-joel@jms.id.au>
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1fOizS-0004Dp-Tk
+	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 08:17:07 -0400
+References: <20180531074601.10647-1-slp@redhat.com>
+	<20180531074601.10647-4-slp@redhat.com>
+	<CAJ+F1CKfpATgpFpHa85Esvv9k_T3FG_pY4rsz_C5a20CWfUgiQ@mail.gmail.com>
+	<20180601115212.GU3458@redhat.com>
+	<20180601120538.guwfrzojgabnpofb@dritchie>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <c543d390-c034-ce60-5699-aa78186eb51d@redhat.com>
+Date: Fri, 1 Jun 2018 14:16:59 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <20180601120538.guwfrzojgabnpofb@dritchie>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2] target/ppc: Allow privileged access to
- SPR_PCR
+Subject: Re: [Qemu-devel] [PATCH 3/3] hw/char/serial: Don't retry on
+ serial_xmit if errno == EPIPE
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,112 +32,20 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Joel Stanley <joel@jms.id.au>
-Cc: David Gibson <david@gibson.dropbear.id.au>, Alexander Graf <agraf@suse.de>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, =?UTF-8?B?Q8OpZHJpYw==?= Le Goater <clg@kaod.org>, Benjamin Herrenschmidt <benh@kernel.crashing.org>, Michael Ellerman <mpe@ellerman.id.au>, Michael Neuling <mikey@neuling.org>
+To: Sergio Lopez <slp@redhat.com>, "=?UTF-8?Q?Daniel_P._Berrang=c3=a9?=" <berrange@redhat.com>
+Cc: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@gmail.com>, "Michael S. Tsirkin" <mst@redhat.com>, QEMU <qemu-devel@nongnu.org>
 
-On Thu, 31 May 2018 22:34:29 +0930
-Joel Stanley <joel@jms.id.au> wrote:
+On 01/06/2018 14:05, Sergio Lopez wrote:
+>>> Instead of adding explicit handling of EPIPE, shouldn't the code be
+>>> rewritten to treat -1 return && errno != EAGAIN as fatal?
+>> Yes, exactly this code is already broken for every single errno
+>> value, not simply EPIPE. It needs fixing to treat '-1' return code
+>> correctly instead of retrying everything.
+> Given that EAGAIN is already taken care of in
+> chardev/char.c:qemu_chr_write_buffer, in which cases should we retry? Or
+> should we just drop all the tsr_retry logic?
 
-> The powerpc Linux kernel[1] and skiboot firmware[2] recently gained changes
-> that cause the Processor Compatibility Register (PCR) SPR to be cleared.
-> 
-> These changes cause Linux to fail to boot on the Qemu powernv machine
-> with an error:
-> 
->  Trying to write privileged spr 338 (0x152) at 0000000030017f0c
-> 
-> With this patch Qemu makes this register available as a hypervisor
-> privileged register.
-> 
-> Note that bits set in this register disable features of the processor.
-> Currently the only register state that is supported is when the register
-> is zeroed (enable all features). This is sufficient for guests to
-> once again boot.
-> 
-> [1] https://lkml.kernel.org/r/20180518013742.24095-1-mikey@neuling.org
-> [2] https://patchwork.ozlabs.org/patch/915932/
-> 
-> Signed-off-by: Joel Stanley <joel@jms.id.au>
-> ---
-> v2:
->  - Change error message to say Invalid instead of Unimplemented
->  - Fix compile warning on other powerpc targets, thanks patchew
-> ---
+It's not handled there, the call from qemu_chr_fe_write has write_all ==
+false.
 
-Reviewed-by: Greg Kurz <groug@kaod.org>
-
->  target/ppc/helper.h             |  1 +
->  target/ppc/misc_helper.c        | 10 ++++++++++
->  target/ppc/translate_init.inc.c |  9 +++++++--
->  3 files changed, 18 insertions(+), 2 deletions(-)
-> 
-> diff --git a/target/ppc/helper.h b/target/ppc/helper.h
-> index 19453c68138a..d751f0e21909 100644
-> --- a/target/ppc/helper.h
-> +++ b/target/ppc/helper.h
-> @@ -17,6 +17,7 @@ DEF_HELPER_2(pminsn, void, env, i32)
->  DEF_HELPER_1(rfid, void, env)
->  DEF_HELPER_1(hrfid, void, env)
->  DEF_HELPER_2(store_lpcr, void, env, tl)
-> +DEF_HELPER_2(store_pcr, void, env, tl)
->  #endif
->  DEF_HELPER_1(check_tlb_flush_local, void, env)
->  DEF_HELPER_1(check_tlb_flush_global, void, env)
-> diff --git a/target/ppc/misc_helper.c b/target/ppc/misc_helper.c
-> index 8c8cba5cc6f1..1870f4c47f1a 100644
-> --- a/target/ppc/misc_helper.c
-> +++ b/target/ppc/misc_helper.c
-> @@ -20,6 +20,7 @@
->  #include "cpu.h"
->  #include "exec/exec-all.h"
->  #include "exec/helper-proto.h"
-> +#include "qemu/error-report.h"
->  
->  #include "helper_regs.h"
->  
-> @@ -98,6 +99,15 @@ void helper_store_ptcr(CPUPPCState *env, target_ulong val)
->          tlb_flush(CPU(cpu));
->      }
->  }
-> +
-> +void helper_store_pcr(CPUPPCState *env, target_ulong value)
-> +{
-> +    if (value != 0) {
-> +        error_report("Invalid PCR value 0x"TARGET_FMT_lx, value);
-> +        return;
-> +    }
-> +    env->spr[SPR_PCR] = value;
-> +}
->  #endif /* defined(TARGET_PPC64) */
->  
->  void helper_store_pidr(CPUPPCState *env, target_ulong val)
-> diff --git a/target/ppc/translate_init.inc.c b/target/ppc/translate_init.inc.c
-> index ab782cb32aaa..1a89017ddea8 100644
-> --- a/target/ppc/translate_init.inc.c
-> +++ b/target/ppc/translate_init.inc.c
-> @@ -424,6 +424,10 @@ static void spr_write_ptcr(DisasContext *ctx, int sprn, int gprn)
->      gen_helper_store_ptcr(cpu_env, cpu_gpr[gprn]);
->  }
->  
-> +static void spr_write_pcr(DisasContext *ctx, int sprn, int gprn)
-> +{
-> +    gen_helper_store_pcr(cpu_env, cpu_gpr[gprn]);
-> +}
->  #endif
->  #endif
->  
-> @@ -7957,11 +7961,12 @@ static void gen_spr_power6_common(CPUPPCState *env)
->  #endif
->      /*
->       * Register PCR to report POWERPC_EXCP_PRIV_REG instead of
-> -     * POWERPC_EXCP_INVAL_SPR.
-> +     * POWERPC_EXCP_INVAL_SPR in userspace. Permit hypervisor access.
->       */
-> -    spr_register(env, SPR_PCR, "PCR",
-> +    spr_register_hv(env, SPR_PCR, "PCR",
->                   SPR_NOACCESS, SPR_NOACCESS,
->                   SPR_NOACCESS, SPR_NOACCESS,
-> +                 &spr_read_generic, &spr_write_pcr,
->                   0x00000000);
->  }
->  
+Paolo
