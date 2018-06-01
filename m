@@ -1,26 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55936)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56109)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1fOm3k-0000nd-6i
-	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 11:33:46 -0400
+	(envelope-from <alindsay@codeaurora.org>) id 1fOm4Z-0001EK-Cy
+	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 11:34:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1fOm3g-0000kz-8g
-	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 11:33:44 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:58794 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1fOm3g-0000kj-2F
-	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 11:33:40 -0400
-Date: Fri, 1 Jun 2018 16:33:29 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20180601153328.GC2531@work-vm>
-References: <1524550428-27173-1-git-send-email-wei.w.wang@intel.com>
-	<20180601045824.GH14867@xz-mi> <5B10F412.8050900@intel.com>
-	<20180601104005.GL14867@xz-mi>
+	(envelope-from <alindsay@codeaurora.org>) id 1fOm4Y-000169-G3
+	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 11:34:35 -0400
+Date: Fri, 1 Jun 2018 11:34:23 -0400
+From: Aaron Lindsay <alindsay@codeaurora.org>
+Message-ID: <20180601153423.GB12424@codeaurora.org>
+References: <1521232280-13089-1-git-send-email-alindsay@codeaurora.org>
+	<1521232280-13089-16-git-send-email-alindsay@codeaurora.org>
+	<CAFEAcA9bYdwByseqCMKSVtWV59mNruT3jJfWWLju1koCnwSb=Q@mail.gmail.com>
+	<20180417142318.GO24561@codeaurora.org>
+	<CAFEAcA8RwC7DSbo+mMqYUS6tL5UwfQGMa_r5AnAkJqm7v63HWw@mail.gmail.com>
+	<20180517193104.GB4771@codeaurora.org>
+	<CAFEAcA-+sO3oUqfQXHcHRBu2i-WFzvFKObcBz26qeLS_0+3s2Q@mail.gmail.com>
+	<20180531203906.GA12424@codeaurora.org>
+	<CAFEAcA_2z-2utCiPQM0DtZGXgiE2qbVsB=Nn81j9DP7Z8keRqw@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20180601104005.GL14867@xz-mi>
-Subject: Re: [Qemu-devel] [PATCH v7 0/5] virtio-balloon: free page hint
- reporting support
+In-Reply-To: <CAFEAcA_2z-2utCiPQM0DtZGXgiE2qbVsB=Nn81j9DP7Z8keRqw@mail.gmail.com>
+Subject: Re: [Qemu-devel] [PATCH v3 15/22] target/arm: Add ARM_FEATURE_V7VE
+ for v7 Virtualization Extensions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,108 +31,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: Wei Wang <wei.w.wang@intel.com>, qemu-devel@nongnu.org, virtio-dev@lists.oasis-open.org, mst@redhat.com, quintela@redhat.com, yang.zhang.wz@gmail.com, quan.xu0@gmail.com, liliang.opensource@gmail.com, pbonzini@redhat.com, nilal@redhat.com
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-arm <qemu-arm@nongnu.org>, Alistair Francis <alistair.francis@xilinx.com>, Wei Huang <wei@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>, Michael Spradling <mspradli@codeaurora.org>, Digant Desai <digantd@codeaurora.org>
 
-* Peter Xu (peterx@redhat.com) wrote:
-> On Fri, Jun 01, 2018 at 03:21:54PM +0800, Wei Wang wrote:
-> > On 06/01/2018 12:58 PM, Peter Xu wrote:
-> > > On Tue, Apr 24, 2018 at 02:13:43PM +0800, Wei Wang wrote:
-> > > > This is the deivce part implementation to add a new feature,
-> > > > VIRTIO_BALLOON_F_FREE_PAGE_HINT to the virtio-balloon device. The device
-> > > > receives the guest free page hints from the driver and clears the
-> > > > corresponding bits in the dirty bitmap, so that those free pages are
-> > > > not transferred by the migration thread to the destination.
-> > > > 
-> > > > - Test Environment
-> > > >      Host: Intel(R) Xeon(R) CPU E5-2699 v4 @ 2.20GHz
-> > > >      Guest: 8G RAM, 4 vCPU
-> > > >      Migration setup: migrate_set_speed 100G, migrate_set_downtime 2 second
-> > > > 
-> > > > - Test Results
-> > > >      - Idle Guest Live Migration Time (results are averaged over 10 runs):
-> > > >          - Optimization v.s. Legacy = 271ms vs 1769ms --> ~86% reduction
-> > > >      - Guest with Linux Compilation Workload (make bzImage -j4):
-> > > >          - Live Migration Time (average)
-> > > >            Optimization v.s. Legacy = 1265ms v.s. 2634ms --> ~51% reduction
-> > > >          - Linux Compilation Time
-> > > >            Optimization v.s. Legacy = 4min56s v.s. 5min3s
-> > > >            --> no obvious difference
-> > > > 
-> > > > - Source Code
-> > > >      - QEMU:  https://github.com/wei-w-wang/qemu-free-page-lm.git
-> > > >      - Linux: https://github.com/wei-w-wang/linux-free-page-lm.git
-> > > Hi, Wei,
-> > > 
-> > > I have a very high-level question to the series.
-> > 
-> > Hi Peter,
-> > 
-> > Thanks for joining the discussion :)
+On Jun 01 09:57, Peter Maydell wrote:
+> On 31 May 2018 at 21:39, Aaron Lindsay <alindsay@codeaurora.org> wrote:
+> > On May 31 15:18, Peter Maydell wrote:
+> >>    if (arm_feature(env, ARM_FEATURE_V7VE) {
+> >>        /* v7 Virtualization Extensions. In real hardware this implies
+> >>         * EL2 and also the presence of the Security Extensions.
+> >>         * For QEMU, for backwards-compatibility we implement some
+> >>         * CPUs or CPU configs which have no actual EL2 or EL3 but do
+> >>         * include the various other features that V7VE implies.
+> >>         * Presence of EL2 itself is ARM_FEATURE_EL2, and of the
+> >>         * Security Extensions is ARM_FEATURE_EL3.
+> >>         */
+> >>        set_feature(env, ARM_FEATURE_ARM_DIV);
+> >
+> > Is it safe to assume from your comment above regarding keeping ARM_DIV
+> > separate from V7VE that the inclusion of it here is an oversight and
+> > that only LPAE and V7 should be set if V7VE is? (and that V8 should
+> > now directly imply both V7VE and ARM_DIV?)
 > 
-> Thanks for letting me know this thread.  It's an interesting idea. :)
-> 
-> > 
-> > > 
-> > > IIUC the core idea for this series is that we can avoid sending some
-> > > of the pages if we know that we don't need to send them.  I think this
-> > > is based on the fact that on the destination side all the pages are by
-> > > default zero after they are malloced.  While before this series, IIUC
-> > > any migration will send every single page to destination, no matter
-> > > whether it's zeroed or not.  So I'm uncertain about whether this will
-> > > affect the received bitmap on the destination side.  Say, before this
-> > > series, the received bitmap will directly cover the whole RAM bitmap
-> > > after migration is finished, now it's won't.  Will there be any side
-> > > effect?  I don't see obvious issue now, but just raise this question
-> > > up.
-> > 
-> > This feature currently only supports pre-copy (I think the received bitmap
-> > is something matters to post copy only).
-> > That's why we have
-> > rs->free_page_support = ..&& !migrate_postcopy();
-> 
-> Okay.
-> 
-> > 
-> > > Meanwhile, this reminds me about a more funny idea: whether we can
-> > > just avoid sending the zero pages directly from QEMU's perspective.
-> > > In other words, can we just do nothing if save_zero_page() detected
-> > > that the page is zero (I guess the is_zero_range() can be fast too,
-> > > but I don't know exactly how fast it is)?  And how that would be
-> > > differed from this page hinting way in either performance and other
-> > > aspects.
-> > 
-> > I guess you referred to the zero page optimization. I think the major
-> > overhead comes to the zero page checking - lots of memory accesses, which
-> > also waste memory bandwidth. Please see the results attached in the cover
-> > letter. The legacy case already includes the zero page optimization.
-> 
-> I replied in the other thread.  We can discuss there altogether.
-> 
-> Actually after a second thought I think maybe what I worried there is
-> exactly the reason why we must send the zero page flag - otherwise
-> there can be stale non-zero page on destination.  Here "zero page" and
-> "freed page" is totally different idea since even if a page is zeroed
-> it might still be in use (not freed)!  While instead for a "free page"
-> even if it's non-zero we might be able to not send it at all, though I
-> am not sure whether that mismatch of data might cause any side effect
-> too. I think the corresponding question would be: if a page is freed
-> in Linux kernel, would its data matter any more?
+> No; V7VE always implies ARM_DIV. (ARM_DIV doesn't imply V7VE,
+> though, which is why it is a separate feature bit.)
 
-I think the answer is no - it doesn't matter; by telling the hypervisor
-the page is 'free' the kernel gives freedom to the hypervisor to
-discard the page contents.
-Now, that is trusting the kernel to get it's 'free' flags right,
-and we wouldn't want a malicious guest kernel to be able to read random
-data, so we have to be a little careful that what actually lands
-in there is something the guest has had at some point - or zero
-which is a very nice empty value.
+Okay, then I'm confused about some of the preexisting logic in
+kvm_arm_get_host_cpu_features. The preexisting code in that function
+sets ARM_DIV and THUMB_DIV based on the appropriate bits in ID_ISAR0. If
+we already knew that
+>    (by definition a host CPU which supports KVM has v7VE.)
+and that all V7VE CPUs have ARM_DIV, why did the code there bother
+checking ID_ISAR0 to begin with?
 
-Dave
+> switch (extract32(id_isar0, 24, 4)) {
+> case 1:
+>     set_feature(&features, ARM_FEATURE_THUMB_DIV);
+>     break;
+> case 2:
+>     set_feature(&features, ARM_FEATURE_ARM_DIV);
+>     set_feature(&features, ARM_FEATURE_THUMB_DIV);
+>     break;
+> default:
+>     break;
+> }
 
-> Thanks,
-> 
-> -- 
-> Peter Xu
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+Should this switch/case be removed entirely?
+
+-Aaron
+
+-- 
+Qualcomm Datacenter Technologies as an affiliate of Qualcomm Technologies, Inc.
+Qualcomm Technologies, Inc. is a member of the
+Code Aurora Forum, a Linux Foundation Collaborative Project.
