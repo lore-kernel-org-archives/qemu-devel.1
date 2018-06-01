@@ -1,28 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34858)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35109)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1fOgoI-0004nO-NA
-	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 05:57:29 -0400
+	(envelope-from <stefanha@redhat.com>) id 1fOgpi-0005bW-UA
+	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 05:58:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1fOgoD-0006Jp-OH
-	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 05:57:26 -0400
-Received: from 10.mo178.mail-out.ovh.net ([46.105.76.150]:42100)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1fOgoD-0006Iz-HT
-	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 05:57:21 -0400
-Received: from player157.ha.ovh.net (unknown [10.109.108.46])
-	by mo178.mail-out.ovh.net (Postfix) with ESMTP id 46CFE164F2
-	for <qemu-devel@nongnu.org>; Fri,  1 Jun 2018 11:57:18 +0200 (CEST)
-Date: Fri, 1 Jun 2018 11:57:14 +0200
-From: Greg Kurz <groug@kaod.org>
-Message-ID: <20180601115714.0d831f92@bahia.lan>
-In-Reply-To: <0758699faca2ee5526d2b64e0a5fdda7e7845cbc.1527814874.git.keno@juliacomputing.com>
-References: <cover.1527814874.git.keno@juliacomputing.com>
-	<0758699faca2ee5526d2b64e0a5fdda7e7845cbc.1527814874.git.keno@juliacomputing.com>
+	(envelope-from <stefanha@redhat.com>) id 1fOgpi-00079M-35
+	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 05:58:55 -0400
+Date: Fri, 1 Jun 2018 10:58:43 +0100
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <20180601095843.GE8687@stefanha-x1.localdomain>
+References: <20180531023445.5923-1-famz@redhat.com>
+	<20180531023445.5923-3-famz@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 06/20] 9p: Avoid warning if
- FS_IOC_GETVERSION is not defined
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="wchHw8dVAp53YPj8"
+Content-Disposition: inline
+In-Reply-To: <20180531023445.5923-3-famz@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 2/2] backup: Use copy offloading
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,115 +24,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Keno Fischer <keno@juliacomputing.com>
-Cc: qemu-devel@nongnu.org
+To: Fam Zheng <famz@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Jeff Cody <jcody@redhat.com>
 
-On Thu, 31 May 2018 21:26:01 -0400
-Keno Fischer <keno@juliacomputing.com> wrote:
 
-> Both `stbuf` and `local_ioc_getversion` where unused when
-> FS_IOC_GETVERSION was not defined, causing a compiler warning.
-> 
-> Reorgnaize the code to avoid this warning.
-> 
-> Signed-off-by: Keno Fischer <keno@juliacomputing.com>
+--wchHw8dVAp53YPj8
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Thu, May 31, 2018 at 10:34:45AM +0800, Fam Zheng wrote:
+> The implementation is similar to the 'qemu-img convert'. In the
+> beginning of the job, offloaded copy is attempted. If it fails, further
+> I/O will go through the existing bounce buffer code path.
+>=20
+> Signed-off-by: Fam Zheng <famz@redhat.com>
 > ---
-> 
-> Changes since v1:
->  * As request in review, logic is factored into a
->    local_ioc_getversion_init function.
-> 
->  hw/9pfs/9p-local.c | 43 +++++++++++++++++++++++++------------------
->  1 file changed, 25 insertions(+), 18 deletions(-)
-> 
-> diff --git a/hw/9pfs/9p-local.c b/hw/9pfs/9p-local.c
-> index 576c8e3..6222891 100644
-> --- a/hw/9pfs/9p-local.c
-> +++ b/hw/9pfs/9p-local.c
-> @@ -1375,10 +1375,10 @@ static int local_unlinkat(FsContext *ctx, V9fsPath *dir,
->      return ret;
->  }
->  
-> +#ifdef FS_IOC_GETVERSION
->  static int local_ioc_getversion(FsContext *ctx, V9fsPath *path,
->                                  mode_t st_mode, uint64_t *st_gen)
->  {
-> -#ifdef FS_IOC_GETVERSION
->      int err;
->      V9fsFidOpenState fid_open;
->  
-> @@ -1397,32 +1397,19 @@ static int local_ioc_getversion(FsContext *ctx, V9fsPath *path,
->      err = ioctl(fid_open.fd, FS_IOC_GETVERSION, st_gen);
->      local_close(ctx, &fid_open);
->      return err;
-> -#else
-> -    errno = ENOTTY;
-> -    return -1;
-> -#endif
->  }
-> +#endif
->  
-> -static int local_init(FsContext *ctx, Error **errp)
-> +static int local_ioc_getversion_init(FsContext *ctx, LocalData *data)
->  {
-> +#ifdef FS_IOC_GETVERSION
->      struct statfs stbuf;
-> -    LocalData *data = g_malloc(sizeof(*data));
->  
-> -    data->mountfd = open(ctx->fs_root, O_DIRECTORY | O_RDONLY);
-> -    if (data->mountfd == -1) {
-> -        error_setg_errno(errp, errno, "failed to open '%s'", ctx->fs_root);
-> -        goto err;
-> -    }
-> -
-> -#ifdef FS_IOC_GETVERSION
->      /*
->       * use ioc_getversion only if the ioctl is definied
->       */
->      if (fstatfs(data->mountfd, &stbuf) < 0) {
-> -        close_preserve_errno(data->mountfd);
-> -        error_setg_errno(errp, errno,
-> -            "failed to stat file system at '%s'", ctx->fs_root);
-> -        goto err;
+>  block/backup.c     | 93 +++++++++++++++++++++++++++++++++++-------------=
+------
+>  block/trace-events |  1 +
+>  2 files changed, 62 insertions(+), 32 deletions(-)
+>=20
+> diff --git a/block/backup.c b/block/backup.c
+> index 4e228e959b..ab189693f4 100644
+> --- a/block/backup.c
+> +++ b/block/backup.c
+> @@ -45,6 +45,8 @@ typedef struct BackupBlockJob {
+>      QLIST_HEAD(, CowRequest) inflight_reqs;
+> =20
+>      HBitmap *copy_bitmap;
+> +    bool use_copy_range;
+> +    int64_t copy_range_size;
+>  } BackupBlockJob;
+> =20
+>  static const BlockJobDriver backup_job_driver;
+> @@ -111,49 +113,70 @@ static int coroutine_fn backup_do_cow(BackupBlockJo=
+b *job,
+>      cow_request_begin(&cow_request, job, start, end);
+> =20
+>      for (; start < end; start +=3D job->cluster_size) {
+> +retry:
 
-Hmm, I'd prefer to keep the error_setg_errno() with fstatfs(), ie,
-add an errp argument to this function.
+This for loop is becoming complex.  Please introduce helper functions.
+The loop body can be replaced with something like this:
 
-> +        return -1;
->      }
->      switch (stbuf.f_type) {
->      case EXT2_SUPER_MAGIC:
-> @@ -1433,6 +1420,26 @@ static int local_init(FsContext *ctx, Error **errp)
->          break;
->      }
->  #endif
-> +    return 0;
-> +}
-> +
-> +static int local_init(FsContext *ctx, Error **errp)
-> +{
-> +    LocalData *data = g_malloc(sizeof(*data));
-> +
-> +    data->mountfd = open(ctx->fs_root, O_DIRECTORY | O_RDONLY);
-> +    if (data->mountfd == -1) {
-> +        error_setg_errno(errp, errno, "failed to open '%s'", ctx->fs_root);
-> +        goto err;
-> +    }
-> +
-> +    if (local_ioc_getversion_init(ctx, data) < 0) {
-> +        close_preserve_errno(data->mountfd);
+  if (!hbitmap_get(job->copy_bitmap, start / job->cluster_size)) {
+      trace_backup_do_cow_skip(job, start);
+      continue; /* already copied */
+  }
 
-And this could even be a plain close()
+  trace_backup_do_cow_process(job, start);
 
-> +        error_setg_errno(errp, errno,
-> +            "failed initialize ioc_getversion for file system at '%s'",
+  ret =3D -ENOTSUPP;
+  if (job->use_copy_range) {
+      ret =3D cow_with_offload(...);
+  }
+  if (ret < 0) {
+      job->use_copy_range =3D false;
+      ret =3D cow_with_bounce_buffer(...);
+  }
+  if (ret < 0) {
+      trace_backup_do_cow_write_fail(job, start, ret);
+      goto out;
+  }
 
-True, but I think "failed to stat file system" is more meaningful,
-especially with the errno.
+--wchHw8dVAp53YPj8
+Content-Type: application/pgp-signature; name="signature.asc"
 
-> +            ctx->fs_root);
-> +        goto err;
-> +    }
->  
->      if (ctx->export_flags & V9FS_SM_PASSTHROUGH) {
->          ctx->xops = passthrough_xattr_ops;
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJbERjTAAoJEJykq7OBq3PIv0MH+wcyZv+UNU+7lELc9uefKS0/
+vcd2/X11uV29zOXXjB6sVkBiNJe3pFdxcmtokOk72OWzc0J3hn5cxh4pkmHwcP6e
+nbxFdHsLQbQ44ZNjoWtkmTivkZfxq2M4Ed5mEDtrL6sgvYYv90Wsy4vQEbQZMqGL
+AMGwXT2Dkg1r/oxZEj8Cxeio2qZw0McDuRkvr8qhSsh55MBFDOHQ7bchcTiDsQIC
+epVVFOvX4/ozfF/Wq083Kf0JjL3ZnaxCPl7loY813r6clnY8Z32qWuS4clRxwGNu
+uV8uqfuUqPI+ggOqN8LfoDDF+02NVpixOQM48r5u03gN0A9CN5zILmsFOx6rMJc=
+=qCLa
+-----END PGP SIGNATURE-----
+
+--wchHw8dVAp53YPj8--
