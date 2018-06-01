@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43661)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44981)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1fOhY5-0001Lg-Mw
-	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 06:44:46 -0400
+	(envelope-from <berto@igalia.com>) id 1fOhfk-00035E-N4
+	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 06:52:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1fOhY4-0005WZ-QU
-	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 06:44:45 -0400
-Received: from mail-wm0-x244.google.com ([2a00:1450:400c:c09::244]:34584)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1fOhY4-0005WE-Jf
-	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 06:44:44 -0400
-Received: by mail-wm0-x244.google.com with SMTP id q4-v6so5978544wmq.1
-	for <qemu-devel@nongnu.org>; Fri, 01 Jun 2018 03:44:44 -0700 (PDT)
+	(envelope-from <berto@igalia.com>) id 1fOhfh-0000vd-Jz
+	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 06:52:40 -0400
+From: Alberto Garcia <berto@igalia.com>
+In-Reply-To: <20180503122241.GA6140@localhost.localdomain>
+References: <w517ep7gpsz.fsf@maestria.local.igalia.com>
+	<ee24e79d-b37e-ac8f-c349-b0fa637ba2a6@redhat.com>
+	<w51bmegjzp4.fsf@maestria.local.igalia.com>
+	<216e7398-0bc3-4822-d4b0-e0267c714abb@redhat.com>
+	<w5136zjsar5.fsf@maestria.local.igalia.com>
+	<bc26c382-458f-5a86-de59-3945397fbcac@redhat.com>
+	<w51wowvqu65.fsf@maestria.local.igalia.com>
+	<b3ec832d-202b-db93-a163-3d63a4d36326@redhat.com>
+	<w51h8nqcijb.fsf@maestria.local.igalia.com>
+	<aab201a7-ef3f-8152-cc37-85ae7e106a5e@redhat.com>
+	<20180503122241.GA6140@localhost.localdomain>
+Date: Fri, 01 Jun 2018 12:51:59 +0200
+Message-ID: <w51zi0e6apc.fsf@maestria.local.igalia.com>
 MIME-Version: 1.0
-In-Reply-To: <CAJSP0QU3h_k28ZouCaJ7eAmLXKOEwEUDYBn2enqaD29U96EuWw@mail.gmail.com>
-References: <20180529220338.10879-1-jusual@mail.ru>
-	<20180529220338.10879-3-jusual@mail.ru>
-	<CALHRZuqSYfTjXJKD=y4Ew9CUvUyhM-biG8Q7Bhs+0r0kYo_sQA@mail.gmail.com>
-	<CAJSP0QU3h_k28ZouCaJ7eAmLXKOEwEUDYBn2enqaD29U96EuWw@mail.gmail.com>
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Date: Fri, 1 Jun 2018 11:44:43 +0100
-Message-ID: <CAJSP0QV_wOv1bV-yB49T7YJA_kjRJb25NkTbt+y2uwzgk_ayGg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [RFC 2/3] hw/char/nrf51_uart: Implement nRF51 SoC
- UART
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [RFC] Intermediate block mirroring
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,51 +31,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: sundeep subbaraya <sundeep.lkml@gmail.com>
-Cc: Julia Suvorova <jusual@mail.ru>, qemu-devel <qemu-devel@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>, Jim Mussared <jim@groklearning.com>, =?UTF-8?Q?Steffen_G=C3=B6rtz?= <mail@steffen-goertz.de>, Joel Stanley <joel@jms.id.au>
+To: Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, Eric Blake <eblake@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
 
-On Fri, Jun 1, 2018 at 11:41 AM, Stefan Hajnoczi <stefanha@gmail.com> wrote:
-> On Thu, May 31, 2018 at 2:58 PM, sundeep subbaraya
-> <sundeep.lkml@gmail.com> wrote:
->> On Wed, May 30, 2018 at 3:33 AM, Julia Suvorova via Qemu-devel
->> <qemu-devel@nongnu.org> wrote:
->>> +static uint64_t uart_read(void *opaque, hwaddr addr, unsigned int size)
->>> +{
->>> +    Nrf51UART *s = NRF51_UART(opaque);
->>> +    uint64_t r;
->>> +
->>> +    switch (addr) {
->>> +    case A_RXD:
->>> +        r = s->rx_fifo[s->rx_fifo_pos];
->>> +        if (s->rx_fifo_len > 0) {
->>> +            s->rx_fifo_pos = (s->rx_fifo_pos + 1) % UART_FIFO_LENGTH;
->>> +            s->rx_fifo_len--;
->>> +            qemu_chr_fe_accept_input(&s->chr);
->>> +        }
->>> +        break;
->>> +
->>> +    case A_INTENSET:
->>> +    case A_INTENCLR:
->>> +    case A_INTEN:
->>> +        r = s->reg[A_INTEN];
->>> +        break;
->>> +    default:
->>> +        r = s->reg[addr];
->>
->> You can use R_* macros for registers and access regs[ ] with addr/4 as index.
->> It is better than using big regs[ ] array out of which most of
->> locations go unused.
+On Thu 03 May 2018 02:22:41 PM CEST, Kevin Wolf wrote:
+>> > Were the (more or less) exact requirements of QMP blockdev-reopen
+>> > discussed? How is it different from qemu-io's "reopen" command?
+>> > What are the options that you can and can not change?
+>> 
+>> I can't quite remember, I'm afraid.  I think it was supposed to be
+>> pretty much qemu-io's reopen (so just bdrv_reopen()).  I suppose you
+>> cannot change the driver (obviously) or probably the node name, because
+>> either would result in the node being replaced by a completely new one.
+>> 
+>> Other than that, it probably depends on what the block driver supports,
+>> but ideally you should be able to change everything.
 >
-> Good point.  The bug is more severe than an inefficiency.
-> s->reg[addr] allows out-of-bounds accesses.  This is a security bug.
+> Honestly the design of bdrv_reopen() is quite broken because of the
+> way it tries to maintain old options if they aren't specified, and
+> guesses what you might mean when you add flags to the mix. The exact
+> semantics are quite complicated and I'd rather avoid them in a stable
+> API.
 >
-> The memory region is 0x1000 *bytes* long, but the array has 0x1000
-> 32-bit *elements*.  A read from address 0xfffc results in a memory
-> load from s->reg + 0xfffc * sizeof(s->reg[0]).  That's beyond the end
-> of the array!
+> A clean QMP command would probably apply the same defaults as
+> blockdev-add, so you just get to specify the full options again.
 
-Sorry, I was wrong.  The array is large enough after all.  It's just
-an inefficiency, but still worth fixing.  Similar issues could lead to
-out-of-bound accesses.
+I have a prototype of this working and almost ready to be published, but
+there's a tricky thing with this part:
 
-Stefan
+If we want blockdev-reopen to apply the defaults for all options except
+from the ones expliclity specified by the user, then it means that we
+need to check not just the options that are present, but also the ones
+that are omitted.
+
+For example:
+
+   { "execute": "blockdev-add",
+     "arguments": { "driver": "null-aio",
+                    "node-name": "root",
+                    "size": 1024 }
+
+This adds a null-aio block device with the "size" option set to 1024
+(the default is 1 << 30).
+
+null_reopen_prepare() allows reopening that block device, but it does
+not allow changing any of its options. Attempting to change the value of
+"size" is detected by the loop that checks unhandled options at the end
+of bdrv_reopen_prepare() and returns "Cannot change the option 'size'".
+
+So far, so good. We have this generic check for all options that works
+with all drivers, so as long as we only specify options that we know
+that can be changed, everything is fine.
+
+However if we want blockdev-reopen to apply the default values for all
+omitted options, then omitting "size" would be equivalent to setting it
+to its default value (1 << 30). And if "size" cannot be changed then
+QEMU should complain unless we explicitly set "size" to 1024 again on
+reopen.
+
+This complicates things a bit, because we would go from "the options
+that can't be changed are the ones that are not handled by each driver's
+_prepare() function" to "options that are absent can also produce an
+error".
+
+Berto
