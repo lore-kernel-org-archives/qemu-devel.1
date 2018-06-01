@@ -1,28 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48326)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48554)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1fOi0S-0001yc-Bh
-	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 07:14:05 -0400
+	(envelope-from <mreitz@redhat.com>) id 1fOi1e-0002vH-Ln
+	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 07:15:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1fOi0N-0002fY-CV
-	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 07:14:04 -0400
-Received: from 9.mo68.mail-out.ovh.net ([46.105.78.111]:37088)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1fOi0N-0002ea-44
-	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 07:13:59 -0400
-Received: from player728.ha.ovh.net (unknown [10.109.105.46])
-	by mo68.mail-out.ovh.net (Postfix) with ESMTP id 1991DE5B42
-	for <qemu-devel@nongnu.org>; Fri,  1 Jun 2018 13:13:56 +0200 (CEST)
-Date: Fri, 1 Jun 2018 13:13:52 +0200
-From: Greg Kurz <groug@kaod.org>
-Message-ID: <20180601131352.6ab033aa@bahia.lan>
-In-Reply-To: <5d222847166f7f3f2b05e7e8a0a0ab3d7520b49d.1527814874.git.keno@juliacomputing.com>
-References: <cover.1527814874.git.keno@juliacomputing.com>
-	<5d222847166f7f3f2b05e7e8a0a0ab3d7520b49d.1527814874.git.keno@juliacomputing.com>
+	(envelope-from <mreitz@redhat.com>) id 1fOi1d-0003dN-Ai
+	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 07:15:18 -0400
+References: <20180501165750.19242-1-mreitz@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <6e9ba185-ca93-cfdc-cf7a-518c431ffd91@redhat.com>
+Date: Fri, 1 Jun 2018 13:15:04 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 15/20] 9p: darwin: *xattr_nofollow
- implementations
+In-Reply-To: <20180501165750.19242-1-mreitz@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="pE3ExPeXjl77vtmszvvjLl9e8jwGbn6xh"
+Subject: Re: [Qemu-devel] [PATCH 0/2] qemu-img: Special post-backing convert
+ handle
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,137 +24,106 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Keno Fischer <keno@juliacomputing.com>
-Cc: qemu-devel@nongnu.org
+To: qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>
 
-On Thu, 31 May 2018 21:26:10 -0400
-Keno Fischer <keno@juliacomputing.com> wrote:
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--pE3ExPeXjl77vtmszvvjLl9e8jwGbn6xh
+From: Max Reitz <mreitz@redhat.com>
+To: qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>
+Message-ID: <6e9ba185-ca93-cfdc-cf7a-518c431ffd91@redhat.com>
+Subject: Re: [PATCH 0/2] qemu-img: Special post-backing convert handle
+References: <20180501165750.19242-1-mreitz@redhat.com>
+In-Reply-To: <20180501165750.19242-1-mreitz@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-> This implements the darwin equivalent of the functions that were
-> moved to 9p-util(-linux) earlier in this series in the new
-> 9p-util-darwin file.
-> 
-> Signed-off-by: Keno Fischer <keno@juliacomputing.com>
-> ---
-> 
+On 2018-05-01 18:57, Max Reitz wrote:
+> This is the issue:
+>=20
+> $ qemu-img create -f qcow2 base.qcow2 512M
+> Formatting 'base.qcow2', fmt=3Dqcow2 size=3D536870912 cluster_size=3D65=
+536 lazy_refcounts=3Doff refcount_bits=3D16
+> $ qemu-img create -f qcow2 -b base.qcow2 source.qcow2 1G
+> Formatting 'source.qcow2', fmt=3Dqcow2 size=3D1073741824 backing_file=3D=
+base.qcow2 cluster_size=3D65536 lazy_refcounts=3Doff refcount_bits=3D16
+> $ qemu-img convert -O qcow2 -B base.qcow2 -o compat=3D0.10 \
+>     source.qcow2 target.qcow2
+> $ qemu-img info target.qcow2
+> image: target.qcow2
+> file format: qcow2
+> virtual size: 1.0G (1073741824 bytes)
+> disk size: 512M    <-------------------- this here
+> cluster_size: 65536
+> backing file: base.qcow2
+> Format specific information:
+>     compat: 0.10
+>     refcount bits: 16
+> $ qemu-img map target.qcow2
+> Offset          Length          Mapped to       File
+> 0x20000000      0x20000000      0x50000         target.qcow2
+>=20
+> So qemu-img convert sees that source.qcow2 contains only zeroes past th=
+e
+> end of base.qcow2 -- but that is not the backing file, so it will
+> explicitly write zeroes to target.qcow2.  But that file is compat=3D0.1=
+0,
+> so it does not support efficient zero writes and will actually fill tha=
+t
+> area with real zeroes.  Hence the mapping, hence the disk size.
+>=20
+> However, we don't need to write zeroes to an image when it is
+> initialized to zeroes -- which the current qemu-img code says doesn't
+> happen for target images with backing files.  But it does happen when
+> the target backing file is shorter than the target image, then the area=
 
-The patch looks good but...
+> past the end of the backing file may indeed read as zeroes and we don't=
 
-> Changes from v1:
->  * New 9p-util-darwin.c rather than ifdefs in 9p-util.c
->  * Drop incorrect AT_NOFOLLOW from the actual call
-> 
->  hw/9pfs/9p-util-darwin.c | 64 ++++++++++++++++++++++++++++++++++++++++++++++++
->  hw/9pfs/Makefile.objs    |  1 +
->  2 files changed, 65 insertions(+)
->  create mode 100644 hw/9pfs/9p-util-darwin.c
-> 
-> diff --git a/hw/9pfs/9p-util-darwin.c b/hw/9pfs/9p-util-darwin.c
-> new file mode 100644
-> index 0000000..cdb4c9e
-> --- /dev/null
-> +++ b/hw/9pfs/9p-util-darwin.c
-> @@ -0,0 +1,64 @@
-> +/*
-> + * 9p utilities (Darwin Implementation)
-> + *
-> + * This work is licensed under the terms of the GNU GPL, version 2 or later.
-> + * See the COPYING file in the top-level directory.
-> + */
-> +
-> +#include "qemu/osdep.h"
-> +#include "qemu/xattr.h"
-> +#include "9p-util.h"
-> +
-> +ssize_t fgetxattrat_nofollow(int dirfd, const char *filename, const char *name,
-> +                             void *value, size_t size)
-> +{
-> +    int ret;
-> +    int fd = openat_file(dirfd, filename,
-> +                         O_RDONLY | O_PATH_9P_UTIL | O_NOFOLLOW, 0);
-> +    if (fd == -1) {
-> +        return -1;
-> +    }
-> +    ret = fgetxattr(fd, name, value, size, 0, 0);
-> +    close_preserve_errno(fd);
-> +    return ret;
-> +}
-> +
-> +ssize_t flistxattrat_nofollow(int dirfd, const char *filename,
-> +                              char *list, size_t size)
-> +{
-> +    int ret;
-> +    int fd = openat_file(dirfd, filename,
-> +                         O_RDONLY | O_PATH_9P_UTIL | O_NOFOLLOW, 0);
-> +    if (fd == -1) {
-> +        return -1;
-> +    }
-> +    ret = flistxattr(fd, list, size, 0);
-> +    close_preserve_errno(fd);
-> +    return ret;
-> +}
-> +
-> +ssize_t fremovexattrat_nofollow(int dirfd, const char *filename,
-> +                                const char *name)
-> +{
-> +    int ret;
-> +    int fd = openat_file(dirfd, filename, O_PATH_9P_UTIL | O_NOFOLLOW, 0);
-> +    if (fd == -1) {
-> +        return -1;
-> +    }
-> +    ret = fremovexattr(fd, name, 0);
-> +    close_preserve_errno(fd);
-> +    return ret;
-> +}
-> +
-> +int fsetxattrat_nofollow(int dirfd, const char *filename, const char *name,
-> +                         void *value, size_t size, int flags)
-> +{
-> +    int ret;
-> +    int fd = openat_file(dirfd, filename, O_PATH_9P_UTIL | O_NOFOLLOW, 0);
-> +    if (fd == -1) {
-> +        return -1;
-> +    }
-> +    ret = fsetxattr(fd, name, value, size, 0, flags);
-> +    close_preserve_errno(fd);
-> +    return ret;
-> +}
+> need to write anything there.
+>=20
+> So the first patch in this series makes qemu-img convert detect that
+> case and handle zeroes past the end of the backing file as "fall back t=
+o
+> the backing file" (because that means zeroes, at least if unallocated
+> areas read as zeroes (which I presume they have to for formats
+> supporting backing files, but better be safe than sorry)), and the
+> second adds an iotest.
+>=20
+>=20
+> Buglink: https://bugzilla.redhat.com/show_bug.cgi?id=3D1527898
+>=20
+>=20
+> Max Reitz (2):
+>   qemu-img: Special post-backing convert handling
+>   iotests: Test post-backing convert target behavior
+>=20
+>  qemu-img.c                 | 26 +++++++++++++++++++++++++-
+>  tests/qemu-iotests/122     | 42 ++++++++++++++++++++++++++++++++++++++=
+++++
+>  tests/qemu-iotests/122.out | 18 ++++++++++++++++++
+>  3 files changed, 85 insertions(+), 1 deletion(-)
 
-... I now realize that flags may come from the client, ie, it should be
-translated before being passed to the backends, pretty much like the other
-patch with unlinkat.
+Applied to my block branch.
 
-The specification for 9p2000.L says it is derived from "Linux setxattr".
+Max
 
-https://github.com/chaos/diod/blob/master/protocol.md#xattrcreate----prepare-to-set-extended-attribute
 
-ie,
+--pE3ExPeXjl77vtmszvvjLl9e8jwGbn6xh
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-include/uapi/linux/xattr.h:#define XATTR_CREATE 0x1     /* set value, fail if attr already exists */
-include/uapi/linux/xattr.h:#define XATTR_REPLACE        0x2     /* set value, fail if attr does not exist */
+-----BEGIN PGP SIGNATURE-----
 
-I guess this calls for some defines in 9p.h:
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlsRKrgACgkQ9AfbAGHV
+z0AyowgAkpuVGchaCWY76ZPlWivSFts40Q6KEbIOlzRZ3vlmpd30b6QrynltQqA0
+b3C1j+smZb2jwkZen2iECjpIrGO8cw0fFHHQuIJMDwNEJ+PNe2XzXD4l7JZQ9oyn
+Ik1+wanZpTsbavcU2/Nc475ieCTgrtdwampQOxNZN//8GreOxrvSNaJCLW4rxkdu
+gd3BwawLnQu+tYJDoOyKsYXkmz7q44K416al+esPLcBo8hoR4Rd0KDpWURx0wdOH
+dS4GYTDf9Kulzw07QcrBb9CD2nfus9IVDTb7xEBLWBatvSoPjmUeen5W7kWitUiQ
+JoHtPjhfiifrmAdEhKbrqmsHiQSZCQ==
+=FkKC
+-----END PGP SIGNATURE-----
 
-/* 9p2000.L says that the 'flags' argument of operation 'xattrcreate'
- * are derived from Linux setxattr.
- */
-#define P9_XATTR_CREATE  1
-#define P9_XATTR_REPLACE 2
-
-Please do that in a preparatory patch.
-
-I would also appreciate you look at other 9P operations and
-check if we have other places where we need to translate
-some flags.
-
-> diff --git a/hw/9pfs/Makefile.objs b/hw/9pfs/Makefile.objs
-> index 083508f..24a8695 100644
-> --- a/hw/9pfs/Makefile.objs
-> +++ b/hw/9pfs/Makefile.objs
-> @@ -1,5 +1,6 @@
->  common-obj-y  = 9p.o
->  common-obj-$(CONFIG_LINUX) += 9p-util-linux.o
-> +common-obj-$(CONFIG_DARWIN) += 9p-util-darwin.o
->  common-obj-y += 9p-local.o 9p-xattr.o
->  common-obj-y += 9p-xattr-user.o 9p-posix-acl.o
->  common-obj-y += coth.o cofs.o codir.o cofile.o
+--pE3ExPeXjl77vtmszvvjLl9e8jwGbn6xh--
