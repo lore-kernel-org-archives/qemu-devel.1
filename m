@@ -1,21 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33417)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34233)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1fOiwR-0007V0-Qm
-	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 08:14:01 -0400
+	(envelope-from <groug@kaod.org>) id 1fOizH-0008VX-Q9
+	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 08:16:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1fOiwN-0001KB-NK
-	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 08:13:59 -0400
-Date: Fri, 1 Jun 2018 14:13:41 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20180601141341.2d0f7ee0@redhat.com>
-In-Reply-To: <451cd080-12ab-42bd-0150-e1dbf0abd859@redhat.com>
-References: <20180517081527.14410-1-david@redhat.com>
-	<451cd080-12ab-42bd-0150-e1dbf0abd859@redhat.com>
+	(envelope-from <groug@kaod.org>) id 1fOizE-00044J-FH
+	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 08:16:55 -0400
+Received: from 17.mo1.mail-out.ovh.net ([87.98.179.142]:35409)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1fOizE-0003xE-8O
+	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 08:16:52 -0400
+Received: from player699.ha.ovh.net (unknown [10.109.122.50])
+	by mo1.mail-out.ovh.net (Postfix) with ESMTP id 4094E1019F6
+	for <qemu-devel@nongnu.org>; Fri,  1 Jun 2018 14:16:41 +0200 (CEST)
+Date: Fri, 1 Jun 2018 14:16:23 +0200
+From: Greg Kurz <groug@kaod.org>
+Message-ID: <20180601141623.78682c23@bahia.lan>
+In-Reply-To: <20180531130429.24911-1-joel@jms.id.au>
+References: <20180531130429.24911-1-joel@jms.id.au>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH v4 00/14] MemoryDevice: use
- multi stage hotplug handlers
+Subject: Re: [Qemu-devel] [PATCH v2] target/ppc: Allow privileged access to
+ SPR_PCR
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,113 +30,112 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>
-Cc: qemu-devel@nongnu.org, Pankaj Gupta <pagupta@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Richard Henderson <rth@twiddle.net>, Cornelia Huck <cohuck@redhat.com>, Alexander Graf <agraf@suse.de>, Markus Armbruster <armbru@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org, qemu-ppc@nongnu.org, Marcel Apfelbaum <marcel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Luiz Capitulino <lcapitulino@redhat.com>, David Gibson <david@gibson.dropbear.id.au>
+To: Joel Stanley <joel@jms.id.au>
+Cc: David Gibson <david@gibson.dropbear.id.au>, Alexander Graf <agraf@suse.de>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, =?UTF-8?B?Q8OpZHJpYw==?= Le Goater <clg@kaod.org>, Benjamin Herrenschmidt <benh@kernel.crashing.org>, Michael Ellerman <mpe@ellerman.id.au>, Michael Neuling <mikey@neuling.org>
 
-On Fri, 25 May 2018 14:43:39 +0200
-David Hildenbrand <david@redhat.com> wrote:
+On Thu, 31 May 2018 22:34:29 +0930
+Joel Stanley <joel@jms.id.au> wrote:
 
-> On 17.05.2018 10:15, David Hildenbrand wrote:
-> > We can have devices that need certain other resources that are e.g.
-> > system resources managed by the machine. We need a clean way to assign
-> > these resources (without violating layers as brought up by Igor).
-> > 
-> > One example is virtio-mem/virtio-pmem. Both device types need to be
-> > assigned some region in guest physical address space. This device memory
-> > belongs to the machine and is managed by it. However, virito devices are
-> > hotplugged using the hotplug handler their proxy device implements. So we
-> > could trigger e.g. a PCI hotplug handler for virtio-pci or a CSS/CCW
-> > hotplug handler for virtio-ccw. But definetly not the machine.
-> > 
-> > Now, we can route other devices through the machine hotplug handler, to
-> > properly assign/unassign resources - like a portion in guest physical
-> > address space.
-
-To sum up review:
-Some comments apply to several patches even though I commented only once.
-
-I'd suggest to restructure and split series into several:
-  * unplug cleanups 08/14 & co
-  * generic _preplug refactoring so we won't have to go back to that question again
-  * extending memory_device interface 11/14 + actual user for the sake of which
-    interface is actually extended (virtio-mem)
-
-Also more descriptive commit messages describing why change is done,
-current ones look like "Lets do something for some vague reason" to
-unaware reviewers, having virtio-mem along with new extensions to
-memory_device would be useful here as it could have cross reference
-to parts that would need it.
-
-Try to keep patches smaller and doing one thing, we can always squash
-them later if it would be better.
-
-I'm sorry if some comments were a bit too much or insisting on things
-but I'm trying to keep hotplug infrastructure simple so that later
-when someone else comes with related patches, I could easily read it
-without studying it from ground up.
-
-PS:
-(I'm not a fan of idea to marry virtio device with its own bus plug logic
-into bus-less machine hotplug, but I don't have a better suggestion or
-time to explore alternatives, so lets do it but keep things manageable)
-
-> > 
-> > v3 -> v4:
-> > - Removed the s390x bits, will send that out separately (was just a proof
-> >   that it works just fine with s390x)
-> > - Fixed a typo and reworded a comment
-> > 
-> > v2 -> v3:
-> > - Added "memory-device: introduce separate config option"
-> > - Dropped "parent_bus" check from hotplug handler lookup functions
-> > - "Handly" -> "Handle" in patch description.
-> > 
-> > v1 -> v2:
-> > - Use multi stage hotplug handler instead of resource handler
-> > - MemoryDevices only compiled if necessary (CONFIG_MEM_HOTPLUG)
-> > - Prepare PC/SPAPR machines properly for multi stage hotplug handlers
-> > - Route SPAPR unplug code via the hotunplug handler
-> > - Directly include s390x support. But there are no usable memory devices
-> >   yet (well, only my virtio-mem prototype)
-> > - Included "memory-device: drop assert related to align and start of address
-> >   space"
-> > 
-> > David Hildenbrand (13):
-> >   memory-device: drop assert related to align and start of address space
-> >   memory-device: introduce separate config option
-> >   pc: prepare for multi stage hotplug handlers
-> >   pc: route all memory devices through the machine hotplug handler
-> >   spapr: prepare for multi stage hotplug handlers
-> >   spapr: route all memory devices through the machine hotplug handler
-> >   spapr: handle pc-dimm unplug via hotplug handler chain
-> >   spapr: handle cpu core unplug via hotplug handler chain
-> >   memory-device: new functions to handle plug/unplug
-> >   pc-dimm: implement new memory device functions
-> >   memory-device: factor out pre-plug into hotplug handler
-> >   memory-device: factor out unplug into hotplug handler
-> >   memory-device: factor out plug into hotplug handler
-> > 
-> > Igor Mammedov (1):
-> >   qdev: let machine hotplug handler to override bus hotplug handler
-> > 
-> >  default-configs/i386-softmmu.mak   |   3 +-
-> >  default-configs/ppc64-softmmu.mak  |   3 +-
-> >  default-configs/x86_64-softmmu.mak |   3 +-
-> >  hw/Makefile.objs                   |   2 +-
-> >  hw/core/qdev.c                     |   6 +-
-> >  hw/i386/pc.c                       | 102 ++++++++++++++++++++++-------
-> >  hw/mem/Makefile.objs               |   4 +-
-> >  hw/mem/memory-device.c             | 129 +++++++++++++++++++++++--------------
-> >  hw/mem/pc-dimm.c                   |  48 ++++++--------
-> >  hw/mem/trace-events                |   4 +-
-> >  hw/ppc/spapr.c                     | 129 +++++++++++++++++++++++++++++++------
-> >  include/hw/mem/memory-device.h     |  21 ++++--
-> >  include/hw/mem/pc-dimm.h           |   3 +-
-> >  include/hw/qdev-core.h             |  11 ++++
-> >  qapi/misc.json                     |   2 +-
-> >  15 files changed, 330 insertions(+), 140 deletions(-)
-> >   
+> The powerpc Linux kernel[1] and skiboot firmware[2] recently gained changes
+> that cause the Processor Compatibility Register (PCR) SPR to be cleared.
 > 
-> As there was no negative feedback so far, I will go ahead and assume
-> that this approach is the right thing to do.
+> These changes cause Linux to fail to boot on the Qemu powernv machine
+> with an error:
 > 
+>  Trying to write privileged spr 338 (0x152) at 0000000030017f0c
+> 
+> With this patch Qemu makes this register available as a hypervisor
+> privileged register.
+> 
+> Note that bits set in this register disable features of the processor.
+> Currently the only register state that is supported is when the register
+> is zeroed (enable all features). This is sufficient for guests to
+> once again boot.
+> 
+> [1] https://lkml.kernel.org/r/20180518013742.24095-1-mikey@neuling.org
+> [2] https://patchwork.ozlabs.org/patch/915932/
+> 
+> Signed-off-by: Joel Stanley <joel@jms.id.au>
+> ---
+> v2:
+>  - Change error message to say Invalid instead of Unimplemented
+>  - Fix compile warning on other powerpc targets, thanks patchew
+> ---
+
+Reviewed-by: Greg Kurz <groug@kaod.org>
+
+>  target/ppc/helper.h             |  1 +
+>  target/ppc/misc_helper.c        | 10 ++++++++++
+>  target/ppc/translate_init.inc.c |  9 +++++++--
+>  3 files changed, 18 insertions(+), 2 deletions(-)
+> 
+> diff --git a/target/ppc/helper.h b/target/ppc/helper.h
+> index 19453c68138a..d751f0e21909 100644
+> --- a/target/ppc/helper.h
+> +++ b/target/ppc/helper.h
+> @@ -17,6 +17,7 @@ DEF_HELPER_2(pminsn, void, env, i32)
+>  DEF_HELPER_1(rfid, void, env)
+>  DEF_HELPER_1(hrfid, void, env)
+>  DEF_HELPER_2(store_lpcr, void, env, tl)
+> +DEF_HELPER_2(store_pcr, void, env, tl)
+>  #endif
+>  DEF_HELPER_1(check_tlb_flush_local, void, env)
+>  DEF_HELPER_1(check_tlb_flush_global, void, env)
+> diff --git a/target/ppc/misc_helper.c b/target/ppc/misc_helper.c
+> index 8c8cba5cc6f1..1870f4c47f1a 100644
+> --- a/target/ppc/misc_helper.c
+> +++ b/target/ppc/misc_helper.c
+> @@ -20,6 +20,7 @@
+>  #include "cpu.h"
+>  #include "exec/exec-all.h"
+>  #include "exec/helper-proto.h"
+> +#include "qemu/error-report.h"
+>  
+>  #include "helper_regs.h"
+>  
+> @@ -98,6 +99,15 @@ void helper_store_ptcr(CPUPPCState *env, target_ulong val)
+>          tlb_flush(CPU(cpu));
+>      }
+>  }
+> +
+> +void helper_store_pcr(CPUPPCState *env, target_ulong value)
+> +{
+> +    if (value != 0) {
+> +        error_report("Invalid PCR value 0x"TARGET_FMT_lx, value);
+> +        return;
+> +    }
+> +    env->spr[SPR_PCR] = value;
+> +}
+>  #endif /* defined(TARGET_PPC64) */
+>  
+>  void helper_store_pidr(CPUPPCState *env, target_ulong val)
+> diff --git a/target/ppc/translate_init.inc.c b/target/ppc/translate_init.inc.c
+> index ab782cb32aaa..1a89017ddea8 100644
+> --- a/target/ppc/translate_init.inc.c
+> +++ b/target/ppc/translate_init.inc.c
+> @@ -424,6 +424,10 @@ static void spr_write_ptcr(DisasContext *ctx, int sprn, int gprn)
+>      gen_helper_store_ptcr(cpu_env, cpu_gpr[gprn]);
+>  }
+>  
+> +static void spr_write_pcr(DisasContext *ctx, int sprn, int gprn)
+> +{
+> +    gen_helper_store_pcr(cpu_env, cpu_gpr[gprn]);
+> +}
+>  #endif
+>  #endif
+>  
+> @@ -7957,11 +7961,12 @@ static void gen_spr_power6_common(CPUPPCState *env)
+>  #endif
+>      /*
+>       * Register PCR to report POWERPC_EXCP_PRIV_REG instead of
+> -     * POWERPC_EXCP_INVAL_SPR.
+> +     * POWERPC_EXCP_INVAL_SPR in userspace. Permit hypervisor access.
+>       */
+> -    spr_register(env, SPR_PCR, "PCR",
+> +    spr_register_hv(env, SPR_PCR, "PCR",
+>                   SPR_NOACCESS, SPR_NOACCESS,
+>                   SPR_NOACCESS, SPR_NOACCESS,
+> +                 &spr_read_generic, &spr_write_pcr,
+>                   0x00000000);
+>  }
+>  
