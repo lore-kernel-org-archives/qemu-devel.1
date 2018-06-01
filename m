@@ -1,19 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35694)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37553)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <gengdongjiu@huawei.com>) id 1fOkfQ-0005Fw-Pz
-	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 10:04:34 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1fOkn8-0007SH-91
+	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 10:12:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <gengdongjiu@huawei.com>) id 1fOkfP-00027w-OV
-	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 10:04:32 -0400
-From: gengdongjiu <gengdongjiu@huawei.com>
-Date: Fri, 1 Jun 2018 13:17:03 +0000
-Message-ID: <0184EA26B2509940AA629AE1405DD7F201CAECD7@DGGEMA503-MBX.china.huawei.com>
-Content-Language: zh-CN
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH RESEND v1 0/3] add support for VCPU event
- states
+	(envelope-from <pm215@archaic.org.uk>) id 1fOkn7-0000hm-Cn
+	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 10:12:30 -0400
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri,  1 Jun 2018 15:12:17 +0100
+Message-Id: <20180601141223.26630-1-peter.maydell@linaro.org>
+Subject: [Qemu-devel] [PATCH 0/6] More conversions away from old_mmio
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,51 +17,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "famz@redhat.com" <famz@redhat.com>, "peter.maydell@linaro.org" <peter.maydell@linaro.org>, "james.morse@arm.com" <james.morse@arm.com>, "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>, Linuxarm <linuxarm@huawei.com>
+To: qemu-devel@nongnu.org
+Cc: patches@linaro.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Thomas Huth <huth@tuxfamily.org>, Aurelien Jarno <aurelien@aurel32.net>, qemu-block@nongnu.org, Yongbok Kim <yongbok.kim@mips.com>
 
-SGkgUGV0ZXIsDQogIA0KPiBIaSwNCj4gDQo+IFRoaXMgc2VyaWVzIGZhaWxlZCBidWlsZCB0ZXN0
-IG9uIHMzOTB4IGhvc3QuIFBsZWFzZSBmaW5kIHRoZSBkZXRhaWxzIGJlbG93Lg0KPiANClsuLi5d
-DQoNCj4gbWFrZVsxXTogKioqIFdhaXRpbmcgZm9yIHVuZmluaXNoZWQgam9icy4uLi4NCj4gICBD
-QyAgICAgIGFhcmNoNjQtc29mdG1tdS9ody9kaXNwbGF5L3ZnYS5vDQo+ICAgQ0MgICAgICBhYXJj
-aDY0LXNvZnRtbXUvaHcvZGlzcGxheS92aXJ0aW8tZ3B1Lm8NCj4gbWFrZTogKioqIFtNYWtlZmls
-ZTo0ODI6IHN1YmRpci1hcm0tc29mdG1tdV0gRXJyb3IgMg0KPiAgIENDICAgICAgYWFyY2g2NC1z
-b2Z0bW11L2h3L2Rpc3BsYXkvdmlydGlvLWdwdS0zZC5vDQo+ICAgQ0MgICAgICBhYXJjaDY0LXNv
-ZnRtbXUvaHcvZGlzcGxheS92aXJ0aW8tZ3B1LXBjaS5vDQo+ICAgQ0MgICAgICBhYXJjaDY0LXNv
-ZnRtbXUvaHcvZGlzcGxheS9kcGNkLm8NCj4gICBDQyAgICAgIGFhcmNoNjQtc29mdG1tdS9ody9k
-aXNwbGF5L3hsbnhfZHAubw0KPiAvdmFyL3RtcC9wYXRjaGV3LXRlc3Rlci10bXAtaHdzbjN3c2wv
-c3JjL2h3L2Rpc3BsYXkvdmlydGlvLWdwdS0zZC5jOiBJbiBmdW5jdGlvbiDigJh2aXJnbF9jbWRf
-Z2V0X2NhcHNldF9pbmZv4oCZOg0KPiAvdmFyL3RtcC9wYXRjaGV3LXRlc3Rlci10bXAtaHdzbjN3
-c2wvc3JjL2h3L2Rpc3BsYXkvdmlydGlvLWdwdS0zZC5jOjM2NjoyNjogZXJyb3I6IOKAmFZJUlRJ
-T19HUFVfQ0FQU0VUX1ZJUkdMMuKAmSB1bmRlY2xhcmVkIChmaXJzdA0KPiB1c2UgaW4gdGhpcyBm
-dW5jdGlvbik7IGRpZCB5b3UgbWVhbiDigJhWSVJUSU9fR1BVX0NBUFNFVF9WSVJHTOKAmT8NCj4g
-ICAgICAgICAgcmVzcC5jYXBzZXRfaWQgPSBWSVJUSU9fR1BVX0NBUFNFVF9WSVJHTDI7DQo+ICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgXn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+DQo+ICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgVklSVElPX0dQVV9DQVBTRVRfVklSR0wNCj4gL3Zhci90bXAv
-cGF0Y2hldy10ZXN0ZXItdG1wLWh3c24zd3NsL3NyYy9ody9kaXNwbGF5L3ZpcnRpby1ncHUtM2Qu
-YzozNjY6MjY6IG5vdGU6IGVhY2ggdW5kZWNsYXJlZCBpZGVudGlmaWVyIGlzIHJlcG9ydGVkIG9u
-bHkgb25jZSBmb3INCj4gZWFjaCBmdW5jdGlvbiBpdCBhcHBlYXJzIGluDQo+IC92YXIvdG1wL3Bh
-dGNoZXctdGVzdGVyLXRtcC1od3NuM3dzbC9zcmMvaHcvZGlzcGxheS92aXJ0aW8tZ3B1LTNkLmM6
-IEluIGZ1bmN0aW9uIOKAmHZpcnRpb19ncHVfdmlyZ2xfZ2V0X251bV9jYXBzZXRz4oCZOg0KPiAv
-dmFyL3RtcC9wYXRjaGV3LXRlc3Rlci10bXAtaHdzbjN3c2wvc3JjL2h3L2Rpc3BsYXkvdmlydGlv
-LWdwdS0zZC5jOjY0NjozMjogZXJyb3I6IOKAmFZJUlRJT19HUFVfQ0FQU0VUX1ZJUkdMMuKAmSB1
-bmRlY2xhcmVkIChmaXJzdA0KPiB1c2UgaW4gdGhpcyBmdW5jdGlvbik7IGRpZCB5b3UgbWVhbiDi
-gJhWSVJUSU9fR1BVX0NBUFNFVF9WSVJHTOKAmT8NCg0KVGhpcyBidWlsZCBmYWlsdXJlIGlzIGR1
-ZSB0byBrZXJuZWwgbWlzc2luZyB0aGUgZGVmaW5pdGlvbiBvZiAiVklSVElPX0dQVV9DQVBTRVRf
-VklSR0wyIiwgSSBzeW5jIHRoZSBtYWlubGluZSBrZXJuZWwgdHJlZSBoZWFkZXIgZmlsZSB0byB0
-aGUgbWFpbmxpbmUgUUVNVSB1c2luZyB0aGUgc2NyaXB0c1sxXSwNClNvIGhhcHBlbiB0aGlzIGZh
-aWx1cmUsIEl0IGRvZXMgbm90IHJlbGF0ZWQgd2l0aCBteXNlbGYgcGF0Y2gsIHNvIGNhbiBJIGRp
-c2NhcmQgdGhlIHBhdGNoIFsxXSBvciBhZGQgdGhlIOKAmFZJUlRJT19HUFVfQ0FQU0VUX1ZJUkdM
-MuKAmSBkZWZpbml0aW9uIHRvIG1haW5saW5lIGtlcm5lbCB0cmVlPw0KDQpbMV0gaHR0cHM6Ly9s
-aXN0cy5nbnUub3JnL2FyY2hpdmUvaHRtbC9xZW11LWRldmVsLzIwMTgtMDUvbXNnMDY5NzMuaHRt
-bA0KDQo+ICAgICAgdmlyZ2xfcmVuZGVyZXJfZ2V0X2NhcF9zZXQoVklSVElPX0dQVV9DQVBTRVRf
-VklSR0wyLA0KPiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIF5+fn5+fn5+fn5+fn5+
-fn5+fn5+fn5+fg0KPiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIFZJUlRJT19HUFVf
-Q0FQU0VUX1ZJUkdMDQo+IG1ha2VbMV06ICoqKiBbL3Zhci90bXAvcGF0Y2hldy10ZXN0ZXItdG1w
-LWh3c24zd3NsL3NyYy9ydWxlcy5tYWs6NjY6IGh3L2Rpc3BsYXkvdmlydGlvLWdwdS0zZC5vXSBF
-cnJvciAxDQo+IG1ha2VbMV06ICoqKiBXYWl0aW5nIGZvciB1bmZpbmlzaGVkIGpvYnMuLi4uDQo+
-IG1ha2U6ICoqKiBbTWFrZWZpbGU6NDgyOiBzdWJkaXItYWFyY2g2NC1zb2Z0bW11XSBFcnJvciAy
-DQo+ID09PSBPVVRQVVQgRU5EID09PQ0KPiANCj4gVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNv
-ZGU6IDINCj4gDQo+IA0KPiAtLS0NCj4gRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkg
-UGF0Y2hldyBbaHR0cDovL3BhdGNoZXcub3JnL10uDQo+IFBsZWFzZSBzZW5kIHlvdXIgZmVlZGJh
-Y2sgdG8gcGF0Y2hldy1kZXZlbEByZWRoYXQuY29tDQo=
+Half a dozen miscellaneous conversions away from old_mmio usage
+in the MemoryRegionOps struct. This leaves us with only 10
+remaining in the tree.
+
+NB: mips parts tested only via 'make check'.
+
+thanks
+-- PMM
+
+Peter Maydell (6):
+  hw/sh/sh7750: Convert away from old_mmio
+  hw/m68k/mcf5206: Convert away from old_mmio
+  hw/block/pflash_cfi02: Convert away from old_mmio
+  hw/watchdog/wdt_i6300esb: Convert away from old_mmio
+  hw/input/pckbd: Convert away from old_mmio
+  hw/char/parallel: Convert away from old_mmio
+
+ hw/block/pflash_cfi02.c    | 97 +++++++-------------------------------
+ hw/char/parallel.c         | 50 +++++---------------
+ hw/input/pckbd.c           | 14 +++---
+ hw/m68k/mcf5206.c          | 48 ++++++++++++++-----
+ hw/sh4/sh7750.c            | 44 +++++++++++++----
+ hw/watchdog/wdt_i6300esb.c | 48 ++++++++++++++-----
+ 6 files changed, 145 insertions(+), 156 deletions(-)
+
+-- 
+2.17.1
