@@ -1,21 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52464)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52852)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1fOiPL-00021J-2c
-	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 07:39:48 -0400
+	(envelope-from <stefanha@gmail.com>) id 1fOiQn-00034v-B8
+	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 07:41:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1fOiPH-0002OW-LY
-	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 07:39:47 -0400
-Date: Fri, 1 Jun 2018 13:39:39 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20180601133939.550378ce@redhat.com>
-In-Reply-To: <20180517081527.14410-15-david@redhat.com>
-References: <20180517081527.14410-1-david@redhat.com>
-	<20180517081527.14410-15-david@redhat.com>
+	(envelope-from <stefanha@gmail.com>) id 1fOiQk-0003xv-6f
+	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 07:41:17 -0400
+Received: from mail-wr0-x236.google.com ([2a00:1450:400c:c0c::236]:44914)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1fOiQj-0003xE-Uv
+	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 07:41:14 -0400
+Received: by mail-wr0-x236.google.com with SMTP id y15-v6so36040518wrg.11
+	for <qemu-devel@nongnu.org>; Fri, 01 Jun 2018 04:41:13 -0700 (PDT)
+Date: Fri, 1 Jun 2018 12:41:11 +0100
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20180601114111.GJ8687@stefanha-x1.localdomain>
+References: <20180522195038.25280-1-pbonzini@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v4 14/14] memory-device: factor out plug
- into hotplug handler
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="6J7GEvtanOfV9oXA"
+Content-Disposition: inline
+In-Reply-To: <20180522195038.25280-1-pbonzini@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH RFC] hw: make virtio devices configurable
+ via default-configs/
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,286 +30,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>
-Cc: qemu-devel@nongnu.org, Pankaj Gupta <pagupta@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Cornelia Huck <cohuck@redhat.com>, Markus Armbruster <armbru@redhat.com>, Alexander Graf <agraf@suse.de>, Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org, qemu-ppc@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Luiz Capitulino <lcapitulino@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Richard Henderson <rth@twiddle.net>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-devel@nongnu.org, thuth@redhat.com, ehabkost@redhat.com
 
-On Thu, 17 May 2018 10:15:27 +0200
-David Hildenbrand <david@redhat.com> wrote:
 
-> Let's move the plug logic into the applicable hotplug handler for pc and
-> spapr.
-> 
-> Signed-off-by: David Hildenbrand <david@redhat.com>
+--6J7GEvtanOfV9oXA
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Tue, May 22, 2018 at 09:50:38PM +0200, Paolo Bonzini wrote:
+> This is only half of the work, because the proxy devices (virtio-*-pci,
+> virtio-*-ccw, etc.) are still included unconditionally.  It is still a
+> move in the right direction.
+>=20
+> Based-on: <20180522194943.24871-1-pbonzini@redhat.com>
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 > ---
->  hw/i386/pc.c                   | 35 ++++++++++++++++++++---------------
->  hw/mem/memory-device.c         | 40 ++++++++++++++++++++++++++++++++++------
->  hw/mem/pc-dimm.c               | 29 +----------------------------
->  hw/mem/trace-events            |  2 +-
->  hw/ppc/spapr.c                 | 15 ++++++++++++---
->  include/hw/mem/memory-device.h |  7 ++-----
->  include/hw/mem/pc-dimm.h       |  3 +--
->  7 files changed, 71 insertions(+), 60 deletions(-)
-> 
-> diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-> index 426fb534c2..f022eb042e 100644
-> --- a/hw/i386/pc.c
-> +++ b/hw/i386/pc.c
-> @@ -1682,22 +1682,8 @@ static void pc_dimm_plug(HotplugHandler *hotplug_dev,
->      HotplugHandlerClass *hhc;
->      Error *local_err = NULL;
->      PCMachineState *pcms = PC_MACHINE(hotplug_dev);
-> -    PCMachineClass *pcmc = PC_MACHINE_GET_CLASS(pcms);
-> -    PCDIMMDevice *dimm = PC_DIMM(dev);
-> -    PCDIMMDeviceClass *ddc = PC_DIMM_GET_CLASS(dimm);
-> -    MemoryRegion *mr;
-> -    uint64_t align = TARGET_PAGE_SIZE;
->      bool is_nvdimm = object_dynamic_cast(OBJECT(dev), TYPE_NVDIMM);
->  
-> -    mr = ddc->get_memory_region(dimm, &local_err);
-> -    if (local_err) {
-> -        goto out;
-> -    }
-> -
-> -    if (memory_region_get_alignment(mr) && pcmc->enforce_aligned_dimm) {
-> -        align = memory_region_get_alignment(mr);
-> -    }
-> -
->      /*
->       * When -no-acpi is used with Q35 machine type, no ACPI is built,
->       * but pcms->acpi_dev is still created. Check !acpi_enabled in
-> @@ -1715,7 +1701,7 @@ static void pc_dimm_plug(HotplugHandler *hotplug_dev,
->          goto out;
->      }
->  
-> -    pc_dimm_memory_plug(dev, MACHINE(pcms), align, &local_err);
-> +    pc_dimm_memory_plug(dev, MACHINE(pcms), &local_err);
->      if (local_err) {
->          goto out;
->      }
-> @@ -2036,6 +2022,25 @@ static void pc_machine_device_plug_cb(HotplugHandler *hotplug_dev,
->  {
->      Error *local_err = NULL;
->  
-> +    /* first stage hotplug handler */
-> +    if (object_dynamic_cast(OBJECT(dev), TYPE_MEMORY_DEVICE)) {
-> +        const PCMachineClass *pcmc = PC_MACHINE_GET_CLASS(hotplug_dev);
-> +        uint64_t align = 0;
-> +
-> +        /* compat handling: force to TARGET_PAGE_SIZE */
-> +        if (object_dynamic_cast(OBJECT(dev), TYPE_PC_DIMM) &&
-> +            !pcmc->enforce_aligned_dimm) {
-> +            align = TARGET_PAGE_SIZE;
-> +        }
-> +        memory_device_plug(MACHINE(hotplug_dev), MEMORY_DEVICE(dev),
-> +                           align ? &align : NULL, &local_err);
-> +    }
-> +
-> +    if (local_err) {
-> +        error_propagate(errp, local_err);
-> +        return;
-> +    }
-> +
->      /* final stage hotplug handler */
->      if (object_dynamic_cast(OBJECT(dev), TYPE_PC_DIMM)) {
->          pc_dimm_plug(hotplug_dev, dev, &local_err);
-> diff --git a/hw/mem/memory-device.c b/hw/mem/memory-device.c
-> index 8f10d613ea..04bdb30f22 100644
-> --- a/hw/mem/memory-device.c
-> +++ b/hw/mem/memory-device.c
-> @@ -69,9 +69,10 @@ static int memory_device_used_region_size(Object *obj, void *opaque)
->      return 0;
->  }
->  
-> -uint64_t memory_device_get_free_addr(MachineState *ms, const uint64_t *hint,
-> -                                     uint64_t align, uint64_t size,
-> -                                     Error **errp)
-> +static uint64_t memory_device_get_free_addr(MachineState *ms,
-> +                                            const uint64_t *hint,
-> +                                            uint64_t align, uint64_t size,
-> +                                            Error **errp)
->  {
->      uint64_t address_space_start, address_space_end;
->      uint64_t used_region_size = 0;
-> @@ -237,11 +238,38 @@ void memory_device_pre_plug(MachineState *ms, const MemoryDeviceState *md,
->      }
->  }
->  
-> -void memory_device_plug_region(MachineState *ms, MemoryRegion *mr,
-> -                               uint64_t addr)
-> +void memory_device_plug(MachineState *ms, MemoryDeviceState *md,
-> +                        uint64_t *enforced_align, Error **errp)
-enforced_align is PC machine specific compat flag
-to keep old machines with unaligned layout work (i.e. don't break CLI/migration)
-it shouldn't go into a generic code.
-By default all new machines should use aligned layout. 
+>  default-configs/arm-softmmu.mak     |  1 +
+>  default-configs/hppa-softmmu.mak    |  2 --
+>  default-configs/pci.mak             |  4 +---
+>  default-configs/riscv32-softmmu.mak |  4 ++--
+>  default-configs/riscv64-softmmu.mak |  4 ++--
+>  default-configs/s390x-softmmu.mak   |  5 +----
+>  default-configs/virtio.mak          | 14 ++++++++++++++
+>  hw/9pfs/Makefile.objs               |  6 ++++--
+>  hw/block/Makefile.objs              |  6 ++----
+>  hw/char/Makefile.objs               |  2 +-
+>  hw/display/Makefile.objs            |  4 ++--
+>  hw/input/Makefile.objs              |  6 +++---
+>  hw/net/Makefile.objs                |  2 +-
+>  hw/scsi/Makefile.objs               |  2 +-
+>  hw/virtio/Makefile.objs             | 16 +++++++++-------
+>  15 files changed, 44 insertions(+), 34 deletions(-)
+>  create mode 100644 default-configs/virtio.mak
 
->  {
-> -    /* we expect a previous call to memory_device_get_free_addr() */
-> +    const MemoryDeviceClass *mdc = MEMORY_DEVICE_GET_CLASS(md);
-> +    const uint64_t size = mdc->get_region_size(md);
-> +    MemoryRegion *mr = mdc->get_memory_region(md);
-> +    uint64_t addr = mdc->get_addr(md);
-> +    uint64_t align;
-> +
-> +    /* we expect a previous call to memory_device_pre_plug */
->      g_assert(ms->device_memory);
-> +    g_assert(mr && !memory_region_is_mapped(mr));
-> +
-> +    /* compat handling, some alignment has to be enforced for DIMMs */
-> +    if (enforced_align) {
-> +        align = *enforced_align;
-> +    } else {
-> +        align = memory_region_get_alignment(mr);
-> +    }
-> +
-> +    /* our device might have stronger alignment requirements */
-> +    if (mdc->get_align) {
-> +        align = MAX(align, mdc->get_align(md));
-> +    }
-> +
-> +    addr = memory_device_get_free_addr(ms, !addr ? NULL : &addr, align,
-> +                                       size, errp);
-> +    if (*errp) {
-> +        return;
-> +    }
-> +    trace_memory_device_assign_address(addr);
-> +    mdc->set_addr(md, addr);
->  
->      memory_region_add_subregion(&ms->device_memory->mr,
->                                  addr - ms->device_memory->base, mr);
-> diff --git a/hw/mem/pc-dimm.c b/hw/mem/pc-dimm.c
-> index d487bb513b..8b1dcb3260 100644
-> --- a/hw/mem/pc-dimm.c
-> +++ b/hw/mem/pc-dimm.c
-> @@ -32,39 +32,13 @@ typedef struct pc_dimms_capacity {
->       Error    **errp;
->  } pc_dimms_capacity;
->  
-> -void pc_dimm_memory_plug(DeviceState *dev, MachineState *machine,
-> -                         uint64_t align, Error **errp)
-> +void pc_dimm_memory_plug(DeviceState *dev, MachineState *machine, Error **errp)
->  {
->      int slot;
->      PCDIMMDevice *dimm = PC_DIMM(dev);
->      PCDIMMDeviceClass *ddc = PC_DIMM_GET_CLASS(dimm);
->      MemoryRegion *vmstate_mr = ddc->get_vmstate_memory_region(dimm);
->      Error *local_err = NULL;
-> -    MemoryRegion *mr;
-> -    uint64_t addr;
-> -
-> -    mr = ddc->get_memory_region(dimm, &local_err);
-> -    if (local_err) {
-> -        goto out;
-> -    }
-> -
-> -    addr = object_property_get_uint(OBJECT(dimm),
-> -                                    PC_DIMM_ADDR_PROP, &local_err);
-> -    if (local_err) {
-> -        goto out;
-> -    }
-> -
-> -    addr = memory_device_get_free_addr(machine, !addr ? NULL : &addr, align,
-> -                                       memory_region_size(mr), &local_err);
-> -    if (local_err) {
-> -        goto out;
-> -    }
-> -
-> -    object_property_set_uint(OBJECT(dev), addr, PC_DIMM_ADDR_PROP, &local_err);
-> -    if (local_err) {
-> -        goto out;
-> -    }
-> -    trace_mhp_pc_dimm_assigned_address(addr);
->  
->      slot = object_property_get_int(OBJECT(dev), PC_DIMM_SLOT_PROP, &local_err);
->      if (local_err) {
-> @@ -82,7 +56,6 @@ void pc_dimm_memory_plug(DeviceState *dev, MachineState *machine,
->      }
->      trace_mhp_pc_dimm_assigned_slot(slot);
->  
-> -    memory_device_plug_region(machine, mr, addr);
->      vmstate_register_ram(vmstate_mr, dev);
->  
->  out:
-> diff --git a/hw/mem/trace-events b/hw/mem/trace-events
-> index a661ee49a3..930b6aa6ea 100644
-> --- a/hw/mem/trace-events
-> +++ b/hw/mem/trace-events
-> @@ -2,6 +2,6 @@
->  
->  # hw/mem/pc-dimm.c
->  mhp_pc_dimm_assigned_slot(int slot) "%d"
-> -mhp_pc_dimm_assigned_address(uint64_t addr) "0x%"PRIx64
->  # hw/mem/memory-device.c
-> +memory_device_assign_address(uint64_t addr) "0x%"PRIx64
->  memory_device_unassign_address(uint64_t addr) "0x%"PRIx64
-> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> index abdd38a6b5..5a4dbbf31e 100644
-> --- a/hw/ppc/spapr.c
-> +++ b/hw/ppc/spapr.c
-> @@ -3144,16 +3144,15 @@ static void spapr_memory_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
->      PCDIMMDevice *dimm = PC_DIMM(dev);
->      PCDIMMDeviceClass *ddc = PC_DIMM_GET_CLASS(dimm);
->      MemoryRegion *mr;
-> -    uint64_t align, size, addr;
-> +    uint64_t size, addr;
->  
->      mr = ddc->get_memory_region(dimm, &local_err);
->      if (local_err) {
->          goto out;
->      }
-> -    align = memory_region_get_alignment(mr);
->      size = memory_region_size(mr);
->  
-> -    pc_dimm_memory_plug(dev, MACHINE(ms), align, &local_err);
-> +    pc_dimm_memory_plug(dev, MACHINE(ms), &local_err);
->      if (local_err) {
->          goto out;
->      }
-> @@ -3595,6 +3594,16 @@ static void spapr_machine_device_plug(HotplugHandler *hotplug_dev,
->      sPAPRMachineClass *smc = SPAPR_MACHINE_GET_CLASS(ms);
->      Error *local_err = NULL;
->  
-> +    /* first stage hotplug handler */
-> +    if (object_dynamic_cast(OBJECT(dev), TYPE_MEMORY_DEVICE)) {
-> +        memory_device_plug(ms, MEMORY_DEVICE(dev), NULL, &local_err);
-> +    }
-> +
-> +    if (local_err) {
-> +        error_propagate(errp, local_err);
-> +        return;
-> +    }
-> +
->      /* final stage hotplug handler */
->      if (object_dynamic_cast(OBJECT(dev), TYPE_PC_DIMM)) {
->          int node;
-> diff --git a/include/hw/mem/memory-device.h b/include/hw/mem/memory-device.h
-> index b8365959e7..a7408597fd 100644
-> --- a/include/hw/mem/memory-device.h
-> +++ b/include/hw/mem/memory-device.h
-> @@ -53,11 +53,8 @@ MemoryDeviceInfoList *qmp_memory_device_list(void);
->  uint64_t get_plugged_memory_size(void);
->  void memory_device_pre_plug(MachineState *ms, const MemoryDeviceState *md,
->                              Error **errp);
-> -uint64_t memory_device_get_free_addr(MachineState *ms, const uint64_t *hint,
-> -                                     uint64_t align, uint64_t size,
-> -                                     Error **errp);
-> -void memory_device_plug_region(MachineState *ms, MemoryRegion *mr,
-> -                               uint64_t addr);
-> +void memory_device_plug(MachineState *ms, MemoryDeviceState *md,
-> +                        uint64_t *enforced_align, Error **errp);
->  void memory_device_unplug(MachineState *ms, MemoryDeviceState *md);
->  
->  #endif
-> diff --git a/include/hw/mem/pc-dimm.h b/include/hw/mem/pc-dimm.h
-> index 627c8601d9..006c80fb2e 100644
-> --- a/include/hw/mem/pc-dimm.h
-> +++ b/include/hw/mem/pc-dimm.h
-> @@ -78,7 +78,6 @@ typedef struct PCDIMMDeviceClass {
->  
->  int pc_dimm_get_free_slot(const int *hint, int max_slots, Error **errp);
->  
-> -void pc_dimm_memory_plug(DeviceState *dev, MachineState *machine,
-> -                         uint64_t align, Error **errp);
-> +void pc_dimm_memory_plug(DeviceState *dev, MachineState *machine, Error **errp);
->  void pc_dimm_memory_unplug(DeviceState *dev, MachineState *machine);
->  #endif
+Per-device config variables are nice.
+
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+
+--6J7GEvtanOfV9oXA
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJbETDXAAoJEJykq7OBq3PI8QgH/2Q1Lrt8g7iX7KOneq/q3pE1
+HIwk98cvVjKzYzyiAP07VfIg7GPrTsGg3En1mjKMz/1OpjkDfWQKTa1y2dALcSW1
+886RxxNprHdf2afCSYJ65rzsCEg3W0nfaXOYPRxuaY4gbMaf6dDEUpGlcxnQgpAk
+82AkQRXqMEh7kMlP8TkL+Gs4YaOV2nq/SnLOzjzyNBLQJd9DKRRnSLIb2hLflEsW
+X8zCDt+hqbcHiT6/tqYE0Kok52KW0ijjA1q/KvReHQdQIplcO7djjjVA5TJcnwvt
+KzGL7L+wsVhEeyQjotUEQe+nHLaIkAYEZGEYaLgWYutp3ct912VOxLq6NXS8OG4=
+=r/mX
+-----END PGP SIGNATURE-----
+
+--6J7GEvtanOfV9oXA--
