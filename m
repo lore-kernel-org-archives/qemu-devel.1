@@ -1,30 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56972)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57492)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dovgaluk@ispras.ru>) id 1fOgQU-0002NY-5F
-	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 05:32:53 -0400
+	(envelope-from <stefanha@redhat.com>) id 1fOgTZ-0004zp-Jy
+	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 05:36:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dovgaluk@ispras.ru>) id 1fOgQQ-0002cE-OD
-	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 05:32:50 -0400
-Received: from mail.ispras.ru ([83.149.199.45]:54432)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dovgaluk@ispras.ru>) id 1fOgQQ-0002bH-62
-	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 05:32:46 -0400
-From: "Pavel Dovgalyuk" <dovgaluk@ispras.ru>
-References: <CAJGDS+HNBG6PSvG7Cc7bN4rMadgm5W+1aQUAeizN9CGjSOCP5w@mail.gmail.com>
-	<20180531085057.GG26429@stefanha-x1.localdomain>
-	<001801d3f8dd$2629a280$727ce780$@ru>
-	<CAJGDS+GEg0kpS_gxCupSz=O6RA8w-uAhO3rypAM524Z_RUHM8Q@mail.gmail.com>
-	<001e01d3f969$be4f32a0$3aed97e0$@ru>
-	<CAJGDS+HssD+rVgbUSyRT0v-Egfd9gn5W-cgy_95o8zASmH1q4A@mail.gmail.com>
-In-Reply-To: <CAJGDS+HssD+rVgbUSyRT0v-Egfd9gn5W-cgy_95o8zASmH1q4A@mail.gmail.com>
-Date: Fri, 1 Jun 2018 12:32:49 +0300
-Message-ID: <003b01d3f98b$81f258b0$85d70a10$@ru>
+	(envelope-from <stefanha@redhat.com>) id 1fOgTY-0004jr-Ey
+	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 05:36:01 -0400
+Date: Fri, 1 Jun 2018 10:35:53 +0100
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <20180601093553.GC8687@stefanha-x1.localdomain>
+References: <20180601062849.28641-1-famz@redhat.com>
+	<20180601062849.28641-7-famz@redhat.com>
 MIME-Version: 1.0
-Content-Language: ru
-Content-Type: text/plain;
-	charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] Recording I/O activity after KVM does a VMEXIT
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="hOcCNbCCxyk/YU74"
+Content-Disposition: inline
+In-Reply-To: <20180601062849.28641-7-famz@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v8 06/11] file-posix: Implement
+ bdrv_co_copy_range
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,169 +25,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: 'Arnabjyoti Kalita' <akalita@cs.stonybrook.edu>
-Cc: 'Stefan Hajnoczi' <stefanha@gmail.com>, qemu-devel@nongnu.org, 'Pavel Dovgalyuk' <pavel.dovgaluk@ispras.ru>
+To: Fam Zheng <famz@redhat.com>
+Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Ronnie Sahlberg <ronniesahlberg@gmail.com>, Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>, qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Peter Lieven <pl@kamp.de>, Max Reitz <mreitz@redhat.com>, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>, eblake@redhat.com
 
-That=E2=80=99s right.
 
-=20
+--hOcCNbCCxyk/YU74
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Pavel Dovgalyuk
+On Fri, Jun 01, 2018 at 02:28:44PM +0800, Fam Zheng wrote:
+> With copy_file_range(2), we can implement the bdrv_co_copy_range
+> semantics.
+>=20
+> Signed-off-by: Fam Zheng <famz@redhat.com>
+> ---
+>  block/file-posix.c      | 98 +++++++++++++++++++++++++++++++++++++++--
+>  configure               | 17 +++++++
+>  include/block/raw-aio.h | 10 ++++-
+>  3 files changed, 120 insertions(+), 5 deletions(-)
 
-=20
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 
-From: Arnabjyoti Kalita [mailto:akalita@cs.stonybrook.edu]=20
-Sent: Friday, June 01, 2018 11:27 AM
-To: Pavel Dovgalyuk
-Cc: Stefan Hajnoczi; qemu-devel@nongnu.org; Pavel Dovgalyuk
-Subject: Re: [Qemu-devel] Recording I/O activity after KVM does a VMEXIT
+--hOcCNbCCxyk/YU74
+Content-Type: application/pgp-signature; name="signature.asc"
 
-=20
+-----BEGIN PGP SIGNATURE-----
 
-Dear Pavel,
+iQEcBAEBAgAGBQJbERN5AAoJEJykq7OBq3PIxtYH/jJvroXoSWaiPb030utZHh8s
+U5EzqRB9TIWiJKgLxWbFxFCGuuTQqp1QRMAq0SSlYG5ipXhiYSLf1S3IE5ZNGt2B
+ufXl3+GxMOz2rzKJ06SfWWt2admi29FIJdD4WsFaRZeGypcd1low1R83wwKtG4xZ
+0M5Xf1JshlAptJD7hOOCt4bmEGdH2ZXE0OoRkcN8DtkoGPGb9QBi5H5BR2sWFarh
+Bved7D2KoIkciX5gjXMRPJkXcj8rbcoQ6zZ+a+41lyzND6icz0YjHdax2zrp7iE+
+vyNvFkmKy7fgwket5h2e5FZ+5s5Yc0eNFMZi6jhQTxJTd7oqjBF/T/uV2U0Kfyo=
+=1RBr
+-----END PGP SIGNATURE-----
 
-=20
-
-Thank you for providing me with all the details. Let us take an example =
-of a Network packet. In icount mode, when the network backend, receives =
-a network packet, you record the whole packet with the help of the =
-replay-filter. This packet will be written to the log file. Now when the =
-time comes for replay, you stop accepting any packets from the network =
-backend and directly inject all of the packets that you have already =
-recorded in the log file into the guest address space memory. Am I =
-correct in understanding this ?
-
-=20
-
-Thanks and Regards,
-
-Arnab =20
-
-=20
-
-On Fri, Jun 1, 2018 at 1:31 AM, Pavel Dovgalyuk <dovgaluk@ispras.ru> =
-wrote:
-
-Hi,
-
-=20
-
-I=E2=80=99m not familiar with KVM, but I know successful attempts of =
-replaying the execution by logging IO and MMIO in TCG mode.
-
-The difference in CPU I/O and VM I/O is the following. In icount we =
-record anything coming into the VM, but not into the CPU.
-
-It means that the whole packet is recorded. Virtual hardware behaves =
-deterministically and therefore CPU will get identical
-
-input in case of replay, because the whole recorded packet is injected =
-again by the filter.
-
-=20
-
-Pavel Dovgalyuk
-
-=20
-
-From: Arnabjyoti Kalita [mailto:akalita@cs.stonybrook.edu]=20
-Sent: Thursday, May 31, 2018 11:14 PM
-To: Pavel Dovgalyuk
-Cc: Stefan Hajnoczi; qemu-devel@nongnu.org; Pavel Dovgalyuk
-Subject: Re: [Qemu-devel] Recording I/O activity after KVM does a VMEXIT
-
-=20
-
-Dear Pavel,
-
-=20
-
-Thank you for your answer. I am not being able to understand the =
-difference between CPU I/Os and VM I/Os. Would any network packet that =
-comes into the Guest OS from the outside be a part of VM I/O or CPU I/O =
-? I am only interested in "recording" and "replaying" those network =
-packets that come from the outside into the networking backend and not =
-the other way around. Say for example when I get a VMExit because of the =
-arrival of a network packet, I will use the VMExit reason : =
-"KVM_EXIT_MMIO"  to trace back to "e1000_mmio_write()" which I expect =
-should be enough to record network packets that come from the outside =
-and write to the guest address space for "e1000" devices. In such a =
-case, I think I will not have to use the "network-filter" backend that =
-you use to record VM I/O only. Let me know if you find errors in my =
-approach.
-
-=20
-
-I will try to see how I can record disk packets. If disk packets use =
-other ways of writing to the guest memory apart from a normal VMExit, I =
-will try to find it out. Eventually I hope that it will use one of the =
-available disk front-end functions to write to the guest memory from the =
-disk, just like e1000 does with an "e1000_mmio_write()" call.=20
-
-=20
-
-Thanks and best regards,
-
-Arnab
-
-=20
-
-=20
-
-=20
-
-=20
-
-=20
-
-   =20
-
-=20
-
-On Thu, May 31, 2018 at 8:44 AM, Pavel Dovgalyuk <dovgaluk@ispras.ru> =
-wrote:
-
-> From: Stefan Hajnoczi [mailto:stefanha@gmail.com]
-> On Wed, May 30, 2018 at 11:19:13PM -0400, Arnabjyoti Kalita wrote:
-> > I am trying to implement a 'minimal' record-replay mechanism for =
-KVM, which
-> > is similar to the one existing for TCG via -icount. I am trying to =
-record
-> > I/O events only (specifically disk and network events) when KVM does =
-a
-> > VMEXIT. This has led me to the function kvm_cpu_exec where I can =
-clearly
-> > see the different ways of handling all of the possible VMExit cases =
-(like
-> > PIO, MMIO etc.). To record network packets, I am working with the =
-e1000
-> > hardware device.
-> >
-> > Can I make sure that all of the network I/O, atleast for the e1000 =
-device
-> > happens through the KVM_EXIT_MMIO case and subsequent use of the
-> > address_space_rw() function ? Do I also need to look at other =
-functions as
-> > well ? Also for recording disk activity, can I make sure that =
-looking out
-> > for the KVM_EXIT_MMIO and/or KVM_EXIT_PIO cases in the vmexit =
-mechanism,
-> > will be enough ?
-> >
-> > Let me know if there are other details that I need to take care of. =
-I am
-> > using QEMU 2.11 on a x86-64 CPU and the guest runs a Linux Kernel =
-4.4 with
-> > Ubuntu 16.04.
-
-The main icount-based record/replay advantage is that we don't record
-any CPU IO. We record only VM IO (e.g., by using the network filter).
-
-Disk devices may transfer data to CPU using DMA, therefore intercepting
-only VMExit cases will not be enough.
-
-Pavel Dovgalyuk
-
-=20
-
-=20
+--hOcCNbCCxyk/YU74--
