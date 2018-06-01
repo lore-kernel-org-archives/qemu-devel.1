@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57442)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57503)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fOeWm-0005VL-0N
-	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 03:31:13 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1fOeWs-0005a5-Mt
+	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 03:31:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fOeWk-0000Q9-OT
-	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 03:31:12 -0400
-Received: from mail-pl0-x244.google.com ([2607:f8b0:400e:c01::244]:41500)
+	(envelope-from <richard.henderson@linaro.org>) id 1fOeWo-0000U0-Vz
+	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 03:31:18 -0400
+Received: from mail-pg0-x242.google.com ([2607:f8b0:400e:c05::242]:35167)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1fOeWk-0000PO-Gw
-	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 03:31:10 -0400
-Received: by mail-pl0-x244.google.com with SMTP id az12-v6so14819013plb.8
-	for <qemu-devel@nongnu.org>; Fri, 01 Jun 2018 00:31:10 -0700 (PDT)
+	id 1fOeWo-0000TL-PE
+	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 03:31:14 -0400
+Received: by mail-pg0-x242.google.com with SMTP id 15-v6so10552596pge.2
+	for <qemu-devel@nongnu.org>; Fri, 01 Jun 2018 00:31:14 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Fri,  1 Jun 2018 00:30:28 -0700
-Message-Id: <20180601073050.8054-12-richard.henderson@linaro.org>
+Date: Fri,  1 Jun 2018 00:30:31 -0700
+Message-Id: <20180601073050.8054-15-richard.henderson@linaro.org>
 In-Reply-To: <20180601073050.8054-1-richard.henderson@linaro.org>
 References: <20180601073050.8054-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH 11/33] linux-user: Split out execve
+Subject: [Qemu-devel] [PATCH 14/33] linux-user: Split out open_to_handle_at
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,241 +29,128 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: laurent@vivier.eu
 
-At the same time, fix the repeated re-reading of the argv and env
-arrays from guest memory.  Instead read into a unified array once.
+At the same time, merge do_open_to_handle_at into the new function.
 
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- linux-user/syscall.c | 203 ++++++++++++++++++++++---------------------
- 1 file changed, 106 insertions(+), 97 deletions(-)
+ linux-user/syscall.c | 84 ++++++++++++++++++++++----------------------
+ 1 file changed, 42 insertions(+), 42 deletions(-)
 
 diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-index b0d268dab7..a9b59a8658 100644
+index 4afc22c20c..48bb1c0231 100644
 --- a/linux-user/syscall.c
 +++ b/linux-user/syscall.c
-@@ -7998,6 +7998,111 @@ IMPL(close)
-     return get_errno(close(arg1));
+@@ -7369,39 +7369,6 @@ static int do_futex(target_ulong uaddr, int op, int val, target_ulong timeout,
+         return -TARGET_ENOSYS;
+     }
+ }
+-#if defined(TARGET_NR_open_by_handle_at) && defined(CONFIG_OPEN_BY_HANDLE)
+-static abi_long do_open_by_handle_at(abi_long mount_fd, abi_long handle,
+-                                     abi_long flags)
+-{
+-    struct file_handle *target_fh;
+-    struct file_handle *fh;
+-    unsigned int size, total_size;
+-    abi_long ret;
+-
+-    if (get_user_s32(size, handle)) {
+-        return -TARGET_EFAULT;
+-    }
+-
+-    total_size = sizeof(struct file_handle) + size;
+-    target_fh = lock_user(VERIFY_READ, handle, total_size, 1);
+-    if (!target_fh) {
+-        return -TARGET_EFAULT;
+-    }
+-
+-    fh = g_memdup(target_fh, total_size);
+-    fh->handle_bytes = size;
+-    fh->handle_type = tswap32(target_fh->handle_type);
+-
+-    ret = get_errno(open_by_handle_at(mount_fd, fh,
+-                    target_to_host_bitmask(flags, fcntl_flags_tbl)));
+-
+-    g_free(fh);
+-
+-    unlock_user(target_fh, handle, total_size);
+-
+-    return ret;
+-}
+-#endif
+ 
+ #if defined(TARGET_NR_signalfd) || defined(TARGET_NR_signalfd4)
+ 
+@@ -8187,6 +8154,45 @@ IMPL(openat)
+     return ret;
  }
  
-+IMPL(execve)
++#if defined(TARGET_NR_open_by_handle_at) && defined(CONFIG_OPEN_BY_HANDLE)
++IMPL(open_by_handle_at)
 +{
-+    abi_ulong *guest_ptrs;
-+    char **host_ptrs;
-+    int argc, envc, alloc, i;
-+    abi_ulong gp;
-+    abi_ulong guest_argp = arg2;
-+    abi_ulong guest_envp = arg3;
-+    char *filename;
++    abi_long mount_fd = arg1;
++    abi_long handle = arg2;
++    abi_long flags = arg3;
++    struct file_handle *target_fh;
++    struct file_handle *fh;
++    unsigned int size, total_size;
 +    abi_long ret;
 +
-+    /* Initial estimate of number of guest pointers required.  */
-+    alloc = 32;
-+    guest_ptrs = g_new(abi_ulong, alloc);
-+
-+    /* Iterate through argp and envp, counting entries, and
-+     * reading guest addresses from the arrays.
-+     */
-+    for (gp = guest_argp, argc = 0; gp; gp += sizeof(abi_ulong)) {
-+        abi_ulong addr;
-+        if (get_user_ual(addr, gp)) {
-+            return -TARGET_EFAULT;
-+        }
-+        if (!addr) {
-+            break;
-+        }
-+        if (argc >= alloc) {
-+            alloc *= 2;
-+            guest_ptrs = g_renew(abi_ulong, guest_ptrs, alloc);
-+        }
-+        guest_ptrs[argc++] = addr;
++    if (is_hostfd(mount_fd)) {
++        return -TARGET_EBADF;
 +    }
-+    for (gp = guest_envp, envc = 0; gp; gp += sizeof(abi_ulong)) {
-+        abi_ulong addr;
-+        if (get_user_ual(addr, gp)) {
-+            return -TARGET_EFAULT;
-+        }
-+        if (!addr) {
-+            break;
-+        }
-+        if (argc + envc >= alloc) {
-+            alloc *= 2;
-+            guest_ptrs = g_renew(abi_ulong, guest_ptrs, alloc);
-+        }
-+        guest_ptrs[argc + envc++] = addr;
++    if (get_user_s32(size, handle)) {
++        return -TARGET_EFAULT;
 +    }
 +
-+    /* Exact number of host pointers required.  */
-+    host_ptrs = g_new0(char *, argc + envc + 2);
-+
-+    /* Iterate through the argp and envp that we already read
-+     * and convert the guest pointers to host pointers.
-+     */
-+    ret = -TARGET_EFAULT;
-+    for (i = 0; i < argc; ++i) {
-+        char *p = lock_user_string(guest_ptrs[i]);
-+        if (!p) {
-+            goto fini;
-+        }
-+        host_ptrs[i] = p;
-+    }
-+    for (i = 0; i < envc; ++i) {
-+        char *p = lock_user_string(guest_ptrs[argc + i]);
-+        if (!p) {
-+            goto fini;
-+        }
-+        host_ptrs[argc + 1 + i] = p;
++    total_size = sizeof(struct file_handle) + size;
++    target_fh = lock_user(VERIFY_READ, handle, total_size, 1);
++    if (!target_fh) {
++        return -TARGET_EFAULT;
 +    }
 +
-+    /* Read the executable filename.  */
-+    filename = lock_user_string(arg1);
-+    if (!filename) {
-+        goto fini;
-+    }
++    fh = g_memdup(target_fh, total_size);
++    fh->handle_bytes = size;
++    fh->handle_type = tswap32(target_fh->handle_type);
 +
-+    /* Although execve() is not an interruptible syscall it is
-+     * a special case where we must use the safe_syscall wrapper:
-+     * if we allow a signal to happen before we make the host
-+     * syscall then we will 'lose' it, because at the point of
-+     * execve the process leaves QEMU's control. So we use the
-+     * safe syscall wrapper to ensure that we either take the
-+     * signal as a guest signal, or else it does not happen
-+     * before the execve completes and makes it the other
-+     * program's problem.
-+     */
-+    ret = get_errno(safe_execve(filename, host_ptrs, host_ptrs + argc + 1));
-+    unlock_user(filename, arg1, 0);
++    ret = get_errno(open_by_handle_at(mount_fd, fh,
++                    target_to_host_bitmask(flags, fcntl_flags_tbl)));
 +
-+ fini:
-+    /* Deallocate everything we allocated above.  */
-+    for (i = 0; i < argc; ++i) {
-+        if (host_ptrs[i]) {
-+            unlock_user(host_ptrs[i], guest_ptrs[i], 0);
-+        }
-+    }
-+    for (i = 0; i < envc; ++i) {
-+        if (host_ptrs[argc + 1 + i]) {
-+            unlock_user(host_ptrs[argc + 1 + i], guest_ptrs[argc + i], 0);
-+        }
-+    }
-+    g_free(host_ptrs);
-+    g_free(guest_ptrs);
++    g_free(fh);
++    unlock_user(target_fh, handle, total_size);
++
++    fd_trans_unregister(ret);
 +    return ret;
 +}
++#endif
 +
- IMPL(exit)
+ IMPL(read)
  {
-     CPUState *cpu = ENV_GET_CPU(cpu_env);
-@@ -8237,103 +8342,6 @@ IMPL(everything_else)
-         unlock_user(p, arg2, 0);
-         return ret;
- #endif
--    case TARGET_NR_execve:
--        {
--            char **argp, **envp;
--            int argc, envc;
--            abi_ulong gp;
--            abi_ulong guest_argp;
--            abi_ulong guest_envp;
--            abi_ulong addr;
--            char **q;
--            int total_size = 0;
--
--            argc = 0;
--            guest_argp = arg2;
--            for (gp = guest_argp; gp; gp += sizeof(abi_ulong)) {
--                if (get_user_ual(addr, gp))
--                    return -TARGET_EFAULT;
--                if (!addr)
--                    break;
--                argc++;
--            }
--            envc = 0;
--            guest_envp = arg3;
--            for (gp = guest_envp; gp; gp += sizeof(abi_ulong)) {
--                if (get_user_ual(addr, gp))
--                    return -TARGET_EFAULT;
--                if (!addr)
--                    break;
--                envc++;
--            }
--
--            argp = g_new0(char *, argc + 1);
--            envp = g_new0(char *, envc + 1);
--
--            for (gp = guest_argp, q = argp; gp;
--                  gp += sizeof(abi_ulong), q++) {
--                if (get_user_ual(addr, gp))
--                    goto execve_efault;
--                if (!addr)
--                    break;
--                if (!(*q = lock_user_string(addr)))
--                    goto execve_efault;
--                total_size += strlen(*q) + 1;
--            }
--            *q = NULL;
--
--            for (gp = guest_envp, q = envp; gp;
--                  gp += sizeof(abi_ulong), q++) {
--                if (get_user_ual(addr, gp))
--                    goto execve_efault;
--                if (!addr)
--                    break;
--                if (!(*q = lock_user_string(addr)))
--                    goto execve_efault;
--                total_size += strlen(*q) + 1;
--            }
--            *q = NULL;
--
--            if (!(p = lock_user_string(arg1)))
--                goto execve_efault;
--            /* Although execve() is not an interruptible syscall it is
--             * a special case where we must use the safe_syscall wrapper:
--             * if we allow a signal to happen before we make the host
--             * syscall then we will 'lose' it, because at the point of
--             * execve the process leaves QEMU's control. So we use the
--             * safe syscall wrapper to ensure that we either take the
--             * signal as a guest signal, or else it does not happen
--             * before the execve completes and makes it the other
--             * program's problem.
--             */
--            ret = get_errno(safe_execve(p, argp, envp));
--            unlock_user(p, arg1, 0);
--
--            goto execve_end;
--
--        execve_efault:
--            ret = -TARGET_EFAULT;
--
--        execve_end:
--            for (gp = guest_argp, q = argp; *q;
--                  gp += sizeof(abi_ulong), q++) {
--                if (get_user_ual(addr, gp)
--                    || !addr)
--                    break;
--                unlock_user(*q, addr, 0);
--            }
--            for (gp = guest_envp, q = envp; *q;
--                  gp += sizeof(abi_ulong), q++) {
--                if (get_user_ual(addr, gp)
--                    || !addr)
--                    break;
--                unlock_user(*q, addr, 0);
--            }
--
--            g_free(argp);
--            g_free(envp);
+     abi_long ret;
+@@ -8252,15 +8258,6 @@ IMPL(everything_else)
+     char *fn;
+ 
+     switch(num) {
+-#if defined(TARGET_NR_open_by_handle_at) && defined(CONFIG_OPEN_BY_HANDLE)
+-    case TARGET_NR_open_by_handle_at:
+-        if (is_hostfd(arg1)) {
+-            return -TARGET_EBADF;
 -        }
+-        ret = do_open_by_handle_at(arg1, arg2, arg3);
+-        fd_trans_unregister(ret);
 -        return ret;
-     case TARGET_NR_chdir:
-         if (!(p = lock_user_string(arg1)))
-             return -TARGET_EFAULT;
-@@ -12916,6 +12924,7 @@ IMPL(everything_else)
- static impl_fn * const syscall_table[] = {
-     [TARGET_NR_brk] = impl_brk,
-     [TARGET_NR_close] = impl_close,
-+    [TARGET_NR_execve] = impl_execve,
-     [TARGET_NR_exit] = impl_exit,
+-#endif
+ #ifdef TARGET_NR_fork
+     case TARGET_NR_fork:
+         return get_errno(do_fork(cpu_env, TARGET_SIGCHLD, 0, 0, 0, 0));
+@@ -12944,6 +12941,9 @@ static impl_fn * const syscall_table[] = {
+     [TARGET_NR_open] = impl_open,
+ #endif
+     [TARGET_NR_openat] = impl_openat,
++#if defined(TARGET_NR_open_by_handle_at) && defined(CONFIG_OPEN_BY_HANDLE)
++    [TARGET_NR_open_by_handle_at] = impl_open_by_handle_at,
++#endif
      [TARGET_NR_read] = impl_read,
      [TARGET_NR_write] = impl_write,
+ };
 -- 
 2.17.0
