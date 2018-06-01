@@ -1,25 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47512)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51277)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fOjeH-0001Yz-3I
-	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 08:59:18 -0400
+	(envelope-from <procmem@riseup.net>) id 1fOjuf-0005OB-9i
+	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 09:16:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fOjeG-00012K-8m
-	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 08:59:17 -0400
-Received: from mail-ot0-x233.google.com ([2607:f8b0:4003:c0f::233]:38079)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fOjeG-00011f-3y
-	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 08:59:16 -0400
-Received: by mail-ot0-x233.google.com with SMTP id n3-v6so29156286ota.5
-	for <qemu-devel@nongnu.org>; Fri, 01 Jun 2018 05:59:15 -0700 (PDT)
+	(envelope-from <procmem@riseup.net>) id 1fOjuc-0006Ou-3j
+	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 09:16:13 -0400
+Received: from mx1.riseup.net ([198.252.153.129]:42969)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <procmem@riseup.net>) id 1fOjub-0006OB-Qf
+	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 09:16:10 -0400
+References: <40602400-cae4-e175-e7ce-10ac70ba52f5@riseup.net>
+	<20180601113444.GG8687@stefanha-x1.localdomain>
+From: procmem <procmem@riseup.net>
+Message-ID: <b25b3adb-bacc-bef1-7d18-c71a4933abc1@riseup.net>
+Date: Fri, 1 Jun 2018 13:15:44 +0000
 MIME-Version: 1.0
-In-Reply-To: <alpine.DEB.2.10.1805311206230.23991@sstabellini-ThinkPad-X260>
-References: <alpine.DEB.2.10.1805311206230.23991@sstabellini-ThinkPad-X260>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 1 Jun 2018 13:58:54 +0100
-Message-ID: <CAFEAcA-S9452xtRnmDMwdOY7Z2oDNDGrRjhaNrHP4Ume8mqAWw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL 0/3] xen-20180531-tag
+In-Reply-To: <20180601113444.GG8687@stefanha-x1.localdomain>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] Virtio-net drivers immune to Nethammer?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,34 +27,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefano Stabellini <sstabellini@kernel.org>
-Cc: Stefan Hajnoczi <stefanha@gmail.com>, Stefan Hajnoczi <stefanha@redhat.com>, Anthony PERARD <anthony.perard@citrix.com>, "open list:X86" <xen-devel@lists.xenproject.org>, QEMU Developers <qemu-devel@nongnu.org>
+To: Stefan Hajnoczi <stefanha@gmail.com>
+Cc: qemu-devel@nongnu.org, whonix-devel@whonix.org, "Michael S. Tsirkin" <mst@redhat.com>, jasowang@redhat.com
 
-On 31 May 2018 at 20:08, Stefano Stabellini <sstabellini@kernel.org> wrote:
-> The following changes since commit c181ddaa176856b3cd2dfd12bbcf25fa9c884a97:
->
->   Merge remote-tracking branch 'remotes/pmaydell/tags/pull-target-arm-20180531-1' into staging (2018-05-31 17:00:55 +0100)
->
-> are available in the git repository at:
->
->
->   http://xenbits.xenproject.org/git-http/people/sstabellini/qemu-dm.git tags/xen-20180531-tag
->
-> for you to fetch changes up to dfb6578d69d60e464be36dafed9741dcfd73d2cf:
->
->   xen-hvm: stop faking I/O to access PCI config space (2018-05-31 12:05:01 -0700)
->
-> ----------------------------------------------------------------
-> Xen 2018/05/31
->
-> ----------------------------------------------------------------
-> Igor Druzhinin (1):
->       xen/hvm: correct reporting of modified memory under physmap during migration
->
-> Paul Durrant (2):
->       xen-hvm: try to use xenforeignmemory_map_resource() to map ioreq pages
->       xen-hvm: stop faking I/O to access PCI config space
 
-Applied, thanks.
 
--- PMM
+Stefan Hajnoczi:
+> On Mon, May 21, 2018 at 11:24:43PM +0000, procmem wrote:
+>> Hi I'm a privacy distro maintainer investigating the implications of the
+>> newly published nethammer attack [0] on KVM guests particularly the
+>> virtio-net drivers. The summary of the paper is that rowhammer can be
+>> remotely triggered by feeding susceptible* network driver crafted
+>> traffic. This attack can do all kinds of nasty things such as modifying
+>> SSL certs on the victim system.
+>>
+>> * Susceptible drivers are those relying on Intel CAT, uncached memory or
+>> the clflush instruction.
+>>
+>> My question is, do virtio-net drivers do any of these things?
+> I have CCed Michael Tsirkin and Jason Wang, the virtio maintainers.
+> 
+>> ***
+>>
+>> [0] https://arxiv.org/abs/1805.04956
+>>
+>>
+>>
+
+Thanks :) I thought my message was forgotten
