@@ -1,25 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58650)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59370)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fOmGk-0008Fz-Ad
-	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 11:47:11 -0400
+	(envelope-from <chen_han_xiao@126.com>) id 1fOmML-0000nq-JC
+	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 11:52:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fOmGh-0001Ix-6P
-	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 11:47:10 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:58114 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1fOmGh-0001Ir-1q
-	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 11:47:07 -0400
-References: <20180601152746.17169-1-chen_han_xiao@126.com>
-	<20180601152746.17169-2-chen_han_xiao@126.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <170dbd1b-19ad-5e8c-5f8d-2a32ebb47525@redhat.com>
-Date: Fri, 1 Jun 2018 10:47:04 -0500
+	(envelope-from <chen_han_xiao@126.com>) id 1fOmMI-0004E8-Ei
+	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 11:52:57 -0400
+Received: from m15-10.126.com ([220.181.15.10]:39626)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <chen_han_xiao@126.com>) id 1fOmMH-0004CO-C7
+	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 11:52:54 -0400
+Date: Fri, 1 Jun 2018 23:21:14 +0800 (CST)
+From: "Chen Hanxiao" <chen_han_xiao@126.com>
+In-Reply-To: <20180601121956.GW3458@redhat.com>
+References: <20180601061121.13161-1-chen_han_xiao@126.com>
+	<20180601121956.GW3458@redhat.com>
+Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset=GBK
 MIME-Version: 1.0
-In-Reply-To: <20180601152746.17169-2-chen_han_xiao@126.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v5 1/2] qga: add mountpoint usage to
+Message-ID: <2399fcde.9565.163bbf041b1.Coremail.chen_han_xiao@126.com>
+Subject: Re: [Qemu-devel] [PATCH v4] qga: add mountpoint usage to
  GuestFilesystemInfo
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -29,64 +28,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Chen Hanxiao <chen_han_xiao@126.com>, qemu-devel@nongnu.org
-Cc: Michael Roth <mdroth@linux.vnet.ibm.com>, "=?UTF-8?Q?Daniel_P_._Berrang=c3=a9?=" <berrange@redhat.com>
+To: =?GBK?Q?Daniel_P=2E_Berrang=A8=A6?= <berrange@redhat.com>
+Cc: qemu-devel@nongnu.org, Michael Roth <mdroth@linux.vnet.ibm.com>
 
-On 06/01/2018 10:27 AM, Chen Hanxiao wrote:
-> From: Chen Hanxiao <chenhanxiao@gmail.com>
->=20
-> This patch adds support for getting the usage of mounted
-> filesystem.
-> The usage of fs stored as used_bytes and total_bytes.
-> It's very useful when we try to monitor guest's filesystem.
->=20
-> Cc: Michael Roth <mdroth@linux.vnet.ibm.com>
-> Cc: Eric Blake <eblake@redhat.com>
-> Cc: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
-> Signed-off-by: Chen Hanxiao <chenhanxiao@gmail.com>
->=20
-
-> +++ b/qga/qapi-schema.json
-> @@ -840,12 +840,24 @@
->              'bus-type': 'GuestDiskBusType',
->              'bus': 'int', 'target': 'int', 'unit': 'int'} }
->  =20
-> +##
-> +# @GuestFsUsage:
-> +#
-> +# @used-bytes:  file system used bytes
-> +# @total-bytes: file system total bytes for nonroot user
-> +#
-> +# Since: 3.0
-> +##
-> +{ 'struct': 'GuestFsUsage',
-> +  'data': {'used-bytes': 'uint64', 'total-bytes': 'uint64'} }
-
-That seems like pointless nesting on the wire, unless we have plans of=20
-reusing this type in other API calls.  Is it any easier...
-
-> +
->   ##
->   # @GuestFilesystemInfo:
->   #
->   # @name: disk name
->   # @mountpoint: mount point path
->   # @type: file system type string
-> +# @usage: file system usage struct (since 3.0)
->   # @disk: an array of disk hardware information that the volume lies o=
-n,
->   #        which may be empty if the disk type is not supported
->   #
-> @@ -853,7 +865,7 @@
->   ##
->   { 'struct': 'GuestFilesystemInfo',
->     'data': {'name': 'str', 'mountpoint': 'str', 'type': 'str',
-> -           'disk': ['GuestDiskAddress']} }
-> +           '*usage': 'GuestFsUsage', 'disk': ['GuestDiskAddress']} }
-
-...to just inline '*used-bytes' and '*total-bytes' here?
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+CgoKQXQgMjAxOC0wNi0wMSAyMDoxOTo1NiwgIkRhbmllbCBQLiBCZXJyYW5nqKYiIDxiZXJyYW5n
+ZUByZWRoYXQuY29tPiB3cm90ZToKPk9uIEZyaSwgSnVuIDAxLCAyMDE4IGF0IDAyOjExOjIxUE0g
+KzA4MDAsIENoZW4gSGFueGlhbyB3cm90ZToKPj4gRnJvbTogQ2hlbiBIYW54aWFvIDxjaGVuaGFu
+eGlhb0BnbWFpbC5jb20+Cj4+IAo+PiBUaGlzIHBhdGNoIGFkZHMgc3VwcG9ydCBmb3IgZ2V0dGlu
+ZyB0aGUgdXNhZ2Ugb2YgbW91bnRlZAo+PiBmaWxlc3lzdGVtLgo+PiBJdCdzIHZlcnkgdXNlZnVs
+IHdoZW4gd2UgdHJ5IHRvIG1vbml0b3IgZ3Vlc3QncyBmaWxlc3lzdGVtLgo+PiAKPj4gQ2M6IE1p
+Y2hhZWwgUm90aCA8bWRyb3RoQGxpbnV4LnZuZXQuaWJtLmNvbT4KPj4gQ2M6IEVyaWMgQmxha2Ug
+PGVibGFrZUByZWRoYXQuY29tPgo+PiBTaWduZWQtb2ZmLWJ5OiBDaGVuIEhhbnhpYW8gPGNoZW5o
+YW54aWFvQGdtYWlsLmNvbT4KPj4gCj4+IC0tLQo+PiB2MjoKPj4gICAgYWRkIGRlc2NyaXB0aW9u
+IGluIHFhcGktc2NoZW1hIGFuZCB2ZXJzaW9uIG51bWJlcnMKPj4gdjM6Cj4+ICAgIHVzZSBmbG9h
+dCBmb3IgdXNhZ2UgdG8gZ2V0IG1vcmUgcHJlY2lzaW9uLgo+PiB2NDoKPj4gICAgbWFrZSB1c2Fn
+ZSBhcyBhIGJlc3QtZWZmb3J0IHF1ZXJ5IGFuZCBtYXJrIGl0IGFzIG9wdGlvbmFsLgo+PiAKPj4g
+IHFnYS9jb21tYW5kcy1wb3NpeC5jIHwgMTcgKysrKysrKysrKysrKysrKysKPj4gIHFnYS9xYXBp
+LXNjaGVtYS5qc29uIHwgIDMgKystCj4+ICAyIGZpbGVzIGNoYW5nZWQsIDE5IGluc2VydGlvbnMo
+KyksIDEgZGVsZXRpb24oLSkKPj4gCj4+IGRpZmYgLS1naXQgYS9xZ2EvY29tbWFuZHMtcG9zaXgu
+YyBiL3FnYS9jb21tYW5kcy1wb3NpeC5jCj4+IGluZGV4IDBkYzIxOWRiY2YuLjRmYWNjNzY5NTMg
+MTAwNjQ0Cj4+IC0tLSBhL3FnYS9jb21tYW5kcy1wb3NpeC5jCj4+ICsrKyBiL3FnYS9jb21tYW5k
+cy1wb3NpeC5jCj4+IEBAIC00Niw2ICs0Niw3IEBAIGV4dGVybiBjaGFyICoqZW52aXJvbjsKPj4g
+ICNpbmNsdWRlIDxhcnBhL2luZXQuaD4KPj4gICNpbmNsdWRlIDxzeXMvc29ja2V0Lmg+Cj4+ICAj
+aW5jbHVkZSA8bmV0L2lmLmg+Cj4+ICsjaW5jbHVkZSA8c3lzL3N0YXR2ZnMuaD4KPj4gIAo+PiAg
+I2lmZGVmIEZJRlJFRVpFCj4+ICAjZGVmaW5lIENPTkZJR19GU0ZSRUVaRQo+PiBAQCAtMTA3Miw2
+ICsxMDczLDkgQEAgc3RhdGljIEd1ZXN0RmlsZXN5c3RlbUluZm8gKmJ1aWxkX2d1ZXN0X2ZzaW5m
+byhzdHJ1Y3QgRnNNb3VudCAqbW91bnQsCj4+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgIEVycm9yICoqZXJycCkKPj4gIHsKPj4gICAgICBHdWVzdEZpbGVz
+eXN0ZW1JbmZvICpmcyA9IGdfbWFsbG9jMChzaXplb2YoKmZzKSk7Cj4+ICsgICAgc3RydWN0IHN0
+YXR2ZnMgYnVmOwo+PiArICAgIHVuc2lnbmVkIGxvbmcgdXNlZCwgbm9ucm9vdF90b3RhbDsKPj4g
+KyAgICBkb3VibGUgdXNhZ2U7Cj4+ICAgICAgY2hhciAqZGV2cGF0aCA9IGdfc3RyZHVwX3ByaW50
+ZigiL3N5cy9kZXYvYmxvY2svJXU6JXUiLAo+PiAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgbW91bnQtPmRldm1ham9yLCBtb3VudC0+ZGV2bWlub3IpOwo+PiAgCj4+IEBAIC0x
+MDc5LDcgKzEwODMsMjAgQEAgc3RhdGljIEd1ZXN0RmlsZXN5c3RlbUluZm8gKmJ1aWxkX2d1ZXN0
+X2ZzaW5mbyhzdHJ1Y3QgRnNNb3VudCAqbW91bnQsCj4+ICAgICAgZnMtPnR5cGUgPSBnX3N0cmR1
+cChtb3VudC0+ZGV2dHlwZSk7Cj4+ICAgICAgYnVpbGRfZ3Vlc3RfZnNpbmZvX2Zvcl9kZXZpY2Uo
+ZGV2cGF0aCwgZnMsIGVycnApOwo+PiAgCj4+ICsgICAgaWYgKHN0YXR2ZnMoZnMtPm1vdW50cG9p
+bnQsICZidWYpKSB7Cj4+ICsgICAgICAgIGZzLT5oYXNfdXNhZ2UgPSBmYWxzZTsKPj4gKyAgICAg
+ICAgZnMtPnVzYWdlID0gLTE7Cj4+ICsgICAgfSBlbHNlIHsKPj4gKyAgICAgICAgdXNlZCA9IGJ1
+Zi5mX2Jsb2NrcyAtIGJ1Zi5mX2JmcmVlOwo+PiArICAgICAgICBub25yb290X3RvdGFsID0gdXNl
+ZCArIGJ1Zi5mX2JhdmFpbDsKPj4gKyAgICAgICAgdXNhZ2UgPSAoZG91YmxlKSB1c2VkIC8gbm9u
+cm9vdF90b3RhbDsKPgo+V2h5IGNhbGN1bGF0ZSB0aGUgdXNhZ2UgaGVyZSA/ICBJTUhPIGl0IHdv
+dWxkIG1ha2UgdGhlIGNvbW1hbmQgbW9yZSB1c2VmdWwKPmlmIHdlIGp1c3QgcmVwb3J0ZWQgdHdv
+IHNlcGFyYXRlICJ1c2VkX2J5dGVzIiBhbmQgInRvdGFsX2J5dGVzIiB2YWx1ZXMuIFRoZQo+YXBw
+IGNhbiBjb252ZXJ0IHRvIGEgcGVyY2VudGFnZSB1dGlsaXphdGlvbiB2YWx1ZSBpZiB0aGV5IHNv
+IGRlc2lyZSwgd2hpbGUKPm90aGVyIGFwcHMgY2FuIG5vdyBnZXQgdGhlIHJhdyB2YWx1ZXMKClRo
+YW5rcyBmb3IgeW91ciBhZHZpY2UuCldpbGwgYmUgZml4ZWQgaW4gdjUuCkFsc28gYWRkaW5nIHN1
+cHBvcnQgZm9yIHFnYS13aW4uCgpSZWdhcmRzLAotIENoZW4K
