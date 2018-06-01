@@ -1,25 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34752)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35205)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1fOj2J-0001RY-ND
-	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 08:20:04 -0400
+	(envelope-from <stefanha@gmail.com>) id 1fOj4z-0002Ej-Cy
+	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 08:22:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1fOj2G-00067h-Df
-	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 08:20:03 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:45370 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1fOj2G-00067M-7u
-	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 08:20:00 -0400
-Date: Fri, 1 Jun 2018 13:19:56 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20180601121956.GW3458@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <20180601061121.13161-1-chen_han_xiao@126.com>
+	(envelope-from <stefanha@gmail.com>) id 1fOj4w-0008JJ-4u
+	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 08:22:49 -0400
+Received: from mail-wr0-x234.google.com ([2a00:1450:400c:c0c::234]:46111)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1fOj4v-0008Iw-Sh
+	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 08:22:46 -0400
+Received: by mail-wr0-x234.google.com with SMTP id v13-v6so24480385wrp.13
+	for <qemu-devel@nongnu.org>; Fri, 01 Jun 2018 05:22:45 -0700 (PDT)
+Date: Fri, 1 Jun 2018 13:22:43 +0100
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20180601122243.GN8687@stefanha-x1.localdomain>
+References: <CAJSP0QURm0Y6FBByzY=kgf7JmDDyt5PLkkxk+ODi21uQKUGq5A@mail.gmail.com>
+	<CAFEAcA_cuf4ZXcwK9+z26wFTb0L28cDuT3_xaJAFy5ijt=ZskQ@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="dPW7zu3hTOhZvCDO"
 Content-Disposition: inline
-In-Reply-To: <20180601061121.13161-1-chen_han_xiao@126.com>
-Subject: Re: [Qemu-devel] [PATCH v4] qga: add mountpoint usage to
- GuestFilesystemInfo
+In-Reply-To: <CAFEAcA_cuf4ZXcwK9+z26wFTb0L28cDuT3_xaJAFy5ijt=ZskQ@mail.gmail.com>
+Subject: Re: [Qemu-devel] Cortex M0 emulation tasks
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,74 +30,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Chen Hanxiao <chen_han_xiao@126.com>
-Cc: qemu-devel@nongnu.org, Michael Roth <mdroth@linux.vnet.ibm.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Julia Suvorova <jusual@mail.ru>, Joel Stanley <joel@jms.id.au>, Steffen =?iso-8859-1?Q?G=F6rtz?= <mail@steffen-goertz.de>, Jim Mussared <jim@groklearning.com>, qemu-devel <qemu-devel@nongnu.org>
 
-On Fri, Jun 01, 2018 at 02:11:21PM +0800, Chen Hanxiao wrote:
-> From: Chen Hanxiao <chenhanxiao@gmail.com>
-> 
-> This patch adds support for getting the usage of mounted
-> filesystem.
-> It's very useful when we try to monitor guest's filesystem.
-> 
-> Cc: Michael Roth <mdroth@linux.vnet.ibm.com>
-> Cc: Eric Blake <eblake@redhat.com>
-> Signed-off-by: Chen Hanxiao <chenhanxiao@gmail.com>
-> 
-> ---
-> v2:
->    add description in qapi-schema and version numbers
-> v3:
->    use float for usage to get more precision.
-> v4:
->    make usage as a best-effort query and mark it as optional.
-> 
->  qga/commands-posix.c | 17 +++++++++++++++++
->  qga/qapi-schema.json |  3 ++-
->  2 files changed, 19 insertions(+), 1 deletion(-)
-> 
-> diff --git a/qga/commands-posix.c b/qga/commands-posix.c
-> index 0dc219dbcf..4facc76953 100644
-> --- a/qga/commands-posix.c
-> +++ b/qga/commands-posix.c
-> @@ -46,6 +46,7 @@ extern char **environ;
->  #include <arpa/inet.h>
->  #include <sys/socket.h>
->  #include <net/if.h>
-> +#include <sys/statvfs.h>
->  
->  #ifdef FIFREEZE
->  #define CONFIG_FSFREEZE
-> @@ -1072,6 +1073,9 @@ static GuestFilesystemInfo *build_guest_fsinfo(struct FsMount *mount,
->                                                 Error **errp)
->  {
->      GuestFilesystemInfo *fs = g_malloc0(sizeof(*fs));
-> +    struct statvfs buf;
-> +    unsigned long used, nonroot_total;
-> +    double usage;
->      char *devpath = g_strdup_printf("/sys/dev/block/%u:%u",
->                                      mount->devmajor, mount->devminor);
->  
-> @@ -1079,7 +1083,20 @@ static GuestFilesystemInfo *build_guest_fsinfo(struct FsMount *mount,
->      fs->type = g_strdup(mount->devtype);
->      build_guest_fsinfo_for_device(devpath, fs, errp);
->  
-> +    if (statvfs(fs->mountpoint, &buf)) {
-> +        fs->has_usage = false;
-> +        fs->usage = -1;
-> +    } else {
-> +        used = buf.f_blocks - buf.f_bfree;
-> +        nonroot_total = used + buf.f_bavail;
-> +        usage = (double) used / nonroot_total;
 
-Why calculate the usage here ?  IMHO it would make the command more useful
-if we just reported two separate "used_bytes" and "total_bytes" values. The
-app can convert to a percentage utilization value if they so desire, while
-other apps can now get the raw values
+--dPW7zu3hTOhZvCDO
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+On Tue, May 29, 2018 at 07:09:20PM +0100, Peter Maydell wrote:
+> On 28 May 2018 at 15:26, Stefan Hajnoczi <stefanha@gmail.com> wrote:
+> > Hi,
+> > I took a look at what's required for ARM Cortex M0 emulation that we
+> > need for the micro:bit ARM board.  The following notes are based on
+> > Appendix D3 of the ARMv6-M Architecture Reference Manual that Peter
+> > Maydell recommended.
+> >
+> > Several people can work on this since there are many smaller tasks.
+> >
+> > The general approach for each task:
+> > 1. Look at Appendix D3 to understand the architecture differences.
+> > 2. Look at QEMU source code (mainly target/arm/translate.c) to
+> > understand the current status.
+>=20
+> Rough guide to where things are:
+
+Thanks for the info, that was very helpful.
+
+Stefan
+
+--dPW7zu3hTOhZvCDO
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJbETqTAAoJEJykq7OBq3PIfsIH/0h5uxckwQ4wg1iviANgpDMY
+/5eIMga89BGKGDSuW1UbRSZIVComWVFHcR7qJhp+uxWhXxnVb6zjeSKopMZvNUGA
+0FLfJ6mflalS1Fp0hxOBjM+jyqkfNfLz5eTFTN8CuCE78s9QOk7bIMMPYNuF3Jw1
+2a0EmMd49AZZF4etxj6vQH1WfeTq9wUkadJPLW/CJwfhRl+CTC2Ml4iRJ36uKAjd
+hXSsmKAEq2ZW8csEOp6KGUDDAZPNoYUiBA0HtYAtzAlaGWDuwe90rMcjb1eYlrnl
+wHTDhu7LXDMcn18PL0OpWXzdFMRzgojsjGkMIwjh4VOTRLjScrKdqvzdpFXH8/A=
+=TT44
+-----END PGP SIGNATURE-----
+
+--dPW7zu3hTOhZvCDO--
