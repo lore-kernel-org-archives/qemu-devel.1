@@ -1,20 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52277)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53362)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1fOXcr-0001KZ-N7
-	for qemu-devel@nongnu.org; Thu, 31 May 2018 20:09:02 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1fOXk4-0002Zu-SC
+	for qemu-devel@nongnu.org; Thu, 31 May 2018 20:16:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1fOXcq-0007jK-Lp
-	for qemu-devel@nongnu.org; Thu, 31 May 2018 20:09:01 -0400
-References: <1524822046-22779-1-git-send-email-thuth@redhat.com>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <4eae64a0-6f03-48c0-0c36-cb4d879169a7@redhat.com>
-Date: Thu, 31 May 2018 20:08:53 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1fOXk1-0007Xp-NT
+	for qemu-devel@nongnu.org; Thu, 31 May 2018 20:16:28 -0400
+Received: from mail-pl0-x244.google.com ([2607:f8b0:400e:c01::244]:37608)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1fOXk1-0007W3-8K
+	for qemu-devel@nongnu.org; Thu, 31 May 2018 20:16:25 -0400
+Received: by mail-pl0-x244.google.com with SMTP id 31-v6so4277999plc.4
+	for <qemu-devel@nongnu.org>; Thu, 31 May 2018 17:16:25 -0700 (PDT)
+References: <20180531224911.23725-1-richard.henderson@linaro.org>
+	<20180531224911.23725-2-richard.henderson@linaro.org>
+	<b5e492dc-da36-dbb4-5cc4-32d2d78050cd@amsat.org>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <b072270a-28c1-6fb5-0b91-87a35ddfc952@linaro.org>
+Date: Thu, 31 May 2018 17:16:21 -0700
 MIME-Version: 1.0
-In-Reply-To: <1524822046-22779-1-git-send-email-thuth@redhat.com>
+In-Reply-To: <b5e492dc-da36-dbb4-5cc4-32d2d78050cd@amsat.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3 0/4] Add new CD-ROM related qtests
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH 1/6] gdbstub: Return the fd from
+ gdbserver_start
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,53 +33,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org, laurent@vivier.eu, evgreen@chromium.org
 
-
-
-On 04/27/2018 05:40 AM, Thomas Huth wrote:
-> With one of my clean-up patches (see commit 1454509726719e0933c800), I
-> recently accidentially broke the "-cdrom" parameter (more precisely
-> "-drive if=scsi") on a couple of boards, since there was no error
-> detected during the "make check" regression testing. This is clearly an
-> indication that we are lacking tests in this area.
-> So this small patch series now introduces some tests for CD-ROM drives:
-> The first two patches introduce the possibility to check that booting
-> from CD-ROM drives still works fine for x86 and s390x, and the third
-> patch adds a test that certain machines can at least still be started
-> with the "-cdrom" parameter (i.e. that test would have catched the
-> mistake that I did with my SCSI cleanup patch).
+On 05/31/2018 04:15 PM, Philippe Mathieu-Daudé wrote:
+> Hi Richard,
 > 
-> v3:
->  - Rebased to current master branch
->  - Add a final patch that adds an entry to the MAINTAINERS file
+> On 05/31/2018 07:49 PM, Richard Henderson wrote:
+>> This will allow us to protect gdbserver_fd from the guest.
+>>
+>> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+>> ---
+>>  gdbstub.c | 5 +++--
+>>  1 file changed, 3 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/gdbstub.c b/gdbstub.c
+>> index 6081e719c5..057d0d65c5 100644
+>> --- a/gdbstub.c
+>> +++ b/gdbstub.c
+>> @@ -1890,15 +1890,16 @@ static int gdbserver_open(int port)
+>>  int gdbserver_start(int port)
+>>  {
+>>      gdbserver_fd = gdbserver_open(port);
+>> -    if (gdbserver_fd < 0)
+>> +    if (gdbserver_fd < 0) {
+>>          return -1;
+>> +    }
+>>      /* accept connections */
+>>      if (!gdb_accept()) {
+>>          close(gdbserver_fd);
+>>          gdbserver_fd = -1;
+>>          return -1;
+>>      }
+>> -    return 0;
+>> +    return gdbserver_fd;
 > 
-> v2:
->  - Use g_spawn_sync() instead of execlp() to run genisoimage
->  - The "-cdrom" parameter test is now run on all architectures (with
->    machine "none" for the machines that are not explicitly checked)
->  - Some rewordings and improved comments here and there
-> 
-> Thomas Huth (4):
->   tests/boot-sector: Add magic bytes to s390x boot code header
->   tests/cdrom-test: Test booting from CD-ROM ISO image file
->   tests/cdrom-test: Test that -cdrom parameter is working
->   MAINTAINERS: Add the cdrom-test to John's section
-> 
->  MAINTAINERS            |   1 +
->  tests/Makefile.include |   2 +
->  tests/boot-sector.c    |   9 +-
->  tests/cdrom-test.c     | 222 +++++++++++++++++++++++++++++++++++++++++++++++++
->  4 files changed, 231 insertions(+), 3 deletions(-)
->  create mode 100644 tests/cdrom-test.c
-> 
+> I agree with your change, but what about !CONFIG_USER_ONLY?
 
-*coughs*
+It's still a non-negative number, so the success value is still the same.
 
-Thanks, applied to my IDE tree:
 
-https://github.com/jnsnow/qemu/commits/ide
-https://github.com/jnsnow/qemu.git
-
---js
+r~
