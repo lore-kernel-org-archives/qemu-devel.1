@@ -1,26 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33455)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35224)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <keno@juliacomputing.com>) id 1fOYrE-0003FF-DR
-	for qemu-devel@nongnu.org; Thu, 31 May 2018 21:27:58 -0400
+	(envelope-from <zhaoshenglong@huawei.com>) id 1fOZ0I-0001pl-7R
+	for qemu-devel@nongnu.org; Thu, 31 May 2018 21:37:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <keno@juliacomputing.com>) id 1fOYrB-0003HU-Oe
-	for qemu-devel@nongnu.org; Thu, 31 May 2018 21:27:56 -0400
-Received: from mail-qt0-x244.google.com ([2607:f8b0:400d:c0d::244]:33784)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <keno@juliacomputing.com>)
-	id 1fOYrB-0003Gf-IS
-	for qemu-devel@nongnu.org; Thu, 31 May 2018 21:27:53 -0400
-Received: by mail-qt0-x244.google.com with SMTP id e8-v6so30315652qth.0
-	for <qemu-devel@nongnu.org>; Thu, 31 May 2018 18:27:53 -0700 (PDT)
-From: Keno Fischer <keno@juliacomputing.com>
-Date: Thu, 31 May 2018 21:26:12 -0400
-Message-Id: <b5c27c58c250088ef6d09bd9321e96d423df02d7.1527814874.git.keno@juliacomputing.com>
-In-Reply-To: <cover.1527814874.git.keno@juliacomputing.com>
-References: <cover.1527814874.git.keno@juliacomputing.com>
-In-Reply-To: <cover.1527814874.git.keno@juliacomputing.com>
-References: <cover.1527814874.git.keno@juliacomputing.com>
-Subject: [Qemu-devel] [PATCH v2 17/20] 9p: darwin: Provide a fallback
- implementation for utimensat
+	(envelope-from <zhaoshenglong@huawei.com>) id 1fOZ0G-0006Ec-OL
+	for qemu-devel@nongnu.org; Thu, 31 May 2018 21:37:18 -0400
+From: Shannon Zhao <zhaoshenglong@huawei.com>
+Date: Fri, 1 Jun 2018 09:36:27 +0800
+Message-ID: <1527816987-16108-1-git-send-email-zhaoshenglong@huawei.com>
+MIME-Version: 1.0
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH v6] arm_gicv3_kvm: kvm_dist_get/put: skip the
+ registers banked by GICR
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,221 +20,224 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Keno Fischer <keno@juliacomputing.com>, groug@kaod.org
+To: qemu-arm@nongnu.org
+Cc: peter.maydell@linaro.org, eric.auger@redhat.com, qemu-devel@nongnu.org, shannon.zhaosl@gmail.com, Shannon Zhao <zhaoshenglong@huawei.com>, qemu-stable@nongnu.org
 
-This function is new in Mac OS 10.13. Provide a fallback implementation
-when building against older SDKs. The complication in the definition comes
-having to separately handle the used SDK version and the target OS version.
+While we skip the GIC_INTERNAL irqs, we don't change the register offset
+accordingly. This will overlap the GICR registers value and leave the
+last GIC_INTERNAL irq's registers out of update.
 
-- If the SDK version is too low (__MAC_10_13 not defined), utimensat is not
-  defined in the header, so we must not try to use it (doing so would error).
-- Otherwise, if the targetted OS version is at least 10.13, we know this
-  function is available, so we can unconditionally call it.
-- Lastly, we check for the availability of the __builtin_available macro to
-  potentially insert a dynamic check for this OS version. However, __builtin_available
-  is only available with sufficiently recent versions of clang and while all
-  Apple clang versions that ship with Xcode versions that support the 10.13
-  SDK support with builtin, we want to allow building with compilers other
-  than Apple clang that may not support this builtin.
+Fix this by skipping the registers banked by GICR.
 
-Signed-off-by: Keno Fischer <keno@juliacomputing.com>
+Also for migration compatibility if the migration source (old version
+qemu) doesn't send gicd_no_migration_shift_bug = 1 to destination, then
+we shift the data of PPI to get the right data for SPI.
+
+Fixes: 367b9f527becdd20ddf116e17a3c0c2bbc486920
+Cc: qemu-stable@nongnu.org
+Reviewed-by: Eric Auger <eric.auger@redhat.com>
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+Signed-off-by: Shannon Zhao <zhaoshenglong@huawei.com>
 ---
+V6: Fix typos and keep same with offset for clroffset 
+---
+ hw/intc/arm_gicv3_common.c         | 79 ++++++++++++++++++++++++++++++++++++++
+ hw/intc/arm_gicv3_kvm.c            | 38 ++++++++++++++++++
+ include/hw/intc/arm_gicv3_common.h |  1 +
+ 3 files changed, 118 insertions(+)
 
-Changes from v1:
- * Correct calculation of tv_usec
- * Support UTIME_NOW/UTIME/OMIT
- * Now covers fsdev/virtfs-proxy-helper.c
-
- fsdev/virtfs-proxy-helper.c |  3 +-
- hw/9pfs/9p-local.c          |  2 +-
- hw/9pfs/9p-util-darwin.c    | 96 +++++++++++++++++++++++++++++++++++++++++++++
- hw/9pfs/9p-util-linux.c     |  6 +++
- hw/9pfs/9p-util.h           |  8 ++++
- hw/9pfs/9p.c                |  1 +
- 6 files changed, 113 insertions(+), 3 deletions(-)
-
-diff --git a/fsdev/virtfs-proxy-helper.c b/fsdev/virtfs-proxy-helper.c
-index a26f8b8..d8dd3f5 100644
---- a/fsdev/virtfs-proxy-helper.c
-+++ b/fsdev/virtfs-proxy-helper.c
-@@ -957,8 +957,7 @@ static int process_requests(int sock)
-                                      &spec[0].tv_sec, &spec[0].tv_nsec,
-                                      &spec[1].tv_sec, &spec[1].tv_nsec);
-             if (retval > 0) {
--                retval = utimensat(AT_FDCWD, path.data, spec,
--                                   AT_SYMLINK_NOFOLLOW);
-+                retval = utimensat_nofollow(AT_FDCWD, path.data, spec);
-                 if (retval < 0) {
-                     retval = -errno;
-                 }
-diff --git a/hw/9pfs/9p-local.c b/hw/9pfs/9p-local.c
-index 7830526..47e8580 100644
---- a/hw/9pfs/9p-local.c
-+++ b/hw/9pfs/9p-local.c
-@@ -1071,7 +1071,7 @@ static int local_utimensat(FsContext *s, V9fsPath *fs_path,
-         goto out;
-     }
+diff --git a/hw/intc/arm_gicv3_common.c b/hw/intc/arm_gicv3_common.c
+index 7b54d52..864b7c6 100644
+--- a/hw/intc/arm_gicv3_common.c
++++ b/hw/intc/arm_gicv3_common.c
+@@ -27,6 +27,7 @@
+ #include "hw/intc/arm_gicv3_common.h"
+ #include "gicv3_internal.h"
+ #include "hw/arm/linux-boot-if.h"
++#include "sysemu/kvm.h"
  
--    ret = utimensat(dirfd, name, buf, AT_SYMLINK_NOFOLLOW);
-+    ret = utimensat_nofollow(dirfd, name, buf);
-     close_preserve_errno(dirfd);
- out:
-     g_free(dirpath);
-diff --git a/hw/9pfs/9p-util-darwin.c b/hw/9pfs/9p-util-darwin.c
-index cdb4c9e..ac414bc 100644
---- a/hw/9pfs/9p-util-darwin.c
-+++ b/hw/9pfs/9p-util-darwin.c
-@@ -62,3 +62,99 @@ int fsetxattrat_nofollow(int dirfd, const char *filename, const char *name,
-     close_preserve_errno(fd);
-     return ret;
- }
-+
-+#ifndef __has_builtin
-+#define __has_builtin(x) 0
-+#endif
-+
-+static int update_times_from_stat(int fd, struct timespec times[2],
-+                                  int update0, int update1)
+ static int gicv3_pre_save(void *opaque)
+ {
+@@ -141,6 +142,79 @@ static const VMStateDescription vmstate_gicv3_cpu = {
+     }
+ };
+ 
++static int gicv3_gicd_no_migration_shift_bug_pre_load(void *opaque)
 +{
-+    struct stat buf;
-+    int ret = fstat(fd, &buf);
-+    if (ret == -1) {
-+        return ret;
++    GICv3State *cs = opaque;
++
++   /*
++    * The gicd_no_migration_shift_bug flag is used for migration compatibility
++    * for old version QEMU which may have the GICD bmp shift bug under KVM mode.
++    * Strictly, what we want to know is whether the migration source is using
++    * KVM. Since we don't have any way to determine that, we look at whether the
++    * destination is using KVM; this is close enough because for the older QEMU
++    * versions with this bug KVM -> TCG migration didn't work anyway. If the
++    * source is a newer QEMU without this bug it will transmit the migration
++    * subsection which sets the flag to true; otherwise it will remain set to
++    * the value we select here.
++    */
++    if (kvm_enabled()) {
++        cs->gicd_no_migration_shift_bug = false;
 +    }
-+    if (update0) {
-+        times[0] = buf.st_atimespec;
-+    }
-+    if (update1) {
-+        times[1] = buf.st_mtimespec;
-+    }
++
 +    return 0;
 +}
 +
-+int utimensat_nofollow(int dirfd, const char *filename,
-+                       const struct timespec times_in[2])
++static int gicv3_gicd_no_migration_shift_bug_post_load(void *opaque,
++                                                       int version_id)
 +{
-+    int ret, fd;
-+    int special0, special1;
-+    struct timeval futimes_buf[2];
-+    struct timespec times[2];
-+    memcpy(times, times_in, 2 * sizeof(struct timespec));
++    GICv3State *cs = opaque;
 +
-+/* Check whether we have an SDK version that defines utimensat */
-+#if defined(__MAC_10_13)
-+# if __MAC_OS_X_VERSION_MIN_REQUIRED >= __MAC_10_13
-+#  define UTIMENSAT_AVAILABLE 1
-+# elif __has_builtin(__builtin_available)
-+#  define UTIMENSAT_AVAILABLE __builtin_available(macos 10.13, *)
-+# else
-+#  define UTIMENSAT_AVAILABLE 0
-+# endif
-+    if (UTIMENSAT_AVAILABLE) {
-+        return utimensat(dirfd, filename, times, AT_SYMLINK_NOFOLLOW);
-+    }
-+#endif
-+
-+    /* utimensat not available. Use futimes. */
-+    fd = openat_file(dirfd, filename, O_PATH_9P_UTIL | O_NOFOLLOW, 0);
-+    if (fd == -1) {
-+        return -1;
++    if (cs->gicd_no_migration_shift_bug) {
++        return 0;
 +    }
 +
-+    special0 = times[0].tv_nsec == UTIME_OMIT;
-+    special1 = times[1].tv_nsec == UTIME_OMIT;
-+    if (special0 || special1) {
-+        /* If both are set, nothing to do */
-+        if (special0 && special1) {
-+            ret = 0;
-+            goto done;
-+        }
++    /* Older versions of QEMU had a bug in the handling of state save/restore
++     * to the KVM GICv3: they got the offset in the bitmap arrays wrong,
++     * so that instead of the data for external interrupts 32 and up
++     * starting at bit position 32 in the bitmap, it started at bit
++     * position 64. If we're receiving data from a QEMU with that bug,
++     * we must move the data down into the right place.
++     */
++    memmove(cs->group, (uint8_t *)cs->group + GIC_INTERNAL / 8,
++            sizeof(cs->group) - GIC_INTERNAL / 8);
++    memmove(cs->grpmod, (uint8_t *)cs->grpmod + GIC_INTERNAL / 8,
++            sizeof(cs->grpmod) - GIC_INTERNAL / 8);
++    memmove(cs->enabled, (uint8_t *)cs->enabled + GIC_INTERNAL / 8,
++            sizeof(cs->enabled) - GIC_INTERNAL / 8);
++    memmove(cs->pending, (uint8_t *)cs->pending + GIC_INTERNAL / 8,
++            sizeof(cs->pending) - GIC_INTERNAL / 8);
++    memmove(cs->active, (uint8_t *)cs->active + GIC_INTERNAL / 8,
++            sizeof(cs->active) - GIC_INTERNAL / 8);
++    memmove(cs->edge_trigger, (uint8_t *)cs->edge_trigger + GIC_INTERNAL / 8,
++            sizeof(cs->edge_trigger) - GIC_INTERNAL / 8);
 +
-+        ret = update_times_from_stat(fd, times, special0, special1);
-+        if (ret < 0) {
-+            goto done;
-+        }
-+    }
++    /*
++     * While this new version QEMU doesn't have this kind of bug as we fix it,
++     * so it needs to set the flag to true to indicate that and it's necessary
++     * for next migration to work from this new version QEMU.
++     */
++    cs->gicd_no_migration_shift_bug = true;
 +
-+    special0 = times[0].tv_nsec == UTIME_NOW;
-+    special1 = times[1].tv_nsec == UTIME_NOW;
-+    if (special0 || special1) {
-+        ret = futimes(fd, NULL);
-+        if (ret < 0) {
-+            goto done;
-+        }
-+
-+        /* If both are set, we are done */
-+        if (special0 && special1) {
-+            ret = 0;
-+            goto done;
-+        }
-+
-+        ret = update_times_from_stat(fd, times, special0, special1);
-+        if (ret < 0) {
-+            goto done;
-+        }
-+    }
-+
-+    futimes_buf[0].tv_sec = times[0].tv_sec;
-+    futimes_buf[0].tv_usec = times[0].tv_nsec / 1000;
-+    futimes_buf[1].tv_sec = times[1].tv_sec;
-+    futimes_buf[1].tv_usec = times[1].tv_nsec / 1000;
-+    ret = futimes(fd, futimes_buf);
-+
-+done:
-+    close_preserve_errno(fd);
-+    return ret;
++    return 0;
 +}
-diff --git a/hw/9pfs/9p-util-linux.c b/hw/9pfs/9p-util-linux.c
-index defa3a4..3902378 100644
---- a/hw/9pfs/9p-util-linux.c
-+++ b/hw/9pfs/9p-util-linux.c
-@@ -57,3 +57,9 @@ int fsetxattrat_nofollow(int dirfd, const char *filename, const char *name,
-     g_free(proc_path);
-     return ret;
++
++const VMStateDescription vmstate_gicv3_gicd_no_migration_shift_bug = {
++    .name = "arm_gicv3/gicd_no_migration_shift_bug",
++    .version_id = 1,
++    .minimum_version_id = 1,
++    .pre_load = gicv3_gicd_no_migration_shift_bug_pre_load,
++    .post_load = gicv3_gicd_no_migration_shift_bug_post_load,
++    .fields = (VMStateField[]) {
++        VMSTATE_BOOL(gicd_no_migration_shift_bug, GICv3State),
++        VMSTATE_END_OF_LIST()
++    }
++};
++
+ static const VMStateDescription vmstate_gicv3 = {
+     .name = "arm_gicv3",
+     .version_id = 1,
+@@ -165,6 +239,10 @@ static const VMStateDescription vmstate_gicv3 = {
+         VMSTATE_STRUCT_VARRAY_POINTER_UINT32(cpu, GICv3State, num_cpu,
+                                              vmstate_gicv3_cpu, GICv3CPUState),
+         VMSTATE_END_OF_LIST()
++    },
++    .subsections = (const VMStateDescription * []) {
++        &vmstate_gicv3_gicd_no_migration_shift_bug,
++        NULL
+     }
+ };
+ 
+@@ -364,6 +442,7 @@ static void arm_gicv3_common_reset(DeviceState *dev)
+             gicv3_gicd_group_set(s, i);
+         }
+     }
++    s->gicd_no_migration_shift_bug = true;
  }
-+
-+int utimensat_nofollow(int dirfd, const char *filename,
-+                       const struct timespec times[2])
-+{
-+    return utimensat(dirfd, filename, times, AT_SYMLINK_NOFOLLOW);
-+}
-diff --git a/hw/9pfs/9p-util.h b/hw/9pfs/9p-util.h
-index 50a03c7..b1dc08a 100644
---- a/hw/9pfs/9p-util.h
-+++ b/hw/9pfs/9p-util.h
-@@ -36,6 +36,12 @@ static inline int qemu_lsetxattr(const char *path, const char *name,
- #define qemu_lsetxattr lsetxattr
- #endif
  
-+/* Compatibility with old SDK Versions for Darwin */
-+#if defined(CONFIG_DARWIN) && !defined(UTIME_NOW)
-+#define UTIME_NOW -1
-+#define UTIME_OMIT -2
-+#endif
-+
- static inline void close_preserve_errno(int fd)
- {
-     int serrno = errno;
-@@ -81,5 +87,7 @@ ssize_t flistxattrat_nofollow(int dirfd, const char *filename,
-                               char *list, size_t size);
- ssize_t fremovexattrat_nofollow(int dirfd, const char *filename,
-                                 const char *name);
-+int utimensat_nofollow(int dirfd, const char *filename,
-+                       const struct timespec times[2]);
+ static void arm_gic_common_linux_init(ARMLinuxBootIf *obj,
+diff --git a/hw/intc/arm_gicv3_kvm.c b/hw/intc/arm_gicv3_kvm.c
+index 147e691..bc6fa41 100644
+--- a/hw/intc/arm_gicv3_kvm.c
++++ b/hw/intc/arm_gicv3_kvm.c
+@@ -178,6 +178,14 @@ static void kvm_dist_get_edge_trigger(GICv3State *s, uint32_t offset,
+     uint32_t reg;
+     int irq;
  
- #endif
-diff --git a/hw/9pfs/9p.c b/hw/9pfs/9p.c
-index 24802b9..71b2dc9 100644
---- a/hw/9pfs/9p.c
-+++ b/hw/9pfs/9p.c
-@@ -21,6 +21,7 @@
- #include "virtio-9p.h"
- #include "fsdev/qemu-fsdev.h"
- #include "9p-xattr.h"
-+#include "9p-util.h"
- #include "coth.h"
- #include "trace.h"
- #include "migration/blocker.h"
++    /* For the KVM GICv3, affinity routing is always enabled, and the first 2
++     * GICD_ICFGR<n> registers are always RAZ/WI. The corresponding
++     * functionality is replaced by GICR_ICFGR<n>. It doesn't need to sync
++     * them. So it should increase the offset to skip GIC_INTERNAL irqs.
++     * This matches the for_each_dist_irq_reg() macro which also skips the
++     * first GIC_INTERNAL irqs.
++     */
++    offset += (GIC_INTERNAL * 2) / 8;
+     for_each_dist_irq_reg(irq, s->num_irq, 2) {
+         kvm_gicd_access(s, offset, &reg, false);
+         reg = half_unshuffle32(reg >> 1);
+@@ -195,6 +203,14 @@ static void kvm_dist_put_edge_trigger(GICv3State *s, uint32_t offset,
+     uint32_t reg;
+     int irq;
+ 
++    /* For the KVM GICv3, affinity routing is always enabled, and the first 2
++     * GICD_ICFGR<n> registers are always RAZ/WI. The corresponding
++     * functionality is replaced by GICR_ICFGR<n>. It doesn't need to sync
++     * them. So it should increase the offset to skip GIC_INTERNAL irqs.
++     * This matches the for_each_dist_irq_reg() macro which also skips the
++     * first GIC_INTERNAL irqs.
++     */
++    offset += (GIC_INTERNAL * 2) / 8;
+     for_each_dist_irq_reg(irq, s->num_irq, 2) {
+         reg = *gic_bmp_ptr32(bmp, irq);
+         if (irq % 32 != 0) {
+@@ -236,6 +252,15 @@ static void kvm_dist_getbmp(GICv3State *s, uint32_t offset, uint32_t *bmp)
+     uint32_t reg;
+     int irq;
+ 
++    /* For the KVM GICv3, affinity routing is always enabled, and the
++     * GICD_IGROUPR0/GICD_IGRPMODR0/GICD_ISENABLER0/GICD_ISPENDR0/
++     * GICD_ISACTIVER0 registers are always RAZ/WI. The corresponding
++     * functionality is replaced by the GICR registers. It doesn't need to sync
++     * them. So it should increase the offset to skip GIC_INTERNAL irqs.
++     * This matches the for_each_dist_irq_reg() macro which also skips the
++     * first GIC_INTERNAL irqs.
++     */
++    offset += (GIC_INTERNAL * 1) / 8;
+     for_each_dist_irq_reg(irq, s->num_irq, 1) {
+         kvm_gicd_access(s, offset, &reg, false);
+         *gic_bmp_ptr32(bmp, irq) = reg;
+@@ -249,6 +274,19 @@ static void kvm_dist_putbmp(GICv3State *s, uint32_t offset,
+     uint32_t reg;
+     int irq;
+ 
++    /* For the KVM GICv3, affinity routing is always enabled, and the
++     * GICD_IGROUPR0/GICD_IGRPMODR0/GICD_ISENABLER0/GICD_ISPENDR0/
++     * GICD_ISACTIVER0 registers are always RAZ/WI. The corresponding
++     * functionality is replaced by the GICR registers. It doesn't need to sync
++     * them. So it should increase the offset and clroffset to skip GIC_INTERNAL
++     * irqs. This matches the for_each_dist_irq_reg() macro which also skips the
++     * first GIC_INTERNAL irqs.
++     */
++    offset += (GIC_INTERNAL * 1) / 8;
++    if (clroffset != 0) {
++        clroffset += (GIC_INTERNAL * 1) / 8;
++    }
++
+     for_each_dist_irq_reg(irq, s->num_irq, 1) {
+         /* If this bitmap is a set/clear register pair, first write to the
+          * clear-reg to clear all bits before using the set-reg to write
+diff --git a/include/hw/intc/arm_gicv3_common.h b/include/hw/intc/arm_gicv3_common.h
+index bccdfe1..d75b49d 100644
+--- a/include/hw/intc/arm_gicv3_common.h
++++ b/include/hw/intc/arm_gicv3_common.h
+@@ -217,6 +217,7 @@ struct GICv3State {
+     uint32_t revision;
+     bool security_extn;
+     bool irq_reset_nonsecure;
++    bool gicd_no_migration_shift_bug;
+ 
+     int dev_fd; /* kvm device fd if backed by kvm vgic support */
+     Error *migration_blocker;
 -- 
-2.8.1
+2.0.4
