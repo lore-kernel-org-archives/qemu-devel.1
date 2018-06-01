@@ -1,16 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46542)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46742)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1fOlHD-0001nZ-Sk
-	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 10:43:36 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1fOlIA-0002Gf-Hm
+	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 10:44:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1fOlHC-0005Q7-Ua
-	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 10:43:35 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1fOlI9-0006Fi-Du
+	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 10:44:34 -0400
+Received: from mail-ot0-x244.google.com ([2607:f8b0:4003:c0f::244]:39130)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1fOlI9-0006Ee-8P
+	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 10:44:33 -0400
+Received: by mail-ot0-x244.google.com with SMTP id l12-v6so29555692oth.6
+	for <qemu-devel@nongnu.org>; Fri, 01 Jun 2018 07:44:33 -0700 (PDT)
+MIME-Version: 1.0
+In-Reply-To: <20180601135610.16149-1-samuel.thibault@ens-lyon.org>
+References: <20180601135610.16149-1-samuel.thibault@ens-lyon.org>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri,  1 Jun 2018 15:43:27 +0100
-Message-Id: <20180601144328.23817-2-peter.maydell@linaro.org>
-In-Reply-To: <20180601144328.23817-1-peter.maydell@linaro.org>
-References: <20180601144328.23817-1-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PATCH 1/2] stellaris: Stop using armv7m_init()
+Date: Fri, 1 Jun 2018 15:44:11 +0100
+Message-ID: <CAFEAcA-iAR8k8+163aoipZfNwezT1MrvbOS=+RXq+JK_ZhSsLw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PULL 0/9 v2] slirp updates
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -19,54 +29,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-arm@nongnu.org, qemu-devel@nongnu.org
-Cc: patches@linaro.org, Julia Suvorova <jusual@mail.ru>, Stefan Hajnoczi <stefanha@redhat.com>, Joel Stanley <joel@jms.id.au>, Jim Mussared <jim@groklearning.com>, =?UTF-8?q?Steffen=20G=C3=B6rtz?= <mail@steffen-goertz.de>
+To: Samuel Thibault <samuel.thibault@ens-lyon.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>, Jan Kiszka <jan.kiszka@siemens.com>
 
-The stellaris board is still using the legacy armv7m_init() function,
-which predates conversion of the ARMv7M into a proper QOM container
-object. Make the board code directly create the ARMv7M object instead.
+On 1 June 2018 at 14:56, Samuel Thibault <samuel.thibault@ens-lyon.org> wro=
+te:
+> The following changes since commit c181ddaa176856b3cd2dfd12bbcf25fa9c884a=
+97:
+>
+>   Merge remote-tracking branch 'remotes/pmaydell/tags/pull-target-arm-201=
+80531-1' into staging (2018-05-31 17:00:55 +0100)
+>
+> are available in the Git repository at:
+>
+>   https://people.debian.org/~sthibault/qemu.git tags/samuel-thibault
+>
+> for you to fetch changes up to 47335eeea8f1d14b7c6a1dd585a25a9166721168:
+>
+>   slirp/ncsi: add checksum support (2018-05-31 21:19:24 +0200)
+>
+> ----------------------------------------------------------------
+> slirp updates
+>
+> Alexey Kardashevskiy
+>   slirp: Improve debugging messages
+>
+> Andreas Gustafsson, Samuel Thibault, James Clarke
+>   slirp: Improve bandwidth in GDB remote debugging and FreeBSD guests
+>
+> Benjamin Drung:
+>   slirp/dhcp: Add domainname option
+>
+> C=C3=A9dric Le Goater (3):
+>   slirp/ncsi: fix "Get Version ID" payload length
+>   slirp/ncsi: add a "Get Parameters" response
+>   slirp/ncsi: add checksum support
+>
+> Nia Alarie:
+>   net/slirp: Convert atoi to qemu_strtoi to allow error checking
 
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
----
- hw/arm/stellaris.c | 12 ++++++++++--
- 1 file changed, 10 insertions(+), 2 deletions(-)
+Applied, thanks.
 
-diff --git a/hw/arm/stellaris.c b/hw/arm/stellaris.c
-index e886f54976..1b2c383e9f 100644
---- a/hw/arm/stellaris.c
-+++ b/hw/arm/stellaris.c
-@@ -20,6 +20,7 @@
- #include "qemu/log.h"
- #include "exec/address-spaces.h"
- #include "sysemu/sysemu.h"
-+#include "hw/arm/armv7m.h"
- #include "hw/char/pl011.h"
- #include "hw/misc/unimp.h"
- #include "cpu.h"
-@@ -1297,8 +1298,13 @@ static void stellaris_init(MachineState *ms, stellaris_board_info *board)
-                            &error_fatal);
-     memory_region_add_subregion(system_memory, 0x20000000, sram);
- 
--    nvic = armv7m_init(system_memory, flash_size, NUM_IRQ_LINES,
--                       ms->kernel_filename, ms->cpu_type);
-+    nvic = qdev_create(NULL, TYPE_ARMV7M);
-+    qdev_prop_set_uint32(nvic, "num-irq", NUM_IRQ_LINES);
-+    qdev_prop_set_string(nvic, "cpu-type", ms->cpu_type);
-+    object_property_set_link(OBJECT(nvic), OBJECT(get_system_memory()),
-+                                     "memory", &error_abort);
-+    /* This will exit with an error if the user passed us a bad cpu_type */
-+    qdev_init_nofail(nvic);
- 
-     qdev_connect_gpio_out_named(nvic, "SYSRESETREQ", 0,
-                                 qemu_allocate_irq(&do_sys_reset, NULL, 0));
-@@ -1430,6 +1436,8 @@ static void stellaris_init(MachineState *ms, stellaris_board_info *board)
-     create_unimplemented_device("analogue-comparator", 0x4003c000, 0x1000);
-     create_unimplemented_device("hibernation", 0x400fc000, 0x1000);
-     create_unimplemented_device("flash-control", 0x400fd000, 0x1000);
-+
-+    armv7m_load_kernel(ARM_CPU(first_cpu), ms->kernel_filename, flash_size);
- }
- 
- /* FIXME: Figure out how to generate these from stellaris_boards.  */
--- 
-2.17.1
+-- PMM
