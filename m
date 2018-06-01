@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57696)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57697)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fOeXC-0005vM-IO
+	(envelope-from <richard.henderson@linaro.org>) id 1fOeXC-0005vN-JB
 	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 03:31:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fOeX8-0000oF-Kh
+	(envelope-from <richard.henderson@linaro.org>) id 1fOeXA-0000pd-1r
 	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 03:31:38 -0400
-Received: from mail-pl0-x244.google.com ([2607:f8b0:400e:c01::244]:41503)
+Received: from mail-pg0-x236.google.com ([2607:f8b0:400e:c05::236]:36963)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1fOeX8-0000nb-CF
-	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 03:31:34 -0400
-Received: by mail-pl0-x244.google.com with SMTP id az12-v6so14819689plb.8
-	for <qemu-devel@nongnu.org>; Fri, 01 Jun 2018 00:31:34 -0700 (PDT)
+	id 1fOeX9-0000or-Rt
+	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 03:31:35 -0400
+Received: by mail-pg0-x236.google.com with SMTP id a13-v6so10873101pgu.4
+	for <qemu-devel@nongnu.org>; Fri, 01 Jun 2018 00:31:35 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Fri,  1 Jun 2018 00:30:45 -0700
-Message-Id: <20180601073050.8054-29-richard.henderson@linaro.org>
+Date: Fri,  1 Jun 2018 00:30:46 -0700
+Message-Id: <20180601073050.8054-30-richard.henderson@linaro.org>
 In-Reply-To: <20180601073050.8054-1-richard.henderson@linaro.org>
 References: <20180601073050.8054-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH 28/33] linux-user: Split out chroot, dup2, dup3,
- fcntl, setpgid, umask
+Subject: [Qemu-devel] [PATCH 29/33] linux-user: Split out getpgrp, getppid,
+ setsid
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,210 +32,93 @@ Cc: laurent@vivier.eu
 
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- linux-user/syscall.c | 123 +++++++++++++++++++++++++++----------------
- 1 file changed, 79 insertions(+), 44 deletions(-)
+ linux-user/syscall.c | 36 ++++++++++++++++++++++++++----------
+ 1 file changed, 26 insertions(+), 10 deletions(-)
 
 diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-index 4be71367fc..4d9b9cad6e 100644
+index 4d9b9cad6e..3dfb77ac11 100644
 --- a/linux-user/syscall.c
 +++ b/linux-user/syscall.c
-@@ -7879,6 +7879,19 @@ IMPL(chmod)
+@@ -8182,6 +8182,13 @@ IMPL(futimesat)
  }
  #endif
  
-+IMPL(chroot)
++#ifdef TARGET_NR_getpgrp
++IMPL(getpgrp)
 +{
-+    char *p = lock_user_string(arg1);
-+    abi_long ret;
-+
-+    if (!p) {
-+        return -TARGET_EFAULT;
-+    }
-+    ret = get_errno(chroot(p));
-+    unlock_user(p, arg1, 0);
-+    return ret;
-+}
-+
- IMPL(close)
- {
-     if (is_hostfd(arg1)) {
-@@ -7918,6 +7931,43 @@ IMPL(dup)
-     return ret;
- }
- 
-+#ifdef TARGET_NR_dup2
-+IMPL(dup2)
-+{
-+    abi_long ret;
-+
-+    if (is_hostfd(arg1) || is_hostfd(arg2)) {
-+        return -TARGET_EBADF;
-+    }
-+    ret = get_errno(dup2(arg1, arg2));
-+    if (ret >= 0) {
-+        fd_trans_dup(arg1, arg2);
-+    }
-+    return ret;
++    return get_errno(getpgrp());
 +}
 +#endif
 +
-+#if defined(TARGET_NR_dup3) && defined(CONFIG_DUP3)
-+IMPL(dup3)
-+{
-+    int host_flags;
-+    abi_long ret;
-+
-+    if (is_hostfd(arg1) || is_hostfd(arg2)) {
-+        return -TARGET_EBADF;
-+    }
-+    if ((arg3 & ~TARGET_O_CLOEXEC) != 0) {
-+        return -EINVAL;
-+    }
-+    host_flags = target_to_host_bitmask(arg3, fcntl_flags_tbl);
-+    ret = get_errno(dup3(arg1, arg2, host_flags));
-+    if (ret >= 0) {
-+        fd_trans_dup(arg1, arg2);
-+    }
-+    return ret;
-+}
-+#endif
-+
- IMPL(execve)
+ #ifdef TARGET_NR_getpid
+ IMPL(getpid)
  {
-     abi_ulong *guest_ptrs;
-@@ -8087,6 +8137,13 @@ IMPL(faccessat)
+@@ -8189,6 +8196,13 @@ IMPL(getpid)
  }
  #endif
  
-+#ifdef TARGET_NR_fcntl
-+IMPL(fcntl)
++#ifdef TARGET_NR_getppid
++IMPL(getppid)
 +{
-+    return do_fcntl(arg1, arg2, arg3);
++    return get_errno(getppid());
 +}
 +#endif
 +
- #ifdef TARGET_NR_fork
- IMPL(fork)
+ #if defined(TARGET_NR_getxpid) && defined(TARGET_ALPHA)
+ IMPL(getxpid)
  {
-@@ -8659,6 +8716,11 @@ IMPL(rmdir)
+@@ -8721,6 +8735,11 @@ IMPL(setpgid)
+     return get_errno(setpgid(arg1, arg2));
  }
- #endif
  
-+IMPL(setpgid)
++IMPL(setsid)
 +{
-+    return get_errno(setpgid(arg1, arg2));
++    return get_errno(setsid());
 +}
 +
  #ifdef TARGET_NR_stime
  IMPL(stime)
  {
-@@ -8716,6 +8778,11 @@ IMPL(times)
-     return ret;
- }
- 
-+IMPL(umask)
-+{
-+    return get_errno(umask(arg1));
-+}
-+
- #ifdef TARGET_NR_umount
- IMPL(umount)
- {
-@@ -8905,50 +8972,6 @@ IMPL(everything_else)
+@@ -8972,16 +8991,6 @@ IMPL(everything_else)
      char *fn;
  
      switch(num) {
--#ifdef TARGET_NR_fcntl
--    case TARGET_NR_fcntl:
--        return do_fcntl(arg1, arg2, arg3);
+-#ifdef TARGET_NR_getppid /* not on alpha */
+-    case TARGET_NR_getppid:
+-        return get_errno(getppid());
 -#endif
--    case TARGET_NR_setpgid:
--        return get_errno(setpgid(arg1, arg2));
--    case TARGET_NR_umask:
--        return get_errno(umask(arg1));
--    case TARGET_NR_chroot:
--        if (!(p = lock_user_string(arg1)))
--            return -TARGET_EFAULT;
--        ret = get_errno(chroot(p));
--        unlock_user(p, arg1, 0);
--        return ret;
--#ifdef TARGET_NR_dup2
--    case TARGET_NR_dup2:
--        if (is_hostfd(arg1) || is_hostfd(arg2)) {
--            return -TARGET_EBADF;
--        }
--        ret = get_errno(dup2(arg1, arg2));
--        if (ret >= 0) {
--            fd_trans_dup(arg1, arg2);
--        }
--        return ret;
+-#ifdef TARGET_NR_getpgrp
+-    case TARGET_NR_getpgrp:
+-        return get_errno(getpgrp());
 -#endif
--#if defined(CONFIG_DUP3) && defined(TARGET_NR_dup3)
--    case TARGET_NR_dup3:
--    {
--        int host_flags;
--
--        if (is_hostfd(arg1) || is_hostfd(arg2)) {
--            return -TARGET_EBADF;
--        }
--        if ((arg3 & ~TARGET_O_CLOEXEC) != 0) {
--            return -EINVAL;
--        }
--        host_flags = target_to_host_bitmask(arg3, fcntl_flags_tbl);
--        ret = get_errno(dup3(arg1, arg2, host_flags));
--        if (ret >= 0) {
--            fd_trans_dup(arg1, arg2);
--        }
--        return ret;
--    }
--#endif
- #ifdef TARGET_NR_getppid /* not on alpha */
-     case TARGET_NR_getppid:
-         return get_errno(getppid());
-@@ -12969,6 +12992,7 @@ static impl_fn * const syscall_table[] = {
-     [TARGET_NR_brk] = impl_brk,
-     [TARGET_NR_close] = impl_close,
-     [TARGET_NR_chdir] = impl_chdir,
-+    [TARGET_NR_chroot] = impl_chroot,
- #ifdef TARGET_NR_chmod
-     [TARGET_NR_chmod] = impl_chmod,
+-    case TARGET_NR_setsid:
+-        return get_errno(setsid());
+ #ifdef TARGET_NR_sigaction
+     case TARGET_NR_sigaction:
+         {
+@@ -13020,9 +13029,15 @@ static impl_fn * const syscall_table[] = {
+ #ifdef TARGET_NR_futimesat
+     [TARGET_NR_futimesat] = impl_futimesat,
  #endif
-@@ -12976,11 +13000,20 @@ static impl_fn * const syscall_table[] = {
-     [TARGET_NR_creat] = impl_creat,
- #endif
-     [TARGET_NR_dup] = impl_dup,
-+#ifdef TARGET_NR_dup2
-+    [TARGET_NR_dup2] = impl_dup2,
++#ifdef TARGET_NR_getpgrp
++    [TARGET_NR_getpgrp] = impl_getpgrp,
 +#endif
-+#if defined(TARGET_NR_dup3) && defined(CONFIG_DUP3)
-+    [TARGET_NR_dup3] = impl_dup3,
-+#endif
-     [TARGET_NR_execve] = impl_execve,
-     [TARGET_NR_exit] = impl_exit,
- #ifdef TARGET_NR_faccessat
-     [TARGET_NR_faccessat] = impl_faccessat,
+ #ifdef TARGET_NR_getpid
+     [TARGET_NR_getpid] = impl_getpid,
  #endif
-+#ifdef TARGET_NR_fcntl
-+    [TARGET_NR_fcntl] = impl_fcntl,
++#ifdef TARGET_NR_getppid
++    [TARGET_NR_getppid] = impl_getppid,
 +#endif
- #ifdef TARGET_NR_fork
-     [TARGET_NR_fork] = impl_fork,
+ #if defined(TARGET_NR_getxpid) && defined(TARGET_ALPHA)
+     [TARGET_NR_getxpid] = impl_getxpid,
  #endif
-@@ -13050,6 +13083,7 @@ static impl_fn * const syscall_table[] = {
- #ifdef TARGET_NR_rmdir
+@@ -13084,6 +13099,7 @@ static impl_fn * const syscall_table[] = {
      [TARGET_NR_rmdir] = impl_rmdir,
  #endif
-+    [TARGET_NR_setpgid] = impl_setpgid,
+     [TARGET_NR_setpgid] = impl_setpgid,
++    [TARGET_NR_setsid] = impl_setsid,
  #ifdef TARGET_NR_stime
      [TARGET_NR_stime] = impl_stime,
- #endif
-@@ -13061,6 +13095,7 @@ static impl_fn * const syscall_table[] = {
-     [TARGET_NR_time] = impl_time,
- #endif
-     [TARGET_NR_times] = impl_times,
-+    [TARGET_NR_umask] = impl_umask,
- #ifdef TARGET_NR_umount
-     [TARGET_NR_umount] = impl_umount,
  #endif
 -- 
 2.17.0
