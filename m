@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33498)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33454)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <keno@juliacomputing.com>) id 1fOYrH-0003Gx-DU
-	for qemu-devel@nongnu.org; Thu, 31 May 2018 21:28:00 -0400
+	(envelope-from <keno@juliacomputing.com>) id 1fOYrE-0003FE-DF
+	for qemu-devel@nongnu.org; Thu, 31 May 2018 21:27:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <keno@juliacomputing.com>) id 1fOYrG-0003Mw-Ew
-	for qemu-devel@nongnu.org; Thu, 31 May 2018 21:27:59 -0400
-Received: from mail-qk0-x242.google.com ([2607:f8b0:400d:c09::242]:38366)
+	(envelope-from <keno@juliacomputing.com>) id 1fOYr9-0003F4-T9
+	for qemu-devel@nongnu.org; Thu, 31 May 2018 21:27:56 -0400
+Received: from mail-qt0-x243.google.com ([2607:f8b0:400d:c0d::243]:46056)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <keno@juliacomputing.com>)
-	id 1fOYrG-0003MM-A3
-	for qemu-devel@nongnu.org; Thu, 31 May 2018 21:27:58 -0400
-Received: by mail-qk0-x242.google.com with SMTP id y4-v6so555063qka.5
-	for <qemu-devel@nongnu.org>; Thu, 31 May 2018 18:27:58 -0700 (PDT)
+	id 1fOYr9-0003Ec-Nj
+	for qemu-devel@nongnu.org; Thu, 31 May 2018 21:27:51 -0400
+Received: by mail-qt0-x243.google.com with SMTP id i18-v6so19638014qtp.12
+	for <qemu-devel@nongnu.org>; Thu, 31 May 2018 18:27:51 -0700 (PDT)
 From: Keno Fischer <keno@juliacomputing.com>
-Date: Thu, 31 May 2018 21:26:15 -0400
-Message-Id: <9c0317e40b127c5f263f82ac628b28f89fddf33e.1527814874.git.keno@juliacomputing.com>
+Date: Thu, 31 May 2018 21:26:11 -0400
+Message-Id: <66d4d3eb6fe9c098b77a6790f015912cd35d86b0.1527814874.git.keno@juliacomputing.com>
 In-Reply-To: <cover.1527814874.git.keno@juliacomputing.com>
 References: <cover.1527814874.git.keno@juliacomputing.com>
 In-Reply-To: <cover.1527814874.git.keno@juliacomputing.com>
 References: <cover.1527814874.git.keno@juliacomputing.com>
-Subject: [Qemu-devel] [PATCH v2 20/20] 9p: darwin: configure: Allow VirtFS
- on Darwin
+Subject: [Qemu-devel] [PATCH v2 16/20] 9p: darwin: Compatibility for
+ f/l*xattr
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,73 +32,145 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Keno Fischer <keno@juliacomputing.com>, groug@kaod.org
 
+On darwin `fgetxattr` takes two extra optional arguments,
+and the l* variants are not defined (in favor of an extra
+flag to the regular variants.
+
 Signed-off-by: Keno Fischer <keno@juliacomputing.com>
 ---
 
-Changes from v1: Now builds the proxy-helper on Darwin.
+Changes from v1: New patch, qemu_fgetxattr had previously been
+ moved to 9p-util as fgetxattr_follow. The remaining functions
+ are required by the proxy-helper.
 
- Makefile.objs |  1 +
- configure     | 22 +++++++++++++++-------
- 2 files changed, 16 insertions(+), 7 deletions(-)
+ Makefile                    |  6 ++++++
+ fsdev/virtfs-proxy-helper.c |  9 +++++----
+ hw/9pfs/9p-local.c          | 12 ++++++++----
+ hw/9pfs/9p-util.h           | 17 +++++++++++++++++
+ 4 files changed, 36 insertions(+), 8 deletions(-)
 
-diff --git a/Makefile.objs b/Makefile.objs
-index c6c3554..a2245c9 100644
---- a/Makefile.objs
-+++ b/Makefile.objs
-@@ -104,6 +104,7 @@ common-obj-$(CONFIG_WIN32) += os-win32.o
- common-obj-$(CONFIG_POSIX) += os-posix.o
+diff --git a/Makefile b/Makefile
+index 6d588d1..dac6efd 100644
+--- a/Makefile
++++ b/Makefile
+@@ -544,7 +544,13 @@ qemu-bridge-helper$(EXESUF): qemu-bridge-helper.o $(COMMON_LDADDS)
+ qemu-keymap$(EXESUF): qemu-keymap.o ui/input-keymap.o $(COMMON_LDADDS)
  
- common-obj-$(CONFIG_LINUX) += fsdev/
-+common-obj-$(CONFIG_DARWIN) += fsdev/
+ fsdev/virtfs-proxy-helper$(EXESUF): fsdev/virtfs-proxy-helper.o fsdev/9p-marshal.o fsdev/9p-iov-marshal.o $(COMMON_LDADDS)
++ifdef CONFIG_DARWIN
++fsdev/virtfs-proxy-helper$(EXESUF): hw/9pfs/9p-util-darwin.o
++endif
++ifdef CONFIG_LINUX
++fsdev/virtfs-proxy-helper$(EXESUF): hw/9pfs/9p-util-linux.o
+ fsdev/virtfs-proxy-helper$(EXESUF): LIBS += -lcap
++endif
  
- common-obj-y += migration/
+ scsi/qemu-pr-helper$(EXESUF): scsi/qemu-pr-helper.o scsi/utils.o $(crypto-obj-y) $(io-obj-y) $(qom-obj-y) $(COMMON_LDADDS)
+ ifdef CONFIG_MPATH
+diff --git a/fsdev/virtfs-proxy-helper.c b/fsdev/virtfs-proxy-helper.c
+index 3bc1269..a26f8b8 100644
+--- a/fsdev/virtfs-proxy-helper.c
++++ b/fsdev/virtfs-proxy-helper.c
+@@ -28,6 +28,7 @@
+ #include "qemu/statfs.h"
+ #include "9p-iov-marshal.h"
+ #include "hw/9pfs/9p-proxy.h"
++#include "hw/9pfs/9p-util.h"
+ #include "fsdev/9p-iov-marshal.h"
  
-diff --git a/configure b/configure
-index a6a4616..4808459 100755
---- a/configure
-+++ b/configure
-@@ -5535,16 +5535,28 @@ if test "$want_tools" = "yes" ; then
-   fi
- fi
- if test "$softmmu" = yes ; then
--  if test "$linux" = yes; then
--    if test "$virtfs" != no && test "$cap" = yes && test "$attr" = yes ; then
-+  if test "$virtfs" != no; then
-+    if test "$linux" = yes; then
-+      if test "$cap" = yes && test "$attr" = yes ; then
-+        virtfs=yes
-+        tools="$tools fsdev/virtfs-proxy-helper\$(EXESUF)"
-+      else
-+        if test "$virtfs" = yes; then
-+          error_exit "VirtFS requires libcap devel and libattr devel under Linux"
-+        fi
-+        virtfs=no
-+      fi
-+    elif test "$darwin" = yes; then
-       virtfs=yes
-       tools="$tools fsdev/virtfs-proxy-helper\$(EXESUF)"
-     else
-       if test "$virtfs" = yes; then
--        error_exit "VirtFS requires libcap devel and libattr devel"
-+        error_exit "VirtFS is supported only on Linux and Darwin"
-       fi
-       virtfs=no
-     fi
-+  fi
-+  if test "$linux" = yes; then
-     if test "$mpath" != no && test "$mpathpersist" = yes ; then
-       mpath=yes
-     else
-@@ -5555,10 +5567,6 @@ if test "$softmmu" = yes ; then
-     fi
-     tools="$tools scsi/qemu-pr-helper\$(EXESUF)"
-   else
--    if test "$virtfs" = yes; then
--      error_exit "VirtFS is supported only on Linux"
--    fi
--    virtfs=no
-     if test "$mpath" = yes; then
-       error_exit "Multipath is supported only on Linux"
-     fi
+ #define PROGNAME "virtfs-proxy-helper"
+@@ -459,7 +460,7 @@ static int do_getxattr(int type, struct iovec *iovec, struct iovec *out_iovec)
+         v9fs_string_init(&name);
+         retval = proxy_unmarshal(iovec, offset, "s", &name);
+         if (retval > 0) {
+-            retval = lgetxattr(path.data, name.data, xattr.data, size);
++            retval = qemu_lgetxattr(path.data, name.data, xattr.data, size);
+             if (retval < 0) {
+                 retval = -errno;
+             } else {
+@@ -469,7 +470,7 @@ static int do_getxattr(int type, struct iovec *iovec, struct iovec *out_iovec)
+         v9fs_string_free(&name);
+         break;
+     case T_LLISTXATTR:
+-        retval = llistxattr(path.data, xattr.data, size);
++        retval = qemu_llistxattr(path.data, xattr.data, size);
+         if (retval < 0) {
+             retval = -errno;
+         } else {
+@@ -1000,7 +1001,7 @@ static int process_requests(int sock)
+             retval = proxy_unmarshal(&in_iovec, PROXY_HDR_SZ, "sssdd", &path,
+                                      &name, &value, &size, &flags);
+             if (retval > 0) {
+-                retval = lsetxattr(path.data,
++                retval = qemu_lsetxattr(path.data,
+                                    name.data, value.data, size, flags);
+                 if (retval < 0) {
+                     retval = -errno;
+@@ -1016,7 +1017,7 @@ static int process_requests(int sock)
+             retval = proxy_unmarshal(&in_iovec,
+                                      PROXY_HDR_SZ, "ss", &path, &name);
+             if (retval > 0) {
+-                retval = lremovexattr(path.data, name.data);
++                retval = qemu_lremovexattr(path.data, name.data);
+                 if (retval < 0) {
+                     retval = -errno;
+                 }
+diff --git a/hw/9pfs/9p-local.c b/hw/9pfs/9p-local.c
+index 1f0b1b0..7830526 100644
+--- a/hw/9pfs/9p-local.c
++++ b/hw/9pfs/9p-local.c
+@@ -776,16 +776,20 @@ static int local_fstat(FsContext *fs_ctx, int fid_type,
+         mode_t tmp_mode;
+         dev_t tmp_dev;
+ 
+-        if (fgetxattr(fd, "user.virtfs.uid", &tmp_uid, sizeof(uid_t)) > 0) {
++        if (qemu_fgetxattr(fd, "user.virtfs.uid",
++                           &tmp_uid, sizeof(uid_t)) > 0) {
+             stbuf->st_uid = le32_to_cpu(tmp_uid);
+         }
+-        if (fgetxattr(fd, "user.virtfs.gid", &tmp_gid, sizeof(gid_t)) > 0) {
++        if (qemu_fgetxattr(fd, "user.virtfs.gid",
++                           &tmp_gid, sizeof(gid_t)) > 0) {
+             stbuf->st_gid = le32_to_cpu(tmp_gid);
+         }
+-        if (fgetxattr(fd, "user.virtfs.mode", &tmp_mode, sizeof(mode_t)) > 0) {
++        if (qemu_fgetxattr(fd, "user.virtfs.mode",
++                           &tmp_mode, sizeof(mode_t)) > 0) {
+             stbuf->st_mode = le32_to_cpu(tmp_mode);
+         }
+-        if (fgetxattr(fd, "user.virtfs.rdev", &tmp_dev, sizeof(dev_t)) > 0) {
++        if (qemu_fgetxattr(fd, "user.virtfs.rdev",
++                           &tmp_dev, sizeof(dev_t)) > 0) {
+             stbuf->st_rdev = le64_to_cpu(tmp_dev);
+         }
+     } else if (fs_ctx->export_flags & V9FS_SM_MAPPED_FILE) {
+diff --git a/hw/9pfs/9p-util.h b/hw/9pfs/9p-util.h
+index 79ed6b2..50a03c7 100644
+--- a/hw/9pfs/9p-util.h
++++ b/hw/9pfs/9p-util.h
+@@ -19,6 +19,23 @@
+ #define O_PATH_9P_UTIL 0
+ #endif
+ 
++#ifdef CONFIG_DARWIN
++#define qemu_fgetxattr(...) fgetxattr(__VA_ARGS__, 0, 0)
++#define qemu_lgetxattr(...) getxattr(__VA_ARGS__, 0, XATTR_NOFOLLOW)
++#define qemu_llistxattr(...) listxattr(__VA_ARGS__, XATTR_NOFOLLOW)
++#define qemu_lremovexattr(...) removexattr(__VA_ARGS__, XATTR_NOFOLLOW)
++static inline int qemu_lsetxattr(const char *path, const char *name,
++                                 const void *value, size_t size, int flags) {
++    return setxattr(path, name, value, size, 0, flags | XATTR_NOFOLLOW);
++}
++#else
++#define qemu_fgetxattr fgetxattr
++#define qemu_lgetxattr lgetxattr
++#define qemu_llistxattr llistxattr
++#define qemu_lremovexattr lremovexattr
++#define qemu_lsetxattr lsetxattr
++#endif
++
+ static inline void close_preserve_errno(int fd)
+ {
+     int serrno = errno;
 -- 
 2.8.1
