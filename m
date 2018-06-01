@@ -1,27 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41291)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43698)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1fOfDq-0004SU-Fp
-	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 04:15:43 -0400
+	(envelope-from <akalita@cs.stonybrook.edu>) id 1fOfPE-00078p-5W
+	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 04:27:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1fOfDn-0005aN-9C
-	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 04:15:42 -0400
-Received: from 4.mo6.mail-out.ovh.net ([87.98.184.159]:51363)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1fOfDm-0005XB-Uf
-	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 04:15:39 -0400
-Received: from player739.ha.ovh.net (unknown [10.109.122.51])
-	by mo6.mail-out.ovh.net (Postfix) with ESMTP id 2DE07160B20
-	for <qemu-devel@nongnu.org>; Fri,  1 Jun 2018 10:15:36 +0200 (CEST)
-Date: Fri, 1 Jun 2018 10:15:31 +0200
-From: Greg Kurz <groug@kaod.org>
-Message-ID: <20180601101531.4f3dd234@bahia.lan>
-In-Reply-To: <1f6bc60305b8c1cd00f5e2a361a05d7b4bc56338.1527814874.git.keno@juliacomputing.com>
-References: <cover.1527814874.git.keno@juliacomputing.com>
-	<1f6bc60305b8c1cd00f5e2a361a05d7b4bc56338.1527814874.git.keno@juliacomputing.com>
+	(envelope-from <akalita@cs.stonybrook.edu>) id 1fOfPC-0000yv-GM
+	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 04:27:28 -0400
+Received: from mail-lf0-x241.google.com ([2a00:1450:4010:c07::241]:35175)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <akalita@cs.stonybrook.edu>)
+	id 1fOfPC-0000x1-1o
+	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 04:27:26 -0400
+Received: by mail-lf0-x241.google.com with SMTP id y72-v6so13605315lfd.2
+	for <qemu-devel@nongnu.org>; Fri, 01 Jun 2018 01:27:25 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 01/20] cutils: Provide strchrnul
+In-Reply-To: <001e01d3f969$be4f32a0$3aed97e0$@ru>
+References: <CAJGDS+HNBG6PSvG7Cc7bN4rMadgm5W+1aQUAeizN9CGjSOCP5w@mail.gmail.com>
+	<20180531085057.GG26429@stefanha-x1.localdomain>
+	<001801d3f8dd$2629a280$727ce780$@ru>
+	<CAJGDS+GEg0kpS_gxCupSz=O6RA8w-uAhO3rypAM524Z_RUHM8Q@mail.gmail.com>
+	<001e01d3f969$be4f32a0$3aed97e0$@ru>
+From: Arnabjyoti Kalita <akalita@cs.stonybrook.edu>
+Date: Fri, 1 Jun 2018 04:27:23 -0400
+Message-ID: <CAJGDS+HssD+rVgbUSyRT0v-Egfd9gn5W-cgy_95o8zASmH1q4A@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] Recording I/O activity after KVM does a VMEXIT
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,162 +33,150 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Keno Fischer <keno@juliacomputing.com>
-Cc: qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>, "Dr. David
-	Alan Gilbert" <dgilbert@redhat.com>
+To: Pavel Dovgalyuk <dovgaluk@ispras.ru>
+Cc: Stefan Hajnoczi <stefanha@gmail.com>, qemu-devel@nongnu.org, Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>
 
-On Thu, 31 May 2018 21:25:56 -0400
-Keno Fischer <keno@juliacomputing.com> wrote:
+Dear Pavel,
 
-> strchrnul is a GNU extension and thus unavailable on a number of targets.
-> In the review for a commit removing strchrnul from 9p, I was asked to
-> create a qemu_strchrnul helper to factor out this functionality.
-> Do so, and use it in a number of other places in the code base that inlined
-> the replacement pattern in a place where strchrnul could be used.
-> 
-> Signed-off-by: Keno Fischer <keno@juliacomputing.com>
-> ---
-> 
+Thank you for providing me with all the details. Let us take an example of
+a Network packet. In icount mode, when the network backend, receives a
+network packet, you record the whole packet with the help of the
+replay-filter. This packet will be written to the log file. Now when the
+time comes for replay, you stop accepting any packets from the network
+backend and directly inject all of the packets that you have already
+recorded in the log file into the guest address space memory. Am I correct
+in understanding this ?
 
-And possibly we could detect in configure if the host has strchrnul() and
-use it, but this optimization can be done later.
+Thanks and Regards,
+Arnab
 
-I haven't checked if there could be other candidates in the current code
-base though. Also, this patch touches some other subsystems, so I'm Cc'ing
-to the other maintainers as reported by ./scripts/get_maintainer.pl:
+On Fri, Jun 1, 2018 at 1:31 AM, Pavel Dovgalyuk <dovgaluk@ispras.ru> wrote:
 
-Greg Kurz <groug@kaod.org> (supporter:virtio-9p)
-Markus Armbruster <armbru@redhat.com> (supporter:QMP)
-"Dr. David Alan Gilbert" <dgilbert@redhat.com> (maintainer:Human Monitor (HMP))
-qemu-devel@nongnu.org (open list:All patches CC here)
-
-Anyway,
-
-Acked-by: Greg Kurz <groug@kaod.org>
-
-> Changes since v1: New patch
-> 
->  hw/9pfs/9p-local.c    |  2 +-
->  include/qemu/cutils.h |  1 +
->  monitor.c             |  8 ++------
->  util/cutils.c         | 13 +++++++++++++
->  util/qemu-option.c    |  6 +-----
->  util/uri.c            |  6 ++----
->  6 files changed, 20 insertions(+), 16 deletions(-)
-> 
-> diff --git a/hw/9pfs/9p-local.c b/hw/9pfs/9p-local.c
-> index b37b1db..bcf2798 100644
-> --- a/hw/9pfs/9p-local.c
-> +++ b/hw/9pfs/9p-local.c
-> @@ -65,7 +65,7 @@ int local_open_nofollow(FsContext *fs_ctx, const char *path, int flags,
->          assert(*path != '/');
->  
->          head = g_strdup(path);
-> -        c = strchrnul(path, '/');
-> +        c = qemu_strchrnul(path, '/');
->          if (*c) {
->              /* Intermediate path element */
->              head[c - path] = 0;
-> diff --git a/include/qemu/cutils.h b/include/qemu/cutils.h
-> index a663340..bc40c30 100644
-> --- a/include/qemu/cutils.h
-> +++ b/include/qemu/cutils.h
-> @@ -122,6 +122,7 @@ int qemu_strnlen(const char *s, int max_len);
->   * Returns: the pointer originally in @input.
->   */
->  char *qemu_strsep(char **input, const char *delim);
-> +const char *qemu_strchrnul(const char *s, int c);
->  time_t mktimegm(struct tm *tm);
->  int qemu_fdatasync(int fd);
->  int fcntl_setfl(int fd, int flag);
-> diff --git a/monitor.c b/monitor.c
-> index 922cfc0..e1f01c4 100644
-> --- a/monitor.c
-> +++ b/monitor.c
-> @@ -798,9 +798,7 @@ static int compare_cmd(const char *name, const char *list)
->      p = list;
->      for(;;) {
->          pstart = p;
-> -        p = strchr(p, '|');
-> -        if (!p)
-> -            p = pstart + strlen(pstart);
-> +        p = qemu_strchrnul(p, '|');
->          if ((p - pstart) == len && !memcmp(pstart, name, len))
->              return 1;
->          if (*p == '\0')
-> @@ -3401,9 +3399,7 @@ static void cmd_completion(Monitor *mon, const char *name, const char *list)
->      p = list;
->      for(;;) {
->          pstart = p;
-> -        p = strchr(p, '|');
-> -        if (!p)
-> -            p = pstart + strlen(pstart);
-> +        p = qemu_strchrnul(p, '|');
->          len = p - pstart;
->          if (len > sizeof(cmd) - 2)
->              len = sizeof(cmd) - 2;
-> diff --git a/util/cutils.c b/util/cutils.c
-> index 0de69e6..6e078b0 100644
-> --- a/util/cutils.c
-> +++ b/util/cutils.c
-> @@ -545,6 +545,19 @@ int qemu_strtou64(const char *nptr, const char **endptr, int base,
->  }
->  
->  /**
-> + * Searches for the first occurrence of 'c' in 's', and returns a pointer
-> + * to the trailing null byte if none was found.
-> + */
-> +const char *qemu_strchrnul(const char *s, int c)
-> +{
-> +    const char *e = strchr(s, c);
-> +    if (!e) {
-> +        e = s + strlen(s);
-> +    }
-> +    return e;
-> +}
-> +
-> +/**
->   * parse_uint:
->   *
->   * @s: String to parse
-> diff --git a/util/qemu-option.c b/util/qemu-option.c
-> index 58d1c23..54eca12 100644
-> --- a/util/qemu-option.c
-> +++ b/util/qemu-option.c
-> @@ -77,11 +77,7 @@ const char *get_opt_value(const char *p, char **value)
->  
->      *value = NULL;
->      while (1) {
-> -        offset = strchr(p, ',');
-> -        if (!offset) {
-> -            offset = p + strlen(p);
-> -        }
-> -
-> +        offset = qemu_strchrnul(p, ',');
->          length = offset - p;
->          if (*offset != '\0' && *(offset + 1) == ',') {
->              length++;
-> diff --git a/util/uri.c b/util/uri.c
-> index 8624a7a..8bdef84 100644
-> --- a/util/uri.c
-> +++ b/util/uri.c
-> @@ -52,6 +52,7 @@
->   */
->  
->  #include "qemu/osdep.h"
-> +#include "qemu/cutils.h"
->  
->  #include "qemu/uri.h"
->  
-> @@ -2266,10 +2267,7 @@ struct QueryParams *query_params_parse(const char *query)
->          /* Find the next separator, or end of the string. */
->          end = strchr(query, '&');
->          if (!end) {
-> -            end = strchr(query, ';');
-> -        }
-> -        if (!end) {
-> -            end = query + strlen(query);
-> +            end = qemu_strchrnul(query, ';');
->          }
->  
->          /* Find the first '=' character between here and end. */
+> Hi,
+>
+>
+>
+> I=E2=80=99m not familiar with KVM, but I know successful attempts of repl=
+aying the
+> execution by logging IO and MMIO in TCG mode.
+>
+> The difference in CPU I/O and VM I/O is the following. In icount we recor=
+d
+> anything coming into the VM, but not into the CPU.
+>
+> It means that the whole packet is recorded. Virtual hardware behaves
+> deterministically and therefore CPU will get identical
+>
+> input in case of replay, because the whole recorded packet is injected
+> again by the filter.
+>
+>
+>
+> Pavel Dovgalyuk
+>
+>
+>
+> *From:* Arnabjyoti Kalita [mailto:akalita@cs.stonybrook.edu]
+> *Sent:* Thursday, May 31, 2018 11:14 PM
+> *To:* Pavel Dovgalyuk
+> *Cc:* Stefan Hajnoczi; qemu-devel@nongnu.org; Pavel Dovgalyuk
+> *Subject:* Re: [Qemu-devel] Recording I/O activity after KVM does a VMEXI=
+T
+>
+>
+>
+> Dear Pavel,
+>
+>
+>
+> Thank you for your answer. I am not being able to understand the
+> difference between CPU I/Os and VM I/Os. Would any network packet that
+> comes into the Guest OS from the outside be a part of VM I/O or CPU I/O ?=
+ I
+> am only interested in "recording" and "replaying" those network packets
+> that come from the outside into the networking backend and not the other
+> way around. Say for example when I get a VMExit because of the arrival of=
+ a
+> network packet, I will use the VMExit reason : "KVM_EXIT_MMIO"  to trace
+> back to "e1000_mmio_write()" which I expect should be enough to record
+> network packets that come from the outside and write to the guest address
+> space for "e1000" devices. In such a case, I think I will not have to use
+> the "network-filter" backend that you use to record VM I/O only. Let me
+> know if you find errors in my approach.
+>
+>
+>
+> I will try to see how I can record disk packets. If disk packets use othe=
+r
+> ways of writing to the guest memory apart from a normal VMExit, I will tr=
+y
+> to find it out. Eventually I hope that it will use one of the available
+> disk front-end functions to write to the guest memory from the disk, just
+> like e1000 does with an "e1000_mmio_write()" call.
+>
+>
+>
+> Thanks and best regards,
+>
+> Arnab
+>
+>
+>
+>
+>
+>
+>
+>
+>
+>
+>
+>
+>
+>
+>
+> On Thu, May 31, 2018 at 8:44 AM, Pavel Dovgalyuk <dovgaluk@ispras.ru>
+> wrote:
+>
+> > From: Stefan Hajnoczi [mailto:stefanha@gmail.com]
+> > On Wed, May 30, 2018 at 11:19:13PM -0400, Arnabjyoti Kalita wrote:
+> > > I am trying to implement a 'minimal' record-replay mechanism for KVM,
+> which
+> > > is similar to the one existing for TCG via -icount. I am trying to
+> record
+> > > I/O events only (specifically disk and network events) when KVM does =
+a
+> > > VMEXIT. This has led me to the function kvm_cpu_exec where I can
+> clearly
+> > > see the different ways of handling all of the possible VMExit cases
+> (like
+> > > PIO, MMIO etc.). To record network packets, I am working with the e10=
+00
+> > > hardware device.
+> > >
+> > > Can I make sure that all of the network I/O, atleast for the e1000
+> device
+> > > happens through the KVM_EXIT_MMIO case and subsequent use of the
+> > > address_space_rw() function ? Do I also need to look at other
+> functions as
+> > > well ? Also for recording disk activity, can I make sure that looking
+> out
+> > > for the KVM_EXIT_MMIO and/or KVM_EXIT_PIO cases in the vmexit
+> mechanism,
+> > > will be enough ?
+> > >
+> > > Let me know if there are other details that I need to take care of. I
+> am
+> > > using QEMU 2.11 on a x86-64 CPU and the guest runs a Linux Kernel 4.4
+> with
+> > > Ubuntu 16.04.
+>
+> The main icount-based record/replay advantage is that we don't record
+> any CPU IO. We record only VM IO (e.g., by using the network filter).
+>
+> Disk devices may transfer data to CPU using DMA, therefore intercepting
+> only VMExit cases will not be enough.
+>
+> Pavel Dovgalyuk
+>
+>
+>
