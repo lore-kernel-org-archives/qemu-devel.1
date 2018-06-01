@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57647)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57634)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fOeX5-0005p1-HH
+	(envelope-from <richard.henderson@linaro.org>) id 1fOeX4-0005nz-3A
 	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 03:31:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1fOeX4-0000jz-FG
-	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 03:31:31 -0400
-Received: from mail-pf0-x241.google.com ([2607:f8b0:400e:c00::241]:37618)
+	(envelope-from <richard.henderson@linaro.org>) id 1fOeX3-0000iZ-1j
+	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 03:31:30 -0400
+Received: from mail-pl0-x241.google.com ([2607:f8b0:400e:c01::241]:43953)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1fOeX4-0000jN-9T
-	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 03:31:30 -0400
-Received: by mail-pf0-x241.google.com with SMTP id e9-v6so12083209pfi.4
-	for <qemu-devel@nongnu.org>; Fri, 01 Jun 2018 00:31:30 -0700 (PDT)
+	id 1fOeX2-0000hw-Sg
+	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 03:31:29 -0400
+Received: by mail-pl0-x241.google.com with SMTP id c41-v6so14803978plj.10
+	for <qemu-devel@nongnu.org>; Fri, 01 Jun 2018 00:31:28 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Fri,  1 Jun 2018 00:30:42 -0700
-Message-Id: <20180601073050.8054-26-richard.henderson@linaro.org>
+Date: Fri,  1 Jun 2018 00:30:41 -0700
+Message-Id: <20180601073050.8054-25-richard.henderson@linaro.org>
 In-Reply-To: <20180601073050.8054-1-richard.henderson@linaro.org>
 References: <20180601073050.8054-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH 25/33] linux-user: Split out dup, mkdir, mkdirat,
- rmdir
+Subject: [Qemu-devel] [PATCH 24/33] linux-user: Split out rename, renameat,
+ renameat2
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,90 +32,67 @@ Cc: laurent@vivier.eu
 
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- linux-user/syscall.c | 109 +++++++++++++++++++++++++++++--------------
- 1 file changed, 73 insertions(+), 36 deletions(-)
+ linux-user/syscall.c | 113 ++++++++++++++++++++++++-------------------
+ 1 file changed, 63 insertions(+), 50 deletions(-)
 
 diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-index 24514329b0..36092d753d 100644
+index 2a172e24eb..24514329b0 100644
 --- a/linux-user/syscall.c
 +++ b/linux-user/syscall.c
-@@ -7977,6 +7977,20 @@ IMPL(creat)
- }
- #endif
- 
-+IMPL(dup)
-+{
-+    abi_long ret;
-+
-+    if (is_hostfd(arg1)) {
-+        return -TARGET_EBADF;
-+    }
-+    ret = get_errno(dup(arg1));
-+    if (ret >= 0) {
-+        fd_trans_dup(arg1, ret);
-+    }
-+    return ret;
-+}
-+
- IMPL(execve)
- {
-     abi_ulong *guest_ptrs;
-@@ -8249,6 +8263,40 @@ IMPL(lseek)
-     return get_errno(lseek(arg1, arg2, arg3));
+@@ -8504,6 +8504,60 @@ IMPL(read)
+     return ret;
  }
  
-+#ifdef TARGET_NR_mkdir
-+IMPL(mkdir)
++#ifdef TARGET_NR_rename
++IMPL(rename)
 +{
-+    char *p = lock_user_string(arg1);
-+    abi_long ret;
++    char *p1 = lock_user_string(arg1);
++    char *p2 = lock_user_string(arg2);
++    abi_long ret = -TARGET_EFAULT;
 +
-+    if (!p) {
-+        return -TARGET_EFAULT;
++    if (p1 && p2) {
++        ret = get_errno(rename(p1, p2));
 +    }
-+    ret = get_errno(mkdir(p, arg2));
-+    unlock_user(p, arg1, 0);
++    unlock_user(p2, arg2, 0);
++    unlock_user(p1, arg1, 0);
 +    return ret;
 +}
 +#endif
 +
-+#ifdef TARGET_NR_mkdirat
-+IMPL(mkdirat)
++#if defined(TARGET_NR_renameat)
++IMPL(renameat)
 +{
-+    char *p;
-+    abi_long ret;
-+
 +    if (is_hostfd(arg1)) {
 +        return -TARGET_EBADF;
 +    }
-+    p = lock_user_string(arg2);
-+    if (!p) {
-+        return -TARGET_EFAULT;
++
++    char *p1 = lock_user_string(arg2);
++    char *p2 = lock_user_string(arg4);
++    abi_long ret = -TARGET_EFAULT;
++    if (p1 && p2) {
++        ret = get_errno(renameat(arg1, p1, arg3, p2));
 +    }
-+    ret = get_errno(mkdirat(arg1, p, arg3));
-+    unlock_user(p, arg2, 0);
++    unlock_user(p2, arg4, 0);
++    unlock_user(p1, arg2, 0);
 +    return ret;
 +}
 +#endif
 +
- #ifdef TARGET_NR_mknod
- IMPL(mknod)
- {
-@@ -8558,6 +8606,21 @@ IMPL(renameat2)
- }
- #endif
- 
-+#ifdef TARGET_NR_rmdir
-+IMPL(rmdir)
++#ifdef TARGET_NR_renameat2
++IMPL(renameat2)
 +{
-+    char *p = lock_user_string(arg1);
-+    abi_long ret;
-+
-+    if (!p) {
-+        return -TARGET_EFAULT;
++    if (is_hostfd(arg1)) {
++        return -TARGET_EBADF;
 +    }
-+    ret = get_errno(rmdir(p));
-+    unlock_user(p, arg1, 0);
++
++    char *p1 = lock_user_string(arg2);
++    char *p2 = lock_user_string(arg4);
++    abi_long ret = -TARGET_EFAULT;
++    if (p1 && p2) {
++        ret = get_errno(sys_renameat2(arg1, p1, arg3, p2, arg5));
++    }
++    unlock_user(p2, arg4, 0);
++    unlock_user(p1, arg2, 0);
 +    return ret;
 +}
 +#endif
@@ -123,76 +100,75 @@ index 24514329b0..36092d753d 100644
  #ifdef TARGET_NR_stime
  IMPL(stime)
  {
-@@ -8768,42 +8831,6 @@ IMPL(everything_else)
+@@ -8714,56 +8768,6 @@ IMPL(everything_else)
      char *fn;
  
      switch(num) {
--#ifdef TARGET_NR_mkdir
--    case TARGET_NR_mkdir:
--        if (!(p = lock_user_string(arg1)))
--            return -TARGET_EFAULT;
--        ret = get_errno(mkdir(p, arg2));
--        unlock_user(p, arg1, 0);
+-#ifdef TARGET_NR_rename
+-    case TARGET_NR_rename:
+-        {
+-            void *p2;
+-            p = lock_user_string(arg1);
+-            p2 = lock_user_string(arg2);
+-            if (!p || !p2)
+-                ret = -TARGET_EFAULT;
+-            else
+-                ret = get_errno(rename(p, p2));
+-            unlock_user(p2, arg2, 0);
+-            unlock_user(p, arg1, 0);
+-        }
 -        return ret;
 -#endif
--#if defined(TARGET_NR_mkdirat)
--    case TARGET_NR_mkdirat:
+-#if defined(TARGET_NR_renameat)
+-    case TARGET_NR_renameat:
 -        if (is_hostfd(arg1)) {
 -            return -TARGET_EBADF;
+-        } else {
+-            void *p2;
+-            p  = lock_user_string(arg2);
+-            p2 = lock_user_string(arg4);
+-            if (!p || !p2)
+-                ret = -TARGET_EFAULT;
+-            else
+-                ret = get_errno(renameat(arg1, p, arg3, p2));
+-            unlock_user(p2, arg4, 0);
+-            unlock_user(p, arg2, 0);
 -        }
--        if (!(p = lock_user_string(arg2)))
--            return -TARGET_EFAULT;
--        ret = get_errno(mkdirat(arg1, p, arg3));
--        unlock_user(p, arg2, 0);
 -        return ret;
 -#endif
--#ifdef TARGET_NR_rmdir
--    case TARGET_NR_rmdir:
--        if (!(p = lock_user_string(arg1)))
--            return -TARGET_EFAULT;
--        ret = get_errno(rmdir(p));
--        unlock_user(p, arg1, 0);
--        return ret;
--#endif
--    case TARGET_NR_dup:
+-#if defined(TARGET_NR_renameat2)
+-    case TARGET_NR_renameat2:
 -        if (is_hostfd(arg1)) {
 -            return -TARGET_EBADF;
--        }
--        ret = get_errno(dup(arg1));
--        if (ret >= 0) {
--            fd_trans_dup(arg1, ret);
+-        } else {
+-            void *p2;
+-            p  = lock_user_string(arg2);
+-            p2 = lock_user_string(arg4);
+-            if (!p || !p2) {
+-                ret = -TARGET_EFAULT;
+-            } else {
+-                ret = get_errno(sys_renameat2(arg1, p, arg3, p2, arg5));
+-            }
+-            unlock_user(p2, arg4, 0);
+-            unlock_user(p, arg2, 0);
 -        }
 -        return ret;
- #ifdef TARGET_NR_pipe
-     case TARGET_NR_pipe:
-         return do_pipe(cpu_env, arg1, 0, 0);
-@@ -12922,6 +12949,7 @@ static impl_fn * const syscall_table[] = {
- #ifdef TARGET_NR_creat
-     [TARGET_NR_creat] = impl_creat,
+-#endif
+ #ifdef TARGET_NR_mkdir
+     case TARGET_NR_mkdir:
+         if (!(p = lock_user_string(arg1)))
+@@ -12967,6 +12971,15 @@ static impl_fn * const syscall_table[] = {
+     [TARGET_NR_pause] = impl_pause,
  #endif
-+    [TARGET_NR_dup] = impl_dup,
-     [TARGET_NR_execve] = impl_execve,
-     [TARGET_NR_exit] = impl_exit,
- #ifdef TARGET_NR_faccessat
-@@ -12947,6 +12975,12 @@ static impl_fn * const syscall_table[] = {
-     [TARGET_NR_linkat] = impl_linkat,
- #endif
-     [TARGET_NR_lseek] = impl_lseek,
-+#ifdef TARGET_NR_mkdir
-+    [TARGET_NR_mkdir] = impl_mkdir,
+     [TARGET_NR_read] = impl_read,
++#ifdef TARGET_NR_rename
++    [TARGET_NR_rename] = impl_rename,
 +#endif
-+#ifdef TARGET_NR_mkdirat
-+    [TARGET_NR_mkdirat] = impl_mkdirat,
++#ifdef TARGET_NR_renameat
++    [TARGET_NR_renameat] = impl_renameat,
 +#endif
- #ifdef TARGET_NR_mknod
-     [TARGET_NR_mknod] = impl_mknod,
- #endif
-@@ -12980,6 +13014,9 @@ static impl_fn * const syscall_table[] = {
- #ifdef TARGET_NR_renameat2
-     [TARGET_NR_renameat2] = impl_renameat2,
- #endif
-+#ifdef TARGET_NR_rmdir
-+    [TARGET_NR_rmdir] = impl_rmdir,
++#ifdef TARGET_NR_renameat2
++    [TARGET_NR_renameat2] = impl_renameat2,
 +#endif
  #ifdef TARGET_NR_stime
      [TARGET_NR_stime] = impl_stime,
