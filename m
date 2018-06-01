@@ -1,21 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35109)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35716)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1fOgpi-0005bW-UA
-	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 05:58:55 -0400
+	(envelope-from <peterx@redhat.com>) id 1fOgtS-0006Zp-Ut
+	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 06:02:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1fOgpi-00079M-35
-	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 05:58:55 -0400
-Date: Fri, 1 Jun 2018 10:58:43 +0100
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20180601095843.GE8687@stefanha-x1.localdomain>
-References: <20180531023445.5923-1-famz@redhat.com>
-	<20180531023445.5923-3-famz@redhat.com>
+	(envelope-from <peterx@redhat.com>) id 1fOgtO-000270-VB
+	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 06:02:47 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:41806 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1fOgtO-00026e-Pk
+	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 06:02:42 -0400
+Date: Fri, 1 Jun 2018 18:02:34 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20180601100234.GJ14867@xz-mi>
+References: <1524550428-27173-1-git-send-email-wei.w.wang@intel.com>
+	<20180601045824.GH14867@xz-mi> <20180601050709.GI14867@xz-mi>
+	<5B10F5E9.8070702@intel.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="wchHw8dVAp53YPj8"
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20180531023445.5923-3-famz@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 2/2] backup: Use copy offloading
+In-Reply-To: <5B10F5E9.8070702@intel.com>
+Subject: Re: [Qemu-devel] [PATCH v7 0/5] virtio-balloon: free page hint
+ reporting support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,82 +29,101 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Jeff Cody <jcody@redhat.com>
+To: Wei Wang <wei.w.wang@intel.com>
+Cc: qemu-devel@nongnu.org, virtio-dev@lists.oasis-open.org, mst@redhat.com, quintela@redhat.com, dgilbert@redhat.com, yang.zhang.wz@gmail.com, quan.xu0@gmail.com, liliang.opensource@gmail.com, pbonzini@redhat.com, nilal@redhat.com
 
+On Fri, Jun 01, 2018 at 03:29:45PM +0800, Wei Wang wrote:
+> On 06/01/2018 01:07 PM, Peter Xu wrote:
+> > On Fri, Jun 01, 2018 at 12:58:24PM +0800, Peter Xu wrote:
+> > > On Tue, Apr 24, 2018 at 02:13:43PM +0800, Wei Wang wrote:
+> > > > This is the deivce part implementation to add a new feature,
+> > > > VIRTIO_BALLOON_F_FREE_PAGE_HINT to the virtio-balloon device. The device
+> > > > receives the guest free page hints from the driver and clears the
+> > > > corresponding bits in the dirty bitmap, so that those free pages are
+> > > > not transferred by the migration thread to the destination.
+> > > > 
+> > > > - Test Environment
+> > > >      Host: Intel(R) Xeon(R) CPU E5-2699 v4 @ 2.20GHz
+> > > >      Guest: 8G RAM, 4 vCPU
+> > > >      Migration setup: migrate_set_speed 100G, migrate_set_downtime 2 second
+> > > > 
+> > > > - Test Results
+> > > >      - Idle Guest Live Migration Time (results are averaged over 10 runs):
+> > > >          - Optimization v.s. Legacy = 271ms vs 1769ms --> ~86% reduction
+> > > >      - Guest with Linux Compilation Workload (make bzImage -j4):
+> > > >          - Live Migration Time (average)
+> > > >            Optimization v.s. Legacy = 1265ms v.s. 2634ms --> ~51% reduction
+> > > >          - Linux Compilation Time
+> > > >            Optimization v.s. Legacy = 4min56s v.s. 5min3s
+> > > >            --> no obvious difference
+> > > > 
+> > > > - Source Code
+> > > >      - QEMU:  https://github.com/wei-w-wang/qemu-free-page-lm.git
+> > > >      - Linux: https://github.com/wei-w-wang/linux-free-page-lm.git
+> > > Hi, Wei,
+> > > 
+> > > I have a very high-level question to the series.
+> > > 
+> > > IIUC the core idea for this series is that we can avoid sending some
+> > > of the pages if we know that we don't need to send them.  I think this
+> > > is based on the fact that on the destination side all the pages are by
+> > > default zero after they are malloced.  While before this series, IIUC
+> > > any migration will send every single page to destination, no matter
+> > > whether it's zeroed or not.  So I'm uncertain about whether this will
+> > > affect the received bitmap on the destination side.  Say, before this
+> > > series, the received bitmap will directly cover the whole RAM bitmap
+> > > after migration is finished, now it's won't.  Will there be any side
+> > > effect?  I don't see obvious issue now, but just raise this question
+> > > up.
+> > > 
+> > > Meanwhile, this reminds me about a more funny idea: whether we can
+> > > just avoid sending the zero pages directly from QEMU's perspective.
+> > > In other words, can we just do nothing if save_zero_page() detected
+> > > that the page is zero (I guess the is_zero_range() can be fast too,
+> > > but I don't know exactly how fast it is)?  And how that would be
+> > > differed from this page hinting way in either performance and other
+> > > aspects.
+> > I noticed a problem (after I wrote the above paragraph 5 minutes
+> > ago...): when a page was valid and sent to the destination (with
+> > non-zero data), however after a while that page was zeroed.  Then if
+> > we don't send zero pages at all, we won't send the page after it's
+> > zeroed.  Then on the destination side we'll have a stale non-zero
+> > page.  Is my understanding correct?  Will that be a problem to this
+> > series too where a valid page can be possibly freed and hinted?
+> 
+> I think that won't be an issue either for zero page optimization or this
+> free page optimization.
+> 
+> For the zero page optimization, QEMU always sends compressed 0s to the
+> destination. The zero page is detected at the time QEMU checks it (before
+> sending the page). if it is a 0 page, QEMU compresses all 0s (actually just
+> a flag) and send it.
 
---wchHw8dVAp53YPj8
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+what I meant is, can we just do not even send that ZERO flag at all? :)
 
-On Thu, May 31, 2018 at 10:34:45AM +0800, Fam Zheng wrote:
-> The implementation is similar to the 'qemu-img convert'. In the
-> beginning of the job, offloaded copy is attempted. If it fails, further
-> I/O will go through the existing bounce buffer code path.
->=20
-> Signed-off-by: Fam Zheng <famz@redhat.com>
-> ---
->  block/backup.c     | 93 +++++++++++++++++++++++++++++++++++-------------=
-------
->  block/trace-events |  1 +
->  2 files changed, 62 insertions(+), 32 deletions(-)
->=20
-> diff --git a/block/backup.c b/block/backup.c
-> index 4e228e959b..ab189693f4 100644
-> --- a/block/backup.c
-> +++ b/block/backup.c
-> @@ -45,6 +45,8 @@ typedef struct BackupBlockJob {
->      QLIST_HEAD(, CowRequest) inflight_reqs;
-> =20
->      HBitmap *copy_bitmap;
-> +    bool use_copy_range;
-> +    int64_t copy_range_size;
->  } BackupBlockJob;
-> =20
->  static const BlockJobDriver backup_job_driver;
-> @@ -111,49 +113,70 @@ static int coroutine_fn backup_do_cow(BackupBlockJo=
-b *job,
->      cow_request_begin(&cow_request, job, start, end);
-> =20
->      for (; start < end; start +=3D job->cluster_size) {
-> +retry:
+> 
+> For the free page optimization, we skip free pages (could be thought of as 0
+> pages in this context). The zero pages are detected at the time guest
+> reports it QEMU. The page won't be reported if it is non-zero (i.e. used).
 
-This for loop is becoming complex.  Please introduce helper functions.
-The loop body can be replaced with something like this:
+Sorry I must have not explained myself well.  Let's assume the page
+hint is used.  I meant this:
 
-  if (!hbitmap_get(job->copy_bitmap, start / job->cluster_size)) {
-      trace_backup_do_cow_skip(job, start);
-      continue; /* already copied */
-  }
+- start precopy, page P is non-zero (let's say, page has content P1,
+  which is non-zero)
+- we send page P with content P1 on src, then latest destination cache
+  of page P is P1
+- page P is freed by the guest, then it becomes zero, dirty bitmap of
+  P is set since it's changed (from P1 to zeroed page)
+- page P is provided as hint that we can skip it since it's zeroed,
+  then the dirty bit of P is cleared
+- ... (page P is never used until migration completes)
 
-  trace_backup_do_cow_process(job, start);
+After migration completes, page P should be an zeroed page on the
+source, while IIUC on the destination side it's still with stale data
+P1.  Did I miss anything important?
 
-  ret =3D -ENOTSUPP;
-  if (job->use_copy_range) {
-      ret =3D cow_with_offload(...);
-  }
-  if (ret < 0) {
-      job->use_copy_range =3D false;
-      ret =3D cow_with_bounce_buffer(...);
-  }
-  if (ret < 0) {
-      trace_backup_do_cow_write_fail(job, start, ret);
-      goto out;
-  }
+Thanks,
 
---wchHw8dVAp53YPj8
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJbERjTAAoJEJykq7OBq3PIv0MH+wcyZv+UNU+7lELc9uefKS0/
-vcd2/X11uV29zOXXjB6sVkBiNJe3pFdxcmtokOk72OWzc0J3hn5cxh4pkmHwcP6e
-nbxFdHsLQbQ44ZNjoWtkmTivkZfxq2M4Ed5mEDtrL6sgvYYv90Wsy4vQEbQZMqGL
-AMGwXT2Dkg1r/oxZEj8Cxeio2qZw0McDuRkvr8qhSsh55MBFDOHQ7bchcTiDsQIC
-epVVFOvX4/ozfF/Wq083Kf0JjL3ZnaxCPl7loY813r6clnY8Z32qWuS4clRxwGNu
-uV8uqfuUqPI+ggOqN8LfoDDF+02NVpixOQM48r5u03gN0A9CN5zILmsFOx6rMJc=
-=qCLa
------END PGP SIGNATURE-----
-
---wchHw8dVAp53YPj8--
+-- 
+Peter Xu
