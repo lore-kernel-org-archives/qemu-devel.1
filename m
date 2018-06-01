@@ -1,26 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56443)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57400)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1fOidh-0000pk-FU
-	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 07:54:38 -0400
+	(envelope-from <berrange@redhat.com>) id 1fOigf-0001mo-L1
+	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 07:57:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1fOidc-0007Vb-Na
-	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 07:54:37 -0400
-Received: from mail-wm0-x241.google.com ([2a00:1450:400c:c09::241]:55034)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1fOidc-0007Tg-FP
-	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 07:54:32 -0400
-Received: by mail-wm0-x241.google.com with SMTP id o13-v6so2514834wmf.4
-	for <qemu-devel@nongnu.org>; Fri, 01 Jun 2018 04:54:32 -0700 (PDT)
-Date: Fri, 1 Jun 2018 12:54:29 +0100
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20180601115429.GL8687@stefanha-x1.localdomain>
-References: <20180523140809.622F.E1E9C6FF@jp.fujitsu.com>
+	(envelope-from <berrange@redhat.com>) id 1fOigb-0002Dy-Oe
+	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 07:57:41 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:37656 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1fOigb-0002Db-Jc
+	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 07:57:37 -0400
+Date: Fri, 1 Jun 2018 12:57:32 +0100
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Message-ID: <20180601115732.GV3458@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <CAFEAcA-hha7jMSfPTdNEVKhuJr4nwAx4wKmEk5E9+j-JS4U14w@mail.gmail.com>
+	<20180430103312.GH3249@redhat.com>
+	<CAFEAcA9gt50-7UR5XuR5DVrxLbsFx1hP=BDR2mjUOwjxDPwkdw@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="2EnvhqpWJq810sZn"
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20180523140809.622F.E1E9C6FF@jp.fujitsu.com>
-Subject: Re: [Qemu-devel] Questions about vNVDIMM on qemu/KVM
+In-Reply-To: <CAFEAcA9gt50-7UR5XuR5DVrxLbsFx1hP=BDR2mjUOwjxDPwkdw@mail.gmail.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] release retrospective, next release timing,
+ numbering
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,91 +31,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Yasunori Goto <y-goto@jp.fujitsu.com>
-Cc: qemu-devel@nongnu.org, NVDIMM-ML <linux-nvdimm@lists.01.org>, Pankaj Gupta <pagupta@redhat.com>, Luiz Capitulino <lcapitulino@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>
+
+On Tue, May 22, 2018 at 11:07:04AM +0100, Peter Maydell wrote:
+> On 30 April 2018 at 11:33, Daniel P. Berrang=C3=A9 <berrange@redhat.com=
+> wrote:
+> >  a) Bump major version once a year, so we'll have 3.0, 3.1, 3.3,
+> >     4.0, 4.1, 4.2, 5.0, ...etc  We missed the first release this
+> >     year, so we would only have 3.0 and 3.1 this year.
+>=20
+> I realised we didn't really come to a conclusion in this discussion.
+> I've reread the thread, and my proposal is to arbitrarily pick
+> something which accords with my aesthetic preferences, which is
+> this one that Dan suggests.
+>
+> That will make the next release be 3.0.0.
 
 
---2EnvhqpWJq810sZn
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Great, I was hoping you would play benevolent leader and arbitrarily
+pick one of the options to bring this to a close :-)
 
-On Wed, May 23, 2018 at 02:08:12PM +0900, Yasunori Goto wrote:
-> Hello,
+FYI, i'll aim to send a patch that documents this versioning plan for
+future reference.
 
-CCing Pankaj, who is developing virtio-pmem and may have comments beyond
-what has already been discussed.
-
-> I'm investigating status of vNVDIMM on qemu/KVM,
-> and I have some questions about it. I'm glad if anyone answer them.
->=20
-> In my understanding, qemu/KVM has a feature to show NFIT for guest,
-> and it will be still updated about platform capability with this patch se=
-t.
-> https://lists.gnu.org/archive/html/qemu-devel/2018-05/msg04756.html
->=20
-> And libvirt also supports this feature with <memory model=3D'nvdimm'>
-> https://libvirt.org/formatdomain.html#elementsMemory
->=20
->=20
-> However, virtio-pmem is developing now, and it is better
-> for archtectures to detect regions of NVDIMM without ACPI (like s390x)
-> In addition, It is also necessary to flush guest contents on vNVDIMM
-> who has a backend-file.=20
->=20
->=20
-> Q1) Does ACPI.NFIT bus of qemu/kvm remain with virtio-pmem?=20
->     How do each roles become it if both NFIT and virtio-pmem will be avai=
-lable?
->     If my understanding is correct, both NFIT and virtio-pmem is used to
->     detect vNVDIMM regions, but only one seems to be necessary....
->=20
->     Otherwize, is the NFIT bus just for keeping compatibility,=20
->     and virtio-pmem is promising way?
->=20
->    =20
-> Q2) What bus is(will be?) created for virtio-pmem?
->     I could confirm the bus of NFIT is created with <memory model=3D'nvdi=
-mm'>,
->     and I heard other bus will be created for virtio-pmem, but I could not
->     find what bus is created concretely.
->     ---
->       # ndctl list -B
->       {
->          "provider":"ACPI.NFIT",
->          "dev":"ndbus0"
->       }
->     ---
->   =20
->     I think it affects what operations user will be able to, and what=20
->     notification is necessary for vNVDIMM.=20
->     ACPI defines some operations like namespace controll, and notification
->     for NVDIMM health status or others.
->     (I suppose that other status notification might be necessary for vNVD=
-IMM,
->      but I'm not sure yet...)
->=20
-> If my understanding is wrong, please correct me.
->=20
-> Thanks,
-> ---
-> Yasunori Goto
->=20
->=20
->=20
-
---2EnvhqpWJq810sZn
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEcBAEBAgAGBQJbETP1AAoJEJykq7OBq3PIAToH/0iQQq1xrjtmm9Pei8pYlY+X
-nyA9L2Q4VhEla9wurFPtksJrKq8aDjou/JwaciD4LNqKWBXR0WNp5j7HNDFe6Jez
-4Kax0uUrCra7PKnFr4fK6EZq7JJF/3gT+Pkr0r2Q/hBLCGYgeMjVN2fnIV3Hyl3p
-ZeKfluimW/8rfCsZxqorRRcZCo6//pJtnTx+HEbmThD5RIeFtAN7yK1rNzWMMWYr
-Ncmb69ktN0CC2kn7pCF5VfjaSrM1MUFcpUXTGU5ENE5pQ+ox0gggh38jSmVm1XUu
-24gDBZxnm3QIVGiYOVFisalpxDlkGcIAJA0OhGbI38hzkTLiEbCBl0zyf5IUB3c=
-=xGxs
------END PGP SIGNATURE-----
-
---2EnvhqpWJq810sZn--
+Regards,
+Daniel
+--=20
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
+ge :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.c=
+om :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
+ge :|
