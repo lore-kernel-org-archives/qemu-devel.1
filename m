@@ -1,21 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33150)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33275)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <keno@juliacomputing.com>) id 1fOYpy-0002YS-9l
-	for qemu-devel@nongnu.org; Thu, 31 May 2018 21:26:39 -0400
+	(envelope-from <keno@juliacomputing.com>) id 1fOYqs-0002wc-DH
+	for qemu-devel@nongnu.org; Thu, 31 May 2018 21:27:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <keno@juliacomputing.com>) id 1fOYpt-0001rT-8g
-	for qemu-devel@nongnu.org; Thu, 31 May 2018 21:26:38 -0400
-Received: from mail-qk0-x241.google.com ([2607:f8b0:400d:c09::241]:45410)
+	(envelope-from <keno@juliacomputing.com>) id 1fOYqn-0002oi-LQ
+	for qemu-devel@nongnu.org; Thu, 31 May 2018 21:27:34 -0400
+Received: from mail-qt0-x241.google.com ([2607:f8b0:400d:c0d::241]:40623)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <keno@juliacomputing.com>)
-	id 1fOYpt-0001qU-0m
-	for qemu-devel@nongnu.org; Thu, 31 May 2018 21:26:33 -0400
-Received: by mail-qk0-x241.google.com with SMTP id c198-v6so18723790qkg.12
-	for <qemu-devel@nongnu.org>; Thu, 31 May 2018 18:26:32 -0700 (PDT)
+	id 1fOYqn-0002oF-Fg
+	for qemu-devel@nongnu.org; Thu, 31 May 2018 21:27:29 -0400
+Received: by mail-qt0-x241.google.com with SMTP id h2-v6so30291358qtp.7
+	for <qemu-devel@nongnu.org>; Thu, 31 May 2018 18:27:29 -0700 (PDT)
 From: Keno Fischer <keno@juliacomputing.com>
-Date: Thu, 31 May 2018 21:25:55 -0400
-Message-Id: <cover.1527814874.git.keno@juliacomputing.com>
-Subject: [Qemu-devel] [PATCH v2 00/20] 9p: Add support for Darwin
+Date: Thu, 31 May 2018 21:25:56 -0400
+Message-Id: <1f6bc60305b8c1cd00f5e2a361a05d7b4bc56338.1527814874.git.keno@juliacomputing.com>
+In-Reply-To: <cover.1527814874.git.keno@juliacomputing.com>
+References: <cover.1527814874.git.keno@juliacomputing.com>
+In-Reply-To: <cover.1527814874.git.keno@juliacomputing.com>
+References: <cover.1527814874.git.keno@juliacomputing.com>
+Subject: [Qemu-devel] [PATCH v2 01/20] cutils: Provide strchrnul
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,62 +31,140 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Keno Fischer <keno@juliacomputing.com>, groug@kaod.org
 
-This is v2 of my patch series to provide 9p server
-support for Darwin.
+strchrnul is a GNU extension and thus unavailable on a number of targets.
+In the review for a commit removing strchrnul from 9p, I was asked to
+create a qemu_strchrnul helper to factor out this functionality.
+Do so, and use it in a number of other places in the code base that inlined
+the replacement pattern in a place where strchrnul could be used.
 
-The patches in this series address review from v1,
-now support building the virtfs proxy, as well
-as fix bugs found since v1.
+Signed-off-by: Keno Fischer <keno@juliacomputing.com>
+---
 
-Keno Fischer (20):
-  cutils: Provide strchrnul
-  9p: proxy: Fix size passed to `connect`
-  9p: xattr: Fix crash due to free of uninitialized value
-  9p: linux: Fix a couple Linux assumptions
-  9p: Properly set errp in fstatfs error path
-  9p: Avoid warning if FS_IOC_GETVERSION is not defined
-  9p: Move a couple xattr functions to 9p-util
-  9p: Rename 9p-util -> 9p-util-linux
-  9p: Properly error check and translate flags in unlinkat
-  9p: darwin: Handle struct stat(fs) differences
-  9p: darwin: Handle struct dirent differences
-  9p: darwin: Explicitly cast comparisons of mode_t with -1
-  9p: darwin: Ignore O_{NOATIME, DIRECT}
-  9p: darwin: Provide a compatibility definition for XATTR_SIZE_MAX
-  9p: darwin: *xattr_nofollow implementations
-  9p: darwin: Compatibility for f/l*xattr
-  9p: darwin: Provide a fallback implementation for utimensat
-  9p: darwin: Implement compatibility for mknodat
-  9p: darwin: virtfs-proxy: Implement setuid code for darwin
-  9p: darwin: configure: Allow VirtFS on Darwin
+Changes since v1: New patch
 
- Makefile                    |   6 ++
- Makefile.objs               |   1 +
- configure                   |  22 +++--
- fsdev/file-op-9p.h          |   2 +-
- fsdev/virtfs-proxy-helper.c | 230 ++++++++++++++++++++++++++++----------------
- hw/9pfs/9p-local.c          |  68 ++++++++-----
- hw/9pfs/9p-proxy.c          |  22 +++--
- hw/9pfs/9p-synth.c          |   4 +
- hw/9pfs/9p-util-darwin.c    | 185 +++++++++++++++++++++++++++++++++++
- hw/9pfs/9p-util-linux.c     |  70 ++++++++++++++
- hw/9pfs/9p-util.c           |  26 -----
- hw/9pfs/9p-util.h           |  31 ++++++
- hw/9pfs/9p-xattr.c          |  33 -------
- hw/9pfs/9p.c                |  86 +++++++++++++++--
- hw/9pfs/Makefile.objs       |   4 +-
- include/qemu/cutils.h       |   1 +
- include/qemu/statfs.h       |  19 ++++
- include/qemu/xattr.h        |   4 +-
- monitor.c                   |   8 +-
- util/cutils.c               |  13 +++
- util/qemu-option.c          |   6 +-
- util/uri.c                  |   6 +-
- 22 files changed, 636 insertions(+), 211 deletions(-)
- create mode 100644 hw/9pfs/9p-util-darwin.c
- create mode 100644 hw/9pfs/9p-util-linux.c
- delete mode 100644 hw/9pfs/9p-util.c
- create mode 100644 include/qemu/statfs.h
+ hw/9pfs/9p-local.c    |  2 +-
+ include/qemu/cutils.h |  1 +
+ monitor.c             |  8 ++------
+ util/cutils.c         | 13 +++++++++++++
+ util/qemu-option.c    |  6 +-----
+ util/uri.c            |  6 ++----
+ 6 files changed, 20 insertions(+), 16 deletions(-)
 
+diff --git a/hw/9pfs/9p-local.c b/hw/9pfs/9p-local.c
+index b37b1db..bcf2798 100644
+--- a/hw/9pfs/9p-local.c
++++ b/hw/9pfs/9p-local.c
+@@ -65,7 +65,7 @@ int local_open_nofollow(FsContext *fs_ctx, const char *path, int flags,
+         assert(*path != '/');
+ 
+         head = g_strdup(path);
+-        c = strchrnul(path, '/');
++        c = qemu_strchrnul(path, '/');
+         if (*c) {
+             /* Intermediate path element */
+             head[c - path] = 0;
+diff --git a/include/qemu/cutils.h b/include/qemu/cutils.h
+index a663340..bc40c30 100644
+--- a/include/qemu/cutils.h
++++ b/include/qemu/cutils.h
+@@ -122,6 +122,7 @@ int qemu_strnlen(const char *s, int max_len);
+  * Returns: the pointer originally in @input.
+  */
+ char *qemu_strsep(char **input, const char *delim);
++const char *qemu_strchrnul(const char *s, int c);
+ time_t mktimegm(struct tm *tm);
+ int qemu_fdatasync(int fd);
+ int fcntl_setfl(int fd, int flag);
+diff --git a/monitor.c b/monitor.c
+index 922cfc0..e1f01c4 100644
+--- a/monitor.c
++++ b/monitor.c
+@@ -798,9 +798,7 @@ static int compare_cmd(const char *name, const char *list)
+     p = list;
+     for(;;) {
+         pstart = p;
+-        p = strchr(p, '|');
+-        if (!p)
+-            p = pstart + strlen(pstart);
++        p = qemu_strchrnul(p, '|');
+         if ((p - pstart) == len && !memcmp(pstart, name, len))
+             return 1;
+         if (*p == '\0')
+@@ -3401,9 +3399,7 @@ static void cmd_completion(Monitor *mon, const char *name, const char *list)
+     p = list;
+     for(;;) {
+         pstart = p;
+-        p = strchr(p, '|');
+-        if (!p)
+-            p = pstart + strlen(pstart);
++        p = qemu_strchrnul(p, '|');
+         len = p - pstart;
+         if (len > sizeof(cmd) - 2)
+             len = sizeof(cmd) - 2;
+diff --git a/util/cutils.c b/util/cutils.c
+index 0de69e6..6e078b0 100644
+--- a/util/cutils.c
++++ b/util/cutils.c
+@@ -545,6 +545,19 @@ int qemu_strtou64(const char *nptr, const char **endptr, int base,
+ }
+ 
+ /**
++ * Searches for the first occurrence of 'c' in 's', and returns a pointer
++ * to the trailing null byte if none was found.
++ */
++const char *qemu_strchrnul(const char *s, int c)
++{
++    const char *e = strchr(s, c);
++    if (!e) {
++        e = s + strlen(s);
++    }
++    return e;
++}
++
++/**
+  * parse_uint:
+  *
+  * @s: String to parse
+diff --git a/util/qemu-option.c b/util/qemu-option.c
+index 58d1c23..54eca12 100644
+--- a/util/qemu-option.c
++++ b/util/qemu-option.c
+@@ -77,11 +77,7 @@ const char *get_opt_value(const char *p, char **value)
+ 
+     *value = NULL;
+     while (1) {
+-        offset = strchr(p, ',');
+-        if (!offset) {
+-            offset = p + strlen(p);
+-        }
+-
++        offset = qemu_strchrnul(p, ',');
+         length = offset - p;
+         if (*offset != '\0' && *(offset + 1) == ',') {
+             length++;
+diff --git a/util/uri.c b/util/uri.c
+index 8624a7a..8bdef84 100644
+--- a/util/uri.c
++++ b/util/uri.c
+@@ -52,6 +52,7 @@
+  */
+ 
+ #include "qemu/osdep.h"
++#include "qemu/cutils.h"
+ 
+ #include "qemu/uri.h"
+ 
+@@ -2266,10 +2267,7 @@ struct QueryParams *query_params_parse(const char *query)
+         /* Find the next separator, or end of the string. */
+         end = strchr(query, '&');
+         if (!end) {
+-            end = strchr(query, ';');
+-        }
+-        if (!end) {
+-            end = query + strlen(query);
++            end = qemu_strchrnul(query, ';');
+         }
+ 
+         /* Find the first '=' character between here and end. */
 -- 
 2.8.1
