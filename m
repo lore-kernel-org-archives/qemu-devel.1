@@ -1,25 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56777)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59173)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mprivozn@redhat.com>) id 1fP3sJ-0003Do-JX
-	for qemu-devel@nongnu.org; Sat, 02 Jun 2018 06:35:08 -0400
+	(envelope-from <mprivozn@redhat.com>) id 1fP43b-0005YF-Gk
+	for qemu-devel@nongnu.org; Sat, 02 Jun 2018 06:46:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mprivozn@redhat.com>) id 1fP3sG-00074y-GB
-	for qemu-devel@nongnu.org; Sat, 02 Jun 2018 06:35:07 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:56204 helo=mx1.redhat.com)
+	(envelope-from <mprivozn@redhat.com>) id 1fP43Y-0001Po-92
+	for qemu-devel@nongnu.org; Sat, 02 Jun 2018 06:46:47 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:55644 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mprivozn@redhat.com>) id 1fP3sG-00072O-By
-	for qemu-devel@nongnu.org; Sat, 02 Jun 2018 06:35:04 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.4])
+	(Exim 4.71) (envelope-from <mprivozn@redhat.com>) id 1fP43Y-0001P9-2t
+	for qemu-devel@nongnu.org; Sat, 02 Jun 2018 06:46:44 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.5])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id B4781401EF23
-	for <qemu-devel@nongnu.org>; Sat,  2 Jun 2018 10:35:02 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 6EBCA805A52F
+	for <qemu-devel@nongnu.org>; Sat,  2 Jun 2018 10:46:43 +0000 (UTC)
+References: <d714d8ac-6642-f2f3-ad9c-ac7e3bdf30e0@redhat.com>
 From: Michal Privoznik <mprivozn@redhat.com>
-Date: Sat,  2 Jun 2018 12:34:52 +0200
-Message-Id: <ad910973c593c5ac2fed3a10ea958f7e9c12f82c.1527935663.git.mprivozn@redhat.com>
-Subject: [Qemu-devel] [PATCH] cli: Don't run early event loop if no
- --preconfig was specified
+Message-ID: <d453da2c-92fe-5ef8-239c-656c1822b9e0@redhat.com>
+Date: Sat, 2 Jun 2018 12:46:40 +0200
+MIME-Version: 1.0
+In-Reply-To: <d714d8ac-6642-f2f3-ad9c-ac7e3bdf30e0@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-GB
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] Preconfig state reachable without --preconfig given
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,72 +33,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: imammedo@redhat.com, ehabkost@redhat.com, eblake@redhat.com, pbonzini@redhat.com
+To: Max Reitz <mreitz@redhat.com>, Igor Mammedov <imammedo@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 
-After 047f7038f586d215 it is possible for event loop to run two
-times. First time whilst parsing command line options (the idea
-is to bring up monitor early so that management applications can
-tweak config before machine is initialized). And the second time
-is after everything is set up (this is the usual place). In both
-cases the event loop is called as main_loop_wait(nonblocking =
-false) which causes the event loop to block until at least one
-event occurred.
+On 06/01/2018 03:28 PM, Max Reitz wrote:
+> Hi,
+> 
+> The @preconfig RunState documentation states:
+> 
+>> The state is reachable only if the --preconfig CLI option is used.
+> 
+> However, this is not true:
+> 
+> $ echo | x86_64-softmmu/qemu-system-x86_64 -monitor stdio
+> QEMU 2.12.50 monitor - type 'help' for more information
+> (qemu)
+> HMP not available in preconfig state, use QMP instead
 
-Now, consider that somebody (i.e. libvirt) calls us with
--daemonize. This operation is split in two steps. The main()
-calls os_daemonize() which fork()-s and then waits in read()
-until child notifies it via write():
+Not sure if this is the same bug, but I've noticed libvirt having
+troubles detecting capabilities of qemu and debugging lead to this patch:
 
-/qemu.git $ ./x86_64-softmmu/qemu-system-x86_64 -S -daemonize \
-  -no-user-config -nodefaults -nographic
+http://lists.nongnu.org/archive/html/qemu-devel/2018-06/msg00367.html
 
-  main():                child:
-    os_daemonize():
-      read(pipe[0])
+(which by no means I claim is proper solution. It might be viewed as
+workaround by expert qemu devels)
 
-                           main_loop():
-                             main_loop_wait(false)
+> 
+> On IRC, Daniel proposed doing the runstate transition immediately after
+> the command line has been read and no --preconfig option has been found.
+>  Doing that indeed fixes the issue for me (but I don't know whether
+> that's the best solution).
 
-                           os_setup_post():
-                             write(pipe[1])
+Oh has he? I can't find it anywhere.
 
-                           main_loop():
-                             main_loop_wait(false)
-
-Here it can be clearly seen that main() does not exit until an
-event occurs, but at the same time nobody will touch the monitor
-socket until their exec("qemu-system-*") finishes. So the whole
-thing deadlocks.
-
-The solution is to not call main_loop() unless --preconfig was
-specified (in which case caller knows they must connect to the
-socket before exec() finishes).
-
-Signed-off-by: Michal Privoznik <mprivozn@redhat.com>
----
- vl.c | 9 +++++++--
- 1 file changed, 7 insertions(+), 2 deletions(-)
-
-diff --git a/vl.c b/vl.c
-index 70f090c823..cde2934c40 100644
---- a/vl.c
-+++ b/vl.c
-@@ -4469,8 +4469,13 @@ int main(int argc, char **argv, char **envp)
-     }
-     parse_numa_opts(current_machine);
- 
--    /* do monitor/qmp handling at preconfig state if requested */
--    main_loop();
-+    if (preconfig_exit_requested) {
-+        runstate_set(RUN_STATE_PRELAUNCH);
-+        preconfig_exit_requested = false;
-+    } else {
-+        /* do monitor/qmp handling at preconfig state if requested */
-+        main_loop();
-+    }
- 
-     /* from here on runstate is RUN_STATE_PRELAUNCH */
-     machine_run_board_init(current_machine);
--- 
-2.16.4
+Michal
