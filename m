@@ -1,25 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59862)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55770)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1fOuRU-0008C1-Ld
-	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 20:34:44 -0400
+	(envelope-from <jsnow@redhat.com>) id 1fOv1W-0003pW-SP
+	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 21:08:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1fOuPr-0006LL-Aj
-	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 20:30:48 -0400
-Received: from out1-smtp.messagingengine.com ([66.111.4.25]:58947)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cota@braap.org>) id 1fOuPq-0006Kr-NB
-	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 20:29:06 -0400
-Date: Fri, 1 Jun 2018 20:29:05 -0400
-From: "Emilio G. Cota" <cota@braap.org>
-Message-ID: <20180602002905.GA19122@flamenco>
-References: <1526945967-9687-1-git-send-email-cota@braap.org>
-	<ff49bf54-3d5c-c2a4-95cd-3cb8c2efab51@linaro.org>
-	<ada5eac5-eceb-b330-6f12-ac6e9c58268d@linaro.org>
+	(envelope-from <jsnow@redhat.com>) id 1fOv1V-0000fe-Rq
+	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 21:08:02 -0400
+References: <20180417153945.20737-1-pbonzini@redhat.com>
+	<20180417153945.20737-6-pbonzini@redhat.com>
+From: John Snow <jsnow@redhat.com>
+Message-ID: <700d0412-5ff4-cb86-7896-d6bd943ea5dd@redhat.com>
+Date: Fri, 1 Jun 2018 21:07:54 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ada5eac5-eceb-b330-6f12-ac6e9c58268d@linaro.org>
-Subject: Re: [Qemu-devel] [PATCH v3 00/17] tcg: tb_lock removal redux v3
+In-Reply-To: <20180417153945.20737-6-pbonzini@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 5/6] atapi: call ide_set_irq before
+ ide_transfer_start
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,57 +25,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>
-Cc: qemu-devel@nongnu.org, Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>
+To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org
 
-On Wed, May 30, 2018 at 16:05:14 -0700, Richard Henderson wrote:
-> On 05/30/2018 03:46 PM, Richard Henderson wrote:
-> > Thanks.  Queued to tcg-next.
-> Hmph.  Unqueued, at least for now.
+
+
+On 04/17/2018 11:39 AM, Paolo Bonzini wrote:
+> The ATAPI_INT_REASON_IO interrupt is raised when I/O starts, but in the
+
+This one is benefit of the doubt for me.
+
+(I still can't quite track down our usage of the nsector register for
+this, it doesn't seem supported by cmd_packet in ATA8 ... It says that
+Interrupt Reason is its own "field" but that doesn't help me know which
+register it's supposed to be stored in... Oh, ATA7 says that Interrupt
+Reason is stored in "Sector Count." (*sigh* -- How are you supposed to
+tell that from the ATA8 doc? What part of the spec tells you how to
+actually read out the "Interrupt Reason" field?))
+
+(I am still not sure which spec says when we can interrupt in ATAPI,
+either. I guess that's in SCSI somewhere, probably?)
+
+> AHCI case ide_set_irq was actually called at the end of a mutual recursion.
+> Move it early, with the side effect that ide_transfer_start becomes a tail
+> call in ide_atapi_cmd_reply_end.
 > 
-> ERROR:/home/rth/work/qemu/qemu/accel/tcg/translate-all.c:615:page_unlock__debug:
-> assertion failed: (page_is_locked(pd))
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> ---
+>  hw/ide/atapi.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+> 
+> diff --git a/hw/ide/atapi.c b/hw/ide/atapi.c
+> index c0509c8bf5..7168ff55a7 100644
+> --- a/hw/ide/atapi.c
+> +++ b/hw/ide/atapi.c
+> @@ -287,6 +287,7 @@ void ide_atapi_cmd_reply_end(IDEState *s)
+>          } else {
+>              /* a new transfer is needed */
+>              s->nsector = (s->nsector & ~7) | ATAPI_INT_REASON_IO;
+> +            ide_set_irq(s->bus);
+>              byte_count_limit = atapi_byte_count_limit(s);
+>              trace_ide_atapi_cmd_reply_end_bcl(s, byte_count_limit);
+>              size = s->packet_transfer_size;
+> @@ -304,13 +305,12 @@ void ide_atapi_cmd_reply_end(IDEState *s)
+>                  if (size > (s->cd_sector_size - s->io_buffer_index))
+>                      size = (s->cd_sector_size - s->io_buffer_index);
+>              }
+> +            trace_ide_atapi_cmd_reply_end_new(s, s->status);
+>              s->packet_transfer_size -= size;
+>              s->elementary_transfer_size -= size;
+>              s->io_buffer_index += size;
+>              ide_transfer_start(s, s->io_buffer + s->io_buffer_index - size,
+>                                 size, ide_atapi_cmd_reply_end);
+> -            ide_set_irq(s->bus);
+> -            trace_ide_atapi_cmd_reply_end_new(s, s->status);
+>          }
+>      }
+>  }
+> 
 
-Gaah, sorry. In v3 forgot to call the lock__debug function from
-a successful trylock. I tested v3 on aarch64, which explains why
-I didn't catch the bug. Fixed now:
+BOD:
 
---- a/accel/tcg/translate-all.c
-+++ b/accel/tcg/translate-all.c
-@@ -704,6 +704,7 @@ static bool page_entry_trylock(struct page_entry *pe)
-     if (!busy) {
-         g_assert(!pe->locked);
-         pe->locked = true;
-+        page_lock__debug(pe->pd);
-     }
-     return busy;
- }
-
-I also added the following, which cannot hurt:
-
-diff --git a/exec.c b/exec.c
-index afc37e0..e874d67 100644
---- a/exec.c
-+++ b/exec.c
-@@ -2493,6 +2493,7 @@ void memory_notdirty_write_complete(NotDirtyInfo *ndi)
- {
-     if (ndi->pages) {
-         page_collection_unlock(ndi->pages);
-+        ndi->pages = NULL;
-     }
-
-(Note that calling page_collection_unlock twice on that pointer
-would blow up.)
-
-The above two one-liners are the only code changes between v3 and v4.
-I also added Alex's R-b tag for the qht patch.
-
-I've boot-tested v4 on aarch64, arm, x86_64-softmmu, riscv64, sh4,
-sparc, s390x, ppc64 and or1k, with and without TCG debug.
-
-You can fetch v4 from:
-  https://github.com/cota/qemu/tree/tb-lock-removal-redux-v4
-
-Thanks,
-
-		Emilio
+Acked-by: John Snow <jsnow@redhat.com>
