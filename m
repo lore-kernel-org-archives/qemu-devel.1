@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41407)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41412)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fP7A4-0007Cn-Uw
+	(envelope-from <bounces@canonical.com>) id 1fP7A5-0007Co-J9
 	for qemu-devel@nongnu.org; Sat, 02 Jun 2018 10:05:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fP79z-0006N4-0H
-	for qemu-devel@nongnu.org; Sat, 02 Jun 2018 10:05:40 -0400
-Received: from indium.canonical.com ([91.189.90.7]:40728)
+	(envelope-from <bounces@canonical.com>) id 1fP79z-0006Oy-OS
+	for qemu-devel@nongnu.org; Sat, 02 Jun 2018 10:05:41 -0400
+Received: from indium.canonical.com ([91.189.90.7]:40744)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1fP79y-0006Jj-B8
-	for qemu-devel@nongnu.org; Sat, 02 Jun 2018 10:05:34 -0400
+	id 1fP79z-0006Mg-Ce
+	for qemu-devel@nongnu.org; Sat, 02 Jun 2018 10:05:35 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1fP79x-0002qm-7k
-	for <qemu-devel@nongnu.org>; Sat, 02 Jun 2018 14:05:33 +0000
+	id 1fP79y-0002rj-KR
+	for <qemu-devel@nongnu.org>; Sat, 02 Jun 2018 14:05:34 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 2D3BE2E80CB
-	for <qemu-devel@nongnu.org>; Sat,  2 Jun 2018 14:05:33 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id 918D62E80C7
+	for <qemu-devel@nongnu.org>; Sat,  2 Jun 2018 14:05:34 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Sat, 02 Jun 2018 13:52:26 -0000
+Date: Sat, 02 Jun 2018 13:55:43 -0000
 From: Satheesh Rajendran <sathnaga@linux.vnet.ibm.com>
 Reply-To: Bug 1773753 <1773753@bugs.launchpad.net>
 Sender: bounces@canonical.com
 References: <152749874146.3829.13327505377905335957.malonedeb@chaenomeles.canonical.com>
-Message-Id: <152794754662.25020.996015921201316381.malone@gac.canonical.com>
+Message-Id: <152794774373.24903.1226938569046067107.malone@gac.canonical.com>
 Errors-To: bounces@canonical.com
 Subject: [Qemu-devel] [Bug 1773753] Re: virsh start,
  after virsh managed save hangs and vm goes to paused state with
@@ -40,33 +40,7 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-Yes, tested again with below levels and not issue is not reproducible.
-
-Issue is fixed!
-
-qemu: 2.12.50 (v2.12.0-949-g392fba9f58-dirty)
-host/guest kernel: 4.17.0-rc7-00045-g0512e0134582
-
-libvirt: =
-
-Compiled against library: libvirt 4.4.0
-Using library: libvirt 4.4.0
-Using API: QEMU 4.4.0
-Running hypervisor: QEMU 2.12.50
-
-#virsh managedsave avocado-vt-vm1
-
-Domain avocado-vt-vm1 state saved by libvirt
-
-# virsh start avocado-vt-vm1
-Domain avocado-vt-vm1 started
-
-Guest console.
-# uname -r
-4.17.0-rc7-00045-g0512e0134582
-
-
-This bug can be closed.
+libvirt compiled against 105bcdde76bc8c64f2d9aca9db684186a5e96e63
 
 -- =
 
