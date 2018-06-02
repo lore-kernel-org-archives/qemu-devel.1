@@ -1,22 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45444)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52819)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <th.huth@gmail.com>) id 1fP0BF-0005Ck-NF
-	for qemu-devel@nongnu.org; Sat, 02 Jun 2018 02:38:26 -0400
+	(envelope-from <afaerber@suse.de>) id 1fP0qV-0001Ud-Vr
+	for qemu-devel@nongnu.org; Sat, 02 Jun 2018 03:21:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <th.huth@gmail.com>) id 1fP0BE-00035G-JY
-	for qemu-devel@nongnu.org; Sat, 02 Jun 2018 02:38:25 -0400
-References: <20180601141223.26630-1-peter.maydell@linaro.org>
-	<20180601141223.26630-3-peter.maydell@linaro.org>
-From: Thomas Huth <huth@tuxfamily.org>
-Message-ID: <616a7583-c7bb-68d6-7611-f058d07e0147@tuxfamily.org>
-Date: Sat, 2 Jun 2018 08:38:16 +0200
+	(envelope-from <afaerber@suse.de>) id 1fP0qR-00087L-1O
+	for qemu-devel@nongnu.org; Sat, 02 Jun 2018 03:21:03 -0400
+Received: from mx2.suse.de ([195.135.220.15]:45105)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <afaerber@suse.de>) id 1fP0qQ-000822-NZ
+	for qemu-devel@nongnu.org; Sat, 02 Jun 2018 03:20:58 -0400
+References: <20180601153922.11590-1-ricardo.perez_blanco@nokia.com>
+From: =?UTF-8?Q?Andreas_F=c3=a4rber?= <afaerber@suse.de>
+Message-ID: <a51fbf8b-9839-ebc1-cde5-5ae95656f918@suse.de>
+Date: Sat, 2 Jun 2018 09:20:55 +0200
 MIME-Version: 1.0
-In-Reply-To: <20180601141223.26630-3-peter.maydell@linaro.org>
+In-Reply-To: <20180601153922.11590-1-ricardo.perez_blanco@nokia.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 2/6] hw/m68k/mcf5206: Convert away from
- old_mmio
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2] Show values and description when using
+ "qom-list"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,76 +28,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
-Cc: patches@linaro.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Thomas Huth <huth@tuxfamily.org>, Aurelien Jarno <aurelien@aurel32.net>, qemu-block@nongnu.org, Yongbok Kim <yongbok.kim@mips.com>
+To: Ricardo Perez Blanco <ricardo.perez_blanco@nokia.com>
+Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, qemu-devel <qemu-devel@nongnu.org>
 
-On 01.06.2018 16:12, Peter Maydell wrote:
-> Convert the mcf5206 device away from using the old_mmio field
-> of MemoryRegionOps. This device is used by the an5206 board.
-> 
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+Am 01.06.2018 um 17:39 schrieb Ricardo Perez Blanco:
+> For debugging purposes it is very useful to:
+>  - See the description of the field. This information is already filled
+>    in but not shown in "qom-list" command.
+
+No objection on this part.
+
+>  - Display value of the field.
+
+That is by definition the qom-get operation, not qom-list. Just like the
+ls command does not show file contents, there's cat etc. for that. For
+debugging purposes we had a qom-tree (?) command that would combine
+both. There might be unmerged patches on qemu-devel related to display
+of certain data types.
+
+Regards,
+Andreas
+
+>=20
+> Signed-off-by: Ricardo Perez Blanco <ricardo.perez_blanco@nokia.com>
 > ---
->  hw/m68k/mcf5206.c | 48 +++++++++++++++++++++++++++++++++++------------
->  1 file changed, 36 insertions(+), 12 deletions(-)
-> 
-> diff --git a/hw/m68k/mcf5206.c b/hw/m68k/mcf5206.c
-> index 6ad1e4bd2d..0962911837 100644
-> --- a/hw/m68k/mcf5206.c
-> +++ b/hw/m68k/mcf5206.c
-> @@ -513,19 +513,43 @@ static void m5206_mbar_writel(void *opaque, hwaddr offset,
->      m5206_mbar_write(s, offset, value, 4);
->  }
->  
-> +static uint64_t m5206_mbar_readfn(void *opaque, hwaddr addr, unsigned size)
-> +{
-> +    switch (size) {
-> +    case 1:
-> +        return m5206_mbar_readb(opaque, addr);
-> +    case 2:
-> +        return m5206_mbar_readw(opaque, addr);
-> +    case 4:
-> +        return m5206_mbar_readl(opaque, addr);
-> +    default:
-> +        g_assert_not_reached();
-> +    }
-> +}
-> +
-> +static void m5206_mbar_writefn(void *opaque, hwaddr addr,
-> +                               uint64_t value, unsigned size)
-> +{
-> +    switch (size) {
-> +    case 1:
-> +        m5206_mbar_writeb(opaque, addr, value);
-> +        break;
-> +    case 2:
-> +        m5206_mbar_writew(opaque, addr, value);
-> +        break;
-> +    case 4:
-> +        m5206_mbar_writel(opaque, addr, value);
-> +        break;
-> +    default:
-> +        g_assert_not_reached();
-> +    }
-> +}
-> +
->  static const MemoryRegionOps m5206_mbar_ops = {
-> -    .old_mmio = {
-> -        .read = {
-> -            m5206_mbar_readb,
-> -            m5206_mbar_readw,
-> -            m5206_mbar_readl,
-> -        },
-> -        .write = {
-> -            m5206_mbar_writeb,
-> -            m5206_mbar_writew,
-> -            m5206_mbar_writel,
-> -        },
-> -    },
-> +    .read = m5206_mbar_readfn,
-> +    .write = m5206_mbar_writefn,
-> +    .valid.min_access_size = 1,
-> +    .valid.max_access_size = 4,
->      .endianness = DEVICE_NATIVE_ENDIAN,
->  };
+>  hmp.c          | 13 +++++++++++--
+>  qapi/misc.json |  6 ++++--
+>  qmp.c          |  7 +++++++
+>  qom/object.c   |  8 +++-----
+>  4 files changed, 25 insertions(+), 9 deletions(-)
+[snip]
 
-Acked-by: Thomas Huth <huth@tuxfamily.org>
+--=20
+SUSE Linux GmbH, Maxfeldstr. 5, 90409 N=C3=BCrnberg, Germany
+GF: Felix Imend=C3=B6rffer, Jane Smithard, Graham Norton
+HRB 21284 (AG N=C3=BCrnberg)
