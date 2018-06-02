@@ -1,26 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37171)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37772)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1fOvET-0006Kp-LY
-	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 21:21:26 -0400
+	(envelope-from <jsnow@redhat.com>) id 1fOvFf-0006ri-Dg
+	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 21:22:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1fOvEQ-0003rC-H3
-	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 21:21:25 -0400
-Resent-Message-Id: <E1fOvEQ-0003rC-H3@eggs.gnu.org>
-Received: from sender-of-o51.zoho.com ([135.84.80.216]:21073)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1fOvEQ-0003pu-BS
-	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 21:21:22 -0400
-In-Reply-To: <152768551387.13955.7085403440722380428.stgit@pasha-ThinkPad-T60>
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <152768721896.303.17095517854312599022@d39dc562802a>
+	(envelope-from <jsnow@redhat.com>) id 1fOvFd-0004ww-OS
+	for qemu-devel@nongnu.org; Fri, 01 Jun 2018 21:22:39 -0400
+References: <20180417153945.20737-1-pbonzini@redhat.com>
+	<20180417153945.20737-2-pbonzini@redhat.com>
+From: John Snow <jsnow@redhat.com>
+Message-ID: <8e293555-d8f0-3a00-00d1-2aac514eb1f2@redhat.com>
+Date: Fri, 1 Jun 2018 21:22:29 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Wed, 30 May 2018 06:33:39 -0700 (PDT)
-Subject: Re: [Qemu-devel] [RFC PATCH v1 0/2] QEMU binary instrumentation
- prototype
+In-Reply-To: <20180417153945.20737-2-pbonzini@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 1/6] ahci: move PIO Setup FIS before
+ transfer, fix it for ATAPI commands
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,63 +25,271 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: pavel.dovgaluk@gmail.com
-Cc: famz@redhat.com, qemu-devel@nongnu.org
+To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
-c3NhZ2UtaWQ6IDE1Mjc2ODU1MTM4Ny4xMzk1NS43MDg1NDAzNDQwNzIyMzgwNDI4LnN0Z2l0QHBh
-c2hhLVRoaW5rUGFkLVQ2MApTdWJqZWN0OiBbUWVtdS1kZXZlbF0gW1JGQyBQQVRDSCB2MSAwLzJd
-IFFFTVUgYmluYXJ5IGluc3RydW1lbnRhdGlvbiBwcm90b3R5cGUKCj09PSBURVNUIFNDUklQVCBC
-RUdJTiA9PT0KIyEvYmluL2Jhc2gKCkJBU0U9YmFzZQpuPTEKdG90YWw9JChnaXQgbG9nIC0tb25l
-bGluZSAkQkFTRS4uIHwgd2MgLWwpCmZhaWxlZD0wCgpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5y
-ZW5hbWVsaW1pdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQpnaXQgY29u
-ZmlnIC0tbG9jYWwgZGlmZi5hbGdvcml0aG0gaGlzdG9ncmFtCgpjb21taXRzPSIkKGdpdCBsb2cg
-LS1mb3JtYXQ9JUggLS1yZXZlcnNlICRCQVNFLi4pIgpmb3IgYyBpbiAkY29tbWl0czsgZG8KICAg
-IGVjaG8gIkNoZWNraW5nIFBBVENIICRuLyR0b3RhbDogJChnaXQgbG9nIC1uIDEgLS1mb3JtYXQ9
-JXMgJGMpLi4uIgogICAgaWYgISBnaXQgc2hvdyAkYyAtLWZvcm1hdD1lbWFpbCB8IC4vc2NyaXB0
-cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgLTsgdGhlbgogICAgICAgIGZhaWxlZD0xCiAgICAg
-ICAgZWNobwogICAgZmkKICAgIG49JCgobisxKSkKZG9uZQoKZXhpdCAkZmFpbGVkCj09PSBURVNU
-IFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQxZGVmN2Y0NGJk
-ODg4NzEzMzg0CkZyb20gaHR0cHM6Ly9naXRodWIuY29tL3BhdGNoZXctcHJvamVjdC9xZW11CiAq
-IFtuZXcgdGFnXSAgICAgICAgICAgICAgIHBhdGNoZXcvMTUyNzY4NTUxMzg3LjEzOTU1LjcwODU0
-MDM0NDA3MjIzODA0Mjguc3RnaXRAcGFzaGEtVGhpbmtQYWQtVDYwIC0+IHBhdGNoZXcvMTUyNzY4
-NTUxMzg3LjEzOTU1LjcwODU0MDM0NDA3MjIzODA0Mjguc3RnaXRAcGFzaGEtVGhpbmtQYWQtVDYw
-CiB0IFt0YWcgdXBkYXRlXSAgICAgICAgICAgIHBhdGNoZXcvMjAxODA1MTcwODE1MjcuMTQ0MTAt
-MS1kYXZpZEByZWRoYXQuY29tIC0+IHBhdGNoZXcvMjAxODA1MTcwODE1MjcuMTQ0MTAtMS1kYXZp
-ZEByZWRoYXQuY29tCiB0IFt0YWcgdXBkYXRlXSAgICAgICAgICAgIHBhdGNoZXcvMjAxODA1Mjkx
-OTM3MzAuOTIwNC0xLWNyb3NhQHJlZGhhdC5jb20gLT4gcGF0Y2hldy8yMDE4MDUyOTE5MzczMC45
-MjA0LTEtY3Jvc2FAcmVkaGF0LmNvbQpTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCjky
-NTIxMzBkZTMgdGNnOiBhZGQgaW5zdHJ1bWVudGluZyBtb2R1bGUKZjg0NWZiZDdhZiB0Y2c6IGFk
-ZCBoZWFkZXJzIGZvciBub24tdGFyZ2V0IGhlbHBlcnMKCj09PSBPVVRQVVQgQkVHSU4gPT09CkNo
-ZWNraW5nIFBBVENIIDEvMjogdGNnOiBhZGQgaGVhZGVycyBmb3Igbm9uLXRhcmdldCBoZWxwZXJz
-Li4uCldBUk5JTkc6IGFkZGVkLCBtb3ZlZCBvciBkZWxldGVkIGZpbGUocyksIGRvZXMgTUFJTlRB
-SU5FUlMgbmVlZCB1cGRhdGluZz8KIzEzOiAKbmV3IGZpbGUgbW9kZSAxMDA2NDQKCkVSUk9SOiBk
-byBub3QgdXNlIEM5OSAvLyBjb21tZW50cwojNzA6IEZJTEU6IGluY2x1ZGUvZXhlYy9oZWxwZXIt
-cmVnaXN0ZXIuaDo1MzoKKyNlbmRpZiAvLyBIRUxQRVJfUkVHSVNURVJfSAoKdG90YWw6IDEgZXJy
-b3JzLCAxIHdhcm5pbmdzLCA4MCBsaW5lcyBjaGVja2VkCgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBw
-cm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNl
-IHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0gg
-aW4gTUFJTlRBSU5FUlMuCgpDaGVja2luZyBQQVRDSCAyLzI6IHRjZzogYWRkIGluc3RydW1lbnRp
-bmcgbW9kdWxlLi4uCldBUk5JTkc6IGFkZGVkLCBtb3ZlZCBvciBkZWxldGVkIGZpbGUocyksIGRv
-ZXMgTUFJTlRBSU5FUlMgbmVlZCB1cGRhdGluZz8KIzI1OiAKbmV3IGZpbGUgbW9kZSAxMDA2NDQK
-CkVSUk9SOiBkbyBub3QgdXNlIEM5OSAvLyBjb21tZW50cwojNTk6IEZJTEU6IGFjY2VsL3RjZy9p
-bnN0cnVtZW50L2luc3RydW1lbnQuYzoxNjoKKy8vI2RlZmluZSBRSV9BTEwKCkVSUk9SOiBkbyBu
-b3QgdXNlIEM5OSAvLyBjb21tZW50cwojNzI6IEZJTEU6IGFjY2VsL3RjZy9pbnN0cnVtZW50L2lu
-c3RydW1lbnQuYzoyOToKKyAgICAvLyBpbnQgODBoIGlzIHByb2Nlc3NlZCBieSBleGNlcHRpb24g
-aGFuZGxlcnMKCkVSUk9SOiB0cmFpbGluZyB3aGl0ZXNwYWNlCiM4NzogRklMRTogYWNjZWwvdGNn
-L2luc3RydW1lbnQvaW5zdHJ1bWVudC5jOjQ0OgorI2VuZGlmICAgICQKCkVSUk9SOiBzcGFjZXMg
-cmVxdWlyZWQgYXJvdW5kIHRoYXQgJz0nIChjdHg6VnhXKQojOTU6IEZJTEU6IGFjY2VsL3RjZy9p
-bnN0cnVtZW50L2luc3RydW1lbnQuYzo1MjoKKyAgICBUQ0d2X3B0ciB0X2NwdT0gdGNnX2NvbnN0
-X3B0cihjcHUpOwogICAgICAgICAgICAgICAgICAgXgoKRVJST1I6ICIoZm9vKikiIHNob3VsZCBi
-ZSAiKGZvbyAqKSIKIzExMTogRklMRTogYWNjZWwvdGNnL2luc3RydW1lbnQvaW5zdHJ1bWVudC5j
-OjY4OgorICAgIENQVUFyY2hTdGF0ZSAqZW52ID0gKChDUFVTdGF0ZSopY3B1KS0+ZW52X3B0cjsK
-CkVSUk9SOiBkbyBub3QgdXNlIEM5OSAvLyBjb21tZW50cwojMTQyOiBGSUxFOiBhY2NlbC90Y2cv
-aW5zdHJ1bWVudC9pbnN0cnVtZW50Lmg6MTE6CisjZW5kaWYgLy8gSU5TVFJVTUVOVF9ICgp0b3Rh
-bDogNiBlcnJvcnMsIDEgd2FybmluZ3MsIDEzMyBsaW5lcyBjaGVja2VkCgpZb3VyIHBhdGNoIGhh
-cyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMK
-YXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNI
-RUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29tbWFu
-ZCBleGl0ZWQgd2l0aCBjb2RlOiAxCgoKLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5
-IGJ5IFBhdGNoZXcgW2h0dHA6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRi
-YWNrIHRvIHBhdGNoZXctZGV2ZWxAcmVkaGF0LmNvbQ==
+
+
+On 04/17/2018 11:39 AM, Paolo Bonzini wrote:
+> The PIO Setup FIS is written in the PIO:Entry state, which comes before
+> the ATA and ATAPI data transfer states.  As a result, the PIO Setup FIS
+> interrupt is now raised before DMA ends for ATAPI commands, and tests h=
+ave
+> to be adjusted.
+>=20
+
+Yes, this is correct.
+
+Unfortunately you wandered into one of the messiest areas of AHCI :(
+
+> This is also hinted by the description of the command header in the AHC=
+I
+> specification, where the "A" bit is described as
+>=20
+>     When =E2=80=981=E2=80=99, indicates that a PIO setup FIS shall be s=
+ent by the device
+>     indicating a transfer for the ATAPI command.
+>=20
+> and also by the description of the ACMD (ATAPI command region):
+>=20
+>     The ATAPI command must be either 12 or 16 bytes in length. The leng=
+th
+>     transmitted by the HBA is determined by the PIO setup FIS that is s=
+ent
+>     by the device requesting the ATAPI command.
+>=20
+
+I wonder how this works in practice...?
+
+PACKET gets delivered to a SATA device via the HBA, and a Register
+Host-To-Device FIS.
+
+The SATA device, seeing that it's a PACKET command, knows that it now
+needs to begin listening for PIO data, because the packet is implicitly
+transferred via PIO mechanisms.
+
+The SATA device generates a PIO Setup FIS to indicate it is ready to
+receive data. I suppose it fills it as such:
+
+- FIS Type: 0x5F
+
+- PM Port: 0
+
+- D: 0, because this is a Host-to-Device PIO.
+  (We never fill this any differently in the AHCI emulator right now.)
+
+- I: "Interrupt bit line of the device." I don't think we track this
+  correctly. We're copying in the IRQ status of the HBA here, which is
+  wrong.
+
+- Status: Should be the status register after receiving the H2D Register
+  update FIS, but prior to the data transfer, I think. "New value of the
+  Status register of the Command Block for initiation of host data
+  transfer."
+  I think this is being set correctly after this patch.
+
+- Error: "Contains the new value of the Error register of the Command
+  Block at the conclusion of all subsequent Data to Device frames."
+
+  This is why we were sending out post-hoc PIO Setup FIS frames before,
+  how would I know what the error register *will* be...? What?
+
+- LBA: Presumably unimportant for the purposes of receiving a command
+  PACKET, as we won't be writing it to disk, but a buffer. The values
+  can be reported dutifully.
+
+- Device: Just report the register value dutifully.
+
+- Count: Likely just relays 0, as the H2D REG FIS should have updated
+  that to zero as part of the PACKET command, as per ATA8 ACS3 7.21.3.
+  In any case, just report the register value dutifully.
+
+- E_Status: "Contains the new value of the Status register of the
+  Command Block at the conclusion of the subsequent Data FIS."
+
+  Again, how would I know...?
+
+- Transfer Count: Should be 12, as per what we specified in 0xA1
+  IDENTIFY PACKET DEVICE, see core.c line 234. Your patch gets this
+  correct, as we'll actually report the PIO FIS for the packet itself.
+
+
+What this patch does do, though, is change the context of the Status,
+Error and E_Status registers to something different. Everything else
+should be the same, but I'd feel better about taking this patch if I
+understood what exactly this FIS packet was supposed to convey, but I don=
+'t.
+
+> QEMU, which conflates the "generator" and the "receiver" of the FIS int=
+o
+> one device, always uses ATAPI_PACKET_SIZE, aka 12, for the length.
+>=20
+
+Yeah, it's pretty messy. We play both the SATA device and the HBA
+receiver in one single function. A bad delineation in the code between
+SCSI, ATA, SATA and AHCI makes it hard to follow.
+
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> ---
+>  hw/ide/ahci.c       | 15 ++++++---------
+>  tests/libqos/ahci.c | 30 ++++++++++++++++++++++++++----
+>  tests/libqos/ahci.h |  2 ++
+>  3 files changed, 34 insertions(+), 13 deletions(-)
+>=20
+> diff --git a/hw/ide/ahci.c b/hw/ide/ahci.c
+> index e22d7be05f..45ce195fb8 100644
+> --- a/hw/ide/ahci.c
+> +++ b/hw/ide/ahci.c
+> @@ -1291,11 +1291,12 @@ static void ahci_start_transfer(IDEDMA *dma)
+>      int is_write =3D opts & AHCI_CMD_WRITE;
+>      int is_atapi =3D opts & AHCI_CMD_ATAPI;
+>      int has_sglist =3D 0;
+> +    uint16_t fis_len;
+> =20
+>      if (is_atapi && !ad->done_atapi_packet) {
+>          /* already prepopulated iobuffer */
+>          ad->done_atapi_packet =3D true;
+> -        size =3D 0;
+> +        fis_len =3D size;
+>          goto out;
+>      }
+> =20
+> @@ -1315,19 +1316,15 @@ static void ahci_start_transfer(IDEDMA *dma)
+>          }
+>      }
+> =20
+> +    /* Update number of transferred bytes, destroy sglist */
+> +    dma_buf_commit(s, size);
+> +    fis_len =3D le32_to_cpu(ad->cur_cmd->status);
+>  out:
+>      /* declare that we processed everything */
+>      s->data_ptr =3D s->data_end;
+> -
+> -    /* Update number of transferred bytes, destroy sglist */
+> -    dma_buf_commit(s, size);
+> +    ahci_write_fis_pio(ad, fis_len);
+> =20
+>      s->end_transfer_func(s);
+> -
+> -    if (!(s->status & DRQ_STAT)) {
+> -        /* done with PIO send/receive */
+> -        ahci_write_fis_pio(ad, le32_to_cpu(ad->cur_cmd->status));
+> -    }
+>  }
+
+So in the ATAPI command packet case, this just changes the size from 0
+to the length of the FIS, avoids performing a useless dma_buf_commit,
+and writes the PIO Setup FIS prior to invoking the ATAPI emulator.
+
+OK! That's definitely better.
+
+In the normal ATA/ATAPI data transfer sense, this still performs the
+data transfer prior to sending the PIO Setup FIS, but doesn't
+necessarily wait for the end of the command.
+
+Next, the fis_len we now calculate is based on the cumulative transfer
+size thus far and not the size of the Data FIS we're pretending to have
+transferred. If we're sending multiple PIO Setup FIS'es per-command, we
+might over-report the total number of bytes transferred.
+
+I think the correct thing to do is probably actually to do one PIO Setup
+FIS per PIO transfer that reports only the size of the chunk being
+transferred, which means a lot of the PIO tests are wrong because they
+can't rely on the PIO FIS to report the total transfer size.
+
+> =20
+>  static void ahci_start_dma(IDEDMA *dma, IDEState *s,
+> diff --git a/tests/libqos/ahci.c b/tests/libqos/ahci.c
+> index bc201d762b..04f33e246c 100644
+> --- a/tests/libqos/ahci.c
+> +++ b/tests/libqos/ahci.c
+> @@ -477,6 +477,23 @@ void ahci_port_check_d2h_sanity(AHCIQState *ahci, =
+uint8_t port, uint8_t slot)
+>      g_free(d2h);
+>  }
+> =20
+> +void ahci_port_check_pio_sanity_atapi(AHCIQState *ahci, uint8_t port,
+> +                                      uint8_t slot)
+> +{
+> +    PIOSetupFIS *pio =3D g_malloc0(0x20);
+> +
+> +    /* We cannot check the Status or E_Status registers, because
+> +     * the status may have again changed between the PIO Setup FIS
+> +     * and the conclusion of the command with the D2H Register FIS. */
+> +    qtest_memread(ahci->parent->qts, ahci->port[port].fb + 0x20, pio, =
+0x20);
+> +    g_assert_cmphex(pio->fis_type, =3D=3D, 0x5f);
+> +
+> +    g_assert(le16_to_cpu(pio->tx_count) =3D=3D 12 ||
+> +             le16_to_cpu(pio->tx_count) =3D=3D 16);
+> +
+> +    g_free(pio);
+> +}
+> +
+>  void ahci_port_check_pio_sanity(AHCIQState *ahci, uint8_t port,
+>                                  uint8_t slot, size_t buffsize)
+>  {
+> @@ -831,9 +848,9 @@ void ahci_command_enable_atapi_dma(AHCICommand *cmd=
+)
+>      RegH2DFIS *fis =3D &(cmd->fis);
+>      g_assert(cmd->props->atapi);
+>      fis->feature_low |=3D 0x01;
+> -    cmd->interrupts &=3D ~AHCI_PX_IS_PSS;
+> +    /* PIO is still used to transfer the ATAPI command */
+> +    g_assert(cmd->props->pio);
+>      cmd->props->dma =3D true;
+> -    cmd->props->pio =3D false;
+>      /* BUG: We expect the DMA Setup interrupt for DMA commands */
+>      /* cmd->interrupts |=3D AHCI_PX_IS_DSS; */
+>  }
+> @@ -845,7 +862,7 @@ AHCICommand *ahci_command_create(uint8_t command_na=
+me)
+> =20
+>      g_assert(props);
+>      cmd =3D g_new0(AHCICommand, 1);
+> -    g_assert(!(props->dma && props->pio));
+> +    g_assert(!(props->dma && props->pio) || props->atapi);
+>      g_assert(!(props->lba28 && props->lba48));
+>      g_assert(!(props->read && props->write));
+>      g_assert(!props->size || props->data);
+> @@ -1216,7 +1233,12 @@ void ahci_command_verify(AHCIQState *ahci, AHCIC=
+ommand *cmd)
+>          ahci_port_check_d2h_sanity(ahci, port, slot);
+>      }
+>      if (cmd->props->pio) {
+> -        ahci_port_check_pio_sanity(ahci, port, slot, cmd->xbytes);
+> +        /* For ATAPI, we might have only used PIO for the command.  */
+> +        if (cmd->props->atapi && (!cmd->xbytes || cmd->props->dma)) {
+> +            ahci_port_check_pio_sanity_atapi(ahci, port, slot);
+> +        } else {
+> +            ahci_port_check_pio_sanity(ahci, port, slot, cmd->xbytes);
+> +        }
+>      }
+>  }
+> =20
+> diff --git a/tests/libqos/ahci.h b/tests/libqos/ahci.h
+> index 715ca1e226..cdba8099dd 100644
+> --- a/tests/libqos/ahci.h
+> +++ b/tests/libqos/ahci.h
+> @@ -598,6 +598,8 @@ void ahci_port_check_nonbusy(AHCIQState *ahci, uint=
+8_t port, uint8_t slot);
+>  void ahci_port_check_d2h_sanity(AHCIQState *ahci, uint8_t port, uint8_=
+t slot);
+>  void ahci_port_check_pio_sanity(AHCIQState *ahci, uint8_t port,
+>                                  uint8_t slot, size_t buffsize);
+> +void ahci_port_check_pio_sanity_atapi(AHCIQState *ahci, uint8_t port,
+> +                                      uint8_t slot);
+>  void ahci_port_check_cmd_sanity(AHCIQState *ahci, AHCICommand *cmd);
+> =20
+>  /* Misc */
+>=20
+
+It's definitely no more wrong than what we do now, but I'm still
+confused as hell over the right way to do them.
+
+I might still stage it even though I am pretty sure it's wrong, because
+I *know* the current behavior is very wrong and a lot of things still
+seem to get along just fine :)
+
+Let me know if you can help clarify my thinking on this one.
+--js
