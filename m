@@ -1,21 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55049)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45832)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcel.apfelbaum@gmail.com>) id 1fPPHj-00024x-0x
-	for qemu-devel@nongnu.org; Sun, 03 Jun 2018 05:26:48 -0400
+	(envelope-from <bounces@canonical.com>) id 1fPQkq-0006xr-Ex
+	for qemu-devel@nongnu.org; Sun, 03 Jun 2018 07:00:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcel.apfelbaum@gmail.com>) id 1fPPHf-0008Dh-Px
-	for qemu-devel@nongnu.org; Sun, 03 Jun 2018 05:26:47 -0400
-Received: from mail-wm0-x243.google.com ([2a00:1450:400c:c09::243]:38574)
+	(envelope-from <bounces@canonical.com>) id 1fPQkn-0001LZ-Dr
+	for qemu-devel@nongnu.org; Sun, 03 Jun 2018 07:00:56 -0400
+Received: from indium.canonical.com ([91.189.90.7]:37544)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <marcel.apfelbaum@gmail.com>)
-	id 1fPPHf-0008Cs-JR
-	for qemu-devel@nongnu.org; Sun, 03 Jun 2018 05:26:43 -0400
-Received: by mail-wm0-x243.google.com with SMTP id m129-v6so9305916wmb.3
-	for <qemu-devel@nongnu.org>; Sun, 03 Jun 2018 02:26:43 -0700 (PDT)
-From: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
-Date: Sun,  3 Jun 2018 12:27:49 +0300
-Message-Id: <20180603092749.107476-1-marcel.apfelbaum@gmail.com>
-Subject: [Qemu-devel] [PATCH RFC] hw/pc: set q35 as the default x86 machine
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1fPQkn-0001LT-7K
+	for qemu-devel@nongnu.org; Sun, 03 Jun 2018 07:00:53 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1fPQkl-0005Kz-Ty
+	for <qemu-devel@nongnu.org>; Sun, 03 Jun 2018 11:00:51 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id E17C02E80C7
+	for <qemu-devel@nongnu.org>; Sun,  3 Jun 2018 11:00:51 +0000 (UTC)
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Sun, 03 Jun 2018 10:51:49 -0000
+From: tsiros <1774853@bugs.launchpad.net>
+Reply-To: Bug 1774853 <1774853@bugs.launchpad.net>
+Sender: bounces@canonical.com
+Message-Id: <152802310962.26200.2575137842813128178.malonedeb@wampee.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1774853] [NEW] claims temp file is used by
+ another process
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,68 +37,43 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: mst@redhat.com, pbonzini@redhat.com, ehabkost@redhat.com, rth@twiddle.net, marcel.apfelbaum@gmail.com
 
-Moving to QEMU 3.0 seems like a good opportunity for such a change.
+Public bug reported:
 
-I440FX is really old and does not support modern features like IOMMU.
-Q35's SATA emulation is faster than pc's IDE, native PCI express hotplug
-is cleaner than ACPI based one and so on...
+QEMU emulator version 2.12.50 (v2.12.0-12378-g99a34dc4d2-dirty)
 
-Also the libvirt guys added very good support for the Q35 machine (thanks!).
+"c:\Program Files\qemu\qemu-system-x86_64.exe" -net none -parallel none -bi=
+os OVMF.fd -L . -hda fat:rw:image
+vvfat image chs 1024,16,63
+c:\Program Files\qemu\qemu-system-x86_64.exe: -hda fat:rw:image: Could not =
+open 'C:\Users\tsiros\AppData\Local\Temp\qem5B92.tmp': The process cannot a=
+ccess the file because it is being used by another process.
 
-Management software should always specify the machine type and for the
-current setups, adding '-machine pc' to the command line is not such a
-big deal.
+** Affects: qemu
+     Importance: Undecided
+         Status: New
 
-In time the pc machine will fade out and we will probably stop adding
-new versions at some point.
+-- =
 
-Signed-off-by: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
----
- hw/i386/pc_piix.c | 2 --
- hw/i386/pc_q35.c  | 2 ++
- 2 files changed, 2 insertions(+), 2 deletions(-)
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1774853
 
-diff --git a/hw/i386/pc_piix.c b/hw/i386/pc_piix.c
-index b4c5b03274..16dd65198f 100644
---- a/hw/i386/pc_piix.c
-+++ b/hw/i386/pc_piix.c
-@@ -429,7 +429,6 @@ static void pc_i440fx_3_0_machine_options(MachineClass *m)
- {
-     pc_i440fx_machine_options(m);
-     m->alias = "pc";
--    m->is_default = 1;
- }
- 
- DEFINE_I440FX_MACHINE(v3_0, "pc-i440fx-3.0", NULL,
-@@ -438,7 +437,6 @@ DEFINE_I440FX_MACHINE(v3_0, "pc-i440fx-3.0", NULL,
- static void pc_i440fx_2_12_machine_options(MachineClass *m)
- {
-     pc_i440fx_3_0_machine_options(m);
--    m->is_default = 0;
-     m->alias = NULL;
-     SET_MACHINE_COMPAT(m, PC_COMPAT_2_12);
- }
-diff --git a/hw/i386/pc_q35.c b/hw/i386/pc_q35.c
-index 83d6d75efa..b33c235d49 100644
---- a/hw/i386/pc_q35.c
-+++ b/hw/i386/pc_q35.c
-@@ -312,6 +312,7 @@ static void pc_q35_3_0_machine_options(MachineClass *m)
- {
-     pc_q35_machine_options(m);
-     m->alias = "q35";
-+    m->is_default = 1;
- }
- 
- DEFINE_Q35_MACHINE(v3_0, "pc-q35-3.0", NULL,
-@@ -321,6 +322,7 @@ static void pc_q35_2_12_machine_options(MachineClass *m)
- {
-     pc_q35_3_0_machine_options(m);
-     m->alias = NULL;
-+    m->is_default = 0;
-     SET_MACHINE_COMPAT(m, PC_COMPAT_2_12);
- }
- 
--- 
-2.13.6
+Title:
+  claims temp file is used by another process
+
+Status in QEMU:
+  New
+
+Bug description:
+  QEMU emulator version 2.12.50 (v2.12.0-12378-g99a34dc4d2-dirty)
+
+  "c:\Program Files\qemu\qemu-system-x86_64.exe" -net none -parallel none -=
+bios OVMF.fd -L . -hda fat:rw:image
+  vvfat image chs 1024,16,63
+  c:\Program Files\qemu\qemu-system-x86_64.exe: -hda fat:rw:image: Could no=
+t open 'C:\Users\tsiros\AppData\Local\Temp\qem5B92.tmp': The process cannot=
+ access the file because it is being used by another process.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1774853/+subscriptions
