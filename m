@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35463)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57712)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <joel.stan@gmail.com>) id 1fPHCf-0006V9-UT
-	for qemu-devel@nongnu.org; Sat, 02 Jun 2018 20:49:03 -0400
+	(envelope-from <zhangckid@gmail.com>) id 1fPLDN-00088P-IC
+	for qemu-devel@nongnu.org; Sun, 03 Jun 2018 01:06:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <joel.stan@gmail.com>) id 1fPHCe-000855-Rw
-	for qemu-devel@nongnu.org; Sat, 02 Jun 2018 20:49:01 -0400
-MIME-Version: 1.0
-Sender: joel.stan@gmail.com
-In-Reply-To: <20180601144328.23817-3-peter.maydell@linaro.org>
-References: <20180601144328.23817-1-peter.maydell@linaro.org>
-	<20180601144328.23817-3-peter.maydell@linaro.org>
-From: Joel Stanley <joel@jms.id.au>
-Date: Sun, 3 Jun 2018 10:18:35 +0930
-Message-ID: <CACPK8XfOZezMM2fL1aNoPx7Gjc1zeCJf5MNaS4FOPfZ5XABB2w@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH 2/2] hw/arm/armv7m: Remove unused
- armv7m_init() function
+	(envelope-from <zhangckid@gmail.com>) id 1fPLDK-0000dm-B2
+	for qemu-devel@nongnu.org; Sun, 03 Jun 2018 01:06:01 -0400
+Received: from mail-pl0-x242.google.com ([2607:f8b0:400e:c01::242]:34827)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <zhangckid@gmail.com>) id 1fPLDK-0000dE-45
+	for qemu-devel@nongnu.org; Sun, 03 Jun 2018 01:05:58 -0400
+Received: by mail-pl0-x242.google.com with SMTP id i5-v6so17657513plt.2
+	for <qemu-devel@nongnu.org>; Sat, 02 Jun 2018 22:05:56 -0700 (PDT)
+From: Zhang Chen <zhangckid@gmail.com>
+Date: Sun,  3 Jun 2018 13:05:29 +0800
+Message-Id: <20180603050546.6827-1-zhangckid@gmail.com>
+Subject: [Qemu-devel] [PATCH V8 00/17] COLO: integrate colo frame with block
+ replication and COLO proxy
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,102 +24,97 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, patches@linaro.org, Julia Suvorova <jusual@mail.ru>, Stefan Hajnoczi <stefanha@redhat.com>, Jim Mussared <jim@groklearning.com>, =?UTF-8?Q?Steffen_G=C3=B6rtz?= <mail@steffen-goertz.de>
+To: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Juan Quintela <quintela@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Jason Wang <jasowang@redhat.com>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>
+Cc: Zhang Chen <zhangckid@gmail.com>, zhanghailiang <zhang.zhanghailiang@huawei.com>, Li Zhijian <lizhijian@cn.fujitsu.com>
 
-Hi Peter,
+Hi~ All~
 
-On 2 June 2018 at 00:13, Peter Maydell <peter.maydell@linaro.org> wrote:
-> Remove the now-unused armv7m_init() function. This was a legacy from
-> before we properly QOMified ARMv7M, and it has some flaws:
->
->  * it combines work that needs to be done by an SoC object (creating
->    and initializing the TYPE_ARMV7M object) with work that needs to
->    be done by the board model (setting the system up to load the ELF
->    file specified with -kernel)
->  * TYPE_ARMV7M creation failure is fatal, but an SoC object wants to
->    arrange to propagate the failure outward
->  * it uses allocate-and-create via qdev_create() whereas the current
->    preferred style for SoC objects is to do creation in-place
->
-> Board and SoC models can instead do the two jobs this function
-> was doing themselves, in the right places and with whatever their
-> preferred style/error handling is.
->
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-> ---
->  include/hw/arm/arm.h |  8 ++------
->  hw/arm/armv7m.c      | 21 ---------------------
->  2 files changed, 2 insertions(+), 27 deletions(-)
->
-> diff --git a/include/hw/arm/arm.h b/include/hw/arm/arm.h
-> index 70fa2287e2..ffed39252d 100644
-> --- a/include/hw/arm/arm.h
-> +++ b/include/hw/arm/arm.h
-> @@ -23,9 +23,6 @@ typedef enum {
->      ARM_ENDIANNESS_BE32,
->  } arm_endianness;
->
-> -/* armv7m.c */
-> -DeviceState *armv7m_init(MemoryRegion *system_memory, int mem_size, int num_irq,
-> -                         const char *kernel_filename, const char *cpu_type);
->  /**
->   * armv7m_load_kernel:
->   * @cpu: CPU
-> @@ -33,9 +30,8 @@ DeviceState *armv7m_init(MemoryRegion *system_memory, int mem_size, int num_irq,
->   * @mem_size: mem_size: maximum image size to load
->   *
->   * Load the guest image for an ARMv7M system. This must be called by
-> - * any ARMv7M board, either directly or via armv7m_init(). (This is
-> - * necessary to ensure that the CPU resets correctly on system reset,
-> - * as well as for kernel loading.)
-> + * any ARMv7M board. (This is necessary to ensure that the CPU resets
-> + * correctly on system reset, as well as for kernel loading.)
->   */
->  void armv7m_load_kernel(ARMCPU *cpu, const char *kernel_filename, int mem_size);
->
-> diff --git a/hw/arm/armv7m.c b/hw/arm/armv7m.c
-> index f123cc7d3d..a4ab7d2069 100644
-> --- a/hw/arm/armv7m.c
-> +++ b/hw/arm/armv7m.c
-> @@ -261,27 +261,6 @@ static void armv7m_reset(void *opaque)
->      cpu_reset(CPU(cpu));
->  }
->
-> -/* Init CPU and memory for a v7-M based board.
-> -   mem_size is in bytes.
-> -   Returns the ARMv7M device.  */
-> -
-> -DeviceState *armv7m_init(MemoryRegion *system_memory, int mem_size, int num_irq,
-> -                         const char *kernel_filename, const char *cpu_type)
-> -{
-> -    DeviceState *armv7m;
-> -
-> -    armv7m = qdev_create(NULL, TYPE_ARMV7M);
-> -    qdev_prop_set_uint32(armv7m, "num-irq", num_irq);
-> -    qdev_prop_set_string(armv7m, "cpu-type", cpu_type);
-> -    object_property_set_link(OBJECT(armv7m), OBJECT(get_system_memory()),
-> -                                     "memory", &error_abort);
+COLO Frame, block replication and COLO proxy(colo-compare,filter-mirror,
+filter-redirector,filter-rewriter) have been exist in qemu
+for long time, it's time to integrate these three parts to make COLO really works.
 
-It looks like the snippet above is going to be a cut/paste for all v7m machines.
+In this series, we have some optimizations for COLO frame, including separating the
+process of saving ram and device state, using an COLO_EXIT event to notify users that
+VM exits COLO, for these parts, most of them have been reviewed long time ago in old version,
+but since this series have just rebased on upstream which had merged a new series of migration,
+parts of pathes in this series deserve review again.
 
-Would it achieve your goal by instead removing the armv7m_load_kernel
-call from this function?
+We use notifier/callback method for COLO compare to notify COLO frame about
+net packets inconsistent event, and add a handle_event method for NetFilterClass to
+help COLO frame to notify filters and colo-compare about checkpoint/failover event,
+it is flexible.
 
-Cheers,
+For the neweset version, please refer to:
+https://github.com/zhangckid/qemu/tree/qemu-colo-18jun1
 
-Joel
+Please review, thanks.
 
-> -    /* This will exit with an error if the user passed us a bad cpu_type */
-> -    qdev_init_nofail(armv7m);
-> -
-> -    armv7m_load_kernel(ARM_CPU(first_cpu), kernel_filename, mem_size);
-> -    return armv7m;
-> -}
-> -
->  void armv7m_load_kernel(ARMCPU *cpu, const char *kernel_filename, int mem_size)
->  {
->      int image_size;
-> --
-> 2.17.1
->
+V8:
+ - Rebased on upstream codes.
+ - Addressed Markus's comments in patch 10/17.
+ - Addressed Markus's comments in patch 11/17.
+ - Removed some comments in patch 4/17.
+ - Moved the "migration_bitmap_clear_dirty()" to suitable position in
+   patch 9/17.
+ - Rewrote the patch 07/17 to address Davie's comments.
+ - Moved the "qemu_savevm_live_state" out of the
+   qemu_mutex_lock_iothread.
+ - Fixed the bug that in some status COLO vm crash with segmentation fault.
+
+V7:
+ - Addressed Markus's comments in 11/17.
+ - Rebased on upstream.
+
+V6:
+ - Addressed Eric Blake's comments, use the enum to feedback in patch 11/17.
+ - Fixed QAPI command separator problem in patch 11/17.
+
+
+Zhang Chen (13):
+  filter-rewriter: fix memory leak for connection in
+    connection_track_table
+  colo-compare: implement the process of checkpoint
+  colo-compare: use notifier to notify packets comparing result
+  COLO: integrate colo compare with colo frame
+  COLO: Add block replication into colo process
+  COLO: Remove colo_state migration struct
+  COLO: Load dirty pages into SVM's RAM cache firstly
+  ram/COLO: Record the dirty pages that SVM received
+  COLO: Flush memory data from ram cache
+  qapi: Add new command to query colo status
+  savevm: split the process of different stages for loadvm/savevm
+  filter: Add handle_event method for NetFilterClass
+  filter-rewriter: handle checkpoint and failover event
+
+zhanghailiang (4):
+  qmp event: Add COLO_EXIT event to notify users while exited COLO
+  COLO: flush host dirty ram from cache
+  COLO: notify net filters about checkpoint/failover event
+  COLO: quick failover process by kick COLO thread
+
+ include/exec/ram_addr.h  |   1 +
+ include/migration/colo.h |  11 +-
+ include/net/filter.h     |   5 +
+ migration/Makefile.objs  |   2 +-
+ migration/colo-comm.c    |  76 -------------
+ migration/colo.c         | 239 +++++++++++++++++++++++++++++++++++++--
+ migration/migration.c    |  44 ++++++-
+ migration/ram.c          | 163 +++++++++++++++++++++++++-
+ migration/ram.h          |   4 +
+ migration/savevm.c       |  53 +++++++--
+ migration/savevm.h       |   5 +
+ migration/trace-events   |   3 +
+ net/colo-compare.c       | 108 ++++++++++++++++--
+ net/colo-compare.h       |  24 ++++
+ net/colo.h               |   4 +
+ net/filter-rewriter.c    | 109 ++++++++++++++++--
+ net/filter.c             |  17 +++
+ net/net.c                |  28 +++++
+ qapi/migration.json      |  72 ++++++++++++
+ vl.c                     |   2 -
+ 20 files changed, 851 insertions(+), 119 deletions(-)
+ delete mode 100644 migration/colo-comm.c
+ create mode 100644 net/colo-compare.h
+
+-- 
+2.17.GIT
