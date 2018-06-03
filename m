@@ -1,34 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44839)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52862)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fPW4N-0008PV-AG
-	for qemu-devel@nongnu.org; Sun, 03 Jun 2018 12:41:28 -0400
+	(envelope-from <wexu@redhat.com>) id 1fPX3E-0001Iw-G5
+	for qemu-devel@nongnu.org; Sun, 03 Jun 2018 13:44:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fPW4K-0005yp-5f
-	for qemu-devel@nongnu.org; Sun, 03 Jun 2018 12:41:27 -0400
-Received: from indium.canonical.com ([91.189.90.7]:42354)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1fPW4J-0005yD-VT
-	for qemu-devel@nongnu.org; Sun, 03 Jun 2018 12:41:24 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1fPW4H-0000Pn-TT
-	for <qemu-devel@nongnu.org>; Sun, 03 Jun 2018 16:41:22 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id DE0DD2E88D3
-	for <qemu-devel@nongnu.org>; Sun,  3 Jun 2018 16:41:21 +0000 (UTC)
+	(envelope-from <wexu@redhat.com>) id 1fPX3B-0001vE-DF
+	for qemu-devel@nongnu.org; Sun, 03 Jun 2018 13:44:20 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:58348 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <wexu@redhat.com>) id 1fPX3B-0001uZ-72
+	for qemu-devel@nongnu.org; Sun, 03 Jun 2018 13:44:17 -0400
+Date: Mon, 4 Jun 2018 01:44:04 +0800
+From: Wei Xu <wexu@redhat.com>
+Message-ID: <20180603174404.GA28131@wei-ubt>
+References: <1522846444-31725-1-git-send-email-wexu@redhat.com>
+	<1522846444-31725-4-git-send-email-wexu@redhat.com>
+	<6a78b53a-0830-74de-5447-63ecab67e5ed@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <6a78b53a-0830-74de-5447-63ecab67e5ed@redhat.com>
 Content-Transfer-Encoding: quoted-printable
-Date: Sun, 03 Jun 2018 16:28:02 -0000
-From: Zhang Chen <zhangckid@gmail.com>
-Reply-To: Bug 1754542 <1754542@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <152056405865.7543.8980677605113063936.malonedeb@wampee.canonical.com>
-Message-Id: <152804328246.32111.3400987708920298033.malone@soybean.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1754542] Re: colo: vm crash with segmentation
- fault
+Subject: Re: [Qemu-devel] [PATCH 3/8] virtio: add empty check for packed ring
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,100 +29,161 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Jason Wang <jasowang@redhat.com>
+Cc: mst@redhat.com, tiwei.bie@intel.com, jfreimann@redhat.com, qemu-devel@nongnu.org
 
-Hi Suiheng,
+On Tue, Apr 10, 2018 at 03:23:03PM +0800, Jason Wang wrote:
+>=20
+>=20
+> On 2018=E5=B9=B404=E6=9C=8804=E6=97=A5 20:53, wexu@redhat.com wrote:
+> >From: Wei Xu <wexu@redhat.com>
+> >
+> >helper for ring empty check.
+>=20
+> And descriptor read.
 
-This bug have been fixed in my latest patch.
-Please retest it.
-https://www.mail-archive.com/qemu-devel@nongnu.org/msg538383.html
+OK.
 
-github:
-https://github.com/zhangckid/qemu/tree/qemu-colo-18jun1
+>=20
+> >
+> >Signed-off-by: Wei Xu <wexu@redhat.com>
+> >---
+> >  hw/virtio/virtio.c | 62 ++++++++++++++++++++++++++++++++++++++++++++=
++++++++---
+> >  1 file changed, 59 insertions(+), 3 deletions(-)
+> >
+> >diff --git a/hw/virtio/virtio.c b/hw/virtio/virtio.c
+> >index 73a35a4..478df3d 100644
+> >--- a/hw/virtio/virtio.c
+> >+++ b/hw/virtio/virtio.c
+> >@@ -24,6 +24,9 @@
+> >  #include "hw/virtio/virtio-access.h"
+> >  #include "sysemu/dma.h"
+> >+#define AVAIL_DESC_PACKED(b) ((b) << 7)
+> >+#define USED_DESC_PACKED(b)  ((b) << 15)
+>=20
+> Can we pass value other than 1 to this macro?
 
-Thanks
-Zhang Chen
+Yes, '0' is also provided for some clear/reset cases.
 
--- =
+>=20
+> >+
+> >  /*
+> >   * The alignment to use between consumer and producer parts of vring=
+.
+> >   * x86 pagesize again. This is the default, used by transports like =
+PCI
+> >@@ -446,10 +449,27 @@ int virtio_queue_ready(VirtQueue *vq)
+> >      return vq->vring.avail !=3D 0;
+> >  }
+> >+static void vring_desc_read_packed(VirtIODevice *vdev, VRingDescPacke=
+d *desc,
+> >+                            MemoryRegionCache *cache, int i)
+> >+{
+> >+    address_space_read_cached(cache, i * sizeof(VRingDescPacked),
+> >+                              desc, sizeof(VRingDescPacked));
+> >+    virtio_tswap64s(vdev, &desc->addr);
+> >+    virtio_tswap32s(vdev, &desc->len);
+> >+    virtio_tswap16s(vdev, &desc->id);
+> >+    virtio_tswap16s(vdev, &desc->flags);
+> >+}
+> >+
+> >+static inline bool is_desc_avail(struct VRingDescPacked* desc)
+> >+{
+> >+    return (!!(desc->flags & AVAIL_DESC_PACKED(1)) !=3D
+> >+            !!(desc->flags & USED_DESC_PACKED(1)));
+>=20
+> Don't we need to care about endian here?
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1754542
+Usually we don't since endian has been converted during reading,
+will double check it.
 
-Title:
-  colo:  vm crash with segmentation fault
+>=20
+> >+}
+> >+
+> >  /* Fetch avail_idx from VQ memory only when we really need to know i=
+f
+> >   * guest has added some buffers.
+> >   * Called within rcu_read_lock().  */
+> >-static int virtio_queue_empty_rcu(VirtQueue *vq)
+> >+static int virtio_queue_empty_split_rcu(VirtQueue *vq)
+> >  {
+> >      if (unlikely(!vq->vring.avail)) {
+> >          return 1;
+> >@@ -462,7 +482,7 @@ static int virtio_queue_empty_rcu(VirtQueue *vq)
+> >      return vring_avail_idx(vq) =3D=3D vq->last_avail_idx;
+> >  }
+> >-int virtio_queue_empty(VirtQueue *vq)
+> >+static int virtio_queue_empty_split(VirtQueue *vq)
+> >  {
+> >      bool empty;
+> >@@ -480,6 +500,42 @@ int virtio_queue_empty(VirtQueue *vq)
+> >      return empty;
+> >  }
+> >+static int virtio_queue_empty_packed_rcu(VirtQueue *vq)
+> >+{
+> >+    struct VRingDescPacked desc;
+> >+    VRingMemoryRegionCaches *cache;
+> >+
+> >+    if (unlikely(!vq->packed.desc)) {
+> >+        return 1;
+> >+    }
+> >+
+> >+    cache =3D vring_get_region_caches(vq);
+> >+    vring_desc_read_packed(vq->vdev, &desc, &cache->desc_packed, vq->=
+last_avail_idx);
+> >+
+> >+    /* Make sure we see the updated flag */
+> >+    smp_mb();
+>=20
+> What we need here is to make sure flag is read before all other fields,
+> looks like this barrier can't.
 
-Status in QEMU:
-  New
+Isn't flag updated yet if it has been read?
 
-Bug description:
-  I use Arch Linux x86_64
-  Zhang Chen's(https://github.com/zhangckid/qemu/tree/qemu-colo-18mar10)
-  Following document 'COLO-FT.txt',
-  I test colo feature on my hosts
+>=20
+> >+    return !is_desc_avail(&desc);
+> >+}
+> >+
+> >+static int virtio_queue_empty_packed(VirtQueue *vq)
+> >+{
+> >+    bool empty;
+> >+
+> >+    rcu_read_lock();
+> >+    empty =3D virtio_queue_empty_packed_rcu(vq);
+> >+    rcu_read_unlock();
+> >+    return empty;
+> >+}
+> >+
+> >+int virtio_queue_empty(VirtQueue *vq)
+> >+{
+> >+    if (virtio_vdev_has_feature(vq->vdev, VIRTIO_F_RING_PACKED)) {
+> >+        return virtio_queue_empty_packed(vq);
+> >+    } else {
+> >+        return virtio_queue_empty_split(vq);
+> >+    }
+> >+}
+> >+
+> >  static void virtqueue_unmap_sg(VirtQueue *vq, const VirtQueueElement=
+ *elem,
+> >                                 unsigned int len)
+> >  {
+> >@@ -951,7 +1007,7 @@ void *virtqueue_pop(VirtQueue *vq, size_t sz)
+> >          return NULL;
+> >      }
+> >      rcu_read_lock();
+> >-    if (virtio_queue_empty_rcu(vq)) {
+> >+    if (virtio_queue_empty_split_rcu(vq)) {
+>=20
+> I think you'd better have a switch inside virtio_queue_empty_rcu() like
+> virtio_queue_empty() here.
 
-  I run this command
-  Primary:
-  sudo /usr/local/bin/qemu-system-x86_64 -enable-kvm -m 2048 -smp 2 -qmp st=
-dio -name primary \
-  -device piix3-usb-uhci \
-  -device usb-tablet -netdev tap,id=3Dhn0,vhost=3Doff \
-  -device virtio-net-pci,id=3Dnet-pci0,netdev=3Dhn0 \
-  -drive if=3Dvirtio,id=3Dprimary-disk0,driver=3Dquorum,read-pattern=3Dfifo=
-,vote-threshold=3D1,\
-  children.0.file.filename=3D/var/lib/libvirt/images/1.raw,\
-  children.0.driver=3Draw -S
+OK.
 
-  Secondary:
-  sudo /usr/local/bin/qemu-system-x86_64 -enable-kvm -m 2048 -smp 2 -qmp st=
-dio -name secondary \
-  -device piix3-usb-uhci \
-  -device usb-tablet -netdev tap,id=3Dhn0,vhost=3Doff \
-  -device virtio-net-pci,id=3Dnet-pci0,netdev=3Dhn0 \
-  -drive if=3Dnone,id=3Dsecondary-disk0,file.filename=3D/var/lib/libvirt/im=
-ages/2.raw,driver=3Draw,node-name=3Dnode0 \
-  -drive if=3Dvirtio,id=3Dactive-disk0,driver=3Dreplication,mode=3Dsecondar=
-y,\
-  file.driver=3Dqcow2,top-id=3Dactive-disk0,\
-  file.file.filename=3D/mnt/ramfs/active_disk.img,\
-  file.backing.driver=3Dqcow2,\
-  file.backing.file.filename=3D/mnt/ramfs/hidden_disk.img,\
-  file.backing.backing=3Dsecondary-disk0 \
-  -incoming tcp:0:8888
-
-  Secondary:
-  {'execute':'qmp_capabilities'}
-  { 'execute': 'nbd-server-start',
-    'arguments': {'addr': {'type': 'inet', 'data': {'host': '192.168.0.34',=
- 'port': '8889'} } }
-  }
-  {'execute': 'nbd-server-add', 'arguments': {'device': 'secondary-disk0', =
-'writable': true } }
-
-  Primary:
-  {'execute':'qmp_capabilities'}
-  { 'execute': 'human-monitor-command',
-    'arguments': {'command-line': 'drive_add -n buddy driver=3Dreplication,=
-mode=3Dprimary,file.driver=3Dnbd,file.host=3D192.168.0.34,file.port=3D8889,=
-file.export=3Dsecondary-disk0,node-name=3Dnbd_client0'}}
-  { 'execute':'x-blockdev-change', 'arguments':{'parent': 'primary-disk0', =
-'node': 'nbd_client0' } }
-  { 'execute': 'migrate-set-capabilities',
-        'arguments': {'capabilities': [ {'capability': 'x-colo', 'state': t=
-rue } ] } }
-  { 'execute': 'migrate', 'arguments': {'uri': 'tcp:192.168.0.34:8888' } }
-  And two VM with cash
-  Primary:
-  {"timestamp": {"seconds": 1520763655, "microseconds": 511415}, "event": "=
-RESUME"}
-  [1]    329 segmentation fault  sudo /usr/local/bin/qemu-system-x86_64 -bo=
-ot c -enable-kvm -m 2048 -smp 2 -qm
-
-  Secondary:
-  {"timestamp": {"seconds": 1520763655, "microseconds": 510907}, "event": "=
-RESUME"}
-  [1]    367 segmentation fault  sudo /usr/local/bin/qemu-system-x86_64 -bo=
-ot c -enable-kvm -m 2048 -smp 2 -qm
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1754542/+subscriptions
+>=20
+> Thanks
+>=20
+> >          goto done;
+> >      }
+> >      /* Needed after virtio_queue_empty(), see comment in
+>=20
