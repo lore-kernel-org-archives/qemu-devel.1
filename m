@@ -1,24 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59577)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59610)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fPGZu-00042n-Ug
-	for qemu-devel@nongnu.org; Sat, 02 Jun 2018 20:08:59 -0400
+	id 1fPGZx-00045R-Cg
+	for qemu-devel@nongnu.org; Sat, 02 Jun 2018 20:09:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fPGZt-00030B-Pl
-	for qemu-devel@nongnu.org; Sat, 02 Jun 2018 20:08:58 -0400
+	id 1fPGZw-00031W-9V
+	for qemu-devel@nongnu.org; Sat, 02 Jun 2018 20:09:01 -0400
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Date: Sat,  2 Jun 2018 21:08:26 -0300
-Message-Id: <20180603000827.30872-8-f4bug@amsat.org>
+Date: Sat,  2 Jun 2018 21:08:27 -0300
+Message-Id: <20180603000827.30872-9-f4bug@amsat.org>
 In-Reply-To: <20180603000827.30872-1-f4bug@amsat.org>
 References: <20180603000827.30872-1-f4bug@amsat.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH 7/8] sdcard: Reflect when the Spec v3 is
- supported in the Config Register (SCR)
+Subject: [Qemu-devel] [PATCH 8/8] sdcard: Disable CMD19/CMD23 for Spec v2
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,52 +29,36 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Alistair Francis <alistair@alistair23.me>, Peter Maydell <peter.maydell@linaro.org>
 Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, qemu-arm@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>
 
+These commands got introduced by Spec v3.
+
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- include/hw/sd/sd.h | 1 +
- hw/sd/sd.c         | 7 +++++--
- 2 files changed, 6 insertions(+), 2 deletions(-)
+ hw/sd/sd.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
-diff --git a/include/hw/sd/sd.h b/include/hw/sd/sd.h
-index 7c6ad3c8f1..b865aafc33 100644
---- a/include/hw/sd/sd.h
-+++ b/include/hw/sd/sd.h
-@@ -57,6 +57,7 @@
- enum SDPhySpecificationVersion {
-     SD_PHY_SPECv1_10_VERS     = 1,
-     SD_PHY_SPECv2_00_VERS     = 2,
-+    SD_PHY_SPECv3_01_VERS     = 3,
- };
- 
- typedef enum {
 diff --git a/hw/sd/sd.c b/hw/sd/sd.c
-index da65f2b178..83426da133 100644
+index 83426da133..ac202e05a1 100644
 --- a/hw/sd/sd.c
 +++ b/hw/sd/sd.c
-@@ -315,11 +315,14 @@ static void sd_set_scr(SDState *sd)
-     if (sd->spec_version == SD_PHY_SPECv1_10_VERS) {
-         sd->scr[0] |= 1;        /* Spec Version 1.10 */
-     } else {
--        sd->scr[0] |= 2;        /* Spec Version 2.00 */
-+        sd->scr[0] |= 2;        /* Spec Version 2.00 or Version 3.0X */
-     }
-     sd->scr[1] = (2 << 4)       /* SDSC Card (Security Version 1.01) */
-                  | 0b0101;      /* 1-bit or 4-bit width bus modes */
-     sd->scr[2] = 0x00;          /* Extended Security is not supported. */
-+    if (sd->spec_version >= SD_PHY_SPECv3_01_VERS) {
-+        sd->scr[2] |= 1 << 7;   /* Spec Version 3.0X */
-+    }
-     sd->scr[3] = 0x00;
-     /* reserved for manufacturer usage */
-     sd->scr[4] = 0x00;
-@@ -2067,7 +2070,7 @@ static void sd_realize(DeviceState *dev, Error **errp)
- 
-     switch (sd->spec_version) {
-     case SD_PHY_SPECv1_10_VERS
--     ... SD_PHY_SPECv2_00_VERS:
-+     ... SD_PHY_SPECv3_01_VERS:
+@@ -1178,6 +1178,9 @@ static sd_rsp_type_t sd_normal_command(SDState *sd, SDRequest req)
          break;
-     default:
-         error_setg(errp, "Invalid SD card Spec version: %u", sd->spec_version);
+ 
+     case 19:    /* CMD19: SEND_TUNING_BLOCK (SD) */
++        if (sd->spec_version < SD_PHY_SPECv3_01_VERS) {
++            break;
++        }
+         if (sd->state == sd_transfer_state) {
+             sd->state = sd_sendingdata_state;
+             sd->data_offset = 0;
+@@ -1186,6 +1189,9 @@ static sd_rsp_type_t sd_normal_command(SDState *sd, SDRequest req)
+         break;
+ 
+     case 23:    /* CMD23: SET_BLOCK_COUNT */
++        if (sd->spec_version < SD_PHY_SPECv3_01_VERS) {
++            break;
++        }
+         switch (sd->state) {
+         case sd_transfer_state:
+             sd->multi_blk_cnt = req.arg;
 -- 
 2.17.1
