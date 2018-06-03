@@ -1,31 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56356)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38505)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aviadye@dev.mellanox.co.il>) id 1fPUYQ-0003Ub-GZ
-	for qemu-devel@nongnu.org; Sun, 03 Jun 2018 11:04:25 -0400
+	(envelope-from <mst@redhat.com>) id 1fPVaA-0000kL-UH
+	for qemu-devel@nongnu.org; Sun, 03 Jun 2018 12:10:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aviadye@dev.mellanox.co.il>) id 1fPUYM-0005NB-4v
-	for qemu-devel@nongnu.org; Sun, 03 Jun 2018 11:04:22 -0400
-Received: from mail-wr0-x244.google.com ([2a00:1450:400c:c0c::244]:39169)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <aviadye@dev.mellanox.co.il>)
-	id 1fPUYL-0005HI-OK
-	for qemu-devel@nongnu.org; Sun, 03 Jun 2018 11:04:18 -0400
-Received: by mail-wr0-x244.google.com with SMTP id w7-v6so28654896wrn.6
-	for <qemu-devel@nongnu.org>; Sun, 03 Jun 2018 08:04:16 -0700 (PDT)
-References: <1527673416-31268-1-git-send-email-lidongchen@tencent.com>
-	<1527673416-31268-12-git-send-email-lidongchen@tencent.com>
-	<20180530173325.GG2410@work-vm>
-	<CAOGPPbe=8AOX0S8vBAOmkV_vnb4A0EV_amUif8Qig0PuJQCwFg@mail.gmail.com>
-From: Aviad Yehezkel <aviadye@dev.mellanox.co.il>
-Message-ID: <c7a6c24d-4699-cfb1-b097-93f62060e36d@dev.mellanox.co.il>
-Date: Sun, 3 Jun 2018 18:04:12 +0300
+	(envelope-from <mst@redhat.com>) id 1fPVa6-0006UW-1h
+	for qemu-devel@nongnu.org; Sun, 03 Jun 2018 12:10:14 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:53282 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1fPVa5-0006Tf-Sg
+	for qemu-devel@nongnu.org; Sun, 03 Jun 2018 12:10:09 -0400
+Date: Sun, 3 Jun 2018 19:10:07 +0300
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20180603190821-mutt-send-email-mst@kernel.org>
+References: <40602400-cae4-e175-e7ce-10ac70ba52f5@riseup.net>
+	<20180601113444.GG8687@stefanha-x1.localdomain>
+	<b25b3adb-bacc-bef1-7d18-c71a4933abc1@riseup.net>
+	<20180601184855-mutt-send-email-mst@kernel.org>
+	<1f4afbd1-e822-aa63-89a5-ba77c7110168@riseup.net>
 MIME-Version: 1.0
-In-Reply-To: <CAOGPPbe=8AOX0S8vBAOmkV_vnb4A0EV_amUif8Qig0PuJQCwFg@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-Subject: Re: [Qemu-devel] [PATCH v4 11/12] migration: poll the cm event
- while wait RDMA work request completion
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1f4afbd1-e822-aa63-89a5-ba77c7110168@riseup.net>
+Subject: Re: [Qemu-devel] Virtio-net drivers immune to Nethammer?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,111 +30,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: 858585 jemmy <jemmy858585@gmail.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Aviad Yehezkel <aviadye@mellanox.com>
-Cc: Adi Dotan <adido@mellanox.com>, zhang.zhanghailiang@huawei.com, Juan Quintela <quintela@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Lidong Chen <lidongchen@tencent.com>
+To: procmem <procmem@riseup.net>
+Cc: Stefan Hajnoczi <stefanha@gmail.com>, qemu-devel@nongnu.org, whonix-devel@whonix.org, jasowang@redhat.com
 
-+Gal
+On Sat, Jun 02, 2018 at 03:08:54AM +0000, procmem wrote:
+> 
+> 
+> Michael S. Tsirkin:
+> > On Fri, Jun 01, 2018 at 01:15:44PM +0000, procmem wrote:
+> >>
+> >>
+> >> Stefan Hajnoczi:
+> >>> On Mon, May 21, 2018 at 11:24:43PM +0000, procmem wrote:
+> >>>> Hi I'm a privacy distro maintainer investigating the implications of the
+> >>>> newly published nethammer attack [0] on KVM guests particularly the
+> >>>> virtio-net drivers. The summary of the paper is that rowhammer can be
+> >>>> remotely triggered by feeding susceptible* network driver crafted
+> >>>> traffic. This attack can do all kinds of nasty things such as modifying
+> >>>> SSL certs on the victim system.
+> >>>>
+> >>>> * Susceptible drivers are those relying on Intel CAT, uncached memory or
+> >>>> the clflush instruction.
+> >>>>
+> >>>> My question is, do virtio-net drivers do any of these things?
+> >>> I have CCed Michael Tsirkin and Jason Wang, the virtio maintainers.
+> >>>
+> >>>> ***
+> >>>>
+> >>>> [0] https://arxiv.org/abs/1805.04956
+> >>>>
+> >>>>
+> >>>>
+> >>
+> >> Thanks :) I thought my message was forgotten
+> > 
+> > 
+> > I don't think virtio is using either of these.
+> > 
+> > Linux does support CAT AFAIK but it has nothing to do with virtio.
+> > 
+> 
+> Thanks for confirming. This is good news indeed. I am considering
+> posting about this to kernel-hardening so it's on the sec team's radar
+> when considering upstream network drivers. What do you think?
 
-Gal, please comment with our findings.
+It's up to you but the usefulness of reposting like that will be limited IMHO,
+unless you have something specific to add.
 
-Thanks!
+I think everyone saw the nethammer paper by now, and kernel hardening
+team doesn't review network driver patches.
 
-
-On 5/31/2018 10:36 AM, 858585 jemmy wrote:
-> On Thu, May 31, 2018 at 1:33 AM, Dr. David Alan Gilbert
-> <dgilbert@redhat.com> wrote:
->> * Lidong Chen (jemmy858585@gmail.com) wrote:
->>> If the peer qemu is crashed, the qemu_rdma_wait_comp_channel function
->>> maybe loop forever. so we should also poll the cm event fd, and when
->>> receive any cm event, we consider some error happened.
->>>
->>> Signed-off-by: Lidong Chen <lidongchen@tencent.com>
->> I don't understand enough about the way the infiniband fd's work to
->> fully review this; so I'd appreciate if some one who does could
->> comment/add their review.
-> Hi Avaid:
->      we need your help. I also not find any document about the cq
-> channel event fd and
-> cm channel event f.
->      Should we set the events to G_IO_IN | G_IO_HUP | G_IO_ERR? or
-> G_IO_IN is enough?
->      pfds[0].events = G_IO_IN | G_IO_HUP | G_IO_ERR;
->      pfds[1].events = G_IO_IN | G_IO_HUP | G_IO_ERR;
->      Thanks.
->
->>> ---
->>>   migration/rdma.c | 35 ++++++++++++++++++++++++-----------
->>>   1 file changed, 24 insertions(+), 11 deletions(-)
->>>
->>> diff --git a/migration/rdma.c b/migration/rdma.c
->>> index 1b9e261..d611a06 100644
->>> --- a/migration/rdma.c
->>> +++ b/migration/rdma.c
->>> @@ -1489,6 +1489,9 @@ static uint64_t qemu_rdma_poll(RDMAContext *rdma, uint64_t *wr_id_out,
->>>    */
->>>   static int qemu_rdma_wait_comp_channel(RDMAContext *rdma)
->>>   {
->>> +    struct rdma_cm_event *cm_event;
->>> +    int ret = -1;
->>> +
->>>       /*
->>>        * Coroutine doesn't start until migration_fd_process_incoming()
->>>        * so don't yield unless we know we're running inside of a coroutine.
->>> @@ -1504,25 +1507,35 @@ static int qemu_rdma_wait_comp_channel(RDMAContext *rdma)
->>>            * But we need to be able to handle 'cancel' or an error
->>>            * without hanging forever.
->>>            */
->>> -        while (!rdma->error_state  && !rdma->received_error) {
->>> -            GPollFD pfds[1];
->>> +        while (!rdma->error_state && !rdma->received_error) {
->>> +            GPollFD pfds[2];
->>>               pfds[0].fd = rdma->comp_channel->fd;
->>>               pfds[0].events = G_IO_IN | G_IO_HUP | G_IO_ERR;
->>> +            pfds[0].revents = 0;
->>> +
->>> +            pfds[1].fd = rdma->channel->fd;
->>> +            pfds[1].events = G_IO_IN | G_IO_HUP | G_IO_ERR;
->>> +            pfds[1].revents = 0;
->>> +
->>>               /* 0.1s timeout, should be fine for a 'cancel' */
->>> -            switch (qemu_poll_ns(pfds, 1, 100 * 1000 * 1000)) {
->>> -            case 1: /* fd active */
->>> -                return 0;
->>> +            qemu_poll_ns(pfds, 2, 100 * 1000 * 1000);
->> Shouldn't we still check the return value of this; if it's negative
->> something has gone wrong.
-> I will fix this.
-> Thanks.
->
->> Dave
->>
->>> -            case 0: /* Timeout, go around again */
->>> -                break;
->>> +            if (pfds[1].revents) {
->>> +                ret = rdma_get_cm_event(rdma->channel, &cm_event);
->>> +                if (!ret) {
->>> +                    rdma_ack_cm_event(cm_event);
->>> +                }
->>> +                error_report("receive cm event while wait comp channel,"
->>> +                             "cm event is %d", cm_event->event);
->>>
->>> -            default: /* Error of some type -
->>> -                      * I don't trust errno from qemu_poll_ns
->>> -                     */
->>> -                error_report("%s: poll failed", __func__);
->>> +                /* consider any rdma communication event as an error */
->>>                   return -EPIPE;
->>>               }
->>>
->>> +            if (pfds[0].revents) {
->>> +                return 0;
->>> +            }
->>> +
->>>               if (migrate_get_current()->state == MIGRATION_STATUS_CANCELLING) {
->>>                   /* Bail out and let the cancellation happen */
->>>                   return -EPIPE;
->>> --
->>> 1.8.3.1
->>>
->> --
->> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+-- 
+MST
