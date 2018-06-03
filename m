@@ -1,34 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46952)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50847)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fPQuY-0000QE-8N
-	for qemu-devel@nongnu.org; Sun, 03 Jun 2018 07:10:59 -0400
+	(envelope-from <kvapss@gmail.com>) id 1fPRZB-0004vB-DF
+	for qemu-devel@nongnu.org; Sun, 03 Jun 2018 07:52:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fPQuV-0004Ml-3f
-	for qemu-devel@nongnu.org; Sun, 03 Jun 2018 07:10:58 -0400
-Received: from indium.canonical.com ([91.189.90.7]:38388)
+	(envelope-from <kvapss@gmail.com>) id 1fPRZA-00035S-E6
+	for qemu-devel@nongnu.org; Sun, 03 Jun 2018 07:52:57 -0400
+Received: from mail-io0-x22a.google.com ([2607:f8b0:4001:c06::22a]:45348)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1fPQuU-0004Mb-Sy
-	for qemu-devel@nongnu.org; Sun, 03 Jun 2018 07:10:55 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1fPQuT-0005tw-Eh
-	for <qemu-devel@nongnu.org>; Sun, 03 Jun 2018 11:10:53 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 6A0142E802D
-	for <qemu-devel@nongnu.org>; Sun,  3 Jun 2018 11:10:53 +0000 (UTC)
+	(Exim 4.71) (envelope-from <kvapss@gmail.com>) id 1fPRZA-00035G-8I
+	for qemu-devel@nongnu.org; Sun, 03 Jun 2018 07:52:56 -0400
+Received: by mail-io0-x22a.google.com with SMTP id l25-v6so12357065ioh.12
+	for <qemu-devel@nongnu.org>; Sun, 03 Jun 2018 04:52:55 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+References: <CAGO-sgOsRvJbjdDH4dbRJPgVu=oYqvEZdFmzSprDkcn-A6rc5Q@mail.gmail.com>
+	<20180601171657.GP3458@redhat.com>
+In-Reply-To: <20180601171657.GP3458@redhat.com>
+From: kvaps <kvapss@gmail.com>
+Date: Sun, 3 Jun 2018 13:52:43 +0200
+Message-ID: <CAGO-sgPw4Hedh0oUCCMQEcWkfLnRScHUrhUPrSmdUfeCfKiH3w@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Sun, 03 Jun 2018 11:02:25 -0000
-From: tsiros <1774853@bugs.launchpad.net>
-Reply-To: Bug 1774853 <1774853@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <152802310962.26200.2575137842813128178.malonedeb@wampee.canonical.com>
-Message-Id: <152802374616.31708.1565949251784371927.malone@soybean.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1774853] Re: claims temp file is used by another
- process
+Subject: Re: [Qemu-devel] Mistake on man page
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,34 +29,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>
+Cc: qemu-devel@nongnu.org
 
-someone please delete this
+Ok, thanks for the clarification.
 
-** Changed in: qemu
-       Status: New =3D> Invalid
+On Fri, Jun 1, 2018 at 7:17 PM Daniel P. Berrang=C3=A9 <berrange@redhat.com=
+>
+wrote:
 
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1774853
-
-Title:
-  claims temp file is used by another process
-
-Status in QEMU:
-  Invalid
-
-Bug description:
-  QEMU emulator version 2.12.50 (v2.12.0-12378-g99a34dc4d2-dirty)
-
-  "c:\Program Files\qemu\qemu-system-x86_64.exe" -net none -parallel none -=
-bios OVMF.fd -L . -hda fat:rw:image
-  vvfat image chs 1024,16,63
-  c:\Program Files\qemu\qemu-system-x86_64.exe: -hda fat:rw:image: Could no=
-t open 'C:\Users\tsiros\AppData\Local\Temp\qem5B92.tmp': The process cannot=
- access the file because it is being used by another process.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1774853/+subscriptions
+> On Fri, Jun 01, 2018 at 04:47:55PM +0200, kvaps wrote:
+> > Hi, here is mistake in man page for qemu-nbd:
+> >
+> > --- a/qemu-nbd.texi
+> > +++ b/qemu-nbd.texi
+> > @@ -1,2 +1,2 @@
+> > --- a/qemu-nbd.texi
+> > -Don't exit on the last connection
+> > +++ b/qemu-nbd.texi
+> > +Don't exit on the lost connection
+>
+> It isn't a mistake actually. qemu-nbd can allow multiple concurrent
+> client connections, and will exit once the last client closes.
+>
+> Regards,
+> Daniel
+> --
+> |: https://berrange.com      -o-
+> https://www.flickr.com/photos/dberrange :|
+> |: https://libvirt.org         -o-
+> https://fstop138.berrange.com :|
+> |: https://entangle-photo.org    -o-
+> https://www.instagram.com/dberrange :|
+>
