@@ -1,23 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59505)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59538)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fPGZl-0003s5-GX
-	for qemu-devel@nongnu.org; Sat, 02 Jun 2018 20:08:50 -0400
+	id 1fPGZo-0003vR-8y
+	for qemu-devel@nongnu.org; Sat, 02 Jun 2018 20:08:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fPGZk-0002w3-FM
-	for qemu-devel@nongnu.org; Sat, 02 Jun 2018 20:08:49 -0400
+	id 1fPGZn-0002xR-EJ
+	for qemu-devel@nongnu.org; Sat, 02 Jun 2018 20:08:52 -0400
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Date: Sat,  2 Jun 2018 21:08:23 -0300
-Message-Id: <20180603000827.30872-5-f4bug@amsat.org>
+Date: Sat,  2 Jun 2018 21:08:24 -0300
+Message-Id: <20180603000827.30872-6-f4bug@amsat.org>
 In-Reply-To: <20180603000827.30872-1-f4bug@amsat.org>
 References: <20180603000827.30872-1-f4bug@amsat.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH 4/8] sdcard: Set Spec v2.00 as default
+Subject: [Qemu-devel] [PATCH 5/8] hw/sd/ssi-sd: Force cards connected in SPI
+ mode to use Spec v1.10
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,63 +28,25 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Alistair Francis <alistair@alistair23.me>, Peter Maydell <peter.maydell@linaro.org>
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, qemu-arm@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, qemu-arm@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>
 
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- include/hw/sd/sd.h |  1 +
- hw/sd/sd.c         | 13 +++++++++----
- 2 files changed, 10 insertions(+), 4 deletions(-)
+ hw/sd/ssi-sd.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/include/hw/sd/sd.h b/include/hw/sd/sd.h
-index 49f22b0b89..7c6ad3c8f1 100644
---- a/include/hw/sd/sd.h
-+++ b/include/hw/sd/sd.h
-@@ -56,6 +56,7 @@
- 
- enum SDPhySpecificationVersion {
-     SD_PHY_SPECv1_10_VERS     = 1,
-+    SD_PHY_SPECv2_00_VERS     = 2,
- };
- 
- typedef enum {
-diff --git a/hw/sd/sd.c b/hw/sd/sd.c
-index 5ddd211114..81f178b36e 100644
---- a/hw/sd/sd.c
-+++ b/hw/sd/sd.c
-@@ -311,8 +311,12 @@ static void sd_ocr_powerup(void *opaque)
- 
- static void sd_set_scr(SDState *sd)
- {
--    sd->scr[0] = (0 << 4)       /* SCR structure version 1.0 */
--                 | 1;           /* Spec Version 1.10 */
-+    sd->scr[0] = 0 << 4;        /* SCR structure version 1.0 */
-+    if (sd->spec_version == SD_PHY_SPECv1_10_VERS) {
-+        sd->scr[0] |= 1;        /* Spec Version 1.10 */
-+    } else {
-+        sd->scr[0] |= 2;        /* Spec Version 2.00 */
-+    }
-     sd->scr[1] = (2 << 4)       /* SDSC Card (Security Version 1.01) */
-                  | 0b0101;      /* 1-bit or 4-bit width bus modes */
-     sd->scr[2] = 0x00;          /* Extended Security is not supported. */
-@@ -2060,7 +2064,8 @@ static void sd_realize(DeviceState *dev, Error **errp)
-     sd->proto_name = sd->spi ? "SPI" : "SD";
- 
-     switch (sd->spec_version) {
--    case SD_PHY_SPECv1_10_VERS:
-+    case SD_PHY_SPECv1_10_VERS
-+     ... SD_PHY_SPECv2_00_VERS:
-         break;
-     default:
-         error_setg(errp, "Invalid SD card Spec version: %u", sd->spec_version);
-@@ -2084,7 +2089,7 @@ static void sd_realize(DeviceState *dev, Error **errp)
- 
- static Property sd_properties[] = {
-     DEFINE_PROP_UINT8("spec_version", SDState,
--                      spec_version, SD_PHY_SPECv1_10_VERS),
-+                      spec_version, SD_PHY_SPECv2_00_VERS),
-     DEFINE_PROP_DRIVE("drive", SDState, blk),
-     /* We do not model the chip select pin, so allow the board to select
-      * whether card should be in SSI or MMC/SD mode.  It is also up to the
+diff --git a/hw/sd/ssi-sd.c b/hw/sd/ssi-sd.c
+index ae04b6641b..c62fdc871c 100644
+--- a/hw/sd/ssi-sd.c
++++ b/hw/sd/ssi-sd.c
+@@ -253,6 +253,8 @@ static void ssi_sd_realize(SSISlave *d, Error **errp)
+     /* FIXME use a qdev drive property instead of drive_get_next() */
+     dinfo = drive_get_next(IF_SD);
+     carddev = qdev_create(&s->sdbus.qbus, TYPE_SD_CARD);
++    object_property_set_uint(OBJECT(carddev),
++                             SD_PHY_SPECv1_10_VERS, "spec_version", &err);
+     if (dinfo) {
+         qdev_prop_set_drive(carddev, "drive", blk_by_legacy_dinfo(dinfo), &err);
+     }
 -- 
 2.17.1
