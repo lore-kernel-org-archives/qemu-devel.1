@@ -1,24 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59424)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59471)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fPGZc-0003oQ-I9
-	for qemu-devel@nongnu.org; Sat, 02 Jun 2018 20:08:41 -0400
+	id 1fPGZg-0003pj-2k
+	for qemu-devel@nongnu.org; Sat, 02 Jun 2018 20:08:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fPGZb-0002rp-Jp
-	for qemu-devel@nongnu.org; Sat, 02 Jun 2018 20:08:40 -0400
+	id 1fPGZf-0002tw-8b
+	for qemu-devel@nongnu.org; Sat, 02 Jun 2018 20:08:44 -0400
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Date: Sat,  2 Jun 2018 21:08:20 -0300
-Message-Id: <20180603000827.30872-2-f4bug@amsat.org>
+Date: Sat,  2 Jun 2018 21:08:21 -0300
+Message-Id: <20180603000827.30872-3-f4bug@amsat.org>
 In-Reply-To: <20180603000827.30872-1-f4bug@amsat.org>
 References: <20180603000827.30872-1-f4bug@amsat.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH 1/8] sdcard: Update the Configuration Register
- (SCR) to Spec Version 1.10
+Subject: [Qemu-devel] [PATCH 2/8] sdcard: Allow commands valid in SPI mode
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,30 +29,67 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Alistair Francis <alistair@alistair23.me>, Peter Maydell <peter.maydell@linaro.org>
 Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, qemu-arm@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>
 
-This register now matches the description of the header:
-
- * SD Memory Card emulation as defined in the "SD Memory Card Physical
- * layer specification, Version 1.10."
+>From the "Physical Layer Simplified Specification Version 1.10"
+  Chapter 7.3 "SPI Mode Transaction Packets"
+    Table 57: "Commands and arguments"
 
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- hw/sd/sd.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ hw/sd/sd.c | 14 --------------
+ 1 file changed, 14 deletions(-)
 
 diff --git a/hw/sd/sd.c b/hw/sd/sd.c
-index 7af19fa06c..e1218d1fb6 100644
+index e1218d1fb6..80e70dd93e 100644
 --- a/hw/sd/sd.c
 +++ b/hw/sd/sd.c
-@@ -310,8 +310,8 @@ static void sd_ocr_powerup(void *opaque)
+@@ -960,8 +960,6 @@ static sd_rsp_type_t sd_normal_command(SDState *sd, SDRequest req)
+         return sd_illegal;
  
- static void sd_set_scr(SDState *sd)
- {
--    sd->scr[0] = (0 << 4)       /* SCR version 1.0 */
--                 | 0;           /* Spec Versions 1.0 and 1.01 */
-+    sd->scr[0] = (0 << 4)       /* SCR structure version 1.0 */
-+                 | 1;           /* Spec Version 1.10 */
-     sd->scr[1] = (2 << 4)       /* SDSC Card (Security Version 1.01) */
-                  | 0b0101;      /* 1-bit or 4-bit width bus modes */
-     sd->scr[2] = 0x00;          /* Extended Security is not supported. */
+     case 6:	/* CMD6:   SWITCH_FUNCTION */
+-        if (sd->spi)
+-            goto bad_cmd;
+         switch (sd->mode) {
+         case sd_data_transfer_mode:
+             sd_function_switch(sd, req.arg);
+@@ -1190,9 +1188,6 @@ static sd_rsp_type_t sd_normal_command(SDState *sd, SDRequest req)
+ 
+     /* Block write commands (Class 4) */
+     case 24:	/* CMD24:  WRITE_SINGLE_BLOCK */
+-        if (sd->spi) {
+-            goto unimplemented_spi_cmd;
+-        }
+         switch (sd->state) {
+         case sd_transfer_state:
+             /* Writing in SPI mode not implemented.  */
+@@ -1217,9 +1212,6 @@ static sd_rsp_type_t sd_normal_command(SDState *sd, SDRequest req)
+         break;
+ 
+     case 25:	/* CMD25:  WRITE_MULTIPLE_BLOCK */
+-        if (sd->spi) {
+-            goto unimplemented_spi_cmd;
+-        }
+         switch (sd->state) {
+         case sd_transfer_state:
+             /* Writing in SPI mode not implemented.  */
+@@ -1259,9 +1251,6 @@ static sd_rsp_type_t sd_normal_command(SDState *sd, SDRequest req)
+         break;
+ 
+     case 27:	/* CMD27:  PROGRAM_CSD */
+-        if (sd->spi) {
+-            goto unimplemented_spi_cmd;
+-        }
+         switch (sd->state) {
+         case sd_transfer_state:
+             sd->state = sd_receivingdata_state;
+@@ -1371,9 +1360,6 @@ static sd_rsp_type_t sd_normal_command(SDState *sd, SDRequest req)
+ 
+     /* Lock card commands (Class 7) */
+     case 42:	/* CMD42:  LOCK_UNLOCK */
+-        if (sd->spi) {
+-            goto unimplemented_spi_cmd;
+-        }
+         switch (sd->state) {
+         case sd_transfer_state:
+             sd->state = sd_receivingdata_state;
 -- 
 2.17.1
