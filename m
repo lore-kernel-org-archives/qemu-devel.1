@@ -1,29 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42476)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43534)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wexu@redhat.com>) id 1fPlyR-0001EN-Ni
-	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 05:40:24 -0400
+	(envelope-from <stefanha@gmail.com>) id 1fPm1A-0002vv-5o
+	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 05:43:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wexu@redhat.com>) id 1fPlyO-0006o9-Hl
-	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 05:40:23 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:50886 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <wexu@redhat.com>) id 1fPlyO-0006nO-5J
-	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 05:40:20 -0400
-Date: Mon, 4 Jun 2018 17:40:09 +0800
-From: Wei Xu <wexu@redhat.com>
-Message-ID: <20180604094009.GC13354@wei-ubt>
-References: <1522846444-31725-1-git-send-email-wexu@redhat.com>
-	<1522846444-31725-5-git-send-email-wexu@redhat.com>
-	<61ac2a50-5583-2932-cac1-f661fd49e89b@redhat.com>
-	<20180604013435.GB28131@wei-ubt>
-	<20180604045330-mutt-send-email-mst@kernel.org>
+	(envelope-from <stefanha@gmail.com>) id 1fPm17-0000GC-4g
+	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 05:43:12 -0400
+Received: from mail-wm0-x244.google.com ([2a00:1450:400c:c09::244]:40073)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1fPm16-0000FX-TR
+	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 05:43:09 -0400
+Received: by mail-wm0-x244.google.com with SMTP id n5-v6so1589535wmc.5
+	for <qemu-devel@nongnu.org>; Mon, 04 Jun 2018 02:43:08 -0700 (PDT)
+Date: Mon, 4 Jun 2018 10:43:06 +0100
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20180604094306.GD13674@stefanha-x1.localdomain>
+References: <CANzW0muSNEuBquUdmU2E_vfpc6zTdsoQh6KG2ooQDBAwq12u6w@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="x4pBfXISqBoDm8sr"
 Content-Disposition: inline
-In-Reply-To: <20180604045330-mutt-send-email-mst@kernel.org>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 4/8] virtio: add detach element for packed
- ring(1.1)
+In-Reply-To: <CANzW0muSNEuBquUdmU2E_vfpc6zTdsoQh6KG2ooQDBAwq12u6w@mail.gmail.com>
+Subject: Re: [Qemu-devel] virtio-vsock feature has no TCG (non-KVM) support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,87 +29,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Jason Wang <jasowang@redhat.com>, jfreimann@redhat.com, qemu-devel@nongnu.org, tiwei.bie@intel.com
+To: Artem Pisarenko <artem.k.pisarenko@gmail.com>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 
-On Mon, Jun 04, 2018 at 04:54:45AM +0300, Michael S. Tsirkin wrote:
-> On Mon, Jun 04, 2018 at 09:34:35AM +0800, Wei Xu wrote:
-> > On Tue, Apr 10, 2018 at 03:32:53PM +0800, Jason Wang wrote:
-> > >=20
-> > >=20
-> > > On 2018=E5=B9=B404=E6=9C=8804=E6=97=A5 20:54, wexu@redhat.com wrote=
-:
-> > > >From: Wei Xu <wexu@redhat.com>
-> > > >
-> > > >helper for packed ring
-> > >=20
-> > > It's odd and hard to review if you put detach patch first. I think =
-this
-> > > patch needs to be reordered after the implementation of pop/map.
-> >=20
-> > This patch is not necessary after sync to tiwei's v5, so we can skip =
-it.
-> >=20
-> > Wei
->=20
-> I suspect we will need to bring detach back eventually but yes,
-> it can wait.
 
-Sure, I reuse the code for 1.0 for now.
+--x4pBfXISqBoDm8sr
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-Wei
+On Fri, Jun 01, 2018 at 04:15:52PM +0600, Artem Pisarenko wrote:
+> Please, add important note to https://wiki.qemu.org/Features/VirtioVsock page,
+> that this feature only supported in KVM accelerated mode. It's not obvious.
+> Furthermore, it isn't checked by qemu when invoking with "-device
+> vhost-vsock-pci,..." and user encounters this only when communicating (via
+> AF_VSOCK) application fails to connect() with weird "Connection timed out"
+> error.
 
->=20
-> > >=20
-> > > Thanks
-> > >=20
-> > > >Signed-off-by: Wei Xu <wexu@redhat.com>
-> > > >---
-> > > >  hw/virtio/virtio.c | 21 +++++++++++++++++++--
-> > > >  1 file changed, 19 insertions(+), 2 deletions(-)
-> > > >
-> > > >diff --git a/hw/virtio/virtio.c b/hw/virtio/virtio.c
-> > > >index 478df3d..fdee40f 100644
-> > > >--- a/hw/virtio/virtio.c
-> > > >+++ b/hw/virtio/virtio.c
-> > > >@@ -561,6 +561,20 @@ static void virtqueue_unmap_sg(VirtQueue *vq,=
- const VirtQueueElement *elem,
-> > > >                           elem->out_sg[i].iov_len);
-> > > >  }
-> > > >+static void virtqueue_detach_element_split(VirtQueue *vq,
-> > > >+                            const VirtQueueElement *elem, unsigne=
-d int len)
-> > > >+{
-> > > >+    vq->inuse--;
-> > > >+    virtqueue_unmap_sg(vq, elem, len);
-> > > >+}
-> > > >+
-> > > >+static void virtqueue_detach_element_packed(VirtQueue *vq,
-> > > >+                            const VirtQueueElement *elem, unsigne=
-d int len)
-> > > >+{
-> > > >+    vq->inuse -=3D elem->count;
-> > > >+    virtqueue_unmap_sg(vq, elem, len);
-> > > >+}
-> > > >+
-> > > >  /* virtqueue_detach_element:
-> > > >   * @vq: The #VirtQueue
-> > > >   * @elem: The #VirtQueueElement
-> > > >@@ -573,8 +587,11 @@ static void virtqueue_unmap_sg(VirtQueue *vq,=
- const VirtQueueElement *elem,
-> > > >  void virtqueue_detach_element(VirtQueue *vq, const VirtQueueElem=
-ent *elem,
-> > > >                                unsigned int len)
-> > > >  {
-> > > >-    vq->inuse--;
-> > > >-    virtqueue_unmap_sg(vq, elem, len);
-> > > >+    if (virtio_vdev_has_feature(vq->vdev, VIRTIO_F_RING_PACKED)) =
-{
-> > > >+        virtqueue_detach_element_packed(vq, elem, len);
-> > > >+    } else {
-> > > >+        virtqueue_detach_element_split(vq, elem, len);
-> > > >+    }
-> > > >  }
-> > > >  /* virtqueue_unpop:
-> > >=20
->=20
+Hi Artem,
+Thanks for letting me know this is broken.  In principle it should work
+because the kernel vhost drivers are independent of KVM and QEMU already
+implements the ioeventfd mechanism that vhost needs in TCG mode.
+
+I've added it to my todo list.
+
+Stefan
+
+--x4pBfXISqBoDm8sr
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJbFQmpAAoJEJykq7OBq3PIyQcH/jRk6eAuwUD/V3QfP/tuhGVG
+uaPMBQcAvxPk5Gwoq/lifzY1RwV9nnhBuQSC6kS8gGe3phEaqONJY2nMjet3HAbH
+hXBMFfx6SDnLwIiWUy1UalDj8hjnYUCEXi6OlcHcXbSJwOcF7ptLnudFWEP0TT/v
+xNGiOMfeMcfdfvBj7V1YFVn3hA+owIhomeYvV+FuFCYyLy2U82XKuL+uhaz5LZf3
+MwvrySVdr9Jx9tI1bN0kaAMtNaQkZBMs2onRD0H1G+jEA05xeVSYK7qSQSa/D4XP
+JOPyKkB8GbKQcLuC0Lfff9mf5Mog3//LH+KfVJtMtVitXrfXM2lsHLEhtYiNC8o=
+=XHaq
+-----END PGP SIGNATURE-----
+
+--x4pBfXISqBoDm8sr--
