@@ -1,28 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40327)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40557)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1fPwot-0004Wf-J4
-	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 17:15:16 -0400
+	(envelope-from <no-reply@patchew.org>) id 1fPwpo-0004x4-3P
+	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 17:16:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1fPwoq-0004gj-DU
-	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 17:15:15 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:59682)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1fPwoq-0004g8-6c
-	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 17:15:12 -0400
-Date: Mon, 4 Jun 2018 18:15:09 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20180604211509.GA7451@localhost.localdomain>
-References: <20180601145921.9500-1-konrad.wilk@oracle.com>
-	<20180601153809.15259-1-konrad.wilk@oracle.com>
-	<20180601153809.15259-2-konrad.wilk@oracle.com>
-	<20180604200701.GB3184@localhost.localdomain>
-	<20180604202205.GH5867@char.us.oracle.com>
+	(envelope-from <no-reply@patchew.org>) id 1fPwpk-0005Fu-Ss
+	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 17:16:12 -0400
+Resent-Message-Id: <E1fPwpk-0005Fu-Ss@eggs.gnu.org>
+Received: from sender-of-o51.zoho.com ([135.84.80.216]:21006)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1fPwpk-0005Et-KC
+	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 17:16:08 -0400
+In-Reply-To: <20180604211106.4442-1-programmingkidx@gmail.com>
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <152814694195.420.12172800603696945943@d39dc562802a>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180604202205.GH5867@char.us.oracle.com>
-Subject: Re: [Qemu-devel] [PATCH 1/2] i386: define the AMD 'amd-ssbd' CPUID
- feature bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Mon, 4 Jun 2018 14:15:42 -0700 (PDT)
+Subject: Re: [Qemu-devel] [PATCH] tcg-target.inc.c: Use byte form of xgetbv
+ instruction
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,54 +29,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>
-Cc: kvm@vger.kernel.org, qemu-devel@nongnu.org, pbonzini@redhat.com, rth@twiddle.net
+To: programmingkidx@gmail.com
+Cc: famz@redhat.com, peter.maydell@linaro.org, qemu-devel@nongnu.org
 
-On Mon, Jun 04, 2018 at 04:22:05PM -0400, Konrad Rzeszutek Wilk wrote:
-> On Mon, Jun 04, 2018 at 05:07:01PM -0300, Eduardo Habkost wrote:
-> > On Fri, Jun 01, 2018 at 11:38:08AM -0400, Konrad Rzeszutek Wilk wrote:
-> > > AMD future CPUs expose _two_ ways to utilize the Intel equivalant
-> > > of the Speculative Store Bypass Disable. The first is via
-> > > the virtualized VIRT_SPEC CTRL MSR (0xC001_011f) and the second
-> > > is via the SPEC_CTRL MSR (0x48). The document titled:
-> > > 124441_AMD64_SpeculativeStoreBypassDisable_Whitepaper_final.pdf
-> > > 
-> > > gives priority of SPEC CTRL MSR over the VIRT SPEC CTRL MSR.
-> > > 
-> > > A copy of this document is available at
-> > >       https://bugzilla.kernel.org/show_bug.cgi?id=199889
-> > > 
-> > > Anyhow, this means that on future AMD CPUs there will be  _two_ ways to
-> > > deal with SSBD.
-> > 
-> > Does anybody know if there are AMD CPUs where virt-ssbd won't
-> > work and would require amd-ssbd to mitigate vulnerabilities?
-> > 
-> > Also, do we have kernel arch/x86/kvm/cpuid.c patches, already?
-> 
-> Not yet. They are being discussed right now. I figured I would send
-> these patches out as a 'Hey, coming at you!', but failed to change
-> the title to be 'RFC'.
-
-OK.  I was queueing them on x86-next, but I'm going drop them by
-now.
-
-
-> 
-> > I prefer to add new CPUID flag names only after the flag name is
-> > already agreed upon on the kernel side.
-> 
-> Of course. I will respin once that discussion has calmed down.
-
-Thanks!
-
-BTW, it looks like the patch on LKML[1] will make bit 26 appear
-on /proc/cpuinfo as "amd_ssb_no", is that correct?  If that's the
-case, I'd prefer to make the QEMU flag to match the name used by
-Linux, and be called "amd-ssb-no" (which sounds weird to me, but
-at least it will be consistent with /proc/cpuinfo).
-
-[1] https://patchwork.kernel.org/patch/10443689/
-
--- 
-Eduardo
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
+c3NhZ2UtaWQ6IDIwMTgwNjA0MjExMTA2LjQ0NDItMS1wcm9ncmFtbWluZ2tpZHhAZ21haWwuY29t
+ClN1YmplY3Q6IFtRZW11LWRldmVsXSBbUEFUQ0hdIHRjZy10YXJnZXQuaW5jLmM6IFVzZSBieXRl
+IGZvcm0gb2YgeGdldGJ2IGluc3RydWN0aW9uCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMh
+L2Jpbi9iYXNoCgpCQVNFPWJhc2UKbj0xCnRvdGFsPSQoZ2l0IGxvZyAtLW9uZWxpbmUgJEJBU0Uu
+LiB8IHdjIC1sKQpmYWlsZWQ9MAoKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQg
+MApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKZ2l0IGNvbmZpZyAtLWxvY2Fs
+IGRpZmYuYWxnb3JpdGhtIGhpc3RvZ3JhbQoKY29tbWl0cz0iJChnaXQgbG9nIC0tZm9ybWF0PSVI
+IC0tcmV2ZXJzZSAkQkFTRS4uKSIKZm9yIGMgaW4gJGNvbW1pdHM7IGRvCiAgICBlY2hvICJDaGVj
+a2luZyBQQVRDSCAkbi8kdG90YWw6ICQoZ2l0IGxvZyAtbiAxIC0tZm9ybWF0PSVzICRjKS4uLiIK
+ICAgIGlmICEgZ2l0IHNob3cgJGMgLS1mb3JtYXQ9ZW1haWwgfCAuL3NjcmlwdHMvY2hlY2twYXRj
+aC5wbCAtLW1haWxiYWNrIC07IHRoZW4KICAgICAgICBmYWlsZWQ9MQogICAgICAgIGVjaG8KICAg
+IGZpCiAgICBuPSQoKG4rMSkpCmRvbmUKCmV4aXQgJGZhaWxlZAo9PT0gVEVTVCBTQ1JJUFQgRU5E
+ID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApG
+cm9tIGh0dHBzOi8vZ2l0aHViLmNvbS9wYXRjaGV3LXByb2plY3QvcWVtdQogdCBbdGFnIHVwZGF0
+ZV0gICAgICAgICAgICBwYXRjaGV3LzIwMTgwNTMxMjA1MDQ2LjE1MzI1Ni0xLWVibGFrZUByZWRo
+YXQuY29tIC0+IHBhdGNoZXcvMjAxODA1MzEyMDUwNDYuMTUzMjU2LTEtZWJsYWtlQHJlZGhhdC5j
+b20KICogW25ldyB0YWddICAgICAgICAgICAgICAgcGF0Y2hldy8yMDE4MDYwNDIxMTEwNi40NDQy
+LTEtcHJvZ3JhbW1pbmdraWR4QGdtYWlsLmNvbSAtPiBwYXRjaGV3LzIwMTgwNjA0MjExMTA2LjQ0
+NDItMS1wcm9ncmFtbWluZ2tpZHhAZ21haWwuY29tClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAn
+dGVzdCcKOGVlNmUzOTcyZSB0Y2ctdGFyZ2V0LmluYy5jOiBVc2UgYnl0ZSBmb3JtIG9mIHhnZXRi
+diBpbnN0cnVjdGlvbgoKPT09IE9VVFBVVCBCRUdJTiA9PT0KQ2hlY2tpbmcgUEFUQ0ggMS8xOiB0
+Y2ctdGFyZ2V0LmluYy5jOiBVc2UgYnl0ZSBmb3JtIG9mIHhnZXRidiBpbnN0cnVjdGlvbi4uLgpF
+UlJPUjogdHJhaWxpbmcgd2hpdGVzcGFjZQojMjM6IEZJTEU6IHRjZy9pMzg2L3RjZy10YXJnZXQu
+aW5jLmM6MzUwNToKKyAgICAgICAgICAgICAqIFRoZSB4Z2V0YnYgaW5zdHJ1Y3Rpb24gaXMgbm90
+IGF2YWlsYWJsZSB0byBvbGRlciB2ZXJzaW9ucyBvZiB0aGUgJAoKRVJST1I6IHNwYWNlcyByZXF1
+aXJlZCBhcm91bmQgdGhhdCAnOicgKGN0eDpWeFcpCiMyNjogRklMRTogdGNnL2kzODYvdGNnLXRh
+cmdldC5pbmMuYzozNTA4OgorICAgICAgICAgICAgYXNtICgiLmJ5dGUgMHgwZiwgMHgwMSwgMHhk
+MCI6ICI9YSIgKHhjcmwpLCAiPWQiICh4Y3JoKSA6ICJjIiAoMCkpOwogICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICBeCgp0b3RhbDogMiBlcnJvcnMsIDAgd2FybmluZ3Ms
+IDEyIGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2Ug
+cmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9y
+dCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4K
+Cj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgot
+LS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cDovL3BhdGNo
+ZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEByZWRo
+YXQuY29t
