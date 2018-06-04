@@ -1,31 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48313)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51704)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1fPxPl-0007ip-Dg
-	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 17:53:22 -0400
+	(envelope-from <gengdongjiu@huawei.com>) id 1fPxie-0003nU-T2
+	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 18:12:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1fPxPi-0004wG-CA
-	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 17:53:21 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:44816 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1fPxPi-0004w7-7f
-	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 17:53:18 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.5])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 607CC406DE3D
-	for <qemu-devel@nongnu.org>; Mon,  4 Jun 2018 21:53:17 +0000 (UTC)
-Date: Mon, 4 Jun 2018 23:53:15 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20180604235315.0447d13f@redhat.com>
-In-Reply-To: <20180604120345.12955-3-berrange@redhat.com>
-References: <20180604120345.12955-1-berrange@redhat.com>
-	<20180604120345.12955-3-berrange@redhat.com>
+	(envelope-from <gengdongjiu@huawei.com>) id 1fPxie-0003TA-46
+	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 18:12:52 -0400
+From: gengdongjiu <gengdongjiu@huawei.com>
+Date: Mon, 4 Jun 2018 22:12:33 +0000
+Message-ID: <0184EA26B2509940AA629AE1405DD7F201CB5BA1@DGGEMA503-MBX.china.huawei.com>
+Content-Language: zh-CN
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 2/2] vl: fix use of --daemonize with
- --preconfig
+Subject: Re: [Qemu-devel] [PATCH RESEND v1 0/3] add support for VCPU event
+ states
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,68 +22,18 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. =?UTF-8?B?QmVycmFuZ8Op?=" <berrange@redhat.com>
-Cc: qemu-devel@nongnu.org, Michal Privoznik <mprivozn@redhat.com>, Markus Armbruster <armbru@redhat.com>, Max Reitz <mreitz@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "famz@redhat.com" <famz@redhat.com>, "james.morse@arm.com" <james.morse@arm.com>, "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>
 
-On Mon,  4 Jun 2018 13:03:45 +0100
-Daniel P. Berrang=C3=A9 <berrange@redhat.com> wrote:
-
-> When using --daemonize, the initial lead process will fork a child and
-> then wait to be notified that setup is complete via a pipe, before it
-> exits.  When using --preconfig there is an extra call to main_loop()
-> before the notification is done from os_setup_post(). Thus the parent
-> process won't exit until the mgmt application connects to the monitor
-> and tells QEMU to leave the RUN_STATE_PRECONFIG. The mgmt application
-> won't connect to the monitor until daemonizing has completed though.
->=20
-> This is a chicken and egg problem, leading to deadlock at startup.
->=20
-> The only viable way to fix this is to call os_setup_post() before
-> the early main_loop() call when in RUN_STATE_PRECONFIG. This has the
-> downside that any errors from this point onwards won't be handled
-> well by the mgmt application, because it will think QEMU has started
-> successfully, so not be expecting an abrupt exit. The only way to
-> deal with that is to move as much user input validation as possible
-> to before the main_loop() call. This is left as an exercise for
-> future interested developers.
->=20
-> Signed-off-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
-[...]
-
-How about combining ideas from yours and Michal's patches?
-It should fix broken iotests/libvirt sync point and
-we can think about NONE runstate idea at without rushing it.
-If it looks acceptable, I'll post proper patches + test case for it
-after some testing (to ensure that iotests Max pointed out are working
-as expected)
-
-diff --git a/vl.c b/vl.c
-index c4fe255..a2062d6 100644
---- a/vl.c
-+++ b/vl.c
-@@ -1953,10 +1953,15 @@ static bool main_loop_should_exit(void)
-=20
- static void main_loop(void)
- {
-+    static bool os_setup_post_done =3D false;
- #ifdef CONFIG_PROFILER
-     int64_t ti;
- #endif
--    do {
-+    if (!os_setup_post_done) {
-+        os_setup_post();
-+        os_setup_post_done =3D true;
-+    }
-+    while (!main_loop_should_exit()) {
- #ifdef CONFIG_PROFILER
-         ti =3D profile_getclock();
- #endif
-@@ -1964,7 +1969,7 @@ static void main_loop(void)
- #ifdef CONFIG_PROFILER
-         dev_time +=3D profile_getclock() - ti;
- #endif
--    } while (!main_loop_should_exit());
-+    }
- }
-=20
- static void version(void)
+PiBPbiAxIEp1bmUgMjAxOCBhdCAxNToxNiwgZ2VuZ2RvbmdqaXUgPGdlbmdkb25naml1QGh1YXdl
+aS5jb20+IHdyb3RlOg0KPiA+IEhpIFBldGVyLA0KPiANCj4gPj4gWW91IHNob3VsZCB3YWl0IGZv
+ciB0aGF0IHRvIGdldCBpbnRvIG1hc3RlciAoaXQgaXMgaW4gUGFvbG8ncyBtb3N0DQo+ID4+IHJl
+Y2VudCBwYXRjaHNldCBidXQgdGhhdCBoYXMgYW4gaXNzdWUgd2l0aCBhIGRpZmZlcmVudCBwYXRj
+aCwgc28gaXMNCj4gPj4gd2FpdGluZyBvbiBQYW9sbyB0byBkbyBhIHJlc3BpbikuIFRoZW4geW91
+IGNhbiBiYXNlIG9uIHRoYXQuIEF0IHRoYXQNCj4gPj4gcG9pbnQgYSBzaW1wbGUgc2NyaXB0IHVw
+ZGF0ZSBzaG91bGQgd29yayBmaW5lIChpZiB5b3UgbmVlZCBhbnl0aGluZw0KPiA+PiBpbiByYzcg
+dGhhdCB3YXNuJ3QgaW4gcmM2KS4NCj4gPg0KPiA+IE9rLCBnb3QgaXQuIFRoYW5rcyBhIGxvdCBm
+b3IgdGhlIGV4cGxhbmF0aW9uLCBJIHdpbGwgd2FpdCBmb3IgeW91cg0KPiA+IHBhdGNoWzFdIG1l
+cmdlIGludG8gbWFzdGVyIGFuZCBiYXNlZCBvbiBpdC4NCj4gDQo+IFRoZSByYzYgaGVhZGVyIHVw
+ZGF0ZSBpcyBub3cgaW4gUUVNVSBnaXQgbWFzdGVyLg0KDQpPaywgdGhhbmtzIGZvciB0aGUgcmVt
+aW5kZXIuIEkgd2lsbCByZWJhc2VkIGl0Lg0KDQo+IA0KPiB0aGFua3MNCj4gLS0gUE1NDQo=
