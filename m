@@ -1,24 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46647)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47180)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <guangrong.xiao@gmail.com>) id 1fPmEI-0007wh-SE
-	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 05:56:48 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1fPmGx-000249-KO
+	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 05:59:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <guangrong.xiao@gmail.com>) id 1fPmEF-0001N6-4z
-	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 05:56:46 -0400
-Received: from mail-pg0-x232.google.com ([2607:f8b0:400e:c05::232]:37681)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <guangrong.xiao@gmail.com>)
-	id 1fPmEE-0001Md-Rd
-	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 05:56:43 -0400
-Received: by mail-pg0-x232.google.com with SMTP id a13-v6so14249069pgu.4
-	for <qemu-devel@nongnu.org>; Mon, 04 Jun 2018 02:56:42 -0700 (PDT)
-From: guangrong.xiao@gmail.com
-Date: Mon,  4 Jun 2018 17:55:20 +0800
-Message-Id: <20180604095520.8563-13-xiaoguangrong@tencent.com>
-In-Reply-To: <20180604095520.8563-1-xiaoguangrong@tencent.com>
-References: <20180604095520.8563-1-xiaoguangrong@tencent.com>
-Subject: [Qemu-devel] [PATCH 12/12] migration: use lockless Multithread
- model for decompression
+	(envelope-from <dgilbert@redhat.com>) id 1fPmGs-0002e9-O1
+	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 05:59:31 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:59176 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1fPmGs-0002dj-Iy
+	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 05:59:26 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.3])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 1E393401EF05
+	for <qemu-devel@nongnu.org>; Mon,  4 Jun 2018 09:59:26 +0000 (UTC)
+Date: Mon, 4 Jun 2018 10:59:17 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20180604095917.GA2628@work-vm>
+References: <20180601162749.27406-1-marcandre.lureau@redhat.com>
+	<20180601162749.27406-7-marcandre.lureau@redhat.com>
+	<20180604090746.GA2629@work-vm>
+	<CAMxuvayhQPPkFbFUE+Onbe7=AEnVuJ3+dFkDiuQyLA2F0tmW_w@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <CAMxuvayhQPPkFbFUE+Onbe7=AEnVuJ3+dFkDiuQyLA2F0tmW_w@mail.gmail.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [RFC v2 06/12] vhost-user: add
+ vhost_user_input_get_config()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,447 +37,176 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: pbonzini@redhat.com, mst@redhat.com, mtosatti@redhat.com
-Cc: qemu-devel@nongnu.org, kvm@vger.kernel.org, dgilbert@redhat.com, peterx@redhat.com, jiang.biao2@zte.com.cn, wei.w.wang@intel.com, Xiao Guangrong <xiaoguangrong@tencent.com>
+To: =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>, Gerd Hoffmann <kraxel@redhat.com>
 
-From: Xiao Guangrong <xiaoguangrong@tencent.com>
+* Marc-Andr=E9 Lureau (marcandre.lureau@redhat.com) wrote:
+> Hi
+>=20
+> On Mon, Jun 4, 2018 at 11:07 AM, Dr. David Alan Gilbert
+> <dgilbert@redhat.com> wrote:
+> > * Marc-Andr=E9 Lureau (marcandre.lureau@redhat.com) wrote:
+> >> Ask vhost user input backend the list of virtio_input_config.
+> >
+> > Why is this vhost-user specific; shouldn't the vhost-input
+> > behaviour be the same irrespective of if it's vhost-user or plain vho=
+st?
+> >
+>=20
+> A similar message could be used for plain vhost, in some ioctl form.
+> Here we are documenting vhost-user protocol only.
 
-Adapt the compression code to the lockless multithread model
+The vhost-user protocol seems to be mostly independent of the device
+it's carrying; for example I see there's a 'net_set_mtu' and 'send_rarp'
+but I don't think there's anything for disk storage;  what are the cases
+whether these have to be done through a change to the vhost-user
+protocol as opposed to stuff carried over it?
 
-Signed-off-by: Xiao Guangrong <xiaoguangrong@tencent.com>
----
- migration/ram.c | 381 ++++++++++++++++++++++++++------------------------------
- 1 file changed, 175 insertions(+), 206 deletions(-)
+Dave
 
-diff --git a/migration/ram.c b/migration/ram.c
-index 58ecf5caa0..0a0ef0ee57 100644
---- a/migration/ram.c
-+++ b/migration/ram.c
-@@ -341,25 +341,9 @@ typedef struct PageSearchStatus PageSearchStatus;
- 
- CompressionStats compression_counters;
- 
--struct DecompressParam {
--    bool done;
--    bool quit;
--    QemuMutex mutex;
--    QemuCond cond;
--    void *des;
--    uint8_t *compbuf;
--    int len;
--    z_stream stream;
--};
--typedef struct DecompressParam DecompressParam;
--
- static const QEMUFileOps empty_ops = { };
- 
- static QEMUFile *decomp_file;
--static DecompressParam *decomp_param;
--static QemuThread *decompress_threads;
--static QemuMutex decomp_done_lock;
--static QemuCond decomp_done_cond;
- 
- /* Multiple fd's */
- 
-@@ -962,6 +946,178 @@ static int compress_threads_save_setup(void)
-     return compress_threads ? 0 : -1;
- }
- 
-+/* return the size after decompression, or negative value on error */
-+static int
-+qemu_uncompress_data(z_stream *stream, uint8_t *dest, size_t dest_len,
-+                     const uint8_t *source, size_t source_len)
-+{
-+    int err;
-+
-+    err = inflateReset(stream);
-+    if (err != Z_OK) {
-+        return -1;
-+    }
-+
-+    stream->avail_in = source_len;
-+    stream->next_in = (uint8_t *)source;
-+    stream->avail_out = dest_len;
-+    stream->next_out = dest;
-+
-+    err = inflate(stream, Z_NO_FLUSH);
-+    if (err != Z_STREAM_END) {
-+        return -1;
-+    }
-+
-+    return stream->total_out;
-+}
-+
-+struct DecompressData {
-+    /* filled by migration thread.*/
-+    void *des;
-+    uint8_t *compbuf;
-+    size_t len;
-+
-+    z_stream stream;
-+    ThreadRequest request;
-+};
-+typedef struct DecompressData DecompressData;
-+
-+static ThreadRequest *decompress_thread_data_init(void)
-+{
-+    DecompressData *dd = g_new0(DecompressData, 1);
-+
-+    if (inflateInit(&dd->stream) != Z_OK) {
-+        g_free(dd);
-+        return NULL;
-+    }
-+
-+    dd->compbuf = g_malloc0(compressBound(TARGET_PAGE_SIZE));
-+    return &dd->request;
-+}
-+
-+static void decompress_thread_data_fini(ThreadRequest *request)
-+{
-+    DecompressData *dd = container_of(request, DecompressData, request);
-+
-+    inflateEnd(&dd->stream);
-+    g_free(dd->compbuf);
-+    g_free(dd);
-+}
-+
-+static void decompress_thread_data_handler(ThreadRequest *request)
-+{
-+    DecompressData *dd = container_of(request, DecompressData, request);
-+    unsigned long pagesize = TARGET_PAGE_SIZE;
-+    int ret;
-+
-+    ret = qemu_uncompress_data(&dd->stream, dd->des, pagesize,
-+                               dd->compbuf, dd->len);
-+    if (ret < 0) {
-+        error_report("decompress data failed");
-+        qemu_file_set_error(decomp_file, ret);
-+    }
-+}
-+
-+static void decompress_thread_data_done(ThreadRequest *data)
-+{
-+}
-+
-+struct CompressLoad {
-+    Threads *decompress_threads;
-+
-+    /*
-+     * used to decompress data in migration thread if
-+     * decompress threads are busy.
-+     */
-+    z_stream stream;
-+    uint8_t *compbuf;
-+};
-+typedef struct CompressLoad CompressLoad;
-+
-+static CompressLoad compress_load;
-+
-+static int decompress_init(QEMUFile *f)
-+{
-+    Threads *threads;
-+
-+    threads = threads_create(migrate_decompress_threads(), "decompress",
-+                             decompress_thread_data_init,
-+                             decompress_thread_data_fini,
-+                             decompress_thread_data_handler,
-+                             decompress_thread_data_done);
-+    if (!threads) {
-+        return -1;
-+    }
-+
-+    if (inflateInit(&compress_load.stream) != Z_OK) {
-+        threads_destroy(threads);
-+        return -1;
-+    }
-+
-+    compress_load.decompress_threads = threads;
-+    compress_load.compbuf = g_malloc0(compressBound(TARGET_PAGE_SIZE));
-+    decomp_file = f;
-+    return 0;
-+}
-+
-+static void decompress_fini(void)
-+{
-+    if (!compress_load.compbuf) {
-+        return;
-+    }
-+
-+    threads_destroy(compress_load.decompress_threads);
-+    compress_load.decompress_threads = NULL;
-+    g_free(compress_load.compbuf);
-+    compress_load.compbuf = NULL;
-+    inflateEnd(&compress_load.stream);
-+    decomp_file = NULL;
-+}
-+
-+static int flush_decompressed_data(void)
-+{
-+    if (!migrate_use_compression()) {
-+        return 0;
-+    }
-+
-+    threads_wait_done(compress_load.decompress_threads);
-+    return qemu_file_get_error(decomp_file);
-+}
-+
-+static void decompress_data_with_multi_threads(QEMUFile *f,
-+                                               void *host, size_t len)
-+{
-+    ThreadRequest *request;
-+    Threads *threads = compress_load.decompress_threads;
-+    unsigned long pagesize = TARGET_PAGE_SIZE;
-+    uint8_t *compbuf = compress_load.compbuf;
-+    int ret;
-+
-+    request = threads_submit_request_prepare(threads);
-+    if (request) {
-+        DecompressData *dd;
-+
-+        dd = container_of(request, DecompressData, request);
-+        dd->des = host;
-+        dd->len = len;
-+        qemu_get_buffer(f, dd->compbuf, len);
-+        threads_submit_request_commit(threads, request);
-+        return;
-+    }
-+
-+    /* load data and decompress in the main thread */
-+
-+    /* it can change compbuf to point to an internal buffer */
-+    qemu_get_buffer_in_place(f, &compbuf, len);
-+
-+    ret = qemu_uncompress_data(&compress_load.stream, host, pagesize,
-+                               compbuf, len);
-+    if (ret < 0) {
-+        error_report("decompress data failed");
-+        qemu_file_set_error(decomp_file, ret);
-+    }
-+}
-+
- /**
-  * xbzrle_cache_zero_page: insert a zero page in the XBZRLE cache
-  *
-@@ -2794,193 +2950,6 @@ void ram_handle_compressed(void *host, uint8_t ch, uint64_t size)
-     }
- }
- 
--/* return the size after decompression, or negative value on error */
--static int
--qemu_uncompress_data(z_stream *stream, uint8_t *dest, size_t dest_len,
--                     const uint8_t *source, size_t source_len)
--{
--    int err;
--
--    err = inflateReset(stream);
--    if (err != Z_OK) {
--        return -1;
--    }
--
--    stream->avail_in = source_len;
--    stream->next_in = (uint8_t *)source;
--    stream->avail_out = dest_len;
--    stream->next_out = dest;
--
--    err = inflate(stream, Z_NO_FLUSH);
--    if (err != Z_STREAM_END) {
--        return -1;
--    }
--
--    return stream->total_out;
--}
--
--static void *do_data_decompress(void *opaque)
--{
--    DecompressParam *param = opaque;
--    unsigned long pagesize;
--    uint8_t *des;
--    int len, ret;
--
--    qemu_mutex_lock(&param->mutex);
--    while (!param->quit) {
--        if (param->des) {
--            des = param->des;
--            len = param->len;
--            param->des = 0;
--            qemu_mutex_unlock(&param->mutex);
--
--            pagesize = TARGET_PAGE_SIZE;
--
--            ret = qemu_uncompress_data(&param->stream, des, pagesize,
--                                       param->compbuf, len);
--            if (ret < 0) {
--                error_report("decompress data failed");
--                qemu_file_set_error(decomp_file, ret);
--            }
--
--            qemu_mutex_lock(&decomp_done_lock);
--            param->done = true;
--            qemu_cond_signal(&decomp_done_cond);
--            qemu_mutex_unlock(&decomp_done_lock);
--
--            qemu_mutex_lock(&param->mutex);
--        } else {
--            qemu_cond_wait(&param->cond, &param->mutex);
--        }
--    }
--    qemu_mutex_unlock(&param->mutex);
--
--    return NULL;
--}
--
--static int wait_for_decompress_done(void)
--{
--    int idx, thread_count;
--
--    if (!migrate_use_compression()) {
--        return 0;
--    }
--
--    thread_count = migrate_decompress_threads();
--    qemu_mutex_lock(&decomp_done_lock);
--    for (idx = 0; idx < thread_count; idx++) {
--        while (!decomp_param[idx].done) {
--            qemu_cond_wait(&decomp_done_cond, &decomp_done_lock);
--        }
--    }
--    qemu_mutex_unlock(&decomp_done_lock);
--    return qemu_file_get_error(decomp_file);
--}
--
--static void compress_threads_load_cleanup(void)
--{
--    int i, thread_count;
--
--    if (!migrate_use_compression()) {
--        return;
--    }
--    thread_count = migrate_decompress_threads();
--    for (i = 0; i < thread_count; i++) {
--        /*
--         * we use it as a indicator which shows if the thread is
--         * properly init'd or not
--         */
--        if (!decomp_param[i].compbuf) {
--            break;
--        }
--
--        qemu_mutex_lock(&decomp_param[i].mutex);
--        decomp_param[i].quit = true;
--        qemu_cond_signal(&decomp_param[i].cond);
--        qemu_mutex_unlock(&decomp_param[i].mutex);
--    }
--    for (i = 0; i < thread_count; i++) {
--        if (!decomp_param[i].compbuf) {
--            break;
--        }
--
--        qemu_thread_join(decompress_threads + i);
--        qemu_mutex_destroy(&decomp_param[i].mutex);
--        qemu_cond_destroy(&decomp_param[i].cond);
--        inflateEnd(&decomp_param[i].stream);
--        g_free(decomp_param[i].compbuf);
--        decomp_param[i].compbuf = NULL;
--    }
--    g_free(decompress_threads);
--    g_free(decomp_param);
--    decompress_threads = NULL;
--    decomp_param = NULL;
--    decomp_file = NULL;
--}
--
--static int compress_threads_load_setup(QEMUFile *f)
--{
--    int i, thread_count;
--
--    if (!migrate_use_compression()) {
--        return 0;
--    }
--
--    thread_count = migrate_decompress_threads();
--    decompress_threads = g_new0(QemuThread, thread_count);
--    decomp_param = g_new0(DecompressParam, thread_count);
--    qemu_mutex_init(&decomp_done_lock);
--    qemu_cond_init(&decomp_done_cond);
--    decomp_file = f;
--    for (i = 0; i < thread_count; i++) {
--        if (inflateInit(&decomp_param[i].stream) != Z_OK) {
--            goto exit;
--        }
--
--        decomp_param[i].compbuf = g_malloc0(compressBound(TARGET_PAGE_SIZE));
--        qemu_mutex_init(&decomp_param[i].mutex);
--        qemu_cond_init(&decomp_param[i].cond);
--        decomp_param[i].done = true;
--        decomp_param[i].quit = false;
--        qemu_thread_create(decompress_threads + i, "decompress",
--                           do_data_decompress, decomp_param + i,
--                           QEMU_THREAD_JOINABLE);
--    }
--    return 0;
--exit:
--    compress_threads_load_cleanup();
--    return -1;
--}
--
--static void decompress_data_with_multi_threads(QEMUFile *f,
--                                               void *host, int len)
--{
--    int idx, thread_count;
--
--    thread_count = migrate_decompress_threads();
--    qemu_mutex_lock(&decomp_done_lock);
--    while (true) {
--        for (idx = 0; idx < thread_count; idx++) {
--            if (decomp_param[idx].done) {
--                decomp_param[idx].done = false;
--                qemu_mutex_lock(&decomp_param[idx].mutex);
--                qemu_get_buffer(f, decomp_param[idx].compbuf, len);
--                decomp_param[idx].des = host;
--                decomp_param[idx].len = len;
--                qemu_cond_signal(&decomp_param[idx].cond);
--                qemu_mutex_unlock(&decomp_param[idx].mutex);
--                break;
--            }
--        }
--        if (idx < thread_count) {
--            break;
--        } else {
--            qemu_cond_wait(&decomp_done_cond, &decomp_done_lock);
--        }
--    }
--    qemu_mutex_unlock(&decomp_done_lock);
--}
--
- /**
-  * ram_load_setup: Setup RAM for migration incoming side
-  *
-@@ -2991,7 +2960,7 @@ static void decompress_data_with_multi_threads(QEMUFile *f,
-  */
- static int ram_load_setup(QEMUFile *f, void *opaque)
- {
--    if (compress_threads_load_setup(f)) {
-+    if (decompress_init(f)) {
-         return -1;
-     }
- 
-@@ -3004,7 +2973,7 @@ static int ram_load_cleanup(void *opaque)
- {
-     RAMBlock *rb;
-     xbzrle_load_cleanup();
--    compress_threads_load_cleanup();
-+    decompress_fini();
- 
-     RAMBLOCK_FOREACH(rb) {
-         g_free(rb->receivedmap);
-@@ -3346,7 +3315,7 @@ static int ram_load(QEMUFile *f, void *opaque, int version_id)
-         }
-     }
- 
--    ret |= wait_for_decompress_done();
-+    ret |= flush_decompressed_data();
-     rcu_read_unlock();
-     trace_ram_load_complete(ret, seq_iter);
-     return ret;
--- 
-2.14.4
+>=20
+> Thanks
+>=20
+> > Dave
+> >
+> >
+> >> Signed-off-by: Marc-Andr=E9 Lureau <marcandre.lureau@redhat.com>
+> >> ---
+> >>  include/hw/virtio/vhost-backend.h |  4 +++
+> >>  hw/virtio/vhost-user.c            | 59 ++++++++++++++++++++++++++++=
++++
+> >>  docs/interop/vhost-user.txt       |  6 ++++
+> >>  3 files changed, 69 insertions(+)
+> >>
+> >> diff --git a/include/hw/virtio/vhost-backend.h b/include/hw/virtio/v=
+host-backend.h
+> >> index 5dac61f9ea..6cc2edacc5 100644
+> >> --- a/include/hw/virtio/vhost-backend.h
+> >> +++ b/include/hw/virtio/vhost-backend.h
+> >> @@ -12,6 +12,7 @@
+> >>  #define VHOST_BACKEND_H
+> >>
+> >>  #include "exec/memory.h"
+> >> +#include "standard-headers/linux/virtio_input.h"
+> >>
+> >>  typedef enum VhostBackendType {
+> >>      VHOST_BACKEND_TYPE_NONE =3D 0,
+> >> @@ -156,4 +157,7 @@ int vhost_backend_invalidate_device_iotlb(struct=
+ vhost_dev *dev,
+> >>  int vhost_backend_handle_iotlb_msg(struct vhost_dev *dev,
+> >>                                            struct vhost_iotlb_msg *i=
+msg);
+> >>
+> >> +int vhost_user_input_get_config(struct vhost_dev *dev,
+> >> +                                struct virtio_input_config **config=
+);
+> >> +
+> >>  #endif /* VHOST_BACKEND_H */
+> >> diff --git a/hw/virtio/vhost-user.c b/hw/virtio/vhost-user.c
+> >> index a87db01e55..19ed87d07c 100644
+> >> --- a/hw/virtio/vhost-user.c
+> >> +++ b/hw/virtio/vhost-user.c
+> >> @@ -84,6 +84,7 @@ typedef enum VhostUserRequest {
+> >>      VHOST_USER_POSTCOPY_ADVISE  =3D 28,
+> >>      VHOST_USER_POSTCOPY_LISTEN  =3D 29,
+> >>      VHOST_USER_POSTCOPY_END     =3D 30,
+> >> +    VHOST_USER_INPUT_GET_CONFIG,
+> >>      VHOST_USER_MAX
+> >>  } VhostUserRequest;
+> >>
+> >> @@ -324,6 +325,64 @@ static int vhost_user_write(struct vhost_dev *d=
+ev, VhostUserMsg *msg,
+> >>      return 0;
+> >>  }
+> >>
+> >> +static void *vhost_user_read_size(struct vhost_dev *dev, uint32_t s=
+ize)
+> >> +{
+> >> +    struct vhost_user *u =3D dev->opaque;
+> >> +    CharBackend *chr =3D u->chr;
+> >> +    int r;
+> >> +    uint8_t *p =3D g_malloc(size);
+> >> +
+> >> +    r =3D qemu_chr_fe_read_all(chr, p, size);
+> >> +    if (r !=3D size) {
+> >> +        error_report("Failed to read msg payload."
+> >> +                     " Read %d instead of %d.", r, size);
+> >> +        return NULL;
+> >> +    }
+> >> +
+> >> +    return p;
+> >> +}
+> >> +
+> >> +int vhost_user_input_get_config(struct vhost_dev *dev,
+> >> +                                struct virtio_input_config **config=
+)
+> >> +{
+> >> +    void *p =3D NULL;
+> >> +    VhostUserMsg msg =3D {
+> >> +        .hdr.request =3D VHOST_USER_INPUT_GET_CONFIG,
+> >> +        .hdr.flags =3D VHOST_USER_VERSION,
+> >> +    };
+> >> +
+> >> +    if (vhost_user_write(dev, &msg, NULL, 0) < 0) {
+> >> +        goto err;
+> >> +    }
+> >> +
+> >> +    if (vhost_user_read_header(dev, &msg) < 0) {
+> >> +        goto err;
+> >> +    }
+> >> +
+> >> +    p =3D vhost_user_read_size(dev, msg.hdr.size);
+> >> +    if (!p) {
+> >> +        goto err;
+> >> +    }
+> >> +
+> >> +    if (msg.hdr.request !=3D VHOST_USER_INPUT_GET_CONFIG) {
+> >> +        error_report("Received unexpected msg type. Expected %d rec=
+eived %d",
+> >> +                     VHOST_USER_INPUT_GET_CONFIG, msg.hdr.request);
+> >> +        goto err;
+> >> +    }
+> >> +
+> >> +    if (msg.hdr.size % sizeof(struct virtio_input_config)) {
+> >> +        error_report("Invalid msg size");
+> >> +        goto err;
+> >> +    }
+> >> +
+> >> +    *config =3D p;
+> >> +    return msg.hdr.size / sizeof(struct virtio_input_config);
+> >> +
+> >> +err:
+> >> +    g_free(p);
+> >> +    return -1;
+> >> +}
+> >> +
+> >>  static int vhost_user_set_log_base(struct vhost_dev *dev, uint64_t =
+base,
+> >>                                     struct vhost_log *log)
+> >>  {
+> >> diff --git a/docs/interop/vhost-user.txt b/docs/interop/vhost-user.t=
+xt
+> >> index 534caab18a..3df9927386 100644
+> >> --- a/docs/interop/vhost-user.txt
+> >> +++ b/docs/interop/vhost-user.txt
+> >> @@ -744,6 +744,12 @@ Master message types
+> >>        was previously sent.
+> >>        The value returned is an error indication; 0 is success.
+> >>
+> >> + * VHOST_USER_INPUT_GET_CONFIG
+> >> +
+> >> +      Slave payload: (struct virtio_input_config)*
+> >> +
+> >> +      Ask vhost user input backend the list of virtio_input_config.
+> >> +
+> >>  Slave message types
+> >>  -------------------
+> >>
+> >> --
+> >> 2.17.1.906.g10fd178552
+> >>
+> >>
+> > --
+> > Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
