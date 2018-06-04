@@ -1,26 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40557)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41153)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1fPwpo-0004x4-3P
-	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 17:16:13 -0400
+	(envelope-from <jcody@redhat.com>) id 1fPwqo-0005YG-E4
+	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 17:17:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1fPwpk-0005Fu-Ss
-	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 17:16:12 -0400
-Resent-Message-Id: <E1fPwpk-0005Fu-Ss@eggs.gnu.org>
-Received: from sender-of-o51.zoho.com ([135.84.80.216]:21006)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1fPwpk-0005Et-KC
-	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 17:16:08 -0400
-In-Reply-To: <20180604211106.4442-1-programmingkidx@gmail.com>
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <152814694195.420.12172800603696945943@d39dc562802a>
+	(envelope-from <jcody@redhat.com>) id 1fPwqn-0005lv-6A
+	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 17:17:14 -0400
+Date: Mon, 4 Jun 2018 17:17:06 -0400
+From: Jeff Cody <jcody@redhat.com>
+Message-ID: <20180604211706.GD14298@localhost.localdomain>
+References: <20180531205046.153256-1-eblake@redhat.com>
+	<20180531205046.153256-4-eblake@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Mon, 4 Jun 2018 14:15:42 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PATCH] tcg-target.inc.c: Use byte form of xgetbv
- instruction
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180531205046.153256-4-eblake@redhat.com>
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v2 3/8] qcow: Switch
+ qcow_co_readv to byte-based calls
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,44 +24,146 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: programmingkidx@gmail.com
-Cc: famz@redhat.com, peter.maydell@linaro.org, qemu-devel@nongnu.org
+To: Eric Blake <eblake@redhat.com>
+Cc: qemu-devel@nongnu.org, kwolf@redhat.com, qemu-block@nongnu.org, mreitz@redhat.com
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
-c3NhZ2UtaWQ6IDIwMTgwNjA0MjExMTA2LjQ0NDItMS1wcm9ncmFtbWluZ2tpZHhAZ21haWwuY29t
-ClN1YmplY3Q6IFtRZW11LWRldmVsXSBbUEFUQ0hdIHRjZy10YXJnZXQuaW5jLmM6IFVzZSBieXRl
-IGZvcm0gb2YgeGdldGJ2IGluc3RydWN0aW9uCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMh
-L2Jpbi9iYXNoCgpCQVNFPWJhc2UKbj0xCnRvdGFsPSQoZ2l0IGxvZyAtLW9uZWxpbmUgJEJBU0Uu
-LiB8IHdjIC1sKQpmYWlsZWQ9MAoKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQg
-MApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKZ2l0IGNvbmZpZyAtLWxvY2Fs
-IGRpZmYuYWxnb3JpdGhtIGhpc3RvZ3JhbQoKY29tbWl0cz0iJChnaXQgbG9nIC0tZm9ybWF0PSVI
-IC0tcmV2ZXJzZSAkQkFTRS4uKSIKZm9yIGMgaW4gJGNvbW1pdHM7IGRvCiAgICBlY2hvICJDaGVj
-a2luZyBQQVRDSCAkbi8kdG90YWw6ICQoZ2l0IGxvZyAtbiAxIC0tZm9ybWF0PSVzICRjKS4uLiIK
-ICAgIGlmICEgZ2l0IHNob3cgJGMgLS1mb3JtYXQ9ZW1haWwgfCAuL3NjcmlwdHMvY2hlY2twYXRj
-aC5wbCAtLW1haWxiYWNrIC07IHRoZW4KICAgICAgICBmYWlsZWQ9MQogICAgICAgIGVjaG8KICAg
-IGZpCiAgICBuPSQoKG4rMSkpCmRvbmUKCmV4aXQgJGZhaWxlZAo9PT0gVEVTVCBTQ1JJUFQgRU5E
-ID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApG
-cm9tIGh0dHBzOi8vZ2l0aHViLmNvbS9wYXRjaGV3LXByb2plY3QvcWVtdQogdCBbdGFnIHVwZGF0
-ZV0gICAgICAgICAgICBwYXRjaGV3LzIwMTgwNTMxMjA1MDQ2LjE1MzI1Ni0xLWVibGFrZUByZWRo
-YXQuY29tIC0+IHBhdGNoZXcvMjAxODA1MzEyMDUwNDYuMTUzMjU2LTEtZWJsYWtlQHJlZGhhdC5j
-b20KICogW25ldyB0YWddICAgICAgICAgICAgICAgcGF0Y2hldy8yMDE4MDYwNDIxMTEwNi40NDQy
-LTEtcHJvZ3JhbW1pbmdraWR4QGdtYWlsLmNvbSAtPiBwYXRjaGV3LzIwMTgwNjA0MjExMTA2LjQ0
-NDItMS1wcm9ncmFtbWluZ2tpZHhAZ21haWwuY29tClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAn
-dGVzdCcKOGVlNmUzOTcyZSB0Y2ctdGFyZ2V0LmluYy5jOiBVc2UgYnl0ZSBmb3JtIG9mIHhnZXRi
-diBpbnN0cnVjdGlvbgoKPT09IE9VVFBVVCBCRUdJTiA9PT0KQ2hlY2tpbmcgUEFUQ0ggMS8xOiB0
-Y2ctdGFyZ2V0LmluYy5jOiBVc2UgYnl0ZSBmb3JtIG9mIHhnZXRidiBpbnN0cnVjdGlvbi4uLgpF
-UlJPUjogdHJhaWxpbmcgd2hpdGVzcGFjZQojMjM6IEZJTEU6IHRjZy9pMzg2L3RjZy10YXJnZXQu
-aW5jLmM6MzUwNToKKyAgICAgICAgICAgICAqIFRoZSB4Z2V0YnYgaW5zdHJ1Y3Rpb24gaXMgbm90
-IGF2YWlsYWJsZSB0byBvbGRlciB2ZXJzaW9ucyBvZiB0aGUgJAoKRVJST1I6IHNwYWNlcyByZXF1
-aXJlZCBhcm91bmQgdGhhdCAnOicgKGN0eDpWeFcpCiMyNjogRklMRTogdGNnL2kzODYvdGNnLXRh
-cmdldC5pbmMuYzozNTA4OgorICAgICAgICAgICAgYXNtICgiLmJ5dGUgMHgwZiwgMHgwMSwgMHhk
-MCI6ICI9YSIgKHhjcmwpLCAiPWQiICh4Y3JoKSA6ICJjIiAoMCkpOwogICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICBeCgp0b3RhbDogMiBlcnJvcnMsIDAgd2FybmluZ3Ms
-IDEyIGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2Ug
-cmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9y
-dCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4K
-Cj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgot
-LS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cDovL3BhdGNo
-ZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEByZWRo
-YXQuY29t
+On Thu, May 31, 2018 at 03:50:41PM -0500, Eric Blake wrote:
+> We are gradually moving away from sector-based interfaces, towards
+> byte-based.  Make the change for the internals of the qcow
+> driver read function, by iterating over offset/bytes instead of
+> sector_num/nb_sectors, and with a rename of index_in_cluster and
+> repurposing of n to track bytes instead of sectors.
+> 
+> A later patch will then switch the qcow driver as a whole over
+> to byte-based operation.
+> 
+> Signed-off-by: Eric Blake <eblake@redhat.com>
+> 
+> ---
+> v2: prefer 64-bit * over 32-bit <<, rename variable for legibility [Kevin]
+> ---
+>  block/qcow.c | 42 ++++++++++++++++++++----------------------
+>  1 file changed, 20 insertions(+), 22 deletions(-)
+> 
+> diff --git a/block/qcow.c b/block/qcow.c
+> index 42d1bbb7643..b90915218ff 100644
+> --- a/block/qcow.c
+> +++ b/block/qcow.c
+> @@ -617,13 +617,15 @@ static coroutine_fn int qcow_co_readv(BlockDriverState *bs, int64_t sector_num,
+>                           int nb_sectors, QEMUIOVector *qiov)
+>  {
+>      BDRVQcowState *s = bs->opaque;
+> -    int index_in_cluster;
+> +    int offset_in_cluster;
+>      int ret = 0, n;
+>      uint64_t cluster_offset;
+>      struct iovec hd_iov;
+>      QEMUIOVector hd_qiov;
+>      uint8_t *buf;
+>      void *orig_buf;
+> +    int64_t offset = sector_num * BDRV_SECTOR_SIZE;
+> +    int64_t bytes = nb_sectors * BDRV_SECTOR_SIZE;
+> 
+>      if (qiov->niov > 1) {
+>          buf = orig_buf = qemu_try_blockalign(bs, qiov->size);
+> @@ -637,36 +639,35 @@ static coroutine_fn int qcow_co_readv(BlockDriverState *bs, int64_t sector_num,
+> 
+>      qemu_co_mutex_lock(&s->lock);
+> 
+> -    while (nb_sectors != 0) {
+> +    while (bytes != 0) {
+>          /* prepare next request */
+> -        ret = get_cluster_offset(bs, sector_num << 9,
+> -                                 0, 0, 0, 0, &cluster_offset);
+> +        ret = get_cluster_offset(bs, offset, 0, 0, 0, 0, &cluster_offset);
+>          if (ret < 0) {
+>              break;
+>          }
+> -        index_in_cluster = sector_num & (s->cluster_sectors - 1);
+> -        n = s->cluster_sectors - index_in_cluster;
+> -        if (n > nb_sectors) {
+> -            n = nb_sectors;
+> +        offset_in_cluster = offset & (s->cluster_size - 1);
+> +        n = s->cluster_size - offset_in_cluster;
+> +        if (n > bytes) {
+> +            n = bytes;
+>          }
+> 
+>          if (!cluster_offset) {
+>              if (bs->backing) {
+>                  /* read from the base image */
+>                  hd_iov.iov_base = (void *)buf;
+> -                hd_iov.iov_len = n * 512;
+> +                hd_iov.iov_len = n;
+>                  qemu_iovec_init_external(&hd_qiov, &hd_iov, 1);
+>                  qemu_co_mutex_unlock(&s->lock);
+>                  /* qcow2 emits this on bs->file instead of bs->backing */
+>                  BLKDBG_EVENT(bs->file, BLKDBG_READ_BACKING_AIO);
+> -                ret = bdrv_co_readv(bs->backing, sector_num, n, &hd_qiov);
+> +                ret = bdrv_co_preadv(bs->backing, offset, n, &hd_qiov, 0);
+>                  qemu_co_mutex_lock(&s->lock);
+>                  if (ret < 0) {
+>                      break;
+>                  }
+>              } else {
+>                  /* Note: in this case, no need to wait */
+> -                memset(buf, 0, 512 * n);
+> +                memset(buf, 0, n);
+>              }
+>          } else if (cluster_offset & QCOW_OFLAG_COMPRESSED) {
+>              /* add AIO support for compressed blocks ? */
+> @@ -674,21 +675,19 @@ static coroutine_fn int qcow_co_readv(BlockDriverState *bs, int64_t sector_num,
+>                  ret = -EIO;
+>                  break;
+>              }
+> -            memcpy(buf,
+> -                   s->cluster_cache + index_in_cluster * 512, 512 * n);
+> +            memcpy(buf, s->cluster_cache + offset_in_cluster, n);
+>          } else {
+>              if ((cluster_offset & 511) != 0) {
+>                  ret = -EIO;
+>                  break;
+>              }
+>              hd_iov.iov_base = (void *)buf;
+> -            hd_iov.iov_len = n * 512;
+> +            hd_iov.iov_len = n;
+>              qemu_iovec_init_external(&hd_qiov, &hd_iov, 1);
+>              qemu_co_mutex_unlock(&s->lock);
+>              BLKDBG_EVENT(bs->file, BLKDBG_READ_AIO);
+> -            ret = bdrv_co_readv(bs->file,
+> -                                (cluster_offset >> 9) + index_in_cluster,
+> -                                n, &hd_qiov);
+> +            ret = bdrv_co_preadv(bs->file, cluster_offset + offset_in_cluster,
+> +                                 n, &hd_qiov, 0);
+>              qemu_co_mutex_lock(&s->lock);
+>              if (ret < 0) {
+>                  break;
+> @@ -696,8 +695,7 @@ static coroutine_fn int qcow_co_readv(BlockDriverState *bs, int64_t sector_num,
+>              if (bs->encrypted) {
+>                  assert(s->crypto);
+>                  if (qcrypto_block_decrypt(s->crypto,
+> -                                          sector_num * BDRV_SECTOR_SIZE, buf,
+> -                                          n * BDRV_SECTOR_SIZE, NULL) < 0) {
+> +                                          offset, buf, n, NULL) < 0) {
+>                      ret = -EIO;
+>                      break;
+>                  }
+> @@ -705,9 +703,9 @@ static coroutine_fn int qcow_co_readv(BlockDriverState *bs, int64_t sector_num,
+>          }
+>          ret = 0;
+> 
+> -        nb_sectors -= n;
+> -        sector_num += n;
+> -        buf += n * 512;
+> +        bytes -= n;
+> +        offset += n;
+> +        buf += n;
+>      }
+> 
+>      qemu_co_mutex_unlock(&s->lock);
+> -- 
+> 2.14.3
+> 
+> 
+
+Reviewed-by: Jeff Cody <jcody@redhat.com>
