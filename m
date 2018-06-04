@@ -1,27 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40537)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41701)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fPloQ-0005HA-40
-	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 05:30:11 -0400
+	(envelope-from <cohuck@redhat.com>) id 1fPlud-0007Y8-MV
+	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 05:36:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fPloP-0000IP-D5
-	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 05:30:02 -0400
-Received: from mail-ot0-x22e.google.com ([2607:f8b0:4003:c0f::22e]:36211)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fPloP-0000He-7N
-	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 05:30:01 -0400
-Received: by mail-ot0-x22e.google.com with SMTP id m11-v6so36750327otf.3
-	for <qemu-devel@nongnu.org>; Mon, 04 Jun 2018 02:30:01 -0700 (PDT)
+	(envelope-from <cohuck@redhat.com>) id 1fPlua-0004rq-KF
+	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 05:36:27 -0400
+Date: Mon, 4 Jun 2018 11:36:19 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20180604113619.0ef8ccbd.cohuck@redhat.com>
+In-Reply-To: <1527671818-23809-4-git-send-email-thuth@redhat.com>
+References: <1527671818-23809-1-git-send-email-thuth@redhat.com>
+	<1527671818-23809-4-git-send-email-thuth@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20180604092008.GA13674@stefanha-x1.localdomain>
-References: <20180603203412.11033-1-contrib@steffen-goertz.de>
-	<20180604092008.GA13674@stefanha-x1.localdomain>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 4 Jun 2018 10:29:40 +0100
-Message-ID: <CAFEAcA9kdvxa61HNxv-cDhcv07E_NUpwVcSJVYNw4weS3k7nUw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [RFC v3] qapi: command category to stimulate
- high-level machine devices
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 3/3] pc-bios/s390-ccw/net: Try to load
+ pxelinux.cfg file accoring to the UUID
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,17 +24,90 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@gmail.com>
-Cc: =?UTF-8?Q?Steffen_G=C3=B6rtz?= <contrib@steffen-goertz.de>, QEMU Developers <qemu-devel@nongnu.org>, Joel Stanley <joel@jms.id.au>, Jim Mussared <jim@groklearning.com>, Julia Suvorova <jusual@mail.ru>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, "open list:ARM" <qemu-arm@nongnu.org>, Gerd Hoffmann <kraxel@redhat.com>
+To: Thomas Huth <thuth@redhat.com>
+Cc: qemu-s390x@nongnu.org, Viktor Mihajlovski <mihajlov@linux.vnet.ibm.com>, Christian Borntraeger <borntraeger@de.ibm.com>, qemu-devel@nongnu.org, Collin Walling <walling@linux.ibm.com>, Farhan Ali <alifm@linux.ibm.com>
 
-On 4 June 2018 at 10:20, Stefan Hajnoczi <stefanha@gmail.com> wrote:
-> Many of these inputs/outputs can be tied to an external UI.  A degree of
-> timing precision is required so that the UI is responsive, although
-> cycle-accurate timing is not what I'd expect from QMP.
+On Wed, 30 May 2018 11:16:58 +0200
+Thomas Huth <thuth@redhat.com> wrote:
 
-Would we also be able to tie them to an internal UI, ie
-something that appears as another view in the GTK/etc
-UI frontends we have?
+> With the STSI instruction, we can get the UUID of the current VM instance,
+> so we can support loading pxelinux config files via UUID in the file name,
+> too.
+> 
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> ---
+>  pc-bios/s390-ccw/netmain.c | 46 +++++++++++++++++++++++++++++++++++++++++++++-
+>  1 file changed, 45 insertions(+), 1 deletion(-)
+> 
+> diff --git a/pc-bios/s390-ccw/netmain.c b/pc-bios/s390-ccw/netmain.c
+> index e84bb2b..7ece302 100644
+> --- a/pc-bios/s390-ccw/netmain.c
+> +++ b/pc-bios/s390-ccw/netmain.c
+> @@ -235,6 +235,49 @@ static void net_release(filename_ip_t *fn_ip)
+>  }
+>  
+>  /**
+> + * Retrieve the Universally Unique Identifier of the VM.
+> + * @return UUID string, or NULL in case of errors
+> + */
+> +static const char *get_uuid(void)
+> +{
+> +    register int r0 asm("0");
+> +    register int r1 asm("1");
+> +    uint8_t *mem, *buf, uuid[16];
+> +    int i, chk = 0;
+> +    static char uuid_str[37];
+> +
+> +    mem = malloc(2 * PAGE_SIZE);
+> +    if (!mem) {
+> +        puts("Out of memory ... can not get UUID.");
+> +        return NULL;
+> +    }
+> +    buf = (uint8_t *)(((uint64_t)mem + PAGE_SIZE - 1) & ~(PAGE_SIZE - 1));
+> +    memset(buf, 0, PAGE_SIZE);
+> +
+> +    /* Get SYSIB 3.2.2 */
+> +    r0 = (3 << 28) | 2;
+> +    r1 = 2;
+> +    asm volatile(" stsi 0(%2)\n" : : "d" (r0), "d" (r1), "a" (buf)
+> +                 : "cc", "memory");
 
-thanks
--- PMM
+Maybe check for cc == 3 here, just to be safe? (We can probably assume
+a dbct >= 1 if it is successful, I think.)
+
+> +
+> +    for (i = 0; i < 16; i++) {
+> +        uuid[i] = buf[8 * 4 + 12 * 4 + i];
+
+Is there some way to make this offset less magic (offset of first vmdb
++ offset of uuid inside vmdb)?
+
+> +        chk |= uuid[i];
+> +    }
+> +    free(mem);
+> +    if (!chk) {
+> +        return NULL;
+> +    }
+> +
+> +    sprintf(uuid_str, "%02x%02x%02x%02x-%02x%02x-%02x%02x-%02x%02x-"
+> +            "%02x%02x%02x%02x%02x%02x", uuid[0], uuid[1], uuid[2], uuid[3],
+> +            uuid[4], uuid[5], uuid[6], uuid[7], uuid[8], uuid[9], uuid[10],
+> +            uuid[11], uuid[12], uuid[13], uuid[14], uuid[15]);
+> +
+> +    return uuid_str;
+> +}
+> +
+> +/**
+>   * Load a kernel with initrd (i.e. with the information that we've got from
+>   * a pxelinux.cfg config file)
+>   */
+> @@ -284,7 +327,8 @@ static int net_try_pxelinux_cfg(filename_ip_t *fn_ip)
+>      struct pl_cfg_entry entries[MAX_PXELINUX_ENTRIES];
+>      int num_ent, def_ent = 0;
+>  
+> -    num_ent = pxelinux_load_parse_cfg(fn_ip, mac, NULL, DEFAULT_TFTP_RETRIES,
+> +    num_ent = pxelinux_load_parse_cfg(fn_ip, mac, get_uuid(),
+> +                                      DEFAULT_TFTP_RETRIES,
+>                                        cfgbuf, sizeof(cfgbuf),
+>                                        entries, MAX_PXELINUX_ENTRIES, &def_ent);
+>      if (num_ent > 0) {
