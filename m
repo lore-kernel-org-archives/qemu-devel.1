@@ -1,31 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55176)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58095)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1fPw1v-0005dZ-Bq
-	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 16:24:40 -0400
+	(envelope-from <jcody@redhat.com>) id 1fPwI3-0001bJ-Pd
+	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 16:41:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1fPw1s-0006ki-8T
-	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 16:24:39 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:39574 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1fPw1s-0006iq-2k
-	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 16:24:36 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.4])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 78C004010207
-	for <qemu-devel@nongnu.org>; Mon,  4 Jun 2018 20:24:35 +0000 (UTC)
-Date: Mon, 4 Jun 2018 22:24:33 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20180604222433.4d585846@redhat.com>
-In-Reply-To: <787c23db-430b-dc20-10f7-00fdf119449c@redhat.com>
-References: <d714d8ac-6642-f2f3-ad9c-ac7e3bdf30e0@redhat.com>
-	<d453da2c-92fe-5ef8-239c-656c1822b9e0@redhat.com>
-	<787c23db-430b-dc20-10f7-00fdf119449c@redhat.com>
+	(envelope-from <jcody@redhat.com>) id 1fPwI2-000556-OC
+	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 16:41:19 -0400
+Date: Mon, 4 Jun 2018 16:41:09 -0400
+From: Jeff Cody <jcody@redhat.com>
+Message-ID: <20180604204109.GC14298@localhost.localdomain>
+References: <20180531205046.153256-1-eblake@redhat.com>
+	<20180531205046.153256-3-eblake@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] Preconfig state reachable without --preconfig given
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180531205046.153256-3-eblake@redhat.com>
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v2 2/8] qcow: Switch
+ get_cluster_offset to be byte-based
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,52 +24,112 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>
-Cc: Michal Privoznik <mprivozn@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+To: Eric Blake <eblake@redhat.com>
+Cc: qemu-devel@nongnu.org, kwolf@redhat.com, qemu-block@nongnu.org, mreitz@redhat.com
 
-On Mon, 4 Jun 2018 16:04:33 +0200
-Max Reitz <mreitz@redhat.com> wrote:
+On Thu, May 31, 2018 at 03:50:40PM -0500, Eric Blake wrote:
+> We are gradually moving away from sector-based interfaces, towards
+> byte-based.  Make the change for the internal helper function
+> get_cluster_offset(), by changing n_start and n_end to by byte
 
-> On 2018-06-02 12:46, Michal Privoznik wrote:
-> > On 06/01/2018 03:28 PM, Max Reitz wrote:  
-> >> Hi,
-> >>
-> >> The @preconfig RunState documentation states:
-> >>  
-> >>> The state is reachable only if the --preconfig CLI option is used.  
-> >>
-> >> However, this is not true:
-> >>
-> >> $ echo | x86_64-softmmu/qemu-system-x86_64 -monitor stdio
-> >> QEMU 2.12.50 monitor - type 'help' for more information
-> >> (qemu)
-> >> HMP not available in preconfig state, use QMP instead  
-> > 
-> > Not sure if this is the same bug, but I've noticed libvirt having
-> > troubles detecting capabilities of qemu and debugging lead to this patch:
-> > 
-> > http://lists.nongnu.org/archive/html/qemu-devel/2018-06/msg00367.html
-> > 
-> > (which by no means I claim is proper solution. It might be viewed as
-> > workaround by expert qemu devels)  
+s/by\ byte/be\ byte/
+
+> offsets rather than sector indices within the cluster being
+> allocated.  However, assert that these values are still
+> sector-aligned (at least qcrypto_block_encrypt() still wants that).
+> For now we get that alignment for free because we still use
+> sector-based driver callbacks.
 > 
-> I haven't investigated further, but that patch breaks iotest 091 (which
-> tests migration).  It just stops now after the migration has started, so
-> it never completes.
+> A later patch will then switch the qcow driver as a whole over
+> to byte-based operation; but will still leave things at sector
+> alignments as it is not worth auditing the qcow image format
+> to worry about sub-sector requests.
 > 
-> Actually, it seems to break all migration iotests (but 203, which
-> migrates to /dev/null), so I suspect it breaks migration as a whole.
-Manual migration to file and restore from it, was tested manually and
-worked fine, migration-test  from 'make check' is ok as well.
-It's probably due broken to "echo foo | $QEMU"
+> Signed-off-by: Eric Blake <eblake@redhat.com>
 
-There is another issue with -nodefaults option leading to indefinite
-timeout even if --preconfig wasn't used. I've just posted fix for that
-so that it won't be masked out by Michal/Daniel's fix.
-But I've run iotests  and -nodefaults fix doesn't affect outcome of the
-tests (the same 4 failures). 
-
+Reviewed-by: Jeff Cody <jcody@redhat.com>
 
 > 
-> Max
+> ---
+> v2: assert sector alignment [Max]
+> ---
+>  block/qcow.c | 29 +++++++++++++++--------------
+>  1 file changed, 15 insertions(+), 14 deletions(-)
+> 
+> diff --git a/block/qcow.c b/block/qcow.c
+> index 3ba2ca25ea5..42d1bbb7643 100644
+> --- a/block/qcow.c
+> +++ b/block/qcow.c
+> @@ -345,8 +345,8 @@ static int qcow_reopen_prepare(BDRVReopenState *state,
+>   *
+>   * 0 to not allocate.
+>   *
+> - * 1 to allocate a normal cluster (for sector indexes 'n_start' to
+> - * 'n_end')
+> + * 1 to allocate a normal cluster (for sector-aligned byte offsets 'n_start'
+> + * to 'n_end' within the cluster)
+>   *
+>   * 2 to allocate a compressed cluster of size
+>   * 'compressed_size'. 'compressed_size' must be > 0 and <
+> @@ -440,9 +440,10 @@ static int get_cluster_offset(BlockDriverState *bs,
+>          if (!allocate)
+>              return 0;
+>          BLKDBG_EVENT(bs->file, BLKDBG_CLUSTER_ALLOC);
+> +        assert(QEMU_IS_ALIGNED(n_start | n_end, BDRV_SECTOR_SIZE));
+>          /* allocate a new cluster */
+>          if ((cluster_offset & QCOW_OFLAG_COMPRESSED) &&
+> -            (n_end - n_start) < s->cluster_sectors) {
+> +            (n_end - n_start) < s->cluster_size) {
+>              /* if the cluster is already compressed, we must
+>                 decompress it in the case it is not completely
+>                 overwritten */
+> @@ -480,16 +481,15 @@ static int get_cluster_offset(BlockDriverState *bs,
+>                  /* if encrypted, we must initialize the cluster
+>                     content which won't be written */
+>                  if (bs->encrypted &&
+> -                    (n_end - n_start) < s->cluster_sectors) {
+> -                    uint64_t start_sect;
+> +                    (n_end - n_start) < s->cluster_size) {
+> +                    uint64_t start_offset;
+>                      assert(s->crypto);
+> -                    start_sect = (offset & ~(s->cluster_size - 1)) >> 9;
+> -                    for(i = 0; i < s->cluster_sectors; i++) {
+> +                    start_offset = offset & ~(s->cluster_size - 1);
+> +                    for (i = 0; i < s->cluster_size; i += BDRV_SECTOR_SIZE) {
+>                          if (i < n_start || i >= n_end) {
+> -                            memset(s->cluster_data, 0x00, 512);
+> +                            memset(s->cluster_data, 0x00, BDRV_SECTOR_SIZE);
+>                              if (qcrypto_block_encrypt(s->crypto,
+> -                                                      (start_sect + i) *
+> -                                                      BDRV_SECTOR_SIZE,
+> +                                                      start_offset + i,
+>                                                        s->cluster_data,
+>                                                        BDRV_SECTOR_SIZE,
+>                                                        NULL) < 0) {
+> @@ -497,8 +497,9 @@ static int get_cluster_offset(BlockDriverState *bs,
+>                              }
+>                              BLKDBG_EVENT(bs->file, BLKDBG_WRITE_AIO);
+>                              ret = bdrv_pwrite(bs->file,
+> -                                              cluster_offset + i * 512,
+> -                                              s->cluster_data, 512);
+> +                                              cluster_offset + i,
+> +                                              s->cluster_data,
+> +                                              BDRV_SECTOR_SIZE);
+>                              if (ret < 0) {
+>                                  return ret;
+>                              }
+> @@ -758,8 +759,8 @@ static coroutine_fn int qcow_co_writev(BlockDriverState *bs, int64_t sector_num,
+>              n = nb_sectors;
+>          }
+>          ret = get_cluster_offset(bs, sector_num << 9, 1, 0,
+> -                                 index_in_cluster,
+> -                                 index_in_cluster + n, &cluster_offset);
+> +                                 index_in_cluster << 9,
+> +                                 (index_in_cluster + n) << 9, &cluster_offset);
+>          if (ret < 0) {
+>              break;
+>          }
+> -- 
+> 2.14.3
+> 
 > 
