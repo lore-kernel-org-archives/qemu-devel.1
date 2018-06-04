@@ -1,24 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56791)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57321)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1fPouU-00022G-TO
-	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 08:48:31 -0400
+	(envelope-from <mlureau@redhat.com>) id 1fPoyO-0003Q6-F8
+	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 08:52:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1fPouP-0004VL-6i
-	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 08:48:30 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:53724 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1fPouP-0004SY-1A
-	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 08:48:25 -0400
-References: <CAFEAcA8Khsu3HTPbsJW-gBvbzrzJkb=z3tpmELwGyw3rQObJFA@mail.gmail.com>
-From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <3e70445d-dc3c-0cf0-af56-934600f0511d@redhat.com>
-Date: Mon, 4 Jun 2018 14:48:21 +0200
+	(envelope-from <mlureau@redhat.com>) id 1fPoyL-0004V1-7e
+	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 08:52:32 -0400
+Received: from mail-it0-f68.google.com ([209.85.214.68]:54953)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <mlureau@redhat.com>) id 1fPoyL-0004Tm-27
+	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 08:52:29 -0400
+Received: by mail-it0-f68.google.com with SMTP id 76-v6so9979583itx.4
+	for <qemu-devel@nongnu.org>; Mon, 04 Jun 2018 05:52:28 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA8Khsu3HTPbsJW-gBvbzrzJkb=z3tpmELwGyw3rQObJFA@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] unique (or otherwise) RAM block names
+In-Reply-To: <20180604123043.13985-1-berrange@redhat.com>
+References: <20180604123043.13985-1-berrange@redhat.com>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>
+Date: Mon, 4 Jun 2018 14:52:27 +0200
+Message-ID: <CAMxuvaweLW5kW9q0DXw7=zBD4ikUe2UyTPTGQCiA4oJAYrGf-Q@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] chardev: don't splatter terminal settings
+ on exit if not previously set
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,40 +29,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>
 
-On 06/01/18 19:34, Peter Maydell wrote:
-> I was going through trying to fix up various devices that currently
-> fail to register RAM blocks for migration, or register the RAM
-> block globally rather than locally, and I ran into something
-> unexpected.
-> 
-> We name RAM blocks in qemu_ram_set_idstr() like this:
->   * if the user passed a device pointer, then call qdev_get_dev_path(),
->     and if that returns non-NULL, use "path/name"
->   * otherwise, use "name"
-> 
-> Unfortunately, it turns out that there's no guarantee that
-> qdev_get_dev_path() will return anything useful. If the device
-> isn't on a bus, or the bus's class doesn't implement the get_dev_path
-> method, then it'll return NULL.
-> 
-> In particular, this means that if you create what you expect to
-> be a local-to-this-device RAM memory region in a SysBusDevice,
-> then (because SysBus doesn't implement get_dev_path), there is
-> no per-device qualification added to the region name, and so the
-> code silently creates a globally-namespaced RAM region.
-> Trying to create multiple instances of the device therefore fails.
-> 
-> How can we make this work (preferably without breaking migration
-> compat for existing devices) ?
-> 
-> (Sysbus isn't the only bus that doesn't implement get_dev_path,
-> it's just the first one I found.)
+On Mon, Jun 4, 2018 at 2:30 PM, Daniel P. Berrang=C3=A9 <berrange@redhat.co=
+m> wrote:
+> The stdio chardev finalize method calls term_exit() to restore the
+> original terminal settings that were saved in the "oldtty" global. If
+> the qemu_chr_open_stdio() method exited with an error, we might not have
+> any original terminal settings saved in "oldtty" yet.
+>
+> eg
+>
+>   $ qemu-system-x86_64 -monitor stdio -daemonize
+>   qemu-system-x86_64: -monitor stdio: cannot use stdio with -daemonize
+>
+> will cause QEMU to splatter the terminal settings with an all-zeros
+> "struct termios", with predictably unpleasant results. Fortunately the
+> existing "stdio_in_use" flag is suitable witness for whether "oldtty"
+> contains settings that need restoring.
+>
+> Signed-off-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
 
-Related: commit f58b39d2d5b6 ("virtio-mmio: format transport base
-address in BusClass.get_dev_path", 2016-07-14).
+Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
-Thanks
-Laszlo
+> ---
+>  chardev/char-stdio.c | 6 ++++--
+>  1 file changed, 4 insertions(+), 2 deletions(-)
+>
+> diff --git a/chardev/char-stdio.c b/chardev/char-stdio.c
+> index d83e60e787..8039e85f64 100644
+> --- a/chardev/char-stdio.c
+> +++ b/chardev/char-stdio.c
+> @@ -46,8 +46,10 @@ static bool stdio_echo_state;
+>
+>  static void term_exit(void)
+>  {
+> -    tcsetattr(0, TCSANOW, &oldtty);
+> -    fcntl(0, F_SETFL, old_fd0_flags);
+> +    if (stdio_in_use) {
+> +        tcsetattr(0, TCSANOW, &oldtty);
+> +        fcntl(0, F_SETFL, old_fd0_flags);
+> +    }
+>  }
+>
+>  static void qemu_chr_set_echo_stdio(Chardev *chr, bool echo)
+> --
+> 2.17.0
+>
