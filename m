@@ -1,25 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48604)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49216)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1fPh8d-0000Mr-Lo
-	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 00:30:36 -0400
+	(envelope-from <bounces@canonical.com>) id 1fPhFC-0001iC-Ey
+	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 00:37:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1fPh8a-0003GJ-Gh
-	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 00:30:35 -0400
-Resent-Message-Id: <E1fPh8a-0003GJ-Gh@eggs.gnu.org>
-Received: from sender-of-o51.zoho.com ([135.84.80.216]:21054)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1fPh8a-0003G2-8D
-	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 00:30:32 -0400
-In-Reply-To: <20180604042156.13812-1-quintela@redhat.com>
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <152808659065.396.9065157974177590230@d39dc562802a>
+	(envelope-from <bounces@canonical.com>) id 1fPhF9-0004jo-4G
+	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 00:37:22 -0400
+Received: from indium.canonical.com ([91.189.90.7]:60558)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1fPhF8-0004ji-UA
+	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 00:37:19 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1fPhF5-00020G-D8
+	for <qemu-devel@nongnu.org>; Mon, 04 Jun 2018 04:37:15 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id B34BF2E88E1
+	for <qemu-devel@nongnu.org>; Mon,  4 Jun 2018 04:37:14 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Sun, 3 Jun 2018 21:29:51 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PULL 0/5] Migration pull request
+Content-Transfer-Encoding: quoted-printable
+Date: Mon, 04 Jun 2018 04:17:47 -0000
+From: Launchpad Bug Tracker <1426092@bugs.launchpad.net>
+Reply-To: Bug 1426092 <1426092@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20150226192349.17124.43439.malonedeb@gac.canonical.com>
+Message-Id: <152808586750.32120.3527616756051774205.malone@loganberry.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1426092] Re: virtio-balloon-device locks up Guest
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,54 +36,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: quintela@redhat.com
-Cc: famz@redhat.com, qemu-devel@nongnu.org, lvivier@redhat.com, dgilbert@redhat.com, peterx@redhat.com
+To: qemu-devel@nongnu.org
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
-c3NhZ2UtaWQ6IDIwMTgwNjA0MDQyMTU2LjEzODEyLTEtcXVpbnRlbGFAcmVkaGF0LmNvbQpTdWJq
-ZWN0OiBbUWVtdS1kZXZlbF0gW1BVTEwgMC81XSBNaWdyYXRpb24gcHVsbCByZXF1ZXN0Cgo9PT0g
-VEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCgpCQVNFPWJhc2UKbj0xCnRvdGFsPSQo
-Z2l0IGxvZyAtLW9uZWxpbmUgJEJBU0UuLiB8IHdjIC1sKQpmYWlsZWQ9MAoKZ2l0IGNvbmZpZyAt
-LWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVz
-IFRydWUKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYuYWxnb3JpdGhtIGhpc3RvZ3JhbQoKY29tbWl0
-cz0iJChnaXQgbG9nIC0tZm9ybWF0PSVIIC0tcmV2ZXJzZSAkQkFTRS4uKSIKZm9yIGMgaW4gJGNv
-bW1pdHM7IGRvCiAgICBlY2hvICJDaGVja2luZyBQQVRDSCAkbi8kdG90YWw6ICQoZ2l0IGxvZyAt
-biAxIC0tZm9ybWF0PSVzICRjKS4uLiIKICAgIGlmICEgZ2l0IHNob3cgJGMgLS1mb3JtYXQ9ZW1h
-aWwgfCAuL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIC07IHRoZW4KICAgICAgICBm
-YWlsZWQ9MQogICAgICAgIGVjaG8KICAgIGZpCiAgICBuPSQoKG4rMSkpCmRvbmUKCmV4aXQgJGZh
-aWxlZAo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIx
-NjRkMWRlZjdmNDRiZDg4ODcxMzM4NApGcm9tIGh0dHBzOi8vZ2l0aHViLmNvbS9wYXRjaGV3LXBy
-b2plY3QvcWVtdQogdCBbdGFnIHVwZGF0ZV0gICAgICAgICAgICBwYXRjaGV3LzIwMTgwNTE0MDY1
-NzAwLjIyMjAyLTEtY2xnQGthb2Qub3JnIC0+IHBhdGNoZXcvMjAxODA1MTQwNjU3MDAuMjIyMDIt
-MS1jbGdAa2FvZC5vcmcKICogW25ldyB0YWddICAgICAgICAgICAgICAgcGF0Y2hldy8yMDE4MDYw
-NDA0MjE1Ni4xMzgxMi0xLXF1aW50ZWxhQHJlZGhhdC5jb20gLT4gcGF0Y2hldy8yMDE4MDYwNDA0
-MjE1Ni4xMzgxMi0xLXF1aW50ZWxhQHJlZGhhdC5jb20KU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNo
-ICd0ZXN0Jwo5OWFjMGZiMjBkIG1pZ3JhdGlvbjogbm90IHdhaXQgUkRNQV9DTV9FVkVOVF9ESVND
-T05ORUNURUQgZXZlbnQgYWZ0ZXIgcmRtYV9kaXNjb25uZWN0CjdjOTAyMjUzYmIgbWlncmF0aW9u
-OiByZW1vdmUgdW5uZWNlc3NhcnkgdmFyaWFibGVzIGxlbiBpbiBRSU9DaGFubmVsUkRNQQozYzEy
-MDNjYjM4IG1pZ3JhdGlvbjogRG9uJ3QgYWN0aXZhdGUgYmxvY2sgZGV2aWNlcyBpZiB1c2luZyAt
-UwoyZWNjNDU4NTQ2IG1pZ3JhdGlvbjogZGlzY2FyZCBub24tbWlncmF0YWJsZSBSQU1CbG9ja3MK
-NzE4YjM4OGQ0ZSBtaWdyYXRpb246IGludHJvZHVjZSBkZWNvbXByZXNzLWVycm9yLWNoZWNrCgo9
-PT0gT1VUUFVUIEJFR0lOID09PQpDaGVja2luZyBQQVRDSCAxLzU6IG1pZ3JhdGlvbjogaW50cm9k
-dWNlIGRlY29tcHJlc3MtZXJyb3ItY2hlY2suLi4KQ2hlY2tpbmcgUEFUQ0ggMi81OiBtaWdyYXRp
-b246IGRpc2NhcmQgbm9uLW1pZ3JhdGFibGUgUkFNQmxvY2tzLi4uCkVSUk9SOiBNYWNyb3Mgd2l0
-aCBtdWx0aXBsZSBzdGF0ZW1lbnRzIHNob3VsZCBiZSBlbmNsb3NlZCBpbiBhIGRvIC0gd2hpbGUg
-bG9vcAojMTkxOiBGSUxFOiBtaWdyYXRpb24vcmFtLmM6MTYxOgorI2RlZmluZSBSQU1CTE9DS19G
-T1JFQUNIX01JR1JBVEFCTEUoYmxvY2spICAgICAgICAgICAgIFwKKyAgICBSQU1CTE9DS19GT1JF
-QUNIKGJsb2NrKSAgICAgICAgICAgICAgICAgICAgICAgICAgICBcCisgICAgICAgIGlmICghcWVt
-dV9yYW1faXNfbWlncmF0YWJsZShibG9jaykpIHt9IGVsc2UKCkVSUk9SOiB0cmFpbGluZyBzdGF0
-ZW1lbnRzIHNob3VsZCBiZSBvbiBuZXh0IGxpbmUKIzE5MzogRklMRTogbWlncmF0aW9uL3JhbS5j
-OjE2MzoKKyAgICAgICAgaWYgKCFxZW11X3JhbV9pc19taWdyYXRhYmxlKGJsb2NrKSkge30gZWxz
-ZQoKdG90YWw6IDIgZXJyb3JzLCAwIHdhcm5pbmdzLCAyNzMgbGluZXMgY2hlY2tlZAoKWW91ciBw
-YXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2Ug
-ZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIs
-IHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKQ2hlY2tpbmcgUEFUQ0ggMy81OiBtaWdy
-YXRpb246IERvbid0IGFjdGl2YXRlIGJsb2NrIGRldmljZXMgaWYgdXNpbmcgLVMuLi4KQ2hlY2tp
-bmcgUEFUQ0ggNC81OiBtaWdyYXRpb246IHJlbW92ZSB1bm5lY2Vzc2FyeSB2YXJpYWJsZXMgbGVu
-IGluIFFJT0NoYW5uZWxSRE1BLi4uCkNoZWNraW5nIFBBVENIIDUvNTogbWlncmF0aW9uOiBub3Qg
-d2FpdCBSRE1BX0NNX0VWRU5UX0RJU0NPTk5FQ1RFRCBldmVudCBhZnRlciByZG1hX2Rpc2Nvbm5l
-Y3QuLi4KPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTog
-MQoKCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwOi8v
-cGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVs
-QHJlZGhhdC5jb20=
+[Expired for QEMU because there has been no activity for 60 days.]
+
+** Changed in: qemu
+       Status: Incomplete =3D> Expired
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1426092
+
+Title:
+  virtio-balloon-device locks up Guest
+
+Status in QEMU:
+  Expired
+
+Bug description:
+  Setting arbitrary balloon target values locks up the guest in some cases =
+crashes it, if the target memory is < used +~5% free.  =
+
+  Found while testing aggressive memory over-commit, scenarios.
+  You get messages like:
+
+  [  155.827448] [<c002060c>] (show_stack) from [<c041c518>] (dump_stack+0x=
+6c/0x88)
+  [  155.837076] [<c041c518>] (dump_stack) from [<c0091994>] (warn_alloc_fa=
+iled+0xe0/0x120)
+  [  155.847075] [<c0091994>] (warn_alloc_failed) from [<c0094480>] (__allo=
+c_pages_nodemask+0x600/0x91c)
+  [  155.859039] [<c0094480>] (__alloc_pages_nodemask) from [<c00da414>] (b=
+alloon_page_enqueue+0x20/0xbc)
+  [  155.870556] [<c00da414>] (balloon_page_enqueue) from [<c025d794>] (bal=
+loon+0x140/0x2cc)
+  [  155.881377] [<c025d794>] (balloon) from [<c0043b38>] (kthread+0xd8/0xf=
+4)
+
+  page dumped bacause: nonzero _count
+  BUG: BAad page state in process Xorg pfn:396e5
+
+  Test Environment:
+  x86_64
+  Ubuntu 13.10, Guest Linux Kernel 3.19, qemu 2.2.0 with following patches =
+applied - balloon OOM enhancement
+  commit 5a10b7dbf904bfe01bb9fcc6298f7df09eed77d5
+  Author: Raushaniya Maksudova <rmaksudova@parallels.com>
+
+  Boot guest with '-balloon virtio', -qmp .... -hmp access
+  1. sudo info balloon | socat - tcp4-connect:127.0.0.1:4444
+     - or over qmp interface
+  {"execute":"qom-get", "arguments": { "path": "/machine/peripheral-anon/de=
+vice[1]","property": "guest-stats" }}
+  {"return": {"stats": {"stat-swap-out": 0, "stat-free-memory": 513454080, =
+"stat-minor-faults": 1261, "stat-major-faults": 0, "stat-total-memory": 526=
+073856, "stat-swap-in": 0}, "last-update": 11109}}
+
+  2. Take memory down check free memory using (1)
+  3. Issue "sudo echo balloon XXX | socat - tcp4-connect:127.0.0.1:4444" - =
+XXX is value in threshold mentioned above
+     and you get Guest lockup
+
+  ARM - samething except '-device virtio-balloon-device' used
+
+  Libvirt - virsh setmem causes same issue.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1426092/+subscriptions
