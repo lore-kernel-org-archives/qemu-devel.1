@@ -1,26 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59419)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60193)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1fPiOy-0005Wg-UW
-	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 01:51:34 -0400
+	(envelope-from <pagupta@redhat.com>) id 1fPiUM-0006jM-G3
+	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 01:57:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1fPiOv-0005IO-0g
-	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 01:51:33 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:42286 helo=mx1.redhat.com)
+	(envelope-from <pagupta@redhat.com>) id 1fPiUI-0006q5-L0
+	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 01:57:06 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:52180)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1fPiOu-0005Ht-RJ
-	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 01:51:28 -0400
-References: <20180603050546.6827-1-zhangckid@gmail.com>
-	<20180603050546.6827-2-zhangckid@gmail.com>
-From: Jason Wang <jasowang@redhat.com>
-Message-ID: <f6951f5c-4005-78b3-cd22-738a89829df9@redhat.com>
-Date: Mon, 4 Jun 2018 13:51:19 +0800
+	(Exim 4.71) (envelope-from <pagupta@redhat.com>) id 1fPiUI-0006pN-By
+	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 01:57:02 -0400
+Date: Mon, 4 Jun 2018 01:56:55 -0400 (EDT)
+From: Pankaj Gupta <pagupta@redhat.com>
+Message-ID: <1227242806.39629768.1528091815515.JavaMail.zimbra@redhat.com>
+In-Reply-To: <20180601142410.5c986f13@redhat.com>
+References: <20180425112415.12327-1-pagupta@redhat.com>
+	<20180601142410.5c986f13@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20180603050546.6827-2-zhangckid@gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH V8 01/17] filter-rewriter: fix memory leak
- for connection in connection_track_table
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [RFC v2 0/2] kvm "fake DAX" device flushing
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,193 +27,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Zhang Chen <zhangckid@gmail.com>, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Juan Quintela <quintela@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>
-Cc: zhanghailiang <zhang.zhanghailiang@huawei.com>, Li Zhijian <lizhijian@cn.fujitsu.com>
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: kwolf@redhat.com, haozhong zhang <haozhong.zhang@intel.com>, nilal@redhat.com, jack@suse.cz, xiaoguangrong eric <xiaoguangrong.eric@gmail.com>, kvm@vger.kernel.org, riel@surriel.com, linux-nvdimm@ml01.01.org, david@redhat.com, ross zwisler <ross.zwisler@intel.com>, linux-kernel@vger.kernel.org, qemu-devel@nongnu.org, hch@infradead.org, linux-mm@kvack.org, mst@redhat.com, stefanha@redhat.com, niteshnarayanlal@hotmail.com, marcel@redhat.com, pbonzini@redhat.com, dan j williams <dan.j.williams@intel.com>, lcapitulino@redhat.com
 
 
+Hi Igor,
 
-On 2018=E5=B9=B406=E6=9C=8803=E6=97=A5 13:05, Zhang Chen wrote:
-> After a net connection is closed, we didn't clear its releated resource=
-s
-> in connection_track_table, which will lead to memory leak.
->
-> Let't track the state of net connection, if it is closed, its related
-> resources will be cleared up.
->
-> Signed-off-by: zhanghailiang <zhang.zhanghailiang@huawei.com>
-> Signed-off-by: Zhang Chen <zhangckid@gmail.com>
-> ---
->   net/colo.h            |  4 +++
->   net/filter-rewriter.c | 69 ++++++++++++++++++++++++++++++++++++++----=
--
->   2 files changed, 66 insertions(+), 7 deletions(-)
->
-> diff --git a/net/colo.h b/net/colo.h
-> index da6c36dcf7..cd118510c5 100644
-> --- a/net/colo.h
-> +++ b/net/colo.h
-> @@ -18,6 +18,7 @@
->   #include "slirp/slirp.h"
->   #include "qemu/jhash.h"
->   #include "qemu/timer.h"
-> +#include "slirp/tcp.h"
->  =20
->   #define HASHTABLE_MAX_SIZE 16384
->  =20
-> @@ -86,6 +87,9 @@ typedef struct Connection {
->        * run once in independent tcp connection
->        */
->       int syn_flag;
-> +
-> +    int tcp_state; /* TCP FSM state */
-> +    tcp_seq fin_ack_seq; /* the seq of 'fin=3D1,ack=3D1' */
+> 
+> [...]
+> > - Qemu virtio-pmem device
+> >   It exposes a persistent memory range to KVM guest which
+> >   at host side is file backed memory and works as persistent
+> >   memory device. In addition to this it provides virtio
+> >   device handling of flushing interface. KVM guest performs
+> >   Qemu side asynchronous sync using this interface.
+> a random high level question,
+> Have you considered using a separate (from memory itself)
+> virtio device as controller for exposing some memory, async flushing.
+> And then just slaving pc-dimm devices to it with notification/ACPI
+> code suppressed so that guest won't touch them?
 
-So the question is, the state machine is not complete. I suspect there=20
-will be corner cases that will be left because of lacking sufficient=20
-states. LAST_ACK happens only for passive close. How about active close?
+No.
 
-So I think we need either maintain a full state machine or not instead=20
-of a partial one. We don't want endless bugs.
+> 
+> That way it might be more scale-able, you consume only 1 PCI slot
+> for controller vs multiple for virtio-pmem devices.
 
-Thanks
+That sounds like a good suggestion. I will note it as an
+enhancement once we have other concerns related to basic working 
+of 'flush' interface addressed. Then probably we can work on
+things 'need to optimize' with robust core flush functionality. 
 
->   } Connection;
->  =20
->   uint32_t connection_key_hash(const void *opaque);
-> diff --git a/net/filter-rewriter.c b/net/filter-rewriter.c
-> index 62dad2d773..0909a9a8af 100644
-> --- a/net/filter-rewriter.c
-> +++ b/net/filter-rewriter.c
-> @@ -59,9 +59,9 @@ static int is_tcp_packet(Packet *pkt)
->   }
->  =20
->   /* handle tcp packet from primary guest */
-> -static int handle_primary_tcp_pkt(NetFilterState *nf,
-> +static int handle_primary_tcp_pkt(RewriterState *rf,
->                                     Connection *conn,
-> -                                  Packet *pkt)
-> +                                  Packet *pkt, ConnectionKey *key)
->   {
->       struct tcphdr *tcp_pkt;
->  =20
-> @@ -99,15 +99,44 @@ static int handle_primary_tcp_pkt(NetFilterState *n=
-f,
->               net_checksum_calculate((uint8_t *)pkt->data + pkt->vnet_h=
-dr_len,
->                                      pkt->size - pkt->vnet_hdr_len);
->           }
-> +        /*
-> +         * Case 1:
-> +         * The *server* side of this connect is VM, *client* tries to =
-close
-> +         * the connection.
-> +         *
-> +         * We got 'ack=3D1' packets from client side, it acks 'fin=3D1=
-, ack=3D1'
-> +         * packet from server side. From this point, we can ensure tha=
-t there
-> +         * will be no packets in the connection, except that, some err=
-ors
-> +         * happen between the path of 'filter object' and vNIC, if thi=
-s rare
-> +         * case really happen, we can still create a new connection,
-> +         * So it is safe to remove the connection from connection_trac=
-k_table.
-> +         *
-> +         */
-> +        if ((conn->tcp_state =3D=3D TCPS_LAST_ACK) &&
-> +            (ntohl(tcp_pkt->th_ack) =3D=3D (conn->fin_ack_seq + 1))) {
-> +            g_hash_table_remove(rf->connection_track_table, key);
-> +        }
-> +    }
-> +    /*
-> +     * Case 2:
-> +     * The *server* side of this connect is VM, *server* tries to clos=
-e
-> +     * the connection.
-> +     *
-> +     * We got 'fin=3D1, ack=3D1' packet from client side, we need to
-> +     * record the seq of 'fin=3D1, ack=3D1' packet.
-> +     */
-> +    if ((tcp_pkt->th_flags & (TH_ACK | TH_FIN)) =3D=3D (TH_ACK | TH_FI=
-N)) {
-> +        conn->fin_ack_seq =3D htonl(tcp_pkt->th_seq);
-> +        conn->tcp_state =3D TCPS_LAST_ACK;
->       }
->  =20
->       return 0;
->   }
->  =20
->   /* handle tcp packet from secondary guest */
-> -static int handle_secondary_tcp_pkt(NetFilterState *nf,
-> +static int handle_secondary_tcp_pkt(RewriterState *rf,
->                                       Connection *conn,
-> -                                    Packet *pkt)
-> +                                    Packet *pkt, ConnectionKey *key)
->   {
->       struct tcphdr *tcp_pkt;
->  =20
-> @@ -139,8 +168,34 @@ static int handle_secondary_tcp_pkt(NetFilterState=
- *nf,
->               net_checksum_calculate((uint8_t *)pkt->data + pkt->vnet_h=
-dr_len,
->                                      pkt->size - pkt->vnet_hdr_len);
->           }
-> +        /*
-> +         * Case 2:
-> +         * The *server* side of this connect is VM, *server* tries to =
-close
-> +         * the connection.
-> +         *
-> +         * We got 'ack=3D1' packets from server side, it acks 'fin=3D1=
-, ack=3D1'
-> +         * packet from client side. Like Case 1, there should be no pa=
-ckets
-> +         * in the connection from now know, But the difference here is
-> +         * if the packet is lost, We will get the resent 'fin=3D1,ack=3D=
-1' packet.
-> +         * TODO: Fix above case.
-> +         */
-> +        if ((conn->tcp_state =3D=3D TCPS_LAST_ACK) &&
-> +            (ntohl(tcp_pkt->th_ack) =3D=3D (conn->fin_ack_seq + 1))) {
-> +            g_hash_table_remove(rf->connection_track_table, key);
-> +        }
-> +    }
-> +    /*
-> +     * Case 1:
-> +     * The *server* side of this connect is VM, *client* tries to clos=
-e
-> +     * the connection.
-> +     *
-> +     * We got 'fin=3D1, ack=3D1' packet from server side, we need to
-> +     * record the seq of 'fin=3D1, ack=3D1' packet.
-> +     */
-> +    if ((tcp_pkt->th_flags & (TH_ACK | TH_FIN)) =3D=3D (TH_ACK | TH_FI=
-N)) {
-> +        conn->fin_ack_seq =3D ntohl(tcp_pkt->th_seq);
-> +        conn->tcp_state =3D TCPS_LAST_ACK;
->       }
-> -
->       return 0;
->   }
->  =20
-> @@ -190,7 +245,7 @@ static ssize_t colo_rewriter_receive_iov(NetFilterS=
-tate *nf,
->  =20
->           if (sender =3D=3D nf->netdev) {
->               /* NET_FILTER_DIRECTION_TX */
-> -            if (!handle_primary_tcp_pkt(nf, conn, pkt)) {
-> +            if (!handle_primary_tcp_pkt(s, conn, pkt, &key)) {
->                   qemu_net_queue_send(s->incoming_queue, sender, 0,
->                   (const uint8_t *)pkt->data, pkt->size, NULL);
->                   packet_destroy(pkt, NULL);
-> @@ -203,7 +258,7 @@ static ssize_t colo_rewriter_receive_iov(NetFilterS=
-tate *nf,
->               }
->           } else {
->               /* NET_FILTER_DIRECTION_RX */
-> -            if (!handle_secondary_tcp_pkt(nf, conn, pkt)) {
-> +            if (!handle_secondary_tcp_pkt(s, conn, pkt, &key)) {
->                   qemu_net_queue_send(s->incoming_queue, sender, 0,
->                   (const uint8_t *)pkt->data, pkt->size, NULL);
->                   packet_destroy(pkt, NULL);
+BTW any sample code doing this right now in Qemu? 
+
+> 
+> 
+> > Changes from previous RFC[1]:
+> > 
+> > - Reuse existing 'pmem' code for registering persistent
+> >   memory and other operations instead of creating an entirely
+> >   new block driver.
+> > - Use VIRTIO driver to register memory information with
+> >   nvdimm_bus and create region_type accordingly.
+> > - Call VIRTIO flush from existing pmem driver.
+> > 
+> > Details of project idea for 'fake DAX' flushing interface is
+> > shared [2] & [3].
+> > 
+> > Pankaj Gupta (2):
+> >    Add virtio-pmem guest driver
+> >    pmem: device flush over VIRTIO
+> > 
+> > [1] https://marc.info/?l=linux-mm&m=150782346802290&w=2
+> > [2] https://www.spinics.net/lists/kvm/msg149761.html
+> > [3] https://www.spinics.net/lists/kvm/msg153095.html
+> > 
+> >  drivers/nvdimm/region_devs.c     |    7 ++
+> >  drivers/virtio/Kconfig           |   12 +++
+> >  drivers/virtio/Makefile          |    1
+> >  drivers/virtio/virtio_pmem.c     |  118
+> >  +++++++++++++++++++++++++++++++++++++++
+> >  include/linux/libnvdimm.h        |    4 +
+> >  include/uapi/linux/virtio_ids.h  |    1
+> >  include/uapi/linux/virtio_pmem.h |   58 +++++++++++++++++++
+> >  7 files changed, 201 insertions(+)
+> > 
+> 
+> 
+> 
