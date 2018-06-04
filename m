@@ -1,30 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46282)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46616)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1fPoDK-0004Y2-C6
-	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 08:03:56 -0400
+	(envelope-from <imammedo@redhat.com>) id 1fPoEf-0005SC-Mf
+	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 08:05:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1fPoDJ-0001IB-HD
-	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 08:03:54 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:41552 helo=mx1.redhat.com)
+	(envelope-from <imammedo@redhat.com>) id 1fPoEc-0002Lt-F1
+	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 08:05:17 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:55310 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1fPoDJ-0001Ha-Cg
-	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 08:03:53 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.5])
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1fPoEc-0002L9-9a
+	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 08:05:14 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.6])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id F2A53BB40A
-	for <qemu-devel@nongnu.org>; Mon,  4 Jun 2018 12:03:52 +0000 (UTC)
-From: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
-Date: Mon,  4 Jun 2018 13:03:45 +0100
-Message-Id: <20180604120345.12955-3-berrange@redhat.com>
-In-Reply-To: <20180604120345.12955-1-berrange@redhat.com>
-References: <20180604120345.12955-1-berrange@redhat.com>
+	by mx1.redhat.com (Postfix) with ESMTPS id E0F7240BC05B
+	for <qemu-devel@nongnu.org>; Mon,  4 Jun 2018 12:05:13 +0000 (UTC)
+Date: Mon, 4 Jun 2018 14:05:12 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20180604140512.1c43b186@redhat.com>
+In-Reply-To: <24719f30-25c9-a80e-0db9-ae2f7f318c68@redhat.com>
+References: <d714d8ac-6642-f2f3-ad9c-ac7e3bdf30e0@redhat.com>
+	<d453da2c-92fe-5ef8-239c-656c1822b9e0@redhat.com>
+	<24719f30-25c9-a80e-0db9-ae2f7f318c68@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v2 2/2] vl: fix use of --daemonize with
- --preconfig
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] Preconfig state reachable without --preconfig given
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,64 +34,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Michal Privoznik <mprivozn@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Eric Blake <eblake@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Markus Armbruster <armbru@redhat.com>, Max Reitz <mreitz@redhat.com>, =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
+To: Max Reitz <mreitz@redhat.com>
+Cc: Michal Privoznik <mprivozn@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 
-When using --daemonize, the initial lead process will fork a child and
-then wait to be notified that setup is complete via a pipe, before it
-exits.  When using --preconfig there is an extra call to main_loop()
-before the notification is done from os_setup_post(). Thus the parent
-process won't exit until the mgmt application connects to the monitor
-and tells QEMU to leave the RUN_STATE_PRECONFIG. The mgmt application
-won't connect to the monitor until daemonizing has completed though.
+On Mon, 4 Jun 2018 11:46:06 +0200
+Max Reitz <mreitz@redhat.com> wrote:
 
-This is a chicken and egg problem, leading to deadlock at startup.
+> On 2018-06-02 12:46, Michal Privoznik wrote:
+> > On 06/01/2018 03:28 PM, Max Reitz wrote:  
+> >> Hi,
+> >>
+> >> The @preconfig RunState documentation states:
+> >>  
+> >>> The state is reachable only if the --preconfig CLI option is used.  
+> >>
+> >> However, this is not true:
+> >>
+> >> $ echo | x86_64-softmmu/qemu-system-x86_64 -monitor stdio
+> >> QEMU 2.12.50 monitor - type 'help' for more information
+> >> (qemu)
+> >> HMP not available in preconfig state, use QMP instead  
+> > 
+> > Not sure if this is the same bug, but I've noticed libvirt having
+> > troubles detecting capabilities of qemu and debugging lead to this patch:
+> > 
+> > http://lists.nongnu.org/archive/html/qemu-devel/2018-06/msg00367.html
+> > 
+> > (which by no means I claim is proper solution. It might be viewed as
+> > workaround by expert qemu devels)  
+> 
+> Well, it'd fix both of my issues, so it has that going for it. :-)
+Acked patch.
 
-The only viable way to fix this is to call os_setup_post() before
-the early main_loop() call when in RUN_STATE_PRECONFIG. This has the
-downside that any errors from this point onwards won't be handled
-well by the mgmt application, because it will think QEMU has started
-successfully, so not be expecting an abrupt exit. The only way to
-deal with that is to move as much user input validation as possible
-to before the main_loop() call. This is left as an exercise for
-future interested developers.
+Markus also suggested to drop HMP monitor altogether at this first loop,
+I'll look into it some more taking in account demonize() issue.
 
-Signed-off-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
----
- vl.c | 7 ++++++-
- 1 file changed, 6 insertions(+), 1 deletion(-)
+> 
+> >> On IRC, Daniel proposed doing the runstate transition immediately after
+> >> the command line has been read and no --preconfig option has been found.
+> >>  Doing that indeed fixes the issue for me (but I don't know whether
+> >> that's the best solution).  
+> > 
+> > Oh has he? I can't find it anywhere.  
+> 
+> That was in #qemu on OFTC:
+> 
+> [Friday, June 1 2018] [15:21:26 CEST] <danpb> if we've not passed
+> --preconfig though, we should not be in PRECONFIG state in the first
+> place IMHO
+> [Friday, June 1 2018] [15:22:27 CEST] <danpb> eg  vl.c should set the
+> state to RUN_STATE_PRELAUNCH  immediately after parsing CLI args if
+> --preconfig wasn't given
+That's not how it should be, PRECONFIG is there to replace PRELAUNCH
+at early stages (which commit 8a36283e12 message states)
+/me is to blame for miss-leading doc comment/
 
-diff --git a/vl.c b/vl.c
-index 30d0e985f0..f4bba36d19 100644
---- a/vl.c
-+++ b/vl.c
-@@ -2921,6 +2921,7 @@ int main(int argc, char **argv, char **envp)
-     Error *err =3D NULL;
-     bool list_data_dirs =3D false;
-     char *dir, **dirs;
-+    bool os_setup_post_done =3D false;
-     typedef struct BlockdevOptions_queue {
-         BlockdevOptions *bdo;
-         Location loc;
-@@ -4476,6 +4477,8 @@ int main(int argc, char **argv, char **envp)
-=20
-     /* do monitor/qmp handling at preconfig state if requested */
-     if (runstate_check(RUN_STATE_PRECONFIG)) {
-+        os_setup_post();
-+        os_setup_post_done =3D true;
-         main_loop();
-     }
-=20
-@@ -4606,7 +4609,9 @@ int main(int argc, char **argv, char **envp)
-     }
-=20
-     accel_setup_post(current_machine);
--    os_setup_post();
-+    if (!os_setup_post_done) {
-+        os_setup_post();
-+    }
-=20
-     main_loop();
-=20
---=20
-2.17.0
+> Max
+> 
