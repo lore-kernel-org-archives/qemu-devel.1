@@ -1,34 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50352)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51718)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fPhNH-0003LB-9D
-	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 00:45:44 -0400
+	(envelope-from <peterx@redhat.com>) id 1fPhaZ-0006R3-Q9
+	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 00:59:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fPhNG-00087T-61
-	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 00:45:43 -0400
-Received: from indium.canonical.com ([91.189.90.7]:58144)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1fPhNF-00086F-Ur
-	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 00:45:42 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1fPhND-0006YY-U4
-	for <qemu-devel@nongnu.org>; Mon, 04 Jun 2018 04:45:40 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 68C612E88D5
-	for <qemu-devel@nongnu.org>; Mon,  4 Jun 2018 04:45:39 +0000 (UTC)
+	(envelope-from <peterx@redhat.com>) id 1fPhaU-0004R7-UF
+	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 00:59:27 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:42132 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1fPhaU-0004R1-NR
+	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 00:59:22 -0400
+Date: Mon, 4 Jun 2018 12:59:04 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20180604045904.GA31407@xz-mi>
+References: <20180531051641.8473-1-peterx@redhat.com>
+	<20180531051641.8473-3-peterx@redhat.com>
+	<ecd9d666-8973-3f09-0ab9-eea9655e5919@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 04 Jun 2018 04:17:49 -0000
-From: Launchpad Bug Tracker <1025244@bugs.launchpad.net>
-Reply-To: Bug 1025244 <1025244@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20120716123031.26191.29124.malonedeb@chaenomeles.canonical.com>
-Message-Id: <152808586989.32120.17175108904928831681.malone@loganberry.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1025244] Re: qcow2 image increasing disk size
- above the virtual limit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <ecd9d666-8973-3f09-0ab9-eea9655e5919@redhat.com>
+Subject: Re: [Qemu-devel] [RFC v2 2/4] tests: iotests: don't compare
+ SHUTDOWN event
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,65 +29,116 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Eric Blake <eblake@redhat.com>
+Cc: qemu-devel@nongnu.org, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Fam Zheng <famz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Eric Auger <eric.auger@redhat.com>, John Snow <jsnow@redhat.com>, Markus Armbruster <armbru@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
 
-[Expired for QEMU because there has been no activity for 60 days.]
+On Thu, May 31, 2018 at 09:42:23AM -0500, Eric Blake wrote:
+> On 05/31/2018 12:16 AM, Peter Xu wrote:
+> > This event is not really necessary.  After OOB series it might affect
+> > the timing of the script so this event may or may not be there comparing
+> > to the old *.out results.  Let's just filter it out.
+> 
+> This is worrying. Are you stating that the SHUTDOWN event can occur in a
+> different order than it used to, or is it even worse that the SHUTDOWN event
+> disappears altogether?  If enabling OOB makes the SHUTDOWN event sometimes
+> disappear, that's a regression that we should fix.  If it just makes things
+> occur in a different order, we need an explanation why that is okay.
 
-** Changed in: qemu
-       Status: Incomplete =3D> Expired
+The event might conditionally disappear in two of the 100+ qcow2
+tests.  And when it happens, it's not disappearing in all the
+testcases in the test but only some.  For example, 087 might
+conditionally fail with this:
 
--- =
+087 8s ... - output mismatch (see 087.out.bad)
+--- /home/peterx/git/qemu/tests/qemu-iotests/087.out    2018-06-01 18:44:22.378982462 +0800
++++ /home/peterx/git/qemu/bin/tests/qemu-iotests/087.out.bad    2018-06-01 18:53:44.267840928 +0800
+@@ -8,7 +8,6 @@
+ {"return": {}}
+ {"error": {"class": "GenericError", "desc": "'node-name' must be specified for the root node"}}
+ {"return": {}}
+-{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1025244
 
-Title:
-  qcow2 image increasing disk size above the virtual limit
+ === Duplicate ID ===
+@@ -53,7 +52,6 @@
+ {"return": {}}
+ {"return": {}}
+ {"return": {}}
+-{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
 
-Status in QEMU:
-  Expired
-Status in qemu-kvm package in Ubuntu:
-  Expired
 
-Bug description:
-  Using qemu/kvm, qcow2 images, ext4 file systems on both guest and host
-   Host and Guest: Ubuntu server 12.04 64bit
-  To create an image I did this:
+ === Missing driver ===
 
-  qemu-img create -f qcow2 -o preallocation=3Dmetadata ubuntu-pdc-vda.img 1=
-0737418240 (not sure about the exact bytes, but around this)
-  ls -l ubuntu-pdc-vda.img
-  fallocate -l theSizeInBytesFromAbove ubuntu-pdc-vda.img
+Firstly, it does not fail every time I run "./check -qcow2 087", but
+it might fail like 1 out of 5.  Then, it's not failing all the
+testcases in 087.  For above example, it's failing "Missing ID and
+node-name" and "Encrypted image LUKS", and it can change too.
 
-  The problem is that the image is growing progressively and has
-  obviously no limit, although I gave it one. The root filesystem's
-  image is the same case:
+> 
+> > 
+> > Since some of the scripts are using qmp-pretty, we need some trick in
+> > the filtering script to make sure sed works for multiple lines to
+> > explicitly mask out this event.
+> > 
+> > CC: John Snow <jsnow@redhat.com>
+> > CC: Max Reitz <mreitz@redhat.com>
+> > CC: Kevin Wolf <kwolf@redhat.com>
+> > Signed-off-by: Peter Xu <peterx@redhat.com>
+> > ---
+> 
+> > +++ b/tests/qemu-iotests/067.out
+> > @@ -70,6 +70,7 @@ Testing: -drive file=TEST_DIR/t.IMGFMT,format=IMGFMT,if=none,id=disk -device vir
+> >       }
+> >   }
+> > +
+> >   === -drive/device_add and device_del ===
+> 
+> Why is this blank line being added (multiple times in this file)?  Is there
+> something about the new filter that isn't quite stripping all the newlines
+> when encountering the SHUTDOWN event in pretty form?
+> 
+> Aha - it's because test 067 is already doing a very similar filtering of
+> events.  Can we reduce the code duplication by promoting _filter_qmp_events
+> from there into common.filter (as a separate patch)?
 
-  qemu-img info ubuntu-pdc-vda.img
-   image: ubuntu-pdc-vda.img
-   file format: qcow2
-   virtual size: 10G (10737418240 bytes)
-   disk size: 14G
-   cluster_size: 65536
+Yeah, can do.
 
-  and for confirmation:
-   du -sh ubuntu-pdc-vda.img
-   15G ubuntu-pdc-vda.img
+> 
+> > +++ b/tests/qemu-iotests/common.filter
+> > @@ -88,7 +88,10 @@ _filter_qmp()
+> >       sed -e 's#\("\(micro\)\?seconds": \)[0-9]\+#\1 TIMESTAMP#g' \
+> >           -e 's#^{"QMP":.*}$#QMP_VERSION#' \
+> >           -e '/^    "QMP": {\s*$/, /^    }\s*$/ c\' \
+> > -        -e '    QMP_VERSION'
+> > +        -e '    QMP_VERSION' | \
+> > +    tr '\n' '\r' | \
+> > +    sed -e 's/{\s*"timestamp":\s*{\s*"seconds":\s*TIMESTAMP,\s*"microseconds":\s*TIMESTAMP\s*},\s*"event":\s*"SHUTDOWN",\s*"data":\s*{\s*"guest":\s*false\s*}\s*}\s//' | \
+> 
+> Really long line. This should do the same:
+> 
+> sed -e 's/\r{\(\r[^}]\|[^\r]\)*SHUTDOWN\(\r[^}]\|[^\r]\)*\r}//'
+> 
+> where the \(\r[^}]\|[^\r]\)* subpattern picks up all line breaks that do not
+> end the current top-level {}, as well as any non-line breaks.
+> 
+> In fact, if you like my suggestion about promoting the filter from 67 into
+> common.filter, we have two use cases: filter a single pretty-printed filter,
+> and filter ANY pretty-printed filter.  Maybe we do that as follows:
+> 
+> # $1 is a regex of event names to filter; leave empty to filter all
+> _filter_qmp_events()
+> {
+>     fluff='\(\r[^}]\|[^\r]\)*'
+>     tr \\n \\r | \
+>     sed -e "s/$fluff"'"event": "'"$1$fluff\\r}//" \
+>   | tr \\r \\n
+> }
+> 
+> at which point '_filter_qmp_events SHUTDOWN' works in this patch, and
+> '_filter_qmp_events' works for 067.  [Untested, but hopefully that gives you
+> some ideas to play with]
 
-  I made a test and saw that when I delete something from the guest, the re=
-al size of the image is not decreasing (I read it is normal). OK, but when =
-I write something again, it doesn't use the freed space, but instead grows =
-the image. So for example:
-   1. The initial physical size of the image is 1GB.
-   2. I copy 1GB of data in the guest. It's physical size becomes 2GB.
-   3. I delete this data (1GB). The physical size of the image remains 2GB.
-   4. I copy another 1GB of data to the guest.
-   5. The physical size of the image becomes 3GB.
-   6. And so on with no limit. It doesn't care if the virtual size is less.
+Regex magic.  Thanks for the lesson. :)
 
-  Is this normal - the real/physical size of the image to be larger than
-  the virtual limit???
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1025244/+subscriptions
+-- 
+Peter Xu
