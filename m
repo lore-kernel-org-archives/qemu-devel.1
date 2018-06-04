@@ -1,22 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53401)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53723)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1fPmjG-0006H8-EX
-	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 06:28:48 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1fPmkg-0007dt-TX
+	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 06:30:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1fPmjF-0007rP-Io
-	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 06:28:46 -0400
-References: <20180601141223.26630-1-peter.maydell@linaro.org>
-	<20180601141223.26630-4-peter.maydell@linaro.org>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <8279dc88-50d6-80d1-2a92-117a3fc2703c@redhat.com>
-Date: Mon, 4 Jun 2018 12:28:35 +0200
+	(envelope-from <peter.maydell@linaro.org>) id 1fPmka-0000D3-Nu
+	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 06:30:14 -0400
+Received: from mail-ot0-x242.google.com ([2607:f8b0:4003:c0f::242]:38948)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1fPmka-0000Cr-IY
+	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 06:30:08 -0400
+Received: by mail-ot0-x242.google.com with SMTP id l12-v6so36977665oth.6
+	for <qemu-devel@nongnu.org>; Mon, 04 Jun 2018 03:30:08 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20180601141223.26630-4-peter.maydell@linaro.org>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="0fUIZhsaByEFeqKZfMFvcGaNzoDZMpm6N"
-Subject: Re: [Qemu-devel] [PATCH 3/6] hw/block/pflash_cfi02: Convert away
- from old_mmio
+In-Reply-To: <1487722868-9111-8-git-send-email-yongbok.kim@imgtec.com>
+References: <1487722868-9111-1-git-send-email-yongbok.kim@imgtec.com>
+	<1487722868-9111-8-git-send-email-yongbok.kim@imgtec.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 4 Jun 2018 11:29:47 +0100
+Message-ID: <CAFEAcA8NehifKn7wsmLgUqiYNHwczzrXGnUcTvx-AbLM=_LeMQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL v2 7/8] hw: xilinx-pcie: Add support for
+ Xilinx AXI PCIe Controller
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,53 +30,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
-Cc: patches@linaro.org, Kevin Wolf <kwolf@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Thomas Huth <huth@tuxfamily.org>, Aurelien Jarno <aurelien@aurel32.net>, qemu-block@nongnu.org, Yongbok Kim <yongbok.kim@mips.com>
+To: Yongbok Kim <yongbok.kim@mips.com>, Paul Burton <paul.burton@mips.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Edgar Iglesias <edgar.iglesias@xilinx.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---0fUIZhsaByEFeqKZfMFvcGaNzoDZMpm6N
-From: Max Reitz <mreitz@redhat.com>
-To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
-Cc: patches@linaro.org, Kevin Wolf <kwolf@redhat.com>,
- "Michael S. Tsirkin" <mst@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Thomas Huth <huth@tuxfamily.org>, Aurelien Jarno <aurelien@aurel32.net>,
- qemu-block@nongnu.org, Yongbok Kim <yongbok.kim@mips.com>
-Message-ID: <8279dc88-50d6-80d1-2a92-117a3fc2703c@redhat.com>
-Subject: Re: [PATCH 3/6] hw/block/pflash_cfi02: Convert away from old_mmio
-References: <20180601141223.26630-1-peter.maydell@linaro.org>
- <20180601141223.26630-4-peter.maydell@linaro.org>
-In-Reply-To: <20180601141223.26630-4-peter.maydell@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-On 2018-06-01 16:12, Peter Maydell wrote:
-> Convert the pflash_cfi02 device away from using the old_mmio field
-> of MemoryRegionOps.
->=20
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+On 22 February 2017 at 00:21, Yongbok Kim <yongbok.kim@imgtec.com> wrote:
+> From: Paul Burton <paul.burton@imgtec.com>
+>
+> Add support for emulating the Xilinx AXI Root Port Bridge for PCI
+> Express as described by Xilinx' PG055 document. This is a PCIe
+> controller that can be used with certain series of Xilinx FPGAs, and is
+> used on the MIPS Boston board which will make use of this code.
+>
+> Signed-off-by: Paul Burton <paul.burton@imgtec.com>
+> [yongbok.kim@imgtec.com:
+>   removed returning on !level,
+>   updated IRQ connection with GPIO logic,
+>   moved xilinx_pcie_init() to boston.c
+>   replaced stw_le_p() with pci_set_word()
+>   and other cosmetic changes]
+> Signed-off-by: Yongbok Kim <yongbok.kim@imgtec.com>
 > ---
->  hw/block/pflash_cfi02.c | 97 ++++++++---------------------------------=
 
->  1 file changed, 18 insertions(+), 79 deletions(-)
+> +static void xilinx_pcie_host_realize(DeviceState *dev, Error **errp)
+> +{
+> +    PCIHostState *pci = PCI_HOST_BRIDGE(dev);
+> +    XilinxPCIEHost *s = XILINX_PCIE_HOST(dev);
+> +    SysBusDevice *sbd = SYS_BUS_DEVICE(dev);
+> +    PCIExpressHost *pex = PCIE_HOST_BRIDGE(dev);
+> +
+> +    snprintf(s->name, sizeof(s->name), "pcie%u", s->bus_nr);
+> +
+> +    /* PCI configuration space */
+> +    pcie_host_mmcfg_init(pex, s->cfg_size);
+> +
+> +    /* MMIO region */
+> +    memory_region_init(&s->mmio, OBJECT(s), "mmio", UINT64_MAX);
+> +    memory_region_set_enabled(&s->mmio, false);
+> +
+> +    /* dummy I/O region */
+> +    memory_region_init_ram(&s->io, OBJECT(s), "io", 16, NULL);
+> +    memory_region_set_enabled(&s->io, false);
 
-Acked-by: Max Reitz <mreitz@redhat.com>
+Hi; I was looking at the code for this PCI controller as
+part of identifying RAM memory regions that don't migrate
+their contents, and this looks kind of odd. Can you explain
+why this is using a RAM region for the PCI bus's IO memory
+space? None of our other PCI controller models do this, so
+I suspect this is a bug. (The effect would be that PCI IO
+accesses to addresses which don't have a PCI BAR mapped there
+will behave as reads-as-written, which seems pretty unlikely
+to be what the hardware does.)
 
+What is the intended semantics for PCI IO accesses with this
+controller? (It seems to only be used with the MIPS boston
+board model.)
 
---0fUIZhsaByEFeqKZfMFvcGaNzoDZMpm6N
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlsVFFMACgkQ9AfbAGHV
-z0CjsQf+NJknhruNL/HpiUsF2Lc2DbP1HMcbXu1pyLr6so7aDPVec/HsGoGnqe0b
-qFuT7ZKZEF5GZI6n65RmzPOH03a6avdnwse6+bWITl6wnjQz3lx4ZVnYHpOc3lbk
-CjhwPPGiY5YGjgLmye8/jmoURc9hgkH6HbxuO7xao4Mj+jOC6F+ls2iKKwsXKbRp
-j/Y3k8D0z77dzXB05+KG9Ts6Ntgqtxa3qJOfrX+f24QYf+wsm6j79VVcvm4hutNW
-LQhPWm8ZU6DAJoOG2PdRypla47h5RlIS12U1NFJ7RdD3aZlSE+rWWbFzecOKkdRx
-mFmSJ2tshiUYqkFlPKKxs1t5JduUqg==
-=eIMl
------END PGP SIGNATURE-----
-
---0fUIZhsaByEFeqKZfMFvcGaNzoDZMpm6N--
+thanks
+-- PMM
