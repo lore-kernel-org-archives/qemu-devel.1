@@ -1,34 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55495)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55961)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fPooA-0006Nv-AK
-	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 08:41:59 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1fPoqr-0007uu-6C
+	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 08:44:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fPoo6-0000aU-A1
-	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 08:41:58 -0400
-Received: from indium.canonical.com ([91.189.90.7]:43066)
+	(envelope-from <peter.maydell@linaro.org>) id 1fPoqq-0005S2-7I
+	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 08:44:45 -0400
+Received: from mail-oi0-x242.google.com ([2607:f8b0:4003:c06::242]:38984)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1fPoo6-0000Z2-2U
-	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 08:41:54 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1fPoo3-0001Fl-QV
-	for <qemu-devel@nongnu.org>; Mon, 04 Jun 2018 12:41:52 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 04F942E88D7
-	for <qemu-devel@nongnu.org>; Mon,  4 Jun 2018 12:41:51 +0000 (UTC)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1fPoqo-0005P4-M7
+	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 08:44:44 -0400
+Received: by mail-oi0-x242.google.com with SMTP id t22-v6so24836849oih.6
+	for <qemu-devel@nongnu.org>; Mon, 04 Jun 2018 05:44:42 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 04 Jun 2018 12:33:52 -0000
-From: Thomas Huth <1715296@bugs.launchpad.net>
-Reply-To: Bug 1715296 <1715296@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <150467634266.16715.896859689385742459.malonedeb@gac.canonical.com>
-Message-Id: <152811563304.4365.14027718153181840588.malone@chaenomeles.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1715296] Re: qemu: invalid serial port
- configuration
+In-Reply-To: <0184EA26B2509940AA629AE1405DD7F201CAF085@DGGEMA503-MBX.china.huawei.com>
+References: <0184EA26B2509940AA629AE1405DD7F201CAF085@DGGEMA503-MBX.china.huawei.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 4 Jun 2018 13:44:21 +0100
+Message-ID: <CAFEAcA_Su0SuR9Q_ao_9G9_VQ5MtoaK1ZLJstL=yWfe0N9Pg5A@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH RESEND v1 0/3] add support for VCPU event
+ states
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,47 +29,22 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: gengdongjiu <gengdongjiu@huawei.com>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "famz@redhat.com" <famz@redhat.com>, "james.morse@arm.com" <james.morse@arm.com>, "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>, Linuxarm <linuxarm@huawei.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-Patch has now been committed here:
-https://git.qemu.org/?p=3Dqemu.git;a=3Dcommitdiff;h=3D12fb0ac0575df83cec72ec
+On 1 June 2018 at 15:16, gengdongjiu <gengdongjiu@huawei.com> wrote:
+> Hi Peter,
 
-** Changed in: qemu
-       Status: New =3D> Fix Committed
+>> You should wait for that to get into master (it is in Paolo's most
+>> recent patchset but that has an issue with a different patch, so
+>> is waiting on Paolo to do a respin). Then you can base on that. At
+>> that point a simple script update should work fine (if you need
+>> anything in rc7 that wasn't in rc6).
+>
+> Ok, got it. Thanks a lot for the explanation, I will wait for your
+> patch[1] merge into master and based on it.
 
--- =
+The rc6 header update is now in QEMU git master.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1715296
-
-Title:
-  qemu: invalid serial port configuration
-
-Status in QEMU:
-  Fix Committed
-
-Bug description:
-  The tty_serial_init() function sets the port c_oflags as follows:
-  tty.c_oflag |=3D OPOST not clearing ONLCR, ONLRET and others.
-  The result is that the postprocess output is enabled and host translates =
-0xa (LF) to 0xd 0xa (CR LF) which breaks the binary transmissions on serial=
- port even if you set the port to raw mode (no matters if on host and/or gu=
-est).
-  The issue has been reported 11 years ago on qemu-devel mailing list:
-  https://lists.nongnu.org/archive/html/qemu-devel/2006-06/msg00196.html
-  There was also a FreeBSD patch including the fix:
-  https://lists.freebsd.org/pipermail/freebsd-ports/2006-October/036390.html
-
-  I think the correct port configuration is:
-  tty.c_iflag &=3D ~(IGNBRK|BRKINT|PARMRK|ISTRIP|INLCR|IGNCR|ICRNL|IXON|IMA=
-XBEL);
-  tty.c_oflag &=3D ~OPOST;
-
-  In such case the host will perform no output processing and will pass the=
- data as is.
-  And the guest will be able to configure input/output processing exactly a=
-s it wants.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1715296/+subscriptions
+thanks
+-- PMM
