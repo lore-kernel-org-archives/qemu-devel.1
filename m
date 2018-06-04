@@ -1,16 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58448)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59391)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <joel.stan@gmail.com>) id 1fPl7O-00060a-8x
-	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 04:45:35 -0400
+	(envelope-from <kraxel@redhat.com>) id 1fPlAs-0006lf-Lk
+	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 04:49:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <joel.stan@gmail.com>) id 1fPl7N-0002o7-8y
-	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 04:45:34 -0400
-Sender: "joel.stan@gmail.com" <joel.stan@gmail.com>
-From: Joel Stanley <joel@jms.id.au>
-Date: Mon,  4 Jun 2018 18:15:13 +0930
-Message-Id: <20180604084513.8298-1-joel@jms.id.au>
-Subject: [Qemu-devel] [PATCH v3] target/ppc: Allow privileged access to
- SPR_PCR
+	(envelope-from <kraxel@redhat.com>) id 1fPlAo-0007XE-MQ
+	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 04:49:10 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:48968 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1fPlAo-0007VB-HK
+	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 04:49:06 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.6])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 05FE9859B2
+	for <qemu-devel@nongnu.org>; Mon,  4 Jun 2018 08:49:05 +0000 (UTC)
+From: Gerd Hoffmann <kraxel@redhat.com>
+Date: Mon,  4 Jun 2018 10:49:02 +0200
+Message-Id: <20180604084903.8163-2-kraxel@redhat.com>
+In-Reply-To: <20180604084903.8163-1-kraxel@redhat.com>
+References: <20180604084903.8163-1-kraxel@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL 1/2] bochs-display: add missing break
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -19,110 +32,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>, Alexander Graf <agraf@suse.de>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
-Cc: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>, Greg Kurz <groug@kaod.org>, Benjamin Herrenschmidt <benh@kernel.crashing.org>, Michael Ellerman <mpe@ellerman.id.au>, Michael Neuling <mikey@neuling.org>
+To: qemu-devel@nongnu.org
+Cc: Gerd Hoffmann <kraxel@redhat.com>
 
-The powerpc Linux kernel[1] and skiboot firmware[2] recently gained changes
-that cause the Processor Compatibility Register (PCR) SPR to be cleared.
-
-These changes cause Linux to fail to boot on the Qemu powernv machine
-with an error:
-
- Trying to write privileged spr 338 (0x152) at 0000000030017f0c
-
-With this patch Qemu makes this register available as a hypervisor
-privileged register.
-
-Note that bits set in this register disable features of the processor.
-Currently the only register state that is supported is when the register
-is zeroed (enable all features). This is sufficient for guests to
-once again boot.
-
-[1] https://lkml.kernel.org/r/20180518013742.24095-1-mikey@neuling.org
-[2] https://patchwork.ozlabs.org/patch/915932/
-
-Signed-off-by: Joel Stanley <joel@jms.id.au>
+Fixes: CID 1391291
+Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+Reviewed-by: J=C3=A1n Tomko <jtomko@redhat.com>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+Message-id: 20180525045344.28347-1-kraxel@redhat.com
 ---
-v2:
- - Change error message to say Invalid instead of Unimplemented
- - Fix compile warning on other powerpc targets, thanks patchew
-v3:
- - Mask against pcr_mask before storing
- - Drop check for non-zero value
----
- target/ppc/helper.h             | 1 +
- target/ppc/misc_helper.c        | 9 +++++++++
- target/ppc/translate_init.inc.c | 9 +++++++--
- 3 files changed, 17 insertions(+), 2 deletions(-)
+ hw/display/bochs-display.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/target/ppc/helper.h b/target/ppc/helper.h
-index 19453c68138a..d751f0e21909 100644
---- a/target/ppc/helper.h
-+++ b/target/ppc/helper.h
-@@ -17,6 +17,7 @@ DEF_HELPER_2(pminsn, void, env, i32)
- DEF_HELPER_1(rfid, void, env)
- DEF_HELPER_1(hrfid, void, env)
- DEF_HELPER_2(store_lpcr, void, env, tl)
-+DEF_HELPER_2(store_pcr, void, env, tl)
- #endif
- DEF_HELPER_1(check_tlb_flush_local, void, env)
- DEF_HELPER_1(check_tlb_flush_global, void, env)
-diff --git a/target/ppc/misc_helper.c b/target/ppc/misc_helper.c
-index 8c8cba5cc6f1..b88493009609 100644
---- a/target/ppc/misc_helper.c
-+++ b/target/ppc/misc_helper.c
-@@ -20,6 +20,7 @@
- #include "cpu.h"
- #include "exec/exec-all.h"
- #include "exec/helper-proto.h"
-+#include "qemu/error-report.h"
- 
- #include "helper_regs.h"
- 
-@@ -98,6 +99,14 @@ void helper_store_ptcr(CPUPPCState *env, target_ulong val)
-         tlb_flush(CPU(cpu));
-     }
- }
-+
-+void helper_store_pcr(CPUPPCState *env, target_ulong value)
-+{
-+    PowerPCCPU *cpu = ppc_env_get_cpu(env);
-+    PowerPCCPUClass *pcc = POWERPC_CPU_GET_CLASS(cpu);
-+
-+    env->spr[SPR_PCR] = value & pcc->pcr_mask;
-+}
- #endif /* defined(TARGET_PPC64) */
- 
- void helper_store_pidr(CPUPPCState *env, target_ulong val)
-diff --git a/target/ppc/translate_init.inc.c b/target/ppc/translate_init.inc.c
-index ab782cb32aaa..1a89017ddea8 100644
---- a/target/ppc/translate_init.inc.c
-+++ b/target/ppc/translate_init.inc.c
-@@ -424,6 +424,10 @@ static void spr_write_ptcr(DisasContext *ctx, int sprn, int gprn)
-     gen_helper_store_ptcr(cpu_env, cpu_gpr[gprn]);
- }
- 
-+static void spr_write_pcr(DisasContext *ctx, int sprn, int gprn)
-+{
-+    gen_helper_store_pcr(cpu_env, cpu_gpr[gprn]);
-+}
- #endif
- #endif
- 
-@@ -7957,11 +7961,12 @@ static void gen_spr_power6_common(CPUPPCState *env)
- #endif
-     /*
-      * Register PCR to report POWERPC_EXCP_PRIV_REG instead of
--     * POWERPC_EXCP_INVAL_SPR.
-+     * POWERPC_EXCP_INVAL_SPR in userspace. Permit hypervisor access.
-      */
--    spr_register(env, SPR_PCR, "PCR",
-+    spr_register_hv(env, SPR_PCR, "PCR",
-                  SPR_NOACCESS, SPR_NOACCESS,
-                  SPR_NOACCESS, SPR_NOACCESS,
-+                 &spr_read_generic, &spr_write_pcr,
-                  0x00000000);
- }
- 
--- 
-2.17.0
+diff --git a/hw/display/bochs-display.c b/hw/display/bochs-display.c
+index c33524b558..1187d77576 100644
+--- a/hw/display/bochs-display.c
++++ b/hw/display/bochs-display.c
+@@ -158,6 +158,7 @@ static int bochs_display_get_mode(BochsDisplayState *=
+s,
+         /* best effort: support native endianess only */
+         mode->format =3D PIXMAN_r5g6b5;
+         mode->bytepp =3D 2;
++        break;
+     case 32:
+         mode->format =3D s->big_endian_fb
+             ? PIXMAN_BE_x8r8g8b8
+--=20
+2.9.3
