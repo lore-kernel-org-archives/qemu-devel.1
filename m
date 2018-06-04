@@ -1,27 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41402)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44218)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fPpsM-0004wq-7U
-	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 09:50:23 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fPq4T-0007y4-8U
+	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 10:03:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fPpsK-00060J-SU
-	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 09:50:22 -0400
-Received: from mail-ot0-x244.google.com ([2607:f8b0:4003:c0f::244]:43330)
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fPq4N-00053O-FC
+	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 10:02:53 -0400
+Received: from mail-qt0-x242.google.com ([2607:f8b0:400d:c0d::242]:35642)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fPpsJ-0005zZ-VY
-	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 09:50:20 -0400
-Received: by mail-ot0-x244.google.com with SMTP id i19-v6so7131186otk.10
-	for <qemu-devel@nongnu.org>; Mon, 04 Jun 2018 06:50:19 -0700 (PDT)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fPq4N-00052t-AP
+	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 10:02:47 -0400
+Received: by mail-qt0-x242.google.com with SMTP id s9-v6so11025797qtg.2
+	for <qemu-devel@nongnu.org>; Mon, 04 Jun 2018 07:02:47 -0700 (PDT)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20180604110358.2821-1-peter.maydell@linaro.org>
+	<20180604110358.2821-2-peter.maydell@linaro.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <8446747d-2ddf-e7a0-c765-43b8570f78bc@amsat.org>
+Date: Mon, 4 Jun 2018 11:02:41 -0300
 MIME-Version: 1.0
-In-Reply-To: <20180515234017.2277-17-quintela@redhat.com>
-References: <20180515234017.2277-1-quintela@redhat.com>
-	<20180515234017.2277-17-quintela@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 4 Jun 2018 14:49:58 +0100
-Message-ID: <CAFEAcA_cpAT27=DQj6qyvoP8u=zUgzG2vidcgN=vP1KLDn8LMA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL 16/40] migration: allow dst vm pause on
- postcopy
+In-Reply-To: <20180604110358.2821-2-peter.maydell@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH 1/2] hw/mips/boston: don't make flash
+ region 'nomigrate'
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,136 +36,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Juan Quintela <quintela@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Laurent Vivier <lvivier@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Peter Xu <peterx@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
+Cc: Juan Quintela <quintela@redhat.com>, patches@linaro.org, dgilbert@redhat.com, Paul Burton <paul.burton@mips.com>, =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>, Yongbok Kim <yongbok.kim@mips.com>, Aurelien Jarno <aurelien@aurel32.net>
 
-On 16 May 2018 at 00:39, Juan Quintela <quintela@redhat.com> wrote:
-> From: Peter Xu <peterx@redhat.com>
->
-> When there is IO error on the incoming channel (e.g., network down),
-> instead of bailing out immediately, we allow the dst vm to switch to the
-> new POSTCOPY_PAUSE state. Currently it is still simple - it waits the
-> new semaphore, until someone poke it for another attempt.
->
-> One note is that here on ram loading thread we cannot detect the
-> POSTCOPY_ACTIVE state, but we need to detect the more specific
-> POSTCOPY_INCOMING_RUNNING state, to make sure we have already loaded all
-> the device states.
->
-> Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> Signed-off-by: Peter Xu <peterx@redhat.com>
-> Message-Id: <20180502104740.12123-5-peterx@redhat.com>
-> Signed-off-by: Juan Quintela <quintela@redhat.com>
+On 06/04/2018 08:03 AM, Peter Maydell wrote:
+> Currently we use memory_region_init_rom_nomigrate() to create
+> the "boston.flash" memory region, and we don't manually register
+> it with vmstate_register_ram(). This currently means that its
+> contents are migrated but as a ram block whose name is the empty
+> string; in future it may mean they are not migrated at all. Use
+> memory_region_init_ram() instead.
+> 
+> Note that this is a a cross-version migration compatibility break
+> for the "boston" machine.
+> 
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+
 > ---
-
-Hi; Coverity (CID 1391289) points out what it thinks is an issue in
-this commit. I think it's wrong, but it does leave me uncertain
-whether we have the locking correct here...
-
-> +/* Return true if we should continue the migration, or false. */
-> +static bool postcopy_pause_incoming(MigrationIncomingState *mis)
-> +{
-> +    trace_postcopy_pause_incoming();
-> +
-> +    migrate_set_state(&mis->state, MIGRATION_STATUS_POSTCOPY_ACTIVE,
-> +                      MIGRATION_STATUS_POSTCOPY_PAUSED);
-> +
-> +    assert(mis->from_src_file);
-> +    qemu_file_shutdown(mis->from_src_file);
-> +    qemu_fclose(mis->from_src_file);
-> +    mis->from_src_file = NULL;
-
-In postcopy_pause_incoming() we always set mis->from_src_file to NULL...
-
-> +
-> +    assert(mis->to_src_file);
-> +    qemu_file_shutdown(mis->to_src_file);
-> +    qemu_mutex_lock(&mis->rp_mutex);
-> +    qemu_fclose(mis->to_src_file);
-> +    mis->to_src_file = NULL;
-> +    qemu_mutex_unlock(&mis->rp_mutex);
-> +
-> +    error_report("Detected IO failure for postcopy. "
-> +                 "Migration paused.");
-> +
-> +    while (mis->state == MIGRATION_STATUS_POSTCOPY_PAUSED) {
-> +        qemu_sem_wait(&mis->postcopy_pause_sem_dst);
-> +    }
-> +
-> +    trace_postcopy_pause_incoming_continued();
-> +
-> +    return true;
-> +}
-> +
->  static int qemu_loadvm_state_main(QEMUFile *f, MigrationIncomingState *mis)
->  {
->      uint8_t section_type;
->      int ret = 0;
->
-> +retry:
->      while (true) {
->          section_type = qemu_get_byte(f);
->
-> @@ -2104,6 +2145,24 @@ static int qemu_loadvm_state_main(QEMUFile *f, MigrationIncomingState *mis)
->  out:
->      if (ret < 0) {
->          qemu_file_set_error(f, ret);
-> +
-> +        /*
-> +         * Detect whether it is:
-> +         *
-> +         * 1. postcopy running (after receiving all device data, which
-> +         *    must be in POSTCOPY_INCOMING_RUNNING state.  Note that
-> +         *    POSTCOPY_INCOMING_LISTENING is still not enough, it's
-> +         *    still receiving device states).
-> +         * 2. network failure (-EIO)
-> +         *
-> +         * If so, we try to wait for a recovery.
-> +         */
-> +        if (postcopy_state_get() == POSTCOPY_INCOMING_RUNNING &&
-> +            ret == -EIO && postcopy_pause_incoming(mis)) {
-> +            /* Reset f to point to the newly created channel */
-> +            f = mis->from_src_file;
-
-...but here we set f to mis->from_src_file, which Coverity
-thinks must be NULL...
-
-> +            goto retry;
-
-...and then we goto the 'retry' label, which will always
-dereference the NULL pointer and crash in qemu_get_byte().
-
-> +        }
->      }
->      return ret;
->  }
-
-Looking at the wider code, I think what Coverity has not spotted is
-that postcopy_pause_incoming() blocks on the semaphore, and the
-code that wakes it up in migration_fd_process_incoming() will
-set mis->from_src_file to something non-NULL before it posts that
-semaphore.
-
-However, I'm not sure about the locking being used here. There's
-no lock held while postcopy_pause_incoming() does the "set state
-to paused and then clear mis->from_src_file", so what prevents
-this interleaving of execution of the two threads?
-
-  postcopy_pause_incoming()        migration_fd_process_incoming()
-    + set state to PAUSED
-                                     + find that state is PAUSED
-                                     + mis->from_src_file = f
-    + mis->from_src_file = NULL
-    + wait on semaphore
-                                     + post semaphare
-
-?
-
-There are also a couple of other things Coverity thinks might
-be data race conditions (CID 1391295 and CID 1391288) that you
-might want to look at, though I suspect they are false-positives
-(access occurs before thread create of the thread the mutex
-is providing protection against).
-
-thanks
---- PMM
+>  hw/mips/boston.c | 3 +--
+>  1 file changed, 1 insertion(+), 2 deletions(-)
+> 
+> diff --git a/hw/mips/boston.c b/hw/mips/boston.c
+> index 5302e5c885..1d136529ad 100644
+> --- a/hw/mips/boston.c
+> +++ b/hw/mips/boston.c
+> @@ -471,8 +471,7 @@ static void boston_mach_init(MachineState *machine)
+>      sysbus_mmio_map_overlap(SYS_BUS_DEVICE(s->cps), 0, 0, 1);
+>  
+>      flash =  g_new(MemoryRegion, 1);
+> -    memory_region_init_rom_nomigrate(flash, NULL,
+> -                                     "boston.flash", 128 * M_BYTE, &err);
+> +    memory_region_init_rom(flash, NULL, "boston.flash", 128 * M_BYTE, &err);
+>      memory_region_add_subregion_overlap(sys_mem, 0x18000000, flash, 0);
+>  
+>      ddr = g_new(MemoryRegion, 1);
+> 
