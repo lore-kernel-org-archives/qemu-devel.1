@@ -1,34 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47180)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47301)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1fPmGx-000249-KO
-	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 05:59:32 -0400
+	(envelope-from <stefanha@gmail.com>) id 1fPmHO-0002RI-DM
+	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 05:59:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1fPmGs-0002e9-O1
-	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 05:59:31 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:59176 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1fPmGs-0002dj-Iy
-	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 05:59:26 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.3])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 1E393401EF05
-	for <qemu-devel@nongnu.org>; Mon,  4 Jun 2018 09:59:26 +0000 (UTC)
-Date: Mon, 4 Jun 2018 10:59:17 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20180604095917.GA2628@work-vm>
-References: <20180601162749.27406-1-marcandre.lureau@redhat.com>
-	<20180601162749.27406-7-marcandre.lureau@redhat.com>
-	<20180604090746.GA2629@work-vm>
-	<CAMxuvayhQPPkFbFUE+Onbe7=AEnVuJ3+dFkDiuQyLA2F0tmW_w@mail.gmail.com>
+	(envelope-from <stefanha@gmail.com>) id 1fPmHN-0002wZ-Fb
+	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 05:59:58 -0400
+Date: Mon, 4 Jun 2018 10:59:48 +0100
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20180604095948.GF13674@stefanha-x1.localdomain>
+References: <1527801443-30620-1-git-send-email-ari@tuxera.com>
+	<e890432c-cfb4-d933-c1a8-d571ac5687e8@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="kbCYTQG2MZjuOjyn"
 Content-Disposition: inline
-In-Reply-To: <CAMxuvayhQPPkFbFUE+Onbe7=AEnVuJ3+dFkDiuQyLA2F0tmW_w@mail.gmail.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC v2 06/12] vhost-user: add
- vhost_user_input_get_config()
+In-Reply-To: <e890432c-cfb4-d933-c1a8-d571ac5687e8@redhat.com>
+Subject: Re: [Qemu-devel] [Qemu-block]  [PATCH 1/5] block: Add blklogwrites
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,176 +24,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>
-Cc: qemu-devel <qemu-devel@nongnu.org>, Gerd Hoffmann <kraxel@redhat.com>
+To: Eric Blake <eblake@redhat.com>
+Cc: Ari Sundholm <ari@tuxera.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org, Aapo Vienamo <aapo@tuxera.com>
 
-* Marc-Andr=E9 Lureau (marcandre.lureau@redhat.com) wrote:
-> Hi
->=20
-> On Mon, Jun 4, 2018 at 11:07 AM, Dr. David Alan Gilbert
-> <dgilbert@redhat.com> wrote:
-> > * Marc-Andr=E9 Lureau (marcandre.lureau@redhat.com) wrote:
-> >> Ask vhost user input backend the list of virtio_input_config.
-> >
-> > Why is this vhost-user specific; shouldn't the vhost-input
-> > behaviour be the same irrespective of if it's vhost-user or plain vho=
-st?
-> >
->=20
-> A similar message could be used for plain vhost, in some ioctl form.
-> Here we are documenting vhost-user protocol only.
 
-The vhost-user protocol seems to be mostly independent of the device
-it's carrying; for example I see there's a 'net_set_mtu' and 'send_rarp'
-but I don't think there's anything for disk storage;  what are the cases
-whether these have to be done through a change to the vhost-user
-protocol as opposed to stuff carried over it?
+--kbCYTQG2MZjuOjyn
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Dave
+On Fri, Jun 01, 2018 at 07:26:03AM -0500, Eric Blake wrote:
+> On 05/31/2018 04:17 PM, Ari Sundholm wrote:
+> > +static void blk_log_writes_co_do_file(void *opaque)
+> > +{
+> > +    BlkLogWritesFileReq *fr =3D opaque;
+> > +
+> > +    fr->file_ret =3D fr->func(fr);
+> > +
+> > +    fr->r->done++;
+>=20
+> Two non-atomic increments...
+>=20
+> > +    qemu_coroutine_enter_if_inactive(fr->r->co);
+> > +}
+> > +
+> > +static int coroutine_fn
+> > +blk_log_writes_co_log(BlockDriverState *bs, uint64_t offset, uint64_t =
+bytes,
+> > +                      QEMUIOVector *qiov, int flags,
+> > +                      int (*file_func)(BlkLogWritesFileReq *r),
+> > +                      uint64_t entry_flags)
+> > +{
+>=20
+> > +    qemu_coroutine_enter(co_file);
+> > +    qemu_coroutine_enter(co_log);
+> > +
+> > +    while (r.done < 2) {
+> > +        qemu_coroutine_yield();
+> > +    }
+>=20
+> ...used as the condition for waiting.  Since the point of coroutines is to
+> allow (restricted) parallel operation, there's a chance that the coroutine
+> implementation can be utilizing parallel threads; if that's the case, then
+> on the rare race when both threads try to increment at near the same time,
+> they can both read 0 and write 1, at which point this wait loop would be =
+an
+> infinite loop.  You're probably better off using atomics (even if I'm wro=
+ng
+> about coroutines being able to race each other on the increment, as the
+> other point of coroutines is that they provide restricted parallelism whe=
+re
+> you can also implement them in only a single thread because of well-defin=
+ed
+> yield points).
 
->=20
-> Thanks
->=20
-> > Dave
-> >
-> >
-> >> Signed-off-by: Marc-Andr=E9 Lureau <marcandre.lureau@redhat.com>
-> >> ---
-> >>  include/hw/virtio/vhost-backend.h |  4 +++
-> >>  hw/virtio/vhost-user.c            | 59 ++++++++++++++++++++++++++++=
-+++
-> >>  docs/interop/vhost-user.txt       |  6 ++++
-> >>  3 files changed, 69 insertions(+)
-> >>
-> >> diff --git a/include/hw/virtio/vhost-backend.h b/include/hw/virtio/v=
-host-backend.h
-> >> index 5dac61f9ea..6cc2edacc5 100644
-> >> --- a/include/hw/virtio/vhost-backend.h
-> >> +++ b/include/hw/virtio/vhost-backend.h
-> >> @@ -12,6 +12,7 @@
-> >>  #define VHOST_BACKEND_H
-> >>
-> >>  #include "exec/memory.h"
-> >> +#include "standard-headers/linux/virtio_input.h"
-> >>
-> >>  typedef enum VhostBackendType {
-> >>      VHOST_BACKEND_TYPE_NONE =3D 0,
-> >> @@ -156,4 +157,7 @@ int vhost_backend_invalidate_device_iotlb(struct=
- vhost_dev *dev,
-> >>  int vhost_backend_handle_iotlb_msg(struct vhost_dev *dev,
-> >>                                            struct vhost_iotlb_msg *i=
-msg);
-> >>
-> >> +int vhost_user_input_get_config(struct vhost_dev *dev,
-> >> +                                struct virtio_input_config **config=
-);
-> >> +
-> >>  #endif /* VHOST_BACKEND_H */
-> >> diff --git a/hw/virtio/vhost-user.c b/hw/virtio/vhost-user.c
-> >> index a87db01e55..19ed87d07c 100644
-> >> --- a/hw/virtio/vhost-user.c
-> >> +++ b/hw/virtio/vhost-user.c
-> >> @@ -84,6 +84,7 @@ typedef enum VhostUserRequest {
-> >>      VHOST_USER_POSTCOPY_ADVISE  =3D 28,
-> >>      VHOST_USER_POSTCOPY_LISTEN  =3D 29,
-> >>      VHOST_USER_POSTCOPY_END     =3D 30,
-> >> +    VHOST_USER_INPUT_GET_CONFIG,
-> >>      VHOST_USER_MAX
-> >>  } VhostUserRequest;
-> >>
-> >> @@ -324,6 +325,64 @@ static int vhost_user_write(struct vhost_dev *d=
-ev, VhostUserMsg *msg,
-> >>      return 0;
-> >>  }
-> >>
-> >> +static void *vhost_user_read_size(struct vhost_dev *dev, uint32_t s=
-ize)
-> >> +{
-> >> +    struct vhost_user *u =3D dev->opaque;
-> >> +    CharBackend *chr =3D u->chr;
-> >> +    int r;
-> >> +    uint8_t *p =3D g_malloc(size);
-> >> +
-> >> +    r =3D qemu_chr_fe_read_all(chr, p, size);
-> >> +    if (r !=3D size) {
-> >> +        error_report("Failed to read msg payload."
-> >> +                     " Read %d instead of %d.", r, size);
-> >> +        return NULL;
-> >> +    }
-> >> +
-> >> +    return p;
-> >> +}
-> >> +
-> >> +int vhost_user_input_get_config(struct vhost_dev *dev,
-> >> +                                struct virtio_input_config **config=
-)
-> >> +{
-> >> +    void *p =3D NULL;
-> >> +    VhostUserMsg msg =3D {
-> >> +        .hdr.request =3D VHOST_USER_INPUT_GET_CONFIG,
-> >> +        .hdr.flags =3D VHOST_USER_VERSION,
-> >> +    };
-> >> +
-> >> +    if (vhost_user_write(dev, &msg, NULL, 0) < 0) {
-> >> +        goto err;
-> >> +    }
-> >> +
-> >> +    if (vhost_user_read_header(dev, &msg) < 0) {
-> >> +        goto err;
-> >> +    }
-> >> +
-> >> +    p =3D vhost_user_read_size(dev, msg.hdr.size);
-> >> +    if (!p) {
-> >> +        goto err;
-> >> +    }
-> >> +
-> >> +    if (msg.hdr.request !=3D VHOST_USER_INPUT_GET_CONFIG) {
-> >> +        error_report("Received unexpected msg type. Expected %d rec=
-eived %d",
-> >> +                     VHOST_USER_INPUT_GET_CONFIG, msg.hdr.request);
-> >> +        goto err;
-> >> +    }
-> >> +
-> >> +    if (msg.hdr.size % sizeof(struct virtio_input_config)) {
-> >> +        error_report("Invalid msg size");
-> >> +        goto err;
-> >> +    }
-> >> +
-> >> +    *config =3D p;
-> >> +    return msg.hdr.size / sizeof(struct virtio_input_config);
-> >> +
-> >> +err:
-> >> +    g_free(p);
-> >> +    return -1;
-> >> +}
-> >> +
-> >>  static int vhost_user_set_log_base(struct vhost_dev *dev, uint64_t =
-base,
-> >>                                     struct vhost_log *log)
-> >>  {
-> >> diff --git a/docs/interop/vhost-user.txt b/docs/interop/vhost-user.t=
-xt
-> >> index 534caab18a..3df9927386 100644
-> >> --- a/docs/interop/vhost-user.txt
-> >> +++ b/docs/interop/vhost-user.txt
-> >> @@ -744,6 +744,12 @@ Master message types
-> >>        was previously sent.
-> >>        The value returned is an error indication; 0 is success.
-> >>
-> >> + * VHOST_USER_INPUT_GET_CONFIG
-> >> +
-> >> +      Slave payload: (struct virtio_input_config)*
-> >> +
-> >> +      Ask vhost user input backend the list of virtio_input_config.
-> >> +
-> >>  Slave message types
-> >>  -------------------
-> >>
-> >> --
-> >> 2.17.1.906.g10fd178552
-> >>
-> >>
-> > --
-> > Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+In this case the coroutines run from a single event loop (the
+BlockDriverState's AioContext) so they cannot race.
+
+As QEMU transitions to a multi-queue block layer we will need to think
+about parallelism more.  But the multi-queue block layer isn't
+implemented yet, so I prefer writing straightforward code now without
+trying to anticipate what parallelism issues might arise in the future.
+
+Stefan
+
+--kbCYTQG2MZjuOjyn
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJbFQ2UAAoJEJykq7OBq3PImdcH+wYizpAsmiMBaM60hpRcXLEZ
+9oAKOLmPnG5NN/7unujH0WCuxjcXtEClGzj6+N6N3CIUMLrVJ956ZcOs8NsQzBDe
++8vGdqSWOtvnJuw57WzysZn/g2vm6zua5XInbKyYf0ck/WEuqSo4Hj5FE/oEFuzh
+H8cLHBxhKVW1e5SQFKI/SKP4jJNdjFt/yfypEdyams+lfWVj3n53JggjA0q6ebDy
+OvtZZQR6byL9Air6pd/41LdOfXxY6fuRaMolgL+32Gk/PhmA53+fBNdB9PGE5itT
+7+LoTUv8ZZhbwxQu5TjM0yhKK7Tt/KNyWHUrsFCJV/Q7/+qwh1LPM3rAWF2wSck=
+=ZQWV
+-----END PGP SIGNATURE-----
+
+--kbCYTQG2MZjuOjyn--
