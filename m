@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41992)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42378)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1fPnvo-0005tc-61
-	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 07:45:49 -0400
+	(envelope-from <david@redhat.com>) id 1fPnxY-0006ta-75
+	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 07:47:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1fPnvj-00026l-9J
-	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 07:45:48 -0400
+	(envelope-from <david@redhat.com>) id 1fPnxX-000338-8i
+	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 07:47:36 -0400
 References: <20180517081527.14410-1-david@redhat.com>
-	<20180517081527.14410-13-david@redhat.com>
-	<20180601131724.6e17a249@redhat.com>
+	<20180517081527.14410-15-david@redhat.com>
+	<20180601133939.550378ce@redhat.com>
 From: David Hildenbrand <david@redhat.com>
-Message-ID: <5f80f3a1-2d40-c197-ebea-636944366d4d@redhat.com>
-Date: Mon, 4 Jun 2018 13:45:38 +0200
+Message-ID: <8b38ef58-ecae-54cf-f657-c0112a6e4cb7@redhat.com>
+Date: Mon, 4 Jun 2018 13:47:31 +0200
 MIME-Version: 1.0
-In-Reply-To: <20180601131724.6e17a249@redhat.com>
+In-Reply-To: <20180601133939.550378ce@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v4 12/14] memory-device: factor out
- pre-plug into hotplug handler
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v4 14/14] memory-device: factor out plug
+ into hotplug handler
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,202 +27,124 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Igor Mammedov <imammedo@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-s390x@nongnu.org, "Michael S . Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Markus Armbruster <armbru@redhat.com>, qemu-ppc@nongnu.org, Pankaj Gupta <pagupta@redhat.com>, Alexander Graf <agraf@suse.de>, Cornelia Huck <cohuck@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Luiz Capitulino <lcapitulino@redhat.com>
+Cc: qemu-devel@nongnu.org, Pankaj Gupta <pagupta@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Cornelia Huck <cohuck@redhat.com>, Markus Armbruster <armbru@redhat.com>, Alexander Graf <agraf@suse.de>, Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org, qemu-ppc@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Luiz Capitulino <lcapitulino@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Richard Henderson <rth@twiddle.net>
 
-On 01.06.2018 13:17, Igor Mammedov wrote:
-> On Thu, 17 May 2018 10:15:25 +0200
+On 01.06.2018 13:39, Igor Mammedov wrote:
+> On Thu, 17 May 2018 10:15:27 +0200
 > David Hildenbrand <david@redhat.com> wrote:
->=20
->> Let's move all pre-plug checks we can do without the device being
->> realized into the applicable hotplug handler for pc and spapr.
+> 
+>> Let's move the plug logic into the applicable hotplug handler for pc and
+>> spapr.
 >>
 >> Signed-off-by: David Hildenbrand <david@redhat.com>
 >> ---
->>  hw/i386/pc.c                   | 11 +++++++
->>  hw/mem/memory-device.c         | 72 +++++++++++++++++++--------------=
----------
->>  hw/ppc/spapr.c                 | 11 +++++++
->>  include/hw/mem/memory-device.h |  2 ++
->>  4 files changed, 57 insertions(+), 39 deletions(-)
+>>  hw/i386/pc.c                   | 35 ++++++++++++++++++++---------------
+>>  hw/mem/memory-device.c         | 40 ++++++++++++++++++++++++++++++++++------
+>>  hw/mem/pc-dimm.c               | 29 +----------------------------
+>>  hw/mem/trace-events            |  2 +-
+>>  hw/ppc/spapr.c                 | 15 ++++++++++++---
+>>  include/hw/mem/memory-device.h |  7 ++-----
+>>  include/hw/mem/pc-dimm.h       |  3 +--
+>>  7 files changed, 71 insertions(+), 60 deletions(-)
 >>
 >> diff --git a/hw/i386/pc.c b/hw/i386/pc.c
->> index 8bc41ef24b..61f1537e14 100644
+>> index 426fb534c2..f022eb042e 100644
 >> --- a/hw/i386/pc.c
 >> +++ b/hw/i386/pc.c
->> @@ -2010,6 +2010,16 @@ static void pc_machine_device_pre_plug_cb(Hotpl=
-ugHandler *hotplug_dev,
+>> @@ -1682,22 +1682,8 @@ static void pc_dimm_plug(HotplugHandler *hotplug_dev,
+>>      HotplugHandlerClass *hhc;
+>>      Error *local_err = NULL;
+>>      PCMachineState *pcms = PC_MACHINE(hotplug_dev);
+>> -    PCMachineClass *pcmc = PC_MACHINE_GET_CLASS(pcms);
+>> -    PCDIMMDevice *dimm = PC_DIMM(dev);
+>> -    PCDIMMDeviceClass *ddc = PC_DIMM_GET_CLASS(dimm);
+>> -    MemoryRegion *mr;
+>> -    uint64_t align = TARGET_PAGE_SIZE;
+>>      bool is_nvdimm = object_dynamic_cast(OBJECT(dev), TYPE_NVDIMM);
+>>  
+>> -    mr = ddc->get_memory_region(dimm, &local_err);
+>> -    if (local_err) {
+>> -        goto out;
+>> -    }
+>> -
+>> -    if (memory_region_get_alignment(mr) && pcmc->enforce_aligned_dimm) {
+>> -        align = memory_region_get_alignment(mr);
+>> -    }
+>> -
+>>      /*
+>>       * When -no-acpi is used with Q35 machine type, no ACPI is built,
+>>       * but pcms->acpi_dev is still created. Check !acpi_enabled in
+>> @@ -1715,7 +1701,7 @@ static void pc_dimm_plug(HotplugHandler *hotplug_dev,
+>>          goto out;
+>>      }
+>>  
+>> -    pc_dimm_memory_plug(dev, MACHINE(pcms), align, &local_err);
+>> +    pc_dimm_memory_plug(dev, MACHINE(pcms), &local_err);
+>>      if (local_err) {
+>>          goto out;
+>>      }
+>> @@ -2036,6 +2022,25 @@ static void pc_machine_device_plug_cb(HotplugHandler *hotplug_dev,
 >>  {
->>      Error *local_err =3D NULL;
->> =20
+>>      Error *local_err = NULL;
+>>  
 >> +    /* first stage hotplug handler */
 >> +    if (object_dynamic_cast(OBJECT(dev), TYPE_MEMORY_DEVICE)) {
->> +        memory_device_pre_plug(MACHINE(hotplug_dev), MEMORY_DEVICE(de=
-v),
->> +                               &local_err);
+>> +        const PCMachineClass *pcmc = PC_MACHINE_GET_CLASS(hotplug_dev);
+>> +        uint64_t align = 0;
+>> +
+>> +        /* compat handling: force to TARGET_PAGE_SIZE */
+>> +        if (object_dynamic_cast(OBJECT(dev), TYPE_PC_DIMM) &&
+>> +            !pcmc->enforce_aligned_dimm) {
+>> +            align = TARGET_PAGE_SIZE;
+>> +        }
+>> +        memory_device_plug(MACHINE(hotplug_dev), MEMORY_DEVICE(dev),
+>> +                           align ? &align : NULL, &local_err);
 >> +    }
 >> +
 >> +    if (local_err) {
->> +        goto out;
+>> +        error_propagate(errp, local_err);
+>> +        return;
 >> +    }
 >> +
 >>      /* final stage hotplug handler */
->>      if (object_dynamic_cast(OBJECT(dev), TYPE_CPU)) {
->>          pc_cpu_pre_plug(hotplug_dev, dev, &local_err);
->> @@ -2017,6 +2027,7 @@ static void pc_machine_device_pre_plug_cb(Hotplu=
-gHandler *hotplug_dev,
->>          hotplug_handler_pre_plug(dev->parent_bus->hotplug_handler, de=
-v,
->>                                   &local_err);
->>      }
->> +out:
->>      error_propagate(errp, local_err);
->>  }
->> =20
+>>      if (object_dynamic_cast(OBJECT(dev), TYPE_PC_DIMM)) {
+>>          pc_dimm_plug(hotplug_dev, dev, &local_err);
 >> diff --git a/hw/mem/memory-device.c b/hw/mem/memory-device.c
->> index 361d38bfc5..d22c91993f 100644
+>> index 8f10d613ea..04bdb30f22 100644
 >> --- a/hw/mem/memory-device.c
 >> +++ b/hw/mem/memory-device.c
->> @@ -68,58 +68,26 @@ static int memory_device_used_region_size(Object *=
-obj, void *opaque)
+>> @@ -69,9 +69,10 @@ static int memory_device_used_region_size(Object *obj, void *opaque)
 >>      return 0;
 >>  }
->> =20
->> -static void memory_device_check_addable(MachineState *ms, uint64_t si=
-ze,
->> -                                        Error **errp)
->> -{
->> -    uint64_t used_region_size =3D 0;
->> -
->> -    /* we will need a new memory slot for kvm and vhost */
->> -    if (kvm_enabled() && !kvm_has_free_slot(ms)) {
->> -        error_setg(errp, "hypervisor has no free memory slots left");
->> -        return;
->> -    }
->> -    if (!vhost_has_free_slot()) {
->> -        error_setg(errp, "a used vhost backend has no free memory slo=
-ts left");
->> -        return;
->> -    }
->> -
->> -    /* will we exceed the total amount of memory specified */
->> -    memory_device_used_region_size(OBJECT(ms), &used_region_size);
->> -    if (used_region_size + size > ms->maxram_size - ms->ram_size) {
->> -        error_setg(errp, "not enough space, currently 0x%" PRIx64
->> -                   " in use of total hot pluggable 0x" RAM_ADDR_FMT,
->> -                   used_region_size, ms->maxram_size - ms->ram_size);
->> -        return;
->> -    }
->> -
->> -}
->> -
->>  uint64_t memory_device_get_free_addr(MachineState *ms, const uint64_t=
- *hint,
->>                                       uint64_t align, uint64_t size,
->>                                       Error **errp)
+>>  
+>> -uint64_t memory_device_get_free_addr(MachineState *ms, const uint64_t *hint,
+>> -                                     uint64_t align, uint64_t size,
+>> -                                     Error **errp)
+>> +static uint64_t memory_device_get_free_addr(MachineState *ms,
+>> +                                            const uint64_t *hint,
+>> +                                            uint64_t align, uint64_t size,
+>> +                                            Error **errp)
 >>  {
 >>      uint64_t address_space_start, address_space_end;
->> +    uint64_t used_region_size =3D 0;
->>      GSList *list =3D NULL, *item;
->>      uint64_t new_addr =3D 0;
->> =20
->> -    if (!ms->device_memory) {
->> -        error_setg(errp, "memory devices (e.g. for memory hotplug) ar=
-e not "
->> -                         "supported by the machine");
->> -        return 0;
->> -    }
->> -
->> -    if (!memory_region_size(&ms->device_memory->mr)) {
->> -        error_setg(errp, "memory devices (e.g. for memory hotplug) ar=
-e not "
->> -                         "enabled, please specify the maxmem option")=
-;
->> -        return 0;
->> -    }
->>      address_space_start =3D ms->device_memory->base;
->>      address_space_end =3D address_space_start +
->>                          memory_region_size(&ms->device_memory->mr);
->>      g_assert(address_space_end >=3D address_space_start);
->> =20
->> -    memory_device_check_addable(ms, size, errp);
->> -    if (*errp) {
->> +    /* will we exceed the total amount of memory specified */
->> +    memory_device_used_region_size(OBJECT(ms), &used_region_size);
->> +    if (used_region_size + size > ms->maxram_size - ms->ram_size) {
->> +        error_setg(errp, "not enough space, currently 0x%" PRIx64
->> +                   " in use of total hot pluggable 0x" RAM_ADDR_FMT,
->> +                   used_region_size, ms->maxram_size - ms->ram_size);
->>          return 0;
+>>      uint64_t used_region_size = 0;
+>> @@ -237,11 +238,38 @@ void memory_device_pre_plug(MachineState *ms, const MemoryDeviceState *md,
 >>      }
->> =20
->> @@ -242,6 +210,32 @@ uint64_t get_plugged_memory_size(void)
->>      return size;
 >>  }
->> =20
->> +void memory_device_pre_plug(MachineState *ms, const MemoryDeviceState=
- *md,
->> +                            Error **errp)
->> +{
->> +    if (!ms->device_memory) {
->> +        error_setg(errp, "memory devices (e.g. for memory hotplug) ar=
-e not "
->> +                         "supported by the machine");
->> +        return;
->> +    }
->> +
->> +    if (!memory_region_size(&ms->device_memory->mr)) {
->> +        error_setg(errp, "memory devices (e.g. for memory hotplug) ar=
-e not "
->> +                         "enabled, please specify the maxmem option")=
-;
->> +        return;
->> +    }
->> +
->> +    /* we will need a new memory slot for kvm and vhost */
->> +    if (kvm_enabled() && !kvm_has_free_slot(ms)) {
->> +        error_setg(errp, "hypervisor has no free memory slots left");
->> +        return;
->> +    }
->> +    if (!vhost_has_free_slot()) {
->> +        error_setg(errp, "a used vhost backend has no free memory slo=
-ts left");
->> +        return;
->> +    }
-> thanks for extracting preparations steps into the right callback.
->=20
-> on top of this _preplug() handler should also set being plugged
-> device properties if they weren't set by user.
->  memory_device_get_free_addr() should be here to.
->=20
-> general rule for _preplug() would be to check and prepare device
-> for being plugged but not touch anything beside the device (it's _plug =
-handler job)
+>>  
+>> -void memory_device_plug_region(MachineState *ms, MemoryRegion *mr,
+>> -                               uint64_t addr)
+>> +void memory_device_plug(MachineState *ms, MemoryDeviceState *md,
+>> +                        uint64_t *enforced_align, Error **errp)
+> enforced_align is PC machine specific compat flag
+> to keep old machines with unaligned layout work (i.e. don't break CLI/migration)
+> it shouldn't go into a generic code.
+> By default all new machines should use aligned layout. 
+> 
 
-I disagree. Or at least I disagree as part of this patch series because
-it over-complicates things :)
+Yes, but there has to be a way for the search to access this property.
+So what do you propose in contrast to this?
 
-preplug() can do basic checks but I don't think it should be used to
-change actual properties. And I give you the main reason for this:
-
-We have to do quite some amount of unnecessary error handling (please
-remember the pc_dimm plug code madness before I refactored it - 80%
-consisted of error handling) if we want to work on device properties
-before a device is realized. And we even have duplicate checks both in
-the realize() and the preplug() code then (again, what we had in the
-pc_dimm plug code - do we have a memdev already or not).
-
-Right now, I assume, that all MemoryDevice functions can be safely
-called after the device has been realized without error handling. This
-is nice. It e.g. guarantees that we have a memdev assigned. Otherwise,
-every time we access some MemoryDevice property (e.g. region size), we
-have to handle possible uninitialized properties (e.g. memdev) -
-something I don't like.
-
-So I want to avoid this by any means. And I don't really see a benefit
-for this additional error handling that will be necessary: We don't care
-about the performance in case something went wrong.
-
---=20
+-- 
 
 Thanks,
 
