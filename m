@@ -1,26 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35587)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36125)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fPpTC-0006YR-Vh
-	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 09:24:23 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1fPpVL-0007SF-IB
+	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 09:26:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fPpTC-0004yf-6f
-	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 09:24:22 -0400
-Received: from mail-ot0-x22d.google.com ([2607:f8b0:4003:c0f::22d]:40090)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fPpTB-0004yT-V2
-	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 09:24:22 -0400
-Received: by mail-ot0-x22d.google.com with SMTP id n1-v6so37572248otf.7
-	for <qemu-devel@nongnu.org>; Mon, 04 Jun 2018 06:24:21 -0700 (PDT)
+	(envelope-from <ehabkost@redhat.com>) id 1fPpVG-0006aB-Dx
+	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 09:26:35 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:38080)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1fPpVG-0006ZH-5K
+	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 09:26:30 -0400
+Date: Mon, 4 Jun 2018 10:26:24 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20180604132624.GO7451@localhost.localdomain>
+References: <20180603092749.107476-1-marcel.apfelbaum@gmail.com>
+	<20180604042928-mutt-send-email-mst@kernel.org>
+	<20180604125415.GN7451@localhost.localdomain>
+	<20180604130129.GG19749@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20180604042156.13812-1-quintela@redhat.com>
-References: <20180604042156.13812-1-quintela@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 4 Jun 2018 14:24:00 +0100
-Message-ID: <CAFEAcA9+HaW=m46WZQaBPWTC-Wo9_9CjN_3993gmuGcC35ngiw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <20180604130129.GG19749@redhat.com>
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PULL 0/5] Migration pull request
+Subject: Re: [Qemu-devel] [PATCH RFC] hw/pc: set q35 as the default x86
+ machine
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,37 +31,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Juan Quintela <quintela@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Laurent Vivier <lvivier@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Peter Xu <peterx@redhat.com>
+To: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, pbonzini@redhat.com, qemu-devel@nongnu.org, rth@twiddle.net
 
-On 4 June 2018 at 05:21, Juan Quintela <quintela@redhat.com> wrote:
-> The following changes since commit 392fba9f583223786f844dce9b2e7f9a0ce014=
-7a:
->
->   Merge remote-tracking branch 'remotes/stsquad/tags/pull-travis-updates-=
-010618-1' into staging (2018-06-01 17:32:30 +0100)
->
-> are available in the Git repository at:
->
->   git://github.com/juanquintela/qemu.git tags/migration/20180604
->
-> for you to fetch changes up to c5e76115ccb4979cec795a8ae38becd07c2fde9f:
->
->   migration: not wait RDMA_CM_EVENT_DISCONNECTED event after rdma_disconn=
-ect (2018-06-04 05:46:15 +0200)
->
-> ----------------------------------------------------------------
-> migration/next for 20180604
->
-> - RDMA fixes from (lidong)
-> - Fix docempress-error-check (Xiao)
-> - make -S and block work better (dave)
-> - don't migrate "bad" ramblocks (C=C3=A9dric)
->
-> Please apply, Juan.
->
-> ----------------------------------------------------------------
+On Mon, Jun 04, 2018 at 02:01:29PM +0100, Daniel P. Berrang=E9 wrote:
+> On Mon, Jun 04, 2018 at 09:54:15AM -0300, Eduardo Habkost wrote:
+> > On Mon, Jun 04, 2018 at 04:38:22AM +0300, Michael S. Tsirkin wrote:
+> > > On Sun, Jun 03, 2018 at 12:27:49PM +0300, Marcel Apfelbaum wrote:
+> > > > Moving to QEMU 3.0 seems like a good opportunity for such a chang=
+e.
+> > > >=20
+> > > > I440FX is really old and does not support modern features like IO=
+MMU.
+> > > > Q35's SATA emulation is faster than pc's IDE, native PCI express =
+hotplug
+> > > > is cleaner than ACPI based one and so on...
+> > > >=20
+> > > > Also the libvirt guys added very good support for the Q35 machine=
+ (thanks!).
+> > > >=20
+> > > > Management software should always specify the machine type and fo=
+r the
+> > > > current setups, adding '-machine pc' to the command line is not s=
+uch a
+> > > > big deal.
+> > > >=20
+> > > > In time the pc machine will fade out and we will probably stop ad=
+ding
+> > > > new versions at some point.
+> > > >=20
+> > > > Signed-off-by: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+> > >=20
+> > > For command line users, I think changing the default isn't nice.
+> > >=20
+> > > Yes it's easy to add -machine pc but there's no documentation
+> > > that tells you to do so. Add to that shortcuts like -cdrom
+> > > stop working, hotplug needs extra bridges to work, and one
+> > > can see that while management tool users benefit from q35,
+> > > command line users will suffer.
+> > >=20
+> > > Can't we add a tag for management without changing the command line
+> > > default? How about "management-default"? "recommended"? "latest"?
+> >=20
+> > We could add new aliases if they are useful for management
+> > software, but we would need a well-defined use case and set of
+> > requirements+expectations for the new alias.
+>=20
+> I'm not convinced by the idea of adding a distinct default "for mgmt". =
+All
+> the problems described wrt 'q35' vs 'pc' apply equally to management ap=
+ps
+> as they do to humans. It just happens that one common mgmt layer (libvi=
+rt)
+> knows how to handle some of the complexity of q35. Other mgmt apps thou=
+gh
+> are just as likely to be hurt by the change as humans are. So effective=
+ly
+> the proposed "for mgmt" is actually  "for libvirt >=3D some version", w=
+hich
+> feels like a layering violation to me.
 
-Applied, thanks.
+This means the new alias would be used only if requested
+explicitly by management software (not used automatically by
+libvirt).
 
--- PMM
+Taking that into account, I still don't see what exactly would be
+the use case here, and what exactly users can/can't expect when
+using the new alias.
+
+--=20
+Eduardo
