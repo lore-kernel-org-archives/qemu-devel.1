@@ -1,23 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56088)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56181)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1fPs5D-0002u5-7n
-	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 12:11:48 -0400
+	(envelope-from <berrange@redhat.com>) id 1fPs5Y-00036G-6V
+	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 12:12:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1fPs5B-0000va-Jr
-	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 12:11:47 -0400
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-References: <20180319080705.10310-1-vsementsov@virtuozzo.com>
-	<8416e4e1-da91-8631-164f-cca680cb8d20@redhat.com>
-	<534fe1b0-b9b3-d4d8-63cb-913f98d607a5@virtuozzo.com>
-Message-ID: <6c2882e3-8f0f-875e-5aa0-ed6ccd356b33@virtuozzo.com>
-Date: Mon, 4 Jun 2018 19:11:27 +0300
+	(envelope-from <berrange@redhat.com>) id 1fPs5R-00014G-AG
+	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 12:12:08 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:42772 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1fPs5R-00013w-2z
+	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 12:12:01 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.5])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 81AB3401EF17
+	for <qemu-devel@nongnu.org>; Mon,  4 Jun 2018 16:12:00 +0000 (UTC)
+Date: Mon, 4 Jun 2018 17:11:57 +0100
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Message-ID: <20180604161157.GL19749@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <20180604120345.12955-1-berrange@redhat.com>
+	<20180604120345.12955-2-berrange@redhat.com>
+	<20180604174032.6962082d@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <534fe1b0-b9b3-d4d8-63cb-913f98d607a5@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20180604174032.6962082d@redhat.com>
 Content-Transfer-Encoding: quoted-printable
-Content-Language: en-US
-Subject: Re: [Qemu-devel] [PATCH v2] qcow2: add overlap check for bitmap
- directory
+Subject: Re: [Qemu-devel] [PATCH v2 1/2] vl: don't use RUN_STATE_PRECONFIG
+ as initial state
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,299 +37,281 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: kwolf@redhat.com, mreitz@redhat.com
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: qemu-devel@nongnu.org, Michal Privoznik <mprivozn@redhat.com>, Markus Armbruster <armbru@redhat.com>, Max Reitz <mreitz@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>
 
-20.04.2018 15:12, Vladimir Sementsov-Ogievskiy wrote:
-> 19.04.2018 23:57, John Snow wrote:
->>
->> On 03/19/2018 04:07 AM, Vladimir Sementsov-Ogievskiy wrote:
->>> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
->>> ---
->>>
->>> If it appropriate for 2.12, let's push it. If not - then for 2.13.
->>>
->> I wonder if I can make the case that this should be in 2.12.1; arguably
->> it is important to prevent corruption no matter how unlikely it is to
->> ever happen.
->>
->> Moving it into stable increases the likelihood it shows up in
->> downstreams, so maybe let's see what we can get away with.
->>
->>> v2: - squash 02 (indentation fix) to 01
->>> =C2=A0=C2=A0=C2=A0=C2=A0 - drop comment from qcow2_check_metadata_overl=
-ap()
->>> =C2=A0=C2=A0=C2=A0=C2=A0 - set @ign to QCOW2_OL_BITMAP_DIRECTORY for in=
--place case in
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 bitmap_list_store. I don't think n=
-on-inplace case should be=20
->>> changed,
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 as it don't touch active bitmap di=
-rectory.
->>>
->>> =C2=A0 block/qcow2.h=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0 | 45=20
->>> ++++++++++++++++++++++++---------------------
->>> =C2=A0 block/qcow2-bitmap.c=C2=A0=C2=A0 |=C2=A0 7 ++++++-
->>> =C2=A0 block/qcow2-refcount.c | 10 ++++++++++
->>> =C2=A0 block/qcow2.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0 | 22 ++++++++++++++--------
->>> =C2=A0 4 files changed, 54 insertions(+), 30 deletions(-)
->>>
->>> diff --git a/block/qcow2.h b/block/qcow2.h
->>> index 6f0ff15dd0..896ad08e5b 100644
->>> --- a/block/qcow2.h
->>> +++ b/block/qcow2.h
->>> @@ -98,6 +98,7 @@
->>> =C2=A0 #define QCOW2_OPT_OVERLAP_SNAPSHOT_TABLE=20
->>> "overlap-check.snapshot-table"
->>> =C2=A0 #define QCOW2_OPT_OVERLAP_INACTIVE_L1 "overlap-check.inactive-l1=
-"
->>> =C2=A0 #define QCOW2_OPT_OVERLAP_INACTIVE_L2 "overlap-check.inactive-l2=
-"
->>> +#define QCOW2_OPT_OVERLAP_BITMAP_DIRECTORY=20
->>> "overlap-check.bitmap-directory"
->>> =C2=A0 #define QCOW2_OPT_CACHE_SIZE "cache-size"
->>> =C2=A0 #define QCOW2_OPT_L2_CACHE_SIZE "l2-cache-size"
->>> =C2=A0 #define QCOW2_OPT_REFCOUNT_CACHE_SIZE "refcount-cache-size"
->>> @@ -398,34 +399,36 @@ typedef enum QCow2ClusterType {
->>> =C2=A0 } QCow2ClusterType;
->>> =C2=A0 =C2=A0 typedef enum QCow2MetadataOverlap {
->>> -=C2=A0=C2=A0=C2=A0 QCOW2_OL_MAIN_HEADER_BITNR=C2=A0=C2=A0=C2=A0 =3D 0,
->>> -=C2=A0=C2=A0=C2=A0 QCOW2_OL_ACTIVE_L1_BITNR=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0 =3D 1,
->>> -=C2=A0=C2=A0=C2=A0 QCOW2_OL_ACTIVE_L2_BITNR=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0 =3D 2,
->>> -=C2=A0=C2=A0=C2=A0 QCOW2_OL_REFCOUNT_TABLE_BITNR =3D 3,
->>> -=C2=A0=C2=A0=C2=A0 QCOW2_OL_REFCOUNT_BLOCK_BITNR =3D 4,
->>> -=C2=A0=C2=A0=C2=A0 QCOW2_OL_SNAPSHOT_TABLE_BITNR =3D 5,
->>> -=C2=A0=C2=A0=C2=A0 QCOW2_OL_INACTIVE_L1_BITNR=C2=A0=C2=A0=C2=A0 =3D 6,
->>> -=C2=A0=C2=A0=C2=A0 QCOW2_OL_INACTIVE_L2_BITNR=C2=A0=C2=A0=C2=A0 =3D 7,
->>> -
->>> -=C2=A0=C2=A0=C2=A0 QCOW2_OL_MAX_BITNR=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 =3D 8,
->>> -
->>> -=C2=A0=C2=A0=C2=A0 QCOW2_OL_NONE=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0 =3D 0,
->>> -=C2=A0=C2=A0=C2=A0 QCOW2_OL_MAIN_HEADER=C2=A0=C2=A0=C2=A0 =3D (1 << QC=
-OW2_OL_MAIN_HEADER_BITNR),
->>> -=C2=A0=C2=A0=C2=A0 QCOW2_OL_ACTIVE_L1=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 =
-=3D (1 << QCOW2_OL_ACTIVE_L1_BITNR),
->>> -=C2=A0=C2=A0=C2=A0 QCOW2_OL_ACTIVE_L2=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 =
-=3D (1 << QCOW2_OL_ACTIVE_L2_BITNR),
->>> -=C2=A0=C2=A0=C2=A0 QCOW2_OL_REFCOUNT_TABLE =3D (1 << QCOW2_OL_REFCOUNT=
-_TABLE_BITNR),
->>> -=C2=A0=C2=A0=C2=A0 QCOW2_OL_REFCOUNT_BLOCK =3D (1 << QCOW2_OL_REFCOUNT=
-_BLOCK_BITNR),
->>> -=C2=A0=C2=A0=C2=A0 QCOW2_OL_SNAPSHOT_TABLE =3D (1 << QCOW2_OL_SNAPSHOT=
-_TABLE_BITNR),
->>> -=C2=A0=C2=A0=C2=A0 QCOW2_OL_INACTIVE_L1=C2=A0=C2=A0=C2=A0 =3D (1 << QC=
-OW2_OL_INACTIVE_L1_BITNR),
->>> +=C2=A0=C2=A0=C2=A0 QCOW2_OL_MAIN_HEADER_BITNR=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0 =3D 0,
->>> +=C2=A0=C2=A0=C2=A0 QCOW2_OL_ACTIVE_L1_BITNR=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0 =3D 1,
->>> +=C2=A0=C2=A0=C2=A0 QCOW2_OL_ACTIVE_L2_BITNR=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0 =3D 2,
->>> +=C2=A0=C2=A0=C2=A0 QCOW2_OL_REFCOUNT_TABLE_BITNR=C2=A0=C2=A0 =3D 3,
->>> +=C2=A0=C2=A0=C2=A0 QCOW2_OL_REFCOUNT_BLOCK_BITNR=C2=A0=C2=A0 =3D 4,
->>> +=C2=A0=C2=A0=C2=A0 QCOW2_OL_SNAPSHOT_TABLE_BITNR=C2=A0=C2=A0 =3D 5,
->>> +=C2=A0=C2=A0=C2=A0 QCOW2_OL_INACTIVE_L1_BITNR=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0 =3D 6,
->>> +=C2=A0=C2=A0=C2=A0 QCOW2_OL_INACTIVE_L2_BITNR=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0 =3D 7,
->>> +=C2=A0=C2=A0=C2=A0 QCOW2_OL_BITMAP_DIRECTORY_BITNR =3D 8,
->>> +
->> A bit hard to read due to the formatting, but you've added #8 here, and
->>
->>> +=C2=A0=C2=A0=C2=A0 QCOW2_OL_MAX_BITNR=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 =3D 9,
->>> +> +=C2=A0=C2=A0=C2=A0 QCOW2_OL_NONE=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 =3D 0,
->>> +=C2=A0=C2=A0=C2=A0 QCOW2_OL_MAIN_HEADER=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 =
-=3D (1 << QCOW2_OL_MAIN_HEADER_BITNR),
->>> +=C2=A0=C2=A0=C2=A0 QCOW2_OL_ACTIVE_L1=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0 =3D (1 << QCOW2_OL_ACTIVE_L1_BITNR),
->>> +=C2=A0=C2=A0=C2=A0 QCOW2_OL_ACTIVE_L2=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0 =3D (1 << QCOW2_OL_ACTIVE_L2_BITNR),
->>> +=C2=A0=C2=A0=C2=A0 QCOW2_OL_REFCOUNT_TABLE=C2=A0=C2=A0 =3D (1 << QCOW2=
-_OL_REFCOUNT_TABLE_BITNR),
->>> +=C2=A0=C2=A0=C2=A0 QCOW2_OL_REFCOUNT_BLOCK=C2=A0=C2=A0 =3D (1 << QCOW2=
-_OL_REFCOUNT_BLOCK_BITNR),
->>> +=C2=A0=C2=A0=C2=A0 QCOW2_OL_SNAPSHOT_TABLE=C2=A0=C2=A0 =3D (1 << QCOW2=
-_OL_SNAPSHOT_TABLE_BITNR),
->>> +=C2=A0=C2=A0=C2=A0 QCOW2_OL_INACTIVE_L1=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 =
-=3D (1 << QCOW2_OL_INACTIVE_L1_BITNR),
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 /* NOTE: Checking overlaps with inactive=
- L2 tables will result=20
->>> in bdrv
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 * reads. */
->>> -=C2=A0=C2=A0=C2=A0 QCOW2_OL_INACTIVE_L2=C2=A0=C2=A0=C2=A0 =3D (1 << QC=
-OW2_OL_INACTIVE_L2_BITNR),
->>> +=C2=A0=C2=A0=C2=A0 QCOW2_OL_INACTIVE_L2=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 =
-=3D (1 << QCOW2_OL_INACTIVE_L2_BITNR),
->>> +=C2=A0=C2=A0=C2=A0 QCOW2_OL_BITMAP_DIRECTORY =3D (1 <<=20
->>> QCOW2_OL_BITMAP_DIRECTORY_BITNR),
->> and this one down here.
->>
->>> =C2=A0 } QCow2MetadataOverlap;
->>> =C2=A0 =C2=A0 /* Perform all overlap checks which can be done in consta=
-nt time */
->>> =C2=A0 #define QCOW2_OL_CONSTANT \
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 (QCOW2_OL_MAIN_HEADER | QCOW2_OL_ACTIVE_=
-L1 |=20
->>> QCOW2_OL_REFCOUNT_TABLE | \
->>> -=C2=A0=C2=A0=C2=A0=C2=A0 QCOW2_OL_SNAPSHOT_TABLE)
->>> +=C2=A0=C2=A0=C2=A0=C2=A0 QCOW2_OL_SNAPSHOT_TABLE | QCOW2_OL_BITMAP_DIR=
-ECTORY)
->>> =C2=A0 =C2=A0 /* Perform all overlap checks which don't require disk ac=
-cess */
->>> =C2=A0 #define QCOW2_OL_CACHED \
->>> diff --git a/block/qcow2-bitmap.c b/block/qcow2-bitmap.c
->>> index f45e46cfbd..fb750ba8d3 100644
->>> --- a/block/qcow2-bitmap.c
->>> +++ b/block/qcow2-bitmap.c
->>> @@ -776,7 +776,12 @@ static int bitmap_list_store(BlockDriverState=20
->>> *bs, Qcow2BitmapList *bm_list,
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
->>> =C2=A0 -=C2=A0=C2=A0=C2=A0 ret =3D qcow2_pre_write_overlap_check(bs, 0,=
- dir_offset,=20
->>> dir_size);
->>> +=C2=A0=C2=A0=C2=A0 /* Actually, even in in-place case ignoring=20
->>> QCOW2_OL_BITMAP_DIRECTORY is not
->>> +=C2=A0=C2=A0=C2=A0=C2=A0 * necessary, because we drop QCOW2_AUTOCLEAR_=
-BITMAPS when=20
->>> updating bitmap
->>> +=C2=A0=C2=A0=C2=A0=C2=A0 * directory in-place (actually, turn-off the =
-extension), which=20
->>> is checked
->>> +=C2=A0=C2=A0=C2=A0=C2=A0 * in qcow2_check_metadata_overlap() */
->> I might need you to rephrase this for me.
->>
->> I guess we're ignoring QCOW2_OL_BITMAP_DIRECTORY if in_place is true,
->> but only as an optimization. Why is it not required?
->
-> because, actually, we don't have any dirty bitmaps extension at the=20
-> moment when we rewrite bitmap directory in-place (as we drop autoclear=20
-> bit), so nothing will be checked.
+On Mon, Jun 04, 2018 at 05:40:32PM +0200, Igor Mammedov wrote:
+> On Mon,  4 Jun 2018 13:03:44 +0100
+> Daniel P. Berrang=C3=A9 <berrange@redhat.com> wrote:
+>=20
+> > The RUN_STATE_PRECONFIG state is not supposed to be reachable unless =
+the
+> > --preconfig argument is given to QEMU, but when it was introduced in:
+> >=20
+> >   commit 047f7038f586d2150f16c6d9ba9cfd0479f0f6ac
+> >   Author: Igor Mammedov <imammedo@redhat.com>
+> >   Date:   Fri May 11 19:24:43 2018 +0200
+> >=20
+> >     cli: add --preconfig option
+> >=20
+> > ...the global 'current_run_state' variable was changed to have an ini=
+tial
+> > value of RUN_STATE_PRECONFIG regardless of whether --preconfig is giv=
+en.
+> >=20
+> > A second invokation of main_loop() was added which then toggles it ba=
+ck
+> > to RUN_STATE_PRELAUNCH when --preconfig is not given. This is racy
+> > because it leaves a window where QEMU is in RUN_STATE_PRECONFIG despi=
+te
+> > --preconfig not being given.
+> Above statements isn't exactly correct, PRECONFIG were supposed to be
+> the new state of QEMU from start up till machine_run_board_init(),
+> that would separate stage of initial configuration out from all
+> encompassing PRELAUNCH state. So I'd scratch out above part.
 
-Is it clear, do you want to rephrase this somehow?
+That doesn't really make sense, given that --preconfig is *not* the
+default and thus not supposed to be an active state unless the app
+has explicitly opted in.
 
->
->>
->>> +=C2=A0=C2=A0=C2=A0 ret =3D qcow2_pre_write_overlap_check(
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 bs,=
- in_place ? QCOW2_OL_BITMAP_DIRECTORY : 0,=20
->>> dir_offset, dir_size);
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (ret < 0) {
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 goto fail;
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
->>> diff --git a/block/qcow2-refcount.c b/block/qcow2-refcount.c
->>> index 3de1ab51ba..275a303cfa 100644
->>> --- a/block/qcow2-refcount.c
->>> +++ b/block/qcow2-refcount.c
->>> @@ -2585,6 +2585,16 @@ int=20
->>> qcow2_check_metadata_overlap(BlockDriverState *bs, int ign, int64_t=20
->>> offset,
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
->>> =C2=A0 +=C2=A0=C2=A0=C2=A0 if ((chk & QCOW2_OL_BITMAP_DIRECTORY) &&
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 (s->autoclear_features & QC=
-OW2_AUTOCLEAR_BITMAPS))
->>> +=C2=A0=C2=A0=C2=A0 {
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (overlaps_with(s->bitmap=
-_directory_offset,
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0 s->bitmap_directory_size))
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 {
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ret=
-urn QCOW2_OL_BITMAP_DIRECTORY;
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
->>> +=C2=A0=C2=A0=C2=A0 }
->>> +
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return 0;
->>> =C2=A0 }
->>> =C2=A0 diff --git a/block/qcow2.c b/block/qcow2.c
->>> index 1914a940e5..23f36a67c7 100644
->>> --- a/block/qcow2.c
->>> +++ b/block/qcow2.c
->>> @@ -655,6 +655,11 @@ static QemuOptsList qcow2_runtime_opts =3D {
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0 .help =3D "Check for unintended writes into an inactive=20
->>> L2 table",
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 },
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 {
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 .na=
-me =3D QCOW2_OPT_OVERLAP_BITMAP_DIRECTORY,
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 .ty=
-pe =3D QEMU_OPT_BOOL,
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 .he=
-lp =3D "Check for unintended writes into the bitmap=20
->>> directory",
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 },
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 {
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0 .name =3D QCOW2_OPT_CACHE_SIZE,
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0 .type =3D QEMU_OPT_SIZE,
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0 .help =3D "Maximum combined metadata (L2 tables and=20
->>> refcount blocks) "
->>> @@ -682,14 +687,15 @@ static QemuOptsList qcow2_runtime_opts =3D {
->>> =C2=A0 };
->>> =C2=A0 =C2=A0 static const char *overlap_bool_option_names[QCOW2_OL_MAX=
-_BITNR]=20
->>> =3D {
->>> -=C2=A0=C2=A0=C2=A0 [QCOW2_OL_MAIN_HEADER_BITNR]=C2=A0=C2=A0=C2=A0 =3D =
-QCOW2_OPT_OVERLAP_MAIN_HEADER,
->>> -=C2=A0=C2=A0=C2=A0 [QCOW2_OL_ACTIVE_L1_BITNR]=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0 =3D QCOW2_OPT_OVERLAP_ACTIVE_L1,
->>> -=C2=A0=C2=A0=C2=A0 [QCOW2_OL_ACTIVE_L2_BITNR]=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0 =3D QCOW2_OPT_OVERLAP_ACTIVE_L2,
->>> -=C2=A0=C2=A0=C2=A0 [QCOW2_OL_REFCOUNT_TABLE_BITNR] =3D=20
->>> QCOW2_OPT_OVERLAP_REFCOUNT_TABLE,
->>> -=C2=A0=C2=A0=C2=A0 [QCOW2_OL_REFCOUNT_BLOCK_BITNR] =3D=20
->>> QCOW2_OPT_OVERLAP_REFCOUNT_BLOCK,
->>> -=C2=A0=C2=A0=C2=A0 [QCOW2_OL_SNAPSHOT_TABLE_BITNR] =3D=20
->>> QCOW2_OPT_OVERLAP_SNAPSHOT_TABLE,
->>> -=C2=A0=C2=A0=C2=A0 [QCOW2_OL_INACTIVE_L1_BITNR]=C2=A0=C2=A0=C2=A0 =3D =
-QCOW2_OPT_OVERLAP_INACTIVE_L1,
->>> -=C2=A0=C2=A0=C2=A0 [QCOW2_OL_INACTIVE_L2_BITNR]=C2=A0=C2=A0=C2=A0 =3D =
-QCOW2_OPT_OVERLAP_INACTIVE_L2,
->>> +=C2=A0=C2=A0=C2=A0 [QCOW2_OL_MAIN_HEADER_BITNR]=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0 =3D QCOW2_OPT_OVERLAP_MAIN_HEADER,
->>> +=C2=A0=C2=A0=C2=A0 [QCOW2_OL_ACTIVE_L1_BITNR]=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0 =3D QCOW2_OPT_OVERLAP_ACTIVE_L1,
->>> +=C2=A0=C2=A0=C2=A0 [QCOW2_OL_ACTIVE_L2_BITNR]=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0 =3D QCOW2_OPT_OVERLAP_ACTIVE_L2,
->>> +=C2=A0=C2=A0=C2=A0 [QCOW2_OL_REFCOUNT_TABLE_BITNR]=C2=A0=C2=A0 =3D=20
->>> QCOW2_OPT_OVERLAP_REFCOUNT_TABLE,
->>> +=C2=A0=C2=A0=C2=A0 [QCOW2_OL_REFCOUNT_BLOCK_BITNR]=C2=A0=C2=A0 =3D=20
->>> QCOW2_OPT_OVERLAP_REFCOUNT_BLOCK,
->>> +=C2=A0=C2=A0=C2=A0 [QCOW2_OL_SNAPSHOT_TABLE_BITNR]=C2=A0=C2=A0 =3D=20
->>> QCOW2_OPT_OVERLAP_SNAPSHOT_TABLE,
->>> +=C2=A0=C2=A0=C2=A0 [QCOW2_OL_INACTIVE_L1_BITNR]=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0 =3D QCOW2_OPT_OVERLAP_INACTIVE_L1,
->>> +=C2=A0=C2=A0=C2=A0 [QCOW2_OL_INACTIVE_L2_BITNR]=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0 =3D QCOW2_OPT_OVERLAP_INACTIVE_L2,
->> Just churn, and
->>
->>> +=C2=A0=C2=A0=C2=A0 [QCOW2_OL_BITMAP_DIRECTORY_BITNR] =3D=20
->>> QCOW2_OPT_OVERLAP_BITMAP_DIRECTORY,
->> this is the only new line.
->>
->>> =C2=A0 };
->>> =C2=A0 =C2=A0 static void cache_clean_timer_cb(void *opaque)
->>>
->> Looks okay to me overall, apart from needing a comment rephrase.
->>
->> --js
->
->
+IMHO running PRECONFIG state for any period of time when the app
+has not requested --preconfig is simply broken, and a recipe for
+obscure bugs like the ones we've seen right now.
 
 
+> >   $ echo | x86_64-softmmu/qemu-system-x86_64 -monitor stdio
+> >   QEMU 2.12.50 monitor - type 'help' for more information
+> >   (qemu)
+> >   HMP not available in preconfig state, use QMP instead
+> Michal's patch is much simpler and fixes that cleanly.
+
+It is incomplete IMHO as it still leaves the hang in main loop
+present - it merely avoids triggering it in one code path, and
+leaves the other code path broken.
+
+> > Using RUN_STATE_PRECONFIG required adding a state transition from
+> > RUN_STATE_PRECONFIG to RUN_STATE_INMIGRATE, which is undesirable as
+> > it prevented automatic detection of --preconfig & --incoming being
+> > mutually exclusive.
+> >=20
+> > If we use RUN_STATE_PRELAUNCH as the initial value, however, we need =
+to
+> > allow transitions between RUN_STATE_PRECONFIG & RUN_STATE_PRELAUNCH i=
+n
+> > both directions which is also undesirable, as RUN_STATE_PRECONFIG sho=
+uld
+> > be a one-time-only state that can never be returned to.
+> >=20
+> > This change solves the confusion by introducing a further RUN_STATE_N=
+ONE
+> > which is used as the initial state value. This can transition to any =
+of
+> > RUN_STATE_PRELAUNCH, RUN_STATE_PRECONFIG or RUN_STATE_INMIGRATE. This
+> > avoids the need to allow any undesirable state transitions.
+> Ugly mutually exclusive code including related long comments are
+> intentional. The plan is to streamline runstate transitions in
+> following order
+>   PRECONFIG -> PRELAUNCH [-> INMIGRATE]
+
+This doesn't make any conceptual sense to me, given that --preconfig
+is an optional flag. We can't make --preconfig the default, because
+of back compat, so we'll always have
+
+   $START ------------->  PRELAUNCH {-> INMIGRATE]
+     |              ^
+     |              |
+     +-- PRECONFIG -+
+
+By marking the current state as PRECONFIG by default, we've essentially
+given 2 meanings to  PRECONFIG - sometimes it means stuff  that can be
+unconditionally run in early startup, and sometimes it means stuff that
+can only be run if --preconfig is given. Introducing the separate NONE
+state clarifies that inherant contradiction in startup phases.
+
+> i.e. postpone RUN_STATE_INMIGRATE transition to the later stage.
+> But that's requires some cleanup work to remove invariants=20
+> in initialization depending if INMIGRATE state is in effect or not.
+>=20
+> Hence I'd keep this part ugly as it is for now, and if we can do
+> without RUN_STATE_NONE it would be better, i.e. keep current
+> PRECONFIG runstate meaning where we would do initial configuration
+> either via CLI or via QMP and one less runstate to deal with.
+>=20
+> I'd go with Michal's version of fix and think some more on
+> introducing RUN_STATE_NONE.
+>=20
+> > Signed-off-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+> > ---
+> >  qapi/run-state.json |  6 +++++-
+> >  vl.c                | 42 ++++++++++++++++++++++++------------------
+> >  2 files changed, 29 insertions(+), 19 deletions(-)
+> >=20
+> > diff --git a/qapi/run-state.json b/qapi/run-state.json
+> > index 332e44897b..c3bd7b9b7a 100644
+> > --- a/qapi/run-state.json
+> > +++ b/qapi/run-state.json
+> > @@ -10,6 +10,10 @@
+> >  #
+> >  # An enumeration of VM run states.
+> >  #
+> > +# @none: QEMU is in early startup. This state should never be visibl=
+e
+> > +# when querying state from the monitor, as QEMU will have already
+> > +# transitioned to another state. (Since 3.0)
+> > +#
+> >  # @debug: QEMU is running on a debugger
+> >  #
+> >  # @finish-migrate: guest is paused to finish the migration process
+> > @@ -54,7 +58,7 @@
+> >  #             (Since 3.0)
+> >  ##
+> >  { 'enum': 'RunState',
+> > -  'data': [ 'debug', 'inmigrate', 'internal-error', 'io-error', 'pau=
+sed',
+> > +  'data': [ 'none', 'debug', 'inmigrate', 'internal-error', 'io-erro=
+r', 'paused',
+> >              'postmigrate', 'prelaunch', 'finish-migrate', 'restore-v=
+m',
+> >              'running', 'save-vm', 'shutdown', 'suspended', 'watchdog=
+',
+> >              'guest-panicked', 'colo', 'preconfig' ] }
+> > diff --git a/vl.c b/vl.c
+> > index 06031715ac..30d0e985f0 100644
+> > --- a/vl.c
+> > +++ b/vl.c
+> > @@ -561,7 +561,7 @@ static int default_driver_check(void *opaque, Qem=
+uOpts *opts, Error **errp)
+> >  /***********************************************************/
+> >  /* QEMU state */
+> > =20
+> > -static RunState current_run_state =3D RUN_STATE_PRECONFIG;
+> > +static RunState current_run_state =3D RUN_STATE_NONE;
+> > =20
+> >  /* We use RUN_STATE__MAX but any invalid value will do */
+> >  static RunState vmstop_requested =3D RUN_STATE__MAX;
+> > @@ -574,12 +574,11 @@ typedef struct {
+> > =20
+> >  static const RunStateTransition runstate_transitions_def[] =3D {
+> >      /*     from      ->     to      */
+> > +    { RUN_STATE_NONE, RUN_STATE_PRELAUNCH },
+> > +    { RUN_STATE_NONE, RUN_STATE_PRECONFIG },
+> > +    { RUN_STATE_NONE, RUN_STATE_INMIGRATE },
+> > +
+> >      { RUN_STATE_PRECONFIG, RUN_STATE_PRELAUNCH },
+> > -      /* Early switch to inmigrate state to allow  -incoming CLI opt=
+ion work
+> > -       * as it used to. TODO: delay actual switching to inmigrate st=
+ate to
+> > -       * the point after machine is built and remove this hack.
+> > -       */
+> Since patch isn't postponing INMIGRATE, it's too early to remove TODO i=
+tem comment.
+
+The switch to INMIGRATE happens with -incoming is processed, at
+which time the current state is NONE. -preconfig is mutually
+exclusive with -incoming currently, so there's no way for there
+to be a valid PRECONFIG -> INMIGRATE transition.
+
+If we do figure out a way to make -incoming work with -preconfig,
+then, this transition could become valid once more, but today it
+simply shouldn't exist.
+
+>=20
+> > -    { RUN_STATE_PRECONFIG, RUN_STATE_INMIGRATE },
+> > =20
+> >      { RUN_STATE_DEBUG, RUN_STATE_RUNNING },
+> >      { RUN_STATE_DEBUG, RUN_STATE_FINISH_MIGRATE },
+> > @@ -618,7 +617,6 @@ static const RunStateTransition runstate_transiti=
+ons_def[] =3D {
+> > =20
+> >      { RUN_STATE_PRELAUNCH, RUN_STATE_RUNNING },
+> >      { RUN_STATE_PRELAUNCH, RUN_STATE_FINISH_MIGRATE },
+> > -    { RUN_STATE_PRELAUNCH, RUN_STATE_INMIGRATE },
+> > =20
+> >      { RUN_STATE_FINISH_MIGRATE, RUN_STATE_RUNNING },
+> >      { RUN_STATE_FINISH_MIGRATE, RUN_STATE_PAUSED },
+> > @@ -1522,7 +1520,7 @@ static pid_t shutdown_pid;
+> >  static int powerdown_requested;
+> >  static int debug_requested;
+> >  static int suspend_requested;
+> > -static bool preconfig_exit_requested =3D true;
+> > +static bool preconfig_exit_requested;
+> >  static WakeupReason wakeup_reason;
+> >  static NotifierList powerdown_notifiers =3D
+> >      NOTIFIER_LIST_INITIALIZER(powerdown_notifiers);
+> > @@ -3572,7 +3570,12 @@ int main(int argc, char **argv, char **envp)
+> >                  }
+> >                  break;
+> >              case QEMU_OPTION_preconfig:
+> > -                preconfig_exit_requested =3D false;
+> > +                if (!runstate_check(RUN_STATE_NONE)) {
+> > +                    error_report("'--preconfig' and '--incoming' opt=
+ions are "
+> > +                                 "mutually exclusive");
+> > +                    exit(EXIT_FAILURE);
+> > +                }
+> > +                runstate_set(RUN_STATE_PRECONFIG);
+> >                  break;
+> >              case QEMU_OPTION_enable_kvm:
+> >                  olist =3D qemu_find_opts("machine");
+> > @@ -3768,9 +3771,12 @@ int main(int argc, char **argv, char **envp)
+> >                  }
+> >                  break;
+> >              case QEMU_OPTION_incoming:
+> > -                if (!incoming) {
+> > -                    runstate_set(RUN_STATE_INMIGRATE);
+> > +                if (!runstate_check(RUN_STATE_NONE)) {
+> > +                    error_report("'--preconfig' and '--incoming' opt=
+ions are "
+> > +                                 "mutually exclusive");
+> > +                    exit(EXIT_FAILURE);
+> >                  }
+> 2 above hunks were a part of previous revisions of preconfig patchset,
+> however they were dropped in favor of one check later per Eduardo's
+> suggestion.
+>=20
+> > +                runstate_set(RUN_STATE_INMIGRATE);
+> >                  incoming =3D optarg;
+> >                  break;
+> >              case QEMU_OPTION_only_migratable:
+> > @@ -3943,14 +3949,12 @@ int main(int argc, char **argv, char **envp)
+> >       */
+> >      loc_set_none();
+> > =20
+> > -    replay_configure(icount_opts);
+> > -
+> > -    if (incoming && !preconfig_exit_requested) {
+> > -        error_report("'preconfig' and 'incoming' options are "
+> > -                     "mutually exclusive");
+> > -        exit(EXIT_FAILURE);
+> > +    if (runstate_check(RUN_STATE_NONE)) {
+> > +        runstate_set(RUN_STATE_PRELAUNCH);
+> >      }
+> > =20
+> > +    replay_configure(icount_opts);
+> > +
+> >      machine_class =3D select_machine();
+> > =20
+> >      set_memory_options(&ram_slots, &maxram_size, machine_class);
+> > @@ -4471,7 +4475,9 @@ int main(int argc, char **argv, char **envp)
+> >      parse_numa_opts(current_machine);
+> > =20
+> >      /* do monitor/qmp handling at preconfig state if requested */
+> > -    main_loop();
+> > +    if (runstate_check(RUN_STATE_PRECONFIG)) {
+> > +        main_loop();
+> > +    }
+> > =20
+> >      /* from here on runstate is RUN_STATE_PRELAUNCH */
+> >      machine_run_board_init(current_machine);
+>=20
+
+Regards,
+Daniel
 --=20
-Best regards,
-Vladimir
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
+ge :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.c=
+om :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
+ge :|
