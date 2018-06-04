@@ -1,21 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47301)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48525)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1fPmHO-0002RI-DM
-	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 05:59:59 -0400
+	(envelope-from <david@redhat.com>) id 1fPmLF-0005aG-So
+	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 06:04:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1fPmHN-0002wZ-Fb
-	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 05:59:58 -0400
-Date: Mon, 4 Jun 2018 10:59:48 +0100
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20180604095948.GF13674@stefanha-x1.localdomain>
-References: <1527801443-30620-1-git-send-email-ari@tuxera.com>
-	<e890432c-cfb4-d933-c1a8-d571ac5687e8@redhat.com>
+	(envelope-from <david@redhat.com>) id 1fPmLB-00052z-U9
+	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 06:03:57 -0400
+References: <20180517081527.14410-1-david@redhat.com>
+	<451cd080-12ab-42bd-0150-e1dbf0abd859@redhat.com>
+	<20180601141341.2d0f7ee0@redhat.com>
+From: David Hildenbrand <david@redhat.com>
+Message-ID: <d440ee15-e126-337b-f365-7a887409cd0f@redhat.com>
+Date: Mon, 4 Jun 2018 12:03:38 +0200
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="kbCYTQG2MZjuOjyn"
-Content-Disposition: inline
-In-Reply-To: <e890432c-cfb4-d933-c1a8-d571ac5687e8@redhat.com>
-Subject: Re: [Qemu-devel] [Qemu-block]  [PATCH 1/5] block: Add blklogwrites
+In-Reply-To: <20180601141341.2d0f7ee0@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH v4 00/14] MemoryDevice: use
+ multi stage hotplug handlers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,82 +26,92 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: Ari Sundholm <ari@tuxera.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org, Aapo Vienamo <aapo@tuxera.com>
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: qemu-devel@nongnu.org, Pankaj Gupta <pagupta@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Richard Henderson <rth@twiddle.net>, Cornelia Huck <cohuck@redhat.com>, Alexander Graf <agraf@suse.de>, Markus Armbruster <armbru@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org, qemu-ppc@nongnu.org, Marcel Apfelbaum <marcel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Luiz Capitulino <lcapitulino@redhat.com>, David Gibson <david@gibson.dropbear.id.au>
 
-
---kbCYTQG2MZjuOjyn
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Fri, Jun 01, 2018 at 07:26:03AM -0500, Eric Blake wrote:
-> On 05/31/2018 04:17 PM, Ari Sundholm wrote:
-> > +static void blk_log_writes_co_do_file(void *opaque)
-> > +{
-> > +    BlkLogWritesFileReq *fr =3D opaque;
-> > +
-> > +    fr->file_ret =3D fr->func(fr);
-> > +
-> > +    fr->r->done++;
+On 01.06.2018 14:13, Igor Mammedov wrote:
+> On Fri, 25 May 2018 14:43:39 +0200
+> David Hildenbrand <david@redhat.com> wrote:
 >=20
-> Two non-atomic increments...
+>> On 17.05.2018 10:15, David Hildenbrand wrote:
+>>> We can have devices that need certain other resources that are e.g.
+>>> system resources managed by the machine. We need a clean way to assig=
+n
+>>> these resources (without violating layers as brought up by Igor).
+>>>
+>>> One example is virtio-mem/virtio-pmem. Both device types need to be
+>>> assigned some region in guest physical address space. This device mem=
+ory
+>>> belongs to the machine and is managed by it. However, virito devices =
+are
+>>> hotplugged using the hotplug handler their proxy device implements. S=
+o we
+>>> could trigger e.g. a PCI hotplug handler for virtio-pci or a CSS/CCW
+>>> hotplug handler for virtio-ccw. But definetly not the machine.
+>>>
+>>> Now, we can route other devices through the machine hotplug handler, =
+to
+>>> properly assign/unassign resources - like a portion in guest physical
+>>> address space.
 >=20
-> > +    qemu_coroutine_enter_if_inactive(fr->r->co);
-> > +}
-> > +
-> > +static int coroutine_fn
-> > +blk_log_writes_co_log(BlockDriverState *bs, uint64_t offset, uint64_t =
-bytes,
-> > +                      QEMUIOVector *qiov, int flags,
-> > +                      int (*file_func)(BlkLogWritesFileReq *r),
-> > +                      uint64_t entry_flags)
-> > +{
+> To sum up review:
+
+Thanks to the review! I'll look into the details and comment where I
+disagree (or where we need a third opinion).
+
+> Some comments apply to several patches even though I commented only onc=
+e.
 >=20
-> > +    qemu_coroutine_enter(co_file);
-> > +    qemu_coroutine_enter(co_log);
-> > +
-> > +    while (r.done < 2) {
-> > +        qemu_coroutine_yield();
-> > +    }
+> I'd suggest to restructure and split series into several:
+>   * unplug cleanups 08/14 & co
+>   * generic _preplug refactoring so we won't have to go back to that qu=
+estion again
+>   * extending memory_device interface 11/14 + actual user for the sake =
+of which
+>     interface is actually extended (virtio-mem)
 >=20
-> ...used as the condition for waiting.  Since the point of coroutines is to
-> allow (restricted) parallel operation, there's a chance that the coroutine
-> implementation can be utilizing parallel threads; if that's the case, then
-> on the rare race when both threads try to increment at near the same time,
-> they can both read 0 and write 1, at which point this wait loop would be =
-an
-> infinite loop.  You're probably better off using atomics (even if I'm wro=
-ng
-> about coroutines being able to race each other on the increment, as the
-> other point of coroutines is that they provide restricted parallelism whe=
-re
-> you can also implement them in only a single thread because of well-defin=
-ed
-> yield points).
+> Also more descriptive commit messages describing why change is done,
+> current ones look like "Lets do something for some vague reason" to
+> unaware reviewers, having virtio-mem along with new extensions to
+> memory_device would be useful here as it could have cross reference
+> to parts that would need it.
 
-In this case the coroutines run from a single event loop (the
-BlockDriverState's AioContext) so they cannot race.
+I'll try to be more verbose.
 
-As QEMU transitions to a multi-queue block layer we will need to think
-about parallelism more.  But the multi-queue block layer isn't
-implemented yet, so I prefer writing straightforward code now without
-trying to anticipate what parallelism issues might arise in the future.
+>=20
+> Try to keep patches smaller and doing one thing, we can always squash
+> them later if it would be better.
 
-Stefan
+I can try to split them up even further where it makes sense. Please
+note that including virtio-mem in the same series won't be happening,
+but I'll soon share a virtio-mem protoype where we reviewers can then
+see the interfaces in action. (or maybe virtio-pmem is the faster one)
 
---kbCYTQG2MZjuOjyn
-Content-Type: application/pgp-signature; name="signature.asc"
+(sending everything in one series will not make reviewers happy due to
+the high amount of code, trust me :) )
 
------BEGIN PGP SIGNATURE-----
+>=20
+> I'm sorry if some comments were a bit too much or insisting on things
+> but I'm trying to keep hotplug infrastructure simple so that later
+> when someone else comes with related patches, I could easily read it
+> without studying it from ground up.
 
-iQEcBAEBAgAGBQJbFQ2UAAoJEJykq7OBq3PImdcH+wYizpAsmiMBaM60hpRcXLEZ
-9oAKOLmPnG5NN/7unujH0WCuxjcXtEClGzj6+N6N3CIUMLrVJ956ZcOs8NsQzBDe
-+8vGdqSWOtvnJuw57WzysZn/g2vm6zua5XInbKyYf0ck/WEuqSo4Hj5FE/oEFuzh
-H8cLHBxhKVW1e5SQFKI/SKP4jJNdjFt/yfypEdyams+lfWVj3n53JggjA0q6ebDy
-OvtZZQR6byL9Air6pd/41LdOfXxY6fuRaMolgL+32Gk/PhmA53+fBNdB9PGE5itT
-7+LoTUv8ZZhbwxQu5TjM0yhKK7Tt/KNyWHUrsFCJV/Q7/+qwh1LPM3rAWF2wSck=
-=ZQWV
------END PGP SIGNATURE-----
+Nothing wrong about that, we can talk about the things where I disagree.
 
---kbCYTQG2MZjuOjyn--
+>=20
+> PS:
+> (I'm not a fan of idea to marry virtio device with its own bus plug log=
+ic
+> into bus-less machine hotplug, but I don't have a better suggestion or
+> time to explore alternatives, so lets do it but keep things manageable)
+
+If it's stupid but it works, it's not stupid ;) No honestly, you
+challenged if it would even be possible and I think we found a way to
+make this fit in nicely.
+
+
+--=20
+
+Thanks,
+
+David / dhildenb
