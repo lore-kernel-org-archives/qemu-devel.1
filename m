@@ -1,21 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47392)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49684)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fPeAH-0006DW-7S
-	for qemu-devel@nongnu.org; Sun, 03 Jun 2018 21:20:06 -0400
+	(envelope-from <wexu@redhat.com>) id 1fPeOY-0003OJ-Px
+	for qemu-devel@nongnu.org; Sun, 03 Jun 2018 21:34:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fPeAD-0003Jy-4A
-	for qemu-devel@nongnu.org; Sun, 03 Jun 2018 21:20:05 -0400
-Date: Mon, 4 Jun 2018 10:38:34 +1000
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20180604003834.GA4251@umbus>
-References: <20180506142005.19580-1-mark.cave-ayland@ilande.co.uk>
-	<20180506142005.19580-3-mark.cave-ayland@ilande.co.uk>
+	(envelope-from <wexu@redhat.com>) id 1fPeOV-0004fC-JM
+	for qemu-devel@nongnu.org; Sun, 03 Jun 2018 21:34:50 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:36856 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <wexu@redhat.com>) id 1fPeOV-0004df-E1
+	for qemu-devel@nongnu.org; Sun, 03 Jun 2018 21:34:47 -0400
+Date: Mon, 4 Jun 2018 09:34:35 +0800
+From: Wei Xu <wexu@redhat.com>
+Message-ID: <20180604013435.GB28131@wei-ubt>
+References: <1522846444-31725-1-git-send-email-wexu@redhat.com>
+	<1522846444-31725-5-git-send-email-wexu@redhat.com>
+	<61ac2a50-5583-2932-cac1-f661fd49e89b@redhat.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="lrZ03NoBR/3+SXJZ"
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20180506142005.19580-3-mark.cave-ayland@ilande.co.uk>
-Subject: Re: [Qemu-devel] [PATCH 2/4] macio: add trace-events to timer device
+In-Reply-To: <61ac2a50-5583-2932-cac1-f661fd49e89b@redhat.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 4/8] virtio: add detach element for packed
+ ring(1.1)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,93 +30,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org
+To: Jason Wang <jasowang@redhat.com>
+Cc: mst@redhat.com, tiwei.bie@intel.com, jfreimann@redhat.com, qemu-devel@nongnu.org
 
-
---lrZ03NoBR/3+SXJZ
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Sun, May 06, 2018 at 03:20:03PM +0100, Mark Cave-Ayland wrote:
-> Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-
-Applied, thanks.
-
-> ---
->  hw/misc/macio/macio.c      | 3 +++
->  hw/misc/macio/trace-events | 4 ++++
->  2 files changed, 7 insertions(+)
+On Tue, Apr 10, 2018 at 03:32:53PM +0800, Jason Wang wrote:
 >=20
-> diff --git a/hw/misc/macio/macio.c b/hw/misc/macio/macio.c
-> index 79621eb879..f9a40eea81 100644
-> --- a/hw/misc/macio/macio.c
-> +++ b/hw/misc/macio/macio.c
-> @@ -32,6 +32,7 @@
->  #include "hw/char/escc.h"
->  #include "hw/misc/macio/macio.h"
->  #include "hw/intc/heathrow_pic.h"
-> +#include "trace.h"
-> =20
->  /* Note: this code is strongly inspirated from the corresponding code
->   * in PearPC */
-> @@ -246,6 +247,7 @@ static void macio_oldworld_init(Object *obj)
->  static void timer_write(void *opaque, hwaddr addr, uint64_t value,
->                         unsigned size)
->  {
-> +    trace_macio_timer_write(addr, size, value);
->  }
-> =20
->  static uint64_t timer_read(void *opaque, hwaddr addr, unsigned size)
-> @@ -266,6 +268,7 @@ static uint64_t timer_read(void *opaque, hwaddr addr,=
- unsigned size)
->          break;
->      }
-> =20
-> +    trace_macio_timer_read(addr, size, value);
->      return value;
->  }
-> =20
-> diff --git a/hw/misc/macio/trace-events b/hw/misc/macio/trace-events
-> index 24c0a36824..d499d78c99 100644
-> --- a/hw/misc/macio/trace-events
-> +++ b/hw/misc/macio/trace-events
-> @@ -9,3 +9,7 @@ cuda_packet_receive(int len) "length %d"
->  cuda_packet_receive_data(int i, const uint8_t data) "[%d] 0x%02x"
->  cuda_packet_send(int len) "length %d"
->  cuda_packet_send_data(int i, const uint8_t data) "[%d] 0x%02x"
-> +
-> +# hw/misc/macio/macio.c
-> +macio_timer_write(uint64_t addr, unsigned len, uint64_t val) "write addr=
- 0x%"PRIx64 " len %d val 0x%"PRIx64
-> +macio_timer_read(uint64_t addr, unsigned len, uint32_t val) "read addr 0=
-x%"PRIx64 " len %d val 0x%"PRIx32
+>=20
+> On 2018=E5=B9=B404=E6=9C=8804=E6=97=A5 20:54, wexu@redhat.com wrote:
+> >From: Wei Xu <wexu@redhat.com>
+> >
+> >helper for packed ring
+>=20
+> It's odd and hard to review if you put detach patch first. I think this
+> patch needs to be reordered after the implementation of pop/map.
 
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
+This patch is not necessary after sync to tiwei's v5, so we can skip it.
 
---lrZ03NoBR/3+SXJZ
-Content-Type: application/pgp-signature; name="signature.asc"
+Wei
 
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlsUigUACgkQbDjKyiDZ
-s5LMdQ//aaOLkCqg5jH+lW28hutkrddwU16C0qIo/vhnEwiKUocF4K4g4ghAtMXi
-3j4WBIWiOwSxqidw4ZDWc3GHutEIM3rme6nK0o+82MjODU0q1iVMdMqPl9maNP1h
-s/8RQD12OBDjqv6XjjcTWl20IwS5GSg25QJfpNwwRXJNyFtrB1iEMr7NbdiNeAUa
-iCgBff00I4KOFTaoCGPJGJk/4vTc2Lb2NLg+7ewVBQlNq0CerYTkJT6OtAQGHsqw
-IFFRbWa+qUl9TC2Q10y9TCgxmZ+GU5YtsybhQ1PTFpc3DgGhweZLpLkuoY/Fa72+
-prRGZCDgeViKNUbiHtv0SL6CnHJJ0JUEhHfLbIKKsWMq/9zrdslk3rkf99ydcbPA
-iRBUsXpU7cbMD203xF5UllNnhf6rTcYLmX7czcO3bpQGrKMzTgQf4INV4LPbFu9F
-9uLvj+UQBOpJ+upYWNnJCLDb9PCzhUTriNNPHI7x74QyCMFLo1kw1Zy6imlgmJvV
-0sorjILwOIQXN0dvZqNiSeMlBjXjpcks6zlqWliMblgtYgOACb5H4KzwgG02myiZ
-qs8dOUJqi1JjcpNvQdLmy634wYjeVVxLeB+Syl1zv1dOyzUQuXiToKC912z4hGkJ
-M9IaKbEE1Oqw4Z0rcdYXnGEy6bPrnOYN9ckTzbJx5llxAXh+JlA=
-=IFQW
------END PGP SIGNATURE-----
-
---lrZ03NoBR/3+SXJZ--
+>=20
+> Thanks
+>=20
+> >Signed-off-by: Wei Xu <wexu@redhat.com>
+> >---
+> >  hw/virtio/virtio.c | 21 +++++++++++++++++++--
+> >  1 file changed, 19 insertions(+), 2 deletions(-)
+> >
+> >diff --git a/hw/virtio/virtio.c b/hw/virtio/virtio.c
+> >index 478df3d..fdee40f 100644
+> >--- a/hw/virtio/virtio.c
+> >+++ b/hw/virtio/virtio.c
+> >@@ -561,6 +561,20 @@ static void virtqueue_unmap_sg(VirtQueue *vq, con=
+st VirtQueueElement *elem,
+> >                           elem->out_sg[i].iov_len);
+> >  }
+> >+static void virtqueue_detach_element_split(VirtQueue *vq,
+> >+                            const VirtQueueElement *elem, unsigned in=
+t len)
+> >+{
+> >+    vq->inuse--;
+> >+    virtqueue_unmap_sg(vq, elem, len);
+> >+}
+> >+
+> >+static void virtqueue_detach_element_packed(VirtQueue *vq,
+> >+                            const VirtQueueElement *elem, unsigned in=
+t len)
+> >+{
+> >+    vq->inuse -=3D elem->count;
+> >+    virtqueue_unmap_sg(vq, elem, len);
+> >+}
+> >+
+> >  /* virtqueue_detach_element:
+> >   * @vq: The #VirtQueue
+> >   * @elem: The #VirtQueueElement
+> >@@ -573,8 +587,11 @@ static void virtqueue_unmap_sg(VirtQueue *vq, con=
+st VirtQueueElement *elem,
+> >  void virtqueue_detach_element(VirtQueue *vq, const VirtQueueElement =
+*elem,
+> >                                unsigned int len)
+> >  {
+> >-    vq->inuse--;
+> >-    virtqueue_unmap_sg(vq, elem, len);
+> >+    if (virtio_vdev_has_feature(vq->vdev, VIRTIO_F_RING_PACKED)) {
+> >+        virtqueue_detach_element_packed(vq, elem, len);
+> >+    } else {
+> >+        virtqueue_detach_element_split(vq, elem, len);
+> >+    }
+> >  }
+> >  /* virtqueue_unpop:
+>=20
