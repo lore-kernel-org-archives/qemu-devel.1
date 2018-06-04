@@ -1,27 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56382)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56954)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1fPkvK-0001sC-E1
-	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 04:33:07 -0400
+	(envelope-from <joel.stan@gmail.com>) id 1fPkyb-0003p8-O7
+	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 04:36:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1fPkvF-0005BW-DI
-	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 04:33:06 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:48528 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1fPkvF-0005AO-8P
-	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 04:33:01 -0400
-References: <1522846444-31725-1-git-send-email-wexu@redhat.com>
-	<1522846444-31725-4-git-send-email-wexu@redhat.com>
-	<6a78b53a-0830-74de-5447-63ecab67e5ed@redhat.com>
-	<20180603174404.GA28131@wei-ubt>
-From: Jason Wang <jasowang@redhat.com>
-Message-ID: <182fcc5e-5996-24e3-d190-be66b0c9f1bd@redhat.com>
-Date: Mon, 4 Jun 2018 16:32:49 +0800
+	(envelope-from <joel.stan@gmail.com>) id 1fPkya-00018i-RG
+	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 04:36:29 -0400
 MIME-Version: 1.0
-In-Reply-To: <20180603174404.GA28131@wei-ubt>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 3/8] virtio: add empty check for packed ring
+Sender: joel.stan@gmail.com
+In-Reply-To: <20180604080448.GM4251@umbus>
+References: <20180531130429.24911-1-joel@jms.id.au>
+	<20180604080448.GM4251@umbus>
+From: Joel Stanley <joel@jms.id.au>
+Date: Mon, 4 Jun 2018 18:06:04 +0930
+Message-ID: <CACPK8XfrL8U_DCu3Ek9e+Gvj9oSn2+c9JnUBf0i4+OTz96-JRw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v2] target/ppc: Allow privileged access to
+ SPR_PCR
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,34 +24,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Wei Xu <wexu@redhat.com>
-Cc: jfreimann@redhat.com, qemu-devel@nongnu.org, tiwei.bie@intel.com, mst@redhat.com
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: Alexander Graf <agraf@suse.de>, qemu-ppc@nongnu.org, QEMU Developers <qemu-devel@nongnu.org>, =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@kaod.org>, Greg Kurz <groug@kaod.org>, Benjamin Herrenschmidt <benh@kernel.crashing.org>, Michael Ellerman <mpe@ellerman.id.au>, Michael Neuling <mikey@neuling.org>
 
-
-
-On 2018=E5=B9=B406=E6=9C=8804=E6=97=A5 01:44, Wei Xu wrote:
->>> +static int virtio_queue_empty_packed_rcu(VirtQueue *vq)
->>> +{
->>> +    struct VRingDescPacked desc;
->>> +    VRingMemoryRegionCaches *cache;
->>> +
->>> +    if (unlikely(!vq->packed.desc)) {
->>> +        return 1;
->>> +    }
->>> +
->>> +    cache =3D vring_get_region_caches(vq);
->>> +    vring_desc_read_packed(vq->vdev, &desc, &cache->desc_packed, vq-=
->last_avail_idx);
->>> +
->>> +    /* Make sure we see the updated flag */
->>> +    smp_mb();
->> What we need here is to make sure flag is read before all other fields=
-,
->> looks like this barrier can't.
-> Isn't flag updated yet if it has been read?
+On 4 June 2018 at 17:34, David Gibson <david@gibson.dropbear.id.au> wrote:
+> On Thu, May 31, 2018 at 10:34:29PM +0930, Joel Stanley wrote:
+>> @@ -98,6 +99,15 @@ void helper_store_ptcr(CPUPPCState *env, target_ulong val)
+>>          tlb_flush(CPU(cpu));
+>>      }
+>>  }
+>> +
+>> +void helper_store_pcr(CPUPPCState *env, target_ulong value)
+>> +{
+>> +    if (value != 0) {
+>> +        error_report("Invalid PCR value 0x"TARGET_FMT_lx, value);
+>> +        return;
+>> +    }
 >
+> I don't see a lot of point to this check.  For now the only user just
+> clears the PCR, but why limit yourself to that explicitly?
 
-Consider the case of event index, you need make sure flag is read before=20
-off_wrap.
+As we're not emulating the features of the register when the value is
+non-zero, I thought it would make make sense to do something.
 
-Thanks
+I'll drop it in v3.
+
+>
+>> +    env->spr[SPR_PCR] = value;
+>
+> You definitely should be masking against pcr_mask too.
+
+Okay. Thanks for the review.
+
+Cheers,
+
+Joel
