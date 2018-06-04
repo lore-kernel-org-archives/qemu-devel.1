@@ -1,24 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51930)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52276)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1fPkVm-0004f1-9z
-	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 04:06:43 -0400
+	(envelope-from <jasowang@redhat.com>) id 1fPkY3-0005Jg-Ea
+	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 04:09:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1fPkVi-0003tB-Aa
-	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 04:06:42 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:56068 helo=mx1.redhat.com)
+	(envelope-from <jasowang@redhat.com>) id 1fPkXz-0004o3-BQ
+	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 04:09:03 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:48676 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1fPkVi-0003sl-5f
-	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 04:06:38 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.6])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 714DD401EF05
-	for <qemu-devel@nongnu.org>; Mon,  4 Jun 2018 08:06:37 +0000 (UTC)
-From: Peter Xu <peterx@redhat.com>
-Date: Mon,  4 Jun 2018 16:06:30 +0800
-Message-Id: <20180604080630.10946-1-peterx@redhat.com>
-Subject: [Qemu-devel] [PATCH] monitor: postpone monitor_qmp_cleanup_queues
+	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1fPkXz-0004nn-5q
+	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 04:08:59 -0400
+References: <CANzW0mv3x1Hxje9fPEAExOb_kmCg2HU9jE_nwpLMqQk2Wh+KQQ@mail.gmail.com>
+	<20180601123016.GP8687@stefanha-x1.localdomain>
+From: Jason Wang <jasowang@redhat.com>
+Message-ID: <6095a332-009e-182e-543d-743ba339f581@redhat.com>
+Date: Mon, 4 Jun 2018 16:08:53 +0800
+MIME-Version: 1.0
+In-Reply-To: <20180601123016.GP8687@stefanha-x1.localdomain>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] "socket" host network backend: suggested
+ improvements and fixes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,82 +29,132 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, peterx@redhat.com, Eric Blake <eblake@redhat.com>, John Snow <jsnow@redhat.com>, Markus Armbruster <armbru@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+To: Stefan Hajnoczi <stefanha@gmail.com>, Artem Pisarenko <artem.k.pisarenko@gmail.com>
+Cc: qemu-devel@nongnu.org
 
-Previously we cleanup the queues when we got CLOSED event.  It was used
-to make sure we won't leftover replies/events of a old client to a new
-client.  Now this patch postpones that until OPENED.
 
-In most cases, it does not really matter much since either way will make
-sure that the new client won't receive unexpected old events/responses.
-However there can be a very rare race condition with the old way when we
-use QMP with stdio and pipelines (which is quite common in iotests).
-The problem is that, we can easily have something like this in scripts:
 
-  cat $QMP_COMMANDS | qemu -qmp stdio ... | filter_commands
+On 2018=E5=B9=B406=E6=9C=8801=E6=97=A5 20:30, Stefan Hajnoczi wrote:
+> On Wed, May 30, 2018 at 04:34:03PM +0600, Artem Pisarenko wrote:
+>> Hi to all.
+> Hi Artem,
+> I have CCed Jason Wang, the QEMU networking maintainer, so your email
+> gets attention.  QEMU is a high-traffic mailing list and you may not ge=
+t
+> responses unless you CC relevant people (use scripts/get_maintainer.pl
+> -f path/to/source.c to look up maintainers).
+>
+>> I'm working on integrating QEMU networking to simulation environment a=
+nd
+>> found socket backend very convenient: it's simple, easy to use (i.e no
+>> intermediate things required, such as tap/tun adapter, vde switch, etc=
+.)
+>> and transparent to host environment (i.e. it doesn't pollutes system w=
+ith
+>> bunch of virtual devices, etc.).
+>>
+>> Although, it have some problems, closely related to each other. I've
+>> investigated source code and played with it a little, but I'm not read=
+y
+>> submit a complete patch. So, here are my thoughts...
 
-In most cases, a QMP session will be based on a bidirectional
-channel (read/write to a TCP port, for example), so IN and OUT are
-sharing some fundamentally same thing.  However that's untrue for pipes
-above - the IN is the "cat" program, while the "OUT" is directed to the
-"filter_commands" which is actually another process.
+You're very welcome to send patches. If you think it's not ready to be=20
+merged, you can send RFC for early discussion.
 
-Now when we received the CLOSED event, we cleanup the queues (including
-the QMP response queue).  That means, if we kill/stop the "cat" process
-faster than the filter_commands process, the filter_commands process is
-possible to miss some responses/events that should belong to it.
+>>
+>> 1. Internal protocol (only qemu instances can join its network devices
+>> between).
 
-In practise, I encountered a very strange SHUTDOWN event missing when
-running test with iotest 087.  Without this patch, iotest 078 will have
-~10% chance to miss the SHUTDOWN event and fail when with Out-Of-Band
-enabled:
+You mean the simple protocol on top of TCP? We probably need at least a=20
+version for socket backend. (We change the protocol recently for vnet=20
+header support).
 
-087 8s ... - output mismatch (see 087.out.bad)
---- /home/peterx/git/qemu/tests/qemu-iotests/087.out    2018-06-01 18:44:22.378982462 +0800
-+++ /home/peterx/git/qemu/bin/tests/qemu-iotests/087.out.bad    2018-06-01 18:53:44.267840928 +0800
-@@ -8,7 +8,6 @@
- {"return": {}}
- {"error": {"class": "GenericError", "desc": "'node-name' must be specified for the root node"}}
- {"return": {}}
--{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
+For UDP, I believe external program could join?
 
- === Duplicate ID ===
-@@ -53,7 +52,6 @@
- {"return": {}}
- {"return": {}}
- {"return": {}}
--{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
+>> I suggest to make it available to plug with external software,
+>> i.e freeze communication protocol at current state and document it in
+>> docs/interop/ directory.
 
-This patch fixes the problem.
+Any pointer to freeze communication protocol?
 
-Fixes: 6d2d563f8c ("qmp: cleanup qmp queues properly", 2018-03-27)
-Signed-off-by: Peter Xu <peterx@redhat.com>
+>>
+>> 2. Transport options wrongly documented. Section "2.3.6 Network option=
+s"
+>> lists "-netdev socket,..." entries. It gives very different basic
+>> understanding of how it works from actual one.
+>>   2.1. It has two entries: listen/connect (TCP connecton) and mcast
+>> (multicast UDP), but 'qemu --help' outputs additional one - udp (UDP
+>> tunnel), which is undocumented, but looks like working.
 
-Signed-off-by: Peter Xu <peterx@redhat.com>
----
- monitor.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Yes.
 
-diff --git a/monitor.c b/monitor.c
-index 46814af533..6f26108108 100644
---- a/monitor.c
-+++ b/monitor.c
-@@ -4354,6 +4354,7 @@ static void monitor_qmp_event(void *opaque, int event)
- 
-     switch (event) {
-     case CHR_EVENT_OPENED:
-+        monitor_qmp_cleanup_queues(mon);
-         mon->qmp.commands = &qmp_cap_negotiation_commands;
-         monitor_qmp_caps_reset(mon);
-         data = get_qmp_greeting(mon);
-@@ -4362,7 +4363,6 @@ static void monitor_qmp_event(void *opaque, int event)
-         mon_refcount++;
-         break;
-     case CHR_EVENT_CLOSED:
--        monitor_qmp_cleanup_queues(mon);
-         json_message_parser_destroy(&mon->qmp.parser);
-         json_message_parser_init(&mon->qmp.parser, handle_qmp_command);
-         mon_refcount--;
--- 
-2.17.0
+>>   2.2. Each entry has fd=3Dh parameter, which looks like it's an optio=
+nal
+>> parameter, but code analysis (net/socket.c) shows that, in fact, it's =
+a
+>> separate transport option exclusive to listed ones. It used as follows=
+:
+>> user creates/opens whatever (almost) custom socket/file it wants, conn=
+ects
+>> it with other endpoint and passes file descriptor (handle) to qemu, wh=
+ich
+>> just recv/send over it and nothing more.
+
+Right.
+
+>>   2.3. As a consequence, if you try to invoke any transport/variant op=
+tion
+>> with "fd=3D", you'll get an error: "exactly one of listen=3D, connect=3D=
+, mcast=3D
+>> or udp=3D is required". And again, error message is incomplete - it mi=
+sses
+>> "fd=3D" option.
+
+This needs to be fixed.
+
+>>
+>> 3. "fd=3D" transport doesn't work with SOCK_DGRAM type sockets. It's d=
+ue to
+>> an implementation error in net/socket.c. Function
+>> net_socket_receive_dgram() uses sendo() call with s->dgram_dst value w=
+hich
+>> is undefined for this case (and, of course, cannot be defined).
+
+I think maybe we need a new qmp method for setting the destination for=20
+socket backend.
+
+>> Although net_socket_fd_init() execution branch is smart enough to dete=
+ct
+>> type of socket passed with "fd=3D", but its "connected" state forgotte=
+n
+>> afterwards. Suggested fix: replace sendto() with send(), which correct=
+ly
+>> assumes already connected socket, and add corresponding connect() call=
+s for
+>> "mcast=3D" and "udp=3D" init sequences.
+
+Appreciated if you could send the aboves fixes. Some unit tests are even=20
+better.
+
+>>
+>> (For those, who interested, currently I've got working network
+>> communication with unmodified qemu 2.12.0 in Linux using UNIX domain
+>> sockets created by socketpair(AF_LOCAL, SOCK_STREAM, ...), one of whic=
+h
+>> passed to spawned child qemu process via -netdev socket,fd=3D... and o=
+ther
+>> one, used in parent application process to send/receive packets. Proto=
+col,
+>> used by qemu, is simple and implements only data plane: it just transf=
+ers
+>> raw ethernet frames in binary form, for datagram-type sockets it's
+>> straightforward, and for stream-type sockets each frame prepended with
+>> uint32 length in network byte order, without any delimiters and escapi=
+ng.)
+>> --=20
+>>
+>> =D0=A1 =D1=83=D0=B2=D0=B0=D0=B6=D0=B5=D0=BD=D0=B8=D0=B5=D0=BC,
+>>    =D0=90=D1=80=D1=82=D0=B5=D0=BC =D0=9F=D0=B8=D1=81=D0=B0=D1=80=D0=B5=
+=D0=BD=D0=BA=D0=BE
+
+Thanks
