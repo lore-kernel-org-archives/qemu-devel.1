@@ -1,33 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49216)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50347)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fPhFC-0001iC-Ey
-	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 00:37:23 -0400
+	(envelope-from <bounces@canonical.com>) id 1fPhNG-0003LA-Ow
+	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 00:45:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fPhF9-0004jo-4G
-	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 00:37:22 -0400
-Received: from indium.canonical.com ([91.189.90.7]:60558)
+	(envelope-from <bounces@canonical.com>) id 1fPhND-00083a-LO
+	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 00:45:42 -0400
+Received: from indium.canonical.com ([91.189.90.7]:57986)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1fPhF8-0004ji-UA
-	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 00:37:19 -0400
+	id 1fPhND-00082E-FI
+	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 00:45:39 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1fPhF5-00020G-D8
-	for <qemu-devel@nongnu.org>; Mon, 04 Jun 2018 04:37:15 +0000
+	id 1fPhNB-0006Yd-HM
+	for <qemu-devel@nongnu.org>; Mon, 04 Jun 2018 04:45:37 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id B34BF2E88E1
-	for <qemu-devel@nongnu.org>; Mon,  4 Jun 2018 04:37:14 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id 6CA422E80C9
+	for <qemu-devel@nongnu.org>; Mon,  4 Jun 2018 04:45:37 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Mon, 04 Jun 2018 04:17:47 -0000
-From: Launchpad Bug Tracker <1426092@bugs.launchpad.net>
-Reply-To: Bug 1426092 <1426092@bugs.launchpad.net>
+Date: Mon, 04 Jun 2018 04:17:48 -0000
+From: Launchpad Bug Tracker <1025244@bugs.launchpad.net>
+Reply-To: Bug 1025244 <1025244@bugs.launchpad.net>
 Sender: bounces@canonical.com
-References: <20150226192349.17124.43439.malonedeb@gac.canonical.com>
-Message-Id: <152808586750.32120.3527616756051774205.malone@loganberry.canonical.com>
+References: <20120716123031.26191.29124.malonedeb@chaenomeles.canonical.com>
+Message-Id: <152808586849.32120.10910639023960467052.malone@loganberry.canonical.com>
 Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1426092] Re: virtio-balloon-device locks up Guest
+Subject: [Qemu-devel] [Bug 1025244] Re: qcow2 image increasing disk size
+ above the virtual limit
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,70 +39,64 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-[Expired for QEMU because there has been no activity for 60 days.]
+[Expired for qemu-kvm (Ubuntu) because there has been no activity for 60
+days.]
 
-** Changed in: qemu
+** Changed in: qemu-kvm (Ubuntu)
        Status: Incomplete =3D> Expired
 
 -- =
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1426092
+https://bugs.launchpad.net/bugs/1025244
 
 Title:
-  virtio-balloon-device locks up Guest
+  qcow2 image increasing disk size above the virtual limit
 
 Status in QEMU:
   Expired
+Status in qemu-kvm package in Ubuntu:
+  Expired
 
 Bug description:
-  Setting arbitrary balloon target values locks up the guest in some cases =
-crashes it, if the target memory is < used +~5% free.  =
+  Using qemu/kvm, qcow2 images, ext4 file systems on both guest and host
+   Host and Guest: Ubuntu server 12.04 64bit
+  To create an image I did this:
 
-  Found while testing aggressive memory over-commit, scenarios.
-  You get messages like:
+  qemu-img create -f qcow2 -o preallocation=3Dmetadata ubuntu-pdc-vda.img 1=
+0737418240 (not sure about the exact bytes, but around this)
+  ls -l ubuntu-pdc-vda.img
+  fallocate -l theSizeInBytesFromAbove ubuntu-pdc-vda.img
 
-  [  155.827448] [<c002060c>] (show_stack) from [<c041c518>] (dump_stack+0x=
-6c/0x88)
-  [  155.837076] [<c041c518>] (dump_stack) from [<c0091994>] (warn_alloc_fa=
-iled+0xe0/0x120)
-  [  155.847075] [<c0091994>] (warn_alloc_failed) from [<c0094480>] (__allo=
-c_pages_nodemask+0x600/0x91c)
-  [  155.859039] [<c0094480>] (__alloc_pages_nodemask) from [<c00da414>] (b=
-alloon_page_enqueue+0x20/0xbc)
-  [  155.870556] [<c00da414>] (balloon_page_enqueue) from [<c025d794>] (bal=
-loon+0x140/0x2cc)
-  [  155.881377] [<c025d794>] (balloon) from [<c0043b38>] (kthread+0xd8/0xf=
-4)
+  The problem is that the image is growing progressively and has
+  obviously no limit, although I gave it one. The root filesystem's
+  image is the same case:
 
-  page dumped bacause: nonzero _count
-  BUG: BAad page state in process Xorg pfn:396e5
+  qemu-img info ubuntu-pdc-vda.img
+   image: ubuntu-pdc-vda.img
+   file format: qcow2
+   virtual size: 10G (10737418240 bytes)
+   disk size: 14G
+   cluster_size: 65536
 
-  Test Environment:
-  x86_64
-  Ubuntu 13.10, Guest Linux Kernel 3.19, qemu 2.2.0 with following patches =
-applied - balloon OOM enhancement
-  commit 5a10b7dbf904bfe01bb9fcc6298f7df09eed77d5
-  Author: Raushaniya Maksudova <rmaksudova@parallels.com>
+  and for confirmation:
+   du -sh ubuntu-pdc-vda.img
+   15G ubuntu-pdc-vda.img
 
-  Boot guest with '-balloon virtio', -qmp .... -hmp access
-  1. sudo info balloon | socat - tcp4-connect:127.0.0.1:4444
-     - or over qmp interface
-  {"execute":"qom-get", "arguments": { "path": "/machine/peripheral-anon/de=
-vice[1]","property": "guest-stats" }}
-  {"return": {"stats": {"stat-swap-out": 0, "stat-free-memory": 513454080, =
-"stat-minor-faults": 1261, "stat-major-faults": 0, "stat-total-memory": 526=
-073856, "stat-swap-in": 0}, "last-update": 11109}}
+  I made a test and saw that when I delete something from the guest, the re=
+al size of the image is not decreasing (I read it is normal). OK, but when =
+I write something again, it doesn't use the freed space, but instead grows =
+the image. So for example:
+   1. The initial physical size of the image is 1GB.
+   2. I copy 1GB of data in the guest. It's physical size becomes 2GB.
+   3. I delete this data (1GB). The physical size of the image remains 2GB.
+   4. I copy another 1GB of data to the guest.
+   5. The physical size of the image becomes 3GB.
+   6. And so on with no limit. It doesn't care if the virtual size is less.
 
-  2. Take memory down check free memory using (1)
-  3. Issue "sudo echo balloon XXX | socat - tcp4-connect:127.0.0.1:4444" - =
-XXX is value in threshold mentioned above
-     and you get Guest lockup
-
-  ARM - samething except '-device virtio-balloon-device' used
-
-  Libvirt - virsh setmem causes same issue.
+  Is this normal - the real/physical size of the image to be larger than
+  the virtual limit???
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1426092/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/1025244/+subscriptions
