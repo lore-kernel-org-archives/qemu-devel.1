@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46564)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46585)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <guangrong.xiao@gmail.com>) id 1fPmDz-0007g9-LS
-	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 05:56:28 -0400
+	(envelope-from <guangrong.xiao@gmail.com>) id 1fPmE7-0007mP-05
+	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 05:56:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <guangrong.xiao@gmail.com>) id 1fPmDy-0001Dd-RQ
-	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 05:56:27 -0400
-Received: from mail-pl0-x243.google.com ([2607:f8b0:400e:c01::243]:33370)
+	(envelope-from <guangrong.xiao@gmail.com>) id 1fPmE2-0001GU-4w
+	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 05:56:35 -0400
+Received: from mail-pf0-x243.google.com ([2607:f8b0:400e:c00::243]:42185)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <guangrong.xiao@gmail.com>)
-	id 1fPmDy-0001DS-Ks
-	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 05:56:26 -0400
-Received: by mail-pl0-x243.google.com with SMTP id n10-v6so19388158plp.0
-	for <qemu-devel@nongnu.org>; Mon, 04 Jun 2018 02:56:26 -0700 (PDT)
+	id 1fPmE1-0001GA-VB
+	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 05:56:30 -0400
+Received: by mail-pf0-x243.google.com with SMTP id w7-v6so272827pfn.9
+	for <qemu-devel@nongnu.org>; Mon, 04 Jun 2018 02:56:29 -0700 (PDT)
 From: guangrong.xiao@gmail.com
-Date: Mon,  4 Jun 2018 17:55:15 +0800
-Message-Id: <20180604095520.8563-8-xiaoguangrong@tencent.com>
+Date: Mon,  4 Jun 2018 17:55:16 +0800
+Message-Id: <20180604095520.8563-9-xiaoguangrong@tencent.com>
 In-Reply-To: <20180604095520.8563-1-xiaoguangrong@tencent.com>
 References: <20180604095520.8563-1-xiaoguangrong@tencent.com>
-Subject: [Qemu-devel] [PATCH 07/12] migration: hold the lock only if it is
- really needed
+Subject: [Qemu-devel] [PATCH 08/12] migration: do not flush_compressed_data
+ at the end of each iteration
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,41 +32,38 @@ Cc: qemu-devel@nongnu.org, kvm@vger.kernel.org, dgilbert@redhat.com, peterx@redh
 
 From: Xiao Guangrong <xiaoguangrong@tencent.com>
 
-Try to hold src_page_req_mutex only if the queue is not
-empty
+flush_compressed_data() needs to wait all compression threads to
+finish their work, after that all threads are free until the
+migration feed new request to them, reducing its call can improve
+the throughput and use CPU resource more effectively
+
+We do not need to flush all threads at the end of iteration, the
+data can be kept locally until the memory block is changed
 
 Signed-off-by: Xiao Guangrong <xiaoguangrong@tencent.com>
 ---
- include/qemu/queue.h | 1 +
- migration/ram.c      | 4 ++++
- 2 files changed, 5 insertions(+)
+ migration/ram.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/include/qemu/queue.h b/include/qemu/queue.h
-index 59fd1203a1..ac418efc43 100644
---- a/include/qemu/queue.h
-+++ b/include/qemu/queue.h
-@@ -341,6 +341,7 @@ struct {                                                                \
- /*
-  * Simple queue access methods.
-  */
-+#define QSIMPLEQ_EMPTY_ATOMIC(head) (atomic_read(&((head)->sqh_first)) == NULL)
- #define QSIMPLEQ_EMPTY(head)        ((head)->sqh_first == NULL)
- #define QSIMPLEQ_FIRST(head)        ((head)->sqh_first)
- #define QSIMPLEQ_NEXT(elm, field)   ((elm)->field.sqe_next)
 diff --git a/migration/ram.c b/migration/ram.c
-index 15b20d3f70..f9a8646520 100644
+index f9a8646520..0a38c1c61e 100644
 --- a/migration/ram.c
 +++ b/migration/ram.c
-@@ -1550,6 +1550,10 @@ static RAMBlock *unqueue_page(RAMState *rs, ram_addr_t *offset)
- {
-     RAMBlock *block = NULL;
+@@ -1994,6 +1994,7 @@ static void ram_save_cleanup(void *opaque)
+     }
  
-+    if (QSIMPLEQ_EMPTY_ATOMIC(&rs->src_page_requests)) {
-+        return NULL;
-+    }
-+
-     qemu_mutex_lock(&rs->src_page_req_mutex);
-     if (!QSIMPLEQ_EMPTY(&rs->src_page_requests)) {
-         struct RAMSrcPageRequest *entry =
+     xbzrle_cleanup();
++    flush_compressed_data(*rsp);
+     compress_threads_save_cleanup();
+     ram_state_cleanup(rsp);
+ }
+@@ -2690,7 +2691,6 @@ static int ram_save_iterate(QEMUFile *f, void *opaque)
+         }
+         i++;
+     }
+-    flush_compressed_data(rs);
+     rcu_read_unlock();
+ 
+     /*
 -- 
 2.14.4
