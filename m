@@ -1,29 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51107)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51411)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wei.w.wang@intel.com>) id 1fPkQR-000235-5G
-	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 04:01:17 -0400
+	(envelope-from <pagupta@redhat.com>) id 1fPkSO-0002wI-0z
+	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 04:03:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wei.w.wang@intel.com>) id 1fPkQM-0000R3-2m
-	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 04:01:11 -0400
-Received: from mga18.intel.com ([134.134.136.126]:27903)
+	(envelope-from <pagupta@redhat.com>) id 1fPkSJ-00023k-RG
+	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 04:03:12 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:51174)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <wei.w.wang@intel.com>)
-	id 1fPkQL-0000QX-OK
-	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 04:01:06 -0400
-Message-ID: <5B14F2A3.9010805@intel.com>
-Date: Mon, 04 Jun 2018 16:04:51 +0800
-From: Wei Wang <wei.w.wang@intel.com>
+	(Exim 4.71) (envelope-from <pagupta@redhat.com>) id 1fPkSJ-00023N-IX
+	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 04:03:07 -0400
+Date: Mon, 4 Jun 2018 04:03:06 -0400 (EDT)
+From: Pankaj Gupta <pagupta@redhat.com>
+Message-ID: <120916025.39666078.1528099386072.JavaMail.zimbra@redhat.com>
+In-Reply-To: <20180601115429.GL8687@stefanha-x1.localdomain>
+References: <20180523140809.622F.E1E9C6FF@jp.fujitsu.com>
+	<20180601115429.GL8687@stefanha-x1.localdomain>
 MIME-Version: 1.0
-References: <1524550428-27173-1-git-send-email-wei.w.wang@intel.com>
-	<1524550428-27173-5-git-send-email-wei.w.wang@intel.com>
-	<20180529181221-mutt-send-email-mst@kernel.org>
-	<5B0E6AE9.2030505@intel.com>
-	<20180530154325-mutt-send-email-mst@kernel.org>
-In-Reply-To: <20180530154325-mutt-send-email-mst@kernel.org>
-Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v7 4/5] virtio-balloon:
- VIRTIO_BALLOON_F_FREE_PAGE_HINT
+Subject: Re: [Qemu-devel] Questions about vNVDIMM on qemu/KVM
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,39 +27,113 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: qemu-devel@nongnu.org, virtio-dev@lists.oasis-open.org, quintela@redhat.com, dgilbert@redhat.com, pbonzini@redhat.com, liliang.opensource@gmail.com, yang.zhang.wz@gmail.com, quan.xu0@gmail.com, nilal@redhat.com, riel@redhat.com, zhang.zhanghailiang@huawei.com, Peter Xu <peterx@redhat.com>
+To: Yasunori Goto <y-goto@jp.fujitsu.com>
+Cc: Luiz Capitulino <lcapitulino@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>, qemu-devel@nongnu.org, NVDIMM-ML <linux-nvdimm@lists.01.org>, dan j williams <dan.j.williams@intel.com>
 
-On 05/30/2018 08:47 PM, Michael S. Tsirkin wrote:
-> On Wed, May 30, 2018 at 05:12:09PM +0800, Wei Wang wrote:
->> On 05/29/2018 11:24 PM, Michael S. Tsirkin wrote:
->>> On Tue, Apr 24, 2018 at 02:13:47PM +0800, Wei Wang wrote:
->>>> +/*
->>>> + * Balloon will report pages which were free at the time of this call. As the
->>>> + * reporting happens asynchronously, dirty bit logging must be enabled before
->>>> + * this call is made.
->>>> + */
->>>> +void balloon_free_page_start(void)
->>>> +{
->>>> +    balloon_free_page_start_fn(balloon_opaque);
->>>> +}
->>> Please create notifier support, not a single global.
->> OK. The start is called at the end of bitmap_sync, and the stop is called at
->> the beginning of bitmap_sync. In this case, we will need to add two
->> migration states, MIGRATION_STATUS_BEFORE_BITMAP_SYNC and
->> MIGRATION_STATUS_AFTER_BITMAP_SYNC, right?
+Hi,
+ 
+> 
+> > I'm investigating status of vNVDIMM on qemu/KVM,
+> > and I have some questions about it. I'm glad if anyone answer them.
+> > 
+> > In my understanding, qemu/KVM has a feature to show NFIT for guest,
+> > and it will be still updated about platform capability with this patch set.
+> > https://lists.gnu.org/archive/html/qemu-devel/2018-05/msg04756.html
+> > 
+> > And libvirt also supports this feature with <memory model='nvdimm'>
+> > https://libvirt.org/formatdomain.html#elementsMemory
+> > 
+> > 
+> > However, virtio-pmem is developing now, and it is better
+> > for archtectures to detect regions of NVDIMM without ACPI (like s390x)
+> > In addition, It is also necessary to flush guest contents on vNVDIMM
+> > who has a backend-file.
+> > 
+> > 
+> > Q1) Does ACPI.NFIT bus of qemu/kvm remain with virtio-pmem?
+        No.
 
-Peter, do you have any thought about this?
+> >     How do each roles become it if both NFIT and virtio-pmem will be
+> >     available?
 
-Currently, the usage of free page optimization isn't limited to the 
-first stage. It is used in each stage. A global call to start the free 
-page optimization is made after bitmap sync, and another global call to 
-stop the optimization is made before bitmap sync. It is simple to just 
-use global calls.
+        There are two main use cases:
 
-If we change the implementation to use notifiers, I think we will need 
-to add two new MigrationStatus as above. Would you think that is 
-worthwhile for some reason?
+        1] DAX memory region pass-through to guest:
+        -------------------------------------------
+        As this region is present in actual physical NVDIMM device and exposed to guest,
+        ACPI/NFIT way is used. If all the persistent memory is used by only this way we 
+        don't need 'virtio-pmem'.
 
-Best,
-Wei
+        2] Emulated DAX memory region in host passed to guest:
+        --------------------------------------------------------
+        If this type of region is exposed to guest, it will be preferable to use
+        'virtio-pmem'. 
+
+        This is regular host memory which is mmaped in guest address space for emulating 
+        persistent memory. Guest writes are present in host page cache and not assured to be 
+        written on backing disk without an explicit flush/sync call.
+ 
+        'virtio-pmem' will solve the problem of flushing guest writes present in host page cache.
+        With filesystems at host which use journal-ling like (ext4, xfs), they automatically call 
+        'fsync' at regular intervals. but still there is not 100% assurance of all write persistence until
+        an explicit flush is done from guest. So, we need an additional fsync to flush guest writes to 
+        backing disk. We are using this approach to avoid using guest page cache and keep page cache management 
+        of all the guests at host side.
+        
+        If both ACPI NFIT and virtio-pmem are present, both will have their corresponding memory regions and 
+        defined by memory type "Persistent shared Memory" in case of virtio-pmem and "Persistent Memory" for 
+        ACPI NVDIMM. This is to differentiate both the memory types.
+
+> >     If my understanding is correct, both NFIT and virtio-pmem is used to
+> >     detect vNVDIMM regions, but only one seems to be necessary....
+> > 
+> >     Otherwize, is the NFIT bus just for keeping compatibility,
+> >     and virtio-pmem is promising way?
+> > 
+> >     
+> > Q2) What bus is(will be?) created for virtio-pmem?
+> >     I could confirm the bus of NFIT is created with <memory
+> >     model='nvdimm'>,
+
+        For virtio-pmem also its nvdimm bus.
+
+> >     and I heard other bus will be created for virtio-pmem, but I could not
+> >     find what bus is created concretely.
+> >     ---
+> >       # ndctl list -B
+> >       {
+> >          "provider":"ACPI.NFIT",
+> >          "dev":"ndbus0"
+> >       }
+> >     ---
+> >    
+> >     I think it affects what operations user will be able to, and what
+> >     notification is necessary for vNVDIMM.
+> >     ACPI defines some operations like namespace controll, and notification
+> >     for NVDIMM health status or others.
+> >     (I suppose that other status notification might be necessary for
+> >     vNVDIMM,
+> >      but I'm not sure yet...)
+
+         For virtio-pmem, we are not providing advance features like namespace and various
+         other features which ACPI/NVDIMM hardware provides. This is just to keep paravirt
+         device simple.
+
+         Moreover I have not yet looked at ndctl side of things. I am not 100% sure how
+         ndctl will handle 'virtio-pmem'.
+
+        Adding 'Dan' in loop, he can add his thoughts.
+
+Thanks,
+Pankaj
+
+> > 
+> > If my understanding is wrong, please correct me.
+> > 
+> > Thanks,
+> > ---
+> > Yasunori Goto
+> > 
+> > 
+> > 
+> 
