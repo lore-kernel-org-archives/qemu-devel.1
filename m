@@ -1,20 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41454)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41433)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1fPjdz-0006W1-UR
-	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 03:11:08 -0400
+	(envelope-from <famz@redhat.com>) id 1fPjdw-0006Ui-0l
+	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 03:11:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1fPjdw-0003KJ-5V
-	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 03:11:07 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:53468 helo=mx1.redhat.com)
+	(envelope-from <famz@redhat.com>) id 1fPjds-0003Ik-1M
+	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 03:11:03 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:53464 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1fPjdw-0003K2-1L
-	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 03:11:04 -0400
+	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1fPjdr-0003IM-TA
+	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 03:10:59 -0400
 From: Fam Zheng <famz@redhat.com>
-Date: Mon,  4 Jun 2018 15:10:50 +0800
-Message-Id: <20180604071050.12492-3-famz@redhat.com>
-In-Reply-To: <20180604071050.12492-1-famz@redhat.com>
-References: <20180604071050.12492-1-famz@redhat.com>
-Subject: [Qemu-devel] [PULL 2/2] docker: Update fedora image to 28
+Date: Mon,  4 Jun 2018 15:10:48 +0800
+Message-Id: <20180604071050.12492-1-famz@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL 0/2] Docker patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,21 +27,39 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Peter Maydell <peter.maydell@linaro.org>
 
-Signed-off-by: Fam Zheng <famz@redhat.com>
-Message-Id: <20180601023557.9770-1-famz@redhat.com>
----
- tests/docker/dockerfiles/fedora.docker | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+The following changes since commit 392fba9f583223786f844dce9b2e7f9a0ce014=
+7a:
 
-diff --git a/tests/docker/dockerfiles/fedora.docker b/tests/docker/dockerfiles/fedora.docker
-index b706f42405..65d7761cf5 100644
---- a/tests/docker/dockerfiles/fedora.docker
-+++ b/tests/docker/dockerfiles/fedora.docker
-@@ -1,4 +1,4 @@
--FROM fedora:27
-+FROM fedora:28
- ENV PACKAGES \
-     ccache gettext git tar PyYAML sparse flex bison python3 bzip2 hostname \
-     gcc gcc-c++ llvm clang make perl which bc findutils glib2-devel \
--- 
+  Merge remote-tracking branch 'remotes/stsquad/tags/pull-travis-updates-=
+010618-1' into staging (2018-06-01 17:32:30 +0100)
+
+are available in the Git repository at:
+
+  git://github.com/famz/qemu.git tags/docker-pull-request
+
+for you to fetch changes up to 63dba573fa65bf830ec3f78a8f3a6b0697ce1637:
+
+  docker: Update fedora image to 28 (2018-06-04 14:39:18 +0800)
+
+----------------------------------------------------------------
+
+Hi Peter,
+
+One improvement from Alex and one patch to track the Fedora latest
+release.
+
+----------------------------------------------------------------
+
+Alex Benn=C3=A9e (1):
+  tests/docker/Makefile.include: handle empty TARGET_LIST
+
+Fam Zheng (1):
+  docker: Update fedora image to 28
+
+ rules.mak                              | 3 +++
+ tests/docker/Makefile.include          | 2 +-
+ tests/docker/dockerfiles/fedora.docker | 2 +-
+ 3 files changed, 5 insertions(+), 2 deletions(-)
+
+--=20
 2.17.0
