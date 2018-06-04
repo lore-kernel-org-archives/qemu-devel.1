@@ -1,14 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36560)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36581)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1fPnXe-0007nj-HQ
-	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 07:20:51 -0400
+	(envelope-from <stefanha@redhat.com>) id 1fPnXf-0007oo-H3
+	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 07:20:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1fPnXd-0001Pd-Lj
-	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 07:20:50 -0400
+	(envelope-from <stefanha@redhat.com>) id 1fPnXe-0001Px-9b
+	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 07:20:51 -0400
 From: Stefan Hajnoczi <stefanha@redhat.com>
-Date: Mon,  4 Jun 2018 12:20:25 +0100
-Message-Id: <20180604112036.2715-1-stefanha@redhat.com>
-Subject: [Qemu-devel] [PULL 00/11] Block patches
+Date: Mon,  4 Jun 2018 12:20:27 +0100
+Message-Id: <20180604112036.2715-3-stefanha@redhat.com>
+In-Reply-To: <20180604112036.2715-1-stefanha@redhat.com>
+References: <20180604112036.2715-1-stefanha@redhat.com>
+Subject: [Qemu-devel] [PULL 02/11] raw: Check byte range uniformly
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,63 +22,146 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Ronnie Sahlberg <ronniesahlberg@gmail.com>, Peter Maydell <peter.maydell@linaro.org>, qemu-block@nongnu.org, Peter Lieven <pl@kamp.de>, Max Reitz <mreitz@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Fam Zheng <famz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
 
-The following changes since commit c25e8bba1f546ea72744ccfab77f8a9e8a323be8:
+From: Fam Zheng <famz@redhat.com>
 
-  Merge remote-tracking branch 'remotes/otubo/tags/pull-seccomp-20180601' into staging (2018-06-01 13:11:30 +0100)
+We don't verify the request range against s->size in the I/O callbacks
+except for raw_co_pwritev. This is inconsistent (especially for
+raw_co_pwrite_zeroes and raw_co_pdiscard), so fix them, in the meanwhile
+make the helper reusable by the coming new callbacks.
 
-are available in the Git repository at:
+Note that in most cases the block layer already verifies the request
+byte range against our reported image length, before invoking the driver
+callbacks.  The exception is during image creating, after
+blk_set_allow_write_beyond_eof(blk, true) is called. But in that case,
+the requests are not directly from the user or guest. So there is no
+visible behavior change in adding the check code.
 
-  git://github.com/stefanha/qemu.git tags/block-pull-request
+The int64_t -> uint64_t inconsistency, as shown by the type casting, is
+pre-existing due to the interface.
 
-for you to fetch changes up to 21891a5a3011608845b5d7f1f9cce60cdc2bcc62:
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
+Signed-off-by: Fam Zheng <famz@redhat.com>
+Message-id: 20180601092648.24614-3-famz@redhat.com
+Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+---
+ block/raw-format.c | 64 ++++++++++++++++++++++++++++------------------
+ 1 file changed, 39 insertions(+), 25 deletions(-)
 
-  main-loop: drop spin_counter (2018-06-01 16:01:29 +0100)
-
-----------------------------------------------------------------
-Pull request
-
- * Copy offloading for qemu-img convert (iSCSI, raw, and qcow2)
-
-   If the underlying storage supports copy offloading, qemu-img convert will
-   use it instead of performing reads and writes.  This avoids data transfers
-   and thus frees up storage bandwidth for other purposes.  SCSI EXTENDED COPY
-   and Linux copy_file_range(2) are used to implement this optimization.
-
- * Drop spurious "WARNING: I\/O thread spun for 1000 iterations" warning
-
-----------------------------------------------------------------
-
-Fam Zheng (10):
-  block: Introduce API for copy offloading
-  raw: Check byte range uniformly
-  raw: Implement copy offloading
-  qcow2: Implement copy offloading
-  file-posix: Implement bdrv_co_copy_range
-  iscsi: Query and save device designator when opening
-  iscsi: Create and use iscsi_co_wait_for_task
-  iscsi: Implement copy offloading
-  block-backend: Add blk_co_copy_range
-  qemu-img: Convert with copy offloading
-
-Stefan Hajnoczi (1):
-  main-loop: drop spin_counter
-
- configure                        |  17 ++
- include/block/block.h            |  32 ++++
- include/block/block_int.h        |  38 ++++
- include/block/raw-aio.h          |  10 +-
- include/scsi/constants.h         |   4 +
- include/sysemu/block-backend.h   |   4 +
- block/block-backend.c            |  18 ++
- block/file-posix.c               |  98 +++++++++-
- block/io.c                       |  97 ++++++++++
- block/iscsi.c                    | 314 +++++++++++++++++++++++++++----
- block/qcow2.c                    | 229 +++++++++++++++++++---
- block/raw-format.c               |  96 +++++++---
- qemu-img.c                       |  50 ++++-
- util/main-loop.c                 |  25 ---
- tests/qemu-iotests/common.filter |   1 -
- 15 files changed, 908 insertions(+), 125 deletions(-)
-
+diff --git a/block/raw-format.c b/block/raw-format.c
+index fe33693a2d..b69a0674b3 100644
+--- a/block/raw-format.c
++++ b/block/raw-format.c
+@@ -167,16 +167,37 @@ static void raw_reopen_abort(BDRVReopenState *state)
+     state->opaque = NULL;
+ }
+ 
++/* Check and adjust the offset, against 'offset' and 'size' options. */
++static inline int raw_adjust_offset(BlockDriverState *bs, uint64_t *offset,
++                                    uint64_t bytes, bool is_write)
++{
++    BDRVRawState *s = bs->opaque;
++
++    if (s->has_size && (*offset > s->size || bytes > (s->size - *offset))) {
++        /* There's not enough space for the write, or the read request is
++         * out-of-range. Don't read/write anything to prevent leaking out of
++         * the size specified in options. */
++        return is_write ? -ENOSPC : -EINVAL;;
++    }
++
++    if (*offset > INT64_MAX - s->offset) {
++        return -EINVAL;
++    }
++    *offset += s->offset;
++
++    return 0;
++}
++
+ static int coroutine_fn raw_co_preadv(BlockDriverState *bs, uint64_t offset,
+                                       uint64_t bytes, QEMUIOVector *qiov,
+                                       int flags)
+ {
+-    BDRVRawState *s = bs->opaque;
++    int ret;
+ 
+-    if (offset > UINT64_MAX - s->offset) {
+-        return -EINVAL;
++    ret = raw_adjust_offset(bs, &offset, bytes, false);
++    if (ret) {
++        return ret;
+     }
+-    offset += s->offset;
+ 
+     BLKDBG_EVENT(bs->file, BLKDBG_READ_AIO);
+     return bdrv_co_preadv(bs->file, offset, bytes, qiov, flags);
+@@ -186,23 +207,11 @@ static int coroutine_fn raw_co_pwritev(BlockDriverState *bs, uint64_t offset,
+                                        uint64_t bytes, QEMUIOVector *qiov,
+                                        int flags)
+ {
+-    BDRVRawState *s = bs->opaque;
+     void *buf = NULL;
+     BlockDriver *drv;
+     QEMUIOVector local_qiov;
+     int ret;
+ 
+-    if (s->has_size && (offset > s->size || bytes > (s->size - offset))) {
+-        /* There's not enough space for the data. Don't write anything and just
+-         * fail to prevent leaking out of the size specified in options. */
+-        return -ENOSPC;
+-    }
+-
+-    if (offset > UINT64_MAX - s->offset) {
+-        ret = -EINVAL;
+-        goto fail;
+-    }
+-
+     if (bs->probed && offset < BLOCK_PROBE_BUF_SIZE && bytes) {
+         /* Handling partial writes would be a pain - so we just
+          * require that guests have 512-byte request alignment if
+@@ -237,7 +246,10 @@ static int coroutine_fn raw_co_pwritev(BlockDriverState *bs, uint64_t offset,
+         qiov = &local_qiov;
+     }
+ 
+-    offset += s->offset;
++    ret = raw_adjust_offset(bs, &offset, bytes, true);
++    if (ret) {
++        goto fail;
++    }
+ 
+     BLKDBG_EVENT(bs->file, BLKDBG_WRITE_AIO);
+     ret = bdrv_co_pwritev(bs->file, offset, bytes, qiov, flags);
+@@ -267,22 +279,24 @@ static int coroutine_fn raw_co_pwrite_zeroes(BlockDriverState *bs,
+                                              int64_t offset, int bytes,
+                                              BdrvRequestFlags flags)
+ {
+-    BDRVRawState *s = bs->opaque;
+-    if (offset > UINT64_MAX - s->offset) {
+-        return -EINVAL;
++    int ret;
++
++    ret = raw_adjust_offset(bs, (uint64_t *)&offset, bytes, true);
++    if (ret) {
++        return ret;
+     }
+-    offset += s->offset;
+     return bdrv_co_pwrite_zeroes(bs->file, offset, bytes, flags);
+ }
+ 
+ static int coroutine_fn raw_co_pdiscard(BlockDriverState *bs,
+                                         int64_t offset, int bytes)
+ {
+-    BDRVRawState *s = bs->opaque;
+-    if (offset > UINT64_MAX - s->offset) {
+-        return -EINVAL;
++    int ret;
++
++    ret = raw_adjust_offset(bs, (uint64_t *)&offset, bytes, true);
++    if (ret) {
++        return ret;
+     }
+-    offset += s->offset;
+     return bdrv_co_pdiscard(bs->file->bs, offset, bytes);
+ }
+ 
 -- 
 2.17.1
