@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41651)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41655)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1fPrQg-0002Aw-Na
-	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 11:29:55 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1fPrQg-0002B3-QB
+	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 11:29:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1fPrQf-0002Xv-Dz
+	(envelope-from <pm215@archaic.org.uk>) id 1fPrQf-0002Y0-F5
 	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 11:29:54 -0400
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon,  4 Jun 2018 16:29:37 +0100
-Message-Id: <20180604152941.20374-10-peter.maydell@linaro.org>
+Date: Mon,  4 Jun 2018 16:29:36 +0100
+Message-Id: <20180604152941.20374-9-peter.maydell@linaro.org>
 In-Reply-To: <20180604152941.20374-1-peter.maydell@linaro.org>
 References: <20180604152941.20374-1-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PATCH v2 09/13] hw/core/or-irq: Support more than 16
- inputs to an OR gate
+Subject: [Qemu-devel] [PATCH v2 08/13] hw/misc/tz_mpc.c: Honour the BLK_LUT
+ settings in translate
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,95 +23,107 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-arm@nongnu.org, qemu-devel@nongnu.org
 Cc: patches@linaro.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Richard Henderson <rth@twiddle.net>, Paolo Bonzini <pbonzini@redhat.com>, Peter Xu <peterx@redhat.com>, Eric Auger <eric.auger@redhat.com>
 
-For the IoTKit MPC support, we need to wire together the
-interrupt outputs of 17 MPCs; this exceeds the current
-value of MAX_OR_LINES. Increase MAX_OR_LINES to 32 (which
-should be enough for anyone).
+The final part of the Memory Protection Controller we need to
+implement is actually using the BLK_LUT data programmed by the
+guest to determine whether to block the transaction or not.
 
-The tricky part is retaining the migration compatibility for
-existing OR gates; we add a subsection which is only used
-for larger OR gates, and define it such that we can freely
-increase MAX_OR_LINES in future (or even move to a dynamically
-allocated levels[] array without an upper size limit) without
-breaking compatibility.
+Since this means we now change transaction mappings when
+the guest writes to BLK_LUT, we must also call the IOMMU
+notifiers at that point.
 
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- include/hw/or-irq.h |  5 ++++-
- hw/core/or-irq.c    | 39 +++++++++++++++++++++++++++++++++++++--
- 2 files changed, 41 insertions(+), 3 deletions(-)
+ hw/misc/tz-mpc.c     | 50 ++++++++++++++++++++++++++++++++++++++++++--
+ hw/misc/trace-events |  1 +
+ 2 files changed, 49 insertions(+), 2 deletions(-)
 
-diff --git a/include/hw/or-irq.h b/include/hw/or-irq.h
-index 3f6fc1b58a4..5a31e5a1881 100644
---- a/include/hw/or-irq.h
-+++ b/include/hw/or-irq.h
-@@ -31,7 +31,10 @@
- 
- #define TYPE_OR_IRQ "or-irq"
- 
--#define MAX_OR_LINES      16
-+/* This can safely be increased if necessary without breaking
-+ * migration compatibility (as long as it remains greater than 15).
-+ */
-+#define MAX_OR_LINES      32
- 
- typedef struct OrIRQState qemu_or_irq;
- 
-diff --git a/hw/core/or-irq.c b/hw/core/or-irq.c
-index f9d76c46415..a86901b673c 100644
---- a/hw/core/or-irq.c
-+++ b/hw/core/or-irq.c
-@@ -66,14 +66,49 @@ static void or_irq_init(Object *obj)
-     qdev_init_gpio_out(DEVICE(obj), &s->out_irq, 1);
+diff --git a/hw/misc/tz-mpc.c b/hw/misc/tz-mpc.c
+index 704bb3fb44d..7a6117c90b3 100644
+--- a/hw/misc/tz-mpc.c
++++ b/hw/misc/tz-mpc.c
+@@ -72,6 +72,50 @@ static void tz_mpc_irq_update(TZMPC *s)
+     qemu_set_irq(s->irq, s->int_stat && s->int_en);
  }
  
-+/* The original version of this device had a fixed 16 entries in its
-+ * VMState array; devices with more inputs than this need to
-+ * migrate the extra lines via a subsection.
-+ * The subsection migrates as much of the levels[] array as is needed
-+ * (including repeating the first 16 elements), to avoid the awkwardness
-+ * of splitting it in two to meet the requirements of VMSTATE_VARRAY_UINT16.
-+ */
-+#define OLD_MAX_OR_LINES 16
-+#if MAX_OR_LINES < OLD_MAX_OR_LINES
-+#error MAX_OR_LINES must be at least 16 for migration compatibility
-+#endif
-+
-+static bool vmstate_extras_needed(void *opaque)
++static void tz_mpc_iommu_notify(TZMPC *s, uint32_t lutidx,
++                                uint32_t oldlut, uint32_t newlut)
 +{
-+    qemu_or_irq *s = OR_IRQ(opaque);
++    /* Called when the LUT word at lutidx has changed from oldlut to newlut;
++     * must call the IOMMU notifiers for the changed blocks.
++     */
++    IOMMUTLBEntry entry = {
++        .addr_mask = s->blocksize - 1,
++    };
++    hwaddr addr = lutidx * s->blocksize * 32;
++    int i;
 +
-+    return s->num_lines >= OLD_MAX_OR_LINES;
++    for (i = 0; i < 32; i++, addr += s->blocksize) {
++        if (!((oldlut ^ newlut) & (1 << i))) {
++            continue;
++        }
++        /* This changes the mappings for both the S and the NS space,
++         * so we need to do four notifies: an UNMAP then a MAP for each.
++         */
++
++        trace_tz_mpc_iommu_notify(addr);
++        entry.iova = addr;
++        entry.translated_addr = addr;
++
++        entry.perm = IOMMU_NONE;
++        memory_region_notify_iommu(&s->upstream, IOMMU_IDX_S, entry);
++        memory_region_notify_iommu(&s->upstream, IOMMU_IDX_NS, entry);
++
++        entry.perm = IOMMU_RW;
++        if (newlut & (1 << i)) {
++            entry.target_as = &s->blocked_io_as;
++        } else {
++            entry.target_as = &s->downstream_as;
++        }
++        memory_region_notify_iommu(&s->upstream, IOMMU_IDX_S, entry);
++        if (newlut & (1 << i)) {
++            entry.target_as = &s->downstream_as;
++        } else {
++            entry.target_as = &s->blocked_io_as;
++        }
++        memory_region_notify_iommu(&s->upstream, IOMMU_IDX_NS, entry);
++    }
 +}
 +
-+static const VMStateDescription vmstate_or_irq_extras = {
-+    .name = "or-irq-extras",
-+    .version_id = 1,
-+    .minimum_version_id = 1,
-+    .needed = vmstate_extras_needed,
-+    .fields = (VMStateField[]) {
-+        VMSTATE_VARRAY_UINT16_UNSAFE(levels, qemu_or_irq, num_lines, 0,
-+                                     vmstate_info_bool, bool),
-+        VMSTATE_END_OF_LIST(),
-+    },
-+};
-+
- static const VMStateDescription vmstate_or_irq = {
-     .name = TYPE_OR_IRQ,
-     .version_id = 1,
-     .minimum_version_id = 1,
-     .fields = (VMStateField[]) {
--        VMSTATE_BOOL_ARRAY(levels, qemu_or_irq, MAX_OR_LINES),
-+        VMSTATE_BOOL_SUB_ARRAY(levels, qemu_or_irq, 0, OLD_MAX_OR_LINES),
-         VMSTATE_END_OF_LIST(),
--    }
-+    },
-+    .subsections = (const VMStateDescription*[]) {
-+        &vmstate_or_irq_extras,
-+        NULL
-+    },
- };
+ static MemTxResult tz_mpc_reg_read(void *opaque, hwaddr addr,
+                                    uint64_t *pdata,
+                                    unsigned size, MemTxAttrs attrs)
+@@ -213,6 +257,7 @@ static MemTxResult tz_mpc_reg_write(void *opaque, hwaddr addr,
+         s->blk_idx = value % s->blk_max;
+         break;
+     case A_BLK_LUT:
++        tz_mpc_iommu_notify(s, s->blk_idx, s->blk_lut[s->blk_idx], value);
+         s->blk_lut[s->blk_idx] = value;
+         if (size == 4) {
+             s->blk_idx++;
+@@ -362,9 +407,10 @@ static IOMMUTLBEntry tz_mpc_translate(IOMMUMemoryRegion *iommu,
+     /* Look at the per-block configuration for this address, and
+      * return a TLB entry directing the transaction at either
+      * downstream_as or blocked_io_as, as appropriate.
+-     * For the moment, always permit accesses.
++     * If the LUT cfg_ns bit is 1, only non-secure transactions
++     * may pass. If the bit is 0, only secure transactions may pass.
+      */
+-    ok = true;
++    ok = tz_mpc_cfg_ns(s, addr) == (iommu_idx == IOMMU_IDX_NS);
  
- static Property or_irq_properties[] = {
+     trace_tz_mpc_translate(addr, flags,
+                            iommu_idx == IOMMU_IDX_S ? "S" : "NS",
+diff --git a/hw/misc/trace-events b/hw/misc/trace-events
+index 72bf9d57000..c956e1419b7 100644
+--- a/hw/misc/trace-events
++++ b/hw/misc/trace-events
+@@ -90,6 +90,7 @@ tz_mpc_reg_write(uint32_t offset, uint64_t data, unsigned size) "TZ MPC regs wri
+ tz_mpc_mem_blocked_read(uint64_t addr, unsigned size, bool secure) "TZ MPC blocked read: offset 0x%" PRIx64 " size %u secure %d"
+ tz_mpc_mem_blocked_write(uint64_t addr, uint64_t data, unsigned size, bool secure) "TZ MPC blocked write: offset 0x%" PRIx64 " data 0x%" PRIx64 " size %u secure %d"
+ tz_mpc_translate(uint64_t addr, int flags, const char *idx, const char *res) "TZ MPC translate: addr 0x%" PRIx64 " flags 0x%x iommu_idx %s: %s"
++tz_mpc_iommu_notify(uint64_t addr) "TZ MPC iommu: notifying UNMAP/MAP for 0x%" PRIx64
+ 
+ # hw/misc/tz-ppc.c
+ tz_ppc_reset(void) "TZ PPC: reset"
 -- 
 2.17.1
