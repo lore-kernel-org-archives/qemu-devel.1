@@ -1,21 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40926)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41779)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1fPnpK-0003iD-9v
-	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 07:39:07 -0400
+	(envelope-from <imammedo@redhat.com>) id 1fPnv3-0005QA-Gf
+	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 07:45:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1fPnpF-0007pp-Dm
-	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 07:39:06 -0400
-Date: Mon, 4 Jun 2018 13:38:53 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20180604133853.7c0f7933.cohuck@redhat.com>
-In-Reply-To: <20180525113708.29856-2-david@redhat.com>
-References: <20180525113708.29856-1-david@redhat.com>
-	<20180525113708.29856-2-david@redhat.com>
+	(envelope-from <imammedo@redhat.com>) id 1fPnuy-0001iw-Hi
+	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 07:45:01 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:55156 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1fPnuy-0001iV-Af
+	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 07:44:56 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.4])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 6EE65854E2
+	for <qemu-devel@nongnu.org>; Mon,  4 Jun 2018 11:44:54 +0000 (UTC)
+Date: Mon, 4 Jun 2018 13:44:52 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20180604134452.7479eb1f@redhat.com>
+In-Reply-To: <ad910973c593c5ac2fed3a10ea958f7e9c12f82c.1527935663.git.mprivozn@redhat.com>
+References: <ad910973c593c5ac2fed3a10ea958f7e9c12f82c.1527935663.git.mprivozn@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v1 1/7] s390x/tod: factor out TOD into
- separate device
+Subject: Re: [Qemu-devel] [PATCH] cli: Don't run early event loop if no
+ --preconfig was specified
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,35 +33,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>
-Cc: qemu-s390x@nongnu.org, qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>, Alexander Graf <agraf@suse.de>, Christian Borntraeger <borntraeger@de.ibm.com>, Thomas Huth <thuth@redhat.com>, "Jason J . Herne" <jjherne@linux.ibm.com>, "Collin L . Walling" <walling@linux.ibm.com>
+To: Michal Privoznik <mprivozn@redhat.com>
+Cc: qemu-devel@nongnu.org, ehabkost@redhat.com, pbonzini@redhat.com
 
-On Fri, 25 May 2018 13:37:02 +0200
-David Hildenbrand <david@redhat.com> wrote:
+On Sat,  2 Jun 2018 12:34:52 +0200
+Michal Privoznik <mprivozn@redhat.com> wrote:
 
-> Let's treat this like a separate device. TCG will have to store the
-> actual state/time later on.
+> After 047f7038f586d215 it is possible for event loop to run two
+> times. First time whilst parsing command line options (the idea
+> is to bring up monitor early so that management applications can
+> tweak config before machine is initialized). And the second time
+> is after everything is set up (this is the usual place). In both
+> cases the event loop is called as main_loop_wait(nonblocking =
+> false) which causes the event loop to block until at least one
+> event occurred.
 > 
-> Include cpu-qom.h in kvm_s390x.h (due to S390CPU) to compile tod-kvm.c.
-
-Can't you include it in tod-kvm.c instead? Why was it not needed before?
-
+> Now, consider that somebody (i.e. libvirt) calls us with
+> -daemonize. This operation is split in two steps. The main()
+> calls os_daemonize() which fork()-s and then waits in read()
+> until child notifies it via write():
 > 
-> Signed-off-by: David Hildenbrand <david@redhat.com>
+> /qemu.git $ ./x86_64-softmmu/qemu-system-x86_64 -S -daemonize \
+>   -no-user-config -nodefaults -nographic
+> 
+>   main():                child:
+>     os_daemonize():
+>       read(pipe[0])
+> 
+>                            main_loop():
+>                              main_loop_wait(false)
+> 
+>                            os_setup_post():
+>                              write(pipe[1])
+> 
+>                            main_loop():
+>                              main_loop_wait(false)
+> 
+> Here it can be clearly seen that main() does not exit until an
+> event occurs, but at the same time nobody will touch the monitor
+> socket until their exec("qemu-system-*") finishes. So the whole
+> thing deadlocks.
+> 
+> The solution is to not call main_loop() unless --preconfig was
+> specified (in which case caller knows they must connect to the
+> socket before exec() finishes).
+> 
+> Signed-off-by: Michal Privoznik <mprivozn@redhat.com>
+Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+
+
 > ---
->  hw/s390x/Makefile.objs     |   3 +
->  hw/s390x/s390-virtio-ccw.c |  57 +-----------------
->  hw/s390x/tod-kvm.c         |  64 ++++++++++++++++++++
->  hw/s390x/tod-qemu.c        |  47 +++++++++++++++
->  hw/s390x/tod.c             | 120 +++++++++++++++++++++++++++++++++++++
->  include/hw/s390x/tod.h     |  46 ++++++++++++++
->  target/s390x/cpu.c         |  32 ----------
->  target/s390x/cpu.h         |   2 -
->  target/s390x/kvm_s390x.h   |   2 +
->  9 files changed, 285 insertions(+), 88 deletions(-)
->  create mode 100644 hw/s390x/tod-kvm.c
->  create mode 100644 hw/s390x/tod-qemu.c
->  create mode 100644 hw/s390x/tod.c
->  create mode 100644 include/hw/s390x/tod.h
-
-Otherwise, looks good.
+>  vl.c | 9 +++++++--
+>  1 file changed, 7 insertions(+), 2 deletions(-)
+> 
+> diff --git a/vl.c b/vl.c
+> index 70f090c823..cde2934c40 100644
+> --- a/vl.c
+> +++ b/vl.c
+> @@ -4469,8 +4469,13 @@ int main(int argc, char **argv, char **envp)
+>      }
+>      parse_numa_opts(current_machine);
+>  
+> -    /* do monitor/qmp handling at preconfig state if requested */
+> -    main_loop();
+> +    if (preconfig_exit_requested) {
+> +        runstate_set(RUN_STATE_PRELAUNCH);
+> +        preconfig_exit_requested = false;
+> +    } else {
+> +        /* do monitor/qmp handling at preconfig state if requested */
+> +        main_loop();
+> +    }
+>  
+>      /* from here on runstate is RUN_STATE_PRELAUNCH */
+>      machine_run_board_init(current_machine);
