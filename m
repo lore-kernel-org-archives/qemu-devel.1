@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50347)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50352)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fPhNG-0003LA-Ow
-	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 00:45:43 -0400
+	(envelope-from <bounces@canonical.com>) id 1fPhNH-0003LB-9D
+	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 00:45:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fPhND-00083a-LO
-	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 00:45:42 -0400
-Received: from indium.canonical.com ([91.189.90.7]:57986)
+	(envelope-from <bounces@canonical.com>) id 1fPhNG-00087T-61
+	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 00:45:43 -0400
+Received: from indium.canonical.com ([91.189.90.7]:58144)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1fPhND-00082E-FI
-	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 00:45:39 -0400
+	id 1fPhNF-00086F-Ur
+	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 00:45:42 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1fPhNB-0006Yd-HM
-	for <qemu-devel@nongnu.org>; Mon, 04 Jun 2018 04:45:37 +0000
+	id 1fPhND-0006YY-U4
+	for <qemu-devel@nongnu.org>; Mon, 04 Jun 2018 04:45:40 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 6CA422E80C9
-	for <qemu-devel@nongnu.org>; Mon,  4 Jun 2018 04:45:37 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id 68C612E88D5
+	for <qemu-devel@nongnu.org>; Mon,  4 Jun 2018 04:45:39 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Mon, 04 Jun 2018 04:17:48 -0000
+Date: Mon, 04 Jun 2018 04:17:49 -0000
 From: Launchpad Bug Tracker <1025244@bugs.launchpad.net>
 Reply-To: Bug 1025244 <1025244@bugs.launchpad.net>
 Sender: bounces@canonical.com
 References: <20120716123031.26191.29124.malonedeb@chaenomeles.canonical.com>
-Message-Id: <152808586849.32120.10910639023960467052.malone@loganberry.canonical.com>
+Message-Id: <152808586989.32120.17175108904928831681.malone@loganberry.canonical.com>
 Errors-To: bounces@canonical.com
 Subject: [Qemu-devel] [Bug 1025244] Re: qcow2 image increasing disk size
  above the virtual limit
@@ -39,10 +39,9 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-[Expired for qemu-kvm (Ubuntu) because there has been no activity for 60
-days.]
+[Expired for QEMU because there has been no activity for 60 days.]
 
-** Changed in: qemu-kvm (Ubuntu)
+** Changed in: qemu
        Status: Incomplete =3D> Expired
 
 -- =
