@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52626)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56382)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1fPkZm-0006IJ-MP
-	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 04:10:51 -0400
+	(envelope-from <jasowang@redhat.com>) id 1fPkvK-0001sC-E1
+	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 04:33:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1fPkZi-00062S-LE
-	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 04:10:50 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:48714 helo=mx1.redhat.com)
+	(envelope-from <jasowang@redhat.com>) id 1fPkvF-0005BW-DI
+	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 04:33:06 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:48528 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1fPkZi-00062B-Dh
-	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 04:10:46 -0400
-Date: Mon, 4 Jun 2018 16:10:28 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20180604081028.GB31407@xz-mi>
-References: <20180531051641.8473-1-peterx@redhat.com>
-	<20180531051641.8473-3-peterx@redhat.com>
-	<ecd9d666-8973-3f09-0ab9-eea9655e5919@redhat.com>
-	<20180604045904.GA31407@xz-mi>
+	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1fPkvF-0005AO-8P
+	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 04:33:01 -0400
+References: <1522846444-31725-1-git-send-email-wexu@redhat.com>
+	<1522846444-31725-4-git-send-email-wexu@redhat.com>
+	<6a78b53a-0830-74de-5447-63ecab67e5ed@redhat.com>
+	<20180603174404.GA28131@wei-ubt>
+From: Jason Wang <jasowang@redhat.com>
+Message-ID: <182fcc5e-5996-24e3-d190-be66b0c9f1bd@redhat.com>
+Date: Mon, 4 Jun 2018 16:32:49 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20180604045904.GA31407@xz-mi>
-Subject: Re: [Qemu-devel] [RFC v2 2/4] tests: iotests: don't compare
- SHUTDOWN event
+In-Reply-To: <20180603174404.GA28131@wei-ubt>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 3/8] virtio: add empty check for packed ring
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,59 +30,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: qemu-devel@nongnu.org, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Fam Zheng <famz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Eric Auger <eric.auger@redhat.com>, John Snow <jsnow@redhat.com>, Markus Armbruster <armbru@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+To: Wei Xu <wexu@redhat.com>
+Cc: jfreimann@redhat.com, qemu-devel@nongnu.org, tiwei.bie@intel.com, mst@redhat.com
 
-On Mon, Jun 04, 2018 at 12:59:04PM +0800, Peter Xu wrote:
-> On Thu, May 31, 2018 at 09:42:23AM -0500, Eric Blake wrote:
-> > On 05/31/2018 12:16 AM, Peter Xu wrote:
-> > > This event is not really necessary.  After OOB series it might affect
-> > > the timing of the script so this event may or may not be there comparing
-> > > to the old *.out results.  Let's just filter it out.
-> > 
-> > This is worrying. Are you stating that the SHUTDOWN event can occur in a
-> > different order than it used to, or is it even worse that the SHUTDOWN event
-> > disappears altogether?  If enabling OOB makes the SHUTDOWN event sometimes
-> > disappear, that's a regression that we should fix.  If it just makes things
-> > occur in a different order, we need an explanation why that is okay.
-> 
-> The event might conditionally disappear in two of the 100+ qcow2
-> tests.  And when it happens, it's not disappearing in all the
-> testcases in the test but only some.  For example, 087 might
-> conditionally fail with this:
-> 
-> 087 8s ... - output mismatch (see 087.out.bad)
-> --- /home/peterx/git/qemu/tests/qemu-iotests/087.out    2018-06-01 18:44:22.378982462 +0800
-> +++ /home/peterx/git/qemu/bin/tests/qemu-iotests/087.out.bad    2018-06-01 18:53:44.267840928 +0800
-> @@ -8,7 +8,6 @@
->  {"return": {}}
->  {"error": {"class": "GenericError", "desc": "'node-name' must be specified for the root node"}}
->  {"return": {}}
-> -{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
-> 
-> 
->  === Duplicate ID ===
-> @@ -53,7 +52,6 @@
->  {"return": {}}
->  {"return": {}}
->  {"return": {}}
-> -{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
-> 
-> 
->  === Missing driver ===
-> 
-> Firstly, it does not fail every time I run "./check -qcow2 087", but
-> it might fail like 1 out of 5.  Then, it's not failing all the
-> testcases in 087.  For above example, it's failing "Missing ID and
-> node-name" and "Encrypted image LUKS", and it can change too.
 
-I think I found the problem underneath.  I posted a standalone patch
-to fix that here:
 
-  [PATCH] monitor: postpone monitor_qmp_cleanup_queues
+On 2018=E5=B9=B406=E6=9C=8804=E6=97=A5 01:44, Wei Xu wrote:
+>>> +static int virtio_queue_empty_packed_rcu(VirtQueue *vq)
+>>> +{
+>>> +    struct VRingDescPacked desc;
+>>> +    VRingMemoryRegionCaches *cache;
+>>> +
+>>> +    if (unlikely(!vq->packed.desc)) {
+>>> +        return 1;
+>>> +    }
+>>> +
+>>> +    cache =3D vring_get_region_caches(vq);
+>>> +    vring_desc_read_packed(vq->vdev, &desc, &cache->desc_packed, vq-=
+>last_avail_idx);
+>>> +
+>>> +    /* Make sure we see the updated flag */
+>>> +    smp_mb();
+>> What we need here is to make sure flag is read before all other fields=
+,
+>> looks like this barrier can't.
+> Isn't flag updated yet if it has been read?
+>
 
-Please have a look first on that, then I'll see how I should proceed
-with this series.  Thanks,
+Consider the case of event index, you need make sure flag is read before=20
+off_wrap.
 
--- 
-Peter Xu
+Thanks
