@@ -1,22 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34377)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34373)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fPilY-000274-4o
+	(envelope-from <dgibson@ozlabs.org>) id 1fPilY-000272-44
 	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 02:14:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fPilU-0006Wf-UJ
+	(envelope-from <dgibson@ozlabs.org>) id 1fPilV-0006Wu-5L
 	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 02:14:52 -0400
-Date: Mon, 4 Jun 2018 11:25:44 +1000
+Date: Mon, 4 Jun 2018 12:42:04 +1000
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20180604012544.GF4251@umbus>
-References: <20180529174821.19964-1-f4bug@amsat.org>
-	<20180529174821.19964-3-f4bug@amsat.org>
+Message-ID: <20180604024204.GJ4251@umbus>
+References: <152700944859.346734.1389264286134807488.stgit@bahia.lan>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="ExXT7PjY8AI4Hyfa"
+	protocol="application/pgp-signature"; boundary="LG0Ll82vYr46+VA1"
 Content-Disposition: inline
-In-Reply-To: <20180529174821.19964-3-f4bug@amsat.org>
-Subject: Re: [Qemu-devel] [PATCH 2/4] hw/ppc/spapr_drc: Replace
- error_setg(&error_abort) by error_report() + abort()
+In-Reply-To: <152700944859.346734.1389264286134807488.stgit@bahia.lan>
+Subject: Re: [Qemu-devel] [PATCH for-2.11.2] spapr: make pseries-2.11 the
+ default machine type
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,51 +24,87 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>
-Cc: Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, Alexander Graf <agraf@suse.de>, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Peter Maydell <peter.maydell@linaro.org>
+To: Greg Kurz <groug@kaod.org>
+Cc: qemu-stable@nongnu.org, qemu-devel@nongnu.org, Michael Roth <mdroth@linux.vnet.ibm.com>
 
 
---ExXT7PjY8AI4Hyfa
-Content-Type: text/plain; charset=iso-8859-1
+--LG0Ll82vYr46+VA1
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, May 29, 2018 at 02:48:19PM -0300, Philippe Mathieu-Daud=E9 wrote:
-> Use error_report() + abort() instead of error_setg(&error_abort),
-> as suggested by the "qapi/error.h" documentation:
+On Tue, May 22, 2018 at 07:17:28PM +0200, Greg Kurz wrote:
+> The spapr capability framework was introduced in QEMU 2.12. It allows
+> to have an explicit control on how host features are exposed to the
+> guest. This is especially needed to handle migration between hetero-
+> geneous hosts (eg, POWER8 to POWER9). It is also used to expose fixes/
+> workarounds against speculative execution vulnerabilities to guests.
+> The framework was hence backported to QEMU 2.11.1, especially these
+> commits:
 >=20
->     Please don't error_setg(&error_fatal, ...), use error_report() and
->     exit(), because that's more obvious.
->     Likewise, don't error_setg(&error_abort, ...), use assert().
+> 0fac4aa93074 spapr: Add pseries-2.12 machine type
+> 9070f408f491 spapr: Treat Hardware Transactional Memory (HTM) as an
+>  optional capability
 >=20
-> Use abort() instead of the suggested assert() because the error message
-> already got displayed.
+> 0fac4aa93074 has the confusing effect of making pseries-2.12 the default
+> machine type for QEMU 2.11.1, instead of the expected pseries-2.11. This
+> patch changes the default machine back to pseries-2.11.
 >=20
-> Suggested-by: Eric Blake <eblake@redhat.com>
-> Signed-off-by: Philippe Mathieu-Daud=E9 <f4bug@amsat.org>
+> Unfortunately, 9070f408f491 enforces the HTM capability for pseries-2.11.
+> This isn't supported by TCG and breaks 'make check'. So this patch also
+> adds a hack to turn HTM off when using TCG.
+>=20
+> Signed-off-by: Greg Kurz <groug@kaod.org>
 
-Applied to ppc-for-2.13, thanks.
+Acked-by: David Gibson <david@gibson.dropbear.id.au>
 
 > ---
->  hw/ppc/spapr_drc.c | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
+>  hw/ppc/spapr.c      |    4 ++--
+>  hw/ppc/spapr_caps.c |    5 +++++
+>  2 files changed, 7 insertions(+), 2 deletions(-)
 >=20
-> diff --git a/hw/ppc/spapr_drc.c b/hw/ppc/spapr_drc.c
-> index 8a045d6b93..2edb7d1e9c 100644
-> --- a/hw/ppc/spapr_drc.c
-> +++ b/hw/ppc/spapr_drc.c
-> @@ -366,7 +366,8 @@ static void prop_get_fdt(Object *obj, Visitor *v, con=
-st char *name,
->              break;
->          }
->          default:
-> -            error_setg(&error_abort, "device FDT in unexpected state: %d=
-", tag);
-> +            error_report("device FDT in unexpected state: %d", tag);
-> +            abort();
->          }
->          fdt_offset =3D fdt_offset_next;
->      } while (fdt_depth !=3D 0);
+> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> index 1a2dd1f597d9..6499a867520f 100644
+> --- a/hw/ppc/spapr.c
+> +++ b/hw/ppc/spapr.c
+> @@ -3820,7 +3820,7 @@ static void spapr_machine_2_12_class_options(Machin=
+eClass *mc)
+>      /* Defaults for the latest behaviour inherited from the base class */
+>  }
+> =20
+> -DEFINE_SPAPR_MACHINE(2_12, "2.12", true);
+> +DEFINE_SPAPR_MACHINE(2_12, "2.12", false);
+> =20
+>  /*
+>   * pseries-2.11
+> @@ -3842,7 +3842,7 @@ static void spapr_machine_2_11_class_options(Machin=
+eClass *mc)
+>      SET_MACHINE_COMPAT(mc, SPAPR_COMPAT_2_11);
+>  }
+> =20
+> -DEFINE_SPAPR_MACHINE(2_11, "2.11", false);
+> +DEFINE_SPAPR_MACHINE(2_11, "2.11", true);
+> =20
+>  /*
+>   * pseries-2.10
+> diff --git a/hw/ppc/spapr_caps.c b/hw/ppc/spapr_caps.c
+> index 7b229517be38..82043e60e78b 100644
+> --- a/hw/ppc/spapr_caps.c
+> +++ b/hw/ppc/spapr_caps.c
+> @@ -285,6 +285,11 @@ static sPAPRCapabilities default_caps_with_cpu(sPAPR=
+MachineState *spapr,
+> =20
+>      caps =3D smc->default_caps;
+> =20
+> +    /* HACK for 2.11.2: fix make check */
+> +    if (tcg_enabled()) {
+> +        caps.caps[SPAPR_CAP_HTM] =3D SPAPR_CAP_OFF;
+> +    }
+> +
+>      if (!ppc_check_compat(cpu, CPU_POWERPC_LOGICAL_2_07,
+>                            0, spapr->max_compat_pvr)) {
+>          caps.caps[SPAPR_CAP_HTM] =3D SPAPR_CAP_OFF;
+>=20
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -77,24 +112,24 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---ExXT7PjY8AI4Hyfa
+--LG0Ll82vYr46+VA1
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlsUlRMACgkQbDjKyiDZ
-s5LkVxAAooh+AOYkAl0qB8DmNHEsnIQ//BkKuOVi+cMFH+NNSgmOpJJT5qDW5vnn
-AyEm8iRqNmsJBaHjhhhS6V4lCoWc/j147jwc1F1HA8LX5AEpihGysWnVd8Hfzpiq
-x+JW3Noa+CIyKBrNY86riOvC9ZcwsB+diNAoM0fG2iKNx3mrEtAnC2p29wLDMhbH
-QftQC2u19HOHBimzUjnfItS+K6V/s7z682FiUm+AHT4kjhYJHBLVZusBwDy/P4Az
-QYbBicqxQWl8RC0dTHxY1sJ/G5bQk8UTsUDn9eGcoPCUKqQE3xmm+mUZjBvFXioi
-JchG+puzjw0U2VSTPR0PT2f5fg/KkHwsSI5rxkFdhLyfhM8HuWXIRjw37BOKa7Yn
-jaUV1apw4KLMbPobepDxrIRiPryMeYdRq+yHyZf+BnOHq49qHCl50uNWL6P3eYma
-DqvOwZ5nKaRvc7eaWtC11dPTfpLbXsusUi/fRV2QiOcNWJg9lu6mF4nfkT1RlEgj
-Cjsh23nhLqlKDNWfI+xl62+tr3WvLqVi2aDUDnqVozSfPXugifebUrQ4SQx142mS
-C1hKYh9velu1J5YrGwN6opFdUBj/OIi1pWGXGoylyOD5gRAQ/Q8BE6qJzQTl5OcY
-HvqUrXLtn4VLIztLRIDsBao1etMWW9qdmB8bSQUwfYvU19/8dts=
-=BSgD
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlsUpvoACgkQbDjKyiDZ
+s5JIEQ//Rse10NIGVbrMtwM/z9aEX+Ht20mHFvATQ7VjqujeLYHIOY4ogpCprDDa
+oXCQoj7MjeR1F/GLMFDBIjh7HcnJ8JFpKBfsJTO6pJ86y43MhmhBA4HO5ICUwAHV
+xNX06ELjR133WEt2G82H5Tet/sxFdr4blcUgineQidus4ewTbHBrYaGE8DJEFGoh
+XXtiD0JewKtTzOyA5TGIb6yNOTsqixrlBypVfMCRI6/Z7qNAv3i4aLLfnvxGwTjF
+etZlc6uFbjVjn1iD2/zlW5pB+/va8ma6GjX6wdsPT6Cs6dtSWwG3YV3bXwsevNUP
+WyPaB/56pP7S0vV1NmosfrdOGywC9QOxacnuFQLpMwCYb/kXT7UwhuVIYdaUsvd2
+J31N+W9cQDH2wi/+ibQoZvxLOQTcG3RLdK0IcDL9iDY9EzhNxZ0OVvbh6AKmWB7v
+rxibyiWI8df5BqINXHeobjEdVwRq3wYYrKd7PoMCNnBR8RTabH9oe4df3cc25Dk0
+QJCqPrbqA4dNMbLHD9v2naF8oLBggAQHUg9LE4pVQZIlQtzcfsBg17GTBv1uorm0
+BtGD70cC3i5+8H8pGQjKTma4P9fYW0oZQQLKLFwTVvedv0ZP5qByARGbTzL4adS/
+WKlw1a28Z84YECGdRoyXLvK/FE7BqQSStRdBKJ1AH4kpKAKhz1A=
+=I2o2
 -----END PGP SIGNATURE-----
 
---ExXT7PjY8AI4Hyfa--
+--LG0Ll82vYr46+VA1--
