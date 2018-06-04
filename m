@@ -1,25 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53372)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53401)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fPmj6-0006BO-La
-	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 06:28:37 -0400
+	(envelope-from <mreitz@redhat.com>) id 1fPmjG-0006H8-EX
+	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 06:28:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fPmj5-0007oi-Uf
-	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 06:28:36 -0400
-Received: from mail-oi0-x241.google.com ([2607:f8b0:4003:c06::241]:33566)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fPmj5-0007oX-Pr
-	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 06:28:35 -0400
-Received: by mail-oi0-x241.google.com with SMTP id k5-v6so27936788oiw.0
-	for <qemu-devel@nongnu.org>; Mon, 04 Jun 2018 03:28:35 -0700 (PDT)
+	(envelope-from <mreitz@redhat.com>) id 1fPmjF-0007rP-Io
+	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 06:28:46 -0400
+References: <20180601141223.26630-1-peter.maydell@linaro.org>
+	<20180601141223.26630-4-peter.maydell@linaro.org>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <8279dc88-50d6-80d1-2a92-117a3fc2703c@redhat.com>
+Date: Mon, 4 Jun 2018 12:28:35 +0200
 MIME-Version: 1.0
-In-Reply-To: <20180601162620.32362-1-mst@redhat.com>
-References: <20180601162620.32362-1-mst@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 4 Jun 2018 11:28:14 +0100
-Message-ID: <CAFEAcA_weoW3XS2dppdc=jwpCSSAaiTxaQDxsBBKdjjA4aY_Rg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL 00/31] acpi, vhost, misc: fixes, features
+In-Reply-To: <20180601141223.26630-4-peter.maydell@linaro.org>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="0fUIZhsaByEFeqKZfMFvcGaNzoDZMpm6N"
+Subject: Re: [Qemu-devel] [PATCH 3/6] hw/block/pflash_cfi02: Convert away
+ from old_mmio
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,32 +25,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
+Cc: patches@linaro.org, Kevin Wolf <kwolf@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Thomas Huth <huth@tuxfamily.org>, Aurelien Jarno <aurelien@aurel32.net>, qemu-block@nongnu.org, Yongbok Kim <yongbok.kim@mips.com>
 
-On 1 June 2018 at 17:26, Michael S. Tsirkin <mst@redhat.com> wrote:
-> The following changes since commit 63b88968f139b6a77f2f81e6f1eedf70c0170a85:
->
->   intel-iommu: rework the page walk logic (2018-05-23 17:34:05 +0300)
->
-> are available in the Git repository at:
->
->   git://git.kernel.org/pub/scm/virt/kvm/mst/qemu.git tags/for_upstream
->
-> for you to fetch changes up to 25b1d45a1975fd8624c37b5bf42e8502ccf53460:
->
->   vhost-blk: turn on pre-defined RO feature bit (2018-06-01 19:20:38 +0300)
->
-> ----------------------------------------------------------------
-> acpi, vhost, misc: fixes, features
->
-> vDPA support, fix to vhost blk RO bit handling, some include path
-> cleanups, NFIT ACPI table.
->
-> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
->
-> ----------------------------------------------------------------
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--0fUIZhsaByEFeqKZfMFvcGaNzoDZMpm6N
+From: Max Reitz <mreitz@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
+Cc: patches@linaro.org, Kevin Wolf <kwolf@redhat.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ Thomas Huth <huth@tuxfamily.org>, Aurelien Jarno <aurelien@aurel32.net>,
+ qemu-block@nongnu.org, Yongbok Kim <yongbok.kim@mips.com>
+Message-ID: <8279dc88-50d6-80d1-2a92-117a3fc2703c@redhat.com>
+Subject: Re: [PATCH 3/6] hw/block/pflash_cfi02: Convert away from old_mmio
+References: <20180601141223.26630-1-peter.maydell@linaro.org>
+ <20180601141223.26630-4-peter.maydell@linaro.org>
+In-Reply-To: <20180601141223.26630-4-peter.maydell@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Applied, thanks.
+On 2018-06-01 16:12, Peter Maydell wrote:
+> Convert the pflash_cfi02 device away from using the old_mmio field
+> of MemoryRegionOps.
+>=20
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+> ---
+>  hw/block/pflash_cfi02.c | 97 ++++++++---------------------------------=
 
--- PMM
+>  1 file changed, 18 insertions(+), 79 deletions(-)
+
+Acked-by: Max Reitz <mreitz@redhat.com>
+
+
+--0fUIZhsaByEFeqKZfMFvcGaNzoDZMpm6N
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlsVFFMACgkQ9AfbAGHV
+z0CjsQf+NJknhruNL/HpiUsF2Lc2DbP1HMcbXu1pyLr6so7aDPVec/HsGoGnqe0b
+qFuT7ZKZEF5GZI6n65RmzPOH03a6avdnwse6+bWITl6wnjQz3lx4ZVnYHpOc3lbk
+CjhwPPGiY5YGjgLmye8/jmoURc9hgkH6HbxuO7xao4Mj+jOC6F+ls2iKKwsXKbRp
+j/Y3k8D0z77dzXB05+KG9Ts6Ntgqtxa3qJOfrX+f24QYf+wsm6j79VVcvm4hutNW
+LQhPWm8ZU6DAJoOG2PdRypla47h5RlIS12U1NFJ7RdD3aZlSE+rWWbFzecOKkdRx
+mFmSJ2tshiUYqkFlPKKxs1t5JduUqg==
+=eIMl
+-----END PGP SIGNATURE-----
+
+--0fUIZhsaByEFeqKZfMFvcGaNzoDZMpm6N--
