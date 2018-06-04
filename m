@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52938)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52999)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fPxsn-0007ER-MX
-	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 18:23:22 -0400
+	(envelope-from <eblake@redhat.com>) id 1fPxtP-0007Yt-7A
+	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 18:24:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fPxsk-0007FI-HS
-	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 18:23:21 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:52104 helo=mx1.redhat.com)
+	(envelope-from <eblake@redhat.com>) id 1fPxtO-0007Vn-CX
+	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 18:23:59 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:42454 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1fPxsk-0007FE-C2
-	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 18:23:18 -0400
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1fPxtO-0007Vj-7w
+	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 18:23:58 -0400
 References: <20180603050546.6827-1-zhangckid@gmail.com>
-	<20180603050546.6827-11-zhangckid@gmail.com>
+	<20180603050546.6827-12-zhangckid@gmail.com>
 From: Eric Blake <eblake@redhat.com>
-Message-ID: <514033a5-9504-efc2-a208-d38bcff36075@redhat.com>
-Date: Mon, 4 Jun 2018 17:23:15 -0500
+Message-ID: <8ed3dcba-d574-7b08-9f82-4e8d61c2245c@redhat.com>
+Date: Mon, 4 Jun 2018 17:23:56 -0500
 MIME-Version: 1.0
-In-Reply-To: <20180603050546.6827-11-zhangckid@gmail.com>
+In-Reply-To: <20180603050546.6827-12-zhangckid@gmail.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH V8 10/17] qmp event: Add COLO_EXIT event to
- notify users while exited COLO
+Subject: Re: [Qemu-devel] [PATCH V8 11/17] qapi: Add new command to query
+ colo status
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,89 +33,63 @@ To: Zhang Chen <zhangckid@gmail.com>, qemu-devel@nongnu.org, Paolo Bonzini <pbon
 Cc: zhanghailiang <zhang.zhanghailiang@huawei.com>, Li Zhijian <lizhijian@cn.fujitsu.com>
 
 On 06/03/2018 12:05 AM, Zhang Chen wrote:
-> From: zhanghailiang <zhang.zhanghailiang@huawei.com>
+> Libvirt or other high level software can use this command query colo status.
+> You can test this command like that:
+> {'execute':'query-colo-status'}
 > 
-> If some errors happen during VM's COLO FT stage, it's important to
-> notify the users of this event. Together with 'x-colo-lost-heartbeat',
-> Users can intervene in COLO's failover work immediately.
-> If users don't want to get involved in COLO's failover verdict,
-> it is still necessary to notify users that we exited COLO mode.
-> 
-> Signed-off-by: zhanghailiang <zhang.zhanghailiang@huawei.com>
-> Signed-off-by: Li Zhijian <lizhijian@cn.fujitsu.com>
 > Signed-off-by: Zhang Chen <zhangckid@gmail.com>
-> Reviewed-by: Eric Blake <eblake@redhat.com>
 > ---
->   migration/colo.c    | 31 +++++++++++++++++++++++++++++++
->   qapi/migration.json | 38 ++++++++++++++++++++++++++++++++++++++
->   2 files changed, 69 insertions(+)
-> 
-> diff --git a/migration/colo.c b/migration/colo.c
-> index c083d3696f..bedb677788 100644
-> --- a/migration/colo.c
-
->   
-> +    /*
-> +     * There are only two reasons we can go here, some error happened.
-> +     * Or the user triggered failover.
-
-s/go here/get here/
-s/happened. Or/happened, or/
 
 > +++ b/qapi/migration.json
-> @@ -880,6 +880,44 @@
->   { 'enum': 'FailoverStatus',
->     'data': [ 'none', 'require', 'active', 'completed', 'relaunch' ] }
+> @@ -1231,6 +1231,40 @@
+>   ##
+>   { 'command': 'xen-colo-do-checkpoint' }
 >   
 > +##
-> +# @COLO_EXIT:
+> +# @COLOStatus:
 > +#
-> +# Emitted when VM finishes COLO mode due to some errors happening or
-> +# at the request of users.
+> +# The result format for 'query-colo-status'.
 > +#
-> +# @mode: report COLO mode when COLO exited.
+> +# @mode: COLO running mode. If COLO is running, this field will return
+> +#        'primary' or 'secodary'.
+
+s/secodary/secondary/
+
+> +#
+> +# @colo-running: true if COLO is running.
 > +#
 > +# @reason: describes the reason for the COLO exit.
 > +#
 > +# Since: 2.13
 
-s/2.13/3.0/
+3.0
 
+> +##
+> +{ 'struct': 'COLOStatus',
+> +  'data': { 'mode': 'COLOMode', 'colo-running': 'bool', 'reason': 'COLOExitReason' } }
+> +
+> +##
+> +# @query-colo-status:
+> +#
+> +# Query COLO status while the vm is running.
+> +#
+> +# Returns: A @COLOStatus object showing the status.
 > +#
 > +# Example:
 > +#
-> +# <- { "timestamp": {"seconds": 2032141960, "microseconds": 417172},
-> +#      "event": "COLO_EXIT", "data": {"mode": "primary", "reason": "request" } }
-> +#
-> +##
-> +{ 'event': 'COLO_EXIT',
-> +  'data': {'mode': 'COLOMode', 'reason': 'COLOExitReason' } }
-> +
-> +##
-> +# @COLOExitReason:
-> +#
-> +# The reason for a COLO exit
-> +#
-> +# @none: no failover has ever happened, This can't occur in the COLO_EXIT event,
-
-s/happened,/happened./
-
-> +# only in the result of query-colo-status.
-> +#
-> +# @request: COLO exit is due to an external request
-> +#
-> +# @error: COLO exit is due to an internal error
+> +# -> { "execute": "query-colo-status" }
+> +# <- { "return": { "mode": "primary", "colo-running": true, "reason": "request" } }
 > +#
 > +# Since: 2.13
 
-s/2.13/3.0/
+3.0
 
 > +##
-> +{ 'enum': 'COLOExitReason',
-> +  'data': [ 'none', 'request', 'error' ] }
+> +{ 'command': 'query-colo-status',
+> +  'returns': 'COLOStatus' }
 > +
 >   ##
->   # @x-colo-lost-heartbeat:
+>   # @migrate-recover:
 >   #
 > 
 
