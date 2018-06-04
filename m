@@ -1,27 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33787)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34901)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fPpKk-0003T1-VM
-	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 09:15:39 -0400
+	(envelope-from <clg@kaod.org>) id 1fPpQE-0005Ae-Et
+	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 09:21:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fPpKk-00070H-2s
-	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 09:15:38 -0400
-Received: from mail-ot0-x243.google.com ([2607:f8b0:4003:c0f::243]:34979)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fPpKj-000707-Tx
-	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 09:15:38 -0400
-Received: by mail-ot0-x243.google.com with SMTP id q17-v6so26980070otg.2
-	for <qemu-devel@nongnu.org>; Mon, 04 Jun 2018 06:15:37 -0700 (PDT)
+	(envelope-from <clg@kaod.org>) id 1fPpQA-0002tZ-9R
+	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 09:21:18 -0400
+Received: from 7.mo68.mail-out.ovh.net ([46.105.63.230]:57369)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1fPpQA-0002sz-3L
+	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 09:21:14 -0400
+Received: from player793.ha.ovh.net (unknown [10.109.105.46])
+	by mo68.mail-out.ovh.net (Postfix) with ESMTP id 94756DCF97
+	for <qemu-devel@nongnu.org>; Mon,  4 Jun 2018 15:21:12 +0200 (CEST)
+References: <20180604110358.2821-1-peter.maydell@linaro.org>
+	<20180604110358.2821-3-peter.maydell@linaro.org>
+From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Message-ID: <f339f5b5-5bc1-164b-02ee-39a53519d344@kaod.org>
+Date: Mon, 4 Jun 2018 15:21:00 +0200
 MIME-Version: 1.0
-In-Reply-To: <20180529105011.1914-28-edgar.iglesias@gmail.com>
-References: <20180529105011.1914-1-edgar.iglesias@gmail.com>
-	<20180529105011.1914-28-edgar.iglesias@gmail.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 4 Jun 2018 14:15:17 +0100
-Message-ID: <CAFEAcA9PQV8toYAFxHUA7cwre64FGPVuTwCiUPROocKyMU2NWA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL v1 27/38] target-microblaze: mmu: Add a
- configurable output address mask
+In-Reply-To: <20180604110358.2821-3-peter.maydell@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 2/2] hw/mips/mips_malta: don't make bios
+ region 'nomigrate'
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,52 +32,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Edgar Iglesias <edgar.iglesias@xilinx.com>
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
+Cc: patches@linaro.org, Paul Burton <paul.burton@mips.com>, Aurelien Jarno <aurelien@aurel32.net>, Yongbok Kim <yongbok.kim@mips.com>, Juan Quintela <quintela@redhat.com>, dgilbert@redhat.com
 
-On 29 May 2018 at 11:50, Edgar E. Iglesias <edgar.iglesias@gmail.com> wrote:
-> From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
->
-> Add a configurable output address mask, used to mimic the
-> configurable physical address bit width.
->
-> Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
-> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-> Signed-off-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
+On 06/04/2018 01:03 PM, Peter Maydell wrote:
+> Currently we use memory_region_init_rom_nomigrate() to create
+> the "bios.1fc" memory region, and we don't manually register
+> it with vmstate_register_ram(). This currently means that its
+> contents are migrated but as a ram block whose name is the empty
+> string; in future it may mean they are not migrated at all. Use
+> memory_region_init_ram() instead.
+>=20
+> Note that this is a a cross-version migration compatibility break
+> for the "malta" machine.
+>=20
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+
+Reviewed-by: C=C3=A9dric Le Goater <clg@kaod.org>
+
+Thanks,
+
+C.
+
 > ---
->  target/microblaze/cpu.c | 1 +
->  target/microblaze/mmu.c | 1 +
->  target/microblaze/mmu.h | 1 +
->  3 files changed, 3 insertions(+)
->
-> diff --git a/target/microblaze/cpu.c b/target/microblaze/cpu.c
-> index 6ee15ac800..71fc8d09fe 100644
-> --- a/target/microblaze/cpu.c
-> +++ b/target/microblaze/cpu.c
-> @@ -128,6 +128,7 @@ static void mb_cpu_reset(CPUState *s)
->      env->mmu.c_mmu = 3;
->      env->mmu.c_mmu_tlb_access = 3;
->      env->mmu.c_mmu_zones = 16;
-> +    env->mmu.c_addr_mask = MAKE_64BIT_MASK(0, cpu->cfg.addr_size);
->  #endif
->  }
->
-> diff --git a/target/microblaze/mmu.c b/target/microblaze/mmu.c
-> index a379968618..166c79908c 100644
-> --- a/target/microblaze/mmu.c
-> +++ b/target/microblaze/mmu.c
-> @@ -164,6 +164,7 @@ unsigned int mmu_translate(struct microblaze_mmu *mmu,
->              tlb_rpn = d & TLB_RPN_MASK;
->
->              lu->vaddr = tlb_tag;
-> +            lu->paddr = tlb_rpn & mmu->c_addr_mask;
->              lu->paddr = tlb_rpn;
->              lu->size = tlb_size;
->              lu->err = ERR_HIT;
-
-Coverity points out (CID 1391441) that the line added here
-has no effect, because we immediately overwrite lu->paddr in
-the following line. What was the intention here ?
-
-thanks
--- PMM
+>  hw/mips/mips_malta.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>=20
+> diff --git a/hw/mips/mips_malta.c b/hw/mips/mips_malta.c
+> index af70ecffc0..927944899b 100644
+> --- a/hw/mips/mips_malta.c
+> +++ b/hw/mips/mips_malta.c
+> @@ -1153,7 +1153,7 @@ void mips_malta_init(MachineState *machine)
+>       * handled by an overlapping region as the resulting ROM code subp=
+age
+>       * regions are not executable.
+>       */
+> -    memory_region_init_ram_nomigrate(bios_copy, NULL, "bios.1fc", BIOS=
+_SIZE,
+> +    memory_region_init_ram(bios_copy, NULL, "bios.1fc", BIOS_SIZE,
+>                             &error_fatal);
+>      if (!rom_copy(memory_region_get_ram_ptr(bios_copy),
+>                    FLASH_ADDRESS, BIOS_SIZE)) {
+>=20
