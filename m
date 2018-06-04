@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57321)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57703)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mlureau@redhat.com>) id 1fPoyO-0003Q6-F8
-	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 08:52:33 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1fPp0H-0004AZ-QY
+	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 08:54:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mlureau@redhat.com>) id 1fPoyL-0004V1-7e
-	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 08:52:32 -0400
-Received: from mail-it0-f68.google.com ([209.85.214.68]:54953)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <mlureau@redhat.com>) id 1fPoyL-0004Tm-27
-	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 08:52:29 -0400
-Received: by mail-it0-f68.google.com with SMTP id 76-v6so9979583itx.4
-	for <qemu-devel@nongnu.org>; Mon, 04 Jun 2018 05:52:28 -0700 (PDT)
+	(envelope-from <ehabkost@redhat.com>) id 1fPp0E-0008El-Kt
+	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 08:54:29 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:41858)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1fPp0E-0008CL-Dq
+	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 08:54:26 -0400
+Date: Mon, 4 Jun 2018 09:54:15 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20180604125415.GN7451@localhost.localdomain>
+References: <20180603092749.107476-1-marcel.apfelbaum@gmail.com>
+	<20180604042928-mutt-send-email-mst@kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20180604123043.13985-1-berrange@redhat.com>
-References: <20180604123043.13985-1-berrange@redhat.com>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>
-Date: Mon, 4 Jun 2018 14:52:27 +0200
-Message-ID: <CAMxuvaweLW5kW9q0DXw7=zBD4ikUe2UyTPTGQCiA4oJAYrGf-Q@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] chardev: don't splatter terminal settings
- on exit if not previously set
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180604042928-mutt-send-email-mst@kernel.org>
+Subject: Re: [Qemu-devel] [PATCH RFC] hw/pc: set q35 as the default x86
+ machine
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,51 +28,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>
-Cc: qemu-devel <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, qemu-devel@nongnu.org, pbonzini@redhat.com, rth@twiddle.net
 
-On Mon, Jun 4, 2018 at 2:30 PM, Daniel P. Berrang=C3=A9 <berrange@redhat.co=
-m> wrote:
-> The stdio chardev finalize method calls term_exit() to restore the
-> original terminal settings that were saved in the "oldtty" global. If
-> the qemu_chr_open_stdio() method exited with an error, we might not have
-> any original terminal settings saved in "oldtty" yet.
->
-> eg
->
->   $ qemu-system-x86_64 -monitor stdio -daemonize
->   qemu-system-x86_64: -monitor stdio: cannot use stdio with -daemonize
->
-> will cause QEMU to splatter the terminal settings with an all-zeros
-> "struct termios", with predictably unpleasant results. Fortunately the
-> existing "stdio_in_use" flag is suitable witness for whether "oldtty"
-> contains settings that need restoring.
->
-> Signed-off-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+On Mon, Jun 04, 2018 at 04:38:22AM +0300, Michael S. Tsirkin wrote:
+> On Sun, Jun 03, 2018 at 12:27:49PM +0300, Marcel Apfelbaum wrote:
+> > Moving to QEMU 3.0 seems like a good opportunity for such a change.
+> > 
+> > I440FX is really old and does not support modern features like IOMMU.
+> > Q35's SATA emulation is faster than pc's IDE, native PCI express hotplug
+> > is cleaner than ACPI based one and so on...
+> > 
+> > Also the libvirt guys added very good support for the Q35 machine (thanks!).
+> > 
+> > Management software should always specify the machine type and for the
+> > current setups, adding '-machine pc' to the command line is not such a
+> > big deal.
+> > 
+> > In time the pc machine will fade out and we will probably stop adding
+> > new versions at some point.
+> > 
+> > Signed-off-by: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+> 
+> For command line users, I think changing the default isn't nice.
+> 
+> Yes it's easy to add -machine pc but there's no documentation
+> that tells you to do so. Add to that shortcuts like -cdrom
+> stop working, hotplug needs extra bridges to work, and one
+> can see that while management tool users benefit from q35,
+> command line users will suffer.
+> 
+> Can't we add a tag for management without changing the command line
+> default? How about "management-default"? "recommended"? "latest"?
 
-Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+We could add new aliases if they are useful for management
+software, but we would need a well-defined use case and set of
+requirements+expectations for the new alias.
 
-> ---
->  chardev/char-stdio.c | 6 ++++--
->  1 file changed, 4 insertions(+), 2 deletions(-)
->
-> diff --git a/chardev/char-stdio.c b/chardev/char-stdio.c
-> index d83e60e787..8039e85f64 100644
-> --- a/chardev/char-stdio.c
-> +++ b/chardev/char-stdio.c
-> @@ -46,8 +46,10 @@ static bool stdio_echo_state;
->
->  static void term_exit(void)
->  {
-> -    tcsetattr(0, TCSANOW, &oldtty);
-> -    fcntl(0, F_SETFL, old_fd0_flags);
-> +    if (stdio_in_use) {
-> +        tcsetattr(0, TCSANOW, &oldtty);
-> +        fcntl(0, F_SETFL, old_fd0_flags);
-> +    }
->  }
->
->  static void qemu_chr_set_echo_stdio(Chardev *chr, bool echo)
-> --
-> 2.17.0
->
+-- 
+Eduardo
