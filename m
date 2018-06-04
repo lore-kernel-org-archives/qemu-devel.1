@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39118)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39130)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1fPrHu-0002Dq-Fj
+	(envelope-from <laurent@vivier.eu>) id 1fPrHu-0002E6-PC
 	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 11:20:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1fPrHs-00063y-Sr
+	(envelope-from <laurent@vivier.eu>) id 1fPrHr-00062F-8P
 	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 11:20:50 -0400
-Received: from mout.kundenserver.de ([212.227.126.131]:38521)
+Received: from mout.kundenserver.de ([212.227.126.187]:59035)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1fPrHs-00062r-Hk
-	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 11:20:48 -0400
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1fPrHq-00060b-Oi
+	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 11:20:47 -0400
 From: Laurent Vivier <laurent@vivier.eu>
-Date: Mon,  4 Jun 2018 17:20:11 +0200
-Message-Id: <20180604152015.13359-14-laurent@vivier.eu>
+Date: Mon,  4 Jun 2018 17:20:09 +0200
+Message-Id: <20180604152015.13359-12-laurent@vivier.eu>
 In-Reply-To: <20180604152015.13359-1-laurent@vivier.eu>
 References: <20180604152015.13359-1-laurent@vivier.eu>
-Subject: [Qemu-devel] [PULL 13/17] linux-user: move mips signal definitions
- to mips/target_signal.h
+Subject: [Qemu-devel] [PULL 11/17] linux-user: move generic signal
+ definitions to generic/signal.h
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,221 +30,333 @@ Cc: Riku Voipio <riku.voipio@iki.fi>, Laurent Vivier <laurent@vivier.eu>, Mark C
 No code change.
 
 Signed-off-by: Laurent Vivier <laurent@vivier.eu>
-Message-Id: <20180529194207.31503-12-laurent@vivier.eu>
+Message-Id: <20180529194207.31503-10-laurent@vivier.eu>
 ---
- linux-user/mips/target_signal.h   | 50 ++++++++++++++++++++++++++++++++++
- linux-user/mips64/target_signal.h | 49 ++++++++++++++++++++++++++++++++++
- linux-user/syscall_defs.h         | 56 +--------------------------------------
- 3 files changed, 100 insertions(+), 55 deletions(-)
+ linux-user/aarch64/target_signal.h    |  2 ++
+ linux-user/arm/target_signal.h        |  2 ++
+ linux-user/cris/target_signal.h       |  2 ++
+ linux-user/generic/signal.h           | 57 +++++++++++++++++++++++++++++++++++
+ linux-user/i386/target_signal.h       |  2 ++
+ linux-user/m68k/target_signal.h       |  2 ++
+ linux-user/microblaze/target_signal.h |  2 ++
+ linux-user/nios2/target_signal.h      |  2 ++
+ linux-user/openrisc/target_signal.h   |  2 ++
+ linux-user/ppc/target_signal.h        |  2 ++
+ linux-user/riscv/target_signal.h      |  2 ++
+ linux-user/s390x/target_signal.h      |  2 ++
+ linux-user/sh4/target_signal.h        |  2 ++
+ linux-user/syscall_defs.h             | 50 ------------------------------
+ linux-user/tilegx/target_signal.h     |  2 ++
+ linux-user/x86_64/target_signal.h     |  2 ++
+ linux-user/xtensa/target_signal.h     |  2 ++
+ 17 files changed, 87 insertions(+), 50 deletions(-)
+ create mode 100644 linux-user/generic/signal.h
 
-diff --git a/linux-user/mips/target_signal.h b/linux-user/mips/target_signal.h
-index 5f68bd7634..66e1ad44a6 100644
---- a/linux-user/mips/target_signal.h
-+++ b/linux-user/mips/target_signal.h
-@@ -1,6 +1,47 @@
- #ifndef MIPS_TARGET_SIGNAL_H
- #define MIPS_TARGET_SIGNAL_H
+diff --git a/linux-user/aarch64/target_signal.h b/linux-user/aarch64/target_signal.h
+index 18599b1447..ddd73169f0 100644
+--- a/linux-user/aarch64/target_signal.h
++++ b/linux-user/aarch64/target_signal.h
+@@ -19,5 +19,7 @@ typedef struct target_sigaltstack {
+ #define TARGET_MINSIGSTKSZ 2048
+ #define TARGET_SIGSTKSZ 8192
  
-+#define TARGET_SIGHUP            1      /* Hangup (POSIX).  */
-+#define TARGET_SIGINT            2      /* Interrupt (ANSI).  */
-+#define TARGET_SIGQUIT           3      /* Quit (POSIX).  */
-+#define TARGET_SIGILL            4      /* Illegal instruction (ANSI).  */
-+#define TARGET_SIGTRAP           5      /* Trace trap (POSIX).  */
-+#define TARGET_SIGIOT            6      /* IOT trap (4.2 BSD).  */
-+#define TARGET_SIGABRT           TARGET_SIGIOT  /* Abort (ANSI).  */
-+#define TARGET_SIGEMT            7
-+#define TARGET_SIGSTKFLT         7 /* XXX: incorrect */
-+#define TARGET_SIGFPE            8      /* Floating-point exception (ANSI).  */
-+#define TARGET_SIGKILL           9      /* Kill, unblockable (POSIX).  */
-+#define TARGET_SIGBUS           10      /* BUS error (4.2 BSD).  */
-+#define TARGET_SIGSEGV          11      /* Segmentation violation (ANSI).  */
-+#define TARGET_SIGSYS           12
-+#define TARGET_SIGPIPE          13      /* Broken pipe (POSIX).  */
-+#define TARGET_SIGALRM          14      /* Alarm clock (POSIX).  */
-+#define TARGET_SIGTERM          15      /* Termination (ANSI).  */
-+#define TARGET_SIGUSR1          16      /* User-defined signal 1 (POSIX).  */
-+#define TARGET_SIGUSR2          17      /* User-defined signal 2 (POSIX).  */
-+#define TARGET_SIGCHLD          18      /* Child status has changed (POSIX).  */
-+#define TARGET_SIGCLD           TARGET_SIGCHLD  /* Same as TARGET_SIGCHLD (System V).  */
-+#define TARGET_SIGPWR           19      /* Power failure restart (System V).  */
-+#define TARGET_SIGWINCH 20      /* Window size change (4.3 BSD, Sun).  */
-+#define TARGET_SIGURG           21      /* Urgent condition on socket (4.2 BSD).  */
-+#define TARGET_SIGIO            22      /* I/O now possible (4.2 BSD).  */
-+#define TARGET_SIGPOLL          TARGET_SIGIO    /* Pollable event occurred (System V).  */
-+#define TARGET_SIGSTOP          23      /* Stop, unblockable (POSIX).  */
-+#define TARGET_SIGTSTP          24      /* Keyboard stop (POSIX).  */
-+#define TARGET_SIGCONT          25      /* Continue (POSIX).  */
-+#define TARGET_SIGTTIN          26      /* Background read from tty (POSIX).  */
-+#define TARGET_SIGTTOU          27      /* Background write to tty (POSIX).  */
-+#define TARGET_SIGVTALRM        28      /* Virtual alarm clock (4.2 BSD).  */
-+#define TARGET_SIGPROF          29      /* Profiling alarm clock (4.2 BSD).  */
-+#define TARGET_SIGXCPU          30      /* CPU limit exceeded (4.2 BSD).  */
-+#define TARGET_SIGXFSZ          31      /* File size limit exceeded (4.2 BSD).  */
-+#define TARGET_SIGRTMIN         32
++#include "../generic/signal.h"
 +
-+#define TARGET_SIG_BLOCK        1       /* for blocking signals */
-+#define TARGET_SIG_UNBLOCK      2       /* for unblocking signals */
-+#define TARGET_SIG_SETMASK      3       /* for setting the signal mask */
-+
- /* this struct defines a stack used during syscall handling */
+ #define TARGET_ARCH_HAS_SETUP_FRAME
+ #endif /* AARCH64_TARGET_SIGNAL_H */
+diff --git a/linux-user/arm/target_signal.h b/linux-user/arm/target_signal.h
+index f80eb0a215..ea123c40f3 100644
+--- a/linux-user/arm/target_signal.h
++++ b/linux-user/arm/target_signal.h
+@@ -19,5 +19,7 @@ typedef struct target_sigaltstack {
+ #define TARGET_MINSIGSTKSZ	2048
+ #define TARGET_SIGSTKSZ		8192
  
- typedef struct target_sigaltstack {
-@@ -16,6 +57,15 @@ typedef struct target_sigaltstack {
- #define TARGET_SS_ONSTACK     1
- #define TARGET_SS_DISABLE     2
- 
-+#define TARGET_SA_NOCLDSTOP     0x00000001
-+#define TARGET_SA_NOCLDWAIT     0x00010000
-+#define TARGET_SA_SIGINFO       0x00000008
-+#define TARGET_SA_ONSTACK       0x08000000
-+#define TARGET_SA_NODEFER       0x40000000
-+#define TARGET_SA_RESTART       0x10000000
-+#define TARGET_SA_RESETHAND     0x80000000
-+#define TARGET_SA_RESTORER      0x04000000      /* Only for O32 */
++#include "../generic/signal.h"
 +
+ #define TARGET_ARCH_HAS_SETUP_FRAME
+ #endif /* ARM_TARGET_SIGNAL_H */
+diff --git a/linux-user/cris/target_signal.h b/linux-user/cris/target_signal.h
+index bf404a85fd..1cb5548f85 100644
+--- a/linux-user/cris/target_signal.h
++++ b/linux-user/cris/target_signal.h
+@@ -19,5 +19,7 @@ typedef struct target_sigaltstack {
  #define TARGET_MINSIGSTKSZ    2048
  #define TARGET_SIGSTKSZ       8192
  
-diff --git a/linux-user/mips64/target_signal.h b/linux-user/mips64/target_signal.h
-index 7fe6b2f517..753e91fbd6 100644
---- a/linux-user/mips64/target_signal.h
-+++ b/linux-user/mips64/target_signal.h
-@@ -1,6 +1,47 @@
- #ifndef MIPS64_TARGET_SIGNAL_H
- #define MIPS64_TARGET_SIGNAL_H
- 
-+#define TARGET_SIGHUP            1      /* Hangup (POSIX).  */
-+#define TARGET_SIGINT            2      /* Interrupt (ANSI).  */
-+#define TARGET_SIGQUIT           3      /* Quit (POSIX).  */
-+#define TARGET_SIGILL            4      /* Illegal instruction (ANSI).  */
-+#define TARGET_SIGTRAP           5      /* Trace trap (POSIX).  */
-+#define TARGET_SIGIOT            6      /* IOT trap (4.2 BSD).  */
-+#define TARGET_SIGABRT           TARGET_SIGIOT  /* Abort (ANSI).  */
-+#define TARGET_SIGEMT            7
-+#define TARGET_SIGSTKFLT         7 /* XXX: incorrect */
-+#define TARGET_SIGFPE            8      /* Floating-point exception (ANSI).  */
-+#define TARGET_SIGKILL           9      /* Kill, unblockable (POSIX).  */
-+#define TARGET_SIGBUS           10      /* BUS error (4.2 BSD).  */
-+#define TARGET_SIGSEGV          11      /* Segmentation violation (ANSI).  */
-+#define TARGET_SIGSYS           12
-+#define TARGET_SIGPIPE          13      /* Broken pipe (POSIX).  */
-+#define TARGET_SIGALRM          14      /* Alarm clock (POSIX).  */
-+#define TARGET_SIGTERM          15      /* Termination (ANSI).  */
-+#define TARGET_SIGUSR1          16      /* User-defined signal 1 (POSIX).  */
-+#define TARGET_SIGUSR2          17      /* User-defined signal 2 (POSIX).  */
-+#define TARGET_SIGCHLD          18      /* Child status has changed (POSIX).  */
-+#define TARGET_SIGCLD           TARGET_SIGCHLD  /* Same as TARGET_SIGCHLD (System V).  */
-+#define TARGET_SIGPWR           19      /* Power failure restart (System V).  */
-+#define TARGET_SIGWINCH 20      /* Window size change (4.3 BSD, Sun).  */
-+#define TARGET_SIGURG           21      /* Urgent condition on socket (4.2 BSD).  */
-+#define TARGET_SIGIO            22      /* I/O now possible (4.2 BSD).  */
-+#define TARGET_SIGPOLL          TARGET_SIGIO    /* Pollable event occurred (System V).  */
-+#define TARGET_SIGSTOP          23      /* Stop, unblockable (POSIX).  */
-+#define TARGET_SIGTSTP          24      /* Keyboard stop (POSIX).  */
-+#define TARGET_SIGCONT          25      /* Continue (POSIX).  */
-+#define TARGET_SIGTTIN          26      /* Background read from tty (POSIX).  */
-+#define TARGET_SIGTTOU          27      /* Background write to tty (POSIX).  */
-+#define TARGET_SIGVTALRM        28      /* Virtual alarm clock (4.2 BSD).  */
-+#define TARGET_SIGPROF          29      /* Profiling alarm clock (4.2 BSD).  */
-+#define TARGET_SIGXCPU          30      /* CPU limit exceeded (4.2 BSD).  */
-+#define TARGET_SIGXFSZ          31      /* File size limit exceeded (4.2 BSD).  */
++#include "../generic/signal.h"
++
+ #define TARGET_ARCH_HAS_SETUP_FRAME
+ #endif /* CRIS_TARGET_SIGNAL_H */
+diff --git a/linux-user/generic/signal.h b/linux-user/generic/signal.h
+new file mode 100644
+index 0000000000..e1083f8fba
+--- /dev/null
++++ b/linux-user/generic/signal.h
+@@ -0,0 +1,57 @@
++/*
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License version 2 as
++ * published by the Free Software Foundation, or (at your option) any
++ * later version. See the COPYING file in the top-level directory.
++ */
++
++#ifndef GENERIC_SIGNAL_H
++#define GENERIC_SIGNAL_H
++
++#define TARGET_SA_NOCLDSTOP     0x00000001
++#define TARGET_SA_NOCLDWAIT     0x00000002 /* not supported yet */
++#define TARGET_SA_SIGINFO       0x00000004
++#define TARGET_SA_ONSTACK       0x08000000
++#define TARGET_SA_RESTART       0x10000000
++#define TARGET_SA_NODEFER       0x40000000
++#define TARGET_SA_RESETHAND     0x80000000
++#define TARGET_SA_RESTORER      0x04000000
++
++#define TARGET_SIGHUP            1
++#define TARGET_SIGINT            2
++#define TARGET_SIGQUIT           3
++#define TARGET_SIGILL            4
++#define TARGET_SIGTRAP           5
++#define TARGET_SIGABRT           6
++#define TARGET_SIGIOT            6
++#define TARGET_SIGBUS            7
++#define TARGET_SIGFPE            8
++#define TARGET_SIGKILL           9
++#define TARGET_SIGUSR1          10
++#define TARGET_SIGSEGV          11
++#define TARGET_SIGUSR2          12
++#define TARGET_SIGPIPE          13
++#define TARGET_SIGALRM          14
++#define TARGET_SIGTERM          15
++#define TARGET_SIGSTKFLT        16
++#define TARGET_SIGCHLD          17
++#define TARGET_SIGCONT          18
++#define TARGET_SIGSTOP          19
++#define TARGET_SIGTSTP          20
++#define TARGET_SIGTTIN          21
++#define TARGET_SIGTTOU          22
++#define TARGET_SIGURG           23
++#define TARGET_SIGXCPU          24
++#define TARGET_SIGXFSZ          25
++#define TARGET_SIGVTALRM        26
++#define TARGET_SIGPROF          27
++#define TARGET_SIGWINCH         28
++#define TARGET_SIGIO            29
++#define TARGET_SIGPWR           30
++#define TARGET_SIGSYS           31
 +#define TARGET_SIGRTMIN         32
 +
-+#define TARGET_SIG_BLOCK        1       /* for blocking signals */
-+#define TARGET_SIG_UNBLOCK      2       /* for unblocking signals */
-+#define TARGET_SIG_SETMASK      3       /* for setting the signal mask */
-+
- /* this struct defines a stack used during syscall handling */
++#define TARGET_SIG_BLOCK          0    /* for blocking signals */
++#define TARGET_SIG_UNBLOCK        1    /* for unblocking signals */
++#define TARGET_SIG_SETMASK        2    /* for setting the signal mask */
++#endif
+diff --git a/linux-user/i386/target_signal.h b/linux-user/i386/target_signal.h
+index 8a284f4b57..f55e78fd33 100644
+--- a/linux-user/i386/target_signal.h
++++ b/linux-user/i386/target_signal.h
+@@ -19,5 +19,7 @@ typedef struct target_sigaltstack {
+ #define TARGET_MINSIGSTKSZ	2048
+ #define TARGET_SIGSTKSZ		8192
  
- typedef struct target_sigaltstack {
-@@ -16,6 +57,14 @@ typedef struct target_sigaltstack {
- #define TARGET_SS_ONSTACK     1
- #define TARGET_SS_DISABLE     2
- 
-+#define TARGET_SA_NOCLDSTOP     0x00000001
-+#define TARGET_SA_NOCLDWAIT     0x00010000
-+#define TARGET_SA_SIGINFO       0x00000008
-+#define TARGET_SA_ONSTACK       0x08000000
-+#define TARGET_SA_NODEFER       0x40000000
-+#define TARGET_SA_RESTART       0x10000000
-+#define TARGET_SA_RESETHAND     0x80000000
++#include "../generic/signal.h"
 +
+ #define TARGET_ARCH_HAS_SETUP_FRAME
+ #endif /* I386_TARGET_SIGNAL_H */
+diff --git a/linux-user/m68k/target_signal.h b/linux-user/m68k/target_signal.h
+index 0cf26b79e5..314e808844 100644
+--- a/linux-user/m68k/target_signal.h
++++ b/linux-user/m68k/target_signal.h
+@@ -19,5 +19,7 @@ typedef struct target_sigaltstack {
+ #define TARGET_MINSIGSTKSZ	2048
+ #define TARGET_SIGSTKSZ	8192
+ 
++#include "../generic/signal.h"
++
+ #define TARGET_ARCH_HAS_SETUP_FRAME
+ #endif /* M68K_TARGET_SIGNAL_H */
+diff --git a/linux-user/microblaze/target_signal.h b/linux-user/microblaze/target_signal.h
+index 86adcc1fc9..35efd5e928 100644
+--- a/linux-user/microblaze/target_signal.h
++++ b/linux-user/microblaze/target_signal.h
+@@ -19,5 +19,7 @@ typedef struct target_sigaltstack {
  #define TARGET_MINSIGSTKSZ    2048
  #define TARGET_SIGSTKSZ       8192
  
++#include "../generic/signal.h"
++
+ #define TARGET_ARCH_HAS_SETUP_FRAME
+ #endif /* MICROBLAZE_TARGET_SIGNAL_H */
+diff --git a/linux-user/nios2/target_signal.h b/linux-user/nios2/target_signal.h
+index 1f09f1e6bb..7776bcdbfd 100644
+--- a/linux-user/nios2/target_signal.h
++++ b/linux-user/nios2/target_signal.h
+@@ -16,4 +16,6 @@ typedef struct target_sigaltstack {
+ #define TARGET_MINSIGSTKSZ    2048
+ #define TARGET_SIGSTKSZ       8192
+ 
++#include "../generic/signal.h"
++
+ #endif /* TARGET_SIGNAL_H */
+diff --git a/linux-user/openrisc/target_signal.h b/linux-user/openrisc/target_signal.h
+index 590383302c..3ccbb974d9 100644
+--- a/linux-user/openrisc/target_signal.h
++++ b/linux-user/openrisc/target_signal.h
+@@ -16,4 +16,6 @@ typedef struct target_sigaltstack {
+ #define TARGET_MINSIGSTKSZ    2048
+ #define TARGET_SIGSTKSZ       8192
+ 
++#include "../generic/signal.h"
++
+ #endif /* OPENRISC_TARGET_SIGNAL_H */
+diff --git a/linux-user/ppc/target_signal.h b/linux-user/ppc/target_signal.h
+index 6f9e67e321..4453e2e7ef 100644
+--- a/linux-user/ppc/target_signal.h
++++ b/linux-user/ppc/target_signal.h
+@@ -19,6 +19,8 @@ typedef struct target_sigaltstack {
+ #define TARGET_MINSIGSTKSZ    2048
+ #define TARGET_SIGSTKSZ       8192
+ 
++#include "../generic/signal.h"
++
+ #if !defined(TARGET_PPC64)
+ #define TARGET_ARCH_HAS_SETUP_FRAME
+ #endif
+diff --git a/linux-user/riscv/target_signal.h b/linux-user/riscv/target_signal.h
+index c7fa357008..c8b1455800 100644
+--- a/linux-user/riscv/target_signal.h
++++ b/linux-user/riscv/target_signal.h
+@@ -13,4 +13,6 @@ typedef struct target_sigaltstack {
+ #define TARGET_MINSIGSTKSZ 2048
+ #define TARGET_SIGSTKSZ 8192
+ 
++#include "../generic/signal.h"
++
+ #endif /* TARGET_SIGNAL_H */
+diff --git a/linux-user/s390x/target_signal.h b/linux-user/s390x/target_signal.h
+index 8f41ccf9b2..b58bc7c20f 100644
+--- a/linux-user/s390x/target_signal.h
++++ b/linux-user/s390x/target_signal.h
+@@ -16,5 +16,7 @@ typedef struct target_sigaltstack {
+ #define TARGET_MINSIGSTKSZ     2048
+ #define TARGET_SIGSTKSZ        8192
+ 
++#include "../generic/signal.h"
++
+ #define TARGET_ARCH_HAS_SETUP_FRAME
+ #endif /* S390X_TARGET_SIGNAL_H */
+diff --git a/linux-user/sh4/target_signal.h b/linux-user/sh4/target_signal.h
+index 2bdc24c48e..434970a990 100644
+--- a/linux-user/sh4/target_signal.h
++++ b/linux-user/sh4/target_signal.h
+@@ -19,5 +19,7 @@ typedef struct target_sigaltstack {
+ #define TARGET_MINSIGSTKSZ    2048
+ #define TARGET_SIGSTKSZ       8192
+ 
++#include "../generic/signal.h"
++
+ #define TARGET_ARCH_HAS_SETUP_FRAME
+ #endif /* SH4_TARGET_SIGNAL_H */
 diff --git a/linux-user/syscall_defs.h b/linux-user/syscall_defs.h
-index 0034156c6b..21d3ef5559 100644
+index 85e0d870d8..44dc7831d6 100644
 --- a/linux-user/syscall_defs.h
 +++ b/linux-user/syscall_defs.h
-@@ -426,18 +426,7 @@ int do_sigaction(int sig, const struct target_sigaction *act,
-     || defined(TARGET_TILEGX) || defined(TARGET_HPPA) || defined(TARGET_NIOS2) \
-     || defined(TARGET_RISCV) || defined(TARGET_XTENSA)
- 
--#if defined(TARGET_MIPS)
+@@ -471,15 +471,6 @@ int do_sigaction(int sig, const struct target_sigaction *act,
+ #define TARGET_SA_NODEFER       0x00000020
+ #define TARGET_SA_RESTART       0x00000040
+ #define TARGET_SA_NOCLDWAIT     0x00000080
+-#else
 -#define TARGET_SA_NOCLDSTOP	0x00000001
--#define TARGET_SA_NOCLDWAIT	0x00010000
--#define TARGET_SA_SIGINFO	0x00000008
+-#define TARGET_SA_NOCLDWAIT	0x00000002 /* not supported yet */
+-#define TARGET_SA_SIGINFO	0x00000004
 -#define TARGET_SA_ONSTACK	0x08000000
--#define TARGET_SA_NODEFER	0x40000000
 -#define TARGET_SA_RESTART	0x10000000
+-#define TARGET_SA_NODEFER	0x40000000
 -#define TARGET_SA_RESETHAND	0x80000000
--#if !defined(TARGET_ABI_MIPSN32) && !defined(TARGET_ABI_MIPSN64)
--#define TARGET_SA_RESTORER	0x04000000	/* Only for O32 */
--#endif
--#elif defined(TARGET_OPENRISC)
-+#if defined(TARGET_OPENRISC)
- #define TARGET_SA_NOCLDSTOP    0x00000001
- #define TARGET_SA_NOCLDWAIT    0x00000002
- #define TARGET_SA_SIGINFO      0x00000004
-@@ -508,49 +497,6 @@ int do_sigaction(int sig, const struct target_sigaction *act,
- #define TARGET_SIG_UNBLOCK       2
- #define TARGET_SIG_SETMASK       3
+-#define TARGET_SA_RESTORER	0x04000000
+ #endif
  
--#elif defined(TARGET_MIPS)
+ #include "target_signal.h"
+@@ -650,47 +641,6 @@ int do_sigaction(int sig, const struct target_sigaction *act,
+ #define TARGET_SIG_UNBLOCK     1
+ #define TARGET_SIG_SETMASK     2
+ 
+-#else
 -
--#define TARGET_SIGHUP		 1	/* Hangup (POSIX).  */
--#define TARGET_SIGINT		 2	/* Interrupt (ANSI).  */
--#define TARGET_SIGQUIT		 3	/* Quit (POSIX).  */
--#define TARGET_SIGILL		 4	/* Illegal instruction (ANSI).  */
--#define TARGET_SIGTRAP		 5	/* Trace trap (POSIX).  */
--#define TARGET_SIGIOT		 6	/* IOT trap (4.2 BSD).  */
--#define TARGET_SIGABRT		 TARGET_SIGIOT	/* Abort (ANSI).  */
--#define TARGET_SIGEMT		 7
--#define TARGET_SIGSTKFLT	 7 /* XXX: incorrect */
--#define TARGET_SIGFPE		 8	/* Floating-point exception (ANSI).  */
--#define TARGET_SIGKILL		 9	/* Kill, unblockable (POSIX).  */
--#define TARGET_SIGBUS		10	/* BUS error (4.2 BSD).  */
--#define TARGET_SIGSEGV		11	/* Segmentation violation (ANSI).  */
--#define TARGET_SIGSYS		12
--#define TARGET_SIGPIPE		13	/* Broken pipe (POSIX).  */
--#define TARGET_SIGALRM		14	/* Alarm clock (POSIX).  */
--#define TARGET_SIGTERM		15	/* Termination (ANSI).  */
--#define TARGET_SIGUSR1		16	/* User-defined signal 1 (POSIX).  */
--#define TARGET_SIGUSR2		17	/* User-defined signal 2 (POSIX).  */
--#define TARGET_SIGCHLD		18	/* Child status has changed (POSIX).  */
--#define TARGET_SIGCLD		TARGET_SIGCHLD	/* Same as TARGET_SIGCHLD (System V).  */
--#define TARGET_SIGPWR		19	/* Power failure restart (System V).  */
--#define TARGET_SIGWINCH	20	/* Window size change (4.3 BSD, Sun).  */
--#define TARGET_SIGURG		21	/* Urgent condition on socket (4.2 BSD).  */
--#define TARGET_SIGIO		22	/* I/O now possible (4.2 BSD).  */
--#define TARGET_SIGPOLL		TARGET_SIGIO	/* Pollable event occurred (System V).  */
--#define TARGET_SIGSTOP		23	/* Stop, unblockable (POSIX).  */
--#define TARGET_SIGTSTP		24	/* Keyboard stop (POSIX).  */
--#define TARGET_SIGCONT		25	/* Continue (POSIX).  */
--#define TARGET_SIGTTIN		26	/* Background read from tty (POSIX).  */
--#define TARGET_SIGTTOU		27	/* Background write to tty (POSIX).  */
--#define TARGET_SIGVTALRM	28	/* Virtual alarm clock (4.2 BSD).  */
--#define TARGET_SIGPROF		29	/* Profiling alarm clock (4.2 BSD).  */
--#define TARGET_SIGXCPU		30	/* CPU limit exceeded (4.2 BSD).  */
--#define TARGET_SIGXFSZ		31	/* File size limit exceeded (4.2 BSD).  */
+-/* OpenRISC Using the general signals */
+-#define TARGET_SIGHUP		 1
+-#define TARGET_SIGINT		 2
+-#define TARGET_SIGQUIT		 3
+-#define TARGET_SIGILL		 4
+-#define TARGET_SIGTRAP		 5
+-#define TARGET_SIGABRT		 6
+-#define TARGET_SIGIOT		 6
+-#define TARGET_SIGBUS		 7
+-#define TARGET_SIGFPE		 8
+-#define TARGET_SIGKILL		 9
+-#define TARGET_SIGUSR1		10
+-#define TARGET_SIGSEGV		11
+-#define TARGET_SIGUSR2		12
+-#define TARGET_SIGPIPE		13
+-#define TARGET_SIGALRM		14
+-#define TARGET_SIGTERM		15
+-#define TARGET_SIGSTKFLT	16
+-#define TARGET_SIGCHLD		17
+-#define TARGET_SIGCONT		18
+-#define TARGET_SIGSTOP		19
+-#define TARGET_SIGTSTP		20
+-#define TARGET_SIGTTIN		21
+-#define TARGET_SIGTTOU		22
+-#define TARGET_SIGURG		23
+-#define TARGET_SIGXCPU		24
+-#define TARGET_SIGXFSZ		25
+-#define TARGET_SIGVTALRM	26
+-#define TARGET_SIGPROF		27
+-#define TARGET_SIGWINCH	        28
+-#define TARGET_SIGIO		29
+-#define TARGET_SIGPWR		30
+-#define TARGET_SIGSYS		31
 -#define TARGET_SIGRTMIN         32
 -
--#define TARGET_SIG_BLOCK	1	/* for blocking signals */
--#define TARGET_SIG_UNBLOCK	2	/* for unblocking signals */
--#define TARGET_SIG_SETMASK	3	/* for setting the signal mask */
+-#define TARGET_SIG_BLOCK          0    /* for blocking signals */
+-#define TARGET_SIG_UNBLOCK        1    /* for unblocking signals */
+-#define TARGET_SIG_SETMASK        2    /* for setting the signal mask */
 -
- #elif defined(TARGET_HPPA)
+ #endif
  
- #define TARGET_SIGHUP           1
+ #if defined(TARGET_ALPHA)
+diff --git a/linux-user/tilegx/target_signal.h b/linux-user/tilegx/target_signal.h
+index 4cb8c56adf..655be13009 100644
+--- a/linux-user/tilegx/target_signal.h
++++ b/linux-user/tilegx/target_signal.h
+@@ -18,4 +18,6 @@ typedef struct target_sigaltstack {
+ #define TARGET_MINSIGSTKSZ    2048
+ #define TARGET_SIGSTKSZ       8192
+ 
++#include "../generic/signal.h"
++
+ #endif /* TILEGX_TARGET_SIGNAL_H */
+diff --git a/linux-user/x86_64/target_signal.h b/linux-user/x86_64/target_signal.h
+index be054d1e59..4c4380f7b9 100644
+--- a/linux-user/x86_64/target_signal.h
++++ b/linux-user/x86_64/target_signal.h
+@@ -19,4 +19,6 @@ typedef struct target_sigaltstack {
+ #define TARGET_MINSIGSTKSZ	2048
+ #define TARGET_SIGSTKSZ		8192
+ 
++#include "../generic/signal.h"
++
+ #endif /* X86_64_TARGET_SIGNAL_H */
+diff --git a/linux-user/xtensa/target_signal.h b/linux-user/xtensa/target_signal.h
+index de03c0a564..c60bf656f6 100644
+--- a/linux-user/xtensa/target_signal.h
++++ b/linux-user/xtensa/target_signal.h
+@@ -18,4 +18,6 @@ typedef struct target_sigaltstack {
+ #define TARGET_MINSIGSTKSZ    2048
+ #define TARGET_SIGSTKSZ       8192
+ 
++#include "../generic/signal.h"
++
+ #endif
 -- 
 2.14.3
