@@ -1,16 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36794)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36809)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1fPnY3-000899-7v
-	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 07:21:16 -0400
+	(envelope-from <stefanha@redhat.com>) id 1fPnY7-0008Db-Jq
+	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 07:21:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1fPnY2-0001Z6-2a
-	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 07:21:15 -0400
+	(envelope-from <stefanha@redhat.com>) id 1fPnY4-0001a0-Ea
+	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 07:21:19 -0400
 From: Stefan Hajnoczi <stefanha@redhat.com>
-Date: Mon,  4 Jun 2018 12:20:35 +0100
-Message-Id: <20180604112036.2715-11-stefanha@redhat.com>
+Date: Mon,  4 Jun 2018 12:20:36 +0100
+Message-Id: <20180604112036.2715-12-stefanha@redhat.com>
 In-Reply-To: <20180604112036.2715-1-stefanha@redhat.com>
 References: <20180604112036.2715-1-stefanha@redhat.com>
-Subject: [Qemu-devel] [PULL 10/11] qemu-img: Convert with copy offloading
+Subject: [Qemu-devel] [PULL 11/11] main-loop: drop spin_counter
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,132 +22,81 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Ronnie Sahlberg <ronniesahlberg@gmail.com>, Peter Maydell <peter.maydell@linaro.org>, qemu-block@nongnu.org, Peter Lieven <pl@kamp.de>, Max Reitz <mreitz@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Fam Zheng <famz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
 
-From: Fam Zheng <famz@redhat.com>
+Commit d759c951f3287fad04210a52f2dc93f94cf58c7f ("replay: push
+replay_mutex_lock up the call tree") removed the !timeout lock
+optimization in the main loop.
 
-The new blk_co_copy_range interface offers a more efficient way in the
-case of network based storage. Make use of it to allow faster convert
-operation.
+The idea of the optimization was to avoid ping-pongs between threads by
+keeping the Big QEMU Lock held across non-blocking (!timeout) main loop
+iterations.
 
-Since copy offloading cannot do zero detection ('-S') and compression
-(-c), only try it when these options are not used.
+A warning is printed when the main loop spins without releasing BQL for
+long periods of time.  These warnings were supposed to aid debugging but
+in practice they just alarm users.  They are considered noise because
+the cause of spinning is not shown and is hard to find.
 
-Signed-off-by: Fam Zheng <famz@redhat.com>
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
-Message-id: 20180601092648.24614-11-famz@redhat.com
+Now that the lock optimization has been removed, there is no danger of
+hogging the BQL.  Drop the spin counter and the infamous warning.
+
 Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+Reviewed-by: Jeff Cody <jcody@redhat.com>
 ---
- qemu-img.c | 50 ++++++++++++++++++++++++++++++++++++++++++++++++--
- 1 file changed, 48 insertions(+), 2 deletions(-)
+ util/main-loop.c                 | 25 -------------------------
+ tests/qemu-iotests/common.filter |  1 -
+ 2 files changed, 26 deletions(-)
 
-diff --git a/qemu-img.c b/qemu-img.c
-index 976b437da0..75f1610aa0 100644
---- a/qemu-img.c
-+++ b/qemu-img.c
-@@ -1547,6 +1547,7 @@ typedef struct ImgConvertState {
-     bool compressed;
-     bool target_has_backing;
-     bool wr_in_order;
-+    bool copy_range;
-     int min_sparse;
-     size_t cluster_sectors;
-     size_t buf_sectors;
-@@ -1740,6 +1741,37 @@ static int coroutine_fn convert_co_write(ImgConvertState *s, int64_t sector_num,
-     return 0;
+diff --git a/util/main-loop.c b/util/main-loop.c
+index 992f9b0f34..affe0403c5 100644
+--- a/util/main-loop.c
++++ b/util/main-loop.c
+@@ -222,36 +222,11 @@ static int os_host_main_loop_wait(int64_t timeout)
+ {
+     GMainContext *context = g_main_context_default();
+     int ret;
+-    static int spin_counter;
+ 
+     g_main_context_acquire(context);
+ 
+     glib_pollfds_fill(&timeout);
+ 
+-    /* If the I/O thread is very busy or we are incorrectly busy waiting in
+-     * the I/O thread, this can lead to starvation of the BQL such that the
+-     * VCPU threads never run.  To make sure we can detect the later case,
+-     * print a message to the screen.  If we run into this condition, create
+-     * a fake timeout in order to give the VCPU threads a chance to run.
+-     */
+-    if (!timeout && (spin_counter > MAX_MAIN_LOOP_SPIN)) {
+-        static bool notified;
+-
+-        if (!notified && !qtest_enabled() && !qtest_driver()) {
+-            warn_report("I/O thread spun for %d iterations",
+-                        MAX_MAIN_LOOP_SPIN);
+-            notified = true;
+-        }
+-
+-        timeout = SCALE_MS;
+-    }
+-
+-
+-    if (timeout) {
+-        spin_counter = 0;
+-    } else {
+-        spin_counter++;
+-    }
+     qemu_mutex_unlock_iothread();
+     replay_mutex_unlock();
+ 
+diff --git a/tests/qemu-iotests/common.filter b/tests/qemu-iotests/common.filter
+index f08ee55046..2031e353a5 100644
+--- a/tests/qemu-iotests/common.filter
++++ b/tests/qemu-iotests/common.filter
+@@ -77,7 +77,6 @@ _filter_qemu()
+ {
+     sed -e "s#\\(^\\|(qemu) \\)$(basename $QEMU_PROG):#\1QEMU_PROG:#" \
+         -e 's#^QEMU [0-9]\+\.[0-9]\+\.[0-9]\+ monitor#QEMU X.Y.Z monitor#' \
+-        -e '/main-loop: WARNING: I\/O thread spun for [0-9]\+ iterations/d' \
+         -e $'s#\r##' # QEMU monitor uses \r\n line endings
  }
  
-+static int coroutine_fn convert_co_copy_range(ImgConvertState *s, int64_t sector_num,
-+                                              int nb_sectors)
-+{
-+    int n, ret;
-+
-+    while (nb_sectors > 0) {
-+        BlockBackend *blk;
-+        int src_cur;
-+        int64_t bs_sectors, src_cur_offset;
-+        int64_t offset;
-+
-+        convert_select_part(s, sector_num, &src_cur, &src_cur_offset);
-+        offset = (sector_num - src_cur_offset) << BDRV_SECTOR_BITS;
-+        blk = s->src[src_cur];
-+        bs_sectors = s->src_sectors[src_cur];
-+
-+        n = MIN(nb_sectors, bs_sectors - (sector_num - src_cur_offset));
-+
-+        ret = blk_co_copy_range(blk, offset, s->target,
-+                                sector_num << BDRV_SECTOR_BITS,
-+                                n << BDRV_SECTOR_BITS, 0);
-+        if (ret < 0) {
-+            return ret;
-+        }
-+
-+        sector_num += n;
-+        nb_sectors -= n;
-+    }
-+    return 0;
-+}
-+
- static void coroutine_fn convert_co_do_copy(void *opaque)
- {
-     ImgConvertState *s = opaque;
-@@ -1762,6 +1794,7 @@ static void coroutine_fn convert_co_do_copy(void *opaque)
-         int n;
-         int64_t sector_num;
-         enum ImgConvertBlockStatus status;
-+        bool copy_range;
- 
-         qemu_co_mutex_lock(&s->lock);
-         if (s->ret != -EINPROGRESS || s->sector_num >= s->total_sectors) {
-@@ -1791,7 +1824,9 @@ static void coroutine_fn convert_co_do_copy(void *opaque)
-                                         s->allocated_sectors, 0);
-         }
- 
--        if (status == BLK_DATA) {
-+retry:
-+        copy_range = s->copy_range && s->status == BLK_DATA;
-+        if (status == BLK_DATA && !copy_range) {
-             ret = convert_co_read(s, sector_num, n, buf);
-             if (ret < 0) {
-                 error_report("error while reading sector %" PRId64
-@@ -1813,7 +1848,15 @@ static void coroutine_fn convert_co_do_copy(void *opaque)
-         }
- 
-         if (s->ret == -EINPROGRESS) {
--            ret = convert_co_write(s, sector_num, n, buf, status);
-+            if (copy_range) {
-+                ret = convert_co_copy_range(s, sector_num, n);
-+                if (ret) {
-+                    s->copy_range = false;
-+                    goto retry;
-+                }
-+            } else {
-+                ret = convert_co_write(s, sector_num, n, buf, status);
-+            }
-             if (ret < 0) {
-                 error_report("error while writing sector %" PRId64
-                              ": %s", sector_num, strerror(-ret));
-@@ -1936,6 +1979,7 @@ static int img_convert(int argc, char **argv)
-     ImgConvertState s = (ImgConvertState) {
-         /* Need at least 4k of zeros for sparse detection */
-         .min_sparse         = 8,
-+        .copy_range         = true,
-         .buf_sectors        = IO_BUF_SIZE / BDRV_SECTOR_SIZE,
-         .wr_in_order        = true,
-         .num_coroutines     = 8,
-@@ -1976,6 +2020,7 @@ static int img_convert(int argc, char **argv)
-             break;
-         case 'c':
-             s.compressed = true;
-+            s.copy_range = false;
-             break;
-         case 'o':
-             if (!is_valid_option_list(optarg)) {
-@@ -2017,6 +2062,7 @@ static int img_convert(int argc, char **argv)
-             }
- 
-             s.min_sparse = sval / BDRV_SECTOR_SIZE;
-+            s.copy_range = false;
-             break;
-         }
-         case 'p':
 -- 
 2.17.1
