@@ -1,20 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39154)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39206)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1fPrHw-0002Fq-CN
-	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 11:20:55 -0400
+	(envelope-from <laurent@vivier.eu>) id 1fPrI0-0002HZ-07
+	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 11:20:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1fPrHu-00066I-3Z
-	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 11:20:52 -0400
-Received: from mout.kundenserver.de ([212.227.126.187]:57449)
+	(envelope-from <laurent@vivier.eu>) id 1fPrHw-0006Aa-Ed
+	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 11:20:55 -0400
+Received: from mout.kundenserver.de ([212.227.126.133]:44883)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1fPrHt-00064Q-QA
-	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 11:20:50 -0400
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1fPrHw-00068Y-1U
+	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 11:20:52 -0400
 From: Laurent Vivier <laurent@vivier.eu>
-Date: Mon,  4 Jun 2018 17:20:15 +0200
-Message-Id: <20180604152015.13359-18-laurent@vivier.eu>
+Date: Mon,  4 Jun 2018 17:20:13 +0200
+Message-Id: <20180604152015.13359-16-laurent@vivier.eu>
 In-Reply-To: <20180604152015.13359-1-laurent@vivier.eu>
 References: <20180604152015.13359-1-laurent@vivier.eu>
-Subject: [Qemu-devel] [PULL 17/17] linux-user: remove useless #if
+Subject: [Qemu-devel] [PULL 15/17] linux-user: move alpha signal definitions
+ to alpha/target_signal.h
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,42 +27,146 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Riku Voipio <riku.voipio@iki.fi>, Laurent Vivier <laurent@vivier.eu>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Artyom Tarasenko <atar4qemu@gmail.com>
 
-Remove a "#if defined(XX) || defined(YY) || ..." with all available
-targets
+No code change.
 
 Signed-off-by: Laurent Vivier <laurent@vivier.eu>
-Message-Id: <20180529194207.31503-16-laurent@vivier.eu>
+Message-Id: <20180529194207.31503-14-laurent@vivier.eu>
 ---
- linux-user/syscall_defs.h | 10 ----------
- 1 file changed, 10 deletions(-)
+ linux-user/alpha/target_signal.h | 45 +++++++++++++++++++++++++++++++++++
+ linux-user/syscall_defs.h        | 51 ++--------------------------------------
+ 2 files changed, 47 insertions(+), 49 deletions(-)
 
+diff --git a/linux-user/alpha/target_signal.h b/linux-user/alpha/target_signal.h
+index e6f2f04911..cd63d59fde 100644
+--- a/linux-user/alpha/target_signal.h
++++ b/linux-user/alpha/target_signal.h
+@@ -1,6 +1,43 @@
+ #ifndef ALPHA_TARGET_SIGNAL_H
+ #define ALPHA_TARGET_SIGNAL_H
+ 
++#define TARGET_SIGHUP            1
++#define TARGET_SIGINT            2
++#define TARGET_SIGQUIT           3
++#define TARGET_SIGILL            4
++#define TARGET_SIGTRAP           5
++#define TARGET_SIGABRT           6
++#define TARGET_SIGSTKFLT         7 /* actually SIGEMT */
++#define TARGET_SIGFPE            8
++#define TARGET_SIGKILL           9
++#define TARGET_SIGBUS           10
++#define TARGET_SIGSEGV          11
++#define TARGET_SIGSYS           12
++#define TARGET_SIGPIPE          13
++#define TARGET_SIGALRM          14
++#define TARGET_SIGTERM          15
++#define TARGET_SIGURG           16
++#define TARGET_SIGSTOP          17
++#define TARGET_SIGTSTP          18
++#define TARGET_SIGCONT          19
++#define TARGET_SIGCHLD          20
++#define TARGET_SIGTTIN          21
++#define TARGET_SIGTTOU          22
++#define TARGET_SIGIO            23
++#define TARGET_SIGXCPU          24
++#define TARGET_SIGXFSZ          25
++#define TARGET_SIGVTALRM        26
++#define TARGET_SIGPROF          27
++#define TARGET_SIGWINCH         28
++#define TARGET_SIGPWR           29 /* actually SIGINFO */
++#define TARGET_SIGUSR1          30
++#define TARGET_SIGUSR2          31
++#define TARGET_SIGRTMIN         32
++
++#define TARGET_SIG_BLOCK         1
++#define TARGET_SIG_UNBLOCK       2
++#define TARGET_SIG_SETMASK       3
++
+ /* this struct defines a stack used during syscall handling */
+ 
+ typedef struct target_sigaltstack {
+@@ -17,6 +54,14 @@ typedef struct target_sigaltstack {
+ #define TARGET_SS_ONSTACK	1
+ #define TARGET_SS_DISABLE	2
+ 
++#define TARGET_SA_ONSTACK       0x00000001
++#define TARGET_SA_RESTART       0x00000002
++#define TARGET_SA_NOCLDSTOP     0x00000004
++#define TARGET_SA_NODEFER       0x00000008
++#define TARGET_SA_RESETHAND     0x00000010
++#define TARGET_SA_NOCLDWAIT     0x00000020 /* not supported yet */
++#define TARGET_SA_SIGINFO       0x00000040
++
+ #define TARGET_MINSIGSTKSZ	4096
+ #define TARGET_SIGSTKSZ		16384
+ 
 diff --git a/linux-user/syscall_defs.h b/linux-user/syscall_defs.h
-index e2896ae1b3..40bb60ef4c 100644
+index 360d37c9c0..8436875005 100644
 --- a/linux-user/syscall_defs.h
 +++ b/linux-user/syscall_defs.h
-@@ -418,14 +418,6 @@ struct target_sigaction;
- int do_sigaction(int sig, const struct target_sigaction *act,
-                  struct target_sigaction *oact);
+@@ -426,15 +426,7 @@ int do_sigaction(int sig, const struct target_sigaction *act,
+     || defined(TARGET_TILEGX) || defined(TARGET_HPPA) || defined(TARGET_NIOS2) \
+     || defined(TARGET_RISCV) || defined(TARGET_XTENSA)
  
--#if defined(TARGET_I386) || defined(TARGET_ARM) || defined(TARGET_SPARC) \
--    || defined(TARGET_PPC) || defined(TARGET_MIPS) || defined(TARGET_SH4) \
--    || defined(TARGET_M68K) || defined(TARGET_ALPHA) || defined(TARGET_CRIS) \
--    || defined(TARGET_MICROBLAZE) \
--    || defined(TARGET_S390X) || defined(TARGET_OPENRISC) \
--    || defined(TARGET_TILEGX) || defined(TARGET_HPPA) || defined(TARGET_NIOS2) \
--    || defined(TARGET_RISCV) || defined(TARGET_XTENSA)
+-#if defined(TARGET_ALPHA)
+-#define TARGET_SA_ONSTACK	0x00000001
+-#define TARGET_SA_RESTART	0x00000002
+-#define TARGET_SA_NOCLDSTOP	0x00000004
+-#define TARGET_SA_NODEFER	0x00000008
+-#define TARGET_SA_RESETHAND	0x00000010
+-#define TARGET_SA_NOCLDWAIT	0x00000020 /* not supported yet */
+-#define TARGET_SA_SIGINFO	0x00000040
+-#elif defined(TARGET_HPPA)
++#if defined(TARGET_HPPA)
+ #define TARGET_SA_ONSTACK       0x00000001
+ #define TARGET_SA_RESETHAND     0x00000004
+ #define TARGET_SA_NOCLDSTOP     0x00000008
+@@ -450,46 +442,7 @@ int do_sigaction(int sig, const struct target_sigaction *act,
+ #define TARGET_ARCH_HAS_SA_RESTORER 1
+ #endif
+ 
+-#if defined(TARGET_ALPHA)
 -
- #include "target_signal.h"
- 
- #ifdef TARGET_SA_RESTORER
-@@ -666,8 +658,6 @@ typedef struct target_siginfo {
- #define TARGET_TRAP_BRANCH      (3)     /* process taken branch trap */
- #define TARGET_TRAP_HWBKPT      (4)     /* hardware breakpoint/watchpoint */
- 
--#endif /* defined(TARGET_I386) || defined(TARGET_ARM) */
+-#define TARGET_SIGHUP            1
+-#define TARGET_SIGINT            2
+-#define TARGET_SIGQUIT           3
+-#define TARGET_SIGILL            4
+-#define TARGET_SIGTRAP           5
+-#define TARGET_SIGABRT           6
+-#define TARGET_SIGSTKFLT         7 /* actually SIGEMT */
+-#define TARGET_SIGFPE            8
+-#define TARGET_SIGKILL           9
+-#define TARGET_SIGBUS           10
+-#define TARGET_SIGSEGV          11
+-#define TARGET_SIGSYS           12
+-#define TARGET_SIGPIPE          13
+-#define TARGET_SIGALRM          14
+-#define TARGET_SIGTERM          15
+-#define TARGET_SIGURG           16
+-#define TARGET_SIGSTOP          17
+-#define TARGET_SIGTSTP          18
+-#define TARGET_SIGCONT          19
+-#define TARGET_SIGCHLD          20
+-#define TARGET_SIGTTIN          21
+-#define TARGET_SIGTTOU          22
+-#define TARGET_SIGIO            23
+-#define TARGET_SIGXCPU          24
+-#define TARGET_SIGXFSZ          25
+-#define TARGET_SIGVTALRM        26
+-#define TARGET_SIGPROF          27
+-#define TARGET_SIGWINCH         28
+-#define TARGET_SIGPWR           29 /* actually SIGINFO */
+-#define TARGET_SIGUSR1          30
+-#define TARGET_SIGUSR2          31
+-#define TARGET_SIGRTMIN         32
 -
- struct target_rlimit {
-         abi_ulong   rlim_cur;
-         abi_ulong   rlim_max;
+-#define TARGET_SIG_BLOCK         1
+-#define TARGET_SIG_UNBLOCK       2
+-#define TARGET_SIG_SETMASK       3
+-
+-#elif defined(TARGET_HPPA)
++#if defined(TARGET_HPPA)
+ 
+ #define TARGET_SIGHUP           1
+ #define TARGET_SIGINT           2
 -- 
 2.14.3
