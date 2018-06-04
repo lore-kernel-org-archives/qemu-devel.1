@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39109)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39199)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1fPrHu-0002DZ-AY
-	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 11:20:55 -0400
+	(envelope-from <laurent@vivier.eu>) id 1fPrHz-0002Gz-9S
+	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 11:20:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1fPrHq-00061I-Go
-	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 11:20:50 -0400
-Received: from mout.kundenserver.de ([212.227.126.131]:51739)
+	(envelope-from <laurent@vivier.eu>) id 1fPrHv-00068N-59
+	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 11:20:55 -0400
+Received: from mout.kundenserver.de ([212.227.126.135]:51297)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1fPrHp-0005zT-W7
-	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 11:20:46 -0400
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1fPrHu-00065Z-K3
+	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 11:20:51 -0400
 From: Laurent Vivier <laurent@vivier.eu>
-Date: Mon,  4 Jun 2018 17:20:01 +0200
-Message-Id: <20180604152015.13359-4-laurent@vivier.eu>
+Date: Mon,  4 Jun 2018 17:20:08 +0200
+Message-Id: <20180604152015.13359-11-laurent@vivier.eu>
 In-Reply-To: <20180604152015.13359-1-laurent@vivier.eu>
 References: <20180604152015.13359-1-laurent@vivier.eu>
-Subject: [Qemu-devel] [PULL 03/17] linux-user: move generic fcntl
- definitions to generic/fcntl.h
+Subject: [Qemu-devel] [PULL 10/17] linux-user: move get_sp_from_cpustate()
+ to target_cpu.h
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,727 +27,1086 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Riku Voipio <riku.voipio@iki.fi>, Laurent Vivier <laurent@vivier.eu>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Artyom Tarasenko <atar4qemu@gmail.com>
 
-add a per target target_fcntl.h and include the generic one from them
-
-No code change.
+Remove useless includes
+Fix HPPA include guard.
 
 Signed-off-by: Laurent Vivier <laurent@vivier.eu>
-Message-Id: <20180529194207.31503-2-laurent@vivier.eu>
+Acked-by: Richard Henderson <richard.henderson@linaro.org>
+Message-Id: <20180529194207.31503-9-laurent@vivier.eu>
 ---
- linux-user/aarch64/target_fcntl.h    |  11 +++
- linux-user/alpha/target_fcntl.h      |  11 +++
- linux-user/arm/target_fcntl.h        |  11 +++
- linux-user/cris/target_fcntl.h       |  11 +++
- linux-user/generic/fcntl.h           | 151 +++++++++++++++++++++++++++++++++++
- linux-user/hppa/target_fcntl.h       |  11 +++
- linux-user/i386/target_fcntl.h       |  11 +++
- linux-user/m68k/target_fcntl.h       |  11 +++
- linux-user/microblaze/target_fcntl.h |  11 +++
- linux-user/mips/target_fcntl.h       |  11 +++
- linux-user/mips64/target_fcntl.h     |   1 +
- linux-user/nios2/target_fcntl.h      |  11 +++
- linux-user/openrisc/target_fcntl.h   |  11 +++
- linux-user/ppc/target_fcntl.h        |  11 +++
- linux-user/riscv/target_fcntl.h      |  11 +++
- linux-user/s390x/target_fcntl.h      |  11 +++
- linux-user/sh4/target_fcntl.h        |  11 +++
- linux-user/sparc/target_fcntl.h      |  11 +++
- linux-user/sparc64/target_fcntl.h    |   1 +
- linux-user/syscall_defs.h            | 129 +-----------------------------
- linux-user/tilegx/target_fcntl.h     |  11 +++
- linux-user/x86_64/target_fcntl.h     |  11 +++
- linux-user/xtensa/target_fcntl.h     |  11 +++
- 23 files changed, 363 insertions(+), 128 deletions(-)
- create mode 100644 linux-user/aarch64/target_fcntl.h
- create mode 100644 linux-user/alpha/target_fcntl.h
- create mode 100644 linux-user/arm/target_fcntl.h
- create mode 100644 linux-user/cris/target_fcntl.h
- create mode 100644 linux-user/generic/fcntl.h
- create mode 100644 linux-user/hppa/target_fcntl.h
- create mode 100644 linux-user/i386/target_fcntl.h
- create mode 100644 linux-user/m68k/target_fcntl.h
- create mode 100644 linux-user/microblaze/target_fcntl.h
- create mode 100644 linux-user/mips/target_fcntl.h
- create mode 100644 linux-user/mips64/target_fcntl.h
- create mode 100644 linux-user/nios2/target_fcntl.h
- create mode 100644 linux-user/openrisc/target_fcntl.h
- create mode 100644 linux-user/ppc/target_fcntl.h
- create mode 100644 linux-user/riscv/target_fcntl.h
- create mode 100644 linux-user/s390x/target_fcntl.h
- create mode 100644 linux-user/sh4/target_fcntl.h
- create mode 100644 linux-user/sparc/target_fcntl.h
- create mode 100644 linux-user/sparc64/target_fcntl.h
- create mode 100644 linux-user/tilegx/target_fcntl.h
- create mode 100644 linux-user/x86_64/target_fcntl.h
- create mode 100644 linux-user/xtensa/target_fcntl.h
+ linux-user/aarch64/signal.c           |  1 -
+ linux-user/aarch64/target_cpu.h       |  4 ++++
+ linux-user/aarch64/target_signal.h    |  7 -------
+ linux-user/alpha/signal.c             |  1 -
+ linux-user/alpha/target_cpu.h         |  4 ++++
+ linux-user/alpha/target_signal.h      |  8 --------
+ linux-user/arm/signal.c               |  1 -
+ linux-user/arm/target_cpu.h           |  4 ++++
+ linux-user/arm/target_signal.h        |  7 -------
+ linux-user/cris/signal.c              |  1 -
+ linux-user/cris/target_cpu.h          |  4 ++++
+ linux-user/cris/target_signal.h       |  7 -------
+ linux-user/hppa/signal.c              |  1 -
+ linux-user/hppa/target_cpu.h          |  8 ++++++--
+ linux-user/hppa/target_signal.h       |  6 ------
+ linux-user/i386/signal.c              |  1 -
+ linux-user/i386/target_cpu.h          |  4 ++++
+ linux-user/i386/target_signal.h       |  7 -------
+ linux-user/m68k/signal.c              |  1 -
+ linux-user/m68k/target_cpu.h          |  4 ++++
+ linux-user/m68k/target_signal.h       |  7 -------
+ linux-user/microblaze/signal.c        |  1 -
+ linux-user/microblaze/target_cpu.h    |  4 ++++
+ linux-user/microblaze/target_signal.h |  7 -------
+ linux-user/mips/signal.c              |  1 -
+ linux-user/mips/target_cpu.h          |  4 ++++
+ linux-user/mips/target_signal.h       |  7 -------
+ linux-user/mips64/target_signal.h     |  6 ------
+ linux-user/nios2/signal.c             |  1 -
+ linux-user/nios2/target_cpu.h         |  4 ++++
+ linux-user/nios2/target_signal.h      |  6 ------
+ linux-user/openrisc/signal.c          |  1 -
+ linux-user/openrisc/target_cpu.h      |  4 ++++
+ linux-user/openrisc/target_signal.h   |  6 ------
+ linux-user/ppc/signal.c               |  1 -
+ linux-user/ppc/target_cpu.h           |  5 ++++-
+ linux-user/ppc/target_signal.h        |  7 -------
+ linux-user/qemu.h                     |  1 -
+ linux-user/riscv/signal.c             |  1 -
+ linux-user/riscv/target_cpu.h         |  4 ++++
+ linux-user/riscv/target_signal.h      |  6 ------
+ linux-user/s390x/signal.c             |  1 -
+ linux-user/s390x/target_cpu.h         |  4 ++++
+ linux-user/s390x/target_signal.h      |  7 -------
+ linux-user/sh4/signal.c               |  1 -
+ linux-user/sh4/target_cpu.h           |  4 ++++
+ linux-user/sh4/target_signal.h        |  7 -------
+ linux-user/signal.c                   |  1 -
+ linux-user/sparc/signal.c             |  1 -
+ linux-user/sparc/target_cpu.h         | 11 +++++++++++
+ linux-user/sparc/target_signal.h      | 14 --------------
+ linux-user/sparc64/target_signal.h    | 14 --------------
+ linux-user/syscall_defs.h             |  2 ++
+ linux-user/tilegx/signal.c            |  1 -
+ linux-user/tilegx/target_cpu.h        |  4 ++++
+ linux-user/tilegx/target_signal.h     |  6 ------
+ linux-user/x86_64/target_signal.h     |  6 ------
+ linux-user/xtensa/signal.c            |  1 -
+ linux-user/xtensa/target_cpu.h        |  4 ++++
+ linux-user/xtensa/target_signal.h     |  6 ------
+ 60 files changed, 83 insertions(+), 177 deletions(-)
 
-diff --git a/linux-user/aarch64/target_fcntl.h b/linux-user/aarch64/target_fcntl.h
-new file mode 100644
-index 0000000000..59be406280
---- /dev/null
-+++ b/linux-user/aarch64/target_fcntl.h
-@@ -0,0 +1,11 @@
-+/*
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License version 2 as
-+ * published by the Free Software Foundation, or (at your option) any
-+ * later version. See the COPYING file in the top-level directory.
-+ */
+diff --git a/linux-user/aarch64/signal.c b/linux-user/aarch64/signal.c
+index f95dc61dfb..07fedfc33c 100644
+--- a/linux-user/aarch64/signal.c
++++ b/linux-user/aarch64/signal.c
+@@ -18,7 +18,6 @@
+  */
+ #include "qemu/osdep.h"
+ #include "qemu.h"
+-#include "target_signal.h"
+ #include "signal-common.h"
+ #include "linux-user/trace.h"
+ 
+diff --git a/linux-user/aarch64/target_cpu.h b/linux-user/aarch64/target_cpu.h
+index 777ce29f16..a021c95fa4 100644
+--- a/linux-user/aarch64/target_cpu.h
++++ b/linux-user/aarch64/target_cpu.h
+@@ -35,4 +35,8 @@ static inline void cpu_set_tls(CPUARMState *env, target_ulong newtls)
+     env->cp15.tpidr_el[0] = newtls;
+ }
+ 
++static inline abi_ulong get_sp_from_cpustate(CPUARMState *state)
++{
++   return state->xregs[31];
++}
+ #endif
+diff --git a/linux-user/aarch64/target_signal.h b/linux-user/aarch64/target_signal.h
+index 0b7ae25120..18599b1447 100644
+--- a/linux-user/aarch64/target_signal.h
++++ b/linux-user/aarch64/target_signal.h
+@@ -1,8 +1,6 @@
+ #ifndef AARCH64_TARGET_SIGNAL_H
+ #define AARCH64_TARGET_SIGNAL_H
+ 
+-#include "cpu.h"
+-
+ /* this struct defines a stack used during syscall handling */
+ 
+ typedef struct target_sigaltstack {
+@@ -21,10 +19,5 @@ typedef struct target_sigaltstack {
+ #define TARGET_MINSIGSTKSZ 2048
+ #define TARGET_SIGSTKSZ 8192
+ 
+-static inline abi_ulong get_sp_from_cpustate(CPUARMState *state)
+-{
+-   return state->xregs[31];
+-}
+-
+ #define TARGET_ARCH_HAS_SETUP_FRAME
+ #endif /* AARCH64_TARGET_SIGNAL_H */
+diff --git a/linux-user/alpha/signal.c b/linux-user/alpha/signal.c
+index f24de02c6f..c5c27ce084 100644
+--- a/linux-user/alpha/signal.c
++++ b/linux-user/alpha/signal.c
+@@ -18,7 +18,6 @@
+  */
+ #include "qemu/osdep.h"
+ #include "qemu.h"
+-#include "target_signal.h"
+ #include "signal-common.h"
+ #include "linux-user/trace.h"
+ 
+diff --git a/linux-user/alpha/target_cpu.h b/linux-user/alpha/target_cpu.h
+index ad124da7c0..ac4d255ae7 100644
+--- a/linux-user/alpha/target_cpu.h
++++ b/linux-user/alpha/target_cpu.h
+@@ -33,4 +33,8 @@ static inline void cpu_set_tls(CPUAlphaState *env, target_ulong newtls)
+     env->unique = newtls;
+ }
+ 
++static inline abi_ulong get_sp_from_cpustate(CPUAlphaState *state)
++{
++    return state->ir[IR_SP];
++}
+ #endif
+diff --git a/linux-user/alpha/target_signal.h b/linux-user/alpha/target_signal.h
+index 4e912e1cf9..e6f2f04911 100644
+--- a/linux-user/alpha/target_signal.h
++++ b/linux-user/alpha/target_signal.h
+@@ -1,8 +1,6 @@
+ #ifndef ALPHA_TARGET_SIGNAL_H
+ #define ALPHA_TARGET_SIGNAL_H
+ 
+-#include "cpu.h"
+-
+ /* this struct defines a stack used during syscall handling */
+ 
+ typedef struct target_sigaltstack {
+@@ -22,12 +20,6 @@ typedef struct target_sigaltstack {
+ #define TARGET_MINSIGSTKSZ	4096
+ #define TARGET_SIGSTKSZ		16384
+ 
+-static inline abi_ulong get_sp_from_cpustate(CPUAlphaState *state)
+-{
+-    return state->ir[IR_SP];
+-}
+-
+-
+ /* From <asm/gentrap.h>.  */
+ #define TARGET_GEN_INTOVF      -1      /* integer overflow */
+ #define TARGET_GEN_INTDIV      -2      /* integer division by zero */
+diff --git a/linux-user/arm/signal.c b/linux-user/arm/signal.c
+index 59b5b65ed1..b0e753801b 100644
+--- a/linux-user/arm/signal.c
++++ b/linux-user/arm/signal.c
+@@ -18,7 +18,6 @@
+  */
+ #include "qemu/osdep.h"
+ #include "qemu.h"
+-#include "target_signal.h"
+ #include "signal-common.h"
+ #include "linux-user/trace.h"
+ 
+diff --git a/linux-user/arm/target_cpu.h b/linux-user/arm/target_cpu.h
+index c3eb4b243d..8a3764919a 100644
+--- a/linux-user/arm/target_cpu.h
++++ b/linux-user/arm/target_cpu.h
+@@ -49,4 +49,8 @@ static inline target_ulong cpu_get_tls(CPUARMState *env)
+     }
+ }
+ 
++static inline abi_ulong get_sp_from_cpustate(CPUARMState *state)
++{
++   return state->regs[13];
++}
+ #endif
+diff --git a/linux-user/arm/target_signal.h b/linux-user/arm/target_signal.h
+index d6a03ec87d..f80eb0a215 100644
+--- a/linux-user/arm/target_signal.h
++++ b/linux-user/arm/target_signal.h
+@@ -1,8 +1,6 @@
+ #ifndef ARM_TARGET_SIGNAL_H
+ #define ARM_TARGET_SIGNAL_H
+ 
+-#include "cpu.h"
+-
+ /* this struct defines a stack used during syscall handling */
+ 
+ typedef struct target_sigaltstack {
+@@ -21,10 +19,5 @@ typedef struct target_sigaltstack {
+ #define TARGET_MINSIGSTKSZ	2048
+ #define TARGET_SIGSTKSZ		8192
+ 
+-static inline abi_ulong get_sp_from_cpustate(CPUARMState *state)
+-{
+-   return state->regs[13];
+-}
+-
+ #define TARGET_ARCH_HAS_SETUP_FRAME
+ #endif /* ARM_TARGET_SIGNAL_H */
+diff --git a/linux-user/cris/signal.c b/linux-user/cris/signal.c
+index 322d9db1a7..0b405247cf 100644
+--- a/linux-user/cris/signal.c
++++ b/linux-user/cris/signal.c
+@@ -18,7 +18,6 @@
+  */
+ #include "qemu/osdep.h"
+ #include "qemu.h"
+-#include "target_signal.h"
+ #include "signal-common.h"
+ #include "linux-user/trace.h"
+ 
+diff --git a/linux-user/cris/target_cpu.h b/linux-user/cris/target_cpu.h
+index c43aac62f9..2309343979 100644
+--- a/linux-user/cris/target_cpu.h
++++ b/linux-user/cris/target_cpu.h
+@@ -33,4 +33,8 @@ static inline void cpu_set_tls(CPUCRISState *env, target_ulong newtls)
+     env->pregs[PR_PID] = (env->pregs[PR_PID] & 0xff) | newtls;
+ }
+ 
++static inline abi_ulong get_sp_from_cpustate(CPUCRISState *state)
++{
++    return state->regs[14];
++}
+ #endif
+diff --git a/linux-user/cris/target_signal.h b/linux-user/cris/target_signal.h
+index 74ff2f3382..bf404a85fd 100644
+--- a/linux-user/cris/target_signal.h
++++ b/linux-user/cris/target_signal.h
+@@ -1,8 +1,6 @@
+ #ifndef CRIS_TARGET_SIGNAL_H
+ #define CRIS_TARGET_SIGNAL_H
+ 
+-#include "cpu.h"
+-
+ /* this struct defines a stack used during syscall handling */
+ 
+ typedef struct target_sigaltstack {
+@@ -21,10 +19,5 @@ typedef struct target_sigaltstack {
+ #define TARGET_MINSIGSTKSZ    2048
+ #define TARGET_SIGSTKSZ       8192
+ 
+-static inline abi_ulong get_sp_from_cpustate(CPUCRISState *state)
+-{
+-    return state->regs[14];
+-}
+-
+ #define TARGET_ARCH_HAS_SETUP_FRAME
+ #endif /* CRIS_TARGET_SIGNAL_H */
+diff --git a/linux-user/hppa/signal.c b/linux-user/hppa/signal.c
+index 6e7a295aee..b6927ee673 100644
+--- a/linux-user/hppa/signal.c
++++ b/linux-user/hppa/signal.c
+@@ -18,7 +18,6 @@
+  */
+ #include "qemu/osdep.h"
+ #include "qemu.h"
+-#include "target_signal.h"
+ #include "signal-common.h"
+ #include "linux-user/trace.h"
+ 
+diff --git a/linux-user/hppa/target_cpu.h b/linux-user/hppa/target_cpu.h
+index 7b78bbea80..1c539bdbd6 100644
+--- a/linux-user/hppa/target_cpu.h
++++ b/linux-user/hppa/target_cpu.h
+@@ -16,8 +16,8 @@
+  * You should have received a copy of the GNU Lesser General Public
+  * License along with this library; if not, see <http://www.gnu.org/licenses/>.
+  */
+-#ifndef ALPHA_TARGET_CPU_H
+-#define ALPHA_TARGET_CPU_H
++#ifndef HPPA_TARGET_CPU_H
++#define HPPA_TARGET_CPU_H
+ 
+ static inline void cpu_clone_regs(CPUHPPAState *env, target_ulong newsp)
+ {
+@@ -36,4 +36,8 @@ static inline void cpu_set_tls(CPUHPPAState *env, target_ulong newtls)
+     env->cr[27] = newtls;
+ }
+ 
++static inline abi_ulong get_sp_from_cpustate(CPUHPPAState *state)
++{
++    return state->gr[30];
++}
+ #endif
+diff --git a/linux-user/hppa/target_signal.h b/linux-user/hppa/target_signal.h
+index f28b4bf6e8..1beae6485a 100644
+--- a/linux-user/hppa/target_signal.h
++++ b/linux-user/hppa/target_signal.h
+@@ -1,8 +1,6 @@
+ #ifndef HPPA_TARGET_SIGNAL_H
+ #define HPPA_TARGET_SIGNAL_H
+ 
+-#include "cpu.h"
+-
+ /* this struct defines a stack used during syscall handling */
+ 
+ typedef struct target_sigaltstack {
+@@ -21,8 +19,4 @@ typedef struct target_sigaltstack {
+ #define TARGET_MINSIGSTKSZ	2048
+ #define TARGET_SIGSTKSZ		8192
+ 
+-static inline abi_ulong get_sp_from_cpustate(CPUHPPAState *state)
+-{
+-    return state->gr[30];
+-}
+ #endif /* HPPA_TARGET_SIGNAL_H */
+diff --git a/linux-user/i386/signal.c b/linux-user/i386/signal.c
+index e9a23a2dec..fecb4c99c3 100644
+--- a/linux-user/i386/signal.c
++++ b/linux-user/i386/signal.c
+@@ -18,7 +18,6 @@
+  */
+ #include "qemu/osdep.h"
+ #include "qemu.h"
+-#include "target_signal.h"
+ #include "signal-common.h"
+ #include "linux-user/trace.h"
+ 
+diff --git a/linux-user/i386/target_cpu.h b/linux-user/i386/target_cpu.h
+index 7fbcf9bb57..ece04d0966 100644
+--- a/linux-user/i386/target_cpu.h
++++ b/linux-user/i386/target_cpu.h
+@@ -45,4 +45,8 @@ static inline void cpu_set_tls(CPUX86State *env, target_ulong newtls)
+ }
+ #endif /* defined(TARGET_ABI32) */
+ 
++static inline abi_ulong get_sp_from_cpustate(CPUX86State *state)
++{
++    return state->regs[R_ESP];
++}
+ #endif /* I386_TARGET_CPU_H */
+diff --git a/linux-user/i386/target_signal.h b/linux-user/i386/target_signal.h
+index 6ad4089482..8a284f4b57 100644
+--- a/linux-user/i386/target_signal.h
++++ b/linux-user/i386/target_signal.h
+@@ -1,8 +1,6 @@
+ #ifndef I386_TARGET_SIGNAL_H
+ #define I386_TARGET_SIGNAL_H
+ 
+-#include "cpu.h"
+-
+ /* this struct defines a stack used during syscall handling */
+ 
+ typedef struct target_sigaltstack {
+@@ -21,10 +19,5 @@ typedef struct target_sigaltstack {
+ #define TARGET_MINSIGSTKSZ	2048
+ #define TARGET_SIGSTKSZ		8192
+ 
+-static inline abi_ulong get_sp_from_cpustate(CPUX86State *state)
+-{
+-    return state->regs[R_ESP];
+-}
+-
+ #define TARGET_ARCH_HAS_SETUP_FRAME
+ #endif /* I386_TARGET_SIGNAL_H */
+diff --git a/linux-user/m68k/signal.c b/linux-user/m68k/signal.c
+index 5dd8bb5f99..38bd77ec16 100644
+--- a/linux-user/m68k/signal.c
++++ b/linux-user/m68k/signal.c
+@@ -18,7 +18,6 @@
+  */
+ #include "qemu/osdep.h"
+ #include "qemu.h"
+-#include "target_signal.h"
+ #include "signal-common.h"
+ #include "linux-user/trace.h"
+ 
+diff --git a/linux-user/m68k/target_cpu.h b/linux-user/m68k/target_cpu.h
+index cc0bfc298e..611df065ca 100644
+--- a/linux-user/m68k/target_cpu.h
++++ b/linux-user/m68k/target_cpu.h
+@@ -37,4 +37,8 @@ static inline void cpu_set_tls(CPUM68KState *env, target_ulong newtls)
+     ts->tp_value = newtls;
+ }
+ 
++static inline abi_ulong get_sp_from_cpustate(CPUM68KState *state)
++{
++    return state->aregs[7];
++}
+ #endif
+diff --git a/linux-user/m68k/target_signal.h b/linux-user/m68k/target_signal.h
+index ff303f2b3c..0cf26b79e5 100644
+--- a/linux-user/m68k/target_signal.h
++++ b/linux-user/m68k/target_signal.h
+@@ -1,8 +1,6 @@
+ #ifndef M68K_TARGET_SIGNAL_H
+ #define M68K_TARGET_SIGNAL_H
+ 
+-#include "cpu.h"
+-
+ /* this struct defines a stack used during syscall handling */
+ 
+ typedef struct target_sigaltstack {
+@@ -21,10 +19,5 @@ typedef struct target_sigaltstack {
+ #define TARGET_MINSIGSTKSZ	2048
+ #define TARGET_SIGSTKSZ	8192
+ 
+-static inline abi_ulong get_sp_from_cpustate(CPUM68KState *state)
+-{
+-    return state->aregs[7];
+-}
+-
+ #define TARGET_ARCH_HAS_SETUP_FRAME
+ #endif /* M68K_TARGET_SIGNAL_H */
+diff --git a/linux-user/microblaze/signal.c b/linux-user/microblaze/signal.c
+index fada0f1495..712ee522b2 100644
+--- a/linux-user/microblaze/signal.c
++++ b/linux-user/microblaze/signal.c
+@@ -18,7 +18,6 @@
+  */
+ #include "qemu/osdep.h"
+ #include "qemu.h"
+-#include "target_signal.h"
+ #include "signal-common.h"
+ #include "linux-user/trace.h"
+ 
+diff --git a/linux-user/microblaze/target_cpu.h b/linux-user/microblaze/target_cpu.h
+index 7dd979f960..73e139938c 100644
+--- a/linux-user/microblaze/target_cpu.h
++++ b/linux-user/microblaze/target_cpu.h
+@@ -32,4 +32,8 @@ static inline void cpu_set_tls(CPUMBState *env, target_ulong newtls)
+     env->regs[21] = newtls;
+ }
+ 
++static inline abi_ulong get_sp_from_cpustate(CPUMBState *state)
++{
++    return state->regs[1];
++}
+ #endif
+diff --git a/linux-user/microblaze/target_signal.h b/linux-user/microblaze/target_signal.h
+index 9fe4048292..86adcc1fc9 100644
+--- a/linux-user/microblaze/target_signal.h
++++ b/linux-user/microblaze/target_signal.h
+@@ -1,8 +1,6 @@
+ #ifndef MICROBLAZE_TARGET_SIGNAL_H
+ #define MICROBLAZE_TARGET_SIGNAL_H
+ 
+-#include "cpu.h"
+-
+ /* this struct defines a stack used during syscall handling */
+ 
+ typedef struct target_sigaltstack {
+@@ -21,10 +19,5 @@ typedef struct target_sigaltstack {
+ #define TARGET_MINSIGSTKSZ    2048
+ #define TARGET_SIGSTKSZ       8192
+ 
+-static inline abi_ulong get_sp_from_cpustate(CPUMBState *state)
+-{
+-    return state->regs[1];
+-}
+-
+ #define TARGET_ARCH_HAS_SETUP_FRAME
+ #endif /* MICROBLAZE_TARGET_SIGNAL_H */
+diff --git a/linux-user/mips/signal.c b/linux-user/mips/signal.c
+index ed9849c7f6..6aa303ec9c 100644
+--- a/linux-user/mips/signal.c
++++ b/linux-user/mips/signal.c
+@@ -18,7 +18,6 @@
+  */
+ #include "qemu/osdep.h"
+ #include "qemu.h"
+-#include "target_signal.h"
+ #include "signal-common.h"
+ #include "linux-user/trace.h"
+ 
+diff --git a/linux-user/mips/target_cpu.h b/linux-user/mips/target_cpu.h
+index 2002920312..02cf5eeff7 100644
+--- a/linux-user/mips/target_cpu.h
++++ b/linux-user/mips/target_cpu.h
+@@ -33,4 +33,8 @@ static inline void cpu_set_tls(CPUMIPSState *env, target_ulong newtls)
+     env->active_tc.CP0_UserLocal = newtls;
+ }
+ 
++static inline abi_ulong get_sp_from_cpustate(CPUMIPSState *state)
++{
++    return state->active_tc.gpr[29];
++}
+ #endif
+diff --git a/linux-user/mips/target_signal.h b/linux-user/mips/target_signal.h
+index d36f5da0a0..5f68bd7634 100644
+--- a/linux-user/mips/target_signal.h
++++ b/linux-user/mips/target_signal.h
+@@ -1,8 +1,6 @@
+ #ifndef MIPS_TARGET_SIGNAL_H
+ #define MIPS_TARGET_SIGNAL_H
+ 
+-#include "cpu.h"
+-
+ /* this struct defines a stack used during syscall handling */
+ 
+ typedef struct target_sigaltstack {
+@@ -21,11 +19,6 @@ typedef struct target_sigaltstack {
+ #define TARGET_MINSIGSTKSZ    2048
+ #define TARGET_SIGSTKSZ       8192
+ 
+-static inline abi_ulong get_sp_from_cpustate(CPUMIPSState *state)
+-{
+-    return state->active_tc.gpr[29];
+-}
+-
+ #if defined(TARGET_ABI_MIPSO32)
+ /* compare linux/arch/mips/kernel/signal.c:setup_frame() */
+ #define TARGET_ARCH_HAS_SETUP_FRAME
+diff --git a/linux-user/mips64/target_signal.h b/linux-user/mips64/target_signal.h
+index c074e1592f..7fe6b2f517 100644
+--- a/linux-user/mips64/target_signal.h
++++ b/linux-user/mips64/target_signal.h
+@@ -1,8 +1,6 @@
+ #ifndef MIPS64_TARGET_SIGNAL_H
+ #define MIPS64_TARGET_SIGNAL_H
+ 
+-#include "cpu.h"
+-
+ /* this struct defines a stack used during syscall handling */
+ 
+ typedef struct target_sigaltstack {
+@@ -21,8 +19,4 @@ typedef struct target_sigaltstack {
+ #define TARGET_MINSIGSTKSZ    2048
+ #define TARGET_SIGSTKSZ       8192
+ 
+-static inline abi_ulong get_sp_from_cpustate(CPUMIPSState *state)
+-{
+-    return state->active_tc.gpr[29];
+-}
+ #endif /* MIPS64_TARGET_SIGNAL_H */
+diff --git a/linux-user/nios2/signal.c b/linux-user/nios2/signal.c
+index 9a0b36e5ad..4985dc2212 100644
+--- a/linux-user/nios2/signal.c
++++ b/linux-user/nios2/signal.c
+@@ -18,7 +18,6 @@
+  */
+ #include "qemu/osdep.h"
+ #include "qemu.h"
+-#include "target_signal.h"
+ #include "signal-common.h"
+ #include "linux-user/trace.h"
+ 
+diff --git a/linux-user/nios2/target_cpu.h b/linux-user/nios2/target_cpu.h
+index 20ab4790a9..14f63338fa 100644
+--- a/linux-user/nios2/target_cpu.h
++++ b/linux-user/nios2/target_cpu.h
+@@ -36,4 +36,8 @@ static inline void cpu_set_tls(CPUNios2State *env, target_ulong newtls)
+      */
+ }
+ 
++static inline abi_ulong get_sp_from_cpustate(CPUNios2State *state)
++{
++    return state->regs[R_SP];
++}
+ #endif
+diff --git a/linux-user/nios2/target_signal.h b/linux-user/nios2/target_signal.h
+index f4db4d6d62..1f09f1e6bb 100644
+--- a/linux-user/nios2/target_signal.h
++++ b/linux-user/nios2/target_signal.h
+@@ -1,8 +1,6 @@
+ #ifndef TARGET_SIGNAL_H
+ #define TARGET_SIGNAL_H
+ 
+-#include "cpu.h"
+-
+ /* this struct defines a stack used during syscall handling */
+ 
+ typedef struct target_sigaltstack {
+@@ -18,8 +16,4 @@ typedef struct target_sigaltstack {
+ #define TARGET_MINSIGSTKSZ    2048
+ #define TARGET_SIGSTKSZ       8192
+ 
+-static inline abi_ulong get_sp_from_cpustate(CPUNios2State *state)
+-{
+-    return state->regs[R_SP];
+-}
+ #endif /* TARGET_SIGNAL_H */
+diff --git a/linux-user/openrisc/signal.c b/linux-user/openrisc/signal.c
+index ecf2897ccd..8be0b74001 100644
+--- a/linux-user/openrisc/signal.c
++++ b/linux-user/openrisc/signal.c
+@@ -18,7 +18,6 @@
+  */
+ #include "qemu/osdep.h"
+ #include "qemu.h"
+-#include "target_signal.h"
+ #include "signal-common.h"
+ #include "linux-user/trace.h"
+ 
+diff --git a/linux-user/openrisc/target_cpu.h b/linux-user/openrisc/target_cpu.h
+index 606ad6f695..d1ea4506e2 100644
+--- a/linux-user/openrisc/target_cpu.h
++++ b/linux-user/openrisc/target_cpu.h
+@@ -33,4 +33,8 @@ static inline void cpu_set_tls(CPUOpenRISCState *env, target_ulong newtls)
+     cpu_set_gpr(env, 10, newtls);
+ }
+ 
++static inline abi_ulong get_sp_from_cpustate(CPUOpenRISCState *state)
++{
++    return cpu_get_gpr(state, 1);
++}
+ #endif
+diff --git a/linux-user/openrisc/target_signal.h b/linux-user/openrisc/target_signal.h
+index 2a4e00b035..590383302c 100644
+--- a/linux-user/openrisc/target_signal.h
++++ b/linux-user/openrisc/target_signal.h
+@@ -1,8 +1,6 @@
+ #ifndef OPENRISC_TARGET_SIGNAL_H
+ #define OPENRISC_TARGET_SIGNAL_H
+ 
+-#include "cpu.h"
+-
+ /* this struct defines a stack used during syscall handling */
+ 
+ typedef struct target_sigaltstack {
+@@ -18,8 +16,4 @@ typedef struct target_sigaltstack {
+ #define TARGET_MINSIGSTKSZ    2048
+ #define TARGET_SIGSTKSZ       8192
+ 
+-static inline abi_ulong get_sp_from_cpustate(CPUOpenRISCState *state)
+-{
+-    return cpu_get_gpr(state, 1);
+-}
+ #endif /* OPENRISC_TARGET_SIGNAL_H */
+diff --git a/linux-user/ppc/signal.c b/linux-user/ppc/signal.c
+index cacc9afb5a..ef4c518f11 100644
+--- a/linux-user/ppc/signal.c
++++ b/linux-user/ppc/signal.c
+@@ -18,7 +18,6 @@
+  */
+ #include "qemu/osdep.h"
+ #include "qemu.h"
+-#include "target_signal.h"
+ #include "signal-common.h"
+ #include "linux-user/trace.h"
+ 
+diff --git a/linux-user/ppc/target_cpu.h b/linux-user/ppc/target_cpu.h
+index 3aab3d185d..c4641834e7 100644
+--- a/linux-user/ppc/target_cpu.h
++++ b/linux-user/ppc/target_cpu.h
+@@ -47,5 +47,8 @@ static inline uint32_t get_ppc64_abi(struct image_info *infop)
+   return infop->elf_flags & EF_PPC64_ABI;
+ }
+ 
+-
++static inline abi_ulong get_sp_from_cpustate(CPUPPCState *state)
++{
++    return state->gpr[1];
++}
+ #endif
+diff --git a/linux-user/ppc/target_signal.h b/linux-user/ppc/target_signal.h
+index e3bf1d2856..6f9e67e321 100644
+--- a/linux-user/ppc/target_signal.h
++++ b/linux-user/ppc/target_signal.h
+@@ -1,8 +1,6 @@
+ #ifndef PPC_TARGET_SIGNAL_H
+ #define PPC_TARGET_SIGNAL_H
+ 
+-#include "cpu.h"
+-
+ /* this struct defines a stack used during syscall handling */
+ 
+ typedef struct target_sigaltstack {
+@@ -21,11 +19,6 @@ typedef struct target_sigaltstack {
+ #define TARGET_MINSIGSTKSZ    2048
+ #define TARGET_SIGSTKSZ       8192
+ 
+-static inline abi_ulong get_sp_from_cpustate(CPUPPCState *state)
+-{
+-    return state->gpr[1];
+-}
+-
+ #if !defined(TARGET_PPC64)
+ #define TARGET_ARCH_HAS_SETUP_FRAME
+ #endif
+diff --git a/linux-user/qemu.h b/linux-user/qemu.h
+index c55c8e294b..6fa1e968db 100644
+--- a/linux-user/qemu.h
++++ b/linux-user/qemu.h
+@@ -623,7 +623,6 @@ static inline void *lock_user_string(abi_ulong guest_addr)
+  * above, so include them last.
+  */
+ #include "target_cpu.h"
+-#include "target_signal.h"
+ #include "target_structs.h"
+ 
+ #endif /* QEMU_H */
+diff --git a/linux-user/riscv/signal.c b/linux-user/riscv/signal.c
+index ef599e319a..f598d41891 100644
+--- a/linux-user/riscv/signal.c
++++ b/linux-user/riscv/signal.c
+@@ -18,7 +18,6 @@
+  */
+ #include "qemu/osdep.h"
+ #include "qemu.h"
+-#include "target_signal.h"
+ #include "signal-common.h"
+ #include "linux-user/trace.h"
+ 
+diff --git a/linux-user/riscv/target_cpu.h b/linux-user/riscv/target_cpu.h
+index c5549b1120..7e090f376a 100644
+--- a/linux-user/riscv/target_cpu.h
++++ b/linux-user/riscv/target_cpu.h
+@@ -15,4 +15,8 @@ static inline void cpu_set_tls(CPURISCVState *env, target_ulong newtls)
+     env->gpr[xTP] = newtls;
+ }
+ 
++static inline abi_ulong get_sp_from_cpustate(CPURISCVState *state)
++{
++   return state->gpr[xSP];
++}
+ #endif
+diff --git a/linux-user/riscv/target_signal.h b/linux-user/riscv/target_signal.h
+index 9dac002c0d..c7fa357008 100644
+--- a/linux-user/riscv/target_signal.h
++++ b/linux-user/riscv/target_signal.h
+@@ -1,8 +1,6 @@
+ #ifndef TARGET_SIGNAL_H
+ #define TARGET_SIGNAL_H
+ 
+-#include "cpu.h"
+-
+ typedef struct target_sigaltstack {
+     abi_ulong ss_sp;
+     abi_int ss_flags;
+@@ -15,8 +13,4 @@ typedef struct target_sigaltstack {
+ #define TARGET_MINSIGSTKSZ 2048
+ #define TARGET_SIGSTKSZ 8192
+ 
+-static inline abi_ulong get_sp_from_cpustate(CPURISCVState *state)
+-{
+-   return state->gpr[xSP];
+-}
+ #endif /* TARGET_SIGNAL_H */
+diff --git a/linux-user/s390x/signal.c b/linux-user/s390x/signal.c
+index e35cbe6870..3d3cb67bbe 100644
+--- a/linux-user/s390x/signal.c
++++ b/linux-user/s390x/signal.c
+@@ -18,7 +18,6 @@
+  */
+ #include "qemu/osdep.h"
+ #include "qemu.h"
+-#include "target_signal.h"
+ #include "signal-common.h"
+ #include "linux-user/trace.h"
+ 
+diff --git a/linux-user/s390x/target_cpu.h b/linux-user/s390x/target_cpu.h
+index 87ea4d2d9b..66ef8aa8c2 100644
+--- a/linux-user/s390x/target_cpu.h
++++ b/linux-user/s390x/target_cpu.h
+@@ -36,4 +36,8 @@ static inline void cpu_set_tls(CPUS390XState *env, target_ulong newtls)
+     env->aregs[1] = newtls & 0xffffffffULL;
+ }
+ 
++static inline abi_ulong get_sp_from_cpustate(CPUS390XState *state)
++{
++   return state->regs[15];
++}
+ #endif
+diff --git a/linux-user/s390x/target_signal.h b/linux-user/s390x/target_signal.h
+index 4e99f8fadd..8f41ccf9b2 100644
+--- a/linux-user/s390x/target_signal.h
++++ b/linux-user/s390x/target_signal.h
+@@ -1,8 +1,6 @@
+ #ifndef S390X_TARGET_SIGNAL_H
+ #define S390X_TARGET_SIGNAL_H
+ 
+-#include "cpu.h"
+-
+ typedef struct target_sigaltstack {
+     abi_ulong ss_sp;
+     int ss_flags;
+@@ -18,10 +16,5 @@ typedef struct target_sigaltstack {
+ #define TARGET_MINSIGSTKSZ     2048
+ #define TARGET_SIGSTKSZ        8192
+ 
+-static inline abi_ulong get_sp_from_cpustate(CPUS390XState *state)
+-{
+-   return state->regs[15];
+-}
+-
+ #define TARGET_ARCH_HAS_SETUP_FRAME
+ #endif /* S390X_TARGET_SIGNAL_H */
+diff --git a/linux-user/sh4/signal.c b/linux-user/sh4/signal.c
+index 2a5378e16e..c6752baa7e 100644
+--- a/linux-user/sh4/signal.c
++++ b/linux-user/sh4/signal.c
+@@ -18,7 +18,6 @@
+  */
+ #include "qemu/osdep.h"
+ #include "qemu.h"
+-#include "target_signal.h"
+ #include "signal-common.h"
+ #include "linux-user/trace.h"
+ 
+diff --git a/linux-user/sh4/target_cpu.h b/linux-user/sh4/target_cpu.h
+index 9d305d2833..1a647ddb98 100644
+--- a/linux-user/sh4/target_cpu.h
++++ b/linux-user/sh4/target_cpu.h
+@@ -32,4 +32,8 @@ static inline void cpu_set_tls(CPUSH4State *env, target_ulong newtls)
+   env->gbr = newtls;
+ }
+ 
++static inline abi_ulong get_sp_from_cpustate(CPUSH4State *state)
++{
++    return state->gregs[15];
++}
+ #endif
+diff --git a/linux-user/sh4/target_signal.h b/linux-user/sh4/target_signal.h
+index e7b18a6db4..2bdc24c48e 100644
+--- a/linux-user/sh4/target_signal.h
++++ b/linux-user/sh4/target_signal.h
+@@ -1,8 +1,6 @@
+ #ifndef SH4_TARGET_SIGNAL_H
+ #define SH4_TARGET_SIGNAL_H
+ 
+-#include "cpu.h"
+-
+ /* this struct defines a stack used during syscall handling */
+ 
+ typedef struct target_sigaltstack {
+@@ -21,10 +19,5 @@ typedef struct target_sigaltstack {
+ #define TARGET_MINSIGSTKSZ    2048
+ #define TARGET_SIGSTKSZ       8192
+ 
+-static inline abi_ulong get_sp_from_cpustate(CPUSH4State *state)
+-{
+-    return state->gregs[15];
+-}
+-
+ #define TARGET_ARCH_HAS_SETUP_FRAME
+ #endif /* SH4_TARGET_SIGNAL_H */
+diff --git a/linux-user/signal.c b/linux-user/signal.c
+index 01de433e3a..be2815b45d 100644
+--- a/linux-user/signal.c
++++ b/linux-user/signal.c
+@@ -23,7 +23,6 @@
+ 
+ #include "qemu.h"
+ #include "qemu-common.h"
+-#include "target_signal.h"
+ #include "trace.h"
+ #include "signal-common.h"
+ 
+diff --git a/linux-user/sparc/signal.c b/linux-user/sparc/signal.c
+index 45e922f328..55e9d6f9b2 100644
+--- a/linux-user/sparc/signal.c
++++ b/linux-user/sparc/signal.c
+@@ -18,7 +18,6 @@
+  */
+ #include "qemu/osdep.h"
+ #include "qemu.h"
+-#include "target_signal.h"
+ #include "signal-common.h"
+ #include "linux-user/trace.h"
+ 
+diff --git a/linux-user/sparc/target_cpu.h b/linux-user/sparc/target_cpu.h
+index f2fe526204..1ffc0ae9f2 100644
+--- a/linux-user/sparc/target_cpu.h
++++ b/linux-user/sparc/target_cpu.h
+@@ -41,4 +41,15 @@ static inline void cpu_set_tls(CPUSPARCState *env, target_ulong newtls)
+     env->gregs[7] = newtls;
+ }
+ 
++#ifndef UREG_I6
++#define UREG_I6        6
++#endif
++#ifndef UREG_FP
++#define UREG_FP        UREG_I6
++#endif
 +
-+#ifndef AARCH64_TARGET_FCNTL_H
-+#define AARCH64_TARGET_FCNTL_H
-+#include "../generic/fcntl.h"
-+#endif
-diff --git a/linux-user/alpha/target_fcntl.h b/linux-user/alpha/target_fcntl.h
-new file mode 100644
-index 0000000000..bb603ff28c
---- /dev/null
-+++ b/linux-user/alpha/target_fcntl.h
-@@ -0,0 +1,11 @@
-+/*
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License version 2 as
-+ * published by the Free Software Foundation, or (at your option) any
-+ * later version. See the COPYING file in the top-level directory.
-+ */
-+
-+#ifndef ALPHA_TARGET_FCNTL_H
-+#define ALPHA_TARGET_FCNTL_H
-+#include "../generic/fcntl.h"
-+#endif
-diff --git a/linux-user/arm/target_fcntl.h b/linux-user/arm/target_fcntl.h
-new file mode 100644
-index 0000000000..ca819df519
---- /dev/null
-+++ b/linux-user/arm/target_fcntl.h
-@@ -0,0 +1,11 @@
-+/*
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License version 2 as
-+ * published by the Free Software Foundation, or (at your option) any
-+ * later version. See the COPYING file in the top-level directory.
-+ */
-+
-+#ifndef ARM_TARGET_FCNTL_H
-+#define ARM_TARGET_FCNTL_H
-+#include "../generic/fcntl.h"
-+#endif
-diff --git a/linux-user/cris/target_fcntl.h b/linux-user/cris/target_fcntl.h
-new file mode 100644
-index 0000000000..df0aceea34
---- /dev/null
-+++ b/linux-user/cris/target_fcntl.h
-@@ -0,0 +1,11 @@
-+/*
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License version 2 as
-+ * published by the Free Software Foundation, or (at your option) any
-+ * later version. See the COPYING file in the top-level directory.
-+ */
-+
-+#ifndef CRIS_TARGET_FCNTL_H
-+#define CRIS_TARGET_FCNTL_H
-+#include "../generic/fcntl.h"
-+#endif
-diff --git a/linux-user/generic/fcntl.h b/linux-user/generic/fcntl.h
-new file mode 100644
-index 0000000000..a775a491e9
---- /dev/null
-+++ b/linux-user/generic/fcntl.h
-@@ -0,0 +1,151 @@
-+/*
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License version 2 as
-+ * published by the Free Software Foundation, or (at your option) any
-+ * later version. See the COPYING file in the top-level directory.
-+ */
-+
-+#ifndef GENERIC_FCNTL_H
-+#define GENERIC_FCNTL_H
-+
-+/* <asm-generic/fcntl.h> values follow.  */
-+#define TARGET_O_ACCMODE          0003
-+#define TARGET_O_RDONLY             00
-+#define TARGET_O_WRONLY             01
-+#define TARGET_O_RDWR               02
-+#ifndef TARGET_O_CREAT
-+#define TARGET_O_CREAT            0100 /* not fcntl */
-+#endif
-+#ifndef TARGET_O_EXCL
-+#define TARGET_O_EXCL             0200 /* not fcntl */
-+#endif
-+#ifndef TARGET_O_NOCTTY
-+#define TARGET_O_NOCTTY           0400 /* not fcntl */
-+#endif
-+#ifndef TARGET_O_TRUNC
-+#define TARGET_O_TRUNC           01000 /* not fcntl */
-+#endif
-+#ifndef TARGET_O_APPEND
-+#define TARGET_O_APPEND          02000
-+#endif
-+#ifndef TARGET_O_NONBLOCK
-+#define TARGET_O_NONBLOCK        04000
-+#endif
-+#ifndef TARGET_O_DSYNC
-+#define TARGET_O_DSYNC          010000
-+#endif
-+#ifndef TARGET_FASYNC
-+#define TARGET_FASYNC           020000 /* fcntl, for BSD compatibility */
-+#endif
-+#ifndef TARGET_O_DIRECT
-+#define TARGET_O_DIRECT         040000 /* direct disk access hint */
-+#endif
-+#ifndef TARGET_O_LARGEFILE
-+#define TARGET_O_LARGEFILE     0100000
-+#endif
-+#ifndef TARGET_O_DIRECTORY
-+#define TARGET_O_DIRECTORY     0200000 /* must be a directory */
-+#endif
-+#ifndef TARGET_O_NOFOLLOW
-+#define TARGET_O_NOFOLLOW      0400000 /* don't follow links */
-+#endif
-+#ifndef TARGET_O_NOATIME
-+#define TARGET_O_NOATIME      01000000
-+#endif
-+#ifndef TARGET_O_CLOEXEC
-+#define TARGET_O_CLOEXEC      02000000
-+#endif
-+#ifndef TARGET___O_SYNC
-+#define TARGET___O_SYNC       04000000
-+#endif
-+#ifndef TARGET_O_PATH
-+#define TARGET_O_PATH        010000000
-+#endif
-+#ifndef TARGET___O_TMPFILE
-+#define TARGET___O_TMPFILE   020000000
-+#endif
-+#ifndef TARGET_O_TMPFILE
-+#define TARGET_O_TMPFILE     (TARGET___O_TMPFILE | TARGET_O_DIRECTORY)
-+#endif
-+#ifndef TARGET_O_NDELAY
-+#define TARGET_O_NDELAY  TARGET_O_NONBLOCK
-+#endif
-+#ifndef TARGET_O_SYNC
-+#define TARGET_O_SYNC    (TARGET___O_SYNC | TARGET_O_DSYNC)
-+#endif
-+
-+#define TARGET_F_DUPFD         0       /* dup */
-+#define TARGET_F_GETFD         1       /* get close_on_exec */
-+#define TARGET_F_SETFD         2       /* set/clear close_on_exec */
-+#define TARGET_F_GETFL         3       /* get file->f_flags */
-+#define TARGET_F_SETFL         4       /* set file->f_flags */
-+#ifndef TARGET_F_GETLK
-+#define TARGET_F_GETLK         5
-+#define TARGET_F_SETLK         6
-+#define TARGET_F_SETLKW        7
-+#endif
-+#ifndef TARGET_F_SETOWN
-+#define TARGET_F_SETOWN        8       /*  for sockets. */
-+#define TARGET_F_GETOWN        9       /*  for sockets. */
-+#endif
-+#ifndef TARGET_F_SETSIG
-+#define TARGET_F_SETSIG        10      /*  for sockets. */
-+#define TARGET_F_GETSIG        11      /*  for sockets. */
-+#endif
-+
-+#ifndef TARGET_F_GETLK64
-+#define TARGET_F_GETLK64       12      /*  using 'struct flock64' */
-+#define TARGET_F_SETLK64       13
-+#define TARGET_F_SETLKW64      14
-+#endif
-+
-+#ifndef TARGET_F_SETOWN_EX
-+#define TARGET_F_SETOWN_EX     15
-+#define TARGET_F_GETOWN_EX     16
-+#endif
-+
-+struct target_f_owner_ex {
-+        int type;       /* Owner type of ID.  */
-+        int pid;        /* ID of owner.  */
-+};
-+
-+#ifndef TARGET_F_RDLCK
-+#define TARGET_F_RDLCK         0
-+#define TARGET_F_WRLCK         1
-+#define TARGET_F_UNLCK         2
-+#endif
-+
-+#ifndef TARGET_F_EXLCK
-+#define TARGET_F_EXLCK         4
-+#define TARGET_F_SHLCK         8
-+#endif
-+
-+#ifndef TARGET_ARCH_FLOCK_PAD
-+#define TARGET_ARCH_FLOCK_PAD
-+#endif
-+
-+struct target_flock {
-+    short l_type;
-+    short l_whence;
-+    abi_long l_start;
-+    abi_long l_len;
-+#if defined(TARGET_MIPS)
-+    abi_long l_sysid;
-+#endif
-+    int l_pid;
-+    TARGET_ARCH_FLOCK_PAD
-+};
-+
-+#ifndef TARGET_ARCH_FLOCK64_PAD
-+#define TARGET_ARCH_FLOCK64_PAD
-+#endif
-+
-+struct target_flock64 {
-+    abi_short l_type;
-+    abi_short l_whence;
-+    abi_llong l_start;
-+    abi_llong l_len;
-+    abi_int   l_pid;
-+    TARGET_ARCH_FLOCK64_PAD
-+};
-+#endif
-diff --git a/linux-user/hppa/target_fcntl.h b/linux-user/hppa/target_fcntl.h
-new file mode 100644
-index 0000000000..aa282a5ce8
---- /dev/null
-+++ b/linux-user/hppa/target_fcntl.h
-@@ -0,0 +1,11 @@
-+/*
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License version 2 as
-+ * published by the Free Software Foundation, or (at your option) any
-+ * later version. See the COPYING file in the top-level directory.
-+ */
-+
-+#ifndef HPPA_TARGET_FCNTL_H
-+#define HPPA_TARGET_FCNTL_H
-+#include "../generic/fcntl.h"
-+#endif
-diff --git a/linux-user/i386/target_fcntl.h b/linux-user/i386/target_fcntl.h
-new file mode 100644
-index 0000000000..4819743dae
---- /dev/null
-+++ b/linux-user/i386/target_fcntl.h
-@@ -0,0 +1,11 @@
-+/*
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License version 2 as
-+ * published by the Free Software Foundation, or (at your option) any
-+ * later version. See the COPYING file in the top-level directory.
-+ */
-+
-+#ifndef I386_TARGET_FCNTL_H
-+#define I386_TARGET_FCNTL_H
-+#include "../generic/fcntl.h"
-+#endif
-diff --git a/linux-user/m68k/target_fcntl.h b/linux-user/m68k/target_fcntl.h
-new file mode 100644
-index 0000000000..4328c60d22
---- /dev/null
-+++ b/linux-user/m68k/target_fcntl.h
-@@ -0,0 +1,11 @@
-+/*
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License version 2 as
-+ * published by the Free Software Foundation, or (at your option) any
-+ * later version. See the COPYING file in the top-level directory.
-+ */
-+
-+#ifndef M68K_TARGET_FCNTL_H
-+#define M68K_TARGET_FCNTL_H
-+#include "../generic/fcntl.h"
-+#endif
-diff --git a/linux-user/microblaze/target_fcntl.h b/linux-user/microblaze/target_fcntl.h
-new file mode 100644
-index 0000000000..45402275ff
---- /dev/null
-+++ b/linux-user/microblaze/target_fcntl.h
-@@ -0,0 +1,11 @@
-+/*
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License version 2 as
-+ * published by the Free Software Foundation, or (at your option) any
-+ * later version. See the COPYING file in the top-level directory.
-+ */
-+
-+#ifndef MICROBLAZE_TARGET_FCNTL_H
-+#define MICROBLAZE_TARGET_FCNTL_H
-+#include "../generic/fcntl.h"
-+#endif
-diff --git a/linux-user/mips/target_fcntl.h b/linux-user/mips/target_fcntl.h
-new file mode 100644
-index 0000000000..5404245068
---- /dev/null
-+++ b/linux-user/mips/target_fcntl.h
-@@ -0,0 +1,11 @@
-+/*
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License version 2 as
-+ * published by the Free Software Foundation, or (at your option) any
-+ * later version. See the COPYING file in the top-level directory.
-+ */
-+
-+#ifndef MIPS_TARGET_FCNTL_H
-+#define MIPS_TARGET_FCNTL_H
-+#include "../generic/fcntl.h"
-+#endif
-diff --git a/linux-user/mips64/target_fcntl.h b/linux-user/mips64/target_fcntl.h
-new file mode 100644
-index 0000000000..a511bc0e6c
---- /dev/null
-+++ b/linux-user/mips64/target_fcntl.h
-@@ -0,0 +1 @@
-+#include "../mips/target_fcntl.h"
-diff --git a/linux-user/nios2/target_fcntl.h b/linux-user/nios2/target_fcntl.h
-new file mode 100644
-index 0000000000..714583215d
---- /dev/null
-+++ b/linux-user/nios2/target_fcntl.h
-@@ -0,0 +1,11 @@
-+/*
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License version 2 as
-+ * published by the Free Software Foundation, or (at your option) any
-+ * later version. See the COPYING file in the top-level directory.
-+ */
-+
-+#ifndef NIOS2_TARGET_FCNTL_H
-+#define NIOS2_TARGET_FCNTL_H
-+#include "../generic/fcntl.h"
-+#endif
-diff --git a/linux-user/openrisc/target_fcntl.h b/linux-user/openrisc/target_fcntl.h
-new file mode 100644
-index 0000000000..ea31bf8b70
---- /dev/null
-+++ b/linux-user/openrisc/target_fcntl.h
-@@ -0,0 +1,11 @@
-+/*
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License version 2 as
-+ * published by the Free Software Foundation, or (at your option) any
-+ * later version. See the COPYING file in the top-level directory.
-+ */
-+
-+#ifndef OPENRISC_TARGET_FCNTL_H
-+#define OPENRISC_TARGET_FCNTL_H
-+#include "../generic/fcntl.h"
-+#endif
-diff --git a/linux-user/ppc/target_fcntl.h b/linux-user/ppc/target_fcntl.h
-new file mode 100644
-index 0000000000..627d547289
---- /dev/null
-+++ b/linux-user/ppc/target_fcntl.h
-@@ -0,0 +1,11 @@
-+/*
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License version 2 as
-+ * published by the Free Software Foundation, or (at your option) any
-+ * later version. See the COPYING file in the top-level directory.
-+ */
-+
-+#ifndef PPC_TARGET_FCNTL_H
-+#define PPC_TARGET_FCNTL_H
-+#include "../generic/fcntl.h"
-+#endif
-diff --git a/linux-user/riscv/target_fcntl.h b/linux-user/riscv/target_fcntl.h
-new file mode 100644
-index 0000000000..9c3d0fbe2b
---- /dev/null
-+++ b/linux-user/riscv/target_fcntl.h
-@@ -0,0 +1,11 @@
-+/*
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License version 2 as
-+ * published by the Free Software Foundation, or (at your option) any
-+ * later version. See the COPYING file in the top-level directory.
-+ */
-+
-+#ifndef RISCV_TARGET_FCNTL_H
-+#define RISCV_TARGET_FCNTL_H
-+#include "../generic/fcntl.h"
-+#endif
-diff --git a/linux-user/s390x/target_fcntl.h b/linux-user/s390x/target_fcntl.h
-new file mode 100644
-index 0000000000..36dc50fba0
---- /dev/null
-+++ b/linux-user/s390x/target_fcntl.h
-@@ -0,0 +1,11 @@
-+/*
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License version 2 as
-+ * published by the Free Software Foundation, or (at your option) any
-+ * later version. See the COPYING file in the top-level directory.
-+ */
-+
-+#ifndef S390X_TARGET_FCNTL_H
-+#define S390X_TARGET_FCNTL_H
-+#include "../generic/fcntl.h"
-+#endif
-diff --git a/linux-user/sh4/target_fcntl.h b/linux-user/sh4/target_fcntl.h
-new file mode 100644
-index 0000000000..2622d95539
---- /dev/null
-+++ b/linux-user/sh4/target_fcntl.h
-@@ -0,0 +1,11 @@
-+/*
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License version 2 as
-+ * published by the Free Software Foundation, or (at your option) any
-+ * later version. See the COPYING file in the top-level directory.
-+ */
-+
-+#ifndef SH4_TARGET_FCNTL_H
-+#define SH4_TARGET_FCNTL_H
-+#include "../generic/fcntl.h"
-+#endif
-diff --git a/linux-user/sparc/target_fcntl.h b/linux-user/sparc/target_fcntl.h
-new file mode 100644
-index 0000000000..35a753153b
---- /dev/null
-+++ b/linux-user/sparc/target_fcntl.h
-@@ -0,0 +1,11 @@
-+/*
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License version 2 as
-+ * published by the Free Software Foundation, or (at your option) any
-+ * later version. See the COPYING file in the top-level directory.
-+ */
-+
-+#ifndef SPARC_TARGET_FCNTL_H
-+#define SPARC_TARGET_FCNTL_H
-+#include "../generic/fcntl.h"
-+#endif
-diff --git a/linux-user/sparc64/target_fcntl.h b/linux-user/sparc64/target_fcntl.h
-new file mode 100644
-index 0000000000..053c774257
---- /dev/null
-+++ b/linux-user/sparc64/target_fcntl.h
-@@ -0,0 +1 @@
-+#include "../sparc/target_fcntl.h"
++static inline abi_ulong get_sp_from_cpustate(CPUSPARCState *state)
++{
++    return state->regwptr[UREG_FP];
++}
+ #endif
+diff --git a/linux-user/sparc/target_signal.h b/linux-user/sparc/target_signal.h
+index 467abea49e..bfa19bbb67 100644
+--- a/linux-user/sparc/target_signal.h
++++ b/linux-user/sparc/target_signal.h
+@@ -1,8 +1,6 @@
+ #ifndef SPARC_TARGET_SIGNAL_H
+ #define SPARC_TARGET_SIGNAL_H
+ 
+-#include "cpu.h"
+-
+ /* this struct defines a stack used during syscall handling */
+ 
+ typedef struct target_sigaltstack {
+@@ -21,17 +19,5 @@ typedef struct target_sigaltstack {
+ #define TARGET_MINSIGSTKSZ	4096
+ #define TARGET_SIGSTKSZ		16384
+ 
+-#ifndef UREG_I6
+-#define UREG_I6        6
+-#endif
+-#ifndef UREG_FP
+-#define UREG_FP        UREG_I6
+-#endif
+-
+-static inline abi_ulong get_sp_from_cpustate(CPUSPARCState *state)
+-{
+-    return state->regwptr[UREG_FP];
+-}
+-
+ #define TARGET_ARCH_HAS_SETUP_FRAME
+ #endif /* SPARC_TARGET_SIGNAL_H */
+diff --git a/linux-user/sparc64/target_signal.h b/linux-user/sparc64/target_signal.h
+index 14b01d9632..1d804bfe86 100644
+--- a/linux-user/sparc64/target_signal.h
++++ b/linux-user/sparc64/target_signal.h
+@@ -1,8 +1,6 @@
+ #ifndef SPARC64_TARGET_SIGNAL_H
+ #define SPARC64_TARGET_SIGNAL_H
+ 
+-#include "cpu.h"
+-
+ /* this struct defines a stack used during syscall handling */
+ 
+ typedef struct target_sigaltstack {
+@@ -21,17 +19,5 @@ typedef struct target_sigaltstack {
+ #define TARGET_MINSIGSTKSZ	4096
+ #define TARGET_SIGSTKSZ		16384
+ 
+-#ifndef UREG_I6
+-#define UREG_I6        6
+-#endif
+-#ifndef UREG_FP
+-#define UREG_FP        UREG_I6
+-#endif
+-
+-static inline abi_ulong get_sp_from_cpustate(CPUSPARCState *state)
+-{
+-    return state->regwptr[UREG_FP];
+-}
+-
+ #define TARGET_ARCH_HAS_SETUP_FRAME
+ #endif /* SPARC64_TARGET_SIGNAL_H */
 diff --git a/linux-user/syscall_defs.h b/linux-user/syscall_defs.h
-index e4cd87cc00..9969f21ba1 100644
+index fbf1bf995a..85e0d870d8 100644
 --- a/linux-user/syscall_defs.h
 +++ b/linux-user/syscall_defs.h
-@@ -2407,13 +2407,6 @@ struct target_statfs64 {
- };
+@@ -482,6 +482,8 @@ int do_sigaction(int sig, const struct target_sigaction *act,
+ #define TARGET_SA_RESTORER	0x04000000
  #endif
  
--
--#define TARGET_F_DUPFD         0       /* dup */
--#define TARGET_F_GETFD         1       /* get close_on_exec */
--#define TARGET_F_SETFD         2       /* set/clear close_on_exec */
--#define TARGET_F_GETFL         3       /* get file->f_flags */
--#define TARGET_F_SETFL         4       /* set file->f_flags */
--
- #if defined(TARGET_ALPHA)
- #define TARGET_F_GETLK         7
- #define TARGET_F_SETLK         8
-@@ -2450,34 +2443,11 @@ struct target_statfs64 {
- #define TARGET_F_GETLK         7
- #define TARGET_F_SETLK         8
- #define TARGET_F_SETLKW        9
--#else
--#define TARGET_F_GETLK         5
--#define TARGET_F_SETLK         6
--#define TARGET_F_SETLKW        7
--#define TARGET_F_SETOWN        8       /*  for sockets. */
--#define TARGET_F_GETOWN        9       /*  for sockets. */
- #endif
--#define TARGET_F_SETOWN_EX     15
--#define TARGET_F_GETOWN_EX     16
--
--#ifndef TARGET_F_RDLCK
--#define TARGET_F_RDLCK         0
--#define TARGET_F_WRLCK         1
--#define TARGET_F_UNLCK         2
--#endif
--
--#ifndef TARGET_F_EXLCK
--#define TARGET_F_EXLCK         4
--#define TARGET_F_SHLCK         8
--#endif
--
- 
- #if defined(TARGET_HPPA)
- #define TARGET_F_SETSIG        13      /*  for sockets. */
- #define TARGET_F_GETSIG        14      /*  for sockets. */
--#else
--#define TARGET_F_SETSIG        10      /*  for sockets. */
--#define TARGET_F_GETSIG        11      /*  for sockets. */
- #endif
- 
- #if defined(TARGET_MIPS)
-@@ -2488,10 +2458,6 @@ struct target_statfs64 {
- #define TARGET_F_GETLK64       8       /*  using 'struct flock64' */
- #define TARGET_F_SETLK64       9
- #define TARGET_F_SETLKW64      10
--#else
--#define TARGET_F_GETLK64       12      /*  using 'struct flock64' */
--#define TARGET_F_SETLK64       13
--#define TARGET_F_SETLKW64      14
- #endif
- 
- #define TARGET_F_LINUX_SPECIFIC_BASE 1024
-@@ -2577,108 +2543,15 @@ struct target_statfs64 {
- #define TARGET___O_TMPFILE   0x2000000
- #endif
- 
--/* <asm-generic/fcntl.h> values follow.  */
--#define TARGET_O_ACCMODE          0003
--#define TARGET_O_RDONLY             00
--#define TARGET_O_WRONLY             01
--#define TARGET_O_RDWR               02
--#ifndef TARGET_O_CREAT
--#define TARGET_O_CREAT            0100 /* not fcntl */
--#endif
--#ifndef TARGET_O_EXCL
--#define TARGET_O_EXCL             0200 /* not fcntl */
--#endif
--#ifndef TARGET_O_NOCTTY
--#define TARGET_O_NOCTTY           0400 /* not fcntl */
--#endif
--#ifndef TARGET_O_TRUNC
--#define TARGET_O_TRUNC           01000 /* not fcntl */
--#endif
--#ifndef TARGET_O_APPEND
--#define TARGET_O_APPEND          02000
--#endif
--#ifndef TARGET_O_NONBLOCK
--#define TARGET_O_NONBLOCK        04000
--#endif
--#ifndef TARGET_O_DSYNC
--#define TARGET_O_DSYNC          010000
--#endif
--#ifndef TARGET_FASYNC
--#define TARGET_FASYNC           020000 /* fcntl, for BSD compatibility */
--#endif
--#ifndef TARGET_O_DIRECT
--#define TARGET_O_DIRECT         040000 /* direct disk access hint */
--#endif
--#ifndef TARGET_O_LARGEFILE
--#define TARGET_O_LARGEFILE     0100000
--#endif
--#ifndef TARGET_O_DIRECTORY
--#define TARGET_O_DIRECTORY     0200000 /* must be a directory */
--#endif
--#ifndef TARGET_O_NOFOLLOW
--#define TARGET_O_NOFOLLOW      0400000 /* don't follow links */
--#endif
--#ifndef TARGET_O_NOATIME
--#define TARGET_O_NOATIME      01000000
--#endif
--#ifndef TARGET_O_CLOEXEC
--#define TARGET_O_CLOEXEC      02000000
--#endif
--#ifndef TARGET___O_SYNC
--#define TARGET___O_SYNC       04000000
--#endif
--#ifndef TARGET_O_PATH
--#define TARGET_O_PATH        010000000
--#endif
--#ifndef TARGET___O_TMPFILE
--#define TARGET___O_TMPFILE   020000000
--#endif
--#ifndef TARGET_O_TMPFILE
--#define TARGET_O_TMPFILE     (TARGET___O_TMPFILE | TARGET_O_DIRECTORY)
--#endif
--#ifndef TARGET_O_NDELAY
--#define TARGET_O_NDELAY  TARGET_O_NONBLOCK
--#endif
--#ifndef TARGET_O_SYNC
--#define TARGET_O_SYNC    (TARGET___O_SYNC | TARGET_O_DSYNC)
--#endif
--
- #if defined(TARGET_SPARC)
- #define TARGET_ARCH_FLOCK_PAD abi_short __unused;
- #define TARGET_ARCH_FLOCK64_PAD abi_short __unused;
- #elif defined(TARGET_MIPS)
- #define TARGET_ARCH_FLOCK_PAD abi_long pad[4];
- #define TARGET_ARCH_FLOCK64_PAD
--#else
--#define TARGET_ARCH_FLOCK_PAD
--#define TARGET_ARCH_FLOCK64_PAD
--#endif
--
--struct target_flock {
--    short l_type;
--    short l_whence;
--    abi_long l_start;
--    abi_long l_len;
--#if defined(TARGET_MIPS)
--    abi_long l_sysid;
- #endif
--    int l_pid;
--    TARGET_ARCH_FLOCK_PAD
--};
- 
--struct target_flock64 {
--    abi_short l_type;
--    abi_short l_whence;
--    abi_llong l_start;
--    abi_llong l_len;
--    abi_int   l_pid;
--    TARGET_ARCH_FLOCK64_PAD
--};
--
--struct target_f_owner_ex {
--        int type;	/* Owner type of ID.  */
--        int pid;	/* ID of owner.  */
--};
-+#include "target_fcntl.h"
- 
- /* soundcard defines */
- /* XXX: convert them all to arch independent entries */
-diff --git a/linux-user/tilegx/target_fcntl.h b/linux-user/tilegx/target_fcntl.h
-new file mode 100644
-index 0000000000..5ed7438459
---- /dev/null
-+++ b/linux-user/tilegx/target_fcntl.h
-@@ -0,0 +1,11 @@
-+/*
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License version 2 as
-+ * published by the Free Software Foundation, or (at your option) any
-+ * later version. See the COPYING file in the top-level directory.
-+ */
++#include "target_signal.h"
 +
-+#ifndef TILEGX_TARGET_FCNTL_H
-+#define TILEGX_TARGET_FCNTL_H
-+#include "../generic/fcntl.h"
-+#endif
-diff --git a/linux-user/x86_64/target_fcntl.h b/linux-user/x86_64/target_fcntl.h
-new file mode 100644
-index 0000000000..3c7238e56b
---- /dev/null
-+++ b/linux-user/x86_64/target_fcntl.h
-@@ -0,0 +1,11 @@
-+/*
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License version 2 as
-+ * published by the Free Software Foundation, or (at your option) any
-+ * later version. See the COPYING file in the top-level directory.
-+ */
-+
-+#ifndef X86_64_TARGET_FCNTL_H
-+#define X86_64_TARGET_FCNTL_H
-+#include "../generic/fcntl.h"
-+#endif
-diff --git a/linux-user/xtensa/target_fcntl.h b/linux-user/xtensa/target_fcntl.h
-new file mode 100644
-index 0000000000..dc1ca7eaa5
---- /dev/null
-+++ b/linux-user/xtensa/target_fcntl.h
-@@ -0,0 +1,11 @@
-+/*
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License version 2 as
-+ * published by the Free Software Foundation, or (at your option) any
-+ * later version. See the COPYING file in the top-level directory.
-+ */
-+
-+#ifndef XTENSA_TARGET_FCNTL_H
-+#define XTENSA_TARGET_FCNTL_H
-+#include "../generic/fcntl.h"
-+#endif
+ #ifdef TARGET_SA_RESTORER
+ #define TARGET_ARCH_HAS_SA_RESTORER 1
+ #endif
+diff --git a/linux-user/tilegx/signal.c b/linux-user/tilegx/signal.c
+index d0ed3de569..c5a1c7161d 100644
+--- a/linux-user/tilegx/signal.c
++++ b/linux-user/tilegx/signal.c
+@@ -18,7 +18,6 @@
+  */
+ #include "qemu/osdep.h"
+ #include "qemu.h"
+-#include "target_signal.h"
+ #include "signal-common.h"
+ #include "linux-user/trace.h"
+ 
+diff --git a/linux-user/tilegx/target_cpu.h b/linux-user/tilegx/target_cpu.h
+index 4878e01b03..d1aa5824f2 100644
+--- a/linux-user/tilegx/target_cpu.h
++++ b/linux-user/tilegx/target_cpu.h
+@@ -32,4 +32,8 @@ static inline void cpu_set_tls(CPUTLGState *env, target_ulong newtls)
+     env->regs[TILEGX_R_TP] = newtls;
+ }
+ 
++static inline abi_ulong get_sp_from_cpustate(CPUTLGState *state)
++{
++    return state->regs[TILEGX_R_SP];
++}
+ #endif
+diff --git a/linux-user/tilegx/target_signal.h b/linux-user/tilegx/target_signal.h
+index a74fa37aac..4cb8c56adf 100644
+--- a/linux-user/tilegx/target_signal.h
++++ b/linux-user/tilegx/target_signal.h
+@@ -1,8 +1,6 @@
+ #ifndef TILEGX_TARGET_SIGNAL_H
+ #define TILEGX_TARGET_SIGNAL_H
+ 
+-#include "cpu.h"
+-
+ /* this struct defines a stack used during syscall handling */
+ 
+ typedef struct target_sigaltstack {
+@@ -20,8 +18,4 @@ typedef struct target_sigaltstack {
+ #define TARGET_MINSIGSTKSZ    2048
+ #define TARGET_SIGSTKSZ       8192
+ 
+-static inline abi_ulong get_sp_from_cpustate(CPUTLGState *state)
+-{
+-    return state->regs[TILEGX_R_SP];
+-}
+ #endif /* TILEGX_TARGET_SIGNAL_H */
+diff --git a/linux-user/x86_64/target_signal.h b/linux-user/x86_64/target_signal.h
+index 6b01b5acb7..be054d1e59 100644
+--- a/linux-user/x86_64/target_signal.h
++++ b/linux-user/x86_64/target_signal.h
+@@ -1,8 +1,6 @@
+ #ifndef X86_64_TARGET_SIGNAL_H
+ #define X86_64_TARGET_SIGNAL_H
+ 
+-#include "cpu.h"
+-
+ /* this struct defines a stack used during syscall handling */
+ 
+ typedef struct target_sigaltstack {
+@@ -21,8 +19,4 @@ typedef struct target_sigaltstack {
+ #define TARGET_MINSIGSTKSZ	2048
+ #define TARGET_SIGSTKSZ		8192
+ 
+-static inline abi_ulong get_sp_from_cpustate(CPUX86State *state)
+-{
+-    return state->regs[R_ESP];
+-}
+ #endif /* X86_64_TARGET_SIGNAL_H */
+diff --git a/linux-user/xtensa/signal.c b/linux-user/xtensa/signal.c
+index 3e483efc61..8d54ef3ae3 100644
+--- a/linux-user/xtensa/signal.c
++++ b/linux-user/xtensa/signal.c
+@@ -18,7 +18,6 @@
+  */
+ #include "qemu/osdep.h"
+ #include "qemu.h"
+-#include "target_signal.h"
+ #include "signal-common.h"
+ #include "linux-user/trace.h"
+ 
+diff --git a/linux-user/xtensa/target_cpu.h b/linux-user/xtensa/target_cpu.h
+index 747d828614..e31efe3ea0 100644
+--- a/linux-user/xtensa/target_cpu.h
++++ b/linux-user/xtensa/target_cpu.h
+@@ -19,4 +19,8 @@ static inline void cpu_set_tls(CPUXtensaState *env, target_ulong newtls)
+     env->uregs[THREADPTR] = newtls;
+ }
+ 
++static inline abi_ulong get_sp_from_cpustate(CPUXtensaState *state)
++{
++    return state->regs[1];
++}
+ #endif
+diff --git a/linux-user/xtensa/target_signal.h b/linux-user/xtensa/target_signal.h
+index 4376b2e538..de03c0a564 100644
+--- a/linux-user/xtensa/target_signal.h
++++ b/linux-user/xtensa/target_signal.h
+@@ -1,8 +1,6 @@
+ #ifndef XTENSA_TARGET_SIGNAL_H
+ #define XTENSA_TARGET_SIGNAL_H
+ 
+-#include "cpu.h"
+-
+ /* this struct defines a stack used during syscall handling */
+ 
+ typedef struct target_sigaltstack {
+@@ -20,8 +18,4 @@ typedef struct target_sigaltstack {
+ #define TARGET_MINSIGSTKSZ    2048
+ #define TARGET_SIGSTKSZ       8192
+ 
+-static inline abi_ulong get_sp_from_cpustate(CPUXtensaState *state)
+-{
+-    return state->regs[1];
+-}
+ #endif
 -- 
 2.14.3
