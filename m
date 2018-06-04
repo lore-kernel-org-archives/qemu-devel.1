@@ -1,34 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55385)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55495)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fPonS-00061S-4n
-	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 08:41:15 -0400
+	(envelope-from <bounces@canonical.com>) id 1fPooA-0006Nv-AK
+	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 08:41:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fPonO-0007uR-5t
-	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 08:41:14 -0400
-Received: from indium.canonical.com ([91.189.90.7]:40502)
+	(envelope-from <bounces@canonical.com>) id 1fPoo6-0000aU-A1
+	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 08:41:58 -0400
+Received: from indium.canonical.com ([91.189.90.7]:43066)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1fPonN-0007tC-UG
-	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 08:41:10 -0400
+	id 1fPoo6-0000Z2-2U
+	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 08:41:54 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1fPonM-0000d6-B4
-	for <qemu-devel@nongnu.org>; Mon, 04 Jun 2018 12:41:08 +0000
+	id 1fPoo3-0001Fl-QV
+	for <qemu-devel@nongnu.org>; Mon, 04 Jun 2018 12:41:52 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 1C8C02E88E0
-	for <qemu-devel@nongnu.org>; Mon,  4 Jun 2018 12:41:08 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id 04F942E88D7
+	for <qemu-devel@nongnu.org>; Mon,  4 Jun 2018 12:41:51 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Mon, 04 Jun 2018 12:32:43 -0000
-From: Thomas Huth <1772086@bugs.launchpad.net>
-Reply-To: Bug 1772086 <1772086@bugs.launchpad.net>
+Date: Mon, 04 Jun 2018 12:33:52 -0000
+From: Thomas Huth <1715296@bugs.launchpad.net>
+Reply-To: Bug 1715296 <1715296@bugs.launchpad.net>
 Sender: bounces@canonical.com
-References: <152666797097.2555.6897470014572103765.malonedeb@gac.canonical.com>
-Message-Id: <152811556357.32292.1570344045880002426.malone@soybean.canonical.com>
+References: <150467634266.16715.896859689385742459.malonedeb@gac.canonical.com>
+Message-Id: <152811563304.4365.14027718153181840588.malone@chaenomeles.canonical.com>
 Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1772086] Re: malformed serial data being sent
- from guest
+Subject: [Qemu-devel] [Bug 1715296] Re: qemu: invalid serial port
+ configuration
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -49,18 +49,35 @@ https://git.qemu.org/?p=3Dqemu.git;a=3Dcommitdiff;h=3D12fb0ac0575df83cec72ec
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1772086
+https://bugs.launchpad.net/bugs/1715296
 
 Title:
-  malformed serial data being sent from guest
+  qemu: invalid serial port configuration
 
 Status in QEMU:
   Fix Committed
 
 Bug description:
-  When sending data through serial from guest each time 0x0A byte is
-  sent 0x0D is sent before it. For example, when sending {0x29, 0x0A} on
-  the other end I receive {0x29, 0x0D, 0x0A}.
+  The tty_serial_init() function sets the port c_oflags as follows:
+  tty.c_oflag |=3D OPOST not clearing ONLCR, ONLRET and others.
+  The result is that the postprocess output is enabled and host translates =
+0xa (LF) to 0xd 0xa (CR LF) which breaks the binary transmissions on serial=
+ port even if you set the port to raw mode (no matters if on host and/or gu=
+est).
+  The issue has been reported 11 years ago on qemu-devel mailing list:
+  https://lists.nongnu.org/archive/html/qemu-devel/2006-06/msg00196.html
+  There was also a FreeBSD patch including the fix:
+  https://lists.freebsd.org/pipermail/freebsd-ports/2006-October/036390.html
+
+  I think the correct port configuration is:
+  tty.c_iflag &=3D ~(IGNBRK|BRKINT|PARMRK|ISTRIP|INLCR|IGNCR|ICRNL|IXON|IMA=
+XBEL);
+  tty.c_oflag &=3D ~OPOST;
+
+  In such case the host will perform no output processing and will pass the=
+ data as is.
+  And the guest will be able to configure input/output processing exactly a=
+s it wants.
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1772086/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/1715296/+subscriptions
