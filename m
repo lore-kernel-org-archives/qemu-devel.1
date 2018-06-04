@@ -1,28 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33237)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33787)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fPpI2-0002YO-Sm
-	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 09:12:57 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1fPpKk-0003T1-VM
+	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 09:15:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fPpHy-00053E-3h
-	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 09:12:50 -0400
-Received: from mail-ot0-x241.google.com ([2607:f8b0:4003:c0f::241]:40685)
+	(envelope-from <peter.maydell@linaro.org>) id 1fPpKk-00070H-2s
+	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 09:15:38 -0400
+Received: from mail-ot0-x243.google.com ([2607:f8b0:4003:c0f::243]:34979)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fPpHx-00052w-So
-	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 09:12:46 -0400
-Received: by mail-ot0-x241.google.com with SMTP id n1-v6so37523840otf.7
-	for <qemu-devel@nongnu.org>; Mon, 04 Jun 2018 06:12:45 -0700 (PDT)
+	id 1fPpKj-000707-Tx
+	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 09:15:38 -0400
+Received: by mail-ot0-x243.google.com with SMTP id q17-v6so26980070otg.2
+	for <qemu-devel@nongnu.org>; Mon, 04 Jun 2018 06:15:37 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20180529105011.1914-17-edgar.iglesias@gmail.com>
+In-Reply-To: <20180529105011.1914-28-edgar.iglesias@gmail.com>
 References: <20180529105011.1914-1-edgar.iglesias@gmail.com>
-	<20180529105011.1914-17-edgar.iglesias@gmail.com>
+	<20180529105011.1914-28-edgar.iglesias@gmail.com>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 4 Jun 2018 14:12:24 +0100
-Message-ID: <CAFEAcA9s=okgW15DoAb5_NFbaDgvqsC+beqpc1gJG=FqeKvG=w@mail.gmail.com>
+Date: Mon, 4 Jun 2018 14:15:17 +0100
+Message-ID: <CAFEAcA9PQV8toYAFxHUA7cwre64FGPVuTwCiUPROocKyMU2NWA@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PULL v1 16/38] target-microblaze: Break out
- trap_illegal()
+Subject: Re: [Qemu-devel] [PULL v1 27/38] target-microblaze: mmu: Add a
+ configurable output address mask
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,41 +33,49 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
 Cc: QEMU Developers <qemu-devel@nongnu.org>, Edgar Iglesias <edgar.iglesias@xilinx.com>
 
-On 29 May 2018 at 11:49, Edgar E. Iglesias <edgar.iglesias@gmail.com> wrote=
-:
+On 29 May 2018 at 11:50, Edgar E. Iglesias <edgar.iglesias@gmail.com> wrote:
 > From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
 >
-> Break out trap_illegal() to handle illegal operation traps.
-> We now generally stop translation of the current insn if
-> it's not valid.
+> Add a configurable output address mask, used to mimic the
+> configurable physical address bit width.
 >
+> Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 > Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 > Signed-off-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
-
-> @@ -1552,13 +1537,7 @@ static inline void decode(DisasContext *dc, uint32=
-_t ir)
->      if (dc->ir)
->          dc->nr_nops =3D 0;
->      else {
-> -        if ((dc->tb_flags & MSR_EE_FLAG)
-> -              && (dc->cpu->env.pvr.regs[2] & PVR2_ILL_OPCODE_EXC_MASK)
-> -              && (dc->cpu->env.pvr.regs[2] & PVR2_OPCODE_0x0_ILL_MASK)) =
-{
-> -            tcg_gen_movi_i32(cpu_SR[SR_ESR], ESR_EC_ILLEGAL_OP);
-> -            t_gen_raise_exception(dc, EXCP_HW_EXCP);
-> -            return;
-> -        }
-> +        trap_illegal(dc, dc->cpu->env.pvr.regs[2] & PVR2_OPCODE_0x0_ILL_=
-MASK);
+> ---
+>  target/microblaze/cpu.c | 1 +
+>  target/microblaze/mmu.c | 1 +
+>  target/microblaze/mmu.h | 1 +
+>  3 files changed, 3 insertions(+)
 >
->          LOG_DIS("nr_nops=3D%d\t", dc->nr_nops);
->          dc->nr_nops++;
+> diff --git a/target/microblaze/cpu.c b/target/microblaze/cpu.c
+> index 6ee15ac800..71fc8d09fe 100644
+> --- a/target/microblaze/cpu.c
+> +++ b/target/microblaze/cpu.c
+> @@ -128,6 +128,7 @@ static void mb_cpu_reset(CPUState *s)
+>      env->mmu.c_mmu = 3;
+>      env->mmu.c_mmu_tlb_access = 3;
+>      env->mmu.c_mmu_zones = 16;
+> +    env->mmu.c_addr_mask = MAKE_64BIT_MASK(0, cpu->cfg.addr_size);
+>  #endif
+>  }
+>
+> diff --git a/target/microblaze/mmu.c b/target/microblaze/mmu.c
+> index a379968618..166c79908c 100644
+> --- a/target/microblaze/mmu.c
+> +++ b/target/microblaze/mmu.c
+> @@ -164,6 +164,7 @@ unsigned int mmu_translate(struct microblaze_mmu *mmu,
+>              tlb_rpn = d & TLB_RPN_MASK;
+>
+>              lu->vaddr = tlb_tag;
+> +            lu->paddr = tlb_rpn & mmu->c_addr_mask;
+>              lu->paddr = tlb_rpn;
+>              lu->size = tlb_size;
+>              lu->err = ERR_HIT;
 
-Here we used to return early in the "illegal insn" case, but in
-the new code we don't. Coverity warns about this (CID 1391443)
-because the trap_illegal() function's return code is checked
-in the other 9 places where it is called.
+Coverity points out (CID 1391441) that the line added here
+has no effect, because we immediately overwrite lu->paddr in
+the following line. What was the intention here ?
 
 thanks
 -- PMM
