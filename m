@@ -1,19 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41735)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43746)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1fPrQk-0002FK-6N
-	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 11:29:59 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fPrY4-00007R-8T
+	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 11:37:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1fPrQj-0002ax-2T
-	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 11:29:58 -0400
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon,  4 Jun 2018 16:29:41 +0100
-Message-Id: <20180604152941.20374-14-peter.maydell@linaro.org>
-In-Reply-To: <20180604152941.20374-1-peter.maydell@linaro.org>
-References: <20180604152941.20374-1-peter.maydell@linaro.org>
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fPrY1-00065m-Lw
+	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 11:37:32 -0400
+Received: from mail-qt0-x244.google.com ([2607:f8b0:400d:c0d::244]:38086)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fPrY1-00065c-DY
+	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 11:37:29 -0400
+Received: by mail-qt0-x244.google.com with SMTP id x34-v6so27648227qtk.5
+	for <qemu-devel@nongnu.org>; Mon, 04 Jun 2018 08:37:29 -0700 (PDT)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Date: Mon,  4 Jun 2018 12:37:20 -0300
+Message-Id: <20180604153722.24956-1-f4bug@amsat.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v2 13/13] hw/arm/mps2-tz.c: Instantiate MPCs
+Subject: [Qemu-devel] [PATCH RESEND v2 0/2] linux-user: fix bugs reported by
+ Clang Static Analyzer
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,138 +32,24 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-arm@nongnu.org, qemu-devel@nongnu.org
-Cc: patches@linaro.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Richard Henderson <rth@twiddle.net>, Paolo Bonzini <pbonzini@redhat.com>, Peter Xu <peterx@redhat.com>, Eric Auger <eric.auger@redhat.com>
+To: Laurent Vivier <laurent@vivier.eu>
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, Riku Voipio <riku.voipio@iki.fi>
 
-Instantiate and wire up the Memory Protection Controllers
-in the MPS2 board itself.
+This is a resend of v1 resend ... not sure what happened previously, MTA sent:
 
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
----
- hw/arm/mps2-tz.c | 71 ++++++++++++++++++++++++++++++------------------
- 1 file changed, 44 insertions(+), 27 deletions(-)
+  550 8-bit characters not allowed in subject (see RFC 2822, sections 3.6.5, 2.2.1)
 
-diff --git a/hw/arm/mps2-tz.c b/hw/arm/mps2-tz.c
-index 8dc8bfd4ab2..a58b5dea79f 100644
---- a/hw/arm/mps2-tz.c
-+++ b/hw/arm/mps2-tz.c
-@@ -44,6 +44,7 @@
- #include "hw/timer/cmsdk-apb-timer.h"
- #include "hw/misc/mps2-scc.h"
- #include "hw/misc/mps2-fpgaio.h"
-+#include "hw/misc/tz-mpc.h"
- #include "hw/arm/iotkit.h"
- #include "hw/devices.h"
- #include "net/net.h"
-@@ -64,13 +65,12 @@ typedef struct {
- 
-     IoTKit iotkit;
-     MemoryRegion psram;
--    MemoryRegion ssram1;
-+    MemoryRegion ssram[3];
-     MemoryRegion ssram1_m;
--    MemoryRegion ssram23;
-     MPS2SCC scc;
-     MPS2FPGAIO fpgaio;
-     TZPPC ppc[5];
--    UnimplementedDeviceState ssram_mpc[3];
-+    TZMPC ssram_mpc[3];
-     UnimplementedDeviceState spi[5];
-     UnimplementedDeviceState i2c[4];
-     UnimplementedDeviceState i2s_audio;
-@@ -95,16 +95,6 @@ typedef struct {
- /* Main SYSCLK frequency in Hz */
- #define SYSCLK_FRQ 20000000
- 
--/* Initialize the auxiliary RAM region @mr and map it into
-- * the memory map at @base.
-- */
--static void make_ram(MemoryRegion *mr, const char *name,
--                     hwaddr base, hwaddr size)
--{
--    memory_region_init_ram(mr, NULL, name, size, &error_fatal);
--    memory_region_add_subregion(get_system_memory(), base, mr);
--}
--
- /* Create an alias of an entire original MemoryRegion @orig
-  * located at @base in the memory map.
-  */
-@@ -224,6 +214,44 @@ static MemoryRegion *make_fpgaio(MPS2TZMachineState *mms, void *opaque,
-     return sysbus_mmio_get_region(SYS_BUS_DEVICE(fpgaio), 0);
- }
- 
-+static MemoryRegion *make_mpc(MPS2TZMachineState *mms, void *opaque,
-+                              const char *name, hwaddr size)
-+{
-+    TZMPC *mpc = opaque;
-+    int i = mpc - &mms->ssram_mpc[0];
-+    MemoryRegion *ssram = &mms->ssram[i];
-+    MemoryRegion *upstream;
-+    char *mpcname = g_strdup_printf("%s-mpc", name);
-+    static uint32_t ramsize[] = { 0x00400000, 0x00200000, 0x00200000 };
-+    static uint32_t rambase[] = { 0x00000000, 0x28000000, 0x28200000 };
-+
-+    memory_region_init_ram(ssram, NULL, name, ramsize[i], &error_fatal);
-+
-+    init_sysbus_child(OBJECT(mms), mpcname, mpc,
-+                      sizeof(mms->ssram_mpc[0]), TYPE_TZ_MPC);
-+    object_property_set_link(OBJECT(mpc), OBJECT(ssram),
-+                             "downstream", &error_fatal);
-+    object_property_set_bool(OBJECT(mpc), true, "realized", &error_fatal);
-+    /* Map the upstream end of the MPC into system memory */
-+    upstream = sysbus_mmio_get_region(SYS_BUS_DEVICE(mpc), 1);
-+    memory_region_add_subregion(get_system_memory(), rambase[i], upstream);
-+    /* and connect its interrupt to the IoTKit */
-+    qdev_connect_gpio_out_named(DEVICE(mpc), "irq", 0,
-+                                qdev_get_gpio_in_named(DEVICE(&mms->iotkit),
-+                                                       "mpcexp_status", i));
-+
-+    /* The first SSRAM is a special case as it has an alias; accesses to
-+     * the alias region at 0x00400000 must also go to the MPC upstream.
-+     */
-+    if (i == 0) {
-+        make_ram_alias(&mms->ssram1_m, "mps.ssram1_m", upstream, 0x00400000);
-+    }
-+
-+    g_free(mpcname);
-+    /* Return the register interface MR for our caller to map behind the PPC */
-+    return sysbus_mmio_get_region(SYS_BUS_DEVICE(mpc), 0);
-+}
-+
- static void mps2tz_common_init(MachineState *machine)
- {
-     MPS2TZMachineState *mms = MPS2TZ_MACHINE(machine);
-@@ -285,14 +313,6 @@ static void mps2tz_common_init(MachineState *machine)
-                                          NULL, "mps.ram", 0x01000000);
-     memory_region_add_subregion(system_memory, 0x80000000, &mms->psram);
- 
--    /* The SSRAM memories should all be behind Memory Protection Controllers,
--     * but we don't implement that yet.
--     */
--    make_ram(&mms->ssram1, "mps.ssram1", 0x00000000, 0x00400000);
--    make_ram_alias(&mms->ssram1_m, "mps.ssram1_m", &mms->ssram1, 0x00400000);
--
--    make_ram(&mms->ssram23, "mps.ssram23", 0x28000000, 0x00400000);
--
-     /* The overflow IRQs for all UARTs are ORed together.
-      * Tx, Rx and "combined" IRQs are sent to the NVIC separately.
-      * Create the OR gate for this.
-@@ -322,12 +342,9 @@ static void mps2tz_common_init(MachineState *machine)
-     const PPCInfo ppcs[] = { {
-             .name = "apb_ppcexp0",
-             .ports = {
--                { "ssram-mpc0", make_unimp_dev, &mms->ssram_mpc[0],
--                  0x58007000, 0x1000 },
--                { "ssram-mpc1", make_unimp_dev, &mms->ssram_mpc[1],
--                  0x58008000, 0x1000 },
--                { "ssram-mpc2", make_unimp_dev, &mms->ssram_mpc[2],
--                  0x58009000, 0x1000 },
-+                { "ssram-0", make_mpc, &mms->ssram_mpc[0], 0x58007000, 0x1000 },
-+                { "ssram-1", make_mpc, &mms->ssram_mpc[1], 0x58008000, 0x1000 },
-+                { "ssram-2", make_mpc, &mms->ssram_mpc[2], 0x58009000, 0x1000 },
-             },
-         }, {
-             .name = "apb_ppcexp1",
+v1 here:
+  http://lists.nongnu.org/archive/html/qemu-devel/2017-07/msg07453.html
+
+Philippe Mathieu-Daudé (2):
+  linux-user: Export use is_error(), use it to avoid warnings
+  linux-user: Use is_error() to avoid warnings and make the code clearer
+
+ linux-user/qemu.h     |  5 +++++
+ linux-user/flatload.c | 15 +++++++++------
+ linux-user/syscall.c  |  5 -----
+ 3 files changed, 14 insertions(+), 11 deletions(-)
+
 -- 
 2.17.1
