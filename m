@@ -1,16 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36624)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36654)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1fPnXi-0007sX-VS
-	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 07:20:58 -0400
+	(envelope-from <stefanha@redhat.com>) id 1fPnXo-0007ue-89
+	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 07:21:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1fPnXh-0001RO-LB
-	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 07:20:54 -0400
+	(envelope-from <stefanha@redhat.com>) id 1fPnXm-0001SY-N6
+	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 07:21:00 -0400
 From: Stefan Hajnoczi <stefanha@redhat.com>
-Date: Mon,  4 Jun 2018 12:20:29 +0100
-Message-Id: <20180604112036.2715-5-stefanha@redhat.com>
+Date: Mon,  4 Jun 2018 12:20:30 +0100
+Message-Id: <20180604112036.2715-6-stefanha@redhat.com>
 In-Reply-To: <20180604112036.2715-1-stefanha@redhat.com>
 References: <20180604112036.2715-1-stefanha@redhat.com>
-Subject: [Qemu-devel] [PULL 04/11] qcow2: Implement copy offloading
+Subject: [Qemu-devel] [PULL 05/11] file-posix: Implement bdrv_co_copy_range
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,286 +24,246 @@ Cc: Ronnie Sahlberg <ronniesahlberg@gmail.com>, Peter Maydell <peter.maydell@lin
 
 From: Fam Zheng <famz@redhat.com>
 
-The two callbacks are implemented quite similarly to the read/write
-functions: bdrv_co_copy_range_from maps for read and calls into bs->file
-or bs->backing depending on the allocation status; bdrv_co_copy_range_to
-maps for write and calls into bs->file.
+With copy_file_range(2), we can implement the bdrv_co_copy_range
+semantics.
 
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 Signed-off-by: Fam Zheng <famz@redhat.com>
-Message-id: 20180601092648.24614-5-famz@redhat.com
+Message-id: 20180601092648.24614-6-famz@redhat.com
 Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
 ---
- block/qcow2.c | 229 +++++++++++++++++++++++++++++++++++++++++++-------
- 1 file changed, 199 insertions(+), 30 deletions(-)
+ configure               | 17 +++++++
+ include/block/raw-aio.h | 10 ++++-
+ block/file-posix.c      | 98 +++++++++++++++++++++++++++++++++++++++--
+ 3 files changed, 120 insertions(+), 5 deletions(-)
 
-diff --git a/block/qcow2.c b/block/qcow2.c
-index a007dc4246..79e5ed7fbb 100644
---- a/block/qcow2.c
-+++ b/block/qcow2.c
-@@ -1761,6 +1761,39 @@ static int coroutine_fn qcow2_co_block_status(BlockDriverState *bs,
-     return status;
+diff --git a/configure b/configure
+index be6edc7b81..8c6ea9ba7f 100755
+--- a/configure
++++ b/configure
+@@ -5183,6 +5183,20 @@ if test "$fortify_source" != "no"; then
+   fi
+ fi
+ 
++###############################################
++# Check if copy_file_range is provided by glibc
++have_copy_file_range=no
++cat > $TMPC << EOF
++#include <unistd.h>
++int main(void) {
++  copy_file_range(0, NULL, 0, NULL, 0, 0);
++  return 0;
++}
++EOF
++if compile_prog "" "" ; then
++    have_copy_file_range=yes
++fi
++
+ ##########################################
+ # check if struct fsxattr is available via linux/fs.h
+ 
+@@ -6286,6 +6300,9 @@ fi
+ if test "$have_fsxattr" = "yes" ; then
+     echo "HAVE_FSXATTR=y" >> $config_host_mak
+ fi
++if test "$have_copy_file_range" = "yes" ; then
++    echo "HAVE_COPY_FILE_RANGE=y" >> $config_host_mak
++fi
+ if test "$vte" = "yes" ; then
+   echo "CONFIG_VTE=y" >> $config_host_mak
+   echo "VTE_CFLAGS=$vte_cflags" >> $config_host_mak
+diff --git a/include/block/raw-aio.h b/include/block/raw-aio.h
+index 9e47b8a629..0e717fd475 100644
+--- a/include/block/raw-aio.h
++++ b/include/block/raw-aio.h
+@@ -25,9 +25,15 @@
+ #define QEMU_AIO_FLUSH        0x0008
+ #define QEMU_AIO_DISCARD      0x0010
+ #define QEMU_AIO_WRITE_ZEROES 0x0020
++#define QEMU_AIO_COPY_RANGE   0x0040
+ #define QEMU_AIO_TYPE_MASK \
+-        (QEMU_AIO_READ|QEMU_AIO_WRITE|QEMU_AIO_IOCTL|QEMU_AIO_FLUSH| \
+-         QEMU_AIO_DISCARD|QEMU_AIO_WRITE_ZEROES)
++        (QEMU_AIO_READ | \
++         QEMU_AIO_WRITE | \
++         QEMU_AIO_IOCTL | \
++         QEMU_AIO_FLUSH | \
++         QEMU_AIO_DISCARD | \
++         QEMU_AIO_WRITE_ZEROES | \
++         QEMU_AIO_COPY_RANGE)
+ 
+ /* AIO flags */
+ #define QEMU_AIO_MISALIGNED   0x1000
+diff --git a/block/file-posix.c b/block/file-posix.c
+index 5a602cfe37..513d371bb1 100644
+--- a/block/file-posix.c
++++ b/block/file-posix.c
+@@ -59,6 +59,7 @@
+ #ifdef __linux__
+ #include <sys/ioctl.h>
+ #include <sys/param.h>
++#include <sys/syscall.h>
+ #include <linux/cdrom.h>
+ #include <linux/fd.h>
+ #include <linux/fs.h>
+@@ -187,6 +188,8 @@ typedef struct RawPosixAIOData {
+ #define aio_ioctl_cmd   aio_nbytes /* for QEMU_AIO_IOCTL */
+     off_t aio_offset;
+     int aio_type;
++    int aio_fd2;
++    off_t aio_offset2;
+ } RawPosixAIOData;
+ 
+ #if defined(__FreeBSD__) || defined(__FreeBSD_kernel__)
+@@ -1446,6 +1449,49 @@ static ssize_t handle_aiocb_write_zeroes(RawPosixAIOData *aiocb)
+     return -ENOTSUP;
  }
  
-+static coroutine_fn int qcow2_handle_l2meta(BlockDriverState *bs,
-+                                            QCowL2Meta **pl2meta,
-+                                            bool link_l2)
++#ifndef HAVE_COPY_FILE_RANGE
++static off_t copy_file_range(int in_fd, off_t *in_off, int out_fd,
++                             off_t *out_off, size_t len, unsigned int flags)
 +{
-+    int ret = 0;
-+    QCowL2Meta *l2meta = *pl2meta;
++#ifdef __NR_copy_file_range
++    return syscall(__NR_copy_file_range, in_fd, in_off, out_fd,
++                   out_off, len, flags);
++#else
++    errno = ENOSYS;
++    return -1;
++#endif
++}
++#endif
 +
-+    while (l2meta != NULL) {
-+        QCowL2Meta *next;
++static ssize_t handle_aiocb_copy_range(RawPosixAIOData *aiocb)
++{
++    uint64_t bytes = aiocb->aio_nbytes;
++    off_t in_off = aiocb->aio_offset;
++    off_t out_off = aiocb->aio_offset2;
 +
-+        if (!ret && link_l2) {
-+            ret = qcow2_alloc_cluster_link_l2(bs, l2meta);
-+            if (ret) {
-+                goto out;
++    while (bytes) {
++        ssize_t ret = copy_file_range(aiocb->aio_fildes, &in_off,
++                                      aiocb->aio_fd2, &out_off,
++                                      bytes, 0);
++        if (ret == -EINTR) {
++            continue;
++        }
++        if (ret < 0) {
++            if (errno == ENOSYS) {
++                return -ENOTSUP;
++            } else {
++                return -errno;
 +            }
 +        }
-+
-+        /* Take the request off the list of running requests */
-+        if (l2meta->nb_clusters != 0) {
-+            QLIST_REMOVE(l2meta, next_in_flight);
++        if (!ret) {
++            /* No progress (e.g. when beyond EOF), fall back to buffer I/O. */
++            return -ENOTSUP;
 +        }
-+
-+        qemu_co_queue_restart_all(&l2meta->dependent_requests);
-+
-+        next = l2meta->next;
-+        g_free(l2meta);
-+        l2meta = next;
++        bytes -= ret;
 +    }
-+out:
-+    *pl2meta = l2meta;
-+    return ret;
++    return 0;
 +}
 +
- static coroutine_fn int qcow2_co_preadv(BlockDriverState *bs, uint64_t offset,
-                                         uint64_t bytes, QEMUIOVector *qiov,
-                                         int flags)
-@@ -2047,24 +2080,9 @@ static coroutine_fn int qcow2_co_pwritev(BlockDriverState *bs, uint64_t offset,
-             }
-         }
- 
--        while (l2meta != NULL) {
--            QCowL2Meta *next;
--
--            ret = qcow2_alloc_cluster_link_l2(bs, l2meta);
--            if (ret < 0) {
--                goto fail;
--            }
--
--            /* Take the request off the list of running requests */
--            if (l2meta->nb_clusters != 0) {
--                QLIST_REMOVE(l2meta, next_in_flight);
--            }
--
--            qemu_co_queue_restart_all(&l2meta->dependent_requests);
--
--            next = l2meta->next;
--            g_free(l2meta);
--            l2meta = next;
-+        ret = qcow2_handle_l2meta(bs, &l2meta, true);
-+        if (ret) {
-+            goto fail;
-         }
- 
-         bytes -= cur_bytes;
-@@ -2075,18 +2093,7 @@ static coroutine_fn int qcow2_co_pwritev(BlockDriverState *bs, uint64_t offset,
-     ret = 0;
- 
- fail:
--    while (l2meta != NULL) {
--        QCowL2Meta *next;
--
--        if (l2meta->nb_clusters != 0) {
--            QLIST_REMOVE(l2meta, next_in_flight);
--        }
--        qemu_co_queue_restart_all(&l2meta->dependent_requests);
--
--        next = l2meta->next;
--        g_free(l2meta);
--        l2meta = next;
--    }
-+    qcow2_handle_l2meta(bs, &l2meta, false);
- 
-     qemu_co_mutex_unlock(&s->lock);
- 
-@@ -3273,6 +3280,166 @@ static coroutine_fn int qcow2_co_pdiscard(BlockDriverState *bs,
+ static ssize_t handle_aiocb_discard(RawPosixAIOData *aiocb)
+ {
+     int ret = -EOPNOTSUPP;
+@@ -1526,6 +1572,9 @@ static int aio_worker(void *arg)
+     case QEMU_AIO_WRITE_ZEROES:
+         ret = handle_aiocb_write_zeroes(aiocb);
+         break;
++    case QEMU_AIO_COPY_RANGE:
++        ret = handle_aiocb_copy_range(aiocb);
++        break;
+     default:
+         fprintf(stderr, "invalid aio request (0x%x)\n", aiocb->aio_type);
+         ret = -EINVAL;
+@@ -1536,9 +1585,10 @@ static int aio_worker(void *arg)
      return ret;
  }
  
-+static int coroutine_fn
-+qcow2_co_copy_range_from(BlockDriverState *bs,
-+                         BdrvChild *src, uint64_t src_offset,
-+                         BdrvChild *dst, uint64_t dst_offset,
-+                         uint64_t bytes, BdrvRequestFlags flags)
-+{
-+    BDRVQcow2State *s = bs->opaque;
-+    int ret;
-+    unsigned int cur_bytes; /* number of bytes in current iteration */
-+    BdrvChild *child = NULL;
-+    BdrvRequestFlags cur_flags;
-+
-+    assert(!bs->encrypted);
-+    qemu_co_mutex_lock(&s->lock);
-+
-+    while (bytes != 0) {
-+        uint64_t copy_offset = 0;
-+        /* prepare next request */
-+        cur_bytes = MIN(bytes, INT_MAX);
-+        cur_flags = flags;
-+
-+        ret = qcow2_get_cluster_offset(bs, src_offset, &cur_bytes, &copy_offset);
-+        if (ret < 0) {
-+            goto out;
-+        }
-+
-+        switch (ret) {
-+        case QCOW2_CLUSTER_UNALLOCATED:
-+            if (bs->backing && bs->backing->bs) {
-+                int64_t backing_length = bdrv_getlength(bs->backing->bs);
-+                if (src_offset >= backing_length) {
-+                    cur_flags |= BDRV_REQ_ZERO_WRITE;
-+                } else {
-+                    child = bs->backing;
-+                    cur_bytes = MIN(cur_bytes, backing_length - src_offset);
-+                    copy_offset = src_offset;
-+                }
-+            } else {
-+                cur_flags |= BDRV_REQ_ZERO_WRITE;
-+            }
-+            break;
-+
-+        case QCOW2_CLUSTER_ZERO_PLAIN:
-+        case QCOW2_CLUSTER_ZERO_ALLOC:
-+            cur_flags |= BDRV_REQ_ZERO_WRITE;
-+            break;
-+
-+        case QCOW2_CLUSTER_COMPRESSED:
-+            ret = -ENOTSUP;
-+            goto out;
-+            break;
-+
-+        case QCOW2_CLUSTER_NORMAL:
-+            child = bs->file;
-+            copy_offset += offset_into_cluster(s, src_offset);
-+            if ((copy_offset & 511) != 0) {
-+                ret = -EIO;
-+                goto out;
-+            }
-+            break;
-+
-+        default:
-+            abort();
-+        }
-+        qemu_co_mutex_unlock(&s->lock);
-+        ret = bdrv_co_copy_range_from(child,
-+                                      copy_offset,
-+                                      dst, dst_offset,
-+                                      cur_bytes, cur_flags);
-+        qemu_co_mutex_lock(&s->lock);
-+        if (ret < 0) {
-+            goto out;
-+        }
-+
-+        bytes -= cur_bytes;
-+        src_offset += cur_bytes;
-+        dst_offset += cur_bytes;
-+    }
-+    ret = 0;
-+
-+out:
-+    qemu_co_mutex_unlock(&s->lock);
-+    return ret;
-+}
-+
-+static int coroutine_fn
-+qcow2_co_copy_range_to(BlockDriverState *bs,
-+                       BdrvChild *src, uint64_t src_offset,
-+                       BdrvChild *dst, uint64_t dst_offset,
-+                       uint64_t bytes, BdrvRequestFlags flags)
-+{
-+    BDRVQcow2State *s = bs->opaque;
-+    int offset_in_cluster;
-+    int ret;
-+    unsigned int cur_bytes; /* number of sectors in current iteration */
-+    uint64_t cluster_offset;
-+    uint8_t *cluster_data = NULL;
-+    QCowL2Meta *l2meta = NULL;
-+
-+    assert(!bs->encrypted);
-+    s->cluster_cache_offset = -1; /* disable compressed cache */
-+
-+    qemu_co_mutex_lock(&s->lock);
-+
-+    while (bytes != 0) {
-+
-+        l2meta = NULL;
-+
-+        offset_in_cluster = offset_into_cluster(s, dst_offset);
-+        cur_bytes = MIN(bytes, INT_MAX);
-+
-+        /* TODO:
-+         * If src->bs == dst->bs, we could simply copy by incrementing
-+         * the refcnt, without copying user data.
-+         * Or if src->bs == dst->bs->backing->bs, we could copy by discarding. */
-+        ret = qcow2_alloc_cluster_offset(bs, dst_offset, &cur_bytes,
-+                                         &cluster_offset, &l2meta);
-+        if (ret < 0) {
-+            goto fail;
-+        }
-+
-+        assert((cluster_offset & 511) == 0);
-+
-+        ret = qcow2_pre_write_overlap_check(bs, 0,
-+                cluster_offset + offset_in_cluster, cur_bytes);
-+        if (ret < 0) {
-+            goto fail;
-+        }
-+
-+        qemu_co_mutex_unlock(&s->lock);
-+        ret = bdrv_co_copy_range_to(src, src_offset,
-+                                    bs->file,
-+                                    cluster_offset + offset_in_cluster,
-+                                    cur_bytes, flags);
-+        qemu_co_mutex_lock(&s->lock);
-+        if (ret < 0) {
-+            goto fail;
-+        }
-+
-+        ret = qcow2_handle_l2meta(bs, &l2meta, true);
-+        if (ret) {
-+            goto fail;
-+        }
-+
-+        bytes -= cur_bytes;
-+        dst_offset += cur_bytes;
-+    }
-+    ret = 0;
-+
-+fail:
-+    qcow2_handle_l2meta(bs, &l2meta, false);
-+
-+    qemu_co_mutex_unlock(&s->lock);
-+
-+    qemu_vfree(cluster_data);
-+    trace_qcow2_writev_done_req(qemu_coroutine_self(), ret);
-+
-+    return ret;
-+}
-+
- static int qcow2_truncate(BlockDriverState *bs, int64_t offset,
-                           PreallocMode prealloc, Error **errp)
+-static int paio_submit_co(BlockDriverState *bs, int fd,
+-                          int64_t offset, QEMUIOVector *qiov,
+-                          int bytes, int type)
++static int paio_submit_co_full(BlockDriverState *bs, int fd,
++                               int64_t offset, int fd2, int64_t offset2,
++                               QEMUIOVector *qiov,
++                               int bytes, int type)
  {
-@@ -4521,6 +4688,8 @@ BlockDriver bdrv_qcow2 = {
+     RawPosixAIOData *acb = g_new(RawPosixAIOData, 1);
+     ThreadPool *pool;
+@@ -1546,6 +1596,8 @@ static int paio_submit_co(BlockDriverState *bs, int fd,
+     acb->bs = bs;
+     acb->aio_type = type;
+     acb->aio_fildes = fd;
++    acb->aio_fd2 = fd2;
++    acb->aio_offset2 = offset2;
  
-     .bdrv_co_pwrite_zeroes  = qcow2_co_pwrite_zeroes,
-     .bdrv_co_pdiscard       = qcow2_co_pdiscard,
-+    .bdrv_co_copy_range_from = qcow2_co_copy_range_from,
-+    .bdrv_co_copy_range_to  = qcow2_co_copy_range_to,
-     .bdrv_truncate          = qcow2_truncate,
-     .bdrv_co_pwritev_compressed = qcow2_co_pwritev_compressed,
-     .bdrv_make_empty        = qcow2_make_empty,
+     acb->aio_nbytes = bytes;
+     acb->aio_offset = offset;
+@@ -1561,6 +1613,13 @@ static int paio_submit_co(BlockDriverState *bs, int fd,
+     return thread_pool_submit_co(pool, aio_worker, acb);
+ }
+ 
++static inline int paio_submit_co(BlockDriverState *bs, int fd,
++                                 int64_t offset, QEMUIOVector *qiov,
++                                 int bytes, int type)
++{
++    return paio_submit_co_full(bs, fd, offset, -1, 0, qiov, bytes, type);
++}
++
+ static BlockAIOCB *paio_submit(BlockDriverState *bs, int fd,
+         int64_t offset, QEMUIOVector *qiov, int bytes,
+         BlockCompletionFunc *cb, void *opaque, int type)
+@@ -2451,6 +2510,35 @@ static void raw_abort_perm_update(BlockDriverState *bs)
+     raw_handle_perm_lock(bs, RAW_PL_ABORT, 0, 0, NULL);
+ }
+ 
++static int coroutine_fn raw_co_copy_range_from(BlockDriverState *bs,
++                                               BdrvChild *src, uint64_t src_offset,
++                                               BdrvChild *dst, uint64_t dst_offset,
++                                               uint64_t bytes, BdrvRequestFlags flags)
++{
++    return bdrv_co_copy_range_to(src, src_offset, dst, dst_offset, bytes, flags);
++}
++
++static int coroutine_fn raw_co_copy_range_to(BlockDriverState *bs,
++                                             BdrvChild *src, uint64_t src_offset,
++                                             BdrvChild *dst, uint64_t dst_offset,
++                                             uint64_t bytes, BdrvRequestFlags flags)
++{
++    BDRVRawState *s = bs->opaque;
++    BDRVRawState *src_s;
++
++    assert(dst->bs == bs);
++    if (src->bs->drv->bdrv_co_copy_range_to != raw_co_copy_range_to) {
++        return -ENOTSUP;
++    }
++
++    src_s = src->bs->opaque;
++    if (fd_open(bs) < 0 || fd_open(bs) < 0) {
++        return -EIO;
++    }
++    return paio_submit_co_full(bs, src_s->fd, src_offset, s->fd, dst_offset,
++                               NULL, bytes, QEMU_AIO_COPY_RANGE);
++}
++
+ BlockDriver bdrv_file = {
+     .format_name = "file",
+     .protocol_name = "file",
+@@ -2474,6 +2562,8 @@ BlockDriver bdrv_file = {
+     .bdrv_co_pwritev        = raw_co_pwritev,
+     .bdrv_aio_flush = raw_aio_flush,
+     .bdrv_aio_pdiscard = raw_aio_pdiscard,
++    .bdrv_co_copy_range_from = raw_co_copy_range_from,
++    .bdrv_co_copy_range_to  = raw_co_copy_range_to,
+     .bdrv_refresh_limits = raw_refresh_limits,
+     .bdrv_io_plug = raw_aio_plug,
+     .bdrv_io_unplug = raw_aio_unplug,
+@@ -2952,6 +3042,8 @@ static BlockDriver bdrv_host_device = {
+     .bdrv_co_pwritev        = raw_co_pwritev,
+     .bdrv_aio_flush	= raw_aio_flush,
+     .bdrv_aio_pdiscard   = hdev_aio_pdiscard,
++    .bdrv_co_copy_range_from = raw_co_copy_range_from,
++    .bdrv_co_copy_range_to  = raw_co_copy_range_to,
+     .bdrv_refresh_limits = raw_refresh_limits,
+     .bdrv_io_plug = raw_aio_plug,
+     .bdrv_io_unplug = raw_aio_unplug,
 -- 
 2.17.1
