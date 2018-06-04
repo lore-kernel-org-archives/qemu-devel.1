@@ -1,33 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57539)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59886)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mprivozn@redhat.com>) id 1fPmvu-00074C-I1
-	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 06:41:51 -0400
+	(envelope-from <david@redhat.com>) id 1fPn7h-0000pX-1z
+	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 06:54:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mprivozn@redhat.com>) id 1fPmvp-0006QQ-8w
-	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 06:41:50 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:50110 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mprivozn@redhat.com>) id 1fPmvp-0006Pk-3H
-	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 06:41:45 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.6])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id DA5BD4022414
-	for <qemu-devel@nongnu.org>; Mon,  4 Jun 2018 10:41:43 +0000 (UTC)
-References: <20180604102752.32260-1-berrange@redhat.com>
-	<8297e5b4-dca4-f080-fb87-4cf29a2bb857@redhat.com>
-	<20180604103515.GE19749@redhat.com>
-From: Michal Privoznik <mprivozn@redhat.com>
-Message-ID: <748b2e3a-194b-c769-f93b-04572cbf16d7@redhat.com>
-Date: Mon, 4 Jun 2018 12:41:41 +0200
+	(envelope-from <david@redhat.com>) id 1fPn7d-0005Ea-02
+	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 06:54:01 -0400
+References: <20180517081527.14410-1-david@redhat.com>
+	<20180517081527.14410-2-david@redhat.com>
+	<20180529152714.232f952c@redhat.com>
+	<cb69838b-e346-503c-f86d-9a0746c6c1e6@redhat.com>
+	<20180530145708.42bfd237@redhat.com>
+	<c0e1637b-e4f9-5436-a050-edd69961e7d0@redhat.com>
+	<20180531155453.40c1188e@redhat.com>
+From: David Hildenbrand <david@redhat.com>
+Message-ID: <af65fc0d-d010-a8f5-9027-886053034b51@redhat.com>
+Date: Mon, 4 Jun 2018 12:53:42 +0200
 MIME-Version: 1.0
-In-Reply-To: <20180604103515.GE19749@redhat.com>
+In-Reply-To: <20180531155453.40c1188e@redhat.com>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-GB
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] vl: don't use RUN_STATE_PRECONFIG unless
- --preconfig is given
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v4 01/14] memory-device: drop assert
+ related to align and start of address space
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,74 +30,140 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "=?UTF-8?Q?Daniel_P._Berrang=c3=a9?=" <berrange@redhat.com>, Max Reitz <mreitz@redhat.com>
-Cc: Igor Mammedov <imammedo@redhat.com>, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-s390x@nongnu.org, "Michael S . Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Markus Armbruster <armbru@redhat.com>, qemu-ppc@nongnu.org, Pankaj Gupta <pagupta@redhat.com>, Alexander Graf <agraf@suse.de>, Cornelia Huck <cohuck@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Luiz Capitulino <lcapitulino@redhat.com>
 
-On 06/04/2018 12:35 PM, Daniel P. Berrang=C3=A9 wrote:
-> On Mon, Jun 04, 2018 at 12:33:04PM +0200, Max Reitz wrote:
->> On 2018-06-04 12:27, Daniel P. Berrang=C3=A9 wrote:
->>> The RUN_STATE_PRECONFIG state is not supposed to be reachable unless =
-the
->>> --preconfig argument is given to QEMU, but when it was introduced in:
->>>
->>>   commit 047f7038f586d2150f16c6d9ba9cfd0479f0f6ac
->>>   Author: Igor Mammedov <imammedo@redhat.com>
->>>   Date:   Fri May 11 19:24:43 2018 +0200
->>>
->>>     cli: add --preconfig option
->>>
->>> The global 'current_run_state' variable was changed to have an initia=
-l
->>> value of RUN_STATE_PRECONFIG regardless of whether --preconfig is giv=
-en.
->>>
->>> It then relies on the main loop to toggle it back to RUN_STATE_PRELAU=
-NCH
->>> when --preconfig is not given. This is racy because it means that the=
-re
->>> is a window where QEMU is in RUN_STATE_PRECONFIG despite --preconfig =
-not
->>> being given. This can be seen with the failure:
->>>
->>>   $ echo | x86_64-softmmu/qemu-system-x86_64 -monitor stdio
->>>   QEMU 2.12.50 monitor - type 'help' for more information
->>>   (qemu)
->>>   HMP not available in preconfig state, use QMP instead
->>>
->>> Signed-off-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
->>> ---
->>>  vl.c | 3 ++-
->>>  1 file changed, 2 insertions(+), 1 deletion(-)
->>
->> This indeed fixes the issue that the preconfig state is reachable
->> without --preconfig, but it still keeps the main loop being invoked
->> twice (which means that e.g. HMP will process a single character befor=
-e
->> the main loop is actually really invoked:
->>
->> $ echo quit | x86_64-softmmu/qemu-system-x86_64 \
->>     -drive file=3D/dev/null,if=3Dide,readonly=3Don -monitor stdio
->> QEMU 2.12.50 monitor - type 'help' for more information
->> (qemu) qqemu-system-x86_64: Initialization of device ide-hd failed:
->> Block node is read-only
->>
->> (Note the "q" before "qemu-system-x86_64"))
->>
->> (Naively,) I agree with Michal that the main loop should only be invok=
-ed
->> twice if --preconfig has been given, which is implemented by his patch=
-:
->>
->> http://lists.nongnu.org/archive/html/qemu-devel/2018-06/msg00367.html
->=20
-> I think we probably need a combination of both patches for maximum safe=
-ty.
 
-Yes, looks like that. Except when your patch is merged then:
+>> Let me explain a little bit why I don't like such restrictions (for
+>> which I don't see a need yet):
+> (*) being conservative is good here because we can always relax restrictions
+> in future if it's needed without breaking users, but we can't take away
+> something thing that's been shipped (and if we do it, it typically
+> introduces a bunch of compat code to keep old machines working).
+> Also beside of giving as some freedom of movement in the future,
+> restrictions also to some degree prevent user from misconfiguration)
 
-+        runstate_set(RUN_STATE_PRELAUNCH);
+Right, but I consider a maximum on an alignment arbitrary (and even
+difficult to implement - as you said, "max page size supported by target
+machine/cpu" - there are even different huge page sizes e.g. on x86).
 
-from my patch becomes unnecessary. So I'll wait for you to merge your
-patch and then I can resend v2 of mine.
+So I'd really vote against introducing such checks.
 
-Michal
+And another point against introducing a check for the maimum alignment
+would be: There might be users with a specified alignment > max page
+size. Changing the behavior will break these setups (strange but true).
+
+> 
+>> virtio-mem devices will later have a certain block size (e.g. 4MB). I
+>> want to give devices during resource assignment the possibility to
+>> specify their alignment requirements.
+> size and alignment are 2 diffrent things here, alignment in our design
+> is dictated by backing storage page size and for performance reasons
+> HVA and GPA should be aligned on the same boundary, users are free
+> to pick another GPA manually as far as it has the same alignment.
+> But for automatic placement we use backend's alignment to make placement
+> as compact as possible but still keeping GPA aligned with HVA.
+> 
+>> For said virtio-mem device, this would e.g. be 4MB. (see patch 10 and 14
+>> of how this call "get_align" comes into play), because the addresses of
+>> the memory blocks are all aligned by e.g. 4MB. This is what is
+>> guaranteed by the device specification.
+> where does this 4Mb magic comes from and why block must be aligned
+> on this size?
+
+(knowing it is hard to get the idea without the current prototype in
+place, but that will be fixed soon)
+
+virtio-mem works in blocks. The block size is the size in which memory
+can be plugged or unplugged by the guest. It also determines the
+granularity (and therefore the bitmap) we have to use to keep track of
+unplugged memory. It is configurable (e.g. for migration purposes), but
+might also depend on the backend memory type. E.g. if huge pages are
+used in the host, the huge page size defines the minimum block size. But
+consider the last part a special case. Huge pages will not be supported
+for now.
+
+The block size also defines the alignment that has to be used by the
+guest for plugging/unplugging (because that's how blocks gets mapped to
+the bitmap entries). So a virtio-mem device really needs a block-aligned
+start address,
+
+For now I use 4MB because it matches what guests (e.g. Linux) can
+actually support and keeps the bitmap small. But as I said, it is
+configurable. (-device virtio-mem,block_size=1MB, ...)
+
+>  
+>> E.g. for DIMMs we might want to allow to specify the section size (e.g.
+>> 128MB on x86), otherwise e.g. Linux is not able to add all memory. (but
+>> we should not hardcode this, as this is a Linux specific requirement -
+>> still it would be nice to specify)
+> true, it's guest specific and we do not have restrictions here.
+> The only restriction we have here is that size must be multiple of
+> backing storage page size (i.e. alignment) so that guest would
+> be able to use tail page.
+> 
+>> So in general, a memory device might have some alignment that is to be
+>> taken care of.
+> Do we really need introducing frontend specific alignment?
+> I'd try reuse backend's one and go for frontend's only in case we have to.
+
+I think so. But I consider this a special case for virtio-mem.
+(specified indirectly via block_size). For the remaining stuff, we might
+be able to live with the memory backend aligment. And I agree that this
+should be the default if possible.
+
+> 
+>> I don't understand right now why an upper limit on the alignment would
+>> make sense at all. We can easily handle it during our search. And we
+>> have to handle it either way during the search, if we plug some device
+>> with strange sizes (e.g. 1MB DIMM).
+>>
+>> Of course, we might end up fragmenting guest physical memory, but that
+>> is purely a setup issue (choosing sizes of devices + main memory
+>> properly). I don't see a reason to error out (and of course also not to
+>> assert out :) ).
+> Agreed about assert, but I'd still prefer error out there so that users
+> won't crate insane config and then complain (see below and *).
+> 
+> Upper alignment value is useful for proper sizing of hotplug address space,
+> so that user could plug #slots devices upto #maxmem specified on CLI.
+> It's still possible to misconfigure using manual placement, but default
+> one just works, user either consumes all memory #maxmem and/or #slots.
+
+
+Please not that it will still work in most cases. Only if people start
+to define crazy alignments (like I did), crazy DIMM sizes (e.g. 1MB) or
+crazy block sizes for virtio-mem, we might have a fragmented guest
+physical memory. This should  usually not happen, but if so, we already
+have error messages for reporting this "fragmented memory".
+
+And I consider these "strange configs" similar as "strange manual
+placement". Same result: fragmented memory, error out.
+
+Personally, I don't think we have to guarantee that automatic placement
+works in all scenarios that the user is able to come up with. It should
+work in sane configurations, which is still that case.
+
+
+> 
+> There is no misunderstanding in case of error here as it works same as
+> on baremetal, one doesn't have a free place to put more memory or all
+> memory one asked for is already there.
+> 
+> So it might be that #slots decoupling from memory device a premature
+> action and we can still use it with virtio-mem/pmem.
+> 
+
+I treat #slots on x86 as #acpi_slots, that's why I don't think they
+apply here. I can see how they are used (on x86 only!) to size the
+address space - but I consider this a "nice to have feature" that should
+not be supposed to work in all possible scenarios.
+
+E.g. powerpc already relies on sane user configs. #slots is not used to
+size the guest address space. Similar things will apply on s390x.
+
+-- 
+
+Thanks,
+
+David / dhildenb
