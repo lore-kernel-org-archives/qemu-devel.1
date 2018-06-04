@@ -1,22 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56262)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56359)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1fPos4-0000WB-Qk
-	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 08:46:01 -0400
+	(envelope-from <bounces@canonical.com>) id 1fPosV-0000nb-Qv
+	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 08:46:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1fPos0-0007uO-Pv
-	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 08:46:00 -0400
-Date: Mon, 4 Jun 2018 13:45:53 +0100
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20180604124553.GG13674@stefanha-x1.localdomain>
-References: <20180602141446.29982-1-stefanha@redhat.com>
-	<20180602141446.29982-3-stefanha@redhat.com>
-	<CAFEAcA9cnV6fyc4AMO--jvvycrHPdy1Syvrqxy3J=OyM3cqGpg@mail.gmail.com>
+	(envelope-from <bounces@canonical.com>) id 1fPosR-0000Pq-Pu
+	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 08:46:27 -0400
+Received: from indium.canonical.com ([91.189.90.7]:43916)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1fPosR-0000Nw-K5
+	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 08:46:23 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1fPosQ-0002NP-HS
+	for <qemu-devel@nongnu.org>; Mon, 04 Jun 2018 12:46:22 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 79CF82E88D2
+	for <qemu-devel@nongnu.org>; Mon,  4 Jun 2018 12:46:22 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="EDJsL2R9iCFAt7IV"
-Content-Disposition: inline
-In-Reply-To: <CAFEAcA9cnV6fyc4AMO--jvvycrHPdy1Syvrqxy3J=OyM3cqGpg@mail.gmail.com>
-Subject: Re: [Qemu-devel] [RFC 2/2] arm: add ARMv6-M device container
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Mon, 04 Jun 2018 12:34:13 -0000
+From: Thomas Huth <1407813@bugs.launchpad.net>
+Reply-To: Bug 1407813 <1407813@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20150105223623.22315.6307.malonedeb@gac.canonical.com>
+Message-Id: <152811565366.32111.1885888328361234982.malone@soybean.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1407813] Re: QEMU wrongly translates newlines on
+ serial output
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,61 +37,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Stefan Hajnoczi <stefanha@redhat.com>, Jim Mussared <jim@groklearning.com>, Steffen =?iso-8859-1?Q?G=F6rtz?= <mail@steffen-goertz.de>, QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Joel Stanley <joel@jms.id.au>, Julia Suvorova <jusual@mail.ru>
+To: qemu-devel@nongnu.org
 
+Patch has now been committed here:
+https://git.qemu.org/?p=3Dqemu.git;a=3Dcommitdiff;h=3D12fb0ac0575df83cec72ec
 
---EDJsL2R9iCFAt7IV
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+** Changed in: qemu
+       Status: New =3D> Fix Committed
 
-On Sat, Jun 02, 2018 at 05:16:00PM +0100, Peter Maydell wrote:
-> On 2 June 2018 at 15:14, Stefan Hajnoczi <stefanha@redhat.com> wrote:
-> > --- /dev/null
-> > +++ b/hw/arm/armv6m.c
-> > @@ -0,0 +1,190 @@
-> > +/*
-> > + * ARMV6M System emulation.
-> > + *
-> > + * Copyright (C) 2018 Red Hat, Inc.
-> > + *
-> > + * Based on hw/arm/armv7m.c (written by Paul Brook),
-> > + * Copyright (c) 2006-2007 CodeSourcery.
-> > + *
-> > + * This code is licensed under the GPL.
-> > + */
->=20
-> There's a lot of code duplication here with the armv7m object;
-> can't we avoid that? What (if anything) needs to be done
-> differently from armv7m/armv8m (which both share the same
-> code)? Can we handle it by parameterizing or a shared base
-> class or something instead?
->=20
-> (This code will break if the "check we actually have an
-> NVIC for M profile cores" patchset I sent the other day
-> is applied, because changes made there to armv7m would
-> need to be propagated across to this copied code. It would
-> be nice not to have to change multiple places for that
-> sort of thing.)
+-- =
 
-Okay, will rebase on qemu.git/master in a few days and work out how to
-share the armv7m code.
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1407813
 
-Stefan
+Title:
+  QEMU wrongly translates newlines on serial output
 
---EDJsL2R9iCFAt7IV
-Content-Type: application/pgp-signature; name="signature.asc"
+Status in QEMU:
+  Fix Committed
 
------BEGIN PGP SIGNATURE-----
+Bug description:
+  When using "-serial stdio", QEMU shows the guest serial port's output
+  on the tty running qemu. As it should, QEMU sets the tty to raw mode.
+  Or almost... Strangely, it neglects to remove one output-translation
+  bit, ONLCR (see termios(3)) enabled on the tty. And it should have
+  removed this output translation!
 
-iQEcBAEBAgAGBQJbFTSBAAoJEJykq7OBq3PIWo8H/i/LoHUQzBN4t/7++5weBVBG
-mVNF3YFsiHNIVQj+SAO4Z+9HAKJpM9TzOjc8HqmUHU/RXT/tB8U68JbuMhgS3oje
-VcODkibXxR/6qfjMGNzai71XUT7uxUMUsl+Iysx/8TPyWPxOe4/7e/4oIGFG1OQe
-Wy4hLTDwIDelAMjT5KJDdw6Qos9xSGOfl4I8s93pmzRjSWW0o1+BU/9WZ9Hgd2a2
-zHHr5tXrwrl+1XC9igYOKzzww7WnDe2OPXxloA0N510DU+UP534GzZjNUa2HbgXt
-nK/HFlHUHt0XR2lEzjceU9baHB8vr/CDYbeqSh1gIN48A/o+cccxCN2rKr7giLM=
-=hP4n
------END PGP SIGNATURE-----
+  The problem is that with this ONLCR, the guest has no way of
+  outputting a bare linefeed ('\n') - every time the guest tries to
+  output a bare linefeed to the serial port, the host tty will translate
+  it to \r\n which will be sent to the underlying terminal (e.g.,
+  xterm).
 
---EDJsL2R9iCFAt7IV--
+  In most cases, this issue doesn't cause a problem: When the guest is
+  running a Unix-like operating system which is itself in cooked mode,
+  the guest itself will always output \r\n, and the hosts second
+  translation (to \r\r\n) does no harm. But in certain cases, the guest
+  can *really* want to output just \n, and have this \n reach the
+  terminal emulator and do what a linefeed is supposed to do without a
+  carriage-return - namely - just go one line down in the same column.
+
+  As an illustration of this bug, consider a guest running a Unix-like
+  operating system running a curses-based application (e.g., "vi"). If
+  you look at the output of "infocmp xterm", you'll notice that cud1=3D^J.
+  This means that if the curses library decides to move one line down
+  (it can happen in some cursor movement situations) it might decide to
+  print a linefeed (\n) to move one line down. The guest's operating
+  system will not mess with this linefeed (because the guest is in raw
+  mode), but then qemu's tty, because it was wrongly left in ONLCR mode,
+  will change this \n to \r\n before it reaches the terminal - causing
+  wrong cursor movement (instead the cursor going straight down, it
+  moves to the first column of the next line).
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1407813/+subscriptions
