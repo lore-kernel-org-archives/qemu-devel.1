@@ -1,34 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52618)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53586)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fPvoi-0007TL-Nx
-	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 16:11:01 -0400
+	(envelope-from <imammedo@redhat.com>) id 1fPvsx-0001AD-Lv
+	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 16:15:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fPvof-0001SW-Cz
-	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 16:11:00 -0400
-Received: from indium.canonical.com ([91.189.90.7]:39614)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1fPvof-0001S2-5t
-	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 16:10:57 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1fPvoe-0005mC-4b
-	for <qemu-devel@nongnu.org>; Mon, 04 Jun 2018 20:10:56 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 1F1C12E80C8
-	for <qemu-devel@nongnu.org>; Mon,  4 Jun 2018 20:10:56 +0000 (UTC)
+	(envelope-from <imammedo@redhat.com>) id 1fPvsu-0002n9-E7
+	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 16:15:23 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:42292 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1fPvst-0002mn-W5
+	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 16:15:20 -0400
+From: Igor Mammedov <imammedo@redhat.com>
+Date: Mon,  4 Jun 2018 22:14:38 +0200
+Message-Id: <1528143278-247932-1-git-send-email-imammedo@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Date: Mon, 04 Jun 2018 20:04:48 -0000
-From: =?utf-8?q?Philippe_Mathieu-Daud=C3=A9?= <1757363@bugs.launchpad.net>
-Reply-To: Bug 1757363 <1757363@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <152162151775.22331.14638507477656772309.malonedeb@soybean.canonical.com>
-Message-Id: <152814268805.26200.10002120343627998151.malone@wampee.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1757363] Re: infinite loop due to improper deal
- with "eret" on mips32
+Subject: [Qemu-devel] [PATCH] vl.c: make default main_loop_wait() timeout
+ independed of slirp
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,62 +26,106 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
+Cc: jan.kiszka@siemens.com, pbonzini@redhat.com, ldoktor@redhat.com, mreitz@redhat.com, mprivozn@redhat.com, berrange@redhat.com, ehabkost@redhat.com
 
-What model/cpu is your router?
+Since commit (047f7038f58 cli: add --preconfig option) QEMU is
+stuck with indefinite timeout in os_host_main_loop_wait()
+at RUN_STATE_PRECONFIG even if --preconfig option wasn't used
+when it's started with -nodefaults CLI option like this:
 
-Which MIPS guest CPU are you using? Are you sure it matches the CPU of
-your router?
+  ./s390x-softmmu/qemu-system-s390x -nodefaults
 
-Is your tplink firmware publicly available? (to reproduce your problem).
+It's caused by the fact that slirp_pollfds_fill() bails out early
+and slirp_update_timeout() won't be called to update timeout
+to a reasonable value (1 sec) so timeout would be left with
+infinite value (0xFFFFFFFF).
 
--- =
+Default infinite timeout though doen't make sense and reducing
+it to 1 second as in slirp_update_timeout() won't affect host.
+Fix issue by simplifying default timeout to the same 1sec as it
+is in slirp_update_timeout() and cleanup the later. It makes
+default timeout the same regardless of slirp_pollfds_fill()
+exited early or not (i.e. -nodefaults won't have any effect on
+main_loop_wait() anymore, which would provide more consistent
+behavior between both variants of startup).
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1757363
+Reported-by: Luk=C3=A1=C5=A1 Doktor <ldoktor@redhat.com>
+Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+---
+PS:
+it doesn't fix issue reported by Max where
+  "echo foo | $QEMU"
+is also broken due to commit 047f7038f58, but there is antoher fix
+on the list to fix that (either Michal's or Daniel's).
+---
+ slirp/slirp.c    | 10 ++--------
+ util/main-loop.c | 13 ++-----------
+ 2 files changed, 4 insertions(+), 19 deletions(-)
 
-Title:
-  infinite loop due to improper deal with "eret" on mips32
-
-Status in QEMU:
-  New
-
-Bug description:
-  1.qemu 2.9.1 release on the official web build with tcg
-  2.cmd: qemu-system-mips -kernel kernelfile
-  3. host: ubuntu 16.04.1 with linux kernel 4.6.2 x86_64
-     guest: mips bigendian 32bit (tplink firmware)
-
-  =
-
-  detail:
-
-  static inline void exception_return(CPUMIPSState *env)
-  {
-      debug_pre_eret(env);
-      if (env->CP0_Status & (1 << CP0St_ERL)) {
-          set_pc(env, env->CP0_ErrorEPC);
-          env->CP0_Status &=3D ~(1 << CP0St_ERL);
-      } else {
-          set_pc(env, env->CP0_EPC);
-          env->CP0_Status &=3D ~(1 << CP0St_EXL);=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D> ISSUE????
-      }
-      compute_hflags(env);
-      debug_post_eret(env);
-  }
-
-  void helper_eret(CPUMIPSState *env)
-  {
-      exception_return(env);
-      env->lladdr =3D 1;
-  }
-
-  =
-
-  In the Issue Line, there is no check CP0_Status whether int is disabled (=
-should not enter int routine),
-  that result in the cpu can not jump out the int routine.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1757363/+subscriptions
+diff --git a/slirp/slirp.c b/slirp/slirp.c
+index 1cb6b07..1112f86 100644
+--- a/slirp/slirp.c
++++ b/slirp/slirp.c
+@@ -358,13 +358,8 @@ void slirp_cleanup(Slirp *slirp)
+ static void slirp_update_timeout(uint32_t *timeout)
+ {
+     Slirp *slirp;
+-    uint32_t t;
+=20
+-    if (*timeout <=3D TIMEOUT_FAST) {
+-        return;
+-    }
+-
+-    t =3D MIN(1000, *timeout);
++    assert(*timeout > TIMEOUT_FAST);
+=20
+     /* If we have tcp timeout with slirp, then we will fill @timeout wit=
+h
+      * more precise value.
+@@ -375,10 +370,9 @@ static void slirp_update_timeout(uint32_t *timeout)
+             return;
+         }
+         if (slirp->do_slowtimo) {
+-            t =3D MIN(TIMEOUT_SLOW, t);
++            *timeout =3D MIN(TIMEOUT_SLOW, *timeout);
+         }
+     }
+-    *timeout =3D t;
+ }
+=20
+ void slirp_pollfds_fill(GArray *pollfds, uint32_t *timeout)
+diff --git a/util/main-loop.c b/util/main-loop.c
+index 992f9b0..fd23166 100644
+--- a/util/main-loop.c
++++ b/util/main-loop.c
+@@ -497,25 +497,16 @@ static int os_host_main_loop_wait(int64_t timeout)
+ void main_loop_wait(int nonblocking)
+ {
+     int ret;
+-    uint32_t timeout =3D UINT32_MAX;
+     int64_t timeout_ns;
++    uint32_t timeout =3D nonblocking ? 0 : 1000 /* milliseconds */;
+=20
+-    if (nonblocking) {
+-        timeout =3D 0;
+-    }
+=20
+     /* poll any events */
+     g_array_set_size(gpollfds, 0); /* reset for new iteration */
+     /* XXX: separate device handlers from system ones */
+     slirp_pollfds_fill(gpollfds, &timeout);
+=20
+-    if (timeout =3D=3D UINT32_MAX) {
+-        timeout_ns =3D -1;
+-    } else {
+-        timeout_ns =3D (uint64_t)timeout * (int64_t)(SCALE_MS);
+-    }
+-
+-    timeout_ns =3D qemu_soonest_timeout(timeout_ns,
++    timeout_ns =3D qemu_soonest_timeout((uint64_t)timeout * (int64_t)(SC=
+ALE_MS),
+                                       timerlistgroup_deadline_ns(
+                                           &main_loop_tlg));
+=20
+--=20
+2.7.4
