@@ -1,15 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59242)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34695)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1fPsEs-0000tg-Qy
-	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 12:21:47 -0400
+	(envelope-from <no-reply@patchew.org>) id 1fPsQb-00063g-D9
+	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 12:33:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1fPsEr-000744-VL
-	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 12:21:46 -0400
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon,  4 Jun 2018 17:21:40 +0100
-Message-Id: <20180604162140.20688-1-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PATCH] CODING_STYLE: Define our preferred form for
- multiline comments
+	(envelope-from <no-reply@patchew.org>) id 1fPsQX-00058t-2u
+	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 12:33:53 -0400
+Resent-Message-Id: <E1fPsQX-00058t-2u@eggs.gnu.org>
+In-Reply-To: <20180604152941.20374-1-peter.maydell@linaro.org>
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <152812999625.414.13583739724442129027@d39dc562802a>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Mon, 4 Jun 2018 09:33:17 -0700 (PDT)
+Subject: Re: [Qemu-devel] [PATCH v2 00/13] iommu: support txattrs,
+ support TCG execution, implement TZ MPC
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -18,51 +24,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: patches@linaro.org, Richard Henderson <rth@twiddle.net>, qemu-trivial@nongnu.org
+To: peter.maydell@linaro.org
+Cc: famz@redhat.com, qemu-arm@nongnu.org, qemu-devel@nongnu.org, patches@linaro.org, peterx@redhat.com, eric.auger@redhat.com, pbonzini@redhat.com, alex.bennee@linaro.org, rth@twiddle.net
 
-The codebase has a bit of a mix of
- /* multiline comments
-  * like this
-  */
-and
- /* multiline comments like this
-    in the GNU Coding Standards style */
-
-State a preference for the former.
-
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
----
-I admit that to some extent I'm imposing my aesthetic
-preferences here; pretty sure we have a lot more style
-1 comments than style 2, though.
----
- CODING_STYLE | 13 +++++++++++++
- 1 file changed, 13 insertions(+)
-
-diff --git a/CODING_STYLE b/CODING_STYLE
-index 12ba58ee293..fb1d1f1cd62 100644
---- a/CODING_STYLE
-+++ b/CODING_STYLE
-@@ -124,6 +124,19 @@ We use traditional C-style /* */ comments and avoid // comments.
- Rationale: The // form is valid in C99, so this is purely a matter of
- consistency of style. The checkpatch script will warn you about this.
- 
-+Multiline comments blocks should have a row of stars on the left
-+and the terminating */ on its own line:
-+    /* like
-+     * this
-+     */
-+Putting the initial /* on its own line is accepted, but not required.
-+(Some of the existing comments in the codebase use the GNU Coding
-+Standards form which does not have stars on the left; avoid this
-+when writing new comments.)
-+
-+Rationale: Consistency, and ease of visually picking out a multiline
-+comment from the surrounding code.
-+
- 8. trace-events style
- 
- 8.1 0x prefix
--- 
-2.17.1
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
+c3NhZ2UtaWQ6IDIwMTgwNjA0MTUyOTQxLjIwMzc0LTEtcGV0ZXIubWF5ZGVsbEBsaW5hcm8ub3Jn
+ClN1YmplY3Q6IFtRZW11LWRldmVsXSBbUEFUQ0ggdjIgMDAvMTNdIGlvbW11OiBzdXBwb3J0IHR4
+YXR0cnMsIHN1cHBvcnQgVENHIGV4ZWN1dGlvbiwgaW1wbGVtZW50IFRaIE1QQwoKPT09IFRFU1Qg
+U0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFzaAoKQkFTRT1iYXNlCm49MQp0b3RhbD0kKGdpdCBs
+b2cgLS1vbmVsaW5lICRCQVNFLi4gfCB3YyAtbCkKZmFpbGVkPTAKCmdpdCBjb25maWcgLS1sb2Nh
+bCBkaWZmLnJlbmFtZWxpbWl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lcyBUcnVl
+CmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLmFsZ29yaXRobSBoaXN0b2dyYW0KCmNvbW1pdHM9IiQo
+Z2l0IGxvZyAtLWZvcm1hdD0lSCAtLXJldmVyc2UgJEJBU0UuLikiCmZvciBjIGluICRjb21taXRz
+OyBkbwogICAgZWNobyAiQ2hlY2tpbmcgUEFUQ0ggJG4vJHRvdGFsOiAkKGdpdCBsb2cgLW4gMSAt
+LWZvcm1hdD0lcyAkYykuLi4iCiAgICBpZiAhIGdpdCBzaG93ICRjIC0tZm9ybWF0PWVtYWlsIHwg
+Li9zY3JpcHRzL2NoZWNrcGF0Y2gucGwgLS1tYWlsYmFjayAtOyB0aGVuCiAgICAgICAgZmFpbGVk
+PTEKICAgICAgICBlY2hvCiAgICBmaQogICAgbj0kKChuKzEpKQpkb25lCgpleGl0ICRmYWlsZWQK
+PT09IFRFU1QgU0NSSVBUIEVORCA9PT0KClVwZGF0aW5nIDNjOGNmNWE5YzIxZmY4NzgyMTY0ZDFk
+ZWY3ZjQ0YmQ4ODg3MTMzODQKU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0JwozYjRiZmEz
+ZWZmIGh3L2FybS9tcHMyLXR6LmM6IEluc3RhbnRpYXRlIE1QQ3MKYzI3OTA4MjJmOSBody9hcm0v
+aW90a2l0OiBXaXJlIHVwIE1QQyBpbnRlcnJ1cHQgbGluZXMKOTc0NmIyMDJkZiBody9hcm0vaW90
+a2l0OiBJbnN0YW50aWF0ZSBNUEMKNGQ0OGQwNjUyMiBody9taXNjL2lvdGtpdC1zZWNjdGwuYzog
+SW1wbGVtZW50IFNFQ01QQ0lOVFNUQVRVUwo1ZTA4ZDA3ZGM1IGh3L2NvcmUvb3ItaXJxOiBTdXBw
+b3J0IG1vcmUgdGhhbiAxNiBpbnB1dHMgdG8gYW4gT1IgZ2F0ZQpkZmYwY2M2OGYxIGh3L21pc2Mv
+dHpfbXBjLmM6IEhvbm91ciB0aGUgQkxLX0xVVCBzZXR0aW5ncyBpbiB0cmFuc2xhdGUKY2M0MjYz
+NmQ3YyBody9taXNjL3R6LW1wYy5jOiBJbXBsZW1lbnQgY29ycmVjdCBibG9ja2VkLWFjY2VzcyBi
+ZWhhdmlvdXIKNTdiNGJlNTlmNiBody9taXNjL3R6LW1wYy5jOiBJbXBsZW1lbnQgcmVnaXN0ZXJz
+CmNiM2M5MzZmNDUgaHcvbWlzYy90ei1tcGMuYzogSW1wbGVtZW50IHRoZSBBcm0gVHJ1c3Rab25l
+IE1lbW9yeSBQcm90ZWN0aW9uIENvbnRyb2xsZXIKN2Q5ZWMzZDlkZCBleGVjLmM6IEhhbmRsZSBJ
+T01NVXMgaW4gYWRkcmVzc19zcGFjZV90cmFuc2xhdGVfZm9yX2lvdGxiKCkKM2M1OTI4MjdiYyBp
+b21tdTogQWRkIElPTU1VIGluZGV4IGFyZ3VtZW50IHRvIHRyYW5zbGF0ZSBtZXRob2QKY2E5NmZj
+ZGNmNiBpb21tdTogQWRkIElPTU1VIGluZGV4IGFyZ3VtZW50IHRvIG5vdGlmaWVyIEFQSXMKODVi
+YWRlOTY0MSBpb21tdTogQWRkIElPTU1VIGluZGV4IGNvbmNlcHQgdG8gSU9NTVUgQVBJCgo9PT0g
+T1VUUFVUIEJFR0lOID09PQpDaGVja2luZyBQQVRDSCAxLzEzOiBpb21tdTogQWRkIElPTU1VIGlu
+ZGV4IGNvbmNlcHQgdG8gSU9NTVUgQVBJLi4uCkNoZWNraW5nIFBBVENIIDIvMTM6IGlvbW11OiBB
+ZGQgSU9NTVUgaW5kZXggYXJndW1lbnQgdG8gbm90aWZpZXIgQVBJcy4uLgpDaGVja2luZyBQQVRD
+SCAzLzEzOiBpb21tdTogQWRkIElPTU1VIGluZGV4IGFyZ3VtZW50IHRvIHRyYW5zbGF0ZSBtZXRo
+b2QuLi4KQ2hlY2tpbmcgUEFUQ0ggNC8xMzogZXhlYy5jOiBIYW5kbGUgSU9NTVVzIGluIGFkZHJl
+c3Nfc3BhY2VfdHJhbnNsYXRlX2Zvcl9pb3RsYigpLi4uCkNoZWNraW5nIFBBVENIIDUvMTM6IGh3
+L21pc2MvdHotbXBjLmM6IEltcGxlbWVudCB0aGUgQXJtIFRydXN0Wm9uZSBNZW1vcnkgUHJvdGVj
+dGlvbiBDb250cm9sbGVyLi4uCldBUk5JTkc6IGFkZGVkLCBtb3ZlZCBvciBkZWxldGVkIGZpbGUo
+cyksIGRvZXMgTUFJTlRBSU5FUlMgbmVlZCB1cGRhdGluZz8KIzg0OiAKbmV3IGZpbGUgbW9kZSAx
+MDA2NDQKCnRvdGFsOiAwIGVycm9ycywgMSB3YXJuaW5ncywgNDg2IGxpbmVzIGNoZWNrZWQKCllv
+dXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRo
+ZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFp
+bmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KQ2hlY2tpbmcgUEFUQ0ggNi8xMzog
+aHcvbWlzYy90ei1tcGMuYzogSW1wbGVtZW50IHJlZ2lzdGVycy4uLgpDaGVja2luZyBQQVRDSCA3
+LzEzOiBody9taXNjL3R6LW1wYy5jOiBJbXBsZW1lbnQgY29ycmVjdCBibG9ja2VkLWFjY2VzcyBi
+ZWhhdmlvdXIuLi4KQ2hlY2tpbmcgUEFUQ0ggOC8xMzogaHcvbWlzYy90el9tcGMuYzogSG9ub3Vy
+IHRoZSBCTEtfTFVUIHNldHRpbmdzIGluIHRyYW5zbGF0ZS4uLgpDaGVja2luZyBQQVRDSCA5LzEz
+OiBody9jb3JlL29yLWlycTogU3VwcG9ydCBtb3JlIHRoYW4gMTYgaW5wdXRzIHRvIGFuIE9SIGdh
+dGUuLi4KRVJST1I6IHNwYWNlcyByZXF1aXJlZCBhcm91bmQgdGhhdCAnKicgKGN0eDpWeFYpCiM3
+MDogRklMRTogaHcvY29yZS9vci1pcnEuYzoxMDg6CisgICAgLnN1YnNlY3Rpb25zID0gKGNvbnN0
+IFZNU3RhdGVEZXNjcmlwdGlvbipbXSkgewogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICBeCgp0b3RhbDogMSBlcnJvcnMsIDAgd2FybmluZ3MsIDYyIGxpbmVzIGNo
+ZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYg
+YW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRo
+ZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCkNoZWNraW5nIFBB
+VENIIDEwLzEzOiBody9taXNjL2lvdGtpdC1zZWNjdGwuYzogSW1wbGVtZW50IFNFQ01QQ0lOVFNU
+QVRVUy4uLgpFUlJPUjogc3BhY2VzIHJlcXVpcmVkIGFyb3VuZCB0aGF0ICcqJyAoY3R4OlZ4VikK
+IzkxOiBGSUxFOiBody9taXNjL2lvdGtpdC1zZWNjdGwuYzo3MTE6CisgICAgLnN1YnNlY3Rpb25z
+ID0gKGNvbnN0IFZNU3RhdGVEZXNjcmlwdGlvbipbXSkgewogICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICBeCgp0b3RhbDogMSBlcnJvcnMsIDAgd2FybmluZ3MsIDEw
+MCBsaW5lcyBjaGVja2VkCgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJl
+dmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQg
+dGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgpD
+aGVja2luZyBQQVRDSCAxMS8xMzogaHcvYXJtL2lvdGtpdDogSW5zdGFudGlhdGUgTVBDLi4uCkNo
+ZWNraW5nIFBBVENIIDEyLzEzOiBody9hcm0vaW90a2l0OiBXaXJlIHVwIE1QQyBpbnRlcnJ1cHQg
+bGluZXMuLi4KQ2hlY2tpbmcgUEFUQ0ggMTMvMTM6IGh3L2FybS9tcHMyLXR6LmM6IEluc3RhbnRp
+YXRlIE1QQ3MuLi4KPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGgg
+Y29kZTogMQoKCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFto
+dHRwOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3
+LWRldmVsQHJlZGhhdC5jb20=
