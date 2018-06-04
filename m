@@ -1,27 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54203)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55385)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1fPoi6-00045Z-3U
-	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 08:35:43 -0400
+	(envelope-from <bounces@canonical.com>) id 1fPonS-00061S-4n
+	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 08:41:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1fPoi1-0001l6-W1
-	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 08:35:42 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:35784 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1fPoi1-0001kd-Q0
-	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 08:35:37 -0400
-References: <20180603092749.107476-1-marcel.apfelbaum@gmail.com>
-	<20180604042928-mutt-send-email-mst@kernel.org>
-	<20180604142446.6f910dbf@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <4e58363f-d055-7556-7a71-51f90e461f4e@redhat.com>
-Date: Mon, 4 Jun 2018 14:35:25 +0200
+	(envelope-from <bounces@canonical.com>) id 1fPonO-0007uR-5t
+	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 08:41:14 -0400
+Received: from indium.canonical.com ([91.189.90.7]:40502)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1fPonN-0007tC-UG
+	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 08:41:10 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1fPonM-0000d6-B4
+	for <qemu-devel@nongnu.org>; Mon, 04 Jun 2018 12:41:08 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 1C8C02E88E0
+	for <qemu-devel@nongnu.org>; Mon,  4 Jun 2018 12:41:08 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20180604142446.6f910dbf@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH RFC] hw/pc: set q35 as the default x86
- machine
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Mon, 04 Jun 2018 12:32:43 -0000
+From: Thomas Huth <1772086@bugs.launchpad.net>
+Reply-To: Bug 1772086 <1772086@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <152666797097.2555.6897470014572103765.malonedeb@gac.canonical.com>
+Message-Id: <152811556357.32292.1570344045880002426.malone@soybean.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1772086] Re: malformed serial data being sent
+ from guest
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,25 +37,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, rth@twiddle.net, qemu-devel@nongnu.org, ehabkost@redhat.com
+To: qemu-devel@nongnu.org
 
-On 04/06/2018 14:24, Igor Mammedov wrote:
->> Yes it's easy to add -machine pc but there's no documentation
->> that tells you to do so. Add to that shortcuts like -cdrom
->> stop working, hotplug needs extra bridges to work, and one
->> can see that while management tool users benefit from q35,
->> command line users will suffer.
-> Maybe we should mark 'pc' default as deprecated first,
-> like we do with CLI options that we wish to drop in future?
-> 
-> That way we 'create' documentation, so users would be aware
-> of the change and have time to fix their CLI if they prefer
-> 'pc' machine.
+Patch has now been committed here:
+https://git.qemu.org/?p=3Dqemu.git;a=3Dcommitdiff;h=3D12fb0ac0575df83cec72ec
 
-Michael has listed reasons why 'pc' cannot be deprecated, since some of
-them are not even fixable.  Honestly, 'pc' works well for 99% of the use
-cases---just like you probably don't care whether your laptop has a PCI
-or PCIe chipset.
+** Changed in: qemu
+       Status: New =3D> Fix Committed
 
-Paolo
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1772086
+
+Title:
+  malformed serial data being sent from guest
+
+Status in QEMU:
+  Fix Committed
+
+Bug description:
+  When sending data through serial from guest each time 0x0A byte is
+  sent 0x0D is sent before it. For example, when sending {0x29, 0x0A} on
+  the other end I receive {0x29, 0x0D, 0x0A}.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1772086/+subscriptions
