@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58590)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58678)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fPqpJ-0002nr-I1
-	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 10:51:19 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1fPqpN-0002rT-LZ
+	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 10:51:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fPqpI-00040U-7g
-	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 10:51:17 -0400
-Received: from mail-wr0-x230.google.com ([2a00:1450:400c:c0c::230]:46379)
+	(envelope-from <alex.bennee@linaro.org>) id 1fPqpM-00044n-IG
+	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 10:51:21 -0400
+Received: from mail-wr0-x234.google.com ([2a00:1450:400c:c0c::234]:35479)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1fPqpH-0003zc-TM
-	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 10:51:16 -0400
-Received: by mail-wr0-x230.google.com with SMTP id v13-v6so32615289wrp.13
-	for <qemu-devel@nongnu.org>; Mon, 04 Jun 2018 07:51:15 -0700 (PDT)
+	id 1fPqpM-000445-A6
+	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 10:51:20 -0400
+Received: by mail-wr0-x234.google.com with SMTP id l10-v6so9450269wrn.2
+	for <qemu-devel@nongnu.org>; Mon, 04 Jun 2018 07:51:20 -0700 (PDT)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Mon,  4 Jun 2018 15:51:05 +0100
-Message-Id: <20180604145109.30498-4-alex.bennee@linaro.org>
+Date: Mon,  4 Jun 2018 15:51:08 +0100
+Message-Id: <20180604145109.30498-7-alex.bennee@linaro.org>
 In-Reply-To: <20180604145109.30498-1-alex.bennee@linaro.org>
 References: <20180604145109.30498-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v1 3/7] Makefile: Rename TARGET_DIRS to
- TARGET_LIST
+Subject: [Qemu-devel] [PATCH v1 6/7] docker: test-mingw: use SDL2 and GTK+3
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,135 +32,55 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: cota@braap.org, famz@redhat.com, berrange@redhat.com, f4bug@amsat.org, richard.henderson@linaro.org, balrogg@gmail.com, aurelien@aurel32.net, agraf@suse.de, pbonzini@redhat.com, stefanha@redhat.com, stefanb@linux.vnet.ibm.com, marcandre.lureau@redhat.com
 Cc: qemu-devel@nongnu.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 
-From: Fam Zheng <famz@redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
 
-To be more accurate on its purpose and make code that looks for a certain
-target out of this variable more readable.
+Do not test the deprecated API versions.  debian-win32-cross and debian-win64-cross
+are already using SDL2 (they do not cover GTK+ at all).
 
-Signed-off-by: Fam Zheng <famz@redhat.com>
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Tested-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+Reviewed-by: Daniel P. Berrangé <berrange@redhat.com>
+[AJB: fix merge conflicts]
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 ---
- Makefile               | 20 ++++++++++----------
- configure              |  2 +-
- scripts/create_config  |  2 +-
- tests/Makefile.include |  2 +-
- 4 files changed, 13 insertions(+), 13 deletions(-)
+ tests/docker/dockerfiles/fedora.docker | 8 ++++----
+ tests/docker/test-mingw                | 4 ++--
+ 2 files changed, 6 insertions(+), 6 deletions(-)
 
-diff --git a/Makefile b/Makefile
-index 6d588d1f71..023b3437ec 100644
---- a/Makefile
-+++ b/Makefile
-@@ -62,8 +62,8 @@ seems to have been used for an in-tree build. You can fix this by running \
- endif
- endif
+diff --git a/tests/docker/dockerfiles/fedora.docker b/tests/docker/dockerfiles/fedora.docker
+index 65d7761cf5..7d1d008002 100644
+--- a/tests/docker/dockerfiles/fedora.docker
++++ b/tests/docker/dockerfiles/fedora.docker
+@@ -11,12 +11,12 @@ ENV PACKAGES \
+     numactl-devel SDL2-devel snappy-devel spice-server-devel \
+     systemtap-sdt-devel usbredir-devel virglrenderer-devel vte3-devel \
+     xen-devel \
+-    mingw32-pixman mingw32-glib2 mingw32-gmp mingw32-SDL mingw32-pkg-config \
+-    mingw32-gtk2 mingw32-gtk3 mingw32-gnutls mingw32-nettle mingw32-libtasn1 \
++    mingw32-pixman mingw32-glib2 mingw32-gmp mingw32-SDL2 mingw32-pkg-config \
++    mingw32-gtk3 mingw32-gnutls mingw32-nettle mingw32-libtasn1 \
+     mingw32-libjpeg-turbo mingw32-libpng mingw32-curl mingw32-libssh2 \
+     mingw32-bzip2 \
+-    mingw64-pixman mingw64-glib2 mingw64-gmp mingw64-SDL mingw64-pkg-config \
+-    mingw64-gtk2 mingw64-gtk3 mingw64-gnutls mingw64-nettle mingw64-libtasn1 \
++    mingw64-pixman mingw64-glib2 mingw64-gmp mingw64-SDL2 mingw64-pkg-config \
++    mingw64-gtk3 mingw64-gnutls mingw64-nettle mingw64-libtasn1 \
+     mingw64-libjpeg-turbo mingw64-libpng mingw64-curl mingw64-libssh2 \
+     mingw64-bzip2
+ ENV QEMU_CONFIGURE_OPTS --python=/usr/bin/python3
+diff --git a/tests/docker/test-mingw b/tests/docker/test-mingw
+index 503a6bc6f7..7cca7e16a6 100755
+--- a/tests/docker/test-mingw
++++ b/tests/docker/test-mingw
+@@ -28,8 +28,8 @@ for prefix in x86_64-w64-mingw32- i686-w64-mingw32-; do
+         --enable-vnc \
+         --enable-bzip2 \
+         --enable-guest-agent \
+-        --with-sdlabi=1.2 \
+-        --with-gtkabi=2.0
++        --with-sdlabi=2.0 \
++        --with-gtkabi=3.0
+     install_qemu
+     make clean
  
--CONFIG_SOFTMMU := $(if $(filter %-softmmu,$(TARGET_DIRS)),y)
--CONFIG_USER_ONLY := $(if $(filter %-user,$(TARGET_DIRS)),y)
-+CONFIG_SOFTMMU := $(if $(filter %-softmmu,$(TARGET_LIST)),y)
-+CONFIG_USER_ONLY := $(if $(filter %-user,$(TARGET_LIST)),y)
- CONFIG_XEN := $(CONFIG_XEN_BACKEND)
- CONFIG_ALL=y
- -include config-all-devices.mak
-@@ -366,8 +366,8 @@ DOCS=
- endif
- 
- SUBDIR_MAKEFLAGS=$(if $(V),,--no-print-directory --quiet) BUILD_DIR=$(BUILD_DIR)
--SUBDIR_DEVICES_MAK=$(patsubst %, %/config-devices.mak, $(TARGET_DIRS))
--SUBDIR_DEVICES_MAK_DEP=$(patsubst %, %-config-devices.mak.d, $(TARGET_DIRS))
-+SUBDIR_DEVICES_MAK=$(patsubst %, %/config-devices.mak, $(TARGET_LIST))
-+SUBDIR_DEVICES_MAK_DEP=$(patsubst %, %-config-devices.mak.d, $(TARGET_LIST))
- 
- ifeq ($(SUBDIR_DEVICES_MAK),)
- config-all-devices.mak:
-@@ -470,7 +470,7 @@ config-host.h-timestamp: config-host.mak
- qemu-options.def: $(SRC_PATH)/qemu-options.hx $(SRC_PATH)/scripts/hxtool
- 	$(call quiet-command,sh $(SRC_PATH)/scripts/hxtool -h < $< > $@,"GEN","$@")
- 
--SUBDIR_RULES=$(patsubst %,subdir-%, $(TARGET_DIRS))
-+SUBDIR_RULES=$(patsubst %,subdir-%, $(TARGET_LIST))
- SOFTMMU_SUBDIR_RULES=$(filter %-softmmu,$(SUBDIR_RULES))
- 
- $(SOFTMMU_SUBDIR_RULES): $(block-obj-y)
-@@ -514,7 +514,7 @@ ROMSUBDIR_RULES=$(patsubst %,romsubdir-%, $(ROMS))
- romsubdir-%:
- 	$(call quiet-command,$(MAKE) $(SUBDIR_MAKEFLAGS) -C pc-bios/$* V="$(V)" TARGET_DIR="$*/" CFLAGS="$(filter -O% -g%,$(CFLAGS))",)
- 
--ALL_SUBDIRS=$(TARGET_DIRS) $(patsubst %,pc-bios/%, $(ROMS))
-+ALL_SUBDIRS=$(TARGET_LIST) $(patsubst %,pc-bios/%, $(ROMS))
- 
- recurse-all: $(SUBDIR_RULES) $(ROMSUBDIR_RULES)
- 
-@@ -772,7 +772,7 @@ distclean: clean
- 	rm -f docs/interop/qemu-qmp-ref.pdf docs/interop/qemu-ga-ref.pdf
- 	rm -f docs/interop/qemu-qmp-ref.html docs/interop/qemu-ga-ref.html
- 	rm -f docs/qemu-block-drivers.7
--	for d in $(TARGET_DIRS); do \
-+	for d in $(TARGET_LIST); do \
- 	rm -rf $$d || exit 1 ; \
-         done
- 	rm -Rf .sdk
-@@ -873,7 +873,7 @@ endif
- 		$(INSTALL_DATA) $(SRC_PATH)/pc-bios/keymaps/$$x "$(DESTDIR)$(qemu_datadir)/keymaps"; \
- 	done
- 	$(INSTALL_DATA) $(BUILD_DIR)/trace-events-all "$(DESTDIR)$(qemu_datadir)/trace-events-all"
--	for d in $(TARGET_DIRS); do \
-+	for d in $(TARGET_LIST); do \
- 	$(MAKE) $(SUBDIR_MAKEFLAGS) TARGET_DIR=$$d/ -C $$d $@ || exit 1 ; \
-         done
- 
-@@ -1071,9 +1071,9 @@ endif
- 	@echo  '  ctags/TAGS      - Generate tags file for editors'
- 	@echo  '  cscope          - Generate cscope index'
- 	@echo  ''
--	@$(if $(TARGET_DIRS), \
-+	@$(if $(TARGET_LIST), \
- 		echo 'Architecture specific targets:'; \
--		$(foreach t, $(TARGET_DIRS), \
-+		$(foreach t, $(TARGET_LIST), \
- 		printf "  %-30s - Build for %s\\n" $(patsubst %,subdir-%,$(t)) $(t);) \
- 		echo '')
- 	@echo  'Cleaning targets:'
-diff --git a/configure b/configure
-index 2e10956cfc..a08544dd6e 100755
---- a/configure
-+++ b/configure
-@@ -6122,7 +6122,7 @@ qemu_version=$(head $source_path/VERSION)
- echo "VERSION=$qemu_version" >>$config_host_mak
- echo "PKGVERSION=$pkgversion" >>$config_host_mak
- echo "SRC_PATH=$source_path" >> $config_host_mak
--echo "TARGET_DIRS=$target_list" >> $config_host_mak
-+echo "TARGET_LIST=$target_list" >> $config_host_mak
- if [ "$docs" = "yes" ] ; then
-   echo "BUILD_DOCS=yes" >> $config_host_mak
- fi
-diff --git a/scripts/create_config b/scripts/create_config
-index d727e5e36e..58948a67a4 100755
---- a/scripts/create_config
-+++ b/scripts/create_config
-@@ -107,7 +107,7 @@ case $line in
-     target_name=${line#*=}
-     echo "#define TARGET_NAME \"$target_name\""
-     ;;
-- TARGET_DIRS=*)
-+ TARGET_LIST=*)
-     # do nothing
-     ;;
-  TARGET_*=y) # configuration
-diff --git a/tests/Makefile.include b/tests/Makefile.include
-index 3b9a5e31a2..3d2f0458ab 100644
---- a/tests/Makefile.include
-+++ b/tests/Makefile.include
-@@ -854,7 +854,7 @@ endif
- 
- # QTest rules
- 
--TARGETS=$(patsubst %-softmmu,%, $(filter %-softmmu,$(TARGET_DIRS)))
-+TARGETS=$(patsubst %-softmmu,%, $(filter %-softmmu,$(TARGET_LIST)))
- ifeq ($(CONFIG_POSIX),y)
- QTEST_TARGETS = $(TARGETS)
- check-qtest-y=$(foreach TARGET,$(TARGETS), $(check-qtest-$(TARGET)-y))
 -- 
 2.17.0
