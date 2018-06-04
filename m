@@ -1,21 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51590)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51930)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fPkUC-0003f4-Nz
-	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 04:05:06 -0400
+	(envelope-from <peterx@redhat.com>) id 1fPkVm-0004f1-9z
+	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 04:06:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fPkU8-0002r9-O6
-	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 04:05:04 -0400
-Date: Mon, 4 Jun 2018 18:04:48 +1000
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20180604080448.GM4251@umbus>
-References: <20180531130429.24911-1-joel@jms.id.au>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="WuedheRyq6FDfQ9j"
-Content-Disposition: inline
-In-Reply-To: <20180531130429.24911-1-joel@jms.id.au>
-Subject: Re: [Qemu-devel] [PATCH v2] target/ppc: Allow privileged access to
- SPR_PCR
+	(envelope-from <peterx@redhat.com>) id 1fPkVi-0003tB-Aa
+	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 04:06:42 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:56068 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1fPkVi-0003sl-5f
+	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 04:06:38 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.6])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 714DD401EF05
+	for <qemu-devel@nongnu.org>; Mon,  4 Jun 2018 08:06:37 +0000 (UTC)
+From: Peter Xu <peterx@redhat.com>
+Date: Mon,  4 Jun 2018 16:06:30 +0800
+Message-Id: <20180604080630.10946-1-peterx@redhat.com>
+Subject: [Qemu-devel] [PATCH] monitor: postpone monitor_qmp_cleanup_queues
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,153 +27,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Joel Stanley <joel@jms.id.au>
-Cc: Alexander Graf <agraf@suse.de>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>, Greg Kurz <groug@kaod.org>, Benjamin Herrenschmidt <benh@kernel.crashing.org>, Michael Ellerman <mpe@ellerman.id.au>, Michael Neuling <mikey@neuling.org>
+To: qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, peterx@redhat.com, Eric Blake <eblake@redhat.com>, John Snow <jsnow@redhat.com>, Markus Armbruster <armbru@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
 
+Previously we cleanup the queues when we got CLOSED event.  It was used
+to make sure we won't leftover replies/events of a old client to a new
+client.  Now this patch postpones that until OPENED.
 
---WuedheRyq6FDfQ9j
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+In most cases, it does not really matter much since either way will make
+sure that the new client won't receive unexpected old events/responses.
+However there can be a very rare race condition with the old way when we
+use QMP with stdio and pipelines (which is quite common in iotests).
+The problem is that, we can easily have something like this in scripts:
 
-On Thu, May 31, 2018 at 10:34:29PM +0930, Joel Stanley wrote:
-> The powerpc Linux kernel[1] and skiboot firmware[2] recently gained chang=
-es
-> that cause the Processor Compatibility Register (PCR) SPR to be cleared.
->=20
-> These changes cause Linux to fail to boot on the Qemu powernv machine
-> with an error:
->=20
->  Trying to write privileged spr 338 (0x152) at 0000000030017f0c
->=20
-> With this patch Qemu makes this register available as a hypervisor
-> privileged register.
->=20
-> Note that bits set in this register disable features of the processor.
-> Currently the only register state that is supported is when the register
-> is zeroed (enable all features). This is sufficient for guests to
-> once again boot.
->=20
-> [1] https://lkml.kernel.org/r/20180518013742.24095-1-mikey@neuling.org
-> [2] https://patchwork.ozlabs.org/patch/915932/
->=20
-> Signed-off-by: Joel Stanley <joel@jms.id.au>
-> ---
-> v2:
->  - Change error message to say Invalid instead of Unimplemented
->  - Fix compile warning on other powerpc targets, thanks patchew
-> ---
->  target/ppc/helper.h             |  1 +
->  target/ppc/misc_helper.c        | 10 ++++++++++
->  target/ppc/translate_init.inc.c |  9 +++++++--
->  3 files changed, 18 insertions(+), 2 deletions(-)
->=20
-> diff --git a/target/ppc/helper.h b/target/ppc/helper.h
-> index 19453c68138a..d751f0e21909 100644
-> --- a/target/ppc/helper.h
-> +++ b/target/ppc/helper.h
-> @@ -17,6 +17,7 @@ DEF_HELPER_2(pminsn, void, env, i32)
->  DEF_HELPER_1(rfid, void, env)
->  DEF_HELPER_1(hrfid, void, env)
->  DEF_HELPER_2(store_lpcr, void, env, tl)
-> +DEF_HELPER_2(store_pcr, void, env, tl)
->  #endif
->  DEF_HELPER_1(check_tlb_flush_local, void, env)
->  DEF_HELPER_1(check_tlb_flush_global, void, env)
-> diff --git a/target/ppc/misc_helper.c b/target/ppc/misc_helper.c
-> index 8c8cba5cc6f1..1870f4c47f1a 100644
-> --- a/target/ppc/misc_helper.c
-> +++ b/target/ppc/misc_helper.c
-> @@ -20,6 +20,7 @@
->  #include "cpu.h"
->  #include "exec/exec-all.h"
->  #include "exec/helper-proto.h"
-> +#include "qemu/error-report.h"
-> =20
->  #include "helper_regs.h"
-> =20
-> @@ -98,6 +99,15 @@ void helper_store_ptcr(CPUPPCState *env, target_ulong =
-val)
->          tlb_flush(CPU(cpu));
->      }
->  }
-> +
-> +void helper_store_pcr(CPUPPCState *env, target_ulong value)
-> +{
-> +    if (value !=3D 0) {
-> +        error_report("Invalid PCR value 0x"TARGET_FMT_lx, value);
-> +        return;
-> +    }
+  cat $QMP_COMMANDS | qemu -qmp stdio ... | filter_commands
 
-I don't see a lot of point to this check.  For now the only user just
-clears the PCR, but why limit yourself to that explicitly?
+In most cases, a QMP session will be based on a bidirectional
+channel (read/write to a TCP port, for example), so IN and OUT are
+sharing some fundamentally same thing.  However that's untrue for pipes
+above - the IN is the "cat" program, while the "OUT" is directed to the
+"filter_commands" which is actually another process.
 
-> +    env->spr[SPR_PCR] =3D value;
+Now when we received the CLOSED event, we cleanup the queues (including
+the QMP response queue).  That means, if we kill/stop the "cat" process
+faster than the filter_commands process, the filter_commands process is
+possible to miss some responses/events that should belong to it.
 
-You definitely should be masking against pcr_mask too.
+In practise, I encountered a very strange SHUTDOWN event missing when
+running test with iotest 087.  Without this patch, iotest 078 will have
+~10% chance to miss the SHUTDOWN event and fail when with Out-Of-Band
+enabled:
 
-> +}
->  #endif /* defined(TARGET_PPC64) */
-> =20
->  void helper_store_pidr(CPUPPCState *env, target_ulong val)
-> diff --git a/target/ppc/translate_init.inc.c b/target/ppc/translate_init.=
-inc.c
-> index ab782cb32aaa..1a89017ddea8 100644
-> --- a/target/ppc/translate_init.inc.c
-> +++ b/target/ppc/translate_init.inc.c
-> @@ -424,6 +424,10 @@ static void spr_write_ptcr(DisasContext *ctx, int sp=
-rn, int gprn)
->      gen_helper_store_ptcr(cpu_env, cpu_gpr[gprn]);
->  }
-> =20
-> +static void spr_write_pcr(DisasContext *ctx, int sprn, int gprn)
-> +{
-> +    gen_helper_store_pcr(cpu_env, cpu_gpr[gprn]);
-> +}
->  #endif
->  #endif
-> =20
-> @@ -7957,11 +7961,12 @@ static void gen_spr_power6_common(CPUPPCState *en=
-v)
->  #endif
->      /*
->       * Register PCR to report POWERPC_EXCP_PRIV_REG instead of
-> -     * POWERPC_EXCP_INVAL_SPR.
-> +     * POWERPC_EXCP_INVAL_SPR in userspace. Permit hypervisor access.
->       */
-> -    spr_register(env, SPR_PCR, "PCR",
-> +    spr_register_hv(env, SPR_PCR, "PCR",
->                   SPR_NOACCESS, SPR_NOACCESS,
->                   SPR_NOACCESS, SPR_NOACCESS,
-> +                 &spr_read_generic, &spr_write_pcr,
->                   0x00000000);
->  }
-> =20
+087 8s ... - output mismatch (see 087.out.bad)
+--- /home/peterx/git/qemu/tests/qemu-iotests/087.out    2018-06-01 18:44:22.378982462 +0800
++++ /home/peterx/git/qemu/bin/tests/qemu-iotests/087.out.bad    2018-06-01 18:53:44.267840928 +0800
+@@ -8,7 +8,6 @@
+ {"return": {}}
+ {"error": {"class": "GenericError", "desc": "'node-name' must be specified for the root node"}}
+ {"return": {}}
+-{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
 
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
+ === Duplicate ID ===
+@@ -53,7 +52,6 @@
+ {"return": {}}
+ {"return": {}}
+ {"return": {}}
+-{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
 
---WuedheRyq6FDfQ9j
-Content-Type: application/pgp-signature; name="signature.asc"
+This patch fixes the problem.
 
------BEGIN PGP SIGNATURE-----
+Fixes: 6d2d563f8c ("qmp: cleanup qmp queues properly", 2018-03-27)
+Signed-off-by: Peter Xu <peterx@redhat.com>
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlsU8qAACgkQbDjKyiDZ
-s5IazRAAvVicvlNjEbmegWPBrfU86ymD41oIRVp+AamLJr3Iv2z1Y9VQ+MsSaFTK
-FjmNRLlDVnkyvvz7YwEIcRvgxqT/lYK3dBuGMkRCd27Fbi3rcR38SgMLfuAkXmtN
-G6IDsilLd7CUlOgeComp/6KXXLHqcb36bnJIEzex8h4px/rtcZzyfi9hiPB5CskW
-XLLGc0JgsH0clLT/DuN7Kw+O8G37oaNyFAvipFJp2IVD+z5t91spS9xPBmdMlQPO
-ysWlqOGAH5CTfF10c/HNSrpI91I6CTl4lREw70o7IK9dat16FWRkh5TSS7fCOTgB
-Kalw9VcO+Qv9naD2vEWMfp/l8uMgYNwWq+ngsHQ3t0oFnHYkcZApg3kozO5Vcuql
-pjvfxbD1l4uf011V3lXp/4NkAblvaWJjZP/ikaxefe9kiYRtOvHGYGCp4ygHYHVN
-JNXzNDX5mcOUYE0E8ovBNCqrI2NzzZUpGNa7GqoPCChiYe/Mn3a/fBBjlmuCWa36
-+nHn22+oB1Ja93ZfrDXyJjTnmevrLHcvsCQ+P/+dlztSxp4m0O6SMniwnxdWHhTz
-alQpKGe9NwsSh3/AC58wAMHHmVC5Coll9X9uZdsI3qJMvAfEn2apM+OU+RZS7Dv2
-vwQvC4LyWvzxSD2QwGShrnC62nXzhrWQGI5ukZJiQFCLMxoGHUI=
-=Szsv
------END PGP SIGNATURE-----
+Signed-off-by: Peter Xu <peterx@redhat.com>
+---
+ monitor.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
---WuedheRyq6FDfQ9j--
+diff --git a/monitor.c b/monitor.c
+index 46814af533..6f26108108 100644
+--- a/monitor.c
++++ b/monitor.c
+@@ -4354,6 +4354,7 @@ static void monitor_qmp_event(void *opaque, int event)
+ 
+     switch (event) {
+     case CHR_EVENT_OPENED:
++        monitor_qmp_cleanup_queues(mon);
+         mon->qmp.commands = &qmp_cap_negotiation_commands;
+         monitor_qmp_caps_reset(mon);
+         data = get_qmp_greeting(mon);
+@@ -4362,7 +4363,6 @@ static void monitor_qmp_event(void *opaque, int event)
+         mon_refcount++;
+         break;
+     case CHR_EVENT_CLOSED:
+-        monitor_qmp_cleanup_queues(mon);
+         json_message_parser_destroy(&mon->qmp.parser);
+         json_message_parser_init(&mon->qmp.parser, handle_qmp_command);
+         mon_refcount--;
+-- 
+2.17.0
