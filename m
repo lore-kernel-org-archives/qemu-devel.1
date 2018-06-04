@@ -1,29 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59562)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60179)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fPp8v-0007ux-5I
-	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 09:03:29 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1fPpAr-0000St-Gl
+	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 09:05:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fPp8u-0004A1-CV
-	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 09:03:25 -0400
-Received: from mail-oi0-x242.google.com ([2607:f8b0:4003:c06::242]:33619)
+	(envelope-from <alex.bennee@linaro.org>) id 1fPpAl-00066I-OT
+	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 09:05:25 -0400
+Received: from mail-wr0-x244.google.com ([2a00:1450:400c:c0c::244]:39707)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fPp8u-00049c-7K
-	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 09:03:24 -0400
-Received: by mail-oi0-x242.google.com with SMTP id k5-v6so28314466oiw.0
-	for <qemu-devel@nongnu.org>; Mon, 04 Jun 2018 06:03:24 -0700 (PDT)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1fPpAl-00065P-Ht
+	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 09:05:19 -0400
+Received: by mail-wr0-x244.google.com with SMTP id w7-v6so31300352wrn.6
+	for <qemu-devel@nongnu.org>; Mon, 04 Jun 2018 06:05:19 -0700 (PDT)
+References: <20180502002143.30624-1-f4bug@amsat.org>
+	<082d9daf-d430-0917-f71e-a96d7735160e@amsat.org>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <082d9daf-d430-0917-f71e-a96d7735160e@amsat.org>
+Date: Mon, 04 Jun 2018 14:05:17 +0100
+Message-ID: <87muwad7n6.fsf@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <87603evivz.fsf@linaro.org>
-References: <20180521140402.23318-1-peter.maydell@linaro.org>
-	<20180521140402.23318-16-peter.maydell@linaro.org>
-	<87603evivz.fsf@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 4 Jun 2018 14:03:03 +0100
-Message-ID: <CAFEAcA8xRj5CWkAMdUVvT_cZJWSL5ysvt8qb6fbypSp5ZJF1sg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 15/27] iommu: Add IOMMU index argument to
- notifier APIs
+Subject: Re: [Qemu-devel] [RFC PATCH] docker: add debian/tricore image
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,60 +30,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
-Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, "patches@linaro.org" <patches@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Cc: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org, David Brenken <david.brenken@efs-auto.de>, Florian Artmeier <florian.artmeier@efs-auto.de>, Georg Hofstetter <georg.hofstetter@efs-auto.de>
 
-On 23 May 2018 at 10:08, Alex Benn=C3=A9e <alex.bennee@linaro.org> wrote:
+
+Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> writes:
+
+> Hi Alex, ping for review ;)
+
+queued, thanks.
+
 >
-> Peter Maydell <peter.maydell@linaro.org> writes:
->
->> Add support for multiple IOMMU indexes to the IOMMU notifier APIs.
->> When initializing a notifier with iommu_notifier_init(), the caller
->> must pass the IOMMU index that it is interested in. When a change
->> happens, the IOMMU implementation must pass
->> memory_region_notify_iommu() the IOMMU index that has changed and
->> that notifiers must be called for.
+> On 05/01/2018 09:21 PM, Philippe Mathieu-Daud=C3=A9 wrote:
+>> TriCore binutils is built from Bastian Koppelmann repository.
 >>
->> IOMMUs which support only a single index don't need to change.
->> Callers which only really support working with IOMMUs with a single
->> index can use the result of passing MEMTXATTRS_UNSPECIFIED to
->> memory_region_iommu_attrs_to_index().
+>> Note: There is no TriCore compiler in this image (only assembler/linker).
 >>
->> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+>> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 >> ---
->>  include/exec/memory.h    | 11 ++++++++++-
->>  hw/i386/intel_iommu.c    |  4 ++--
->>  hw/ppc/spapr_iommu.c     |  2 +-
->>  hw/s390x/s390-pci-inst.c |  4 ++--
->>  hw/vfio/common.c         |  6 +++++-
->>  hw/virtio/vhost.c        |  7 ++++++-
->>  memory.c                 |  8 +++++++-
->>  7 files changed, 33 insertions(+), 9 deletions(-)
+>> See http://lists.nongnu.org/archive/html/qemu-devel/2018-05/msg00074.html
 >>
->> diff --git a/include/exec/memory.h b/include/exec/memory.h
->> index f6226fb263..4e6b125add 100644
->> --- a/include/exec/memory.h
->> +++ b/include/exec/memory.h
->> @@ -71,6 +71,7 @@ struct IOMMUTLBEntry {
->>      hwaddr           iova;
->>      hwaddr           translated_addr;
->>      hwaddr           addr_mask;  /* 0xfff =3D 4k translation */
->> +    int              iommu_idx;
->>      IOMMUAccessFlags perm;
->>  };
+>> $ docker images --format "{{.Repository}}:{{.Tag}} {{.Size}}"
+>> qemu:debian-tricore-cross 323MB
 >>
->> @@ -98,18 +99,21 @@ struct IOMMUNotifier {
->>      /* Notify for address space range start <=3D addr <=3D end */
->>      hwaddr start;
->>      hwaddr end;
->> +    int iommu_idx;
->
-> Its a minor thing but are we ever expecting iommu_idx to ever be
-> negative?
+>>  .../dockerfiles/debian-tricore-cross.docker   | 35 +++++++++++++++++++
+>>  1 file changed, 35 insertions(+)
+>>  create mode 100644 tests/docker/dockerfiles/debian-tricore-cross.docker
+>>
+>> diff --git a/tests/docker/dockerfiles/debian-tricore-cross.docker b/test=
+s/docker/dockerfiles/debian-tricore-cross.docker
+>> new file mode 100644
+>> index 0000000000..f71ac3eb47
+>> --- /dev/null
+>> +++ b/tests/docker/dockerfiles/debian-tricore-cross.docker
+>> @@ -0,0 +1,35 @@
+>> +#
+>> +# Docker TriCore cross-compiler target
+>> +#
+>> +# This docker target builds on the debian Stretch base image.
+>> +#
+>> +# Copyright (c) 2018 Philippe Mathieu-Daud=C3=A9
+>> +#
+>> +# SPDX-License-Identifier: GPL-2.0-or-later
+>> +#
+>> +FROM debian:stretch-slim
+>> +
+>> +MAINTAINER Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+>> +
+>> +# Install common build utilities
+>> +RUN apt-get update && \
+>> +    DEBIAN_FRONTEND=3Dnoninteractive apt-get install -yy eatmydata && \
+>> +    DEBIAN_FRONTEND=3Dnoninteractive eatmydata \
+>> +    apt-get install -y --no-install-recommends \
+>> +        automake \
+>> +        bison \
+>> +        build-essential \
+>> +        ca-certificates \
+>> +        flex \
+>> +        git
+>> +
+>> +RUN git clone --single-branch \
+>> +        https://github.com/bkoppelmann/tricore-binutils.git \
+>> +        /usr/src/binutils && \
+>> +    cd /usr/src/binutils && chmod +x missing && \
+>> +    CFLAGS=3D-w ./configure --prefix=3D/usr --disable-nls --target=3Dtr=
+icore && \
+>> +    make && make install && \
+>> +    rm -rf /usr/src/binutils
+>> +
+>> +# Specify the cross prefix for this image (see tests/docker/common.rc)
+>> +ENV QEMU_CONFIGURE_OPTS --cross-prefix=3Dtricore-
+>>
 
-Coming back to this one -- no, we don't expect negative iommu_idxs.
-But on the other hand we don't ever expect negative TCG mmu_indexes
-either, and we use 'int' for those...
 
-thanks
--- PMM
+--
+Alex Benn=C3=A9e
