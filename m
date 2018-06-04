@@ -1,30 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40819)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40938)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1fPsmn-0006Rs-El
-	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 12:56:50 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1fPsn8-0006bN-Da
+	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 12:57:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1fPsmj-0000i6-6i
-	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 12:56:49 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:39162 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1fPsmi-0000gN-Tx
-	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 12:56:45 -0400
-Date: Mon, 4 Jun 2018 17:56:37 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20180604165637.GP19749@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <20180603092749.107476-1-marcel.apfelbaum@gmail.com>
-	<20180604042928-mutt-send-email-mst@kernel.org>
-	<20180604125415.GN7451@localhost.localdomain>
-	<20180604130129.GG19749@redhat.com>
-	<20180604194500-mutt-send-email-mst@kernel.org>
+	(envelope-from <peter.maydell@linaro.org>) id 1fPsn7-0000wt-JS
+	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 12:57:10 -0400
+Received: from mail-ot0-x234.google.com ([2607:f8b0:4003:c0f::234]:40684)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1fPsn7-0000wY-DX
+	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 12:57:09 -0400
+Received: by mail-ot0-x234.google.com with SMTP id n1-v6so38505347otf.7
+	for <qemu-devel@nongnu.org>; Mon, 04 Jun 2018 09:57:09 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20180604194500-mutt-send-email-mst@kernel.org>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH RFC] hw/pc: set q35 as the default x86
- machine
+In-Reply-To: <20180530180120.13355-9-richard.henderson@linaro.org>
+References: <20180530180120.13355-1-richard.henderson@linaro.org>
+	<20180530180120.13355-9-richard.henderson@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 4 Jun 2018 17:56:48 +0100
+Message-ID: <CAFEAcA8=aALvwnD1DP4cL6CQpcji3=DJ8qDcmNbSFMbJ2kRVBA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v3b 08/18] target/arm: Implement SVE
+ reverse within elements
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,85 +30,91 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Eduardo Habkost <ehabkost@redhat.com>, pbonzini@redhat.com, qemu-devel@nongnu.org, rth@twiddle.net
+To: Richard Henderson <richard.henderson@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>
 
-On Mon, Jun 04, 2018 at 07:48:51PM +0300, Michael S. Tsirkin wrote:
-> On Mon, Jun 04, 2018 at 02:01:29PM +0100, Daniel P. Berrang=C3=A9 wrote=
-:
-> > On Mon, Jun 04, 2018 at 09:54:15AM -0300, Eduardo Habkost wrote:
-> > > On Mon, Jun 04, 2018 at 04:38:22AM +0300, Michael S. Tsirkin wrote:
-> > > > On Sun, Jun 03, 2018 at 12:27:49PM +0300, Marcel Apfelbaum wrote:
-> > > > > Moving to QEMU 3.0 seems like a good opportunity for such a cha=
-nge.
-> > > > >=20
-> > > > > I440FX is really old and does not support modern features like =
-IOMMU.
-> > > > > Q35's SATA emulation is faster than pc's IDE, native PCI expres=
-s hotplug
-> > > > > is cleaner than ACPI based one and so on...
-> > > > >=20
-> > > > > Also the libvirt guys added very good support for the Q35 machi=
-ne (thanks!).
-> > > > >=20
-> > > > > Management software should always specify the machine type and =
-for the
-> > > > > current setups, adding '-machine pc' to the command line is not=
- such a
-> > > > > big deal.
-> > > > >=20
-> > > > > In time the pc machine will fade out and we will probably stop =
-adding
-> > > > > new versions at some point.
-> > > > >=20
-> > > > > Signed-off-by: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
-> > > >=20
-> > > > For command line users, I think changing the default isn't nice.
-> > > >=20
-> > > > Yes it's easy to add -machine pc but there's no documentation
-> > > > that tells you to do so. Add to that shortcuts like -cdrom
-> > > > stop working, hotplug needs extra bridges to work, and one
-> > > > can see that while management tool users benefit from q35,
-> > > > command line users will suffer.
-> > > >=20
-> > > > Can't we add a tag for management without changing the command li=
-ne
-> > > > default? How about "management-default"? "recommended"? "latest"?
-> > >=20
-> > > We could add new aliases if they are useful for management
-> > > software, but we would need a well-defined use case and set of
-> > > requirements+expectations for the new alias.
-> >=20
-> > I'm not convinced by the idea of adding a distinct default "for mgmt"=
-. All
-> > the problems described wrt 'q35' vs 'pc' apply equally to management =
-apps
-> > as they do to humans. It just happens that one common mgmt layer (lib=
-virt)
-> > knows how to handle some of the complexity of q35. Other mgmt apps th=
-ough
-> > are just as likely to be hurt by the change as humans are. So effecti=
-vely
-> > the proposed "for mgmt" is actually  "for libvirt >=3D some version",=
- which
-> > feels like a layering violation to me.
->=20
-> Is libvirt happy to just hard-code q35 for now then?
+On 30 May 2018 at 19:01, Richard Henderson <richard.henderson@linaro.org> wrote:
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+> ---
+>  target/arm/helper-sve.h    | 14 +++++++++++++
+>  target/arm/sve_helper.c    | 41 +++++++++++++++++++++++++++++++-------
+>  target/arm/translate-sve.c | 38 +++++++++++++++++++++++++++++++++++
+>  target/arm/sve.decode      |  7 +++++++
+>  4 files changed, 93 insertions(+), 7 deletions(-)
 
-I'm pretty wary of doing that, as I feel 'pc' has broader OS compatibilit=
-y
-than 'q35', so we'd be likely to cause breakage for users.
+> diff --git a/target/arm/sve_helper.c b/target/arm/sve_helper.c
+> index 941a098234..f8579a25e3 100644
+> --- a/target/arm/sve_helper.c
+> +++ b/target/arm/sve_helper.c
+> @@ -238,6 +238,26 @@ static inline uint64_t expand_pred_s(uint8_t byte)
+>      return word[byte & 0x11];
+>  }
+>
+> +/* Swap 16-bit words within a 32-bit word.  */
+> +static inline uint32_t hswap32(uint32_t h)
+> +{
+> +    return rol32(h, 16);
+> +}
+> +
+> +/* Swap 16-bit words within a 64-bit word.  */
+> +static inline uint64_t hswap64(uint64_t h)
+> +{
+> +    uint64_t m = 0x0000ffff0000ffffull;
+> +    h = rol64(h, 32);
+> +    return ((h & m) << 16) | ((h >> 16) & m);
+> +}
+> +
+> +/* Swap 32-bit words within a 64-bit word.  */
+> +static inline uint64_t wswap64(uint64_t h)
+> +{
+> +    return rol64(h, 32);
+> +}
+> +
+>  #define LOGICAL_PPPP(NAME, FUNC) \
+>  void HELPER(NAME)(void *vd, void *vn, void *vm, void *vg, uint32_t desc)  \
+>  {                                                                         \
+> @@ -616,6 +636,20 @@ DO_ZPZ(sve_neg_h, uint16_t, H1_2, DO_NEG)
+>  DO_ZPZ(sve_neg_s, uint32_t, H1_4, DO_NEG)
+>  DO_ZPZ_D(sve_neg_d, uint64_t, DO_NEG)
+>
+> +DO_ZPZ(sve_revb_h, uint16_t, H1_2, bswap16)
+> +DO_ZPZ(sve_revb_s, uint32_t, H1_4, bswap32)
+> +DO_ZPZ_D(sve_revb_d, uint64_t, bswap64)
+> +
+> +DO_ZPZ(sve_revh_s, uint32_t, H1_4, hswap32)
+> +DO_ZPZ_D(sve_revh_d, uint64_t, hswap64)
+> +
+> +DO_ZPZ_D(sve_revw_d, uint64_t, wswap64)
+> +
+> +DO_ZPZ(sve_rbit_b, uint8_t, H1, revbit8)
+> +DO_ZPZ(sve_rbit_h, uint16_t, H1_2, revbit16)
+> +DO_ZPZ(sve_rbit_s, uint32_t, H1_4, revbit32)
+> +DO_ZPZ_D(sve_rbit_d, uint64_t, revbit64)
+> +
+>  /* Three-operand expander, unpredicated, in which the third operand is "wide".
+>   */
+>  #define DO_ZZW(NAME, TYPE, TYPEW, H, OP)                       \
+> @@ -1587,13 +1621,6 @@ void HELPER(sve_rev_b)(void *vd, void *vn, uint32_t desc)
+>      }
+>  }
+>
+> -static inline uint64_t hswap64(uint64_t h)
+> -{
+> -    uint64_t m = 0x0000ffff0000ffffull;
+> -    h = rol64(h, 32);
+> -    return ((h & m) << 16) | ((h >> 16) & m);
+> -}
+> -
 
-IMHO, defaults are something better expressed in libosinfo, so if there's
-guests where we think q35 is a better choice, we can record it there and
-leave everything else on pc to avoid risk of breakage.
+You added this in patch 2, I think -- you could avoid the code
+motion here by putting it in the right place to start with.
 
-Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
-ge :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.c=
-om :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
-ge :|
+>  void HELPER(sve_rev_h)(void *vd, void *vn, uint32_t desc)
+>  {
+>      intptr_t i, j, opr_sz = simd_oprsz(desc);
+
+Otherwise
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+
+thanks
+-- PMM
