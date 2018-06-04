@@ -1,31 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44147)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45225)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1fPm47-00049z-5b
-	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 05:46:16 -0400
+	(envelope-from <mreitz@redhat.com>) id 1fPm8c-0005GL-L1
+	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 05:50:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1fPm44-0002Z6-3H
-	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 05:46:15 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:57556 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1fPm43-0002Wi-Tq
-	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 05:46:12 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.3])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 3D8AF818F024
-	for <qemu-devel@nongnu.org>; Mon,  4 Jun 2018 09:46:10 +0000 (UTC)
-References: <d714d8ac-6642-f2f3-ad9c-ac7e3bdf30e0@redhat.com>
-	<d453da2c-92fe-5ef8-239c-656c1822b9e0@redhat.com>
+	(envelope-from <mreitz@redhat.com>) id 1fPm8b-0006fT-JJ
+	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 05:50:54 -0400
+References: <20180601123221.29437-1-mreitz@redhat.com>
+	<c0002f27-b60c-a09c-0a2f-9dde3daaba8f@redhat.com>
 From: Max Reitz <mreitz@redhat.com>
-Message-ID: <24719f30-25c9-a80e-0db9-ae2f7f318c68@redhat.com>
-Date: Mon, 4 Jun 2018 11:46:06 +0200
+Message-ID: <617f1301-4479-8c25-4ce8-92acdd690ec2@redhat.com>
+Date: Mon, 4 Jun 2018 11:50:38 +0200
 MIME-Version: 1.0
-In-Reply-To: <d453da2c-92fe-5ef8-239c-656c1822b9e0@redhat.com>
+In-Reply-To: <c0002f27-b60c-a09c-0a2f-9dde3daaba8f@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="4YRfFjbJ5eShEPHO4jrYSdp5jzE9AcuE0"
-Subject: Re: [Qemu-devel] Preconfig state reachable without --preconfig given
+	boundary="hkag7BwQ48cOTf3yXiYrIyBITzyVBUAFX"
+Subject: Re: [Qemu-devel] [PATCH] iotests: Fix 219's timing
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,84 +24,149 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Michal Privoznik <mprivozn@redhat.com>, Igor Mammedov <imammedo@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+To: Eric Blake <eblake@redhat.com>, qemu-block@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---4YRfFjbJ5eShEPHO4jrYSdp5jzE9AcuE0
+--hkag7BwQ48cOTf3yXiYrIyBITzyVBUAFX
 From: Max Reitz <mreitz@redhat.com>
-To: Michal Privoznik <mprivozn@redhat.com>,
- Igor Mammedov <imammedo@redhat.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Message-ID: <24719f30-25c9-a80e-0db9-ae2f7f318c68@redhat.com>
-Subject: Re: [Qemu-devel] Preconfig state reachable without --preconfig given
-References: <d714d8ac-6642-f2f3-ad9c-ac7e3bdf30e0@redhat.com>
- <d453da2c-92fe-5ef8-239c-656c1822b9e0@redhat.com>
-In-Reply-To: <d453da2c-92fe-5ef8-239c-656c1822b9e0@redhat.com>
+To: Eric Blake <eblake@redhat.com>, qemu-block@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org
+Message-ID: <617f1301-4479-8c25-4ce8-92acdd690ec2@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] iotests: Fix 219's timing
+References: <20180601123221.29437-1-mreitz@redhat.com>
+ <c0002f27-b60c-a09c-0a2f-9dde3daaba8f@redhat.com>
+In-Reply-To: <c0002f27-b60c-a09c-0a2f-9dde3daaba8f@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On 2018-06-02 12:46, Michal Privoznik wrote:
-> On 06/01/2018 03:28 PM, Max Reitz wrote:
->> Hi,
+On 2018-06-01 23:36, Eric Blake wrote:
+> On 06/01/2018 07:32 AM, Max Reitz wrote:
+>> 219 has two issues that may lead to sporadic failure, both of which ar=
+e
+>> the result of issuing query-jobs too early after a job has been
+>> modified.=C2=A0 This can then lead to different results based on wheth=
+er the
+>> modification has taken effect already or not.
 >>
->> The @preconfig RunState documentation states:
+>> First, query-jobs is issued right after the job has been created.
+>> Besides its current progress possibly being in any random state (which=
+
+>> has already been taken care of), its total progress too is basically
+>> arbitrary, because the job may not yet have been able to determine it.=
+
+>> This patch addresses this by just filtering the total progress, like
+>> what has been done for the current progress already.
 >>
->>> The state is reachable only if the --preconfig CLI option is used.
->>
->> However, this is not true:
->>
->> $ echo | x86_64-softmmu/qemu-system-x86_64 -monitor stdio
->> QEMU 2.12.50 monitor - type 'help' for more information
->> (qemu)
->> HMP not available in preconfig state, use QMP instead
+>> Secondly, query-jobs is issued right after a job has been resumed.=C2=A0=
+ The
+>> job may or may not yet have had the time to actually perform any I/O,
+>> and thus its current progress may or may not have advanced.=C2=A0 To m=
+ake
+>> sure it has indeed advanced (which is what the reference output alread=
+y
+>> assumes), insert a sleep of 100 ms before query-jobs is invoked.=C2=A0=
+ With a
+>> slice time of 100 ms, a buffer size of 64 kB and a speed of 256 kB/s,
+>> this should be the right amount of time to let the job advance by
+>> exactly 64 kB.
 >=20
-> Not sure if this is the same bug, but I've noticed libvirt having
-> troubles detecting capabilities of qemu and debugging lead to this patc=
-h:
+> This still sounds a bit fragile (under heavy load, our 100ms sleep coul=
+d
+> turn into 200 such that more than 64k could transfer before we finally
+> get a chance to query), but seems more robust that what we currently ha=
+ve.
+
+Indeed.  I'll just say I'll try to keep it in mind when I see the test
+failing somewhen in the future. O:-)
+
+(I guess I'll have to make it slower then.)
+
+>> Signed-off-by: Max Reitz <mreitz@redhat.com>
+>> ---
+>> =C2=A0 tests/qemu-iotests/219=C2=A0=C2=A0=C2=A0=C2=A0 | 10 +++++++---
+>> =C2=A0 tests/qemu-iotests/219.out | 10 +++++-----
+>> =C2=A0 2 files changed, 12 insertions(+), 8 deletions(-)
 >=20
-> http://lists.nongnu.org/archive/html/qemu-devel/2018-06/msg00367.html
+>> @@ -58,12 +61,13 @@ def test_job_lifecycle(vm, job, job_args,
+>> has_ready=3DFalse):
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 iotests.log(vm.qmp(job, job_id=3D'job0'=
+, **job_args))
+>> =C2=A0 =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 # Depending on the storage, the =
+first request may or may not
+>> have completed
+>> -=C2=A0=C2=A0=C2=A0 # yet, so filter out the progress. Later query-job=
+ calls don't
+>> need the
+>> -=C2=A0=C2=A0=C2=A0 # filtering because the progress is made determini=
+stic by the
+>> block job
+>> -=C2=A0=C2=A0=C2=A0 # speed
+>> +=C2=A0=C2=A0=C2=A0 # yet (and the total progress may not have been fu=
+lly determined
+>> yet), so
+>> +=C2=A0=C2=A0=C2=A0 # filter out the progress. Later query-job calls d=
+on't need the
+>> filtering
+>> +=C2=A0=C2=A0=C2=A0 # because the progress is made deterministic by th=
+e block job speed
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 result =3D vm.qmp('query-jobs')
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 for j in result['return']:
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 del j['current-=
+progress']
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 del j['total-progress']
 >=20
-> (which by no means I claim is proper solution. It might be viewed as
-> workaround by expert qemu devels)
-
-Well, it'd fix both of my issues, so it has that going for it. :-)
-
->> On IRC, Daniel proposed doing the runstate transition immediately afte=
-r
->> the command line has been read and no --preconfig option has been foun=
-d.
->>  Doing that indeed fixes the issue for me (but I don't know whether
->> that's the best solution).
+> Would this be better as:
 >=20
-> Oh has he? I can't find it anywhere.
+> j['current-progress'] =3D "VALUE"
+> j['total-progress'] =3D "VALUE"
+>=20
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 iotests.log(result)
+>> =C2=A0 =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 # undefined -> created -> runnin=
+g
+>> diff --git a/tests/qemu-iotests/219.out b/tests/qemu-iotests/219.out
+>> index 346801b655..740b3d06d7 100644
+>> --- a/tests/qemu-iotests/219.out
+>> +++ b/tests/qemu-iotests/219.out
+>> @@ -3,7 +3,7 @@ Launching VM...
+>> =C2=A0 =C2=A0 Starting block job: drive-mirror (auto-finalize: True;
+>> auto-dismiss: True)
+>> =C2=A0 {u'return': {}}
+>> -{u'return': [{u'status': u'running', u'total-progress': 4194304,
+>> u'id': u'job0', u'type': u'mirror'}]}
+>> +{u'return': [{u'status': u'running', u'id': u'job0', u'type':
+>> u'mirror'}]}
+>=20
+> so that the trace shows that the field was present but filtered, rather=
 
-That was in #qemu on OFTC:
+> than looking strange by not showing the field at all?
 
-[Friday, June 1 2018] [15:21:26 CEST] <danpb> if we've not passed
---preconfig though, we should not be in PRECONFIG state in the first
-place IMHO
-[Friday, June 1 2018] [15:22:27 CEST] <danpb> eg  vl.c should set the
-state to RUN_STATE_PRELAUNCH  immediately after parsing CLI args if
---preconfig wasn't given
+Yes, that would be better.  I'll change it.
+
+> But since it was copied from pre-existing deletion rather than replacem=
+ent,
+> Reviewed-by: Eric Blake <eblake@redhat.com>
+
+Thanks,
 
 Max
 
 
---4YRfFjbJ5eShEPHO4jrYSdp5jzE9AcuE0
+--hkag7BwQ48cOTf3yXiYrIyBITzyVBUAFX
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlsVCl4ACgkQ9AfbAGHV
-z0Cj5gf+K9g89X11rcX8J4jVE8BINC/D07Y/IRG/zEdrJKvyee+RKaD/C0QQquRM
-iW5CuGFIlKJcp/sUhloqsDB4S84bxDrWBFfR4IbVEQyJQ97VAh46vI138LTGdW3/
-oD0cEYGprgwLVXkUrFTwCb/lYO00Kg47kKOPCk3p00sMGdXWj+gUwevwWnH1dfnj
-CWsSohvpc1RExT15AsfIALoMmoSmoGlW0P0OYJ4N9YruG2L7cTZp85kTrN5siVrO
-094u7cF5BTHIOB8zXYnxlWZfoXs7opQ1qvp6iJfzMKWGxJDQ11XvT3mVdNzQCXRz
-v1PafCoi0SxbweMkcXkPPGV8sEJeKw==
-=W3dF
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlsVC24ACgkQ9AfbAGHV
+z0CaGwf+INuPlQvn2qBeAfQefElCHTYlREJoroKkfz3LQpOcDRgL9t4ctdccsjKp
+Z+LM0v/DC2hNCHx4PNUOUHg6phLb+5WbX7hwgdKjNkRCdwtemz08wAUvGqo9FpjO
+k3cVebJfYJflqz3KSAi7TC8R+z2VxTYjrnKPQOhNa0SO1ECUOXVzvaTJ+M9Z0mwe
+u4dFZihBLrL+182QH+lLsd7F/eg7K6Os8VXtAdbUxUHkxSss/saxXAB16VUcFuWK
+nvqBwDboVAun52oti0iYj+S3zJVKxy5D5+GhlORj8ks4wSnydVEO9dstUhhIPU8w
+81MmwoN2StYBxakR0Qjc55JnR27b2w==
+=wapH
 -----END PGP SIGNATURE-----
 
---4YRfFjbJ5eShEPHO4jrYSdp5jzE9AcuE0--
+--hkag7BwQ48cOTf3yXiYrIyBITzyVBUAFX--
