@@ -1,33 +1,37 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48422)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50211)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fPqGs-0004oR-Le
-	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 10:15:43 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fPqLs-0008Ja-HQ
+	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 10:20:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fPqGm-0005JP-Li
-	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 10:15:42 -0400
-Received: from indium.canonical.com ([91.189.90.7]:46772)
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fPqLo-0008Rz-Gf
+	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 10:20:52 -0400
+Received: from mail-qk0-x244.google.com ([2607:f8b0:400d:c09::244]:33360)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1fPqGm-0005Iy-9A
-	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 10:15:36 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1fPqGl-0002QO-A1
-	for <qemu-devel@nongnu.org>; Mon, 04 Jun 2018 14:15:35 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 47B642E8030
-	for <qemu-devel@nongnu.org>; Mon,  4 Jun 2018 14:15:35 +0000 (UTC)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fPqLo-0008Rb-CE
+	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 10:20:48 -0400
+Received: by mail-qk0-x244.google.com with SMTP id h7-v6so17895100qkm.0
+	for <qemu-devel@nongnu.org>; Mon, 04 Jun 2018 07:20:48 -0700 (PDT)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20170724182751.18261-1-f4bug@amsat.org>
+	<20170724182751.18261-27-f4bug@amsat.org>
+	<cc23ddee-ad10-74ef-874c-6ed1ef485d2e@vivier.eu>
+	<811e6e16-d9d7-3b96-7d43-f9d7b6ace063@amsat.org>
+	<d93b02bd-6776-497a-2dc0-aed009be380b@vivier.eu>
+	<cb4c699f-897e-146e-6435-bfb0597aee75@vivier.eu>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <e973502f-6c20-d303-d758-c3f1c1e6036c@amsat.org>
+Date: Mon, 4 Jun 2018 11:20:42 -0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 04 Jun 2018 14:07:23 -0000
-From: Alex <1775011@bugs.launchpad.net>
-Reply-To: Bug 1775011 <1775011@bugs.launchpad.net>
-Sender: bounces@canonical.com
-Message-Id: <152812124309.24357.17398369138889360746.malonedeb@gac.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1775011] [NEW] -display gtk,
- gl=on crashes on Wayland
+In-Reply-To: <cb4c699f-897e-146e-6435-bfb0597aee75@vivier.eu>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH for 2.10 26/35] linux-user: use is_error()
+ to avoid warnings and make the code clearer
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,70 +40,115 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Laurent Vivier <laurent@vivier.eu>, qemu-devel@nongnu.org
 
-Public bug reported:
+On 06/03/2018 08:33 PM, Laurent Vivier wrote:
+> Le 29/05/2018 à 17:19, Laurent Vivier a écrit :
+>> Le 29/05/2018 à 16:25, Philippe Mathieu-Daudé a écrit :
+>>> Hi Laurent,
+>>
+>> Hi Philippe,
+>>
+>>> On 07/24/2017 04:16 PM, Laurent Vivier wrote:
+>>>> Le 24/07/2017 à 20:27, Philippe Mathieu-Daudé a écrit :
+>>>>> linux-user/flatload.c:740:9: warning: Loss of sign in implicit conversion
+>>>>>     if (res > (unsigned long)-4096)
+>>>>>         ^~~
+>>>>>
+>>>>> Reported-by: Clang Static Analyzer
+>>>>> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+>>>>
+>>>> Reviewed-by: Laurent Vivier <laurent@vivier.eu>
+>>>>
+>>>>> ---
+>>>>>  linux-user/flatload.c | 15 +++++++++------
+>>>>>  1 file changed, 9 insertions(+), 6 deletions(-)
+>>>>>
+>>>>> diff --git a/linux-user/flatload.c b/linux-user/flatload.c
+>>>>> index a35a560904..10c529910f 100644
+>>>>> --- a/linux-user/flatload.c
+>>>>> +++ b/linux-user/flatload.c
+>>>>> @@ -224,8 +224,9 @@ static int decompress_exec(
+>>>>>  		ret = bprm->file->f_op->read(bprm->file, buf, LBUFSIZE, &fpos);
+>>>>>  		if (ret <= 0)
+>>>>>  			break;
+>>>>> -		if (ret >= (unsigned long) -4096)
+>>>>> +                if (is_error(ret)) {
+>>>>>  			break;
+>>>>> +                }
+>>>>>  		len -= ret;
+>>>>>  
+>>>>>  		strm.next_in = buf;
+>>>>> @@ -283,8 +284,7 @@ calc_reloc(abi_ulong r, struct lib_info *p, int curid, int internalp)
+>>>>>                      "in same module (%d != %d)\n",
+>>>>>                      (unsigned) r, curid, id);
+>>>>>              goto failed;
+>>>>> -        } else if ( ! p[id].loaded &&
+>>>>> -                    load_flat_shared_library(id, p) > (unsigned long) -4096) {
+>>>>> +        } else if (!p[id].loaded && is_error(load_flat_shared_library(id, p))) {
+>>>>>              fprintf(stderr, "BINFMT_FLAT: failed to load library %d\n", id);
+>>>>>              goto failed;
+>>>>>          }
+>>>>> @@ -523,9 +523,10 @@ static int load_flat_file(struct linux_binprm * bprm,
+>>>>>                  fpos = 0;
+>>>>>                  result = bprm->file->f_op->read(bprm->file,
+>>>>>                                  (char *) textpos, text_len, &fpos);
+>>>>> -                if (result < (unsigned long) -4096)
+>>>>> +                if (!is_error(result)) {
+>>>>>                          result = decompress_exec(bprm, text_len, (char *) datapos,
+>>>>>                                           data_len + (relocs * sizeof(unsigned long)), 0);
+>>>>> +                }
+>>>>>          }
+>>>>>          else
+>>>>>  #endif
+>>>>> @@ -693,8 +694,9 @@ static int load_flat_shared_library(int id, struct lib_info *libs)
+>>>>>  
+>>>>>  	res = prepare_binprm(&bprm);
+>>>>>  
+>>>>> -	if (res <= (unsigned long)-4096)
+>>>>> +        if (!is_error(res)) {
+>>>>>  		res = load_flat_file(&bprm, libs, id, NULL);
+>>>>> +        }
+>>>>>  	if (bprm.file) {
+>>>>>  		allow_write_access(bprm.file);
+>>>>>  		fput(bprm.file);
+>>>>> @@ -737,8 +739,9 @@ int load_flt_binary(struct linux_binprm *bprm, struct image_info *info)
+>>>>>  
+>>>>>  
+>>>>>      res = load_flat_file(bprm, libinfo, 0, &stack_len);
+>>>>> -    if (res > (unsigned long)-4096)
+>>>>> +    if (is_error(res)) {
+>>>>>              return res;
+>>>>> +    }
+>>>>>  
+>>>>>      /* Update data segment pointers for all libraries */
+>>>>>      for (i=0; i<MAX_SHARED_LIBS; i++) {
+>>>>>
+>>>
+>>> Can you take this via your linux-user tree?
+>>>
+>>
+>> Applied, thanks.
+> 
+> Unapplied, it needs a rebase:
 
-steps to reproduce:
+No rebase required, it just need the previous patch applied too :)
+But I didn't think of explicit it :/
+Can you take both of them directly or do you prefer I RESEND?
 
-1. run a Wayland compositor (I use sway, probably the same bug exists for o=
-ther compositors)
-2. execute qemu -display gtk,gl=3Don
-
-expected results:
-
-a GTK window is created that shows SeaBIOS failing to boot
-
-actual results:
-
-segmentation fault  qemu-system-x86_64 -display gtk,gl=3Don
-
-additional information:
-
-qemu version 2.12.0 from Arch Linux
-
-looks like qemu is trying to take the Wayland display from GTK and
-initialize EGL but telling EGL it's a X11 display, which is not correct.
-setting GDK_BACKEND=3Dx11 works around the issue.
-
-** Affects: qemu
-     Importance: Undecided
-         Status: New
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1775011
-
-Title:
-  -display gtk,gl=3Don crashes on Wayland
-
-Status in QEMU:
-  New
-
-Bug description:
-  steps to reproduce:
-
-  1. run a Wayland compositor (I use sway, probably the same bug exists for=
- other compositors)
-  2. execute qemu -display gtk,gl=3Don
-
-  expected results:
-
-  a GTK window is created that shows SeaBIOS failing to boot
-
-  actual results:
-
-  segmentation fault  qemu-system-x86_64 -display gtk,gl=3Don
-
-  additional information:
-
-  qemu version 2.12.0 from Arch Linux
-
-  looks like qemu is trying to take the Wayland display from GTK and
-  initialize EGL but telling EGL it's a X11 display, which is not
-  correct. setting GDK_BACKEND=3Dx11 works around the issue.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1775011/+subscriptions
+> 
+> qemu/linux-user/flatload.c: In function 'load_flt_binary':
+> qemu/linux-user/flatload.c:742:9: error: implicit declaration of
+> function 'is_error'; did you mean 'g_error'?
+> [-Werror=implicit-function-declaration]
+>      if (is_error(res)) {
+>          ^~~~~~~~
+>          g_error
+> qemu/linux-user/flatload.c:742:9: error: nested extern declaration of
+> 'is_error' [-Werror=nested-externs]
+> 
+> Thanks,
+> Laurent
+> 
+> 
+> 
