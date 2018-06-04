@@ -1,34 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49338)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49818)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1fPrp6-0006C6-Pr
-	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 11:55:10 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1fPrqA-0007E0-9b
+	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 11:56:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1fPrp2-00074c-N5
-	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 11:55:08 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:36854 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1fPrp2-000743-Hf
-	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 11:55:04 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.4])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 0CD5588841
-	for <qemu-devel@nongnu.org>; Mon,  4 Jun 2018 15:55:04 +0000 (UTC)
-Date: Mon, 4 Jun 2018 17:55:01 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20180604175501.275b08c8@redhat.com>
-In-Reply-To: <20180604151523.GK19749@redhat.com>
-References: <20180604120345.12955-1-berrange@redhat.com>
-	<20180604120345.12955-3-berrange@redhat.com>
-	<fecc57bf-78a3-065c-729d-a465c974b2c5@redhat.com>
-	<20180604170111.33480718@redhat.com>
-	<20180604151523.GK19749@redhat.com>
+	(envelope-from <pm215@archaic.org.uk>) id 1fPrq9-0007xE-2Q
+	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 11:56:14 -0400
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon,  4 Jun 2018 16:29:40 +0100
+Message-Id: <20180604152941.20374-13-peter.maydell@linaro.org>
+In-Reply-To: <20180604152941.20374-1-peter.maydell@linaro.org>
+References: <20180604152941.20374-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 2/2] vl: fix use of --daemonize with
- --preconfig
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH v2 12/13] hw/arm/iotkit: Wire up MPC interrupt
+ lines
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,92 +23,156 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. =?UTF-8?B?QmVycmFuZ8Op?=" <berrange@redhat.com>
-Cc: Michal Privoznik <mprivozn@redhat.com>, qemu-devel@nongnu.org, Eric Blake <eblake@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Markus Armbruster <armbru@redhat.com>, Max Reitz <mreitz@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>
+To: qemu-arm@nongnu.org, qemu-devel@nongnu.org
+Cc: patches@linaro.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Richard Henderson <rth@twiddle.net>, Paolo Bonzini <pbonzini@redhat.com>, Peter Xu <peterx@redhat.com>, Eric Auger <eric.auger@redhat.com>
 
-On Mon, 4 Jun 2018 16:15:23 +0100
-Daniel P. Berrang=C3=A9 <berrange@redhat.com> wrote:
+The interrupt outputs from the MPC in the IoTKit and the expansion
+MPCs in the board must be wired up to the security controller, and
+also all ORed together to produce a single line to the NVIC.
 
-> On Mon, Jun 04, 2018 at 05:01:11PM +0200, Igor Mammedov wrote:
-> > On Mon, 4 Jun 2018 16:21:48 +0200
-> > Michal Privoznik <mprivozn@redhat.com> wrote:
-> >  =20
-> > > On 06/04/2018 02:03 PM, Daniel P. Berrang=C3=A9 wrote: =20
-> > > > When using --daemonize, the initial lead process will fork a child =
-and
-> > > > then wait to be notified that setup is complete via a pipe, before =
-it
-> > > > exits.  When using --preconfig there is an extra call to main_loop()
-> > > > before the notification is done from os_setup_post(). Thus the pare=
-nt
-> > > > process won't exit until the mgmt application connects to the monit=
-or
-> > > > and tells QEMU to leave the RUN_STATE_PRECONFIG. The mgmt applicati=
-on
-> > > > won't connect to the monitor until daemonizing has completed though.
-> > > >=20
-> > > > This is a chicken and egg problem, leading to deadlock at startup. =
-=20
-> > not calling 1st main_loop(), solves the issue if no --preconfig
-> > is specified like Michal has suggested. So moving os_setup_post()
-> > earlier isn't the only option.
-> >=20
-> > With Michal's patch it should work fine with old libvirt versions,
-> > however it would mean more changes to libvirt when adding
-> > --preconfig option handling as it would need to connect to qmp
-> > socket earlier if the option is used. =20
->=20
-> This patch doesn't cause problems with old libvirt either - the opposite
-> in fact, it fixes the problems that broke with old libvirt.
->=20
-> >  =20
-> > > > The only viable way to fix this is to call os_setup_post() before
-> > > > the early main_loop() call when in RUN_STATE_PRECONFIG. This has the
-> > > > downside that any errors from this point onwards won't be handled
-> > > > well by the mgmt application, because it will think QEMU has started
-> > > > successfully, so not be expecting an abrupt exit. The only way to
-> > > > deal with that is to move as much user input validation as possible
-> > > > to before the main_loop() call. This is left as an exercise for
-> > > > future interested developers. =20
-> > Moving post board input validation might be problematic as
-> > it might require existing board to create a device so it could verify
-> > user provided parameters.
-> >=20
-> > Does mgmt application starts QEMU with log file where QEMU would
-> > write errors if any after os_setup_post() and would mgmt app look
-> > into it/report from it to user if QEMU disappears? =20
->=20
-> Sure any app can redirect stdout/err to a file if it wishes.
->=20
-> --daemonize was actually also a synchronization point - once the parent
-> returns, the mgmt app knows it can successfully connect to the QEMU
-> monitor as the listener socket is guaranteed to be created by then.
-> So moving the os_setup_post earlier as I did still gives that sync
-> point, which is good. It just means when the mgmt app has to be aware
-> that more errors might appear on stderr in the window until it exits
-> preconfig phase.
->=20
-> Ideally there would be a way to feed them back via the monitor, but
-> that's non-trivial, so doubt it'll happen any time in the forseeable
-> future.
-Question is if libvirt would notify user (in its logs) about error
-after sync point?
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
+---
+ include/hw/arm/iotkit.h |  6 ++++
+ hw/arm/iotkit.c         | 74 +++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 80 insertions(+)
 
-> > > > Signed-off-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
-> > > > ---
-> > > >  vl.c | 7 ++++++-
-> > > >  1 file changed, 6 insertions(+), 1 deletion(-)   =20
-> > >=20
-> > > Yup, this fixes the problem I've raised in my patch. Thanks! =20
-> > I'd prefer your patch, as it doesn't break error handling, =20
->=20
-> Michal's patch didn't actually fix the real problem. It simply avoided
-> triggering the bug when --preconfig was not present - QEMU still hangs
-> with --preconfig --daemonize are used together.
-it's not exactly a bug, it's new behavior so mgmt could adapt to it,
-i.e. lack of sync point (which certainly complicates mgmt part).
-
-So this patch is also fine if libvirt would be able to provide
-meaning-full error to users in case of problem post os_setup_post() stage.
-In both cases it would require some work on mgmt part when adding support
-for --precongig.
+diff --git a/include/hw/arm/iotkit.h b/include/hw/arm/iotkit.h
+index b21cf1ab9d1..2cddde55dd1 100644
+--- a/include/hw/arm/iotkit.h
++++ b/include/hw/arm/iotkit.h
+@@ -42,6 +42,9 @@
+  *  + named GPIO outputs ahb_ppcexp{0,1,2,3}_irq_enable
+  *  + named GPIO outputs ahb_ppcexp{0,1,2,3}_irq_clear
+  *  + named GPIO inputs ahb_ppcexp{0,1,2,3}_irq_status
++ * Controlling each of the 16 expansion MPCs which a system using the IoTKit
++ * might provide:
++ *  + named GPIO inputs mpcexp_status[0..15]
+  */
+ 
+ #ifndef IOTKIT_H
+@@ -81,6 +84,8 @@ typedef struct IoTKit {
+     qemu_or_irq ppc_irq_orgate;
+     SplitIRQ sec_resp_splitter;
+     SplitIRQ ppc_irq_splitter[NUM_PPCS];
++    SplitIRQ mpc_irq_splitter[IOTS_NUM_EXP_MPC + IOTS_NUM_MPC];
++    qemu_or_irq mpc_irq_orgate;
+ 
+     UnimplementedDeviceState dualtimer;
+     UnimplementedDeviceState s32ktimer;
+@@ -99,6 +104,7 @@ typedef struct IoTKit {
+     qemu_irq nsc_cfg_in;
+ 
+     qemu_irq irq_status_in[NUM_EXTERNAL_PPCS];
++    qemu_irq mpcexp_status_in[IOTS_NUM_EXP_MPC];
+ 
+     uint32_t nsccfg;
+ 
+diff --git a/hw/arm/iotkit.c b/hw/arm/iotkit.c
+index 160e40c7449..133d5bb34f4 100644
+--- a/hw/arm/iotkit.c
++++ b/hw/arm/iotkit.c
+@@ -131,6 +131,18 @@ static void iotkit_init(Object *obj)
+     init_sysbus_child(obj, "apb-ppc1", &s->apb_ppc1, sizeof(s->apb_ppc1),
+                       TYPE_TZ_PPC);
+     init_sysbus_child(obj, "mpc", &s->mpc, sizeof(s->mpc), TYPE_TZ_MPC);
++    object_initialize(&s->mpc_irq_orgate, sizeof(s->mpc_irq_orgate),
++                      TYPE_OR_IRQ);
++    object_property_add_child(obj, "mpc-irq-orgate",
++                              OBJECT(&s->mpc_irq_orgate), &error_abort);
++    for (i = 0; i < ARRAY_SIZE(s->mpc_irq_splitter); i++) {
++        char *name = g_strdup_printf("mpc-irq-splitter-%d", i);
++        SplitIRQ *splitter = &s->mpc_irq_splitter[i];
++
++        object_initialize(splitter, sizeof(*splitter), TYPE_SPLIT_IRQ);
++        object_property_add_child(obj, name, OBJECT(splitter), &error_abort);
++        g_free(name);
++    }
+     init_sysbus_child(obj, "timer0", &s->timer0, sizeof(s->timer0),
+                       TYPE_CMSDK_APB_TIMER);
+     init_sysbus_child(obj, "timer1", &s->timer1, sizeof(s->timer1),
+@@ -163,6 +175,12 @@ static void iotkit_exp_irq(void *opaque, int n, int level)
+     qemu_set_irq(s->exp_irqs[n], level);
+ }
+ 
++static void iotkit_mpcexp_status(void *opaque, int n, int level)
++{
++    IoTKit *s = IOTKIT(opaque);
++    qemu_set_irq(s->mpcexp_status_in[n], level);
++}
++
+ static void iotkit_realize(DeviceState *dev, Error **errp)
+ {
+     IoTKit *s = IOTKIT(dev);
+@@ -328,6 +346,22 @@ static void iotkit_realize(DeviceState *dev, Error **errp)
+                                 sysbus_mmio_get_region(SYS_BUS_DEVICE(&s->mpc),
+                                                        0));
+ 
++    /* We must OR together lines from the MPC splitters to go to the NVIC */
++    object_property_set_int(OBJECT(&s->mpc_irq_orgate),
++                            IOTS_NUM_EXP_MPC + IOTS_NUM_MPC, "num-lines", &err);
++    if (err) {
++        error_propagate(errp, err);
++        return;
++    }
++    object_property_set_bool(OBJECT(&s->mpc_irq_orgate), true,
++                             "realized", &err);
++    if (err) {
++        error_propagate(errp, err);
++        return;
++    }
++    qdev_connect_gpio_out(DEVICE(&s->mpc_irq_orgate), 0,
++                          qdev_get_gpio_in(DEVICE(&s->armv7m), 9));
++
+     /* Devices behind APB PPC0:
+      *   0x40000000: timer0
+      *   0x40001000: timer1
+@@ -536,6 +570,46 @@ static void iotkit_realize(DeviceState *dev, Error **errp)
+         g_free(gpioname);
+     }
+ 
++    /* Wire up the splitters for the MPC IRQs */
++    for (i = 0; i < IOTS_NUM_EXP_MPC + IOTS_NUM_MPC; i++) {
++        SplitIRQ *splitter = &s->mpc_irq_splitter[i];
++        DeviceState *dev_splitter = DEVICE(splitter);
++
++        object_property_set_int(OBJECT(splitter), 2, "num-lines", &err);
++        if (err) {
++            error_propagate(errp, err);
++            return;
++        }
++        object_property_set_bool(OBJECT(splitter), true, "realized", &err);
++        if (err) {
++            error_propagate(errp, err);
++            return;
++        }
++
++        if (i < IOTS_NUM_EXP_MPC) {
++            /* Splitter input is from GPIO input line */
++            s->mpcexp_status_in[i] = qdev_get_gpio_in(dev_splitter, 0);
++            qdev_connect_gpio_out(dev_splitter, 0,
++                                  qdev_get_gpio_in_named(dev_secctl,
++                                                         "mpcexp_status", i));
++        } else {
++            /* Splitter input is from our own MPC */
++            qdev_connect_gpio_out_named(DEVICE(&s->mpc), "irq", 0,
++                                        qdev_get_gpio_in(dev_splitter, 0));
++            qdev_connect_gpio_out(dev_splitter, 0,
++                                  qdev_get_gpio_in_named(dev_secctl,
++                                                         "mpc_status", 0));
++        }
++
++        qdev_connect_gpio_out(dev_splitter, 1,
++                              qdev_get_gpio_in(DEVICE(&s->mpc_irq_orgate), i));
++    }
++    /* Create GPIO inputs which will pass the line state for our
++     * mpcexp_irq inputs to the correct splitter devices.
++     */
++    qdev_init_gpio_in_named(dev, iotkit_mpcexp_status, "mpcexp_status",
++                            IOTS_NUM_EXP_MPC);
++
+     iotkit_forward_sec_resp_cfg(s);
+ 
+     system_clock_scale = NANOSECONDS_PER_SECOND / s->mainclk_frq;
+-- 
+2.17.1
