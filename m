@@ -1,28 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58449)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60747)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1fPtvb-0002ZG-GM
-	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 14:10:00 -0400
+	(envelope-from <alistair23@gmail.com>) id 1fPu6P-0005cX-MQ
+	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 14:21:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1fPtvX-0007NI-2r
-	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 14:09:59 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:46316 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1fPtvW-0007Mk-T8
-	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 14:09:55 -0400
-References: <20180603092749.107476-1-marcel.apfelbaum@gmail.com>
-	<20180604042928-mutt-send-email-mst@kernel.org>
-	<20180604142446.6f910dbf@redhat.com>
-	<4e58363f-d055-7556-7a71-51f90e461f4e@redhat.com>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <2003b551-2bc6-f9fe-8303-837397e4ac01@redhat.com>
-Date: Mon, 4 Jun 2018 14:09:50 -0400
+	(envelope-from <alistair23@gmail.com>) id 1fPu6O-0007It-He
+	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 14:21:09 -0400
 MIME-Version: 1.0
-In-Reply-To: <4e58363f-d055-7556-7a71-51f90e461f4e@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH RFC] hw/pc: set q35 as the default x86
- machine
+In-Reply-To: <20180603000827.30872-1-f4bug@amsat.org>
+References: <20180603000827.30872-1-f4bug@amsat.org>
+From: Alistair Francis <alistair23@gmail.com>
+Date: Mon, 4 Jun 2018 11:20:36 -0700
+Message-ID: <CAKmqyKMgmsuqPqM=h6y85e-psAxRpQxo2hvkcS0Xq+FftwUTfw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 0/8] sdcard: cleanup the SD_SPEC version
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,40 +22,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, Igor Mammedov <imammedo@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
-Cc: ehabkost@redhat.com, qemu-devel@nongnu.org, rth@twiddle.net
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+Cc: Alistair Francis <alistair@alistair23.me>, Peter Maydell <peter.maydell@linaro.org>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Igor Mitsyanko <i.mitsyanko@gmail.com>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Paul Brook <paul@codesourcery.com>, Paolo Bonzini <pbonzini@redhat.com>
 
+On Sat, Jun 2, 2018 at 5:08 PM, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.or=
+g> wrote:
+> Hi,
+>
+> This series adds a 'spec_version' property to the SD Card device,
+> to allow to limit some commands to specific spec version range
+> (some firmwares use this feature to detect which spec version the
+> card implements).
+>
+> This restore the SSI/SD support of the Stellaris LM3S6965EVB board,
+> which allow to stress the SD Card code with a nice integration test
+> (waiting for another series to get merged to add the Avocado test):
+>
+>     $ qemu-system-arm -M lm3s6965evb -serial stdio \
+>       -kernel sd_card.bin -sd sdcard.img
+>
+>     SD Card Example Program
+>     Type 'help' for help.
+>
+>     /> ls
+>     Open
+>     listing
+>
+>     ----A 2012/04/25 17:44        12  README.TXT
+>
+>        1 File(s),        12 bytes total
+>        0 Dir(s),      61182K bytes free
+>
+>     /> cat README.TXT
+>     Hello World
+>
+> See:
+> http://lists.nongnu.org/archive/html/qemu-devel/2012-04/msg03790.html
+> http://lists.nongnu.org/archive/html/qemu-devel/2018-06/msg00353.html
 
+Do you have a branch with all of your SD work available?
 
-On 06/04/2018 08:35 AM, Paolo Bonzini wrote:
-> On 04/06/2018 14:24, Igor Mammedov wrote:
->>> Yes it's easy to add -machine pc but there's no documentation
->>> that tells you to do so. Add to that shortcuts like -cdrom
->>> stop working, hotplug needs extra bridges to work, and one
->>> can see that while management tool users benefit from q35,
->>> command line users will suffer.
->> Maybe we should mark 'pc' default as deprecated first,
->> like we do with CLI options that we wish to drop in future?
->>
->> That way we 'create' documentation, so users would be aware
->> of the change and have time to fix their CLI if they prefer
->> 'pc' machine.
-> 
-> Michael has listed reasons why 'pc' cannot be deprecated, since some of
-> them are not even fixable.  Honestly, 'pc' works well for 99% of the use
-> cases---just like you probably don't care whether your laptop has a PCI
-> or PCIe chipset.
-> 
-> Paolo
-> 
-> 
+Alistair
 
-I understood this comment to mean deprecating a *default* machine type.
-
-So if you do `-M pc` you're still OK, but if you simply omit a machine
-type and hope for a specific one you're out of luck.
-
-... We could just deprecate having any default and then make QEMU whine
-at you if you don't specify one, like we do for guessing format types on
-drive images -- it'll do it, but if it guesses raw it whines at you a
-little.
+>
+> Regards,
+>
+> Phil.
+>
+> Philippe Mathieu-Daud=C3=A9 (8):
+>   sdcard: Update the Configuration Register (SCR) to Spec Version 1.10
+>   sdcard: Allow commands valid in SPI mode
+>   sdcard: Add a 'spec_version' property
+>   sdcard: Set Spec v2.00 as default
+>   hw/sd/ssi-sd: Force cards connected in SPI mode to use Spec v1.10
+>   sdcard: Disable SEND_IF_COND (CMD8) for Spec v1
+>   sdcard: Reflect when the Spec v3 is supported in the Config Register (S=
+CR)
+>   sdcard: Disable CMD19/CMD23 for Spec v2
+>
+>  include/hw/sd/sd.h |  6 ++++++
+>  hw/sd/sd.c         | 47 +++++++++++++++++++++++++++++-----------------
+>  hw/sd/ssi-sd.c     |  2 ++
+>  3 files changed, 38 insertions(+), 17 deletions(-)
+>
+> --
+> 2.17.1
+>
+>
