@@ -1,24 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37577)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39012)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pavel.dovgaluk@ispras.ru>) id 1fPjD9-0001Kp-Lp
-	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 02:43:25 -0400
+	(envelope-from <jasowang@redhat.com>) id 1fPjQt-0003ZN-6l
+	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 02:57:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pavel.dovgaluk@ispras.ru>) id 1fPjD6-0002gi-Bt
-	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 02:43:23 -0400
-Received: from mail.ispras.ru ([83.149.199.45]:51950)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pavel.dovgaluk@ispras.ru>) id 1fPjD5-0002fo-PJ
-	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 02:43:20 -0400
-In-Reply-To: <20180528071332.9424.27343.stgit@pasha-VirtualBox>
-References: <20180528071332.9424.27343.stgit@pasha-VirtualBox>
+	(envelope-from <jasowang@redhat.com>) id 1fPjQo-0007I9-G2
+	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 02:57:35 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:53170 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1fPjQo-0007Hy-9v
+	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 02:57:30 -0400
+References: <20180603050546.6827-1-zhangckid@gmail.com>
+	<20180603050546.6827-15-zhangckid@gmail.com>
+From: Jason Wang <jasowang@redhat.com>
+Message-ID: <96b6dd17-bbb6-48e9-54c8-6495c8a56c98@redhat.com>
+Date: Mon, 4 Jun 2018 14:57:22 +0800
 MIME-Version: 1.0
-From: Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>
-Date: Mon, 04 Jun 2018 09:43:12 +0300
-Message-ID: <b2f04223-f52d-44e6-95a6-6ed91d021dad@ispras.ru>
-Content-Type: text/plain;
- charset=UTF-8
+In-Reply-To: <20180603050546.6827-15-zhangckid@gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v4 00/19] reverse debugging
+Subject: Re: [Qemu-devel] [PATCH V8 14/17] filter: Add handle_event method
+ for NetFilterClass
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,195 +29,141 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, peter.maydell@linaro.org, war2jordan@live.com, crosthwaite.peter@gmail.com, boost.lists@gmail.com, quintela@redhat.com, ciro.santilli@gmail.com, jasowang@redhat.com, mst@redhat.com, zuban32s@gmail.com, armbru@redhat.com, maria.klimushenkova@ispras.ru, dovgaluk@ispras.ru, kraxel@redhat.com, thomas.dullien@googlemail.com, pbonzini@redhat.com, mreitz@redhat.com, alex.bennee@linaro.org, dgilbert@redhat.com, rth@twiddle.net
-
-Ping?
+To: Zhang Chen <zhangckid@gmail.com>, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Juan Quintela <quintela@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>
+Cc: zhanghailiang <zhang.zhanghailiang@huawei.com>, Li Zhijian <lizhijian@cn.fujitsu.com>
 
 
 
-=E2=81=A3=D0=9E=D1=82=D0=BF=D1=80=D0=B0=D0=B2=D0=BB=D0=B5=D0=BD=D0=
-=BE =D1=81 =D0=BF=D0=BE=D0=BC=D0=BE=D1=89=D1=8C=D1=8E BlueMail =E2=80=8B
+On 2018=E5=B9=B406=E6=9C=8803=E6=97=A5 13:05, Zhang Chen wrote:
+> Filter needs to process the event of checkpoint/failover or
+> other event passed by COLO frame.
+>
+> Signed-off-by: zhanghailiang <zhang.zhanghailiang@huawei.com>
+> ---
+>   include/net/filter.h |  5 +++++
+>   net/filter.c         | 17 +++++++++++++++++
+>   net/net.c            | 28 ++++++++++++++++++++++++++++
+>   3 files changed, 50 insertions(+)
+>
+> diff --git a/include/net/filter.h b/include/net/filter.h
+> index 435acd6f82..49da666ac0 100644
+> --- a/include/net/filter.h
+> +++ b/include/net/filter.h
+> @@ -38,6 +38,8 @@ typedef ssize_t (FilterReceiveIOV)(NetFilterState *nc=
+,
+>  =20
+>   typedef void (FilterStatusChanged) (NetFilterState *nf, Error **errp)=
+;
+>  =20
+> +typedef void (FilterHandleEvent) (NetFilterState *nf, int event, Error=
+ **errp);
+> +
+>   typedef struct NetFilterClass {
+>       ObjectClass parent_class;
+>  =20
+> @@ -45,6 +47,7 @@ typedef struct NetFilterClass {
+>       FilterSetup *setup;
+>       FilterCleanup *cleanup;
+>       FilterStatusChanged *status_changed;
+> +    FilterHandleEvent *handle_event;
+>       /* mandatory */
+>       FilterReceiveIOV *receive_iov;
+>   } NetFilterClass;
+> @@ -77,4 +80,6 @@ ssize_t qemu_netfilter_pass_to_next(NetClientState *s=
+ender,
+>                                       int iovcnt,
+>                                       void *opaque);
+>  =20
+> +void colo_notify_filters_event(int event, Error **errp);
+> +
+>   #endif /* QEMU_NET_FILTER_H */
+> diff --git a/net/filter.c b/net/filter.c
+> index 2fd7d7d663..0f17eba143 100644
+> --- a/net/filter.c
+> +++ b/net/filter.c
+> @@ -17,6 +17,8 @@
+>   #include "net/vhost_net.h"
+>   #include "qom/object_interfaces.h"
+>   #include "qemu/iov.h"
+> +#include "net/colo.h"
+> +#include "migration/colo.h"
+>  =20
+>   static inline bool qemu_can_skip_netfilter(NetFilterState *nf)
+>   {
+> @@ -245,11 +247,26 @@ static void netfilter_finalize(Object *obj)
+>       g_free(nf->netdev_id);
+>   }
+>  =20
+> +static void dummy_handle_event(NetFilterState *nf, int event, Error **=
+errp)
+> +{
+> +    switch (event) {
+> +    case COLO_EVENT_CHECKPOINT:
+> +        break;
+> +    case COLO_EVENT_FAILOVER:
+> +        object_property_set_str(OBJECT(nf), "off", "status", errp);
+> +        break;
+> +    default:
+> +        break;
+> +    }
+> +}
+> +
+>   static void netfilter_class_init(ObjectClass *oc, void *data)
+>   {
+>       UserCreatableClass *ucc =3D USER_CREATABLE_CLASS(oc);
+> +    NetFilterClass *nfc =3D NETFILTER_CLASS(oc);
+>  =20
+>       ucc->complete =3D netfilter_complete;
+> +    nfc->handle_event =3D dummy_handle_event;
+>   }
+>  =20
+>   static const TypeInfo netfilter_info =3D {
+> diff --git a/net/net.c b/net/net.c
+> index efb9eaf779..378cd2f9ec 100644
+> --- a/net/net.c
+> +++ b/net/net.c
+> @@ -1329,6 +1329,34 @@ void hmp_info_network(Monitor *mon, const QDict =
+*qdict)
+>       }
+>   }
+>  =20
+> +void colo_notify_filters_event(int event, Error **errp)
+> +{
+> +    NetClientState *nc, *peer;
+> +    NetClientDriver type;
+> +    NetFilterState *nf;
+> +    NetFilterClass *nfc =3D NULL;
+> +    Error *local_err =3D NULL;
+> +
+> +    QTAILQ_FOREACH(nc, &net_clients, next) {
+> +        peer =3D nc->peer;
+> +        type =3D nc->info->type;
+> +        if (!peer || type !=3D NET_CLIENT_DRIVER_TAP) {
+> +            continue;
 
-=
-=D0=9D=D0=B0 28 =D0=9C=D0=B0=D0=B9 2018 =D0=B3=2E, 10:13, =D0=B2 10:13, Pav=
-el Dovgalyuk <pavel=2Edovgaluk@ispras=2Eru> =D0=BD=D0=B0=D0=BF=D0=B8=D1=81=
-=D0=B0=D0=BB:=D0=BF>GDB remote protocol supports reverse debugging of the t=
-argets=2E
->It includes 'reverse step' and 'reverse continue' operations=2E
-=
->The first one finds the previous step of the execution,
->and the second on=
-e is intended to stop at the last breakpoint that
->would happen when the pr=
-ogram is executed normally=2E
->
->Reverse debugging is possible in the repla=
-y mode, when at least
->one snapshot was created at the record or replay pha=
-se=2E
->QEMU can use these snapshots for travelling back in time with GDB=2E=
+I think when COLO is enabled, qemu should reject all other types of=20
+backends.
 
->
->Running the execution in replay mode allows using GDB reverse debugging=
+> +        }
+> +        QTAILQ_FOREACH(nf, &nc->filters, next) {
+> +            nfc =3D  NETFILTER_GET_CLASS(OBJECT(nf));
+> +            if (!nfc->handle_event) {
+> +                continue;
+> +            }
 
->commands:
-> - reverse-stepi (or rsi): Steps one instruction to the past=
-=2E
->   QEMU loads on of the prior snapshots and proceeds to the desired
-> =
-  instruction forward=2E When that step is reaches, execution stops=2E
-> - =
-reverse-continue (or rc): Runs execution "backwards"=2E
->   QEMU tries to f=
-ind breakpoint or watchpoint by loaded prior snapshot
->   and replaying the=
- execution=2E Then QEMU loads snapshots again and
->   replays to the latest=
- breakpoint=2E When there are no breakpoints in
->   the examined section of=
- the execution, QEMU finds one more snapshot
->   and tries again=2E After t=
-he first snapshot is processed, execution
->   stops at this snapshot=2E
->
->=
-The set of patches include the following modifications:
-> - gdbstub update =
-for reverse debugging support
-> - functions that automatically perform reve=
-rse step and reverse
->   continue operations
-> - hmp/qmp commands for manip=
-ulating the replay process
-> - improvement of the snapshotting for saving t=
-he execution step
->   in the snapshot parameters
-> - other record/replay fi=
-xes
->
->The patches are available in the repository:
->https://github=2Ecom/i=
-spras/qemu/tree/rr-180524
->
->v4 changes:
->- changed 'since 2=2E13' to 'sinc=
-e 3=2E0' in json (as suggested by Eric
->Blake)
->
->v3 changes:
->- Fixed PS/2=
- bug with save/load vm, which caused failures of the
->replay=2E
->   The pat=
-ch was sent separately=2E
-> - Rebased to the new code base=2E
-> - Minor fix=
-es=2E
->
->v2 changes:
-> - documented reverse debugging
-> - fixed start vmsta=
-te loading in record mode
-> - documented qcow2 changes (as suggested by Eri=
-c Blake)
-> - made icount SnapshotInfo field optional (as suggested by Eric =
-Blake)
-> - renamed qmp commands (as suggested by Eric Blake)
-> - minor chan=
-ges
->
->---
->
->Pavel Dovgalyuk (19):
->      block: implement bdrv_snapshot_g=
-oto for blkreplay
->      replay: disable default snapshot for record/replay=
+Is this still necessary?
 
->      replay: update docs for record/replay with block devices
->      rep=
-lay: don't drain/flush bdrv queue while RR is working
->      replay: finish=
- record/replay before closing the disks
->      qcow2: introduce icount fiel=
-d for snapshots
->      migration: introduce icount field for snapshots
->   =
-   replay: introduce info hmp/qmp command
->      replay: introduce breakpoi=
-nt at the specified step
->   replay: implement replay-seek command to proce=
-ed to the desired step
->      replay: flush events when exiting
->      time=
-r: remove replay clock probe in deadline calculation
->      replay: refine =
-replay-time module
->      translator: fix breakpoint processing
->      repl=
-ay: flush rr queue before loading the vmstate
->      gdbstub: add reverse s=
-tep support in replay mode
->      gdbstub: add reverse continue support in =
-replay mode
->      replay: describe reverse debugging in docs/replay=2Etxt
-=
->      replay: allow loading any snapshots before recording
->
->
-> accel/tcg=
-/translator=2Ec    |    9 +
-> block/blkreplay=2Ec         |    8 +
-> block/=
-io=2Ec                |   22 +++
-> block/qapi=2Ec              |   17 ++-
->=
- block/qcow2-snapshot=2Ec    |    9 +
-> block/qcow2=2Eh             |    2 =
+Thanks
 
-> blockdev=2Ec                |   10 ++
-> cpus=2Ec                    |   =
-19 ++-
-> docs/interop/qcow2=2Etxt    |    4 +
-> docs/replay=2Etxt          =
- |   45 +++++++
-> exec=2Ec                    |    6 +
-> gdbstub=2Ec       =
-          |   50 +++++++-
-> hmp-commands-info=2Ehx      |   14 ++
-> hmp-com=
-mands=2Ehx           |   30 +++++
-> hmp=2Eh                     |    3 
-> i=
-nclude/block/snapshot=2Eh  |    1 
-> include/sysemu/replay=2Eh   |   18 +++=
-
-> migration/savevm=2Ec        |   15 +-
-> qapi/block-core=2Ejson      |   =
- 5 +
-> qapi/block=2Ejson           |    3 
-> qapi/misc=2Ejson            | =
-  68 +++++++++++
-> replay/Makefile=2Eobjs      |    3 
->replay/replay-debug=
-ging=2Ec |  287
->+++++++++++++++++++++++++++++++++++++++++++++
-> replay/rep=
-lay-events=2Ec    |   14 --
-> replay/replay-internal=2Eh  |   10 +-
-> repla=
-y/replay-snapshot=2Ec  |   17 ++-
-> replay/replay-time=2Ec      |   27 ++--=
-
-> replay/replay=2Ec           |   22 +++
-> stubs/replay=2Ec            |  =
- 10 ++
-> util/qemu-timer=2Ec         |   11 --
-> vl=2Ec                    =
-  |   18 ++-
-> 31 files changed, 696 insertions(+), 81 deletions(-)
-> creat=
-e mode 100644 replay/replay-debugging=2Ec
->
->-- 
->Pavel Dovgalyuk
+> +            nfc->handle_event(nf, event, &local_err);
+> +            if (local_err) {
+> +                error_propagate(errp, local_err);
+> +                return;
+> +            }
+> +        }
+> +    }
+> +}
+> +
+>   void qmp_set_link(const char *name, bool up, Error **errp)
+>   {
+>       NetClientState *ncs[MAX_QUEUE_NUM];
