@@ -1,20 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36495)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37023)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fPz3k-0003LO-8r
-	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 19:38:45 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1fPz7H-0004km-QX
+	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 19:42:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fPz3j-0001MP-1H
-	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 19:38:44 -0400
-Date: Tue, 5 Jun 2018 09:10:33 +1000
+	(envelope-from <dgibson@ozlabs.org>) id 1fPz7E-0002r9-GS
+	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 19:42:23 -0400
+Date: Tue, 5 Jun 2018 09:42:11 +1000
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20180604231033.GB5140@umbus.fritz.box>
-References: <20180604172039.19427-1-clg@kaod.org>
+Message-ID: <20180604234211.GC5140@umbus.fritz.box>
+References: <152725285229.537901.6934923933763529191.stgit@bahia.lan>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="H+4ONPRPur6+Ovig"
+	protocol="application/pgp-signature"; boundary="f+W+jCU1fRNres8c"
 Content-Disposition: inline
-In-Reply-To: <20180604172039.19427-1-clg@kaod.org>
-Subject: Re: [Qemu-devel] [RFC PATCH] target/ppc: extend eieio for POWER9
+In-Reply-To: <152725285229.537901.6934923933763529191.stgit@bahia.lan>
+Subject: Re: [Qemu-devel] [PATCH] spapr: don't call KVM_PPC_CONFIGURE_V3_MMU
+ if HPT is in userspace
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,56 +24,88 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Michael Ellerman <mpe@ellerman.id.au>
+To: Greg Kurz <groug@kaod.org>
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Laurent Vivier <lvivier@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, Paul Mackerras <paulus@samba.org>, qemu-stable@nongnu.org
 
 
---H+4ONPRPur6+Ovig
-Content-Type: text/plain; charset=iso-8859-1
+--f+W+jCU1fRNres8c
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, Jun 04, 2018 at 07:20:39PM +0200, C=E9dric Le Goater wrote:
-> POWER9 introduced a new variant of the eieio instruction using bit 6
-> as a hint to tell the CPU it is a store-forwarding barrier.
+On Fri, May 25, 2018 at 02:54:12PM +0200, Greg Kurz wrote:
+> Since the kernel commit "dbfcf3cb9c68 powerpc/64: Call H_REGISTER_PROC_TBL
+> when running as a HPT guest on POWER9", a nested guest running with PR KVM
+> hangs at boot:
 >=20
-> The usage of this eieio extension was recently added in Linux 4.17
-> which activated the "support for a store forwarding barrier at kernel
-> entry/exit".
+> Preparing to boot Linux version 4.16.0-kvm-pr-hang-gku+ (greg@qemu2222.bo=
+ston16) (gcc version 8.1.1 20180502 (Red Hat 8.1.1-1) (GCC)) #19 SMP Fri Ma=
+y 25 08:41:55 CEST 2018
+> Detected machine type: 0000000000000101
+> command line: root=3DUUID=3D22128c5c-30b1-4e0a-ac16-95853df31131 ro rhgb =
+console=3Dhvc0 early_printk disable-radix=3Don
+> Max number of cores passed to firmware: 1024 (NR_CPUS =3D 1024)
+> Calling ibm,client-architecture-support... done
+> memory layout at init:
+>   memory_limit : 0000000000000000 (16 MB aligned)
+>   alloc_bottom : 0000000001b80000
+>   alloc_top    : 0000000030000000
+>   alloc_top_hi : 0000000100000000
+>   rmo_top      : 0000000030000000
+>   ram_top      : 0000000100000000
+> instantiating rtas at 0x000000002fff0000... done
+> prom_hold_cpus: skipped
+> copying OF device tree...
+> Building dt strings...
+> Building dt structure...
+> Device tree strings 0x0000000003d90000 -> 0x0000000003d90abb
+> Device tree struct  0x0000000003da0000 -> 0x0000000003db0000
+> Quiescing Open Firmware ...
+> Booting Linux via __start() @ 0x0000000000400000 ...
 >=20
-> This loosen the QEMU eieio instruction mask to boot newer kernel but I
-> think we should be adding a new *eieio* instruction specific to POWER9
-> instead. I just don't know how to define an instruction variant with
-> the same op code for an ISA version. Any idea ?
-
-I think you're right that this should be done slightly differently.
-I think you can do that by adding a new instruction mask bit; say
-PPC2_MEM_EIEIO2 or whatever.  You leave the existing GEN_HANDLER as
-is, add another GEN_HANDLER_E with the new mask dependent on the new
-bit, then make sure POWER9 has the new bit set, but not the old one.
-
+> This happens because the H_REGISTER_PROC_TBL implementation in QEMU
+> always call KVM_PPC_CONFIGURE_V3_MMU when KVM is present. This fails
+> in the case of PR KVM, which doesn't implement it, and QEMU returns
+> H_PARAMETER to the guest, which is a BUG() condition in linux.
 >=20
-> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
+> In the case of PR, the HPT is allocated in userspace by QEMU, so it
+> doesn't make sense to call KVM_PPC_CONFIGURE_V3_MMU in the first
+> place. So, skip it in this case and let the guest boot.
+>=20
+> Signed-off-by: Greg Kurz <groug@kaod.org>
 > ---
 >=20
->  target/ppc/translate.c |    2 +-
+> Note that PR KVM requires this patch from Paul to work on POWER9:
+>=20
+>     https://patchwork.ozlabs.org/patch/916766/
+>=20
+> The original request was coming from people who want to run openQA in
+> fedora28 under PowerVM on a POWER9 system. This requires PR KVM, which
+> will be running in HPT-mode since pHyp doesn't do radix.
+>=20
+> Cc'ing stable because fedora28 ships QEMU 2.11.x.
+> ---
+>  hw/ppc/spapr_hcall.c |    2 +-
 >  1 file changed, 1 insertion(+), 1 deletion(-)
 >=20
-> Index: qemu-powernv-2.13.git/target/ppc/translate.c
-> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> --- qemu-powernv-2.13.git.orig/target/ppc/translate.c
-> +++ qemu-powernv-2.13.git/target/ppc/translate.c
-> @@ -6496,7 +6496,7 @@ GEN_HANDLER(lswi, 0x1F, 0x15, 0x12, 0x00
->  GEN_HANDLER(lswx, 0x1F, 0x15, 0x10, 0x00000001, PPC_STRING),
->  GEN_HANDLER(stswi, 0x1F, 0x15, 0x16, 0x00000001, PPC_STRING),
->  GEN_HANDLER(stswx, 0x1F, 0x15, 0x14, 0x00000001, PPC_STRING),
-> -GEN_HANDLER(eieio, 0x1F, 0x16, 0x1A, 0x03FFF801, PPC_MEM_EIEIO),
-> +GEN_HANDLER(eieio, 0x1F, 0x16, 0x1A, 0x01FFF801, PPC_MEM_EIEIO),
->  GEN_HANDLER(isync, 0x13, 0x16, 0x04, 0x03FFF801, PPC_MEM),
->  GEN_HANDLER_E(lbarx, 0x1F, 0x14, 0x01, 0, PPC_NONE, PPC2_ATOMIC_ISA206),
->  GEN_HANDLER_E(lharx, 0x1F, 0x14, 0x03, 0, PPC_NONE, PPC2_ATOMIC_ISA206),
+> diff --git a/hw/ppc/spapr_hcall.c b/hw/ppc/spapr_hcall.c
+> index 022f6d810182..12cbb317e5e8 100644
+> --- a/hw/ppc/spapr_hcall.c
+> +++ b/hw/ppc/spapr_hcall.c
+> @@ -1420,7 +1420,7 @@ static target_ulong h_register_process_table(PowerP=
+CCPU *cpu,
+>                    ((flags & FLAG_GTSE) ? LPCR_GTSE : 0),
+>                    LPCR_UPRT | LPCR_GTSE);
+> =20
+> -    if (kvm_enabled()) {
+> +    if (kvm_enabled() && !spapr->htab) {
+>          return kvmppc_configure_v3_mmu(cpu, flags & FLAG_RADIX,
+>                                         flags & FLAG_GTSE, cproc);
+
+Won't this also omit the configure MMU call if the guest is in radix
+mode?  We don't want that.
+
+>      }
 >=20
 
 --=20
@@ -81,24 +114,24 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---H+4ONPRPur6+Ovig
+--f+W+jCU1fRNres8c
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlsVxucACgkQbDjKyiDZ
-s5LuXQ//bqH8Flx+qYH8uLIqxpVge2RvHk2pjyvKmYBrXQOlaZA4m9AlEzBdCARn
-K2LBUhlWXtjbXJ2gnpaGxQUJt8XvmrsgZp/sul4rjHcUBUc+UeoR76WtP/EJQo/r
-+r/AvnEZ/1rCbcSllwOM4IEzYlPwa5kOSmltUBnfF6RAV/EivXZ/xTGn9CrxShOC
-+3CXwaAo5T9ru5Y2MgicEqPu8v6tcW5LmyjNnGs3RoGjgcw91Eqlj0MjIIk1pJfy
-2GgUWg95Fw///vrRXgG3S+27h0KmHVbLVJk0wcKov2jixuBE4NU/Dx7+1fJ+7B0b
-vQ/3R3U+/I7DyWjM+5/oi7YAoWHVO6yCNvdkfMt43ARUS7h8BavuxXrG2Tgn7Rjz
-t2XtLxAeZDWIZY3ciF+0JdwswBqgephcgejZff0BbKeLmqMAlShy2cr5vRZTcQNn
-+fPNMDyHKE+uK+IfpfEh1afFN3DP+hgVayLhU36N1mZiPh/GK5gaTOrKJWnpts6Q
-rXPWW5ncD5495TuwjYrrDVrVkbdRF3MKOav5j035SEJkUyJGiUUCRHSiY2qfcHoC
-CjbIK5vkx2cPVxjt9zEwSl/mRv8cAX+3EwbFqotn8LGCSsF/EvX/ghuA4VhIpNWt
-aNRhyfm28GtsdW2eTViwEmTgKBcyHQUqdV7+VDPsndR2jNUZjgk=
-=3zrK
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlsVzlMACgkQbDjKyiDZ
+s5INGA/+OjLcGV5WUxkrtENLmuGLDS7CAn3uYQVtGgw59rs6ycuFt2IzI0n8A01z
+ThpxIGrS+SuSo7TUDqt5zeiheRn5fDlSO6liVWUAayFrtVDE24M/h07eL6QQBZHu
+GZTme4ALy0x3BKbrf8KB8xxR8geOK0etvhGcRmLSxEjBtZBahXJVuntw2keldRwj
+CBWtSZoNTWnV4A+AUK+liRwLuLgduPhhHum6ej3P+fx8funTV3a4EtOjKMhm6MnF
+ei9MCk/vAhP/Ag7nyxd5RMP+hq8qDESIGxxEmZwfDSw6q+iyKuOatUXTujeFXKdP
+SEW/I3qbppAX8LpoSA9acW+Vg+oHT/dgZNCxoVnjY9cIFmhNnJiDg/SuCxVf7PQx
+O6DxyqWyYVPrN+Ikc1CZVy4RugdN3Qlk4/n5G27sY2cuVoM90odCNptdu/gaEt4J
+qniPNe99DiUg2KRZXroNfb9wp92ig4p8uLge1oMz1Wb58fF5BmDodR408GI4nmm1
+KcRYR7zSk6PlFMpDxsIb+QBNcrfwUhDQfWqnF1sqhykPyPw85xne2ngyX2pYzU0u
+znKMsnQ3MYLR7AbHIeHcq9p9qEdvb2MMzgm6D5Er3zpkdjM7+b4JNG1yfqeJUUyW
+EpYh4AX/oytKDxrbtRdTxb5T4VnAI4XaUOJRNziMlZ1CPS1tTk0=
+=NnO6
 -----END PGP SIGNATURE-----
 
---H+4ONPRPur6+Ovig--
+--f+W+jCU1fRNres8c--
