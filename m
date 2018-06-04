@@ -1,21 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58095)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33829)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1fPwI3-0001bJ-Pd
-	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 16:41:20 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1fPwbh-0007YG-C8
+	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 17:01:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1fPwI2-000556-OC
-	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 16:41:19 -0400
-Date: Mon, 4 Jun 2018 16:41:09 -0400
-From: Jeff Cody <jcody@redhat.com>
-Message-ID: <20180604204109.GC14298@localhost.localdomain>
-References: <20180531205046.153256-1-eblake@redhat.com>
-	<20180531205046.153256-3-eblake@redhat.com>
+	(envelope-from <richard.henderson@linaro.org>) id 1fPwbd-0005ng-EL
+	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 17:01:37 -0400
+Received: from mail-pg0-x241.google.com ([2607:f8b0:400e:c05::241]:45395)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1fPwbd-0005m4-4k
+	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 17:01:33 -0400
+Received: by mail-pg0-x241.google.com with SMTP id z1-v6so32616pgv.12
+	for <qemu-devel@nongnu.org>; Mon, 04 Jun 2018 14:01:32 -0700 (PDT)
+References: <20180601073050.8054-1-richard.henderson@linaro.org>
+	<20180601073050.8054-11-richard.henderson@linaro.org>
+	<1da933da-35f1-5370-10a1-26f7f16bae42@vivier.eu>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <6338e5da-6d03-a33e-a7fc-1291462d5f6d@linaro.org>
+Date: Mon, 4 Jun 2018 14:01:28 -0700
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180531205046.153256-3-eblake@redhat.com>
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v2 2/8] qcow: Switch
- get_cluster_offset to be byte-based
+In-Reply-To: <1da933da-35f1-5370-10a1-26f7f16bae42@vivier.eu>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH 10/33] linux-user: Split out brk, close,
+ exit, read, write
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,112 +33,306 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: qemu-devel@nongnu.org, kwolf@redhat.com, qemu-block@nongnu.org, mreitz@redhat.com
+To: Laurent Vivier <laurent@vivier.eu>, qemu-devel@nongnu.org
 
-On Thu, May 31, 2018 at 03:50:40PM -0500, Eric Blake wrote:
-> We are gradually moving away from sector-based interfaces, towards
-> byte-based.  Make the change for the internal helper function
-> get_cluster_offset(), by changing n_start and n_end to by byte
+On 06/04/2018 01:17 PM, Laurent Vivier wrote:
+> Le 01/06/2018 à 09:30, Richard Henderson a écrit :
+>> These are relatively simple unconditionally defined syscalls.
+>>
+>> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+>> ---
+>>  linux-user/syscall.c | 198 ++++++++++++++++++++++++-------------------
+>>  1 file changed, 111 insertions(+), 87 deletions(-)
+>>
+>> diff --git a/linux-user/syscall.c b/linux-user/syscall.c
+>> index fc3dc3f40d..b0d268dab7 100644
+>> --- a/linux-user/syscall.c
+>> +++ b/linux-user/syscall.c
+>> @@ -7984,6 +7984,112 @@ IMPL(enosys)
+>>      return do_unimplemented(num);
+>>  }
+>>  
+>> +IMPL(brk)
+>> +{
+>> +    return do_brk(arg1);
+>> +}
+>> +
+>> +IMPL(close)
+>> +{
+>> +    if (is_hostfd(arg1)) {
+>> +        return -TARGET_EBADF;
+>> +    }
+>> +    fd_trans_unregister(arg1);
+>> +    return get_errno(close(arg1));
+>> +}
+>> +
+>> +IMPL(exit)
+>> +{
+>> +    CPUState *cpu = ENV_GET_CPU(cpu_env);
+>> +
+>> +    /* In old applications this may be used to implement _exit(2).
+>> +       However in threaded applictions it is used for thread termination,
+>> +       and _exit_group is used for application termination.
+>> +       Do thread termination if we have more then one thread.  */
+>> +    if (block_signals()) {
+>> +        return -TARGET_ERESTARTSYS;
+>> +    }
+>> +
+>> +    cpu_list_lock();
+>> +
+>> +    if (CPU_NEXT(first_cpu)) {
+>> +        /* Remove the CPU from the list.  */
+>> +        QTAILQ_REMOVE(&cpus, cpu, node);
+>> +        cpu_list_unlock();
+>> +
+>> +        TaskState *ts = cpu->opaque;
+>> +        if (ts->child_tidptr) {
+>> +            put_user_u32(0, ts->child_tidptr);
+>> +            sys_futex(g2h(ts->child_tidptr), FUTEX_WAKE, INT_MAX,
+>> +                      NULL, NULL, 0);
+>> +        }
+>> +        thread_cpu = NULL;
+>> +        object_unref(OBJECT(cpu));
+>> +        g_free(ts);
+>> +        rcu_unregister_thread();
+>> +        pthread_exit(NULL);
+>> +    } else {
+>> +        cpu_list_unlock();
+>> +
+>> +#ifdef TARGET_GPROF
+>> +        _mcleanup();
+>> +#endif
+>> +        gdb_exit(cpu_env, arg1);
+>> +        _exit(arg1);
+>> +    }
+>> +    g_assert_not_reached();
+>> +}
+>> +
+>> +IMPL(read)
+>> +{
+>> +    abi_long ret;
+>> +    char *fn;
+>> +
+>> +    if (arg3 == 0) {
+>> +        return 0;
+>> +    }
+>> +    if (is_hostfd(arg1)) {
+>> +        return -TARGET_EBADF;
+>> +    }
+>> +    fn = lock_user(VERIFY_WRITE, arg2, arg3, 0);
+>> +    if (!fn) {
+>> +        return -TARGET_EFAULT;
+>> +    }
+>> +    ret = get_errno(safe_read(arg1, fn, arg3));
+>> +    if (ret >= 0 && fd_trans_host_to_target_data(arg1)) {
+>> +        ret = fd_trans_host_to_target_data(arg1)(fn, ret);
+>> +    }
+>> +    unlock_user(fn, arg2, ret);
+>> +    return ret;
+>> +}
+>> +
+>> +IMPL(write)
+>> +{
+>> +    abi_long ret;
+>> +    char *fn;
+>> +
+>> +    if (is_hostfd(arg1)) {
+>> +        return -TARGET_EBADF;
+>> +    }
+>> +    fn = lock_user(VERIFY_READ, arg2, arg3, 1);
+>> +    if (!fn) {
+>> +        return -TARGET_EFAULT;
+>> +    }
+>> +    if (fd_trans_target_to_host_data(arg1)) {
+>> +        void *copy = g_malloc(arg3);
+>> +        memcpy(copy, fn, arg3);
+>> +        ret = fd_trans_target_to_host_data(arg1)(copy, arg3);
+>> +        if (ret >= 0) {
+>> +            ret = get_errno(safe_write(arg1, copy, ret));
+>> +        }
+>> +        g_free(copy);
+>> +    } else {
+>> +        ret = get_errno(safe_write(arg1, fn, arg3));
+>> +    }
+>> +    unlock_user(fn, arg2, ret);
+>> +    return ret;
+>> +}
+>> +
+>>  /* This is an internal helper for do_syscall so that it is easier
+>>   * to have a single return point, so that actions, such as logging
+>>   * of syscall results, can be performed.
+>> @@ -7999,83 +8105,6 @@ IMPL(everything_else)
+>>      char *fn;
+>>  
+>>      switch(num) {
+>> -    case TARGET_NR_exit:
+>> -        /* In old applications this may be used to implement _exit(2).
+>> -           However in threaded applictions it is used for thread termination,
+>> -           and _exit_group is used for application termination.
+>> -           Do thread termination if we have more then one thread.  */
+>> -
+>> -        if (block_signals()) {
+>> -            return -TARGET_ERESTARTSYS;
+>> -        }
+>> -
+>> -        cpu_list_lock();
+>> -
+>> -        if (CPU_NEXT(first_cpu)) {
+>> -            TaskState *ts;
+>> -
+>> -            /* Remove the CPU from the list.  */
+>> -            QTAILQ_REMOVE(&cpus, cpu, node);
+>> -
+>> -            cpu_list_unlock();
+>> -
+>> -            ts = cpu->opaque;
+>> -            if (ts->child_tidptr) {
+>> -                put_user_u32(0, ts->child_tidptr);
+>> -                sys_futex(g2h(ts->child_tidptr), FUTEX_WAKE, INT_MAX,
+>> -                          NULL, NULL, 0);
+>> -            }
+>> -            thread_cpu = NULL;
+>> -            object_unref(OBJECT(cpu));
+>> -            g_free(ts);
+>> -            rcu_unregister_thread();
+>> -            pthread_exit(NULL);
+>> -        }
+>> -
+>> -        cpu_list_unlock();
+>> -#ifdef TARGET_GPROF
+>> -        _mcleanup();
+>> -#endif
+>> -        gdb_exit(cpu_env, arg1);
+>> -        _exit(arg1);
+>> -        return 0; /* avoid warning */
+>> -    case TARGET_NR_read:
+>> -        if (arg3 == 0) {
+>> -            return 0;
+>> -        } else {
+>> -            if (is_hostfd(arg1)) {
+>> -                return -TARGET_EBADF;
+>> -            }
+>> -            if (!(p = lock_user(VERIFY_WRITE, arg2, arg3, 0)))
+>> -                return -TARGET_EFAULT;
+>> -            ret = get_errno(safe_read(arg1, p, arg3));
+>> -            if (ret >= 0 &&
+>> -                fd_trans_host_to_target_data(arg1)) {
+>> -                ret = fd_trans_host_to_target_data(arg1)(p, ret);
+>> -            }
+>> -            unlock_user(p, arg2, ret);
+>> -        }
+>> -        return ret;
+>> -    case TARGET_NR_write:
+>> -        if (is_hostfd(arg1)) {
+>> -            return -TARGET_EBADF;
+>> -        }
+>> -        if (!(p = lock_user(VERIFY_READ, arg2, arg3, 1)))
+>> -            return -TARGET_EFAULT;
+>> -        if (fd_trans_target_to_host_data(arg1)) {
+>> -            void *copy = g_malloc(arg3);
+>> -            memcpy(copy, p, arg3);
+>> -            ret = fd_trans_target_to_host_data(arg1)(copy, arg3);
+>> -            if (ret >= 0) {
+>> -                ret = get_errno(safe_write(arg1, copy, ret));
+>> -            }
+>> -            g_free(copy);
+>> -        } else {
+>> -            ret = get_errno(safe_write(arg1, p, arg3));
+>> -        }
+>> -        unlock_user(p, arg2, 0);
+>> -        return ret;
+>> -
+>>  #ifdef TARGET_NR_open
+>>      case TARGET_NR_open:
+>>          if (!(p = lock_user_string(arg1)))
+>> @@ -8116,15 +8145,6 @@ IMPL(everything_else)
+>>          fd_trans_unregister(ret);
+>>          return ret;
+>>  #endif
+>> -    case TARGET_NR_close:
+>> -        if (is_hostfd(arg1)) {
+>> -            return -TARGET_EBADF;
+>> -        }
+>> -        fd_trans_unregister(arg1);
+>> -        return get_errno(close(arg1));
+>> -
+>> -    case TARGET_NR_brk:
+>> -        return do_brk(arg1);
+>>  #ifdef TARGET_NR_fork
+>>      case TARGET_NR_fork:
+>>          return get_errno(do_fork(cpu_env, TARGET_SIGCHLD, 0, 0, 0, 0));
+>> @@ -12894,7 +12914,11 @@ IMPL(everything_else)
+>>  }
+>>  
+>>  static impl_fn * const syscall_table[] = {
+>> -    impl_everything_else,
+>> +    [TARGET_NR_brk] = impl_brk,
+>> +    [TARGET_NR_close] = impl_close,
+>> +    [TARGET_NR_exit] = impl_exit,
+>> +    [TARGET_NR_read] = impl_read,
+>> +    [TARGET_NR_write] = impl_write,
+>>  };
+>>  
+>>  abi_long do_syscall(void *cpu_env, unsigned num, abi_long arg1,
+>>
+> 
+> Starting with this patch, this is broken...
+> 
+> For instance with ppc64le target:
+> 
+> qemu: Unsupported syscall: 33
+> qemu: Unsupported syscall: 33
+> qemu: Unsupported syscall: 5
+> qemu: Unsupported syscall: 5
+> qemu: Unsupported syscall: 5
+> qemu: Unsupported syscall: 5
+> qemu: Unsupported syscall: 5
+> qemu: Unsupported syscall: 5
+> qemu: Unsupported syscall: 5
+> qemu: Unsupported syscall: 5
+> qemu: Unsupported syscall: 5
+> /bin/uname: error while loading shared libraries: libc.so.6: cannot open
+> shared object file: Error 38
+> 
+> for instance, for num = TARGET_NR_OPEN:
+> 
+> +    impl_fn *fn = impl_everything_else;
+> 
+> -> fn = impl_everything_else
+> 
+> +    if (num < ARRAY_SIZE(syscall_table)) {
+> +        fn = syscall_table[num];
+> 
+> -> fn = NULL
+> 
+> +    }
+> +    if (fn == NULL) {
+> +        fn = impl_enosys;
+> 
+> -> fn = impl_enosys;
+> 
+> +    }
+> 
+> So all undefined syscall numbers < max(defined syscall numbers) will
+> call impl_enosys.
+> 
+> You should do
+> 
+>     fn = NULL;
+>     if (num < ARRAY_SIZE(syscall_table)) {
+>         fn = syscall_table[num];
+>     }
+>     if (fn == NULL) {
+>         fn = impl_eveything_else;
+>     }
+> 
+> and the impl_enosys is managed by impl_eveything_else.
+> 
+> You can come back to your initial code when all syscalls are split out
+> (when you remove the enosys case from everything_else)... otherwise we
+> will not be able to bisect this part in the future.
 
-s/by\ byte/be\ byte/
+Ack.  How did my testing not catch this.  Will fix.
 
-> offsets rather than sector indices within the cluster being
-> allocated.  However, assert that these values are still
-> sector-aligned (at least qcrypto_block_encrypt() still wants that).
-> For now we get that alignment for free because we still use
-> sector-based driver callbacks.
-> 
-> A later patch will then switch the qcow driver as a whole over
-> to byte-based operation; but will still leave things at sector
-> alignments as it is not worth auditing the qcow image format
-> to worry about sub-sector requests.
-> 
-> Signed-off-by: Eric Blake <eblake@redhat.com>
 
-Reviewed-by: Jeff Cody <jcody@redhat.com>
-
-> 
-> ---
-> v2: assert sector alignment [Max]
-> ---
->  block/qcow.c | 29 +++++++++++++++--------------
->  1 file changed, 15 insertions(+), 14 deletions(-)
-> 
-> diff --git a/block/qcow.c b/block/qcow.c
-> index 3ba2ca25ea5..42d1bbb7643 100644
-> --- a/block/qcow.c
-> +++ b/block/qcow.c
-> @@ -345,8 +345,8 @@ static int qcow_reopen_prepare(BDRVReopenState *state,
->   *
->   * 0 to not allocate.
->   *
-> - * 1 to allocate a normal cluster (for sector indexes 'n_start' to
-> - * 'n_end')
-> + * 1 to allocate a normal cluster (for sector-aligned byte offsets 'n_start'
-> + * to 'n_end' within the cluster)
->   *
->   * 2 to allocate a compressed cluster of size
->   * 'compressed_size'. 'compressed_size' must be > 0 and <
-> @@ -440,9 +440,10 @@ static int get_cluster_offset(BlockDriverState *bs,
->          if (!allocate)
->              return 0;
->          BLKDBG_EVENT(bs->file, BLKDBG_CLUSTER_ALLOC);
-> +        assert(QEMU_IS_ALIGNED(n_start | n_end, BDRV_SECTOR_SIZE));
->          /* allocate a new cluster */
->          if ((cluster_offset & QCOW_OFLAG_COMPRESSED) &&
-> -            (n_end - n_start) < s->cluster_sectors) {
-> +            (n_end - n_start) < s->cluster_size) {
->              /* if the cluster is already compressed, we must
->                 decompress it in the case it is not completely
->                 overwritten */
-> @@ -480,16 +481,15 @@ static int get_cluster_offset(BlockDriverState *bs,
->                  /* if encrypted, we must initialize the cluster
->                     content which won't be written */
->                  if (bs->encrypted &&
-> -                    (n_end - n_start) < s->cluster_sectors) {
-> -                    uint64_t start_sect;
-> +                    (n_end - n_start) < s->cluster_size) {
-> +                    uint64_t start_offset;
->                      assert(s->crypto);
-> -                    start_sect = (offset & ~(s->cluster_size - 1)) >> 9;
-> -                    for(i = 0; i < s->cluster_sectors; i++) {
-> +                    start_offset = offset & ~(s->cluster_size - 1);
-> +                    for (i = 0; i < s->cluster_size; i += BDRV_SECTOR_SIZE) {
->                          if (i < n_start || i >= n_end) {
-> -                            memset(s->cluster_data, 0x00, 512);
-> +                            memset(s->cluster_data, 0x00, BDRV_SECTOR_SIZE);
->                              if (qcrypto_block_encrypt(s->crypto,
-> -                                                      (start_sect + i) *
-> -                                                      BDRV_SECTOR_SIZE,
-> +                                                      start_offset + i,
->                                                        s->cluster_data,
->                                                        BDRV_SECTOR_SIZE,
->                                                        NULL) < 0) {
-> @@ -497,8 +497,9 @@ static int get_cluster_offset(BlockDriverState *bs,
->                              }
->                              BLKDBG_EVENT(bs->file, BLKDBG_WRITE_AIO);
->                              ret = bdrv_pwrite(bs->file,
-> -                                              cluster_offset + i * 512,
-> -                                              s->cluster_data, 512);
-> +                                              cluster_offset + i,
-> +                                              s->cluster_data,
-> +                                              BDRV_SECTOR_SIZE);
->                              if (ret < 0) {
->                                  return ret;
->                              }
-> @@ -758,8 +759,8 @@ static coroutine_fn int qcow_co_writev(BlockDriverState *bs, int64_t sector_num,
->              n = nb_sectors;
->          }
->          ret = get_cluster_offset(bs, sector_num << 9, 1, 0,
-> -                                 index_in_cluster,
-> -                                 index_in_cluster + n, &cluster_offset);
-> +                                 index_in_cluster << 9,
-> +                                 (index_in_cluster + n) << 9, &cluster_offset);
->          if (ret < 0) {
->              break;
->          }
-> -- 
-> 2.14.3
-> 
-> 
+r~
