@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34373)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34374)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fPilY-000272-44
+	(envelope-from <dgibson@ozlabs.org>) id 1fPilY-000273-3w
 	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 02:14:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fPilV-0006Wu-5L
+	(envelope-from <dgibson@ozlabs.org>) id 1fPilU-0006WW-U7
 	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 02:14:52 -0400
-Date: Mon, 4 Jun 2018 12:42:04 +1000
+Date: Mon, 4 Jun 2018 11:28:59 +1000
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20180604024204.GJ4251@umbus>
-References: <152700944859.346734.1389264286134807488.stgit@bahia.lan>
+Message-ID: <20180604012859.GH4251@umbus>
+References: <20180525211523.14897-1-mark.cave-ayland@ilande.co.uk>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="LG0Ll82vYr46+VA1"
+	protocol="application/pgp-signature"; boundary="G44BJl3Aq1QbV/QL"
 Content-Disposition: inline
-In-Reply-To: <152700944859.346734.1389264286134807488.stgit@bahia.lan>
-Subject: Re: [Qemu-devel] [PATCH for-2.11.2] spapr: make pseries-2.11 the
- default machine type
+In-Reply-To: <20180525211523.14897-1-mark.cave-ayland@ilande.co.uk>
+Subject: Re: [Qemu-devel] [PATCH] 40p: remove pci_allow_0_address = true
+ from 40p machine class
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,87 +24,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>
-Cc: qemu-stable@nongnu.org, qemu-devel@nongnu.org, Michael Roth <mdroth@linux.vnet.ibm.com>
+To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, hpoussin@reactos.org
 
 
---LG0Ll82vYr46+VA1
+--G44BJl3Aq1QbV/QL
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, May 22, 2018 at 07:17:28PM +0200, Greg Kurz wrote:
-> The spapr capability framework was introduced in QEMU 2.12. It allows
-> to have an explicit control on how host features are exposed to the
-> guest. This is especially needed to handle migration between hetero-
-> geneous hosts (eg, POWER8 to POWER9). It is also used to expose fixes/
-> workarounds against speculative execution vulnerabilities to guests.
-> The framework was hence backported to QEMU 2.11.1, especially these
-> commits:
+On Fri, May 25, 2018 at 10:15:23PM +0100, Mark Cave-Ayland wrote:
+> The Linux sandalfoot zImage has an initialisation process which resets the
+> VGA controller by setting all the BAR addresses to zero to access the VGA
+> ioports at their legacy addresses.
 >=20
-> 0fac4aa93074 spapr: Add pseries-2.12 machine type
-> 9070f408f491 spapr: Treat Hardware Transactional Memory (HTM) as an
->  optional capability
+> Unfortunately setting the framebuffer BAR to address 0 makes the framebuf=
+fer
+> memory overlap the internal VGA memory causing accesses to fail, and so
+> prevents the kernel from switching successfully to text mode.
 >=20
-> 0fac4aa93074 has the confusing effect of making pseries-2.12 the default
-> machine type for QEMU 2.11.1, instead of the expected pseries-2.11. This
-> patch changes the default machine back to pseries-2.11.
+> Since OpenHackWare configures the framebuffer BAR address outside of the =
+legacy
+> VGA internal memory space, remove pci_allow_0_address from the 40p machin=
+e class
+> which causes the BAR reprogramming to zero to fail and so the VGA internal
+> memory can be accessed correctly again.
 >=20
-> Unfortunately, 9070f408f491 enforces the HTM capability for pseries-2.11.
-> This isn't supported by TCG and breaks 'make check'. So this patch also
-> adds a hack to turn HTM off when using TCG.
->=20
-> Signed-off-by: Greg Kurz <groug@kaod.org>
+> Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 
-Acked-by: David Gibson <david@gibson.dropbear.id.au>
+Applied, thanks.
 
 > ---
->  hw/ppc/spapr.c      |    4 ++--
->  hw/ppc/spapr_caps.c |    5 +++++
->  2 files changed, 7 insertions(+), 2 deletions(-)
+>  hw/ppc/prep.c | 1 -
+>  1 file changed, 1 deletion(-)
 >=20
-> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> index 1a2dd1f597d9..6499a867520f 100644
-> --- a/hw/ppc/spapr.c
-> +++ b/hw/ppc/spapr.c
-> @@ -3820,7 +3820,7 @@ static void spapr_machine_2_12_class_options(Machin=
-eClass *mc)
->      /* Defaults for the latest behaviour inherited from the base class */
->  }
-> =20
-> -DEFINE_SPAPR_MACHINE(2_12, "2.12", true);
-> +DEFINE_SPAPR_MACHINE(2_12, "2.12", false);
-> =20
->  /*
->   * pseries-2.11
-> @@ -3842,7 +3842,7 @@ static void spapr_machine_2_11_class_options(Machin=
-eClass *mc)
->      SET_MACHINE_COMPAT(mc, SPAPR_COMPAT_2_11);
->  }
-> =20
-> -DEFINE_SPAPR_MACHINE(2_11, "2.11", false);
-> +DEFINE_SPAPR_MACHINE(2_11, "2.11", true);
-> =20
->  /*
->   * pseries-2.10
-> diff --git a/hw/ppc/spapr_caps.c b/hw/ppc/spapr_caps.c
-> index 7b229517be38..82043e60e78b 100644
-> --- a/hw/ppc/spapr_caps.c
-> +++ b/hw/ppc/spapr_caps.c
-> @@ -285,6 +285,11 @@ static sPAPRCapabilities default_caps_with_cpu(sPAPR=
-MachineState *spapr,
-> =20
->      caps =3D smc->default_caps;
-> =20
-> +    /* HACK for 2.11.2: fix make check */
-> +    if (tcg_enabled()) {
-> +        caps.caps[SPAPR_CAP_HTM] =3D SPAPR_CAP_OFF;
-> +    }
-> +
->      if (!ppc_check_compat(cpu, CPU_POWERPC_LOGICAL_2_07,
->                            0, spapr->max_compat_pvr)) {
->          caps.caps[SPAPR_CAP_HTM] =3D SPAPR_CAP_OFF;
->=20
+> diff --git a/hw/ppc/prep.c b/hw/ppc/prep.c
+> index be4db6a687..5ed0bcd862 100644
+> --- a/hw/ppc/prep.c
+> +++ b/hw/ppc/prep.c
+> @@ -884,7 +884,6 @@ static void ibm_40p_machine_init(MachineClass *mc)
+>      mc->desc =3D "IBM RS/6000 7020 (40p)",
+>      mc->init =3D ibm_40p_init;
+>      mc->max_cpus =3D 1;
+> -    mc->pci_allow_0_address =3D true;
+>      mc->default_ram_size =3D 128 * M_BYTE;
+>      mc->block_default_type =3D IF_SCSI;
+>      mc->default_boot_order =3D "c";
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -112,24 +77,24 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---LG0Ll82vYr46+VA1
+--G44BJl3Aq1QbV/QL
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlsUpvoACgkQbDjKyiDZ
-s5JIEQ//Rse10NIGVbrMtwM/z9aEX+Ht20mHFvATQ7VjqujeLYHIOY4ogpCprDDa
-oXCQoj7MjeR1F/GLMFDBIjh7HcnJ8JFpKBfsJTO6pJ86y43MhmhBA4HO5ICUwAHV
-xNX06ELjR133WEt2G82H5Tet/sxFdr4blcUgineQidus4ewTbHBrYaGE8DJEFGoh
-XXtiD0JewKtTzOyA5TGIb6yNOTsqixrlBypVfMCRI6/Z7qNAv3i4aLLfnvxGwTjF
-etZlc6uFbjVjn1iD2/zlW5pB+/va8ma6GjX6wdsPT6Cs6dtSWwG3YV3bXwsevNUP
-WyPaB/56pP7S0vV1NmosfrdOGywC9QOxacnuFQLpMwCYb/kXT7UwhuVIYdaUsvd2
-J31N+W9cQDH2wi/+ibQoZvxLOQTcG3RLdK0IcDL9iDY9EzhNxZ0OVvbh6AKmWB7v
-rxibyiWI8df5BqINXHeobjEdVwRq3wYYrKd7PoMCNnBR8RTabH9oe4df3cc25Dk0
-QJCqPrbqA4dNMbLHD9v2naF8oLBggAQHUg9LE4pVQZIlQtzcfsBg17GTBv1uorm0
-BtGD70cC3i5+8H8pGQjKTma4P9fYW0oZQQLKLFwTVvedv0ZP5qByARGbTzL4adS/
-WKlw1a28Z84YECGdRoyXLvK/FE7BqQSStRdBKJ1AH4kpKAKhz1A=
-=I2o2
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlsUldsACgkQbDjKyiDZ
+s5Lq1BAAtZjO+JXkRrGDfN8lYpOJZ+cQocOa6UfKwP62aDjvWheFmnKZTgSApqVf
+tz00DuzH5xNx67DSkwGt8ur1omovgAydHFJSgjXBya19F6w7ZsAjVI4yuKu6qRgd
+E4I+XGOPM4GILrXmfkX2wBuGDKQVkZFb5jIQfEMYcwQ+3yjdSQMCAaiTPTPHJISV
+XHQfmRMAqT58qM23Dofbvf3Kgf+j7TA7Dr3On6ARsMQGy/w9lDcWrSPYboJ1m6rm
+ybxxqqPblWCj+tsv4g2x/HEJIMJz212dRamob/ijKeorL0jsJxTDYGsN6BXdj7W8
+1tKHJ8YdhH8wuFtkGZ9RXVeYq+pLJ/Ui33M683yYCl9i9vFF1552wZAoprO+mqH/
+xbML0kW7BUn4/0nIXnZtiOWZ3uQ9e4eWJZJgjyyL56uHlKLauu1I7EREQg+SK3zk
+br/+0XElWxiGG8DUakXU5Dfj1jrPs0kho1hljgvIeaYyx3NVSQzShhHeYuxRqFih
+Y3602WcFC9LmfWKWpsPWvApxmIvRjZo7eB5jb76lGwYikaKP1F6rpx5aKZywgF9X
+mcWLQl+szyZhPpnDRdtvzTUkylIAYPXVbF+vUsr8bOnp4eMMSiPyI78YVRN27nGG
+DnSRwXd++2DTFkSSuzaANiMpTe74Jf8EgCuOBYx9KcZT8VuE+XQ=
+=xGbM
 -----END PGP SIGNATURE-----
 
---LG0Ll82vYr46+VA1--
+--G44BJl3Aq1QbV/QL--
