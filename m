@@ -1,22 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53586)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53908)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1fPvsx-0001AD-Lv
-	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 16:15:24 -0400
+	(envelope-from <laurent@vivier.eu>) id 1fPvun-0001ok-2l
+	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 16:17:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1fPvsu-0002n9-E7
-	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 16:15:23 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:42292 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1fPvst-0002mn-W5
-	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 16:15:20 -0400
-From: Igor Mammedov <imammedo@redhat.com>
-Date: Mon,  4 Jun 2018 22:14:38 +0200
-Message-Id: <1528143278-247932-1-git-send-email-imammedo@redhat.com>
+	(envelope-from <laurent@vivier.eu>) id 1fPvuj-0003Qo-To
+	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 16:17:17 -0400
+Received: from mout.kundenserver.de ([212.227.17.24]:38385)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1fPvuj-0003Qa-HG
+	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 16:17:13 -0400
+References: <20180601073050.8054-1-richard.henderson@linaro.org>
+	<20180601073050.8054-11-richard.henderson@linaro.org>
+From: Laurent Vivier <laurent@vivier.eu>
+Message-ID: <1da933da-35f1-5370-10a1-26f7f16bae42@vivier.eu>
+Date: Mon, 4 Jun 2018 22:17:10 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH] vl.c: make default main_loop_wait() timeout
- independed of slirp
+In-Reply-To: <20180601073050.8054-11-richard.henderson@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH 10/33] linux-user: Split out brk, close,
+ exit, read, write
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,107 +29,303 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: jan.kiszka@siemens.com, pbonzini@redhat.com, ldoktor@redhat.com, mreitz@redhat.com, mprivozn@redhat.com, berrange@redhat.com, ehabkost@redhat.com
+To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
 
-Since commit (047f7038f58 cli: add --preconfig option) QEMU is
-stuck with indefinite timeout in os_host_main_loop_wait()
-at RUN_STATE_PRECONFIG even if --preconfig option wasn't used
-when it's started with -nodefaults CLI option like this:
+Le 01/06/2018 à 09:30, Richard Henderson a écrit :
+> These are relatively simple unconditionally defined syscalls.
+> 
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+> ---
+>  linux-user/syscall.c | 198 ++++++++++++++++++++++++-------------------
+>  1 file changed, 111 insertions(+), 87 deletions(-)
+> 
+> diff --git a/linux-user/syscall.c b/linux-user/syscall.c
+> index fc3dc3f40d..b0d268dab7 100644
+> --- a/linux-user/syscall.c
+> +++ b/linux-user/syscall.c
+> @@ -7984,6 +7984,112 @@ IMPL(enosys)
+>      return do_unimplemented(num);
+>  }
+>  
+> +IMPL(brk)
+> +{
+> +    return do_brk(arg1);
+> +}
+> +
+> +IMPL(close)
+> +{
+> +    if (is_hostfd(arg1)) {
+> +        return -TARGET_EBADF;
+> +    }
+> +    fd_trans_unregister(arg1);
+> +    return get_errno(close(arg1));
+> +}
+> +
+> +IMPL(exit)
+> +{
+> +    CPUState *cpu = ENV_GET_CPU(cpu_env);
+> +
+> +    /* In old applications this may be used to implement _exit(2).
+> +       However in threaded applictions it is used for thread termination,
+> +       and _exit_group is used for application termination.
+> +       Do thread termination if we have more then one thread.  */
+> +    if (block_signals()) {
+> +        return -TARGET_ERESTARTSYS;
+> +    }
+> +
+> +    cpu_list_lock();
+> +
+> +    if (CPU_NEXT(first_cpu)) {
+> +        /* Remove the CPU from the list.  */
+> +        QTAILQ_REMOVE(&cpus, cpu, node);
+> +        cpu_list_unlock();
+> +
+> +        TaskState *ts = cpu->opaque;
+> +        if (ts->child_tidptr) {
+> +            put_user_u32(0, ts->child_tidptr);
+> +            sys_futex(g2h(ts->child_tidptr), FUTEX_WAKE, INT_MAX,
+> +                      NULL, NULL, 0);
+> +        }
+> +        thread_cpu = NULL;
+> +        object_unref(OBJECT(cpu));
+> +        g_free(ts);
+> +        rcu_unregister_thread();
+> +        pthread_exit(NULL);
+> +    } else {
+> +        cpu_list_unlock();
+> +
+> +#ifdef TARGET_GPROF
+> +        _mcleanup();
+> +#endif
+> +        gdb_exit(cpu_env, arg1);
+> +        _exit(arg1);
+> +    }
+> +    g_assert_not_reached();
+> +}
+> +
+> +IMPL(read)
+> +{
+> +    abi_long ret;
+> +    char *fn;
+> +
+> +    if (arg3 == 0) {
+> +        return 0;
+> +    }
+> +    if (is_hostfd(arg1)) {
+> +        return -TARGET_EBADF;
+> +    }
+> +    fn = lock_user(VERIFY_WRITE, arg2, arg3, 0);
+> +    if (!fn) {
+> +        return -TARGET_EFAULT;
+> +    }
+> +    ret = get_errno(safe_read(arg1, fn, arg3));
+> +    if (ret >= 0 && fd_trans_host_to_target_data(arg1)) {
+> +        ret = fd_trans_host_to_target_data(arg1)(fn, ret);
+> +    }
+> +    unlock_user(fn, arg2, ret);
+> +    return ret;
+> +}
+> +
+> +IMPL(write)
+> +{
+> +    abi_long ret;
+> +    char *fn;
+> +
+> +    if (is_hostfd(arg1)) {
+> +        return -TARGET_EBADF;
+> +    }
+> +    fn = lock_user(VERIFY_READ, arg2, arg3, 1);
+> +    if (!fn) {
+> +        return -TARGET_EFAULT;
+> +    }
+> +    if (fd_trans_target_to_host_data(arg1)) {
+> +        void *copy = g_malloc(arg3);
+> +        memcpy(copy, fn, arg3);
+> +        ret = fd_trans_target_to_host_data(arg1)(copy, arg3);
+> +        if (ret >= 0) {
+> +            ret = get_errno(safe_write(arg1, copy, ret));
+> +        }
+> +        g_free(copy);
+> +    } else {
+> +        ret = get_errno(safe_write(arg1, fn, arg3));
+> +    }
+> +    unlock_user(fn, arg2, ret);
+> +    return ret;
+> +}
+> +
+>  /* This is an internal helper for do_syscall so that it is easier
+>   * to have a single return point, so that actions, such as logging
+>   * of syscall results, can be performed.
+> @@ -7999,83 +8105,6 @@ IMPL(everything_else)
+>      char *fn;
+>  
+>      switch(num) {
+> -    case TARGET_NR_exit:
+> -        /* In old applications this may be used to implement _exit(2).
+> -           However in threaded applictions it is used for thread termination,
+> -           and _exit_group is used for application termination.
+> -           Do thread termination if we have more then one thread.  */
+> -
+> -        if (block_signals()) {
+> -            return -TARGET_ERESTARTSYS;
+> -        }
+> -
+> -        cpu_list_lock();
+> -
+> -        if (CPU_NEXT(first_cpu)) {
+> -            TaskState *ts;
+> -
+> -            /* Remove the CPU from the list.  */
+> -            QTAILQ_REMOVE(&cpus, cpu, node);
+> -
+> -            cpu_list_unlock();
+> -
+> -            ts = cpu->opaque;
+> -            if (ts->child_tidptr) {
+> -                put_user_u32(0, ts->child_tidptr);
+> -                sys_futex(g2h(ts->child_tidptr), FUTEX_WAKE, INT_MAX,
+> -                          NULL, NULL, 0);
+> -            }
+> -            thread_cpu = NULL;
+> -            object_unref(OBJECT(cpu));
+> -            g_free(ts);
+> -            rcu_unregister_thread();
+> -            pthread_exit(NULL);
+> -        }
+> -
+> -        cpu_list_unlock();
+> -#ifdef TARGET_GPROF
+> -        _mcleanup();
+> -#endif
+> -        gdb_exit(cpu_env, arg1);
+> -        _exit(arg1);
+> -        return 0; /* avoid warning */
+> -    case TARGET_NR_read:
+> -        if (arg3 == 0) {
+> -            return 0;
+> -        } else {
+> -            if (is_hostfd(arg1)) {
+> -                return -TARGET_EBADF;
+> -            }
+> -            if (!(p = lock_user(VERIFY_WRITE, arg2, arg3, 0)))
+> -                return -TARGET_EFAULT;
+> -            ret = get_errno(safe_read(arg1, p, arg3));
+> -            if (ret >= 0 &&
+> -                fd_trans_host_to_target_data(arg1)) {
+> -                ret = fd_trans_host_to_target_data(arg1)(p, ret);
+> -            }
+> -            unlock_user(p, arg2, ret);
+> -        }
+> -        return ret;
+> -    case TARGET_NR_write:
+> -        if (is_hostfd(arg1)) {
+> -            return -TARGET_EBADF;
+> -        }
+> -        if (!(p = lock_user(VERIFY_READ, arg2, arg3, 1)))
+> -            return -TARGET_EFAULT;
+> -        if (fd_trans_target_to_host_data(arg1)) {
+> -            void *copy = g_malloc(arg3);
+> -            memcpy(copy, p, arg3);
+> -            ret = fd_trans_target_to_host_data(arg1)(copy, arg3);
+> -            if (ret >= 0) {
+> -                ret = get_errno(safe_write(arg1, copy, ret));
+> -            }
+> -            g_free(copy);
+> -        } else {
+> -            ret = get_errno(safe_write(arg1, p, arg3));
+> -        }
+> -        unlock_user(p, arg2, 0);
+> -        return ret;
+> -
+>  #ifdef TARGET_NR_open
+>      case TARGET_NR_open:
+>          if (!(p = lock_user_string(arg1)))
+> @@ -8116,15 +8145,6 @@ IMPL(everything_else)
+>          fd_trans_unregister(ret);
+>          return ret;
+>  #endif
+> -    case TARGET_NR_close:
+> -        if (is_hostfd(arg1)) {
+> -            return -TARGET_EBADF;
+> -        }
+> -        fd_trans_unregister(arg1);
+> -        return get_errno(close(arg1));
+> -
+> -    case TARGET_NR_brk:
+> -        return do_brk(arg1);
+>  #ifdef TARGET_NR_fork
+>      case TARGET_NR_fork:
+>          return get_errno(do_fork(cpu_env, TARGET_SIGCHLD, 0, 0, 0, 0));
+> @@ -12894,7 +12914,11 @@ IMPL(everything_else)
+>  }
+>  
+>  static impl_fn * const syscall_table[] = {
+> -    impl_everything_else,
+> +    [TARGET_NR_brk] = impl_brk,
+> +    [TARGET_NR_close] = impl_close,
+> +    [TARGET_NR_exit] = impl_exit,
+> +    [TARGET_NR_read] = impl_read,
+> +    [TARGET_NR_write] = impl_write,
+>  };
+>  
+>  abi_long do_syscall(void *cpu_env, unsigned num, abi_long arg1,
+> 
 
-  ./s390x-softmmu/qemu-system-s390x -nodefaults
+Starting with this patch, this is broken...
 
-It's caused by the fact that slirp_pollfds_fill() bails out early
-and slirp_update_timeout() won't be called to update timeout
-to a reasonable value (1 sec) so timeout would be left with
-infinite value (0xFFFFFFFF).
+For instance with ppc64le target:
 
-Default infinite timeout though doen't make sense and reducing
-it to 1 second as in slirp_update_timeout() won't affect host.
-Fix issue by simplifying default timeout to the same 1sec as it
-is in slirp_update_timeout() and cleanup the later. It makes
-default timeout the same regardless of slirp_pollfds_fill()
-exited early or not (i.e. -nodefaults won't have any effect on
-main_loop_wait() anymore, which would provide more consistent
-behavior between both variants of startup).
+qemu: Unsupported syscall: 33
+qemu: Unsupported syscall: 33
+qemu: Unsupported syscall: 5
+qemu: Unsupported syscall: 5
+qemu: Unsupported syscall: 5
+qemu: Unsupported syscall: 5
+qemu: Unsupported syscall: 5
+qemu: Unsupported syscall: 5
+qemu: Unsupported syscall: 5
+qemu: Unsupported syscall: 5
+qemu: Unsupported syscall: 5
+/bin/uname: error while loading shared libraries: libc.so.6: cannot open
+shared object file: Error 38
 
-Reported-by: Luk=C3=A1=C5=A1 Doktor <ldoktor@redhat.com>
-Signed-off-by: Igor Mammedov <imammedo@redhat.com>
----
-PS:
-it doesn't fix issue reported by Max where
-  "echo foo | $QEMU"
-is also broken due to commit 047f7038f58, but there is antoher fix
-on the list to fix that (either Michal's or Daniel's).
----
- slirp/slirp.c    | 10 ++--------
- util/main-loop.c | 13 ++-----------
- 2 files changed, 4 insertions(+), 19 deletions(-)
+for instance, for num = TARGET_NR_OPEN:
 
-diff --git a/slirp/slirp.c b/slirp/slirp.c
-index 1cb6b07..1112f86 100644
---- a/slirp/slirp.c
-+++ b/slirp/slirp.c
-@@ -358,13 +358,8 @@ void slirp_cleanup(Slirp *slirp)
- static void slirp_update_timeout(uint32_t *timeout)
- {
-     Slirp *slirp;
--    uint32_t t;
-=20
--    if (*timeout <=3D TIMEOUT_FAST) {
--        return;
--    }
--
--    t =3D MIN(1000, *timeout);
-+    assert(*timeout > TIMEOUT_FAST);
-=20
-     /* If we have tcp timeout with slirp, then we will fill @timeout wit=
-h
-      * more precise value.
-@@ -375,10 +370,9 @@ static void slirp_update_timeout(uint32_t *timeout)
-             return;
-         }
-         if (slirp->do_slowtimo) {
--            t =3D MIN(TIMEOUT_SLOW, t);
-+            *timeout =3D MIN(TIMEOUT_SLOW, *timeout);
-         }
-     }
--    *timeout =3D t;
- }
-=20
- void slirp_pollfds_fill(GArray *pollfds, uint32_t *timeout)
-diff --git a/util/main-loop.c b/util/main-loop.c
-index 992f9b0..fd23166 100644
---- a/util/main-loop.c
-+++ b/util/main-loop.c
-@@ -497,25 +497,16 @@ static int os_host_main_loop_wait(int64_t timeout)
- void main_loop_wait(int nonblocking)
- {
-     int ret;
--    uint32_t timeout =3D UINT32_MAX;
-     int64_t timeout_ns;
-+    uint32_t timeout =3D nonblocking ? 0 : 1000 /* milliseconds */;
-=20
--    if (nonblocking) {
--        timeout =3D 0;
--    }
-=20
-     /* poll any events */
-     g_array_set_size(gpollfds, 0); /* reset for new iteration */
-     /* XXX: separate device handlers from system ones */
-     slirp_pollfds_fill(gpollfds, &timeout);
-=20
--    if (timeout =3D=3D UINT32_MAX) {
--        timeout_ns =3D -1;
--    } else {
--        timeout_ns =3D (uint64_t)timeout * (int64_t)(SCALE_MS);
--    }
--
--    timeout_ns =3D qemu_soonest_timeout(timeout_ns,
-+    timeout_ns =3D qemu_soonest_timeout((uint64_t)timeout * (int64_t)(SC=
-ALE_MS),
-                                       timerlistgroup_deadline_ns(
-                                           &main_loop_tlg));
-=20
---=20
-2.7.4
++    impl_fn *fn = impl_everything_else;
+
+-> fn = impl_everything_else
+
++    if (num < ARRAY_SIZE(syscall_table)) {
++        fn = syscall_table[num];
+
+-> fn = NULL
+
++    }
++    if (fn == NULL) {
++        fn = impl_enosys;
+
+-> fn = impl_enosys;
+
++    }
+
+So all undefined syscall numbers < max(defined syscall numbers) will
+call impl_enosys.
+
+You should do
+
+    fn = NULL;
+    if (num < ARRAY_SIZE(syscall_table)) {
+        fn = syscall_table[num];
+    }
+    if (fn == NULL) {
+        fn = impl_eveything_else;
+    }
+
+and the impl_enosys is managed by impl_eveything_else.
+
+You can come back to your initial code when all syscalls are split out
+(when you remove the enosys case from everything_else)... otherwise we
+will not be able to bisect this part in the future.
+
+Thanks,
+Laurent
