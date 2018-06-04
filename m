@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41433)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43654)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1fPjdw-0006Ui-0l
-	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 03:11:09 -0400
+	(envelope-from <armbru@redhat.com>) id 1fPjli-0000dg-N3
+	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 03:19:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1fPjds-0003Ik-1M
-	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 03:11:03 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:53464 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1fPjdr-0003IM-TA
-	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 03:10:59 -0400
-From: Fam Zheng <famz@redhat.com>
-Date: Mon,  4 Jun 2018 15:10:48 +0800
-Message-Id: <20180604071050.12492-1-famz@redhat.com>
+	(envelope-from <armbru@redhat.com>) id 1fPjlh-0007FJ-Ok
+	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 03:19:06 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <20180426161958.2872-1-rkagan@virtuozzo.com>
+	<20180426161958.2872-4-rkagan@virtuozzo.com>
+Date: Mon, 04 Jun 2018 09:18:57 +0200
+In-Reply-To: <20180426161958.2872-4-rkagan@virtuozzo.com> (Roman Kagan's
+	message of "Thu, 26 Apr 2018 19:19:44 +0300")
+Message-ID: <87tvqjf28u.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 0/2] Docker patches
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH 03/17] iotests: ask qemu for supported
+ formats
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,42 +24,106 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>
+To: Roman Kagan <rkagan@virtuozzo.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
 
-The following changes since commit 392fba9f583223786f844dce9b2e7f9a0ce014=
-7a:
+Roman Kagan <rkagan@virtuozzo.com> writes:
 
-  Merge remote-tracking branch 'remotes/stsquad/tags/pull-travis-updates-=
-010618-1' into staging (2018-06-01 17:32:30 +0100)
+> Add helper functions to query the block drivers actually supported by
+> QEMU using "-drive format=?".  This allows to skip certain tests that
+> require drivers not built in or whitelisted in QEMU.
+>
+> Signed-off-by: Roman Kagan <rkagan@virtuozzo.com>
+> ---
+>  tests/qemu-iotests/common.rc  | 19 +++++++++++++++++++
+>  tests/qemu-iotests/iotests.py | 30 +++++++++++++++++++++++++++---
+>  2 files changed, 46 insertions(+), 3 deletions(-)
+>
+> diff --git a/tests/qemu-iotests/common.rc b/tests/qemu-iotests/common.rc
+> index 9a65a11026..fe5a4d1cfd 100644
+> --- a/tests/qemu-iotests/common.rc
+> +++ b/tests/qemu-iotests/common.rc
+> @@ -493,5 +493,24 @@ _require_command()
+>      [ -x "$c" ] || _notrun "$1 utility required, skipped this test"
+>  }
+>  
+> +# this test requires support for specific formats
+> +#
+> +_require_format()
+> +{
+> +    supported_formats=$($QEMU_PROG $QEMU_OPTIONS -drive format=\? 2>&1 | \
 
-are available in the Git repository at:
+Use of '?' to get help is deprecated.  Please use 'format=help', and
+update your commit message accordingly.
 
-  git://github.com/famz/qemu.git tags/docker-pull-request
+> +        head -1 | cut -d : -f 2)
+> +    for f; do
+> +        found=false
+> +        for sf in $supported_formats; do
+> +            if [ "$f" = "$sf" ]; then
+> +                found=true
+> +                break
+> +            fi
+> +        done
+> +
+> +        $found || _notrun "$QEMU_PROG doesn't support format $f"
+> +    done
+> +}
+> +
+>  # make sure this script returns success
+>  true
+> diff --git a/tests/qemu-iotests/iotests.py b/tests/qemu-iotests/iotests.py
+> index e2abf0cb53..698ef2b2c0 100644
+> --- a/tests/qemu-iotests/iotests.py
+> +++ b/tests/qemu-iotests/iotests.py
+> @@ -119,6 +119,17 @@ def qemu_io(*args):
+>          sys.stderr.write('qemu-io received signal %i: %s\n' % (-subp.returncode, ' '.join(args)))
+>      return output
+>  
+> +def qemu_pipe(*args):
+> +    '''Run qemu with an option to print something and exit (e.g. a help option),
+> +    and return its output'''
+> +    args = [qemu_prog] + qemu_opts + list(args)
+> +    subp = subprocess.Popen(args, stdout=subprocess.PIPE,
+> +                            stderr=subprocess.STDOUT)
+> +    output = subp.communicate()[0]
+> +    if subp.returncode < 0:
+> +        sys.stderr.write('qemu received signal %i: %s\n' % (-subp.returncode, ' '.join(args)))
+> +    return output
+> +
+>  
+>  class QemuIoInteractive:
+>      def __init__(self, *args):
+> @@ -550,13 +561,26 @@ def verify_cache_mode(supported_cache_modes=[]):
+>      if supported_cache_modes and (cachemode not in supported_cache_modes):
+>          notrun('not suitable for this cache mode: %s' % cachemode)
+>  
+> +rw_formats = None
+> +
+> +def supports_format(format_name):
+> +    format_message = qemu_pipe('-drive', 'format=?')
 
-for you to fetch changes up to 63dba573fa65bf830ec3f78a8f3a6b0697ce1637:
+Likewise.
 
-  docker: Update fedora image to 28 (2018-06-04 14:39:18 +0800)
-
-----------------------------------------------------------------
-
-Hi Peter,
-
-One improvement from Alex and one patch to track the Fedora latest
-release.
-
-----------------------------------------------------------------
-
-Alex Benn=C3=A9e (1):
-  tests/docker/Makefile.include: handle empty TARGET_LIST
-
-Fam Zheng (1):
-  docker: Update fedora image to 28
-
- rules.mak                              | 3 +++
- tests/docker/Makefile.include          | 2 +-
- tests/docker/dockerfiles/fedora.docker | 2 +-
- 3 files changed, 5 insertions(+), 2 deletions(-)
-
---=20
-2.17.0
+> +    global rw_formats
+> +    if rw_formats is None:
+> +        rw_formats = format_message.splitlines()[0].split(':')[1].split()
+> +    return format_name in rw_formats
+> +
+> +def require_formats(*formats):
+> +    for fmt in formats:
+> +        if not supports_format(fmt):
+> +            notrun('%s does not support format %s' % (qemu_prog, fmt))
+> +
+>  def supports_quorum():
+> -    return 'quorum' in qemu_img_pipe('--help')
+> +    return supports_format('quorum')
+>  
+>  def verify_quorum():
+>      '''Skip test suite if quorum support is not available'''
+> -    if not supports_quorum():
+> -        notrun('quorum support missing')
+> +    require_formats('quorum')
+>  
+>  def main(supported_fmts=[], supported_oses=['linux'], supported_cache_modes=[],
+>           unsupported_fmts=[]):
