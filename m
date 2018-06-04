@@ -1,28 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37603)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38027)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mlureau@redhat.com>) id 1fPlcz-0001Ip-VG
-	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 05:18:15 -0400
+	(envelope-from <stefanha@gmail.com>) id 1fPlez-0002XH-BA
+	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 05:20:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mlureau@redhat.com>) id 1fPlcv-0006qg-12
-	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 05:18:13 -0400
-Received: from mail-io0-f195.google.com ([209.85.223.195]:34443)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <mlureau@redhat.com>) id 1fPlcu-0006p5-S8
-	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 05:18:08 -0400
-Received: by mail-io0-f195.google.com with SMTP id e15-v6so28805861iog.1
-	for <qemu-devel@nongnu.org>; Mon, 04 Jun 2018 02:18:08 -0700 (PDT)
+	(envelope-from <stefanha@gmail.com>) id 1fPleu-0000Ns-7t
+	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 05:20:17 -0400
+Date: Mon, 4 Jun 2018 10:20:08 +0100
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20180604092008.GA13674@stefanha-x1.localdomain>
+References: <20180603203412.11033-1-contrib@steffen-goertz.de>
 MIME-Version: 1.0
-In-Reply-To: <20180604090746.GA2629@work-vm>
-References: <20180601162749.27406-1-marcandre.lureau@redhat.com>
-	<20180601162749.27406-7-marcandre.lureau@redhat.com>
-	<20180604090746.GA2629@work-vm>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>
-Date: Mon, 4 Jun 2018 11:18:06 +0200
-Message-ID: <CAMxuvayhQPPkFbFUE+Onbe7=AEnVuJ3+dFkDiuQyLA2F0tmW_w@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC v2 06/12] vhost-user: add
- vhost_user_input_get_config()
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="k1lZvvs/B4yU6o8G"
+Content-Disposition: inline
+In-Reply-To: <20180603203412.11033-1-contrib@steffen-goertz.de>
+Subject: Re: [Qemu-devel] [RFC v3] qapi: command category to stimulate
+ high-level machine devices
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,159 +24,123 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: qemu-devel <qemu-devel@nongnu.org>, Gerd Hoffmann <kraxel@redhat.com>
-
-Hi
-
-On Mon, Jun 4, 2018 at 11:07 AM, Dr. David Alan Gilbert
-<dgilbert@redhat.com> wrote:
-> * Marc-Andr=C3=A9 Lureau (marcandre.lureau@redhat.com) wrote:
->> Ask vhost user input backend the list of virtio_input_config.
->
-> Why is this vhost-user specific; shouldn't the vhost-input
-> behaviour be the same irrespective of if it's vhost-user or plain vhost?
->
-
-A similar message could be used for plain vhost, in some ioctl form.
-Here we are documenting vhost-user protocol only.
+To: Steffen =?iso-8859-1?Q?G=F6rtz?= <contrib@steffen-goertz.de>
+Cc: qemu-devel@nongnu.org, Joel Stanley <joel@jms.id.au>, Jim Mussared <jim@groklearning.com>, Julia Suvorova <jusual@mail.ru>, Peter Maydell <peter.maydell@linaro.org>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, "open list:ARM" <qemu-arm@nongnu.org>, Gerd Hoffmann <kraxel@redhat.com>
 
 
-Thanks
+--k1lZvvs/B4yU6o8G
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-> Dave
->
->
->> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
->> ---
->>  include/hw/virtio/vhost-backend.h |  4 +++
->>  hw/virtio/vhost-user.c            | 59 +++++++++++++++++++++++++++++++
->>  docs/interop/vhost-user.txt       |  6 ++++
->>  3 files changed, 69 insertions(+)
->>
->> diff --git a/include/hw/virtio/vhost-backend.h b/include/hw/virtio/vhost=
--backend.h
->> index 5dac61f9ea..6cc2edacc5 100644
->> --- a/include/hw/virtio/vhost-backend.h
->> +++ b/include/hw/virtio/vhost-backend.h
->> @@ -12,6 +12,7 @@
->>  #define VHOST_BACKEND_H
->>
->>  #include "exec/memory.h"
->> +#include "standard-headers/linux/virtio_input.h"
->>
->>  typedef enum VhostBackendType {
->>      VHOST_BACKEND_TYPE_NONE =3D 0,
->> @@ -156,4 +157,7 @@ int vhost_backend_invalidate_device_iotlb(struct vho=
-st_dev *dev,
->>  int vhost_backend_handle_iotlb_msg(struct vhost_dev *dev,
->>                                            struct vhost_iotlb_msg *imsg)=
-;
->>
->> +int vhost_user_input_get_config(struct vhost_dev *dev,
->> +                                struct virtio_input_config **config);
->> +
->>  #endif /* VHOST_BACKEND_H */
->> diff --git a/hw/virtio/vhost-user.c b/hw/virtio/vhost-user.c
->> index a87db01e55..19ed87d07c 100644
->> --- a/hw/virtio/vhost-user.c
->> +++ b/hw/virtio/vhost-user.c
->> @@ -84,6 +84,7 @@ typedef enum VhostUserRequest {
->>      VHOST_USER_POSTCOPY_ADVISE  =3D 28,
->>      VHOST_USER_POSTCOPY_LISTEN  =3D 29,
->>      VHOST_USER_POSTCOPY_END     =3D 30,
->> +    VHOST_USER_INPUT_GET_CONFIG,
->>      VHOST_USER_MAX
->>  } VhostUserRequest;
->>
->> @@ -324,6 +325,64 @@ static int vhost_user_write(struct vhost_dev *dev, =
-VhostUserMsg *msg,
->>      return 0;
->>  }
->>
->> +static void *vhost_user_read_size(struct vhost_dev *dev, uint32_t size)
->> +{
->> +    struct vhost_user *u =3D dev->opaque;
->> +    CharBackend *chr =3D u->chr;
->> +    int r;
->> +    uint8_t *p =3D g_malloc(size);
->> +
->> +    r =3D qemu_chr_fe_read_all(chr, p, size);
->> +    if (r !=3D size) {
->> +        error_report("Failed to read msg payload."
->> +                     " Read %d instead of %d.", r, size);
->> +        return NULL;
->> +    }
->> +
->> +    return p;
->> +}
->> +
->> +int vhost_user_input_get_config(struct vhost_dev *dev,
->> +                                struct virtio_input_config **config)
->> +{
->> +    void *p =3D NULL;
->> +    VhostUserMsg msg =3D {
->> +        .hdr.request =3D VHOST_USER_INPUT_GET_CONFIG,
->> +        .hdr.flags =3D VHOST_USER_VERSION,
->> +    };
->> +
->> +    if (vhost_user_write(dev, &msg, NULL, 0) < 0) {
->> +        goto err;
->> +    }
->> +
->> +    if (vhost_user_read_header(dev, &msg) < 0) {
->> +        goto err;
->> +    }
->> +
->> +    p =3D vhost_user_read_size(dev, msg.hdr.size);
->> +    if (!p) {
->> +        goto err;
->> +    }
->> +
->> +    if (msg.hdr.request !=3D VHOST_USER_INPUT_GET_CONFIG) {
->> +        error_report("Received unexpected msg type. Expected %d receive=
-d %d",
->> +                     VHOST_USER_INPUT_GET_CONFIG, msg.hdr.request);
->> +        goto err;
->> +    }
->> +
->> +    if (msg.hdr.size % sizeof(struct virtio_input_config)) {
->> +        error_report("Invalid msg size");
->> +        goto err;
->> +    }
->> +
->> +    *config =3D p;
->> +    return msg.hdr.size / sizeof(struct virtio_input_config);
->> +
->> +err:
->> +    g_free(p);
->> +    return -1;
->> +}
->> +
->>  static int vhost_user_set_log_base(struct vhost_dev *dev, uint64_t base=
-,
->>                                     struct vhost_log *log)
->>  {
->> diff --git a/docs/interop/vhost-user.txt b/docs/interop/vhost-user.txt
->> index 534caab18a..3df9927386 100644
->> --- a/docs/interop/vhost-user.txt
->> +++ b/docs/interop/vhost-user.txt
->> @@ -744,6 +744,12 @@ Master message types
->>        was previously sent.
->>        The value returned is an error indication; 0 is success.
->>
->> + * VHOST_USER_INPUT_GET_CONFIG
->> +
->> +      Slave payload: (struct virtio_input_config)*
->> +
->> +      Ask vhost user input backend the list of virtio_input_config.
->> +
->>  Slave message types
->>  -------------------
->>
->> --
->> 2.17.1.906.g10fd178552
->>
->>
-> --
-> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+On Sun, Jun 03, 2018 at 04:34:12PM -0400, Steffen G=F6rtz wrote:
+> Changes in v2:
+>   - Remove stray 1
+>=20
+> Changes in v1:
+>   - Fix coding style issues
+>=20
+> Add a new category "stimulate" to host commands that
+> act upon high-level devices associated with machines/boards.
+>=20
+> This is patch is part of an effort to add support for BBC:microbit
+> educational computer to QEMU.
+>=20
+> The microbit board, as many other microcontroller boards,
+> contains typical trivial (digital) input and output options such as butto=
+ns and LEDs,
+> but also more sophiscated possibilities such as analog inputs and
+> complex dedicated sensor ICs that are connected to the microbit machine
+> by means of inter-ic bus (i2c).
+> These devices interact with peripheral devices of the microcontroller
+> in use, for example with the GPIO peripheral of the used NRF51.
+>=20
+> One aim of our efforts is to create a user interface that models the
+> look and feel of the physical microbit board and lets the user interact
+> with its inputs and provide feedback on its outsputs.
+>=20
+> For this it is necessary to transmit user inputs such as the pressing of a
+> button to the machine.
+> In return, when the state of an output is changed on the machine, this
+> change needs to be reflected in the user interface.
+>=20
+> At the moment, there are only a few QMP commands that provide user input =
+to the
+> machine, eg. send-keys, input-button. These commands require very
+
+QMP command names (from qapi/ui.json): send-key and input-send-event.
+
+> high-level concepts, which are not really suitable for applications that
+> microcontrollers are typically used in in.
+
+I agree that existing commands aren't suitable.  They are tied to
+QemuConsole, which makes sense for graphics + keyboard/mouse input
+devices but doesn't exist for microcontrollers.
+
+I have CCed Gerd Hoffmann, the ui/ maintainer, to see if he agrees.
+
+> This RFC is meant to start a discussion on how to provide stimuli to
+> low-complex inputs and outputs typically found in embedded
+> microcontroller applications. To the best of my knowledge, there are
+> currently no examples of how to provide such stimuli to either SoC
+> device peripheral or machine level concepts like pushbuttons and LEDs.
+>=20
+> To my understanding, the following concepts/apis are needed:
+> - QMP commands to send stimuli to machine level concepts like
+> pushbuttons
+> - Machine level devices that receive these stimuli and act as an adapter
+> to manipulate the associated SoC peripheral devices
+
+The QEMU Object Model offers "interfaces".  Many object-oriented
+programming languages have similar concepts (interfaces, virtual base
+classes, etc).
+
+Interfaces could be used to connect board-specific devices with the
+monitor command.  But this is an implementation detail, we first need to
+agree on the API design.
+
+> - For outputs, machine level devices are needed that observe changes in
+> SoC peripherals and emit QMP events that clients can receive
+>=20
+> This patch adds a new qmp command "buttons-set-state" to update the
+> push-down state of arbitrarily identified buttons (string identifier).
+
+Can you list the types of devices that can consume events?
+
+ * Pushbutton
+ * GPIO input pin
+ * Analog-to-digital converter
+ * Temperature sensor
+ * Accelerometer
+ * Magnetometer
+ * LED voltage decay light sensing
+ * ?
+
+And list the types of devices that can produce events?
+
+ * LED states
+ * GPIO output pin
+ * Digital-to-analog converter
+ * ?
+
+Many of these inputs/outputs can be tied to an external UI.  A degree of
+timing precision is required so that the UI is responsive, although
+cycle-accurate timing is not what I'd expect from QMP.
+
+Stefan
+
+--k1lZvvs/B4yU6o8G
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJbFQRIAAoJEJykq7OBq3PIA1kH/jUiBMZgVfnCZKv5lWUpSW5n
+9hGfyd5HJLO0xurOpXQamnv1xNshckWAmj3U0TdZ/MUdDn6IbG2RsX4/MSd/EnpF
+JB9W39eQpc/jNunCt1da0y9DTwngDlowuhmK5HjQ365Thr+YWqgpWMJJ9hjmaFaJ
+ZTQLOIbDUSrwiLY+HWjvfA9jsmFbHQ+OXt08C7Mgz8fyu49SwJ/egF6Arl+eV/Gx
+fipi7dC1GfqPo5evcm/WFKXhBHfzF5nA7DlE8Hs7Y0Z/qc1Mo3I3+DiblXVzjuFN
+d/6uqYvnJqVmMANos3cn0xmmkkzW1jvt2Bg+fIvCYuikbL0P6OdxT/JYXI/pRU8=
+=IhHS
+-----END PGP SIGNATURE-----
+
+--k1lZvvs/B4yU6o8G--
