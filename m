@@ -1,27 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53067)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57043)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fPtWD-0002WJ-IE
-	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 13:43:46 -0400
+	(envelope-from <jsnow@redhat.com>) id 1fPtnB-0007ZW-3V
+	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 14:01:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fPtWC-0003AY-Ql
-	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 13:43:45 -0400
-Received: from mail-oi0-x243.google.com ([2607:f8b0:4003:c06::243]:41646)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fPtWC-00039c-C4
-	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 13:43:44 -0400
-Received: by mail-oi0-x243.google.com with SMTP id a141-v6so5292815oii.8
-	for <qemu-devel@nongnu.org>; Mon, 04 Jun 2018 10:43:44 -0700 (PDT)
+	(envelope-from <jsnow@redhat.com>) id 1fPtn8-0001J3-Ap
+	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 14:01:17 -0400
+References: <20180604162140.20688-1-peter.maydell@linaro.org>
+From: John Snow <jsnow@redhat.com>
+Message-ID: <03a1670a-8e43-d541-3468-a2249bc8fa34@redhat.com>
+Date: Mon, 4 Jun 2018 14:01:12 -0400
 MIME-Version: 1.0
-In-Reply-To: <20180530064049.27976-1-clg@kaod.org>
-References: <20180530064049.27976-1-clg@kaod.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 4 Jun 2018 18:43:23 +0100
-Message-ID: <CAFEAcA9B5sW35+LX=_fCWF8SOODJNNZD1dx-XTAUQHg=86w+ig@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v7 0/7] aspeed: add a witherspoon-bmc
- machine
+In-Reply-To: <20180604162140.20688-1-peter.maydell@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] CODING_STYLE: Define our preferred form
+ for multiline comments
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,23 +24,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@kaod.org>
-Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, Joel Stanley <joel@jms.id.au>, Andrew Jeffery <andrew@aj.id.au>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
-
-On 30 May 2018 at 07:40, C=C3=A9dric Le Goater <clg@kaod.org> wrote:
-> Hello
->
-> This series adds a new Aspeed machine to emulate the BMC of a
-> Witherspoon system. It also extends the other Aspeed machines with I2C
-> devices and adds a simple model for the pca9552 LED blinker present on
-> the Witherspoon board.
->
-> Thanks,
->
-> C.
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
+Cc: qemu-trivial@nongnu.org, Richard Henderson <rth@twiddle.net>, patches@linaro.org
 
 
 
-Applied to target-arm.next, thanks.
+On 06/04/2018 12:21 PM, Peter Maydell wrote:
+> The codebase has a bit of a mix of
+>  /* multiline comments
+>   * like this
+>   */
+> and
+>  /* multiline comments like this
+>     in the GNU Coding Standards style */
+> 
+> State a preference for the former.
+> 
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+> ---
+> I admit that to some extent I'm imposing my aesthetic
+> preferences here; pretty sure we have a lot more style
+> 1 comments than style 2, though.
+> ---
+>  CODING_STYLE | 13 +++++++++++++
+>  1 file changed, 13 insertions(+)
+> 
+> diff --git a/CODING_STYLE b/CODING_STYLE
+> index 12ba58ee293..fb1d1f1cd62 100644
+> --- a/CODING_STYLE
+> +++ b/CODING_STYLE
+> @@ -124,6 +124,19 @@ We use traditional C-style /* */ comments and avoid // comments.
+>  Rationale: The // form is valid in C99, so this is purely a matter of
+>  consistency of style. The checkpatch script will warn you about this.
+>  
+> +Multiline comments blocks should have a row of stars on the left
+> +and the terminating */ on its own line:
+> +    /* like
+> +     * this
+> +     */
+> +Putting the initial /* on its own line is accepted, but not required.
+> +(Some of the existing comments in the codebase use the GNU Coding
+> +Standards form which does not have stars on the left; avoid this
+> +when writing new comments.)
+> +
+> +Rationale: Consistency, and ease of visually picking out a multiline
+> +comment from the surrounding code.
+> +
+>  8. trace-events style
+>  
+>  8.1 0x prefix
+> 
 
--- PMM
+Is there some name for the unholy abomination that is the combination of
+both styles?:
+
+/* Like this, but without the trailing
+ * end-comment on a standalone line. */
+
+I prefer the asterisks on the left because it makes it obvious when
+grepping that it's from a comment block; I dislike the standalone
+comment for taking up a bunch of room for seemingly no reason.
+
+...Not that I expect to change your mind, or to suggest I've got enough
+paint for a shed this large, so any standard is better than no standard...
+
+--js
