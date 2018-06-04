@@ -1,17 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36738)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36765)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1fPnXz-00084c-DZ
-	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 07:21:12 -0400
+	(envelope-from <stefanha@redhat.com>) id 1fPnY1-00086T-1U
+	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 07:21:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1fPnXy-0001XW-CY
-	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 07:21:11 -0400
+	(envelope-from <stefanha@redhat.com>) id 1fPnY0-0001YL-6y
+	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 07:21:13 -0400
 From: Stefan Hajnoczi <stefanha@redhat.com>
-Date: Mon,  4 Jun 2018 12:20:32 +0100
-Message-Id: <20180604112036.2715-8-stefanha@redhat.com>
+Date: Mon,  4 Jun 2018 12:20:34 +0100
+Message-Id: <20180604112036.2715-10-stefanha@redhat.com>
 In-Reply-To: <20180604112036.2715-1-stefanha@redhat.com>
 References: <20180604112036.2715-1-stefanha@redhat.com>
-Subject: [Qemu-devel] [PULL 07/11] iscsi: Create and use
- iscsi_co_wait_for_task
+Subject: [Qemu-devel] [PULL 09/11] block-backend: Add blk_co_copy_range
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,124 +24,55 @@ Cc: Ronnie Sahlberg <ronniesahlberg@gmail.com>, Peter Maydell <peter.maydell@lin
 
 From: Fam Zheng <famz@redhat.com>
 
-This loop is repeated a growing number times. Make a helper.
+It's a BlockBackend wrapper of the BDS interface.
 
 Signed-off-by: Fam Zheng <famz@redhat.com>
 Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
-Message-id: 20180601092648.24614-8-famz@redhat.com
+Message-id: 20180601092648.24614-10-famz@redhat.com
 Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
 ---
- block/iscsi.c | 54 ++++++++++++++++-----------------------------------
- 1 file changed, 17 insertions(+), 37 deletions(-)
+ include/sysemu/block-backend.h |  4 ++++
+ block/block-backend.c          | 18 ++++++++++++++++++
+ 2 files changed, 22 insertions(+)
 
-diff --git a/block/iscsi.c b/block/iscsi.c
-index 6d0035d4b9..6a365cb07b 100644
---- a/block/iscsi.c
-+++ b/block/iscsi.c
-@@ -556,6 +556,17 @@ static inline bool iscsi_allocmap_is_valid(IscsiLun *iscsilun,
-                                offset / iscsilun->cluster_size) == size);
- }
+diff --git a/include/sysemu/block-backend.h b/include/sysemu/block-backend.h
+index 92ab624fac..8d03d493c2 100644
+--- a/include/sysemu/block-backend.h
++++ b/include/sysemu/block-backend.h
+@@ -232,4 +232,8 @@ void blk_set_force_allow_inactivate(BlockBackend *blk);
+ void blk_register_buf(BlockBackend *blk, void *host, size_t size);
+ void blk_unregister_buf(BlockBackend *blk, void *host);
  
-+static void coroutine_fn iscsi_co_wait_for_task(IscsiTask *iTask,
-+                                                IscsiLun *iscsilun)
-+{
-+    while (!iTask->complete) {
-+        iscsi_set_events(iscsilun);
-+        qemu_mutex_unlock(&iscsilun->mutex);
-+        qemu_coroutine_yield();
-+        qemu_mutex_lock(&iscsilun->mutex);
-+    }
-+}
++int coroutine_fn blk_co_copy_range(BlockBackend *blk_in, int64_t off_in,
++                                   BlockBackend *blk_out, int64_t off_out,
++                                   int bytes, BdrvRequestFlags flags);
 +
- static int coroutine_fn
- iscsi_co_writev(BlockDriverState *bs, int64_t sector_num, int nb_sectors,
-                 QEMUIOVector *iov, int flags)
-@@ -617,12 +628,7 @@ retry:
-     scsi_task_set_iov_out(iTask.task, (struct scsi_iovec *) iov->iov,
-                           iov->niov);
  #endif
--    while (!iTask.complete) {
--        iscsi_set_events(iscsilun);
--        qemu_mutex_unlock(&iscsilun->mutex);
--        qemu_coroutine_yield();
--        qemu_mutex_lock(&iscsilun->mutex);
--    }
-+    iscsi_co_wait_for_task(&iTask, iscsilun);
- 
-     if (iTask.task != NULL) {
-         scsi_free_scsi_task(iTask.task);
-@@ -693,13 +699,7 @@ retry:
-         ret = -ENOMEM;
-         goto out_unlock;
-     }
--
--    while (!iTask.complete) {
--        iscsi_set_events(iscsilun);
--        qemu_mutex_unlock(&iscsilun->mutex);
--        qemu_coroutine_yield();
--        qemu_mutex_lock(&iscsilun->mutex);
--    }
-+    iscsi_co_wait_for_task(&iTask, iscsilun);
- 
-     if (iTask.do_retry) {
-         if (iTask.task != NULL) {
-@@ -863,13 +863,8 @@ retry:
- #if LIBISCSI_API_VERSION < (20160603)
-     scsi_task_set_iov_in(iTask.task, (struct scsi_iovec *) iov->iov, iov->niov);
- #endif
--    while (!iTask.complete) {
--        iscsi_set_events(iscsilun);
--        qemu_mutex_unlock(&iscsilun->mutex);
--        qemu_coroutine_yield();
--        qemu_mutex_lock(&iscsilun->mutex);
--    }
- 
-+    iscsi_co_wait_for_task(&iTask, iscsilun);
-     if (iTask.task != NULL) {
-         scsi_free_scsi_task(iTask.task);
-         iTask.task = NULL;
-@@ -906,12 +901,7 @@ retry:
-         return -ENOMEM;
-     }
- 
--    while (!iTask.complete) {
--        iscsi_set_events(iscsilun);
--        qemu_mutex_unlock(&iscsilun->mutex);
--        qemu_coroutine_yield();
--        qemu_mutex_lock(&iscsilun->mutex);
--    }
-+    iscsi_co_wait_for_task(&iTask, iscsilun);
- 
-     if (iTask.task != NULL) {
-         scsi_free_scsi_task(iTask.task);
-@@ -1143,12 +1133,7 @@ retry:
-         goto out_unlock;
-     }
- 
--    while (!iTask.complete) {
--        iscsi_set_events(iscsilun);
--        qemu_mutex_unlock(&iscsilun->mutex);
--        qemu_coroutine_yield();
--        qemu_mutex_lock(&iscsilun->mutex);
--    }
-+    iscsi_co_wait_for_task(&iTask, iscsilun);
- 
-     if (iTask.task != NULL) {
-         scsi_free_scsi_task(iTask.task);
-@@ -1244,12 +1229,7 @@ retry:
-         return -ENOMEM;
-     }
- 
--    while (!iTask.complete) {
--        iscsi_set_events(iscsilun);
--        qemu_mutex_unlock(&iscsilun->mutex);
--        qemu_coroutine_yield();
--        qemu_mutex_lock(&iscsilun->mutex);
--    }
-+    iscsi_co_wait_for_task(&iTask, iscsilun);
- 
-     if (iTask.status == SCSI_STATUS_CHECK_CONDITION &&
-         iTask.task->sense.key == SCSI_SENSE_ILLEGAL_REQUEST &&
+diff --git a/block/block-backend.c b/block/block-backend.c
+index 89f47b00ea..d55c328736 100644
+--- a/block/block-backend.c
++++ b/block/block-backend.c
+@@ -2211,3 +2211,21 @@ void blk_unregister_buf(BlockBackend *blk, void *host)
+ {
+     bdrv_unregister_buf(blk_bs(blk), host);
+ }
++
++int coroutine_fn blk_co_copy_range(BlockBackend *blk_in, int64_t off_in,
++                                   BlockBackend *blk_out, int64_t off_out,
++                                   int bytes, BdrvRequestFlags flags)
++{
++    int r;
++    r = blk_check_byte_request(blk_in, off_in, bytes);
++    if (r) {
++        return r;
++    }
++    r = blk_check_byte_request(blk_out, off_out, bytes);
++    if (r) {
++        return r;
++    }
++    return bdrv_co_copy_range(blk_in->root, off_in,
++                              blk_out->root, off_out,
++                              bytes, flags);
++}
 -- 
 2.17.1
