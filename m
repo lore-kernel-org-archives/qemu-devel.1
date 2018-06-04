@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39015)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39017)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1fPrHq-0002AU-K5
+	(envelope-from <laurent@vivier.eu>) id 1fPrHq-0002AV-Kq
 	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 11:20:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1fPrHp-0005zg-B1
+	(envelope-from <laurent@vivier.eu>) id 1fPrHn-0005xN-Ax
 	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 11:20:46 -0400
-Received: from mout.kundenserver.de ([212.227.126.130]:56827)
+Received: from mout.kundenserver.de ([212.227.126.130]:50871)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1fPrHp-0005xy-0y
-	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 11:20:45 -0400
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1fPrHn-0005wI-0z
+	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 11:20:43 -0400
 From: Laurent Vivier <laurent@vivier.eu>
-Date: Mon,  4 Jun 2018 17:20:05 +0200
-Message-Id: <20180604152015.13359-8-laurent@vivier.eu>
+Date: Mon,  4 Jun 2018 17:20:04 +0200
+Message-Id: <20180604152015.13359-7-laurent@vivier.eu>
 In-Reply-To: <20180604152015.13359-1-laurent@vivier.eu>
 References: <20180604152015.13359-1-laurent@vivier.eu>
-Subject: [Qemu-devel] [PULL 07/17] linux-user: move mips/mips64 fcntl
- definitions to mips/target_fcntl.h
+Subject: [Qemu-devel] [PULL 06/17] linux-user: move arm/aarch64/m68k fcntl
+ definitions to [arm|aarch64|m68k]/target_fcntl.h
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,111 +30,79 @@ Cc: Riku Voipio <riku.voipio@iki.fi>, Laurent Vivier <laurent@vivier.eu>, Mark C
 No code change.
 
 Signed-off-by: Laurent Vivier <laurent@vivier.eu>
-Message-Id: <20180529194207.31503-6-laurent@vivier.eu>
+Acked-by: Richard Henderson <richard.henderson@linaro.org>
+Message-Id: <20180529194207.31503-5-laurent@vivier.eu>
 ---
- linux-user/mips/target_fcntl.h | 27 +++++++++++++++++++++++++++
- linux-user/syscall_defs.h      | 31 ++-----------------------------
- 2 files changed, 29 insertions(+), 29 deletions(-)
+ linux-user/aarch64/target_fcntl.h | 5 +++++
+ linux-user/arm/target_fcntl.h     | 6 ++++++
+ linux-user/m68k/target_fcntl.h    | 6 ++++++
+ linux-user/syscall_defs.h         | 7 +------
+ 4 files changed, 18 insertions(+), 6 deletions(-)
 
-diff --git a/linux-user/mips/target_fcntl.h b/linux-user/mips/target_fcntl.h
-index 5404245068..000527cc95 100644
---- a/linux-user/mips/target_fcntl.h
-+++ b/linux-user/mips/target_fcntl.h
-@@ -7,5 +7,32 @@
+diff --git a/linux-user/aarch64/target_fcntl.h b/linux-user/aarch64/target_fcntl.h
+index 59be406280..efdf6e5f05 100644
+--- a/linux-user/aarch64/target_fcntl.h
++++ b/linux-user/aarch64/target_fcntl.h
+@@ -7,5 +7,10 @@
  
- #ifndef MIPS_TARGET_FCNTL_H
- #define MIPS_TARGET_FCNTL_H
+ #ifndef AARCH64_TARGET_FCNTL_H
+ #define AARCH64_TARGET_FCNTL_H
 +
-+#define TARGET_O_APPEND         0x0008
-+#define TARGET_O_DSYNC          0x0010
-+#define TARGET_O_NONBLOCK       0x0080
-+#define TARGET_O_CREAT          0x0100  /* not fcntl */
-+#define TARGET_O_TRUNC          0x0200  /* not fcntl */
-+#define TARGET_O_EXCL           0x0400  /* not fcntl */
-+#define TARGET_O_NOCTTY         0x0800  /* not fcntl */
-+#define TARGET_FASYNC           0x1000  /* fcntl, for BSD compatibility */
-+#define TARGET_O_LARGEFILE      0x2000  /* allow large file opens */
-+#define TARGET___O_SYNC         0x4000
-+#define TARGET_O_DIRECT         0x8000  /* direct disk access hint */
++#define TARGET_O_DIRECTORY      040000 /* must be a directory */
++#define TARGET_O_NOFOLLOW      0100000 /* don't follow links */
++#define TARGET_O_DIRECT        0200000 /* direct disk access hint */
 +
-+#define TARGET_F_GETLK         14
-+#define TARGET_F_SETLK         6
-+#define TARGET_F_SETLKW        7
+ #include "../generic/fcntl.h"
+ #endif
+diff --git a/linux-user/arm/target_fcntl.h b/linux-user/arm/target_fcntl.h
+index ca819df519..c8ff6b2505 100644
+--- a/linux-user/arm/target_fcntl.h
++++ b/linux-user/arm/target_fcntl.h
+@@ -7,5 +7,11 @@
+ 
+ #ifndef ARM_TARGET_FCNTL_H
+ #define ARM_TARGET_FCNTL_H
 +
-+#define TARGET_F_SETOWN        24       /*  for sockets. */
-+#define TARGET_F_GETOWN        23       /*  for sockets. */
++#define TARGET_O_DIRECTORY      040000 /* must be a directory */
++#define TARGET_O_NOFOLLOW      0100000 /* don't follow links */
++#define TARGET_O_DIRECT        0200000 /* direct disk access hint */
++#define TARGET_O_LARGEFILE     0400000
 +
-+#define TARGET_ARCH_FLOCK_PAD abi_long pad[4];
-+#define TARGET_ARCH_FLOCK64_PAD
+ #include "../generic/fcntl.h"
+ #endif
+diff --git a/linux-user/m68k/target_fcntl.h b/linux-user/m68k/target_fcntl.h
+index 4328c60d22..068bc3243e 100644
+--- a/linux-user/m68k/target_fcntl.h
++++ b/linux-user/m68k/target_fcntl.h
+@@ -7,5 +7,11 @@
+ 
+ #ifndef M68K_TARGET_FCNTL_H
+ #define M68K_TARGET_FCNTL_H
 +
-+#define TARGET_F_GETLK64       33      /*  using 'struct flock64' */
-+#define TARGET_F_SETLK64       34
-+#define TARGET_F_SETLKW64      35
++#define TARGET_O_DIRECTORY      040000 /* must be a directory */
++#define TARGET_O_NOFOLLOW      0100000 /* don't follow links */
++#define TARGET_O_DIRECT        0200000 /* direct disk access hint */
++#define TARGET_O_LARGEFILE     0400000
 +
  #include "../generic/fcntl.h"
  #endif
 diff --git a/linux-user/syscall_defs.h b/linux-user/syscall_defs.h
-index 3d13cdd654..44a590d2c9 100644
+index 46d2353254..3d13cdd654 100644
 --- a/linux-user/syscall_defs.h
 +++ b/linux-user/syscall_defs.h
-@@ -2407,13 +2407,7 @@ struct target_statfs64 {
- };
- #endif
- 
--#if defined(TARGET_MIPS)
--#define TARGET_F_GETLK         14
--#define TARGET_F_SETLK         6
--#define TARGET_F_SETLKW        7
--#define TARGET_F_SETOWN        24       /*  for sockets. */
--#define TARGET_F_GETOWN        23       /*  for sockets. */
--#elif defined(TARGET_SPARC)
-+#if defined(TARGET_SPARC)
- #define TARGET_F_RDLCK         1
- #define TARGET_F_WRLCK         2
- #define TARGET_F_UNLCK         3
-@@ -2424,12 +2418,6 @@ struct target_statfs64 {
- #define TARGET_F_SETLKW        9
- #endif
- 
--#if defined(TARGET_MIPS)
--#define TARGET_F_GETLK64       33      /*  using 'struct flock64' */
--#define TARGET_F_SETLK64       34
--#define TARGET_F_SETLKW64      35
--#endif
--
- #define TARGET_F_LINUX_SPECIFIC_BASE 1024
- #define TARGET_F_SETLEASE (TARGET_F_LINUX_SPECIFIC_BASE + 0)
- #define TARGET_F_GETLEASE (TARGET_F_LINUX_SPECIFIC_BASE + 1)
-@@ -2438,19 +2426,7 @@ struct target_statfs64 {
+@@ -2438,12 +2438,7 @@ struct target_statfs64 {
  #define TARGET_F_GETPIPE_SZ (TARGET_F_LINUX_SPECIFIC_BASE + 8)
  #define TARGET_F_NOTIFY  (TARGET_F_LINUX_SPECIFIC_BASE+2)
  
--#if defined(TARGET_MIPS)
--#define TARGET_O_APPEND         0x0008
--#define TARGET_O_DSYNC          0x0010
--#define TARGET_O_NONBLOCK       0x0080
--#define TARGET_O_CREAT          0x0100  /* not fcntl */
--#define TARGET_O_TRUNC          0x0200  /* not fcntl */
--#define TARGET_O_EXCL           0x0400  /* not fcntl */
--#define TARGET_O_NOCTTY         0x0800  /* not fcntl */
--#define TARGET_FASYNC           0x1000  /* fcntl, for BSD compatibility */
--#define TARGET_O_LARGEFILE      0x2000  /* allow large file opens */
--#define TARGET___O_SYNC         0x4000
--#define TARGET_O_DIRECT         0x8000  /* direct disk access hint */
--#elif defined (TARGET_PPC)
-+#if defined (TARGET_PPC)
- #define TARGET_O_DIRECTORY      040000 /* must be a directory */
- #define TARGET_O_NOFOLLOW      0100000 /* don't follow links */
- #define TARGET_O_LARGEFILE     0200000
-@@ -2481,9 +2457,6 @@ struct target_statfs64 {
- #if defined(TARGET_SPARC)
- #define TARGET_ARCH_FLOCK_PAD abi_short __unused;
- #define TARGET_ARCH_FLOCK64_PAD abi_short __unused;
+-#if defined(TARGET_ARM) || defined(TARGET_M68K) || defined(TARGET_AARCH64)
+-#define TARGET_O_DIRECTORY      040000 /* must be a directory */
+-#define TARGET_O_NOFOLLOW      0100000 /* don't follow links */
+-#define TARGET_O_DIRECT        0200000 /* direct disk access hint */
+-#define TARGET_O_LARGEFILE     0400000
 -#elif defined(TARGET_MIPS)
--#define TARGET_ARCH_FLOCK_PAD abi_long pad[4];
--#define TARGET_ARCH_FLOCK64_PAD
- #endif
- 
- #include "target_fcntl.h"
++#if defined(TARGET_MIPS)
+ #define TARGET_O_APPEND         0x0008
+ #define TARGET_O_DSYNC          0x0010
+ #define TARGET_O_NONBLOCK       0x0080
 -- 
 2.14.3
