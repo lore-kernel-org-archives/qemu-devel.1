@@ -1,27 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33030)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33580)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dovgaluk@ispras.ru>) id 1fQAZo-0003fo-CF
-	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 07:56:38 -0400
+	(envelope-from <berrange@redhat.com>) id 1fQAcK-0004jo-4k
+	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 07:59:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dovgaluk@ispras.ru>) id 1fQAZj-0008H9-CY
-	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 07:56:36 -0400
-Received: from mail.ispras.ru ([83.149.199.45]:36028)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dovgaluk@ispras.ru>) id 1fQAZi-0008GN-Ru
-	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 07:56:31 -0400
-From: "Pavel Dovgalyuk" <dovgaluk@ispras.ru>
-References: <152819515565.30857.16834004920507717324.stgit@pasha-ThinkPad-T60>
-	<CAFEAcA-3UPDD3muShM=yYgiwQcN-U+f_TyEiu-Z=EWb7_hFaCw@mail.gmail.com>
-In-Reply-To: <CAFEAcA-3UPDD3muShM=yYgiwQcN-U+f_TyEiu-Z=EWb7_hFaCw@mail.gmail.com>
-Date: Tue, 5 Jun 2018 14:56:29 +0300
-Message-ID: <001d01d3fcc4$3dfd33f0$b9f79bd0$@ru>
+	(envelope-from <berrange@redhat.com>) id 1fQAcG-0001Rd-8o
+	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 07:59:12 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:59074 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1fQAcG-0001RH-49
+	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 07:59:08 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.6])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 62C31E44B5
+	for <qemu-devel@nongnu.org>; Tue,  5 Jun 2018 11:59:07 +0000 (UTC)
+Date: Tue, 5 Jun 2018 12:59:02 +0100
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Message-ID: <20180605115902.GY32286@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <20180604120345.12955-1-berrange@redhat.com>
+	<20180604120345.12955-2-berrange@redhat.com>
+	<2604e5d5-0e56-62e7-91eb-fd207a907ac8@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Content-Language: ru
-Subject: Re: [Qemu-devel] [RFC PATCH v2 0/7] QEMU binary instrumentation
- prototype
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <2604e5d5-0e56-62e7-91eb-fd207a907ac8@redhat.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 1/2] vl: don't use RUN_STATE_PRECONFIG
+ as initial state
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,97 +37,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: 'Peter Maydell' <peter.maydell@linaro.org>, 'Pavel Dovgalyuk' <Pavel.Dovgaluk@ispras.ru>
-Cc: 'QEMU Developers' <qemu-devel@nongnu.org>, maria.klimushenkova@ispras.ru, 'Paolo Bonzini' <pbonzini@redhat.com>, =?utf-8?Q?'Llu=C3=ADs_Vilanova'?= <vilanova@ac.upc.edu>
+To: Michal Privoznik <mprivozn@redhat.com>
+Cc: qemu-devel@nongnu.org, Igor Mammedov <imammedo@redhat.com>, Eric Blake <eblake@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Markus Armbruster <armbru@redhat.com>, Max Reitz <mreitz@redhat.com>
 
-> From: Peter Maydell [mailto:peter.maydell@linaro.org]
-> 
-> This series doesn't seem to add anything to Documentation/ that
-> describes the API we make available to plugins. I'm a lot more
-> interested in reviewing the API that will be used by plugins
-> than I am in the implementation at this stage. Can you provide
-> a description/documentation of the API for review, please?
+On Mon, Jun 04, 2018 at 04:21:47PM +0200, Michal Privoznik wrote:
+> On 06/04/2018 02:03 PM, Daniel P. Berrang=C3=A9 wrote:
+> > @@ -3572,7 +3570,12 @@ int main(int argc, char **argv, char **envp)
+> >                  }
+> >                  break;
+> >              case QEMU_OPTION_preconfig:
+> > -                preconfig_exit_requested =3D false;
+> > +                if (!runstate_check(RUN_STATE_NONE)) {
+> > +                    error_report("'--preconfig' and '--incoming' opt=
+ions are "
+> > +                                 "mutually exclusive");
+> > +                    exit(EXIT_FAILURE);
+> > +                }
+> > +                runstate_set(RUN_STATE_PRECONFIG);
+>=20
+> Specifying --preconfig twice on the command line now fails with a very
+> cryptic message (there's no --incoming).
 
+This can be addressed with a slight rewording
 
-Here is the draft:
+   "Only a single usage of --preconfig or --incoming is permitted"
 
-Introduction
-============
-
-This document describes an API for creating the QEMU
-instrumentation plugins.
-
-It is based on the following prior sources:
- - KVM Forum 2017 talk "Instrumenting, Introspection, and Debugging with QEMU"
-   https://www.linux-kvm.org/images/3/3d/Introspect.pdf
- - Discussion on Lluis Vilanova instrumentation patch series
-   https://lists.gnu.org/archive/html/qemu-devel/2017-09/msg03357.html
-
-The aim of the instrumentation is implementing different runtime
-tracers that can track the executed instructions, memory and
-hardware operations.
-
-Instrumenting the code
-======================
-
-Instrumentation subsystem exploits TCG helper mechanism to embed
-callbacks into the translation blocks. These callbacks may be inserted
-before the specific instructions, when the plugins require such filtering.
-
-Translator uses two functions for embedding the callbacks:
- - first function checks whether the current instruction should be
-   instrumented
- - second function embeds the callback for executing the plugin-specific
-   code before that instruction
-
-The similar method may be used for memory access instrumentation.
-
-QEMU->Plugin API
-================
-
-Instrumentation layer passes the requests from the translator
-to the dynamically loaded plugins. Every plugin may provide
-the following functions to perform the instrumentation:
-
- 1. bool plugin_init(const char *args);
-    Initialization function. May return false if the plugin
-    can't work in the current environment.
-
- 2. bool plugin_needs_before_insn(uint64_t pc, void *cpu);
-    Returns true if the plugin needs to instrument the current instruction.
-    It may use the address (pc) for making the decision or the guest
-    CPU state (cpu), which can be passed back to QEMU core API
-    (e.g., for reading the guest memory).
-    This function is called at both translation and execution phases.
-
- 3. void plugin_before_insn(uint64_t pc, void *cpu);
-    If the previous function returned true for some instruction,
-    then this function will be called. This process is repeated before
-    every execution of the instruction, if it was instrumented.
-
-The similar pair of functions will also be added for the memory
-operations.
-
-Plugin->QEMU API
-================
-
-QEMU core exports some functions to let the plugins introspect the guest
-or perform some interaction with other QEMU services (e.g., logging).
-API doesn't contain any data structures, because their memory layout depend
-on the compilation settings.
-
-QEMU exports the following functions that may be called from the plugins:
-
- 1. void qemulib_log(const char *fmt, ...);
-    Wrapper for qemu_log.
-
- 2. int qemulib_read_memory(void *cpu, uint64_t addr, uint8_t *buf, int len);
-    Reads guest memory into the buffer. Wrapper for cpu_memory_rw_debug.
-
- 3. int qemulib_read_register(void *cpu, uint8_t *mem_buf, int reg);
-    Uses target gdb interface for accessing the guest registers.
-    'reg' is the id of the desired register as it is coded by gdb.
-
-There also should be a function for flushing the translated blocks to
-ensure that the instrumentation will occur in the case of changing
-the internal plugin state.
+Regards,
+Daniel
+--=20
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
+ge :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.c=
+om :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
+ge :|
