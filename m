@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40136)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40133)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1fQHAu-00035Y-Kx
+	(envelope-from <jsnow@redhat.com>) id 1fQHAu-00035P-Hs
 	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 14:59:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1fQHAt-0005RA-GD
+	(envelope-from <jsnow@redhat.com>) id 1fQHAt-0005Qs-6R
 	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 14:59:20 -0400
 From: John Snow <jsnow@redhat.com>
-Date: Tue,  5 Jun 2018 14:59:05 -0400
-Message-Id: <20180605185905.4583-6-jsnow@redhat.com>
+Date: Tue,  5 Jun 2018 14:59:03 -0400
+Message-Id: <20180605185905.4583-4-jsnow@redhat.com>
 In-Reply-To: <20180605185905.4583-1-jsnow@redhat.com>
 References: <20180605185905.4583-1-jsnow@redhat.com>
-Subject: [Qemu-devel] [PATCH 5/5] qapi: add disabled parameter to
- block-dirty-bitmap-add
+Subject: [Qemu-devel] [PATCH 3/5] qmp: transaction support for
+ x-block-dirty-bitmap-enable/disable
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,80 +25,141 @@ Cc: Fam Zheng <famz@redhat.com>, John Snow <jsnow@redhat.com>, Markus Armbruster
 
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 
-This is needed, for example, to create a new bitmap and merge several
-disabled bitmaps into a new one. Without this flag we will have to
-put block-dirty-bitmap-add and block-dirty-bitmap-disable into one
-transaction.
-
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+[Added x- prefix. --js]
 Signed-off-by: John Snow <jsnow@redhat.com>
 ---
- blockdev.c           | 10 ++++++++++
- qapi/block-core.json |  6 +++++-
- 2 files changed, 15 insertions(+), 1 deletion(-)
+ blockdev.c            | 81 ++++++++++++++++++++++++++++++++++++++++++++++++++-
+ qapi/transaction.json |  4 +++
+ 2 files changed, 84 insertions(+), 1 deletion(-)
 
 diff --git a/blockdev.c b/blockdev.c
-index b00908fdfd..03e7cbeea1 100644
+index 5f059cedcb..33bfe4817f 100644
 --- a/blockdev.c
 +++ b/blockdev.c
-@@ -2073,6 +2073,7 @@ static void block_dirty_bitmap_add_prepare(BlkActionState *common,
-                                action->has_granularity, action->granularity,
-                                action->has_persistent, action->persistent,
-                                action->has_autoload, action->autoload,
-+                               action->has_x_disabled, action->x_disabled,
-                                &local_err);
- 
-     if (!local_err) {
-@@ -2880,6 +2881,7 @@ void qmp_block_dirty_bitmap_add(const char *node, const char *name,
-                                 bool has_granularity, uint32_t granularity,
-                                 bool has_persistent, bool persistent,
-                                 bool has_autoload, bool autoload,
-+                                bool has_disabled, bool disabled,
-                                 Error **errp)
- {
+@@ -2052,6 +2052,7 @@ typedef struct BlockDirtyBitmapState {
      BlockDriverState *bs;
-@@ -2914,6 +2916,10 @@ void qmp_block_dirty_bitmap_add(const char *node, const char *name,
-         warn_report("Autoload option is deprecated and its value is ignored");
-     }
+     HBitmap *backup;
+     bool prepared;
++    bool was_enabled;
+ } BlockDirtyBitmapState;
  
-+    if (!has_disabled) {
-+        disabled = false;
-+    }
-+
-     if (persistent &&
-         !bdrv_can_store_new_dirty_bitmap(bs, name, granularity, errp))
-     {
-@@ -2925,6 +2931,10 @@ void qmp_block_dirty_bitmap_add(const char *node, const char *name,
-         return;
-     }
- 
-+    if (disabled) {
-+        bdrv_disable_dirty_bitmap(bitmap);
-+    }
-+
-     bdrv_dirty_bitmap_set_persistance(bitmap, persistent);
+ static void block_dirty_bitmap_add_prepare(BlkActionState *common,
+@@ -2151,6 +2152,74 @@ static void block_dirty_bitmap_clear_commit(BlkActionState *common)
+     hbitmap_free(state->backup);
  }
  
-diff --git a/qapi/block-core.json b/qapi/block-core.json
-index 3999175c23..f06a43bfb2 100644
---- a/qapi/block-core.json
-+++ b/qapi/block-core.json
-@@ -1734,11 +1734,15 @@
- #            Currently, all dirty tracking bitmaps are loaded from Qcow2 on
- #            open.
- #
-+# @x-disabled: the bitmap is created in the disabled state, which means that
-+#              it will not track drive changes. The bitmap may be enabled with
-+#              x-block-dirty-bitmap-enable. Default is false. (Since: 3.0)
-+#
- # Since: 2.4
- ##
- { 'struct': 'BlockDirtyBitmapAdd',
-   'data': { 'node': 'str', 'name': 'str', '*granularity': 'uint32',
--            '*persistent': 'bool', '*autoload': 'bool' } }
-+            '*persistent': 'bool', '*autoload': 'bool', '*x-disabled': 'bool' } }
++static void block_dirty_bitmap_enable_prepare(BlkActionState *common,
++                                              Error **errp)
++{
++    BlockDirtyBitmap *action;
++    BlockDirtyBitmapState *state = DO_UPCAST(BlockDirtyBitmapState,
++                                             common, common);
++
++    if (action_check_completion_mode(common, errp) < 0) {
++        return;
++    }
++
++    action = common->action->u.x_block_dirty_bitmap_enable.data;
++    state->bitmap = block_dirty_bitmap_lookup(action->node,
++                                              action->name,
++                                              NULL,
++                                              errp);
++    if (!state->bitmap) {
++        return;
++    }
++
++    state->was_enabled = bdrv_dirty_bitmap_enabled(state->bitmap);
++    bdrv_enable_dirty_bitmap(state->bitmap);
++}
++
++static void block_dirty_bitmap_enable_abort(BlkActionState *common)
++{
++    BlockDirtyBitmapState *state = DO_UPCAST(BlockDirtyBitmapState,
++                                             common, common);
++
++    if (!state->was_enabled) {
++        bdrv_disable_dirty_bitmap(state->bitmap);
++    }
++}
++
++static void block_dirty_bitmap_disable_prepare(BlkActionState *common,
++                                               Error **errp)
++{
++    BlockDirtyBitmap *action;
++    BlockDirtyBitmapState *state = DO_UPCAST(BlockDirtyBitmapState,
++                                             common, common);
++
++    if (action_check_completion_mode(common, errp) < 0) {
++        return;
++    }
++
++    action = common->action->u.x_block_dirty_bitmap_disable.data;
++    state->bitmap = block_dirty_bitmap_lookup(action->node,
++                                              action->name,
++                                              NULL,
++                                              errp);
++    if (!state->bitmap) {
++        return;
++    }
++
++    state->was_enabled = bdrv_dirty_bitmap_enabled(state->bitmap);
++    bdrv_disable_dirty_bitmap(state->bitmap);
++}
++
++static void block_dirty_bitmap_disable_abort(BlkActionState *common)
++{
++    BlockDirtyBitmapState *state = DO_UPCAST(BlockDirtyBitmapState,
++                                             common, common);
++
++    if (state->was_enabled) {
++        bdrv_enable_dirty_bitmap(state->bitmap);
++    }
++}
++
+ static void abort_prepare(BlkActionState *common, Error **errp)
+ {
+     error_setg(errp, "Transaction aborted using Abort action");
+@@ -2211,7 +2280,17 @@ static const BlkActionOps actions[] = {
+         .prepare = block_dirty_bitmap_clear_prepare,
+         .commit = block_dirty_bitmap_clear_commit,
+         .abort = block_dirty_bitmap_clear_abort,
+-    }
++    },
++    [TRANSACTION_ACTION_KIND_X_BLOCK_DIRTY_BITMAP_ENABLE] = {
++        .instance_size = sizeof(BlockDirtyBitmapState),
++        .prepare = block_dirty_bitmap_enable_prepare,
++        .abort = block_dirty_bitmap_enable_abort,
++    },
++    [TRANSACTION_ACTION_KIND_X_BLOCK_DIRTY_BITMAP_DISABLE] = {
++        .instance_size = sizeof(BlockDirtyBitmapState),
++        .prepare = block_dirty_bitmap_disable_prepare,
++        .abort = block_dirty_bitmap_disable_abort,
++     }
+ };
  
- ##
- # @BlockDirtyBitmapMerge:
+ /**
+diff --git a/qapi/transaction.json b/qapi/transaction.json
+index bd312792da..d7e4274550 100644
+--- a/qapi/transaction.json
++++ b/qapi/transaction.json
+@@ -46,6 +46,8 @@
+ # - @abort: since 1.6
+ # - @block-dirty-bitmap-add: since 2.5
+ # - @block-dirty-bitmap-clear: since 2.5
++# - @x-block-dirty-bitmap-enable: since 3.0
++# - @x-block-dirty-bitmap-disable: since 3.0
+ # - @blockdev-backup: since 2.3
+ # - @blockdev-snapshot: since 2.5
+ # - @blockdev-snapshot-internal-sync: since 1.7
+@@ -59,6 +61,8 @@
+        'abort': 'Abort',
+        'block-dirty-bitmap-add': 'BlockDirtyBitmapAdd',
+        'block-dirty-bitmap-clear': 'BlockDirtyBitmap',
++       'x-block-dirty-bitmap-enable': 'BlockDirtyBitmap',
++       'x-block-dirty-bitmap-disable': 'BlockDirtyBitmap',
+        'blockdev-backup': 'BlockdevBackup',
+        'blockdev-snapshot': 'BlockdevSnapshot',
+        'blockdev-snapshot-internal-sync': 'BlockdevSnapshotInternal',
 -- 
 2.14.3
