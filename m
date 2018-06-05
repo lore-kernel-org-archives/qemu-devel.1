@@ -1,21 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37023)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45353)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fPz7H-0004km-QX
-	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 19:42:25 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1fPzx2-0000Ye-PF
+	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 20:35:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fPz7E-0002r9-GS
-	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 19:42:23 -0400
-Date: Tue, 5 Jun 2018 09:42:11 +1000
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20180604234211.GC5140@umbus.fritz.box>
-References: <152725285229.537901.6934923933763529191.stgit@bahia.lan>
+	(envelope-from <ehabkost@redhat.com>) id 1fPzwz-0005lW-Lx
+	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 20:35:52 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:60716)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1fPzwz-0005lH-CR
+	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 20:35:49 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 450F6372583
+	for <qemu-devel@nongnu.org>; Tue,  5 Jun 2018 00:35:48 +0000 (UTC)
+Date: Mon, 4 Jun 2018 21:35:46 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20180605003546.GC3184@localhost.localdomain>
+References: <20180604120345.12955-1-berrange@redhat.com>
+	<20180604120345.12955-2-berrange@redhat.com>
+	<20180604174032.6962082d@redhat.com>
+	<20180604161157.GL19749@redhat.com>
+	<20180604193715.187c488b@redhat.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="f+W+jCU1fRNres8c"
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <152725285229.537901.6934923933763529191.stgit@bahia.lan>
-Subject: Re: [Qemu-devel] [PATCH] spapr: don't call KVM_PPC_CONFIGURE_V3_MMU
- if HPT is in userspace
+In-Reply-To: <20180604193715.187c488b@redhat.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 1/2] vl: don't use RUN_STATE_PRECONFIG
+ as initial state
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,114 +38,101 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Laurent Vivier <lvivier@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, Paul Mackerras <paulus@samba.org>, qemu-stable@nongnu.org
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>, qemu-devel@nongnu.org, Michal Privoznik <mprivozn@redhat.com>, Markus Armbruster <armbru@redhat.com>, Max Reitz <mreitz@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
+On Mon, Jun 04, 2018 at 07:37:15PM +0200, Igor Mammedov wrote:
+> On Mon, 4 Jun 2018 17:11:57 +0100
+> Daniel P. Berrang=E9 <berrange@redhat.com> wrote:
+>=20
+> > On Mon, Jun 04, 2018 at 05:40:32PM +0200, Igor Mammedov wrote:
+> > > On Mon,  4 Jun 2018 13:03:44 +0100
+> > > Daniel P. Berrang=E9 <berrange@redhat.com> wrote:
+> > >  =20
+> > > > The RUN_STATE_PRECONFIG state is not supposed to be reachable unl=
+ess the
+> > > > --preconfig argument is given to QEMU, but when it was introduced=
+ in:
+> > > >=20
+> > > >   commit 047f7038f586d2150f16c6d9ba9cfd0479f0f6ac
+> > > >   Author: Igor Mammedov <imammedo@redhat.com>
+> > > >   Date:   Fri May 11 19:24:43 2018 +0200
+> > > >=20
+> > > >     cli: add --preconfig option
+> > > >=20
+> > > > ...the global 'current_run_state' variable was changed to have an=
+ initial
+> > > > value of RUN_STATE_PRECONFIG regardless of whether --preconfig is=
+ given.
+> > > >=20
+> > > > A second invokation of main_loop() was added which then toggles i=
+t back
+> > > > to RUN_STATE_PRELAUNCH when --preconfig is not given. This is rac=
+y
+> > > > because it leaves a window where QEMU is in RUN_STATE_PRECONFIG d=
+espite
+> > > > --preconfig not being given. =20
+> > > Above statements isn't exactly correct, PRECONFIG were supposed to =
+be
+> > > the new state of QEMU from start up till machine_run_board_init(),
+> > > that would separate stage of initial configuration out from all
+> > > encompassing PRELAUNCH state. So I'd scratch out above part. =20
+> >=20
+> > That doesn't really make sense, given that --preconfig is *not* the
+> > default and thus not supposed to be an active state unless the app
+> > has explicitly opted in.
+> >
+> > IMHO running PRECONFIG state for any period of time when the app
+> > has not requested --preconfig is simply broken, and a recipe for
+> > obscure bugs like the ones we've seen right now.
+> mgmt hasn't opted in for default PRELAUNCH either, for it default
+> PRECONFIG runstate is not visible unless it opts in so nothing
+> is broken in regards to this.
+> Default runstate selection is QEMU's internal impl. detail.
 
---f+W+jCU1fRNres8c
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Daniel's description is how he expects it to work, but your
+description reflects the way the state machine actually works
+today (and how it worked befor the --preconfig series).
 
-On Fri, May 25, 2018 at 02:54:12PM +0200, Greg Kurz wrote:
-> Since the kernel commit "dbfcf3cb9c68 powerpc/64: Call H_REGISTER_PROC_TBL
-> when running as a HPT guest on POWER9", a nested guest running with PR KVM
-> hangs at boot:
->=20
-> Preparing to boot Linux version 4.16.0-kvm-pr-hang-gku+ (greg@qemu2222.bo=
-ston16) (gcc version 8.1.1 20180502 (Red Hat 8.1.1-1) (GCC)) #19 SMP Fri Ma=
-y 25 08:41:55 CEST 2018
-> Detected machine type: 0000000000000101
-> command line: root=3DUUID=3D22128c5c-30b1-4e0a-ac16-95853df31131 ro rhgb =
-console=3Dhvc0 early_printk disable-radix=3Don
-> Max number of cores passed to firmware: 1024 (NR_CPUS =3D 1024)
-> Calling ibm,client-architecture-support... done
-> memory layout at init:
->   memory_limit : 0000000000000000 (16 MB aligned)
->   alloc_bottom : 0000000001b80000
->   alloc_top    : 0000000030000000
->   alloc_top_hi : 0000000100000000
->   rmo_top      : 0000000030000000
->   ram_top      : 0000000100000000
-> instantiating rtas at 0x000000002fff0000... done
-> prom_hold_cpus: skipped
-> copying OF device tree...
-> Building dt strings...
-> Building dt structure...
-> Device tree strings 0x0000000003d90000 -> 0x0000000003d90abb
-> Device tree struct  0x0000000003da0000 -> 0x0000000003db0000
-> Quiescing Open Firmware ...
-> Booting Linux via __start() @ 0x0000000000400000 ...
->=20
-> This happens because the H_REGISTER_PROC_TBL implementation in QEMU
-> always call KVM_PPC_CONFIGURE_V3_MMU when KVM is present. This fails
-> in the case of PR KVM, which doesn't implement it, and QEMU returns
-> H_PARAMETER to the guest, which is a BUG() condition in linux.
->=20
-> In the case of PR, the HPT is allocated in userspace by QEMU, so it
-> doesn't make sense to call KVM_PPC_CONFIGURE_V3_MMU in the first
-> place. So, skip it in this case and let the guest boot.
->=20
-> Signed-off-by: Greg Kurz <groug@kaod.org>
-> ---
->=20
-> Note that PR KVM requires this patch from Paul to work on POWER9:
->=20
->     https://patchwork.ozlabs.org/patch/916766/
->=20
-> The original request was coming from people who want to run openQA in
-> fedora28 under PowerVM on a POWER9 system. This requires PR KVM, which
-> will be running in HPT-mode since pHyp doesn't do radix.
->=20
-> Cc'ing stable because fedora28 ships QEMU 2.11.x.
-> ---
->  hw/ppc/spapr_hcall.c |    2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->=20
-> diff --git a/hw/ppc/spapr_hcall.c b/hw/ppc/spapr_hcall.c
-> index 022f6d810182..12cbb317e5e8 100644
-> --- a/hw/ppc/spapr_hcall.c
-> +++ b/hw/ppc/spapr_hcall.c
-> @@ -1420,7 +1420,7 @@ static target_ulong h_register_process_table(PowerP=
-CCPU *cpu,
->                    ((flags & FLAG_GTSE) ? LPCR_GTSE : 0),
->                    LPCR_UPRT | LPCR_GTSE);
-> =20
-> -    if (kvm_enabled()) {
-> +    if (kvm_enabled() && !spapr->htab) {
->          return kvmppc_configure_v3_mmu(cpu, flags & FLAG_RADIX,
->                                         flags & FLAG_GTSE, cproc);
+However, I agree with Daniel that moving to PRECONFIG or
+PRELAUNCH if neither --preconfig or -S were specified is
+confusing, and I would prefer to change it the way he suggests.
 
-Won't this also omit the configure MMU call if the guest is in radix
-mode?  We don't want that.
+But:
 
->      }
+[...]
+> >    $START ------------->  PRELAUNCH {-> INMIGRATE]
+> >      |              ^
+> >      |              |
+> >      +-- PRECONFIG -+
+> >=20
+> > By marking the current state as PRECONFIG by default, we've essential=
+ly
+> > given 2 meanings to  PRECONFIG - sometimes it means stuff  that can b=
+e
+> > unconditionally run in early startup, and sometimes it means stuff th=
+at
+> > can only be run if --preconfig is given. Introducing the separate NON=
+E
+> > state clarifies that inherant contradiction in startup phases.
+> Yep, one can say it this way (as merged PRECONFIG was early
+> configuration stage regardless of if it's unconditional early
+> initialization or early CLI parsing/QMP configuration).
 >=20
+> Maybe adding NONE state makes sense but I'm not quite sure,
+> that's why I'd not rush it in and discuss if we really need
+> fragment early configuration into more stages.
+> (we can do it later as both stages aren't visible to user by default).
+
+Is it possible to fix the bugs first, and discuss how to refactor
+the state machine later?
+
+In the meantime, we could even document preconfig more accurately
+to avoid additional confusion:
+
+# @preconfig: Board initialization was not run yet.  The state is
+#             visible to the outside only if the --preconfig CLI
+#             option is used.  (Since 3.0)
 
 --=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---f+W+jCU1fRNres8c
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlsVzlMACgkQbDjKyiDZ
-s5INGA/+OjLcGV5WUxkrtENLmuGLDS7CAn3uYQVtGgw59rs6ycuFt2IzI0n8A01z
-ThpxIGrS+SuSo7TUDqt5zeiheRn5fDlSO6liVWUAayFrtVDE24M/h07eL6QQBZHu
-GZTme4ALy0x3BKbrf8KB8xxR8geOK0etvhGcRmLSxEjBtZBahXJVuntw2keldRwj
-CBWtSZoNTWnV4A+AUK+liRwLuLgduPhhHum6ej3P+fx8funTV3a4EtOjKMhm6MnF
-ei9MCk/vAhP/Ag7nyxd5RMP+hq8qDESIGxxEmZwfDSw6q+iyKuOatUXTujeFXKdP
-SEW/I3qbppAX8LpoSA9acW+Vg+oHT/dgZNCxoVnjY9cIFmhNnJiDg/SuCxVf7PQx
-O6DxyqWyYVPrN+Ikc1CZVy4RugdN3Qlk4/n5G27sY2cuVoM90odCNptdu/gaEt4J
-qniPNe99DiUg2KRZXroNfb9wp92ig4p8uLge1oMz1Wb58fF5BmDodR408GI4nmm1
-KcRYR7zSk6PlFMpDxsIb+QBNcrfwUhDQfWqnF1sqhykPyPw85xne2ngyX2pYzU0u
-znKMsnQ3MYLR7AbHIeHcq9p9qEdvb2MMzgm6D5Er3zpkdjM7+b4JNG1yfqeJUUyW
-EpYh4AX/oytKDxrbtRdTxb5T4VnAI4XaUOJRNziMlZ1CPS1tTk0=
-=NnO6
------END PGP SIGNATURE-----
-
---f+W+jCU1fRNres8c--
+Eduardo
