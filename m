@@ -1,32 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58173)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58385)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1fQAMx-0005LA-W3
-	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 07:43:21 -0400
+	(envelope-from <stefanha@gmail.com>) id 1fQANu-0005uA-Qv
+	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 07:44:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1fQAMu-0007vz-VC
-	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 07:43:20 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:45572 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1fQAMu-0007vo-R8
-	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 07:43:16 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.4])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 660D6195467
-	for <qemu-devel@nongnu.org>; Tue,  5 Jun 2018 11:43:16 +0000 (UTC)
-Date: Tue, 5 Jun 2018 13:43:14 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20180605134314.651edcee@redhat.com>
-In-Reply-To: <20180605004146.GD3184@localhost.localdomain>
-References: <ad910973c593c5ac2fed3a10ea958f7e9c12f82c.1527935663.git.mprivozn@redhat.com>
-	<20180604103244.GD19749@redhat.com>
-	<20180605004146.GD3184@localhost.localdomain>
+	(envelope-from <stefanha@gmail.com>) id 1fQANr-0008KT-Pj
+	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 07:44:18 -0400
+Received: from mail-wm0-x230.google.com ([2a00:1450:400c:c09::230]:52054)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1fQANr-0008KC-IB
+	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 07:44:15 -0400
+Received: by mail-wm0-x230.google.com with SMTP id r15-v6so4318896wmc.1
+	for <qemu-devel@nongnu.org>; Tue, 05 Jun 2018 04:44:15 -0700 (PDT)
+Date: Tue, 5 Jun 2018 12:44:12 +0100
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20180605114412.GE11888@stefanha-x1.localdomain>
+References: <1527840629-18648-1-git-send-email-junyan.he@gmx.com>
+	<1527840629-18648-8-git-send-email-junyan.he@gmx.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] cli: Don't run early event loop if no
- --preconfig was specified
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="WK3l2KTTmXPVedZ6"
+Content-Disposition: inline
+In-Reply-To: <1527840629-18648-8-git-send-email-junyan.he@gmx.com>
+Subject: Re: [Qemu-devel] [PATCH V6 7/7] migration/ram: ensure write
+ persistence on loading all data to PMEM.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,33 +31,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: "Daniel P. =?UTF-8?B?QmVycmFuZ8Op?=" <berrange@redhat.com>, Michal Privoznik <mprivozn@redhat.com>, pbonzini@redhat.com, qemu-devel@nongnu.org
+To: junyan.he@gmx.com
+Cc: qemu-devel@nongnu.org, xiaoguangrong.eric@gmail.com, crosthwaite.peter@gmail.com, mst@redhat.com, dgilbert@redhat.com, ehabkost@redhat.com, quintela@redhat.com, Junyan He <junyan.he@intel.com>, stefanha@redhat.com, pbonzini@redhat.com, imammedo@redhat.com, rth@twiddle.net
 
-On Mon, 4 Jun 2018 21:41:46 -0300
-Eduardo Habkost <ehabkost@redhat.com> wrote:
 
-> On Mon, Jun 04, 2018 at 11:32:44AM +0100, Daniel P. Berrang=C3=A9 wrote:
-> [...]
-> > Avoiding the double-run of main_loop is good, however, I think we should
-> > also not have put current_run_state in RUN_STATE_PRECONFIG in the first
-> > place if --preconfig wasn't set.  I've sent a patch to fix that problem
-> > too, so if yours is also applied, it could be changed to just do:
-> >=20
-> >     if (current_run_state =3D=3D RNU_STATE_PRECONFIG) {
-> >         main_loop();
-> >     } =20
->=20
-> So, this patch is desirable even if we refactor the state machine
-> as suggested in the other threads, right?
->=20
-> I'm queueing it on machine-next right now.
->=20
-Maybe add a note to commit message that it also fixes
-qemu hang when -nodefaults CLI option is used.
+--WK3l2KTTmXPVedZ6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-Also we would need Daniel's
+On Fri, Jun 01, 2018 at 04:10:29PM +0800, junyan.he@gmx.com wrote:
+> diff --git a/migration/ram.c b/migration/ram.c
+> index aa0c6f0..09525b2 100644
+> --- a/migration/ram.c
+> +++ b/migration/ram.c
+> @@ -33,6 +33,7 @@
+>  #include "qemu/bitops.h"
+>  #include "qemu/bitmap.h"
+>  #include "qemu/main-loop.h"
+> +#include "qemu/pmem.h"
+>  #include "xbzrle.h"
+>  #include "ram.h"
+>  #include "migration.h"
+> @@ -3046,6 +3047,13 @@ static int ram_load_setup(QEMUFile *f, void *opaque)
+>  static int ram_load_cleanup(void *opaque)
+>  {
+>      RAMBlock *rb;
+> +
+> +    RAMBLOCK_FOREACH(rb) {
+> +        if (ramblock_is_pmem(rb)) {
+> +            pmem_persist(rb->host, rb->used_length);
+> +         }
 
-  [PATCH v2 2/2] vl: fix use of --daemonize with  --preconfig
+Indentation is off.  This can be fixed by the maintainer who merges
+these patches.
 
-to fix the same issue with demonize but in case --preconfig were used
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+
+--WK3l2KTTmXPVedZ6
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJbFneMAAoJEJykq7OBq3PIqf4H/iVuZJ6VDk7b8xQ6fatM9gfF
+4r3TcKi++BeIVeeTqzTHe8JsE+yOonNlY8wSviRBxtGieB6XFZ1Cs/6uOwKlAQri
++DLghDs+RuOgAvfC6EwkJ36AKw81ygLuAHLhl1A/JVAp2P69jqZL25YZMzfLV4Uk
+g+Y0x/izCzg1DxbJUNStVrbtUZ8dSTWI6vOlsii5hDTX3HUKhqV0JFOSRaTtRtmo
+flkoVJBjGrUtSSrt6CVY2LURd6ZjMauNY5UofaRh5zwb7GJbM1Zioz9IXNHaPvza
+bbm+cOulDsjge69kzjbF31d18elaFaCqAshZAQBq5XU0OkocQ660DLjPnXdLjgw=
+=3tkp
+-----END PGP SIGNATURE-----
+
+--WK3l2KTTmXPVedZ6--
