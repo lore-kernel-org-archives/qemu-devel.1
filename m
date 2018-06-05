@@ -1,25 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51776)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53328)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <juterry@microsoft.com>) id 1fQKEo-0003pE-9l
-	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 18:15:35 -0400
+	(envelope-from <dan.j.williams@intel.com>) id 1fQKKb-000655-Cl
+	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 18:21:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <juterry@microsoft.com>) id 1fQKEl-0003vk-0p
-	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 18:15:34 -0400
-Received: from mail-sn1nam02on0125.outbound.protection.outlook.com
-	([104.47.36.125]:20751
-	helo=NAM02-SN1-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <juterry@microsoft.com>)
-	id 1fQKEk-0003sZ-3E
-	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 18:15:30 -0400
-From: "Justin Terry (VM)" <juterry@microsoft.com>
-Date: Tue, 5 Jun 2018 22:15:27 +0000
-Message-ID: <20180605221500.21674-1-juterry@microsoft.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+	(envelope-from <dan.j.williams@intel.com>) id 1fQKKa-0006ys-9d
+	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 18:21:33 -0400
+Received: from mail-oi0-x242.google.com ([2607:f8b0:4003:c06::242]:45153)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <dan.j.williams@intel.com>)
+	id 1fQKKa-0006yY-1r
+	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 18:21:32 -0400
+Received: by mail-oi0-x242.google.com with SMTP id b130-v6so3592194oif.12
+	for <qemu-devel@nongnu.org>; Tue, 05 Jun 2018 15:21:31 -0700 (PDT)
 MIME-Version: 1.0
-Subject: [Qemu-devel] [PATCH 1/2] WHPX workaround bug in OSVW handling
+In-Reply-To: <20180605220700.GB16066@linux.intel.com>
+References: <20180521163203.26590-1-ross.zwisler@linux.intel.com>
+	<20180521163203.26590-4-ross.zwisler@linux.intel.com>
+	<20180605182243-mutt-send-email-mst@kernel.org>
+	<20180605164205.GA21034@linux.intel.com>
+	<CAPcyv4jSoFifTc05WGgxkEX6i7b12zYyB+VchJVW_+QPQzO7Fg@mail.gmail.com>
+	<20180605213547-mutt-send-email-mst@kernel.org>
+	<20180605220700.GB16066@linux.intel.com>
+From: Dan Williams <dan.j.williams@intel.com>
+Date: Tue, 5 Jun 2018 15:21:30 -0700
+Message-ID: <CAPcyv4irudGth3+WZtgF4TjGL53s8mN70aVXpGWjj_Lc=7AMVg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [qemu PATCH v4 3/4] nvdimm,
+ acpi: support NFIT platform capabilities
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,57 +35,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "pbonzini@redhat.com" <pbonzini@redhat.com>, "rth@twiddle.net" <rth@twiddle.net>, "ehabkost@redhat.com" <ehabkost@redhat.com>, "Justin Terry (VM)" <juterry@microsoft.com>
+To: Ross Zwisler <ross.zwisler@linux.intel.com>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, linux-nvdimm <linux-nvdimm@lists.01.org>, Qemu Developers <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>, Igor Mammedov <imammedo@redhat.com>
 
-Adds a workaround to an incorrect value setting
-CPUID Fn8000_0001_ECX[bit 9 OSVW] =3D 1. This can cause a guest linux kerne=
-l
-to panic when an issue to rdmsr C001_0140h returns 0. Disabling this featur=
-e
-correctly allows the guest to boot without accessing the osv workarounds.
+On Tue, Jun 5, 2018 at 3:07 PM, Ross Zwisler
+<ross.zwisler@linux.intel.com> wrote:
+> On Tue, Jun 05, 2018 at 09:37:25PM +0300, Michael S. Tsirkin wrote:
+>> On Tue, Jun 05, 2018 at 11:15:00AM -0700, Dan Williams wrote:
+>> > On Tue, Jun 5, 2018 at 9:42 AM, Ross Zwisler
+>> > <ross.zwisler@linux.intel.com> wrote:
+>> > > On Tue, Jun 05, 2018 at 06:25:27PM +0300, Michael S. Tsirkin wrote:
+>> > >> On Mon, May 21, 2018 at 10:32:02AM -0600, Ross Zwisler wrote:
+>> > >> > Add a machine command line option to allow the user to control the Platform
+>> > >> > Capabilities Structure in the virtualized NFIT.  This Platform Capabilities
+>> > >> > Structure was added in ACPI 6.2 Errata A.
+>> > >> >
+>> > >> > Signed-off-by: Ross Zwisler <ross.zwisler@linux.intel.com>
+>> > >>
+>> > >> I tried playing with it and encoding the capabilities is
+>> > >> quite awkward.
+>> > >>
+>> > >> Can we add bits for specific capabilities instead of nvdimm-cap?
+>> > >>
+>> > >> How about:
+>> > >>
+>> > >> "cpu-flush-on-power-loss-cap"
+>> > >> "memory-flush-on-power-loss-cap"
+>> > >> "byte-addressable-mirroring-cap"
+>> > >
+>> > > Hmmm...I don't like that as much because:
+>> > >
+>> > > a) It's very verbose.  Looking at my current qemu command line few other
+>> > >    options require that many characters, and you'd commonly be defining more
+>> > >    than one of these for a given VM.
+>> > >
+>> > > b) It means that the QEMU will need to be updated if/when new flags are added,
+>> > >    because we'll have to have new options for each flag.  The current
+>> > >    implementation is more future-proof because you can specify any flags
+>> > >    value you want.
+>> > >
+>> > > However, if you feel strongly about this, I'll make the change.
+>> >
+>> > Straw-man: Could we do something similar with what we are doing in ndctl?
+>> >
+>> > enum ndctl_persistence_domain {
+>> >         PERSISTENCE_NONE = 0,
+>> >         PERSISTENCE_MEM_CTRL = 10,
+>> >         PERSISTENCE_CPU_CACHE = 20,
+>> >         PERSISTENCE_UNKNOWN = INT_MAX,
+>> > };
+>> >
+>> > ...and have the command line take a number where "10" and "20" are
+>> > supported today, but allows us to adapt to new persistence domains in
+>> > the future.
+>>
+>> I'm fine with that except can we have symbolic names instead of numbers
+>> on command line?
+>>
+>> --
+>> MST
+>
+> Okay, we can move to the symbolic names.  Do you want them to be that long, or
+> would:
+>
+> nvdimm-cap-cpu
+> nvdimm-cap-mem-ctrl
+> nvdimm-cap-mirroring
 
-Signed-off-by: Justin Terry (VM) <juterry@microsoft.com>
----
- target/i386/whpx-all.c | 13 ++++++++++++-
- 1 file changed, 12 insertions(+), 1 deletion(-)
+Wait, why is mirroring part of this?
 
-diff --git a/target/i386/whpx-all.c b/target/i386/whpx-all.c
-index 6b42096698..99501bac57 100644
---- a/target/i386/whpx-all.c
-+++ b/target/i386/whpx-all.c
-@@ -964,6 +964,16 @@ static int whpx_vcpu_run(CPUState *cpu)
-                 rdx =3D vcpu->exit_ctx.CpuidAccess.DefaultResultRdx;
-                 rbx =3D vcpu->exit_ctx.CpuidAccess.DefaultResultRbx;
-                 break;
-+            case 0x80000001:
-+                rax =3D vcpu->exit_ctx.CpuidAccess.DefaultResultRax;
-+                /* Remove any support of OSVW */
-+                rcx =3D
-+                    vcpu->exit_ctx.CpuidAccess.DefaultResultRcx &
-+                    ~CPUID_EXT3_OSVW;
-+
-+                rdx =3D vcpu->exit_ctx.CpuidAccess.DefaultResultRdx;
-+                rbx =3D vcpu->exit_ctx.CpuidAccess.DefaultResultRbx;
-+                break;
-             default:
-                 rax =3D vcpu->exit_ctx.CpuidAccess.DefaultResultRax;
-                 rcx =3D vcpu->exit_ctx.CpuidAccess.DefaultResultRcx;
-@@ -1382,12 +1392,13 @@ static int whpx_accel_init(MachineState *ms)
-         goto error;
-     }
-=20
--    UINT32 cpuidExitList[] =3D {1};
-+    UINT32 cpuidExitList[] =3D {1, 0x80000001};
-     hr =3D whp_dispatch.WHvSetPartitionProperty(
-         whpx->partition,
-         WHvPartitionPropertyCodeCpuidExitList,
-         cpuidExitList,
-         RTL_NUMBER_OF(cpuidExitList) * sizeof(UINT32));
-+
-     if (FAILED(hr)) {
-         error_report("WHPX: Failed to set partition CpuidExitList hr=3D%08=
-lx",
-                      hr);
---=20
-2.13.6
+I was thinking this option would be:
+
+    --persistence-domain={cpu,mem-ctrl}
+
+...and try not to let ACPI specifics leak into the qemu command line
+interface. For example PowerPC qemu could have a persistence domain
+communicated via Open Firmware or some other mechanism.
+>
+> or something be better?
