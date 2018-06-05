@@ -1,27 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34061)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35453)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1fQIiO-0003KU-Sp
-	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 16:38:02 -0400
+	(envelope-from <eblake@redhat.com>) id 1fQIr0-0006K6-LY
+	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 16:46:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1fQIiK-00032A-GQ
-	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 16:38:00 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:52402 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1fQIiK-00031v-Ag
-	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 16:37:56 -0400
-Date: Tue, 5 Jun 2018 23:37:54 +0300
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20180605232907-mutt-send-email-mst@kernel.org>
-References: <1525734594-11134-1-git-send-email-sridhar.samudrala@intel.com>
-	<fcefe501-b410-f1ec-829c-68199edcdbef@intel.com>
-	<20180605152344-mutt-send-email-mst@kernel.org>
-	<0a69d897-d084-8a7e-a681-86a49ab8f59a@intel.com>
+	(envelope-from <eblake@redhat.com>) id 1fQIqz-0007UH-AI
+	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 16:46:54 -0400
+References: <20180528212054.GH2209@redhat.com>
+	<20180528212510.GC4660@redhat.com>
+	<20180529064415.GA4756@localhost.localdomain>
+	<2b3eef00-f326-c1e6-0e4b-b7602646eec4@redhat.com>
+	<20180605092159.GA2544@work-vm>
+	<20180605190324.GA11372@localhost.localdomain>
+	<20180605223934-mutt-send-email-mst@kernel.org>
+	<a9fdbe0f-2c39-7da3-11f2-6752b74cce08@redhat.com>
+	<20180605195855.GC1455@redhat.com>
+	<6f6ecbb5-3175-44d0-5922-b13ac163f006@redhat.com>
+	<20180605231419-mutt-send-email-mst@kernel.org>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <0dce5af0-8fd8-b22f-3642-49a55ba37804@redhat.com>
+Date: Tue, 5 Jun 2018 15:46:45 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <0a69d897-d084-8a7e-a681-86a49ab8f59a@intel.com>
-Subject: Re: [Qemu-devel] [PATCH] qemu: Introduce VIRTIO_NET_F_STANDBY
- feature bit to virtio_net
+In-Reply-To: <20180605231419-mutt-send-email-mst@kernel.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [Qemu-block] storing machine data in qcow images?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,124 +33,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Samudrala, Sridhar" <sridhar.samudrala@intel.com>
-Cc: virtualization@lists.linux-foundation.org, virtio-dev@lists.oasis-open.org, jesse.brandeburg@intel.com, alexander.h.duyck@intel.com, jasowang@redhat.com, qemu-devel@nongnu.org
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: "Richard W.M. Jones" <rjones@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org, stefanha@redhat.com, Max Reitz <mreitz@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-On Tue, Jun 05, 2018 at 01:20:33PM -0700, Samudrala, Sridhar wrote:
+On 06/05/2018 03:28 PM, Michael S. Tsirkin wrote:
+> On Tue, Jun 05, 2018 at 03:09:17PM -0500, Eric Blake wrote:
+>> On 06/05/2018 02:58 PM, Richard W.M. Jones wrote:
+>>>> Binary blobs can always be base64 encoded for representation within
+>>>> a valid JSON UTF-8 string (and we already have several QMP
+>>>> interfaces that utilize base64 encoding to pass through what is
+>>>> otherwise invalid UTF-8).  It does inflate things slightly compared
+>>>> to a format that allows a raw length coupled with raw data, but that
+>>>> is not necessarily a problem.
+>>>
+>>> Of course how we represent them externally and/or while
+>>> using QMP / qemu-img to store and retrieve them is up for grabs.
+>>> Doesn't JSON allow binary to be encoded?  (Knowing how poorly
+>>> done JSON is, I wouldn't be surprised if not)
+>>
+>> JSON itself does not have a binary primitive; to pass arbitrary data through
+>> JSON you have to first encode that data into something like base64 that can
+>> then be represented as a UTF-8 string.  For reference, look at
+>> qapi/crypto.json and the definition of QCryptoSecretFormat.
 > 
-> On 6/5/2018 5:33 AM, Michael S. Tsirkin wrote:
-> > I don't think this is sufficient.
-> 
-> Sure. This is not sufficient for a complete solution, but is Qemu the right place
-> to manage primary/standby interfaces?
-> 
-> I think the other steps including plugging/unplugging the primary interface needs
-> to handled by some orchestration layer.
+> But there isn't a way to figure out that a string is base64, which
+> means each application needs to know whether it's a string or
+> a binary.
 
-I don't see any real benefit to it but yes, you can push it up the stack.
-Unfortunately the patch still won't be sufficient then, see below :)
+Other than if the key name is well-known (and interpretation of the 
+value is done according to the key, if it is interpreted at all).
 
 > 
-> > 
-> > If both primary and standby devices are present, a legacy guest without
-> > support for the feature might see two devices with same mac and get
-> > confused.
+> How about specifying the encoding in the value?
 > 
-> Yes. Isn't this possible today when a VM is started with a mis-configured domain
-> XML file that passes a virtio-net interface and a VF with the same MAC?
-
-Yes, so if you misconfigure the hypervisor then your guest won't run.
-Not sure what you are trying to say by this though.
-
+> string value:
+> [A-Za-z][^=\0]=S[^\0]*
 > 
-> > 
-> > I think that we should only make primary visible after guest acked the
-> > backup feature bit.
+> base64 value:
+> [A-Za-z][^=\0]=B[A-Za-z0-9+/]*
 > 
-> The primary can be plugged/unplugged at any time by the management layer.
-> So i guess this needs to be handled in the libvirt layer.
-
-management just wants to give the primary to guest and later take it back,
-it really does not care about the details of the process,
-so I don't see what does pushing it up the stack buy you.
-
-So I don't think it *needs* to be done in libvirt. It probably can if you
-add a bunch of hooks so it knows whenever vm reboots, driver binds and
-unbinds from device, and can check that backup flag was set.
-If you are pushing for a setup like that please get a buy-in
-from libvirt maintainers or better write a patch.
-
-> > 
-> > And on reset or when backup is cleared in some other way, unplug the
-> > primary.
-> > 
-> > Something like the below will do the job:
-> > 
-> > Primary device is added with a special "primary-failover" flag.
+> or the key:
+> S[A-Za-z][^=\0]=[^\0]*
 > 
-> Are you suggesting an extension to Qemu to add another flag for
-> primary device too?
+> base64 value:
+> B[A-Za-z][^=\0]=[A-Za-z0-9+/]*
 
-Exactly.
+If we're going to express a tuple of <key,type,value>, then let's 
+describe it as a 3-tuple, rather than trying to overload that into a 
+2-tuple key=value syntax.  After all, while you may want a high-level 
+layer 1 representation in JSON or something else easy to hand off to 
+other processing, there's no requirement that the layer 0 storage in 
+qcow2 can't be a struct in some other layout, even if we have to convert 
+between layouts for what is stored in the file vs. what is presented to 
+the user.
 
-> > A virtual machine is then initialized with just a standby virtio
-> > device. Primary is not yet added.
-> > 
-> > Later QEMU detects that guest driver device set DRIVER_OK.
-> > It then exposes the primary device to the guest, and triggers
-> > a device addition event (hot-plug event) for it.
-> > 
-> > If QEMU detects guest driver removal, it initiates a hot-unplug sequence
-> > to remove the primary driver.  In particular, if QEMU detects guest
-> > re-initialization (e.g. by detecting guest reset) it immediately removes
-> > the primary device.
-> > 
-> > We can move some of this code to management as well, architecturally it
-> > does not make too much sense but it might be easier implementation-wise.
-> > 
-> > HTH
-> > 
-> > On Mon, Jun 04, 2018 at 06:41:48PM -0700, Samudrala, Sridhar wrote:
-> > > Ping on this patch now that the kernel patches are accepted into davem's net-next tree.
-> > > https://patchwork.ozlabs.org/cover/920005/
-> > > 
-> > > 
-> > > On 5/7/2018 4:09 PM, Sridhar Samudrala wrote:
-> > > > This feature bit can be used by hypervisor to indicate virtio_net device to
-> > > > act as a standby for another device with the same MAC address.
-> > > > 
-> > > > I tested this with a small change to the patch to mark the STANDBY feature 'true'
-> > > > by default as i am using libvirt to start the VMs.
-> > > > Is there a way to pass the newly added feature bit 'standby' to qemu via libvirt
-> > > > XML file?
-> > > > 
-> > > > Signed-off-by: Sridhar Samudrala <sridhar.samudrala@intel.com>
-> > > > ---
-> > > >    hw/net/virtio-net.c                         | 2 ++
-> > > >    include/standard-headers/linux/virtio_net.h | 3 +++
-> > > >    2 files changed, 5 insertions(+)
-> > > > 
-> > > > diff --git a/hw/net/virtio-net.c b/hw/net/virtio-net.c
-> > > > index 90502fca7c..38b3140670 100644
-> > > > --- a/hw/net/virtio-net.c
-> > > > +++ b/hw/net/virtio-net.c
-> > > > @@ -2198,6 +2198,8 @@ static Property virtio_net_properties[] = {
-> > > >                         true),
-> > > >        DEFINE_PROP_INT32("speed", VirtIONet, net_conf.speed, SPEED_UNKNOWN),
-> > > >        DEFINE_PROP_STRING("duplex", VirtIONet, net_conf.duplex_str),
-> > > > +    DEFINE_PROP_BIT64("standby", VirtIONet, host_features, VIRTIO_NET_F_STANDBY,
-> > > > +                      false),
-> > > >        DEFINE_PROP_END_OF_LIST(),
-> > > >    };
-> > > > diff --git a/include/standard-headers/linux/virtio_net.h b/include/standard-headers/linux/virtio_net.h
-> > > > index e9f255ea3f..01ec09684c 100644
-> > > > --- a/include/standard-headers/linux/virtio_net.h
-> > > > +++ b/include/standard-headers/linux/virtio_net.h
-> > > > @@ -57,6 +57,9 @@
-> > > >    					 * Steering */
-> > > >    #define VIRTIO_NET_F_CTRL_MAC_ADDR 23	/* Set MAC address */
-> > > > +#define VIRTIO_NET_F_STANDBY      62    /* Act as standby for another device
-> > > > +                                         * with the same MAC.
-> > > > +                                         */
-> > > >    #define VIRTIO_NET_F_SPEED_DUPLEX 63	/* Device set linkspeed and duplex */
-> > > >    #ifndef VIRTIO_NET_NO_LEGACY
+By that argument, a single JSON object (if we insist on storing a single 
+JSON object as layer 0) might be:
+
+[ { "name": "foo", "type": "raw", "value": "bar" },
+   { "name": "quux", "type": "base64", "value": "aGVsbG8=" } ]
+
+But figuring out how to add a "Header extension type" to 
+docs/interop/qcow2.txt, and whether the key/value payload will usefully 
+fit in that header extension (where we are tight on spacing, as ALL 
+extensions combined must fit in a single cluster), or whether the header 
+should instead have an offset field that points to some other cluster in 
+the qcow2 image, is relatively straightforward, and relatively 
+independent of the even bigger design question of whether we want to 
+allow qcow2 as an image format to expose an arbitrary data store feature 
+and what types of data should go into that store.
+
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
