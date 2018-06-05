@@ -1,29 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53116)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41187)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <edgari@xilinx.com>) id 1fQG08-0006Mk-9W
-	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 13:44:09 -0400
+	(envelope-from <jcody@redhat.com>) id 1fQJGu-0006qF-2c
+	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 17:13:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <edgari@xilinx.com>) id 1fQG05-0003jb-6G
-	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 13:44:08 -0400
-Received: from mail-sn1nam01on0060.outbound.protection.outlook.com
-	([104.47.32.60]:16548
-	helo=NAM01-SN1-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <edgari@xilinx.com>) id 1fQG04-0003jI-Rx
-	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 13:44:05 -0400
-From: Edgar Iglesias <edgari@xilinx.com>
-Date: Tue, 5 Jun 2018 17:44:01 +0000
-Message-ID: <iemtxwegx187yqo3oqysh7hb.1528220734178@email.android.com>
-References: <20180529105011.1914-1-edgar.iglesias@gmail.com>
-	<20180529105011.1914-17-edgar.iglesias@gmail.com>,
-	<CAFEAcA9s=okgW15DoAb5_NFbaDgvqsC+beqpc1gJG=FqeKvG=w@mail.gmail.com>
-In-Reply-To: <CAFEAcA9s=okgW15DoAb5_NFbaDgvqsC+beqpc1gJG=FqeKvG=w@mail.gmail.com>
-Content-Language: en-US
+	(envelope-from <jcody@redhat.com>) id 1fQJGs-0003Xe-Vu
+	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 17:13:40 -0400
+Date: Tue, 5 Jun 2018 17:13:23 -0400
+From: Jeff Cody <jcody@redhat.com>
+Message-ID: <20180605211323.GH11303@localhost.localdomain>
+References: <20180605185905.4583-1-jsnow@redhat.com>
+	<20180605185905.4583-5-jsnow@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PULL v1 16/38] target-microblaze: Break out
- trap_illegal()
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180605185905.4583-5-jsnow@redhat.com>
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 4/5] qapi: add
+ x-block-dirty-bitmap-merge
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,60 +24,166 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: John Snow <jsnow@redhat.com>
+Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, Fam Zheng <famz@redhat.com>, Markus Armbruster <armbru@redhat.com>, Max Reitz <mreitz@redhat.com>
 
-Yeah, I think we should perhaps remove the nop insn counting hack all toget=
-her...
+On Tue, Jun 05, 2018 at 02:59:04PM -0400, John Snow wrote:
+> From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> 
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> Signed-off-by: John Snow <jsnow@redhat.com>
+> ---
+>  block/dirty-bitmap.c         | 18 ++++++++++++++++++
+>  blockdev.c                   | 30 ++++++++++++++++++++++++++++++
+>  include/block/dirty-bitmap.h |  3 ++-
+>  qapi/block-core.json         | 38 ++++++++++++++++++++++++++++++++++++++
+>  4 files changed, 88 insertions(+), 1 deletion(-)
+> 
+> diff --git a/block/dirty-bitmap.c b/block/dirty-bitmap.c
+> index 56234257f4..4159d3929e 100644
+> --- a/block/dirty-bitmap.c
+> +++ b/block/dirty-bitmap.c
+> @@ -757,3 +757,21 @@ int64_t bdrv_dirty_bitmap_next_zero(BdrvDirtyBitmap *bitmap, uint64_t offset)
+>  {
+>      return hbitmap_next_zero(bitmap->bitmap, offset);
+>  }
+> +
+> +void bdrv_merge_dirty_bitmap(BdrvDirtyBitmap *dest, const BdrvDirtyBitmap *src,
+> +                             Error **errp)
+> +{
+> +    /* only bitmaps from one bds are supported */
+> +    assert(dest->mutex == src->mutex);
+> +
+> +    qemu_mutex_lock(dest->mutex);
+> +
+> +    assert(bdrv_dirty_bitmap_enabled(dest));
+> +    assert(!bdrv_dirty_bitmap_readonly(dest));
+> +
+> +    if (!hbitmap_merge(dest->bitmap, src->bitmap)) {
+> +        error_setg(errp, "Bitmaps are incompatible and can't be merged");
+> +    }
+> +
+> +    qemu_mutex_unlock(dest->mutex);
+> +}
+> diff --git a/blockdev.c b/blockdev.c
+> index 33bfe4817f..b00908fdfd 100644
+> --- a/blockdev.c
+> +++ b/blockdev.c
+> @@ -3044,6 +3044,36 @@ void qmp_x_block_dirty_bitmap_disable(const char *node, const char *name,
+>      bdrv_disable_dirty_bitmap(bitmap);
+>  }
+>  
+> +void qmp_x_block_dirty_bitmap_merge(const char *node, const char *dst_name,
+> +                                    const char *src_name, Error **errp)
+> +{
+> +    BlockDriverState *bs;
+> +    BdrvDirtyBitmap *dst, *src;
+> +
+> +    dst = block_dirty_bitmap_lookup(node, dst_name, &bs, errp);
+> +    if (!dst || !bs) {
 
-Cheers,
-Edgar
+!bs check should be dropped, as it doesn't do anything, since
+block_dirty_bitmap_lookup() cannot return a NULL BlockDriverState.
 
+> +        return;
+> +    }
+> +
+> +    if (bdrv_dirty_bitmap_frozen(dst)) {
+> +        error_setg(errp, "Bitmap '%s' is frozen and cannot be modified",
+> +                   dst_name);
+> +        return;
+> +    } else if (bdrv_dirty_bitmap_readonly(dst)) {
+> +        error_setg(errp, "Bitmap '%s' is readonly and cannot be modified",
+> +                   dst_name);
+> +        return;
+> +    }
+> +
+> +    src = bdrv_find_dirty_bitmap(bs, src_name);
+> +    if (!src) {
+> +        error_setg(errp, "Dirty bitmap '%s' not found", src_name);
+> +        return;
+> +    }
+> +
+> +    bdrv_merge_dirty_bitmap(dst, src, errp);
+> +}
+> +
+>  BlockDirtyBitmapSha256 *qmp_x_debug_block_dirty_bitmap_sha256(const char *node,
+>                                                                const char *name,
+>                                                                Error **errp)
+> diff --git a/include/block/dirty-bitmap.h b/include/block/dirty-bitmap.h
+> index 1ff8949b1b..1e14743032 100644
+> --- a/include/block/dirty-bitmap.h
+> +++ b/include/block/dirty-bitmap.h
+> @@ -70,7 +70,8 @@ void bdrv_dirty_bitmap_set_readonly(BdrvDirtyBitmap *bitmap, bool value);
+>  void bdrv_dirty_bitmap_set_persistance(BdrvDirtyBitmap *bitmap,
+>                                         bool persistent);
+>  void bdrv_dirty_bitmap_set_qmp_locked(BdrvDirtyBitmap *bitmap, bool qmp_locked);
+> -
+> +void bdrv_merge_dirty_bitmap(BdrvDirtyBitmap *dest, const BdrvDirtyBitmap *src,
+> +                             Error **errp);
+>  
+>  /* Functions that require manual locking.  */
+>  void bdrv_dirty_bitmap_lock(BdrvDirtyBitmap *bitmap);
+> diff --git a/qapi/block-core.json b/qapi/block-core.json
+> index c061884a0e..3999175c23 100644
+> --- a/qapi/block-core.json
+> +++ b/qapi/block-core.json
+> @@ -1740,6 +1740,20 @@
+>    'data': { 'node': 'str', 'name': 'str', '*granularity': 'uint32',
+>              '*persistent': 'bool', '*autoload': 'bool' } }
+>  
+> +##
+> +# @BlockDirtyBitmapMerge:
+> +#
+> +# @node: name of device/node which the bitmap is tracking
+> +#
+> +# @dst_name: name of the destination dirty bitmap
+> +#
+> +# @src_name: name of the source dirty bitmap
+> +#
+> +# Since: 3.0
+> +##
+> +{ 'struct': 'BlockDirtyBitmapMerge',
+> +  'data': { 'node': 'str', 'dst_name': 'str', 'src_name': 'str' } }
+> +
+>  ##
+>  # @block-dirty-bitmap-add:
+>  #
+> @@ -1850,6 +1864,30 @@
+>      { 'command': 'x-block-dirty-bitmap-disable',
+>        'data': 'BlockDirtyBitmap' }
+>  
+> +##
+> +# @x-block-dirty-bitmap-merge:
+> +#
+> +# Merge @src_name dirty bitmap to @dst_name dirty bitmap. @src_name dirty
+> +# bitmap is unchanged.
+> +#
 
----
-Sent from my phone
+Can we also extended a promise that @dst_name is unchanged on error?
 
-
--------- Original Message --------
-Subject: Re: [PULL v1 16/38] target-microblaze: Break out trap_illegal()
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Jun 4, 2018, 20:12
-To: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
-On 29 May 2018 at 11:49, Edgar E. Iglesias <edgar.iglesias@gmail.com> wrote=
-:
-> From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
->
-> Break out trap_illegal() to handle illegal operation traps.
-> We now generally stop translation of the current insn if
-> it's not valid.
->
-> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-> Reviewed-by: Philippe Mathieu-Daud=E9 <f4bug@amsat.org>
-> Signed-off-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
-
-> @@ -1552,13 +1537,7 @@ static inline void decode(DisasContext *dc, uint32=
-_t ir)
->      if (dc->ir)
->          dc->nr_nops =3D 0;
->      else {
-> -        if ((dc->tb_flags & MSR_EE_FLAG)
-> -              && (dc->cpu->env.pvr.regs[2] & PVR2_ILL_OPCODE_EXC_MASK)
-> -              && (dc->cpu->env.pvr.regs[2] & PVR2_OPCODE_0x0_ILL_MASK)) =
-{
-> -            tcg_gen_movi_i32(cpu_SR[SR_ESR], ESR_EC_ILLEGAL_OP);
-> -            t_gen_raise_exception(dc, EXCP_HW_EXCP);
-> -            return;
-> -        }
-> +        trap_illegal(dc, dc->cpu->env.pvr.regs[2] & PVR2_OPCODE_0x0_ILL_=
-MASK);
->
->          LOG_DIS("nr_nops=3D%d\t", dc->nr_nops);
->          dc->nr_nops++;
-
-Here we used to return early in the "illegal insn" case, but in
-the new code we don't. Coverity warns about this (CID 1391443)
-because the trap_illegal() function's return code is checked
-in the other 9 places where it is called.
-
-thanks
--- PMM
+> +# Returns: nothing on success
+> +#          If @node is not a valid block device, DeviceNotFound
+> +#          If @dst_name or @src_name is not found, GenericError
+> +#          If bitmaps has different sizes or granularities, GenericError
+> +#
+> +# Since: 3.0
+> +#
+> +# Example:
+> +#
+> +# -> { "execute": "x-block-dirty-bitmap-merge",
+> +#      "arguments": { "node": "drive0", "dst_name": "bitmap0",
+> +#                     "src_name": "bitmap1" } }
+> +# <- { "return": {} }
+> +#
+> +##
+> +      { 'command': 'x-block-dirty-bitmap-merge',
+> +        'data': 'BlockDirtyBitmapMerge' }
+> +
+>  ##
+>  # @BlockDirtyBitmapSha256:
+>  #
+> -- 
+> 2.14.3
+> 
+> 
