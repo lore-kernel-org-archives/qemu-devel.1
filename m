@@ -1,25 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57678)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57809)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fQAKu-0003zK-Lz
-	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 07:41:13 -0400
+	(envelope-from <stefanha@gmail.com>) id 1fQALY-0004Mw-VH
+	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 07:41:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fQAKr-0007D5-JW
-	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 07:41:12 -0400
-References: <1527671818-23809-1-git-send-email-thuth@redhat.com>
-	<1527671818-23809-3-git-send-email-thuth@redhat.com>
-	<9b84d9e4-f7b8-dd5b-3180-551047879eab@linux.ibm.com>
-	<0eaa6943-57a8-3dec-18e5-5e498dd06e6a@redhat.com>
-	<2489ce83-a622-2f63-e9d1-50b3298596cb@linux.ibm.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <a890c257-63f9-ca49-cc6f-fbd5e2bddf5b@redhat.com>
-Date: Tue, 5 Jun 2018 13:41:04 +0200
+	(envelope-from <stefanha@gmail.com>) id 1fQALX-0007Rx-CE
+	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 07:41:52 -0400
+Received: from mail-wm0-x242.google.com ([2a00:1450:400c:c09::242]:35345)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1fQALX-0007Rg-4Q
+	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 07:41:51 -0400
+Received: by mail-wm0-x242.google.com with SMTP id j15-v6so4509182wme.0
+	for <qemu-devel@nongnu.org>; Tue, 05 Jun 2018 04:41:50 -0700 (PDT)
+Date: Tue, 5 Jun 2018 12:41:48 +0100
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20180605114148.GD11888@stefanha-x1.localdomain>
+References: <1527840629-18648-1-git-send-email-junyan.he@gmx.com>
+	<1527840629-18648-5-git-send-email-junyan.he@gmx.com>
 MIME-Version: 1.0
-In-Reply-To: <2489ce83-a622-2f63-e9d1-50b3298596cb@linux.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 2/3] pc-bios/s390-ccw/net: Add support for
- pxelinux-style config files
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="n/aVsWSeQ4JHkrmm"
+Content-Disposition: inline
+In-Reply-To: <1527840629-18648-5-git-send-email-junyan.he@gmx.com>
+Subject: Re: [Qemu-devel] [PATCH V6 4/7] configure: add libpmem support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,39 +30,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Farhan Ali <alifm@linux.ibm.com>, qemu-s390x@nongnu.org, Viktor Mihajlovski <mihajlov@linux.vnet.ibm.com>
-Cc: Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cohuck@redhat.com>, qemu-devel@nongnu.org, Collin Walling <walling@linux.ibm.com>
+To: junyan.he@gmx.com
+Cc: qemu-devel@nongnu.org, Haozhong Zhang <haozhong.zhang@intel.com>, xiaoguangrong.eric@gmail.com, crosthwaite.peter@gmail.com, mst@redhat.com, dgilbert@redhat.com, ehabkost@redhat.com, quintela@redhat.com, Junyan He <junyan.he@intel.com>, stefanha@redhat.com, pbonzini@redhat.com, imammedo@redhat.com, rth@twiddle.net
 
-On 01.06.2018 22:19, Farhan Ali wrote:
-> 
-> 
-> On 05/31/2018 11:21 PM, Thomas Huth wrote:
->>> Just a question do we want to clear cfgbuf here, before calling
->>> pxelinux_load_parse_cfg?
->> That's theoretically not necessary. The buffer either gets populated
->> with data, or the function errors out. The code also makes sure that
->> there is a final NUL-character in the buffer:
->>
->> https://github.com/aik/SLOF/blob/64c526a/lib/libnet/pxelinux.c#L169
->>
->> ... but I think I've got to double check that there is also a
->> NUL-character immediately at the end of the downloaded data ... so
->> there's indeed a change required, but likely rather in the SLOF code
->> than here.
-> 
-> Can't we do that in net_try_direct_tftp_load, or it is better to put
-> that in SLOF code?
 
-I've now submitted a patch to SLOF to fix two issues with regards to the
-NUL-termination handling there:
+--n/aVsWSeQ4JHkrmm
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-https://lists.ozlabs.org/pipermail/slof/2018-June/002201.html
+On Fri, Jun 01, 2018 at 04:10:26PM +0800, junyan.he@gmx.com wrote:
+> From: Junyan He <junyan.he@intel.com>
+>=20
+> Add a pair of configure options --{enable,disable}-libpmem to control
+> whether QEMU is compiled with PMDK libpmem [1].
+>=20
+> QEMU may write to the host persistent memory (e.g. in vNVDIMM label
+> emulation and live migration), so it must take the proper operations
+> to ensure the persistence of its own writes. Depending on the CPU
+> models and available instructions, the optimal operation can vary [2].
+> PMDK libpmem have already implemented those operations on multiple CPU
+> models (x86 and ARM) and the logic to select the optimal ones, so QEMU
+> can just use libpmem rather than re-implement them.
+>=20
+> [1] PMDK (formerly known as NMVL), https://github.com/pmem/pmdk/
+> [2] https://github.com/pmem/pmdk/blob/38bfa652721a37fd94c0130ce0e3f5d8baa=
+3ed40/src/libpmem/pmem.c#L33
+>=20
+> Signed-off-by: Junyan He <junyan.he@intel.com>
+> Signed-off-by: Haozhong Zhang <haozhong.zhang@intel.com>
+> ---
+>  configure | 29 +++++++++++++++++++++++++++++
+>  1 file changed, 29 insertions(+)
 
-Now it's the duty of the caller to take care of proper NUL-termination.
-There is already this line in net_try_direct_tftp_load():
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 
-  cfgbuf[rc] = 0;    /* Make sure that it is NUL-terminated */
+--n/aVsWSeQ4JHkrmm
+Content-Type: application/pgp-signature; name="signature.asc"
 
-... so I think we should be fine there.
+-----BEGIN PGP SIGNATURE-----
 
- Thomas
+iQEcBAEBAgAGBQJbFnb8AAoJEJykq7OBq3PIZ4gH/j3iwYvM2mL2QcoW2sVBIAY9
+BjoOFCJyIwANO7WttDXM4CiBHfoFodzNqh44nELAFuDxPkFz1Zj2JCw53cTonu/y
+s4l9Iz9ktCR4Hx2S4o5LEI6W95nKZZMAH5Ynr3uxFXyyHg4h/1bpULSxk3WkGPZk
+MO6oYmXlkXmBtCdeqNcAfTeqF+JAhwJdVkaYoLaNxQ0V6irUs8637l25dCt8WCnP
+bLzcOFwp487xkV3i713BlL9T1NVa/QMOqpZUF1B4SJoqUcKuxyJo4nIXeU0Sm1/L
+zwO8tAtY2T1JFAFBiKSRro0Y/1zafzZIZVIwgoqQh33PYRIw81/ieH3aXVB3Mug=
+=6exv
+-----END PGP SIGNATURE-----
+
+--n/aVsWSeQ4JHkrmm--
