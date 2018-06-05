@@ -1,29 +1,48 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33955)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37615)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Babu.Moger@amd.com>) id 1fQDhX-0000gA-5l
-	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 11:16:48 -0400
+	(envelope-from <pmorel@linux.ibm.com>) id 1fQDnq-00057Y-1z
+	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 11:23:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <Babu.Moger@amd.com>) id 1fQDhT-00046X-VW
-	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 11:16:47 -0400
-Received: from mail-cys01nam02on061b.outbound.protection.outlook.com
-	([2a01:111:f400:fe45::61b]:63297
-	helo=NAM02-CY1-obe.outbound.protection.outlook.com)
+	(envelope-from <pmorel@linux.ibm.com>) id 1fQDnl-00009F-El
+	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 11:23:18 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:42502
+	helo=mx0a-001b2d01.pphosted.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <Babu.Moger@amd.com>) id 1fQDhT-00043k-IL
-	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 11:16:43 -0400
-From: "Moger, Babu" <Babu.Moger@amd.com>
-Date: Tue, 5 Jun 2018 15:16:38 +0000
-Message-ID: <BL0PR12MB246855F205E7BE5ED6400EFA95660@BL0PR12MB2468.namprd12.prod.outlook.com>
-References: <1527176614-26271-1-git-send-email-babu.moger@amd.com>
-	<1527176614-26271-3-git-send-email-babu.moger@amd.com>
-	<20180605015928.GH3184@localhost.localdomain>
-In-Reply-To: <20180605015928.GH3184@localhost.localdomain>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+	(Exim 4.71) (envelope-from <pmorel@linux.ibm.com>)
+	id 1fQDnl-00006M-91
+	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 11:23:13 -0400
+Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
+	w55FJM8p008622
+	for <qemu-devel@nongnu.org>; Tue, 5 Jun 2018 11:23:10 -0400
+Received: from e06smtp05.uk.ibm.com (e06smtp05.uk.ibm.com [195.75.94.101])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2jdv4qu4fd-1
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Tue, 05 Jun 2018 11:23:10 -0400
+Received: from localhost
+	by e06smtp05.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <pmorel@linux.ibm.com>;
+	Tue, 5 Jun 2018 16:23:08 +0100
+Reply-To: pmorel@linux.ibm.com
+References: <20180509154822.23510-1-cohuck@redhat.com>
+	<20180509154822.23510-3-cohuck@redhat.com>
+	<c18f9b9f-da00-1a0b-8ef0-7ac223c73d1a@linux.ibm.com>
+	<20180515181006.0cb1dfc2.cohuck@redhat.com>
+	<a5d08fb7-d9c1-b230-fe0c-acebbda2ba65@linux.ibm.com>
+	<20180522145208.310143ea.cohuck@redhat.com>
+	<4e4001cc-540e-0f2b-bbd1-1f82ca594bb3@linux.ibm.com>
+	<20180605151449.22aafbfc.cohuck@redhat.com>
+From: Pierre Morel <pmorel@linux.ibm.com>
+Date: Tue, 5 Jun 2018 17:23:02 +0200
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v11 2/5] i386: Populate AMD Processor Cache
- Information for cpuid 0x8000001D
+In-Reply-To: <20180605151449.22aafbfc.cohuck@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Message-Id: <e73038ff-fb2d-5865-8b84-e775990f3983@linux.ibm.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH RFC 2/2] vfio-ccw: support for halt/clear
+ subchannel
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,81 +51,171 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: "mst@redhat.com" <mst@redhat.com>, "marcel.apfelbaum@gmail.com" <marcel.apfelbaum@gmail.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "rth@twiddle.net" <rth@twiddle.net>, "mtosatti@redhat.com" <mtosatti@redhat.com>, "geoff@hostfission.com" <geoff@hostfission.com>, "kash@tripleback.net" <kash@tripleback.net>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>
+To: Cornelia Huck <cohuck@redhat.com>
+Cc: Dong Jia Shi <bjsdjshi@linux.ibm.com>, Halil Pasic <pasic@linux.ibm.com>, linux-s390@vger.kernel.org, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, qemu-s390x@nongnu.org, qemu-devel@nongnu.org
 
-DQo+IC0tLS0tT3JpZ2luYWwgTWVzc2FnZS0tLS0tDQo+IEZyb206IEVkdWFyZG8gSGFia29zdCBb
-bWFpbHRvOmVoYWJrb3N0QHJlZGhhdC5jb21dDQo+IFNlbnQ6IE1vbmRheSwgSnVuZSA0LCAyMDE4
-IDg6NTkgUE0NCj4gVG86IE1vZ2VyLCBCYWJ1IDxCYWJ1Lk1vZ2VyQGFtZC5jb20+DQo+IENjOiBt
-c3RAcmVkaGF0LmNvbTsgbWFyY2VsLmFwZmVsYmF1bUBnbWFpbC5jb207IHBib256aW5pQHJlZGhh
-dC5jb207DQo+IHJ0aEB0d2lkZGxlLm5ldDsgbXRvc2F0dGlAcmVkaGF0LmNvbTsgZ2VvZmZAaG9z
-dGZpc3Npb24uY29tOw0KPiBrYXNoQHRyaXBsZWJhY2submV0OyBxZW11LWRldmVsQG5vbmdudS5v
-cmc7IGt2bUB2Z2VyLmtlcm5lbC5vcmcNCj4gU3ViamVjdDogUmU6IFtRZW11LWRldmVsXSBbUEFU
-Q0ggdjExIDIvNV0gaTM4NjogUG9wdWxhdGUgQU1EIFByb2Nlc3Nvcg0KPiBDYWNoZSBJbmZvcm1h
-dGlvbiBmb3IgY3B1aWQgMHg4MDAwMDAxRA0KPiANCj4gT24gVGh1LCBNYXkgMjQsIDIwMTggYXQg
-MTE6NDM6MzFBTSAtMDQwMCwgQmFidSBNb2dlciB3cm90ZToNCj4gPiBBZGQgaW5mb3JtYXRpb24g
-Zm9yIGNwdWlkIDB4ODAwMDAwMUQgbGVhZi4gUG9wdWxhdGUgY2FjaGUgdG9wb2xvZ3kNCj4gaW5m
-b3JtYXRpb24NCj4gPiBmb3IgZGlmZmVyZW50IGNhY2hlIHR5cGVzIChEYXRhIENhY2hlLCBJbnN0
-cnVjdGlvbiBDYWNoZSwgTDIgYW5kIEwzKQ0KPiBzdXBwb3J0ZWQNCj4gPiBieSAweDgwMDAwMDFE
-IGxlYWYuIFBsZWFzZSByZWZlciB0byB0aGUgUHJvY2Vzc29yIFByb2dyYW1taW5nIFJlZmVyZW5j
-ZQ0KPiAoUFBSKQ0KPiA+IGZvciBBTUQgRmFtaWx5IDE3aCBNb2RlbCBmb3IgbW9yZSBkZXRhaWxz
-Lg0KPiA+DQo+ID4gU2lnbmVkLW9mZi1ieTogQmFidSBNb2dlciA8YmFidS5tb2dlckBhbWQuY29t
-Pg0KPiA+IC0tLQ0KPiA+ICB0YXJnZXQvaTM4Ni9jcHUuYyB8IDExNw0KPiArKysrKysrKysrKysr
-KysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysNCj4gPiAgdGFyZ2V0L2kz
-ODYva3ZtLmMgfCAgMjkgKysrKysrKysrKysrLS0NCj4gPiAgMiBmaWxlcyBjaGFuZ2VkLCAxNDMg
-aW5zZXJ0aW9ucygrKSwgMyBkZWxldGlvbnMoLSkNCj4gPg0KPiA+IGRpZmYgLS1naXQgYS90YXJn
-ZXQvaTM4Ni9jcHUuYyBiL3RhcmdldC9pMzg2L2NwdS5jDQo+ID4gaW5kZXggNWM5YmRjOS4uMGQ0
-MjNlNSAxMDA2NDQNCj4gPiAtLS0gYS90YXJnZXQvaTM4Ni9jcHUuYw0KPiA+ICsrKyBiL3Rhcmdl
-dC9pMzg2L2NwdS5jDQo+ID4gQEAgLTMzNyw2ICszMzcsOTkgQEAgc3RhdGljIHZvaWQNCj4gZW5j
-b2RlX2NhY2hlX2NwdWlkODAwMDAwMDYoQ1BVQ2FjaGVJbmZvICpsMiwNCj4gPiAgfQ0KPiA+DQo+
-ID4gIC8qDQo+ID4gKyAqIERlZmluaXRpb25zIHVzZWQgZm9yIGJ1aWxkaW5nIENQVUlEIExlYWYg
-MHg4MDAwMDAxRCBhbmQgMHg4MDAwMDAxRQ0KPiA+ICsgKiBQbGVhc2UgcmVmZXIgdG8gdGhlIEFN
-RDY0IEFyY2hpdGVjdHVyZSBQcm9ncmFtbWVy4oCZcyBNYW51YWwgVm9sdW1lDQo+IDMuDQo+ID4g
-KyAqIERlZmluZSB0aGUgY29uc3RhbnRzIHRvIGJ1aWxkIHRoZSBjcHUgdG9wb2xvZ3kuIFJpZ2h0
-IG5vdywgVE9QT0VYVA0KPiA+ICsgKiBmZWF0dXJlIGlzIGVuYWJsZWQgb25seSBvbiBFUFlDLiBT
-bywgdGhlc2UgY29uc3RhbnRzIGFyZSBiYXNlZCBvbg0KPiA+ICsgKiBFUFlDIHN1cHBvcnRlZCBj
-b25maWd1cmF0aW9ucy4gV2UgbWF5IG5lZWQgdG8gaGFuZGxlIHRoZSBjYXNlcyBpZg0KPiA+ICsg
-KiB0aGVzZSB2YWx1ZXMgY2hhbmdlIGluIGZ1dHVyZS4NCj4gPiArICovDQo+ID4gKy8qIE1heGlt
-dW0gY29yZSBjb21wbGV4ZXMgaW4gYSBub2RlICovDQo+ID4gKyNkZWZpbmUgTUFYX0NDWCAyDQo+
-ID4gKy8qIE1heGltdW0gY29yZXMgaW4gYSBjb3JlIGNvbXBsZXggKi8NCj4gPiArI2RlZmluZSBN
-QVhfQ09SRVNfSU5fQ0NYIDQNCj4gPiArLyogTWF4aW11bSBjb3JlcyBpbiBhIG5vZGUgKi8NCj4g
-PiArI2RlZmluZSBNQVhfQ09SRVNfSU5fTk9ERSA4DQo+ID4gKy8qIE1heGltdW0gbm9kZXMgaW4g
-YSBzb2NrZXQgKi8NCj4gPiArI2RlZmluZSBNQVhfTk9ERVNfUEVSX1NPQ0tFVCA0DQo+ID4gKw0K
-PiA+ICsvKg0KPiA+ICsgKiBGaWd1cmUgb3V0IHRoZSBudW1iZXIgb2Ygbm9kZXMgcmVxdWlyZWQg
-dG8gYnVpbGQgdGhpcyBjb25maWcuDQo+ID4gKyAqIE1heCBjb3JlcyBpbiBhIG5vZGUgaXMgNA0K
-PiA+ICsgKi8NCj4gPiArc3RhdGljIGludCBub2Rlc19pbl9zb2NrZXQoaW50IG5yX2NvcmVzKQ0K
-PiA+ICt7DQo+ID4gKyAgICBpbnQgbm9kZXM7DQo+ID4gKw0KPiA+ICsgICAgbm9kZXMgPSBESVZf
-Uk9VTkRfVVAobnJfY29yZXMsIE1BWF9DT1JFU19JTl9OT0RFKTsNCj4gPiArDQo+ID4gKyAgIC8q
-IEhhcmR3YXJlIGRvZXMgbm90IHN1cHBvcnQgY29uZmlnIHdpdGggMyBub2RlcywgcmV0dXJuIDQg
-aW4gdGhhdCBjYXNlDQo+ICovDQo+ID4gKyAgICByZXR1cm4gKG5vZGVzID09IDMpID8gNCA6IG5v
-ZGVzOw0KPiA+ICt9DQo+ID4gKw0KPiA+ICsvKg0KPiA+ICsgKiBEZWNpZGUgdGhlIG51bWJlciBv
-ZiBjb3JlcyBpbiBhIGNvcmUgY29tcGxleCB3aXRoIHRoZSBnaXZlbiBucl9jb3Jlcw0KPiB1c2lu
-Zw0KPiA+ICsgKiBmb2xsb3dpbmcgc2V0IGNvbnN0YW50cyBNQVhfQ0NYLCBNQVhfQ09SRVNfSU5f
-Q0NYLA0KPiBNQVhfQ09SRVNfSU5fTk9ERSBhbmQNCj4gPiArICogTUFYX05PREVTX1BFUl9TT0NL
-RVQuIE1haW50YWluIHN5bW1ldHJ5IGFzIG11Y2ggYXMgcG9zc2libGUNCj4gPiArICogTDMgY2Fj
-aGUgaXMgc2hhcmVkIGFjcm9zcyBhbGwgY29yZXMgaW4gYSBjb3JlIGNvbXBsZXguIFNvLCB0aGlz
-IHdpbGwgYWxzbw0KPiA+ICsgKiB0ZWxsIHVzIGhvdyBtYW55IGNvcmVzIGFyZSBzaGFyaW5nIHRo
-ZSBMMyBjYWNoZS4NCj4gPiArICovDQo+ID4gK3N0YXRpYyBpbnQgY29yZXNfaW5fY29yZV9jb21w
-bGV4KGludCBucl9jb3JlcykNCj4gPiArew0KPiA+ICsgICAgaW50IG5vZGVzOw0KPiA+ICsNCj4g
-PiArICAgIC8qIENoZWNrIGlmIHdlIGNhbiBmaXQgYWxsIHRoZSBjb3JlcyBpbiBvbmUgY29yZSBj
-b21wbGV4ICovDQo+ID4gKyAgICBpZiAobnJfY29yZXMgPD0gTUFYX0NPUkVTX0lOX0NDWCkgew0K
-PiA+ICsgICAgICAgIHJldHVybiBucl9jb3JlczsNCj4gPiArICAgIH0NCj4gPiArICAgIC8qIEdl
-dCB0aGUgbnVtYmVyIG9mIG5vZGVzIHJlcXVpcmVkIHRvIGJ1aWxkIHRoaXMgY29uZmlnICovDQo+
-ID4gKyAgICBub2RlcyA9IG5vZGVzX2luX3NvY2tldChucl9jb3Jlcyk7DQo+ID4gKw0KPiA+ICsg
-ICAgLyoNCj4gPiArICAgICAqIERpdmlkZSB0aGUgY29yZXMgYWNjcm9zIGFsbCB0aGUgY29yZSBj
-b21wbGV4ZXMNCj4gPiArICAgICAqIFJldHVybiByb3VuZGVkIHVwIHZhbHVlDQo+ID4gKyAgICAg
-Ki8NCj4gPiArICAgIHJldHVybiBESVZfUk9VTkRfVVAobnJfY29yZXMsIG5vZGVzICogTUFYX0ND
-WCk7DQo+ID4gK30NCj4gDQo+IEl0J3MgbmljZSB0aGF0IHdlIHRyeSB0byBmaWd1cmUgb3V0IGEg
-Z29vZCBkZWZhdWx0IGV2ZW4gb24gd2VpcmQNCj4gdG9wb2xvZ2llczoNCj4gDQo+IFJldmlld2Vk
-LWJ5OiBFZHVhcmRvIEhhYmtvc3QgPGVoYWJrb3N0QHJlZGhhdC5jb20+DQpUaGFua3MNCj4gDQo+
-IEJ1dCBJIHN0aWxsIHdvcnJ5IGFib3V0IHRoZSBjb21wbGV4aXR5IG9mIGNvbXBhdCBjb2RlIGlu
-IHRoZQ0KPiBmdXR1cmUgaWYgd2UgZGVjaWRlIHRvIGNoYW5nZSB0aGUgcmVzdWx0cyBvZiB0aGlz
-IGZ1bmN0aW9uIGENCj4gbGl0dGxlIGJpdC4gIE1heWJlIHdlIHNob3VsZCBhbGxvdyBUT1BPRVhU
-IHRvIGJlIGVuYWJsZWQgb25seSBvbg0KPiBjYXNlcyB3aGVyZSB3ZSByZWFsbHkga25vdyBob3cg
-dG8gZml0IHRoZSBjb3JlcyBpbiBhIHJvdW5kIG51bWJlcg0KPiBvZiBub2Rlcy9jb3JlLWNvbXBs
-ZXhlcz8NCj4gDQo+IExldCdzIGRvIHRoaXMgaW4gYSBmb2xsb3ctdXAgcGF0Y2g/DQoNCkkgdGhv
-dWdodCBhYm91dCB0aGlzIGVhcmxpZXIuICBCdXQgZHJvcHBlZCB0aGUgaWRlYSBiZWNhdXNlIGl0
-IHdpbGwgYmUgdG9vIHJlc3RyaWN0aXZlLiANCk1vc3Qgb2YgdGhlIG9kZCBudW1iZXIgb2YgY29y
-ZXMgY2Fubm90IGJlIHN1cHBvcnRlZCBieSByZWFsIGhhcmR3YXJlLg0KSWYgeW91IHN0cm9uZ2x5
-IGJlbGlldmUgd2UgbmVlZCB0byBhZGQgdGhpcyBjaGVjayB0aGVuIEkgd2lsbCBhZGQgaXQuDQog
-DQo+IA0KPiAtLQ0KPiBFZHVhcmRvDQo=
+On 05/06/2018 15:14, Cornelia Huck wrote:
+> On Tue, 22 May 2018 17:10:44 +0200
+> Pierre Morel <pmorel@linux.ibm.com> wrote:
+>
+>> On 22/05/2018 14:52, Cornelia Huck wrote:
+>>> On Wed, 16 May 2018 15:32:48 +0200
+>>> Pierre Morel <pmorel@linux.ibm.com> wrote:
+>>>  =20
+>>>> On 15/05/2018 18:10, Cornelia Huck wrote:
+>>>>> On Fri, 11 May 2018 11:33:35 +0200
+>>>>> Pierre Morel <pmorel@linux.ibm.com> wrote:
+>>>>>     =20
+>>>>>> On 09/05/2018 17:48, Cornelia Huck wrote:
+>>>>>>> @@ -126,7 +192,24 @@ static void fsm_io_request(struct vfio_ccw_p=
+rivate *private,
+>>>>>>>     =20
+>>>>>>>      	memcpy(scsw, io_region->scsw_area, sizeof(*scsw));
+>>>>>>>     =20
+>>>>>>> -	if (scsw->cmd.fctl & SCSW_FCTL_START_FUNC) {
+>>>>>>> +	/*
+>>>>>>> +	 * Start processing with the clear function, then halt, then st=
+art.
+>>>>>>> +	 * We may still be start pending when the caller wants to clean
+>>>>>>> +	 * up things via halt/clear.
+>>>>>>> +	 */
+>>>>>> hum. The scsw here does not reflect the hardware state but the
+>>>>>> command passed from the user interface.
+>>>>>> Can we and should we authorize multiple commands in one call?
+>>>>>>
+>>>>>> If not, the comment is not appropriate and a switch on cmd.fctl
+>>>>>> would be a clearer.
+>>>>> There may be multiple functions specified, but we need to process t=
+hem
+>>>>> in precedence order (and clear wins over the others, so to speak).
+>>>>> Would adding a sentence like "we always process just one function" =
+help?
+>>>> Why should we allow multiple commands in a single call ?
+>>>> It brings no added value.
+>>>> Is there a use case?
+>>>> Currently QEMU does not do this and since we only have the SCSH ther=
+e
+>>>> is no difference having the bit set alone or not alone.
+>>> I found this to be a very easy way to implement halt/clear. This stil=
+l
+>>> holds true if we switch to some kind of capabilities for this (did no=
+t
+>>> have time to look at this further, though).
+>>>
+>>> As we have the fctl field anyway, I'm in favour of processing this al=
+l
+>>> in one function.
+>>>  =20
+> [starting to look at this again]
+>
+>> Sorry, I do not understand if we agree or not.
+>>
+>> I agree we have the fctl field and we must continue to use it
+>> for backward compatibility.
+> It also mirrors the hardware, no?
+
+No, in the hardware this is the result of the instruction in the SCSW.
+Not the instruction itself.
+
+>
+>> I do not understand the "processing all in one function".
+>>
+>> Since yo already have 3 function to process these three instructions.
+>>
+>> Do you mean the if .. else if .. else if ?
+> Yes. There is a lot of common handling for each of these.
+
+There are also differences and it breaks the FSM
+
+>
+>> Then I come back to what you said earlier on the precedence of the cle=
+ar
+>> instruction:
+>>
+>> 1) do we have a use case to have more than one bit set in the fctl fie=
+ld?
+>>
+>> - if no, there is no need for precedence
+> It mirrors what the hardware does: you just set an additional bit if
+> processing has not yet finished.
+
+I do not agree, this is true for the SCSW but not for instructions.
+We receive instructions in VFIO and give back status.
+The name used to provide the command is misleading.
+
+>
+>> - if yes, why should clear have precedence ?
+> Because it does on the hardware?
+
+What you say is right if we would have a register inside the subchannel
+where we write the commands.
+But this is not what we handle we handle separate instructions coming
+from an instruction stream.
+
+We do never receive two instructions at the same time, but each after
+the other.
+If the sub-channel is busy on IO a clear or a cancel must be able to=20
+stop the IO.
+I agree upon this.
+But we do not have any other command in the same call.
+
+If we would construct the interface differently, for example using an=20
+mmap() system
+call and let the user ORing the command bitfield before using an ioctl=20
+to inform
+us from the change, or if we poll on the command bitfield we should=20
+implement
+it like you say.
+But this is not what we do, and this is not what the architecture does.
+does it?
+
+>
+>>   =C2=A0 How do QEMU set more than one bit in fctl?
+>>   =C2=A0 why should we alter the order of the instructions given by th=
+e guest?
+>>   =C2=A0 How can we know this order if there are multiple instructions=
+ at once?
+> In the future, we should return after we fired off the start etc.
+> request even if we did not receive an interrupt yet, so that the guest
+> might do a halt or clear before the start has finished.
+
+This is already what is done here:
+We fire off the start (go to BUSY state) and return
+
+If the guest want to start another command it polls on
+the vfio_write() untill the channel isn't BUSY anymore.
+
+On interrupt we set the channel back to IDLE and the next
+command shall be proceed.
+
+(I must enhance the cover letter (already said))
+
+>   IOW, make this
+> as asynchronous as the hardware. That's why I'd like to simply
+> accumulate the things. The architecture already specified what happens
+> in the response.
+>
+> Do you think that is feasible?
+>
+Yes I think it is feasible and it is what we need to do.
+
+CLEAR, CANCEL and HALT must be able to overtake the
+START and really stop the IO transfer.
+
+They just should be able to proceed in the BUSY state
+on the opposite of the START.
+This is easily done with new events in the FSM inside
+both IDLE and BUSY states
+
+May be I should try to integrate your patches so we have a better view.
+
+Thanks.
+
+Best regards,
+
+Pierre
+
+
+--=20
+Pierre Morel
+Linux/KVM/QEMU in B=C3=B6blingen - Germany
