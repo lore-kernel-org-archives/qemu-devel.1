@@ -1,16 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39501)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40595)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1fQ70A-0002F9-Pc
-	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 04:07:37 -0400
+	(envelope-from <thuth@redhat.com>) id 1fQ74N-0004zf-K2
+	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 04:11:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1fQ706-00033k-P0
-	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 04:07:34 -0400
-From: Fam Zheng <famz@redhat.com>
-Date: Tue,  5 Jun 2018 16:07:10 +0800
-Message-Id: <20180605080710.27035-3-famz@redhat.com>
-In-Reply-To: <20180605080710.27035-1-famz@redhat.com>
-References: <20180605080710.27035-1-famz@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 2/2] backup: Use copy offloading
+	(envelope-from <thuth@redhat.com>) id 1fQ74J-0006Xy-Kc
+	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 04:11:55 -0400
+References: <20180605065626.4304-1-clg@kaod.org>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <553ae565-5b9c-36c0-1789-f7f8cc6b2c94@redhat.com>
+Date: Tue, 5 Jun 2018 10:11:48 +0200
+MIME-Version: 1.0
+In-Reply-To: <20180605065626.4304-1-clg@kaod.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] spapr/vio: deprecate the "irq" property
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -19,239 +23,96 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, Fam Zheng <famz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Jeff Cody <jcody@redhat.com>
+To: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>, qemu-ppc@nongnu.org
+Cc: qemu-devel@nongnu.org, David Gibson <david@gibson.dropbear.id.au>, Greg Kurz <groug@kaod.org>
 
-The implementation is similar to the 'qemu-img convert'. In the
-beginning of the job, offloaded copy is attempted. If it fails, further
-I/O will go through the existing bounce buffer code path.
+On 05.06.2018 08:56, C=C3=A9dric Le Goater wrote:
+> VIO devices have an "irq" property that can be used by the sPAPR IRQ
+> allocator as an IRQ number hint. But it is not set in QEMU nor in
+> libvirt. It brings unnecessary complexity to the underlying layers
+> managing the IRQ number space and it is in full opposition with the
+> new static IRQ allocator we want to introduce in sPAPR.
+>=20
+> Let's deprecate it to simplify the spapr_irq_alloc routine in the
+> future.
+>=20
+> Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
+> ---
+>  qemu-doc.texi      | 12 ++++++++++--
+>  hw/ppc/spapr_vio.c | 19 ++++++++++++++++++-
+>  2 files changed, 28 insertions(+), 3 deletions(-)
+>=20
+> diff --git a/qemu-doc.texi b/qemu-doc.texi
+> index f00706b9996c..fd25ddf7a06a 100644
+> --- a/qemu-doc.texi
+> +++ b/qemu-doc.texi
+> @@ -2970,13 +2970,21 @@ support page sizes < 4096 any longer.
+>  The ``xlnx-ep108'' machine has been replaced by the ``xlnx-zcu102'' ma=
+chine.
+>  The ``xlnx-zcu102'' machine has the same features and capabilites in Q=
+EMU.
+> =20
+> -@section Block device options
+> +@section Device options
+> =20
+> -@subsection "backing": "" (since 2.12.0)
+> +@subsection Block device options
+> +
+> +@subsubsection "backing": "" (since 2.12.0)
+> =20
+>  In order to prevent QEMU from automatically opening an image's backing
+>  chain, use ``"backing": null'' instead.
+> =20
+> +@subsection vio-spapr-device device options
+> +
+> +@subsubsection "irq": "" (since 3.0.0)
+> +
+> +The ``irq'' property is obsoleted.
+> +
+>  @node Supported build platforms
+>  @appendix Supported build platforms
+> =20
+> diff --git a/hw/ppc/spapr_vio.c b/hw/ppc/spapr_vio.c
+> index 472dd6f33a96..28bb3b849b9b 100644
+> --- a/hw/ppc/spapr_vio.c
+> +++ b/hw/ppc/spapr_vio.c
+> @@ -22,6 +22,7 @@
+>  #include "qemu/osdep.h"
+>  #include "qemu/error-report.h"
+>  #include "qapi/error.h"
+> +#include "qapi/visitor.h"
+>  #include "hw/hw.h"
+>  #include "qemu/log.h"
+>  #include "sysemu/sysemu.h"
+> @@ -41,8 +42,24 @@
+> =20
+>  #include <libfdt.h>
+> =20
+> +static void spapr_vio_getset_irq(Object *obj, Visitor *v, const char *=
+name,
+> +                              void *opaque, Error **errp)
+> +{
+> +    Property *prop =3D opaque;
+> +    uint32_t *ptr =3D qdev_get_prop_ptr(DEVICE(obj), prop);
+> +
+> +    warn_report(TYPE_VIO_SPAPR_DEVICE " '%s' property is deprecated", =
+name);
+> +    visit_type_uint32(v, name, ptr, errp);
+> +}
+> +
+> +static const PropertyInfo spapr_vio_irq_propinfo =3D {
+> +    .name =3D "irq",
+> +    .get =3D spapr_vio_getset_irq,
+> +    .set =3D spapr_vio_getset_irq,
+> +};
+> +
+>  static Property spapr_vio_props[] =3D {
+> -    DEFINE_PROP_UINT32("irq", VIOsPAPRDevice, irq, 0), \
+> +    DEFINE_PROP("irq", VIOsPAPRDevice, irq, spapr_vio_irq_propinfo, ui=
+nt32_t),
+>      DEFINE_PROP_END_OF_LIST(),
+>  };
 
-Signed-off-by: Fam Zheng <famz@redhat.com>
----
- block/backup.c     | 151 +++++++++++++++++++++++++++++++++------------
- block/trace-events |   1 +
- 2 files changed, 111 insertions(+), 41 deletions(-)
+Looks fine to me.
 
-diff --git a/block/backup.c b/block/backup.c
-index 4e228e959b..8a7658db12 100644
---- a/block/backup.c
-+++ b/block/backup.c
-@@ -45,6 +45,8 @@ typedef struct BackupBlockJob {
-     QLIST_HEAD(, CowRequest) inflight_reqs;
- 
-     HBitmap *copy_bitmap;
-+    bool use_copy_range;
-+    int64_t copy_range_size;
- } BackupBlockJob;
- 
- static const BlockJobDriver backup_job_driver;
-@@ -86,19 +88,102 @@ static void cow_request_end(CowRequest *req)
-     qemu_co_queue_restart_all(&req->wait_queue);
- }
- 
-+/* Copy range to target with a bounce buffer and return the bytes copied. If
-+ * error occured, return a negative error number */
-+static int coroutine_fn backup_cow_with_bounce_buffer(BackupBlockJob *job,
-+                                                      int64_t start,
-+                                                      int64_t end,
-+                                                      bool is_write_notifier,
-+                                                      bool *error_is_read,
-+                                                      void **bounce_buffer)
-+{
-+    int ret;
-+    struct iovec iov;
-+    QEMUIOVector qiov;
-+    BlockBackend *blk = job->common.blk;
-+    int nbytes;
-+
-+    hbitmap_reset(job->copy_bitmap, start / job->cluster_size, 1);
-+    nbytes = MIN(job->cluster_size, job->len - start);
-+    if (!*bounce_buffer) {
-+        *bounce_buffer = blk_blockalign(blk, job->cluster_size);
-+    }
-+    iov.iov_base = *bounce_buffer;
-+    iov.iov_len = nbytes;
-+    qemu_iovec_init_external(&qiov, &iov, 1);
-+
-+    ret = blk_co_preadv(blk, start, qiov.size, &qiov,
-+                        is_write_notifier ? BDRV_REQ_NO_SERIALISING : 0);
-+    if (ret < 0) {
-+        trace_backup_do_cow_read_fail(job, start, ret);
-+        if (error_is_read) {
-+            *error_is_read = true;
-+        }
-+        goto fail;
-+    }
-+
-+    if (qemu_iovec_is_zero(&qiov)) {
-+        ret = blk_co_pwrite_zeroes(job->target, start,
-+                                   qiov.size, BDRV_REQ_MAY_UNMAP);
-+    } else {
-+        ret = blk_co_pwritev(job->target, start,
-+                             qiov.size, &qiov,
-+                             job->compress ? BDRV_REQ_WRITE_COMPRESSED : 0);
-+    }
-+    if (ret < 0) {
-+        trace_backup_do_cow_write_fail(job, start, ret);
-+        if (error_is_read) {
-+            *error_is_read = false;
-+        }
-+        goto fail;
-+    }
-+
-+    return nbytes;
-+fail:
-+    hbitmap_set(job->copy_bitmap, start / job->cluster_size, 1);
-+    return ret;
-+
-+}
-+
-+/* Copy range to target and return the bytes copied. If error occured, return a
-+ * negative error number. */
-+static int backup_cow_with_offload(BackupBlockJob *job,
-+                                   int64_t start,
-+                                   int64_t end,
-+                                   bool is_write_notifier)
-+{
-+    int ret;
-+    int nr_clusters;
-+    BlockBackend *blk = job->common.blk;
-+    int nbytes;
-+
-+    assert(QEMU_IS_ALIGNED(job->copy_range_size, job->cluster_size));
-+    nbytes = MIN(job->copy_range_size, end - start);
-+    nr_clusters = DIV_ROUND_UP(nbytes, job->cluster_size);
-+    hbitmap_reset(job->copy_bitmap, start / job->cluster_size,
-+                  nr_clusters);
-+    ret = blk_co_copy_range(blk, start, job->target, start, nbytes,
-+                            is_write_notifier ? BDRV_REQ_NO_SERIALISING : 0);
-+    if (ret < 0) {
-+        job->use_copy_range = false;
-+        trace_backup_do_cow_copy_range_fail(job, start, ret);
-+        hbitmap_set(job->copy_bitmap, start / job->cluster_size,
-+                    nr_clusters);
-+        return ret;
-+    }
-+
-+    return nbytes;
-+}
-+
- static int coroutine_fn backup_do_cow(BackupBlockJob *job,
-                                       int64_t offset, uint64_t bytes,
-                                       bool *error_is_read,
-                                       bool is_write_notifier)
- {
--    BlockBackend *blk = job->common.blk;
-     CowRequest cow_request;
--    struct iovec iov;
--    QEMUIOVector bounce_qiov;
--    void *bounce_buffer = NULL;
-     int ret = 0;
-     int64_t start, end; /* bytes */
--    int n; /* bytes */
-+    void *bounce_buffer = NULL;
- 
-     qemu_co_rwlock_rdlock(&job->flush_rwlock);
- 
-@@ -110,60 +195,38 @@ static int coroutine_fn backup_do_cow(BackupBlockJob *job,
-     wait_for_overlapping_requests(job, start, end);
-     cow_request_begin(&cow_request, job, start, end);
- 
--    for (; start < end; start += job->cluster_size) {
-+    while (start < end) {
-         if (!hbitmap_get(job->copy_bitmap, start / job->cluster_size)) {
-             trace_backup_do_cow_skip(job, start);
-+            start += job->cluster_size;
-             continue; /* already copied */
-         }
--        hbitmap_reset(job->copy_bitmap, start / job->cluster_size, 1);
- 
-         trace_backup_do_cow_process(job, start);
- 
--        n = MIN(job->cluster_size, job->len - start);
--
--        if (!bounce_buffer) {
--            bounce_buffer = blk_blockalign(blk, job->cluster_size);
--        }
--        iov.iov_base = bounce_buffer;
--        iov.iov_len = n;
--        qemu_iovec_init_external(&bounce_qiov, &iov, 1);
--
--        ret = blk_co_preadv(blk, start, bounce_qiov.size, &bounce_qiov,
--                            is_write_notifier ? BDRV_REQ_NO_SERIALISING : 0);
--        if (ret < 0) {
--            trace_backup_do_cow_read_fail(job, start, ret);
--            if (error_is_read) {
--                *error_is_read = true;
-+        if (job->use_copy_range) {
-+            ret = backup_cow_with_offload(job, start, end, is_write_notifier);
-+            if (ret < 0) {
-+                job->use_copy_range = false;
-             }
--            hbitmap_set(job->copy_bitmap, start / job->cluster_size, 1);
--            goto out;
-         }
--
--        if (buffer_is_zero(iov.iov_base, iov.iov_len)) {
--            ret = blk_co_pwrite_zeroes(job->target, start,
--                                       bounce_qiov.size, BDRV_REQ_MAY_UNMAP);
--        } else {
--            ret = blk_co_pwritev(job->target, start,
--                                 bounce_qiov.size, &bounce_qiov,
--                                 job->compress ? BDRV_REQ_WRITE_COMPRESSED : 0);
-+        if (!job->use_copy_range) {
-+            ret = backup_cow_with_bounce_buffer(job, start, end, is_write_notifier,
-+                                                error_is_read, &bounce_buffer);
-         }
-         if (ret < 0) {
--            trace_backup_do_cow_write_fail(job, start, ret);
--            if (error_is_read) {
--                *error_is_read = false;
--            }
--            hbitmap_set(job->copy_bitmap, start / job->cluster_size, 1);
--            goto out;
-+            break;
-         }
- 
-         /* Publish progress, guest I/O counts as progress too.  Note that the
-          * offset field is an opaque progress value, it is not a disk offset.
-          */
--        job->bytes_read += n;
--        job_progress_update(&job->common.job, n);
-+        start += ret;
-+        job->bytes_read += ret;
-+        job_progress_update(&job->common.job, ret);
-+        ret = 0;
-     }
- 
--out:
-     if (bounce_buffer) {
-         qemu_vfree(bounce_buffer);
-     }
-@@ -665,6 +728,12 @@ BlockJob *backup_job_create(const char *job_id, BlockDriverState *bs,
-     } else {
-         job->cluster_size = MAX(BACKUP_CLUSTER_SIZE_DEFAULT, bdi.cluster_size);
-     }
-+    job->use_copy_range = true;
-+    job->copy_range_size = MIN_NON_ZERO(blk_get_max_transfer(job->common.blk),
-+                                        blk_get_max_transfer(job->target));
-+    job->copy_range_size = MAX(job->cluster_size,
-+                               QEMU_ALIGN_UP(job->copy_range_size,
-+                                             job->cluster_size));
- 
-     /* Required permissions are already taken with target's blk_new() */
-     block_job_add_bdrv(&job->common, "target", target, 0, BLK_PERM_ALL,
-diff --git a/block/trace-events b/block/trace-events
-index 2d59b53fd3..c35287b48a 100644
---- a/block/trace-events
-+++ b/block/trace-events
-@@ -42,6 +42,7 @@ backup_do_cow_skip(void *job, int64_t start) "job %p start %"PRId64
- backup_do_cow_process(void *job, int64_t start) "job %p start %"PRId64
- backup_do_cow_read_fail(void *job, int64_t start, int ret) "job %p start %"PRId64" ret %d"
- backup_do_cow_write_fail(void *job, int64_t start, int ret) "job %p start %"PRId64" ret %d"
-+backup_do_cow_copy_range_fail(void *job, int64_t start, int ret) "job %p start %"PRId64" ret %d"
- 
- # blockdev.c
- qmp_block_job_cancel(void *job) "job %p"
--- 
-2.17.0
+Reviewed-by: Thomas Huth <thuth@redhat.com>
