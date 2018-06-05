@@ -1,26 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46565)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47810)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1fQ2pU-0005Rs-8a
-	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 23:40:17 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1fQ2ye-00088D-3s
+	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 23:49:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1fQ2pQ-0002Fz-2k
-	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 23:40:16 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:52248 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1fQ2pP-0002FY-T2
-	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 23:40:12 -0400
-Date: Tue, 5 Jun 2018 11:39:58 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20180605033958.GC32701@xz-mi>
-References: <20180604080630.10946-1-peterx@redhat.com>
-	<CAJ+F1CLkDdMSQ6cyMNv8Gwf1AtdgfKV9Zz-F+ZT=FUVTERuevg@mail.gmail.com>
+	(envelope-from <dgibson@ozlabs.org>) id 1fQ2ya-0005gl-79
+	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 23:49:44 -0400
+Date: Tue, 5 Jun 2018 13:44:18 +1000
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20180605034418.GV5140@umbus.fritz.box>
+References: <20180518164405.11804-1-clg@kaod.org>
+	<20180518164405.11804-3-clg@kaod.org>
+	<20180526114023.49ee54e9@bahia.lan>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="X6f5cqjOqKjuoPgI"
 Content-Disposition: inline
-In-Reply-To: <CAJ+F1CLkDdMSQ6cyMNv8Gwf1AtdgfKV9Zz-F+ZT=FUVTERuevg@mail.gmail.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] monitor: postpone
- monitor_qmp_cleanup_queues
+In-Reply-To: <20180526114023.49ee54e9@bahia.lan>
+Subject: Re: [Qemu-devel] [PATCH 2/4] sparp_pci: simplify how the PCI LSIs
+ are allocated
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,187 +26,116 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@gmail.com>
-Cc: QEMU <qemu-devel@nongnu.org>, Kevin Wolf <kwolf@redhat.com>, John Snow <jsnow@redhat.com>, Markus Armbruster <armbru@redhat.com>, Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+To: Greg Kurz <groug@kaod.org>
+Cc: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Alexey Kardashevskiy <aik@ozlabs.ru>
 
-On Mon, Jun 04, 2018 at 05:01:21PM +0200, Marc-Andr=C3=A9 Lureau wrote:
-> Hi
+
+--X6f5cqjOqKjuoPgI
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Sat, May 26, 2018 at 11:40:23AM +0200, Greg Kurz wrote:
+> On Fri, 18 May 2018 18:44:03 +0200
+> C=E9dric Le Goater <clg@kaod.org> wrote:
 >=20
-> On Mon, Jun 4, 2018 at 10:06 AM, Peter Xu <peterx@redhat.com> wrote:
-> > Previously we cleanup the queues when we got CLOSED event.  It was us=
-ed
-> > to make sure we won't leftover replies/events of a old client to a ne=
-w
-> > client.  Now this patch postpones that until OPENED.
-> >
-> > In most cases, it does not really matter much since either way will m=
-ake
-> > sure that the new client won't receive unexpected old events/response=
-s.
-> > However there can be a very rare race condition with the old way when=
- we
-> > use QMP with stdio and pipelines (which is quite common in iotests).
-> > The problem is that, we can easily have something like this in script=
-s:
-> >
-> >   cat $QMP_COMMANDS | qemu -qmp stdio ... | filter_commands
-> >
-> > In most cases, a QMP session will be based on a bidirectional
-> > channel (read/write to a TCP port, for example), so IN and OUT are
-> > sharing some fundamentally same thing.  However that's untrue for pip=
-es
-> > above - the IN is the "cat" program, while the "OUT" is directed to t=
-he
-> > "filter_commands" which is actually another process.
-> >
-> > Now when we received the CLOSED event, we cleanup the queues (includi=
-ng
-> > the QMP response queue).  That means, if we kill/stop the "cat" proce=
-ss
-> > faster than the filter_commands process, the filter_commands process =
-is
-> > possible to miss some responses/events that should belong to it.
-> >
-> > In practise, I encountered a very strange SHUTDOWN event missing when
-> > running test with iotest 087.  Without this patch, iotest 078 will ha=
-ve
-> > ~10% chance to miss the SHUTDOWN event and fail when with Out-Of-Band
-> > enabled:
-> >
-> > 087 8s ... - output mismatch (see 087.out.bad)
-> > --- /home/peterx/git/qemu/tests/qemu-iotests/087.out    2018-06-01 18=
-:44:22.378982462 +0800
-> > +++ /home/peterx/git/qemu/bin/tests/qemu-iotests/087.out.bad    2018-=
-06-01 18:53:44.267840928 +0800
-> > @@ -8,7 +8,6 @@
-> >  {"return": {}}
-> >  {"error": {"class": "GenericError", "desc": "'node-name' must be spe=
-cified for the root node"}}
-> >  {"return": {}}
-> > -{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "=
-event": "SHUTDOWN", "data": {"guest": false}}
-> >
-> >  =3D=3D=3D Duplicate ID =3D=3D=3D
-> > @@ -53,7 +52,6 @@
-> >  {"return": {}}
-> >  {"return": {}}
-> >  {"return": {}}
-> > -{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "=
-event": "SHUTDOWN", "data": {"guest": false}}
-> >
-> > This patch fixes the problem.
-> >
-> > Fixes: 6d2d563f8c ("qmp: cleanup qmp queues properly", 2018-03-27)
-> > Signed-off-by: Peter Xu <peterx@redhat.com>
-> >
-> > Signed-off-by: Peter Xu <peterx@redhat.com>
+> > PCI LSIs are today allocated one by one using the IRQ alloc_block
+> > routine. Change the code sequence to first allocate a PCI_NUM_PINS
+> > block. It will help us providing a generic IRQ framework to the
+> > machine.
+> >=20
+> > Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
 > > ---
-> >  monitor.c | 2 +-
-> >  1 file changed, 1 insertion(+), 1 deletion(-)
-> >
-> > diff --git a/monitor.c b/monitor.c
-> > index 46814af533..6f26108108 100644
-> > --- a/monitor.c
-> > +++ b/monitor.c
-> > @@ -4354,6 +4354,7 @@ static void monitor_qmp_event(void *opaque, int=
- event)
-> >
-> >      switch (event) {
-> >      case CHR_EVENT_OPENED:
-> > +        monitor_qmp_cleanup_queues(mon);
-> >          mon->qmp.commands =3D &qmp_cap_negotiation_commands;
-> >          monitor_qmp_caps_reset(mon);
-> >          data =3D get_qmp_greeting(mon);
-> > @@ -4362,7 +4363,6 @@ static void monitor_qmp_event(void *opaque, int=
- event)
-> >          mon_refcount++;
-> >          break;
-> >      case CHR_EVENT_CLOSED:
-> > -        monitor_qmp_cleanup_queues(mon);
-> >          json_message_parser_destroy(&mon->qmp.parser);
-> >          json_message_parser_init(&mon->qmp.parser, handle_qmp_comman=
-d);
-> >          mon_refcount--;
-> > --
-> > 2.17.0
-> >
-> >
+> >  hw/ppc/spapr_pci.c | 21 ++++++++++-----------
+> >  1 file changed, 10 insertions(+), 11 deletions(-)
+> >=20
+> > diff --git a/hw/ppc/spapr_pci.c b/hw/ppc/spapr_pci.c
+> > index 39a14980d397..4fd97ffe4c6e 100644
+> > --- a/hw/ppc/spapr_pci.c
+> > +++ b/hw/ppc/spapr_pci.c
+> > @@ -1546,6 +1546,8 @@ static void spapr_phb_realize(DeviceState *dev, E=
+rror **errp)
+> >      sPAPRTCETable *tcet;
+> >      const unsigned windows_supported =3D
+> >          sphb->ddw_enabled ? SPAPR_PCI_DMA_MAX_WINDOWS : 1;
+> > +    uint32_t irq;
+> > +    Error *local_err =3D NULL;
+> > =20
+> >      if (!spapr) {
+> >          error_setg(errp, TYPE_SPAPR_PCI_HOST_BRIDGE " needs a pseries =
+machine");
+> > @@ -1694,18 +1696,15 @@ static void spapr_phb_realize(DeviceState *dev,=
+ Error **errp)
+> >      QLIST_INSERT_HEAD(&spapr->phbs, sphb, list);
+> > =20
+> >      /* Initialize the LSI table */
+> > -    for (i =3D 0; i < PCI_NUM_PINS; i++) {
+> > -        uint32_t irq;
+> > -        Error *local_err =3D NULL;
+> > -
+> > -        irq =3D spapr_irq_alloc_block(spapr, 1, true, false, &local_er=
+r);
+> > -        if (local_err) {
+> > -            error_propagate(errp, local_err);
+> > -            error_prepend(errp, "can't allocate LSIs: ");
+> > -            return;
+> > -        }
+> > +    irq =3D spapr_irq_alloc_block(spapr, PCI_NUM_PINS, true, false, &l=
+ocal_err);
+> > +    if (local_err) {
+> > +        error_propagate(errp, local_err);
+> > +        error_prepend(errp, "can't allocate LSIs: ");
+> > +        return;
+> > +    }
+> > =20
 >=20
-> Drawback, we will not clean up pending commands until next client.
+> It isn't strictly equivalent. The current code would be happy with
+> sparse IRQ numbers, while the proposed one wouldn't... Anyway, this
+> cannot happen since we don't have PHB hotplug.
 
-IMHO that's fine.
+This makes me pretty nervous, because it's not obvious it will come up
+with the same numbers in all circumstances, which we have to do for
+existing machine types.  It's also not obvious to me why it's useful
+to go via this step before going straight to static allocation of the
+irq numbers.
+
+If you can convince me this will (in practice) return the same numbers
+as the existing code for all valid setups, and that it's a useful
+intermediate step, then I'll apply it.
 
 >=20
-> Perhaps we could have something more specific to the stdio case (untest=
-ed):
-
-Yeah if we can fix that from the QIO layer that'll be good to me too,
-though...
-
+> > -        sphb->lsi_table[i].irq =3D irq;
+> > +    for (i =3D 0; i < PCI_NUM_PINS; i++) {
+> > +        sphb->lsi_table[i].irq =3D irq + i;
+> >      }
+> > =20
+> >      /* allocate connectors for child PCI devices */
 >=20
->=20
-> diff --git a/include/io/channel-file.h b/include/io/channel-file.h
-> index ebfe54ec70..04a20bc2ed 100644
-> --- a/include/io/channel-file.h
-> +++ b/include/io/channel-file.h
-> @@ -90,4 +90,12 @@ qio_channel_file_new_path(const char *path,
->                            mode_t mode,
->                            Error **errp);
->=20
-> +/**
-> + * qio_channel_file_is_opened:
-> + *
-> + * Returns: true if the associated file descriptor is valid & opened.
-> + */
-> +bool
-> +qio_channel_file_is_opened(QIOChannelFile *ioc);
-> +
->  #endif /* QIO_CHANNEL_FILE_H */
-> diff --git a/chardev/char-fd.c b/chardev/char-fd.c
-> index 2c9b2ce567..bf9803b4c9 100644
-> --- a/chardev/char-fd.c
-> +++ b/chardev/char-fd.c
-> @@ -59,7 +59,10 @@ static gboolean fd_chr_read(QIOChannel *chan,
-> GIOCondition cond, void *opaque)
->          chan, (gchar *)buf, len, NULL);
->      if (ret =3D=3D 0) {
->          remove_fd_in_watch(chr);
-> -        qemu_chr_be_event(chr, CHR_EVENT_CLOSED);
-> +        if (!qio_channel_file_is_opened(s->ioc_out)) {
-> +            /* only send close event if both in & out channels are clo=
-sed */
-> +            qemu_chr_be_event(chr, CHR_EVENT_CLOSED);
-
-... here what if we close READ file first then WRITE file?  Will we
-miss one CLOSED event then for the channel?
-
-Regards,
-
-> +        }
->          return FALSE;
->      }
->      if (ret > 0) {
-> diff --git a/io/channel-file.c b/io/channel-file.c
-> index db948abc3e..1a02f99abf 100644
-> --- a/io/channel-file.c
-> +++ b/io/channel-file.c
-> @@ -63,6 +63,12 @@ qio_channel_file_new_path(const char *path,
->      return ioc;
->  }
->=20
-> +bool
-> +qio_channel_file_is_opened(QIOChannelFile *ioc)
-> +{
-> +    errno =3D 0;
-> +    return ioc->fd !=3D -1 && (fcntl(ioc->fd, F_GETFD) !=3D -1 || errn=
-o !=3D EBADF);
-> +}
->=20
->  static void qio_channel_file_init(Object *obj)
->  {
->=20
-> --=20
-> Marc-Andr=C3=A9 Lureau
 
 --=20
-Peter Xu
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--X6f5cqjOqKjuoPgI
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlsWBxAACgkQbDjKyiDZ
+s5L/pxAAvm3HW1Dh0CAB+xigJJOZpK3UX5y/IfpWCfcz6spKKDIiJeMiJVuUnAl4
+ItxcJn7PMjfoUhr9cLeOxf6MAnvreMK0cONOnC6fkS5dpDghKIbfYp/e6vdQX5Uy
+TIaOP4MMt/5DZBS7aaiYRQNzEG5lOto23NTUB/QcDyfZ+SJmhdsy0/oBjPdnCFYq
+cAEXMAmC75W+sISAd3QbZiUgVhKqkjKK2AN/NXMh4nIOuASF2FUKcNFvAAEDy91y
+e5bl43ixVi1BySo0wBz6n40NeitCDGDEvnrVPDU1fb6ceuTJk/39Th8kPNqS9AQT
+BXi5vp32dHcnv/Dynm49ynLdNB7AjjwbdC2ecr6m7/oY9v0fBf14FL74qKCUsyMo
+9jLZTf9JyS146KktLxbTFG4rZ8Gn/Tb1YZpzJVD/8YFhVOIjZsfPeFqYx1tZP06R
+FpO2YQuE/ahN7QeFTP0tu4/LvUfK7XpHRC2qND5njNreEmchC21uIsDXyiZueFGH
+/cDW/pvK8+xGSUPp1Shf1IgFl8zwJHnQfgtKD1916mH0HsLT/H8+jMliDPYe+oPy
+a6GLsVqwk+QJGcfWbPMWkVnqpDG1xhktLqvWFHBh5mo+UJUtvI/i+u73+LkjTReQ
+GiOMcytmiEyh+qDIAJQE3q5cHmSt1WJJS1HX/To+TdR633BY4Vw=
+=uNix
+-----END PGP SIGNATURE-----
+
+--X6f5cqjOqKjuoPgI--
