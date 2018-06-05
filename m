@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57879)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34884)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1fQ1N8-0002m8-SQ
-	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 22:06:56 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1fQ1zV-0005cs-9c
+	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 22:46:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1fQ1N5-0008Vh-N8
-	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 22:06:54 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:56668 helo=mx1.redhat.com)
+	(envelope-from <ehabkost@redhat.com>) id 1fQ1zQ-0000f2-E2
+	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 22:46:33 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:50514)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1fQ1N5-0008VX-I4
-	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 22:06:51 -0400
-References: <1525734594-11134-1-git-send-email-sridhar.samudrala@intel.com>
-	<fcefe501-b410-f1ec-829c-68199edcdbef@intel.com>
-From: Jason Wang <jasowang@redhat.com>
-Message-ID: <d61c88c7-0803-ba1c-08ab-fc668cffa40b@redhat.com>
-Date: Tue, 5 Jun 2018 10:06:41 +0800
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1fQ1zQ-0000dY-4x
+	for qemu-devel@nongnu.org; Mon, 04 Jun 2018 22:46:28 -0400
+Date: Mon, 4 Jun 2018 23:46:20 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20180605024620.GI3184@localhost.localdomain>
+References: <1527176614-26271-1-git-send-email-babu.moger@amd.com>
+	<1527176614-26271-4-git-send-email-babu.moger@amd.com>
 MIME-Version: 1.0
-In-Reply-To: <fcefe501-b410-f1ec-829c-68199edcdbef@intel.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] qemu: Introduce VIRTIO_NET_F_STANDBY
- feature bit to virtio_net
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1527176614-26271-4-git-send-email-babu.moger@amd.com>
+Subject: Re: [Qemu-devel] [PATCH v11 3/5] i386: Add support for
+ CPUID_8000_001E for AMD
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,88 +28,131 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Samudrala, Sridhar" <sridhar.samudrala@intel.com>, mst@redhat.com, virtualization@lists.linux-foundation.org, virtio-dev@lists.oasis-open.org, jesse.brandeburg@intel.com, alexander.h.duyck@intel.com, qemu-devel@nongnu.org
+To: Babu Moger <babu.moger@amd.com>
+Cc: mst@redhat.com, marcel.apfelbaum@gmail.com, pbonzini@redhat.com, rth@twiddle.net, mtosatti@redhat.com, geoff@hostfission.com, kash@tripleback.net, qemu-devel@nongnu.org, kvm@vger.kernel.org
+
+On Thu, May 24, 2018 at 11:43:32AM -0400, Babu Moger wrote:
+> Add support for cpuid leaf CPUID_8000_001E. Build the config that closely
+> match the underlying hardware. Please refer to the Processor Programming
+> Reference (PPR) for AMD Family 17h Model for more details.
+> 
+> Signed-off-by: Babu Moger <babu.moger@amd.com>
+> ---
+>  target/i386/cpu.c | 61 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 61 insertions(+)
+> 
+> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+> index 0d423e5..9f8bad9 100644
+> --- a/target/i386/cpu.c
+> +++ b/target/i386/cpu.c
+> @@ -429,6 +429,62 @@ static void encode_cache_cpuid8000001d(CPUCacheInfo *cache, CPUState *cs,
+>             (cache->complex_indexing ? CACHE_COMPLEX_IDX : 0);
+>  }
+>  
+> +/* Data structure to hold the configuration info for a given core index */
+> +struct core_topology {
+> +    /* core complex id of the current core index */
+> +    int ccx_id;
+> +    /* Adjusted core id for this core index in the topology */
+
+What's an "adjusted core id"?
+
+> +    int core_id;
+> +    /* Node id for this core index */
+> +    int node_id;
+> +    /* Number of nodes in this config, 0 based */
+> +    int num_nodes;
+
+I suggest making num_nodes carry the actual number of nodes, and
+using (num_nodes - 1) when building CPUID data.
+
+> +};
+> +
+> +/*
+> + * Build the configuration closely match the EPYC hardware. Using the EPYC
+> + * hardware configuration values (MAX_CCX, MAX_CORES_IN_CCX, MAX_CORES_IN_NODE)
+> + * right now. This could change in future.
+> + * nr_cores : Total number of cores in the config
+> + * core_id  : Core index of the current CPU
+> + * topo     : Data structure to hold all the config info for this core index
+> + */
+> +static void build_core_topology(int nr_cores, int core_id,
+> +                                struct core_topology *topo)
+> +{
+> +    int nodes, cores_in_ccx;
+> +
+> +    /* First get the number of nodes required */
+> +    nodes = nodes_in_socket(nr_cores);
+> +
+> +    cores_in_ccx = cores_in_core_complex(nr_cores);
+> +
+> +    topo->node_id = core_id / (cores_in_ccx * MAX_CCX);
+> +    topo->ccx_id = (core_id % (cores_in_ccx * MAX_CCX)) / cores_in_ccx;
+> +    topo->core_id = core_id % cores_in_ccx;
+> +    /* num_nodes is 0 based, return n - 1 */
+> +    topo->num_nodes = nodes - 1;
+> +}
+
+Is this guaranteed to work with any nr_cores value, or only with
+a few specific values that match real hardware?
 
 
 
-On 2018=E5=B9=B406=E6=9C=8805=E6=97=A5 09:41, Samudrala, Sridhar wrote:
-> Ping on this patch now that the kernel patches are accepted into=20
-> davem's net-next tree.
-> https://patchwork.ozlabs.org/cover/920005/
->
->
-> On 5/7/2018 4:09 PM, Sridhar Samudrala wrote:
->> This feature bit can be used by hypervisor to indicate virtio_net=20
->> device to
->> act as a standby for another device with the same MAC address.
->>
->> I tested this with a small change to the patch to mark the STANDBY=20
->> feature 'true'
->> by default as i am using libvirt to start the VMs.
->> Is there a way to pass the newly added feature bit 'standby' to qemu=20
->> via libvirt
->> XML file?
->>
+> +
+> +/* Encode cache info for CPUID[8000001E] */
+> +static void encode_topo_cpuid8000001e(CPUState *cs, X86CPU *cpu,
+> +                                       uint32_t *eax, uint32_t *ebx,
+> +                                       uint32_t *ecx, uint32_t *edx)
+> +{
+> +    struct core_topology topo = {0};
+> +
+> +    build_core_topology(cs->nr_cores, cpu->core_id, &topo);
+> +    *eax = cpu->apic_id;
+> +    if (cs->nr_threads - 1) {
+> +        *ebx = ((cs->nr_threads - 1) << 8) | (topo.node_id << 3) |
+> +                (topo.ccx_id << 2) | topo.core_id;
+> +    } else {
+> +        *ebx = (topo.node_id << 4) | (topo.ccx_id << 3) | topo.core_id;
+> +    }
 
-Maybe you can try qemu command line passthrough:
+This part confuses me a lot.  Where are those bit offsets in EBX
+defined?
 
-https://libvirt.org/drvqemu.html#qemucommand
+Is this guaranteed to work with any cs->nr_cores value?
 
-The patch looks good to me. Let's see if Michael have any comment.
 
-Thanks
+> +    *ecx = (topo.num_nodes << 8) | (cpu->socket_id << 2) | topo.node_id;
 
->> Signed-off-by: Sridhar Samudrala <sridhar.samudrala@intel.com>
->> ---
->> =C2=A0 hw/net/virtio-net.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0 | 2 ++
->> =C2=A0 include/standard-headers/linux/virtio_net.h | 3 +++
->> =C2=A0 2 files changed, 5 insertions(+)
->>
->> diff --git a/hw/net/virtio-net.c b/hw/net/virtio-net.c
->> index 90502fca7c..38b3140670 100644
->> --- a/hw/net/virtio-net.c
->> +++ b/hw/net/virtio-net.c
->> @@ -2198,6 +2198,8 @@ static Property virtio_net_properties[] =3D {
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 true),
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 DEFINE_PROP_INT32("speed", VirtIONet, n=
-et_conf.speed,=20
->> SPEED_UNKNOWN),
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 DEFINE_PROP_STRING("duplex", VirtIONet,=
- net_conf.duplex_str),
->> +=C2=A0=C2=A0=C2=A0 DEFINE_PROP_BIT64("standby", VirtIONet, host_featu=
-res,=20
->> VIRTIO_NET_F_STANDBY,
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 false),
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 DEFINE_PROP_END_OF_LIST(),
->> =C2=A0 };
->> =C2=A0 diff --git a/include/standard-headers/linux/virtio_net.h=20
->> b/include/standard-headers/linux/virtio_net.h
->> index e9f255ea3f..01ec09684c 100644
->> --- a/include/standard-headers/linux/virtio_net.h
->> +++ b/include/standard-headers/linux/virtio_net.h
->> @@ -57,6 +57,9 @@
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 * Steering *=
-/
->> =C2=A0 #define VIRTIO_NET_F_CTRL_MAC_ADDR 23=C2=A0=C2=A0=C2=A0 /* Set =
-MAC address */
->> =C2=A0 +#define VIRTIO_NET_F_STANDBY=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 62=C2=
-=A0=C2=A0=C2=A0 /* Act as standby for=20
->> another device
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0 * with the same MAC.
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0 */
->> =C2=A0 #define VIRTIO_NET_F_SPEED_DUPLEX 63=C2=A0=C2=A0=C2=A0 /* Devic=
-e set linkspeed and=20
->> duplex */
->> =C2=A0 =C2=A0 #ifndef VIRTIO_NET_NO_LEGACY
->
+Like on EBX, I'm confused by the bit offsets.  Where are they
+defined?
+
+Probably it's safer to not allow TOPOEXT to be enabled if the CPU
+socket/core/thread topology configuration can't generate a sane
+node/core-complex topology.
+
+
+> +    *edx = 0;
+> +}
+> +
+>  /*
+>   * Definitions of the hardcoded cache entries we expose:
+>   * These are legacy cache values. If there is a need to change any
+> @@ -4122,6 +4178,11 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t index, uint32_t count,
+>              break;
+>          }
+>          break;
+> +    case 0x8000001E:
+> +        assert(cpu->core_id <= 255);
+> +        encode_topo_cpuid8000001e(cs, cpu,
+> +                                  eax, ebx, ecx, edx);
+> +        break;
+>      case 0xC0000000:
+>          *eax = env->cpuid_xlevel2;
+>          *ebx = 0;
+> -- 
+> 1.8.3.1
+> 
+> 
+
+-- 
+Eduardo
