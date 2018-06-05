@@ -1,23 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48786)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49034)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1fQJwl-0006SH-GX
-	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 17:56:56 -0400
+	(envelope-from <msuchanek@suse.de>) id 1fQJyT-000785-9b
+	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 17:58:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1fQJwk-0001uW-Dc
-	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 17:56:55 -0400
-References: <20180605185905.4583-1-jsnow@redhat.com>
-	<20180605185905.4583-5-jsnow@redhat.com>
-	<20180605211323.GH11303@localhost.localdomain>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <91b6d48f-e152-602e-1e36-21212ab3e738@redhat.com>
-Date: Tue, 5 Jun 2018 17:56:44 -0400
+	(envelope-from <msuchanek@suse.de>) id 1fQJyS-0002ke-CA
+	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 17:58:41 -0400
+Date: Tue, 5 Jun 2018 23:58:30 +0200
+From: Michal =?UTF-8?B?U3VjaMOhbmVr?= <msuchanek@suse.de>
+Message-ID: <20180605235830.4905ee97@kitsune.suse.cz>
+In-Reply-To: <874liycoto.fsf@dusky.pond.sub.org>
+References: <20180518180440-mutt-send-email-mst@kernel.org>
+	<20180518170956.GI8615@redhat.com>
+	<20180518174133.GC25013@localhost.localdomain>
+	<87bmdc18q5.fsf@dusky.pond.sub.org>
+	<20180521182928.GO25013@localhost.localdomain>
+	<20180521184440.GB8214@redhat.com>
+	<20180521190112.GP25013@localhost.localdomain>
+	<87o9h6hb59.fsf@dusky.pond.sub.org>
+	<20180523121344.GB8988@localhost.localdomain>
+	<874liycoto.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <20180605211323.GH11303@localhost.localdomain>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 4/5] qapi: add
- x-block-dirty-bitmap-merge
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] storing machine data in qcow images?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,176 +31,92 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jeff Cody <jcody@redhat.com>
-Cc: Kevin Wolf <kwolf@redhat.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, Fam Zheng <famz@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>, Max Reitz <mreitz@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>
+Cc: Eduardo Habkost <ehabkost@redhat.com>, kwolf@redhat.com, qemu-block@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org, mreitz@redhat.com, stefanha@redhat.com
 
+On Wed, 23 May 2018 18:35:31 +0200
+Markus Armbruster <armbru@redhat.com> wrote:
 
+> Eduardo Habkost <ehabkost@redhat.com> writes:
+>=20
+> > On Wed, May 23, 2018 at 01:19:46PM +0200, Markus Armbruster wrote: =20
+> >> Eduardo Habkost <ehabkost@redhat.com> writes:
+> >>  =20
+> >> > On Mon, May 21, 2018 at 07:44:40PM +0100, Daniel P. Berrang=C3=A9
+> >> > wrote: =20
+> >> >> On Mon, May 21, 2018 at 03:29:28PM -0300, Eduardo Habkost
+> >> >> wrote: =20
+> >> >> > On Sat, May 19, 2018 at 08:05:06AM +0200, Markus Armbruster
+> >> >> > wrote: =20
+... =20
+> >> >> > The point here is to allow users to simply copy an existing
+> >> >> > disk image, and it will contain enough hints for a cloud
+> >> >> > stack to choose reasonable defaults for machine-type and disk
+> >> >> > type automatically.  Requiring the user to perform a separate
+> >> >> > step to encapsulate the disk image in another file format
+> >> >> > defeats the whole purpose of the proposal. =20
+> >> >>=20
+> >> >> It doesn't have to mean more work for the user - the application
+> >> >> that is used to create the image can do that on their behalf.
+> >> >> oVirt for example can import/export OVA files, containing OVF
+> >> >> metadata. I could imagine virt-manager, and other tools adding
+> >> >> export ability without much trouble if this was deemed a
+> >> >> desirable thing. Bundling gives ability to have multiple disk
+> >> >> images in one archive, which is something OVF does. =20
+> >> >
+> >> > I have the impression that "the application that is used to
+> >> > create the image" is a very large set.  It can be virt-manager,
+> >> > virt-install, virt-manager, or even QEMU itself.
+> >> >
+> >> > Today people can simply create a VM on virt-manager, or run QEMU
+> >> > manually, and upload the qcow2 image directly from its original
+> >> > location (they don't need to copy/export it).  Don't we want the
+> >> > same procedure to keep working instead of requiring users to use
+> >> > another tool? =20
+> >>=20
+...
+> >> With OVF, you solve the problem further up the stack: you do
+> >> virtual appliances instead of disk images.
+> >>  =20
+> >
+> > I guess the main problem is that people are already using disk
+> > images as if they were virtual appliances.
+> >
+> > We can tell people to stop doing that and use OVF, but then we
+> > won't make anybody's life any easier: publishers of images might
+> > need to generate both qcow2 and OVF images if they want it to
+> > work with older hosts; consumers will need to find out if they
+> > need qcow2 or OVF. =20
+>=20
+> I'm afraid providing for "hints" in QCOW2 could only add problems.  To
+> pick the right hints, publishers need to predict how future software
+> consuming the image will interpret them.  Consumers may have to
+> configure their software to interpret hints in various ways.
 
-On 06/05/2018 05:13 PM, Jeff Cody wrote:
-> On Tue, Jun 05, 2018 at 02:59:04PM -0400, John Snow wrote:
->> From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
->>
->> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
->> Signed-off-by: John Snow <jsnow@redhat.com>
->> ---
->>  block/dirty-bitmap.c         | 18 ++++++++++++++++++
->>  blockdev.c                   | 30 ++++++++++++++++++++++++++++++
->>  include/block/dirty-bitmap.h |  3 ++-
->>  qapi/block-core.json         | 38 ++++++++++++++++++++++++++++++++++++++
->>  4 files changed, 88 insertions(+), 1 deletion(-)
->>
->> diff --git a/block/dirty-bitmap.c b/block/dirty-bitmap.c
->> index 56234257f4..4159d3929e 100644
->> --- a/block/dirty-bitmap.c
->> +++ b/block/dirty-bitmap.c
->> @@ -757,3 +757,21 @@ int64_t bdrv_dirty_bitmap_next_zero(BdrvDirtyBitmap *bitmap, uint64_t offset)
->>  {
->>      return hbitmap_next_zero(bitmap->bitmap, offset);
->>  }
->> +
->> +void bdrv_merge_dirty_bitmap(BdrvDirtyBitmap *dest, const BdrvDirtyBitmap *src,
->> +                             Error **errp)
->> +{
->> +    /* only bitmaps from one bds are supported */
->> +    assert(dest->mutex == src->mutex);
->> +
->> +    qemu_mutex_lock(dest->mutex);
->> +
->> +    assert(bdrv_dirty_bitmap_enabled(dest));
->> +    assert(!bdrv_dirty_bitmap_readonly(dest));
->> +
->> +    if (!hbitmap_merge(dest->bitmap, src->bitmap)) {
->> +        error_setg(errp, "Bitmaps are incompatible and can't be merged");
->> +    }
->> +
->> +    qemu_mutex_unlock(dest->mutex);
->> +}
->> diff --git a/blockdev.c b/blockdev.c
->> index 33bfe4817f..b00908fdfd 100644
->> --- a/blockdev.c
->> +++ b/blockdev.c
->> @@ -3044,6 +3044,36 @@ void qmp_x_block_dirty_bitmap_disable(const char *node, const char *name,
->>      bdrv_disable_dirty_bitmap(bitmap);
->>  }
->>  
->> +void qmp_x_block_dirty_bitmap_merge(const char *node, const char *dst_name,
->> +                                    const char *src_name, Error **errp)
->> +{
->> +    BlockDriverState *bs;
->> +    BdrvDirtyBitmap *dst, *src;
->> +
->> +    dst = block_dirty_bitmap_lookup(node, dst_name, &bs, errp);
->> +    if (!dst || !bs) {
-> 
-> !bs check should be dropped, as it doesn't do anything, since
-> block_dirty_bitmap_lookup() cannot return a NULL BlockDriverState.
-> 
+That depends on the hint.
 
-Oh, makes sense.
+If you define that the key libvirt-xml contains the libvirt machine
+definition it is up to libvirt to define what exactly the hint contains.
 
->> +        return;
->> +    }
->> +
->> +    if (bdrv_dirty_bitmap_frozen(dst)) {
->> +        error_setg(errp, "Bitmap '%s' is frozen and cannot be modified",
->> +                   dst_name);
->> +        return;
->> +    } else if (bdrv_dirty_bitmap_readonly(dst)) {
->> +        error_setg(errp, "Bitmap '%s' is readonly and cannot be modified",
->> +                   dst_name);
->> +        return;
->> +    }
->> +
->> +    src = bdrv_find_dirty_bitmap(bs, src_name);
->> +    if (!src) {
->> +        error_setg(errp, "Dirty bitmap '%s' not found", src_name);
->> +        return;
->> +    }
->> +
->> +    bdrv_merge_dirty_bitmap(dst, src, errp);
->> +}
->> +
->>  BlockDirtyBitmapSha256 *qmp_x_debug_block_dirty_bitmap_sha256(const char *node,
->>                                                                const char *name,
->>                                                                Error **errp)
->> diff --git a/include/block/dirty-bitmap.h b/include/block/dirty-bitmap.h
->> index 1ff8949b1b..1e14743032 100644
->> --- a/include/block/dirty-bitmap.h
->> +++ b/include/block/dirty-bitmap.h
->> @@ -70,7 +70,8 @@ void bdrv_dirty_bitmap_set_readonly(BdrvDirtyBitmap *bitmap, bool value);
->>  void bdrv_dirty_bitmap_set_persistance(BdrvDirtyBitmap *bitmap,
->>                                         bool persistent);
->>  void bdrv_dirty_bitmap_set_qmp_locked(BdrvDirtyBitmap *bitmap, bool qmp_locked);
->> -
->> +void bdrv_merge_dirty_bitmap(BdrvDirtyBitmap *dest, const BdrvDirtyBitmap *src,
->> +                             Error **errp);
->>  
->>  /* Functions that require manual locking.  */
->>  void bdrv_dirty_bitmap_lock(BdrvDirtyBitmap *bitmap);
->> diff --git a/qapi/block-core.json b/qapi/block-core.json
->> index c061884a0e..3999175c23 100644
->> --- a/qapi/block-core.json
->> +++ b/qapi/block-core.json
->> @@ -1740,6 +1740,20 @@
->>    'data': { 'node': 'str', 'name': 'str', '*granularity': 'uint32',
->>              '*persistent': 'bool', '*autoload': 'bool' } }
->>  
->> +##
->> +# @BlockDirtyBitmapMerge:
->> +#
->> +# @node: name of device/node which the bitmap is tracking
->> +#
->> +# @dst_name: name of the destination dirty bitmap
->> +#
->> +# @src_name: name of the source dirty bitmap
->> +#
->> +# Since: 3.0
->> +##
->> +{ 'struct': 'BlockDirtyBitmapMerge',
->> +  'data': { 'node': 'str', 'dst_name': 'str', 'src_name': 'str' } }
->> +
->>  ##
->>  # @block-dirty-bitmap-add:
->>  #
->> @@ -1850,6 +1864,30 @@
->>      { 'command': 'x-block-dirty-bitmap-disable',
->>        'data': 'BlockDirtyBitmap' }
->>  
->> +##
->> +# @x-block-dirty-bitmap-merge:
->> +#
->> +# Merge @src_name dirty bitmap to @dst_name dirty bitmap. @src_name dirty
->> +# bitmap is unchanged.
->> +#
-> 
-> Can we also extended a promise that @dst_name is unchanged on error?
-> 
+It allows exporting a machine from virt-manager or virsh and importing
+into same with exact same properties. Looking at it will probably give
+you some idea how to configure the VM in another virtualization
+solution.
 
-Absolutely we can.
+Similarly OpenStack can define different hint for OpenStack VMs.=20
 
->> +# Returns: nothing on success
->> +#          If @node is not a valid block device, DeviceNotFound
->> +#          If @dst_name or @src_name is not found, GenericError
->> +#          If bitmaps has different sizes or granularities, GenericError
->> +#
->> +# Since: 3.0
->> +#
->> +# Example:
->> +#
->> +# -> { "execute": "x-block-dirty-bitmap-merge",
->> +#      "arguments": { "node": "drive0", "dst_name": "bitmap0",
->> +#                     "src_name": "bitmap1" } }
->> +# <- { "return": {} }
->> +#
->> +##
->> +      { 'command': 'x-block-dirty-bitmap-merge',
->> +        'data': 'BlockDirtyBitmapMerge' }
->> +
->>  ##
->>  # @BlockDirtyBitmapSha256:
->>  #
->> -- 
->> 2.14.3
->>
->>
-> 
+You are free to equip you appliance with multiple hints if you want it
+to work it on multiple virtualization solutions. It is much more
+efficient than providing multiple appliance images that embed the
+same disk image and different metadata. Virtualization solutions are
+free to implement conversions to ease importing VMs from different
+source, even for something as horrible as OVF.
+
+It is a bit limiting, though.
+
+You cannot make an applicance with multiple disks when the metadata is
+embedded in a disk image.
+
+Thanks
+
+Michal
