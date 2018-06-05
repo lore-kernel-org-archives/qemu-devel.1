@@ -1,30 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45719)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48786)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <konrad.wilk@oracle.com>) id 1fQJgf-0000sO-6T
-	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 17:40:18 -0400
+	(envelope-from <jsnow@redhat.com>) id 1fQJwl-0006SH-GX
+	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 17:56:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <konrad.wilk@oracle.com>) id 1fQJga-0007nW-C9
-	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 17:40:17 -0400
-Received: from userp2120.oracle.com ([156.151.31.85]:45476)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <konrad.wilk@oracle.com>)
-	id 1fQJga-0007lf-1y
-	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 17:40:12 -0400
-Date: Tue, 5 Jun 2018 17:40:06 -0400
-From: Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>
-Message-ID: <20180605214006.GA2172@char.us.oracle.com>
-References: <20180601145921.9500-1-konrad.wilk@oracle.com>
-	<20180601153809.15259-1-konrad.wilk@oracle.com>
-	<20180601153809.15259-2-konrad.wilk@oracle.com>
-	<20180604200701.GB3184@localhost.localdomain>
-	<20180604202205.GH5867@char.us.oracle.com>
-	<20180604211509.GA7451@localhost.localdomain>
+	(envelope-from <jsnow@redhat.com>) id 1fQJwk-0001uW-Dc
+	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 17:56:55 -0400
+References: <20180605185905.4583-1-jsnow@redhat.com>
+	<20180605185905.4583-5-jsnow@redhat.com>
+	<20180605211323.GH11303@localhost.localdomain>
+From: John Snow <jsnow@redhat.com>
+Message-ID: <91b6d48f-e152-602e-1e36-21212ab3e738@redhat.com>
+Date: Tue, 5 Jun 2018 17:56:44 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180604211509.GA7451@localhost.localdomain>
-Subject: Re: [Qemu-devel] [PATCH 1/2] i386: define the AMD 'amd-ssbd' CPUID
- feature bit
+In-Reply-To: <20180605211323.GH11303@localhost.localdomain>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 4/5] qapi: add
+ x-block-dirty-bitmap-merge
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,60 +26,176 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: kvm@vger.kernel.org, qemu-devel@nongnu.org, pbonzini@redhat.com, rth@twiddle.net
+To: Jeff Cody <jcody@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, Fam Zheng <famz@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>, Max Reitz <mreitz@redhat.com>
 
-On Mon, Jun 04, 2018 at 06:15:09PM -0300, Eduardo Habkost wrote:
-> On Mon, Jun 04, 2018 at 04:22:05PM -0400, Konrad Rzeszutek Wilk wrote:
-> > On Mon, Jun 04, 2018 at 05:07:01PM -0300, Eduardo Habkost wrote:
-> > > On Fri, Jun 01, 2018 at 11:38:08AM -0400, Konrad Rzeszutek Wilk wrote:
-> > > > AMD future CPUs expose _two_ ways to utilize the Intel equivalant
-> > > > of the Speculative Store Bypass Disable. The first is via
-> > > > the virtualized VIRT_SPEC CTRL MSR (0xC001_011f) and the second
-> > > > is via the SPEC_CTRL MSR (0x48). The document titled:
-> > > > 124441_AMD64_SpeculativeStoreBypassDisable_Whitepaper_final.pdf
-> > > > 
-> > > > gives priority of SPEC CTRL MSR over the VIRT SPEC CTRL MSR.
-> > > > 
-> > > > A copy of this document is available at
-> > > >       https://bugzilla.kernel.org/show_bug.cgi?id=199889
-> > > > 
-> > > > Anyhow, this means that on future AMD CPUs there will be  _two_ ways to
-> > > > deal with SSBD.
-> > > 
-> > > Does anybody know if there are AMD CPUs where virt-ssbd won't
-> > > work and would require amd-ssbd to mitigate vulnerabilities?
-> > > 
-> > > Also, do we have kernel arch/x86/kvm/cpuid.c patches, already?
-> > 
-> > Not yet. They are being discussed right now. I figured I would send
-> > these patches out as a 'Hey, coming at you!', but failed to change
-> > the title to be 'RFC'.
-> 
-> OK.  I was queueing them on x86-next, but I'm going drop them by
-> now.
-> 
-> 
-> > 
-> > > I prefer to add new CPUID flag names only after the flag name is
-> > > already agreed upon on the kernel side.
-> > 
-> > Of course. I will respin once that discussion has calmed down.
-> 
-> Thanks!
-> 
-> BTW, it looks like the patch on LKML[1] will make bit 26 appear
-> on /proc/cpuinfo as "amd_ssb_no", is that correct?  If that's the
-> case, I'd prefer to make the QEMU flag to match the name used by
-> Linux, and be called "amd-ssb-no" (which sounds weird to me, but
-> at least it will be consistent with /proc/cpuinfo).
 
-The "" in the comment section makes sure to hide it. That is only
-CPU features without the "" are exposed in /proc/cpuinfo
 
-You got me worried there for a minute :-)
+On 06/05/2018 05:13 PM, Jeff Cody wrote:
+> On Tue, Jun 05, 2018 at 02:59:04PM -0400, John Snow wrote:
+>> From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+>>
+>> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+>> Signed-off-by: John Snow <jsnow@redhat.com>
+>> ---
+>>  block/dirty-bitmap.c         | 18 ++++++++++++++++++
+>>  blockdev.c                   | 30 ++++++++++++++++++++++++++++++
+>>  include/block/dirty-bitmap.h |  3 ++-
+>>  qapi/block-core.json         | 38 ++++++++++++++++++++++++++++++++++++++
+>>  4 files changed, 88 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/block/dirty-bitmap.c b/block/dirty-bitmap.c
+>> index 56234257f4..4159d3929e 100644
+>> --- a/block/dirty-bitmap.c
+>> +++ b/block/dirty-bitmap.c
+>> @@ -757,3 +757,21 @@ int64_t bdrv_dirty_bitmap_next_zero(BdrvDirtyBitmap *bitmap, uint64_t offset)
+>>  {
+>>      return hbitmap_next_zero(bitmap->bitmap, offset);
+>>  }
+>> +
+>> +void bdrv_merge_dirty_bitmap(BdrvDirtyBitmap *dest, const BdrvDirtyBitmap *src,
+>> +                             Error **errp)
+>> +{
+>> +    /* only bitmaps from one bds are supported */
+>> +    assert(dest->mutex == src->mutex);
+>> +
+>> +    qemu_mutex_lock(dest->mutex);
+>> +
+>> +    assert(bdrv_dirty_bitmap_enabled(dest));
+>> +    assert(!bdrv_dirty_bitmap_readonly(dest));
+>> +
+>> +    if (!hbitmap_merge(dest->bitmap, src->bitmap)) {
+>> +        error_setg(errp, "Bitmaps are incompatible and can't be merged");
+>> +    }
+>> +
+>> +    qemu_mutex_unlock(dest->mutex);
+>> +}
+>> diff --git a/blockdev.c b/blockdev.c
+>> index 33bfe4817f..b00908fdfd 100644
+>> --- a/blockdev.c
+>> +++ b/blockdev.c
+>> @@ -3044,6 +3044,36 @@ void qmp_x_block_dirty_bitmap_disable(const char *node, const char *name,
+>>      bdrv_disable_dirty_bitmap(bitmap);
+>>  }
+>>  
+>> +void qmp_x_block_dirty_bitmap_merge(const char *node, const char *dst_name,
+>> +                                    const char *src_name, Error **errp)
+>> +{
+>> +    BlockDriverState *bs;
+>> +    BdrvDirtyBitmap *dst, *src;
+>> +
+>> +    dst = block_dirty_bitmap_lookup(node, dst_name, &bs, errp);
+>> +    if (!dst || !bs) {
 > 
-> [1] https://patchwork.kernel.org/patch/10443689/
+> !bs check should be dropped, as it doesn't do anything, since
+> block_dirty_bitmap_lookup() cannot return a NULL BlockDriverState.
 > 
-> -- 
-> Eduardo
+
+Oh, makes sense.
+
+>> +        return;
+>> +    }
+>> +
+>> +    if (bdrv_dirty_bitmap_frozen(dst)) {
+>> +        error_setg(errp, "Bitmap '%s' is frozen and cannot be modified",
+>> +                   dst_name);
+>> +        return;
+>> +    } else if (bdrv_dirty_bitmap_readonly(dst)) {
+>> +        error_setg(errp, "Bitmap '%s' is readonly and cannot be modified",
+>> +                   dst_name);
+>> +        return;
+>> +    }
+>> +
+>> +    src = bdrv_find_dirty_bitmap(bs, src_name);
+>> +    if (!src) {
+>> +        error_setg(errp, "Dirty bitmap '%s' not found", src_name);
+>> +        return;
+>> +    }
+>> +
+>> +    bdrv_merge_dirty_bitmap(dst, src, errp);
+>> +}
+>> +
+>>  BlockDirtyBitmapSha256 *qmp_x_debug_block_dirty_bitmap_sha256(const char *node,
+>>                                                                const char *name,
+>>                                                                Error **errp)
+>> diff --git a/include/block/dirty-bitmap.h b/include/block/dirty-bitmap.h
+>> index 1ff8949b1b..1e14743032 100644
+>> --- a/include/block/dirty-bitmap.h
+>> +++ b/include/block/dirty-bitmap.h
+>> @@ -70,7 +70,8 @@ void bdrv_dirty_bitmap_set_readonly(BdrvDirtyBitmap *bitmap, bool value);
+>>  void bdrv_dirty_bitmap_set_persistance(BdrvDirtyBitmap *bitmap,
+>>                                         bool persistent);
+>>  void bdrv_dirty_bitmap_set_qmp_locked(BdrvDirtyBitmap *bitmap, bool qmp_locked);
+>> -
+>> +void bdrv_merge_dirty_bitmap(BdrvDirtyBitmap *dest, const BdrvDirtyBitmap *src,
+>> +                             Error **errp);
+>>  
+>>  /* Functions that require manual locking.  */
+>>  void bdrv_dirty_bitmap_lock(BdrvDirtyBitmap *bitmap);
+>> diff --git a/qapi/block-core.json b/qapi/block-core.json
+>> index c061884a0e..3999175c23 100644
+>> --- a/qapi/block-core.json
+>> +++ b/qapi/block-core.json
+>> @@ -1740,6 +1740,20 @@
+>>    'data': { 'node': 'str', 'name': 'str', '*granularity': 'uint32',
+>>              '*persistent': 'bool', '*autoload': 'bool' } }
+>>  
+>> +##
+>> +# @BlockDirtyBitmapMerge:
+>> +#
+>> +# @node: name of device/node which the bitmap is tracking
+>> +#
+>> +# @dst_name: name of the destination dirty bitmap
+>> +#
+>> +# @src_name: name of the source dirty bitmap
+>> +#
+>> +# Since: 3.0
+>> +##
+>> +{ 'struct': 'BlockDirtyBitmapMerge',
+>> +  'data': { 'node': 'str', 'dst_name': 'str', 'src_name': 'str' } }
+>> +
+>>  ##
+>>  # @block-dirty-bitmap-add:
+>>  #
+>> @@ -1850,6 +1864,30 @@
+>>      { 'command': 'x-block-dirty-bitmap-disable',
+>>        'data': 'BlockDirtyBitmap' }
+>>  
+>> +##
+>> +# @x-block-dirty-bitmap-merge:
+>> +#
+>> +# Merge @src_name dirty bitmap to @dst_name dirty bitmap. @src_name dirty
+>> +# bitmap is unchanged.
+>> +#
+> 
+> Can we also extended a promise that @dst_name is unchanged on error?
+> 
+
+Absolutely we can.
+
+>> +# Returns: nothing on success
+>> +#          If @node is not a valid block device, DeviceNotFound
+>> +#          If @dst_name or @src_name is not found, GenericError
+>> +#          If bitmaps has different sizes or granularities, GenericError
+>> +#
+>> +# Since: 3.0
+>> +#
+>> +# Example:
+>> +#
+>> +# -> { "execute": "x-block-dirty-bitmap-merge",
+>> +#      "arguments": { "node": "drive0", "dst_name": "bitmap0",
+>> +#                     "src_name": "bitmap1" } }
+>> +# <- { "return": {} }
+>> +#
+>> +##
+>> +      { 'command': 'x-block-dirty-bitmap-merge',
+>> +        'data': 'BlockDirtyBitmapMerge' }
+>> +
+>>  ##
+>>  # @BlockDirtyBitmapSha256:
+>>  #
+>> -- 
+>> 2.14.3
+>>
+>>
+> 
