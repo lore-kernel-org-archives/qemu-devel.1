@@ -1,29 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60687)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34430)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dan.j.williams@intel.com>) id 1fQGU6-00031j-F2
-	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 14:15:07 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1fQGie-0007zG-Ln
+	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 14:30:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dan.j.williams@intel.com>) id 1fQGU5-0004cr-BW
-	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 14:15:06 -0400
-Received: from mail-oi0-x242.google.com ([2607:f8b0:4003:c06::242]:44107)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <dan.j.williams@intel.com>)
-	id 1fQGU5-0004Xx-4G
-	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 14:15:05 -0400
-Received: by mail-oi0-x242.google.com with SMTP id c128-v6so2954010oig.11
-	for <qemu-devel@nongnu.org>; Tue, 05 Jun 2018 11:15:01 -0700 (PDT)
+	(envelope-from <ehabkost@redhat.com>) id 1fQGib-0004Sm-Fs
+	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 14:30:08 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:54062)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1fQGib-0004RD-1o
+	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 14:30:05 -0400
+Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.phx2.redhat.com
+	[10.5.11.24])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id ABA7181DF4
+	for <qemu-devel@nongnu.org>; Tue,  5 Jun 2018 18:30:03 +0000 (UTC)
+Date: Tue, 5 Jun 2018 15:30:01 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20180605183001.GO7451@localhost.localdomain>
+References: <1528207243-268226-1-git-send-email-imammedo@redhat.com>
+	<1528207243-268226-3-git-send-email-imammedo@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20180605164205.GA21034@linux.intel.com>
-References: <20180521163203.26590-1-ross.zwisler@linux.intel.com>
-	<20180521163203.26590-4-ross.zwisler@linux.intel.com>
-	<20180605182243-mutt-send-email-mst@kernel.org>
-	<20180605164205.GA21034@linux.intel.com>
-From: Dan Williams <dan.j.williams@intel.com>
-Date: Tue, 5 Jun 2018 11:15:00 -0700
-Message-ID: <CAPcyv4jSoFifTc05WGgxkEX6i7b12zYyB+VchJVW_+QPQzO7Fg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [qemu PATCH v4 3/4] nvdimm,
- acpi: support NFIT platform capabilities
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <1528207243-268226-3-git-send-email-imammedo@redhat.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v3 2/2] vl: fix use of --daemonize with
+ --preconfig
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,52 +35,101 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Ross Zwisler <ross.zwisler@linux.intel.com>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, linux-nvdimm <linux-nvdimm@lists.01.org>, Qemu Developers <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>, Igor Mammedov <imammedo@redhat.com>
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: qemu-devel@nongnu.org, berrange@redhat.com, mreitz@redhat.com, pbonzini@redhat.com, ldoktor@redhat.com
 
-On Tue, Jun 5, 2018 at 9:42 AM, Ross Zwisler
-<ross.zwisler@linux.intel.com> wrote:
-> On Tue, Jun 05, 2018 at 06:25:27PM +0300, Michael S. Tsirkin wrote:
->> On Mon, May 21, 2018 at 10:32:02AM -0600, Ross Zwisler wrote:
->> > Add a machine command line option to allow the user to control the Platform
->> > Capabilities Structure in the virtualized NFIT.  This Platform Capabilities
->> > Structure was added in ACPI 6.2 Errata A.
->> >
->> > Signed-off-by: Ross Zwisler <ross.zwisler@linux.intel.com>
->>
->> I tried playing with it and encoding the capabilities is
->> quite awkward.
->>
->> Can we add bits for specific capabilities instead of nvdimm-cap?
->>
->> How about:
->>
->> "cpu-flush-on-power-loss-cap"
->> "memory-flush-on-power-loss-cap"
->> "byte-addressable-mirroring-cap"
->
-> Hmmm...I don't like that as much because:
->
-> a) It's very verbose.  Looking at my current qemu command line few other
->    options require that many characters, and you'd commonly be defining more
->    than one of these for a given VM.
->
-> b) It means that the QEMU will need to be updated if/when new flags are added,
->    because we'll have to have new options for each flag.  The current
->    implementation is more future-proof because you can specify any flags
->    value you want.
->
-> However, if you feel strongly about this, I'll make the change.
+On Tue, Jun 05, 2018 at 04:00:43PM +0200, Igor Mammedov wrote:
+> When using --daemonize, the initial lead process will fork a child and
+> then wait to be notified that setup is complete via a pipe, before it
+> exits.  When using --preconfig there is an extra call to main_loop()
+> before the notification is done from os_setup_post(). Thus the parent
+> process won't exit until the mgmt application connects to the monitor
+> and tells QEMU to leave the RUN_STATE_PRECONFIG. The mgmt application
+> won't connect to the monitor until daemonizing has completed though.
+>=20
+> This is a chicken and egg problem, leading to deadlock at startup.
+>=20
+> The only viable way to fix this is to call os_setup_post() before
+> the early main_loop_wait() call when in RUN_STATE_PRECONFIG. This has
+> the downside that any errors from this point onwards won't be handled
+> well by the mgmt application, because it will think QEMU has started
+> successfully, so not be expecting an abrupt exit. The only way to
+> deal with that is to move as much user input validation as possible
+> to before the main_loop() call. This is left as an exercise for
+> future interested developers.
+>=20
+> Based on:
+>   From: Daniel P. Berrang=E9 <berrange@redhat.com>
+>   Subject: [PATCH v2 2/2] vl: fix use of --daemonize with --preconfig
+>   Message-Id: <20180604120345.12955-3-berrange@redhat.com>
+>=20
+> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+> ---
+> v3:
+>   - rewrite to apply on top of 1/2
+> ---
+>  os-posix.c | 6 ++++++
+>  vl.c       | 2 +-
+>  2 files changed, 7 insertions(+), 1 deletion(-)
+>=20
+> diff --git a/os-posix.c b/os-posix.c
+> index 9ce6f74..ee06a8d 100644
+> --- a/os-posix.c
+> +++ b/os-posix.c
+> @@ -309,8 +309,14 @@ void os_daemonize(void)
+> =20
+>  void os_setup_post(void)
+>  {
+> +    static bool os_setup_post_done =3D false;
+>      int fd =3D 0;
+> =20
+> +    if (os_setup_post_done) {
+> +        return;
+> +    }
+> +    os_setup_post_done =3D true;
+> +
 
-Straw-man: Could we do something similar with what we are doing in ndctl?
+This part is nice because it allows the os_setup_post() call in
+the second main loop to be unconditional, but:
 
-enum ndctl_persistence_domain {
-        PERSISTENCE_NONE = 0,
-        PERSISTENCE_MEM_CTRL = 10,
-        PERSISTENCE_CPU_CACHE = 20,
-        PERSISTENCE_UNKNOWN = INT_MAX,
-};
+>      if (daemonize) {
+>          if (chdir("/")) {
+>              error_report("not able to chdir to /: %s", strerror(errno)=
+);
+> diff --git a/vl.c b/vl.c
+> index fa44138..d6fa67f 100644
+> --- a/vl.c
+> +++ b/vl.c
+> @@ -1960,6 +1960,7 @@ static void main_loop(void)
+>  #ifdef CONFIG_PROFILER
+>          ti =3D profile_getclock();
+>  #endif
+> +        os_setup_post();
+>          main_loop_wait(false);
 
-...and have the command line take a number where "10" and "20" are
-supported today, but allows us to adapt to new persistence domains in
-the future.
+Ensuring the correctness of this os_setup_post() call depends on
+reading the whole body of main_loop_should_exit(), which is a
+complex and large function.  I think this is too fragile for my
+taste.
+
+I prefer Daniel's approach where we have two
+os_setup_post()/main_loop() call sites, and the first one is
+conditional on --preconfig.
+
+
+>  #ifdef CONFIG_PROFILER
+>          dev_time +=3D profile_getclock() - ti;
+> @@ -4707,7 +4708,6 @@ int main(int argc, char **argv, char **envp)
+>      }
+> =20
+>      accel_setup_post(current_machine);
+> -    os_setup_post();
+> =20
+>      main_loop();
+> =20
+> --=20
+> 2.7.4
+>=20
+
+--=20
+Eduardo
