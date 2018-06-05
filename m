@@ -1,18 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50837)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52237)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1fQHvq-0003pU-Ki
-	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 15:47:52 -0400
+	(envelope-from <eblake@redhat.com>) id 1fQI24-0007FC-CL
+	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 15:54:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1fQHvn-000178-J8
-	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 15:47:50 -0400
-Received: from mout.kundenserver.de ([212.227.126.187]:55971)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1fQHvn-00015x-8B
-	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 15:47:47 -0400
-From: Laurent Vivier <laurent@vivier.eu>
-Date: Tue,  5 Jun 2018 21:47:25 +0200
-Message-Id: <20180605194725.8585-1-laurent@vivier.eu>
-Subject: [Qemu-devel] [PATCH] qemu-binfmt-conf.sh: ignore the OS/ABI field
+	(envelope-from <eblake@redhat.com>) id 1fQI23-0004Xs-Hm
+	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 15:54:16 -0400
+References: <20180524113251.GB4660@redhat.com>
+	<d9bb2cb9-d9dc-8fe0-a767-10d9cbbab803@redhat.com>
+	<20180528183058.GG2209@redhat.com>
+	<20180528183833.GJ4580@localhost.localdomain>
+	<20180528212054.GH2209@redhat.com> <20180528212510.GC4660@redhat.com>
+	<20180529064415.GA4756@localhost.localdomain>
+	<2b3eef00-f326-c1e6-0e4b-b7602646eec4@redhat.com>
+	<20180605092159.GA2544@work-vm>
+	<20180605190324.GA11372@localhost.localdomain>
+	<20180605223934-mutt-send-email-mst@kernel.org>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <a9fdbe0f-2c39-7da3-11f2-6752b74cce08@redhat.com>
+Date: Tue, 5 Jun 2018 14:54:07 -0500
+MIME-Version: 1.0
+In-Reply-To: <20180605223934-mutt-send-email-mst@kernel.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [Qemu-block] storing machine data in qcow images?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,85 +32,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Laurent Vivier <laurent@vivier.eu>, Riku Voipio <riku.voipio@iki.fi>
+To: "Michael S. Tsirkin" <mst@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org, "Richard W.M. Jones" <rjones@redhat.com>, stefanha@redhat.com, Max Reitz <mreitz@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-Most of the binaries have a value of "UNIX - System V" for the OS/ABI.
+On 06/05/2018 02:47 PM, Michael S. Tsirkin wrote:
 
-But cc1 has a value of "UNIX - GNU", and if we don't update the binfmt
-mask to ignore the OS/ABI field, gcc fails to execute it:
+>>> Layer 1:
+>>>     The string shall always be a JSON 'object'; i.e. of the form
+>>>      { "something": ... , "more": ... }
+>>>
+>>>     The key strings shall be non-null and non-empty and shall
+>>>     be unique.
 
-gcc: error trying to exec '/usr/lib/gcc/m68k-linux-gnu/7/cc1': execv: Exec format error
+>>
+>> I think it would be simpler if layer 0 simply provided a list of
+>> names/value pairs, where names are ascii strings, and values are
+>> binary data[1].  It would make layer 1 unnecessary, and allow (3)
+>> and (4) to happen.
+>>
+>> [1] In other words, Rich's proposal of "named blobs":
+>> https://www.mail-archive.com/qemu-block@nongnu.org/msg37856.html
+> 
+> I think simple is beautiful, too. But assuming they
+> really are binary how are blobs encoded?
+> Did binary really mean UTF-8 here?
 
-Signed-off-by: Laurent Vivier <laurent@vivier.eu>
----
- scripts/qemu-binfmt-conf.sh | 18 +++++++++---------
- 1 file changed, 9 insertions(+), 9 deletions(-)
+Binary blobs can always be base64 encoded for representation within a 
+valid JSON UTF-8 string (and we already have several QMP interfaces that 
+utilize base64 encoding to pass through what is otherwise invalid 
+UTF-8).  It does inflate things slightly compared to a format that 
+allows a raw length coupled with raw data, but that is not necessarily a 
+problem.
 
-diff --git a/scripts/qemu-binfmt-conf.sh b/scripts/qemu-binfmt-conf.sh
-index 7ab7435fbd..d7eefda0b8 100755
---- a/scripts/qemu-binfmt-conf.sh
-+++ b/scripts/qemu-binfmt-conf.sh
-@@ -7,15 +7,15 @@ mips mipsel mipsn32 mipsn32el mips64 mips64el \
- sh4 sh4eb s390x aarch64 aarch64_be hppa riscv32 riscv64 xtensa xtensaeb microblaze microblazeel"
- 
- i386_magic='\x7fELF\x01\x01\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x02\x00\x03\x00'
--i386_mask='\xff\xff\xff\xff\xff\xfe\xfe\xff\xff\xff\xff\xff\xff\xff\xff\xff\xfe\xff\xff\xff'
-+i386_mask='\xff\xff\xff\xff\xff\xfe\xfe\x00\xff\xff\xff\xff\xff\xff\xff\xff\xfe\xff\xff\xff'
- i386_family=i386
- 
- i486_magic='\x7fELF\x01\x01\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x02\x00\x06\x00'
--i486_mask='\xff\xff\xff\xff\xff\xfe\xfe\xff\xff\xff\xff\xff\xff\xff\xff\xff\xfe\xff\xff\xff'
-+i486_mask='\xff\xff\xff\xff\xff\xfe\xfe\x00\xff\xff\xff\xff\xff\xff\xff\xff\xfe\xff\xff\xff'
- i486_family=i386
- 
- alpha_magic='\x7fELF\x02\x01\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x02\x00\x26\x90'
--alpha_mask='\xff\xff\xff\xff\xff\xfe\xfe\xff\xff\xff\xff\xff\xff\xff\xff\xff\xfe\xff\xff\xff'
-+alpha_mask='\xff\xff\xff\xff\xff\xfe\xfe\x00\xff\xff\xff\xff\xff\xff\xff\xff\xfe\xff\xff\xff'
- alpha_family=alpha
- 
- arm_magic='\x7fELF\x01\x01\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x02\x00\x28\x00'
-@@ -27,11 +27,11 @@ armeb_mask='\xff\xff\xff\xff\xff\xff\xff\x00\xff\xff\xff\xff\xff\xff\xff\xff\xff
- armeb_family=armeb
- 
- sparc_magic='\x7fELF\x01\x02\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x02\x00\x02'
--sparc_mask='\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xfe\xff\xff'
-+sparc_mask='\xff\xff\xff\xff\xff\xff\xff\x00\xff\xff\xff\xff\xff\xff\xff\xff\xff\xfe\xff\xff'
- sparc_family=sparc
- 
- sparc32plus_magic='\x7fELF\x01\x02\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x02\x00\x12'
--sparc32plus_mask='\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xfe\xff\xff'
-+sparc32plus_mask='\xff\xff\xff\xff\xff\xff\xff\x00\xff\xff\xff\xff\xff\xff\xff\xff\xff\xfe\xff\xff'
- sparc32plus_family=sparc
- 
- ppc_magic='\x7fELF\x01\x02\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x02\x00\x14'
-@@ -47,7 +47,7 @@ ppc64le_mask='\xff\xff\xff\xff\xff\xff\xff\x00\xff\xff\xff\xff\xff\xff\xff\xff\x
- ppc64le_family=ppcle
- 
- m68k_magic='\x7fELF\x01\x02\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x02\x00\x04'
--m68k_mask='\xff\xff\xff\xff\xff\xff\xfe\xfe\xff\xff\xff\xff\xff\xff\xff\xff\xff\xfe\xff\xff'
-+m68k_mask='\xff\xff\xff\xff\xff\xff\xfe\x00\xff\xff\xff\xff\xff\xff\xff\xff\xff\xfe\xff\xff'
- m68k_family=m68k
- 
- # FIXME: We could use the other endianness on a MIPS host.
-@@ -77,15 +77,15 @@ mips64el_mask='\xff\xff\xff\xff\xff\xff\xff\x00\xff\xff\xff\xff\xff\xff\xff\xff\
- mips64el_family=mips
- 
- sh4_magic='\x7fELF\x01\x01\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x02\x00\x2a\x00'
--sh4_mask='\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xfe\xff\xff\xff'
-+sh4_mask='\xff\xff\xff\xff\xff\xff\xff\x00\xff\xff\xff\xff\xff\xff\xff\xff\xfe\xff\xff\xff'
- sh4_family=sh4
- 
- sh4eb_magic='\x7fELF\x01\x02\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x02\x00\x2a'
--sh4eb_mask='\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xfe\xff\xff'
-+sh4eb_mask='\xff\xff\xff\xff\xff\xff\xff\x00\xff\xff\xff\xff\xff\xff\xff\xff\xff\xfe\xff\xff'
- sh4eb_family=sh4
- 
- s390x_magic='\x7fELF\x02\x02\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x02\x00\x16'
--s390x_mask='\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xfe\xff\xff'
-+s390x_mask='\xff\xff\xff\xff\xff\xff\xff\x00\xff\xff\xff\xff\xff\xff\xff\xff\xff\xfe\xff\xff'
- s390x_family=s390x
- 
- aarch64_magic='\x7fELF\x02\x01\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x02\x00\xb7\x00'
 -- 
-2.14.4
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
