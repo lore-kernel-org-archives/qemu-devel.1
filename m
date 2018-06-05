@@ -1,31 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56509)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35644)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Thomas.Lendacky@amd.com>) id 1fQC42-0007rp-C0
-	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 09:31:55 -0400
+	(envelope-from <elohimes@gmail.com>) id 1fQCUj-0007pj-J3
+	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 09:59:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <Thomas.Lendacky@amd.com>) id 1fQC3x-0004dj-FO
-	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 09:31:54 -0400
-Received: from mail-sn1nam01on0079.outbound.protection.outlook.com
-	([104.47.32.79]:10656
-	helo=NAM01-SN1-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <Thomas.Lendacky@amd.com>)
-	id 1fQC3x-0004d5-3C
-	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 09:31:49 -0400
-References: <20180601145921.9500-1-konrad.wilk@oracle.com>
-	<20180601153809.15259-1-konrad.wilk@oracle.com>
-	<20180601153809.15259-2-konrad.wilk@oracle.com>
-	<20180604200701.GB3184@localhost.localdomain>
-From: Tom Lendacky <thomas.lendacky@amd.com>
-Message-ID: <caa3376a-252b-0a85-1a63-d2a6a911739c@amd.com>
-Date: Tue, 5 Jun 2018 08:31:41 -0500
-MIME-Version: 1.0
-In-Reply-To: <20180604200701.GB3184@localhost.localdomain>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 1/2] i386: define the AMD 'amd-ssbd' CPUID
- feature bit
+	(envelope-from <elohimes@gmail.com>) id 1fQCUe-0001W8-8i
+	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 09:59:29 -0400
+Received: from mail-pg0-x243.google.com ([2607:f8b0:400e:c05::243]:36866)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <elohimes@gmail.com>) id 1fQCUe-0001Vk-2G
+	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 09:59:24 -0400
+Received: by mail-pg0-x243.google.com with SMTP id r21-v6so946183pgv.4
+	for <qemu-devel@nongnu.org>; Tue, 05 Jun 2018 06:59:23 -0700 (PDT)
+From: Yongji Xie <elohimes@gmail.com>
+Date: Tue,  5 Jun 2018 21:56:10 +0800
+Message-Id: <1528206970-4815-1-git-send-email-xieyongji@baidu.com>
+Subject: [Qemu-devel] [PATCH] vhost-user-blk: start vhost when guest kicks
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,65 +23,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>, Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>
-Cc: kvm@vger.kernel.org, qemu-devel@nongnu.org, pbonzini@redhat.com, rth@twiddle.net
+To: mst@redhat.com, stefanha@redhat.com, changpeng.liu@intel.com
+Cc: qemu-devel@nongnu.org, chaiwen@baidu.com, nixun@baidu.com, elohimes@gmail.com
 
-On 6/4/2018 3:07 PM, Eduardo Habkost wrote:
-> On Fri, Jun 01, 2018 at 11:38:08AM -0400, Konrad Rzeszutek Wilk wrote:
->> AMD future CPUs expose _two_ ways to utilize the Intel equivalant
->> of the Speculative Store Bypass Disable. The first is via
->> the virtualized VIRT_SPEC CTRL MSR (0xC001_011f) and the second
->> is via the SPEC_CTRL MSR (0x48). The document titled:
->> 124441_AMD64_SpeculativeStoreBypassDisable_Whitepaper_final.pdf
->>
->> gives priority of SPEC CTRL MSR over the VIRT SPEC CTRL MSR.
->>
->> A copy of this document is available at
->>       https://bugzilla.kernel.org/show_bug.cgi?id=199889
->>
->> Anyhow, this means that on future AMD CPUs there will be  _two_ ways to
->> deal with SSBD.
-> 
-> Does anybody know if there are AMD CPUs where virt-ssbd won't
-> work and would require amd-ssbd to mitigate vulnerabilities?
+Some old guests (before commit 7a11370e5: "virtio_blk: enable VQs early")
+kick virtqueue before setting VIRTIO_CONFIG_S_DRIVER_OK. This would cause
+that those old guests fail to boot with vhost-user-blk device.
 
-The idea behind virt-ssbd was to provide an architectural method for
-a guest to do SSBD when amd-ssbd isn't present.  The amd-ssbd feature
-will use SPEC_CTRL which is intended to not be intercepted and
-will be fast.  The use of virt-ssbd will always be intercepted and
-therefore will not be as fast.  So a guest should be presented with
-amd-ssbd, if available, in preference to virt-ssbd.
+To fix it, start vhost when guest kicks instead of waiting for .set_status().
 
-Thanks,
-Tom
+Signed-off-by: Yongji Xie <xieyongji@baidu.com>
+Signed-off-by: Chai Wen <chaiwen@baidu.com>
+Signed-off-by: Ni Xun <nixun@baidu.com>
+---
+ hw/block/vhost-user-blk.c |   20 ++++++++++++++++++++
+ 1 file changed, 20 insertions(+)
 
-> 
-> Also, do we have kernel arch/x86/kvm/cpuid.c patches, already?
-> I prefer to add new CPUID flag names only after the flag name is
-> already agreed upon on the kernel side.
-> 
-> 
->>
->> Signed-off-by: Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>
->> ---
->>  target/i386/cpu.c | 2 +-
->>  1 file changed, 1 insertion(+), 1 deletion(-)
->>
->> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
->> index 52d334a..f91990c 100644
->> --- a/target/i386/cpu.c
->> +++ b/target/i386/cpu.c
->> @@ -490,7 +490,7 @@ static FeatureWordInfo feature_word_info[FEATURE_WORDS] = {
->>              "ibpb", NULL, NULL, NULL,
->>              NULL, NULL, NULL, NULL,
->>              NULL, NULL, NULL, NULL,
->> -            NULL, "virt-ssbd", NULL, NULL,
->> +            "amd-ssbd", "virt-ssbd", NULL, NULL,
->>              NULL, NULL, NULL, NULL,
->>          },
->>          .cpuid_eax = 0x80000008,
->> -- 
->> 1.8.3.1
->>
->>
-> 
+diff --git a/hw/block/vhost-user-blk.c b/hw/block/vhost-user-blk.c
+index d755223..8fd0e6f 100644
+--- a/hw/block/vhost-user-blk.c
++++ b/hw/block/vhost-user-blk.c
+@@ -217,7 +217,27 @@ static uint64_t vhost_user_blk_get_features(VirtIODevice *vdev,
+ 
+ static void vhost_user_blk_handle_output(VirtIODevice *vdev, VirtQueue *vq)
+ {
++    VHostUserBlk *s = VHOST_USER_BLK(vdev);
++    int i;
+ 
++    if (s->dev.started) {
++        return;
++    }
++
++    /* Some guests kick before setting VIRTIO_CONFIG_S_DRIVER_OK so start
++     * vhost here instead of waiting for .set_status().
++     */
++    vhost_user_blk_start(vdev);
++
++    /* Kick right away to begin processing requests already in vring */
++    for (i = 0; i < s->dev.nvqs; i++) {
++        VirtQueue *kick_vq = virtio_get_queue(vdev, i);
++
++        if (!virtio_queue_get_desc_addr(vdev, i)) {
++            continue;
++        }
++        event_notifier_set(virtio_queue_get_host_notifier(kick_vq));
++    }
+ }
+ 
+ static void vhost_user_blk_device_realize(DeviceState *dev, Error **errp)
+-- 
+1.7.9.5
