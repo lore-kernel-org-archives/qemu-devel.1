@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33624)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35227)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1fQ8Hn-0002uS-A3
-	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 05:29:52 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1fQ8QJ-00054O-Ht
+	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 05:38:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1fQ8Hk-00025C-0d
-	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 05:29:51 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:57716 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1fQ8Hj-00023f-QF
-	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 05:29:47 -0400
-Date: Tue, 5 Jun 2018 10:29:37 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20180605092937.GK32286@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <20180605091508.14129-1-aik@ozlabs.ru>
+	(envelope-from <peter.maydell@linaro.org>) id 1fQ8QI-0005ui-Gd
+	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 05:38:39 -0400
+Received: from mail-ot0-x235.google.com ([2607:f8b0:4003:c0f::235]:35897)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1fQ8QI-0005uT-Aa
+	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 05:38:38 -0400
+Received: by mail-ot0-x235.google.com with SMTP id m11-v6so2012934otf.3
+	for <qemu-devel@nongnu.org>; Tue, 05 Jun 2018 02:38:38 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20180605091508.14129-1-aik@ozlabs.ru>
-Subject: Re: [Qemu-devel] [RFC PATCH qemu] qdev: Use "string" for QOM string
- properties
+In-Reply-To: <20180604112036.2715-1-stefanha@redhat.com>
+References: <20180604112036.2715-1-stefanha@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 5 Jun 2018 10:38:17 +0100
+Message-ID: <CAFEAcA8UGhob5NMUkLkqyWMMXXj3C4aK27gXze9q518hgTtaAg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL 00/11] Block patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,101 +28,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alexey Kardashevskiy <aik@ozlabs.ru>
-Cc: qemu-devel@nongnu.org, armbru@redhat.com
+To: Stefan Hajnoczi <stefanha@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Ronnie Sahlberg <ronniesahlberg@gmail.com>, Qemu-block <qemu-block@nongnu.org>, Peter Lieven <pl@kamp.de>, Max Reitz <mreitz@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Fam Zheng <famz@redhat.com>
 
-On Tue, Jun 05, 2018 at 07:15:08PM +1000, Alexey Kardashevskiy wrote:
-> For QOM properties QEMU uses "string", for example:
-> 
-> {"execute": "qom-list", "arguments": {"path": "/machine"}}
-> [{'return': [{'type': 'string', 'name': 'append'},  {'type': 'string', 'name': 'kernel'}]
-> 
-> However for the device properties copied from DEVICE_CLASS(class)->props,
-> "str" is used for a type (vnet0 is "-device virtio-net-pci,id=vnet0"):
-> 
-> {"execute": "qom-list", "arguments": {"path": "/machine/peripheral/vnet0"}}
-> ret=[{'return': [{'name': 'tx', 'type': 'str'}]
-> 
-> This changes string type when adding them to QOM property list so
-> we get one string type in QMP.
-> 
-> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
-> ---
-> 
-> Not a huge improvement and might actually break something but since
-> I got that far I decided to post this anyway :)
-> 
-> The alternatives are: 1) do nothing 2) do this:
-> 
->  const PropertyInfo qdev_prop_string = {
-> -    .name  = "str",
-> +    .name  = "string",
->      .release = release_string,
->      .get   = get_string,
->      .set   = set_string,
->  };
+On 4 June 2018 at 12:20, Stefan Hajnoczi <stefanha@redhat.com> wrote:
+> The following changes since commit c25e8bba1f546ea72744ccfab77f8a9e8a323be8:
+>
+>   Merge remote-tracking branch 'remotes/otubo/tags/pull-seccomp-20180601' into staging (2018-06-01 13:11:30 +0100)
+>
+> are available in the Git repository at:
+>
+>   git://github.com/stefanha/qemu.git tags/block-pull-request
+>
+> for you to fetch changes up to 21891a5a3011608845b5d7f1f9cce60cdc2bcc62:
+>
+>   main-loop: drop spin_counter (2018-06-01 16:01:29 +0100)
+>
+> ----------------------------------------------------------------
+> Pull request
+>
+>  * Copy offloading for qemu-img convert (iSCSI, raw, and qcow2)
+>
+>    If the underlying storage supports copy offloading, qemu-img convert will
+>    use it instead of performing reads and writes.  This avoids data transfers
+>    and thus frees up storage bandwidth for other purposes.  SCSI EXTENDED COPY
+>    and Linux copy_file_range(2) are used to implement this optimization.
+>
+>  * Drop spurious "WARNING: I\/O thread spun for 1000 iterations" warning
+>
+> ----------------------------------------------------------------
 
-As further points of reference:
 
- - object_property_add_str & object_class_property_add_str
-   both use "string".
-   
- - QAPI schema uses "str"
+Applied, thanks.
 
-So the inconsistency is even bigger than just qdev. I'm inclined
-to say "QAPI schema" is the canonical source of truth, and so
-every use of "string" should change to "str".
-
-CC'd Markus for 2nd opinion.
-
-> 
-> 
-> ---
->  hw/core/qdev.c | 9 +++++++--
->  1 file changed, 7 insertions(+), 2 deletions(-)
-> 
-> diff --git a/hw/core/qdev.c b/hw/core/qdev.c
-> index f6f9247..2895693 100644
-> --- a/hw/core/qdev.c
-> +++ b/hw/core/qdev.c
-> @@ -687,7 +687,7 @@ static void qdev_property_add_legacy(DeviceState *dev, Property *prop,
->      }
->  
->      name = g_strdup_printf("legacy-%s", prop->name);
-> -    object_property_add(OBJECT(dev), name, "str",
-> +    object_property_add(OBJECT(dev), name, "string",
->                          prop->info->print ? qdev_get_legacy_property : prop->info->get,
->                          NULL,
->                          NULL,
-> @@ -711,6 +711,7 @@ void qdev_property_add_static(DeviceState *dev, Property *prop,
->  {
->      Error *local_err = NULL;
->      Object *obj = OBJECT(dev);
-> +    const char *proptype;
->  
->      if (prop->info->create) {
->          prop->info->create(obj, prop, &local_err);
-> @@ -723,7 +724,11 @@ void qdev_property_add_static(DeviceState *dev, Property *prop,
->          if (!prop->info->get && !prop->info->set) {
->              return;
->          }
-> -        object_property_add(obj, prop->name, prop->info->name,
-> +        proptype = prop->info->name;
-> +        if (0 == strncmp(proptype, "str", 3)) {
-> +            proptype = "string";
-> +        }
-> +        object_property_add(obj, prop->name, proptype,
->                              prop->info->get, prop->info->set,
->                              prop->info->release,
->                              prop, &local_err);
-> -- 
-> 2.11.0
-> 
-> 
-
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+-- PMM
