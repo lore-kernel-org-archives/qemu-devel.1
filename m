@@ -1,29 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49063)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49382)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Babu.Moger@amd.com>) id 1fQEIQ-0001dJ-Jg
-	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 11:54:56 -0400
+	(envelope-from <marcel.apfelbaum@gmail.com>) id 1fQEJl-000323-9D
+	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 11:56:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <Babu.Moger@amd.com>) id 1fQEIN-00037T-AC
-	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 11:54:54 -0400
-Received: from mail-sn1nam01on0051.outbound.protection.outlook.com
-	([104.47.32.51]:55520
-	helo=NAM01-SN1-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <Babu.Moger@amd.com>) id 1fQEIN-00036G-0p
-	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 11:54:51 -0400
-From: "Moger, Babu" <Babu.Moger@amd.com>
-Date: Tue, 5 Jun 2018 15:54:47 +0000
-Message-ID: <BL0PR12MB24680C07E472400D280F3B8395660@BL0PR12MB2468.namprd12.prod.outlook.com>
-References: <1527176614-26271-1-git-send-email-babu.moger@amd.com>
-	<1527176614-26271-5-git-send-email-babu.moger@amd.com>
-	<20180605025713.GJ3184@localhost.localdomain>
-In-Reply-To: <20180605025713.GJ3184@localhost.localdomain>
-Content-Language: en-US
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	(envelope-from <marcel.apfelbaum@gmail.com>) id 1fQEJi-0004el-7u
+	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 11:56:17 -0400
+Received: from mail-wr0-x244.google.com ([2a00:1450:400c:c0c::244]:43271)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <marcel.apfelbaum@gmail.com>)
+	id 1fQEJi-0004eM-0d
+	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 11:56:14 -0400
+Received: by mail-wr0-x244.google.com with SMTP id d2-v6so2975477wrm.10
+	for <qemu-devel@nongnu.org>; Tue, 05 Jun 2018 08:56:13 -0700 (PDT)
+References: <20180603092749.107476-1-marcel.apfelbaum@gmail.com>
+	<20180604042928-mutt-send-email-mst@kernel.org>
+	<23040757-b561-e0bf-a41d-38d3c44555ee@gmail.com>
+	<20180605072746.v6xxabsbewiuw7ka@sirius.home.kraxel.org>
+	<20180605084300.GF32286@redhat.com>
+	<53c37321-52d2-732c-19fb-8f6a9542c714@gmail.com>
+	<20180605132948.GH32286@redhat.com>
+From: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+Message-ID: <0952e6da-a75f-914a-857e-40a6704cad33@gmail.com>
+Date: Tue, 5 Jun 2018 18:56:09 +0300
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v11 4/5] i386: Enable TOPOEXT feature on
- AMD EPYC CPU
+In-Reply-To: <20180605132948.GH32286@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
+Subject: Re: [Qemu-devel] [PATCH RFC] hw/pc: set q35 as the default x86
+ machine
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,192 +37,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: "mst@redhat.com" <mst@redhat.com>, "marcel.apfelbaum@gmail.com" <marcel.apfelbaum@gmail.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "rth@twiddle.net" <rth@twiddle.net>, "mtosatti@redhat.com" <mtosatti@redhat.com>, "geoff@hostfission.com" <geoff@hostfission.com>, "kash@tripleback.net" <kash@tripleback.net>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>
+To: "=?UTF-8?Q?Daniel_P._Berrang=c3=a9?=" <berrange@redhat.com>
+Cc: Gerd Hoffmann <kraxel@redhat.com>, pbonzini@redhat.com, rth@twiddle.net, qemu-devel@nongnu.org, ehabkost@redhat.com, "Michael S. Tsirkin" <mst@redhat.com>, Laszlo Ersek <lersek@redhat.com>
 
 
-> -----Original Message-----
-> From: Eduardo Habkost [mailto:ehabkost@redhat.com]
-> Sent: Monday, June 4, 2018 9:57 PM
-> To: Moger, Babu <Babu.Moger@amd.com>
-> Cc: mst@redhat.com; marcel.apfelbaum@gmail.com; pbonzini@redhat.com;
-> rth@twiddle.net; mtosatti@redhat.com; geoff@hostfission.com;
-> kash@tripleback.net; qemu-devel@nongnu.org; kvm@vger.kernel.org
-> Subject: Re: [Qemu-devel] [PATCH v11 4/5] i386: Enable TOPOEXT feature on
-> AMD EPYC CPU
->=20
-> On Thu, May 24, 2018 at 11:43:33AM -0400, Babu Moger wrote:
-> > Enable TOPOEXT feature on EPYC CPU. This is required to support
-> > hyperthreading on VM guests. Also extend xlevel to 0x8000001E.
-> >
-> > Disable TOPOEXT feature for legacy machines and also disable
-> > TOPOEXT feature if the config cannot be supported.
-> >
-> > Signed-off-by: Babu Moger <babu.moger@amd.com>
-> > ---
-> >  include/hw/i386/pc.h |  4 ++++
-> >  target/i386/cpu.c    | 37 +++++++++++++++++++++++++++++++++++--
-> >  2 files changed, 39 insertions(+), 2 deletions(-)
-> >
-> > diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
-> > index a0c269f..9c8db3d 100644
-> > --- a/include/hw/i386/pc.h
-> > +++ b/include/hw/i386/pc.h
-> > @@ -302,6 +302,10 @@ bool e820_get_entry(int, uint32_t, uint64_t *,
-> uint64_t *);
-> >          .driver   =3D TYPE_X86_CPU,\
-> >          .property =3D "legacy-cache",\
-> >          .value    =3D "on",\
-> > +    },{\
-> > +        .driver   =3D "EPYC-" TYPE_X86_CPU,\
-> > +        .property =3D "topoext",\
-> > +        .value    =3D "off",\
-> >      },
-> >
-> >  #define PC_COMPAT_2_11 \
-> > diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-> > index 9f8bad9..0b62356 100644
-> > --- a/target/i386/cpu.c
-> > +++ b/target/i386/cpu.c
-> > @@ -486,6 +486,20 @@ static void encode_topo_cpuid8000001e(CPUState
-> *cs, X86CPU *cpu,
-> >  }
-> >
-> >  /*
-> > + * Check if we can support this topology
-> > + * Fail if number of cores are beyond the supported config
-> > + * or nr_threads is more than 2
-> > + */
-> > +static int verify_topology(int nr_cores, int nr_threads)
->=20
-> I suggest using a more descriptive name, like
-> "topology_supports_topoext()".
 
-Ok. Sure.
->=20
-> > +{
-> > +    if ((nr_cores > (MAX_CORES_IN_NODE * MAX_NODES_PER_SOCKET))
-> ||
-> > +        (nr_threads > 2)) {
-> > +        return 0;
->=20
-> Oh, this is what I was looking for, on the previous patches.  I
-> suggest moving this to a separate patch, separate from the patch
-> that changes the EPYC CPU model.
+On 06/05/2018 04:29 PM, Daniel P. Berrangé wrote:
+> On Tue, Jun 05, 2018 at 04:20:46PM +0300, Marcel Apfelbaum wrote:
+>>
+>> On 06/05/2018 11:43 AM, Daniel P. Berrangé wrote:
+>>> On Tue, Jun 05, 2018 at 09:27:46AM +0200, Gerd Hoffmann wrote:
+>>>>     Hi,
+>>>>
+>>>>>>     Add to that shortcuts like -cdrom
+>>>>>> stop working,
+>>>>> Maybe is fixable.
+>>>> Already fixed for ages.
+>>>>
+>>>>> I see marking Q35 as the default machine a first step.
+>>>> Maybe the better option is to go the arm route:  Just don't define a
+>>>> default, so users have to specify pc or q35.  That will make them notice
+>>>> there is a world beside 'pc', and we also avoid breaking things
+>>>> silently.
+>> It can work, sure. And we can add user hints: "Use q35 for ...., select pc
+>> if..."
+>>
+>>> If QEMU removes the default, then libvirt will have to hardcode
+>>> 'pc' as the default to maintain back compatibility, so I don't
+>>> think that ends up as a net win
+>> Can't libvirt preserve 'pc' for existing domains, while defaulting to q35
+>> the creation of new domains ? This way it aligns with Gerd's proposal of no
+>> default x86 machine.
+> Existing domains wasn't the case I was concerned about. Consider you have
+> libvirt 4.4.0 intsalled and you deploy a *new* domain from a prebuilt
+> disk image "foo".
 
-Ok. Will make a separate patch and include before this patch.
->=20
->=20
-> > +    }
-> > +    return 1;
-> > +}
-> > +
-> > +/*
-> >   * Definitions of the hardcoded cache entries we expose:
-> >   * These are legacy cache values. If there is a need to change any
-> >   * of these values please use builtin_x86_defs
-> > @@ -2531,7 +2545,8 @@ static X86CPUDefinition builtin_x86_defs[] =3D {
-> >          .features[FEAT_8000_0001_ECX] =3D
-> >              CPUID_EXT3_OSVW | CPUID_EXT3_3DNOWPREFETCH |
-> >              CPUID_EXT3_MISALIGNSSE | CPUID_EXT3_SSE4A |
-> CPUID_EXT3_ABM |
-> > -            CPUID_EXT3_CR8LEG | CPUID_EXT3_SVM | CPUID_EXT3_LAHF_LM,
-> > +            CPUID_EXT3_CR8LEG | CPUID_EXT3_SVM | CPUID_EXT3_LAHF_LM
-> |
-> > +            CPUID_EXT3_TOPOEXT,
-> >          .features[FEAT_7_0_EBX] =3D
-> >              CPUID_7_0_EBX_FSGSBASE | CPUID_7_0_EBX_BMI1 |
-> CPUID_7_0_EBX_AVX2 |
-> >              CPUID_7_0_EBX_SMEP | CPUID_7_0_EBX_BMI2 |
-> CPUID_7_0_EBX_RDSEED |
-> > @@ -2576,7 +2591,8 @@ static X86CPUDefinition builtin_x86_defs[] =3D {
-> >          .features[FEAT_8000_0001_ECX] =3D
-> >              CPUID_EXT3_OSVW | CPUID_EXT3_3DNOWPREFETCH |
-> >              CPUID_EXT3_MISALIGNSSE | CPUID_EXT3_SSE4A |
-> CPUID_EXT3_ABM |
-> > -            CPUID_EXT3_CR8LEG | CPUID_EXT3_SVM | CPUID_EXT3_LAHF_LM,
-> > +            CPUID_EXT3_CR8LEG | CPUID_EXT3_SVM | CPUID_EXT3_LAHF_LM
-> |
-> > +            CPUID_EXT3_TOPOEXT,
-> >          .features[FEAT_8000_0008_EBX] =3D
-> >              CPUID_8000_0008_EBX_IBPB,
-> >          .features[FEAT_7_0_EBX] =3D
-> > @@ -4156,6 +4172,12 @@ void cpu_x86_cpuid(CPUX86State *env,
-> uint32_t index, uint32_t count,
-> >          break;
-> >      case 0x8000001D:
-> >          *eax =3D 0;
-> > +        /* Check if we can support this topology */
-> > +        if (!verify_topology(cs->nr_cores, cs->nr_threads)) {
-> > +            /* Disable topology extention */
-> > +            env->features[FEAT_8000_0001_ECX] &=3D !CPUID_EXT3_TOPOEXT=
-;
-> > +            break;
->=20
-> Please don't change CPUX86State inside cpu_x86_cpuid().  This
-> belongs to x86_cpu_realizefn().
+Using Laszlo idea (I think):
+  1) disk image "foo"/no info -> use 'pc' machine.
+  2) no prebuild image (clean install?) ->  use q35 and add this info to 
+xml
+In the meantime find a way to embed the supported machine type(s) in the 
+image.
+(I think the above idea was already discussed, not sure what was the 
+conclusion )
 
-Ok. I will bring the function, verify_topology(or new topology_supports_top=
-oext) in here.
 
->=20
-> Also, we want this:
->   "-cpu EPYC -smp cores=3D64"
-> to not error out, because it's a supported configuration today.
->=20
-> But this:
->   "-cpu EPYC,+topoext -smp cores=3D64"
-> should error out because the user explicitly requested an
-> unsupported configuration.
->=20
-> You can implement this by checking if TOPOEXT is set on
-> env->user_features.
+Thanks,
+Marcel
 
-Ok. Will add those checks in verify_topology(or new topology_supports_topoe=
-xt).
-
->=20
->=20
-> > +        }
-> >          switch (count) {
-> >          case 0: /* L1 dcache info */
-> >              encode_cache_cpuid8000001d(env->cache_info_amd.l1d_cache, =
-cs,
-> > @@ -4180,6 +4202,12 @@ void cpu_x86_cpuid(CPUX86State *env,
-> uint32_t index, uint32_t count,
-> >          break;
-> >      case 0x8000001E:
-> >          assert(cpu->core_id <=3D 255);
-> > +        /* Check if we can support this topology */
-> > +        if (!verify_topology(cs->nr_cores, cs->nr_threads)) {
-> > +            /* Disable topology extention */
-> > +            env->features[FEAT_8000_0001_ECX] &=3D !CPUID_EXT3_TOPOEXT=
-;
-> > +            break;
-> > +        }
-> >          encode_topo_cpuid8000001e(cs, cpu,
-> >                                    eax, ebx, ecx, edx);
-> >          break;
-> > @@ -4644,6 +4672,11 @@ static void x86_cpu_expand_features(X86CPU
-> *cpu, Error **errp)
-> >              x86_cpu_adjust_level(cpu, &env->cpuid_min_xlevel, 0x800000=
-0A);
-> >          }
-> >
-> > +        /* TOPOEXT feature requires 0x8000001E */
-> > +        if (env->features[FEAT_8000_0001_ECX] & CPUID_EXT3_TOPOEXT) {
-> > +            x86_cpu_adjust_level(cpu, &env->cpuid_min_xlevel, 0x800000=
-1E);
-> > +        }
-> > +
-> >          /* SEV requires CPUID[0x8000001F] */
-> >          if (sev_enabled()) {
-> >              x86_cpu_adjust_level(cpu, &env->cpuid_min_xlevel, 0x800000=
-1F);
-> > --
-> > 1.8.3.1
-> >
-> >
->=20
-> --
-> Eduardo
+>   Now update to a libvirt or QEMU which changes to q35
+> and try to deploy another new domain from the same prebuilt disk
+> image "foo". It may not work now if that disk image doesn't support
+> q35. That would be a regression from the user's POV, whether libvirt or
+> qemu has changed the default.
+>
+> Regards,
+> Daniel
