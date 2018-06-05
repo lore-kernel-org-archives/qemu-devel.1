@@ -1,28 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43164)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47174)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <prvs=687e870ee=anthony.perard@citrix.com>)
-	id 1fQFEq-0003o7-2V
-	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 12:55:16 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1fQFTh-0000NM-U3
+	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 13:10:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <prvs=687e870ee=anthony.perard@citrix.com>)
-	id 1fQFEm-0003XO-Rc
-	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 12:55:16 -0400
-Received: from smtp03.citrix.com ([162.221.156.55]:26132)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71)
-	(envelope-from <prvs=687e870ee=anthony.perard@citrix.com>)
-	id 1fQFEm-0003Uc-Ib
-	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 12:55:12 -0400
-Date: Tue, 5 Jun 2018 17:55:07 +0100
-From: Anthony PERARD <anthony.perard@citrix.com>
-Message-ID: <20180605165507.GB2165@perard.uk.xensource.com>
-References: <20180601175910.28146-1-peter.maydell@linaro.org>
+	(envelope-from <peter.maydell@linaro.org>) id 1fQFTg-00035Z-U5
+	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 13:10:37 -0400
+Received: from mail-ot0-x241.google.com ([2607:f8b0:4003:c0f::241]:35197)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1fQFTg-000355-NW
+	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 13:10:36 -0400
+Received: by mail-ot0-x241.google.com with SMTP id q17-v6so3724319otg.2
+	for <qemu-devel@nongnu.org>; Tue, 05 Jun 2018 10:10:36 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20180601175910.28146-1-peter.maydell@linaro.org>
-Subject: Re: [Qemu-devel] [RFC] xen: Don't use
- memory_region_init_ram_nomigrate() in pci_assign_dev_load_option_rom()
+In-Reply-To: <20180530180120.13355-14-richard.henderson@linaro.org>
+References: <20180530180120.13355-1-richard.henderson@linaro.org>
+	<20180530180120.13355-14-richard.henderson@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 5 Jun 2018 18:10:15 +0100
+Message-ID: <CAFEAcA-OJhenKFwXtentkb-pgg87a_Lzf8WP6TuoVif-Uaj2tg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v3b 13/18] target/arm: Implement SVE
+ Partition Break Group
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,34 +30,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: qemu-devel@nongnu.org, patches@linaro.org, Stefano Stabellini <sstabellini@kernel.org>, xen-devel@lists.xenproject.org
+To: Richard Henderson <richard.henderson@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>
 
-On Fri, Jun 01, 2018 at 06:59:10PM +0100, Peter Maydell wrote:
-> The xen pci_assign_dev_load_option_rom() currently creates a RAM
-> memory region with memory_region_init_ram_nomigrate(), and then
-> manually registers it with vmstate_register_ram(). In fact for
-> its only callsite, the 'owner' pointer we use for the init call
-> and the '&dev->qdev' pointer we use for the vmstate_register_ram()
-> call refer to the same object. Simplify the function to only
-> take a pointer to the device once instead of twice, and use
-> memory_region_init_ram() which automatically does the vmstate
-> register for us.
-> 
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+On 30 May 2018 at 19:01, Richard Henderson <richard.henderson@linaro.org> wrote:
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 > ---
-> This is a fairly trivial no-behaviour-change code cleanup, but
-> I've marked it as RFC because I don't have a setup for doing
-> more than just compile-testing Xen related patches.
-> This was found as part of a sweep through for code using
-> the _nomigrate versions of functions.
+>  target/arm/helper-sve.h    |  18 +++
+>  target/arm/sve_helper.c    | 247 +++++++++++++++++++++++++++++++++++++
+>  target/arm/translate-sve.c | 106 ++++++++++++++++
+>  target/arm/sve.decode      |  19 +++
+>  4 files changed, 390 insertions(+)
 
-That patch looks fine, and seams fine after hacking my way into testing
-the change.
+> +static bool compute_brk(uint64_t *retb, uint64_t n, uint64_t g,
+> +                        bool brk, bool after)
+> +{
+> +    uint64_t b;
+> +
+> +    if (brk) {
+> +        b = 0;
+> +    } else if ((g & n) == 0) {
+> +        /* For all G, no N are set; break not found.  */
+> +        b = g;
+> +    } else {
+> +        /* Break somewhere in N.  Locate it.  */
+> +        b = g & n;            /* guard true, pred true*/
 
-Acked-by: Anthony PERARD <anthony.perard@citrix.com>
+Missing space before '*/'.
 
-Thanks,
+> +        b = b & -b;           /* first such */
+> +        if (after) {
+> +            b = b | (b - 1);  /* break after same */
+> +        } else {
+> +            b = b - 1;        /* break before same */
+> +        }
+> +        brk = true;
+> +    }
+> +
+> +    *retb = b;
+> +    return brk;
+> +}
 
--- 
-Anthony PERARD
+> +
+> +/* Given a computation function, compute a merging BRK.  */
+> +static void compute_brk_m(uint64_t *d, uint64_t *n, uint64_t *g,
+> +                          intptr_t oprsz, bool after)
+
+Comment suggests function should take a function pointer argument,
+but it doesn't ?
+
+> +{
+> +    bool brk = false;
+> +    intptr_t i;
+> +
+> +    for (i = 0; i < DIV_ROUND_UP(oprsz, 8); ++i) {
+> +        uint64_t this_b, this_g = g[i];
+> +
+> +        brk = compute_brk(&this_b, n[i], this_g, brk, after);
+> +        d[i] = (this_b & this_g) | (d[i] & ~this_g);
+> +    }
+> +}
+
+Otherwise
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+
+thanks
+-- PMM
