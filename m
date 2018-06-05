@@ -1,33 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35770)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36127)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1fQAgr-0008SJ-It
-	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 08:03:57 -0400
+	(envelope-from <thuth@redhat.com>) id 1fQAhO-0000U7-Ca
+	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 08:04:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1fQAgn-0005QZ-Af
-	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 08:03:53 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:36886 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1fQAgn-0005Q7-3r
-	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 08:03:49 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.5])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id A6E0B407519F
-	for <qemu-devel@nongnu.org>; Tue,  5 Jun 2018 12:03:48 +0000 (UTC)
-Date: Tue, 5 Jun 2018 13:03:44 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20180605120344.GA32286@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <20180604120345.12955-1-berrange@redhat.com>
-	<20180604120345.12955-2-berrange@redhat.com>
+	(envelope-from <thuth@redhat.com>) id 1fQAhJ-0005tA-Ec
+	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 08:04:26 -0400
+References: <1527671818-23809-1-git-send-email-thuth@redhat.com>
+	<1527671818-23809-4-git-send-email-thuth@redhat.com>
+	<20180604113619.0ef8ccbd.cohuck@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <d1cae0f9-7185-5b2d-0576-422747da7e78@redhat.com>
+Date: Tue, 5 Jun 2018 14:04:18 +0200
 MIME-Version: 1.0
+In-Reply-To: <20180604113619.0ef8ccbd.cohuck@redhat.com>
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20180604120345.12955-2-berrange@redhat.com>
+Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 1/2] vl: don't use RUN_STATE_PRECONFIG
- as initial state
+Subject: Re: [Qemu-devel] [PATCH 3/3] pc-bios/s390-ccw/net: Try to load
+ pxelinux.cfg file accoring to the UUID
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,147 +26,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Michal Privoznik <mprivozn@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Eric Blake <eblake@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Markus Armbruster <armbru@redhat.com>, Max Reitz <mreitz@redhat.com>
+To: Cornelia Huck <cohuck@redhat.com>
+Cc: qemu-s390x@nongnu.org, Viktor Mihajlovski <mihajlov@linux.vnet.ibm.com>, Christian Borntraeger <borntraeger@de.ibm.com>, qemu-devel@nongnu.org, Collin Walling <walling@linux.ibm.com>, Farhan Ali <alifm@linux.ibm.com>
 
-On Mon, Jun 04, 2018 at 01:03:44PM +0100, Daniel P. Berrang=C3=A9 wrote:
-
-> diff --git a/vl.c b/vl.c
-> index 06031715ac..30d0e985f0 100644
-> --- a/vl.c
-> +++ b/vl.c
-> @@ -561,7 +561,7 @@ static int default_driver_check(void *opaque, QemuO=
-pts *opts, Error **errp)
->  /***********************************************************/
->  /* QEMU state */
-> =20
-> -static RunState current_run_state =3D RUN_STATE_PRECONFIG;
-> +static RunState current_run_state =3D RUN_STATE_NONE;
-
-BTW, an alternative to introducing a RNU_STATE_NONE is to just use
-an intentionally invalid enum value here eg
-
-   static RunState current_run_state =3D -1;
-
-on the basis that while we're parsing argv[], current_run_state
-is not really meaningful. Only once we're done with argv[] do
-we know what valid state will be used as the initial value of
-current_run_state.
-
-This would avoid exposing the "none" concept in QAPI schema,
-or the runstate transitions list.
-
-> =20
->  /* We use RUN_STATE__MAX but any invalid value will do */
->  static RunState vmstop_requested =3D RUN_STATE__MAX;
-> @@ -574,12 +574,11 @@ typedef struct {
-> =20
->  static const RunStateTransition runstate_transitions_def[] =3D {
->      /*     from      ->     to      */
-> +    { RUN_STATE_NONE, RUN_STATE_PRELAUNCH },
-> +    { RUN_STATE_NONE, RUN_STATE_PRECONFIG },
-> +    { RUN_STATE_NONE, RUN_STATE_INMIGRATE },
-> +
->      { RUN_STATE_PRECONFIG, RUN_STATE_PRELAUNCH },
-> -      /* Early switch to inmigrate state to allow  -incoming CLI optio=
-n work
-> -       * as it used to. TODO: delay actual switching to inmigrate stat=
-e to
-> -       * the point after machine is built and remove this hack.
-> -       */
-> -    { RUN_STATE_PRECONFIG, RUN_STATE_INMIGRATE },
-> =20
->      { RUN_STATE_DEBUG, RUN_STATE_RUNNING },
->      { RUN_STATE_DEBUG, RUN_STATE_FINISH_MIGRATE },
-> @@ -618,7 +617,6 @@ static const RunStateTransition runstate_transition=
-s_def[] =3D {
-> =20
->      { RUN_STATE_PRELAUNCH, RUN_STATE_RUNNING },
->      { RUN_STATE_PRELAUNCH, RUN_STATE_FINISH_MIGRATE },
-> -    { RUN_STATE_PRELAUNCH, RUN_STATE_INMIGRATE },
-> =20
->      { RUN_STATE_FINISH_MIGRATE, RUN_STATE_RUNNING },
->      { RUN_STATE_FINISH_MIGRATE, RUN_STATE_PAUSED },
-> @@ -1522,7 +1520,7 @@ static pid_t shutdown_pid;
->  static int powerdown_requested;
->  static int debug_requested;
->  static int suspend_requested;
-> -static bool preconfig_exit_requested =3D true;
-> +static bool preconfig_exit_requested;
->  static WakeupReason wakeup_reason;
->  static NotifierList powerdown_notifiers =3D
->      NOTIFIER_LIST_INITIALIZER(powerdown_notifiers);
-> @@ -3572,7 +3570,12 @@ int main(int argc, char **argv, char **envp)
->                  }
->                  break;
->              case QEMU_OPTION_preconfig:
-> -                preconfig_exit_requested =3D false;
-> +                if (!runstate_check(RUN_STATE_NONE)) {
-> +                    error_report("'--preconfig' and '--incoming' optio=
-ns are "
-> +                                 "mutually exclusive");
-> +                    exit(EXIT_FAILURE);
-> +                }
-> +                runstate_set(RUN_STATE_PRECONFIG);
->                  break;
->              case QEMU_OPTION_enable_kvm:
->                  olist =3D qemu_find_opts("machine");
-> @@ -3768,9 +3771,12 @@ int main(int argc, char **argv, char **envp)
->                  }
->                  break;
->              case QEMU_OPTION_incoming:
-> -                if (!incoming) {
-> -                    runstate_set(RUN_STATE_INMIGRATE);
-> +                if (!runstate_check(RUN_STATE_NONE)) {
-> +                    error_report("'--preconfig' and '--incoming' optio=
-ns are "
-> +                                 "mutually exclusive");
-> +                    exit(EXIT_FAILURE);
->                  }
-> +                runstate_set(RUN_STATE_INMIGRATE);
->                  incoming =3D optarg;
->                  break;
->              case QEMU_OPTION_only_migratable:
-> @@ -3943,14 +3949,12 @@ int main(int argc, char **argv, char **envp)
->       */
->      loc_set_none();
-> =20
-> -    replay_configure(icount_opts);
-> -
-> -    if (incoming && !preconfig_exit_requested) {
-> -        error_report("'preconfig' and 'incoming' options are "
-> -                     "mutually exclusive");
-> -        exit(EXIT_FAILURE);
-> +    if (runstate_check(RUN_STATE_NONE)) {
-> +        runstate_set(RUN_STATE_PRELAUNCH);
->      }
-> =20
-> +    replay_configure(icount_opts);
-> +
->      machine_class =3D select_machine();
-> =20
->      set_memory_options(&ram_slots, &maxram_size, machine_class);
-> @@ -4471,7 +4475,9 @@ int main(int argc, char **argv, char **envp)
->      parse_numa_opts(current_machine);
-> =20
->      /* do monitor/qmp handling at preconfig state if requested */
-> -    main_loop();
-> +    if (runstate_check(RUN_STATE_PRECONFIG)) {
-> +        main_loop();
-> +    }
-> =20
->      /* from here on runstate is RUN_STATE_PRELAUNCH */
->      machine_run_board_init(current_machine);
-> --=20
-> 2.17.0
+On 04.06.2018 11:36, Cornelia Huck wrote:
+> On Wed, 30 May 2018 11:16:58 +0200
+> Thomas Huth <thuth@redhat.com> wrote:
 >=20
+>> With the STSI instruction, we can get the UUID of the current VM insta=
+nce,
+>> so we can support loading pxelinux config files via UUID in the file n=
+ame,
+>> too.
+>>
+>> Signed-off-by: Thomas Huth <thuth@redhat.com>
+>> ---
+>>  pc-bios/s390-ccw/netmain.c | 46 +++++++++++++++++++++++++++++++++++++=
+++++++++-
+>>  1 file changed, 45 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/pc-bios/s390-ccw/netmain.c b/pc-bios/s390-ccw/netmain.c
+>> index e84bb2b..7ece302 100644
+>> --- a/pc-bios/s390-ccw/netmain.c
+>> +++ b/pc-bios/s390-ccw/netmain.c
+>> @@ -235,6 +235,49 @@ static void net_release(filename_ip_t *fn_ip)
+>>  }
+>> =20
+>>  /**
+>> + * Retrieve the Universally Unique Identifier of the VM.
+>> + * @return UUID string, or NULL in case of errors
+>> + */
+>> +static const char *get_uuid(void)
+>> +{
+>> +    register int r0 asm("0");
+>> +    register int r1 asm("1");
+>> +    uint8_t *mem, *buf, uuid[16];
+>> +    int i, chk =3D 0;
+>> +    static char uuid_str[37];
+>> +
+>> +    mem =3D malloc(2 * PAGE_SIZE);
+>> +    if (!mem) {
+>> +        puts("Out of memory ... can not get UUID.");
+>> +        return NULL;
+>> +    }
+>> +    buf =3D (uint8_t *)(((uint64_t)mem + PAGE_SIZE - 1) & ~(PAGE_SIZE=
+ - 1));
+>> +    memset(buf, 0, PAGE_SIZE);
+>> +
+>> +    /* Get SYSIB 3.2.2 */
+>> +    r0 =3D (3 << 28) | 2;
+>> +    r1 =3D 2;
+>> +    asm volatile(" stsi 0(%2)\n" : : "d" (r0), "d" (r1), "a" (buf)
+>> +                 : "cc", "memory");
+>=20
+> Maybe check for cc =3D=3D 3 here, just to be safe? (We can probably ass=
+ume
+> a dbct >=3D 1 if it is successful, I think.)
 
-Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
-ge :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.c=
-om :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
-ge :|
+Sure, I can add that check. In case it's not available, this should have
+been catched by the "if (!chk)" below, but let's better be safe than
+sorry here.
+
+>> +
+>> +    for (i =3D 0; i < 16; i++) {
+>> +        uuid[i] =3D buf[8 * 4 + 12 * 4 + i];
+>=20
+> Is there some way to make this offset less magic (offset of first vmdb
+> + offset of uuid inside vmdb)?
+
+Would a comment be sufficient? Or shall I copy the SysIB_322 structure
+from target/s390x/cpu.h over to the s390-ccw bios?
+
+ Thomas
