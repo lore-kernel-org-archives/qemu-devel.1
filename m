@@ -1,30 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40546)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42744)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1fQDtl-0000eB-9g
-	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 11:29:26 -0400
+	(envelope-from <cohuck@redhat.com>) id 1fQE0O-0007BU-If
+	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 11:36:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1fQDtg-0004IB-C9
-	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 11:29:25 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:51648 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1fQDtg-0004I1-6u
-	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 11:29:20 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.6])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id CDCE34187E59
-	for <qemu-devel@nongnu.org>; Tue,  5 Jun 2018 15:29:19 +0000 (UTC)
-From: Igor Mammedov <imammedo@redhat.com>
-Date: Tue,  5 Jun 2018 17:28:39 +0200
-Message-Id: <1528212519-37498-1-git-send-email-imammedo@redhat.com>
-In-Reply-To: <b3bbeaa4-de51-11bc-ddf8-d83b809efc45@redhat.com>
-References: <b3bbeaa4-de51-11bc-ddf8-d83b809efc45@redhat.com>
+	(envelope-from <cohuck@redhat.com>) id 1fQE0J-0000dK-LA
+	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 11:36:16 -0400
+Date: Tue, 5 Jun 2018 17:36:07 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20180605173607.4074f54d.cohuck@redhat.com>
+In-Reply-To: <e73038ff-fb2d-5865-8b84-e775990f3983@linux.ibm.com>
+References: <20180509154822.23510-1-cohuck@redhat.com>
+	<20180509154822.23510-3-cohuck@redhat.com>
+	<c18f9b9f-da00-1a0b-8ef0-7ac223c73d1a@linux.ibm.com>
+	<20180515181006.0cb1dfc2.cohuck@redhat.com>
+	<a5d08fb7-d9c1-b230-fe0c-acebbda2ba65@linux.ibm.com>
+	<20180522145208.310143ea.cohuck@redhat.com>
+	<4e4001cc-540e-0f2b-bbd1-1f82ca594bb3@linux.ibm.com>
+	<20180605151449.22aafbfc.cohuck@redhat.com>
+	<e73038ff-fb2d-5865-8b84-e775990f3983@linux.ibm.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v4 2/2] vl: fix use of --daemonize with
- --preconfig
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH RFC 2/2] vfio-ccw: support for halt/clear
+ subchannel
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,91 +31,16 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: berrange@redhat.com, mreitz@redhat.com, pbonzini@redhat.com, ehabkost@redhat.com, ldoktor@redhat.com, eblake@redhat.com
+To: Pierre Morel <pmorel@linux.ibm.com>
+Cc: Dong Jia Shi <bjsdjshi@linux.ibm.com>, Halil Pasic <pasic@linux.ibm.com>, linux-s390@vger.kernel.org, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, qemu-s390x@nongnu.org, qemu-devel@nongnu.org
 
-When using --daemonize, the initial lead process will fork a child and
-then wait to be notified that setup is complete via a pipe, before it
-exits.  When using --preconfig there is an extra call to main_loop()
-before the notification is done from os_setup_post(). Thus the parent
-process won't exit until the mgmt application connects to the monitor
-and tells QEMU to leave the RUN_STATE_PRECONFIG. The mgmt application
-won't connect to the monitor until daemonizing has completed though.
+On Tue, 5 Jun 2018 17:23:02 +0200
+Pierre Morel <pmorel@linux.ibm.com> wrote:
 
-This is a chicken and egg problem, leading to deadlock at startup.
+<snip lots of comments - I still need to think about this>
 
-The only viable way to fix this is to call os_setup_post() before
-the early main_loop_wait() call when in RUN_STATE_PRECONFIG. This has
-the downside that any errors from this point onwards won't be handled
-well by the mgmt application, because it will think QEMU has started
-successfully, so not be expecting an abrupt exit. The only way to
-deal with that is to move as much user input validation as possible
-to before the main_loop() call. This is left as an exercise for
-future interested developers.
+> May be I should try to integrate your patches so we have a better view.
 
-Based on:
-  From: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
-  Subject: [PATCH v2 2/2] vl: fix use of --daemonize with --preconfig
-  Message-Id: <20180604120345.12955-3-berrange@redhat.com>
-
-Signed-off-by: Igor Mammedov <imammedo@redhat.com>
----
-v3:
-  - rewrite to apply on top of 1/2
-v4:
-  - do not init static boolean to false as it's aready false
-    (Eric Blake <eblake@redhat.com>)
-
-CC: berrange@redhat.com
-CC: mreitz@redhat.com
-CC: pbonzini@redhat.com
-CC: ehabkost@redhat.com
-CC: ldoktor@redhat.com
-CC: eblake@redhat.com
-
----
- os-posix.c | 6 ++++++
- vl.c       | 2 +-
- 2 files changed, 7 insertions(+), 1 deletion(-)
-
-diff --git a/os-posix.c b/os-posix.c
-index 9ce6f74..0246195 100644
---- a/os-posix.c
-+++ b/os-posix.c
-@@ -309,8 +309,14 @@ void os_daemonize(void)
-=20
- void os_setup_post(void)
- {
-+    static bool os_setup_post_done;
-     int fd =3D 0;
-=20
-+    if (os_setup_post_done) {
-+        return;
-+    }
-+    os_setup_post_done =3D true;
-+
-     if (daemonize) {
-         if (chdir("/")) {
-             error_report("not able to chdir to /: %s", strerror(errno));
-diff --git a/vl.c b/vl.c
-index fa44138..d6fa67f 100644
---- a/vl.c
-+++ b/vl.c
-@@ -1960,6 +1960,7 @@ static void main_loop(void)
- #ifdef CONFIG_PROFILER
-         ti =3D profile_getclock();
- #endif
-+        os_setup_post();
-         main_loop_wait(false);
- #ifdef CONFIG_PROFILER
-         dev_time +=3D profile_getclock() - ti;
-@@ -4707,7 +4708,6 @@ int main(int argc, char **argv, char **envp)
-     }
-=20
-     accel_setup_post(current_machine);
--    os_setup_post();
-=20
-     main_loop();
-=20
---=20
-2.7.4
+Not sure whether it is worth trying to do so in the current state.
+(Also, I really need to get the information into my personal cache
+again, before I write too many weird things.)
