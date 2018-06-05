@@ -1,24 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45604)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45637)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1fQ9N5-0005OK-Su
-	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 06:39:27 -0400
+	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1fQ9ND-0005Za-BJ
+	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 06:39:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1fQ9N4-00068B-Nv
-	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 06:39:23 -0400
-Received: from mail.ispras.ru ([83.149.199.45]:55888)
+	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1fQ9NA-0006D0-4v
+	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 06:39:31 -0400
+Received: from mail.ispras.ru ([83.149.199.45]:55908)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1fQ9N4-00067i-B9
-	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 06:39:22 -0400
+	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1fQ9N9-0006Bi-P0
+	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 06:39:28 -0400
 From: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
-Date: Tue, 05 Jun 2018 13:39:21 +0300
-Message-ID: <152819516132.30857.1700667353240369481.stgit@pasha-ThinkPad-T60>
+Date: Tue, 05 Jun 2018 13:39:26 +0300
+Message-ID: <152819516675.30857.9162557650483931182.stgit@pasha-ThinkPad-T60>
 In-Reply-To: <152819515565.30857.16834004920507717324.stgit@pasha-ThinkPad-T60>
 References: <152819515565.30857.16834004920507717324.stgit@pasha-ThinkPad-T60>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] [RFC PATCH v2 1/7] tcg: add headers for non-target
- helpers
+Subject: [Qemu-devel] [RFC PATCH v2 2/7] Add plugin support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,112 +29,276 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: peter.maydell@linaro.org, maria.klimushenkova@ispras.ru, dovgaluk@ispras.ru, pavel.dovgaluk@ispras.ru, pbonzini@redhat.com, vilanova@ac.upc.edu
 
-From: Pavel Dovgalyuk <pavel.dovgaluk@gmail.com>
-
-This patch adds functions and headers for adding the helpers from
-the modules other than the target translators.
+This patch adds support for dynamically loaded plugins.
+Every plugin is a dynamic library with a set of optional exported
+functions that will be called from QEMU.
 
 Signed-off-by: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
 ---
- include/exec/helper-register.h |   53 ++++++++++++++++++++++++++++++++++++++++
- tcg/tcg.c                      |   12 +++++++++
- tcg/tcg.h                      |    3 ++
- 3 files changed, 68 insertions(+)
- create mode 100644 include/exec/helper-register.h
+ Makefile.target           |    1 
+ configure                 |   14 ++++++-
+ include/qemu/plugins.h    |    8 ++++
+ plugins/include/plugins.h |   12 ++++++
+ plugins/plugins.c         |   91 +++++++++++++++++++++++++++++++++++++++++++++
+ qemu-options.hx           |   10 +++++
+ vl.c                      |    8 ++++
+ 7 files changed, 143 insertions(+), 1 deletion(-)
+ create mode 100644 include/qemu/plugins.h
+ create mode 100644 plugins/include/plugins.h
+ create mode 100644 plugins/plugins.c
 
-diff --git a/include/exec/helper-register.h b/include/exec/helper-register.h
-new file mode 100644
-index 0000000..aeface9
---- /dev/null
-+++ b/include/exec/helper-register.h
-@@ -0,0 +1,53 @@
-+#ifndef HELPER_REGISTER_H
-+#define HELPER_REGISTER_H
-+
-+#include "exec/helper-head.h"
-+
-+/* Need one more level of indirection before stringification
-+   to get all the macros expanded first.  */
-+#define str(s) #s
-+
-+#define DEF_HELPER_FLAGS_0(NAME, FLAGS, ret) \
-+    tcg_register_helper(HELPER(NAME), str(NAME), FLAGS, dh_sizemask(ret, 0));
-+
-+#define DEF_HELPER_FLAGS_1(NAME, FLAGS, ret, t1) \
-+    tcg_register_helper(HELPER(NAME), str(NAME), FLAGS, \
-+        dh_sizemask(ret, 0) | dh_sizemask(t1, 1));
-+
-+#define DEF_HELPER_FLAGS_2(NAME, FLAGS, ret, t1, t2) \
-+    tcg_register_helper(HELPER(NAME), str(NAME), FLAGS, \
-+        dh_sizemask(ret, 0) | dh_sizemask(t1, 1) | dh_sizemask(t2, 2));
-+
-+#define DEF_HELPER_FLAGS_3(NAME, FLAGS, ret, t1, t2, t3) \
-+    tcg_register_helper(HELPER(NAME), str(NAME), FLAGS, \
-+        dh_sizemask(ret, 0) | dh_sizemask(t1, 1) | dh_sizemask(t2, 2) \
-+        | dh_sizemask(t3, 3));
-+
-+#define DEF_HELPER_FLAGS_4(NAME, FLAGS, ret, t1, t2, t3, t4) \
-+    tcg_register_helper(HELPER(NAME), str(NAME), FLAGS, \
-+        dh_sizemask(ret, 0) | dh_sizemask(t1, 1) | dh_sizemask(t2, 2) \
-+        | dh_sizemask(t3, 3) | dh_sizemask(t4, 4));
-+
-+#define DEF_HELPER_FLAGS_5(NAME, FLAGS, ret, t1, t2, t3, t4, t5) \
-+    tcg_register_helper(HELPER(NAME), str(NAME), FLAGS, \
-+        dh_sizemask(ret, 0) | dh_sizemask(t1, 1) | dh_sizemask(t2, 2) \
-+        | dh_sizemask(t3, 3) | dh_sizemask(t4, 4) | dh_sizemask(t5, 5));
-+
-+#define DEF_HELPER_FLAGS_6(NAME, FLAGS, ret, t1, t2, t3, t4, t5, t6) \
-+    tcg_register_helper(HELPER(NAME), str(NAME), FLAGS, \
-+        dh_sizemask(ret, 0) | dh_sizemask(t1, 1) | dh_sizemask(t2, 2) \
-+        | dh_sizemask(t3, 3) | dh_sizemask(t4, 4) | dh_sizemask(t5, 5) \
-+        | dh_sizemask(t6, 6));
-+
-+#include "helper.h"
-+
-+#undef str
-+#undef DEF_HELPER_FLAGS_0
-+#undef DEF_HELPER_FLAGS_1
-+#undef DEF_HELPER_FLAGS_2
-+#undef DEF_HELPER_FLAGS_3
-+#undef DEF_HELPER_FLAGS_4
-+#undef DEF_HELPER_FLAGS_5
-+#undef DEF_HELPER_FLAGS_6
-+
-+#endif /* HELPER_REGISTER_H */
-diff --git a/tcg/tcg.c b/tcg/tcg.c
-index 6eeebe0..8191381 100644
---- a/tcg/tcg.c
-+++ b/tcg/tcg.c
-@@ -1623,6 +1623,18 @@ static inline const char *tcg_find_helper(TCGContext *s, uintptr_t val)
-     return ret;
- }
+diff --git a/Makefile.target b/Makefile.target
+index dad2cf8..4cffd96 100644
+--- a/Makefile.target
++++ b/Makefile.target
+@@ -93,6 +93,7 @@ all: $(PROGS) stap
+ # cpu emulator library
+ obj-y += exec.o
+ obj-y += accel/
++obj-$(CONFIG_PLUGINS) += plugins/plugins.o
+ obj-$(CONFIG_TCG) += tcg/tcg.o tcg/tcg-op.o tcg/tcg-op-vec.o tcg/tcg-op-gvec.o
+ obj-$(CONFIG_TCG) += tcg/tcg-common.o tcg/optimize.o
+ obj-$(CONFIG_TCG_INTERPRETER) += tcg/tci.o
+diff --git a/configure b/configure
+index a71bf9b..34e6f00 100755
+--- a/configure
++++ b/configure
+@@ -373,6 +373,7 @@ EXESUF=""
+ DSOSUF=".so"
+ LDFLAGS_SHARED="-shared"
+ modules="no"
++plugins="no"
+ prefix="/usr/local"
+ mandir="\${prefix}/share/man"
+ datadir="\${prefix}/share"
+@@ -922,6 +923,12 @@ for opt do
+   --disable-modules)
+       modules="no"
+   ;;
++  --enable-plugins)
++      plugins="yes"
++  ;;
++  --disable-plugins)
++      plugins="no"
++  ;;
+   --cpu=*)
+   ;;
+   --target-list=*) target_list="$optarg"
+@@ -1567,6 +1574,7 @@ disabled with --disable-FEATURE, default is enabled if available:
+   guest-agent-msi build guest agent Windows MSI installation package
+   pie             Position Independent Executables
+   modules         modules support
++  plugins         plugins support
+   debug-tcg       TCG debugging (default is disabled)
+   debug-info      debugging information
+   sparse          sparse checker
+@@ -3392,7 +3400,7 @@ else
+     glib_req_ver=2.22
+ fi
+ glib_modules=gthread-2.0
+-if test "$modules" = yes; then
++if test "$modules" = yes || test "$plugins" = yes; then
+     glib_modules="$glib_modules gmodule-export-2.0"
+ fi
  
-+void tcg_register_helper(void *func, const char *name,
-+                         unsigned flags, unsigned sizemask)
-+{
-+    TCGHelperInfo *info = g_new0(TCGHelperInfo, 1);
-+    info->func = func;
-+    info->name = name;
-+    info->flags = flags;
-+    info->sizemask = sizemask;
+@@ -5777,6 +5785,7 @@ if test "$slirp" = "yes" ; then
+     echo "smbd              $smbd"
+ fi
+ echo "module support    $modules"
++echo "plugin support    $plugins"
+ echo "host CPU          $cpu"
+ echo "host big endian   $bigendian"
+ echo "target list       $target_list"
+@@ -6111,6 +6120,9 @@ if test "$modules" = "yes"; then
+   echo "CONFIG_STAMP=_$( (echo $qemu_version; echo $pkgversion; cat $0) | $shacmd - | cut -f1 -d\ )" >> $config_host_mak
+   echo "CONFIG_MODULES=y" >> $config_host_mak
+ fi
++if test "$plugins" = "yes"; then
++  echo "CONFIG_PLUGINS=y" >> $config_host_mak
++fi
+ if test "$have_x11" = "yes" -a "$need_x11" = "yes"; then
+   echo "CONFIG_X11=y" >> $config_host_mak
+   echo "X11_CFLAGS=$x11_cflags" >> $config_host_mak
+diff --git a/include/qemu/plugins.h b/include/qemu/plugins.h
+new file mode 100644
+index 0000000..4464822
+--- /dev/null
++++ b/include/qemu/plugins.h
+@@ -0,0 +1,8 @@
++#ifndef PLUGINS_H
++#define PLUGINS_H
 +
-+    g_hash_table_insert(helper_table, func, info);
++void qemu_plugin_parse_cmd_args(const char *optarg);
++void qemu_plugin_load(const char *filename, const char *args);
++void qemu_plugins_init(void);
++
++#endif /* PLUGINS_H */
+diff --git a/plugins/include/plugins.h b/plugins/include/plugins.h
+new file mode 100644
+index 0000000..100a786
+--- /dev/null
++++ b/plugins/include/plugins.h
+@@ -0,0 +1,12 @@
++#ifndef PLUGINS_INTERFACE_H
++#define PLUGINS_INTERFACE_H
++
++#include <stdbool.h>
++
++/* Plugin interface */
++
++bool plugin_init(const char *args);
++bool plugin_needs_before_insn(uint64_t pc, void *cpu);
++void plugin_before_insn(uint64_t pc, void *cpu);
++
++#endif /* PLUGINS_INTERFACE_H */
+diff --git a/plugins/plugins.c b/plugins/plugins.c
+new file mode 100644
+index 0000000..eabc931
+--- /dev/null
++++ b/plugins/plugins.c
+@@ -0,0 +1,91 @@
++#include "qemu/osdep.h"
++#include "qemu-common.h"
++#include "qemu/error-report.h"
++#include "qemu/plugins.h"
++#include "qemu/queue.h"
++#include <gmodule.h>
++
++typedef bool (*PluginInitFunc)(const char *);
++typedef bool (*PluginNeedsBeforeInsnFunc)(uint64_t, void *);
++typedef void (*PluginBeforeInsnFunc)(uint64_t, void *);
++
++typedef struct QemuPluginInfo {
++    const char *filename;
++    const char *args;
++    GModule *g_module;
++
++    PluginInitFunc init;
++    PluginNeedsBeforeInsnFunc needs_before_insn;
++    PluginBeforeInsnFunc before_insn;
++
++    QLIST_ENTRY(QemuPluginInfo) next;
++} QemuPluginInfo;
++
++static QLIST_HEAD(, QemuPluginInfo) qemu_plugins
++                                = QLIST_HEAD_INITIALIZER(qemu_plugins);
++
++static QemuOptsList qemu_plugin_opts = {
++    .name = "plugin",
++    .head = QTAILQ_HEAD_INITIALIZER(qemu_plugin_opts.head),
++    .desc = {
++        {
++            .name = "file",
++            .type = QEMU_OPT_STRING,
++        },{
++            .name = "args",
++            .type = QEMU_OPT_STRING,
++        },
++        { /* end of list */ }
++    },
++};
++
++void qemu_plugin_parse_cmd_args(const char *optarg)
++{
++    QemuOpts *opts = qemu_opts_parse_noisily(&qemu_plugin_opts, optarg, false);
++    qemu_plugin_load(qemu_opt_get(opts, "file"),
++        qemu_opt_get(opts, "args"));
 +}
 +
- static const char * const cond_name[] =
- {
-     [TCG_COND_NEVER] = "never",
-diff --git a/tcg/tcg.h b/tcg/tcg.h
-index 08f8bbf..7a4b750 100644
---- a/tcg/tcg.h
-+++ b/tcg/tcg.h
-@@ -890,6 +890,9 @@ void tcg_register_thread(void);
- void tcg_prologue_init(TCGContext *s);
- void tcg_func_start(TCGContext *s);
- 
-+void tcg_register_helper(void *func, const char *name,
-+                         unsigned flags, unsigned sizemask);
++void qemu_plugin_load(const char *filename, const char *args)
++{
++    GModule *g_module;
++    QemuPluginInfo *info = NULL;
++    if (!filename) {
++        error_report("plugin name was not specified");
++        return;
++    }
++    g_module = g_module_open(filename,
++        G_MODULE_BIND_LAZY | G_MODULE_BIND_LOCAL);
++    if (!g_module) {
++        error_report("can't load plugin '%s'", filename);
++        return;
++    }
++    info = g_new0(QemuPluginInfo, 1);
++    info->filename = g_strdup(filename);
++    info->g_module = g_module;
++    if (args) {
++        info->args = g_strdup(args);
++    }
 +
- int tcg_gen_code(TCGContext *s, TranslationBlock *tb);
++    g_module_symbol(g_module, "plugin_init", (gpointer*)&info->init);
++
++    /* Get the instrumentation callbacks */
++    g_module_symbol(g_module, "plugin_needs_before_insn",
++        (gpointer*)&info->needs_before_insn);
++    g_module_symbol(g_module, "plugin_before_insn",
++        (gpointer*)&info->before_insn);
++
++    QLIST_INSERT_HEAD(&qemu_plugins, info, next);
++
++    return;
++}
++
++void qemu_plugins_init(void)
++{
++    QemuPluginInfo *info;
++    QLIST_FOREACH(info, &qemu_plugins, next) {
++        if (info->init) {
++            info->init(info->args);
++        }
++    }
++}
+diff --git a/qemu-options.hx b/qemu-options.hx
+index c0d3951..d171544 100644
+--- a/qemu-options.hx
++++ b/qemu-options.hx
+@@ -3950,6 +3950,16 @@ Dump json-encoded vmstate information for current machine type to file
+ in @var{file}
+ ETEXI
  
- void tcg_set_frame(TCGContext *s, TCGReg reg, intptr_t start, intptr_t size);
++#ifdef CONFIG_PLUGINS
++DEF("plugin", HAS_ARG, QEMU_OPTION_plugin, \
++           "-plugin file=<file>[,args=<args>] load <dso> plugin with <args>\n", QEMU_ARCH_ALL)
++STEXI
++@item -plugin file=@var{file}[,args=@var{args}]
++@findex -plugin
++Load @var{file} plugin passing @var{args} arguments.
++ETEXI
++#endif
++
+ STEXI
+ @end table
+ ETEXI
+diff --git a/vl.c b/vl.c
+index 0603171..05420bf 100644
+--- a/vl.c
++++ b/vl.c
+@@ -129,6 +129,7 @@ int main(int argc, char **argv)
+ #include "qapi/qapi-commands-run-state.h"
+ #include "qapi/qmp/qerror.h"
+ #include "sysemu/iothread.h"
++#include "qemu/plugins.h"
+ 
+ #define MAX_VIRTIO_CONSOLES 1
+ 
+@@ -3925,6 +3926,11 @@ int main(int argc, char **argv, char **envp)
+                     exit(1);
+                 }
+                 break;
++#ifdef CONFIG_PLUGINS
++            case QEMU_OPTION_plugin:
++                qemu_plugin_parse_cmd_args(optarg);
++                break;
++#endif
+             case QEMU_OPTION_nodefconfig:
+             case QEMU_OPTION_nouserconfig:
+                 /* Nothing to be parsed here. Especially, do not error out below. */
+@@ -4470,6 +4476,8 @@ int main(int argc, char **argv, char **envp)
+     }
+     parse_numa_opts(current_machine);
+ 
++    qemu_plugins_init();
++
+     /* do monitor/qmp handling at preconfig state if requested */
+     main_loop();
+ 
