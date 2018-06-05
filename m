@@ -1,30 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35453)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52878)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fQIr0-0006K6-LY
-	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 16:46:55 -0400
+	(envelope-from <edgari@xilinx.com>) id 1fQFyZ-0006FP-CJ
+	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 13:42:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fQIqz-0007UH-AI
-	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 16:46:54 -0400
-References: <20180528212054.GH2209@redhat.com>
-	<20180528212510.GC4660@redhat.com>
-	<20180529064415.GA4756@localhost.localdomain>
-	<2b3eef00-f326-c1e6-0e4b-b7602646eec4@redhat.com>
-	<20180605092159.GA2544@work-vm>
-	<20180605190324.GA11372@localhost.localdomain>
-	<20180605223934-mutt-send-email-mst@kernel.org>
-	<a9fdbe0f-2c39-7da3-11f2-6752b74cce08@redhat.com>
-	<20180605195855.GC1455@redhat.com>
-	<6f6ecbb5-3175-44d0-5922-b13ac163f006@redhat.com>
-	<20180605231419-mutt-send-email-mst@kernel.org>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <0dce5af0-8fd8-b22f-3642-49a55ba37804@redhat.com>
-Date: Tue, 5 Jun 2018 15:46:45 -0500
-MIME-Version: 1.0
-In-Reply-To: <20180605231419-mutt-send-email-mst@kernel.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
+	(envelope-from <edgari@xilinx.com>) id 1fQFyW-0003BA-9G
+	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 13:42:31 -0400
+Received: from mail-by2nam01on0067.outbound.protection.outlook.com
+	([104.47.34.67]:43819
+	helo=NAM01-BY2-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <edgari@xilinx.com>) id 1fQFyV-0003Ak-JQ
+	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 13:42:28 -0400
+From: Edgar Iglesias <edgari@xilinx.com>
+Date: Tue, 5 Jun 2018 17:42:22 +0000
+Message-ID: <l2atfaoxbakjm4lkr6fpijgm.1528220631723@email.android.com>
+References: <20180529105011.1914-1-edgar.iglesias@gmail.com>
+	<20180529105011.1914-28-edgar.iglesias@gmail.com>,
+	<CAFEAcA9PQV8toYAFxHUA7cwre64FGPVuTwCiUPROocKyMU2NWA@mail.gmail.com>
+In-Reply-To: <CAFEAcA9PQV8toYAFxHUA7cwre64FGPVuTwCiUPROocKyMU2NWA@mail.gmail.com>
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [Qemu-block] storing machine data in qcow images?
+MIME-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PULL v1 27/38] target-microblaze: mmu: Add a
+ configurable output address mask
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,77 +32,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: "Richard W.M. Jones" <rjones@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org, stefanha@redhat.com, Max Reitz <mreitz@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-On 06/05/2018 03:28 PM, Michael S. Tsirkin wrote:
-> On Tue, Jun 05, 2018 at 03:09:17PM -0500, Eric Blake wrote:
->> On 06/05/2018 02:58 PM, Richard W.M. Jones wrote:
->>>> Binary blobs can always be base64 encoded for representation within
->>>> a valid JSON UTF-8 string (and we already have several QMP
->>>> interfaces that utilize base64 encoding to pass through what is
->>>> otherwise invalid UTF-8).  It does inflate things slightly compared
->>>> to a format that allows a raw length coupled with raw data, but that
->>>> is not necessarily a problem.
->>>
->>> Of course how we represent them externally and/or while
->>> using QMP / qemu-img to store and retrieve them is up for grabs.
->>> Doesn't JSON allow binary to be encoded?  (Knowing how poorly
->>> done JSON is, I wouldn't be surprised if not)
->>
->> JSON itself does not have a binary primitive; to pass arbitrary data through
->> JSON you have to first encode that data into something like base64 that can
->> then be represented as a UTF-8 string.  For reference, look at
->> qapi/crypto.json and the definition of QCryptoSecretFormat.
-> 
-> But there isn't a way to figure out that a string is base64, which
-> means each application needs to know whether it's a string or
-> a binary.
+Hi,
 
-Other than if the key name is well-known (and interpretation of the 
-value is done according to the key, if it is interpreted at all).
+Sorry for top post. This was my fuck up. The second assignment should go aw=
+ay. I'll send out a fix later.
 
-> 
-> How about specifying the encoding in the value?
-> 
-> string value:
-> [A-Za-z][^=\0]=S[^\0]*
-> 
-> base64 value:
-> [A-Za-z][^=\0]=B[A-Za-z0-9+/]*
-> 
-> or the key:
-> S[A-Za-z][^=\0]=[^\0]*
-> 
-> base64 value:
-> B[A-Za-z][^=\0]=[A-Za-z0-9+/]*
+Thanks,
+Edgar
 
-If we're going to express a tuple of <key,type,value>, then let's 
-describe it as a 3-tuple, rather than trying to overload that into a 
-2-tuple key=value syntax.  After all, while you may want a high-level 
-layer 1 representation in JSON or something else easy to hand off to 
-other processing, there's no requirement that the layer 0 storage in 
-qcow2 can't be a struct in some other layout, even if we have to convert 
-between layouts for what is stored in the file vs. what is presented to 
-the user.
 
-By that argument, a single JSON object (if we insist on storing a single 
-JSON object as layer 0) might be:
+---
+Sent from my phone
 
-[ { "name": "foo", "type": "raw", "value": "bar" },
-   { "name": "quux", "type": "base64", "value": "aGVsbG8=" } ]
 
-But figuring out how to add a "Header extension type" to 
-docs/interop/qcow2.txt, and whether the key/value payload will usefully 
-fit in that header extension (where we are tight on spacing, as ALL 
-extensions combined must fit in a single cluster), or whether the header 
-should instead have an offset field that points to some other cluster in 
-the qcow2 image, is relatively straightforward, and relatively 
-independent of the even bigger design question of whether we want to 
-allow qcow2 as an image format to expose an arbitrary data store feature 
-and what types of data should go into that store.
+-------- Original Message --------
+Subject: Re: [PULL v1 27/38] target-microblaze: mmu: Add a configurable out=
+put address mask
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Jun 4, 2018, 20:15
+To: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
+On 29 May 2018 at 11:50, Edgar E. Iglesias <edgar.iglesias@gmail.com> wrote=
+:
+> From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
+>
+> Add a configurable output address mask, used to mimic the
+> configurable physical address bit width.
+>
+> Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
+> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+> Signed-off-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
+> ---
+>  target/microblaze/cpu.c | 1 +
+>  target/microblaze/mmu.c | 1 +
+>  target/microblaze/mmu.h | 1 +
+>  3 files changed, 3 insertions(+)
+>
+> diff --git a/target/microblaze/cpu.c b/target/microblaze/cpu.c
+> index 6ee15ac800..71fc8d09fe 100644
+> --- a/target/microblaze/cpu.c
+> +++ b/target/microblaze/cpu.c
+> @@ -128,6 +128,7 @@ static void mb_cpu_reset(CPUState *s)
+>      env->mmu.c_mmu =3D 3;
+>      env->mmu.c_mmu_tlb_access =3D 3;
+>      env->mmu.c_mmu_zones =3D 16;
+> +    env->mmu.c_addr_mask =3D MAKE_64BIT_MASK(0, cpu->cfg.addr_size);
+>  #endif
+>  }
+>
+> diff --git a/target/microblaze/mmu.c b/target/microblaze/mmu.c
+> index a379968618..166c79908c 100644
+> --- a/target/microblaze/mmu.c
+> +++ b/target/microblaze/mmu.c
+> @@ -164,6 +164,7 @@ unsigned int mmu_translate(struct microblaze_mmu *mmu=
+,
+>              tlb_rpn =3D d & TLB_RPN_MASK;
+>
+>              lu->vaddr =3D tlb_tag;
+> +            lu->paddr =3D tlb_rpn & mmu->c_addr_mask;
+>              lu->paddr =3D tlb_rpn;
+>              lu->size =3D tlb_size;
+>              lu->err =3D ERR_HIT;
 
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+Coverity points out (CID 1391441) that the line added here
+has no effect, because we immediately overwrite lu->paddr in
+the following line. What was the intention here ?
+
+thanks
+-- PMM
