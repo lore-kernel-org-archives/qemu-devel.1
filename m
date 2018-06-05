@@ -1,29 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48468)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51300)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fQ9aV-0006Iq-3P
-	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 06:53:15 -0400
+	(envelope-from <kraxel@redhat.com>) id 1fQ9nr-0001xk-GB
+	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 07:07:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fQ9aT-0007cy-Pw
-	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 06:53:15 -0400
-Received: from mail-oi0-x243.google.com ([2607:f8b0:4003:c06::243]:33532)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fQ9aT-0007cW-Iy
-	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 06:53:13 -0400
-Received: by mail-oi0-x243.google.com with SMTP id c6-v6so504796oiy.0
-	for <qemu-devel@nongnu.org>; Tue, 05 Jun 2018 03:53:13 -0700 (PDT)
+	(envelope-from <kraxel@redhat.com>) id 1fQ9no-0006rZ-Dl
+	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 07:07:03 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:41586 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1fQ9no-0006rO-8d
+	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 07:07:00 -0400
+Date: Tue, 5 Jun 2018 13:06:47 +0200
+From: Gerd Hoffmann <kraxel@redhat.com>
+Message-ID: <20180605110647.7ctaj7fiy6x4ewdw@sirius.home.kraxel.org>
+References: <20180323122520.11270-1-kraxel@redhat.com>
+	<43fc23c1-d72f-748a-5b9d-a816466d7406@redhat.com>
+	<20180425140749.6x3w4h4i2n6uaq7o@sirius.home.kraxel.org>
+	<1ed94b1c-b416-eebe-9cf3-91943a0e6c5a@redhat.com>
+	<20180531084347.xb2r5aolkis2nmqg@sirius.home.kraxel.org>
+	<4b65af58-8451-a365-6c81-52c49e42b6ff@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <149da730-950c-a527-2373-9cb0433543b1@linaro.org>
-References: <20180531224911.23725-1-richard.henderson@linaro.org>
-	<20180531224911.23725-7-richard.henderson@linaro.org>
-	<788ee514-a026-d415-73ce-67cc996e6259@vivier.eu>
-	<149da730-950c-a527-2373-9cb0433543b1@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 5 Jun 2018 11:52:52 +0100
-Message-ID: <CAFEAcA-h7Ef5yfOS3V_kR5_fCmhr-N6okHY9=N87M9Ld+8MVdA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH 6/6] linux-user: Use *at functions to
- implement interp_prefix
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <4b65af58-8451-a365-6c81-52c49e42b6ff@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2 0/7] ramfb: simple boot framebuffer,
+ no legacy vga
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,18 +32,24 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>
-Cc: Laurent Vivier <laurent@vivier.eu>, QEMU Developers <qemu-devel@nongnu.org>, Evan Green <evgreen@chromium.org>
+To: Laszlo Ersek <lersek@redhat.com>
+Cc: qemu-devel@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>, Alex Williamson <alex.williamson@redhat.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>
 
-On 5 June 2018 at 06:27, Richard Henderson <richard.henderson@linaro.org> wrote:
-> On Fedora 28, one can no longer build a static qemu.  We depend on libraries
-> for which Fedora no longer ships static versions.
+  Hi,
 
-Do you mean you can't build the system binaries statically (that's
-never really been very supported), or that you can't do a build
-with configure --disable-system --disable-tools --static ?
+> >> I could imagine an OvmfPkg-specific PCI capability that said, "all PCI
+> >> drivers in OvmfPkg that could otherwise drive this device, ignore it --
+> >> another (platform) driver in OvmfPkg will pick it up instead".
+> > 
+> > pci capability for ramfb could be useful (also for linux).  I'll keep it
+> > in mind for now.
+> 
+> Please do. :)
 
-The latter would be more concerning.
+Hmm, well.  Virtio 1.0 uses vendor specific capabilities already to
+define the regions, and they don't have a fixed field saying "this is
+for virtio".  So adding another vendor specific capability for something
+else on the same device is a bit problematic ...
 
-thanks
--- PMM
+cheers,
+  Gerd
