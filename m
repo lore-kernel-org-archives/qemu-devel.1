@@ -1,31 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51607)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52128)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1fQBlZ-0003jJ-GI
-	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 09:12:50 -0400
+	(envelope-from <cohuck@redhat.com>) id 1fQBnj-0005IX-NK
+	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 09:15:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1fQBlW-00022N-Ay
-	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 09:12:49 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:46850 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1fQBlW-00022A-5R
-	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 09:12:46 -0400
-Date: Tue, 5 Jun 2018 14:12:32 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20180605131232.GG32286@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <20180603092749.107476-1-marcel.apfelbaum@gmail.com>
-	<20180604042928-mutt-send-email-mst@kernel.org>
-	<23040757-b561-e0bf-a41d-38d3c44555ee@gmail.com>
-	<20180605072746.v6xxabsbewiuw7ka@sirius.home.kraxel.org>
-	<20180605084300.GF32286@redhat.com>
-	<20180605130646.GF7451@localhost.localdomain>
+	(envelope-from <cohuck@redhat.com>) id 1fQBnZ-0003La-Po
+	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 09:15:03 -0400
+Date: Tue, 5 Jun 2018 15:14:49 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20180605151449.22aafbfc.cohuck@redhat.com>
+In-Reply-To: <4e4001cc-540e-0f2b-bbd1-1f82ca594bb3@linux.ibm.com>
+References: <20180509154822.23510-1-cohuck@redhat.com>
+	<20180509154822.23510-3-cohuck@redhat.com>
+	<c18f9b9f-da00-1a0b-8ef0-7ac223c73d1a@linux.ibm.com>
+	<20180515181006.0cb1dfc2.cohuck@redhat.com>
+	<a5d08fb7-d9c1-b230-fe0c-acebbda2ba65@linux.ibm.com>
+	<20180522145208.310143ea.cohuck@redhat.com>
+	<4e4001cc-540e-0f2b-bbd1-1f82ca594bb3@linux.ibm.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20180605130646.GF7451@localhost.localdomain>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] libvirt default machine-type guarantees? (was Re:
- [PATCH RFC] hw/pc: set q35 as the default x86 machine)
+Subject: Re: [Qemu-devel] [PATCH RFC 2/2] vfio-ccw: support for halt/clear
+ subchannel
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,61 +29,103 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: Gerd Hoffmann <kraxel@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, pbonzini@redhat.com, rth@twiddle.net, qemu-devel@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>, libvir-list@redhat.com
+To: Pierre Morel <pmorel@linux.ibm.com>
+Cc: Dong Jia Shi <bjsdjshi@linux.ibm.com>, Halil Pasic <pasic@linux.ibm.com>, linux-s390@vger.kernel.org, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, qemu-s390x@nongnu.org, qemu-devel@nongnu.org
 
-On Tue, Jun 05, 2018 at 10:06:46AM -0300, Eduardo Habkost wrote:
-> (CCing libvir-list)
+On Tue, 22 May 2018 17:10:44 +0200
+Pierre Morel <pmorel@linux.ibm.com> wrote:
+
+> On 22/05/2018 14:52, Cornelia Huck wrote:
+> > On Wed, 16 May 2018 15:32:48 +0200
+> > Pierre Morel <pmorel@linux.ibm.com> wrote:
+> > =20
+> >> On 15/05/2018 18:10, Cornelia Huck wrote: =20
+> >>> On Fri, 11 May 2018 11:33:35 +0200
+> >>> Pierre Morel <pmorel@linux.ibm.com> wrote:
+> >>>    =20
+> >>>> On 09/05/2018 17:48, Cornelia Huck wrote: =20
+> >>>>> @@ -126,7 +192,24 @@ static void fsm_io_request(struct vfio_ccw_pri=
+vate *private,
+> >>>>>    =20
+> >>>>>     	memcpy(scsw, io_region->scsw_area, sizeof(*scsw));
+> >>>>>    =20
+> >>>>> -	if (scsw->cmd.fctl & SCSW_FCTL_START_FUNC) {
+> >>>>> +	/*
+> >>>>> +	 * Start processing with the clear function, then halt, then star=
+t.
+> >>>>> +	 * We may still be start pending when the caller wants to clean
+> >>>>> +	 * up things via halt/clear.
+> >>>>> +	 */ =20
+> >>>> hum. The scsw here does not reflect the hardware state but the
+> >>>> command passed from the user interface.
+> >>>> Can we and should we authorize multiple commands in one call?
+> >>>>
+> >>>> If not, the comment is not appropriate and a switch on cmd.fctl
+> >>>> would be a clearer. =20
+> >>> There may be multiple functions specified, but we need to process them
+> >>> in precedence order (and clear wins over the others, so to speak).
+> >>> Would adding a sentence like "we always process just one function" he=
+lp? =20
+> >> Why should we allow multiple commands in a single call ?
+> >> It brings no added value.
+> >> Is there a use case?
+> >> Currently QEMU does not do this and since we only have the SCSH there
+> >> is no difference having the bit set alone or not alone. =20
+> > I found this to be a very easy way to implement halt/clear. This still
+> > holds true if we switch to some kind of capabilities for this (did not
+> > have time to look at this further, though).
+> >
+> > As we have the fctl field anyway, I'm in favour of processing this all
+> > in one function.
+> > =20
+
+[starting to look at this again]
+
 >=20
-> On Tue, Jun 05, 2018 at 09:43:00AM +0100, Daniel P. Berrang=C3=A9 wrote=
-:
-> > On Tue, Jun 05, 2018 at 09:27:46AM +0200, Gerd Hoffmann wrote:
-> > >   Hi,
-> > >=20
-> > > > >   Add to that shortcuts like -cdrom
-> > > > > stop working,
-> > > >=20
-> > > > Maybe is fixable.
-> > >=20
-> > > Already fixed for ages.
-> > >=20
-> > > > I see marking Q35 as the default machine a first step.
-> > >=20
-> > > Maybe the better option is to go the arm route:  Just don't define =
-a
-> > > default, so users have to specify pc or q35.  That will make them n=
-otice
-> > > there is a world beside 'pc', and we also avoid breaking things
-> > > silently.
-> >=20
-> > If QEMU removes the default, then libvirt will have to hardcode
-> > 'pc' as the default to maintain back compatibility, so I don't
-> > think that ends up as a net win
+> Sorry, I do not understand if we agree or not.
 >=20
-> Is there an actual promise to never change the default
-> machine-type documented in the libvirt API, or is this just fear
-> of breaking existing code?
+> I agree we have the fctl field and we must continue to use it
+> for backward compatibility.
 
-The risk of breaking things that currently work. Some of the things
-discussed here that risk breaking users if QEMU changes the default,
-have the same risk if libvirt changes the default.
+It also mirrors the hardware, no?
 
-eg old OS versions that only work with PC, or more commonly pre-existing
-cloud disk images that were built against PC can't be assumed to just
-work against q35, even if the OS in the image supports it.
+>=20
+> I do not understand the "processing all in one function".
+>=20
+> Since yo already have 3 function to process these three instructions.
+>=20
+> Do you mean the if .. else if .. else if ?
 
-If we want to get q35 broadly used for modern OS, then IMHO the best
-option is to record that metadata in libosinfo, as ew do for other
-virtual hardware preferences.  That doesn't fix the problem of disk
-images that might not transparently boot between pc/q35, but at least
-avoids breaking OS that don't support q35 at all.
+Yes. There is a lot of common handling for each of these.
 
-Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
-ge :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.c=
-om :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
-ge :|
+>=20
+> Then I come back to what you said earlier on the precedence of the clear=
+=20
+> instruction:
+>=20
+> 1) do we have a use case to have more than one bit set in the fctl field?
+>=20
+> - if no, there is no need for precedence
+
+It mirrors what the hardware does: you just set an additional bit if
+processing has not yet finished.
+
+>=20
+> - if yes, why should clear have precedence ?
+
+Because it does on the hardware?
+
+>  =C2=A0 How do QEMU set more than one bit in fctl?
+>  =C2=A0 why should we alter the order of the instructions given by the gu=
+est?
+>  =C2=A0 How can we know this order if there are multiple instructions at =
+once?
+
+In the future, we should return after we fired off the start etc.
+request even if we did not receive an interrupt yet, so that the guest
+might do a halt or clear before the start has finished. IOW, make this
+as asynchronous as the hardware. That's why I'd like to simply
+accumulate the things. The architecture already specified what happens
+in the response.
+
+Do you think that is feasible?
