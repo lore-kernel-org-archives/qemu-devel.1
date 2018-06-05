@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40222)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40223)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jemmy858585@gmail.com>) id 1fQDt7-0008Mw-21
-	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 11:28:45 -0400
+	(envelope-from <jemmy858585@gmail.com>) id 1fQDt7-0008My-27
+	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 11:28:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jemmy858585@gmail.com>) id 1fQDt3-0003yg-Ek
+	(envelope-from <jemmy858585@gmail.com>) id 1fQDt5-0003zu-Sc
 	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 11:28:45 -0400
-Received: from mail-pl0-x241.google.com ([2607:f8b0:400e:c01::241]:41292)
+Received: from mail-pf0-x241.google.com ([2607:f8b0:400e:c00::241]:34678)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <jemmy858585@gmail.com>)
-	id 1fQDt3-0003yN-9K
-	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 11:28:41 -0400
-Received: by mail-pl0-x241.google.com with SMTP id az12-v6so1722726plb.8
-	for <qemu-devel@nongnu.org>; Tue, 05 Jun 2018 08:28:41 -0700 (PDT)
+	id 1fQDt5-0003zN-JP
+	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 11:28:43 -0400
+Received: by mail-pf0-x241.google.com with SMTP id a63-v6so1492802pfl.1
+	for <qemu-devel@nongnu.org>; Tue, 05 Jun 2018 08:28:43 -0700 (PDT)
 From: Lidong Chen <jemmy858585@gmail.com>
-Date: Tue,  5 Jun 2018 23:28:08 +0800
-Message-Id: <1528212489-19137-10-git-send-email-lidongchen@tencent.com>
+Date: Tue,  5 Jun 2018 23:28:09 +0800
+Message-Id: <1528212489-19137-11-git-send-email-lidongchen@tencent.com>
 In-Reply-To: <1528212489-19137-1-git-send-email-lidongchen@tencent.com>
 References: <1528212489-19137-1-git-send-email-lidongchen@tencent.com>
-Subject: [Qemu-devel] [PATCH v5 09/10] migration: poll the cm event while
- wait RDMA work request completion
+Subject: [Qemu-devel] [PATCH v5 10/10] migration: implement the shutdown for
+ RDMA QIOChannel
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,70 +30,116 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: zhang.zhanghailiang@huawei.com, quintela@redhat.com, dgilbert@redhat.com, berrange@redhat.com, aviadye@mellanox.com, pbonzini@redhat.com
 Cc: qemu-devel@nongnu.org, adido@mellanox.com, galsha@mellanox.com, Lidong Chen <lidongchen@tencent.com>
 
-If the peer qemu is crashed, the qemu_rdma_wait_comp_channel function
-maybe loop forever. so we should also poll the cm event fd, and when
-receive RDMA_CM_EVENT_DISCONNECTED and RDMA_CM_EVENT_DEVICE_REMOVAL,
-we consider some error happened.
+Because RDMA QIOChannel not implement shutdown function,
+If the to_dst_file was set error, the return path thread
+will wait forever. and the migration thread will wait
+return path thread exit.
+
+the backtrace of return path thread is:
+
+(gdb) bt
+    #0  0x00007f372a76bb0f in ppoll () from /lib64/libc.so.6
+    #1  0x000000000071dc24 in qemu_poll_ns (fds=0x7ef7091d0580, nfds=2, timeout=100000000)
+        at qemu-timer.c:325
+    #2  0x00000000006b2fba in qemu_rdma_wait_comp_channel (rdma=0xd424000)
+        at migration/rdma.c:1501
+    #3  0x00000000006b3191 in qemu_rdma_block_for_wrid (rdma=0xd424000, wrid_requested=4000,
+        byte_len=0x7ef7091d0640) at migration/rdma.c:1580
+    #4  0x00000000006b3638 in qemu_rdma_exchange_get_response (rdma=0xd424000,
+        head=0x7ef7091d0720, expecting=3, idx=0) at migration/rdma.c:1726
+    #5  0x00000000006b3ad6 in qemu_rdma_exchange_recv (rdma=0xd424000, head=0x7ef7091d0720,
+        expecting=3) at migration/rdma.c:1903
+    #6  0x00000000006b5d03 in qemu_rdma_get_buffer (opaque=0x6a57dc0, buf=0x5c80030 "", pos=8,
+        size=32768) at migration/rdma.c:2714
+    #7  0x00000000006a9635 in qemu_fill_buffer (f=0x5c80000) at migration/qemu-file.c:232
+    #8  0x00000000006a9ecd in qemu_peek_byte (f=0x5c80000, offset=0)
+        at migration/qemu-file.c:502
+    #9  0x00000000006a9f1f in qemu_get_byte (f=0x5c80000) at migration/qemu-file.c:515
+    #10 0x00000000006aa162 in qemu_get_be16 (f=0x5c80000) at migration/qemu-file.c:591
+    #11 0x00000000006a46d3 in source_return_path_thread (
+        opaque=0xd826a0 <current_migration.37100>) at migration/migration.c:1331
+    #12 0x00007f372aa49e25 in start_thread () from /lib64/libpthread.so.0
+    #13 0x00007f372a77635d in clone () from /lib64/libc.so.6
+
+the backtrace of migration thread is:
+
+(gdb) bt
+    #0  0x00007f372aa4af57 in pthread_join () from /lib64/libpthread.so.0
+    #1  0x00000000007d5711 in qemu_thread_join (thread=0xd826f8 <current_migration.37100+88>)
+        at util/qemu-thread-posix.c:504
+    #2  0x00000000006a4bc5 in await_return_path_close_on_source (
+        ms=0xd826a0 <current_migration.37100>) at migration/migration.c:1460
+    #3  0x00000000006a53e4 in migration_completion (s=0xd826a0 <current_migration.37100>,
+        current_active_state=4, old_vm_running=0x7ef7089cf976, start_time=0x7ef7089cf980)
+        at migration/migration.c:1695
+    #4  0x00000000006a5c54 in migration_thread (opaque=0xd826a0 <current_migration.37100>)
+        at migration/migration.c:1837
+    #5  0x00007f372aa49e25 in start_thread () from /lib64/libpthread.so.0
+    #6  0x00007f372a77635d in clone () from /lib64/libc.so.6
 
 Signed-off-by: Lidong Chen <lidongchen@tencent.com>
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 ---
- migration/rdma.c | 33 ++++++++++++++++++++++++++++++---
- 1 file changed, 30 insertions(+), 3 deletions(-)
+ migration/rdma.c | 40 ++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 40 insertions(+)
 
 diff --git a/migration/rdma.c b/migration/rdma.c
-index f12e8d5..bb6989e 100644
+index bb6989e..0b35d65 100644
 --- a/migration/rdma.c
 +++ b/migration/rdma.c
-@@ -1489,6 +1489,9 @@ static uint64_t qemu_rdma_poll(RDMAContext *rdma, uint64_t *wr_id_out,
-  */
- static int qemu_rdma_wait_comp_channel(RDMAContext *rdma)
- {
-+    struct rdma_cm_event *cm_event;
-+    int ret = -1;
-+
-     /*
-      * Coroutine doesn't start until migration_fd_process_incoming()
-      * so don't yield unless we know we're running inside of a coroutine.
-@@ -1505,13 +1508,37 @@ static int qemu_rdma_wait_comp_channel(RDMAContext *rdma)
-          * without hanging forever.
-          */
-         while (!rdma->error_state  && !rdma->received_error) {
--            GPollFD pfds[1];
-+            GPollFD pfds[2];
-             pfds[0].fd = rdma->comp_channel->fd;
-             pfds[0].events = G_IO_IN | G_IO_HUP | G_IO_ERR;
-+            pfds[0].revents = 0;
-+
-+            pfds[1].fd = rdma->channel->fd;
-+            pfds[1].events = G_IO_IN | G_IO_HUP | G_IO_ERR;
-+            pfds[1].revents = 0;
-+
-             /* 0.1s timeout, should be fine for a 'cancel' */
--            switch (qemu_poll_ns(pfds, 1, 100 * 1000 * 1000)) {
-+            switch (qemu_poll_ns(pfds, 2, 100 * 1000 * 1000)) {
-+            case 2:
-             case 1: /* fd active */
--                return 0;
-+                if (pfds[0].revents) {
-+                    return 0;
-+                }
-+
-+                if (pfds[1].revents) {
-+                    ret = rdma_get_cm_event(rdma->channel, &cm_event);
-+                    if (!ret) {
-+                        rdma_ack_cm_event(cm_event);
-+                    }
-+
-+                    error_report("receive cm event while wait comp channel,"
-+                                 "cm event is %d", cm_event->event);
-+                    if (cm_event->event == RDMA_CM_EVENT_DISCONNECTED ||
-+                        cm_event->event == RDMA_CM_EVENT_DEVICE_REMOVAL) {
-+                        return -EPIPE;
-+                    }
-+                }
-+                break;
+@@ -3050,6 +3050,45 @@ static int qio_channel_rdma_close(QIOChannel *ioc,
+     return 0;
+ }
  
-             case 0: /* Timeout, go around again */
-                 break;
++static int
++qio_channel_rdma_shutdown(QIOChannel *ioc,
++                            QIOChannelShutdown how,
++                            Error **errp)
++{
++    QIOChannelRDMA *rioc = QIO_CHANNEL_RDMA(ioc);
++    RDMAContext *rdmain, *rdmaout;
++
++    rcu_read_lock();
++
++    rdmain = atomic_rcu_read(&rioc->rdmain);
++    rdmaout = atomic_rcu_read(&rioc->rdmain);
++
++    switch (how) {
++    case QIO_CHANNEL_SHUTDOWN_READ:
++        if (rdmain) {
++            rdmain->error_state = -1;
++        }
++        break;
++    case QIO_CHANNEL_SHUTDOWN_WRITE:
++        if (rdmaout) {
++            rdmaout->error_state = -1;
++        }
++        break;
++    case QIO_CHANNEL_SHUTDOWN_BOTH:
++    default:
++        if (rdmain) {
++            rdmain->error_state = -1;
++        }
++        if (rdmaout) {
++            rdmaout->error_state = -1;
++        }
++        break;
++    }
++
++    rcu_read_unlock();
++    return 0;
++}
++
+ /*
+  * Parameters:
+  *    @offset == 0 :
+@@ -3876,6 +3915,7 @@ static void qio_channel_rdma_class_init(ObjectClass *klass,
+     ioc_klass->io_close = qio_channel_rdma_close;
+     ioc_klass->io_create_watch = qio_channel_rdma_create_watch;
+     ioc_klass->io_set_aio_fd_handler = qio_channel_rdma_set_aio_fd_handler;
++    ioc_klass->io_shutdown = qio_channel_rdma_shutdown;
+ }
+ 
+ static const TypeInfo qio_channel_rdma_info = {
 -- 
 1.8.3.1
