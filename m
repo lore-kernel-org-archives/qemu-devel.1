@@ -1,32 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56563)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57169)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1fQAFe-0001ZR-O1
-	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 07:35:48 -0400
+	(envelope-from <stefanha@gmail.com>) id 1fQAIT-0002S1-Um
+	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 07:38:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1fQAFZ-0004a4-Tg
-	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 07:35:46 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:58216 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1fQAFZ-0004ZP-OE
-	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 07:35:41 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.4])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 1AF04CB9C5
-	for <qemu-devel@nongnu.org>; Tue,  5 Jun 2018 11:35:40 +0000 (UTC)
-Date: Tue, 5 Jun 2018 12:35:36 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20180605113536.GB2544@work-vm>
-References: <d714d8ac-6642-f2f3-ad9c-ac7e3bdf30e0@redhat.com>
-	<d453da2c-92fe-5ef8-239c-656c1822b9e0@redhat.com>
-	<24719f30-25c9-a80e-0db9-ae2f7f318c68@redhat.com>
-	<20180604140512.1c43b186@redhat.com>
+	(envelope-from <stefanha@gmail.com>) id 1fQAIQ-0006BA-TQ
+	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 07:38:42 -0400
+Received: from mail-wm0-x241.google.com ([2a00:1450:400c:c09::241]:40676)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1fQAIQ-0006Am-Kq
+	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 07:38:38 -0400
+Received: by mail-wm0-x241.google.com with SMTP id n5-v6so4419592wmc.5
+	for <qemu-devel@nongnu.org>; Tue, 05 Jun 2018 04:38:38 -0700 (PDT)
+Date: Tue, 5 Jun 2018 12:38:34 +0100
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20180605113834.GB11888@stefanha-x1.localdomain>
+References: <1527840629-18648-1-git-send-email-junyan.he@gmx.com>
+	<1527840629-18648-2-git-send-email-junyan.he@gmx.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="Pd0ReVV5GZGQvF3a"
 Content-Disposition: inline
-In-Reply-To: <20180604140512.1c43b186@redhat.com>
-Subject: Re: [Qemu-devel] Preconfig state reachable without --preconfig given
+In-Reply-To: <1527840629-18648-2-git-send-email-junyan.he@gmx.com>
+Subject: Re: [Qemu-devel] [PATCH V6 1/7] memory,
+ exec: Expose all memory block related flags.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,70 +31,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: Max Reitz <mreitz@redhat.com>, Michal Privoznik <mprivozn@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+To: junyan.he@gmx.com
+Cc: qemu-devel@nongnu.org, xiaoguangrong.eric@gmail.com, crosthwaite.peter@gmail.com, mst@redhat.com, dgilbert@redhat.com, ehabkost@redhat.com, quintela@redhat.com, Junyan He <junyan.he@intel.com>, stefanha@redhat.com, pbonzini@redhat.com, imammedo@redhat.com, rth@twiddle.net
 
-* Igor Mammedov (imammedo@redhat.com) wrote:
-> On Mon, 4 Jun 2018 11:46:06 +0200
-> Max Reitz <mreitz@redhat.com> wrote:
-> 
-> > On 2018-06-02 12:46, Michal Privoznik wrote:
-> > > On 06/01/2018 03:28 PM, Max Reitz wrote:  
-> > >> Hi,
-> > >>
-> > >> The @preconfig RunState documentation states:
-> > >>  
-> > >>> The state is reachable only if the --preconfig CLI option is used.  
-> > >>
-> > >> However, this is not true:
-> > >>
-> > >> $ echo | x86_64-softmmu/qemu-system-x86_64 -monitor stdio
-> > >> QEMU 2.12.50 monitor - type 'help' for more information
-> > >> (qemu)
-> > >> HMP not available in preconfig state, use QMP instead  
-> > > 
-> > > Not sure if this is the same bug, but I've noticed libvirt having
-> > > troubles detecting capabilities of qemu and debugging lead to this patch:
-> > > 
-> > > http://lists.nongnu.org/archive/html/qemu-devel/2018-06/msg00367.html
-> > > 
-> > > (which by no means I claim is proper solution. It might be viewed as
-> > > workaround by expert qemu devels)  
-> > 
-> > Well, it'd fix both of my issues, so it has that going for it. :-)
-> Acked patch.
-> 
-> Markus also suggested to drop HMP monitor altogether at this first loop,
-> I'll look into it some more taking in account demonize() issue.
 
-I've got a patchset I'm just tidying which makes HMP work properly with
-preconfig, i.e it allows a subset of commands.
+--Pd0ReVV5GZGQvF3a
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Dave
+On Fri, Jun 01, 2018 at 04:10:23PM +0800, junyan.he@gmx.com wrote:
+> From: Junyan He <junyan.he@intel.com>
+>=20
+> We need to use these flags in other files rather than just in exec.c,
+> For example, RAM_SHARED should be used when create a ram block from file.
+> We expose them the exec/memory.h
+>=20
+> Signed-off-by: Junyan He <junyan.he@intel.com>
+> ---
+>  exec.c                | 17 -----------------
+>  include/exec/memory.h | 17 +++++++++++++++++
+>  2 files changed, 17 insertions(+), 17 deletions(-)
 
-> > 
-> > >> On IRC, Daniel proposed doing the runstate transition immediately after
-> > >> the command line has been read and no --preconfig option has been found.
-> > >>  Doing that indeed fixes the issue for me (but I don't know whether
-> > >> that's the best solution).  
-> > > 
-> > > Oh has he? I can't find it anywhere.  
-> > 
-> > That was in #qemu on OFTC:
-> > 
-> > [Friday, June 1 2018] [15:21:26 CEST] <danpb> if we've not passed
-> > --preconfig though, we should not be in PRECONFIG state in the first
-> > place IMHO
-> > [Friday, June 1 2018] [15:22:27 CEST] <danpb> eg  vl.c should set the
-> > state to RUN_STATE_PRELAUNCH  immediately after parsing CLI args if
-> > --preconfig wasn't given
-> That's not how it should be, PRECONFIG is there to replace PRELAUNCH
-> at early stages (which commit 8a36283e12 message states)
-> /me is to blame for miss-leading doc comment/
-> 
-> > Max
-> > 
-> 
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+To other reviewers:
+All of include/exec/memory.h is inside #ifndef CONFIG_USER_ONLY so the
+ifdef situation hasn't changed (it's hard to tell from the patch
+itself).
+
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+
+--Pd0ReVV5GZGQvF3a
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBAgAGBQJbFnY6AAoJEJykq7OBq3PImAEIAI9nsQ8xnC6KouEm9TavyPvv
+7KY685VlRNmpt1ZjLKkzkr0bM5aANA1+QoJLJXvVOCY071F4MRSeSEJdaSUV4vbG
+BAGTMtkOBcFRrYCUXqv/sm5PCZ/rCExxo/3EMkwi3qW/I8cRj9LArb08WZbIzMQS
+U6s9wLRgg59ZwlIzZpGjHGyUyS5cQzOY8+LnUFu7mA2FgACqlSHhzZI/VIdL65ZH
+te2hcAL/XDL4+nsC81S3A3Z5LYnuyHgnFyced/l2X5ipxwbERls1hxk575clJ2yo
+9NqjzGvKBwTuEJ0yWr+t/l8rXQeAOHdFim+2rOjB5u0sOBPH3zhs0xTr9ugBDno=
+=EnFb
+-----END PGP SIGNATURE-----
+
+--Pd0ReVV5GZGQvF3a--
