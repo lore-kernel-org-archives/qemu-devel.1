@@ -1,21 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41847)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42969)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1fQ8zE-0007h4-Rz
-	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 06:14:46 -0400
+	(envelope-from <kraxel@redhat.com>) id 1fQ951-0001Je-3d
+	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 06:20:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1fQ8zB-0002iW-Kw
-	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 06:14:44 -0400
-Date: Tue, 5 Jun 2018 12:14:37 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20180605121437.4c360af3.cohuck@redhat.com>
-In-Reply-To: <20180524175828.3143-2-pasic@linux.ibm.com>
-References: <20180524175828.3143-1-pasic@linux.ibm.com>
-	<20180524175828.3143-2-pasic@linux.ibm.com>
+	(envelope-from <kraxel@redhat.com>) id 1fQ94x-0007RY-SG
+	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 06:20:43 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:55616 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1fQ94x-0007Qn-M9
+	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 06:20:39 -0400
+Date: Tue, 5 Jun 2018 12:20:37 +0200
+From: Gerd Hoffmann <kraxel@redhat.com>
+Message-ID: <20180605102037.3f54j2ir4aqrvelr@sirius.home.kraxel.org>
+References: <20180221170820.15365-1-kraxel@redhat.com>
+	<20180221170820.15365-3-kraxel@redhat.com>
+	<78856018-DE4F-42C2-899F-428FE7E55141@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3 1/2] vfio-ccw: add force unlimited
- prefetch property
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <78856018-DE4F-42C2-899F-428FE7E55141@gmail.com>
+Subject: Re: [Qemu-devel] [RFC PATCH 2/5] kbd-state: add hotkey registry
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,54 +28,19 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Halil Pasic <pasic@linux.ibm.com>
-Cc: Dong Jia Shi <bjsdjshi@linux.ibm.com>, "Jason J. Herne" <jjherne@linux.ibm.com>, qemu-s390x@nongnu.org, qemu-devel@nongnu.org
+To: Programmingkid <programmingkidx@gmail.com>
+Cc: qemu-devel@nongnu.org, berrange@redhat.com, peter.maydell@linaro.org
 
-On Thu, 24 May 2018 19:58:27 +0200
-Halil Pasic <pasic@linux.ibm.com> wrote:
+  Hi,
 
-> There is at least one guest (OS) such that although it does not rely on
-> the guarantees provided by ORB 1 word 9 bit (aka unlimited prefetch, aka
-> P bit) not being set, it fails to tell this to the machine.
+> You say the hotkey is a QKeyCode and a modifier key combined. But it looks like a single QKeyCode would be supported. I would prefer being able to use a single key like F16 to ungrab the mouse. Would that be possible here?
 > 
-> Usually this ain't a big deal, as the original purpose of the P bit is to
-> allow for performance optimizations. vfio-ccw however can not provide the
-> guarantees required if the bit is not set.
-> 
-> It is not possible to implement support for the P bit not set without
-> transitioning to lower level protocols for vfio-ccw.  So let's give the
-> user the opportunity to force setting the P bit, if the user knows this
-> is safe.  For self modifying channel programs forcing the P bit is not
-> safe.  If the P bit is forced for a self modifying channel program things
-> are expected to break in strange ways.
-> 
-> Let's also avoid warning multiple about P bit not set in the ORB in case
-> P bit is not told to be forced, and designate the affected vfio-ccw
-> device.
-> 
-> Signed-off-by: Halil Pasic <pasic@linux.ibm.com>
-> Suggested-by: Dong Jia Shi <bjsdjshi@linux.ibm.com>
-> Acked-by: Jason J. Herne <jjherne@linux.ibm.com>
-> Tested-by: Jason J. Herne <jjherne@linux.ibm.com>
-> ---
-> 
-> @Jason:
-> I have kept the tags this time without consulting you because
-> all that changed is the logging. Scream if that's not OK with you.
-> 
-> v2->v3:
-> * tweak commit message (Connie)
-> * designate subsystem (vfio-ccw) and devno in the log messages (Connie)
-> * turn WARN_ONCE macro into inline function
-> 
-> ---
->  hw/s390x/css.c |  3 +--
->  hw/vfio/ccw.c  | 35 +++++++++++++++++++++++++++++++++++
->  2 files changed, 36 insertions(+), 2 deletions(-)
+> Kbd_state_hotkey_register(kbd, KBD_HOTKEY_GRAB, Q_KEY_CODE_F16, KBD_MOD_NONE, KBD_MOD_NONE, KBD_MOD_NONE);
 
-How shall we proceed with this? I currently don't have much
-(understatement of the year...) queued, so we could wait until we
-hashed out where to go with _once logging (although the discussion
-seems to have died down a bit). If I merge a respin of David's tcg
-patches, however, I'd be inclined to merge this in the current form as
-well and transition to a common _once handling later.
+Yes, that should work.  I'm working on the series now and then (when I
+find some time), latest state is here:
+
+https://git.kraxel.org/cgit/qemu/log/?h=sirius/kbd-state
+
+cheers,
+  Gerd
