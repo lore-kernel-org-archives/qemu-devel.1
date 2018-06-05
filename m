@@ -1,28 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38271)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41847)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1fQ8gV-0002IS-Ls
-	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 05:55:24 -0400
+	(envelope-from <cohuck@redhat.com>) id 1fQ8zE-0007h4-Rz
+	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 06:14:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1fQ8gR-0005ZX-MH
-	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 05:55:23 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:33112 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1fQ8gR-0005Wn-FM
-	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 05:55:19 -0400
-Date: Tue, 5 Jun 2018 11:55:14 +0200
+	(envelope-from <cohuck@redhat.com>) id 1fQ8zB-0002iW-Kw
+	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 06:14:44 -0400
+Date: Tue, 5 Jun 2018 12:14:37 +0200
 From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20180605115514.65af4c41.cohuck@redhat.com>
-In-Reply-To: <CAFEAcA80XzxdxLfwMUYLpHprX8L=AZyNDw1DiJKshhGvbFJLRA@mail.gmail.com>
-References: <20180604162140.20688-1-peter.maydell@linaro.org>
-	<20180604191756.1ae61871@w520.home>
-	<52a5446f-4624-fd45-ce7d-492269aa5c3f@redhat.com>
-	<20180605094613.52bcf85d.cohuck@redhat.com>
-	<CAFEAcA80XzxdxLfwMUYLpHprX8L=AZyNDw1DiJKshhGvbFJLRA@mail.gmail.com>
+Message-ID: <20180605121437.4c360af3.cohuck@redhat.com>
+In-Reply-To: <20180524175828.3143-2-pasic@linux.ibm.com>
+References: <20180524175828.3143-1-pasic@linux.ibm.com>
+	<20180524175828.3143-2-pasic@linux.ibm.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] CODING_STYLE: Define our preferred form
- for multiline comments
+Subject: Re: [Qemu-devel] [PATCH v3 1/2] vfio-ccw: add force unlimited
+ prefetch property
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,31 +24,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Thomas Huth <thuth@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
+To: Halil Pasic <pasic@linux.ibm.com>
+Cc: Dong Jia Shi <bjsdjshi@linux.ibm.com>, "Jason J. Herne" <jjherne@linux.ibm.com>, qemu-s390x@nongnu.org, qemu-devel@nongnu.org
 
-On Tue, 5 Jun 2018 10:19:15 +0100
-Peter Maydell <peter.maydell@linaro.org> wrote:
+On Thu, 24 May 2018 19:58:27 +0200
+Halil Pasic <pasic@linux.ibm.com> wrote:
 
-> On 5 June 2018 at 08:46, Cornelia Huck <cohuck@redhat.com> wrote:
-> > On Tue, 5 Jun 2018 06:33:22 +0200
-> > Thomas Huth <thuth@redhat.com> wrote:  
-
-> >> Anyway, could we either use that dense format or the kernel-style
-> >> multi-lines-comment format, please? Mixing it asymmetrically is just ugly.  
-> >
-> > I'd vote for the kernel style, then.  
+> There is at least one guest (OS) such that although it does not rely on
+> the guarantees provided by ORB 1 word 9 bit (aka unlimited prefetch, aka
+> P bit) not being set, it fails to tell this to the machine.
 > 
-> I don't particularly object to the kernel style (though it's not
-> how I personally default to writing comments). I just didn't want
-> to rule a huge chunk of our existing comments as out-of-standard
-> for what I see as a relatively minor divergence in form --
-> we do have a lot of no-leading-separate-/* comments. I can live
-> with mandating kernel-style if it means we can rule out GNU-form
-> and other weirdnesses though :-)
+> Usually this ain't a big deal, as the original purpose of the P bit is to
+> allow for performance optimizations. vfio-ccw however can not provide the
+> guarantees required if the bit is not set.
+> 
+> It is not possible to implement support for the P bit not set without
+> transitioning to lower level protocols for vfio-ccw.  So let's give the
+> user the opportunity to force setting the P bit, if the user knows this
+> is safe.  For self modifying channel programs forcing the P bit is not
+> safe.  If the P bit is forced for a self modifying channel program things
+> are expected to break in strange ways.
+> 
+> Let's also avoid warning multiple about P bit not set in the ORB in case
+> P bit is not told to be forced, and designate the affected vfio-ccw
+> device.
+> 
+> Signed-off-by: Halil Pasic <pasic@linux.ibm.com>
+> Suggested-by: Dong Jia Shi <bjsdjshi@linux.ibm.com>
+> Acked-by: Jason J. Herne <jjherne@linux.ibm.com>
+> Tested-by: Jason J. Herne <jjherne@linux.ibm.com>
+> ---
+> 
+> @Jason:
+> I have kept the tags this time without consulting you because
+> all that changed is the logging. Scream if that's not OK with you.
+> 
+> v2->v3:
+> * tweak commit message (Connie)
+> * designate subsystem (vfio-ccw) and devno in the log messages (Connie)
+> * turn WARN_ONCE macro into inline function
+> 
+> ---
+>  hw/s390x/css.c |  3 +--
+>  hw/vfio/ccw.c  | 35 +++++++++++++++++++++++++++++++++++
+>  2 files changed, 36 insertions(+), 2 deletions(-)
 
-Yes, we should be flexible... as long as it isn't GNU :)
-
-Whatever we end up with, we should take care that we don't get zillions
-of "cleanup" patches that don't add value... something like "no need to
-change preexisting comments, unless you're touching the code anyway".
+How shall we proceed with this? I currently don't have much
+(understatement of the year...) queued, so we could wait until we
+hashed out where to go with _once logging (although the discussion
+seems to have died down a bit). If I merge a respin of David's tcg
+patches, however, I'd be inclined to merge this in the current form as
+well and transition to a common _once handling later.
