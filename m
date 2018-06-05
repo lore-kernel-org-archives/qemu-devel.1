@@ -1,22 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45584)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45604)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1fQ9N4-0005Jc-Fw
-	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 06:39:24 -0400
+	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1fQ9N5-0005OK-Su
+	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 06:39:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1fQ9N1-00065u-Ai
-	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 06:39:22 -0400
-Received: from mail.ispras.ru ([83.149.199.45]:55868)
+	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1fQ9N4-00068B-Nv
+	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 06:39:23 -0400
+Received: from mail.ispras.ru ([83.149.199.45]:55888)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1fQ9N0-00063X-Qo
-	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 06:39:19 -0400
+	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1fQ9N4-00067i-B9
+	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 06:39:22 -0400
 From: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
-Date: Tue, 05 Jun 2018 13:39:15 +0300
-Message-ID: <152819515565.30857.16834004920507717324.stgit@pasha-ThinkPad-T60>
+Date: Tue, 05 Jun 2018 13:39:21 +0300
+Message-ID: <152819516132.30857.1700667353240369481.stgit@pasha-ThinkPad-T60>
+In-Reply-To: <152819515565.30857.16834004920507717324.stgit@pasha-ThinkPad-T60>
+References: <152819515565.30857.16834004920507717324.stgit@pasha-ThinkPad-T60>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] [RFC PATCH v2 0/7] QEMU binary instrumentation
- prototype
+Subject: [Qemu-devel] [RFC PATCH v2 1/7] tcg: add headers for non-target
+ helpers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,119 +30,112 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: peter.maydell@linaro.org, maria.klimushenkova@ispras.ru, dovgaluk@ispras.ru, pavel.dovgaluk@ispras.ru, pbonzini@redhat.com, vilanova@ac.upc.edu
 
-The following series implements dynamic binary instrumentation upon QEMU.
+From: Pavel Dovgalyuk <pavel.dovgaluk@gmail.com>
 
-It is based on the following prior sources:
- - KVM Forum 2017 talk "Instrumenting, Introspection, and Debugging with QEMU"
-   https://www.linux-kvm.org/images/3/3d/Introspect.pdf
- - Discussion on Lluis Vilanova instrumentation patch series
-   https://lists.gnu.org/archive/html/qemu-devel/2017-09/msg03357.html
+This patch adds functions and headers for adding the helpers from
+the modules other than the target translators.
 
-There are many implementations of the instrumentation for QEMU.
-We have our own attempt on github: https://github.com/ispras/qemu/tree/plugins
-But this series differ from that approach and it is intended
-to provide a stable interface for adding and extending the QEMU binary
-analysis functions.
-
-We propose adding new instrumentation API for QEMU which will include
-the following parts:
- - some translator modifications to enable instrumenting the instructions
-   (and memory operations in the next version of the patches)
- - dynamic binary instrumentation part (a sample which is currently submitted
-   in this RFC series)
- - subsystem for dynamically loaded plugins that interact with this API
-
-The aim of the instrumentation is implementing different runtime
-tracers that can track the executed instructions, memory and
-hardware operations. The implementation should not incur too much
-overhead to make memory tracing as efficient as it is possible
-for this heavy task.
-
-The plugins should not have too many dependencies from the QEMU
-core. They should be built as a separate projects using just
-a couple of the headers.
-
-For the current patches the plugins should provide the following
-callbacks:
- - "needs" callback to check whether the specific instruction
-   should be instrumented by this plugin
- - "run" callback which called before executing the instuction
-
-Our instrumentation subsystem exploits TCG helper mechanism to embed
-callbacks into the translation blocks. These callbacks may be inserted
-before the specific instructions.
-
-The aim of submission of this series at that early stage is to get
-the feedback which will guide the development process. We are faced
-the following questions:
- 1. Does every plugins should have its own callback embedded into the TB
-    (which will cause TB extra growth in case of multiple plugins),
-    or the instrumentation layer's callback should invoke the plugins
-    that wanted to instrument that specific instruction?
- 2. How the plugins should function? Will they work as a binary dynamic
-    libraries or a script on some interpreted language?
- 3. Should the plugins reuse QEMU configuration script results?
-    Now there is no possibility for using platform-specific macros
-    generated by QEMU configure.
- 4. Maybe QEMU module infrastructure should be extended to support
-    plugins too?
- 5. How the GDB-related CPU inspection interface may be used better?
-    We should pass a register code to read the value. These codes
-    are not described in any of the files. Maybe a function for
-    accessing register by name should be added?
-
-
-v2 changes:
- - added a subsystem for the plugins
- - added QEMU side API for plugins
- - added sample plugins for simple tracing
-
+Signed-off-by: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
 ---
-
-Pavel Dovgalyuk (7):
-      tcg: add headers for non-target helpers
-      Add plugin support
-      plugins: provide helper functions for plugins
-      tcg: add instrumenting module
-      plugins: add plugin template
-      plugin: add instruction execution logger
-      plugins: add syscall logging plugin sample
-
-
- Makefile.target                   |    1 
- accel/tcg/translator.c            |    5 +
- configure                         |   14 ++++
- include/exec/helper-register.h    |   53 +++++++++++++++
- include/qemu/instrument.h         |    7 ++
- include/qemu/plugins.h            |    8 ++
- plugins/exec-log/Makefile         |   19 +++++
- plugins/exec-log/exec-log.c       |   18 +++++
- plugins/helper.h                  |    1 
- plugins/include/plugins.h         |   18 +++++
- plugins/plugins.c                 |  132 +++++++++++++++++++++++++++++++++++++
- plugins/qemulib.c                 |   31 +++++++++
- plugins/syscall-log/Makefile      |   19 +++++
- plugins/syscall-log/syscall-log.c |   44 ++++++++++++
- plugins/template/Makefile         |   19 +++++
- plugins/template/template.c       |   19 +++++
- qemu-options.hx                   |   10 +++
- tcg/tcg.c                         |   12 +++
- tcg/tcg.h                         |    3 +
- vl.c                              |    8 ++
- 20 files changed, 440 insertions(+), 1 deletion(-)
+ include/exec/helper-register.h |   53 ++++++++++++++++++++++++++++++++++++++++
+ tcg/tcg.c                      |   12 +++++++++
+ tcg/tcg.h                      |    3 ++
+ 3 files changed, 68 insertions(+)
  create mode 100644 include/exec/helper-register.h
- create mode 100644 include/qemu/instrument.h
- create mode 100644 include/qemu/plugins.h
- create mode 100644 plugins/exec-log/Makefile
- create mode 100644 plugins/exec-log/exec-log.c
- create mode 100644 plugins/helper.h
- create mode 100644 plugins/include/plugins.h
- create mode 100644 plugins/plugins.c
- create mode 100644 plugins/qemulib.c
- create mode 100644 plugins/syscall-log/Makefile
- create mode 100644 plugins/syscall-log/syscall-log.c
- create mode 100644 plugins/template/Makefile
- create mode 100644 plugins/template/template.c
 
---
-Pavel Dovgalyuk
+diff --git a/include/exec/helper-register.h b/include/exec/helper-register.h
+new file mode 100644
+index 0000000..aeface9
+--- /dev/null
++++ b/include/exec/helper-register.h
+@@ -0,0 +1,53 @@
++#ifndef HELPER_REGISTER_H
++#define HELPER_REGISTER_H
++
++#include "exec/helper-head.h"
++
++/* Need one more level of indirection before stringification
++   to get all the macros expanded first.  */
++#define str(s) #s
++
++#define DEF_HELPER_FLAGS_0(NAME, FLAGS, ret) \
++    tcg_register_helper(HELPER(NAME), str(NAME), FLAGS, dh_sizemask(ret, 0));
++
++#define DEF_HELPER_FLAGS_1(NAME, FLAGS, ret, t1) \
++    tcg_register_helper(HELPER(NAME), str(NAME), FLAGS, \
++        dh_sizemask(ret, 0) | dh_sizemask(t1, 1));
++
++#define DEF_HELPER_FLAGS_2(NAME, FLAGS, ret, t1, t2) \
++    tcg_register_helper(HELPER(NAME), str(NAME), FLAGS, \
++        dh_sizemask(ret, 0) | dh_sizemask(t1, 1) | dh_sizemask(t2, 2));
++
++#define DEF_HELPER_FLAGS_3(NAME, FLAGS, ret, t1, t2, t3) \
++    tcg_register_helper(HELPER(NAME), str(NAME), FLAGS, \
++        dh_sizemask(ret, 0) | dh_sizemask(t1, 1) | dh_sizemask(t2, 2) \
++        | dh_sizemask(t3, 3));
++
++#define DEF_HELPER_FLAGS_4(NAME, FLAGS, ret, t1, t2, t3, t4) \
++    tcg_register_helper(HELPER(NAME), str(NAME), FLAGS, \
++        dh_sizemask(ret, 0) | dh_sizemask(t1, 1) | dh_sizemask(t2, 2) \
++        | dh_sizemask(t3, 3) | dh_sizemask(t4, 4));
++
++#define DEF_HELPER_FLAGS_5(NAME, FLAGS, ret, t1, t2, t3, t4, t5) \
++    tcg_register_helper(HELPER(NAME), str(NAME), FLAGS, \
++        dh_sizemask(ret, 0) | dh_sizemask(t1, 1) | dh_sizemask(t2, 2) \
++        | dh_sizemask(t3, 3) | dh_sizemask(t4, 4) | dh_sizemask(t5, 5));
++
++#define DEF_HELPER_FLAGS_6(NAME, FLAGS, ret, t1, t2, t3, t4, t5, t6) \
++    tcg_register_helper(HELPER(NAME), str(NAME), FLAGS, \
++        dh_sizemask(ret, 0) | dh_sizemask(t1, 1) | dh_sizemask(t2, 2) \
++        | dh_sizemask(t3, 3) | dh_sizemask(t4, 4) | dh_sizemask(t5, 5) \
++        | dh_sizemask(t6, 6));
++
++#include "helper.h"
++
++#undef str
++#undef DEF_HELPER_FLAGS_0
++#undef DEF_HELPER_FLAGS_1
++#undef DEF_HELPER_FLAGS_2
++#undef DEF_HELPER_FLAGS_3
++#undef DEF_HELPER_FLAGS_4
++#undef DEF_HELPER_FLAGS_5
++#undef DEF_HELPER_FLAGS_6
++
++#endif /* HELPER_REGISTER_H */
+diff --git a/tcg/tcg.c b/tcg/tcg.c
+index 6eeebe0..8191381 100644
+--- a/tcg/tcg.c
++++ b/tcg/tcg.c
+@@ -1623,6 +1623,18 @@ static inline const char *tcg_find_helper(TCGContext *s, uintptr_t val)
+     return ret;
+ }
+ 
++void tcg_register_helper(void *func, const char *name,
++                         unsigned flags, unsigned sizemask)
++{
++    TCGHelperInfo *info = g_new0(TCGHelperInfo, 1);
++    info->func = func;
++    info->name = name;
++    info->flags = flags;
++    info->sizemask = sizemask;
++
++    g_hash_table_insert(helper_table, func, info);
++}
++
+ static const char * const cond_name[] =
+ {
+     [TCG_COND_NEVER] = "never",
+diff --git a/tcg/tcg.h b/tcg/tcg.h
+index 08f8bbf..7a4b750 100644
+--- a/tcg/tcg.h
++++ b/tcg/tcg.h
+@@ -890,6 +890,9 @@ void tcg_register_thread(void);
+ void tcg_prologue_init(TCGContext *s);
+ void tcg_func_start(TCGContext *s);
+ 
++void tcg_register_helper(void *func, const char *name,
++                         unsigned flags, unsigned sizemask);
++
+ int tcg_gen_code(TCGContext *s, TranslationBlock *tb);
+ 
+ void tcg_set_frame(TCGContext *s, TCGReg reg, intptr_t start, intptr_t size);
