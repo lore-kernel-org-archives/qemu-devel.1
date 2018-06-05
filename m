@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53171)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53145)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fQEVH-0000vI-KE
-	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 12:08:25 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1fQEVG-0000v7-4Y
+	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 12:08:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1fQESv-0004Jz-1E
-	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 12:08:11 -0400
-Received: from mail-wm0-x236.google.com ([2a00:1450:400c:c09::236]:36039)
+	(envelope-from <alex.bennee@linaro.org>) id 1fQESx-0004Ll-Hh
+	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 12:08:10 -0400
+Received: from mail-wr0-x235.google.com ([2a00:1450:400c:c0c::235]:38387)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1fQESu-0004JE-Lb
-	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 12:05:44 -0400
-Received: by mail-wm0-x236.google.com with SMTP id v131-v6so6185897wma.1
-	for <qemu-devel@nongnu.org>; Tue, 05 Jun 2018 09:05:44 -0700 (PDT)
+	id 1fQESx-0004Kx-5M
+	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 12:05:47 -0400
+Received: by mail-wr0-x235.google.com with SMTP id 94-v6so3030849wrf.5
+	for <qemu-devel@nongnu.org>; Tue, 05 Jun 2018 09:05:47 -0700 (PDT)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Date: Tue,  5 Jun 2018 17:05:36 +0100
-Message-Id: <20180605160541.10664-2-alex.bennee@linaro.org>
+Date: Tue,  5 Jun 2018 17:05:41 +0100
+Message-Id: <20180605160541.10664-7-alex.bennee@linaro.org>
 In-Reply-To: <20180605160541.10664-1-alex.bennee@linaro.org>
 References: <20180605160541.10664-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 1/6] docker: add "probe" command for configure
+Subject: [Qemu-devel] [PULL 6/6] docker: add debian/tricore image
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,43 +30,60 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: peter.maydell@linaro.org
-Cc: qemu-devel@nongnu.org, berrange@redhat.com, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Fam Zheng <famz@redhat.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Cc: qemu-devel@nongnu.org, berrange@redhat.com, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Fam Zheng <famz@redhat.com>
 
-This is a helper function for the configure script. It replies yes,
-sudo or no to inform the user if non-interactive docker support is
-available. We trap the Exception to fail gracefully.
+From: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
+TriCore binutils is built from Bastian Koppelmann repository.
+
+Note: There is no TriCore compiler in this image (only assembler/linker).
+
+Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+[AJB: base of Debian9, add to Makefile.include]
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-Reviewed-by: Fam Zheng <famz@redhat.com>
 
-diff --git a/tests/docker/docker.py b/tests/docker/docker.py
-index 1246ba9578..f8267586eb 100755
---- a/tests/docker/docker.py
-+++ b/tests/docker/docker.py
-@@ -390,6 +390,24 @@ class ImagesCommand(SubCommand):
-     def run(self, args, argv):
-         return Docker().command("images", argv, args.quiet)
+diff --git a/tests/docker/Makefile.include b/tests/docker/Makefile.include
+index 9d5749887a..74fd51c22c 100644
+--- a/tests/docker/Makefile.include
++++ b/tests/docker/Makefile.include
+@@ -63,6 +63,9 @@ docker-image-debian-win32-cross: docker-image-debian8-mxe
+ docker-image-debian-win64-cross: docker-image-debian8-mxe
+ docker-image-travis: NOUSER=1
  
++# Specialist build images, sometimes very limited tools
++docker-image-tricore-cross: docker-image-debian9
 +
-+class ProbeCommand(SubCommand):
-+    """Probe if we can run docker automatically"""
-+    name = "probe"
+ # Expand all the pre-requistes for each docker image and test combination
+ $(foreach i,$(DOCKER_IMAGES) $(DOCKER_DEPRECATED_IMAGES), \
+ 	$(foreach t,$(DOCKER_TESTS) $(DOCKER_TOOLS), \
+diff --git a/tests/docker/dockerfiles/debian-tricore-cross.docker b/tests/docker/dockerfiles/debian-tricore-cross.docker
+new file mode 100644
+index 0000000000..898b8dd511
+--- /dev/null
++++ b/tests/docker/dockerfiles/debian-tricore-cross.docker
+@@ -0,0 +1,23 @@
++#
++# Docker TriCore cross-compiler target
++#
++# This docker target builds on the debian Stretch base image.
++#
++# Copyright (c) 2018 Philippe Mathieu-Daudé
++#
++# SPDX-License-Identifier: GPL-2.0-or-later
++#
++FROM debian:9
 +
-+    def run(self, args, argv):
-+        try:
-+            docker = Docker()
-+            if docker._command[0] == "docker":
-+                print "yes"
-+            elif docker._command[0] == "sudo":
-+                print "sudo"
-+        except Exception:
-+            print "no"
++MAINTAINER Philippe Mathieu-Daudé <f4bug@amsat.org>
 +
-+        return
++RUN git clone --single-branch \
++        https://github.com/bkoppelmann/tricore-binutils.git \
++        /usr/src/binutils && \
++    cd /usr/src/binutils && chmod +x missing && \
++    CFLAGS=-w ./configure --prefix=/usr --disable-nls --target=tricore && \
++    make && make install && \
++    rm -rf /usr/src/binutils
 +
-+
- def main():
-     parser = argparse.ArgumentParser(description="A Docker helper",
-             usage="%s <subcommand> ..." % os.path.basename(sys.argv[0]))
++# Specify the cross prefix for this image (see tests/docker/common.rc)
++ENV QEMU_CONFIGURE_OPTS --cross-prefix=tricore-
 -- 
 2.17.0
