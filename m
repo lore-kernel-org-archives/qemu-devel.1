@@ -1,25 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42969)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45584)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1fQ951-0001Je-3d
-	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 06:20:44 -0400
+	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1fQ9N4-0005Jc-Fw
+	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 06:39:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1fQ94x-0007RY-SG
-	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 06:20:43 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:55616 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1fQ94x-0007Qn-M9
-	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 06:20:39 -0400
-Date: Tue, 5 Jun 2018 12:20:37 +0200
-From: Gerd Hoffmann <kraxel@redhat.com>
-Message-ID: <20180605102037.3f54j2ir4aqrvelr@sirius.home.kraxel.org>
-References: <20180221170820.15365-1-kraxel@redhat.com>
-	<20180221170820.15365-3-kraxel@redhat.com>
-	<78856018-DE4F-42C2-899F-428FE7E55141@gmail.com>
+	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1fQ9N1-00065u-Ai
+	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 06:39:22 -0400
+Received: from mail.ispras.ru ([83.149.199.45]:55868)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <Pavel.Dovgaluk@ispras.ru>) id 1fQ9N0-00063X-Qo
+	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 06:39:19 -0400
+From: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
+Date: Tue, 05 Jun 2018 13:39:15 +0300
+Message-ID: <152819515565.30857.16834004920507717324.stgit@pasha-ThinkPad-T60>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <78856018-DE4F-42C2-899F-428FE7E55141@gmail.com>
-Subject: Re: [Qemu-devel] [RFC PATCH 2/5] kbd-state: add hotkey registry
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Subject: [Qemu-devel] [RFC PATCH v2 0/7] QEMU binary instrumentation
+ prototype
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,19 +25,122 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Programmingkid <programmingkidx@gmail.com>
-Cc: qemu-devel@nongnu.org, berrange@redhat.com, peter.maydell@linaro.org
+To: qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org, maria.klimushenkova@ispras.ru, dovgaluk@ispras.ru, pavel.dovgaluk@ispras.ru, pbonzini@redhat.com, vilanova@ac.upc.edu
 
-  Hi,
+The following series implements dynamic binary instrumentation upon QEMU.
 
-> You say the hotkey is a QKeyCode and a modifier key combined. But it looks like a single QKeyCode would be supported. I would prefer being able to use a single key like F16 to ungrab the mouse. Would that be possible here?
-> 
-> Kbd_state_hotkey_register(kbd, KBD_HOTKEY_GRAB, Q_KEY_CODE_F16, KBD_MOD_NONE, KBD_MOD_NONE, KBD_MOD_NONE);
+It is based on the following prior sources:
+ - KVM Forum 2017 talk "Instrumenting, Introspection, and Debugging with QEMU"
+   https://www.linux-kvm.org/images/3/3d/Introspect.pdf
+ - Discussion on Lluis Vilanova instrumentation patch series
+   https://lists.gnu.org/archive/html/qemu-devel/2017-09/msg03357.html
 
-Yes, that should work.  I'm working on the series now and then (when I
-find some time), latest state is here:
+There are many implementations of the instrumentation for QEMU.
+We have our own attempt on github: https://github.com/ispras/qemu/tree/plugins
+But this series differ from that approach and it is intended
+to provide a stable interface for adding and extending the QEMU binary
+analysis functions.
 
-https://git.kraxel.org/cgit/qemu/log/?h=sirius/kbd-state
+We propose adding new instrumentation API for QEMU which will include
+the following parts:
+ - some translator modifications to enable instrumenting the instructions
+   (and memory operations in the next version of the patches)
+ - dynamic binary instrumentation part (a sample which is currently submitted
+   in this RFC series)
+ - subsystem for dynamically loaded plugins that interact with this API
 
-cheers,
-  Gerd
+The aim of the instrumentation is implementing different runtime
+tracers that can track the executed instructions, memory and
+hardware operations. The implementation should not incur too much
+overhead to make memory tracing as efficient as it is possible
+for this heavy task.
+
+The plugins should not have too many dependencies from the QEMU
+core. They should be built as a separate projects using just
+a couple of the headers.
+
+For the current patches the plugins should provide the following
+callbacks:
+ - "needs" callback to check whether the specific instruction
+   should be instrumented by this plugin
+ - "run" callback which called before executing the instuction
+
+Our instrumentation subsystem exploits TCG helper mechanism to embed
+callbacks into the translation blocks. These callbacks may be inserted
+before the specific instructions.
+
+The aim of submission of this series at that early stage is to get
+the feedback which will guide the development process. We are faced
+the following questions:
+ 1. Does every plugins should have its own callback embedded into the TB
+    (which will cause TB extra growth in case of multiple plugins),
+    or the instrumentation layer's callback should invoke the plugins
+    that wanted to instrument that specific instruction?
+ 2. How the plugins should function? Will they work as a binary dynamic
+    libraries or a script on some interpreted language?
+ 3. Should the plugins reuse QEMU configuration script results?
+    Now there is no possibility for using platform-specific macros
+    generated by QEMU configure.
+ 4. Maybe QEMU module infrastructure should be extended to support
+    plugins too?
+ 5. How the GDB-related CPU inspection interface may be used better?
+    We should pass a register code to read the value. These codes
+    are not described in any of the files. Maybe a function for
+    accessing register by name should be added?
+
+
+v2 changes:
+ - added a subsystem for the plugins
+ - added QEMU side API for plugins
+ - added sample plugins for simple tracing
+
+---
+
+Pavel Dovgalyuk (7):
+      tcg: add headers for non-target helpers
+      Add plugin support
+      plugins: provide helper functions for plugins
+      tcg: add instrumenting module
+      plugins: add plugin template
+      plugin: add instruction execution logger
+      plugins: add syscall logging plugin sample
+
+
+ Makefile.target                   |    1 
+ accel/tcg/translator.c            |    5 +
+ configure                         |   14 ++++
+ include/exec/helper-register.h    |   53 +++++++++++++++
+ include/qemu/instrument.h         |    7 ++
+ include/qemu/plugins.h            |    8 ++
+ plugins/exec-log/Makefile         |   19 +++++
+ plugins/exec-log/exec-log.c       |   18 +++++
+ plugins/helper.h                  |    1 
+ plugins/include/plugins.h         |   18 +++++
+ plugins/plugins.c                 |  132 +++++++++++++++++++++++++++++++++++++
+ plugins/qemulib.c                 |   31 +++++++++
+ plugins/syscall-log/Makefile      |   19 +++++
+ plugins/syscall-log/syscall-log.c |   44 ++++++++++++
+ plugins/template/Makefile         |   19 +++++
+ plugins/template/template.c       |   19 +++++
+ qemu-options.hx                   |   10 +++
+ tcg/tcg.c                         |   12 +++
+ tcg/tcg.h                         |    3 +
+ vl.c                              |    8 ++
+ 20 files changed, 440 insertions(+), 1 deletion(-)
+ create mode 100644 include/exec/helper-register.h
+ create mode 100644 include/qemu/instrument.h
+ create mode 100644 include/qemu/plugins.h
+ create mode 100644 plugins/exec-log/Makefile
+ create mode 100644 plugins/exec-log/exec-log.c
+ create mode 100644 plugins/helper.h
+ create mode 100644 plugins/include/plugins.h
+ create mode 100644 plugins/plugins.c
+ create mode 100644 plugins/qemulib.c
+ create mode 100644 plugins/syscall-log/Makefile
+ create mode 100644 plugins/syscall-log/syscall-log.c
+ create mode 100644 plugins/template/Makefile
+ create mode 100644 plugins/template/template.c
+
+--
+Pavel Dovgalyuk
