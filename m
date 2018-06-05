@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40139)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40136)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1fQHAu-00035n-QB
+	(envelope-from <jsnow@redhat.com>) id 1fQHAu-00035Y-Kx
 	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 14:59:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1fQHAt-0005RM-Kf
+	(envelope-from <jsnow@redhat.com>) id 1fQHAt-0005RA-GD
 	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 14:59:20 -0400
 From: John Snow <jsnow@redhat.com>
-Date: Tue,  5 Jun 2018 14:59:02 -0400
-Message-Id: <20180605185905.4583-3-jsnow@redhat.com>
+Date: Tue,  5 Jun 2018 14:59:05 -0400
+Message-Id: <20180605185905.4583-6-jsnow@redhat.com>
 In-Reply-To: <20180605185905.4583-1-jsnow@redhat.com>
 References: <20180605185905.4583-1-jsnow@redhat.com>
-Subject: [Qemu-devel] [PATCH 2/5] qapi: add
- x-block-dirty-bitmap-enable/disable
+Subject: [Qemu-devel] [PATCH 5/5] qapi: add disabled parameter to
+ block-dirty-bitmap-add
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,119 +23,82 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org, qemu-devel@nongnu.org
 Cc: Fam Zheng <famz@redhat.com>, John Snow <jsnow@redhat.com>, Markus Armbruster <armbru@redhat.com>, Max Reitz <mreitz@redhat.com>, Eric Blake <eblake@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+
+This is needed, for example, to create a new bitmap and merge several
+disabled bitmaps into a new one. Without this flag we will have to
+put block-dirty-bitmap-add and block-dirty-bitmap-disable into one
+transaction.
+
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-[Added x- prefix. --js]
 Signed-off-by: John Snow <jsnow@redhat.com>
 ---
- blockdev.c           | 42 ++++++++++++++++++++++++++++++++++++++++++
- qapi/block-core.json | 42 ++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 84 insertions(+)
+ blockdev.c           | 10 ++++++++++
+ qapi/block-core.json |  6 +++++-
+ 2 files changed, 15 insertions(+), 1 deletion(-)
 
 diff --git a/blockdev.c b/blockdev.c
-index 8de95be8f4..5f059cedcb 100644
+index b00908fdfd..03e7cbeea1 100644
 --- a/blockdev.c
 +++ b/blockdev.c
-@@ -2923,6 +2923,48 @@ void qmp_block_dirty_bitmap_clear(const char *node, const char *name,
-     bdrv_clear_dirty_bitmap(bitmap, NULL);
+@@ -2073,6 +2073,7 @@ static void block_dirty_bitmap_add_prepare(BlkActionState *common,
+                                action->has_granularity, action->granularity,
+                                action->has_persistent, action->persistent,
+                                action->has_autoload, action->autoload,
++                               action->has_x_disabled, action->x_disabled,
+                                &local_err);
+ 
+     if (!local_err) {
+@@ -2880,6 +2881,7 @@ void qmp_block_dirty_bitmap_add(const char *node, const char *name,
+                                 bool has_granularity, uint32_t granularity,
+                                 bool has_persistent, bool persistent,
+                                 bool has_autoload, bool autoload,
++                                bool has_disabled, bool disabled,
+                                 Error **errp)
+ {
+     BlockDriverState *bs;
+@@ -2914,6 +2916,10 @@ void qmp_block_dirty_bitmap_add(const char *node, const char *name,
+         warn_report("Autoload option is deprecated and its value is ignored");
+     }
+ 
++    if (!has_disabled) {
++        disabled = false;
++    }
++
+     if (persistent &&
+         !bdrv_can_store_new_dirty_bitmap(bs, name, granularity, errp))
+     {
+@@ -2925,6 +2931,10 @@ void qmp_block_dirty_bitmap_add(const char *node, const char *name,
+         return;
+     }
+ 
++    if (disabled) {
++        bdrv_disable_dirty_bitmap(bitmap);
++    }
++
+     bdrv_dirty_bitmap_set_persistance(bitmap, persistent);
  }
  
-+void qmp_x_block_dirty_bitmap_enable(const char *node, const char *name,
-+                                   Error **errp)
-+{
-+    BlockDriverState *bs;
-+    BdrvDirtyBitmap *bitmap;
-+
-+    bitmap = block_dirty_bitmap_lookup(node, name, &bs, errp);
-+    if (!bitmap || !bs) {
-+        return;
-+    }
-+
-+    if (bdrv_dirty_bitmap_frozen(bitmap)) {
-+        error_setg(errp,
-+                   "Bitmap '%s' is currently frozen and cannot be enabled",
-+                   name);
-+        return;
-+    }
-+
-+    bdrv_enable_dirty_bitmap(bitmap);
-+}
-+
-+void qmp_x_block_dirty_bitmap_disable(const char *node, const char *name,
-+                                    Error **errp)
-+{
-+    BlockDriverState *bs;
-+    BdrvDirtyBitmap *bitmap;
-+
-+    bitmap = block_dirty_bitmap_lookup(node, name, &bs, errp);
-+    if (!bitmap || !bs) {
-+        return;
-+    }
-+
-+    if (bdrv_dirty_bitmap_frozen(bitmap)) {
-+        error_setg(errp,
-+                   "Bitmap '%s' is currently frozen and cannot be disabled",
-+                   name);
-+        return;
-+    }
-+
-+    bdrv_disable_dirty_bitmap(bitmap);
-+}
-+
- BlockDirtyBitmapSha256 *qmp_x_debug_block_dirty_bitmap_sha256(const char *node,
-                                                               const char *name,
-                                                               Error **errp)
 diff --git a/qapi/block-core.json b/qapi/block-core.json
-index 4b1de474a9..c061884a0e 100644
+index 3999175c23..f06a43bfb2 100644
 --- a/qapi/block-core.json
 +++ b/qapi/block-core.json
-@@ -1808,6 +1808,48 @@
- { 'command': 'block-dirty-bitmap-clear',
-   'data': 'BlockDirtyBitmap' }
- 
-+##
-+# @x-block-dirty-bitmap-enable:
-+#
-+# Enables a dirty bitmap so that it will begin tracking disk changes.
-+#
-+# Returns: nothing on success
-+#          If @node is not a valid block device, DeviceNotFound
-+#          If @name is not found, GenericError with an explanation
-+#
-+# Since: 2.12
-+#
-+# Example:
-+#
-+# -> { "execute": "x-block-dirty-bitmap-enable",
-+#      "arguments": { "node": "drive0", "name": "bitmap0" } }
-+# <- { "return": {} }
-+#
-+##
-+  { 'command': 'x-block-dirty-bitmap-enable',
-+    'data': 'BlockDirtyBitmap' }
-+
-+##
-+# @x-block-dirty-bitmap-disable:
-+#
-+# Disables a dirty bitmap so that it will stop tracking disk changes.
-+#
-+# Returns: nothing on success
-+#          If @node is not a valid block device, DeviceNotFound
-+#          If @name is not found, GenericError with an explanation
-+#
-+# Since: 2.12
-+#
-+# Example:
-+#
-+# -> { "execute": "x-block-dirty-bitmap-disable",
-+#      "arguments": { "node": "drive0", "name": "bitmap0" } }
-+# <- { "return": {} }
-+#
-+##
-+    { 'command': 'x-block-dirty-bitmap-disable',
-+      'data': 'BlockDirtyBitmap' }
-+
- ##
- # @BlockDirtyBitmapSha256:
+@@ -1734,11 +1734,15 @@
+ #            Currently, all dirty tracking bitmaps are loaded from Qcow2 on
+ #            open.
  #
++# @x-disabled: the bitmap is created in the disabled state, which means that
++#              it will not track drive changes. The bitmap may be enabled with
++#              x-block-dirty-bitmap-enable. Default is false. (Since: 3.0)
++#
+ # Since: 2.4
+ ##
+ { 'struct': 'BlockDirtyBitmapAdd',
+   'data': { 'node': 'str', 'name': 'str', '*granularity': 'uint32',
+-            '*persistent': 'bool', '*autoload': 'bool' } }
++            '*persistent': 'bool', '*autoload': 'bool', '*x-disabled': 'bool' } }
+ 
+ ##
+ # @BlockDirtyBitmapMerge:
 -- 
 2.14.3
