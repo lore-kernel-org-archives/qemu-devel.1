@@ -1,32 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53952)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54546)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcel.apfelbaum@gmail.com>) id 1fQBtO-0000vS-Ug
-	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 09:20:56 -0400
+	(envelope-from <lersek@redhat.com>) id 1fQBw4-00033A-R8
+	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 09:23:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcel.apfelbaum@gmail.com>) id 1fQBtL-00077E-Pp
-	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 09:20:54 -0400
-Received: from mail-wm0-x241.google.com ([2a00:1450:400c:c09::241]:38567)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <marcel.apfelbaum@gmail.com>)
-	id 1fQBtL-00076a-Ie
-	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 09:20:51 -0400
-Received: by mail-wm0-x241.google.com with SMTP id m129-v6so5060863wmb.3
-	for <qemu-devel@nongnu.org>; Tue, 05 Jun 2018 06:20:51 -0700 (PDT)
-References: <20180603092749.107476-1-marcel.apfelbaum@gmail.com>
-	<20180604042928-mutt-send-email-mst@kernel.org>
-	<23040757-b561-e0bf-a41d-38d3c44555ee@gmail.com>
-	<20180605072746.v6xxabsbewiuw7ka@sirius.home.kraxel.org>
-	<20180605084300.GF32286@redhat.com>
-From: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
-Message-ID: <53c37321-52d2-732c-19fb-8f6a9542c714@gmail.com>
-Date: Tue, 5 Jun 2018 16:20:46 +0300
+	(envelope-from <lersek@redhat.com>) id 1fQBw3-00007H-WC
+	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 09:23:40 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:45992 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1fQBw3-00005J-R0
+	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 09:23:39 -0400
+References: <20180323122520.11270-1-kraxel@redhat.com>
+	<43fc23c1-d72f-748a-5b9d-a816466d7406@redhat.com>
+	<20180425140749.6x3w4h4i2n6uaq7o@sirius.home.kraxel.org>
+	<1ed94b1c-b416-eebe-9cf3-91943a0e6c5a@redhat.com>
+	<20180531084347.xb2r5aolkis2nmqg@sirius.home.kraxel.org>
+	<4b65af58-8451-a365-6c81-52c49e42b6ff@redhat.com>
+	<20180605110647.7ctaj7fiy6x4ewdw@sirius.home.kraxel.org>
+	<a3fe57cf-1569-834d-5528-d85847b29f9f@redhat.com>
+	<20180605131649.fu3cellm7vwaf4ao@sirius.home.kraxel.org>
+From: Laszlo Ersek <lersek@redhat.com>
+Message-ID: <20d457f0-647f-04e3-76c3-ed58f3494208@redhat.com>
+Date: Tue, 5 Jun 2018 15:23:23 +0200
 MIME-Version: 1.0
-In-Reply-To: <20180605084300.GF32286@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <20180605131649.fu3cellm7vwaf4ao@sirius.home.kraxel.org>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Subject: Re: [Qemu-devel] [PATCH RFC] hw/pc: set q35 as the default x86
- machine
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 0/7] ramfb: simple boot framebuffer,
+ no legacy vga
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,41 +36,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "=?UTF-8?Q?Daniel_P._Berrang=c3=a9?=" <berrange@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>
-Cc: pbonzini@redhat.com, rth@twiddle.net, qemu-devel@nongnu.org, ehabkost@redhat.com, "Michael S. Tsirkin" <mst@redhat.com>
+To: Gerd Hoffmann <kraxel@redhat.com>
+Cc: qemu-devel@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>, Alex Williamson <alex.williamson@redhat.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>
 
-
-
-On 06/05/2018 11:43 AM, Daniel P. Berrangé wrote:
-> On Tue, Jun 05, 2018 at 09:27:46AM +0200, Gerd Hoffmann wrote:
->>    Hi,
+On 06/05/18 15:16, Gerd Hoffmann wrote:
+> On Tue, Jun 05, 2018 at 02:07:27PM +0200, Laszlo Ersek wrote:
+>> On 06/05/18 13:06, Gerd Hoffmann wrote:
+>>>   Hi,
+>>>
+>>>>>> I could imagine an OvmfPkg-specific PCI capability that said, "all PCI
+>>>>>> drivers in OvmfPkg that could otherwise drive this device, ignore it --
+>>>>>> another (platform) driver in OvmfPkg will pick it up instead".
+>>>>>
+>>>>> pci capability for ramfb could be useful (also for linux).  I'll keep it
+>>>>> in mind for now.
+>>>>
+>>>> Please do. :)
+>>>
+>>> Hmm, well.  Virtio 1.0 uses vendor specific capabilities already to
+>>> define the regions, and they don't have a fixed field saying "this is
+>>> for virtio".  So adding another vendor specific capability for something
+>>> else on the same device is a bit problematic ...
 >>
->>>>    Add to that shortcuts like -cdrom
->>>> stop working,
->>> Maybe is fixable.
->> Already fixed for ages.
->>
->>> I see marking Q35 as the default machine a first step.
->> Maybe the better option is to go the arm route:  Just don't define a
->> default, so users have to specify pc or q35.  That will make them notice
->> there is a world beside 'pc', and we also avoid breaking things
->> silently.
+>> Can we invent a non-PCI method, e.g. fw_cfg, that tells QemuVideoDxe and
+>> Virtio10Dxe not to bind some PCI S/B/D/Fs? Something like:
+> 
+> Well, from edk2 point of view Virtio10Dxe is the only problematic case
+> because there is a is a native driver.  For cirrus/stdvga a version with
+> ramfb is rather pointless.
 
-It can work, sure. And we can add user hints: "Use q35 for ...., select 
-pc if..."
+Good catch; thinko on my part!
 
-> If QEMU removes the default, then libvirt will have to hardcode
-> 'pc' as the default to maintain back compatibility, so I don't
-> think that ends up as a net win
+> A qxl-ramfb device might make sense, but
+> QemuVideoDxe would ignore such a device like it ignores qxl today as it
+> can only handle the vga mode of qxl-vga devices.
 
-Can't libvirt preserve 'pc' for existing domains, while defaulting to q35
-the creation of new domains ? This way it aligns with Gerd's proposal of 
-no default
-x86 machine.
+Indeed.
 
-Thanks,
-Marcel
+> Also I'd prefer to provide informations (device foo has ramfb at <addr>)
+> not instructions (please ignore device foo).
+> 
+> Maybe we should for now just scratch the idea of an virtio-ramfb device.
+> Linux doesn't need it, and windows wouldn't use the virtio part of it so
+> a standalone ramfb device would work equally well.
 
->
-> Regards,
-> Daniel
+If that works for you, it works for me best!
+
+Thanks!
+Laszlo
