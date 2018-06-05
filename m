@@ -1,33 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42136)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43722)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1fQB3O-000487-6p
-	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 08:27:12 -0400
+	(envelope-from <mst@redhat.com>) id 1fQB9Q-0001XO-RT
+	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 08:33:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1fQB3L-0005Wi-0W
-	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 08:27:10 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:34742 helo=mx1.redhat.com)
+	(envelope-from <mst@redhat.com>) id 1fQB9P-000288-Nf
+	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 08:33:24 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:47994 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1fQB3K-0005WL-RQ
-	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 08:27:06 -0400
-Date: Tue, 5 Jun 2018 13:27:02 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20180605122702.GF32286@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <20180531224911.23725-1-richard.henderson@linaro.org>
-	<20180531224911.23725-7-richard.henderson@linaro.org>
-	<788ee514-a026-d415-73ce-67cc996e6259@vivier.eu>
-	<149da730-950c-a527-2373-9cb0433543b1@linaro.org>
-	<CAFEAcA-h7Ef5yfOS3V_kR5_fCmhr-N6okHY9=N87M9Ld+8MVdA@mail.gmail.com>
-	<54f54010-ad2d-7df0-8838-b2ddc7668875@vivier.eu>
-	<CAFEAcA9b==mGZQUAoPDCt1zbqxT3RmTa0XoQZvuPb17L0NYbMg@mail.gmail.com>
-	<18231864-96b1-8f6f-5caa-c3d8613ec20e@vivier.eu>
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1fQB9P-00027d-Ip
+	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 08:33:23 -0400
+Date: Tue, 5 Jun 2018 15:33:21 +0300
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20180605152344-mutt-send-email-mst@kernel.org>
+References: <1525734594-11134-1-git-send-email-sridhar.samudrala@intel.com>
+	<fcefe501-b410-f1ec-829c-68199edcdbef@intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <18231864-96b1-8f6f-5caa-c3d8613ec20e@vivier.eu>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 6/6] linux-user: Use *at functions to
- implement interp_prefix
+In-Reply-To: <fcefe501-b410-f1ec-829c-68199edcdbef@intel.com>
+Subject: Re: [Qemu-devel] [PATCH] qemu: Introduce VIRTIO_NET_F_STANDBY
+ feature bit to virtio_net
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,50 +28,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laurent Vivier <laurent@vivier.eu>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Richard Henderson <richard.henderson@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, Evan Green <evgreen@chromium.org>
+To: "Samudrala, Sridhar" <sridhar.samudrala@intel.com>
+Cc: virtualization@lists.linux-foundation.org, virtio-dev@lists.oasis-open.org, jesse.brandeburg@intel.com, alexander.h.duyck@intel.com, jasowang@redhat.com, qemu-devel@nongnu.org
 
-On Tue, Jun 05, 2018 at 02:23:56PM +0200, Laurent Vivier wrote:
-> Le 05/06/2018 =C3=A0 14:14, Peter Maydell a =C3=A9crit=C2=A0:
-> > On 5 June 2018 at 13:05, Laurent Vivier <laurent@vivier.eu> wrote:
-> >> Le 05/06/2018 =C3=A0 12:52, Peter Maydell a =C3=A9crit :
-> >>> On 5 June 2018 at 06:27, Richard Henderson <richard.henderson@linar=
-o.org> wrote:
-> >>>> On Fedora 28, one can no longer build a static qemu.  We depend on=
- libraries
-> >>>> for which Fedora no longer ships static versions.
-> >>>
-> >>> Do you mean you can't build the system binaries statically (that's
-> >>> never really been very supported), or that you can't do a build
-> >>> with configure --disable-system --disable-tools --static ?
-> >>>
-> >>> The latter would be more concerning.
-> >>
-> >> On Fedora I have also to disable gcrypt, nettle and libiscsi because=
- we
-> >> don't have the statically linked libraries, but we don't need them w=
-ith
-> >> linux-user.
-> >=20
-> > Do we actually try to link with those for linux-user? If not,
-> > maybe we could make configure a bit more helpful about not
-> > requiring you to manually --disable-foo them.
->=20
-> They are used by tests/qemu-iotests/socket_scm_helper and
-> qemu-bridge-helper.
->=20
-> Perhaps we can disable qemu-iotests with linux-user only and to not
-> build qemu-bridge-helper when tools are disabled?
+I don't think this is sufficient.
 
-Actually we should not build qemu-bridge-helper if all system emulator
-builds are disabled, since its not intended as a standalone tool.
+If both primary and standby devices are present, a legacy guest without
+support for the feature might see two devices with same mac and get
+confused.
 
-Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
-ge :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.c=
-om :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
-ge :|
+I think that we should only make primary visible after guest acked the
+backup feature bit.
+
+And on reset or when backup is cleared in some other way, unplug the
+primary.
+
+Something like the below will do the job:
+
+Primary device is added with a special "primary-failover" flag.
+A virtual machine is then initialized with just a standby virtio
+device. Primary is not yet added.
+
+Later QEMU detects that guest driver device set DRIVER_OK.
+It then exposes the primary device to the guest, and triggers 
+a device addition event (hot-plug event) for it.
+
+If QEMU detects guest driver removal, it initiates a hot-unplug sequence
+to remove the primary driver.  In particular, if QEMU detects guest
+re-initialization (e.g. by detecting guest reset) it immediately removes
+the primary device.
+
+We can move some of this code to management as well, architecturally it
+does not make too much sense but it might be easier implementation-wise.
+
+HTH
+
+On Mon, Jun 04, 2018 at 06:41:48PM -0700, Samudrala, Sridhar wrote:
+> Ping on this patch now that the kernel patches are accepted into davem's net-next tree.
+> https://patchwork.ozlabs.org/cover/920005/
+> 
+> 
+> On 5/7/2018 4:09 PM, Sridhar Samudrala wrote:
+> > This feature bit can be used by hypervisor to indicate virtio_net device to
+> > act as a standby for another device with the same MAC address.
+> > 
+> > I tested this with a small change to the patch to mark the STANDBY feature 'true'
+> > by default as i am using libvirt to start the VMs.
+> > Is there a way to pass the newly added feature bit 'standby' to qemu via libvirt
+> > XML file?
+> > 
+> > Signed-off-by: Sridhar Samudrala <sridhar.samudrala@intel.com>
+> > ---
+> >   hw/net/virtio-net.c                         | 2 ++
+> >   include/standard-headers/linux/virtio_net.h | 3 +++
+> >   2 files changed, 5 insertions(+)
+> > 
+> > diff --git a/hw/net/virtio-net.c b/hw/net/virtio-net.c
+> > index 90502fca7c..38b3140670 100644
+> > --- a/hw/net/virtio-net.c
+> > +++ b/hw/net/virtio-net.c
+> > @@ -2198,6 +2198,8 @@ static Property virtio_net_properties[] = {
+> >                        true),
+> >       DEFINE_PROP_INT32("speed", VirtIONet, net_conf.speed, SPEED_UNKNOWN),
+> >       DEFINE_PROP_STRING("duplex", VirtIONet, net_conf.duplex_str),
+> > +    DEFINE_PROP_BIT64("standby", VirtIONet, host_features, VIRTIO_NET_F_STANDBY,
+> > +                      false),
+> >       DEFINE_PROP_END_OF_LIST(),
+> >   };
+> > diff --git a/include/standard-headers/linux/virtio_net.h b/include/standard-headers/linux/virtio_net.h
+> > index e9f255ea3f..01ec09684c 100644
+> > --- a/include/standard-headers/linux/virtio_net.h
+> > +++ b/include/standard-headers/linux/virtio_net.h
+> > @@ -57,6 +57,9 @@
+> >   					 * Steering */
+> >   #define VIRTIO_NET_F_CTRL_MAC_ADDR 23	/* Set MAC address */
+> > +#define VIRTIO_NET_F_STANDBY      62    /* Act as standby for another device
+> > +                                         * with the same MAC.
+> > +                                         */
+> >   #define VIRTIO_NET_F_SPEED_DUPLEX 63	/* Device set linkspeed and duplex */
+> >   #ifndef VIRTIO_NET_NO_LEGACY
