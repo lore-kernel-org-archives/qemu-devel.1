@@ -1,20 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42632)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50830)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wexu@redhat.com>) id 1fQHJq-0002Fb-8q
-	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 15:08:35 -0400
+	(envelope-from <mst@redhat.com>) id 1fQHvp-0003oe-G1
+	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 15:47:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wexu@redhat.com>) id 1fQHJo-0003C8-5a
-	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 15:08:34 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:47186 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <wexu@redhat.com>) id 1fQHJn-0003Be-Vq
-	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 15:08:32 -0400
-From: wexu@redhat.com
-Date: Tue,  5 Jun 2018 15:08:02 -0400
-Message-Id: <1528225683-11413-8-git-send-email-wexu@redhat.com>
-In-Reply-To: <1528225683-11413-1-git-send-email-wexu@redhat.com>
-References: <1528225683-11413-1-git-send-email-wexu@redhat.com>
-Subject: [Qemu-devel] [RFC v2 7/8] virtio: event suppression for packed ring
+	(envelope-from <mst@redhat.com>) id 1fQHvo-00017b-25
+	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 15:47:49 -0400
+Date: Tue, 5 Jun 2018 22:47:40 +0300
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20180605223934-mutt-send-email-mst@kernel.org>
+References: <20180524113251.GB4660@redhat.com>
+	<d9bb2cb9-d9dc-8fe0-a767-10d9cbbab803@redhat.com>
+	<20180528183058.GG2209@redhat.com>
+	<20180528183833.GJ4580@localhost.localdomain>
+	<20180528212054.GH2209@redhat.com>
+	<20180528212510.GC4660@redhat.com>
+	<20180529064415.GA4756@localhost.localdomain>
+	<2b3eef00-f326-c1e6-0e4b-b7602646eec4@redhat.com>
+	<20180605092159.GA2544@work-vm>
+	<20180605190324.GA11372@localhost.localdomain>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180605190324.GA11372@localhost.localdomain>
+Subject: Re: [Qemu-devel] storing machine data in qcow images?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,194 +31,183 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: jasowang@redhat.com, tiwei.bie@intel.com, mst@redhat.com, wexu@redhat.com, jfreimann@redhat.com
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org, "Richard W.M. Jones" <rjones@redhat.com>, stefanha@redhat.com
 
-From: Wei Xu <wexu@redhat.com>
+On Tue, Jun 05, 2018 at 04:03:24PM -0300, Eduardo Habkost wrote:
+> On Tue, Jun 05, 2018 at 10:21:59AM +0100, Dr. David Alan Gilbert wrote:
+> > <reawakening a fizzled out thread>
+> > 
+> > This seems to have fizzled out because of a lack of a concrete proposal;
+> > so here is one based on a reply to Max's post:
+> > 
+> > * Max Reitz (mreitz@redhat.com) wrote:
+> > 
+> > <snip>
+> > 
+> > > The original problem was that you need to supply a machine type to qemu,
+> > > and that multiple common architectures now have multiple machine types
+> > > and not necessarily all work with a single image.  So far so good, but I
+> > > have two issues here already:
+> > > 
+> > > (1) How is qemu supposed to interpret that information?  If it's stored
+> > > in the image file, I don't see a nice way of retrieving it before the
+> > > machine is initialized, at least not with qemu's current architecture.
+> > 
+> > <snip>
+> > 
+> > > (2) Again, I personally just really don't like saving such information
+> > > in a disk image.  One actual argument I can bring up for that distaste
+> > > is this: Suppose, you have multiple images attached to your VM.  Now the
+> > > VM wants to store the machine type.  Where does it go?  Into all of
+> > > them?
+> > 
+> > <snip>
+> > 
+> > > So I think if we decide to store the machine type, that is kind of a
+> > > slippery slope and then there are good arguments for storing even more
+> > > configuration options in the file, too.  But I really, really don't like
+> > > that.
+> > 
+> > <snip>
+> > 
+> > > For another, how do we store the data?  key-value seems wrong if we want
+> > > to store everything.  JSON might be fine.  But eventually we just want
+> > > basically a qemu configuration file in there, I would think (which may
+> > > support JSON at some point?).   So basically we would store the data as
+> > > a binary blob and let the rest of qemu do its thing with it.  But then
+> > > please tell me why I fought so valiantly against storing random bitmaps
+> > > in qcow2 files.  I hate the idea of making qcow2 a random archive
+> > > format.  We have tar for that.
+> > 
+> > <snip>
+> > 
+> > > tl;dr: I really don't get why it's so hard to supply a config file along
+> > > with a qcow2 image.  Is it so hard for people to realize that a VM does
+> > > not only consist of a disk?
+> > 
+> > Yes! Because in many cases that's all it needs, and it's ready to run
+> > with no unpacking.
+> > 
+> > I think we should have:
+> > 
+> > --------------------------------------------------------------
+> > Layer 0:
+> >    QCOW provides a way to store a single string of arbitrary (but
+> > limited?) length.
+> >    QCOW provides a way to replace the string by a new string.
+> >    The original or the new string will be stored after that;
+> >    never some mix.
+> >    Where a file 'b' has a backing file 'a', 'b' inherits the
+> >    string from 'a' unless 'b' has it's own string.
+> >    Snapshots inherit their string from the main unless they have
+> >    their own string.
+> > 
+> > Layer 1:
+> >    The string shall always be a JSON 'object'; i.e. of the form
+> >     { "something": ... , "more": ... }
+> > 
+> >    The key strings shall be non-null and non-empty and shall
+> >    be unique.
+> > 
+> 
+> I'd prefer layer 0+1 to:
+> 
+> 1) Allow multiple entries to be stored (implemented by layer 1
+>    in this proposal)
+> 2) Identify each entry with a name (implemented by layer 1 in
+>    this proposal)
+> 3) Allow arbitrary binary data to be stored on an entry
+>    (not possible with the JSON-based proposal, because JSON
+>    strings are not blobs, but Unicode strings).
+> 4) Make it easy to replace only one entry while keeping others
+>    intact (not the case here, if all entries are stored in the
+>    same JSON string)
+> 
+> I think it would be simpler if layer 0 simply provided a list of
+> names/value pairs, where names are ascii strings, and values are
+> binary data[1].  It would make layer 1 unnecessary, and allow (3)
+> and (4) to happen.
+> 
+> [1] In other words, Rich's proposal of "named blobs":
+> https://www.mail-archive.com/qemu-block@nongnu.org/msg37856.html
 
-Signed-off-by: Wei Xu <wexu@redhat.com>
-Signed-off-by: Wei Xu <wexu@redhat.com>
----
- hw/virtio/virtio.c                             | 115 +++++++++++++++++++++++--
- include/standard-headers/linux/virtio_config.h |  13 +++
- 2 files changed, 119 insertions(+), 9 deletions(-)
+I think simple is beautiful, too. But assuming they
+really are binary how are blobs encoded?
+Did binary really mean UTF-8 here?
 
-diff --git a/hw/virtio/virtio.c b/hw/virtio/virtio.c
-index 6f2da83..4543974 100644
---- a/hw/virtio/virtio.c
-+++ b/hw/virtio/virtio.c
-@@ -226,6 +226,24 @@ static void vring_desc_read(VirtIODevice *vdev, VRingDesc *desc,
-     virtio_tswap16s(vdev, &desc->next);
- }
- 
-+static void vring_packed_event_read(VirtIODevice *vdev,
-+                            MemoryRegionCache *cache, VRingPackedDescEvent *e)
-+{
-+    address_space_read_cached(cache, 0, e, sizeof(*e));
-+    virtio_tswap16s(vdev, &e->off_wrap);
-+    virtio_tswap16s(vdev, &e->flags);
-+}
-+
-+static void vring_packed_event_write(VirtIODevice *vdev,
-+                            MemoryRegionCache *cache, VRingPackedDescEvent *e)
-+{
-+    virtio_tswap16s(vdev, &e->off_wrap);
-+    virtio_tswap16s(vdev, &e->flags);
-+    address_space_write_cached(cache, 0, e, sizeof(*e));
-+    address_space_cache_invalidate(cache, 0, sizeof(VRingUsedElem));
-+}
-+
-+
- static VRingMemoryRegionCaches *vring_get_region_caches(struct VirtQueue *vq)
- {
-     VRingMemoryRegionCaches *caches = atomic_rcu_read(&vq->vring.caches);
-@@ -332,14 +350,8 @@ static inline void vring_set_avail_event(VirtQueue *vq, uint16_t val)
-     address_space_cache_invalidate(&caches->used, pa, sizeof(val));
- }
- 
--void virtio_queue_set_notification(VirtQueue *vq, int enable)
-+static void virtio_queue_set_notification_split(VirtQueue *vq, int enable)
- {
--    vq->notification = enable;
--
--    if (!vq->vring.desc) {
--        return;
--    }
--
-     rcu_read_lock();
-     if (virtio_vdev_has_feature(vq->vdev, VIRTIO_RING_F_EVENT_IDX)) {
-         vring_set_avail_event(vq, vring_avail_idx(vq));
-@@ -355,6 +367,38 @@ void virtio_queue_set_notification(VirtQueue *vq, int enable)
-     rcu_read_unlock();
- }
- 
-+static void virtio_queue_set_notification_packed(VirtQueue *vq, int enable)
-+{
-+    VRingPackedDescEvent e;
-+    VRingMemoryRegionCaches *caches;
-+
-+    rcu_read_lock();
-+    caches  = vring_get_region_caches(vq);
-+    vring_packed_event_read(vq->vdev, &caches->device, &e);
-+    if (enable) {
-+        e.flags = RING_EVENT_FLAGS_ENABLE;
-+    } else {
-+        e.flags = RING_EVENT_FLAGS_DISABLE;
-+    }
-+    vring_packed_event_write(vq->vdev, &caches->device, &e);
-+    rcu_read_unlock();
-+}
-+
-+void virtio_queue_set_notification(VirtQueue *vq, int enable)
-+{
-+    vq->notification = enable;
-+
-+    if (!vq->vring.desc) {
-+        return;
-+    }
-+
-+    if (virtio_vdev_has_feature(vq->vdev, VIRTIO_F_RING_PACKED)) {
-+        virtio_queue_set_notification_packed(vq, enable);
-+    } else {
-+        virtio_queue_set_notification_split(vq, enable);
-+    }
-+}
-+
- int virtio_queue_ready(VirtQueue *vq)
- {
-     return vq->vring.avail != 0;
-@@ -2059,8 +2103,7 @@ static void virtio_set_isr(VirtIODevice *vdev, int value)
-     }
- }
- 
--/* Called within rcu_read_lock().  */
--static bool virtio_should_notify(VirtIODevice *vdev, VirtQueue *vq)
-+static bool virtio_split_should_notify(VirtIODevice *vdev, VirtQueue *vq)
- {
-     uint16_t old, new;
-     bool v;
-@@ -2083,6 +2126,60 @@ static bool virtio_should_notify(VirtIODevice *vdev, VirtQueue *vq)
-     return !v || vring_need_event(vring_get_used_event(vq), new, old);
- }
- 
-+static bool vring_packed_need_event(VirtQueue *vq, uint16_t off_wrap,
-+                                    uint16_t new, uint16_t old)
-+{
-+    bool wrap = vq->used_wrap_counter;
-+    int off = off_wrap & ~(1 << 15);
-+
-+    if (new < old) {
-+        new += vq->vring.num;
-+        wrap ^= 1;
-+    }
-+
-+    if (wrap != off_wrap >> 15) {
-+        off += vq->vring.num;
-+    }
-+
-+    return vring_need_event(off, new, old);
-+}
-+
-+static bool virtio_packed_should_notify(VirtIODevice *vdev, VirtQueue *vq)
-+{
-+    VRingPackedDescEvent e;
-+    uint16_t old, new;
-+    bool v;
-+    VRingMemoryRegionCaches *caches;
-+
-+    caches  = vring_get_region_caches(vq);
-+    vring_packed_event_read(vdev, &caches->driver, &e);
-+
-+    /* Make sure we see the updated flags */
-+    smp_mb();
-+    if (e.flags == RING_EVENT_FLAGS_DISABLE) {
-+        return false;
-+    } else if (e.flags == RING_EVENT_FLAGS_ENABLE) {
-+        return true;
-+    }
-+
-+    v = vq->signalled_used_valid;
-+    vq->signalled_used_valid = true;
-+    old = vq->signalled_used;
-+    new = vq->signalled_used = vq->used_idx;
-+
-+    return !v || vring_packed_need_event(vq, e.off_wrap, new, old);
-+}
-+
-+/* Called within rcu_read_lock().  */
-+static bool virtio_should_notify(VirtIODevice *vdev, VirtQueue *vq)
-+{
-+    if (virtio_vdev_has_feature(vdev, VIRTIO_F_RING_PACKED)) {
-+        return virtio_packed_should_notify(vdev, vq);
-+    } else {
-+        return virtio_split_should_notify(vdev, vq);
-+    }
-+}
-+
- void virtio_notify_irqfd(VirtIODevice *vdev, VirtQueue *vq)
- {
-     bool should_notify;
-diff --git a/include/standard-headers/linux/virtio_config.h b/include/standard-headers/linux/virtio_config.h
-index 6ee5529..53e5c83 100644
---- a/include/standard-headers/linux/virtio_config.h
-+++ b/include/standard-headers/linux/virtio_config.h
-@@ -73,4 +73,17 @@
- #define VIRTIO_F_IOMMU_PLATFORM		33
- 
- #define VIRTIO_F_RING_PACKED		34
-+
-+/* Enable events */
-+#define RING_EVENT_FLAGS_ENABLE 0x0
-+/* Disable events */
-+#define RING_EVENT_FLAGS_DISABLE 0x1
-+/*
-+ *  * Enable events for a specific descriptor
-+ *   * (as specified by Descriptor Ring Change Event Offset/Wrap Counter).
-+ *    * Only valid if VIRTIO_F_RING_EVENT_IDX has been negotiated.
-+ *     */
-+#define RING_EVENT_FLAGS_DESC 0x2
-+/* The value 0x3 is reserved */
-+
- #endif /* _LINUX_VIRTIO_CONFIG_H */
--- 
-1.8.3.1
+> 
+> > Layer 2:
+> >    '.'s in the key string shall indicate hierarchy
+> >    
+> >    Key strings shall be listed in qemu's 
+> >       docs/specs/qcow-keys.rst
+> > 
+> >       that shall indicate their meaning and the meaning and
+> >       valid formatting of the value associated with the,
+> > 
+> >    Key strings shall start with either:
+> >       qemu.   in which case they must be listed in a file in
+> >               the qemu source tree
+> > 
+> >       a reverse dotted name unique to the submitter, they may
+> >               be listed in the same file in the source tree, e.g.
+> >       com.redhat.
+> > 
+> 
+> Based on this proposal for layer 2, it looks like you expect the
+> number of keys used on layer 1 to become large.
+> 
+> I would prefer a solution that expects a very small set of keys
+> for layer 0+1, and point to other specifications of how the blob
+> can be interpreted for each key.  This way we can experiment with
+> different solutions for layers 2-4, instead of deciding on a
+> specific format like JSON.
+> 
+> 
+> > Layer 3:
+> >    QEMU shall, for a given qcow2 file be able to dump the
+> >    key values.
+> > 
+> > Layer 4:
+> >    On creating a VM by importing a qcow2, a management layer
+> >    shall inspect the key/values to influence the configuration
+> >    of the VM created.   Where it imports multiple qcow2's it
+> >    shall inspect all the files and flag disagreements.
+> > 
+> >    Management layers shall, on creating a qcow2 shall set the
+> >    keys based on the VM the qcow2 is created for.  If the qcow2
+> >    is created as an additional disk for an exisitng VM it's
+> >    fine to leave the string empty (e.g. for a data disk).
+> > 
+> > --------------------------------------------------------------
+> >    
+> > 
+> > Some reasoning:
+> >    a) I've avoided the problem of when QEMU interprets the value
+> >       by ignoring it and giving it to management layers at the point
+> >       of VM import.
+> >    b) I hate JSON, but there again nailing down a fixed format
+> >       seems easiest and it makes the job of QCOW easy - a single
+> >       string.
+> >       (I would suggest in layer2 that the keys are sorted, but
+> >       that's a pain to do in some json creators)
+> >    c) Forcing the registry of keys might avoid silly duplication.
+> >       We can but hope.
+> >    d) I've not said it's a libvirt XML file since that seems
+> >       a bit prescriptive.
+> > 
+> > Some initial suggested keys:
+> > 
+> >    "qemu.machine-types": [ "q35", "i440fx" ]
+> >    "qemu.min-ram-MB": 1024
+> > 
+> > 
+> > Dave
+> > 
+> > --
+> > Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> > 
+> 
+> -- 
+> Eduardo
