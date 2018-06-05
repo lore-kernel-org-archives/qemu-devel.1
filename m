@@ -1,33 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50038)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50184)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1fQ5er-0007nC-13
-	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 02:41:30 -0400
+	(envelope-from <peterx@redhat.com>) id 1fQ5gA-0008Qp-CZ
+	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 02:42:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1fQ5en-0000Jh-Sf
-	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 02:41:29 -0400
-Received: from 9.mo179.mail-out.ovh.net ([46.105.76.148]:52139)
+	(envelope-from <peterx@redhat.com>) id 1fQ5g9-0001S6-Bd
+	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 02:42:50 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:36070 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1fQ5en-0000Iv-Lq
-	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 02:41:25 -0400
-Received: from player789.ha.ovh.net (unknown [10.109.122.15])
-	by mo179.mail-out.ovh.net (Postfix) with ESMTP id 4B6B3CCE21
-	for <qemu-devel@nongnu.org>; Tue,  5 Jun 2018 08:41:22 +0200 (CEST)
-References: <20180518164405.11804-1-clg@kaod.org>
-	<20180518164405.11804-2-clg@kaod.org>
-	<20180525160249.7cb0a5bc@bahia.lan>
-	<82ee8b24-91d7-9396-82b7-be37200cfacd@redhat.com>
-	<a567d42f-af8e-01da-5e0b-9b6f41c150cf@kaod.org>
-	<20180605033401.GU5140@umbus.fritz.box>
-From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <48e319d0-2cf7-ab9a-f3d4-085880e1bda8@kaod.org>
-Date: Tue, 5 Jun 2018 08:41:13 +0200
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1fQ5g9-0001Rq-5q
+	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 02:42:49 -0400
+Date: Tue, 5 Jun 2018 14:42:40 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20180605064240.GA9216@xz-mi>
+References: <1524550428-27173-1-git-send-email-wei.w.wang@intel.com>
+	<20180601045824.GH14867@xz-mi> <5B10F412.8050900@intel.com>
+	<20180601104005.GL14867@xz-mi> <20180601153328.GC2531@work-vm>
 MIME-Version: 1.0
-In-Reply-To: <20180605033401.GU5140@umbus.fritz.box>
-Content-Type: text/plain; charset=windows-1252
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 1/4] spapr: remove irq_hint parameter from
- spapr_irq_alloc()
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20180601153328.GC2531@work-vm>
+Subject: Re: [Qemu-devel] [PATCH v7 0/5] virtio-balloon: free page hint
+ reporting support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,104 +29,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: Thomas Huth <thuth@redhat.com>, Greg Kurz <groug@kaod.org>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Alexey Kardashevskiy <aik@ozlabs.ru>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: Wei Wang <wei.w.wang@intel.com>, qemu-devel@nongnu.org, virtio-dev@lists.oasis-open.org, mst@redhat.com, quintela@redhat.com, yang.zhang.wz@gmail.com, quan.xu0@gmail.com, liliang.opensource@gmail.com, pbonzini@redhat.com, nilal@redhat.com
 
-On 06/05/2018 05:34 AM, David Gibson wrote:
-> On Mon, May 28, 2018 at 09:06:12AM +0200, C=E9dric Le Goater wrote:
->> On 05/28/2018 08:17 AM, Thomas Huth wrote:
->>> On 25.05.2018 16:02, Greg Kurz wrote:
->>>> On Fri, 18 May 2018 18:44:02 +0200
->>>> C=E9dric Le Goater <clg@kaod.org> wrote:
->>>>
->>>>> This IRQ number hint can possibly be used by the VIO devices if the
->>>>> "irq" property is defined on the command line but it seems it is ne=
-ver
->>>>> the case. It is not used in libvirt for instance. So, let's remove =
-it
->>>>> to simplify future changes.
->>>>>
->>>>
->>>> Setting an irq manually looks a bit anachronistic. I doubt anyone wo=
-uld
->>>> do that nowadays, and the patch does a nice cleanup. So this looks l=
-ike
->>>> a good idea.
->>> [...]
->>>>> diff --git a/hw/ppc/spapr_vio.c b/hw/ppc/spapr_vio.c
->>>>> index 472dd6f33a96..cc064f64fccf 100644
->>>>> --- a/hw/ppc/spapr_vio.c
->>>>> +++ b/hw/ppc/spapr_vio.c
->>>>> @@ -455,7 +455,7 @@ static void spapr_vio_busdev_realize(DeviceStat=
-e *qdev, Error **errp)
->>>>>          dev->qdev.id =3D id;
->>>>>      }
->>>>> =20
->>>>> -    dev->irq =3D spapr_irq_alloc(spapr, dev->irq, false, &local_er=
-r);
->>>>> +    dev->irq =3D spapr_irq_alloc(spapr, false, &local_err);
->>>>
->>>> Silently breaking "irq" like this looks wrong. I'd rather officially=
- remove
->>>> it first (ie, kill spapr_vio_props, -5 lines in spapr_vio.c).
->>>>
->>>> Of course, this raises the question of interface deprecation, and it=
- should
->>>> theoretically follow the process described at:
->>>>
->>>> https://wiki.qemu.org/Features/LegacyRemoval#Rules_for_removing_an_i=
-nterface
->>>>
->>>> Cc'ing Thomas, our Chief Deprecation Officer, for insights :)
->>>
->>> The property is a public interface. Just because it's not used by
->>> libvirt does not mean that nobody is using it. So yes, please follow =
-the
->>> rules and mark it as deprecated first for two release, before you rea=
-lly
->>> remove it.
->>
->> This "irq" property is a problem to introduce a new static layout of I=
-RQ=20
->> numbers. It is in complete opposition.=20
->>
->> Can we keep it as it is for old pseries machine (settable) and ignore =
-it=20
->> for newer ? Would that be fine ?
->=20
-> So, Thomas is right that we need to keep the interface while we go
-> through the deprecation process, even though it's a bit of a pain
-> (like you, I seriously doubt anyone ever used it).
+On Fri, Jun 01, 2018 at 04:33:29PM +0100, Dr. David Alan Gilbert wrote:
 
-That's OK. The patch is simple. But it means that we have to keep the=20
-irq_hint parameter for 2 QEMU versions.
+[...]
 
-> But, I think there's a way to avoid that getting in the way of your
-> cleanups too much.
->=20
-> A bunch of the current problems are caused because spapr_irq_alloc()
-> conflates two meanings of "allocate": 1) finding a free irq to use for
-> this device and 2) assigning that irq exclusively to this device.
->=20
-> I think the first thing to do is to split those two parts.  (1) will
-> never take an irq parameter, (2) will always take an irq parameter.
-> To implement the (to be deprecated) "irq" property on vio devices you
-> should skip (1) and just call (2) with the given irq number.
+> > > > Meanwhile, this reminds me about a more funny idea: whether we can
+> > > > just avoid sending the zero pages directly from QEMU's perspective.
+> > > > In other words, can we just do nothing if save_zero_page() detected
+> > > > that the page is zero (I guess the is_zero_range() can be fast too,
+> > > > but I don't know exactly how fast it is)?  And how that would be
+> > > > differed from this page hinting way in either performance and other
+> > > > aspects.
+> > > 
+> > > I guess you referred to the zero page optimization. I think the major
+> > > overhead comes to the zero page checking - lots of memory accesses, which
+> > > also waste memory bandwidth. Please see the results attached in the cover
+> > > letter. The legacy case already includes the zero page optimization.
+> > 
+> > I replied in the other thread.  We can discuss there altogether.
+> > 
+> > Actually after a second thought I think maybe what I worried there is
+> > exactly the reason why we must send the zero page flag - otherwise
+> > there can be stale non-zero page on destination.  Here "zero page" and
+> > "freed page" is totally different idea since even if a page is zeroed
+> > it might still be in use (not freed)!  While instead for a "free page"
+> > even if it's non-zero we might be able to not send it at all, though I
+> > am not sure whether that mismatch of data might cause any side effect
+> > too. I think the corresponding question would be: if a page is freed
+> > in Linux kernel, would its data matter any more?
+> 
+> I think the answer is no - it doesn't matter; by telling the hypervisor
+> the page is 'free' the kernel gives freedom to the hypervisor to
+> discard the page contents.
 
-well, we need to call both because if "irq" is zero then when we=20
-fallback to "1) finding a free irq to use."=20
+Yeh it seems so.  I just read over the whole work so I think there is
+a future work for the poisoned bits.  If that's the only usage that
+might make the content of freed page meaningful then it seems fine to
+me.  After all I don't know much about that...  However still this
+seems to be a bit tricky, e.g., we need to be very careful on the
+guest OS side (when writting up the balloon driver for one guest OS)
+to make sure of that otherwise it'll be very easy to break a guest
+when something similar is enabled without our notice just like the
+poisoned feature.
 
-But we can move the exclusive IRQ assignment (2) under the VIO model=20
-which is the only one using it and start deprecating the property.=20
+> Now, that is trusting the kernel to get it's 'free' flags right,
+> and we wouldn't want a malicious guest kernel to be able to read random
+> data, so we have to be a little careful that what actually lands
+> in there is something the guest has had at some point - or zero
+> which is a very nice empty value.
 
-> The point of this series is to basically get rid of (1), but this
-> first step means we don't need to worry about the hint parameter as we
-> gradually remove it.
+Yeah I agree - basically this feature brings more trouble from the
+security POV, but I don't know whether that can be a problem since
+after all we can disable this when we care very much about security.
 
-OK. I think I got what you are asking for. (2) means adding an extra=20
-handler to the sPAPR IRQ interface, which would always fail in the
-new XICS sPAPR IRQ backend using static numbers.
+Regards,
 
-Thanks,
-
-C.
+-- 
+Peter Xu
