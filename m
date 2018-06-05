@@ -1,21 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41187)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42146)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1fQJGu-0006qF-2c
-	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 17:13:41 -0400
+	(envelope-from <thuth@redhat.com>) id 1fQJLg-0000wA-6s
+	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 17:18:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcody@redhat.com>) id 1fQJGs-0003Xe-Vu
-	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 17:13:40 -0400
-Date: Tue, 5 Jun 2018 17:13:23 -0400
-From: Jeff Cody <jcody@redhat.com>
-Message-ID: <20180605211323.GH11303@localhost.localdomain>
-References: <20180605185905.4583-1-jsnow@redhat.com>
-	<20180605185905.4583-5-jsnow@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180605185905.4583-5-jsnow@redhat.com>
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 4/5] qapi: add
- x-block-dirty-bitmap-merge
+	(envelope-from <thuth@redhat.com>) id 1fQJLf-0005Rc-9Q
+	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 17:18:36 -0400
+From: Thomas Huth <thuth@redhat.com>
+Date: Tue,  5 Jun 2018 23:18:25 +0200
+Message-Id: <1528233505-25842-1-git-send-email-thuth@redhat.com>
+Subject: [Qemu-devel] [PATCH] hw/arm: Remove the deprecated xlnx-ep108
+ machine
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,166 +18,126 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>
-Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, Fam Zheng <famz@redhat.com>, Markus Armbruster <armbru@redhat.com>, Max Reitz <mreitz@redhat.com>
+To: Alistair Francis <alistair@alistair23.me>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, qemu-devel@nongnu.org
+Cc: Alistair Francis <alistair.francis@xilinx.com>, Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org
 
-On Tue, Jun 05, 2018 at 02:59:04PM -0400, John Snow wrote:
-> From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> 
-> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> Signed-off-by: John Snow <jsnow@redhat.com>
-> ---
->  block/dirty-bitmap.c         | 18 ++++++++++++++++++
->  blockdev.c                   | 30 ++++++++++++++++++++++++++++++
->  include/block/dirty-bitmap.h |  3 ++-
->  qapi/block-core.json         | 38 ++++++++++++++++++++++++++++++++++++++
->  4 files changed, 88 insertions(+), 1 deletion(-)
-> 
-> diff --git a/block/dirty-bitmap.c b/block/dirty-bitmap.c
-> index 56234257f4..4159d3929e 100644
-> --- a/block/dirty-bitmap.c
-> +++ b/block/dirty-bitmap.c
-> @@ -757,3 +757,21 @@ int64_t bdrv_dirty_bitmap_next_zero(BdrvDirtyBitmap *bitmap, uint64_t offset)
->  {
->      return hbitmap_next_zero(bitmap->bitmap, offset);
->  }
-> +
-> +void bdrv_merge_dirty_bitmap(BdrvDirtyBitmap *dest, const BdrvDirtyBitmap *src,
-> +                             Error **errp)
-> +{
-> +    /* only bitmaps from one bds are supported */
-> +    assert(dest->mutex == src->mutex);
-> +
-> +    qemu_mutex_lock(dest->mutex);
-> +
-> +    assert(bdrv_dirty_bitmap_enabled(dest));
-> +    assert(!bdrv_dirty_bitmap_readonly(dest));
-> +
-> +    if (!hbitmap_merge(dest->bitmap, src->bitmap)) {
-> +        error_setg(errp, "Bitmaps are incompatible and can't be merged");
-> +    }
-> +
-> +    qemu_mutex_unlock(dest->mutex);
-> +}
-> diff --git a/blockdev.c b/blockdev.c
-> index 33bfe4817f..b00908fdfd 100644
-> --- a/blockdev.c
-> +++ b/blockdev.c
-> @@ -3044,6 +3044,36 @@ void qmp_x_block_dirty_bitmap_disable(const char *node, const char *name,
->      bdrv_disable_dirty_bitmap(bitmap);
->  }
->  
-> +void qmp_x_block_dirty_bitmap_merge(const char *node, const char *dst_name,
-> +                                    const char *src_name, Error **errp)
-> +{
-> +    BlockDriverState *bs;
-> +    BdrvDirtyBitmap *dst, *src;
-> +
-> +    dst = block_dirty_bitmap_lookup(node, dst_name, &bs, errp);
-> +    if (!dst || !bs) {
+It has been marked as deprecated since QEMU v2.11, so it is time to
+remove this now. The xlnx-zcu102 machine is very much the same and
+can be used as a replacement instead.
 
-!bs check should be dropped, as it doesn't do anything, since
-block_dirty_bitmap_lookup() cannot return a NULL BlockDriverState.
+Signed-off-by: Thomas Huth <thuth@redhat.com>
+---
+ hw/arm/xlnx-zcu102.c | 62 ++--------------------------------------------------
+ qemu-doc.texi        |  5 -----
+ 2 files changed, 2 insertions(+), 65 deletions(-)
 
-> +        return;
-> +    }
-> +
-> +    if (bdrv_dirty_bitmap_frozen(dst)) {
-> +        error_setg(errp, "Bitmap '%s' is frozen and cannot be modified",
-> +                   dst_name);
-> +        return;
-> +    } else if (bdrv_dirty_bitmap_readonly(dst)) {
-> +        error_setg(errp, "Bitmap '%s' is readonly and cannot be modified",
-> +                   dst_name);
-> +        return;
-> +    }
-> +
-> +    src = bdrv_find_dirty_bitmap(bs, src_name);
-> +    if (!src) {
-> +        error_setg(errp, "Dirty bitmap '%s' not found", src_name);
-> +        return;
-> +    }
-> +
-> +    bdrv_merge_dirty_bitmap(dst, src, errp);
-> +}
-> +
->  BlockDirtyBitmapSha256 *qmp_x_debug_block_dirty_bitmap_sha256(const char *node,
->                                                                const char *name,
->                                                                Error **errp)
-> diff --git a/include/block/dirty-bitmap.h b/include/block/dirty-bitmap.h
-> index 1ff8949b1b..1e14743032 100644
-> --- a/include/block/dirty-bitmap.h
-> +++ b/include/block/dirty-bitmap.h
-> @@ -70,7 +70,8 @@ void bdrv_dirty_bitmap_set_readonly(BdrvDirtyBitmap *bitmap, bool value);
->  void bdrv_dirty_bitmap_set_persistance(BdrvDirtyBitmap *bitmap,
->                                         bool persistent);
->  void bdrv_dirty_bitmap_set_qmp_locked(BdrvDirtyBitmap *bitmap, bool qmp_locked);
-> -
-> +void bdrv_merge_dirty_bitmap(BdrvDirtyBitmap *dest, const BdrvDirtyBitmap *src,
-> +                             Error **errp);
->  
->  /* Functions that require manual locking.  */
->  void bdrv_dirty_bitmap_lock(BdrvDirtyBitmap *bitmap);
-> diff --git a/qapi/block-core.json b/qapi/block-core.json
-> index c061884a0e..3999175c23 100644
-> --- a/qapi/block-core.json
-> +++ b/qapi/block-core.json
-> @@ -1740,6 +1740,20 @@
->    'data': { 'node': 'str', 'name': 'str', '*granularity': 'uint32',
->              '*persistent': 'bool', '*autoload': 'bool' } }
->  
-> +##
-> +# @BlockDirtyBitmapMerge:
-> +#
-> +# @node: name of device/node which the bitmap is tracking
-> +#
-> +# @dst_name: name of the destination dirty bitmap
-> +#
-> +# @src_name: name of the source dirty bitmap
-> +#
-> +# Since: 3.0
-> +##
-> +{ 'struct': 'BlockDirtyBitmapMerge',
-> +  'data': { 'node': 'str', 'dst_name': 'str', 'src_name': 'str' } }
-> +
->  ##
->  # @block-dirty-bitmap-add:
->  #
-> @@ -1850,6 +1864,30 @@
->      { 'command': 'x-block-dirty-bitmap-disable',
->        'data': 'BlockDirtyBitmap' }
->  
-> +##
-> +# @x-block-dirty-bitmap-merge:
-> +#
-> +# Merge @src_name dirty bitmap to @dst_name dirty bitmap. @src_name dirty
-> +# bitmap is unchanged.
-> +#
-
-Can we also extended a promise that @dst_name is unchanged on error?
-
-> +# Returns: nothing on success
-> +#          If @node is not a valid block device, DeviceNotFound
-> +#          If @dst_name or @src_name is not found, GenericError
-> +#          If bitmaps has different sizes or granularities, GenericError
-> +#
-> +# Since: 3.0
-> +#
-> +# Example:
-> +#
-> +# -> { "execute": "x-block-dirty-bitmap-merge",
-> +#      "arguments": { "node": "drive0", "dst_name": "bitmap0",
-> +#                     "src_name": "bitmap1" } }
-> +# <- { "return": {} }
-> +#
-> +##
-> +      { 'command': 'x-block-dirty-bitmap-merge',
-> +        'data': 'BlockDirtyBitmapMerge' }
-> +
->  ##
->  # @BlockDirtyBitmapSha256:
->  #
-> -- 
-> 2.14.3
-> 
-> 
+diff --git a/hw/arm/xlnx-zcu102.c b/hw/arm/xlnx-zcu102.c
+index c70278c..f26fd8e 100644
+--- a/hw/arm/xlnx-zcu102.c
++++ b/hw/arm/xlnx-zcu102.c
+@@ -39,10 +39,6 @@ typedef struct XlnxZCU102 {
+ #define ZCU102_MACHINE(obj) \
+     OBJECT_CHECK(XlnxZCU102, (obj), TYPE_ZCU102_MACHINE)
+ 
+-#define TYPE_EP108_MACHINE   MACHINE_TYPE_NAME("xlnx-ep108")
+-#define EP108_MACHINE(obj) \
+-    OBJECT_CHECK(XlnxZCU102, (obj), TYPE_EP108_MACHINE)
+-
+ static struct arm_boot_info xlnx_zcu102_binfo;
+ 
+ static bool zcu102_get_secure(Object *obj, Error **errp)
+@@ -73,8 +69,9 @@ static void zcu102_set_virt(Object *obj, bool value, Error **errp)
+     s->virt = value;
+ }
+ 
+-static void xlnx_zynqmp_init(XlnxZCU102 *s, MachineState *machine)
++static void xlnx_zcu102_init(MachineState *machine)
+ {
++    XlnxZCU102 *s = ZCU102_MACHINE(machine);
+     int i;
+     uint64_t ram_size = machine->ram_size;
+ 
+@@ -183,60 +180,6 @@ static void xlnx_zynqmp_init(XlnxZCU102 *s, MachineState *machine)
+     arm_load_kernel(s->soc.boot_cpu_ptr, &xlnx_zcu102_binfo);
+ }
+ 
+-static void xlnx_ep108_init(MachineState *machine)
+-{
+-    XlnxZCU102 *s = EP108_MACHINE(machine);
+-
+-    if (!qtest_enabled()) {
+-        info_report("The Xilinx EP108 machine is deprecated, please use the "
+-                    "ZCU102 machine (which has the same features) instead.");
+-    }
+-
+-    xlnx_zynqmp_init(s, machine);
+-}
+-
+-static void xlnx_ep108_machine_instance_init(Object *obj)
+-{
+-    XlnxZCU102 *s = EP108_MACHINE(obj);
+-
+-    /* EP108, we don't support setting secure or virt */
+-    s->secure = false;
+-    s->virt = false;
+-}
+-
+-static void xlnx_ep108_machine_class_init(ObjectClass *oc, void *data)
+-{
+-    MachineClass *mc = MACHINE_CLASS(oc);
+-
+-    mc->desc = "Xilinx ZynqMP EP108 board (Deprecated, please use xlnx-zcu102)";
+-    mc->init = xlnx_ep108_init;
+-    mc->block_default_type = IF_IDE;
+-    mc->units_per_default_bus = 1;
+-    mc->ignore_memory_transaction_failures = true;
+-    mc->max_cpus = XLNX_ZYNQMP_NUM_APU_CPUS + XLNX_ZYNQMP_NUM_RPU_CPUS;
+-    mc->default_cpus = XLNX_ZYNQMP_NUM_APU_CPUS;
+-}
+-
+-static const TypeInfo xlnx_ep108_machine_init_typeinfo = {
+-    .name       = MACHINE_TYPE_NAME("xlnx-ep108"),
+-    .parent     = TYPE_MACHINE,
+-    .class_init = xlnx_ep108_machine_class_init,
+-    .instance_init = xlnx_ep108_machine_instance_init,
+-    .instance_size = sizeof(XlnxZCU102),
+-};
+-
+-static void xlnx_ep108_machine_init_register_types(void)
+-{
+-    type_register_static(&xlnx_ep108_machine_init_typeinfo);
+-}
+-
+-static void xlnx_zcu102_init(MachineState *machine)
+-{
+-    XlnxZCU102 *s = ZCU102_MACHINE(machine);
+-
+-    xlnx_zynqmp_init(s, machine);
+-}
+-
+ static void xlnx_zcu102_machine_instance_init(Object *obj)
+ {
+     XlnxZCU102 *s = ZCU102_MACHINE(obj);
+@@ -289,4 +232,3 @@ static void xlnx_zcu102_machine_init_register_types(void)
+ }
+ 
+ type_init(xlnx_zcu102_machine_init_register_types)
+-type_init(xlnx_ep108_machine_init_register_types)
+diff --git a/qemu-doc.texi b/qemu-doc.texi
+index f00706b..2effe66 100644
+--- a/qemu-doc.texi
++++ b/qemu-doc.texi
+@@ -2965,11 +2965,6 @@ support page sizes < 4096 any longer.
+ 
+ @section System emulator machines
+ 
+-@subsection Xilinx EP108 (since 2.11.0)
+-
+-The ``xlnx-ep108'' machine has been replaced by the ``xlnx-zcu102'' machine.
+-The ``xlnx-zcu102'' machine has the same features and capabilites in QEMU.
+-
+ @section Block device options
+ 
+ @subsection "backing": "" (since 2.12.0)
+-- 
+1.8.3.1
