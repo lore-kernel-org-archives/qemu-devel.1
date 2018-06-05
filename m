@@ -1,24 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46109)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46368)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1fQD6m-0003Oq-T3
-	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 10:38:50 -0400
+	(envelope-from <mst@redhat.com>) id 1fQD7e-0004LM-N7
+	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 10:39:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1fQD6j-0004sI-KN
-	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 10:38:48 -0400
-Received: from 2.mo179.mail-out.ovh.net ([178.33.250.45]:46762)
+	(envelope-from <mst@redhat.com>) id 1fQD7b-0005F3-GP
+	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 10:39:42 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:41670 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1fQD6j-0004rY-Dx
-	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 10:38:45 -0400
-Received: from player787.ha.ovh.net (unknown [10.109.105.119])
-	by mo179.mail-out.ovh.net (Postfix) with ESMTP id 96890CC09F
-	for <qemu-devel@nongnu.org>; Tue,  5 Jun 2018 16:38:43 +0200 (CEST)
-From: Greg Kurz <groug@kaod.org>
-Date: Tue, 05 Jun 2018 16:38:30 +0200
-Message-ID: <152820951004.885713.15116723374602433120.stgit@bahia.lan>
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1fQD7b-0005Dz-B5
+	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 10:39:39 -0400
+Date: Tue, 5 Jun 2018 17:39:34 +0300
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20180605173342-mutt-send-email-mst@kernel.org>
+References: <1524550428-27173-1-git-send-email-wei.w.wang@intel.com>
+	<20180601045824.GH14867@xz-mi> <5B10F412.8050900@intel.com>
+	<20180601104005.GL14867@xz-mi> <20180601153328.GC2531@work-vm>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] [PATCH v3] target/ppc: migrate VPA related state
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180601153328.GC2531@work-vm>
+Subject: Re: [Qemu-devel] [PATCH v7 0/5] virtio-balloon: free page hint
+ reporting support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,125 +29,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>, Paul Mackerras <paulus@samba.org>, Michael Roth <mdroth@linux.vnet.ibm.com>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: Peter Xu <peterx@redhat.com>, Wei Wang <wei.w.wang@intel.com>, qemu-devel@nongnu.org, virtio-dev@lists.oasis-open.org, quintela@redhat.com, yang.zhang.wz@gmail.com, quan.xu0@gmail.com, liliang.opensource@gmail.com, pbonzini@redhat.com, nilal@redhat.com
 
-QEMU implements the "Shared Processor LPAR" (SPLPAR) option, which allows
-the hypervisor to time-slice a physical processor into multiple virtual
-processor. The intent is to allow more guests to run, and to optimize
-processor utilization.
+On Fri, Jun 01, 2018 at 04:33:29PM +0100, Dr. David Alan Gilbert wrote:
+> I think the answer is no - it doesn't matter; by telling the hypervisor
+> the page is 'free' the kernel gives freedom to the hypervisor to
+> discard the page contents.
 
-The guest OS can cede idle VCPUs, so that their processing capacity may
-be used by other VCPUs, with the H_CEDE hcall. The guest OS can also
-optimize spinlocks, by confering the time-slice of a spinning VCPU to the
-spinlock holder if it's currently notrunning, with the H_CONFER hcall.
+I'd like to call attention to this since it's easy to get confused.
 
-Both hcalls depend on a "Virtual Processor Area" (VPA) to be registered
-by the guest OS, generally during early boot. Other per-VCPU areas can
-be registered: the "SLB Shadow Buffer" which allows a more efficient
-dispatching of VCPUs, and the "Dispatch Trace Log Buffer" (DTL) which
-is used to compute time stolen by the hypervisor. Both DTL and SLB Shadow
-areas depend on the VPA to be registered.
+That's not exactly true in the current interface.
 
-The VPA/SLB Shadow/DTL are state that QEMU should migrate, but this doesn't
-happen, for no apparent reason other than it was just never coded. This
-causes the features listed above to stop working after migration, and it
-breaks the logic of the H_REGISTER_VPA hcall in the destination.
+It's a *hint* not a guarantee.
 
-This patch fixes it for newer machine types (ie, version > 2.12) by adding
-a "cpu/vpa" subsection to the CPU migration stream. It ensures backward
-migration to existing QEMU versions.
+Let me explain.
 
-Since DTL and SLB Shadow are optional and both depend on VPA, they get
-their own subsections "cpu/vpa/slb_shadow" and "cpu/vpa/dtl" hanging from
-the "cpu/vpa" subsection.
+It all starts with a request from hypervisor and each free page report
+is matched to a request.  What the report says is that the page was free
+*sometime after the request was sent to guest*.  If hypervisor was
+tracking changes to page all the time since before sending the request,
+it can conclude that page was free and can discard the contents.  If it
+wasn't then it can't be sure and can not discard the page, it can maybe
+use the hint for other decisions (e.g. unused => should be sent before
+other pages).
 
-Signed-off-by: Greg Kurz <groug@kaod.org>
----
-v3: - switched to pre_3_0_migration
-
-v2: - added missing TARGET_PP64 ifdefs (patchew)
----
- target/ppc/machine.c |   62 ++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 62 insertions(+)
-
-diff --git a/target/ppc/machine.c b/target/ppc/machine.c
-index b2745ec4e519..d439f5cd4961 100644
---- a/target/ppc/machine.c
-+++ b/target/ppc/machine.c
-@@ -677,6 +677,67 @@ static const VMStateDescription vmstate_compat = {
-     }
- };
- 
-+static bool slb_shadow_needed(void *opaque)
-+{
-+    PowerPCCPU *cpu = opaque;
-+
-+    return cpu->env.slb_shadow_addr != 0;
-+}
-+
-+static const VMStateDescription vmstate_slb_shadow = {
-+    .name = "cpu/vpa/slb_shadow",
-+    .version_id = 1,
-+    .minimum_version_id = 1,
-+    .needed = slb_shadow_needed,
-+    .fields = (VMStateField[]) {
-+        VMSTATE_UINT64(env.slb_shadow_addr, PowerPCCPU),
-+        VMSTATE_UINT64(env.slb_shadow_size, PowerPCCPU),
-+        VMSTATE_END_OF_LIST()
-+    }
-+};
-+
-+static bool dtl_needed(void *opaque)
-+{
-+    PowerPCCPU *cpu = opaque;
-+
-+    return cpu->env.dtl_addr != 0;
-+}
-+
-+static const VMStateDescription vmstate_dtl = {
-+    .name = "cpu/vpa/dtl",
-+    .version_id = 1,
-+    .minimum_version_id = 1,
-+    .needed = dtl_needed,
-+    .fields = (VMStateField[]) {
-+        VMSTATE_UINT64(env.dtl_addr, PowerPCCPU),
-+        VMSTATE_UINT64(env.dtl_size, PowerPCCPU),
-+        VMSTATE_END_OF_LIST()
-+    }
-+};
-+
-+static bool vpa_needed(void *opaque)
-+{
-+    PowerPCCPU *cpu = opaque;
-+
-+    return !cpu->pre_3_0_migration && cpu->env.vpa_addr != 0;
-+}
-+
-+static const VMStateDescription vmstate_vpa = {
-+    .name = "cpu/vpa",
-+    .version_id = 1,
-+    .minimum_version_id = 1,
-+    .needed = vpa_needed,
-+    .fields = (VMStateField[]) {
-+        VMSTATE_UINT64(env.vpa_addr, PowerPCCPU),
-+        VMSTATE_END_OF_LIST()
-+    },
-+    .subsections = (const VMStateDescription * []) {
-+        &vmstate_slb_shadow,
-+        &vmstate_dtl,
-+        NULL
-+    }
-+};
-+
- const VMStateDescription vmstate_ppc_cpu = {
-     .name = "cpu",
-     .version_id = 5,
-@@ -731,6 +792,7 @@ const VMStateDescription vmstate_ppc_cpu = {
-         &vmstate_tlbemb,
-         &vmstate_tlbmas,
-         &vmstate_compat,
-+        &vmstate_vpa,
-         NULL
-     }
- };
+-- 
+MST
