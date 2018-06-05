@@ -1,35 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56293)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37201)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fQ3ey-00025I-2z
-	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 00:33:29 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1fQ4VN-0006hO-0i
+	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 01:27:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fQ3eu-0006II-Vw
-	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 00:33:28 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:33524 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1fQ3eu-0006Hx-Qn
-	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 00:33:24 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.3])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 2FF0F40122B5
-	for <qemu-devel@nongnu.org>; Tue,  5 Jun 2018 04:33:24 +0000 (UTC)
-Received: from [10.36.116.62] (ovpn-116-62.ams2.redhat.com [10.36.116.62])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id D09C7111AF36
-	for <qemu-devel@nongnu.org>; Tue,  5 Jun 2018 04:33:23 +0000 (UTC)
-References: <20180604162140.20688-1-peter.maydell@linaro.org>
-	<20180604191756.1ae61871@w520.home>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <52a5446f-4624-fd45-ce7d-492269aa5c3f@redhat.com>
-Date: Tue, 5 Jun 2018 06:33:22 +0200
+	(envelope-from <richard.henderson@linaro.org>) id 1fQ4VJ-0005aC-2b
+	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 01:27:37 -0400
+Received: from mail-pl0-x242.google.com ([2607:f8b0:400e:c01::242]:44742)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1fQ4VI-0005Zu-QM
+	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 01:27:32 -0400
+Received: by mail-pl0-x242.google.com with SMTP id z9-v6so782240plk.11
+	for <qemu-devel@nongnu.org>; Mon, 04 Jun 2018 22:27:32 -0700 (PDT)
+References: <20180531224911.23725-1-richard.henderson@linaro.org>
+	<20180531224911.23725-7-richard.henderson@linaro.org>
+	<788ee514-a026-d415-73ce-67cc996e6259@vivier.eu>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <149da730-950c-a527-2373-9cb0433543b1@linaro.org>
+Date: Mon, 4 Jun 2018 22:27:28 -0700
 MIME-Version: 1.0
-In-Reply-To: <20180604191756.1ae61871@w520.home>
+In-Reply-To: <788ee514-a026-d415-73ce-67cc996e6259@vivier.eu>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] CODING_STYLE: Define our preferred form
- for multiline comments
+Subject: Re: [Qemu-devel] [PATCH 6/6] linux-user: Use *at functions to
+ implement interp_prefix
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,56 +33,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Laurent Vivier <laurent@vivier.eu>, qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org, evgreen@chromium.org
 
-On 05.06.2018 03:17, Alex Williamson wrote:
-> On Mon,  4 Jun 2018 17:21:40 +0100
-> Peter Maydell <peter.maydell@linaro.org> wrote:
+On 06/03/2018 06:04 PM, Laurent Vivier wrote:
+> On 01/06/2018 00:49, Richard Henderson wrote:
+>> If the interp_prefix is a complete chroot, it may have a *lot* of files.
+>> Setting up the cache for this is quite expensive.
+>>
+>> For the most part, we can use the *at versions of various syscalls to
+>> attempt the operation in the prefix.  For the few cases that remain,
+>> attempt the operation in the prefix via concatenation and then retry
+>> if that fails.
+>>
 > 
->> The codebase has a bit of a mix of
->>  /* multiline comments
->>   * like this
->>   */
->> and
->>  /* multiline comments like this
->>     in the GNU Coding Standards style */
->>
->> State a preference for the former.
->>
->> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
->> ---
->> I admit that to some extent I'm imposing my aesthetic
->> preferences here; pretty sure we have a lot more style
->> 1 comments than style 2, though.
->> ---
->>  CODING_STYLE | 13 +++++++++++++
->>  1 file changed, 13 insertions(+)
->>
->> diff --git a/CODING_STYLE b/CODING_STYLE
->> index 12ba58ee293..fb1d1f1cd62 100644
->> --- a/CODING_STYLE
->> +++ b/CODING_STYLE
->> @@ -124,6 +124,19 @@ We use traditional C-style /* */ comments and avoid // comments.
->>  Rationale: The // form is valid in C99, so this is purely a matter of
->>  consistency of style. The checkpatch script will warn you about this.
->>  
->> +Multiline comments blocks should have a row of stars on the left
->> +and the terminating */ on its own line:
->> +    /* like
->> +     * this
->> +     */
->> +Putting the initial /* on its own line is accepted, but not required.
+> I like the idea, but it breaks real chroot.
 > 
-> Could we say "at maintainer discretion", or is that always implied?  The
-> asymmetry of the proposed standard is not my favorite and a mostly
-> blank line before and after further supports standing out from
-> surrounding code. 
-I also don't like the asymmetry. I'd prefer more dense comments, though:
+> You can test it with:
+> 
+> wget
+> https://github.com/vivier/linux-user-test-scrips/raw/master/create_chroot.sh
+> 
+> then
+> 
+> sudo sh ./create_chroot.sh /path/to/static/qemu-s390x stretch
 
-  /* like
-   * this */
+*shrug* Works for me, at least as far as I can test.
 
-Anyway, could we either use that dense format or the kernel-style
-multi-lines-comment format, please? Mixing it asymmetrically is just ugly.
+Your script doesn't work outside debian, lacking debootstrap.
+At the moment, I can't build on debian *at all*.  Some bit of the build
+infrastructure is off and QEMU_FULL_VERSION gets incorrectly defined.  I have
+no idea how or why it is different than Fedora.
 
- Thomas
+On Fedora 28, one can no longer build a static qemu.  We depend on libraries
+for which Fedora no longer ships static versions.
+
+Do you have some specific binary that fails?
+
+
+r~
