@@ -1,25 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60693)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33380)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fQDcN-0006Mo-Ou
-	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 11:11:32 -0400
+	(envelope-from <eblake@redhat.com>) id 1fQDeS-0007c0-91
+	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 11:13:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fQDcM-0000xA-LD
-	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 11:11:27 -0400
-Received: from mail-oi0-x22d.google.com ([2607:f8b0:4003:c06::22d]:36274)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fQDcM-0000ww-GX
-	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 11:11:26 -0400
-Received: by mail-oi0-x22d.google.com with SMTP id 14-v6so2405628oie.3
-	for <qemu-devel@nongnu.org>; Tue, 05 Jun 2018 08:11:26 -0700 (PDT)
+	(envelope-from <eblake@redhat.com>) id 1fQDeP-0002C4-4b
+	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 11:13:36 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:49380 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1fQDeO-0002Bd-W3
+	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 11:13:33 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.3])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 55C5F805A530
+	for <qemu-devel@nongnu.org>; Tue,  5 Jun 2018 15:13:32 +0000 (UTC)
+References: <1528207243-268226-1-git-send-email-imammedo@redhat.com>
+	<1528207243-268226-3-git-send-email-imammedo@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <b3bbeaa4-de51-11bc-ddf8-d83b809efc45@redhat.com>
+Date: Tue, 5 Jun 2018 10:13:30 -0500
 MIME-Version: 1.0
-In-Reply-To: <20180605141933.30169-1-jcody@redhat.com>
-References: <20180605141933.30169-1-jcody@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 5 Jun 2018 16:11:00 +0100
-Message-ID: <CAFEAcA9UwDDtSc5f_8f4CL+Nqgwz=L7skhv1gj5yRY-tBFUrsQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL 0/2] Block patches
+In-Reply-To: <1528207243-268226-3-git-send-email-imammedo@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v3 2/2] vl: fix use of --daemonize with
+ --preconfig
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,33 +35,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jeff Cody <jcody@redhat.com>
-Cc: Qemu-block <qemu-block@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>
+To: Igor Mammedov <imammedo@redhat.com>, qemu-devel@nongnu.org
+Cc: ldoktor@redhat.com, pbonzini@redhat.com, ehabkost@redhat.com, mreitz@redhat.com
 
-On 5 June 2018 at 15:19, Jeff Cody <jcody@redhat.com> wrote:
-> The following changes since commit 41feb5b955f0d7c9d071b2c5adbc404ae2895c7a:
->
->   Merge remote-tracking branch 'remotes/vivier2/tags/linux-user-for-3.0-pull-request' into staging (2018-06-05 10:38:33 +0100)
->
-> are available in the git repository at:
->
->   git://github.com/codyprime/qemu-kvm-jtc.git tags/block-pull-request
->
-> for you to fetch changes up to 68acc99f143b60ec4faa2903065b187d4d3c4bf3:
->
->   sheepdog: remove huge BSS object (2018-06-05 10:15:12 -0400)
->
-> ----------------------------------------------------------------
-> Sheepdog patches
-> ----------------------------------------------------------------
->
-> Paolo Bonzini (2):
->   sheepdog: cleanup repeated expression
->   sheepdog: remove huge BSS object
->
->  block/sheepdog.c | 28 +++++++++++++++-------------
->  1 file changed, 15 insertions(+), 13 deletions(-)
+On 06/05/2018 09:00 AM, Igor Mammedov wrote:
+> When using --daemonize, the initial lead process will fork a child and
+> then wait to be notified that setup is complete via a pipe, before it
+> exits.  When using --preconfig there is an extra call to main_loop()
+> before the notification is done from os_setup_post(). Thus the parent
+> process won't exit until the mgmt application connects to the monitor
+> and tells QEMU to leave the RUN_STATE_PRECONFIG. The mgmt application
+> won't connect to the monitor until daemonizing has completed though.
+>=20
+> This is a chicken and egg problem, leading to deadlock at startup.
+>=20
+> The only viable way to fix this is to call os_setup_post() before
+> the early main_loop_wait() call when in RUN_STATE_PRECONFIG. This has
+> the downside that any errors from this point onwards won't be handled
+> well by the mgmt application, because it will think QEMU has started
+> successfully, so not be expecting an abrupt exit. The only way to
+> deal with that is to move as much user input validation as possible
+> to before the main_loop() call. This is left as an exercise for
+> future interested developers.
+>=20
+> Based on:
+>    From: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+>    Subject: [PATCH v2 2/2] vl: fix use of --daemonize with --preconfig
+>    Message-Id: <20180604120345.12955-3-berrange@redhat.com>
+>=20
+> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+> ---
+> v3:
+>    - rewrite to apply on top of 1/2
+> ---
+>   os-posix.c | 6 ++++++
+>   vl.c       | 2 +-
+>   2 files changed, 7 insertions(+), 1 deletion(-)
+>=20
+> diff --git a/os-posix.c b/os-posix.c
+> index 9ce6f74..ee06a8d 100644
+> --- a/os-posix.c
+> +++ b/os-posix.c
+> @@ -309,8 +309,14 @@ void os_daemonize(void)
+>  =20
+>   void os_setup_post(void)
+>   {
+> +    static bool os_setup_post_done =3D false;
 
-Applied, thanks.
+The '=3D false' is not technically necessary; all static variables defaul=
+t=20
+to zero-initialization.
 
--- PMM
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
