@@ -1,31 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41361)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41983)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1fQB0O-000212-3u
-	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 08:24:04 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1fQB31-0003nq-Hj
+	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 08:26:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1fQB0K-0003D8-UJ
-	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 08:24:04 -0400
-Received: from mout.kundenserver.de ([217.72.192.75]:59739)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1fQB0K-0003CF-JM
-	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 08:24:00 -0400
-References: <20180531224911.23725-1-richard.henderson@linaro.org>
-	<20180531224911.23725-7-richard.henderson@linaro.org>
-	<788ee514-a026-d415-73ce-67cc996e6259@vivier.eu>
-	<149da730-950c-a527-2373-9cb0433543b1@linaro.org>
-	<CAFEAcA-h7Ef5yfOS3V_kR5_fCmhr-N6okHY9=N87M9Ld+8MVdA@mail.gmail.com>
-	<54f54010-ad2d-7df0-8838-b2ddc7668875@vivier.eu>
-	<CAFEAcA9b==mGZQUAoPDCt1zbqxT3RmTa0XoQZvuPb17L0NYbMg@mail.gmail.com>
-From: Laurent Vivier <laurent@vivier.eu>
-Message-ID: <18231864-96b1-8f6f-5caa-c3d8613ec20e@vivier.eu>
-Date: Tue, 5 Jun 2018 14:23:56 +0200
-MIME-Version: 1.0
-In-Reply-To: <CAFEAcA9b==mGZQUAoPDCt1zbqxT3RmTa0XoQZvuPb17L0NYbMg@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 6/6] linux-user: Use *at functions to
- implement interp_prefix
+	(envelope-from <dgilbert@redhat.com>) id 1fQB2y-0005D1-BR
+	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 08:26:47 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:47800 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1fQB2y-0005C9-3X
+	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 08:26:44 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.6])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 45469859CC
+	for <qemu-devel@nongnu.org>; Tue,  5 Jun 2018 12:26:43 +0000 (UTC)
+From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
+Date: Tue,  5 Jun 2018 13:26:30 +0100
+Message-Id: <20180605122636.33654-1-dgilbert@redhat.com>
+Subject: [Qemu-devel] [PATCH 0/6] Reenable hmp for preconfig mode
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,35 +27,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Richard Henderson <richard.henderson@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, Evan Green <evgreen@chromium.org>
+To: qemu-devel@nongnu.org, armbru@redhat.com, imammedo@redhat.com
 
-Le 05/06/2018 à 14:14, Peter Maydell a écrit :
-> On 5 June 2018 at 13:05, Laurent Vivier <laurent@vivier.eu> wrote:
->> Le 05/06/2018 à 12:52, Peter Maydell a écrit :
->>> On 5 June 2018 at 06:27, Richard Henderson <richard.henderson@linaro.org> wrote:
->>>> On Fedora 28, one can no longer build a static qemu.  We depend on libraries
->>>> for which Fedora no longer ships static versions.
->>>
->>> Do you mean you can't build the system binaries statically (that's
->>> never really been very supported), or that you can't do a build
->>> with configure --disable-system --disable-tools --static ?
->>>
->>> The latter would be more concerning.
->>
->> On Fedora I have also to disable gcrypt, nettle and libiscsi because we
->> don't have the statically linked libraries, but we don't need them with
->> linux-user.
-> 
-> Do we actually try to link with those for linux-user? If not,
-> maybe we could make configure a bit more helpful about not
-> requiring you to manually --disable-foo them.
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-They are used by tests/qemu-iotests/socket_scm_helper and
-qemu-bridge-helper.
+Reenable HMP in preconfig mode; it's pretty
+easy and anyway I want to do a similar thing for OOB eventually.
+We'll want to enable more commands in preconfig mode to make it
+useful at some point.
 
-Perhaps we can disable qemu-iotests with linux-user only and to not
-build qemu-bridge-helper when tools are disabled?
+Dave
 
-Thanks,
-Laurent
+
+Dr. David Alan Gilbert (6):
+  hmp: Add flag for preconfig commands
+  hmp: Allow help on preconfig commands
+  hmp: Restrict auto-complete in preconfig
+  hmp: Add info commands for preconfig
+  hmp: add exit_preconfig
+  hmp: Allow HMP in preconfig state again
+
+ hmp-commands-info.hx |  9 +++++++++
+ hmp-commands.hx      | 17 +++++++++++++++++
+ hmp.c                |  7 +++++++
+ hmp.h                |  1 +
+ monitor.c            | 42 +++++++++++++++++++++++++++++++++---------
+ 5 files changed, 67 insertions(+), 9 deletions(-)
+
+-- 
+2.17.0
