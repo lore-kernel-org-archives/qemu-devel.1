@@ -1,16 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37545)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37599)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1fQCcA-0004nV-55
-	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 10:07:11 -0400
+	(envelope-from <berrange@redhat.com>) id 1fQCcJ-0004w2-L6
+	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 10:07:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1fQCc8-0005hu-RO
-	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 10:07:10 -0400
-From: Fam Zheng <famz@redhat.com>
-Date: Tue,  5 Jun 2018 22:06:31 +0800
-Message-Id: <20180605140631.4696-3-famz@redhat.com>
-In-Reply-To: <20180605140631.4696-1-famz@redhat.com>
-References: <20180605140631.4696-1-famz@redhat.com>
-Subject: [Qemu-devel] [PATCH v3 2/2] backup: Use copy offloading
+	(envelope-from <berrange@redhat.com>) id 1fQCc9-0005iL-Oo
+	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 10:07:19 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:47192 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1fQCc9-0005iC-Ie
+	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 10:07:09 -0400
+Date: Tue, 5 Jun 2018 15:07:04 +0100
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Message-ID: <20180605140704.GM32286@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <20180603092749.107476-1-marcel.apfelbaum@gmail.com>
+	<20180604042928-mutt-send-email-mst@kernel.org>
+	<23040757-b561-e0bf-a41d-38d3c44555ee@gmail.com>
+	<20180605072746.v6xxabsbewiuw7ka@sirius.home.kraxel.org>
+	<20180605084300.GF32286@redhat.com>
+	<20180605130646.GF7451@localhost.localdomain>
+	<20180605131232.GG32286@redhat.com>
+	<20180605133538.GG7451@localhost.localdomain>
+	<20180605134439.GN8876@antique-desktop>
+	<20180605140346.GI7451@localhost.localdomain>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20180605140346.GI7451@localhost.localdomain>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [libvirt] libvirt default machine-type guarantees?
+ (was Re: [PATCH RFC] hw/pc: set q35 as the default x86 machine)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -19,238 +38,102 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, Fam Zheng <famz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Jeff Cody <jcody@redhat.com>
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: Pavel Hrdina <phrdina@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, libvir-list@redhat.com, qemu-devel@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, pbonzini@redhat.com, rth@twiddle.net
 
-The implementation is similar to the 'qemu-img convert'. In the
-beginning of the job, offloaded copy is attempted. If it fails, further
-I/O will go through the existing bounce buffer code path.
+On Tue, Jun 05, 2018 at 11:03:46AM -0300, Eduardo Habkost wrote:
+> On Tue, Jun 05, 2018 at 03:44:39PM +0200, Pavel Hrdina wrote:
+> > On Tue, Jun 05, 2018 at 10:35:38AM -0300, Eduardo Habkost wrote:
+> > > On Tue, Jun 05, 2018 at 02:12:32PM +0100, Daniel P. Berrang=C3=A9 w=
+rote:
+> > > > On Tue, Jun 05, 2018 at 10:06:46AM -0300, Eduardo Habkost wrote:
+> > > > > (CCing libvir-list)
+> > > > >=20
+> > > > > On Tue, Jun 05, 2018 at 09:43:00AM +0100, Daniel P. Berrang=C3=A9=
+ wrote:
+> > > > > > On Tue, Jun 05, 2018 at 09:27:46AM +0200, Gerd Hoffmann wrote=
+:
+> > > > > > >   Hi,
+> > > > > > >=20
+> > > > > > > > >   Add to that shortcuts like -cdrom
+> > > > > > > > > stop working,
+> > > > > > > >=20
+> > > > > > > > Maybe is fixable.
+> > > > > > >=20
+> > > > > > > Already fixed for ages.
+> > > > > > >=20
+> > > > > > > > I see marking Q35 as the default machine a first step.
+> > > > > > >=20
+> > > > > > > Maybe the better option is to go the arm route:  Just don't=
+ define a
+> > > > > > > default, so users have to specify pc or q35.  That will mak=
+e them notice
+> > > > > > > there is a world beside 'pc', and we also avoid breaking th=
+ings
+> > > > > > > silently.
+> > > > > >=20
+> > > > > > If QEMU removes the default, then libvirt will have to hardco=
+de
+> > > > > > 'pc' as the default to maintain back compatibility, so I don'=
+t
+> > > > > > think that ends up as a net win
+> > > > >=20
+> > > > > Is there an actual promise to never change the default
+> > > > > machine-type documented in the libvirt API, or is this just fea=
+r
+> > > > > of breaking existing code?
+> > > >=20
+> > > > The risk of breaking things that currently work. Some of the thin=
+gs
+> > > > discussed here that risk breaking users if QEMU changes the defau=
+lt,
+> > > > have the same risk if libvirt changes the default.
+> > > >=20
+> > > > eg old OS versions that only work with PC, or more commonly pre-e=
+xisting
+> > > > cloud disk images that were built against PC can't be assumed to =
+just
+> > > > work against q35, even if the OS in the image supports it.
+> > > >=20
+> > > > If we want to get q35 broadly used for modern OS, then IMHO the b=
+est
+> > > > option is to record that metadata in libosinfo, as ew do for othe=
+r
+> > > > virtual hardware preferences.  That doesn't fix the problem of di=
+sk
+> > > > images that might not transparently boot between pc/q35, but at l=
+east
+> > > > avoids breaking OS that don't support q35 at all.
+> > >=20
+> > > This leads to a more general question: sometimes the defaults
+> > > chosen by libvirt are obsolete or broken, and we might want to
+> > > change them.
+> > >=20
+> > > Is there a process for changing defaults in libvirt, or libvirt
+> > > is bound by past decisions forever?
+> >=20
+> > If the default was always recorded in the domain XML it is safe to
+> > change it because it will not affect already existing domains or
+> > migration but if the default is not recorded in the domain XML there
+> > needs to be a lot of compatibility code.
+>=20
+> That's the opposite of what Daniel said above, isn't it?  The
+> machine-type is always recorded in the domain XML, but it's still
+> considered unsafe to change.
 
-Signed-off-by: Fam Zheng <famz@redhat.com>
----
- block/backup.c     | 150 ++++++++++++++++++++++++++++++++-------------
- block/trace-events |   1 +
- 2 files changed, 110 insertions(+), 41 deletions(-)
+Yes, I disagree with that Pavel has written here. The domain XML recordin=
+g
+of settings is critical for preserving guest ABI for migration, etc, so
+obviously must be stable. Even if there is *no* domain XML yet, however,
+libvirt still aims to avoid changes in defaults that are liable to break
+an existing mgmt application creating guests in future.
 
-diff --git a/block/backup.c b/block/backup.c
-index 4e228e959b..0dabdc9693 100644
---- a/block/backup.c
-+++ b/block/backup.c
-@@ -45,6 +45,8 @@ typedef struct BackupBlockJob {
-     QLIST_HEAD(, CowRequest) inflight_reqs;
- 
-     HBitmap *copy_bitmap;
-+    bool use_copy_range;
-+    int64_t copy_range_size;
- } BackupBlockJob;
- 
- static const BlockJobDriver backup_job_driver;
-@@ -86,19 +88,101 @@ static void cow_request_end(CowRequest *req)
-     qemu_co_queue_restart_all(&req->wait_queue);
- }
- 
-+/* Copy range to target with a bounce buffer and return the bytes copied. If
-+ * error occured, return a negative error number */
-+static int coroutine_fn backup_cow_with_bounce_buffer(BackupBlockJob *job,
-+                                                      int64_t start,
-+                                                      int64_t end,
-+                                                      bool is_write_notifier,
-+                                                      bool *error_is_read,
-+                                                      void **bounce_buffer)
-+{
-+    int ret;
-+    struct iovec iov;
-+    QEMUIOVector qiov;
-+    BlockBackend *blk = job->common.blk;
-+    int nbytes;
-+
-+    hbitmap_reset(job->copy_bitmap, start / job->cluster_size, 1);
-+    nbytes = MIN(job->cluster_size, job->len - start);
-+    if (!*bounce_buffer) {
-+        *bounce_buffer = blk_blockalign(blk, job->cluster_size);
-+    }
-+    iov.iov_base = *bounce_buffer;
-+    iov.iov_len = nbytes;
-+    qemu_iovec_init_external(&qiov, &iov, 1);
-+
-+    ret = blk_co_preadv(blk, start, qiov.size, &qiov,
-+                        is_write_notifier ? BDRV_REQ_NO_SERIALISING : 0);
-+    if (ret < 0) {
-+        trace_backup_do_cow_read_fail(job, start, ret);
-+        if (error_is_read) {
-+            *error_is_read = true;
-+        }
-+        goto fail;
-+    }
-+
-+    if (qemu_iovec_is_zero(&qiov)) {
-+        ret = blk_co_pwrite_zeroes(job->target, start,
-+                                   qiov.size, BDRV_REQ_MAY_UNMAP);
-+    } else {
-+        ret = blk_co_pwritev(job->target, start,
-+                             qiov.size, &qiov,
-+                             job->compress ? BDRV_REQ_WRITE_COMPRESSED : 0);
-+    }
-+    if (ret < 0) {
-+        trace_backup_do_cow_write_fail(job, start, ret);
-+        if (error_is_read) {
-+            *error_is_read = false;
-+        }
-+        goto fail;
-+    }
-+
-+    return nbytes;
-+fail:
-+    hbitmap_set(job->copy_bitmap, start / job->cluster_size, 1);
-+    return ret;
-+
-+}
-+
-+/* Copy range to target and return the bytes copied. If error occured, return a
-+ * negative error number. */
-+static int coroutine_fn backup_cow_with_offload(BackupBlockJob *job,
-+                                                int64_t start,
-+                                                int64_t end,
-+                                                bool is_write_notifier)
-+{
-+    int ret;
-+    int nr_clusters;
-+    BlockBackend *blk = job->common.blk;
-+    int nbytes;
-+
-+    assert(QEMU_IS_ALIGNED(job->copy_range_size, job->cluster_size));
-+    nbytes = MIN(job->copy_range_size, end - start);
-+    nr_clusters = DIV_ROUND_UP(nbytes, job->cluster_size);
-+    hbitmap_reset(job->copy_bitmap, start / job->cluster_size,
-+                  nr_clusters);
-+    ret = blk_co_copy_range(blk, start, job->target, start, nbytes,
-+                            is_write_notifier ? BDRV_REQ_NO_SERIALISING : 0);
-+    if (ret < 0) {
-+        trace_backup_do_cow_copy_range_fail(job, start, ret);
-+        hbitmap_set(job->copy_bitmap, start / job->cluster_size,
-+                    nr_clusters);
-+        return ret;
-+    }
-+
-+    return nbytes;
-+}
-+
- static int coroutine_fn backup_do_cow(BackupBlockJob *job,
-                                       int64_t offset, uint64_t bytes,
-                                       bool *error_is_read,
-                                       bool is_write_notifier)
- {
--    BlockBackend *blk = job->common.blk;
-     CowRequest cow_request;
--    struct iovec iov;
--    QEMUIOVector bounce_qiov;
--    void *bounce_buffer = NULL;
-     int ret = 0;
-     int64_t start, end; /* bytes */
--    int n; /* bytes */
-+    void *bounce_buffer = NULL;
- 
-     qemu_co_rwlock_rdlock(&job->flush_rwlock);
- 
-@@ -110,60 +194,38 @@ static int coroutine_fn backup_do_cow(BackupBlockJob *job,
-     wait_for_overlapping_requests(job, start, end);
-     cow_request_begin(&cow_request, job, start, end);
- 
--    for (; start < end; start += job->cluster_size) {
-+    while (start < end) {
-         if (!hbitmap_get(job->copy_bitmap, start / job->cluster_size)) {
-             trace_backup_do_cow_skip(job, start);
-+            start += job->cluster_size;
-             continue; /* already copied */
-         }
--        hbitmap_reset(job->copy_bitmap, start / job->cluster_size, 1);
- 
-         trace_backup_do_cow_process(job, start);
- 
--        n = MIN(job->cluster_size, job->len - start);
--
--        if (!bounce_buffer) {
--            bounce_buffer = blk_blockalign(blk, job->cluster_size);
--        }
--        iov.iov_base = bounce_buffer;
--        iov.iov_len = n;
--        qemu_iovec_init_external(&bounce_qiov, &iov, 1);
--
--        ret = blk_co_preadv(blk, start, bounce_qiov.size, &bounce_qiov,
--                            is_write_notifier ? BDRV_REQ_NO_SERIALISING : 0);
--        if (ret < 0) {
--            trace_backup_do_cow_read_fail(job, start, ret);
--            if (error_is_read) {
--                *error_is_read = true;
-+        if (job->use_copy_range) {
-+            ret = backup_cow_with_offload(job, start, end, is_write_notifier);
-+            if (ret < 0) {
-+                job->use_copy_range = false;
-             }
--            hbitmap_set(job->copy_bitmap, start / job->cluster_size, 1);
--            goto out;
-         }
--
--        if (buffer_is_zero(iov.iov_base, iov.iov_len)) {
--            ret = blk_co_pwrite_zeroes(job->target, start,
--                                       bounce_qiov.size, BDRV_REQ_MAY_UNMAP);
--        } else {
--            ret = blk_co_pwritev(job->target, start,
--                                 bounce_qiov.size, &bounce_qiov,
--                                 job->compress ? BDRV_REQ_WRITE_COMPRESSED : 0);
-+        if (!job->use_copy_range) {
-+            ret = backup_cow_with_bounce_buffer(job, start, end, is_write_notifier,
-+                                                error_is_read, &bounce_buffer);
-         }
-         if (ret < 0) {
--            trace_backup_do_cow_write_fail(job, start, ret);
--            if (error_is_read) {
--                *error_is_read = false;
--            }
--            hbitmap_set(job->copy_bitmap, start / job->cluster_size, 1);
--            goto out;
-+            break;
-         }
- 
-         /* Publish progress, guest I/O counts as progress too.  Note that the
-          * offset field is an opaque progress value, it is not a disk offset.
-          */
--        job->bytes_read += n;
--        job_progress_update(&job->common.job, n);
-+        start += ret;
-+        job->bytes_read += ret;
-+        job_progress_update(&job->common.job, ret);
-+        ret = 0;
-     }
- 
--out:
-     if (bounce_buffer) {
-         qemu_vfree(bounce_buffer);
-     }
-@@ -665,6 +727,12 @@ BlockJob *backup_job_create(const char *job_id, BlockDriverState *bs,
-     } else {
-         job->cluster_size = MAX(BACKUP_CLUSTER_SIZE_DEFAULT, bdi.cluster_size);
-     }
-+    job->use_copy_range = true;
-+    job->copy_range_size = MIN_NON_ZERO(blk_get_max_transfer(job->common.blk),
-+                                        blk_get_max_transfer(job->target));
-+    job->copy_range_size = MAX(job->cluster_size,
-+                               QEMU_ALIGN_UP(job->copy_range_size,
-+                                             job->cluster_size));
- 
-     /* Required permissions are already taken with target's blk_new() */
-     block_job_add_bdrv(&job->common, "target", target, 0, BLK_PERM_ALL,
-diff --git a/block/trace-events b/block/trace-events
-index 2d59b53fd3..c35287b48a 100644
---- a/block/trace-events
-+++ b/block/trace-events
-@@ -42,6 +42,7 @@ backup_do_cow_skip(void *job, int64_t start) "job %p start %"PRId64
- backup_do_cow_process(void *job, int64_t start) "job %p start %"PRId64
- backup_do_cow_read_fail(void *job, int64_t start, int ret) "job %p start %"PRId64" ret %d"
- backup_do_cow_write_fail(void *job, int64_t start, int ret) "job %p start %"PRId64" ret %d"
-+backup_do_cow_copy_range_fail(void *job, int64_t start, int ret) "job %p start %"PRId64" ret %d"
- 
- # blockdev.c
- qmp_block_job_cancel(void *job) "job %p"
--- 
-2.17.0
+Regards,
+Daniel
+--=20
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
+ge :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.c=
+om :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
+ge :|
