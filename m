@@ -1,30 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54828)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54894)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1fQIE1-0003X3-Tj
-	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 16:06:42 -0400
+	(envelope-from <mst@redhat.com>) id 1fQIEI-0003jL-7R
+	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 16:06:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1fQIE0-00033H-W6
-	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 16:06:37 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:52852)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
-	id 1fQIE0-000333-Q3
-	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 16:06:36 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 0E5A3300432C
-	for <qemu-devel@nongnu.org>; Tue,  5 Jun 2018 20:06:36 +0000 (UTC)
-From: Alex Williamson <alex.williamson@redhat.com>
-Date: Tue, 05 Jun 2018 14:06:31 -0600
-Message-ID: <20180605200631.24323.43223.stgit@gimli.home>
-In-Reply-To: <20180605200425.24323.56023.stgit@gimli.home>
-References: <20180605200425.24323.56023.stgit@gimli.home>
+	(envelope-from <mst@redhat.com>) id 1fQIEH-0003DA-3t
+	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 16:06:54 -0400
+Date: Tue, 5 Jun 2018 23:06:41 +0300
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20180605225717-mutt-send-email-mst@kernel.org>
+References: <20180528183058.GG2209@redhat.com>
+	<20180528183833.GJ4580@localhost.localdomain>
+	<20180528212054.GH2209@redhat.com>
+	<20180528212510.GC4660@redhat.com>
+	<20180529064415.GA4756@localhost.localdomain>
+	<2b3eef00-f326-c1e6-0e4b-b7602646eec4@redhat.com>
+	<20180605092159.GA2544@work-vm>
+	<20180605190324.GA11372@localhost.localdomain>
+	<20180605223934-mutt-send-email-mst@kernel.org>
+	<a9fdbe0f-2c39-7da3-11f2-6752b74cce08@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] [PULL 3/6] vfio/quirks: Add quirk reset callback
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <a9fdbe0f-2c39-7da3-11f2-6752b74cce08@redhat.com>
+Subject: Re: [Qemu-devel] [Qemu-block] storing machine data in qcow images?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,76 +31,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Eric Blake <eblake@redhat.com>
+Cc: Eduardo Habkost <ehabkost@redhat.com>, Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org, "Richard W.M. Jones" <rjones@redhat.com>, stefanha@redhat.com, Max Reitz <mreitz@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-Quirks can be self modifying, provide a hook to allow them to cleanup
-on device reset if desired.
+On Tue, Jun 05, 2018 at 02:54:07PM -0500, Eric Blake wrote:
+> On 06/05/2018 02:47 PM, Michael S. Tsirkin wrote:
+> 
+> > > > Layer 1:
+> > > >     The string shall always be a JSON 'object'; i.e. of the form
+> > > >      { "something": ... , "more": ... }
+> > > > 
+> > > >     The key strings shall be non-null and non-empty and shall
+> > > >     be unique.
+> 
+> > > 
+> > > I think it would be simpler if layer 0 simply provided a list of
+> > > names/value pairs, where names are ascii strings, and values are
+> > > binary data[1].  It would make layer 1 unnecessary, and allow (3)
+> > > and (4) to happen.
+> > > 
+> > > [1] In other words, Rich's proposal of "named blobs":
+> > > https://www.mail-archive.com/qemu-block@nongnu.org/msg37856.html
+> > 
+> > I think simple is beautiful, too. But assuming they
+> > really are binary how are blobs encoded?
+> > Did binary really mean UTF-8 here?
+> 
+> Binary blobs can always be base64 encoded for representation within a valid
+> JSON UTF-8 string (and we already have several QMP interfaces that utilize
+> base64 encoding to pass through what is otherwise invalid UTF-8).  It does
+> inflate things slightly compared to a format that allows a raw length
+> coupled with raw data, but that is not necessarily a problem.
 
-Reviewed-by: Eric Auger <eric.auger@redhat.com>
-Reviewed-by: Peter Xu <peterx@redhat.com>
-Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
----
- hw/vfio/pci-quirks.c |   15 +++++++++++++++
- hw/vfio/pci.c        |    2 ++
- hw/vfio/pci.h        |    2 ++
- 3 files changed, 19 insertions(+)
+OK so what's proposed here is something like the following:
 
-diff --git a/hw/vfio/pci-quirks.c b/hw/vfio/pci-quirks.c
-index cc3a74ed992a..f0947cbf152f 100644
---- a/hw/vfio/pci-quirks.c
-+++ b/hw/vfio/pci-quirks.c
-@@ -1694,6 +1694,21 @@ void vfio_bar_quirk_finalize(VFIOPCIDevice *vdev, int nr)
- /*
-  * Reset quirks
-  */
-+void vfio_quirk_reset(VFIOPCIDevice *vdev)
-+{
-+    int i;
-+
-+    for (i = 0; i < PCI_ROM_SLOT; i++) {
-+        VFIOQuirk *quirk;
-+        VFIOBAR *bar = &vdev->bars[i];
-+
-+        QLIST_FOREACH(quirk, &bar->quirks, next) {
-+            if (quirk->reset) {
-+                quirk->reset(vdev, quirk);
-+            }
-+        }
-+    }
-+}
- 
- /*
-  * AMD Radeon PCI config reset, based on Linux:
-diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
-index 4947fe39a28c..65446fb42845 100644
---- a/hw/vfio/pci.c
-+++ b/hw/vfio/pci.c
-@@ -2207,6 +2207,8 @@ static void vfio_pci_post_reset(VFIOPCIDevice *vdev)
-                          vdev->vbasedev.name, nr);
-         }
-     }
-+
-+    vfio_quirk_reset(vdev);
- }
- 
- static bool vfio_pci_host_match(PCIHostDeviceAddress *addr, const char *name)
-diff --git a/hw/vfio/pci.h b/hw/vfio/pci.h
-index 59ab7757a300..594a5bd00593 100644
---- a/hw/vfio/pci.h
-+++ b/hw/vfio/pci.h
-@@ -29,6 +29,7 @@ typedef struct VFIOQuirk {
-     void *data;
-     int nr_mem;
-     MemoryRegion *mem;
-+    void (*reset)(struct VFIOPCIDevice *vdev, struct VFIOQuirk *quirk);
- } VFIOQuirk;
- 
- typedef struct VFIOBAR {
-@@ -167,6 +168,7 @@ void vfio_bar_quirk_exit(VFIOPCIDevice *vdev, int nr);
- void vfio_bar_quirk_finalize(VFIOPCIDevice *vdev, int nr);
- void vfio_setup_resetfn_quirk(VFIOPCIDevice *vdev);
- int vfio_add_virt_caps(VFIOPCIDevice *vdev, Error **errp);
-+void vfio_quirk_reset(VFIOPCIDevice *vdev);
- 
- extern const PropertyInfo qdev_prop_nv_gpudirect_clique;
- 
+[A-Za-z][^=\0]*=[^\0]*
+
+Sound reasonable?
+
+How about a fixed key at the beginning to specify the format?
+
+E.g. 16 first bytes:
+
+qcow2-format=00\0
+
+anything else in first 16 bytes means some other format?
+
+> -- 
+> Eric Blake, Principal Software Engineer
+> Red Hat, Inc.           +1-919-301-3266
+> Virtualization:  qemu.org | libvirt.org
