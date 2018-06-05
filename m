@@ -1,30 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36208)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36761)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1fQCWl-0000hv-0M
-	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 10:01:38 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1fQCZ6-0002Et-6v
+	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 10:04:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1fQCWf-0002VK-3c
-	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 10:01:35 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:46972 helo=mx1.redhat.com)
+	(envelope-from <ehabkost@redhat.com>) id 1fQCZ2-0003ls-Mf
+	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 10:04:00 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:39806)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1fQCWe-0002Uk-V8
-	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 10:01:29 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.3])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 7809C818BAEE
-	for <qemu-devel@nongnu.org>; Tue,  5 Jun 2018 14:01:28 +0000 (UTC)
-From: Igor Mammedov <imammedo@redhat.com>
-Date: Tue,  5 Jun 2018 16:00:43 +0200
-Message-Id: <1528207243-268226-3-git-send-email-imammedo@redhat.com>
-In-Reply-To: <1528207243-268226-1-git-send-email-imammedo@redhat.com>
-References: <1528207243-268226-1-git-send-email-imammedo@redhat.com>
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1fQCZ2-0003lW-EQ
+	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 10:03:56 -0400
+Date: Tue, 5 Jun 2018 11:03:46 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20180605140346.GI7451@localhost.localdomain>
+References: <20180603092749.107476-1-marcel.apfelbaum@gmail.com>
+	<20180604042928-mutt-send-email-mst@kernel.org>
+	<23040757-b561-e0bf-a41d-38d3c44555ee@gmail.com>
+	<20180605072746.v6xxabsbewiuw7ka@sirius.home.kraxel.org>
+	<20180605084300.GF32286@redhat.com>
+	<20180605130646.GF7451@localhost.localdomain>
+	<20180605131232.GG32286@redhat.com>
+	<20180605133538.GG7451@localhost.localdomain>
+	<20180605134439.GN8876@antique-desktop>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <20180605134439.GN8876@antique-desktop>
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v3 2/2] vl: fix use of --daemonize with
- --preconfig
+Subject: Re: [Qemu-devel] [libvirt] libvirt default machine-type guarantees?
+ (was Re: [PATCH RFC] hw/pc: set q35 as the default x86 machine)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,80 +36,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: berrange@redhat.com, mreitz@redhat.com, pbonzini@redhat.com, ehabkost@redhat.com, ldoktor@redhat.com
+To: Pavel Hrdina <phrdina@redhat.com>
+Cc: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, libvir-list@redhat.com, qemu-devel@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, pbonzini@redhat.com, rth@twiddle.net
 
-When using --daemonize, the initial lead process will fork a child and
-then wait to be notified that setup is complete via a pipe, before it
-exits.  When using --preconfig there is an extra call to main_loop()
-before the notification is done from os_setup_post(). Thus the parent
-process won't exit until the mgmt application connects to the monitor
-and tells QEMU to leave the RUN_STATE_PRECONFIG. The mgmt application
-won't connect to the monitor until daemonizing has completed though.
+On Tue, Jun 05, 2018 at 03:44:39PM +0200, Pavel Hrdina wrote:
+> On Tue, Jun 05, 2018 at 10:35:38AM -0300, Eduardo Habkost wrote:
+> > On Tue, Jun 05, 2018 at 02:12:32PM +0100, Daniel P. Berrang=E9 wrote:
+> > > On Tue, Jun 05, 2018 at 10:06:46AM -0300, Eduardo Habkost wrote:
+> > > > (CCing libvir-list)
+> > > >=20
+> > > > On Tue, Jun 05, 2018 at 09:43:00AM +0100, Daniel P. Berrang=E9 wr=
+ote:
+> > > > > On Tue, Jun 05, 2018 at 09:27:46AM +0200, Gerd Hoffmann wrote:
+> > > > > >   Hi,
+> > > > > >=20
+> > > > > > > >   Add to that shortcuts like -cdrom
+> > > > > > > > stop working,
+> > > > > > >=20
+> > > > > > > Maybe is fixable.
+> > > > > >=20
+> > > > > > Already fixed for ages.
+> > > > > >=20
+> > > > > > > I see marking Q35 as the default machine a first step.
+> > > > > >=20
+> > > > > > Maybe the better option is to go the arm route:  Just don't d=
+efine a
+> > > > > > default, so users have to specify pc or q35.  That will make =
+them notice
+> > > > > > there is a world beside 'pc', and we also avoid breaking thin=
+gs
+> > > > > > silently.
+> > > > >=20
+> > > > > If QEMU removes the default, then libvirt will have to hardcode
+> > > > > 'pc' as the default to maintain back compatibility, so I don't
+> > > > > think that ends up as a net win
+> > > >=20
+> > > > Is there an actual promise to never change the default
+> > > > machine-type documented in the libvirt API, or is this just fear
+> > > > of breaking existing code?
+> > >=20
+> > > The risk of breaking things that currently work. Some of the things
+> > > discussed here that risk breaking users if QEMU changes the default=
+,
+> > > have the same risk if libvirt changes the default.
+> > >=20
+> > > eg old OS versions that only work with PC, or more commonly pre-exi=
+sting
+> > > cloud disk images that were built against PC can't be assumed to ju=
+st
+> > > work against q35, even if the OS in the image supports it.
+> > >=20
+> > > If we want to get q35 broadly used for modern OS, then IMHO the bes=
+t
+> > > option is to record that metadata in libosinfo, as ew do for other
+> > > virtual hardware preferences.  That doesn't fix the problem of disk
+> > > images that might not transparently boot between pc/q35, but at lea=
+st
+> > > avoids breaking OS that don't support q35 at all.
+> >=20
+> > This leads to a more general question: sometimes the defaults
+> > chosen by libvirt are obsolete or broken, and we might want to
+> > change them.
+> >=20
+> > Is there a process for changing defaults in libvirt, or libvirt
+> > is bound by past decisions forever?
+>=20
+> If the default was always recorded in the domain XML it is safe to
+> change it because it will not affect already existing domains or
+> migration but if the default is not recorded in the domain XML there
+> needs to be a lot of compatibility code.
 
-This is a chicken and egg problem, leading to deadlock at startup.
+That's the opposite of what Daniel said above, isn't it?  The
+machine-type is always recorded in the domain XML, but it's still
+considered unsafe to change.
 
-The only viable way to fix this is to call os_setup_post() before
-the early main_loop_wait() call when in RUN_STATE_PRECONFIG. This has
-the downside that any errors from this point onwards won't be handled
-well by the mgmt application, because it will think QEMU has started
-successfully, so not be expecting an abrupt exit. The only way to
-deal with that is to move as much user input validation as possible
-to before the main_loop() call. This is left as an exercise for
-future interested developers.
-
-Based on:
-  From: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
-  Subject: [PATCH v2 2/2] vl: fix use of --daemonize with --preconfig
-  Message-Id: <20180604120345.12955-3-berrange@redhat.com>
-
-Signed-off-by: Igor Mammedov <imammedo@redhat.com>
----
-v3:
-  - rewrite to apply on top of 1/2
----
- os-posix.c | 6 ++++++
- vl.c       | 2 +-
- 2 files changed, 7 insertions(+), 1 deletion(-)
-
-diff --git a/os-posix.c b/os-posix.c
-index 9ce6f74..ee06a8d 100644
---- a/os-posix.c
-+++ b/os-posix.c
-@@ -309,8 +309,14 @@ void os_daemonize(void)
-=20
- void os_setup_post(void)
- {
-+    static bool os_setup_post_done =3D false;
-     int fd =3D 0;
-=20
-+    if (os_setup_post_done) {
-+        return;
-+    }
-+    os_setup_post_done =3D true;
-+
-     if (daemonize) {
-         if (chdir("/")) {
-             error_report("not able to chdir to /: %s", strerror(errno));
-diff --git a/vl.c b/vl.c
-index fa44138..d6fa67f 100644
---- a/vl.c
-+++ b/vl.c
-@@ -1960,6 +1960,7 @@ static void main_loop(void)
- #ifdef CONFIG_PROFILER
-         ti =3D profile_getclock();
- #endif
-+        os_setup_post();
-         main_loop_wait(false);
- #ifdef CONFIG_PROFILER
-         dev_time +=3D profile_getclock() - ti;
-@@ -4707,7 +4708,6 @@ int main(int argc, char **argv, char **envp)
-     }
-=20
-     accel_setup_post(current_machine);
--    os_setup_post();
-=20
-     main_loop();
-=20
 --=20
-2.7.4
+Eduardo
