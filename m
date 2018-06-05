@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42630)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42650)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wexu@redhat.com>) id 1fQHJq-0002FZ-7q
-	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 15:08:35 -0400
+	(envelope-from <wexu@redhat.com>) id 1fQHJs-0002Hp-U7
+	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 15:08:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wexu@redhat.com>) id 1fQHJl-00038b-AD
-	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 15:08:34 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:50274 helo=mx1.redhat.com)
+	(envelope-from <wexu@redhat.com>) id 1fQHJr-0003FN-U2
+	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 15:08:36 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:56678 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <wexu@redhat.com>) id 1fQHJl-00038A-3x
-	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 15:08:29 -0400
+	(Exim 4.71) (envelope-from <wexu@redhat.com>) id 1fQHJr-0003EO-4z
+	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 15:08:35 -0400
 From: wexu@redhat.com
-Date: Tue,  5 Jun 2018 15:08:01 -0400
-Message-Id: <1528225683-11413-7-git-send-email-wexu@redhat.com>
+Date: Tue,  5 Jun 2018 15:08:03 -0400
+Message-Id: <1528225683-11413-9-git-send-email-wexu@redhat.com>
 In-Reply-To: <1528225683-11413-1-git-send-email-wexu@redhat.com>
 References: <1528225683-11413-1-git-send-email-wexu@redhat.com>
-Subject: [Qemu-devel] [RFC v2 6/8] virtio: flush/push for packed ring
+Subject: [Qemu-devel] [RFC v2 8/8] virtio: guest driver reload for vhost-net
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,162 +28,90 @@ Cc: jasowang@redhat.com, tiwei.bie@intel.com, mst@redhat.com, wexu@redhat.com, j
 
 From: Wei Xu <wexu@redhat.com>
 
-Signed-off-by: Wei Xu <wexu@redhat.com>
+last_avail, avail_wrap_count, used_idx and used_wrap_count are
+needed to support vhost-net backend, all these are either 16 or
+bool variables, since state.num is 64bit wide, so here it is
+possible to put them to the 'num' without introducing a new case
+while handling ioctl.
+
+Unload/Reload test has been done successfully with a patch in vhost kernel.
+
 Signed-off-by: Wei Xu <wexu@redhat.com>
 ---
- hw/virtio/virtio.c | 109 ++++++++++++++++++++++++++++++++++++++++++++++-------
- 1 file changed, 96 insertions(+), 13 deletions(-)
+ hw/virtio/virtio.c | 42 ++++++++++++++++++++++++++++++++++--------
+ 1 file changed, 34 insertions(+), 8 deletions(-)
 
 diff --git a/hw/virtio/virtio.c b/hw/virtio/virtio.c
-index 0160d03..6f2da83 100644
+index 4543974..153f6d7 100644
 --- a/hw/virtio/virtio.c
 +++ b/hw/virtio/virtio.c
-@@ -371,6 +371,21 @@ static void vring_packed_desc_read(VirtIODevice *vdev, VRingDescPacked *desc,
-     virtio_tswap16s(vdev, &desc->flags);
- }
- 
-+static void vring_packed_desc_write(VirtIODevice *vdev, VRingDescPacked *desc,
-+                            MemoryRegionCache *cache, int i)
-+{
-+    virtio_tswap64s(vdev, &desc->addr);
-+    virtio_tswap32s(vdev, &desc->len);
-+    virtio_tswap16s(vdev, &desc->id);
-+    virtio_tswap16s(vdev, &desc->flags);
-+    address_space_write_cached(cache,
-+                               sizeof(VRingDescPacked) * i, desc,
-+                               sizeof(VRingDescPacked));
-+    address_space_cache_invalidate(cache,
-+                                   sizeof(VRingDescPacked) * i,
-+                                   sizeof(VRingDescPacked));
-+}
-+
- static inline bool is_desc_avail(struct VRingDescPacked *desc)
- {
-     return !!(desc->flags & AVAIL_DESC_PACKED(1)) !=
-@@ -526,19 +541,11 @@ bool virtqueue_rewind(VirtQueue *vq, unsigned int num)
- }
- 
- /* Called within rcu_read_lock().  */
--void virtqueue_fill(VirtQueue *vq, const VirtQueueElement *elem,
-+static void virtqueue_split_fill(VirtQueue *vq, const VirtQueueElement *elem,
-                     unsigned int len, unsigned int idx)
- {
-     VRingUsedElem uelem;
- 
--    trace_virtqueue_fill(vq, elem, len, idx);
--
--    virtqueue_unmap_sg(vq, elem, len);
--
--    if (unlikely(vq->vdev->broken)) {
--        return;
--    }
--
-     if (unlikely(!vq->vring.used)) {
-         return;
+@@ -2862,33 +2862,59 @@ hwaddr virtio_queue_get_used_size(VirtIODevice *vdev, int n)
      }
-@@ -550,16 +557,64 @@ void virtqueue_fill(VirtQueue *vq, const VirtQueueElement *elem,
-     vring_used_write(vq, &uelem, idx);
  }
  
--/* Called within rcu_read_lock().  */
--void virtqueue_flush(VirtQueue *vq, unsigned int count)
-+static void virtqueue_packed_fill(VirtQueue *vq, const VirtQueueElement *elem,
-+                        unsigned int len, unsigned int idx)
+-uint16_t virtio_queue_get_last_avail_idx(VirtIODevice *vdev, int n)
++uint64_t virtio_queue_get_last_avail_idx(VirtIODevice *vdev, int n)
  {
--    uint16_t old, new;
-+    uint16_t w, head;
-+    VRingMemoryRegionCaches *caches;
-+    VRingDescPacked desc = {
-+        .addr = 0,
-+        .flags = 0,
-+    };
+-    return vdev->vq[n].last_avail_idx;
++    uint64_t num;
 +
-+    if (unlikely(!vq->vring.desc)) {
-+        return;
++    num = vdev->vq[n].last_avail_idx;
++    if (virtio_vdev_has_feature(vdev, VIRTIO_F_RING_PACKED)) {
++        num |= ((uint64_t)vdev->vq[n].avail_wrap_counter) << 16;
++        num |= ((uint64_t)vdev->vq[n].used_idx) << 32;
++        num |= ((uint64_t)vdev->vq[n].used_wrap_counter) << 48;
 +    }
 +
-+    caches = vring_get_region_caches(vq);
-+    head = vq->used_idx + idx;
-+    head = head >= vq->vring.num ? (head - vq->vring.num) : head;
-+    vring_packed_desc_read(vq->vdev, &desc, &caches->desc, head);
-+
-+    w = (desc.flags & AVAIL_DESC_PACKED(1)) >> 7;
-+    desc.flags &= ~(AVAIL_DESC_PACKED(1) | USED_DESC_PACKED(1));
-+    desc.flags |= AVAIL_DESC_PACKED(w) | USED_DESC_PACKED(w);
-+    if (!(desc.flags & VRING_DESC_F_INDIRECT)) {
-+        if (!(desc.flags & VRING_DESC_F_WRITE)) {
-+            desc.len = 0;
-+        } else {
-+            desc.len = len;
-+        }
-+    }
-+    vring_packed_desc_write(vq->vdev, &desc, &caches->desc, head);
-+
-+    /* Make sure flags has been updated */
-+    smp_mb();
-+}
-+
-+void virtqueue_fill(VirtQueue *vq, const VirtQueueElement *elem,
-+                    unsigned int len, unsigned int idx)
-+{
-+    trace_virtqueue_fill(vq, elem, len, idx);
-+
-+    virtqueue_unmap_sg(vq, elem, len);
- 
-     if (unlikely(vq->vdev->broken)) {
--        vq->inuse -= count;
-         return;
-     }
- 
-+    if (virtio_vdev_has_feature(vq->vdev, VIRTIO_F_RING_PACKED)) {
-+        virtqueue_packed_fill(vq, elem, len, idx);
-+    } else {
-+        virtqueue_split_fill(vq, elem, len, idx);
-+    }
-+}
-+
-+/* Called within rcu_read_lock().  */
-+static void virtqueue_split_flush(VirtQueue *vq, unsigned int count)
-+{
-+    uint16_t old, new;
-+
-     if (unlikely(!vq->vring.used)) {
-         return;
-     }
-@@ -575,6 +630,34 @@ void virtqueue_flush(VirtQueue *vq, unsigned int count)
-         vq->signalled_used_valid = false;
++    return num;
  }
  
-+static void virtqueue_packed_flush(VirtQueue *vq, unsigned int count)
-+{
-+    if (unlikely(!vq->vring.desc)) {
-+        return;
-+    }
-+
-+    vq->inuse -= count;
-+    vq->used_idx += count;
-+    if (vq->used_idx >= vq->vring.num) {
-+        vq->used_idx -= vq->vring.num;
-+        vq->used_wrap_counter = !vq->used_wrap_counter;
-+    }
-+}
-+
-+void virtqueue_flush(VirtQueue *vq, unsigned int count)
-+{
-+    if (unlikely(vq->vdev->broken)) {
-+        vq->inuse -= count;
-+        return;
-+    }
-+
-+    if (virtio_vdev_has_feature(vq->vdev, VIRTIO_F_RING_PACKED)) {
-+        virtqueue_packed_flush(vq, count);
-+    } else {
-+        virtqueue_split_flush(vq, count);
-+    }
-+}
-+
- void virtqueue_push(VirtQueue *vq, const VirtQueueElement *elem,
-                     unsigned int len)
+-void virtio_queue_set_last_avail_idx(VirtIODevice *vdev, int n, uint16_t idx)
++void virtio_queue_set_last_avail_idx(VirtIODevice *vdev, int n, uint64_t num)
  {
+-    vdev->vq[n].last_avail_idx = idx;
+-    vdev->vq[n].shadow_avail_idx = idx;
++    vdev->vq[n].shadow_avail_idx = vdev->vq[n].last_avail_idx = (uint16_t)(num);
++
++    if (virtio_vdev_has_feature(vdev, VIRTIO_F_RING_PACKED)) {
++        vdev->vq[n].avail_wrap_counter = (uint16_t)(num >> 16);
++        vdev->vq[n].used_idx = (uint16_t)(num >> 32);
++        vdev->vq[n].used_wrap_counter = (uint16_t)(num >> 48);
++    }
+ }
+ 
+ void virtio_queue_restore_last_avail_idx(VirtIODevice *vdev, int n)
+ {
+     rcu_read_lock();
+-    if (vdev->vq[n].vring.desc) {
++    if (!vdev->vq[n].vring.desc) {
++        goto out;
++    }
++
++    if (!virtio_vdev_has_feature(vdev, VIRTIO_F_RING_PACKED)) {
+         vdev->vq[n].last_avail_idx = vring_used_idx(&vdev->vq[n]);
+-        vdev->vq[n].shadow_avail_idx = vdev->vq[n].last_avail_idx;
+     }
++    vdev->vq[n].shadow_avail_idx = vdev->vq[n].last_avail_idx;
++
++out:
+     rcu_read_unlock();
+ }
+ 
+ void virtio_queue_update_used_idx(VirtIODevice *vdev, int n)
+ {
+     rcu_read_lock();
+-    if (vdev->vq[n].vring.desc) {
++    if (!vdev->vq[n].vring.desc) {
++        goto out;
++    }
++
++    if (!virtio_vdev_has_feature(vdev, VIRTIO_F_RING_PACKED)) {
+         vdev->vq[n].used_idx = vring_used_idx(&vdev->vq[n]);
+     }
++
++out:
+     rcu_read_unlock();
+ }
+ 
 -- 
 1.8.3.1
