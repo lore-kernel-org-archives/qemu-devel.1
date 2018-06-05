@@ -1,28 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42744)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43593)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1fQE0O-0007BU-If
-	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 11:36:17 -0400
+	(envelope-from <laurent@vivier.eu>) id 1fQE38-0000dx-Fi
+	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 11:39:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1fQE0J-0000dK-LA
-	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 11:36:16 -0400
-Date: Tue, 5 Jun 2018 17:36:07 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20180605173607.4074f54d.cohuck@redhat.com>
-In-Reply-To: <e73038ff-fb2d-5865-8b84-e775990f3983@linux.ibm.com>
-References: <20180509154822.23510-1-cohuck@redhat.com>
-	<20180509154822.23510-3-cohuck@redhat.com>
-	<c18f9b9f-da00-1a0b-8ef0-7ac223c73d1a@linux.ibm.com>
-	<20180515181006.0cb1dfc2.cohuck@redhat.com>
-	<a5d08fb7-d9c1-b230-fe0c-acebbda2ba65@linux.ibm.com>
-	<20180522145208.310143ea.cohuck@redhat.com>
-	<4e4001cc-540e-0f2b-bbd1-1f82ca594bb3@linux.ibm.com>
-	<20180605151449.22aafbfc.cohuck@redhat.com>
-	<e73038ff-fb2d-5865-8b84-e775990f3983@linux.ibm.com>
+	(envelope-from <laurent@vivier.eu>) id 1fQE35-0001xP-CE
+	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 11:39:06 -0400
+Received: from mout.kundenserver.de ([212.227.17.24]:50747)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1fQE35-0001wx-1G
+	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 11:39:03 -0400
+References: <20180605135404.16301-1-laurent@vivier.eu>
+	<CAFEAcA95tCKv0sV9hYhn1tiv11wPypEctEbbbO_xqV2f6JRV_Q@mail.gmail.com>
+From: Laurent Vivier <laurent@vivier.eu>
+Message-ID: <ee8692d5-231c-5ce2-fc15-173d9742e143@vivier.eu>
+Date: Tue, 5 Jun 2018 17:38:56 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH RFC 2/2] vfio-ccw: support for halt/clear
- subchannel
+In-Reply-To: <CAFEAcA95tCKv0sV9hYhn1tiv11wPypEctEbbbO_xqV2f6JRV_Q@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH] linux-user: disable qemu-bridge-helper and
+ socket_scm_helper build
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,16 +29,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Pierre Morel <pmorel@linux.ibm.com>
-Cc: Dong Jia Shi <bjsdjshi@linux.ibm.com>, Halil Pasic <pasic@linux.ibm.com>, linux-s390@vger.kernel.org, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, qemu-s390x@nongnu.org, qemu-devel@nongnu.org
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, "=?UTF-8?Q?Daniel_P_._Berrang=c3=a9?=" <berrange@redhat.com>, Richard Henderson <richard.henderson@linaro.org>
 
-On Tue, 5 Jun 2018 17:23:02 +0200
-Pierre Morel <pmorel@linux.ibm.com> wrote:
+Le 05/06/2018 à 16:00, Peter Maydell a écrit :
+> On 5 June 2018 at 14:54, Laurent Vivier <laurent@vivier.eu> wrote:
+>> linux-user targets don't need them, and if we ask to build statically
+>> linked binaries some static binaries they need are not available.
+>>
+>> Signed-off-by: Laurent Vivier <laurent@vivier.eu>
+>> ---
+>>  Makefile               | 2 ++
+>>  tests/Makefile.include | 2 ++
+>>  2 files changed, 4 insertions(+)
+>>
+>> diff --git a/Makefile b/Makefile
+>> index 6d588d1f71..5f198ee4bb 100644
+>> --- a/Makefile
+>> +++ b/Makefile
+>> @@ -351,7 +351,9 @@ $(call set-vpath, $(SRC_PATH))
+>>
+>>  LIBS+=-lz $(LIBS_TOOLS)
+>>
+>> +ifeq ($(CONFIG_SOFTMMU),y)
+>>  HELPERS-$(CONFIG_LINUX) = qemu-bridge-helper$(EXESUF)
+>> +endif
+> 
+> HELPERS-$(call land,$(CONFIG_SOFTMMU),$(CONFIG_LINUX)) =
+> qemu-bridge-helper$(EXESUF)
+> 
 
-<snip lots of comments - I still need to think about this>
+I can try that.
 
-> May be I should try to integrate your patches so we have a better view.
+> 
+>>  ifdef BUILD_DOCS
+>>  DOCS=qemu-doc.html qemu-doc.txt qemu.1 qemu-img.1 qemu-nbd.8 qemu-ga.8
+>> diff --git a/tests/Makefile.include b/tests/Makefile.include
+>> index 86f90c0cb0..adaa5274c8 100644
+>> --- a/tests/Makefile.include
+>> +++ b/tests/Makefile.include
+>> @@ -923,7 +923,9 @@ check-report.html: check-report.xml
+>>
+>>  # Other tests
+>>
+>> +ifeq ($(CONFIG_SOFTMMU),y)
+>>  QEMU_IOTESTS_HELPERS-$(CONFIG_LINUX) = tests/qemu-iotests/socket_scm_helper$(EXESUF)
+>> +endif
+> 
+> Do we also need to do something to ensure that the tests that
+> use this helper don't run, or does that happen automatically?
 
-Not sure whether it is worth trying to do so in the current state.
-(Also, I really need to get the information into my personal cache
-again, before I write too many weird things.)
+I don't think iotests can run if no machine is configured.
+
+qemu-iotests needs *-softmmu targets, see in tests/qemu-iotests/check
+
+If I tried a "make check-block" with --disable-system it fails with
+
+.../tests/qemu-iotests-quick.sh
+check: qemu not found
+
+Thanks,
+Laurent
