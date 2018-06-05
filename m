@@ -1,27 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36170)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36208)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1fQCWf-0000d0-QO
-	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 10:01:39 -0400
+	(envelope-from <imammedo@redhat.com>) id 1fQCWl-0000hv-0M
+	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 10:01:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1fQCWb-0002SR-9g
-	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 10:01:27 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:37920 helo=mx1.redhat.com)
+	(envelope-from <imammedo@redhat.com>) id 1fQCWf-0002VK-3c
+	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 10:01:35 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:46972 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1fQCWb-0002S9-4n
-	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 10:01:25 -0400
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1fQCWe-0002Uk-V8
+	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 10:01:29 -0400
 Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
 	[10.11.54.3])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id A13444023834
-	for <qemu-devel@nongnu.org>; Tue,  5 Jun 2018 14:01:24 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 7809C818BAEE
+	for <qemu-devel@nongnu.org>; Tue,  5 Jun 2018 14:01:28 +0000 (UTC)
 From: Igor Mammedov <imammedo@redhat.com>
-Date: Tue,  5 Jun 2018 16:00:42 +0200
-Message-Id: <1528207243-268226-2-git-send-email-imammedo@redhat.com>
+Date: Tue,  5 Jun 2018 16:00:43 +0200
+Message-Id: <1528207243-268226-3-git-send-email-imammedo@redhat.com>
 In-Reply-To: <1528207243-268226-1-git-send-email-imammedo@redhat.com>
 References: <1528207243-268226-1-git-send-email-imammedo@redhat.com>
-Subject: [Qemu-devel] [PATCH v3 1/2] cli: Don't run early event loop if no
- --preconfig was specified
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v3 2/2] vl: fix use of --daemonize with
+ --preconfig
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,84 +36,77 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: berrange@redhat.com, mreitz@redhat.com, pbonzini@redhat.com, ehabkost@redhat.com, ldoktor@redhat.com
 
-After 047f7038f586d215 it is possible for event loop to run two
-times. First time whilst parsing command line options (the idea
-is to bring up monitor early so that management applications can
-tweak config before machine is initialized). And the second time
-is after everything is set up (this is the usual place). In both
-cases the event loop is called as main_loop_wait(nonblocking =
-false) which causes the event loop to block until at least one
-event occurred.
+When using --daemonize, the initial lead process will fork a child and
+then wait to be notified that setup is complete via a pipe, before it
+exits.  When using --preconfig there is an extra call to main_loop()
+before the notification is done from os_setup_post(). Thus the parent
+process won't exit until the mgmt application connects to the monitor
+and tells QEMU to leave the RUN_STATE_PRECONFIG. The mgmt application
+won't connect to the monitor until daemonizing has completed though.
 
-Now, consider that somebody (i.e. libvirt) calls us with
--daemonize. This operation is split in two steps. The main()
-calls os_daemonize() which fork()-s and then waits in read()
-until child notifies it via write():
+This is a chicken and egg problem, leading to deadlock at startup.
 
-/qemu.git $ ./x86_64-softmmu/qemu-system-x86_64 -S -daemonize \
-  -no-user-config -nodefaults -nographic
+The only viable way to fix this is to call os_setup_post() before
+the early main_loop_wait() call when in RUN_STATE_PRECONFIG. This has
+the downside that any errors from this point onwards won't be handled
+well by the mgmt application, because it will think QEMU has started
+successfully, so not be expecting an abrupt exit. The only way to
+deal with that is to move as much user input validation as possible
+to before the main_loop() call. This is left as an exercise for
+future interested developers.
 
-  main():                child:
-    os_daemonize():
-      read(pipe[0])
+Based on:
+  From: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+  Subject: [PATCH v2 2/2] vl: fix use of --daemonize with --preconfig
+  Message-Id: <20180604120345.12955-3-berrange@redhat.com>
 
-                           main_loop():
-                             main_loop_wait(false)
-
-                           os_setup_post():
-                             write(pipe[1])
-
-                           main_loop():
-                             main_loop_wait(false)
-
-Here it can be clearly seen that main() does not exit until an
-event occurs, but at the same time nobody will touch the monitor
-socket until their exec("qemu-system-*") finishes. So the whole
-thing deadlocks.
-
-The solution is to not call main_loop_wait() unless --preconfig was
-specified (in which case caller knows they must connect to the
-socket before exec() finishes).
-
-Patch also fixes hang when -nodefaults option is used, which were
-causing QEMU hang in the early main_loop_wait() indefinitely by
-the same means (not calling main_loop_wait() unless --preconfig
-is present on CLI)
-
-Based on
-  From: Michal Privoznik <mprivozn@redhat.com>
-  Subject: [PATCH] cli: Don't run early event loop if no --preconfig was specified
-  Message-Id: <ad910973c593c5ac2fed3a10ea958f7e9c12f82c.1527935663.git.mprivozn@redhat.com>
 Signed-off-by: Igor Mammedov <imammedo@redhat.com>
 ---
-v2:
-  - fix iotests that involve migration,
-    rewrite v1 so it would take into account -incoming use case
+v3:
+  - rewrite to apply on top of 1/2
 ---
- vl.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ os-posix.c | 6 ++++++
+ vl.c       | 2 +-
+ 2 files changed, 7 insertions(+), 1 deletion(-)
 
+diff --git a/os-posix.c b/os-posix.c
+index 9ce6f74..ee06a8d 100644
+--- a/os-posix.c
++++ b/os-posix.c
+@@ -309,8 +309,14 @@ void os_daemonize(void)
+=20
+ void os_setup_post(void)
+ {
++    static bool os_setup_post_done =3D false;
+     int fd =3D 0;
+=20
++    if (os_setup_post_done) {
++        return;
++    }
++    os_setup_post_done =3D true;
++
+     if (daemonize) {
+         if (chdir("/")) {
+             error_report("not able to chdir to /: %s", strerror(errno));
 diff --git a/vl.c b/vl.c
-index c4fe255..fa44138 100644
+index fa44138..d6fa67f 100644
 --- a/vl.c
 +++ b/vl.c
-@@ -1956,7 +1956,7 @@ static void main_loop(void)
+@@ -1960,6 +1960,7 @@ static void main_loop(void)
  #ifdef CONFIG_PROFILER
-     int64_t ti;
+         ti =3D profile_getclock();
  #endif
--    do {
-+    while (!main_loop_should_exit()) {
++        os_setup_post();
+         main_loop_wait(false);
  #ifdef CONFIG_PROFILER
-         ti = profile_getclock();
- #endif
-@@ -1964,7 +1964,7 @@ static void main_loop(void)
- #ifdef CONFIG_PROFILER
-         dev_time += profile_getclock() - ti;
- #endif
--    } while (!main_loop_should_exit());
-+    }
- }
- 
- static void version(void)
--- 
+         dev_time +=3D profile_getclock() - ti;
+@@ -4707,7 +4708,6 @@ int main(int argc, char **argv, char **envp)
+     }
+=20
+     accel_setup_post(current_machine);
+-    os_setup_post();
+=20
+     main_loop();
+=20
+--=20
 2.7.4
