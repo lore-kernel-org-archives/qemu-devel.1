@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47047)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47086)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1fQ7d9-0000A6-NT
-	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 04:47:53 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1fQ7dM-0000Ew-OA
+	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 04:48:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1fQ7d6-0007B5-JR
-	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 04:47:51 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:59438 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1fQ7d6-0007Ab-CO
-	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 04:47:48 -0400
-Date: Tue, 5 Jun 2018 09:47:44 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20180605084744.GG32286@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <1528143278-247932-1-git-send-email-imammedo@redhat.com>
-	<20180605010413.GF3184@localhost.localdomain>
-	<20180605102703.6fdee3c5@redhat.com>
+	(envelope-from <alex.bennee@linaro.org>) id 1fQ7dJ-0007G4-LX
+	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 04:48:04 -0400
+Received: from mail-wr0-x243.google.com ([2a00:1450:400c:c0c::243]:45566)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1fQ7dJ-0007FO-5W
+	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 04:48:01 -0400
+Received: by mail-wr0-x243.google.com with SMTP id o12-v6so1444405wrm.12
+	for <qemu-devel@nongnu.org>; Tue, 05 Jun 2018 01:48:00 -0700 (PDT)
+References: <20180528071332.9424.27343.stgit@pasha-VirtualBox>
+	<b2f04223-f52d-44e6-95a6-6ed91d021dad@ispras.ru>
+	<87in6yd146.fsf@linaro.org> <001201d3fc8d$e8a06390$b9e12ab0$@ru>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <001201d3fc8d$e8a06390$b9e12ab0$@ru>
+Date: Tue, 05 Jun 2018 09:47:58 +0100
+Message-ID: <87fu21d3gh.fsf@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20180605102703.6fdee3c5@redhat.com>
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] vl.c: make default main_loop_wait()
- timeout independed of slirp
+Subject: Re: [Qemu-devel] [PATCH v4 00/19] reverse debugging
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,69 +31,96 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: Eduardo Habkost <ehabkost@redhat.com>, ldoktor@redhat.com, jan.kiszka@siemens.com, qemu-devel@nongnu.org, mreitz@redhat.com, mprivozn@redhat.com, pbonzini@redhat.com
+To: Pavel Dovgalyuk <dovgaluk@ispras.ru>
+Cc: 'Pavel Dovgalyuk' <pavel.dovgaluk@ispras.ru>, qemu-devel@nongnu.org, kwolf@redhat.com, peter.maydell@linaro.org, war2jordan@live.com, crosthwaite.peter@gmail.com, boost.lists@gmail.com, quintela@redhat.com, ciro.santilli@gmail.com, jasowang@redhat.com, mst@redhat.com, zuban32s@gmail.com, armbru@redhat.com, maria.klimushenkova@ispras.ru, kraxel@redhat.com, thomas.dullien@googlemail.com, pbonzini@redhat.com, mreitz@redhat.com, dgilbert@redhat.com, rth@twiddle.net
 
-On Tue, Jun 05, 2018 at 10:27:03AM +0200, Igor Mammedov wrote:
-> On Mon, 4 Jun 2018 22:04:13 -0300
-> Eduardo Habkost <ehabkost@redhat.com> wrote:
->=20
-> > On Mon, Jun 04, 2018 at 10:14:38PM +0200, Igor Mammedov wrote:
-> > > Since commit (047f7038f58 cli: add --preconfig option) QEMU is
-> > > stuck with indefinite timeout in os_host_main_loop_wait()
-> > > at RUN_STATE_PRECONFIG even if --preconfig option wasn't used
-> > > when it's started with -nodefaults CLI option like this:
-> > >=20
-> > >   ./s390x-softmmu/qemu-system-s390x -nodefaults
-> > >=20
-> > > It's caused by the fact that slirp_pollfds_fill() bails out early
-> > > and slirp_update_timeout() won't be called to update timeout
-> > > to a reasonable value (1 sec) so timeout would be left with
-> > > infinite value (0xFFFFFFFF).
-> > >=20
-> > > Default infinite timeout though doen't make sense and reducing
-> > > it to 1 second as in slirp_update_timeout() won't affect host. =20
-> >=20
-> > I don't get this part.  Why default infinite timeout doesn't make
-> > sense?  Why would a 1 second timeout make sense?
-> I've meant that there is no reason for infinite timeuot,
-> and 1sec is good as any other finite one.
 
-I don't really agree - it is better to not wakeup at all if there's
-no work todo rather than pointlessly wake up once a second, to deal
-with a hack for the SLIRP feature that's almost never used in most
-production scenarios..
+Pavel Dovgalyuk <dovgaluk@ispras.ru> writes:
 
-> Hence we can unify timeout with/without -nodefaults, by moving 1sec
-> constant from slirp to main_loop_wait() and simplify code a bit.
-> =20
-> >=20
-> > > Fix issue by simplifying default timeout to the same 1sec as it
-> > > is in slirp_update_timeout() and cleanup the later. It makes
-> > > default timeout the same regardless of slirp_pollfds_fill()
-> > > exited early or not (i.e. -nodefaults won't have any effect on
-> > > main_loop_wait() anymore, which would provide more consistent
-> > > behavior between both variants of startup).
-> > >=20
-> > > Reported-by: Luk=C3=A1=C5=A1 Doktor <ldoktor@redhat.com>
-> > > Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-> > > ---
-> > > PS:
-> > > it doesn't fix issue reported by Max where
-> > >   "echo foo | $QEMU"
-> > > is also broken due to commit 047f7038f58, but there is antoher fix
-> > > on the list to fix that (either Michal's or Daniel's). =20
-> > [...]
-> >=20
->=20
->=20
+>> From: Alex Benn=C3=A9e [mailto:alex.bennee@linaro.org]
+>> Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru> writes:
+>>
+>> > Ping?
+>>
+>> I started having a look but I ran into this straight away. First I
+>> recorded a boot of the kernel:
+>>
+>>   ./aarch64-softmmu/qemu-system-aarch64 -machine virt,graphics=3Don,gic-
+>> version=3D3,virtualization=3Don -cpu cortex-a53 --serial mon:stdio -disp=
+lay none -kernel
+>> ../images/aarch64-current-linux-initrd-guest.img -icount shift=3D7,rr=3D=
+record,rrfile=3Dreplay.bin
+>>
+>> Then played back:
+>>
+>>   ./aarch64-softmmu/qemu-system-aarch64 -machine virt,graphics=3Don,gic-
+>> version=3D3,virtualization=3Don -cpu cortex-a53 --serial mon:stdio -disp=
+lay none -kernel
+>> ../images/aarch64-current-linux-initrd-guest.img -icount shift=3D7,rr=3D=
+replay,rrfile=3Dreplay.bin -
+>> s -S
+>
+> This looks ok, but...
+>
+>> And did the following on gdb:
+>>
+>> (gdb) i
+>> 0x0000000040000004 in ?? ()
+>> =3D> 0x40000004:  mov     x1, xzr
+>>    0x40000008:  mov     x2, xzr
+>>    0x4000000c:  mov     x3, xzr
+>> (gdb)
+>> 0x0000000040000008 in ?? ()
+>> =3D> 0x40000008:  mov     x2, xzr
+>>    0x4000000c:  mov     x3, xzr
+>>    0x40000010:  ldr     x4, 0x40000020
+>> (gdb)
+>> 0x000000004000000c in ?? ()
+>> =3D> 0x4000000c:  mov     x3, xzr
+>>    0x40000010:  ldr     x4, 0x40000020
+>>    0x40000014:  br      x4
+>> (gdb)
+>> 0x0000000040000010 in ?? ()
+>> =3D> 0x40000010:  ldr     x4, 0x40000020
+>>    0x40000014:  br      x4
+>>    0x40000018:  .inst   0x44000000 ; undefined
+>> (gdb)
+>> 0x0000000040000014 in ?? ()
+>> =3D> 0x40000014:  br      x4
+>>    0x40000018:  .inst   0x44000000 ; undefined
+>>    0x4000001c:  .inst   0x00000000 ; undefined
+>> (gdb) p/x $x4
+>> $1 =3D 0x40080000
+>> (gdb) reverse-stepi
+>> warning: Remote failure reply: E14
+>>
+>> Surely this is the simple case and doesn't require any snapshots for
+>> block devices as there are none. Am I missing something?
+>
+> Reverse debugging requires the snapshotting. QEMU can't revert the VM sta=
+te without the snapshots.
+> You can try adding an empty qcow2 image to allow snapshotting there.
 
-Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
-ge :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.c=
-om :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
-ge :|
+I suspect a recent patch has broken locking again:
+
+Starting program: /home/alex/lsrc/qemu/qemu.git/aarch64-softmmu/qemu-system=
+-aarch64 -machine virt,graphics=3Don,gic-version=3D3,virtualization=3Don -c=
+pu cortex-a53 --serial mon:stdio -display none -kernel ../images/aarch64-cu=
+rrent-linux-initrd-guest.img -icount shift=3D7,rr=3Dreplay,rrfile=3Dreplay.=
+bin,rrsnapshot=3Ddebug -drive file=3Drr.qcow2,if=3Dnone,snapshot,id=3Drr -s=
+ -S
+[Thread debugging using libthread_db enabled]
+Using host libthread_db library "/lib/x86_64-linux-gnu/libthread_db.so.1".
+[New Thread 0x7fffd8536700 (LWP 32452)]
+[New Thread 0x7fffd5bb3700 (LWP 32453)]
+[New Thread 0x7fffd4eab700 (LWP 32454)]
+**
+ERROR:replay/replay-time.c:49:replay_read_clock: assertion failed: (replay_=
+file && replay_mutex_locked())
+
+Once I have the linux-user TCG tests merged I'm planning on focusing on
+the system emulation tests and we should be able to add some
+record/replay tests to defend the behaviour.
+
+--
+Alex Benn=C3=A9e
