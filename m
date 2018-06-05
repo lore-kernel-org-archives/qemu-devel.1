@@ -1,32 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33380)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33955)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fQDeS-0007c0-91
-	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 11:13:37 -0400
+	(envelope-from <Babu.Moger@amd.com>) id 1fQDhX-0000gA-5l
+	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 11:16:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1fQDeP-0002C4-4b
-	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 11:13:36 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:49380 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1fQDeO-0002Bd-W3
-	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 11:13:33 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.3])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 55C5F805A530
-	for <qemu-devel@nongnu.org>; Tue,  5 Jun 2018 15:13:32 +0000 (UTC)
-References: <1528207243-268226-1-git-send-email-imammedo@redhat.com>
-	<1528207243-268226-3-git-send-email-imammedo@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <b3bbeaa4-de51-11bc-ddf8-d83b809efc45@redhat.com>
-Date: Tue, 5 Jun 2018 10:13:30 -0500
-MIME-Version: 1.0
-In-Reply-To: <1528207243-268226-3-git-send-email-imammedo@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+	(envelope-from <Babu.Moger@amd.com>) id 1fQDhT-00046X-VW
+	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 11:16:47 -0400
+Received: from mail-cys01nam02on061b.outbound.protection.outlook.com
+	([2a01:111:f400:fe45::61b]:63297
+	helo=NAM02-CY1-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <Babu.Moger@amd.com>) id 1fQDhT-00043k-IL
+	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 11:16:43 -0400
+From: "Moger, Babu" <Babu.Moger@amd.com>
+Date: Tue, 5 Jun 2018 15:16:38 +0000
+Message-ID: <BL0PR12MB246855F205E7BE5ED6400EFA95660@BL0PR12MB2468.namprd12.prod.outlook.com>
+References: <1527176614-26271-1-git-send-email-babu.moger@amd.com>
+	<1527176614-26271-3-git-send-email-babu.moger@amd.com>
+	<20180605015928.GH3184@localhost.localdomain>
+In-Reply-To: <20180605015928.GH3184@localhost.localdomain>
 Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v3 2/2] vl: fix use of --daemonize with
- --preconfig
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+Subject: Re: [Qemu-devel] [PATCH v11 2/5] i386: Populate AMD Processor Cache
+ Information for cpuid 0x8000001D
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,58 +32,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>, qemu-devel@nongnu.org
-Cc: ldoktor@redhat.com, pbonzini@redhat.com, ehabkost@redhat.com, mreitz@redhat.com
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: "mst@redhat.com" <mst@redhat.com>, "marcel.apfelbaum@gmail.com" <marcel.apfelbaum@gmail.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "rth@twiddle.net" <rth@twiddle.net>, "mtosatti@redhat.com" <mtosatti@redhat.com>, "geoff@hostfission.com" <geoff@hostfission.com>, "kash@tripleback.net" <kash@tripleback.net>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>
 
-On 06/05/2018 09:00 AM, Igor Mammedov wrote:
-> When using --daemonize, the initial lead process will fork a child and
-> then wait to be notified that setup is complete via a pipe, before it
-> exits.  When using --preconfig there is an extra call to main_loop()
-> before the notification is done from os_setup_post(). Thus the parent
-> process won't exit until the mgmt application connects to the monitor
-> and tells QEMU to leave the RUN_STATE_PRECONFIG. The mgmt application
-> won't connect to the monitor until daemonizing has completed though.
->=20
-> This is a chicken and egg problem, leading to deadlock at startup.
->=20
-> The only viable way to fix this is to call os_setup_post() before
-> the early main_loop_wait() call when in RUN_STATE_PRECONFIG. This has
-> the downside that any errors from this point onwards won't be handled
-> well by the mgmt application, because it will think QEMU has started
-> successfully, so not be expecting an abrupt exit. The only way to
-> deal with that is to move as much user input validation as possible
-> to before the main_loop() call. This is left as an exercise for
-> future interested developers.
->=20
-> Based on:
->    From: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
->    Subject: [PATCH v2 2/2] vl: fix use of --daemonize with --preconfig
->    Message-Id: <20180604120345.12955-3-berrange@redhat.com>
->=20
-> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-> ---
-> v3:
->    - rewrite to apply on top of 1/2
-> ---
->   os-posix.c | 6 ++++++
->   vl.c       | 2 +-
->   2 files changed, 7 insertions(+), 1 deletion(-)
->=20
-> diff --git a/os-posix.c b/os-posix.c
-> index 9ce6f74..ee06a8d 100644
-> --- a/os-posix.c
-> +++ b/os-posix.c
-> @@ -309,8 +309,14 @@ void os_daemonize(void)
->  =20
->   void os_setup_post(void)
->   {
-> +    static bool os_setup_post_done =3D false;
-
-The '=3D false' is not technically necessary; all static variables defaul=
-t=20
-to zero-initialization.
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+DQo+IC0tLS0tT3JpZ2luYWwgTWVzc2FnZS0tLS0tDQo+IEZyb206IEVkdWFyZG8gSGFia29zdCBb
+bWFpbHRvOmVoYWJrb3N0QHJlZGhhdC5jb21dDQo+IFNlbnQ6IE1vbmRheSwgSnVuZSA0LCAyMDE4
+IDg6NTkgUE0NCj4gVG86IE1vZ2VyLCBCYWJ1IDxCYWJ1Lk1vZ2VyQGFtZC5jb20+DQo+IENjOiBt
+c3RAcmVkaGF0LmNvbTsgbWFyY2VsLmFwZmVsYmF1bUBnbWFpbC5jb207IHBib256aW5pQHJlZGhh
+dC5jb207DQo+IHJ0aEB0d2lkZGxlLm5ldDsgbXRvc2F0dGlAcmVkaGF0LmNvbTsgZ2VvZmZAaG9z
+dGZpc3Npb24uY29tOw0KPiBrYXNoQHRyaXBsZWJhY2submV0OyBxZW11LWRldmVsQG5vbmdudS5v
+cmc7IGt2bUB2Z2VyLmtlcm5lbC5vcmcNCj4gU3ViamVjdDogUmU6IFtRZW11LWRldmVsXSBbUEFU
+Q0ggdjExIDIvNV0gaTM4NjogUG9wdWxhdGUgQU1EIFByb2Nlc3Nvcg0KPiBDYWNoZSBJbmZvcm1h
+dGlvbiBmb3IgY3B1aWQgMHg4MDAwMDAxRA0KPiANCj4gT24gVGh1LCBNYXkgMjQsIDIwMTggYXQg
+MTE6NDM6MzFBTSAtMDQwMCwgQmFidSBNb2dlciB3cm90ZToNCj4gPiBBZGQgaW5mb3JtYXRpb24g
+Zm9yIGNwdWlkIDB4ODAwMDAwMUQgbGVhZi4gUG9wdWxhdGUgY2FjaGUgdG9wb2xvZ3kNCj4gaW5m
+b3JtYXRpb24NCj4gPiBmb3IgZGlmZmVyZW50IGNhY2hlIHR5cGVzIChEYXRhIENhY2hlLCBJbnN0
+cnVjdGlvbiBDYWNoZSwgTDIgYW5kIEwzKQ0KPiBzdXBwb3J0ZWQNCj4gPiBieSAweDgwMDAwMDFE
+IGxlYWYuIFBsZWFzZSByZWZlciB0byB0aGUgUHJvY2Vzc29yIFByb2dyYW1taW5nIFJlZmVyZW5j
+ZQ0KPiAoUFBSKQ0KPiA+IGZvciBBTUQgRmFtaWx5IDE3aCBNb2RlbCBmb3IgbW9yZSBkZXRhaWxz
+Lg0KPiA+DQo+ID4gU2lnbmVkLW9mZi1ieTogQmFidSBNb2dlciA8YmFidS5tb2dlckBhbWQuY29t
+Pg0KPiA+IC0tLQ0KPiA+ICB0YXJnZXQvaTM4Ni9jcHUuYyB8IDExNw0KPiArKysrKysrKysrKysr
+KysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysNCj4gPiAgdGFyZ2V0L2kz
+ODYva3ZtLmMgfCAgMjkgKysrKysrKysrKysrLS0NCj4gPiAgMiBmaWxlcyBjaGFuZ2VkLCAxNDMg
+aW5zZXJ0aW9ucygrKSwgMyBkZWxldGlvbnMoLSkNCj4gPg0KPiA+IGRpZmYgLS1naXQgYS90YXJn
+ZXQvaTM4Ni9jcHUuYyBiL3RhcmdldC9pMzg2L2NwdS5jDQo+ID4gaW5kZXggNWM5YmRjOS4uMGQ0
+MjNlNSAxMDA2NDQNCj4gPiAtLS0gYS90YXJnZXQvaTM4Ni9jcHUuYw0KPiA+ICsrKyBiL3Rhcmdl
+dC9pMzg2L2NwdS5jDQo+ID4gQEAgLTMzNyw2ICszMzcsOTkgQEAgc3RhdGljIHZvaWQNCj4gZW5j
+b2RlX2NhY2hlX2NwdWlkODAwMDAwMDYoQ1BVQ2FjaGVJbmZvICpsMiwNCj4gPiAgfQ0KPiA+DQo+
+ID4gIC8qDQo+ID4gKyAqIERlZmluaXRpb25zIHVzZWQgZm9yIGJ1aWxkaW5nIENQVUlEIExlYWYg
+MHg4MDAwMDAxRCBhbmQgMHg4MDAwMDAxRQ0KPiA+ICsgKiBQbGVhc2UgcmVmZXIgdG8gdGhlIEFN
+RDY0IEFyY2hpdGVjdHVyZSBQcm9ncmFtbWVy4oCZcyBNYW51YWwgVm9sdW1lDQo+IDMuDQo+ID4g
+KyAqIERlZmluZSB0aGUgY29uc3RhbnRzIHRvIGJ1aWxkIHRoZSBjcHUgdG9wb2xvZ3kuIFJpZ2h0
+IG5vdywgVE9QT0VYVA0KPiA+ICsgKiBmZWF0dXJlIGlzIGVuYWJsZWQgb25seSBvbiBFUFlDLiBT
+bywgdGhlc2UgY29uc3RhbnRzIGFyZSBiYXNlZCBvbg0KPiA+ICsgKiBFUFlDIHN1cHBvcnRlZCBj
+b25maWd1cmF0aW9ucy4gV2UgbWF5IG5lZWQgdG8gaGFuZGxlIHRoZSBjYXNlcyBpZg0KPiA+ICsg
+KiB0aGVzZSB2YWx1ZXMgY2hhbmdlIGluIGZ1dHVyZS4NCj4gPiArICovDQo+ID4gKy8qIE1heGlt
+dW0gY29yZSBjb21wbGV4ZXMgaW4gYSBub2RlICovDQo+ID4gKyNkZWZpbmUgTUFYX0NDWCAyDQo+
+ID4gKy8qIE1heGltdW0gY29yZXMgaW4gYSBjb3JlIGNvbXBsZXggKi8NCj4gPiArI2RlZmluZSBN
+QVhfQ09SRVNfSU5fQ0NYIDQNCj4gPiArLyogTWF4aW11bSBjb3JlcyBpbiBhIG5vZGUgKi8NCj4g
+PiArI2RlZmluZSBNQVhfQ09SRVNfSU5fTk9ERSA4DQo+ID4gKy8qIE1heGltdW0gbm9kZXMgaW4g
+YSBzb2NrZXQgKi8NCj4gPiArI2RlZmluZSBNQVhfTk9ERVNfUEVSX1NPQ0tFVCA0DQo+ID4gKw0K
+PiA+ICsvKg0KPiA+ICsgKiBGaWd1cmUgb3V0IHRoZSBudW1iZXIgb2Ygbm9kZXMgcmVxdWlyZWQg
+dG8gYnVpbGQgdGhpcyBjb25maWcuDQo+ID4gKyAqIE1heCBjb3JlcyBpbiBhIG5vZGUgaXMgNA0K
+PiA+ICsgKi8NCj4gPiArc3RhdGljIGludCBub2Rlc19pbl9zb2NrZXQoaW50IG5yX2NvcmVzKQ0K
+PiA+ICt7DQo+ID4gKyAgICBpbnQgbm9kZXM7DQo+ID4gKw0KPiA+ICsgICAgbm9kZXMgPSBESVZf
+Uk9VTkRfVVAobnJfY29yZXMsIE1BWF9DT1JFU19JTl9OT0RFKTsNCj4gPiArDQo+ID4gKyAgIC8q
+IEhhcmR3YXJlIGRvZXMgbm90IHN1cHBvcnQgY29uZmlnIHdpdGggMyBub2RlcywgcmV0dXJuIDQg
+aW4gdGhhdCBjYXNlDQo+ICovDQo+ID4gKyAgICByZXR1cm4gKG5vZGVzID09IDMpID8gNCA6IG5v
+ZGVzOw0KPiA+ICt9DQo+ID4gKw0KPiA+ICsvKg0KPiA+ICsgKiBEZWNpZGUgdGhlIG51bWJlciBv
+ZiBjb3JlcyBpbiBhIGNvcmUgY29tcGxleCB3aXRoIHRoZSBnaXZlbiBucl9jb3Jlcw0KPiB1c2lu
+Zw0KPiA+ICsgKiBmb2xsb3dpbmcgc2V0IGNvbnN0YW50cyBNQVhfQ0NYLCBNQVhfQ09SRVNfSU5f
+Q0NYLA0KPiBNQVhfQ09SRVNfSU5fTk9ERSBhbmQNCj4gPiArICogTUFYX05PREVTX1BFUl9TT0NL
+RVQuIE1haW50YWluIHN5bW1ldHJ5IGFzIG11Y2ggYXMgcG9zc2libGUNCj4gPiArICogTDMgY2Fj
+aGUgaXMgc2hhcmVkIGFjcm9zcyBhbGwgY29yZXMgaW4gYSBjb3JlIGNvbXBsZXguIFNvLCB0aGlz
+IHdpbGwgYWxzbw0KPiA+ICsgKiB0ZWxsIHVzIGhvdyBtYW55IGNvcmVzIGFyZSBzaGFyaW5nIHRo
+ZSBMMyBjYWNoZS4NCj4gPiArICovDQo+ID4gK3N0YXRpYyBpbnQgY29yZXNfaW5fY29yZV9jb21w
+bGV4KGludCBucl9jb3JlcykNCj4gPiArew0KPiA+ICsgICAgaW50IG5vZGVzOw0KPiA+ICsNCj4g
+PiArICAgIC8qIENoZWNrIGlmIHdlIGNhbiBmaXQgYWxsIHRoZSBjb3JlcyBpbiBvbmUgY29yZSBj
+b21wbGV4ICovDQo+ID4gKyAgICBpZiAobnJfY29yZXMgPD0gTUFYX0NPUkVTX0lOX0NDWCkgew0K
+PiA+ICsgICAgICAgIHJldHVybiBucl9jb3JlczsNCj4gPiArICAgIH0NCj4gPiArICAgIC8qIEdl
+dCB0aGUgbnVtYmVyIG9mIG5vZGVzIHJlcXVpcmVkIHRvIGJ1aWxkIHRoaXMgY29uZmlnICovDQo+
+ID4gKyAgICBub2RlcyA9IG5vZGVzX2luX3NvY2tldChucl9jb3Jlcyk7DQo+ID4gKw0KPiA+ICsg
+ICAgLyoNCj4gPiArICAgICAqIERpdmlkZSB0aGUgY29yZXMgYWNjcm9zIGFsbCB0aGUgY29yZSBj
+b21wbGV4ZXMNCj4gPiArICAgICAqIFJldHVybiByb3VuZGVkIHVwIHZhbHVlDQo+ID4gKyAgICAg
+Ki8NCj4gPiArICAgIHJldHVybiBESVZfUk9VTkRfVVAobnJfY29yZXMsIG5vZGVzICogTUFYX0ND
+WCk7DQo+ID4gK30NCj4gDQo+IEl0J3MgbmljZSB0aGF0IHdlIHRyeSB0byBmaWd1cmUgb3V0IGEg
+Z29vZCBkZWZhdWx0IGV2ZW4gb24gd2VpcmQNCj4gdG9wb2xvZ2llczoNCj4gDQo+IFJldmlld2Vk
+LWJ5OiBFZHVhcmRvIEhhYmtvc3QgPGVoYWJrb3N0QHJlZGhhdC5jb20+DQpUaGFua3MNCj4gDQo+
+IEJ1dCBJIHN0aWxsIHdvcnJ5IGFib3V0IHRoZSBjb21wbGV4aXR5IG9mIGNvbXBhdCBjb2RlIGlu
+IHRoZQ0KPiBmdXR1cmUgaWYgd2UgZGVjaWRlIHRvIGNoYW5nZSB0aGUgcmVzdWx0cyBvZiB0aGlz
+IGZ1bmN0aW9uIGENCj4gbGl0dGxlIGJpdC4gIE1heWJlIHdlIHNob3VsZCBhbGxvdyBUT1BPRVhU
+IHRvIGJlIGVuYWJsZWQgb25seSBvbg0KPiBjYXNlcyB3aGVyZSB3ZSByZWFsbHkga25vdyBob3cg
+dG8gZml0IHRoZSBjb3JlcyBpbiBhIHJvdW5kIG51bWJlcg0KPiBvZiBub2Rlcy9jb3JlLWNvbXBs
+ZXhlcz8NCj4gDQo+IExldCdzIGRvIHRoaXMgaW4gYSBmb2xsb3ctdXAgcGF0Y2g/DQoNCkkgdGhv
+dWdodCBhYm91dCB0aGlzIGVhcmxpZXIuICBCdXQgZHJvcHBlZCB0aGUgaWRlYSBiZWNhdXNlIGl0
+IHdpbGwgYmUgdG9vIHJlc3RyaWN0aXZlLiANCk1vc3Qgb2YgdGhlIG9kZCBudW1iZXIgb2YgY29y
+ZXMgY2Fubm90IGJlIHN1cHBvcnRlZCBieSByZWFsIGhhcmR3YXJlLg0KSWYgeW91IHN0cm9uZ2x5
+IGJlbGlldmUgd2UgbmVlZCB0byBhZGQgdGhpcyBjaGVjayB0aGVuIEkgd2lsbCBhZGQgaXQuDQog
+DQo+IA0KPiAtLQ0KPiBFZHVhcmRvDQo=
