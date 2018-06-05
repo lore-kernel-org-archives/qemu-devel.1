@@ -1,31 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52679)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53257)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1fQBpW-0006Go-8I
-	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 09:16:55 -0400
+	(envelope-from <wei.w.wang@intel.com>) id 1fQBrg-0007cU-Mf
+	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 09:19:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1fQBpT-0004eh-53
-	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 09:16:54 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:49460 helo=mx1.redhat.com)
+	(envelope-from <wei.w.wang@intel.com>) id 1fQBrd-0005kV-GA
+	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 09:19:08 -0400
+Received: from mga17.intel.com ([192.55.52.151]:45628)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1fQBpS-0004eY-Vz
-	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 09:16:51 -0400
-Date: Tue, 5 Jun 2018 15:16:49 +0200
-From: Gerd Hoffmann <kraxel@redhat.com>
-Message-ID: <20180605131649.fu3cellm7vwaf4ao@sirius.home.kraxel.org>
-References: <20180323122520.11270-1-kraxel@redhat.com>
-	<43fc23c1-d72f-748a-5b9d-a816466d7406@redhat.com>
-	<20180425140749.6x3w4h4i2n6uaq7o@sirius.home.kraxel.org>
-	<1ed94b1c-b416-eebe-9cf3-91943a0e6c5a@redhat.com>
-	<20180531084347.xb2r5aolkis2nmqg@sirius.home.kraxel.org>
-	<4b65af58-8451-a365-6c81-52c49e42b6ff@redhat.com>
-	<20180605110647.7ctaj7fiy6x4ewdw@sirius.home.kraxel.org>
-	<a3fe57cf-1569-834d-5528-d85847b29f9f@redhat.com>
+	(Exim 4.71) (envelope-from <wei.w.wang@intel.com>)
+	id 1fQBrd-0005jZ-2U
+	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 09:19:05 -0400
+Message-ID: <5B168EAB.7090607@intel.com>
+Date: Tue, 05 Jun 2018 21:22:51 +0800
+From: Wei Wang <wei.w.wang@intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <a3fe57cf-1569-834d-5528-d85847b29f9f@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2 0/7] ramfb: simple boot framebuffer,
- no legacy vga
+References: <1524550428-27173-1-git-send-email-wei.w.wang@intel.com>
+	<1524550428-27173-5-git-send-email-wei.w.wang@intel.com>
+	<20180529181221-mutt-send-email-mst@kernel.org>
+	<5B0E6AE9.2030505@intel.com>
+	<20180530154325-mutt-send-email-mst@kernel.org>
+	<5B14F2A3.9010805@intel.com> <20180605065857.GC9216@xz-mi>
+In-Reply-To: <20180605065857.GC9216@xz-mi>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v7 4/5] virtio-balloon:
+ VIRTIO_BALLOON_F_FREE_PAGE_HINT
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,42 +33,142 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laszlo Ersek <lersek@redhat.com>
-Cc: qemu-devel@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>, Alex Williamson <alex.williamson@redhat.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>
+To: Peter Xu <peterx@redhat.com>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org, virtio-dev@lists.oasis-open.org, quintela@redhat.com, dgilbert@redhat.com, pbonzini@redhat.com, liliang.opensource@gmail.com, yang.zhang.wz@gmail.com, quan.xu0@gmail.com, nilal@redhat.com, riel@redhat.com, zhang.zhanghailiang@huawei.com
 
-On Tue, Jun 05, 2018 at 02:07:27PM +0200, Laszlo Ersek wrote:
-> On 06/05/18 13:06, Gerd Hoffmann wrote:
-> >   Hi,
-> > 
-> >>>> I could imagine an OvmfPkg-specific PCI capability that said, "all PCI
-> >>>> drivers in OvmfPkg that could otherwise drive this device, ignore it --
-> >>>> another (platform) driver in OvmfPkg will pick it up instead".
-> >>>
-> >>> pci capability for ramfb could be useful (also for linux).  I'll keep it
-> >>> in mind for now.
-> >>
-> >> Please do. :)
-> > 
-> > Hmm, well.  Virtio 1.0 uses vendor specific capabilities already to
-> > define the regions, and they don't have a fixed field saying "this is
-> > for virtio".  So adding another vendor specific capability for something
-> > else on the same device is a bit problematic ...
-> 
-> Can we invent a non-PCI method, e.g. fw_cfg, that tells QemuVideoDxe and
-> Virtio10Dxe not to bind some PCI S/B/D/Fs? Something like:
+On 06/05/2018 02:58 PM, Peter Xu wrote:
+> On Mon, Jun 04, 2018 at 04:04:51PM +0800, Wei Wang wrote:
+>> On 05/30/2018 08:47 PM, Michael S. Tsirkin wrote:
+>>> On Wed, May 30, 2018 at 05:12:09PM +0800, Wei Wang wrote:
+>>>> On 05/29/2018 11:24 PM, Michael S. Tsirkin wrote:
+>>>>> On Tue, Apr 24, 2018 at 02:13:47PM +0800, Wei Wang wrote:
+>>>>>> +/*
+>>>>>> + * Balloon will report pages which were free at the time of this call. As the
+>>>>>> + * reporting happens asynchronously, dirty bit logging must be enabled before
+>>>>>> + * this call is made.
+>>>>>> + */
+>>>>>> +void balloon_free_page_start(void)
+>>>>>> +{
+>>>>>> +    balloon_free_page_start_fn(balloon_opaque);
+>>>>>> +}
+>>>>> Please create notifier support, not a single global.
+>>>> OK. The start is called at the end of bitmap_sync, and the stop is called at
+>>>> the beginning of bitmap_sync. In this case, we will need to add two
+>>>> migration states, MIGRATION_STATUS_BEFORE_BITMAP_SYNC and
+>>>> MIGRATION_STATUS_AFTER_BITMAP_SYNC, right?
+>> Peter, do you have any thought about this?
+>>
+>> Currently, the usage of free page optimization isn't limited to the first
+>> stage. It is used in each stage. A global call to start the free page
+>> optimization is made after bitmap sync, and another global call to stop the
+>> optimization is made before bitmap sync. It is simple to just use global
+>> calls.
+>>
+>> If we change the implementation to use notifiers, I think we will need to
+>> add two new MigrationStatus as above. Would you think that is worthwhile for
+>> some reason?
+> I'm a bit confused.  Could you elaborate why we need those extra
+> states?
 
-Well, from edk2 point of view Virtio10Dxe is the only problematic case
-because there is a is a native driver.  For cirrus/stdvga a version with
-ramfb is rather pointless.  A qxl-ramfb device might make sense, but
-QemuVideoDxe would ignore such a device like it ignores qxl today as it
-can only handle the vga mode of qxl-vga devices.
+Sure. Notifiers are used when an event happens. In this case, it would 
+be a state change, which invokes the state change callback. So I think 
+we probably need to add 2 new states for the start and stop callback.
 
-Also I'd prefer to provide informations (device foo has ramfb at <addr>)
-not instructions (please ignore device foo).
 
-Maybe we should for now just scratch the idea of an virtio-ramfb device.
-Linux doesn't need it, and windows wouldn't use the virtio part of it so
-a standalone ramfb device would work equally well.
+> Or, to ask a more general question - could you elaborate a bit on how
+> you order these operations?  I would be really glad if you can point
+> me to some documents for the feature.  Is there any latest virtio
+> document that I can refer to (or old cover letter links)?  It'll be
+> good if the document could mention about things like:
 
-cheers,
-  Gerd
+I haven't made documents to explain it yet. It's planed to be ready 
+after this code series is done. But I'm glad to answer the questions below.
+
+
+>
+> - why we need this feature? Is that purely for migration purpose?  Or
+>    it can be used somewhere else too?
+
+Yes. Migration is the one that currently benefits a lot from this 
+feature. I haven't thought of others so far. It is common that new 
+features start with just 1 or 2 typical use cases.
+
+
+> - high level stuff about how this is implemented, e.g.:
+>    - the protocol of the new virtio queues
+>    - how we should get the free page hints (please see below)
+
+The high-level introduction would be
+1. host sends a start cmd id to the guest;
+2. the guest starts a new round of reporting by sending a cmd_id+free 
+page hints to host;
+3. QEMU side optimization code applies the free page hints (filter them 
+from the dirty bitmap) only when the reported cmd id matches the one 
+that was just sent.
+
+The protocol was suggested by Michael and has been thoroughly discussed 
+when upstreaming the kernel part. It might not be necessary to go over 
+that again :)
+I would suggest to focus on the supplied interface and its usage in live 
+migration. That is, now we have two APIs, start() and stop(), to start 
+and stop the optimization.
+
+1) where in the migration code should we use them (do you agree with the 
+step (1), (2), (3) you concluded below?)
+2) how should we use them, directly do global call or via notifiers?
+
+>
+> For now, what I see is that we do:
+>
+> (1) stop hinting
+> (2) sync bitmap
+> (3) start hinting
+>
+> Why this order?
+
+We start to filter out free pages from the dirty bitmap only when all 
+the dirty bits are ready there, i.e. after sync bitmap. To some degree, 
+the action of synchronizing bitmap indicates the end of the last round 
+and the beginning of the new round, so we stop the free page 
+optimization for the old round when the old round ends.
+
+
+>   My understanding is that obviously there is a race
+> between the page hinting thread and the dirty bitmap tracking part
+> (which is done in KVM).  How do we make sure there is no race?
+
+Could you please explain more about the race you saw? (free page is 
+reported from the guest, and the bitmap is tracked in KVM)
+
+
+
+>
+> An direct question is that, do we need to make sure step (1) must be
+> before step (2)?  Asked since I see that currently step (1) is an
+> async operation (taking a lock, set status, then return).  Then would
+> such an async operation satisfy any ordering requirement after all?
+
+Yes. Step(1) guarantees us that the QEMU side optimization call has 
+exited (we don't need to rely on guest side ACK because the guest could 
+be in any state). This is enough. If the guest continues to report after 
+that, that reported hints will be detected as stale hints and dropped in 
+the next start of optimization.
+
+
+>
+> Btw, I would appreciate if you can push your new trees (both QEMU and
+> kernel) to the links you mentioned in the cover letter - I noticed
+> that they are not the same as what you have posted on the list.
+>
+
+Sure.
+For kernel part, you can get it from linux-next: 
+git://git.kernel.org/pub/scm/linux/kernel/git/next/linux-next.git
+For the v7 QEMU part: 
+git://github.com/wei-w-wang/qemu-free-page-hint.git (my connection to 
+github is too slow, it would be ready in 24hours, I can also send you 
+the raw patches via email if you need)
+
+
+Best,
+Wei
