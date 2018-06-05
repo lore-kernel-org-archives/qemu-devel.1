@@ -1,28 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36066)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40132)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1fQGpp-0003ES-28
-	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 14:37:34 -0400
+	(envelope-from <jsnow@redhat.com>) id 1fQHAu-00035N-Gw
+	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 14:59:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1fQGpl-0000Gv-TW
-	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 14:37:33 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:45972 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1fQGpl-0000FF-M1
-	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 14:37:29 -0400
-Date: Tue, 5 Jun 2018 21:37:25 +0300
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20180605213547-mutt-send-email-mst@kernel.org>
-References: <20180521163203.26590-1-ross.zwisler@linux.intel.com>
-	<20180521163203.26590-4-ross.zwisler@linux.intel.com>
-	<20180605182243-mutt-send-email-mst@kernel.org>
-	<20180605164205.GA21034@linux.intel.com>
-	<CAPcyv4jSoFifTc05WGgxkEX6i7b12zYyB+VchJVW_+QPQzO7Fg@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAPcyv4jSoFifTc05WGgxkEX6i7b12zYyB+VchJVW_+QPQzO7Fg@mail.gmail.com>
-Subject: Re: [Qemu-devel] [qemu PATCH v4 3/4] nvdimm,
- acpi: support NFIT platform capabilities
+	(envelope-from <jsnow@redhat.com>) id 1fQHAt-0005Qm-4Q
+	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 14:59:20 -0400
+From: John Snow <jsnow@redhat.com>
+Date: Tue,  5 Jun 2018 14:59:01 -0400
+Message-Id: <20180605185905.4583-2-jsnow@redhat.com>
+In-Reply-To: <20180605185905.4583-1-jsnow@redhat.com>
+References: <20180605185905.4583-1-jsnow@redhat.com>
+Subject: [Qemu-devel] [PATCH 1/5] block/dirty-bitmap: add lock to
+ bdrv_enable/disable_dirty_bitmap
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,59 +20,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Dan Williams <dan.j.williams@intel.com>
-Cc: Ross Zwisler <ross.zwisler@linux.intel.com>, Eduardo Habkost <ehabkost@redhat.com>, linux-nvdimm <linux-nvdimm@lists.01.org>, Qemu Developers <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>, Igor Mammedov <imammedo@redhat.com>
+To: qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: Fam Zheng <famz@redhat.com>, John Snow <jsnow@redhat.com>, Markus Armbruster <armbru@redhat.com>, Max Reitz <mreitz@redhat.com>, Eric Blake <eblake@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 
-On Tue, Jun 05, 2018 at 11:15:00AM -0700, Dan Williams wrote:
-> On Tue, Jun 5, 2018 at 9:42 AM, Ross Zwisler
-> <ross.zwisler@linux.intel.com> wrote:
-> > On Tue, Jun 05, 2018 at 06:25:27PM +0300, Michael S. Tsirkin wrote:
-> >> On Mon, May 21, 2018 at 10:32:02AM -0600, Ross Zwisler wrote:
-> >> > Add a machine command line option to allow the user to control the Platform
-> >> > Capabilities Structure in the virtualized NFIT.  This Platform Capabilities
-> >> > Structure was added in ACPI 6.2 Errata A.
-> >> >
-> >> > Signed-off-by: Ross Zwisler <ross.zwisler@linux.intel.com>
-> >>
-> >> I tried playing with it and encoding the capabilities is
-> >> quite awkward.
-> >>
-> >> Can we add bits for specific capabilities instead of nvdimm-cap?
-> >>
-> >> How about:
-> >>
-> >> "cpu-flush-on-power-loss-cap"
-> >> "memory-flush-on-power-loss-cap"
-> >> "byte-addressable-mirroring-cap"
-> >
-> > Hmmm...I don't like that as much because:
-> >
-> > a) It's very verbose.  Looking at my current qemu command line few other
-> >    options require that many characters, and you'd commonly be defining more
-> >    than one of these for a given VM.
-> >
-> > b) It means that the QEMU will need to be updated if/when new flags are added,
-> >    because we'll have to have new options for each flag.  The current
-> >    implementation is more future-proof because you can specify any flags
-> >    value you want.
-> >
-> > However, if you feel strongly about this, I'll make the change.
-> 
-> Straw-man: Could we do something similar with what we are doing in ndctl?
-> 
-> enum ndctl_persistence_domain {
->         PERSISTENCE_NONE = 0,
->         PERSISTENCE_MEM_CTRL = 10,
->         PERSISTENCE_CPU_CACHE = 20,
->         PERSISTENCE_UNKNOWN = INT_MAX,
-> };
-> 
-> ...and have the command line take a number where "10" and "20" are
-> supported today, but allows us to adapt to new persistence domains in
-> the future.
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 
-I'm fine with that except can we have symbolic names instead of numbers
-on command line?
+Add locks and remove comments about BQL accordingly to
+dirty_bitmap_mutex definition in block_int.h.
 
+Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Signed-off-by: John Snow <jsnow@redhat.com>
+---
+ block/dirty-bitmap.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/block/dirty-bitmap.c b/block/dirty-bitmap.c
+index 967159479d..56234257f4 100644
+--- a/block/dirty-bitmap.c
++++ b/block/dirty-bitmap.c
+@@ -442,18 +442,20 @@ void bdrv_remove_persistent_dirty_bitmap(BlockDriverState *bs,
+     }
+ }
+ 
+-/* Called with BQL taken.  */
+ void bdrv_disable_dirty_bitmap(BdrvDirtyBitmap *bitmap)
+ {
++    bdrv_dirty_bitmap_lock(bitmap);
+     assert(!bdrv_dirty_bitmap_frozen(bitmap));
+     bitmap->disabled = true;
++    bdrv_dirty_bitmap_unlock(bitmap);
+ }
+ 
+-/* Called with BQL taken.  */
+ void bdrv_enable_dirty_bitmap(BdrvDirtyBitmap *bitmap)
+ {
++    bdrv_dirty_bitmap_lock(bitmap);
+     assert(!bdrv_dirty_bitmap_frozen(bitmap));
+     bitmap->disabled = false;
++    bdrv_dirty_bitmap_unlock(bitmap);
+ }
+ 
+ BlockDirtyInfoList *bdrv_query_dirty_bitmaps(BlockDriverState *bs)
 -- 
-MST
+2.14.3
