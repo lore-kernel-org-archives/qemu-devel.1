@@ -1,28 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49034)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50723)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <msuchanek@suse.de>) id 1fQJyT-000785-9b
-	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 17:58:42 -0400
+	(envelope-from <ross.zwisler@linux.intel.com>) id 1fQK6d-0001VW-Cs
+	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 18:07:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <msuchanek@suse.de>) id 1fQJyS-0002ke-CA
-	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 17:58:41 -0400
-Date: Tue, 5 Jun 2018 23:58:30 +0200
-From: Michal =?UTF-8?B?U3VjaMOhbmVr?= <msuchanek@suse.de>
-Message-ID: <20180605235830.4905ee97@kitsune.suse.cz>
-In-Reply-To: <874liycoto.fsf@dusky.pond.sub.org>
-References: <20180518180440-mutt-send-email-mst@kernel.org>
-	<20180518170956.GI8615@redhat.com>
-	<20180518174133.GC25013@localhost.localdomain>
-	<87bmdc18q5.fsf@dusky.pond.sub.org>
-	<20180521182928.GO25013@localhost.localdomain>
-	<20180521184440.GB8214@redhat.com>
-	<20180521190112.GP25013@localhost.localdomain>
-	<87o9h6hb59.fsf@dusky.pond.sub.org>
-	<20180523121344.GB8988@localhost.localdomain>
-	<874liycoto.fsf@dusky.pond.sub.org>
+	(envelope-from <ross.zwisler@linux.intel.com>) id 1fQK6Z-0008Gx-8u
+	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 18:07:07 -0400
+Received: from mga01.intel.com ([192.55.52.88]:48274)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ross.zwisler@linux.intel.com>)
+	id 1fQK6Z-0008Gd-0A
+	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 18:07:03 -0400
+Date: Tue, 5 Jun 2018 16:07:00 -0600
+From: Ross Zwisler <ross.zwisler@linux.intel.com>
+Message-ID: <20180605220700.GB16066@linux.intel.com>
+References: <20180521163203.26590-1-ross.zwisler@linux.intel.com>
+	<20180521163203.26590-4-ross.zwisler@linux.intel.com>
+	<20180605182243-mutt-send-email-mst@kernel.org>
+	<20180605164205.GA21034@linux.intel.com>
+	<CAPcyv4jSoFifTc05WGgxkEX6i7b12zYyB+VchJVW_+QPQzO7Fg@mail.gmail.com>
+	<20180605213547-mutt-send-email-mst@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] storing machine data in qcow images?
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180605213547-mutt-send-email-mst@kernel.org>
+Subject: Re: [Qemu-devel] [qemu PATCH v4 3/4] nvdimm,
+ acpi: support NFIT platform capabilities
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,92 +33,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: Eduardo Habkost <ehabkost@redhat.com>, kwolf@redhat.com, qemu-block@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org, mreitz@redhat.com, stefanha@redhat.com
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Dan Williams <dan.j.williams@intel.com>, Ross Zwisler <ross.zwisler@linux.intel.com>, Eduardo Habkost <ehabkost@redhat.com>, linux-nvdimm <linux-nvdimm@lists.01.org>, Qemu Developers <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>, Igor Mammedov <imammedo@redhat.com>
 
-On Wed, 23 May 2018 18:35:31 +0200
-Markus Armbruster <armbru@redhat.com> wrote:
+On Tue, Jun 05, 2018 at 09:37:25PM +0300, Michael S. Tsirkin wrote:
+> On Tue, Jun 05, 2018 at 11:15:00AM -0700, Dan Williams wrote:
+> > On Tue, Jun 5, 2018 at 9:42 AM, Ross Zwisler
+> > <ross.zwisler@linux.intel.com> wrote:
+> > > On Tue, Jun 05, 2018 at 06:25:27PM +0300, Michael S. Tsirkin wrote:
+> > >> On Mon, May 21, 2018 at 10:32:02AM -0600, Ross Zwisler wrote:
+> > >> > Add a machine command line option to allow the user to control the Platform
+> > >> > Capabilities Structure in the virtualized NFIT.  This Platform Capabilities
+> > >> > Structure was added in ACPI 6.2 Errata A.
+> > >> >
+> > >> > Signed-off-by: Ross Zwisler <ross.zwisler@linux.intel.com>
+> > >>
+> > >> I tried playing with it and encoding the capabilities is
+> > >> quite awkward.
+> > >>
+> > >> Can we add bits for specific capabilities instead of nvdimm-cap?
+> > >>
+> > >> How about:
+> > >>
+> > >> "cpu-flush-on-power-loss-cap"
+> > >> "memory-flush-on-power-loss-cap"
+> > >> "byte-addressable-mirroring-cap"
+> > >
+> > > Hmmm...I don't like that as much because:
+> > >
+> > > a) It's very verbose.  Looking at my current qemu command line few other
+> > >    options require that many characters, and you'd commonly be defining more
+> > >    than one of these for a given VM.
+> > >
+> > > b) It means that the QEMU will need to be updated if/when new flags are added,
+> > >    because we'll have to have new options for each flag.  The current
+> > >    implementation is more future-proof because you can specify any flags
+> > >    value you want.
+> > >
+> > > However, if you feel strongly about this, I'll make the change.
+> > 
+> > Straw-man: Could we do something similar with what we are doing in ndctl?
+> > 
+> > enum ndctl_persistence_domain {
+> >         PERSISTENCE_NONE = 0,
+> >         PERSISTENCE_MEM_CTRL = 10,
+> >         PERSISTENCE_CPU_CACHE = 20,
+> >         PERSISTENCE_UNKNOWN = INT_MAX,
+> > };
+> > 
+> > ...and have the command line take a number where "10" and "20" are
+> > supported today, but allows us to adapt to new persistence domains in
+> > the future.
+> 
+> I'm fine with that except can we have symbolic names instead of numbers
+> on command line?
+> 
+> -- 
+> MST
 
-> Eduardo Habkost <ehabkost@redhat.com> writes:
->=20
-> > On Wed, May 23, 2018 at 01:19:46PM +0200, Markus Armbruster wrote: =20
-> >> Eduardo Habkost <ehabkost@redhat.com> writes:
-> >>  =20
-> >> > On Mon, May 21, 2018 at 07:44:40PM +0100, Daniel P. Berrang=C3=A9
-> >> > wrote: =20
-> >> >> On Mon, May 21, 2018 at 03:29:28PM -0300, Eduardo Habkost
-> >> >> wrote: =20
-> >> >> > On Sat, May 19, 2018 at 08:05:06AM +0200, Markus Armbruster
-> >> >> > wrote: =20
-... =20
-> >> >> > The point here is to allow users to simply copy an existing
-> >> >> > disk image, and it will contain enough hints for a cloud
-> >> >> > stack to choose reasonable defaults for machine-type and disk
-> >> >> > type automatically.  Requiring the user to perform a separate
-> >> >> > step to encapsulate the disk image in another file format
-> >> >> > defeats the whole purpose of the proposal. =20
-> >> >>=20
-> >> >> It doesn't have to mean more work for the user - the application
-> >> >> that is used to create the image can do that on their behalf.
-> >> >> oVirt for example can import/export OVA files, containing OVF
-> >> >> metadata. I could imagine virt-manager, and other tools adding
-> >> >> export ability without much trouble if this was deemed a
-> >> >> desirable thing. Bundling gives ability to have multiple disk
-> >> >> images in one archive, which is something OVF does. =20
-> >> >
-> >> > I have the impression that "the application that is used to
-> >> > create the image" is a very large set.  It can be virt-manager,
-> >> > virt-install, virt-manager, or even QEMU itself.
-> >> >
-> >> > Today people can simply create a VM on virt-manager, or run QEMU
-> >> > manually, and upload the qcow2 image directly from its original
-> >> > location (they don't need to copy/export it).  Don't we want the
-> >> > same procedure to keep working instead of requiring users to use
-> >> > another tool? =20
-> >>=20
-...
-> >> With OVF, you solve the problem further up the stack: you do
-> >> virtual appliances instead of disk images.
-> >>  =20
-> >
-> > I guess the main problem is that people are already using disk
-> > images as if they were virtual appliances.
-> >
-> > We can tell people to stop doing that and use OVF, but then we
-> > won't make anybody's life any easier: publishers of images might
-> > need to generate both qcow2 and OVF images if they want it to
-> > work with older hosts; consumers will need to find out if they
-> > need qcow2 or OVF. =20
->=20
-> I'm afraid providing for "hints" in QCOW2 could only add problems.  To
-> pick the right hints, publishers need to predict how future software
-> consuming the image will interpret them.  Consumers may have to
-> configure their software to interpret hints in various ways.
+Okay, we can move to the symbolic names.  Do you want them to be that long, or
+would:
 
-That depends on the hint.
+nvdimm-cap-cpu
+nvdimm-cap-mem-ctrl
+nvdimm-cap-mirroring
 
-If you define that the key libvirt-xml contains the libvirt machine
-definition it is up to libvirt to define what exactly the hint contains.
-
-It allows exporting a machine from virt-manager or virsh and importing
-into same with exact same properties. Looking at it will probably give
-you some idea how to configure the VM in another virtualization
-solution.
-
-Similarly OpenStack can define different hint for OpenStack VMs.=20
-
-You are free to equip you appliance with multiple hints if you want it
-to work it on multiple virtualization solutions. It is much more
-efficient than providing multiple appliance images that embed the
-same disk image and different metadata. Virtualization solutions are
-free to implement conversions to ease importing VMs from different
-source, even for something as horrible as OVF.
-
-It is a bit limiting, though.
-
-You cannot make an applicance with multiple disks when the metadata is
-embedded in a disk image.
-
-Thanks
-
-Michal
+or something be better?
