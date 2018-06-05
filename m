@@ -1,29 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50931)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59584)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <loseweigh@gmail.com>) id 1fQK8v-0002Xp-MG
-	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 18:09:31 -0400
+	(envelope-from <alistair23@gmail.com>) id 1fQL5H-0001eH-Ty
+	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 19:09:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <loseweigh@gmail.com>) id 1fQK8t-0000Qo-V8
-	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 18:09:29 -0400
-Received: from mail-it0-x243.google.com ([2607:f8b0:4001:c0b::243]:33645)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <loseweigh@gmail.com>) id 1fQK8t-0000Qa-Nw
-	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 18:09:27 -0400
-Received: by mail-it0-x243.google.com with SMTP id k17-v6so15721998ita.0
-	for <qemu-devel@nongnu.org>; Tue, 05 Jun 2018 15:09:27 -0700 (PDT)
+	(envelope-from <alistair23@gmail.com>) id 1fQL5G-0006mO-Qp
+	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 19:09:47 -0400
 MIME-Version: 1.0
-In-Reply-To: <20180606002650-mutt-send-email-mst@kernel.org>
-References: <1525734594-11134-1-git-send-email-sridhar.samudrala@intel.com>
-	<fcefe501-b410-f1ec-829c-68199edcdbef@intel.com>
-	<20180605152344-mutt-send-email-mst@kernel.org>
-	<CADGSJ21Qf6KpLzr+og5DOFjMPqu69n6dWRLvvj1FGAR5kVRNew@mail.gmail.com>
-	<20180606002650-mutt-send-email-mst@kernel.org>
-From: Siwei Liu <loseweigh@gmail.com>
-Date: Tue, 5 Jun 2018 15:09:26 -0700
-Message-ID: <CADGSJ21AMp02vV+qxa+DuyvAUCCsXUFwV7wjzQ1Vy1jKV=n1HA@mail.gmail.com>
+Sender: alistair23@gmail.com
+In-Reply-To: <1528233505-25842-1-git-send-email-thuth@redhat.com>
+References: <1528233505-25842-1-git-send-email-thuth@redhat.com>
+From: Alistair Francis <alistair.francis@xilinx.com>
+Date: Tue, 5 Jun 2018 16:09:13 -0700
+Message-ID: <CAKmqyKM0O+oLZyxXuW+tdydgrHEi1SpJdTkO_5ixT8pXGGZrKA@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [virtio-dev] Re: [PATCH] qemu: Introduce
- VIRTIO_NET_F_STANDBY feature bit to virtio_net
+Subject: Re: [Qemu-devel] [PATCH] hw/arm: Remove the deprecated xlnx-ep108
+ machine
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,158 +23,134 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: "Samudrala, Sridhar" <sridhar.samudrala@intel.com>, virtualization@lists.linux-foundation.org, virtio-dev@lists.oasis-open.org, "Brandeburg, Jesse" <jesse.brandeburg@intel.com>, Alexander Duyck <alexander.h.duyck@intel.com>, Jason Wang <jasowang@redhat.com>, qemu-devel@nongnu.org
+To: Thomas Huth <thuth@redhat.com>
+Cc: Alistair Francis <alistair@alistair23.me>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>, qemu-arm <qemu-arm@nongnu.org>, Alistair Francis <alistair.francis@xilinx.com>
 
-On Tue, Jun 5, 2018 at 2:32 PM, Michael S. Tsirkin <mst@redhat.com> wrote:
-> On Tue, Jun 05, 2018 at 02:16:44PM -0700, Siwei Liu wrote:
->> Good to see this discussion going. I share the same feeling that the
->> decision of plugging the primary (passthrough) should only be made
->> until guest driver acknowledges DRIVER_OK and _F_STANDBY.
->> Architecturally this intelligence should be baken to QEMU itself
->> rather than moving up to management stack, such as libvirt.
->>
->> A few questions in line below.
->>
->> On Tue, Jun 5, 2018 at 5:33 AM, Michael S. Tsirkin <mst@redhat.com> wrote:
->> > I don't think this is sufficient.
->> >
->> > If both primary and standby devices are present, a legacy guest without
->> > support for the feature might see two devices with same mac and get
->> > confused.
->> >
->> > I think that we should only make primary visible after guest acked the
->> > backup feature bit.
->> >
->> > And on reset or when backup is cleared in some other way, unplug the
->> > primary.
->> >
->> > Something like the below will do the job:
->> >
->> > Primary device is added with a special "primary-failover" flag.
->>
->> I wonder if you envision this flag as a user interface or some
->> internal attribute/property to QEMU device?
->>
->> Since QEMU needs to associate this particular primary-failover device
->> with a virtio standby instance for checking DRIVER_OK as you indicate
->> below, I wonder if the group ID thing will be helpful to set
->> "primary-failover" flag internally without having to add another
->> option in CLI?
+On Tue, Jun 5, 2018 at 2:18 PM, Thomas Huth <thuth@redhat.com> wrote:
+> It has been marked as deprecated since QEMU v2.11, so it is time to
+> remove this now. The xlnx-zcu102 machine is very much the same and
+> can be used as a replacement instead.
 >
-> I haven't thought about it but it's an option.
->
->> > A virtual machine is then initialized with just a standby virtio
->> > device. Primary is not yet added.
->> >
->> > Later QEMU detects that guest driver device set DRIVER_OK.
->> > It then exposes the primary device to the guest, and triggers
->> > a device addition event (hot-plug event) for it.
->>
->> Sounds OK. While there might be a small window the guest already
->> starts to use virtio interface before the passthrough gets plugged in,
->> I think that should be fine.
->>
->> Another option is to wait until the primary appears and gets
->> registered in the guest, so it can bring up the upper failover
->> interface.
->
-> We can't be sure this will ever happen, can we? We might be asked to
-> migrate at any time.
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
 
-Right. For that to work, virtio driver needs a complicated state
-tracking hand-in-hand with the host for VF's hot plugging activity. If
-hot plugging is defered due to migration activity the failover
-interface can be brought up immediately.
+Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 
-As said, this is just an option. I don't have strong preference here.
+Alistair
 
+> ---
+>  hw/arm/xlnx-zcu102.c | 62 ++--------------------------------------------------
+>  qemu-doc.texi        |  5 -----
+>  2 files changed, 2 insertions(+), 65 deletions(-)
 >
->> >
->> > If QEMU detects guest driver removal, it initiates a hot-unplug sequence
->> > to remove the primary driver.  In particular, if QEMU detects guest
->> > re-initialization (e.g. by detecting guest reset) it immediately removes
->> > the primary device.
->>
->> Agreed.
->>
->> For legacy guest, user might prefer seeing a single passthrough device
->> rather than a virtio device. I would hope there's an option to allow
->> it to happen, instead of removing all passthrough devices.
->>
->> Regards,
->> -Siwei
+> diff --git a/hw/arm/xlnx-zcu102.c b/hw/arm/xlnx-zcu102.c
+> index c70278c..f26fd8e 100644
+> --- a/hw/arm/xlnx-zcu102.c
+> +++ b/hw/arm/xlnx-zcu102.c
+> @@ -39,10 +39,6 @@ typedef struct XlnxZCU102 {
+>  #define ZCU102_MACHINE(obj) \
+>      OBJECT_CHECK(XlnxZCU102, (obj), TYPE_ZCU102_MACHINE)
 >
-> I don't see a way to make it work since then you can't migrate, can you?
-
-The thing is cloud service provider might prefer sticking to the same
-level of service agreement (SLA) of keeping VF over migration,
-particularly when guest OS or kernel does not have the support.The
-footprint in guest OS support might NOT be prevailing in the early
-days. There's no point the cloud vendor can switch back and forth, as
-there's no way for hypervisor to detect what kernel version even OS
-the guest will be running ahead of time, until the guest gets fully
-loaded and boots up, right?
-
--Siwei
-
+> -#define TYPE_EP108_MACHINE   MACHINE_TYPE_NAME("xlnx-ep108")
+> -#define EP108_MACHINE(obj) \
+> -    OBJECT_CHECK(XlnxZCU102, (obj), TYPE_EP108_MACHINE)
+> -
+>  static struct arm_boot_info xlnx_zcu102_binfo;
 >
-> The way I see it, if you don't need migration, just use PT without
-> failover.  If you do, then you either use virtio or failover if guest
-> supports it.
+>  static bool zcu102_get_secure(Object *obj, Error **errp)
+> @@ -73,8 +69,9 @@ static void zcu102_set_virt(Object *obj, bool value, Error **errp)
+>      s->virt = value;
+>  }
 >
->> >
->> > We can move some of this code to management as well, architecturally it
->> > does not make too much sense but it might be easier implementation-wise.
->> >
->> > HTH
->> >
->> > On Mon, Jun 04, 2018 at 06:41:48PM -0700, Samudrala, Sridhar wrote:
->> >> Ping on this patch now that the kernel patches are accepted into davem's net-next tree.
->> >> https://patchwork.ozlabs.org/cover/920005/
->> >>
->> >>
->> >> On 5/7/2018 4:09 PM, Sridhar Samudrala wrote:
->> >> > This feature bit can be used by hypervisor to indicate virtio_net device to
->> >> > act as a standby for another device with the same MAC address.
->> >> >
->> >> > I tested this with a small change to the patch to mark the STANDBY feature 'true'
->> >> > by default as i am using libvirt to start the VMs.
->> >> > Is there a way to pass the newly added feature bit 'standby' to qemu via libvirt
->> >> > XML file?
->> >> >
->> >> > Signed-off-by: Sridhar Samudrala <sridhar.samudrala@intel.com>
->> >> > ---
->> >> >   hw/net/virtio-net.c                         | 2 ++
->> >> >   include/standard-headers/linux/virtio_net.h | 3 +++
->> >> >   2 files changed, 5 insertions(+)
->> >> >
->> >> > diff --git a/hw/net/virtio-net.c b/hw/net/virtio-net.c
->> >> > index 90502fca7c..38b3140670 100644
->> >> > --- a/hw/net/virtio-net.c
->> >> > +++ b/hw/net/virtio-net.c
->> >> > @@ -2198,6 +2198,8 @@ static Property virtio_net_properties[] = {
->> >> >                        true),
->> >> >       DEFINE_PROP_INT32("speed", VirtIONet, net_conf.speed, SPEED_UNKNOWN),
->> >> >       DEFINE_PROP_STRING("duplex", VirtIONet, net_conf.duplex_str),
->> >> > +    DEFINE_PROP_BIT64("standby", VirtIONet, host_features, VIRTIO_NET_F_STANDBY,
->> >> > +                      false),
->> >> >       DEFINE_PROP_END_OF_LIST(),
->> >> >   };
->> >> > diff --git a/include/standard-headers/linux/virtio_net.h b/include/standard-headers/linux/virtio_net.h
->> >> > index e9f255ea3f..01ec09684c 100644
->> >> > --- a/include/standard-headers/linux/virtio_net.h
->> >> > +++ b/include/standard-headers/linux/virtio_net.h
->> >> > @@ -57,6 +57,9 @@
->> >> >                                      * Steering */
->> >> >   #define VIRTIO_NET_F_CTRL_MAC_ADDR 23     /* Set MAC address */
->> >> > +#define VIRTIO_NET_F_STANDBY      62    /* Act as standby for another device
->> >> > +                                         * with the same MAC.
->> >> > +                                         */
->> >> >   #define VIRTIO_NET_F_SPEED_DUPLEX 63      /* Device set linkspeed and duplex */
->> >> >   #ifndef VIRTIO_NET_NO_LEGACY
->> >
->> > ---------------------------------------------------------------------
->> > To unsubscribe, e-mail: virtio-dev-unsubscribe@lists.oasis-open.org
->> > For additional commands, e-mail: virtio-dev-help@lists.oasis-open.org
->> >
+> -static void xlnx_zynqmp_init(XlnxZCU102 *s, MachineState *machine)
+> +static void xlnx_zcu102_init(MachineState *machine)
+>  {
+> +    XlnxZCU102 *s = ZCU102_MACHINE(machine);
+>      int i;
+>      uint64_t ram_size = machine->ram_size;
+>
+> @@ -183,60 +180,6 @@ static void xlnx_zynqmp_init(XlnxZCU102 *s, MachineState *machine)
+>      arm_load_kernel(s->soc.boot_cpu_ptr, &xlnx_zcu102_binfo);
+>  }
+>
+> -static void xlnx_ep108_init(MachineState *machine)
+> -{
+> -    XlnxZCU102 *s = EP108_MACHINE(machine);
+> -
+> -    if (!qtest_enabled()) {
+> -        info_report("The Xilinx EP108 machine is deprecated, please use the "
+> -                    "ZCU102 machine (which has the same features) instead.");
+> -    }
+> -
+> -    xlnx_zynqmp_init(s, machine);
+> -}
+> -
+> -static void xlnx_ep108_machine_instance_init(Object *obj)
+> -{
+> -    XlnxZCU102 *s = EP108_MACHINE(obj);
+> -
+> -    /* EP108, we don't support setting secure or virt */
+> -    s->secure = false;
+> -    s->virt = false;
+> -}
+> -
+> -static void xlnx_ep108_machine_class_init(ObjectClass *oc, void *data)
+> -{
+> -    MachineClass *mc = MACHINE_CLASS(oc);
+> -
+> -    mc->desc = "Xilinx ZynqMP EP108 board (Deprecated, please use xlnx-zcu102)";
+> -    mc->init = xlnx_ep108_init;
+> -    mc->block_default_type = IF_IDE;
+> -    mc->units_per_default_bus = 1;
+> -    mc->ignore_memory_transaction_failures = true;
+> -    mc->max_cpus = XLNX_ZYNQMP_NUM_APU_CPUS + XLNX_ZYNQMP_NUM_RPU_CPUS;
+> -    mc->default_cpus = XLNX_ZYNQMP_NUM_APU_CPUS;
+> -}
+> -
+> -static const TypeInfo xlnx_ep108_machine_init_typeinfo = {
+> -    .name       = MACHINE_TYPE_NAME("xlnx-ep108"),
+> -    .parent     = TYPE_MACHINE,
+> -    .class_init = xlnx_ep108_machine_class_init,
+> -    .instance_init = xlnx_ep108_machine_instance_init,
+> -    .instance_size = sizeof(XlnxZCU102),
+> -};
+> -
+> -static void xlnx_ep108_machine_init_register_types(void)
+> -{
+> -    type_register_static(&xlnx_ep108_machine_init_typeinfo);
+> -}
+> -
+> -static void xlnx_zcu102_init(MachineState *machine)
+> -{
+> -    XlnxZCU102 *s = ZCU102_MACHINE(machine);
+> -
+> -    xlnx_zynqmp_init(s, machine);
+> -}
+> -
+>  static void xlnx_zcu102_machine_instance_init(Object *obj)
+>  {
+>      XlnxZCU102 *s = ZCU102_MACHINE(obj);
+> @@ -289,4 +232,3 @@ static void xlnx_zcu102_machine_init_register_types(void)
+>  }
+>
+>  type_init(xlnx_zcu102_machine_init_register_types)
+> -type_init(xlnx_ep108_machine_init_register_types)
+> diff --git a/qemu-doc.texi b/qemu-doc.texi
+> index f00706b..2effe66 100644
+> --- a/qemu-doc.texi
+> +++ b/qemu-doc.texi
+> @@ -2965,11 +2965,6 @@ support page sizes < 4096 any longer.
+>
+>  @section System emulator machines
+>
+> -@subsection Xilinx EP108 (since 2.11.0)
+> -
+> -The ``xlnx-ep108'' machine has been replaced by the ``xlnx-zcu102'' machine.
+> -The ``xlnx-zcu102'' machine has the same features and capabilites in QEMU.
+> -
+>  @section Block device options
+>
+>  @subsection "backing": "" (since 2.12.0)
+> --
+> 1.8.3.1
+>
+>
