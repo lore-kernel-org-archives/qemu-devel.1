@@ -1,33 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44740)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46557)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1fQBDo-00045q-5L
-	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 08:37:57 -0400
+	(envelope-from <gengdongjiu@huawei.com>) id 1fQBNS-0007Ot-6C
+	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 08:47:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1fQBDl-0005AT-1H
-	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 08:37:56 -0400
-Received: from mout.kundenserver.de ([217.72.192.73]:52885)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1fQBDk-00059i-OV
-	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 08:37:52 -0400
-References: <20180531224911.23725-1-richard.henderson@linaro.org>
-	<20180531224911.23725-7-richard.henderson@linaro.org>
-	<788ee514-a026-d415-73ce-67cc996e6259@vivier.eu>
-	<149da730-950c-a527-2373-9cb0433543b1@linaro.org>
-	<CAFEAcA-h7Ef5yfOS3V_kR5_fCmhr-N6okHY9=N87M9Ld+8MVdA@mail.gmail.com>
-	<54f54010-ad2d-7df0-8838-b2ddc7668875@vivier.eu>
-	<CAFEAcA9b==mGZQUAoPDCt1zbqxT3RmTa0XoQZvuPb17L0NYbMg@mail.gmail.com>
-	<18231864-96b1-8f6f-5caa-c3d8613ec20e@vivier.eu>
-	<CAFEAcA9e1ymU6aiOi=mQJzyXgZmda+mckhk6uKgR=3E_Po5GVQ@mail.gmail.com>
-From: Laurent Vivier <laurent@vivier.eu>
-Message-ID: <d1fb5706-3d69-49ec-b411-8fb6886dac22@vivier.eu>
-Date: Tue, 5 Jun 2018 14:37:49 +0200
+	(envelope-from <gengdongjiu@huawei.com>) id 1fQBNQ-0003F4-RC
+	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 08:47:54 -0400
+From: Dongjiu Geng <gengdongjiu@huawei.com>
+Date: Wed, 6 Jun 2018 04:52:48 +0800
+Message-ID: <1528231969-19584-2-git-send-email-gengdongjiu@huawei.com>
+In-Reply-To: <1528231969-19584-1-git-send-email-gengdongjiu@huawei.com>
+References: <1528231969-19584-1-git-send-email-gengdongjiu@huawei.com>
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA9e1ymU6aiOi=mQJzyXgZmda+mckhk6uKgR=3E_Po5GVQ@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 6/6] linux-user: Use *at functions to
- implement interp_prefix
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH v2 1/2] kvm: sync linux headers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,38 +21,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Richard Henderson <richard.henderson@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, Evan Green <evgreen@chromium.org>
+To: peter.maydell@linaro.org, james.morse@arm.com, qemu-arm@nongnu.org, qemu-devel@nongnu.org, gengdongjiu@huawei.com, linuxarm@huawei.com
 
-Le 05/06/2018 à 14:33, Peter Maydell a écrit :
-> On 5 June 2018 at 13:23, Laurent Vivier <laurent@vivier.eu> wrote:
->> They are used by tests/qemu-iotests/socket_scm_helper and
->> qemu-bridge-helper.
->>
->> Perhaps we can disable qemu-iotests with linux-user only and to not
->> build qemu-bridge-helper when tools are disabled?
-> 
-> Yeah, we shouldn't be building those if you're using --disable-system
-> --disable-tools...
+Import KVM_CAP_ARM_INJECT_SERROR_ESR and struct kvm_vcpu_events
+for arm64
 
-So something like that should do the work:
+Signed-off-by: Dongjiu Geng <gengdongjiu@huawei.com>
+---
+ linux-headers/asm-arm64/kvm.h | 13 +++++++++++++
+ linux-headers/linux/kvm.h     |  1 +
+ 2 files changed, 14 insertions(+)
 
-diff --git a/Makefile b/Makefile
-....
-+ifeq ($(CONFIG_SOFTMMU),y)
- HELPERS-$(CONFIG_LINUX) = qemu-bridge-helper$(EXESUF)
-+endif
-...
-diff --git a/tests/Makefile.include b/tests/Makefile.include
-...
-+ifeq ($(CONFIG_SOFTMMU),y)
- QEMU_IOTESTS_HELPERS-$(CONFIG_LINUX) =
-tests/qemu-iotests/socket_scm_helper$(EXESUF)
-+endif
-...
-
-I prepare a patch...
-
-Thanks,
-
-Laurent
+diff --git a/linux-headers/asm-arm64/kvm.h b/linux-headers/asm-arm64/kvm.h
+index 17315ab..e240afc 100644
+--- a/linux-headers/asm-arm64/kvm.h
++++ b/linux-headers/asm-arm64/kvm.h
+@@ -39,6 +39,7 @@
+ #define __KVM_HAVE_GUEST_DEBUG
+ #define __KVM_HAVE_IRQ_LINE
+ #define __KVM_HAVE_READONLY_MEM
++#define __KVM_HAVE_VCPU_EVENTS
+ 
+ #define KVM_COALESCED_MMIO_PAGE_OFFSET 1
+ 
+@@ -153,6 +154,18 @@ struct kvm_sync_regs {
+ struct kvm_arch_memory_slot {
+ };
+ 
++/* for KVM_GET/SET_VCPU_EVENTS */
++struct kvm_vcpu_events {
++	struct {
++		__u8 serror_pending;
++		__u8 serror_has_esr;
++		/* Align it to 8 bytes */
++		__u8 pad[6];
++		__u64 serror_esr;
++	} exception;
++	__u32 reserved[12];
++};
++
+ /* If you need to interpret the index values, here is the key: */
+ #define KVM_REG_ARM_COPROC_MASK		0x000000000FFF0000
+ #define KVM_REG_ARM_COPROC_SHIFT	16
+diff --git a/linux-headers/linux/kvm.h b/linux-headers/linux/kvm.h
+index cdb148e..cd8be47 100644
+--- a/linux-headers/linux/kvm.h
++++ b/linux-headers/linux/kvm.h
+@@ -948,6 +948,7 @@ struct kvm_ppc_resize_hpt {
+ #define KVM_CAP_S390_BPB 152
+ #define KVM_CAP_GET_MSR_FEATURES 153
+ #define KVM_CAP_HYPERV_EVENTFD 154
++#define KVM_CAP_ARM_INJECT_SERROR_ESR 155
+ 
+ #ifdef KVM_CAP_IRQ_ROUTING
+ 
+-- 
+2.7.4
