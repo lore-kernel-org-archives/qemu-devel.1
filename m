@@ -1,34 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35175)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35316)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1fQAeC-0006cG-4n
-	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 08:01:12 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1fQAeL-0006jk-SE
+	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 08:01:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1fQAe2-0003Vf-O5
-	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 08:01:08 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:33966 helo=mx1.redhat.com)
+	(envelope-from <ehabkost@redhat.com>) id 1fQAeH-0003o6-1p
+	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 08:01:17 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:48068)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1fQAe2-0003Uk-HI
-	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 08:00:58 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.6])
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1fQAeG-0003mp-PH
+	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 08:01:12 -0400
+Received: from smtp.corp.redhat.com (int-mx12.intmail.prod.int.phx2.redhat.com
+	[10.5.11.27])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 12B99402346D
-	for <qemu-devel@nongnu.org>; Tue,  5 Jun 2018 12:00:58 +0000 (UTC)
-Date: Tue, 5 Jun 2018 13:00:54 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20180605120054.GZ32286@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+	by mx1.redhat.com (Postfix) with ESMTPS id E102A655E
+	for <qemu-devel@nongnu.org>; Tue,  5 Jun 2018 12:01:11 +0000 (UTC)
+Date: Tue, 5 Jun 2018 09:01:09 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20180605120109.GD7451@localhost.localdomain>
 References: <20180604120345.12955-1-berrange@redhat.com>
-	<20180604120345.12955-3-berrange@redhat.com>
-	<20180604235315.0447d13f@redhat.com>
+	<20180604120345.12955-2-berrange@redhat.com>
+	<2604e5d5-0e56-62e7-91eb-fd207a907ac8@redhat.com>
+	<20180605005647.GE3184@localhost.localdomain>
+	<20180605103755.34840d5d@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20180604235315.0447d13f@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 2/2] vl: fix use of --daemonize with
- --preconfig
+In-Reply-To: <20180605103755.34840d5d@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2 1/2] vl: don't use RUN_STATE_PRECONFIG
+ as initial state
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,84 +38,90 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Igor Mammedov <imammedo@redhat.com>
-Cc: qemu-devel@nongnu.org, Michal Privoznik <mprivozn@redhat.com>, Markus Armbruster <armbru@redhat.com>, Max Reitz <mreitz@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: Michal Privoznik <mprivozn@redhat.com>, Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>, qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-On Mon, Jun 04, 2018 at 11:53:15PM +0200, Igor Mammedov wrote:
-> On Mon,  4 Jun 2018 13:03:45 +0100
-> Daniel P. Berrang=C3=A9 <berrange@redhat.com> wrote:
->=20
-> > When using --daemonize, the initial lead process will fork a child an=
-d
-> > then wait to be notified that setup is complete via a pipe, before it
-> > exits.  When using --preconfig there is an extra call to main_loop()
-> > before the notification is done from os_setup_post(). Thus the parent
-> > process won't exit until the mgmt application connects to the monitor
-> > and tells QEMU to leave the RUN_STATE_PRECONFIG. The mgmt application
-> > won't connect to the monitor until daemonizing has completed though.
-> >=20
-> > This is a chicken and egg problem, leading to deadlock at startup.
-> >=20
-> > The only viable way to fix this is to call os_setup_post() before
-> > the early main_loop() call when in RUN_STATE_PRECONFIG. This has the
-> > downside that any errors from this point onwards won't be handled
-> > well by the mgmt application, because it will think QEMU has started
-> > successfully, so not be expecting an abrupt exit. The only way to
-> > deal with that is to move as much user input validation as possible
-> > to before the main_loop() call. This is left as an exercise for
-> > future interested developers.
-> >=20
-> > Signed-off-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
-> [...]
->=20
-> How about combining ideas from yours and Michal's patches?
-> It should fix broken iotests/libvirt sync point and
-> we can think about NONE runstate idea at without rushing it.
-> If it looks acceptable, I'll post proper patches + test case for it
-> after some testing (to ensure that iotests Max pointed out are working
-> as expected)
->=20
-> diff --git a/vl.c b/vl.c
-> index c4fe255..a2062d6 100644
-> --- a/vl.c
-> +++ b/vl.c
-> @@ -1953,10 +1953,15 @@ static bool main_loop_should_exit(void)
-> =20
->  static void main_loop(void)
->  {
-> +    static bool os_setup_post_done =3D false;
->  #ifdef CONFIG_PROFILER
->      int64_t ti;
->  #endif
-> -    do {
-> +    if (!os_setup_post_done) {
-> +        os_setup_post();
-> +        os_setup_post_done =3D true;
-> +    }
+On Tue, Jun 05, 2018 at 10:37:55AM +0200, Igor Mammedov wrote:
+> On Mon, 4 Jun 2018 21:56:47 -0300
+> Eduardo Habkost <ehabkost@redhat.com> wrote:
+> > On Mon, Jun 04, 2018 at 04:21:47PM +0200, Michal Privoznik wrote:
+> > [...]
+> > > > @@ -3572,7 +3570,12 @@ int main(int argc, char **argv, char **envp)
+> > > >                  }
+> > > >                  break;
+> > > >              case QEMU_OPTION_preconfig:
+> > > > -                preconfig_exit_requested = false;
+> > > > +                if (!runstate_check(RUN_STATE_NONE)) {
+> > > > +                    error_report("'--preconfig' and '--incoming' options are "
+> > > > +                                 "mutually exclusive");
+> > > > +                    exit(EXIT_FAILURE);
+> > > > +                }
+> > > > +                runstate_set(RUN_STATE_PRECONFIG);  
+> > > 
+> > > Specifying --preconfig twice on the command line now fails with a very
+> > > cryptic message (there's no --incoming).
+> > >   
+> > > >                  break;
+> > > >              case QEMU_OPTION_enable_kvm:
+> > > >                  olist = qemu_find_opts("machine");
+> > > > @@ -3768,9 +3771,12 @@ int main(int argc, char **argv, char **envp)
+> > > >                  }
+> > > >                  break;
+> > > >              case QEMU_OPTION_incoming:
+> > > > -                if (!incoming) {
+> > > > -                    runstate_set(RUN_STATE_INMIGRATE);
+> > > > +                if (!runstate_check(RUN_STATE_NONE)) {
+> > > > +                    error_report("'--preconfig' and '--incoming' options are "
+> > > > +                                 "mutually exclusive");
+> > > > +                    exit(EXIT_FAILURE);
+> > > >                  }
+> > > > +                runstate_set(RUN_STATE_INMIGRATE);  
+> > > 
+> > > Same here. Specifying --incoming twice fails with cryptic message. But
+> > > one can argue that specifying --incoming twice is wrong anyway.
+> > >   
+> > 
+> > Initially I was going to suggest simply not changing runstate
+> > during option parsing to avoid this kind of problem, but maybe
+> > this would be a nice way to implement the command-line parsing
+> > rules:
+> Is there a big reason to try making early incoming transition hack nicer?
+> I'd rather leave it as it is for now and fix it properly later
+> (i.e. postponing the transition after machine_done point, which is on my
+> todo list).
 
-I don't really like hiding the os_setup_post() call in
-the main_loop() method, since they're really independant
-functionality.
+Yeah, I'm not sure we want go towards encoding more knowledge in
+the state machine, or keeping the system simple and encoding the
+rules in more straightforward code+variables inside main().
 
-> +    while (!main_loop_should_exit()) {
->  #ifdef CONFIG_PROFILER
->          ti =3D profile_getclock();
->  #endif
-> @@ -1964,7 +1969,7 @@ static void main_loop(void)
->  #ifdef CONFIG_PROFILER
->          dev_time +=3D profile_getclock() - ti;
->  #endif
-> -    } while (!main_loop_should_exit());
-> +    }
->  }
-> =20
->  static void version(void)
+> > 
+> >     case QEMU_OPTION_preconfig:
+> >         /*
+> >          * A INCOMING -> PRECONFIG transition would call:
+> >          *   error_setg("--preconfig and --incoming options are mutually exclusive");
+> >          */
+> >         try_runstate_set(RUN_STATE_PRECONFIG, &error_fatal);
+> >         break;
+> >     case QEMU_OPTION_incoming:
+> >         /*
+> >          * A PRECONFIG -> INCOMING transition would also call:
+> >          *   error_setg("--preconfig and --incoming options are mutually exclusive");
+> >          *
+> >          * Maybe a INCOMING -> INCOMING transition could
+> >          * result in:
+> >          *   error_setg("--incoming can't be specified twice");
+> >          */
+> >         try_runstate_set(RUN_STATE_INMIGRATE, &error_fatal);
+> >         break;
+> > 
+> > 
+> > > >                  incoming = optarg;
+> > > >                  break;
+> > > >              case QEMU_OPTION_only_migratable:  
+> > > 
+> > > Michal
+> > >   
+> > 
+> 
 
-Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
-ge :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.c=
-om :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
-ge :|
+-- 
+Eduardo
