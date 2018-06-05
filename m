@@ -1,33 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48867)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50805)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1fQDHE-0003op-AW
-	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 10:49:37 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1fQDNQ-0006kl-3o
+	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 10:56:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1fQDHB-0001M6-3b
-	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 10:49:36 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:39462 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1fQDHA-0001Lx-Ti
-	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 10:49:33 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.3])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 3584B4029AEC
-	for <qemu-devel@nongnu.org>; Tue,  5 Jun 2018 14:49:32 +0000 (UTC)
-Date: Tue, 5 Jun 2018 16:49:29 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20180605164929.46e2890a@redhat.com>
-In-Reply-To: <20180605120054.GZ32286@redhat.com>
-References: <20180604120345.12955-1-berrange@redhat.com>
-	<20180604120345.12955-3-berrange@redhat.com>
-	<20180604235315.0447d13f@redhat.com>
-	<20180605120054.GZ32286@redhat.com>
+	(envelope-from <alex.bennee@linaro.org>) id 1fQDNN-00054q-0l
+	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 10:56:00 -0400
+Received: from mail-wr0-x22a.google.com ([2a00:1450:400c:c0c::22a]:34337)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1fQDNM-000529-FD
+	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 10:55:56 -0400
+Received: by mail-wr0-x22a.google.com with SMTP id a12-v6so2789162wro.1
+	for <qemu-devel@nongnu.org>; Tue, 05 Jun 2018 07:55:56 -0700 (PDT)
+References: <20180528071332.9424.27343.stgit@pasha-VirtualBox>
+	<b2f04223-f52d-44e6-95a6-6ed91d021dad@ispras.ru>
+	<87in6yd146.fsf@linaro.org> <001201d3fc8d$e8a06390$b9e12ab0$@ru>
+	<87fu21d3gh.fsf@linaro.org> <001c01d3fcae$f0443fb0$d0ccbf10$@ru>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <001c01d3fcae$f0443fb0$d0ccbf10$@ru>
+Date: Tue, 05 Jun 2018 15:55:53 +0100
+Message-ID: <87bmcpcmfa.fsf@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 2/2] vl: fix use of --daemonize with
- --preconfig
+Subject: Re: [Qemu-devel] [PATCH v4 00/19] reverse debugging
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,131 +32,124 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. =?UTF-8?B?QmVycmFuZ8Op?=" <berrange@redhat.com>
-Cc: qemu-devel@nongnu.org, Michal Privoznik <mprivozn@redhat.com>, Markus Armbruster <armbru@redhat.com>, Max Reitz <mreitz@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: Pavel Dovgalyuk <dovgaluk@ispras.ru>
+Cc: 'Pavel Dovgalyuk' <pavel.dovgaluk@ispras.ru>, qemu-devel@nongnu.org, kwolf@redhat.com, peter.maydell@linaro.org, war2jordan@live.com, crosthwaite.peter@gmail.com, boost.lists@gmail.com, quintela@redhat.com, ciro.santilli@gmail.com, jasowang@redhat.com, mst@redhat.com, zuban32s@gmail.com, armbru@redhat.com, maria.klimushenkova@ispras.ru, kraxel@redhat.com, thomas.dullien@googlemail.com, pbonzini@redhat.com, mreitz@redhat.com, dgilbert@redhat.com, rth@twiddle.net
 
-On Tue, 5 Jun 2018 13:00:54 +0100
-Daniel P. Berrang=C3=A9 <berrange@redhat.com> wrote:
 
-> On Mon, Jun 04, 2018 at 11:53:15PM +0200, Igor Mammedov wrote:
-> > On Mon,  4 Jun 2018 13:03:45 +0100
-> > Daniel P. Berrang=C3=A9 <berrange@redhat.com> wrote:
-> >  =20
-> > > When using --daemonize, the initial lead process will fork a child and
-> > > then wait to be notified that setup is complete via a pipe, before it
-> > > exits.  When using --preconfig there is an extra call to main_loop()
-> > > before the notification is done from os_setup_post(). Thus the parent
-> > > process won't exit until the mgmt application connects to the monitor
-> > > and tells QEMU to leave the RUN_STATE_PRECONFIG. The mgmt application
-> > > won't connect to the monitor until daemonizing has completed though.
-> > >=20
-> > > This is a chicken and egg problem, leading to deadlock at startup.
-> > >=20
-> > > The only viable way to fix this is to call os_setup_post() before
-> > > the early main_loop() call when in RUN_STATE_PRECONFIG. This has the
-> > > downside that any errors from this point onwards won't be handled
-> > > well by the mgmt application, because it will think QEMU has started
-> > > successfully, so not be expecting an abrupt exit. The only way to
-> > > deal with that is to move as much user input validation as possible
-> > > to before the main_loop() call. This is left as an exercise for
-> > > future interested developers.
-> > >=20
-> > > Signed-off-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com> =20
-> > [...]
-> >=20
-> > How about combining ideas from yours and Michal's patches?
-> > It should fix broken iotests/libvirt sync point and
-> > we can think about NONE runstate idea at without rushing it.
-> > If it looks acceptable, I'll post proper patches + test case for it
-> > after some testing (to ensure that iotests Max pointed out are working
-> > as expected)
-> >=20
-> > diff --git a/vl.c b/vl.c
-> > index c4fe255..a2062d6 100644
-> > --- a/vl.c
-> > +++ b/vl.c
-> > @@ -1953,10 +1953,15 @@ static bool main_loop_should_exit(void)
-> > =20
-> >  static void main_loop(void)
-> >  {
-> > +    static bool os_setup_post_done =3D false;
-> >  #ifdef CONFIG_PROFILER
-> >      int64_t ti;
-> >  #endif
-> > -    do {
-> > +    if (!os_setup_post_done) {
-> > +        os_setup_post();
-> > +        os_setup_post_done =3D true;
-> > +    } =20
->=20
-> I don't really like hiding the os_setup_post() call in
-> the main_loop() method, since they're really independant
-> functionality.
-I've posted v3 series with this variant as both turned out
-to be somewhat related and it avoids forgetting to call os_setup_post()
-before main_loop() is called which is non obvious requirement from
-libvirt side. Resulting code ended up  cleaner and still keeps runstate
-transitions in one place main_loop_should_exit().
+Pavel Dovgalyuk <dovgaluk@ispras.ru> writes:
 
-But I don't really have a preference here, so if we don't hide
-it inside of main_loop() we need to duplicate exit condition
-from main_loop_should_exit(), but that's it.
-It would look a bit more messier, like:
+>> From: Alex Benn=C3=A9e [mailto:alex.bennee@linaro.org]
+>> Pavel Dovgalyuk <dovgaluk@ispras.ru> writes:
+>>
+>> >> From: Alex Benn=C3=A9e [mailto:alex.bennee@linaro.org]
+>> >> Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru> writes:
+>> >>
+>> >> > Ping?
+>> >>
+>> >> I started having a look but I ran into this straight away. First I
+>> >> recorded a boot of the kernel:
+>> >>
+>> >>   ./aarch64-softmmu/qemu-system-aarch64 -machine virt,graphics=3Don,g=
+ic-
+>> >> version=3D3,virtualization=3Don -cpu cortex-a53 --serial mon:stdio -d=
+isplay none -kernel
+>> >> ../images/aarch64-current-linux-initrd-guest.img -icount
+>> shift=3D7,rr=3Drecord,rrfile=3Dreplay.bin
+>> >>
+>> >> Then played back:
+>> >>
+>> >>   ./aarch64-softmmu/qemu-system-aarch64 -machine virt,graphics=3Don,g=
+ic-
+>> >> version=3D3,virtualization=3Don -cpu cortex-a53 --serial mon:stdio -d=
+isplay none -kernel
+>> >> ../images/aarch64-current-linux-initrd-guest.img -icount
+>> shift=3D7,rr=3Dreplay,rrfile=3Dreplay.bin -
+>> >> s -S
+>> >
+>> > This looks ok, but...
+>> >
+>> >> And did the following on gdb:
+>> >>
+>> >> (gdb) i
+>> >> 0x0000000040000004 in ?? ()
+>> >> =3D> 0x40000004:  mov     x1, xzr
+>> >>    0x40000008:  mov     x2, xzr
+>> >>    0x4000000c:  mov     x3, xzr
+>> >> (gdb)
+>> >> 0x0000000040000008 in ?? ()
+>> >> =3D> 0x40000008:  mov     x2, xzr
+>> >>    0x4000000c:  mov     x3, xzr
+>> >>    0x40000010:  ldr     x4, 0x40000020
+>> >> (gdb)
+>> >> 0x000000004000000c in ?? ()
+>> >> =3D> 0x4000000c:  mov     x3, xzr
+>> >>    0x40000010:  ldr     x4, 0x40000020
+>> >>    0x40000014:  br      x4
+>> >> (gdb)
+>> >> 0x0000000040000010 in ?? ()
+>> >> =3D> 0x40000010:  ldr     x4, 0x40000020
+>> >>    0x40000014:  br      x4
+>> >>    0x40000018:  .inst   0x44000000 ; undefined
+>> >> (gdb)
+>> >> 0x0000000040000014 in ?? ()
+>> >> =3D> 0x40000014:  br      x4
+>> >>    0x40000018:  .inst   0x44000000 ; undefined
+>> >>    0x4000001c:  .inst   0x00000000 ; undefined
+>> >> (gdb) p/x $x4
+>> >> $1 =3D 0x40080000
+>> >> (gdb) reverse-stepi
+>> >> warning: Remote failure reply: E14
+>> >>
+>> >> Surely this is the simple case and doesn't require any snapshots for
+>> >> block devices as there are none. Am I missing something?
+>> >
+>> > Reverse debugging requires the snapshotting. QEMU can't revert the VM =
+state without the
+>> snapshots.
+>> > You can try adding an empty qcow2 image to allow snapshotting there.
+>>
+>> I suspect a recent patch has broken locking again:
+>>
+>> Starting program: /home/alex/lsrc/qemu/qemu.git/aarch64-softmmu/qemu-sys=
+tem-aarch64 -machine
+>> virt,graphics=3Don,gic-version=3D3,virtualization=3Don -cpu cortex-a53 -=
+-serial mon:stdio -display
+>> none -kernel ../images/aarch64-current-linux-initrd-guest.img -icount
+>> shift=3D7,rr=3Dreplay,rrfile=3Dreplay.bin,rrsnapshot=3Ddebug -drive
+>> file=3Drr.qcow2,if=3Dnone,snapshot,id=3Drr -s -S
+>> [Thread debugging using libthread_db enabled]
+>> Using host libthread_db library "/lib/x86_64-linux-gnu/libthread_db.so.1=
+".
+>> [New Thread 0x7fffd8536700 (LWP 32452)]
+>> [New Thread 0x7fffd5bb3700 (LWP 32453)]
+>> [New Thread 0x7fffd4eab700 (LWP 32454)]
+>> **
+>> ERROR:replay/replay-time.c:49:replay_read_clock: assertion failed: (repl=
+ay_file &&
+>> replay_mutex_locked())
+>
+> Have you recorded it with the attached disk before replaying?
 
-diff --git a/vl.c b/vl.c
-index d6fa67f..f1bda99 100644
---- a/vl.c
-+++ b/vl.c
-@@ -3039,6 +3039,7 @@ int main(int argc, char **argv, char **envp)
-     Error *err =3D NULL;
-     bool list_data_dirs =3D false;
-     char *dir, **dirs;
-+    bool os_setup_post_done =3D false;
-     typedef struct BlockdevOptions_queue {
-         BlockdevOptions *bdo;
-         Location loc;
-@@ -4579,7 +4580,16 @@ int main(int argc, char **argv, char **envp)
-     parse_numa_opts(current_machine);
-=20
-     /* do monitor/qmp handling at preconfig state if requested */
--    main_loop();
-+    if (preconfig_exit_requested) {
-+        if (runstate_check(RUN_STATE_PRECONFIG)) {
-+            runstate_set(RUN_STATE_PRELAUNCH);
-+        }
-+        preconfig_exit_requested =3D false;
-+    } else {
-+        os_setup_post();
-+        os_setup_post_done =3D true;
-+        main_loop();
-+    }
-=20
-     /* from here on runstate is RUN_STATE_PRELAUNCH */
-     machine_run_board_init(current_machine);
-@@ -4709,6 +4719,9 @@ int main(int argc, char **argv, char **envp)
-=20
-     accel_setup_post(current_machine);
-=20
-+    if (!os_setup_post_done) {
-+       os_setup_post();
-+    }
-     main_loop();
+Yes. I assume the -drive doesn't actually have to be visible to the
+guest, it's just the mechanism rr needs for saving snapshots?
 
-but if that's what is preferred I can repost v4.
+> Are you using the latest version?
+> If the both answers are 'yes', then can you share the kernel? My i386
+> runs work normally.
 
-> > +    while (!main_loop_should_exit()) {
-> >  #ifdef CONFIG_PROFILER
-> >          ti =3D profile_getclock();
-> >  #endif
-> > @@ -1964,7 +1969,7 @@ static void main_loop(void)
-> >  #ifdef CONFIG_PROFILER
-> >          dev_time +=3D profile_getclock() - ti;
-> >  #endif
-> > -    } while (!main_loop_should_exit());
-> > +    }
-> >  }
-> > =20
-> >  static void version(void) =20
->=20
-> Regards,
-> Daniel
+I'll have a go with x86 first as aarch64 hasn't been proven yet.
+
+>
+>> Once I have the linux-user TCG tests merged I'm planning on focusing on
+>> the system emulation tests and we should be able to add some
+>> record/replay tests to defend the behaviour.
+>
+> That will be great.
+> There are some Ciro's attempts on that: https://github.com/cirosantilli/q=
+emu-test/blob/master/arm/rr
+>
+> Pavel Dovgalyuk
+
+
+--
+Alex Benn=C3=A9e
