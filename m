@@ -1,25 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49916)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50113)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fQBes-0006QL-L3
-	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 09:05:56 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1fQBfy-0007Ay-OW
+	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 09:07:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fQBer-00076a-Et
-	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 09:05:54 -0400
-Received: from mail-ot0-x244.google.com ([2607:f8b0:4003:c0f::244]:33509)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fQBer-00076M-7g
-	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 09:05:53 -0400
-Received: by mail-ot0-x244.google.com with SMTP id h6-v6so2706276otj.0
-	for <qemu-devel@nongnu.org>; Tue, 05 Jun 2018 06:05:53 -0700 (PDT)
+	(envelope-from <ehabkost@redhat.com>) id 1fQBfv-0007cs-K8
+	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 09:07:02 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:35576)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1fQBfv-0007c7-Di
+	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 09:06:59 -0400
+Date: Tue, 5 Jun 2018 10:06:46 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20180605130646.GF7451@localhost.localdomain>
+References: <20180603092749.107476-1-marcel.apfelbaum@gmail.com>
+	<20180604042928-mutt-send-email-mst@kernel.org>
+	<23040757-b561-e0bf-a41d-38d3c44555ee@gmail.com>
+	<20180605072746.v6xxabsbewiuw7ka@sirius.home.kraxel.org>
+	<20180605084300.GF32286@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20180605125245.32612-1-kraxel@redhat.com>
-References: <20180605125245.32612-1-kraxel@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 5 Jun 2018 14:05:32 +0100
-Message-ID: <CAFEAcA_OBtsYoBe_hSb3mbjQRiBcW2tx0rigWkQEUNX_ESdkZg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH] usb: update docs
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <20180605084300.GF32286@redhat.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] libvirt default machine-type guarantees? (was Re:
+ [PATCH RFC] hw/pc: set q35 as the default x86 machine)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,155 +32,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Markus Armbruster <armbru@redhat.com>
+To: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>
+Cc: Gerd Hoffmann <kraxel@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, pbonzini@redhat.com, rth@twiddle.net, qemu-devel@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>, libvir-list@redhat.com
 
-On 5 June 2018 at 13:52, Gerd Hoffmann <kraxel@redhat.com> wrote:
-> xhci is rock solid meanwhile.  So move it up in the docs and feature it
-> as prefered usb host adapter, instead of the old shy version saying "you
-> might want try ...".
->
-> While being at it rework the text on ehci and companion controllers too.
->
-> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
-> ---
->  docs/usb2.txt | 80 ++++++++++++++++++++++++++++++++++-------------------------
->  1 file changed, 46 insertions(+), 34 deletions(-)
+(CCing libvir-list)
 
+On Tue, Jun 05, 2018 at 09:43:00AM +0100, Daniel P. Berrang=E9 wrote:
+> On Tue, Jun 05, 2018 at 09:27:46AM +0200, Gerd Hoffmann wrote:
+> >   Hi,
+> >=20
+> > > >   Add to that shortcuts like -cdrom
+> > > > stop working,
+> > >=20
+> > > Maybe is fixable.
+> >=20
+> > Already fixed for ages.
+> >=20
+> > > I see marking Q35 as the default machine a first step.
+> >=20
+> > Maybe the better option is to go the arm route:  Just don't define a
+> > default, so users have to specify pc or q35.  That will make them not=
+ice
+> > there is a world beside 'pc', and we also avoid breaking things
+> > silently.
+>=20
+> If QEMU removes the default, then libvirt will have to hardcode
+> 'pc' as the default to maintain back compatibility, so I don't
+> think that ends up as a net win
 
-This is good; I did a quick pass-through for typos and the like.
+Is there an actual promise to never change the default
+machine-type documented in the libvirt API, or is this just fear
+of breaking existing code?
 
-> diff --git a/docs/usb2.txt b/docs/usb2.txt
-> index 09df45b5b1..30055a2258 100644
-> --- a/docs/usb2.txt
-> +++ b/docs/usb2.txt
-> @@ -1,16 +1,42 @@
->
-> -USB 2.0 Quick Start
-> -===================
-> +USB Quick Start
-> +===============
->
-> -The QEMU EHCI Adapter can be used with and without companion
-> -controllers.  See below for the companion controller mode.
-> +xhci controller support
-> +-----------------------
->
-> -When not running in companion controller mode there are two completely
-> -separate USB busses: One USB 1.1 bus driven by the UHCI controller and
-> -one USB 2.0 bus driven by the EHCI controller.  Devices must be
-> -attached to the correct controller manually.
-> +Qemu has xhci host adapter support.  The xhci hardware design is much
-
-"QEMU" should be all upper-case.
-
-We also seem to be inconsistent about whether to uppercase UHCI,
-EHCI and XHCI. I'd suggest using all-upper-case (except obviously
-in QEMU device names like 'qemu-xhci').
-
-> +more virtualization-friendly when compared to ehci and uhci, thus xhci
-> +emulation uses less resources (especially cpu).  So if your guest
-> +supports xhci (which should be the case for any operating system
-> +released around 2010 or later) I recommend using it:
-
-I think we should phrase our documentation from a project point
-of view, so "we recommend" rather than "I".
-
->
-> -The '-usb' switch will make qemu create the UHCI controller as part of
-> +    qemu -device qemu-xhci
-> +
-> +xhci supports USB 1.1, USB 2.0 and USB 3.0 devices, so this is the
-> +only controller you need.  With only a single usb controller (and
-> +therefore only a single usb bus) being present in the system there is
-
-s/being//
-
-> +no need to use the bus= parameter when adding usb devices.
-> +
-> +
-> +ehci controller support
-> +-----------------------
-> +
-> +The QEMU EHCI Adapter supports USB 2.0 devices.  It can be used either
-> +standalone or with companion controllers (UHCI, OHCI) for USB 1.1
-> +devices.  The companion controller setup is more convinient to use
-
-"convenient".
-
-> +because it provides a single usb bus supporting both USB 2.0 and USB
-> +1.1 devices.  See next section for details.
-> +
-> +When running EHCI in standalone mode you can add UHCI or OHCI
-> +controllers for USB 1.1 devices too.  Each controller creates its own
-> +bus though, so there are two completely separate USB busses: One USB
-
-"buses". (the double-s spelling is a valid but less-used variant;
-our docs mostly use the single-s spelling though, so we should
-go with that for consistency.)
-
-> +1.1 bus driven by the UHCI controller and one USB 2.0 bus driven by
-> +the EHCI controller.  Devices must be attached to the correct
-> +controller manually.
-> +
-> +The easiest way to add a UHCI controller to a 'pc' machine is the
-> +'-usb' switch, qemu will create the UHCI controller as function of
-
-s/, qemu/. QEMU/.
-
->  the PIIX3 chipset.  The USB 1.1 bus will carry the name "usb-bus.0".
->
->  You can use the standard -device switch to add a EHCI controller to
-> @@ -37,37 +63,23 @@ device to the EHCI adapter.
->  Companion controller support
->  ----------------------------
->
-> -Companion controller support has been added recently.  The operational
-> -model described above with two completely separate busses still works
-> -fine.  Additionally the UHCI and OHCI controllers got the ability to
-> -attach to a usb bus created by EHCI as companion controllers.  This is
-> -done by specifying the masterbus and firstport properties.  masterbus
-> -specifies the bus name the controller should attach to.  firstport
-> -specifies the first port the controller should attach to, which is
-> -needed as usually one ehci controller with six ports has three uhci
-> -companion controllers with two ports each.
-> +The UHCI and OHCI controllers can attach to a usb bus created by EHCI
-> +as companion controllers.  This is done by specifying the masterbus
-> +and firstport properties.  masterbus specifies the bus name the
-> +controller should attach to.  firstport specifies the first port the
-> +controller should attach to, which is needed as usually one ehci
-> +controller with six ports has three uhci companion controllers with
-> +two ports each.
->
-> -There is a config file in docs which will do all this for you, just
-> -try ...
-> +There is a config file in docs which will do all this for
-> +you, just try ...
->
->      qemu -readconfig docs/config/ich9-ehci-uhci.cfg
->
->  ... then use "bus=ehci.0" to assign your usb devices to that bus.
->
-> -
-> -xhci controller support
-> ------------------------
-> -
-> -There is also xhci host controller support available.  It got a lot
-> -less testing than ehci and there are a bunch of known limitations, so
-> -ehci may work better for you.  On the other hand the xhci hardware
-> -design is much more virtualization-friendly, thus xhci emulation uses
-> -less resources (especially cpu).  If you want to give xhci a try
-> -use this to add the host controller ...
-> -
-> -    qemu -device nec-usb-xhci,id=xhci
-> -
-> -... then use "bus=xhci.0" when assigning usb devices.
-> +Using the '-usb' switch for 'q35' machines will create a simliar
-
-"similar".
-
-> +usb controller configuration.
->
-
-thanks
--- PMM
+--=20
+Eduardo
