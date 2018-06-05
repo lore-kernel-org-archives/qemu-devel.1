@@ -1,33 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54546)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54765)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1fQBw4-00033A-R8
-	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 09:23:41 -0400
+	(envelope-from <peterx@redhat.com>) id 1fQBxh-0004Nb-K7
+	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 09:25:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1fQBw3-00007H-WC
-	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 09:23:40 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:45992 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1fQBw3-00005J-R0
-	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 09:23:39 -0400
-References: <20180323122520.11270-1-kraxel@redhat.com>
-	<43fc23c1-d72f-748a-5b9d-a816466d7406@redhat.com>
-	<20180425140749.6x3w4h4i2n6uaq7o@sirius.home.kraxel.org>
-	<1ed94b1c-b416-eebe-9cf3-91943a0e6c5a@redhat.com>
-	<20180531084347.xb2r5aolkis2nmqg@sirius.home.kraxel.org>
-	<4b65af58-8451-a365-6c81-52c49e42b6ff@redhat.com>
-	<20180605110647.7ctaj7fiy6x4ewdw@sirius.home.kraxel.org>
-	<a3fe57cf-1569-834d-5528-d85847b29f9f@redhat.com>
-	<20180605131649.fu3cellm7vwaf4ao@sirius.home.kraxel.org>
-From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <20d457f0-647f-04e3-76c3-ed58f3494208@redhat.com>
-Date: Tue, 5 Jun 2018 15:23:23 +0200
+	(envelope-from <peterx@redhat.com>) id 1fQBxc-0000tL-6j
+	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 09:25:21 -0400
+Date: Tue, 5 Jun 2018 21:25:01 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20180605132501.GH9216@xz-mi>
+References: <20180604152941.20374-1-peter.maydell@linaro.org>
+	<20180605073937.GD9216@xz-mi>
+	<CAFEAcA-=WtB8bCM2Q=CATM9YBM7whRf5uK1fLhaJH_mfkip1uw@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20180605131649.fu3cellm7vwaf4ao@sirius.home.kraxel.org>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 0/7] ramfb: simple boot framebuffer,
- no legacy vga
+Content-Disposition: inline
+In-Reply-To: <CAFEAcA-=WtB8bCM2Q=CATM9YBM7whRf5uK1fLhaJH_mfkip1uw@mail.gmail.com>
+Subject: Re: [Qemu-devel] [PATCH v2 00/13] iommu: support txattrs,
+ support TCG execution, implement TZ MPC
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,51 +25,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>
-Cc: qemu-devel@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>, Alex Williamson <alex.williamson@redhat.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, "patches@linaro.org" <patches@linaro.org>, Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>, Richard Henderson <rth@twiddle.net>, Paolo Bonzini <pbonzini@redhat.com>, Eric Auger <eric.auger@redhat.com>
 
-On 06/05/18 15:16, Gerd Hoffmann wrote:
-> On Tue, Jun 05, 2018 at 02:07:27PM +0200, Laszlo Ersek wrote:
->> On 06/05/18 13:06, Gerd Hoffmann wrote:
->>>   Hi,
->>>
->>>>>> I could imagine an OvmfPkg-specific PCI capability that said, "all PCI
->>>>>> drivers in OvmfPkg that could otherwise drive this device, ignore it --
->>>>>> another (platform) driver in OvmfPkg will pick it up instead".
->>>>>
->>>>> pci capability for ramfb could be useful (also for linux).  I'll keep it
->>>>> in mind for now.
->>>>
->>>> Please do. :)
->>>
->>> Hmm, well.  Virtio 1.0 uses vendor specific capabilities already to
->>> define the regions, and they don't have a fixed field saying "this is
->>> for virtio".  So adding another vendor specific capability for something
->>> else on the same device is a bit problematic ...
->>
->> Can we invent a non-PCI method, e.g. fw_cfg, that tells QemuVideoDxe and
->> Virtio10Dxe not to bind some PCI S/B/D/Fs? Something like:
+On Tue, Jun 05, 2018 at 10:13:12AM +0100, Peter Maydell wrote:
+> On 5 June 2018 at 08:39, Peter Xu <peterx@redhat.com> wrote:
+> > On Mon, Jun 04, 2018 at 04:29:28PM +0100, Peter Maydell wrote:
+> >> Hi; this is v2 of my iommu patchset, which does:
+> >>  * support IOMMUs that are aware of memory transaction attributes and
+> >>    may generate different translations for different attributes
+> >>  * support TCG execution out of memory which is behind an IOMMU
+> >>  * implement the Arm TrustZone Memory Protection Controller
+> >>    (which needs both the above features in the IOMMU core code)
+> >>  * use the MPC in the mps2-an505 board
 > 
-> Well, from edk2 point of view Virtio10Dxe is the only problematic case
-> because there is a is a native driver.  For cirrus/stdvga a version with
-> ramfb is rather pointless.
-
-Good catch; thinko on my part!
-
-> A qxl-ramfb device might make sense, but
-> QemuVideoDxe would ignore such a device like it ignores qxl today as it
-> can only handle the vga mode of qxl-vga devices.
-
-Indeed.
-
-> Also I'd prefer to provide informations (device foo has ramfb at <addr>)
-> not instructions (please ignore device foo).
+> > It seems that this series is still using the IOMMU index way.  In case
+> > I missed anything... Could you elaborate a bit on why this IOMMU index
+> > solution is preferred comparing to the way to pass in MemTxAttrs?  Or
+> > was there any further discussion I missed on the topic?
+> >
+> > My last post to previous series is here:
+> >
+> > https://lists.gnu.org/archive/html/qemu-devel/2018-05/msg05702.html
+> >
+> > In that, I was still confused on why we couldn't use the existing
+> > MemTxAttrs directly instead of the new IOMMU index (and I explained on
+> > why that was prefered at least to me). I didn't see replies
+> > afterwards.
 > 
-> Maybe we should for now just scratch the idea of an virtio-ramfb device.
-> Linux doesn't need it, and windows wouldn't use the virtio part of it so
-> a standalone ramfb device would work equally well.
+> Broadly speaking I didn't think I had any further better
+> explanation than I'd already given in that thread, eg here:
+> https://lists.gnu.org/archive/html/qemu-devel/2018-05/msg05250.html
+> and here:
+> https://lists.gnu.org/archive/html/qemu-devel/2018-05/msg05513.html
+> 
+> If you want to make a specific (detailed) counterproposal of a
+> different API, I'm happy to look at whether that works for
+> the use cases I care about and whether it's a nicer way to do it.
 
-If that works for you, it works for me best!
+I posted a few pesudo code (ok, it can actually compile...) to show
+what I meant.  Please have a look there:
 
-Thanks!
-Laszlo
+  [RFC 0/3] memory: enhance IOMMU notifier to support USER bit
+
+I very suspect I missed some important requirement there but I cannot
+really figure it out myself.  Hope these patches can either provide an
+alternative solution on the problem, or help me to figure out what I
+missed.   Thanks,
+
+-- 
+Peter Xu
