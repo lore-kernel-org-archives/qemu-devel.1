@@ -1,26 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59424)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33537)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1fQ6Nk-0005Po-DK
-	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 03:27:53 -0400
+	(envelope-from <peterx@redhat.com>) id 1fQ6ZL-0000Mt-AT
+	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 03:39:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1fQ6Ng-0005Th-F9
-	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 03:27:52 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:54266 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1fQ6Ng-0005TM-9g
-	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 03:27:48 -0400
-Date: Tue, 5 Jun 2018 09:27:46 +0200
-From: Gerd Hoffmann <kraxel@redhat.com>
-Message-ID: <20180605072746.v6xxabsbewiuw7ka@sirius.home.kraxel.org>
-References: <20180603092749.107476-1-marcel.apfelbaum@gmail.com>
-	<20180604042928-mutt-send-email-mst@kernel.org>
-	<23040757-b561-e0bf-a41d-38d3c44555ee@gmail.com>
+	(envelope-from <peterx@redhat.com>) id 1fQ6ZJ-0003by-NU
+	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 03:39:51 -0400
+Date: Tue, 5 Jun 2018 15:39:37 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20180605073937.GD9216@xz-mi>
+References: <20180604152941.20374-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <23040757-b561-e0bf-a41d-38d3c44555ee@gmail.com>
-Subject: Re: [Qemu-devel] [PATCH RFC] hw/pc: set q35 as the default x86
- machine
+In-Reply-To: <20180604152941.20374-1-peter.maydell@linaro.org>
+Subject: Re: [Qemu-devel] [PATCH v2 00/13] iommu: support txattrs,
+ support TCG execution, implement TZ MPC
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,27 +23,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, pbonzini@redhat.com, rth@twiddle.net, qemu-devel@nongnu.org, ehabkost@redhat.com
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-arm@nongnu.org, qemu-devel@nongnu.org, patches@linaro.org, Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>, Richard Henderson <rth@twiddle.net>, Paolo Bonzini <pbonzini@redhat.com>, Eric Auger <eric.auger@redhat.com>
 
-  Hi,
-
-> >   Add to that shortcuts like -cdrom
-> > stop working,
+On Mon, Jun 04, 2018 at 04:29:28PM +0100, Peter Maydell wrote:
+> Hi; this is v2 of my iommu patchset, which does:
+>  * support IOMMUs that are aware of memory transaction attributes and
+>    may generate different translations for different attributes
+>  * support TCG execution out of memory which is behind an IOMMU
+>  * implement the Arm TrustZone Memory Protection Controller
+>    (which needs both the above features in the IOMMU core code)
+>  * use the MPC in the mps2-an505 board
 > 
-> Maybe is fixable.
+> Patches 1-3 add the support for memory-transaction-aware
+> IOMMUs. The general approach is that we have the concept of an
+> IOMMU index (similar to the TCG MMU index), which selects which of
+> multiple possible translation tables in the IOMMU we're trying to use.
+> Most IOMMUs will support just a single index. When you register an
+> IOMMU notifier and when you call the translate method you have to
+> specify which IOMMU index you want. There's a method for getting the
+> index that applies for a particular set of transaction attributes.
+> All the current IOMMU implementations have just one iommu index, and
+> all the current users of the notify API assume that.
 
-Already fixed for ages.
+Hi, Peter,
 
-> I see marking Q35 as the default machine a first step.
+It seems that this series is still using the IOMMU index way.  In case
+I missed anything... Could you elaborate a bit on why this IOMMU index
+solution is preferred comparing to the way to pass in MemTxAttrs?  Or
+was there any further discussion I missed on the topic?
 
-Maybe the better option is to go the arm route:  Just don't define a
-default, so users have to specify pc or q35.  That will make them notice
-there is a world beside 'pc', and we also avoid breaking things
-silently.
+My last post to previous series is here:
 
-In case no machine type is given qemu can print some hints together with
-the error message.
+https://lists.gnu.org/archive/html/qemu-devel/2018-05/msg05702.html
 
-cheers,
-  Gerd
+In that, I was still confused on why we couldn't use the existing
+MemTxAttrs directly instead of the new IOMMU index (and I explained on
+why that was prefered at least to me). I didn't see replies
+afterwards.
+
+Frankly speaking I fully trust the expertise of you and all the
+reviewers.  I am just afraid I missed any context along the way.
+
+Thanks,
+
+-- 
+Peter Xu
