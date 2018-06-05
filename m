@@ -1,23 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36127)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36668)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fQAhO-0000U7-Ca
-	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 08:04:27 -0400
+	(envelope-from <laurent@vivier.eu>) id 1fQAiU-0001k8-9N
+	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 08:05:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fQAhJ-0005tA-Ec
-	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 08:04:26 -0400
-References: <1527671818-23809-1-git-send-email-thuth@redhat.com>
-	<1527671818-23809-4-git-send-email-thuth@redhat.com>
-	<20180604113619.0ef8ccbd.cohuck@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <d1cae0f9-7185-5b2d-0576-422747da7e78@redhat.com>
-Date: Tue, 5 Jun 2018 14:04:18 +0200
+	(envelope-from <laurent@vivier.eu>) id 1fQAiP-0006r9-Al
+	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 08:05:34 -0400
+Received: from mout.kundenserver.de ([217.72.192.73]:44341)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1fQAiP-0006q3-0e
+	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 08:05:29 -0400
+References: <20180531224911.23725-1-richard.henderson@linaro.org>
+	<20180531224911.23725-7-richard.henderson@linaro.org>
+	<788ee514-a026-d415-73ce-67cc996e6259@vivier.eu>
+	<149da730-950c-a527-2373-9cb0433543b1@linaro.org>
+	<CAFEAcA-h7Ef5yfOS3V_kR5_fCmhr-N6okHY9=N87M9Ld+8MVdA@mail.gmail.com>
+From: Laurent Vivier <laurent@vivier.eu>
+Message-ID: <54f54010-ad2d-7df0-8838-b2ddc7668875@vivier.eu>
+Date: Tue, 5 Jun 2018 14:05:25 +0200
 MIME-Version: 1.0
-In-Reply-To: <20180604113619.0ef8ccbd.cohuck@redhat.com>
+In-Reply-To: <CAFEAcA-h7Ef5yfOS3V_kR5_fCmhr-N6okHY9=N87M9Ld+8MVdA@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 3/3] pc-bios/s390-ccw/net: Try to load
- pxelinux.cfg file accoring to the UUID
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH 6/6] linux-user: Use *at functions to
+ implement interp_prefix
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,75 +32,23 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>
-Cc: qemu-s390x@nongnu.org, Viktor Mihajlovski <mihajlov@linux.vnet.ibm.com>, Christian Borntraeger <borntraeger@de.ibm.com>, qemu-devel@nongnu.org, Collin Walling <walling@linux.ibm.com>, Farhan Ali <alifm@linux.ibm.com>
+To: Peter Maydell <peter.maydell@linaro.org>, Richard Henderson <richard.henderson@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Evan Green <evgreen@chromium.org>
 
-On 04.06.2018 11:36, Cornelia Huck wrote:
-> On Wed, 30 May 2018 11:16:58 +0200
-> Thomas Huth <thuth@redhat.com> wrote:
->=20
->> With the STSI instruction, we can get the UUID of the current VM insta=
-nce,
->> so we can support loading pxelinux config files via UUID in the file n=
-ame,
->> too.
->>
->> Signed-off-by: Thomas Huth <thuth@redhat.com>
->> ---
->>  pc-bios/s390-ccw/netmain.c | 46 +++++++++++++++++++++++++++++++++++++=
-++++++++-
->>  1 file changed, 45 insertions(+), 1 deletion(-)
->>
->> diff --git a/pc-bios/s390-ccw/netmain.c b/pc-bios/s390-ccw/netmain.c
->> index e84bb2b..7ece302 100644
->> --- a/pc-bios/s390-ccw/netmain.c
->> +++ b/pc-bios/s390-ccw/netmain.c
->> @@ -235,6 +235,49 @@ static void net_release(filename_ip_t *fn_ip)
->>  }
->> =20
->>  /**
->> + * Retrieve the Universally Unique Identifier of the VM.
->> + * @return UUID string, or NULL in case of errors
->> + */
->> +static const char *get_uuid(void)
->> +{
->> +    register int r0 asm("0");
->> +    register int r1 asm("1");
->> +    uint8_t *mem, *buf, uuid[16];
->> +    int i, chk =3D 0;
->> +    static char uuid_str[37];
->> +
->> +    mem =3D malloc(2 * PAGE_SIZE);
->> +    if (!mem) {
->> +        puts("Out of memory ... can not get UUID.");
->> +        return NULL;
->> +    }
->> +    buf =3D (uint8_t *)(((uint64_t)mem + PAGE_SIZE - 1) & ~(PAGE_SIZE=
- - 1));
->> +    memset(buf, 0, PAGE_SIZE);
->> +
->> +    /* Get SYSIB 3.2.2 */
->> +    r0 =3D (3 << 28) | 2;
->> +    r1 =3D 2;
->> +    asm volatile(" stsi 0(%2)\n" : : "d" (r0), "d" (r1), "a" (buf)
->> +                 : "cc", "memory");
->=20
-> Maybe check for cc =3D=3D 3 here, just to be safe? (We can probably ass=
-ume
-> a dbct >=3D 1 if it is successful, I think.)
+Le 05/06/2018 à 12:52, Peter Maydell a écrit :
+> On 5 June 2018 at 06:27, Richard Henderson <richard.henderson@linaro.org> wrote:
+>> On Fedora 28, one can no longer build a static qemu.  We depend on libraries
+>> for which Fedora no longer ships static versions.
+> 
+> Do you mean you can't build the system binaries statically (that's
+> never really been very supported), or that you can't do a build
+> with configure --disable-system --disable-tools --static ?
+> 
+> The latter would be more concerning.
 
-Sure, I can add that check. In case it's not available, this should have
-been catched by the "if (!chk)" below, but let's better be safe than
-sorry here.
+On Fedora I have also to disable gcrypt, nettle and libiscsi because we
+don't have the statically linked libraries, but we don't need them with
+linux-user.
 
->> +
->> +    for (i =3D 0; i < 16; i++) {
->> +        uuid[i] =3D buf[8 * 4 + 12 * 4 + i];
->=20
-> Is there some way to make this offset less magic (offset of first vmdb
-> + offset of uuid inside vmdb)?
-
-Would a comment be sufficient? Or shall I copy the SysIB_322 structure
-from target/s390x/cpu.h over to the s390-ccw bios?
-
- Thomas
+Thanks,
+Laurent
