@@ -1,20 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37051)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37065)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1fQdjt-0003zD-9E
-	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 15:04:58 -0400
+	(envelope-from <mst@redhat.com>) id 1fQdk0-00044J-7N
+	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 15:05:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1fQdjs-0006q2-8I
-	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 15:04:57 -0400
-References: <20180606190407.6005-1-mreitz@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <ff5c4268-1d26-3e3e-3189-85c4d8b7715b@redhat.com>
-Date: Wed, 6 Jun 2018 21:04:48 +0200
+	(envelope-from <mst@redhat.com>) id 1fQdjx-0006rk-0O
+	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 15:05:04 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:60404 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1fQdjw-0006rY-OV
+	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 15:05:00 -0400
+Date: Wed, 6 Jun 2018 22:04:56 +0300
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20180606220431-mutt-send-email-mst@kernel.org>
+References: <20180521163203.26590-1-ross.zwisler@linux.intel.com>
+	<20180521163203.26590-4-ross.zwisler@linux.intel.com>
+	<20180605182243-mutt-send-email-mst@kernel.org>
+	<20180605164205.GA21034@linux.intel.com>
+	<CAPcyv4jSoFifTc05WGgxkEX6i7b12zYyB+VchJVW_+QPQzO7Fg@mail.gmail.com>
+	<20180605213547-mutt-send-email-mst@kernel.org>
+	<20180605220700.GB16066@linux.intel.com>
+	<CAPcyv4irudGth3+WZtgF4TjGL53s8mN70aVXpGWjj_Lc=7AMVg@mail.gmail.com>
+	<20180606165051.GC30568@linux.intel.com>
+	<20180606170033.GA29035@linux.intel.com>
 MIME-Version: 1.0
-In-Reply-To: <20180606190407.6005-1-mreitz@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="y8vpT2VJ0npAJbT8168tfsyqdE0webiid"
-Subject: Re: [Qemu-devel] [PATCH v3] iotests: Fix 219's timing
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180606170033.GA29035@linux.intel.com>
+Subject: Re: [Qemu-devel] [qemu PATCH v4 3/4] nvdimm,
+ acpi: support NFIT platform capabilities
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,87 +36,99 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Eric Blake <eblake@redhat.com>
+To: Ross Zwisler <ross.zwisler@linux.intel.com>
+Cc: Dan Williams <dan.j.williams@intel.com>, Eduardo Habkost <ehabkost@redhat.com>, linux-nvdimm <linux-nvdimm@lists.01.org>, Qemu Developers <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>, Igor Mammedov <imammedo@redhat.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---y8vpT2VJ0npAJbT8168tfsyqdE0webiid
-From: Max Reitz <mreitz@redhat.com>
-To: qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>,
- Eric Blake <eblake@redhat.com>
-Message-ID: <ff5c4268-1d26-3e3e-3189-85c4d8b7715b@redhat.com>
-Subject: Re: [PATCH v3] iotests: Fix 219's timing
-References: <20180606190407.6005-1-mreitz@redhat.com>
-In-Reply-To: <20180606190407.6005-1-mreitz@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On Wed, Jun 06, 2018 at 11:00:33AM -0600, Ross Zwisler wrote:
+> On Wed, Jun 06, 2018 at 10:50:51AM -0600, Ross Zwisler wrote:
+> > On Tue, Jun 05, 2018 at 03:21:30PM -0700, Dan Williams wrote:
+> > > On Tue, Jun 5, 2018 at 3:07 PM, Ross Zwisler
+> > > <ross.zwisler@linux.intel.com> wrote:
+> > > > On Tue, Jun 05, 2018 at 09:37:25PM +0300, Michael S. Tsirkin wrote:
+> > > >> On Tue, Jun 05, 2018 at 11:15:00AM -0700, Dan Williams wrote:
+> > > >> > On Tue, Jun 5, 2018 at 9:42 AM, Ross Zwisler
+> > > >> > <ross.zwisler@linux.intel.com> wrote:
+> > > >> > > On Tue, Jun 05, 2018 at 06:25:27PM +0300, Michael S. Tsirkin wrote:
+> > > >> > >> On Mon, May 21, 2018 at 10:32:02AM -0600, Ross Zwisler wrote:
+> > > >> > >> > Add a machine command line option to allow the user to control the Platform
+> > > >> > >> > Capabilities Structure in the virtualized NFIT.  This Platform Capabilities
+> > > >> > >> > Structure was added in ACPI 6.2 Errata A.
+> > > >> > >> >
+> > > >> > >> > Signed-off-by: Ross Zwisler <ross.zwisler@linux.intel.com>
+> > > >> > >>
+> > > >> > >> I tried playing with it and encoding the capabilities is
+> > > >> > >> quite awkward.
+> > > >> > >>
+> > > >> > >> Can we add bits for specific capabilities instead of nvdimm-cap?
+> > > >> > >>
+> > > >> > >> How about:
+> > > >> > >>
+> > > >> > >> "cpu-flush-on-power-loss-cap"
+> > > >> > >> "memory-flush-on-power-loss-cap"
+> > > >> > >> "byte-addressable-mirroring-cap"
+> > > >> > >
+> > > >> > > Hmmm...I don't like that as much because:
+> > > >> > >
+> > > >> > > a) It's very verbose.  Looking at my current qemu command line few other
+> > > >> > >    options require that many characters, and you'd commonly be defining more
+> > > >> > >    than one of these for a given VM.
+> > > >> > >
+> > > >> > > b) It means that the QEMU will need to be updated if/when new flags are added,
+> > > >> > >    because we'll have to have new options for each flag.  The current
+> > > >> > >    implementation is more future-proof because you can specify any flags
+> > > >> > >    value you want.
+> > > >> > >
+> > > >> > > However, if you feel strongly about this, I'll make the change.
+> > > >> >
+> > > >> > Straw-man: Could we do something similar with what we are doing in ndctl?
+> > > >> >
+> > > >> > enum ndctl_persistence_domain {
+> > > >> >         PERSISTENCE_NONE = 0,
+> > > >> >         PERSISTENCE_MEM_CTRL = 10,
+> > > >> >         PERSISTENCE_CPU_CACHE = 20,
+> > > >> >         PERSISTENCE_UNKNOWN = INT_MAX,
+> > > >> > };
+> > > >> >
+> > > >> > ...and have the command line take a number where "10" and "20" are
+> > > >> > supported today, but allows us to adapt to new persistence domains in
+> > > >> > the future.
+> > > >>
+> > > >> I'm fine with that except can we have symbolic names instead of numbers
+> > > >> on command line?
+> > > >>
+> > > >> --
+> > > >> MST
+> > > >
+> > > > Okay, we can move to the symbolic names.  Do you want them to be that long, or
+> > > > would:
+> > > >
+> > > > nvdimm-cap-cpu
+> > > > nvdimm-cap-mem-ctrl
+> > > > nvdimm-cap-mirroring
+> > > 
+> > > Wait, why is mirroring part of this?
+> > > 
+> > > I was thinking this option would be:
+> > > 
+> > >     --persistence-domain={cpu,mem-ctrl}
+> > > 
+> > > ...and try not to let ACPI specifics leak into the qemu command line
+> > > interface. For example PowerPC qemu could have a persistence domain
+> > > communicated via Open Firmware or some other mechanism.
+> > 
+> > Sure, this seems fine, though we may want to throw an "nvdimm" in the name
+> > somewhere so it's clear what the option affects.
+> > 
+> > nvdimm-persistence={cpu,mem-ctrl} maybe?
+> > 
+> > Michael, does this work for you?
+> 
+> Hmm...also, the version of these patches that used numeric values did go
+> upstream in QEMU.  So, do we need to leave that interface intact, and just add
+> a new one that uses symbolic names?  Or did you still just want to replace the
+> numeric one since it hasn't appeared in a QEMU release yet?
 
-On 2018-06-06 21:04, Max Reitz wrote:
-> 219 has two issues that may lead to sporadic failure, both of which are=
+The later. No release => no stable APIs.
 
-> the result of issuing query-jobs too early after a job has been
-> modified.  This can then lead to different results based on whether the=
-
-> modification has taken effect already or not.
->=20
-> First, query-jobs is issued right after the job has been created.
-> Besides its current progress possibly being in any random state (which
-> has already been taken care of), its total progress too is basically
-> arbitrary, because the job may not yet have been able to determine it.
-> This patch addresses this by just filtering the total progress, like
-> what has been done for the current progress already.  However, for more=
-
-> clarity, the filtering is changed to replace the values by a string
-> 'FILTERED' instead of deleting them.
->=20
-> Secondly, query-jobs is issued right after a job has been resumed.  The=
-
-> job may or may not yet have had the time to actually perform any I/O,
-> and thus its current progress may or may not have advanced.  To make
-> sure it has indeed advanced (which is what the reference output already=
-
-> assumes), keep querying it until it has.
->=20
-> Signed-off-by: Max Reitz <mreitz@redhat.com>
-> ---
-> v3: Keep querying until the job has advanced instead of waiting for a
->     fixed amount of time [Peter in v2, Eric in v1]
-> ---
->  tests/qemu-iotests/219     | 27 +++++++++++++++++++++------
->  tests/qemu-iotests/219.out | 10 +++++-----
->  2 files changed, 26 insertions(+), 11 deletions(-)
->=20
-> diff --git a/tests/qemu-iotests/219 b/tests/qemu-iotests/219
-> index 898a26eef0..1a0329c6a0 100755
-> --- a/tests/qemu-iotests/219
-> +++ b/tests/qemu-iotests/219
-> @@ -20,6 +20,7 @@
->  # Check using the job-* QMP commands with block jobs
-> =20
->  import iotests
-> +import time
-
-Urgh, now of course we don't need this any more...  Will send a v4.
-
-Max
-
-
---y8vpT2VJ0npAJbT8168tfsyqdE0webiid
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlsYMFAACgkQ9AfbAGHV
-z0Ca7Af/QQpAq6a1USK1AFD/ixqhxaHy0Hu+6pANI4WcCbtjYMpEcz9McRKDfXdK
-XsQWeLRP62nVuhrrWfeW78JVtKPFueSAo8rUqjpy9ws/abHc1Pe4rov6HVe/wSpC
-RB1E/Vo49h2AjSblgeubR6f4dJHrf4IlyTsi9uGJX0Z9J8zep87DWgzoa1scZyed
-gS20oxFENXVGK7qH6YZIYoPTe9igmAXyl2vblZf8iT1yyQwYomVxC9LlOhvg5aon
-EitOF546xRbMppMGC/9BgE5m7SqnHS21/pWcIFtPIUWOhO8ui9DdNW9HeMuJB6Y2
-sHKRR62QOnDF07vR+B0KoxLyIpKw1Q==
-=dA/+
------END PGP SIGNATURE-----
-
---y8vpT2VJ0npAJbT8168tfsyqdE0webiid--
+-- 
+MST
