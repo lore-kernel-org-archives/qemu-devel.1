@@ -1,32 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42147)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42969)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1fQSmT-00083S-9y
-	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 03:22:54 -0400
+	(envelope-from <dovgaluk@ispras.ru>) id 1fQSta-0002CG-4v
+	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 03:30:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1fQSmQ-00050J-68
-	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 03:22:53 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:47748 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1fQSmQ-000502-10
-	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 03:22:50 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.6])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 7DCE9401EF23
-	for <qemu-devel@nongnu.org>; Wed,  6 Jun 2018 07:22:49 +0000 (UTC)
-Date: Wed, 6 Jun 2018 09:22:47 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20180606092247.54bd320d@redhat.com>
-In-Reply-To: <20180605181246.GN7451@localhost.localdomain>
-References: <1528207243-268226-1-git-send-email-imammedo@redhat.com>
-	<1528207243-268226-2-git-send-email-imammedo@redhat.com>
-	<20180605181246.GN7451@localhost.localdomain>
+	(envelope-from <dovgaluk@ispras.ru>) id 1fQStW-0000pe-Pm
+	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 03:30:14 -0400
+Received: from mail.ispras.ru ([83.149.199.45]:45490)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <dovgaluk@ispras.ru>) id 1fQStW-0000nQ-H9
+	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 03:30:10 -0400
+From: "Pavel Dovgalyuk" <dovgaluk@ispras.ru>
+References: <152819515565.30857.16834004920507717324.stgit@pasha-ThinkPad-T60>
+	<152819516132.30857.1700667353240369481.stgit@pasha-ThinkPad-T60>
+	<aac4626c-c379-13b6-f505-e6ea12fea1a1@redhat.com>
+In-Reply-To: <aac4626c-c379-13b6-f505-e6ea12fea1a1@redhat.com>
+Date: Wed, 6 Jun 2018 10:30:10 +0300
+Message-ID: <000a01d3fd68$33d85cc0$9b891640$@ru>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain;
+	charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3 1/2] cli: Don't run early event loop if
- no --preconfig was specified
+Content-Language: ru
+Subject: Re: [Qemu-devel] [RFC PATCH v2 1/7] tcg: add headers for non-target
+ helpers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,20 +31,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: qemu-devel@nongnu.org, berrange@redhat.com, mreitz@redhat.com, pbonzini@redhat.com, ldoktor@redhat.com
+To: 'Thomas Huth' <thuth@redhat.com>, 'Pavel Dovgalyuk' <Pavel.Dovgaluk@ispras.ru>, qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org, maria.klimushenkova@ispras.ru, pbonzini@redhat.com, vilanova@ac.upc.edu
 
-On Tue, 5 Jun 2018 15:12:46 -0300
-Eduardo Habkost <ehabkost@redhat.com> wrote:
+> From: Thomas Huth [mailto:thuth@redhat.com]
+> On 05.06.2018 12:39, Pavel Dovgalyuk wrote:
+> > From: Pavel Dovgalyuk <pavel.dovgaluk@gmail.com>
+> >
+> > This patch adds functions and headers for adding the helpers from
+> > the modules other than the target translators.
+> >
+> > Signed-off-by: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
+> > ---
+> >  include/exec/helper-register.h |   53 ++++++++++++++++++++++++++++++++++++++++
+> >  tcg/tcg.c                      |   12 +++++++++
+> >  tcg/tcg.h                      |    3 ++
+> >  3 files changed, 68 insertions(+)
+> >  create mode 100644 include/exec/helper-register.h
+> >
+> > diff --git a/include/exec/helper-register.h b/include/exec/helper-register.h
+> > new file mode 100644
+> > index 0000000..aeface9
+> > --- /dev/null
+> > +++ b/include/exec/helper-register.h
+> > @@ -0,0 +1,53 @@
+> > +#ifndef HELPER_REGISTER_H
+> > +#define HELPER_REGISTER_H
+> > +
+> > +#include "exec/helper-head.h"
+> > +
+> > +/* Need one more level of indirection before stringification
+> > +   to get all the macros expanded first.  */
+> > +#define str(s) #s
+> 
+> Could you use tostring() from include/qemu/compiler.h instead?
 
-> On Tue, Jun 05, 2018 at 04:00:42PM +0200, Igor Mammedov wrote:
-> [...]
-> > Based on
-> >   From: Michal Privoznik <mprivozn@redhat.com>
-> >   Subject: [PATCH] cli: Don't run early event loop if no --preconfig was specified
-> >   Message-Id: <ad910973c593c5ac2fed3a10ea958f7e9c12f82c.1527935663.git.mprivozn@redhat.com>  
-> 
-> Michal's patch is already queued on machine-next.  It should be
-> dropped if this patch gets included, correct?
-> 
-yep, it should be dropped as it has migrations issues.
+
+Thanks, fixed.
+
+BTW, this was a copy-paste from helper-tcg.h
+
+Pavel Dovgalyuk
