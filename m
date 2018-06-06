@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35091)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37129)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1fQOHg-0008Pw-Aj
-	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 22:34:49 -0400
+	(envelope-from <jasowang@redhat.com>) id 1fQOVq-0003P9-1O
+	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 22:49:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1fQOHd-0000XF-5t
-	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 22:34:48 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:39240 helo=mx1.redhat.com)
+	(envelope-from <jasowang@redhat.com>) id 1fQOVm-00073P-Tx
+	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 22:49:26 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:60392 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1fQOHd-0000WJ-0l
-	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 22:34:45 -0400
+	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1fQOVm-00073E-Np
+	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 22:49:22 -0400
 References: <1528225683-11413-1-git-send-email-wexu@redhat.com>
+	<1528225683-11413-2-git-send-email-wexu@redhat.com>
 From: Jason Wang <jasowang@redhat.com>
-Message-ID: <22f43a8e-7e98-e034-e9f7-1046f4b4b554@redhat.com>
-Date: Wed, 6 Jun 2018 10:34:32 +0800
+Message-ID: <8a331129-62f2-a268-38e3-6dfafe28eeae@redhat.com>
+Date: Wed, 6 Jun 2018 10:49:16 +0800
 MIME-Version: 1.0
-In-Reply-To: <1528225683-11413-1-git-send-email-wexu@redhat.com>
+In-Reply-To: <1528225683-11413-2-git-send-email-wexu@redhat.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC v2 0/8] packed ring virtio-net userspace
- backend support
+Subject: Re: [Qemu-devel] [RFC v2 1/8] virtio: feature bit, data structure,
+ init for 1.1
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,93 +37,140 @@ Cc: tiwei.bie@intel.com, mst@redhat.com, jfreimann@redhat.com
 On 2018=E5=B9=B406=E6=9C=8806=E6=97=A5 03:07, wexu@redhat.com wrote:
 > From: Wei Xu <wexu@redhat.com>
 >
-> Todo:
-> - address Rx slow performance
-> - event index interrupt suppression test
-
-Tiwei's code support event index, you can try with that.
-
-Actually, unless you disable event_idx explicitly, it work by default.
-
+> New feature bit and members for packed ring.
 >
-> v1->v2
-> - sync to tiwei's v5
-> - reuse memory cache function with 1.0
-> - dropped detach patch and notification helper(04 & 05 in v1)
-> - guest virtio-net driver unload/reload support
-> - event suppression support(not tested)
-> - addressed feedback from v1
->
-> About guest virtio-net load/unload:
-> Since last_avail, avail_wrap_count, used_idx and used_wrap_count are
-> all 16 or bool type variables, so I turned to merge them to
-> 'vhost_vring_state.num' in stead of introducing a new case
-> in handling ioctl, test has been done with a tweak in kernel side like:
-
-s.num is unsigned int which is 32bit, but you want to hold 2 16bit vars=20
-and a boolean.
-
-So I'm afraid it won't work...
-
->
-> --- a/drivers/vhost/vhost.c
-> +++ b/drivers/vhost/vhost.c
-> @@ -1439,10 +1439,16 @@ long vhost_vring_ioctl(struct vhost_dev *d, int=
- ioctl, void __user *argp)
->              r =3D -EFAULT;
->              break;
->          }
-> -               if (s.num > 0xffff) {
-> -                       r =3D -EINVAL;
-> -                       break;
-> -               }
-> +               if (vhost_has_feature(vq, VIRTIO_F_RING_PACKED)) {
-> +                       vq->avail_wrap_counter =3D (bool)(uint16_t)(s.n=
-um >> 16);
-> +                       vq->last_used_idx =3D (uint16_t)(s.num >> 32);
-> +                       vq->used_wrap_counter =3D (bool)(uint16_t)(s.nu=
-m >> 48);
-> +                } else {
-> +                    if (s.num > 0xffff) {
-> +                            r =3D -EINVAL;
-> +                            break;
-> +                    }
-> +                }
->          vq->last_avail_idx =3D s.num;
->          /* Forget the cached index value. */
->          vq->avail_idx =3D vq->last_avail_idx;
-> @@ -1450,8 +1456,15 @@ long vhost_vring_ioctl(struct vhost_dev *d, int =
-ioctl, void __user *argp)
->      case VHOST_GET_VRING_BASE:
->          s.index =3D idx;
->          s.num =3D vq->last_avail_idx;
-> +               if (vhost_has_feature(vq, VIRTIO_F_RING_PACKED)) {
-> +                       s.num |=3D vq->avail_wrap_counter << 16;
-> +                       s.num |=3D vq->last_used_idx << 32;
-> +                       s.num |=3D vq->used_wrap_counter << 48;
-> +                }
->          if (copy_to_user(argp, &s, sizeof s))
->              r =3D -EFAULT;
-> +               if (vhost_has_feature(vq, VIRTIO_F_RING_PACKED))
-> +                       s.num |=3D vq->avail_wrap_counter << 31;
->          break;
->      case VHOST_SET_VRING_ADDR:
->          if (copy_from_user(&a, argp, sizeof a)) {
->
-> Wei Xu (8):
->    virtio: feature bit, data structure, init for packed ring
->    virtio: memory cache for packed ring
->    virtio: empty check and desc read for packed ring
->    virtio: get avail bytes check for packed ring
->    virtio: queue pop support for packed ring
->    virtio: flush/push support for packed ring
->    virtio: event suppression support for packed ring
->    virtio: support guest driver reload for vhost-net
->
->   hw/net/vhost_net.c                             |   2 +
->   hw/virtio/virtio.c                             | 677 ++++++++++++++++=
+> Signed-off-by: Wei Xu <wexu@redhat.com>
+> ---
+>   hw/net/vhost_net.c                             |  2 ++
+>   hw/virtio/virtio.c                             | 27 +++++++++++++++++=
 +++++++--
->   include/hw/virtio/virtio.h                     |   4 +-
->   include/standard-headers/linux/virtio_config.h |  15 +
->   4 files changed, 649 insertions(+), 49 deletions(-)
+>   include/hw/virtio/virtio.h                     |  4 +++-
+>   include/standard-headers/linux/virtio_config.h |  2 ++
+>   4 files changed, 32 insertions(+), 3 deletions(-)
 >
+> diff --git a/hw/net/vhost_net.c b/hw/net/vhost_net.c
+> index e037db6..f593086 100644
+> --- a/hw/net/vhost_net.c
+> +++ b/hw/net/vhost_net.c
+> @@ -53,6 +53,7 @@ static const int kernel_feature_bits[] =3D {
+>       VIRTIO_F_VERSION_1,
+>       VIRTIO_NET_F_MTU,
+>       VIRTIO_F_IOMMU_PLATFORM,
+> +    VIRTIO_F_RING_PACKED,
+>       VHOST_INVALID_FEATURE_BIT
+>   };
+>  =20
+> @@ -78,6 +79,7 @@ static const int user_feature_bits[] =3D {
+>       VIRTIO_NET_F_MRG_RXBUF,
+>       VIRTIO_NET_F_MTU,
+>       VIRTIO_F_IOMMU_PLATFORM,
+> +    VIRTIO_F_RING_PACKED,
+
+This could be another patch for enabling packed ring for vhost. So it=20
+should be done in/after the patch of vhost support but not here.
+
+>  =20
+>       /* This bit implies RARP isn't sent by QEMU out of band */
+>       VIRTIO_NET_F_GUEST_ANNOUNCE,
+> diff --git a/hw/virtio/virtio.c b/hw/virtio/virtio.c
+> index 006d3d1..e192a9a 100644
+> --- a/hw/virtio/virtio.c
+> +++ b/hw/virtio/virtio.c
+> @@ -39,6 +39,13 @@ typedef struct VRingDesc
+>       uint16_t next;
+>   } VRingDesc;
+>  =20
+> +typedef struct VRingDescPacked {
+> +    uint64_t addr;
+> +    uint32_t len;
+> +    uint16_t id;
+> +    uint16_t flags;
+> +} VRingDescPacked;
+> +
+>   typedef struct VRingAvail
+>   {
+>       uint16_t flags;
+> @@ -62,8 +69,14 @@ typedef struct VRingUsed
+>   typedef struct VRingMemoryRegionCaches {
+>       struct rcu_head rcu;
+>       MemoryRegionCache desc;
+> -    MemoryRegionCache avail;
+> -    MemoryRegionCache used;
+> +    union {
+> +        MemoryRegionCache avail;
+> +        MemoryRegionCache driver;
+> +    };
+> +    union {
+> +        MemoryRegionCache used;
+> +        MemoryRegionCache device;
+> +    };
+>   } VRingMemoryRegionCaches;
+>  =20
+>   typedef struct VRing
+> @@ -77,6 +90,11 @@ typedef struct VRing
+>       VRingMemoryRegionCaches *caches;
+>   } VRing;
+>  =20
+> +typedef struct VRingPackedDescEvent {
+> +    uint16_t off_wrap;
+> +    uint16_t flags;
+> +} VRingPackedDescEvent ;
+> +
+>   struct VirtQueue
+>   {
+>       VRing vring;
+> @@ -89,6 +107,9 @@ struct VirtQueue
+>  =20
+>       uint16_t used_idx;
+>  =20
+> +    bool avail_wrap_counter;
+> +    bool used_wrap_counter;
+> +
+>       /* Last used index value we have signalled on */
+>       uint16_t signalled_used;
+>  =20
+> @@ -1213,6 +1234,8 @@ void virtio_reset(void *opaque)
+>           vdev->vq[i].last_avail_idx =3D 0;
+>           vdev->vq[i].shadow_avail_idx =3D 0;
+>           vdev->vq[i].used_idx =3D 0;
+> +        vdev->vq[i].avail_wrap_counter =3D true;
+> +        vdev->vq[i].used_wrap_counter =3D true;
+>           virtio_queue_set_vector(vdev, i, VIRTIO_NO_VECTOR);
+>           vdev->vq[i].signalled_used =3D 0;
+>           vdev->vq[i].signalled_used_valid =3D false;
+> diff --git a/include/hw/virtio/virtio.h b/include/hw/virtio/virtio.h
+> index 098bdaa..4a7fb21 100644
+> --- a/include/hw/virtio/virtio.h
+> +++ b/include/hw/virtio/virtio.h
+> @@ -262,7 +262,9 @@ typedef struct VirtIORNGConf VirtIORNGConf;
+>       DEFINE_PROP_BIT64("any_layout", _state, _field, \
+>                         VIRTIO_F_ANY_LAYOUT, true), \
+>       DEFINE_PROP_BIT64("iommu_platform", _state, _field, \
+> -                      VIRTIO_F_IOMMU_PLATFORM, false)
+> +                      VIRTIO_F_IOMMU_PLATFORM, false), \
+> +    DEFINE_PROP_BIT64("ring_packed", _state, _field, \
+> +                      VIRTIO_F_RING_PACKED, false)
+
+This is wrong. Even if default is false, setting it to true will break=20
+everything. Please move this to the end of the series.
+
+>  =20
+>   hwaddr virtio_queue_get_desc_addr(VirtIODevice *vdev, int n);
+>   hwaddr virtio_queue_get_avail_addr(VirtIODevice *vdev, int n);
+> diff --git a/include/standard-headers/linux/virtio_config.h b/include/s=
+tandard-headers/linux/virtio_config.h
+> index b777069..6ee5529 100644
+> --- a/include/standard-headers/linux/virtio_config.h
+> +++ b/include/standard-headers/linux/virtio_config.h
+> @@ -71,4 +71,6 @@
+>    * this is for compatibility with legacy systems.
+>    */
+>   #define VIRTIO_F_IOMMU_PLATFORM		33
+> +
+> +#define VIRTIO_F_RING_PACKED		34
+>   #endif /* _LINUX_VIRTIO_CONFIG_H */
+
+For formal version, it's better to have to just do a header sync in an=20
+independent patch.
+
+Thanks
