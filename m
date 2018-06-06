@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50043)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52738)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fQann-0005c2-T7
-	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 11:56:50 -0400
+	id 1fQauf-0001Zb-Um
+	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 12:03:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fQanl-0008HD-FN
-	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 11:56:48 -0400
+	id 1fQaub-0003j5-QG
+	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 12:03:53 -0400
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
 References: <cover.1528291908.git.balaton@eik.bme.hu>
-	<53f9d0b04374a3f4449af65ce01bd68dbe757ab5.1528291908.git.balaton@eik.bme.hu>
+	<8c404c8c4ee1bfd2e4d079877d481094f797df8f.1528291908.git.balaton@eik.bme.hu>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <428ea537-a8d7-1c7c-7052-ea959797022d@amsat.org>
-Date: Wed, 6 Jun 2018 12:56:32 -0300
+Message-ID: <6aa1bc4e-a4b0-d7be-b9eb-85dfe8c06781@amsat.org>
+Date: Wed, 6 Jun 2018 13:03:32 -0300
 MIME-Version: 1.0
-In-Reply-To: <53f9d0b04374a3f4449af65ce01bd68dbe757ab5.1528291908.git.balaton@eik.bme.hu>
+In-Reply-To: <8c404c8c4ee1bfd2e4d079877d481094f797df8f.1528291908.git.balaton@eik.bme.hu>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v2 1/8] ppc4xx_i2c: Clean up and improve
- error logging
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 5/8] hw/timer: Add basic M41T80 emulation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,237 +32,188 @@ To: BALATON Zoltan <balaton@eik.bme.hu>, qemu-devel@nongnu.org, qemu-ppc@nongnu.
 Cc: Alexander Graf <agraf@suse.de>, David Gibson <david@gibson.dropbear.id.au>
 
 On 06/06/2018 10:31 AM, BALATON Zoltan wrote:
-> Make it more readable by converting register indexes to decimal
-> (avoids lot of superfluous 0x0) and distinguish errors caused by
-> accessing non-existent vs. unimplemented registers.
-> No functional change.
+> Basic emulation of the M41T80 serial (I2C) RTC chip. Only getting time
+> of day is implemented. Setting time and RTC alarm are not supported.
 > 
 > Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
 > ---
->  hw/i2c/ppc4xx_i2c.c | 94 +++++++++++++++++++++++++++++------------------------
->  1 file changed, 51 insertions(+), 43 deletions(-)
+>  MAINTAINERS                     |   1 +
+>  default-configs/ppc-softmmu.mak |   1 +
+>  hw/timer/Makefile.objs          |   1 +
+>  hw/timer/m41t80.c               | 117 ++++++++++++++++++++++++++++++++++++++++
+>  4 files changed, 120 insertions(+)
+>  create mode 100644 hw/timer/m41t80.c
 > 
-> diff --git a/hw/i2c/ppc4xx_i2c.c b/hw/i2c/ppc4xx_i2c.c
-> index ab64d19..d1936db 100644
-> --- a/hw/i2c/ppc4xx_i2c.c
-> +++ b/hw/i2c/ppc4xx_i2c.c
-> @@ -31,7 +31,7 @@
->  #include "hw/hw.h"
->  #include "hw/i2c/ppc4xx_i2c.h"
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index 41cd373..9e13bc1 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -826,6 +826,7 @@ M: BALATON Zoltan <balaton@eik.bme.hu>
+>  L: qemu-ppc@nongnu.org
+>  S: Maintained
+>  F: hw/ide/sii3112.c
+> +F: hw/timer/m41t80.c
 >  
-> -#define PPC4xx_I2C_MEM_SIZE 0x12
-> +#define PPC4xx_I2C_MEM_SIZE 18
+>  SH4 Machines
+>  ------------
+> diff --git a/default-configs/ppc-softmmu.mak b/default-configs/ppc-softmmu.mak
+> index 7d0dc2f..9fbaadc 100644
+> --- a/default-configs/ppc-softmmu.mak
+> +++ b/default-configs/ppc-softmmu.mak
+> @@ -27,6 +27,7 @@ CONFIG_SM501=y
+>  CONFIG_IDE_SII3112=y
+>  CONFIG_I2C=y
+>  CONFIG_BITBANG_I2C=y
+> +CONFIG_M41T80=y
+>  
+>  # For Macs
+>  CONFIG_MAC=y
+> diff --git a/hw/timer/Makefile.objs b/hw/timer/Makefile.objs
+> index 8b27a4b..e16b2b9 100644
+> --- a/hw/timer/Makefile.objs
+> +++ b/hw/timer/Makefile.objs
+> @@ -6,6 +6,7 @@ common-obj-$(CONFIG_CADENCE) += cadence_ttc.o
+>  common-obj-$(CONFIG_DS1338) += ds1338.o
+>  common-obj-$(CONFIG_HPET) += hpet.o
+>  common-obj-$(CONFIG_I8254) += i8254_common.o i8254.o
+> +common-obj-$(CONFIG_M41T80) += m41t80.o
+>  common-obj-$(CONFIG_M48T59) += m48t59.o
+>  ifeq ($(CONFIG_ISA_BUS),y)
+>  common-obj-$(CONFIG_M48T59) += m48t59-isa.o
+> diff --git a/hw/timer/m41t80.c b/hw/timer/m41t80.c
+> new file mode 100644
+> index 0000000..9dbdb1b
+> --- /dev/null
+> +++ b/hw/timer/m41t80.c
+> @@ -0,0 +1,117 @@
+> +/*
+> + * M41T80 serial rtc emulation
+> + *
+> + * Copyright (c) 2018 BALATON Zoltan
+> + *
+> + * This work is licensed under the GNU GPL license version 2 or later.
+> + *
+> + */
+> +
+> +#include "qemu/osdep.h"
+> +#include "qemu/log.h"
+> +#include "qemu/timer.h"
+> +#include "qemu/bcd.h"
+> +#include "hw/i2c/i2c.h"
+> +
+> +#define TYPE_M41T80 "m41t80"
+> +#define M41T80(obj) OBJECT_CHECK(M41t80State, (obj), TYPE_M41T80)
+> +
+> +typedef struct M41t80State {
+> +    I2CSlave parent_obj;
+> +    int8_t addr;
+> +} M41t80State;
+> +
+> +static void m41t80_realize(DeviceState *dev, Error **errp)
+> +{
+> +    M41t80State *s = M41T80(dev);
+> +
+> +    s->addr = -1;
+> +}
+> +
+> +static int m41t80_send(I2CSlave *i2c, uint8_t data)
+> +{
+> +    M41t80State *s = M41T80(i2c);
+> +
+> +    if (s->addr < 0) {
+> +        s->addr = data;
+> +    } else {
+> +        s->addr++;
+> +    }
 
-This looks weird, it seems all memory range sizes are in hex in other
-QEMU devices.
+What about adding enum i2c_event in M41t80State and use the enum here
+rather than the addr < 0? Also this wrap at INT8_MAX = 127, is this
+expected?
 
->  
->  #define IIC_CNTL_PT         (1 << 0)
->  #define IIC_CNTL_READ       (1 << 1)
-> @@ -70,7 +70,7 @@ static void ppc4xx_i2c_reset(DeviceState *s)
->      i2c->intrmsk = 0;
->      i2c->xfrcnt = 0;
->      i2c->xtcntlss = 0;
-> -    i2c->directcntl = 0x0f;
-> +    i2c->directcntl = 0xf;
->      i2c->intr = 0;
->  }
->  
-> @@ -85,7 +85,7 @@ static uint64_t ppc4xx_i2c_readb(void *opaque, hwaddr addr, unsigned int size)
->      uint64_t ret;
->  
->      switch (addr) {
-> -    case 0x00:
+> +    return 0;
+> +}
+> +
+> +static int m41t80_recv(I2CSlave *i2c)
+> +{
+> +    M41t80State *s = M41T80(i2c);
+> +    struct tm now;
+> +    qemu_timeval tv;
+
+       int8_t addr;
+
+> +
+> +    if (s->addr < 0) {
+> +        s->addr = 0;
+> +    }
+
+       addr = s->addr++;
+
+So you can simply use 'addr' bellow.
+
+> +    if (s->addr >= 1 && s->addr <= 7) {
+> +        qemu_get_timedate(&now, -1);
+> +    }
+> +    switch (s->addr++) {
 > +    case 0:
->          ret = i2c->mdata;
->          if (ppc4xx_i2c_is_master(i2c)) {
->              ret = 0xff;
-> @@ -139,58 +139,62 @@ static uint64_t ppc4xx_i2c_readb(void *opaque, hwaddr addr, unsigned int size)
->                            TYPE_PPC4xx_I2C, __func__);
->          }
->          break;
-> -    case 0x02:
+> +        qemu_gettimeofday(&tv);
+> +        return to_bcd(tv.tv_usec / 10000);
+> +    case 1:
+> +        return to_bcd(now.tm_sec);
 > +    case 2:
->          ret = i2c->sdata;
->          break;
-> -    case 0x04:
+> +        return to_bcd(now.tm_min);
+> +    case 3:
+> +        return to_bcd(now.tm_hour);
 > +    case 4:
->          ret = i2c->lmadr;
->          break;
-> -    case 0x05:
+> +        return to_bcd(now.tm_wday);
 > +    case 5:
->          ret = i2c->hmadr;
->          break;
-> -    case 0x06:
+> +        return to_bcd(now.tm_mday);
 > +    case 6:
->          ret = i2c->cntl;
->          break;
-> -    case 0x07:
+> +        return to_bcd(now.tm_mon + 1);
 > +    case 7:
->          ret = i2c->mdcntl;
->          break;
-> -    case 0x08:
-> +    case 8:
->          ret = i2c->sts;
->          break;
-> -    case 0x09:
-> +    case 9:
->          ret = i2c->extsts;
->          break;
-> -    case 0x0A:
-> +    case 10:
->          ret = i2c->lsadr;
->          break;
-> -    case 0x0B:
-> +    case 11:
->          ret = i2c->hsadr;
->          break;
-> -    case 0x0C:
-> +    case 12:
->          ret = i2c->clkdiv;
->          break;
-> -    case 0x0D:
-> +    case 13:
->          ret = i2c->intrmsk;
->          break;
-> -    case 0x0E:
-> +    case 14:
->          ret = i2c->xfrcnt;
->          break;
-> -    case 0x0F:
-> +    case 15:
->          ret = i2c->xtcntlss;
->          break;
-> -    case 0x10:
-> +    case 16:
->          ret = i2c->directcntl;
->          break;
-> -    case 0x11:
-> +    case 17:
->          ret = i2c->intr;
->          break;
->      default:
-> -        qemu_log_mask(LOG_GUEST_ERROR, "[%s]%s: Bad address at offset 0x%"
-> -                      HWADDR_PRIx "\n", TYPE_PPC4xx_I2C, __func__, addr);
-> +        if (addr < PPC4xx_I2C_MEM_SIZE) {
-> +            qemu_log_mask(LOG_UNIMP, "%s: Unimplemented register 0x%"
-> +                          HWADDR_PRIx "\n", __func__, addr);
-> +        } else {
-> +            qemu_log_mask(LOG_GUEST_ERROR, "%s: Bad address 0x%"
-> +                          HWADDR_PRIx "\n", __func__, addr);
-> +        }
->          ret = 0;
->          break;
->      }
-> -
->      return ret;
->  }
->  
-> @@ -200,7 +204,7 @@ static void ppc4xx_i2c_writeb(void *opaque, hwaddr addr, uint64_t value,
->      PPC4xxI2CState *i2c = opaque;
->  
->      switch (addr) {
-> -    case 0x00:
-> +    case 0:
->          i2c->mdata = value;
->          if (!i2c_bus_busy(i2c->bus)) {
->              /* assume we start a write transfer */
-> @@ -225,19 +229,19 @@ static void ppc4xx_i2c_writeb(void *opaque, hwaddr addr, uint64_t value,
->              }
->          }
->          break;
-> -    case 0x02:
-> +    case 2:
->          i2c->sdata = value;
->          break;
-> -    case 0x04:
-> +    case 4:
->          i2c->lmadr = value;
->          if (i2c_bus_busy(i2c->bus)) {
->              i2c_end_transfer(i2c->bus);
->          }
->          break;
-> -    case 0x05:
-> +    case 5:
->          i2c->hmadr = value;
->          break;
-> -    case 0x06:
-> +    case 6:
->          i2c->cntl = value;
->          if (i2c->cntl & IIC_CNTL_PT) {
->              if (i2c->cntl & IIC_CNTL_READ) {
-> @@ -263,32 +267,31 @@ static void ppc4xx_i2c_writeb(void *opaque, hwaddr addr, uint64_t value,
->              }
->          }
->          break;
-> -    case 0x07:
-> -        i2c->mdcntl = value & 0xDF;
-> +    case 7:
-> +        i2c->mdcntl = value & 0xdf;
->          break;
-> -    case 0x08:
-> -        i2c->sts &= ~(value & 0x0A);
-> +    case 8:
-> +        i2c->sts &= ~(value & 0xa);
-
-'value & 0x0a' implicitly denotes than 'value' is a 8-bit register.
-Matter of taste...
-
->          break;
-> -    case 0x09:
-> -        i2c->extsts &= ~(value & 0x8F);
-> +    case 9:
-> +        i2c->extsts &= ~(value & 0x8f);
->          break;
-> -    case 0x0A:
-> +    case 10:
->          i2c->lsadr = value;
-> -        /*i2c_set_slave_address(i2c->bus, i2c->lsadr);*/
->          break;
-> -    case 0x0B:
-> +    case 11:
->          i2c->hsadr = value;
->          break;
-> -    case 0x0C:
-> +    case 12:
->          i2c->clkdiv = value;
->          break;
-> -    case 0x0D:
-> +    case 13:
->          i2c->intrmsk = value;
->          break;
-> -    case 0x0E:
-> +    case 14:
->          i2c->xfrcnt = value & 0x77;
->          break;
-> -    case 0x0F:
-> +    case 15:
->          if (value & IIC_XTCNTLSS_SRST) {
->              /* Is it actually a full reset? U-Boot sets some regs before */
->              ppc4xx_i2c_reset(DEVICE(i2c));
-> @@ -296,15 +299,20 @@ static void ppc4xx_i2c_writeb(void *opaque, hwaddr addr, uint64_t value,
->          }
->          i2c->xtcntlss = value;
->          break;
-> -    case 0x10:
-> +    case 16:
->          i2c->directcntl = value & 0x7;
->          break;
-> -    case 0x11:
-> +    case 17:
->          i2c->intr = value;
->          break;
->      default:
-> -        qemu_log_mask(LOG_GUEST_ERROR, "[%s]%s: Bad address at offset 0x%"
-> -                      HWADDR_PRIx "\n", TYPE_PPC4xx_I2C, __func__, addr);
-> +        if (addr < PPC4xx_I2C_MEM_SIZE) {
-> +            qemu_log_mask(LOG_UNIMP, "%s: Unimplemented register 0x%"
-> +                          HWADDR_PRIx "\n", __func__, addr);
-> +        } else {
-> +            qemu_log_mask(LOG_GUEST_ERROR, "%s: Bad address 0x%"
-> +                          HWADDR_PRIx "\n", __func__, addr);
-> +        }
->          break;
->      }
->  }
+> +        return to_bcd(now.tm_year % 100);
+> +    case 8 ... 19:
+> +        qemu_log_mask(LOG_UNIMP, "\n%s: unimplemented register: %d\n",
+> +                      __func__, s->addr - 1);
+> +        return 0;
+> +    default:
+> +        qemu_log_mask(LOG_GUEST_ERROR, "\n%s: invalid register: %d",
+> +                      __func__, s->addr - 1);
+> +        return 0;
+> +    }
+> +}
+> +
+> +static int m41t80_event(I2CSlave *i2c, enum i2c_event event)
+> +{
+> +    M41t80State *s = M41T80(i2c);
+> +
+> +    if (event == I2C_START_SEND) {
+> +        s->addr = -1;
+> +    }
+> +    return 0;
+> +}
+> +
+> +static void m41t80_class_init(ObjectClass *klass, void *data)
+> +{
+> +    DeviceClass *dc = DEVICE_CLASS(klass);
+> +    I2CSlaveClass *sc = I2C_SLAVE_CLASS(klass);
+> +
+> +    dc->realize = m41t80_realize;
+> +    sc->send = m41t80_send;
+> +    sc->recv = m41t80_recv;
+> +    sc->event = m41t80_event;
+> +}
+> +
+> +static const TypeInfo m41t80_info = {
+> +    .name          = TYPE_M41T80,
+> +    .parent        = TYPE_I2C_SLAVE,
+> +    .instance_size = sizeof(M41t80State),
+> +    .class_init    = m41t80_class_init,
+> +};
+> +
+> +static void m41t80_register_types(void)
+> +{
+> +    type_register_static(&m41t80_info);
+> +}
+> +
+> +type_init(m41t80_register_types)
 > 
