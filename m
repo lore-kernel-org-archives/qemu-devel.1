@@ -1,29 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42974)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44382)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1fQXMo-0003Bk-O9
-	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 08:16:43 -0400
+	(envelope-from <cohuck@redhat.com>) id 1fQXRe-0006Wc-2o
+	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 08:21:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1fQXMn-0000Pv-Du
-	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 08:16:42 -0400
-Date: Wed, 6 Jun 2018 13:16:25 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20180606121624.GD2661@work-vm>
-References: <20180528212054.GH2209@redhat.com>
-	<20180528212510.GC4660@redhat.com>
-	<20180529064415.GA4756@localhost.localdomain>
-	<2b3eef00-f326-c1e6-0e4b-b7602646eec4@redhat.com>
-	<20180606123237.2235ae4a@kitsune.suse.cz>
-	<bc97cdc3-85ba-e053-0816-b6bc431064fb@redhat.com>
-	<20180606131929.44d0fd6b@kitsune.suse.cz>
-	<93233bff-604b-c891-90ce-64fe1eaaaab5@redhat.com>
-	<20180606113720.GA2661@work-vm>
-	<2c833e2c-f0bb-ea98-a703-54fb9447bd2f@redhat.com>
+	(envelope-from <cohuck@redhat.com>) id 1fQXRZ-0003F2-1m
+	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 08:21:42 -0400
+Date: Wed, 6 Jun 2018 14:21:31 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20180606142131.74ea2eb7.cohuck@redhat.com>
+In-Reply-To: <e73038ff-fb2d-5865-8b84-e775990f3983@linux.ibm.com>
+References: <20180509154822.23510-1-cohuck@redhat.com>
+	<20180509154822.23510-3-cohuck@redhat.com>
+	<c18f9b9f-da00-1a0b-8ef0-7ac223c73d1a@linux.ibm.com>
+	<20180515181006.0cb1dfc2.cohuck@redhat.com>
+	<a5d08fb7-d9c1-b230-fe0c-acebbda2ba65@linux.ibm.com>
+	<20180522145208.310143ea.cohuck@redhat.com>
+	<4e4001cc-540e-0f2b-bbd1-1f82ca594bb3@linux.ibm.com>
+	<20180605151449.22aafbfc.cohuck@redhat.com>
+	<e73038ff-fb2d-5865-8b84-e775990f3983@linux.ibm.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <2c833e2c-f0bb-ea98-a703-54fb9447bd2f@redhat.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] storing machine data in qcow images?
+Subject: Re: [Qemu-devel] [PATCH RFC 2/2] vfio-ccw: support for halt/clear
+ subchannel
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,103 +31,200 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>
-Cc: Kevin Wolf <kwolf@redhat.com>, ehabkost@redhat.com, qemu-block@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>, "Richard W.M. Jones" <rjones@redhat.com>, qemu-devel@nongnu.org, stefanha@redhat.com, Michal =?iso-8859-1?Q?Such=E1nek?= <msuchanek@suse.de>
+To: Pierre Morel <pmorel@linux.ibm.com>
+Cc: Dong Jia Shi <bjsdjshi@linux.ibm.com>, Halil Pasic <pasic@linux.ibm.com>, linux-s390@vger.kernel.org, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, qemu-s390x@nongnu.org, qemu-devel@nongnu.org
 
-* Max Reitz (mreitz@redhat.com) wrote:
-> On 2018-06-06 13:37, Dr. David Alan Gilbert wrote:
-> > * Max Reitz (mreitz@redhat.com) wrote:
-> >> On 2018-06-06 13:19, Michal Such=E1nek wrote:
-> >>> On Wed, 6 Jun 2018 13:02:53 +0200
-> >>> Max Reitz <mreitz@redhat.com> wrote:
+On Tue, 5 Jun 2018 17:23:02 +0200
+Pierre Morel <pmorel@linux.ibm.com> wrote:
+
+> On 05/06/2018 15:14, Cornelia Huck wrote:
+> > On Tue, 22 May 2018 17:10:44 +0200
+> > Pierre Morel <pmorel@linux.ibm.com> wrote:
+> > =20
+> >> On 22/05/2018 14:52, Cornelia Huck wrote: =20
+> >>> On Wed, 16 May 2018 15:32:48 +0200
+> >>> Pierre Morel <pmorel@linux.ibm.com> wrote:
+> >>>    =20
+> >>>> On 15/05/2018 18:10, Cornelia Huck wrote: =20
+> >>>>> On Fri, 11 May 2018 11:33:35 +0200
+> >>>>> Pierre Morel <pmorel@linux.ibm.com> wrote:
+> >>>>>       =20
+> >>>>>> On 09/05/2018 17:48, Cornelia Huck wrote: =20
+> >>>>>>> @@ -126,7 +192,24 @@ static void fsm_io_request(struct vfio_ccw_p=
+rivate *private,
+> >>>>>>>     =20
+> >>>>>>>      	memcpy(scsw, io_region->scsw_area, sizeof(*scsw));
+> >>>>>>>     =20
+> >>>>>>> -	if (scsw->cmd.fctl & SCSW_FCTL_START_FUNC) {
+> >>>>>>> +	/*
+> >>>>>>> +	 * Start processing with the clear function, then halt, then st=
+art.
+> >>>>>>> +	 * We may still be start pending when the caller wants to clean
+> >>>>>>> +	 * up things via halt/clear.
+> >>>>>>> +	 */ =20
+> >>>>>> hum. The scsw here does not reflect the hardware state but the
+> >>>>>> command passed from the user interface.
+> >>>>>> Can we and should we authorize multiple commands in one call?
+> >>>>>>
+> >>>>>> If not, the comment is not appropriate and a switch on cmd.fctl
+> >>>>>> would be a clearer. =20
+> >>>>> There may be multiple functions specified, but we need to process t=
+hem
+> >>>>> in precedence order (and clear wins over the others, so to speak).
+> >>>>> Would adding a sentence like "we always process just one function" =
+help? =20
+> >>>> Why should we allow multiple commands in a single call ?
+> >>>> It brings no added value.
+> >>>> Is there a use case?
+> >>>> Currently QEMU does not do this and since we only have the SCSH there
+> >>>> is no difference having the bit set alone or not alone. =20
+> >>> I found this to be a very easy way to implement halt/clear. This still
+> >>> holds true if we switch to some kind of capabilities for this (did not
+> >>> have time to look at this further, though).
 > >>>
-> >>>> On 2018-06-06 12:32, Michal Such=E1nek wrote:
-> >>>>> On Tue, 29 May 2018 12:14:15 +0200
-> >>>>> Max Reitz <mreitz@redhat.com> wrote:
->=20
-> [...]
->=20
-> >>>>>> Unless I have got something terribly wrong (which is indeed a
-> >>>>>> possibility!), to me this proposal means basically to turn qcow2
-> >>>>>> into (1) a VM description format for qemu, and (2) to turn it in=
-to
-> >>>>>> an archive format on the way. =20
-> >>>>>
-> >>>>> And if you go all the way you can store multiple disks along with
-> >>>>> the VM definition so you can have the whole appliance in one file=
-.
-> >>>>> It conveniently solves the problem of synchronizing snapshots acr=
-oss
-> >>>>> multiple disk images and the question where to store the machine
-> >>>>> state if you want to suspend it.  =20
-> >>>>
-> >>>> Yeah, but why make qcow2 that format?  That's what I completely fa=
-il
-> >>>> to understand.
-> >>>>
-> >>>> If you want to have a single VM description file that contains the=
- VM
-> >>>> configuration and some qcow2/raw/whatever files along with it for =
-the
-> >>>> guest disk data, sure, go ahead.  But why does the format of the w=
-hole
-> >>>> thing need to be qcow2?
-> >>>
-> >>> Because then qemu can access the disk data from the image directly
-> >>> without any need for extraction, copying to different file, etc.
+> >>> As we have the fctl field anyway, I'm in favour of processing this all
+> >>> in one function.
+> >>>    =20
+> > [starting to look at this again]
+> > =20
+> >> Sorry, I do not understand if we agree or not.
 > >>
-> >> This does not explain why it needs to be qcow2.  There is absolutely=
- no
-> >> reason why you couldn't use qcow2 files in-place inside of another f=
-ile.
-> >=20
-> > Because then we'd have to change the whole stack to take advantage of
-> > that.  Adding a feature into qcow2 means nothing else changes.
+> >> I agree we have the fctl field and we must continue to use it
+> >> for backward compatibility. =20
+> > It also mirrors the hardware, no? =20
 >=20
-> Because it's a hack, right.  Storing binary data in a qcow2 file,
-> completely ignoring it in qemu (and being completely unusable to any
-> potential other users of the qcow2 format[1]) and only interpreting it
-> somewhere up the stack is a hack.
+> No, in the hardware this is the result of the instruction in the SCSW.
+> Not the instruction itself.
 
-It's not a hack!
-Seriously it's not.
-There's nothing wrong with it being aimed higher up the stack than qemu,
-the problem we started off with was what happens when a user downloads
-a VM image and tries to import it into their VM system; weve already
-got 2+ layers of management stuff in there - I want the information to
-guide those layers, not form a complete set of configuration.
+Not sure if I parse this correctly... but the architecture says that
+the subchannel has the {start,halt,clear} function set as a result of
+{start,halt,clear} subchannel, doesn't it?
 
-> That is not necessarily a negative point, hacks can work wonderfully
-> well, and they usually are simple, that is correct.  But the thing is
-> that I feel like people have grand visions of what to get out of this.
-> Imagine, a single file that can configure all and any VM!
 >=20
-> But hacks usually only solve a single issue.  Once you try to extend a
-> hack, it breaks down and becomes insufficient.
+> > =20
+> >> I do not understand the "processing all in one function".
+> >>
+> >> Since yo already have 3 function to process these three instructions.
+> >>
+> >> Do you mean the if .. else if .. else if ? =20
+> > Yes. There is a lot of common handling for each of these. =20
 >=20
-> If we want a grand vision where a single file stores the whole VM, why
-> not invest the work and make it right from the start?
+> There are also differences and it breaks the FSM
 
-Because we won't get it right; however much we bikeshed about it
-we'll just end up with a mess.   The right thing is to put in something
-to hold configuration and then review the items of configuration we
-add properly as we define them.
+Depends on what we will do with the fsm ;)
 
-> Max
 >=20
-> [1] Yes, I concede that there are probably no other users of qcow2.  Bu=
-t
-> please forgive me for assuming that qcow2 was in a sense designed to be
-> a rather general image format that not only qemu could use.
+> > =20
+> >> Then I come back to what you said earlier on the precedence of the cle=
+ar
+> >> instruction:
+> >>
+> >> 1) do we have a use case to have more than one bit set in the fctl fie=
+ld?
+> >>
+> >> - if no, there is no need for precedence =20
+> > It mirrors what the hardware does: you just set an additional bit if
+> > processing has not yet finished. =20
+>=20
+> I do not agree, this is true for the SCSW but not for instructions.
+> We receive instructions in VFIO and give back status.
+> The name used to provide the command is misleading.
 
-What makes it QEMU specific?  It's basically just the same key/value
-setup as OVA, except putting them inside the qcow2.
-We could use the same keys/value definitions as OVA in the blob,
-although their definitions aren't very portable either.
+Confused. What we get over the interface is an scsw (the current scsw
+for the subchannel in QEMU). A halt does set an additional bit in the
+fctl if the start is not yet finished.
 
-Dave
+But that had me re-reading the PoP, and clear is indeed different (it,
+ah, clears the other bits). So, clear handling is different enough from
+the others, and I'm not sure anymore whether it makes sense to handle
+start and halt together. I'll rework this.
 
+>=20
+> > =20
+> >> - if yes, why should clear have precedence ? =20
+> > Because it does on the hardware? =20
+>=20
+> What you say is right if we would have a register inside the subchannel
+> where we write the commands.
+> But this is not what we handle we handle separate instructions coming
+> from an instruction stream.
+>=20
+> We do never receive two instructions at the same time, but each after
+> the other.
+> If the sub-channel is busy on IO a clear or a cancel must be able to=20
+> stop the IO.
+> I agree upon this.
+> But we do not have any other command in the same call.
+>=20
+> If we would construct the interface differently, for example using an=20
+> mmap() system
+> call and let the user ORing the command bitfield before using an ioctl=20
+> to inform
+> us from the change, or if we poll on the command bitfield we should=20
+> implement
+> it like you say.
+> But this is not what we do, and this is not what the architecture does.
+> does it?
 
+The thing is that the guest does not interact with this interface at
+all, it is just the backend implementation. The instructions set the
+bits in the scsw fctl field, and we get the scsw from QEMU. By the
+architecture, both start and halt may be set in the fctl at the same
+time. [That this currently does not happen because QEMU is not really
+handling things asynchronously is an implementation detail.]
 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+>=20
+> > =20
+> >>   =C2=A0 How do QEMU set more than one bit in fctl?
+> >>   =C2=A0 why should we alter the order of the instructions given by th=
+e guest?
+> >>   =C2=A0 How can we know this order if there are multiple instructions=
+ at once? =20
+> > In the future, we should return after we fired off the start etc.
+> > request even if we did not receive an interrupt yet, so that the guest
+> > might do a halt or clear before the start has finished. =20
+>=20
+> This is already what is done here:
+> We fire off the start (go to BUSY state) and return
+>=20
+> If the guest want to start another command it polls on
+> the vfio_write() untill the channel isn't BUSY anymore.
+
+It's not the guest that polls, but QEMU (resp. another user space
+program). And it should be able to fire a halt etc. even if the start
+function is still active, as the architecture allows that. (I would
+expect the real hardware to give us a busy if applicable anyway.)
+
+>=20
+> On interrupt we set the channel back to IDLE and the next
+> command shall be proceed.
+>=20
+> (I must enhance the cover letter (already said))
+>=20
+> >   IOW, make this
+> > as asynchronous as the hardware. That's why I'd like to simply
+> > accumulate the things. The architecture already specified what happens
+> > in the response.
+> >
+> > Do you think that is feasible?
+> > =20
+> Yes I think it is feasible and it is what we need to do.
+>=20
+> CLEAR, CANCEL and HALT must be able to overtake the
+> START and really stop the IO transfer.
+>=20
+> They just should be able to proceed in the BUSY state
+> on the opposite of the START.
+> This is easily done with new events in the FSM inside
+> both IDLE and BUSY states
+
+On re-reading the PoP, the three of them do have some different
+requirements:
+
+- cancel is currently handled completely in QEMU, and it also has quite
+  different semantics as it is not asynchronous etc.
+- halt can be made pending in addition to a start function
+- clear will need to clear anything that's currently going on
+
+I'll need to rethink some of this; probably does not make sense for you
+to try to integrate my patches.
