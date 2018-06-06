@@ -1,28 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42969)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43324)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dovgaluk@ispras.ru>) id 1fQSta-0002CG-4v
-	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 03:30:15 -0400
+	(envelope-from <clg@kaod.org>) id 1fQSxV-0002vc-3z
+	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 03:34:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dovgaluk@ispras.ru>) id 1fQStW-0000pe-Pm
-	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 03:30:14 -0400
-Received: from mail.ispras.ru ([83.149.199.45]:45490)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dovgaluk@ispras.ru>) id 1fQStW-0000nQ-H9
-	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 03:30:10 -0400
-From: "Pavel Dovgalyuk" <dovgaluk@ispras.ru>
-References: <152819515565.30857.16834004920507717324.stgit@pasha-ThinkPad-T60>
-	<152819516132.30857.1700667353240369481.stgit@pasha-ThinkPad-T60>
-	<aac4626c-c379-13b6-f505-e6ea12fea1a1@redhat.com>
-In-Reply-To: <aac4626c-c379-13b6-f505-e6ea12fea1a1@redhat.com>
-Date: Wed, 6 Jun 2018 10:30:10 +0300
-Message-ID: <000a01d3fd68$33d85cc0$9b891640$@ru>
+	(envelope-from <clg@kaod.org>) id 1fQSxS-0002lw-03
+	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 03:34:17 -0400
+Received: from 8.mo3.mail-out.ovh.net ([87.98.172.249]:46015)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1fQSxR-0002kt-QQ
+	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 03:34:13 -0400
+Received: from player750.ha.ovh.net (unknown [10.109.108.70])
+	by mo3.mail-out.ovh.net (Postfix) with ESMTP id E74291BBDE0
+	for <qemu-devel@nongnu.org>; Wed,  6 Jun 2018 09:34:10 +0200 (CEST)
+From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
+Date: Wed,  6 Jun 2018 09:33:53 +0200
+Message-Id: <20180606073353.18465-1-clg@kaod.org>
 MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Content-Language: ru
-Subject: Re: [Qemu-devel] [RFC PATCH v2 1/7] tcg: add headers for non-target
- helpers
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v2] target/ppc: extend eieio for POWER9
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,44 +27,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: 'Thomas Huth' <thuth@redhat.com>, 'Pavel Dovgalyuk' <Pavel.Dovgaluk@ispras.ru>, qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, maria.klimushenkova@ispras.ru, pbonzini@redhat.com, vilanova@ac.upc.edu
+To: qemu-ppc@nongnu.org
+Cc: qemu-devel@nongnu.org, David Gibson <david@gibson.dropbear.id.au>, Michael Ellerman <mpe@ellerman.id.au>, =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
 
-> From: Thomas Huth [mailto:thuth@redhat.com]
-> On 05.06.2018 12:39, Pavel Dovgalyuk wrote:
-> > From: Pavel Dovgalyuk <pavel.dovgaluk@gmail.com>
-> >
-> > This patch adds functions and headers for adding the helpers from
-> > the modules other than the target translators.
-> >
-> > Signed-off-by: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
-> > ---
-> >  include/exec/helper-register.h |   53 ++++++++++++++++++++++++++++++++++++++++
-> >  tcg/tcg.c                      |   12 +++++++++
-> >  tcg/tcg.h                      |    3 ++
-> >  3 files changed, 68 insertions(+)
-> >  create mode 100644 include/exec/helper-register.h
-> >
-> > diff --git a/include/exec/helper-register.h b/include/exec/helper-register.h
-> > new file mode 100644
-> > index 0000000..aeface9
-> > --- /dev/null
-> > +++ b/include/exec/helper-register.h
-> > @@ -0,0 +1,53 @@
-> > +#ifndef HELPER_REGISTER_H
-> > +#define HELPER_REGISTER_H
-> > +
-> > +#include "exec/helper-head.h"
-> > +
-> > +/* Need one more level of indirection before stringification
-> > +   to get all the macros expanded first.  */
-> > +#define str(s) #s
-> 
-> Could you use tostring() from include/qemu/compiler.h instead?
+POWER9 introduced a new variant of the eieio instruction using bit 6
+as a hint to tell the CPU it is a store-forwarding barrier.
 
+The usage of this eieio extension was recently added in Linux 4.17
+which activated the "support for a store forwarding barrier at kernel
+entry/exit".
 
-Thanks, fixed.
+Unfortunately, it is not possible to insert this new eieio instruction
+without considerable change in ppc_tr_translate_insn(). So instead we
+loosen the QEMU eieio instruction mask and modify the gen_eieio()
+helper to test for bit6. On non-POWER9 CPUs, the bit6 is just ignored
+but a warning is emitted as this is not an instruction software should
+be using.
 
-BTW, this was a copy-paste from helper-tcg.h
+Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
+---
 
-Pavel Dovgalyuk
+ Changes since v1:
+
+ - removed specific PPC2_MEM_EIEIO2 flag
+ - ignore bit6 on non-POWER9 CPU
+
+ target/ppc/translate.c | 25 +++++++++++++++++++++++--
+ 1 file changed, 23 insertions(+), 2 deletions(-)
+
+diff --git a/target/ppc/translate.c b/target/ppc/translate.c
+index 8ba8f67dc513..5fe1ba655599 100644
+--- a/target/ppc/translate.c
++++ b/target/ppc/translate.c
+@@ -2967,7 +2967,28 @@ static void gen_stswx(DisasContext *ctx)
+ /* eieio */
+ static void gen_eieio(DisasContext *ctx)
+ {
+-    tcg_gen_mb(TCG_MO_LD_ST | TCG_BAR_SC);
++    TCGBar bar =3D TCG_MO_LD_ST;
++
++    /*
++     * POWER9 has a eieio instruction variant using bit 6 as a hint to
++     * tell the CPU it is a store-forwarding barrier.
++     */
++    if (ctx->opcode & 0x2000000) {
++        /*
++         * ISA says that "Reserved fields in instructions are ignored
++         * by the processor". So ignore the bit 6 on non-POWER9 CPU but
++         * as this is not an instruction software should be using,
++         * complain to the user.
++         */
++        if (!(ctx->insns_flags2 & PPC2_ISA300)) {
++            qemu_log_mask(LOG_GUEST_ERROR, "invalid eieio using bit 6 at=
+ @"
++                          TARGET_FMT_lx "\n", ctx->base.pc_next - 4);
++        } else {
++            bar =3D TCG_MO_ST_LD;
++        }
++    }
++
++    tcg_gen_mb(bar | TCG_BAR_SC);
+ }
+=20
+ #if !defined(CONFIG_USER_ONLY)
+@@ -6483,7 +6504,7 @@ GEN_HANDLER(lswi, 0x1F, 0x15, 0x12, 0x00000001, PPC=
+_STRING),
+ GEN_HANDLER(lswx, 0x1F, 0x15, 0x10, 0x00000001, PPC_STRING),
+ GEN_HANDLER(stswi, 0x1F, 0x15, 0x16, 0x00000001, PPC_STRING),
+ GEN_HANDLER(stswx, 0x1F, 0x15, 0x14, 0x00000001, PPC_STRING),
+-GEN_HANDLER(eieio, 0x1F, 0x16, 0x1A, 0x03FFF801, PPC_MEM_EIEIO),
++GEN_HANDLER(eieio, 0x1F, 0x16, 0x1A, 0x01FFF801, PPC_MEM_EIEIO),
+ GEN_HANDLER(isync, 0x13, 0x16, 0x04, 0x03FFF801, PPC_MEM),
+ GEN_HANDLER_E(lbarx, 0x1F, 0x14, 0x01, 0, PPC_NONE, PPC2_ATOMIC_ISA206),
+ GEN_HANDLER_E(lharx, 0x1F, 0x14, 0x03, 0, PPC_NONE, PPC2_ATOMIC_ISA206),
+--=20
+2.13.6
