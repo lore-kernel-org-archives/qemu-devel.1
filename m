@@ -1,17 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57551)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59576)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1fQd7B-0004QS-OX
-	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 14:24:58 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1fQdEG-00036a-Ac
+	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 14:32:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1fQd7A-0002sj-NQ
-	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 14:24:57 -0400
-From: John Snow <jsnow@redhat.com>
-Date: Wed,  6 Jun 2018 14:24:49 -0400
-Message-Id: <20180606182449.1607-6-jsnow@redhat.com>
-In-Reply-To: <20180606182449.1607-1-jsnow@redhat.com>
-References: <20180606182449.1607-1-jsnow@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 5/5] qapi: add disabled parameter to
- block-dirty-bitmap-add
+	(envelope-from <peter.maydell@linaro.org>) id 1fQdEF-0006qX-Gw
+	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 14:32:16 -0400
+Received: from mail-ot0-x241.google.com ([2607:f8b0:4003:c0f::241]:32947)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1fQdEF-0006pw-Ad
+	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 14:32:15 -0400
+Received: by mail-ot0-x241.google.com with SMTP id h6-v6so8448532otj.0
+	for <qemu-devel@nongnu.org>; Wed, 06 Jun 2018 11:32:15 -0700 (PDT)
+MIME-Version: 1.0
+In-Reply-To: <20180606173233.28080-4-berrange@redhat.com>
+References: <20180606173233.28080-1-berrange@redhat.com>
+	<20180606173233.28080-4-berrange@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Wed, 6 Jun 2018 19:31:53 +0100
+Message-ID: <CAFEAcA-_e7mMB07fOCN6qmm-9YTPG2HSMJ3-z=0wRHaa+uTteA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 3/3] util: remove redundant include of
+ glib.h
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,86 +31,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: Eric Blake <eblake@redhat.com>, John Snow <jsnow@redhat.com>, Fam Zheng <famz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Markus Armbruster <armbru@redhat.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+To: =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, Eric Blake <eblake@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Peter Xu <peterx@redhat.com>, Olaf Hering <olaf@aepfle.de>, Stefan Berger <stefanb@linux.vnet.ibm.com>, Thomas Huth <thuth@redhat.com>
 
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+On 6 June 2018 at 18:32, Daniel P. Berrang=C3=A9 <berrange@redhat.com> wrot=
+e:
+> Code must only ever include glib.h indirectly via the glib-compat.h
+> header file, because we will need some macros set before glib.h is
+> pulled in. Adding extra includes of glib.h will (soon) cause compile
+> failures such as:
+>
+> In file included from /home/berrange/src/virt/qemu/include/qemu/osdep.h:1=
+07,
+>                  from /home/berrange/src/virt/qemu/include/qemu/iova-tree=
+.h:26,
+>                  from util/iova-tree.c:13:
+> /home/berrange/src/virt/qemu/include/glib-compat.h:22: error: "GLIB_VERSI=
+ON_MIN_REQUIRED" redefined [-Werror]
+>  #define GLIB_VERSION_MIN_REQUIRED GLIB_VERSION_2_40
+>
+> In file included from /usr/include/glib-2.0/glib/gtypes.h:34,
+>                  from /usr/include/glib-2.0/glib/galloca.h:32,
+>                  from /usr/include/glib-2.0/glib.h:30,
+>                  from util/iova-tree.c:12:
+> /usr/include/glib-2.0/glib/gversionmacros.h:237: note: this is the locati=
+on of the previous definition
+>  # define GLIB_VERSION_MIN_REQUIRED      (GLIB_VERSION_CUR_STABLE)
+>
+> Signed-off-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+> ---
+>  util/iova-tree.c | 1 -
+>  1 file changed, 1 deletion(-)
+>
+> diff --git a/util/iova-tree.c b/util/iova-tree.c
+> index 2d9cebfc89..d39cd8bb29 100644
+> --- a/util/iova-tree.c
+> +++ b/util/iova-tree.c
+> @@ -9,7 +9,6 @@
+>   * This work is licensed under the terms of the GNU GPL, version 2 or la=
+ter.
+>   */
+>
+> -#include <glib.h>
+>  #include "qemu/iova-tree.h"
 
-This is needed, for example, to create a new bitmap and merge several
-disabled bitmaps into a new one. Without this flag we will have to
-put block-dirty-bitmap-add and block-dirty-bitmap-disable into one
-transaction.
+While we're fixing up the headers in this file:
+it should start with an include of qemu/osdep.h,
+and qemu/iova-tree.h should not include osdep.h...
 
-Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Signed-off-by: John Snow <jsnow@redhat.com>
-Reviewed-by: Jeff Cody <jcody@redhat.com>
----
- blockdev.c           | 10 ++++++++++
- qapi/block-core.json |  6 +++++-
- 2 files changed, 15 insertions(+), 1 deletion(-)
-
-diff --git a/blockdev.c b/blockdev.c
-index dc40a358b0..041f5d594f 100644
---- a/blockdev.c
-+++ b/blockdev.c
-@@ -2073,6 +2073,7 @@ static void block_dirty_bitmap_add_prepare(BlkActionState *common,
-                                action->has_granularity, action->granularity,
-                                action->has_persistent, action->persistent,
-                                action->has_autoload, action->autoload,
-+                               action->has_x_disabled, action->x_disabled,
-                                &local_err);
- 
-     if (!local_err) {
-@@ -2880,6 +2881,7 @@ void qmp_block_dirty_bitmap_add(const char *node, const char *name,
-                                 bool has_granularity, uint32_t granularity,
-                                 bool has_persistent, bool persistent,
-                                 bool has_autoload, bool autoload,
-+                                bool has_disabled, bool disabled,
-                                 Error **errp)
- {
-     BlockDriverState *bs;
-@@ -2914,6 +2916,10 @@ void qmp_block_dirty_bitmap_add(const char *node, const char *name,
-         warn_report("Autoload option is deprecated and its value is ignored");
-     }
- 
-+    if (!has_disabled) {
-+        disabled = false;
-+    }
-+
-     if (persistent &&
-         !bdrv_can_store_new_dirty_bitmap(bs, name, granularity, errp))
-     {
-@@ -2925,6 +2931,10 @@ void qmp_block_dirty_bitmap_add(const char *node, const char *name,
-         return;
-     }
- 
-+    if (disabled) {
-+        bdrv_disable_dirty_bitmap(bitmap);
-+    }
-+
-     bdrv_dirty_bitmap_set_persistance(bitmap, persistent);
- }
- 
-diff --git a/qapi/block-core.json b/qapi/block-core.json
-index 9d4ab93190..fff23fc82b 100644
---- a/qapi/block-core.json
-+++ b/qapi/block-core.json
-@@ -1734,11 +1734,15 @@
- #            Currently, all dirty tracking bitmaps are loaded from Qcow2 on
- #            open.
- #
-+# @x-disabled: the bitmap is created in the disabled state, which means that
-+#              it will not track drive changes. The bitmap may be enabled with
-+#              x-block-dirty-bitmap-enable. Default is false. (Since: 3.0)
-+#
- # Since: 2.4
- ##
- { 'struct': 'BlockDirtyBitmapAdd',
-   'data': { 'node': 'str', 'name': 'str', '*granularity': 'uint32',
--            '*persistent': 'bool', '*autoload': 'bool' } }
-+            '*persistent': 'bool', '*autoload': 'bool', '*x-disabled': 'bool' } }
- 
- ##
- # @BlockDirtyBitmapMerge:
--- 
-2.14.3
+thanks
+-- PMM
