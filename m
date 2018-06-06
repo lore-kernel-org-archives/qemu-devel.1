@@ -1,28 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37923)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38939)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1fQSN8-0000Ab-8p
-	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 02:56:43 -0400
+	(envelope-from <clg@kaod.org>) id 1fQSUb-0002z3-Vp
+	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 03:04:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1fQSN4-0004CV-A3
-	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 02:56:42 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:55876 helo=mx1.redhat.com)
+	(envelope-from <clg@kaod.org>) id 1fQSUX-0001e8-Sq
+	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 03:04:25 -0400
+Received: from 7.mo177.mail-out.ovh.net ([46.105.61.149]:42628)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1fQSN4-0004CD-5C
-	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 02:56:38 -0400
-Date: Wed, 6 Jun 2018 14:56:29 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20180606065629.GC7815@xz-mi>
-References: <20180605131944.14649-1-peterx@redhat.com>
-	<20180605131944.14649-4-peterx@redhat.com>
-	<CAFEAcA_hVW6d04frBW=Szz4JTsdhnjC_v-v7Kt_zZ-y8uoCyrw@mail.gmail.com>
-	<20180605142655.GI9216@xz-mi>
-	<CAFEAcA_AT7a2KiXGKpvaJFwpkkn8x2uNuOgjPXAm=rgjFLCMWg@mail.gmail.com>
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1fQSUX-0001dN-Hf
+	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 03:04:21 -0400
+Received: from player756.ha.ovh.net (unknown [10.109.120.42])
+	by mo177.mail-out.ovh.net (Postfix) with ESMTP id BAC12B4FEF
+	for <qemu-devel@nongnu.org>; Wed,  6 Jun 2018 09:04:19 +0200 (CEST)
+References: <20180530100754.15833-1-clg@kaod.org>
+	<20180606063910.GK17757@umbus.fritz.box>
+From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Message-ID: <326e1949-28d0-941d-54f7-dbba6825388d@kaod.org>
+Date: Wed, 6 Jun 2018 09:04:10 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <CAFEAcA_AT7a2KiXGKpvaJFwpkkn8x2uNuOgjPXAm=rgjFLCMWg@mail.gmail.com>
-Subject: Re: [Qemu-devel] [RFC 3/3] memory: introduce
- IOMMU_NOTIFIER_USER_[UN]SET
+In-Reply-To: <20180606063910.GK17757@umbus.fritz.box>
+Content-Type: text/plain; charset=windows-1252
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2] pnv: add a physical mapping array
+ describing MMIO ranges in each chip
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,75 +32,374 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Eric Auger <eric.auger@redhat.com>, Richard Henderson <rth@twiddle.net>, David Gibson <david@gibson.dropbear.id.au>, Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>, Alex Williamson <alex.williamson@redhat.com>
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Greg Kurz <groug@kaod.org>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
 
-On Tue, Jun 05, 2018 at 03:42:11PM +0100, Peter Maydell wrote:
-> On 5 June 2018 at 15:26, Peter Xu <peterx@redhat.com> wrote:
-> > So we have a requirement that we want to send an invalidation for
-> > either (1) unspecified, or (2) secure=1.  We can't do that with a
-> > single MemTxAttrs.
-> >
-> > Could we just notify twice?  One with unspecified=1 and one with
-> > secure=1?  Is this (reduce the calls to notify functions) the major
-> > reason we introduce this IOMMU index idea into the memory API (besides
-> > "avoid possible programming error" you mentioned in IRC discussion)?
-> 
-> How would you handle "this changes mappings for txattrs where
-> unspecified == 0 && secure == 0" ?
+On 06/06/2018 08:39 AM, David Gibson wrote:
+> On Wed, May 30, 2018 at 12:07:54PM +0200, C=E9dric Le Goater wrote:
+>> Based on previous work done in skiboot, the physical mapping array
+>> helps in calculating the MMIO ranges of each controller depending on
+>> the chip id and the chip type. This is will be particularly useful for
+>> the P9 models which use less the XSCOM bus and rely more on MMIOs.
+>>
+>> A link on the chip is now necessary to calculate MMIO BARs and
+>> sizes. This is why such a link is introduced in the PSIHB model.
+>=20
+> I think this message needs some work.  This says what it's for, but
+> what actually *is* this array, and how does it work?
 
-Let's forget this patch.  I was confused about the problem behind when
-I wrote this up...  Now I know a bit more.  It's related to how we can
-send a notification covers multiple contexts. Let's assume we still
-only support MAP and UNMAP in the notifiers. But let's assume
-IOMMUTLBEntry has MemTxAttrs field.
+OK. It is relatively simple: each controller has an entry defining its=20
+MMIO range.=20
 
-If so, for "this changes mappings for txattrs where unspecified == 0
-&& secure == 0", we just send one notify with attrs.unspecified=0 and
-attrs.secure=0.  Meanwhile in the notifier hook you can parse the
-attrs to see whether that's what you need, and skip if not.
+> The outside-core differences between POWER8 and POWER9 are substantial
+> enough that I'm wondering if pnvP8 and pnvP9 would be better off as
+> different machine types (sharing some routines, of course).
 
-Will that work?
+yes and no. I have survived using a common PnvChip framework but
+it is true that I had to add P9 classes for each: LPC, PSI, OCC=20
+They are very similar but not enough. P9 uses much more MMIOs than=20
+P8 which still uses a lot of XSCOM. I haven't looked at PHB4.=20
 
-> 
-> How does the notifier registering API say what it's interested in?
-> In the exec.c code that deals with sending TCG transactions
-> through IOMMUs, if I have to register a notifier for every
-> possible TCG transaction attribute I ever see, that's a lot
-> of unnecessary notifiers.
+The interrupt controller is completely different of course.
+ =20
+C.
 
-Again, let's assume this patch does not exist.  Then only one notifier
-is needed to be registered with UNMAP notify, and in the hook function
-it can detect whether it has (attrs.unspecified==0 &&
-attrs.unsecure==0).
-
-> 
-> > Again, I think the more critical question would be whether we can pass
-> > in MemTxAttrs into translate(), and whether we can avoid introducing
-> > this IOMMU index idea into the memory API layer... For example, would
-> > it add complexity to other architectures without much benefit?
-> 
-> I think the fundamental difference in our points of view here
-> is that I see the IOMMU index as *reducing* complexity, not
-> adding it. Yes, it is an extra level of indirection, but I
-> think it helps us express a useful concept.
-
-Yes.  And again, I'm also worrying about what we should do when we
-want to pass requester ID into translate() too if we have this extra
-layer.
-
-> The patches you've
-> sent here seem to me to be adding extra complexity to the
-> notifier API and the core code which isn't required in
-> the patch set that I sent.
-
-Again I didn't really understand the problem behind before.  Now I
-don't think it's important on whether we'll need to introduce new
-notifier flags, I wanted to know whether we can avoid introducing
-IOMMU index into memory API. Let's just ignore this patch.  Sorry for
-that confusion.
-
-Regards,
-
--- 
-Peter Xu
+>> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
+>> Reviewed-by: Philippe Mathieu-Daud=E9 <f4bug@amsat.org>
+>> ---
+>>
+>>  Changes since v1:
+>>
+>>  - removed PNV_MAP_MAX which has unused
+>>  - introduced a chip class handler to calculate the base address of a
+>>    controller as suggested by Greg.
+>>  - fix error reporting in pnv_psi_realize()
+>>
+>>  include/hw/ppc/pnv.h | 51 ++++++++++++++++++++++++++++++++++---------=
+-------
+>>  hw/ppc/pnv.c         | 53 +++++++++++++++++++++++++++++++++++++++++++=
++--------
+>>  hw/ppc/pnv_psi.c     | 15 ++++++++++++---
+>>  hw/ppc/pnv_xscom.c   |  8 ++++----
+>>  4 files changed, 96 insertions(+), 31 deletions(-)
+>>
+>> diff --git a/include/hw/ppc/pnv.h b/include/hw/ppc/pnv.h
+>> index 90759240a7b1..ffa4a0899705 100644
+>> --- a/include/hw/ppc/pnv.h
+>> +++ b/include/hw/ppc/pnv.h
+>> @@ -53,7 +53,6 @@ typedef struct PnvChip {
+>>      uint64_t     cores_mask;
+>>      void         *cores;
+>> =20
+>> -    hwaddr       xscom_base;
+>>      MemoryRegion xscom_mmio;
+>>      MemoryRegion xscom;
+>>      AddressSpace xscom_as;
+>> @@ -64,6 +63,18 @@ typedef struct PnvChip {
+>>      PnvOCC       occ;
+>>  } PnvChip;
+>> =20
+>> +typedef enum PnvPhysMapType {
+>> +    PNV_MAP_XSCOM,
+>> +    PNV_MAP_ICP,
+>> +    PNV_MAP_PSIHB,
+>> +    PNV_MAP_PSIHB_FSP,
+>> +} PnvPhysMapType;
+>> +
+>> +typedef struct PnvPhysMapEntry {
+>> +    uint64_t        base;
+>> +    uint64_t        size;
+>> +} PnvPhysMapEntry;
+>> +
+>>  typedef struct PnvChipClass {
+>>      /*< private >*/
+>>      SysBusDeviceClass parent_class;
+>> @@ -73,9 +84,10 @@ typedef struct PnvChipClass {
+>>      uint64_t     chip_cfam_id;
+>>      uint64_t     cores_mask;
+>> =20
+>> -    hwaddr       xscom_base;
+>> +    const PnvPhysMapEntry *phys_map;
+>> =20
+>>      uint32_t (*core_pir)(PnvChip *chip, uint32_t core_id);
+>> +    uint64_t (*map_base)(const PnvChip *chip, PnvPhysMapType type);
+>>  } PnvChipClass;
+>> =20
+>>  #define PNV_CHIP_TYPE_SUFFIX "-" TYPE_PNV_CHIP
+>> @@ -159,9 +171,21 @@ void pnv_bmc_powerdown(IPMIBmc *bmc);
+>>  /*
+>>   * POWER8 MMIO base addresses
+>>   */
+>> -#define PNV_XSCOM_SIZE        0x800000000ull
+>> -#define PNV_XSCOM_BASE(chip)                                         =
+   \
+>> -    (chip->xscom_base + ((uint64_t)(chip)->chip_id) * PNV_XSCOM_SIZE)
+>> +static inline uint64_t pnv_map_size(const PnvChip *chip, PnvPhysMapTy=
+pe type)
+>> +{
+>> +    PnvChipClass *pcc =3D PNV_CHIP_GET_CLASS(chip);
+>> +    const PnvPhysMapEntry *map =3D &pcc->phys_map[type];
+>> +
+>> +    return map->size;
+>> +}
+>> +
+>> +static inline uint64_t pnv_map_base(const PnvChip *chip, PnvPhysMapTy=
+pe type)
+>> +{
+>> +    return PNV_CHIP_GET_CLASS(chip)->map_base(chip, type);
+>> +}
+>> +
+>> +#define PNV_XSCOM_SIZE(chip)         pnv_map_size(chip, PNV_MAP_XSCOM=
+)
+>> +#define PNV_XSCOM_BASE(chip)         pnv_map_base(chip, PNV_MAP_XSCOM=
+)
+>> =20
+>>  /*
+>>   * XSCOM 0x20109CA defines the ICP BAR:
+>> @@ -177,18 +201,13 @@ void pnv_bmc_powerdown(IPMIBmc *bmc);
+>>   *      0xffffe02200000000 -> 0x0003ffff80800000
+>>   *      0xffffe02600000000 -> 0x0003ffff80900000
+>>   */
+>> -#define PNV_ICP_SIZE         0x0000000000100000ull
+>> -#define PNV_ICP_BASE(chip)                                           =
+   \
+>> -    (0x0003ffff80000000ull + (uint64_t) PNV_CHIP_INDEX(chip) * PNV_IC=
+P_SIZE)
+>> -
+>> +#define PNV_ICP_SIZE(chip)           pnv_map_size(chip, PNV_MAP_ICP)
+>> +#define PNV_ICP_BASE(chip)           pnv_map_base(chip, PNV_MAP_ICP)
+>> =20
+>> -#define PNV_PSIHB_SIZE       0x0000000000100000ull
+>> -#define PNV_PSIHB_BASE(chip) \
+>> -    (0x0003fffe80000000ull + (uint64_t)PNV_CHIP_INDEX(chip) * PNV_PSI=
+HB_SIZE)
+>> +#define PNV_PSIHB_SIZE(chip)         pnv_map_size(chip, PNV_MAP_PSIHB=
+)
+>> +#define PNV_PSIHB_BASE(chip)         pnv_map_base(chip, PNV_MAP_PSIHB=
+)
+>> =20
+>> -#define PNV_PSIHB_FSP_SIZE   0x0000000100000000ull
+>> -#define PNV_PSIHB_FSP_BASE(chip) \
+>> -    (0x0003ffe000000000ull + (uint64_t)PNV_CHIP_INDEX(chip) * \
+>> -     PNV_PSIHB_FSP_SIZE)
+>> +#define PNV_PSIHB_FSP_SIZE(chip)     pnv_map_size(chip, PNV_MAP_PSIHB=
+_FSP)
+>> +#define PNV_PSIHB_FSP_BASE(chip)     pnv_map_base(chip, PNV_MAP_PSIHB=
+_FSP)
+>> =20
+>>  #endif /* _PPC_PNV_H */
+>> diff --git a/hw/ppc/pnv.c b/hw/ppc/pnv.c
+>> index 031488131629..77caaea64b2f 100644
+>> --- a/hw/ppc/pnv.c
+>> +++ b/hw/ppc/pnv.c
+>> @@ -712,6 +712,24 @@ static uint32_t pnv_chip_core_pir_p9(PnvChip *chi=
+p, uint32_t core_id)
+>>   */
+>>  #define POWER9_CORE_MASK   (0xffffffffffffffull)
+>> =20
+>> +/*
+>> + * POWER8 MMIOs
+>> + */
+>> +static const PnvPhysMapEntry pnv_chip_power8_phys_map[] =3D {
+>> +    [PNV_MAP_XSCOM]     =3D { 0x0003fc0000000000ull, 0x00000008000000=
+00ull },
+>> +    [PNV_MAP_ICP]       =3D { 0x0003ffff80000000ull, 0x00000000001000=
+00ull },
+>> +    [PNV_MAP_PSIHB]     =3D { 0x0003fffe80000000ull, 0x00000000001000=
+00ull },
+>> +    [PNV_MAP_PSIHB_FSP] =3D { 0x0003ffe000000000ull, 0x00000001000000=
+00ull },
+>> +};
+>> +
+>> +static uint64_t pnv_chip_map_base_p8(const PnvChip *chip, PnvPhysMapT=
+ype type)
+>> +{
+>> +    PnvChipClass *pcc =3D PNV_CHIP_GET_CLASS(chip);
+>> +    const PnvPhysMapEntry *map =3D &pcc->phys_map[type];
+>> +
+>> +    return map->base + chip->chip_id * map->size;
+>> +}
+>> +
+>>  static void pnv_chip_power8e_class_init(ObjectClass *klass, void *dat=
+a)
+>>  {
+>>      DeviceClass *dc =3D DEVICE_CLASS(klass);
+>> @@ -721,7 +739,8 @@ static void pnv_chip_power8e_class_init(ObjectClas=
+s *klass, void *data)
+>>      k->chip_cfam_id =3D 0x221ef04980000000ull;  /* P8 Murano DD2.1 */
+>>      k->cores_mask =3D POWER8E_CORE_MASK;
+>>      k->core_pir =3D pnv_chip_core_pir_p8;
+>> -    k->xscom_base =3D 0x003fc0000000000ull;
+>> +    k->map_base =3D pnv_chip_map_base_p8;
+>> +    k->phys_map =3D pnv_chip_power8_phys_map;
+>>      dc->desc =3D "PowerNV Chip POWER8E";
+>>  }
+>> =20
+>> @@ -734,7 +753,8 @@ static void pnv_chip_power8_class_init(ObjectClass=
+ *klass, void *data)
+>>      k->chip_cfam_id =3D 0x220ea04980000000ull; /* P8 Venice DD2.0 */
+>>      k->cores_mask =3D POWER8_CORE_MASK;
+>>      k->core_pir =3D pnv_chip_core_pir_p8;
+>> -    k->xscom_base =3D 0x003fc0000000000ull;
+>> +    k->map_base =3D pnv_chip_map_base_p8;
+>> +    k->phys_map =3D pnv_chip_power8_phys_map;
+>>      dc->desc =3D "PowerNV Chip POWER8";
+>>  }
+>> =20
+>> @@ -747,10 +767,27 @@ static void pnv_chip_power8nvl_class_init(Object=
+Class *klass, void *data)
+>>      k->chip_cfam_id =3D 0x120d304980000000ull;  /* P8 Naples DD1.0 */
+>>      k->cores_mask =3D POWER8_CORE_MASK;
+>>      k->core_pir =3D pnv_chip_core_pir_p8;
+>> -    k->xscom_base =3D 0x003fc0000000000ull;
+>> +    k->map_base =3D pnv_chip_map_base_p8;
+>> +    k->phys_map =3D pnv_chip_power8_phys_map;
+>>      dc->desc =3D "PowerNV Chip POWER8NVL";
+>>  }
+>> =20
+>> +/*
+>> + * POWER9 MMIOs
+>> + */
+>> +static const PnvPhysMapEntry pnv_chip_power9_phys_map[] =3D {
+>> +    [PNV_MAP_XSCOM]     =3D { 0x000603fc00000000ull, 0x00000004000000=
+00ull },
+>> +};
+>> +
+>> +/* Each chip has a 4TB range for its MMIOs */
+>> +static uint64_t pnv_chip_map_base_p9(const PnvChip *chip, PnvPhysMapT=
+ype type)
+>> +{
+>> +    PnvChipClass *pcc =3D PNV_CHIP_GET_CLASS(chip);
+>> +    const PnvPhysMapEntry *map =3D &pcc->phys_map[type];
+>> +
+>> +    return map->base + ((uint64_t) chip->chip_id << 42);
+>> +}
+>> +
+>>  static void pnv_chip_power9_class_init(ObjectClass *klass, void *data=
+)
+>>  {
+>>      DeviceClass *dc =3D DEVICE_CLASS(klass);
+>> @@ -760,7 +797,8 @@ static void pnv_chip_power9_class_init(ObjectClass=
+ *klass, void *data)
+>>      k->chip_cfam_id =3D 0x220d104900008000ull; /* P9 Nimbus DD2.0 */
+>>      k->cores_mask =3D POWER9_CORE_MASK;
+>>      k->core_pir =3D pnv_chip_core_pir_p9;
+>> -    k->xscom_base =3D 0x00603fc00000000ull;
+>> +    k->map_base =3D pnv_chip_map_base_p9;
+>> +    k->phys_map =3D pnv_chip_power9_phys_map;
+>>      dc->desc =3D "PowerNV Chip POWER9";
+>>  }
+>> =20
+>> @@ -797,15 +835,14 @@ static void pnv_chip_core_sanitize(PnvChip *chip=
+, Error **errp)
+>>  static void pnv_chip_init(Object *obj)
+>>  {
+>>      PnvChip *chip =3D PNV_CHIP(obj);
+>> -    PnvChipClass *pcc =3D PNV_CHIP_GET_CLASS(chip);
+>> -
+>> -    chip->xscom_base =3D pcc->xscom_base;
+>> =20
+>>      object_initialize(&chip->lpc, sizeof(chip->lpc), TYPE_PNV_LPC);
+>>      object_property_add_child(obj, "lpc", OBJECT(&chip->lpc), NULL);
+>> =20
+>>      object_initialize(&chip->psi, sizeof(chip->psi), TYPE_PNV_PSI);
+>>      object_property_add_child(obj, "psi", OBJECT(&chip->psi), NULL);
+>> +    object_property_add_const_link(OBJECT(&chip->psi), "chip", obj,
+>> +                                   &error_abort);
+>>      object_property_add_const_link(OBJECT(&chip->psi), "xics",
+>>                                     OBJECT(qdev_get_machine()), &error=
+_abort);
+>> =20
+>> @@ -829,7 +866,7 @@ static void pnv_chip_icp_realize(PnvChip *chip, Er=
+ror **errp)
+>>      XICSFabric *xi =3D XICS_FABRIC(qdev_get_machine());
+>> =20
+>>      name =3D g_strdup_printf("icp-%x", chip->chip_id);
+>> -    memory_region_init(&chip->icp_mmio, OBJECT(chip), name, PNV_ICP_S=
+IZE);
+>> +    memory_region_init(&chip->icp_mmio, OBJECT(chip), name, PNV_ICP_S=
+IZE(chip));
+>>      sysbus_init_mmio(SYS_BUS_DEVICE(chip), &chip->icp_mmio);
+>>      g_free(name);
+>> =20
+>> diff --git a/hw/ppc/pnv_psi.c b/hw/ppc/pnv_psi.c
+>> index 5b969127c303..882b5d4b9f99 100644
+>> --- a/hw/ppc/pnv_psi.c
+>> +++ b/hw/ppc/pnv_psi.c
+>> @@ -465,11 +465,20 @@ static void pnv_psi_realize(DeviceState *dev, Er=
+ror **errp)
+>>      Object *obj;
+>>      Error *err =3D NULL;
+>>      unsigned int i;
+>> +    PnvChip *chip;
+>> +
+>> +    obj =3D object_property_get_link(OBJECT(dev), "chip", &err);
+>> +    if (!obj) {
+>> +        error_propagate(errp, err);
+>> +        error_prepend(errp, "required link 'chip' not found: ");
+>> +        return;
+>> +    }
+>> +    chip =3D PNV_CHIP(obj);
+>> =20
+>>      obj =3D object_property_get_link(OBJECT(dev), "xics", &err);
+>>      if (!obj) {
+>> -        error_setg(errp, "%s: required link 'xics' not found: %s",
+>> -                   __func__, error_get_pretty(err));
+>> +        error_propagate(errp, err);
+>> +        error_prepend(errp, "required link 'xics' not found: ");
+>>          return;
+>>      }
+>> =20
+>> @@ -497,7 +506,7 @@ static void pnv_psi_realize(DeviceState *dev, Erro=
+r **errp)
+>> =20
+>>      /* Initialize MMIO region */
+>>      memory_region_init_io(&psi->regs_mr, OBJECT(dev), &psi_mmio_ops, =
+psi,
+>> -                          "psihb", PNV_PSIHB_SIZE);
+>> +                          "psihb", PNV_PSIHB_SIZE(chip));
+>> =20
+>>      /* Default BAR for MMIO region */
+>>      pnv_psi_set_bar(psi, psi->bar | PSIHB_BAR_EN);
+>> diff --git a/hw/ppc/pnv_xscom.c b/hw/ppc/pnv_xscom.c
+>> index 46fae41f32b0..20ffc233174c 100644
+>> --- a/hw/ppc/pnv_xscom.c
+>> +++ b/hw/ppc/pnv_xscom.c
+>> @@ -50,7 +50,7 @@ static void xscom_complete(CPUState *cs, uint64_t hm=
+er_bits)
+>> =20
+>>  static uint32_t pnv_xscom_pcba(PnvChip *chip, uint64_t addr)
+>>  {
+>> -    addr &=3D (PNV_XSCOM_SIZE - 1);
+>> +    addr &=3D (PNV_XSCOM_SIZE(chip) - 1);
+>> =20
+>>      if (pnv_chip_is_power9(chip)) {
+>>          return addr >> 3;
+>> @@ -179,10 +179,10 @@ void pnv_xscom_realize(PnvChip *chip, Error **er=
+rp)
+>> =20
+>>      name =3D g_strdup_printf("xscom-%x", chip->chip_id);
+>>      memory_region_init_io(&chip->xscom_mmio, OBJECT(chip), &pnv_xscom=
+_ops,
+>> -                          chip, name, PNV_XSCOM_SIZE);
+>> +                          chip, name, PNV_XSCOM_SIZE(chip));
+>>      sysbus_init_mmio(sbd, &chip->xscom_mmio);
+>> =20
+>> -    memory_region_init(&chip->xscom, OBJECT(chip), name, PNV_XSCOM_SI=
+ZE);
+>> +    memory_region_init(&chip->xscom, OBJECT(chip), name, PNV_XSCOM_SI=
+ZE(chip));
+>>      address_space_init(&chip->xscom_as, &chip->xscom, name);
+>>      g_free(name);
+>>  }
+>> @@ -225,7 +225,7 @@ static const char compat_p9[] =3D "ibm,power9-xsco=
+m\0ibm,xscom";
+>>  int pnv_dt_xscom(PnvChip *chip, void *fdt, int root_offset)
+>>  {
+>>      uint64_t reg[] =3D { cpu_to_be64(PNV_XSCOM_BASE(chip)),
+>> -                       cpu_to_be64(PNV_XSCOM_SIZE) };
+>> +                       cpu_to_be64(PNV_XSCOM_SIZE(chip)) };
+>>      int xscom_offset;
+>>      ForeachPopulateArgs args;
+>>      char *name;
+>=20
