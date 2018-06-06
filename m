@@ -1,28 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36138)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36300)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1fQS9N-0003or-GX
-	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 02:42:30 -0400
+	(envelope-from <peterx@redhat.com>) id 1fQSAK-0004Jh-RV
+	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 02:43:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1fQS9I-0005kF-In
-	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 02:42:29 -0400
-Received: from 2.mo177.mail-out.ovh.net ([178.33.109.80]:38466)
+	(envelope-from <peterx@redhat.com>) id 1fQSAF-0006C0-R2
+	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 02:43:28 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:45094 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1fQS9I-0005gR-9d
-	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 02:42:24 -0400
-Received: from player762.ha.ovh.net (unknown [10.109.120.42])
-	by mo177.mail-out.ovh.net (Postfix) with ESMTP id 30578B4FF7
-	for <qemu-devel@nongnu.org>; Wed,  6 Jun 2018 08:42:16 +0200 (CEST)
-References: <20180606060830.25942-1-clg@kaod.org>
-	<20180606063206.GI17757@umbus.fritz.box>
-From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <66b6b9eb-5b26-2a73-a637-a7f8027fd372@kaod.org>
-Date: Wed, 6 Jun 2018 08:42:08 +0200
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1fQSAF-0006Bf-Jn
+	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 02:43:23 -0400
+Date: Wed, 6 Jun 2018 14:43:15 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20180606064315.GB7815@xz-mi>
+References: <1524550428-27173-1-git-send-email-wei.w.wang@intel.com>
+	<1524550428-27173-5-git-send-email-wei.w.wang@intel.com>
 MIME-Version: 1.0
-In-Reply-To: <20180606063206.GI17757@umbus.fritz.box>
-Content-Type: text/plain; charset=windows-1252
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] target/ppc: extend eieio for POWER9
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <1524550428-27173-5-git-send-email-wei.w.wang@intel.com>
+Subject: Re: [Qemu-devel] [PATCH v7 4/5] virtio-balloon:
+ VIRTIO_BALLOON_F_FREE_PAGE_HINT
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,144 +28,192 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Michael Ellerman <mpe@ellerman.id.au>
+To: Wei Wang <wei.w.wang@intel.com>
+Cc: qemu-devel@nongnu.org, virtio-dev@lists.oasis-open.org, mst@redhat.com, quintela@redhat.com, dgilbert@redhat.com, yang.zhang.wz@gmail.com, quan.xu0@gmail.com, liliang.opensource@gmail.com, pbonzini@redhat.com, nilal@redhat.com
 
-On 06/06/2018 08:32 AM, David Gibson wrote:
-> On Wed, Jun 06, 2018 at 08:08:30AM +0200, C=E9dric Le Goater wrote:
->> POWER9 introduced a new variant of the eieio instruction using bit 6
->> as a hint to tell the CPU it is a store-forwarding barrier.
->>
->> The usage of this eieio extension was recently added in Linux 4.17
->> which activated the "support for a store forwarding barrier at kernel
->> entry/exit".
->>
->> Unfortunately, it is not possible to insert this new eieio instruction
->> without considerable change in ppc_tr_translate_insn(). So instead we
->> loosen the QEMU eieio instruction mask. The gen_eieio() helper is
->> modified to test for bit6 and a custom instruction flag to catch
->> invalid eieio opcodes on non-POWER9 CPUs.
->>
->> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
->> ---
->>  target/ppc/cpu.h                |  5 ++++-
->>  target/ppc/translate.c          | 19 +++++++++++++++++--
->>  target/ppc/translate_init.inc.c |  3 ++-
->>  3 files changed, 23 insertions(+), 4 deletions(-)
->>
->> diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
->> index 0247c1f04c37..021c9b2f10d1 100644
->> --- a/target/ppc/cpu.h
->> +++ b/target/ppc/cpu.h
->> @@ -2206,6 +2206,9 @@ enum {
->>      /* POWER ISA 3.0                                                 =
-        */
->>      PPC2_ISA300        =3D 0x0000000000080000ULL,
->> =20
->> +    /* POWER ISA 3.0 eieio variants                                  =
-        */
->> +    PPC2_MEM_EIEIO2    =3D 0x0000000000100000ULL,
->> +
->>  #define PPC_TCG_INSNS2 (PPC2_BOOKE206 | PPC2_VSX | PPC2_PRCNTL | PPC2=
-_DBRX | \
->>                          PPC2_ISA205 | PPC2_VSX207 | PPC2_PERM_ISA206 =
-| \
->>                          PPC2_DIVE_ISA206 | PPC2_ATOMIC_ISA206 | \
->> @@ -2213,7 +2216,7 @@ enum {
->>                          PPC2_BCTAR_ISA207 | PPC2_LSQ_ISA207 | \
->>                          PPC2_ALTIVEC_207 | PPC2_ISA207S | PPC2_DFP | =
-\
->>                          PPC2_FP_CVT_S64 | PPC2_TM | PPC2_PM_ISA206 | =
-\
->> -                        PPC2_ISA300)
->> +                        PPC2_ISA300 | PPC2_MEM_EIEIO2)
->>  };
->> =20
->>  /********************************************************************=
-*********/
->> diff --git a/target/ppc/translate.c b/target/ppc/translate.c
->> index 8ba8f67dc513..a73ef02aef1d 100644
->> --- a/target/ppc/translate.c
->> +++ b/target/ppc/translate.c
->> @@ -2967,7 +2967,22 @@ static void gen_stswx(DisasContext *ctx)
->>  /* eieio */
->>  static void gen_eieio(DisasContext *ctx)
->>  {
->> -    tcg_gen_mb(TCG_MO_LD_ST | TCG_BAR_SC);
->> +    TCGBar bar =3D TCG_MO_LD_ST;
->> +
->> +    /*
->> +     * POWER9 has a eieio instruction variant using bit 6 as a hint t=
-o
->> +     * tell the CPU it is a store-forwarding barrier.
->> +     */
->> +    if (ctx->opcode & 0x2000000) {
->> +        if (!(ctx->insns_flags2 & PPC2_MEM_EIEIO2)) {
->=20
-> Since we have to adapt the gen_eieio code anyway we don't really need
-> the new instruction flag - we can just reuse PPC2_ISA300 for it.
+On Tue, Apr 24, 2018 at 02:13:47PM +0800, Wei Wang wrote:
 
-OK. That seems now a little superfluous, indeed. Unless there are more
-or these instructions which depend on CPU revision. I don't know so
-let's stick to  PPC2_ISA300.
+[...]
 
->=20
->> +            qemu_log_mask(LOG_GUEST_ERROR, "invalid eieio using bit 6=
- at @"
->> +                          TARGET_FMT_lx "\n", ctx->base.pc_next - 4);
->=20
-> Logging is ok, but it's not enough in this context - that will turn
-> the variant eieio into a no-op.  You need to actually generate an
-> invalid instruction exception here, which is what I assume will happen
-> if you try to execute the new variant on a POWER8:
->     gen_inval_exception(ctx, POWERPC_EXCP_INVAL_INVAL);
+> +static void virtio_balloon_poll_free_page_hints(void *opaque)
+> +{
+> +    VirtQueueElement *elem;
+> +    VirtIOBalloon *dev = opaque;
+> +    VirtIODevice *vdev = VIRTIO_DEVICE(dev);
+> +    VirtQueue *vq = dev->free_page_vq;
+> +    uint32_t id;
+> +    size_t size;
+> +
+> +    while (1) {
+> +        qemu_mutex_lock(&dev->free_page_lock);
+> +        while (dev->block_iothread) {
+> +            qemu_cond_wait(&dev->free_page_cond, &dev->free_page_lock);
+> +        }
+> +
+> +        /*
+> +         * If the migration thread actively stops the reporting, exit
+> +         * immediately.
+> +         */
+> +        if (dev->free_page_report_status == FREE_PAGE_REPORT_S_STOP) {
+> +            qemu_mutex_unlock(&dev->free_page_lock);
+> +            break;
+> +        }
+> +
+> +        elem = virtqueue_pop(vq, sizeof(VirtQueueElement));
+> +        if (!elem) {
+> +            qemu_mutex_unlock(&dev->free_page_lock);
+> +            continue;
+> +        }
+> +
+> +        if (elem->out_num) {
+> +            size = iov_to_buf(elem->out_sg, elem->out_num, 0, &id, sizeof(id));
+> +            virtqueue_push(vq, elem, size);
 
-well, I didn't try but ISA says that :
+Silly question: is this sending the same id back to guest?  Why?
 
-	"Reserved fields in instructions are ignored by the processor."
+> +            g_free(elem);
+> +
+> +            virtio_tswap32s(vdev, &id);
+> +            if (unlikely(size != sizeof(id))) {
+> +                virtio_error(vdev, "received an incorrect cmd id");
 
-So it should be a no-op.
+Forgot to unlock?
 
-C.=20
+Maybe we can just move the lock operations outside:
 
->> +            return;
->> +        }
->> +        bar =3D TCG_MO_ST_LD;
->> +    }
->> +
->> +    tcg_gen_mb(bar | TCG_BAR_SC);
->>  }
->> =20
->>  #if !defined(CONFIG_USER_ONLY)
->> @@ -6483,7 +6498,7 @@ GEN_HANDLER(lswi, 0x1F, 0x15, 0x12, 0x00000001, =
-PPC_STRING),
->>  GEN_HANDLER(lswx, 0x1F, 0x15, 0x10, 0x00000001, PPC_STRING),
->>  GEN_HANDLER(stswi, 0x1F, 0x15, 0x16, 0x00000001, PPC_STRING),
->>  GEN_HANDLER(stswx, 0x1F, 0x15, 0x14, 0x00000001, PPC_STRING),
->> -GEN_HANDLER(eieio, 0x1F, 0x16, 0x1A, 0x03FFF801, PPC_MEM_EIEIO),
->> +GEN_HANDLER(eieio, 0x1F, 0x16, 0x1A, 0x01FFF801, PPC_MEM_EIEIO),
->>  GEN_HANDLER(isync, 0x13, 0x16, 0x04, 0x03FFF801, PPC_MEM),
->>  GEN_HANDLER_E(lbarx, 0x1F, 0x14, 0x01, 0, PPC_NONE, PPC2_ATOMIC_ISA20=
-6),
->>  GEN_HANDLER_E(lharx, 0x1F, 0x14, 0x03, 0, PPC_NONE, PPC2_ATOMIC_ISA20=
-6),
->> diff --git a/target/ppc/translate_init.inc.c b/target/ppc/translate_in=
-it.inc.c
->> index 1a89017ddea8..6b70f6dc5a2c 100644
->> --- a/target/ppc/translate_init.inc.c
->> +++ b/target/ppc/translate_init.inc.c
->> @@ -8847,7 +8847,8 @@ POWERPC_FAMILY(POWER9)(ObjectClass *oc, void *da=
-ta)
->>                          PPC2_FP_TST_ISA206 | PPC2_BCTAR_ISA207 |
->>                          PPC2_LSQ_ISA207 | PPC2_ALTIVEC_207 |
->>                          PPC2_ISA205 | PPC2_ISA207S | PPC2_FP_CVT_S64 =
-|
->> -                        PPC2_TM | PPC2_PM_ISA206 | PPC2_ISA300 | PPC2=
-_PRCNTL;
->> +                        PPC2_TM | PPC2_PM_ISA206 | PPC2_ISA300 | PPC2=
-_PRCNTL |
->> +                        PPC2_MEM_EIEIO2;
->>      pcc->msr_mask =3D (1ull << MSR_SF) |
->>                      (1ull << MSR_TM) |
->>                      (1ull << MSR_VR) |
->=20
+  mutex_lock();
+  while (1) {
+    ...
+    if (block) {
+      qemu_cond_wait();
+    }
+    ...
+    if (skip) {
+      continue;
+    }
+    ...
+    if (error) {
+      break;
+    }
+    ...
+  }
+  mutex_unlock();
+
+> +                break;
+> +            }
+> +            if (id == dev->free_page_report_cmd_id) {
+> +                dev->free_page_report_status = FREE_PAGE_REPORT_S_START;
+> +            } else {
+> +                /*
+> +                 * Stop the optimization only when it has started. This
+> +                 * avoids a stale stop sign for the previous command.
+> +                 */
+> +                if (dev->free_page_report_status == FREE_PAGE_REPORT_S_START) {
+> +                    dev->free_page_report_status = FREE_PAGE_REPORT_S_STOP;
+> +                    qemu_mutex_unlock(&dev->free_page_lock);
+> +                    break;
+> +                }
+> +            }
+> +        }
+> +
+> +        if (elem->in_num) {
+> +            /* TODO: send the poison value to the destination */
+> +            if (dev->free_page_report_status == FREE_PAGE_REPORT_S_START &&
+> +                !dev->poison_val) {
+> +                qemu_guest_free_page_hint(elem->in_sg[0].iov_base,
+> +                                          elem->in_sg[0].iov_len);
+> +            }
+> +            virtqueue_push(vq, elem, 0);
+> +            g_free(elem);
+> +        }
+> +        qemu_mutex_unlock(&dev->free_page_lock);
+> +    }
+> +    virtio_notify(vdev, vq);
+> +}
+
+[...]
+
+> +static const VMStateDescription vmstate_virtio_balloon_free_page_report = {
+> +    .name = "virtio-balloon-device/free-page-report",
+> +    .version_id = 1,
+> +    .minimum_version_id = 1,
+> +    .needed = virtio_balloon_free_page_support,
+> +    .fields = (VMStateField[]) {
+> +        VMSTATE_UINT32(free_page_report_cmd_id, VirtIOBalloon),
+> +        VMSTATE_UINT32(poison_val, VirtIOBalloon),
+
+(could we move all the poison-related lines into another patch or
+ postpone?  after all we don't support it yet, do we?)
+
+> +        VMSTATE_END_OF_LIST()
+> +    }
+> +};
+> +
+>  static const VMStateDescription vmstate_virtio_balloon_device = {
+>      .name = "virtio-balloon-device",
+>      .version_id = 1,
+> @@ -423,30 +572,42 @@ static const VMStateDescription vmstate_virtio_balloon_device = {
+>          VMSTATE_UINT32(actual, VirtIOBalloon),
+>          VMSTATE_END_OF_LIST()
+>      },
+> +    .subsections = (const VMStateDescription * []) {
+> +        &vmstate_virtio_balloon_free_page_report,
+> +        NULL
+> +    }
+>  };
+>  
+>  static void virtio_balloon_device_realize(DeviceState *dev, Error **errp)
+>  {
+>      VirtIODevice *vdev = VIRTIO_DEVICE(dev);
+>      VirtIOBalloon *s = VIRTIO_BALLOON(dev);
+> -    int ret;
+>  
+>      virtio_init(vdev, "virtio-balloon", VIRTIO_ID_BALLOON,
+>                  sizeof(struct virtio_balloon_config));
+>  
+> -    ret = qemu_add_balloon_handler(virtio_balloon_to_target,
+> -                                   virtio_balloon_stat, s);
+> -
+> -    if (ret < 0) {
+> -        error_setg(errp, "Only one balloon device is supported");
+> -        virtio_cleanup(vdev);
+> -        return;
+> -    }
+> -
+>      s->ivq = virtio_add_queue(vdev, 128, virtio_balloon_handle_output);
+>      s->dvq = virtio_add_queue(vdev, 128, virtio_balloon_handle_output);
+>      s->svq = virtio_add_queue(vdev, 128, virtio_balloon_receive_stats);
+> -
+> +    if (virtio_has_feature(s->host_features,
+> +                           VIRTIO_BALLOON_F_FREE_PAGE_HINT)) {
+> +        s->free_page_vq = virtio_add_queue(vdev, VIRTQUEUE_MAX_SIZE, NULL);
+> +        s->free_page_report_status = FREE_PAGE_REPORT_S_STOP;
+> +        s->free_page_report_cmd_id =
+> +                           VIRTIO_BALLOON_FREE_PAGE_REPORT_CMD_ID_MIN - 1;
+
+Why explicitly -1?  I thought ID_MIN would be fine too?
+
+> +        if (s->iothread) {
+> +            object_ref(OBJECT(s->iothread));
+> +            s->free_page_bh = aio_bh_new(iothread_get_aio_context(s->iothread),
+> +                                       virtio_balloon_poll_free_page_hints, s);
+
+Just to mention that now we can create internal iothreads.  Please
+have a look at iothread_create().
+
+> +            qemu_mutex_init(&s->free_page_lock);
+> +            qemu_cond_init(&s->free_page_cond);
+> +            s->block_iothread = false;
+> +        } else {
+> +            /* Simply disable this feature if the iothread wasn't created. */
+> +            s->host_features &= ~(1 << VIRTIO_BALLOON_F_FREE_PAGE_HINT);
+> +            virtio_error(vdev, "iothread is missing");
+> +        }
+> +    }
+>      reset_stats(s);
+>  }
+
+Regards,
+
+-- 
+Peter Xu
