@@ -1,14 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34099)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34272)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1fQbQS-0003Zh-6N
-	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 12:36:46 -0400
+	(envelope-from <eblake@redhat.com>) id 1fQbRg-0004Dp-Ch
+	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 12:38:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1fQbQQ-0006qX-Qv
-	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 12:36:44 -0400
-Date: Wed, 6 Jun 2018 17:36:26 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20180606163625.GK2660@work-vm>
-References: <46ef4200-eccf-7e65-d3a0-69e4a7414b51@redhat.com>
+	(envelope-from <eblake@redhat.com>) id 1fQbRf-0007am-Ff
+	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 12:38:00 -0400
+References: <20180529064415.GA4756@localhost.localdomain>
+	<2b3eef00-f326-c1e6-0e4b-b7602646eec4@redhat.com>
+	<20180605092159.GA2544@work-vm>
+	<46ef4200-eccf-7e65-d3a0-69e4a7414b51@redhat.com>
 	<20180606111406.GD2660@work-vm>
 	<9e8b49fb-0162-bf35-21bb-acc0dc28555f@redhat.com>
 	<20180606120050.GB2661@work-vm>
@@ -17,11 +17,14 @@ References: <46ef4200-eccf-7e65-d3a0-69e4a7414b51@redhat.com>
 	<39bcee27-329a-61d8-47fa-678b431b0a79@redhat.com>
 	<20180606150507.GJ2660@work-vm>
 	<66727986-1cf1-c12e-d78c-d56cc15eaf00@redhat.com>
-	<20180606163246.GL3064@redhat.com>
+	<20180606181135.2985cf0c@kitsune.suse.cz>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <5665031b-f400-8f8b-e43f-8b93e79ead85@redhat.com>
+Date: Wed, 6 Jun 2018 11:37:51 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <20180606163246.GL3064@redhat.com>
+In-Reply-To: <20180606181135.2985cf0c@kitsune.suse.cz>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 Subject: Re: [Qemu-devel] storing machine data in qcow images?
 List-Id: <qemu-devel.nongnu.org>
@@ -32,103 +35,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>
-Cc: Eric Blake <eblake@redhat.com>, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>, armbru@redhat.com, qemu-devel@nongnu.org, "Richard W.M. Jones" <rjones@redhat.com>, stefanha@redhat.com
+To: =?UTF-8?Q?Michal_Such=c3=a1nek?= <msuchanek@suse.de>
+Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>, armbru@redhat.com, qemu-devel@nongnu.org, "Richard W.M. Jones" <rjones@redhat.com>, stefanha@redhat.com
 
-* Daniel P. Berrang=E9 (berrange@redhat.com) wrote:
-> On Wed, Jun 06, 2018 at 10:36:20AM -0500, Eric Blake wrote:
-> > On 06/06/2018 10:05 AM, Dr. David Alan Gilbert wrote:
-> >=20
-> > > > If that's the issue, add a UUID to qcow2 files and reference it f=
-rom the
-> > > > config file.
-> > >=20
-> > > Is a UUID a small string :-)
-> >=20
-> > Even better, it's something that you could stick directly in the qcow=
-2
-> > header (and which therefore cannot grow to a larger size) - it would =
-be a
-> > well-constrained scoped addition.  Maybe the analogy to actual hardwa=
-re
-> > would be that the config file is like a sticky note, and a UUID embed=
-ded in
-> > the qcow2 file would be the disk serial number; if you are paranoid t=
-hat the
-> > sticky note could be too easily pulled off one disk and put on anothe=
-r, then
-> > the sticky note can include the serial number.
-> >=20
-> > >=20
-> > > > > We should make this EASY for users.
-> > > >=20
-> > > > To me, having a simple config file they can edit manually certain=
-ly
-> > > > seems simpler than having to use specific tools to edit it inside=
- of the
-> > > > qcow2 file.
-> > >=20
-> > > The users never touch the tools; they click and import the VM image=
-.
-> >=20
-> > And if we make it easy to import a tar file as the VM image, then tha=
-t's
-> > still the case.
-> >=20
-> > > > Sure that it isn't a soft constraint?  If most tools can stay unc=
-hanged
-> > > > but some very specific ones have to be changed, that seems reason=
-able to me.
-> > >=20
-> > > The hard constraint is the normal path stays unchanged; we can chan=
-ge
-> > > the tools to make use of the extra data, but not change what's out
-> > > there.
-> >=20
-> > But for the new config to be useful, you have to modify at least one =
-tool in
-> > the path.  At which point, it is just as easy to say: "libvirt is now=
- smart
-> > enough to read the config file out of a .qcow2 to know that it should=
- prefer
-> > a q35 machine" as it is to say "libvirt is now smart enough to treat =
-a .tar
-> > file containing .qcow2 and a config file that states that it should p=
-refer a
-> > q35 machine", and either approach requires just a single file for the=
- user
-> > to download.
->=20
-> Just to be clear, libvirt isn't going to do either of those things.
->=20
-> Whether there is metadata stuffed inside qcow2, or in a metdata file
-> inside a tar file, libvirt is not going to look inside either of them.
-> The XML is the only place libvirt deals with the hardware config.
->=20
-> Extracting machine type is always going to be a job for the layer above
-> such as OpenStack/OVirt/Virt-manager/etc. They will then decide whether
-> or not they want to honour that info, and if so, put it into the XML
-> they give to libvirt.
->=20
-> As mentioned elsewhere, IMHO, it is more friendly to those tools
-> to use pre-existing formats, eg TAR and XML/JSON, for which
-> their respective programming langauges already have APIs/parsers.
+On 06/06/2018 11:11 AM, Michal Such=C3=A1nek wrote:
 
-Libvirt could provide a wrapper around whichever format to extract the
-data and provide it to the upper layer.  It could also validate against
-it to see if the constraints were met as a service for an upper layer.
+> The reason why storing the config inside the qcow2 file is you have one
+> self-contained file that can be updated by qemu itself.
+>=20
+> So you take an image file, point your management console to it, boot
+> it, change something on it, shut it down, and publish the image as the
+> new revision of the VM.
+>=20
+> With the tar file the management console needs to chew the tar file,
+> save a copy of the config file and the disk image somewhere, and when
+> you update the image you have to re-export the tar file.
 
-Dave
+That's not necessarily true.  We're arguing that as long as the qcow2=20
+image is last in the tar file, it should still be relatively easy to=20
+write a qemu block driver that manages tar files for in-place qcow2=20
+editing.  GNU tar can also do --append or --update to modify the config=20
+file; although we may have to be careful if that starts to make the=20
+qcow2 image not the last member in the tar file.  On the other hand, if=20
+updating the config file is a common enough operation, I would not be=20
+surprised if we end up teaching the qemu tar driver how to resize images=20
+even when the qcow2 portion of the tar file is not last, or adding=20
+qemu-img commands that wrap typical tar file manipulations.
 
 >=20
-> Regards,
-> Daniel
-> --=20
-> |: https://berrange.com      -o-    https://www.flickr.com/photos/dberr=
-ange :|
-> |: https://libvirt.org         -o-            https://fstop138.berrange=
-.com :|
-> |: https://entangle-photo.org    -o-    https://www.instagram.com/dberr=
-ange :|
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> This is a lot of lengthy copying. The upside is that the console can
+> check that the machine you are exporting is not running an you are not
+> prone to publishing images in inconsistent state.
+
+Read-only qcow2 within a tar does NOT require lengthy copying.  Updating=20
+qcow2 within tar might, but then again, we are arguing that with a sane=20
+layout, copying the ENTIRE qcow2 portion is NOT always going to be=20
+necessary.  For example, modern Linux has things like=20
+fallocate(FALLOC_FL_INSERT_RANGE) (on file systems that are capable) for=20
+enlarging the head of a tar file enough to stick in a larger config file=20
+at the front, with a LOT less data movement effort when compared to=20
+moving the qcow2 tail of that same tar file.
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
