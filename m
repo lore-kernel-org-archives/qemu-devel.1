@@ -1,27 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55659)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55667)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Paul.Burton@mips.com>) id 1fQeyA-0008UL-FH
-	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 16:23:47 -0400
+	(envelope-from <crosa@redhat.com>) id 1fQeyC-0008VW-9Z
+	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 16:23:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <Paul.Burton@mips.com>) id 1fQey7-0001SF-Cf
-	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 16:23:46 -0400
-Received: from 9pmail.ess.barracuda.com ([64.235.154.210]:34240)
+	(envelope-from <crosa@redhat.com>) id 1fQey9-0001TJ-5k
+	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 16:23:48 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:43080 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <Paul.Burton@mips.com>)
-	id 1fQey7-0001Pc-2f
-	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 16:23:43 -0400
-Date: Wed, 6 Jun 2018 13:23:20 -0700
-From: Paul Burton <paul.burton@mips.com>
-Message-ID: <20180606202320.4lopjnm4be3d5gix@pburton-laptop>
-References: <1487722868-9111-1-git-send-email-yongbok.kim@imgtec.com>
-	<1487722868-9111-8-git-send-email-yongbok.kim@imgtec.com>
-	<CAFEAcA8NehifKn7wsmLgUqiYNHwczzrXGnUcTvx-AbLM=_LeMQ@mail.gmail.com>
+	(Exim 4.71) (envelope-from <crosa@redhat.com>) id 1fQey9-0001SW-0P
+	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 16:23:45 -0400
+References: <20180530200334.24179-1-f4bug@amsat.org>
+	<22ca41bb-9f8b-e8bb-e676-b5c96f3f9add@redhat.com>
+	<acf7522a-4fc0-5138-9797-6cfcc5ad5719@amsat.org>
+	<20180606192429.GV7451@localhost.localdomain>
+	<2bdd428e-8790-7c1f-f324-4bc6b6923c15@amsat.org>
+	<20180606201140.GZ7451@localhost.localdomain>
+From: Cleber Rosa <crosa@redhat.com>
+Message-ID: <34060c1c-ca8d-8aed-7f62-609d82e734b7@redhat.com>
+Date: Wed, 6 Jun 2018 16:23:42 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <CAFEAcA8NehifKn7wsmLgUqiYNHwczzrXGnUcTvx-AbLM=_LeMQ@mail.gmail.com>
-Subject: Re: [Qemu-devel] [PULL v2 7/8] hw: xilinx-pcie: Add support for
- Xilinx AXI PCIe Controller
+In-Reply-To: <20180606201140.GZ7451@localhost.localdomain>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [RFC PATCH] configure: Enable out-of-tree
+ acceptance tests
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,72 +33,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Yongbok Kim <yongbok.kim@mips.com>, QEMU Developers <qemu-devel@nongnu.org>, Edgar Iglesias <edgar.iglesias@xilinx.com>
+To: Eduardo Habkost <ehabkost@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Cc: Amador Pahim <amador@pahim.org>, Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org
 
-Hi Peter,
 
-On Mon, Jun 04, 2018 at 11:29:47AM +0100, Peter Maydell wrote:
-> On 22 February 2017 at 00:21, Yongbok Kim <yongbok.kim@imgtec.com> wrote:
-> > From: Paul Burton <paul.burton@imgtec.com>
-> >
-> > Add support for emulating the Xilinx AXI Root Port Bridge for PCI
-> > Express as described by Xilinx' PG055 document. This is a PCIe
-> > controller that can be used with certain series of Xilinx FPGAs, and is
-> > used on the MIPS Boston board which will make use of this code.
-> >
-> > Signed-off-by: Paul Burton <paul.burton@imgtec.com>
-> > [yongbok.kim@imgtec.com:
-> >   removed returning on !level,
-> >   updated IRQ connection with GPIO logic,
-> >   moved xilinx_pcie_init() to boston.c
-> >   replaced stw_le_p() with pci_set_word()
-> >   and other cosmetic changes]
-> > Signed-off-by: Yongbok Kim <yongbok.kim@imgtec.com>
-> > ---
-> 
-> > +static void xilinx_pcie_host_realize(DeviceState *dev, Error **errp)
-> > +{
-> > +    PCIHostState *pci = PCI_HOST_BRIDGE(dev);
-> > +    XilinxPCIEHost *s = XILINX_PCIE_HOST(dev);
-> > +    SysBusDevice *sbd = SYS_BUS_DEVICE(dev);
-> > +    PCIExpressHost *pex = PCIE_HOST_BRIDGE(dev);
-> > +
-> > +    snprintf(s->name, sizeof(s->name), "pcie%u", s->bus_nr);
-> > +
-> > +    /* PCI configuration space */
-> > +    pcie_host_mmcfg_init(pex, s->cfg_size);
-> > +
-> > +    /* MMIO region */
-> > +    memory_region_init(&s->mmio, OBJECT(s), "mmio", UINT64_MAX);
-> > +    memory_region_set_enabled(&s->mmio, false);
-> > +
-> > +    /* dummy I/O region */
-> > +    memory_region_init_ram(&s->io, OBJECT(s), "io", 16, NULL);
-> > +    memory_region_set_enabled(&s->io, false);
-> 
-> Hi; I was looking at the code for this PCI controller as
-> part of identifying RAM memory regions that don't migrate
-> their contents, and this looks kind of odd. Can you explain
-> why this is using a RAM region for the PCI bus's IO memory
-> space? None of our other PCI controller models do this, so
-> I suspect this is a bug. (The effect would be that PCI IO
-> accesses to addresses which don't have a PCI BAR mapped there
-> will behave as reads-as-written, which seems pretty unlikely
-> to be what the hardware does.)
-> 
-> What is the intended semantics for PCI IO accesses with this
-> controller? (It seems to only be used with the MIPS boston
-> board model.)
-> 
-> thanks
-> -- PMM
 
-The controller here simply doesn't support I/O accesses, and the dummy
-region is there to prevent the rest of QEMU's PCI code & device
-emulation from needing to care about that fact. The region is never
-mapped into the system memory and so software running on the emulated
-system has no way to access it.
+On 06/06/2018 04:11 PM, Eduardo Habkost wrote:
+> On Wed, Jun 06, 2018 at 04:36:16PM -0300, Philippe Mathieu-Daud=C3=A9 w=
+rote:
+>> On 06/06/2018 04:24 PM, Eduardo Habkost wrote:
+>>> On Tue, Jun 05, 2018 at 11:45:03AM -0300, Philippe Mathieu-Daud=C3=A9=
+ wrote:
+>>> [... something about config files ...]
+>>>>> And after that, the following would run all "console" tests:
+>>>>>
+>>>>>   avocado run -t console
+>>>>>
+>>>>> How does this sound?
+>>>>
+>>>> For my use cases this doesn't worry me, I'll let Eduardo/Fam opine a=
+bout
+>>>> use_test_dir_when_no_references_given.
+>>>
+>>> Well, I can't give an opinion because I couldn't understand
+>>> what's the final goal here.
+>>
+>> You cut too much, the relevant part is:
+>>
+>>   On 05/30/2018 10:06 PM, Cleber Rosa wrote:
+>>   > But at the same, there are security implications: `list` won't
+>>   > load/execute any test code (different from, say, standard Python
+>>   > unittests), while "run" obviously will.  So "avocado run" may end =
+up
+>>   > running what users don't want if a malicious user controls
+>>   > "$avocado_datadir_paths_test_dir".
+>=20
+> The final goal still isn't clear to me.  Why would somebody want
+> to use $avocado_datadir_paths_test_dir instead of just specifying
+> "." in the command-line?
+>=20
+>=20
+>>
+>>>
+>>> What exactly is missing in the current solution?  Why
+>>> "avocado run -t console ." wouldn't work?
+>>
+>> It doesn't work in out-of-tree builds, I have to use the full path:
+>>
+>>   >>   build_dir$ avocado run
+>> /full/path/to/sources/qemu/tests/acceptance/boot_linux_console.py
+>=20
+> Isn't the symlink you suggested a better solution than requiring
+> the user to edit a config file?
+>=20
 
-Thanks,
-    Paul
+It's definitely the simplest, and would avoid a questionable knob and
+behavior in Avocado.
+
+- Cleber.
