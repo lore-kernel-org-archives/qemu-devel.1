@@ -1,30 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60967)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33716)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1fQWlL-00068W-CS
-	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 07:38:00 -0400
+	(envelope-from <rjones@redhat.com>) id 1fQWo8-0000Hg-Hr
+	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 07:40:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1fQWlI-00054G-AP
-	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 07:37:59 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:43446 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1fQWlI-00053y-5r
-	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 07:37:56 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.6])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 54370401DE62
-	for <qemu-devel@nongnu.org>; Wed,  6 Jun 2018 11:37:55 +0000 (UTC)
-Date: Wed, 6 Jun 2018 12:37:52 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20180606113752.GA3064@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <20180606104357.GB3205@lemon.usersys.redhat.com>
+	(envelope-from <rjones@redhat.com>) id 1fQWo7-0006he-B6
+	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 07:40:52 -0400
+Date: Wed, 6 Jun 2018 12:40:35 +0100
+From: "Richard W.M. Jones" <rjones@redhat.com>
+Message-ID: <20180606114035.GG1455@redhat.com>
+References: <20180524113251.GB4660@redhat.com>
+	<d9bb2cb9-d9dc-8fe0-a767-10d9cbbab803@redhat.com>
+	<20180528183058.GG2209@redhat.com>
+	<20180528183833.GJ4580@localhost.localdomain>
+	<20180528212054.GH2209@redhat.com>
+	<20180528212510.GC4660@redhat.com>
+	<20180529064415.GA4756@localhost.localdomain>
+	<2b3eef00-f326-c1e6-0e4b-b7602646eec4@redhat.com>
+	<20180606123237.2235ae4a@kitsune.suse.cz>
+	<bc97cdc3-85ba-e053-0816-b6bc431064fb@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20180606104357.GB3205@lemon.usersys.redhat.com>
-Subject: Re: [Qemu-devel] 100% host cpu with gtk3
+In-Reply-To: <bc97cdc3-85ba-e053-0816-b6bc431064fb@redhat.com>
+Subject: Re: [Qemu-devel] storing machine data in qcow images?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,35 +31,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>
-Cc: qemu-devel@nongnu.org, kraxel@redhat.com
+To: Max Reitz <mreitz@redhat.com>
+Cc: Michal =?iso-8859-1?Q?Such=E1nek?= <msuchanek@suse.de>, Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org, stefanha@redhat.com, ehabkost@redhat.com, qemu-block@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>
 
-On Wed, Jun 06, 2018 at 06:43:57PM +0800, Fam Zheng wrote:
-> Hi Gerd,
-> 
-> When using the gtk frontend, it seems there is a busy loop in libgtk repeatedly
-> calling recvmsg, causing 100% cpu on the main thread. This started to appear
-> after I upgraded to Fedora 28. Is this a known problem?
-> 
-> Any hints on how to track it down?
+On Wed, Jun 06, 2018 at 01:02:53PM +0200, Max Reitz wrote:
+> (I'm wondering if we could write a block driver that could provide such
+> a chunk allocation transparently to qcow2...  Note that a qcow2 file
+> does not need to be continuous, so you could in theory indeed store the
+> qcow2 file and its data in completely separate places in a tar file.)
 
-GLib has systemtap probes registered in its dispatch code. These probes
-will include the name of the GSource. You could possibly use this to
-identify which GSource is firing too often.
+nbdkit-split-plugin
+(https://github.com/libguestfs/nbdkit/tree/master/plugins/split).  It
+currently doesn't support resizing although it could do fairly easily.
 
-eg in gmain.c in glib code there are these events to hook into:
+> Yeah, but why make qcow2 that format?  That's what I completely fail to
+> understand.
 
-          TRACE (GLIB_MAIN_BEFORE_DISPATCH (g_source_get_name (source), source,
-                                            dispatch, callback, user_data));
-          need_destroy = !(* dispatch) (source, callback, user_data);
-          TRACE (GLIB_MAIN_AFTER_DISPATCH (g_source_get_name (source), source,
-                                           dispatch, need_destroy));
+I started off a long reply here, but I think you're right.  If we
+cannot make people decide on and use a proper disk image + metadata
+container, then it's also unlikely we'll get them to add sensible
+metadata to their qcow2 images either :-(
 
+Rich.
 
-
-Regards,
-Daniel
 -- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+Richard Jones, Virtualization Group, Red Hat http://people.redhat.com/~rjones
+Read my programming and virtualization blog: http://rwmj.wordpress.com
+libguestfs lets you edit virtual machines.  Supports shell scripting,
+bindings from many languages.  http://libguestfs.org
