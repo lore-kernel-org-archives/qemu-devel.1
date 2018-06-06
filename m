@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42463)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42728)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1fQPKJ-0003Ru-1r
-	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 23:41:35 -0400
+	(envelope-from <elohimes@gmail.com>) id 1fQPMG-0004UA-Oy
+	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 23:43:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1fQPKE-0007MG-54
-	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 23:41:35 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:33576 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1fQPKD-0007Ln-W5
-	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 23:41:30 -0400
-References: <1528225683-11413-1-git-send-email-wexu@redhat.com>
-	<1528225683-11413-6-git-send-email-wexu@redhat.com>
-	<f94057e1-5d6f-c90d-5b21-d1cd561d6d53@redhat.com>
-	<20180606033815.GA3749@wei-ubt>
-From: Jason Wang <jasowang@redhat.com>
-Message-ID: <04a61e4a-f0ae-0e7d-03aa-c488e89fd1ca@redhat.com>
-Date: Wed, 6 Jun 2018 11:41:18 +0800
+	(envelope-from <elohimes@gmail.com>) id 1fQPMG-0008Bt-4W
+	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 23:43:36 -0400
+Received: from mail-ot0-x241.google.com ([2607:f8b0:4003:c0f::241]:46323)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <elohimes@gmail.com>) id 1fQPMF-0008Bc-VG
+	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 23:43:36 -0400
+Received: by mail-ot0-x241.google.com with SMTP id q1-v6so5465360oth.13
+	for <qemu-devel@nongnu.org>; Tue, 05 Jun 2018 20:43:35 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20180606033815.GA3749@wei-ubt>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC v2 5/8] virtio: queue pop for packed ring
+In-Reply-To: <20180605172222-mutt-send-email-mst@kernel.org>
+References: <1528206970-4815-1-git-send-email-xieyongji@baidu.com>
+	<20180605172222-mutt-send-email-mst@kernel.org>
+From: Yongji Xie <elohimes@gmail.com>
+Date: Wed, 6 Jun 2018 11:43:34 +0800
+Message-ID: <CAONzpcaaAeYCD3tWXGpa3hCYKdL5K9uSm1Xs4BU_9gaBS1hy=A@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH] vhost-user-blk: start vhost when guest
+ kicks
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,25 +29,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Wei Xu <wexu@redhat.com>
-Cc: qemu-devel@nongnu.org, jfreimann@redhat.com, tiwei.bie@intel.com, mst@redhat.com
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: stefanha@redhat.com, changpeng.liu@intel.com, qemu-devel@nongnu.org, chaiwen@baidu.com, nixun@baidu.com
 
-
-
-On 2018=E5=B9=B406=E6=9C=8806=E6=97=A5 11:38, Wei Xu wrote:
->>> +
->>> +    head =3D vq->last_avail_idx;
->>> +    i =3D head;
->>> +
->>> +    caches =3D vring_get_region_caches(vq);
->>> +    cache =3D &caches->desc;
->>> +    vring_packed_desc_read(vdev, &desc, cache, i);
->> I think we'd better find a way to avoid reading descriptor twice.
-> Do you mean here and the read for empty check?
+On 5 June 2018 at 22:23, Michael S. Tsirkin <mst@redhat.com> wrote:
+> On Tue, Jun 05, 2018 at 09:56:10PM +0800, Yongji Xie wrote:
+>> Some old guests (before commit 7a11370e5: "virtio_blk: enable VQs early")
+>> kick virtqueue before setting VIRTIO_CONFIG_S_DRIVER_OK. This would cause
+>> that those old guests fail to boot with vhost-user-blk device.
+>>
+>> To fix it, start vhost when guest kicks instead of waiting for .set_status().
+>>
+>> Signed-off-by: Yongji Xie <xieyongji@baidu.com>
+>> Signed-off-by: Chai Wen <chaiwen@baidu.com>
+>> Signed-off-by: Ni Xun <nixun@baidu.com>
 >
-> Wei
+> Can we at least limit this to when virtio 1.0 has not
+> been negotiated?
 >
 
-Yes.
+OK, I will limit this to when driver is v0.9.x and device is v1.0 so
+we don't violate the spec.
 
-Thanks
+Thanks,
+Yongji
