@@ -1,29 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37708)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37900)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dovgaluk@ispras.ru>) id 1fQSLy-00085R-DT
-	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 02:55:31 -0400
+	(envelope-from <kevin.tian@intel.com>) id 1fQSMx-00005m-KD
+	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 02:56:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dovgaluk@ispras.ru>) id 1fQSLu-0003hy-C8
-	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 02:55:30 -0400
-Received: from mail.ispras.ru ([83.149.199.45]:42602)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dovgaluk@ispras.ru>) id 1fQSLt-0003gY-NP
-	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 02:55:26 -0400
-From: "Pavel Dovgalyuk" <dovgaluk@ispras.ru>
-References: <20180528071332.9424.27343.stgit@pasha-VirtualBox>
-	<b2f04223-f52d-44e6-95a6-6ed91d021dad@ispras.ru>
-	<87in6yd146.fsf@linaro.org> <001201d3fc8d$e8a06390$b9e12ab0$@ru>
-	<87fu21d3gh.fsf@linaro.org> <001c01d3fcae$f0443fb0$d0ccbf10$@ru>
-	<87bmcpcmfa.fsf@linaro.org>
-In-Reply-To: <87bmcpcmfa.fsf@linaro.org>
-Date: Wed, 6 Jun 2018 09:55:24 +0300
-Message-ID: <000901d3fd63$587ca630$0975f290$@ru>
+	(envelope-from <kevin.tian@intel.com>) id 1fQSMt-000475-LU
+	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 02:56:31 -0400
+Received: from mga12.intel.com ([192.55.52.136]:57636)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kevin.tian@intel.com>)
+	id 1fQSMt-00045o-BH
+	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 02:56:27 -0400
+From: "Tian, Kevin" <kevin.tian@intel.com>
+Date: Wed, 6 Jun 2018 06:56:22 +0000
+Message-ID: <AADFC41AFE54684AB9EE6CBC0274A5D1911F8B6B@SHSMSX101.ccr.corp.intel.com>
+References: <CAHyh4xhckUtH=gfa5K+KVehz27hVznUg7UX-Ca-AcjCvtiAhHg@mail.gmail.com>
+	<AADFC41AFE54684AB9EE6CBC0274A5D1911F3CAE@SHSMSX101.ccr.corp.intel.com>
+	<CAHyh4xhbVROe3xUXwojOMBHKdTxNms7ZqRkhpm+1N0XZm3xBuA@mail.gmail.com>
+In-Reply-To: <CAHyh4xhbVROe3xUXwojOMBHKdTxNms7ZqRkhpm+1N0XZm3xBuA@mail.gmail.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Content-Language: ru
-Subject: Re: [Qemu-devel] [PATCH v4 00/19] reverse debugging
+Subject: Re: [Qemu-devel] vIOMMU Posted-interrupt implementation - atomic
+ operation?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,103 +31,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?Q?'Alex_Benn=C3=A9e'?= <alex.bennee@linaro.org>
-Cc: 'Pavel Dovgalyuk' <pavel.dovgaluk@ispras.ru>, qemu-devel@nongnu.org, kwolf@redhat.com, peter.maydell@linaro.org, war2jordan@live.com, crosthwaite.peter@gmail.com, boost.lists@gmail.com, quintela@redhat.com, ciro.santilli@gmail.com, jasowang@redhat.com, mst@redhat.com, zuban32s@gmail.com, armbru@redhat.com, maria.klimushenkova@ispras.ru, kraxel@redhat.com, thomas.dullien@googlemail.com, pbonzini@redhat.com, mreitz@redhat.com, dgilbert@redhat.com, rth@twiddle.net
+To: Jintack Lim <jintack@cs.columbia.edu>
+Cc: QEMU Devel Mailing List <qemu-devel@nongnu.org>, Peter Xu <peterx@redhat.com>
 
-> From: Alex Benn=C3=A9e [mailto:alex.bennee@linaro.org]
-> Pavel Dovgalyuk <dovgaluk@ispras.ru> writes:
->=20
-> >> From: Alex Benn=C3=A9e [mailto:alex.bennee@linaro.org]
-> >> Pavel Dovgalyuk <dovgaluk@ispras.ru> writes:
-> >>
-> >> >> From: Alex Benn=C3=A9e [mailto:alex.bennee@linaro.org]
-> >> >> Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru> writes:
-> >> >>
-> >> >> > Ping?
-> >> >>
-> >> >> I started having a look but I ran into this straight away. First =
-I
-> >> >> recorded a boot of the kernel:
-> >> >>
-> >> >>   ./aarch64-softmmu/qemu-system-aarch64 -machine =
-virt,graphics=3Don,gic-
-> >> >> version=3D3,virtualization=3Don -cpu cortex-a53 --serial =
-mon:stdio -display none -kernel
-> >> >> ../images/aarch64-current-linux-initrd-guest.img -icount
-> >> shift=3D7,rr=3Drecord,rrfile=3Dreplay.bin
-> >> >>
-> >> >> Then played back:
-> >> >>
-> >> >>   ./aarch64-softmmu/qemu-system-aarch64 -machine =
-virt,graphics=3Don,gic-
-> >> >> version=3D3,virtualization=3Don -cpu cortex-a53 --serial =
-mon:stdio -display none -kernel
-> >> >> ../images/aarch64-current-linux-initrd-guest.img -icount
-> >> shift=3D7,rr=3Dreplay,rrfile=3Dreplay.bin -
-> >> >> s -S
-> >> >
-> >> > This looks ok, but...
-> >> >
-> >> >> And did the following on gdb:
-> >> >>
-> >> >> (gdb) i
-> >> >> 0x0000000040000004 in ?? ()
-> >> >> =3D> 0x40000004:  mov     x1, xzr
-> >> >>    0x40000008:  mov     x2, xzr
-> >> >>    0x4000000c:  mov     x3, xzr
-> >> >> (gdb)
-> >> >> 0x0000000040000008 in ?? ()
-> >> >> =3D> 0x40000008:  mov     x2, xzr
-> >> >>    0x4000000c:  mov     x3, xzr
-> >> >>    0x40000010:  ldr     x4, 0x40000020
-> >> >> (gdb)
-> >> >> 0x000000004000000c in ?? ()
-> >> >> =3D> 0x4000000c:  mov     x3, xzr
-> >> >>    0x40000010:  ldr     x4, 0x40000020
-> >> >>    0x40000014:  br      x4
-> >> >> (gdb)
-> >> >> 0x0000000040000010 in ?? ()
-> >> >> =3D> 0x40000010:  ldr     x4, 0x40000020
-> >> >>    0x40000014:  br      x4
-> >> >>    0x40000018:  .inst   0x44000000 ; undefined
-> >> >> (gdb)
-> >> >> 0x0000000040000014 in ?? ()
-> >> >> =3D> 0x40000014:  br      x4
-> >> >>    0x40000018:  .inst   0x44000000 ; undefined
-> >> >>    0x4000001c:  .inst   0x00000000 ; undefined
-> >> >> (gdb) p/x $x4
-> >> >> $1 =3D 0x40080000
-> >> >> (gdb) reverse-stepi
-> >> >> warning: Remote failure reply: E14
-> >> >>
-> >> >> Surely this is the simple case and doesn't require any snapshots =
-for
-> >> >> block devices as there are none. Am I missing something?
-> >> >
-> >> > Reverse debugging requires the snapshotting. QEMU can't revert =
-the VM state without the
-> >> snapshots.
-> >> > You can try adding an empty qcow2 image to allow snapshotting =
-there.
-> >>
-> >> I suspect a recent patch has broken locking again:
-> >>
-> >> Starting program: =
-/home/alex/lsrc/qemu/qemu.git/aarch64-softmmu/qemu-system-aarch64 -
-> machine
-> >> virt,graphics=3Don,gic-version=3D3,virtualization=3Don -cpu =
-cortex-a53 --serial mon:stdio -
-> display
-> >> none -kernel ../images/aarch64-current-linux-initrd-guest.img =
--icount
-> >> shift=3D7,rr=3Dreplay,rrfile=3Dreplay.bin,rrsnapshot=3Ddebug -drive
-> >> file=3Drr.qcow2,if=3Dnone,snapshot,id=3Drr -s -S
-
-Just noticed. If you are using VM snapshots, then you should disable =
-"snapshot" option
-of the drive. Like that: -drive file=3Drr.qcow2,if=3Dnone
-
-BTW, similar command line for aarch64 worked for me.
-I just removed "-display=3Dnone" for convenience.
-
-Pavel Dovgalyuk
+PiBGcm9tOiBKaW50YWNrIExpbSBbbWFpbHRvOmppbnRhY2tAY3MuY29sdW1iaWEuZWR1XQ0KPiBT
+ZW50OiBUdWVzZGF5LCBKdW5lIDUsIDIwMTggODo1NyBQTQ0KPiANCj4gVGhhbmtzLCBLZXZpbi4N
+Cj4gDQo+IE9uIFR1ZSwgSnVuIDUsIDIwMTggYXQgMjo1NCBBTSwgVGlhbiwgS2V2aW4gPGtldmlu
+LnRpYW5AaW50ZWwuY29tPiB3cm90ZToNCj4gPj4gRnJvbTogSmludGFjayBMaW0NCj4gPj4gU2Vu
+dDogRnJpZGF5LCBKdW5lIDEsIDIwMTggMTE6NDcgQU0NCj4gPj4NCj4gPj4gSGksDQo+ID4+DQo+
+ID4+IEknbSBpbXBsZW1lbnRpbmcgUG9zdGVkLWludGVycnVwdCBmdW5jdGlvbmFsaXR5IGluIHZJ
+T01NVS4gQWNjb3JkaW5nDQo+ID4+IHRvIFZ0LWQgc3BlYyA1LjIuMywgSU9NTVUgcGVyZm9ybXMg
+YSBjb2hlcmVudCBhdG9taWMgcmVhZC1tb2RpZnktDQo+IHdyaXRlDQo+ID4+IG9wZXJhdGlvbiBv
+ZiB0aGUgcG9zdGVkLWludGVycnVwdCBkZXNjcmlwdG9yLiBJIHdvbmRlciBob3cgY2FuIHdlDQo+
+ID4+IGFjaGlldmUgdGhpcyBjb25zaWRlcmluZyB0aGUgZ3Vlc3QgY2FuIG1vZGlmeSB0aGUgc2Ft
+ZQ0KPiA+PiBwb3N0ZWQtaW50ZXJydXB0IGRlc2NyaXB0b3IgYW55dGltZS4gSXMgdGhlcmUgYW55
+IGV4aXN0aW5nIG1lY2hhbmlzbQ0KPiA+PiB0aGF0IEkgY2FuIHVzZSBpbiBRRU1VPw0KPiA+Pg0K
+PiA+DQo+ID4gSSBkb24ndCB0aGluayBpdCdzIHBvc3NpYmxlIHRvIGVtdWxhdGUgc3VjaCBvcGVy
+YXRpb24gaW4gc29mdHdhcmUsIHVubGVzcw0KPiA+IHlvdSB3YW50IHRvIGNoYW5nZSBndWVzdCB0
+byBiZSBjb29wZXJhdGl2ZS4gQWN0dWFsbHkgaXQgaXMgbm90IG5lY2Vzc2FyeS4NCj4gPiBWVC1k
+IGRvZXMgc28gZHVlIHRvIHNvbWUgaGFyZHdhcmUgaW1wbGVtZW50YXRpb24gY29uc2lkZXJhdGlv
+bi4NCj4gDQo+IFdvdWxkIHlvdSBtaW5kIGV4cGFuZGluZyB0aGlzPyBJJ20gY3VyaW91cyB3aGF0
+IGl0IHdvdWxkIGJlLiBJcyBpdA0KPiBiZWNhdXNlIElPTU1VIGNhbid0IGRvIHNvbWV0aGluZyBs
+aWtlIGNtcHhjaGcgaW5zdHJ1Y3Rpb25zPw0KDQpJIGRvbid0IGhhdmUgZnVydGhlciBpbmZvcm1h
+dGlvbi4gQWJvdmUgaXMgd2hhdCBJIHdhcyB0b2xkIGJ5IGhhcmR3YXJlDQp0ZWFtLg0KDQo+IA0K
+PiA+IFNpbmNlIHlvdSBhcmUgZW11bGF0aW5nIG9uIENQVSwgY291bGQganVzdCBmb2xsb3cgaG93
+IENQVSBwb3N0ZWQNCj4gPiBpbnRlcnJ1cHQgaXMgY29uZHVjdGVkLiBJZiB5b3UgbG9vayBhdCBT
+RE0gKDI5LjYgUG9zdGVkLUludGVycnVwdA0KPiA+IFByb2Nlc3NpbmcpOg0KPiA+DQo+ID4gICAg
+ICAgICAiVGhlcmUgaXMgYSByZXF1aXJlbWVudCwgaG93ZXZlciwgdGhhdCBzdWNoIG1vZGlmaWNh
+dGlvbnMgYmUNCj4gPiBkb25lIHVzaW5nIGxvY2tlZCByZWFkLW1vZGlmeS13cml0ZSBpbnN0cnVj
+dGlvbnMuIg0KPiA+DQo+ID4gW2luc3RydWN0aW9uc10gbWVhbnMgeW91IGNhbiBkbyB1cGRhdGUg
+bXVsdGlwbGUgdGltZXMgd2hlbiBwb3N0aW5nIGFuDQo+ID4gaW50ZXJydXB0LCBhcyBsb25nIGFz
+IGVhY2ggdXBkYXRlIGlzIGF0b21pYy4NCj4gDQo+IEFoLCB0aGF0J3MgYSBnb29kIHBvaW50LiBT
+byB0aGUgdW5pdCBvZiBhdG9taWMgb3BlcmF0aW9uIGRvZXNuJ3QgbmVlZA0KPiB0byBiZSB0aGUg
+d2hvbGUgUEkgZGVzY3JpcHRvciwgYnV0IGl0IGNhbiBiZSBhbnkgc3Vic2V0IChlLmcuIGp1c3Qg
+b25lDQo+IGJpdCkgb2YgdGhlIGRlc2NyaXB0b3I/IEJ5IGxvb2tpbmcgYXQgTGludXgga2VybmVs
+IGNvZGUsIHRoYXQgc2VlbXMgdG8NCj4gYmUgdGhlIGNhc2UuDQo+IA0KDQpFeGFjdGx5LiA6LSkN
+Cg0KVGhhbmtzDQpLZXZpbg0K
