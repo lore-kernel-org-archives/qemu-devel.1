@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39327)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39360)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fQaG8-0004mA-9Q
-	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 11:22:03 -0400
+	id 1fQaGA-0004q1-Ky
+	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 11:22:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fQaG6-0003hx-K0
-	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 11:22:00 -0400
+	id 1fQaG8-0003iy-Qd
+	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 11:22:02 -0400
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Date: Wed,  6 Jun 2018 12:21:24 -0300
-Message-Id: <20180606152128.449-8-f4bug@amsat.org>
+Date: Wed,  6 Jun 2018 12:21:25 -0300
+Message-Id: <20180606152128.449-9-f4bug@amsat.org>
 In-Reply-To: <20180606152128.449-1-f4bug@amsat.org>
 References: <20180606152128.449-1-f4bug@amsat.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH 07/11] stellaris: Add trailing '\n' to
+Subject: [Qemu-devel] [PATCH 08/11] target/arm: Add trailing '\n' to
  qemu_log() calls
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -32,50 +32,30 @@ Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nong
 
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- hw/arm/stellaris.c | 11 ++++++-----
- 1 file changed, 6 insertions(+), 5 deletions(-)
+ target/arm/helper.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/hw/arm/stellaris.c b/hw/arm/stellaris.c
-index e886f54976..502a20842c 100644
---- a/hw/arm/stellaris.c
-+++ b/hw/arm/stellaris.c
-@@ -203,11 +203,11 @@ static uint64_t gptm_read(void *opaque, hwaddr offset,
-             return s->rtc;
-         }
+diff --git a/target/arm/helper.c b/target/arm/helper.c
+index f75aa6e9ca..1248d84e6f 100644
+--- a/target/arm/helper.c
++++ b/target/arm/helper.c
+@@ -4570,7 +4570,7 @@ void hw_breakpoint_update(ARMCPU *cpu, int n)
+     case 4: /* unlinked address mismatch (reserved if AArch64) */
+     case 5: /* linked address mismatch (reserved if AArch64) */
          qemu_log_mask(LOG_UNIMP,
--                      "GPTM: read of TAR but timer read not supported");
-+                      "GPTM: read of TAR but timer read not supported\n");
-         return 0;
-     case 0x4c: /* TBR */
+-                      "arm: address mismatch breakpoint types not implemented");
++                      "arm: address mismatch breakpoint types not implemented\n");
+         return;
+     case 0: /* unlinked address match */
+     case 1: /* linked address match */
+@@ -4604,7 +4604,7 @@ void hw_breakpoint_update(ARMCPU *cpu, int n)
+     case 8: /* unlinked VMID match (reserved if no EL2) */
+     case 10: /* unlinked context ID and VMID match (reserved if no EL2) */
          qemu_log_mask(LOG_UNIMP,
--                      "GPTM: read of TBR but timer read not supported");
-+                      "GPTM: read of TBR but timer read not supported\n");
-         return 0;
-     default:
-         qemu_log_mask(LOG_GUEST_ERROR,
-@@ -836,11 +836,12 @@ static void stellaris_i2c_write(void *opaque, hwaddr offset,
-         break;
-     case 0x20: /* MCR */
-         if (value & 1) {
--            qemu_log_mask(LOG_UNIMP, "stellaris_i2c: Loopback not implemented");
-+            qemu_log_mask(LOG_UNIMP,
-+                          "stellaris_i2c: Loopback not implemented\n");
-         }
-         if (value & 0x20) {
-             qemu_log_mask(LOG_UNIMP,
--                          "stellaris_i2c: Slave mode not implemented");
-+                          "stellaris_i2c: Slave mode not implemented\n");
-         }
-         s->mcr = value & 0x31;
-         break;
-@@ -1124,7 +1125,7 @@ static void stellaris_adc_write(void *opaque, hwaddr offset,
-         s->sspri = value;
-         break;
-     case 0x28: /* PSSI */
--        qemu_log_mask(LOG_UNIMP, "ADC: sample initiate unimplemented");
-+        qemu_log_mask(LOG_UNIMP, "ADC: sample initiate unimplemented\n");
-         break;
-     case 0x30: /* SAC */
-         s->sac = value;
+-                      "arm: unlinked context breakpoint types not implemented");
++                      "arm: unlinked context breakpoint types not implemented\n");
+         return;
+     case 9: /* linked VMID match (reserved if no EL2) */
+     case 11: /* linked context ID and VMID match (reserved if no EL2) */
 -- 
 2.17.1
