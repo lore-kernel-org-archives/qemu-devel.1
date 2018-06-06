@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35655)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36189)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fQYei-0005We-Ul
-	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 09:39:21 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1fQYgY-0007T8-4F
+	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 09:41:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fQYef-0006eH-T8
-	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 09:39:16 -0400
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20180606093101.30518-1-luc.michel@greensocs.com>
-	<20180606093101.30518-2-luc.michel@greensocs.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <d1fa5a1a-91a8-e2e6-cd1f-cd0633591120@amsat.org>
-Date: Wed, 6 Jun 2018 10:38:44 -0300
+	(envelope-from <pbonzini@redhat.com>) id 1fQYgT-0007qR-Kz
+	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 09:41:10 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:53190 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1fQYgT-0007q9-9x
+	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 09:41:05 -0400
+References: <1527256943-7667-1-git-send-email-lpetrut@cloudbasesolutions.com>
+	<1527256943-7667-2-git-send-email-lpetrut@cloudbasesolutions.com>
+	<MW2PR2101MB09217EDB59C18C11145349E7B6670@MW2PR2101MB0921.namprd21.prod.outlook.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <0f01da29-e00c-2d20-f07e-8498a242e290@redhat.com>
+Date: Wed, 6 Jun 2018 15:41:01 +0200
 MIME-Version: 1.0
-In-Reply-To: <20180606093101.30518-2-luc.michel@greensocs.com>
+In-Reply-To: <MW2PR2101MB09217EDB59C18C11145349E7B6670@MW2PR2101MB0921.namprd21.prod.outlook.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH 1/6] intc/arm_gic: Refactor
- operations on the distributor
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v3 2/3] WHPX: dynamically load WHP libraries
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,724 +29,626 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: luc.michel@greensocs.com, qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, mark.burton@greensocs.com, saipava@xilinx.com, edgari@xilinx.com, qemu-arm@nongnu.org, Jan Kiszka <jan.kiszka@web.de>
+To: "Justin Terry (VM)" <juterry@microsoft.com>, "petrutlucian94@gmail.com" <petrutlucian94@gmail.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: Lucian Petrut <lpetrut@cloudbasesolutions.com>, apilotti <apilotti@cloudbasesolutions.com>
 
-On 06/06/2018 06:30 AM, luc.michel@greensocs.com wrote:
-> From: Luc MICHEL <luc.michel@greensocs.com>
-> 
-> In preparation for the virtualization extensions implementation,
-> refactor the name of the functions and macros that act on the GIC
-> distributor to make that fact explicit. It will be useful to
-> differentiate them from the ones that will act on the virtual
-> interfaces.
-> 
-> Signed-off-by: Luc MICHEL <luc.michel@greensocs.com>
+On 05/06/2018 01:06, Justin Terry (VM) wrote:
+> Paolo - I saw that this merged with commit: 327fccb288976f95808efa968082fc9d4a9ced84 but it seems to be missing whp-dispatch.h so now the build is failing. Any idea how this file failed to get included?
 
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
-> ---
->  hw/intc/arm_gic.c        | 164 ++++++++++++++++++++-------------------
->  hw/intc/arm_gic_common.c |   6 +-
->  hw/intc/arm_gic_kvm.c    |  23 +++---
->  hw/intc/gic_internal.h   |  51 ++++++------
->  4 files changed, 127 insertions(+), 117 deletions(-)
+My mistake, I'll add it.
+
+Paolo
+
+> Thanks,
+> Justin
 > 
-> diff --git a/hw/intc/arm_gic.c b/hw/intc/arm_gic.c
-> index ea0323f969..141f3e7a48 100644
-> --- a/hw/intc/arm_gic.c
-> +++ b/hw/intc/arm_gic.c
-> @@ -92,11 +92,12 @@ void gic_update(GICState *s)
->          best_prio = 0x100;
->          best_irq = 1023;
->          for (irq = 0; irq < s->num_irq; irq++) {
-> -            if (GIC_TEST_ENABLED(irq, cm) && gic_test_pending(s, irq, cm) &&
-> -                (!GIC_TEST_ACTIVE(irq, cm)) &&
-> -                (irq < GIC_INTERNAL || GIC_TARGET(irq) & cm)) {
-> -                if (GIC_GET_PRIORITY(irq, cpu) < best_prio) {
-> -                    best_prio = GIC_GET_PRIORITY(irq, cpu);
-> +            if (GIC_DIST_TEST_ENABLED(irq, cm) &&
-> +                gic_test_pending(s, irq, cm) &&
-> +                (!GIC_DIST_TEST_ACTIVE(irq, cm)) &&
-> +                (irq < GIC_INTERNAL || GIC_DIST_TARGET(irq) & cm)) {
-> +                if (GIC_DIST_GET_PRIORITY(irq, cpu) < best_prio) {
-> +                    best_prio = GIC_DIST_GET_PRIORITY(irq, cpu);
->                      best_irq = irq;
->                  }
->              }
-> @@ -112,7 +113,7 @@ void gic_update(GICState *s)
->          if (best_prio < s->priority_mask[cpu]) {
->              s->current_pending[cpu] = best_irq;
->              if (best_prio < s->running_priority[cpu]) {
-> -                int group = GIC_TEST_GROUP(best_irq, cm);
-> +                int group = GIC_DIST_TEST_GROUP(best_irq, cm);
->  
->                  if (extract32(s->ctlr, group, 1) &&
->                      extract32(s->cpu_ctlr[cpu], group, 1)) {
-> @@ -145,7 +146,7 @@ void gic_set_pending_private(GICState *s, int cpu, int irq)
->      }
->  
->      DPRINTF("Set %d pending cpu %d\n", irq, cpu);
-> -    GIC_SET_PENDING(irq, cm);
-> +    GIC_DIST_SET_PENDING(irq, cm);
->      gic_update(s);
->  }
->  
-> @@ -153,13 +154,13 @@ static void gic_set_irq_11mpcore(GICState *s, int irq, int level,
->                                   int cm, int target)
->  {
->      if (level) {
-> -        GIC_SET_LEVEL(irq, cm);
-> -        if (GIC_TEST_EDGE_TRIGGER(irq) || GIC_TEST_ENABLED(irq, cm)) {
-> +        GIC_DIST_SET_LEVEL(irq, cm);
-> +        if (GIC_DIST_TEST_EDGE_TRIGGER(irq) || GIC_DIST_TEST_ENABLED(irq, cm)) {
->              DPRINTF("Set %d pending mask %x\n", irq, target);
-> -            GIC_SET_PENDING(irq, target);
-> +            GIC_DIST_SET_PENDING(irq, target);
->          }
->      } else {
-> -        GIC_CLEAR_LEVEL(irq, cm);
-> +        GIC_DIST_CLEAR_LEVEL(irq, cm);
->      }
->  }
->  
-> @@ -167,13 +168,13 @@ static void gic_set_irq_generic(GICState *s, int irq, int level,
->                                  int cm, int target)
->  {
->      if (level) {
-> -        GIC_SET_LEVEL(irq, cm);
-> +        GIC_DIST_SET_LEVEL(irq, cm);
->          DPRINTF("Set %d pending mask %x\n", irq, target);
-> -        if (GIC_TEST_EDGE_TRIGGER(irq)) {
-> -            GIC_SET_PENDING(irq, target);
-> +        if (GIC_DIST_TEST_EDGE_TRIGGER(irq)) {
-> +            GIC_DIST_SET_PENDING(irq, target);
->          }
->      } else {
-> -        GIC_CLEAR_LEVEL(irq, cm);
-> +        GIC_DIST_CLEAR_LEVEL(irq, cm);
->      }
->  }
->  
-> @@ -192,7 +193,7 @@ static void gic_set_irq(void *opaque, int irq, int level)
->          /* The first external input line is internal interrupt 32.  */
->          cm = ALL_CPU_MASK;
->          irq += GIC_INTERNAL;
-> -        target = GIC_TARGET(irq);
-> +        target = GIC_DIST_TARGET(irq);
->      } else {
->          int cpu;
->          irq -= (s->num_irq - GIC_INTERNAL);
-> @@ -204,7 +205,7 @@ static void gic_set_irq(void *opaque, int irq, int level)
->  
->      assert(irq >= GIC_NR_SGIS);
->  
-> -    if (level == GIC_TEST_LEVEL(irq, cm)) {
-> +    if (level == GIC_DIST_TEST_LEVEL(irq, cm)) {
->          return;
->      }
->  
-> @@ -224,7 +225,7 @@ static uint16_t gic_get_current_pending_irq(GICState *s, int cpu,
->      uint16_t pending_irq = s->current_pending[cpu];
->  
->      if (pending_irq < GIC_MAXIRQ && gic_has_groups(s)) {
-> -        int group = GIC_TEST_GROUP(pending_irq, (1 << cpu));
-> +        int group = GIC_DIST_TEST_GROUP(pending_irq, (1 << cpu));
->          /* On a GIC without the security extensions, reading this register
->           * behaves in the same way as a secure access to a GIC with them.
->           */
-> @@ -255,7 +256,7 @@ static int gic_get_group_priority(GICState *s, int cpu, int irq)
->  
->      if (gic_has_groups(s) &&
->          !(s->cpu_ctlr[cpu] & GICC_CTLR_CBPR) &&
-> -        GIC_TEST_GROUP(irq, (1 << cpu))) {
-> +        GIC_DIST_TEST_GROUP(irq, (1 << cpu))) {
->          bpr = s->abpr[cpu] - 1;
->          assert(bpr >= 0);
->      } else {
-> @@ -268,7 +269,7 @@ static int gic_get_group_priority(GICState *s, int cpu, int irq)
->       */
->      mask = ~0U << ((bpr & 7) + 1);
->  
-> -    return GIC_GET_PRIORITY(irq, cpu) & mask;
-> +    return GIC_DIST_GET_PRIORITY(irq, cpu) & mask;
->  }
->  
->  static void gic_activate_irq(GICState *s, int cpu, int irq)
-> @@ -281,14 +282,14 @@ static void gic_activate_irq(GICState *s, int cpu, int irq)
->      int regno = preemption_level / 32;
->      int bitno = preemption_level % 32;
->  
-> -    if (gic_has_groups(s) && GIC_TEST_GROUP(irq, (1 << cpu))) {
-> +    if (gic_has_groups(s) && GIC_DIST_TEST_GROUP(irq, (1 << cpu))) {
->          s->nsapr[regno][cpu] |= (1 << bitno);
->      } else {
->          s->apr[regno][cpu] |= (1 << bitno);
->      }
->  
->      s->running_priority[cpu] = prio;
-> -    GIC_SET_ACTIVE(irq, 1 << cpu);
-> +    GIC_DIST_SET_ACTIVE(irq, 1 << cpu);
->  }
->  
->  static int gic_get_prio_from_apr_bits(GICState *s, int cpu)
-> @@ -357,7 +358,7 @@ uint32_t gic_acknowledge_irq(GICState *s, int cpu, MemTxAttrs attrs)
->          return irq;
->      }
->  
-> -    if (GIC_GET_PRIORITY(irq, cpu) >= s->running_priority[cpu]) {
-> +    if (GIC_DIST_GET_PRIORITY(irq, cpu) >= s->running_priority[cpu]) {
->          DPRINTF("ACK, pending interrupt (%d) has insufficient priority\n", irq);
->          return 1023;
->      }
-> @@ -366,7 +367,8 @@ uint32_t gic_acknowledge_irq(GICState *s, int cpu, MemTxAttrs attrs)
->          /* Clear pending flags for both level and edge triggered interrupts.
->           * Level triggered IRQs will be reasserted once they become inactive.
->           */
-> -        GIC_CLEAR_PENDING(irq, GIC_TEST_MODEL(irq) ? ALL_CPU_MASK : cm);
-> +        GIC_DIST_CLEAR_PENDING(irq, GIC_DIST_TEST_MODEL(irq) ? ALL_CPU_MASK
-> +                                                             : cm);
->          ret = irq;
->      } else {
->          if (irq < GIC_NR_SGIS) {
-> @@ -378,7 +380,9 @@ uint32_t gic_acknowledge_irq(GICState *s, int cpu, MemTxAttrs attrs)
->              src = ctz32(s->sgi_pending[irq][cpu]);
->              s->sgi_pending[irq][cpu] &= ~(1 << src);
->              if (s->sgi_pending[irq][cpu] == 0) {
-> -                GIC_CLEAR_PENDING(irq, GIC_TEST_MODEL(irq) ? ALL_CPU_MASK : cm);
-> +                GIC_DIST_CLEAR_PENDING(irq,
-> +                                       GIC_DIST_TEST_MODEL(irq) ? ALL_CPU_MASK
-> +                                                                : cm);
->              }
->              ret = irq | ((src & 0x7) << 10);
->          } else {
-> @@ -386,7 +390,8 @@ uint32_t gic_acknowledge_irq(GICState *s, int cpu, MemTxAttrs attrs)
->               * interrupts. (level triggered interrupts with an active line
->               * remain pending, see gic_test_pending)
->               */
-> -            GIC_CLEAR_PENDING(irq, GIC_TEST_MODEL(irq) ? ALL_CPU_MASK : cm);
-> +            GIC_DIST_CLEAR_PENDING(irq, GIC_DIST_TEST_MODEL(irq) ? ALL_CPU_MASK
-> +                                                                 : cm);
->              ret = irq;
->          }
->      }
-> @@ -397,11 +402,11 @@ uint32_t gic_acknowledge_irq(GICState *s, int cpu, MemTxAttrs attrs)
->      return ret;
->  }
->  
-> -void gic_set_priority(GICState *s, int cpu, int irq, uint8_t val,
-> +void gic_dist_set_priority(GICState *s, int cpu, int irq, uint8_t val,
->                        MemTxAttrs attrs)
->  {
->      if (s->security_extn && !attrs.secure) {
-> -        if (!GIC_TEST_GROUP(irq, (1 << cpu))) {
-> +        if (!GIC_DIST_TEST_GROUP(irq, (1 << cpu))) {
->              return; /* Ignore Non-secure access of Group0 IRQ */
->          }
->          val = 0x80 | (val >> 1); /* Non-secure view */
-> @@ -414,13 +419,13 @@ void gic_set_priority(GICState *s, int cpu, int irq, uint8_t val,
->      }
->  }
->  
-> -static uint32_t gic_get_priority(GICState *s, int cpu, int irq,
-> +static uint32_t gic_dist_get_priority(GICState *s, int cpu, int irq,
->                                   MemTxAttrs attrs)
->  {
-> -    uint32_t prio = GIC_GET_PRIORITY(irq, cpu);
-> +    uint32_t prio = GIC_DIST_GET_PRIORITY(irq, cpu);
->  
->      if (s->security_extn && !attrs.secure) {
-> -        if (!GIC_TEST_GROUP(irq, (1 << cpu))) {
-> +        if (!GIC_DIST_TEST_GROUP(irq, (1 << cpu))) {
->              return 0; /* Non-secure access cannot read priority of Group0 IRQ */
->          }
->          prio = (prio << 1) & 0xff; /* Non-secure view */
-> @@ -543,7 +548,7 @@ static bool gic_eoi_split(GICState *s, int cpu, MemTxAttrs attrs)
->  static void gic_deactivate_irq(GICState *s, int cpu, int irq, MemTxAttrs attrs)
->  {
->      int cm = 1 << cpu;
-> -    int group = gic_has_groups(s) && GIC_TEST_GROUP(irq, cm);
-> +    int group = gic_has_groups(s) && GIC_DIST_TEST_GROUP(irq, cm);
->  
->      if (!gic_eoi_split(s, cpu, attrs)) {
->          /* This is UNPREDICTABLE; we choose to ignore it */
-> @@ -557,7 +562,7 @@ static void gic_deactivate_irq(GICState *s, int cpu, int irq, MemTxAttrs attrs)
->          return;
->      }
->  
-> -    GIC_CLEAR_ACTIVE(irq, cm);
-> +    GIC_DIST_CLEAR_ACTIVE(irq, cm);
->  }
->  
->  void gic_complete_irq(GICState *s, int cpu, int irq, MemTxAttrs attrs)
-> @@ -584,14 +589,15 @@ void gic_complete_irq(GICState *s, int cpu, int irq, MemTxAttrs attrs)
->      if (s->revision == REV_11MPCORE) {
->          /* Mark level triggered interrupts as pending if they are still
->             raised.  */
-> -        if (!GIC_TEST_EDGE_TRIGGER(irq) && GIC_TEST_ENABLED(irq, cm)
-> -            && GIC_TEST_LEVEL(irq, cm) && (GIC_TARGET(irq) & cm) != 0) {
-> +        if (!GIC_DIST_TEST_EDGE_TRIGGER(irq) && GIC_DIST_TEST_ENABLED(irq, cm)
-> +            && GIC_DIST_TEST_LEVEL(irq, cm)
-> +            && (GIC_DIST_TARGET(irq) & cm) != 0) {
->              DPRINTF("Set %d pending mask %x\n", irq, cm);
-> -            GIC_SET_PENDING(irq, cm);
-> +            GIC_DIST_SET_PENDING(irq, cm);
->          }
->      }
->  
-> -    group = gic_has_groups(s) && GIC_TEST_GROUP(irq, cm);
-> +    group = gic_has_groups(s) && GIC_DIST_TEST_GROUP(irq, cm);
->  
->      if (s->security_extn && !attrs.secure && !group) {
->          DPRINTF("Non-secure EOI for Group0 interrupt %d ignored\n", irq);
-> @@ -607,7 +613,7 @@ void gic_complete_irq(GICState *s, int cpu, int irq, MemTxAttrs attrs)
->  
->      /* In GICv2 the guest can choose to split priority-drop and deactivate */
->      if (!gic_eoi_split(s, cpu, attrs)) {
-> -        GIC_CLEAR_ACTIVE(irq, cm);
-> +        GIC_DIST_CLEAR_ACTIVE(irq, cm);
->      }
->      gic_update(s);
->  }
-> @@ -655,7 +661,7 @@ static uint32_t gic_dist_readb(void *opaque, hwaddr offset, MemTxAttrs attrs)
->                      goto bad_reg;
->                  }
->                  for (i = 0; i < 8; i++) {
-> -                    if (GIC_TEST_GROUP(irq + i, cm)) {
-> +                    if (GIC_DIST_TEST_GROUP(irq + i, cm)) {
->                          res |= (1 << i);
->                      }
->                  }
-> @@ -675,11 +681,11 @@ static uint32_t gic_dist_readb(void *opaque, hwaddr offset, MemTxAttrs attrs)
->          res = 0;
->          for (i = 0; i < 8; i++) {
->              if (s->security_extn && !attrs.secure &&
-> -                !GIC_TEST_GROUP(irq + i, 1 << cpu)) {
-> +                !GIC_DIST_TEST_GROUP(irq + i, 1 << cpu)) {
->                  continue; /* Ignore Non-secure access of Group0 IRQ */
->              }
->  
-> -            if (GIC_TEST_ENABLED(irq + i, cm)) {
-> +            if (GIC_DIST_TEST_ENABLED(irq + i, cm)) {
->                  res |= (1 << i);
->              }
->          }
-> @@ -696,7 +702,7 @@ static uint32_t gic_dist_readb(void *opaque, hwaddr offset, MemTxAttrs attrs)
->          mask = (irq < GIC_INTERNAL) ?  cm : ALL_CPU_MASK;
->          for (i = 0; i < 8; i++) {
->              if (s->security_extn && !attrs.secure &&
-> -                !GIC_TEST_GROUP(irq + i, 1 << cpu)) {
-> +                !GIC_DIST_TEST_GROUP(irq + i, 1 << cpu)) {
->                  continue; /* Ignore Non-secure access of Group0 IRQ */
->              }
->  
-> @@ -713,11 +719,11 @@ static uint32_t gic_dist_readb(void *opaque, hwaddr offset, MemTxAttrs attrs)
->          mask = (irq < GIC_INTERNAL) ?  cm : ALL_CPU_MASK;
->          for (i = 0; i < 8; i++) {
->              if (s->security_extn && !attrs.secure &&
-> -                !GIC_TEST_GROUP(irq + i, 1 << cpu)) {
-> +                !GIC_DIST_TEST_GROUP(irq + i, 1 << cpu)) {
->                  continue; /* Ignore Non-secure access of Group0 IRQ */
->              }
->  
-> -            if (GIC_TEST_ACTIVE(irq + i, mask)) {
-> +            if (GIC_DIST_TEST_ACTIVE(irq + i, mask)) {
->                  res |= (1 << i);
->              }
->          }
-> @@ -726,7 +732,7 @@ static uint32_t gic_dist_readb(void *opaque, hwaddr offset, MemTxAttrs attrs)
->          irq = (offset - 0x400) + GIC_BASE_IRQ;
->          if (irq >= s->num_irq)
->              goto bad_reg;
-> -        res = gic_get_priority(s, cpu, irq, attrs);
-> +        res = gic_dist_get_priority(s, cpu, irq, attrs);
->      } else if (offset < 0xc00) {
->          /* Interrupt CPU Target.  */
->          if (s->num_cpu == 1 && s->revision != REV_11MPCORE) {
-> @@ -740,7 +746,7 @@ static uint32_t gic_dist_readb(void *opaque, hwaddr offset, MemTxAttrs attrs)
->              if (irq >= 29 && irq <= 31) {
->                  res = cm;
->              } else {
-> -                res = GIC_TARGET(irq);
-> +                res = GIC_DIST_TARGET(irq);
->              }
->          }
->      } else if (offset < 0xf00) {
-> @@ -751,14 +757,16 @@ static uint32_t gic_dist_readb(void *opaque, hwaddr offset, MemTxAttrs attrs)
->          res = 0;
->          for (i = 0; i < 4; i++) {
->              if (s->security_extn && !attrs.secure &&
-> -                !GIC_TEST_GROUP(irq + i, 1 << cpu)) {
-> +                !GIC_DIST_TEST_GROUP(irq + i, 1 << cpu)) {
->                  continue; /* Ignore Non-secure access of Group0 IRQ */
->              }
->  
-> -            if (GIC_TEST_MODEL(irq + i))
-> +            if (GIC_DIST_TEST_MODEL(irq + i)) {
->                  res |= (1 << (i * 2));
-> -            if (GIC_TEST_EDGE_TRIGGER(irq + i))
-> +            }
-> +            if (GIC_DIST_TEST_EDGE_TRIGGER(irq + i)) {
->                  res |= (2 << (i * 2));
-> +            }
->          }
->      } else if (offset < 0xf10) {
->          goto bad_reg;
-> @@ -776,7 +784,7 @@ static uint32_t gic_dist_readb(void *opaque, hwaddr offset, MemTxAttrs attrs)
->          }
->  
->          if (s->security_extn && !attrs.secure &&
-> -            !GIC_TEST_GROUP(irq, 1 << cpu)) {
-> +            !GIC_DIST_TEST_GROUP(irq, 1 << cpu)) {
->              res = 0; /* Ignore Non-secure access of Group0 IRQ */
->          } else {
->              res = s->sgi_pending[irq][cpu];
-> @@ -872,10 +880,10 @@ static void gic_dist_writeb(void *opaque, hwaddr offset,
->                      int cm = (irq < GIC_INTERNAL) ? (1 << cpu) : ALL_CPU_MASK;
->                      if (value & (1 << i)) {
->                          /* Group1 (Non-secure) */
-> -                        GIC_SET_GROUP(irq + i, cm);
-> +                        GIC_DIST_SET_GROUP(irq + i, cm);
->                      } else {
->                          /* Group0 (Secure) */
-> -                        GIC_CLEAR_GROUP(irq + i, cm);
-> +                        GIC_DIST_CLEAR_GROUP(irq + i, cm);
->                      }
->                  }
->              }
-> @@ -893,26 +901,26 @@ static void gic_dist_writeb(void *opaque, hwaddr offset,
->  
->          for (i = 0; i < 8; i++) {
->              if (value & (1 << i)) {
-> -                int mask =
-> -                    (irq < GIC_INTERNAL) ? (1 << cpu) : GIC_TARGET(irq + i);
-> +                int mask = (irq < GIC_INTERNAL) ? (1 << cpu)
-> +                                                : GIC_DIST_TARGET(irq + i);
->                  int cm = (irq < GIC_INTERNAL) ? (1 << cpu) : ALL_CPU_MASK;
->  
->                  if (s->security_extn && !attrs.secure &&
-> -                    !GIC_TEST_GROUP(irq + i, 1 << cpu)) {
-> +                    !GIC_DIST_TEST_GROUP(irq + i, 1 << cpu)) {
->                      continue; /* Ignore Non-secure access of Group0 IRQ */
->                  }
->  
-> -                if (!GIC_TEST_ENABLED(irq + i, cm)) {
-> +                if (!GIC_DIST_TEST_ENABLED(irq + i, cm)) {
->                      DPRINTF("Enabled IRQ %d\n", irq + i);
->                      trace_gic_enable_irq(irq + i);
->                  }
-> -                GIC_SET_ENABLED(irq + i, cm);
-> +                GIC_DIST_SET_ENABLED(irq + i, cm);
->                  /* If a raised level triggered IRQ enabled then mark
->                     is as pending.  */
-> -                if (GIC_TEST_LEVEL(irq + i, mask)
-> -                        && !GIC_TEST_EDGE_TRIGGER(irq + i)) {
-> +                if (GIC_DIST_TEST_LEVEL(irq + i, mask)
-> +                        && !GIC_DIST_TEST_EDGE_TRIGGER(irq + i)) {
->                      DPRINTF("Set %d pending mask %x\n", irq + i, mask);
-> -                    GIC_SET_PENDING(irq + i, mask);
-> +                    GIC_DIST_SET_PENDING(irq + i, mask);
->                  }
->              }
->          }
-> @@ -930,15 +938,15 @@ static void gic_dist_writeb(void *opaque, hwaddr offset,
->                  int cm = (irq < GIC_INTERNAL) ? (1 << cpu) : ALL_CPU_MASK;
->  
->                  if (s->security_extn && !attrs.secure &&
-> -                    !GIC_TEST_GROUP(irq + i, 1 << cpu)) {
-> +                    !GIC_DIST_TEST_GROUP(irq + i, 1 << cpu)) {
->                      continue; /* Ignore Non-secure access of Group0 IRQ */
->                  }
->  
-> -                if (GIC_TEST_ENABLED(irq + i, cm)) {
-> +                if (GIC_DIST_TEST_ENABLED(irq + i, cm)) {
->                      DPRINTF("Disabled IRQ %d\n", irq + i);
->                      trace_gic_disable_irq(irq + i);
->                  }
-> -                GIC_CLEAR_ENABLED(irq + i, cm);
-> +                GIC_DIST_CLEAR_ENABLED(irq + i, cm);
->              }
->          }
->      } else if (offset < 0x280) {
-> @@ -953,11 +961,11 @@ static void gic_dist_writeb(void *opaque, hwaddr offset,
->          for (i = 0; i < 8; i++) {
->              if (value & (1 << i)) {
->                  if (s->security_extn && !attrs.secure &&
-> -                    !GIC_TEST_GROUP(irq + i, 1 << cpu)) {
-> +                    !GIC_DIST_TEST_GROUP(irq + i, 1 << cpu)) {
->                      continue; /* Ignore Non-secure access of Group0 IRQ */
->                  }
->  
-> -                GIC_SET_PENDING(irq + i, GIC_TARGET(irq + i));
-> +                GIC_DIST_SET_PENDING(irq + i, GIC_DIST_TARGET(irq + i));
->              }
->          }
->      } else if (offset < 0x300) {
-> @@ -971,7 +979,7 @@ static void gic_dist_writeb(void *opaque, hwaddr offset,
->  
->          for (i = 0; i < 8; i++) {
->              if (s->security_extn && !attrs.secure &&
-> -                !GIC_TEST_GROUP(irq + i, 1 << cpu)) {
-> +                !GIC_DIST_TEST_GROUP(irq + i, 1 << cpu)) {
->                  continue; /* Ignore Non-secure access of Group0 IRQ */
->              }
->  
-> @@ -979,7 +987,7 @@ static void gic_dist_writeb(void *opaque, hwaddr offset,
->                 for per-CPU interrupts.  It's unclear whether this is the
->                 corect behavior.  */
->              if (value & (1 << i)) {
-> -                GIC_CLEAR_PENDING(irq + i, ALL_CPU_MASK);
-> +                GIC_DIST_CLEAR_PENDING(irq + i, ALL_CPU_MASK);
->              }
->          }
->      } else if (offset < 0x400) {
-> @@ -990,7 +998,7 @@ static void gic_dist_writeb(void *opaque, hwaddr offset,
->          irq = (offset - 0x400) + GIC_BASE_IRQ;
->          if (irq >= s->num_irq)
->              goto bad_reg;
-> -        gic_set_priority(s, cpu, irq, value, attrs);
-> +        gic_dist_set_priority(s, cpu, irq, value, attrs);
->      } else if (offset < 0xc00) {
->          /* Interrupt CPU Target. RAZ/WI on uniprocessor GICs, with the
->           * annoying exception of the 11MPCore's GIC.
-> @@ -1016,21 +1024,21 @@ static void gic_dist_writeb(void *opaque, hwaddr offset,
->              value |= 0xaa;
->          for (i = 0; i < 4; i++) {
->              if (s->security_extn && !attrs.secure &&
-> -                !GIC_TEST_GROUP(irq + i, 1 << cpu)) {
-> +                !GIC_DIST_TEST_GROUP(irq + i, 1 << cpu)) {
->                  continue; /* Ignore Non-secure access of Group0 IRQ */
->              }
->  
->              if (s->revision == REV_11MPCORE) {
->                  if (value & (1 << (i * 2))) {
-> -                    GIC_SET_MODEL(irq + i);
-> +                    GIC_DIST_SET_MODEL(irq + i);
->                  } else {
-> -                    GIC_CLEAR_MODEL(irq + i);
-> +                    GIC_DIST_CLEAR_MODEL(irq + i);
->                  }
->              }
->              if (value & (2 << (i * 2))) {
-> -                GIC_SET_EDGE_TRIGGER(irq + i);
-> +                GIC_DIST_SET_EDGE_TRIGGER(irq + i);
->              } else {
-> -                GIC_CLEAR_EDGE_TRIGGER(irq + i);
-> +                GIC_DIST_CLEAR_EDGE_TRIGGER(irq + i);
->              }
->          }
->      } else if (offset < 0xf10) {
-> @@ -1044,10 +1052,10 @@ static void gic_dist_writeb(void *opaque, hwaddr offset,
->          irq = (offset - 0xf10);
->  
->          if (!s->security_extn || attrs.secure ||
-> -            GIC_TEST_GROUP(irq, 1 << cpu)) {
-> +            GIC_DIST_TEST_GROUP(irq, 1 << cpu)) {
->              s->sgi_pending[irq][cpu] &= ~value;
->              if (s->sgi_pending[irq][cpu] == 0) {
-> -                GIC_CLEAR_PENDING(irq, 1 << cpu);
-> +                GIC_DIST_CLEAR_PENDING(irq, 1 << cpu);
->              }
->          }
->      } else if (offset < 0xf30) {
-> @@ -1058,8 +1066,8 @@ static void gic_dist_writeb(void *opaque, hwaddr offset,
->          irq = (offset - 0xf20);
->  
->          if (!s->security_extn || attrs.secure ||
-> -            GIC_TEST_GROUP(irq, 1 << cpu)) {
-> -            GIC_SET_PENDING(irq, 1 << cpu);
-> +            GIC_DIST_TEST_GROUP(irq, 1 << cpu)) {
-> +            GIC_DIST_SET_PENDING(irq, 1 << cpu);
->              s->sgi_pending[irq][cpu] |= value;
->          }
->      } else {
-> @@ -1106,7 +1114,7 @@ static void gic_dist_writel(void *opaque, hwaddr offset,
->              mask = ALL_CPU_MASK;
->              break;
->          }
-> -        GIC_SET_PENDING(irq, mask);
-> +        GIC_DIST_SET_PENDING(irq, mask);
->          target_cpu = ctz32(mask);
->          while (target_cpu < GIC_NCPU) {
->              s->sgi_pending[irq][target_cpu] |= (1 << cpu);
-> diff --git a/hw/intc/arm_gic_common.c b/hw/intc/arm_gic_common.c
-> index aee50a20e0..295ee9cc5e 100644
-> --- a/hw/intc/arm_gic_common.c
-> +++ b/hw/intc/arm_gic_common.c
-> @@ -204,8 +204,8 @@ static void arm_gic_common_reset(DeviceState *dev)
->          }
->      }
->      for (i = 0; i < GIC_NR_SGIS; i++) {
-> -        GIC_SET_ENABLED(i, ALL_CPU_MASK);
-> -        GIC_SET_EDGE_TRIGGER(i);
-> +        GIC_DIST_SET_ENABLED(i, ALL_CPU_MASK);
-> +        GIC_DIST_SET_EDGE_TRIGGER(i);
->      }
->  
->      for (i = 0; i < ARRAY_SIZE(s->priority2); i++) {
-> @@ -222,7 +222,7 @@ static void arm_gic_common_reset(DeviceState *dev)
->      }
->      if (s->security_extn && s->irq_reset_nonsecure) {
->          for (i = 0; i < GIC_MAXIRQ; i++) {
-> -            GIC_SET_GROUP(i, ALL_CPU_MASK);
-> +            GIC_DIST_SET_GROUP(i, ALL_CPU_MASK);
->          }
->      }
->  
-> diff --git a/hw/intc/arm_gic_kvm.c b/hw/intc/arm_gic_kvm.c
-> index 204369d0e2..799136732a 100644
-> --- a/hw/intc/arm_gic_kvm.c
-> +++ b/hw/intc/arm_gic_kvm.c
-> @@ -140,10 +140,10 @@ static void translate_group(GICState *s, int irq, int cpu,
->      int cm = (irq < GIC_INTERNAL) ? (1 << cpu) : ALL_CPU_MASK;
->  
->      if (to_kernel) {
-> -        *field = GIC_TEST_GROUP(irq, cm);
-> +        *field = GIC_DIST_TEST_GROUP(irq, cm);
->      } else {
->          if (*field & 1) {
-> -            GIC_SET_GROUP(irq, cm);
-> +            GIC_DIST_SET_GROUP(irq, cm);
->          }
->      }
->  }
-> @@ -154,10 +154,10 @@ static void translate_enabled(GICState *s, int irq, int cpu,
->      int cm = (irq < GIC_INTERNAL) ? (1 << cpu) : ALL_CPU_MASK;
->  
->      if (to_kernel) {
-> -        *field = GIC_TEST_ENABLED(irq, cm);
-> +        *field = GIC_DIST_TEST_ENABLED(irq, cm);
->      } else {
->          if (*field & 1) {
-> -            GIC_SET_ENABLED(irq, cm);
-> +            GIC_DIST_SET_ENABLED(irq, cm);
->          }
->      }
->  }
-> @@ -171,7 +171,7 @@ static void translate_pending(GICState *s, int irq, int cpu,
->          *field = gic_test_pending(s, irq, cm);
->      } else {
->          if (*field & 1) {
-> -            GIC_SET_PENDING(irq, cm);
-> +            GIC_DIST_SET_PENDING(irq, cm);
->              /* TODO: Capture is level-line is held high in the kernel */
->          }
->      }
-> @@ -183,10 +183,10 @@ static void translate_active(GICState *s, int irq, int cpu,
->      int cm = (irq < GIC_INTERNAL) ? (1 << cpu) : ALL_CPU_MASK;
->  
->      if (to_kernel) {
-> -        *field = GIC_TEST_ACTIVE(irq, cm);
-> +        *field = GIC_DIST_TEST_ACTIVE(irq, cm);
->      } else {
->          if (*field & 1) {
-> -            GIC_SET_ACTIVE(irq, cm);
-> +            GIC_DIST_SET_ACTIVE(irq, cm);
->          }
->      }
->  }
-> @@ -195,10 +195,10 @@ static void translate_trigger(GICState *s, int irq, int cpu,
->                                uint32_t *field, bool to_kernel)
->  {
->      if (to_kernel) {
-> -        *field = (GIC_TEST_EDGE_TRIGGER(irq)) ? 0x2 : 0x0;
-> +        *field = (GIC_DIST_TEST_EDGE_TRIGGER(irq)) ? 0x2 : 0x0;
->      } else {
->          if (*field & 0x2) {
-> -            GIC_SET_EDGE_TRIGGER(irq);
-> +            GIC_DIST_SET_EDGE_TRIGGER(irq);
->          }
->      }
->  }
-> @@ -207,9 +207,10 @@ static void translate_priority(GICState *s, int irq, int cpu,
->                                 uint32_t *field, bool to_kernel)
->  {
->      if (to_kernel) {
-> -        *field = GIC_GET_PRIORITY(irq, cpu) & 0xff;
-> +        *field = GIC_DIST_GET_PRIORITY(irq, cpu) & 0xff;
->      } else {
-> -        gic_set_priority(s, cpu, irq, *field & 0xff, MEMTXATTRS_UNSPECIFIED);
-> +        gic_dist_set_priority(s, cpu, irq,
-> +                              *field & 0xff, MEMTXATTRS_UNSPECIFIED);
->      }
->  }
->  
-> diff --git a/hw/intc/gic_internal.h b/hw/intc/gic_internal.h
-> index 7fe87b13de..6f8d242904 100644
-> --- a/hw/intc/gic_internal.h
-> +++ b/hw/intc/gic_internal.h
-> @@ -27,30 +27,31 @@
->  
->  #define GIC_BASE_IRQ 0
->  
-> -#define GIC_SET_ENABLED(irq, cm) s->irq_state[irq].enabled |= (cm)
-> -#define GIC_CLEAR_ENABLED(irq, cm) s->irq_state[irq].enabled &= ~(cm)
-> -#define GIC_TEST_ENABLED(irq, cm) ((s->irq_state[irq].enabled & (cm)) != 0)
-> -#define GIC_SET_PENDING(irq, cm) s->irq_state[irq].pending |= (cm)
-> -#define GIC_CLEAR_PENDING(irq, cm) s->irq_state[irq].pending &= ~(cm)
-> -#define GIC_SET_ACTIVE(irq, cm) s->irq_state[irq].active |= (cm)
-> -#define GIC_CLEAR_ACTIVE(irq, cm) s->irq_state[irq].active &= ~(cm)
-> -#define GIC_TEST_ACTIVE(irq, cm) ((s->irq_state[irq].active & (cm)) != 0)
-> -#define GIC_SET_MODEL(irq) s->irq_state[irq].model = true
-> -#define GIC_CLEAR_MODEL(irq) s->irq_state[irq].model = false
-> -#define GIC_TEST_MODEL(irq) s->irq_state[irq].model
-> -#define GIC_SET_LEVEL(irq, cm) s->irq_state[irq].level |= (cm)
-> -#define GIC_CLEAR_LEVEL(irq, cm) s->irq_state[irq].level &= ~(cm)
-> -#define GIC_TEST_LEVEL(irq, cm) ((s->irq_state[irq].level & (cm)) != 0)
-> -#define GIC_SET_EDGE_TRIGGER(irq) s->irq_state[irq].edge_trigger = true
-> -#define GIC_CLEAR_EDGE_TRIGGER(irq) s->irq_state[irq].edge_trigger = false
-> -#define GIC_TEST_EDGE_TRIGGER(irq) (s->irq_state[irq].edge_trigger)
-> -#define GIC_GET_PRIORITY(irq, cpu) (((irq) < GIC_INTERNAL) ?            \
-> +#define GIC_DIST_SET_ENABLED(irq, cm) (s->irq_state[irq].enabled |= (cm))
-> +#define GIC_DIST_CLEAR_ENABLED(irq, cm) (s->irq_state[irq].enabled &= ~(cm))
-> +#define GIC_DIST_TEST_ENABLED(irq, cm) ((s->irq_state[irq].enabled & (cm)) != 0)
-> +#define GIC_DIST_SET_PENDING(irq, cm) (s->irq_state[irq].pending |= (cm))
-> +#define GIC_DIST_CLEAR_PENDING(irq, cm) (s->irq_state[irq].pending &= ~(cm))
-> +#define GIC_DIST_SET_ACTIVE(irq, cm) (s->irq_state[irq].active |= (cm))
-> +#define GIC_DIST_CLEAR_ACTIVE(irq, cm) (s->irq_state[irq].active &= ~(cm))
-> +#define GIC_DIST_TEST_ACTIVE(irq, cm) ((s->irq_state[irq].active & (cm)) != 0)
-> +#define GIC_DIST_SET_MODEL(irq) (s->irq_state[irq].model = true)
-> +#define GIC_DIST_CLEAR_MODEL(irq) (s->irq_state[irq].model = false)
-> +#define GIC_DIST_TEST_MODEL(irq) (s->irq_state[irq].model)
-> +#define GIC_DIST_SET_LEVEL(irq, cm) (s->irq_state[irq].level |= (cm))
-> +#define GIC_DIST_CLEAR_LEVEL(irq, cm) (s->irq_state[irq].level &= ~(cm))
-> +#define GIC_DIST_TEST_LEVEL(irq, cm) ((s->irq_state[irq].level & (cm)) != 0)
-> +#define GIC_DIST_SET_EDGE_TRIGGER(irq) (s->irq_state[irq].edge_trigger = true)
-> +#define GIC_DIST_CLEAR_EDGE_TRIGGER(irq) \
-> +    (s->irq_state[irq].edge_trigger = false)
-> +#define GIC_DIST_TEST_EDGE_TRIGGER(irq) (s->irq_state[irq].edge_trigger)
-> +#define GIC_DIST_GET_PRIORITY(irq, cpu) (((irq) < GIC_INTERNAL) ?            \
->                                      s->priority1[irq][cpu] :            \
->                                      s->priority2[(irq) - GIC_INTERNAL])
-> -#define GIC_TARGET(irq) s->irq_target[irq]
-> -#define GIC_CLEAR_GROUP(irq, cm) (s->irq_state[irq].group &= ~(cm))
-> -#define GIC_SET_GROUP(irq, cm) (s->irq_state[irq].group |= (cm))
-> -#define GIC_TEST_GROUP(irq, cm) ((s->irq_state[irq].group & (cm)) != 0)
-> +#define GIC_DIST_TARGET(irq) (s->irq_target[irq])
-> +#define GIC_DIST_CLEAR_GROUP(irq, cm) (s->irq_state[irq].group &= ~(cm))
-> +#define GIC_DIST_SET_GROUP(irq, cm) (s->irq_state[irq].group |= (cm))
-> +#define GIC_DIST_TEST_GROUP(irq, cm) ((s->irq_state[irq].group & (cm)) != 0)
->  
->  #define GICD_CTLR_EN_GRP0 (1U << 0)
->  #define GICD_CTLR_EN_GRP1 (1U << 1)
-> @@ -79,8 +80,8 @@ uint32_t gic_acknowledge_irq(GICState *s, int cpu, MemTxAttrs attrs);
->  void gic_complete_irq(GICState *s, int cpu, int irq, MemTxAttrs attrs);
->  void gic_update(GICState *s);
->  void gic_init_irqs_and_distributor(GICState *s);
-> -void gic_set_priority(GICState *s, int cpu, int irq, uint8_t val,
-> -                      MemTxAttrs attrs);
-> +void gic_dist_set_priority(GICState *s, int cpu, int irq, uint8_t val,
-> +                           MemTxAttrs attrs);
->  
->  static inline bool gic_test_pending(GICState *s, int irq, int cm)
->  {
-> @@ -93,7 +94,7 @@ static inline bool gic_test_pending(GICState *s, int irq, int cm)
->           * GICD_ISPENDR to set the state pending.
->           */
->          return (s->irq_state[irq].pending & cm) ||
-> -            (!GIC_TEST_EDGE_TRIGGER(irq) && GIC_TEST_LEVEL(irq, cm));
-> +            (!GIC_DIST_TEST_EDGE_TRIGGER(irq) && GIC_DIST_TEST_LEVEL(irq, cm));
->      }
->  }
->  
+>> -----Original Message-----
+>> From: petrutlucian94@gmail.com <petrutlucian94@gmail.com>
+>> Sent: Friday, May 25, 2018 7:02 AM
+>> To: qemu-devel@nongnu.org
+>> Cc: Lucian Petrut <lpetrut@cloudbasesolutions.com>; apilotti
+>> <apilotti@cloudbasesolutions.com>; Justin Terry (VM)
+>> <juterry@microsoft.com>
+>> Subject: [PATCH v3 2/3] WHPX: dynamically load WHP libraries
+>>
+>> From: Lucian Petrut <lpetrut@cloudbasesolutions.com>
+>>
+>> We're currently linking against import libraries of the WHP DLLs.
+>>
+>> By dynamically loading the libraries, we ensure that QEMU will work on
+>> previous Windows versions, where the WHP DLLs will be missing (assuming
+>> that WHP is not requested).
+>>
+>> Also, we're simplifying the build process, as we no longer require the import
+>> libraries.
+>>
+>> Signed-off-by: Alessandro Pilotti <apilotti@cloudbasesolutions.com>
+>> Signed-off-by: Justin Terry (VM) <juterry@microsoft.com>
+>> Signed-off-by: Lucian Petrut <lpetrut@cloudbasesolutions.com>
+>> ---
+>>  configure                  |  15 +--
+>>  target/i386/whp-dispatch.h |  56 ++++++++++++
+>>  target/i386/whpx-all.c     | 222 ++++++++++++++++++++++++++++++--------
+>> -------
+>>  3 files changed, 206 insertions(+), 87 deletions(-)  create mode 100644
+>> target/i386/whp-dispatch.h
+>>
+>> diff --git a/configure b/configure
+>> index a8498ab..99b4a28 100755
+>> --- a/configure
+>> +++ b/configure
+>> @@ -2524,20 +2524,7 @@ fi
+>>  ##########################################
+>>  # Windows Hypervisor Platform accelerator (WHPX) check  if test "$whpx" !=
+>> "no" ; then
+>> -    cat > $TMPC << EOF
+>> -#include <windows.h>
+>> -#include <WinHvPlatform.h>
+>> -#include <WinHvEmulation.h>
+>> -int main(void) {
+>> -    WHV_CAPABILITY whpx_cap;
+>> -    UINT32 writtenSize;
+>> -    WHvGetCapability(WHvCapabilityCodeFeatures, &whpx_cap,
+>> sizeof(whpx_cap),
+>> -                     &writtenSize);
+>> -    return 0;
+>> -}
+>> -EOF
+>> -    if compile_prog "" "-lWinHvPlatform -lWinHvEmulation" ; then
+>> -        libs_softmmu="$libs_softmmu -lWinHvPlatform -lWinHvEmulation"
+>> +    if check_include "WinHvPlatform.h" && check_include
+>> + "WinHvEmulation.h"; then
+>>          whpx="yes"
+>>      else
+>>          if test "$whpx" = "yes"; then
+>> diff --git a/target/i386/whp-dispatch.h b/target/i386/whp-dispatch.h new file
+>> mode 100644 index 0000000..d8d3485
+>> --- /dev/null
+>> +++ b/target/i386/whp-dispatch.h
+>> @@ -0,0 +1,56 @@
+>> +#include "windows.h"
+>> +#include <stdbool.h>
+>> +
+>> +#include <WinHvPlatform.h>
+>> +#include <WinHvEmulation.h>
+>> +
+>> +#ifndef WHP_DISPATCH_H
+>> +#define WHP_DISPATCH_H
+>> +
+>> +
+>> +#define LIST_WINHVPLATFORM_FUNCTIONS(X) \
+>> +  X(HRESULT, WHvGetCapability, (WHV_CAPABILITY_CODE CapabilityCode,
+>> +VOID* CapabilityBuffer, UINT32 CapabilityBufferSizeInBytes, UINT32*
+>> +WrittenSizeInBytes)) \
+>> +  X(HRESULT, WHvCreatePartition, (WHV_PARTITION_HANDLE* Partition)) \
+>> +  X(HRESULT, WHvSetupPartition, (WHV_PARTITION_HANDLE Partition)) \
+>> +  X(HRESULT, WHvDeletePartition, (WHV_PARTITION_HANDLE Partition)) \
+>> +  X(HRESULT, WHvGetPartitionProperty, (WHV_PARTITION_HANDLE
+>> Partition,
+>> +WHV_PARTITION_PROPERTY_CODE PropertyCode, VOID* PropertyBuffer,
+>> UINT32
+>> +PropertyBufferSizeInBytes, UINT32* WrittenSizeInBytes)) \
+>> +  X(HRESULT, WHvSetPartitionProperty, (WHV_PARTITION_HANDLE
+>> Partition,
+>> +WHV_PARTITION_PROPERTY_CODE PropertyCode, const VOID*
+>> PropertyBuffer,
+>> +UINT32 PropertyBufferSizeInBytes)) \
+>> +  X(HRESULT, WHvMapGpaRange, (WHV_PARTITION_HANDLE Partition,
+>> VOID*
+>> +SourceAddress, WHV_GUEST_PHYSICAL_ADDRESS GuestAddress, UINT64
+>> +SizeInBytes, WHV_MAP_GPA_RANGE_FLAGS Flags)) \
+>> +  X(HRESULT, WHvUnmapGpaRange, (WHV_PARTITION_HANDLE Partition,
+>> +WHV_GUEST_PHYSICAL_ADDRESS GuestAddress, UINT64 SizeInBytes)) \
+>> +  X(HRESULT, WHvTranslateGva, (WHV_PARTITION_HANDLE Partition,
+>> UINT32
+>> +VpIndex, WHV_GUEST_VIRTUAL_ADDRESS Gva,
+>> WHV_TRANSLATE_GVA_FLAGS
+>> +TranslateFlags, WHV_TRANSLATE_GVA_RESULT* TranslationResult,
+>> +WHV_GUEST_PHYSICAL_ADDRESS* Gpa)) \
+>> +  X(HRESULT, WHvCreateVirtualProcessor, (WHV_PARTITION_HANDLE
+>> +Partition, UINT32 VpIndex, UINT32 Flags)) \
+>> +  X(HRESULT, WHvDeleteVirtualProcessor, (WHV_PARTITION_HANDLE
+>> +Partition, UINT32 VpIndex)) \
+>> +  X(HRESULT, WHvRunVirtualProcessor, (WHV_PARTITION_HANDLE
+>> Partition,
+>> +UINT32 VpIndex, VOID* ExitContext, UINT32 ExitContextSizeInBytes)) \
+>> +  X(HRESULT, WHvCancelRunVirtualProcessor, (WHV_PARTITION_HANDLE
+>> +Partition, UINT32 VpIndex, UINT32 Flags)) \
+>> +  X(HRESULT, WHvGetVirtualProcessorRegisters,
+>> (WHV_PARTITION_HANDLE
+>> +Partition, UINT32 VpIndex, const WHV_REGISTER_NAME* RegisterNames,
+>> +UINT32 RegisterCount, WHV_REGISTER_VALUE* RegisterValues)) \
+>> +  X(HRESULT, WHvSetVirtualProcessorRegisters, (WHV_PARTITION_HANDLE
+>> +Partition, UINT32 VpIndex, const WHV_REGISTER_NAME* RegisterNames,
+>> +UINT32 RegisterCount, const WHV_REGISTER_VALUE* RegisterValues)) \
+>> +
+>> +
+>> +#define LIST_WINHVEMULATION_FUNCTIONS(X) \
+>> +  X(HRESULT, WHvEmulatorCreateEmulator, (const
+>> WHV_EMULATOR_CALLBACKS*
+>> +Callbacks, WHV_EMULATOR_HANDLE* Emulator)) \
+>> +  X(HRESULT, WHvEmulatorDestroyEmulator, (WHV_EMULATOR_HANDLE
+>> +Emulator)) \
+>> +  X(HRESULT, WHvEmulatorTryIoEmulation, (WHV_EMULATOR_HANDLE
+>> Emulator,
+>> +VOID* Context, const WHV_VP_EXIT_CONTEXT* VpContext, const
+>> +WHV_X64_IO_PORT_ACCESS_CONTEXT* IoInstructionContext,
+>> +WHV_EMULATOR_STATUS* EmulatorReturnStatus)) \
+>> +  X(HRESULT, WHvEmulatorTryMmioEmulation, (WHV_EMULATOR_HANDLE
+>> +Emulator, VOID* Context, const WHV_VP_EXIT_CONTEXT* VpContext,
+>> const
+>> +WHV_MEMORY_ACCESS_CONTEXT* MmioInstructionContext,
+>> WHV_EMULATOR_STATUS*
+>> +EmulatorReturnStatus)) \
+>> +
+>> +
+>> +#define WHP_DEFINE_TYPE(return_type, function_name, signature) \
+>> +    typedef return_type (WINAPI *function_name ## _t) signature;
+>> +
+>> +#define WHP_DECLARE_MEMBER(return_type, function_name, signature)
+>> \
+>> +    function_name ## _t function_name;
+>> +
+>> +/* Define function typedef */
+>> +LIST_WINHVPLATFORM_FUNCTIONS(WHP_DEFINE_TYPE)
+>> +LIST_WINHVEMULATION_FUNCTIONS(WHP_DEFINE_TYPE)
+>> +
+>> +struct WHPDispatch {
+>> +    LIST_WINHVPLATFORM_FUNCTIONS(WHP_DECLARE_MEMBER)
+>> +    LIST_WINHVEMULATION_FUNCTIONS(WHP_DECLARE_MEMBER)
+>> +};
+>> +
+>> +extern struct WHPDispatch whp_dispatch;
+>> +
+>> +bool init_whp_dispatch(void);
+>> +
+>> +
+>> +#endif /* WHP_DISPATCH_H */
+>> diff --git a/target/i386/whpx-all.c b/target/i386/whpx-all.c index
+>> ffc083e..280e2bc 100644
+>> --- a/target/i386/whpx-all.c
+>> +++ b/target/i386/whpx-all.c
+>> @@ -25,6 +25,7 @@
+>>  #include "qemu/queue.h"
+>>  #include "qapi/error.h"
+>>  #include "migration/blocker.h"
+>> +#include "whp-dispatch.h"
+>>
+>>  #include <WinHvPlatform.h>
+>>  #include <WinHvEmulation.h>
+>> @@ -162,8 +163,11 @@ struct whpx_vcpu {
+>>  };
+>>
+>>  static bool whpx_allowed;
+>> +static bool whp_dispatch_initialized;
+>> +static HMODULE hWinHvPlatform, hWinHvEmulation;
+>>
+>>  struct whpx_state whpx_global;
+>> +struct WHPDispatch whp_dispatch;
+>>
+>>
+>>  /*
+>> @@ -357,10 +361,11 @@ static void whpx_set_registers(CPUState *cpu)
+>>
+>>      assert(idx == RTL_NUMBER_OF(whpx_register_names));
+>>
+>> -    hr = WHvSetVirtualProcessorRegisters(whpx->partition, cpu->cpu_index,
+>> -                                         whpx_register_names,
+>> -                                         RTL_NUMBER_OF(whpx_register_names),
+>> -                                         &vcxt.values[0]);
+>> +    hr = whp_dispatch.WHvSetVirtualProcessorRegisters(
+>> +        whpx->partition, cpu->cpu_index,
+>> +        whpx_register_names,
+>> +        RTL_NUMBER_OF(whpx_register_names),
+>> +        &vcxt.values[0]);
+>>
+>>      if (FAILED(hr)) {
+>>          error_report("WHPX: Failed to set virtual processor context, hr=%08lx",
+>> @@ -384,10 +389,11 @@ static void whpx_get_registers(CPUState *cpu)
+>>
+>>      assert(cpu_is_stopped(cpu) || qemu_cpu_is_self(cpu));
+>>
+>> -    hr = WHvGetVirtualProcessorRegisters(whpx->partition, cpu->cpu_index,
+>> -                                         whpx_register_names,
+>> -                                         RTL_NUMBER_OF(whpx_register_names),
+>> -                                         &vcxt.values[0]);
+>> +    hr = whp_dispatch.WHvGetVirtualProcessorRegisters(
+>> +        whpx->partition, cpu->cpu_index,
+>> +        whpx_register_names,
+>> +        RTL_NUMBER_OF(whpx_register_names),
+>> +        &vcxt.values[0]);
+>>      if (FAILED(hr)) {
+>>          error_report("WHPX: Failed to get virtual processor context, hr=%08lx",
+>>                       hr);
+>> @@ -547,9 +553,10 @@ static HRESULT CALLBACK
+>> whpx_emu_getreg_callback(
+>>      struct whpx_state *whpx = &whpx_global;
+>>      CPUState *cpu = (CPUState *)ctx;
+>>
+>> -    hr = WHvGetVirtualProcessorRegisters(whpx->partition, cpu->cpu_index,
+>> -                                         RegisterNames, RegisterCount,
+>> -                                         RegisterValues);
+>> +    hr = whp_dispatch.WHvGetVirtualProcessorRegisters(
+>> +        whpx->partition, cpu->cpu_index,
+>> +        RegisterNames, RegisterCount,
+>> +        RegisterValues);
+>>      if (FAILED(hr)) {
+>>          error_report("WHPX: Failed to get virtual processor registers,"
+>>                       " hr=%08lx", hr);
+>> @@ -568,9 +575,10 @@ static HRESULT CALLBACK
+>> whpx_emu_setreg_callback(
+>>      struct whpx_state *whpx = &whpx_global;
+>>      CPUState *cpu = (CPUState *)ctx;
+>>
+>> -    hr = WHvSetVirtualProcessorRegisters(whpx->partition, cpu->cpu_index,
+>> -                                         RegisterNames, RegisterCount,
+>> -                                         RegisterValues);
+>> +    hr = whp_dispatch.WHvSetVirtualProcessorRegisters(
+>> +        whpx->partition, cpu->cpu_index,
+>> +        RegisterNames, RegisterCount,
+>> +        RegisterValues);
+>>      if (FAILED(hr)) {
+>>          error_report("WHPX: Failed to set virtual processor registers,"
+>>                       " hr=%08lx", hr);
+>> @@ -597,8 +605,8 @@ static HRESULT CALLBACK
+>> whpx_emu_translate_callback(
+>>      CPUState *cpu = (CPUState *)ctx;
+>>      WHV_TRANSLATE_GVA_RESULT res;
+>>
+>> -    hr = WHvTranslateGva(whpx->partition, cpu->cpu_index,
+>> -                         Gva, TranslateFlags, &res, Gpa);
+>> +    hr = whp_dispatch.WHvTranslateGva(whpx->partition, cpu->cpu_index,
+>> +                                      Gva, TranslateFlags, &res, Gpa);
+>>      if (FAILED(hr)) {
+>>          error_report("WHPX: Failed to translate GVA, hr=%08lx", hr);
+>>      } else {
+>> @@ -623,16 +631,18 @@ static int whpx_handle_mmio(CPUState *cpu,
+>> WHV_MEMORY_ACCESS_CONTEXT *ctx)
+>>      struct whpx_vcpu *vcpu = get_whpx_vcpu(cpu);
+>>      WHV_EMULATOR_STATUS emu_status;
+>>
+>> -    hr = WHvEmulatorTryMmioEmulation(vcpu->emulator, cpu,
+>> -                                     &vcpu->exit_ctx.VpContext, ctx,
+>> -                                     &emu_status);
+>> +    hr = whp_dispatch.WHvEmulatorTryMmioEmulation(
+>> +        vcpu->emulator, cpu,
+>> +        &vcpu->exit_ctx.VpContext, ctx,
+>> +        &emu_status);
+>>      if (FAILED(hr)) {
+>>          error_report("WHPX: Failed to parse MMIO access, hr=%08lx", hr);
+>>          return -1;
+>>      }
+>>
+>>      if (!emu_status.EmulationSuccessful) {
+>> -        error_report("WHPX: Failed to emulate MMIO access");
+>> +        error_report("WHPX: Failed to emulate MMIO access with"
+>> +                     " EmulatorReturnStatus: %u", emu_status.AsUINT32);
+>>          return -1;
+>>      }
+>>
+>> @@ -646,16 +656,18 @@ static int whpx_handle_portio(CPUState *cpu,
+>>      struct whpx_vcpu *vcpu = get_whpx_vcpu(cpu);
+>>      WHV_EMULATOR_STATUS emu_status;
+>>
+>> -    hr = WHvEmulatorTryIoEmulation(vcpu->emulator, cpu,
+>> -                                   &vcpu->exit_ctx.VpContext, ctx,
+>> -                                   &emu_status);
+>> +    hr = whp_dispatch.WHvEmulatorTryIoEmulation(
+>> +        vcpu->emulator, cpu,
+>> +        &vcpu->exit_ctx.VpContext, ctx,
+>> +        &emu_status);
+>>      if (FAILED(hr)) {
+>>          error_report("WHPX: Failed to parse PortIO access, hr=%08lx", hr);
+>>          return -1;
+>>      }
+>>
+>>      if (!emu_status.EmulationSuccessful) {
+>> -        error_report("WHPX: Failed to emulate PortMMIO access");
+>> +        error_report("WHPX: Failed to emulate PortIO access with"
+>> +                     " EmulatorReturnStatus: %u", emu_status.AsUINT32);
+>>          return -1;
+>>      }
+>>
+>> @@ -770,8 +782,9 @@ static void whpx_vcpu_pre_run(CPUState *cpu)
+>>      qemu_mutex_unlock_iothread();
+>>
+>>      if (reg_count) {
+>> -        hr = WHvSetVirtualProcessorRegisters(whpx->partition, cpu-
+>>> cpu_index,
+>> -                                             reg_names, reg_count, reg_values);
+>> +        hr = whp_dispatch.WHvSetVirtualProcessorRegisters(
+>> +            whpx->partition, cpu->cpu_index,
+>> +            reg_names, reg_count, reg_values);
+>>          if (FAILED(hr)) {
+>>              error_report("WHPX: Failed to set interrupt state registers,"
+>>                           " hr=%08lx", hr); @@ -879,8 +892,9 @@ static int
+>> whpx_vcpu_run(CPUState *cpu)
+>>              whpx_vcpu_kick(cpu);
+>>          }
+>>
+>> -        hr = WHvRunVirtualProcessor(whpx->partition, cpu->cpu_index,
+>> -                                    &vcpu->exit_ctx, sizeof(vcpu->exit_ctx));
+>> +        hr = whp_dispatch.WHvRunVirtualProcessor(
+>> +            whpx->partition, cpu->cpu_index,
+>> +            &vcpu->exit_ctx, sizeof(vcpu->exit_ctx));
+>>
+>>          if (FAILED(hr)) {
+>>              error_report("WHPX: Failed to exec a virtual processor,"
+>> @@ -951,11 +965,11 @@ static int whpx_vcpu_run(CPUState *cpu)
+>>              reg_values[3].Reg64 = rdx;
+>>              reg_values[4].Reg64 = rbx;
+>>
+>> -            hr = WHvSetVirtualProcessorRegisters(whpx->partition,
+>> -                                                 cpu->cpu_index,
+>> -                                                 reg_names,
+>> -                                                 reg_count,
+>> -                                                 reg_values);
+>> +            hr = whp_dispatch.WHvSetVirtualProcessorRegisters(
+>> +                whpx->partition, cpu->cpu_index,
+>> +                reg_names,
+>> +                reg_count,
+>> +                reg_values);
+>>
+>>              if (FAILED(hr)) {
+>>                  error_report("WHPX: Failed to set CpuidAccess state registers,"
+>> @@ -1067,8 +1081,8 @@ int whpx_init_vcpu(CPUState *cpu)
+>>          (void)migrate_add_blocker(whpx_migration_blocker, &local_error);
+>>          if (local_error) {
+>>              error_report_err(local_error);
+>> -            error_free(whpx_migration_blocker);
+>>              migrate_del_blocker(whpx_migration_blocker);
+>> +            error_free(whpx_migration_blocker);
+>>              return -EINVAL;
+>>          }
+>>      }
+>> @@ -1080,7 +1094,9 @@ int whpx_init_vcpu(CPUState *cpu)
+>>          return -ENOMEM;
+>>      }
+>>
+>> -    hr = WHvEmulatorCreateEmulator(&whpx_emu_callbacks, &vcpu-
+>>> emulator);
+>> +    hr = whp_dispatch.WHvEmulatorCreateEmulator(
+>> +        &whpx_emu_callbacks,
+>> +        &vcpu->emulator);
+>>      if (FAILED(hr)) {
+>>          error_report("WHPX: Failed to setup instruction completion support,"
+>>                       " hr=%08lx", hr);
+>> @@ -1088,11 +1104,12 @@ int whpx_init_vcpu(CPUState *cpu)
+>>          return -EINVAL;
+>>      }
+>>
+>> -    hr = WHvCreateVirtualProcessor(whpx->partition, cpu->cpu_index, 0);
+>> +    hr = whp_dispatch.WHvCreateVirtualProcessor(
+>> +        whpx->partition, cpu->cpu_index, 0);
+>>      if (FAILED(hr)) {
+>>          error_report("WHPX: Failed to create a virtual processor,"
+>>                       " hr=%08lx", hr);
+>> -        WHvEmulatorDestroyEmulator(vcpu->emulator);
+>> +        whp_dispatch.WHvEmulatorDestroyEmulator(vcpu->emulator);
+>>          g_free(vcpu);
+>>          return -EINVAL;
+>>      }
+>> @@ -1133,8 +1150,8 @@ void whpx_destroy_vcpu(CPUState *cpu)
+>>      struct whpx_state *whpx = &whpx_global;
+>>      struct whpx_vcpu *vcpu = get_whpx_vcpu(cpu);
+>>
+>> -    WHvDeleteVirtualProcessor(whpx->partition, cpu->cpu_index);
+>> -    WHvEmulatorDestroyEmulator(vcpu->emulator);
+>> +    whp_dispatch.WHvDeleteVirtualProcessor(whpx->partition, cpu-
+>>> cpu_index);
+>> +    whp_dispatch.WHvEmulatorDestroyEmulator(vcpu->emulator);
+>>      g_free(cpu->hax_vcpu);
+>>      return;
+>>  }
+>> @@ -1142,7 +1159,8 @@ void whpx_destroy_vcpu(CPUState *cpu)  void
+>> whpx_vcpu_kick(CPUState *cpu)  {
+>>      struct whpx_state *whpx = &whpx_global;
+>> -    WHvCancelRunVirtualProcessor(whpx->partition, cpu->cpu_index, 0);
+>> +    whp_dispatch.WHvCancelRunVirtualProcessor(
+>> +        whpx->partition, cpu->cpu_index, 0);
+>>  }
+>>
+>>  /*
+>> @@ -1168,17 +1186,17 @@ static void whpx_update_mapping(hwaddr
+>> start_pa, ram_addr_t size,
+>>      */
+>>
+>>      if (add) {
+>> -        hr = WHvMapGpaRange(whpx->partition,
+>> -                            host_va,
+>> -                            start_pa,
+>> -                            size,
+>> -                            (WHvMapGpaRangeFlagRead |
+>> -                             WHvMapGpaRangeFlagExecute |
+>> -                             (rom ? 0 : WHvMapGpaRangeFlagWrite)));
+>> +        hr = whp_dispatch.WHvMapGpaRange(whpx->partition,
+>> +                                         host_va,
+>> +                                         start_pa,
+>> +                                         size,
+>> +                                         (WHvMapGpaRangeFlagRead |
+>> +                                          WHvMapGpaRangeFlagExecute |
+>> +                                          (rom ? 0 :
+>> + WHvMapGpaRangeFlagWrite)));
+>>      } else {
+>> -        hr = WHvUnmapGpaRange(whpx->partition,
+>> -                              start_pa,
+>> -                              size);
+>> +        hr = whp_dispatch.WHvUnmapGpaRange(whpx->partition,
+>> +                                           start_pa,
+>> +                                           size);
+>>      }
+>>
+>>      if (FAILED(hr)) {
+>> @@ -1292,18 +1310,24 @@ static int whpx_accel_init(MachineState *ms)
+>>
+>>      whpx = &whpx_global;
+>>
+>> +    if (!init_whp_dispatch()) {
+>> +        ret = -ENOSYS;
+>> +        goto error;
+>> +    }
+>> +
+>>      memset(whpx, 0, sizeof(struct whpx_state));
+>>      whpx->mem_quota = ms->ram_size;
+>>
+>> -    hr = WHvGetCapability(WHvCapabilityCodeHypervisorPresent,
+>> &whpx_cap,
+>> -                          sizeof(whpx_cap), &whpx_cap_size);
+>> +    hr = whp_dispatch.WHvGetCapability(
+>> +        WHvCapabilityCodeHypervisorPresent, &whpx_cap,
+>> +        sizeof(whpx_cap), &whpx_cap_size);
+>>      if (FAILED(hr) || !whpx_cap.HypervisorPresent) {
+>>          error_report("WHPX: No accelerator found, hr=%08lx", hr);
+>>          ret = -ENOSPC;
+>>          goto error;
+>>      }
+>>
+>> -    hr = WHvCreatePartition(&whpx->partition);
+>> +    hr = whp_dispatch.WHvCreatePartition(&whpx->partition);
+>>      if (FAILED(hr)) {
+>>          error_report("WHPX: Failed to create partition, hr=%08lx", hr);
+>>          ret = -EINVAL;
+>> @@ -1312,10 +1336,11 @@ static int whpx_accel_init(MachineState *ms)
+>>
+>>      memset(&prop, 0, sizeof(WHV_PARTITION_PROPERTY));
+>>      prop.ProcessorCount = smp_cpus;
+>> -    hr = WHvSetPartitionProperty(whpx->partition,
+>> -                                 WHvPartitionPropertyCodeProcessorCount,
+>> -                                 &prop,
+>> -                                 sizeof(WHV_PARTITION_PROPERTY));
+>> +    hr = whp_dispatch.WHvSetPartitionProperty(
+>> +        whpx->partition,
+>> +        WHvPartitionPropertyCodeProcessorCount,
+>> +        &prop,
+>> +        sizeof(WHV_PARTITION_PROPERTY));
+>>
+>>      if (FAILED(hr)) {
+>>          error_report("WHPX: Failed to set partition core count to %d,"
+>> @@ -1326,10 +1351,11 @@ static int whpx_accel_init(MachineState *ms)
+>>
+>>      memset(&prop, 0, sizeof(WHV_PARTITION_PROPERTY));
+>>      prop.ExtendedVmExits.X64CpuidExit = 1;
+>> -    hr = WHvSetPartitionProperty(whpx->partition,
+>> -                                 WHvPartitionPropertyCodeExtendedVmExits,
+>> -                                 &prop,
+>> -                                 sizeof(WHV_PARTITION_PROPERTY));
+>> +    hr = whp_dispatch.WHvSetPartitionProperty(
+>> +        whpx->partition,
+>> +        WHvPartitionPropertyCodeExtendedVmExits,
+>> +        &prop,
+>> +        sizeof(WHV_PARTITION_PROPERTY));
+>>
+>>      if (FAILED(hr)) {
+>>          error_report("WHPX: Failed to enable partition extended X64CpuidExit"
+>> @@ -1339,11 +1365,11 @@ static int whpx_accel_init(MachineState *ms)
+>>      }
+>>
+>>      UINT32 cpuidExitList[] = {1};
+>> -    hr = WHvSetPartitionProperty(whpx->partition,
+>> -                                 WHvPartitionPropertyCodeCpuidExitList,
+>> -                                 cpuidExitList,
+>> -                                 RTL_NUMBER_OF(cpuidExitList) * sizeof(UINT32));
+>> -
+>> +    hr = whp_dispatch.WHvSetPartitionProperty(
+>> +        whpx->partition,
+>> +        WHvPartitionPropertyCodeCpuidExitList,
+>> +        cpuidExitList,
+>> +        RTL_NUMBER_OF(cpuidExitList) * sizeof(UINT32));
+>>      if (FAILED(hr)) {
+>>          error_report("WHPX: Failed to set partition CpuidExitList hr=%08lx",
+>>                       hr);
+>> @@ -1360,11 +1386,11 @@ static int whpx_accel_init(MachineState *ms)
+>>      cpuidResultList[0].Ebx = signature[0];
+>>      cpuidResultList[0].Ecx = signature[1];
+>>      cpuidResultList[0].Edx = signature[2];
+>> -    hr = WHvSetPartitionProperty(whpx->partition,
+>> -                                 WHvPartitionPropertyCodeCpuidResultList,
+>> -                                 cpuidResultList,
+>> -                                 RTL_NUMBER_OF(cpuidResultList) *
+>> -                                    sizeof(WHV_X64_CPUID_RESULT));
+>> +    hr = whp_dispatch.WHvSetPartitionProperty(
+>> +        whpx->partition,
+>> +        WHvPartitionPropertyCodeCpuidResultList,
+>> +        cpuidResultList,
+>> +        RTL_NUMBER_OF(cpuidResultList) *
+>> sizeof(WHV_X64_CPUID_RESULT));
+>>      if (FAILED(hr)) {
+>>          error_report("WHPX: Failed to set partition CpuidResultList hr=%08lx",
+>>                       hr);
+>> @@ -1372,7 +1398,7 @@ static int whpx_accel_init(MachineState *ms)
+>>          goto error;
+>>      }
+>>
+>> -    hr = WHvSetupPartition(whpx->partition);
+>> +    hr = whp_dispatch.WHvSetupPartition(whpx->partition);
+>>      if (FAILED(hr)) {
+>>          error_report("WHPX: Failed to setup partition, hr=%08lx", hr);
+>>          ret = -EINVAL;
+>> @@ -1389,7 +1415,7 @@ static int whpx_accel_init(MachineState *ms)
+>>    error:
+>>
+>>      if (NULL != whpx->partition) {
+>> -        WHvDeletePartition(whpx->partition);
+>> +        whp_dispatch.WHvDeletePartition(whpx->partition);
+>>          whpx->partition = NULL;
+>>      }
+>>
+>> @@ -1421,4 +1447,54 @@ static void whpx_type_init(void)
+>>      type_register_static(&whpx_accel_type);
+>>  }
+>>
+>> +bool init_whp_dispatch(void)
+>> +{
+>> +    const char *lib_name;
+>> +    HMODULE hLib;
+>> +
+>> +    if (whp_dispatch_initialized) {
+>> +        return true;
+>> +    }
+>> +
+>> +    #define WHP_LOAD_FIELD(return_type, function_name, signature) \
+>> +        whp_dispatch.function_name = \
+>> +            (function_name ## _t)GetProcAddress(hLib, #function_name); \
+>> +        if (!whp_dispatch.function_name) { \
+>> +            error_report("Could not load function %s from library %s.", \
+>> +                         #function_name, lib_name); \
+>> +            goto error; \
+>> +        } \
+>> +
+>> +    lib_name = "WinHvPlatform.dll";
+>> +    hWinHvPlatform = LoadLibrary(lib_name);
+>> +    if (!hWinHvPlatform) {
+>> +        error_report("Could not load library %s.", lib_name);
+>> +        goto error;
+>> +    }
+>> +    hLib = hWinHvPlatform;
+>> +    LIST_WINHVPLATFORM_FUNCTIONS(WHP_LOAD_FIELD)
+>> +
+>> +    lib_name = "WinHvEmulation.dll";
+>> +    hWinHvEmulation = LoadLibrary(lib_name);
+>> +    if (!hWinHvEmulation) {
+>> +        error_report("Could not load library %s.", lib_name);
+>> +        goto error;
+>> +    }
+>> +    hLib = hWinHvEmulation;
+>> +    LIST_WINHVEMULATION_FUNCTIONS(WHP_LOAD_FIELD)
+>> +
+>> +    whp_dispatch_initialized = true;
+>> +    return true;
+>> +
+>> +    error:
+>> +
+>> +    if (hWinHvPlatform) {
+>> +        FreeLibrary(hWinHvPlatform);
+>> +    }
+>> +    if (hWinHvEmulation) {
+>> +        FreeLibrary(hWinHvEmulation);
+>> +    }
+>> +    return false;
+>> +}
+>> +
+>>  type_init(whpx_type_init);
+>> --
+>> 2.7.4
 > 
