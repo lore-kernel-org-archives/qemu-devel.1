@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40171)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40178)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <balaton@eik.bme.hu>) id 1fQYwW-0008Q4-0Y
+	(envelope-from <balaton@eik.bme.hu>) id 1fQYwW-0008Q8-5B
 	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 09:57:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <balaton@eik.bme.hu>) id 1fQYwT-0000VU-1I
+	(envelope-from <balaton@eik.bme.hu>) id 1fQYwU-0000Wy-DW
 	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 09:57:40 -0400
-Message-Id: <d13ea58b288f386a12a76c41a617c500c4454341.1528291908.git.balaton@eik.bme.hu>
+Message-Id: <53f9d0b04374a3f4449af65ce01bd68dbe757ab5.1528291908.git.balaton@eik.bme.hu>
 In-Reply-To: <cover.1528291908.git.balaton@eik.bme.hu>
 References: <cover.1528291908.git.balaton@eik.bme.hu>
 From: BALATON Zoltan <balaton@eik.bme.hu>
 Date: Wed, 06 Jun 2018 15:31:48 +0200
-Subject: [Qemu-devel] [PATCH v2 3/8] ppc4xx_i2c: Implement directcntl
- register
+Subject: [Qemu-devel] [PATCH v2 1/8] ppc4xx_i2c: Clean up and improve error
+ logging
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,80 +23,230 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org, qemu-ppc@nongnu.org
 Cc: Alexander Graf <agraf@suse.de>, David Gibson <david@gibson.dropbear.id.au>
 
+Make it more readable by converting register indexes to decimal
+(avoids lot of superfluous 0x0) and distinguish errors caused by
+accessing non-existent vs. unimplemented registers.
+No functional change.
+
 Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
 ---
- default-configs/ppc-softmmu.mak    |  1 +
- default-configs/ppcemb-softmmu.mak |  1 +
- hw/i2c/ppc4xx_i2c.c                | 14 +++++++++++++-
- 3 files changed, 15 insertions(+), 1 deletion(-)
+ hw/i2c/ppc4xx_i2c.c | 94 +++++++++++++++++++++++++++++------------------------
+ 1 file changed, 51 insertions(+), 43 deletions(-)
 
-diff --git a/default-configs/ppc-softmmu.mak b/default-configs/ppc-softmmu.mak
-index 4d7be45..7d0dc2f 100644
---- a/default-configs/ppc-softmmu.mak
-+++ b/default-configs/ppc-softmmu.mak
-@@ -26,6 +26,7 @@ CONFIG_USB_EHCI_SYSBUS=y
- CONFIG_SM501=y
- CONFIG_IDE_SII3112=y
- CONFIG_I2C=y
-+CONFIG_BITBANG_I2C=y
- 
- # For Macs
- CONFIG_MAC=y
-diff --git a/default-configs/ppcemb-softmmu.mak b/default-configs/ppcemb-softmmu.mak
-index 67d18b2..37af193 100644
---- a/default-configs/ppcemb-softmmu.mak
-+++ b/default-configs/ppcemb-softmmu.mak
-@@ -19,3 +19,4 @@ CONFIG_USB_EHCI_SYSBUS=y
- CONFIG_SM501=y
- CONFIG_IDE_SII3112=y
- CONFIG_I2C=y
-+CONFIG_BITBANG_I2C=y
 diff --git a/hw/i2c/ppc4xx_i2c.c b/hw/i2c/ppc4xx_i2c.c
-index a68b5f7..5806209 100644
+index ab64d19..d1936db 100644
 --- a/hw/i2c/ppc4xx_i2c.c
 +++ b/hw/i2c/ppc4xx_i2c.c
-@@ -30,6 +30,7 @@
- #include "cpu.h"
+@@ -31,7 +31,7 @@
  #include "hw/hw.h"
  #include "hw/i2c/ppc4xx_i2c.h"
-+#include "bitbang_i2c.h"
  
- #define PPC4xx_I2C_MEM_SIZE 18
+-#define PPC4xx_I2C_MEM_SIZE 0x12
++#define PPC4xx_I2C_MEM_SIZE 18
  
-@@ -46,7 +47,13 @@
- 
- #define IIC_XTCNTLSS_SRST   (1 << 0)
- 
-+#define IIC_DIRECTCNTL_SDAC (1 << 3)
-+#define IIC_DIRECTCNTL_SCLC (1 << 2)
-+#define IIC_DIRECTCNTL_MSDA (1 << 1)
-+#define IIC_DIRECTCNTL_MSCL (1 << 0)
-+
- typedef struct {
-+    bitbang_i2c_interface *bitbang;
-     uint8_t mdata;
-     uint8_t lmadr;
-     uint8_t hmadr;
-@@ -308,7 +315,11 @@ static void ppc4xx_i2c_writeb(void *opaque, hwaddr addr, uint64_t value,
-         i2c->xtcntlss = value;
-         break;
-     case 16:
--        i2c->directcntl = value & 0x7;
-+        i2c->directcntl = value & (IIC_DIRECTCNTL_SDAC & IIC_DIRECTCNTL_SCLC);
-+        i2c->directcntl |= (value & IIC_DIRECTCNTL_SCLC ? 1 : 0);
-+        bitbang_i2c_set(i2c->bitbang, BITBANG_I2C_SCL, i2c->directcntl & 1);
-+        i2c->directcntl |= bitbang_i2c_set(i2c->bitbang, BITBANG_I2C_SDA,
-+                               (value & IIC_DIRECTCNTL_SDAC) != 0) << 1;
-         break;
-     default:
-         if (addr < PPC4xx_I2C_MEM_SIZE) {
-@@ -343,6 +354,7 @@ static void ppc4xx_i2c_init(Object *o)
-     sysbus_init_mmio(SYS_BUS_DEVICE(s), &s->iomem);
-     sysbus_init_irq(SYS_BUS_DEVICE(s), &s->irq);
-     s->bus = i2c_init_bus(DEVICE(s), "i2c");
-+    r->bitbang = bitbang_i2c_init(s->bus);
+ #define IIC_CNTL_PT         (1 << 0)
+ #define IIC_CNTL_READ       (1 << 1)
+@@ -70,7 +70,7 @@ static void ppc4xx_i2c_reset(DeviceState *s)
+     i2c->intrmsk = 0;
+     i2c->xfrcnt = 0;
+     i2c->xtcntlss = 0;
+-    i2c->directcntl = 0x0f;
++    i2c->directcntl = 0xf;
+     i2c->intr = 0;
  }
  
- static void ppc4xx_i2c_class_init(ObjectClass *klass, void *data)
+@@ -85,7 +85,7 @@ static uint64_t ppc4xx_i2c_readb(void *opaque, hwaddr addr, unsigned int size)
+     uint64_t ret;
+ 
+     switch (addr) {
+-    case 0x00:
++    case 0:
+         ret = i2c->mdata;
+         if (ppc4xx_i2c_is_master(i2c)) {
+             ret = 0xff;
+@@ -139,58 +139,62 @@ static uint64_t ppc4xx_i2c_readb(void *opaque, hwaddr addr, unsigned int size)
+                           TYPE_PPC4xx_I2C, __func__);
+         }
+         break;
+-    case 0x02:
++    case 2:
+         ret = i2c->sdata;
+         break;
+-    case 0x04:
++    case 4:
+         ret = i2c->lmadr;
+         break;
+-    case 0x05:
++    case 5:
+         ret = i2c->hmadr;
+         break;
+-    case 0x06:
++    case 6:
+         ret = i2c->cntl;
+         break;
+-    case 0x07:
++    case 7:
+         ret = i2c->mdcntl;
+         break;
+-    case 0x08:
++    case 8:
+         ret = i2c->sts;
+         break;
+-    case 0x09:
++    case 9:
+         ret = i2c->extsts;
+         break;
+-    case 0x0A:
++    case 10:
+         ret = i2c->lsadr;
+         break;
+-    case 0x0B:
++    case 11:
+         ret = i2c->hsadr;
+         break;
+-    case 0x0C:
++    case 12:
+         ret = i2c->clkdiv;
+         break;
+-    case 0x0D:
++    case 13:
+         ret = i2c->intrmsk;
+         break;
+-    case 0x0E:
++    case 14:
+         ret = i2c->xfrcnt;
+         break;
+-    case 0x0F:
++    case 15:
+         ret = i2c->xtcntlss;
+         break;
+-    case 0x10:
++    case 16:
+         ret = i2c->directcntl;
+         break;
+-    case 0x11:
++    case 17:
+         ret = i2c->intr;
+         break;
+     default:
+-        qemu_log_mask(LOG_GUEST_ERROR, "[%s]%s: Bad address at offset 0x%"
+-                      HWADDR_PRIx "\n", TYPE_PPC4xx_I2C, __func__, addr);
++        if (addr < PPC4xx_I2C_MEM_SIZE) {
++            qemu_log_mask(LOG_UNIMP, "%s: Unimplemented register 0x%"
++                          HWADDR_PRIx "\n", __func__, addr);
++        } else {
++            qemu_log_mask(LOG_GUEST_ERROR, "%s: Bad address 0x%"
++                          HWADDR_PRIx "\n", __func__, addr);
++        }
+         ret = 0;
+         break;
+     }
+-
+     return ret;
+ }
+ 
+@@ -200,7 +204,7 @@ static void ppc4xx_i2c_writeb(void *opaque, hwaddr addr, uint64_t value,
+     PPC4xxI2CState *i2c = opaque;
+ 
+     switch (addr) {
+-    case 0x00:
++    case 0:
+         i2c->mdata = value;
+         if (!i2c_bus_busy(i2c->bus)) {
+             /* assume we start a write transfer */
+@@ -225,19 +229,19 @@ static void ppc4xx_i2c_writeb(void *opaque, hwaddr addr, uint64_t value,
+             }
+         }
+         break;
+-    case 0x02:
++    case 2:
+         i2c->sdata = value;
+         break;
+-    case 0x04:
++    case 4:
+         i2c->lmadr = value;
+         if (i2c_bus_busy(i2c->bus)) {
+             i2c_end_transfer(i2c->bus);
+         }
+         break;
+-    case 0x05:
++    case 5:
+         i2c->hmadr = value;
+         break;
+-    case 0x06:
++    case 6:
+         i2c->cntl = value;
+         if (i2c->cntl & IIC_CNTL_PT) {
+             if (i2c->cntl & IIC_CNTL_READ) {
+@@ -263,32 +267,31 @@ static void ppc4xx_i2c_writeb(void *opaque, hwaddr addr, uint64_t value,
+             }
+         }
+         break;
+-    case 0x07:
+-        i2c->mdcntl = value & 0xDF;
++    case 7:
++        i2c->mdcntl = value & 0xdf;
+         break;
+-    case 0x08:
+-        i2c->sts &= ~(value & 0x0A);
++    case 8:
++        i2c->sts &= ~(value & 0xa);
+         break;
+-    case 0x09:
+-        i2c->extsts &= ~(value & 0x8F);
++    case 9:
++        i2c->extsts &= ~(value & 0x8f);
+         break;
+-    case 0x0A:
++    case 10:
+         i2c->lsadr = value;
+-        /*i2c_set_slave_address(i2c->bus, i2c->lsadr);*/
+         break;
+-    case 0x0B:
++    case 11:
+         i2c->hsadr = value;
+         break;
+-    case 0x0C:
++    case 12:
+         i2c->clkdiv = value;
+         break;
+-    case 0x0D:
++    case 13:
+         i2c->intrmsk = value;
+         break;
+-    case 0x0E:
++    case 14:
+         i2c->xfrcnt = value & 0x77;
+         break;
+-    case 0x0F:
++    case 15:
+         if (value & IIC_XTCNTLSS_SRST) {
+             /* Is it actually a full reset? U-Boot sets some regs before */
+             ppc4xx_i2c_reset(DEVICE(i2c));
+@@ -296,15 +299,20 @@ static void ppc4xx_i2c_writeb(void *opaque, hwaddr addr, uint64_t value,
+         }
+         i2c->xtcntlss = value;
+         break;
+-    case 0x10:
++    case 16:
+         i2c->directcntl = value & 0x7;
+         break;
+-    case 0x11:
++    case 17:
+         i2c->intr = value;
+         break;
+     default:
+-        qemu_log_mask(LOG_GUEST_ERROR, "[%s]%s: Bad address at offset 0x%"
+-                      HWADDR_PRIx "\n", TYPE_PPC4xx_I2C, __func__, addr);
++        if (addr < PPC4xx_I2C_MEM_SIZE) {
++            qemu_log_mask(LOG_UNIMP, "%s: Unimplemented register 0x%"
++                          HWADDR_PRIx "\n", __func__, addr);
++        } else {
++            qemu_log_mask(LOG_GUEST_ERROR, "%s: Bad address 0x%"
++                          HWADDR_PRIx "\n", __func__, addr);
++        }
+         break;
+     }
+ }
 -- 
 2.7.6
