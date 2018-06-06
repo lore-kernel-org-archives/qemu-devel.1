@@ -1,28 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36070)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38469)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1fQX0T-0007Ij-7H
-	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 07:53:38 -0400
+	(envelope-from <bounces@canonical.com>) id 1fQX7q-0001YY-Hi
+	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 08:01:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1fQX0S-0004jW-Cy
-	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 07:53:37 -0400
-References: <20180528183058.GG2209@redhat.com>
-	<20180528183833.GJ4580@localhost.localdomain>
-	<20180528212054.GH2209@redhat.com> <20180528212510.GC4660@redhat.com>
-	<20180529064415.GA4756@localhost.localdomain>
-	<2b3eef00-f326-c1e6-0e4b-b7602646eec4@redhat.com>
-	<20180605092159.GA2544@work-vm>
-	<46ef4200-eccf-7e65-d3a0-69e4a7414b51@redhat.com>
-	<20180606111406.GD2660@work-vm> <20180606114228.GH1455@redhat.com>
-	<20180606114817.GC3064@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <ae6e0d35-690a-41c7-59aa-3d2517ff95ea@redhat.com>
-Date: Wed, 6 Jun 2018 13:53:27 +0200
+	(envelope-from <bounces@canonical.com>) id 1fQX7n-0001C8-FS
+	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 08:01:14 -0400
+Received: from indium.canonical.com ([91.189.90.7]:34684)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1fQX7n-0001BQ-9H
+	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 08:01:11 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1fQX7l-0004za-IF
+	for <qemu-devel@nongnu.org>; Wed, 06 Jun 2018 12:01:09 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 766F52E807B
+	for <qemu-devel@nongnu.org>; Wed,  6 Jun 2018 12:01:09 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20180606114817.GC3064@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="3dtDjy1nXg3AZ5lAtgfhnbVyj4HLeD2af"
-Subject: Re: [Qemu-devel] storing machine data in qcow images?
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Wed, 06 Jun 2018 11:51:33 -0000
+From: Mykola Ivanets <1636217@bugs.launchpad.net>
+Reply-To: Bug 1636217 <1636217@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20161024141318.21041.87583.malonedeb@gac.canonical.com>
+Message-Id: <152828589345.4172.17095155971104009673.malone@chaenomeles.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1636217] Re: qemu-kvm 2.7 does not boot kvm VMs
+ with virtio on top of VMware ESX
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,76 +37,89 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "=?UTF-8?Q?Daniel_P._Berrang=c3=a9?=" <berrange@redhat.com>, "Richard W.M. Jones" <rjones@redhat.com>
-Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org, armbru@redhat.com, stefanha@redhat.com
+To: qemu-devel@nongnu.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---3dtDjy1nXg3AZ5lAtgfhnbVyj4HLeD2af
-From: Max Reitz <mreitz@redhat.com>
-To: =?UTF-8?Q?Daniel_P._Berrang=c3=a9?= <berrange@redhat.com>,
- "Richard W.M. Jones" <rjones@redhat.com>
-Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org,
- "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org,
- armbru@redhat.com, stefanha@redhat.com
-Message-ID: <ae6e0d35-690a-41c7-59aa-3d2517ff95ea@redhat.com>
-Subject: Re: [Qemu-devel] storing machine data in qcow images?
-References: <20180528183058.GG2209@redhat.com>
- <20180528183833.GJ4580@localhost.localdomain>
- <20180528212054.GH2209@redhat.com> <20180528212510.GC4660@redhat.com>
- <20180529064415.GA4756@localhost.localdomain>
- <2b3eef00-f326-c1e6-0e4b-b7602646eec4@redhat.com>
- <20180605092159.GA2544@work-vm>
- <46ef4200-eccf-7e65-d3a0-69e4a7414b51@redhat.com>
- <20180606111406.GD2660@work-vm> <20180606114228.GH1455@redhat.com>
- <20180606114817.GC3064@redhat.com>
-In-Reply-To: <20180606114817.GC3064@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+I'd like to share some other available workarounds:
 
-On 2018-06-06 13:48, Daniel P. Berrang=C3=A9 wrote:
-> On Wed, Jun 06, 2018 at 12:42:28PM +0100, Richard W.M. Jones wrote:
->> On Wed, Jun 06, 2018 at 12:14:07PM +0100, Dr. David Alan Gilbert wrote=
-:
->>> The problem with having a separate file is that you either have to co=
-py
->>> it around with the image or have an archive.  If you have an archive
->>> you have to have an unpacking step which then copies, potentially a l=
-ot
->>> of data taking some reasonable amount of time.  Storing a simple bit
->>> of data with the image avoids that.
->>
->> This isn't really true.  For OVA (ie. tar) we don't unpack them.
->> Adding file.offset and file.size in qemu's raw driver was crucial to
->> that optimization.
->=20
-> Though that assumes you're only using the qcow2 file in read-only mode.=
+1. Use "-machine type=3Dpc-i440fx-x" where x <=3D 2.6
+2. Add "disable-modern=3Don" option for all virtio block devices
+3. Add "-global virtio-blk-pci.disable-modern=3Don"
+3. Use software acceleration for virtual appliances ("-machine accel=3Dtcg")
 
-> As soon as you need write access you need to unpack from the OVA so tha=
-t
-> the qcow2 file can grow its length when new sectors are allocated.
+-- =
 
-Except if the qcow2 file is at the end of the archive.  Then all you
-need to do is adjust the length field of the tar file header.
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1636217
 
-Max
+Title:
+  qemu-kvm 2.7 does not boot kvm VMs with virtio on top of VMware ESX
 
+Status in QEMU:
+  New
 
---3dtDjy1nXg3AZ5lAtgfhnbVyj4HLeD2af
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+Bug description:
+  After todays Proxmox update all my Linux VMs stopped booting.
 
------BEGIN PGP SIGNATURE-----
+  # How to reproduce
+  - Have KVM on top of VMware ESX (I use VMware ESX 6)
+  - Boot Linux VM with virtio Disk drive.
 
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlsXyzgACgkQ9AfbAGHV
-z0DqYQgAnadwiG8H79CKbqCeGIp5vHZsujhUGxch0q16CDCcrJo+BP2WTfcE9xK8
-Vp6Q0RHEJpIyEr6N/tSm1WyYeU9g+ZwNYzfTGsDxhOEAcSU28cdYAf0GoN82kst4
-2Ur1MlfC1DMmK6lNSNVu+hOa4jkqB5i6mL8zmSumf++wslSMwF303YgQPNbPt0Y6
-natwzjmAUH/cVWBIcTzFzyQ9ADphkDds3Jf70Hmg0atzwFebm66T8LBVt+SegRWU
-ZQiOW+DdEufS4n+Pku6CMgDCt+/uNi1nj2woJzTWI8JlxRp8V0I4ArK9m+vlgKwI
-rAt2XwkDe7SFMjEcH3nYA274k8Yntg==
-=R/Tq
------END PGP SIGNATURE-----
+  =
 
---3dtDjy1nXg3AZ5lAtgfhnbVyj4HLeD2af--
+  # Result
+  virtio based VMs do not boot anymore:
+
+  root@demotuxdc:/etc/pve/nodes/demotuxdc/qemu-server# grep virtio0 100.con=
+f =
+
+  bootdisk: virtio0
+  virtio0: pvestorage:100/vm-100-disk-1.raw,discard=3Don,size=3D20G
+
+  (initially with cache=3Dwritethrough, but that doesn=C2=B4t matter)
+
+  What happens instead is:
+
+  - BIOS displays "Booting from harddisk..."
+  - kvm process of VM loops at about 140% of Intel(R) Core(TM) i5-6260U CPU=
+ @ 1.80GHz Skylake dual core CPU
+
+  Disk of course has valid bootsector:
+
+  root@demotuxdc:/srv/pvestorage/images/100# file -sk vm-100-disk-1.raw =
+
+  vm-100-disk-1.raw: DOS/MBR boot sector DOS/MBR boot sector DOS executable=
+ (COM), boot code
+  root@demotuxdc:/srv/pvestorage/images/100# head -c 2048 vm-100-disk-1.raw=
+ | hd | grep GRUB
+  00000170  be 94 7d e8 2e 00 cd 18  eb fe 47 52 55 42 20 00  |..}.......GR=
+UB .|
+
+  =
+
+  # Workaround 1
+  - Change disk from virtio0 to scsi0
+  - Debian boots out of the box after this change
+  - SLES 12 needs a rebuilt initrd
+  - CentOS 7 too, but it seems that is not even enough and it still fails (=
+even in hostonly=3D"no" mode for dracut)
+
+  =
+
+  # Workaround 2
+  Downgrade pve-qemu-kvm 2.7.0-3 to 2.6.2-2.
+
+  =
+
+  # Expected results
+  Disk boots just fine via virtio like it did before.
+
+  =
+
+  # Downstream bug report
+  Downstream suggests an issue with upstream qemu-kvm:
+
+  https://bugzilla.proxmox.com/show_bug.cgi?id=3D1181
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1636217/+subscriptions
