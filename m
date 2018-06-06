@@ -1,28 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54909)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55587)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1fQZhX-0004A1-2l
-	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 10:46:15 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fQZiY-0004m9-Gk
+	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 10:47:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1fQZhW-0000fJ-CR
-	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 10:46:15 -0400
-Date: Wed, 6 Jun 2018 17:46:05 +0300
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20180606174412-mutt-send-email-mst@kernel.org>
-References: <20180528212054.GH2209@redhat.com>
-	<20180528212510.GC4660@redhat.com>
-	<20180529064415.GA4756@localhost.localdomain>
-	<2b3eef00-f326-c1e6-0e4b-b7602646eec4@redhat.com>
-	<20180606123237.2235ae4a@kitsune.suse.cz>
-	<bc97cdc3-85ba-e053-0816-b6bc431064fb@redhat.com>
-	<20180606131929.44d0fd6b@kitsune.suse.cz>
-	<93233bff-604b-c891-90ce-64fe1eaaaab5@redhat.com>
-	<20180606113720.GA2661@work-vm>
-	<2c833e2c-f0bb-ea98-a703-54fb9447bd2f@redhat.com>
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fQZiV-00018j-Cr
+	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 10:47:18 -0400
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Date: Wed,  6 Jun 2018 11:47:06 -0300
+Message-Id: <20180606144706.29732-1-f4bug@amsat.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <2c833e2c-f0bb-ea98-a703-54fb9447bd2f@redhat.com>
-Subject: Re: [Qemu-devel] storing machine data in qcow images?
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH] MAINTAINERS: Adopt the Gumstix
+ computers-on-module machines
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,19 +25,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>
-Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Michal =?iso-8859-1?Q?Such=E1nek?= <msuchanek@suse.de>, Kevin Wolf <kwolf@redhat.com>, ehabkost@redhat.com, qemu-block@nongnu.org, "Richard W.M. Jones" <rjones@redhat.com>, qemu-devel@nongnu.org, stefanha@redhat.com
+To: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, qemu-arm@nongnu.org
 
-On Wed, Jun 06, 2018 at 01:44:02PM +0200, Max Reitz wrote:
-> Because it's a hack, right.  Storing binary data in a qcow2 file,
-> completely ignoring it in qemu (and being completely unusable to any
-> potential other users of the qcow2 format[1]) and only interpreting it
-> somewhere up the stack is a hack.
+These COMs are hard to find, and the companie dropped the support
+few years ago.
 
-It's just a first step and it ensures compatibility with old QEMU
-versions. But down the road I think we will start warning
-user if the machine type does not match, and possibly even
-get the type from there if user didn't supply it.
+Per the "Gumstix Product Changes, Known Issues, and EOL" pdf:
 
+- Phasing out: PXA270-based Verdex product line
+  September 2012
+
+- Phasing out: PXA255-based Basix & Connex
+  September 2009
+
+However there are still booting SD card image availables, very
+convenient to stress test the QEMU SD card implementation.
+Therefore I volunteer to keep an eye on this file, while it
+is useful for testing.
+
+Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+---
+ MAINTAINERS | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 41cd3736a9..1825deb762 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -491,9 +491,10 @@ F: include/hw/arm/digic.h
+ F: hw/*/digic*
+ 
+ Gumstix
++M: Philippe Mathieu-Daudé <f4bug@amsat.org>
+ L: qemu-devel@nongnu.org
+ L: qemu-arm@nongnu.org
+-S: Orphan
++S: Odd Fixes
+ F: hw/arm/gumstix.c
+ 
+ i.MX31
 -- 
-MST
+2.17.1
