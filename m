@@ -1,17 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38360)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38428)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1fQdoo-0000h3-LS
-	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 15:10:03 -0400
+	(envelope-from <jsnow@redhat.com>) id 1fQdot-0000ob-Qx
+	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 15:10:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1fQdon-0000kO-LF
-	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 15:10:02 -0400
+	(envelope-from <jsnow@redhat.com>) id 1fQdon-0000km-Rz
+	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 15:10:07 -0400
 From: John Snow <jsnow@redhat.com>
-Date: Wed,  6 Jun 2018 15:09:54 -0400
-Message-Id: <20180606190955.20845-7-jsnow@redhat.com>
+Date: Wed,  6 Jun 2018 15:09:49 -0400
+Message-Id: <20180606190955.20845-2-jsnow@redhat.com>
 In-Reply-To: <20180606190955.20845-1-jsnow@redhat.com>
 References: <20180606190955.20845-1-jsnow@redhat.com>
-Subject: [Qemu-devel] [PATCH 6/7] atapi: call ide_set_irq before
- ide_transfer_start
+Subject: [Qemu-devel] [PATCH 1/7] libqos/ahci: track sector size
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,51 +20,75 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: John Snow <jsnow@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: John Snow <jsnow@redhat.com>
 
-From: Paolo Bonzini <pbonzini@redhat.com>
+It's not always 512, and it does wind up mattering for PIO tranfers,
+because this means DRQ blocks are four times as big for ATAPI.
+Replace an instance of 2048 with the correct define, too.
 
-The ATAPI_INT_REASON_IO interrupt is raised when I/O starts, but in the
-AHCI case ide_set_irq was actually called at the end of a mutual recursion.
-Move it early, with the side effect that ide_transfer_start becomes a tail
-call in ide_atapi_cmd_reply_end.
+This patch by itself winds changing no behavior. fis->count is ignored
+for CMD_PACKET, and sect_count only gets used in non-ATAPI cases.
 
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 Signed-off-by: John Snow <jsnow@redhat.com>
 ---
- hw/ide/atapi.c | 12 ++++++------
- 1 file changed, 6 insertions(+), 6 deletions(-)
+ tests/libqos/ahci.c | 10 ++++++----
+ 1 file changed, 6 insertions(+), 4 deletions(-)
 
-diff --git a/hw/ide/atapi.c b/hw/ide/atapi.c
-index c0509c8bf5..7168ff55a7 100644
---- a/hw/ide/atapi.c
-+++ b/hw/ide/atapi.c
-@@ -287,6 +287,7 @@ void ide_atapi_cmd_reply_end(IDEState *s)
-         } else {
-             /* a new transfer is needed */
-             s->nsector = (s->nsector & ~7) | ATAPI_INT_REASON_IO;
-+            ide_set_irq(s->bus);
-             byte_count_limit = atapi_byte_count_limit(s);
-             trace_ide_atapi_cmd_reply_end_bcl(s, byte_count_limit);
-             size = s->packet_transfer_size;
-@@ -304,13 +305,12 @@ void ide_atapi_cmd_reply_end(IDEState *s)
-                 if (size > (s->cd_sector_size - s->io_buffer_index))
-                     size = (s->cd_sector_size - s->io_buffer_index);
-             }
--            s->packet_transfer_size -= size;
--            s->elementary_transfer_size -= size;
--            s->io_buffer_index += size;
--            ide_transfer_start(s, s->io_buffer + s->io_buffer_index - size,
--                               size, ide_atapi_cmd_reply_end);
--            ide_set_irq(s->bus);
-             trace_ide_atapi_cmd_reply_end_new(s, s->status);
-+            s->packet_transfer_size -= size;
-+            s->elementary_transfer_size -= size;
-+            s->io_buffer_index += size;
-+            ide_transfer_start(s, s->io_buffer + s->io_buffer_index - size,
-+                               size, ide_atapi_cmd_reply_end);
+diff --git a/tests/libqos/ahci.c b/tests/libqos/ahci.c
+index bc201d762b..63e1f9b92d 100644
+--- a/tests/libqos/ahci.c
++++ b/tests/libqos/ahci.c
+@@ -90,6 +90,7 @@ struct AHCICommand {
+     uint32_t interrupts;
+     uint64_t xbytes;
+     uint32_t prd_size;
++    uint32_t sector_size;
+     uint64_t buffer;
+     AHCICommandProp *props;
+     /* Data to be transferred to the guest */
+@@ -796,7 +797,7 @@ static void command_header_init(AHCICommand *cmd)
+ static void command_table_init(AHCICommand *cmd)
+ {
+     RegH2DFIS *fis = &(cmd->fis);
+-    uint16_t sect_count = (cmd->xbytes / AHCI_SECTOR_SIZE);
++    uint16_t sect_count = (cmd->xbytes / cmd->sector_size);
+ 
+     fis->fis_type = REG_H2D_FIS;
+     fis->flags = REG_H2D_FIS_CMD; /* "Command" bit */
+@@ -819,7 +820,7 @@ static void command_table_init(AHCICommand *cmd)
+         if (cmd->props->lba28 || cmd->props->lba48) {
+             fis->device = ATA_DEVICE_LBA;
          }
+-        fis->count = (cmd->xbytes / AHCI_SECTOR_SIZE);
++        fis->count = (cmd->xbytes / cmd->sector_size);
      }
- }
+     fis->icc = 0x00;
+     fis->control = 0x00;
+@@ -857,6 +858,7 @@ AHCICommand *ahci_command_create(uint8_t command_name)
+     cmd->xbytes = props->size;
+     cmd->prd_size = 4096;
+     cmd->buffer = 0xabad1dea;
++    cmd->sector_size = props->atapi ? ATAPI_SECTOR_SIZE : AHCI_SECTOR_SIZE;
+ 
+     if (!cmd->props->ncq) {
+         cmd->interrupts = AHCI_PX_IS_DHRS;
+@@ -1033,7 +1035,7 @@ void ahci_command_set_buffer(AHCICommand *cmd, uint64_t buffer)
+ static void ahci_atapi_set_size(AHCICommand *cmd, uint64_t xbytes)
+ {
+     unsigned char *cbd = cmd->atapi_cmd;
+-    uint64_t nsectors = xbytes / 2048;
++    uint64_t nsectors = xbytes / ATAPI_SECTOR_SIZE;
+     uint32_t tmp;
+     g_assert(cbd);
+ 
+@@ -1080,7 +1082,7 @@ void ahci_command_set_sizes(AHCICommand *cmd, uint64_t xbytes,
+         cmd->prd_size = prd_size;
+     }
+     cmd->xbytes = xbytes;
+-    sect_count = (cmd->xbytes / AHCI_SECTOR_SIZE);
++    sect_count = (cmd->xbytes / cmd->sector_size);
+ 
+     if (cmd->props->ncq) {
+         NCQFIS *nfis = (NCQFIS *)&(cmd->fis);
 -- 
 2.14.3
