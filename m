@@ -1,21 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34833)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35030)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1fQdWK-0004Vu-EX
-	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 14:50:57 -0400
+	(envelope-from <jtomko@redhat.com>) id 1fQdXl-0005CU-Kd
+	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 14:52:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1fQdWJ-000082-FS
-	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 14:50:56 -0400
-References: <20180606183738.31688-1-mreitz@redhat.com>
-	<CAFEAcA-GnSTh7aOEYm8g0DiFKP_o3LgPs_OHO8x0nPKuGU2-bw@mail.gmail.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <0e08539e-62cc-ae4f-c770-8e366252a1b0@redhat.com>
-Date: Wed, 6 Jun 2018 20:50:46 +0200
+	(envelope-from <jtomko@redhat.com>) id 1fQdXh-00010X-NL
+	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 14:52:25 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:38450 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jtomko@redhat.com>) id 1fQdXh-00010A-HU
+	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 14:52:21 -0400
+Date: Wed, 6 Jun 2018 20:52:14 +0200
+From: =?iso-8859-1?B?SuFu?= Tomko <jtomko@redhat.com>
+Message-ID: <20180606185214.GH6767@dnr>
+References: <1525734594-11134-1-git-send-email-sridhar.samudrala@intel.com>
+	<fcefe501-b410-f1ec-829c-68199edcdbef@intel.com>
+	<d61c88c7-0803-ba1c-08ab-fc668cffa40b@redhat.com>
+	<8e411566-1146-03a2-5372-8f8134ee0ce6@intel.com>
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA-GnSTh7aOEYm8g0DiFKP_o3LgPs_OHO8x0nPKuGU2-bw@mail.gmail.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="FyY3tioH7lkIUrnRjOwjVXOvvLUfTHurV"
-Subject: Re: [Qemu-devel] [PATCH] iotests: Fix 219's timing
+	protocol="application/pgp-signature"; boundary="LG0Ll82vYr46+VA1"
+Content-Disposition: inline
+In-Reply-To: <8e411566-1146-03a2-5372-8f8134ee0ce6@intel.com>
+Subject: Re: [Qemu-devel] [libvirt] [PATCH] qemu: Introduce
+ VIRTIO_NET_F_STANDBY feature bit to virtio_net
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,96 +31,108 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Qemu-block <qemu-block@nongnu.org>, Kevin Wolf <kwolf@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
+To: "Samudrala, Sridhar" <sridhar.samudrala@intel.com>
+Cc: Jason Wang <jasowang@redhat.com>, mst@redhat.com, virtualization@lists.linux-foundation.org, virtio-dev@lists.oasis-open.org, jesse.brandeburg@intel.com, alexander.h.duyck@intel.com, qemu-devel@nongnu.org, laine@redhat.com, libvir-list@redhat.com
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---FyY3tioH7lkIUrnRjOwjVXOvvLUfTHurV
-From: Max Reitz <mreitz@redhat.com>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Qemu-block <qemu-block@nongnu.org>, Kevin Wolf <kwolf@redhat.com>,
- QEMU Developers <qemu-devel@nongnu.org>
-Message-ID: <0e08539e-62cc-ae4f-c770-8e366252a1b0@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] iotests: Fix 219's timing
-References: <20180606183738.31688-1-mreitz@redhat.com>
- <CAFEAcA-GnSTh7aOEYm8g0DiFKP_o3LgPs_OHO8x0nPKuGU2-bw@mail.gmail.com>
-In-Reply-To: <CAFEAcA-GnSTh7aOEYm8g0DiFKP_o3LgPs_OHO8x0nPKuGU2-bw@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
+
+--LG0Ll82vYr46+VA1
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On 2018-06-06 20:41, Peter Maydell wrote:
-> On 6 June 2018 at 19:37, Max Reitz <mreitz@redhat.com> wrote:
->> 219 has two issues that may lead to sporadic failure, both of which ar=
-e
->> the result of issuing query-jobs too early after a job has been
->> modified.  This can then lead to different results based on whether th=
-e
->> modification has taken effect already or not.
+On Wed, Jun 06, 2018 at 11:17:36AM -0700, Samudrala, Sridhar wrote:
+>On 6/4/2018 7:06 PM, Jason Wang wrote:
 >>
->> First, query-jobs is issued right after the job has been created.
->> Besides its current progress possibly being in any random state (which=
-
->> has already been taken care of), its total progress too is basically
->> arbitrary, because the job may not yet have been able to determine it.=
-
->> This patch addresses this by just filtering the total progress, like
->> what has been done for the current progress already.  However, for mor=
-e
->> clarity, the filtering is changed to replace the values by a string
->> 'FILTERED' instead of deleting them.
 >>
->> Secondly, query-jobs is issued right after a job has been resumed.  Th=
-e
->> job may or may not yet have had the time to actually perform any I/O,
->> and thus its current progress may or may not have advanced.  To make
->> sure it has indeed advanced (which is what the reference output alread=
-y
->> assumes), insert a sleep of 100 ms before query-jobs is invoked.  With=
- a
->> slice time of 100 ms, a buffer size of 64 kB and a speed of 256 kB/s,
->> this should be the right amount of time to let the job advance by
->> exactly 64 kB.
+>> On 2018=E5=B9=B406=E6=9C=8805=E6=97=A5 09:41, Samudrala, Sridhar wrote:
+>>> Ping on this patch now that the kernel patches are accepted into
+>>> davem's net-next tree.
+>>> https://patchwork.ozlabs.org/cover/920005/
+>>>
+>>>
+>>> On 5/7/2018 4:09 PM, Sridhar Samudrala wrote:
+>>>> This feature bit can be used by hypervisor to indicate virtio_net
+>>>> device to
+>>>> act as a standby for another device with the same MAC address.
+>>>>
+>>>> I tested this with a small change to the patch to mark the STANDBY
+>>>> feature 'true'
+>>>> by default as i am using libvirt to start the VMs.
+>>>> Is there a way to pass the newly added feature bit 'standby' to qemu
+>>>> via libvirt
+>>>> XML file?
+>>>>
 >>
->> Signed-off-by: Max Reitz <mreitz@redhat.com>
->> ---
->> v2: Changed the query-jobs progress filtering [Eric]
->> ---
->=20
-> I know nothing about the iotests, so this might be off-base,
-> but this looks rather like "try to fix a race condition by
-> adding a sleep", which generally doesn't work very well ?
+>> Maybe you can try qemu command line passthrough:
+>>
+>> https://libvirt.org/drvqemu.html#qemucommand
+>
+>It looks like this can be used to pass command line arguments to qemu.
+>Is it possible to specify a virtio specific attribute via this method?
+>
 
-The job tested here already has its own timing (copying 64 kB four times
-a second, in 100 ms steps), so a sleep is not too bad.  What is
-happening is that the job is put to sleep, then reawakened and it should
-do one copy step immediately afterwards.  Then it won't do anything for
-250 ms.
+Yes, for testing purposes you should be able to do this via using QEMU's
+-set command line argument:
+http://blog.vmsplice.net/2011/04/how-to-pass-qemu-command-line-options.html
+i.e.:
 
-Now waiting 100 ms should really be enough to make that "immediate" step
-actually happening, and it doesn't really hurt because we have 250 ms
-anyway.
-
-But I think it should be possible without the sleep (by repeatedly
-querying the progress), I'll give it a try.
-
-Max
+<domain type=3D'kvm' xmlns:qemu=3D'http://libvirt.org/schemas/domain/qemu/1=
+=2E0'>
+  ...
+  <qemu:commandline>
+    <qemu:arg value=3D'-set'/>
+    <qemu:arg value=3D'device.net0.standby=3Don'/>
+  </qemu:commandline>
+</domain>
 
 
---FyY3tioH7lkIUrnRjOwjVXOvvLUfTHurV
+>For ex: to say mrg_rxbuf is off we can add the following line to virtio
+>section of the domain xml file.
+>   <host mrg_rxbuf=3D'off'/>
+>
+>I think libvirt needs to be extended to to support the new 'standby' attri=
+bute
+>via this mechanism.
+>Adding Liane Stump and libvirt to the CC list.
+
+*Laine
+
+>
+>Michael,
+>Can we start with getting this patch into Qemu and an update to libvirt to
+>support the 'standby' feature so that this feature can be enabled via
+>some scripts/orchestration layer for now.
+>
+>We could improve this solution by enhancing Qemu to do automatic managemen=
+t of the
+>addition/deletion of the primary device based on feature negotiation as a =
+later patch.
+>
+
+If that means the libvirt attribute would no longer be needed, I don't
+see the reason to add it to libvirt in the first place.
+
+Jano
+
+--LG0Ll82vYr46+VA1
 Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+Content-Description: Digital signature
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlsYLQYACgkQ9AfbAGHV
-z0AHiwgAwruWTqwlug+ilLJtPtZjCvgeokLZplPWtL/v4M6yeJJi9KcHtryDMlde
-JWUhIGwY3RHnf57WkbBHzyCGuX/lceRLp13ZcSDEtKm8lqUwYh3/jaA4uWHAHL2r
-+WeSrGt287UZjEZUUIfZOmDfN2AVC5hhOkVjgQ61H6/driOwGUn/r+ONrrarpds5
-IGLlGQ8sF5c1JxptMLnAZoW/OJKRVi8VNRlPZQgxFnknJrgiVjVTs1S9EffLW4hH
-XKFmpH1L+x3SppUHCW+in5YIv1NeVLmz3n9LpRMZMc7SXOkr7WYWMmaEFy2AqLqW
-BxMWWShYYUhPlunwGJPZrAUhLgEAiA==
-=mTNA
+iQIzBAEBCAAdFiEEyAry0cRMFDoj9m/ZyvpdPXT/AmkFAlsYLVgACgkQyvpdPXT/
+AmkqsBAA1U8EMjXoXpQlNvE2eXo0NoiVV8zC3VqYsa1wLmo2J7mfYWJ12p4yRk8D
+CCUV/Mz9mpLz+dNH/nSy4fAlItSQNJA3rFTyPtedBPUjU1mxm9q+KUe0q3xhYoDc
+BDXd7VA44DDPJQu3XtmBDpazWyWebQ3TXrm4OyQx51nmG0UWugoBIvdzZn8KxqdX
+fsEAr01zuRWfsTUIsmpTKRqxtpySt3fXYJbquVOZVZS4kqml69ydpG+Iwg3fWn7Y
+sIqMvQemdo96CQVXhRpPf7OFcsuqDITBtPnY5EzgO6xjb2klzL5J7JlXSSCkWrQK
+zowABWYz6WNv9Y0JFM6mDdQX2vywPohBOk9rkynMnejq1IQI+lGBdPFre+pZESAY
+k9TQ6kyAkIrgkn+ZheCmjdOm5aI360tVfyzl+iDymMU1UxCeIFXHxRHoJwK/7Xt/
+wAKMnUDW1K50Vi0W26z+C2Ff2jYBJg4atQPHT5PJBpevwK0+xlE4GULNNJcnbCLL
+rmASZpYe4f84jlVEyef9FftzSQVxFLdlDOxqP5KDhh6MMIhBnPacelktHM2Y73rq
+qLnag3l0PnyMy9J9VCXysU730PQ5c/XU5uIBR1T3JUfDQLCiZK5Oba93FypGG7rV
+X2xIomqFD0M03K5mGh3HvQ/PwQWnpB9SW1cAvgmUOvMxk1VUfik=
+=uc2Q
 -----END PGP SIGNATURE-----
 
---FyY3tioH7lkIUrnRjOwjVXOvvLUfTHurV--
+--LG0Ll82vYr46+VA1--
