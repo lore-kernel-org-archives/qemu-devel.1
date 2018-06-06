@@ -1,27 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47656)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47623)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fQMhg-0004Uu-K8
-	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 20:53:33 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1fQMhe-0004Tf-K3
+	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 20:53:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fQMhd-00083Y-Hv
-	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 20:53:32 -0400
-Received: from ozlabs.org ([203.11.71.1]:38417)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgibson@ozlabs.org>) id 1fQMhc-00081F-Pc
-	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 20:53:29 -0400
-Date: Wed, 6 Jun 2018 10:11:18 +1000
+	(envelope-from <dgibson@ozlabs.org>) id 1fQMhd-00083U-He
+	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 20:53:30 -0400
+Date: Wed, 6 Jun 2018 10:53:17 +1000
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20180606001118.GB17757@umbus.fritz.box>
-References: <20180605131944.14649-1-peterx@redhat.com>
-	<20180605131944.14649-2-peterx@redhat.com>
-	<CAFEAcA9-O7B5h0ozAqLEUXR=YRS+s-X7A_m=xce-aLgR59EG1w@mail.gmail.com>
+Message-ID: <20180606005317.GD17757@umbus.fritz.box>
+References: <20180507180835.4b7b9222@bahia.lan>
+	<20180507165242.46502-1-leandro.lupori@gmail.com>
+	<20180604005322.GE4251@umbus> <20180605184612.42099707@bahia.lan>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="U+BazGySraz5kW0T"
+	protocol="application/pgp-signature"; boundary="sgneBHv3152wZ8jf"
 Content-Disposition: inline
-In-Reply-To: <CAFEAcA9-O7B5h0ozAqLEUXR=YRS+s-X7A_m=xce-aLgR59EG1w@mail.gmail.com>
-Subject: Re: [Qemu-devel] [RFC 1/3] memory: add MemTxAttrs to translate
- function
+In-Reply-To: <20180605184612.42099707@bahia.lan>
+Subject: Re: [Qemu-devel] [PATCH v3] target/ppc: Allow PIR read in
+ privileged mode
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,60 +26,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Peter Xu <peterx@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Eric Auger <eric.auger@redhat.com>, Richard Henderson <rth@twiddle.net>, Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>, Alex Williamson <alex.williamson@redhat.com>
+To: Greg Kurz <groug@kaod.org>
+Cc: luporl <leandro.lupori@gmail.com>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Alexander Graf <agraf@suse.de>
 
 
---U+BazGySraz5kW0T
+--sgneBHv3152wZ8jf
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, Jun 05, 2018 at 02:38:31PM +0100, Peter Maydell wrote:
-> On 5 June 2018 at 14:19, Peter Xu <peterx@redhat.com> wrote:
-> > Add a new MemTxAttrs parameter to the IOMMUMemoryRegionClass.translate()
-> > function, which takes some extra context of the translation request.
-> >
-> > Signed-off-by: Peter Xu <peterx@redhat.com>
-> > ---
-> >  include/exec/memory.h    | 5 ++++-
-> >  exec.c                   | 2 +-
-> >  hw/alpha/typhoon.c       | 3 ++-
-> >  hw/arm/smmuv3.c          | 2 +-
-> >  hw/dma/rc4030.c          | 6 ++++--
-> >  hw/i386/amd_iommu.c      | 2 +-
-> >  hw/i386/intel_iommu.c    | 6 ++++--
-> >  hw/ppc/spapr_iommu.c     | 3 ++-
-> >  hw/s390x/s390-pci-bus.c  | 6 ++++--
-> >  hw/sparc/sun4m_iommu.c   | 3 ++-
-> >  hw/sparc64/sun4u_iommu.c | 3 ++-
-> >  memory.c                 | 3 ++-
-> >  12 files changed, 29 insertions(+), 15 deletions(-)
-> >
-> > diff --git a/include/exec/memory.h b/include/exec/memory.h
-> > index eb2ba06519..6b0ced554d 100644
-> > --- a/include/exec/memory.h
-> > +++ b/include/exec/memory.h
-> > @@ -234,9 +234,12 @@ typedef struct IOMMUMemoryRegionClass {
-> >       * @iommu: the IOMMUMemoryRegion
-> >       * @hwaddr: address to be translated within the memory region
-> >       * @flag: requested access permissions
-> > +     * @attrs: MemTxAttrs that was bound to the translation
-> > +     *         operation. If flag=3D=3DIOMMU_NONE, this field is
-> > +     *         meaningless
-> >       */
+On Tue, Jun 05, 2018 at 06:46:12PM +0200, Greg Kurz wrote:
+> On Mon, 4 Jun 2018 10:53:22 +1000
+> David Gibson <david@gibson.dropbear.id.au> wrote:
 >=20
-> This won't work, because the "allow TCG transactions to pass
-> through an IOMMU" code needs to pass IOMMU_NONE. IOMMU_NONE
-> means "give me all the permissions info, and don't shortcut it".
-> For TCG we get the info, and then cache it and use it for
-> subsequent transactions, both read and write, regardless of
-> whether the first one was a read or a write.
+> > On Mon, May 07, 2018 at 01:52:42PM -0300, luporl wrote:
+> > > According to PowerISA, the PIR register should be readable in privile=
+ged
+> > > mode also, not only in hypervisor privileged mode.
+> > >=20
+> > > PowerISA 3.0 - 4.3.3 Processor Identification Register
+> > >=20
+> > > "Read access to the PIR is privileged; write access is not
+> > > provided." =20
+> >=20
+> > Yes... but a little further down it says "The PIR is a hypervisor
+> > resource".  Looking at the older 2.07 ISA, it says that
+> > guest-supervisor mode reads to the PIR should be redirected to the
+> > GPIR register, which this change won't accomplish.
+> >=20
+>=20
+> Hmmm, there are two definitions for the PIR, one in Book III-S (4.3.3)
+> and one in Book III-E (5.3.3). It looks like you're referring to the
+> latter...
+>=20
+> [Category:Embedded.Hypervisor]
+> Read accesses to the PIR in guest supervisor state are
+> mapped to the GPIR.
+>=20
+> The Book III-S definition doesn't mention the GPIR.
 
-Likewise the "replay" operations needed for hotplug use IOMMU_NONE.
-
-It also seems like it's kind of abusing the meaning of "AddressSpace",
-if other factors are influencing how the translation is done.
+Oops, sorry.  Yes the GPIR stuff is only for BookE.  The statement
+about the PIR being a hypervisor resource is definitely in the BookS
+section, however (both 2.07 and 3.0).
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -91,24 +75,24 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---U+BazGySraz5kW0T
+--sgneBHv3152wZ8jf
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlsXJqQACgkQbDjKyiDZ
-s5IfmA//U2DANRRtYfKfcM+Zb0nq0JD7Lw8UealrUjEp0qWj3hKzDsV4JJK8VASj
-HEsRi6MuE6kHkKhy9do9hFuXMRq//HMrcgVKd4DHt4i6oLt8gqVmj23YFtFh6I11
-VlSKtYNL9CKKsgxBZ6nucDBqsq2M11x5OzNb11r8DS4ZGiGNsZL0xcO73fqWPupz
-YZsFXZQjyqJDHuirI0g5HLQlBDDG530EoFIaOlTnnlED3HK1gmoQmmDZYgcW1H1H
-aS3ZuSID2H5rqmvs+1Ech0vMmP3H/Dt0pAF3U7u6ZpiTUnZUInujxQjrTVE95LoA
-AFmU4i2pDcUTT5QfqZtUjyl62mbrLgg+fMR86q5blSQCrEfID/nSUnXTEO+bLZ2m
-PBaNGlqSbzYShPR3KbXD+mVmv353k81D/i52C4nm/H25uPTpVP7FWh1Aim2nyyje
-cMIxPiNlHGo+ct/dN91TX0DzrALPzCfmREVTPhZwbjyZfoICUQhRmyAV6n4H5GA4
-f0xAgXwOMxZpZILZykqPO/bbHr8jfbw0HLllgC8rcKc1HDbNn155K5fBFf+OipSe
-9cpGxVdl756h/CuVhqDxSUNTFg3u+U8NNupRDvFWCDlxxY+mI+a6q7KxgaM3hkS4
-lA64aV2f9Dq+Nt7hMBWI2XkFbYoDAwO8ftYzHB5Dfe+NrqjKf2s=
-=uxEp
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlsXMH0ACgkQbDjKyiDZ
+s5I26RAAxNnVUBDiYGowBfy1AqUD7vuv1QWoQZ9P1cwySPWi6JJj+lX988q+h2bg
+qvFcgm3GxB8/zu7sWPxjWK2MM+36UNxaSJsjS/VbmgnQyP7DPXE2dccCIIPM6BhH
+qd3CCDDaUnvQHAqEmX73fC9WLSZUYQYGliuA+tylY1LtJJrwE9EDoJNJHZNABhiZ
+UWYkdUC2P/KGqlSz3qpavpMmC3lbe0tw1Cdhh0gjV/k3nyqBr7hd3oXlp6BWnsmb
+gpe8Y5k70nup+hwkYiiNWMPHDcFGTByPm2YHj53NYwzkMmPhF/B00r27piExcDP3
+LJBLqbH1dN0HbRc/7Kx7xeDTPQvTWGcqoc0QknR6JYQfEURxQ7MxcDqNEuAKAKAo
+jpLwXL0cel3NaDUZNYuCI5j0uVg89ZA9o9jYKcN84O8WwV5Npm9engG8EblSuBd1
+d5tiym2hPkWrZ+MthVN0F1feNHhD0e8b8dyhfYB0CXYaj2utZwtaTjcyC+lIuEpC
+9uRvBpQZMHSm6Z9wsmdl8WVBDIGeZbWb2b7i6h7/P4gaO8yp3FKAeD5A2xnm82eV
+CAhgdD9XKG/MIAffRc2ft2DCWRmjtNhcSt5vhGfUIly9p6Jd8nLL2iMj8qSz3YZJ
+R0x2hqC8Kye43gcyiTwjUWMMmbQbPNWLcB/iAMoz3PVAdOHGPRw=
+=T7xy
 -----END PGP SIGNATURE-----
 
---U+BazGySraz5kW0T--
+--sgneBHv3152wZ8jf--
