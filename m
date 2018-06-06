@@ -1,29 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45727)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45867)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1fQZJ7-0003I2-Er
-	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 10:21:02 -0400
+	(envelope-from <mreitz@redhat.com>) id 1fQZJm-0003ik-2z
+	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 10:21:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1fQZJ3-0005Tz-Ch
-	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 10:21:01 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:43396 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1fQZJ3-0005Tl-79
-	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 10:20:57 -0400
-Date: Wed, 6 Jun 2018 15:20:52 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20180606142052.GG3064@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <20180601145921.9500-1-konrad.wilk@oracle.com>
-	<20180601153809.15259-1-konrad.wilk@oracle.com>
-	<20180601153809.15259-2-konrad.wilk@oracle.com>
-	<20180604200701.GB3184@localhost.localdomain>
-	<caa3376a-252b-0a85-1a63-d2a6a911739c@amd.com>
+	(envelope-from <mreitz@redhat.com>) id 1fQZJh-0005fx-JY
+	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 10:21:42 -0400
+References: <20180606123237.2235ae4a@kitsune.suse.cz>
+	<bc97cdc3-85ba-e053-0816-b6bc431064fb@redhat.com>
+	<20180606131929.44d0fd6b@kitsune.suse.cz>
+	<93233bff-604b-c891-90ce-64fe1eaaaab5@redhat.com>
+	<20180606134327.05de9616@kitsune.suse.cz>
+	<94cea1d9-d934-85d1-66d4-dbfc82b8dd53@redhat.com>
+	<20180606141356.0b86d6b4@kitsune.suse.cz>
+	<95f92a95-6592-27a2-a822-d3a047cf8339@redhat.com>
+	<20180606154510.24be6ceb@kitsune.suse.cz>
+	<20180606135010.GF3064@redhat.com>
+	<20180606141432.GS7451@localhost.localdomain>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <9a7567dd-5813-8a5a-b079-ae198e5394a5@redhat.com>
+Date: Wed, 6 Jun 2018 16:21:28 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <caa3376a-252b-0a85-1a63-d2a6a911739c@amd.com>
-Subject: Re: [Qemu-devel] [PATCH 1/2] i386: define the AMD 'amd-ssbd' CPUID
- feature bit
+In-Reply-To: <20180606141432.GS7451@localhost.localdomain>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="e9YQjKZ60Ooz8oyv0YxZuc93YYkFwoMBH"
+Subject: Re: [Qemu-devel] storing machine data in qcow images?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,45 +33,101 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Tom Lendacky <thomas.lendacky@amd.com>
-Cc: Eduardo Habkost <ehabkost@redhat.com>, Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>, pbonzini@redhat.com, qemu-devel@nongnu.org, kvm@vger.kernel.org, rth@twiddle.net
+To: Eduardo Habkost <ehabkost@redhat.com>, "=?UTF-8?Q?Daniel_P._Berrang=c3=a9?=" <berrange@redhat.com>
+Cc: =?UTF-8?Q?Michal_Such=c3=a1nek?= <msuchanek@suse.de>, Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>, "Richard W.M. Jones" <rjones@redhat.com>, qemu-devel@nongnu.org, stefanha@redhat.com
 
-On Tue, Jun 05, 2018 at 08:31:41AM -0500, Tom Lendacky wrote:
-> On 6/4/2018 3:07 PM, Eduardo Habkost wrote:
-> > On Fri, Jun 01, 2018 at 11:38:08AM -0400, Konrad Rzeszutek Wilk wrote:
-> >> AMD future CPUs expose _two_ ways to utilize the Intel equivalant
-> >> of the Speculative Store Bypass Disable. The first is via
-> >> the virtualized VIRT_SPEC CTRL MSR (0xC001_011f) and the second
-> >> is via the SPEC_CTRL MSR (0x48). The document titled:
-> >> 124441_AMD64_SpeculativeStoreBypassDisable_Whitepaper_final.pdf
-> >>
-> >> gives priority of SPEC CTRL MSR over the VIRT SPEC CTRL MSR.
-> >>
-> >> A copy of this document is available at
-> >>       https://bugzilla.kernel.org/show_bug.cgi?id=199889
-> >>
-> >> Anyhow, this means that on future AMD CPUs there will be  _two_ ways to
-> >> deal with SSBD.
-> > 
-> > Does anybody know if there are AMD CPUs where virt-ssbd won't
-> > work and would require amd-ssbd to mitigate vulnerabilities?
-> 
-> The idea behind virt-ssbd was to provide an architectural method for
-> a guest to do SSBD when amd-ssbd isn't present.  The amd-ssbd feature
-> will use SPEC_CTRL which is intended to not be intercepted and
-> will be fast.  The use of virt-ssbd will always be intercepted and
-> therefore will not be as fast.  So a guest should be presented with
-> amd-ssbd, if available, in preference to virt-ssbd.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--e9YQjKZ60Ooz8oyv0YxZuc93YYkFwoMBH
+From: Max Reitz <mreitz@redhat.com>
+To: Eduardo Habkost <ehabkost@redhat.com>,
+ =?UTF-8?Q?Daniel_P._Berrang=c3=a9?= <berrange@redhat.com>
+Cc: =?UTF-8?Q?Michal_Such=c3=a1nek?= <msuchanek@suse.de>,
+ Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org,
+ "Michael S. Tsirkin" <mst@redhat.com>, "Richard W.M. Jones"
+ <rjones@redhat.com>, qemu-devel@nongnu.org, stefanha@redhat.com
+Message-ID: <9a7567dd-5813-8a5a-b079-ae198e5394a5@redhat.com>
+Subject: Re: [Qemu-devel] storing machine data in qcow images?
+References: <20180606123237.2235ae4a@kitsune.suse.cz>
+ <bc97cdc3-85ba-e053-0816-b6bc431064fb@redhat.com>
+ <20180606131929.44d0fd6b@kitsune.suse.cz>
+ <93233bff-604b-c891-90ce-64fe1eaaaab5@redhat.com>
+ <20180606134327.05de9616@kitsune.suse.cz>
+ <94cea1d9-d934-85d1-66d4-dbfc82b8dd53@redhat.com>
+ <20180606141356.0b86d6b4@kitsune.suse.cz>
+ <95f92a95-6592-27a2-a822-d3a047cf8339@redhat.com>
+ <20180606154510.24be6ceb@kitsune.suse.cz> <20180606135010.GF3064@redhat.com>
+ <20180606141432.GS7451@localhost.localdomain>
+In-Reply-To: <20180606141432.GS7451@localhost.localdomain>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Can you clarify whether 'amd-ssbd' is also an architectural method
-or not ?  ie is it safe to use 'amd-ssbd' in a guest which can be
-live migrated between different generations/families of AMD CPU,
-or must be use virt-ssbd in that case ?
+On 2018-06-06 16:14, Eduardo Habkost wrote:
+> On Wed, Jun 06, 2018 at 02:50:10PM +0100, Daniel P. Berrang=C3=A9 wrote=
+:
+>> On Wed, Jun 06, 2018 at 03:45:10PM +0200, Michal Such=C3=A1nek wrote:
+>>>
+>>> I think that *if* we want an 'appliance' format that stores a whole V=
+M
+>>> in a single file to ease VM distribution then the logical place to lo=
+ok
+>>> in qemu is qcow. The reason have been explained at length.
+>>
+>> I rather disagree. This is a common problem beyond just QEMU and every=
+one
+>> just uses an existing archive format (TAR, ZIP) for bundling together
+>> one or more disk images, metdata for config, and whatever other resour=
+ces
+>> are applicable for the vendor.  This works with any disk format (raw,
+>> qcow2, vmdk, vpc, etc) so is preferrable to inventing someting that is=
+
+>> specific to qcow2 IMHO.
+>=20
+> Now we have N+1 appliance file formats.  :)
+>=20
+> (We like it or not, qcow2 is already used as an appliance format
+> for single-disk VMs in practice.)
+>=20
+> But I agree this must not be specific to qcow2.  The same VM
+> description format we agree upon should work with other disk
+> formats or with multi-disk appliances.
+>=20
+> If we specify a reasonable VM description format for appliances
+> and make it work inside (e.g.) tar files, we will still have the
+> option of allowing the description be placed inside qcow2 if we
+> really want to.  I don't think we need to finish this qcow2
+> bikeshedding exercise right now.
+
+That actually sounds reasonable to me.
+
+I better not think about it for too long so I don't come up with
+something I very much dislike about it.
+
+(Well, now I have.  The thing I still dislike is that we haven't talked
+about what we actually want in the end.  Do we want just the very basic
+configuration options that are portable?  But what really is the use
+case for such basic information?  Won't people demand ever more
+configuration options, then?  I certainly would.
+
+And having to handle a full-blown config is probably a pain...)
+
+Max
 
 
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+--e9YQjKZ60Ooz8oyv0YxZuc93YYkFwoMBH
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlsX7egACgkQ9AfbAGHV
+z0D0Mgf/QLYs7GLheg1zG/v9bR5nvLkVh2sur5NZR6uW+BanWlAZUrBYnNqTxhL9
+chZdKdD2VbHanzxICc9RUrEDfPH6WbnQl2V3pMdVm5TYK9CEPQ9BStuby+pRAHup
+SY/4f1wvPVaO1hJmffCyTK2Gkd42DxzMSdL6x0K55Z0tZhA4h4V0S1AQrBPTzONc
+vC5lX2hXmL0lBmcLTPhKQRbMRA5P/TysW9dhDJRmnKs0pr/IUytmn5uxk8+Jh/cf
+MSJ8d0RLoOVXfM7pSAuCJxM5r7C2JNJ9hQQ0Cm5AI/bzpdT+FLr/LN9RtHC7cXjn
+73lNKRskNLhC2cPHCXPWv4Nv/WyLfQ==
+=2mxf
+-----END PGP SIGNATURE-----
+
+--e9YQjKZ60Ooz8oyv0YxZuc93YYkFwoMBH--
