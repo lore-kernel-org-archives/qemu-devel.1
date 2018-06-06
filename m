@@ -1,31 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60359)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33887)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1fQUbW-0005yw-2n
-	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 05:19:43 -0400
+	(envelope-from <luc.michel@greensocs.com>) id 1fQUnJ-0001jX-Qn
+	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 05:31:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1fQUbS-0005zx-3H
-	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 05:19:42 -0400
-Received: from 4.mo173.mail-out.ovh.net ([46.105.34.219]:56553)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1fQUbR-0005t6-T0
-	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 05:19:38 -0400
-Received: from player718.ha.ovh.net (unknown [10.109.120.2])
-	by mo173.mail-out.ovh.net (Postfix) with ESMTP id 10B14C484D
-	for <qemu-devel@nongnu.org>; Wed,  6 Jun 2018 11:19:29 +0200 (CEST)
-Date: Wed, 6 Jun 2018 11:19:22 +0200
-From: Greg Kurz <groug@kaod.org>
-Message-ID: <20180606111922.66882650@bahia.lan>
-In-Reply-To: <20180606005317.GD17757@umbus.fritz.box>
-References: <20180507180835.4b7b9222@bahia.lan>
-	<20180507165242.46502-1-leandro.lupori@gmail.com>
-	<20180604005322.GE4251@umbus> <20180605184612.42099707@bahia.lan>
-	<20180606005317.GD17757@umbus.fritz.box>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	boundary="Sig_/usN/3Pv5y_KYy+n/n.EhMJT";
-	protocol="application/pgp-signature"
-Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH v3] target/ppc: Allow PIR read
- in privileged mode
+	(envelope-from <luc.michel@greensocs.com>) id 1fQUnI-0003k3-5b
+	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 05:31:53 -0400
+From: luc.michel@greensocs.com
+Date: Wed,  6 Jun 2018 11:31:01 +0200
+Message-Id: <20180606093101.30518-7-luc.michel@greensocs.com>
+In-Reply-To: <20180606093101.30518-1-luc.michel@greensocs.com>
+References: <20180606093101.30518-1-luc.michel@greensocs.com>
+Subject: [Qemu-devel] [PATCH 6/6] xlnx-zynqmp: Improve GIC wiring and MMIO
+ mapping
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,98 +20,210 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: luporl <leandro.lupori@gmail.com>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: Luc MICHEL <luc.michel@greensocs.com>, qemu-arm@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, saipava@xilinx.com, edgari@xilinx.com, mark.burton@greensocs.com, Jan Kiszka <jan.kiszka@web.de>
 
---Sig_/usN/3Pv5y_KYy+n/n.EhMJT
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+From: Luc MICHEL <luc.michel@greensocs.com>
 
-On Wed, 6 Jun 2018 10:53:17 +1000
-David Gibson <david@gibson.dropbear.id.au> wrote:
+This commit improve the way the GIC is realized and connected in the
+ZynqMP SoC. The security extensions are enabled only if requested in the
+machine state. The same goes for the virtualization extensions.
 
-> On Tue, Jun 05, 2018 at 06:46:12PM +0200, Greg Kurz wrote:
-> > On Mon, 4 Jun 2018 10:53:22 +1000
-> > David Gibson <david@gibson.dropbear.id.au> wrote:
-> >  =20
-> > > On Mon, May 07, 2018 at 01:52:42PM -0300, luporl wrote: =20
-> > > > According to PowerISA, the PIR register should be readable in privi=
-leged
-> > > > mode also, not only in hypervisor privileged mode.
-> > > >=20
-> > > > PowerISA 3.0 - 4.3.3 Processor Identification Register
-> > > >=20
-> > > > "Read access to the PIR is privileged; write access is not
-> > > > provided."   =20
-> > >=20
-> > > Yes... but a little further down it says "The PIR is a hypervisor
-> > > resource".  Looking at the older 2.07 ISA, it says that
-> > > guest-supervisor mode reads to the PIR should be redirected to the
-> > > GPIR register, which this change won't accomplish.
-> > >  =20
-> >=20
-> > Hmmm, there are two definitions for the PIR, one in Book III-S (4.3.3)
-> > and one in Book III-E (5.3.3). It looks like you're referring to the
-> > latter...
-> >=20
-> > [Category:Embedded.Hypervisor]
-> > Read accesses to the PIR in guest supervisor state are
-> > mapped to the GPIR.
-> >=20
-> > The Book III-S definition doesn't mention the GPIR. =20
->=20
-> Oops, sorry.  Yes the GPIR stuff is only for BookE.  The statement
-> about the PIR being a hypervisor resource is definitely in the BookS
-> section, however (both 2.07 and 3.0).
->=20
+All the GIC to APU CPU(s) IRQ lines are now connected, including FIQ,
+vIRQ and vFIQ. The missing CPU to GIC timers IRQ connections are also
+added (HYP and SEC timers).
 
-Yes it is, but IIUC, this means that the guest cannot modify it, eg,
-do mtspr. Section 4.4.4 in Book III-S has a list of SPRs that seem to
-indicate that mfspr doesn't require hypervisor state with the PIR.
+The GIC maintenance IRQs are back-wired to the correct GIC PPIs.
 
-FWIW, this can be verified with xmon in a KVM guest:
+Finally, the MMIO mappings are reworked to take into account the ZynqMP
+specificities. the GIC (v)CPU interface is aliased 16 times:
+  * for the firsts 0x1000 bytes from 0xf9010000 to 0xf901f000
+  * for the seconds 0x1000 bytes from 0xf9020000 to 0xf902f000
+Mappings of the virtual interface and virtual CPU interface are mapped
+only when virtualization extensions are requested. The
+XlnxZynqMPGICRegion struct has been enhanced to be able to catch all
+this information.
 
-0:mon> S
-...
-srr0   =3D c0000000000cd06c  srr1  =3D 8000000000001033 dsisr  =3D 00000000
-dscr   =3D 0000000000000000  ppr   =3D 0010000000000000 pir    =3D 00000020
-...
-0:mon> Sr 3ff
-SPR 0x3ff (1023) =3D 0x20
+Signed-off-by: Luc MICHEL <luc.michel@greensocs.com>
+---
+ hw/arm/xlnx-zynqmp.c         | 92 ++++++++++++++++++++++++++++++++----
+ include/hw/arm/xlnx-zynqmp.h |  4 +-
+ 2 files changed, 86 insertions(+), 10 deletions(-)
 
-but with TCG xmon hits a program check:
-
-0:mon> S
-...
-srr0   =3D c0000000000ef204  srr1  =3D 8000000000041033 dsisr  =3D 40000000
-cpu 0x0: Vector: 700 (Program Check) at [c00000003ffdf510]
-...
-cpu 0x0: Exception 700 (Program Check) in xmon, returning to main loop
-...
-0:mon> Sr 3ff
-SPR 0x3ff (1023) Faulted during read
-
-This patch makes xmon happy under TCG.
-
---Sig_/usN/3Pv5y_KYy+n/n.EhMJT
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEtIKLr5QxQM7yo0kQcdTV5YIvc9YFAlsXpxoACgkQcdTV5YIv
-c9Zc2BAAnXBCvdYiZeIbB+su1Wkcsab0By81JTYa9hGg/IPusnBhrQGQN1FvQHPA
-3JgTR1Xz3Kz4H6dtBRYbnu6KK2sCDFsvYAxCfmI5S1o9iq8F8Q/I0vRmwMwPBbnB
-rxAyPWie8WevmQuIhAg+t+11YBL/SFbJBh/e+1pkK5jKl5ddtPJPtAXN4z05uqc6
-tog630SLha0M+p2h/DNdT+/o9CBE0AG3Ar5ROV7Vs0sTz82NYV45rbHI2oolrD5z
-gGqzYCg2m15vjd1PeWD6XqZuj1CgxLcZPZTwjNCZAWhhelqCpZ3zag4EPHndLrcp
-DZjgOaPT5ullzS+MxNuYPkE03Tlu5xKjbrMb5vA+dUCo/KxCpnXw7vat8XHywJB8
-LhUl5ra/tnv/og5qUdkT+yeaO8kwpmb3lOFt6Galb3RhnfTgg/YOmT40FGDKFB4f
-2uL1Y6W16WVJR/Icr7YKg+6mVkFiCDgtwavlqkchSUe1yOg2OQ6n/mPiAchrmqf6
-7QNtFrjt7hbHpadr4H2klBlI6tde3qGYw3sndrqgs3MNcFxFDN3GNjew/jnN3wcq
-154Iq8m6uA6izvKWR49Ahh6gmgsvWJkKE8V/0YAnrImSpVOdL1cQYBJ3ZigJU9ff
-zvdqHfCJb0w2tyY5Apb/IkUCmQEt+RwS7twLboqo2z8BP8Kc8bQ=
-=sRwu
------END PGP SIGNATURE-----
-
---Sig_/usN/3Pv5y_KYy+n/n.EhMJT--
+diff --git a/hw/arm/xlnx-zynqmp.c b/hw/arm/xlnx-zynqmp.c
+index 2045b9d71e..4d17c70ec6 100644
+--- a/hw/arm/xlnx-zynqmp.c
++++ b/hw/arm/xlnx-zynqmp.c
+@@ -29,12 +29,17 @@
+ 
+ #define ARM_PHYS_TIMER_PPI  30
+ #define ARM_VIRT_TIMER_PPI  27
++#define ARM_HYP_TIMER_PPI   26
++#define ARM_SEC_TIMER_PPI   29
++#define GIC_MAINTENANCE_PPI 25
+ 
+ #define GEM_REVISION        0x40070106
+ 
+ #define GIC_BASE_ADDR       0xf9000000
+ #define GIC_DIST_ADDR       0xf9010000
+ #define GIC_CPU_ADDR        0xf9020000
++#define GIC_VIFACE_ADDR     0xf9040000
++#define GIC_VCPU_ADDR       0xf9060000
+ 
+ #define SATA_INTR           133
+ #define SATA_ADDR           0xFD0C0000
+@@ -111,11 +116,54 @@ static const int adma_ch_intr[XLNX_ZYNQMP_NUM_ADMA_CH] = {
+ typedef struct XlnxZynqMPGICRegion {
+     int region_index;
+     uint32_t address;
++    uint32_t offset;
++    bool virt;
+ } XlnxZynqMPGICRegion;
+ 
+ static const XlnxZynqMPGICRegion xlnx_zynqmp_gic_regions[] = {
+-    { .region_index = 0, .address = GIC_DIST_ADDR, },
+-    { .region_index = 1, .address = GIC_CPU_ADDR,  },
++    /* Distributor */
++    {
++        .region_index = 0,
++        .address = GIC_DIST_ADDR,
++        .offset = 0,
++        .virt = false
++    },
++
++    /* CPU interface */
++    {
++        .region_index = 1,
++        .address = GIC_CPU_ADDR,
++        .offset = 0,
++        .virt = false
++    },
++    {
++        .region_index = 1,
++        .address = GIC_CPU_ADDR + 0x10000,
++        .offset = 0x1000,
++        .virt = false
++    },
++
++    /* Virtual interface */
++    {
++        .region_index = 2,
++        .address = GIC_VIFACE_ADDR,
++        .offset = 0,
++        .virt = true
++    },
++
++    /* Virtual CPU interface */
++    {
++        .region_index = 3,
++        .address = GIC_VCPU_ADDR,
++        .offset = 0,
++        .virt = true
++    },
++    {
++        .region_index = 3,
++        .address = GIC_VCPU_ADDR + 0x10000,
++        .offset = 0x1000,
++        .virt = true
++    },
+ };
+ 
+ static inline int arm_gic_ppi_index(int cpu_nr, int ppi_index)
+@@ -286,6 +334,9 @@ static void xlnx_zynqmp_realize(DeviceState *dev, Error **errp)
+     qdev_prop_set_uint32(DEVICE(&s->gic), "num-irq", GIC_NUM_SPI_INTR + 32);
+     qdev_prop_set_uint32(DEVICE(&s->gic), "revision", 2);
+     qdev_prop_set_uint32(DEVICE(&s->gic), "num-cpu", num_apus);
++    qdev_prop_set_bit(DEVICE(&s->gic), "has-security-extensions", s->secure);
++    qdev_prop_set_bit(DEVICE(&s->gic),
++                      "has-virtualization-extensions", s->virt);
+ 
+     /* Realize APUs before realizing the GIC. KVM requires this.  */
+     for (i = 0; i < num_apus; i++) {
+@@ -330,19 +381,23 @@ static void xlnx_zynqmp_realize(DeviceState *dev, Error **errp)
+     for (i = 0; i < XLNX_ZYNQMP_GIC_REGIONS; i++) {
+         SysBusDevice *gic = SYS_BUS_DEVICE(&s->gic);
+         const XlnxZynqMPGICRegion *r = &xlnx_zynqmp_gic_regions[i];
+-        MemoryRegion *mr = sysbus_mmio_get_region(gic, r->region_index);
++        MemoryRegion *mr;
+         uint32_t addr = r->address;
+         int j;
+ 
+-        sysbus_mmio_map(gic, r->region_index, addr);
++        if (r->virt && !s->virt) {
++            continue;
++        }
+ 
++        mr = sysbus_mmio_get_region(gic, r->region_index);
+         for (j = 0; j < XLNX_ZYNQMP_GIC_ALIASES; j++) {
+             MemoryRegion *alias = &s->gic_mr[i][j];
+ 
+-            addr += XLNX_ZYNQMP_GIC_REGION_SIZE;
+             memory_region_init_alias(alias, OBJECT(s), "zynqmp-gic-alias", mr,
+-                                     0, XLNX_ZYNQMP_GIC_REGION_SIZE);
++                                     r->offset, XLNX_ZYNQMP_GIC_REGION_SIZE);
+             memory_region_add_subregion(system_memory, addr, alias);
++
++            addr += XLNX_ZYNQMP_GIC_REGION_SIZE;
+         }
+     }
+ 
+@@ -352,12 +407,33 @@ static void xlnx_zynqmp_realize(DeviceState *dev, Error **errp)
+         sysbus_connect_irq(SYS_BUS_DEVICE(&s->gic), i,
+                            qdev_get_gpio_in(DEVICE(&s->apu_cpu[i]),
+                                             ARM_CPU_IRQ));
++        sysbus_connect_irq(SYS_BUS_DEVICE(&s->gic), i + num_apus,
++                           qdev_get_gpio_in(DEVICE(&s->apu_cpu[i]),
++                                            ARM_CPU_FIQ));
++        sysbus_connect_irq(SYS_BUS_DEVICE(&s->gic), i + num_apus * 2,
++                           qdev_get_gpio_in(DEVICE(&s->apu_cpu[i]),
++                                            ARM_CPU_VIRQ));
++        sysbus_connect_irq(SYS_BUS_DEVICE(&s->gic), i + num_apus * 3,
++                           qdev_get_gpio_in(DEVICE(&s->apu_cpu[i]),
++                                            ARM_CPU_VFIQ));
+         irq = qdev_get_gpio_in(DEVICE(&s->gic),
+                                arm_gic_ppi_index(i, ARM_PHYS_TIMER_PPI));
+-        qdev_connect_gpio_out(DEVICE(&s->apu_cpu[i]), 0, irq);
++        qdev_connect_gpio_out(DEVICE(&s->apu_cpu[i]), GTIMER_PHYS, irq);
+         irq = qdev_get_gpio_in(DEVICE(&s->gic),
+                                arm_gic_ppi_index(i, ARM_VIRT_TIMER_PPI));
+-        qdev_connect_gpio_out(DEVICE(&s->apu_cpu[i]), 1, irq);
++        qdev_connect_gpio_out(DEVICE(&s->apu_cpu[i]), GTIMER_VIRT, irq);
++        irq = qdev_get_gpio_in(DEVICE(&s->gic),
++                               arm_gic_ppi_index(i, ARM_HYP_TIMER_PPI));
++        qdev_connect_gpio_out(DEVICE(&s->apu_cpu[i]), GTIMER_HYP, irq);
++        irq = qdev_get_gpio_in(DEVICE(&s->gic),
++                               arm_gic_ppi_index(i, ARM_SEC_TIMER_PPI));
++        qdev_connect_gpio_out(DEVICE(&s->apu_cpu[i]), GTIMER_SEC, irq);
++
++        if (s->virt) {
++            irq = qdev_get_gpio_in(DEVICE(&s->gic),
++                                   arm_gic_ppi_index(i, GIC_MAINTENANCE_PPI));
++            sysbus_connect_irq(SYS_BUS_DEVICE(&s->gic), i + num_apus * 4, irq);
++        }
+     }
+ 
+     if (s->has_rpu) {
+diff --git a/include/hw/arm/xlnx-zynqmp.h b/include/hw/arm/xlnx-zynqmp.h
+index 82b6ec2486..98f925ab84 100644
+--- a/include/hw/arm/xlnx-zynqmp.h
++++ b/include/hw/arm/xlnx-zynqmp.h
+@@ -53,7 +53,7 @@
+ #define XLNX_ZYNQMP_OCM_RAM_0_ADDRESS 0xFFFC0000
+ #define XLNX_ZYNQMP_OCM_RAM_SIZE 0x10000
+ 
+-#define XLNX_ZYNQMP_GIC_REGIONS 2
++#define XLNX_ZYNQMP_GIC_REGIONS 6
+ 
+ /* ZynqMP maps the ARM GIC regions (GICC, GICD ...) at consecutive 64k offsets
+  * and under-decodes the 64k region. This mirrors the 4k regions to every 4k
+@@ -62,7 +62,7 @@
+  */
+ 
+ #define XLNX_ZYNQMP_GIC_REGION_SIZE 0x1000
+-#define XLNX_ZYNQMP_GIC_ALIASES     (0x10000 / XLNX_ZYNQMP_GIC_REGION_SIZE - 1)
++#define XLNX_ZYNQMP_GIC_ALIASES     (0x10000 / XLNX_ZYNQMP_GIC_REGION_SIZE)
+ 
+ #define XLNX_ZYNQMP_MAX_LOW_RAM_SIZE    0x80000000ull
+ 
+-- 
+2.17.0
