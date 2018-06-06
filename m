@@ -1,50 +1,36 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44232)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44712)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pmorel@linux.ibm.com>) id 1fQZE2-0007e3-L9
-	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 10:15:48 -0400
+	(envelope-from <mreitz@redhat.com>) id 1fQZFn-0000QF-Qz
+	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 10:17:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pmorel@linux.ibm.com>) id 1fQZDx-0002sE-Jt
-	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 10:15:46 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:36196
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pmorel@linux.ibm.com>)
-	id 1fQZDx-0002rO-Dj
-	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 10:15:41 -0400
-Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id
-	w56EEhDv043264
-	for <qemu-devel@nongnu.org>; Wed, 6 Jun 2018 10:15:40 -0400
-Received: from e06smtp07.uk.ibm.com (e06smtp07.uk.ibm.com [195.75.94.103])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2jegywru5e-1
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Wed, 06 Jun 2018 10:15:39 -0400
-Received: from localhost
-	by e06smtp07.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <pmorel@linux.ibm.com>;
-	Wed, 6 Jun 2018 15:15:38 +0100
-Reply-To: pmorel@linux.ibm.com
-References: <20180509154822.23510-1-cohuck@redhat.com>
-	<20180509154822.23510-3-cohuck@redhat.com>
-	<c18f9b9f-da00-1a0b-8ef0-7ac223c73d1a@linux.ibm.com>
-	<20180515181006.0cb1dfc2.cohuck@redhat.com>
-	<a5d08fb7-d9c1-b230-fe0c-acebbda2ba65@linux.ibm.com>
-	<20180522145208.310143ea.cohuck@redhat.com>
-	<4e4001cc-540e-0f2b-bbd1-1f82ca594bb3@linux.ibm.com>
-	<20180605151449.22aafbfc.cohuck@redhat.com>
-	<e73038ff-fb2d-5865-8b84-e775990f3983@linux.ibm.com>
-	<20180606142131.74ea2eb7.cohuck@redhat.com>
-From: Pierre Morel <pmorel@linux.ibm.com>
-Date: Wed, 6 Jun 2018 16:15:31 +0200
+	(envelope-from <mreitz@redhat.com>) id 1fQZFl-0003lC-Me
+	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 10:17:35 -0400
+From: Max Reitz <mreitz@redhat.com>
+References: <20180518180440-mutt-send-email-mst@kernel.org>
+	<20180524113251.GB4660@redhat.com>
+	<d9bb2cb9-d9dc-8fe0-a767-10d9cbbab803@redhat.com>
+	<20180528183058.GG2209@redhat.com>
+	<20180528183833.GJ4580@localhost.localdomain>
+	<20180528212054.GH2209@redhat.com> <20180528212510.GC4660@redhat.com>
+	<20180529064415.GA4756@localhost.localdomain>
+	<2b3eef00-f326-c1e6-0e4b-b7602646eec4@redhat.com>
+	<20180606123237.2235ae4a@kitsune.suse.cz>
+	<bc97cdc3-85ba-e053-0816-b6bc431064fb@redhat.com>
+	<20180606131929.44d0fd6b@kitsune.suse.cz>
+	<93233bff-604b-c891-90ce-64fe1eaaaab5@redhat.com>
+	<20180606134327.05de9616@kitsune.suse.cz>
+	<94cea1d9-d934-85d1-66d4-dbfc82b8dd53@redhat.com>
+	<20180606141356.0b86d6b4@kitsune.suse.cz>
+	<95f92a95-6592-27a2-a822-d3a047cf8339@redhat.com>
+	<20180606154510.24be6ceb@kitsune.suse.cz>
+Message-ID: <d2b5d074-4052-a5fb-4048-cc30ad092f0f@redhat.com>
+Date: Wed, 6 Jun 2018 16:17:14 +0200
 MIME-Version: 1.0
-In-Reply-To: <20180606142131.74ea2eb7.cohuck@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Message-Id: <5b77ec9c-41b8-2e32-ce79-d9005b93fdd0@linux.ibm.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH RFC 2/2] vfio-ccw: support for halt/clear
- subchannel
+In-Reply-To: <20180606154510.24be6ceb@kitsune.suse.cz>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="dTUO5wtXaprvw6AoNkELr2yNIdVfRMETi"
+Subject: [Qemu-devel]  storing machine data in qcow images?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -53,192 +39,292 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>
-Cc: Dong Jia Shi <bjsdjshi@linux.ibm.com>, Halil Pasic <pasic@linux.ibm.com>, linux-s390@vger.kernel.org, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, qemu-s390x@nongnu.org, qemu-devel@nongnu.org
+To: =?UTF-8?Q?Michal_Such=c3=a1nek?= <msuchanek@suse.de>
+Cc: Kevin Wolf <kwolf@redhat.com>, ehabkost@redhat.com, qemu-block@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>, "Richard W.M. Jones" <rjones@redhat.com>, qemu-devel@nongnu.org, stefanha@redhat.com
 
-On 06/06/2018 14:21, Cornelia Huck wrote:
-> On Tue, 5 Jun 2018 17:23:02 +0200
-> Pierre Morel <pmorel@linux.ibm.com> wrote:
->
->> On 05/06/2018 15:14, Cornelia Huck wrote:
->>> On Tue, 22 May 2018 17:10:44 +0200
->>> Pierre Morel <pmorel@linux.ibm.com> wrote:
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--dTUO5wtXaprvw6AoNkELr2yNIdVfRMETi
+From: Max Reitz <mreitz@redhat.com>
+To: =?UTF-8?Q?Michal_Such=c3=a1nek?= <msuchanek@suse.de>
+Cc: Kevin Wolf <kwolf@redhat.com>, ehabkost@redhat.com,
+ qemu-block@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>,
+ "Richard W.M. Jones" <rjones@redhat.com>, qemu-devel@nongnu.org,
+ stefanha@redhat.com
+Message-ID: <d2b5d074-4052-a5fb-4048-cc30ad092f0f@redhat.com>
+Subject: [Qemu-devel] storing machine data in qcow images?
+References: <20180518180440-mutt-send-email-mst@kernel.org>
+ <20180524113251.GB4660@redhat.com>
+ <d9bb2cb9-d9dc-8fe0-a767-10d9cbbab803@redhat.com>
+ <20180528183058.GG2209@redhat.com>
+ <20180528183833.GJ4580@localhost.localdomain>
+ <20180528212054.GH2209@redhat.com> <20180528212510.GC4660@redhat.com>
+ <20180529064415.GA4756@localhost.localdomain>
+ <2b3eef00-f326-c1e6-0e4b-b7602646eec4@redhat.com>
+ <20180606123237.2235ae4a@kitsune.suse.cz>
+ <bc97cdc3-85ba-e053-0816-b6bc431064fb@redhat.com>
+ <20180606131929.44d0fd6b@kitsune.suse.cz>
+ <93233bff-604b-c891-90ce-64fe1eaaaab5@redhat.com>
+ <20180606134327.05de9616@kitsune.suse.cz>
+ <94cea1d9-d934-85d1-66d4-dbfc82b8dd53@redhat.com>
+ <20180606141356.0b86d6b4@kitsune.suse.cz>
+ <95f92a95-6592-27a2-a822-d3a047cf8339@redhat.com>
+ <20180606154510.24be6ceb@kitsune.suse.cz>
+In-Reply-To: <20180606154510.24be6ceb@kitsune.suse.cz>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+On 2018-06-06 15:45, Michal Such=C3=A1nek wrote:
+> On Wed, 6 Jun 2018 15:14:03 +0200
+> Max Reitz <mreitz@redhat.com> wrote:
+>=20
+>> On 2018-06-06 14:13, Michal Such=C3=A1nek wrote:
+>>> On Wed, 6 Jun 2018 13:52:35 +0200
+>>> Max Reitz <mreitz@redhat.com> wrote:
 >>>  =20
->>>> On 22/05/2018 14:52, Cornelia Huck wrote:
->>>>> On Wed, 16 May 2018 15:32:48 +0200
->>>>> Pierre Morel <pmorel@linux.ibm.com> wrote:
->>>>>     =20
->>>>>> On 15/05/2018 18:10, Cornelia Huck wrote:
->>>>>>> On Fri, 11 May 2018 11:33:35 +0200
->>>>>>> Pierre Morel <pmorel@linux.ibm.com> wrote:
->>>>>>>        =20
->>>>>>>> On 09/05/2018 17:48, Cornelia Huck wrote:
-...snip...
-> Not sure if I parse this correctly... but the architecture says that
-> the subchannel has the {start,halt,clear} function set as a result of
-> {start,halt,clear} subchannel, doesn't it?
-The fc field of the SCSW indicates the functions pending or in progress
-resulting of the execution of the instructions START, CLEAR or HALT which
-have been accepted by the subchannel.
-Up to 2 functions being pending or in progress.
-The fc field is only updated when the condition code is set to 0 during=20
-the execution
-of the instruction.
-
-1) The guest do a SSCH instruction
-2) we intercept and QEMU issue the write with SSCH bit set
-3) In the driver we are called in write and issue the SSCH instruction
-4) the subchannel (the real one) set the start bit in fc field
-
-later
-1) The guest do a CSCH instruction
-2) we intercept and QEMU issue the write with CSCH bit set
-3) In the driver we are called in write and issue the CSCH instruction
-4) the subchannel (the real one) set the clear bit in fc and clear the=20
-start bit
-
-
-The subchannel accept to handle functions (start, halt, clear)=20
-asynchronously
-otherwise it could not accept a CLEAR instruction to stop a previous STAR=
-T
-instruction.
-But the instructions are issued one after the other to the sub-channel.
-
-I think we can only agree on this and that we had at some point a=20
-misunderstanding.
-
-
->
->>>  =20
->>>> I do not understand the "processing all in one function".
->>>>
->>>> Since yo already have 3 function to process these three instructions.
->>>>
->>>> Do you mean the if .. else if .. else if ?
->>> Yes. There is a lot of common handling for each of these.
->> There are also differences and it breaks the FSM
-> Depends on what we will do with the fsm ;)
-
-Yes :)
-
->
->>>  =20
->>>> Then I come back to what you said earlier on the precedence of the c=
-lear
->>>> instruction:
->>>>
->>>> 1) do we have a use case to have more than one bit set in the fctl f=
-ield?
->>>>
->>>> - if no, there is no need for precedence
->>> It mirrors what the hardware does: you just set an additional bit if
->>> processing has not yet finished.
->> I do not agree, this is true for the SCSW but not for instructions.
->> We receive instructions in VFIO and give back status.
->> The name used to provide the command is misleading.
-> Confused. What we get over the interface is an scsw (the current scsw
-> for the subchannel in QEMU). A halt does set an additional bit in the
-> fctl if the start is not yet finished.
->
-> But that had me re-reading the PoP, and clear is indeed different (it,
-> ah, clears the other bits). So, clear handling is different enough from
-> the others, and I'm not sure anymore whether it makes sense to handle
-> start and halt together. I'll rework this.
-
-OK, it matches with my comprehension.
-
->
->>>  =20
->>>> - if yes, why should clear have precedence ?
->>> Because it does on the hardware?
->> What you say is right if we would have a register inside the subchanne=
-l
->> where we write the commands.
->> But this is not what we handle we handle separate instructions coming
->> from an instruction stream.
+>>>> On 2018-06-06 13:43, Michal Such=C3=A1nek wrote: =20
+>>>>> On Wed, 6 Jun 2018 13:32:47 +0200
+>>>>> Max Reitz <mreitz@redhat.com> wrote:
+>>>>>    =20
+>>>>>> On 2018-06-06 13:19, Michal Such=C3=A1nek wrote:   =20
+>>>>>>> On Wed, 6 Jun 2018 13:02:53 +0200
+>>>>>>> Max Reitz <mreitz@redhat.com> wrote: =20
 >>
->> We do never receive two instructions at the same time, but each after
->> the other.
->> If the sub-channel is busy on IO a clear or a cancel must be able to
->> stop the IO.
->> I agree upon this.
->> But we do not have any other command in the same call.
+>> [...]
 >>
->> If we would construct the interface differently, for example using an
->> mmap() system
->> call and let the user ORing the command bitfield before using an ioctl
->> to inform
->> us from the change, or if we poll on the command bitfield we should
->> implement
->> it like you say.
->> But this is not what we do, and this is not what the architecture does.
->> does it?
-> The thing is that the guest does not interact with this interface at
-> all, it is just the backend implementation. The instructions set the
-> bits in the scsw fctl field, and we get the scsw from QEMU. By the
-> architecture, both start and halt may be set in the fctl at the same
-> time. [That this currently does not happen because QEMU is not really
-> handling things asynchronously is an implementation detail.]
-
-I do not understand the point of sending a halt and a start to the same
-sub-channel at the same time?
-
-If QEMU, once asynchronous, can do this, it could just
-halt the start before asking this to the backend. Don't it?
-
-Another point is that the start must have been accepted by the
-sub-channel for the start bit in the fc field of the SCSW to be set.
-
->
->>>  =20
->>>>    =C2=A0 How do QEMU set more than one bit in fctl?
->>>>    =C2=A0 why should we alter the order of the instructions given by=
- the guest?
->>>>    =C2=A0 How can we know this order if there are multiple instructi=
-ons at once?
->>> In the future, we should return after we fired off the start etc.
->>> request even if we did not receive an interrupt yet, so that the gues=
-t
->>> might do a halt or clear before the start has finished.
->> This is already what is done here:
->> We fire off the start (go to BUSY state) and return
+>>>>>>>> What I'm trying to get at is that qcow2 was not designed to be
+>>>>>>>> a container format for arbitrary files.  If you want to make it
+>>>>>>>> such, I'm sure there are existing formats that work
+>>>>>>>> better.     =20
+>>>>>>>
+>>>>>>> Such as?     =20
+>>>>>>
+>>>>>> ext2?   =20
+>>>>>
+>>>>> So you want an ext2 driver in qemu instead of expanding qcow2 to
+>>>>> work not only for a single disk but also for an appliance?   =20
+>>>>
+>>>> Yes, because ext2 was designed to be a proper filesystem.  I'm not
+>>>> an FS designer.  Well, not a good one anyway.  So I don't trust
+>>>> myself on extending qcow2 to be a good FS -- and why would I, when
+>>>> there are already numerous FS around. =20
+>>>
+>>> Do you expect that performance of qemu using qcow2 driver over ext2
+>>> driver will be better than using qcow driver directly with some part
+>>> semi-permanently occupied by a configuration blob? My bet is not. =20
 >>
->> If the guest want to start another command it polls on
->> the vfio_write() untill the channel isn't BUSY anymore.
-> It's not the guest that polls, but QEMU (resp. another user space
-> program). And it should be able to fire a halt etc. even if the start
-> function is still active, as the architecture allows that. (I would
-> expect the real hardware to give us a busy if applicable anyway.)
+>> If you want to store multiple disk images in a single file?  I would
+>> think so, yes.  With qcow2, I would assume it leads to
+>> fragmentation. =20
+>=20
+> How is that different from single disk divided into two partitions
+> internally (without any knowledge on the qcow2 level)?
 
-I do not find where QEMU is waiting when the sub-channel is busy.
-I found a loop on EAGAIN (which is never returned but by the system AFAIU=
-)
-and I missed the place where a retry is implemented when I followed
-the back calls.
+=46rom how it's going to be fragmented, there is no difference.  If you
+have multiple partitions and write to them concurrently, thus allocating
+new areas, you get bad fragmentation.
 
->
-...snip...
-> On re-reading the PoP, the three of them do have some different
-> requirements:
->
-> - cancel is currently handled completely in QEMU, and it also has quite
->    different semantics as it is not asynchronous etc.
-> - halt can be made pending in addition to a start function
-> - clear will need to clear anything that's currently going on
->
-> I'll need to rethink some of this; probably does not make sense for you
-> to try to integrate my patches.
->
+>> I would hope that proper filesystems can mitigate this.
+>=20
+> Not really. Not without much complexity and repeated maintenance.
 
-Make sense (that it doesn't (make sense)).
+Yes, a proper filesystem.  Which we'd get for free with multiple files.
 
-Regards,
-
-Pierre
+>>> The ext* drivers are designed to work with kernel VM infrastructure
+>>> which must be tuned for different usage scenarios and you would
+>>> have to duplicate that tuning in qemu to get competitive
+>>> performance. Also you get qcow2 and ext2 metadata which must be
+>>> allocated, managed, etc. You get more storage and performance
+>>> overhead for no good reason. =20
+>>
+>> Yes, there is a good reason.  You can add arbitrary configuration
+>> options without having to worry about me.
+>=20
+> But I will not be able to use the images in qemu so it will be useless.=
 
 
+Neither can you with the current proposal because that is about adding
+management layer configuration options which are opaque to qemu.
 
---=20
-Pierre Morel
-Linux/KVM/QEMU in B=C3=B6blingen - Germany
+> Well, there is FUSE and that is certainly blazing fast and ubiquitous,
+> I am sure.
+
+If you want to use pre-existing drivers, you'd probably use a loop device=
+=2E
+
+Otherwise, you'd use the block layer for accessing the disk.
+
+If you want blazingly fast, you probably won't use qcow2 anyway.  Or,
+funnily enough, you'd want to probably split the qcow2 file into a
+metadata and a data file, so you get even more files.  (But that is a
+proposal for the future.)
+
+>> Seriously, though, a real FS would allow you to be more expressive and=
+
+>> really do what you want without having to work around the quirks that
+>> adding a not-real-FS in the most simple way possible to qcow2 would
+>> bring with it.
+>>
+>> Because this is part of my fear, that we now add a very simple blob
+>> for just a sprinkle of data.  But over time it gets more and more
+>> complex because we want to store more and more data to make things
+>> ever more convenient[1], we notice that we need more features, the
+>> format gets more complex, and in the end we have an FS that is just
+>> worse than a real FS.
+>>
+>> [1] And note that if I'm convinced to store VM configuration data in
+>> qemu, I will agree that we can store any data in there and it would be=
+
+>> nice if any VM could be provisioned and used that way.
+>>
+>>> On the other hand, qcow is designed for storing VM disk data and
+>>> hopefully was tuned to do that decently over the years. The primary
+>>> use case remains storing VM disk data. Adding a configuration blob
+>>> does not change that. =20
+>>
+>> True.  So the argument is that qcow2 may be worse for storing
+>> arbitrary data, but we don't have performance requirements for that;
+>> but we do have performance requirements for disk data and adding
+>> another format below qcow2 will not make it better.
+>>
+>> I do think it is possible to not make things worse with a format under=
+
+>> qcow2, but that may require additional complexity, that you think is
+>> pointless.
+>>
+>> I understand that you think that, but I still believe that putting the=
+
+>> configuration into qcow2 is just the wrong way around and will fall on=
+
+>> our feet in the long run.
+>=20
+> I think that *if* we want an 'appliance' format that stores a whole VM
+> in a single file to ease VM distribution then the logical place to look=
+
+> in qemu is qcow. The reason have been explained at length.
+
+The reason being that it's the easiest place, yes.  That doesn't make it
+the best place.
+
+> I understand that for some use cases simplifying the distribution of
+> VMs as much as possible is quite important.
+
+I don't because still nobody has explained it to me.
+
+The only explanation I got so far was "People are lazy and we have
+defaults for everything, so we don't throw an error if people forget to
+pass a configuration file."
+
+Which to me still just makes it an inconvenience.
+
+>>>>>>>>>> Unless I have got something terribly wrong (which is indeed a
+>>>>>>>>>> possibility!), to me this proposal means basically to turn
+>>>>>>>>>> qcow2 into (1) a VM description format for qemu, and (2) to
+>>>>>>>>>> turn it into an archive format on the way.       =20
+>>>>>>>>>
+>>>>>>>>> And if you go all the way you can store multiple disks along
+>>>>>>>>> with the VM definition so you can have the whole appliance in
+>>>>>>>>> one file. It conveniently solves the problem of synchronizing
+>>>>>>>>> snapshots across multiple disk images and the question where
+>>>>>>>>> to store the machine state if you want to suspend it.        =20
+>>>>>>>>
+>>>>>>>> Yeah, but why make qcow2 that format?  That's what I completely
+>>>>>>>> fail to understand.
+>>>>>>>>
+>>>>>>>> If you want to have a single VM description file that contains
+>>>>>>>> the VM configuration and some qcow2/raw/whatever files along
+>>>>>>>> with it for the guest disk data, sure, go ahead.  But why does
+>>>>>>>> the format of the whole thing need to be qcow2?     =20
+>>>>>>>
+>>>>>>> Because then qemu can access the disk data from the image
+>>>>>>> directly without any need for extraction, copying to different
+>>>>>>> file, etc.     =20
+>>>>>>
+>>>>>> This does not explain why it needs to be qcow2.  There is
+>>>>>> absolutely no reason why you couldn't use qcow2 files in-place
+>>>>>> inside of another file.   =20
+>>>>>
+>>>>> qemu cannot read the disk data from the file in-place.   =20
+>>>>
+>>>> Hu?  Why not? =20
+>>>
+>>> Well, it can possibly read the image if it happens to be
+>>> continuous. It will not be able to update it without a fs driver,
+>>> however. =20
+>>
+>> Yes, but first, such an FS driver would be possible (and as long as we=
+
+>> don't need real complexity, it could be very simple, like just using
+>> an offset in a tar file and then just adjust the file length field on
+>> allocations beyond the EOF).
+>=20
+> As said this will cover only the simplest case with readonly
+> configuration blob(s) and one disk image at the end. The solution is
+> obsolete even as we are designing it.
+
+As said this is not true because you can resize the configuration blob
+by restructuring the qcow2 file.
+
+It is true for one disk image, but others apparently don't want an
+appliance file, so they only want a simple case where we only have one
+disk image.
+
+I'm noticing a pattern here, and that is that everybody has a different
+opinion on what we actually want in the end, and it's just by chance
+that we find ourselves in two camps ("put it in qcow2" vs. "put it
+somewhere else").
+
+Maybe we should first discuss what we actually want before we can
+discuss where to put it.
+
+>> And secondly, I think adding another format has the advantage of
+>> easier deprecation.  If we think we need something more complex, we
+>> are free to design that and throw away the old format.  But if we add
+>> something to qcow2, I would think it is there to stay.
+>=20
+> And then we would better add something general enough to work for
+> foreseeable future or not add anything at all.
+
+The intention is always to do everything right from the start, but that
+is rarely successful.
+
+>> So, yes, for qcow2 we might want to design something (overly?) complex=
+
+>> from that start that we hope will fulfill all our needs (which it
+>> won't, because things never turn out that way).  But if we'd add a
+>> new format, we could keep it simple in the beginning and start over
+>> later.
+>>
+>=20
+> Yes, you basically want something like a tar file that can interleave
+> the archive members. Wait, isn't that a new filesystem?
+
+Exactly.  But I'd rather have this outside of qcow2 (and thus easily
+deprecatable) than inside.
+
+(And if we just need to store something simple, we don't need such a
+filesystem, because then we can get away without fragmentation.  But if
+we really need to grow the configuration options often, I suspect we'll
+want some allocation information and the like inside that blob in qcow2,
+too, so we'd end up with a filesystem there.)
+
+Max
+
+
+--dTUO5wtXaprvw6AoNkELr2yNIdVfRMETi
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlsX7OsACgkQ9AfbAGHV
+z0Dvwgf/SsJChIMJg+4nw9bMjc8zSjdmJdPx5H/9IY4WhCVSUdMLTGggSJLU/LCf
+cQT7G7nQpEmxJUici2oBu2GhLT+QQLuqV0D5laXux0arIeRW+bwChOWy0GGK5NVl
+msaEzX1XJCkVoVBLjRWTvELff+0dYvN4E7mpP8nJFmi2iKz9JsnKKRx4EfZlRl06
+FPCb8tXf5mVr36QzQo2orTQMV35pTt+Z36VVuhMwsTpRZ9S6VkN3+jV52yX/FI+Q
+CStr+7SWITJA98fiH2Ga3LiPrtQ6oj8HssHIy1qCaqaUIeA1C6Bdvs6ekUB3d4/9
+dfEKlQrFIRSoQgY4r2ycKhRmeHbbEg==
+=5LbT
+-----END PGP SIGNATURE-----
+
+--dTUO5wtXaprvw6AoNkELr2yNIdVfRMETi--
