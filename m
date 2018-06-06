@@ -1,25 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52738)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55163)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fQauf-0001Zb-Um
-	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 12:03:55 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1fQb1M-0006g7-P3
+	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 12:10:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fQaub-0003j5-QG
-	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 12:03:53 -0400
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <cover.1528291908.git.balaton@eik.bme.hu>
-	<8c404c8c4ee1bfd2e4d079877d481094f797df8f.1528291908.git.balaton@eik.bme.hu>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <6aa1bc4e-a4b0-d7be-b9eb-85dfe8c06781@amsat.org>
-Date: Wed, 6 Jun 2018 13:03:32 -0300
+	(envelope-from <ehabkost@redhat.com>) id 1fQb1L-0007M0-5I
+	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 12:10:48 -0400
+Date: Wed, 6 Jun 2018 13:10:31 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20180606161031.GT7451@localhost.localdomain>
+References: <20180606123237.2235ae4a@kitsune.suse.cz>
+	<bc97cdc3-85ba-e053-0816-b6bc431064fb@redhat.com>
+	<20180606131929.44d0fd6b@kitsune.suse.cz>
+	<93233bff-604b-c891-90ce-64fe1eaaaab5@redhat.com>
+	<20180606134327.05de9616@kitsune.suse.cz>
+	<94cea1d9-d934-85d1-66d4-dbfc82b8dd53@redhat.com>
+	<20180606141356.0b86d6b4@kitsune.suse.cz>
+	<95f92a95-6592-27a2-a822-d3a047cf8339@redhat.com>
+	<20180606154510.24be6ceb@kitsune.suse.cz>
+	<d2b5d074-4052-a5fb-4048-cc30ad092f0f@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <8c404c8c4ee1bfd2e4d079877d481094f797df8f.1528291908.git.balaton@eik.bme.hu>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 5/8] hw/timer: Add basic M41T80 emulation
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <d2b5d074-4052-a5fb-4048-cc30ad092f0f@redhat.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] storing machine data in qcow images?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,192 +32,192 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: BALATON Zoltan <balaton@eik.bme.hu>, qemu-devel@nongnu.org, qemu-ppc@nongnu.org
-Cc: Alexander Graf <agraf@suse.de>, David Gibson <david@gibson.dropbear.id.au>
+To: Max Reitz <mreitz@redhat.com>
+Cc: Michal =?iso-8859-1?Q?Such=E1nek?= <msuchanek@suse.de>, Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>, "Richard W.M. Jones" <rjones@redhat.com>, qemu-devel@nongnu.org, stefanha@redhat.com
 
-On 06/06/2018 10:31 AM, BALATON Zoltan wrote:
-> Basic emulation of the M41T80 serial (I2C) RTC chip. Only getting time
-> of day is implemented. Setting time and RTC alarm are not supported.
-> 
-> Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
-> ---
->  MAINTAINERS                     |   1 +
->  default-configs/ppc-softmmu.mak |   1 +
->  hw/timer/Makefile.objs          |   1 +
->  hw/timer/m41t80.c               | 117 ++++++++++++++++++++++++++++++++++++++++
->  4 files changed, 120 insertions(+)
->  create mode 100644 hw/timer/m41t80.c
-> 
-> diff --git a/MAINTAINERS b/MAINTAINERS
-> index 41cd373..9e13bc1 100644
-> --- a/MAINTAINERS
-> +++ b/MAINTAINERS
-> @@ -826,6 +826,7 @@ M: BALATON Zoltan <balaton@eik.bme.hu>
->  L: qemu-ppc@nongnu.org
->  S: Maintained
->  F: hw/ide/sii3112.c
-> +F: hw/timer/m41t80.c
->  
->  SH4 Machines
->  ------------
-> diff --git a/default-configs/ppc-softmmu.mak b/default-configs/ppc-softmmu.mak
-> index 7d0dc2f..9fbaadc 100644
-> --- a/default-configs/ppc-softmmu.mak
-> +++ b/default-configs/ppc-softmmu.mak
-> @@ -27,6 +27,7 @@ CONFIG_SM501=y
->  CONFIG_IDE_SII3112=y
->  CONFIG_I2C=y
->  CONFIG_BITBANG_I2C=y
-> +CONFIG_M41T80=y
->  
->  # For Macs
->  CONFIG_MAC=y
-> diff --git a/hw/timer/Makefile.objs b/hw/timer/Makefile.objs
-> index 8b27a4b..e16b2b9 100644
-> --- a/hw/timer/Makefile.objs
-> +++ b/hw/timer/Makefile.objs
-> @@ -6,6 +6,7 @@ common-obj-$(CONFIG_CADENCE) += cadence_ttc.o
->  common-obj-$(CONFIG_DS1338) += ds1338.o
->  common-obj-$(CONFIG_HPET) += hpet.o
->  common-obj-$(CONFIG_I8254) += i8254_common.o i8254.o
-> +common-obj-$(CONFIG_M41T80) += m41t80.o
->  common-obj-$(CONFIG_M48T59) += m48t59.o
->  ifeq ($(CONFIG_ISA_BUS),y)
->  common-obj-$(CONFIG_M48T59) += m48t59-isa.o
-> diff --git a/hw/timer/m41t80.c b/hw/timer/m41t80.c
-> new file mode 100644
-> index 0000000..9dbdb1b
-> --- /dev/null
-> +++ b/hw/timer/m41t80.c
-> @@ -0,0 +1,117 @@
-> +/*
-> + * M41T80 serial rtc emulation
-> + *
-> + * Copyright (c) 2018 BALATON Zoltan
-> + *
-> + * This work is licensed under the GNU GPL license version 2 or later.
-> + *
-> + */
-> +
-> +#include "qemu/osdep.h"
-> +#include "qemu/log.h"
-> +#include "qemu/timer.h"
-> +#include "qemu/bcd.h"
-> +#include "hw/i2c/i2c.h"
-> +
-> +#define TYPE_M41T80 "m41t80"
-> +#define M41T80(obj) OBJECT_CHECK(M41t80State, (obj), TYPE_M41T80)
-> +
-> +typedef struct M41t80State {
-> +    I2CSlave parent_obj;
-> +    int8_t addr;
-> +} M41t80State;
-> +
-> +static void m41t80_realize(DeviceState *dev, Error **errp)
-> +{
-> +    M41t80State *s = M41T80(dev);
-> +
-> +    s->addr = -1;
-> +}
-> +
-> +static int m41t80_send(I2CSlave *i2c, uint8_t data)
-> +{
-> +    M41t80State *s = M41T80(i2c);
-> +
-> +    if (s->addr < 0) {
-> +        s->addr = data;
-> +    } else {
-> +        s->addr++;
-> +    }
+On Wed, Jun 06, 2018 at 04:17:14PM +0200, Max Reitz wrote:
+> On 2018-06-06 15:45, Michal Such=E1nek wrote:
+> > On Wed, 6 Jun 2018 15:14:03 +0200
+> > Max Reitz <mreitz@redhat.com> wrote:
+> >=20
+> >> On 2018-06-06 14:13, Michal Such=E1nek wrote:
+> >>> On Wed, 6 Jun 2018 13:52:35 +0200
+> >>> Max Reitz <mreitz@redhat.com> wrote:
+> >>>  =20
+> >>>> On 2018-06-06 13:43, Michal Such=E1nek wrote: =20
+> >>>>> On Wed, 6 Jun 2018 13:32:47 +0200
+> >>>>> Max Reitz <mreitz@redhat.com> wrote:
+> >>>>>    =20
+> >>>>>> On 2018-06-06 13:19, Michal Such=E1nek wrote:   =20
+> >>>>>>> On Wed, 6 Jun 2018 13:02:53 +0200
+> >>>>>>> Max Reitz <mreitz@redhat.com> wrote: =20
+> >>
+> >> [...]
+> >>
+> >>>>>>>> What I'm trying to get at is that qcow2 was not designed to be
+> >>>>>>>> a container format for arbitrary files.  If you want to make i=
+t
+> >>>>>>>> such, I'm sure there are existing formats that work
+> >>>>>>>> better.     =20
+> >>>>>>>
+> >>>>>>> Such as?     =20
+> >>>>>>
+> >>>>>> ext2?   =20
+> >>>>>
+> >>>>> So you want an ext2 driver in qemu instead of expanding qcow2 to
+> >>>>> work not only for a single disk but also for an appliance?   =20
+> >>>>
+> >>>> Yes, because ext2 was designed to be a proper filesystem.  I'm not
+> >>>> an FS designer.  Well, not a good one anyway.  So I don't trust
+> >>>> myself on extending qcow2 to be a good FS -- and why would I, when
+> >>>> there are already numerous FS around. =20
+> >>>
+> >>> Do you expect that performance of qemu using qcow2 driver over ext2
+> >>> driver will be better than using qcow driver directly with some par=
+t
+> >>> semi-permanently occupied by a configuration blob? My bet is not. =20
+> >>
+> >> If you want to store multiple disk images in a single file?  I would
+> >> think so, yes.  With qcow2, I would assume it leads to
+> >> fragmentation. =20
+> >=20
+> > How is that different from single disk divided into two partitions
+> > internally (without any knowledge on the qcow2 level)?
+>=20
+> From how it's going to be fragmented, there is no difference.  If you
+> have multiple partitions and write to them concurrently, thus allocatin=
+g
+> new areas, you get bad fragmentation.
+>=20
+> >> I would hope that proper filesystems can mitigate this.
+> >=20
+> > Not really. Not without much complexity and repeated maintenance.
+>=20
+> Yes, a proper filesystem.  Which we'd get for free with multiple files.
+>=20
+> >>> The ext* drivers are designed to work with kernel VM infrastructure
+> >>> which must be tuned for different usage scenarios and you would
+> >>> have to duplicate that tuning in qemu to get competitive
+> >>> performance. Also you get qcow2 and ext2 metadata which must be
+> >>> allocated, managed, etc. You get more storage and performance
+> >>> overhead for no good reason. =20
+> >>
+> >> Yes, there is a good reason.  You can add arbitrary configuration
+> >> options without having to worry about me.
+> >=20
+> > But I will not be able to use the images in qemu so it will be useles=
+s.
+>=20
+> Neither can you with the current proposal because that is about adding
+> management layer configuration options which are opaque to qemu.
+>=20
+> > Well, there is FUSE and that is certainly blazing fast and ubiquitous=
+,
+> > I am sure.
+>=20
+> If you want to use pre-existing drivers, you'd probably use a loop devi=
+ce.
+>=20
+> Otherwise, you'd use the block layer for accessing the disk.
+>=20
+> If you want blazingly fast, you probably won't use qcow2 anyway.  Or,
+> funnily enough, you'd want to probably split the qcow2 file into a
+> metadata and a data file, so you get even more files.  (But that is a
+> proposal for the future.)
+>=20
+> >> Seriously, though, a real FS would allow you to be more expressive a=
+nd
+> >> really do what you want without having to work around the quirks tha=
+t
+> >> adding a not-real-FS in the most simple way possible to qcow2 would
+> >> bring with it.
+> >>
+> >> Because this is part of my fear, that we now add a very simple blob
+> >> for just a sprinkle of data.  But over time it gets more and more
+> >> complex because we want to store more and more data to make things
+> >> ever more convenient[1], we notice that we need more features, the
+> >> format gets more complex, and in the end we have an FS that is just
+> >> worse than a real FS.
+> >>
+> >> [1] And note that if I'm convinced to store VM configuration data in
+> >> qemu, I will agree that we can store any data in there and it would =
+be
+> >> nice if any VM could be provisioned and used that way.
+> >>
+> >>> On the other hand, qcow is designed for storing VM disk data and
+> >>> hopefully was tuned to do that decently over the years. The primary
+> >>> use case remains storing VM disk data. Adding a configuration blob
+> >>> does not change that. =20
+> >>
+> >> True.  So the argument is that qcow2 may be worse for storing
+> >> arbitrary data, but we don't have performance requirements for that;
+> >> but we do have performance requirements for disk data and adding
+> >> another format below qcow2 will not make it better.
+> >>
+> >> I do think it is possible to not make things worse with a format und=
+er
+> >> qcow2, but that may require additional complexity, that you think is
+> >> pointless.
+> >>
+> >> I understand that you think that, but I still believe that putting t=
+he
+> >> configuration into qcow2 is just the wrong way around and will fall =
+on
+> >> our feet in the long run.
+> >=20
+> > I think that *if* we want an 'appliance' format that stores a whole V=
+M
+> > in a single file to ease VM distribution then the logical place to lo=
+ok
+> > in qemu is qcow. The reason have been explained at length.
+>=20
+> The reason being that it's the easiest place, yes.  That doesn't make i=
+t
+> the best place.
+>=20
+> > I understand that for some use cases simplifying the distribution of
+> > VMs as much as possible is quite important.
+>=20
+> I don't because still nobody has explained it to me.
+>=20
+> The only explanation I got so far was "People are lazy and we have
+> defaults for everything, so we don't throw an error if people forget to
+> pass a configuration file."
 
-What about adding enum i2c_event in M41t80State and use the enum here
-rather than the addr < 0? Also this wrap at INT8_MAX = 127, is this
-expected?
+People don't pass a configuration file today because there's no
+standard for such a configuration file.  qcow2 is already used
+today as an appliance file format because there's no better
+option.  People download disk images from appliance and OS
+providers, import them into a cloud system, and it works out of
+the box because (luckily) "pc" is enough for most of them.
 
-> +    return 0;
-> +}
-> +
-> +static int m41t80_recv(I2CSlave *i2c)
-> +{
-> +    M41t80State *s = M41T80(i2c);
-> +    struct tm now;
-> +    qemu_timeval tv;
+We can specify a true appliance file format, and ask people to
+use it.  But then providers of single-disk appliances and OSes
+will need to publish two appliance images: qcow2 disk image for
+old systems that don't support the new format, and one in the new
+appliance format, for systems that support it.
 
-       int8_t addr;
 
-> +
-> +    if (s->addr < 0) {
-> +        s->addr = 0;
-> +    }
+>=20
+> Which to me still just makes it an inconvenience.
 
-       addr = s->addr++;
+Well, there are small inconveniences and there are big
+inconveniences that together make a system unnecessarily hard to
+use.  I'd say this one falls somewhere in the middle.
 
-So you can simply use 'addr' bellow.
 
-> +    if (s->addr >= 1 && s->addr <= 7) {
-> +        qemu_get_timedate(&now, -1);
-> +    }
-> +    switch (s->addr++) {
-> +    case 0:
-> +        qemu_gettimeofday(&tv);
-> +        return to_bcd(tv.tv_usec / 10000);
-> +    case 1:
-> +        return to_bcd(now.tm_sec);
-> +    case 2:
-> +        return to_bcd(now.tm_min);
-> +    case 3:
-> +        return to_bcd(now.tm_hour);
-> +    case 4:
-> +        return to_bcd(now.tm_wday);
-> +    case 5:
-> +        return to_bcd(now.tm_mday);
-> +    case 6:
-> +        return to_bcd(now.tm_mon + 1);
-> +    case 7:
-> +        return to_bcd(now.tm_year % 100);
-> +    case 8 ... 19:
-> +        qemu_log_mask(LOG_UNIMP, "\n%s: unimplemented register: %d\n",
-> +                      __func__, s->addr - 1);
-> +        return 0;
-> +    default:
-> +        qemu_log_mask(LOG_GUEST_ERROR, "\n%s: invalid register: %d",
-> +                      __func__, s->addr - 1);
-> +        return 0;
-> +    }
-> +}
-> +
-> +static int m41t80_event(I2CSlave *i2c, enum i2c_event event)
-> +{
-> +    M41t80State *s = M41T80(i2c);
-> +
-> +    if (event == I2C_START_SEND) {
-> +        s->addr = -1;
-> +    }
-> +    return 0;
-> +}
-> +
-> +static void m41t80_class_init(ObjectClass *klass, void *data)
-> +{
-> +    DeviceClass *dc = DEVICE_CLASS(klass);
-> +    I2CSlaveClass *sc = I2C_SLAVE_CLASS(klass);
-> +
-> +    dc->realize = m41t80_realize;
-> +    sc->send = m41t80_send;
-> +    sc->recv = m41t80_recv;
-> +    sc->event = m41t80_event;
-> +}
-> +
-> +static const TypeInfo m41t80_info = {
-> +    .name          = TYPE_M41T80,
-> +    .parent        = TYPE_I2C_SLAVE,
-> +    .instance_size = sizeof(M41t80State),
-> +    .class_init    = m41t80_class_init,
-> +};
-> +
-> +static void m41t80_register_types(void)
-> +{
-> +    type_register_static(&m41t80_info);
-> +}
-> +
-> +type_init(m41t80_register_types)
-> 
+[...]
+> I'm noticing a pattern here, and that is that everybody has a different
+> opinion on what we actually want in the end, and it's just by chance
+> that we find ourselves in two camps ("put it in qcow2" vs. "put it
+> somewhere else").
+>=20
+> Maybe we should first discuss what we actually want before we can
+> discuss where to put it.
+
+I'm inclined to agree.  Once we figure out a good VM description
+format, we can justify a proposal to allow embedding the VM
+description in qcow2 for convenience.
+
+--=20
+Eduardo
