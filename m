@@ -1,16 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38428)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38557)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1fQdot-0000ob-Qx
-	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 15:10:11 -0400
+	(envelope-from <jsnow@redhat.com>) id 1fQdpM-0001Ha-5G
+	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 15:10:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1fQdon-0000km-Rz
-	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 15:10:07 -0400
-From: John Snow <jsnow@redhat.com>
-Date: Wed,  6 Jun 2018 15:09:49 -0400
-Message-Id: <20180606190955.20845-2-jsnow@redhat.com>
-In-Reply-To: <20180606190955.20845-1-jsnow@redhat.com>
+	(envelope-from <jsnow@redhat.com>) id 1fQdpL-00017P-07
+	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 15:10:36 -0400
 References: <20180606190955.20845-1-jsnow@redhat.com>
-Subject: [Qemu-devel] [PATCH 1/7] libqos/ahci: track sector size
+From: John Snow <jsnow@redhat.com>
+Message-ID: <87ced889-d7b0-c5cd-153a-afa52e48b401@redhat.com>
+Date: Wed, 6 Jun 2018 15:10:29 -0400
+MIME-Version: 1.0
+In-Reply-To: <20180606190955.20845-1-jsnow@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 0/7] atapi: change unlimited recursion to
+ while loop
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,75 +25,48 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: John Snow <jsnow@redhat.com>
 
-It's not always 512, and it does wind up mattering for PIO tranfers,
-because this means DRQ blocks are four times as big for ATAPI.
-Replace an instance of 2048 with the correct define, too.
+MEH I forgot to v2 this.
 
-This patch by itself winds changing no behavior. fis->count is ignored
-for CMD_PACKET, and sect_count only gets used in non-ATAPI cases.
-
-Signed-off-by: John Snow <jsnow@redhat.com>
----
- tests/libqos/ahci.c | 10 ++++++----
- 1 file changed, 6 insertions(+), 4 deletions(-)
-
-diff --git a/tests/libqos/ahci.c b/tests/libqos/ahci.c
-index bc201d762b..63e1f9b92d 100644
---- a/tests/libqos/ahci.c
-+++ b/tests/libqos/ahci.c
-@@ -90,6 +90,7 @@ struct AHCICommand {
-     uint32_t interrupts;
-     uint64_t xbytes;
-     uint32_t prd_size;
-+    uint32_t sector_size;
-     uint64_t buffer;
-     AHCICommandProp *props;
-     /* Data to be transferred to the guest */
-@@ -796,7 +797,7 @@ static void command_header_init(AHCICommand *cmd)
- static void command_table_init(AHCICommand *cmd)
- {
-     RegH2DFIS *fis = &(cmd->fis);
--    uint16_t sect_count = (cmd->xbytes / AHCI_SECTOR_SIZE);
-+    uint16_t sect_count = (cmd->xbytes / cmd->sector_size);
- 
-     fis->fis_type = REG_H2D_FIS;
-     fis->flags = REG_H2D_FIS_CMD; /* "Command" bit */
-@@ -819,7 +820,7 @@ static void command_table_init(AHCICommand *cmd)
-         if (cmd->props->lba28 || cmd->props->lba48) {
-             fis->device = ATA_DEVICE_LBA;
-         }
--        fis->count = (cmd->xbytes / AHCI_SECTOR_SIZE);
-+        fis->count = (cmd->xbytes / cmd->sector_size);
-     }
-     fis->icc = 0x00;
-     fis->control = 0x00;
-@@ -857,6 +858,7 @@ AHCICommand *ahci_command_create(uint8_t command_name)
-     cmd->xbytes = props->size;
-     cmd->prd_size = 4096;
-     cmd->buffer = 0xabad1dea;
-+    cmd->sector_size = props->atapi ? ATAPI_SECTOR_SIZE : AHCI_SECTOR_SIZE;
- 
-     if (!cmd->props->ncq) {
-         cmd->interrupts = AHCI_PX_IS_DHRS;
-@@ -1033,7 +1035,7 @@ void ahci_command_set_buffer(AHCICommand *cmd, uint64_t buffer)
- static void ahci_atapi_set_size(AHCICommand *cmd, uint64_t xbytes)
- {
-     unsigned char *cbd = cmd->atapi_cmd;
--    uint64_t nsectors = xbytes / 2048;
-+    uint64_t nsectors = xbytes / ATAPI_SECTOR_SIZE;
-     uint32_t tmp;
-     g_assert(cbd);
- 
-@@ -1080,7 +1082,7 @@ void ahci_command_set_sizes(AHCICommand *cmd, uint64_t xbytes,
-         cmd->prd_size = prd_size;
-     }
-     cmd->xbytes = xbytes;
--    sect_count = (cmd->xbytes / AHCI_SECTOR_SIZE);
-+    sect_count = (cmd->xbytes / cmd->sector_size);
- 
-     if (cmd->props->ncq) {
-         NCQFIS *nfis = (NCQFIS *)&(cmd->fis);
--- 
-2.14.3
+On 06/06/2018 03:09 PM, John Snow wrote:
+> Real hardware doesn't have an unlimited stack, so the unlimited
+> recursion in the ATAPI code smells a bit.  In fact, the call to
+> ide_transfer_start easily becomes a tail call with a small change
+> to the code (patch 5); however, we also need to turn the call back to
+> ide_atapi_cmd_reply_end into another tail call before turning the
+> (double) tail recursion into a while loop.
+> 
+> In particular, patch 1 ensures that the call to the end_transfer_func is
+> the last thing in ide_transfer_start.  To do so, it moves the write of
+> the PIO Setup FIS before the PIO transfer, which actually makes sense:
+> the FIS is sent by the device to inform the AHCI about the transfer,
+> so it cannot come after!  This is the main change from the RFC, and
+> it simplifies the rest of the series (the RFC had to introduce an
+> "end_transfer" callback just for writing the PIO Setup FIS).
+> 
+> I tested this manually with READ CD commands sent through sg_raw,
+> and the existing AHCI tests still pass.
+> 
+> v2: reworked PIO Setup FIS based on spec reading, adjusted tests.
+> 
+> John Snow (2):
+>   libqos/ahci: track sector size
+>   ahci: move PIO Setup FIS before transfer, fix it for ATAPI commands
+> 
+> Paolo Bonzini (5):
+>   ide: push end_transfer_func out of start_transfer callback, rename
+>     callback
+>   ide: call ide_cmd_done from ide_transfer_stop
+>   ide: make ide_transfer_stop idempotent
+>   atapi: call ide_set_irq before ide_transfer_start
+>   ide: introduce ide_transfer_start_norecurse
+> 
+>  hw/ide/ahci.c             | 31 ++++++++++++-------------------
+>  hw/ide/atapi.c            | 44 ++++++++++++++++++++++++--------------------
+>  hw/ide/core.c             | 39 ++++++++++++++++++++-------------------
+>  hw/ide/trace-events       |  2 +-
+>  include/hw/ide/internal.h |  4 +++-
+>  tests/libqos/ahci.c       | 45 +++++++++++++++++++++++++++------------------
+>  tests/libqos/ahci.h       |  3 +--
+>  7 files changed, 88 insertions(+), 80 deletions(-)
+> 
