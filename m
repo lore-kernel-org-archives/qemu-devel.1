@@ -1,29 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54063)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54922)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1fQcoY-0005N2-FV
-	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 14:05:43 -0400
+	(envelope-from <mreitz@redhat.com>) id 1fQcsf-0007xa-7Y
+	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 14:09:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1fQcoV-0003FO-8M
-	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 14:05:42 -0400
-Received: from 14.mo5.mail-out.ovh.net ([188.165.51.82]:45928)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1fQcoV-0003Dt-04
-	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 14:05:39 -0400
-Received: from player695.ha.ovh.net (unknown [10.109.120.118])
-	by mo5.mail-out.ovh.net (Postfix) with ESMTP id 377EA1BD201
-	for <qemu-devel@nongnu.org>; Wed,  6 Jun 2018 20:05:37 +0200 (CEST)
-References: <20180605162545.80778-1-dgilbert@redhat.com>
-	<20180605162545.80778-3-dgilbert@redhat.com>
-From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <2ea9eee6-43a5-3570-bf73-ae771722b701@kaod.org>
-Date: Wed, 6 Jun 2018 20:05:34 +0200
+	(envelope-from <mreitz@redhat.com>) id 1fQcse-000852-5g
+	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 14:09:57 -0400
+References: <20180606123237.2235ae4a@kitsune.suse.cz>
+	<bc97cdc3-85ba-e053-0816-b6bc431064fb@redhat.com>
+	<20180606131929.44d0fd6b@kitsune.suse.cz>
+	<93233bff-604b-c891-90ce-64fe1eaaaab5@redhat.com>
+	<20180606134327.05de9616@kitsune.suse.cz>
+	<94cea1d9-d934-85d1-66d4-dbfc82b8dd53@redhat.com>
+	<20180606141356.0b86d6b4@kitsune.suse.cz>
+	<95f92a95-6592-27a2-a822-d3a047cf8339@redhat.com>
+	<20180606154510.24be6ceb@kitsune.suse.cz>
+	<d2b5d074-4052-a5fb-4048-cc30ad092f0f@redhat.com>
+	<20180606161031.GT7451@localhost.localdomain>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <61c88dc0-5585-f8f0-8777-eabac594c925@redhat.com>
+Date: Wed, 6 Jun 2018 20:09:42 +0200
 MIME-Version: 1.0
-In-Reply-To: <20180605162545.80778-3-dgilbert@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 2/2] migration: Poison ramblock loops in
- migration
+In-Reply-To: <20180606161031.GT7451@localhost.localdomain>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="NGrYIp5xrEJRCzFMVVlVIdxwDdwJB6Z4B"
+Subject: Re: [Qemu-devel] storing machine data in qcow images?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,75 +33,127 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>, qemu-devel@nongnu.org, peterx@redhat.com
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: =?UTF-8?Q?Michal_Such=c3=a1nek?= <msuchanek@suse.de>, Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>, "Richard W.M. Jones" <rjones@redhat.com>, qemu-devel@nongnu.org, stefanha@redhat.com
 
-On 06/05/2018 06:25 PM, Dr. David Alan Gilbert (git) wrote:
-> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--NGrYIp5xrEJRCzFMVVlVIdxwDdwJB6Z4B
+From: Max Reitz <mreitz@redhat.com>
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: =?UTF-8?Q?Michal_Such=c3=a1nek?= <msuchanek@suse.de>,
+ Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org,
+ "Michael S. Tsirkin" <mst@redhat.com>, "Richard W.M. Jones"
+ <rjones@redhat.com>, qemu-devel@nongnu.org, stefanha@redhat.com
+Message-ID: <61c88dc0-5585-f8f0-8777-eabac594c925@redhat.com>
+Subject: Re: [Qemu-devel] storing machine data in qcow images?
+References: <20180606123237.2235ae4a@kitsune.suse.cz>
+ <bc97cdc3-85ba-e053-0816-b6bc431064fb@redhat.com>
+ <20180606131929.44d0fd6b@kitsune.suse.cz>
+ <93233bff-604b-c891-90ce-64fe1eaaaab5@redhat.com>
+ <20180606134327.05de9616@kitsune.suse.cz>
+ <94cea1d9-d934-85d1-66d4-dbfc82b8dd53@redhat.com>
+ <20180606141356.0b86d6b4@kitsune.suse.cz>
+ <95f92a95-6592-27a2-a822-d3a047cf8339@redhat.com>
+ <20180606154510.24be6ceb@kitsune.suse.cz>
+ <d2b5d074-4052-a5fb-4048-cc30ad092f0f@redhat.com>
+ <20180606161031.GT7451@localhost.localdomain>
+In-Reply-To: <20180606161031.GT7451@localhost.localdomain>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+On 2018-06-06 18:10, Eduardo Habkost wrote:
+> On Wed, Jun 06, 2018 at 04:17:14PM +0200, Max Reitz wrote:
+>> On 2018-06-06 15:45, Michal Such=C3=A1nek wrote:
+
+[...]
+
+>>> I understand that for some use cases simplifying the distribution of
+>>> VMs as much as possible is quite important.
+>>
+>> I don't because still nobody has explained it to me.
+>>
+>> The only explanation I got so far was "People are lazy and we have
+>> defaults for everything, so we don't throw an error if people forget t=
+o
+>> pass a configuration file."
 >=20
-> The migration code should be using the
->   RAMBLOCK_FOREACH_MIGRATABLE and qemu_ram_foreach_block_migratable
-> not the all-block versions;  poison them so that we can't accidentally
-> use them.
+> People don't pass a configuration file today because there's no
+> standard for such a configuration file.  qcow2 is already used
+> today as an appliance file format because there's no better
+> option.  People download disk images from appliance and OS
+> providers, import them into a cloud system, and it works out of
+> the box because (luckily) "pc" is enough for most of them.
+
+OK.
+
+> We can specify a true appliance file format, and ask people to
+> use it.  But then providers of single-disk appliances and OSes
+> will need to publish two appliance images: qcow2 disk image for
+> old systems that don't support the new format, and one in the new
+> appliance format, for systems that support it.
+
+True.  This is a valid argument for making a compatible change to qcow2.
+ But: If these options are actually important, the qcow2 file is not
+really compatible either.  You might end up with a blank screen again.
+
+Depending on how we'd design a new format, it might contain a config
+file and a qcow2 file which may be easily extractable.  If so, users of
+legacy software could easily extract the qcow2 file and might even be
+tempted to look at the config file when it doesn't work, and maybe that
+could even help them.
+
+Also, I think that it is not too unreasonable to ask providers to
+provide two formats.
+
+But that does not make me disregard your argument.  It is still valid,
+especially with your convenience note below.
+
+(Providers could choose whether it is best for them to include the
+description in the qcow2 file, or whether to offer an archive that
+contains e.g. a raw file.)
+
+>> Which to me still just makes it an inconvenience.
 >=20
-> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> Well, there are small inconveniences and there are big
+> inconveniences that together make a system unnecessarily hard to
+> use.  I'd say this one falls somewhere in the middle.
 
-Reviewed-by: C=C3=A9dric Le Goater <clg@kaod.org>=20
+Hm, OK.
 
-Thanks,
-
-C.
-
-
-> ---
->  include/exec/ramlist.h | 4 +++-
->  migration/migration.h  | 3 +++
->  migration/ram.c        | 4 +++-
->  3 files changed, 9 insertions(+), 2 deletions(-)
+> [...]
+>> I'm noticing a pattern here, and that is that everybody has a differen=
+t
+>> opinion on what we actually want in the end, and it's just by chance
+>> that we find ourselves in two camps ("put it in qcow2" vs. "put it
+>> somewhere else").
+>>
+>> Maybe we should first discuss what we actually want before we can
+>> discuss where to put it.
 >=20
-> diff --git a/include/exec/ramlist.h b/include/exec/ramlist.h
-> index 2e2ac6cb99..bc4faa1b00 100644
-> --- a/include/exec/ramlist.h
-> +++ b/include/exec/ramlist.h
-> @@ -56,8 +56,10 @@ typedef struct RAMList {
->  extern RAMList ram_list;
-> =20
->  /* Should be holding either ram_list.mutex, or the RCU lock. */
-> -#define  RAMBLOCK_FOREACH(block)  \
-> +#define  INTERNAL_RAMBLOCK_FOREACH(block)  \
->      QLIST_FOREACH_RCU(block, &ram_list.blocks, next)
-> +/* Never use the INTERNAL_ version except for defining other macros */
-> +#define RAMBLOCK_FOREACH(block) INTERNAL_RAMBLOCK_FOREACH(block)
-> =20
->  void qemu_mutex_lock_ramlist(void);
->  void qemu_mutex_unlock_ramlist(void);
-> diff --git a/migration/migration.h b/migration/migration.h
-> index 5af57d616c..31d3ed12dc 100644
-> --- a/migration/migration.h
-> +++ b/migration/migration.h
-> @@ -284,4 +284,7 @@ void migrate_send_rp_resume_ack(MigrationIncomingSt=
-ate *mis, uint32_t value);
->  void dirty_bitmap_mig_before_vm_start(void);
->  void init_dirty_bitmap_incoming_migration(void);
-> =20
-> +#define qemu_ram_foreach_block \
-> +  #warning "Use qemu_ram_foreach_block_migratable in migration code"
-> +
->  #endif
-> diff --git a/migration/ram.c b/migration/ram.c
-> index a7807cea84..e0d19305ee 100644
-> --- a/migration/ram.c
-> +++ b/migration/ram.c
-> @@ -159,9 +159,11 @@ out:
-> =20
->  /* Should be holding either ram_list.mutex, or the RCU lock. */
->  #define RAMBLOCK_FOREACH_MIGRATABLE(block)             \
-> -    RAMBLOCK_FOREACH(block)                            \
-> +    INTERNAL_RAMBLOCK_FOREACH(block)                   \
->          if (!qemu_ram_is_migratable(block)) {} else
-> =20
-> +#undef RAMBLOCK_FOREACH
-> +
->  static void ramblock_recv_map_init(void)
->  {
->      RAMBlock *rb;
->=20
+> I'm inclined to agree.  Once we figure out a good VM description
+> format, we can justify a proposal to allow embedding the VM
+> description in qcow2 for convenience.
+
+OK.
+
+Max
+
+
+--NGrYIp5xrEJRCzFMVVlVIdxwDdwJB6Z4B
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlsYI2YACgkQ9AfbAGHV
+z0BrZQf/V1nQyPXUlUzS0FbsbYBrGmdDSWnArUHi+jlt4TZBooBYnsDANn6FQ3n2
+FusbXeKhxgBH2d4tKnqptK/RtpwrSuVN3uN+y3FbjAUanjrrWhzS4yxGVJj9vAVV
++NNV/UwMCWX9gISYRgJ0Sy+xwf4UfBuBRzVuAqanM+AgMIWGNMTCi2OVgAdh3bC/
+dYT3pA1BQv2wmHhR6Xx55RARPIkTcno6gD94saxzwRwd6kY2T5vH7QQOS+ecLT3m
+h7M3IUWXsBP67MZE3TuulMY9KQpeFSsvYxL/PsfNqEScNYvRcO80sPc44ir50o12
+B3vMvwoWiSvhqnBtrnu1rZHg7Bu+JA==
+=HgMR
+-----END PGP SIGNATURE-----
+
+--NGrYIp5xrEJRCzFMVVlVIdxwDdwJB6Z4B--
