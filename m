@@ -1,30 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47027)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47979)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1fQZNA-00069T-TU
-	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 10:25:14 -0400
+	(envelope-from <balaton@eik.bme.hu>) id 1fQZQd-0007kT-FH
+	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 10:28:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1fQZN9-00071j-NS
-	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 10:25:12 -0400
-Date: Wed, 6 Jun 2018 15:24:50 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Message-ID: <20180606142450.GH3064@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <bc97cdc3-85ba-e053-0816-b6bc431064fb@redhat.com>
-	<20180606131929.44d0fd6b@kitsune.suse.cz>
-	<93233bff-604b-c891-90ce-64fe1eaaaab5@redhat.com>
-	<20180606134327.05de9616@kitsune.suse.cz>
-	<94cea1d9-d934-85d1-66d4-dbfc82b8dd53@redhat.com>
-	<20180606141356.0b86d6b4@kitsune.suse.cz>
-	<95f92a95-6592-27a2-a822-d3a047cf8339@redhat.com>
-	<20180606154510.24be6ceb@kitsune.suse.cz>
-	<20180606135010.GF3064@redhat.com>
-	<20180606141432.GS7451@localhost.localdomain>
+	(envelope-from <balaton@eik.bme.hu>) id 1fQZQZ-0008Un-Fc
+	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 10:28:47 -0400
+Date: Wed, 6 Jun 2018 16:28:41 +0200 (CEST)
+From: BALATON Zoltan <balaton@eik.bme.hu>
+In-Reply-To: <CAFEAcA_GwgmiZPQ9NmY9a7_OwYFCBHFZiVQzk1nZEoxYaD+mwQ@mail.gmail.com>
+Message-ID: <alpine.BSF.2.21.1806061619030.42561@zero.eik.bme.hu>
+References: <cover.1528291908.git.balaton@eik.bme.hu>
+	<fdb61fc16922f78190f0db04a11dd20519cd2fb5.1528291908.git.balaton@eik.bme.hu>
+	<CAFEAcA_GwgmiZPQ9NmY9a7_OwYFCBHFZiVQzk1nZEoxYaD+mwQ@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20180606141432.GS7451@localhost.localdomain>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] storing machine data in qcow images?
+Content-Type: text/plain; charset=US-ASCII; format=flowed
+Subject: Re: [Qemu-devel] [PATCH v2 7/8] sm501: Do not clear read only bits
+ when writing register
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,57 +24,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: Michal =?utf-8?B?U3VjaMOhbmVr?= <msuchanek@suse.de>, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>, "Richard W.M. Jones" <rjones@redhat.com>, qemu-devel@nongnu.org, stefanha@redhat.com
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-ppc <qemu-ppc@nongnu.org>, Alexander Graf <agraf@suse.de>, David Gibson <david@gibson.dropbear.id.au>
 
-On Wed, Jun 06, 2018 at 11:14:32AM -0300, Eduardo Habkost wrote:
-> On Wed, Jun 06, 2018 at 02:50:10PM +0100, Daniel P. Berrang=C3=A9 wrote=
-:
-> > On Wed, Jun 06, 2018 at 03:45:10PM +0200, Michal Such=C3=A1nek wrote:
-> > >=20
-> > > I think that *if* we want an 'appliance' format that stores a whole=
- VM
-> > > in a single file to ease VM distribution then the logical place to =
-look
-> > > in qemu is qcow. The reason have been explained at length.
-> >=20
-> > I rather disagree. This is a common problem beyond just QEMU and ever=
-yone
-> > just uses an existing archive format (TAR, ZIP) for bundling together
-> > one or more disk images, metdata for config, and whatever other resou=
-rces
-> > are applicable for the vendor.  This works with any disk format (raw,
-> > qcow2, vmdk, vpc, etc) so is preferrable to inventing someting that i=
-s
-> > specific to qcow2 IMHO.
->=20
-> Now we have N+1 appliance file formats.  :)
->=20
-> (We like it or not, qcow2 is already used as an appliance format
-> for single-disk VMs in practice.)
->=20
-> But I agree this must not be specific to qcow2.  The same VM
-> description format we agree upon should work with other disk
-> formats or with multi-disk appliances.
->=20
-> If we specify a reasonable VM description format for appliances
-> and make it work inside (e.g.) tar files, we will still have the
-> option of allowing the description be placed inside qcow2 if we
-> really want to.  I don't think we need to finish this qcow2
-> bikeshedding exercise right now.
+On Wed, 6 Jun 2018, Peter Maydell wrote:
+> On 6 June 2018 at 14:31, BALATON Zoltan <balaton@eik.bme.hu> wrote:
+>> When writing a register that has read only bits besides reserved bits
+>> we have to avoid changing read only bits that may have non zero
+>> default values.
+>>
+>> Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
+>> ---
+>>  hw/display/sm501.c | 6 +++---
+>>  1 file changed, 3 insertions(+), 3 deletions(-)
+>>
+>> diff --git a/hw/display/sm501.c b/hw/display/sm501.c
+>> index e47be99..7ec1434 100644
+>> --- a/hw/display/sm501.c
+>> +++ b/hw/display/sm501.c
+>> @@ -836,10 +836,10 @@ static void sm501_system_config_write(void *opaque, hwaddr addr,
+>>
+>>      switch (addr) {
+>>      case SM501_SYSTEM_CONTROL:
+>> -        s->system_control = value & 0xE300B8F7;
+>> +        s->system_control |= value & 0xEF00B8F7;
+>
+> This will mean that you can't clear a r/w bit by writing a
+> zero to it -- is that the hardware behaviour? The
 
-Yes, I think that is sensible, as once we actually try it out in real
-world cases, we might then find a tar/zip is sufficient after all and
-we don't need to do something extra for qcow2. Also means we can do
-experiments without committing to a qcow2 format spec change right
-away.
+Not really sure about real hardware behaviour. I only have that not very 
+detailed docs we've looked at before but I assume r/w bits could be 
+changed by writing them.
 
-Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
-ge :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.c=
-om :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
-ge :|
+> description in the commit message suggests that you want
+>   s->whatever = (value & rw_bit_mask) | ro_one_bits_mask;
+
+Wouldn't that always set ro bits? I need to leave ro bits untouched by 
+written value and only set rw bits. The previous version masked out ro 
+bits which also cleared them due to assigning with =. Maybe
+
+s->whatever &= ro_bits_mask;
+s->whatever |= value & rw_bits_mask;
+
+would work? Could this be simplified?
+
+>>          break;
+>>      case SM501_MISC_CONTROL:
+>> -        s->misc_control = value & 0xFF7FFF20;
+>> +        s->misc_control |= value & 0xFF7FFF10;
+>>          break;
+>>      case SM501_GPIO31_0_CONTROL:
+>>          s->gpio_31_0_control = value;
+>> @@ -853,7 +853,7 @@ static void sm501_system_config_write(void *opaque, hwaddr addr,
+>>          s->dram_control |=  value & 0x7FFFFFC3;
+>>          break;
+>>      case SM501_ARBTRTN_CONTROL:
+>> -        s->arbitration_control =  value & 0x37777777;
+>> +        s->arbitration_control = value & 0x37777777;
+>
+> Was this intended to be changed too?
+
+Yes, just a simple white space cleanup. Does that worth a separate patch 
+or enough to mention in commit message to make it clear it's intended 
+change?
+
+Thanks for the quick review,
+BALATON Zoltan
