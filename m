@@ -1,14 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40173)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40170)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <balaton@eik.bme.hu>) id 1fQYwW-0008Q5-13
+	(envelope-from <balaton@eik.bme.hu>) id 1fQYwW-0008Q3-0J
 	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 09:57:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <balaton@eik.bme.hu>) id 1fQYwS-0000VI-VO
+	(envelope-from <balaton@eik.bme.hu>) id 1fQYwT-0000Vo-4a
 	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 09:57:40 -0400
-Message-Id: <cover.1528291908.git.balaton@eik.bme.hu>
+Message-Id: <a09140c7fad266eff61212f989ddb27203bf4466.1528291908.git.balaton@eik.bme.hu>
+In-Reply-To: <cover.1528291908.git.balaton@eik.bme.hu>
+References: <cover.1528291908.git.balaton@eik.bme.hu>
 From: BALATON Zoltan <balaton@eik.bme.hu>
 Date: Wed, 06 Jun 2018 15:31:48 +0200
-Subject: [Qemu-devel] [PATCH v2 0/8] Misc sam460ex improvements
+Subject: [Qemu-devel] [PATCH v2 4/8] ppc4xx_i2c: Rewrite to model hardware
+ more closely
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,38 +23,341 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org, qemu-ppc@nongnu.org
 Cc: Alexander Graf <agraf@suse.de>, David Gibson <david@gibson.dropbear.id.au>
 
-Some more improvements to sam460ex emulation:
-- Implemented RTC (which also needed fixing I2C to work)
-- Fix a problem in sm501 which led to AmigaOS slow down
+Rewrite to make it closer to how real device works so that guest OS
+drivers can access I2C devices. Previously this was only a hack to
+allow U-Boot to get past accessing SPD EEPROMs but to support other
+I2C devices and allow guests to access them we need to model real
+device more properly.
 
-v2:
-- split patch 1 (i2c rewrite) into smaller pieces
-- Added another sm501 patch
+Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
+---
+Can't split this up more but since previous version really only worked
+with U-Boot and this version still works with that what else could break?
+This version however also works with AROS, Linux and AmigaOS. So it's
+an improvement and if something else breaks due to this then that's a
+bug that should be fixed separately instead of this patch being dropped.
 
-BALATON Zoltan (8):
-  ppc4xx_i2c: Clean up and improve error logging
-  ppc4xx_i2c: Move register state to private struct and remove    
-    unimplemented sdata and intr registers
-  ppc4xx_i2c: Implement directcntl register
-  ppc4xx_i2c: Rewrite to model hardware more closely
-  hw/timer: Add basic M41T80 emulation
-  sam460ex: Add RTC device
-  sm501: Do not clear read only bits when writing register
-  sm501: Implement i2c part for reading monitor EDID
+hw/i2c/ppc4xx_i2c.c | 223 +++++++++++++++++++++++++---------------------------
+ 1 file changed, 109 insertions(+), 114 deletions(-)
 
- MAINTAINERS                        |   1 +
- default-configs/ppc-softmmu.mak    |   3 +
- default-configs/ppcemb-softmmu.mak |   2 +
- default-configs/sh4-softmmu.mak    |   1 +
- default-configs/sh4eb-softmmu.mak  |   1 +
- hw/display/sm501.c                 | 142 ++++++++++++++-
- hw/i2c/ppc4xx_i2c.c                | 364 ++++++++++++++++++++-----------------
- hw/ppc/sam460ex.c                  |   1 +
- hw/timer/Makefile.objs             |   1 +
- hw/timer/m41t80.c                  | 117 ++++++++++++
- include/hw/i2c/ppc4xx_i2c.h        |  19 +-
- 11 files changed, 457 insertions(+), 195 deletions(-)
- create mode 100644 hw/timer/m41t80.c
-
+diff --git a/hw/i2c/ppc4xx_i2c.c b/hw/i2c/ppc4xx_i2c.c
+index 5806209..8c381ec 100644
+--- a/hw/i2c/ppc4xx_i2c.c
++++ b/hw/i2c/ppc4xx_i2c.c
+@@ -38,13 +38,26 @@
+ #define IIC_CNTL_READ       (1 << 1)
+ #define IIC_CNTL_CHT        (1 << 2)
+ #define IIC_CNTL_RPST       (1 << 3)
++#define IIC_CNTL_AMD        (1 << 6)
++#define IIC_CNTL_HMT        (1 << 7)
++
++#define IIC_MDCNTL_EINT     (1 << 2)
++#define IIC_MDCNTL_ESM      (1 << 3)
++#define IIC_MDCNTL_FMDB     (1 << 6)
+ 
+ #define IIC_STS_PT          (1 << 0)
++#define IIC_STS_IRQA        (1 << 1)
+ #define IIC_STS_ERR         (1 << 2)
++#define IIC_STS_MDBF        (1 << 4)
+ #define IIC_STS_MDBS        (1 << 5)
+ 
+ #define IIC_EXTSTS_XFRA     (1 << 0)
+ 
++#define IIC_INTRMSK_EIMTC   (1 << 0)
++#define IIC_INTRMSK_EITA    (1 << 1)
++#define IIC_INTRMSK_EIIC    (1 << 2)
++#define IIC_INTRMSK_EIHE    (1 << 3)
++
+ #define IIC_XTCNTLSS_SRST   (1 << 0)
+ 
+ #define IIC_DIRECTCNTL_SDAC (1 << 3)
+@@ -54,7 +67,8 @@
+ 
+ typedef struct {
+     bitbang_i2c_interface *bitbang;
+-    uint8_t mdata;
++    int mdidx;
++    uint8_t mdata[4];
+     uint8_t lmadr;
+     uint8_t hmadr;
+     uint8_t cntl;
+@@ -74,21 +88,13 @@ static void ppc4xx_i2c_reset(DeviceState *s)
+ {
+     PPC4xxI2CRegs *i2c = PPC4xx_I2C(s)->regs;
+ 
+-    /* FIXME: Should also reset bus?
+-     *if (s->address != ADDR_RESET) {
+-     *    i2c_end_transfer(s->bus);
+-     *}
+-     */
+-
+-    i2c->mdata = 0;
+-    i2c->lmadr = 0;
+-    i2c->hmadr = 0;
++    i2c->mdidx = -1;
++    memset(i2c->mdata, 0, ARRAY_SIZE(i2c->mdata));
++    /* [hl][ms]addr are not affected by reset */
+     i2c->cntl = 0;
+     i2c->mdcntl = 0;
+     i2c->sts = 0;
+-    i2c->extsts = 0x8f;
+-    i2c->lsadr = 0;
+-    i2c->hsadr = 0;
++    i2c->extsts = (1 << 6);
+     i2c->clkdiv = 0;
+     i2c->intrmsk = 0;
+     i2c->xfrcnt = 0;
+@@ -96,70 +102,30 @@ static void ppc4xx_i2c_reset(DeviceState *s)
+     i2c->directcntl = 0xf;
+ }
+ 
+-static inline bool ppc4xx_i2c_is_master(PPC4xxI2CState *i2c)
+-{
+-    return true;
+-}
+-
+ static uint64_t ppc4xx_i2c_readb(void *opaque, hwaddr addr, unsigned int size)
+ {
+     PPC4xxI2CState *s = PPC4xx_I2C(opaque);
+     PPC4xxI2CRegs *i2c = s->regs;
+     uint64_t ret;
++    int i;
+ 
+     switch (addr) {
+     case 0:
+-        ret = i2c->mdata;
+-        if (ppc4xx_i2c_is_master(s)) {
++        if (i2c->mdidx < 0) {
+             ret = 0xff;
+-
+-            if (!(i2c->sts & IIC_STS_MDBS)) {
+-                qemu_log_mask(LOG_GUEST_ERROR, "[%s]%s: Trying to read "
+-                              "without starting transfer\n",
+-                              TYPE_PPC4xx_I2C, __func__);
+-            } else {
+-                int pending = (i2c->cntl >> 4) & 3;
+-
+-                /* get the next byte */
+-                int byte = i2c_recv(s->bus);
+-
+-                if (byte < 0) {
+-                    qemu_log_mask(LOG_GUEST_ERROR, "[%s]%s: read failed "
+-                                  "for device 0x%02x\n", TYPE_PPC4xx_I2C,
+-                                  __func__, i2c->lmadr);
+-                    ret = 0xff;
+-                } else {
+-                    ret = byte;
+-                    /* Raise interrupt if enabled */
+-                    /*ppc4xx_i2c_raise_interrupt(i2c)*/;
+-                }
+-
+-                if (!pending) {
+-                    i2c->sts &= ~IIC_STS_MDBS;
+-                    /*i2c_end_transfer(s->bus);*/
+-                /*} else if (i2c->cntl & (IIC_CNTL_RPST | IIC_CNTL_CHT)) {*/
+-                } else if (pending) {
+-                    /* current smbus implementation doesn't like
+-                       multibyte xfer repeated start */
+-                    i2c_end_transfer(s->bus);
+-                    if (i2c_start_transfer(s->bus, i2c->lmadr >> 1, 1)) {
+-                        /* if non zero is returned, the adress is not valid */
+-                        i2c->sts &= ~IIC_STS_PT;
+-                        i2c->sts |= IIC_STS_ERR;
+-                        i2c->extsts |= IIC_EXTSTS_XFRA;
+-                    } else {
+-                        /*i2c->sts |= IIC_STS_PT;*/
+-                        i2c->sts |= IIC_STS_MDBS;
+-                        i2c->sts &= ~IIC_STS_ERR;
+-                        i2c->extsts = 0;
+-                    }
+-                }
+-                pending--;
+-                i2c->cntl = (i2c->cntl & 0xcf) | (pending << 4);
+-            }
+-        } else {
+-            qemu_log_mask(LOG_UNIMP, "[%s]%s: slave mode not implemented\n",
+-                          TYPE_PPC4xx_I2C, __func__);
++            break;
++        }
++        ret = i2c->mdata[0];
++        if (i2c->mdidx == 3) {
++            i2c->sts &= ~IIC_STS_MDBF;
++        } else if (i2c->mdidx == 0) {
++            i2c->sts &= ~IIC_STS_MDBS;
++        }
++        for (i = 0; i < i2c->mdidx; i++) {
++            i2c->mdata[i] = i2c->mdata[i + 1];
++        }
++        if (i2c->mdidx >= 0) {
++            i2c->mdidx--;
+         }
+         break;
+     case 4:
+@@ -179,6 +145,7 @@ static uint64_t ppc4xx_i2c_readb(void *opaque, hwaddr addr, unsigned int size)
+         break;
+     case 9:
+         ret = i2c->extsts;
++        ret |= !!i2c_bus_busy(s->bus) << 4;
+         break;
+     case 10:
+         ret = i2c->lsadr;
+@@ -223,70 +190,98 @@ static void ppc4xx_i2c_writeb(void *opaque, hwaddr addr, uint64_t value,
+ 
+     switch (addr) {
+     case 0:
+-        i2c->mdata = value;
+-        if (!i2c_bus_busy(s->bus)) {
+-            /* assume we start a write transfer */
+-            if (i2c_start_transfer(s->bus, i2c->lmadr >> 1, 0)) {
+-                /* if non zero is returned, the adress is not valid */
+-                i2c->sts &= ~IIC_STS_PT;
+-                i2c->sts |= IIC_STS_ERR;
+-                i2c->extsts |= IIC_EXTSTS_XFRA;
+-            } else {
+-                i2c->sts |= IIC_STS_PT;
+-                i2c->sts &= ~IIC_STS_ERR;
+-                i2c->extsts = 0;
+-            }
++        if (i2c->mdidx >= 3) {
++            break;
+         }
+-        if (i2c_bus_busy(s->bus)) {
+-            if (i2c_send(s->bus, i2c->mdata)) {
+-                /* if the target return non zero then end the transfer */
+-                i2c->sts &= ~IIC_STS_PT;
+-                i2c->sts |= IIC_STS_ERR;
+-                i2c->extsts |= IIC_EXTSTS_XFRA;
+-                i2c_end_transfer(s->bus);
+-            }
++        i2c->mdata[++i2c->mdidx] = value;
++        if (i2c->mdidx == 3) {
++            i2c->sts |= IIC_STS_MDBF;
++        } else if (i2c->mdidx == 0) {
++            i2c->sts |= IIC_STS_MDBS;
+         }
+         break;
+     case 4:
+         i2c->lmadr = value;
+-        if (i2c_bus_busy(s->bus)) {
+-            i2c_end_transfer(s->bus);
+-        }
+         break;
+     case 5:
+         i2c->hmadr = value;
+         break;
+     case 6:
+-        i2c->cntl = value;
+-        if (i2c->cntl & IIC_CNTL_PT) {
+-            if (i2c->cntl & IIC_CNTL_READ) {
+-                if (i2c_bus_busy(s->bus)) {
+-                    /* end previous transfer */
+-                    i2c->sts &= ~IIC_STS_PT;
+-                    i2c_end_transfer(s->bus);
++        i2c->cntl = value & 0xfe;
++        if (value & IIC_CNTL_AMD) {
++            qemu_log_mask(LOG_UNIMP, "%s: only 7 bit addresses supported\n",
++                          __func__);
++        }
++        if (value & IIC_CNTL_HMT && i2c_bus_busy(s->bus)) {
++            i2c_end_transfer(s->bus);
++            if (i2c->mdcntl & IIC_MDCNTL_EINT &&
++                i2c->intrmsk & IIC_INTRMSK_EIHE) {
++                    i2c->sts |= IIC_STS_IRQA;
++                    qemu_irq_raise(s->irq);
++            }
++        } else if (value & IIC_CNTL_PT) {
++            int recv = (value & IIC_CNTL_READ) >> 1;
++            int tct = value >> 4 & 3;
++            int i;
++
++            if (recv && (i2c->lmadr >> 1) >= 0x50 && (i2c->lmadr >> 1) < 0x58) {
++                /* smbus emulation does not like multi byte reads w/o restart */
++                value |= IIC_CNTL_RPST;
++            }
++
++            for (i = 0; i <= tct; i++) {
++                if (!i2c_bus_busy(s->bus)) {
++                    i2c->extsts = (1 << 6);
++                    if (i2c_start_transfer(s->bus, i2c->lmadr >> 1, recv)) {
++                        i2c->sts |= IIC_STS_ERR;
++                        i2c->extsts |= IIC_EXTSTS_XFRA;
++                        break;
++                    } else {
++                        i2c->sts &= ~IIC_STS_ERR;
++                    }
++                }
++                if (!(i2c->sts & IIC_STS_ERR) &&
++                    i2c_send_recv(s->bus, &i2c->mdata[i], !recv)) {
++                        i2c->sts |= IIC_STS_ERR;
++                        i2c->extsts |= IIC_EXTSTS_XFRA;
++                        break;
+                 }
+-                if (i2c_start_transfer(s->bus, i2c->lmadr >> 1, 1)) {
+-                    /* if non zero is returned, the adress is not valid */
+-                    i2c->sts &= ~IIC_STS_PT;
+-                    i2c->sts |= IIC_STS_ERR;
+-                    i2c->extsts |= IIC_EXTSTS_XFRA;
+-                } else {
+-                    /*i2c->sts |= IIC_STS_PT;*/
+-                    i2c->sts |= IIC_STS_MDBS;
+-                    i2c->sts &= ~IIC_STS_ERR;
+-                    i2c->extsts = 0;
++                if (value & IIC_CNTL_RPST || !(value & IIC_CNTL_CHT)) {
++                    i2c_end_transfer(s->bus);
+                 }
+-            } else {
+-                /* we actually already did the write transfer... */
+-                i2c->sts &= ~IIC_STS_PT;
++            }
++            i2c->xfrcnt = i;
++            i2c->mdidx = i - 1;
++            if (recv && i2c->mdidx >= 0) {
++                i2c->sts |= IIC_STS_MDBS;
++            }
++            if (recv && i2c->mdidx == 3) {
++                i2c->sts |= IIC_STS_MDBF;
++            }
++            if (i && i2c->mdcntl & IIC_MDCNTL_EINT &&
++                i2c->intrmsk & IIC_INTRMSK_EIMTC) {
++                i2c->sts |= IIC_STS_IRQA;
++                qemu_irq_raise(s->irq);
+             }
+         }
+         break;
+     case 7:
+-        i2c->mdcntl = value & 0xdf;
++        i2c->mdcntl = value & 0x3d;
++        if (value & IIC_MDCNTL_ESM) {
++            qemu_log_mask(LOG_UNIMP, "%s: slave mode not implemented\n",
++                          __func__);
++        }
++        if (value & IIC_MDCNTL_FMDB) {
++            i2c->mdidx = -1;
++            memset(i2c->mdata, 0, ARRAY_SIZE(i2c->mdata));
++            i2c->sts &= ~(IIC_STS_MDBF | IIC_STS_MDBS);
++        }
+         break;
+     case 8:
+         i2c->sts &= ~(value & 0xa);
++        if (value & IIC_STS_IRQA && i2c->mdcntl & IIC_MDCNTL_EINT) {
++            qemu_irq_lower(s->irq);
++        }
+         break;
+     case 9:
+         i2c->extsts &= ~(value & 0x8f);
+@@ -307,12 +302,12 @@ static void ppc4xx_i2c_writeb(void *opaque, hwaddr addr, uint64_t value,
+         i2c->xfrcnt = value & 0x77;
+         break;
+     case 15:
++        i2c->xtcntlss &= ~(value & 0xf0);
+         if (value & IIC_XTCNTLSS_SRST) {
+             /* Is it actually a full reset? U-Boot sets some regs before */
+             ppc4xx_i2c_reset(DEVICE(s));
+             break;
+         }
+-        i2c->xtcntlss = value;
+         break;
+     case 16:
+         i2c->directcntl = value & (IIC_DIRECTCNTL_SDAC & IIC_DIRECTCNTL_SCLC);
 -- 
 2.7.6
