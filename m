@@ -1,51 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48387)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48591)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jl4312@columbia.edu>) id 1fQXfG-0006Cz-3v
-	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 08:35:47 -0400
+	(envelope-from <thuth@redhat.com>) id 1fQXfb-0006Sz-MS
+	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 08:36:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jl4312@columbia.edu>) id 1fQXfC-0002Ef-VU
-	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 08:35:46 -0400
-Received: from outprodmail01.cc.columbia.edu ([128.59.72.39]:56490)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jl4312@columbia.edu>) id 1fQXfC-0002EA-Rr
-	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 08:35:42 -0400
-Received: from hazelnut (hazelnut.cc.columbia.edu [128.59.213.250])
-	by outprodmail01.cc.columbia.edu (8.14.4/8.14.4) with ESMTP id
-	w56CZ2MS030633
-	for <qemu-devel@nongnu.org>; Wed, 6 Jun 2018 08:35:41 -0400
-Received: from hazelnut (localhost.localdomain [127.0.0.1])
-	by hazelnut (Postfix) with ESMTP id E8BB380
-	for <qemu-devel@nongnu.org>; Wed,  6 Jun 2018 08:35:41 -0400 (EDT)
-Received: from sendprodmail03.cc.columbia.edu (sendprodmail03.cc.columbia.edu
-	[128.59.72.15]) by hazelnut (Postfix) with ESMTP id B84E980
-	for <qemu-devel@nongnu.org>; Wed,  6 Jun 2018 08:35:41 -0400 (EDT)
-Received: from mail-wm0-f70.google.com (mail-wm0-f70.google.com [74.125.82.70])
-	by sendprodmail03.cc.columbia.edu (8.14.4/8.14.4) with ESMTP id
-	w56CZflU049365
-	(version=TLSv1/SSLv3 cipher=AES128-GCM-SHA256 bits=128 verify=NOT)
-	for <qemu-devel@nongnu.org>; Wed, 6 Jun 2018 08:35:41 -0400
-Received: by mail-wm0-f70.google.com with SMTP id l4-v6so2954272wmh.0
-	for <qemu-devel@nongnu.org>; Wed, 06 Jun 2018 05:35:41 -0700 (PDT)
-Received: from mail-wm0-f54.google.com (mail-wm0-f54.google.com.
-	[74.125.82.54]) by smtp.gmail.com with ESMTPSA id
-	c40-v6sm14484699edb.68.2018.06.06.05.35.38
-	for <qemu-devel@nongnu.org>
-	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Wed, 06 Jun 2018 05:35:38 -0700 (PDT)
-Received: by mail-wm0-f54.google.com with SMTP id j15-v6so11760287wme.0
-	for <qemu-devel@nongnu.org>; Wed, 06 Jun 2018 05:35:38 -0700 (PDT)
-MIME-Version: 1.0
-In-Reply-To: <AADFC41AFE54684AB9EE6CBC0274A5D1911F8B6B@SHSMSX101.ccr.corp.intel.com>
-References: <CAHyh4xhckUtH=gfa5K+KVehz27hVznUg7UX-Ca-AcjCvtiAhHg@mail.gmail.com>
-	<AADFC41AFE54684AB9EE6CBC0274A5D1911F3CAE@SHSMSX101.ccr.corp.intel.com>
-	<CAHyh4xhbVROe3xUXwojOMBHKdTxNms7ZqRkhpm+1N0XZm3xBuA@mail.gmail.com>
-	<AADFC41AFE54684AB9EE6CBC0274A5D1911F8B6B@SHSMSX101.ccr.corp.intel.com>
-From: Jintack Lim <jintack@cs.columbia.edu>
-Date: Wed, 6 Jun 2018 08:35:37 -0400
-Message-ID: <CAHyh4xjO8uJ3bwRN2Zmk6vL5-mT7xEY=LBLLfaFnHB6qF_C-MQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] vIOMMU Posted-interrupt implementation - atomic
- operation?
+	(envelope-from <thuth@redhat.com>) id 1fQXfa-0002WS-7L
+	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 08:36:07 -0400
+From: Thomas Huth <thuth@redhat.com>
+Date: Wed,  6 Jun 2018 14:35:51 +0200
+Message-Id: <1528288551-31641-1-git-send-email-thuth@redhat.com>
+Subject: [Qemu-devel] [PATCH] qemu-img: Remove deprecated -s
+ snapshot_id_or_name option
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -54,67 +18,148 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Tian, Kevin" <kevin.tian@intel.com>
-Cc: QEMU Devel Mailing List <qemu-devel@nongnu.org>, Peter Xu <peterx@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org
 
-On Wed, Jun 6, 2018 at 2:56 AM, Tian, Kevin <kevin.tian@intel.com> wrote:
->> From: Jintack Lim [mailto:jintack@cs.columbia.edu]
->> Sent: Tuesday, June 5, 2018 8:57 PM
->>
->> Thanks, Kevin.
->>
->> On Tue, Jun 5, 2018 at 2:54 AM, Tian, Kevin <kevin.tian@intel.com> wrote:
->> >> From: Jintack Lim
->> >> Sent: Friday, June 1, 2018 11:47 AM
->> >>
->> >> Hi,
->> >>
->> >> I'm implementing Posted-interrupt functionality in vIOMMU. According
->> >> to Vt-d spec 5.2.3, IOMMU performs a coherent atomic read-modify-
->> write
->> >> operation of the posted-interrupt descriptor. I wonder how can we
->> >> achieve this considering the guest can modify the same
->> >> posted-interrupt descriptor anytime. Is there any existing mechanism
->> >> that I can use in QEMU?
->> >>
->> >
->> > I don't think it's possible to emulate such operation in software, unless
->> > you want to change guest to be cooperative. Actually it is not necessary.
->> > VT-d does so due to some hardware implementation consideration.
->>
->> Would you mind expanding this? I'm curious what it would be. Is it
->> because IOMMU can't do something like cmpxchg instructions?
->
-> I don't have further information. Above is what I was told by hardware
-> team.
+It has been marked as deprecated since QEMU v2.0 already, so it
+is time now to finally remove it.
 
-Ah, I see. Thanks!
+Signed-off-by: Thomas Huth <thuth@redhat.com>
+---
+ qemu-doc.texi          | 7 -------
+ qemu-img-cmds.hx       | 4 ++--
+ qemu-img.c             | 7 +------
+ qemu-img.texi          | 7 ++-----
+ tests/qemu-iotests/029 | 2 +-
+ tests/qemu-iotests/080 | 4 ++--
+ 6 files changed, 8 insertions(+), 23 deletions(-)
 
->
->>
->> > Since you are emulating on CPU, could just follow how CPU posted
->> > interrupt is conducted. If you look at SDM (29.6 Posted-Interrupt
->> > Processing):
->> >
->> >         "There is a requirement, however, that such modifications be
->> > done using locked read-modify-write instructions."
->> >
->> > [instructions] means you can do update multiple times when posting an
->> > interrupt, as long as each update is atomic.
->>
->> Ah, that's a good point. So the unit of atomic operation doesn't need
->> to be the whole PI descriptor, but it can be any subset (e.g. just one
->> bit) of the descriptor? By looking at Linux kernel code, that seems to
->> be the case.
->>
->
-> Exactly. :-)
-
-Cool. Thanks for the confirmation.
-
-Thanks,
-Jintack
-
->
-> Thanks
-> Kevin
+diff --git a/qemu-doc.texi b/qemu-doc.texi
+index 2effe66..9aff6b4 100644
+--- a/qemu-doc.texi
++++ b/qemu-doc.texi
+@@ -2927,13 +2927,6 @@ Option @option{-virtioconsole} has been replaced by
+ The @code{-clock} option is ignored since QEMU version 1.7.0. There is no
+ replacement since it is not needed anymore.
+ 
+-@section qemu-img command line arguments
+-
+-@subsection convert -s (since 2.0.0)
+-
+-The ``convert -s snapshot_id_or_name'' argument is obsoleted
+-by the ``convert -l snapshot_param'' argument instead.
+-
+ @section QEMU Machine Protocol (QMP) commands
+ 
+ @subsection block-dirty-bitmap-add "autoload" parameter (since 2.12.0)
+diff --git a/qemu-img-cmds.hx b/qemu-img-cmds.hx
+index 3d2f7b2..69758fb 100644
+--- a/qemu-img-cmds.hx
++++ b/qemu-img-cmds.hx
+@@ -44,9 +44,9 @@ STEXI
+ ETEXI
+ 
+ DEF("convert", img_convert,
+-    "convert [--object objectdef] [--image-opts] [--target-image-opts] [-U] [-c] [-p] [-q] [-n] [-f fmt] [-t cache] [-T src_cache] [-O output_fmt] [-B backing_file] [-o options] [-s snapshot_id_or_name] [-l snapshot_param] [-S sparse_size] [-m num_coroutines] [-W] filename [filename2 [...]] output_filename")
++    "convert [--object objectdef] [--image-opts] [--target-image-opts] [-U] [-c] [-p] [-q] [-n] [-f fmt] [-t cache] [-T src_cache] [-O output_fmt] [-B backing_file] [-o options] [-l snapshot_param] [-S sparse_size] [-m num_coroutines] [-W] filename [filename2 [...]] output_filename")
+ STEXI
+-@item convert [--object @var{objectdef}] [--image-opts] [--target-image-opts] [-U] [-c] [-p] [-q] [-n] [-f @var{fmt}] [-t @var{cache}] [-T @var{src_cache}] [-O @var{output_fmt}] [-B @var{backing_file}] [-o @var{options}] [-s @var{snapshot_id_or_name}] [-l @var{snapshot_param}] [-S @var{sparse_size}] [-m @var{num_coroutines}] [-W] @var{filename} [@var{filename2} [...]] @var{output_filename}
++@item convert [--object @var{objectdef}] [--image-opts] [--target-image-opts] [-U] [-c] [-p] [-q] [-n] [-f @var{fmt}] [-t @var{cache}] [-T @var{src_cache}] [-O @var{output_fmt}] [-B @var{backing_file}] [-o @var{options}] [-l @var{snapshot_param}] [-S @var{sparse_size}] [-m @var{num_coroutines}] [-W] @var{filename} [@var{filename2} [...]] @var{output_filename}
+ ETEXI
+ 
+ DEF("create", img_create,
+diff --git a/qemu-img.c b/qemu-img.c
+index 75f1610..24656e1 100644
+--- a/qemu-img.c
++++ b/qemu-img.c
+@@ -148,8 +148,6 @@ static void QEMU_NORETURN help(void)
+            "  'snapshot_param' is param used for internal snapshot, format\n"
+            "    is 'snapshot.id=[ID],snapshot.name=[NAME]', or\n"
+            "    '[ID_OR_NAME]'\n"
+-           "  'snapshot_id_or_name' is deprecated, use 'snapshot_param'\n"
+-           "    instead\n"
+            "  '-c' indicates that target image must be compressed (qcow format only)\n"
+            "  '-u' allows unsafe backing chains. For rebasing, it is assumed that old and\n"
+            "       new backing file match exactly. The image doesn't need a working\n"
+@@ -1994,7 +1992,7 @@ static int img_convert(int argc, char **argv)
+             {"target-image-opts", no_argument, 0, OPTION_TARGET_IMAGE_OPTS},
+             {0, 0, 0, 0}
+         };
+-        c = getopt_long(argc, argv, ":hf:O:B:co:s:l:S:pt:T:qnm:WU",
++        c = getopt_long(argc, argv, ":hf:O:B:co:l:S:pt:T:qnm:WU",
+                         long_options, NULL);
+         if (c == -1) {
+             break;
+@@ -2035,9 +2033,6 @@ static int img_convert(int argc, char **argv)
+                 g_free(old_options);
+             }
+             break;
+-        case 's':
+-            snapshot_name = optarg;
+-            break;
+         case 'l':
+             if (strstart(optarg, SNAPSHOT_OPT_BASE, NULL)) {
+                 sn_opts = qemu_opts_parse_noisily(&internal_snapshot_opts,
+diff --git a/qemu-img.texi b/qemu-img.texi
+index 2be8206..aeb1b9e 100644
+--- a/qemu-img.texi
++++ b/qemu-img.texi
+@@ -61,9 +61,6 @@ by the used format or see the format descriptions below for details.
+ is param used for internal snapshot, format is
+ 'snapshot.id=[ID],snapshot.name=[NAME]' or '[ID_OR_NAME]'
+ 
+-@item snapshot_id_or_name
+-is deprecated, use snapshot_param instead
+-
+ @end table
+ 
+ @table @option
+@@ -322,9 +319,9 @@ Error on reading data
+ 
+ @end table
+ 
+-@item convert [--object @var{objectdef}] [--image-opts] [--target-image-opts] [-U] [-c] [-p] [-q] [-n] [-f @var{fmt}] [-t @var{cache}] [-T @var{src_cache}] [-O @var{output_fmt}] [-B @var{backing_file}] [-o @var{options}] [-s @var{snapshot_id_or_name}] [-l @var{snapshot_param}] [-S @var{sparse_size}] [-m @var{num_coroutines}] [-W] @var{filename} [@var{filename2} [...]] @var{output_filename}
++@item convert [--object @var{objectdef}] [--image-opts] [--target-image-opts] [-U] [-c] [-p] [-q] [-n] [-f @var{fmt}] [-t @var{cache}] [-T @var{src_cache}] [-O @var{output_fmt}] [-B @var{backing_file}] [-o @var{options}] [-l @var{snapshot_param}] [-S @var{sparse_size}] [-m @var{num_coroutines}] [-W] @var{filename} [@var{filename2} [...]] @var{output_filename}
+ 
+-Convert the disk image @var{filename} or a snapshot @var{snapshot_param}(@var{snapshot_id_or_name} is deprecated)
++Convert the disk image @var{filename} or a snapshot @var{snapshot_param}
+ to disk image @var{output_filename} using format @var{output_fmt}. It can be optionally compressed (@code{-c}
+ option) or use any format specific options like encryption (@code{-o} option).
+ 
+diff --git a/tests/qemu-iotests/029 b/tests/qemu-iotests/029
+index 30bab24..5cff687 100755
+--- a/tests/qemu-iotests/029
++++ b/tests/qemu-iotests/029
+@@ -92,7 +92,7 @@ _make_test_img 64M
+ { $QEMU_IMG snapshot -c foo $TEST_IMG; } 2>&1 | _filter_qemu_io | _filter_testdir
+ poke_file "$TEST_IMG" "$offset_size" "\x00\x00\x00\x00\x00\x00\x02\x00"
+ poke_file "$TEST_IMG" "$offset_l1_size" "\x00\x00\x00\x01"
+-{ $QEMU_IMG convert -s foo $TEST_IMG $TEST_IMG.snap; } 2>&1 | _filter_qemu_io | _filter_testdir
++{ $QEMU_IMG convert -l foo $TEST_IMG $TEST_IMG.snap; } 2>&1 | _filter_qemu_io | _filter_testdir
+ 
+ 
+ # success, all done
+diff --git a/tests/qemu-iotests/080 b/tests/qemu-iotests/080
+index 4dbe68e..f0eb42f 100755
+--- a/tests/qemu-iotests/080
++++ b/tests/qemu-iotests/080
+@@ -176,7 +176,7 @@ _make_test_img 64M
+ { $QEMU_IO -c "write 0 512" $TEST_IMG; } 2>&1 | _filter_qemu_io | _filter_testdir
+ { $QEMU_IMG snapshot -c test $TEST_IMG; } 2>&1 | _filter_testdir
+ poke_file "$TEST_IMG" "$offset_snap1_l1_offset" "\x00\x00\x00\x00\x00\x40\x02\x00"
+-{ $QEMU_IMG convert -s test $TEST_IMG $TEST_IMG.snap; } 2>&1 | _filter_testdir
++{ $QEMU_IMG convert -l test $TEST_IMG $TEST_IMG.snap; } 2>&1 | _filter_testdir
+ { $QEMU_IMG amend -o compat=0.10 $TEST_IMG; } 2>&1 | _filter_testdir
+ { $QEMU_IO -c "open -o overlap-check.inactive-l2=on $TEST_IMG" \
+            -c 'write 0 4k'; } 2>&1 | _filter_qemu_io | _filter_testdir
+@@ -190,7 +190,7 @@ _make_test_img 64M
+ { $QEMU_IO -c "write 0 512" $TEST_IMG; } 2>&1 | _filter_qemu_io | _filter_testdir
+ { $QEMU_IMG snapshot -c test $TEST_IMG; } 2>&1 | _filter_testdir
+ poke_file "$TEST_IMG" "$offset_snap1_l1_size" "\x10\x00\x00\x00"
+-{ $QEMU_IMG convert -s test $TEST_IMG $TEST_IMG.snap; } 2>&1 | _filter_testdir
++{ $QEMU_IMG convert -l test $TEST_IMG $TEST_IMG.snap; } 2>&1 | _filter_testdir
+ { $QEMU_IMG amend -o compat=0.10 $TEST_IMG; } 2>&1 | _filter_testdir
+ { $QEMU_IO -c "open -o overlap-check.inactive-l2=on $TEST_IMG" \
+            -c 'write 0 4k'; } 2>&1 | _filter_qemu_io | _filter_testdir
+-- 
+1.8.3.1
