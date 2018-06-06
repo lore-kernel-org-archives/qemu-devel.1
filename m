@@ -1,32 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52010)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52069)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1fQTuG-0004RL-3S
-	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 04:35:01 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1fQTun-0004kE-0n
+	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 04:35:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1fQTuB-0005Qm-5G
-	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 04:35:00 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:59128 helo=mx1.redhat.com)
+	(envelope-from <dgilbert@redhat.com>) id 1fQTui-0005ks-3P
+	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 04:35:33 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:49706 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1fQTuA-0005QD-T8
-	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 04:34:55 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.5])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 211738D6C6
-	for <qemu-devel@nongnu.org>; Wed,  6 Jun 2018 08:34:53 +0000 (UTC)
-Date: Wed, 6 Jun 2018 10:34:50 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20180606103450.5d534b78@redhat.com>
-In-Reply-To: <20180605183001.GO7451@localhost.localdomain>
-References: <1528207243-268226-1-git-send-email-imammedo@redhat.com>
-	<1528207243-268226-3-git-send-email-imammedo@redhat.com>
-	<20180605183001.GO7451@localhost.localdomain>
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1fQTuh-0005kV-SP
+	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 04:35:28 -0400
+Date: Wed, 6 Jun 2018 09:35:24 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20180606083523.GB2660@work-vm>
+References: <20180605162545.80778-1-dgilbert@redhat.com>
+	<20180605162545.80778-3-dgilbert@redhat.com>
+	<20180606033600.GA2606@xz-mi> <20180606033741.GB2606@xz-mi>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v3 2/2] vl: fix use of --daemonize with
- --preconfig
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180606033741.GB2606@xz-mi>
+Subject: Re: [Qemu-devel] [PATCH 2/2] migration: Poison ramblock loops in
+ migration
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,114 +29,96 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: qemu-devel@nongnu.org, berrange@redhat.com, mreitz@redhat.com, pbonzini@redhat.com, ldoktor@redhat.com
+To: Peter Xu <peterx@redhat.com>
+Cc: qemu-devel@nongnu.org, clg@kaod.org
 
-On Tue, 5 Jun 2018 15:30:01 -0300
-Eduardo Habkost <ehabkost@redhat.com> wrote:
+* Peter Xu (peterx@redhat.com) wrote:
+> On Wed, Jun 06, 2018 at 11:36:00AM +0800, Peter Xu wrote:
+> > On Tue, Jun 05, 2018 at 05:25:45PM +0100, Dr. David Alan Gilbert (git) wrote:
+> > > From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+> > > 
+> > > The migration code should be using the
+> > >   RAMBLOCK_FOREACH_MIGRATABLE and qemu_ram_foreach_block_migratable
+> > > not the all-block versions;  poison them so that we can't accidentally
+> > > use them.
+> > > 
+> > > Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> > > ---
+> > >  include/exec/ramlist.h | 4 +++-
+> > >  migration/migration.h  | 3 +++
+> > >  migration/ram.c        | 4 +++-
+> > >  3 files changed, 9 insertions(+), 2 deletions(-)
+> > > 
+> > > diff --git a/include/exec/ramlist.h b/include/exec/ramlist.h
+> > > index 2e2ac6cb99..bc4faa1b00 100644
+> > > --- a/include/exec/ramlist.h
+> > > +++ b/include/exec/ramlist.h
+> > > @@ -56,8 +56,10 @@ typedef struct RAMList {
+> > >  extern RAMList ram_list;
+> > >  
+> > >  /* Should be holding either ram_list.mutex, or the RCU lock. */
+> > > -#define  RAMBLOCK_FOREACH(block)  \
+> > > +#define  INTERNAL_RAMBLOCK_FOREACH(block)  \
+> > >      QLIST_FOREACH_RCU(block, &ram_list.blocks, next)
+> > > +/* Never use the INTERNAL_ version except for defining other macros */
+> > > +#define RAMBLOCK_FOREACH(block) INTERNAL_RAMBLOCK_FOREACH(block)
+> > >  
+> > >  void qemu_mutex_lock_ramlist(void);
+> > >  void qemu_mutex_unlock_ramlist(void);
+> > > diff --git a/migration/migration.h b/migration/migration.h
+> > > index 5af57d616c..31d3ed12dc 100644
+> > > --- a/migration/migration.h
+> > > +++ b/migration/migration.h
+> > > @@ -284,4 +284,7 @@ void migrate_send_rp_resume_ack(MigrationIncomingState *mis, uint32_t value);
+> > >  void dirty_bitmap_mig_before_vm_start(void);
+> > >  void init_dirty_bitmap_incoming_migration(void);
+> > >  
+> > > +#define qemu_ram_foreach_block \
+> > > +  #warning "Use qemu_ram_foreach_block_migratable in migration code"
+> > > +
+> > >  #endif
+> > > diff --git a/migration/ram.c b/migration/ram.c
+> > > index a7807cea84..e0d19305ee 100644
+> > > --- a/migration/ram.c
+> > > +++ b/migration/ram.c
+> > > @@ -159,9 +159,11 @@ out:
+> > >  
+> > >  /* Should be holding either ram_list.mutex, or the RCU lock. */
+> > >  #define RAMBLOCK_FOREACH_MIGRATABLE(block)             \
+> > > -    RAMBLOCK_FOREACH(block)                            \
+> > > +    INTERNAL_RAMBLOCK_FOREACH(block)                   \
+> > >          if (!qemu_ram_is_migratable(block)) {} else
+> > >  
+> > > +#undef RAMBLOCK_FOREACH
+> > 
+> > This will only cover the ram.c file.  How about we move
+> > RAMBLOCK_FOREACH_MIGRATABLE() directly into migration.h then undef
+> > RAMBLOCK_FOREACH there?  Then since migration.h should be used in all
+> > the migration internal source files so the poisoned bit can be used in
+> > a broader aspect?
+> 
+> (I forgot to reply-all.... forwarding to the list)
 
-> On Tue, Jun 05, 2018 at 04:00:43PM +0200, Igor Mammedov wrote:
-> > When using --daemonize, the initial lead process will fork a child and
-> > then wait to be notified that setup is complete via a pipe, before it
-> > exits.  When using --preconfig there is an extra call to main_loop()
-> > before the notification is done from os_setup_post(). Thus the parent
-> > process won't exit until the mgmt application connects to the monitor
-> > and tells QEMU to leave the RUN_STATE_PRECONFIG. The mgmt application
-> > won't connect to the monitor until daemonizing has completed though.
-> >=20
-> > This is a chicken and egg problem, leading to deadlock at startup.
-> >=20
-> > The only viable way to fix this is to call os_setup_post() before
-> > the early main_loop_wait() call when in RUN_STATE_PRECONFIG. This has
-> > the downside that any errors from this point onwards won't be handled
-> > well by the mgmt application, because it will think QEMU has started
-> > successfully, so not be expecting an abrupt exit. The only way to
-> > deal with that is to move as much user input validation as possible
-> > to before the main_loop() call. This is left as an exercise for
-> > future interested developers.
-> >=20
-> > Based on:
-> >   From: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
-> >   Subject: [PATCH v2 2/2] vl: fix use of --daemonize with --preconfig
-> >   Message-Id: <20180604120345.12955-3-berrange@redhat.com>
-> >=20
-> > Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-> > ---
-> > v3:
-> >   - rewrite to apply on top of 1/2
-> > ---
-> >  os-posix.c | 6 ++++++
-> >  vl.c       | 2 +-
-> >  2 files changed, 7 insertions(+), 1 deletion(-)
-> >=20
-> > diff --git a/os-posix.c b/os-posix.c
-> > index 9ce6f74..ee06a8d 100644
-> > --- a/os-posix.c
-> > +++ b/os-posix.c
-> > @@ -309,8 +309,14 @@ void os_daemonize(void)
-> > =20
-> >  void os_setup_post(void)
-> >  {
-> > +    static bool os_setup_post_done =3D false;
-> >      int fd =3D 0;
-> > =20
-> > +    if (os_setup_post_done) {
-> > +        return;
-> > +    }
-> > +    os_setup_post_done =3D true;
-> > + =20
->=20
-> This part is nice because it allows the os_setup_post() call in
-> the second main loop to be unconditional, but:
->=20
-> >      if (daemonize) {
-> >          if (chdir("/")) {
-> >              error_report("not able to chdir to /: %s", strerror(errno)=
-);
-> > diff --git a/vl.c b/vl.c
-> > index fa44138..d6fa67f 100644
-> > --- a/vl.c
-> > +++ b/vl.c
-> > @@ -1960,6 +1960,7 @@ static void main_loop(void)
-> >  #ifdef CONFIG_PROFILER
-> >          ti =3D profile_getclock();
-> >  #endif
-> > +        os_setup_post();
-> >          main_loop_wait(false); =20
->=20
-> Ensuring the correctness of this os_setup_post() call depends on
-> reading the whole body of main_loop_should_exit(), which is a
-> complex and large function.  I think this is too fragile for my
-> taste.
-Fragility was the reason why I moved it into main_loop(),
-as os_setup_post() was already overlooked once, since
-one would have to make very non-obvious connection with
-libvirt requirement to call it before main_loop_wait()
-This way call to os_setup_post() will not be forgotten,
-and would get an attention whenever main_loop() is concerned.
+Yes, we could; although it's only the ram.c that's compiled
+target specific and can include the header that allows use of those macros anyway.
 
+Dave
 
-> I prefer Daniel's approach where we have two
-> os_setup_post()/main_loop() call sites, and the first one is
-> conditional on --preconfig.
-Considering we are unlikely to add one more invocation of main_loop().
-I'll post here Daniel's version that applies on top of 1/2 with
-a comment so we won't forget about libvirt's requirement
-(not the best way to write something robust but better then nothing).
-So pick whatever variant would seem the best.
-
-
-> >  #ifdef CONFIG_PROFILER
-> >          dev_time +=3D profile_getclock() - ti;
-> > @@ -4707,7 +4708,6 @@ int main(int argc, char **argv, char **envp)
-> >      }
-> > =20
-> >      accel_setup_post(current_machine);
-> > -    os_setup_post();
-> > =20
-> >      main_loop();
-> > =20
-> > --=20
-> > 2.7.4
-> >  =20
->=20
+> > 
+> > Thanks,
+> > 
+> > > +
+> > >  static void ramblock_recv_map_init(void)
+> > >  {
+> > >      RAMBlock *rb;
+> > > -- 
+> > > 2.17.0
+> > > 
+> > 
+> > -- 
+> > Peter Xu
+> 
+> -- 
+> Peter Xu
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
