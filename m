@@ -1,16 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57186)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57763)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <msuchanek@suse.de>) id 1fQWTp-0007JH-NE
-	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 07:19:56 -0400
+	(envelope-from <pkrempa@redhat.com>) id 1fQWWp-0008Vi-EL
+	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 07:23:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <msuchanek@suse.de>) id 1fQWTn-0004kv-VJ
-	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 07:19:53 -0400
-Date: Wed, 6 Jun 2018 13:19:29 +0200
-From: Michal =?UTF-8?B?U3VjaMOhbmVr?= <msuchanek@suse.de>
-Message-ID: <20180606131929.44d0fd6b@kitsune.suse.cz>
-In-Reply-To: <bc97cdc3-85ba-e053-0816-b6bc431064fb@redhat.com>
-References: <20180518180440-mutt-send-email-mst@kernel.org>
-	<20180524113251.GB4660@redhat.com>
+	(envelope-from <pkrempa@redhat.com>) id 1fQWWo-0006Mm-IM
+	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 07:22:59 -0400
+Date: Wed, 6 Jun 2018 13:22:48 +0200
+From: Peter Krempa <pkrempa@redhat.com>
+Message-ID: <20180606112248.GE2744@andariel.pipo.sk>
+References: <20180524113251.GB4660@redhat.com>
 	<d9bb2cb9-d9dc-8fe0-a767-10d9cbbab803@redhat.com>
 	<20180528183058.GG2209@redhat.com>
 	<20180528183833.GJ4580@localhost.localdomain>
@@ -18,13 +16,14 @@ References: <20180518180440-mutt-send-email-mst@kernel.org>
 	<20180528212510.GC4660@redhat.com>
 	<20180529064415.GA4756@localhost.localdomain>
 	<2b3eef00-f326-c1e6-0e4b-b7602646eec4@redhat.com>
-	<20180606123237.2235ae4a@kitsune.suse.cz>
-	<bc97cdc3-85ba-e053-0816-b6bc431064fb@redhat.com>
+	<20180605092159.GA2544@work-vm>
+	<46ef4200-eccf-7e65-d3a0-69e4a7414b51@redhat.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	boundary="Sig_/Bcol5syH133ZZTHry+dXtuV";
-	protocol="application/pgp-signature"
-Subject: Re: [Qemu-devel] storing machine data in qcow images?
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="Ns7jmDPpOpCD+GE/"
+Content-Disposition: inline
+In-Reply-To: <46ef4200-eccf-7e65-d3a0-69e4a7414b51@redhat.com>
+Subject: Re: [Qemu-devel] [Qemu-block] storing machine data in qcow images?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,238 +33,80 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Max Reitz <mreitz@redhat.com>
-Cc: Kevin Wolf <kwolf@redhat.com>, "Richard W.M. Jones" <rjones@redhat.com>, qemu-devel@nongnu.org, stefanha@redhat.com, ehabkost@redhat.com, qemu-block@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>
+Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org, "Richard W.M. Jones" <rjones@redhat.com>, stefanha@redhat.com
 
---Sig_/Bcol5syH133ZZTHry+dXtuV
-Content-Type: text/plain; charset=UTF-8
+
+--Ns7jmDPpOpCD+GE/
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, 6 Jun 2018 13:02:53 +0200
-Max Reitz <mreitz@redhat.com> wrote:
+On Wed, Jun 06, 2018 at 13:02:56 +0200, Max Reitz wrote:
+> On 2018-06-05 11:21, Dr. David Alan Gilbert wrote:
 
-> On 2018-06-06 12:32, Michal Such=C3=A1nek wrote:
-> > On Tue, 29 May 2018 12:14:15 +0200
-> > Max Reitz <mreitz@redhat.com> wrote:
-> >  =20
-> >> On 2018-05-29 08:44, Kevin Wolf wrote: =20
-> >>> Am 28.05.2018 um 23:25 hat Richard W.M. Jones geschrieben:   =20
-> >>>> On Mon, May 28, 2018 at 10:20:54PM +0100, Richard W.M. Jones
-> >>>> wrote:   =20
-> >>>>> On Mon, May 28, 2018 at 08:38:33PM +0200, Kevin Wolf wrote:   =20
-> >>>>>> Just accessing the image file within a tar archive is possible
-> >>>>>> and we could write a block driver for that (I actually think we
-> >>>>>> should do this), but it restricts you because certain
-> >>>>>> operations like resizing aren't really possible in tar.
-> >>>>>> Unfortunately, resizing is a really common operation for
-> >>>>>> non-raw image formats.   =20
-> >>>>>
-> >>>>> We do this already in virt-v2v (using file.offset and file.size
-> >>>>> parameters in the raw driver).
-> >>>>>
-> >>>>> For virt-v2v we only need to read the source so resizing isn't
-> >>>>> an issue.  For most of the cases we're talking about the
-> >>>>> downloaded image would also be a template / base image, so I
-> >>>>> suppose only reading would be required too.
-> >>>>>
-> >>>>> I also wrote an nbdkit tar file driver (supports writes, but not
-> >>>>> resizing).
-> >>>>> https://manpages.debian.org/testing/nbdkit-plugin-perl/nbdkit-tar-p=
-lugin.1.en.html   =20
-> >>>>
-> >>>> I should add the other thorny issue with OVA files is that the
-> >>>> metadata contains a checksum (SHA1 or SHA256) of the disk images.
-> >>>> If you modify the disk images in-place in the tar file then you
-> >>>> need to recalculate those.   =20
-> >>>
-> >>> All of this means that OVA isn't really well suited to be used as
-> >>> a native format for VM configuration + images. It's just for
-> >>> sharing read-only images that are converted into another native
-> >>> format before they are used.
-> >>>
-> >>> Which is probably fair for the use case it was made for, but means
-> >>> that we need something else to solve our problem.   =20
-> >>
-> >> Maybe we should first narrow down our problem.  Maybe you have done
-> >> that already, but I'm quite in the dark still.
-> >>
-> >> The original problem was that you need to supply a machine type to
-> >> qemu, and that multiple common architectures now have multiple
-> >> machine types and not necessarily all work with a single image.  So
-> >> far so good, but I have two issues here already:
-> >>
-> >> (1) How is qemu supposed to interpret that information?  If it's
-> >> stored in the image file, I don't see a nice way of retrieving it
-> >> before the machine is initialized, at least not with qemu's current
-> >> architecture. Once we support configuring qemu solely through QMP,
-> >> sure, you can do a blockdev-add and then build the machine
-> >> accordingly.  But that is not here today, and I'm not sure this is
-> >> a good idea either, because that would mean automagic defaults for
-> >> the machine-building QMP commands derived from the blockdev-add
-> >> earlier, which should get a plain "No". Also, having to use QMP to
-> >> build your machine wouldn't make anything easier; at least not
-> >> easier than just supplying a configuration file along with the
-> >> image.
-> >>
-> >> (Building the magic into -blockdev might be less horrible, but such
-> >> magic (adding block devices influences machine defaults) to me
-> >> still doesn't seem worth not having to supply a config file along
-> >> with the disk image.)
-> >>
-> >> (2) Again, I personally just really don't like saving such
-> >> information in a disk image.  One actual argument I can bring up
-> >> for that distaste is this: Suppose, you have multiple images
-> >> attached to your VM.  Now the VM wants to store the machine type.
-> >> Where does it go?  Into all of them?  But some of those images may
-> >> only contain data and might be intended to be shared between
-> >> multiple VMs.  So those shouldn't receive the mark.  Only disks
-> >> with binaries should receive them. But what if those binaries are
-> >> just cross-compiled binaries for some other VM?  Oh no, so not
-> >> even binaries are a sure indicator...  So I have no idea where the
-> >> information is supposed to be stored.  In any case, "the first
-> >> image" just gets an outright "no" from me, and "all images" gets
-> >> an "I don't think this is a good idea".
-> >>
-> >> Loading is fun, too.  OK, so you attach multiple disk images to a
-> >> VM. Oops, they have varying machine type information...  Now
-> >> what?  Use the information from the first one?  Definitely no.
-> >> Just ignore all of the information in such a case and have the
-> >> user supply the machine type again?  Possible, but it seems weird
-> >> to me that qemu would usually guess the machine type, but once you
-> >> attach some random other image to it, it suddenly fails to do
-> >> that.  But maybe it's just me who thinks this is weird.
-> >>
-> >>
-> >> OK, so let's go a step further.  We have stored the machine type
-> >> information in order to not have to supply a config file with the
-> >> qcow2 image -- because if we did, it could just contain the machine
-> >> type and that would be it.
-> >>
-> >> So to me it follows naturally that just storing the machine type
-> >> doesn't make much sense if we cannot also store more VM
-> >> configuration in a qcow2 file, because I don't see why you should
-> >> be able to ship an image without a config file only if all you
-> >> need to supply is a machine type. Often, you also need to supply
-> >> how much memory the VM needs (which depends on the OS on the
-> >> image) or what storage controller to use (does the OS have virtio
-> >> drivers? (to be fair, it usually does, because you're supplying a
-> >> VM image in the first place)).
-> >>
-> >> So I think if we decide to store the machine type, that is kind of
-> >> a slippery slope and then there are good arguments for storing
-> >> even more configuration options in the file, too.  But I really,
-> >> really don't like that.
-> >>
-> >> For one thing, I suspect it to get really ugly implementation-wise.
-> >> Getting the machine type out of a disk image and actually
-> >> interpreting it automatically is bad enough, but getting possibly
-> >> everything out of it?  It's not going to be any better.
-> >>
-> >> For another, how do we store the data?  key-value seems wrong if we
-> >> want to store everything.  JSON might be fine.  But eventually we
-> >> just want basically a qemu configuration file in there, I would
-> >> think (which may support JSON at some point?).   So basically we
-> >> would store the data as a binary blob and let the rest of qemu do
-> >> its thing with it.  But then please tell me why I fought so
-> >> valiantly against storing random bitmaps in qcow2 files.   =20
+[...]
+
+> >       (I would suggest in layer2 that the keys are sorted, but
+> >       that's a pain to do in some json creators)
+> >    c) Forcing the registry of keys might avoid silly duplication.
+> >       We can but hope.
+> >    d) I've not said it's a libvirt XML file since that seems
+> >       a bit prescriptive.
 > >=20
-> > Yes, I wonder. Why did you? =20
->=20
-> That was mostly directed at Kevin.
->=20
-> My reasoning was that a qcow2 file is a disk image.  All data stored
-> therein should be immediately associated with the stored data.
-> Another reason was that from the perspective of qcow2 you don't lose
-> anything by tying the bitmaps directly to that data; all we lost was
-> the capability of storing bitmaps for unrelated raw files.
->=20
-> (And the reasoning for that is "if you want features, use qcow2" --
-> although R/W backing files may loosen that phrase.)
->=20
-> >> I hate the idea of making qcow2 a random archive format. =20
+> > Some initial suggested keys:
 > >=20
-> > What's wrong with that? =20
+> >    "qemu.machine-types": [ "q35", "i440fx" ]
+> >    "qemu.min-ram-MB": 1024
 >=20
-> The fact that qcow2 isn't.
+> I still don't understand why you'd want to put the configuration into
+> qcow2 instead of the other way around.
 >=20
-> From my perspective it would increase the format's complexity to a
-> point where you could just create a new format altogether.  Well,
-> actually, all you do is design a filesystem (or reuse an existing
-> one).
->=20
-> >> We have tar for that. =20
-> >=20
-> > It does not support expanding the stored files. =20
->=20
-> Nor does qcow2, because it does not support storing files at all.
+> Or why you'd want to use a single file at all, because as this whole
+> thread shows, a disk image alone is clearly not sufficient to describe a =
+VM.
 
-AFAICT from the previous discussion it already does allow storing
-multiple data streams that can be changed independently so it basically
-is an archive format or filesystem except the streams are not named nor
-easily accessible separately outside of qemu.
+I concur to many points made here. I think it would be wrong to put
+anything besides disk-related data in a disk image.
 
->=20
-> Secondly, that completely depends on how you use it.  You can freely
-> expand the last file in the archive, for instance.  Also I've seen
-> people store files in chunks so they can indeed resize it.
->=20
-> (I'm wondering if we could write a block driver that could provide
-> such a chunk allocation transparently to qcow2...  Note that a qcow2
-> file does not need to be continuous, so you could in theory indeed
-> store the qcow2 file and its data in completely separate places in a
-> tar file.)
+If we want to have a all-in-one VM image, then it should be something
+separate from this.
 
-Which basically invents another new filesystem on top of tar for no
-good reason. Especially when we have already support for storage format
-that is capable enough.
+Some more points against squashing all this irrelevant stuff into qcow2
+is that if you use it as a disk image only with any higher level
+management you don't care about any stored configuration.
 
->=20
-> What I'm trying to get at is that qcow2 was not designed to be a
-> container format for arbitrary files.  If you want to make it such,
-> I'm sure there are existing formats that work better.
+In fact in libvirt we'd need a way to prevent any of the data from the
+disk image from  being applied to the configuration as it would create
+problems.
 
-Such as?
+Also there is a big difference between storing "suggestions" of
+configuration and the actual full configuration itself. The
+"suggestions" which storage controller or machine type to use are
+sometimes helpful and sometimes not. Users may have their own
+preference. And besides this we have the libosinfo project which can
+provide suggestions.
 
->=20
-> >> Unless I have got something terribly wrong (which is indeed a
-> >> possibility!), to me this proposal means basically to turn qcow2
-> >> into (1) a VM description format for qemu, and (2) to turn it into
-> >> an archive format on the way. =20
-> >=20
-> > And if you go all the way you can store multiple disks along with
-> > the VM definition so you can have the whole appliance in one file.
-> > It conveniently solves the problem of synchronizing snapshots across
-> > multiple disk images and the question where to store the machine
-> > state if you want to suspend it.  =20
->=20
-> Yeah, but why make qcow2 that format?  That's what I completely fail
-> to understand.
->=20
-> If you want to have a single VM description file that contains the VM
-> configuration and some qcow2/raw/whatever files along with it for the
-> guest disk data, sure, go ahead.  But why does the format of the whole
-> thing need to be qcow2?
+I think that if the clear separation between a disk image format and an
+all-in-one VM file is not kept it will end up in a big mess.
 
-Because then qemu can access the disk data from the image directly
-without any need for extraction, copying to different file, etc.
-
-Thanks
-
-Michal
-
---Sig_/Bcol5syH133ZZTHry+dXtuV
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
+--Ns7jmDPpOpCD+GE/
+Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
 
-iQEcBAEBAgAGBQJbF8NOAAoJEFCz6i1PzvpbD7EH/R/K5i6cYY0nNx3v3VgD01c8
-nGnlhtiCuE5ba9jvYHpd8NXQ6l5ruSbDa8oHvefgeN3E4jKCTS0dYM9aKDfshUwo
-q2sa8D6G7qth4hNNtPcPn66AgMBBBB0COKdIGMdGabmTTzF3u2PtETy8ghVXJXSE
-FcMxczDucjj+eui0sLeXGhppuV1Na5W5tR/k0VPyTGrDBb/7QMenbLbU3D+3Itht
-IPGjGegSbVf6HHW9L4r+fE+wdJYa2hWdGh00cIHvSp/jppH5z2P3CpUJrmLXyNyh
-9rFGx6nqKbErk6El/PdyIiv83iYf3L0ySrJGHVzaFql7nJdepaFOWp85Nz6RJuE=
-=N++d
+iQIzBAEBCAAdFiEEUn7DGLvflazX+2GwHGwCByjY1GoFAlsXxAUACgkQHGwCByjY
+1GrNKQ/8D+TIc63KPUtN1jwP0gMiv03WKqbIvMcZSXgJnxeQPaqMF9bRPw3aoazP
+HfeGptYZTIGg0qqL1de4mzRjVHynty5goWGM778ftBRac4yPoUM59cl5bja39QBf
+dOvlprhibb4ZlTECzaTvV41EZb+B7PSCucWSNtXvfmqAe8kMFb8s6F0A0L7rAcct
+He8Xv2Y92LJvhKrzkkGtxpwIX59DoMoI5cL0f+c1utNEbrN9xDHpvJZxyGc5fyco
+oksvLrre08opA24XNQr/Zj/yWyIYNFxdY8AhAxX6zP9NxHwGTzJP8FQ3H0fUz1g0
+65gCe/2pek6+iHM7zenGIzYD/pYN78J7aT0wuZaEZq7vyZD+x2lBMq9TQ/S/8U7L
+YfYhfNT13h4C6n7gwLng5t+9vyhHh1w7RcsAS9UTsT49ixVxLJin4OhynEoOVuN5
+eIVKbXJp1kUCvBlxsPlyG3JOKMYIkCfouGkEkONMf5K/26SxSd21gWRC/PvEqWYq
+yaK058rwqfEjg4NYIT9s/wlWPmkUP9e1R9VenhhzA6R+7CkqcjhfK+AmS2txcCim
+BoiPcgdIjPJ6U6TGSzz4j5QAzyDFPdIaVxlzADmBtqlPIiXHUj4eur6NOcKo5exl
+9iCa+eBKHW4jORm/ZB1GP5RTf0XjEq4Ydk5TSvpZ8UiGwrArmMk=
+=Zyrc
 -----END PGP SIGNATURE-----
 
---Sig_/Bcol5syH133ZZTHry+dXtuV--
+--Ns7jmDPpOpCD+GE/--
