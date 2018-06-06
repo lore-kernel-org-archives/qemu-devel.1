@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40178)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40176)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <balaton@eik.bme.hu>) id 1fQYwW-0008Q8-5B
+	(envelope-from <balaton@eik.bme.hu>) id 1fQYwW-0008Q6-4i
 	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 09:57:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <balaton@eik.bme.hu>) id 1fQYwU-0000Wy-DW
+	(envelope-from <balaton@eik.bme.hu>) id 1fQYwU-0000X5-Er
 	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 09:57:40 -0400
-Message-Id: <53f9d0b04374a3f4449af65ce01bd68dbe757ab5.1528291908.git.balaton@eik.bme.hu>
+Message-Id: <49bd881dc323dfd61cbb0773ac248a32c441d4c2.1528291908.git.balaton@eik.bme.hu>
 In-Reply-To: <cover.1528291908.git.balaton@eik.bme.hu>
 References: <cover.1528291908.git.balaton@eik.bme.hu>
 From: BALATON Zoltan <balaton@eik.bme.hu>
 Date: Wed, 06 Jun 2018 15:31:48 +0200
-Subject: [Qemu-devel] [PATCH v2 1/8] ppc4xx_i2c: Clean up and improve error
- logging
+Subject: [Qemu-devel] [PATCH v2 8/8] sm501: Implement i2c part for reading
+ monitor EDID
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,232 +21,285 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org, qemu-ppc@nongnu.org
-Cc: Alexander Graf <agraf@suse.de>, David Gibson <david@gibson.dropbear.id.au>
-
-Make it more readable by converting register indexes to decimal
-(avoids lot of superfluous 0x0) and distinguish errors caused by
-accessing non-existent vs. unimplemented registers.
-No functional change.
+Cc: Alexander Graf <agraf@suse.de>, David Gibson <david@gibson.dropbear.id.au>, Peter Maydell <peter.maydell@linaro.org>
 
 Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
 ---
- hw/i2c/ppc4xx_i2c.c | 94 +++++++++++++++++++++++++++++------------------------
- 1 file changed, 51 insertions(+), 43 deletions(-)
+ default-configs/ppc-softmmu.mak    |   1 +
+ default-configs/ppcemb-softmmu.mak |   1 +
+ default-configs/sh4-softmmu.mak    |   1 +
+ default-configs/sh4eb-softmmu.mak  |   1 +
+ hw/display/sm501.c                 | 136 +++++++++++++++++++++++++++++++++++--
+ 5 files changed, 136 insertions(+), 4 deletions(-)
 
-diff --git a/hw/i2c/ppc4xx_i2c.c b/hw/i2c/ppc4xx_i2c.c
-index ab64d19..d1936db 100644
---- a/hw/i2c/ppc4xx_i2c.c
-+++ b/hw/i2c/ppc4xx_i2c.c
-@@ -31,7 +31,7 @@
+diff --git a/default-configs/ppc-softmmu.mak b/default-configs/ppc-softmmu.mak
+index 9fbaadc..860de80 100644
+--- a/default-configs/ppc-softmmu.mak
++++ b/default-configs/ppc-softmmu.mak
+@@ -24,6 +24,7 @@ CONFIG_ETSEC=y
+ # For Sam460ex
+ CONFIG_USB_EHCI_SYSBUS=y
+ CONFIG_SM501=y
++CONFIG_DDC=y
+ CONFIG_IDE_SII3112=y
+ CONFIG_I2C=y
+ CONFIG_BITBANG_I2C=y
+diff --git a/default-configs/ppcemb-softmmu.mak b/default-configs/ppcemb-softmmu.mak
+index 37af193..ac44f15 100644
+--- a/default-configs/ppcemb-softmmu.mak
++++ b/default-configs/ppcemb-softmmu.mak
+@@ -17,6 +17,7 @@ CONFIG_XILINX=y
+ CONFIG_XILINX_ETHLITE=y
+ CONFIG_USB_EHCI_SYSBUS=y
+ CONFIG_SM501=y
++CONFIG_DDC=y
+ CONFIG_IDE_SII3112=y
+ CONFIG_I2C=y
+ CONFIG_BITBANG_I2C=y
+diff --git a/default-configs/sh4-softmmu.mak b/default-configs/sh4-softmmu.mak
+index 546d855..72d8fca 100644
+--- a/default-configs/sh4-softmmu.mak
++++ b/default-configs/sh4-softmmu.mak
+@@ -9,6 +9,7 @@ CONFIG_PFLASH_CFI02=y
+ CONFIG_SH4=y
+ CONFIG_IDE_MMIO=y
+ CONFIG_SM501=y
++CONFIG_DDC=y
+ CONFIG_ISA_TESTDEV=y
+ CONFIG_I82378=y
+ CONFIG_I8259=y
+diff --git a/default-configs/sh4eb-softmmu.mak b/default-configs/sh4eb-softmmu.mak
+index 2d3fd49..c686637 100644
+--- a/default-configs/sh4eb-softmmu.mak
++++ b/default-configs/sh4eb-softmmu.mak
+@@ -9,6 +9,7 @@ CONFIG_PFLASH_CFI02=y
+ CONFIG_SH4=y
+ CONFIG_IDE_MMIO=y
+ CONFIG_SM501=y
++CONFIG_DDC=y
+ CONFIG_ISA_TESTDEV=y
+ CONFIG_I82378=y
+ CONFIG_I8259=y
+diff --git a/hw/display/sm501.c b/hw/display/sm501.c
+index 7ec1434..d357583 100644
+--- a/hw/display/sm501.c
++++ b/hw/display/sm501.c
+@@ -26,6 +26,7 @@
+ #include "qemu/osdep.h"
+ #include "qemu/cutils.h"
+ #include "qapi/error.h"
++#include "qemu/log.h"
+ #include "qemu-common.h"
+ #include "cpu.h"
  #include "hw/hw.h"
- #include "hw/i2c/ppc4xx_i2c.h"
+@@ -34,6 +35,8 @@
+ #include "hw/devices.h"
+ #include "hw/sysbus.h"
+ #include "hw/pci/pci.h"
++#include "hw/i2c/i2c.h"
++#include "hw/i2c/i2c-ddc.h"
+ #include "qemu/range.h"
+ #include "ui/pixel_ops.h"
  
--#define PPC4xx_I2C_MEM_SIZE 0x12
-+#define PPC4xx_I2C_MEM_SIZE 18
+@@ -471,10 +474,12 @@ typedef struct SM501State {
+     MemoryRegion local_mem_region;
+     MemoryRegion mmio_region;
+     MemoryRegion system_config_region;
++    MemoryRegion i2c_region;
+     MemoryRegion disp_ctrl_region;
+     MemoryRegion twoD_engine_region;
+     uint32_t last_width;
+     uint32_t last_height;
++    I2CBus *i2c_bus;
  
- #define IIC_CNTL_PT         (1 << 0)
- #define IIC_CNTL_READ       (1 << 1)
-@@ -70,7 +70,7 @@ static void ppc4xx_i2c_reset(DeviceState *s)
-     i2c->intrmsk = 0;
-     i2c->xfrcnt = 0;
-     i2c->xtcntlss = 0;
--    i2c->directcntl = 0x0f;
-+    i2c->directcntl = 0xf;
-     i2c->intr = 0;
- }
+     /* mmio registers */
+     uint32_t system_control;
+@@ -487,6 +492,11 @@ typedef struct SM501State {
+     uint32_t misc_timing;
+     uint32_t power_mode_control;
  
-@@ -85,7 +85,7 @@ static uint64_t ppc4xx_i2c_readb(void *opaque, hwaddr addr, unsigned int size)
-     uint64_t ret;
++    uint8_t i2c_byte_count;
++    uint8_t i2c_status;
++    uint8_t i2c_addr;
++    uint8_t i2c_data[16];
++
+     uint32_t uart0_ier;
+     uint32_t uart0_lcr;
+     uint32_t uart0_mcr;
+@@ -894,6 +904,107 @@ static const MemoryRegionOps sm501_system_config_ops = {
+     .endianness = DEVICE_LITTLE_ENDIAN,
+ };
  
-     switch (addr) {
--    case 0x00:
-+    case 0:
-         ret = i2c->mdata;
-         if (ppc4xx_i2c_is_master(i2c)) {
-             ret = 0xff;
-@@ -139,58 +139,62 @@ static uint64_t ppc4xx_i2c_readb(void *opaque, hwaddr addr, unsigned int size)
-                           TYPE_PPC4xx_I2C, __func__);
-         }
-         break;
--    case 0x02:
-+    case 2:
-         ret = i2c->sdata;
-         break;
--    case 0x04:
-+    case 4:
-         ret = i2c->lmadr;
-         break;
--    case 0x05:
-+    case 5:
-         ret = i2c->hmadr;
-         break;
--    case 0x06:
-+    case 6:
-         ret = i2c->cntl;
-         break;
--    case 0x07:
-+    case 7:
-         ret = i2c->mdcntl;
-         break;
--    case 0x08:
-+    case 8:
-         ret = i2c->sts;
-         break;
--    case 0x09:
-+    case 9:
-         ret = i2c->extsts;
-         break;
--    case 0x0A:
-+    case 10:
-         ret = i2c->lsadr;
-         break;
--    case 0x0B:
-+    case 11:
-         ret = i2c->hsadr;
-         break;
--    case 0x0C:
-+    case 12:
-         ret = i2c->clkdiv;
-         break;
--    case 0x0D:
-+    case 13:
-         ret = i2c->intrmsk;
-         break;
--    case 0x0E:
-+    case 14:
-         ret = i2c->xfrcnt;
-         break;
--    case 0x0F:
-+    case 15:
-         ret = i2c->xtcntlss;
-         break;
--    case 0x10:
-+    case 16:
-         ret = i2c->directcntl;
-         break;
--    case 0x11:
-+    case 17:
-         ret = i2c->intr;
-         break;
-     default:
--        qemu_log_mask(LOG_GUEST_ERROR, "[%s]%s: Bad address at offset 0x%"
--                      HWADDR_PRIx "\n", TYPE_PPC4xx_I2C, __func__, addr);
-+        if (addr < PPC4xx_I2C_MEM_SIZE) {
-+            qemu_log_mask(LOG_UNIMP, "%s: Unimplemented register 0x%"
-+                          HWADDR_PRIx "\n", __func__, addr);
-+        } else {
-+            qemu_log_mask(LOG_GUEST_ERROR, "%s: Bad address 0x%"
-+                          HWADDR_PRIx "\n", __func__, addr);
++static uint64_t sm501_i2c_read(void *opaque, hwaddr addr, unsigned size)
++{
++    SM501State *s = (SM501State *)opaque;
++    uint8_t ret = 0;
++
++    switch (addr) {
++    case SM501_I2C_BYTE_COUNT:
++        ret = s->i2c_byte_count;
++        break;
++    case SM501_I2C_STATUS:
++        ret = s->i2c_status;
++        break;
++    case SM501_I2C_SLAVE_ADDRESS:
++        ret = s->i2c_addr;
++        break;
++    case SM501_I2C_DATA ... SM501_I2C_DATA + 15:
++        ret = s->i2c_data[addr - SM501_I2C_DATA];
++        break;
++    default:
++        qemu_log_mask(LOG_UNIMP, "sm501 i2c : not implemented register read."
++                      " addr=0x%" HWADDR_PRIx "\n", addr);
++    }
++
++    SM501_DPRINTF("sm501 i2c regs : read addr=%" HWADDR_PRIx " val=%x\n",
++                  addr, ret);
++    return ret;
++}
++
++static void sm501_i2c_write(void *opaque, hwaddr addr, uint64_t value,
++                            unsigned size)
++{
++    SM501State *s = (SM501State *)opaque;
++    SM501_DPRINTF("sm501 i2c regs : write addr=%" HWADDR_PRIx
++                  " val=%" PRIx64 "\n", addr, value);
++
++    switch (addr) {
++    case SM501_I2C_BYTE_COUNT:
++        s->i2c_byte_count = value & 0xf;
++        break;
++    case SM501_I2C_CONTROL:
++        if (value & 1) {
++            if (value & 4) {
++                int res = i2c_start_transfer(s->i2c_bus,
++                                             s->i2c_addr >> 1,
++                                             s->i2c_addr & 1);
++                s->i2c_status |= (res ? 1 << 2 : 0);
++                if (!res) {
++                    int i;
++                    SM501_DPRINTF("sm501 i2c : transferring %d bytes to 0x%x\n",
++                                  s->i2c_byte_count + 1, s->i2c_addr >> 1);
++                    for (i = 0; i <= s->i2c_byte_count; i++) {
++                        res = i2c_send_recv(s->i2c_bus, &s->i2c_data[i],
++                                            !(s->i2c_addr & 1));
++                        if (res) {
++                            SM501_DPRINTF("sm501 i2c : transfer failed"
++                                          " i=%d, res=%d\n", i, res);
++                            s->i2c_status |= (res ? 1 << 2 : 0);
++                            return;
++                        }
++                    }
++                    if (i) {
++                        SM501_DPRINTF("sm501 i2c : transferred %d bytes\n", i);
++                        s->i2c_status = 8;
++                    }
++                }
++            } else {
++                SM501_DPRINTF("sm501 i2c : end transfer\n");
++                i2c_end_transfer(s->i2c_bus);
++                s->i2c_status &= ~4;
++            }
 +        }
-         ret = 0;
-         break;
-     }
--
-     return ret;
- }
++        break;
++    case SM501_I2C_RESET:
++            s->i2c_status &= ~4;
++        break;
++    case SM501_I2C_SLAVE_ADDRESS:
++        s->i2c_addr = value & 0xff;
++        break;
++    case SM501_I2C_DATA ... SM501_I2C_DATA + 15:
++        s->i2c_data[addr - SM501_I2C_DATA] = value & 0xff;
++        break;
++    default:
++        qemu_log_mask(LOG_UNIMP, "sm501 i2c : not implemented register write. "
++                      "addr=0x%" HWADDR_PRIx " val=%" PRIx64 "\n", addr, value);
++    }
++}
++
++static const MemoryRegionOps sm501_i2c_ops = {
++    .read = sm501_i2c_read,
++    .write = sm501_i2c_write,
++    .valid = {
++        .min_access_size = 1,
++        .max_access_size = 4,
++    },
++    .impl = {
++        .min_access_size = 1,
++        .max_access_size = 1,
++    },
++    .endianness = DEVICE_LITTLE_ENDIAN,
++};
++
+ static uint32_t sm501_palette_read(void *opaque, hwaddr addr)
+ {
+     SM501State *s = (SM501State *)opaque;
+@@ -1574,6 +1685,10 @@ static void sm501_reset(SM501State *s)
+     s->irq_mask = 0;
+     s->misc_timing = 0;
+     s->power_mode_control = 0;
++    s->i2c_byte_count = 0;
++    s->i2c_status = 0;
++    s->i2c_addr = 0;
++    memset(s->i2c_data, 0, 16);
+     s->dc_panel_control = 0x00010000; /* FIFO level 3 */
+     s->dc_video_control = 0;
+     s->dc_crt_control = 0x00010000;
+@@ -1612,6 +1727,11 @@ static void sm501_init(SM501State *s, DeviceState *dev,
+     memory_region_set_log(&s->local_mem_region, true, DIRTY_MEMORY_VGA);
+     s->local_mem = memory_region_get_ram_ptr(&s->local_mem_region);
  
-@@ -200,7 +204,7 @@ static void ppc4xx_i2c_writeb(void *opaque, hwaddr addr, uint64_t value,
-     PPC4xxI2CState *i2c = opaque;
++    /* i2c */
++    s->i2c_bus = i2c_init_bus(dev, "sm501.i2c");
++    I2CDDCState *ddc = I2CDDC(qdev_create(BUS(s->i2c_bus), TYPE_I2CDDC));
++    i2c_set_slave_address(I2C_SLAVE(ddc), 0x50);
++
+     /* mmio */
+     memory_region_init(&s->mmio_region, OBJECT(dev), "sm501.mmio", MMIO_SIZE);
+     memory_region_init_io(&s->system_config_region, OBJECT(dev),
+@@ -1619,6 +1739,9 @@ static void sm501_init(SM501State *s, DeviceState *dev,
+                           "sm501-system-config", 0x6c);
+     memory_region_add_subregion(&s->mmio_region, SM501_SYS_CONFIG,
+                                 &s->system_config_region);
++    memory_region_init_io(&s->i2c_region, OBJECT(dev), &sm501_i2c_ops, s,
++                          "sm501-i2c", 0x14);
++    memory_region_add_subregion(&s->mmio_region, SM501_I2C, &s->i2c_region);
+     memory_region_init_io(&s->disp_ctrl_region, OBJECT(dev),
+                           &sm501_disp_ctrl_ops, s,
+                           "sm501-disp-ctrl", 0x1000);
+@@ -1702,6 +1825,11 @@ static const VMStateDescription vmstate_sm501_state = {
+         VMSTATE_UINT32(twoD_destination_base, SM501State),
+         VMSTATE_UINT32(twoD_alpha, SM501State),
+         VMSTATE_UINT32(twoD_wrap, SM501State),
++        /* Added in version 2 */
++        VMSTATE_UINT8(i2c_byte_count, SM501State),
++        VMSTATE_UINT8(i2c_status, SM501State),
++        VMSTATE_UINT8(i2c_addr, SM501State),
++        VMSTATE_UINT8_ARRAY(i2c_data, SM501State, 16),
+         VMSTATE_END_OF_LIST()
+      }
+ };
+@@ -1767,8 +1895,8 @@ static void sm501_reset_sysbus(DeviceState *dev)
  
-     switch (addr) {
--    case 0x00:
-+    case 0:
-         i2c->mdata = value;
-         if (!i2c_bus_busy(i2c->bus)) {
-             /* assume we start a write transfer */
-@@ -225,19 +229,19 @@ static void ppc4xx_i2c_writeb(void *opaque, hwaddr addr, uint64_t value,
-             }
-         }
-         break;
--    case 0x02:
-+    case 2:
-         i2c->sdata = value;
-         break;
--    case 0x04:
-+    case 4:
-         i2c->lmadr = value;
-         if (i2c_bus_busy(i2c->bus)) {
-             i2c_end_transfer(i2c->bus);
-         }
-         break;
--    case 0x05:
-+    case 5:
-         i2c->hmadr = value;
-         break;
--    case 0x06:
-+    case 6:
-         i2c->cntl = value;
-         if (i2c->cntl & IIC_CNTL_PT) {
-             if (i2c->cntl & IIC_CNTL_READ) {
-@@ -263,32 +267,31 @@ static void ppc4xx_i2c_writeb(void *opaque, hwaddr addr, uint64_t value,
-             }
-         }
-         break;
--    case 0x07:
--        i2c->mdcntl = value & 0xDF;
-+    case 7:
-+        i2c->mdcntl = value & 0xdf;
-         break;
--    case 0x08:
--        i2c->sts &= ~(value & 0x0A);
-+    case 8:
-+        i2c->sts &= ~(value & 0xa);
-         break;
--    case 0x09:
--        i2c->extsts &= ~(value & 0x8F);
-+    case 9:
-+        i2c->extsts &= ~(value & 0x8f);
-         break;
--    case 0x0A:
-+    case 10:
-         i2c->lsadr = value;
--        /*i2c_set_slave_address(i2c->bus, i2c->lsadr);*/
-         break;
--    case 0x0B:
-+    case 11:
-         i2c->hsadr = value;
-         break;
--    case 0x0C:
-+    case 12:
-         i2c->clkdiv = value;
-         break;
--    case 0x0D:
-+    case 13:
-         i2c->intrmsk = value;
-         break;
--    case 0x0E:
-+    case 14:
-         i2c->xfrcnt = value & 0x77;
-         break;
--    case 0x0F:
-+    case 15:
-         if (value & IIC_XTCNTLSS_SRST) {
-             /* Is it actually a full reset? U-Boot sets some regs before */
-             ppc4xx_i2c_reset(DEVICE(i2c));
-@@ -296,15 +299,20 @@ static void ppc4xx_i2c_writeb(void *opaque, hwaddr addr, uint64_t value,
-         }
-         i2c->xtcntlss = value;
-         break;
--    case 0x10:
-+    case 16:
-         i2c->directcntl = value & 0x7;
-         break;
--    case 0x11:
-+    case 17:
-         i2c->intr = value;
-         break;
-     default:
--        qemu_log_mask(LOG_GUEST_ERROR, "[%s]%s: Bad address at offset 0x%"
--                      HWADDR_PRIx "\n", TYPE_PPC4xx_I2C, __func__, addr);
-+        if (addr < PPC4xx_I2C_MEM_SIZE) {
-+            qemu_log_mask(LOG_UNIMP, "%s: Unimplemented register 0x%"
-+                          HWADDR_PRIx "\n", __func__, addr);
-+        } else {
-+            qemu_log_mask(LOG_GUEST_ERROR, "%s: Bad address 0x%"
-+                          HWADDR_PRIx "\n", __func__, addr);
-+        }
-         break;
-     }
- }
+ static const VMStateDescription vmstate_sm501_sysbus = {
+     .name = TYPE_SYSBUS_SM501,
+-    .version_id = 1,
+-    .minimum_version_id = 1,
++    .version_id = 2,
++    .minimum_version_id = 2,
+     .fields = (VMStateField[]) {
+         VMSTATE_STRUCT(state, SM501SysBusState, 1,
+                        vmstate_sm501_state, SM501State),
+@@ -1840,8 +1968,8 @@ static void sm501_reset_pci(DeviceState *dev)
+ 
+ static const VMStateDescription vmstate_sm501_pci = {
+     .name = TYPE_PCI_SM501,
+-    .version_id = 1,
+-    .minimum_version_id = 1,
++    .version_id = 2,
++    .minimum_version_id = 2,
+     .fields = (VMStateField[]) {
+         VMSTATE_PCI_DEVICE(parent_obj, SM501PCIState),
+         VMSTATE_STRUCT(state, SM501PCIState, 1,
 -- 
 2.7.6
