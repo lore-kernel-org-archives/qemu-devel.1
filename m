@@ -1,26 +1,51 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47958)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48387)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1fQXcc-0004AJ-Vw
-	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 08:33:04 -0400
+	(envelope-from <jl4312@columbia.edu>) id 1fQXfG-0006Cz-3v
+	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 08:35:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1fQXcZ-0000yM-Sg
-	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 08:33:03 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:54666 helo=mx1.redhat.com)
+	(envelope-from <jl4312@columbia.edu>) id 1fQXfC-0002Ef-VU
+	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 08:35:46 -0400
+Received: from outprodmail01.cc.columbia.edu ([128.59.72.39]:56490)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1fQXcZ-0000xO-MF
-	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 08:32:59 -0400
-References: <CAPybu_0+enKVGf-bZHrkvWQ8reFtJnkKC=sucr2aaZ_DidaHNA@mail.gmail.com>
-	<20170712184540.12352-1-rth@twiddle.net>
-	<CAPybu_334DoALQ_a4bSf9VPHwMLw6hyLr1-OvCD+EqhvTAsE6g@mail.gmail.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <1f2d314a-350e-bdd9-b938-a8435ec15726@redhat.com>
-Date: Wed, 6 Jun 2018 14:32:55 +0200
+	(Exim 4.71) (envelope-from <jl4312@columbia.edu>) id 1fQXfC-0002EA-Rr
+	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 08:35:42 -0400
+Received: from hazelnut (hazelnut.cc.columbia.edu [128.59.213.250])
+	by outprodmail01.cc.columbia.edu (8.14.4/8.14.4) with ESMTP id
+	w56CZ2MS030633
+	for <qemu-devel@nongnu.org>; Wed, 6 Jun 2018 08:35:41 -0400
+Received: from hazelnut (localhost.localdomain [127.0.0.1])
+	by hazelnut (Postfix) with ESMTP id E8BB380
+	for <qemu-devel@nongnu.org>; Wed,  6 Jun 2018 08:35:41 -0400 (EDT)
+Received: from sendprodmail03.cc.columbia.edu (sendprodmail03.cc.columbia.edu
+	[128.59.72.15]) by hazelnut (Postfix) with ESMTP id B84E980
+	for <qemu-devel@nongnu.org>; Wed,  6 Jun 2018 08:35:41 -0400 (EDT)
+Received: from mail-wm0-f70.google.com (mail-wm0-f70.google.com [74.125.82.70])
+	by sendprodmail03.cc.columbia.edu (8.14.4/8.14.4) with ESMTP id
+	w56CZflU049365
+	(version=TLSv1/SSLv3 cipher=AES128-GCM-SHA256 bits=128 verify=NOT)
+	for <qemu-devel@nongnu.org>; Wed, 6 Jun 2018 08:35:41 -0400
+Received: by mail-wm0-f70.google.com with SMTP id l4-v6so2954272wmh.0
+	for <qemu-devel@nongnu.org>; Wed, 06 Jun 2018 05:35:41 -0700 (PDT)
+Received: from mail-wm0-f54.google.com (mail-wm0-f54.google.com.
+	[74.125.82.54]) by smtp.gmail.com with ESMTPSA id
+	c40-v6sm14484699edb.68.2018.06.06.05.35.38
+	for <qemu-devel@nongnu.org>
+	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+	Wed, 06 Jun 2018 05:35:38 -0700 (PDT)
+Received: by mail-wm0-f54.google.com with SMTP id j15-v6so11760287wme.0
+	for <qemu-devel@nongnu.org>; Wed, 06 Jun 2018 05:35:38 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <CAPybu_334DoALQ_a4bSf9VPHwMLw6hyLr1-OvCD+EqhvTAsE6g@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] target/i386: Fix BLSR and BLSI
+In-Reply-To: <AADFC41AFE54684AB9EE6CBC0274A5D1911F8B6B@SHSMSX101.ccr.corp.intel.com>
+References: <CAHyh4xhckUtH=gfa5K+KVehz27hVznUg7UX-Ca-AcjCvtiAhHg@mail.gmail.com>
+	<AADFC41AFE54684AB9EE6CBC0274A5D1911F3CAE@SHSMSX101.ccr.corp.intel.com>
+	<CAHyh4xhbVROe3xUXwojOMBHKdTxNms7ZqRkhpm+1N0XZm3xBuA@mail.gmail.com>
+	<AADFC41AFE54684AB9EE6CBC0274A5D1911F8B6B@SHSMSX101.ccr.corp.intel.com>
+From: Jintack Lim <jintack@cs.columbia.edu>
+Date: Wed, 6 Jun 2018 08:35:37 -0400
+Message-ID: <CAHyh4xjO8uJ3bwRN2Zmk6vL5-mT7xEY=LBLLfaFnHB6qF_C-MQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] vIOMMU Posted-interrupt implementation - atomic
+ operation?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,83 +54,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Ricardo Ribalda Delgado <ricardo.ribalda@gmail.com>, Richard Henderson <rth@twiddle.net>
-Cc: qemu-devel@nongnu.org, ehabkost@redhat.com
+To: "Tian, Kevin" <kevin.tian@intel.com>
+Cc: QEMU Devel Mailing List <qemu-devel@nongnu.org>, Peter Xu <peterx@redhat.com>
 
-On 06/06/2018 11:13, Ricardo Ribalda Delgado wrote:
-> Hi Richard,
-> 
-> I cannot find this patch on qemu master branch. Do you need any help
-> to get this done?
+On Wed, Jun 6, 2018 at 2:56 AM, Tian, Kevin <kevin.tian@intel.com> wrote:
+>> From: Jintack Lim [mailto:jintack@cs.columbia.edu]
+>> Sent: Tuesday, June 5, 2018 8:57 PM
+>>
+>> Thanks, Kevin.
+>>
+>> On Tue, Jun 5, 2018 at 2:54 AM, Tian, Kevin <kevin.tian@intel.com> wrote:
+>> >> From: Jintack Lim
+>> >> Sent: Friday, June 1, 2018 11:47 AM
+>> >>
+>> >> Hi,
+>> >>
+>> >> I'm implementing Posted-interrupt functionality in vIOMMU. According
+>> >> to Vt-d spec 5.2.3, IOMMU performs a coherent atomic read-modify-
+>> write
+>> >> operation of the posted-interrupt descriptor. I wonder how can we
+>> >> achieve this considering the guest can modify the same
+>> >> posted-interrupt descriptor anytime. Is there any existing mechanism
+>> >> that I can use in QEMU?
+>> >>
+>> >
+>> > I don't think it's possible to emulate such operation in software, unless
+>> > you want to change guest to be cooperative. Actually it is not necessary.
+>> > VT-d does so due to some hardware implementation consideration.
+>>
+>> Would you mind expanding this? I'm curious what it would be. Is it
+>> because IOMMU can't do something like cmpxchg instructions?
+>
+> I don't have further information. Above is what I was told by hardware
+> team.
 
-I queued it now, thanks for the reminder!
+Ah, I see. Thanks!
 
-Paolo
+>
+>>
+>> > Since you are emulating on CPU, could just follow how CPU posted
+>> > interrupt is conducted. If you look at SDM (29.6 Posted-Interrupt
+>> > Processing):
+>> >
+>> >         "There is a requirement, however, that such modifications be
+>> > done using locked read-modify-write instructions."
+>> >
+>> > [instructions] means you can do update multiple times when posting an
+>> > interrupt, as long as each update is atomic.
+>>
+>> Ah, that's a good point. So the unit of atomic operation doesn't need
+>> to be the whole PI descriptor, but it can be any subset (e.g. just one
+>> bit) of the descriptor? By looking at Linux kernel code, that seems to
+>> be the case.
+>>
+>
+> Exactly. :-)
 
+Cool. Thanks for the confirmation.
 
-> Thanks!
-> On Wed, Jul 12, 2017 at 8:45 PM Richard Henderson <rth@twiddle.net> wrote:
->>
->> The implementation of these two instructions was swapped.
->> At the same time, unify the setup of eflags for the insn group.
->>
->> Reported-by: Ricardo Ribalda Delgado <ricardo.ribalda@gmail.com>
->> Signed-off-by: Richard Henderson <rth@twiddle.net>
->> ---
->>  target/i386/translate.c | 25 ++++++++-----------------
->>  1 file changed, 8 insertions(+), 17 deletions(-)
->>
->> diff --git a/target/i386/translate.c b/target/i386/translate.c
->> index 8365a6d..087a2e6 100644
->> --- a/target/i386/translate.c
->> +++ b/target/i386/translate.c
->> @@ -4029,36 +4029,27 @@ static void gen_sse(CPUX86State *env, DisasContext *s, int b,
->>                      goto illegal_op;
->>                  }
->>                  ot = mo_64_32(s->dflag);
->> -                gen_ldst_modrm(env, s, modrm, ot, OR_TMP0, 0);
->> +                gen_ldst_modrm(env, s, modrm, ot, OR_TMP1, 0);
->>
->>                  switch (reg & 7) {
->>                  case 1: /* blsr By,Ey */
->> -                    tcg_gen_neg_tl(cpu_T1, cpu_T0);
->> +                    tcg_gen_subi_tl(cpu_T0, cpu_T1, 1);
->>                      tcg_gen_and_tl(cpu_T0, cpu_T0, cpu_T1);
->>                      gen_op_mov_reg_v(ot, s->vex_v, cpu_T0);
->> -                    gen_op_update2_cc();
->> -                    set_cc_op(s, CC_OP_BMILGB + ot);
->>                      break;
->> -
->>                  case 2: /* blsmsk By,Ey */
->> -                    tcg_gen_mov_tl(cpu_cc_src, cpu_T0);
->> -                    tcg_gen_subi_tl(cpu_T0, cpu_T0, 1);
->> -                    tcg_gen_xor_tl(cpu_T0, cpu_T0, cpu_cc_src);
->> -                    tcg_gen_mov_tl(cpu_cc_dst, cpu_T0);
->> -                    set_cc_op(s, CC_OP_BMILGB + ot);
->> +                    tcg_gen_subi_tl(cpu_T0, cpu_T1, 1);
->> +                    tcg_gen_xor_tl(cpu_T0, cpu_T0, cpu_T1);
->>                      break;
->> -
->>                  case 3: /* blsi By, Ey */
->> -                    tcg_gen_mov_tl(cpu_cc_src, cpu_T0);
->> -                    tcg_gen_subi_tl(cpu_T0, cpu_T0, 1);
->> -                    tcg_gen_and_tl(cpu_T0, cpu_T0, cpu_cc_src);
->> -                    tcg_gen_mov_tl(cpu_cc_dst, cpu_T0);
->> -                    set_cc_op(s, CC_OP_BMILGB + ot);
->> +                    tcg_gen_neg_tl(cpu_T0, cpu_T1);
->> +                    tcg_gen_and_tl(cpu_T0, cpu_T0, cpu_T1);
->>                      break;
->> -
->>                  default:
->>                      goto unknown_op;
->>                  }
->> +                gen_op_update2_cc();
->> +                set_cc_op(s, CC_OP_BMILGB + ot);
->>                  break;
->>
->>              default:
->> --
->> 2.9.4
->>
-> 
-> 
+Thanks,
+Jintack
+
+>
+> Thanks
+> Kevin
