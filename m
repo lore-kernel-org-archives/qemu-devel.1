@@ -1,23 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47623)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54516)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fQMhe-0004Tf-K3
-	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 20:53:31 -0400
+	(envelope-from <y-goto@jp.fujitsu.com>) id 1fQNW0-0003gy-OK
+	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 21:45:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fQMhd-00083U-He
-	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 20:53:30 -0400
-Date: Wed, 6 Jun 2018 10:53:17 +1000
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20180606005317.GD17757@umbus.fritz.box>
-References: <20180507180835.4b7b9222@bahia.lan>
-	<20180507165242.46502-1-leandro.lupori@gmail.com>
-	<20180604005322.GE4251@umbus> <20180605184612.42099707@bahia.lan>
+	(envelope-from <y-goto@jp.fujitsu.com>) id 1fQNVx-0007Mq-M1
+	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 21:45:32 -0400
+Received: from mgwym02.jp.fujitsu.com ([211.128.242.41]:28374)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <y-goto@jp.fujitsu.com>)
+	id 1fQNVx-0007GE-3T
+	for qemu-devel@nongnu.org; Tue, 05 Jun 2018 21:45:29 -0400
+Received: from m3051.s.css.fujitsu.com (m3051.s.css.fujitsu.com
+	[10.134.21.209])
+	by yt-mxauth.gw.nic.fujitsu.com (Postfix) with ESMTP id B4574AC0206
+	for <qemu-devel@nongnu.org>; Wed,  6 Jun 2018 10:45:13 +0900 (JST)
+Date: Wed, 06 Jun 2018 10:44:45 +0900
+From: Yasunori Goto <y-goto@jp.fujitsu.com>
+In-Reply-To: <120916025.39666078.1528099386072.JavaMail.zimbra@redhat.com>
+References: <20180601115429.GL8687@stefanha-x1.localdomain>
+	<120916025.39666078.1528099386072.JavaMail.zimbra@redhat.com>
+Message-Id: <20180606104437.40CE.E1E9C6FF@jp.fujitsu.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="sgneBHv3152wZ8jf"
-Content-Disposition: inline
-In-Reply-To: <20180605184612.42099707@bahia.lan>
-Subject: Re: [Qemu-devel] [PATCH v3] target/ppc: Allow PIR read in
- privileged mode
+Content-Type: text/plain; charset="US-ASCII"
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] Questions about vNVDIMM on qemu/KVM
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,73 +32,115 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>
-Cc: luporl <leandro.lupori@gmail.com>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Alexander Graf <agraf@suse.de>
+To: Pankaj Gupta <pagupta@redhat.com>
+Cc: Luiz Capitulino <lcapitulino@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>, qemu-devel@nongnu.org, NVDIMM-ML <linux-nvdimm@lists.01.org>, dan j williams <dan.j.williams@intel.com>
+
+> Hi,
+>  
+> > 
+> > > I'm investigating status of vNVDIMM on qemu/KVM,
+> > > and I have some questions about it. I'm glad if anyone answer them.
+> > > 
+> > > In my understanding, qemu/KVM has a feature to show NFIT for guest,
+> > > and it will be still updated about platform capability with this patch set.
+> > > https://lists.gnu.org/archive/html/qemu-devel/2018-05/msg04756.html
+> > > 
+> > > And libvirt also supports this feature with <memory model='nvdimm'>
+> > > https://libvirt.org/formatdomain.html#elementsMemory
+> > > 
+> > > 
+> > > However, virtio-pmem is developing now, and it is better
+> > > for archtectures to detect regions of NVDIMM without ACPI (like s390x)
+> > > In addition, It is also necessary to flush guest contents on vNVDIMM
+> > > who has a backend-file.
+> > > 
+> > > 
+> > > Q1) Does ACPI.NFIT bus of qemu/kvm remain with virtio-pmem?
+>         No.
+> 
+> > >     How do each roles become it if both NFIT and virtio-pmem will be
+> > >     available?
+> 
+>         There are two main use cases:
+> 
+>         1] DAX memory region pass-through to guest:
+>         -------------------------------------------
+>         As this region is present in actual physical NVDIMM device and exposed to guest,
+>         ACPI/NFIT way is used. If all the persistent memory is used by only this way we 
+>         don't need 'virtio-pmem'.
+> 
+>         2] Emulated DAX memory region in host passed to guest:
+>         --------------------------------------------------------
+>         If this type of region is exposed to guest, it will be preferable to use
+>         'virtio-pmem'. 
+> 
+>         This is regular host memory which is mmaped in guest address space for emulating 
+>         persistent memory. Guest writes are present in host page cache and not assured to be 
+>         written on backing disk without an explicit flush/sync call.
+>  
+>         'virtio-pmem' will solve the problem of flushing guest writes present in host page cache.
+>         With filesystems at host which use journal-ling like (ext4, xfs), they automatically call 
+>         'fsync' at regular intervals. but still there is not 100% assurance of all write persistence until
+>         an explicit flush is done from guest. So, we need an additional fsync to flush guest writes to 
+>         backing disk. We are using this approach to avoid using guest page cache and keep page cache management 
+>         of all the guests at host side.
+>         
+>         If both ACPI NFIT and virtio-pmem are present, both will have their corresponding memory regions and 
+>         defined by memory type "Persistent shared Memory" in case of virtio-pmem and "Persistent Memory" for 
+>         ACPI NVDIMM. This is to differentiate both the memory types.
+
+Ok.
+
+> 
+> > >     If my understanding is correct, both NFIT and virtio-pmem is used to
+> > >     detect vNVDIMM regions, but only one seems to be necessary....
+> > > 
+> > >     Otherwize, is the NFIT bus just for keeping compatibility,
+> > >     and virtio-pmem is promising way?
+> > > 
+> > >     
+> > > Q2) What bus is(will be?) created for virtio-pmem?
+> > >     I could confirm the bus of NFIT is created with <memory
+> > >     model='nvdimm'>,
+> 
+>         For virtio-pmem also its nvdimm bus.
+> 
+> > >     and I heard other bus will be created for virtio-pmem, but I could not
+> > >     find what bus is created concretely.
+> > >     ---
+> > >       # ndctl list -B
+> > >       {
+> > >          "provider":"ACPI.NFIT",
+> > >          "dev":"ndbus0"
+> > >       }
+> > >     ---
+> > >    
+> > >     I think it affects what operations user will be able to, and what
+> > >     notification is necessary for vNVDIMM.
+> > >     ACPI defines some operations like namespace controll, and notification
+> > >     for NVDIMM health status or others.
+> > >     (I suppose that other status notification might be necessary for
+> > >     vNVDIMM,
+> > >      but I'm not sure yet...)
+> 
+>          For virtio-pmem, we are not providing advance features like namespace and various
+>          other features which ACPI/NVDIMM hardware provides. This is just to keep paravirt
+>          device simple.
+
+Hmm, I see.
+Thank you for your explanation.
+
+Bye.
+---
+Yasunori Goto
 
 
---sgneBHv3152wZ8jf
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Tue, Jun 05, 2018 at 06:46:12PM +0200, Greg Kurz wrote:
-> On Mon, 4 Jun 2018 10:53:22 +1000
-> David Gibson <david@gibson.dropbear.id.au> wrote:
->=20
-> > On Mon, May 07, 2018 at 01:52:42PM -0300, luporl wrote:
-> > > According to PowerISA, the PIR register should be readable in privile=
-ged
-> > > mode also, not only in hypervisor privileged mode.
-> > >=20
-> > > PowerISA 3.0 - 4.3.3 Processor Identification Register
-> > >=20
-> > > "Read access to the PIR is privileged; write access is not
-> > > provided." =20
-> >=20
-> > Yes... but a little further down it says "The PIR is a hypervisor
-> > resource".  Looking at the older 2.07 ISA, it says that
-> > guest-supervisor mode reads to the PIR should be redirected to the
-> > GPIR register, which this change won't accomplish.
-> >=20
->=20
-> Hmmm, there are two definitions for the PIR, one in Book III-S (4.3.3)
-> and one in Book III-E (5.3.3). It looks like you're referring to the
-> latter...
->=20
-> [Category:Embedded.Hypervisor]
-> Read accesses to the PIR in guest supervisor state are
-> mapped to the GPIR.
->=20
-> The Book III-S definition doesn't mention the GPIR.
-
-Oops, sorry.  Yes the GPIR stuff is only for BookE.  The statement
-about the PIR being a hypervisor resource is definitely in the BookS
-section, however (both 2.07 and 3.0).
-
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---sgneBHv3152wZ8jf
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlsXMH0ACgkQbDjKyiDZ
-s5I26RAAxNnVUBDiYGowBfy1AqUD7vuv1QWoQZ9P1cwySPWi6JJj+lX988q+h2bg
-qvFcgm3GxB8/zu7sWPxjWK2MM+36UNxaSJsjS/VbmgnQyP7DPXE2dccCIIPM6BhH
-qd3CCDDaUnvQHAqEmX73fC9WLSZUYQYGliuA+tylY1LtJJrwE9EDoJNJHZNABhiZ
-UWYkdUC2P/KGqlSz3qpavpMmC3lbe0tw1Cdhh0gjV/k3nyqBr7hd3oXlp6BWnsmb
-gpe8Y5k70nup+hwkYiiNWMPHDcFGTByPm2YHj53NYwzkMmPhF/B00r27piExcDP3
-LJBLqbH1dN0HbRc/7Kx7xeDTPQvTWGcqoc0QknR6JYQfEURxQ7MxcDqNEuAKAKAo
-jpLwXL0cel3NaDUZNYuCI5j0uVg89ZA9o9jYKcN84O8WwV5Npm9engG8EblSuBd1
-d5tiym2hPkWrZ+MthVN0F1feNHhD0e8b8dyhfYB0CXYaj2utZwtaTjcyC+lIuEpC
-9uRvBpQZMHSm6Z9wsmdl8WVBDIGeZbWb2b7i6h7/P4gaO8yp3FKAeD5A2xnm82eV
-CAhgdD9XKG/MIAffRc2ft2DCWRmjtNhcSt5vhGfUIly9p6Jd8nLL2iMj8qSz3YZJ
-R0x2hqC8Kye43gcyiTwjUWMMmbQbPNWLcB/iAMoz3PVAdOHGPRw=
-=T7xy
------END PGP SIGNATURE-----
-
---sgneBHv3152wZ8jf--
+> 
+>          Moreover I have not yet looked at ndctl side of things. I am not 100% sure how
+>          ndctl will handle 'virtio-pmem'.
+> 
+>         Adding 'Dan' in loop, he can add his thoughts.
+> 
+> Thanks,
+> Pankaj
+> 
