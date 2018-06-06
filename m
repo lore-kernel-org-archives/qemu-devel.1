@@ -1,25 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41756)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41974)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1fQe5E-0003Gj-5d
-	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 15:27:02 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fQe5v-0003d8-K5
+	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 15:27:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1fQe57-0002No-O4
-	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 15:27:00 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:45914)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1fQe57-0002NO-IH
-	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 15:26:53 -0400
-Date: Wed, 6 Jun 2018 16:26:45 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20180606192645.GW7451@localhost.localdomain>
-References: <20180530184156.15634-1-crosa@redhat.com>
-	<fe720a76-5d39-e26a-79a8-9ffb6c6b7113@amsat.org>
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fQe5q-0002nQ-M2
+	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 15:27:43 -0400
+Received: from mail-qk0-x22e.google.com ([2607:f8b0:400d:c09::22e]:39698)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fQe5q-0002nB-Gq
+	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 15:27:38 -0400
+Received: by mail-qk0-x22e.google.com with SMTP id g14-v6so4731796qkm.6
+	for <qemu-devel@nongnu.org>; Wed, 06 Jun 2018 12:27:38 -0700 (PDT)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Date: Wed,  6 Jun 2018 16:27:31 -0300
+Message-Id: <20180606192731.6910-1-f4bug@amsat.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <fe720a76-5d39-e26a-79a8-9ffb6c6b7113@amsat.org>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v4 0/5] Acceptance/functional tests
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [RFC PATCH v2] qmp.py: Fix exception parsing partial
+ JSON
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,31 +32,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>
-Cc: Fam Zheng <famz@redhat.com>, Cleber Rosa <crosa@redhat.com>, qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>, Amador Pahim <amador@pahim.org>
+To: Eduardo Habkost <ehabkost@redhat.com>, Cleber Rosa <crosa@redhat.com>, Markus Armbruster <armbru@redhat.com>
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, =?UTF-8?q?Luk=C3=A1=C5=A1=20Doktor?= <ldoktor@redhat.com>, =?UTF-8?q?Daniel=20P=20=2E=20Berrang=C3=A9?= <berrange@redhat.com>
 
-On Tue, Jun 05, 2018 at 11:49:07AM -0300, Philippe Mathieu-Daud=E9 wrote:
-> Hi Eduardo,
->=20
-> On 05/30/2018 03:41 PM, Cleber Rosa wrote:
-> > TL;DR
-> > =3D=3D=3D=3D=3D
-> >=20
-> > Another version, with a minimalist approach, of the acceptance tests
-> > infrastructure for QEMU, based on the Avocado Testing Framework.
->=20
-> What do you think of this series?
->=20
-> Are you OK to take it via your tree, or should it goes via Fam's "Build
-> and test automation"?
+The readline() call returns partial data.
+Keep appending until the JSON buffer is complete.
 
-I can take it via my tree, I just couldn't reserve the time to
-check the existing review comments and finish reviewing it.
+This fixes:
 
-But if Fam or other maintainer already thinks the series look
-good and can be merged, please don't delay this because of me.
+    $ scripts/qmp/qmp-shell -v -p /tmp/qmp.sock
+    Traceback (most recent call last):
+      File "scripts/qmp/qmp-shell", line 456, in <module>
+        main()
+      File "scripts/qmp/qmp-shell", line 441, in main
+        qemu.connect(negotiate)
+      File "scripts/qmp/qmp-shell", line 284, in connect
+        self._greeting = super(QMPShell, self).connect(negotiate)
+      File "scripts/qmp/qmp.py", line 143, in connect
+        return self.__negotiate_capabilities()
+      File "scripts/qmp/qmp.py", line 71, in __negotiate_capabilities
+        greeting = self.__json_read()
+      File "scripts/qmp/qmp.py", line 85, in __json_read
+        resp = json.loads(data)
+      File "/usr/lib/python2.7/json/__init__.py", line 339, in loads
+        return _default_decoder.decode(s)
+      File "/usr/lib/python2.7/json/decoder.py", line 364, in decode
+        obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+      File "/usr/lib/python2.7/json/decoder.py", line 380, in raw_decode
+        obj, end = self.scan_once(s, idx)
+    ValueError: Expecting object: line 1 column 3 (char 2)
 
-Acked-by: Eduardo Habkost <ehabkost@redhat.com>
+Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+---
+Since v1:
+- addressed Daniel review: clean data after json.loads() succeeds
+- add a XXX comment
 
---=20
-Eduardo
+Daniel suggested this is due to blocking i/o.
+
+I'm sure there is a nicer/more pythonic way to do this, but this works for me,
+sorry :)
+
+ scripts/qmp/qmp.py | 13 ++++++++++---
+ 1 file changed, 10 insertions(+), 3 deletions(-)
+
+diff --git a/scripts/qmp/qmp.py b/scripts/qmp/qmp.py
+index 5c8cf6a056..14f0b48936 100644
+--- a/scripts/qmp/qmp.py
++++ b/scripts/qmp/qmp.py
+@@ -78,11 +78,18 @@ class QEMUMonitorProtocol(object):
+         raise QMPCapabilitiesError
+ 
+     def __json_read(self, only_event=False):
++        data = ""
+         while True:
+-            data = self.__sockfile.readline()
+-            if not data:
++            tmp = self.__sockfile.readline()
++            if not tmp:
+                 return
+-            resp = json.loads(data)
++            data += tmp
++            try:
++                resp = json.loads(data)
++            except ValueError:
++                # XXX: blindly loop, even if QEMU ever sends malformed data
++                continue
++            data = ""
+             if 'event' in resp:
+                 self.logger.debug("<<< %s", resp)
+                 self.__events.append(resp)
+-- 
+2.17.1
