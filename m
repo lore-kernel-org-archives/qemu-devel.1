@@ -1,16 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40177)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40173)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <balaton@eik.bme.hu>) id 1fQYwW-0008Q7-59
+	(envelope-from <balaton@eik.bme.hu>) id 1fQYwW-0008Q5-13
 	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 09:57:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <balaton@eik.bme.hu>) id 1fQYwT-0000Vc-2l
+	(envelope-from <balaton@eik.bme.hu>) id 1fQYwS-0000VI-VO
 	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 09:57:40 -0400
-Message-Id: <8c404c8c4ee1bfd2e4d079877d481094f797df8f.1528291908.git.balaton@eik.bme.hu>
-In-Reply-To: <cover.1528291908.git.balaton@eik.bme.hu>
-References: <cover.1528291908.git.balaton@eik.bme.hu>
+Message-Id: <cover.1528291908.git.balaton@eik.bme.hu>
 From: BALATON Zoltan <balaton@eik.bme.hu>
 Date: Wed, 06 Jun 2018 15:31:48 +0200
-Subject: [Qemu-devel] [PATCH v2 5/8] hw/timer: Add basic M41T80 emulation
+Subject: [Qemu-devel] [PATCH v2 0/8] Misc sam460ex improvements
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,176 +20,38 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org, qemu-ppc@nongnu.org
 Cc: Alexander Graf <agraf@suse.de>, David Gibson <david@gibson.dropbear.id.au>
 
-Basic emulation of the M41T80 serial (I2C) RTC chip. Only getting time
-of day is implemented. Setting time and RTC alarm are not supported.
+Some more improvements to sam460ex emulation:
+- Implemented RTC (which also needed fixing I2C to work)
+- Fix a problem in sm501 which led to AmigaOS slow down
 
-Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
----
- MAINTAINERS                     |   1 +
- default-configs/ppc-softmmu.mak |   1 +
- hw/timer/Makefile.objs          |   1 +
- hw/timer/m41t80.c               | 117 ++++++++++++++++++++++++++++++++++++++++
- 4 files changed, 120 insertions(+)
+v2:
+- split patch 1 (i2c rewrite) into smaller pieces
+- Added another sm501 patch
+
+BALATON Zoltan (8):
+  ppc4xx_i2c: Clean up and improve error logging
+  ppc4xx_i2c: Move register state to private struct and remove    
+    unimplemented sdata and intr registers
+  ppc4xx_i2c: Implement directcntl register
+  ppc4xx_i2c: Rewrite to model hardware more closely
+  hw/timer: Add basic M41T80 emulation
+  sam460ex: Add RTC device
+  sm501: Do not clear read only bits when writing register
+  sm501: Implement i2c part for reading monitor EDID
+
+ MAINTAINERS                        |   1 +
+ default-configs/ppc-softmmu.mak    |   3 +
+ default-configs/ppcemb-softmmu.mak |   2 +
+ default-configs/sh4-softmmu.mak    |   1 +
+ default-configs/sh4eb-softmmu.mak  |   1 +
+ hw/display/sm501.c                 | 142 ++++++++++++++-
+ hw/i2c/ppc4xx_i2c.c                | 364 ++++++++++++++++++++-----------------
+ hw/ppc/sam460ex.c                  |   1 +
+ hw/timer/Makefile.objs             |   1 +
+ hw/timer/m41t80.c                  | 117 ++++++++++++
+ include/hw/i2c/ppc4xx_i2c.h        |  19 +-
+ 11 files changed, 457 insertions(+), 195 deletions(-)
  create mode 100644 hw/timer/m41t80.c
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 41cd373..9e13bc1 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -826,6 +826,7 @@ M: BALATON Zoltan <balaton@eik.bme.hu>
- L: qemu-ppc@nongnu.org
- S: Maintained
- F: hw/ide/sii3112.c
-+F: hw/timer/m41t80.c
- 
- SH4 Machines
- ------------
-diff --git a/default-configs/ppc-softmmu.mak b/default-configs/ppc-softmmu.mak
-index 7d0dc2f..9fbaadc 100644
---- a/default-configs/ppc-softmmu.mak
-+++ b/default-configs/ppc-softmmu.mak
-@@ -27,6 +27,7 @@ CONFIG_SM501=y
- CONFIG_IDE_SII3112=y
- CONFIG_I2C=y
- CONFIG_BITBANG_I2C=y
-+CONFIG_M41T80=y
- 
- # For Macs
- CONFIG_MAC=y
-diff --git a/hw/timer/Makefile.objs b/hw/timer/Makefile.objs
-index 8b27a4b..e16b2b9 100644
---- a/hw/timer/Makefile.objs
-+++ b/hw/timer/Makefile.objs
-@@ -6,6 +6,7 @@ common-obj-$(CONFIG_CADENCE) += cadence_ttc.o
- common-obj-$(CONFIG_DS1338) += ds1338.o
- common-obj-$(CONFIG_HPET) += hpet.o
- common-obj-$(CONFIG_I8254) += i8254_common.o i8254.o
-+common-obj-$(CONFIG_M41T80) += m41t80.o
- common-obj-$(CONFIG_M48T59) += m48t59.o
- ifeq ($(CONFIG_ISA_BUS),y)
- common-obj-$(CONFIG_M48T59) += m48t59-isa.o
-diff --git a/hw/timer/m41t80.c b/hw/timer/m41t80.c
-new file mode 100644
-index 0000000..9dbdb1b
---- /dev/null
-+++ b/hw/timer/m41t80.c
-@@ -0,0 +1,117 @@
-+/*
-+ * M41T80 serial rtc emulation
-+ *
-+ * Copyright (c) 2018 BALATON Zoltan
-+ *
-+ * This work is licensed under the GNU GPL license version 2 or later.
-+ *
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "qemu/log.h"
-+#include "qemu/timer.h"
-+#include "qemu/bcd.h"
-+#include "hw/i2c/i2c.h"
-+
-+#define TYPE_M41T80 "m41t80"
-+#define M41T80(obj) OBJECT_CHECK(M41t80State, (obj), TYPE_M41T80)
-+
-+typedef struct M41t80State {
-+    I2CSlave parent_obj;
-+    int8_t addr;
-+} M41t80State;
-+
-+static void m41t80_realize(DeviceState *dev, Error **errp)
-+{
-+    M41t80State *s = M41T80(dev);
-+
-+    s->addr = -1;
-+}
-+
-+static int m41t80_send(I2CSlave *i2c, uint8_t data)
-+{
-+    M41t80State *s = M41T80(i2c);
-+
-+    if (s->addr < 0) {
-+        s->addr = data;
-+    } else {
-+        s->addr++;
-+    }
-+    return 0;
-+}
-+
-+static int m41t80_recv(I2CSlave *i2c)
-+{
-+    M41t80State *s = M41T80(i2c);
-+    struct tm now;
-+    qemu_timeval tv;
-+
-+    if (s->addr < 0) {
-+        s->addr = 0;
-+    }
-+    if (s->addr >= 1 && s->addr <= 7) {
-+        qemu_get_timedate(&now, -1);
-+    }
-+    switch (s->addr++) {
-+    case 0:
-+        qemu_gettimeofday(&tv);
-+        return to_bcd(tv.tv_usec / 10000);
-+    case 1:
-+        return to_bcd(now.tm_sec);
-+    case 2:
-+        return to_bcd(now.tm_min);
-+    case 3:
-+        return to_bcd(now.tm_hour);
-+    case 4:
-+        return to_bcd(now.tm_wday);
-+    case 5:
-+        return to_bcd(now.tm_mday);
-+    case 6:
-+        return to_bcd(now.tm_mon + 1);
-+    case 7:
-+        return to_bcd(now.tm_year % 100);
-+    case 8 ... 19:
-+        qemu_log_mask(LOG_UNIMP, "\n%s: unimplemented register: %d\n",
-+                      __func__, s->addr - 1);
-+        return 0;
-+    default:
-+        qemu_log_mask(LOG_GUEST_ERROR, "\n%s: invalid register: %d",
-+                      __func__, s->addr - 1);
-+        return 0;
-+    }
-+}
-+
-+static int m41t80_event(I2CSlave *i2c, enum i2c_event event)
-+{
-+    M41t80State *s = M41T80(i2c);
-+
-+    if (event == I2C_START_SEND) {
-+        s->addr = -1;
-+    }
-+    return 0;
-+}
-+
-+static void m41t80_class_init(ObjectClass *klass, void *data)
-+{
-+    DeviceClass *dc = DEVICE_CLASS(klass);
-+    I2CSlaveClass *sc = I2C_SLAVE_CLASS(klass);
-+
-+    dc->realize = m41t80_realize;
-+    sc->send = m41t80_send;
-+    sc->recv = m41t80_recv;
-+    sc->event = m41t80_event;
-+}
-+
-+static const TypeInfo m41t80_info = {
-+    .name          = TYPE_M41T80,
-+    .parent        = TYPE_I2C_SLAVE,
-+    .instance_size = sizeof(M41t80State),
-+    .class_init    = m41t80_class_init,
-+};
-+
-+static void m41t80_register_types(void)
-+{
-+    type_register_static(&m41t80_info);
-+}
-+
-+type_init(m41t80_register_types)
 -- 
 2.7.6
