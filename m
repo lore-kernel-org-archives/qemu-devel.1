@@ -1,35 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35770)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37208)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fQbZC-0007op-Eu
-	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 12:45:47 -0400
+	(envelope-from <ross.zwisler@linux.intel.com>) id 1fQbed-00022Y-JZ
+	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 12:51:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1fQbZ8-00058G-Fm
-	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 12:45:46 -0400
-Received: from indium.canonical.com ([91.189.90.7]:41416)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1fQbZ8-000580-8m
-	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 12:45:42 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1fQbZ7-0001x2-7J
-	for <qemu-devel@nongnu.org>; Wed, 06 Jun 2018 16:45:41 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 2347A2E88D2
-	for <qemu-devel@nongnu.org>; Wed,  6 Jun 2018 16:45:41 +0000 (UTC)
+	(envelope-from <ross.zwisler@linux.intel.com>) id 1fQbeZ-0000xP-L2
+	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 12:51:23 -0400
+Received: from mga01.intel.com ([192.55.52.88]:8645)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ross.zwisler@linux.intel.com>)
+	id 1fQbeZ-0000Ko-Ae
+	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 12:51:19 -0400
+Date: Wed, 6 Jun 2018 10:50:51 -0600
+From: Ross Zwisler <ross.zwisler@linux.intel.com>
+Message-ID: <20180606165051.GC30568@linux.intel.com>
+References: <20180521163203.26590-1-ross.zwisler@linux.intel.com>
+	<20180521163203.26590-4-ross.zwisler@linux.intel.com>
+	<20180605182243-mutt-send-email-mst@kernel.org>
+	<20180605164205.GA21034@linux.intel.com>
+	<CAPcyv4jSoFifTc05WGgxkEX6i7b12zYyB+VchJVW_+QPQzO7Fg@mail.gmail.com>
+	<20180605213547-mutt-send-email-mst@kernel.org>
+	<20180605220700.GB16066@linux.intel.com>
+	<CAPcyv4irudGth3+WZtgF4TjGL53s8mN70aVXpGWjj_Lc=7AMVg@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 06 Jun 2018 16:29:57 -0000
-From: =?utf-8?q?Jos=C3=A9_Antonio_L=C3=B3pez_Cano?=
-	<1101210@bugs.launchpad.net>
-Reply-To: Bug 1101210 <1101210@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20130118141238.13697.51258.malonedeb@chaenomeles.canonical.com>
-Message-Id: <152830259746.24714.14104090331096187842.malone@gac.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1101210] Re: qemu 1.4.2: usb keyboard not fully
- working
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAPcyv4irudGth3+WZtgF4TjGL53s8mN70aVXpGWjj_Lc=7AMVg@mail.gmail.com>
+Subject: Re: [Qemu-devel] [qemu PATCH v4 3/4] nvdimm,
+ acpi: support NFIT platform capabilities
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,43 +35,87 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Dan Williams <dan.j.williams@intel.com>
+Cc: Ross Zwisler <ross.zwisler@linux.intel.com>, "Michael S. Tsirkin" <mst@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, linux-nvdimm <linux-nvdimm@lists.01.org>, Qemu Developers <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>, Igor Mammedov <imammedo@redhat.com>
 
-I am testing the qemu windows version from:
+On Tue, Jun 05, 2018 at 03:21:30PM -0700, Dan Williams wrote:
+> On Tue, Jun 5, 2018 at 3:07 PM, Ross Zwisler
+> <ross.zwisler@linux.intel.com> wrote:
+> > On Tue, Jun 05, 2018 at 09:37:25PM +0300, Michael S. Tsirkin wrote:
+> >> On Tue, Jun 05, 2018 at 11:15:00AM -0700, Dan Williams wrote:
+> >> > On Tue, Jun 5, 2018 at 9:42 AM, Ross Zwisler
+> >> > <ross.zwisler@linux.intel.com> wrote:
+> >> > > On Tue, Jun 05, 2018 at 06:25:27PM +0300, Michael S. Tsirkin wrote:
+> >> > >> On Mon, May 21, 2018 at 10:32:02AM -0600, Ross Zwisler wrote:
+> >> > >> > Add a machine command line option to allow the user to control the Platform
+> >> > >> > Capabilities Structure in the virtualized NFIT.  This Platform Capabilities
+> >> > >> > Structure was added in ACPI 6.2 Errata A.
+> >> > >> >
+> >> > >> > Signed-off-by: Ross Zwisler <ross.zwisler@linux.intel.com>
+> >> > >>
+> >> > >> I tried playing with it and encoding the capabilities is
+> >> > >> quite awkward.
+> >> > >>
+> >> > >> Can we add bits for specific capabilities instead of nvdimm-cap?
+> >> > >>
+> >> > >> How about:
+> >> > >>
+> >> > >> "cpu-flush-on-power-loss-cap"
+> >> > >> "memory-flush-on-power-loss-cap"
+> >> > >> "byte-addressable-mirroring-cap"
+> >> > >
+> >> > > Hmmm...I don't like that as much because:
+> >> > >
+> >> > > a) It's very verbose.  Looking at my current qemu command line few other
+> >> > >    options require that many characters, and you'd commonly be defining more
+> >> > >    than one of these for a given VM.
+> >> > >
+> >> > > b) It means that the QEMU will need to be updated if/when new flags are added,
+> >> > >    because we'll have to have new options for each flag.  The current
+> >> > >    implementation is more future-proof because you can specify any flags
+> >> > >    value you want.
+> >> > >
+> >> > > However, if you feel strongly about this, I'll make the change.
+> >> >
+> >> > Straw-man: Could we do something similar with what we are doing in ndctl?
+> >> >
+> >> > enum ndctl_persistence_domain {
+> >> >         PERSISTENCE_NONE = 0,
+> >> >         PERSISTENCE_MEM_CTRL = 10,
+> >> >         PERSISTENCE_CPU_CACHE = 20,
+> >> >         PERSISTENCE_UNKNOWN = INT_MAX,
+> >> > };
+> >> >
+> >> > ...and have the command line take a number where "10" and "20" are
+> >> > supported today, but allows us to adapt to new persistence domains in
+> >> > the future.
+> >>
+> >> I'm fine with that except can we have symbolic names instead of numbers
+> >> on command line?
+> >>
+> >> --
+> >> MST
+> >
+> > Okay, we can move to the symbolic names.  Do you want them to be that long, or
+> > would:
+> >
+> > nvdimm-cap-cpu
+> > nvdimm-cap-mem-ctrl
+> > nvdimm-cap-mirroring
+> 
+> Wait, why is mirroring part of this?
+> 
+> I was thinking this option would be:
+> 
+>     --persistence-domain={cpu,mem-ctrl}
+> 
+> ...and try not to let ACPI specifics leak into the qemu command line
+> interface. For example PowerPC qemu could have a persistence domain
+> communicated via Open Firmware or some other mechanism.
 
-https://qemu.weilnetz.de/w64/qemu-w64-setup-20180519.exe
+Sure, this seems fine, though we may want to throw an "nvdimm" in the name
+somewhere so it's clear what the option affects.
 
-And AltGr does not work at all.
+nvdimm-persistence={cpu,mem-ctrl} maybe?
 
-Another issue is that it seems that Spanish keyboard layout has been
-changed and in my Spanish (from Spain -Europe-) does not work fine.
-Maybe the layout has been changed into Spanish Latin layout. I think
-that two diferent layouts are needed.
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1101210
-
-Title:
-  qemu 1.4.2: usb keyboard not fully working
-
-Status in QEMU:
-  Incomplete
-
-Bug description:
-  When using the usb keyboard, I can't type the | character. I'm using
-  german keyboard layout (de) on the host and inside the guest. As a
-  guest OS, I use Linux (e.g. a recent KNOPPIX cd). To obtain the |
-  character on a german keyboard, I need to press AltGr + the < or >
-  key, i.e. the key right to the left shift.
-
-  The qemu command line is something like this:
-  ./qemu-system-i386 -device pci-ohci -device usb-kbd
-  I also tried
-  ./qemu-system-i386 -usb -usbdevice keyboard
-  with the same effect.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1101210/+subscriptions
+Michael, does this work for you?
