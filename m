@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39360)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39448)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fQaGA-0004q1-Ky
-	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 11:22:04 -0400
+	id 1fQaGG-000501-Ki
+	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 11:22:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fQaG8-0003iy-Qd
-	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 11:22:02 -0400
+	id 1fQaGA-0003jq-NI
+	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 11:22:08 -0400
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Date: Wed,  6 Jun 2018 12:21:25 -0300
-Message-Id: <20180606152128.449-9-f4bug@amsat.org>
+Date: Wed,  6 Jun 2018 12:21:26 -0300
+Message-Id: <20180606152128.449-10-f4bug@amsat.org>
 In-Reply-To: <20180606152128.449-1-f4bug@amsat.org>
 References: <20180606152128.449-1-f4bug@amsat.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH 08/11] target/arm: Add trailing '\n' to
- qemu_log() calls
+Subject: [Qemu-devel] [PATCH 09/11] target/m68k: Add trailing '\n' to
+ qemu_log() call
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,35 +27,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, qemu-trivial@nongnu.org, qemu-arm@nongnu.org
+To: Laurent Vivier <laurent@vivier.eu>
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, qemu-trivial@nongnu.org
 
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- target/arm/helper.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ target/m68k/translate.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/target/arm/helper.c b/target/arm/helper.c
-index f75aa6e9ca..1248d84e6f 100644
---- a/target/arm/helper.c
-+++ b/target/arm/helper.c
-@@ -4570,7 +4570,7 @@ void hw_breakpoint_update(ARMCPU *cpu, int n)
-     case 4: /* unlinked address mismatch (reserved if AArch64) */
-     case 5: /* linked address mismatch (reserved if AArch64) */
-         qemu_log_mask(LOG_UNIMP,
--                      "arm: address mismatch breakpoint types not implemented");
-+                      "arm: address mismatch breakpoint types not implemented\n");
-         return;
-     case 0: /* unlinked address match */
-     case 1: /* linked address match */
-@@ -4604,7 +4604,7 @@ void hw_breakpoint_update(ARMCPU *cpu, int n)
-     case 8: /* unlinked VMID match (reserved if no EL2) */
-     case 10: /* unlinked context ID and VMID match (reserved if no EL2) */
-         qemu_log_mask(LOG_UNIMP,
--                      "arm: unlinked context breakpoint types not implemented");
-+                      "arm: unlinked context breakpoint types not implemented\n");
-         return;
-     case 9: /* linked VMID match (reserved if no EL2) */
-     case 11: /* linked context ID and VMID match (reserved if no EL2) */
+diff --git a/target/m68k/translate.c b/target/m68k/translate.c
+index 37d6ffd853..4b5dbdb51c 100644
+--- a/target/m68k/translate.c
++++ b/target/m68k/translate.c
+@@ -1556,7 +1556,7 @@ DISAS_INSN(undef)
+     /* ??? This is both instructions that are as yet unimplemented
+        for the 680x0 series, as well as those that are implemented
+        but actually illegal for CPU32 or pre-68020.  */
+-    qemu_log_mask(LOG_UNIMP, "Illegal instruction: %04x @ %08x",
++    qemu_log_mask(LOG_UNIMP, "Illegal instruction: %04x @ %08x\n",
+                   insn, s->insn_pc);
+     gen_exception(s, s->insn_pc, EXCP_UNSUPPORTED);
+ }
 -- 
 2.17.1
