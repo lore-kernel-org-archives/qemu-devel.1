@@ -1,24 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44093)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44141)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1fQZDM-00076N-AG
-	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 10:15:05 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1fQZDU-0007Dp-M3
+	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 10:15:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1fQZDH-0002Qr-9u
-	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 10:15:04 -0400
-Received: from 13.mo6.mail-out.ovh.net ([188.165.56.124]:43644)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1fQZDH-0002QH-2G
-	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 10:14:59 -0400
-Received: from player169.ha.ovh.net (unknown [10.109.120.103])
-	by mo6.mail-out.ovh.net (Postfix) with ESMTP id 2E2C516215B
-	for <qemu-devel@nongnu.org>; Wed,  6 Jun 2018 16:14:56 +0200 (CEST)
-From: Greg Kurz <groug@kaod.org>
-Date: Wed, 06 Jun 2018 16:14:42 +0200
-Message-ID: <152829448248.980911.16227091249877176333.stgit@bahia.lan>
+	(envelope-from <ehabkost@redhat.com>) id 1fQZDT-0002co-TA
+	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 10:15:12 -0400
+Date: Wed, 6 Jun 2018 11:14:32 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20180606141432.GS7451@localhost.localdomain>
+References: <20180606123237.2235ae4a@kitsune.suse.cz>
+	<bc97cdc3-85ba-e053-0816-b6bc431064fb@redhat.com>
+	<20180606131929.44d0fd6b@kitsune.suse.cz>
+	<93233bff-604b-c891-90ce-64fe1eaaaab5@redhat.com>
+	<20180606134327.05de9616@kitsune.suse.cz>
+	<94cea1d9-d934-85d1-66d4-dbfc82b8dd53@redhat.com>
+	<20180606141356.0b86d6b4@kitsune.suse.cz>
+	<95f92a95-6592-27a2-a822-d3a047cf8339@redhat.com>
+	<20180606154510.24be6ceb@kitsune.suse.cz>
+	<20180606135010.GF3064@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] [PATCH v4] target/ppc: migrate VPA related state
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <20180606135010.GF3064@redhat.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] storing machine data in qcow images?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,131 +32,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>, Paul Mackerras <paulus@ozlabs.org>, Michael Roth <mdroth@linux.vnet.ibm.com>
+To: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>
+Cc: Michal =?iso-8859-1?Q?Such=E1nek?= <msuchanek@suse.de>, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>, "Richard W.M. Jones" <rjones@redhat.com>, qemu-devel@nongnu.org, stefanha@redhat.com
 
-QEMU implements the "Shared Processor LPAR" (SPLPAR) option, which allows
-the hypervisor to time-slice a physical processor into multiple virtual
-processor. The intent is to allow more guests to run, and to optimize
-processor utilization.
+On Wed, Jun 06, 2018 at 02:50:10PM +0100, Daniel P. Berrang=E9 wrote:
+> On Wed, Jun 06, 2018 at 03:45:10PM +0200, Michal Such=E1nek wrote:
+> >=20
+> > I think that *if* we want an 'appliance' format that stores a whole V=
+M
+> > in a single file to ease VM distribution then the logical place to lo=
+ok
+> > in qemu is qcow. The reason have been explained at length.
+>=20
+> I rather disagree. This is a common problem beyond just QEMU and everyo=
+ne
+> just uses an existing archive format (TAR, ZIP) for bundling together
+> one or more disk images, metdata for config, and whatever other resourc=
+es
+> are applicable for the vendor.  This works with any disk format (raw,
+> qcow2, vmdk, vpc, etc) so is preferrable to inventing someting that is
+> specific to qcow2 IMHO.
 
-The guest OS can cede idle VCPUs, so that their processing capacity may
-be used by other VCPUs, with the H_CEDE hcall. The guest OS can also
-optimize spinlocks, by confering the time-slice of a spinning VCPU to the
-spinlock holder if it's currently notrunning, with the H_CONFER hcall.
+Now we have N+1 appliance file formats.  :)
 
-Both hcalls depend on a "Virtual Processor Area" (VPA) to be registered
-by the guest OS, generally during early boot. Other per-VCPU areas can
-be registered: the "SLB Shadow Buffer" which allows a more efficient
-dispatching of VCPUs, and the "Dispatch Trace Log Buffer" (DTL) which
-is used to compute time stolen by the hypervisor. Both DTL and SLB Shadow
-areas depend on the VPA to be registered.
+(We like it or not, qcow2 is already used as an appliance format
+for single-disk VMs in practice.)
 
-The VPA/SLB Shadow/DTL are state that QEMU should migrate, but this doesn't
-happen, for no apparent reason other than it was just never coded. This
-causes the features listed above to stop working after migration, and it
-breaks the logic of the H_REGISTER_VPA hcall in the destination.
+But I agree this must not be specific to qcow2.  The same VM
+description format we agree upon should work with other disk
+formats or with multi-disk appliances.
 
-This patch fixes it for newer machine types (ie, version > 2.12) by adding
-a "cpu/vpa" subsection to the CPU migration stream. It ensures backward
-migration to existing QEMU versions.
+If we specify a reasonable VM description format for appliances
+and make it work inside (e.g.) tar files, we will still have the
+option of allowing the description be placed inside qcow2 if we
+really want to.  I don't think we need to finish this qcow2
+bikeshedding exercise right now.
 
-Since DTL and SLB Shadow are optional and both depend on VPA, they get
-their own subsections "cpu/vpa/slb_shadow" and "cpu/vpa/dtl" hanging from
-the "cpu/vpa" subsection.
-
-Signed-off-by: Greg Kurz <groug@kaod.org>
----
-v4: - re-added TARGET_PPC64 ifdefs accidentally dropped in v3
-
-v3: - switched to pre_3_0_migration
-
-v2: - added missing TARGET_PP64 ifdefs (patchew)
----
- target/ppc/machine.c |   66 ++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 66 insertions(+)
-
-diff --git a/target/ppc/machine.c b/target/ppc/machine.c
-index b2745ec4e519..d063fe278fb7 100644
---- a/target/ppc/machine.c
-+++ b/target/ppc/machine.c
-@@ -677,6 +677,69 @@ static const VMStateDescription vmstate_compat = {
-     }
- };
- 
-+#if defined(TARGET_PPC64)
-+static bool slb_shadow_needed(void *opaque)
-+{
-+    PowerPCCPU *cpu = opaque;
-+
-+    return cpu->env.slb_shadow_addr != 0;
-+}
-+
-+static const VMStateDescription vmstate_slb_shadow = {
-+    .name = "cpu/vpa/slb_shadow",
-+    .version_id = 1,
-+    .minimum_version_id = 1,
-+    .needed = slb_shadow_needed,
-+    .fields = (VMStateField[]) {
-+        VMSTATE_UINT64(env.slb_shadow_addr, PowerPCCPU),
-+        VMSTATE_UINT64(env.slb_shadow_size, PowerPCCPU),
-+        VMSTATE_END_OF_LIST()
-+    }
-+};
-+
-+static bool dtl_needed(void *opaque)
-+{
-+    PowerPCCPU *cpu = opaque;
-+
-+    return cpu->env.dtl_addr != 0;
-+}
-+
-+static const VMStateDescription vmstate_dtl = {
-+    .name = "cpu/vpa/dtl",
-+    .version_id = 1,
-+    .minimum_version_id = 1,
-+    .needed = dtl_needed,
-+    .fields = (VMStateField[]) {
-+        VMSTATE_UINT64(env.dtl_addr, PowerPCCPU),
-+        VMSTATE_UINT64(env.dtl_size, PowerPCCPU),
-+        VMSTATE_END_OF_LIST()
-+    }
-+};
-+
-+static bool vpa_needed(void *opaque)
-+{
-+    PowerPCCPU *cpu = opaque;
-+
-+    return !cpu->pre_3_0_migration && cpu->env.vpa_addr != 0;
-+}
-+
-+static const VMStateDescription vmstate_vpa = {
-+    .name = "cpu/vpa",
-+    .version_id = 1,
-+    .minimum_version_id = 1,
-+    .needed = vpa_needed,
-+    .fields = (VMStateField[]) {
-+        VMSTATE_UINT64(env.vpa_addr, PowerPCCPU),
-+        VMSTATE_END_OF_LIST()
-+    },
-+    .subsections = (const VMStateDescription * []) {
-+        &vmstate_slb_shadow,
-+        &vmstate_dtl,
-+        NULL
-+    }
-+};
-+#endif /* TARGET_PPC64 */
-+
- const VMStateDescription vmstate_ppc_cpu = {
-     .name = "cpu",
-     .version_id = 5,
-@@ -731,6 +794,9 @@ const VMStateDescription vmstate_ppc_cpu = {
-         &vmstate_tlbemb,
-         &vmstate_tlbmas,
-         &vmstate_compat,
-+#if defined(TARGET_PPC64)
-+        &vmstate_vpa,
-+#endif
-         NULL
-     }
- };
+--=20
+Eduardo
