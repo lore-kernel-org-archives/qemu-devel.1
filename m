@@ -1,33 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52817)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53162)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1fQWBT-0008Fb-VB
-	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 07:00:57 -0400
+	(envelope-from <jan.kiszka@web.de>) id 1fQWCy-0000Qp-Lj
+	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 07:02:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1fQWBQ-00048p-Sj
-	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 07:00:56 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:42468 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1fQWBQ-00048Q-OL
-	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 07:00:52 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.5])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id E29A5401DE69
-	for <qemu-devel@nongnu.org>; Wed,  6 Jun 2018 11:00:51 +0000 (UTC)
-Date: Wed, 6 Jun 2018 13:00:50 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20180606130050.7bc74b34@redhat.com>
-In-Reply-To: <19cc576e-5b1c-c45e-034a-95329d1bff62@redhat.com>
-References: <d714d8ac-6642-f2f3-ad9c-ac7e3bdf30e0@redhat.com>
-	<d453da2c-92fe-5ef8-239c-656c1822b9e0@redhat.com>
-	<787c23db-430b-dc20-10f7-00fdf119449c@redhat.com>
-	<20180604222433.4d585846@redhat.com>
-	<19cc576e-5b1c-c45e-034a-95329d1bff62@redhat.com>
+	(envelope-from <jan.kiszka@web.de>) id 1fQWCx-0004jo-R5
+	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 07:02:28 -0400
+References: <20180606093101.30518-1-luc.michel@greensocs.com>
+From: Jan Kiszka <jan.kiszka@web.de>
+Message-ID: <3c53fcca-0bf1-affc-6778-94a493e3fc08@web.de>
+Date: Wed, 6 Jun 2018 13:02:08 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <20180606093101.30518-1-luc.michel@greensocs.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] Preconfig state reachable without --preconfig given
+Subject: Re: [Qemu-devel] [PATCH 0/6] arm_gic: add virtualization extensions
+ support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,66 +24,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>
-Cc: Michal Privoznik <mprivozn@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+To: luc.michel@greensocs.com, qemu-devel@nongnu.org
+Cc: qemu-arm@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, saipava@xilinx.com, edgari@xilinx.com, mark.burton@greensocs.com, Jailhouse <jailhouse-dev@googlegroups.com>
 
-On Wed, 6 Jun 2018 12:35:07 +0200
-Max Reitz <mreitz@redhat.com> wrote:
+On 2018-06-06 11:30, luc.michel@greensocs.com wrote:
+> From: Luc MICHEL <luc.michel@greensocs.com>
+> 
+> This patch series add support for the virtualization extensions in the
+> ARM GICv2 interrupt controller.
+> 
+> The first two commits do some refactoring to prepare for the
+> implementation. Commits 3 and 4 are the actual implementation. The last
+> commit updates the ZynqMP implementation to support virtualization.
+> 
+> The current state allows to boot Xen (tested with 4.8 and 4.10) with
+> Linux Dom0 guest properly.
+> 
+> I also tested in SMP. It does not work directly because Xen expects to
+> find CPU IDs in the GIC ITARGETSR0 register. This behavior is not
+> documented in the GICv2 specification, and is not implemented in QEMU.
+> By hacking this register, I was able to get the whole thing to boot in
+> SMP properly. This hack is not part of those patches though.
+> 
+> I also tested migration, it works fine AFAIK. I had to add the HYP and
+> SEC timers in the ARM CPU VMState though (Xen uses the HYP one) (not
+> part of those patches).
+> 
+> I want to thanks the Xilinx's QEMU team who sponsored this work for
+> their collaboration.
+> 
+> Luc MICHEL (6):
+>   intc/arm_gic: Refactor operations on the distributor
+>   intc/arm_gic: Remove some dead code and put some functions static
+>   intc/arm_gic: Add the virtualization extensions to the GIC state
+>   intc/arm_gic: Add virtualization extensions logic
+>   intc/arm_gic: Improve traces
+>   xlnx-zynqmp: Improve GIC wiring and MMIO mapping
+> 
+>  hw/arm/xlnx-zynqmp.c             |  92 +++-
+>  hw/intc/arm_gic.c                | 768 ++++++++++++++++++++++++-------
+>  hw/intc/arm_gic_common.c         | 159 +++++--
+>  hw/intc/arm_gic_kvm.c            |  31 +-
+>  hw/intc/gic_internal.h           | 258 +++++++++--
+>  hw/intc/trace-events             |  12 +-
+>  include/hw/arm/xlnx-zynqmp.h     |   4 +-
+>  include/hw/intc/arm_gic_common.h |  52 ++-
+>  8 files changed, 1128 insertions(+), 248 deletions(-)
+> 
+> --
+> 2.17.0
+> 
 
-> On 2018-06-04 22:24, Igor Mammedov wrote:
-> > On Mon, 4 Jun 2018 16:04:33 +0200
-> > Max Reitz <mreitz@redhat.com> wrote:
-> >   
-> >> On 2018-06-02 12:46, Michal Privoznik wrote:  
-> >>> On 06/01/2018 03:28 PM, Max Reitz wrote:    
-> >>>> Hi,
-> >>>>
-> >>>> The @preconfig RunState documentation states:
-> >>>>    
-> >>>>> The state is reachable only if the --preconfig CLI option is used.    
-> >>>>
-> >>>> However, this is not true:
-> >>>>
-> >>>> $ echo | x86_64-softmmu/qemu-system-x86_64 -monitor stdio
-> >>>> QEMU 2.12.50 monitor - type 'help' for more information
-> >>>> (qemu)
-> >>>> HMP not available in preconfig state, use QMP instead    
-> >>>
-> >>> Not sure if this is the same bug, but I've noticed libvirt having
-> >>> troubles detecting capabilities of qemu and debugging lead to this patch:
-> >>>
-> >>> http://lists.nongnu.org/archive/html/qemu-devel/2018-06/msg00367.html
-> >>>
-> >>> (which by no means I claim is proper solution. It might be viewed as
-> >>> workaround by expert qemu devels)    
-> >>
-> >> I haven't investigated further, but that patch breaks iotest 091 (which
-> >> tests migration).  It just stops now after the migration has started, so
-> >> it never completes.
-> >>
-> >> Actually, it seems to break all migration iotests (but 203, which
-> >> migrates to /dev/null), so I suspect it breaks migration as a whole.  
-> > Manual migration to file and restore from it, was tested manually and
-> > worked fine, migration-test  from 'make check' is ok as well.
-> > It's probably due broken to "echo foo | $QEMU"  
-> 
-> I highly doubt that, because four of the failing migration iotests are
-> written in Python and thus use QMP.  (169, 194, 196, 199)
-> 
-> They work on master, but fail after that patch.
-Indeed, this patch breaks migration. There is fixed version on list [CCed]
+Cool! We will give this a try with Jailhouse as well.
 
-[PATCH v3 1/2] cli: Don't run early event loop if no  --preconfig was specified
-
-that passes all iotests, some of tests I had to run several times
-due to transient failures not related to the topic (some timing issues)
-
-> 
-> Max
-> 
-> > There is another issue with -nodefaults option leading to indefinite
-> > timeout even if --preconfig wasn't used. I've just posted fix for that
-> > so that it won't be masked out by Michal/Daniel's fix.
-> > But I've run iotests  and -nodefaults fix doesn't affect outcome of the
-> > tests (the same 4 failures).   
-> 
+Jan
