@@ -1,30 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55667)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58925)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <crosa@redhat.com>) id 1fQeyC-0008VW-9Z
-	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 16:23:49 -0400
+	(envelope-from <eblake@redhat.com>) id 1fQfDI-0007Jo-M4
+	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 16:39:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <crosa@redhat.com>) id 1fQey9-0001TJ-5k
-	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 16:23:48 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:43080 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <crosa@redhat.com>) id 1fQey9-0001SW-0P
-	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 16:23:45 -0400
-References: <20180530200334.24179-1-f4bug@amsat.org>
-	<22ca41bb-9f8b-e8bb-e676-b5c96f3f9add@redhat.com>
-	<acf7522a-4fc0-5138-9797-6cfcc5ad5719@amsat.org>
-	<20180606192429.GV7451@localhost.localdomain>
-	<2bdd428e-8790-7c1f-f324-4bc6b6923c15@amsat.org>
-	<20180606201140.GZ7451@localhost.localdomain>
-From: Cleber Rosa <crosa@redhat.com>
-Message-ID: <34060c1c-ca8d-8aed-7f62-609d82e734b7@redhat.com>
-Date: Wed, 6 Jun 2018 16:23:42 -0400
+	(envelope-from <eblake@redhat.com>) id 1fQfDH-0001C2-1Y
+	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 16:39:24 -0400
+References: <20180524113251.GB4660@redhat.com>
+	<d9bb2cb9-d9dc-8fe0-a767-10d9cbbab803@redhat.com>
+	<20180528183058.GG2209@redhat.com>
+	<20180528183833.GJ4580@localhost.localdomain>
+	<20180528212054.GH2209@redhat.com> <20180528212510.GC4660@redhat.com>
+	<20180529064415.GA4756@localhost.localdomain>
+	<2b3eef00-f326-c1e6-0e4b-b7602646eec4@redhat.com>
+	<20180606123237.2235ae4a@kitsune.suse.cz>
+	<bc97cdc3-85ba-e053-0816-b6bc431064fb@redhat.com>
+	<20180606173140-mutt-send-email-mst@kernel.org>
+	<60c9b327-6503-0950-0720-3ccbb4637ad4@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <0de83ab1-070e-f12a-def4-404868d05a80@redhat.com>
+Date: Wed, 6 Jun 2018 15:39:12 -0500
 MIME-Version: 1.0
-In-Reply-To: <20180606201140.GZ7451@localhost.localdomain>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <60c9b327-6503-0950-0720-3ccbb4637ad4@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC PATCH] configure: Enable out-of-tree
- acceptance tests
+Subject: Re: [Qemu-devel] storing machine data in qcow images?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,61 +33,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Cc: Amador Pahim <amador@pahim.org>, Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org
+To: "Michael S. Tsirkin" <mst@redhat.com>, Max Reitz <mreitz@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, ehabkost@redhat.com, qemu-block@nongnu.org, "Richard W.M. Jones" <rjones@redhat.com>, qemu-devel@nongnu.org, stefanha@redhat.com, =?UTF-8?Q?Michal_Such=c3=a1nek?= <msuchanek@suse.de>
 
+On 06/06/2018 09:57 AM, Eric Blake wrote:
+> On 06/06/2018 09:43 AM, Michael S. Tsirkin wrote:
+>> On Wed, Jun 06, 2018 at 01:02:53PM +0200, Max Reitz wrote:
+>>> Yeah, but why make qcow2 that format?=C2=A0 That's what I completely =
+fail to
+>>> understand.
+>>
+>> Because why not? It's cheap to add it there and is much easier
+>> than teaching people about a new container format.
+>=20
+> tar is not a new container format, but it is a new format to various=20
+> toolchains - that said, if we popularize tar as the format for includin=
+g=20
+> a config file alongside a qcow2 image, it's not that hard to fix the=20
+> stack to start passing that file around as the new preferred file type.
 
+On a completely different front, 'qcow2' as a file format comes with=20
+some psychological baggage.  If someone was using it 8 years ago, before=20
+we did coroutine optimizations, it was noticeably slower than raw, and=20
+relatively easier to get into a corrupted image condition that resulted=20
+in data loss.  Just one VM lost, and it leaves a sour taste in your=20
+mouth, where you are unwilling to trust that file format (even though=20
+the file format was not necessarily the cause of the corruption).=20
+Marketing-wise, we failed with our improvements ('qcow2v3' is so much=20
+more of a mouthful than 'qcow3'), and it took years to flip the defaults=20
+from v2 as the default to v3 as the default (moreso in downstream=20
+distros than upstream), in part because we couldn't convince people of=20
+the improvements they would be gaining by moving to v3.  Historically,=20
+there's also 'qed' which was promised as a way to fix some of the poor=20
+performance of qcow2, but which ended up not being any better than our=20
+actual qcow2v3 improvements, so no one ended up switching to that. So,=20
+to some extent, various high-level consumers still have the notion that=20
+'raw' files are better/safer/faster than 'qcow2' files because of an=20
+anecdote from years ago, even if we have since fixed the speed parity=20
+and added locking to eliminate careless data loss.
 
-On 06/06/2018 04:11 PM, Eduardo Habkost wrote:
-> On Wed, Jun 06, 2018 at 04:36:16PM -0300, Philippe Mathieu-Daud=C3=A9 w=
-rote:
->> On 06/06/2018 04:24 PM, Eduardo Habkost wrote:
->>> On Tue, Jun 05, 2018 at 11:45:03AM -0300, Philippe Mathieu-Daud=C3=A9=
- wrote:
->>> [... something about config files ...]
->>>>> And after that, the following would run all "console" tests:
->>>>>
->>>>>   avocado run -t console
->>>>>
->>>>> How does this sound?
->>>>
->>>> For my use cases this doesn't worry me, I'll let Eduardo/Fam opine a=
-bout
->>>> use_test_dir_when_no_references_given.
->>>
->>> Well, I can't give an opinion because I couldn't understand
->>> what's the final goal here.
->>
->> You cut too much, the relevant part is:
->>
->>   On 05/30/2018 10:06 PM, Cleber Rosa wrote:
->>   > But at the same, there are security implications: `list` won't
->>   > load/execute any test code (different from, say, standard Python
->>   > unittests), while "run" obviously will.  So "avocado run" may end =
-up
->>   > running what users don't want if a malicious user controls
->>   > "$avocado_datadir_paths_test_dir".
->=20
-> The final goal still isn't clear to me.  Why would somebody want
-> to use $avocado_datadir_paths_test_dir instead of just specifying
-> "." in the command-line?
->=20
->=20
->>
->>>
->>> What exactly is missing in the current solution?  Why
->>> "avocado run -t console ." wouldn't work?
->>
->> It doesn't work in out-of-tree builds, I have to use the full path:
->>
->>   >>   build_dir$ avocado run
->> /full/path/to/sources/qemu/tests/acceptance/boot_linux_console.py
->=20
-> Isn't the symlink you suggested a better solution than requiring
-> the user to edit a config file?
->=20
+If we DO add a new tar-file block driver to qemu, that could serve as a=20
+marketing opportunity to convince people that the new format has all of=20
+the features that you can't get from just a raw file, and does not=20
+suffer from the slowness or data corruption they were worried about in=20
+qcow2.  Thus, even if our new format is just a thin wrapper around a=20
+config file plus the existing qcow2v3 we already know and love, the mere=20
+fact that it is a new format may get people to move away from raw images=20
+in situations where just the name 'qcow2' is unable to do so, at which=20
+point we can help them take advantage of the features made possible by=20
+qcow2.
 
-It's definitely the simplest, and would avoid a questionable knob and
-behavior in Avocado.
-
-- Cleber.
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
