@@ -1,31 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53260)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53455)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1fQWD9-0000X0-BS
-	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 07:02:43 -0400
+	(envelope-from <mreitz@redhat.com>) id 1fQWDY-0000lw-7B
+	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 07:03:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1fQWD3-0004nS-4Y
-	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 07:02:39 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:47396 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1fQWD2-0004mm-W0
-	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 07:02:33 -0400
-Date: Wed, 6 Jun 2018 19:02:17 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20180606110217.GF7815@xz-mi>
-References: <1524550428-27173-1-git-send-email-wei.w.wang@intel.com>
-	<1524550428-27173-5-git-send-email-wei.w.wang@intel.com>
-	<20180529181221-mutt-send-email-mst@kernel.org>
-	<5B0E6AE9.2030505@intel.com>
-	<20180530154325-mutt-send-email-mst@kernel.org>
-	<5B14F2A3.9010805@intel.com> <20180605065857.GC9216@xz-mi>
-	<5B168EAB.7090607@intel.com> <20180606054227.GA7815@xz-mi>
-	<5B17B1A7.8060307@intel.com>
+	(envelope-from <mreitz@redhat.com>) id 1fQWDW-00050n-8L
+	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 07:03:04 -0400
+References: <20180518180440-mutt-send-email-mst@kernel.org>
+	<20180524113251.GB4660@redhat.com>
+	<d9bb2cb9-d9dc-8fe0-a767-10d9cbbab803@redhat.com>
+	<20180528183058.GG2209@redhat.com>
+	<20180528183833.GJ4580@localhost.localdomain>
+	<20180528212054.GH2209@redhat.com> <20180528212510.GC4660@redhat.com>
+	<20180529064415.GA4756@localhost.localdomain>
+	<2b3eef00-f326-c1e6-0e4b-b7602646eec4@redhat.com>
+	<20180606123237.2235ae4a@kitsune.suse.cz>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <bc97cdc3-85ba-e053-0816-b6bc431064fb@redhat.com>
+Date: Wed, 6 Jun 2018 13:02:53 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <5B17B1A7.8060307@intel.com>
-Subject: Re: [Qemu-devel] [PATCH v7 4/5] virtio-balloon:
- VIRTIO_BALLOON_F_FREE_PAGE_HINT
+In-Reply-To: <20180606123237.2235ae4a@kitsune.suse.cz>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="sgmRfpZIjhKVx2ovY9XiBrdw64Cs86zTc"
+Subject: Re: [Qemu-devel] storing machine data in qcow images?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,149 +31,239 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Wei Wang <wei.w.wang@intel.com>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org, virtio-dev@lists.oasis-open.org, quintela@redhat.com, dgilbert@redhat.com, pbonzini@redhat.com, liliang.opensource@gmail.com, yang.zhang.wz@gmail.com, quan.xu0@gmail.com, nilal@redhat.com, riel@redhat.com, zhang.zhanghailiang@huawei.com
+To: =?UTF-8?Q?Michal_Such=c3=a1nek?= <msuchanek@suse.de>
+Cc: Kevin Wolf <kwolf@redhat.com>, "Richard W.M. Jones" <rjones@redhat.com>, qemu-devel@nongnu.org, stefanha@redhat.com, ehabkost@redhat.com, qemu-block@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>
 
-On Wed, Jun 06, 2018 at 06:04:23PM +0800, Wei Wang wrote:
-> On 06/06/2018 01:42 PM, Peter Xu wrote:
-> > 
-> > IMHO migration states do not suite here.  IMHO bitmap syncing is too
-> > frequently an operation, especially at the end of a precopy migration.
-> > If you really want to introduce some notifiers, I would prefer
-> > something new rather than fiddling around with migration state.  E.g.,
-> > maybe a new migration event notifiers, then introduce two new events
-> > for both start/end of bitmap syncing.
-> 
-> Please see if below aligns to what you meant:
-> 
-> MigrationState {
-> ...
-> + int ram_save_state;
-> 
-> }
-> 
-> typedef enum RamSaveState {
->     RAM_SAVE_BEGIN = 0,
->     RAM_SAVE_END = 1,
->     RAM_SAVE_MAX = 2
-> }
-> 
-> then at the step 1) and 3) you concluded somewhere below, we change the
-> state and invoke the callback.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--sgmRfpZIjhKVx2ovY9XiBrdw64Cs86zTc
+From: Max Reitz <mreitz@redhat.com>
+To: =?UTF-8?Q?Michal_Such=c3=a1nek?= <msuchanek@suse.de>
+Cc: Kevin Wolf <kwolf@redhat.com>, "Richard W.M. Jones" <rjones@redhat.com>,
+ qemu-devel@nongnu.org, stefanha@redhat.com, ehabkost@redhat.com,
+ qemu-block@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <bc97cdc3-85ba-e053-0816-b6bc431064fb@redhat.com>
+Subject: Re: [Qemu-devel] storing machine data in qcow images?
+References: <20180518180440-mutt-send-email-mst@kernel.org>
+ <20180524113251.GB4660@redhat.com>
+ <d9bb2cb9-d9dc-8fe0-a767-10d9cbbab803@redhat.com>
+ <20180528183058.GG2209@redhat.com>
+ <20180528183833.GJ4580@localhost.localdomain>
+ <20180528212054.GH2209@redhat.com> <20180528212510.GC4660@redhat.com>
+ <20180529064415.GA4756@localhost.localdomain>
+ <2b3eef00-f326-c1e6-0e4b-b7602646eec4@redhat.com>
+ <20180606123237.2235ae4a@kitsune.suse.cz>
+In-Reply-To: <20180606123237.2235ae4a@kitsune.suse.cz>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: quoted-printable
 
-I mean something like this:
+On 2018-06-06 12:32, Michal Such=E1nek wrote:
+> On Tue, 29 May 2018 12:14:15 +0200
+> Max Reitz <mreitz@redhat.com> wrote:
+>=20
+>> On 2018-05-29 08:44, Kevin Wolf wrote:
+>>> Am 28.05.2018 um 23:25 hat Richard W.M. Jones geschrieben: =20
+>>>> On Mon, May 28, 2018 at 10:20:54PM +0100, Richard W.M. Jones
+>>>> wrote: =20
+>>>>> On Mon, May 28, 2018 at 08:38:33PM +0200, Kevin Wolf wrote: =20
+>>>>>> Just accessing the image file within a tar archive is possible
+>>>>>> and we could write a block driver for that (I actually think we
+>>>>>> should do this), but it restricts you because certain operations
+>>>>>> like resizing aren't really possible in tar. Unfortunately,
+>>>>>> resizing is a really common operation for non-raw image
+>>>>>> formats. =20
+>>>>>
+>>>>> We do this already in virt-v2v (using file.offset and file.size
+>>>>> parameters in the raw driver).
+>>>>>
+>>>>> For virt-v2v we only need to read the source so resizing isn't an
+>>>>> issue.  For most of the cases we're talking about the downloaded
+>>>>> image would also be a template / base image, so I suppose only
+>>>>> reading would be required too.
+>>>>>
+>>>>> I also wrote an nbdkit tar file driver (supports writes, but not
+>>>>> resizing).
+>>>>> https://manpages.debian.org/testing/nbdkit-plugin-perl/nbdkit-tar-p=
+lugin.1.en.html =20
+>>>>
+>>>> I should add the other thorny issue with OVA files is that the
+>>>> metadata contains a checksum (SHA1 or SHA256) of the disk images.
+>>>> If you modify the disk images in-place in the tar file then you
+>>>> need to recalculate those. =20
+>>>
+>>> All of this means that OVA isn't really well suited to be used as a
+>>> native format for VM configuration + images. It's just for sharing
+>>> read-only images that are converted into another native format
+>>> before they are used.
+>>>
+>>> Which is probably fair for the use case it was made for, but means
+>>> that we need something else to solve our problem. =20
+>>
+>> Maybe we should first narrow down our problem.  Maybe you have done
+>> that already, but I'm quite in the dark still.
+>>
+>> The original problem was that you need to supply a machine type to
+>> qemu, and that multiple common architectures now have multiple
+>> machine types and not necessarily all work with a single image.  So
+>> far so good, but I have two issues here already:
+>>
+>> (1) How is qemu supposed to interpret that information?  If it's
+>> stored in the image file, I don't see a nice way of retrieving it
+>> before the machine is initialized, at least not with qemu's current
+>> architecture. Once we support configuring qemu solely through QMP,
+>> sure, you can do a blockdev-add and then build the machine
+>> accordingly.  But that is not here today, and I'm not sure this is a
+>> good idea either, because that would mean automagic defaults for the
+>> machine-building QMP commands derived from the blockdev-add earlier,
+>> which should get a plain "No". Also, having to use QMP to build your
+>> machine wouldn't make anything easier; at least not easier than just
+>> supplying a configuration file along with the image.
+>>
+>> (Building the magic into -blockdev might be less horrible, but such
+>> magic (adding block devices influences machine defaults) to me still
+>> doesn't seem worth not having to supply a config file along with the
+>> disk image.)
+>>
+>> (2) Again, I personally just really don't like saving such information=
 
-1693c64c27 ("postcopy: Add notifier chain", 2018-03-20)
+>> in a disk image.  One actual argument I can bring up for that distaste=
 
-That was a postcopy-only notifier.  Maybe we can generalize it into a
-more common notifier for the migration framework so that we can even
-register with non-postcopy events like bitmap syncing?
+>> is this: Suppose, you have multiple images attached to your VM.  Now
+>> the VM wants to store the machine type.  Where does it go?  Into all
+>> of them?  But some of those images may only contain data and might be
+>> intended to be shared between multiple VMs.  So those shouldn't
+>> receive the mark.  Only disks with binaries should receive them.
+>> But what if those binaries are just cross-compiled binaries for some
+>> other VM?  Oh no, so not even binaries are a sure indicator...  So I
+>> have no idea where the information is supposed to be stored.  In any
+>> case, "the first image" just gets an outright "no" from me, and "all
+>> images" gets an "I don't think this is a good idea".
+>>
+>> Loading is fun, too.  OK, so you attach multiple disk images to a VM.
+>> Oops, they have varying machine type information...  Now what?  Use
+>> the information from the first one?  Definitely no.  Just ignore all
+>> of the information in such a case and have the user supply the
+>> machine type again?  Possible, but it seems weird to me that qemu
+>> would usually guess the machine type, but once you attach some random
+>> other image to it, it suddenly fails to do that.  But maybe it's just
+>> me who thinks this is weird.
+>>
+>>
+>> OK, so let's go a step further.  We have stored the machine type
+>> information in order to not have to supply a config file with the
+>> qcow2 image -- because if we did, it could just contain the machine
+>> type and that would be it.
+>>
+>> So to me it follows naturally that just storing the machine type
+>> doesn't make much sense if we cannot also store more VM configuration
+>> in a qcow2 file, because I don't see why you should be able to ship
+>> an image without a config file only if all you need to supply is a
+>> machine type. Often, you also need to supply how much memory the VM
+>> needs (which depends on the OS on the image) or what storage
+>> controller to use (does the OS have virtio drivers? (to be fair, it
+>> usually does, because you're supplying a VM image in the first
+>> place)).
+>>
+>> So I think if we decide to store the machine type, that is kind of a
+>> slippery slope and then there are good arguments for storing even more=
 
-> 
-> 
-> Btw, the migration_state_notifiers is already there, but seems not really
-> used (I only tracked spice-core.c called
-> add_migration_state_change_notifier). I thought adding new migration states
-> can reuse all that we have.
-> What's your real concern about that? (not sure how defining new events would
-> make a difference)
+>> configuration options in the file, too.  But I really, really don't
+>> like that.
+>>
+>> For one thing, I suspect it to get really ugly implementation-wise.
+>> Getting the machine type out of a disk image and actually interpreting=
 
-Migration state is exposed via control path (QMP).  Adding new states
-mean that the QMP clients will see more.  IMO that's not really
-anything that a QMP client will need to know, instead we can keep it
-internally.  That's a reason from compatibility pov.
+>> it automatically is bad enough, but getting possibly everything out of=
 
-Meanwhile, it's not really a state-thing at all for me.  It looks
-really more like hook or event (start/stop of sync).
+>> it?  It's not going to be any better.
+>>
+>> For another, how do we store the data?  key-value seems wrong if we
+>> want to store everything.  JSON might be fine.  But eventually we
+>> just want basically a qemu configuration file in there, I would think
+>> (which may support JSON at some point?).   So basically we would
+>> store the data as a binary blob and let the rest of qemu do its thing
+>> with it.  But then please tell me why I fought so valiantly against
+>> storing random bitmaps in qcow2 files. =20
+>=20
+> Yes, I wonder. Why did you?
 
-> 
-> > > I would suggest to focus on the supplied interface and its usage in live
-> > > migration. That is, now we have two APIs, start() and stop(), to start and
-> > > stop the optimization.
-> > > 
-> > > 1) where in the migration code should we use them (do you agree with the
-> > > step (1), (2), (3) you concluded below?)
-> > > 2) how should we use them, directly do global call or via notifiers?
-> > I don't know how Dave and Juan might think; here I tend to agree with
-> > Michael that some notifier framework should be nicer.
-> > 
-> 
-> What would be the advantages of using notifiers here?
+That was mostly directed at Kevin.
 
-Isolation of modules?  Then migration/ram.c at least won't need to
-include something like "balloon.h".
+My reasoning was that a qcow2 file is a disk image.  All data stored
+therein should be immediately associated with the stored data.  Another
+reason was that from the perspective of qcow2 you don't lose anything by
+tying the bitmaps directly to that data; all we lost was the capability
+of storing bitmaps for unrelated raw files.
 
-And I think it's also possible too if some other modules would like to
-hook at these places someday.
+(And the reasoning for that is "if you want features, use qcow2" --
+although R/W backing files may loosen that phrase.)
 
-> 
-> 
-> 
-> > This is not that obvious to me.  For now I think it's true, since when
-> > we call stop() we'll take the mutex, meanwhile the mutex is actually
-> > always held by the iothread (in the big loop in
-> > virtio_balloon_poll_free_page_hints) until either:
-> > 
-> > - it sleeps in qemu_cond_wait() [1], or
-> > - it leaves the big loop [2]
-> > 
-> > Since I don't see anyone who will set dev->block_iothread to true for
-> > the balloon device, then [1] cannot happen;
-> 
-> there is a case in virtio_balloon_set_status which sets dev->block_iothread
-> to true.
-> 
-> Did you mean the free_page_lock mutex? it is released at the bottom of the
-> while() loop in virtio_balloon_poll_free_page_hint. It's actually released
-> for every hint. That is,
-> 
-> while(1){
->     take the lock;
->     process 1 hint from the vq;
->     release the lock;
-> }
+>> I hate the idea of making qcow2 a random archive format.
+>=20
+> What's wrong with that?
 
-Ah, so now I understand why you need the lock to be inside the loop,
-since the loop is busy polling actually.  Is it possible to do this in
-an async way?  I'm a bit curious on how much time will it use to do
-one round of the free page hints (e.g., an idle guest with 8G mem, or
-any configuration you tested)?  I suppose during that time the
-iothread will be held steady with 100% cpu usage, am I right?
+The fact that qcow2 isn't.
 
-> 
-> >   then I think when stop()
-> > has taken the mutex then the thread must have quitted the big loop,
-> > which goes to path [2].  I am not sure my understanding is correct,
-> > but in all cases "Step(1) guarantees us that the QEMU side
-> > optimization call has exited" is not obvious to me.  Would you add
-> > some comment to the code (or even improve the code itself somehow) to
-> > help people understand that?
-> > 
-> > For example, I saw that the old github code has a pthread_join() (in
-> > that old code it was not using iothread at all).  That's a very good
-> > code example so that people can understand that it's a synchronous
-> > operations.
-> 
-> > > This is enough. If the guest continues to report after that, that
-> > > reported hints will be detected as stale hints and dropped in the next start
-> > > of optimization.
-> > This is not clear to me too.  Say, stop() only sets the balloon status
-> > to STOP, AFAIU it does not really modify the cmd_id field immediately,
-> > then how will the new coming hints be known as stale hints?
-> 
-> Yes, you get that correctly - stop() only sets the status to STOP. On the
-> other side, virtio_balloon_poll_free_page_hints will stop when it sees the
-> staus is STOP. The free_page_lock guarantees that when stop() returns,
-> virtio_balloon_poll_free_page_hints will not proceed. When
-> virtio_balloon_poll_free_page_hints exits, the coming hints are not
-> processed any more. They just stay in the vq. The next time start() is
-> called, virtio_balloon_poll_free_page_hints works again, it will first drop
-> all those stale hints.
-> I'll see where I could add some comments to explain.
+=46rom my perspective it would increase the format's complexity to a poin=
+t
+where you could just create a new format altogether.  Well, actually,
+all you do is design a filesystem (or reuse an existing one).
 
-That'll be nice.
+>> We have tar for that.
+>=20
+> It does not support expanding the stored files.
 
-Thanks,
+Nor does qcow2, because it does not support storing files at all.
 
--- 
-Peter Xu
+Secondly, that completely depends on how you use it.  You can freely
+expand the last file in the archive, for instance.  Also I've seen
+people store files in chunks so they can indeed resize it.
+
+(I'm wondering if we could write a block driver that could provide such
+a chunk allocation transparently to qcow2...  Note that a qcow2 file
+does not need to be continuous, so you could in theory indeed store the
+qcow2 file and its data in completely separate places in a tar file.)
+
+What I'm trying to get at is that qcow2 was not designed to be a
+container format for arbitrary files.  If you want to make it such, I'm
+sure there are existing formats that work better.
+
+>> Unless I have got something terribly wrong (which is indeed a
+>> possibility!), to me this proposal means basically to turn qcow2 into
+>> (1) a VM description format for qemu, and (2) to turn it into an
+>> archive format on the way.
+>=20
+> And if you go all the way you can store multiple disks along with the
+> VM definition so you can have the whole appliance in one file. It
+> conveniently solves the problem of synchronizing snapshots across
+> multiple disk images and the question where to store the machine state
+> if you want to suspend it.=20
+
+Yeah, but why make qcow2 that format?  That's what I completely fail to
+understand.
+
+If you want to have a single VM description file that contains the VM
+configuration and some qcow2/raw/whatever files along with it for the
+guest disk data, sure, go ahead.  But why does the format of the whole
+thing need to be qcow2?
+
+Max
+
+
+--sgmRfpZIjhKVx2ovY9XiBrdw64Cs86zTc
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlsXv10ACgkQ9AfbAGHV
+z0AgDAf9ELRt9TL8enomDcWHoZXjKKie5hY6KB2k6midpXx73EUNNno0vXWmy3q4
+5/YF48ozAxf5J7D4nCzm40ihOHqScBjP6NW0ttFaL7Fiz5ShDF63YaimrPBsU84D
+HN5fDLdzxd0XItMojV78PW6yh4kcevuAiX7Og5UXXL3uRrm5XChQKgxHK52g/498
+BGbskLKmTg1G8Uv4Sb+dC7tLafi8WBEplZjP78LBJV9izOVQh8tHR4fxWf8OiWQd
+AqORLK3oaCPO3OOv5Yny2BuhXfA8tKXxSQVXY+DkJ4FzNebu+3gvGzYkfnl4B1Tp
+liNnr7Jzv2EmgrrXpRbwhx+nvVo+/w==
+=OvCl
+-----END PGP SIGNATURE-----
+
+--sgmRfpZIjhKVx2ovY9XiBrdw64Cs86zTc--
