@@ -1,29 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36768)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37060)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1fQYiC-0000Ci-9q
-	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 09:42:53 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1fQYjp-0001S5-SY
+	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 09:44:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1fQYiB-0000MG-8x
-	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 09:42:52 -0400
-Date: Wed, 6 Jun 2018 10:42:33 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20180606134233.GQ7451@localhost.localdomain>
-References: <20180528212054.GH2209@redhat.com>
-	<20180528212510.GC4660@redhat.com>
-	<20180529064415.GA4756@localhost.localdomain>
-	<2b3eef00-f326-c1e6-0e4b-b7602646eec4@redhat.com>
-	<20180606123237.2235ae4a@kitsune.suse.cz>
-	<bc97cdc3-85ba-e053-0816-b6bc431064fb@redhat.com>
-	<20180606131929.44d0fd6b@kitsune.suse.cz>
-	<93233bff-604b-c891-90ce-64fe1eaaaab5@redhat.com>
-	<20180606113720.GA2661@work-vm>
-	<2c833e2c-f0bb-ea98-a703-54fb9447bd2f@redhat.com>
+	(envelope-from <pbonzini@redhat.com>) id 1fQYjo-00016X-RW
+	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 09:44:33 -0400
+References: <20180417153945.20737-1-pbonzini@redhat.com>
+	<20180417153945.20737-2-pbonzini@redhat.com>
+	<8e293555-d8f0-3a00-00d1-2aac514eb1f2@redhat.com>
+	<897e242b-ef3b-7eec-8d32-fade89eaf5a9@redhat.com>
+	<21dce199-daac-1ac4-ba19-5b20f5898825@redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <9d33d6f3-d30c-08c0-4f77-18cd81050354@redhat.com>
+Date: Wed, 6 Jun 2018 15:44:21 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <2c833e2c-f0bb-ea98-a703-54fb9447bd2f@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] storing machine data in qcow images?
+In-Reply-To: <21dce199-daac-1ac4-ba19-5b20f5898825@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 1/6] ahci: move PIO Setup FIS before
+ transfer, fix it for ATAPI commands
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,78 +28,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>
-Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Michal =?iso-8859-1?Q?Such=E1nek?= <msuchanek@suse.de>, Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>, "Richard W.M. Jones" <rjones@redhat.com>, qemu-devel@nongnu.org, stefanha@redhat.com
+To: John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org
 
-On Wed, Jun 06, 2018 at 01:44:02PM +0200, Max Reitz wrote:
-> On 2018-06-06 13:37, Dr. David Alan Gilbert wrote:
-> > * Max Reitz (mreitz@redhat.com) wrote:
-> >> On 2018-06-06 13:19, Michal Such=E1nek wrote:
-> >>> On Wed, 6 Jun 2018 13:02:53 +0200
-> >>> Max Reitz <mreitz@redhat.com> wrote:
-> >>>
-> >>>> On 2018-06-06 12:32, Michal Such=E1nek wrote:
-> >>>>> On Tue, 29 May 2018 12:14:15 +0200
-> >>>>> Max Reitz <mreitz@redhat.com> wrote:
->=20
-> [...]
->=20
-> >>>>>> Unless I have got something terribly wrong (which is indeed a
-> >>>>>> possibility!), to me this proposal means basically to turn qcow2
-> >>>>>> into (1) a VM description format for qemu, and (2) to turn it in=
-to
-> >>>>>> an archive format on the way. =20
-> >>>>>
-> >>>>> And if you go all the way you can store multiple disks along with
-> >>>>> the VM definition so you can have the whole appliance in one file=
-.
-> >>>>> It conveniently solves the problem of synchronizing snapshots acr=
-oss
-> >>>>> multiple disk images and the question where to store the machine
-> >>>>> state if you want to suspend it.  =20
-> >>>>
-> >>>> Yeah, but why make qcow2 that format?  That's what I completely fa=
-il
-> >>>> to understand.
-> >>>>
-> >>>> If you want to have a single VM description file that contains the=
- VM
-> >>>> configuration and some qcow2/raw/whatever files along with it for =
-the
-> >>>> guest disk data, sure, go ahead.  But why does the format of the w=
-hole
-> >>>> thing need to be qcow2?
-> >>>
-> >>> Because then qemu can access the disk data from the image directly
-> >>> without any need for extraction, copying to different file, etc.
-> >>
-> >> This does not explain why it needs to be qcow2.  There is absolutely=
- no
-> >> reason why you couldn't use qcow2 files in-place inside of another f=
-ile.
-> >=20
-> > Because then we'd have to change the whole stack to take advantage of
-> > that.  Adding a feature into qcow2 means nothing else changes.
->=20
-> Because it's a hack, right.  Storing binary data in a qcow2 file,
-> completely ignoring it in qemu (and being completely unusable to any
-> potential other users of the qcow2 format[1]) and only interpreting it
-> somewhere up the stack is a hack.
->=20
-> That is not necessarily a negative point, hacks can work wonderfully
-> well, and they usually are simple, that is correct.  But the thing is
-> that I feel like people have grand visions of what to get out of this.
-> Imagine, a single file that can configure all and any VM!
->=20
-> But hacks usually only solve a single issue.  Once you try to extend a
-> hack, it breaks down and becomes insufficient.
->=20
-> If we want a grand vision where a single file stores the whole VM, why
-> not invest the work and make it right from the start?
+On 05/06/2018 01:27, John Snow wrote:
+> 
+> 
+> On 06/04/2018 11:50 AM, Paolo Bonzini wrote:
+>> On 02/06/2018 03:22, John Snow wrote:
+>>> - Status: Should be the status register after receiving the H2D Register
+>>>   update FIS, but prior to the data transfer, I think. "New value of the
+>>>   Status register of the Command Block for initiation of host data
+>>>   transfer."
+>>>   I think this is being set correctly after this patch.
+>>>
+>>> - Error: "Contains the new value of the Error register of the Command
+>>>   Block at the conclusion of all subsequent Data to Device frames."
+>>>
+>>>   This is why we were sending out post-hoc PIO Setup FIS frames before,
+>>>   how would I know what the error register *will* be...? What?
+>>
+>> You don't, I guess.  Zero?
+>>
+> 
+> Yeah, I don't mean to hold it up based on other arcane stuff, I was just
+> briefly hoping that maybe you actually understood it so I could fix it
+> once and for all...
+> 
+>>> - LBA: Presumably unimportant for the purposes of receiving a command
+>>>   PACKET, as we won't be writing it to disk, but a buffer. The values
+>>>   can be reported dutifully.
+>>>
+>>> - Device: Just report the register value dutifully.
+>>>
+>>> - Count: Likely just relays 0, as the H2D REG FIS should have updated
+>>>   that to zero as part of the PACKET command, as per ATA8 ACS3 7.21.3.
+>>>   In any case, just report the register value dutifully.
+>>>
+>>> - E_Status: "Contains the new value of the Status register of the
+>>>   Command Block at the conclusion of the subsequent Data FIS."
+>>>
+>>>   Again, how would I know...?
+>>>
+>>> - Transfer Count: Should be 12, as per what we specified in 0xA1
+>>>   IDENTIFY PACKET DEVICE, see core.c line 234. Your patch gets this
+>>>   correct, as we'll actually report the PIO FIS for the packet itself.
+>>>
+>>>
+>>> What this patch does do, though, is change the context of the Status,
+>>> Error and E_Status registers to something different. Everything else
+>>> should be the same, but I'd feel better about taking this patch if I
+>>> understood what exactly this FIS packet was supposed to convey, but I don't.
+>>
+>> At least Status and Transfer Count are correct after this patch. :/
+>>
+>> Paolo
+>>
+> 
+> How about ...
+> 
+> https://github.com/jnsnow/qemu/commit/0657390a2639b7cb533ca8b514c49c0edd3f4483
 
-We don't want a grand vision where a single file stores the whole
-VM.  This is exactly what I would like to avoid, by not inventing
-a whole different appliance file format.
+Yes, it's sane.
 
---=20
-Eduardo
+Paolo
