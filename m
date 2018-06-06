@@ -1,29 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41974)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42930)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fQe5v-0003d8-K5
-	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 15:27:45 -0400
+	(envelope-from <eblake@redhat.com>) id 1fQe9N-00087D-9b
+	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 15:31:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fQe5q-0002nQ-M2
-	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 15:27:43 -0400
-Received: from mail-qk0-x22e.google.com ([2607:f8b0:400d:c09::22e]:39698)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fQe5q-0002nB-Gq
-	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 15:27:38 -0400
-Received: by mail-qk0-x22e.google.com with SMTP id g14-v6so4731796qkm.6
-	for <qemu-devel@nongnu.org>; Wed, 06 Jun 2018 12:27:38 -0700 (PDT)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Date: Wed,  6 Jun 2018 16:27:31 -0300
-Message-Id: <20180606192731.6910-1-f4bug@amsat.org>
+	(envelope-from <eblake@redhat.com>) id 1fQe9M-0004j5-Bn
+	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 15:31:17 -0400
+References: <20180606190628.8170-1-mreitz@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <5c14d67c-227b-25c6-aa49-a2847e8e9048@redhat.com>
+Date: Wed, 6 Jun 2018 14:31:08 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [RFC PATCH v2] qmp.py: Fix exception parsing partial
- JSON
+In-Reply-To: <20180606190628.8170-1-mreitz@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v4] iotests: Fix 219's timing
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,75 +23,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>, Cleber Rosa <crosa@redhat.com>, Markus Armbruster <armbru@redhat.com>
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, =?UTF-8?q?Luk=C3=A1=C5=A1=20Doktor?= <ldoktor@redhat.com>, =?UTF-8?q?Daniel=20P=20=2E=20Berrang=C3=A9?= <berrange@redhat.com>
+To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>
 
-The readline() call returns partial data.
-Keep appending until the JSON buffer is complete.
+On 06/06/2018 02:06 PM, Max Reitz wrote:
+> 219 has two issues that may lead to sporadic failure, both of which are
+> the result of issuing query-jobs too early after a job has been
+> modified.  This can then lead to different results based on whether the
+> modification has taken effect already or not.
+> 
+> First, query-jobs is issued right after the job has been created.
+> Besides its current progress possibly being in any random state (which
+> has already been taken care of), its total progress too is basically
+> arbitrary, because the job may not yet have been able to determine it.
+> This patch addresses this by just filtering the total progress, like
+> what has been done for the current progress already.  However, for more
+> clarity, the filtering is changed to replace the values by a string
+> 'FILTERED' instead of deleting them.
+> 
+> Secondly, query-jobs is issued right after a job has been resumed.  The
+> job may or may not yet have had the time to actually perform any I/O,
+> and thus its current progress may or may not have advanced.  To make
+> sure it has indeed advanced (which is what the reference output already
+> assumes), keep querying it until it has.
+> 
+> Signed-off-by: Max Reitz <mreitz@redhat.com>
+> ---
 
-This fixes:
+Reviewed-by: Eric Blake <eblake@redhat.com>
 
-    $ scripts/qmp/qmp-shell -v -p /tmp/qmp.sock
-    Traceback (most recent call last):
-      File "scripts/qmp/qmp-shell", line 456, in <module>
-        main()
-      File "scripts/qmp/qmp-shell", line 441, in main
-        qemu.connect(negotiate)
-      File "scripts/qmp/qmp-shell", line 284, in connect
-        self._greeting = super(QMPShell, self).connect(negotiate)
-      File "scripts/qmp/qmp.py", line 143, in connect
-        return self.__negotiate_capabilities()
-      File "scripts/qmp/qmp.py", line 71, in __negotiate_capabilities
-        greeting = self.__json_read()
-      File "scripts/qmp/qmp.py", line 85, in __json_read
-        resp = json.loads(data)
-      File "/usr/lib/python2.7/json/__init__.py", line 339, in loads
-        return _default_decoder.decode(s)
-      File "/usr/lib/python2.7/json/decoder.py", line 364, in decode
-        obj, end = self.raw_decode(s, idx=_w(s, 0).end())
-      File "/usr/lib/python2.7/json/decoder.py", line 380, in raw_decode
-        obj, end = self.scan_once(s, idx)
-    ValueError: Expecting object: line 1 column 3 (char 2)
-
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
----
-Since v1:
-- addressed Daniel review: clean data after json.loads() succeeds
-- add a XXX comment
-
-Daniel suggested this is due to blocking i/o.
-
-I'm sure there is a nicer/more pythonic way to do this, but this works for me,
-sorry :)
-
- scripts/qmp/qmp.py | 13 ++++++++++---
- 1 file changed, 10 insertions(+), 3 deletions(-)
-
-diff --git a/scripts/qmp/qmp.py b/scripts/qmp/qmp.py
-index 5c8cf6a056..14f0b48936 100644
---- a/scripts/qmp/qmp.py
-+++ b/scripts/qmp/qmp.py
-@@ -78,11 +78,18 @@ class QEMUMonitorProtocol(object):
-         raise QMPCapabilitiesError
- 
-     def __json_read(self, only_event=False):
-+        data = ""
-         while True:
--            data = self.__sockfile.readline()
--            if not data:
-+            tmp = self.__sockfile.readline()
-+            if not tmp:
-                 return
--            resp = json.loads(data)
-+            data += tmp
-+            try:
-+                resp = json.loads(data)
-+            except ValueError:
-+                # XXX: blindly loop, even if QEMU ever sends malformed data
-+                continue
-+            data = ""
-             if 'event' in resp:
-                 self.logger.debug("<<< %s", resp)
-                 self.__events.append(resp)
 -- 
-2.17.1
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
