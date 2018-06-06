@@ -1,20 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38398)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38407)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1fQdop-0000im-DF
+	(envelope-from <jsnow@redhat.com>) id 1fQdop-0000jU-S1
 	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 15:10:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1fQdoo-0000ks-0w
+	(envelope-from <jsnow@redhat.com>) id 1fQdoo-0000lA-6e
 	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 15:10:03 -0400
 From: John Snow <jsnow@redhat.com>
-Date: Wed,  6 Jun 2018 15:09:50 -0400
-Message-Id: <20180606190955.20845-3-jsnow@redhat.com>
+Date: Wed,  6 Jun 2018 15:09:51 -0400
+Message-Id: <20180606190955.20845-4-jsnow@redhat.com>
 In-Reply-To: <20180606190955.20845-1-jsnow@redhat.com>
 References: <20180606190955.20845-1-jsnow@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH 2/7] ahci: move PIO Setup FIS before transfer,
- fix it for ATAPI commands
+Subject: [Qemu-devel] [PATCH 3/7] ide: push end_transfer_func out of
+ start_transfer callback, rename callback
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,191 +23,119 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org, qemu-devel@nongnu.org
 Cc: John Snow <jsnow@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-The PIO Setup FIS is written in the PIO:Entry state, which comes before
-the ATA and ATAPI data transfer states.  As a result, the PIO Setup FIS
-interrupt is now raised before DMA ends for ATAPI commands, and tests hav=
-e
-to be adjusted.
+From: Paolo Bonzini <pbonzini@redhat.com>
 
-This is also hinted by the description of the command header in the AHCI
-specification, where the "A" bit is described as
-
-    When =E2=80=981=E2=80=99, indicates that a PIO setup FIS shall be sen=
-t by the device
-    indicating a transfer for the ATAPI command.
-
-and also by the description of the ACMD (ATAPI command region):
-
-    The ATAPI command must be either 12 or 16 bytes in length. The length
-    transmitted by the HBA is determined by the PIO setup FIS that is sen=
-t
-    by the device requesting the ATAPI command.
-
-QEMU, which conflates the "generator" and the "receiver" of the FIS into
-one device, always uses ATAPI_PACKET_SIZE, aka 12, for the length.
+Now that end_transfer_func is a tail call in ahci_start_transfer,
+formalize the fact that the callback (of which ahci_start_transfer is
+the sole implementation) takes care of the transfer too: rename it to
+pio_transfer and, if it is present, call the end_transfer_func as soon
+as it returns.
 
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 Signed-off-by: John Snow <jsnow@redhat.com>
 ---
- hw/ide/ahci.c       | 18 ++++++------------
- tests/libqos/ahci.c | 35 +++++++++++++++++++++--------------
- tests/libqos/ahci.h |  3 +--
- 3 files changed, 28 insertions(+), 28 deletions(-)
+ hw/ide/ahci.c             | 13 ++++++-------
+ hw/ide/core.c             |  8 +++++---
+ hw/ide/trace-events       |  2 +-
+ include/hw/ide/internal.h |  2 +-
+ 4 files changed, 13 insertions(+), 12 deletions(-)
 
 diff --git a/hw/ide/ahci.c b/hw/ide/ahci.c
-index 24dbad5125..5871333686 100644
+index 5871333686..89127f5fb6 100644
 --- a/hw/ide/ahci.c
 +++ b/hw/ide/ahci.c
-@@ -1198,7 +1198,6 @@ static void handle_reg_h2d_fis(AHCIState *s, int po=
-rt,
-             g_free(pretty_fis);
-         }
-         s->dev[port].done_atapi_packet =3D false;
--        /* XXX send PIO setup FIS */
-     }
-=20
-     ide_state->error =3D 0;
-@@ -1292,10 +1291,12 @@ static void ahci_start_transfer(IDEDMA *dma)
-     int is_atapi =3D opts & AHCI_CMD_ATAPI;
-     int has_sglist =3D 0;
-=20
-+    /* PIO FIS gets written prior to transfer */
-+    ahci_write_fis_pio(ad, size);
-+
-     if (is_atapi && !ad->done_atapi_packet) {
-         /* already prepopulated iobuffer */
-         ad->done_atapi_packet =3D true;
--        size =3D 0;
-         goto out;
-     }
-=20
-@@ -1315,19 +1316,12 @@ static void ahci_start_transfer(IDEDMA *dma)
-         }
-     }
-=20
--out:
--    /* declare that we processed everything */
--    s->data_ptr =3D s->data_end;
--
-     /* Update number of transferred bytes, destroy sglist */
-     dma_buf_commit(s, size);
--
-+out:
-+    /* declare that we processed everything */
-+    s->data_ptr =3D s->data_end;
-     s->end_transfer_func(s);
--
--    if (!(s->status & DRQ_STAT)) {
--        /* done with PIO send/receive */
--        ahci_write_fis_pio(ad, le32_to_cpu(ad->cur_cmd->status));
--    }
+@@ -1279,8 +1279,8 @@ out:
+     return 0;
  }
-=20
- static void ahci_start_dma(IDEDMA *dma, IDEState *s,
-diff --git a/tests/libqos/ahci.c b/tests/libqos/ahci.c
-index 63e1f9b92d..7264e085d0 100644
---- a/tests/libqos/ahci.c
-+++ b/tests/libqos/ahci.c
-@@ -478,10 +478,10 @@ void ahci_port_check_d2h_sanity(AHCIQState *ahci, u=
-int8_t port, uint8_t slot)
-     g_free(d2h);
- }
-=20
--void ahci_port_check_pio_sanity(AHCIQState *ahci, uint8_t port,
--                                uint8_t slot, size_t buffsize)
-+void ahci_port_check_pio_sanity(AHCIQState *ahci, AHCICommand *cmd)
+ 
+-/* DMA dev <-> ram */
+-static void ahci_start_transfer(IDEDMA *dma)
++/* Transfer PIO data between RAM and device */
++static void ahci_pio_transfer(IDEDMA *dma)
  {
-     PIOSetupFIS *pio =3D g_malloc0(0x20);
-+    uint8_t port =3D cmd->port;
-=20
-     /* We cannot check the Status or E_Status registers, because
-      * the status may have again changed between the PIO Setup FIS
-@@ -489,15 +489,22 @@ void ahci_port_check_pio_sanity(AHCIQState *ahci, u=
-int8_t port,
-     qtest_memread(ahci->parent->qts, ahci->port[port].fb + 0x20, pio, 0x=
-20);
-     g_assert_cmphex(pio->fis_type, =3D=3D, 0x5f);
-=20
--    /* BUG: PIO Setup FIS as utilized by QEMU tries to fit the entire
--     * transfer size in a uint16_t field. The maximum transfer size can
--     * eclipse this; the field is meant to convey the size of data per
--     * each Data FIS, not the entire operation as a whole. For now,
--     * we will sanity check the broken case where applicable. */
--    if (buffsize <=3D UINT16_MAX) {
--        g_assert_cmphex(le16_to_cpu(pio->tx_count), =3D=3D, buffsize);
-+    /* Data transferred by PIO will either be:
-+     * (1) 12 or 16 bytes for an ATAPI command packet (QEMU always uses =
-12), or
-+     * (2) Actual data from the drive.
-+     * If we do both, (2) winds up erasing any evidence of (1).
-+     */
-+    if (cmd->props->atapi && (cmd->xbytes =3D=3D 0 || cmd->props->dma)) =
-{
-+        g_assert(le16_to_cpu(pio->tx_count) =3D=3D 12 ||
-+                 le16_to_cpu(pio->tx_count) =3D=3D 16);
-+    } else {
-+        /* The AHCI test suite here does not test any PIO command that s=
-pecifies
-+         * a DRQ block larger than one sector (like 0xC4), so this shoul=
-d always
-+         * be one sector or less. */
-+        size_t pio_len =3D ((cmd->xbytes % cmd->sector_size) ?
-+                          (cmd->xbytes % cmd->sector_size) : cmd->sector=
-_size);
-+        g_assert_cmphex(le16_to_cpu(pio->tx_count), =3D=3D, pio_len);
+     AHCIDevice *ad = DO_UPCAST(AHCIDevice, dma, dma);
+     IDEState *s = &ad->port.ifs[0];
+@@ -1304,9 +1304,9 @@ static void ahci_start_transfer(IDEDMA *dma)
+         has_sglist = 1;
      }
--
-     g_free(pio);
+ 
+-    trace_ahci_start_transfer(ad->hba, ad->port_no, is_write ? "writ" : "read",
+-                              size, is_atapi ? "atapi" : "ata",
+-                              has_sglist ? "" : "o");
++    trace_ahci_pio_transfer(ad->hba, ad->port_no, is_write ? "writ" : "read",
++                            size, is_atapi ? "atapi" : "ata",
++                            has_sglist ? "" : "o");
+ 
+     if (has_sglist && size) {
+         if (is_write) {
+@@ -1321,7 +1321,6 @@ static void ahci_start_transfer(IDEDMA *dma)
+ out:
+     /* declare that we processed everything */
+     s->data_ptr = s->data_end;
+-    s->end_transfer_func(s);
  }
-=20
-@@ -832,9 +839,9 @@ void ahci_command_enable_atapi_dma(AHCICommand *cmd)
-     RegH2DFIS *fis =3D &(cmd->fis);
-     g_assert(cmd->props->atapi);
-     fis->feature_low |=3D 0x01;
--    cmd->interrupts &=3D ~AHCI_PX_IS_PSS;
-+    /* PIO is still used to transfer the ATAPI command */
-+    g_assert(cmd->props->pio);
-     cmd->props->dma =3D true;
--    cmd->props->pio =3D false;
-     /* BUG: We expect the DMA Setup interrupt for DMA commands */
-     /* cmd->interrupts |=3D AHCI_PX_IS_DSS; */
- }
-@@ -846,7 +853,7 @@ AHCICommand *ahci_command_create(uint8_t command_name=
-)
-=20
-     g_assert(props);
-     cmd =3D g_new0(AHCICommand, 1);
--    g_assert(!(props->dma && props->pio));
-+    g_assert(!(props->dma && props->pio) || props->atapi);
-     g_assert(!(props->lba28 && props->lba48));
-     g_assert(!(props->read && props->write));
-     g_assert(!props->size || props->data);
-@@ -1218,7 +1225,7 @@ void ahci_command_verify(AHCIQState *ahci, AHCIComm=
-and *cmd)
-         ahci_port_check_d2h_sanity(ahci, port, slot);
+ 
+ static void ahci_start_dma(IDEDMA *dma, IDEState *s,
+@@ -1437,7 +1436,7 @@ static const IDEDMAOps ahci_dma_ops = {
+     .start_dma = ahci_start_dma,
+     .restart = ahci_restart,
+     .restart_dma = ahci_restart_dma,
+-    .start_transfer = ahci_start_transfer,
++    .pio_transfer = ahci_pio_transfer,
+     .prepare_buf = ahci_dma_prepare_buf,
+     .commit_buf = ahci_commit_buf,
+     .rw_buf = ahci_dma_rw_buf,
+diff --git a/hw/ide/core.c b/hw/ide/core.c
+index cc9ca28c33..1a6cb337bf 100644
+--- a/hw/ide/core.c
++++ b/hw/ide/core.c
+@@ -526,16 +526,18 @@ static void ide_clear_retry(IDEState *s)
+ void ide_transfer_start(IDEState *s, uint8_t *buf, int size,
+                         EndTransferFunc *end_transfer_func)
+ {
+-    s->end_transfer_func = end_transfer_func;
+     s->data_ptr = buf;
+     s->data_end = buf + size;
+     ide_set_retry(s);
+     if (!(s->status & ERR_STAT)) {
+         s->status |= DRQ_STAT;
      }
-     if (cmd->props->pio) {
--        ahci_port_check_pio_sanity(ahci, port, slot, cmd->xbytes);
-+        ahci_port_check_pio_sanity(ahci, cmd);
+-    if (s->bus->dma->ops->start_transfer) {
+-        s->bus->dma->ops->start_transfer(s->bus->dma);
++    if (!s->bus->dma->ops->pio_transfer) {
++        s->end_transfer_func = end_transfer_func;
++        return;
      }
++    s->bus->dma->ops->pio_transfer(s->bus->dma);
++    end_transfer_func(s);
  }
-=20
-diff --git a/tests/libqos/ahci.h b/tests/libqos/ahci.h
-index 715ca1e226..13f6d87b75 100644
---- a/tests/libqos/ahci.h
-+++ b/tests/libqos/ahci.h
-@@ -596,8 +596,7 @@ void ahci_port_check_interrupts(AHCIQState *ahci, uin=
-t8_t port,
-                                 uint32_t intr_mask);
- void ahci_port_check_nonbusy(AHCIQState *ahci, uint8_t port, uint8_t slo=
-t);
- void ahci_port_check_d2h_sanity(AHCIQState *ahci, uint8_t port, uint8_t =
-slot);
--void ahci_port_check_pio_sanity(AHCIQState *ahci, uint8_t port,
--                                uint8_t slot, size_t buffsize);
-+void ahci_port_check_pio_sanity(AHCIQState *ahci, AHCICommand *cmd);
- void ahci_port_check_cmd_sanity(AHCIQState *ahci, AHCICommand *cmd);
-=20
- /* Misc */
---=20
+ 
+ static void ide_cmd_done(IDEState *s)
+diff --git a/hw/ide/trace-events b/hw/ide/trace-events
+index 5c0e59ec42..153a7a62c9 100644
+--- a/hw/ide/trace-events
++++ b/hw/ide/trace-events
+@@ -101,7 +101,7 @@ handle_cmd_badport(void *s, int port) "ahci(%p)[%d]: guest accessed unused port"
+ handle_cmd_badfis(void *s, int port) "ahci(%p)[%d]: guest provided an invalid cmd FIS"
+ handle_cmd_badmap(void *s, int port, uint64_t len) "ahci(%p)[%d]: dma_memory_map failed, 0x%02"PRIx64" != 0x80"
+ handle_cmd_unhandled_fis(void *s, int port, uint8_t b0, uint8_t b1, uint8_t b2) "ahci(%p)[%d]: unhandled FIS type. cmd_fis: 0x%02x-%02x-%02x"
+-ahci_start_transfer(void *s, int port, const char *rw, uint32_t size, const char *tgt, const char *sgl) "ahci(%p)[%d]: %sing %d bytes on %s w/%s sglist"
++ahci_pio_transfer(void *s, int port, const char *rw, uint32_t size, const char *tgt, const char *sgl) "ahci(%p)[%d]: %sing %d bytes on %s w/%s sglist"
+ ahci_start_dma(void *s, int port) "ahci(%p)[%d]: start dma"
+ ahci_dma_prepare_buf(void *s, int port, int32_t io_buffer_size, int32_t limit) "ahci(%p)[%d]: prepare buf limit=%"PRId32" prepared=%"PRId32
+ ahci_dma_prepare_buf_fail(void *s, int port) "ahci(%p)[%d]: sglist population failed"
+diff --git a/include/hw/ide/internal.h b/include/hw/ide/internal.h
+index 88212f59df..f3de6f9b73 100644
+--- a/include/hw/ide/internal.h
++++ b/include/hw/ide/internal.h
+@@ -444,7 +444,7 @@ struct IDEState {
+ 
+ struct IDEDMAOps {
+     DMAStartFunc *start_dma;
+-    DMAVoidFunc *start_transfer;
++    DMAVoidFunc *pio_transfer;
+     DMAInt32Func *prepare_buf;
+     DMAu32Func *commit_buf;
+     DMAIntFunc *rw_buf;
+-- 
 2.14.3
