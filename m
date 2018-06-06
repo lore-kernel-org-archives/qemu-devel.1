@@ -1,33 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54128)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54874)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1fQU83-0000kq-EQ
-	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 04:49:17 -0400
+	(envelope-from <no-reply@patchew.org>) id 1fQUCB-0002n5-Iy
+	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 04:53:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1fQU7x-0006wy-FM
-	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 04:49:15 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:39102 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1fQU7x-0006wL-26
-	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 04:49:09 -0400
-Date: Wed, 6 Jun 2018 10:49:00 +0200
-From: Gerd Hoffmann <kraxel@redhat.com>
-Message-ID: <20180606084900.77jv3z4il47bx5gi@sirius.home.kraxel.org>
-References: <20180323122520.11270-1-kraxel@redhat.com>
-	<43fc23c1-d72f-748a-5b9d-a816466d7406@redhat.com>
-	<20180425140749.6x3w4h4i2n6uaq7o@sirius.home.kraxel.org>
-	<1ed94b1c-b416-eebe-9cf3-91943a0e6c5a@redhat.com>
-	<20180531084347.xb2r5aolkis2nmqg@sirius.home.kraxel.org>
-	<4b65af58-8451-a365-6c81-52c49e42b6ff@redhat.com>
-	<20180605110647.7ctaj7fiy6x4ewdw@sirius.home.kraxel.org>
-	<a3fe57cf-1569-834d-5528-d85847b29f9f@redhat.com>
-	<20180605131649.fu3cellm7vwaf4ao@sirius.home.kraxel.org>
-	<20d457f0-647f-04e3-76c3-ed58f3494208@redhat.com>
+	(envelope-from <no-reply@patchew.org>) id 1fQUC6-0000in-EN
+	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 04:53:31 -0400
+Resent-Message-Id: <E1fQUC6-0000in-EN@eggs.gnu.org>
+Received: from sender-of-o51.zoho.com ([135.84.80.216]:21097)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1fQUC6-0000hJ-4q
+	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 04:53:26 -0400
+In-Reply-To: <152819515565.30857.16834004920507717324.stgit@pasha-ThinkPad-T60>
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <152827516114.435.5343867589178162033@d39dc562802a>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20d457f0-647f-04e3-76c3-ed58f3494208@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2 0/7] ramfb: simple boot framebuffer,
- no legacy vga
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Wed, 6 Jun 2018 01:52:42 -0700 (PDT)
+Subject: Re: [Qemu-devel] [RFC PATCH v2 0/7] QEMU binary instrumentation
+ prototype
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,69 +29,90 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laszlo Ersek <lersek@redhat.com>
-Cc: qemu-devel@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>, Alex Williamson <alex.williamson@redhat.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>
+To: Pavel.Dovgaluk@ispras.ru
+Cc: famz@redhat.com, qemu-devel@nongnu.org, peter.maydell@linaro.org, maria.klimushenkova@ispras.ru, dovgaluk@ispras.ru, pavel.dovgaluk@ispras.ru, pbonzini@redhat.com, vilanova@ac.upc.edu
 
-  Hi,
-
-> > Maybe we should for now just scratch the idea of an virtio-ramfb device.
-> > Linux doesn't need it, and windows wouldn't use the virtio part of it so
-> > a standalone ramfb device would work equally well.
-> 
-> If that works for you, it works for me best!
-
-
-Ok, pushed updated branches.
-
-qemu (including seabios + ovmf blobs):
-  https://git.kraxel.org/cgit/qemu/log/?h=sirius/ramfb
-
-edk2:
-  https://github.com/kraxel/edk2/commits/ramfb
-
-seabios:
-  https://git.kraxel.org/cgit/seabios/log/?h=bochs
-
-
-What is in there?
-
-qemu:
-   -device ramfb
-      standalone ramfb device
-   -device virtio-ramfb
-      kept for now for testing, as discussed above no plans
-      to merge this one for now.
-   -device vfio-pci-ramfb
-      boot display for vgpu devices.
-   bochs-display got a vgabios.
-
-seabios:
-   support for bochs-display + rmafb added.  For both of them
-   vga text mode (at vgabios call level) is emulated by seabios
-   inside the guest.
-
-edk2:
-   QemuRamfbDxe driver, x86 wireup, incomplete arm wireup.
-
-
-Notes on QemuRamfbDxe:
-
-QemuRamfbDxe registers as VenHw device with a fresh generated uuid.  The
-uuid should probably go to some header file, suggestions where to place
-it best? 
-
-QemuRamfbDxe registers a acpi devpath node for the gop protocol.  It's
-appended to the VenHw path, but looks like that isn't enough to create
-it as child node of the VenHw device (according to devtree outout).
-Suggestions how to fix that?  Still this is good enough for consplitter
-to accept the device.
-
-The device path is added to the gPlatformConsole list, so consplitter
-will pick up the ramfb device even though it isn't a pci display device.
-The firmware display will show up on ramfb in addition to other display
-devices (if any).  Is that approach ok?  If so I'll do that for armvirt
-too.
-
-thanks and happy playing,
-
-  Gerd
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
+c3NhZ2UtaWQ6IDE1MjgxOTUxNTU2NS4zMDg1Ny4xNjgzNDAwNDkyMDUwNzcxNzMyNC5zdGdpdEBw
+YXNoYS1UaGlua1BhZC1UNjAKU3ViamVjdDogW1FlbXUtZGV2ZWxdIFtSRkMgUEFUQ0ggdjIgMC83
+XSBRRU1VIGJpbmFyeSBpbnN0cnVtZW50YXRpb24gcHJvdG90eXBlCgo9PT0gVEVTVCBTQ1JJUFQg
+QkVHSU4gPT09CiMhL2Jpbi9iYXNoCgpCQVNFPWJhc2UKbj0xCnRvdGFsPSQoZ2l0IGxvZyAtLW9u
+ZWxpbmUgJEJBU0UuLiB8IHdjIC1sKQpmYWlsZWQ9MAoKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYu
+cmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKZ2l0IGNv
+bmZpZyAtLWxvY2FsIGRpZmYuYWxnb3JpdGhtIGhpc3RvZ3JhbQoKY29tbWl0cz0iJChnaXQgbG9n
+IC0tZm9ybWF0PSVIIC0tcmV2ZXJzZSAkQkFTRS4uKSIKZm9yIGMgaW4gJGNvbW1pdHM7IGRvCiAg
+ICBlY2hvICJDaGVja2luZyBQQVRDSCAkbi8kdG90YWw6ICQoZ2l0IGxvZyAtbiAxIC0tZm9ybWF0
+PSVzICRjKS4uLiIKICAgIGlmICEgZ2l0IHNob3cgJGMgLS1mb3JtYXQ9ZW1haWwgfCAuL3Njcmlw
+dHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIC07IHRoZW4KICAgICAgICBmYWlsZWQ9MQogICAg
+ICAgIGVjaG8KICAgIGZpCiAgICBuPSQoKG4rMSkpCmRvbmUKCmV4aXQgJGZhaWxlZAo9PT0gVEVT
+VCBTQ1JJUFQgRU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRi
+ZDg4ODcxMzM4NApGcm9tIGh0dHBzOi8vZ2l0aHViLmNvbS9wYXRjaGV3LXByb2plY3QvcWVtdQog
+KiBbbmV3IHRhZ10gICAgICAgICAgICAgICBwYXRjaGV3LzIwMTgwNjA1MTYwOTU4LjU0MzQtMS1s
+YXVyZW50QHZpdmllci5ldSAtPiBwYXRjaGV3LzIwMTgwNjA1MTYwOTU4LjU0MzQtMS1sYXVyZW50
+QHZpdmllci5ldQogKiBbbmV3IHRhZ10gICAgICAgICAgICAgICBwYXRjaGV3LzIwMTgwNjA1MTYy
+NTQ1LjgwNzc4LTEtZGdpbGJlcnRAcmVkaGF0LmNvbSAtPiBwYXRjaGV3LzIwMTgwNjA1MTYyNTQ1
+LjgwNzc4LTEtZGdpbGJlcnRAcmVkaGF0LmNvbQpTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rl
+c3QnCjhlMjEzNzE1OWQgcGx1Z2luczogYWRkIHN5c2NhbGwgbG9nZ2luZyBwbHVnaW4gc2FtcGxl
+CjRmODM2ODgzODcgcGx1Z2luOiBhZGQgaW5zdHJ1Y3Rpb24gZXhlY3V0aW9uIGxvZ2dlcgowMWI2
+MjkwNTQwIHBsdWdpbnM6IGFkZCBwbHVnaW4gdGVtcGxhdGUKOGRiN2Y2MmVmNSB0Y2c6IGFkZCBp
+bnN0cnVtZW50aW5nIG1vZHVsZQoyZDIxNDRkMjAyIHBsdWdpbnM6IHByb3ZpZGUgaGVscGVyIGZ1
+bmN0aW9ucyBmb3IgcGx1Z2lucwo2NjMwYWE0MmQzIEFkZCBwbHVnaW4gc3VwcG9ydApmMzFiYWVl
+ODUzIHRjZzogYWRkIGhlYWRlcnMgZm9yIG5vbi10YXJnZXQgaGVscGVycwoKPT09IE9VVFBVVCBC
+RUdJTiA9PT0KQ2hlY2tpbmcgUEFUQ0ggMS83OiB0Y2c6IGFkZCBoZWFkZXJzIGZvciBub24tdGFy
+Z2V0IGhlbHBlcnMuLi4KV0FSTklORzogYWRkZWQsIG1vdmVkIG9yIGRlbGV0ZWQgZmlsZShzKSwg
+ZG9lcyBNQUlOVEFJTkVSUyBuZWVkIHVwZGF0aW5nPwojMTM6IApuZXcgZmlsZSBtb2RlIDEwMDY0
+NAoKdG90YWw6IDAgZXJyb3JzLCAxIHdhcm5pbmdzLCA4MCBsaW5lcyBjaGVja2VkCgpZb3VyIHBh
+dGNoIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBl
+cnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwg
+c2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCkNoZWNraW5nIFBBVENIIDIvNzogQWRkIHBs
+dWdpbiBzdXBwb3J0Li4uCldBUk5JTkc6IGFkZGVkLCBtb3ZlZCBvciBkZWxldGVkIGZpbGUocyks
+IGRvZXMgTUFJTlRBSU5FUlMgbmVlZCB1cGRhdGluZz8KIzg2OiAKbmV3IGZpbGUgbW9kZSAxMDA2
+NDQKCkVSUk9SOiAiKGZvbyopIiBzaG91bGQgYmUgIihmb28gKikiCiMxOTI6IEZJTEU6IHBsdWdp
+bnMvcGx1Z2lucy5jOjcwOgorICAgIGdfbW9kdWxlX3N5bWJvbChnX21vZHVsZSwgInBsdWdpbl9p
+bml0IiwgKGdwb2ludGVyKikmaW5mby0+aW5pdCk7CgpFUlJPUjogIihmb28qKSIgc2hvdWxkIGJl
+ICIoZm9vICopIgojMTk2OiBGSUxFOiBwbHVnaW5zL3BsdWdpbnMuYzo3NDoKKyAgICAgICAgKGdw
+b2ludGVyKikmaW5mby0+bmVlZHNfYmVmb3JlX2luc24pOwoKRVJST1I6ICIoZm9vKikiIHNob3Vs
+ZCBiZSAiKGZvbyAqKSIKIzE5ODogRklMRTogcGx1Z2lucy9wbHVnaW5zLmM6NzY6CisgICAgICAg
+IChncG9pbnRlciopJmluZm8tPmJlZm9yZV9pbnNuKTsKCnRvdGFsOiAzIGVycm9ycywgMSB3YXJu
+aW5ncywgMjEwIGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBw
+bGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVz
+IHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJ
+TkVSUy4KCkNoZWNraW5nIFBBVENIIDMvNzogcGx1Z2luczogcHJvdmlkZSBoZWxwZXIgZnVuY3Rp
+b25zIGZvciBwbHVnaW5zLi4uCldBUk5JTkc6IGFkZGVkLCBtb3ZlZCBvciBkZWxldGVkIGZpbGUo
+cyksIGRvZXMgTUFJTlRBSU5FUlMgbmVlZCB1cGRhdGluZz8KIzQyOiAKbmV3IGZpbGUgbW9kZSAx
+MDA2NDQKCnRvdGFsOiAwIGVycm9ycywgMSB3YXJuaW5ncywgNDkgbGluZXMgY2hlY2tlZAoKWW91
+ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhl
+c2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWlu
+ZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgpDaGVja2luZyBQQVRDSCA0Lzc6IHRj
+ZzogYWRkIGluc3RydW1lbnRpbmcgbW9kdWxlLi4uCldBUk5JTkc6IGFkZGVkLCBtb3ZlZCBvciBk
+ZWxldGVkIGZpbGUocyksIGRvZXMgTUFJTlRBSU5FUlMgbmVlZCB1cGRhdGluZz8KIzM2OiAKbmV3
+IGZpbGUgbW9kZSAxMDA2NDQKCnRvdGFsOiAwIGVycm9ycywgMSB3YXJuaW5ncywgODQgbGluZXMg
+Y2hlY2tlZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJ
+ZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8g
+dGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgpDaGVja2luZyBQ
+QVRDSCA1Lzc6IHBsdWdpbnM6IGFkZCBwbHVnaW4gdGVtcGxhdGUuLi4KV0FSTklORzogYWRkZWQs
+IG1vdmVkIG9yIGRlbGV0ZWQgZmlsZShzKSwgZG9lcyBNQUlOVEFJTkVSUyBuZWVkIHVwZGF0aW5n
+PwojMTM6IApuZXcgZmlsZSBtb2RlIDEwMDY0NAoKdG90YWw6IDAgZXJyb3JzLCAxIHdhcm5pbmdz
+LCAzOCBsaW5lcyBjaGVja2VkCgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNl
+IHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBv
+cnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMu
+CkNoZWNraW5nIFBBVENIIDYvNzogcGx1Z2luOiBhZGQgaW5zdHJ1Y3Rpb24gZXhlY3V0aW9uIGxv
+Z2dlci4uLgpXQVJOSU5HOiBhZGRlZCwgbW92ZWQgb3IgZGVsZXRlZCBmaWxlKHMpLCBkb2VzIE1B
+SU5UQUlORVJTIG5lZWQgdXBkYXRpbmc/CiMxMzogCm5ldyBmaWxlIG1vZGUgMTAwNjQ0Cgp0b3Rh
+bDogMCBlcnJvcnMsIDEgd2FybmluZ3MsIDM3IGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFz
+IHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwph
+cmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hF
+Q0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KQ2hlY2tpbmcgUEFUQ0ggNy83OiBwbHVnaW5zOiBhZGQg
+c3lzY2FsbCBsb2dnaW5nIHBsdWdpbiBzYW1wbGUuLi4KV0FSTklORzogYWRkZWQsIG1vdmVkIG9y
+IGRlbGV0ZWQgZmlsZShzKSwgZG9lcyBNQUlOVEFJTkVSUyBuZWVkIHVwZGF0aW5nPwojMTQ6IApu
+ZXcgZmlsZSBtb2RlIDEwMDY0NAoKRVJST1I6ICIoZm9vKikiIHNob3VsZCBiZSAiKGZvbyAqKSIK
+IzgwOiBGSUxFOiBwbHVnaW5zL3N5c2NhbGwtbG9nL3N5c2NhbGwtbG9nLmM6Mzc6CisgICAgcWVt
+dWxpYl9yZWFkX3JlZ2lzdGVyKGNwdSwgKHVpbnQ4X3QqKSZyZWcsIDApOwoKdG90YWw6IDEgZXJy
+b3JzLCAxIHdhcm5pbmdzLCA2MyBsaW5lcyBjaGVja2VkCgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBw
+cm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNl
+IHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0gg
+aW4gTUFJTlRBSU5FUlMuCgo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29tbWFuZCBleGl0ZWQg
+d2l0aCBjb2RlOiAxCgoKLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNo
+ZXcgW2h0dHA6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBh
+dGNoZXctZGV2ZWxAcmVkaGF0LmNvbQ==
