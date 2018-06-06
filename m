@@ -1,17 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59257)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33034)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <elliott@hpe.com>) id 1fQhjp-000100-QB
-	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 19:21:10 -0400
+	(envelope-from <dan.j.williams@intel.com>) id 1fQi2f-0006rH-R6
+	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 19:40:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <elliott@hpe.com>) id 1fQhjk-0004o8-QT
-	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 19:21:09 -0400
-Received: from g9t5009.houston.hpe.com ([15.241.48.73]:37712)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <elliott@hpe.com>) id 1fQhjk-0004n2-J4
-	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 19:21:04 -0400
-From: "Elliott, Robert (Persistent Memory)" <elliott@hpe.com>
-Date: Wed, 6 Jun 2018 23:20:58 +0000
-Message-ID: <AT5PR8401MB1169403448C8AA5FF267F6A6AB650@AT5PR8401MB1169.NAMPRD84.PROD.OUTLOOK.COM>
+	(envelope-from <dan.j.williams@intel.com>) id 1fQi2e-00070t-Od
+	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 19:40:37 -0400
+Received: from mail-ot0-x241.google.com ([2607:f8b0:4003:c0f::241]:43168)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <dan.j.williams@intel.com>)
+	id 1fQi2e-0006xd-JL
+	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 19:40:36 -0400
+Received: by mail-ot0-x241.google.com with SMTP id i19-v6so9356661otk.10
+	for <qemu-devel@nongnu.org>; Wed, 06 Jun 2018 16:40:32 -0700 (PDT)
+MIME-Version: 1.0
+In-Reply-To: <AT5PR8401MB1169403448C8AA5FF267F6A6AB650@AT5PR8401MB1169.NAMPRD84.PROD.OUTLOOK.COM>
 References: <20180521163203.26590-1-ross.zwisler@linux.intel.com>
 	<20180521163203.26590-4-ross.zwisler@linux.intel.com>
 	<20180605182243-mutt-send-email-mst@kernel.org>
@@ -20,11 +22,11 @@ References: <20180521163203.26590-1-ross.zwisler@linux.intel.com>
 	<20180605213547-mutt-send-email-mst@kernel.org>
 	<20180605220700.GB16066@linux.intel.com>
 	<CAPcyv4irudGth3+WZtgF4TjGL53s8mN70aVXpGWjj_Lc=7AMVg@mail.gmail.com>
-In-Reply-To: <CAPcyv4irudGth3+WZtgF4TjGL53s8mN70aVXpGWjj_Lc=7AMVg@mail.gmail.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
-MIME-Version: 1.0
+	<AT5PR8401MB1169403448C8AA5FF267F6A6AB650@AT5PR8401MB1169.NAMPRD84.PROD.OUTLOOK.COM>
+From: Dan Williams <dan.j.williams@intel.com>
+Date: Wed, 6 Jun 2018 16:40:31 -0700
+Message-ID: <CAPcyv4gwsasnnt=LpU5wgbjvL8=w+fErCPtNHyRDGO1iQukYnw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Subject: Re: [Qemu-devel] [qemu PATCH v4 3/4] nvdimm,
  acpi: support NFIT platform capabilities
 List-Id: <qemu-devel.nongnu.org>
@@ -35,27 +37,25 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: 'Dan Williams' <dan.j.williams@intel.com>, Ross Zwisler <ross.zwisler@linux.intel.com>
-Cc: Eduardo Habkost <ehabkost@redhat.com>, linux-nvdimm <linux-nvdimm@lists.01.org>, "Michael S. Tsirkin" <mst@redhat.com>, Qemu
-	Developers <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>, Igor Mammedov <imammedo@redhat.com>
+To: "Elliott, Robert (Persistent Memory)" <elliott@hpe.com>
+Cc: Ross Zwisler <ross.zwisler@linux.intel.com>, Eduardo Habkost <ehabkost@redhat.com>, linux-nvdimm <linux-nvdimm@lists.01.org>, "Michael S. Tsirkin" <mst@redhat.com>, Qemu Developers <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>, Igor Mammedov <imammedo@redhat.com>
 
+On Wed, Jun 6, 2018 at 4:20 PM, Elliott, Robert (Persistent Memory)
+<elliott@hpe.com> wrote:
+>
+>> > Okay, we can move to the symbolic names.  Do you want them to be that
+>> long, or
+>> > would:
+>> >
+>> > nvdimm-cap-cpu
+>> > nvdimm-cap-mem-ctrl
+>> > nvdimm-cap-mirroring
+>>
+>> Wait, why is mirroring part of this?
+>
+> This data structure is intended to report any kind of platform capability, not
+> just platform persistence capabilities.
 
-> > Okay, we can move to the symbolic names.  Do you want them to be that
-> long, or
-> > would:
-> >
-> > nvdimm-cap-cpu
-> > nvdimm-cap-mem-ctrl
-> > nvdimm-cap-mirroring
->=20
-> Wait, why is mirroring part of this?
-
-This data structure is intended to report any kind of platform capability, =
-not=20
-just platform persistence capabilities.
-
-We could add a short symbolic name to the definitions in ACPI that matches
-the ones selected for this command line option, if that'll help people
-find the right names to use.
-
-I recommend mc rather than mem-ctrl to keep dashes as special.
+Yes, but here's nothing actionable that a qemu guest OS can do with
+that mirroring information, so there's no need at this time to add cli
+cruft and code to support it.
