@@ -1,27 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48764)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49266)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1fQZTg-0001Ow-TR
-	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 10:32:01 -0400
+	(envelope-from <mreitz@redhat.com>) id 1fQZV3-0002GQ-M7
+	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 10:33:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1fQZTc-0001g8-OM
-	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 10:31:56 -0400
-Date: Wed, 6 Jun 2018 15:31:35 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20180606143134.GG2660@work-vm>
-References: <20180528212054.GH2209@redhat.com>
-	<20180528212510.GC4660@redhat.com>
-	<20180529064415.GA4756@localhost.localdomain>
+	(envelope-from <mreitz@redhat.com>) id 1fQZV1-0002Ko-Q3
+	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 10:33:21 -0400
+References: <20180529064415.GA4756@localhost.localdomain>
 	<2b3eef00-f326-c1e6-0e4b-b7602646eec4@redhat.com>
-	<20180605092159.GA2544@work-vm>
-	<46ef4200-eccf-7e65-d3a0-69e4a7414b51@redhat.com>
-	<20180606111406.GD2660@work-vm>
-	<9e8b49fb-0162-bf35-21bb-acc0dc28555f@redhat.com>
-	<20180606120050.GB2661@work-vm>
-	<61a301dd-8e50-8799-8328-341d6ab744f5@redhat.com>
+	<20180606123237.2235ae4a@kitsune.suse.cz>
+	<bc97cdc3-85ba-e053-0816-b6bc431064fb@redhat.com>
+	<20180606131929.44d0fd6b@kitsune.suse.cz>
+	<93233bff-604b-c891-90ce-64fe1eaaaab5@redhat.com>
+	<20180606113720.GA2661@work-vm>
+	<2c833e2c-f0bb-ea98-a703-54fb9447bd2f@redhat.com>
+	<20180606121624.GD2661@work-vm>
+	<2d572c2f-8dda-87db-ec26-6f2230375424@redhat.com>
+	<20180606140233.GF2660@work-vm>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <66366ae1-1db8-7121-bfcc-f2096d0c954f@redhat.com>
+Date: Wed, 6 Jun 2018 16:33:03 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <61a301dd-8e50-8799-8328-341d6ab744f5@redhat.com>
+In-Reply-To: <20180606140233.GF2660@work-vm>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="gLfVTqEavfXD9R2cNcTLZUAbLrCJ5ApzH"
 Subject: Re: [Qemu-devel] storing machine data in qcow images?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -31,409 +33,312 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>, armbru@redhat.com, qemu-devel@nongnu.org, "Richard W.M. Jones" <rjones@redhat.com>, stefanha@redhat.com
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, ehabkost@redhat.com, qemu-block@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>, "Richard W.M. Jones" <rjones@redhat.com>, qemu-devel@nongnu.org, stefanha@redhat.com, =?UTF-8?Q?Michal_Such=c3=a1nek?= <msuchanek@suse.de>
 
-* Max Reitz (mreitz@redhat.com) wrote:
-> On 2018-06-06 14:00, Dr. David Alan Gilbert wrote:
-> > * Max Reitz (mreitz@redhat.com) wrote:
-> >> On 2018-06-06 13:14, Dr. David Alan Gilbert wrote:
-> >>> * Max Reitz (mreitz@redhat.com) wrote:
-> >>>> On 2018-06-05 11:21, Dr. David Alan Gilbert wrote:
-> >>>>> <reawakening a fizzled out thread>
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--gLfVTqEavfXD9R2cNcTLZUAbLrCJ5ApzH
+From: Max Reitz <mreitz@redhat.com>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, ehabkost@redhat.com,
+ qemu-block@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>,
+ "Richard W.M. Jones" <rjones@redhat.com>, qemu-devel@nongnu.org,
+ stefanha@redhat.com, =?UTF-8?Q?Michal_Such=c3=a1nek?= <msuchanek@suse.de>
+Message-ID: <66366ae1-1db8-7121-bfcc-f2096d0c954f@redhat.com>
+Subject: Re: [Qemu-devel] storing machine data in qcow images?
+References: <20180529064415.GA4756@localhost.localdomain>
+ <2b3eef00-f326-c1e6-0e4b-b7602646eec4@redhat.com>
+ <20180606123237.2235ae4a@kitsune.suse.cz>
+ <bc97cdc3-85ba-e053-0816-b6bc431064fb@redhat.com>
+ <20180606131929.44d0fd6b@kitsune.suse.cz>
+ <93233bff-604b-c891-90ce-64fe1eaaaab5@redhat.com>
+ <20180606113720.GA2661@work-vm>
+ <2c833e2c-f0bb-ea98-a703-54fb9447bd2f@redhat.com>
+ <20180606121624.GD2661@work-vm>
+ <2d572c2f-8dda-87db-ec26-6f2230375424@redhat.com>
+ <20180606140233.GF2660@work-vm>
+In-Reply-To: <20180606140233.GF2660@work-vm>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-<snip>
+On 2018-06-06 16:02, Dr. David Alan Gilbert wrote:
+> * Max Reitz (mreitz@redhat.com) wrote:
+>> On 2018-06-06 14:16, Dr. David Alan Gilbert wrote:
+>>> * Max Reitz (mreitz@redhat.com) wrote:
+>>>> On 2018-06-06 13:37, Dr. David Alan Gilbert wrote:
+>>>>> * Max Reitz (mreitz@redhat.com) wrote:
+>>>>>> On 2018-06-06 13:19, Michal Such=C3=A1nek wrote:
+>>>>>>> On Wed, 6 Jun 2018 13:02:53 +0200
+>>>>>>> Max Reitz <mreitz@redhat.com> wrote:
+>>>>>>>
+>>>>>>>> On 2018-06-06 12:32, Michal Such=C3=A1nek wrote:
+>>>>>>>>> On Tue, 29 May 2018 12:14:15 +0200
+>>>>>>>>> Max Reitz <mreitz@redhat.com> wrote:
+>>>>
+>>>> [...]
+>>>>
+>>>>>>>>>> Unless I have got something terribly wrong (which is indeed a
+>>>>>>>>>> possibility!), to me this proposal means basically to turn qco=
+w2
+>>>>>>>>>> into (1) a VM description format for qemu, and (2) to turn it =
+into
+>>>>>>>>>> an archive format on the way. =20
+>>>>>>>>>
+>>>>>>>>> And if you go all the way you can store multiple disks along wi=
+th
+>>>>>>>>> the VM definition so you can have the whole appliance in one fi=
+le.
+>>>>>>>>> It conveniently solves the problem of synchronizing snapshots a=
+cross
+>>>>>>>>> multiple disk images and the question where to store the machin=
+e
+>>>>>>>>> state if you want to suspend it.  =20
+>>>>>>>>
+>>>>>>>> Yeah, but why make qcow2 that format?  That's what I completely =
+fail
+>>>>>>>> to understand.
+>>>>>>>>
+>>>>>>>> If you want to have a single VM description file that contains t=
+he VM
+>>>>>>>> configuration and some qcow2/raw/whatever files along with it fo=
+r the
+>>>>>>>> guest disk data, sure, go ahead.  But why does the format of the=
+ whole
+>>>>>>>> thing need to be qcow2?
+>>>>>>>
+>>>>>>> Because then qemu can access the disk data from the image directl=
+y
+>>>>>>> without any need for extraction, copying to different file, etc.
+>>>>>>
+>>>>>> This does not explain why it needs to be qcow2.  There is absolute=
+ly no
+>>>>>> reason why you couldn't use qcow2 files in-place inside of another=
+ file.
+>>>>>
+>>>>> Because then we'd have to change the whole stack to take advantage =
+of
+>>>>> that.  Adding a feature into qcow2 means nothing else changes.
+>>>>
+>>>> Because it's a hack, right.  Storing binary data in a qcow2 file,
+>>>> completely ignoring it in qemu (and being completely unusable to any=
 
-> >>> The problem with having a separate file is that you either have to copy
-> >>> it around with the image 
-> >>
-> >> Which is just an inconvenience.
-> > 
-> > It's more than that;  if it's a separate file then the tools can't
-> > rely on users supplying it, and frankly they won't and they'll still
-> > just supply an image.
-> 
-> At which point you throw an error and tell them to specify the config file.
+>>>> potential other users of the qcow2 format[1]) and only interpreting =
+it
+>>>> somewhere up the stack is a hack.
+>>>
+>>> It's not a hack!
+>>> Seriously it's not.
+>>> There's nothing wrong with it being aimed higher up the stack than qe=
+mu,
+>>
+>> Not really, but storing that information in a disk image file is, from=
 
-No:
-   a) At the moment they get away with it for images since they're all
-      'pc' and the management layers do the right thing.
-   b) They'll give the wrong config file - then you'd need to add a flag
-     to detect that - which means you'd need to add something to the
-     qcow to match it to the config; loop back to teh start!
+>> my perspective.  So far, qcow2 was always just for qemu.  (Hmm...  May=
+be
+>> backing links weren't, but at least they were intended for qemu origin=
+ally.)
+>>
+>> So this would mix information for different layers inside qcow2 which =
+to
+>> me sounds weird.  Maybe I just have to get used to it.
+>=20
+> The important point is it's explicitly for a different layer; we're not=
 
-We should make this EASY for users.
+> mixing it - the guest can never get to this information.
 
-> >> I understand it is an inconvenience and it would be nice to change it,
-> >> but please understand that I do not want qcow2 to become a filesystem
-> >> just to relieve an inconvenience.
-> > 
-> > I very much don't want it to be a filesystem; my reason for writing
-> > down my spec the way I did was to make it clear that the only
-> > thing I want of qcow2 is a single blob, no more; I don't want naming
-> > of the blob or anything else.
-> > 
-> >> (Note: I understand that you may not want qcow2 to become a filesystem,
-> >> but I do get the impression from others.)
-> > 
-> > My aim was to specify it to fulfill the requirements that everyone
-> > else had asked for, but still only having one unmodifiable blob in qcow.
-> > 
-> >>>                           or have an archive. If you have an archive
-> >>> you have to have an unpacking step which then copies, potentially a lot
-> >>> of data taking some reasonable amount of time.
-> >>
-> >> I'm sure this can be optimized, but yes, I get that.
-> >>
-> >> (If you use e.g. tar and store the image data starting on an FS cluster
-> >> boundary (64 kB should be more than sufficient), I assume there is a way
-> >> to extract that data into a new file without copying anything.)
-> > 
-> > But then we have to modify all the current things that know how to
-> > handle a qcow2.
-> 
-> Not in this case because it'd still be a flat qcow2 file in a simple tar
-> archive.
-> 
-> But you're right if we had a more complex format (like chunks stored in
-> a tar file).
+Neither can it get to bitmaps, but bitmaps are still for qemu.
 
-My only problem with using the tar like that is that all tools
-everywhere would need to be updated to be able to parse them.
-(Note if adding a blob to qcow2 like I'm asking for would break existing
-qcow2 users then I don't want it either).
+>                                                           It also saves=
 
-> >>>                                                 Storing a simple bit
-> >>> of data with the image avoids that.
-> >>
-> >> It is not a simple bit of data, as evidenced by the discussion about
-> >> storing binary blobs and MIME types going on.
-> > 
-> > All of the things they've suggested can be done inside that one blob;
-> > even inside the json (or any other structure in that blob).
-> 
-> Right, from qcow2's perspective it's a blob of data.  But you can put a
-> whole filesystem into a blob of data, and I get the impression that this
-> is what some are trying to do.
-> 
-> Once we store larger amounts of binary data in that blob (which is what
-> I'm fearing from comments on MIME types and PNG images), people will
-> realize that always having to re-store the whole blob if you modify
-> something in the middle is inefficient and that it needs to be
-> optimized.  I don't think you want to do that, but we haven't
-> implemented any of this yet and people are already asking for such
-> binary data inside of the blob.
-> 
-> I suspect it'll only get worse over time.
-> I think the most difficult thing about this discussion is that there are
-> different targets.
-> 
-> You just want to store a bit of information.  OK, good, but then I'd say
-> we could even just prepend that to the image file in a small header.
+> the higher level management layers ever having to look at the data the
+> guest can get to, which is a security advantage.
 
+Er, well, yes, but guessing configuration options from the guest disk
+contents is definitely a bad idea, I agree on that anyway.
 
-I think you're over-reading what people are asking for.
-I think the PNG suggestion is again the 'label on the front' for a logo.
-I've not seen anything that's not for either:
-  a) The user to know what the image is
-  b) The management layer to know what type of VM to create
+> From my point of view, it really is the sticky label on the disc rather=
 
-> (Note that extending that header would not even be too complicated,
-> because you can easily move the qcow2 header somewhere else.  Say you
-> move it back by one cluster (e.g. 64 kB), then you just put the cluster
-> that was there originally to the end of the file, which is pretty much
-> trivial.  Then you copy that original data there and overwrite it with
-> the image header.  Done.)
-> 
-> Others want to store more binary data.  Then this may get inefficient
-> and insufficient.  But I'd think at this point it gets really
-> problematic to put the data into the qcow2 file because it really
-> doesn't belong there.  (I can't imagine anything that would warrant a
-> MIME type.)
+> than the contents of it.
 
-No, I can't imagine why anyone wants a MIME type either.
+Sure, which is why I wouldn't put it in qcow2.  Content and meta-content
+is what qcow2 currently stores, but not how to use it.
 
-> Then I've heard proposals of storing multiple disk images.  Yes, you
-> could store multiple disks inside of a single qcow2 file, but it would
-> be basically exactly the same as storing just multiple qcow2 files, so...
+>>> the problem we started off with was what happens when a user download=
+s
+>>> a VM image and tries to import it into their VM system;
+>>
+>> Well, the VM system should choke without a config file. O:-)
+>>
+>>>                                                         weve already
+>>> got 2+ layers of management stuff in there - I want the information t=
+o
+>>> guide those layers, not form a complete set of configuration.
+>>
+>> But I do.
+>>
+>> If we store some information, I don't see why we don't store all of it=
+=2E
+>=20
+> Hmm, now that generally I don't like:
 
-No, completely agree.
+Me neither.
 
-> And really, I still believe in my slippery slope argument, which means
-> that even if you just want to innocently store a machine type, we will
-> end up with something vastly more complex in the end.
-> 
-> Finally, it appears to me that you have a simple problem, found one
-> possible solution, and now you just focus on that solution instead of
-> taking a step back and looking at the problem again.
-> 
-> The problem: You want to store a binary blob and a disk image together.
-> 
-> Your solution: qcow2 has refcounting and thus "occupation bits".  You
-> can put data into it and it will leave it alone, as long as that area is
-> marked as occupied.  Let's put the data into the qcow2 file.
-> 
-> OK, let's look at the problem and its constraints again.
-> 
-> Hard constraint: Store a single file.
-> (I don't think this is a hard constraint, because I haven't been
-> convinced yet that handling more than a single file is so bad.)
+>   a) That really would make it hypervisor specific
 
-See above; I think it is.
-My other hard contraint is that no tool has to change unless
-it wants to make use of the new data.
+Yes.
 
-> Soft constraint: Max doesn't like storing blobs in qcow2.
-> 
-> So one solution is to ignore the soft constraint.  OK, valid solution, I
-> give you that.  But it doesn't leave me content, probably understandably so.
-> 
-> 
-> So let me try to understand how we end up with qcow2 as a result...  We
-> need a single file that needs to contain both the disk data and a binary
-> blob.  Or, well, even better would be if that file can store multiple
-> arbitrary objects, in a format of your choosing, but that makes things
-> more complicated, so let's leave that off for now.
-> 
-> So all you need is object storage (probably with a single root object
-> that references the rest in a custom format) and a way to tell which
-> areas of the file are occupied.  Now the issue is that both the disk
-> image and the blob may grow.  So both need mutual understanding of which
-> areas are occupied and which can be used for growth.  For the disk
-> image, the block layer would definitely need a driver to handle that,
-> which is not impossible.  But qcow2 would automatically handle it.
-> 
-> So, OK, for now this is my result.  If we create a new format, we'd need
-> a block driver for it (underneath qcow2) that handles the allocation.
-> With qcow2, we'd get it for free.
-> 
-> 
-> Hm, OK.
-> 
-> The simplest implementation for such an additional layer would get away
-> without actual occupation bits and just always allocate new storage at
-> the end of the file.  That should be sufficient, it would be quick and
-> not very complex.  But I see that it is additional complexity when
-> compared with just adding the blob to qcow2.
-> 
-> 
-> Well, in a sense, because we'd need block layer interfaces for
-> extracting the information from a qcow2 file through qemu-img.  So maybe
-> adding another block driver would actually mean less complexity...
-> 
-> 
-> [...]
-> 
-> >>>> But I really, really, really do not like storing arbitrary data in qcow2
-> >>>> files.  I hated it badly enough when qemu knew what to do with it, but I
-> >>>> hate it even more when even qemu has no idea what to do with it.
-> >>>>
-> >>>> Having a specification of what everything means in the qemu tree makes
-> >>>> things less unbearable, but not to my liking still.
-> >>>
-> >>> Have you said why you hate it so much?
-> >>> Your hate for it seems to be making a simple solution hard.
-> >>
-> >> Because it's a disk image format.  Data therein should be relevant to
-> >> the disk image.  I see qcow2 as a representation of data stored on a
-> >> physical storage medium.
-> > 
-> > What we're missing here is the notes scribbled on the sticky label on
-> > the disc;  you rarely need them on a physical drive in a computer,
-> > LUNs on a SAN don't need them that much because they have a full
-> > filesystem and don't move about much.  Here we're talking about an image
-> > being downloaded or sent between people.
-> 
-> Well, qcow2 doesn't even describe the device type, so the sticky label
-> may be off limits.
-> 
-> But really, if you create a VM, you need a configuration.  Like if you
-> set up a new computer, you need to know what you want.  Usually there is
-> no sticky label, but you just have to know and input it manually.  Maybe
-> you have a sheet of paper, which I'd call the configuration file.
+>   b) It would be a lot of data
 
-Most things are figurable-out by the management tools/defaults or
-are dependent on the whim of the user - we're only trying to stop the
-user doing things that wont work.
-Simpler example; what stops you trying to put the PPC qcow image into
-your x86 VM system - nothing that I know of.  I just want to stop the
-users shooting themselves in the foot.
+Yes.
 
-> >> Some metadata associated directly with that is fine (such as dirty
-> >> bitmaps, backing chains, things like that).  But configuring the whole
-> >> VM seems out of scope to me.
-> >>
-> >> Also, making qcow2 a filesystem is not a simple solution.
-> >>
-> >> ...OK, let me back off here, I may be over-interpreting things and
-> >> throwing opinions of different people into one pot.
-> >>
-> >> Maybe you don't want qcow2 to be a filesystem, and you just want to
-> >> store a single binary blob.  Well, OK, that's not that bad.  But in any
-> >> case, I wouldn't call it a simple solution anymore.
-> >>
-> >> Yes, storing just the machine type somewhere would be possible with a
-> >> simple solution; but as I said (and the whole thread shows since then),
-> >> this is a slippery slope, and suddenly we arrive at storing arbitrary
-> >> binary data (like images?!) along with MIME types.  That will not be
-> >> possible with a simple solution anymore, I don't think.
-> > 
-> > Right; I was thinking we were too far down that slope to get rid
-> > of all of those requirements, but I was trying to force it back to
-> > being a single blob as far as QCOW2 saw it.
-> 
-> A valiant effort, but I myself cannot see why we should forbid storing
-> more data once we started storing some data.  I myself do think that if
-> we store some VM configuration, we should be able to store all of it,
-> and allow for arbitrarily complex scenarios.
-> 
-> >>>>> --------------------------------------------------------------
-> >>>>>    
-> >>>>>
-> >>>>> Some reasoning:
-> >>>>>    a) I've avoided the problem of when QEMU interprets the value
-> >>>>>       by ignoring it and giving it to management layers at the point
-> >>>>>       of VM import.
-> >>>>
-> >>>> Yes, but in the process you've made it completely opaque to qemu,
-> >>>> basically, which doesn't really make it better for me.  Not that
-> >>>> qemu-specific information in qcow2 files would be what I want, but, well.
-> >>>>
-> >>>> But it does solve technical issues, I concede that.
-> >>>>
-> >>>>>    b) I hate JSON, but there again nailing down a fixed format
-> >>>>>       seems easiest and it makes the job of QCOW easy - a single
-> >>>>>       string.
-> >>>>
-> >>>> Not really.  The string can be rather long, so you probably don't want
-> >>>> to store it in the image header, and thus it's just a binary blob from
-> >>>> qcow2's perspective, essentially.
-> >>>
-> >>> Yes, but it's a single blob - I'm not asking for multiple keyed blobs
-> >>> or the ability to update individual blobs; just one blob that I can
-> >>> replace.
-> >>
-> >> OK, you aren't, but others seem to be.
-> >>
-> >> Or, well, you call it a single blob.  But actually the current ideas
-> >> seem to be to store a rather large configuration tree with binary data
-> >> in that blob, so to me personally there is absolutely no functional
-> >> difference to just storing a tar file in that blob.
-> >>
-> >> So correct me if I'm wrong, but to me it appears that you effectively
-> >> want to store a filesystem in qcow2.[1]  Well, that's better than making
-> >> qcow2 the filesystem, but it still appears just the wrong way around to me.
-> > 
-> > It's different in the sense that what we end up with is still a qcow2;
-> > anything that just handles qcow2's and can pass them through doesn't
-> > need to do anything different; users don't need to do anything
-> > different.  No one has to pack/unpack the file.
-> 
-> Packing/unpacking is a strawman because I'm doing my best to give
-> proposals that completely avoid that.
-> 
-> Users do need to do something different, because users do need to
-> realize that today there is no way to store VM configuration and disk
-> data in a single file.  So if they already start VMs just based on a
-> disk, then they are assuming behavior we do not have and that I'd call
-> naive.  But that is a strawman from my side, sorry.  Keeping naive users
-> happy is probably OK.
+>   c) Generally, the supplier of an image doesn't know how the end-user
+>      wants it configured - although for some appliances they might.
 
-Remember this all works fine now and has done for many years;
-it's the addition of q35 that breaks that assumption.
-The users can already blidly pick up the qcow2 image and stuff it in and
-it all works; all I want is for that to keep working.
+Well, yes.  But just storing very basic information limits the use case
+to a very basic case anyway, doesn't it?  So this wouldn't be worse.
 
-> Keeping tools working is a good argument, but I'm not exactly sure what
-> the use cases are.  What I'd want is that in the end we have a way of
-> configuring a whole VM in a single file.[1]  Then, that file is no
-> longer just a disk image, it is a whole VM.  So maybe those tools need
-> to be adjusted anyway.
-> 
-> I assume that we have tools that work on disk images, and we trivially
-> want to keep them working on that VM's disk image without having to
-> incorporate a block layer.  Depending on the format we choose, that may
-> be very simple (maybe just use an offset for the qcow2 header).
-> 
-> But if we want to store a whole VM in a single file, then storing
-> multiple disk images in that single file does not seem too far off to
-> me, and that would mean breaking those tools anyway.
-> 
-> [1] I still don't quite see the point, because just using more than a
-> single file is so much easier.
-> 
-> >> [1] Yes, I know that the guest disk already contains an FS. :-P
-> >>
-> >>>>>       (I would suggest in layer2 that the keys are sorted, but
-> >>>>>       that's a pain to do in some json creators)
-> >>>>>    c) Forcing the registry of keys might avoid silly duplication.
-> >>>>>       We can but hope.
-> >>>>>    d) I've not said it's a libvirt XML file since that seems
-> >>>>>       a bit prescriptive.
-> >>>>>
-> >>>>> Some initial suggested keys:
-> >>>>>
-> >>>>>    "qemu.machine-types": [ "q35", "i440fx" ]
-> >>>>>    "qemu.min-ram-MB": 1024
-> >>>>
-> >>>> I still don't understand why you'd want to put the configuration into
-> >>>> qcow2 instead of the other way around.
-> >>>>
-> >>>> Or why you'd want to use a single file at all, because as this whole
-> >>>> thread shows, a disk image alone is clearly not sufficient to describe a VM.
-> >>>>
-> >>>> (Or it may be in simple cases, but then that's because you don't need
-> >>>> any configuration.)
-> >>>
-> >>> Because it avoids the unpacking associated with archives.
-> >>
-> >> I'm not talking about unpacking.  I'm talking about a potentially new
-> >> format which allows accessing the qcow2 file in-place.  It would
-> >> probably be trivial to write a block driver to allow this.
-> >>
-> >> (And as I wrote in my response to Michal, I suspect that tar could
-> >> actually allow this, even though it would probably not be the ideal format.)
-> > 
-> > As above, I don't think this is trivial; you have to change all the
-> > layers;  lets say it was a tar; you'd have to somehow know that you're
-> > importing one of these special tars,
-> 
-> Which is trivial because it's just "Hey, look, it's a tar with that
-> description file".
+Everything beyond a very basic use case can expect the user to take 30
+seconds to download and pass a config file.
 
-Trivial? It's taking 100+ mails to add a tag to a qcow2 file! Can you
-imagine what it takes to change libvirt, openstack, ovirt and the rest?
+>   d) Remember the only problem we had when we got here was how to stop
+>      the user shooting themselves in the foot by connecting the wrong
+>      image to the wrong VM type.
+
+Hm.  How exactly is that shooting yourself in the foot?  Won't it just
+not work?
+
+>                                   So I'm expecting to use this to
+>      contain requirements, nothing more.
+
+I assumed you'd want to relieve users of having to specify config
+options in basic use cases.  This is why I believed it would be natural
+to expand that scope.
+
+So why is it so dangerous to connect a disk you just downloaded to e.g.
+the wrong machine type?  I assumed it just wouldn't work and you'd try
+again, until you realized that maybe you should read the download
+description and do as it says ("download this config file, pass it").
+
+>>>> That is not necessarily a negative point, hacks can work wonderfully=
+
+>>>> well, and they usually are simple, that is correct.  But the thing i=
+s
+>>>> that I feel like people have grand visions of what to get out of thi=
+s.
+>>>> Imagine, a single file that can configure all and any VM!
+>>>>
+>>>> But hacks usually only solve a single issue.  Once you try to extend=
+ a
+>>>> hack, it breaks down and becomes insufficient.
+>>>>
+>>>> If we want a grand vision where a single file stores the whole VM, w=
+hy
+>>>> not invest the work and make it right from the start?
+>>>
+>>> Because we won't get it right; however much we bikeshed about it
+>>> we'll just end up with a mess.
+>>
+>> Sure, but the same thing applies to putting it into qcow2.  The
+>> difference is, for something outside of qcow2, throwing it away and
+>> starting over is simple.
+>>
+>> When putting it into qcow2, we can only do that if we really just put =
+a
+>> binary blob there that isn't described in the specification.
+>=20
+> Well, it's why I'm going for defined key/values that are stored in the
+> blob and only a few of them.  We've got a reasonable chance of being
+> able to define what we want from 3-4 key/values, it should be a lot
+> easier than trying to define a grand scheme.
+
+Yes, as long as we can agree on how we can justify to future generations
+why we really only want these very few very specific values.
+
+>>>                                  The right thing is to put in somethi=
+ng
+>>> to hold configuration and then review the items of configuration we
+>>> add properly as we define them.
+>>
+>> OK, but review them on what terms?  Whether they are simple enough?
+>=20
+> Well, I'll take simple, make sense - whatever - feel free to be the
+> maintainer for that list!
+
+OK, none. :-P
+
+It would need to be a very strict requirement, in any case.  Just
+"simple" or "dense" do not suffice, because those can be stretched.
+
+>> As I said, I would want a whole configuration if we allow some
+>> configuration.
+>=20
+> Well then you could go for libvirt XML as the contents; but I think
+> that's crossing layers even more.
+> (I would have veered more to it being exactly the same as an OVA
+> description except for rjones dislike of it)
+
+Well, the format doesn't really matter for now, I think it's most
+important to first talk about what kind of scope we want.
+
+>> (More below)
+>>
+>>>> [1] Yes, I concede that there are probably no other users of qcow2. =
+ But
+>>>> please forgive me for assuming that qcow2 was in a sense designed to=
+ be
+>>>> a rather general image format that not only qemu could use.
+>>>
+>>> What makes it QEMU specific?  It's basically just the same key/value
+>>> setup as OVA, except putting them inside the qcow2.
+>>
+>> Well, not necessarily qemu-specific, but
+>> ${management_software}-specific, which comes down to the same.  Or,
+>> well, I'd think that, but hold on.
+>>
+>>> We could use the same keys/value definitions as OVA in the blob,
+>>> although their definitions aren't very portable either.
+>>
+>> So you're proposing that we only add options that seem portable for an=
+y VM?
+>=20
+> Hmm.  We should probably split them, so there should be general options=
+
+> (e.g. minimum-ram) but also hypervisor specifics
+> (qemu.machine-class=3Dq35); but that doesn't mean you can't add keys
+> for multiple hypervisors into the one blob.  I mean
+> something like:
+>     minimum-ram =3D 1G
+>     qemu.machine-class =3D q35
+>     anothervm.machine-class =3D ....
+
+Well, and that's my issue.  Once you have application-specific info, you
+can go wild.  And I would go wild, without a reasonable and strict
+requirement that the information we want to store has to fulfill.
+
+For the record, I would've liked it if you'd said "only portable
+options".  But I would have replied that I would fear we'd still end up
+with someone saying "I'd like to store X and Y, let's just put them into
+the specification, then they are portable [even if only this stack
+supports them]" and we wouldn't really have won anything.
+
+Max
 
 
-> >                                      you also have to have a tool to
-> > create them;
-> 
-> Also trivial.  Non-trivial is modifying them.
-> 
-> The workflow would be to create the tar with an empty qcow2 file, the VM
-> description you want, and then just using it.
-> 
-> Yes, using is more difficult, but it wouldn't be an own tool, it would
-> be built into qemu.  I can't say how difficult that implementation would
-> be, but it would not be trivial, that is correct.
-> 
-> >              and you have to worry about whether that alignment
-> > is correct for the storage/memory you're using it with.
-> 
-> Which would be difficult with tar, right.  But we don't have to use tar.
-> 
-> (And, no, I don't think creating a new container format is not worse for
-> interoperability than adding a blob to qcow2.)
+--gLfVTqEavfXD9R2cNcTLZUAbLrCJ5ApzH
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-If you were going to do this then you'd end up just using OVA.
-You couldn't justify yet another format.
+-----BEGIN PGP SIGNATURE-----
 
-Dave
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlsX8J8ACgkQ9AfbAGHV
+z0DJHQf/TC6R42JhVKZVR+oNti6vYt6eWvDcnsI7YlbKsAhaiNAG8B8yO/2+5gEU
+DKEDpO3nOCeFgCh/t/6SegoYFyNUH6n3deAt58/tkeuO87cu3coUpswVMz151fYr
+zFs+UT6YWxBQ0Wcepu+2IUGwsrUzaCcYM4hdpX+HictTEWthVEPYvaXd3wYh8MFM
+JNzGHXLdOWL6bDu4wKVSLNrkzlfRSU4lVB40uC1dT0ssH1rdX/mv6tNOKPQekvn4
+r7Hwp81nvhA587JL4N7VQlinWsQvEuR5HibMYK/cd3xnl0s0q3y7JL//+aeQMXMx
+kD+Kfj88jtPZ2U9yCFfrzSDgc4gP8Q==
+=OZNY
+-----END PGP SIGNATURE-----
 
-> Max
-> 
-
-
-
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+--gLfVTqEavfXD9R2cNcTLZUAbLrCJ5ApzH--
