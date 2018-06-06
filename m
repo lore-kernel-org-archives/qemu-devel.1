@@ -1,20 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34835)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35256)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fQRzX-000893-P1
-	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 02:32:21 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1fQS3R-0001JN-8y
+	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 02:36:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1fQRzU-0007ml-IX
-	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 02:32:19 -0400
-Date: Wed, 6 Jun 2018 16:32:06 +1000
+	(envelope-from <dgibson@ozlabs.org>) id 1fQS3O-0001kk-Bb
+	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 02:36:21 -0400
+Date: Wed, 6 Jun 2018 16:36:06 +1000
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20180606063206.GI17757@umbus.fritz.box>
-References: <20180606060830.25942-1-clg@kaod.org>
+Message-ID: <20180606063606.GJ17757@umbus.fritz.box>
+References: <cover.1528069840.git.balaton@eik.bme.hu>
+	<6f3e8e1070c12d1a8321f4fdb6f65d56adc2767b.1528069840.git.balaton@eik.bme.hu>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="Li7ckgedzMh1NgdW"
+	protocol="application/pgp-signature"; boundary="lYetfuAxy9ic4HK3"
 Content-Disposition: inline
-In-Reply-To: <20180606060830.25942-1-clg@kaod.org>
-Subject: Re: [Qemu-devel] [PATCH] target/ppc: extend eieio for POWER9
+In-Reply-To: <6f3e8e1070c12d1a8321f4fdb6f65d56adc2767b.1528069840.git.balaton@eik.bme.hu>
+Subject: Re: [Qemu-devel] [PATCH 1/4] ppc4xx_i2c: Rewrite PPC4xx I2C
+ emulation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,130 +25,621 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+To: BALATON Zoltan <balaton@eik.bme.hu>
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Alexander Graf <agraf@suse.de>
 
 
---Li7ckgedzMh1NgdW
+--lYetfuAxy9ic4HK3
 Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, Jun 06, 2018 at 08:08:30AM +0200, C=E9dric Le Goater wrote:
-> POWER9 introduced a new variant of the eieio instruction using bit 6
-> as a hint to tell the CPU it is a store-forwarding barrier.
+On Mon, Jun 04, 2018 at 01:50:40AM +0200, BALATON Zoltan wrote:
+> I2C emulation currently is just enough for U-Boot to access SPD
+> EEPROMs but features that guests use to access I2C devices are not
+> correctly emulated. Rewrite to implement missing features to make it
+> work with all clients.
 >=20
-> The usage of this eieio extension was recently added in Linux 4.17
-> which activated the "support for a store forwarding barrier at kernel
-> entry/exit".
->=20
-> Unfortunately, it is not possible to insert this new eieio instruction
-> without considerable change in ppc_tr_translate_insn(). So instead we
-> loosen the QEMU eieio instruction mask. The gen_eieio() helper is
-> modified to test for bit6 and a custom instruction flag to catch
-> invalid eieio opcodes on non-POWER9 CPUs.
->=20
-> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
+> Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
 > ---
->  target/ppc/cpu.h                |  5 ++++-
->  target/ppc/translate.c          | 19 +++++++++++++++++--
->  target/ppc/translate_init.inc.c |  3 ++-
->  3 files changed, 23 insertions(+), 4 deletions(-)
+> Maybe this could be split up into more patches but because the
+> previous implementation was wrong only allowing U-Boot to pass and no
+> clients could access I2C devices before this rewrite it probably does
+> not worth to try to make it a lot of small changes instead of dropping
+> the previous hack and rewrite following features of real hardware more
+> closely. (It turns out that each client driver accesses I2C in a
+> different way so we need to implement almost all features of the
+> hardware to please everyone.)
+
+The trouble is that because I don't really have a good test setup for
+this, I'm pretty reluctant to apply such a total rewrite without acks
+=66rom more people who've tested it.  That or reviewing the changes
+myself, which I can't really do when it's in one big lump like this.
+
 >=20
-> diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
-> index 0247c1f04c37..021c9b2f10d1 100644
-> --- a/target/ppc/cpu.h
-> +++ b/target/ppc/cpu.h
-> @@ -2206,6 +2206,9 @@ enum {
->      /* POWER ISA 3.0                                                    =
-     */
->      PPC2_ISA300        =3D 0x0000000000080000ULL,
+> default-configs/ppc-softmmu.mak |   1 +
+>  hw/i2c/ppc4xx_i2c.c             | 366 +++++++++++++++++++++-------------=
+------
+>  include/hw/i2c/ppc4xx_i2c.h     |  19 +--
+>  3 files changed, 197 insertions(+), 189 deletions(-)
+>=20
+> diff --git a/default-configs/ppc-softmmu.mak b/default-configs/ppc-softmm=
+u.mak
+> index 4d7be45..7d0dc2f 100644
+> --- a/default-configs/ppc-softmmu.mak
+> +++ b/default-configs/ppc-softmmu.mak
+> @@ -26,6 +26,7 @@ CONFIG_USB_EHCI_SYSBUS=3Dy
+>  CONFIG_SM501=3Dy
+>  CONFIG_IDE_SII3112=3Dy
+>  CONFIG_I2C=3Dy
+> +CONFIG_BITBANG_I2C=3Dy
 > =20
-> +    /* POWER ISA 3.0 eieio variants                                     =
-     */
-> +    PPC2_MEM_EIEIO2    =3D 0x0000000000100000ULL,
+>  # For Macs
+>  CONFIG_MAC=3Dy
+> diff --git a/hw/i2c/ppc4xx_i2c.c b/hw/i2c/ppc4xx_i2c.c
+> index ab64d19..638bb01 100644
+> --- a/hw/i2c/ppc4xx_i2c.c
+> +++ b/hw/i2c/ppc4xx_i2c.c
+> @@ -3,7 +3,7 @@
+>   *
+>   * Copyright (c) 2007 Jocelyn Mayer
+>   * Copyright (c) 2012 Fran=E7ois Revol
+> - * Copyright (c) 2016 BALATON Zoltan
+> + * Copyright (c) 2016-2018 BALATON Zoltan
+>   *
+>   * Permission is hereby granted, free of charge, to any person obtaining=
+ a copy
+>   * of this software and associated documentation files (the "Software"),=
+ to deal
+> @@ -30,281 +30,300 @@
+>  #include "cpu.h"
+>  #include "hw/hw.h"
+>  #include "hw/i2c/ppc4xx_i2c.h"
+> +#include "bitbang_i2c.h"
+> =20
+> -#define PPC4xx_I2C_MEM_SIZE 0x12
+> +#define PPC4xx_I2C_MEM_SIZE 18
+> =20
+>  #define IIC_CNTL_PT         (1 << 0)
+>  #define IIC_CNTL_READ       (1 << 1)
+>  #define IIC_CNTL_CHT        (1 << 2)
+>  #define IIC_CNTL_RPST       (1 << 3)
+> +#define IIC_CNTL_AMD        (1 << 6)
+> +#define IIC_CNTL_HMT        (1 << 7)
 > +
->  #define PPC_TCG_INSNS2 (PPC2_BOOKE206 | PPC2_VSX | PPC2_PRCNTL | PPC2_DB=
-RX | \
->                          PPC2_ISA205 | PPC2_VSX207 | PPC2_PERM_ISA206 | \
->                          PPC2_DIVE_ISA206 | PPC2_ATOMIC_ISA206 | \
-> @@ -2213,7 +2216,7 @@ enum {
->                          PPC2_BCTAR_ISA207 | PPC2_LSQ_ISA207 | \
->                          PPC2_ALTIVEC_207 | PPC2_ISA207S | PPC2_DFP | \
->                          PPC2_FP_CVT_S64 | PPC2_TM | PPC2_PM_ISA206 | \
-> -                        PPC2_ISA300)
-> +                        PPC2_ISA300 | PPC2_MEM_EIEIO2)
->  };
+> +#define IIC_MDCNTL_EINT     (1 << 2)
+> +#define IIC_MDCNTL_ESM      (1 << 3)
+> +#define IIC_MDCNTL_FMDB     (1 << 6)
 > =20
->  /***********************************************************************=
-******/
-> diff --git a/target/ppc/translate.c b/target/ppc/translate.c
-> index 8ba8f67dc513..a73ef02aef1d 100644
-> --- a/target/ppc/translate.c
-> +++ b/target/ppc/translate.c
-> @@ -2967,7 +2967,22 @@ static void gen_stswx(DisasContext *ctx)
->  /* eieio */
->  static void gen_eieio(DisasContext *ctx)
+>  #define IIC_STS_PT          (1 << 0)
+> +#define IIC_STS_IRQA        (1 << 1)
+>  #define IIC_STS_ERR         (1 << 2)
+> +#define IIC_STS_MDBF        (1 << 4)
+>  #define IIC_STS_MDBS        (1 << 5)
+> =20
+>  #define IIC_EXTSTS_XFRA     (1 << 0)
+> =20
+> +#define IIC_INTRMSK_EIMTC   (1 << 0)
+> +#define IIC_INTRMSK_EITA    (1 << 1)
+> +#define IIC_INTRMSK_EIIC    (1 << 2)
+> +#define IIC_INTRMSK_EIHE    (1 << 3)
+> +
+>  #define IIC_XTCNTLSS_SRST   (1 << 0)
+> =20
+> +#define IIC_DIRECTCNTL_SDAC (1 << 3)
+> +#define IIC_DIRECTCNTL_SCLC (1 << 2)
+> +#define IIC_DIRECTCNTL_MSDA (1 << 1)
+> +#define IIC_DIRECTCNTL_MSCL (1 << 0)
+> +
+> +typedef struct {
+> +    bitbang_i2c_interface *bitbang;
+> +    int mdidx;
+> +    uint8_t mdata[4];
+> +    uint8_t lmadr;
+> +    uint8_t hmadr;
+> +    uint8_t cntl;
+> +    uint8_t mdcntl;
+> +    uint8_t sts;
+> +    uint8_t extsts;
+> +    uint8_t lsadr;
+> +    uint8_t hsadr;
+> +    uint8_t clkdiv;
+> +    uint8_t intrmsk;
+> +    uint8_t xfrcnt;
+> +    uint8_t xtcntlss;
+> +    uint8_t directcntl;
+> +} PPC4xxI2CRegs;
+> +
+>  static void ppc4xx_i2c_reset(DeviceState *s)
 >  {
-> -    tcg_gen_mb(TCG_MO_LD_ST | TCG_BAR_SC);
-> +    TCGBar bar =3D TCG_MO_LD_ST;
-> +
-> +    /*
-> +     * POWER9 has a eieio instruction variant using bit 6 as a hint to
-> +     * tell the CPU it is a store-forwarding barrier.
-> +     */
-> +    if (ctx->opcode & 0x2000000) {
-> +        if (!(ctx->insns_flags2 & PPC2_MEM_EIEIO2)) {
-
-Since we have to adapt the gen_eieio code anyway we don't really need
-the new instruction flag - we can just reuse PPC2_ISA300 for it.
-
-> +            qemu_log_mask(LOG_GUEST_ERROR, "invalid eieio using bit 6 at=
- @"
-> +                          TARGET_FMT_lx "\n", ctx->base.pc_next - 4);
-
-Logging is ok, but it's not enough in this context - that will turn
-the variant eieio into a no-op.  You need to actually generate an
-invalid instruction exception here, which is what I assume will happen
-if you try to execute the new variant on a POWER8:
-    gen_inval_exception(ctx, POWERPC_EXCP_INVAL_INVAL);
-
-> +            return;
-> +        }
-> +        bar =3D TCG_MO_ST_LD;
-> +    }
-> +
-> +    tcg_gen_mb(bar | TCG_BAR_SC);
+> -    PPC4xxI2CState *i2c =3D PPC4xx_I2C(s);
+> +    PPC4xxI2CRegs *i2c =3D PPC4xx_I2C(s)->regs;
+> =20
+> -    /* FIXME: Should also reset bus?
+> -     *if (s->address !=3D ADDR_RESET) {
+> -     *    i2c_end_transfer(s->bus);
+> -     *}
+> -     */
+> -
+> -    i2c->mdata =3D 0;
+> -    i2c->lmadr =3D 0;
+> -    i2c->hmadr =3D 0;
+> +    i2c->mdidx =3D -1;
+> +    memset(i2c->mdata, 0, ARRAY_SIZE(i2c->mdata));
+> +    /* [hl][ms]addr are not affected by reset */
+>      i2c->cntl =3D 0;
+>      i2c->mdcntl =3D 0;
+>      i2c->sts =3D 0;
+> -    i2c->extsts =3D 0x8f;
+> -    i2c->sdata =3D 0;
+> -    i2c->lsadr =3D 0;
+> -    i2c->hsadr =3D 0;
+> +    i2c->extsts =3D (1 << 6);
+>      i2c->clkdiv =3D 0;
+>      i2c->intrmsk =3D 0;
+>      i2c->xfrcnt =3D 0;
+>      i2c->xtcntlss =3D 0;
+> -    i2c->directcntl =3D 0x0f;
+> -    i2c->intr =3D 0;
+> -}
+> -
+> -static inline bool ppc4xx_i2c_is_master(PPC4xxI2CState *i2c)
+> -{
+> -    return true;
+> +    i2c->directcntl =3D 0xf;
 >  }
 > =20
->  #if !defined(CONFIG_USER_ONLY)
-> @@ -6483,7 +6498,7 @@ GEN_HANDLER(lswi, 0x1F, 0x15, 0x12, 0x00000001, PPC=
-_STRING),
->  GEN_HANDLER(lswx, 0x1F, 0x15, 0x10, 0x00000001, PPC_STRING),
->  GEN_HANDLER(stswi, 0x1F, 0x15, 0x16, 0x00000001, PPC_STRING),
->  GEN_HANDLER(stswx, 0x1F, 0x15, 0x14, 0x00000001, PPC_STRING),
-> -GEN_HANDLER(eieio, 0x1F, 0x16, 0x1A, 0x03FFF801, PPC_MEM_EIEIO),
-> +GEN_HANDLER(eieio, 0x1F, 0x16, 0x1A, 0x01FFF801, PPC_MEM_EIEIO),
->  GEN_HANDLER(isync, 0x13, 0x16, 0x04, 0x03FFF801, PPC_MEM),
->  GEN_HANDLER_E(lbarx, 0x1F, 0x14, 0x01, 0, PPC_NONE, PPC2_ATOMIC_ISA206),
->  GEN_HANDLER_E(lharx, 0x1F, 0x14, 0x03, 0, PPC_NONE, PPC2_ATOMIC_ISA206),
-> diff --git a/target/ppc/translate_init.inc.c b/target/ppc/translate_init.=
-inc.c
-> index 1a89017ddea8..6b70f6dc5a2c 100644
-> --- a/target/ppc/translate_init.inc.c
-> +++ b/target/ppc/translate_init.inc.c
-> @@ -8847,7 +8847,8 @@ POWERPC_FAMILY(POWER9)(ObjectClass *oc, void *data)
->                          PPC2_FP_TST_ISA206 | PPC2_BCTAR_ISA207 |
->                          PPC2_LSQ_ISA207 | PPC2_ALTIVEC_207 |
->                          PPC2_ISA205 | PPC2_ISA207S | PPC2_FP_CVT_S64 |
-> -                        PPC2_TM | PPC2_PM_ISA206 | PPC2_ISA300 | PPC2_PR=
-CNTL;
-> +                        PPC2_TM | PPC2_PM_ISA206 | PPC2_ISA300 | PPC2_PR=
-CNTL |
-> +                        PPC2_MEM_EIEIO2;
->      pcc->msr_mask =3D (1ull << MSR_SF) |
->                      (1ull << MSR_TM) |
->                      (1ull << MSR_VR) |
+>  static uint64_t ppc4xx_i2c_readb(void *opaque, hwaddr addr, unsigned int=
+ size)
+>  {
+> -    PPC4xxI2CState *i2c =3D PPC4xx_I2C(opaque);
+> +    PPC4xxI2CState *s =3D PPC4xx_I2C(opaque);
+> +    PPC4xxI2CRegs *i2c =3D s->regs;
+>      uint64_t ret;
+> +    int i;
+> =20
+>      switch (addr) {
+> -    case 0x00:
+> -        ret =3D i2c->mdata;
+> -        if (ppc4xx_i2c_is_master(i2c)) {
+> +    case 0:
+> +        if (i2c->mdidx < 0) {
+>              ret =3D 0xff;
+> -
+> -            if (!(i2c->sts & IIC_STS_MDBS)) {
+> -                qemu_log_mask(LOG_GUEST_ERROR, "[%s]%s: Trying to read "
+> -                              "without starting transfer\n",
+> -                              TYPE_PPC4xx_I2C, __func__);
+> -            } else {
+> -                int pending =3D (i2c->cntl >> 4) & 3;
+> -
+> -                /* get the next byte */
+> -                int byte =3D i2c_recv(i2c->bus);
+> -
+> -                if (byte < 0) {
+> -                    qemu_log_mask(LOG_GUEST_ERROR, "[%s]%s: read failed "
+> -                                  "for device 0x%02x\n", TYPE_PPC4xx_I2C,
+> -                                  __func__, i2c->lmadr);
+> -                    ret =3D 0xff;
+> -                } else {
+> -                    ret =3D byte;
+> -                    /* Raise interrupt if enabled */
+> -                    /*ppc4xx_i2c_raise_interrupt(i2c)*/;
+> -                }
+> -
+> -                if (!pending) {
+> -                    i2c->sts &=3D ~IIC_STS_MDBS;
+> -                    /*i2c_end_transfer(i2c->bus);*/
+> -                /*} else if (i2c->cntl & (IIC_CNTL_RPST | IIC_CNTL_CHT))=
+ {*/
+> -                } else if (pending) {
+> -                    /* current smbus implementation doesn't like
+> -                       multibyte xfer repeated start */
+> -                    i2c_end_transfer(i2c->bus);
+> -                    if (i2c_start_transfer(i2c->bus, i2c->lmadr >> 1, 1)=
+) {
+> -                        /* if non zero is returned, the adress is not va=
+lid */
+> -                        i2c->sts &=3D ~IIC_STS_PT;
+> -                        i2c->sts |=3D IIC_STS_ERR;
+> -                        i2c->extsts |=3D IIC_EXTSTS_XFRA;
+> -                    } else {
+> -                        /*i2c->sts |=3D IIC_STS_PT;*/
+> -                        i2c->sts |=3D IIC_STS_MDBS;
+> -                        i2c->sts &=3D ~IIC_STS_ERR;
+> -                        i2c->extsts =3D 0;
+> -                    }
+> -                }
+> -                pending--;
+> -                i2c->cntl =3D (i2c->cntl & 0xcf) | (pending << 4);
+> -            }
+> -        } else {
+> -            qemu_log_mask(LOG_UNIMP, "[%s]%s: slave mode not implemented=
+\n",
+> -                          TYPE_PPC4xx_I2C, __func__);
+> +            break;
+> +        }
+> +        ret =3D i2c->mdata[0];
+> +        if (i2c->mdidx =3D=3D 3) {
+> +            i2c->sts &=3D ~IIC_STS_MDBF;
+> +        } else if (i2c->mdidx =3D=3D 0) {
+> +            i2c->sts &=3D ~IIC_STS_MDBS;
+> +        }
+> +        for (i =3D 0; i < i2c->mdidx; i++) {
+> +            i2c->mdata[i] =3D i2c->mdata[i + 1];
+> +        }
+> +        if (i2c->mdidx >=3D 0) {
+> +            i2c->mdidx--;
+>          }
+>          break;
+> -    case 0x02:
+> -        ret =3D i2c->sdata;
+> -        break;
+> -    case 0x04:
+> +    case 4:
+>          ret =3D i2c->lmadr;
+>          break;
+> -    case 0x05:
+> +    case 5:
+>          ret =3D i2c->hmadr;
+>          break;
+> -    case 0x06:
+> +    case 6:
+>          ret =3D i2c->cntl;
+>          break;
+> -    case 0x07:
+> +    case 7:
+>          ret =3D i2c->mdcntl;
+>          break;
+> -    case 0x08:
+> +    case 8:
+>          ret =3D i2c->sts;
+>          break;
+> -    case 0x09:
+> +    case 9:
+>          ret =3D i2c->extsts;
+> +        ret |=3D !!i2c_bus_busy(s->bus) << 4;
+>          break;
+> -    case 0x0A:
+> +    case 10:
+>          ret =3D i2c->lsadr;
+>          break;
+> -    case 0x0B:
+> +    case 11:
+>          ret =3D i2c->hsadr;
+>          break;
+> -    case 0x0C:
+> +    case 12:
+>          ret =3D i2c->clkdiv;
+>          break;
+> -    case 0x0D:
+> +    case 13:
+>          ret =3D i2c->intrmsk;
+>          break;
+> -    case 0x0E:
+> +    case 14:
+>          ret =3D i2c->xfrcnt;
+>          break;
+> -    case 0x0F:
+> +    case 15:
+>          ret =3D i2c->xtcntlss;
+>          break;
+> -    case 0x10:
+> +    case 16:
+>          ret =3D i2c->directcntl;
+>          break;
+> -    case 0x11:
+> -        ret =3D i2c->intr;
+> -        break;
+>      default:
+> -        qemu_log_mask(LOG_GUEST_ERROR, "[%s]%s: Bad address at offset 0x=
+%"
+> -                      HWADDR_PRIx "\n", TYPE_PPC4xx_I2C, __func__, addr);
+> +        if (addr < PPC4xx_I2C_MEM_SIZE) {
+> +            qemu_log_mask(LOG_UNIMP, "%s: Unimplemented register 0x%"
+> +                          HWADDR_PRIx "\n", __func__, addr);
+> +        } else {
+> +            qemu_log_mask(LOG_GUEST_ERROR, "%s: Bad address 0x%"
+> +                          HWADDR_PRIx "\n", __func__, addr);
+> +        }
+>          ret =3D 0;
+>          break;
+>      }
+> -
+>      return ret;
+>  }
+> =20
+>  static void ppc4xx_i2c_writeb(void *opaque, hwaddr addr, uint64_t value,
+>                                unsigned int size)
+>  {
+> -    PPC4xxI2CState *i2c =3D opaque;
+> +    PPC4xxI2CState *s =3D PPC4xx_I2C(opaque);
+> +    PPC4xxI2CRegs *i2c =3D s->regs;
+> =20
+>      switch (addr) {
+> -    case 0x00:
+> -        i2c->mdata =3D value;
+> -        if (!i2c_bus_busy(i2c->bus)) {
+> -            /* assume we start a write transfer */
+> -            if (i2c_start_transfer(i2c->bus, i2c->lmadr >> 1, 0)) {
+> -                /* if non zero is returned, the adress is not valid */
+> -                i2c->sts &=3D ~IIC_STS_PT;
+> -                i2c->sts |=3D IIC_STS_ERR;
+> -                i2c->extsts |=3D IIC_EXTSTS_XFRA;
+> -            } else {
+> -                i2c->sts |=3D IIC_STS_PT;
+> -                i2c->sts &=3D ~IIC_STS_ERR;
+> -                i2c->extsts =3D 0;
+> -            }
+> +    case 0:
+> +        if (i2c->mdidx >=3D 3) {
+> +            break;
+>          }
+> -        if (i2c_bus_busy(i2c->bus)) {
+> -            if (i2c_send(i2c->bus, i2c->mdata)) {
+> -                /* if the target return non zero then end the transfer */
+> -                i2c->sts &=3D ~IIC_STS_PT;
+> -                i2c->sts |=3D IIC_STS_ERR;
+> -                i2c->extsts |=3D IIC_EXTSTS_XFRA;
+> -                i2c_end_transfer(i2c->bus);
+> -            }
+> +        i2c->mdata[++i2c->mdidx] =3D value;
+> +        if (i2c->mdidx =3D=3D 3) {
+> +            i2c->sts |=3D IIC_STS_MDBF;
+> +        } else if (i2c->mdidx =3D=3D 0) {
+> +            i2c->sts |=3D IIC_STS_MDBS;
+>          }
+>          break;
+> -    case 0x02:
+> -        i2c->sdata =3D value;
+> -        break;
+> -    case 0x04:
+> +    case 4:
+>          i2c->lmadr =3D value;
+> -        if (i2c_bus_busy(i2c->bus)) {
+> -            i2c_end_transfer(i2c->bus);
+> -        }
+>          break;
+> -    case 0x05:
+> +    case 5:
+>          i2c->hmadr =3D value;
+>          break;
+> -    case 0x06:
+> -        i2c->cntl =3D value;
+> -        if (i2c->cntl & IIC_CNTL_PT) {
+> -            if (i2c->cntl & IIC_CNTL_READ) {
+> -                if (i2c_bus_busy(i2c->bus)) {
+> -                    /* end previous transfer */
+> -                    i2c->sts &=3D ~IIC_STS_PT;
+> -                    i2c_end_transfer(i2c->bus);
+> +    case 6:
+> +        i2c->cntl =3D value & 0xfe;
+> +        if (value & IIC_CNTL_AMD) {
+> +            qemu_log_mask(LOG_UNIMP, "%s: only 7 bit addresses supported=
+\n",
+> +                          __func__);
+> +        }
+> +        if (value & IIC_CNTL_HMT && i2c_bus_busy(s->bus)) {
+> +            i2c_end_transfer(s->bus);
+> +            if (i2c->mdcntl & IIC_MDCNTL_EINT &&
+> +                i2c->intrmsk & IIC_INTRMSK_EIHE) {
+> +                    i2c->sts |=3D IIC_STS_IRQA;
+> +                    qemu_irq_raise(s->irq);
+> +            }
+> +        } else if (value & IIC_CNTL_PT) {
+> +            int recv =3D (value & IIC_CNTL_READ) >> 1;
+> +            int tct =3D value >> 4 & 3;
+> +            int i;
+> +
+> +            if (recv && (i2c->lmadr >> 1) >=3D 0x50 && (i2c->lmadr >> 1)=
+ < 0x58) {
+> +                /* smbus emulation does not like multi byte reads w/o re=
+start */
+> +                value |=3D IIC_CNTL_RPST;
+> +            }
+> +
+> +            for (i =3D 0; i <=3D tct; i++) {
+> +                if (!i2c_bus_busy(s->bus)) {
+> +                    i2c->extsts =3D (1 << 6);
+> +                    if (i2c_start_transfer(s->bus, i2c->lmadr >> 1, recv=
+)) {
+> +                        i2c->sts |=3D IIC_STS_ERR;
+> +                        i2c->extsts |=3D IIC_EXTSTS_XFRA;
+> +                        break;
+> +                    } else {
+> +                        i2c->sts &=3D ~IIC_STS_ERR;
+> +                    }
+>                  }
+> -                if (i2c_start_transfer(i2c->bus, i2c->lmadr >> 1, 1)) {
+> -                    /* if non zero is returned, the adress is not valid =
+*/
+> -                    i2c->sts &=3D ~IIC_STS_PT;
+> -                    i2c->sts |=3D IIC_STS_ERR;
+> -                    i2c->extsts |=3D IIC_EXTSTS_XFRA;
+> -                } else {
+> -                    /*i2c->sts |=3D IIC_STS_PT;*/
+> -                    i2c->sts |=3D IIC_STS_MDBS;
+> -                    i2c->sts &=3D ~IIC_STS_ERR;
+> -                    i2c->extsts =3D 0;
+> +                if (!(i2c->sts & IIC_STS_ERR) &&
+> +                    i2c_send_recv(s->bus, &i2c->mdata[i], !recv)) {
+> +                        i2c->sts |=3D IIC_STS_ERR;
+> +                        i2c->extsts |=3D IIC_EXTSTS_XFRA;
+> +                        break;
+>                  }
+> -            } else {
+> -                /* we actually already did the write transfer... */
+> -                i2c->sts &=3D ~IIC_STS_PT;
+> +                if (value & IIC_CNTL_RPST || !(value & IIC_CNTL_CHT)) {
+> +                    i2c_end_transfer(s->bus);
+> +                }
+> +            }
+> +            i2c->xfrcnt =3D i;
+> +            i2c->mdidx =3D i - 1;
+> +            if (recv && i2c->mdidx >=3D 0) {
+> +                i2c->sts |=3D IIC_STS_MDBS;
+> +            }
+> +            if (recv && i2c->mdidx =3D=3D 3) {
+> +                i2c->sts |=3D IIC_STS_MDBF;
+> +            }
+> +            if (i && i2c->mdcntl & IIC_MDCNTL_EINT &&
+> +                i2c->intrmsk & IIC_INTRMSK_EIMTC) {
+> +                i2c->sts |=3D IIC_STS_IRQA;
+> +                qemu_irq_raise(s->irq);
+>              }
+>          }
+>          break;
+> -    case 0x07:
+> -        i2c->mdcntl =3D value & 0xDF;
+> +    case 7:
+> +        i2c->mdcntl =3D value & 0x3d;
+> +        if (value & IIC_MDCNTL_ESM) {
+> +            qemu_log_mask(LOG_UNIMP, "%s: slave mode not implemented\n",
+> +                          __func__);
+> +        }
+> +        if (value & IIC_MDCNTL_FMDB) {
+> +            i2c->mdidx =3D -1;
+> +            memset(i2c->mdata, 0, ARRAY_SIZE(i2c->mdata));
+> +            i2c->sts &=3D ~(IIC_STS_MDBF | IIC_STS_MDBS);
+> +        }
+>          break;
+> -    case 0x08:
+> -        i2c->sts &=3D ~(value & 0x0A);
+> +    case 8:
+> +        i2c->sts &=3D ~(value & 0xa);
+> +        if (value & IIC_STS_IRQA && i2c->mdcntl & IIC_MDCNTL_EINT) {
+> +            qemu_irq_lower(s->irq);
+> +        }
+>          break;
+> -    case 0x09:
+> -        i2c->extsts &=3D ~(value & 0x8F);
+> +    case 9:
+> +        i2c->extsts &=3D ~(value & 0x8f);
+>          break;
+> -    case 0x0A:
+> +    case 10:
+>          i2c->lsadr =3D value;
+> -        /*i2c_set_slave_address(i2c->bus, i2c->lsadr);*/
+>          break;
+> -    case 0x0B:
+> +    case 11:
+>          i2c->hsadr =3D value;
+>          break;
+> -    case 0x0C:
+> +    case 12:
+>          i2c->clkdiv =3D value;
+>          break;
+> -    case 0x0D:
+> +    case 13:
+>          i2c->intrmsk =3D value;
+>          break;
+> -    case 0x0E:
+> -        i2c->xfrcnt =3D value & 0x77;
+> +    case 14:
+> +        i2c->xfrcnt =3D value;
+>          break;
+> -    case 0x0F:
+> +    case 15:
+> +        i2c->xtcntlss &=3D ~(value & 0xf0);
+>          if (value & IIC_XTCNTLSS_SRST) {
+>              /* Is it actually a full reset? U-Boot sets some regs before=
+ */
+> -            ppc4xx_i2c_reset(DEVICE(i2c));
+> +            ppc4xx_i2c_reset(DEVICE(s));
+>              break;
+>          }
+> -        i2c->xtcntlss =3D value;
+>          break;
+> -    case 0x10:
+> -        i2c->directcntl =3D value & 0x7;
+> -        break;
+> -    case 0x11:
+> -        i2c->intr =3D value;
+> +    case 16:
+> +        i2c->directcntl =3D value & (IIC_DIRECTCNTL_SDAC & IIC_DIRECTCNT=
+L_SCLC);
+> +        i2c->directcntl |=3D (value & IIC_DIRECTCNTL_SCLC ? 1 : 0);
+> +        bitbang_i2c_set(i2c->bitbang, BITBANG_I2C_SCL, i2c->directcntl &=
+ 1);
+> +        i2c->directcntl |=3D bitbang_i2c_set(i2c->bitbang, BITBANG_I2C_S=
+DA,
+> +                               (value & IIC_DIRECTCNTL_SDAC) !=3D 0) << =
+1;
+>          break;
+>      default:
+> -        qemu_log_mask(LOG_GUEST_ERROR, "[%s]%s: Bad address at offset 0x=
+%"
+> -                      HWADDR_PRIx "\n", TYPE_PPC4xx_I2C, __func__, addr);
+> +        if (addr < PPC4xx_I2C_MEM_SIZE) {
+> +            qemu_log_mask(LOG_UNIMP, "%s: Unimplemented register 0x%"
+> +                          HWADDR_PRIx "\n", __func__, addr);
+> +        } else {
+> +            qemu_log_mask(LOG_GUEST_ERROR, "%s: Bad address 0x%"
+> +                          HWADDR_PRIx "\n", __func__, addr);
+> +        }
+>          break;
+>      }
+>  }
+> @@ -322,12 +341,15 @@ static const MemoryRegionOps ppc4xx_i2c_ops =3D {
+>  static void ppc4xx_i2c_init(Object *o)
+>  {
+>      PPC4xxI2CState *s =3D PPC4xx_I2C(o);
+> +    PPC4xxI2CRegs *r =3D g_malloc0(sizeof(PPC4xxI2CRegs));
+> =20
+> +    s->regs =3D r;
+>      memory_region_init_io(&s->iomem, OBJECT(s), &ppc4xx_i2c_ops, s,
+>                            TYPE_PPC4xx_I2C, PPC4xx_I2C_MEM_SIZE);
+>      sysbus_init_mmio(SYS_BUS_DEVICE(s), &s->iomem);
+>      sysbus_init_irq(SYS_BUS_DEVICE(s), &s->irq);
+>      s->bus =3D i2c_init_bus(DEVICE(s), "i2c");
+> +    r->bitbang =3D bitbang_i2c_init(s->bus);
+>  }
+> =20
+>  static void ppc4xx_i2c_class_init(ObjectClass *klass, void *data)
+> diff --git a/include/hw/i2c/ppc4xx_i2c.h b/include/hw/i2c/ppc4xx_i2c.h
+> index 3c60307..1d5ba0c 100644
+> --- a/include/hw/i2c/ppc4xx_i2c.h
+> +++ b/include/hw/i2c/ppc4xx_i2c.h
+> @@ -3,7 +3,7 @@
+>   *
+>   * Copyright (c) 2007 Jocelyn Mayer
+>   * Copyright (c) 2012 Fran=E7ois Revol
+> - * Copyright (c) 2016 BALATON Zoltan
+> + * Copyright (c) 2016-2018 BALATON Zoltan
+>   *
+>   * Permission is hereby granted, free of charge, to any person obtaining=
+ a copy
+>   * of this software and associated documentation files (the "Software"),=
+ to deal
+> @@ -37,27 +37,12 @@
+>  typedef struct PPC4xxI2CState {
+>      /*< private >*/
+>      SysBusDevice parent_obj;
+> +    void *regs;
+> =20
+>      /*< public >*/
+>      I2CBus *bus;
+>      qemu_irq irq;
+>      MemoryRegion iomem;
+> -    uint8_t mdata;
+> -    uint8_t lmadr;
+> -    uint8_t hmadr;
+> -    uint8_t cntl;
+> -    uint8_t mdcntl;
+> -    uint8_t sts;
+> -    uint8_t extsts;
+> -    uint8_t sdata;
+> -    uint8_t lsadr;
+> -    uint8_t hsadr;
+> -    uint8_t clkdiv;
+> -    uint8_t intrmsk;
+> -    uint8_t xfrcnt;
+> -    uint8_t xtcntlss;
+> -    uint8_t directcntl;
+> -    uint8_t intr;
+>  } PPC4xxI2CState;
+> =20
+>  #endif /* PPC4XX_I2C_H */
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -154,24 +647,24 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---Li7ckgedzMh1NgdW
+--lYetfuAxy9ic4HK3
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlsXf+QACgkQbDjKyiDZ
-s5KhLw/9E59nw4BYT/2RXaZgdl3nIeM4ud+3/36RGGNEAnvxxI5r65NxPgk63xGX
-M5d9M4KKvAT9/rHzXgwRfx41iEA7ItWXqfvV4baLEiAFb2ONwydWmjt/Ba/8wCtq
-ETa20mjGevLjS1htWuzZGTBgx2l8Ct+uadJ3gLLARePOGMbg9JtfcGKGOJ0ouxSZ
-OcabUlv7u2vmeRTm9+gWTWq4WskfkVxAQAs9HKlXKjehNjOPaMrYBe8um5/6l1ib
-vqz290a25xo9QJmbyzhi9se6Mimkq9VVL35J1GImDuNI84R4uayr1hjQDHYtGXLG
-+5DbkcPVzqpMPdHojqRs2Z7xpaJZHYM7R6JdpnZZwn5QRT57paiIVS5w+/BfPCln
-R/M8gJ5ou7qdF2JrUooOE0STAPGyv5uFL6Om8nZx1j6kBqPHvjmRO0m/qvLo3e4L
-/PkD3kjtyhsBoeFhCIx1jvxY6Kf+fVL1smO3SNuV/VpS8mWlpJbvOyZJN6E929Dp
-WbmvW3iuZer+Km7S4pK/9G/o5cTTpXHmYz5WEW9aRE7lCAPZAodmIEmjjiYOhd5a
-g0YMycBMIRtNs93eg1ZusY528JJUusX9R2+JP8C7HtokQxKcheBArlXei6x6/gi1
-ads8VLRNEKdYjey78jQQ1kBnY7q77fj6opr14A/J0VA2YBAvTA0=
-=E2Fw
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlsXgNYACgkQbDjKyiDZ
+s5I26Q//TE/cZNOhAiOreKL/2HZQUIokVV3BLIn500y4X/vPF/afi5Sze3aYYEmJ
+p3AAcZ6QXwn9NsCkw62U4RPpdoXmAicgdMx42J4l7QzLPew8BAKZ3ucFbK3ndCrB
+l7piymY8GPFPlNYVTcTpZx6Fe7s17RyTxAPBDgcxp0kodfWxbcQQQQp9aUb30wch
+qm4NxdcvyRUz7xZmeKD/H8VhQ0NtWt6YlDwBwrTge4Jk7dvH1GEWt7691zDIwXfg
+qBBnFEVoubR5NauiXV8Dm/z98nmucZjRu9KiwEH3hcd1oCWTwNR8MJxHOW2wR608
+ApHF4V/N0ZnGLphz7LTBsZ8VqO0DRN/lopwVSDQcZVRuE0T8l8Dl0BljL3EMu1RJ
+gvdDaKS3DFs9USd/iKuHQ5VKcOP0NCxzI9DWzF4dzhbCi4Oqmoe7LdPDcbeOKCog
+TbxSF59z+Ayzw1hnlA8pu8/JUz+UGWm1Mq3qRxsSyoFeaS5N6iHTL1ATo7dmsCCG
+TxGCzbj8h8fhF1Hc7l3Q9RE7WZoZuxXlO6gutCj5k/kUtpuJMNS9YCN4od/Ojfkm
+pvQ7g8u0zZIRSgfhu/cGsb5yY24x8hTFfAToFHZbkFoCbIlQZXDVegaj75LGxFpu
+/SZMyvK6EXhuKHWlVhCiGTRK7wm6B8qOE1IUS1HzUrHPVA2wKaA=
+=VYlh
 -----END PGP SIGNATURE-----
 
---Li7ckgedzMh1NgdW--
+--lYetfuAxy9ic4HK3--
