@@ -1,28 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35503)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35519)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1fQfYT-000297-Db
-	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 17:01:18 -0400
+	(envelope-from <no-reply@patchew.org>) id 1fQfYY-0002DV-Cj
+	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 17:01:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1fQfYS-0006ar-Oq
+	(envelope-from <no-reply@patchew.org>) id 1fQfYT-0006c7-H8
+	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 17:01:22 -0400
+Resent-Message-Id: <E1fQfYT-0006c7-H8@eggs.gnu.org>
+Received: from sender-of-o51.zoho.com ([135.84.80.216]:21106)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1fQfYT-0006aj-Bw
 	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 17:01:17 -0400
-Date: Wed, 6 Jun 2018 23:01:02 +0200
-From: Gerd Hoffmann <kraxel@redhat.com>
-Message-ID: <20180606210102.q7lfarlidgjn4gbl@sirius.home.kraxel.org>
-References: <20180528183833.GJ4580@localhost.localdomain>
-	<20180528212054.GH2209@redhat.com>
-	<20180528212510.GC4660@redhat.com>
-	<20180529064415.GA4756@localhost.localdomain>
-	<2b3eef00-f326-c1e6-0e4b-b7602646eec4@redhat.com>
-	<20180606123237.2235ae4a@kitsune.suse.cz>
-	<bc97cdc3-85ba-e053-0816-b6bc431064fb@redhat.com>
-	<20180606173140-mutt-send-email-mst@kernel.org>
-	<60c9b327-6503-0950-0720-3ccbb4637ad4@redhat.com>
-	<0de83ab1-070e-f12a-def4-404868d05a80@redhat.com>
+In-Reply-To: <20180606181352.61144-1-lfy@google.com>
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <152831886916.438.6759227591299820501@d39dc562802a>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <0de83ab1-070e-f12a-def4-404868d05a80@redhat.com>
-Subject: Re: [Qemu-devel] storing machine data in qcow images?
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Wed, 6 Jun 2018 14:01:09 -0700 (PDT)
+Subject: Re: [Qemu-devel] [PATCH] Improve file-backed RAM
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,21 +28,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, ehabkost@redhat.com, qemu-block@nongnu.org, qemu-devel@nongnu.org, "Richard W.M. Jones" <rjones@redhat.com>, stefanha@redhat.com, Michal =?utf-8?B?U3VjaMOhbmVr?= <msuchanek@suse.de>
+To: qemu-devel@nongnu.org
+Cc: famz@redhat.com, pbonzini@redhat.com, rth@twiddle.net, crosthwaite.peter@gmail.com, ehabkost@redhat.com, lfy@google.com
 
-  Hi,
-
-> our actual qcow2v3 improvements, so no one ended up switching to that. So,
-> to some extent, various high-level consumers still have the notion that
-> 'raw' files are better/safer/faster than 'qcow2' files because of an
-> anecdote from years ago, even if we have since fixed the speed parity and
-> added locking to eliminate careless data loss.
-
-When I use raw images the reasons are different ones.  Most of the time
-it is that I want use the image with something which isn't qemu and thus
-doesn't understand qcow2.  Booting a image as container for example
-(systemd-nspawn -i $image.raw).
-
-cheers,
-  Gerd
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1l
+c3NhZ2UtaWQ6IDIwMTgwNjA2MTgxMzUyLjYxMTQ0LTEtbGZ5QGdvb2dsZS5jb20KU3ViamVjdDog
+W1FlbXUtZGV2ZWxdIFtQQVRDSF0gSW1wcm92ZSBmaWxlLWJhY2tlZCBSQU0KCj09PSBURVNUIFND
+UklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKCkJBU0U9YmFzZQpuPTEKdG90YWw9JChnaXQgbG9n
+IC0tb25lbGluZSAkQkFTRS4uIHwgd2MgLWwpCmZhaWxlZD0wCgpnaXQgY29uZmlnIC0tbG9jYWwg
+ZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQpn
+aXQgY29uZmlnIC0tbG9jYWwgZGlmZi5hbGdvcml0aG0gaGlzdG9ncmFtCgpjb21taXRzPSIkKGdp
+dCBsb2cgLS1mb3JtYXQ9JUggLS1yZXZlcnNlICRCQVNFLi4pIgpmb3IgYyBpbiAkY29tbWl0czsg
+ZG8KICAgIGVjaG8gIkNoZWNraW5nIFBBVENIICRuLyR0b3RhbDogJChnaXQgbG9nIC1uIDEgLS1m
+b3JtYXQ9JXMgJGMpLi4uIgogICAgaWYgISBnaXQgc2hvdyAkYyAtLWZvcm1hdD1lbWFpbCB8IC4v
+c2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgLTsgdGhlbgogICAgICAgIGZhaWxlZD0x
+CiAgICAgICAgZWNobwogICAgZmkKICAgIG49JCgobisxKSkKZG9uZQoKZXhpdCAkZmFpbGVkCj09
+PSBURVNUIFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQxZGVm
+N2Y0NGJkODg4NzEzMzg0ClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKMTFjMDljMjY1
+MSBJbXByb3ZlIGZpbGUtYmFja2VkIFJBTQoKPT09IE9VVFBVVCBCRUdJTiA9PT0KQ2hlY2tpbmcg
+UEFUQ0ggMS8xOiBJbXByb3ZlIGZpbGUtYmFja2VkIFJBTS4uLgpFUlJPUjogZG8gbm90IGluaXRp
+YWxpc2UgZ2xvYmFscyB0byAwIG9yIE5VTEwKIzMwMDogRklMRTogdmwuYzoxNDQ6CitpbnQgbWVt
+X2ZpbGVfc2hhcmVkID0gMDsgLyogbWFwIGZpbGUtYmFja2VkIFJBTSBpbiBzaGFyZWQgbW9kZSAq
+LwoKdG90YWw6IDEgZXJyb3JzLCAwIHdhcm5pbmdzLCAyMzAgbGluZXMgY2hlY2tlZAoKWW91ciBw
+YXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2Ug
+ZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIs
+IHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0
+IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21h
+dGljYWxseSBieSBQYXRjaGV3IFtodHRwOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91
+ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
