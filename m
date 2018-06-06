@@ -1,30 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52408)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54128)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1fQTwz-0005jj-NH
-	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 04:37:50 -0400
+	(envelope-from <kraxel@redhat.com>) id 1fQU83-0000kq-EQ
+	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 04:49:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1fQTwu-0007Rw-Pt
-	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 04:37:49 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:42608 helo=mx1.redhat.com)
+	(envelope-from <kraxel@redhat.com>) id 1fQU7x-0006wy-FM
+	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 04:49:15 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:39102 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1fQTwu-0007Rj-I4
-	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 04:37:44 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
-	[10.11.54.5])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id D6DD8C12BA
-	for <qemu-devel@nongnu.org>; Wed,  6 Jun 2018 08:37:43 +0000 (UTC)
-From: Igor Mammedov <imammedo@redhat.com>
-Date: Wed,  6 Jun 2018 10:37:05 +0200
-Message-Id: <1528274225-90644-1-git-send-email-imammedo@redhat.com>
-In-Reply-To: <20180605183001.GO7451@localhost.localdomain>
-References: <20180605183001.GO7451@localhost.localdomain>
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1fQU7x-0006wL-26
+	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 04:49:09 -0400
+Date: Wed, 6 Jun 2018 10:49:00 +0200
+From: Gerd Hoffmann <kraxel@redhat.com>
+Message-ID: <20180606084900.77jv3z4il47bx5gi@sirius.home.kraxel.org>
+References: <20180323122520.11270-1-kraxel@redhat.com>
+	<43fc23c1-d72f-748a-5b9d-a816466d7406@redhat.com>
+	<20180425140749.6x3w4h4i2n6uaq7o@sirius.home.kraxel.org>
+	<1ed94b1c-b416-eebe-9cf3-91943a0e6c5a@redhat.com>
+	<20180531084347.xb2r5aolkis2nmqg@sirius.home.kraxel.org>
+	<4b65af58-8451-a365-6c81-52c49e42b6ff@redhat.com>
+	<20180605110647.7ctaj7fiy6x4ewdw@sirius.home.kraxel.org>
+	<a3fe57cf-1569-834d-5528-d85847b29f9f@redhat.com>
+	<20180605131649.fu3cellm7vwaf4ao@sirius.home.kraxel.org>
+	<20d457f0-647f-04e3-76c3-ed58f3494208@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v5 2/2] vl: fix use of --daemonize with
- --preconfig
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20d457f0-647f-04e3-76c3-ed58f3494208@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2 0/7] ramfb: simple boot framebuffer,
+ no legacy vga
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,85 +36,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: berrange@redhat.com, mreitz@redhat.com, pbonzini@redhat.com, ehabkost@redhat.com, ldoktor@redhat.com, eblake@redhat.com
+To: Laszlo Ersek <lersek@redhat.com>
+Cc: qemu-devel@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>, Alex Williamson <alex.williamson@redhat.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>
 
-When using --daemonize, the initial lead process will fork a child and
-then wait to be notified that setup is complete via a pipe, before it
-exits.  When using --preconfig there is an extra call to main_loop()
-before the notification is done from os_setup_post(). Thus the parent
-process won't exit until the mgmt application connects to the monitor
-and tells QEMU to leave the RUN_STATE_PRECONFIG. The mgmt application
-won't connect to the monitor until daemonizing has completed though.
+  Hi,
 
-This is a chicken and egg problem, leading to deadlock at startup.
+> > Maybe we should for now just scratch the idea of an virtio-ramfb device.
+> > Linux doesn't need it, and windows wouldn't use the virtio part of it so
+> > a standalone ramfb device would work equally well.
+> 
+> If that works for you, it works for me best!
 
-The only viable way to fix this is to call os_setup_post() before
-the early main_loop() call when --preconfig is used. This has the
-downside that any errors from this point onwards won't be handled
-well by the mgmt application, because it will think QEMU has started
-successfully, so not be expecting an abrupt exit. Moving as much user
-input validation as possible to before the main_loop() call might help,
-but mgmt application should stop assuming that QEMU has started
-successfuly and use other means to collect errors from QEMU (logfile).
 
-Signed-off-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
-Signed-off-by: Igor Mammedov <imammedo@redhat.com>
----
-v5:
-  * use original Daniel's patch [1], but addapt it to apply on top of
-    "[PATCH v3 1/2] cli: Don't run early event loop if no  --preconfig wa=
-s specified"
-    with extra comment and massage commit message a little bit.
+Ok, pushed updated branches.
 
-CC: berrange@redhat.com
-CC: mreitz@redhat.com
-CC: pbonzini@redhat.com
-CC: ehabkost@redhat.com
-CC: ldoktor@redhat.com
-CC: eblake@redhat.com
+qemu (including seabios + ovmf blobs):
+  https://git.kraxel.org/cgit/qemu/log/?h=sirius/ramfb
 
----
- vl.c | 12 +++++++++++-
- 1 file changed, 11 insertions(+), 1 deletion(-)
+edk2:
+  https://github.com/kraxel/edk2/commits/ramfb
 
-diff --git a/vl.c b/vl.c
-index fa44138..ee359e6 100644
---- a/vl.c
-+++ b/vl.c
-@@ -3038,6 +3038,7 @@ int main(int argc, char **argv, char **envp)
-     Error *err =3D NULL;
-     bool list_data_dirs =3D false;
-     char *dir, **dirs;
-+    bool os_setup_post_done =3D false;
-     typedef struct BlockdevOptions_queue {
-         BlockdevOptions *bdo;
-         Location loc;
-@@ -4578,6 +4579,13 @@ int main(int argc, char **argv, char **envp)
-     parse_numa_opts(current_machine);
-=20
-     /* do monitor/qmp handling at preconfig state if requested */
-+    if (!preconfig_exit_requested && is_daemonized()) {
-+        /* signal parent QEMU to exit, libvirt treats it as a sign
-+         * that monitor socket is ready to accept connections
-+         */
-+        os_setup_post();
-+        os_setup_post_done =3D true;
-+    }
-     main_loop();
-=20
-     /* from here on runstate is RUN_STATE_PRELAUNCH */
-@@ -4707,8 +4715,10 @@ int main(int argc, char **argv, char **envp)
-     }
-=20
-     accel_setup_post(current_machine);
--    os_setup_post();
-=20
-+    if (!os_setup_post_done) {
-+        os_setup_post();
-+    }
-     main_loop();
-=20
-     gdbserver_cleanup();
---=20
-2.7.4
+seabios:
+  https://git.kraxel.org/cgit/seabios/log/?h=bochs
+
+
+What is in there?
+
+qemu:
+   -device ramfb
+      standalone ramfb device
+   -device virtio-ramfb
+      kept for now for testing, as discussed above no plans
+      to merge this one for now.
+   -device vfio-pci-ramfb
+      boot display for vgpu devices.
+   bochs-display got a vgabios.
+
+seabios:
+   support for bochs-display + rmafb added.  For both of them
+   vga text mode (at vgabios call level) is emulated by seabios
+   inside the guest.
+
+edk2:
+   QemuRamfbDxe driver, x86 wireup, incomplete arm wireup.
+
+
+Notes on QemuRamfbDxe:
+
+QemuRamfbDxe registers as VenHw device with a fresh generated uuid.  The
+uuid should probably go to some header file, suggestions where to place
+it best? 
+
+QemuRamfbDxe registers a acpi devpath node for the gop protocol.  It's
+appended to the VenHw path, but looks like that isn't enough to create
+it as child node of the VenHw device (according to devtree outout).
+Suggestions how to fix that?  Still this is good enough for consplitter
+to accept the device.
+
+The device path is added to the gPlatformConsole list, so consplitter
+will pick up the ramfb device even though it isn't a pci display device.
+The firmware display will show up on ramfb in addition to other display
+devices (if any).  Is that approach ok?  If so I'll do that for armvirt
+too.
+
+thanks and happy playing,
+
+  Gerd
