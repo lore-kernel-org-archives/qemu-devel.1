@@ -1,27 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43001)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44093)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fQZ8C-0002C3-06
-	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 10:09:50 -0400
+	(envelope-from <groug@kaod.org>) id 1fQZDM-00076N-AG
+	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 10:15:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1fQZ8B-0008FW-0x
-	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 10:09:43 -0400
-Received: from mail-ot0-x241.google.com ([2607:f8b0:4003:c0f::241]:43314)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1fQZ8A-0008F6-Qr
-	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 10:09:42 -0400
-Received: by mail-ot0-x241.google.com with SMTP id i19-v6so7374199otk.10
-	for <qemu-devel@nongnu.org>; Wed, 06 Jun 2018 07:09:42 -0700 (PDT)
+	(envelope-from <groug@kaod.org>) id 1fQZDH-0002Qr-9u
+	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 10:15:04 -0400
+Received: from 13.mo6.mail-out.ovh.net ([188.165.56.124]:43644)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1fQZDH-0002QH-2G
+	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 10:14:59 -0400
+Received: from player169.ha.ovh.net (unknown [10.109.120.103])
+	by mo6.mail-out.ovh.net (Postfix) with ESMTP id 2E2C516215B
+	for <qemu-devel@nongnu.org>; Wed,  6 Jun 2018 16:14:56 +0200 (CEST)
+From: Greg Kurz <groug@kaod.org>
+Date: Wed, 06 Jun 2018 16:14:42 +0200
+Message-ID: <152829448248.980911.16227091249877176333.stgit@bahia.lan>
 MIME-Version: 1.0
-In-Reply-To: <fdb61fc16922f78190f0db04a11dd20519cd2fb5.1528291908.git.balaton@eik.bme.hu>
-References: <cover.1528291908.git.balaton@eik.bme.hu>
-	<fdb61fc16922f78190f0db04a11dd20519cd2fb5.1528291908.git.balaton@eik.bme.hu>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Wed, 6 Jun 2018 15:09:05 +0100
-Message-ID: <CAFEAcA_GwgmiZPQ9NmY9a7_OwYFCBHFZiVQzk1nZEoxYaD+mwQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v2 7/8] sm501: Do not clear read only bits
- when writing register
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Subject: [Qemu-devel] [PATCH v4] target/ppc: migrate VPA related state
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,56 +27,131 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: BALATON Zoltan <balaton@eik.bme.hu>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-ppc <qemu-ppc@nongnu.org>, Alexander Graf <agraf@suse.de>, David Gibson <david@gibson.dropbear.id.au>
+To: qemu-devel@nongnu.org
+Cc: qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>, Paul Mackerras <paulus@ozlabs.org>, Michael Roth <mdroth@linux.vnet.ibm.com>
 
-On 6 June 2018 at 14:31, BALATON Zoltan <balaton@eik.bme.hu> wrote:
-> When writing a register that has read only bits besides reserved bits
-> we have to avoid changing read only bits that may have non zero
-> default values.
->
-> Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
-> ---
->  hw/display/sm501.c | 6 +++---
->  1 file changed, 3 insertions(+), 3 deletions(-)
->
-> diff --git a/hw/display/sm501.c b/hw/display/sm501.c
-> index e47be99..7ec1434 100644
-> --- a/hw/display/sm501.c
-> +++ b/hw/display/sm501.c
-> @@ -836,10 +836,10 @@ static void sm501_system_config_write(void *opaque, hwaddr addr,
->
->      switch (addr) {
->      case SM501_SYSTEM_CONTROL:
-> -        s->system_control = value & 0xE300B8F7;
-> +        s->system_control |= value & 0xEF00B8F7;
+QEMU implements the "Shared Processor LPAR" (SPLPAR) option, which allows
+the hypervisor to time-slice a physical processor into multiple virtual
+processor. The intent is to allow more guests to run, and to optimize
+processor utilization.
 
-This will mean that you can't clear a r/w bit by writing a
-zero to it -- is that the hardware behaviour? The
-description in the commit message suggests that you want
-   s->whatever = (value & rw_bit_mask) | ro_one_bits_mask;
+The guest OS can cede idle VCPUs, so that their processing capacity may
+be used by other VCPUs, with the H_CEDE hcall. The guest OS can also
+optimize spinlocks, by confering the time-slice of a spinning VCPU to the
+spinlock holder if it's currently notrunning, with the H_CONFER hcall.
 
-?
+Both hcalls depend on a "Virtual Processor Area" (VPA) to be registered
+by the guest OS, generally during early boot. Other per-VCPU areas can
+be registered: the "SLB Shadow Buffer" which allows a more efficient
+dispatching of VCPUs, and the "Dispatch Trace Log Buffer" (DTL) which
+is used to compute time stolen by the hypervisor. Both DTL and SLB Shadow
+areas depend on the VPA to be registered.
 
->          break;
->      case SM501_MISC_CONTROL:
-> -        s->misc_control = value & 0xFF7FFF20;
-> +        s->misc_control |= value & 0xFF7FFF10;
->          break;
->      case SM501_GPIO31_0_CONTROL:
->          s->gpio_31_0_control = value;
-> @@ -853,7 +853,7 @@ static void sm501_system_config_write(void *opaque, hwaddr addr,
->          s->dram_control |=  value & 0x7FFFFFC3;
->          break;
->      case SM501_ARBTRTN_CONTROL:
-> -        s->arbitration_control =  value & 0x37777777;
-> +        s->arbitration_control = value & 0x37777777;
+The VPA/SLB Shadow/DTL are state that QEMU should migrate, but this doesn't
+happen, for no apparent reason other than it was just never coded. This
+causes the features listed above to stop working after migration, and it
+breaks the logic of the H_REGISTER_VPA hcall in the destination.
 
-Was this intended to be changed too?
+This patch fixes it for newer machine types (ie, version > 2.12) by adding
+a "cpu/vpa" subsection to the CPU migration stream. It ensures backward
+migration to existing QEMU versions.
 
->          break;
->      case SM501_IRQ_MASK:
->          s->irq_mask = value;
+Since DTL and SLB Shadow are optional and both depend on VPA, they get
+their own subsections "cpu/vpa/slb_shadow" and "cpu/vpa/dtl" hanging from
+the "cpu/vpa" subsection.
 
-thanks
--- PMM
+Signed-off-by: Greg Kurz <groug@kaod.org>
+---
+v4: - re-added TARGET_PPC64 ifdefs accidentally dropped in v3
+
+v3: - switched to pre_3_0_migration
+
+v2: - added missing TARGET_PP64 ifdefs (patchew)
+---
+ target/ppc/machine.c |   66 ++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 66 insertions(+)
+
+diff --git a/target/ppc/machine.c b/target/ppc/machine.c
+index b2745ec4e519..d063fe278fb7 100644
+--- a/target/ppc/machine.c
++++ b/target/ppc/machine.c
+@@ -677,6 +677,69 @@ static const VMStateDescription vmstate_compat = {
+     }
+ };
+ 
++#if defined(TARGET_PPC64)
++static bool slb_shadow_needed(void *opaque)
++{
++    PowerPCCPU *cpu = opaque;
++
++    return cpu->env.slb_shadow_addr != 0;
++}
++
++static const VMStateDescription vmstate_slb_shadow = {
++    .name = "cpu/vpa/slb_shadow",
++    .version_id = 1,
++    .minimum_version_id = 1,
++    .needed = slb_shadow_needed,
++    .fields = (VMStateField[]) {
++        VMSTATE_UINT64(env.slb_shadow_addr, PowerPCCPU),
++        VMSTATE_UINT64(env.slb_shadow_size, PowerPCCPU),
++        VMSTATE_END_OF_LIST()
++    }
++};
++
++static bool dtl_needed(void *opaque)
++{
++    PowerPCCPU *cpu = opaque;
++
++    return cpu->env.dtl_addr != 0;
++}
++
++static const VMStateDescription vmstate_dtl = {
++    .name = "cpu/vpa/dtl",
++    .version_id = 1,
++    .minimum_version_id = 1,
++    .needed = dtl_needed,
++    .fields = (VMStateField[]) {
++        VMSTATE_UINT64(env.dtl_addr, PowerPCCPU),
++        VMSTATE_UINT64(env.dtl_size, PowerPCCPU),
++        VMSTATE_END_OF_LIST()
++    }
++};
++
++static bool vpa_needed(void *opaque)
++{
++    PowerPCCPU *cpu = opaque;
++
++    return !cpu->pre_3_0_migration && cpu->env.vpa_addr != 0;
++}
++
++static const VMStateDescription vmstate_vpa = {
++    .name = "cpu/vpa",
++    .version_id = 1,
++    .minimum_version_id = 1,
++    .needed = vpa_needed,
++    .fields = (VMStateField[]) {
++        VMSTATE_UINT64(env.vpa_addr, PowerPCCPU),
++        VMSTATE_END_OF_LIST()
++    },
++    .subsections = (const VMStateDescription * []) {
++        &vmstate_slb_shadow,
++        &vmstate_dtl,
++        NULL
++    }
++};
++#endif /* TARGET_PPC64 */
++
+ const VMStateDescription vmstate_ppc_cpu = {
+     .name = "cpu",
+     .version_id = 5,
+@@ -731,6 +794,9 @@ const VMStateDescription vmstate_ppc_cpu = {
+         &vmstate_tlbemb,
+         &vmstate_tlbmas,
+         &vmstate_compat,
++#if defined(TARGET_PPC64)
++        &vmstate_vpa,
++#endif
+         NULL
+     }
+ };
