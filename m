@@ -1,32 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53591)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53717)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1fQcm6-00028d-JG
-	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 14:03:13 -0400
+	(envelope-from <balaton@eik.bme.hu>) id 1fQcn0-0002Vh-4H
+	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 14:04:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1fQcm4-0008Qo-LI
-	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 14:03:10 -0400
-References: <20180606123237.2235ae4a@kitsune.suse.cz>
-	<bc97cdc3-85ba-e053-0816-b6bc431064fb@redhat.com>
-	<20180606131929.44d0fd6b@kitsune.suse.cz>
-	<93233bff-604b-c891-90ce-64fe1eaaaab5@redhat.com>
-	<20180606113720.GA2661@work-vm>
-	<2c833e2c-f0bb-ea98-a703-54fb9447bd2f@redhat.com>
-	<20180606121624.GD2661@work-vm>
-	<2d572c2f-8dda-87db-ec26-6f2230375424@redhat.com>
-	<20180606140233.GF2660@work-vm>
-	<66366ae1-1db8-7121-bfcc-f2096d0c954f@redhat.com>
-	<20180606144140.GH2660@work-vm>
-	<cea4f615-c768-7a2f-3849-5dd00c37b537@redhat.com>
-	<20180606172523.3816a882@kitsune.suse.cz>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <a1d7851c-e01f-4190-cc8f-af98531e6379@redhat.com>
-Date: Wed, 6 Jun 2018 20:02:54 +0200
+	(envelope-from <balaton@eik.bme.hu>) id 1fQcmw-0000r9-TQ
+	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 14:04:06 -0400
+Date: Wed, 6 Jun 2018 20:04:00 +0200 (CEST)
+From: BALATON Zoltan <balaton@eik.bme.hu>
+In-Reply-To: <fe2799d9-0a74-774a-1b97-59365afa1c8b@amsat.org>
+Message-ID: <alpine.BSF.2.21.1806061936550.94568@zero.eik.bme.hu>
+References: <cover.1528069840.git.balaton@eik.bme.hu>
+	<6f3e8e1070c12d1a8321f4fdb6f65d56adc2767b.1528069840.git.balaton@eik.bme.hu>
+	<20180606063606.GJ17757@umbus.fritz.box>
+	<alpine.BSF.2.21.1806061558010.42561@zero.eik.bme.hu>
+	<fe2799d9-0a74-774a-1b97-59365afa1c8b@amsat.org>
 MIME-Version: 1.0
-In-Reply-To: <20180606172523.3816a882@kitsune.suse.cz>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="Z5MMMETAJw5opmgzB3UpT0DQRZyj2b3q9"
-Subject: Re: [Qemu-devel] storing machine data in qcow images?
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 1/4] ppc4xx_i2c: Rewrite PPC4xx I2C
+ emulation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,137 +27,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Michal_Such=c3=a1nek?= <msuchanek@suse.de>
-Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Kevin Wolf <kwolf@redhat.com>, ehabkost@redhat.com, qemu-block@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>, "Richard W.M. Jones" <rjones@redhat.com>, qemu-devel@nongnu.org, stefanha@redhat.com
+To: =?ISO-8859-15?Q?Philippe_Mathieu-Daud=E9?= <f4bug@amsat.org>
+Cc: David Gibson <david@gibson.dropbear.id.au>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Alexander Graf <agraf@suse.de>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---Z5MMMETAJw5opmgzB3UpT0DQRZyj2b3q9
-From: Max Reitz <mreitz@redhat.com>
-To: =?UTF-8?Q?Michal_Such=c3=a1nek?= <msuchanek@suse.de>
-Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- Kevin Wolf <kwolf@redhat.com>, ehabkost@redhat.com, qemu-block@nongnu.org,
- "Michael S. Tsirkin" <mst@redhat.com>, "Richard W.M. Jones"
- <rjones@redhat.com>, qemu-devel@nongnu.org, stefanha@redhat.com
-Message-ID: <a1d7851c-e01f-4190-cc8f-af98531e6379@redhat.com>
-Subject: Re: [Qemu-devel] storing machine data in qcow images?
-References: <20180606123237.2235ae4a@kitsune.suse.cz>
- <bc97cdc3-85ba-e053-0816-b6bc431064fb@redhat.com>
- <20180606131929.44d0fd6b@kitsune.suse.cz>
- <93233bff-604b-c891-90ce-64fe1eaaaab5@redhat.com>
- <20180606113720.GA2661@work-vm>
- <2c833e2c-f0bb-ea98-a703-54fb9447bd2f@redhat.com>
- <20180606121624.GD2661@work-vm>
- <2d572c2f-8dda-87db-ec26-6f2230375424@redhat.com>
- <20180606140233.GF2660@work-vm>
- <66366ae1-1db8-7121-bfcc-f2096d0c954f@redhat.com>
- <20180606144140.GH2660@work-vm>
- <cea4f615-c768-7a2f-3849-5dd00c37b537@redhat.com>
- <20180606172523.3816a882@kitsune.suse.cz>
-In-Reply-To: <20180606172523.3816a882@kitsune.suse.cz>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: quoted-printable
-
-On 2018-06-06 17:25, Michal Such=E1nek wrote:
-> On Wed, 6 Jun 2018 16:55:08 +0200
-> Max Reitz <mreitz@redhat.com> wrote:
->=20
->> On 2018-06-06 16:41, Dr. David Alan Gilbert wrote:
->>> * Max Reitz (mreitz@redhat.com) wrote: =20
->>
->> [...]
->>
->>>> So why is it so dangerous to connect a disk you just downloaded to
->>>> e.g. the wrong machine type?  I assumed it just wouldn't work and
->>>> you'd try again, until you realized that maybe you should read the
->>>> download description and do as it says ("download this config
->>>> file, pass it"). =20
+On Wed, 6 Jun 2018, Philippe Mathieu-Daud=C3=A9 wrote:
+> On 06/06/2018 11:03 AM, BALATON Zoltan wrote:
+>> On Wed, 6 Jun 2018, David Gibson wrote:
+>>> On Mon, Jun 04, 2018 at 01:50:40AM +0200, BALATON Zoltan wrote:
+>>>> I2C emulation currently is just enough for U-Boot to access SPD
+>>>> EEPROMs but features that guests use to access I2C devices are not
+>>>> correctly emulated. Rewrite to implement missing features to make it
+>>>> work with all clients.
+>>>>
+>>>> Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
+>>>> ---
+>>>> Maybe this could be split up into more patches but because the
+>>>> previous implementation was wrong only allowing U-Boot to pass and n=
+o
+>>>> clients could access I2C devices before this rewrite it probably doe=
+s
+>>>> not worth to try to make it a lot of small changes instead of droppi=
+ng
+>>>> the previous hack and rewrite following features of real hardware mo=
+re
+>>>> closely. (It turns out that each client driver accesses I2C in a
+>>>> different way so we need to implement almost all features of the
+>>>> hardware to please everyone.)
 >>>
->>> That's bad!  Stuff should just-work; =20
+>>> The trouble is that because I don't really have a good test setup for
+>>> this, I'm pretty reluctant to apply such a total rewrite without acks
+>>> from more people who've tested it.? That or reviewing the changes
+>>> myself, which I can't really do when it's in one big lump like this.
 >>
->> That's how it always should be.  Life's tough, though.
->>
->>>                                      it currently just works, =20
->>
->> Due to sheer blind luck, I'd say.
->=20
-> It's TimeProvenSolution(tm).
->=20
->>
->>>                                                               things
->>> should get better and easier for our users. =20
->>
->> Users using a whole VM stack plus management, but then handling two
->> files instead of one is too much to ask?
->=20
-> What you don't seem to realize is there are cases when there is an
-> 'administrator' who has set up the VM stack plus management and 'joe
-> user' who wants to run some random VM on that stack.
->=20
-> And if you download an appliance compatible with the stack it should
-> just work. For a long time the 'appliance' for qemu based
-> virtualization was a simple qcow2 file which was sized sufficiently for=
+>> OK, I've sent a v2 where this patch is split up to smaller pieces that
+>> are hopefully easier to review. However this i2c emulation was only a
+>> stub originally which was hacked together to make U-Boot happy when
+>> added the sam460ex machine and this is the first version that attempts
+>> to really model the device so that guests can also use it. Therefore I
+>> think there's not a high chance of breaking anything important. I've
+>> tested this with AROS, Linux, AmigaOS and MorphOS and they seem to be
+>> able to read the RTC so it should work better than the previous versio=
+n.
+>
+> Are those images publicly accessible? (thinking about adding acceptance
+> qtests).
 
-> the VM to run but shrunk for transport. And although it is technically
-> wrong it JustWorked(tm).
+AROS is available, get the sam440-ppc-boot-iso from this page:
+http://aros.sourceforge.net/nightly1.php
+for latest nightly build which should work.
 
-Hm, yes.  As I replied to Dave, I understand, but I would think this
-then requires a real appliance solution.  I think you do want such a
-solution, but Dave doesn't.
+There are several Linux images available around the net but none seems to=
+=20
+be fully working (and may have bugs even on real hardware) so I don't kno=
+w=20
+about a good one to try. I test with booting a kernel directly via -kerne=
+l=20
+option but couldn't get a distro running and recent upstream kernels seem=
+=20
+to have a bug finding SM501 display. Older and/or patched kernels for=20
+Sam460ex seem to work better but haven't tested all of those.
 
-My problem is that I cannot accept Dave's arguments on why to include
-this blob in qcow2 if someone else already plans on making that blob the
-basis for qcow2 appliances.
+AmigaOS and MorphOS are closed source. Only MorphOS is available publicly=
+=20
+as a demo but that's not booting yet for some reason and (at least some=20
+of) its developers are against running it on QEMU and said that won't=20
+support attempts getting it to work. Therefore I'll have to find out what=
+=20
+it's missing in emulation without their help. (Just mentioning it in case=
+=20
+someone tries to ask for help and get an unfriendly reply or no reply at=20
+all. This does not bother me testing with it and improving emulation to=20
+the point where it will work as well. But I think it may have bugs on rea=
+l=20
+hardware as well because I've seen forum posts about problems with PCI=20
+devices on real sam460 which is what I see on QEMU as well.)
 
-And I still do not think that qcow2 is the right format for VM
-appliances.  To convince me, we'd first need a consensus on what the
-appliances are for (Michael seems to want them for qemu directly,
-apparently you want them for something higher up the stack) and thus
-what they are supposed to be capable of exactly.
+Not sure if there are any other OSes that run on real hardware that I=20
+should be aware of. There was a Haiku port attempted which is what this=20
+emulation started from (to help that porting) but not sure if there was=20
+any progress with that since.
 
-Like, one thing that is important to discuss is this (but please not in
-this thread...): If we agree on making an appliance format (qcow2 or
-not), is it for running VMs off or do we just want it for VM
-export/import?  The former might mean we need qcow2, because there is no
-good way to offer good performance with multiple disks otherwise (but
-this would constrain us e.g. in the disk image format -- no raw images
-for you, then).  But the latter can work just fine with a normal
-archival format as long as building/decomposing it is possible without
-copying.
-
-(I would think that you can move blocks from one file to another, so
-with proper alignment you should be able to build/decompose an archive
-from/into its members without copying.)
-
->>>                                              And anyway, not
->>> working for EFI for exmaple can be just a blank screen.  Seriously
->>> - keep it easy for the user! =20
->>
->> Thinking this through makes you end up with appliances.
->=20
-> And those can in general have more than one disk.
-
-Indeed.  And thus knowing what we want is important so we can make a
-good decision on where to store it instead of just focusing on where it
-would be apparently simplest.
-
-Max
-
-
---Z5MMMETAJw5opmgzB3UpT0DQRZyj2b3q9
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlsYIc4ACgkQ9AfbAGHV
-z0CSmwf/bT1WNOCXdHFNATWUHHb2bGYZZCW8fmY2SUxwS/EMmC70nvJZi8TXN63d
-G6Y/Xq/52tL6kHqMbWnrKYRkxESJLnEO54Nzkoyk1vJ5G6UVubEzx+SzE/0QTh7w
-bNn1SPeKSFu1ywF+J2RIoj9UvNS5XKZakbjuHTAKMT2+nlzzn9byUOiC4MYs1dLQ
-/3L7UJI17kt9cKxOj/VvnCK4AzNasBIV4kxWV04u/zAdDJBm5GJ7CxSInjCvgP1k
-eeF8Hek1JdxWBjDaw+IT++jVXi9N7H1FMKUjGL5ebU2QHrZJZFwcw+cTY42d4U7B
-9RHSgHOGG8Wt726ohVaeE3xsUOWmpw==
-=NLdq
------END PGP SIGNATURE-----
-
---Z5MMMETAJw5opmgzB3UpT0DQRZyj2b3q9--
+Regards,
+BALATON Zoltan
