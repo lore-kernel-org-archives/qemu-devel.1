@@ -1,23 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37148)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38244)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <msuchanek@suse.de>) id 1fQYkk-0002Rb-U8
-	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 09:45:34 -0400
+	(envelope-from <berrange@redhat.com>) id 1fQYpY-0004iZ-Qp
+	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 09:50:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <msuchanek@suse.de>) id 1fQYkg-0001bg-Cp
-	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 09:45:30 -0400
-Date: Wed, 6 Jun 2018 15:45:10 +0200
-From: Michal =?UTF-8?B?U3VjaMOhbmVr?= <msuchanek@suse.de>
-Message-ID: <20180606154510.24be6ceb@kitsune.suse.cz>
-In-Reply-To: <95f92a95-6592-27a2-a822-d3a047cf8339@redhat.com>
-References: <20180518180440-mutt-send-email-mst@kernel.org>
-	<20180524113251.GB4660@redhat.com>
-	<d9bb2cb9-d9dc-8fe0-a767-10d9cbbab803@redhat.com>
-	<20180528183058.GG2209@redhat.com>
-	<20180528183833.GJ4580@localhost.localdomain>
-	<20180528212054.GH2209@redhat.com>
-	<20180528212510.GC4660@redhat.com>
-	<20180529064415.GA4756@localhost.localdomain>
-	<2b3eef00-f326-c1e6-0e4b-b7602646eec4@redhat.com>
+	(envelope-from <berrange@redhat.com>) id 1fQYpX-0003iX-8q
+	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 09:50:28 -0400
+Date: Wed, 6 Jun 2018 14:50:10 +0100
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Message-ID: <20180606135010.GF3064@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <2b3eef00-f326-c1e6-0e4b-b7602646eec4@redhat.com>
 	<20180606123237.2235ae4a@kitsune.suse.cz>
 	<bc97cdc3-85ba-e053-0816-b6bc431064fb@redhat.com>
 	<20180606131929.44d0fd6b@kitsune.suse.cz>
@@ -26,10 +18,12 @@ References: <20180518180440-mutt-send-email-mst@kernel.org>
 	<94cea1d9-d934-85d1-66d4-dbfc82b8dd53@redhat.com>
 	<20180606141356.0b86d6b4@kitsune.suse.cz>
 	<95f92a95-6592-27a2-a822-d3a047cf8339@redhat.com>
+	<20180606154510.24be6ceb@kitsune.suse.cz>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	boundary="Sig_/u=3=8U.Mc/v.8CC8uekO+ch";
-	protocol="application/pgp-signature"
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20180606154510.24be6ceb@kitsune.suse.cz>
+Content-Transfer-Encoding: quoted-printable
 Subject: Re: [Qemu-devel] storing machine data in qcow images?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -39,203 +33,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>
-Cc: Kevin Wolf <kwolf@redhat.com>, ehabkost@redhat.com, qemu-block@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>, "Richard W.M.
-	Jones" <rjones@redhat.com>, qemu-devel@nongnu.org, stefanha@redhat.com
+To: Michal =?utf-8?B?U3VjaMOhbmVr?= <msuchanek@suse.de>
+Cc: Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, ehabkost@redhat.com, qemu-block@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>, "Richard W.M. Jones" <rjones@redhat.com>, qemu-devel@nongnu.org, stefanha@redhat.com
 
---Sig_/u=3=8U.Mc/v.8CC8uekO+ch
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-
-On Wed, 6 Jun 2018 15:14:03 +0200
-Max Reitz <mreitz@redhat.com> wrote:
-
-> On 2018-06-06 14:13, Michal Such=C3=A1nek wrote:
-> > On Wed, 6 Jun 2018 13:52:35 +0200
-> > Max Reitz <mreitz@redhat.com> wrote:
-> >  =20
-> >> On 2018-06-06 13:43, Michal Such=C3=A1nek wrote: =20
-> >>> On Wed, 6 Jun 2018 13:32:47 +0200
-> >>> Max Reitz <mreitz@redhat.com> wrote:
-> >>>    =20
-> >>>> On 2018-06-06 13:19, Michal Such=C3=A1nek wrote:   =20
-> >>>>> On Wed, 6 Jun 2018 13:02:53 +0200
-> >>>>> Max Reitz <mreitz@redhat.com> wrote: =20
+On Wed, Jun 06, 2018 at 03:45:10PM +0200, Michal Such=C3=A1nek wrote:
 >=20
-> [...]
->=20
-> >>>>>> What I'm trying to get at is that qcow2 was not designed to be
-> >>>>>> a container format for arbitrary files.  If you want to make it
-> >>>>>> such, I'm sure there are existing formats that work
-> >>>>>> better.     =20
-> >>>>>
-> >>>>> Such as?     =20
-> >>>>
-> >>>> ext2?   =20
-> >>>
-> >>> So you want an ext2 driver in qemu instead of expanding qcow2 to
-> >>> work not only for a single disk but also for an appliance?   =20
-> >>
-> >> Yes, because ext2 was designed to be a proper filesystem.  I'm not
-> >> an FS designer.  Well, not a good one anyway.  So I don't trust
-> >> myself on extending qcow2 to be a good FS -- and why would I, when
-> >> there are already numerous FS around. =20
-> >=20
-> > Do you expect that performance of qemu using qcow2 driver over ext2
-> > driver will be better than using qcow driver directly with some part
-> > semi-permanently occupied by a configuration blob? My bet is not. =20
->=20
-> If you want to store multiple disk images in a single file?  I would
-> think so, yes.  With qcow2, I would assume it leads to
-> fragmentation. =20
+> I think that *if* we want an 'appliance' format that stores a whole VM
+> in a single file to ease VM distribution then the logical place to look
+> in qemu is qcow. The reason have been explained at length.
 
-How is that different from single disk divided into two partitions
-internally (without any knowledge on the qcow2 level)?
+I rather disagree. This is a common problem beyond just QEMU and everyone
+just uses an existing archive format (TAR, ZIP) for bundling together
+one or more disk images, metdata for config, and whatever other resources
+are applicable for the vendor.  This works with any disk format (raw,
+qcow2, vmdk, vpc, etc) so is preferrable to inventing someting that is
+specific to qcow2 IMHO.
 
-> I would hope that proper filesystems can mitigate this.
-
-Not really. Not without much complexity and repeated maintenance.
-
-> > The ext* drivers are designed to work with kernel VM infrastructure
-> > which must be tuned for different usage scenarios and you would
-> > have to duplicate that tuning in qemu to get competitive
-> > performance. Also you get qcow2 and ext2 metadata which must be
-> > allocated, managed, etc. You get more storage and performance
-> > overhead for no good reason. =20
->=20
-> Yes, there is a good reason.  You can add arbitrary configuration
-> options without having to worry about me.
-
-But I will not be able to use the images in qemu so it will be useless.
-
-Well, there is FUSE and that is certainly blazing fast and ubiquitous,
-I am sure.
-
->=20
-> Seriously, though, a real FS would allow you to be more expressive and
-> really do what you want without having to work around the quirks that
-> adding a not-real-FS in the most simple way possible to qcow2 would
-> bring with it.
->=20
-> Because this is part of my fear, that we now add a very simple blob
-> for just a sprinkle of data.  But over time it gets more and more
-> complex because we want to store more and more data to make things
-> ever more convenient[1], we notice that we need more features, the
-> format gets more complex, and in the end we have an FS that is just
-> worse than a real FS.
->=20
-> [1] And note that if I'm convinced to store VM configuration data in
-> qemu, I will agree that we can store any data in there and it would be
-> nice if any VM could be provisioned and used that way.
->=20
-> > On the other hand, qcow is designed for storing VM disk data and
-> > hopefully was tuned to do that decently over the years. The primary
-> > use case remains storing VM disk data. Adding a configuration blob
-> > does not change that. =20
->=20
-> True.  So the argument is that qcow2 may be worse for storing
-> arbitrary data, but we don't have performance requirements for that;
-> but we do have performance requirements for disk data and adding
-> another format below qcow2 will not make it better.
->=20
-> I do think it is possible to not make things worse with a format under
-> qcow2, but that may require additional complexity, that you think is
-> pointless.
->=20
-> I understand that you think that, but I still believe that putting the
-> configuration into qcow2 is just the wrong way around and will fall on
-> our feet in the long run.
-
-I think that *if* we want an 'appliance' format that stores a whole VM
-in a single file to ease VM distribution then the logical place to look
-in qemu is qcow. The reason have been explained at length.
-
-I understand that for some use cases simplifying the distribution of
-VMs as much as possible is quite important.
-
->=20
-> >>>>>>>> Unless I have got something terribly wrong (which is indeed a
-> >>>>>>>> possibility!), to me this proposal means basically to turn
-> >>>>>>>> qcow2 into (1) a VM description format for qemu, and (2) to
-> >>>>>>>> turn it into an archive format on the way.       =20
-> >>>>>>>
-> >>>>>>> And if you go all the way you can store multiple disks along
-> >>>>>>> with the VM definition so you can have the whole appliance in
-> >>>>>>> one file. It conveniently solves the problem of synchronizing
-> >>>>>>> snapshots across multiple disk images and the question where
-> >>>>>>> to store the machine state if you want to suspend it.        =20
-> >>>>>>
-> >>>>>> Yeah, but why make qcow2 that format?  That's what I completely
-> >>>>>> fail to understand.
-> >>>>>>
-> >>>>>> If you want to have a single VM description file that contains
-> >>>>>> the VM configuration and some qcow2/raw/whatever files along
-> >>>>>> with it for the guest disk data, sure, go ahead.  But why does
-> >>>>>> the format of the whole thing need to be qcow2?     =20
-> >>>>>
-> >>>>> Because then qemu can access the disk data from the image
-> >>>>> directly without any need for extraction, copying to different
-> >>>>> file, etc.     =20
-> >>>>
-> >>>> This does not explain why it needs to be qcow2.  There is
-> >>>> absolutely no reason why you couldn't use qcow2 files in-place
-> >>>> inside of another file.   =20
-> >>>
-> >>> qemu cannot read the disk data from the file in-place.   =20
-> >>
-> >> Hu?  Why not? =20
-> >=20
-> > Well, it can possibly read the image if it happens to be
-> > continuous. It will not be able to update it without a fs driver,
-> > however. =20
->=20
-> Yes, but first, such an FS driver would be possible (and as long as we
-> don't need real complexity, it could be very simple, like just using
-> an offset in a tar file and then just adjust the file length field on
-> allocations beyond the EOF).
-
-As said this will cover only the simplest case with readonly
-configuration blob(s) and one disk image at the end. The solution is
-obsolete even as we are designing it.
-
->=20
-> And secondly, I think adding another format has the advantage of
-> easier deprecation.  If we think we need something more complex, we
-> are free to design that and throw away the old format.  But if we add
-> something to qcow2, I would think it is there to stay.
-
-And then we would better add something general enough to work for
-foreseeable future or not add anything at all.
-
->=20
-> So, yes, for qcow2 we might want to design something (overly?) complex
-> from that start that we hope will fulfill all our needs (which it
-> won't, because things never turn out that way).  But if we'd add a
-> new format, we could keep it simple in the beginning and start over
-> later.
->=20
-
-Yes, you basically want something like a tar file that can interleave
-the archive members. Wait, isn't that a new filesystem?
-
-Thanks
-
-Michal
-
---Sig_/u=3=8U.Mc/v.8CC8uekO+ch
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-
-iQEcBAEBAgAGBQJbF+VtAAoJEFCz6i1PzvpbiegIAKUi+GGrzapxFOFWr1uT8whq
-a7d4CaMl7XIPpfS8SOtXL3sZWxT8np5NPYluF/US0uQMXXWYkOBkJgp5G/K92owV
-QaV9fx2ptzMCmuYK8iUjoQqc64Wron+G4PJbMefsccvZ0y4JXlS8rcMezKdaU4nx
-kizfqy+tKFVOtKF3THkKQKtHV170Q7mJNinlyB6hh90rrAIUZi/FyUmmlCoS0Axu
-6HJ6adPyCmBVrXhz1lRkGLaVafU9+7plcbYFIDIvCoI7GmL+NKOyQ6sULIvgefaV
-wcBlEcmgodSV37I37im8qHmUa6a3VFnkt/G52rR5mKkrlhQ0XxL7iL6MXHUHnAY=
-=jcCX
------END PGP SIGNATURE-----
-
---Sig_/u=3=8U.Mc/v.8CC8uekO+ch--
+Regards,
+Daniel
+--=20
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
+ge :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.c=
+om :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
+ge :|
