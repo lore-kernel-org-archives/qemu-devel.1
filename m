@@ -1,28 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34677)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34891)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1fQYb8-0002n1-VI
-	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 09:35:36 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fQYc1-0003PV-Et
+	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 09:36:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1fQYb7-0004t9-J7
-	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 09:35:34 -0400
-Date: Wed, 6 Jun 2018 10:35:20 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20180606133520.GP7451@localhost.localdomain>
-References: <d9bb2cb9-d9dc-8fe0-a767-10d9cbbab803@redhat.com>
-	<20180528183058.GG2209@redhat.com>
-	<20180528183833.GJ4580@localhost.localdomain>
-	<20180528212054.GH2209@redhat.com>
-	<20180528212510.GC4660@redhat.com>
-	<20180529064415.GA4756@localhost.localdomain>
-	<2b3eef00-f326-c1e6-0e4b-b7602646eec4@redhat.com>
-	<20180605092159.GA2544@work-vm>
-	<20180605190324.GA11372@localhost.localdomain>
-	<20180606094418.GC2660@work-vm>
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fQYbz-0005I5-SO
+	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 09:36:29 -0400
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20180606093101.30518-1-luc.michel@greensocs.com>
+	<20180606093101.30518-6-luc.michel@greensocs.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <a49fd0e8-7865-7a05-c093-5bb9a14bdf43@amsat.org>
+Date: Wed, 6 Jun 2018 10:36:13 -0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180606094418.GC2660@work-vm>
-Subject: Re: [Qemu-devel] storing machine data in qcow images?
+In-Reply-To: <20180606093101.30518-6-luc.michel@greensocs.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH 5/6] intc/arm_gic: Improve traces
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,128 +28,165 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org, "Richard W.M. Jones" <rjones@redhat.com>, stefanha@redhat.com
+To: luc.michel@greensocs.com, qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>, mark.burton@greensocs.com, saipava@xilinx.com, edgari@xilinx.com, qemu-arm@nongnu.org, Jan Kiszka <jan.kiszka@web.de>
 
-On Wed, Jun 06, 2018 at 10:44:20AM +0100, Dr. David Alan Gilbert wrote:
-> * Eduardo Habkost (ehabkost@redhat.com) wrote:
-> > On Tue, Jun 05, 2018 at 10:21:59AM +0100, Dr. David Alan Gilbert wrote:
-> > > <reawakening a fizzled out thread>
-> > > 
-> > > This seems to have fizzled out because of a lack of a concrete proposal;
-> > > so here is one based on a reply to Max's post:
-> > > 
-> > > * Max Reitz (mreitz@redhat.com) wrote:
-> > > 
-> > > <snip>
-> > > 
-> > > > The original problem was that you need to supply a machine type to qemu,
-> > > > and that multiple common architectures now have multiple machine types
-> > > > and not necessarily all work with a single image.  So far so good, but I
-> > > > have two issues here already:
-> > > > 
-> > > > (1) How is qemu supposed to interpret that information?  If it's stored
-> > > > in the image file, I don't see a nice way of retrieving it before the
-> > > > machine is initialized, at least not with qemu's current architecture.
-> > > 
-> > > <snip>
-> > > 
-> > > > (2) Again, I personally just really don't like saving such information
-> > > > in a disk image.  One actual argument I can bring up for that distaste
-> > > > is this: Suppose, you have multiple images attached to your VM.  Now the
-> > > > VM wants to store the machine type.  Where does it go?  Into all of
-> > > > them?
-> > > 
-> > > <snip>
-> > > 
-> > > > So I think if we decide to store the machine type, that is kind of a
-> > > > slippery slope and then there are good arguments for storing even more
-> > > > configuration options in the file, too.  But I really, really don't like
-> > > > that.
-> > > 
-> > > <snip>
-> > > 
-> > > > For another, how do we store the data?  key-value seems wrong if we want
-> > > > to store everything.  JSON might be fine.  But eventually we just want
-> > > > basically a qemu configuration file in there, I would think (which may
-> > > > support JSON at some point?).   So basically we would store the data as
-> > > > a binary blob and let the rest of qemu do its thing with it.  But then
-> > > > please tell me why I fought so valiantly against storing random bitmaps
-> > > > in qcow2 files.  I hate the idea of making qcow2 a random archive
-> > > > format.  We have tar for that.
-> > > 
-> > > <snip>
-> > > 
-> > > > tl;dr: I really don't get why it's so hard to supply a config file along
-> > > > with a qcow2 image.  Is it so hard for people to realize that a VM does
-> > > > not only consist of a disk?
-> > > 
-> > > Yes! Because in many cases that's all it needs, and it's ready to run
-> > > with no unpacking.
-> > > 
-> > > I think we should have:
-> > > 
-> > > --------------------------------------------------------------
-> > > Layer 0:
-> > >    QCOW provides a way to store a single string of arbitrary (but
-> > > limited?) length.
-> > >    QCOW provides a way to replace the string by a new string.
-> > >    The original or the new string will be stored after that;
-> > >    never some mix.
-> > >    Where a file 'b' has a backing file 'a', 'b' inherits the
-> > >    string from 'a' unless 'b' has it's own string.
-> > >    Snapshots inherit their string from the main unless they have
-> > >    their own string.
-> > > 
-> > > Layer 1:
-> > >    The string shall always be a JSON 'object'; i.e. of the form
-> > >     { "something": ... , "more": ... }
-> > > 
-> > >    The key strings shall be non-null and non-empty and shall
-> > >    be unique.
-> > > 
-> > 
-> > I'd prefer layer 0+1 to:
-> > 
-> > 1) Allow multiple entries to be stored (implemented by layer 1
-> >    in this proposal)
-> > 2) Identify each entry with a name (implemented by layer 1 in
-> >    this proposal)
-> > 3) Allow arbitrary binary data to be stored on an entry
-> >    (not possible with the JSON-based proposal, because JSON
-> >    strings are not blobs, but Unicode strings).
-> > 4) Make it easy to replace only one entry while keeping others
-> >    intact (not the case here, if all entries are stored in the
-> >    same JSON string)
-> > 
-> > I think it would be simpler if layer 0 simply provided a list of
-> > names/value pairs, where names are ascii strings, and values are
-> > binary data[1].  It would make layer 1 unnecessary, and allow (3)
-> > and (4) to happen.
-> > 
-> > [1] In other words, Rich's proposal of "named blobs":
-> > https://www.mail-archive.com/qemu-block@nongnu.org/msg37856.html
+On 06/06/2018 06:31 AM, luc.michel@greensocs.com wrote:
+> From: Luc MICHEL <luc.michel@greensocs.com>
 > 
-> My reasoning was just one of simplicity; each layer in this is
-> almost trivial.
-> The downside to my proposal is it's more expensive if you want
-> to change a single key; but as yet no one has suggested why we'd
-> want to do it frequently enough to worry.
+> Add some traces to the ARM GIC to catch register accesses (distributor,
+> (v)cpu interface and virtual interface), and to take into account
+> virtualization extensions (print `vcpu` instead of `cpu` when needed).
 > 
-> My suggestion of JSON was just to try and stop the bikeshedding;
-> we seem to be putting a lot of effort into inventing a new
-> storage definition for something that so far we need to hold
-> one rarely changing short string, which even with all the discussion
-> has moved upto maybe 3 or 4 rarely changing pieces of data.
+> Also add some virtualization extensions specific traces: LR updating
+> and maintenance IRQ generation.
+> 
+> Signed-off-by: Luc MICHEL <luc.michel@greensocs.com>
 
-I agree with that feeling, and I don't have a very strong
-preference.
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
-I would prefer if qcow2 let us store named blobs, because it
-gives us more flexibility to decide about the data format later.
-But if qcow2 maintainers tell us it's much simpler to let us
-store a single string instead of named blobs, I won't complain
-too loudly if we follow your suggestion.
-
--- 
-Eduardo
+> ---
+>  hw/intc/arm_gic.c    | 31 +++++++++++++++++++++++++------
+>  hw/intc/trace-events | 12 ++++++++++--
+>  2 files changed, 35 insertions(+), 8 deletions(-)
+> 
+> diff --git a/hw/intc/arm_gic.c b/hw/intc/arm_gic.c
+> index 6105f930c4..a0ffd85fdf 100644
+> --- a/hw/intc/arm_gic.c
+> +++ b/hw/intc/arm_gic.c
+> @@ -179,8 +179,10 @@ static inline void gic_update_internal(GICState *s, bool virt)
+>          }
+>  
+>          if (best_irq != 1023) {
+> -            trace_gic_update_bestirq(cpu, best_irq, best_prio,
+> -                s->priority_mask[cpu_iface], s->running_priority[cpu_iface]);
+> +            trace_gic_update_bestirq(virt ? "vcpu" : "cpu", cpu,
+> +                                     best_irq, best_prio,
+> +                                     s->priority_mask[cpu_iface],
+> +                                     s->running_priority[cpu_iface]);
+>          }
+>  
+>          irq_level = fiq_level = 0;
+> @@ -268,6 +270,7 @@ static void gic_update_maintenance(GICState *s)
+>          gic_compute_misr(s, cpu);
+>          maint_level = (s->h_hcr[cpu] & GICH_HCR_EN) && s->h_misr[cpu];
+>  
+> +        trace_gic_update_maintenance_irq(cpu, maint_level);
+>          qemu_set_irq(s->maintenance_irq[cpu], maint_level);
+>      }
+>  }
+> @@ -524,7 +527,8 @@ uint32_t gic_acknowledge_irq(GICState *s, int cpu, MemTxAttrs attrs)
+>       * is in the wrong group.
+>       */
+>      irq = gic_get_current_pending_irq(s, cpu, attrs);
+> -    trace_gic_acknowledge_irq(gic_get_vcpu_real_id(cpu), irq);
+> +    trace_gic_acknowledge_irq(gic_is_vcpu(cpu) ? "vcpu" : "cpu",
+> +                              gic_get_vcpu_real_id(cpu), irq);
+>  
+>      if (irq >= GIC_MAXIRQ) {
+>          DPRINTF("ACK, no pending interrupt or it is hidden: %d\n", irq);
+> @@ -1002,20 +1006,23 @@ static MemTxResult gic_dist_read(void *opaque, hwaddr offset, uint64_t *data,
+>      switch (size) {
+>      case 1:
+>          *data = gic_dist_readb(opaque, offset, attrs);
+> -        return MEMTX_OK;
+> +        break;
+>      case 2:
+>          *data = gic_dist_readb(opaque, offset, attrs);
+>          *data |= gic_dist_readb(opaque, offset + 1, attrs) << 8;
+> -        return MEMTX_OK;
+> +        break;
+>      case 4:
+>          *data = gic_dist_readb(opaque, offset, attrs);
+>          *data |= gic_dist_readb(opaque, offset + 1, attrs) << 8;
+>          *data |= gic_dist_readb(opaque, offset + 2, attrs) << 16;
+>          *data |= gic_dist_readb(opaque, offset + 3, attrs) << 24;
+> -        return MEMTX_OK;
+> +        break;
+>      default:
+>          return MEMTX_ERROR;
+>      }
+> +
+> +    trace_gic_dist_read(offset, size, *data);
+> +    return MEMTX_OK;
+>  }
+>  
+>  static void gic_dist_writeb(void *opaque, hwaddr offset,
+> @@ -1309,6 +1316,8 @@ static void gic_dist_writel(void *opaque, hwaddr offset,
+>  static MemTxResult gic_dist_write(void *opaque, hwaddr offset, uint64_t data,
+>                                    unsigned size, MemTxAttrs attrs)
+>  {
+> +    trace_gic_dist_write(offset, size, data);
+> +
+>      switch (size) {
+>      case 1:
+>          gic_dist_writeb(opaque, offset, data, attrs);
+> @@ -1463,12 +1472,18 @@ static MemTxResult gic_cpu_read(GICState *s, int cpu, int offset,
+>          *data = 0;
+>          break;
+>      }
+> +
+> +    trace_gic_cpu_read(gic_is_vcpu(cpu) ? "vcpu" : "cpu",
+> +                       gic_get_vcpu_real_id(cpu), offset, *data);
+>      return MEMTX_OK;
+>  }
+>  
+>  static MemTxResult gic_cpu_write(GICState *s, int cpu, int offset,
+>                                   uint32_t value, MemTxAttrs attrs)
+>  {
+> +    trace_gic_cpu_write(gic_is_vcpu(cpu) ? "vcpu" : "cpu",
+> +                        gic_get_vcpu_real_id(cpu), offset, value);
+> +
+>      switch (offset) {
+>      case 0x00: /* Control */
+>          gic_set_cpu_control(s, cpu, value, attrs);
+> @@ -1679,6 +1694,7 @@ static void gic_set_lr_entry(GICState *s, int cpu, int lr_num, uint32_t entry)
+>      }
+>  
+>      s->h_lr[lr_num][cpu] = entry;
+> +    trace_gic_lr_entry(cpu, lr_num, entry);
+>      is_free = gic_lr_update(s, lr_num, cpu);
+>  
+>      if (!is_free) {
+> @@ -1749,6 +1765,7 @@ static MemTxResult gic_hyp_read(void *opaque, hwaddr addr, uint64_t *data,
+>          return MEMTX_OK;
+>      }
+>  
+> +    trace_gic_hyp_read(addr, *data);
+>      return MEMTX_OK;
+>  }
+>  
+> @@ -1759,6 +1776,8 @@ static MemTxResult gic_hyp_write(void *opaque, hwaddr addr, uint64_t value,
+>      int cpu = gic_get_current_cpu(s);
+>      int vcpu = gic_get_current_vcpu(s);
+>  
+> +    trace_gic_hyp_write(addr, value);
+> +
+>      switch (addr) {
+>      case 0x0: /* Hypervisor Control */
+>          s->h_hcr[cpu] = value & 0xf80000ff;
+> diff --git a/hw/intc/trace-events b/hw/intc/trace-events
+> index 55e8c2570c..16d02fa8cf 100644
+> --- a/hw/intc/trace-events
+> +++ b/hw/intc/trace-events
+> @@ -92,9 +92,17 @@ aspeed_vic_write(uint64_t offset, unsigned size, uint32_t data) "To 0x%" PRIx64
+>  gic_enable_irq(int irq) "irq %d enabled"
+>  gic_disable_irq(int irq) "irq %d disabled"
+>  gic_set_irq(int irq, int level, int cpumask, int target) "irq %d level %d cpumask 0x%x target 0x%x"
+> -gic_update_bestirq(int cpu, int irq, int prio, int priority_mask, int running_priority) "cpu %d irq %d priority %d cpu priority mask %d cpu running priority %d"
+> +gic_update_bestirq(const char *s, int cpu, int irq, int prio, int priority_mask, int running_priority) "%s %d irq %d priority %d cpu priority mask %d cpu running priority %d"
+>  gic_update_set_irq(int cpu, const char *name, int level) "cpu[%d]: %s = %d"
+> -gic_acknowledge_irq(int cpu, int irq) "cpu %d acknowledged irq %d"
+> +gic_acknowledge_irq(const char *s, int cpu, int irq) "%s %d acknowledged irq %d"
+> +gic_cpu_write(const char *s, int cpu, int addr, uint32_t val) "%s %d iface write at 0x%08x 0x%08" PRIx32
+> +gic_cpu_read(const char *s, int cpu, int addr, uint32_t val) "%s %d iface write at 0x%08x: 0x%08" PRIx32
+> +gic_hyp_read(int addr, uint32_t val) "hyp read at 0x%08x: 0x%08" PRIx32
+> +gic_hyp_write(int addr, uint32_t val) "hyp write at 0x%08x: 0x%08" PRIx32
+> +gic_dist_read(int addr, unsigned int size, uint32_t val) "dist read at 0x%08x size %u: 0x%08" PRIx32
+> +gic_dist_write(int addr, unsigned int size, uint32_t val) "dist write at 0x%08x size %u: 0x%08" PRIx32
+> +gic_lr_entry(int cpu, int entry, uint32_t val) "cpu %d: new lr entry %d: 0x%08" PRIx32
+> +gic_update_maintenance_irq(int cpu, int val) "cpu %d: maintenance = %d"
+>  
+>  # hw/intc/arm_gicv3_cpuif.c
+>  gicv3_icc_pmr_read(uint32_t cpu, uint64_t val) "GICv3 ICC_PMR read cpu 0x%x value 0x%" PRIx64
+> 
