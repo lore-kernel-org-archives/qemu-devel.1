@@ -1,17 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43969)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44293)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1fQeFE-0003Cn-6l
-	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 15:37:21 -0400
+	(envelope-from <mreitz@redhat.com>) id 1fQeGA-0003x6-UQ
+	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 15:38:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1fQeF9-00082R-8S
-	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 15:37:20 -0400
-From: Max Reitz <mreitz@redhat.com>
-Date: Wed,  6 Jun 2018 21:37:02 +0200
-Message-Id: <20180606193702.7113-4-mreitz@redhat.com>
-In-Reply-To: <20180606193702.7113-1-mreitz@redhat.com>
+	(envelope-from <mreitz@redhat.com>) id 1fQeG9-0008UD-79
+	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 15:38:18 -0400
 References: <20180606193702.7113-1-mreitz@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 3/3] iotests: Add case for a corrupted
- inactive image
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <c4206420-f623-4a64-7b28-1bf66b932be2@redhat.com>
+Date: Wed, 6 Jun 2018 21:38:05 +0200
+MIME-Version: 1.0
+In-Reply-To: <20180606193702.7113-1-mreitz@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="ePXUYlzbPrE01mByVOf2aLQFrd4kvUFqx"
+Subject: Re: [Qemu-devel] [PATCH v2 0/3] qcow2: Do not mark inactive images
+ corrupt
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,80 +25,66 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, John Snow <jsnow@redhat.com>, Jeff Cody <jcody@redhat.com>, Kevin Wolf <kwolf@redhat.com>
+Cc: qemu-devel@nongnu.org, John Snow <jsnow@redhat.com>, Jeff Cody <jcody@redhat.com>, Kevin Wolf <kwolf@redhat.com>, qemu-stable <qemu-stable@nongnu.org>
 
-Reviewed-by: John Snow <jsnow@redhat.com>
-Tested-by: Jeff Cody <jcody@redhat.com>
-Reviewed-by: Jeff Cody <jcody@redhat.com>
-Signed-off-by: Max Reitz <mreitz@redhat.com>
----
- tests/qemu-iotests/060     | 30 ++++++++++++++++++++++++++++++
- tests/qemu-iotests/060.out | 14 ++++++++++++++
- 2 files changed, 44 insertions(+)
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--ePXUYlzbPrE01mByVOf2aLQFrd4kvUFqx
+From: Max Reitz <mreitz@redhat.com>
+To: qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org, John Snow <jsnow@redhat.com>,
+ Jeff Cody <jcody@redhat.com>, Kevin Wolf <kwolf@redhat.com>,
+ qemu-stable <qemu-stable@nongnu.org>
+Message-ID: <c4206420-f623-4a64-7b28-1bf66b932be2@redhat.com>
+Subject: Re: [PATCH v2 0/3] qcow2: Do not mark inactive images corrupt
+References: <20180606193702.7113-1-mreitz@redhat.com>
+In-Reply-To: <20180606193702.7113-1-mreitz@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-diff --git a/tests/qemu-iotests/060 b/tests/qemu-iotests/060
-index 6c7407f499..7bdf609f3f 100755
---- a/tests/qemu-iotests/060
-+++ b/tests/qemu-iotests/060
-@@ -440,6 +440,36 @@ echo "{'execute': 'qmp_capabilities'}
-             -drive if=none,node-name=drive,file="$TEST_IMG",driver=qcow2 \
-     | _filter_qmp | _filter_qemu_io
- 
-+echo
-+echo "=== Testing incoming inactive corrupted image ==="
-+echo
-+
-+_make_test_img 64M
-+# Create an unaligned L1 entry, so qemu will signal a corruption when
-+# reading from the covered area
-+poke_file "$TEST_IMG" "$l1_offset" "\x00\x00\x00\x00\x2a\x2a\x2a\x2a"
-+
-+# Inactive images are effectively read-only images, so this should be a
-+# non-fatal corruption (which does not modify the image)
-+echo "{'execute': 'qmp_capabilities'}
-+      {'execute': 'human-monitor-command',
-+       'arguments': {'command-line': 'qemu-io drive \"read 0 512\"'}}
-+      {'execute': 'quit'}" \
-+    | $QEMU -qmp stdio -nographic -nodefaults \
-+            -blockdev "{'node-name': 'drive',
-+                        'driver': 'qcow2',
-+                        'file': {
-+                            'driver': 'file',
-+                            'filename': '$TEST_IMG'
-+                        }}" \
-+            -incoming exec:'cat /dev/null' \
-+            2>&1 \
-+    | _filter_qmp | _filter_qemu_io
-+
-+echo
-+# Image should not have been marked corrupt
-+_img_info --format-specific | grep 'corrupt:'
-+
- # success, all done
- echo "*** done"
- rm -f $seq.full
-diff --git a/tests/qemu-iotests/060.out b/tests/qemu-iotests/060.out
-index 5f4264cff6..bff023d889 100644
---- a/tests/qemu-iotests/060.out
-+++ b/tests/qemu-iotests/060.out
-@@ -420,4 +420,18 @@ write failed: Input/output error
- {"return": ""}
- {"return": {}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
-+
-+=== Testing incoming inactive corrupted image ===
-+
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=67108864
-+QMP_VERSION
-+{"return": {}}
-+qcow2: Image is corrupt: L2 table offset 0x2a2a2a00 unaligned (L1 index: 0); further non-fatal corruption events will be suppressed
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_IMAGE_CORRUPTED", "data": {"device": "", "msg": "L2 table offset 0x2a2a2a00 unaligned (L1 index: 0)", "node-name": "drive", "fatal": false}}
-+read failed: Input/output error
-+{"return": ""}
-+{"return": {}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
-+
-+    corrupt: false
- *** done
--- 
-2.17.0
+On 2018-06-06 21:36, Max Reitz wrote:
+> The non-public logs in
+> https://bugzilla.redhat.com/show_bug.cgi?id=3D1583346 (sorry...) reveal=
+
+> this problem:
+>=20
+> $ (Create a qcow2 file "foo.qcow2" with a corrupted first L1 entry)
+> $ echo 'qemu-io none0 "read 0 512"' \
+>     | x86_64-softmmu/qemu-system-x86_64 -drive if=3Dnone,file=3Dfoo.qco=
+w2 \
+>                                         -monitor stdio \
+>                                         -incoming exec:'cat /dev/null'
+> QEMU 2.12.50 monitor - type 'help' for more information
+> (qemu) qemu-io none0 "read 0 512"
+> qcow2: Marking image as corrupt: L2 table offset 0x44200 unaligned (L1 =
+index: 0); further corruption events will be suppressed
+> qemu-system-x86_64: block/io.c:1691: bdrv_co_pwritev: Assertion `!(bs->=
+open_flags & BDRV_O_INACTIVE)' failed.
+> [1]    18444 done                 echo 'qemu-io none0 "read 0 512"' |
+>        18445 abort (core dumped)  x86_64-softmmu/qemu-system-x86_64 -dr=
+ive if=3Dnone,file=3Dfoo.qcow2 -monitor stdi
+>=20
+> Oops.
+
+And I forgot to CC qemu-stable this time.
+
+Oops =C3=972
+
+
+--ePXUYlzbPrE01mByVOf2aLQFrd4kvUFqx
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlsYOB0ACgkQ9AfbAGHV
+z0DARgf/U3mP9AIt29rkf8neWx2ppasFKwc2Y4pZ9MF926gDDT+4m8PkTD+b/QMb
+UUI6OQhqrny8lRzcYfY6lPfitGqbrWFHqf1+PbMxKfVCTpC1e91qF9/G8sOs3nbZ
+K26pFAyM1/0KEpgCbDPIy6FpHji9eomYugK9Y+hw1MZXje2LWMVHnhTAJ8cMqyBG
+Vu9uQMsntU57HNNzBglewnEpGajPgvlA0OxmKKJ2gG2TIqztLcBl9f4gesTFF7YP
+xhwNrWN2tpRLxH5sE/PfpgR7BTkXHHmiKacJG+rXKXj/15qFR2zvMGSJUjuJ1I3G
+LfNBJOFNzkn57+1R4Enz+WbIm1qS4A==
+=kJFW
+-----END PGP SIGNATURE-----
+
+--ePXUYlzbPrE01mByVOf2aLQFrd4kvUFqx--
