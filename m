@@ -1,16 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33882)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33870)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <luc.michel@greensocs.com>) id 1fQUnJ-0001jM-I3
-	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 05:31:54 -0400
+	(envelope-from <luc.michel@greensocs.com>) id 1fQUnJ-0001ix-3n
+	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 05:31:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <luc.michel@greensocs.com>) id 1fQUnI-0003k9-6S
+	(envelope-from <luc.michel@greensocs.com>) id 1fQUnI-0003jt-4n
 	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 05:31:53 -0400
 From: luc.michel@greensocs.com
-Date: Wed,  6 Jun 2018 11:31:00 +0200
-Message-Id: <20180606093101.30518-6-luc.michel@greensocs.com>
+Date: Wed,  6 Jun 2018 11:30:57 +0200
+Message-Id: <20180606093101.30518-3-luc.michel@greensocs.com>
 In-Reply-To: <20180606093101.30518-1-luc.michel@greensocs.com>
 References: <20180606093101.30518-1-luc.michel@greensocs.com>
-Subject: [Qemu-devel] [PATCH 5/6] intc/arm_gic: Improve traces
+Subject: [Qemu-devel] [PATCH 2/6] intc/arm_gic: Remove some dead code and
+ put some functions static
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,157 +25,86 @@ Cc: Luc MICHEL <luc.michel@greensocs.com>, qemu-arm@nongnu.org, Peter Maydell <p
 
 From: Luc MICHEL <luc.michel@greensocs.com>
 
-Add some traces to the ARM GIC to catch register accesses (distributor,
-(v)cpu interface and virtual interface), and to take into account
-virtualization extensions (print `vcpu` instead of `cpu` when needed).
-
-Also add some virtualization extensions specific traces: LR updating
-and maintenance IRQ generation.
+Some functions are now only used in arm_gic.c, put them static. Some of
+them where only used by the NVIC implementation and are not used
+anymore, so remove them.
 
 Signed-off-by: Luc MICHEL <luc.michel@greensocs.com>
 ---
- hw/intc/arm_gic.c    | 31 +++++++++++++++++++++++++------
- hw/intc/trace-events | 12 ++++++++++--
- 2 files changed, 35 insertions(+), 8 deletions(-)
+ hw/intc/arm_gic.c      | 23 ++---------------------
+ hw/intc/gic_internal.h |  4 ----
+ 2 files changed, 2 insertions(+), 25 deletions(-)
 
 diff --git a/hw/intc/arm_gic.c b/hw/intc/arm_gic.c
-index 6105f930c4..a0ffd85fdf 100644
+index 141f3e7a48..679b19fb94 100644
 --- a/hw/intc/arm_gic.c
 +++ b/hw/intc/arm_gic.c
-@@ -179,8 +179,10 @@ static inline void gic_update_internal(GICState *s, bool virt)
-         }
+@@ -71,7 +71,7 @@ static inline bool gic_has_groups(GICState *s)
  
-         if (best_irq != 1023) {
--            trace_gic_update_bestirq(cpu, best_irq, best_prio,
--                s->priority_mask[cpu_iface], s->running_priority[cpu_iface]);
-+            trace_gic_update_bestirq(virt ? "vcpu" : "cpu", cpu,
-+                                     best_irq, best_prio,
-+                                     s->priority_mask[cpu_iface],
-+                                     s->running_priority[cpu_iface]);
-         }
- 
-         irq_level = fiq_level = 0;
-@@ -268,6 +270,7 @@ static void gic_update_maintenance(GICState *s)
-         gic_compute_misr(s, cpu);
-         maint_level = (s->h_hcr[cpu] & GICH_HCR_EN) && s->h_misr[cpu];
- 
-+        trace_gic_update_maintenance_irq(cpu, maint_level);
-         qemu_set_irq(s->maintenance_irq[cpu], maint_level);
-     }
- }
-@@ -524,7 +527,8 @@ uint32_t gic_acknowledge_irq(GICState *s, int cpu, MemTxAttrs attrs)
-      * is in the wrong group.
-      */
-     irq = gic_get_current_pending_irq(s, cpu, attrs);
--    trace_gic_acknowledge_irq(gic_get_vcpu_real_id(cpu), irq);
-+    trace_gic_acknowledge_irq(gic_is_vcpu(cpu) ? "vcpu" : "cpu",
-+                              gic_get_vcpu_real_id(cpu), irq);
- 
-     if (irq >= GIC_MAXIRQ) {
-         DPRINTF("ACK, no pending interrupt or it is hidden: %d\n", irq);
-@@ -1002,20 +1006,23 @@ static MemTxResult gic_dist_read(void *opaque, hwaddr offset, uint64_t *data,
-     switch (size) {
-     case 1:
-         *data = gic_dist_readb(opaque, offset, attrs);
--        return MEMTX_OK;
-+        break;
-     case 2:
-         *data = gic_dist_readb(opaque, offset, attrs);
-         *data |= gic_dist_readb(opaque, offset + 1, attrs) << 8;
--        return MEMTX_OK;
-+        break;
-     case 4:
-         *data = gic_dist_readb(opaque, offset, attrs);
-         *data |= gic_dist_readb(opaque, offset + 1, attrs) << 8;
-         *data |= gic_dist_readb(opaque, offset + 2, attrs) << 16;
-         *data |= gic_dist_readb(opaque, offset + 3, attrs) << 24;
--        return MEMTX_OK;
-+        break;
-     default:
-         return MEMTX_ERROR;
-     }
-+
-+    trace_gic_dist_read(offset, size, *data);
-+    return MEMTX_OK;
- }
- 
- static void gic_dist_writeb(void *opaque, hwaddr offset,
-@@ -1309,6 +1316,8 @@ static void gic_dist_writel(void *opaque, hwaddr offset,
- static MemTxResult gic_dist_write(void *opaque, hwaddr offset, uint64_t data,
-                                   unsigned size, MemTxAttrs attrs)
+ /* TODO: Many places that call this routine could be optimized.  */
+ /* Update interrupt status after enabled or pending bits have been changed.  */
+-void gic_update(GICState *s)
++static void gic_update(GICState *s)
  {
-+    trace_gic_dist_write(offset, size, data);
-+
-     switch (size) {
-     case 1:
-         gic_dist_writeb(opaque, offset, data, attrs);
-@@ -1463,12 +1472,18 @@ static MemTxResult gic_cpu_read(GICState *s, int cpu, int offset,
-         *data = 0;
-         break;
+     int best_irq;
+     int best_prio;
+@@ -137,19 +137,6 @@ void gic_update(GICState *s)
      }
-+
-+    trace_gic_cpu_read(gic_is_vcpu(cpu) ? "vcpu" : "cpu",
-+                       gic_get_vcpu_real_id(cpu), offset, *data);
-     return MEMTX_OK;
  }
  
- static MemTxResult gic_cpu_write(GICState *s, int cpu, int offset,
-                                  uint32_t value, MemTxAttrs attrs)
+-void gic_set_pending_private(GICState *s, int cpu, int irq)
+-{
+-    int cm = 1 << cpu;
+-
+-    if (gic_test_pending(s, irq, cm)) {
+-        return;
+-    }
+-
+-    DPRINTF("Set %d pending cpu %d\n", irq, cpu);
+-    GIC_DIST_SET_PENDING(irq, cm);
+-    gic_update(s);
+-}
+-
+ static void gic_set_irq_11mpcore(GICState *s, int irq, int level,
+                                  int cm, int target)
  {
-+    trace_gic_cpu_write(gic_is_vcpu(cpu) ? "vcpu" : "cpu",
-+                        gic_get_vcpu_real_id(cpu), offset, value);
-+
-     switch (offset) {
-     case 0x00: /* Control */
-         gic_set_cpu_control(s, cpu, value, attrs);
-@@ -1679,6 +1694,7 @@ static void gic_set_lr_entry(GICState *s, int cpu, int lr_num, uint32_t entry)
-     }
- 
-     s->h_lr[lr_num][cpu] = entry;
-+    trace_gic_lr_entry(cpu, lr_num, entry);
-     is_free = gic_lr_update(s, lr_num, cpu);
- 
-     if (!is_free) {
-@@ -1749,6 +1765,7 @@ static MemTxResult gic_hyp_read(void *opaque, hwaddr addr, uint64_t *data,
-         return MEMTX_OK;
-     }
- 
-+    trace_gic_hyp_read(addr, *data);
-     return MEMTX_OK;
+@@ -565,7 +552,7 @@ static void gic_deactivate_irq(GICState *s, int cpu, int irq, MemTxAttrs attrs)
+     GIC_DIST_CLEAR_ACTIVE(irq, cm);
  }
  
-@@ -1759,6 +1776,8 @@ static MemTxResult gic_hyp_write(void *opaque, hwaddr addr, uint64_t value,
-     int cpu = gic_get_current_cpu(s);
-     int vcpu = gic_get_current_vcpu(s);
+-void gic_complete_irq(GICState *s, int cpu, int irq, MemTxAttrs attrs)
++static void gic_complete_irq(GICState *s, int cpu, int irq, MemTxAttrs attrs)
+ {
+     int cm = 1 << cpu;
+     int group;
+@@ -1418,12 +1405,6 @@ static const MemoryRegionOps gic_cpu_ops = {
+     .endianness = DEVICE_NATIVE_ENDIAN,
+ };
  
-+    trace_gic_hyp_write(addr, value);
-+
-     switch (addr) {
-     case 0x0: /* Hypervisor Control */
-         s->h_hcr[cpu] = value & 0xf80000ff;
-diff --git a/hw/intc/trace-events b/hw/intc/trace-events
-index 55e8c2570c..16d02fa8cf 100644
---- a/hw/intc/trace-events
-+++ b/hw/intc/trace-events
-@@ -92,9 +92,17 @@ aspeed_vic_write(uint64_t offset, unsigned size, uint32_t data) "To 0x%" PRIx64
- gic_enable_irq(int irq) "irq %d enabled"
- gic_disable_irq(int irq) "irq %d disabled"
- gic_set_irq(int irq, int level, int cpumask, int target) "irq %d level %d cpumask 0x%x target 0x%x"
--gic_update_bestirq(int cpu, int irq, int prio, int priority_mask, int running_priority) "cpu %d irq %d priority %d cpu priority mask %d cpu running priority %d"
-+gic_update_bestirq(const char *s, int cpu, int irq, int prio, int priority_mask, int running_priority) "%s %d irq %d priority %d cpu priority mask %d cpu running priority %d"
- gic_update_set_irq(int cpu, const char *name, int level) "cpu[%d]: %s = %d"
--gic_acknowledge_irq(int cpu, int irq) "cpu %d acknowledged irq %d"
-+gic_acknowledge_irq(const char *s, int cpu, int irq) "%s %d acknowledged irq %d"
-+gic_cpu_write(const char *s, int cpu, int addr, uint32_t val) "%s %d iface write at 0x%08x 0x%08" PRIx32
-+gic_cpu_read(const char *s, int cpu, int addr, uint32_t val) "%s %d iface write at 0x%08x: 0x%08" PRIx32
-+gic_hyp_read(int addr, uint32_t val) "hyp read at 0x%08x: 0x%08" PRIx32
-+gic_hyp_write(int addr, uint32_t val) "hyp write at 0x%08x: 0x%08" PRIx32
-+gic_dist_read(int addr, unsigned int size, uint32_t val) "dist read at 0x%08x size %u: 0x%08" PRIx32
-+gic_dist_write(int addr, unsigned int size, uint32_t val) "dist write at 0x%08x size %u: 0x%08" PRIx32
-+gic_lr_entry(int cpu, int entry, uint32_t val) "cpu %d: new lr entry %d: 0x%08" PRIx32
-+gic_update_maintenance_irq(int cpu, int val) "cpu %d: maintenance = %d"
+-/* This function is used by nvic model */
+-void gic_init_irqs_and_distributor(GICState *s)
+-{
+-    gic_init_irqs_and_mmio(s, gic_set_irq, gic_ops);
+-}
+-
+ static void arm_gic_realize(DeviceState *dev, Error **errp)
+ {
+     /* Device instance realize function for the GIC sysbus device */
+diff --git a/hw/intc/gic_internal.h b/hw/intc/gic_internal.h
+index 6f8d242904..a2075a94db 100644
+--- a/hw/intc/gic_internal.h
++++ b/hw/intc/gic_internal.h
+@@ -75,11 +75,7 @@
+ /* The special cases for the revision property: */
+ #define REV_11MPCORE 0
  
- # hw/intc/arm_gicv3_cpuif.c
- gicv3_icc_pmr_read(uint32_t cpu, uint64_t val) "GICv3 ICC_PMR read cpu 0x%x value 0x%" PRIx64
+-void gic_set_pending_private(GICState *s, int cpu, int irq);
+ uint32_t gic_acknowledge_irq(GICState *s, int cpu, MemTxAttrs attrs);
+-void gic_complete_irq(GICState *s, int cpu, int irq, MemTxAttrs attrs);
+-void gic_update(GICState *s);
+-void gic_init_irqs_and_distributor(GICState *s);
+ void gic_dist_set_priority(GICState *s, int cpu, int irq, uint8_t val,
+                            MemTxAttrs attrs);
+ 
 -- 
 2.17.0
