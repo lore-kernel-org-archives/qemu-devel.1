@@ -1,29 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52870)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53387)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1fQemb-0001jR-CD
-	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 16:11:50 -0400
+	(envelope-from <jsnow@redhat.com>) id 1fQer5-0003WN-Vy
+	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 16:16:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1fQemY-0002Rv-7v
-	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 16:11:49 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:60290)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1fQemY-0002RJ-0z
-	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 16:11:46 -0400
-Date: Wed, 6 Jun 2018 17:11:40 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20180606201140.GZ7451@localhost.localdomain>
-References: <20180530200334.24179-1-f4bug@amsat.org>
-	<22ca41bb-9f8b-e8bb-e676-b5c96f3f9add@redhat.com>
-	<acf7522a-4fc0-5138-9797-6cfcc5ad5719@amsat.org>
-	<20180606192429.GV7451@localhost.localdomain>
-	<2bdd428e-8790-7c1f-f324-4bc6b6923c15@amsat.org>
+	(envelope-from <jsnow@redhat.com>) id 1fQer4-0005aH-Tv
+	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 16:16:27 -0400
+References: <20180606193702.7113-1-mreitz@redhat.com>
+From: John Snow <jsnow@redhat.com>
+Message-ID: <cad2860f-78a6-3a03-0630-a0b30265c460@redhat.com>
+Date: Wed, 6 Jun 2018 16:16:20 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <2bdd428e-8790-7c1f-f324-4bc6b6923c15@amsat.org>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC PATCH] configure: Enable out-of-tree
- acceptance tests
+In-Reply-To: <20180606193702.7113-1-mreitz@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 0/3] qcow2: Do not mark inactive images
+ corrupt
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,54 +24,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>
-Cc: Cleber Rosa <crosa@redhat.com>, Fam Zheng <famz@redhat.com>, Amador Pahim <amador@pahim.org>, qemu-devel@nongnu.org
-
-On Wed, Jun 06, 2018 at 04:36:16PM -0300, Philippe Mathieu-Daud=E9 wrote:
-> On 06/06/2018 04:24 PM, Eduardo Habkost wrote:
-> > On Tue, Jun 05, 2018 at 11:45:03AM -0300, Philippe Mathieu-Daud=E9 wr=
-ote:
-> > [... something about config files ...]
-> >>> And after that, the following would run all "console" tests:
-> >>>
-> >>>   avocado run -t console
-> >>>
-> >>> How does this sound?
-> >>
-> >> For my use cases this doesn't worry me, I'll let Eduardo/Fam opine a=
-bout
-> >> use_test_dir_when_no_references_given.
-> >=20
-> > Well, I can't give an opinion because I couldn't understand
-> > what's the final goal here.
->=20
-> You cut too much, the relevant part is:
->=20
->   On 05/30/2018 10:06 PM, Cleber Rosa wrote:
->   > But at the same, there are security implications: `list` won't
->   > load/execute any test code (different from, say, standard Python
->   > unittests), while "run" obviously will.  So "avocado run" may end u=
-p
->   > running what users don't want if a malicious user controls
->   > "$avocado_datadir_paths_test_dir".
-
-The final goal still isn't clear to me.  Why would somebody want
-to use $avocado_datadir_paths_test_dir instead of just specifying
-"." in the command-line?
+To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, Jeff Cody <jcody@redhat.com>, qemu-devel@nongnu.org, qemu-stable <qemu-stable@nongnu.org>
 
 
->=20
-> >=20
-> > What exactly is missing in the current solution?  Why
-> > "avocado run -t console ." wouldn't work?
->=20
-> It doesn't work in out-of-tree builds, I have to use the full path:
->=20
->   >>   build_dir$ avocado run
-> /full/path/to/sources/qemu/tests/acceptance/boot_linux_console.py
 
-Isn't the symlink you suggested a better solution than requiring
-the user to edit a config file?
+On 06/06/2018 03:36 PM, Max Reitz wrote:
+> The non-public logs in
+> https://bugzilla.redhat.com/show_bug.cgi?id=1583346 (sorry...) reveal
+> this problem:
+> 
+> $ (Create a qcow2 file "foo.qcow2" with a corrupted first L1 entry)
+> $ echo 'qemu-io none0 "read 0 512"' \
+>     | x86_64-softmmu/qemu-system-x86_64 -drive if=none,file=foo.qcow2 \
+>                                         -monitor stdio \
+>                                         -incoming exec:'cat /dev/null'
+> QEMU 2.12.50 monitor - type 'help' for more information
+> (qemu) qemu-io none0 "read 0 512"
+> qcow2: Marking image as corrupt: L2 table offset 0x44200 unaligned (L1 index: 0); further corruption events will be suppressed
+> qemu-system-x86_64: block/io.c:1691: bdrv_co_pwritev: Assertion `!(bs->open_flags & BDRV_O_INACTIVE)' failed.
+> [1]    18444 done                 echo 'qemu-io none0 "read 0 512"' |
+>        18445 abort (core dumped)  x86_64-softmmu/qemu-system-x86_64 -drive if=none,file=foo.qcow2 -monitor stdi
+> 
+> Oops.
+> 
+> 
+> The first patch in this series makes a function public that the second
+> patch uses to fix the issue by treating all non-writable images like
+> read-only images (yes, there is a difference...) in this regard (which
+> most importantly means not trying to set the corrupt flag on them).
+> Inactive images count as non-writable images, but not as read-only
+> images, so that fixes it.
+> 
+> The third patch adds an iotest case.
+> 
+> 
+> v2:
+> - Use bdrv_is_writable() instead of copying its functionality [Jeff]
+> 
+> 
+> git-backport-diff against v1:
+> 
+> Key:
+> [----] : patches are identical
+> [####] : number of functional differences between upstream/downstream patch
+> [down] : patch is downstream-only
+> The flags [FC] indicate (F)unctional and (C)ontextual differences, respectively
+> 
+> 001/3:[down] 'block: Make bdrv_is_writable() public'
+> 002/3:[0004] [FC] 'qcow2: Do not mark inactive images corrupt'
+> 003/3:[----] [--] 'iotests: Add case for a corrupted inactive image'
+> 
+> 
+> Max Reitz (3):
+>   block: Make bdrv_is_writable() public
+>   qcow2: Do not mark inactive images corrupt
+>   iotests: Add case for a corrupted inactive image
+> 
+>  include/block/block.h      |  1 +
+>  block.c                    | 17 ++++++++++++++---
+>  block/qcow2.c              |  2 +-
+>  tests/qemu-iotests/060     | 30 ++++++++++++++++++++++++++++++
+>  tests/qemu-iotests/060.out | 14 ++++++++++++++
+>  5 files changed, 60 insertions(+), 4 deletions(-)
+> 
 
---=20
-Eduardo
+Reviewed-by: John Snow <jsnow@redhat.com>
