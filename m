@@ -1,28 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48641)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52010)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1fQTTe-0006CL-Jb
-	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 04:07:31 -0400
+	(envelope-from <imammedo@redhat.com>) id 1fQTuG-0004RL-3S
+	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 04:35:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1fQTTa-0004Jt-Me
-	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 04:07:30 -0400
-Date: Wed, 6 Jun 2018 09:07:10 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20180606080709.GA2660@work-vm>
-References: <20180528212510.GC4660@redhat.com>
-	<20180529064415.GA4756@localhost.localdomain>
-	<2b3eef00-f326-c1e6-0e4b-b7602646eec4@redhat.com>
-	<20180605092159.GA2544@work-vm>
-	<20180605190324.GA11372@localhost.localdomain>
-	<20180605223934-mutt-send-email-mst@kernel.org>
-	<a9fdbe0f-2c39-7da3-11f2-6752b74cce08@redhat.com>
-	<20180605195855.GC1455@redhat.com>
-	<6f6ecbb5-3175-44d0-5922-b13ac163f006@redhat.com>
-	<20180605231419-mutt-send-email-mst@kernel.org>
+	(envelope-from <imammedo@redhat.com>) id 1fQTuB-0005Qm-5G
+	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 04:35:00 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:59128 helo=mx1.redhat.com)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1fQTuA-0005QD-T8
+	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 04:34:55 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com
+	[10.11.54.5])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 211738D6C6
+	for <qemu-devel@nongnu.org>; Wed,  6 Jun 2018 08:34:53 +0000 (UTC)
+Date: Wed, 6 Jun 2018 10:34:50 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20180606103450.5d534b78@redhat.com>
+In-Reply-To: <20180605183001.GO7451@localhost.localdomain>
+References: <1528207243-268226-1-git-send-email-imammedo@redhat.com>
+	<1528207243-268226-3-git-send-email-imammedo@redhat.com>
+	<20180605183001.GO7451@localhost.localdomain>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180605231419-mutt-send-email-mst@kernel.org>
-Subject: Re: [Qemu-devel] [Qemu-block] storing machine data in qcow images?
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v3 2/2] vl: fix use of --daemonize with
+ --preconfig
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,58 +35,114 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Eric Blake <eblake@redhat.com>, "Richard W.M. Jones" <rjones@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org, stefanha@redhat.com, Max Reitz <mreitz@redhat.com>
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: qemu-devel@nongnu.org, berrange@redhat.com, mreitz@redhat.com, pbonzini@redhat.com, ldoktor@redhat.com
 
-* Michael S. Tsirkin (mst@redhat.com) wrote:
-> On Tue, Jun 05, 2018 at 03:09:17PM -0500, Eric Blake wrote:
-> > On 06/05/2018 02:58 PM, Richard W.M. Jones wrote:
-> > > > Binary blobs can always be base64 encoded for representation within
-> > > > a valid JSON UTF-8 string (and we already have several QMP
-> > > > interfaces that utilize base64 encoding to pass through what is
-> > > > otherwise invalid UTF-8).  It does inflate things slightly compared
-> > > > to a format that allows a raw length coupled with raw data, but that
-> > > > is not necessarily a problem.
-> > > 
-> > > Of course how we represent them externally and/or while
-> > > using QMP / qemu-img to store and retrieve them is up for grabs.
-> > > Doesn't JSON allow binary to be encoded?  (Knowing how poorly
-> > > done JSON is, I wouldn't be surprised if not)
-> > 
-> > JSON itself does not have a binary primitive; to pass arbitrary data through
-> > JSON you have to first encode that data into something like base64 that can
-> > then be represented as a UTF-8 string.  For reference, look at
-> > qapi/crypto.json and the definition of QCryptoSecretFormat.
-> 
-> But there isn't a way to figure out that a string is base64, which
-> means each application needs to know whether it's a string or
-> a binary.
-> 
-> How about specifying the encoding in the value?
-> 
-> string value:
-> [A-Za-z][^=\0]=S[^\0]*
-> 
-> base64 value:
-> [A-Za-z][^=\0]=B[A-Za-z0-9+/]*
-> 
-> or the key:
-> S[A-Za-z][^=\0]=[^\0]*
-> 
-> base64 value:
-> B[A-Za-z][^=\0]=[A-Za-z0-9+/]*
+On Tue, 5 Jun 2018 15:30:01 -0300
+Eduardo Habkost <ehabkost@redhat.com> wrote:
 
-Why reinvent the wheel yet again?
-The world has enough encodings out there, and we're trying to add
-something that's a trivial data store for a frankly trivial use.
+> On Tue, Jun 05, 2018 at 04:00:43PM +0200, Igor Mammedov wrote:
+> > When using --daemonize, the initial lead process will fork a child and
+> > then wait to be notified that setup is complete via a pipe, before it
+> > exits.  When using --preconfig there is an extra call to main_loop()
+> > before the notification is done from os_setup_post(). Thus the parent
+> > process won't exit until the mgmt application connects to the monitor
+> > and tells QEMU to leave the RUN_STATE_PRECONFIG. The mgmt application
+> > won't connect to the monitor until daemonizing has completed though.
+> >=20
+> > This is a chicken and egg problem, leading to deadlock at startup.
+> >=20
+> > The only viable way to fix this is to call os_setup_post() before
+> > the early main_loop_wait() call when in RUN_STATE_PRECONFIG. This has
+> > the downside that any errors from this point onwards won't be handled
+> > well by the mgmt application, because it will think QEMU has started
+> > successfully, so not be expecting an abrupt exit. The only way to
+> > deal with that is to move as much user input validation as possible
+> > to before the main_loop() call. This is left as an exercise for
+> > future interested developers.
+> >=20
+> > Based on:
+> >   From: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+> >   Subject: [PATCH v2 2/2] vl: fix use of --daemonize with --preconfig
+> >   Message-Id: <20180604120345.12955-3-berrange@redhat.com>
+> >=20
+> > Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+> > ---
+> > v3:
+> >   - rewrite to apply on top of 1/2
+> > ---
+> >  os-posix.c | 6 ++++++
+> >  vl.c       | 2 +-
+> >  2 files changed, 7 insertions(+), 1 deletion(-)
+> >=20
+> > diff --git a/os-posix.c b/os-posix.c
+> > index 9ce6f74..ee06a8d 100644
+> > --- a/os-posix.c
+> > +++ b/os-posix.c
+> > @@ -309,8 +309,14 @@ void os_daemonize(void)
+> > =20
+> >  void os_setup_post(void)
+> >  {
+> > +    static bool os_setup_post_done =3D false;
+> >      int fd =3D 0;
+> > =20
+> > +    if (os_setup_post_done) {
+> > +        return;
+> > +    }
+> > +    os_setup_post_done =3D true;
+> > + =20
+>=20
+> This part is nice because it allows the os_setup_post() call in
+> the second main loop to be unconditional, but:
+>=20
+> >      if (daemonize) {
+> >          if (chdir("/")) {
+> >              error_report("not able to chdir to /: %s", strerror(errno)=
+);
+> > diff --git a/vl.c b/vl.c
+> > index fa44138..d6fa67f 100644
+> > --- a/vl.c
+> > +++ b/vl.c
+> > @@ -1960,6 +1960,7 @@ static void main_loop(void)
+> >  #ifdef CONFIG_PROFILER
+> >          ti =3D profile_getclock();
+> >  #endif
+> > +        os_setup_post();
+> >          main_loop_wait(false); =20
+>=20
+> Ensuring the correctness of this os_setup_post() call depends on
+> reading the whole body of main_loop_should_exit(), which is a
+> complex and large function.  I think this is too fragile for my
+> taste.
+Fragility was the reason why I moved it into main_loop(),
+as os_setup_post() was already overlooked once, since
+one would have to make very non-obvious connection with
+libvirt requirement to call it before main_loop_wait()
+This way call to os_setup_post() will not be forgotten,
+and would get an attention whenever main_loop() is concerned.
 
-While I hate json, it's at least standard.
 
-Dave
+> I prefer Daniel's approach where we have two
+> os_setup_post()/main_loop() call sites, and the first one is
+> conditional on --preconfig.
+Considering we are unlikely to add one more invocation of main_loop().
+I'll post here Daniel's version that applies on top of 1/2 with
+a comment so we won't forget about libvirt's requirement
+(not the best way to write something robust but better then nothing).
+So pick whatever variant would seem the best.
 
-> ?
-> 
-> -- 
-> MST
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+
+> >  #ifdef CONFIG_PROFILER
+> >          dev_time +=3D profile_getclock() - ti;
+> > @@ -4707,7 +4708,6 @@ int main(int argc, char **argv, char **envp)
+> >      }
+> > =20
+> >      accel_setup_post(current_machine);
+> > -    os_setup_post();
+> > =20
+> >      main_loop();
+> > =20
+> > --=20
+> > 2.7.4
+> >  =20
+>=20
