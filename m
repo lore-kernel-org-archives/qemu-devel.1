@@ -1,38 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59200)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59257)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fQhis-0000S3-AH
-	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 19:20:11 -0400
+	(envelope-from <elliott@hpe.com>) id 1fQhjp-000100-QB
+	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 19:21:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fQhin-0004JX-99
-	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 19:20:10 -0400
-Received: from mail-vk0-x243.google.com ([2607:f8b0:400c:c05::243]:36813)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1fQhin-0004JL-4O
-	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 19:20:05 -0400
-Received: by mail-vk0-x243.google.com with SMTP id o138-v6so4882042vkd.3
-	for <qemu-devel@nongnu.org>; Wed, 06 Jun 2018 16:20:05 -0700 (PDT)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20180530200334.24179-1-f4bug@amsat.org>
-	<22ca41bb-9f8b-e8bb-e676-b5c96f3f9add@redhat.com>
-	<acf7522a-4fc0-5138-9797-6cfcc5ad5719@amsat.org>
-	<20180606192429.GV7451@localhost.localdomain>
-	<2bdd428e-8790-7c1f-f324-4bc6b6923c15@amsat.org>
-	<20180606201140.GZ7451@localhost.localdomain>
-	<34060c1c-ca8d-8aed-7f62-609d82e734b7@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <cd4b01a0-e2a4-af2f-86c7-865097395235@amsat.org>
-Date: Wed, 6 Jun 2018 20:19:58 -0300
-MIME-Version: 1.0
-In-Reply-To: <34060c1c-ca8d-8aed-7f62-609d82e734b7@redhat.com>
-Content-Type: text/plain; charset=utf-8
+	(envelope-from <elliott@hpe.com>) id 1fQhjk-0004o8-QT
+	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 19:21:09 -0400
+Received: from g9t5009.houston.hpe.com ([15.241.48.73]:37712)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <elliott@hpe.com>) id 1fQhjk-0004n2-J4
+	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 19:21:04 -0400
+From: "Elliott, Robert (Persistent Memory)" <elliott@hpe.com>
+Date: Wed, 6 Jun 2018 23:20:58 +0000
+Message-ID: <AT5PR8401MB1169403448C8AA5FF267F6A6AB650@AT5PR8401MB1169.NAMPRD84.PROD.OUTLOOK.COM>
+References: <20180521163203.26590-1-ross.zwisler@linux.intel.com>
+	<20180521163203.26590-4-ross.zwisler@linux.intel.com>
+	<20180605182243-mutt-send-email-mst@kernel.org>
+	<20180605164205.GA21034@linux.intel.com>
+	<CAPcyv4jSoFifTc05WGgxkEX6i7b12zYyB+VchJVW_+QPQzO7Fg@mail.gmail.com>
+	<20180605213547-mutt-send-email-mst@kernel.org>
+	<20180605220700.GB16066@linux.intel.com>
+	<CAPcyv4irudGth3+WZtgF4TjGL53s8mN70aVXpGWjj_Lc=7AMVg@mail.gmail.com>
+In-Reply-To: <CAPcyv4irudGth3+WZtgF4TjGL53s8mN70aVXpGWjj_Lc=7AMVg@mail.gmail.com>
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [RFC PATCH] configure: Enable out-of-tree
- acceptance tests
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+Subject: Re: [Qemu-devel] [qemu PATCH v4 3/4] nvdimm,
+ acpi: support NFIT platform capabilities
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -41,60 +35,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cleber Rosa <crosa@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>
-Cc: Amador Pahim <amador@pahim.org>, Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org
+To: 'Dan Williams' <dan.j.williams@intel.com>, Ross Zwisler <ross.zwisler@linux.intel.com>
+Cc: Eduardo Habkost <ehabkost@redhat.com>, linux-nvdimm <linux-nvdimm@lists.01.org>, "Michael S. Tsirkin" <mst@redhat.com>, Qemu
+	Developers <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>, Igor Mammedov <imammedo@redhat.com>
 
-On 06/06/2018 05:23 PM, Cleber Rosa wrote:
-> On 06/06/2018 04:11 PM, Eduardo Habkost wrote:
->> On Wed, Jun 06, 2018 at 04:36:16PM -0300, Philippe Mathieu-Daudé wrote:
->>> On 06/06/2018 04:24 PM, Eduardo Habkost wrote:
->>>> On Tue, Jun 05, 2018 at 11:45:03AM -0300, Philippe Mathieu-Daudé wrote:
->>>> [... something about config files ...]
->>>>>> And after that, the following would run all "console" tests:
->>>>>>
->>>>>>   avocado run -t console
->>>>>>
->>>>>> How does this sound?
->>>>>
->>>>> For my use cases this doesn't worry me, I'll let Eduardo/Fam opine about
->>>>> use_test_dir_when_no_references_given.
->>>>
->>>> Well, I can't give an opinion because I couldn't understand
->>>> what's the final goal here.
->>>
->>> You cut too much, the relevant part is:
->>>
->>>   On 05/30/2018 10:06 PM, Cleber Rosa wrote:
->>>   > But at the same, there are security implications: `list` won't
->>>   > load/execute any test code (different from, say, standard Python
->>>   > unittests), while "run" obviously will.  So "avocado run" may end up
->>>   > running what users don't want if a malicious user controls
->>>   > "$avocado_datadir_paths_test_dir".
->>
->> The final goal still isn't clear to me.  Why would somebody want
->> to use $avocado_datadir_paths_test_dir instead of just specifying
->> "." in the command-line?
 
-Oh I guess I misunderstood your first review, I'll just improve the
-commit message and repost.
+> > Okay, we can move to the symbolic names.  Do you want them to be that
+> long, or
+> > would:
+> >
+> > nvdimm-cap-cpu
+> > nvdimm-cap-mem-ctrl
+> > nvdimm-cap-mirroring
+>=20
+> Wait, why is mirroring part of this?
 
->>
->>
->>>
->>>>
->>>> What exactly is missing in the current solution?  Why
->>>> "avocado run -t console ." wouldn't work?
->>>
->>> It doesn't work in out-of-tree builds, I have to use the full path:
->>>
->>>   >>   build_dir$ avocado run
->>> /full/path/to/sources/qemu/tests/acceptance/boot_linux_console.py
->>
->> Isn't the symlink you suggested a better solution than requiring
->> the user to edit a config file?
->>
-> 
-> It's definitely the simplest, and would avoid a questionable knob and
-> behavior in Avocado.
+This data structure is intended to report any kind of platform capability, =
+not=20
+just platform persistence capabilities.
 
-:)
+We could add a short symbolic name to the definitions in ACPI that matches
+the ones selected for this command line option, if that'll help people
+find the right names to use.
+
+I recommend mc rather than mem-ctrl to keep dashes as special.
