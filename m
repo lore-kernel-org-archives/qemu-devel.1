@@ -1,40 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47938)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48667)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <huaicheng@cs.uchicago.edu>) id 1fQQ0y-0008ES-2G
-	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 00:25:41 -0400
+	(envelope-from <bounces@canonical.com>) id 1fQQ54-0000tl-PM
+	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 00:29:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <huaicheng@cs.uchicago.edu>) id 1fQQ0t-0007QZ-27
-	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 00:25:40 -0400
-Received: from mx.cs.uchicago.edu ([128.135.164.214]:44900)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <huaicheng@cs.uchicago.edu>)
-	id 1fQQ0s-0007P3-Qj
-	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 00:25:34 -0400
-Received: from localhost (localhost [127.0.0.1])
-	by mx.cs.uchicago.edu (Postfix) with ESMTP id D54AC7483F
-	for <qemu-devel@nongnu.org>; Tue,  5 Jun 2018 23:25:33 -0500 (CDT)
-Received: from mx.cs.uchicago.edu ([127.0.0.1])
-	by localhost (mx.cs.uchicago.edu [127.0.0.1]) (amavisd-new, port 10024)
-	with LMTP id SpSdfJD3aMcw for <qemu-devel@nongnu.org>;
-	Tue,  5 Jun 2018 23:25:32 -0500 (CDT)
-Received: from mail-vk0-f48.google.com (mail-vk0-f48.google.com
-	[209.85.213.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by mx.cs.uchicago.edu (Postfix) with ESMTPSA id B7A9974839
-	for <qemu-devel@nongnu.org>; Tue,  5 Jun 2018 23:25:32 -0500 (CDT)
-Received: by mail-vk0-f48.google.com with SMTP id b77-v6so2862746vkb.5
-	for <qemu-devel@nongnu.org>; Tue, 05 Jun 2018 21:25:32 -0700 (PDT)
+	(envelope-from <bounces@canonical.com>) id 1fQQ4z-0000ll-Ru
+	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 00:29:54 -0400
+Received: from indium.canonical.com ([91.189.90.7]:33302)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1fQQ4z-0000l6-Kg
+	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 00:29:49 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1fQQ4w-0007vK-7z
+	for <qemu-devel@nongnu.org>; Wed, 06 Jun 2018 04:29:46 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id B67B32E88F2
+	for <qemu-devel@nongnu.org>; Wed,  6 Jun 2018 04:29:45 +0000 (UTC)
 MIME-Version: 1.0
-References: <CANr0WEeKL03vFNYh1Nfj8rNWv_F3hrjwXZJUk+pjySfePAKo9w@mail.gmail.com>
-	<CAFEAcA_JudaxmJTqT262ioZWY_2J=+4Kkx4_ZwW3Gaa2D1YM8Q@mail.gmail.com>
-	<CANr0WEeZCHbOjKNWJfpx2+ai_h97bgt-J-pLw5PYct7=jSG=fw@mail.gmail.com>
-In-Reply-To: <CANr0WEeZCHbOjKNWJfpx2+ai_h97bgt-J-pLw5PYct7=jSG=fw@mail.gmail.com>
-From: Huaicheng Li <huaicheng@cs.uchicago.edu>
-Date: Tue, 5 Jun 2018 21:22:50 -0700
-Message-ID: <CANr0WEcCSR-0T8_K6HKRp9zv=MVeG9JLq_JANPCsGc_XShefCA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] About cpu_physical_memory_map()
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Wed, 06 Jun 2018 04:17:27 -0000
+From: Launchpad Bug Tracker <855800@bugs.launchpad.net>
+Reply-To: Bug 855800 <855800@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20110921182430.29459.49832.malonedeb@wampee.canonical.com>
+Message-Id: <152825864768.23836.9073437840464787523.malone@loganberry.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 855800] Re: KVM crashes when attempting to
+ restart migration
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -43,94 +37,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
 
-Hi Peter,
+[Expired for qemu-kvm (Ubuntu) because there has been no activity for 60
+days.]
 
-Just a follow up on my previous question. I have figured it out by trying
-it out with QEMU.
-I'm writing to thank you again for your help! I really appreciate that.
+** Changed in: qemu-kvm (Ubuntu)
+       Status: Incomplete =3D> Expired
 
-Thank you!
+-- =
 
-Best,
-Huaicheng
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/855800
 
-On Fri, Jun 1, 2018 at 1:00 AM Huaicheng Li <huaicheng@cs.uchicago.edu>
-wrote:
+Title:
+  KVM crashes when attempting to restart migration
 
-> Hi Peter,
->
-> Thank you a lot for the analysis!
->
-> So it'll be simpler
->> if you start with the buffer in the host QEMU process, map this
->> in to the guest's physical address space at some GPA, tell the
->> guest kernel that that's the GPA to use, and have the guest kernel
->> map that GPA into the guest userspace process's virtual address space.
->> (Think of how you would map a framebuffer, for instance.)
->
->
-> This makes sense to me. Could you help provide a pointer where I can refer
-> to similar implementations?
-> Should I do something like this during system memory initialization:
->
->     memory_region_init_ram_ptr(my_mr, owner, "mybuf", buf_size, buf); //
-> where buf is the buffer in QEMU AS
->     memory_region_add_subregion(system_memory, GPA_OFFSET, my_mr);
->
-> If I set guest memory to be "-m 1G", can I make "GPA_OFFSET" beyond 1GB
-> (e.g. 2GB)? This way, the guest OS
-> won't be able to access my buffer and use it like other regular RAM.
->
-> Thanks!
->
-> Best,
-> Huaicheng
->
->
->
->
-> On Thu, May 31, 2018 at 3:11 AM Peter Maydell <peter.maydell@linaro.org>
-> wrote:
->
->> On 30 May 2018 at 01:24, Huaicheng Li <huaicheng@cs.uchicago.edu> wrote:
->> > Dear QEMU/KVM developers,
->> >
->> > I was trying to map a buffer in host QEMU process to a guest user space
->> > application. I tried to achieve this
->> > by allocating a buffer in the guest application first, then map this
->> buffer
->> > to QEMU process address space via
->> > GVA -> GPA --> HVA (GPA to HVA is done via cpu_physical_memory_map).
->> Last,
->> > I wrote a host kernel driver to
->> > walk QEMU process's page table and change corresponding page table
->> entries
->> > of HVA to the HPA of the target
->> > buffer.
->>
->> This seems like the wrong way round to try to do this. As a rule
->> of thumb, you'll have an easier life if you have things behave
->> similarly to how they would in real hardware. So it'll be simpler
->> if you start with the buffer in the host QEMU process, map this
->> in to the guest's physical address space at some GPA, tell the
->> guest kernel that that's the GPA to use, and have the guest kernel
->> map that GPA into the guest userspace process's virtual address space.
->> (Think of how you would map a framebuffer, for instance.)
->>
->> Changing the host page table entries for QEMU under its feet seems
->> like it's never going to work reliably.
->>
->> (I think the specific problem you're running into is that guest memory
->> is both mapped into the QEMU host process and also exposed to the
->> guest VM. The former is controlled by the page tables for the
->> QEMU host process, but the latter is a different set of page tables,
->> which QEMU asks the kernel to configure, using KVM_SET_USER_MEMORY_REGION
->> ioctls.)
->>
->> thanks
->> -- PMM
->>
->
+Status in QEMU:
+  Expired
+Status in qemu-kvm package in Ubuntu:
+  Expired
+
+Bug description:
+  Operations performed:
+  Sequence to trigger crash:
+
+      * Start two kvm systems, one on gerph (primary), one on nbuild2 (list=
+ening for incoming migration) - do not use -daemonize
+      * On gerph, connect to monitor.
+      * "migrate -d -b tcp:nbuild2:4444"
+      * "info migrate"
+      * "migrate_cancel"
+      * "info migrate"
+      * "migrate -d -b tcp:nbuild2:4444"
+      * crashed with assertion:
+  kvm: block-migration.c:355: flush_blks: Assertion `block_mig_state.read_d=
+one >=3D 0' failed.
+                   Connection closed by foreign host.
+  [1]+  Aborted                 (core dumped) kvm -drive file=3D./copy-disk=
+2.img,boot=3Don -m 4096 -serial mon:telnet::23023,server,nowait -balloon vi=
+rtio -vnc :99 -usbdevice tablet -net nic,macaddr=3Df6:a6:31:53:89:9a,model=
+=3Drtl8139,vlan=3D0 -net tap,vlan=3D0
+
+  =
+
+  Repeating the operations above often dies in different places; just repea=
+t the cancel and restart the operation. Because the KVM system dies, the un=
+derlying VM is obviously terminated.
+
+  Distribution:
+
+  jfletcher@gerph:~$ lsb_release -rd
+  Description:	Ubuntu 10.04.3 LTS
+  Release:	10.04
+
+  Package:
+
+  jfletcher@gerph:~$ apt-cache policy kvm
+  kvm:
+    Installed: 1:84+dfsg-0ubuntu16+0.12.3+noroms+0ubuntu9.15
+    Candidate: 1:84+dfsg-0ubuntu16+0.12.3+noroms+0ubuntu9.15
+    Version table:
+   *** 1:84+dfsg-0ubuntu16+0.12.3+noroms+0ubuntu9.15 0
+          500 http://gb.archive.ubuntu.com/ubuntu/ lucid-updates/main Packa=
+ges
+          500 http://security.ubuntu.com/ubuntu/ lucid-security/main Packag=
+es
+          100 /var/lib/dpkg/status
+       1:84+dfsg-0ubuntu16+0.12.3+noroms+0ubuntu9 0
+          500 http://gb.archive.ubuntu.com/ubuntu/ lucid/main Packages
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/855800/+subscriptions
