@@ -1,32 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37494)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38365)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1fQdm4-0006Hy-MY
-	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 15:07:14 -0400
+	(envelope-from <jsnow@redhat.com>) id 1fQdoo-0000h6-N4
+	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 15:10:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1fQdm1-0007jJ-Eq
-	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 15:07:12 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:40916 helo=mx1.redhat.com)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1fQdm1-0007in-8M
-	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 15:07:09 -0400
-Date: Wed, 6 Jun 2018 22:07:08 +0300
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20180606220624-mutt-send-email-mst@kernel.org>
-References: <20180521163203.26590-1-ross.zwisler@linux.intel.com>
-	<20180521163203.26590-4-ross.zwisler@linux.intel.com>
-	<20180605182243-mutt-send-email-mst@kernel.org>
-	<20180605164205.GA21034@linux.intel.com>
-	<CAPcyv4jSoFifTc05WGgxkEX6i7b12zYyB+VchJVW_+QPQzO7Fg@mail.gmail.com>
-	<20180605213547-mutt-send-email-mst@kernel.org>
-	<20180605220700.GB16066@linux.intel.com>
-	<CAPcyv4irudGth3+WZtgF4TjGL53s8mN70aVXpGWjj_Lc=7AMVg@mail.gmail.com>
-	<20180606165051.GC30568@linux.intel.com>
+	(envelope-from <jsnow@redhat.com>) id 1fQdon-0000kE-GX
+	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 15:10:02 -0400
+From: John Snow <jsnow@redhat.com>
+Date: Wed,  6 Jun 2018 15:09:48 -0400
+Message-Id: <20180606190955.20845-1-jsnow@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180606165051.GC30568@linux.intel.com>
-Subject: Re: [Qemu-devel] [qemu PATCH v4 3/4] nvdimm,
- acpi: support NFIT platform capabilities
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH 0/7] atapi: change unlimited recursion to while
+ loop
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,90 +21,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Ross Zwisler <ross.zwisler@linux.intel.com>
-Cc: Dan Williams <dan.j.williams@intel.com>, Eduardo Habkost <ehabkost@redhat.com>, linux-nvdimm <linux-nvdimm@lists.01.org>, Qemu Developers <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>, Igor Mammedov <imammedo@redhat.com>
+To: qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: John Snow <jsnow@redhat.com>
 
-On Wed, Jun 06, 2018 at 10:50:51AM -0600, Ross Zwisler wrote:
-> On Tue, Jun 05, 2018 at 03:21:30PM -0700, Dan Williams wrote:
-> > On Tue, Jun 5, 2018 at 3:07 PM, Ross Zwisler
-> > <ross.zwisler@linux.intel.com> wrote:
-> > > On Tue, Jun 05, 2018 at 09:37:25PM +0300, Michael S. Tsirkin wrote:
-> > >> On Tue, Jun 05, 2018 at 11:15:00AM -0700, Dan Williams wrote:
-> > >> > On Tue, Jun 5, 2018 at 9:42 AM, Ross Zwisler
-> > >> > <ross.zwisler@linux.intel.com> wrote:
-> > >> > > On Tue, Jun 05, 2018 at 06:25:27PM +0300, Michael S. Tsirkin wrote:
-> > >> > >> On Mon, May 21, 2018 at 10:32:02AM -0600, Ross Zwisler wrote:
-> > >> > >> > Add a machine command line option to allow the user to control the Platform
-> > >> > >> > Capabilities Structure in the virtualized NFIT.  This Platform Capabilities
-> > >> > >> > Structure was added in ACPI 6.2 Errata A.
-> > >> > >> >
-> > >> > >> > Signed-off-by: Ross Zwisler <ross.zwisler@linux.intel.com>
-> > >> > >>
-> > >> > >> I tried playing with it and encoding the capabilities is
-> > >> > >> quite awkward.
-> > >> > >>
-> > >> > >> Can we add bits for specific capabilities instead of nvdimm-cap?
-> > >> > >>
-> > >> > >> How about:
-> > >> > >>
-> > >> > >> "cpu-flush-on-power-loss-cap"
-> > >> > >> "memory-flush-on-power-loss-cap"
-> > >> > >> "byte-addressable-mirroring-cap"
-> > >> > >
-> > >> > > Hmmm...I don't like that as much because:
-> > >> > >
-> > >> > > a) It's very verbose.  Looking at my current qemu command line few other
-> > >> > >    options require that many characters, and you'd commonly be defining more
-> > >> > >    than one of these for a given VM.
-> > >> > >
-> > >> > > b) It means that the QEMU will need to be updated if/when new flags are added,
-> > >> > >    because we'll have to have new options for each flag.  The current
-> > >> > >    implementation is more future-proof because you can specify any flags
-> > >> > >    value you want.
-> > >> > >
-> > >> > > However, if you feel strongly about this, I'll make the change.
-> > >> >
-> > >> > Straw-man: Could we do something similar with what we are doing in ndctl?
-> > >> >
-> > >> > enum ndctl_persistence_domain {
-> > >> >         PERSISTENCE_NONE = 0,
-> > >> >         PERSISTENCE_MEM_CTRL = 10,
-> > >> >         PERSISTENCE_CPU_CACHE = 20,
-> > >> >         PERSISTENCE_UNKNOWN = INT_MAX,
-> > >> > };
-> > >> >
-> > >> > ...and have the command line take a number where "10" and "20" are
-> > >> > supported today, but allows us to adapt to new persistence domains in
-> > >> > the future.
-> > >>
-> > >> I'm fine with that except can we have symbolic names instead of numbers
-> > >> on command line?
-> > >>
-> > >> --
-> > >> MST
-> > >
-> > > Okay, we can move to the symbolic names.  Do you want them to be that long, or
-> > > would:
-> > >
-> > > nvdimm-cap-cpu
-> > > nvdimm-cap-mem-ctrl
-> > > nvdimm-cap-mirroring
-> > 
-> > Wait, why is mirroring part of this?
-> > 
-> > I was thinking this option would be:
-> > 
-> >     --persistence-domain={cpu,mem-ctrl}
-> > 
-> > ...and try not to let ACPI specifics leak into the qemu command line
-> > interface. For example PowerPC qemu could have a persistence domain
-> > communicated via Open Firmware or some other mechanism.
-> 
-> Sure, this seems fine, though we may want to throw an "nvdimm" in the name
-> somewhere so it's clear what the option affects.
-> 
-> nvdimm-persistence={cpu,mem-ctrl} maybe?
-> 
-> Michael, does this work for you?
+Real hardware doesn't have an unlimited stack, so the unlimited
+recursion in the ATAPI code smells a bit.  In fact, the call to
+ide_transfer_start easily becomes a tail call with a small change
+to the code (patch 5); however, we also need to turn the call back to
+ide_atapi_cmd_reply_end into another tail call before turning the
+(double) tail recursion into a while loop.
 
-Sounds good to me.
+In particular, patch 1 ensures that the call to the end_transfer_func is
+the last thing in ide_transfer_start.  To do so, it moves the write of
+the PIO Setup FIS before the PIO transfer, which actually makes sense:
+the FIS is sent by the device to inform the AHCI about the transfer,
+so it cannot come after!  This is the main change from the RFC, and
+it simplifies the rest of the series (the RFC had to introduce an
+"end_transfer" callback just for writing the PIO Setup FIS).
+
+I tested this manually with READ CD commands sent through sg_raw,
+and the existing AHCI tests still pass.
+
+v2: reworked PIO Setup FIS based on spec reading, adjusted tests.
+
+John Snow (2):
+  libqos/ahci: track sector size
+  ahci: move PIO Setup FIS before transfer, fix it for ATAPI commands
+
+Paolo Bonzini (5):
+  ide: push end_transfer_func out of start_transfer callback, rename
+    callback
+  ide: call ide_cmd_done from ide_transfer_stop
+  ide: make ide_transfer_stop idempotent
+  atapi: call ide_set_irq before ide_transfer_start
+  ide: introduce ide_transfer_start_norecurse
+
+ hw/ide/ahci.c             | 31 ++++++++++++-------------------
+ hw/ide/atapi.c            | 44 ++++++++++++++++++++++++-----------------=
+---
+ hw/ide/core.c             | 39 ++++++++++++++++++++-------------------
+ hw/ide/trace-events       |  2 +-
+ include/hw/ide/internal.h |  4 +++-
+ tests/libqos/ahci.c       | 45 +++++++++++++++++++++++++++--------------=
+----
+ tests/libqos/ahci.h       |  3 +--
+ 7 files changed, 88 insertions(+), 80 deletions(-)
+
+--=20
+2.14.3
