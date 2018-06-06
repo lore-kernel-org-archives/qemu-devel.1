@@ -1,21 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48392)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48408)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ppandit@redhat.com>) id 1fQVnL-000657-3a
-	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 06:36:03 -0400
+	(envelope-from <ppandit@redhat.com>) id 1fQVnQ-0006Aa-7p
+	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 06:36:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ppandit@redhat.com>) id 1fQVnJ-0001e5-V0
-	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 06:35:59 -0400
-Received: from mx3-rdu2.redhat.com ([66.187.233.73]:46592 helo=mx1.redhat.com)
+	(envelope-from <ppandit@redhat.com>) id 1fQVnM-0001fK-4S
+	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 06:36:04 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:41974 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ppandit@redhat.com>) id 1fQVnJ-0001dv-Qd
-	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 06:35:57 -0400
+	(Exim 4.71) (envelope-from <ppandit@redhat.com>) id 1fQVnL-0001fA-Vr
+	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 06:36:00 -0400
 From: P J P <ppandit@redhat.com>
-Date: Wed,  6 Jun 2018 16:05:48 +0530
-Message-Id: <20180606103549.12031-2-ppandit@redhat.com>
+Date: Wed,  6 Jun 2018 16:05:49 +0530
+Message-Id: <20180606103549.12031-3-ppandit@redhat.com>
 In-Reply-To: <20180606103549.12031-1-ppandit@redhat.com>
 References: <20180606103549.12031-1-ppandit@redhat.com>
-Subject: [Qemu-devel] [PATCH v1 1/2] slirp: correct size computation while
- concatenating mbuf
+Subject: [Qemu-devel] [PATCH v1 2/2] slirp: reformat m_cat routine
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,59 +28,65 @@ Cc: Samuel Thibault <samuel.thibault@ens-lyon.org>, Jan Kiszka <jan.kiszka@sieme
 
 From: Prasad J Pandit <pjp@fedoraproject.org>
 
-While reassembling incoming fragmented datagrams, 'm_cat' routine
-extends the 'mbuf' buffer, if it has insufficient room. It computes
-a wrong buffer size, which leads to overwriting adjacent heap buffer
-area. Correct this size computation in m_cat.
+Coding style changes to the m_cat routine and minor refactoring.
 
-Reported-by: ZDI Disclosures <zdi-disclosures@trendmicro.com>
 Signed-off-by: Prasad J Pandit <pjp@fedoraproject.org>
 ---
- slirp/mbuf.c | 11 ++++++-----
- 1 file changed, 6 insertions(+), 5 deletions(-)
-
-Update v1: fixed indentation
-    https://lists.gnu.org/archive/html/qemu-devel/2018-06/msg01121.html
+ slirp/mbuf.c | 36 ++++++++++++++++--------------------
+ 1 file changed, 16 insertions(+), 20 deletions(-)
 
 diff --git a/slirp/mbuf.c b/slirp/mbuf.c
-index 5ff24559fd..6650981fc7 100644
+index 6650981fc7..e012cd4760 100644
 --- a/slirp/mbuf.c
 +++ b/slirp/mbuf.c
-@@ -137,8 +137,9 @@ m_cat(struct mbuf *m, struct mbuf *n)
- 	/*
- 	 * If there's no room, realloc
- 	 */
--	if (M_FREEROOM(m) < n->m_len)
--		m_inc(m,m->m_size+MINCSIZE);
-+    if (M_FREEROOM(m) < n->m_len) {
-+        m_inc(m, m->m_len + n->m_len);
+@@ -152,32 +152,28 @@ m_cat(struct mbuf *m, struct mbuf *n)
+ void
+ m_inc(struct mbuf *m, int size)
+ {
+-	int datasize;
++    int datasize;
+ 
+-	/* some compiles throw up on gotos.  This one we can fake. */
+-        if(m->m_size>size) return;
++    /* some compiles throw up on gotos. This one we can fake. */
++    if (m->m_size > size) {
++        return;
 +    }
  
- 	memcpy(m->m_data+m->m_len, n->m_data, n->m_len);
- 	m->m_len += n->m_len;
-@@ -158,12 +159,12 @@ m_inc(struct mbuf *m, int size)
+-        if (m->m_flags & M_EXT) {
+-	  datasize = m->m_data - m->m_ext;
+-          m->m_ext = g_realloc(m->m_ext, size + datasize);
+-	  m->m_data = m->m_ext + datasize;
+-        } else {
+-	  char *dat;
+-	  datasize = m->m_data - m->m_dat;
+-      dat = g_malloc(size + datasize);
+-	  memcpy(dat, m->m_dat, m->m_size);
+-
+-	  m->m_ext = dat;
+-	  m->m_data = m->m_ext + datasize;
+-	  m->m_flags |= M_EXT;
+-        }
+-
+-        m->m_size = size + datasize;
++    if (m->m_flags & M_EXT) {
++        datasize = m->m_data - m->m_ext;
++        m->m_ext = g_realloc(m->m_ext, size + datasize);
++    } else {
++        datasize = m->m_data - m->m_dat;
++        m->m_ext = g_malloc(size + datasize);
++        memcpy(m->m_ext, m->m_dat, m->m_size);
++        m->m_flags |= M_EXT;
++    }
  
-         if (m->m_flags & M_EXT) {
- 	  datasize = m->m_data - m->m_ext;
--          m->m_ext = g_realloc(m->m_ext, size);
-+          m->m_ext = g_realloc(m->m_ext, size + datasize);
- 	  m->m_data = m->m_ext + datasize;
-         } else {
- 	  char *dat;
- 	  datasize = m->m_data - m->m_dat;
--          dat = g_malloc(size);
-+      dat = g_malloc(size + datasize);
- 	  memcpy(dat, m->m_dat, m->m_size);
- 
- 	  m->m_ext = dat;
-@@ -171,7 +172,7 @@ m_inc(struct mbuf *m, int size)
- 	  m->m_flags |= M_EXT;
-         }
- 
--        m->m_size = size;
-+        m->m_size = size + datasize;
- 
++    m->m_data = m->m_ext + datasize;
++    m->m_size = size + datasize;
  }
  
+ 
+-
+ void
+ m_adj(struct mbuf *m, int len)
+ {
 -- 
 2.17.1
