@@ -1,20 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44762)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44994)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1fQeHw-0005d1-Mz
-	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 15:40:09 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fQeIm-0006VZ-Ey
+	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 15:41:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1fQeHv-0001Dk-Ru
-	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 15:40:08 -0400
-References: <20180606190628.8170-1-mreitz@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <2f82ae86-2691-6329-887b-2a78d27b41ad@redhat.com>
-Date: Wed, 6 Jun 2018 21:39:58 +0200
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1fQeIh-0001fj-HZ
+	for qemu-devel@nongnu.org; Wed, 06 Jun 2018 15:41:00 -0400
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20180606190955.20845-1-jsnow@redhat.com>
+	<20180606190955.20845-2-jsnow@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <1ff7fd70-7cf3-a555-bb55-8df7f4eeac3b@amsat.org>
+Date: Wed, 6 Jun 2018 16:40:51 -0300
 MIME-Version: 1.0
-In-Reply-To: <20180606190628.8170-1-mreitz@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="D3RXOCctwzquBlQKpszclaYzoLpNegL9X"
-Subject: Re: [Qemu-devel] [PATCH v4] iotests: Fix 219's timing
+In-Reply-To: <20180606190955.20845-2-jsnow@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH 1/7] libqos/ahci: track sector size
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,79 +28,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Eric Blake <eblake@redhat.com>
+To: John Snow <jsnow@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---D3RXOCctwzquBlQKpszclaYzoLpNegL9X
-From: Max Reitz <mreitz@redhat.com>
-To: qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>,
- Eric Blake <eblake@redhat.com>
-Message-ID: <2f82ae86-2691-6329-887b-2a78d27b41ad@redhat.com>
-Subject: Re: [PATCH v4] iotests: Fix 219's timing
-References: <20180606190628.8170-1-mreitz@redhat.com>
-In-Reply-To: <20180606190628.8170-1-mreitz@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On 06/06/2018 04:09 PM, John Snow wrote:
+> It's not always 512, and it does wind up mattering for PIO tranfers,
+> because this means DRQ blocks are four times as big for ATAPI.
+> Replace an instance of 2048 with the correct define, too.
+> 
+> This patch by itself winds changing no behavior. fis->count is ignored
+> for CMD_PACKET, and sect_count only gets used in non-ATAPI cases.
+> 
+> Signed-off-by: John Snow <jsnow@redhat.com>
 
-On 2018-06-06 21:06, Max Reitz wrote:
-> 219 has two issues that may lead to sporadic failure, both of which are=
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
-> the result of issuing query-jobs too early after a job has been
-> modified.  This can then lead to different results based on whether the=
-
-> modification has taken effect already or not.
->=20
-> First, query-jobs is issued right after the job has been created.
-> Besides its current progress possibly being in any random state (which
-> has already been taken care of), its total progress too is basically
-> arbitrary, because the job may not yet have been able to determine it.
-> This patch addresses this by just filtering the total progress, like
-> what has been done for the current progress already.  However, for more=
-
-> clarity, the filtering is changed to replace the values by a string
-> 'FILTERED' instead of deleting them.
->=20
-> Secondly, query-jobs is issued right after a job has been resumed.  The=
-
-> job may or may not yet have had the time to actually perform any I/O,
-> and thus its current progress may or may not have advanced.  To make
-> sure it has indeed advanced (which is what the reference output already=
-
-> assumes), keep querying it until it has.
->=20
-> Signed-off-by: Max Reitz <mreitz@redhat.com>
 > ---
-> v4: Drop the "import time" that has become unnecessary
->=20
-> v3: Keep querying until the job has advanced instead of waiting for a
->     fixed amount of time [Peter in v2, Eric in v1]
-> ---
->  tests/qemu-iotests/219     | 26 ++++++++++++++++++++------
->  tests/qemu-iotests/219.out | 10 +++++-----
->  2 files changed, 25 insertions(+), 11 deletions(-)
-
-Applied to my block branch.
-
-Max
-
-
---D3RXOCctwzquBlQKpszclaYzoLpNegL9X
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlsYOI4ACgkQ9AfbAGHV
-z0AjIQf8DJXjynl2CY8lv+G29JoyKAymdHaWdG2fwQ93hSRhtBy78rTeAUq3tXin
-bcN+yJi8K1d2HNEA1BDGVW1vvVoCIVGUW4izWDqQ/5X8KNjGjyjt+aGuPbNjaDl+
-Ciiaun2upqWqgukH7pyYGJQ+9fOEXdpKyYkQDKC+R2MJlwfQB4s077lLxIrJuKyB
-KH9CpMy9WaifjnM/iVi7gswOuua14gv/xG6Bb2nLbos7AlVFDTLR0G4AQPQaEBzx
-I1NGexUUP01tGjoZ/5PX5DUU/5ZS7vF/Hj2mcZKEgLVz/7xYCUGiCwIW7UarCD8W
-j4ZpusPq371E48+8Gsu10S4HymTeEw==
-=3ikO
------END PGP SIGNATURE-----
-
---D3RXOCctwzquBlQKpszclaYzoLpNegL9X--
+>  tests/libqos/ahci.c | 10 ++++++----
+>  1 file changed, 6 insertions(+), 4 deletions(-)
+> 
+> diff --git a/tests/libqos/ahci.c b/tests/libqos/ahci.c
+> index bc201d762b..63e1f9b92d 100644
+> --- a/tests/libqos/ahci.c
+> +++ b/tests/libqos/ahci.c
+> @@ -90,6 +90,7 @@ struct AHCICommand {
+>      uint32_t interrupts;
+>      uint64_t xbytes;
+>      uint32_t prd_size;
+> +    uint32_t sector_size;
+>      uint64_t buffer;
+>      AHCICommandProp *props;
+>      /* Data to be transferred to the guest */
+> @@ -796,7 +797,7 @@ static void command_header_init(AHCICommand *cmd)
+>  static void command_table_init(AHCICommand *cmd)
+>  {
+>      RegH2DFIS *fis = &(cmd->fis);
+> -    uint16_t sect_count = (cmd->xbytes / AHCI_SECTOR_SIZE);
+> +    uint16_t sect_count = (cmd->xbytes / cmd->sector_size);
+>  
+>      fis->fis_type = REG_H2D_FIS;
+>      fis->flags = REG_H2D_FIS_CMD; /* "Command" bit */
+> @@ -819,7 +820,7 @@ static void command_table_init(AHCICommand *cmd)
+>          if (cmd->props->lba28 || cmd->props->lba48) {
+>              fis->device = ATA_DEVICE_LBA;
+>          }
+> -        fis->count = (cmd->xbytes / AHCI_SECTOR_SIZE);
+> +        fis->count = (cmd->xbytes / cmd->sector_size);
+>      }
+>      fis->icc = 0x00;
+>      fis->control = 0x00;
+> @@ -857,6 +858,7 @@ AHCICommand *ahci_command_create(uint8_t command_name)
+>      cmd->xbytes = props->size;
+>      cmd->prd_size = 4096;
+>      cmd->buffer = 0xabad1dea;
+> +    cmd->sector_size = props->atapi ? ATAPI_SECTOR_SIZE : AHCI_SECTOR_SIZE;
+>  
+>      if (!cmd->props->ncq) {
+>          cmd->interrupts = AHCI_PX_IS_DHRS;
+> @@ -1033,7 +1035,7 @@ void ahci_command_set_buffer(AHCICommand *cmd, uint64_t buffer)
+>  static void ahci_atapi_set_size(AHCICommand *cmd, uint64_t xbytes)
+>  {
+>      unsigned char *cbd = cmd->atapi_cmd;
+> -    uint64_t nsectors = xbytes / 2048;
+> +    uint64_t nsectors = xbytes / ATAPI_SECTOR_SIZE;
+>      uint32_t tmp;
+>      g_assert(cbd);
+>  
+> @@ -1080,7 +1082,7 @@ void ahci_command_set_sizes(AHCICommand *cmd, uint64_t xbytes,
+>          cmd->prd_size = prd_size;
+>      }
+>      cmd->xbytes = xbytes;
+> -    sect_count = (cmd->xbytes / AHCI_SECTOR_SIZE);
+> +    sect_count = (cmd->xbytes / cmd->sector_size);
+>  
+>      if (cmd->props->ncq) {
+>          NCQFIS *nfis = (NCQFIS *)&(cmd->fis);
+> 
