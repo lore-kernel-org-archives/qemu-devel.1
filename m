@@ -1,22 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35299)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35325)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1fQyY5-0002Wq-QY
-	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 13:18:10 -0400
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1fQyY7-0002ZE-MM
+	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 13:18:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1fQyY4-0001nu-Vi
-	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 13:18:09 -0400
-References: <20180607144645.10187-1-f4bug@amsat.org>
-	<20180607144645.10187-2-f4bug@amsat.org>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <30e6332f-7f4f-5fe3-9517-d057d3bff4a7@redhat.com>
-Date: Thu, 7 Jun 2018 13:18:02 -0400
-MIME-Version: 1.0
-In-Reply-To: <20180607144645.10187-2-f4bug@amsat.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 1/4] hw/block/fdc: Replace
- error_setg(&error_abort) by assert()
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1fQyY6-0001pM-KC
+	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 13:18:11 -0400
+From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Date: Thu,  7 Jun 2018 18:17:51 +0100
+Message-Id: <20180607171751.11510-5-mark.cave-ayland@ilande.co.uk>
+In-Reply-To: <20180607171751.11510-1-mark.cave-ayland@ilande.co.uk>
+References: <20180607171751.11510-1-mark.cave-ayland@ilande.co.uk>
+Subject: [Qemu-devel] [PATCH 4/4] mos6522: convert VMSTATE_TIMER_PTR_TEST to
+ VMSTATE_TIMER_PTR
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,51 +20,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, Peter Maydell <peter.maydell@linaro.org>
+To: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, david@gibson.dropbear.id.au
 
+The timers are configured in the mos6522 init function and therefore will
+always exist, so the function can never return false.
 
+Peter also pointed out that this is the only remaining user of
+VMSTATE_TIMER_PTR_TEST in the codebase, so we might as well just convert it
+over to VMSTATE_TIMER_PTR and remove mos6522_timer_exist() as it is no
+longer required.
 
-On 06/07/2018 10:46 AM, Philippe Mathieu-Daud=C3=A9 wrote:
-> Use assert() instead of error_setg(&error_abort),
-> as suggested by the "qapi/error.h" documentation:
->=20
->     Please don't error_setg(&error_fatal, ...), use error_report() and
->     exit(), because that's more obvious.
->     Likewise, don't error_setg(&error_abort, ...), use assert().
->=20
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-> ---
->  hw/block/fdc.c | 9 +--------
->  1 file changed, 1 insertion(+), 8 deletions(-)
->=20
-> diff --git a/hw/block/fdc.c b/hw/block/fdc.c
-> index cd29e27d8f..7c1c57f57f 100644
-> --- a/hw/block/fdc.c
-> +++ b/hw/block/fdc.c
-> @@ -396,16 +396,9 @@ static int pick_geometry(FDrive *drv)
->                             nb_sectors,
->                             FloppyDriveType_str(parse->drive));
->          }
-> +        assert(type_match !=3D -1 && "misconfigured fd_format");
->          match =3D type_match;
->      }
-> -
-> -    /* No match of any kind found -- fd_format is misconfigured, abort=
-. */
-> -    if (match =3D=3D -1) {
-> -        error_setg(&error_abort, "No candidate geometries present in t=
-able "
-> -                   " for floppy drive type '%s'",
-> -                   FloppyDriveType_str(drv->drive));
-> -    }
-> -
->      parse =3D &(fd_formats[match]);
-> =20
->   out:
->=20
+Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+---
+ hw/misc/mos6522.c | 9 +--------
+ 1 file changed, 1 insertion(+), 8 deletions(-)
 
-Truthfully sad to see the lipstick go, because this is my pig.
-Oh well, it doesn't matter. Not really, anyway.
-
-ACK
+diff --git a/hw/misc/mos6522.c b/hw/misc/mos6522.c
+index d0a0c9e5d9..e9b686ac92 100644
+--- a/hw/misc/mos6522.c
++++ b/hw/misc/mos6522.c
+@@ -369,13 +369,6 @@ static const MemoryRegionOps mos6522_ops = {
+     },
+ };
+ 
+-static bool mos6522_timer_exist(void *opaque, int version_id)
+-{
+-    MOS6522Timer *s = opaque;
+-
+-    return s->timer != NULL;
+-}
+-
+ static const VMStateDescription vmstate_mos6522_timer = {
+     .name = "mos6522_timer",
+     .version_id = 0,
+@@ -385,7 +378,7 @@ static const VMStateDescription vmstate_mos6522_timer = {
+         VMSTATE_UINT16(counter_value, MOS6522Timer),
+         VMSTATE_INT64(load_time, MOS6522Timer),
+         VMSTATE_INT64(next_irq_time, MOS6522Timer),
+-        VMSTATE_TIMER_PTR_TEST(timer, MOS6522Timer, mos6522_timer_exist),
++        VMSTATE_TIMER_PTR(timer, MOS6522Timer),
+         VMSTATE_END_OF_LIST()
+     }
+ };
+-- 
+2.11.0
