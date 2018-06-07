@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54218)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54291)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fQwYM-0001vR-SG
-	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 11:10:20 -0400
+	(envelope-from <david@redhat.com>) id 1fQwYe-0002QX-Dr
+	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 11:10:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1fQwYI-0001rU-Ag
-	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 11:10:18 -0400
-From: Markus Armbruster <armbru@redhat.com>
-References: <1516366207-109842-1-git-send-email-anton.nefedov@virtuozzo.com>
-	<1516366207-109842-9-git-send-email-anton.nefedov@virtuozzo.com>
-	<b0066a7f-0197-73c9-4012-67b5e48e178a@redhat.com>
-	<87tvuyf4it.fsf@dusky.pond.sub.org>
-	<959271ee-c39e-09ab-9f9a-90d97d34f4f5@virtuozzo.com>
-Date: Thu, 07 Jun 2018 17:09:58 +0200
-In-Reply-To: <959271ee-c39e-09ab-9f9a-90d97d34f4f5@virtuozzo.com> (Anton
-	Nefedov's message of "Thu, 7 Jun 2018 17:32:04 +0300")
-Message-ID: <87wovar5tl.fsf@dusky.pond.sub.org>
+	(envelope-from <david@redhat.com>) id 1fQwYZ-0002HK-Bt
+	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 11:10:36 -0400
+References: <20180517081527.14410-1-david@redhat.com>
+	<20180517081527.14410-13-david@redhat.com>
+	<20180601131724.6e17a249@redhat.com>
+	<5f80f3a1-2d40-c197-ebea-636944366d4d@redhat.com>
+	<20180607170012.65ddd90b@redhat.com>
+From: David Hildenbrand <david@redhat.com>
+Message-ID: <38fefcfc-d6c7-9777-b3e7-64e3c360e656@redhat.com>
+Date: Thu, 7 Jun 2018 17:10:18 +0200
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v2 8/8] qapi: query-blockstat: add driver
- specific file-posix stats
+In-Reply-To: <20180607170012.65ddd90b@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v4 12/14] memory-device: factor out
+ pre-plug into hotplug handler
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,108 +28,259 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Anton Nefedov <anton.nefedov@virtuozzo.com>
-Cc: Eric Blake <eblake@redhat.com>, kwolf@redhat.com, den@virtuozzo.com, qemu-block@nongnu.org, qemu-devel@nongnu.org, mreitz@redhat.com, pbonzini@redhat.com, jsnow@redhat.com
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-s390x@nongnu.org, "Michael S . Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Markus Armbruster <armbru@redhat.com>, qemu-ppc@nongnu.org, Pankaj Gupta <pagupta@redhat.com>, Alexander Graf <agraf@suse.de>, Cornelia Huck <cohuck@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Luiz Capitulino <lcapitulino@redhat.com>
 
-Anton Nefedov <anton.nefedov@virtuozzo.com> writes:
-
-> On 3/2/2018 6:59 PM, Markus Armbruster wrote:
->> Eric Blake <eblake@redhat.com> writes:
->>
->>> On 01/19/2018 06:50 AM, Anton Nefedov wrote:
->>>> A block driver can provide a callback to report driver-specific
->>>> statistics.
+On 07.06.2018 17:00, Igor Mammedov wrote:
+> On Mon, 4 Jun 2018 13:45:38 +0200
+> David Hildenbrand <david@redhat.com> wrote:
+>=20
+>> On 01.06.2018 13:17, Igor Mammedov wrote:
+>>> On Thu, 17 May 2018 10:15:25 +0200
+>>> David Hildenbrand <david@redhat.com> wrote:
+>>>  =20
+>>>> Let's move all pre-plug checks we can do without the device being
+>>>> realized into the applicable hotplug handler for pc and spapr.
 >>>>
->>>> file-posix driver now reports discard statistics
->>>>
->>>> Signed-off-by: Anton Nefedov <anton.nefedov@virtuozzo.com>
->>>> Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+>>>> Signed-off-by: David Hildenbrand <david@redhat.com>
 >>>> ---
-> [..]
->>>> +##
->>>> +# @BlockDriverStats:
->>>> +#
->>>> +# Statistics of a block driver (driver-specific)
->>>> +#
->>>> +# Since: 2.12
->>>> +##
->>>> +{ 'union': 'BlockDriverStats',
->>>> +  'data': {
->>>> +      'file': 'BlockDriverStatsFile'
->>>> +  } }
->>>
->>> Markus has been adamant that we add no new "simple unions" (unions with
->>> a 'discriminator' field) - because they are anything but simple in the
->>> long run.
->>
->> Indeed.  You could make this a flat union, similar to BlockdevOptions:
->>
->> { 'union': 'BlockDriverStats':
->>    'base': { 'driver': 'BlockdevDriver' },
->>    'discriminator': 'driver',
->>    'data': {
->>        'file': 'BlockDriverStatsFile',
->>        ... } }
->>
->> However:
->>
+>>>>  hw/i386/pc.c                   | 11 +++++++
+>>>>  hw/mem/memory-device.c         | 72 +++++++++++++++++++------------=
+-----------
+>>>>  hw/ppc/spapr.c                 | 11 +++++++
+>>>>  include/hw/mem/memory-device.h |  2 ++
+>>>>  4 files changed, 57 insertions(+), 39 deletions(-)
+>>>>
+>>>> diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+>>>> index 8bc41ef24b..61f1537e14 100644
+>>>> --- a/hw/i386/pc.c
+>>>> +++ b/hw/i386/pc.c
+>>>> @@ -2010,6 +2010,16 @@ static void pc_machine_device_pre_plug_cb(Hot=
+plugHandler *hotplug_dev,
+>>>>  {
+>>>>      Error *local_err =3D NULL;
+>>>> =20
+>>>> +    /* first stage hotplug handler */
+>>>> +    if (object_dynamic_cast(OBJECT(dev), TYPE_MEMORY_DEVICE)) {
+>>>> +        memory_device_pre_plug(MACHINE(hotplug_dev), MEMORY_DEVICE(=
+dev),
+>>>> +                               &local_err);
+>>>> +    }
 >>>> +
->>>> +##
->>>>   # @BlockStats:
->>>>   #
->>>>   # Statistics of a virtual block device or a block backing device.
->>>> @@ -785,6 +819,8 @@
->>>>   #
->>>>   # @stats:  A @BlockDeviceStats for the device.
->>>>   #
->>>> +# @driver-stats: Optional driver-specific statistics. (Since 2.12)
->>>> +#
->>>>   # @parent: This describes the file block device if it has one.
->>>>   #          Contains recursively the statistics of the underlying
->>>>   #          protocol (e.g. the host file for a qcow2 image). If there is
->>>> @@ -798,6 +834,7 @@
->>>>   { 'struct': 'BlockStats',
->>>>     'data': {'*device': 'str', '*node-name': 'str',
->>>>              'stats': 'BlockDeviceStats',
->>>> +           '*driver-stats': 'BlockDriverStats',
+>>>> +    if (local_err) {
+>>>> +        goto out;
+>>>> +    }
+>>>> +
+>>>>      /* final stage hotplug handler */
+>>>>      if (object_dynamic_cast(OBJECT(dev), TYPE_CPU)) {
+>>>>          pc_cpu_pre_plug(hotplug_dev, dev, &local_err);
+>>>> @@ -2017,6 +2027,7 @@ static void pc_machine_device_pre_plug_cb(Hotp=
+lugHandler *hotplug_dev,
+>>>>          hotplug_handler_pre_plug(dev->parent_bus->hotplug_handler, =
+dev,
+>>>>                                   &local_err);
+>>>>      }
+>>>> +out:
+>>>>      error_propagate(errp, local_err);
+>>>>  }
+>>>> =20
+>>>> diff --git a/hw/mem/memory-device.c b/hw/mem/memory-device.c
+>>>> index 361d38bfc5..d22c91993f 100644
+>>>> --- a/hw/mem/memory-device.c
+>>>> +++ b/hw/mem/memory-device.c
+>>>> @@ -68,58 +68,26 @@ static int memory_device_used_region_size(Object=
+ *obj, void *opaque)
+>>>>      return 0;
+>>>>  }
+>>>> =20
+>>>> -static void memory_device_check_addable(MachineState *ms, uint64_t =
+size,
+>>>> -                                        Error **errp)
+>>>> -{
+>>>> -    uint64_t used_region_size =3D 0;
+>>>> -
+>>>> -    /* we will need a new memory slot for kvm and vhost */
+>>>> -    if (kvm_enabled() && !kvm_has_free_slot(ms)) {
+>>>> -        error_setg(errp, "hypervisor has no free memory slots left"=
+);
+>>>> -        return;
+>>>> -    }
+>>>> -    if (!vhost_has_free_slot()) {
+>>>> -        error_setg(errp, "a used vhost backend has no free memory s=
+lots left");
+>>>> -        return;
+>>>> -    }
+>>>> -
+>>>> -    /* will we exceed the total amount of memory specified */
+>>>> -    memory_device_used_region_size(OBJECT(ms), &used_region_size);
+>>>> -    if (used_region_size + size > ms->maxram_size - ms->ram_size) {
+>>>> -        error_setg(errp, "not enough space, currently 0x%" PRIx64
+>>>> -                   " in use of total hot pluggable 0x" RAM_ADDR_FMT=
+,
+>>>> -                   used_region_size, ms->maxram_size - ms->ram_size=
+);
+>>>> -        return;
+>>>> -    }
+>>>> -
+>>>> -}
+>>>> -
+>>>>  uint64_t memory_device_get_free_addr(MachineState *ms, const uint64=
+_t *hint,
+>>>>                                       uint64_t align, uint64_t size,
+>>>>                                       Error **errp)
+>>>>  {
+>>>>      uint64_t address_space_start, address_space_end;
+>>>> +    uint64_t used_region_size =3D 0;
+>>>>      GSList *list =3D NULL, *item;
+>>>>      uint64_t new_addr =3D 0;
+>>>> =20
+>>>> -    if (!ms->device_memory) {
+>>>> -        error_setg(errp, "memory devices (e.g. for memory hotplug) =
+are not "
+>>>> -                         "supported by the machine");
+>>>> -        return 0;
+>>>> -    }
+>>>> -
+>>>> -    if (!memory_region_size(&ms->device_memory->mr)) {
+>>>> -        error_setg(errp, "memory devices (e.g. for memory hotplug) =
+are not "
+>>>> -                         "enabled, please specify the maxmem option=
+");
+>>>> -        return 0;
+>>>> -    }
+>>>>      address_space_start =3D ms->device_memory->base;
+>>>>      address_space_end =3D address_space_start +
+>>>>                          memory_region_size(&ms->device_memory->mr);
+>>>>      g_assert(address_space_end >=3D address_space_start);
+>>>> =20
+>>>> -    memory_device_check_addable(ms, size, errp);
+>>>> -    if (*errp) {
+>>>> +    /* will we exceed the total amount of memory specified */
+>>>> +    memory_device_used_region_size(OBJECT(ms), &used_region_size);
+>>>> +    if (used_region_size + size > ms->maxram_size - ms->ram_size) {
+>>>> +        error_setg(errp, "not enough space, currently 0x%" PRIx64
+>>>> +                   " in use of total hot pluggable 0x" RAM_ADDR_FMT=
+,
+>>>> +                   used_region_size, ms->maxram_size - ms->ram_size=
+);
+>>>>          return 0;
+>>>>      }
+>>>> =20
+>>>> @@ -242,6 +210,32 @@ uint64_t get_plugged_memory_size(void)
+>>>>      return size;
+>>>>  }
+>>>> =20
+>>>> +void memory_device_pre_plug(MachineState *ms, const MemoryDeviceSta=
+te *md,
+>>>> +                            Error **errp)
+>>>> +{
+>>>> +    if (!ms->device_memory) {
+>>>> +        error_setg(errp, "memory devices (e.g. for memory hotplug) =
+are not "
+>>>> +                         "supported by the machine");
+>>>> +        return;
+>>>> +    }
+>>>> +
+>>>> +    if (!memory_region_size(&ms->device_memory->mr)) {
+>>>> +        error_setg(errp, "memory devices (e.g. for memory hotplug) =
+are not "
+>>>> +                         "enabled, please specify the maxmem option=
+");
+>>>> +        return;
+>>>> +    }
+>>>> +
+>>>> +    /* we will need a new memory slot for kvm and vhost */
+>>>> +    if (kvm_enabled() && !kvm_has_free_slot(ms)) {
+>>>> +        error_setg(errp, "hypervisor has no free memory slots left"=
+);
+>>>> +        return;
+>>>> +    }
+>>>> +    if (!vhost_has_free_slot()) {
+>>>> +        error_setg(errp, "a used vhost backend has no free memory s=
+lots left");
+>>>> +        return;
+>>>> +    } =20
+>>> thanks for extracting preparations steps into the right callback.
+>>>
+>>> on top of this _preplug() handler should also set being plugged
+>>> device properties if they weren't set by user.
+>>>  memory_device_get_free_addr() should be here to.
+>>>
+>>> general rule for _preplug() would be to check and prepare device
+>>> for being plugged but not touch anything beside the device (it's _plu=
+g handler job) =20
 >>
->> You're adding a union of driver-specific stats to a struct of generic
->> stats.  That's unnecessarily complicated.  Instead, turn the struct of
->> generic stats into a flat union, like this:
+>> I disagree. Or at least I disagree as part of this patch series becaus=
+e
+>> it over-complicates things :)
+> "Welcome to rewrite QEMU first before you do your thing" club :)
+
+I feels like I'm doing nothing else all time :)
+
+>=20
+> That's why I've suggested to split series in several small ones
+> tackling concrete goals /1st: unplug cleanups, 2nd: preplug refactoring=
+/
+> instead of intermixing loosely related patches.
+
+I'll send the fixes and cleanups fairly soon. That will hopefully reduce
+the patch count (it increased already a lot due to your review already).
+
+>=20
+> It should help to review and merge prerequisite work fast as it doesn't
+> related to virtio-mem. The rest of refactoring (which is not much once
+> you split out the 2 first series) that's is done directly for virtio-me=
+m
+> sake should be posted as part of that series.
+> It probably would be biger series but posting them separately doesn't
+> make sense either as reviewer would have to jump between them anyways
+> to make sensible review.
+
+We'll find a way. As you want to have TYPE_VIRTIO_MEM specific handling
+code, this can go into the virtio-mem series.
+
+>=20
+>> preplug() can do basic checks but I don't think it should be used to
+>> change actual properties. And I give you the main reason for this:
 >>
->> { 'union': 'BlockStats',
->>    'base': { ... the generic stats, i.e. the members of BlockStats
->>              before this patch ...
->>              'driver': 'BlockdevDriver' }
->>    'discriminator': 'driver',
->>    'data': {
->>        'file': 'BlockDriverStatsFile',
->>        ... } }
+>> We have to do quite some amount of unnecessary error handling (please
+>> remember the pc_dimm plug code madness before I refactored it - 80%
+>> consisted of error handling) if we want to work on device properties
+>> before a device is realized. And we even have duplicate checks both in
+>> the realize() and the preplug() code then (again, what we had in the
+>> pc_dimm plug code - do we have a memdev already or not).
 >>
->
-> hi,
->
-> (resurrecting this series now that there is no-more-dummy-enums patchset
-> https://lists.nongnu.org/archive/html/qemu-devel/2018-05/msg06836.html )
->
-> If we introduce BlockdevDriver as a discriminator as Markus suggests
-> above, we need some way to define its value.
-> I guess one would be to check blk->bs->drv->format_name but it won't
-> always work; often it's even blk->bs == NULL.
+>> Right now, I assume, that all MemoryDevice functions can be safely
+>> called after the device has been realized without error handling. This
+>> is nice. It e.g. guarantees that we have a memdev assigned. Otherwise,
+>> every time we access some MemoryDevice property (e.g. region size), we
+>> have to handle possible uninitialized properties (e.g. memdev) -
+>> something I don't like.
+>>
+>> So I want to avoid this by any means. And I don't really see a benefit
+>> for this additional error handling that will be necessary: We don't ca=
+re
+>> about the performance in case something went wrong.
+>>
+> error checks are not really important here.
+> Here I care about keeping QOM model work as it supposed to, i.e.
+>  object_new() -> set properties -> realize()
+> set properties should happen before realize() is called and
+> that's preplug callback.
+>=20
+> Currently setting properties is still in plug() handler
+> because preplug handler was introduced later and nobody was
+> rewriting that code to the extent you do.
+>=20
 
-There is no blk->bs, at least not if blk is a BlockBackend *.
+/me regretting he started to touch that code
 
-I figure the problem you're trying to describe is query-blockstats
-running into BlockBackends that aren't associated with a
-BlockDriverState (blk->root is null), and thus aren't associated with a
-BlockDriver.  Correct?
+I still don't think performing that change is wort it. As I said, we
+will need a lot of duplicate error handling "is memdev set or not" -
+while this is checked at one central place: when realizing.
 
-> I guess we could add a default ('unspecified'?) to BlockdevDriver enum?
+--=20
 
-This part I understand, but...
+Thanks,
 
-> But I'd rather leave an optional BlockDriverStats union (but make it
-> flat). Only the drivers that provide these stats will need to set
-> BlockdevDriver field. What do you think?
-
-I'm not sure I got this part.  Care to sketch the QAPI schema snippet?
+David / dhildenb
