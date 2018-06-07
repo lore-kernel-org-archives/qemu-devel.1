@@ -1,23 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53230)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53678)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1fQsta-0000fP-QA
-	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 07:15:59 -0400
+	(envelope-from <abologna@redhat.com>) id 1fQsvD-0001Ub-P3
+	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 07:17:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1fQstZ-0003rj-BA
-	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 07:15:58 -0400
-Date: Thu, 7 Jun 2018 13:15:52 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20180607131552.03d2c508.cohuck@redhat.com>
-In-Reply-To: <470c9e37-1e1b-a189-2ae2-9889860dde94@redhat.com>
-References: <20180525113708.29856-1-david@redhat.com>
-	<20180525113708.29856-6-david@redhat.com>
-	<20180604140547.68c95e17.cohuck@redhat.com>
-	<470c9e37-1e1b-a189-2ae2-9889860dde94@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [qemu-s390x] [PATCH v1 5/7] s390x/tcg: implement
- SET CLOCK
+	(envelope-from <abologna@redhat.com>) id 1fQsvC-0004pN-SV
+	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 07:17:39 -0400
+Message-ID: <2afb9305deb37c8ca4f930235eaf52486ab0153e.camel@redhat.com>
+From: Andrea Bolognani <abologna@redhat.com>
+Date: Thu, 07 Jun 2018 13:17:24 +0200
+In-Reply-To: <20180607102257.GH28827@redhat.com>
+References: <20180606111406.GD2660@work-vm>
+	<9e8b49fb-0162-bf35-21bb-acc0dc28555f@redhat.com>
+	<20180606120050.GB2661@work-vm>
+	<61a301dd-8e50-8799-8328-341d6ab744f5@redhat.com>
+	<20180606143134.GG2660@work-vm>
+	<39bcee27-329a-61d8-47fa-678b431b0a79@redhat.com>
+	<20180606150507.GJ2660@work-vm>
+	<66727986-1cf1-c12e-d78c-d56cc15eaf00@redhat.com>
+	<20180606163246.GL3064@redhat.com>
+	<f3914a591a46c9d489f2fa1ad2ac4fd0c5a9e5b6.camel@redhat.com>
+	<20180607102257.GH28827@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] storing machine data in qcow images?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,49 +32,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>
-Cc: "Jason J . Herne" <jjherne@linux.ibm.com>, Thomas Huth <thuth@redhat.com>, Alexander Graf <agraf@suse.de>, qemu-devel@nongnu.org, Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org, "Collin L . Walling" <walling@linux.ibm.com>, Richard Henderson <rth@twiddle.net>
+To: "Daniel P. =?ISO-8859-1?Q?Berrang=E9?=" <berrange@redhat.com>
+Cc: Eric Blake <eblake@redhat.com>, Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org, armbru@redhat.com, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, "Richard W.M. Jones" <rjones@redhat.com>, stefanha@redhat.com, Max Reitz <mreitz@redhat.com>
 
-On Thu, 7 Jun 2018 12:48:21 +0200
-David Hildenbrand <david@redhat.com> wrote:
+On Thu, 2018-06-07 at 11:22 +0100, Daniel P. Berrang=C3=A9 wrote:
+> On Thu, Jun 07, 2018 at 12:02:29PM +0200, Andrea Bolognani wrote:
+> > While hints might be considered a reasonable fit for qcow2, I think
+> > it's pretty hard to argue for embedding the NVRAM file in there,
+> > which to me signals quite clearly that an archive containing the
+> > disk image(s) *and* the configuration hints *and* other ancillary
+> > files such as the NVRAM is the only way to build a solution that's
+> > not dead on arrival.
+>=20
+> On a similar theme, I can imagine users wanting to provide a TPM
+> data blob too, and for AMD SEV we'd need to be able to provide a
+> DH key, and session blob too IIUC.
 
-> On 04.06.2018 14:05, Cornelia Huck wrote:
-> > On Fri, 25 May 2018 13:37:06 +0200
-> > David Hildenbrand <david@redhat.com> wrote:
-> >   
-> >> This allows a guest to change its TOD. We already take care of updating
-> >> all CKC timers from within S390TODClass.
-> >>
-> >> Use MO_ALIGN to load the operand manually - this will properly trigger a
-> >> SPECIFICATION exception.
-> >>
-> >> Signed-off-by: David Hildenbrand <david@redhat.com>
-> >> ---
-> >>  target/s390x/helper.h      |  1 +
-> >>  target/s390x/insn-data.def |  3 +--
-> >>  target/s390x/misc_helper.c | 19 +++++++++++++++++++
-> >>  target/s390x/translate.c   |  9 +++++++++
-> >>  4 files changed, 30 insertions(+), 2 deletions(-)
-> >>  
-> >   
-> >> diff --git a/target/s390x/misc_helper.c b/target/s390x/misc_helper.c
-> >> index 2ef9de1cca..2f5cd6d22a 100644
-> >> --- a/target/s390x/misc_helper.c
-> >> +++ b/target/s390x/misc_helper.c
-> >> @@ -191,6 +191,25 @@ void tcg_s390_tod_updated(CPUState *cs, run_on_cpu_data opaque)
-> >>      helper_sckc(env, env->ckc);
-> >>  }
-> >>  
-> >> +/* Set Clock */
-> >> +uint32_t HELPER(sck)(CPUS390XState *env, uint64_t tod_low)
-> >> +{
-> >> +    S390TODState *td = s390_get_tod();
-> >> +    S390TODClass *tdc = S390_TOD_GET_CLASS(td);  
-> > 
-> > Would it make sense to cache the class as well?  
-> 
-> Probably, but I don't think this is as critical as the flic (as this
-> code is TCG only and the class conversion should be fairly fast compared
-> to a device lookup).
+I'm not familiar with the technologies you're talking about, but
+all that sounds like something very security sensitive and not
+something eg. the Fedora project would want to bake into their
+cloud images.
 
-Yes, it probably does not matter that much. Do as you like :)
+Perhaps we should keep in mind that this kind of archive format
+lends itself quite naturally to both generic ready-made images and
+custom, fully configured images: in the former case it would only
+contain the few things mentione above, while in the latter it might
+also have security sensitive data that's specific to the deployment
+it's going to be used against.
+
+For non-vanilla images, it might be interesting to include the
+libvirt XML in its entirety, which would make it trivial to keep
+around a full-contained copy of a guest that can be imported back
+into libvirt with a single click; on the other hand, the management
+layer might want to override that, and for generic images we
+probably want to avoid the security implications of people
+importing potentially untrusted configurations into the system
+libvirt instance and stick to just a few hints instead.
+
+So there's at least two partially overlapping use cases right
+there. Fun :)
+
+--=20
+Andrea Bolognani / Red Hat / Virtualization
