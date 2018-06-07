@@ -1,21 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58387)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59421)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fQyIL-0004a1-25
-	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 13:01:58 -0400
+	(envelope-from <bounces@canonical.com>) id 1fQyMC-0000Vj-M6
+	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 13:05:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1fQyIJ-0006wn-WA
-	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 13:01:53 -0400
-References: <152837465974.447.3394605257699992372@d39dc562802a>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <2b5c36fb-1c71-e7b2-bf96-30b5a747d20d@redhat.com>
-Date: Thu, 7 Jun 2018 19:01:47 +0200
+	(envelope-from <bounces@canonical.com>) id 1fQyM9-0001f7-AO
+	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 13:05:52 -0400
+Received: from indium.canonical.com ([91.189.90.7]:47486)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1fQyM9-0001eK-3a
+	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 13:05:49 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1fQyM8-0006oJ-4t
+	for <qemu-devel@nongnu.org>; Thu, 07 Jun 2018 17:05:48 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 226212E8030
+	for <qemu-devel@nongnu.org>; Thu,  7 Jun 2018 17:05:48 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <152837465974.447.3394605257699992372@d39dc562802a>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 0/4] pc-bios/s390-ccw: Allow network
- booting via pxelinux.cfg
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Thu, 07 Jun 2018 16:54:10 -0000
+From: =?utf-8?q?Jos=C3=A9_Antonio_L=C3=B3pez_Cano?=
+	<1101210@bugs.launchpad.net>
+Reply-To: Bug 1101210 <1101210@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20130118141238.13697.51258.malonedeb@chaenomeles.canonical.com>
+Message-Id: <152839045086.24511.586645771186385341.malone@gac.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1101210] Re: qemu 1.4.2: usb keyboard not fully
+ working
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,65 +39,46 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: famz@redhat.com, borntraeger@de.ibm.com, qemu-s390x@nongnu.org, mihajlov@linux.vnet.ibm.com, alifm@linux.ibm.com, walling@linux.ibm.com, cohuck@redhat.com
 
-On 07.06.2018 14:31, no-reply@patchew.org wrote:
-> Hi,
-> 
-> This series seems to have some coding style problems. See output below for
-> more information:
-> 
-> Type: series
-> Message-id: 1528374154-14680-1-git-send-email-thuth@redhat.com
-> Subject: [Qemu-devel] [PATCH v2 0/4] pc-bios/s390-ccw: Allow network booting via pxelinux.cfg
-> 
-> === TEST SCRIPT BEGIN ===
-> #!/bin/bash
-> 
-> BASE=base
-> n=1
-> total=$(git log --oneline $BASE.. | wc -l)
-> failed=0
-> 
-> git config --local diff.renamelimit 0
-> git config --local diff.renames True
-> git config --local diff.algorithm histogram
-> 
-> commits="$(git log --format=%H --reverse $BASE..)"
-> for c in $commits; do
->     echo "Checking PATCH $n/$total: $(git log -n 1 --format=%s $c)..."
->     if ! git show $c --format=email | ./scripts/checkpatch.pl --mailback -; then
->         failed=1
->         echo
->     fi
->     n=$((n+1))
-> done
-> 
-> exit $failed
-> === TEST SCRIPT END ===
-> 
-> Updating 3c8cf5a9c21ff8782164d1def7f44bd888713384
-> From https://github.com/patchew-project/qemu
->    5d328d7d2f..8e36d27c5a  master     -> master
->  * [new tag]               patchew/1528374154-14680-1-git-send-email-thuth@redhat.com -> patchew/1528374154-14680-1-git-send-email-thuth@redhat.com
->  * [new tag]               patchew/1528403460-30526-1-git-send-email-gengdongjiu@huawei.com -> patchew/1528403460-30526-1-git-send-email-gengdongjiu@huawei.com
->  t [tag update]            patchew/20180530180120.13355-1-richard.henderson@linaro.org -> patchew/20180530180120.13355-1-richard.henderson@linaro.org
-> Switched to a new branch 'test'
-> 132ffa3587 pc-bios/s390-ccw/net: Try to load pxelinux.cfg file accoring to the UUID
-> b3b73613ba pc-bios/s390-ccw/net: Add support for pxelinux-style config files
-> 699020402a pc-bios/s390-ccw/net: Update code for the latest changes in SLOF
-> 5dd76a9c89 roms: Update SLOF submodule to current status
-> 
-> === OUTPUT BEGIN ===
-> Checking PATCH 1/4: roms: Update SLOF submodule to current status...
-> Checking PATCH 2/4: pc-bios/s390-ccw/net: Update code for the latest changes in SLOF...
-> Checking PATCH 3/4: pc-bios/s390-ccw/net: Add support for pxelinux-style config files...
-> Checking PATCH 4/4: pc-bios/s390-ccw/net: Try to load pxelinux.cfg file accoring to the UUID...
-> ERROR: space prohibited before open square bracket '['
-> #57: FILE: pc-bios/s390-ccw/netmain.c:267:
-> +                 : [cc] "=d" (cc)
+Hi, Thomas,
 
-Patchew obviously does not know about inline assembly ... I think I
-prefer to keep the space here.
+Thanks for your answer.
 
- Thomas
+The mapping keyboard problem happens only from latests versions of qemu
+for windows. December one, was correct.
+
+My host system is windows 10 and my guest system is an Spanish (Spain
+-Europe-) msdos 5.0.
+
+But if I boot whithout any system (network booting), the altgr problem
+still remains.
+
+Thanks for your answer.
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1101210
+
+Title:
+  qemu 1.4.2: usb keyboard not fully working
+
+Status in QEMU:
+  New
+
+Bug description:
+  When using the usb keyboard, I can't type the | character. I'm using
+  german keyboard layout (de) on the host and inside the guest. As a
+  guest OS, I use Linux (e.g. a recent KNOPPIX cd). To obtain the |
+  character on a german keyboard, I need to press AltGr + the < or >
+  key, i.e. the key right to the left shift.
+
+  The qemu command line is something like this:
+  ./qemu-system-i386 -device pci-ohci -device usb-kbd
+  I also tried
+  ./qemu-system-i386 -usb -usbdevice keyboard
+  with the same effect.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1101210/+subscriptions
