@@ -1,21 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52519)
-	by lists.gnu.org with esmtp (Exim 4.71) (envelope-from <pl@kamp.de>)
-	id 1fQuPg-0007Gj-Dg
-	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 08:53:13 -0400
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52700)
+	by lists.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <armbru@redhat.com>) id 1fQuQm-0007uK-RP
+	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 08:54:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pl@kamp.de>) id 1fQuPd-0003hZ-BC
-	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 08:53:12 -0400
-Received: from mx-v6.kamp.de ([2a02:248:0:51::16]:54224 helo=mx01.kamp.de)
+	(envelope-from <armbru@redhat.com>) id 1fQuQj-00044V-PN
+	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 08:54:20 -0400
+Received: from mx3-rdu2.redhat.com ([66.187.233.73]:39098 helo=mx1.redhat.com)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pl@kamp.de>) id 1fQuPd-0003gH-1c
-	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 08:53:09 -0400
-Received: from submission.kamp.de ([195.62.97.28]) by kerio.kamp.de with ESMTPS
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256 bits))
-	for qemu-devel@nongnu.org; Thu, 7 Jun 2018 14:46:20 +0200
-From: Peter Lieven <pl@kamp.de>
-Date: Thu,  7 Jun 2018 14:46:21 +0200
-Message-Id: <1528375581-29538-1-git-send-email-pl@kamp.de>
-Subject: [Qemu-devel] [PATCH] qemu-img: align is_allocated_sectors to 4k
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1fQuQj-00044D-KV
+	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 08:54:17 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <20180603050546.6827-1-zhangckid@gmail.com>
+	<20180603050546.6827-11-zhangckid@gmail.com>
+	<514033a5-9504-efc2-a208-d38bcff36075@redhat.com>
+Date: Thu, 07 Jun 2018 14:54:15 +0200
+In-Reply-To: <514033a5-9504-efc2-a208-d38bcff36075@redhat.com> (Eric Blake's
+	message of "Mon, 4 Jun 2018 17:23:15 -0500")
+Message-ID: <87in6uwydk.fsf@dusky.pond.sub.org>
+MIME-Version: 1.0
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH V8 10/17] qmp event: Add COLO_EXIT event to
+ notify users while exited COLO
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,71 +29,97 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, qemu-block@nongnu.org
-Cc: kwolf@redhat.com, mreitz@redhat.com, Peter Lieven <pl@kamp.de>
+To: Eric Blake <eblake@redhat.com>
+Cc: Zhang Chen <zhangckid@gmail.com>, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Juan Quintela <quintela@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Jason Wang <jasowang@redhat.com>, zhanghailiang <zhang.zhanghailiang@huawei.com>, Li Zhijian <lizhijian@cn.fujitsu.com>
 
-We currently don't enforce that the sparse segments we detect during convert are
-aligned. This leads to unnecessary and costly read-modify-write cycles either
-internally in Qemu or in the background on the storage device as nearly all
-modern filesystems or hardware has a 4k alignment internally.
+Eric Blake <eblake@redhat.com> writes:
 
-As we per default set the min_sparse size to 4k it makes perfectly sense to ensure
-that these sparse holes in the file are placed at 4k boundaries.
+> On 06/03/2018 12:05 AM, Zhang Chen wrote:
+>> From: zhanghailiang <zhang.zhanghailiang@huawei.com>
+>>
+>> If some errors happen during VM's COLO FT stage, it's important to
+>> notify the users of this event. Together with 'x-colo-lost-heartbeat',
+>> Users can intervene in COLO's failover work immediately.
+>> If users don't want to get involved in COLO's failover verdict,
+>> it is still necessary to notify users that we exited COLO mode.
+>>
+>> Signed-off-by: zhanghailiang <zhang.zhanghailiang@huawei.com>
+>> Signed-off-by: Li Zhijian <lizhijian@cn.fujitsu.com>
+>> Signed-off-by: Zhang Chen <zhangckid@gmail.com>
+>> Reviewed-by: Eric Blake <eblake@redhat.com>
+>> ---
+>>   migration/colo.c    | 31 +++++++++++++++++++++++++++++++
+>>   qapi/migration.json | 38 ++++++++++++++++++++++++++++++++++++++
+>>   2 files changed, 69 insertions(+)
+>>
+>> diff --git a/migration/colo.c b/migration/colo.c
+>> index c083d3696f..bedb677788 100644
+>> --- a/migration/colo.c
+>
+>>   +    /*
+>> +     * There are only two reasons we can go here, some error happened.
+>> +     * Or the user triggered failover.
+>
+> s/go here/get here/
+> s/happened. Or/happened, or/
+>
+>> +++ b/qapi/migration.json
+>> @@ -880,6 +880,44 @@
+>>   { 'enum': 'FailoverStatus',
+>>     'data': [ 'none', 'require', 'active', 'completed', 'relaunch' ] }
+>> +##
+>> +# @COLO_EXIT:
+>> +#
+>> +# Emitted when VM finishes COLO mode due to some errors happening or
+>> +# at the request of users.
+>> +#
+>> +# @mode: report COLO mode when COLO exited.
+>> +#
+>> +# @reason: describes the reason for the COLO exit.
+>> +#
+>> +# Since: 2.13
+>
+> s/2.13/3.0/
+>
+>> +#
+>> +# Example:
+>> +#
+>> +# <- { "timestamp": {"seconds": 2032141960, "microseconds": 417172},
+>> +#      "event": "COLO_EXIT", "data": {"mode": "primary", "reason": "request" } }
+>> +#
+>> +##
+>> +{ 'event': 'COLO_EXIT',
+>> +  'data': {'mode': 'COLOMode', 'reason': 'COLOExitReason' } }
+>> +
+>> +##
+>> +# @COLOExitReason:
+>> +#
+>> +# The reason for a COLO exit
+>> +#
+>> +# @none: no failover has ever happened, This can't occur in the COLO_EXIT event,
+>
+> s/happened,/happened./
 
-The number of RMW cycles when converting an example image [1] to a raw device that
-has 4k sector size is about 4600 4k read requests to perform a total of about 15000
-write requests. With this path the 4600 additional read requests are eliminated.
+While there, wrap the line around column 70, please.
 
-[1] https://cloud-images.ubuntu.com/releases/16.04/release/ubuntu-16.04-server-cloudimg-amd64-disk1.vmdk
+>> +# only in the result of query-colo-status.
+>> +#
+>> +# @request: COLO exit is due to an external request
+>> +#
+>> +# @error: COLO exit is due to an internal error
+>> +#
+>> +# Since: 2.13
+>
+> s/2.13/3.0/
+>
+>> +##
+>> +{ 'enum': 'COLOExitReason',
+>> +  'data': [ 'none', 'request', 'error' ] }
+>> +
+>>   ##
+>>   # @x-colo-lost-heartbeat:
+>>   #
+>>
 
-Signed-off-by: Peter Lieven <pl@kamp.de>
----
- qemu-img.c | 21 +++++++++++++++------
- 1 file changed, 15 insertions(+), 6 deletions(-)
-
-diff --git a/qemu-img.c b/qemu-img.c
-index 75f1610..68eefba 100644
---- a/qemu-img.c
-+++ b/qemu-img.c
-@@ -1096,24 +1096,33 @@ static int64_t find_nonzero(const uint8_t *buf, int64_t n)
-  *
-  * 'pnum' is set to the number of sectors (including and immediately following
-  * the first one) that are known to be in the same allocated/unallocated state.
-+ * The function will try to align 'pnum' to 8 sectors (4k) to avoid unnecassary
-+ * RMW cycles on modern hardware.
-  */
- static int is_allocated_sectors(const uint8_t *buf, int n, int *pnum)
- {
-     bool is_zero;
--    int i;
-+    int i, alignment = 1;
- 
-     if (n <= 0) {
-         *pnum = 0;
-         return 0;
-     }
--    is_zero = buffer_is_zero(buf, 512);
--    for(i = 1; i < n; i++) {
--        buf += 512;
--        if (is_zero != buffer_is_zero(buf, 512)) {
-+
-+    if (!(n & 7)) {
-+        /* the buffer size is dividable by 4k */
-+        alignment = 8;
-+        n /= 8;
-+    }
-+
-+    is_zero = buffer_is_zero(buf, BDRV_SECTOR_SIZE * alignment);
-+    for (i = 1; i < n; i++) {
-+        buf += BDRV_SECTOR_SIZE * alignment;
-+        if (is_zero != buffer_is_zero(buf, BDRV_SECTOR_SIZE * alignment)) {
-             break;
-         }
-     }
--    *pnum = i;
-+    *pnum = i * alignment;
-     return !is_zero;
- }
- 
--- 
-2.7.4
+With these touch-ups:
+Reviewed-by: Markus Armbruster <armbru@redhat.com>
