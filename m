@@ -1,14 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34217)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34216)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1fQyUs-0008B3-DQ
+	(envelope-from <vsementsov@virtuozzo.com>) id 1fQyUs-0008B2-Cl
 	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 13:14:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1fQyUo-00084k-Q8
+	(envelope-from <vsementsov@virtuozzo.com>) id 1fQyUo-00084U-Q2
 	for qemu-devel@nongnu.org; Thu, 07 Jun 2018 13:14:50 -0400
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Thu,  7 Jun 2018 20:14:30 +0300
-Message-Id: <20180607171441.64079-1-vsementsov@virtuozzo.com>
-Subject: [Qemu-devel] [PATCH v2 00/11] NBD reconnect
+Date: Thu,  7 Jun 2018 20:14:37 +0300
+Message-Id: <20180607171441.64079-8-vsementsov@virtuozzo.com>
+In-Reply-To: <20180607171441.64079-1-vsementsov@virtuozzo.com>
+References: <20180607171441.64079-1-vsementsov@virtuozzo.com>
+Subject: [Qemu-devel] [PATCH v2 07/11] block/nbd-client: rename
+ read_reply_co to connection_co
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,45 +23,139 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org, qemu-block@nongnu.org
 Cc: armbru@redhat.com, mreitz@redhat.com, kwolf@redhat.com, pbonzini@redhat.com, eblake@redhat.com, vsementsov@virtuozzo.com, den@openvz.org
 
-Hi all.
+This coroutine will serve nbd reconnects, so, rename it to be something
+more generic.
 
-Here is v2 of NBD reconnect, but it is very very different from v1, so,
-forget about v1.
-The series includes my "NBD reconnect: preliminary refactoring", with
-changes in 05: leave asserts (Eric).
+Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+---
+ block/nbd-client.h |  4 ++--
+ block/nbd-client.c | 24 ++++++++++++------------
+ 2 files changed, 14 insertions(+), 14 deletions(-)
 
-The feature realized inside nbd-client driver and works as follows:
-
-There are two parameters: reconnect-attempts and reconnect-timeout.
-So, we will try to reconnect in case of initial connection failed or
-in case of connection lost. All current and new io operations will wait
-until we make reconnect-attempts tries to reconnect. After this, all
-requests will fail with EIO, but we will continue trying to reconnect.
-
-Vladimir Sementsov-Ogievskiy (11):
-  block/nbd-client: split channel errors from export errors
-  block/nbd: move connection code from block/nbd to block/nbd-client
-  block/nbd-client: split connection from initialization
-  block/nbd-client: fix nbd_reply_chunk_iter_receive
-  block/nbd-client: don't check ioc
-  block/nbd-client: move from quit to state
-  block/nbd-client: rename read_reply_co to connection_co
-  block/nbd-client: move connecting to connection_co
-  block/nbd: add cmdline and qapi parameters for nbd reconnect
-  block/nbd-client: nbd reconnect
-  iotests: test nbd reconnect
-
- qapi/block-core.json          |  12 +-
- block/nbd-client.h            |  23 ++-
- block/nbd-client.c            | 421 ++++++++++++++++++++++++++++++------------
- block/nbd.c                   |  61 +++---
- tests/qemu-iotests/220        |  68 +++++++
- tests/qemu-iotests/220.out    |   7 +
- tests/qemu-iotests/group      |   1 +
- tests/qemu-iotests/iotests.py |   4 +
- 8 files changed, 440 insertions(+), 157 deletions(-)
- create mode 100755 tests/qemu-iotests/220
- create mode 100644 tests/qemu-iotests/220.out
-
+diff --git a/block/nbd-client.h b/block/nbd-client.h
+index 014015cd7e..7cb31e72e6 100644
+--- a/block/nbd-client.h
++++ b/block/nbd-client.h
+@@ -20,7 +20,7 @@
+ typedef struct {
+     Coroutine *coroutine;
+     uint64_t offset;        /* original offset of the request */
+-    bool receiving;         /* waiting for read_reply_co? */
++    bool receiving;         /* waiting for connection_co? */
+ } NBDClientRequest;
+ 
+ typedef enum NBDClientState {
+@@ -38,7 +38,7 @@ typedef struct NBDClientSession {
+ 
+     CoMutex send_mutex;
+     CoQueue free_sema;
+-    Coroutine *read_reply_co;
++    Coroutine *connection_co;
+     int in_flight;
+     NBDClientState state;
+ 
+diff --git a/block/nbd-client.c b/block/nbd-client.c
+index 592fc9196c..97bbb4339a 100644
+--- a/block/nbd-client.c
++++ b/block/nbd-client.c
+@@ -63,7 +63,7 @@ static void nbd_teardown_connection(BlockDriverState *bs)
+     qio_channel_shutdown(client->ioc,
+                          QIO_CHANNEL_SHUTDOWN_BOTH,
+                          NULL);
+-    BDRV_POLL_WHILE(bs, client->read_reply_co);
++    BDRV_POLL_WHILE(bs, client->connection_co);
+ 
+     nbd_client_detach_aio_context(bs);
+     object_unref(OBJECT(client->sioc));
+@@ -72,7 +72,7 @@ static void nbd_teardown_connection(BlockDriverState *bs)
+     client->ioc = NULL;
+ }
+ 
+-static coroutine_fn void nbd_read_reply_entry(void *opaque)
++static coroutine_fn void nbd_connection_entry(void *opaque)
+ {
+     NBDClientSession *s = opaque;
+     uint64_t i;
+@@ -105,14 +105,14 @@ static coroutine_fn void nbd_read_reply_entry(void *opaque)
+         }
+ 
+         /* We're woken up again by the request itself.  Note that there
+-         * is no race between yielding and reentering read_reply_co.  This
++         * is no race between yielding and reentering connection_co.  This
+          * is because:
+          *
+          * - if the request runs on the same AioContext, it is only
+          *   entered after we yield
+          *
+          * - if the request runs on a different AioContext, reentering
+-         *   read_reply_co happens through a bottom half, which can only
++         *   connection_co happens through a bottom half, which can only
+          *   run after we yield.
+          */
+         aio_co_wake(s->requests[i].coroutine);
+@@ -120,7 +120,7 @@ static coroutine_fn void nbd_read_reply_entry(void *opaque)
+     }
+ 
+     nbd_recv_coroutines_wake_all(s);
+-    s->read_reply_co = NULL;
++    s->connection_co = NULL;
+ }
+ 
+ static int nbd_co_send_request(BlockDriverState *bs,
+@@ -426,7 +426,7 @@ static coroutine_fn int nbd_co_do_receive_one_chunk(
+     }
+     *request_ret = 0;
+ 
+-    /* Wait until we're woken up by nbd_read_reply_entry.  */
++    /* Wait until we're woken up by nbd_connection_entry.  */
+     s->requests[i].receiving = true;
+     qemu_coroutine_yield();
+     s->requests[i].receiving = false;
+@@ -501,7 +501,7 @@ static coroutine_fn int nbd_co_do_receive_one_chunk(
+ }
+ 
+ /* nbd_co_receive_one_chunk
+- * Read reply, wake up read_reply_co and set s->quit if needed.
++ * Read reply, wake up connection_co and set s->quit if needed.
+  * Return value is a fatal error code or normal nbd reply error code
+  */
+ static coroutine_fn int nbd_co_receive_one_chunk(
+@@ -515,15 +515,15 @@ static coroutine_fn int nbd_co_receive_one_chunk(
+     if (ret < 0) {
+         nbd_channel_error(s, ret);
+     } else {
+-        /* For assert at loop start in nbd_read_reply_entry */
++        /* For assert at loop start in nbd_connection_entry */
+         if (reply) {
+             *reply = s->reply;
+         }
+         s->reply.handle = 0;
+     }
+ 
+-    if (s->read_reply_co) {
+-        aio_co_wake(s->read_reply_co);
++    if (s->connection_co) {
++        aio_co_wake(s->connection_co);
+     }
+ 
+     return ret;
+@@ -964,7 +964,7 @@ void nbd_client_attach_aio_context(BlockDriverState *bs,
+ {
+     NBDClientSession *client = nbd_get_client_session(bs);
+     qio_channel_attach_aio_context(QIO_CHANNEL(client->ioc), new_context);
+-    aio_co_schedule(new_context, client->read_reply_co);
++    aio_co_schedule(new_context, client->connection_co);
+ }
+ 
+ void nbd_client_close(BlockDriverState *bs)
+@@ -1061,7 +1061,7 @@ static int nbd_client_connect(BlockDriverState *bs,
+     /* Now that we're connected, set the socket to be non-blocking and
+      * kick the reply mechanism.  */
+     qio_channel_set_blocking(QIO_CHANNEL(sioc), false, NULL);
+-    client->read_reply_co = qemu_coroutine_create(nbd_read_reply_entry, client);
++    client->connection_co = qemu_coroutine_create(nbd_connection_entry, client);
+     nbd_client_attach_aio_context(bs, bdrv_get_aio_context(bs));
+ 
+     logout("Established connection with NBD server\n");
 -- 
 2.11.1
